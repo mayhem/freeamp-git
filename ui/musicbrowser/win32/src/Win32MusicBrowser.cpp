@@ -262,6 +262,9 @@ MusicBrowserUI::~MusicBrowserUI()
     DeleteObject(m_hSplitterCursor);
     DeleteObject(m_hPointerCursor);
 
+    if(m_streamsTimer)
+        m_context->timerManager->StopTimer(m_streamsTimer);
+
     if (m_pParent)
     {
         delete m_plm;

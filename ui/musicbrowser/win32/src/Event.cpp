@@ -760,13 +760,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                     }
                     else if(pTreeView->itemNew.hItem == m_hStreamsItem)
                     {
-                        m_fillStreamsThread = Thread::CreateThread();
-	                    m_fillStreamsThread->Create(MusicBrowserUI::streams_timer, this);
-                        
-                        m_context->timerManager->StartTimer(&m_streamsTimer,
-                                                            MusicBrowserUI::streams_timer,
-                                                            60,
-                                                            this);
+                        FillStreams();
                     }
                     else if(pTreeView->itemNew.hItem == m_hFavoritesItem)
                     {

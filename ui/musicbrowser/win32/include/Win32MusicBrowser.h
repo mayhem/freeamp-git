@@ -49,7 +49,7 @@ using namespace std;
 #include "DataIndex.h"
 #include "DropTarget.h"
 #include "timer.h"
-#include "Icecast.h"
+#include "FreeAmpStreams.h"
 
 class FAContext;
 
@@ -278,7 +278,9 @@ class MusicBrowserUI : public UserInterface
     void    FillUncatTracks();
     void    FillPortables();
     void    FillWiredPlanet();
-    void    FillStreams(vector<IcecastStreamInfo> &list);
+    void    FillStreams();
+    void    UpdateStreams(vector<FreeAmpStreamInfo> &list);
+    HTREEITEM MusicBrowserUI::CreateStreamFolder(string& treePath);
     void    FillFavorites();
     int32   GetCurrentItemFromMousePos();
     void    GetSelectedMusicTreeItems(vector<PlaylistItem*>* items);
