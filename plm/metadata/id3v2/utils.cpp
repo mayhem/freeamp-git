@@ -215,7 +215,7 @@ ID3_Err dami::createFile(String name, fstream& file)
     file.close();
   }
     
-  file.open(name.c_str(), ios_base::out | ios::binary | ios::trunc);
+  file.open(name.c_str(), ios::out | ios::binary | ios::trunc);
   if (!file)
   {
     return ID3E_ReadOnly;
