@@ -361,6 +361,8 @@ UserInterface()
 	m_totalFrames		= 0;
     m_currentFrame      = 0;
 
+    m_state = STATE_Stopped;
+
     for(int32 i = 0; i < kNumControls; i++)
     {
         m_controlRegions[i] = NULL;
@@ -440,6 +442,8 @@ Create()
 
     // Create Controls
     CreateControls();
+
+    CreateTooltips();
 }
 
 void 
@@ -795,66 +799,146 @@ void
 FreeAmpUI::
 Notify(int32 command, LPNMHDR notifyMsgHdr)
 {
-    switch( command )
+    if(notifyMsgHdr->code == TTN_NEEDTEXT)
     {
-        case kVolumeControl:
+        int32 idCtrl = notifyMsgHdr->idFrom;
+        LPTOOLTIPTEXT lpttt = (LPTOOLTIPTEXT) notifyMsgHdr; 
+
+        POINT pt;
+
+        GetCursorPos(&pt);
+
+        ScreenToClient(m_hwnd, &pt);
+
+        // tooltips only use rects... we have non-rectangular controls
+        if(PtInRegion(m_controlRegions[idCtrl], pt.x, pt.y))
         {
-            switch(notifyMsgHdr->code)
-            {
-                case DIAL_BUTTON_DOWN:
-                {
-                    m_timeView->Hide();
-                    m_volumeInfoView->Show();
+            switch (idCtrl) 
+            { 
+                case kRepeatControl:
+                    lpttt->lpszText = "Repeat"; 
                     break;
-                }
-
-                case DIAL_BUTTON_UP:
-                {
-                    m_timeView->Show();
-                    m_volumeInfoView->Hide();
+                case kShuffleControl:
+                    lpttt->lpszText = "Shuffle"; 
                     break;
-                }
-
-                case DIAL_MOVE:
-                {
+                case kOpenControl:
+                    lpttt->lpszText = "Open..."; 
                     break;
-                }
+                case kModeControl:
+                    lpttt->lpszText = "Change Player Mode (disabled)"; 
+                    break;
+                case kMinimizeControl:
+                    lpttt->lpszText = "Minimize"; 
+                    break;
+                case kCloseControl:
+                    lpttt->lpszText = "Close"; 
+                    break;
+                case kPlayControl:
+                    if(m_state == STATE_Stopped)
+                        lpttt->lpszText = "Play"; 
+                    else
+                        lpttt->lpszText = "Stop";
+                    break;
+                case kPauseControl:
+                    if(m_state == STATE_Paused)
+                        lpttt->lpszText = "Continue Playing"; 
+                    else
+                        lpttt->lpszText = "Pause"; 
+                    break;
+                case kNextControl:
+                    lpttt->lpszText = "Next Song"; 
+                    break;
+                case kLastControl:
+                    lpttt->lpszText = "Previous Song"; 
+                    break;
+                case kPlaylistControl:
+                    lpttt->lpszText = "Display Playlist (disabled)"; 
+                    break;
+                case kSongInfoControl:
+                    lpttt->lpszText = "Change Display Mode"; 
+                    break;
+                case kVolumeControl:
+                    lpttt->lpszText = "Volume"; 
+                    break;
+                case kSeekControl:
+                    lpttt->lpszText = "Seek"; 
+                    break;
             }
-
-            break;
         }
-
-        case kSeekControl:
+    }
+    else
+    {
+        switch( command )
         {
-            switch(notifyMsgHdr->code)
+            case kVolumeControl:
             {
-                case DIAL_BUTTON_DOWN:
+                switch(notifyMsgHdr->code)
                 {
-                    int32 hours = m_timeView->CurrentHours();
-                    int32 minutes = m_timeView->CurrentMinutes();
-                    int32 seconds = m_timeView->CurrentSeconds();
+                    case DIAL_BUTTON_DOWN:
+                    {
+                        m_timeView->Hide();
+                        m_volumeInfoView->Show();
 
-                    m_lastTimeDisplay = m_timeView->Display();
+                        uint32 volume;
 
-                    m_timeView->SetDisplay(DisplaySeekTime);
-                    m_timeView->SetSeekTime(hours, minutes, seconds);
-                    break;
+                        waveOutGetVolume((HWAVEOUT)WAVE_MAPPER, (DWORD*)&volume);
+
+                        //volume = (uint32)(100 * ((float)LOWORD(volume)/(float)0xffff));
+
+                        m_volumeInfoView->SetVolume(volume);
+
+                        break;
+                    }
+
+                    case DIAL_BUTTON_UP:
+                    {
+                        m_timeView->Show();
+                        m_volumeInfoView->Hide();
+                        break;
+                    }
+
+                    case DIAL_MOVE:
+                    {
+
+                        break;
+                    }
                 }
 
-                case DIAL_BUTTON_UP:
-                {
-                    m_timeView->SetDisplay(m_lastTimeDisplay);
-                    break;
-                }
-
-                case DIAL_MOVE:
-                {
-                    m_timeView->SetSeekTime(0, 11, 36);
-                    break;
-                }
+                break;
             }
 
-            break;
+            case kSeekControl:
+            {
+                switch(notifyMsgHdr->code)
+                {
+                    case DIAL_BUTTON_DOWN:
+                    {
+                        int32 hours = m_timeView->CurrentHours();
+                        int32 minutes = m_timeView->CurrentMinutes();
+                        int32 seconds = m_timeView->CurrentSeconds();
+
+                        m_lastTimeDisplay = m_timeView->Display();
+
+                        m_timeView->SetDisplay(DisplaySeekTime);
+                        m_timeView->SetSeekTime(hours, minutes, seconds);
+                        break;
+                    }
+
+                    case DIAL_BUTTON_UP:
+                    {
+                        m_timeView->SetDisplay(m_lastTimeDisplay);
+                        break;
+                    }
+
+                    case DIAL_MOVE:
+                    {
+                        m_timeView->SetSeekTime(0, 11, 36);
+                        break;
+                    }
+                }
+
+                break;
+            }
         }
     }
 }
@@ -1537,6 +1621,56 @@ CreatePalette()
     m_palette = ::CreatePalette(logicalPalette);
 
     free(logicalPalette);
+}
+
+void
+FreeAmpUI::
+CreateTooltips()
+{
+    // tooltip support
+    HWND hwndTooltip = NULL;
+    HINSTANCE hinst = (HINSTANCE)GetWindowLong( m_hwnd, 
+										        GWL_HINSTANCE);
+
+    hwndTooltip = CreateWindowEx(WS_EX_TOPMOST,
+                                TOOLTIPS_CLASS, 
+                                NULL, 
+                                0, 
+                                CW_USEDEFAULT, 
+                                CW_USEDEFAULT, 
+                                CW_USEDEFAULT, 
+                                CW_USEDEFAULT, 
+                                NULL, 
+                                (HMENU) NULL, 
+                                hinst, 
+                                NULL);
+
+    RECT toolRect;
+    TOOLINFO ti;
+
+    for(int32 i = 0; i < kNumControls; i++)
+    {
+        GetRgnBox(m_controlRegions[i], &toolRect);
+
+        ti.cbSize = sizeof(TOOLINFO); 
+        ti.uFlags =  TTF_SUBCLASS; 
+        ti.hwnd = m_hwnd; 
+        ti.hinst = hinst; 
+        ti.uId = (UINT) i; 
+        ti.lpszText = (LPSTR) LPSTR_TEXTCALLBACK; 
+        ti.rect.left = toolRect.left; 
+        ti.rect.top = toolRect.top; 
+        ti.rect.right = toolRect.right; 
+        ti.rect.bottom = toolRect.bottom; 
+
+        if(i != kStopControl)
+        {
+            SendMessage(hwndTooltip, 
+                    TTM_ADDTOOL, 
+                    0, 
+                    (LPARAM) &ti);
+        }
+    }
 }
 
 void 

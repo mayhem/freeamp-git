@@ -113,6 +113,8 @@ class FreeAmpUI : public UserInterface {
 
     void CreatePalette();
 
+    void CreateTooltips();
+
     void UpdatePlayList();
 
  public:

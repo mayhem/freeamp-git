@@ -124,8 +124,8 @@ MouseMove(int32 x, int32 y, int32 modifiers)
 
         m_offset = abs(m_position % 5) * Width();
 
-        if(y == 0 || y == Height() - 1)
-            SetCursorPos(m_screenPoint.x, m_screenPoint.y);
+        /*if(y == 0 || y == Height() - 1)
+            SetCursorPos(m_screenPoint.x, m_screenPoint.y);*/
 
         Invalidate();
 
@@ -136,6 +136,15 @@ MouseMove(int32 x, int32 y, int32 modifiers)
                     y);
 
         OutputDebugString(buffer);*/
+
+        NMHDR nmhdr;
+
+        nmhdr.hwndFrom = (HWND)this;
+        nmhdr.idFrom = (UINT)m_command;
+        nmhdr.code = (UINT)DIAL_MOVE;
+
+
+        SendMessage(Window(), WM_NOTIFY, (WPARAM)m_command, (LPARAM) &nmhdr);
     }
 }
 
