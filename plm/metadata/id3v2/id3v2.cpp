@@ -273,8 +273,8 @@ bool ID3v2::ReadMetaData(const char* url, MetaData* metadata)
         pData[0] = 0;
         pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
         ID3Field_GetASCII(pField, pData, iDataFieldLen, 1); 
-        if (strlen(pData) > 0)
-           metadata->SetTime(atoi(pData));
+        if (strlen(pData) > 0) 
+           metadata->SetTime(atoi(pData) / 1000);
     }
     pFrame = ID3Tag_FindFrameWithID(pTag, ID3FID_YEAR);
     if (pFrame)
