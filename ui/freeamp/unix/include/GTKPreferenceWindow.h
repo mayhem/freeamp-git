@@ -294,7 +294,7 @@ class GTKPreferenceWindow : public PreferenceWindow
       void ApplyInfo(void);
       void CancelInfo(void);
       
-      void SetInputBufferSize(int newvalue);
+      int  SetInputBufferSize(int newvalue);
       void SetOutputBufferSize(int newvalue);
       void SetPreBufferLength(int newvalue);
 

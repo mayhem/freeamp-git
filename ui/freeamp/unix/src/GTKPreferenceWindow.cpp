@@ -1405,17 +1405,38 @@ GtkWidget *GTKPreferenceWindow::CreatePlugins(void)
     return pane;
 }
 
-void GTKPreferenceWindow::SetInputBufferSize(int newvalue)
+int GTKPreferenceWindow::SetInputBufferSize(int newvalue)
 {
-    proposedValues.inputBufferSize = newvalue;
-    gtk_widget_set_sensitive(applyButton, TRUE);
+    if (newvalue < 8)
+    {
+        MessageDialog oBox(m_pContext);
+        string        oMessage;
+
+        oMessage = string("The input buffer size must be at least 8k.");
+
+        oBox.Show(oMessage.c_str(), "Input buffer size", kMessageOk, true);
+        return proposedValues.inputBufferSize;
+    }
+    else
+    {
+        proposedValues.inputBufferSize = newvalue;
+        gtk_widget_set_sensitive(applyButton, TRUE);
+        return 0;
+    }
 }
 
 static void input_buffer_change(GtkWidget *w, GTKPreferenceWindow *p)
 {
     char *text = gtk_entry_get_text(GTK_ENTRY(w));
     int newdata = atoi(text);
-    p->SetInputBufferSize(newdata);
+    int last = p->SetInputBufferSize(newdata);
+    if (last > 0)
+    {
+        char temp[10];
+
+        sprintf(temp, "%d", last);
+        gtk_entry_set_text(GTK_ENTRY(w), temp);
+    }
 }
 
 void GTKPreferenceWindow::SetOutputBufferSize(int newvalue)
