@@ -1408,7 +1408,7 @@ LMCError(Event *pEvent)
    MessageBox(NULL, ((LMCErrorEvent *) pEvent)->GetError() ,NULL,MB_OK); 
 #endif
    if (m_pmo)
-      Pause(pEvent);
+      Stop(pEvent);
    else
       delete pEvent;
 }
@@ -1510,7 +1510,6 @@ ServiceEvent(Event * pC)
            break;
 
       case INFO_LMCError:
-           printf("Got error event\n");
            LMCError(pC);
            break;
 

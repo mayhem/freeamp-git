@@ -104,7 +104,7 @@ void PhysicalMediaOutput::SetPMI(PhysicalMediaInput *pPMI)
     m_pMutex->Release();
 }
 
-void PhysicalMediaOutput::Pause()
+void PhysicalMediaOutput::Pause(void)
 {
     PipelineUnit::Pause();
 
@@ -113,7 +113,7 @@ void PhysicalMediaOutput::Pause()
     Reset(true);
 }
 
-void PhysicalMediaOutput::Resume()
+void PhysicalMediaOutput::Resume(void)
 {
     if (m_pPmi->PauseLoop(false))
     {
@@ -129,7 +129,7 @@ void PhysicalMediaOutput::Resume()
 
 bool PhysicalMediaOutput::WasteTime()
 {
-    usleep(10000);
+    usleep(50000);
 
     return m_bExit || m_bPause;
 }       

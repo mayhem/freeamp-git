@@ -112,7 +112,7 @@ void PipelineUnit::SetTarget(EventQueue *target)
     m_pMutex->Release();
 }
 
-void PipelineUnit::Pause()
+void PipelineUnit::Pause(void)
 {
     m_pMutex->Acquire();
 
@@ -122,7 +122,7 @@ void PipelineUnit::Pause()
     m_pMutex->Release();
 }
 
-void PipelineUnit::Resume()
+void PipelineUnit::Resume(void)
 {
     m_pMutex->Acquire();
 
@@ -132,7 +132,7 @@ void PipelineUnit::Resume()
     m_pMutex->Release();
 }
 
-void PipelineUnit::Clear()
+void PipelineUnit::Clear(void)
 {
     m_pMutex->Acquire();
 
@@ -142,7 +142,7 @@ void PipelineUnit::Clear()
     m_pMutex->Release();
 }
 
-void PipelineUnit::Wake()
+void PipelineUnit::Wake(void)
 {
     m_pMutex->Acquire();
 
@@ -151,7 +151,7 @@ void PipelineUnit::Wake()
     m_pMutex->Release();
 }
 
-bool PipelineUnit::Sleep()
+bool PipelineUnit::Sleep(void)
 {
     m_pSleepSem->Wait();
 

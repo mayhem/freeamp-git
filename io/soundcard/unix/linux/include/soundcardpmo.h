@@ -74,12 +74,9 @@ class SoundCardPMO:public PhysicalMediaOutput
    bool          WaitForDrain(void);
 
    bool         m_properlyInitialized;
-   int16        buffer[OBUFFERSIZE];
-   int16       *bufferp[MAXCHANNELS];
    uint32       channels;
    static int   audio_fd;
    OutputInfo  *myInfo;
-   int32        getprocessed(void);
    Thread      *m_pBufferThread;
    int          m_iOutputBufferSize, m_iBytesPerSample, m_iTotalFragments;
    long long    m_iTotalBytesWritten;

@@ -158,9 +158,6 @@ Error SoundCardPMO::Init(OutputInfo * info)
 
    channels = info->number_of_channels;
 
-   for (unsigned int i = 0; i < info->number_of_channels; ++i)
-      bufferp[i] = buffer + i;
-
    // configure the device:
    int       play_precision = 16;
    int       play_stereo = channels - 1;

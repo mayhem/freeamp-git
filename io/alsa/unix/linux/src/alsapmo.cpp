@@ -44,11 +44,6 @@ ____________________________________________________________________________*/
 
 #define DB printf("%s:%d\n", __FILE__, __LINE__);
 
-const int iDefaultBufferSize = 512 * 1024;
-const int iOrigBufferSize = 64 * 1024;
-const int iOverflowSize = 0;
-const int iWriteTriggerSize = 8 * 1024;
-
 extern "C"
 {
    PhysicalMediaOutput *Initialize(FAContext *context) {
@@ -57,8 +52,7 @@ extern "C"
 }
 
 AlsaPMO::AlsaPMO(FAContext *context) :
-        EventBuffer(iOrigBufferSize, iOverflowSize,
-		    iWriteTriggerSize, context)
+	    PhysicalMediaOutput(context)
 {
 	uint32 deviceNameSize = 128;
    char scard[128];
@@ -69,11 +63,9 @@ AlsaPMO::AlsaPMO(FAContext *context) :
 
    m_pBufferThread = NULL;
 
-   m_pPauseMutex = new Mutex();
    m_iOutputBufferSize = 0;
-   m_iTotalBytesWritten = 0;
    m_iBytesPerSample = 0;
-   m_iLastFrame = -1;
+   m_iBaseTime = -1;
    m_iDataSize = 0;
 
    if (!m_pBufferThread)
@@ -95,7 +87,7 @@ AlsaPMO::AlsaPMO(FAContext *context) :
    ai->mixer_handle=0;
 
 	ai->device = (char *) malloc(deviceNameSize);
-	m_context->prefs->GetPrefString(kALSADevicePref, ai->device,
+	m_pContext->prefs->GetPrefString(kALSADevicePref, ai->device,
 					&deviceNameSize);
 
    if (ai->device)
@@ -128,27 +120,17 @@ AlsaPMO::AlsaPMO(FAContext *context) :
 
 AlsaPMO::~AlsaPMO() 
 {
-   m_bExit = true;
-   m_pWriteSem->Signal();
-   m_pReadSem->Signal();
-   m_pPauseMutex->Release();
+    m_bExit = true;
+    m_pSleepSem->Signal();
+    m_pPauseSem->Signal();
 
-   if (m_pBufferThread)
-   {
-      m_pBufferThread->Join();
-      delete m_pBufferThread;
-   }
-
-   if (m_pPauseMutex)
-   {
-      delete m_pPauseMutex;
-      m_pPauseMutex = NULL;
-   }
-
-    int err;
-    if ((err=snd_pcm_close(ai->handle)) < 0) {
-            (Error)pmoError_ALSA_DeviceCloseFailed;
+    if (m_pBufferThread)
+    {
+       m_pBufferThread->Join();
+       delete m_pBufferThread;
     }
+
+    snd_pcm_close(ai->handle);
     if (myInfo) {
         delete myInfo;
         myInfo = NULL;
@@ -159,49 +141,9 @@ AlsaPMO::~AlsaPMO()
     }
 }
 
-void AlsaPMO::WaitToQuit()
-{
-   if (m_pBufferThread)
-   {
-      m_pBufferThread->Join();
-      delete m_pBufferThread;
-      m_pBufferThread = NULL;
-   }
-}
-
-Error AlsaPMO::SetPropManager(Properties * p)
-{
-   m_propManager = p;
-   return kError_NoErr;
-}
-
 VolumeManager *AlsaPMO::GetVolumeManager()
 {
    return new ALSAVolumeManager(m_iCard, m_iDevice);
-}
-
-int AlsaPMO::GetBufferPercentage()
-{
-   return PullBuffer::GetBufferPercentage();
-}
-
-Error AlsaPMO::Pause() 
-{
-   m_pPauseMutex->Acquire();
-}
-
-Error AlsaPMO::Resume() {
-   m_pPauseMutex->Release();
-    return kError_NoErr;
-}
-
-Error AlsaPMO::Break()
-{
-   m_bExit = true;
-   Reset(true);
-   PullBuffer::BreakBlocks();
-
-   return kError_NoErr;
 }
 
 Error AlsaPMO::Init(OutputInfo* info) {
@@ -212,21 +154,7 @@ Error AlsaPMO::Init(OutputInfo* info) {
         info = myInfo;
     } else {
         // got info, so this is the beginning...
-        PropValue *pv = NULL, *pProp;
-        int32      iNewSize = iDefaultBufferSize;
-        Error      result;
-   m_iDataSize = info->max_buffer_size;
-	m_context->prefs->GetOutputBufferSize(&iNewSize);
-	iNewSize *= 1024;
-
-        iNewSize -= iNewSize % m_iDataSize;
-        result = Resize(iNewSize, 0, m_iDataSize);
-        if (IsError(result))
-        {
-           ReportError("Internal buffer sizing error occurred.");
-           m_context->log->Error("Resize output buffer failed.");
-           return result;
-        }
+        m_iDataSize = info->max_buffer_size;
 
         if((err=snd_pcm_open(&ai->handle, m_iCard, m_iDevice, SND_PCM_OPEN_PLAYBACK)) < 0 )
         {
@@ -244,8 +172,6 @@ Error AlsaPMO::Init(OutputInfo* info) {
     }
 
     channels = info->number_of_channels;
-    for (int i = 0; i < info->number_of_channels; ++i)
-        bufferp[i] = buffer + i;
     
     // configure the device:
     ai->format=16;
@@ -259,10 +185,14 @@ Error AlsaPMO::Init(OutputInfo* info) {
     myInfo->samples_per_second = info->samples_per_second;
     myInfo->max_buffer_size = info->max_buffer_size;
 
-   snd_pcm_playback_status_t aInfo;
-   snd_pcm_playback_status(&ai->handle,&aInfo);
-   m_iOutputBufferSize = aInfo.fragment_size * aInfo.fragments;
-   m_iBytesPerSample = info->number_of_channels * (info->bits_per_sample / 8);
+    if (snd_pcm_playback_time(ai->handle, true))
+        ReportError("Cannot set soundcard time playback mode.");
+
+    snd_pcm_playback_status_t aInfo;
+    snd_pcm_playback_status(ai->handle,&aInfo);
+    m_iOutputBufferSize = aInfo.fragment_size * aInfo.fragments;
+    m_iTotalFragments = aInfo.fragments;
+    m_iBytesPerSample = info->number_of_channels * (info->bits_per_sample / 8);
 
     m_properlyInitialized = true;
     return kError_NoErr;
@@ -278,46 +208,50 @@ Error AlsaPMO::Reset(bool user_stop) {
     return kError_NoErr;
 }
 
-Error AlsaPMO::BeginWrite(void *&pBuffer, size_t &iBytesToWrite)
+void AlsaPMO::Pause(void)
 {
-   return EventBuffer::BeginWrite(pBuffer, iBytesToWrite);
+    m_iBaseTime = -1;
+
+    PhysicalMediaOutput::Pause();
 }
 
-Error AlsaPMO::EndWrite(size_t iNumBytesWritten)
+bool AlsaPMO::WaitForDrain(void)
 {
-   return EventBuffer::EndWrite(iNumBytesWritten);
-}
+   snd_pcm_playback_status_t ainfo;
 
-Error AlsaPMO::AcceptEvent(Event *pEvent)
-{
-   return EventBuffer::AcceptEvent(pEvent);
-}
-
-Error AlsaPMO::Clear()
-{
-   return EventBuffer::Clear();
-}
+   snd_pcm_playback_status(ai->handle,&ainfo);
+   for(; !m_bExit && !m_bPause; )
+   {
+       snd_pcm_playback_status(ai->handle,&ainfo);
+       if (ainfo.underrun || ainfo.queue  < ainfo.fragment_size)
+       {
+           return true;
+       }
+       WasteTime();
+   }
+   return false;
+} 
 
 void AlsaPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
 {
    MediaTimeInfoEvent *pmtpi;
    int32               hours, minutes, seconds;
    int                 iTotalTime = 0;
-
-   if (pEvent->GetFrameNumber() != m_iLastFrame + 1)
-   {
-       m_iTotalBytesWritten = 1152 * pEvent->GetFrameNumber() * 
-                              m_iBytesPerSample; 
-   }
-   m_iLastFrame = pEvent->GetFrameNumber();
-
-   if (myInfo->samples_per_second <= 0 || pEvent->GetFrameNumber() < 3)
-      return;
-
    snd_pcm_playback_status_t ainfo;
-   snd_pcm_playback_status(&ai->handle,&ainfo);
-   iTotalTime = (m_iTotalBytesWritten) /
-                (m_iBytesPerSample * myInfo->samples_per_second);
+   long long           llStart, llEnd;
+
+   if (m_iBaseTime < 0)
+   {
+       m_iBaseTime = (pEvent->GetFrameNumber() * 1152) / 
+                      myInfo->samples_per_second;
+   }
+
+   snd_pcm_playback_status(ai->handle,&ainfo);
+   llEnd = ((long long)ainfo.time.tv_sec * 100) + 
+           ((long long)ainfo.time.tv_usec / 10000);
+   llStart = ((long long)ainfo.stime.tv_sec * 100) + 
+             ((long long)ainfo.stime.tv_usec / 10000);
+   iTotalTime = ((llEnd - llStart) / 100) + m_iBaseTime;
 
    hours = iTotalTime / 3600;
    minutes = (iTotalTime / 60) % 60;
@@ -330,7 +264,7 @@ void AlsaPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
 
    pmtpi = new MediaTimeInfoEvent(hours, minutes, seconds, 0, 
                                   iTotalTime, 0);
-   m_target->AcceptEvent(pmtpi);
+   m_pTarget->AcceptEvent(pmtpi);
 }
 
 void AlsaPMO::StartWorkerThread(void *pVoidBuffer)
@@ -341,22 +275,41 @@ void AlsaPMO::StartWorkerThread(void *pVoidBuffer)
 void AlsaPMO::WorkerThread(void)
 {
    void                      *pBuffer;
-   size_t                     iToCopy, iCopied;
    Error                      eErr;
    size_t                     iRet;
    Event                     *pEvent;
-   OutputInfo                *pInfo;
    snd_pcm_playback_status_t  ainfo;
+
+   // Don't do anything until resume is called.
+   m_pPauseSem->Wait();
+
+   // The following should be abstracted out into the general thread
+   // classes:
+#ifdef __linux__
+   struct sched_param sParam;
+
+   sParam.sched_priority = sched_get_priority_max(SCHED_OTHER);
+   pthread_setschedparam(pthread_self(), SCHED_OTHER, &sParam);
+#endif
 
    for(; !m_bExit;)
    {
+      if (m_bPause)
+      {
+          m_pPauseSem->Wait();
+          continue;
+      }
+
+      // Loop until we get an Init event from the LMC
       if (!m_properlyInitialized)
       {
-          pEvent = GetEvent();
+          pEvent = ((EventBuffer *)m_pInputBuffer)->GetEvent();
 
           if (pEvent == NULL)
           {
-              m_pReadSem->Wait();
+              m_pLmc->Wake();
+              WasteTime();
+
               continue;
           }
 
@@ -372,118 +325,99 @@ void AlsaPMO::WorkerThread(void)
 
           continue;
       }
-      iToCopy = m_iDataSize;
-      m_pPauseMutex->Acquire();
 
-      eErr = BeginRead(pBuffer, iToCopy);
-      if (eErr == kError_InputUnsuccessful || eErr == kError_NoDataAvail)
-      {
-          m_pPauseMutex->Release();
-          m_pReadSem->Wait();
-          continue;
-      }
-      if (iToCopy < m_iDataSize)
-      {
-          EndRead(0);
-          m_pPauseMutex->Release();
-          m_pReadSem->Wait();
-          continue;
-      }
-      if (eErr == kError_Interrupt)
-      {
-          m_pPauseMutex->Release();
-          break;
-      }
-          
-      if (eErr == kError_EventPending)
-      {
-          m_pPauseMutex->Release();
-
-          pEvent = GetEvent();
-
-          if (pEvent->Type() == PMO_Init)
-              Init(((PMOInitEvent *)pEvent)->GetInfo());
-
-          if (pEvent->Type() == PMO_Reset)
-              Reset(false);
-
-          if (pEvent->Type() == PMO_Info) 
-              HandleTimeInfoEvent((PMOTimeInfoEvent *)pEvent);
-
-          if (pEvent->Type() == PMO_Quit) 
-          {
-              Reset(false);
-              delete pEvent;
-              break;
-          }
- 
-          delete pEvent;
-
-          continue;
-      }
-          
-      if (IsError(eErr))
-      {
-          m_pPauseMutex->Release();
-
-          ReportError("Internal error occured.");
-          m_context->log->Error("Cannot read from buffer in PMO worker tread: %d\n",
-              eErr);
-          break;
-      }
-
+      // Set up reading a block from the buffer. If not enough bytes are
+      // available, sleep for a little while and try again.
       for(;;)
       {
-          iRet = snd_pcm_playback_status(ai->handle,&ainfo);
-          if (ainfo.count < iToCopy)
+          eErr = ((EventBuffer *)m_pInputBuffer)->BeginRead(pBuffer, 
+                                                             m_iDataSize);
+          if (eErr == kError_EndOfStream || eErr == kError_Interrupt)
+             break;
+
+          if (eErr == kError_NoDataAvail)
           {
-              EndRead(0);
-              m_pPauseMutex->Release();
+              m_pLmc->Wake();
 
-              usleep(10000);
+              WasteTime();
+              continue;
+          }
 
-              for(;!m_bExit;)
+          // Is there an event pending that we need to take care of
+          // before we play this block of samples?
+          if (eErr == kError_EventPending)
+          {
+              pEvent = ((EventBuffer *)m_pInputBuffer)->GetEvent();
+
+              if (pEvent->Type() == PMO_Init)
+                  Init(((PMOInitEvent *)pEvent)->GetInfo());
+    
+              if (pEvent->Type() == PMO_Reset)
+                  Reset(false);
+    
+              if (pEvent->Type() == PMO_Info) 
+                  HandleTimeInfoEvent((PMOTimeInfoEvent *)pEvent);
+    
+              if (pEvent->Type() == PMO_Quit) 
               {
-                 if (m_pPauseMutex->Acquire(10000))
-                 {
-                     break;
-                 }
+                  delete pEvent;
+                  if (WaitForDrain())
+                  {
+                     Reset(true);
+                     m_pTarget->AcceptEvent(new Event(INFO_DoneOutputting));
+                  }
+                  return;
               }
-              if (m_bExit)
-                 iToCopy = 0;
+ 
+              delete pEvent;
+    
+              continue;
+          }
+          
+          if (IsError(eErr))
+          {
+              ReportError("Internal error occured.");
+              m_pContext->log->Error("Cannot read from buffer in PMO "
+                                    "worker tread: %d\n", eErr);
+              break;
+          }
+          break;
+      }
 
-              // If beginread returns an error, break out...
-              if (BeginRead(pBuffer, iToCopy) != kError_NoErr)
-                 iToCopy = 0;
+      // Now write the block to the audio device. If the block doesn't
+      // all fit, pause and loop until the entire block has been played.
+      // This loop could be written using non-blocking io...
+      for(;;)
+      {
+          if (m_bExit || m_bPause)
+              break;
 
+          iRet = snd_pcm_playback_status(ai->handle,&ainfo);
+          if (ainfo.count < m_iDataSize)      
+          {
+              WasteTime();
               continue;
           }
           break;
+      }        
+      if (m_bExit || m_bPause)
+      {
+          m_pInputBuffer->EndRead(0);
+          continue;
       }
 
-      iCopied = snd_pcm_write(ai->handle,pBuffer,iToCopy);
-      if (iCopied > 0)
-          m_iTotalBytesWritten += iCopied;
-
-      // Was iToCopy set to zero? If so, we got cleared and should
-      // start from the top
-      if (iToCopy == 0)
+      iRet = snd_pcm_write(ai->handle,pBuffer,m_iDataSize);
+      if (iRet < 0)
       {
-         m_pPauseMutex->Release();
-         continue;
-      }
-
-      if (iCopied < iToCopy)
-      {
-         EndRead(0);
-         m_pPauseMutex->Release();
+         m_pInputBuffer->EndRead(0);
          ReportError("Could not write sound data to the soundcard.");
-         m_context->log->Error("Failed to write to the soundcard\n");
+         m_pContext->log->Error("Failed to write to the soundcard: %s\n", 
+                               strerror(errno));
          break;
       }
 
-      EndRead(iCopied);
-      m_pPauseMutex->Release();
+      m_pInputBuffer->EndRead(iRet);
+      m_pLmc->Wake();
    }
 }
 
@@ -557,8 +491,10 @@ cout<<"AlsaPMO::audio_set_all: format="<<ai->format<<",rate="<<ai->rate<<",chann
 
         bzero(&pp, sizeof(pp));
         pp.fragment_size = pi.buffer_size/4;
-        if (pp.fragment_size > pi.max_fragment_size) pp.fragment_size = pi.max_fragment_size;
-        if (pp.fragment_size < pi.min_fragment_size) pp.fragment_size = pi.min_fragment_size;
+        if ((unsigned)pp.fragment_size > pi.max_fragment_size) 
+            pp.fragment_size = pi.max_fragment_size;
+        if ((unsigned)pp.fragment_size < pi.min_fragment_size) 
+            pp.fragment_size = pi.min_fragment_size;
         pp.fragments_max = -1;
         pp.fragments_room = 1;
 
@@ -569,3 +505,4 @@ cout<<"AlsaPMO::audio_set_all: format="<<ai->format<<",rate="<<ai->rate<<",chann
         }
         return 0;
 }
+

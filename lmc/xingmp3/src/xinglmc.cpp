@@ -51,7 +51,6 @@ ____________________________________________________________________________*/
 #include "facontext.h"
 #include "log.h"
 
-#define DB printf("%s:%d\n", __FILE__, __LINE__);
 const int iInitialOutputBufferSize = 64512;
 
 extern    "C"
@@ -170,6 +169,9 @@ Error XingLMC::AdvanceBufferToNextFrame()
 	Error          Err;
 
    Err = BeginRead(pBufferBase, iMaxFrameSize);
+   if (Err == kError_EndOfStream)
+      return Err;
+
    if (Err != kError_NoErr)
    {
       ReportError(szFailRead);
@@ -245,13 +247,16 @@ Error XingLMC::GetHeadInfo()
            else
               m_pInputBuffer->EndRead(0);
 
-           AdvanceBufferToNextFrame();
+           Err = AdvanceBufferToNextFrame();
+           if (Err != kError_NoErr)
+              return Err;
        }
 		 else
 		 {
-           if (Err != kError_EndOfStream)
+           if (Err != kError_EndOfStream && Err != kError_Interrupt)
+           {
                ReportError(szFailRead);
-
+           }
            return Err;
        }
    }
@@ -259,7 +264,7 @@ Error XingLMC::GetHeadInfo()
    return (Error)lmcError_DecodeFailed;
 }
 
-bool XingLMC::CanDecode()
+Error XingLMC::CanDecode()
 {
    Error      Err;
    int32      dummy;
@@ -267,25 +272,27 @@ bool XingLMC::CanDecode()
    if (!m_pInputBuffer)
    {
       m_pContext->log->Error("CanDecode() called, with no PMI set.\n");
-      return false;
+      return kError_PluginNotInitialized;
    }
 
    if (!m_pPmi->IsStreaming())
        m_pPmi->Seek(dummy, 0, SEEK_FROM_START);
 
    Err = GetHeadInfo();
+   if (Err == kError_Interrupt)
+      return Err;
+
    if (Err != kError_NoErr)
    {
        m_pContext->log->Log(LogDecode, "GetHeadInfo() in CanDecode() could not find the sync marker.\n");
-       return false;
+       return Err;
    }
 
    if (IsError(m_pContext->prefs->
 	       GetStreamBufferInterval(&m_iBufferUpInterval)))
       m_iBufferUpInterval = iDefaultBufferUpInterval;
 
-
-   return true;
+   return kError_NoErr;
 }
 
 Error XingLMC::ExtractMediaInfo()
@@ -494,7 +501,6 @@ void XingLMC::DecodeWorkerThreadFunc(void *pxlmc)
 
 void XingLMC::DecodeWork()
 {
-   bool           bRet;
    void          *pBuffer, *pOutBuffer;
    Error          Err;
    int            iLoop = 0, iValue;
@@ -507,8 +513,10 @@ void XingLMC::DecodeWork()
 
    m_pPmi->Wake();
 
-   bRet = CanDecode();
-   if (!bRet)
+   Err = CanDecode();
+   if (Err == kError_Interrupt)
+      return;
+   if (Err != kError_NoErr)
    {
        m_pContext->log->Error("CanDecode returned false.\n");
        ReportError("This LMC cannot decode this media\n");

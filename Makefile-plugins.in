@@ -87,7 +87,7 @@ plugins/soundcard-$(HOST_OS).pmo: $(SCPMOOBJ)
 
 # alsa
 ALSAOBJ = io/alsa/$(OSDEP)/src/alsapmo.o io/alsa/$(OSDEP)/src/alsavolume.o \
-          io/src/pipeline.o
+          io/src/pipeline.o io/src/pmo.o
 
 plugins/alsa-$(HOST_OS).pmo: $(ALSAOBJ)
 	$(LINKMOD) -o $@ $(ALSAOBJ) -lasound

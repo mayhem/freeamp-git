@@ -80,7 +80,7 @@ class     XingLMC:public LogicalMediaConverter
 
    virtual Error ChangePosition(int32 position);
 
-   virtual bool  CanDecode();
+   virtual Error CanDecode();
    virtual void  Clear();
    virtual Error ExtractMediaInfo();
 

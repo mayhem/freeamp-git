@@ -54,7 +54,7 @@ class LogicalMediaConverter : public PipelineUnit
 
     protected:
 
-      virtual bool  CanDecode() = 0;
+      virtual Error CanDecode() = 0;
       virtual Error ExtractMediaInfo() = 0;
      
       PhysicalMediaInput    *m_pmi;
