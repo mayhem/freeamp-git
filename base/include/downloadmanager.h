@@ -53,7 +53,7 @@ using namespace std;
 #include "registry.h"
 #include "downloadformat.h"
 
-#ifndef WIN32
+#if !defined(WIN32) && !defined(HAVE_BEOS)
 #include <arpa/inet.h>
 #endif
 
