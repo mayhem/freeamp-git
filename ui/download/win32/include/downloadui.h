@@ -102,6 +102,7 @@ class DownloadUI : public UserInterface {
     HWND    m_hwndClose;
     HWND    m_hwndProgress;
     HWND    m_hwndText;
+	HWND    m_hwndCheck;
 
     HIMAGELIST  m_noteImage;
     HBITMAP  m_progressBitmap;

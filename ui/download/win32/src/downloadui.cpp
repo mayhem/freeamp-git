@@ -23,6 +23,7 @@ ____________________________________________________________________________*/
 
 /* system headers */
 #include <windows.h>
+#include <windowsx.h>
 #include <commctrl.h>
 #include <stdio.h>
 #include <math.h>
@@ -448,6 +449,7 @@ BOOL DownloadUI::InitDialog()
     m_hwndClose = GetDlgItem(m_hwnd, IDC_CLOSE);
     m_hwndProgress = GetDlgItem(m_hwnd, IDC_OVERALL_PROGRESS);
     m_hwndText = GetDlgItem(m_hwnd, IDC_FREETRACKS);
+    m_hwndCheck = GetDlgItem(m_hwnd, IDC_CHECK1);
     
     // Set the proc address as a property 
     // of the window so it can get it
@@ -586,6 +588,10 @@ BOOL DownloadUI::InitDialog()
 
     UpdateOverallProgress();*/
 
+	bool checkSet = false;
+	m_prefs->GetPrefBoolean(kCloseDLMOnCompletePref, &checkSet);
+	Button_SetCheck(m_hwndCheck, checkSet);
+	
     m_handCursor = LoadCursor(g_hInstance, MAKEINTRESOURCE(IDC_HAND));
 
     if (strcasecmp(BRANDING_COMPANY, "EMusic") == 0)
@@ -1603,6 +1609,15 @@ BOOL DownloadUI::Command(int32 command, HWND src)
             SendMessage(m_hwnd, WM_CLOSE, 0, 0);
             break;
         }
+		case IDC_CHECK1:
+		{
+			bool checkSet = false;
+			if (Button_GetCheck(m_hwndCheck) == BST_CHECKED)
+				checkSet = true;
+
+			m_prefs->SetPrefBoolean(kCloseDLMOnCompletePref, checkSet);
+			break;
+		}
     }
 
     return TRUE;        
@@ -1900,6 +1915,16 @@ void DownloadUI::UpdateOverallProgress()
     m_totalItems = totalItems;
     m_doneItems = doneItems;
     InvalidateRect(m_hwndProgress, NULL, FALSE);
+
+	if (m_doneItems == m_totalItems && m_totalItems != 0) {
+		bool checkSet = false;
+		if (Button_GetCheck(m_hwndCheck) == BST_CHECKED)
+			checkSet = true;
+
+		if (checkSet) {
+			SendMessage(m_hwnd, WM_CLOSE, 0, 0);
+		}
+	}
 }
 
 LRESULT WINAPI 
