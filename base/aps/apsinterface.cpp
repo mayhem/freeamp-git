@@ -264,7 +264,7 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
         pmetaData->SetComment(temp);
     pmetaData->SetYear(mb_GetResultInt(o, MBE_MEGetYear));
     pmetaData->SetTrack(mb_GetResultInt(o, MBE_MEGetTrackNum));
-    pmetaData->SetLength(mb_GetResultInt(o, MBE_MEGetDuration));
+    pmetaData->SetLength(mb_GetResultInt(o, MBE_MEGetDuration) / 1000);
 
     mb_Delete(o);
 
