@@ -24,7 +24,7 @@ ____________________________________________________________________________*/
 #ifndef INCLUDED_HELP_H
 #define INCLUDED_HELP_H
 
-#define HELP_FILE "freeamp.hlp"
+#define HELP_FILE BRANDING_HELP_FILE
 
 //Main Dialog by default in Help_Finder
 #define FreeAmp_Main_Window	0x0	

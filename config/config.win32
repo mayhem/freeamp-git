@@ -36,16 +36,17 @@ ____________________________________________________________________________*/
 #define The_BRANDING "FreeAmp"
 #define the_BRANDING "FreeAmp"
 
+#define BRANDING_URL "http://www.freeamp.org"
+#define BRANDING_UPDATE_SERVER "fatman.freeamp.org"
+#define BRANDING_UPDATE_PATH "/update/freeamp/"
+#define BRANDING_DEFAULT_THEME "FreeAmp.fat"
+#define BRANDING_HELP_FILE "freeamp.hlp"
+
 // uncomment these lines if branding version != FreeAmp version
 //#define BRANDING_MAJOR_VERSION "2"
 //#define BRANDING_MINOR_VERSION "0"
 //#define BRANDING_REVISION_VERSION "1"
 //#define BRANDING_VERSION BRANDING_MAJOR_VERSION"."BRANDING_MINOR_VERSION"."BRANDING_REVISION_VERSION
-
-#define BRANDING_URL "http://www.freeamp.org"
-#define BRANDING_UPDATE_SERVER "fatman.freeamp.org"
-#define BRANDING_UPDATE_PATH "/update/freeamp/"
-#define BRANDING_DEFAULT_THEME "FreeAmp.fat"
 
 #if !defined(RC_INVOKED)
 
