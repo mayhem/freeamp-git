@@ -49,6 +49,8 @@ PLUGINS += plugins/misc.mdf
 
 PLUGINS += plugins/m3u.plf
 
+PLUGINS += plugins/rmp.dlf
+
 plugins plugins-cc: $(PLUGINS) $(OSDEPPLUGINS)
 
 #
@@ -110,7 +112,8 @@ plugins/esound.pmo: $(ESNDOBJ)
 
 # download manager ui
 DOWNLOADUIOBJ = ui/download/unix/src/downloadui.o \
-                ui/download/unix/src/gtkdownloadui.o 
+                ui/download/unix/src/gtkdownloadui.o \
+                ui/freeamp/unix/src/GTKMessageDialog.o
 
 plugins/download.ui: $(DOWNLOADUIOBJ)
 	$(LINKMOD) -o $@ $(DOWNLOADUIOBJ) $(GTK_LIBS)
@@ -248,6 +251,15 @@ PMP300OBJ = plm/portable/pmp300/pmp300.o plm/portable/pmp300/sba/rio.o
 
 plugins/pmp300.ppp: $(PMP300OBJ)
 	$(LINKMOD) -o $@ $(PMP300OBJ)
+
+# DLM section
+
+#rmo
+
+RMPOBJ = dlm/rmp/rmp.o
+
+plugins/rmp.dlf: $(RMPOBJ)
+	$(LINKMOD) -o $@ $(RMPOBJ)
 
 # zlib section
 

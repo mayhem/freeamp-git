@@ -601,7 +601,7 @@ Error DownloadManager::Download(DownloadItem* item)
 
         m_context->prefs->GetPrefString(kSaveMusicDirPref, destPath, &length);
 
-        strcat(destPath, "\\");
+        strcat(destPath, DIR_MARKER_STR);
         strcat(destPath, item->DestinationFile().c_str());
 
         result = kError_ProtocolNotSupported;
@@ -1082,7 +1082,7 @@ void DownloadManager::CleanUpDownload(DownloadItem* item)
 
     m_context->prefs->GetPrefString(kSaveMusicDirPref, path, &length);
 
-    strcat(path, "\\");
+    strcat(path, DIR_MARKER_STR);
     strcat(path, item->DestinationFile().c_str());
 
     remove(path);

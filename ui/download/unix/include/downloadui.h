@@ -56,6 +56,7 @@ class DownloadUI : public UserInterface {
     void PauseEvent(void);
     void ResumeEvent(void);
     void SelChangeEvent(int row);
+    void AddURLEvent(void);
 
  protected:
 
@@ -99,7 +100,9 @@ class DownloadUI : public UserInterface {
     GtkWidget *playlist;
     GtkWidget *name;
     GtkWidget *size;
-    
+   
+    GtkWidget *addEntry;
+ 
     vector<DownloadItem *> downloadList;
     
 };

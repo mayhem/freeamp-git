@@ -34,7 +34,7 @@ using namespace std;
 #include "errors.h"
 #include "facontext.h"
 #include "Parse.h"
-#include "MetaData.h"
+#include "metadata.h"
 
 #include "downloadformat.h"
 #include "downloadmanager.h"

@@ -244,3 +244,34 @@ void DownloadUI::SelChangeEvent(int row)
     UpdateInfo();
 }
 
+void DownloadUI::AddURLEvent(void)
+{
+    char *text = gtk_entry_get_text(GTK_ENTRY(addEntry));
+    if (text) {
+        uint32 length = strlen(text);
+        if (length) {
+            length++;
+            char *sp = NULL;
+            char *url = new char[length + 7];
+ 
+            strcpy(url+7, text);
+
+            if ((sp = strstr(url + 7, "://"))) {
+                if (strncasecmp(url + 7, "http://", 7)) {
+                    // error
+                    delete [] url;
+                    return;
+                }
+                sp = url + 7;
+            }
+            else {
+                memcpy(url, "http://", 7);
+                sp = url;
+            }
+
+        m_dlm->AddItem(sp);
+
+        delete [] url;
+        }
+    }
+}

@@ -239,6 +239,11 @@ void resume_internal(GtkWidget *w, DownloadUI *p)
     p->ResumeEvent();
 }
 
+void add_button_event(GtkWidget *w, DownloadUI *p)
+{
+    p->AddURLEvent();
+}
+
 void DownloadUI::CreateDownloadUI(void)
 {
     m_downloadUI = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -251,6 +256,25 @@ void DownloadUI::CreateDownloadUI(void)
     GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
     gtk_container_add(GTK_CONTAINER(m_downloadUI), vbox);
     gtk_widget_show(vbox);
+
+    GtkWidget *addHbox = gtk_hbox_new(FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), addHbox, FALSE, FALSE, 5);
+    gtk_widget_show(addHbox);
+
+    GtkWidget *label = gtk_label_new("Add URL: ");
+    gtk_box_pack_start(GTK_BOX(addHbox), label, FALSE, FALSE, 5);
+    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5); 
+    gtk_widget_show(label);
+
+    addEntry = gtk_entry_new();
+    gtk_box_pack_start(GTK_BOX(addHbox), addEntry, TRUE, TRUE, 0);
+    gtk_widget_show(addEntry);
+
+    GtkWidget *addButton = gtk_button_new_with_label(" Add ");
+    gtk_signal_connect(GTK_OBJECT(addButton), "clicked",
+                       GTK_SIGNAL_FUNC(add_button_event), this);
+    gtk_box_pack_start(GTK_BOX(addHbox), addButton, FALSE, FALSE, 5);
+    gtk_widget_show(addButton);
 
     GtkWidget *listwindow = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(listwindow),
@@ -267,7 +291,6 @@ void DownloadUI::CreateDownloadUI(void)
     gtk_box_pack_start(GTK_BOX(vbox), table, FALSE, FALSE, 0);
     gtk_widget_show(table);
 
-    GtkWidget *label;
     label = gtk_label_new("Artist:");
     gtk_misc_set_alignment(GTK_MISC(label), (gfloat)0.0, (gfloat)0.5);
     gtk_table_attach(GTK_TABLE(table), label, 0, 1, 0, 1, GTK_FILL, GTK_FILL,
@@ -352,7 +375,7 @@ void DownloadUI::CreateDownloadUI(void)
     gtk_widget_show(sep);
 
     GtkWidget *hbox = gtk_hbox_new(FALSE, 0);
-    gtk_box_pack_end(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
+    gtk_box_pack_end(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
     gtk_widget_show(hbox);
 
     m_CancelButton = gtk_button_new_with_label("Cancel Download");
