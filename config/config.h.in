@@ -63,6 +63,8 @@ ____________________________________________________________________________*/
 #define HAVE_IO_H 0
 #define HAVE_ERRNO_H 0
 
+#undef WORDS_BIGENDIAN
+
 /* cdaudio stuff */
 #undef HAVE_GETMNTENT
 #undef STDC_HEADERS

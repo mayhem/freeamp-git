@@ -42,6 +42,7 @@ AC_CHECK_FUNCS(getmntinfo)
 AC_FUNC_GETMNTENT
 
 AC_C_CONST
+AC_C_BIGENDIAN
 
 dnl Checks for libraries.
 
@@ -643,7 +644,11 @@ if test "x$enable_x86" = "xyes"; then
   if expr "$host_cpu" : "i.86$" > /dev/null; then
     if test -n "$NASM"; then
       AC_MSG_RESULT([Using x86 optimizations])
-      XINGASM="`echo lmc/xingmp3/src/{cdct,cwin,cwin8,mdct,msis}asm.o`"
+      XINGASM="`echo lmc/xingmp3/src/cdctasm.o \
+                     lmc/xingmp3/src/crwinasm.o \
+                     lmc/xingmp3/src/cwin8asm.o \
+                     lmc/xingmp3/src/mdctasm.o \
+                     lmc/xingmp3/src/msisasm.o`"
       AC_DEFINE(ASM_X86)
     else
       AC_MSG_RESULT([nasm not available, using older x86 optimizations])

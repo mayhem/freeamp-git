@@ -58,6 +58,14 @@ ____________________________________________________________________________*/
 #endif
 
 #ifndef LITTLE_ENDIAN
+#if defined(WORDS_BIGENDIAN)
+#define LITTLE_ENDIAN 0
+#else
+#define LITTLE_ENDIAN 1
+#endif
+#endif
+
+#ifndef LITTLE_ENDIAN
 #error Layer III LITTLE_ENDIAN must be defined 0 or 1
 #endif
 
