@@ -117,6 +117,7 @@ XingLMC::XingLMC(FAContext *context) :
    m_pPmo = NULL;
    m_fpFile = NULL;
    m_pLocalReadBuffer = NULL;
+   m_pXingHeader = NULL;
 }
 
 XingLMC::~XingLMC()
@@ -132,6 +133,11 @@ XingLMC::~XingLMC()
 
       delete m_decoderThread;
       m_decoderThread = NULL;
+   }
+   if (m_pXingHeader)
+   {
+      delete m_pXingHeader->toc;
+      delete m_pXingHeader;
    }
 }
 
@@ -239,13 +245,29 @@ Error XingLMC::GetHeadInfo()
                                     m_frameBytes + iForward + m_sMpegHead.pad,
                                     iMaxFrameSize - (m_frameBytes + iForward), 
                                     &sHead, &iBitRate, &iForward);
-              EndRead(0);
 
               if (m_frameBytes > 0 && m_frameBytes < iMaxFrameSize && 
                  (m_sMpegHead.option == 1 || m_sMpegHead.option == 2))
               {
+                 if (m_pXingHeader)
+                 {
+                    delete m_pXingHeader->toc;
+                    delete m_pXingHeader;
+                 }   
+                 
+                 m_pXingHeader = new XHEADDATA;
+                 m_pXingHeader->toc = new unsigned char[100];
+                 if (!GetXingHeader(m_pXingHeader, (unsigned char *)pBuffer))
+                 {
+                    delete m_pXingHeader->toc;
+                    delete m_pXingHeader;
+                    m_pXingHeader = NULL;
+                 }    
+              
+                 EndRead(0);
                  return kError_NoErr;
               }
+              EndRead(0);
            }
            else
            {
@@ -310,53 +332,15 @@ Error XingLMC::CanDecode()
 
 Error XingLMC::ExtractMediaInfo()
 {
-   int32           totalFrames = 0;
-   int32           bytesPerFrame;
-   size_t          end;
-   Error           Err;
-   float           totalSeconds;
+   int32           totalFrames = 0, samprate, layer;
+   Error           eRet;
+   float           totalSeconds, fMsPerFrame;
    MediaInfoEvent *pMIE;
 
-   if (!m_pPmi)
-      return kError_NullValueInvalid;
- 
-   if (m_frameBytes < 0)
-   {
-       Err = GetHeadInfo();
-		 if (Err != kError_NoErr)
-		    return Err;
-   }
-
-   if (m_pPmi->GetLength(end) == kError_FileSeekNotSupported)
-      end = 0;
-
-   int32     sampRateIndex = 4 * m_sMpegHead.id + m_sMpegHead.sr_index;
-   int32     samprate = sample_rate_table[sampRateIndex];
-
-   if ((m_sMpegHead.sync & 1) == 0)
-        samprate = samprate / 2;    // mpeg25
-
-   double    milliseconds_per_frame = 0;
-   static int32 l[4] = {25, 3, 2, 1};
-
-   int32     layer = l[m_sMpegHead.option];
-   if (m_sMpegHead.id == 1)
-      milliseconds_per_frame = (double)(1152 * 1000) / (double)samprate;
-   else   
-      milliseconds_per_frame = (double)(576 * 1000) / (double)samprate;
-
-   if (end > 0)
-   {
-       bytesPerFrame = m_frameBytes;
-       totalFrames = end / bytesPerFrame;
-       totalSeconds = (float) ((double) totalFrames * 
-                      (double) milliseconds_per_frame / 1000);
-   }
-   else
-   {
-       totalFrames = -1;
-       totalSeconds = -1;
-   }
+   eRet = GetBitstreamStats(totalSeconds, fMsPerFrame,
+                            totalFrames, samprate, layer);
+   if (IsError(eRet))
+      return eRet; 
 
    pMIE = new MediaInfoEvent(m_pPmi->Url(), totalSeconds);
 
@@ -364,7 +348,7 @@ Error XingLMC::ExtractMediaInfo()
       return kError_OutOfMemory;
 
    /*LEAK*/MpegInfoEvent *mie = new MpegInfoEvent(totalFrames,
-                       (float)(milliseconds_per_frame / 1000), m_frameBytes,
+                       (float)(fMsPerFrame / 1000), m_frameBytes,
                        m_iBitRate, samprate, layer,
                        (m_sMpegHead.sync == 2) ? 3 : (m_sMpegHead.id) ? 1 : 2,
                        (m_sMpegHead.mode == 0x3 ? 1 : 2), 
@@ -388,11 +372,10 @@ Error XingLMC::ExtractMediaInfo()
    return kError_NoErr;
 }
 
-bool XingLMC::GetBitstreamStats(float &fTotalSeconds, float &fMsPerFrame,
-                                int &iTotalFrames, int &iSampleRate, 
-                                int &iLayer)
+Error XingLMC::GetBitstreamStats(float &fTotalSeconds, float &fMsPerFrame,
+                                 int &iTotalFrames, int &iSampleRate, 
+                                 int &iLayer)
 {
-   size_t       end;
    Error        Err;
    static int32 l[4] = {25, 3, 2, 1};
    int32        sampRateIndex;
@@ -401,24 +384,24 @@ bool XingLMC::GetBitstreamStats(float &fTotalSeconds, float &fMsPerFrame,
    iTotalFrames = iSampleRate = iLayer = 0;
 
    if (!m_pPmi && !m_fpFile)
-      return false;
+      return kError_NullValueInvalid;
  
    if (m_frameBytes < 0)
    {
        Err = GetHeadInfo();
        if (Err != kError_NoErr)
-		    return false;
+		    return Err;
    }
 
    if (m_fpFile)
    {
       fseek(m_fpFile, 0, SEEK_END);
-      end = ftell(m_fpFile);
+      m_lFileSize = ftell(m_fpFile);
       fseek(m_fpFile, 0, SEEK_SET);
    }
    else   
-      if (m_pPmi->GetLength(end) == kError_FileSeekNotSupported)
-          end = 0;
+      if (m_pPmi->GetLength(m_lFileSize) == kError_FileSeekNotSupported)
+          m_lFileSize = 0;
 
    sampRateIndex = 4 * m_sMpegHead.id + m_sMpegHead.sr_index;
    iSampleRate = sample_rate_table[sampRateIndex];
@@ -432,9 +415,13 @@ bool XingLMC::GetBitstreamStats(float &fTotalSeconds, float &fMsPerFrame,
    else   
       fMsPerFrame = (double)(576 * 1000) / (double)iSampleRate;
 
-   if (end > 0)
+   if (m_lFileSize > 0)
    {
-       iTotalFrames = end / m_frameBytes;
+       if (m_pXingHeader)
+          iTotalFrames = m_pXingHeader->frames;
+       else    
+          iTotalFrames = m_lFileSize / m_frameBytes;
+           
        fTotalSeconds = (float) ((double) iTotalFrames * 
                                 (double) fMsPerFrame / 1000);
    }
@@ -444,7 +431,7 @@ bool XingLMC::GetBitstreamStats(float &fTotalSeconds, float &fMsPerFrame,
        fTotalSeconds = -1;
    }
    
-   return true;
+   return kError_NoErr;
 }
 
 uint32 XingLMC::CalculateSongLength(const char *szUrl)
@@ -453,19 +440,19 @@ uint32 XingLMC::CalculateSongLength(const char *szUrl)
     uint32 len = MAX_PATH;
     float  fTotalSeconds, fMsPerFrame;
     int    iTotalFrames, iSampleRate, iLayer;
-    bool   bRet;
+    Error  eRet;
 
     URLToFilePath(szUrl, path, &len);
     m_fpFile = fopen(path, "rb");
     if (m_fpFile == NULL)
        return 0;
 
-    bRet = GetBitstreamStats(fTotalSeconds, fMsPerFrame, iTotalFrames, 
+    eRet = GetBitstreamStats(fTotalSeconds, fMsPerFrame, iTotalFrames, 
                               iSampleRate, iLayer);
     fclose(m_fpFile);
     m_fpFile = NULL;
                               
-    if (bRet)   
+    if (!IsError(eRet))   
     {
         if (fTotalSeconds < 0)
            return 0;
@@ -474,6 +461,108 @@ uint32 XingLMC::CalculateSongLength(const char *szUrl)
     }
     
     return 0;
+}
+
+int XingLMC::ExtractI4(unsigned char *buf)
+{
+    int x;
+    // big endian extract
+    
+    x = buf[0];
+    x <<= 8;
+    x |= buf[1];
+    x <<= 8;
+    x |= buf[2];
+    x <<= 8;
+    x |= buf[3];
+    
+    return x;
+}
+
+int XingLMC::GetXingHeader(XHEADDATA *X,  unsigned char *buf)
+{
+    int i, head_flags;
+    int h_id, h_mode, h_sr_index;
+    static int sr_table[4] = { 44100, 48000, 32000, 99999 };
+    
+    // get Xing header data
+    X->flags = 0;     // clear to null incase fail
+    
+    // get selected MPEG header data
+    h_id       = (buf[1] >> 3) & 1;
+    h_sr_index = (buf[2] >> 2) & 3;
+    h_mode     = (buf[3] >> 6) & 3;
+    
+    
+    // determine offset of header
+    if( h_id ) {        // mpeg1
+        if( h_mode != 3 ) buf+=(32+4);
+        else              buf+=(17+4);
+    }
+    else {      // mpeg2
+        if( h_mode != 3 ) buf+=(17+4);
+        else              buf+=(9+4);
+    }
+    
+    if( buf[0] != 'X' ) return 0;    // fail
+    if( buf[1] != 'i' ) return 0;    // header not found
+    if( buf[2] != 'n' ) return 0;
+    if( buf[3] != 'g' ) return 0;
+    buf+=4;
+    
+    X->h_id = h_id;
+    X->samprate = sr_table[h_sr_index];
+    if( h_id == 0 ) X->samprate >>= 1;
+    
+    head_flags = X->flags = ExtractI4(buf); buf+=4;      // get flags
+    
+    if( head_flags & FRAMES_FLAG ) {X->frames   = ExtractI4(buf); buf+=4;}
+    if( head_flags & BYTES_FLAG )  {X->bytes = ExtractI4(buf); buf+=4;}
+    
+    if( head_flags & TOC_FLAG ) {
+        if( X->toc != NULL ) {
+            for(i=0;i<100;i++) X->toc[i] = buf[i];
+        }
+        buf+=100;
+    }
+    
+    X->vbr_scale = -1;
+    if( head_flags & VBR_SCALE_FLAG )  {X->vbr_scale = ExtractI4(buf); buf+=4;}
+    
+    //if( X->toc != NULL ) {
+    //for(i=0;i<100;i++) {
+    //    if( (i%10) == 0 ) printf("\n");
+    //    printf(" %3d", (int)(X->toc[i]));
+    //}
+    //}
+    
+    return 1;       // success
+}
+
+int XingLMC::SeekPoint(unsigned char TOC[100], int file_bytes, float percent)
+{
+    // interpolate in TOC to get file seek point in bytes
+    int a, seekpoint;
+    float fa, fb, fx;
+    
+    if( percent < 0.0f )   percent = 0.0f;
+    if( percent > 100.0f ) percent = 100.0f;
+    
+    a = (int)percent;
+    if( a > 99 ) a = 99;
+    fa = TOC[a];
+    if( a < 99 ) {
+        fb = TOC[a+1];
+    }
+    else {
+        fb = 256.0f;
+    }
+    
+    fx = fa + (fb-fa)*(percent-a);
+    
+    seekpoint = (int)((1.0f/256.0f)*fx*file_bytes); 
+    
+    return seekpoint;
 }
 
 Error XingLMC::InitDecoder()
@@ -926,10 +1015,19 @@ Error XingLMC::SetEQData(bool enable) {
 
 Error XingLMC::ChangePosition(int32 position)
 {
-   m_frameCounter = position;
+   int32   dummy;
+   uint32  lSeekTo;
 
-   int32 dummy;
-   m_pPmi->Seek(dummy, position * m_frameBytes, SEEK_FROM_START);
+   
+   m_frameCounter = position;
+   if (m_pXingHeader)
+      lSeekTo = XingLMC::SeekPoint(m_pXingHeader->toc, m_lFileSize, 
+                                   (float)position * 100/
+                                   (float)m_pXingHeader->frames);
+   else
+      lSeekTo = position * m_frameBytes;
+      
+   m_pPmi->Seek(dummy, lSeekTo, SEEK_FROM_START);
 
    return kError_NoErr;
 }
