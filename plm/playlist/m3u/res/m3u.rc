@@ -73,7 +73,7 @@ BEGIN
             VALUE "Comments", "For the latest version go to http://www.freeamp.org\0"
             VALUE "CompanyName", "FreeAmp Open Source Development Effort\0"
             VALUE "FileDescription", "The M3U Playlist plugin allows FreeAmp to read and write external playlists in the M3U format.\0"
-            VALUE "FileVersion", "2.0.1.0\0"
+            VALUE "FileVersion", "2.0.2.0\0"
             VALUE "InternalName", "m3u\0"
             VALUE "LegalCopyright", "http://www.gnu.org/copyleft/gpl.html\0"
             VALUE "LegalTrademarks", "FreeAmp\0"

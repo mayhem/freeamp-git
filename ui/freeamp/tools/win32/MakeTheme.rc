@@ -73,7 +73,7 @@ BEGIN
             VALUE "Comments", "For the latest version go to http://www.freeamp.org\0"
             VALUE "CompanyName", "FreeAmp Open Source Development Effort\0"
             VALUE "FileDescription", "This program creates FreeAmp Theme (FAT) files. \0"
-            VALUE "FileVersion", "2.0.1.0\0"
+            VALUE "FileVersion", "2.0.2.0\0"
             VALUE "InternalName", "FreeAmp\0"
             VALUE "LegalCopyright", "http://www.gnu.org/copyleft/gpl.html\0"
             VALUE "OriginalFilename", "MakeTheme.exe\0"
