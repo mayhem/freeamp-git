@@ -56,35 +56,33 @@ if test "$x11"="true"; then
   AC_PATH_XTRA
 
   if test "x$no_x" = "xyes"; then 
-    AC_MSG_ERROR([
-*** X libraries or include files not found. Check 'config.log' for 
-*** more details.])
+     x11="false"
+     echo X11 not found. X11 UI build disabled.
+  else
+
+    CFLAGS="$CFLAGS $X_CFLAGS"
+    LDFLAGS="$LDFLAGS $X_LDFLAGS $X_LIBS"
+
+    AC_CHECK_LIB(X11, XOpenDisplay, x11="true",
+      x11="false"
+      echo X11 not found. X11 UI build disabled.
+    )
+
+    if test "$x11" = "true"; then
+       AC_CHECK_LIB(Xext, XShapeQueryExtension, x11="true",
+         x11="false"
+         echo X11 Shape Extension not found.  X11 UI build disabled.
+       )
+
+    fi
+
+    if test "$x11" = "true"; then
+       AC_CHECK_HEADER(X11/xpm.h, x11="true",
+         x11="false"
+         echo XPM Header not found. X11 UI build disabled.
+       )
+    fi
   fi
-
-  CFLAGS="$CFLAGS $X_CFLAGS"
-  LDFLAGS="$LDFLAGS $X_LDFLAGS $X_LIBS"
-
-  AC_CHECK_LIB(X11, XOpenDisplay, x11="true",
-    x11="false"
-    echo X11 not found. X11 UI build disabled.
-  )
-
-  if test "$x11" = "true"; then
-     AC_CHECK_LIB(Xext, XShapeQueryExtension, x11="true",
-       x11="false"
-       echo X11 Shape Extension not found.  X11 UI build disabled.
-     )
-
-  fi
-
-
-  if test "$x11" = "true"; then
-     AC_CHECK_HEADER(X11/xpm.h, x11="true",
-       x11="false"
-       echo XPM Header not found. X11 UI build disabled.
-     )
-  fi
-
   dnl ******************
   dnl Check for libc5.  If found warn the user about potential problems
   dnl ******************
