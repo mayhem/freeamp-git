@@ -61,7 +61,7 @@ class GTKMusicBrowser {
 
     void ShowPlaylist(void);
     void ShowMusicBrowser(void);
-    void Close(void);
+    void Close(bool inMain = true);
  
     bool Visible(void) { return isVisible; }
     int32 AcceptEvent(Event *e);
@@ -79,7 +79,7 @@ class GTKMusicBrowser {
     void UpdateCatalog(void);
 
     int pauseState;
-    int playState;
+    int stopState;
 
  protected:
     FAContext *m_context;
@@ -159,7 +159,8 @@ class GTKMusicBrowser {
     void MoveItemEvent(int source, int dest);
     void AddTrackPlaylistEvent(char *path);
     void AddTrackPlaylistEvent(PlaylistItem *newitem);
-    void AddTracksPlaylistEvent(vector<PlaylistItem *> *newlist);
+    void AddTracksPlaylistEvent(vector<PlaylistItem *> *newlist, 
+                                bool end = false);
     void PlayEvent();
     void StartMusicSearch(bool runMain = true);
     void SortPlaylistEvent(PlaylistSortKey order, PlaylistSortType type);
@@ -171,7 +172,7 @@ class GTKMusicBrowser {
     void CreateNewEditor(char *playlisturl);
 
     void ShowOptions(void);
-    void PauseMenu(void);
+    void StopMenu(void);
     void PlayMenu(void);
     void NextMenu(void);
     void PrevMenu(void);

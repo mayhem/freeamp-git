@@ -285,6 +285,11 @@ Error MusicCatalog::AddSong(const char *url)
         m_context->target->AcceptEvent(new MusicCatalogTrackAddedEvent(newtrack, NULL, NULL));
     }
     else {
+        if (meta->Album() == " " || meta->Album().size() == 0)
+            meta->SetAlbum("Unknown");
+        if (meta->Title() == " " || meta->Title().size() == 0)
+            meta->SetTitle("Unknown");
+
         bool found_artist = false;
         vector<ArtistList *>::iterator i = m_artistList->begin();
         for (; i != m_artistList->end(); i++) {
@@ -329,7 +334,6 @@ Error MusicCatalog::AddSong(const char *url)
             newartist->m_albumList->push_back(newalbum);
             m_artistList->push_back(newartist);
             m_context->target->AcceptEvent(new MusicCatalogTrackAddedEvent(newtrack, newartist, newalbum));
-
         }
     }
     return kError_NoErr;

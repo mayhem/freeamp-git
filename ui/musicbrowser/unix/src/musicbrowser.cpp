@@ -61,6 +61,10 @@ Error MusicBrowserUI::Init(int32 startup_level)
     m_argc = m_context->argc;
     m_argv = m_context->argv;
 
+    string URL = string("file://") + FreeampDir(NULL) +
+                 string("/currentlist.m3u");
+    mainBrowser = new GTKMusicBrowser(m_context, this, URL);
+
     gtkThread = Thread::CreateThread();
     gtkThread->Create(MusicBrowserUI::gtkServiceFunction, this);
 
@@ -84,10 +88,6 @@ void MusicBrowserUI::GTKEventService(void)
     weAreGTK = false;
     doQuitNow = false;
  
-    string URL = string("file://") + FreeampDir(NULL) + 
-                 string("/currentlist.m3u");
-    mainBrowser = new GTKMusicBrowser(m_context, this, URL);
-
     m_context->gtkLock.Acquire();
     if (!m_context->gtkInitialized) {
         m_context->gtkInitialized = true;
@@ -109,13 +109,12 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
 {
     switch (event->Type()) {
         case CMD_Cleanup: {
-            mainBrowser->Close();
+            mainBrowser->Close(false);
             delete mainBrowser;
 
             vector<GTKMusicBrowser *>::iterator i = browserWindows.begin();
             for (; i != browserWindows.end(); i++) {
-                (*i)->Close();
-                delete (*i);
+                (*i)->Close(false);
             }
 
             if (weAreGTK) 
@@ -151,10 +150,20 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
         case CMD_AddFiles:
         case INFO_Paused:
         case INFO_Stopped:
-        case INFO_Playing:
+        case INFO_Playing: {
+            if (mainBrowser->Visible())
+                mainBrowser->AcceptEvent(event);
+            break; }
+        case INFO_MusicCatalogPlaylistAdded:
+        case INFO_MusicCatalogPlaylistRemoved:
+        case INFO_MusicCatalogTrackRemoved: 
         case INFO_MusicCatalogTrackAdded: {
             if (mainBrowser->Visible())
                 mainBrowser->AcceptEvent(event);
+            vector<GTKMusicBrowser *>::iterator i = browserWindows.begin();
+            for (; i != browserWindows.end(); i++)
+                if ((*i)->Visible())
+                    (*i)->AcceptEvent(event);
             break; }
         default:
             break;
