@@ -1230,6 +1230,8 @@ void Player::HandleMediaInfo(Event *pEvent)
       m_autoplay = false;
       AcceptEvent(new Event(CMD_Play));
    }
+
+   delete pEvent;
 }
 
 void Player::HandleMediaTimeInfo(Event *pEvent)

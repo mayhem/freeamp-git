@@ -525,6 +525,7 @@ void SoundCardPMO::WorkerThread(void)
 
               continue;
           }
+          
           iRet = write(audio_fd, pBuffer, iToCopy);
           if (iRet > 0)
           {
