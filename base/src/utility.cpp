@@ -838,8 +838,11 @@ bool ShowHelp(FAContext *m_context, const char *helpurl)
          return false;
     }
 
-#ifdef UNIX 
-    LaunchBrowser((char *)oHelpFile.c_str());
+    len = _MAX_PATH;
+    FilePathToURL(oHelpFile.c_str(), dir, &len);
+
+#ifdef HAVE_GTK 
+    LaunchBrowser(dir);
 #endif
 #ifdef WIN32
 
@@ -851,8 +854,6 @@ bool ShowHelp(FAContext *m_context, const char *helpurl)
     else
        hWnd = (HWND)pProp->GetInt32();
 
-    len = _MAX_PATH;
-    FilePathToURL(oHelpFile.c_str(), dir, &len);
     ShellExecute(hWnd, "open", dir, NULL, NULL, SW_SHOWNORMAL);
 #endif
     delete [] dir;
