@@ -513,15 +513,22 @@ void MusicBrowserUI::Close()
 
 void MusicBrowserUI::Destroy()
 {
-    RECT rect;
+    RECT rect, controlRect;
     char buf[256];
+    int32 h,w, s;
 
     GetWindowRect(m_hWnd, &rect);
+    GetWindowRect(m_hMusicView, &controlRect);
 
-    sprintf(buf, "%d,%d,%d,%d", rect.left, rect.top, 
-                rect.right - rect.left, rect.bottom - rect.top);
+    h = rect.bottom - rect.top;
+    w = rect.right - rect.left;
+    s = controlRect.right - controlRect.left;
 
-    m_context->prefs->SetPrefString(kMusicBrowserPositionPref, buf);
+    if(rect.left >= 0 && rect.top >= 0 && h >= 0  && w >= 0 && s >= 0)
+    {
+        sprintf(buf, "%d,%d,%d,%d,%d", rect.left, rect.top, w, h, s);
+        m_context->prefs->SetPrefString(kMusicBrowserPositionPref, buf);
+    }
 
     RevokeDragDrop(m_hPlaylistView);
     OleUninitialize(); 
@@ -1037,14 +1044,64 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
     // resize window
     char buf[256];
     uint32 size = sizeof(buf);
-    int32 x,y,h,w;
+    int32 x,y,h,w, s;
 
     m_context->prefs->GetPrefString(kMusicBrowserPositionPref, buf, &size);
-    sscanf(buf, " %d , %d , %d , %d", &x, &y, &w, &h);
+    sscanf(buf, " %d , %d , %d , %d, %d", &x, &y, &w, &h, &s);
 
-    if(x != -1 && y != -1 && h != -1 && w != -1)
+    if(x >= 0 && y >= 0 && h >= 0  && w >= 0 && s >= 0)
     {
         MoveWindow(hWnd, x, y, w, h, TRUE);
+
+        /*RECT controlRect;
+        int32 controlHeight, controlWidth;
+
+        GetWindowRect(m_hMusicView, &controlRect);
+        MapWindowPoints(NULL, m_hWnd, (LPPOINT)&controlRect, 2);
+        controlHeight = controlRect.bottom - controlRect.top;
+        controlWidth = controlRect.right - controlRect.left;
+
+        MoveWindow(m_hMusicView, controlRect.left, 
+                    controlRect.top, s, controlHeight, TRUE);
+        */
+
+        RECT catalogRect, playlistRect, titleRect;
+        int32 delta;
+
+        GetWindowRect(m_hMusicView, &catalogRect);
+        GetWindowRect(m_hPlaylistView, &playlistRect);
+        GetWindowRect(m_hPlaylistTitle, &titleRect);
+
+        delta = s - (catalogRect.right - catalogRect.left);
+        catalogRect.right = catalogRect.left + s;
+        playlistRect.left = playlistRect.left + delta;
+        titleRect.left += delta;
+
+        MapWindowPoints(NULL, m_hWnd, (LPPOINT)&catalogRect, 2);
+        MapWindowPoints(NULL, m_hWnd, (LPPOINT)&playlistRect, 2);
+        MapWindowPoints(NULL, m_hWnd, (LPPOINT)&titleRect, 2);
+
+        
+        MoveWindow(m_hMusicView, 
+                  catalogRect.left, 
+                  catalogRect.top, 
+        	      (catalogRect.right - catalogRect.left),
+                  catalogRect.bottom - catalogRect.top,
+                  TRUE);
+
+        MoveWindow(m_hPlaylistView, 
+                  playlistRect.left,
+                  playlistRect.top, 
+        	      (playlistRect.right - playlistRect.left),
+                  playlistRect.bottom - playlistRect.top,
+                  TRUE);
+
+        MoveWindow(m_hPlaylistTitle, 
+                  titleRect.left,
+                  titleRect.top, 
+        	      (titleRect.right - titleRect.left),
+                  titleRect.bottom - titleRect.top,
+                  TRUE);
     }
 
     InitTree();
