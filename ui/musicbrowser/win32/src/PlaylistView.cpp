@@ -570,12 +570,15 @@ void MusicBrowserUI::UpdateTotalTime()
     {
         PlaylistItem* item = m_oPlm->ItemAt(index);
 
-        uint32 time = item->GetMetaData().Time();
+        if(item)
+        {
+            uint32 time = item->GetMetaData().Time();
 
-        if(!time)
-            approximate = true;
+            if(!time)
+                approximate = true;
 
-        total += time;
+            total += time;
+        }
     }   
 
     char buf[32] = "~";
