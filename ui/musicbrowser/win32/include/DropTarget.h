@@ -26,7 +26,7 @@ ____________________________________________________________________________*/
 
 #include <ole2.h>
 
-#define WM_DROPURLS WM_USER + 92173
+#define WM_DROPURLS WM_USER + 92173 
 
 class FAR DropTarget : public IDropTarget
 {
