@@ -966,10 +966,13 @@ begin
     if (!BATCH_INSTALL) then
         bOpt1 = FALSE;
         bOpt2 = TRUE;
-        szMsg1 = "";
+        szMsg1 = "Setup has finished installing " + @THE_PRODUCT_NAME_LC +
+        		 " on your computer. \r\n" +
+        	     "If you wish, Setup can display the Read Me File and launch " +
+        		 @THE_PRODUCT_NAME_LC + " for you. Choose the options you want below.";
         szMsg2 = "";
-        szOption1 = "Read the README file";
-        szOption2 = "Launch " + @THE_PRODUCT_NAME_LC;
+        szOption1 = "Read the Read Me file.";
+        szOption2 = "Launch " + @THE_PRODUCT_NAME_LC + ".";
         nResult = SdFinish( szTitle, szMsg1, szMsg2, szOption1, szOption2, bOpt1, bOpt2 );
 
 		if (bOpt1) then
