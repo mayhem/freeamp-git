@@ -260,7 +260,6 @@ Player::
     TYPICAL_DELETE(m_dlm);
 
     TYPICAL_DELETE(m_pTermSem);
-    TYPICAL_DELETE(m_APSInterface);
 
     if(m_argUIList)
     {
@@ -308,6 +307,7 @@ Player::
     }
 
     TYPICAL_DELETE(m_musicCatalog);
+    TYPICAL_DELETE(m_APSInterface);
     TYPICAL_DELETE(m_uiManipLock);
     TYPICAL_DELETE(m_lmcMutex);
     TYPICAL_DELETE(m_pmiMutex);

@@ -95,6 +95,10 @@ void MusicCatalog::StartTimer(void)
 
 MusicCatalog::~MusicCatalog()
 {
+    m_killMBThread = true;
+    while (m_MBLookupThreadActive)
+        usleep(50);
+
     ClearCatalog();
     StopSearchMusic();
 
@@ -104,9 +108,6 @@ MusicCatalog::~MusicCatalog()
 
     if(m_watchTimer)
         m_context->timerManager->StopTimer(m_watchTimer);
-
-    if (m_MBLookupThreadActive)
-        m_killMBThread = true;
 
     delete m_artistList;
     delete m_unsorted;
