@@ -30,6 +30,7 @@ ____________________________________________________________________________*/
 #include "config.h"
 #include "SoundCardPMO.h"
 #include "eventdata.h"
+#include "preferences.h"
 #include "log.h"
 
 LogFile  *g_Log;
@@ -509,8 +510,28 @@ void SoundCardPMO::WorkerThread(void)
    void       *pBuffer;
    Error       eErr;
    Event      *pEvent;
+   int         iValue;
+   Preferences *pPref;
 
-   SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
+   pPref = new Preferences();
+   pPret->GetDecoderThreadPriority(&iValue);
+   delete pPref;
+
+   switch(iValue)
+   {
+       case 0: 
+          SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_IDLE);
+          break;
+       case 1: 
+          SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_BELOW_NORMAL);
+          break;
+       case 2: 
+          SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_NORMAL);
+          break;
+       case 3: 
+          SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
+          break;
+   }
 
    m_bPause = false;
    for(; !m_bExit;)

@@ -1,29 +1,29 @@
 /*____________________________________________________________________________
-	
-	FreeAmp - The Free MP3 Player
-	Driver for Advanced Linux Sound Architecture, http://alsa.jcu.cz
+        
+        FreeAmp - The Free MP3 Player
+        Driver for Advanced Linux Sound Architecture, http://alsa.jcu.cz
  
-	Portions Copyright (C) 1998 GoodNoise
+        Portions Copyright (C) 1998 GoodNoise
 
-	alsapmo.cpp by Fleischer Gabor <flocsy@usa.net>
-	uses code by Anders Semb Hermansen <ahermans@vf.telia.no>
-	and Jaroslav Kysela <perex@jcu.cz>
+        alsapmo.cpp by Fleischer Gabor <flocsy@usa.net>
+        uses code by Anders Semb Hermansen <ahermans@vf.telia.no>
+        and Jaroslav Kysela <perex@jcu.cz>
 
-	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; either version 2 of the License, or
-	(at your option) any later version.
+        This program is free software; you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation; either version 2 of the License, or
+        (at your option) any later version.
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+        This program is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-	
-	$Id$
+        You should have received a copy of the GNU General Public License
+        along with this program; if not, write to the Free Software
+        Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+        
+        $Id$
 
  *  You can use -a <soundcard #>:<device #>...
  *  For example: mpg123 -a 1:0 aaa.mpg
@@ -52,19 +52,16 @@ You will find them in the "#else" part of "#ifdef ALSA".
 /* project headers */
 #include <config.h>
 #include "alsapmo.h"
-//#include "eventdata.h"
 #include "log.h"
 
 LogFile  *g_Log;
 
-#define PIECES 50
 #define DB printf("%s:%d\n", __FILE__, __LINE__);
 
-const int iInitialBufferSize = 64 * 1024;
-const int iBufferSize = 256 * 1024;
-const int iOverflowSize = 24 * 1024;
-const int iWriteTriggerSize = 18432;
-const int iWriteToCard = 8 * 1024;
+const int iDefaultBufferSize = 512 * 1024;
+const int iOrigBufferSize = 64 * 1024;
+const int iOverflowSize = 0;
+const int iWriteTriggerSize = 8 * 1024;
 
 extern "C"
 {
@@ -94,14 +91,14 @@ static char * g_ErrorArray[pmoError_MaximumError] = {
 
 const char *AlsaPMO::GetErrorString(int32 error) {
     if ((error <= pmoError_MinimumError) || (error >= pmoError_MaximumError)) {
-	return g_ErrorArray[0];
+        return g_ErrorArray[0];
     }
     return g_ErrorArray[error - pmoError_MinimumError];
 }
 */
 
 AlsaPMO::AlsaPMO() :
-	EventBuffer(iBufferSize, iOverflowSize, iWriteTriggerSize)
+        EventBuffer(iOrigBufferSize, iOverflowSize, iWriteTriggerSize)
 {
 #ifdef DEBUG
     cout << "AlsaPMO::AlsaPMO:Creating scpmo" << endl;
@@ -118,6 +115,7 @@ AlsaPMO::AlsaPMO() :
    m_iTotalBytesWritten = 0;
    m_iBytesPerSample = 0;
    m_iLastFrame = -1;
+   m_iDataSize = 0;
 
    if (!m_pBufferThread)
    {
@@ -152,10 +150,10 @@ AlsaPMO::~AlsaPMO() {
 #ifdef DEBUG
     cout << "AlsaPMO::~AlsaPMO:begin:";
 #ifdef DEBUG2
-	struct timeval tv;
-	struct timezone tz;
-	gettimeofday(&tv,&tz);
-	cout<<""<<tv.tv_sec<<","<<tv.tv_usec;
+        struct timeval tv;
+        struct timezone tz;
+        gettimeofday(&tv,&tz);
+        cout<<""<<tv.tv_sec<<","<<tv.tv_usec;
 #endif
 cout<<endl;
 #endif
@@ -181,39 +179,39 @@ cout<<endl;
 #ifdef DEBUG
     cout << "AlsaPMO::~AlsaPMO:close-:";
 #ifdef DEBUG2
-	gettimeofday(&tv,&tz);
-	cout<<""<<tv.tv_sec<<","<<tv.tv_usec;
+        gettimeofday(&tv,&tz);
+        cout<<""<<tv.tv_sec<<","<<tv.tv_usec;
 #endif
 cout<<endl;
 #endif
     int err;
     if ((err=snd_pcm_close(ai->handle)) < 0) {
 #ifdef DEBUG
-	    cout<<"AlsaPMO::~AlsaPMO:close failed: "<<snd_strerror(err)<<endl;
+            cout<<"AlsaPMO::~AlsaPMO:close failed: "<<snd_strerror(err)<<endl;
 #endif
-	    (Error)pmoError_ALSA_DeviceCloseFailed;
+            (Error)pmoError_ALSA_DeviceCloseFailed;
     }
 #ifdef DEBUG
     cout << "AlsaPMO::~AlsaPMO:close+:";
 #ifdef DEBUG2
-	gettimeofday(&tv,&tz);
-	cout<<""<<tv.tv_sec<<","<<tv.tv_usec;
+        gettimeofday(&tv,&tz);
+        cout<<""<<tv.tv_sec<<","<<tv.tv_usec;
 #endif
 cout<<endl;
 #endif
     if (myInfo) {
-	delete myInfo;
-	myInfo = NULL;
+        delete myInfo;
+        myInfo = NULL;
     }
     if (ai) {
-	delete ai;
-	ai = NULL;
+        delete ai;
+        ai = NULL;
     }
 #ifdef DEBUG
     cout << "AlsaPMO::~AlsaPMO:done:";
 #ifdef DEBUG2
-	gettimeofday(&tv,&tz);
-	cout<<""<<tv.tv_sec<<","<<tv.tv_usec;
+        gettimeofday(&tv,&tz);
+        cout<<""<<tv.tv_sec<<","<<tv.tv_usec;
 #endif
 cout<<endl;
 #endif
@@ -231,20 +229,7 @@ void AlsaPMO::WaitToQuit()
 
 Error AlsaPMO::SetPropManager(Properties * p)
 {
-   PropValue *pProp;
-   int        iNewSize;
-
    m_propManager = p;
-   m_propManager->GetProperty("OutputBuffer", &pProp);
-   if (pProp)
-   {
-       iNewSize = atoi(((StringPropValue *)pProp)->GetString()) * 1024;
-       if (iNewSize > iInitialBufferSize)
-           Resize(iNewSize, iOverflowSize, iWriteTriggerSize);
-   }
-   else
-      Resize(iBufferSize, iOverflowSize, iWriteTriggerSize);
-
    return kError_NoErr;
 }
 
@@ -321,10 +306,10 @@ Error AlsaPMO::Pause() {
 #ifdef DEBUG
 cout<<"AlsaPMO::Pause:mutex-:";
 #ifdef DEBUG2
-	struct timeval tv;
-	struct timezone tz;
-	gettimeofday(&tv,&tz);
-	cout<<""<<tv.tv_sec<<","<<tv.tv_usec;
+        struct timeval tv;
+        struct timezone tz;
+        gettimeofday(&tv,&tz);
+        cout<<""<<tv.tv_sec<<","<<tv.tv_usec;
 #endif
 cout<<endl;
 #endif
@@ -332,8 +317,8 @@ cout<<endl;
 #ifdef DEBUG
 cout<<"AlsaPMO::Pause:mutex+:";
 #ifdef DEBUG2
-	gettimeofday(&tv,&tz);
-	cout<<""<<tv.tv_sec<<","<<tv.tv_usec;
+        gettimeofday(&tv,&tz);
+        cout<<""<<tv.tv_sec<<","<<tv.tv_usec;
 #endif
 cout<<endl;
 #endif
@@ -342,8 +327,8 @@ cout<<endl;
 #ifdef DEBUG
 cout<<"AlsaPMO::Pause:reset+:";
 #ifdef DEBUG2
-	gettimeofday(&tv,&tz);
-	cout<<""<<tv.tv_sec<<","<<tv.tv_usec;
+        gettimeofday(&tv,&tz);
+        cout<<""<<tv.tv_sec<<","<<tv.tv_usec;
 #endif
 cout<<endl;
 #endif
@@ -371,10 +356,10 @@ Error AlsaPMO::Init(OutputInfo* info) {
 #ifdef DEBUG
     cout << "AlsaPMO::Init:";
 #ifdef DEBUG2
-	struct timeval tv;
-	struct timezone tz;
-	gettimeofday(&tv,&tz);
-	cout<<""<<tv.tv_sec<<","<<tv.tv_usec;
+        struct timeval tv;
+        struct timezone tz;
+        gettimeofday(&tv,&tz);
+        cout<<""<<tv.tv_sec<<","<<tv.tv_usec;
 #endif
 cout<<endl;
     if (info) {
@@ -387,100 +372,118 @@ cout<<endl;
 
     m_properlyInitialized = false;
     if (!info) {
-	info = myInfo;
+        info = myInfo;
     } else {
-	// got info, so this is the beginning...
-	PropValue *pv = NULL;
-	m_propManager->GetProperty("ALSA-device",&pv);
-	if (pv) {
-	    const char *pChar = ((StringPropValue *)pv)->GetString();
-	    if (pChar) {
-		ai->device = strdup(pChar);
-	    } else {
-		ai->device=strdup(ALSA_DEVICE);
-	    }
-	} else {
-	    ai->device=strdup(ALSA_DEVICE);  // use default
-	}
+        // got info, so this is the beginning...
+        PropValue *pv = NULL, *pProp;
+        int        iNewSize = iDefaultBufferSize;
+        Error      result;
 
-	if(ai->device) {	/* parse ALSA device name */
-		if(strchr(ai->device,':')) {	/* card with device */
-			strncpy(scard, ai->device, sizeof(scard)-1);
-			scard[sizeof(scard)-1] = '\0';
-			if (strchr(scard,':')) *strchr(scard,':') = '\0';
-			card = snd_card_name(scard);
-			if (card < 0) {
+        m_propManager->GetProperty("ALSA-device",&pv);
+        if (pv) {
+            const char *pChar = ((StringPropValue *)pv)->GetString();
+            if (pChar) {
+                ai->device = strdup(pChar);
+            } else {
+                ai->device=strdup(ALSA_DEVICE);
+            }
+        } else {
+            ai->device=strdup(ALSA_DEVICE);  // use default
+        }
+        m_iDataSize = info->max_buffer_size;
+        m_propManager->GetProperty("OutputBuffer", &pProp);
+        if (pProp)
+        {
+            iNewSize = atoi(((StringPropValue *)pProp)->GetString()) * 1024;
+        }
+
+        iNewSize -= iNewSize % m_iDataSize;
+        result = Resize(iNewSize, 0, m_iDataSize);
+        if (IsError(result))
+        {
+           ReportError("Internal buffer sizing error occurred.");
+           g_Log->Error("Resize output buffer failed.");
+           return result;
+        }
+
+        if(ai->device) {        /* parse ALSA device name */
+                if(strchr(ai->device,':')) {    /* card with device */
+                        strncpy(scard, ai->device, sizeof(scard)-1);
+                        scard[sizeof(scard)-1] = '\0';
+                        if (strchr(scard,':')) *strchr(scard,':') = '\0';
+                        card = snd_card_name(scard);
+                        if (card < 0) {
 #ifdef DEBUG
-				cerr<<"wrong Alsa card number: "<<scard<<endl;
+                                cerr<<"wrong Alsa card number: "<<scard<<endl;
 #endif
-				return (Error)pmoError_ALSA_CardNumber;
-			}
-			strncpy(sdevice, strchr(ai->device, ':') + 1, sizeof(sdevice)-1);
-		} else {
-			strncpy(sdevice, ai->device, sizeof(sdevice)-1);
-		}
-		sdevice[sizeof(sdevice)-1] = '\0';
-		device = atoi(sdevice);
-		if (!isdigit(sdevice[0]) || device < 0 || device > 31) {
+                                return (Error)pmoError_ALSA_CardNumber;
+                        }
+                        strncpy(sdevice, strchr(ai->device, ':') + 1, sizeof(sdevice)-1);
+                } else {
+                        strncpy(sdevice, ai->device, sizeof(sdevice)-1);
+                }
+                sdevice[sizeof(sdevice)-1] = '\0';
+                device = atoi(sdevice);
+                if (!isdigit(sdevice[0]) || device < 0 || device > 31) {
 #ifdef DEBUG
-			cerr<<"wrong device number: "<<sdevice<<endl;
+                        cerr<<"wrong device number: "<<sdevice<<endl;
 #endif
-			return (Error)pmoError_ALSA_DeviceNumber;
-		}
+                        return (Error)pmoError_ALSA_DeviceNumber;
+                }
 #ifdef DEBUG
 cout<<"AlsaPMO::Init:device="<<ai->device<<" -> "<<card<<":"<<device<<endl;
 #endif
-	}
-	if((err=snd_pcm_open(&ai->handle, card, device, SND_PCM_OPEN_PLAYBACK)) < 0 )
-	{
+        }
+        if((err=snd_pcm_open(&ai->handle, card, device, SND_PCM_OPEN_PLAYBACK)) < 0 )
+        {
 #ifdef DEBUG
-	    cout<<"AlsaPMO::Init:open failed: "<<snd_strerror(err)<<endl;
+            cout<<"AlsaPMO::Init:open failed: "<<snd_strerror(err)<<endl;
 #endif
-	    ReportError("Audio device is busy. Please make sure that "
+            ReportError("Audio device is busy. Please make sure that "
                         "another program is not using the device.");
 //            ReportError("Cannot open audio device. Please make sure that "
 //                        "the audio device is properly configured.");
-	    return (Error)pmoError_DeviceOpenFailed;
-	}
-#define SND_PCM_BLOCK_MODE_NON_BLOCKING		(0)
-#define SND_PCM_BLOCK_MODE_BLOCKING		(1)
-	snd_pcm_block_mode(ai->handle,SND_PCM_BLOCK_MODE_NON_BLOCKING);
-	if ((err=snd_pcm_playback_time(ai->handle,1))!=0) {
-		ReportError("Can't enable playback time.");
-	    return (Error)pmoError_DeviceOpenFailed;
-	}
+            return (Error)pmoError_DeviceOpenFailed;
+        }
+#define SND_PCM_BLOCK_MODE_NON_BLOCKING         (0)
+#define SND_PCM_BLOCK_MODE_BLOCKING             (1)
+        snd_pcm_block_mode(ai->handle,SND_PCM_BLOCK_MODE_NON_BLOCKING);
+        if ((err=snd_pcm_playback_time(ai->handle,1))!=0) {
+                ReportError("Can't enable playback time.");
+            return (Error)pmoError_DeviceOpenFailed;
+        }
 //Here comes the VolumeManager stuff's setup
-	switch (device) {
-	    case 0 : strncpy(mixer_id,SND_MIXER_ID_PCM,sizeof(mixer_id));break;
-	    case 1 : strncpy(mixer_id,SND_MIXER_ID_PCM1,sizeof(mixer_id));break;
-	}
+        switch (device) {
+            case 0 : strncpy(mixer_id,SND_MIXER_ID_PCM,sizeof(mixer_id));break;
+            case 1 : strncpy(mixer_id,SND_MIXER_ID_PCM1,sizeof(mixer_id));break;
+        }
 #ifdef DEBUG
 cout<<"AlsaPMO::Init:mixer_id="<<mixer_id<<endl;
 #endif
-//	err = snd_mixer_open(&ai->mixer_handle,card,device);
-	err = snd_mixer_open(&ai->mixer_handle,0,0);
-	if (err < 0) {
+//      err = snd_mixer_open(&ai->mixer_handle,card,device);
+        err = snd_mixer_open(&ai->mixer_handle,0,0);
+        if (err < 0) {
 #ifdef DEBUG
 cout<<"AlsaPMO::Init:snd_mixer_open err("<<err<<")="<<snd_strerror(err)<<endl;
 #endif
-		ReportError("Cannot open mixer device.");
-		return (Error)pmoError_ALSA_MixerOpenFailed;
-	}
+                ReportError("Cannot open mixer device.");
+                return (Error)pmoError_ALSA_MixerOpenFailed;
+        }
 //in fact i think the next step is not needed all time, just at the first
 //to get the channel into info. This could be done in constructor of
 //VolumeManager.
-	snd_mixer_info_t mixer_info;
-	err = snd_mixer_info( ai->mixer_handle, &mixer_info );
-	if (err < 0) {
+        snd_mixer_info_t mixer_info;
+        err = snd_mixer_info( ai->mixer_handle, &mixer_info );
+        if (err < 0) {
 #ifdef DEBUG
 cout<<"AlsaPMO::Init:snd_mixer_info err"<<endl;
 #endif
-		ReportError("Cannot get mixer info.");
-		snd_mixer_close( ai->mixer_handle );
-		return (Error)pmoError_ALSA_Mixer_Info;
-	}
+                ReportError("Cannot get mixer info.");
+                snd_mixer_close( ai->mixer_handle );
+                return (Error)pmoError_ALSA_Mixer_Info;
+        }
 
-	ai->pcm = snd_mixer_channel( ai->mixer_handle, mixer_id );
+        ai->pcm = snd_mixer_channel( ai->mixer_handle, mixer_id );
 #ifdef DEBUG
 cout<<"AlsaPMO::Init:pcm="<<ai->pcm<<endl;
 #endif
@@ -521,10 +524,10 @@ Error AlsaPMO::Reset(bool user_stop) {
 #ifdef DEBUG
     cout << "AlsaPMO::Reset:";
 #ifdef DEBUG2
-	struct timeval tv;
-	struct timezone tz;
-	gettimeofday(&tv,&tz);
-	cout<<""<<tv.tv_sec<<","<<tv.tv_usec;
+        struct timeval tv;
+        struct timezone tz;
+        gettimeofday(&tv,&tz);
+        cout<<""<<tv.tv_sec<<","<<tv.tv_usec;
 #endif
 cout<<endl;
 #endif
@@ -535,7 +538,7 @@ cout<<endl;
 ///    audio_set_all(ai);
 
     if (user_stop) {
-	Init(NULL);
+        Init(NULL);
     }
     return kError_NoErr;
 }
@@ -619,37 +622,61 @@ void AlsaPMO::StartWorkerThread(void *pVoidBuffer)
 
 void AlsaPMO::WorkerThread(void)
 {
-#ifdef DEBUG
-cout<<"AlsaPMO::WorkerThread:"<<endl;
-#endif
-   void       *pBuffer;
-   size_t      iToCopy, iCopied;
-   Error       eErr;
-   size_t      iRet;
-   Event      *pEvent;
-   OutputInfo *pInfo;
+   void                      *pBuffer;
+   size_t                     iToCopy, iCopied;
+   Error                      eErr;
+   size_t                     iRet;
+   Event                     *pEvent;
+   OutputInfo                *pInfo;
+   snd_pcm_playback_status_t  ainfo;
 
    for(; !m_bExit;)
    {
-      iToCopy = iWriteToCard;
-      //printf("before pause mutex acquire\n");
+      if (!m_properlyInitialized)
+      {
+          pEvent = GetEvent();
+
+          if (pEvent == NULL)
+          {
+              m_pReadSem->Wait();
+              continue;
+          }
+
+          if (pEvent->Type() == PMO_Init)
+          {
+              if (IsError(Init(((PMOInitEvent *)pEvent)->GetInfo())))
+              {
+                  delete pEvent;
+                  break;
+              }
+          }
+          delete pEvent;
+
+          continue;
+      }
+
+DB
+      iToCopy = m_iDataSize;
       m_pPauseMutex->Acquire();
-      //printf("after pause mutex acquire\n");
+DB
 
       eErr = BeginRead(pBuffer, iToCopy);
-      //printf("after begin read\n");
-      if (eErr == kError_InputUnsuccessful || eErr == kError_NoDataAvail)
+      if (eErr == kError_InputUnsuccessful || eErr == kError_NoDataAvail || 
+          iToCopy < m_iDataSize)
       {
+          EndRead(0);
           m_pPauseMutex->Release();
           m_pReadSem->Wait();
           continue;
       }
+DB
       if (eErr == kError_Interrupt)
       {
           m_pPauseMutex->Release();
           break;
       }
           
+DB
       if (eErr == kError_EventPending)
       {
           m_pPauseMutex->Release();
@@ -687,50 +714,31 @@ cout<<"AlsaPMO::WorkerThread:"<<endl;
           break;
       }
 
-      iCopied = 0;
-      do
+      iRet = snd_pcm_playback_status(ai->handle,&ainfo);
+      if (ainfo.count < iToCopy)
       {
-//          snd_pcm_playback_status_t ainfo;
-//          snd_pcm_playback_status(&ai->handle,&ainfo);
-//          if(ainfo.count==0)
-          iRet = snd_pcm_write(ai->handle,pBuffer,iToCopy);
-/*
-//if(iRet<=0)
-if (iRet<iToCopy)
-{
-//cout<<"iToCopy="<<iToCopy<<" != iRet="<<iRet<<endl;
-cout<<"-"<<endl;
-} else {cout<<"*"<<endl;}
-*/
-          if (iRet > 0)
-          {
-              pBuffer = ((char *)pBuffer + iRet);
-              iCopied += iRet;
-              m_iTotalBytesWritten += iRet;
-          }
-//          if(iRet<=0)
-          if(iRet<=iToCopy)
-          {
-              EndRead(0);
-              m_pPauseMutex->Release();
+          EndRead(0);
+          m_pPauseMutex->Release();
 
-              usleep(10000);
+          usleep(10000);
 
-              for(;!m_bExit;)
-                 if (m_pPauseMutex->Acquire(10000))
-                     break;
-              if (m_bExit)
-                 iToCopy = 0;
+          for(;!m_bExit;)
+             if (m_pPauseMutex->Acquire(10000))
+                 break;
+          if (m_bExit)
+             iToCopy = 0;
 
-              // If beginread returns an error, break out...
-              if (BeginRead(pBuffer, iToCopy) != kError_NoErr)
-                 iToCopy = 0;
+          // If beginread returns an error, break out...
+          if (BeginRead(pBuffer, iToCopy) != kError_NoErr)
+             iToCopy = 0;
 
-              continue;
-          }
+          continue;
       }
-      while (iCopied < iToCopy /*&& (errno == EINTR || errno == 0)*/);
-//      while (iCopied < iToCopy && iRet >=0);
+
+      iCopied = snd_pcm_write(ai->handle,pBuffer,iToCopy);
+      if (iCopied > 0)
+          m_iTotalBytesWritten += iCopied;
+      printf("\nbytes written: %d\n",m_iTotalBytesWritten);
 
       // Was iToCopy set to zero? If so, we got cleared and should
       // start from the top
@@ -748,137 +756,129 @@ cout<<"-"<<endl;
          g_Log->Error("Failed to write to the soundcard\n");
          break;
       }
+
       EndRead(iCopied);
       m_pPauseMutex->Release();
    }
-#ifdef DEBUG
-cout<<"AlsaPMO::WorkerThread:output buffer thread exit\n";
-#ifdef DEBUG2
-	struct timeval tv;
-	struct timezone tz;
-	gettimeofday(&tv,&tz);
-	cout<<"AlsaPMO::WorkerThread-end "<<tv.tv_sec<<","<<tv.tv_usec<<endl;
-#endif
-#endif
 }
 
 int AlsaPMO::audio_set_all(struct audio_info_struct *ai)
 {
-	int err;
+        int err;
 
-	if(ai->format == -1) {
+        if(ai->format == -1) {
 #ifdef DEBUG
 cout<<"AlsaPMO::audio_set_all:ai->format error"<<endl;
 #endif
-		return 0;
-	}
-	if(!ai || ai->rate < 0) {
+                return 0;
+        }
+        if(!ai || ai->rate < 0) {
 #ifdef DEBUG
 cout<<"AlsaPMO::audio_set_all:ai->rate error"<<endl;
 #endif
-		return -1;
-	}
-	if(ai->alsa_format.channels < 0) {
+                return -1;
+        }
+        if(ai->alsa_format.channels < 0) {
 #ifdef DEBUG
 cout<<"AlsaPMO::audio_set_all:ai->channels error"<<endl;
 #endif
-		return 0;
-	}
+                return 0;
+        }
 #ifdef DEBUG
 cout<<"AlsaPMO::audio_set_all: format="<<ai->format<<",rate="<<ai->rate<<",channels="<<ai->channels<<endl;
 #endif
 
-	switch(ai->format)
-	{
-		case AUDIO_FORMAT_SIGNED_16:
-		default:
-			ai->alsa_format.format=SND_PCM_SFMT_S16_LE;
-			break;
-		case AUDIO_FORMAT_UNSIGNED_8:
-			ai->alsa_format.format=SND_PCM_SFMT_U8;
-			break;
-		case AUDIO_FORMAT_SIGNED_8:
-			ai->alsa_format.format=SND_PCM_SFMT_S8;
-			break;
-		case AUDIO_FORMAT_ULAW_8:
-			ai->alsa_format.format=SND_PCM_SFMT_MU_LAW;
-			break;
-		case AUDIO_FORMAT_ALAW_8:
-			ai->alsa_format.format=SND_PCM_SFMT_A_LAW;
-			break;
-		case AUDIO_FORMAT_UNSIGNED_16:
-			ai->alsa_format.format=SND_PCM_SFMT_U16_LE;
-			break;
-	}
-//	ai->alsa_format.format=SND_PCM_SFMT_S16_LE;
-	ai->alsa_format.rate=ai->rate;
-	ai->alsa_format.channels = ai->channels;
+        switch(ai->format)
+        {
+                case AUDIO_FORMAT_SIGNED_16:
+                default:
+                        ai->alsa_format.format=SND_PCM_SFMT_S16_LE;
+                        break;
+                case AUDIO_FORMAT_UNSIGNED_8:
+                        ai->alsa_format.format=SND_PCM_SFMT_U8;
+                        break;
+                case AUDIO_FORMAT_SIGNED_8:
+                        ai->alsa_format.format=SND_PCM_SFMT_S8;
+                        break;
+                case AUDIO_FORMAT_ULAW_8:
+                        ai->alsa_format.format=SND_PCM_SFMT_MU_LAW;
+                        break;
+                case AUDIO_FORMAT_ALAW_8:
+                        ai->alsa_format.format=SND_PCM_SFMT_A_LAW;
+                        break;
+                case AUDIO_FORMAT_UNSIGNED_16:
+                        ai->alsa_format.format=SND_PCM_SFMT_U16_LE;
+                        break;
+        }
+//      ai->alsa_format.format=SND_PCM_SFMT_S16_LE;
+        ai->alsa_format.rate=ai->rate;
+        ai->alsa_format.channels = ai->channels;
 
 #ifdef DEBUG2
-	struct timeval tv;
-	struct timezone tz;
-	gettimeofday(&tv,&tz);
-	cout<<"AlsaPMO::audio_set_all:Before all2:"<<tv.tv_sec<<","<<tv.tv_usec<<endl;
+        struct timeval tv;
+        struct timezone tz;
+        gettimeofday(&tv,&tz);
+        cout<<"AlsaPMO::audio_set_all:Before all2:"<<tv.tv_sec<<","<<tv.tv_usec<<endl;
 #endif
-	if((err=snd_pcm_playback_format(ai->handle, &ai->alsa_format)) < 0 ) {
+        if((err=snd_pcm_playback_format(ai->handle, &ai->alsa_format)) < 0 ) {
 #ifdef DEBUG
-	    cout<<"AlsaPMO::audio_set_all:audio_set_all failed: "<<snd_strerror(err)<<endl;
+            cout<<"AlsaPMO::audio_set_all:audio_set_all failed: "<<snd_strerror(err)<<endl;
 #endif
-//	    ReportError("Cannot reset the soundcard.");
-   	    ReportError("Cannot get audio format.");
-	    return (Error)pmoError_IOCTL_SNDCTL_DSP_RESET;
-	}
+//          ReportError("Cannot reset the soundcard.");
+            ReportError("Cannot get audio format.");
+            return (Error)pmoError_IOCTL_SNDCTL_DSP_RESET;
+        }
 #ifdef DEBUG2
-	gettimeofday(&tv,&tz);
-	cout<<"AlsaPMO::audio_set_all:Before all3:"<<tv.tv_sec<<","<<tv.tv_usec<<endl;
+        gettimeofday(&tv,&tz);
+        cout<<"AlsaPMO::audio_set_all:Before all3:"<<tv.tv_sec<<","<<tv.tv_usec<<endl;
 #endif
-//	audio_set_playback_params2(ai);
-//	int err;
-	snd_pcm_playback_info_t pi;
-	snd_pcm_playback_params_t pp;
+//      audio_set_playback_params2(ai);
+//      int err;
+        snd_pcm_playback_info_t pi;
+        snd_pcm_playback_params_t pp;
 
 #ifdef DEBUG2
-//	struct timeval tv;
-//	struct timezone tz;
-	gettimeofday(&tv,&tz);
-	cout<<"AlsaPMO::audio_set_all:Before allA:"<<tv.tv_sec<<","<<tv.tv_usec<<endl;
+//      struct timeval tv;
+//      struct timezone tz;
+        gettimeofday(&tv,&tz);
+        cout<<"AlsaPMO::audio_set_all:Before allA:"<<tv.tv_sec<<","<<tv.tv_usec<<endl;
 #endif
-	if((err=snd_pcm_playback_info(ai->handle, &pi)) < 0 )
-	{
+        if((err=snd_pcm_playback_info(ai->handle, &pi)) < 0 )
+        {
 #ifdef DEBUG
-		cerr<<"audio_set_playback_params: playback info failed: "<<snd_strerror(err)<<endl;
+                cerr<<"audio_set_playback_params: playback info failed: "<<snd_strerror(err)<<endl;
 #endif
-		ReportError("Cannot get audio info.");
-		return (Error)pmoError_ALSA_Playback_Info;
-	}
+                ReportError("Cannot get audio info.");
+                return (Error)pmoError_ALSA_Playback_Info;
+        }
 #ifdef DEBUG2
-	gettimeofday(&tv,&tz);
-	cout<<"AlsaPMO::audio_set_all:Before allB:"<<tv.tv_sec<<","<<tv.tv_usec<<endl;
+        gettimeofday(&tv,&tz);
+        cout<<"AlsaPMO::audio_set_all:Before allB:"<<tv.tv_sec<<","<<tv.tv_usec<<endl;
 #endif
 
-	bzero(&pp, sizeof(pp));
-	pp.fragment_size = pi.buffer_size/4;
-	if (pp.fragment_size > pi.max_fragment_size) pp.fragment_size = pi.max_fragment_size;
-	if (pp.fragment_size < pi.min_fragment_size) pp.fragment_size = pi.min_fragment_size;
-	pp.fragments_max = -1;
-	pp.fragments_room = 1;
+        bzero(&pp, sizeof(pp));
+        pp.fragment_size = pi.buffer_size/4;
+        if (pp.fragment_size > pi.max_fragment_size) pp.fragment_size = pi.max_fragment_size;
+        if (pp.fragment_size < pi.min_fragment_size) pp.fragment_size = pi.min_fragment_size;
+        pp.fragments_max = -1;
+        pp.fragments_room = 1;
 
-	if((err=snd_pcm_playback_params(ai->handle, &pp)) < 0 )
-	{
+        if((err=snd_pcm_playback_params(ai->handle, &pp)) < 0 )
+        {
 #ifdef DEBUG
-		cerr<<"audio_set_playback_params: playback params failed: "<<snd_strerror(err)<<endl;
+                cerr<<"audio_set_playback_params: playback params failed: "<<snd_strerror(err)<<endl;
 #endif
-		ReportError("Cannot set audio params.");
-		return (Error)pmoError_ALSA_Playback_Params;
-	}
+                ReportError("Cannot set audio params.");
+                return (Error)pmoError_ALSA_Playback_Params;
+        }
 #ifdef DEBUG2
-	gettimeofday(&tv,&tz);
-	cout<<"AlsaPMO::audio_set_all:Before allC:"<<tv.tv_sec<<","<<tv.tv_usec<<endl;
+        gettimeofday(&tv,&tz);
+        cout<<"AlsaPMO::audio_set_all:Before allC:"<<tv.tv_sec<<","<<tv.tv_usec<<endl;
 #endif
-//	return 0;
+//      return 0;
 #ifdef DEBUG2
-	gettimeofday(&tv,&tz);
-	cout<<"AlsaPMO::audio_set_all:Before all4:"<<tv.tv_sec<<","<<tv.tv_usec<<endl;
+        gettimeofday(&tv,&tz);
+        cout<<"AlsaPMO::audio_set_all:Before all4:"<<tv.tv_sec<<","<<tv.tv_usec<<endl;
 #endif
-	return 0;
+        return 0;
 }

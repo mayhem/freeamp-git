@@ -45,6 +45,7 @@ ____________________________________________________________________________*/
 #include "eventdata.h"
 #include "mutex.h"
 #include "semaphore.h"
+#include "preferences.h"
 #include "lmc.h"
 #include "log.h"
 
@@ -411,7 +412,7 @@ bool XingLMC::CanDecode()
    Error      Err;
    int32      dummy;
    bool       bRet = false;
-   PropValue *pProp;
+   Preferences *pPref;
 
    if (!m_input)
    {
@@ -419,10 +420,11 @@ bool XingLMC::CanDecode()
       return false;
    }
 
-   m_propManager->GetProperty("InputBuffer", &pProp);
-   if (pProp)
-       m_iBufferSize = atoi(((StringPropValue *)pProp)->GetString()) * 1024;
+   pPref = new Preferences();
+   if (IsError(pPref->GetInputBufferSize(&m_iBufferSize)))
+       m_iBufferSize = iStreamingBufferSize;
 
+   m_iBufferSize *= 1024;
    m_input->SetBufferSize(m_iBufferSize);
 
    if (!m_input->IsStreaming())
@@ -435,13 +437,10 @@ bool XingLMC::CanDecode()
        return false;
    }
 
-   m_propManager->GetProperty("BufferUpInterval", &pProp);
-   if (pProp)
-   {
-       m_iBufferUpInterval = atoi(((StringPropValue *)pProp)->GetString());
-       if (m_iBufferUpInterval <= 0)
-           m_iBufferUpInterval = iDefaultBufferUpInterval;
-   }
+   if (IsError(pPref->GetStreamBufferInterval(&m_iBufferUpInterval)))
+      m_iBufferUpInterval = iDefaultBufferUpInterval;
+
+   delete pPref;
 
    return true;
 }

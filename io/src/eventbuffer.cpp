@@ -29,7 +29,7 @@ ____________________________________________________________________________*/
 
 #include "eventbuffer.h"
 
-#define DB Debug_v("%s:%d\n", __FILE__, __LINE__);
+#define DB printf("%x: %s:%d\n", pthread_self(), __FILE__, __LINE__);
 
 EventBuffer::EventBuffer(size_t iBufferSize, size_t iOverFlowSize, 
                          size_t iWriteTriggerSize) : 
@@ -50,7 +50,6 @@ Error EventBuffer::BeginRead(void *&pBuffer, size_t &iBytesWanted)
 
    pEvent = m_pQueue->Peek();
    iReadIndex = GetReadIndex();
-
 
    if (pEvent && pEvent->iIndex == iReadIndex)
    {

@@ -47,7 +47,6 @@ const int iDefaultBufferSize = 512 * 1024;
 const int iOrigBufferSize = 64 * 1024;
 const int iOverflowSize = 0;
 const int iWriteTriggerSize = 8 * 1024;
-const int iWriteToCard = 8 * 1024;
 
 extern    "C"
 {
@@ -454,6 +453,7 @@ void SoundCardPMO::WorkerThread(void)
               bPerfWarn = true;
           }
 
+          EndRead(0);
           m_pPauseMutex->Release();
           m_pReadSem->Wait();
           continue;

@@ -60,6 +60,27 @@ class Preferences {
     Error GetNextLibDir(HANDLE hLibDirFind,char *path, uint32 *len);
     Error GetLibDirClose(HANDLE hLibDirFind);
 
+    Error  GetLogMain(bool *bValue)
+          { *bValue = false; return kError_NoErr; };
+    Error  GetLogDecode(bool *bValue)
+          { *bValue = false; return kError_NoErr; };
+    Error  GetLogInput(bool *bValue)
+          { *bValue = false; return kError_NoErr; };
+    Error  GetLogOutput(bool *bValue)
+          { *bValue = false; return kError_NoErr; };
+    Error  GetLogPerf(bool *bValue)
+          { *bValue = false; return kError_NoErr; };
+    Error  GetUseDebugLog(bool *bValue)
+          { *bValue = false; return kError_NoErr; };
+    Error  GetInputBufferSize(int32 *iValue)
+          { *iValue = 64; return kError_NoErr; };
+    Error  GetOutputBufferSize(int32 *iValue)
+          { *iValue = 512 * 1024; return kError_NoErr; };
+    Error  GetStreamBufferInterval(int32 *iValue)
+          { *iValue = 2; return kError_NoErr; };
+    Error  GetDecoderThreadPriority(int32 *iValue)
+          { *iValue = 0; return kError_NoErr; };
+
     static const char *GetLibDirs();
 
  protected:

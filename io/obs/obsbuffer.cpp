@@ -252,12 +252,15 @@ void ObsBuffer::WorkerThread(void)
           eError = BeginWrite(pBuffer, iToCopy);
           if (eError == kError_BufferTooSmall)
           {
+              EndWrite(0);
+              //printf("Sleeping on too small\n");
               m_pWriteSem->Wait();
               continue;
           }
           if (eError == kError_NoErr && iToCopy < iRead)
           {
               EndWrite(0);
+              //printf("Sleeping on not enough space\n");
               m_pWriteSem->Wait();
               continue;
           }

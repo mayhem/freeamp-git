@@ -430,39 +430,35 @@ Run()
    Error     error = kError_NoErr;
    int32     uisActivated = 0;
    PropValue *pProp; 
+   bool      bValue;
 
-   m_props.GetProperty("Logging", &pProp);
-   if (pProp)
-   {
-      if (strcasecmp(((StringPropValue *)pProp)->GetString(), "yes") == 0)
-         g_Log->Open();
-   }
-   m_props.GetProperty("LogInput", &pProp);
-   if (pProp)
-   {
-      if (strcasecmp(((StringPropValue *)pProp)->GetString(), "yes") == 0)
-         g_Log->AddLogLevel(LogInput);
-   }
-   m_props.GetProperty("LogDecode", &pProp);
-   if (pProp)
-   {
-      if (strcasecmp(((StringPropValue *)pProp)->GetString(), "yes") == 0)
-         g_Log->AddLogLevel(LogDecode);
-   }
-   m_props.GetProperty("LogPerf", &pProp);
-   if (pProp)
-   {
-      if (strcasecmp(((StringPropValue *)pProp)->GetString(), "yes") == 0)
-         g_Log->AddLogLevel(LogPerf);
-   }
+   prefs = new Preferences;
 
-
+   prefs->GetUseDebugLog(&bValue);
+   if (bValue)
+      g_Log->Open();
+   
+   prefs->GetLogInput(&bValue);
+   if (bValue)
+      g_Log->AddLogLevel(LogInput);
+   
+   prefs->GetLogOutput(&bValue);
+   if (bValue)
+      g_Log->AddLogLevel(LogOutput);
+   
+   prefs->GetLogDecode(&bValue);
+   if (bValue)
+      g_Log->AddLogLevel(LogDecode);
+   
+   prefs->GetLogPerf(&bValue);
+   if (bValue)
+      g_Log->AddLogLevel(LogPerf);
+   
    // which ui should we instantiate first??
    if (m_argUIList->CountItems() == 0)
    {
       name = new char[len];
 
-      prefs = new Preferences;
 
       while ((error = prefs->GetDefaultUI(name, &len)) ==
              kError_BufferTooSmall)
@@ -473,7 +469,6 @@ Run()
          name = new char[len];
       }
 
-      delete    prefs;
    }
    else
    {
@@ -481,6 +476,7 @@ Run()
 
       strcpy(name, m_argUIList->ItemAt(uiListIndex));
    }
+   delete    prefs;
 
    if (IsntError(error))
    {

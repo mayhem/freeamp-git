@@ -143,6 +143,7 @@ public:
 //   bool         m_bPause;
    int          m_iOutputBufferSize, m_iTotalBytesWritten, m_iBytesPerSample;
    int          m_iLastFrame;
+   int          m_iDataSize;
  
     struct audio_info_struct *ai;
     int audio_set_all(struct audio_info_struct *);

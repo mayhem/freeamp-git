@@ -34,7 +34,7 @@ extern LogFile *g_Log;
 #ifndef min
 #define min(a,b) ((a) < (b) ? (a) : (b))
 #endif
-#define DB Debug_v("%x:%d\n", GetCurrentThread(), __LINE__);
+#define DB printf("%x %s:%d\n", pthread_self(), __FILE__, __LINE__);
 
 PullBuffer::PullBuffer(size_t iBufferSize,
                        size_t iOverflowSize,
@@ -360,7 +360,6 @@ Error PullBuffer::BeginRead(void *&pBuffer, size_t &iBytesNeeded, bool bBlock)
       {
           return kError_Interrupt;
       }
-
       m_pMutex->Acquire();
 
       if (m_bEOS && iBytesNeeded > m_iBytesInBuffer)
@@ -430,12 +429,13 @@ Error PullBuffer::EndRead(size_t iBytesUsed)
    m_iBytesInBuffer -= iBytesUsed;
    assert(m_iBytesInBuffer <= m_iBufferSize);
 
-   if (m_iBufferSize - m_iBytesInBuffer >= m_iWriteTriggerSize && !m_bEOS)
-       m_pWriteSem->Signal();
-
    m_bReadOpPending = false;
 
    g_Log->Log(LogInput, "EndRead: ReadIndex: %d WriteIndex %d\n", m_iReadIndex, m_iWriteIndex);
+
+   if (m_iBufferSize - m_iBytesInBuffer >= m_iWriteTriggerSize && !m_bEOS)
+       m_pWriteSem->Signal();
+
    m_pMutex->Release();
 
    return kError_NoErr;
