@@ -303,6 +303,11 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                SendMessage(m_hStatus, SB_SETTEXT, 0, (LPARAM)"");
         }
 
+        //if (pTreeView->hdr.code == NM_CLICK)
+        //{
+        //    SendMessage();
+        //}
+
         if (pTreeView->hdr.code == NM_RCLICK)
         {
             POINT sPoint;

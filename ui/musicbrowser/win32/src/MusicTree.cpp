@@ -672,6 +672,9 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
                                         LPARAM lParam)
 {
     WNDPROC lpOldProc = (WNDPROC)GetProp(hwnd, "oldproc" );
+    static bool dragging = false;
+    static RECT dragRect;
+    static HTREEITEM dragItem = NULL;
 
 	switch(msg)
 	{
@@ -689,7 +692,51 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
 
         case WM_MOUSEMOVE:
         {
-			break;
+            if(dragging)
+            {
+                if(wParam & MK_LBUTTON)
+                {
+                    POINT dragPt;
+
+                    dragPt.x = LOWORD(lParam);
+                    dragPt.y = HIWORD(lParam);
+
+                    if( !PtInRect(&dragRect, dragPt) )
+                    {
+                        SetCapture(NULL);
+                        dragging = false;
+
+                        NM_TREEVIEW nm_treeview;
+
+                        memset(&nm_treeview, 0x00, sizeof(NM_TREEVIEW));
+                        
+                        nm_treeview.hdr.code = TVN_BEGINDRAG;
+                        nm_treeview.hdr.hwndFrom = hwnd;
+                        nm_treeview.hdr.idFrom = GetWindowLong(hwnd, GWL_ID);
+
+                        nm_treeview.itemNew.hItem = dragItem;
+                        nm_treeview.itemNew.mask = TVIF_STATE|TVIF_PARAM;
+                        nm_treeview.itemNew.stateMask = TVIS_BOLD|TVIS_CUT|TVIS_DROPHILITED|TVIS_EXPANDED|TVIS_SELECTED|TVIS_EXPANDEDONCE;
+                        
+                        TreeView_GetItem(hwnd, &nm_treeview.itemNew);
+
+                        nm_treeview.ptDrag.x = LOWORD(lParam);
+                        nm_treeview.ptDrag.y = HIWORD(lParam);
+
+                        SendMessage(GetParent(hwnd), 
+                                    WM_NOTIFY, 
+                                    (WPARAM)nm_treeview.hdr.idFrom,
+                                    (LPARAM)&nm_treeview);
+
+                        return TRUE;
+
+                        //MessageBox(NULL, "drag", "hey", MB_OK);
+                    }
+                
+                }
+            }
+
+            break;
         }
 
         case WM_LBUTTONDOWN:
@@ -702,13 +749,31 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
 
             hti.pt.x = LOWORD(lParam);
             hti.pt.y = HIWORD(lParam);
+
+            int dx = GetSystemMetrics(SM_CXDRAG);
+            int dy = GetSystemMetrics(SM_CYDRAG);
+
+            dragRect.top = hti.pt.y - dy;
+            dragRect.bottom = hti.pt.y + dy;
+            dragRect.left = hti.pt.x - dx;
+            dragRect.right = hti.pt.x + dx;
         
             item = TreeView_HitTest(hwnd, &hti);  
 
             if(item && (hti.flags & TVHT_ONITEM))
             {
+                dragItem = item;
+
                 HTREEITEM focusItem = TreeView_GetSelection(hwnd);
                 TV_ITEM tv_item;
+
+                tv_item.hItem = focusItem;
+                tv_item.mask = TVIF_STATE;
+                tv_item.stateMask = TVIS_SELECTED;
+
+                TreeView_GetItem(hwnd, &tv_item);
+
+                bool wasFocusSelected = (tv_item.state & TVIS_SELECTED) != 0;
 
                 tv_item.hItem = item;
                 tv_item.mask = TVIF_STATE;
@@ -747,8 +812,8 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
                         {
                             tv_item.hItem = rootItem;
                             tv_item.mask = TVIF_STATE;
-                            tv_item.stateMask = TVIS_SELECTED | TVIS_EXPANDEDONCE;
-                            tv_item.state = TVIS_EXPANDEDONCE;
+                            tv_item.stateMask = TVIS_SELECTED;
+                            tv_item.state = 0;
 
                             TreeView_SetBranch(hwnd, &tv_item);
                             
@@ -815,28 +880,43 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
                 }
                 else
                 {
-                    // need to iterate all the items and 
-                    // make sure they aren't selected
-                    HTREEITEM rootItem = TreeView_GetRoot(hwnd);
-
-                    if(rootItem)
+                    if(!wasSelected)
                     {
-                        do
-                        {
-                            tv_item.hItem = rootItem;
-                            tv_item.mask = TVIF_STATE;
-                            tv_item.stateMask = TVIS_SELECTED | TVIS_EXPANDEDONCE;
-                            tv_item.state = TVIS_EXPANDEDONCE;
+                        // need to iterate all the items and 
+                        // make sure they aren't selected
+                        HTREEITEM rootItem = TreeView_GetRoot(hwnd);
 
-                            TreeView_SetBranch(hwnd, &tv_item);
+                        if(rootItem)
+                        {
+                            do
+                            {
+                                tv_item.hItem = rootItem;
+                                tv_item.mask = TVIF_STATE;
+                                tv_item.stateMask = TVIS_SELECTED;
+                                tv_item.state = 0;
+
+                                TreeView_SetBranch(hwnd, &tv_item);
                             
-                        }while(rootItem = TreeView_GetNextSibling(hwnd, rootItem));
+                            }while(rootItem = TreeView_GetNextSibling(hwnd, rootItem));
+                        }
+
+                        // need to set this back cause windows won't
+                        // set it if it is already the focus item and
+                        // we just deselected it
+                        if(wasSelected && wasFocus)
+                        {
+                            tv_item.hItem = focusItem;
+                            tv_item.mask = TVIF_STATE;
+                            tv_item.stateMask = TVIS_SELECTED;
+                            tv_item.state = TVIS_SELECTED;
+
+                            TreeView_SetItem(hwnd, &tv_item);
+                        }
                     }
 
-                    // need to set this back cause windows won't
-                    // set it if it is already the focus item and
-                    // we just deselected it
-                    if(wasSelected && wasFocus)
+                    TreeView_Select(hwnd, item, TVGN_CARET);
+
+                    if(!wasFocus && wasFocusSelected && wasSelected)
                     {
                         tv_item.hItem = focusItem;
                         tv_item.mask = TVIF_STATE;
@@ -845,9 +925,14 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
 
                         TreeView_SetItem(hwnd, &tv_item);
                     }
-
+                    
                     
                 }
+
+                SetCapture(hwnd);
+                dragging = true;
+
+                return TRUE;
             }
                     
             break;
@@ -857,6 +942,9 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
         {
             bool shiftKeyPressed = IsShiftDown();
             bool ctrlKeyPressed = IsCtrlDown();
+
+            SetCapture(NULL);
+            dragging = false;
 
             HTREEITEM item;
             TV_HITTESTINFO hti;
@@ -915,7 +1003,41 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
 
                     return TRUE;
                 }
+                else
+                {
+                    // need to iterate all the items and 
+                    // make sure they aren't selected
+                    HTREEITEM rootItem = TreeView_GetRoot(hwnd);
+
+                    if(rootItem)
+                    {
+                        do
+                        {
+                            tv_item.hItem = rootItem;
+                            tv_item.mask = TVIF_STATE;
+                            tv_item.stateMask = TVIS_SELECTED;
+                            tv_item.state = 0;
+
+                            TreeView_SetBranch(hwnd, &tv_item);
+                        
+                        }while(rootItem = TreeView_GetNextSibling(hwnd, rootItem));
+                    }
+
+                    // need to set this back cause windows won't
+                    // set it if it is already the focus item and
+                    // we just deselected it
+                    if(wasSelected && wasFocus)
+                    {
+                        tv_item.hItem = focusItem;
+                        tv_item.mask = TVIF_STATE;
+                        tv_item.stateMask = TVIS_SELECTED;
+                        tv_item.state = TVIS_SELECTED;
+
+                        TreeView_SetItem(hwnd, &tv_item);
+                    }
+                }
             }
+
                     
             break;
         }

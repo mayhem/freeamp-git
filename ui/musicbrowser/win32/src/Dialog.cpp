@@ -689,7 +689,6 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
 			      GWL_WNDPROC, 
                   (DWORD)::TreeViewWndProc );  
 
-
     // register our OLE drag and drop crap
     OleInitialize(NULL);
 
@@ -698,29 +697,7 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
     //CoLockObjectExternal ((IUnknown*)m_playlistDropTarget, TRUE, TRUE);
     result = RegisterDragDrop(m_hPlaylistView, m_playlistDropTarget);
 
-    if(result != S_OK)
-    {
-        LPVOID lpMessageBuffer;
 
-        FormatMessage(
-		  FORMAT_MESSAGE_ALLOCATE_BUFFER |
-		  FORMAT_MESSAGE_FROM_SYSTEM,
-		  NULL,
-		  result,
-		  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		  (LPTSTR) &lpMessageBuffer,
-		  0,
-		  NULL );
-
-		// now display this string
- 		MessageBox(NULL, (char*)lpMessageBuffer, 0, MB_OK);
-
-		// Free the buffer allocated by the system
-		LocalFree( lpMessageBuffer );
-
-
-    }
-    
     m_hStatus= CreateStatusWindow(WS_CHILD | WS_VISIBLE,
                                   "", m_hWnd, IDC_STATUS);
 
