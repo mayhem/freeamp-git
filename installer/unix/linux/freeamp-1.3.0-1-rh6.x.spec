@@ -56,6 +56,14 @@ for file in plugins/*.*; do
 		      rm -f "$fadir/$file"
 	      fi
 	   ;;
+    	*/ncurses-*.ui)
+	      if ldconfig -p | grep 'libncurses\.so' > /dev/null; then
+	      	enable=t
+	      else
+	      	enable=f
+		      rm -f "$fadir/$file"
+	      fi
+	   ;;
 	   *)
 	   enable=t
 	   ;;

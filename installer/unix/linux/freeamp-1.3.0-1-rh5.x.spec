@@ -6,7 +6,7 @@ Copyright: GPL
 Group: Applications/Multimedia
 Source: www.freeamp.org:/pub/freeamp/freeamp-1.3.0-linux-x86-glibc2.tar.gz
 AutoReqProv: No
-Requires: ld-linux.so.2 libX11.so.6 libXext.so.6 libXpm.so.4 libc.so.6 libdl.so.2 libm.so.6 libpthread.so.0 libstdc++.so.2.9 libc.so.6(GLIBC_2.0) libc.so.6(GLIBC_2.1) libm.so.6(GLIBC_2.1) libdl.so.2(GLIBC_2.1) libdl.so.2(GLIBC_2.0) libpthread.so.0(GLIBC_2.1) libpthread.so.0(GLIBC_2.0) 
+Requires: ld-linux.so.2 libX11.so.6 libXext.so.6 libXpm.so.4 libc.so.6 libdl.so.2 libm.so.6 libpthread.so.0 libstdc++.so.2.8 
 %description
 This program plays MP3 (MPEG-1 audio layer 3) files and streams. The
 player will run on Windows, Linux and Solaris.
@@ -50,6 +50,14 @@ for file in plugins/*.*; do
 	   ;;
     	*/esound-*.pmo)
 	      if ldconfig -p | grep 'libesd\.so' > /dev/null; then
+	      	enable=t
+	      else
+	      	enable=f
+		      rm -f "$fadir/$file"
+	      fi
+	   ;;
+    	*/ncurses-*.ui)
+	      if ldconfig -p | grep 'libncurses\.so' > /dev/null; then
 	      	enable=t
 	      else
 	      	enable=f
