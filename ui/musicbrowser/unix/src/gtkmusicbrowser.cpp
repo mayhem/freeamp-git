@@ -59,6 +59,7 @@ using namespace std;
 #include "../res/playlist_pix.xpm"
 #include "../res/track_pix.xpm"
 #include "../res/uncatagorized_pix.xpm"
+#include "../res/cd_pix.xpm"
 
 extern "C" {
 void new_plist(GTKMusicBrowser *p, guint action, GtkWidget *w);
@@ -1043,7 +1044,7 @@ void GTKMusicBrowser::CreateMainTreeItems(void)
 
     pixmap = gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, &mask,
                                           &style->bg[GTK_STATE_NORMAL],
-                                          uncatagorized_pix);
+                                          cd_pix);
     name[0] = "CD Audio";
     CDTree = gtk_ctree_insert_node(musicBrowserTree, NULL, NULL, name, 5, 
                                    pixmap, mask, pixmap, mask, false, false);
