@@ -47,6 +47,13 @@ enum TimeDisplayState
     kTimeRemaining
 };
 
+enum TitleDisplayState
+{
+    kName = 0,
+    kNameArtist = 1,
+    kNameArtistAlbum = 2
+};
+
 enum FreeAmpMenuCommand
 {
    kMCMyMusic = 6900,
@@ -117,10 +124,11 @@ class FreeAmpTheme : public UserInterface, public Theme
         bool             m_bPaused, m_bInOptions, m_bPlayShown;
         bool             m_bShowBuffers, m_bBufferingUp;
         string           m_oCurrentWindow, m_oTitle, m_oStreamInfo, m_oHeadlineUrl;
-        string           m_themeCache;
-        TimeDisplayState m_eTimeDisplayState;
-        UpdateManager   *m_pUpdateMan;
-        Equalizer       *m_eq;
+        TimeDisplayState      m_eTimeDisplayState;
+        TitleDisplayState     m_eTitleDisplayState;
+        string                m_themeCache;
+        UpdateManager        *m_pUpdateMan;
+        Equalizer            *m_eq;
         SignatureDisplayState m_sigState;
 };
 

@@ -122,6 +122,12 @@ plugins/esound.pmo: $(ESNDOBJ)
 	$(LINKMOD) -o $@ $(ESNDOBJ) $(ESD_LIBS)
 #	$(LINKMOD) -o $@ $(ESNDOBJ) $(STATICLD) /usr/lib/libesd.a /usr/lib/libaudiofile.a
 
+# esound
+ARTSOBJ  = io/arts/src/artspmo.o io/src/pipeline.lo io/src/pmo.o
+
+plugins/arts.pmo: $(ARTSOBJ)
+	$(LINKMOD) -o $@ $(ARTSOBJ) $(ARTS_LIBS)
+   
 # cd
 CDPMOOBJ  = io/cd/unix/src/cdpmo.o io/cd/unix/src/cdaudio.o 
 CDPMOOBJ += io/cd/unix/src/discids.o io/src/pipeline.lo io/src/pmo.o

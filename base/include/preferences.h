@@ -101,6 +101,7 @@ extern const char* kPerformDBCheckPref;
 extern const char* kWAVOutputPathPref;
 extern const char* kPlaylistHeaderColumnsPref;
 extern const char* kAdvancedRelatablePref;
+extern const char* kMetadataDisplayPref;
 
 extern const int32 kDefaultWatchThisDirTimeout;
 

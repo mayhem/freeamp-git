@@ -121,6 +121,7 @@ FreeAmpTheme::FreeAmpTheme(FAContext * context)
    m_bPlayShown = true;
    m_oTitle = string("");
    m_eTimeDisplayState = kNormal;
+   m_eTitleDisplayState = kNameArtist;
    m_oStreamInfo = string("");
    m_pUpdateMan = NULL;
    m_pUpdateThread = NULL;
@@ -197,7 +198,12 @@ void FreeAmpTheme::WorkerThread(void)
     m_pContext->prefs->GetPrefInt32(kTimeDisplayPref, &iValue);
     if (iValue)
        m_eTimeDisplayState = kTimeRemaining;
-
+    iValue = -1;
+    m_pContext->prefs->GetPrefInt32(kMetadataDisplayPref, &iValue);
+    if (iValue < 0)
+       iValue = 1;
+    m_eTitleDisplayState = (TitleDisplayState)iValue;
+    
     m_pContext->prefs->GetPrefString(kMainWindowPosPref, szTemp, &iLen);
     sscanf(szTemp, " %d , %d", &m_oWindowPos.x, &m_oWindowPos.y);
 
@@ -225,7 +231,10 @@ void FreeAmpTheme::WorkerThread(void)
     else     
        m_pContext->target->AcceptEvent(new Event(CMD_QuitPlayer));
    
-    m_pContext->prefs->SetPrefInt32(kTimeDisplayPref, m_eTimeDisplayState == kTimeRemaining);
+    m_pContext->prefs->SetPrefInt32(kTimeDisplayPref, 
+                                    m_eTimeDisplayState == kTimeRemaining);
+    m_pContext->prefs->SetPrefInt32(kMetadataDisplayPref, 
+                                    (int)m_eTitleDisplayState);
 }
 
 void WorkerThreadStart(void* arg)
@@ -1716,7 +1725,32 @@ void FreeAmpTheme::HandleKeystroke(unsigned char cKey)
      case 'T':
         ReloadTheme();
         break;
-       
+      
+     case 'i':
+     case 'I':
+     {  
+        string oText;
+
+        m_eTitleDisplayState = 
+          (m_eTitleDisplayState == kName) ? kNameArtist :
+          (m_eTitleDisplayState == kNameArtist) ? kNameArtistAlbum : kName;
+
+        switch(m_eTitleDisplayState)
+        {
+            case kName: 
+              oText = string("Display track name only.");
+              break;
+            case kNameArtist: 
+              oText = string("Display track and artist name.");
+              break;
+            case kNameArtistAlbum: 
+              oText = string("Display track, artist and album name.");
+              break;
+        }
+        m_pWindow->ControlStringValue("Info", true, oText);
+              
+        break;
+     }
      case 'h':
      case 'H':
         ShowHelp();
@@ -1888,13 +1922,21 @@ void FreeAmpTheme::UpdateTimeDisplay(int iCurrentSeconds)
 void FreeAmpTheme::UpdateMetaData(const PlaylistItem *pItem)
 {
     if (pItem->GetMetaData().Title().length() > 0 || 
-        pItem->GetMetaData().Artist().length() > 0)
+        pItem->GetMetaData().Artist().length() > 0 ||
+        pItem->GetMetaData().Album().length() > 0)
     {
         string oText;
         
         m_oTitle = pItem->GetMetaData().Title();
-        if (pItem->GetMetaData().Artist().length() > 0)
+        if (pItem->GetMetaData().Artist().length() > 0 && 
+            (m_eTitleDisplayState == kNameArtist ||
+             m_eTitleDisplayState == kNameArtistAlbum))
            m_oTitle += string(" - ") + pItem->GetMetaData().Artist();
+
+        if (pItem->GetMetaData().Album().length() > 0 && 
+             m_eTitleDisplayState == kNameArtistAlbum)
+           m_oTitle += string(" (") + pItem->GetMetaData().Album() + 
+                       string(")");;
 
         oText = string(BRANDING": ") + m_oTitle;
         m_pWindow->SetTitle(oText);

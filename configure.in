@@ -730,7 +730,7 @@ ALSAPMOPLUGIN=plugins/alsa.pmo
 if test "$have_alsa" = "true"; then
   OSDEPPLUGINS="$OSDEPPLUGINS $ALSAPMOPLUGIN";
   OSINC="$OSINC -I$srcdir/io/alsa/$OSDEP/include"
-  AC_MSG_RESULT([compiling alsa soundcard plugin])
+  AC_MSG_RESULT([compiling alsa pmo plugin])
 fi
 
 dnl AC_CHECK_LIB(vorbis, ogg_sync_init,
@@ -739,6 +739,15 @@ dnl  OSINC="$OSINC -I$srcdir/lmc/vorbis/include"
 dnl  AC_MSG_RESULT([compiling vorbis codec plugin])
 dnl )
 
+ARTS_LIBS=""
+AC_CHECK_LIB(artsc, arts_init, 
+  OSDEPPLUGINS="$OSDEPPLUGINS plugins/arts.pmo";
+  OSINC="$OSINC -I$srcdir/io/arts/include"
+  ARTS_LIBS="-lartsc -laudiofile"
+  AC_MSG_RESULT([compiling arts pmo plugin])
+)
+
+AC_SUBST(ARTS_LIBS)
 AC_SUBST(EXTRALIBS)
 AC_SUBST(OSDEPPLUGINS)
 AC_SUBST(OSINC)
