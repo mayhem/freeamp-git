@@ -43,7 +43,7 @@ class PlaylistFormat {
 
  public:
 
-    PlaylistFormat(FAContext *context) {}
+    PlaylistFormat(FAContext *context) { m_context = context; }
     virtual ~PlaylistFormat() {}
 
     virtual Error GetSupportedFormats(PlaylistFormatInfo* info, uint32 index) = 0;
@@ -55,6 +55,8 @@ class PlaylistFormat {
                                 vector<PlaylistItem*>* items,
                                 PLMCallBackFunction function = NULL,
                                 void* cookie = NULL) = 0;
+  protected:
+    FAContext *m_context;
 };
 
 typedef PlaylistFormat* PlaylistFormatRef;

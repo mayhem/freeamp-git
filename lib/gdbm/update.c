@@ -40,7 +40,7 @@ static void
 write_header (dbf)
      gdbm_file_info *dbf;
 {
-  int  num_bytes;	/* Return value for write. */
+  unsigned int  num_bytes;	/* Return value for write. */
   off_t file_pos;	/* Return value for lseek. */
 
   file_pos = lseek (dbf->desc, 0L, L_SET);
@@ -61,7 +61,7 @@ void
 _gdbm_end_update (dbf)
      gdbm_file_info *dbf;
 {
-  int  num_bytes;	/* Return value for write. */
+  unsigned int  num_bytes;	/* Return value for write. */
   off_t file_pos;	/* Return value for lseek. */
   
   

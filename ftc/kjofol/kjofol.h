@@ -92,8 +92,6 @@ class KJofol : public ThemeFormat
                     bool hasextra = false, string extrainfo = "");
         void VolumeBMP(void);
 
-        FAContext *m_context;
-
         FILE *infile, *outfile;
 
         map<string, Pos> bmp_sizes;

@@ -50,9 +50,6 @@ class M3U : public PlaylistFormat {
                                 vector<PlaylistItem*>* items,
                                 PLMCallBackFunction function = NULL,
                                 void* cookie = NULL); 
-
- private:
-     FAContext* m_context;
 };
 
 

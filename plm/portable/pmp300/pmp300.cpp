@@ -119,8 +119,6 @@ class PlaylistItemCompare {
 
 PMP300::PMP300(FAContext* context):PortableDevice(context)
 {
-    m_context = context;
-
 #ifdef WIN32
     OSVERSIONINFO osid;
 

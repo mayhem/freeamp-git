@@ -82,7 +82,7 @@ class Player : public EventQueue, Properties, PropertyWatcher
     void      testQueue();
     static void EventServiceThreadFunc(void *);
     virtual Error AcceptEvent(Event *);
-    virtual RegistryItem *ChooseLMC(const char *szUrl, char *szTitle = NULL);
+    virtual RegistryItem *ChooseLMC(const char *szUrl);
     virtual RegistryItem *ChoosePMI(const char *szUrl, char *szTitle = NULL);
 
     bool    IsSupportedExtension(const char *ext);

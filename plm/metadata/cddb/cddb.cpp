@@ -47,7 +47,6 @@ extern "C"
 
 CDDB::CDDB(FAContext* context):MetaDataFormat(context)
 {
-    m_context = context;
     use_cddb_message = true;
     parse_disc_artist = true;
     parse_track_artist = true;

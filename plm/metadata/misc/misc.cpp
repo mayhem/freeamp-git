@@ -53,8 +53,6 @@ extern "C"
 
 Misc::Misc(FAContext* context):MetaDataFormat(context)
 {
-    m_context = context;
-
     Registrar registrar;
 
     registrar.SetSubDir("plugins");

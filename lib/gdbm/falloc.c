@@ -178,7 +178,7 @@ pop_avail_block (dbf)
   off_t file_pos;		/* For use with the lseek system call. */
   avail_elem new_el;
   avail_block *new_blk;
-  int index;
+  unsigned int index;
 
   /* Set up variables. */
   new_el.av_adr = dbf->header->avail.next_block;
@@ -226,7 +226,7 @@ push_avail_block (dbf)
   int  num_bytes;
   unsigned int  av_size;
   off_t av_adr;
-  int  index;
+  unsigned int  index;
   off_t file_pos;
   avail_block *temp;
   avail_elem  new_loc;
@@ -347,14 +347,14 @@ _gdbm_put_av_elem (new_el, av_table, av_count, can_merge)
 	{
 	  /* Can we merge with the previous block? */
 	  if ((av_table[index].av_adr
-	       + av_table[index].av_size) == new_el.av_adr)
+	       + (off_t)av_table[index].av_size) == (off_t)new_el.av_adr)
 	    {
 	      /* Simply expand the endtry. */
 	      av_table[index].av_size += new_el.av_size;
 	    }
 	    /* Can we merge with the next block? */
 	    else if ((new_el.av_adr
-	      	      + new_el.av_size) == av_table[index].av_adr)
+	      	      + (off_t)new_el.av_size) == (off_t)av_table[index].av_adr)
 	      {
 	        /* Update this entry. */
 	        av_table[index].av_adr = new_el.av_adr;

@@ -162,12 +162,15 @@ typedef enum MetaDataOrder {
 
 class MetaDataFormat {
  public:
-    MetaDataFormat(FAContext *context) {}
+    MetaDataFormat(FAContext *context) { m_context = context; }
     virtual ~MetaDataFormat() {}
 
     virtual bool ReadMetaData(const char* url, MetaData* metadata) = 0;
     virtual bool WriteMetaData(const char* url, const MetaData& metadata) = 0;
     virtual MetaDataOrder Order() = 0;
+
+ protected:
+    FAContext *m_context;
 };
 
 

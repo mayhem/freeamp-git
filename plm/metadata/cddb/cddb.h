@@ -51,7 +51,6 @@ class CDDB : public MetaDataFormat {
     virtual MetaDataOrder Order() { return MetaDataOrder_Low; }
 
  private:
-    FAContext        *m_context;
     unsigned long     m_discid;
     int               m_total_tracks;
     struct disc_info *m_discinfo;

@@ -103,7 +103,7 @@ class PortableDevice {
  
  public:
 
-    PortableDevice(FAContext *context) {}
+    PortableDevice(FAContext *context) { m_context = context; }
     virtual ~PortableDevice() {}
 
     virtual Error GetSupportedDevices(DeviceInfo* device, uint32 index) = 0;
@@ -133,6 +133,8 @@ class PortableDevice {
                                const char* url,
                                PLMCallBackFunction function = NULL,
                                void* cookie = NULL) = 0;
+  protected:
+     FAContext *m_context;
 };
 
 

@@ -55,7 +55,6 @@ extern "C"
 
 RMP::RMP(FAContext* context):DownloadFormat(context)
 {
-    m_context = context;
     m_pMetaData = NULL;
 }
 

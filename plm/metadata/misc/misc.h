@@ -54,7 +54,6 @@ class Misc : public MetaDataFormat
 
  private:
 
-    FAContext* m_context;
     Registry  m_lmcReg;
     Registry  m_pmiReg;
     ExtensionMap m_extensions;

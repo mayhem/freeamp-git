@@ -58,7 +58,6 @@ extern "C"
 
 PLS::PLS(FAContext* context):PlaylistFormat(context)
 {
-    m_context = context;
 }
 
 PLS::~PLS()

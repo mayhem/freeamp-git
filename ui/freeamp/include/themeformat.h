@@ -39,11 +39,13 @@ class ThemeFormat
 {
     public:
 
-        ThemeFormat(FAContext *context) {}
+        ThemeFormat(FAContext *context) { m_context = context; }
         virtual ~ThemeFormat() {}
 
         virtual bool IsSupportedFormat(string &oDir) = 0;
         virtual Error ConvertToNative(string &oDir) = 0;
+    protected:
+        FAContext *m_context;
 };
 
 #endif

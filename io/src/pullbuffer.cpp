@@ -418,7 +418,6 @@ Error PullBuffer::EndRead(size_t iBytesUsed)
 {
    assert(m_pPullBuffer != NULL);
    assert(iBytesUsed <= m_iBytesToRead);
-   assert(iBytesUsed >= 0);
    assert(iBytesUsed <= m_iBytesInBuffer);
 
    m_pMutex->Acquire();

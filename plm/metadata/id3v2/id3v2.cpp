@@ -189,7 +189,6 @@ extern "C"
 
 ID3v2::ID3v2(FAContext* context):MetaDataFormat(context)
 {
-    m_context = context;
 }
 
 ID3v2::~ID3v2()

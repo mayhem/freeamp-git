@@ -1188,7 +1188,7 @@ IsSupportedExtension(const char *ext)
 
 RegistryItem *
 Player::
-ChooseLMC(const char *szUrl, char *szTitle)
+ChooseLMC(const char *szUrl)
 {
    RegistryItem *lmc_item = NULL;
    char     *iExt;

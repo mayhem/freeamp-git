@@ -56,7 +56,6 @@ class RMP : public DownloadFormat, public Parse {
 
  private:
  
-     FAContext             *m_context;
      vector<DownloadItem*> *m_pList;
      string                 m_oPath, m_oFileName, m_oLocation;
 	 string                 m_oPackageId, m_oListId, m_oTrackId;  

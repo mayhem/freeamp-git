@@ -55,8 +55,6 @@ class PLS : public PlaylistFormat {
 
      void AddItem(vector<PlaylistItem*>* list, char *entry, 
 	              char *title, int32 len, char *root);
-
-     FAContext* m_context;
 };
 
 

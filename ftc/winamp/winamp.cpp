@@ -51,7 +51,6 @@ extern "C"
 
 Winamp::Winamp(FAContext *context):ThemeFormat(context)
 {
-    m_context = context;
 }
 
 Winamp::~Winamp()

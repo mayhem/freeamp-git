@@ -46,8 +46,6 @@ class ID3v1 : public MetaDataFormat {
     virtual MetaDataOrder Order() { return MetaDataOrder_Medium; }
 
  private:
-     FAContext* m_context;
-
      void KillTrailingSpaces(char* string);
 };
 

@@ -737,7 +737,7 @@ bool CopyFile(const char *pExistingFileName,
     for(;;)
     {
         iRet = fread(szBuffer, 1, iCopyBufferSize, fpSrc);
-        if (iRet < 0)
+        if ((int)iRet < 0)
         {
             fclose(fpDest);
             fclose(fpSrc);

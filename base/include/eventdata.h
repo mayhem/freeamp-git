@@ -234,7 +234,7 @@ class     MediaInfoEvent:public Event
       m_childEvents = new vector<Event *>;
    }
 
-   MediaInfoEvent(MediaInfoEvent &other)
+   MediaInfoEvent(MediaInfoEvent &other):Event(other)
    {
       m_copy = true;
       m_type = other.m_type;

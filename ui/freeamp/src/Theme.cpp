@@ -499,8 +499,12 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
            m_oLastError = string("the <Bitmap> tag needs a File attribute");
            return kError_ParseError;
        }        
+ 
+       if (IsRelative(oAttrMap["File"].c_str()))
+           oCompleteFile = m_oThemePath + oAttrMap["File"];
+       else
+           oCompleteFile = oAttrMap["File"];
 
-       oCompleteFile = m_oThemePath + oAttrMap["File"];
        eRet = pBitmap->LoadBitmapFromDisk(oCompleteFile);
        if (eRet != kError_NoErr)
        {

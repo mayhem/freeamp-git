@@ -129,7 +129,7 @@ int sock_recv_string(int fd, char *dest, size_t maxlen)
 
    /* Read in characters until the end of the line... */
    for(i=0;
-       i<maxlen && (read(fd, dest+i, 1) > 0);
+       (size_t)i<maxlen && (read(fd, dest+i, 1) > 0);
        i++)
       if(dest[i] == 0  ||  dest[i] == '\n') break;
       

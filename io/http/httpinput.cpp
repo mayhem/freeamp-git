@@ -376,9 +376,10 @@ Error HttpInput::GetHostByName(char *szHostName, struct hostent *pResult)
     struct hostent TempHostent;
     static unsigned long IP_Adr;
     static char *AdrPtrs[2] = {(char *) &IP_Adr, NULL };
-	Error  eRet;
 
 #ifdef WIN32
+    Error eRet;
+
     eRet = Win32GetHostByName(szHostName, &TempHostent);
 	if (eRet == kError_Interrupt)
         return eRet;
@@ -397,7 +398,7 @@ Error HttpInput::GetHostByName(char *szHostName, struct hostent *pResult)
         // That didn't work.  On some stacks a numeric IP address
         // will not parse with gethostbyname.  Try to convert it as a
         // numeric address before giving up.
-        if((IP_Adr = inet_addr(szHostName)) < 0) 
+        if((int)(IP_Adr = inet_addr(szHostName)) < 0) 
             return kError_NoDataAvail;
 
         TempHostent.h_length = sizeof(uint32);

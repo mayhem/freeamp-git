@@ -47,8 +47,6 @@ class Winamp : public ThemeFormat
         virtual Error ConvertToNative(string &oDir);
 
     private:
-
-        FAContext *m_context;
 };
 
 #endif

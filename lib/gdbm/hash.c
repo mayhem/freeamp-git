@@ -43,7 +43,7 @@ _gdbm_hash (key)
      datum key;
 {
   unsigned int value;	/* Used to compute the hash value.  */
-  int   index;		/* Used to cycle through random values. */
+  unsigned int index;		/* Used to cycle through random values. */
 
 
   /* Set the initial value from key. */

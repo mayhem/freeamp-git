@@ -70,7 +70,6 @@ static char timefontmap[] =
 
 KJofol::KJofol(FAContext *context):ThemeFormat(context)
 {
-    m_context = context;
 }
 
 KJofol::~KJofol()
@@ -321,6 +320,8 @@ void KJofol::ParseRCFile(string rcfile, string windowname, bool dock)
             haswinshade = true;
         }
         else if (!strncasecmp(left, "Playlist", 8)) {
+        }
+        else if (!strcasecmp(left, "About")) {
         }
         else
             cout << "don't understand: " << line << endl;

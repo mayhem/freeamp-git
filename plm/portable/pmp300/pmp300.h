@@ -70,8 +70,6 @@ class PMP300 : public PortableDevice {
                                PLMCallBackFunction function = NULL,
                                void* cookie = NULL);
 
- private:
-     FAContext* m_context;
 };
 
 

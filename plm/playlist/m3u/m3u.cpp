@@ -58,7 +58,6 @@ extern "C"
 
 M3U::M3U(FAContext* context):PlaylistFormat(context)
 {
-    m_context = context;
 }
 
 M3U::~M3U()

@@ -43,12 +43,14 @@ class DownloadFormat {
 
  public:
 
-    DownloadFormat(FAContext *context) {}
+    DownloadFormat(FAContext *context) { m_context = context; }
     virtual ~DownloadFormat() {}
 
     virtual Error GetSupportedFormats(DownloadFormatInfo* info, uint32 index) = 0;
     virtual Error ReadDownloadFile(const char* url, vector<DownloadItem*>* items) = 0;
-    
+
+ protected:
+    FAContext *m_context;   
 };
 
 typedef DownloadFormat* DownloadFormatRef;

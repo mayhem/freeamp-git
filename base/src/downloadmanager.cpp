@@ -718,7 +718,7 @@ Error DownloadManager::Download(DownloadItem* item)
                 static unsigned long ip;
                 static char *addr_ptr[2] = {(char*)&ip, NULL};
 
-                if((ip = inet_addr(server)) < 0) 
+                if((int)(ip = inet_addr(server)) < 0) 
                     result =  kError_CantFindHost;
                 else
                 {

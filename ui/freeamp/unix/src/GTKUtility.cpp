@@ -31,6 +31,7 @@ ____________________________________________________________________________*/
 #include <gdk/gdk.h>
 #include <gdk/gdkx.h>
 #include <gtk/gtk.h>
+#include <X11/Xatom.h>
 #include <iostream>
 #include <unistd.h>
 
@@ -58,6 +59,56 @@ void WarpPointer(GdkWindow *win, int x, int y)
     XWarpPointer(GDK_DISPLAY(), window, window, 0, 0, 0, 0, x, y);
 }
 
+static void *GetWindowProperty(Window win, Atom type, Atom format, int *size)
+{
+   unsigned char      *retval;
+   Atom                type_ret;
+   unsigned long       bytes_after, num_ret;
+   int                 format_ret;
+   void               *data = NULL;
+
+   retval = NULL;
+   if (win == 0) {
+       *size = 0;
+       return NULL;
+   }
+   XGetWindowProperty(GDK_DISPLAY(), win, type, 0, 0x7fffffffL, False, format,
+                      &type_ret, &format_ret, &num_ret, &bytes_after, &retval);
+
+   if (retval) {
+       if (format_ret == 32) {
+           int i;
+
+           *size = num_ret * sizeof(unsigned int);
+           data = (void *)new unsigned int[num_ret];
+
+           for (i = 0; i < (int)num_ret; i++)
+               ((unsigned int *)data)[i] = ((unsigned long *)retval)[i];
+       }
+       else if (format_ret == 16) {
+           int i;
+
+           *size = num_ret * sizeof(unsigned short);
+           data = (void *)new unsigned short[num_ret];
+
+           for (i = 0; i < (int)num_ret; i++)
+               ((unsigned short *)data)[i] = ((unsigned short *)retval)[i];
+       }
+       else if (format_ret == 8) {
+           *size = num_ret;
+           data = (void *)new char[num_ret];
+
+           if (data)
+              memcpy(data, retval, num_ret);
+        }
+        XFree(retval);
+        return data;
+   }
+   *size = 0;
+   return NULL;
+}
+
+
 Pos GetFocusPos(void)
 {
     Window win, tempwin;
@@ -65,6 +116,8 @@ Pos GetFocusPos(void)
     int v, rx = -1, ry = -1;
     char *name;
     Pos retpos;
+    static Atom atom = None;
+    int *data, size;
 
     if (XGetInputFocus(GDK_DISPLAY(), &win, &v) &&
         XFetchName(GDK_DISPLAY(), win, &name) &&
@@ -75,6 +128,18 @@ Pos GetFocusPos(void)
                                   -win_attr.border_width, 
                                   -win_attr.border_width, &rx, &ry,
                                   &tempwin);
+        if (atom == None)
+            atom = XInternAtom(GDK_DISPLAY(), "_E_FRAME_SIZE", True);
+
+        if (atom != None) {
+            data = (int *)GetWindowProperty(win, atom, XA_CARDINAL, &size);
+            if (data) {
+                if (size == (4 * sizeof(int))) {
+                    rx -= data[0];
+                    ry -= data[2];
+                }
+            }
+        }
     }
 
     retpos.x = rx;

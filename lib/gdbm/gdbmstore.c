@@ -57,7 +57,7 @@ gdbm_store (dbf, key, content, flags)
   int  elem_loc;		/* The location in hash bucket. */
   off_t file_adr;		/* The address of new space in the file.  */
   off_t file_pos;		/* The position after a lseek. */
-  int  num_bytes;		/* Used for error detection. */
+  unsigned int  num_bytes;		/* Used for error detection. */
   off_t free_adr;		/* For keeping track of a freed section. */
   unsigned int free_size;
   unsigned int new_size;	/* Used in allocating space. */
