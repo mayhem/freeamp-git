@@ -1216,10 +1216,12 @@ void FreeAmpTheme::UpdateTimeDisplay(int iCurrentSeconds)
                     (iSeconds % 3600) / 60,
                     iSeconds % 60);
         else                
+        if (iSeconds <= 0)
+            sprintf(szText, "0:00");
+        else
             sprintf(szText, "-%d:%02d", 
                     (iSeconds % 3600) / 60,
                     iSeconds % 60);
-                
     }    
     else    
     if (iCurrentSeconds >= 0)
