@@ -79,8 +79,6 @@ SUBDIRS = base io ui lmc
 @AM_HAVE_WIN32_TRUE@PRG =
 @AM_HAVE_WIN32_FALSE@PRG = freeamp
 @AM_HAVE_WIN32_FALSE@ALLLDADD = @top_srcdir@/base/unix/@target_os@/src/*.o \
-@AM_HAVE_WIN32_FALSE@	  @top_srcdir@/io/local/*.o \
-@AM_HAVE_WIN32_FALSE@	  @top_srcdir@/ui/cmdline/*.o \
 @AM_HAVE_WIN32_FALSE@	  @top_srcdir@/ui/dummy/src/*.o \
 @AM_HAVE_WIN32_FALSE@	  @top_srcdir@/lmc/src/*.o \
 @AM_HAVE_WIN32_FALSE@	  @top_srcdir@/io/src/*.o \
@@ -90,9 +88,6 @@ SUBDIRS = base io ui lmc
 @AM_HAVE_WIN32_FALSE@DSLDADD = @top_srcdir@/base/src/player.o @top_srcdir@/base/src/playlist.o @top_srcdir@/base/src/command.o @top_srcdir@/base/src/thread.o $(ALLLDADD)
 @AM_HAVE_WIN32_FALSE@MYDEPS = @top_srcdir@/base/unix/@target_os@/src/libfasys.a \
 @AM_HAVE_WIN32_FALSE@         @top_srcdir@/base/src/libfabase.a \
-@AM_HAVE_WIN32_FALSE@         @top_srcdir@/io/local/libfaiolocal.a \
-@AM_HAVE_WIN32_FALSE@         @top_srcdir@/ui/cmdline/libfauicmdline.a \
-@AM_HAVE_WIN32_FALSE@         @top_srcdir@/lmc/xingmp3/src/libfalmcxingmp3.a \
 @AM_HAVE_WIN32_FALSE@	 @top_srcdir@/ui/dummy/src/libfauidummy.a \
 @AM_HAVE_WIN32_FALSE@	 @top_srcdir@/lmc/src/libfalmcsrc.a \
 @AM_HAVE_WIN32_FALSE@	 @top_srcdir@/io/src/libfaiosrc.a \

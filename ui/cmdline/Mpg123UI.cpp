@@ -285,6 +285,7 @@ void Mpg123UI::SetArgs(int argc, char **argv) {
 		    break;
 	    }
 	} else {
+	    cout << "Adding: " <<argv[i] << endl;
 	    pl->Add(argv[i],0);
 	}
     }

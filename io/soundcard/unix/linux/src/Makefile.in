@@ -41,7 +41,7 @@ pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
 
-top_builddir = ../../../..
+top_builddir = ../../../../..
 
 ACLOCAL = @ACLOCAL@
 AUTOCONF = @AUTOCONF@
@@ -74,34 +74,34 @@ RANLIB = @RANLIB@
 VERSION = @VERSION@
 target_os = @target_os@
 
-@AM_HAVE_LINUX_TRUE@FILES = linuxthread.cpp mutex.cpp debug.cpp semaphore.cpp utility.cpp
-@AM_HAVE_LINUX_TRUE@MYLIBS = libfasys.a
+@AM_HAVE_LINUX_TRUE@FILES = soundcardpmo.cpp soundcardlib.cpp
+@AM_HAVE_LINUX_TRUE@MYLIBS = libfasndcard.a
 @AM_HAVE_LINUX_FALSE@FILES = 
 @AM_HAVE_LINUX_FALSE@MYLIBS = 
 
 @AM_HAVE_LINUXTHREADS_TRUE@REENT = -D_REENTRANT
 
 noinst_LIBRARIES = $(MYLIBS)
-libfasys_a_SOURCES = $(FILES)
+libfasndcard_a_SOURCES = $(FILES)
 
-INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I@top_srcdir@/io/include -I@top_srcdir@/ui/include
-CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT) -D__@target_os@__
+INCLUDES = -I@top_srcdir@/base/include -I@top_srcdir@/base/unix/@target_os@/include  -I@srcdir@/../include -I@top_srcdir@/config -I@top_srcdir@/io/include -I@top_srcdir@/ui/include
+CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT) -D__@target_os@__ -fPIC
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
-CONFIG_HEADER = ../../../../config/config.h
+CONFIG_HEADER = ../../../../../config/config.h
 CONFIG_CLEAN_FILES = 
 LIBRARIES =  $(noinst_LIBRARIES)
 
 
-DEFS = @DEFS@ -I. -I$(srcdir) -I../../../../config
+DEFS = @DEFS@ -I. -I$(srcdir) -I../../../../../config
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-libfasys_a_LIBADD = 
-@AM_HAVE_LINUX_FALSE@cond0libfasys_a_OBJECTS = 
-@AM_HAVE_LINUX_TRUE@cond1libfasys_a_OBJECTS =  linuxthread.o mutex.o \
-@AM_HAVE_LINUX_TRUE@debug.o semaphore.o utility.o
-libfasys_a_OBJECTS =  $(cond0libfasys_a_OBJECTS) \
-$(cond1libfasys_a_OBJECTS)
+libfasndcard_a_LIBADD = 
+@AM_HAVE_LINUX_FALSE@cond0libfasndcard_a_OBJECTS = 
+@AM_HAVE_LINUX_TRUE@cond1libfasndcard_a_OBJECTS =  soundcardpmo.o \
+@AM_HAVE_LINUX_TRUE@soundcardlib.o
+libfasndcard_a_OBJECTS =  $(cond0libfasndcard_a_OBJECTS) \
+$(cond1libfasndcard_a_OBJECTS)
 AR = ar
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 CXXLINK = $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@
@@ -112,18 +112,17 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP = --best
-DEP_FILES =  .deps/debug.P .deps/linuxthread.P .deps/mutex.P \
-.deps/semaphore.P .deps/utility.P
+DEP_FILES =  .deps/soundcardlib.P .deps/soundcardpmo.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
-SOURCES = $(libfasys_a_SOURCES)
-OBJECTS = $(libfasys_a_OBJECTS)
+SOURCES = $(libfasndcard_a_SOURCES)
+OBJECTS = $(libfasndcard_a_OBJECTS)
 
-all: Makefile $(LIBRARIES)
+all: Makefile $(LIBRARIES) all-local
 
 .SUFFIXES:
 .SUFFIXES: .S .c .cpp .o .s
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4)
-	cd $(top_srcdir) && $(AUTOMAKE) --gnu base/unix/linux/src/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu io/soundcard/unix/linux/src/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
@@ -155,10 +154,10 @@ distclean-compile:
 
 maintainer-clean-compile:
 
-libfasys.a: $(libfasys_a_OBJECTS) $(libfasys_a_DEPENDENCIES)
-	-rm -f libfasys.a
-	$(AR) cru libfasys.a $(libfasys_a_OBJECTS) $(libfasys_a_LIBADD)
-	$(RANLIB) libfasys.a
+libfasndcard.a: $(libfasndcard_a_OBJECTS) $(libfasndcard_a_DEPENDENCIES)
+	-rm -f libfasndcard.a
+	$(AR) cru libfasndcard.a $(libfasndcard_a_OBJECTS) $(libfasndcard_a_LIBADD)
+	$(RANLIB) libfasndcard.a
 .cpp.o:
 	$(CXXCOMPILE) -c $<
 
@@ -189,14 +188,14 @@ maintainer-clean-tags:
 
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 
-subdir = base/unix/linux/src
+subdir = io/soundcard/unix/linux/src
 
 distdir: $(DISTFILES)
 	here=`cd $(top_builddir) && pwd`; \
 	top_distdir=`cd $(top_distdir) && pwd`; \
 	distdir=`cd $(distdir) && pwd`; \
 	cd $(top_srcdir) \
-	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu base/unix/linux/src/Makefile
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu io/soundcard/unix/linux/src/Makefile
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  test -f $(distdir)/$$file \
@@ -302,6 +301,12 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
 include @top_srcdir@/config/Makefile.header
+
+all-local: sndcard-local
+
+sndcard-local: soundcardpmo.o soundcardlib.o
+	gcc -shared -Wl,-soname,soundcard-@target_os@.pmo -o soundcard-@target_os@.pmo soundcardpmo.o soundcardlib.o
+	cp soundcard-@target_os@.pmo @top_srcdir@/io
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

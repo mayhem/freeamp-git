@@ -23,6 +23,7 @@ ____________________________________________________________________________*/
 /* project headers */
 #include "pmilib.h"
 #include "localfileinput.h"
+#ifdef WIN32
 #include "mem.h"
 
 void* operator new(size_t size)
@@ -39,6 +40,7 @@ void operator delete(void* p)
    __free(p);
 }
 
+#endif
 
 void Initialize(PMIRef ref)
 {
