@@ -61,6 +61,7 @@ MusicCatalog::MusicCatalog(FAContext *context, char *databasepath)
     m_context = context;
     m_plm = context->plm;
     m_mutex = new Mutex();
+    m_catMutex = new Mutex();
     m_inUpdateSong = false;
     m_acceptItemChanged = false;
     m_artistList = new vector<ArtistList *>;
@@ -99,9 +100,10 @@ class comp_catalog {
           return (a->name < b->name);
       }
 };
-          
+
 void MusicCatalog::Sort(void)
 {
+    m_catMutex->Acquire();
     // Sort the playlists...
     sort(m_playlists->begin(), m_playlists->end());
 
@@ -120,6 +122,7 @@ void MusicCatalog::Sort(void)
              comp_catalog());
     }
     sort(m_artistList->begin(), m_artistList->end(), comp_catalog());
+    m_catMutex->Release();
 }
 
 Error MusicCatalog::RemovePlaylist(const char *url)
@@ -137,6 +140,8 @@ Error MusicCatalog::RemovePlaylist(const char *url)
     delete [] data;
     m_database->Remove(url);
 
+    m_catMutex->Acquire();
+
     vector<string>::iterator i = m_playlists->begin();
     for (; i != m_playlists->end(); i++)
          if ((*i) == url) {
@@ -146,9 +151,11 @@ Error MusicCatalog::RemovePlaylist(const char *url)
                  m_context->target->AcceptEvent(new MusicCatalogPlaylistRemovedEvent(sUrl));
                  m_playlists->erase(i);
              }
+             m_catMutex->Release();
              return kError_NoErr;
          }   
 
+    m_catMutex->Release();
     return kError_ItemNotFound;
 }
 
@@ -167,6 +174,7 @@ Error MusicCatalog::AddPlaylist(const char *url)
         delete [] data;
 
     bool found = false;
+    m_catMutex->Acquire();
     vector<string>::iterator i = m_playlists->begin();
     for (; i != m_playlists->end(); i++)
          if ((*i) == url)
@@ -181,9 +189,11 @@ Error MusicCatalog::AddPlaylist(const char *url)
 
         string sUrl = url;
         m_context->target->AcceptEvent(new MusicCatalogPlaylistAddedEvent(sUrl));
+        m_catMutex->Release();
         return kError_NoErr;
     }
 
+    m_catMutex->Release();
     return kError_DuplicateItem;
 }
 
@@ -200,6 +210,7 @@ Error MusicCatalog::RemoveSong(const char *url)
 
     m_database->Remove(url);
 
+    m_catMutex->Acquire();
     if ((meta->Artist().size() == 0) || (meta->Artist() == " ")) {
         vector<PlaylistItem *>::iterator i = m_unsorted->begin();
         for (; i != m_unsorted->end(); i++)
@@ -254,6 +265,7 @@ Error MusicCatalog::RemoveSong(const char *url)
 
     delete meta;
 
+    m_catMutex->Release();
     return kError_NoErr;
 }
 
@@ -277,11 +289,15 @@ Error MusicCatalog::AddSong(const char *url)
 
         MetaData tempdata = (MetaData)(newtrack->GetMetaData());
         WriteMetaDataToDatabase(url, tempdata);
+
+        delete newtrack;
+
         meta = ReadMetaDataFromDatabase(url);
     }
-    else
-        newtrack = new PlaylistItem(url, meta);
 
+    newtrack = new PlaylistItem(url, meta);
+
+    m_catMutex->Acquire();
     if ((meta->Artist().size() == 0) || (meta->Artist() == " ")) {
         m_unsorted->push_back(newtrack);
         AcceptEvent(new MusicCatalogTrackAddedEvent(newtrack, NULL, NULL));
@@ -318,7 +334,8 @@ Error MusicCatalog::AddSong(const char *url)
                         vector<PlaylistItem *>::iterator k = trList->begin();
                         for (; k != trList->end(); k++) {
                             if (url == (*k)->URL()) {
-                                delete newtrack;                                
+                                delete newtrack;  
+                                m_catMutex->Release();
                                 return kError_DuplicateItem;
                             }
                         }
@@ -348,6 +365,7 @@ Error MusicCatalog::AddSong(const char *url)
             AcceptEvent(new MusicCatalogTrackAddedEvent(newtrack, newartist, newalbum));
         }
     }
+    m_catMutex->Release();
     return kError_NoErr;
 }
 
@@ -429,12 +447,14 @@ Error MusicCatalog::Add(const char *url)
 
 void MusicCatalog::ClearCatalog()
 {
+    m_catMutex->Acquire();
     delete m_artistList;
     delete m_unsorted;
     delete m_playlists;
     m_artistList = new vector<ArtistList *>;
     m_unsorted = new vector<PlaylistItem *>;
     m_playlists = new vector<string>;
+    m_catMutex->Release();
 }
 
 Error MusicCatalog::RePopulateFromDatabase()

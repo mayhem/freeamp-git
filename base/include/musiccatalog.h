@@ -40,9 +40,12 @@ class AlbumList {
  public:
      AlbumList() { m_trackList = new vector<PlaylistItem *>; }
     ~AlbumList() {
-                      vector<PlaylistItem *>::iterator i = m_trackList->begin();
-		      for (; i != m_trackList->end(); i++)
-                          delete (*i);
+                      while (m_trackList->size() > 0) {
+                          delete (*m_trackList)[0];
+                          m_trackList->erase(m_trackList->begin());
+                      }
+                      delete m_trackList;
+                      m_trackList = NULL;
                   }
 
     vector<PlaylistItem *> *m_trackList;
@@ -53,9 +56,12 @@ class ArtistList {
  public:
     ArtistList() { m_albumList = new vector<AlbumList *>; }
    ~ArtistList() {
-                     vector<AlbumList *>::iterator i = m_albumList->begin();
-           	     for (; i != m_albumList->end(); i++)
-                         delete (*i);
+                     while (m_albumList->size() > 0) {
+                         delete (*m_albumList)[0];
+                         m_albumList->erase(m_albumList->begin());
+                     }
+                     delete m_albumList;
+                     m_albumList = NULL;
 		 }
     
     vector<AlbumList *> *m_albumList;
@@ -96,6 +102,9 @@ class MusicCatalog : public EventQueue
     const vector<PlaylistItem *> *GetUnsortedMusic(void) { return m_unsorted; }
     const vector<string> *GetPlaylists(void) { return m_playlists; }
 
+    void  GetCatalogLock(void) { m_catMutex->Acquire(); }
+    void  ReleaseCatalogLock(void) { m_catMutex->Release(); }
+
     virtual int32 AcceptEvent(Event *e);
 
  protected:
@@ -110,6 +119,8 @@ class MusicCatalog : public EventQueue
     FAContext *m_context;
 
  private:
+    Mutex *m_catMutex;
+
     vector<ArtistList *> *m_artistList;
     vector<PlaylistItem *> *m_unsorted;
     vector<string> *m_playlists;

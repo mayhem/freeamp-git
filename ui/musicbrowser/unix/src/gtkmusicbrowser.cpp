@@ -258,9 +258,11 @@ static vector<PlaylistItem *> *getTreeSelection(GtkCTree *tree)
             MusicCatalog *cat = data->catalog;
             if (!cat)
                 return newlist;
-            const vector<ArtistList *> *artistList = cat->GetMusicList();
-            const vector<PlaylistItem *> *unsorted = cat->GetUnsortedMusic();
-            vector<ArtistList *>::const_iterator h = artistList->begin();
+            vector<ArtistList *> *artistList = 
+                                   (vector<ArtistList *>*)cat->GetMusicList();
+            vector<PlaylistItem *> *unsorted = 
+                             (vector<PlaylistItem *>*)cat->GetUnsortedMusic();
+            vector<ArtistList *>::iterator h = artistList->begin();
             for (; h != artistList->end(); h++) {
                 vector<AlbumList *>::iterator i = (*h)->m_albumList->begin();
                 for (; i != (*h)->m_albumList->end(); i++) {
@@ -271,7 +273,7 @@ static vector<PlaylistItem *> *getTreeSelection(GtkCTree *tree)
                     }
                 }
             }
-            vector<PlaylistItem *>::const_iterator k = unsorted->begin();
+            vector<PlaylistItem *>::iterator k = unsorted->begin();
             for (; k != unsorted->end(); k++) {
                 PlaylistItem *item = new PlaylistItem(*(PlaylistItem *)*k);
                 newlist->push_back(item);
@@ -306,8 +308,9 @@ static vector<PlaylistItem *> *getTreeSelection(GtkCTree *tree)
             break; }
         case kTreeUncat: {
             MusicCatalog *cat = data->catalog;
-            const vector<PlaylistItem *> *unsorted = cat->GetUnsortedMusic();
-            vector<PlaylistItem *>::const_iterator k = unsorted->begin();
+            vector<PlaylistItem *> *unsorted = 
+                               (vector<PlaylistItem *>*)cat->GetUnsortedMusic();
+            vector<PlaylistItem *>::iterator k = unsorted->begin();
             for (; k != unsorted->end(); k++) {
                 PlaylistItem *item = new PlaylistItem(*(PlaylistItem *)*k);
                 newlist->push_back(item);
@@ -781,9 +784,15 @@ void GTKMusicBrowser::UpdateCatalog(void)
 {
     m_musicCatalog = m_context->catalog;
     static bool triedUpdate = false;
-    const vector<ArtistList *> *artistList = m_musicCatalog->GetMusicList();
-    const vector<PlaylistItem *> *unsorted = m_musicCatalog->GetUnsortedMusic();
-    const vector<string> *playlists = m_musicCatalog->GetPlaylists();
+
+    m_musicCatalog->GetCatalogLock();
+
+    vector<ArtistList *> *artistList = 
+                         (vector<ArtistList *> *)m_musicCatalog->GetMusicList();
+    vector<PlaylistItem *> *unsorted = 
+                   (vector<PlaylistItem *> *)m_musicCatalog->GetUnsortedMusic();
+    vector<string> *playlists = 
+                               (vector<string> *)m_musicCatalog->GetPlaylists();
 
     if ((artistList->size() == 0) && (unsorted->size() == 0) && 
         (playlists->size() == 0) && (triedUpdate == false)) {
@@ -794,12 +803,15 @@ void GTKMusicBrowser::UpdateCatalog(void)
         if (oBox.Show(oMessage.c_str(), "MusicBrowser", kMessageYesNo)
             == kMessageReturnYes)
             StartMusicSearch(false); 
+        m_musicCatalog->ReleaseCatalogLock();
         return;
     }
 
     if ((artistList->size() == 0) && (unsorted->size() == 0) &&
-        (playlists->size() == 0)) 
-       return;
+        (playlists->size() == 0)) {
+        m_musicCatalog->ReleaseCatalogLock(); 
+        return;
+    }
 
     gtk_clist_freeze(GTK_CLIST(musicBrowserTree));
     if (musicBrowserTree) 
@@ -847,7 +859,7 @@ void GTKMusicBrowser::UpdateCatalog(void)
 
     uncatItem = NULL;
     allItem = NULL;
-    vector<PlaylistItem *>::const_iterator l = unsorted->begin();
+    vector<PlaylistItem *>::iterator l = unsorted->begin();
     for (; l != unsorted->end(); l++) {
         MetaData mdata = (*l)->GetMetaData();
         name[0] = (char *)mdata.Title().c_str();
@@ -868,11 +880,8 @@ void GTKMusicBrowser::UpdateCatalog(void)
         gtk_ctree_node_set_row_data(musicBrowserTree, allItem, data);
     }
 
-    vector<ArtistList *>::const_iterator i = artistList->begin();
+    vector<ArtistList *>::iterator i = artistList->begin();
     for (; i != artistList->end(); i++) {
-        if (!*i)
-            continue;
-
         GtkCTreeNode *artTree, *artItem = NULL;
 
         name[0] = (char *)(*i)->name.c_str();
@@ -887,9 +896,6 @@ void GTKMusicBrowser::UpdateCatalog(void)
 
         vector<AlbumList *>::iterator j = (*i)->m_albumList->begin();
         for (; j != (*i)->m_albumList->end(); j++) {
-            if (!*j)
-                continue;
-
             GtkCTreeNode *trackItem = NULL;
 
             name[0] = (char *)(*j)->name.c_str();
@@ -904,9 +910,6 @@ void GTKMusicBrowser::UpdateCatalog(void)
 
             vector<PlaylistItem *>::iterator k = (*j)->m_trackList->begin();
             for (;k != (*j)->m_trackList->end(); k++) {
-                if (!*k)
-                    continue;
-
                 name[0] = (char *)(*k)->GetMetaData().Title().c_str();
                 pixmap =gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, 
                                           &mask, &style->bg[GTK_STATE_NORMAL],
@@ -941,7 +944,7 @@ void GTKMusicBrowser::UpdateCatalog(void)
                        "This tree item contains all of your playlists");
     gtk_ctree_node_set_row_data(musicBrowserTree, playlistTree, data);
 
-    vector<string>::const_iterator m = playlists->begin();
+    vector<string>::iterator m = playlists->begin();
     for (; m != playlists->end(); m++) {
         char *fullname = new char[(*m).length() + 1];
         strcpy(fullname, (*m).c_str());
@@ -968,6 +971,8 @@ void GTKMusicBrowser::UpdateCatalog(void)
         delete [] fullname;
     } 
     gtk_clist_thaw(GTK_CLIST(musicBrowserTree));
+
+    m_musicCatalog->ReleaseCatalogLock();
 }
 
 static void music_search(GTKMusicBrowser *p, guint action, GtkWidget *w)
