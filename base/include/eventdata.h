@@ -34,29 +34,6 @@ ____________________________________________________________________________*/
 #include "id3v1.h"
 #include "vector.h"
 
-class UserMessageEvent : public Event {
- private:
-    char *m_info;
- public:
-    virtual ~UserMessageEvent() { 
-	if (m_info) {
-	    delete m_info;
-	    m_info = NULL;
-	}
-    }
-    UserMessageEvent() {
-	m_type = INFO_UserMessage;
-	m_info = NULL;
-    }
-    UserMessageEvent(const char *info) {
-	m_type = INFO_UserMessage;
-	m_info = strdup(info);
-    }
-    const char *GetInfo() {
-	return m_info;
-    }
-};
-
 class MediaInfoEvent : public Event {
  public:
     Vector<Event *> *m_childEvents;
@@ -120,6 +97,45 @@ class ChangePositionEvent : public Event {
     int32 GetPosition() { return m_frame; }
     virtual ~ChangePositionEvent() {}
 };
+
+#define	_EQUALIZER_ENABLE_
+#ifdef	_EQUALIZER_ENABLE_
+class SetEqualizerDataEvent : public Event {
+private:
+	float *m_eq;
+	bool m_enable;
+	bool m_IsEQData;
+public:
+	SetEqualizerDataEvent(bool enable) { m_type = CMD_SetEQData; m_enable = enable; m_IsEQData = false; }
+	SetEqualizerDataEvent(float *eq) {	m_type = CMD_SetEQData; m_eq = eq; m_IsEQData = true; }
+	float *GetEQData() { return m_eq; }
+	bool IsEQData() { return m_IsEQData; }
+	bool GetEnableState() { return m_enable; }
+	virtual ~SetEqualizerDataEvent() {}
+};
+#endif	//_EQUALIZER_ENABLE_
+#undef	_EQUALIZER_ENABLE_
+
+#define	_VISUAL_ENABLE_
+#ifdef	_VISUAL_ENABLE_
+class SendVisBufEvent : public Event {
+private:
+		int32 m_length;
+		unsigned char *m_buf;
+public:
+	SendVisBufEvent(int32& wrote, void *pBuffer,int32 length) {
+		m_type = CMD_SendVisBuf;
+		m_buf = new unsigned char[length];
+		m_length = length;
+		memcpy(m_buf, pBuffer, length);
+		wrote = length;
+	}
+	unsigned char *GetBuf() { return m_buf; }
+	int32 GetLength() { return m_length; }
+	virtual ~SendVisBufEvent() { delete m_buf; }
+};
+#endif	//_VISUAL_ENABLE_
+#undef	_VISUAL_ENABLE_
 
 class LMCErrorEvent : public Event {
  private:

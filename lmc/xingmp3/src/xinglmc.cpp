@@ -273,6 +273,11 @@ Error XingLMC::InitDecoder() {
 	    if (!m_pcmBuffer) 
 		return kError_OutOfMemory;
 	    m_pcmTrigger = info.max_buffer_size - 2500 * sizeof(short); 
+#define	_VISUAL_ENABLE_
+#ifdef	_VISUAL_ENABLE_
+		m_pcmTrigger = info.max_buffer_size - 6500 * sizeof(short); 
+#endif	//_VISUAL_ENABLE_
+#undef	_VISUAL_ENABLE_
 	    m_pcmBufBytes = 0;
 
 	} else {
@@ -373,6 +378,7 @@ Error XingLMC::Decode() {
 	    return (Error)lmcError_DecoderThreadFailed;
 	}
 	m_decoderThread->Create(XingLMC::DecodeWorkerThreadFunc,this);
+	m_decoderThread->SetPriority(High);
     }
     
     return kError_NoErr;
@@ -475,6 +481,12 @@ void XingLMC::DecodeWork() {
 		    if (m_target) m_target->AcceptEvent(new LMCErrorEvent(this,(Error)lmcError_OutputWriteFailed));
 		    return;
 		}
+#define	_VISUAL_ENABLE_
+#ifdef	_VISUAL_ENABLE_
+		if (m_target)
+			m_target->AcceptEvent(new SendVisBufEvent(nwrite,m_pcmBuffer,m_pcmBufBytes));
+#endif	//_VISUAL_ENABLE_
+#undef	_VISUAL_ENABLE_
 	    }
 	    out_bytes += m_pcmBufBytes;
 	    m_pcmBufBytes = 0;
@@ -493,6 +505,12 @@ void XingLMC::DecodeWork() {
 	    if (m_target) m_target->AcceptEvent(new LMCErrorEvent(this,(Error)lmcError_OutputWriteFailed));
 	    return;
 	}
+#define	_VISUAL_ENABLE_
+#ifdef	_VISUAL_ENABLE_
+		if (m_target)
+			m_target->AcceptEvent(new SendVisBufEvent(nwrite,m_pcmBuffer,m_pcmBufBytes));
+#endif	//_VISUAL_ENABLE_
+#undef	_VISUAL_ENABLE_
 	out_bytes += m_pcmBufBytes;
 	m_pcmBufBytes = 0;
     }
@@ -579,6 +597,34 @@ Error XingLMC::ChangePosition(int32 position) {
     
     return error;
 }
+
+#define	_EQUALIZER_ENABLE_
+#ifdef	_EQUALIZER_ENABLE_
+extern "C" {
+float equalizer[32] = {
+	1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+	1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+	1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+	1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+};
+int enableEQ = false;
+}
+Error XingLMC::SetEQData(float *arrayEQ) {
+    ENSURE_INITIALIZED;
+    Error error = kError_NoErr;
+	for(int i=0; i<32; i++)
+		equalizer[i] = arrayEQ[i];
+	return error;
+}
+
+Error XingLMC::SetEQData(bool enable) {
+    ENSURE_INITIALIZED;
+    Error error = kError_NoErr;
+	enableEQ = enable;
+	return error;
+}
+#endif	//_EQUALIZER_ENABLE_
+#undef	_EQUALIZER_ENABLE_
 
 void XingLMC::bs_clear() {
 }
