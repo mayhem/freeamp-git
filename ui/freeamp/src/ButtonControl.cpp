@@ -112,7 +112,11 @@ void ButtonControl::Transition(ControlTransitionEnum  eTrans,
         eTrans == CT_MouseLButtonUp)
     {    
        if (m_oTargetWindow.length() == 0)
+       {
            m_pParent->SendControlMessage(this, CM_Pressed);
+           if (m_oName == "ReloadTheme")
+              return;
+       }    
        else 
        {   
            m_oValue = m_oTargetWindow;

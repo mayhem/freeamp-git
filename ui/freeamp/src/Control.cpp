@@ -178,6 +178,11 @@ void Control::SetBitmap(Bitmap *pBitmap, Rect &oBitmapRect, bool bHoriz)
     m_bHorizontalBitmap = bHoriz;
 }
 
+Bitmap *Control::GetBitmap(void)
+{
+    return m_pBitmap;
+}    
+
 void Control::GetName(string &oName)
 {
     oName = m_oName;
@@ -198,6 +203,8 @@ void Control::BlitFrame(int iFrame, int iNumFramesInBitmap, Rect *pRect)
 	else
 		BlitFrameVert(iFrame,iNumFramesInBitmap,pRect);
 }
+
+Bitmap *last = NULL;
 
 void Control::BlitFrameHoriz(int iFrame, int iNumFramesInBitmap, Rect *pRect)
 {

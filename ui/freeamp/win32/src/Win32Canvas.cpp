@@ -266,8 +266,8 @@ void Win32Canvas::Paint(HDC hDC, Rect &oRect)
    StretchBlt(hDC, oRect.x1, oRect.y1, oRect.Width(), oRect.Height(),
               hMemDC, oRect.x1, oRect.y1, oRect.Width(), oRect.Height(), SRCCOPY);
 
-   if (iPaintCount++ == 0)
-      m_pBufferBitmap->SaveBitmap("c:\\temp\\out.bmp");
+//   if (iPaintCount++ == 0)
+//      m_pBufferBitmap->SaveBitmap("c:\\temp\\out.bmp");
 
    DeleteDC(hMemDC);       
 }

@@ -63,9 +63,15 @@ Win32Bitmap::Win32Bitmap(int iWidth, int iHeight, string &oName)
 Win32Bitmap::~Win32Bitmap(void)
 {
    if (m_hBitmap)
+   {
        DeleteObject(m_hBitmap);
+       m_hBitmap = NULL;
+   }
    if (m_hMaskBitmap)
+   {
        DeleteObject(m_hMaskBitmap);
+       m_hMaskBitmap = NULL;
+   }    
 }
 
 Error Win32Bitmap::LoadBitmapFromDisk(string &oFile)
@@ -209,6 +215,9 @@ Error Win32Bitmap::BlitRect(Bitmap *pOther, Rect &oSrcRect,
 {
    HDC hRootDC, hSrcDC, hDestDC;
    Win32Bitmap *pSrcBitmap = (Win32Bitmap *)pOther;
+ 
+   if (pSrcBitmap->m_hBitmap == NULL)
+      return kError_UnknownErr;
    
    hRootDC = GetDC(NULL);
    hSrcDC = CreateCompatibleDC(hRootDC);
@@ -222,15 +231,6 @@ Error Win32Bitmap::BlitRect(Bitmap *pOther, Rect &oSrcRect,
           oDestRect.Width(), oDestRect.Height(),
    	      hSrcDC, oSrcRect.x1, oSrcRect.y1, SRCCOPY);
    
-   //if (GetDeviceCaps(hDestDC, RASTERCAPS) & RC_PALETTE)
-   //   SetStretchBltMode(hDestDC, HALFTONE);
-   //
-   //StretchBlt(hDestDC, oDestRect.x1, oDestRect.y1, 
-   //           oDestRect.Width(), oDestRect.Height(),
-   //	          hSrcDC, oSrcRect.x1, oSrcRect.y1, 
-   //           oSrcRect.Width(), oSrcRect.Height(), 
-   //           SRCCOPY);
-
    DeleteDC(hSrcDC);
    DeleteDC(hDestDC);
 
@@ -246,15 +246,18 @@ Error Win32Bitmap::MaskBlitRect(Bitmap *pOther, Rect &oSrcRect,
    if (!pSrcBitmap->m_hMaskBitmap)
    	  return BlitRect(pOther, oSrcRect, oDestRect);
    
+   if (pSrcBitmap->m_hBitmap == NULL)
+      return kError_UnknownErr;
+   
    hRootDC = GetDC(NULL);
    hSrcDC = CreateCompatibleDC(hRootDC);
    hDestDC = CreateCompatibleDC(hRootDC);
    hMaskDC = CreateCompatibleDC(hRootDC);
    ReleaseDC(NULL, hRootDC);
    
-   DeleteObject(SelectObject(hSrcDC, pSrcBitmap->m_hBitmap));
-   DeleteObject(SelectObject(hMaskDC, pSrcBitmap->m_hMaskBitmap));
-   DeleteObject(SelectObject(hDestDC, m_hBitmap));
+   SelectObject(hSrcDC, pSrcBitmap->m_hBitmap);
+   SelectObject(hMaskDC, pSrcBitmap->m_hMaskBitmap);
+   SelectObject(hDestDC, m_hBitmap);
 
    SetBkColor(hSrcDC, RGB(m_oTransColor.red,m_oTransColor.green,m_oTransColor.blue));
    BitBlt(hDestDC, oDestRect.x1, oDestRect.y1, 
@@ -288,8 +291,6 @@ void Win32Bitmap::SaveBitmap(char *szFile)
    if (iBytesToWrite % 4)
       iBytesToWrite += 4 - (iBytesToWrite % 4);
    iBytesToWrite *= sBitmap.bmHeight;   
-   
-   Debug_v("Size: %d %d (%d)", sBitmap.bmWidth, sBitmap.bmHeight, iBytesToWrite);
    
    sInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER); 
    sInfo.bmiHeader.biWidth = sBitmap.bmWidth; 

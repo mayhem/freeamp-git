@@ -157,7 +157,9 @@ LRESULT Win32Window::WindowProc(HWND hwnd, UINT msg,
             oPos.x = pt.x;
             oPos.y = pt.y;
             
+            m_pMindMeldMutex->Acquire();
             HandleMouseMove(oPos);
+            m_pMindMeldMutex->Release();
             break;
         }
 
@@ -167,7 +169,9 @@ LRESULT Win32Window::WindowProc(HWND hwnd, UINT msg,
             
         	oPos.x = (int16)LOWORD(lParam);
             oPos.y = (int16)HIWORD(lParam);  
+            m_pMindMeldMutex->Acquire();
             HandleMouseMove(oPos);
+            m_pMindMeldMutex->Release();
 
             break;
         }		
@@ -184,7 +188,9 @@ LRESULT Win32Window::WindowProc(HWND hwnd, UINT msg,
             oPos.x = pt.x;
             oPos.y = pt.y;
             
+            m_pMindMeldMutex->Acquire();
             HandleMouseLButtonDown(oPos);
+            m_pMindMeldMutex->Release();
             
             break;
         }
@@ -200,8 +206,10 @@ LRESULT Win32Window::WindowProc(HWND hwnd, UINT msg,
             ClientToScreen(hwnd, &pt);
             oPos.x = pt.x;
             oPos.y = pt.y;
-            
+
+            m_pMindMeldMutex->Acquire();
             HandleMouseLButtonUp(oPos);
+            m_pMindMeldMutex->Release();
             
             break;
         }

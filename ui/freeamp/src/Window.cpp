@@ -86,6 +86,8 @@ Error Window::VulcanMindMeld(Window *pOther)
     
     m_pMouseInControl = NULL;
     m_pCaptureControl = NULL;
+    m_pMouseDownControl = NULL;
+
     m_oControls = pOther->m_oControls;
     m_oControlMap = pOther->m_oControlMap;
 
@@ -358,7 +360,9 @@ void Window::HandleMouseMove(Pos &oScreenPos)
                m_pMouseInControl = pControl;
                m_pMouseInControl->AcceptTransition(CT_MouseEnter);
                if (m_bLButtonDown)
+               {
                   m_pMouseInControl->AcceptTransition(CT_MouseLButtonDown);
+               }   
            }
            else
            if (m_pMouseInControl == NULL)
@@ -366,7 +370,9 @@ void Window::HandleMouseMove(Pos &oScreenPos)
                m_pMouseInControl = pControl;
                m_pMouseInControl->AcceptTransition(CT_MouseEnter);
                if (m_bLButtonDown)
+               {
                   m_pMouseInControl->AcceptTransition(CT_MouseLButtonDown);
+               }
            }
        }
 

@@ -120,6 +120,7 @@ class Control
       virtual void  GetRect(Rect &oRect);
       virtual void  SetPos(Pos &oPos);
       virtual void  SetBitmap(Bitmap *pBitmap, Rect &oBitmapRect, bool bHoriz = true);
+      virtual Bitmap *GetBitmap(void);
       virtual void  GetName(string &oName);
       virtual void  SetDesc(const string &oDesc);
       virtual void  SetTip(const string &oTip);
