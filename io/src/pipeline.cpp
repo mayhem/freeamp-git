@@ -29,6 +29,7 @@ ____________________________________________________________________________*/
 #include <string.h>
 #include <time.h>
 #include <assert.h>
+#include <stdarg.h>
 
 /* project headers */
 #include <config.h>
