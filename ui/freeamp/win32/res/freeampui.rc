@@ -59,7 +59,7 @@ BEGIN
     CONTROL         "Save current playlist when exiting the application.",
                     IDC_SAVECURRENTLIST,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,12,138,171,10
-    CONTROL         "By default queue tracks rather than play them immediately.",
+    CONTROL         "Default action is to queue tracks; do not play them immediately.",
                     IDC_DEFAULTACTION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     12,128,213,10
 END

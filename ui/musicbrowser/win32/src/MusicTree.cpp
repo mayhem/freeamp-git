@@ -83,6 +83,8 @@ void MusicBrowserUI::InitTree(void)
     insert.hParent = NULL;
     m_hPlaylistItem = TreeView_InsertItem(m_hMusicView, &insert);
 
+	/*
+
     HTREEITEM temp;
 
     insert.item.pszText = "Streams";
@@ -115,7 +117,7 @@ void MusicBrowserUI::InitTree(void)
     insert.hParent = temp;
     m_hIceCastItem = TreeView_InsertItem(m_hMusicView, &insert);
 
-    /*
+    
     insert.item.pszText = kShoutCast;
     insert.item.cchTextMax = lstrlen(insert.item.pszText);
     insert.item.iImage = 11;
