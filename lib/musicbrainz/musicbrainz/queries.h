@@ -24,7 +24,9 @@
 #ifndef _QUERIES_H_
 #define _QUERIES_H_
 
-#define MUSICBRAINZ_VERSION "musicbrainz_client/1.0.0-pre2"
+// The following define should match the version number of the MM spec
+// that is implemented by the defines in this file
+#define MM_VERSION                "1.0-pre3"
 
 // local query names
 #define MB_GetCDInfo              "@CDINFO@"
@@ -42,16 +44,16 @@
 #define MB_GetArtistName          "DC:Creator"
 #define MB_GetArtistID            "DC:Identifier/@artistId"
 
-#define MB_GetAlbumName           "MM:Album"
+#define MB_GetAlbumName           "DC:Title"
 #define MB_GetAlbumID             "DC:Identifier/@albumId"
 
 #define MB_GetTrackID             "DC:Identifier/@trackId"
 #define MB_GetTrackNum            "DC:Relation/@track"
 #define MB_GetTrackName           "DC:Title"
-#define MB_GetNumTracks           "MM:Album/@numTracks"
+#define MB_GetNumTracks           "MM:Collection/@numParts"
 
 #define MB_GetGUID                "DC:Identifier/@guid"
-#define MB_GetFilename            "DC:Identifier/@fileName"
+#define MB_GetFilename            "MQ:Filename"
 #define MB_GetDuration            "DC:Format/@duration"
 #define MB_GetYear                "DC:Date/@issued"
 #define MB_GetGenre               "MM:Genre"
@@ -63,15 +65,16 @@
 #define MB_GetLyricTimestamp      "MM:SyncText/@ts"
 
 // Select the local query 
-#define MB_SelectLocalQuery       "/rdf:RDF/rdf:Description"
+#define MB_SelectTopLevel         "/rdf:RDF/rdf:Description"
 
-// Track selectors for queries that return an album
-#define MB_SelectFirstTrack       "/rdf:RDF/rdf:Description/MC:Collection/rdf:Bag/rdf:li[]/rdf:Description/rdf:Seq/rdf:li[0]/rdf:Description"
-#define MB_SelectNextTrack        "/rdf:RDF/rdf:Description/MC:Collection/rdf:Bag/rdf:li[]/rdf:Description/rdf:Seq/rdf:li[+1]/rdf:Description"
+// Select Album information
+#define MB_SelectAlbum            "/rdf:RDF/rdf:Description/MM:Collection/rdf:Description"
+#define MB_SelectFirstTrack       "/rdf:RDF/rdf:Description/MM:Collection/rdf:Description/rdf:Seq/rdf:li[0]/rdf:Description"
+#define MB_SelectNextTrack        "/rdf:RDF/rdf:Description/MM:Collection/rdf:Description/rdf:Seq/rdf:li[+1]/rdf:Description"
 
 // Item selectors for queries that return a list of items
-#define MB_SelectFirstItem        "/rdf:RDF/rdf:Description/MC:Collection/rdf:Bag/rdf:li[0]/rdf:Description"
-#define MB_SelectNextItem         "/rdf:RDF/rdf:Description/MC:Collection/rdf:Bag/rdf:li[+1]/rdf:Description"
+#define MB_SelectFirstItem        "/rdf:RDF/rdf:Description/MM:Collection/rdf:Bag/rdf:li[0]/rdf:Description"
+#define MB_SelectNextItem         "/rdf:RDF/rdf:Description/MM:Collection/rdf:Bag/rdf:li[+1]/rdf:Description"
 
 // Item selectors for queries that return a list of items
 #define MB_SelectExchangedData    "/rdf:RDF/rdf:Description"
@@ -83,8 +86,8 @@
 #define MB_SelectNextSyncEvent    "/rdf:RDF/rdf:Description/MM:SyncEvents/rdf:Description/rdf:Seq/rdf:li[+1]/rdf:Description"
 
 // GUID selectors for queries that return a list of GUIDS
-#define MB_SelectFirstGUID        "/rdf:RDF/rdf:Description/MC:Collection/rdf:Bag/rdf:li[0]/rdf:Description"
-#define MB_SelectNextGUID         "/rdf:RDF/rdf:Description/MC:Collection/rdf:Bag/rdf:li[+1]/rdf:Description"
+#define MB_SelectFirstGUID        "/rdf:RDF/rdf:Description/MM:Collection/rdf:Bag/rdf:li[0]/rdf:Description"
+#define MB_SelectNextGUID         "/rdf:RDF/rdf:Description/MM:Collection/rdf:Bag/rdf:li[+1]/rdf:Description"
 
 // Lookup queries
 #define MB_GetCDInfoFromCDIndexID "<MQ:Query>GetCDInfoFromId</MQ:Query>\n"     \
@@ -111,11 +114,15 @@
                                   "<MQ:Args id=\"@1@\"/>\n"
 #define MB_ExchangeMetadata       "<MQ:Query>ExchangeMetadata</MQ:Query>\n"    \
                                   "<DC:Title>@1@</DC:Title>\n"                 \
-                                  "<DC:Identifier guid=\"@2@\" \n"             \
-                                  "               fileName=\"@3@\"/>\n"        \
+                                  "<DC:Identifier guid=\"@2@\"/>\n"            \
+                                  "<MQ:Filename>@3@</MQ:Filename>\n"           \
                                   "<DC:Creator>@4@</DC:Creator>\n"             \
-                                  "<MM:Album>@5@</MM:Album>\n"                 \
-                                  "<DC:Relation track=\"@6@\"/>\n"             \
+                                  "<DC:Relation>\n"                            \
+                                  "  <rdf:Description>\n"                      \
+                                  "    <DC:Title>@5@</DC:Title>\n"             \
+                                  "  </rdf:Description>\n"                     \
+                                  "</DC:Relation>\n"                           \
+                                  "<MM:TrackNum>@6@</MM:TrackNum>\n"           \
                                   "<DC:Format duration=\"@7@\"/>\n"            \
                                   "<DC:Date issued=\"@8@\"/>\n"                \
                                   "<MM:Genre>@9@</MM:Genre>\n"                 \
@@ -126,9 +133,13 @@
                                   "<DC:Title>@1@</DC:Title>\n"                 \
                                   "<DC:Identifier guid=\"@2@\"/>\n"            \
                                   "<DC:Creator>@3@</DC:Creator>\n"             \
-                                  "<MM:Album>@4@</MM:Album>\n"                 \
+                                  "<DC:Relation>\n"                            \
+                                  "  <rdf:Description>\n"                      \
+                                  "    <DC:Title>@4@</DC:Title>\n"             \
+                                  "  </rdf:Description>\n"                     \
+                                  "</DC:Relation>\n"                           \
                                   "<DC:Relation track=\"@5@\"/>\n"             \
-                                  "<DC:Format duration=\"@6@\"/>\n"            \
+                                  "<MM:TrackNum>@6@</MM:TrackNum>\n"           \
                                   "<DC:Date issued=\"@7@\"/>\n"                \
                                   "<MM:Genre>@8@</MM:Genre>\n"                 \
                                   "<DC:Description>@9@</DC:Description>\n"
