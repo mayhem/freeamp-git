@@ -306,7 +306,9 @@ _fdct32 proc near
 	push esi
 	push ebx
 	sub esp,140
-	mov ecx,_coef32-128	; coef = coef32 - (32 * 4)
+;	mov ecx,_coef32-128	; coef = coef32 - (32 * 4)
+	mov ecx,_coef32		; coef = coef32
+	sub ecx,128
 	mov DWORD PTR [esp+4],1		; m = 1
 	mov ebp,16		; n = 32 / 2
 
