@@ -12,6 +12,7 @@
 #include "stdafx.h"
 #include "Rainplay.h"
 #include "BmpSize.h"
+#include "Mutex.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -35,6 +36,7 @@ CBmpSize::CBmpSize(UINT uID /*= 0*/)
 {
 	m_iWidth = 0;
 	m_iHeight = 0;
+	m_Mutex = new Mutex();
 
 	if (uID != 0)
 		LoadBitmap(uID);
@@ -45,11 +47,18 @@ CBmpSize::~CBmpSize()
 	//Delete the bitmap
 	m_cBmp.DeleteObject();
 	::DeleteObject(hBitmap);
+	if (m_Mutex) {
+		delete m_Mutex;
+		m_Mutex = NULL;
+	}
+
 }
 
 
 BOOL CBmpSize::LoadBitmap(LPCTSTR lpszBmpFile)
 {
+	GetBmpSizeLock();
+
 	hBitmap=(HBITMAP)LoadImage( NULL, lpszBmpFile, IMAGE_BITMAP, 0,0,
 		LR_DEFAULTCOLOR |
 		LR_LOADFROMFILE |
@@ -62,6 +71,8 @@ BOOL CBmpSize::LoadBitmap(LPCTSTR lpszBmpFile)
 		return FALSE;
 	m_iWidth = m_sBmp.bmWidth;
 	m_iHeight = m_sBmp.bmHeight;
+
+	ReleaseBmpSizeLock();
 	return TRUE;
 }
 
@@ -77,6 +88,8 @@ BOOL CBmpSize::LoadBitmap(LPCTSTR lpszBmpFile)
 /***************************************************************/
 BOOL CBmpSize::LoadBitmap(UINT uID)
 {
+	GetBmpSizeLock();
+
 	//Load the bitmap from the ID resource
 	//Get the size of the loaded bitmap
 	if ( m_cBmp.LoadBitmap(uID) &&
@@ -86,6 +99,8 @@ BOOL CBmpSize::LoadBitmap(UINT uID)
 		m_iHeight = m_sBmp.bmHeight;
 		return TRUE;
 	}
+
+	ReleaseBmpSizeLock();
 	return FALSE;
 }
 
@@ -107,33 +122,37 @@ BOOL CBmpSize::LoadBitmap(UINT uID)
 /***************************************************************/
 BOOL CBmpSize::BmpBlt(BOOL IsPaint, CWnd *pWnd, int xDest, int yDest, int iDx, int iDy, int iFromWhereX, int iFromWhereY)
 {
-	CDC dcMem;
-	CPaintDC dcPaint(pWnd);
-	CClientDC dcClient(pWnd);
+	GetBmpSizeLock();
 
+	CDC dcMem;
+	
 	if ( IsPaint ) {
+		CPaintDC dcPaint(pWnd);
 		if( !dcMem.CreateCompatibleDC(&dcPaint) )
 			return FALSE;
 		dcMem.SelectObject(&m_cBmp);
 		return( dcPaint.BitBlt(xDest, yDest,
-		(iDx==0) ? m_iWidth : iDx,
-		(iDy==0) ? m_iHeight : iDy, 
+		(iDx==-1) ? m_iWidth : iDx,
+		(iDy==-1) ? m_iHeight : iDy, 
 		&dcMem,
 		(iFromWhereX==-1) ? 0 : iFromWhereX,
 		(iFromWhereY==-1) ? 0 : iFromWhereY,
 		SRCCOPY) );
 	} else {
+		CClientDC dcClient(pWnd);
 		if ( !dcMem.CreateCompatibleDC(&dcClient) )
 			return FALSE;
 		dcMem.SelectObject(&m_cBmp);
 		return( dcClient.BitBlt(xDest, yDest,
-		(iDx==0) ? m_iWidth : iDx,
-		(iDy==0) ? m_iHeight : iDy, 
+		(iDx==-1) ? m_iWidth : iDx,
+		(iDy==-1) ? m_iHeight : iDy, 
 		&dcMem,
 		(iFromWhereX==-1) ? 0 : iFromWhereX,
 		(iFromWhereY==-1) ? 0 : iFromWhereY,
 		SRCCOPY) );
 	}
+
+	ReleaseBmpSizeLock();
 }
 
 
@@ -148,6 +167,8 @@ BOOL CBmpSize::BmpBlt(BOOL IsPaint, CWnd *pWnd, int xDest, int yDest, int iDx, i
 /***************************************************************/
 HRGN CBmpSize::MakeRegion()
 {
+	GetBmpSizeLock();
+
 	HRGN rgnc, rgnl;
 	COLORREF tc;
 	int x, y, l = 0;
@@ -180,5 +201,6 @@ HRGN CBmpSize::MakeRegion()
 		}
 	}
 	
+	ReleaseBmpSizeLock();
 	return rgnc;
 }

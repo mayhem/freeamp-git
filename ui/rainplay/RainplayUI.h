@@ -11,6 +11,7 @@
 #include "queue.h"
 #include "playlist.h"
 #include "RainplayDlg.h"
+#include "player.h"
 
 class CRainplayUI: public UserInterface
 {
@@ -18,24 +19,24 @@ public:
     CRainplayUI();
     ~CRainplayUI();
 
-	virtual void Init() {}
+	virtual Error Init() { return kError_NoErr; }
     virtual void SetTarget(EventQueue*);
     virtual int32 AcceptEvent(Event *);
     virtual void SetArgs(int32,char **);
 	virtual void SetPlayListManager(PlayListManager *);
 
     void CreateUI();
-    
-	Semaphore*      m_uiSemaphore;
 
+	Semaphore*      m_uiSemaphore;
+	int32			m_state;
+	PlayListManager *m_plm;
+	EventQueue*     m_target;
 protected:
       static void UIThreadFunc(void *);
 
 private:
-	PlayListManager *m_plm;
 	CRainplayDlg*	m_Dlg;
 	Thread*         m_uiThread;
-    EventQueue*     m_target;
 };
 
 #endif	//__RAINPLAYUI_H__

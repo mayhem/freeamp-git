@@ -12,7 +12,7 @@
 #define	_MAINFACEDESCRIBE_H_
 #include "StdAfx.h"
 
-typedef struct tagCoordinates {
+typedef struct _tagCoordinates {
 	BOOL bIsButton;				//这个区域是否为按钮
 	char szAreaName[MAX_PATH];	//区域名称
 	int x;						//X
@@ -21,7 +21,7 @@ typedef struct tagCoordinates {
 	int iHeight;				//高度
 } COORDINATES;
 
-#define MAX_AREA				23		//最大区域数目
+#define MAX_AREA				24		//最大区域数目
 #define	AREA_ABOUT				0
 #define	AREA_MINIMIZE			1
 #define	AREA_QUIT				2
@@ -45,8 +45,15 @@ typedef struct tagCoordinates {
 #define	AREA_DISPLAYSTEREO		20
 #define	AREA_DISPLAYSPECTRUM	21
 #define	AREA_SEEKBAR			22
+#define	AREA_EQ					23
+#define	AREA_RECT(r)			LPRECT(new CRect(coordinatesMain[r].x, \
+										coordinatesMain[r].y, \
+										coordinatesMain[r].x+coordinatesMain[r].iWidth, \
+										coordinatesMain[r].y+coordinatesMain[r].iHeight))
 CString	szFontName = "Arial";
+CString oldszFontName = "Arial";
 COLORREF rgbDisplayColur = RGB(255,255,255);
+COLORREF oldrgbDisplayColur = RGB(255,255,255);
 
 COORDINATES coordinatesMain[MAX_AREA] = {
 	TRUE,	"About",			7, 8, 12, 13,			//About
@@ -67,11 +74,12 @@ COORDINATES coordinatesMain[MAX_AREA] = {
 	FALSE,	"DisplayTime",		240, 45, 50, 20,		//DisplayTime
 	FALSE,	"DisplayBitrate",	245, 10, 18, 12,		//DisplayBitrate
 	FALSE,	"DisplayKhz",		250, 21, 18, 12,		//DisplayKhz
-	FALSE,	"DisplayRepeat",	0, 0, 0, 0,				//DisplayRepeat
-	FALSE,	"DisplayShuffle",	0, 0, 0, 0,				//DisplayShuffle
+	FALSE,	"DisplayRepeat",	82, 23, 38, 13,			//DisplayRepeat
+	FALSE,	"DisplayShuffle",	82, 12, 38, 10,			//DisplayShuffle
 	FALSE,	"DisplayStereo",	0, 0, 0, 0,				//DisplayStereo
-	FALSE,	"DisplaySpectrum",	0, 0, 0, 0,				//DisplaySpectrum
-	TRUE,	"SeekBar",			82, 36, 200, 8			//SeekBar
+	TRUE,	"DisplaySpectrum",	121, 12, 115, 22,		//DisplaySpectrum
+	TRUE,	"SeekBar",			82, 36, 200, 8,			//SeekBar
+	TRUE,	"Equalizer",		8, 55, 12, 12			//Equalizer
 };
 
 RECT	oldSkinCoord[MAX_AREA] = {
@@ -93,11 +101,12 @@ RECT	oldSkinCoord[MAX_AREA] = {
 	240, 45, 50, 20,		//DisplayTime
 	245, 10, 18, 12,		//DisplayBitrate
 	250, 21, 18, 12,		//DisplayKhz
-	0, 0, 0, 0,				//DisplayRepeat
-	0, 0, 0, 0,				//DisplayShuffle
+	82, 23, 38, 13,			//DisplayRepeat
+	82, 12, 38, 10,			//DisplayShuffle
 	0, 0, 0, 0,				//DisplayStereo
-	0, 0, 0, 0,				//DisplaySpectrum
-	82, 36, 200, 8			//SeekBar
+	121, 12, 115, 22,		//DisplaySpectrum
+	82, 36, 200, 8,			//SeekBar
+	8, 55, 12, 12			//Equalizer
 };
 
 #endif //_MAINFACEDESCRIBE_H_

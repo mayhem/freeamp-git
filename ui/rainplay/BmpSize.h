@@ -16,6 +16,8 @@
 #pragma once
 #endif // _MSC_VER >= 1000
 
+#include "Mutex.h"
+
 class CBmpSize : public CBitmap  
 {
 public:
@@ -30,11 +32,16 @@ public:
 	BOOL LoadBitmap(LPCTSTR lpszBmpFile);
 	BOOL LoadBitmap( UINT uID );	//Load bitmap and get the size
 	BmpBlt(BOOL IsPaint, CWnd *pWnd,
-		int xDest, int yDest, int iDx = 0, int iDy = 0,
+		int xDest, int yDest, int iDx = -1, int iDy = -1,
 		int iFromWhereX = -1, int iFromWhereY = -1);
 	HRGN MakeRegion();
 	CBitmap m_cBmp;
 	int	m_iWidth;
 	int m_iHeight;
+
+private:
+	Mutex *					m_Mutex;
+	void GetBmpSizeLock() { m_Mutex->Acquire(WAIT_FOREVER); }
+	void ReleaseBmpSizeLock() { m_Mutex->Release(); }
 };
 #endif // !defined(AFX_BMPSIZE_H__D2747CC3_9DA1_11D1_BF2C_0000B423931A__INCLUDED_)

@@ -1,66 +1,65 @@
-========================================================================
-       MICROSOFT FOUNDATION CLASS LIBRARY : Rainplay
-========================================================================
+Jan/17/1999
+elrod@gold.liquidmetal.com,jdw@freeamp.org
+freeamp-dev@freeamp.org
+Dear Elrod,Jason:
+Here I attached the lasted version of rainplay update.
+Please update this to freeamp-snap.*.
+
+Rainplay current supporting:
+[new]:
+1. oscilliscope display
+about 40 fps on my PII 300 compaq notebook
+which work well with fusion skin.
+2. scope mode dot/line/solid
+3. fix some bugs.
+4. seek bar
+5. full rclick menu support
+6. to find out the change other than rainplay ui files, just search key work.
+'#define _VISUAL_ENABLE_'
+
+base\include\event.h
+base\include\eventdata.h
+base\src\player.cpp
+lmc\xingmp3\src\xinglmc.cpp
+[TODO]
+1.add volume change function
+2.spectrum
+3.CVisualView should has it's own buffer. That means
+once the PCM being copy into the CVisualView, the SendVisBufEvent
+should be delete at once(reduce the load of Event queue), then
+another thread render the waveform display sync with the xinglmc's
+work.
+4.user can change fps.
 
 
-AppWizard has created this Rainplay DLL for you.  This DLL not only
-demonstrates the basics of using the Microsoft Foundation classes but
-is also a starting point for writing your DLL.
+Jan/13/1999
+elrod@gold.liquidmetal.com,jdw@freeamp.org
+freeamp-dev@freeamp.org
 
-This file contains a summary of what you will find in each of the files that
-make up your Rainplay DLL.
+Dear Elrod,Jason:
+Here I attached the lasted version of rainplay update.
+Please update this to freeamp-snap.*.
 
-Rainplay.dsp
-    This file (the project file) contains information at the project level and
-    is used to build a single project or subproject. Other users can share the
-    project (.dsp) file, but they should export the makefiles locally.
+Rainplay current supporting:
+[new]:
+1. Sine wave display when haven't buffing data.
 
-Rainplay.h
-	This is the main header file for the DLL.  It declares the
-	CRainplayApp class.
+2.playlist/Equalizer modueless dialog.You must start playing
+songs 1st, then open the Equalizer dialog(P:-))
 
-Rainplay.cpp
-	This is the main DLL source file.  It contains the class CRainplayApp.
+3.fix some bugs
 
+4.simple EQ function works(with some modify on files below)
+to find out this modify, just search key work.
+'#define _EQUALIZER_ENABLE_'
+base\include\event.h
+base\include\eventdata.h
+base\src\player.cpp
 
-Rainplay.rc
-    This is a listing of all of the Microsoft Windows resources that the
-    program uses.  It includes the icons, bitmaps, and cursors that are stored
-    in the RES subdirectory.  This file can be directly edited in Microsoft
-	Visual C++.
+lmc\include\lmc.h
+lmc\xingmp3\include\xinglmc.h
+lmc\xingmp3\src\cdct.c
+lmc\xingmp3\src\xinglmc.cpp
 
-Rainplay.clw
-    This file contains information used by ClassWizard to edit existing
-    classes or add new classes.  ClassWizard also uses this file to store
-    information needed to create and edit message maps and dialog data
-    maps and to create prototype member functions.
-
-res\Rainplay.rc2
-    This file contains resources that are not edited by Microsoft 
-	Visual C++.  You should place all resources not editable by
-	the resource editor in this file.
-
-Rainplay.def
-    This file contains information about the DLL that must be
-    provided to run with Microsoft Windows.  It defines parameters
-    such as the name and description of the DLL.  It also exports
-	functions from the DLL.
-
-/////////////////////////////////////////////////////////////////////////////
-Other standard files:
-
-StdAfx.h, StdAfx.cpp
-    These files are used to build a precompiled header (PCH) file
-    named Rainplay.pch and a precompiled types file named StdAfx.obj.
-
-Resource.h
-    This is the standard header file, which defines new resource IDs.
-    Microsoft Visual C++ reads and updates this file.
-
-/////////////////////////////////////////////////////////////////////////////
-Other notes:
-
-AppWizard uses "TODO:" to indicate parts of the source code you
-should add to or customize.
-
-/////////////////////////////////////////////////////////////////////////////
+5.the EQ band's value is learn from XAUDIO 3.07 sdk doc, I simply
+modify the 32 sub-bands's factor.It current only support layer3.
