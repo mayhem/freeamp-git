@@ -43,8 +43,61 @@ using namespace std;
 #include "aps.h"
 #include "apsplaylist.h"
 
+void GTKMusicBrowser::HandleSignature(void)
+{
+    if (m_sigsStart) {
+        m_context->catalog->StartGeneratingSigs();
+    }
+    else {
+        m_context->catalog->StopGeneratingSigs();
+    }
+}
+
+void GTKMusicBrowser::AskSignatureDialog(void)
+{
+    GTKMessageDialog *dialog = new GTKMessageDialog();
+    string caption = "Signature Tracks?";
+
+    char numtracks[10];
+    sprintf(numtracks, "%d", m_context->catalog->GetNumNeedingSigs());
+    string message = string("You need to signature ") + string(numtracks) + 
+                     string(" tracks.  Do it?");
+
+    if (dialog->Show(message.c_str(), caption.c_str(), kMessageYesNo) ==
+        kMessageReturnYes) 
+    {
+        m_context->catalog->StartGeneratingSigs();
+    }
+
+    delete dialog;
+}
+
+void GTKMusicBrowser::AskOptIn(bool inMain)
+{
+    GTKMessageDialog *dialog = new GTKMessageDialog();
+    string caption = "Relatable Not Enabled";
+    string message = "You didn't opt-in to use the Relatable features.  Would you like to go to the options dialog and create a profile?";
+
+    if (dialog->Show(message.c_str(), caption.c_str(), kMessageYesNo, inMain) ==
+        kMessageReturnYes)
+    {
+        ShowOptions(6);
+    }
+
+    delete dialog;
+}
+
 void GTKMusicBrowser::SubmitPlaylist(void)
 {
+    APSInterface *pInterface = m_context->aps;
+    if (!pInterface)
+        return;
+ 
+    if (!pInterface->IsTurnedOn()) {
+        AskOptIn();
+        return;
+    }
+
     vector<PlaylistItem *> *items;
 
     if (GetClickState() == kContextPlaylist) {
@@ -71,10 +124,7 @@ void GTKMusicBrowser::SubmitPlaylist(void)
             InputPlaylist.Insert((*i)->GetMetaData().GUID().c_str(),
                                  (*i)->URL().c_str());
 
-        APSInterface *pInterface = m_context->aps;
-
-        if (pInterface) 
-            pInterface->APSSubmitPlaylist(&InputPlaylist);
+        pInterface->APSSubmitPlaylist(&InputPlaylist);
     }
 
     delete items;    
@@ -82,6 +132,15 @@ void GTKMusicBrowser::SubmitPlaylist(void)
 
 void GTKMusicBrowser::GenPlaylist(void)
 {
+    APSInterface *pInterface = m_context->aps;
+    if (!pInterface)
+        return;
+
+    if (!pInterface->IsTurnedOn()) {
+        AskOptIn();
+        return;
+    }
+
     vector<PlaylistItem *> *items;  
 
     if (GetClickState() == kContextPlaylist) {
@@ -105,6 +164,15 @@ void GTKMusicBrowser::GenPlaylist(void)
 
 void GTKMusicBrowser::GenPlaylist(vector<PlaylistItem *> *seed)
 {
+    APSInterface *pInterface = m_context->aps;
+    if (!pInterface)
+        return;
+
+    if (!pInterface->IsTurnedOn()) {
+        AskOptIn(false);
+        return;
+    }
+
     APSPlaylist ResultPlaylist;
     uint32 nResponse = 0;
 
@@ -753,6 +821,16 @@ void GTKMusicBrowser::SetClickState(ClickState newState)
                               (gpointer)"Burn Audio CD");
     }
 
+    GtkWidget *sig = gtk_item_factory_get_widget(menuFactory,
+                                               "/Relatable/Start Signaturing");
+    gtk_widget_set_sensitive(sig, m_sigsExist);
+    if (m_sigsStart)
+        gtk_container_foreach(GTK_CONTAINER(sig), set_label_menu, 
+                              (gpointer)"Start Signaturing");
+    else
+        gtk_container_foreach(GTK_CONTAINER(sig), set_label_menu,
+                              (gpointer)"Stop Signaturing");
+
     m_clickState = newState;
     if (m_clickState == kContextPlaylist) {
         gtk_widget_set_sensitive(toolRemove, TRUE);
@@ -1341,6 +1419,8 @@ GTKMusicBrowser::GTKMusicBrowser(FAContext *context, MusicBrowserUI *masterUI,
     m_bCDMode = cdCreationMode;
     stream_timer_started = false;
     stream_timer = NULL;
+    m_sigsExist = false;
+    m_sigsStart = true;
 
     mbSelections = new vector<TreeData *>;
 
@@ -1762,6 +1842,54 @@ Error GTKMusicBrowser::AcceptEvent(Event *e)
             else
                 GenPlaylist(NULL);
             break; }
+        case INFO_UnsignaturedTracksExist: {
+            if (m_context->catalog->GetNumNeedingSigs() > 0) {
+                m_sigsExist = true;
+                gdk_threads_enter();
+                if (m_initialized) {
+                    gtk_widget_set_sensitive(gtk_item_factory_get_widget
+                                             (menuFactory,
+                                             "/Relatable/Start Signaturing"), 
+                                             TRUE);
+                }
+                AskSignatureDialog();
+                gdk_threads_leave();
+            }
+            break;
+        }
+        case INFO_SignaturingStarted: {
+            m_sigsExist = true;
+            m_sigsStart = false;
+            if (m_initialized) {
+                gdk_threads_enter();
+                GtkWidget *w = gtk_item_factory_get_widget(menuFactory,
+                                                "/Relatable/Start Signaturing");
+                gtk_container_foreach(GTK_CONTAINER(w), set_label_menu,
+                                      (gpointer)"Stop Signaturing");
+
+                gtk_widget_set_sensitive(w, TRUE);
+                gdk_threads_leave();
+            }
+            break; 
+        }
+        case INFO_SignaturingStopped: {
+            if (m_context->catalog->GetNumNeedingSigs() > 0)
+                m_sigsExist = true;
+            else
+                m_sigsExist = false;
+            m_sigsStart = true;
+            if (m_initialized) {
+                gdk_threads_enter();
+                GtkWidget *w = gtk_item_factory_get_widget(menuFactory,
+                                                "/Relatable/Start Signaturing");
+                gtk_container_foreach(GTK_CONTAINER(w), set_label_menu,
+                                      (gpointer)"Start Signaturing");
+
+                gtk_widget_set_sensitive(w, m_sigsExist);
+                gdk_threads_leave();
+            }
+            break; 
+        }
         default:
             break;
     }

@@ -167,6 +167,16 @@ public:
     /** Add a new profile, registering with the YP Server */
     int CreateProfile(const char *pczUserName);
 
+    /** Convenience function to wrap the active status */
+    bool IsTurnedOn(void);
+
+    /** Convenience functions to quickly enable + disable all these features */
+    void TurnOff(void) { m_bRelatableOn = false; }
+    void TurnOn(void) { m_bRelatableOn = true; }
+    
+    /** Convenience function to just get the status of the OnOff flag */
+    bool GetTurnedOnFlag(void) { return m_bRelatableOn; }
+
 protected:
     /** Helper function to save the profile alias map */
     int WriteProfileMap(const char* pczFile);
@@ -198,6 +208,7 @@ private:
     int m_nMetaFailures;             // track metadata timeouts to stop lookups
                                      // if the server is down ;)
     string m_profilePath;            // store the path to the profile
+    bool m_bRelatableOn;             // is this thing on?
 };
 
 

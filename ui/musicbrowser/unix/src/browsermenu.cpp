@@ -537,6 +537,11 @@ static void submitplaylist(GTKMusicBrowser *p, guint action, GtkWidget *w)
     p->SubmitPlaylist();
 }
 
+static void signature_func(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+    p->HandleSignature();
+}
+
 void GTKMusicBrowser::CreateMenu(GtkWidget *topbox)
 {
     GtkItemFactoryEntry menu_items[] = {
@@ -601,6 +606,8 @@ void GTKMusicBrowser::CreateMenu(GtkWidget *topbox)
      {"/_Relatable",           NULL,            0,          0, "<Branch>" },
      {"/_Relatable/_Recommend Playlist", NULL,  (void(*)(...))genplaylist, 0, 0 },
      {"/_Relatable/_Learn Playlist",  NULL,  (void(*)(...))submitplaylist, 0, 0 },
+     {"/_Relatable/sep",       NULL,            0,          0, "<Separator>" },
+     {"/_Relatable/_Start Signaturing", NULL, (void(*)(...))signature_func, 0, 0 },
 
      {"/_Help",                 NULL,           0,          0, "<Branch>" },
      {"/_Help/_Contents",        NULL,           (void(*)(...))show_help,  0, 0 },

@@ -70,6 +70,8 @@ APSInterface::APSInterface(char *profilePath, const char* pIP,
     m_pProfileMap = new map<string, string>;
     m_pActiveProfiles = new vector<string>;
 
+    m_bRelatableOn = true;
+
     m_pLogFile = NULL;
     m_profilePath = string(profilePath);
     string savedProfiles = m_profilePath + string(DIR_MARKER_STR) +
@@ -473,6 +475,7 @@ int APSInterface::LoadProfileMap(const char *pczFile)
 {
     if (pczFile == NULL) 
         return APS_PARAMERROR;
+
     int nNumProfiles = 0;
     fstream fTemp(pczFile, ios_base::in);
     string strCurrentUser;
@@ -480,7 +483,13 @@ int APSInterface::LoadProfileMap(const char *pczFile)
     string strUserName;
     string strFilename;
 
-    fTemp >> nNumProfiles >> strCurrentUser >> strCollectionID;
+    fTemp >> nNumProfiles >> strCurrentUser;
+    if (strCurrentUser == "1" || strCurrentUser == "0") {
+        m_bRelatableOn = atoi(strCurrentUser.c_str());
+        fTemp >> strCurrentUser;
+    }
+
+    fTemp >> strCollectionID;
 
     if (strCollectionID == "NULL")
         m_strCollectionID = "";
@@ -518,8 +527,8 @@ int APSInterface::WriteProfileMap(const char *pczFile)
     if (strCollectionID.empty())
         strCollectionID = "NULL";
 
-    // to store current profile name (or none)
-    fTemp << nNumProfiles << " " << strCurrentProfile << endl;
+    fTemp << nNumProfiles << " " << m_bRelatableOn << endl;
+    fTemp << strCurrentProfile << endl; // to store current profile name
     fTemp << m_strCollectionID << endl; // to store music collection id
 
     for (i = m_pProfileMap->begin(); i != m_pProfileMap->end(); i++)
@@ -589,7 +598,7 @@ vector<string>* APSInterface::GetKnownProfiles()
 
 vector<string>* APSInterface::GetActiveProfiles()
 {
-    if (m_pActiveProfiles->empty()) 
+    if (!IsTurnedOn()) 
         return NULL;
 
     vector<string>* pReturn = new vector<string>(*m_pActiveProfiles);
@@ -607,7 +616,7 @@ void APSInterface::ClearActiveProfiles()
 
 int APSInterface::SyncLog()
 {
-    if (m_strCurrentProfile.empty()) 
+    if (!IsTurnedOn())
         return APS_PARAMERROR;
 
     EventRecord TempRecord;
@@ -658,3 +667,9 @@ int APSInterface::SyncLog()
     return nRes;
 }
 
+bool APSInterface::IsTurnedOn()
+{
+    if (m_bRelatableOn && m_strCurrentProfile != "")
+        return true;
+    return false;
+}

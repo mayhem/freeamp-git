@@ -487,10 +487,8 @@ bool MusicCatalog::CaseCompare(string s1, string s2)
 
 void MusicCatalog::GenerateSignature(PlaylistItem *track)
 {
-    if (m_context->aps->GetCurrentProfileName() != "") {
-        string url = track->URL();
-        m_sigs->insert(url);
-    }
+    string url = track->URL();
+    m_sigs->insert(url);
 }
 
 Error MusicCatalog::AddSong(const char *url)
@@ -750,16 +748,24 @@ Error MusicCatalog::RePopulateFromDatabase()
         key = m_database->NextKey(key);
     }
     m_catMutex->Release();
-    if (!m_sigs->empty()) {
-        set<string> *newset = new set<string>;
-        set<string>::iterator i = m_sigs->begin();
-        for (; i != m_sigs->end(); i++) {
-            newset->insert(*i);
-        }
-        m_context->target->AcceptEvent(new GenerateSignatureEvent(newset));
-        m_sigs->erase(m_sigs->begin(), m_sigs->end());
-    }
+    if (!m_sigs->empty() && m_context->aps->IsTurnedOn()) 
+        m_context->target->AcceptEvent(new Event(INFO_UnsignaturedTracksExist)); 
     return kError_NoErr;
+}
+
+void MusicCatalog::StartGeneratingSigs(void)
+{
+    set<string> *newset = new set<string>;
+    set<string>::iterator i = m_sigs->begin();
+    for (; i != m_sigs->end(); i++) {
+        newset->insert(*i);
+    }
+    m_context->target->AcceptEvent(new GenerateSignatureEvent(newset));
+}
+
+void MusicCatalog::StopGeneratingSigs(void)
+{
+    m_context->target->AcceptEvent(new Event(CMD_KillSigThread));
 }
 
 void MusicCatalog::SetDatabase(const char *path)
@@ -1306,6 +1312,8 @@ Error MusicCatalog::AcceptEvent(Event *e)
             m_context->aps->APSLookupSignature(sig, GUID);
 
             if (GUID != "") {
+                m_sigs->erase(asge->Url());
+
                 uint32 length = asge->Url().size() + 20;
                 char *curl = new char[length];
                 FilePathToURL(asge->Url().c_str(), curl, &length);

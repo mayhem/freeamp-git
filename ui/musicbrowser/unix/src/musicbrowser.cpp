@@ -126,6 +126,9 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
         case INFO_PlaylistCurrentItemInfo:
         case INFO_PlaylistItemsUpdated:
         case INFO_PlaylistItemMoved:
+        case INFO_UnsignaturedTracksExist:
+        case INFO_SignaturingStarted:
+        case INFO_SignaturingStopped:
         case INFO_CDDiscStatus: 
         case INFO_PrefsChanged: {
             mainBrowser->AcceptEvent(event);

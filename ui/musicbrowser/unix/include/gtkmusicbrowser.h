@@ -224,6 +224,9 @@ class GTKMusicBrowser {
     bool relatableExpanded;
     bool streamExpanded;
  
+    bool m_sigsExist;
+    bool m_sigsStart;
+
     GtkWidget *NewPixmap(char **data);
 
     GtkStyle *normStyle;
@@ -269,7 +272,10 @@ class GTKMusicBrowser {
     void SetRepeatType(RepeatMode mode);
     void SetShuffleType(bool shuffled);
     bool CheckEmptyDatabase(void);
-    
+  
+    void AskSignatureDialog(void);  
+    void AskOptIn(bool inMain = true);
+
   public:
 
     vector<PlaylistItem *> *GetTreeSelection(void);
@@ -330,6 +336,8 @@ class GTKMusicBrowser {
     void AddStreamToFavs(void);
     void AddPLStreamToFavs(void);
     void AddNewStream(void);
+
+    void HandleSignature(void);
 };
 
 #endif

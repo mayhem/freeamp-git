@@ -128,6 +128,10 @@ class MusicCatalog : public EventQueue
 
     void PruneDirectory(string &directory);
 
+    int32 GetNumNeedingSigs(void) { return m_sigs->size(); }
+    void StartGeneratingSigs(void);
+    void StopGeneratingSigs(void);
+    
  protected:
     static void musicsearch_thread_function(void *arg);
     static void prune_thread_function(void *arg);

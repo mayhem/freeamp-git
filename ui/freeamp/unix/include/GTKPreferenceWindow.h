@@ -226,9 +226,16 @@ class GTKPreferenceWindow : public PreferenceWindow
 
       GtkCTree *prefTree;
 
+      GtkWidget *profileEnable;
+      GtkWidget *profileListFrame;
+      GtkWidget *profileTextFrame;
       GtkWidget *profileList;
       GtkWidget *profileEntry;
-
+      GtkWidget *profileAdd;
+      GtkWidget *profileDelete;
+      
+      bool enableProfiles;
+      
       vector<OptionsPane *> *paneList;
       void AddPane(OptionsPane *pane);      
 
@@ -252,7 +259,8 @@ class GTKPreferenceWindow : public PreferenceWindow
       void SelectProfile(int row, bool select);
       void AddProfileEvent(void);
       void DeleteProfileEvent(void);
-
+      void ProfileToggle(int active);
+      
       void UpdateThemeList(void);
       void AddThemeEvent(const char *newpath);
       void DeleteThemeEvent(void);
@@ -291,7 +299,7 @@ class GTKPreferenceWindow : public PreferenceWindow
 
       void WatchDirSet(char *newpath, bool set);
       void SetWatchTimeout(int32 timeout);
- 
+
       FAContext *GetContext(void) { return m_pContext; }
 };
 

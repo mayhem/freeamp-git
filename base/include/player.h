@@ -148,7 +148,8 @@ class Player : public EventQueue, Properties, PropertyWatcher
     void SendEventToCatalog(Event *pEvent);   
     void GenerateSignature(Event *pEvent);
     void HandleAudioSigGenerated(Event *pEvent);
- 
+    void KillSigThread(Event *pEvent);
+    
     #define _EQUALIZER_ENABLE_
     #ifdef  _EQUALIZER_ENABLE_
     void Player::SetEQData(Event *pEvent);
@@ -174,6 +175,9 @@ class Player : public EventQueue, Properties, PropertyWatcher
     // and COO's haven't sent in 
     // their "Ready To Die" infos.
 
+    Thread   *m_signatureThread;
+    bool      m_bKillSignature;
+    
     int32     m_imQuitting;
     vector < UserInterface * >*m_uiList;
 

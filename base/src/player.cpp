@@ -84,8 +84,7 @@ GetPlayer(FAContext *context)
 }
 
 Player::
-Player(FAContext *context):
-EventQueue()
+Player(FAContext *context) : EventQueue()
 {
     m_context = context;
     m_context->player = this;
@@ -96,6 +95,9 @@ EventQueue()
     m_context->aps = m_APSInterface;
 
     delete [] m_faDir;
+
+    m_signatureThread = NULL;
+    m_bKillSignature = false;
 
     // cout << "Creating player..." << endl;
     m_eventSem = new Semaphore();
@@ -234,6 +236,8 @@ Player::
 
         m_eventServiceThread = NULL;
     }
+
+    KillSigThread(NULL);
 
     if(m_pmo)
     {
@@ -1264,6 +1268,21 @@ ChoosePMI(const char *szUrl, char *szTitle)
    return ret;
 }
 
+void 
+Player::
+KillSigThread(Event *pEvent)
+{
+    if (m_signatureThread) {
+        m_bKillSignature = true;
+        if (m_sigspmo) {
+            delete m_sigspmo;
+            m_sigspmo = NULL;
+        }
+        m_signatureThread->Join();
+    }
+    m_signatureThread = NULL;
+}
+    
 typedef struct GenerateSigsStruct {
     Player *player;
     Thread *thread;
@@ -1277,14 +1296,19 @@ GenerateSignature(Event *pEvent)
     GenerateSignatureEvent *gse = (GenerateSignatureEvent *)pEvent;
     set<string> *tracks = gse->Tracks();
 
-    Thread *thread = Thread::CreateThread();
-    if (thread) {
+    if (m_signatureThread) {
+        m_bKillSignature = true;
+        m_signatureThread->Join();
+    }
+        
+    m_signatureThread = Thread::CreateThread();
+    if (m_signatureThread) {
         GenerateSigsStruct *gss = new GenerateSigsStruct;
         gss->player = this;
-        gss->thread = thread;
+        gss->thread = m_signatureThread;
         gss->tracks = tracks;
 
-        thread->Create(generate_sigs_function, gss, true);
+        m_signatureThread->Create(generate_sigs_function, gss, true);
     }
 }
 
@@ -1303,10 +1327,15 @@ void
 Player::
 GenerateSigsWork(set<string> *items)
 {
-    cout << "Generating signatures for " << items->size() << " tracks.\n";
+    //cout << "Generating signatures for " << items->size() << " tracks.\n";
+    AcceptEvent(new Event(INFO_SignaturingStarted));
+
     set<string>::iterator i = items->begin();
     for (; i != items->end(); i++) 
     {
+        if (m_bKillSignature)
+            break;
+
         Error  error = kError_NoErr;
         PhysicalMediaOutput *pmo = NULL;
         PhysicalMediaInput *pmi = NULL;
@@ -1316,7 +1345,6 @@ GenerateSigsWork(set<string> *items)
         RegistryItem *item = NULL;
 
         string url = *i;
- cout << url << endl;
 
         pmi_item = ChoosePMI(url.c_str());
         if (!pmi_item)
@@ -1372,7 +1400,12 @@ GenerateSigsWork(set<string> *items)
         lmc->SetEQData(m_eqEnabled);
 
         m_signatureSem->Wait();
-      
+     
+        if (m_bKillSignature) {
+            m_signatureSem->Signal();
+            break; 
+        }
+ 
         m_sigspmo = pmo; 
 
         error = pmo->SetTo(url.c_str());
@@ -1411,7 +1444,11 @@ GenerateSigsWork(set<string> *items)
         m_signatureSem->Signal();
     }
 
+    AcceptEvent(new Event(INFO_SignaturingStopped));
+
     delete items;
+    m_signatureThread = NULL;
+    m_bKillSignature = false;
 }
 
 void 
@@ -1609,7 +1646,6 @@ DoneOutputting(Event *pEvent)
    {
       delete m_sigspmo;
       m_sigspmo = NULL;
-      m_signatureSem->Signal();
    
       return;  
    }
@@ -2230,6 +2266,9 @@ ServiceEvent(Event * pC)
         case INFO_MusicCatalogRegenerating:
         case INFO_MusicCatalogDoneRegenerating:
         case INFO_CDDiscStatus:
+        case INFO_UnsignaturedTracksExist:
+        case INFO_SignaturingStarted:
+        case INFO_SignaturingStopped:
         case CMD_AddFiles:
         case CMD_LoadTheme:
         case CMD_ShowPreferences:
@@ -2254,6 +2293,11 @@ ServiceEvent(Event * pC)
             delete pC;
             break;
 
+        case CMD_KillSigThread:
+            KillSigThread(pC);
+            delete pC;
+            break;
+         
 #define _VISUAL_ENABLE_
 #ifdef  _VISUAL_ENABLE_
         case CMD_SendVisBuf:
