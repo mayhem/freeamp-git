@@ -80,6 +80,7 @@ extern const char* kSaveCurrentPlaylistOnExitPref;
 extern const char* kViewMusicBrowserPref;
 extern const char* kWelcomePref;
 extern const char* kPlayImmediatelyPref;
+extern const char* kNumberOfURLsToRememberPref;
 
 class LibDirFindHandle;
 
@@ -247,6 +248,8 @@ class Preferences {
     Error GetPlayImmediately(bool* value);
     Error SetPlayImmediately(bool value);
 
+    Error GetNumberOfURLsToRemember(int32* value);
+    Error SetNumberOfURLsToRemember(int32 value);
 };
 
 #endif /* _PREFERENCES_H */

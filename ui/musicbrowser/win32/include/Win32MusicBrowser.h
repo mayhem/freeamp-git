@@ -74,13 +74,6 @@ class TrackSort : public binary_function<PlaylistItem*, PlaylistItem*, bool> {
 };
 
 
-bool FileOpenDialog(HWND hwnd, 
-                    const char* title,
-                    const char* filter,
-                    vector<string>* fileList,
-                    Preferences* prefs, 
-                    bool allowURL);
-
 LRESULT WINAPI 
 ListViewWndProc(HWND hwnd, 
                 UINT msg, 
@@ -154,7 +147,13 @@ class MusicBrowserUI : public UserInterface
     BOOL MusicSearchDlgProc(HWND hwnd, 
                             UINT msg, 
                             WPARAM wParam, 
-                            LPARAM lParam);    
+                            LPARAM lParam);   
+    
+    bool FileOpenDialog(HWND hwnd, 
+                    const char* title,
+                    const char* filter,
+                    vector<string>* fileList,
+                    bool allowURL);
     
     const PlaylistManager* PLManager() const { return m_oPlm; }
  

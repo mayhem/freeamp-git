@@ -1767,6 +1767,17 @@ OpenFileHookProc(   HWND hwnd,
         {
             ofn = (OPENFILENAME*)lParam;
 
+            HWND hwndURL = GetDlgItem(hwnd, IDC_URL);
+            
+            vector<PlaylistItem*>* url_list = (vector<PlaylistItem*>*)ofn->lCustData; 
+            vector<PlaylistItem*>::iterator i = url_list->begin();
+
+            for(i; i != url_list->end(); i++)
+            {
+                ComboBox_AddString(hwndURL, (*i)->URL().c_str());               
+            }
+
+            ofn->lCustData = 0;
             break;
         }
 
@@ -1830,27 +1841,41 @@ OpenFileHookProc(   HWND hwnd,
     return result;
 }
 
-bool 
+bool
+MusicBrowserUI::
 FileOpenDialog(HWND hwnd, 
                const char* title,
                const char* filter,
                vector<string>* fileList,
-               Preferences* prefs, 
                bool allowURL)
 {
     bool result = false;
     OPENFILENAME ofn;
-    char szInitialDir[MAX_PATH + 1] = {0x00};
-    uint32 initialDirSize = sizeof(szInitialDir);
+    char initialDir[MAX_PATH] = {0x00};
+    uint32 initialDirSize = sizeof(initialDir);
+    char installDir[MAX_PATH] = {0x00};
+    uint32 installDirSize = sizeof(installDir);
+    char urlPath[MAX_PATH + 7];
+    uint32 urlPathSize = sizeof(urlPath);
     const int32 kBufferSize = MAX_PATH * 128;
     char* fileBuffer = new char[kBufferSize];
+    vector<PlaylistItem*> url_list;
 
     *fileBuffer = 0x00;
 
-    if(prefs)
+    m_context->prefs->GetInstallDirectory( installDir, &initialDirSize);
+
+    if(*installDir)
     {
-        prefs->GetOpenSaveDirectory( szInitialDir, &initialDirSize);
+        strcat(installDir, "\\urls.m3u");
+
+        if(IsntError(FilePathToURL(installDir, urlPath, &urlPathSize)))
+        {
+            m_oPlm->ReadPlaylist(urlPath, &url_list);
+        }
     }
+
+    m_context->prefs->GetOpenSaveDirectory( initialDir, &initialDirSize);
 
     int hookFlags = 0;
 
@@ -1869,7 +1894,7 @@ FileOpenDialog(HWND hwnd,
     ofn.nMaxFile          = kBufferSize;
     ofn.lpstrFileTitle    = NULL;
     ofn.nMaxFileTitle     = 0;
-    ofn.lpstrInitialDir   = szInitialDir;
+    ofn.lpstrInitialDir   = initialDir;
     ofn.lpstrTitle        = title;
     ofn.Flags             = OFN_FILEMUSTEXIST | 
 					        OFN_PATHMUSTEXIST |
@@ -1880,7 +1905,7 @@ FileOpenDialog(HWND hwnd,
     ofn.nFileOffset       = 0;
     ofn.nFileExtension    = 0;
     ofn.lpstrDefExt       = "MP3";
-    ofn.lCustData         = 0;
+    ofn.lCustData         = (DWORD)&url_list;
     ofn.lpfnHook          = OpenFileHookProc;
     ofn.lpTemplateName    = (allowURL ? MAKEINTRESOURCE(IDD_OPENURL) : NULL);
 
@@ -1892,6 +1917,48 @@ FileOpenDialog(HWND hwnd,
         if(ofn.lCustData) // URL
         {
             fileList->push_back(fileBuffer);
+
+            if(*urlPath)
+            {
+                bool found = false;
+                vector<PlaylistItem*>::iterator i = url_list.begin();
+
+                for(i; i != url_list.end(); i++)
+                {
+                    if((*i)->URL() == fileBuffer)
+                    {
+                        PlaylistItem* item = *i;
+                        url_list.erase(i);
+                        url_list.insert(url_list.begin(), item);
+
+                        found = true;
+                        break;
+                    }
+                }
+
+                if(!found)
+                {
+                    PlaylistItem* item = new PlaylistItem(fileBuffer);
+                    url_list.insert(url_list.begin(), item);
+                    int32 numToRemember = 10;
+
+                    m_context->prefs->GetNumberOfURLsToRemember(&numToRemember);
+
+                    if(url_list.size() > numToRemember)
+                    {
+                        i = url_list.begin() + numToRemember;
+
+                        for(i; i != url_list.end(); i++)
+                        {
+                            delete *i;
+                        }
+
+                        url_list.erase(url_list.begin() + numToRemember, url_list.end());
+                    }                    
+                }
+
+                m_oPlm->WritePlaylist(urlPath, &url_list);
+            }
         }
         else // potential list of files
         {
@@ -1918,10 +1985,7 @@ FileOpenDialog(HWND hwnd,
 
             *(fileBuffer + ofn.nFileOffset - 1) = 0x00;
 
-            if(prefs)
-            {
-                prefs->SetOpenSaveDirectory(fileBuffer);
-            }
+            m_context->prefs->SetOpenSaveDirectory(fileBuffer);
         }
 
         result = true;
@@ -1953,6 +2017,13 @@ FileOpenDialog(HWND hwnd,
 
 	// Free the buffer allocated by the system
 	LocalFree( lpMessageBuffer );*/
+
+    vector<PlaylistItem*>::iterator i = url_list.begin();
+
+    for(i; i != url_list.end(); i++)
+    {
+        delete (*i);
+    }
 
     delete [] fileBuffer;
 
