@@ -80,7 +80,6 @@ SUBDIRS = base io ui lmc
 @AM_HAVE_WIN32_FALSE@PRG = freeamp
 @AM_HAVE_WIN32_FALSE@ALLLDADD = @top_srcdir@/base/unix/@target_os@/src/*.o \
 @AM_HAVE_WIN32_FALSE@          @top_srcdir@/base/unix/src/*.o \
-@AM_HAVE_WIN32_FALSE@	  @top_srcdir@/ui/dummy/src/*.o \
 @AM_HAVE_WIN32_FALSE@	  @top_srcdir@/lmc/src/*.o \
 @AM_HAVE_WIN32_FALSE@	  @top_srcdir@/io/src/*.o \
 @AM_HAVE_WIN32_FALSE@	  @top_srcdir@/ui/src/*.o \
@@ -90,7 +89,6 @@ SUBDIRS = base io ui lmc
 @AM_HAVE_WIN32_FALSE@MYDEPS = @top_srcdir@/base/unix/@target_os@/src/libfasys.a \
 @AM_HAVE_WIN32_FALSE@         @top_srcdir@/base/src/libfabase.a \
 @AM_HAVE_WIN32_FALSE@	 @top_srcdir@/base/unix/src/libfaunix.a \
-@AM_HAVE_WIN32_FALSE@	 @top_srcdir@/ui/dummy/src/libfauidummy.a \
 @AM_HAVE_WIN32_FALSE@	 @top_srcdir@/lmc/src/libfalmcsrc.a \
 @AM_HAVE_WIN32_FALSE@	 @top_srcdir@/io/src/libfaiosrc.a \
 @AM_HAVE_WIN32_FALSE@	 @top_srcdir@/ui/src/libfauisrc.a

@@ -30,13 +30,13 @@ ____________________________________________________________________________*/
 #include "vector.h"
 #include "hashtable.h"
 #include "semaphore.h"
-#include "dummyui.h"
 #include "registrar.h"
 
 
 void testVector();
 void testHashTable();
 
+#if 0
 bool CompareName(const char *p1, const char *p2) {
     //cout << "Comparing " << p1 << " to " << p2 << endl;
     int32 i=0; int32 j=0;
@@ -50,6 +50,7 @@ bool CompareName(const char *p1, const char *p2) {
 	return false;
     }
 }
+#endif
 int main(int argc, char **argv) {
     //testVector();
     //testBuffer();
@@ -92,21 +93,6 @@ int main(int argc, char **argv) {
     termSemaphore = new Semaphore();
     Player *pP = Player::GetPlayer();
 
-    EventQueueRef eqRef = new EventQueue();
-    eqRef->ref = pP;
-    eqRef->AcceptEvent = Player::AcceptEventStub;
-
-
-
-    DummyUI *pDCOO = new DummyUI(termSemaphore);
-    pDCOO->SetTarget(eqRef);
-
-    UIRef dummyRef = new UI();
-    dummyRef->ref = pDCOO;
-    dummyRef->AcceptEvent = pDCOO->AcceptEventStub;
-    dummyRef->Cleanup = pDCOO->Cleanup;
-
-    pP->RegisterActiveUI(dummyRef);
     pP->RegisterLMCs(lmc);
     pP->RegisterPMIs(pmi);
     pP->RegisterPMOs(pmo);
@@ -114,34 +100,9 @@ int main(int argc, char **argv) {
 
 
 
-    //cout << "Looking to start up a UI..." << endl;
-#if 0
-    char *calledName = strrchr(argv[0],'/');
-    if (!calledName) calledName = argv[0]; else calledName++;
-    int32 index = 0;
-    RegistryItem *item = ui->GetItem(index++);
-    while (item) {
-	if (CompareName(calledName,item->Name())) {
-	    UI *myui = new UI;
-	    item->InitFunction()(myui);
-	    EventQueueRef eqRef = new EventQueue();
-	    eqRef->ref = pP;
-	    eqRef->AcceptEvent = Player::AcceptEventStub;
-	    myui->SetTarget(myui,eqRef);
-	    myui->SetArgs(myui,argc,argv);
-	    pP->RegisterActiveUI(myui);
-	    break;
-	}
-	item = ui->GetItem(index++);
-    }
-
-    if (!item) {
-	cout << "Error initializing UI!" << endl;
-	return 1;
-    }
-#endif
 
     pP->SetArgs(argc,argv);
+    pP->SetTerminationSemaphore(termSemaphore);
     pP->Run();
 
     termSemaphore->Wait();
@@ -149,6 +110,7 @@ int main(int argc, char **argv) {
     return 0;
 }
 
+#if 0
 void testVector() {
     cout << "Beginning testVector..." << endl;
     Vector<char *> *pVect = new Vector<char *>(2);
@@ -188,7 +150,7 @@ void testVector() {
     }
     cout << "Ending testVector..." << endl;
 }
-
+#endif
 
 void testHashTable() {
     HashTable *pHT = new HashTable();

@@ -32,10 +32,6 @@ else
 PRG = freeamp
 ALLLDADD = @top_srcdir@/base/unix/@target_os@/src/*.o \
           @top_srcdir@/base/unix/src/*.o \
-##	  @top_srcdir@/io/local/*.o \
-##	  @top_srcdir@/ui/cmdline/*.o \
-##	  @top_srcdir@/lmc/xingmp3/src/*.o \
-	  @top_srcdir@/ui/dummy/src/*.o \
 	  @top_srcdir@/lmc/src/*.o \
 	  @top_srcdir@/io/src/*.o \
 	  @top_srcdir@/ui/src/*.o \
@@ -45,10 +41,6 @@ DSLDADD = @top_srcdir@/base/src/player.o @top_srcdir@/base/src/playlist.o @top_s
 MYDEPS = @top_srcdir@/base/unix/@target_os@/src/libfasys.a \
          @top_srcdir@/base/src/libfabase.a \
 	 @top_srcdir@/base/unix/src/libfaunix.a \
-##         @top_srcdir@/io/local/libfaiolocal.a \
-##         @top_srcdir@/ui/cmdline/libfauicmdline.a \
-##         @top_srcdir@/lmc/xingmp3/src/libfalmcxingmp3.a \
-	 @top_srcdir@/ui/dummy/src/libfauidummy.a \
 	 @top_srcdir@/lmc/src/libfalmcsrc.a \
 	 @top_srcdir@/io/src/libfaiosrc.a \
 	 @top_srcdir@/ui/src/libfauisrc.a

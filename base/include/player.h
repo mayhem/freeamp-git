@@ -62,7 +62,7 @@ class Player {
 
     void Run();
     void SetArgs(int32 argc, char** argv);
-
+    void SetTerminationSemaphore(Semaphore *);
     void testQueue();
     static void EventServiceThreadFunc(void *);
     static int32 AcceptEventStub(EventQueueRef ref, Event* e);
@@ -81,6 +81,7 @@ class Player {
 
 
  private:
+    Semaphore*              m_pTermSem;
     static Player*          m_thePlayer;
     Semaphore*              m_eventSem;
     PlayerState             m_playerState;
