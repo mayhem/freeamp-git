@@ -1165,14 +1165,33 @@ Error PlaylistManager::MoveItems(vector<PlaylistItem*>* items, uint32 index)
 
     index = CheckIndex(index);
 
-    if(items && index != kInvalidIndex)
+    const PlaylistItem* currentItem = GetCurrentItem();
+    vector<uint32> oldIndices;
+
+    if(items)
     {
         uint32 size = 0;
+        uint32 i = 0;
         PlaylistItem* item = NULL;
 
         size = items->size();
 
-        for(uint32 i = 0; i < size; i++)
+        for(i = 0; i < size; i++)
+        {
+            item = (*items)[i];
+
+            if(item)
+            {
+                uint32 oldIndex = IndexOf(item);
+
+                if(oldIndex < index)
+                    index--;
+
+                oldIndices.push_back(oldIndex);
+            }
+        }
+
+        for(i = 0; i < size; i++)
         {
             item = (*items)[i];
 
@@ -1182,14 +1201,53 @@ Error PlaylistManager::MoveItems(vector<PlaylistItem*>* items, uint32 index)
             }
         }  
 
-        if(index > m_activeList->size())
+        if(index >= m_activeList->size())
             index = m_activeList->size();
 
         m_activeList->insert(&(*m_activeList)[index],
                              items->begin(), 
                              items->end());
 
+        if(kPlaylistKey_MasterPlaylist == GetActivePlaylist())
+            InternalSetCurrentIndex(IndexOf(currentItem));
+
+        for(i = 0; i < size; i++)
+        {
+            item = (*items)[i];
+
+            if(item)
+            {
+                m_context->target->AcceptEvent(
+                    new PlaylistItemMovedEvent(oldIndices[i], index + i, item, this));
+            }
+        }  
+
         result = kError_NoErr;
+    }
+
+    m_mutex.Release();
+    return result;
+}
+
+Error PlaylistManager::MoveItems(vector<uint32>* items, uint32 index)
+{
+    Error result = kError_InvalidParam;
+    m_mutex.Acquire();
+
+    assert(items);
+
+    if(items)
+    {
+        vector<PlaylistItem*> pl_items;
+
+        vector<uint32>::iterator i;
+
+        for(i = items->begin(); i != items->end(); i++)
+        {
+            pl_items.push_back(ItemAt(*i));
+        }
+
+        result = MoveItems(&pl_items, index);
     }
 
     m_mutex.Release();
@@ -1202,6 +1260,8 @@ Error PlaylistManager::Sort(PlaylistSortKey key, PlaylistSortType type)
 {
     Error result = kError_InvalidParam;
     m_mutex.Acquire();
+
+    const PlaylistItem* currentItem = GetCurrentItem();
 
     if(key >= kPlaylistSortKey_FirstKey && key < kPlaylistSortKey_LastKey)
     {
@@ -1226,7 +1286,12 @@ Error PlaylistManager::Sort(PlaylistSortKey key, PlaylistSortType type)
     }
 
     if(IsntError(result))
+    {
+        if(kPlaylistKey_MasterPlaylist == GetActivePlaylist())
+            InternalSetCurrentIndex(IndexOf(currentItem));
+           
         m_context->target->AcceptEvent(new PlaylistSortedEvent(key, this));
+    }
 
     m_mutex.Release();
     return result;

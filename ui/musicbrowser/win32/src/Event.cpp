@@ -227,7 +227,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
 	    if (pTreeView->hdr.code == TVN_BEGINDRAG )//&&
             //m_oTreeData.GetLevel(pTreeView->itemNew.lParam) == 3)
         {
-            BeginDrag(GetDlgItem(m_hWnd, IDC_MUSICTREE), 
+            TVBeginDrag(GetDlgItem(m_hWnd, IDC_MUSICTREE), 
                       (NM_TREEVIEW*)pHdr);
             return 0;
         }    
@@ -397,6 +397,12 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
     pListView = (NM_LISTVIEW *)pHdr;
     if (pListView->hdr.idFrom == IDC_PLAYLISTBOX)
     {
+        if (pListView->hdr.code == LVN_BEGINDRAG )
+        {
+            LVBeginDrag(m_hPlaylistView, (NM_LISTVIEW*)pHdr);
+            return 0;
+        }    
+
 	    if(pListView->hdr.code == LVN_ITEMCHANGED)
         {
             UpdateButtonMenuStates();

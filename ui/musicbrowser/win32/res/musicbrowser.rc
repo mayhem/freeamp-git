@@ -188,14 +188,14 @@ BEGIN
     END
     POPUP "&Controls"
     BEGIN
-        MENUITEM "Play The CurrentTrack",       ID_CONTROLS_PLAYPAUSE
-        MENUITEM "Stop The Current Track",      ID_CONTROLS_STOP
+        MENUITEM "Play the CurrentTrack",       ID_CONTROLS_PLAYPAUSE
+        MENUITEM "Stop the Current Track",      ID_CONTROLS_STOP
         MENUITEM SEPARATOR
-        MENUITEM "Move To Previous Track",      ID_CONTROLS_PREVIOUSSONG
-        MENUITEM "Move To Next Track",          ID_CONTROLS_NEXTSONG
+        MENUITEM "Move to Previous Track",      ID_CONTROLS_PREVIOUSSONG
+        MENUITEM "Move to Next Track",          ID_CONTROLS_NEXTSONG
         MENUITEM SEPARATOR
-        MENUITEM "Play Tracks In Normal Order", ID_CONTROLS_NORMALORDER
-        MENUITEM "Play Tracks In Random Order", ID_CONTROLS_SHUFFLE
+        MENUITEM "Play Tracks in Normal Order", ID_CONTROLS_NORMALORDER
+        MENUITEM "Play Tracks in Random Order", ID_CONTROLS_SHUFFLE
         MENUITEM SEPARATOR
         MENUITEM "Repeat No Tracks",            ID_CONTROLS_REPEATNONE
         MENUITEM "Repeat Current Track",        ID_CONTROLS_REPEATONE

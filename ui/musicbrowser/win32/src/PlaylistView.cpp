@@ -31,7 +31,8 @@ ____________________________________________________________________________*/
 #include "utility.h"
 #include "resource.h"
 #include "Win32MusicBrowser.h"
-#include "debug.h"
+#include "DropSource.h"
+#include "DropObject.h"
 
 #define kPrePadding 5
 
@@ -251,7 +252,7 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             }
 
             // If the item is focused draw a focus rect around the entire row
-            if(dis->itemState & ODS_FOCUS)
+            if(dis->itemState & ODS_FOCUS && hwndList == GetFocus())
             {
                 // Draw the focus rect
                 DrawFocusRect(dis->hDC, &dis->rcItem);
@@ -322,23 +323,37 @@ void MusicBrowserUI::PlaylistListItemMoved(const PlaylistItem* item,
 
     if(index != kInvalidIndex)
     {
-        LV_ITEM sItem;
+
+        char buf[256];
+        sprintf(buf, "oldIndex: %d\tnewIndex: %d\r\n", oldIndex, newIndex);
+
+        OutputDebugString(buf);
+
+        //LV_ITEM sItem;
 
         uint32 state = ListView_GetItemState(m_hPlaylistView, 
                                              oldIndex, 
                                              LVIS_SELECTED|LVIS_FOCUSED);
 
-        sItem.mask = LVIF_IMAGE | LVIF_PARAM | LVIF_STATE;
+        /*sItem.mask = LVIF_IMAGE | LVIF_PARAM | LVIF_STATE;
         sItem.iSubItem = 0;
         sItem.iItem = index;
         sItem.lParam = (LPARAM)item;
         sItem.iImage = 0;
         sItem.stateMask = LVIS_FOCUSED|LVIS_SELECTED;
-        sItem.state = state;
+        sItem.state = state;*/
 
-        ListView_DeleteItem(hwnd, oldIndex);
+        ListView_SetItemState(m_hPlaylistView, 
+                              oldIndex, 
+                              0,
+                              LVIS_SELECTED|LVIS_FOCUSED);
 
-        ListView_InsertItem(hwnd, &sItem);
+        ListView_SetItemState(m_hPlaylistView, 
+                              newIndex, 
+                              state,
+                              LVIS_SELECTED|LVIS_FOCUSED);
+
+        ListView_RedrawItems(m_hPlaylistView, 0, ListView_GetItemCount(m_hPlaylistView) - 1);
     }
 }
 
@@ -352,10 +367,11 @@ void MusicBrowserUI::PlaylistListItemRemoved(const PlaylistItem* item,
     {
         LV_ITEM sItem;
         
-        sItem.mask = LVIF_PARAM;
+        sItem.mask = LVIF_PARAM|LVIF_STATE;
         sItem.iItem = oldIndex;
         sItem.iSubItem = 0;
         sItem.lParam = 0;
+        sItem.stateMask = LVIS_SELECTED;
 
         ListView_GetItem(m_hPlaylistView, &sItem);
         
@@ -364,7 +380,11 @@ void MusicBrowserUI::PlaylistListItemRemoved(const PlaylistItem* item,
         if(oldIndex >= ListView_GetItemCount(m_hPlaylistView))
             oldIndex = ListView_GetItemCount(m_hPlaylistView) - 1;
 
-        ListView_SetItemState(m_hPlaylistView, oldIndex, LVIS_SELECTED, LVIS_SELECTED);
+        if(sItem.state & LVIS_SELECTED)
+        {
+            ListView_SetItemState(m_hPlaylistView, oldIndex, LVIS_SELECTED, LVIS_SELECTED);
+        }
+
         ListView_RedrawItems(m_hPlaylistView, oldIndex, ListView_GetItemCount(m_hPlaylistView) - 1);
 
         m_bListChanged = true;
@@ -418,6 +438,97 @@ void MusicBrowserUI::PlaylistListItemAdded(const PlaylistItem* item)
     }
 }
 
+void MusicBrowserUI::LVBeginDrag(HWND hwnd, NM_LISTVIEW* nmlv)
+{
+    vector<string>* urls = new vector<string>;
+    vector<PlaylistItem*> list;
+
+    m_playlistDropTarget->TargetIsSource(true);
+
+    //GetSelectedMusicTreeItems(urls); 
+    uint32 selected = ListView_GetSelectedCount(hwnd);
+    uint32 count = ListView_GetItemCount(hwnd);
+    uint32 index = 0;
+    uint32 found = 0;
+
+    for(index = 0, found = 0; found < selected && index < count; index++)
+    {
+        uint32 state = ListView_GetItemState(hwnd, 
+                                             index, 
+                                             LVIS_SELECTED);
+        if(state & LVIS_SELECTED)
+        {
+            PlaylistItem* item = m_oPlm->ItemAt(index);
+
+            urls->push_back(item->URL());
+
+            //ListView_SetItemState(hwnd, index, LVIS_CUT, LVIS_CUT);
+            list.push_back(item);
+            found++;
+        }
+    }
+
+    HIMAGELIST himl;
+    RECT rcItem;
+    POINT hotspot;
+    
+    himl = ListView_CreateDragImage(hwnd, nmlv->iItem, &hotspot);
+
+    ListView_GetItemRect(hwnd, nmlv->iItem, &rcItem, LVIR_ICON); 
+
+    hotspot.x = 0;
+    hotspot.y = (rcItem.bottom - rcItem.top)/2;
+
+    DataObject* data = new DataObject(CFSTR_FREEAMP_PLAYLISTITEM, urls);
+    DropSource* src = new DropSource(hwnd, himl, hotspot, nmlv->ptAction);
+    DWORD dwEffect = 0;
+
+    DoDragDrop(data, 
+               src, 
+               DROPEFFECT_COPY|DROPEFFECT_SCROLL|DROPEFFECT_MOVE, 
+               &dwEffect); 
+
+    if(dwEffect == DROPEFFECT_MOVE)
+    {
+        vector<PlaylistItem*>::iterator i;
+
+        for(i = list.begin(); i != list.end(); i++)
+        {
+            m_oPlm->RemoveItem(*i);         
+        }
+    }
+
+    /*if(dwEffect != DROPEFFECT_NONE)
+    {
+        for(index = 0, found = 0; found < selected && index < count; index++)
+        {
+            uint32 state = ListView_GetItemState(hwnd, 
+                                                 index, 
+                                                 LVIS_SELECTED);
+            if(state & LVIS_SELECTED)
+            {
+                ListView_SetItemState(hwnd, index, 0, LVIS_SELECTED);
+                found++;
+            }
+        }
+    }
+
+    if(dwEffect == DROPEFFECT_MOVE)
+    {
+        vector<PlaylistItem*>::iterator i;
+
+        for(i = list.begin(); i != list.end(); i++)
+        {
+            m_oPlm->RemoveItem(*i);         
+        }
+    }*/
+
+    data->Release();
+    src->Release();
+
+    m_playlistDropTarget->TargetIsSource(false);
+}
+
 LRESULT WINAPI 
 ListViewWndProc(HWND hwnd, 
                 UINT msg, 
@@ -457,7 +568,61 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
             UpdateButtonMenuStates();
             break;
         
-        case WM_DROPURLS:
+        case UWM_MOVEITEMS:
+        {
+            LV_HITTESTINFO hti;
+            RECT itemRect;
+
+            hti.pt = *((POINT*)lParam);
+            int32 insertIndex = ListView_HitTest(hwnd, &hti);
+
+            if(insertIndex < 0)
+            {
+                insertIndex = ListView_GetItemCount(hwnd) - 1;
+            }
+            else
+            {   
+                int32 middle;
+
+                ListView_GetItemRect(hwnd, hti.iItem, &itemRect, LVIR_BOUNDS);
+
+                middle = itemRect.top + (itemRect.bottom - itemRect.top)/2;
+
+                if(hti.pt.y >= middle)
+                {                    
+                    insertIndex++; 
+                }
+            }
+
+            char buf[256];
+            sprintf(buf, "insert: %d\r\n", insertIndex);
+
+            OutputDebugString(buf);
+
+            vector<uint32> items;
+            uint32 selected = ListView_GetSelectedCount(hwnd);
+            uint32 count = ListView_GetItemCount(hwnd);
+            uint32 index = 0;
+            uint32 found = 0;
+
+            for(index = 0, found = 0; found < selected && index < count; index++)
+            {
+                uint32 state = ListView_GetItemState(hwnd, 
+                                                     index, 
+                                                     LVIS_SELECTED);
+                if(state & LVIS_SELECTED)
+                {
+                    items.push_back(index);
+                    found++;
+                }
+            }
+
+            m_oPlm->MoveItems(&items, insertIndex);
+
+            break;
+        }
+
+        case UWM_DROPURLS:
             filesAreURLs = true;
         case WM_DROPFILES:
         {

@@ -78,8 +78,10 @@ DropTarget::DropTarget(HWND	hwnd)
 {
     m_refs = 1;  
 	m_hwnd = hwnd;
-	m_bAcceptFmt = FALSE;
-	m_bEnabled = TRUE;
+	m_acceptFormat = false;
+    m_allowMove = false;
+	m_enabled = true;
+    m_targetIsSource = false;
     m_scrolling = true;
 
     g_me = this;
@@ -102,9 +104,14 @@ DropTarget::~DropTarget()
 }
 
 //	Enable/disable dropping
-void DropTarget::Enable(BOOL bEnable) 
+void DropTarget::Enable(bool enable) 
 {
-    m_bEnabled = bEnable;  
+    m_enabled = enable;  
+}
+
+void DropTarget::TargetIsSource(bool isSrc)
+{
+    m_targetIsSource = isSrc;
 }
 
 #define SCROLL_OFF 0
@@ -224,23 +231,24 @@ void DropTarget::AutoScroll(int scrollCode)
 //	IDropTarget Methods
 
 STDMETHODIMP DropTarget::DragEnter(LPDATAOBJECT pDataObj, 
-                                   DWORD grfKeyState, 
+                                   DWORD dwKeyState, 
                                    POINTL pt, 
                                    LPDWORD pdwEffect) 
 {  
     FORMATETC fmtetc;
 
     // default to not allowing drop
-    m_bAcceptFmt = FALSE;
+    m_acceptFormat = false;
+    m_allowMove = false;
     *pdwEffect = DROPEFFECT_NONE;
 
-    if(!m_bEnabled) 
+    if(!m_enabled) 
     {
         return NOERROR;
     }
 
     // Does the drag source provide our private format?     
-    fmtetc.cfFormat = RegisterClipboardFormat(CFSTR_FREEAMP_MUSICBROWSERITEM);
+    fmtetc.cfFormat = RegisterClipboardFormat(CFSTR_FREEAMP_CATALOGITEM);
     fmtetc.ptd      = NULL;
     fmtetc.dwAspect = DVASPECT_CONTENT;  
     fmtetc.lindex   = -1;
@@ -248,8 +256,24 @@ STDMETHODIMP DropTarget::DragEnter(LPDATAOBJECT pDataObj,
 
     if(pDataObj->QueryGetData(&fmtetc) == NOERROR) 
     {
-        m_bAcceptFmt = TRUE;
+        m_acceptFormat = true;
         *pdwEffect = DROPEFFECT_COPY;
+    }
+
+    fmtetc.cfFormat = RegisterClipboardFormat(CFSTR_FREEAMP_PLAYLISTITEM);
+    fmtetc.ptd      = NULL;
+    fmtetc.dwAspect = DVASPECT_CONTENT;  
+    fmtetc.lindex   = -1;
+    fmtetc.tymed    = TYMED_HGLOBAL; 
+
+    if(pDataObj->QueryGetData(&fmtetc) == NOERROR) 
+    {
+        m_acceptFormat = true;
+        m_allowMove = true;
+        if(dwKeyState & MK_CONTROL)
+            *pdwEffect = DROPEFFECT_COPY;
+        else
+            *pdwEffect = DROPEFFECT_COPY;
     }
 
     // Does the drag source provide CF_HDROP?     
@@ -261,149 +285,53 @@ STDMETHODIMP DropTarget::DragEnter(LPDATAOBJECT pDataObj,
 
     if(pDataObj->QueryGetData(&fmtetc) == NOERROR) 
     {
-        m_bAcceptFmt = TRUE;
+        m_acceptFormat = true;
         *pdwEffect = DROPEFFECT_COPY;
     }
 
-    // draw a line to indicate insertion point in list
-    LV_HITTESTINFO hti;
-    RECT itemRect;
-
-    hti.pt.x = pt.x;
-    hti.pt.y = pt.y;
-
-    MapWindowPoints(NULL, m_hwnd, (LPPOINT)&hti.pt, 1);
-
-    m_oldItem = ListView_HitTest(m_hwnd, &hti);
-
-    if(m_oldItem < 0)
+    if(m_acceptFormat)
     {
-        itemRect.top = 0;
-        itemRect.bottom = 0;
-        itemRect.left = 0;
-        itemRect.right = 0;
-    }
-    else
-    {   
-        int middle;
+        // draw a line to indicate insertion point in list
+        LV_HITTESTINFO hti;
+        RECT itemRect;
 
-        ListView_GetItemRect(m_hwnd, hti.iItem, &itemRect, LVIR_BOUNDS);
+        hti.pt.x = pt.x;
+        hti.pt.y = pt.y;
 
-        middle = itemRect.top + (itemRect.bottom - itemRect.top)/2;
+        MapWindowPoints(NULL, m_hwnd, (LPPOINT)&hti.pt, 1);
 
-        if(pt.y < middle)
+        m_oldItem = ListView_HitTest(m_hwnd, &hti);
+
+        if(m_oldItem < 0)
         {
-            itemRect.top -= 2;
-            itemRect.bottom = itemRect.top + 1;
+            itemRect.top = 0;
+            itemRect.bottom = 0;
+            itemRect.left = 0;
+            itemRect.right = 0;
         }
         else
-        {
-            itemRect.bottom += 2;
-            itemRect.top = itemRect.bottom - 1;
-        }
-    }
+        {   
+            int middle;
 
-    HDC hdc = GetDC(m_hwnd);
+            ListView_GetItemRect(m_hwnd, hti.iItem, &itemRect, LVIR_BOUNDS);
 
-    HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, m_insertBrush);
+            middle = itemRect.top + (itemRect.bottom - itemRect.top)/2;
 
-    // draw new
-    PatBlt(hdc,
-           itemRect.left, 
-           itemRect.top, 
-           itemRect.right - itemRect.left, 
-           itemRect.bottom - itemRect.top, 
-           PATINVERT);
-
-    SelectObject(hdc, oldBrush);
-
-    ReleaseDC(m_hwnd, hdc);
-
-    m_insertRect = itemRect;
-   
-	return NOERROR;
-}
-
-STDMETHODIMP DropTarget::DragOver(DWORD grfKeyState, 
-                                  POINTL pt, 
-                                  LPDWORD pdwEffect) 
-{
-    //OutputDebugString("Drag Over\r\n");
-
-    if(m_bAcceptFmt && m_bEnabled) 
-        *pdwEffect = DROPEFFECT_COPY; 
-	else 
-        *pdwEffect = DROPEFFECT_NONE; 
-
-    // draw a line to indicate insertion point in list
-    LV_HITTESTINFO hti;
-    RECT itemRect;
-
-    hti.pt.x = pt.x;
-    hti.pt.y = pt.y;
-
-    MapWindowPoints(NULL, m_hwnd, (LPPOINT)&hti.pt, 1);
-
-    m_oldItem = ListView_HitTest(m_hwnd, &hti);
-
-    if(m_oldItem < 0)
-    {
-        itemRect = m_insertRect;
-    }
-    else
-    {   
-        int middle;
-
-        ListView_GetItemRect(m_hwnd, hti.iItem, &itemRect, LVIR_BOUNDS);
-
-        middle = itemRect.top + (itemRect.bottom - itemRect.top)/2;
-
-        if(hti.pt.y < middle)
-        {
-            if(m_oldItem == 0)
+            if(pt.y < middle)
             {
-                itemRect.bottom = itemRect.top + 2;
+                itemRect.top -= 2;
+                itemRect.bottom = itemRect.top + 1;
             }
             else
             {
-                itemRect.bottom = itemRect.top;
-                itemRect.top -= 2;
+                itemRect.bottom += 2;
+                itemRect.top = itemRect.bottom - 1;
             }
-            //OutputDebugString("top\r\n");
         }
-        else
-        {
-            itemRect.top = itemRect.bottom - 2;
-            //itemRect.bottom;
-            //OutputDebugString("bottom\r\n");
-        }
-    }
 
-    //char buf[256];
-    //sprintf(buf, "%d, %d\r\n", pt.x, pt.y);
-
-    //sprintf(buf, "%d, %d, %d, %d\r\n", 
-    //    itemRect.top, itemRect.left, itemRect.bottom, itemRect.right);
-    //OutputDebugString(buf);
-
-    if(!m_scrolling)
-    {
-        ImageList_DragShowNolock(FALSE);
-       
         HDC hdc = GetDC(m_hwnd);
 
         HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, m_insertBrush);
-
-        //OutputDebugString("erase old - drag over\r\n");
-        // erase old
-        PatBlt(hdc,
-               m_insertRect.left, 
-               m_insertRect.top, 
-               m_insertRect.right - m_insertRect.left, 
-               m_insertRect.bottom - m_insertRect.top, 
-               PATINVERT);
-
-        //OutputDebugString("draw new - drag over\r\n");
 
         // draw new
         PatBlt(hdc,
@@ -418,11 +346,124 @@ STDMETHODIMP DropTarget::DragOver(DWORD grfKeyState,
         ReleaseDC(m_hwnd, hdc);
 
         m_insertRect = itemRect;
-
-        ImageList_DragShowNolock(TRUE);
     }
+   
+	return NOERROR;
+}
 
-    CheckAutoScroll(hti.pt);
+STDMETHODIMP DropTarget::DragOver(DWORD dwKeyState, 
+                                  POINTL pt, 
+                                  LPDWORD pdwEffect) 
+{
+    //OutputDebugString("Drag Over\r\n");
+
+    if(m_acceptFormat && m_enabled) 
+    {
+        *pdwEffect = DROPEFFECT_COPY; 
+
+        if(m_allowMove && !m_targetIsSource)
+        {
+            if(dwKeyState & MK_CONTROL)
+                *pdwEffect = DROPEFFECT_COPY; 
+            else
+                *pdwEffect = DROPEFFECT_MOVE; 
+        }
+    }
+	else 
+        *pdwEffect = DROPEFFECT_NONE; 
+
+    
+    if(m_acceptFormat && m_enabled)
+    {
+        // draw a line to indicate insertion point in list
+        LV_HITTESTINFO hti;
+        RECT itemRect;
+
+        hti.pt.x = pt.x;
+        hti.pt.y = pt.y;
+
+        MapWindowPoints(NULL, m_hwnd, (LPPOINT)&hti.pt, 1);
+
+        m_oldItem = ListView_HitTest(m_hwnd, &hti);
+
+        if(m_oldItem < 0)
+        {
+            itemRect = m_insertRect;
+        }
+        else
+        {   
+            int middle;
+
+            ListView_GetItemRect(m_hwnd, hti.iItem, &itemRect, LVIR_BOUNDS);
+
+            middle = itemRect.top + (itemRect.bottom - itemRect.top)/2;
+
+            if(hti.pt.y < middle)
+            {
+                if(m_oldItem == 0)
+                {
+                    itemRect.bottom = itemRect.top + 2;
+                }
+                else
+                {
+                    itemRect.bottom = itemRect.top;
+                    itemRect.top -= 2;
+                }
+                //OutputDebugString("top\r\n");
+            }
+            else
+            {
+                itemRect.top = itemRect.bottom - 2;
+                //itemRect.bottom;
+                //OutputDebugString("bottom\r\n");
+            }
+        }
+
+        //char buf[256];
+        //sprintf(buf, "%d, %d\r\n", pt.x, pt.y);
+
+        //sprintf(buf, "%d, %d, %d, %d\r\n", 
+        //    itemRect.top, itemRect.left, itemRect.bottom, itemRect.right);
+        //OutputDebugString(buf);
+
+        if(!m_scrolling)
+        {
+            ImageList_DragShowNolock(FALSE);
+       
+            HDC hdc = GetDC(m_hwnd);
+
+            HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, m_insertBrush);
+
+            //OutputDebugString("erase old - drag over\r\n");
+            // erase old
+            PatBlt(hdc,
+                   m_insertRect.left, 
+                   m_insertRect.top, 
+                   m_insertRect.right - m_insertRect.left, 
+                   m_insertRect.bottom - m_insertRect.top, 
+                   PATINVERT);
+
+            //OutputDebugString("draw new - drag over\r\n");
+
+            // draw new
+            PatBlt(hdc,
+                   itemRect.left, 
+                   itemRect.top, 
+                   itemRect.right - itemRect.left, 
+                   itemRect.bottom - itemRect.top, 
+                   PATINVERT);
+
+            SelectObject(hdc, oldBrush);
+
+            ReleaseDC(m_hwnd, hdc);
+
+            m_insertRect = itemRect;
+
+            ImageList_DragShowNolock(TRUE);
+        }
+
+        CheckAutoScroll(hti.pt);
+    }
 
 	return NOERROR;
 }
@@ -430,36 +471,40 @@ STDMETHODIMP DropTarget::DragOver(DWORD grfKeyState,
 
 STDMETHODIMP DropTarget::DragLeave() 
 {   
-    m_bAcceptFmt = FALSE;  
-    
-    AutoScroll(SCROLL_OFF);
+    if(m_acceptFormat)
+    {
+        AutoScroll(SCROLL_OFF);
 
-    ImageList_DragShowNolock(FALSE);
+        ImageList_DragShowNolock(FALSE);
 
-    HDC hdc = GetDC(m_hwnd);
+        HDC hdc = GetDC(m_hwnd);
 
-    HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, m_insertBrush);
+        HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, m_insertBrush);
 
-    // erase old
-    PatBlt(hdc,
-           m_insertRect.left, 
-           m_insertRect.top, 
-           m_insertRect.right - m_insertRect.left, 
-           m_insertRect.bottom - m_insertRect.top, 
-           PATINVERT);
+        // erase old
+        PatBlt(hdc,
+               m_insertRect.left, 
+               m_insertRect.top, 
+               m_insertRect.right - m_insertRect.left, 
+               m_insertRect.bottom - m_insertRect.top, 
+               PATINVERT);
 
-    // erase old
-    SelectObject(hdc, oldBrush);
+        // erase old
+        SelectObject(hdc, oldBrush);
 
-    ReleaseDC(m_hwnd, hdc);
+        ReleaseDC(m_hwnd, hdc);
 
-    ImageList_DragShowNolock(TRUE);
+        ImageList_DragShowNolock(TRUE);
+    }
+
+    m_acceptFormat = false;
+    m_allowMove = false;
 
     return NOERROR;
 }
 
-STDMETHODIMP DropTarget::Drop(LPDATAOBJECT pDataObj, 
-                              DWORD grfKeyState, 
+STDMETHODIMP DropTarget::Drop(LPDATAOBJECT pDataObj,
+                              DWORD dwKeyState, 
                               POINTL pt, 
                               LPDWORD pdwEffect) 
 {   
@@ -473,7 +518,7 @@ STDMETHODIMP DropTarget::Drop(LPDATAOBJECT pDataObj,
 
     AutoScroll(SCROLL_OFF);
 
-    if(m_bAcceptFmt && m_bEnabled) 
+    if(m_acceptFormat && m_enabled) 
     {   
         if(m_oldItem > 0)
             m_oldItem--;
@@ -505,7 +550,7 @@ STDMETHODIMP DropTarget::Drop(LPDATAOBJECT pDataObj,
         // User has dropped on us. First, try getting data in the 
         // private FreeAmp format
 
-        fmtetc.cfFormat = RegisterClipboardFormat(CFSTR_FREEAMP_MUSICBROWSERITEM);
+        fmtetc.cfFormat = RegisterClipboardFormat(CFSTR_FREEAMP_CATALOGITEM);
         fmtetc.ptd = NULL;
         fmtetc.dwAspect = DVASPECT_CONTENT;  
         fmtetc.lindex = -1;
@@ -529,10 +574,58 @@ STDMETHODIMP DropTarget::Drop(LPDATAOBJECT pDataObj,
 
             // our format is the same as the DROPFILES format
             // except we pass URLs not paths... 
-            SendMessage(m_hwnd, WM_DROPURLS, (WPARAM)hGlobal, 0);
+            SendMessage(m_hwnd, UWM_DROPURLS, (WPARAM)hGlobal, 0);
            
             ReleaseStgMedium(&medium);
             *pdwEffect = DROPEFFECT_COPY;
+
+            return NOERROR;
+        }
+
+        fmtetc.cfFormat = RegisterClipboardFormat(CFSTR_FREEAMP_PLAYLISTITEM);
+        fmtetc.ptd = NULL;
+        fmtetc.dwAspect = DVASPECT_CONTENT;  
+        fmtetc.lindex = -1;
+        fmtetc.tymed = TYMED_HGLOBAL;       
+        
+        hr = pDataObj->GetData(&fmtetc, &medium);
+        if(!FAILED(hr)) 
+        {
+            // if target is source we simply do an internal move
+            if(m_targetIsSource)
+            {
+                *pdwEffect = DROPEFFECT_NONE;
+
+                MapWindowPoints(NULL, m_hwnd, (LPPOINT)&pt, 1);
+                
+                SendMessage(m_hwnd, UWM_MOVEITEMS, 0, (LPARAM)&pt);
+            }
+            else // we export the items to the target
+            {
+                // Import the data and release it.
+                hGlobal = medium.hGlobal;
+
+                // need to update the point so we know 
+                // where it was droppped in the window
+                DROPFILES* df = (DROPFILES*)GlobalLock(hGlobal);
+                df->pt.x = pt.x;
+                df->pt.y = pt.y;
+
+                MapWindowPoints(NULL, m_hwnd, (LPPOINT)&df->pt, 1);
+
+                GlobalUnlock(hGlobal);
+
+                // our format is the same as the DROPFILES format
+                // except we pass URLs not paths... 
+                SendMessage(m_hwnd, UWM_DROPURLS, (WPARAM)hGlobal, 0);
+
+                if(dwKeyState & MK_CONTROL)
+                    *pdwEffect = DROPEFFECT_COPY;
+                else
+                    *pdwEffect = DROPEFFECT_MOVE;
+            }
+
+            ReleaseStgMedium(&medium);
 
             return NOERROR;
         }

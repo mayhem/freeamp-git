@@ -78,14 +78,13 @@ STDMETHODIMP_(ULONG) DataObject::Release(void)
 
 // DataObject Constructor
  
-DataObject::DataObject(vector<string>* urls) 
+DataObject::DataObject(LPCSTR type, vector<string>* urls) 
 {
     m_urls = urls;
-    m_szData = NULL;
     m_refs = 1;  
     m_cfe = 1;
 
-    m_fe[0].cfFormat = RegisterClipboardFormat(CFSTR_FREEAMP_MUSICBROWSERITEM);
+    m_fe[0].cfFormat = RegisterClipboardFormat(type);
     m_fe[0].ptd = NULL;
     m_fe[0].dwAspect = DVASPECT_CONTENT;
     m_fe[0].lindex = -1;
@@ -142,7 +141,6 @@ char* DataObject::CreateDropFiles(DWORD* size)
         df->fWide = FALSE;
     }
 
-
     if(!result)
         *size = 0;
 
@@ -178,7 +176,7 @@ STDMETHODIMP DataObject::GetData(LPFORMATETC pFE,
     UINT uFormat;
     CHAR* p;
 
-    m_uFmtUsed = 0;
+    m_format = 0;
     uFormat = pFE->cfFormat;
 
 	// CFSTR_FREEAMP_MUSICBROWSERITEM clipboard format
@@ -196,12 +194,12 @@ STDMETHODIMP DataObject::GetData(LPFORMATETC pFE,
 
         data = CreateDropFiles(&size);
 
-        hMem=GlobalAlloc(GMEM_SHARE | GMEM_MOVEABLE, size);
+        hMem = GlobalAlloc(GMEM_SHARE | GMEM_MOVEABLE, size);
 
         if(hMem == NULL) 
             return STG_E_MEDIUMFULL;
 
-        p =(LPSTR) GlobalLock(hMem);
+        p = (LPSTR) GlobalLock(hMem);
         memcpy(p, data, size);
         GlobalUnlock(hMem);
 
@@ -210,7 +208,7 @@ STDMETHODIMP DataObject::GetData(LPFORMATETC pFE,
         pSTM->hGlobal = hMem;
         pSTM->tymed = TYMED_HGLOBAL;
         pSTM->pUnkForRelease = NULL;
-        m_uFmtUsed = uFormat;
+        m_format = uFormat;
 
         return S_OK;	
 	}

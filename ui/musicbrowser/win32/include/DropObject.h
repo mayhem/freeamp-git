@@ -24,7 +24,8 @@ ____________________________________________________________________________*/
 #ifndef INCLUDED_DATAOBJECT_H_
 #define INCLUDED_DATAOBJECT_H_
 
-#define CFSTR_FREEAMP_MUSICBROWSERITEM ("FREEAMP_MUSICBROWSERITEM")
+#define CFSTR_FREEAMP_CATALOGITEM ("FREEAMP_CATALOGITEM")
+#define CFSTR_FREEAMP_PLAYLISTITEM ("FREEAMP_PLAYLISTITEM")
 
 #include <ole2.h>
 
@@ -36,8 +37,8 @@ using namespace std;
 class FAR DataObject : public IDataObject
 {
  public:    
-    DataObject(vector<string>* urls);
-	~DataObject ();
+    DataObject(LPCSTR type, vector<string>* urls);
+	~DataObject();
 
     /* IUnknown methods */
     STDMETHOD(QueryInterface)(REFIID riid, void FAR* FAR* ppvObj);
@@ -46,27 +47,27 @@ class FAR DataObject : public IDataObject
 
     /* IDataObject methods */
 	/* IDataObject methods required for Drag and Drop */
-	STDMETHODIMP GetData (LPFORMATETC, LPSTGMEDIUM);
-    STDMETHODIMP GetDataHere (LPFORMATETC, LPSTGMEDIUM);
-    STDMETHODIMP QueryGetData (LPFORMATETC);
-    STDMETHODIMP EnumFormatEtc (DWORD, LPENUMFORMATETC *);
+	STDMETHODIMP GetData(LPFORMATETC, LPSTGMEDIUM);
+    STDMETHODIMP GetDataHere(LPFORMATETC, LPSTGMEDIUM);
+    STDMETHODIMP QueryGetData(LPFORMATETC);
+    STDMETHODIMP EnumFormatEtc(DWORD, LPENUMFORMATETC*);
 
 	/*  IDataObject methods not required for Drag and Drop */
-    STDMETHODIMP GetCanonicalFormatEtc (LPFORMATETC,LPFORMATETC);
-    STDMETHODIMP SetData (LPFORMATETC, LPSTGMEDIUM, BOOL);
-    STDMETHODIMP DAdvise (LPFORMATETC, DWORD,  LPADVISESINK, DWORD *);
-    STDMETHODIMP DUnadvise (DWORD);
-    STDMETHODIMP EnumDAdvise (LPENUMSTATDATA *);
+    STDMETHODIMP GetCanonicalFormatEtc(LPFORMATETC,LPFORMATETC);
+    STDMETHODIMP SetData(LPFORMATETC, LPSTGMEDIUM, BOOL);
+    STDMETHODIMP DAdvise(LPFORMATETC, DWORD,  LPADVISESINK, DWORD*);
+    STDMETHODIMP DUnadvise(DWORD);
+    STDMETHODIMP EnumDAdvise(LPENUMSTATDATA*);
  
  private:
     char* CreateDropFiles(DWORD* size);
 
     vector<string>* m_urls;
-	LPSTR m_szData;
+
     ULONG m_refs;  
-	ULONG m_cfe;			// number of FORMATETC structs
-	FORMATETC m_fe[4];		// pointer to FORMATETC structs
-	UINT  m_uFmtUsed;		// format used to actually render object
+	ULONG m_cfe;        // number of FORMATETC structs
+	FORMATETC m_fe[4];  // pointer to FORMATETC structs
+	UINT m_format;      // format used to actually render object
 };  
 
 #endif // INCLUDED_DATAOBJECT_H_

@@ -31,7 +31,8 @@ ____________________________________________________________________________*/
 #include "utility.h"
 #include "resource.h"
 #include "Win32MusicBrowser.h"
-#include "debug.h"
+#include "DropSource.h"
+#include "DropObject.h"
 
 char* kMusicCatalog = "My Music Catalog";
 char* kAllTracks = "<All>";
@@ -503,6 +504,36 @@ void MusicBrowserUI::AddTrackURLs(TV_ITEM* tv_item,
         PlaylistItem* track = m_oTreeIndex.Data(tv_item->lParam).m_pTrack;
 
         urls->push_back(track->URL());
+    }
+}
+
+void MusicBrowserUI::TVBeginDrag(HWND hwnd, NM_TREEVIEW* nmtv)
+{
+    if(m_hNewPlaylistItem != nmtv->itemNew.hItem)
+    {
+        vector<string>* urls = new vector<string>;
+
+        GetSelectedMusicTreeItems(urls); 
+
+        HIMAGELIST himl;
+        RECT rcItem;
+        POINT hotspot;
+
+        himl = TreeView_CreateDragImage(hwnd, nmtv->itemNew.hItem);
+
+        TreeView_GetItemRect(hwnd, nmtv->itemNew.hItem, &rcItem, TRUE); 
+
+        hotspot.x = 0;
+        hotspot.y = (rcItem.bottom - rcItem.top)/2;
+
+        DataObject* data = new DataObject(CFSTR_FREEAMP_CATALOGITEM, urls);
+        DropSource* src = new DropSource(hwnd, himl, hotspot, nmtv->ptDrag);
+        DWORD dwEffect = 0;
+
+        DoDragDrop(data, src, DROPEFFECT_COPY|DROPEFFECT_SCROLL, &dwEffect); 
+
+        data->Release();
+        src->Release();
     }
 }
 

@@ -27,8 +27,8 @@ ____________________________________________________________________________*/
 class FAR DropSource : public IDropSource
 {
  public:    
-    DropSource(HWND hwndTree, NM_TREEVIEW* nmtv);
-	~DropSource ();
+    DropSource(HWND hwndSrc, HIMAGELIST himl, POINT hotspot, POINT dragPt);
+	~DropSource();
 
     /* IUnknown methods */
     STDMETHOD(QueryInterface)(REFIID riid, void FAR* FAR* ppvObj);
@@ -44,6 +44,6 @@ class FAR DropSource : public IDropSource
 	HWND		m_hwnd;
 	ULONG		m_ncyoffset;
 	ULONG		m_ncxoffset;
-};  
+};
 
 #endif // INCLUDED_DROPSOURCE_H_

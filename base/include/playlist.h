@@ -239,6 +239,7 @@ class PlaylistManager {
     Error MoveItem(PlaylistItem* item, uint32 index);
     Error MoveItem(uint32 oldIndex, uint32 newIndex);
     Error MoveItems(vector<PlaylistItem*>* items, uint32 index);
+    Error MoveItems(vector<uint32>* items, uint32 index);
 
     // Functions for sorting
     Error Sort(PlaylistSortKey key, PlaylistSortType type = PlaylistSortType_Ascending);

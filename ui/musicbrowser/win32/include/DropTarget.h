@@ -26,14 +26,16 @@ ____________________________________________________________________________*/
 
 #include <ole2.h>
 
-#define WM_DROPURLS WM_USER + 92173 
+#define UWM_DROPURLS    WM_USER + 92173 
+#define UWM_MOVEITEMS   WM_USER + 120742
 
 class FAR DropTarget : public IDropTarget
 {
  public:    
     DropTarget(HWND hwnd);
 	~DropTarget ();
-    void Enable(BOOL bEnable);
+    void Enable(bool bEnable);
+    void TargetIsSource(bool isSrc);
     void ScrollFunction();
 
     /* IUnknown methods */
@@ -42,12 +44,12 @@ class FAR DropTarget : public IDropTarget
     STDMETHOD_(ULONG, Release)(void);
 
     /* IDropTarget methods */
-    STDMETHOD(DragEnter)(LPDATAOBJECT pDataObj, DWORD grfKeyState, 
-        POINTL pt, LPDWORD pdwEffect);
-    STDMETHOD(DragOver)(DWORD grfKeyState, POINTL pt, LPDWORD pdwEffect);
+    STDMETHOD(DragEnter)(LPDATAOBJECT pDataObj, DWORD dwKeyState, 
+                         POINTL pt, LPDWORD pdwEffect);
+    STDMETHOD(DragOver)(DWORD dwKeyState, POINTL pt, LPDWORD pdwEffect);
     STDMETHOD(DragLeave)();
-    STDMETHOD(Drop)(LPDATAOBJECT pDataObj, DWORD grfKeyState, 
-        POINTL pt, LPDWORD pdwEffect); 
+    STDMETHOD(Drop)(LPDATAOBJECT pDataObj, DWORD dwKeyState, 
+                    POINTL pt, LPDWORD pdwEffect); 
  
     
  private:
@@ -56,10 +58,10 @@ class FAR DropTarget : public IDropTarget
 
     ULONG           m_refs;  
 	HWND            m_hwnd;
-    BOOL            m_bAcceptFmt;
-	BOOL            m_bEnabled;
-	POINT           m_ptPrevious;
-	ULONG           m_uDEPrevious;
+    bool            m_acceptFormat;
+	bool            m_enabled;
+    bool            m_allowMove;
+    bool            m_targetIsSource;
     HBRUSH          m_insertBrush;
     int             m_oldItem; 
     RECT            m_insertRect;

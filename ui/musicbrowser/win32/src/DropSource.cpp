@@ -30,7 +30,6 @@ ____________________________________________________________________________*/
 #include "DropSource.h"
 #include "resource.h"
 
-
 // IUnknown Methods
 
 STDMETHODIMP DropSource::QueryInterface(REFIID iid, void FAR* FAR* ppv) 
@@ -66,77 +65,26 @@ STDMETHODIMP_(ULONG) DropSource::Release(void)
  
 // DropSource Constructor
  
-DropSource::DropSource(HWND hwndTree, NM_TREEVIEW* nmtv) 
+DropSource::DropSource(HWND hwndSrc, HIMAGELIST himl, 
+                       POINT hotspot, POINT dragPt)
 {
-    /*HIMAGELIST			hIml;
-    TL_DRAGBITMAP		tldb;
-
+    m_hwnd = hwndSrc;
     m_refs = 1; 
-    m_hwnd = hwnd;
-
-    sCalcOffsets(hwnd, &m_ncxoffset, &m_ncyoffset);
-
-    GetCursorPos(&tldb.ptCursorPos);
-    ScreenToClient(hwndTree, &tldb.ptCursorPos);
-    tldb.ulFlags = TLRB_TOPLEVELONLY;
-    TreeList_RenderDragBitmap(hwndTree, &tldb);
-    hIml = ImageList_Create(tldb.sizeDrag.cx, tldb.sizeDrag.cy, 
-    ILC_MASK|ILC_COLORDDB, 1, 1);
-    ImageList_AddMasked(hIml, tldb.hbmDrag, GetSysColor(COLOR_WINDOW));
-    DeleteObject(tldb.hbmDrag);
-
-    ImageList_BeginDrag(hIml, 0, tldb.ptHotSpot.x, tldb.ptHotSpot.y);
-    ImageList_Destroy(hIml);
-
-    GetCursorPos(&tldb.ptCursorPos);
-    ScreenToClient(hwnd, &tldb.ptCursorPos);
-    ImageList_DragEnter(hwnd, tldb.ptCursorPos.x + m_ncxoffset, 
-                         tldb.ptCursorPos.y + m_ncyoffset);*/
-
-    HIMAGELIST himl;    // handle of image list 
-    RECT rcItem;        // bounding rectangle of item 
-    //DWORD dwLevel;      // heading level of item 
-    DWORD dwIndent;     // amount that child items are indented 
-
-    m_hwnd = hwndTree;
-    m_refs = 1; 
- 
-    // Tell the tree-view control to create an image to use 
-    // for dragging. 
-    himl = TreeView_CreateDragImage(hwndTree, nmtv->itemNew.hItem);
- 
-    // Get the bounding rectangle of the item being dragged. 
-    TreeView_GetItemRect(hwndTree, nmtv->itemNew.hItem, &rcItem, TRUE); 
- 
-    // Get the heading level and the amount that the child items are 
-    // indented. 
-    //dwLevel = nmtv->itemNew.lParam; 
-    dwIndent = (DWORD) SendMessage(hwndTree, TVM_GETINDENT, 0, 0);
- 
-    //MapWindowPoints(hwnd, GetParent(hwndTree), &nmtv->ptDrag, 1);
-
+  
     // Start the drag operation. 
-    //ImageList_DragEnter(GetParent(hwndTree), nmtv->ptDrag.x, nmtv->ptDrag.y);
     ImageList_BeginDrag(himl, 
                         0, 
-                        0,
-                        (rcItem.bottom - rcItem.top)/2);// + (rcItem.bottom - rcItem.top)/2);
+                        hotspot.x,
+                        hotspot.y);
 
-                        //nmtv->ptDrag.x - rcItem.left, 
-                        //nmtv->ptDrag.y - rcItem.top);
-
+    // ImageList_BeginDrag makes its own copy...
     ImageList_Destroy(himl);
  
-    POINT pt = nmtv->ptDrag;
+    POINT pt = dragPt;
     
-    ClientToScreen(hwndTree, &pt);
+    ClientToScreen(hwndSrc, &pt);
 
     ImageList_DragEnter(NULL, pt.x, pt.y);
- 
-    // Hide the mouse cursor, and direct mouse input to the 
-    // parent window. 
-    //ShowCursor(FALSE); 
-    //SetCapture(GetParent(hwndTree)); 
 }
 
 DropSource::~DropSource() 
@@ -144,7 +92,6 @@ DropSource::~DropSource()
     ImageList_DragShowNolock(FALSE);
     ImageList_DragLeave(NULL);
     ImageList_EndDrag();
-    //ShowCursor(TRUE); 
 }
 
 
@@ -152,14 +99,14 @@ DropSource::~DropSource()
 //
 //	IDropSource Methods
 
-STDMETHODIMP DropSource::QueryContinueDrag(BOOL	fEscapePressed, 
+STDMETHODIMP DropSource::QueryContinueDrag(BOOL fEscapePressed, 
                                            DWORD grfKeyState) 
 {  
     POINT	pt;
 
 	GetCursorPos(&pt);
 
-    ImageList_DragMove(pt.x , pt.y);
+    ImageList_DragMove(pt.x, pt.y);
 
     if(fEscapePressed)
         return DRAGDROP_S_CANCEL;
@@ -171,33 +118,6 @@ STDMETHODIMP DropSource::QueryContinueDrag(BOOL	fEscapePressed,
 
 STDMETHODIMP DropSource::GiveFeedback(DWORD dwEffect) 
 {
-	//POINT	pt;
-	//HWND	hwnd;
-	//RECT	rc;
-
-	//GetCursorPos(&pt);
-
-	//GetWindowRect(m_hwnd, &rc);
-
-	/*if(!PtInRect(&rc, pt)) {
-		hwnd = NULL;
-		//KMFindWindowFromPoint((PKEYMAN)m_pKeyMan, &pt, &hwnd);
-
-		if(hwnd != m_hwnd) {
-			ImageList_DragLeave(m_hwnd);
-			m_hwnd = hwnd;
-			if(m_hwnd) {
-				sCalcOffsets(hwnd, &m_ncxoffset, &m_ncyoffset);
-				ScreenToClient(m_hwnd, &pt);
-				ImageList_DragEnter(m_hwnd, 
-						pt.x + m_ncxoffset, pt.y + m_ncyoffset);
-			}
-		}
-	}*/
-
-	//if(!(dwEffect & DROPEFFECT_SCROLL)) {
-	//	ImageList_DragMove(pt.x , pt.y);
-	//}
 
 	return DRAGDROP_S_USEDEFAULTCURSORS;
 }
