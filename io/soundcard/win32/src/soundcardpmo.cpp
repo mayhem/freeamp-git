@@ -87,6 +87,7 @@ SoundCardPMO::SoundCardPMO(FAContext *context) :
    m_iBaseTime = MAXINT32;
    m_iBytesPerSample = 0;
    m_num_headers = 0;
+   m_iLastVolume = 0;
    
    if (!m_pBufferThread)
    {
@@ -133,10 +134,27 @@ SoundCardPMO::~SoundCardPMO()
    }
 }
 
-VolumeManager *SoundCardPMO::GetVolumeManager()
+void SoundCardPMO::SetVolume(int32 volume) 
 {
-   return new Win32VolumeManager();
+   // When we begin playing the volume does not get set properly.
+   // In order to work around that, we'll save the last volume
+   // settting and then set the volume on the stream after we open
+   // the stream in init.
+   waveOutSetVolume(   (HWAVEOUT)WAVE_MAPPER, 
+                        MAKELPARAM( 0xFFFF*volume/100,  
+                                    0xFFFF*volume/100));
+   m_iLastVolume = volume;
 }
+
+int32 SoundCardPMO::GetVolume() 
+{
+    int32 volume = 0;
+
+    waveOutGetVolume((HWAVEOUT)WAVE_MAPPER, (DWORD*)&volume);
+    volume = (int32)(100 * ((float)LOWORD(volume)/(float)0xffff));
+
+    return volume;
+} 
 
 Error SoundCardPMO::Init(OutputInfo * info)
 {
@@ -174,6 +192,10 @@ Error SoundCardPMO::Init(OutputInfo * info)
    {
       result = kError_NoErr;
    }
+
+   waveOutSetVolume(m_hwo, 
+            MAKELPARAM( 0xFFFF*m_iLastVolume/100,  
+                        0xFFFF*m_iLastVolume/100));
 
    uint32    i;
 

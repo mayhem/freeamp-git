@@ -873,10 +873,8 @@ CreatePMO(PlayListItem * pc, Event * pC)
       pmo->SetTarget((EventQueue *)this);
       if (m_iVolume < 0)
          m_iVolume = pmo->GetVolume();
-      else
-      {
-         pmo->SetVolume(m_iVolume);
-      }
+      
+      pmo->SetVolume(m_iVolume);
    }
 
    error = kError_NoErr;

@@ -37,7 +37,6 @@ ____________________________________________________________________________*/
 #include "semaphore.h"
 #include "facontext.h"
 #include "preferences.h"
-#include "dsoundvolume.h"
 
 typedef enum {
   UNDERFLOW,
@@ -81,7 +80,8 @@ public:
   void            Pause(void);
   void            Resume(void);
 
-  virtual VolumeManager *GetVolumeManager();
+  virtual int32   GetVolume(void);
+  virtual void    SetVolume(int32);
 
   static  void    StartWorkerThread(void *);
 
@@ -105,7 +105,7 @@ public:
   WAVEFORMATEX*   m_wfex;
 
   uint32          m_samples_per_second;
-  uint32          m_data_size;
+  uint32          m_data_size, m_iLastVolume;
   bool            m_initialized;
 
   Thread*         m_pBufferThread;
