@@ -65,6 +65,7 @@ class LocalFileInput:public PhysicalMediaInput
 
    virtual Error Open(void);
    static  void  StartWorkerThread(void *pVoidBuffer);
+           void  SkipID3v2Tag(void);
 
    FILE           *m_fpFile;
    bool            m_bLoop;

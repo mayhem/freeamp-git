@@ -29,6 +29,11 @@ ____________________________________________________________________________*/
 #include <iostream.h>
 #include <errno.h>
 #include <assert.h>
+#ifdef WIN32
+#include <winsock.h>
+#else
+#include <netinet/in.h>
+#endif
 
 #include <config.h>
 
@@ -49,6 +54,17 @@ ____________________________________________________________________________*/
 #include "debug.h"
 
 const uint32 iReadBlock = 8192;
+
+const int supportedVersion = 3;
+
+struct ID3Header
+{
+   char          tag[3];
+   unsigned char versionMajor;
+   unsigned char versionRevision;
+   unsigned char flags;
+   unsigned char size[4];
+};
 
 #define DB Debug_v("%s:%d\n", __FILE__, __LINE__);
 
@@ -270,8 +286,47 @@ Error LocalFileInput::Open(void)
 
     fseek(m_fpFile, 0, SEEK_SET);
 
+    SkipID3v2Tag();
+
     return kError_NoErr;
 }
+
+void LocalFileInput::SkipID3v2Tag(void)
+{
+    ID3Header   sHead;
+    int         ret, padding = 0;
+    int         size;
+
+    ret = fread(&sHead, 1, sizeof(ID3Header), m_fpFile);
+    if (ret != sizeof(ID3Header))
+        return;
+
+    if (strncmp(sHead.tag, "ID3", 3))
+        return;
+
+    if (sHead.versionMajor != supportedVersion)
+        return;
+
+    size = ( sHead.size[3] & 0x7F       ) |
+           ((sHead.size[2] & 0x7F) << 7 ) |
+           ((sHead.size[1] & 0x7F) << 14) |
+           ((sHead.size[0] & 0x7F) << 21);
+    if (sHead.flags & (1 << 6))
+    {
+        unsigned extHeaderSize;
+        long lNet;
+
+        if (fread(&extHeaderSize, 1, sizeof(int), m_fpFile) != sizeof(int))
+            return;
+       
+        fseek(m_fpFile, sizeof(int32) + sizeof(int16), SEEK_CUR); 
+        if (fread(&lNet, sizeof(int32), 1, m_fpFile) != 1)
+            return;
+
+        padding = ntohl(lNet);
+    }
+    fseek(m_fpFile, padding + size, SEEK_CUR); 
+} 
 
 Error LocalFileInput::Run(void)
 {

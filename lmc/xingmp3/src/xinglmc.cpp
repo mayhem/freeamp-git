@@ -92,7 +92,9 @@ const int iDefaultBufferUpInterval = 3;
 // parsing a wrong sized stream and think max frame size if greater than
 // 1046. The after seek sych code should be improved to detect
 // crap changes like this -- it also sometimes causes static output
-const int iMaxFrameSize = 1441; //1046;
+const int iMaxFrameSize = 1441;
+const int iNumSanityCheckFrames = 3;
+const int iInitialFrameSize = iMaxFrameSize * iNumSanityCheckFrames;
 
 const char *szFailRead = "Cannot read MP3 data from input plugin.";
 const char *szFailWrite = "Cannot write audio data to output buffer.";
@@ -222,69 +224,85 @@ Error XingLMC::AdvanceBufferToNextFrame()
 
 Error XingLMC::GetHeadInfo()
 {
-   int          iLoop;
+   int          iLoop, iFrame, iOffset;
+   int          iLastSRIndex = -1, iLastOption = -1;
+   int          iLastId = -1, iLastMode = -1;
    unsigned int iForward;
    void        *pBuffer;
    Error        Err;
 
    for(iLoop = 0; iLoop < iMaxDecodeRetries; iLoop++)
    {
-       Err = BeginRead(pBuffer, iMaxFrameSize, false);
-       if (Err == kError_NoErr)
+       Err = BeginRead(pBuffer, iInitialFrameSize, false);
+       if (IsError(Err))
        {
-           m_frameBytes = head_info3((unsigned char *)pBuffer,
+          if (Err != kError_EndOfStream && Err != kError_Interrupt)
+          {
+              ReportError(szFailRead);
+          }
+          return Err;
+       }
+
+       for(iFrame = 0, iOffset = 0; iFrame < iNumSanityCheckFrames; iFrame++)
+       {
+           m_frameBytes = head_info3(((unsigned char *)pBuffer) + iOffset,
 			                            iMaxFrameSize, &m_sMpegHead, 
                                      (int*)&m_iBitRate, &iForward);
-           if (m_frameBytes > 0 && m_frameBytes < iMaxFrameSize && 
-               (m_sMpegHead.option == 1 || m_sMpegHead.option == 2))
-           {
-              MPEG_HEAD sHead;
-              int       iFrameBytes, iBitRate;
-            
-              iFrameBytes = head_info3(((unsigned char *)pBuffer) + 
-                                    m_frameBytes + iForward + m_sMpegHead.pad,
-                                    iMaxFrameSize - (m_frameBytes + iForward), 
-                                    &sHead, &iBitRate, &iForward);
 
-              if (m_frameBytes > 0 && m_frameBytes < iMaxFrameSize && 
-                 (m_sMpegHead.option == 1 || m_sMpegHead.option == 2))
+           iOffset += m_frameBytes + iForward + m_sMpegHead.pad;
+           if (iFrame == 0)
+           {
+               iLastSRIndex = m_sMpegHead.sr_index;
+               iLastOption = m_sMpegHead.option;
+               iLastId = m_sMpegHead.id;
+               iLastMode = m_sMpegHead.mode;
+               continue;
+           }
+               
+           if (m_frameBytes > 0 && m_frameBytes < iMaxFrameSize && 
+              (m_sMpegHead.option == 1 || m_sMpegHead.option == 2) &&
+              iLastSRIndex == m_sMpegHead.sr_index &&
+              iLastOption == m_sMpegHead.option && 
+              iLastId == m_sMpegHead.id && 
+              iLastMode == m_sMpegHead.mode)
+           {
+              iLastSRIndex = m_sMpegHead.sr_index;
+              iLastOption = m_sMpegHead.option;
+              iLastId = m_sMpegHead.id;
+              iLastMode = m_sMpegHead.mode;
+
+              if (iFrame < iNumSanityCheckFrames - 1)
+                 continue;
+
+              if (m_pXingHeader)
               {
-                 if (m_pXingHeader)
-                 {
-                    delete m_pXingHeader->toc;
-                    delete m_pXingHeader;
-                 }   
+                 delete m_pXingHeader->toc;
+                 delete m_pXingHeader;
+              }   
                  
-                 m_pXingHeader = new XHEADDATA;
-                 m_pXingHeader->toc = new unsigned char[100];
-                 if (!GetXingHeader(m_pXingHeader, (unsigned char *)pBuffer))
-                 {
-                    delete m_pXingHeader->toc;
-                    delete m_pXingHeader;
-                    m_pXingHeader = NULL;
-                 }    
-              
-                 EndRead(0);
-                 return kError_NoErr;
-              }
-              EndRead(0);
+              m_pXingHeader = new XHEADDATA;
+              m_pXingHeader->toc = new unsigned char[100];
+              if (!GetXingHeader(m_pXingHeader, (unsigned char *)pBuffer))
+              {
+                 delete m_pXingHeader->toc;
+                 delete m_pXingHeader;
+                 m_pXingHeader = NULL;
+              }    
+              continue;
            }
            else
-           {
               EndRead(0);
-           }
 
            Err = AdvanceBufferToNextFrame();
            if (Err != kError_NoErr)
               return Err;
+
+           break;
        }
-		 else
-		 {
-           if (Err != kError_EndOfStream && Err != kError_Interrupt)
-           {
-               ReportError(szFailRead);
-           }
-           return Err;
+       if (iFrame == iNumSanityCheckFrames)
+       {
+           EndRead(0);
+           return kError_NoErr;
        }
    }
 
