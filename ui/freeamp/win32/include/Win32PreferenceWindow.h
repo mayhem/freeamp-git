@@ -211,6 +211,10 @@ class Win32PreferenceWindow : public PreferenceWindow
                                   UINT msg, 
                                   WPARAM wParam, 
                                   LPARAM lParam);
+               bool PrefDirectoryProc(HWND hwnd, 
+                                  UINT msg, 
+                                  WPARAM wParam, 
+                                  LPARAM lParam);
                bool PrefDebugProc(HWND hwnd, 
                                   UINT msg, 
                                   WPARAM wParam, 
@@ -239,6 +243,7 @@ class Win32PreferenceWindow : public PreferenceWindow
       HWND m_hwndPref;
       string m_caption;
       uint32 m_startPage;
+      PrefPage* m_currentPage;
       
 };
 

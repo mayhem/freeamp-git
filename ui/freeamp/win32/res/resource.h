@@ -98,6 +98,7 @@
 #define IDD_PREF_GENERAL_OLD            227
 #define IDD_PREF_ADVANCED               233
 #define IDD_PREF_PLUGINS                234
+#define IDD_PREF_DIRECTORY              235
 #define IDB_CHECKED                     542
 #define IDB_UNCHECKED                   543
 #define IDC_FADE                        1001
@@ -169,6 +170,11 @@
 #define IDC_TEXTANDIMAGES               1059
 #define IDC_SAVECURRENTLIST             1060
 #define IDC_DEFAULTACTION               1061
+#define IDC_UNDERSCORES                 1062
+#define IDC_WATCHDIRS                   1063
+#define IDC_DIRLIST                     1064
+#define IDC_ADD                         1065
+#define IDC_REMOVEDIR                   1066
 #define IDMC_MYMUSIC                    6900
 #define IDMC_PLAY                       6901
 #define IDMC_STOP                       6902
@@ -186,7 +192,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        199
 #define _APS_NEXT_COMMAND_VALUE         40013
-#define _APS_NEXT_CONTROL_VALUE         1062
+#define _APS_NEXT_CONTROL_VALUE         1067
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

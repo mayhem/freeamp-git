@@ -68,7 +68,7 @@ MainCallback(HWND hwnd,
                     LPARAM lParam)
 {
 	return g_pCurrentPrefWindow->MainProc(hwnd, msg, wParam, lParam);
-}   
+}
 
 static BOOL CALLBACK 
 PrefGeneralCallback(HWND hwnd, 
@@ -77,7 +77,7 @@ PrefGeneralCallback(HWND hwnd,
                     LPARAM lParam)
 {
 	return g_pCurrentPrefWindow->PrefGeneralProc(hwnd, msg, wParam, lParam);
-}          
+}
 
 static BOOL CALLBACK 
 PrefThemeCallback(HWND hwnd, 
@@ -86,7 +86,7 @@ PrefThemeCallback(HWND hwnd,
                   LPARAM lParam)
 {
 	return g_pCurrentPrefWindow->PrefThemeProc(hwnd, msg, wParam, lParam);
-}          
+}
 
 static BOOL CALLBACK 
 PrefStreamingCallback(HWND hwnd, 
@@ -95,7 +95,7 @@ PrefStreamingCallback(HWND hwnd,
                       LPARAM lParam)
 {
 	return g_pCurrentPrefWindow->PrefStreamingProc(hwnd, msg, wParam, lParam);
-}          
+}
 
 static BOOL CALLBACK 
 PrefPluginsCallback(HWND hwnd, 
@@ -104,7 +104,7 @@ PrefPluginsCallback(HWND hwnd,
                     LPARAM lParam)
 {
 	return g_pCurrentPrefWindow->PrefPluginsProc(hwnd, msg, wParam, lParam);
-}          
+}
 
 static BOOL CALLBACK 
 PrefUpdateCallback(HWND hwnd, 
@@ -113,7 +113,7 @@ PrefUpdateCallback(HWND hwnd,
                    LPARAM lParam)
 {
 	return g_pCurrentPrefWindow->PrefUpdateProc(hwnd, msg, wParam, lParam);
-}      
+}
 
 static BOOL CALLBACK 
 PrefAdvancedCallback(HWND hwnd, 
@@ -122,7 +122,7 @@ PrefAdvancedCallback(HWND hwnd,
                      LPARAM lParam)
 {
 	return g_pCurrentPrefWindow->PrefAdvancedProc(hwnd, msg, wParam, lParam);
-}    
+}
 
 static BOOL CALLBACK 
 PrefAboutCallback(HWND hwnd, 
@@ -131,7 +131,16 @@ PrefAboutCallback(HWND hwnd,
                   LPARAM lParam)
 {
 	return g_pCurrentPrefWindow->PrefAboutProc(hwnd, msg, wParam, lParam);
-}      
+}
+
+static BOOL CALLBACK 
+PrefDirectoryCallback(HWND hwnd, 
+                  UINT msg, 
+                  WPARAM wParam, 
+                  LPARAM lParam)
+{
+	return g_pCurrentPrefWindow->PrefDirectoryProc(hwnd, msg, wParam, lParam);
+}   
 
 static BOOL CALLBACK 
 PrefDebugCallback(HWND hwnd, 
@@ -155,6 +164,7 @@ Win32PreferenceWindow::Win32PreferenceWindow(FAContext *context,
     deleteUpdateManager = false;
     m_hwndPref = NULL;
     m_startPage = defaultPage;
+    m_currentPage = NULL;
 
     if(!m_updateManager)
     {
@@ -201,6 +211,10 @@ bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent)
 
     page.pszTemplate = MAKEINTRESOURCE(IDD_PREF_THEME);
     page.pfnDlgProc = PrefThemeCallback;
+    m_pages.push_back(page);
+
+    page.pszTemplate = MAKEINTRESOURCE(IDD_PREF_DIRECTORY);
+    page.pfnDlgProc = PrefDirectoryCallback;
     m_pages.push_back(page);
 
     page.pszTemplate = MAKEINTRESOURCE(IDD_PREF_STREAMING);
@@ -655,7 +669,8 @@ bool Win32PreferenceWindow::MainProc(HWND hwnd,
                     break;
 
                 case IDC_HELPME:
-                    LaunchHelp(hwnd, Preferences_General);
+                    if(m_currentPage)
+                        SendMessage(m_currentPage->hwnd, WM_HELP, 0, 0);
                     break;
 
                 case IDC_APPLY:
@@ -2031,6 +2046,100 @@ bool Win32PreferenceWindow::PrefAboutProc(HWND hwnd,
         case WM_HELP:
         {
             LaunchHelp(hwnd, Preferences_About);
+            break;
+        }
+
+        case WM_NOTIFY:
+        {
+            NMHDR* notify = (NMHDR*)lParam;
+
+            switch(notify->code)
+            {
+                case PSN_HELP:
+                {
+                    LaunchHelp(hwnd, Preferences_About);
+                    break;
+                }
+                case PSN_SETACTIVE:
+                {
+                    
+                    break;
+                }
+
+                case PSN_APPLY:
+                {
+                    SavePrefsValues(&m_proposedValues);
+                    break;
+                }
+
+                case PSN_KILLACTIVE:
+                {
+                    
+                    break;
+                }
+
+                case PSN_RESET:
+                {
+                    SavePrefsValues(&m_originalValues);
+                    break;
+                }
+            }
+
+            break;
+        }
+    }
+
+    return result;
+}
+
+bool Win32PreferenceWindow::PrefDirectoryProc(HWND hwnd, 
+                                              UINT msg, 
+                                              WPARAM wParam, 
+                                              LPARAM lParam)      
+{
+    bool result = false;
+    
+    switch(msg)
+    {
+        case WM_INITDIALOG:
+        {
+
+            break;
+        }
+
+        case WM_COMMAND:
+        {
+            switch(LOWORD(wParam))
+            {
+                case IDC_GOTOFREEAMP:
+                {
+                    ShellExecute(   hwnd, 
+                                    "open", 
+                                    "http://www.freeamp.org/", 
+                                    NULL, 
+                                    NULL, 
+                                    SW_SHOWNORMAL);
+                    break;
+                }
+
+                case IDC_GOTOEMUSIC:
+                {
+                    ShellExecute(   hwnd, 
+                                    "open", 
+                                    "http://www.emusic.com/", 
+                                    NULL, 
+                                    NULL, 
+                                    SW_SHOWNORMAL);
+                    break;
+                }
+            }
+
+            break;
+        }
+
+        case WM_HELP:
+        {
+            //LaunchHelp(hwnd, Preferences_Directory);
             break;
         }
 
@@ -4147,12 +4256,17 @@ void Win32PreferenceWindow::ShowPrefPage(PrefPage* page, bool show)
     if(!show)
     {
         if(page->hwnd)
+        {
             ShowWindow(page->hwnd, FALSE);
+            m_currentPage = NULL;
+        }
     }
     else
     {
         if(page->hwnd)
+        {
             ShowWindow(page->hwnd, TRUE);
+        }
         else
         {
 
@@ -4213,6 +4327,8 @@ void Win32PreferenceWindow::ShowPrefPage(PrefPage* page, bool show)
             UnlockResource(hDlgResMem);
             FreeResource(hDlgResMem);
         }
+
+        m_currentPage = page;
 
         // change the caption for this page
         uint32 length = GetWindowTextLength(page->hwnd) + 1;

@@ -761,10 +761,18 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
                                item != m_hPlaylistItem &&
                                item != m_hAllItem &&
                                item != m_hUncatItem &&
-                               item != m_hNewPlaylistItem&& 
+                               item != m_hNewPlaylistItem &&
+                               item != m_hStreamsItem &&
                                item != m_hPortableItem &&
                                TreeView_GetParent(m_hMusicView, item) != m_hPortableItem &&
-                               TreeView_GetParent(m_hMusicView, item) != m_hWiredPlanetItem)
+                               item != m_hWiredPlanetItem &&
+                               TreeView_GetParent(m_hMusicView, item) != m_hWiredPlanetItem &&
+                               item != m_hShoutCastItem &&
+                               TreeView_GetParent(m_hMusicView, item) != m_hShoutCastItem &&
+                               item != m_hIceCastItem &&
+                               TreeView_GetParent(m_hMusicView, item) != m_hIceCastItem &&
+                               item != m_hCDItem &&
+                               TreeView_GetParent(m_hMusicView, item) != m_hCDItem)
                             {
                                 // pause a half sec so this does not
                                 // look so jarring

@@ -552,6 +552,10 @@ SOURCE=..\..\..\..\base\include\thread.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\..\base\include\timer.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\include\ui.h
 # End Source File
 # Begin Source File

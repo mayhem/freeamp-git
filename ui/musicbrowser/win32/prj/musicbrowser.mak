@@ -135,11 +135,11 @@ INTDIR=.\Debug
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : "..\..\..\..\config\config.h" ".\musicbrowser.ui"
+ALL : ".\musicbrowser.ui"
 
 !ELSE 
 
-ALL : "gdbm - Win32 Debug" "fabaselib - Win32 Debug" "..\..\..\..\config\config.h" ".\musicbrowser.ui"
+ALL : "gdbm - Win32 Debug" "fabaselib - Win32 Debug" ".\musicbrowser.ui"
 
 !ENDIF 
 
@@ -174,7 +174,6 @@ CLEAN :
 	-@erase "$(OUTDIR)\musicbrowser.pdb"
 	-@erase ".\musicbrowser.ilk"
 	-@erase ".\musicbrowser.ui"
-	-@erase "..\..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -221,7 +220,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "gdbm - Win32 Debug" "fabaselib - Win32 Debug" "..\..\..\..\config\config.h" ".\musicbrowser.ui"
+$(DS_POSTBUILD_DEP) : "gdbm - Win32 Debug" "fabaselib - Win32 Debug" ".\musicbrowser.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                                     ..\..\..\..\base\win32\prj\plugins
 	copy musicbrowser.ui                                                                                       ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -330,11 +329,11 @@ INTDIR=.\Release
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : "..\..\..\..\config\config.h" ".\musicbrowser.ui"
+ALL : ".\musicbrowser.ui"
 
 !ELSE 
 
-ALL : "gdbm - Win32 NASM Release" "fabaselib - Win32 NASM Release" "..\..\..\..\config\config.h" ".\musicbrowser.ui"
+ALL : "gdbm - Win32 NASM Release" "fabaselib - Win32 NASM Release" ".\musicbrowser.ui"
 
 !ENDIF 
 
@@ -366,7 +365,6 @@ CLEAN :
 	-@erase "$(OUTDIR)\musicbrowser.exp"
 	-@erase "$(OUTDIR)\musicbrowser.lib"
 	-@erase ".\musicbrowser.ui"
-	-@erase "..\..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -415,7 +413,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "gdbm - Win32 NASM Release" "fabaselib - Win32 NASM Release" "..\..\..\..\config\config.h" ".\musicbrowser.ui"
+$(DS_POSTBUILD_DEP) : "gdbm - Win32 NASM Release" "fabaselib - Win32 NASM Release" ".\musicbrowser.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                                     ..\..\..\..\base\win32\prj\plugins
 	copy musicbrowser.ui                                                                                       ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
