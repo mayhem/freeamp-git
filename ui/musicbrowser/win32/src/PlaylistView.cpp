@@ -501,7 +501,17 @@ void MusicBrowserUI::UpdatePlaylistListItem(const PlaylistItem* item)
 
         // Update Time
         if (item->GetMetaData().Time() != 0)
-            sprintf(szText, "%d", item->GetMetaData().Time());
+        {
+            int32 seconds = item->GetMetaData().Time();
+            int32 hours = seconds / 3600;
+		    int32 minutes = seconds / 60 - hours * 60;
+            seconds = seconds - minutes * 60 - hours * 3600;
+
+            if(hours)
+                sprintf(szText, "%d:%02d:%02d", hours, minutes, seconds);
+            else
+                sprintf(szText, "%d:%02d", minutes, seconds);
+        }
         else    
             strcpy(szText, "Unknown");
         sItem.pszText = szText;
@@ -554,7 +564,17 @@ void MusicBrowserUI::AddPlaylistListItem(const PlaylistItem* item)
 
         // Update Time
         if (item->GetMetaData().Time() != 0)
-            sprintf(szText, "%d", item->GetMetaData().Time());
+        {
+            int32 seconds = item->GetMetaData().Time();
+            int32 hours = seconds / 3600;
+		    int32 minutes = seconds / 60 - hours * 60;
+            seconds = seconds - minutes * 60 - hours * 3600;
+
+            if(hours)
+                sprintf(szText, "%d:%02d:%02d", hours, minutes, seconds);
+            else
+                sprintf(szText, "%d:%02d", minutes, seconds);
+        }
         else    
             strcpy(szText, "Unknown");
         sItem.pszText = szText;

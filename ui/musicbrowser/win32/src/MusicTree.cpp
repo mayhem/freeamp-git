@@ -128,7 +128,7 @@ void MusicBrowserUI::FillArtists(void)
        sInsert.item.iSelectedImage = 2;
        sInsert.item.cChildren= 1;
        sInsert.item.lParam = m_oTreeIndex.Add(oCrossRef);
-       sInsert.hInsertAfter = TVI_LAST;
+       sInsert.hInsertAfter = TVI_SORT;
        sInsert.hParent = m_hCatalogItem;
        TreeView_InsertItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sInsert);
     }    
