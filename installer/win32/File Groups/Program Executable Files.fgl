@@ -5,9 +5,6 @@ file2=..\..\Copying.txt
 file3=..\..\Changes.txt
 file4=..\..\Authors.txt
 file5=..\..\base\win32\prj\update.exe
-file6=..\..\base\win32\prj\freeamp.cnt
-file7=..\..\base\win32\prj\freeamp.hlp
-file9=..\..\base\win32\prj\id3lib.dll
 
 [General]
 Type=FILELIST

@@ -49,42 +49,70 @@ TARGETDIRCDROM=
 PASSWORD=
 TARGETHIDDEN=General Application Destination
 
+[Help Files]
+SELECTED=Yes
+FILENEED=STANDARD
+HTTPLOCATION=
+STATUS=
+UNINSTALLABLE=Yes
+TARGET=<TARGETDIR>\Help
+FTPLOCATION=
+VISIBLE=Yes
+DESCRIPTION=This component installs the HTML help files for the player.
+DISPLAYTEXT=
+IMAGE=
+DEFSELECTION=Yes
+filegroup0=Help Files
+COMMENT=
+INCLUDEINBUILD=Yes
+INSTALLATION=ALWAYSOVERWRITE
+COMPRESSIFSEPARATE=No
+MISC=
+ENCRYPT=No
+DISK=ANYDISK
+TARGETDIRCDROM=
+PASSWORD=
+TARGETHIDDEN=General Application Destination
+
 [Components]
 component17=Default Theme
-component9=Theme Tools
-component18=Foreign Themes
-component19=Playlist Formats
+component9=Input & Output\HTTP Input
+component18=Playlist Formats\M3U
+component19=Foreign Themes
 component0=System DLLs
-component1=MetaData\ID3v1
-component10=MetaData\CDDB
-component2=MetaData
-component11=Default Plugins
-component3=Input & Output
-component12=Input & Output\Soundcard Output
-component4=MetaData\ID3v2
-component13=Program Files
-component5=Foreign Themes\WinAmp Skins
-component14=Input & Output\Wave File Output
+component20=Playlist Formats
+component1=Help Files
+component10=Theme Tools
+component2=MetaData\ID3v1
+component11=Input & Output\Soundcard Output
+component3=MetaData\ID3v2
+component12=Default Plugins
+component4=Input & Output
+component13=MetaData\CDDB
+component5=MetaData
+component14=Program Files
 component6=Input & Output\DirectSound Output
 component15=Input & Output\OBS Input
-component7=Input & Output\HTTP Input
-component16=Playlist Formats\M3U
+component7=Foreign Themes\WinAmp Skins
+component16=Input & Output\Wave File Output
 component8=Playlist Formats\PLS
 
-[MetaData\ID3v2]
+[MetaData]
 SELECTED=Yes
 FILENEED=STANDARD
 HTTPLOCATION=
 STATUS=
 UNINSTALLABLE=Yes
 TARGET=<TARGETDIR>\Plugins
+member0=MetaData\ID3v1
 FTPLOCATION=
+member1=MetaData\ID3v2
 VISIBLE=Yes
-DESCRIPTION=This component  reads metadata in the ID3v2 format.
+DESCRIPTION=These components allow the player to read metadata stored within music files so it can display it during playback.
+member2=MetaData\CDDB
 DISPLAYTEXT=
 IMAGE=
 DEFSELECTION=Yes
-filegroup0=ID3v2 MetaData
 COMMENT=
 INCLUDEINBUILD=Yes
 INSTALLATION=SAMEORNEWERVERSION\SAMEORNEWERDATE
@@ -125,22 +153,20 @@ TARGETDIRCDROM=
 PASSWORD=
 TARGETHIDDEN=General Application Destination\Plugins
 
-[MetaData]
+[MetaData\ID3v2]
 SELECTED=Yes
 FILENEED=STANDARD
 HTTPLOCATION=
 STATUS=
 UNINSTALLABLE=Yes
 TARGET=<TARGETDIR>\Plugins
-member0=MetaData\ID3v1
 FTPLOCATION=
-member1=MetaData\ID3v2
 VISIBLE=Yes
-DESCRIPTION=These components allow the player to read metadata stored within music files so it can display it during playback.
-member2=MetaData\CDDB
+DESCRIPTION=This component  reads metadata in the ID3v2 format.
 DISPLAYTEXT=
 IMAGE=
 DEFSELECTION=Yes
+filegroup0=ID3v2 MetaData
 COMMENT=
 INCLUDEINBUILD=Yes
 INSTALLATION=SAMEORNEWERVERSION\SAMEORNEWERDATE
@@ -159,34 +185,11 @@ component2=MetaData
 component3=Playlist Formats
 component4=Foreign Themes
 component5=Theme Tools
-component6=Default Plugins
-component7=Default Theme
-component8=System DLLs
+component6=Help Files
+component7=Default Plugins
+component8=Default Theme
+component9=System DLLs
 
-[Input & Output\DirectSound Output]
-SELECTED=Yes
-FILENEED=STANDARD
-HTTPLOCATION=
-STATUS=
-UNINSTALLABLE=Yes
-TARGET=<TARGETDIR>\Plugins
-FTPLOCATION=
-VISIBLE=Yes
-DESCRIPTION=This component allows the player to play audio through your sound card via DirectSound on Windows 95 and 98.
-DISPLAYTEXT=
-IMAGE=
-DEFSELECTION=Yes
-filegroup0=Direct Sound Output
-COMMENT=
-INCLUDEINBUILD=Yes
-INSTALLATION=SAMEORNEWERVERSION\SAMEORNEWERDATE
-COMPRESSIFSEPARATE=No
-MISC=
-ENCRYPT=No
-DISK=ANYDISK
-TARGETDIRCDROM=
-PASSWORD=
-TARGETHIDDEN=General Application Destination\Plugins
 
 [Foreign Themes\WinAmp Skins]
 SELECTED=Yes
@@ -213,12 +216,7 @@ TARGETDIRCDROM=
 PASSWORD=
 TARGETHIDDEN=General Application Destination
 
-[SetupType]
-setuptype0=Compact
-setuptype1=Typical
-setuptype2=Custom
-
-[Playlist Formats\PLS]
+[Input & Output\DirectSound Output]
 SELECTED=Yes
 FILENEED=STANDARD
 HTTPLOCATION=
@@ -227,11 +225,11 @@ UNINSTALLABLE=Yes
 TARGET=<TARGETDIR>\Plugins
 FTPLOCATION=
 VISIBLE=Yes
-DESCRIPTION=This component allows the player to read and write playlists in the PLS format.
+DESCRIPTION=This component allows the player to play audio through your sound card via DirectSound on Windows 95 and 98.
 DISPLAYTEXT=
 IMAGE=
 DEFSELECTION=Yes
-filegroup0=PLS Playlist
+filegroup0=Direct Sound Output
 COMMENT=
 INCLUDEINBUILD=Yes
 INSTALLATION=SAMEORNEWERVERSION\SAMEORNEWERDATE
@@ -241,7 +239,12 @@ ENCRYPT=No
 DISK=ANYDISK
 TARGETDIRCDROM=
 PASSWORD=
-TARGETHIDDEN=General Application Destination
+TARGETHIDDEN=General Application Destination\Plugins
+
+[SetupType]
+setuptype0=Compact
+setuptype1=Typical
+setuptype2=Custom
 
 [Input & Output\HTTP Input]
 SELECTED=Yes
@@ -267,6 +270,31 @@ DISK=ANYDISK
 TARGETDIRCDROM=
 PASSWORD=
 TARGETHIDDEN=General Application Destination\Plugins
+
+[Playlist Formats\PLS]
+SELECTED=Yes
+FILENEED=STANDARD
+HTTPLOCATION=
+STATUS=
+UNINSTALLABLE=Yes
+TARGET=<TARGETDIR>\Plugins
+FTPLOCATION=
+VISIBLE=Yes
+DESCRIPTION=This component allows the player to read and write playlists in the PLS format.
+DISPLAYTEXT=
+IMAGE=
+DEFSELECTION=Yes
+filegroup0=PLS Playlist
+COMMENT=
+INCLUDEINBUILD=Yes
+INSTALLATION=SAMEORNEWERVERSION\SAMEORNEWERDATE
+COMPRESSIFSEPARATE=No
+MISC=
+ENCRYPT=No
+DISK=ANYDISK
+TARGETDIRCDROM=
+PASSWORD=
+TARGETHIDDEN=General Application Destination
 
 [Theme Tools]
 SELECTED=Yes
@@ -299,26 +327,26 @@ item6=Default Theme
 Comment=
 item0=System DLLs
 item1=Input & Output
-item2=Input & Output\Soundcard Output
-item3=Default Plugins
+item2=Default Plugins
+item3=Input & Output\Soundcard Output
 Descrip=This choice will install only the minimum number of plugins needed by the player.
 item4=Program Files
 DisplayText=
 
-[Input & Output\Soundcard Output]
+[MetaData\CDDB]
 SELECTED=Yes
-FILENEED=HIGHLYRECOMMENDED
+FILENEED=STANDARD
 HTTPLOCATION=
 STATUS=
 UNINSTALLABLE=Yes
 TARGET=<TARGETDIR>\Plugins
 FTPLOCATION=
 VISIBLE=Yes
-DESCRIPTION=This component allows the player to play audio through your sound card.
+DESCRIPTION=This component looks up a CD's metadata in the CDDB.
 DISPLAYTEXT=
 IMAGE=
 DEFSELECTION=Yes
-filegroup0=Soundcard Output
+filegroup0=CDDB MetaData
 COMMENT=
 INCLUDEINBUILD=Yes
 INSTALLATION=SAMEORNEWERVERSION\SAMEORNEWERDATE
@@ -328,7 +356,7 @@ ENCRYPT=No
 DISK=ANYDISK
 TARGETDIRCDROM=
 PASSWORD=
-TARGETHIDDEN=General Application Destination\Plugins
+TARGETHIDDEN=General Application Destination
 
 [Default Plugins]
 SELECTED=Yes
@@ -356,20 +384,20 @@ TARGETDIRCDROM=
 PASSWORD=
 TARGETHIDDEN=General Application Destination
 
-[MetaData\CDDB]
+[Input & Output\Soundcard Output]
 SELECTED=Yes
-FILENEED=STANDARD
+FILENEED=HIGHLYRECOMMENDED
 HTTPLOCATION=
 STATUS=
 UNINSTALLABLE=Yes
 TARGET=<TARGETDIR>\Plugins
 FTPLOCATION=
 VISIBLE=Yes
-DESCRIPTION=This component looks up a CD's metadata in the CDDB.
+DESCRIPTION=This component allows the player to play audio through your sound card.
 DISPLAYTEXT=
 IMAGE=
 DEFSELECTION=Yes
-filegroup0=CDDB MetaData
+filegroup0=Soundcard Output
 COMMENT=
 INCLUDEINBUILD=Yes
 INSTALLATION=SAMEORNEWERVERSION\SAMEORNEWERDATE
@@ -379,7 +407,7 @@ ENCRYPT=No
 DISK=ANYDISK
 TARGETDIRCDROM=
 PASSWORD=
-TARGETHIDDEN=General Application Destination
+TARGETHIDDEN=General Application Destination\Plugins
 
 [Program Files]
 required0=System DLLs
@@ -410,57 +438,33 @@ PASSWORD=
 TARGETHIDDEN=General Application Destination
 
 [SetupTypeItem-Custom]
-item20=Foreign Themes
-item5=Input & Output\DirectSound Output
-item21=Playlist Formats
-item10=Playlist Formats\PLS
+item20=Default Theme
+item5=MetaData
+item21=Foreign Themes
+item10=Input & Output\HTTP Input
 item6=Foreign Themes\WinAmp Skins
-item22=Portable Players\Rio PMP300
-item11=Theme Tools
-item7=User Interfaces\FreeAmp
-item12=MetaData\CDDB
-item8=Input & Output\HTTP Input
-item13=Default Plugins
+item22=Playlist Formats
+item11=User Interfaces\FreeAmp
+item7=Input & Output\DirectSound Output
+item23=Portable Players\Rio PMP300
+item12=Theme Tools
+item8=Playlist Formats\PLS
+item13=Input & Output\Soundcard Output
 item9=Decoders\Xing MP3
-item14=Input & Output\Soundcard Output
-item15=Program Files
-item16=Input & Output\Wave File Output
+item14=Default Plugins
+item15=MetaData\CDDB
+item16=Program Files
 item17=Input & Output\OBS Input
 Comment=
-item18=Default Theme
+item18=Input & Output\Wave File Output
 item19=Playlist Formats\M3U
 item0=System DLLs
-item1=MetaData\ID3v1
-item2=MetaData
-item3=Input & Output
+item1=Help Files
+item2=MetaData\ID3v1
+item3=MetaData\ID3v2
 Descrip=This choice allows you to select the plugins you would like to install.
-item4=MetaData\ID3v2
+item4=Input & Output
 DisplayText=
-
-[Input & Output\OBS Input]
-SELECTED=Yes
-FILENEED=HIGHLYRECOMMENDED
-HTTPLOCATION=
-STATUS=
-UNINSTALLABLE=Yes
-TARGET=<TARGETDIR>\Plugins
-FTPLOCATION=
-VISIBLE=Yes
-DESCRIPTION=This component allows the player to receive data from Obsequiem and other RTP compliant servers.
-DISPLAYTEXT=
-IMAGE=
-DEFSELECTION=Yes
-filegroup0=OBS Input
-COMMENT=
-INCLUDEINBUILD=Yes
-INSTALLATION=SAMEORNEWERVERSION\SAMEORNEWERDATE
-COMPRESSIFSEPARATE=No
-MISC=
-ENCRYPT=No
-DISK=ANYDISK
-TARGETDIRCDROM=
-PASSWORD=
-TARGETHIDDEN=General Application Destination\Plugins
 
 [Input & Output\Wave File Output]
 SELECTED=Yes
@@ -487,21 +491,20 @@ TARGETDIRCDROM=
 PASSWORD=
 TARGETHIDDEN=General Application Destination
 
-[Default Theme]
+[Input & Output\OBS Input]
 SELECTED=Yes
-FILENEED=STANDARD
+FILENEED=HIGHLYRECOMMENDED
 HTTPLOCATION=
 STATUS=
 UNINSTALLABLE=Yes
-TARGET=<TARGETDIR>\Themes
+TARGET=<TARGETDIR>\Plugins
 FTPLOCATION=
 VISIBLE=Yes
-DESCRIPTION=This is the default theme file for the player, defining how it looks. Head over to http://www.freeamp.org to check out other cool themes that are available for download.
+DESCRIPTION=This component allows the player to receive data from Obsequiem and other RTP compliant servers.
 DISPLAYTEXT=
 IMAGE=
 DEFSELECTION=Yes
-filegroup0=Default Theme
-requiredby0=Program Files
+filegroup0=OBS Input
 COMMENT=
 INCLUDEINBUILD=Yes
 INSTALLATION=SAMEORNEWERVERSION\SAMEORNEWERDATE
@@ -511,7 +514,7 @@ ENCRYPT=No
 DISK=ANYDISK
 TARGETDIRCDROM=
 PASSWORD=
-TARGETHIDDEN=General Application Destination
+TARGETHIDDEN=General Application Destination\Plugins
 
 [Playlist Formats\M3U]
 SELECTED=Yes
@@ -527,6 +530,32 @@ DISPLAYTEXT=
 IMAGE=
 DEFSELECTION=Yes
 filegroup0=M3U Playlist
+COMMENT=
+INCLUDEINBUILD=Yes
+INSTALLATION=SAMEORNEWERVERSION\SAMEORNEWERDATE
+COMPRESSIFSEPARATE=No
+MISC=
+ENCRYPT=No
+DISK=ANYDISK
+TARGETDIRCDROM=
+PASSWORD=
+TARGETHIDDEN=General Application Destination
+
+[Default Theme]
+SELECTED=Yes
+FILENEED=STANDARD
+HTTPLOCATION=
+STATUS=
+UNINSTALLABLE=Yes
+TARGET=<TARGETDIR>\Themes
+FTPLOCATION=
+VISIBLE=Yes
+DESCRIPTION=This is the default theme file for the player, defining how it looks. Head over to http://www.freeamp.org to check out other cool themes that are available for download.
+DISPLAYTEXT=
+IMAGE=
+DEFSELECTION=Yes
+filegroup0=Default Theme
+requiredby0=Program Files
 COMMENT=
 INCLUDEINBUILD=Yes
 INSTALLATION=SAMEORNEWERVERSION\SAMEORNEWERDATE
@@ -569,31 +598,32 @@ Version=1.00.000
 Name=
 
 [SetupTypeItem-Typical]
-item20=Foreign Themes
-item5=Foreign Themes\WinAmp Skins
-item21=Playlist Formats
-item10=Playlist Formats\PLS
+item20=Default Theme
+item5=MetaData
+item21=Foreign Themes
+item10=Input & Output\HTTP Input
 item6=Input & Output\DirectSound Output
-item22=Portable Players\Rio PMP300
-item11=Theme Tools
-item7=User Interfaces\FreeAmp
-item12=MetaData\CDDB
-item8=Input & Output\HTTP Input
-item13=Default Plugins
+item22=Playlist Formats
+item11=User Interfaces\FreeAmp
+item7=Foreign Themes\WinAmp Skins
+item23=Portable Players\Rio PMP300
+item12=Theme Tools
+item8=Playlist Formats\PLS
+item13=Input & Output\Soundcard Output
 item9=Decoders\Xing MP3
-item14=Input & Output\Soundcard Output
-item15=Program Files
-item16=Input & Output\Wave File Output
+item14=Default Plugins
+item15=MetaData\CDDB
+item16=Program Files
 item17=Input & Output\OBS Input
 Comment=
-item18=Default Theme
+item18=Input & Output\Wave File Output
 item19=Playlist Formats\M3U
 item0=System DLLs
-item1=MetaData\ID3v1
-item2=MetaData
-item3=Input & Output
+item1=Help Files
+item2=MetaData\ID3v1
+item3=MetaData\ID3v2
 Descrip=This choice will install the the player and all plugins.
-item4=MetaData\ID3v2
+item4=Input & Output
 DisplayText=
 
 [Playlist Formats]

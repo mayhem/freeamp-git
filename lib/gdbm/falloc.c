@@ -193,7 +193,7 @@ pop_avail_block (dbf)
   file_pos = lseek (dbf->desc, new_el.av_adr, L_SET);
   if (file_pos != new_el.av_adr)  _gdbm_fatal (dbf, "lseek error");
   num_bytes = read (dbf->desc, new_blk, new_el.av_size);
-  if (num_bytes != new_el.av_size) _gdbm_fatal (dbf, "read error");
+  if (num_bytes != (int)new_el.av_size) _gdbm_fatal (dbf, "read error");
 
   /* Add the elements from the new block to the header. */
   for (index = 0; index < new_blk->count; index++)
@@ -271,7 +271,7 @@ push_avail_block (dbf)
   file_pos = lseek (dbf->desc, av_adr, L_SET);
   if (file_pos != av_adr) _gdbm_fatal (dbf, "lseek error");
   num_bytes = write (dbf->desc, temp, av_size);
-  if (num_bytes != av_size) _gdbm_fatal (dbf, "write error");
+  if (num_bytes != (int)av_size) _gdbm_fatal (dbf, "write error");
   free (temp);
 }
 

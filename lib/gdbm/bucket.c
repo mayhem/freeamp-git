@@ -113,7 +113,7 @@ _gdbm_get_bucket (dbf, dir_index)
 	_gdbm_fatal (dbf, "lseek error");
 
       num_bytes = read (dbf->desc, dbf->bucket, dbf->header->bucket_size);
-      if (num_bytes != dbf->header->bucket_size)
+      if (num_bytes != (int)dbf->header->bucket_size)
 	_gdbm_fatal (dbf, "read error");
     }
 
@@ -205,7 +205,7 @@ _gdbm_split_bucket (dbf, next_insert)
 	  new_dir  = (off_t *) malloc (dir_size);
 	  if (new_dir == NULL) _gdbm_fatal (dbf, "malloc error");
 	  for (index = 0;
-	  	index < dbf->header->dir_size/sizeof (off_t); index++)
+	  	index < (int)(dbf->header->dir_size/sizeof (off_t)); index++)
 	    {
 	      new_dir[2*index]   = dbf->dir[index];
 	      new_dir[2*index+1] = dbf->dir[index];
@@ -330,7 +330,7 @@ _gdbm_write_bucket (dbf, ca_entry)
   if (file_pos != ca_entry->ca_adr)
     _gdbm_fatal (dbf, "lseek error");
   num_bytes = write (dbf->desc, ca_entry->ca_bucket, dbf->header->bucket_size);
-  if (num_bytes != dbf->header->bucket_size)
+  if (num_bytes != (int)dbf->header->bucket_size)
     _gdbm_fatal (dbf, "write error");
   ca_entry->ca_changed = FALSE;
   ca_entry->ca_data.hash_val = -1;

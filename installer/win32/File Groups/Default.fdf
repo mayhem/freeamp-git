@@ -1,20 +1,21 @@
 [FileGroups]
+group16=M3U Playlist
 group0=System DLLs
-group1=ID3v1 MetaData
-group2=PLS Playlist
-group3=Program Executable Files
-group4=Theme Tools
-group5=Direct Sound Output
-group6=Default Plugins
-group10=CDDB MetaData
-group7=OBS Input
-group11=WinAmp Skin Support
-group8=ID3v2 MetaData
-group12=Wave File Output
-group9=Soundcard Output
-group13=Default Theme
-group14=HTTP Input
-group15=M3U Playlist
+group1=Help Files
+group2=ID3v1 MetaData
+group3=PLS Playlist
+group4=Program Executable Files
+group5=Theme Tools
+group6=Direct Sound Output
+group10=Soundcard Output
+group7=Default Plugins
+group11=CDDB MetaData
+group8=OBS Input
+group12=WinAmp Skin Support
+group9=ID3v2 MetaData
+group13=Wave File Output
+group14=Default Theme
+group15=HTTP Input
 
 [System DLLs]
 SELFREGISTERING=No
@@ -23,6 +24,20 @@ LANGUAGE=
 OPERATINGSYSTEM=
 FTPLOCATION=
 FILETYPE=Yes
+INFOTYPE=Standard
+COMMENT=
+COMPRESS=Yes
+COMPRESSDLL=
+POTENTIALLY=No
+MISC=
+
+[Help Files]
+SELFREGISTERING=No
+HTTPLOCATION=
+LANGUAGE=
+OPERATINGSYSTEM=
+FTPLOCATION=
+FILETYPE=No
 INFOTYPE=Standard
 COMMENT=
 COMPRESS=Yes
