@@ -232,11 +232,19 @@ None||Repeat current"/>
             <ControlStateBitmap Rect="18, 0, 26, 8" State="Normal"
                                 Name="PlayPaus"/>
         </ButtonControl>
+        <ButtonControl Name="WindowStatus">
+                <Info Desc="" Tip=""/>
+            <Position Pos="0, 0"/>
+            <ControlStateBitmap Rect="27, 0, 301, 13" State="Normal"
+                                Name="Titlebar"/>
+            <ControlStateBitmap Rect="27, 15, 301, 28" State="Disabled"
+                                Name="Titlebar"/>
+         </ButtonControl>
     </Controls>
 </Window>
 
 <Window Name="Mini-Me">
-    <BackgroundBitmap Name="Titlebar" Rect="27, 29, 302, 43"/>
+    <BackgroundBitmap Name="Titlebar" Rect="27, 29, 301, 42"/>
     <Controls>
         <ButtonControl Name="MaxView">
                 <Info Desc="Change to Normal view" Tip="Normal view"/>
@@ -307,5 +315,21 @@ None||Repeat current"/>
             <ControlStateBitmap Rect="242, 31, 241, 40" State="Normal"
                                 Name="Titlebar"/>
         </ButtonControl>
+        <SliderControl Name="Seek" ThumbStates="3" Frames="1">
+                <Info Desc="Seek in the current track" Tip="Seek"/>
+            <Position Rect="226, 4, 242, 10"/>
+            <ControlBitmap Rect="17, 36, 25, 42" Name="Titlebar" 
+                           Style="Vert"/>
+            <SliderTroughBitmap Rect="0, 36, 16, 42" NumFrames="1"
+                                Name="Titlebar"/>
+        </SliderControl>
+        <ButtonControl Name="WindowStatus">
+                <Info Desc="" Tip=""/>
+            <Position Pos="0, 0"/>
+            <ControlStateBitmap Rect="27, 29, 301, 42" State="Normal"
+                                Name="Titlebar"/>
+            <ControlStateBitmap Rect="27, 42, 301, 55" State="Disabled"
+                                Name="Titlebar"/>
+         </ButtonControl>
     </Controls>
 </Window>

@@ -89,7 +89,8 @@ class Window
       virtual void  HandleMouseMove(Pos &oPos);
       virtual void  HandleMouseLButtonDown(Pos &oPos);
       virtual void  HandleMouseLButtonUp(Pos &oPos);
-	  virtual void  MouseHasLeftWindow(void);
+      virtual void  MouseHasEnteredWindow(void);
+      virtual void  MouseHasLeftWindow(void);
 
       virtual Error StartMouseCapture(Control *);
       virtual Error EndMouseCapture(void);

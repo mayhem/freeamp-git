@@ -738,7 +738,7 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
     if (oElement == string("SliderControl"))
     {
        m_bPosDefined = m_bBitmapDefined = m_bInfoDefined = false;
-       int iThumbStates = 1;    
+       int iThumbStates = 1, iNumFrames = 3;    
 
        if (m_pCurrentControl)
        {
@@ -755,18 +755,23 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
        {
            iThumbStates = atoi(oAttrMap["ThumbStates"].c_str());
        }
+ 
+       if (oAttrMap.find("Frames") != oAttrMap.end())
+       {
+           iNumFrames = atoi(oAttrMap["Frames"].c_str());
+       }
 
        m_eCurrentControl = eSliderControl;
        m_pCurrentControl = new SliderControl(m_pCurrentWindow,
                                              oAttrMap["Name"],
-                                             iThumbStates);
+                                             iThumbStates, iNumFrames);
        return kError_NoErr;
     }
 
     if (oElement == string("VSliderControl"))
     {
        m_bPosDefined = m_bBitmapDefined = m_bInfoDefined = false;
-       int iThumbStates;    
+       int iThumbStates = 1, iNumFrames = 3;    
    
        if (m_pCurrentControl)
        {
@@ -784,10 +789,15 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
            iThumbStates = atoi(oAttrMap["ThumbStates"].c_str());
        }
 
+       if (oAttrMap.find("Frames") != oAttrMap.end())
+       {
+           iNumFrames = atoi(oAttrMap["Frames"].c_str());
+       }
+
        m_eCurrentControl = eVSliderControl;
        m_pCurrentControl = new VSliderControl(m_pCurrentWindow,
                                               oAttrMap["Name"],
-                                              iThumbStates);
+                                              iThumbStates, iNumFrames);
        return kError_NoErr;
     }
 

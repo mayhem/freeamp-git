@@ -51,13 +51,15 @@ static TransitionInfo pTransitions[] =
     { CS_LastState,  CT_LastTransition,   CS_LastState  }
 };
 
-SliderControl::SliderControl(Window *pWindow, string &oName, int iThumbs) :
+SliderControl::SliderControl(Window *pWindow, string &oName, int iThumbs,
+                             int iNumFrames) :
                Control(pWindow, oName, pTransitions)
 {
      m_iRange = -1;
      m_iCurrentPos = 0;
      m_oOrigin.x = -1;
      m_iNumThumbStates = iThumbs;
+     m_iNumFrames = iNumFrames;
      m_bIsDrag = false;
      m_bInUpdate = false;
      m_bHasTroughBitmap = false;
@@ -85,10 +87,10 @@ void SliderControl::SetTroughBitmap(Bitmap *pBitmap, Rect &oBitmapRect,
 void SliderControl::Init(void)
 {
     m_oMutex.Acquire();
-   
+  
     if (!m_bUsesStateBitmapRects) {
         for (int row = 0; row < m_iNumThumbStates; row++) {
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < m_iNumFrames; i++) {
                 int iFrameWidth, iFrameHeight; 
                 Rect oFrameRect;
 
@@ -130,6 +132,7 @@ void SliderControl::Init(void)
             }
         }
     }
+
 
     m_iThumbWidth = m_oStateBitmapRect[0][CS_Normal].Width(); 
     m_iRange = m_oRect.Width() - m_iThumbWidth;

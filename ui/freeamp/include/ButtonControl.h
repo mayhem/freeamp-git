@@ -50,6 +50,7 @@ class ButtonControl : public Control
       void Transition(ControlTransitionEnum eTrans, Pos *pMousePos);
       virtual void Init(void);
       virtual bool PosInControl(Pos &oPos);
+      virtual bool UseToDragWindow(void);
       
     private:
 

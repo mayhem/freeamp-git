@@ -725,6 +725,21 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
        return kError_NoErr;
    }    
 
+   if (oControlName == string("WindowStatus")) 
+   {
+       bool bEnable;
+
+       if (eMesg == CM_WindowEnter) 
+           bEnable = true;
+       else if (eMesg == CM_WindowLeave)
+           bEnable = false;
+       else
+           return kError_NoErr;
+
+       m_pWindow->ControlEnable(oControlName, true, bEnable);
+       return kError_NoErr;
+   } 
+
    if (eMesg == CM_MouseEnter)
    {
        string oName("Info"), oDesc("");
@@ -752,7 +767,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
        m_pWindow->ControlStringValue(oName, true, oEmpty);
                                 
        return kError_NoErr;
-   }    
+   } 
    if (oControlName == string("Minimize") && eMesg == CM_Pressed)
    {
        m_pWindow->Minimize();

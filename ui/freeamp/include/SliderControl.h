@@ -30,7 +30,8 @@ class SliderControl : public Control
 {
     public:
 
-               SliderControl(Window *pWindow, string &oName, int iThumbs);
+               SliderControl(Window *pWindow, string &oName, int iThumbs,
+                             int iNumFrames);
       virtual ~SliderControl(void);
 
               void Transition(ControlTransitionEnum eTrans, Pos *pMousePos);
@@ -52,7 +53,7 @@ class SliderControl : public Control
       int     m_iCurrentPos;
       int     m_iThumbWidth;
       bool    m_bIsDrag, m_bInUpdate;
-      int     m_iNumThumbStates;
+      int     m_iNumThumbStates, m_iNumFrames;
       bool    m_bHasTroughBitmap, m_bHorizontalTroughBitmap;
       int     m_iTroughFrames, m_iCurrentTroughFrame, m_iTroughDelta;
       Rect    m_oTroughBitmapRect;

@@ -51,13 +51,15 @@ static TransitionInfo pTransitions[] =
     { CS_LastState,  CT_LastTransition,   CS_LastState  }
 };
 
-VSliderControl::VSliderControl(Window *pWindow, string &oName, int iThumbs) :
+VSliderControl::VSliderControl(Window *pWindow, string &oName, int iThumbs,
+                               int iNumFrames) :
                Control(pWindow, oName, pTransitions)
 {
      m_iRange = -1;
      m_iCurrentPos = 0;
      m_oOrigin.y = -1;
      m_iNumThumbStates = iThumbs;
+     m_iNumFrames = iNumFrames;
      m_bIsDrag = false;
      m_bInUpdate = false;
      m_bHasTroughBitmap = false;
@@ -88,7 +90,7 @@ void VSliderControl::Init(void)
    
     if (!m_bUsesStateBitmapRects) {
         for (int row = 0; row < m_iNumThumbStates; row++) {
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < m_iNumFrames; i++) {
                 int iFrameWidth, iFrameHeight;
                 Rect oFrameRect;
 
@@ -119,6 +121,7 @@ void VSliderControl::Init(void)
                         break;
                     case 1:
                         SetStateBitmap(m_pBitmap, oFrameRect, CS_MouseOver, row);
+                        SetStateBitmap(m_pBitmap, oFrameRect, CS_Dragging, row);
                         break;
                     case 2:
                         SetStateBitmap(m_pBitmap, oFrameRect, CS_Disabled, row);

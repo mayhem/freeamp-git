@@ -207,3 +207,8 @@ void ButtonControl::SetTargetWindow(string &oWindow)
     m_oMutex.Release();
 }
 
+bool ButtonControl::UseToDragWindow(void)
+{
+    return m_oName == string("WindowStatus");
+}
+

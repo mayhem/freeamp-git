@@ -54,6 +54,8 @@ enum ControlMessageEnum
     CM_SliderUpdate,
     CM_ValueChanged,
     CM_ChangeWindow,
+    CM_WindowEnter,
+    CM_WindowLeave,
 
     CM_LastValue
 };

@@ -884,8 +884,12 @@ void Win32Window::MouseLeaveCheck(void)
             MouseHasLeftWindow();
         m_bMouseInWindow = false;
     }
-    else
+    else 
+    {
+        if (!m_bMouseInWindow)
+            MouseHasEnteredWindow();
         m_bMouseInWindow = true;
+    }
         
     ReleaseDC(m_hWnd, hDc);
 }

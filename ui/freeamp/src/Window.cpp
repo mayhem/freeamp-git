@@ -658,27 +658,38 @@ void Window::HandleMouseLButtonUp(Pos &oScreenPos)
     return;
 }
 
+void Window::MouseHasEnteredWindow(void)
+{
+    IncUsageRef();
+    string StatusControlName = string("WindowStatus");
+    m_pTheme->HandleControlMessage(StatusControlName, CM_WindowEnter);
+    DecUsageRef();
+}
+
 // Do you have any idea how much I wanted to call 
 // this ElvisHasLeftTheBuilding()?
 void Window::MouseHasLeftWindow(void)
 {
     IncUsageRef();
 
+    string StatusControlName = string("WindowStatus");
+    m_pTheme->HandleControlMessage(StatusControlName, CM_WindowLeave);
+
     if (m_pMouseInControl)
     {
        m_pMouseInControl->AcceptTransition(CT_MouseLeave);
        m_pMouseInControl = NULL;
-       DecUsageRef();
-       return;
     }
-    if (!m_pMouseInControl)
+    else if (!m_pMouseInControl)
     { 
        Pos oPos;
 
        GetMousePos(oPos);
        m_pMouseInControl = ControlFromPos(oPos);
-       if (m_pMouseInControl)
+       if (m_pMouseInControl) {
           m_pMouseInControl->AcceptTransition(CT_MouseEnter);
+          m_pTheme->HandleControlMessage(StatusControlName, CM_WindowEnter);
+       }
     }      
     DecUsageRef();
 }

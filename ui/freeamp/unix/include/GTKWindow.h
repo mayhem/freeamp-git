@@ -58,10 +58,9 @@ class GTKWindow : public Window
      virtual void  BringWindowToFront(void);
 
      GtkWidget *GetWindow(void) { return mainWindow; }
-   
+
+     void SetMouseIn(void);   
      void MouseLeaveCheck(void); 
-     void SetMouseIn(void) { m_bMouseInWindow = true; }
-     void SetMouseOut(void) { m_bMouseInWindow = false; }
      void ModifyTimer(bool stop);
 
      void DropFiles(char *filename);
