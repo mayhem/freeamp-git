@@ -52,7 +52,7 @@ const int iHttpPort = 80;
 const int iMaxHostNameLen = 64;
 const int iGetHostNameBuffer = 1024;
 const int iBufferUpInterval = 3;
-const int iInitialBufferSize = 128;
+const int iInitialBufferSize = 1024;
 const int iHeaderSize = 1024;
 const int iICY_OK = 200;
 const int iTransmitTimeout = 60;
@@ -217,7 +217,7 @@ Error HttpBuffer::Open(void)
 	unsigned long lMicrosoftSucksBalls = 1;
 	ioctlsocket(m_hHandle, FIONBIO, &lMicrosoftSucksBalls);
 #endif
-    iConnect = connect(m_hHandle,(const sockaddr *)&sAddr,sizeof sAddr);
+    iConnect = connect(m_hHandle,(const sockaddr *)&sAddr,sizeof(sAddr));
     for(; iConnect && !m_bExit;)
     {
         sTv.tv_sec = 0; sTv.tv_usec = 0;
@@ -225,7 +225,7 @@ Error HttpBuffer::Open(void)
         iRet = select(m_hHandle + 1, NULL, &sSet, NULL, &sTv);
         if (!iRet)
         {
-		   usleep(100000);
+		     usleep(100000);
            continue;
         }
         if (iRet < 0)
@@ -245,18 +245,17 @@ Error HttpBuffer::Open(void)
     if (szFile)
         sprintf(szQuery, "GET %s HTTP/1.0\n\n", szFile);
     else
-        sprintf(szQuery, "GET / HTTP/1.0\nHost %s\nAccept: */*\n\n\n", 
+        sprintf(szQuery, "GET / HTTP/1.0\nHost %s\nAccept: */*\n\n", 
                 szHostName);
 
     iRet = send(m_hHandle, szQuery, strlen(szQuery), 0);
+    delete szQuery;
     if (iRet != strlen(szQuery))
     {
         LogError("Cannot write to socket");
         closesocket(m_hHandle);
         return (Error)httpError_SocketWrite;
     }
-
-    delete szQuery;
 
     pInitialBuffer = new char[iInitialBufferSize + 1];
 
@@ -282,7 +281,8 @@ Error HttpBuffer::Open(void)
     if (m_bExit)
         return (Error)kError_Interrupt;
 
-    if (sscanf(pInitialBuffer, " ICY %d %255[^\n\r]", &iRet, m_szError))
+    if (sscanf(pInitialBuffer, " ICY %d %255[^\n\r]", &iRet, m_szError) ||
+        sscanf(pInitialBuffer, " HTTP/1.0 %d %255[^\n\r]", &iRet, m_szError))
     {
         char *pStreamBegin, *pHeaderData, *pPtr;
         int   iHeaderBytes = 0, iCurHeaderSize = iHeaderSize;
@@ -319,18 +319,12 @@ Error HttpBuffer::Open(void)
             memcpy(pHeaderData + iHeaderBytes, pInitialBuffer, iRead);
             iHeaderBytes += iRead;
 
-            for(iLoop = 0, pStreamBegin = pHeaderData; 
-                iLoop < iHeaderBytes; pStreamBegin++, iLoop++)
-            {
-                if (strncmp(pStreamBegin, "\r\n\r\n", 4) == 0)
-                {
-                    pHeaderData[iLoop + 2] = 0; 
-                    break;
-                }
-            }
- 
-            if (iLoop < iHeaderBytes)
-               break;
+            //for(int i = 0; i < iHeaderBytes; i++)
+            //   printf("'%c' - '%x'\n", pHeaderData[i], pHeaderData[i]);
+
+            if (strstr(pHeaderData, "\r\n\r\n") ||
+                strstr(pHeaderData, "\n\n"))
+                break;
                
             for(;!m_bExit;)
             {
@@ -339,7 +333,7 @@ Error HttpBuffer::Open(void)
                 iRet = select(m_hHandle + 1, &sSet, NULL, NULL, &sTv);
                 if (!iRet)
                 {
-				   usleep(10000);
+                   usleep(10000);
                    continue;
                 }
                 iRead = recv(m_hHandle, pInitialBuffer, iInitialBufferSize, 0);
@@ -450,8 +444,6 @@ void HttpBuffer::WorkerThread(void)
    fd_set          sSet;
    struct timeval  sTv;
 
-   FD_ZERO(&sSet);
-
    for(; !m_bExit;)
    {
       if (IsEndOfStream())
@@ -465,7 +457,7 @@ void HttpBuffer::WorkerThread(void)
       iRet = select(m_hHandle + 1, &sSet, NULL, NULL, &sTv);
       if (!iRet)
       {
-		 usleep(10000);
+		   usleep(10000);
          continue;
       }
         
