@@ -741,20 +741,25 @@ AC_CHECK_LIB(z, uncompress,
 )
 AC_SUBST(ID3_LIBS)
 
-AC_CHECK_HEADERS(kde/artsc/artsc.h, have_arts="true", have_arts="false")
+dnl Partly taken from SDL's configure.in
+dnl -------------------------------------------------------------
 
-if test "$have_arts" = "false"; then
-  AC_CHECK_HEADERS(artsc/artsc.h, have_arts="true", 
-                    have_arts="false")
+AC_PATH_PROG(ARTSCCONFIG, artsc-config)
+if test x$ARTSCCONFIG = x -o x$ARTSCCONFIG = x'"$ARTSCCONFIG"'; then
+: # arts isn't installed
+else
+    CFLAGS="$CFLAGS `$ARTSCCONFIG --cflags`"
+    AC_TRY_COMPILE([
+     #include <artsc.h>
+    ],[
+     arts_stream_t stream;
+    ],[
+     OSDEPPLUGINS="$OSDEPPLUGINS plugins/arts.pmo";
+     OSINC="$OSINC -I$srcdir/io/arts/include"
+     ARTS_LIBS=`$ARTSCCONFIG --libs`
+     AC_MSG_RESULT([compiling arts pmo plugin])
+    ])
 fi
-
-ARTS_LIBS=""
-AC_CHECK_LIB(artsc, arts_init, 
-  OSDEPPLUGINS="$OSDEPPLUGINS plugins/arts.pmo";
-  OSINC="$OSINC -I$srcdir/io/arts/include"
-  ARTS_LIBS="-lartsc -laudiofile"
-  AC_MSG_RESULT([compiling arts pmo plugin])
-)
 
 AC_SUBST(ARTS_LIBS)
 AC_SUBST(EXTRALIBS)

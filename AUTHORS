@@ -185,3 +185,5 @@ Michael Rich <istan@alltel.net>
 "Kris" <kris@cs.ucsb.edu>
 * A patch to fix some theme manager inconsistencies in linux
 
+"Stefan Gehn" <sgehn@gmx.net>
+* Submitted a patch for a proper kde artsc detection
