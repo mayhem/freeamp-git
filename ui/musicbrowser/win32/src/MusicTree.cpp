@@ -657,6 +657,92 @@ HTREEITEM MusicBrowserUI::FindPlaylist(const string playlist)
     return result;
 }
 
+
+
+void MusicBrowserUI::MusicCatalogTrackChanged(const ArtistList *oldArtist,
+                                              const ArtistList *newArtist,
+                                              const AlbumList *oldAlbum,
+                                              const AlbumList *newAlbum,
+                                              const PlaylistItem *oldItem,
+                                              const PlaylistItem *newItem)
+{
+    HTREEITEM artistItem = NULL;
+    HTREEITEM albumItem = NULL;
+    HTREEITEM trackItem = NULL;
+    UINT artistState = 0;
+    UINT albumState = 0;
+    
+    // is this in the uncatagorized section?
+    if(!oldArtist) 
+    {
+        trackItem = FindTrack(m_hUncatItem, oldItem);
+    }
+    else
+    {
+        artistItem = FindArtist(oldArtist);
+
+        if(artistItem)
+        {
+            TV_ITEM tv_item;
+
+            tv_item.hItem = artistItem;
+            tv_item.mask = TVIF_STATE;
+            tv_item.stateMask = TVIS_SELECTED|TVIS_EXPANDED;
+            tv_item.state = 0;
+
+            TreeView_GetItem(m_hMusicCatalog, &tv_item);
+
+            artistState = tv_item.state;
+
+            albumItem = FindAlbum(artistItem, oldAlbum);
+
+            if(albumItem)
+            {
+                tv_item.hItem = albumItem;
+                tv_item.mask = TVIF_STATE;
+                tv_item.stateMask = TVIS_SELECTED|TVIS_EXPANDED;
+                tv_item.state = 0;
+
+                TreeView_GetItem(m_hMusicCatalog, &tv_item);
+
+                albumState = tv_item.state;
+
+                //trackItem = FindTrack(albumItem, oldItem);
+            }
+        }
+    }   
+
+    MusicCatalogTrackRemoved(oldArtist, oldAlbum, oldItem);
+
+    MusicCatalogTrackAdded(newArtist,newAlbum, newItem);   
+
+    // is this in the uncatagorized section?
+    if(!oldArtist) 
+    {
+        //trackItem = FindTrack(m_hUncatItem, newItem);
+    }
+    else
+    {
+        artistItem = FindArtist(newArtist);
+
+        if(artistItem)
+        {
+            if(artistState & TVIS_EXPANDED)
+                TreeView_Expand(m_hMusicCatalog, artistItem, TVE_EXPAND);
+
+            albumItem = FindAlbum(artistItem, newAlbum);
+
+            if(albumItem)
+            {
+                if(albumState & TVIS_EXPANDED)
+                    TreeView_Expand(m_hMusicCatalog, albumItem, TVE_EXPAND);
+
+                //trackItem = FindTrack(albumItem, oldItem);
+            }
+        }
+    }   
+}
+
 void MusicBrowserUI::MusicCatalogPlaylistRemoved(string item)
 {
     HTREEITEM playlistItem = NULL;
@@ -861,6 +947,7 @@ void MusicBrowserUI::MusicCatalogTrackAdded(const ArtistList* artist,
                     sInsert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
                                         TVIF_SELECTEDIMAGE | TVIF_PARAM; 
 
+                    oCrossRef.m_iLevel = 2;
                     oCrossRef.m_pArtist = (ArtistList*)artist;
                     oCrossRef.m_pAlbum = (AlbumList*)album;
 

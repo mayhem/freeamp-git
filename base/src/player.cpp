@@ -1819,6 +1819,7 @@ ServiceEvent(Event * pC)
         case INFO_MusicCatalogTrackRemoved: 
         case INFO_MusicCatalogPlaylistAdded:
         case INFO_MusicCatalogPlaylistRemoved:
+        case INFO_MusicCatalogTrackChanged:
         case CMD_AddFiles:
         case CMD_LoadTheme:
         case CMD_ShowPreferences:

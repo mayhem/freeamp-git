@@ -6,9 +6,8 @@
 2 Getting Help=Getting_Help>Main
 2 What is FreeAmp?=What_is_FreeAmp_>Main
 2 What Kinds of MP3 Files Can I Play?=What_Kinds_of_MP3_Files_Can_I_Play_>Main
-2 What is the Music Browser?=What_is_the_Music_Browser_>Main
+2 What is My Music?=What_is_My_Music?>Main
 2 What is a Playlist?=What_is_a_Playlist_>Main
-2 What is the Download Manager?=What_is_the_Download_Manager_
 1 Creating Your Music Collection
 2 Searching for Music on Your Computer=Searching_for_Music_on_Your_Computer>Main
 1 Creating and Modifying Playlists
@@ -38,13 +37,13 @@
 1 Streaming Files
 2 What is Streaming?=What_is_Streaming_>Main
 2 Saving a Stream on Your Computer=Saving_a_Stream_on_Your_Computer>Main
-1 Viewing Information about a Track
+1 Viewing or Changing ID3 Information about a Track
 2 What are ID3 Tags?=What_are_ID3_Tags_>Main
 2 Viewing the Track Duration=Viewing_the_Track_Duration>Main
 2 Viewing the Track Name=Viewing_the_Track_Name>Main
-1 Downloading MP3 Files and Streams from Web Sites
+2 Changing Information about a Track=Changing_Information_about_a_Track>Main
+1 Download MP3 Files and Streams from Web Sites
 2 Downloading MP3 Files and Streams from a Web Site=Downloading_MP3_Files_and_Streams_from_a_Web_Site>Main
-2 Download Manager=Download_Manager
 2 Pausing Downloading=Pausing_Downloading>Main
 2 Resuming Downloading=Resuming_Downloading>Main
 1 Configuring FreeAmp Settings
@@ -52,7 +51,10 @@
 2 Setting the Folder Location to Save Your Music=Setting_the_Folder_Location_to_Save_Your_Music>Main
 2 Setting FreeAmp to Stay on Top of Other Applications=Setting_FreeAmp_to_Stay_on_Top_of_Other_Applications>Main
 1 Menus and Windows - Field Descriptions
-2 Search Computer for Music=Search_Computer_for_Music>Main
+2 FreeAmp Main Window=FreeAmp_Main_Window>Main
+2 My Music=My_Music>Main
+2 Search Computer for Music=Search_Computer_for_Music_dialog>Main
+2 Edit Track Info=Edit_Track_Info>Main
 2 Preferences - General=Preferences_General>Main
 2 Preferences - Themes=Preferences_Themes>Main
 2 Preferences - Streaming=Preferences_Streaming
@@ -60,8 +62,7 @@
 2 Preferences - Advanced=Preferences_Advanced>Main
 2 Preferences - Plugins=Preferences_Plugins>Main
 2 Preferences - About=Preferences_About>Main
-2 FreeAmp Main Window=FreeAmp_Main_Window>Main
-2 Search Computer for Music=Search_Computer_for_Music_dialog>Main
+2 Download Manager=Download_Manager>Main
 2 Keyboard Shortcuts=Keyboard_Shortcuts>Main
 1 Changing FreeAmp's Appearance
 2 What are Themes?=What_are_Themes_

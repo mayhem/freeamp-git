@@ -266,6 +266,12 @@ class MusicBrowserUI : public UserInterface
     void    AddUncatagorizedTrackItems(vector<PlaylistItem*>* items);
     void    GetSelectedPlaylistItems(vector<string>* urls);
     void    TVBeginDrag(HWND hwnd, NM_TREEVIEW* nmtv);
+    void    MusicCatalogTrackChanged(const ArtistList *oldArtist,
+                                     const ArtistList *newArtist,
+                                     const AlbumList *oldAlbum,
+                                     const AlbumList *newAlbum,
+                                     const PlaylistItem *oldItem,
+                                     const PlaylistItem *newItem);
     void    MusicCatalogTrackAdded(const ArtistList* artist,
                                    const AlbumList* album,
                                    const PlaylistItem* item);
@@ -292,8 +298,8 @@ class MusicBrowserUI : public UserInterface
     bool IsItemSelected(HTREEITEM item);
 
     // Functions in EditTrackInfoDialog.cpp
-    void CreateEditInfoLists(vector<string>& artists,
-                             vector<string>& albums,
+    void CreateEditInfoLists(set<string>& artists,
+                             set<string>& albums,
                              set<string>& genres);
     
 

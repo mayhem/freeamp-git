@@ -604,9 +604,10 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
             return 0;
         }
         
-	    if (pTreeView->hdr.code == TVN_ITEMEXPANDING && 
-            m_oTreeIndex.GetLevel(pTreeView->itemNew.lParam) == 2 &&
-            TreeView_GetChild(
+	    if (pTreeView->hdr.code == TVN_ITEMEXPANDING )
+            if( m_oTreeIndex.GetLevel(pTreeView->itemNew.lParam) == 2)
+
+            if(TreeView_GetChild(
             m_hMusicCatalog, pTreeView->itemNew.hItem) == NULL)
         {    
             FillTracks(&pTreeView->itemNew);

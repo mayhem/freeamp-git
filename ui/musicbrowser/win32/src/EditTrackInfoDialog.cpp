@@ -70,8 +70,8 @@ BOOL MusicBrowserUI::EditTrackInfoDlgProc(HWND hwnd,
     {
         case WM_INITDIALOG:
         {
-            vector<string> artists;
-            vector<string> albums;
+            set<string> artists;
+            set<string> albums;
             set<string> genres;
             char number[64];
             
@@ -86,8 +86,8 @@ BOOL MusicBrowserUI::EditTrackInfoDlgProc(HWND hwnd,
             HWND hwndYear = GetDlgItem(hwnd, IDC_YEAR);
             HWND hwndSpinYear = GetDlgItem(hwnd, IDC_SPINYEAR);
             HWND hwndComment = GetDlgItem(hwnd, IDC_COMMENT);
-            HWND hwndTitleText =  FindWindowEx(hwnd, NULL, NULL, "Title:"); //GetDlgItem(hwnd, IDC_TITLETEXT);
-            HWND hwndTrackText =  FindWindowEx(hwnd, NULL, NULL, "Track #:"); //GetDlgItem(hwnd, IDC_TRACKTEXT);
+            HWND hwndTitleText =  FindWindowEx(hwnd, NULL, NULL, "Title:");
+            HWND hwndTrackText =  FindWindowEx(hwnd, NULL, NULL, "Track #:");
             
             SYSTEMTIME sysTime;
 
@@ -96,8 +96,7 @@ BOOL MusicBrowserUI::EditTrackInfoDlgProc(HWND hwnd,
             SendMessage(hwndSpinTrack, UDM_SETRANGE, 0, MAKELPARAM(1000, 0));
             SendMessage(hwndSpinYear, UDM_SETRANGE, 0, MAKELPARAM(sysTime.wYear, 0));
 
-            vector<string>::iterator vi;
-            set<string>::iterator si;
+            set<string>::iterator i;
 
             // track name
             Edit_SetText(hwndTitle, m_editTrackMetaData.Title().c_str());
@@ -134,17 +133,17 @@ BOOL MusicBrowserUI::EditTrackInfoDlgProc(HWND hwnd,
 
 
             // add artists
-            for(vi = artists.begin(); vi != artists.end(); vi++)
+            for(i = artists.begin(); i != artists.end(); i++)
             {
-                uint32 length = (*vi).size();
+                uint32 length = (*i).size();
 
                 if(length)
                 {
                     bool notJustWhiteSpace = false;
 
-                    for(uint32 i = 0; i < length; i++)
+                    for(uint32 index = 0; index < length; index++)
                     {
-                        if(!isspace((*vi)[i]))
+                        if(!isspace((*i)[index]))
                         {
                             notJustWhiteSpace = true;
                             break;
@@ -152,24 +151,24 @@ BOOL MusicBrowserUI::EditTrackInfoDlgProc(HWND hwnd,
                     }
 
                     if(notJustWhiteSpace)
-                        ComboBox_AddString(hwndArtist, (*vi).c_str());
+                        ComboBox_AddString(hwndArtist, (*i).c_str());
                 }
             }
 
             ComboBox_SetText(hwndArtist, m_editTrackMetaData.Artist().c_str());
 
             // add albums
-            for(vi = albums.begin(); vi != albums.end(); vi++)
+            for(i = albums.begin(); i != albums.end(); i++)
             {
-                uint32 length = (*vi).size();
+                uint32 length = (*i).size();
 
                 if(length)
                 {
                     bool notJustWhiteSpace = false;
 
-                    for(uint32 i = 0; i < length; i++)
+                    for(uint32 index = 0; index < length; index++)
                     {
-                        if(!isspace((*vi)[i]))
+                        if(!isspace((*i)[index]))
                         {
                             notJustWhiteSpace = true;
                             break;
@@ -177,24 +176,24 @@ BOOL MusicBrowserUI::EditTrackInfoDlgProc(HWND hwnd,
                     }
 
                     if(notJustWhiteSpace)
-                        ComboBox_AddString(hwndAlbum, (*vi).c_str());
+                        ComboBox_AddString(hwndAlbum, (*i).c_str());
                 }
             }
 
             ComboBox_SetText(hwndAlbum, m_editTrackMetaData.Album().c_str());
 
             // add genres
-            for(si = genres.begin(); si != genres.end(); si++)
+            for(i = genres.begin(); i != genres.end(); i++)
             {
-                uint32 length = (*si).size();
+                uint32 length = (*i).size();
 
                 if(length)
                 {
                     bool notJustWhiteSpace = false;
 
-                    for(uint32 i = 0; i < length; i++)
+                    for(uint32 index = 0; index < length; indexi++)
                     {
-                        if(!isspace((*si)[i]))
+                        if(!isspace((*i)[index]))
                         {
                             notJustWhiteSpace = true;
                             break;
@@ -202,7 +201,7 @@ BOOL MusicBrowserUI::EditTrackInfoDlgProc(HWND hwnd,
                     }
 
                     if(notJustWhiteSpace)
-                        ComboBox_AddString(hwndGenre, (*si).c_str());
+                        ComboBox_AddString(hwndGenre, (*i).c_str());
                 }
             }
 
@@ -317,8 +316,8 @@ BOOL MusicBrowserUI::EditTrackInfoDlgProc(HWND hwnd,
     return result;
 }
 
-void MusicBrowserUI::CreateEditInfoLists(vector<string>& artists,
-                                         vector<string>& albums,
+void MusicBrowserUI::CreateEditInfoLists(set<string>& artists,
+                                         set<string>& albums,
                                          set<string>& genres)
 {
     vector<ArtistList*>*            artistList;
@@ -333,7 +332,7 @@ void MusicBrowserUI::CreateEditInfoLists(vector<string>& artists,
     {
         vector<AlbumList*>::iterator album;
 
-        artists.push_back((*artist)->name);
+        artists.insert((*artist)->name);
 
         for(album = (*artist)->m_albumList->begin();
             album != (*artist)->m_albumList->end();
@@ -341,7 +340,7 @@ void MusicBrowserUI::CreateEditInfoLists(vector<string>& artists,
         {
             vector<PlaylistItem*>::iterator track;
 
-            albums.push_back((*album)->name);
+            albums.insert((*album)->name);
 
             for(track = (*album)->m_trackList->begin();
                 track != (*album)->m_trackList->end();

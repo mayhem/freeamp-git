@@ -327,6 +327,32 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
             break; 
         }
 
+        case INFO_MusicCatalogTrackChanged:
+        {
+            MusicCatalogTrackChangedEvent* pie = (MusicCatalogTrackChangedEvent*)event;
+
+            vector<MusicBrowserUI *>::iterator i;
+
+            for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
+            {
+                (*i)->MusicCatalogTrackChanged(pie->OldArtist(), 
+                                               pie->NewArtist(), 
+                                               pie->OldAlbum(), 
+                                               pie->NewAlbum(), 
+                                               pie->OldItem(),
+                                               pie->NewItem());
+            }
+
+            MusicCatalogTrackChanged(pie->OldArtist(), 
+                                     pie->NewArtist(), 
+                                     pie->OldAlbum(), 
+                                     pie->NewAlbum(), 
+                                     pie->OldItem(),
+                                     pie->NewItem());
+            
+            break; 
+        }
+
         case INFO_MusicCatalogTrackAdded:
         {
             MusicCatalogTrackAddedEvent* pie = (MusicCatalogTrackAddedEvent*)event;
