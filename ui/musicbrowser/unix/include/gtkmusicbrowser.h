@@ -110,6 +110,7 @@ class GTKMusicBrowser {
     string m_currentListName;
 
     vector<TreeData *> *mbSelections;
+
     GtkCTree *musicBrowserTree;
  
     FAContext *GetContext(void) { return m_context; }

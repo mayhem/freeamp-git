@@ -175,6 +175,33 @@ bool Misc::ReadMetaData(const char* url, MetaData* metadata)
         metadata->SetTitle("RTP Stream");
     }
 
+    // do we need to come up with a track number?
+    if (!strncasecmp(url, "file://", 7) && !metadata->Track())
+    {
+        char *temp = new char[strlen(url) + 1];
+        strcpy(temp, url);
+
+        char *ext = strrchr(temp, '.');
+        char *file = strrchr(temp, '/');
+
+        if (ext) {
+            *ext = '\0';
+            ext++;
+        }
+        if (!file)
+            file = temp;
+        else
+            file++;
+        
+        while (file && !isdigit(*file))
+            file++;
+
+        if (strlen(file) > 4)
+            metadata->SetTrack(atoi(file));
+
+        delete [] temp;
+    }
+
     // do we need to convert underscores?
     bool convertUnderscores = false;
 

@@ -106,7 +106,7 @@ vector<PlaylistItem *> *GTKMusicBrowser::GetTreeSelection(void)
         case kTreeMyMusic:
         case kTreeAll: {
             MusicCatalog *cat = data->catalog;
-            if (!cat)
+            if (!cat) 
                 return newlist;
             vector<ArtistList *> *artistList =
                                    (vector<ArtistList *>*)cat->GetMusicList();

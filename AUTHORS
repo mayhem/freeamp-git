@@ -148,3 +148,6 @@ Michael Rich <istan@alltel.net>
 
 "Chris Kuklewicz" <chrisk@mit.edu>
 * patch to StopTimer to properly handle NULL timers.
+
+"Robert Hart" <ab6rah@bath.ac.uk>
+* patch to grab track numbers from filenames

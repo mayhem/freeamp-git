@@ -22,6 +22,7 @@
 ____________________________________________________________________________*/ 
 
 #include <gtk/gtk.h>
+#include <gdk/gdkkeysyms.h>
 #include <unistd.h>
 
 #include "gtkmessagedialog.h"
@@ -118,6 +119,29 @@ static void check_box_toggle(GtkWidget *w, GTKMessageDialog *p)
     p->SetCheck(bool(i));
 }
 
+/* Keyboard accelerators courtesy of Chris Kuklewicz <chrisk@mit.edu> */
+static GtkWidget *new_button_with_accel(const char *uline_label,
+                                        GtkAccelGroup *accel_group,
+                                        bool useEscape = false)
+{
+    GtkWidget *button;
+    GtkWidget *label;
+   
+    button = gtk_button_new();
+    label = gtk_label_new(NULL);
+    gtk_widget_add_accelerator(button, "clicked", accel_group,
+                               gtk_label_parse_uline(GTK_LABEL(label), 
+                               uline_label), GDK_MOD1_MASK, (GtkAccelFlags)0);
+    if (useEscape)
+        gtk_widget_add_accelerator(button, "clicked", accel_group, GDK_Escape,
+                                   0, (GtkAccelFlags)0);
+
+    gtk_widget_show(label);
+    gtk_container_add(GTK_CONTAINER(button), label);
+
+    return button;
+}
+
 MessageDialogReturnEnum GTKMessageDialog::
                         Show(const string      &oMessage, 
                              const string      &oTitle, 
@@ -125,6 +149,8 @@ MessageDialogReturnEnum GTKMessageDialog::
                              bool inMain)
 {
     GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    GtkAccelGroup *accel_group = gtk_accel_group_new();
+    gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
     if (inMain)
         gtk_window_set_modal(GTK_WINDOW(window), TRUE);
     gtk_signal_connect(GTK_OBJECT(window), "destroy",
@@ -168,73 +194,79 @@ MessageDialogReturnEnum GTKMessageDialog::
     int iRet = 0;
     switch (eType) {
         case kMessageOk: {
-            button = gtk_button_new_with_label("OK");
+            button = new_button_with_accel("_OK", accel_group, true);
             gtk_signal_connect(GTK_OBJECT(button), "clicked",
                                GTK_SIGNAL_FUNC(ok_click), &iRet);
             gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-                               GTK_SIGNAL_FUNC(gtk_widget_destroy), 
-                               GTK_OBJECT(window));
+                                      GTK_SIGNAL_FUNC(gtk_widget_destroy), 
+                                      GTK_OBJECT(window));
             gtk_container_add(GTK_CONTAINER(hbox), button);
             gtk_widget_show(button);
+            gtk_widget_grab_focus(button);
             break; }
         case kMessageYesNo: {
-            button = gtk_button_new_with_label("Yes");
+            button = new_button_with_accel("_Yes", accel_group);
             gtk_signal_connect(GTK_OBJECT(button), "clicked",
                                GTK_SIGNAL_FUNC(yes_click), &iRet);
             gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-                               GTK_SIGNAL_FUNC(gtk_widget_destroy),
-                               GTK_OBJECT(window));
+                                      GTK_SIGNAL_FUNC(gtk_widget_destroy),
+                                      GTK_OBJECT(window));
             gtk_container_add(GTK_CONTAINER(hbox), button);
             gtk_widget_show(button);
+            gtk_widget_grab_focus(button);
 
-            button = gtk_button_new_with_label("No");
+            button = new_button_with_accel("_No", accel_group, true);
             gtk_signal_connect(GTK_OBJECT(button), "clicked",
                                GTK_SIGNAL_FUNC(no_click), &iRet);
             gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-                               GTK_SIGNAL_FUNC(gtk_widget_destroy),
-                               GTK_OBJECT(window));
+                                      GTK_SIGNAL_FUNC(gtk_widget_destroy),
+                                      GTK_OBJECT(window));
             gtk_container_add(GTK_CONTAINER(hbox), button);
             gtk_widget_show(button);
             break; }
         case kMessageOkCancel: {
-            button = gtk_button_new_with_label("OK");
+            button = new_button_with_accel("_OK", accel_group);
             gtk_signal_connect(GTK_OBJECT(button), "clicked",
                                GTK_SIGNAL_FUNC(ok_click), &iRet);
             gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-                               GTK_SIGNAL_FUNC(gtk_widget_destroy),
-                               GTK_OBJECT(window));
+                                      GTK_SIGNAL_FUNC(gtk_widget_destroy),
+                                      GTK_OBJECT(window));
             gtk_container_add(GTK_CONTAINER(hbox), button);
             gtk_widget_show(button);
+            gtk_widget_grab_focus(button);
 
-            button = gtk_button_new_with_label("Cancel");
+            button = new_button_with_accel("_Cancel", accel_group, true);
             gtk_signal_connect(GTK_OBJECT(button), "clicked",
                                GTK_SIGNAL_FUNC(cancel_click), &iRet);
             gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-                               GTK_SIGNAL_FUNC(gtk_widget_destroy),
-                               GTK_OBJECT(window));
+                                      GTK_SIGNAL_FUNC(gtk_widget_destroy),
+                                      GTK_OBJECT(window));
             gtk_container_add(GTK_CONTAINER(hbox), button);
             gtk_widget_show(button);
             break; }
         case kMessageMonicaSucks: {
-            button = gtk_button_new_with_label("Retry");
+            button = new_button_with_accel("_Retry", accel_group, true);
             gtk_signal_connect(GTK_OBJECT(button), "clicked",
                                GTK_SIGNAL_FUNC(retry_click), &iRet);
             gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-                               GTK_SIGNAL_FUNC(gtk_widget_destroy),
-                               GTK_OBJECT(window));
+                                      GTK_SIGNAL_FUNC(gtk_widget_destroy),
+                                      GTK_OBJECT(window));
             gtk_container_add(GTK_CONTAINER(hbox), button);
             gtk_widget_show(button);
+            gtk_widget_grab_focus(button);
 
-            button = gtk_button_new_with_label("Cancel");
+            button = new_button_with_accel("_Cancel", accel_group);
             gtk_signal_connect(GTK_OBJECT(button), "clicked",
                                GTK_SIGNAL_FUNC(cancel_click), &iRet);
             gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-                               GTK_SIGNAL_FUNC(gtk_widget_destroy),
-                               GTK_OBJECT(window));
+                                      GTK_SIGNAL_FUNC(gtk_widget_destroy),
+                                      GTK_OBJECT(window));
             gtk_container_add(GTK_CONTAINER(hbox), button);
             gtk_widget_show(button);
             break; }
     }
+    if (hasEntry)
+        gtk_widget_grab_focus(entryBox);
 
     gtk_widget_show(window);
 

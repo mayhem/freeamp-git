@@ -48,6 +48,7 @@ PLUGINS += plugins/lcd.ui
 PLUGINS += plugins/irman.ui
 
 PLUGINS += plugins/xingmp3.lmc
+PLUGINS += plugins/vorbis.lmc
 PLUGINS += plugins/cd.lmc
 
 PLUGINS += plugins/id3v1.mdf
