@@ -87,6 +87,7 @@ SoundCardPMO::~SoundCardPMO()
       m_pBufferThread->Join();
       delete m_pBufferThread;
    }
+
    Reset(true);
    close(audio_fd);
 

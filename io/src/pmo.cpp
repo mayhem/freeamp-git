@@ -40,6 +40,7 @@ ____________________________________________________________________________*/
 #include "facontext.h"
 #include "log.h"
 
+#define DB printf("%s:%d\n", __FILE__, __LINE__);  
 
 PhysicalMediaOutput::PhysicalMediaOutput(FAContext *context) :
                      PipelineUnit(context)

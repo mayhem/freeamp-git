@@ -88,6 +88,8 @@ private:
    bool            m_bLoop, m_bDiscarded;
    FILE           *m_fpSave;
    char           *m_szError;
+   bool            m_bUseProxy;
+   char            m_szProxyHost[iMaxUrlLen];
 };
 
 #endif /* _HTTPFILEINPUT_H_ */

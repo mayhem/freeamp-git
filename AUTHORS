@@ -64,3 +64,6 @@ Other major contributors and their contributions:
 
 "Tom Spindler" <dogcow@globalcenter.net>
 * Solaris port, makefile organization
+
+"Alan Cutter" <alien@azure.melloworld.com>
+* HTTP Proxy patch

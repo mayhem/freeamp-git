@@ -581,13 +581,16 @@ EventServiceThreadFunc(void *pPlayer)
 
    while (rtnVal == 0)
    {                            // serviceEvent will return 1 if error or time
-      pP->m_eventSem->Wait();
+      if (pP->m_eventQueue->Peek() == NULL)
+          pP->m_eventSem->Wait();
+
       pC = pP->m_eventQueue->Read();
       if (pC)
       {
          rtnVal = pP->ServiceEvent(pC);
       }
    }
+   printf("Event service thread bye bye!\n");
 }
 
 int32     
@@ -929,14 +932,14 @@ CreatePMO(PlayListItem * pc, Event * pC)
 
    epilogue:
 
-   if (pmi)
-   {
-       delete pmi;
-   }
-
    if (pmo)
    {
        delete pmo;
+   }
+
+   if (pmi)
+   {
+       delete pmi;
    }
 
    if (lmc)

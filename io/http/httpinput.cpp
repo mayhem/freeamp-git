@@ -100,6 +100,8 @@ extern    "C"
 HttpInput::HttpInput(FAContext *context):
            PhysicalMediaInput(context)
 {
+    unsigned int len;
+
     m_path = NULL;
     m_hHandle = -1;
     m_bLoop = false;
@@ -107,6 +109,15 @@ HttpInput::HttpInput(FAContext *context):
     m_pBufferThread = NULL;
     m_fpSave = NULL;
     m_szError = new char[iMaxErrorLen];
+
+    m_pContext->prefs->GetPrefBoolean(kUseProxyPref, &m_bUseProxy);
+    if (m_bUseProxy)
+    {
+        m_pContext->prefs->GetPrefString(kProxyHostPref, m_szProxyHost, &len);
+        if ( len == 0 )
+            m_pContext->log->Error("useProxy is true but ProxyHost "
+                                  "has no value ?!");
+    }   
 }
 
 HttpInput::~HttpInput()
@@ -171,14 +182,14 @@ Error HttpInput::Prepare(PullBuffer *&pBuffer, bool bStartThread)
             result = Run();
             if (IsError(result))
             {
-                ReportError("Could not run the input plugin.");
+                LogError("Could not run the input plugin.");
                 return result;
             }
         }
     }
     else
     {
-       ReportError("Could not open the specified file.");
+       LogError("Could not open the specified stream.");
        return result;
     }
 
@@ -243,10 +254,9 @@ void HttpInput::LogError(char *szErrorMsg)
    LocalFree(lpMessageBuffer);
 
 #else
-    sprintf(m_szError, "%s: %s", szErrorMsg, strerror(errno));
+    ReportError(szErrorMsg);
 #endif
-    ReportError(m_szError);
-    m_pContext->log->Error("%s\n", m_szError);
+    m_pContext->log->Error("%s\n", szErrorMsg);
 }
 
 // NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
@@ -285,40 +295,57 @@ Error HttpInput::Open(void)
 
     szStreamName[0] = 0;
 
-    iRet = sscanf(m_path, "http://%[^:/]:%d", szHostName, &iPort);
-    if (iRet < 1)
+    if (!m_bUseProxy)
     {
-        ReportError("Bad URL format. URL format: http:<host name>"
-                             ":[port][/path]");
-        m_pContext->log->Error("Badly formatted URL: %s\n", m_path);
-        return (Error)httpError_BadUrl;
-    }
+        iRet = sscanf(m_path, "http://%[^:/]:%d", szHostName, &iPort);
+        if (iRet < 1)
+        {
+           LogError("Bad URL format. URL format: http:<host name>"
+                              ":[port][/path]");
+           m_pContext->log->Error("Badly formatted URL: %s\n", m_path);
+           return (Error)httpError_BadUrl;
+        }
+        szFile = strchr(m_path + 7, '/');
+     }
+     else
+     {
+        printf("Using proxy!\n");
+        iRet = sscanf(m_szProxyHost, "http://%[^:/]:%d", szHostName, &iPort);
+        if (iRet < 1)
+        {
+           LogError("Bad Proxy URL format. URL format: http:"
+                                "<host name>:[port]");
+           m_pContext->log->Error("Badly formatted Proxy URL: %s\n", 
+                m_szProxyHost);
+           return (Error)httpError_BadUrl;
+        }
+        szFile = m_path;
+     }
 
-    if (iRet < 2)
-       iPort = iHttpPort;
+     if (iRet < 2)
+        iPort = iHttpPort;
 
-    szFile = strchr(m_path + 7, '/');
-    memset(&sAddr, 0, sizeof(struct sockaddr_in));
+     memset(&sAddr, 0, sizeof(struct sockaddr_in));
 
-    eRet = GetHostByName(szHostName, &sHost);
-    if (eRet != kError_NoErr)
-    {
-       sprintf(m_szError, "Cannot find host %s\n", szHostName);
-       ReportError(m_szError);
-       m_pContext->log->Error("Cannot find host %s\n", szHostName);
-       return (Error)httpError_CustomError;
-    }
+     eRet = GetHostByName(szHostName, &sHost);
+     if (eRet != kError_NoErr)
+     {
+          sprintf(m_szError, "Cannot find host %s\n", szHostName);
+          LogError(m_szError);
+          m_pContext->log->Error("Cannot find host %s\n", szHostName);
+          return (Error)httpError_CustomError;
+     }
 
-    memcpy((char *)&sAddr.sin_addr,sHost.h_addr, sHost.h_length);
-    sAddr.sin_family= sHost.h_addrtype;
-    sAddr.sin_port= htons((unsigned short)iPort);
+     memcpy((char *)&sAddr.sin_addr,sHost.h_addr, sHost.h_length);
+     sAddr.sin_family= sHost.h_addrtype;
+     sAddr.sin_port= htons((unsigned short)iPort); 
 
-    m_hHandle = socket(sHost.h_addrtype,SOCK_STREAM,0);
-    if (m_hHandle < 0)
-    {
-       LogError("Cannot create socket");
-       return (Error)httpError_CannotOpenSocket;
-    }
+     m_hHandle = socket(sHost.h_addrtype,SOCK_STREAM,0);
+     if (m_hHandle < 0)
+     {
+          LogError("Cannot create socket");
+          return (Error)httpError_CannotOpenSocket;
+     }    
 
 #ifndef WIN32
     fcntl(m_hHandle, F_SETFL, fcntl(m_hHandle, F_GETFL) | O_NONBLOCK);
@@ -334,7 +361,7 @@ Error HttpInput::Open(void)
         iRet = select(m_hHandle + 1, NULL, &sSet, NULL, &sTv);
         if (!iRet)
         {
-		   usleep(100000);
+           usleep(100000);
            continue;
         }
 
@@ -361,12 +388,12 @@ Error HttpInput::Open(void)
     iRet = send(m_hHandle, szQuery, strlen(szQuery), 0);
     if (iRet != (int)strlen(szQuery))
     {
-		delete szQuery;
+        delete szQuery;
         LogError("Cannot write to socket");
         closesocket(m_hHandle);
         return (Error)httpError_SocketWrite;
     }
-	delete szQuery;
+	 delete szQuery;
 
     pInitialBuffer = new char[iInitialBufferSize + 1];
 
@@ -393,7 +420,7 @@ Error HttpInput::Open(void)
         return (Error)kError_Interrupt;
 
     if (sscanf(pInitialBuffer, " ICY %d %255[^\n\r]", &iRet, m_szError) ||
-        sscanf(pInitialBuffer, " HTTP/1.0 %d %255[^\n\r]", &iRet, m_szError))
+        sscanf(pInitialBuffer, " %*s %d %255[^\n\r]", &iRet, m_szError))
     {
         char *pHeaderData, *pPtr;
         int   iHeaderBytes = 0, iCurHeaderSize = iHeaderSize;
@@ -403,8 +430,7 @@ Error HttpInput::Open(void)
             char szErr[255];
 
             sprintf(szErr, "This stream is not available: %s\n", m_szError);
-            m_pContext->log->Error(szErr);
-            ReportError(szErr);
+            LogError(szErr);
 
 		      delete pInitialBuffer;
 		      closesocket(m_hHandle);
@@ -591,7 +617,7 @@ void HttpInput::WorkerThread(void)
              iRet = fwrite(pBuffer, sizeof(char), iRead, m_fpSave);
              if (iRet != iRead)
              {
-                 ReportError("Cannot save http stream to disk. Disk full?");
+                 LogError("Cannot save http stream to disk. Disk full?");
                  break;
              }
           }

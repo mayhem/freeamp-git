@@ -53,6 +53,8 @@ extern const char* kLogOutputPref;
 extern const char* kLogPerformancePref;
 extern const char* kSaveStreamsPref;
 extern const char* kSaveStreamsDirPref;
+extern const char* kUseProxyPref;
+extern const char* kProxyHostPref;
 
 class LibDirFindHandle;
 

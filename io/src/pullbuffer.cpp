@@ -36,7 +36,6 @@ ____________________________________________________________________________*/
 #define min(a,b) ((a) < (b) ? (a) : (b))
 #endif
 #define DB //printf("%s:%d\n",  __FILE__, __LINE__);
-#include "debug.hpp"
 
 PullBuffer::PullBuffer(size_t iBufferSize,
                        size_t iOverflowSize,

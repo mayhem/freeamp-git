@@ -46,6 +46,8 @@ const char* kWindowPositionWidthPref = "WindowPositionWidth";
 const char* kWindowPositionHeightPref = "WindowPositionHeight";
 const char* kSaveStreamsPref = "SaveStreams";
 const char* kSaveStreamsDirPref = "SaveStreamsDirectory";
+const char* kUseProxyPref = "UseProxy";
+const char* kProxyHostPref = "ProxyHost";  
 
 //logging
 const char* kUseDebugLogPref = "UseDebugLog";
