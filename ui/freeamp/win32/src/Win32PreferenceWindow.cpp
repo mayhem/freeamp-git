@@ -422,6 +422,7 @@ void Win32PreferenceWindow::GetPrefsValues(Preferences* prefs,
     prefs->GetShowToolbarTextLabels(&values->useTextLabels);
     prefs->GetShowToolbarImages(&values->useImages);
     prefs->GetSaveCurrentPlaylistOnExit(&values->savePlaylistOnExit);
+    prefs->GetPlayImmediately(&values->playImmediately);
 
     free(buffer);
 }
@@ -476,6 +477,7 @@ void Win32PreferenceWindow::SavePrefsValues(Preferences* prefs,
     prefs->SetShowToolbarImages(values->useImages);
 
     prefs->SetSaveCurrentPlaylistOnExit(values->savePlaylistOnExit);
+    prefs->SetPlayImmediately(values->playImmediately);
 
     // this gets called by each page unfortunately
     // so save some effort by only doing it once
@@ -517,6 +519,7 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
     static HWND hwndImagesOnly = NULL;
     static HWND hwndTextAndImages = NULL;
     static HWND hwndSavePlaylistOnExit = NULL;
+    static HWND hwndDefaultAction = NULL;
     
 
     switch(msg)
@@ -537,6 +540,7 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
             hwndImagesOnly = GetDlgItem(hwnd, IDC_IMAGESONLY);
             hwndTextAndImages = GetDlgItem(hwnd, IDC_TEXTANDIMAGES);
             hwndSavePlaylistOnExit = GetDlgItem(hwnd, IDC_SAVECURRENTLIST);
+            hwndDefaultAction = GetDlgItem(hwnd, IDC_DEFAULTACTION);
 
 
             Button_SetCheck(hwndStayOnTop, m_originalValues.stayOnTop);
@@ -546,6 +550,8 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
             Button_SetCheck(hwndAskReclaimFiletypes, m_originalValues.askReclaimFiletypes);
 
             Button_SetCheck(hwndSavePlaylistOnExit, m_originalValues.savePlaylistOnExit);
+
+            Button_SetCheck(hwndDefaultAction, !m_originalValues.playImmediately);
 
             Button_SetCheck(hwndTextOnly, 
                 m_originalValues.useTextLabels && !m_originalValues.useImages);
@@ -622,6 +628,29 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
                     {
                         m_proposedValues.useTextLabels = true;
                         m_proposedValues.useImages = true;
+                    }
+
+                    if(m_proposedValues != m_currentValues)
+                    {
+                        PropSheet_Changed(GetParent(hwnd), hwnd);
+                    }
+                    else
+                    {
+                        PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                    }
+
+                    break;
+                }
+
+                case IDC_DEFAULTACTION:
+                {
+                    if(Button_GetCheck(hwndDefaultAction) == BST_CHECKED)
+                    {
+                        m_proposedValues.playImmediately = false;
+                    }
+                    else
+                    {
+                        m_proposedValues.playImmediately = true;
                     }
 
                     if(m_proposedValues != m_currentValues)

@@ -59,6 +59,7 @@ typedef struct PrefsStruct
     bool useTextLabels;
     bool useImages;
     bool savePlaylistOnExit;
+    bool playImmediately;
 
     // page 2
     int32 streamInterval;
@@ -131,6 +132,7 @@ typedef struct PrefsStruct
             useImages == pref.useImages &&
 
             savePlaylistOnExit == pref.savePlaylistOnExit &&
+            playImmediately == pref.playImmediately &&
 
             true
         );
