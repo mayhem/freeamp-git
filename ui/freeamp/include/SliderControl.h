@@ -46,12 +46,12 @@ class SliderControl : public Control
 
     private:
 
-              void MoveThumb(int iCurrentPos, int iNewPos);
+              void MoveThumb(int iNewPos);
               void BlitTrough(int iPos);
 					  
       Pos     m_oOrigin, m_oLastPos;
       int     m_iRange;
-      int     m_iCurrentPos;
+      int     m_iCurrentPos, m_iLastThumbPos;
       int     m_iThumbWidth;
       bool    m_bIsDrag, m_bInUpdate;
       int     m_iNumThumbStates, m_iNumFrames;

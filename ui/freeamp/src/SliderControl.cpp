@@ -68,6 +68,7 @@ SliderControl::SliderControl(Window *pWindow, string &oName, int iThumbs,
      m_bHasTroughBitmap = false;
      m_bTroughMiddle = false;
      m_iCurrentTroughFrame = -1;
+     m_iLastThumbPos = -1; 
 };
 
 SliderControl::~SliderControl(void)
@@ -167,7 +168,7 @@ void SliderControl::Transition(ControlTransitionEnum  eTrans,
 
        case CT_SetValue:
        {
-           int iNewPos, iOldPos;    
+           int iNewPos;    
 
            if (m_iValue < 0 || m_iValue > 100)
                return;
@@ -188,13 +189,12 @@ void SliderControl::Transition(ControlTransitionEnum  eTrans,
               return;
            }
 
-           iOldPos = m_iCurrentPos;
            m_iCurrentPos = iNewPos;
            m_bInUpdate = false;
            m_oMutex.Release();
 
            if (!m_pPanel->IsHidden())
-               MoveThumb(iOldPos, iNewPos);
+               MoveThumb(iNewPos);
            
            return;
        }   
@@ -298,7 +298,7 @@ void SliderControl::Transition(ControlTransitionEnum  eTrans,
 void SliderControl::HandleJump(ControlTransitionEnum  eTrans,
                                Pos                   *pPos)
 {
-    int iNewPos, iOldPos;
+    int iNewPos;
 
     m_oMutex.Acquire();
 
@@ -311,8 +311,6 @@ void SliderControl::HandleJump(ControlTransitionEnum  eTrans,
        return;
     }   
 
-    iOldPos = m_iCurrentPos;
-    
     m_iCurrentPos = iNewPos;
     m_oLastPos = *pPos;
     
@@ -321,13 +319,13 @@ void SliderControl::HandleJump(ControlTransitionEnum  eTrans,
     
     m_oMutex.Release();
     
-    MoveThumb(iOldPos, iNewPos);
+    MoveThumb(iNewPos);
 }
 
 void SliderControl::HandleDrag(ControlTransitionEnum  eTrans,
                                Pos                   *pPos)
 {
-    int     iDelta, iNewPos, iOldPos;
+    int     iDelta, iNewPos;
 
     m_oMutex.Acquire();
 
@@ -359,29 +357,31 @@ void SliderControl::HandleDrag(ControlTransitionEnum  eTrans,
         return;
     }    
 
-    iOldPos = m_iCurrentPos;
     m_iCurrentPos = iNewPos;
     m_oLastPos = *pPos;
     
     m_iValue = (m_iCurrentPos * 100) / m_iRange;
     m_oMutex.Release();
 
-    MoveThumb(iOldPos, iNewPos);
+    MoveThumb(iNewPos);
     m_pParent->SendControlMessage(this, CM_SliderUpdate);
 }
 
-void SliderControl::MoveThumb(int iCurrentPos, int iNewPos)
+void SliderControl::MoveThumb(int iNewPos)
 {
     Canvas *pCanvas;
     Rect    oEraseRect, oRect;
 
-    oEraseRect.x1 = m_oRect.x1 + iCurrentPos;
-    oEraseRect.x2 = oEraseRect.x1 + m_iThumbWidth + 1;
-    oEraseRect.y1 = m_oRect.y1;
-    oEraseRect.y2 = m_oRect.y2 + 1;
-    
     pCanvas = m_pParent->GetCanvas();
-    pCanvas->Erase(oEraseRect);
+    if (m_iLastThumbPos >= 0)
+    {
+        oEraseRect.x1 = m_oRect.x1 + m_iLastThumbPos;
+        oEraseRect.x2 = oEraseRect.x1 + m_iThumbWidth + 1;
+        oEraseRect.y1 = m_oRect.y1;
+        oEraseRect.y2 = m_oRect.y2 + 1;
+        
+        pCanvas->Erase(oEraseRect);
+    }
 
     oRect.x1 = m_oRect.x1 + iNewPos;
     oRect.x2 = oRect.x1 + m_iThumbWidth;
@@ -419,6 +419,8 @@ void SliderControl::MoveThumb(int iCurrentPos, int iNewPos)
     
     oEraseRect.Union(oRect);
     pCanvas->Invalidate(oEraseRect);
+
+    m_iLastThumbPos = iNewPos;
 } 
 
 void SliderControl::BlitTrough(int iPos)
