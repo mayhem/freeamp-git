@@ -90,6 +90,7 @@ class TextView : public View {
 
     char*               m_text;
     int32               m_textLength;
+    int32               m_bitmapLength;
 
     Thread*             m_thread;
     CRITICAL_SECTION    m_criticalSection;
