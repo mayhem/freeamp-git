@@ -778,10 +778,10 @@ Error MusicCatalog::RePopulateFromDatabase()
     while (key) {
         err = Add(key);
 
-        if (IsError(err)) {
-             m_context->target->AcceptEvent(new ErrorMessageEvent("There was an internal error during generation of the Music Catalog"));
-             m_catMutex->Release();
-             return kError_YouScrewedUp;
+        if (IsError(err)) { 
+             //m_context->target->AcceptEvent(new ErrorMessageEvent("There was an internal error during generation of the Music Catalog"));
+             //m_catMutex->Release();
+             //return kError_YouScrewedUp;
         }
             
         key = m_database->NextKey(key);

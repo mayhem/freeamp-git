@@ -207,8 +207,8 @@ int Database::GetSubVersion(void)
 
     if (!stored_ver)
         sub_ver = 0;
-    
-    sub_ver = atoi(stored_ver);
+    else
+        sub_ver = atoi(stored_ver);
 
     delete [] stored_ver;
     return sub_ver;
