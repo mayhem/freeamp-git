@@ -151,12 +151,14 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
 
     musicbrainz_t o;
     int    ret;
-    char   *args[11];
+    char   *args[20];
     char    temp[255], guid[40], url[MAX_PATH];
     char    hostname[MAX_PATH], file[MAX_PATH];
     int     i, port;
     uint32  len = MAX_PATH;
     BitprintInfo  info;
+
+    memset(args, 0, sizeof(args));
 
     // Parse the musicbrainz server from the preference
     m_context->prefs->GetPrefString(kMBServerPref, url, &len);
@@ -191,48 +193,47 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
     fclose(guidLogfile);
 
     args[0] = strdup(pmetaData->Title().c_str());
-    args[1] = strdup(guid);
-    args[2] = strdup(pmetaData->Filename().c_str());
-    args[3] = strdup(pmetaData->Artist().c_str());
-    args[4] = strdup(pmetaData->Album().c_str());
+    args[1] = strdup(pmetaData->Artist().c_str());
+    args[2] = strdup(pmetaData->Album().c_str());
     sprintf(temp, "%d", pmetaData->Track());
-    args[5] = strdup(temp);
-    sprintf(temp, "%d", pmetaData->Length());
-    args[6] = strdup(temp);
+    args[3] = strdup(temp);
+    args[4] = strdup(guid);
+    args[5] = strdup(pmetaData->Filename().c_str());
     sprintf(temp, "%d", pmetaData->Year());
-    args[7] = strdup(temp);
-    args[8] = strdup(pmetaData->Genre().c_str());
-    args[9] = strdup(pmetaData->Comment().c_str());
+    args[6] = strdup(temp);
+    args[7] = strdup(pmetaData->Genre().c_str());
+    args[8] = strdup(pmetaData->Comment().c_str());
 
-    // These are the bitzi bitpint metadata
-    args[10] = strdup(info.bitprint);
-    args[11] = strdup(info.first20);
+    // These are the bitzi bitpint metadata items
+    args[9] = strdup(info.bitprint);
+    args[10] = strdup(info.first20);
     sprintf(temp, "%d", info.length);
-    args[12] = strdup(temp);
+    args[11] = strdup(temp);
 
     if (info.audioSha1)
     {
-        args[13] = strdup(info.audioSha1);
+        args[12] = strdup(info.audioSha1);
         sprintf(temp, "%d", info.duration);
-        args[14] = strdup(temp);
+        args[13] = strdup(temp);
         sprintf(temp, "%d", info.samplerate);
-        args[15] = strdup(temp);
+        args[14] = strdup(temp);
         sprintf(temp, "%d", info.bitrate);
-        args[16] = strdup(temp);
+        args[15] = strdup(temp);
         sprintf(temp, "%d", info.stereo);
-        args[17] = strdup(temp);
+        args[16] = strdup(temp);
         sprintf(temp, "%d", info.vbr);
-        args[18] = strdup(temp);
-        args[19] = NULL;
+        args[17] = strdup(temp);
+        args[18] = NULL;
     }
     else
     {
-        args[13] = NULL;
+        args[12] = NULL;
     }
 
     ret = mb_QueryWithArgs(o, MB_ExchangeMetadata, args);
     for(i = 0; i < 11; i++)
-       free(args[i]);
+       if (args[i])
+           free(args[i]);
 
     if (!ret)
     {
