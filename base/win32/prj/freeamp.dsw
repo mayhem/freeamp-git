@@ -555,6 +555,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "wavlmc"=..\..\..\lmc\wav\win32\prj\wavlmc.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "wavout"=..\..\..\io\wavout\win32\prj\wavout.dsp - Package Owner=<4>
 
 Package=<5>

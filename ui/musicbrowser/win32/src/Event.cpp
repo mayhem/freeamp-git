@@ -1979,7 +1979,9 @@ void MusicBrowserUI::AddFileEvent(HWND hwndParent, bool playNow)
     char szFilter[1024] = "MPEG Audio Streams (.mp1;.mp2;.mp3;.mpp)\0"
                           "*.mp1;*.mp2;*.mp3;*.mpp\0"
                           "Ogg/Vorbis Streams (.ogg)\0"
-                          "*.ogg\0";
+                          "*.ogg\0"
+                          "WAV Files (.wav)\0"
+                          "*.wav\0";
 
     // we need a way to iterate LMCs...
     iOffset += strlen(szFilter) + 1; 
