@@ -365,6 +365,8 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
          m_pWindow->ControlStringValue("BufferInfo", true, oEmpty);
          m_oStreamInfo = "";
          m_pWindow->ControlStringValue("StreamInfo", true, oEmpty);
+         m_pWindow->ControlStringValue("SampleRate", true, oEmpty);
+         m_pWindow->ControlStringValue("BitRate", true, oEmpty);
          
          if (e->Type() == INFO_Stopped)
          {
@@ -564,6 +566,15 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
 
          m_oStreamInfo = text;
          m_pWindow->ControlStringValue("StreamInfo", true, m_oStreamInfo);
+
+         sprintf(text, "%d", info->GetBitRate() / 1000);    
+         string tempstr = text;
+         m_pWindow->ControlStringValue("BitRate", true, tempstr);
+         
+         sprintf(text, "%d", info->GetSampleRate() / 1000);
+         tempstr = text;
+         m_pWindow->ControlStringValue("SampleRate", true, tempstr);
+
          delete [] text;
       
          break;

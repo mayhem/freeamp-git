@@ -156,6 +156,7 @@ void GTKCanvas::Erase(Rect &oRect)
 {
     Rect newRect = oRect;
     newRect.y2++;
+    newRect.x2++;
     if (m_pBufferBitmap)
         m_pBufferBitmap->MaskBlitRect(m_pBGBitmap, newRect, newRect);
 }
