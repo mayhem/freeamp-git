@@ -70,56 +70,56 @@ FirstInner:
 	add esi,64		; si += 64
 	add ecx,4		; Advance coef pointer
 	and esi,edi		; si &= 511
-	faddp st(1),st			; Add to sum
+	faddp st(1),st	; Add to sum
 
 	fld DWORD PTR [ecx]		; Push *coef
 	fmul DWORD PTR [ebp+ebx*4]	; Multiply by vbuf[bx]
 	add ebx,64		; bx += 64
 	add ecx,4		; Advance coef pointer
 	and ebx,edi		; bx &= 511
-	fsubrp st(1),st			; Subtract from sum
+	fsubrp st(1),st	; Subtract from sum
 ;--
 	fld DWORD PTR [ecx]		; Push *coef
 	fmul DWORD PTR [ebp+esi*4]	; Multiply by vbuf[si]
 	add esi,64		; si += 64
 	add ecx,4		; Advance coef pointer
 	and esi,edi		; si &= 511
-	faddp st(1),st			; Add to sum
+	faddp st(1),st	; Add to sum
 
 	fld DWORD PTR [ecx]		; Push *coef
 	fmul DWORD PTR [ebp+ebx*4]	; Multiply by vbuf[bx]
 	add ebx,64		; bx += 64
 	add ecx,4		; Advance coef pointer
 	and ebx,edi		; bx &= 511
-	fsubrp st(1),st			; Subtract from sum
+	fsubrp st(1),st	; Subtract from sum
 ;--
 	fld DWORD PTR [ecx]		; Push *coef
 	fmul DWORD PTR [ebp+esi*4]	; Multiply by vbuf[si]
 	add esi,64		; si += 64
 	add ecx,4		; Advance coef pointer
 	and esi,edi		; si &= 511
-	faddp st(1),st			; Add to sum
+	faddp st(1),st	; Add to sum
 
 	fld DWORD PTR [ecx]		; Push *coef
 	fmul DWORD PTR [ebp+ebx*4]	; Multiply by vbuf[bx]
 	add ebx,64		; bx += 64
 	add ecx,4		; Advance coef pointer
 	and ebx,edi		; bx &= 511
-	fsubrp st(1),st			; Subtract from sum
+	fsubrp st(1),st	; Subtract from sum
 ;--
 	fld DWORD PTR [ecx]		; Push *coef
 	fmul DWORD PTR [ebp+esi*4]	; Multiply by vbuf[si]
 	add esi,64		; si += 64
 	add ecx,4		; Advance coef pointer
 	and esi,edi		; si &= 511
-	faddp st(1),st			; Add to sum
+	faddp st(1),st	; Add to sum
 
 	fld DWORD PTR [ecx]		; Push *coef
 	fmul DWORD PTR [ebp+ebx*4]	; Multiply by vbuf[bx]
 	add ebx,64		; bx += 64
 	add ecx,4		; Advance coef pointer
 	and ebx,edi		; bx &= 511
-	fsubrp st(1),st			; Subtract from sum
+	fsubrp st(1),st	; Subtract from sum
 ;--
 ; END REPEAT
 
@@ -161,14 +161,14 @@ SpecialInner:
 	add ebx,64		; bx += 64
 	add ecx,4		; Increment coef pointer
 	and ebx,edi		; bx &= 511
-	faddp st(1),st			; Add to sum
+	faddp st(1),st	; Add to sum
 ;--
 	fld DWORD PTR [ecx]		; Push *coef
 	fmul DWORD PTR [ebp+ebx*4]	; Multiply by vbuf[bx]
 	add ebx,64		; bx += 64
 	add ecx,4		; Increment coef pointer
 	and ebx,edi		; bx &= 511
-	faddp st(1),st			; Add to sum
+	faddp st(1),st	; Add to sum
 ;--
 ; END REPEAT
 
@@ -211,56 +211,56 @@ LastInner:
 	add esi,64		; si += 64
 	sub ecx,4		; Back up coef pointer
 	and esi,edi		; si &= 511
-	faddp st(1),st			; Add to sum
+	faddp st(1),st	; Add to sum
 
 	fld DWORD PTR [ecx]		; Push *coef
 	fmul DWORD PTR [ebp+ebx*4]	; Multiply by vbuf[bx]
 	add ebx,64		; bx += 64
 	sub ecx,4		; Back up coef pointer
 	and ebx,edi		; bx &= 511
-	faddp st(1),st			; Add to sum
+	faddp st(1),st	; Add to sum
 ;--
 	fld DWORD PTR [ecx]		; Push *coef
 	fmul DWORD PTR [ebp+esi*4]	; Multiply by vbuf[si]
 	add esi,64		; si += 64
 	sub ecx,4		; Back up coef pointer
 	and esi,edi		; si &= 511
-	faddp st(1),st			; Add to sum
+	faddp st(1),st	; Add to sum
 
 	fld DWORD PTR [ecx]		; Push *coef
 	fmul DWORD PTR [ebp+ebx*4]	; Multiply by vbuf[bx]
 	add ebx,64		; bx += 64
 	sub ecx,4		; Back up coef pointer
 	and ebx,edi		; bx &= 511
-	faddp st(1),st			; Add to sum
+	faddp st(1),st	; Add to sum
 ;--
 	fld DWORD PTR [ecx]		; Push *coef
 	fmul DWORD PTR [ebp+esi*4]	; Multiply by vbuf[si]
 	add esi,64		; si += 64
 	sub ecx,4		; Back up coef pointer
 	and esi,edi		; si &= 511
-	faddp st(1),st			; Add to sum
+	faddp st(1),st	; Add to sum
 
 	fld DWORD PTR [ecx]		; Push *coef
 	fmul DWORD PTR [ebp+ebx*4]	; Multiply by vbuf[bx]
 	add ebx,64		; bx += 64
 	sub ecx,4		; Back up coef pointer
 	and ebx,edi		; bx &= 511
-	faddp st(1),st			; Add to sum
+	faddp st(1),st	; Add to sum
 ;--
 	fld DWORD PTR [ecx]		; Push *coef
 	fmul DWORD PTR [ebp+esi*4]	; Multiply by vbuf[si]
 	add esi,64		; si += 64
 	sub ecx,4		; Back up coef pointer
 	and esi,edi		; si &= 511
-	faddp st(1),st			; Add to sum
+	faddp st(1),st	; Add to sum
 
 	fld DWORD PTR [ecx]		; Push *coef
 	fmul DWORD PTR [ebp+ebx*4]	; Multiply by vbuf[bx]
 	add ebx,64		; bx += 64
 	sub ecx,4		; Back up coef pointer
 	and ebx,edi		; bx &= 511
-	faddp st(1),st			; Add to sum
+	faddp st(1),st	; Add to sum
 ;--
 ; END REPEAT
 
@@ -403,8 +403,8 @@ BackInnerLoop:
 	mov ebp,DWORD PTR [ebx+eax]
 	mov DWORD PTR [esi+edx],ebp	; f[p] = x2[q]
 	fld DWORD PTR [edi+eax]	; push x[q]
-	fadd st(1),st
-	fxch st(1),st
+	fadd 
+	fxch 
 	fstp DWORD PTR [esi+edx+4]	; f[p + 4] = x[q] + x[q + 4]
 	sub eax,4		; q -= 4
 	sub edx,8		; p -= 8
