@@ -1,0 +1,7 @@
+[TopDir]
+file0=..\..\base\win32\prj\plugins\pls.plf
+
+[General]
+Type=FILELIST
+Version=1.00.000
+

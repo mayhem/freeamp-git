@@ -50,37 +50,39 @@ PASSWORD=
 TARGETHIDDEN=General Application Destination
 
 [Components]
-component9=Program Files
+component9=Default Plugins
 component0=System DLLs
 component1=MetaData\ID3v1
-component10=Input & Output\OBS Input
-component2=MetaData
-component11=Playlist Formats\M3U
+component10=Program Files
+component2=MetaData\ID3v2
+component11=Input & Output\OBS Input
 component3=Input & Output
 component12=Default Theme
-component4=MetaData\ID3v2
-component13=Portable Players
+component4=MetaData
+component13=Playlist Formats\M3U
 component5=Input & Output\DirectSound Output
 component14=Playlist Formats
-component6=Input & Output\HTTP Input
-component15=Portable Players\Rio PMP300
-component7=Default Plugins
+component6=Playlist Formats\PLS
+component15=Portable Players
+component7=Input & Output\HTTP Input
+component16=Portable Players\Rio PMP300
 component8=Input & Output\Soundcard Output
 
-[MetaData\ID3v2]
+[MetaData]
 SELECTED=Yes
 FILENEED=STANDARD
 HTTPLOCATION=
 STATUS=
 UNINSTALLABLE=Yes
 TARGET=<TARGETDIR>\Plugins
+member0=MetaData\ID3v1
 FTPLOCATION=
+member1=MetaData\ID3v2
 VISIBLE=Yes
-DESCRIPTION=This component  reads metadata in the ID3v2 format.
+DESCRIPTION=These components allow FreeAmp to read metadata stored within music files so it can display it during playback.
 DISPLAYTEXT=
 IMAGE=
 DEFSELECTION=Yes
-filegroup0=ID3v2 MetaData
 COMMENT=
 INCLUDEINBUILD=Yes
 INSTALLATION=NEWERVERSION\NEWERDATE
@@ -120,21 +122,20 @@ TARGETDIRCDROM=
 PASSWORD=
 TARGETHIDDEN=General Application Destination\Plugins
 
-[MetaData]
+[MetaData\ID3v2]
 SELECTED=Yes
 FILENEED=STANDARD
 HTTPLOCATION=
 STATUS=
 UNINSTALLABLE=Yes
 TARGET=<TARGETDIR>\Plugins
-member0=MetaData\ID3v1
 FTPLOCATION=
-member1=MetaData\ID3v2
 VISIBLE=Yes
-DESCRIPTION=These components allow FreeAmp to read metadata stored within music files so it can display it during playback.
+DESCRIPTION=This component  reads metadata in the ID3v2 format.
 DISPLAYTEXT=
 IMAGE=
 DEFSELECTION=Yes
+filegroup0=ID3v2 MetaData
 COMMENT=
 INCLUDEINBUILD=Yes
 INSTALLATION=NEWERVERSION\NEWERDATE
@@ -211,41 +212,41 @@ TARGETDIRCDROM=
 PASSWORD=
 TARGETHIDDEN=General Application Destination\Plugins
 
-[SetupTypeItem-Compact]
-item5=Default Theme
-Comment=
-item0=System DLLs
-item1=Input & Output
-item2=Input & Output\Soundcard Output
-item3=Default Plugins
-Descrip=This choice will install only the minimum number of plugins needed by FreeAmp to run.
-item4=Program Files
-DisplayText=
-
-[Input & Output\Soundcard Output]
+[Playlist Formats\PLS]
 SELECTED=Yes
-FILENEED=HIGHLYRECOMMENDED
+FILENEED=STANDARD
 HTTPLOCATION=
 STATUS=
 UNINSTALLABLE=Yes
-TARGET=<TARGETDIR>\Plugins
+TARGET=<TARGETDIR>
 FTPLOCATION=
 VISIBLE=Yes
-DESCRIPTION=This component allows FreeAmp to play audio through your sound card.
+DESCRIPTION=
 DISPLAYTEXT=
 IMAGE=
 DEFSELECTION=Yes
-filegroup0=Soundcard Output
+filegroup0=PLS Playlist
 COMMENT=
 INCLUDEINBUILD=Yes
-INSTALLATION=NEWERVERSION\NEWERDATE
+INSTALLATION=ALWAYSOVERWRITE
 COMPRESSIFSEPARATE=No
 MISC=
 ENCRYPT=No
 DISK=ANYDISK
 TARGETDIRCDROM=
 PASSWORD=
-TARGETHIDDEN=General Application Destination\Plugins
+TARGETHIDDEN=General Application Destination
+
+[SetupTypeItem-Compact]
+item5=Default Theme
+Comment=
+item0=System DLLs
+item1=Input & Output
+item2=Default Plugins
+item3=Input & Output\Soundcard Output
+Descrip=This choice will install only the minimum number of plugins needed by FreeAmp to run.
+item4=Program Files
+DisplayText=
 
 [Default Plugins]
 SELECTED=Yes
@@ -272,6 +273,31 @@ DISK=ANYDISK
 TARGETDIRCDROM=
 PASSWORD=
 TARGETHIDDEN=General Application Destination
+
+[Input & Output\Soundcard Output]
+SELECTED=Yes
+FILENEED=HIGHLYRECOMMENDED
+HTTPLOCATION=
+STATUS=
+UNINSTALLABLE=Yes
+TARGET=<TARGETDIR>\Plugins
+FTPLOCATION=
+VISIBLE=Yes
+DESCRIPTION=This component allows FreeAmp to play audio through your sound card.
+DISPLAYTEXT=
+IMAGE=
+DEFSELECTION=Yes
+filegroup0=Soundcard Output
+COMMENT=
+INCLUDEINBUILD=Yes
+INSTALLATION=NEWERVERSION\NEWERDATE
+COMPRESSIFSEPARATE=No
+MISC=
+ENCRYPT=No
+DISK=ANYDISK
+TARGETDIRCDROM=
+PASSWORD=
+TARGETHIDDEN=General Application Destination\Plugins
 
 [Program Files]
 required0=System DLLs
@@ -302,25 +328,26 @@ PASSWORD=
 TARGETHIDDEN=General Application Destination
 
 [SetupTypeItem-Custom]
-item5=User Interfaces\FreeAmp
-item10=Program Files
-item6=Input & Output\HTTP Input
-item11=Input & Output\OBS Input
-item7=Decoders\Xing MP3
-item12=Default Theme
-item8=Default Plugins
+item5=Playlist Formats\PLS
+item10=Default Plugins
+item6=Decoders\Xing MP3
+item11=Program Files
+item7=Input & Output\HTTP Input
+item12=Input & Output\OBS Input
+item8=User Interfaces\FreeAmp
 item13=Playlist Formats\M3U
 item9=Input & Output\Soundcard Output
-item14=Playlist Formats
+item14=Default Theme
 item15=Portable Players
-item16=Portable Players\Rio PMP300
+item16=Playlist Formats
+item17=Portable Players\Rio PMP300
 Comment=
 item0=System DLLs
 item1=MetaData\ID3v1
-item2=MetaData
+item2=MetaData\ID3v2
 item3=Input & Output
 Descrip=This choice allows you to select the plugins you would like to install.
-item4=MetaData\ID3v2
+item4=MetaData
 DisplayText=
 
 [Input & Output\OBS Input]
@@ -348,6 +375,31 @@ TARGETDIRCDROM=
 PASSWORD=
 TARGETHIDDEN=General Application Destination\Plugins
 
+[Playlist Formats\M3U]
+SELECTED=Yes
+FILENEED=STANDARD
+HTTPLOCATION=
+STATUS=
+UNINSTALLABLE=Yes
+TARGET=<TARGETDIR>\Plugins
+FTPLOCATION=
+VISIBLE=Yes
+DESCRIPTION=These components allow FreeAmp to read and write playlists in the M3U format.
+DISPLAYTEXT=
+IMAGE=
+DEFSELECTION=Yes
+filegroup0=M3U Playlist
+COMMENT=
+INCLUDEINBUILD=Yes
+INSTALLATION=NEWERVERSION\NEWERDATE
+COMPRESSIFSEPARATE=No
+MISC=
+ENCRYPT=No
+DISK=ANYDISK
+TARGETDIRCDROM=
+PASSWORD=
+TARGETHIDDEN=General Application Destination
+
 [Default Theme]
 SELECTED=Yes
 FILENEED=STANDARD
@@ -374,31 +426,6 @@ TARGETDIRCDROM=
 PASSWORD=
 TARGETHIDDEN=General Application Destination
 
-[Playlist Formats\M3U]
-SELECTED=Yes
-FILENEED=STANDARD
-HTTPLOCATION=
-STATUS=
-UNINSTALLABLE=Yes
-TARGET=<TARGETDIR>\Plugins
-FTPLOCATION=
-VISIBLE=Yes
-DESCRIPTION=These components allow FreeAmp to read and write playlists in the M3U format.
-DISPLAYTEXT=
-IMAGE=
-DEFSELECTION=Yes
-filegroup0=M3U Playlist
-COMMENT=
-INCLUDEINBUILD=Yes
-INSTALLATION=NEWERVERSION\NEWERDATE
-COMPRESSIFSEPARATE=No
-MISC=
-ENCRYPT=No
-DISK=ANYDISK
-TARGETDIRCDROM=
-PASSWORD=
-TARGETHIDDEN=General Application Destination
-
 [Info]
 Type=CompDef
 Version=1.00.000
@@ -407,50 +434,26 @@ Name=
 [SetupTypeItem-Typical]
 item5=Input & Output\DirectSound Output
 item10=Input & Output\Soundcard Output
-item6=User Interfaces\FreeAmp
-item11=Program Files
-item7=Input & Output\HTTP Input
-item12=Input & Output\OBS Input
-item8=Decoders\Xing MP3
-item13=Default Theme
-item9=Default Plugins
+item6=Playlist Formats\PLS
+item11=Default Plugins
+item7=Decoders\Xing MP3
+item12=Program Files
+item8=Input & Output\HTTP Input
+item13=Input & Output\OBS Input
+item9=User Interfaces\FreeAmp
 item14=Playlist Formats\M3U
-item15=Playlist Formats
+item15=Default Theme
 item16=Portable Players
-item17=Portable Players\Rio PMP300
+item17=Playlist Formats
 Comment=
+item18=Portable Players\Rio PMP300
 item0=System DLLs
 item1=MetaData\ID3v1
-item2=MetaData
+item2=MetaData\ID3v2
 item3=Input & Output
 Descrip=This choice will install the FreeAmp program and all plugins.
-item4=MetaData\ID3v2
+item4=MetaData
 DisplayText=
-
-[Playlist Formats]
-SELECTED=Yes
-FILENEED=STANDARD
-HTTPLOCATION=
-STATUS=
-UNINSTALLABLE=Yes
-TARGET=<TARGETDIR>\Plugins
-member0=Playlist Formats\M3U
-FTPLOCATION=
-VISIBLE=Yes
-DESCRIPTION=These components allow FreeAmp to read and write playlists in various formats.
-DISPLAYTEXT=
-IMAGE=
-DEFSELECTION=Yes
-COMMENT=
-INCLUDEINBUILD=Yes
-INSTALLATION=NEWERVERSION\NEWERDATE
-COMPRESSIFSEPARATE=No
-MISC=
-ENCRYPT=No
-DISK=ANYDISK
-TARGETDIRCDROM=
-PASSWORD=
-TARGETHIDDEN=General Application Destination
 
 [Portable Players]
 SELECTED=Yes
@@ -463,6 +466,32 @@ member0=Portable Players\Rio PMP300
 FTPLOCATION=
 VISIBLE=Yes
 DESCRIPTION=These components allow FreeAmp to manage the music on your portable audio player.
+DISPLAYTEXT=
+IMAGE=
+DEFSELECTION=Yes
+COMMENT=
+INCLUDEINBUILD=Yes
+INSTALLATION=NEWERVERSION\NEWERDATE
+COMPRESSIFSEPARATE=No
+MISC=
+ENCRYPT=No
+DISK=ANYDISK
+TARGETDIRCDROM=
+PASSWORD=
+TARGETHIDDEN=General Application Destination
+
+[Playlist Formats]
+SELECTED=Yes
+FILENEED=STANDARD
+HTTPLOCATION=
+STATUS=
+UNINSTALLABLE=Yes
+TARGET=<TARGETDIR>\Plugins
+member0=Playlist Formats\M3U
+FTPLOCATION=
+member1=Playlist Formats\PLS
+VISIBLE=Yes
+DESCRIPTION=These components allow FreeAmp to read and write playlists in various formats.
 DISPLAYTEXT=
 IMAGE=
 DEFSELECTION=Yes
