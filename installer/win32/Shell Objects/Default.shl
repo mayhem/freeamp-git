@@ -4,24 +4,24 @@ Parameters=
 ShortcutKey=
 SeparateMemorySpace=No
 Run=Normal Window
-IconIndex=0
-Replace=Yes
 FileGroup=
+Replace=Yes
+IconIndex=0
 StartIn=<TARGETDIR>
-IconFile=
 InternetShortcut=No
-DisplayText=FreeAmp
+IconFile=
 Comments=
+DisplayText=FreeAmp
 
 [Folder4]
-Type=Common
-Comments=
+Type=Personal
 DisplayText=
+Comments=
 
 [Data]
-Folder3=<FOLDER_STARTUP>
 Shortcut0=Folder4\FreeAmp
-Folder4=Folder2\FreeAmp 1.2
+Folder3=<FOLDER_STARTUP>
+Folder4=Folder2\FreeAmp 1.3
 Group0=Main
 Group1=Startup
 Folder0=<FOLDER_DESKTOP>
