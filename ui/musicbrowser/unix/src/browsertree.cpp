@@ -46,7 +46,6 @@ FAContext *BADContext = NULL;
 
 void kill_treedata(TreeData *dead)
 {
-cout << "deleting junk\n";
     delete dead;
 }
 
