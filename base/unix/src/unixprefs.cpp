@@ -540,7 +540,7 @@ SetDefaults()
 
     size = sizeof(buf);
     if (GetPrefString(kSaveMusicDirPref, buf, &size) == kError_NoPrefValue) {
-        string tempdir = FreeampDir(NULL);
+        string tempdir = string(getenv("HOME"));
         tempdir += "/MyMusic";
         SetPrefString(kSaveMusicDirPref, tempdir.c_str());
     }

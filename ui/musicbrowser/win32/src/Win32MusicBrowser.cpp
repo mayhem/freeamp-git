@@ -138,7 +138,7 @@ MusicBrowserUI::MusicBrowserUI(FAContext      *context,
 
     Init();
 
-    if (m_pParent == NULL)
+    if(m_pParent == NULL)
     {
        m_plm = m_context->plm;
 
@@ -168,7 +168,8 @@ MusicBrowserUI::MusicBrowserUI(FAContext      *context,
                 m_initialCount = items.size();
                 m_autoPlayHack = true;
 
-                m_plm->AddItems(&items);
+                if(m_initialCount)
+                    m_plm->AddItems(&items);
             }           
        }
     }

@@ -182,7 +182,7 @@ Error XingLMC::AdvanceBufferToNextFrame()
 	Error          Err;
 
    Err = BeginRead(pBufferBase, iMaxFrameSize);
-   if (Err == kError_EndOfStream)
+   if (Err == kError_EndOfStream || Err == kError_Interrupt)
       return Err;
 
    if (Err != kError_NoErr)
@@ -782,13 +782,9 @@ void XingLMC::DecodeWork()
               return;
           }
 
-          if (iMaxFrameSize > (int)m_pInputBuffer->GetNumBytesInBuffer())
-          {
-              if ((int)m_pInputBuffer->GetNumBytesInBuffer() == m_frameBytes)
-                  iReadSize = m_frameBytes;
-              else    
-                  iReadSize = m_frameBytes + 1;
-          }        
+          if (iMaxFrameSize > (int)m_pInputBuffer->GetNumBytesInBuffer() &&
+              m_pInputBuffer->IsEndOfStream())
+              iReadSize = m_pInputBuffer->GetNumBytesInBuffer();
           else
               iReadSize = iMaxFrameSize;    
 

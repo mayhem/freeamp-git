@@ -46,13 +46,14 @@ class HeadlineInfo
         HeadlineInfo(void) { ; };
         HeadlineInfo(const string &oUrl,
                      const string &oXMLPath, 
+                     const string &oXMLURLPath, 
                      int iDownloadInterval,
                      int iHeadlineChangeInterval);
         virtual ~HeadlineInfo();
 
         void   operator=(const HeadlineInfo &oOther);
 
-        string m_oUrl, m_oXMLPath;
+        string m_oUrl, m_oXMLPath, m_oXMLURLPath;
         int    m_iDownloadInterval, m_iHeadlineChangeInterval;
 };
 
@@ -81,7 +82,7 @@ class Headlines : public Parse
         FAContext       *m_pContext;
         Thread          *m_pThread;
         string           m_oPath;
-        vector<string>   m_oHeadlines;
+        vector<string>   m_oHeadlines, m_oHeadlineURLs;
         bool             m_bPause;
         Semaphore       *m_pWakeSem;
 		HeadlineInfo     m_oInfo;

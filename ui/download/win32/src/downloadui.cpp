@@ -54,6 +54,20 @@ static const int32 kPostPadding = 5;
 static const int32 kMinProgressWidth = 3;
 static const int32 kTotalPadding = kPrePadding + kElementPadding + kPostPadding;
 
+static const char *szEMusicText = 
+   "The Download Manager enables you to download music from the downloadable "
+   "page at the EMusic site and other sites that support RMP/"
+   "RealJukebox downloads.";
+static const char *szEMusicURLText = "Go to my downloadables at EMusic";
+static const char *szEMusicURL = "https://secure.emusic.com/perl/secure/downloadables.pl";
+
+static const char *szFreeAmpText = 
+   "The Download Manager enables you to download music from sites that "
+   "support the RMP or RealJukebox download format. To try it check "
+   "out the free music at:";
+   
+static const char *szFreeAmpURLText = "http://www.emusic.com/music/free.html";
+static const char *szFreeAmpURL = "http://www.emusic.com/music/free.html";
 
 HINSTANCE g_hInstance = NULL;
 
@@ -144,8 +158,6 @@ DownloadUI::~DownloadUI()
 
     delete m_uiSemaphore;
     delete m_uiThread;
-
-
 }
 
 Error DownloadUI::AcceptEvent(Event* event)
@@ -282,6 +294,7 @@ Error DownloadUI::AcceptEvent(Event* event)
                                 if (dlinse->Item()->GetState() == 
                                     kDownloadItemState_Downloading)
                                 {    
+                                    SetButtonStates(dlinse->Item());
                                     ListView_SetItemState(m_hwndList, i, 
                                         LVIS_SELECTED | LVIS_FOCUSED, 
                                         LVIS_SELECTED | LVIS_FOCUSED);
@@ -419,6 +432,12 @@ Error DownloadUI::Init(int32 startup_type)
 
 BOOL DownloadUI::InitDialog()
 {
+    char title[100];
+    
+    GetWindowText(m_hwnd, title, 100);
+    strcat(title, BRANDING);
+    SetWindowText(m_hwnd, title);
+    
     // get hwnds for all my controls
     m_hwndList = GetDlgItem(m_hwnd, IDC_LIST);
     m_hwndInfo = GetDlgItem(m_hwnd, IDC_INFO);
@@ -567,6 +586,17 @@ BOOL DownloadUI::InitDialog()
     UpdateOverallProgress();*/
 
     m_handCursor = LoadCursor(g_hInstance, MAKEINTRESOURCE(IDC_HAND));
+
+    if (strcasecmp(BRANDING_COMPANY, "EMusic") == 0)
+    {
+       SetWindowText(GetDlgItem(m_hwnd, IDC_DLMTEXT), szEMusicText);
+       SetWindowText(GetDlgItem(m_hwnd, IDC_FREETRACKS), szEMusicURLText);
+    }
+    else
+    {
+       SetWindowText(GetDlgItem(m_hwnd, IDC_DLMTEXT), szFreeAmpText);
+       SetWindowText(GetDlgItem(m_hwnd, IDC_FREETRACKS), szFreeAmpURLText);
+    }
 
     m_uiSemaphore->Signal();
     return TRUE;
@@ -863,7 +893,6 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                 ImageList_Draw( himl, 0, hDc, 0, 0, uiFlags);
             }
 
-#if 1
             // draw the progress column
 
             rcClip.left += ListView_GetColumnWidth(m_hwndList, 0);
@@ -1077,9 +1106,6 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                 default:
                     break;
             }
-#endif
-
-#if 1
             uint32 pad = kPrePadding;
 
             if(progressWidth)
@@ -1113,7 +1139,6 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                 // Draw the focus rect
                 DrawFocusRect(hDc, &dis->rcItem);
             }
-#endif
 
             // paint the actual bitmap
             BitBlt(dis->hDC, dis->rcItem.left, dis->rcItem.top,
@@ -1493,33 +1518,31 @@ BOOL DownloadUI::Command(int32 command, HWND src)
                        {
 		                    case IDC_PAUSE:
                             {
-                                m_dlm->CancelDownload(dli, true);
                                 m_dlm->PauseDownloads();
-                                EnableWindow(m_hwndPause, FALSE);
-                                EnableWindow(m_hwndCancel, TRUE);
-                                EnableWindow(m_hwndResume, TRUE);
+                                m_dlm->CancelDownload(dli, true);
                                 break;
                             }
 
                             case IDC_CANCEL:
 		                    {
                                 m_dlm->CancelDownload(dli, false);  
-                                EnableWindow(m_hwndPause, FALSE);
-                                EnableWindow(m_hwndCancel, FALSE);
-                                EnableWindow(m_hwndResume, TRUE);
                                 break;
                             }
 
                             case IDC_RESUME:
                             {
-                                m_dlm->QueueDownload(dli, true); 
-                                m_dlm->ResumeDownloads();
-                                EnableWindow(m_hwndPause, TRUE);
-                                EnableWindow(m_hwndCancel, TRUE);
-                                EnableWindow(m_hwndResume, FALSE);
+                                char szText[100];
+                                GetWindowText(m_hwndResume, szText, 100);
+
+                                if (strcmp(szText, "Start") == 0)
+                                    m_dlm->ResumeDownloads();
+                                else
+                                    m_dlm->QueueDownload(dli, true); 
+                                    
                                 break;
                             }
                         }
+                        SetButtonStates(dli);
                     }
                 }
             }
@@ -1600,49 +1623,7 @@ BOOL DownloadUI::Notify(int32 controlId, NMHDR* nmh)
             if(nmh->code == LVN_ITEMCHANGED)
             {
                 ListView_RedrawItems(m_hwndInfo, 0, ListView_GetItemCount(m_hwndInfo) - 1);
-
-                DownloadItem* dli = (DownloadItem*)nmlv->lParam;
-
-                SetWindowText(m_hwndResume, "Resume");
-                switch(dli->GetState())
-                {
-                    case kDownloadItemState_Queued:
-                        EnableWindow(m_hwndPause, FALSE);
-                        EnableWindow(m_hwndCancel, TRUE);
-                        EnableWindow(m_hwndResume, m_dlm->IsPaused());
-                        SetWindowText(m_hwndResume, "Start");
-                        break;
-                        
-                    case kDownloadItemState_Downloading:
-                        EnableWindow(m_hwndPause, TRUE);
-                        EnableWindow(m_hwndCancel, TRUE);
-                        EnableWindow(m_hwndResume, FALSE);
-                        break;
-                    
-                    case kDownloadItemState_Cancelled:
-                    case kDownloadItemState_Error:
-                        EnableWindow(m_hwndPause, FALSE);
-                        EnableWindow(m_hwndCancel, FALSE);
-                        EnableWindow(m_hwndResume, TRUE);
-                        break;
-
-                    case kDownloadItemState_Paused:
-                        EnableWindow(m_hwndPause, FALSE);
-                        EnableWindow(m_hwndCancel, TRUE);
-                        EnableWindow(m_hwndResume, TRUE);
-                        break;
-                    
-                    case kDownloadItemState_Done:
-                        EnableWindow(m_hwndPause, FALSE);
-                        EnableWindow(m_hwndCancel, FALSE);
-                        EnableWindow(m_hwndResume, FALSE);
-                        break;
-
-                    default:
-                        break;
-                }
-
-                //OutputDebugString("LVN_ITEMCHANGING\r\n");
+                SetButtonStates((DownloadItem*)nmlv->lParam);
             }
 
             break;
@@ -1653,6 +1634,51 @@ BOOL DownloadUI::Notify(int32 controlId, NMHDR* nmh)
     return result;
 }
 
+
+void DownloadUI::SetButtonStates(DownloadItem *dli)
+{
+   switch(dli->GetState())
+   {
+       case kDownloadItemState_Queued:
+           EnableWindow(m_hwndPause, FALSE);
+           EnableWindow(m_hwndCancel, TRUE);
+           EnableWindow(m_hwndResume, m_dlm->IsPaused());
+           SetWindowText(m_hwndResume, "Start");
+           break;
+           
+       case kDownloadItemState_Downloading:
+           EnableWindow(m_hwndPause, TRUE);
+           EnableWindow(m_hwndCancel, TRUE);
+           EnableWindow(m_hwndResume, FALSE);
+           SetWindowText(m_hwndResume, "Resume");
+           break;
+       
+       case kDownloadItemState_Cancelled:
+       case kDownloadItemState_Error:
+           EnableWindow(m_hwndPause, FALSE);
+           EnableWindow(m_hwndCancel, FALSE);
+           EnableWindow(m_hwndResume, TRUE);
+           SetWindowText(m_hwndResume, "Resume");
+           break;
+
+       case kDownloadItemState_Paused:
+           EnableWindow(m_hwndPause, FALSE);
+           EnableWindow(m_hwndCancel, TRUE);
+           EnableWindow(m_hwndResume, TRUE);
+           SetWindowText(m_hwndResume, "Resume");
+           break;
+       
+       case kDownloadItemState_Done:
+           EnableWindow(m_hwndPause, FALSE);
+           EnableWindow(m_hwndCancel, FALSE);
+           EnableWindow(m_hwndResume, FALSE);
+           SetWindowText(m_hwndResume, "Resume");
+           break;
+
+       default:
+           break;
+   }
+}
 
 BOOL CALLBACK DownloadUI::MainProc(	HWND hwnd, 
 						            UINT msg, 
@@ -1996,16 +2022,12 @@ LRESULT DownloadUI::FreeTracksWndProc(HWND hwnd,
 
             if(PtInRect(&m_urlRect, pt))
             {
-                char url[256];
-
-                GetWindowText(hwnd, url, sizeof(url));
-
-                ShellExecute(hwnd, 
-                             "open", 
-                             url, 
-                             NULL, 
-                             NULL, 
-                             SW_SHOWNORMAL);
+                if (strcasecmp(BRANDING_COMPANY, "EMusic") == 0)
+                    ShellExecute(hwnd, "open", szEMusicURL, NULL, 
+                                 NULL, SW_SHOWNORMAL);
+                else
+                    ShellExecute(hwnd, "open", szFreeAmpURL, NULL, 
+                                 NULL, SW_SHOWNORMAL);
             }
                 
 			break;

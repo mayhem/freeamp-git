@@ -1,5 +1,5 @@
 [TopDir]
-file0=c:\winnt\system32\msvcp50.dll
+file0=c:\winnt\system32\msvcp60.dll
 file1=c:\winnt\system32\msvcrt.dll
 file2=..\..\help\win32\roboex32.dll
 file3=..\..\help\win32\inetwh32.dll

@@ -32,14 +32,7 @@ ____________________________________________________________________________*/
 
 #include <assert.h>
 
-#ifdef WIN32
-#include <io.h>
-#else
-#undef socklen_t
-#include <sys/socket.h>
-#include <netdb.h>
-#include <unistd.h>
-#endif
+#include "downloadmanager.h"
 
 #if defined(unix) || defined(__BEOS__)
 #define SOCKET int
@@ -52,13 +45,13 @@ ____________________________________________________________________________*/
 #endif
 
 #if !defined(WIN32)
+#include <sys/time.h>
 #include <strstream>
 typedef ostrstream ostringstream;
 #else
 #include <sstream>
 #endif
 
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <time.h>
 #include <fcntl.h>
@@ -73,7 +66,6 @@ using namespace std;
 #include "facontext.h"
 
 #include "errors.h"
-#include "downloadmanager.h"
 #include "registrar.h"
 #include "utility.h"
 #include "event.h"
@@ -88,6 +80,7 @@ DownloadManager::DownloadManager(FAContext* context)
     m_current = 0;
     m_downloadsPaused = true;
 	m_downloadIndex = -1;
+    m_exit = false;
  
     Registrar registrar;
 
@@ -140,6 +133,8 @@ DownloadManager::~DownloadManager()
     uint32 index = 0;
     uint32 size = 0;
     DownloadItem* item = NULL;
+
+    m_exit = true;
 
     m_runDownloadThread = false;
     m_queueSemaphore.Signal();
@@ -418,10 +413,10 @@ Error DownloadManager::ReadDownloadFile(char* url,
             }
         }
         
-        char   path[255];
-        uint32 length = sizeof(path);
-        URLToFilePath(url, path, &length);
-        unlink(path);
+        //char   path[255];
+        //uint32 length = sizeof(path);
+        //URLToFilePath(url, path, &length);
+        //unlink(path);
     }
 
     return result;
@@ -555,6 +550,29 @@ static int32 GetContentLengthFromHeader(const char* buffer)
     return result;
 }
 
+static void GetContentTimeFromHeader(const char* buffer, string &mTime)
+{
+    char* cp = strstr(buffer, "Last-Modified:");
+    if(cp)
+    {
+        string::size_type pos;
+        
+        cp += strlen("Last-Modified:") + 1;
+        mTime = string(cp);
+
+        pos = mTime.find(string("\r"), 0);
+        if (pos != string::npos)
+           mTime.erase(pos, mTime.length() - 2);
+
+        pos = mTime.find(string("\n"), 0);
+        if (pos != string::npos)
+           mTime.erase(pos, mTime.length() - 2);
+    }
+    else
+        mTime = string("");
+}
+
+
 const uint8 kHttpPort = 80;
 const uint32 kMaxHostNameLen = 64;
 
@@ -653,8 +671,7 @@ Error DownloadManager::Download(DownloadItem* item)
             }            
         }
 
-        if(item->GetState() == kDownloadItemState_Cancelled ||
-           item->GetState() == kDownloadItemState_Paused)
+        if(item->GetState() != kDownloadItemState_Downloading) 
             result = kError_UserCancel;
 
         // get hostname
@@ -691,8 +708,7 @@ Error DownloadManager::Download(DownloadItem* item)
                 memcpy(&host, hostByName, sizeof(struct hostent));
             }
 
-            if(item->GetState() == kDownloadItemState_Cancelled ||
-               item->GetState() == kDownloadItemState_Paused)
+            if(item->GetState() != kDownloadItemState_Downloading) 
                 result = kError_UserCancel;
         }
 
@@ -711,21 +727,24 @@ Error DownloadManager::Download(DownloadItem* item)
             if(s < 0)
                 result = kError_CantCreateSocket;
 
-            if(item->GetState() == kDownloadItemState_Cancelled ||
-               item->GetState() == kDownloadItemState_Paused)
+            if(item->GetState() != kDownloadItemState_Downloading)
                 result = kError_UserCancel;
         }
 
         // connect and send request
         if(IsntError(result))
         {
-            //*m_debug << "connect" << endl;
+            Error err;
+            int   ret;
+            
+            err = Connect(s, (const struct sockaddr*)&addr, ret, item);
+            if (IsError(err))
+                result = kError_UserCancel;
+                
+            if (ret < 0)    
+                result = kError_ConnectFailed;
 
-            if(connect(s,(const struct sockaddr*)&addr, sizeof(struct sockaddr)))
-                result = kError_CannotBind;
-
-            if(item->GetState() == kDownloadItemState_Cancelled ||
-               item->GetState() == kDownloadItemState_Paused)
+            if(item->GetState() != kDownloadItemState_Downloading)
                 result = kError_UserCancel;
 
             if(IsntError(result))
@@ -737,19 +756,18 @@ Error DownloadManager::Download(DownloadItem* item)
                                          "Accept: */*\n" 
                                          "User-Agent: FreeAmp/%s\n";
 
-                const char* kRange = "Range: %lu-\n"
-                                     "If-Range: %s\n";
+                const char* kRange = "Range: bytes=%lu-\n";
+                const char* kIfRange = "If-Range: %s\n";
 
                 const char* kCookie = "Cookie: %s\n";
 
-                // the magic 58 is enough for fixed length time in
-                // HTTP time format + 2 terabyte length range numbers.
-                // the 2 extra bytes on the end is an extra \n and 0x00 byte
+                // the magic 256 is enough for a time field that
+                // we got from the server
                 char* query = new char[ strlen(kHTTPQuery) + 
                                         strlen(file) +
                                         strlen(localname) +
                                         strlen(FREEAMP_VERSION)+
-                                        (item->GetBytesReceived() ? (strlen(kRange) + 58): 0 ) +
+                                        (item->GetBytesReceived() ? (strlen(kRange) + 256): 0 ) +
                                         (item->SourceCookie().size() ? (item->SourceCookie().size() + strlen(kCookie)): 0) +
                                         2];
             
@@ -762,20 +780,22 @@ Error DownloadManager::Download(DownloadItem* item)
 
                     if(-1 != stat(destPath, &st))
                     {
-                        char* range = new char[strlen(kRange) + 58 + 1];
-                        char time[32];
+                        char* range = new char[strlen(kRange) + 256 + 1];
 
-                        RFC822GMTTimeString(gmtime(&st.st_mtime), time);
-
-                        sprintf(range, kRange, item->GetBytesReceived(), time);
-
+                        sprintf(range, kRange, item->GetBytesReceived());
                         strcat(query, range);
 
+                        if (item->MTime().length() > 0)
+                        {
+                            sprintf(range, kIfRange, item->MTime().c_str());
+                            strcat(query, range);
+                        }
                         delete [] range;
                     }
                     else
                     {
                         item->SetBytesReceived(0);
+                        item->SetMTime("");
                     }
                 }
 
@@ -792,21 +812,27 @@ Error DownloadManager::Download(DownloadItem* item)
             
                 strcat(query, "\n");
 
-                //cout << query << endl;
-
+                // Quick hack to save the query for debug
+                //FILE *f;
+                //f = fopen("c:\\temp\\foo.txt", "w");
+                //if (f)
+                //{
+                //   fwrite(query, 1, strlen(query), f);
+                //   fclose(f);
+                //}   
+                
                 int count;
 
-                //*m_debug << "send:" << endl << query;
-
-                count = send(s, query, strlen(query), 0);
+                err = Send(s, query, strlen(query), 0, count, item);
+                if (IsError(err))
+                    result = kError_UserCancel; 
 
                 if(count != (int)strlen(query))
                 {
                     result = kError_IOError;
                 }
 
-                if(item->GetState() == kDownloadItemState_Cancelled ||
-                   item->GetState() == kDownloadItemState_Paused)
+                if(item->GetState() != kDownloadItemState_Downloading)
                     result = kError_UserCancel;
 
                 delete [] query;
@@ -827,6 +853,7 @@ Error DownloadManager::Download(DownloadItem* item)
 
             if(buffer)
             {
+                Error err;
                 result = kError_NoErr;
 
                 do
@@ -844,7 +871,9 @@ Error DownloadManager::Download(DownloadItem* item)
                         }
                     }
 
-                    count = recv(s, buffer + total, bufferSize - total - 1, 0);
+                    err = Recv(s, buffer + total, bufferSize - total - 1, 0, count, item);
+                    if (IsError(err))
+                        result = kError_UserCancel;
 
                     if(count > 0)
                         total += count;
@@ -853,12 +882,11 @@ Error DownloadManager::Download(DownloadItem* item)
                         result = kError_IOError;
                     }
 
-                    if(item->GetState() == kDownloadItemState_Cancelled ||
-                       item->GetState() == kDownloadItemState_Paused)
+                    if(item->GetState() != kDownloadItemState_Downloading)
                         result = kError_UserCancel;
 
 
-                }while(!IsHTTPHeaderComplete(buffer, total) && IsntError(result));
+                }while(IsntError(result) && !IsHTTPHeaderComplete(buffer, total));
             }
 
             // parse header
@@ -886,8 +914,6 @@ Error DownloadManager::Download(DownloadItem* item)
 
                         int32 fileSize = GetContentLengthFromHeader(buffer);
 
-                        if(fileSize > 0)
-                            item->SetTotalBytes(fileSize);
 
                         //cout << destPath << endl;
 
@@ -895,17 +921,27 @@ Error DownloadManager::Download(DownloadItem* item)
 
                         if(returnCode != 206) // server oked partial download
                         {
+                            string mTime;
+
                             item->SetBytesReceived(0);
                             openFlags |= O_TRUNC;
+                            
+                            GetContentTimeFromHeader(buffer, mTime);
+                            item->SetMTime(mTime.c_str());
+                            if(fileSize > 0)
+                               item->SetTotalBytes(fileSize);
                         }
-
-                        //*m_debug << "open file:" << destPath<< endl;
 
                         int fd = open(destPath, openFlags, S_IREAD | S_IWRITE);
 
                         if(fd >= 0)
                         {
+                            Error err;
+
+                            lseek(fd, 0, SEEK_END);
+
                             result = kError_NoErr;
+                            int wcount = 0;
 
                             char* cp = strstr(buffer, "\n\n");
 
@@ -923,7 +959,7 @@ Error DownloadManager::Download(DownloadItem* item)
                             {
                                 if(cp - buffer < (int)total)
                                 {
-                                    write(fd, cp, total - (cp - buffer));
+                                    wcount = write(fd, cp, total - (cp - buffer));
                                     item->SetBytesReceived(total - (cp - buffer) + item->GetBytesReceived());
                                     SendProgressMessage(item);
                                 }
@@ -931,25 +967,30 @@ Error DownloadManager::Download(DownloadItem* item)
 
                             do
                             {
-                                count = recv(s, buffer, bufferSize, 0);
+                            
+                                err = Recv(s, buffer, bufferSize, 0, count, item);
+                                if (IsError(err))
+                                    result = kError_UserCancel;
+                                else 
+                                   if(count > 0)
+                                   {
+                                       wcount = write(fd, buffer, count);
+                                       item->SetBytesReceived(count + item->GetBytesReceived());
+                                       SendProgressMessage(item);
+                                   }
 
-                                if(count > 0)
-                                {
-                                    write(fd, buffer, count);
-                                    item->SetBytesReceived(count + item->GetBytesReceived());
-                                    SendProgressMessage(item);
-                                }
-
-                                if(count < 0)
+                                if(count < 0) 
                                     result = kError_IOError;
                                 
-                                if(item->GetState() == kDownloadItemState_Cancelled ||
-                                   item->GetState() == kDownloadItemState_Paused)
+                                if(wcount < 0)
+                                    result = kError_WriteFile;
+
+                                if(item->GetState() != kDownloadItemState_Downloading)
                                     result = kError_UserCancel;
 
-                            }while(count > 0 && IsntError(result) && m_runDownloadThread &&
-                                  item->GetTotalBytes() > item->GetBytesReceived());
-
+                            }while(count > 0 && IsntError(result) && 
+                                   m_runDownloadThread && wcount >= 0 && 
+                                   (item->GetTotalBytes() > item->GetBytesReceived()));
                             close(fd);                           
                         }
                         else
@@ -1188,8 +1229,7 @@ void DownloadManager::DownloadThreadFunction()
 
                 result = SubmitToDatabase(item);
             }
-            else 
-            if(result == kError_UserCancel)
+            else if(result == kError_UserCancel)
             {
                 if(item->GetState() == kDownloadItemState_Cancelled)
                 {
@@ -1288,8 +1328,15 @@ void DownloadManager::SaveResumableDownloadItems()
 
                     sprintf(num, "%ld", (long int)item->GetTotalBytes());
                     ost << strlen(num) << kDatabaseDelimiter;
+
                     sprintf(num, "%ld", (long int)item->GetBytesReceived());
-                    ost << strlen(num) << kDatabaseDelimiter;
+                    if (item->MTime().length())
+                    {
+                        int iTimeSize = strlen(num) + 1 + item->MTime().length();
+                        ost << iTimeSize << kDatabaseDelimiter;
+                    }
+                    else
+                        ost << strlen(num) << kDatabaseDelimiter;
 
                     // metadata lengths
                     ost << metadata.Artist().size() << kDatabaseDelimiter;
@@ -1316,6 +1363,10 @@ void DownloadManager::SaveResumableDownloadItems()
                     ost << item->PlaylistName();
                     ost << item->GetTotalBytes();
                     ost << item->GetBytesReceived();
+
+                    if (item->MTime().length())
+                        ost << " " << item->MTime();
+                        
                     ost << metadata.Artist();
                     ost << metadata.Album();
                     ost << metadata.Title();
@@ -1418,8 +1469,21 @@ void DownloadManager::LoadResumableDownloadItems()
                             item->SetTotalBytes(atoi(data.substr(count, fieldLength[j]).c_str()));
                             break;
                         case 5:
-                            item->SetBytesReceived(atoi(data.substr(count, fieldLength[j]).c_str()));
+                        {
+                            string            val;
+                            string::size_type pos;
+                            
+                            val = data.substr(count, fieldLength[j]).c_str();
+                            item->SetBytesReceived(atoi(val.c_str()));
+                            
+                            pos = val.find(string(" "), 0);
+                            if (pos != string::npos)
+                            {
+                                val.erase(0, pos + 1);
+                                item->SetMTime(val.c_str());
+                            }
                             break;
+                        }    
                         case 6:
                             metadata.SetArtist(data.substr(count, fieldLength[j]).c_str());
                             break;
@@ -1490,3 +1554,107 @@ bool DownloadManager::DoesDBDirExist(char* path)
     return result;
 }
 
+Error DownloadManager::Connect(int hHandle, const sockaddr *pAddr, 
+                               int &iRet, DownloadItem *item)
+{
+    fd_set              sSet; 
+    struct timeval      sTv;
+
+#if defined(WIN32)
+	unsigned long lMicrosoftSucksBalls = 1;
+	ioctlsocket(hHandle, FIONBIO, &lMicrosoftSucksBalls);
+#elif defined(__BEOS__)
+//	int on = 1;
+//	setsockopt( hHandle, SOL_SOCKET, SO_NONBLOCK, &on, sizeof( on ) );
+#else
+    fcntl(hHandle, F_SETFL, fcntl(hHandle, F_GETFL) | O_NONBLOCK);
+#endif
+
+    iRet = connect(hHandle, (const sockaddr *)pAddr,sizeof(*pAddr));
+    for(; iRet && !m_exit && 
+        item->GetState() == kDownloadItemState_Downloading;)
+    {
+        sTv.tv_sec = 0; sTv.tv_usec = 0;
+        FD_ZERO(&sSet); FD_SET(hHandle, &sSet);
+        iRet = select(hHandle + 1, NULL, &sSet, NULL, &sTv);
+        if (!iRet)
+        {
+           usleep(100000);
+           continue;
+        }
+
+        if (iRet < 0)
+           return kError_NoErr;
+           
+        break;
+    }
+    
+    if (m_exit || item->GetState() != kDownloadItemState_Downloading)
+       return kError_Interrupt;
+       
+    return kError_NoErr;
+}
+
+Error DownloadManager::Recv(int hHandle, char *pBuffer, int iSize, 
+                            int iFlags, int &iRead, DownloadItem *item)
+{
+    fd_set              sSet; 
+    struct timeval      sTv;
+    int                 iRet;
+
+    iRead = 0;
+    for(; !m_exit && item->GetState() == kDownloadItemState_Downloading;)
+    {
+        sTv.tv_sec = 0; sTv.tv_usec = 0;
+        FD_ZERO(&sSet); FD_SET(hHandle, &sSet);
+        iRet = select(hHandle + 1, &sSet, NULL, NULL, &sTv);
+        if (!iRet)
+        {
+		   usleep(10000);
+           continue;
+        }
+        iRead = recv(hHandle, pBuffer, iSize, iFlags);
+        if (iRead < 0)
+        {
+           return kError_NoErr;
+        }
+        break;
+    }
+
+    if (m_exit || item->GetState() != kDownloadItemState_Downloading)
+       return kError_Interrupt;
+       
+    return kError_NoErr;
+}                            
+
+Error DownloadManager::Send(int hHandle, char *pBuffer, int iSize, 
+                            int iFlags, int &iRead, DownloadItem *item)
+{
+    fd_set              sSet; 
+    struct timeval      sTv;
+    int                 iRet;
+
+    iRead = 0;
+    for(; !m_exit && item->GetState() == kDownloadItemState_Downloading;)
+    {
+        sTv.tv_sec = 0; sTv.tv_usec = 0;
+        FD_ZERO(&sSet); FD_SET(hHandle, &sSet);
+        iRet = select(hHandle + 1, NULL, &sSet, NULL, &sTv);
+        if (!iRet)
+        {
+		   usleep(10000);
+           continue;
+        }
+        iRead = send(hHandle, pBuffer, iSize, iFlags);
+        if (iRead < 0)
+        {
+           return kError_NoErr;
+        }
+        break;
+    }
+
+    if (m_exit || item->GetState() != kDownloadItemState_Downloading)
+       return kError_Interrupt;
+       
+    return kError_NoErr;
+}                            

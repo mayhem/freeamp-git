@@ -54,8 +54,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,0,4,0
- PRODUCTVERSION 2,0,4,0
+ FILEVERSION 2,0,5,0
+ PRODUCTVERSION 2,0,5,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -73,13 +73,13 @@ BEGIN
             VALUE "Comments", "For the latest version go to http://www.freeamp.org\0"
             VALUE "CompanyName", "FreeAmp Open Source Development Effort\0"
             VALUE "FileDescription", "The ID3v2 MetaData plugin enables FreeAmp to decode and display extra information attached to MP3s (such as the artist's name, the album title and the song title) in the id3 version 2 format.\0"
-            VALUE "FileVersion", "2.0.4.0\0"
+            VALUE "FileVersion", "2.0.5.0\0"
             VALUE "InternalName", "id3v2\0"
             VALUE "LegalCopyright", "http://www.gnu.org/copyleft/gpl.html\0"
             VALUE "LegalTrademarks", "FreeAmp\0"
             VALUE "OriginalFilename", "id3v2.mdf\0"
             VALUE "ProductName", "ID3v2 Metadata Plugin\0"
-            VALUE "ProductVersion", "2.0.4\0"
+            VALUE "ProductVersion", "2.0.5\0"
         END
     END
     BLOCK "VarFileInfo"

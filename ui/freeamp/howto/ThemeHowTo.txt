@@ -4,7 +4,7 @@
                             Robert Kaye
                          (rob@emusic.com)
         $Id$
-                    (Updated for version 2.0.2)
+                    (Updated for version 2.0.5)
 
 INTRODUCTION
 
@@ -488,7 +488,7 @@ field is for whatever miscellaneous credit information you'd like to
 include. Only the Name attribute is required.
 
 
-Headlines: (Added for 2.0.2)
+Headlines: (Added for 2.0.2, updated for 2.0.5)
 ----------
 
 FreeAmp now has the capabilities to download headlines from popular
@@ -497,20 +497,38 @@ the headlines and what data to display:
 
 <Headlines URL="http://www.slashdot.org/slashdot.xml"
            XMLPath="/backslash/story/title"
+           XMLURLPath="/backslash/story/url"
 		   DownloadInterval="3600"
 		   ChangeInterval="10"/>
 
 This Headlines tag shows the headlines from Slashdot in the 'HeadlineInfo'
-TextField. The URL attribute specifies the location of the XML document that 
-contains the headlines. This currently only works with XML documents! The 
-XMLPath attribute defines which text fields to show as headlines. In this 
-case each <title> tag that is nested inside of a <story> tag, which is in 
-turn nested inside a <backslash> tag will be considered a headline. The 
-DownloadInterval attribute detemines how often the headlines should be 
+TextField. The URL attribute specifies the HTTP location of the XML document 
+that contains the headlines. This currently only works with XML documents
+retrieved via HTTP! The XMLPath attribute defines which text fields to show 
+as headlines. In this case each <title> tag that is nested inside of a 
+<story> tag, which is in turn nested inside a <backslash> tag will be 
+considered a headline. The XMLURLPath attribute defines which XML fields are 
+URLs associated with the headlines. There must be an XMLURLPath field for 
+every headline, otherwise the headline URLs will not function. For example, 
+examine the following XML example:
+
+    <?xml version="1.0"?><backslash
+    xmlns:backslash="http://slashdot.org/backslash.dtd">
+ 
+    <story>
+       <title>Final Fantasy Movie Trailers</title>
+       <url>http://slashdot.org/articles/00/03/07/0058211.shtml</url>
+
+Given the above Headlines tag, it will show 'Final Fantasy Move Trailers'
+in the HeadlineInfo field and if the user clicks on that text field,
+FreeAmp will open a browser to http://slashdot.org/articles/00... 
+
+The DownloadInterval attribute detemines how often the headlines should be 
 downloaded, and the ChangeInterval attribute determines how quickly FreeAmp 
 should flip through the headlines. Both intervals are specified in seconds, 
 and in the example above, the headlines are grabbed once an hour and each 
-headline is displayed for 10 seconds. All 4 attributes are required.
+headline is displayed for 10 seconds. All attributes except XMLURLPath 
+are required.
 
 The headlines are actually displayed in a TextField called HeadlineInfo.
 
@@ -714,6 +732,18 @@ QUICK REFERENCE
    Author -- The name(s) of the theme author(s) [optional]
    EMail -- The email address of the theme author(s) [optional]
    WebPage -- The Web page associated with the author(s)/theme. [optional]
+
+
+<Headlines>
+
+   -- specified a what to display in the HeadlineInfo text field.
+   
+   URL -- The HTTP location where the XML headline document can be found.
+   XMLPath -- The XML location where headlines can be found.
+   XMLURLPath -- The XML location where headline URLs can be found.	[optional]
+   DownloadInterval -- How frequently to download new headlines (seconds)
+   ChangeInterval -- How frequently to show a new headline (seconds)
+
       
 
 Troubleshooting:

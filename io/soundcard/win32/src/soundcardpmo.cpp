@@ -263,7 +263,6 @@ Error SoundCardPMO::Init(OutputInfo * info)
    m_num_headers = (m_pInputBuffer->GetBufferSize() / m_data_size) - 1;
    
    m_hdr_size = sizeof(WAVEHDR);
-   m_wavehdr_array = new WAVEHDR[m_num_headers];
 
    m_wfex = new WAVEFORMATEX;
 

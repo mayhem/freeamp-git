@@ -373,7 +373,7 @@ if test "$have_gtk" = "true"; then
   else
      GTK_CFLAGS=`$GTK_CONFIG --cflags`
      GTK_LIBS=`$GTK_CONFIG --libs gthread`
-     min_gtk_version="1.2.2"
+     min_gtk_version="1.2.5"
      AC_MSG_CHECKING(for GTK+ version >= $min_gtk_version)
      gtk_config_major=`$GTK_CONFIG --version | sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\1/'`
      gtk_config_minor=`$GTK_CONFIG --version | sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\2/'`

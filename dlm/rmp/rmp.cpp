@@ -158,7 +158,6 @@ Error RMP::PCData(string &oData)
     if (m_oPath == string("/PACKAGE/TRACKLIST/TRACK/TRACKID"))
     {
         m_oTrackId = oData;
-    	m_pMetaData->SetTrack(atoi(oData.c_str()));
         return kError_NoErr;
     }
     if (m_oPath == string("/PACKAGE/TRACKLIST/TRACK/DIR"))

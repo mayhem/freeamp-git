@@ -44,6 +44,7 @@ using namespace std;
 #include <shlobj.h>
 #define MKDIR(z) mkdir(z)
 #else
+#include "win32impl.h"
 #include <unistd.h>
 #define MKDIR(z) mkdir(z, 0755)
 #endif
@@ -739,4 +740,53 @@ bool CopyFile(const char *pExistingFileName,
 
     return true;
 }
+
 #endif
+
+string FindFile(string oPath)
+{
+    char *findpath, *path, *filename, *slash;
+    string retvalue = oPath;
+
+    path = new char[_MAX_PATH];
+    strcpy(path, oPath.c_str());
+
+    slash = strrchr(path, DIR_MARKER);
+
+    if (!slash)
+        return retvalue;
+
+    slash++;
+    filename = new char[strlen(slash) + 1];
+    strcpy(filename, slash);
+    *slash = '\0';
+
+    findpath = new char[strlen(path) + 1];
+    strcpy(findpath, path);
+
+    strcat(findpath, "*");
+#ifdef WIN32
+    strcat(findpath, ".*");
+#endif
+
+    WIN32_FIND_DATA find;
+    HANDLE handle;
+
+    handle = FindFirstFile(findpath, &find);
+    if (handle != INVALID_HANDLE_VALUE) {
+        do {
+            if (!strcasecmp(find.cFileName, filename)) {
+                retvalue = string(path) + string(find.cFileName);
+                break;
+            }
+        }
+        while (FindNextFile(handle, &find));
+        FindClose(handle);
+    }
+
+    delete [] findpath;
+    delete [] path;
+    delete [] filename;
+
+    return retvalue;
+}

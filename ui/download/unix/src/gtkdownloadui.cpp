@@ -33,6 +33,21 @@ ____________________________________________________________________________*/
 #include "help.h"
 #include "gtkmessagedialog.h"
 
+static const char *szEMusicText =
+   "The Download Manager enables you to download music from the downloadable "
+   "page at the EMusic site and other sites that support RMP/"
+   "RealJukebox downloads.";
+static const char *szEMusicURLText = "Go to my downloadables at EMusic";
+static const char *szEMusicURL = "https://secure.emusic.com/perl/secure/downloadables.pl";
+
+static const char *szFreeAmpText =
+   "The Download Manager enables you to download music from sites that "
+   "support the RMP or RealJukebox download format. To try it check "
+   "out the free music at:";
+
+static const char *szFreeAmpURLText = "http://www.emusic.com/music/free.html";
+static const char *szFreeAmpURL = "http://www.emusic.com/music/free.html";
+
 void DownloadUI::ToggleVisEvent(void)
 {
     m_initialized = false;
@@ -99,6 +114,97 @@ void DownloadUI::UpdateInfo(void)
     gtk_label_set_text(GTK_LABEL(size), display.c_str());
 }
 
+string DownloadUI::StatusString(DownloadItem *dli)
+{
+    string statusString;
+
+    switch (dli->GetState()) {
+        case kDownloadItemState_Queued: {
+            char outtext[128];
+            float total;
+
+            total = dli->GetTotalBytes();
+
+            if (total >= 1048576) {
+                total /= 1048576;
+                sprintf(outtext, "Queued (%.2f MB)", total);
+            }
+            else if (total >= 1024) {
+                total /= 1024;
+                sprintf(outtext, "Queued (%.2f KB)", total);
+            }
+            else
+                sprintf(outtext, "Queued (%.2f Bytes)", total);
+
+            statusString = outtext;
+            break; }
+        case kDownloadItemState_Downloading: {
+            float total;
+            float recvd;
+            uint32 percent;
+            char outtext[128];
+
+            total = dli->GetTotalBytes();
+            recvd = dli->GetBytesReceived();
+            percent = (uint32)(recvd/total*100);
+
+            if (total >= 1048576) {
+                total /= 1048576;
+                recvd /= 1048576;
+                sprintf(outtext, "%d%% (%.2f of %.2f MB)", percent, recvd, total);
+            }
+            else if(total >= 1024) {
+                total /= 1024;
+                recvd /= 1024;
+                sprintf(outtext, "%d%% (%.2f of %.2f KB)", percent, recvd, total);
+            }
+            else
+                sprintf(outtext, "%d%% (%.2f of %.2f Bytes)", percent, recvd, total);
+
+            statusString = outtext;
+            break; }
+        case kDownloadItemState_Cancelled: {
+            statusString = "Cancelled";
+            break; }
+        case kDownloadItemState_Paused: {
+            char outtext[128];
+            float total;
+            float recvd;
+            uint32 percent;
+
+            total = dli->GetTotalBytes();
+            recvd = dli->GetBytesReceived();
+            percent = (uint32)(recvd/total*100);
+
+            if (total >= 1048576) {
+                total /= 1048576;
+                recvd /= 1048576;
+                sprintf(outtext, "Paused (%.2f of %.2f MB - %d%%)", recvd, total, percent);
+            }
+            else if(total >= 1024) {
+                total /= 1024;
+                recvd /= 1024;
+                sprintf(outtext, "Paused (%.2f of %.2f KB - %d%%)", recvd, total, percent);
+            }
+            else
+                sprintf(outtext, "Paused (%.2f of %.2f Bytes - %d%%)", recvd, total, percent);
+
+            statusString = outtext;
+            break; }
+        case kDownloadItemState_Error: {
+            char outtext[1024];
+            sprintf(outtext, "Error: %s\n", ErrorString[dli->GetDownloadError()]);
+            statusString = outtext;
+            break; }
+        case kDownloadItemState_Done: {
+            statusString = "Download Complete\0";
+            break; }
+        default:
+            break;
+    }
+    return statusString;
+}
+
 void DownloadUI::UpdateDownloadList(void)
 {
     if (!m_List || !isVisible)
@@ -109,110 +215,86 @@ void DownloadUI::UpdateDownloadList(void)
 
     uint32 iLoop = downloadList.size();
 
-    if (iLoop == 0)
+    if (iLoop == 0) {
+        gtk_clist_thaw(GTK_CLIST(m_List));
         return;
+    }
 
     for (uint32 i = 0; i < iLoop; i++) {
         DownloadItem *dli = downloadList[i];
         char *iText[2];
 
         string displayString = dli->GetMetaData().Title();
-        string statusString;
 
         iText[0] = (char *)displayString.c_str();  
-  
-        switch (dli->GetState()) {
-            case kDownloadItemState_Queued: {
-                char outtext[128];
-                float total;
- 
-                total = dli->GetTotalBytes();
- 
-                if (total >= 1048576) {
-                    total /= 1048576;
-                    sprintf(outtext, "Queued (%.2f MB)", total);
-                }
-                else if (total >= 1024) {
-                    total /= 1024;
-                    sprintf(outtext, "Queued (%.2f KB)", total);
-                }
-                else 
-                    sprintf(outtext, "Queued (%.2f Bytes)", total);
-                
-                statusString = outtext;
-                break; }
-            case kDownloadItemState_Downloading: {
-                float total;
-                float recvd;
-                uint32 percent;
-                char outtext[128];
+        iText[1] = (char *)StatusString(dli).c_str();
 
-                total = dli->GetTotalBytes();
-                recvd = dli->GetBytesReceived();
-                percent = (uint32)(recvd/total*100);
-
-                if (total >= 1048576) {
-                    total /= 1048576;
-                    recvd /= 1048576;
-                    sprintf(outtext, "%d%% (%.2f of %.2f MB)", percent, recvd, total);
-                }
-                else if(total >= 1024) {
-                    total /= 1024;
-                    recvd /= 1024;
-                    sprintf(outtext, "%d%% (%.2f of %.2f KB)", percent, recvd, total);
-                }
-                else
-                    sprintf(outtext, "%d%% (%.2f of %.2f Bytes)", percent, recvd, total);
-                
-                statusString = outtext;
-                break; }
-            case kDownloadItemState_Cancelled: {
-                statusString = "Cancelled";
-                break; }
-            case kDownloadItemState_Paused: {
-                char outtext[128];
-                float total;
-                float recvd;
-                uint32 percent;
- 
-                total = dli->GetTotalBytes();
-                recvd = dli->GetBytesReceived();
-                percent = (uint32)(recvd/total*100);
-
-                if (total >= 1048576) {
-                    total /= 1048576;
-                    recvd /= 1048576;
-                    sprintf(outtext, "Paused (%.2f of %.2f MB - %d%%)", recvd, total, percent);
-                }
-                else if(total >= 1024) {
-                    total /= 1024;
-                    recvd /= 1024;
-                    sprintf(outtext, "Paused (%.2f of %.2f KB - %d%%)", recvd, total, percent);
-                }
-                else
-                    sprintf(outtext, "Paused (%.2f of %.2f Bytes - %d%%)", recvd, total, percent);
-
-                statusString = outtext;
-                break; }
-            case kDownloadItemState_Error: {
-                char outtext[128];
-                sprintf(outtext, "Error: %d\n", dli->GetDownloadError());
-                statusString = outtext;
-                break; }
-            case kDownloadItemState_Done: {
-                statusString = "Download Complete\0";
-                break; }
-            default:
-                break;
-        }
-        iText[1] = (char *)statusString.c_str();
-
-        gtk_clist_append(GTK_CLIST(m_List), iText);
+        int row = gtk_clist_append(GTK_CLIST(m_List), iText);
+        gtk_clist_set_row_data(GTK_CLIST(m_List), row, (gpointer)dli);
     }
 
     gtk_clist_select_row(GTK_CLIST(m_List), m_currentindex, 0);
-    UpdateInfo();
+    SelChangeEvent(m_currentindex);
     gtk_clist_thaw(GTK_CLIST(m_List));
+}
+
+void DownloadUI::AddItem(DownloadItem *dli)
+{
+    if (!dli || !m_List || !isVisible)
+        return;
+
+    char *iText[2];
+    string displayString = dli->GetMetaData().Title();
+
+    iText[0] = (char *)displayString.c_str();
+    iText[1] = (char *)StatusString(dli).c_str();
+
+    int row = gtk_clist_append(GTK_CLIST(m_List), iText);
+    gtk_clist_set_row_data(GTK_CLIST(m_List), row, (gpointer)dli);
+}
+
+void DownloadUI::UpdateItem(DownloadItem *dli)
+{
+    if (!dli || !m_List || !isVisible)
+        return;
+
+    int row = gtk_clist_find_row_from_data(GTK_CLIST(m_List), (gpointer)dli);
+
+    if (row < 0)
+        return;
+
+    char *iText[2];
+    iText[0] = (char *)StatusString(dli).c_str();
+    if (gtk_clist_get_text(GTK_CLIST(m_List), row, 1, &iText[1])) {
+        if (!strcmp(iText[0], iText[1]))
+            return;
+    }
+
+    gtk_clist_set_text(GTK_CLIST(m_List), row, 1, iText[0]);
+
+    if (row == (int)m_currentindex) 
+        SelChangeEvent(m_currentindex);
+}
+
+void DownloadUI::RemoveItem(DownloadItem *dli)
+{
+    if (!dli || !m_List || !isVisible)
+        return;
+
+    int row = gtk_clist_find_row_from_data(GTK_CLIST(m_List), (gpointer)dli);
+
+    if (row < 0)
+        return;
+
+    gtk_clist_remove(GTK_CLIST(m_List), row);
+
+    vector<DownloadItem *>::iterator i = downloadList.begin();
+    for (; i != downloadList.end(); i++) {
+        if ((*i) == dli) 
+            break;
+    }
+    if (i != downloadList.end())
+        downloadList.erase(i);
 }
 
 void set_current_sel_internal(GtkWidget *widget, int row, int column,
@@ -234,8 +316,7 @@ void DownloadUI::CreateDownloadList(GtkWidget *box)
     gtk_signal_connect(GTK_OBJECT(m_List), "select_row",
                        GTK_SIGNAL_FUNC(set_current_sel_internal), this);
     gtk_widget_show(m_List);
-
-    UpdateDownloadList();
+    gtk_clist_column_titles_passive(GTK_CLIST(m_List));
 }
 
 void cancel_internal(GtkWidget *w, DownloadUI *p)
@@ -281,14 +362,16 @@ void help_button_click(GtkWidget *w, DownloadUI *p)
 
 void emusic_click(GtkWidget *w, DownloadUI *p)
 {
-    LaunchBrowser("http://www.emusic.com/music/free.html");
+    if (!strncasecmp(BRANDING_COMPANY, "EMusic", 6))
+        LaunchBrowser((char *)szEMusicURL);
+    else
+        LaunchBrowser((char *)szFreeAmpURL);
 }
 
 void DownloadUI::CreateDownloadUI(void)
 {
     m_downloadUI = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(m_downloadUI), BRANDING" - DownloadManager");
-    gtk_window_set_policy(GTK_WINDOW(m_downloadUI), FALSE, FALSE, TRUE);
     gtk_signal_connect(GTK_OBJECT(m_downloadUI), "destroy",
                        GTK_SIGNAL_FUNC(toggle_vis_internal), this);
     gtk_container_set_border_width(GTK_CONTAINER(m_downloadUI), 5);
@@ -300,7 +383,10 @@ void DownloadUI::CreateDownloadUI(void)
 
     GtkWidget *text = gtk_label_new(NULL);
     gtk_label_set_line_wrap(GTK_LABEL(text), TRUE);
-    gtk_label_set_text(GTK_LABEL(text), "The Download Manager enables you to download music from sites that support the RMP or Real Jukebox download format.  To try it, check out the free music at:");
+    if (!strncasecmp(BRANDING_COMPANY, "EMusic", 6))
+        gtk_label_set_text(GTK_LABEL(text), szEMusicText);
+    else
+        gtk_label_set_text(GTK_LABEL(text), szFreeAmpText);
     gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_FILL);
     gtk_misc_set_alignment(GTK_MISC(text), (gfloat)0.0, (gfloat)0.0);
     
@@ -308,7 +394,12 @@ void DownloadUI::CreateDownloadUI(void)
     gtk_widget_set_usize(text, 400, 46);
     gtk_widget_show(text);
 
-    GtkWidget *emusic_button = gtk_button_new_with_label("http://www.emusic.com/music/free.html");
+    GtkWidget *emusic_button;
+    if (!strncasecmp(BRANDING_COMPANY, "EMusic", 6))
+        emusic_button = gtk_button_new_with_label(szEMusicURLText);
+    else
+        emusic_button = gtk_button_new_with_label(szFreeAmpURLText);
+
     gtk_box_pack_start(GTK_BOX(vbox), emusic_button, FALSE, FALSE, 2);
     gtk_signal_connect(GTK_OBJECT(emusic_button), "clicked",
                        GTK_SIGNAL_FUNC(emusic_click), this);
@@ -321,10 +412,6 @@ void DownloadUI::CreateDownloadUI(void)
     gtk_box_pack_start(GTK_BOX(vbox), listwindow, TRUE, TRUE, 0);
     gtk_widget_set_usize(listwindow, 400, 140);
     gtk_widget_show(listwindow);
-
-    GtkWidget *sep = gtk_hseparator_new();
-    gtk_box_pack_start(GTK_BOX(vbox), sep, FALSE, TRUE, 0);
-    gtk_widget_show(sep);
 
     GtkWidget *table = gtk_table_new(7, 2, FALSE);
     gtk_box_pack_start(GTK_BOX(vbox), table, FALSE, FALSE, 0);
@@ -409,7 +496,7 @@ void DownloadUI::CreateDownloadUI(void)
 
     CreateDownloadList(listwindow);
 
-    sep = gtk_hseparator_new();
+    GtkWidget *sep = gtk_hseparator_new();
     gtk_box_pack_start(GTK_BOX(vbox), sep, FALSE, TRUE, 5);
     gtk_widget_show(sep);
 

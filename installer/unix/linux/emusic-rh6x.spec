@@ -1,6 +1,6 @@
 Summary: MP3 audio player with theme user interface and streaming support
 Name: emusic
-Version: 2.0.4
+Version: 2.0.5
 Release: 1
 Copyright: GPL
 Group: Applications/Multimedia

@@ -22,6 +22,8 @@
 ____________________________________________________________________________*/
 
 /* system headers */
+#include "config.h"
+
 #include <stdlib.h>
 #include <assert.h>
 #include <sys/stat.h>
@@ -1472,6 +1474,18 @@ void GTKPreferenceWindow::UpdateThemeList(void)
          if ((*i).second == originalValues.currentTheme) 
              originalValues.listboxIndex = proposedValues.listboxIndex 
                                          = currentValues.listboxIndex = iLoop;
+         else {
+             char *name = strrchr((*i).second.c_str(), '/');
+             if (name) {
+                 name++;
+                 if (name && *name) {
+                     if (!strcmp(name, originalValues.currentTheme.c_str())) 
+                         originalValues.listboxIndex = 
+                                             proposedValues.listboxIndex 
+                                           = currentValues.listboxIndex = iLoop;
+                 }
+             }
+         }
     }
 
     gtk_clist_select_row(GTK_CLIST(themeList), proposedValues.listboxIndex, 0);

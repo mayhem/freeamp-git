@@ -64,4 +64,7 @@ void FindMusicFiles(const char* rootPath,
 bool ResolveLink(string& path);
 #endif
 
+/* func to find the real filename of a path, irregardless of case */
+string FindFile(string oPath);
+
 #endif /* INCLUDED_UTILITY_H */

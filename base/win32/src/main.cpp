@@ -436,6 +436,12 @@ static LRESULT WINAPI HiddenWndProc(HWND hwnd,
             bool playNow = false;
 
             context->prefs->GetPlayImmediately(&playNow);
+            
+            // If a single theme or rpm file gets passed, don't affect 
+            // the play queue
+            if (strcasecmp("fat", array + strlen(array) - 3) == 0 ||
+                strcasecmp("rmp", array + strlen(array) - 3) == 0)
+                playNow = false;
 
             if(playNow)
             {

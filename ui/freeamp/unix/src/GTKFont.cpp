@@ -182,8 +182,8 @@ Error GTKFont::AddFont(string &oFontFile)
 {
     string oFontDest;
     char fcopy[_MAX_PATH], *filename, *ext;
-    FILE *orig, *dest;
     struct stat st;
+    string tempfile;
 
     oFontDest = FreeampDir(NULL) + string ("/fonts");
 
@@ -199,40 +199,16 @@ Error GTKFont::AddFont(string &oFontFile)
         *ext = '\0';
         ext++;
     }
- 
+
+    tempfile = oFontFile;
+    if (-1 == stat(tempfile.c_str(), &st)) 
+        tempfile = FindFile(tempfile);
+         
     oFontDest += string("/") + string(filename);
     if (ext)
         oFontDest += string(".") + string(ext);
 
-/*    WIN32_FIND_DATA find;
-    HANDLE          handle;
-
-    handle = FindFirstFile((char *)oFontFile.c_str(), &find);
-    if (handle != INVALID_HANDLE_VALUE) {
-        do {
-            if (!strncasecmp(filename, find.cFileName, strlen(filename)))
-                cout << "found..\n";
-        }
-        while (FindNextFile(handle, &find));
-        FindClose(handle);
-    }
-*/
-    orig = fopen(oFontFile.c_str(), "r");
-
-    if (!orig) 
-        return kError_FileNotFound;
-
-    dest = fopen(oFontDest.c_str(), "w");
-
-    if (!dest) {
-        fclose(orig);
-        return kError_FileNotFound;
-    }
-    unsigned char buf[1];
-    while (fread(buf, 1, 1, orig))
-        fwrite(buf, 1, 1, dest);
-    fclose(orig);
-    fclose(dest);
+    CopyFile(tempfile.c_str(), oFontDest.c_str(), true);
 
     m_oFace = oFontDest;
 

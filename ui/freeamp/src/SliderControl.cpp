@@ -143,6 +143,9 @@ void SliderControl::Transition(ControlTransitionEnum  eTrans,
 {
     Rect oRect;
 
+    if (m_eCurrentState == CS_Dragging && eTrans == CT_SetValue)
+        return;
+    
     switch(eTrans)
     {
        case CT_MouseEnter:

@@ -63,7 +63,12 @@ char* kShoutCast = "ShoutCast";
 char* kIceCast = "IceCast";
 
 void MusicBrowserUI::InitTree(void)
-{                          
+{
+    if(m_hMyMusicItem)
+        TreeView_DeleteItem(m_hMusicView, m_hMyMusicItem);
+    if(m_hPlaylistItem)
+        TreeView_DeleteItem(m_hMusicView, m_hPlaylistItem);
+    
     TV_INSERTSTRUCT insert;
         
     insert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
@@ -813,9 +818,6 @@ HTREEITEM MusicBrowserUI::FindPlaylist(const string playlist)
 
 void MusicBrowserUI::MusicCatalogCleared()
 {
-    TreeView_DeleteItem(m_hMusicView, m_hMyMusicItem);
-    TreeView_DeleteItem(m_hMusicView, m_hPlaylistItem);
-
     InitTree();
 }
 

@@ -448,8 +448,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,0,4,0
- PRODUCTVERSION 2,0,4,0
+ FILEVERSION 2,0,5,0
+ PRODUCTVERSION 2,0,5,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -467,13 +467,13 @@ BEGIN
             VALUE "Comments", "For the latest version go to http://www.freeamp.org\0"
             VALUE "CompanyName", "FreeAmp Open Source Development Effort\0"
             VALUE "FileDescription", "The default user interface for FreeAmp. A user can change it's look through theme files which are similiar to, but more powerful than skins.\0"
-            VALUE "FileVersion", "2.0.4.0\0"
+            VALUE "FileVersion", "2.0.5.0\0"
             VALUE "InternalName", "FreeAmp\0"
             VALUE "LegalCopyright", "Copyright © EMusic.com 1999\0"
             VALUE "LegalTrademarks", "FreeAmp, EMusic\0"
             VALUE "OriginalFilename", "freeamp.ui\0"
             VALUE "ProductName", "FreeAmp User interface\0"
-            VALUE "ProductVersion", "2.0.4\0"
+            VALUE "ProductVersion", "2.0.5\0"
         END
     END
     BLOCK "VarFileInfo"

@@ -109,10 +109,10 @@ void DownloadUI::GTKEventService(void)
     }
 }
 
-Error DownloadUI::AcceptEvent(Event *event)
+Error DownloadUI::AcceptEvent(Event *e)
 {
     
-    switch (event->Type()) {
+    switch (e->Type()) {
         case CMD_Cleanup: {
             if (weAreGTK) 
                 doQuitNow = true;
@@ -142,15 +142,30 @@ Error DownloadUI::AcceptEvent(Event *event)
                     m_initialized = true;
                 }
                 isVisible = true;
+                UpdateDownloadList();
+                UpdateOverallProgress();
             }
             gdk_threads_leave();
             break; }
         case INFO_DownloadItemAdded: {
-            DownloadItemAddedEvent *dliae = (DownloadItemAddedEvent *)event;
+            DownloadItemAddedEvent *dliae = (DownloadItemAddedEvent *)e;
             downloadList.push_back(dliae->Item());
 
             if (isVisible) {
                 gdk_threads_enter();
+                AddItem(dliae->Item());
+                UpdateOverallProgress();
+                gdk_threads_leave();
+            }
+            else {
+                gdk_threads_enter();
+                if (m_initialized)
+                    gtk_widget_show(m_downloadUI); 
+                else {
+                    CreateDownloadUI();
+                    m_initialized = true;
+                }
+                isVisible = true;
                 UpdateDownloadList();
                 UpdateOverallProgress();
                 gdk_threads_leave();
@@ -161,10 +176,10 @@ Error DownloadUI::AcceptEvent(Event *event)
 
             break; }
 	case INFO_DownloadItemNewState: {
-	    DownloadItemNewStateEvent *dlinse = (DownloadItemNewStateEvent *)event;
+	    DownloadItemNewStateEvent *dlinse = (DownloadItemNewStateEvent *)e;
 	    if (isVisible) {
 	        gdk_threads_enter();
-		UpdateDownloadList();
+		UpdateItem(dlinse->Item());
 		UpdateOverallProgress();
 		
 		uint32 count = 0;
@@ -180,11 +195,20 @@ Error DownloadUI::AcceptEvent(Event *event)
 		gdk_threads_leave();
             }
 	    break; }
-        case INFO_DownloadItemRemoved:
-        case INFO_DownloadItemProgress: {
+        case INFO_DownloadItemRemoved: {
+            DownloadItemRemovedEvent *dire = (DownloadItemRemovedEvent *)e;
             if (isVisible) {
                 gdk_threads_enter();
-                UpdateDownloadList();
+                RemoveItem(dire->Item());
+                UpdateOverallProgress();
+                gdk_threads_leave();
+            }
+            break; }
+        case INFO_DownloadItemProgress: {
+            DownloadItemProgressEvent *dipe = (DownloadItemProgressEvent *)e;
+            if (isVisible) {
+                gdk_threads_enter();
+                UpdateItem(dipe->Item());
                 UpdateOverallProgress();
                 gdk_threads_leave();
             }
@@ -197,6 +221,7 @@ Error DownloadUI::AcceptEvent(Event *event)
 
 void DownloadUI::UpdateOverallProgress(void)
 {
+/*
     uint32 itemCount = downloadList.size();
     uint32 totalBytes = 0, doneBytes = 0;
     uint32 totalItems = 0, doneItems = 0;
@@ -221,6 +246,7 @@ void DownloadUI::UpdateOverallProgress(void)
              }
         }
     }
+*/
 }
 
 void DownloadUI::CancelEvent(void)
@@ -261,30 +287,40 @@ void DownloadUI::ResumeEvent(void)
 
     DownloadItem *dli = downloadList[m_currentindex];
     if (dli != *downloadList.end()) {
-        m_dlm->QueueDownload(dli, true);
-	m_dlm->ResumeDownloads();
+        if (!m_resumeLabelIsStart) {
+            m_dlm->QueueDownload(dli, true);
+            m_dlm->ResumeDownloads();
+        }
+        else
+            m_dlm->ResumeDownloads();
         gtk_widget_set_sensitive(m_PauseButton, TRUE);
         gtk_widget_set_sensitive(m_CancelButton, TRUE);
         gtk_widget_set_sensitive(m_ResumeButton, FALSE);
     }
 }
 
-void DownloadUI::SelChangeEvent(int row)
+bool DownloadUI::UpdateButtons(int row)
 {
-    m_currentindex = row;
-    DownloadItem *dli = downloadList[m_currentindex];
- 
+    DownloadItem *dli = downloadList[row];
+
     if (dli == *downloadList.end() || !isVisible)
-        return;    
+        return false; 
 
     gtk_label_set_text(GTK_LABEL(m_ResumeLabel), "  Resume  ");
+    m_resumeLabelIsStart = false;
+
     switch (dli->GetState()) {
         case kDownloadItemState_Queued: {
-	    gtk_widget_set_sensitive(m_PauseButton, FALSE);
-	    gtk_widget_set_sensitive(m_CancelButton, TRUE);
-	    gtk_widget_set_sensitive(m_ResumeButton, m_dlm->IsPaused());
-	    gtk_label_set_text(GTK_LABEL(m_ResumeLabel), "  Start  ");
-	    break; }
+            gtk_widget_set_sensitive(m_PauseButton, FALSE);
+            gtk_widget_set_sensitive(m_CancelButton, TRUE);
+       
+            int active = m_dlm->IsPaused();
+            if (!active && downloadList.size() == 1)
+                active = TRUE;
+            gtk_widget_set_sensitive(m_ResumeButton, active);
+            gtk_label_set_text(GTK_LABEL(m_ResumeLabel), "  Start  ");
+            m_resumeLabelIsStart = true;
+            break; }
         case kDownloadItemState_Downloading: {
             gtk_widget_set_sensitive(m_PauseButton, TRUE);
             gtk_widget_set_sensitive(m_CancelButton, TRUE);
@@ -309,5 +345,13 @@ void DownloadUI::SelChangeEvent(int row)
         default:
             break;
     }
-    UpdateInfo();
+    return true;
+}
+    
+void DownloadUI::SelChangeEvent(int row)
+{
+    m_currentindex = row;
+ 
+    if (UpdateButtons(m_currentindex))
+        UpdateInfo();
 }

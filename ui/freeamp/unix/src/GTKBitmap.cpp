@@ -24,6 +24,8 @@ ____________________________________________________________________________*/
 #include "string"
 #include "GTKBitmap.h"
 
+#include "utility.h"
+
 #include <gdk/gdk.h>
 extern "C" {
 #include <gdk/gdkx.h>
@@ -128,11 +130,17 @@ Error GTKBitmap::LoadBitmapFromDisk(string &oFile)
     gulong rmask = 0xff, gmask = 0xff, bmask = 0xff;
     gulong rshift = 0, gshift = 0, bshift = 0;
 
-    if (stat(oFile.c_str(), &statbuf) == -1) 
-        return kError_LoadBitmapFailed;
+    string filename = oFile;
+
+    if (stat(filename.c_str(), &statbuf) == -1) {
+        filename = FindFile(filename);
+        if (stat(filename.c_str(), &statbuf) == -1) 
+            return kError_LoadBitmapFailed;
+    }
+
     size = statbuf.st_size;
 
-    file = fopen(oFile.c_str(), "rb");
+    file = fopen(filename.c_str(), "rb");
     if (!file) 
         return kError_LoadBitmapFailed;
 

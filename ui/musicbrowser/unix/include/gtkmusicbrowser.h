@@ -177,6 +177,11 @@ class GTKMusicBrowser {
 
     GtkWidget *NewPixmap(char **data);
 
+    GtkStyle *normStyle;
+    GtkStyle *boldStyle;
+
+    void ChangeCurrentPlayingIndex(uint32 oldindex, uint32 newindex);
+
     void SetStatusText(const char *text);
     GtkWidget *statusBar;
     unsigned int statusContext;

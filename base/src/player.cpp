@@ -1241,6 +1241,7 @@ CreatePMO(const PlaylistItem * pc, Event * pC)
                }
            }
        }
+       delete extension;
    }
 
    if (!item) {

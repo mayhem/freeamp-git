@@ -81,6 +81,7 @@ class DownloadUI : public UserInterface {
 
     uint32 CalcStringEllipsis(HDC hdc, string& displayString, int32 columnWidth);
     void UpdateOverallProgress();
+    void SetButtonStates(DownloadItem *dli);
 
  private:
     FAContext*		    m_context;
