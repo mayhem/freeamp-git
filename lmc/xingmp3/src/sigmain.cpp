@@ -143,7 +143,7 @@ void submit_metadata(MetaData *pmetaData)
    args[8] = strdup(pmetaData->Comment().c_str());
    args[9] = NULL;
 
-   ret = mb_QueryWithArgs(o, MB_ExchangeMetadata, args);
+   ret = mb_QueryWithArgs(o, MB_SubmitTrack, args);
    for(i = 0; i < 9; i++)
       free(args[i]);
 
