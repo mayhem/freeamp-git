@@ -2375,6 +2375,7 @@ ServiceEvent(Event * pC)
         case INFO_UnsignaturedTracksExist:
         case INFO_SignaturingStarted:
         case INFO_SignaturingStopped:
+        case INFO_VorbisInfo:
         case CMD_AddFiles:
         case CMD_LoadTheme:
         case CMD_ShowPreferences:
