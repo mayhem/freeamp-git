@@ -29,7 +29,6 @@ ____________________________________________________________________________*/
 #include <iostream.h>
 
 /* Project Includes */
-#include "resource.h"
 #include "player.h"
 #include "event.h"
 #include "utility.h"
