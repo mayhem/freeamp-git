@@ -149,7 +149,7 @@ bool MusicBrainzCD::LookupCD(void)
                       string("mbcd");
 
 
-    mb_SetServer(o, "www.musicbrainz.org", 80);
+    mb_SetServer(o, MUSICBRAINZ_SERVER, MUSICBRAINZ_PORT);
 
     ret = mb_Query(o, MB_GetCDTOC);
     if (!ret)

@@ -35,6 +35,7 @@ ____________________________________________________________________________*/
 #include <unistd.h> 
 
 #include "metadata.h"
+#include "config.h"
 
 #include "plm/metadata/id3v1/id3v1.h"
 #include "plm/metadata/id3v2/id3v2.h"
@@ -131,7 +132,7 @@ void submit_metadata(MetaData *pmetaData)
    }
 
    o = mb_New();
-   mb_SetServer(o, "musicbrainz.eorbit.net", 80);
+   mb_SetServer(o, MUSICBRAINZ_SERVER, MUSICBRAINZ_PORT);
 
    args[0] = strdup(pmetaData->Title().c_str());
    args[1] = strdup(pmetaData->GUID().c_str());

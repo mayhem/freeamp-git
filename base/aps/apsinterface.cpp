@@ -47,6 +47,7 @@ ____________________________________________________________________________*/
 #include "comsocket.h"
 #endif
 
+#include "config.h"
 #include "mutex.h"
 #include "semaphore.h"
 #include "YPClient.h"
@@ -154,7 +155,7 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
     int     i;
 
     o = mb_New();
-    mb_SetServer(o, "www.musicbrainz.org", 80);
+    mb_SetServer(o, MUSICBRAINZ_SERVER, MUSICBRAINZ_PORT);
     if (m_strProxyAddr.size() > 7)
         mb_SetProxy(o, (char *)m_strProxyAddr.c_str(), m_nProxyPort);
 
