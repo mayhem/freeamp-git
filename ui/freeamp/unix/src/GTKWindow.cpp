@@ -455,7 +455,7 @@ void GTKWindow::DropFiles(char *filename)
     if (filename) {
         char *filereturn = new char[strlen(filename) + 1];
         strcpy(filereturn, filename);
-        char *temp = strtok(filename, "\n");
+        char *temp = strtok(filereturn, "\n");
         do {
             char *realname = strchr(temp, ':');
             realname++;

@@ -602,7 +602,7 @@ void GTKMusicBrowser::CreatePlaylist(void)
 
 void GTKMusicBrowser::DeleteListEvent(void)
 {
-    if (m_lastindex == kInvalidIndex)
+    if (m_plm->CountItems() == 0)
         return;
 
     m_plm->RemoveAll();

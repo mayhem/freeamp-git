@@ -21,13 +21,33 @@
         $Id$
 ____________________________________________________________________________*/
 
+#include "config.h"
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include "gtkmusicbrowser.h"
+#include "utility.h"
+#include "player.h"
 
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
 
 #include <algorithm>
 using namespace std;
+
+struct GtkDragDestSite
+{
+  GtkDestDefaults    flags;
+  GtkTargetList     *target_list;
+  GdkDragAction      actions;
+  GdkWindow         *proxy_window;
+  GdkDragProtocol    proxy_protocol;
+  gboolean           do_proxy : 1;
+  gboolean           proxy_coords : 1;
+  gboolean           have_drag : 1;
+};
 
 PlaylistManager *BADPLM = NULL;
 
@@ -363,13 +383,20 @@ static gboolean list_drag_drop_internal(GtkWidget *widget,
                                         gint x, gint y, guint time,
                                         GTKMusicBrowser *p)
 {
-    if (widget == gtk_drag_get_source_widget(context))
-        return FALSE;
     GList *list = context->targets;
-    GdkAtom atom = gdk_atom_intern("tree-drag", FALSE);
+    GdkAtom atom = gdk_atom_intern("gtk-clist-drag-reorder", FALSE);
+    GdkAtom tree = gdk_atom_intern("tree-drag", FALSE);
+    GdkAtom plain = gdk_atom_intern("text/plain", FALSE);
+    GdkAtom html = gdk_atom_intern("text/html", FALSE);
     while (list) {
-        if ((int)atom == GPOINTER_TO_INT(list->data))
+        if (((int)atom == GPOINTER_TO_INT(list->data)) ||
+            ((int)tree == GPOINTER_TO_INT(list->data)) ||
+            ((int)plain == GPOINTER_TO_INT(list->data)) ||
+            ((int)html == GPOINTER_TO_INT(list->data))) {
+            gtk_drag_get_data(widget, context, GPOINTER_TO_INT(list->data), 
+                              time);
             return TRUE;
+        }
         list = list->next;
     }
     return FALSE;
@@ -458,9 +485,92 @@ static void list_drag_rec_internal(GtkWidget *widget, GdkDragContext *context,
 {
     if (widget == gtk_drag_get_source_widget(context))
         return;
-    if (data->length == sizeof(vector<PlaylistItem *> *)) {
-        vector<PlaylistItem *> *newlist = *((vector<PlaylistItem *> **)(data->data));
-        if (newlist) {
+    if (info == TARGET_TREE) {
+        if (data->length == sizeof(vector<PlaylistItem *> *)) {
+            vector<PlaylistItem *> *newlist;
+            newlist = *((vector<PlaylistItem *>**)(data->data));
+            if (newlist) {
+                GtkCListDestInfo dest_info;
+
+                drag_dest_cell(GTK_CLIST(widget), x, y, &dest_info);
+                if (dest_info.insert_pos == GTK_CLIST_DRAG_AFTER)
+                    dest_info.cell.row++;
+
+                p->m_lastindex = dest_info.cell.row;
+                p->AddTracksPlaylistEvent(newlist);
+ 
+                p->SetClickState(kContextPlaylist);
+
+                g_dataset_remove_data(context, "gtk-clist-drag-dest"); 
+                gtk_drag_finish(context, TRUE, FALSE, time);
+            }
+        }
+    }
+    else if (info == TARGET_STRING || info == TARGET_URL) {
+        if (data->data) {
+            vector<PlaylistItem *> *itemList = new vector<PlaylistItem *>;
+            vector<string> oFileList;
+            char *filereturn = strdup_new((char *)(data->data));
+            char *temp = strtok(filereturn, "\n");
+            do {
+                char *realname = strchr(temp, ':');
+                realname++;
+                if (realname && *realname) {
+                    uint32 length = strlen(realname);
+                    if (realname[length - 1] == '\r')
+                        realname[length - 1] = '\0';
+                    oFileList.push_back(string(realname));
+                }
+            }
+            while ((temp = strtok(NULL, "\n")));
+            delete [] filereturn;
+
+            char *url;
+            uint32 length;
+            vector<string>::iterator i;
+
+            url = new char[_MAX_PATH + 7];
+
+            for (i = oFileList.begin(); i != oFileList.end(); i++) {
+                char *ext = NULL;
+                struct stat st;
+
+                stat((*i).c_str(), &st);
+                if (st.st_mode & S_IFDIR) {
+                    vector<string> oList, oQuery;
+                    oQuery.push_back(string("*.mp1"));
+                    oQuery.push_back(string("*.mp2"));
+                    oQuery.push_back(string("*.mp3"));
+ 
+                    FindMusicFiles((*i).c_str(), oList, oQuery);
+                    if (oList.size() > 0) {
+                        vector<string>::iterator j = oList.begin();
+                        for (; j != oList.end(); j++) {
+                            PlaylistItem *newitem = new PlaylistItem((*j).c_str());
+                            itemList->push_back(newitem);
+                        }
+                    }
+                }
+                else {
+                    ext = p->GetContext()->player->GetExtension((*i).c_str());
+                    FilePathToURL((*i).c_str(), url, &length);
+
+                    if (ext) {
+                        PlaylistManager *plm = p->GetContext()->plm;
+                        if (plm->IsSupportedPlaylistFormat(ext)) 
+                            plm->ReadPlaylist(url, itemList);
+                        else if (p->GetContext()->player->IsSupportedExtension(ext))
+                        {
+                            PlaylistItem *newitem = new PlaylistItem(url);
+                            itemList->push_back(newitem);
+                        }
+                        delete [] ext;
+                    }
+                }
+            }
+
+            delete [] url;
+
             GtkCListDestInfo dest_info;
 
             drag_dest_cell(GTK_CLIST(widget), x, y, &dest_info);
@@ -468,13 +578,17 @@ static void list_drag_rec_internal(GtkWidget *widget, GdkDragContext *context,
                 dest_info.cell.row++;
 
             p->m_lastindex = dest_info.cell.row;
-            p->AddTracksPlaylistEvent(newlist);
+            p->AddTracksPlaylistEvent(itemList);
+
+            delete itemList;
 
             p->SetClickState(kContextPlaylist);
 
             g_dataset_remove_data(context, "gtk-clist-drag-dest");
+            gtk_drag_finish(context, TRUE, FALSE, time);
         }
     }
+    gtk_drag_finish(context, FALSE, FALSE, time);
 }
 
 static void list_drag_leave_internal(GtkWidget *widget, GdkDragContext *context,
@@ -490,9 +604,13 @@ static void list_drag_leave_internal(GtkWidget *widget, GdkDragContext *context,
     if (dest_info) {
         if (dest_info->cell.row >= 0) {
             GList *list = context->targets;
-            GdkAtom atom = gdk_atom_intern("tree-drag", FALSE);
+            GdkAtom tree = gdk_atom_intern("tree-drag", FALSE);
+            GdkAtom plain = gdk_atom_intern("text/plain", FALSE);
+            GdkAtom html = gdk_atom_intern("text/html", FALSE); 
             while (list) {
-                if ((int)atom == GPOINTER_TO_INT(list->data)) {
+                if (((int)tree == GPOINTER_TO_INT(list->data)) ||
+                    ((int)plain == GPOINTER_TO_INT(list->data)) ||
+                    ((int)html == GPOINTER_TO_INT(list->data))) {
                     GTK_CLIST_CLASS_FW(clist)->draw_drag_highlight(clist,
                             (GtkCListRow *)g_list_nth(clist->row_list,
                                                      dest_info->cell.row)->data,
@@ -506,13 +624,63 @@ static void list_drag_leave_internal(GtkWidget *widget, GdkDragContext *context,
     }
 }
 
+static GdkAtom i_drag_dest_find_target(GtkWidget *widget,
+                                       GtkDragDestSite *site,
+                                       GdkDragContext *context)
+{
+  GList *tmp_target;
+  GList *tmp_source = NULL;
+  GtkWidget *source_widget = gtk_drag_get_source_widget (context);
+
+  tmp_target = site->target_list->list;
+  while (tmp_target)
+    {
+      GtkTargetPair *pair = (GtkTargetPair *)(tmp_target->data);
+      tmp_source = context->targets;
+      while (tmp_source)
+        {
+          if (tmp_source->data == GUINT_TO_POINTER (pair->target))
+            {
+              if ((!(pair->flags & GTK_TARGET_SAME_APP) || source_widget) &&
+                  (!(pair->flags & GTK_TARGET_SAME_WIDGET) || (source_widget == widget)))
+                return pair->target;
+              else
+                break;
+            }
+          tmp_source = tmp_source->next;
+        }
+      tmp_target = tmp_target->next;
+    }
+
+  return GDK_NONE;
+}
+
 static gint list_drag_motion_internal(GtkWidget *widget,
                                       GdkDragContext *context,
                                       gint x, gint y, guint time,
                                       GTKMusicBrowser *p)
 {
-    if (widget == gtk_drag_get_source_widget(context))
-        return FALSE;
+    GtkDragDestSite *site;
+    GdkDragAction action = (GdkDragAction)0;
+    site = (GtkDragDestSite *)gtk_object_get_data(GTK_OBJECT(widget), "gtk-drag-dest");
+
+    if (context->suggested_action & site->actions)
+        action = context->suggested_action;
+    else {
+        gint i;
+        for (i = 0; i < 8; i++) {
+            if ((site->actions & (1 << i)) && (context->actions & (1 << i))) {
+                action = (GdkDragAction)(1 << i);
+                break;
+            }
+        }
+    }
+
+    if (action && i_drag_dest_find_target(widget, site, context)) {
+        if (!site->have_drag) 
+            site->have_drag = TRUE;
+        gdk_drag_status(context, action, time);
+    }
 
     GtkCList *clist = GTK_CLIST(widget);
     GtkCListDestInfo new_info;
@@ -531,14 +699,24 @@ static gint list_drag_motion_internal(GtkWidget *widget,
     drag_dest_cell(clist, x, y, &new_info);
 
     GList *list = context->targets;
-    GdkAtom atom = gdk_atom_intern("tree-drag", FALSE);
+    GdkAtom atom = gdk_atom_intern("gtk-clist-drag-reorder", FALSE);
+    GdkAtom tree = gdk_atom_intern("tree-drag", FALSE);
+    GdkAtom plain = gdk_atom_intern("text/plain", FALSE);
+    GdkAtom html = gdk_atom_intern("text/html", FALSE);
     list = context->targets;
     while (list) {
-        if ((int)atom == GPOINTER_TO_INT(list->data))
+        if ((int)tree == GPOINTER_TO_INT(list->data))
+            break;
+        else if ((int)plain == GPOINTER_TO_INT(list->data))
+            break;
+        else if ((int)html == GPOINTER_TO_INT(list->data))
+            break;
+        else if ((int)atom == GPOINTER_TO_INT(list->data))
             break;
         list = list->next;
     }
     if (list) {
+        site->have_drag = TRUE;
         if (new_info.cell.row != dest_info->cell.row ||
             (new_info.cell.row == dest_info->cell.row &&
              dest_info->insert_pos != new_info.insert_pos)) {
@@ -655,14 +833,15 @@ void GTKMusicBrowser::CreatePlaylistList(GtkWidget *box)
                        GTK_SIGNAL_FUNC(unset_current_index_internal), this);
     gtk_clist_set_selection_mode(GTK_CLIST(playlistList),
                                  GTK_SELECTION_EXTENDED);
-    GtkTargetEntry new_clist_target_table[2] = {
+    GtkTargetEntry new_clist_target_table[4] = {
         {"gtk-clist-drag-reorder", 0, 0},
-        {"tree-drag", 0, 1}
+        {"tree-drag", 0, TARGET_TREE},
+        {"text/plain", 0, TARGET_STRING},
+        {"text/html", 0, TARGET_URL},
     };
     GTK_CLIST_SET_FLAG(GTK_CLIST(playlistList), CLIST_REORDERABLE);
-    gtk_drag_dest_set(playlistList, (GtkDestDefaults)(GTK_DEST_DEFAULT_MOTION |
-                      GTK_DEST_DEFAULT_DROP),
-                      (GtkTargetEntry *)&new_clist_target_table, 2,
+    gtk_drag_dest_set(playlistList, (GtkDestDefaults)0,
+                      (GtkTargetEntry *)&new_clist_target_table, 4,
                       GDK_ACTION_MOVE);
     gtk_signal_connect(GTK_OBJECT(playlistList), "drag_leave",
                        GTK_SIGNAL_FUNC(list_drag_leave_internal), this);

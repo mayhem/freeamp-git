@@ -71,6 +71,12 @@ typedef enum {
    kTreeStreamFolder
 } TreeNodeType;
 
+enum {
+   TARGET_TREE = 1, 
+   TARGET_STRING,
+   TARGET_URL
+};
+
 typedef struct {
     TreeNodeType            type;
     MusicCatalog           *catalog;

@@ -590,9 +590,15 @@ void FindMusicFiles(const char* rootPath,
 
     // next find all the directories in this directory and
     // and run the queries on them
+#ifdef WIN32
     findPath.replace(pos, 
                      findPath.size() - pos, 
                      "*.*");
+#else
+    findPath.replace(pos,
+                     findPath.size() - pos,
+                     "*");
+#endif
 
     findFileHandle = FindFirstFile((char *)findPath.c_str(), &findData);
 
