@@ -60,12 +60,12 @@ void PlayList::Add(char *pc, int type) {
 	
 	item->type = type;
 	
-	pMediaElems->insert(item);
+	pMediaElems->Insert(item);
     }
 }
 
 void PlayList::Shuffle(void) {
-    double count= (double) pMediaElems->numElements();
+    double count= (double) pMediaElems->NumElements();
     if (count < 2) {
 	return;
     }
@@ -103,7 +103,7 @@ void PlayList::Shuffle(void) {
 }
 
  PlayListItem *PlayList::GetCurrent() {
-    return pMediaElems->elementAt(current);
+    return pMediaElems->ElementAt(current);
 }
 
  void PlayList::SetFirst() { current = 0; }
@@ -118,3 +118,4 @@ PlayListItem::~PlayListItem() {
     if(url)
         delete url;
 }
+

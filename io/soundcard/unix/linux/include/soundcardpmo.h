@@ -55,8 +55,6 @@ public:
     int16 *bufferp[MAXCHANNELS];
     uint32 channels;
     static int audio_fd;
-    static Mutex refcountMutex;
-    static int refCount;
     OutputInfo *myInfo;
     int32 getprocessed(void);
     

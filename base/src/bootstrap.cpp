@@ -168,35 +168,35 @@ void testVector() {
     char *p1 = "Hey man!";
     char *p2 = "Yo dude!";
     char *p3 = "And, the third.";
-    pVect->insert(p1);
-    pVect->insert(p2);
-    pVect->insert(p3);
+    pVect->Insert(p1);
+    pVect->Insert(p2);
+    pVect->Insert(p3);
     
-    cout << pVect->elementAt(0) << endl;
-    cout << pVect->elementAt(1) << endl;
-    cout << pVect->elementAt(2) << endl;
+    cout << pVect->ElementAt(0) << endl;
+    cout << pVect->ElementAt(1) << endl;
+    cout << pVect->ElementAt(2) << endl;
 
-    pVect->removeElementAt(1);
+    pVect->RemoveElementAt(1);
 
-    cout << pVect->elementAt(0) << endl;
-    cout << pVect->elementAt(1) << endl;
+    cout << pVect->ElementAt(0) << endl;
+    cout << pVect->ElementAt(1) << endl;
 
     pVect->RemoveAll();
 
-    if (pVect->elementAt(0) != NULL) {
+    if (pVect->ElementAt(0) != NULL) {
 	cout << "Final Test failed!!" << endl;
     }
 
     Vector<DummyCOO *> *pVect2 = new Vector<DummyCOO *>(2);
     DummyCOO *pd = new DummyCOO(NULL);
-    pVect2->insert(pd);
+    pVect2->Insert(pd);
     pd = new DummyCOO(NULL);
-    pVect2->insert(pd);
+    pVect2->Insert(pd);
     pd = new DummyCOO(NULL);
-    pVect2->insert(pd);
+    pVect2->Insert(pd);
 
     pVect2->DeleteAll();
-    if (pVect2->elementAt(0) != NULL) {
+    if (pVect2->ElementAt(0) != NULL) {
 	cout << "Final Test failed!! (2nd one)" << endl;
     }
     cout << "Ending testVector..." << endl;

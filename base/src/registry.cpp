@@ -46,7 +46,7 @@ Registry::
 Add(RegistryItem* info)
 {
     if (info) {
-	    m_elements->insert(info);
+	    m_elements->Insert(info);
     }
 }
 
@@ -54,7 +54,7 @@ RegistryItem*
 Registry::
 GetItem(int32 index)
 {
-    return m_elements->elementAt(index);
+    return m_elements->ElementAt(index);
 }
 
 
@@ -142,3 +142,4 @@ SetModule(void* module)
     if(module)
         m_module = module;
 }
+

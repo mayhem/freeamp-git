@@ -30,6 +30,8 @@ ____________________________________________________________________________*/
 #include <fcntl.h>
 #include <sys/soundcard.h>
 #include <errno.h>
+#include <string.h>
+
 
 /* project headers */
 #include <config.h>
@@ -65,9 +67,6 @@ SoundCardPMO::~SoundCardPMO() {
 
 int SoundCardPMO::audio_fd = -1;
 
-Mutex SoundCardPMO::refcountMutex;
-
-int SoundCardPMO::refCount = 0; 
 
 bool SoundCardPMO::Init(OutputInfo* info) {
     //cout << "initialize..." << endl;

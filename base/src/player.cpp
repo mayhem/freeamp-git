@@ -188,7 +188,7 @@ void Player::EventServiceThreadFunc(void *pPlayer) {
 int32 Player::RegisterActiveUI(EventQueue* queue) {
     GetUIManipLock();
     if (ui_vector && queue) {
-        ui_vector->insert(queue);
+        ui_vector->Insert(queue);
         ReleaseUIManipLock();
         return 0;
     } else {
@@ -453,7 +453,7 @@ int32 Player::ServiceEvent(Event *pC) {
 		// 2) Get CIO/COO manipulation lock
 		GetUIManipLock();
 		// 3) Count CIO/COO, put into quitWaitingFor.
-		quitWaitingFor = ui_vector->numElements();
+		quitWaitingFor = ui_vector->NumElements();
 		// 4) Send CMD_Cleanup event to all CIO/COOs
 		
 		Event *pe = new Event(CMD_Cleanup);
@@ -472,7 +472,7 @@ int32 Player::ServiceEvent(Event *pC) {
 		if (pC->GetArgument()) {
 		    EventQueue *pCOO = (EventQueue *)(pC->GetArgument());
 		    //printf("having %x killed(COO)\n",pCOO);
-		    ui_death_vector->insert(pCOO);
+		    ui_death_vector->Insert(pCOO);
 		}
 		
 		quitWaitingFor--;
@@ -531,8 +531,8 @@ int32 Player::ServiceEvent(Event *pC) {
 
 void Player::SendToUI(Event *pe) {
     int32 i;
-    for (i = 0;i<ui_vector->numElements();i++) {
-	ui_vector->elementAt(i)->AcceptEvent(pe);
+    for (i = 0;i<ui_vector->NumElements();i++) {
+	ui_vector->ElementAt(i)->AcceptEvent(pe);
     }
 }
 

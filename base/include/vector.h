@@ -45,13 +45,13 @@ class Vector {
     ~Vector();
     int32 RemoveAll();
     int32 DeleteAll();
-    T elementAt(int32);
-    T removeElementAt(int32);
+    T ElementAt(int32);
+    T RemoveElementAt(int32);
     T RandomElement();
     void Swap(int32,int32);
-    int32 deleteElementAt(int32);
-    int32 insert(T &);
-    int32 numElements();
+    int32 DeleteElementAt(int32);
+    int32 Insert(T &);
+    int32 NumElements();
 };
 
 
@@ -86,7 +86,7 @@ template<class T> Vector<T>::~Vector() {
     delete pObjs;
 }
 
-template<class T> int32 Vector<T>::numElements() {
+template<class T> int32 Vector<T>::NumElements() {
     return insertionPoint;
 }
 
@@ -105,14 +105,14 @@ template<class T> int32 Vector<T>::DeleteAll() {
     return 0;
 }
 
-template<class T> T Vector<T>::elementAt(int32 e) {
+template<class T> T Vector<T>::ElementAt(int32 e) {
     if ((e >= insertionPoint) || (e < 0)) {
 	return NULL;
     }
     return pObjs[e];
 }
 
-template<class T> T Vector<T>::removeElementAt(int32 e) {
+template<class T> T Vector<T>::RemoveElementAt(int32 e) {
     if ((e >= insertionPoint) || (e < 0)) {
 	return NULL;
     }
@@ -125,7 +125,7 @@ template<class T> T Vector<T>::removeElementAt(int32 e) {
     return rtnval;
 }
 
-template<class T> int32 Vector<T>::deleteElementAt(int32 e) {
+template<class T> int32 Vector<T>::DeleteElementAt(int32 e) {
     T* p = removeElementAt(e);
     if (p) {
 	delete p;
@@ -135,7 +135,7 @@ template<class T> int32 Vector<T>::deleteElementAt(int32 e) {
     }
 }
 
-template<class T> int32 Vector<T>::insert(T &pE) {
+template<class T> int32 Vector<T>::Insert(T &pE) {
 //    cout << "v:inserting" << endl;
     if (pE) {
 	if (insertionPoint == currentLength) {
