@@ -5,6 +5,14 @@ Changes for Linux and Windows version 2.1.0 beta 7
 - Fix the horribly broken Coca-Cola themes
 - Fix icecast titlestreaming
 - id3 tags are now saves properly on linux
+- Turning on/off the equalizer now works as expected
+- The equalizer now clips less and sounds a bit better
+- The preamp in the equalizer panel works.
+- Fixed an issue where http streaming/headlines/downloads 
+  were not working on some proxies.
+- The ID3v2 Artist is now read from either TPE1 or TPE2 if one or
+  the other is empty
+
 
 Changes for Linux and Windows version 2.1.0 beta 6
 --------------------------------------------------------------------
@@ -12,6 +20,9 @@ Changes for Linux and Windows version 2.1.0 beta 6
 - FreeAmp lives!
 - Full Vorbis support (www. )
 - Relatable playlist features - see http://www.relatable.com
+- The player should now advance through playlists that contain
+  HTTP streams.
+- The slider bars no longer eat the mouse input for lunch.
 
 Changes for Linux and Windows version 2.1.0 beta 5
 --------------------------------------------------------------------
