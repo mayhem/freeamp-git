@@ -873,7 +873,7 @@ void XingLMC::DecodeWork()
       {
           return;
       }
-      EndRead(x.in_bytes);
+      EndRead(min(x.in_bytes, iReadSize));
       m_pPmi->Wake();
 
       if (m_pOutputBuffer)
