@@ -40,11 +40,16 @@ Mutex::Mutex(bool createOwned)
 
    pthread_mutexattr_init(&attr);
 
-#if 0
-pthread_mutexattr_setpshared(&attr, PTHREAD_PROCESS_PRIVATE);
-pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-#else
-pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK);
+// If the mutexen become sane, we can do the following
+// pthread_mutexattr_setpshared(&attr, PTHREAD_PROCESS_PRIVATE);
+// pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+
+#ifdef SOLDEBUGMUTEX
+   pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK);
+   // This is really, really, really helpful.
+   // There's all sorts of multiple locking that shouldn't be going on,
+   // and quite frankly, I don't know if freeamp will work at all with
+   // "normal" non-debugging/recursive mutexen.
 #endif
 
    if (!pthread_mutex_init(&m_mutex, &attr))
@@ -78,62 +83,17 @@ Mutex::
 Acquire(long timeout)
 {
    bool      result = false;
-void *zot;
+   void *zot;
 
-zot = (void *) &m_mutex;
-//printf("woii! Acquire %p!\n", zot);
-   if (timeout == WAIT_FOREVER)
-   {
-#ifdef USE_HACK
-      if (!pthread_equal(myTid, pthread_self()))
-      {                         // _SHOULD_ simulate an ERRORCHECK mutex
-#endif
-         if (!pthread_mutex_lock(&m_mutex))
-         {
-#ifdef USE_HACK
-            myTid = pthread_self();
-#endif
-            result = true;
-         }
-#ifdef USE_HACK
-      }
-      else
-      {
-         result = true;
-      }
-#endif
-
+   zot = (void *) &m_mutex;
+   //   printf("woii! Acquire %p!\n", zot);
+ 
+   while (pthread_mutex_trylock(&m_mutex)) {
+     //     printf("woii! %p sleeping!\n",&m_mutex);
+     usleep(999999);
    }
-   else
-   {
-      if (pthread_mutex_trylock(&m_mutex))
-      {
-         usleep(timeout);
-#ifdef USE_HACK
-         if (!pthread_equal(myTid, pthread_self()))
-         {
-#endif
-            if (!pthread_mutex_trylock(&m_mutex))
-            {
-#ifdef USE_HACK
-               myTid = pthread_self();
-#endif
-               result = true;
-            }
-#ifdef USE_HACK
-         }
-         else
-         {
-            result = true;
-         }
-#endif
-      }
-      else
-      {
-         result = true;
-      }
-   }
-
+   result = true;
+   
    return (result);
 }
 
