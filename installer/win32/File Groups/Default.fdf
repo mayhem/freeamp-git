@@ -1,18 +1,17 @@
 [FileGroups]
 group0=System DLLs
-group1=PLS Playlist
-group2=ID3v1 MetaData
+group1=ID3v1 MetaData
+group2=PLS Playlist
 group3=Program Executable Files
-group4=Direct Sound Output
-group5=Theme Tools
+group4=Theme Tools
+group5=Direct Sound Output
 group6=Default Plugins
 group10=Default Theme
-group7=Soundcard Output
+group7=OBS Input
 group11=HTTP Input
 group8=ID3v2 MetaData
-group12=PMP300 Portable
-group9=OBS Input
-group13=M3U Playlist
+group12=M3U Playlist
+group9=Soundcard Output
 
 [System DLLs]
 SELFREGISTERING=No
@@ -28,7 +27,7 @@ COMPRESSDLL=
 POTENTIALLY=No
 MISC=
 
-[ID3v1 MetaData]
+[PLS Playlist]
 SELFREGISTERING=No
 HTTPLOCATION=
 LANGUAGE=
@@ -42,7 +41,7 @@ COMPRESSDLL=
 POTENTIALLY=No
 MISC=
 
-[PLS Playlist]
+[ID3v1 MetaData]
 SELFREGISTERING=No
 HTTPLOCATION=
 LANGUAGE=
@@ -70,7 +69,7 @@ COMPRESSDLL=
 POTENTIALLY=No
 MISC=
 
-[Theme Tools]
+[Direct Sound Output]
 SELFREGISTERING=No
 HTTPLOCATION=
 LANGUAGE=
@@ -84,7 +83,7 @@ COMPRESSDLL=
 POTENTIALLY=No
 MISC=
 
-[Direct Sound Output]
+[Theme Tools]
 SELFREGISTERING=No
 HTTPLOCATION=
 LANGUAGE=
@@ -112,7 +111,7 @@ COMPRESSDLL=
 POTENTIALLY=No
 MISC=
 
-[OBS Input]
+[Soundcard Output]
 SELFREGISTERING=No
 HTTPLOCATION=
 LANGUAGE=
@@ -140,7 +139,7 @@ COMPRESSDLL=
 POTENTIALLY=No
 MISC=
 
-[Soundcard Output]
+[OBS Input]
 SELFREGISTERING=No
 HTTPLOCATION=
 LANGUAGE=
@@ -174,20 +173,6 @@ Version=1.00.000
 Name=
 
 [HTTP Input]
-SELFREGISTERING=No
-HTTPLOCATION=
-LANGUAGE=
-OPERATINGSYSTEM=
-FTPLOCATION=
-FILETYPE=No
-INFOTYPE=Standard
-COMMENT=
-COMPRESS=Yes
-COMPRESSDLL=
-POTENTIALLY=No
-MISC=
-
-[PMP300 Portable]
 SELFREGISTERING=No
 HTTPLOCATION=
 LANGUAGE=
