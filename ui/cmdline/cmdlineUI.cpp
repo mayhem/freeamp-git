@@ -337,9 +337,9 @@ ProcessArgs()
          processSwitch(&(pc[0]));
    }
    m_plm->SetCurrentIndex(0);
-   Event    *e = new Event(CMD_Play);
-
-   m_playerEQ->AcceptEvent(e);
+   
+   //Event    *e = new Event(CMD_Play);
+   //m_playerEQ->AcceptEvent(e);
 }
 
 void      cmdlineUI::
