@@ -104,7 +104,6 @@ void fdct32(float x[], float c[])
 {
 #if (!defined(ASM_X86) && !defined(ASM_X86_OLD))
    float a[32];			/* ping pong buffers */
-   float b[32];
    int p, q;
 #endif
 
