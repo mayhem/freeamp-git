@@ -1184,9 +1184,7 @@ Error DownloadManager::SubmitToDatabase(DownloadItem* item)
             else   
                newtrack = new PlaylistItem(url, &(item->GetMetaData()));
                
-            m_context->plm->RetrieveMetaData(newtrack);
-            while (newtrack->GetState() != kPlaylistItemState_Normal)
-                usleep(100);
+            m_context->plm->RetrieveMetaDataNow(newtrack);
 
             MetaData tempdata = (MetaData)(newtrack->GetMetaData());
             m_context->catalog->WriteMetaDataToDatabase(url, tempdata);
