@@ -27,11 +27,13 @@ ____________________________________________________________________________*/
 
 #include <iostream>
 
-#include <be/app/Application.h>
 #include <be/storage/Entry.h>
 #include <be/storage/Path.h>
+#define DEBUG 1
+#include <be/support/Debug.h>
 
 #include "config.h"
+#include "freeampapp.h"
 #include "player.h"
 #include "event.h"
 #include "ui.h"
@@ -42,6 +44,18 @@ ____________________________________________________________________________*/
 #include "log.h"
 #include "facontext.h"
 #include "beosprefs.h"
+#include "thread.h"
+
+void
+termination_thread( void* arg )
+{
+    PRINT(( "waiting for termination semaphore\n" ));
+    Semaphore* termSem = (Semaphore*)arg;
+    termSem->Wait();
+
+    be_app->PostMessage( B_QUIT_REQUESTED );
+    PRINT(( "Termination thread exiting\n" ));
+}
 
 int main(int argc, char **argv)
 {
@@ -49,10 +63,7 @@ int main(int argc, char **argv)
     context->prefs = new BeOSPrefs();
     context->log = new LogFile("freeamp.log");
 
-    // *** BeOS specific section begin ***
-
-    // BSoundPlayer needs BApplication.
-    BApplication* app = new BApplication( "application/x-vnd.freeamp-freeamp" );
+    FreeAmpApp app( "application/x-vnd.freeamp.freeamp", context );
 
     app_info appInfo;
     be_app->GetAppInfo( &appInfo );
@@ -89,8 +100,6 @@ int main(int argc, char **argv)
     }
     delete[] new_addon_path;
 #endif
-
-    // *** BeOS specific section end ***
 
     Registrar *registrar= new Registrar();
     Registry *lmc;
@@ -134,11 +143,16 @@ int main(int argc, char **argv)
         pP->SetTerminationSemaphore(termSemaphore);
         pP->Run();
 
-        termSemaphore->Wait();
+        Thread* termThread = Thread::CreateThread();
+        termThread->Create( termination_thread, termSemaphore );
+
+        app.Run();
+        delete termThread;
     }
     
     delete pP;
     delete context;
-    delete app;
     return 0;
 }
+
+// vi: set ts=4:
