@@ -45,6 +45,9 @@ class MusicBrowserUI : public UserInterface {
  
     EventQueue *m_playerEQ;
 
+    void CreateNewEditor(string & newPlaylist);
+    void WindowClose(GTKMusicBrowser *oldUI);
+
  protected:
     FAContext *m_context;
 

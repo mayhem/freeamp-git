@@ -27,7 +27,7 @@ ____________________________________________________________________________*/
 #include <gtk/gtk.h>
 
 extern "C" {
-void CreateMenuItems(GtkItemFactory *item_factory);
+void CreateMenuItems(GtkItemFactory *item_factory, void *p);
 }
 
 #endif

@@ -26,6 +26,9 @@ ____________________________________________________________________________*/
 #include "infoeditor.h"
 #include "eventdata.h"
 
+#include <algorithm>
+using namespace std;
+
 extern "C" {
 
 UserInterface *Initialize(FAContext *context) {
@@ -69,7 +72,7 @@ void MusicBrowserUI::GTKEventService(void)
 {
     weAreGTK = false;
 
-    mainBrowser = new GTKMusicBrowser(m_context);
+    mainBrowser = new GTKMusicBrowser(m_context, this);
 
     m_context->gtkLock.Acquire();
     if (!m_context->gtkInitialized) {
@@ -94,6 +97,12 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
             mainBrowser->Close();
             delete mainBrowser;
 
+            vector<GTKMusicBrowser *>::iterator i = browserWindows.begin();
+            for (; i != browserWindows.end(); i++) {
+                (*i)->Close();
+                delete (*i);
+            }
+
             if (weAreGTK) {
                 gdk_threads_enter();
                 gtk_main_quit();
@@ -105,6 +114,9 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
         case INFO_SearchMusicDone:
         case INFO_BrowserMessage: {
             mainBrowser->AcceptEvent(event);
+            vector<GTKMusicBrowser *>::iterator i = browserWindows.begin();
+            for (; i != browserWindows.end(); i++)
+                (*i)->AcceptEvent(event);
             break; }
         case CMD_TogglePlaylistUI: {
             if (mainBrowser->Visible())
@@ -122,4 +134,22 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
             break;
     }
     return 0;
+}
+
+void MusicBrowserUI::CreateNewEditor(string & newPlaylist)
+{
+    GTKMusicBrowser *newUI = new GTKMusicBrowser(m_context, this, newPlaylist);
+    gdk_threads_leave();
+    newUI->ShowPlaylist();
+    gdk_threads_enter();
+    browserWindows.push_back(newUI);
+}
+
+void MusicBrowserUI::WindowClose(GTKMusicBrowser *oldUI)
+{
+    vector<GTKMusicBrowser *>::iterator
+        loc = find(browserWindows.begin(), browserWindows.end(), oldUI);
+
+    if (loc != browserWindows.end())
+        browserWindows.erase(loc);
 }

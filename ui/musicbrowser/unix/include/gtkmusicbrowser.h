@@ -35,13 +35,22 @@ ____________________________________________________________________________*/
 #include "musicbrowser.h"
 
 class FAContext;
+class MusicBrowserUI;
 
 #define STATE_COLLAPSED 0
 #define STATE_EXPANDED  1
 
+#define CONTEXT_PLAYLIST 0
+#define CONTEXT_BROWSER  1
+
+#define MB_NONE     0
+#define MB_PLAYLIST 1
+#define MB_TRACK    2
+
 class GTKMusicBrowser {
  public:
-    GTKMusicBrowser(FAContext *, string playlistURL = string(""));
+    GTKMusicBrowser(FAContext *, MusicBrowserUI *masterUI,
+                    string playlistURL = string(""));
     virtual ~GTKMusicBrowser();
 
     void ShowPlaylist(void);
@@ -57,24 +66,36 @@ class GTKMusicBrowser {
     int m_playlistLastSort;
     string m_currentListName;
 
+    int32 clickState;
+    int32 mbState;
+    
+    char *mbSelName;
+    PlaylistItem *mbSel;
+ 
+    FAContext *GetContext(void) { return m_context; }
+    void UpdateCatalog(void);
+
  protected:
     FAContext *m_context;
 
  private:
+    MusicBrowserUI *parentUI;
+
     bool isVisible;
     void UpdatePlaylistList(void);
-    void UpdateCatalog(void);
 
     Properties *m_propManager;
 
     bool m_initialized;
     bool m_browserCreated;
 
+    bool master;
+
     PlaylistManager *m_plm;
     MusicCatalog *m_musicCatalog;
  
     int32 m_state;
-	    
+
     /* Widget creation */
     void CreateExpanded(void);
     void CreateMenu(GtkWidget *);
@@ -119,10 +140,12 @@ class GTKMusicBrowser {
     void PlayEvent();
     void StartMusicSearch();
     void SortPlaylistEvent(PlaylistSortKey order, PlaylistSortType type);
-    void PopUpInfoEditor();
+    void PopUpInfoEditor(PlaylistItem *editee = NULL);
     void SaveCurrentPlaylist(char *path = NULL);
     void LoadPlaylist(string &oPlaylist);
     void ImportPlaylist(char *path);
+
+    void CreateNewEditor(char *playlisturl);
 };
 
 #endif
