@@ -43,6 +43,8 @@ ____________________________________________________________________________*/
 using namespace std;
 
 #include "config.h"
+#include "player.h"
+#include "pmo.h"
 #include "utility.h"
 #include "resource.h"
 #include "Win32MusicBrowser.h"
@@ -2487,6 +2489,59 @@ void MusicBrowserUI::UpdateArtistName(ArtistList* artist,
             m_plm->UpdateTrackMetaData(*track, true);
         }
     }
+}
+
+void MusicBrowserUI::DeviceChanged(uint32 event, PDEV_BROADCAST_HDR data)
+{
+    switch(event)
+    {
+        case DBT_DEVICEARRIVAL:
+        case DBT_DEVICEREMOVECOMPLETE:
+        {
+            // See if a CD-ROM or DVD was inserted into a drive.
+            if(data->dbch_devicetype == DBT_DEVTYP_VOLUME)
+            {
+                PDEV_BROADCAST_VOLUME lpdbv = (PDEV_BROADCAST_VOLUME)data;
+
+                if(lpdbv->dbcv_flags & DBTF_MEDIA)
+                {
+                    Registry *pmoRegistry = m_context->player->GetPMORegistry();
+                    RegistryItem *pmo_item = NULL;
+                    int32 i = 0;
+
+                    if(!pmoRegistry)
+                        return;
+
+                    while(NULL != (pmo_item = pmoRegistry->GetItem(i++))) 
+                    {
+                        if(!strcmp("cd.pmo", pmo_item->Name())) 
+                        {
+                            break;
+                        }
+                    }
+
+                    if(!pmo_item)
+                        return;
+
+                    PhysicalMediaOutput *pmo;
+                    pmo = (PhysicalMediaOutput *)pmo_item->InitFunction()(m_context);
+                    pmo->SetPropManager(m_context->props);
+
+                    if(IsError(pmo->Init(NULL))) 
+                    {
+                        CDInfoEvent *cie = new CDInfoEvent(0, 0, "");
+                        AcceptEvent(cie);
+                    }
+
+                    delete pmo;
+                }                  
+            }
+            break;
+        }
+
+        default:
+            break;
+     }
 }
 
 // Function object used for sorting PlaylistItems in PlaylistManager

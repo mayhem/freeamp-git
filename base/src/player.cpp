@@ -122,8 +122,6 @@ EventQueue()
     m_lmc = NULL;
     m_ui = NULL;
 
-    //m_cdTimer = new CDTimer(m_context);
-
     m_argUIList = new vector < char *>();
 
     m_argc = 0;
@@ -141,8 +139,12 @@ EventQueue()
     m_context->timerManager = new TimerManager();
 
     // add timer for checking CDs
-    m_context->timerManager->StartTimer(&m_cdTimer, cd_timer, 5, this);
+    // this should be used only if there is no way to get notifications
+    // from the OS since polling is inefficient
 
+#ifndef WIN32
+    m_context->timerManager->StartTimer(&m_cdTimer, cd_timer, 5, this);
+#endif
     // make sure the db dir exists so we have a place to store our 
     // stuff
 
@@ -189,7 +191,9 @@ EventQueue()
 Player::
 ~Player()
 {
+#ifndef WIN32
     m_context->timerManager->StopTimer(m_cdTimer);
+#endif
 
     TYPICAL_DELETE(m_dlm);
 

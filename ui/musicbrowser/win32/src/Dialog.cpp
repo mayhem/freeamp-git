@@ -413,6 +413,12 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
             break;
         }
 
+        case WM_DEVICECHANGE:
+        {   
+            DeviceChanged(wParam, (PDEV_BROADCAST_HDR)lParam);
+            break;
+        }
+
     }
     
     return 0;

@@ -33,6 +33,7 @@ ____________________________________________________________________________*/
 
 #include <windows.h>
 #include <commctrl.h>
+#include <dbt.h>
 
 #include <vector>
 #include <string>
@@ -336,6 +337,7 @@ class MusicBrowserUI : public UserInterface
     bool IsItemSelected(HTREEITEM item);
 
     void RefreshCDList(vector<PlaylistItem*>* tracks);
+    void DeviceChanged(uint32 event, PDEV_BROADCAST_HDR data);
 
     // Functions in EditTrackInfoDialog.cpp
     void CreateEditInfoLists(set<string>& artists,
