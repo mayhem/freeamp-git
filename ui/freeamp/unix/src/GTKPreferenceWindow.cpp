@@ -1793,7 +1793,7 @@ static void save_music_browse(GtkWidget *w, GTKPreferenceWindow *p)
 
 void GTKPreferenceWindow::WatchDirSet(char *newpath, bool set)
 {
-    proposedValues.saveMusicDirectory = newpath;
+    proposedValues.watchThisDirectory = newpath;
     gtk_widget_set_sensitive(applyButton, TRUE);
     if (set)
         gtk_entry_set_text(GTK_ENTRY(watchDirBox), newpath);
