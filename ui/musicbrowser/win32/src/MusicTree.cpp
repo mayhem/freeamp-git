@@ -678,10 +678,10 @@ void MusicBrowserUI::FillStreams()
     m_fillStreamsThread = Thread::CreateThread();
 	m_fillStreamsThread->Create(MusicBrowserUI::streams_timer, this);
     
-    m_context->timerManager->StartTimer(&m_streamsTimer,
-                                        MusicBrowserUI::streams_timer,
-                                        60,
-                                        this);
+    //m_context->timerManager->StartTimer(&m_streamsTimer,
+    //                                    MusicBrowserUI::streams_timer,
+    //                                    60,
+    //                                    this);
 }
 
 void MusicBrowserUI::FillPortables()

@@ -213,6 +213,7 @@
 #define ID_POPUP_TIP                    40097
 #define ID_RELATABLE_EDITPROFILE        40098
 #define ID_HELP_RELATABLEWEBSITE        40099
+#define ID_POPUP_SUPDATE                40100
 #define IDS_URL                         65535
 #define IDC_TRACKTEXT                   65535
 #define IDC_TITLETEXT                   65535
@@ -222,7 +223,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        142
-#define _APS_NEXT_COMMAND_VALUE         40100
+#define _APS_NEXT_COMMAND_VALUE         40101
 #define _APS_NEXT_CONTROL_VALUE         1054
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

@@ -191,6 +191,10 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                     AddTrackAndPlayEvent();
                     return 1;
 
+                case ID_POPUP_SUPDATE:
+					StreamsTimer();
+					return 1;
+
                 case ID_POPUP_PLAY:
                     PlayNowEvent();
                     return 1;
