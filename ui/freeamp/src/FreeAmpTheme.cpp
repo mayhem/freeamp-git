@@ -775,7 +775,7 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
          ReloadTheme();
 
          m_pContext->prefs->GetPrefBoolean(kStayOnTopPref, &bValue);
-         m_pWindow->SetPrefBoolean(kStayOnTopPref, bValue);
+         m_pWindow->SetStayOnTop(bValue);
          m_pContext->prefs->GetPrefBoolean(kLiveInTrayPref, &bValue);
          m_pWindow->SetLiveInToolbar(bValue);
          
@@ -909,7 +909,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
            m_bVolumeChangeInProgress = false;
 
        m_pWindow->ControlIntValue(oControlName, false, iVol);
-       SetPrefInt32(kVolumePref, iVol, m_iBalance);
+       SetVolume(iVol, m_iBalance);
            
        return kError_NoErr;
    }    
@@ -919,7 +919,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
        int iBal;
 
        m_pWindow->ControlIntValue(oControlName, false, iBal);
-       SetPrefInt32(kVolumePref, m_iVolume, iBal);
+       SetVolume(m_iVolume, iBal);
            
        return kError_NoErr;
    }    
@@ -940,7 +940,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
            m_iMuteVolume = -1;
            iState = 0;
        }
-       SetPrefInt32(kVolumePref, m_iVolume, m_iBalance);
+       SetVolume(m_iVolume, m_iBalance);
        m_pWindow->ControlIntValue(oControlName, true, iState);
        return kError_NoErr;
    }
@@ -1410,7 +1410,7 @@ void FreeAmpTheme::InitWindow(void)
 	bool   bValue;
     
     m_pContext->prefs->GetPrefBoolean(kStayOnTopPref, &bValue);
-    m_pWindow->SetPrefBoolean(kStayOnTopPref, bValue);
+    m_pWindow->SetStayOnTop(bValue);
 
     m_pContext->prefs->GetPrefBoolean(kLiveInTrayPref, &bValue);
     m_pWindow->SetLiveInToolbar(bValue);
@@ -1467,7 +1467,7 @@ void FreeAmpTheme::ReloadTheme(void)
     delete [] szTemp;
 }
 
-void FreeAmpTheme::SetPrefInt32(kVolumePref, int iVolume, int iBalance)
+void FreeAmpTheme::SetVolume(int iVolume, int iBalance)
 {       
     string oVol("Volume: ");
     char   szPercent[40];

@@ -90,19 +90,19 @@ CDPMO::~CDPMO()
    cd_finish(m_cdDesc);
 }
 
-void CDPMO::SetPrefInt32(kVolumePref, int32 left, int32 right)
+void CDPMO::SetVolume(int32 left, int32 right)
 {
     if (m_cdDesc != "")
     {
-        m_volume->SetPrefInt32(kVolumePref,  left, right );
+        m_volume->SetVolume( left, right );
     }
 }
 
-void CDPMO::GetPrefInt32(kVolumePref, int &left, int &right)
+void CDPMO::GetVolume(int &left, int &right)
 {
     if (m_cdDesc != "")
     {
-        m_volume->GetPrefInt32(kVolumePref,  left, right );
+        m_volume->GetVolume( left, right );
     }
 } 
 

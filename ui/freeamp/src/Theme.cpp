@@ -187,7 +187,7 @@ void Theme::ClearFonts(void)
     }
 }
 
-void Theme::SetPrefString(kThemePathPref, string &oThemePath)
+void Theme::SetThemePath(string &oThemePath)
 {
     m_oThemePath = oThemePath + string(DIR_MARKER_STR);
 }
@@ -205,7 +205,7 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
 
     if (_stat(oFile.c_str(), &buf) == 0 && (buf.st_mode & _S_IFDIR))
     {
-        SetPrefString(kThemePathPref, oFile);
+        SetThemePath(oFile);
         ConvertForeignFormat(oFile);
         oCompleteFile = oFile + string(DIR_MARKER_STR) + string("theme.xml");
         eRet = Parse::ParseFile(oCompleteFile);
@@ -223,7 +223,7 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
             oBox.Show(oMessage.c_str(), string(BRANDING), kMessageOk);
             return kError_InvalidParam;
         }    
-        SetPrefString(kThemePathPref, oTempPath);
+        SetThemePath(oTempPath);
 
         pZip = new ThemeZip();
         eRet = pZip->DecompressTheme(oFile, oTempPath);

@@ -314,7 +314,7 @@ bool DSoundCardPMO::SetupVolumeControl(void)
 
 void
 DSoundCardPMO::
-GetPrefInt32(kVolumePref, int32 &left, int32 &right)
+GetVolume(int32 &left, int32 &right)
 {
     MIXERCONTROLDETAILS_UNSIGNED mxcdVolume[2];
     MIXERCONTROLDETAILS mxcd;
@@ -341,7 +341,7 @@ GetPrefInt32(kVolumePref, int32 &left, int32 &right)
 
 void
 DSoundCardPMO::
-SetPrefInt32(kVolumePref, int32 left, int32 right)
+SetVolume(int32 left, int32 right)
 {
     DWORD dwLeft, dwRight;
     

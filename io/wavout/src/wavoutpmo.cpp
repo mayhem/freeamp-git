@@ -86,14 +86,14 @@ WavOutPMO::
 
 void
 WavOutPMO::
-GetPrefInt32(kVolumePref, int32 &left, int32 &right)
+GetVolume(int32 &left, int32 &right)
 {
     left = right = -1;
 }
 
 void
 WavOutPMO::
-SetPrefInt32(kVolumePref, int32 left, int32 right)
+SetVolume(int32 left, int32 right)
 {
     ;
 }

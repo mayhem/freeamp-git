@@ -20,7 +20,7 @@ Win32Volume* Win32Volume::GetInstance( eDeviceType eType, HWND hWnd )
 	return m_Instance;
 }
 
-void Win32Volume::GetPrefInt32(kVolumePref, int32 &left, int32 &right) 
+void Win32Volume::GetVolume(int32 &left, int32 &right) 
 {
     MIXERCONTROLDETAILS_UNSIGNED mxcdVolume[2];
     MIXERCONTROLDETAILS mxcd;
@@ -45,7 +45,7 @@ void Win32Volume::GetPrefInt32(kVolumePref, int32 &left, int32 &right)
                   (float)(m_dwMaximum - m_dwMinimum)) + 0.5); 
 }
 
-void Win32Volume::SetPrefInt32(kVolumePref, int32 left, int32 right) 
+void Win32Volume::SetVolume(int32 left, int32 right) 
 {
     DWORD dwValLeft, dwValRight;
     

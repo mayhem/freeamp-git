@@ -168,14 +168,14 @@ bool SoundCardPMO::SetupVolumeControl( HWND hWnd)
     return !!m_volume;
 }
 
-void SoundCardPMO::GetPrefInt32(kVolumePref, int32 &left, int32 &right) 
+void SoundCardPMO::GetVolume(int32 &left, int32 &right) 
 {
-    m_volume->GetPrefInt32(kVolumePref, left, right);
+    m_volume->GetVolume(left, right);
 }
 
-void SoundCardPMO::SetPrefInt32(kVolumePref, int32 left, int32 right) 
+void SoundCardPMO::SetVolume(int32 left, int32 right) 
 {
-    m_volume->SetPrefInt32(kVolumePref, left, right);
+    m_volume->SetVolume(left, right);
 }
 
 Error SoundCardPMO::Init(OutputInfo * info)

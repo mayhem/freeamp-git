@@ -149,7 +149,7 @@ MusicBrowserUI::MusicBrowserUI(FAContext      *context,
             uint32 index = 0;
 
             m_context->prefs->GetPrefBoolean(kSaveCurrentPlaylistOnExitPref, &savePlaylist);
-            m_context->prefs->GetPrefInt32(kSavedPlaylistPositionPref, &index);
+            m_context->prefs->GetPrefInt32(kSavedPlaylistPositionPref, (int32*)&index);
 
             if(savePlaylist)
             {
