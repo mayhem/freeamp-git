@@ -178,7 +178,7 @@ Error XingLMC::AdvanceBufferToNextFrame()
            !(*pBuffer == 0xFF && (*(pBuffer+1) & 0xF0) == 0xF0); 
            pBuffer++, iCount++)
                ; // <=== Empty body!
-   
+  
        m_input->EndRead(iCount + 1);
 
        if (iCount != 0 && iCount < iNumBytes - 1)
@@ -214,23 +214,22 @@ Error XingLMC::GetHeadInfo()
            m_frameBytes = head_info3((unsigned char *)pBuffer,
 			                            iNumBytes, &m_sMpegHead, 
                                      &m_iBitRate, &iForward);
-           if (m_frameBytes > 0)
+           if (m_frameBytes > 0 || m_frameBytes < 1050)
            {
               MPEG_HEAD sHead;
               int       iFrameBytes, iBitRate;
-              
-              iFrameBytes = head_info3(((unsigned char *)pBuffer) + iForward + 2,
-                                       iNumBytes - (iForward + 2), &sHead,
+             
+              iFrameBytes = head_info3(((unsigned char *)pBuffer) + 
+                                       m_frameBytes - 1,
+                                       iNumBytes - (m_frameBytes - 1), &sHead,
                                        &iBitRate, &iForward);
               m_input->EndRead(0);
-
 
               // Did the decoder find a bad sync marker?
               if (iFrameBytes == m_frameBytes && iBitRate == m_iBitRate)
               {
 			         return kError_NoErr;
               }
-
            }
            else
               m_input->EndRead(0);
