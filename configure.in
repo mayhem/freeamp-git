@@ -645,7 +645,7 @@ if test "x$enable_x86" = "xyes"; then
     if test -n "$NASM"; then
       AC_MSG_RESULT([Using x86 optimizations])
       XINGASM="`echo lmc/xingmp3/src/cdctasm.o \
-                     lmc/xingmp3/src/crwinasm.o \
+                     lmc/xingmp3/src/cwinasm.o \
                      lmc/xingmp3/src/cwin8asm.o \
                      lmc/xingmp3/src/mdctasm.o \
                      lmc/xingmp3/src/msisasm.o`"

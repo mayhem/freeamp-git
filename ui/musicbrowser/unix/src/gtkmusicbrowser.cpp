@@ -548,13 +548,6 @@ static gint list_drag_motion_internal(GtkWidget *widget,
         list = list->next;
     }
     if (list) {
-/*        if (new_info.insert_pos == GTK_CLIST_DRAG_NONE) {
-            if (dest_info->cell.row < 0) {
-                gdk_drag_status(context, GDK_ACTION_DEFAULT, time);
-                return FALSE;
-            }
-            return TRUE;
-        } */
         if (new_info.cell.row != dest_info->cell.row ||
             (new_info.cell.row == dest_info->cell.row &&
              dest_info->insert_pos != new_info.insert_pos)) {
@@ -2319,12 +2312,28 @@ void GTKMusicBrowser::AddTrackPlaylistEvent(PlaylistItem *newitem)
 void GTKMusicBrowser::AddTracksPlaylistEvent(vector<PlaylistItem *> *newlist,
                                              bool end)
 {
+    bool play = false;
+
     if (m_currentindex == kInvalidIndex)
         m_currentindex = 0;
     else if (end)
         m_currentindex = m_plm->CountItems();
+
+    if (master && (m_plm->CountItems() == 0)) {
+        bool playNow = false;
+        m_context->prefs->GetPlayImmediately(&playNow);
+
+        if (playNow)
+            play = true;
+    }
+
     m_plm->AddItems(newlist, m_currentindex, true);
     UpdatePlaylistList();
+
+    if (play) {
+        m_currentindex = 0;
+        PlayEvent();
+    }
 }
 
 void GTKMusicBrowser::PlayEvent(void)
