@@ -131,20 +131,18 @@ Error PropertiesImpl::RemovePropertyWatcher(const char *pProp, PropertyWatcher *
 	if (pProp) 
     {
         map<string, PropElem *>::iterator i;
+        vector<PropertyWatcher *>::iterator j;
         i = m_props.find(pProp);
         
 	    if (i != m_props.end()) 
         {
            PropElem *ppe = (*i).second;
            
-	       int32 endNum = ppe->m_propWatchers.size();
-           for (int i = 0; i < endNum ; i++) 
+           for (j = ppe->m_propWatchers. end(); 
+                j >= ppe->m_propWatchers.begin(); j--)
            {
-	          if (pw == ppe->m_propWatchers[i]) 
-              {
-	              ppe->m_propWatchers.erase(&ppe->m_propWatchers[i]);
-		          endNum--;
-	          }
+	          if (pw == *j)
+	              ppe->m_propWatchers.erase(j);
 	       }
 	       rtn = kError_NoErr;
 	    }
