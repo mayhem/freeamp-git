@@ -122,10 +122,9 @@ Mpg123UI::~Mpg123UI()
 Error     Mpg123UI::
 AcceptEvent(Event * e)
 {
-   printf("Accept event\n");
    if (e)
    {
-      // cerr << "Mpg123COO: processing event " << e->Type() << endl;
+      //cerr << "Mpg123COO: processing event " << e->Type() << endl;
       switch (e->Type())
       {
       case INFO_ErrorMessage:
@@ -151,11 +150,17 @@ AcceptEvent(Event * e)
             {
                m_mpegInfo = *mie;
                m_mpegInfo_set = true;
-               DisplayStuff();
+               DisplayMPEGStuff();
             }
             totalFrames = m_mpegInfo.GetTotalFrames();
             break;
          }
+      case INFO_VorbisInfo:
+         {
+            VorbisInfoEvent *info = (VorbisInfoEvent *) e;
+            DisplayVorbisStuff(info);
+            break;
+         }  
       case INFO_MediaInfo:
          {
             MediaInfoEvent *pmvi = (MediaInfoEvent *) e;
@@ -164,7 +169,7 @@ AcceptEvent(Event * e)
             {
                m_mediaInfo = new MediaInfoEvent(*pmvi);
                m_mediaInfo_set = true;
-               DisplayStuff();
+               DisplayMPEGStuff();
             }
             totalTime = m_mediaInfo->m_totalSeconds;
             break;
@@ -210,7 +215,7 @@ AcceptEvent(Event * e)
 }
 
 void      Mpg123UI::
-DisplayStuff()
+DisplayMPEGStuff()
 {
    if (!m_mediaInfo_set)
       return;
@@ -285,6 +290,53 @@ DisplayStuff()
       cerr << (m_mpegInfo.GetOriginal()? "Yes" : "No") << ", CRC: " << (m_mpegInfo.GetCRC()? "Yes" : "No") << ", emphasis: " << m_mpegInfo.GetEmphasis() << "." << endl;
       cerr << "Bitrate: " << m_mpegInfo.GetBitRate() / 1000 << " KBits/s, Extension value: 0" << endl;
       cerr << "Audio: 1:1 conversion, rate: " << m_mpegInfo.GetSampleRate() << ", encoding: signed 16 bit, channels: " << m_mpegInfo.GetChannels() << endl;
+   }
+}
+
+void      Mpg123UI::
+DisplayVorbisStuff(VorbisInfoEvent *info)
+{
+   if (!m_mediaInfo_set)
+      return;
+
+   if (!m_displaystuff)
+       return;
+
+   m_displaystuff = false;
+
+   char     *path = m_mediaInfo->m_filename;
+   char     *pLastSlash = strrchr(path, '/');
+   char     *dir = NULL;
+   char     *fname = NULL;
+
+   m_mpegInfo_set = false;
+   if (pLastSlash)
+   {
+      *pLastSlash = '\0';
+      fname = pLastSlash + 1;
+      dir = path;
+   }
+   else
+   {
+      fname = path;
+   }
+
+   strncpy(fileName, fname, 511);
+   fileName[511] = '\0';
+   
+   if (verboseMode == false)
+   {
+      cerr << "\n";
+      // NORMAL MODE
+      if (dir)
+      {
+         cerr << "Directory: " << dir << "/" << endl;
+      }
+      cerr << "Playing Vorbis stream from " << fileName << " ..." << endl;
+      fprintf(stderr, "%ldkbps %ldkHz %s Vorbis\n\n",
+               (long int)(info->GetBitRate() / 1000),
+               (long int)(info->GetSampleRate() / 1000),
+               info->GetChannels() ? "Stereo" : "Mono");  
    }
 }
 
@@ -437,10 +489,9 @@ ProcessArgs()
    {
 
       m_plm->SetCurrentIndex(0);
-/*  m_plm->SetSkip(skipFirst); */
-      Event    *e = new Event(CMD_Play);
-
-      m_playerEQ->AcceptEvent(e);
+      //RAK: This should not be necessary as the player auto plays
+      //Event    *e = new Event(CMD_Play);
+      //m_playerEQ->AcceptEvent(e);
    }
    else
    {

@@ -54,12 +54,12 @@ class Mpg123UI : public UserInterface {
     void ProcessArgs();
 
     PlaylistManager *m_plm;
-    void DisplayStuff();
+    void DisplayMPEGStuff();
+    void DisplayVorbisStuff(VorbisInfoEvent *);
     MediaInfoEvent *m_mediaInfo;
     bool m_mediaInfo_set;
     MpegInfoEvent m_mpegInfo;
     bool m_mpegInfo_set;
-/*    Id3TagInfo m_id3Tag; */
     bool verboseMode;
     int32 totalFrames;
     float totalTime;
