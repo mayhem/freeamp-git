@@ -412,7 +412,7 @@ BackInnerLoop:
 	mov ecx,DWORD PTR [ebx+eax]
 	mov DWORD PTR [esi+edx],ecx	; f[p] = x2[q]
 	fld DWORD PTR [edi+eax]	; push x[q]
-	fadd 
+	fadd st(1),st
 	fxch 
 	fstp DWORD PTR [esi+edx+4]	; f[p + 4] = x[q] + x[q + 4]
 	sub eax,4		; q -= 4
