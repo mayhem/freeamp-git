@@ -7,6 +7,7 @@
 #define IDD_MUSICBROWSER                101
 #define IDC_URL                         101
 #define IDC_SPLITTER                    101
+#define IDI_EXE_ICON                    101
 #define IDR_MENU1                       102
 #define IDI_CLOSED                      104
 #define IDC_DRAG                        104
@@ -21,6 +22,9 @@
 #define IDD_MUSICSEARCH                 120
 #define IDR_MENU2                       120
 #define IDD_SAVEPLAYLIST                121
+#define IDB_ALL                         124
+#define IDB_UNCATAGORIZED               125
+#define IDI_MYMUSIC                     126
 #define IDI_WARN                        207
 #define IDD_OPENURL                     219
 #define IDD_DELETETRACKS                220
@@ -129,8 +133,8 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        123
-#define _APS_NEXT_COMMAND_VALUE         40064
+#define _APS_NEXT_RESOURCE_VALUE        127
+#define _APS_NEXT_COMMAND_VALUE         40065
 #define _APS_NEXT_CONTROL_VALUE         1030
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

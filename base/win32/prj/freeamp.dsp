@@ -59,7 +59,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
-              ..\..\..\themes\freeamp.fat themes
+               ..\..\..\themes\freeamp.fat themes
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
@@ -92,7 +92,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
-              ..\..\..\themes\freeamp.fat themes
+               ..\..\..\themes\freeamp.fat themes
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
@@ -126,7 +126,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
-              ..\..\..\themes\freeamp.fat themes
+               ..\..\..\themes\freeamp.fat themes
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
@@ -162,7 +162,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
-              ..\..\..\themes\freeamp.fat themes
+               ..\..\..\themes\freeamp.fat themes
 # End Special Build Tool
 
 !ENDIF 
@@ -532,6 +532,30 @@ SOURCE=..\res\freeamp.rc
 # Begin Source File
 
 SOURCE=..\res\icon1.ico
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\music1.ico
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\music2.ico
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\music3.ico
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\music4.ico
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\music5.ico
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\music6.ico
 # End Source File
 # Begin Source File
 

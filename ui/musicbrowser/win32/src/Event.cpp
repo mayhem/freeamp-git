@@ -769,7 +769,7 @@ void MusicBrowserUI::AddTrackEvent(void)
     m_oPlm->AddItems(urls);
     
 }
-void MusicBrowserUI::AddFileEvent(void)
+void MusicBrowserUI::AddFileEvent(HWND hwndParent)
 {
     PlaylistFormatInfo format;
     int32 i, iOffset = 0;
@@ -804,7 +804,8 @@ void MusicBrowserUI::AddFileEvent(void)
     
     vector<string> oFileList;
 
-    if (FileOpenDialog(m_hWnd, "Add Tracks and Playlists",
+    if (FileOpenDialog(hwndParent, 
+                       "Add Tracks and Playlists",
                        szFilter, 
                        &oFileList,
                        m_context->prefs))
@@ -816,8 +817,8 @@ void MusicBrowserUI::AddFileEvent(void)
         newSize += oFileList.size();
         ListView_SetItemCount(m_hPlaylistView, newSize);
 
-        m_oPlm->AddItems(oFileList); 
-    }  
+        m_oPlm->AddItems(oFileList);
+    }
 }
 
 void MusicBrowserUI::EmptyDBCheck(void)

@@ -409,7 +409,8 @@ BOOL DownloadUI::InitDialog()
 					GWL_WNDPROC, 
 					(DWORD)ProgressWndProc );  
 
-    HICON appIcon = LoadIcon(g_hInstance, MAKEINTRESOURCE(IDI_EXE_ICON));
+    HINSTANCE hinst = (HINSTANCE)GetWindowLong(m_hwnd, GWL_HINSTANCE);
+    HICON appIcon = LoadIcon(hinst, MAKEINTRESOURCE(IDI_EXE_ICON));
 
     SetClassLong(m_hwnd, GCL_HICON, (LONG)appIcon);
 

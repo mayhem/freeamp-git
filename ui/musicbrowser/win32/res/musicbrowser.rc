@@ -104,8 +104,8 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,148,47,54,14
     LTEXT           "Are you sure you want to remove the selected tracks from your music library?",
                     -1,34,7,168,20
-    ICON            IDI_WARN,-1,7,7,21,20
-    CONTROL         "Permantly remove items from my computer",IDC_DELETE,
+    ICON            IDI_WARN,-1,7,7,20,20
+    CONTROL         "Permanently remove items from my computer",IDC_DELETE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,34,30,165,10
 END
 
@@ -395,6 +395,7 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_WARN                ICON    DISCARDABLE     "warn.ico"
+IDI_EXE_ICON            ICON    DISCARDABLE     "icon1.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -417,6 +418,8 @@ IDB_CATALOG             BITMAP  DISCARDABLE     "catalog.bmp"
 IDB_ARTIST              BITMAP  DISCARDABLE     "artist.bmp"
 IDB_TRACK               BITMAP  DISCARDABLE     "track.bmp"
 IDB_ALBUM               BITMAP  DISCARDABLE     "album.bmp"
+IDB_ALL                 BITMAP  DISCARDABLE     "all.bmp"
+IDB_UNCATAGORIZED       BITMAP  DISCARDABLE     "uncatagorized.bmp"
 
 #ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////

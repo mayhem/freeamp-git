@@ -69,8 +69,8 @@ void MusicBrowserUI::InitTree(void)
 
     sItem.pszText = kAllTracks;
     sItem.cchTextMax = lstrlen(sItem.pszText);
-    sItem.iImage = 1;
-    sItem.iSelectedImage = 1;
+    sItem.iImage = 5;
+    sItem.iSelectedImage = 5;
     sItem.cChildren= 1;
     sItem.lParam = -1;
         
@@ -81,8 +81,8 @@ void MusicBrowserUI::InitTree(void)
 
     sItem.pszText = kUncatagorized;
     sItem.cchTextMax = lstrlen(sItem.pszText);
-    sItem.iImage = 1;
-    sItem.iSelectedImage = 1;
+    sItem.iImage = 6;
+    sItem.iSelectedImage = 6;
     sItem.cChildren= 1;
     sItem.lParam = -1;
         
@@ -370,8 +370,8 @@ void MusicBrowserUI::FillPlaylists(void)
 
         sInsert.item.pszText = szBase;
         sInsert.item.cchTextMax = strlen(szBase);
-        sInsert.item.iImage = 0;
-        sInsert.item.iSelectedImage = 0;
+        sInsert.item.iImage = 1;
+        sInsert.item.iSelectedImage = 1;
         sInsert.item.cChildren= 0;
         sInsert.item.lParam = m_oTreeIndex.Add(oData);
         sInsert.hInsertAfter = TVI_SORT;
@@ -381,8 +381,8 @@ void MusicBrowserUI::FillPlaylists(void)
     
     sInsert.item.pszText = kNewPlaylist;
     sInsert.item.cchTextMax = strlen(kNewPlaylist);
-    sInsert.item.iImage = 0;
-    sInsert.item.iSelectedImage = 0;
+    sInsert.item.iImage = 1;
+    sInsert.item.iSelectedImage = 1;
     sInsert.item.cChildren= 0;
     sInsert.item.lParam = -1;
     sInsert.hInsertAfter = TVI_FIRST;

@@ -39,16 +39,16 @@ ____________________________________________________________________________*/
 
 TBBUTTON tbButtons[] = {
     { 0, ID_FILE_NEWPLAYLIST, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-    { 2, ID_FILE_SAVEPLAYLIST, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+    { 1, ID_FILE_SAVEPLAYLIST, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
 	{ 0, 0, TBSTATE_ENABLED, TBSTYLE_SEP, 0L, 0},
-    { 1, ID_FILE_IMPORT, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-	{ 12,ID_EDIT_REMOVE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-	{ 5, ID_EDIT_EDITINFO, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+    { 2, ID_FILE_IMPORT, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+	{ 3, ID_EDIT_REMOVE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+	{ 4, ID_EDIT_EDITINFO, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
     { 0, 0, TBSTATE_ENABLED, TBSTYLE_SEP, 0L, 0},
-    { 1, ID_EDIT_ADDTRACK, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-    { 1, ID_EDIT_ADDFILE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-    { 9, ID_EDIT_MOVEUP, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-    { 10,ID_EDIT_MOVEDOWN, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},  
+    { 5, ID_EDIT_ADDTRACK, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+    { 6, ID_EDIT_ADDFILE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+    { 7, ID_EDIT_MOVEUP, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+    { 8, ID_EDIT_MOVEDOWN, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},  
 };
 
 static BOOL CALLBACK MainDlgProc(HWND hwnd, UINT msg, 
@@ -209,7 +209,7 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                     return 1;
 
                 case ID_EDIT_ADDFILE:
-                    AddFileEvent();
+                    AddFileEvent(m_hWnd);
                     return 1;
 
                 case ID_EDIT_REMOVE:
@@ -713,6 +713,11 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
     const int32     kNumPanes = 2;
     int32           panes[kNumPanes]= {500, -1};
 
+    HINSTANCE hinst = (HINSTANCE)GetWindowLong(m_hWnd, GWL_HINSTANCE);
+    HICON appIcon = LoadIcon(hinst, MAKEINTRESOURCE(IDI_EXE_ICON));
+
+    SetClassLong(m_hWnd, GCL_HICON, (LONG)appIcon);
+
     m_hWnd = hWnd;
     m_hMusicCatalog = GetDlgItem(m_hWnd, IDC_MUSICTREE);
     m_hPlaylistView = GetDlgItem(m_hWnd, IDC_PLAYLISTBOX);
@@ -721,10 +726,10 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
 
     HBITMAP bmp;
     
-    hList = ImageList_Create(16, 16, ILC_COLOR24|ILC_MASK, 5, 0);
+    hList = ImageList_Create(16, 16, ILC_COLOR24|ILC_MASK, 7, 0);
 
     bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_CATALOG));
-    ImageList_AddMasked(hList, bmp, RGB(255,0,0));
+    ImageList_AddMasked(hList, bmp, RGB(255,255,0));
     bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_PLAYLIST));
     ImageList_AddMasked(hList, bmp, RGB(255,0,0));
     bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_ARTIST));
@@ -732,6 +737,10 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
     bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_ALBUM));
     ImageList_AddMasked(hList, bmp, RGB(255,0,0));
     bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_TRACK));
+    ImageList_AddMasked(hList, bmp, RGB(255,0,0));
+    bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_ALL));
+    ImageList_AddMasked(hList, bmp, RGB(255,0,0));
+    bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_UNCATAGORIZED));
     ImageList_AddMasked(hList, bmp, RGB(255,0,0));
  
     TreeView_SetImageList(m_hMusicCatalog, hList, TVSIL_NORMAL); 
@@ -873,7 +882,7 @@ void MusicBrowserUI::CreateToolbar(void)
 				g_hinst,
 				NULL );
 
-    m_hToolbar = CreateWindowEx(0, TOOLBARCLASSNAME, (LPSTR) NULL, 
+    m_hToolbar = CreateWindowEx(0, TOOLBARCLASSNAME, (LPSTR) NULL,
                      WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT |
                      TBSTYLE_TOOLTIPS |  WS_CLIPCHILDREN | 
                      WS_CLIPSIBLINGS | CCS_NODIVIDER | CCS_NORESIZE, 
@@ -881,16 +890,16 @@ void MusicBrowserUI::CreateToolbar(void)
 
     // Send the TB_BUTTONSTRUCTSIZE message, which is required for 
     // backward compatibility. 
-    SendMessage(m_hToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM) sizeof(TBBUTTON), 0); 
+    SendMessage(m_hToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM) sizeof(TBBUTTON), 0);
 
-    SendMessage(m_hToolbar, TB_SETBITMAPSIZE, 0, MAKELPARAM(16, 16)); 
+    SendMessage(m_hToolbar, TB_SETBITMAPSIZE, 0, MAKELPARAM(22, 18)); 
 
     TBADDBITMAP tbab; 
 
     // Add the bitmap containing button images to the toolbar.
     tbab.hInst = g_hinst; 
     tbab.nID   = IDB_TOOLBAR; 
-    SendMessage(m_hToolbar, TB_ADDBITMAP, (WPARAM) 13, (WPARAM) &tbab);
+    SendMessage(m_hToolbar, TB_ADDBITMAP, (WPARAM) 10, (WPARAM) &tbab);
 
     int32 index;
     index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"New Playlist");
@@ -1628,6 +1637,34 @@ FileOpenDialog(HWND hwnd,
 
         result = true;
     }
+
+
+    /*if(CommDlgExtendedError() == CDERR_NOHINSTANCE)
+    {   
+        MessageBox(hwnd, "CDERR_NOHINSTANCE", 0, MB_OK); 
+    }*/
+
+    /*char buf[256];
+    sprintf(buf, "%lx", CommDlgExtendedError());
+    MessageBox(hwnd, buf, 0, MB_OK); */
+
+    /*LPVOID lpMessageBuffer;
+
+	FormatMessage(
+	  FORMAT_MESSAGE_ALLOCATE_BUFFER |
+	  FORMAT_MESSAGE_FROM_SYSTEM,
+	  NULL,
+	  CommDlgExtendedError(),
+	  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+	  (LPTSTR) &lpMessageBuffer,
+	  0,
+	  NULL );
+
+	// now display this string
+ 	MessageBox(NULL, (char*)lpMessageBuffer, 0, MB_OK);
+
+	// Free the buffer allocated by the system
+	LocalFree( lpMessageBuffer );*/
 
     delete [] fileBuffer;
 

@@ -55,6 +55,12 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_ICON1               ICON    DISCARDABLE     "icon1.ico"
+IDI_MUSIC1              ICON    DISCARDABLE     "music1.ico"
+IDI_MUSIC2              ICON    DISCARDABLE     "music2.ico"
+IDI_MUSIC3              ICON    DISCARDABLE     "music3.ico"
+IDI_MUSIC4              ICON    DISCARDABLE     "music4.ico"
+IDI_MUSIC5              ICON    DISCARDABLE     "music5.ico"
+IDI_MUSIC6              ICON    DISCARDABLE     "music6.ico"
 
 #ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////

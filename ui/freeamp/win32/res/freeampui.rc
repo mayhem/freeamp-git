@@ -34,8 +34,9 @@ FONT 8, "MS Sans Serif"
 BEGIN
     CONTROL         "Remain on top of all other windows.",IDC_STAYONTOP,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,131,128,10
-    CONTROL         "Show FreeAmp icon in tooltray.",IDC_TRAY,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,18,145,158,10
+    CONTROL         "Show FreeAmp icon in the system tray instead of the taskbar.",
+                    IDC_TRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,145,
+                    207,10
     GROUPBOX        "Miscellaneous",IDC_STATIC,3,117,227,44
     GROUPBOX        "Save Music Folder",IDC_STATIC,3,3,227,44
     EDITTEXT        IDC_SAVEMUSICDIR,11,22,160,14,ES_AUTOHSCROLL
