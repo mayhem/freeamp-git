@@ -60,7 +60,6 @@ int GTKCanvas::RenderText(int iFontHeight, Rect &oClipRect,
                           Font *pFont, const Color &oColor,
                           bool bBold, bool bItalic, bool bUnderline)
 {
-    Erase(oClipRect);
     GTKFont *ourFont = (GTKFont *)pFont;
     Error err = ourFont->Load(iFontHeight, bBold, bItalic);
     if (IsError(err)) 
@@ -88,7 +87,6 @@ int GTKCanvas::RenderOffsetText(int iFontHeight, Rect &oClipRect,
                                 Font *pFont, const Color &oColor,
                                 bool bBold, bool bItalic, bool bUnderline)
 {
-    Erase(oClipRect);
     GTKFont *ourFont = (GTKFont *)pFont;
     Error err = ourFont->Load(iFontHeight, bBold, bItalic);
     if (IsError(err))
@@ -156,6 +154,8 @@ void GTKCanvas::Paint(Rect &oRect)
 
 void GTKCanvas::Erase(Rect &oRect)
 {
+    Rect newRect = oRect;
+    newRect.y2++;
     if (m_pBufferBitmap)
-        m_pBufferBitmap->MaskBlitRect(m_pBGBitmap, oRect, oRect);
+        m_pBufferBitmap->MaskBlitRect(m_pBGBitmap, newRect, newRect);
 }
