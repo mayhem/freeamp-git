@@ -140,7 +140,7 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
     m_pSema->Wait();
 
     musicbrainz_t o;
-    bool    ret;
+    int    ret;
     char   *args[11];
     char    temp[255], guid[40];
     int     i;

@@ -1,15 +1,15 @@
 # Microsoft Developer Studio Generated NMAKE File, Based on gdbm.dsp
 !IF "$(CFG)" == ""
-CFG=gdbm - Win32 NASM Debug
-!MESSAGE No configuration specified. Defaulting to gdbm - Win32 NASM Debug.
+CFG=gdbm - Win32 NASM Debug MS STL
+!MESSAGE No configuration specified. Defaulting to gdbm - Win32 NASM Debug MS STL.
 !ENDIF 
 
-!IF "$(CFG)" != "gdbm - Win32 Release" && "$(CFG)" != "gdbm - Win32 Debug" && "$(CFG)" != "gdbm - Win32 NASM Release" && "$(CFG)" != "gdbm - Win32 NASM Debug"
+!IF "$(CFG)" != "gdbm - Win32 Release" && "$(CFG)" != "gdbm - Win32 Debug" && "$(CFG)" != "gdbm - Win32 NASM Release" && "$(CFG)" != "gdbm - Win32 NASM Debug" && "$(CFG)" != "gdbm - Win32 NASM Debug MS STL"
 !MESSAGE Invalid configuration "$(CFG)" specified.
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "gdbm.mak" CFG="gdbm - Win32 NASM Debug"
+!MESSAGE NMAKE /f "gdbm.mak" CFG="gdbm - Win32 NASM Debug MS STL"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
@@ -17,6 +17,7 @@ CFG=gdbm - Win32 NASM Debug
 !MESSAGE "gdbm - Win32 Debug" (based on "Win32 (x86) Static Library")
 !MESSAGE "gdbm - Win32 NASM Release" (based on "Win32 (x86) Static Library")
 !MESSAGE "gdbm - Win32 NASM Debug" (based on "Win32 (x86) Static Library")
+!MESSAGE "gdbm - Win32 NASM Debug MS STL" (based on "Win32 (x86) Static Library")
 !MESSAGE 
 !ERROR An invalid configuration is specified.
 !ENDIF 
@@ -65,7 +66,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MD /W3 /GX /O2 /I ".\\" /I "..\\" /I "..\config" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\gdbm.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MD /W3 /GX /O2 /I ".\\" /I "..\\" /I "..\config" /D "NDEBUG" /D "_WINDOWS" /D "WIN32" /D "NOMINMAX" /Fp"$(INTDIR)\gdbm.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\gdbm.bsc" 
 BSC32_SBRS= \
@@ -103,7 +104,7 @@ LIB32_OBJS= \
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
-ALL : "..\gdbm.lib"
+ALL : "..\config\config.h" "..\gdbm.lib"
 
 
 CLEAN :
@@ -128,11 +129,12 @@ CLEAN :
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(INTDIR)\version.obj"
 	-@erase "..\gdbm.lib"
+	-@erase "..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MDd /W3 /GX /Z7 /Od /I ".\\" /I "..\\" /I "..\config" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\gdbm.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MDd /W3 /GX /Z7 /Od /I ".\\" /I "..\\" /I "..\config" /D "_DEBUG" /D "_WINDOWS" /D "WIN32" /D "NOMINMAX" /Fp"$(INTDIR)\gdbm.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\gdbm.bsc" 
 BSC32_SBRS= \
@@ -200,7 +202,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MD /W3 /GX /O2 /I ".\\" /I "..\\" /I "..\config" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\gdbm.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MD /W3 /GX /O2 /I ".\\" /I "..\\" /I "..\config" /D "NDEBUG" /D "_WINDOWS" /D "WIN32" /D "NOMINMAX" /Fp"$(INTDIR)\gdbm.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\gdbm.bsc" 
 BSC32_SBRS= \
@@ -238,7 +240,7 @@ LIB32_OBJS= \
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
-ALL : "..\gdbm.lib"
+ALL : "..\config\config.h" "..\gdbm.lib"
 
 
 CLEAN :
@@ -263,11 +265,80 @@ CLEAN :
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(INTDIR)\version.obj"
 	-@erase "..\gdbm.lib"
+	-@erase "..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MDd /W3 /GX /Z7 /Od /I "..\config" /I ".\\" /I "..\\" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\gdbm.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MDd /W3 /GX /Z7 /Od /I "..\config" /I ".\\" /I "..\\" /D "_DEBUG" /D "_WINDOWS" /D "WIN32" /D "NOMINMAX" /Fp"$(INTDIR)\gdbm.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+BSC32=bscmake.exe
+BSC32_FLAGS=/nologo /o"$(OUTDIR)\gdbm.bsc" 
+BSC32_SBRS= \
+	
+LIB32=link.exe -lib
+LIB32_FLAGS=/nologo /out:"..\gdbm.lib" 
+LIB32_OBJS= \
+	"$(INTDIR)\bucket.obj" \
+	"$(INTDIR)\falloc.obj" \
+	"$(INTDIR)\findkey.obj" \
+	"$(INTDIR)\gdbmclose.obj" \
+	"$(INTDIR)\gdbmdelete.obj" \
+	"$(INTDIR)\gdbmerrno.obj" \
+	"$(INTDIR)\gdbmexists.obj" \
+	"$(INTDIR)\gdbmfdesc.obj" \
+	"$(INTDIR)\gdbmfetch.obj" \
+	"$(INTDIR)\gdbmopen.obj" \
+	"$(INTDIR)\gdbmreorg.obj" \
+	"$(INTDIR)\gdbmseq.obj" \
+	"$(INTDIR)\gdbmsetopt.obj" \
+	"$(INTDIR)\gdbmstore.obj" \
+	"$(INTDIR)\gdbmsync.obj" \
+	"$(INTDIR)\global.obj" \
+	"$(INTDIR)\hash.obj" \
+	"$(INTDIR)\update.obj" \
+	"$(INTDIR)\version.obj"
+
+"..\gdbm.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
+    $(LIB32) @<<
+  $(LIB32_FLAGS) $(DEF_FLAGS) $(LIB32_OBJS)
+<<
+
+!ELSEIF  "$(CFG)" == "gdbm - Win32 NASM Debug MS STL"
+
+OUTDIR=.\Debug
+INTDIR=.\Debug
+
+ALL : "..\config\config.h" "..\gdbm.lib"
+
+
+CLEAN :
+	-@erase "$(INTDIR)\bucket.obj"
+	-@erase "$(INTDIR)\falloc.obj"
+	-@erase "$(INTDIR)\findkey.obj"
+	-@erase "$(INTDIR)\gdbmclose.obj"
+	-@erase "$(INTDIR)\gdbmdelete.obj"
+	-@erase "$(INTDIR)\gdbmerrno.obj"
+	-@erase "$(INTDIR)\gdbmexists.obj"
+	-@erase "$(INTDIR)\gdbmfdesc.obj"
+	-@erase "$(INTDIR)\gdbmfetch.obj"
+	-@erase "$(INTDIR)\gdbmopen.obj"
+	-@erase "$(INTDIR)\gdbmreorg.obj"
+	-@erase "$(INTDIR)\gdbmseq.obj"
+	-@erase "$(INTDIR)\gdbmsetopt.obj"
+	-@erase "$(INTDIR)\gdbmstore.obj"
+	-@erase "$(INTDIR)\gdbmsync.obj"
+	-@erase "$(INTDIR)\global.obj"
+	-@erase "$(INTDIR)\hash.obj"
+	-@erase "$(INTDIR)\update.obj"
+	-@erase "$(INTDIR)\vc60.idb"
+	-@erase "$(INTDIR)\version.obj"
+	-@erase "..\gdbm.lib"
+	-@erase "..\config\config.h"
+
+"$(OUTDIR)" :
+    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
+
+CPP_PROJ=/nologo /MDd /W3 /GX /Z7 /Od /I "..\config" /I ".\\" /I "..\\" /D "_DEBUG" /D "_WINDOWS" /D "WIN32" /Fp"$(INTDIR)\gdbm.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\gdbm.bsc" 
 BSC32_SBRS= \
@@ -342,7 +413,7 @@ LIB32_OBJS= \
 !ENDIF 
 
 
-!IF "$(CFG)" == "gdbm - Win32 Release" || "$(CFG)" == "gdbm - Win32 Debug" || "$(CFG)" == "gdbm - Win32 NASM Release" || "$(CFG)" == "gdbm - Win32 NASM Debug"
+!IF "$(CFG)" == "gdbm - Win32 Release" || "$(CFG)" == "gdbm - Win32 Debug" || "$(CFG)" == "gdbm - Win32 NASM Release" || "$(CFG)" == "gdbm - Win32 NASM Debug" || "$(CFG)" == "gdbm - Win32 NASM Debug MS STL"
 SOURCE=..\bucket.c
 
 "$(INTDIR)\bucket.obj" : $(SOURCE) "$(INTDIR)"
@@ -385,6 +456,17 @@ InputPath=..\config\config.win32
 	
 
 !ELSEIF  "$(CFG)" == "gdbm - Win32 NASM Debug"
+
+InputPath=..\config\config.win32
+
+"..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	<<tempfile.bat 
+	@echo off 
+	if not exist ..\config\config.h copy ..\config\config.win32 ..\config\config.h
+<< 
+	
+
+!ELSEIF  "$(CFG)" == "gdbm - Win32 NASM Debug MS STL"
 
 InputPath=..\config\config.win32
 

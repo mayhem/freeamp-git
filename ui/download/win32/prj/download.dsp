@@ -4,7 +4,7 @@
 
 # TARGTYPE "Win32 (x86) Dynamic-Link Library" 0x0102
 
-CFG=download - Win32 NASM Debug
+CFG=download - Win32 NASM Debug MS STL
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
@@ -13,7 +13,7 @@ CFG=download - Win32 NASM Debug
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "download.mak" CFG="download - Win32 NASM Debug"
+!MESSAGE NMAKE /f "download.mak" CFG="download - Win32 NASM Debug MS STL"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
@@ -21,6 +21,7 @@ CFG=download - Win32 NASM Debug
 !MESSAGE "download - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "download - Win32 NASM Debug" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "download - Win32 NASM Release" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "download - Win32 NASM Debug MS STL" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE 
 
 # Begin Project
@@ -156,6 +157,39 @@ SOURCE="$(InputPath)"
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                           ..\..\..\..\base\win32\prj\plugins	copy download.ui                             ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
+!ELSEIF  "$(CFG)" == "download - Win32 NASM Debug MS STL"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 1
+# PROP BASE Output_Dir "Debug"
+# PROP BASE Intermediate_Dir "Debug"
+# PROP BASE Ignore_Export_Lib 0
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 1
+# PROP Output_Dir "Debug"
+# PROP Intermediate_Dir "Debug"
+# PROP Ignore_Export_Lib 0
+# PROP Target_Dir ""
+# ADD BASE CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\res" /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /I "..\..\..\..\lib\gdbm" /D "_DEBUG" /D "_WINDOWS" /D "WIN32" /D "NOMINMAX" /YX /FD /c
+# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\res" /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /I "..\..\..\..\lib\gdbm" /D "_DEBUG" /D "_WINDOWS" /D "WIN32" /YX /FD /c
+# ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32
+# ADD MTL /nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32
+# ADD BASE RSC /l 0x409 /d "_DEBUG"
+# ADD RSC /l 0x409 /d "_DEBUG"
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LINK32=link.exe
+# ADD BASE LINK32 fabaselib.lib gdbm.lib version.lib wsock32.lib comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib musicbrainz.lib /nologo /base:"0x12200000" /subsystem:windows /dll /debug /machine:I386 /out:"download.ui" /pdbtype:sept /libpath:"..\..\..\..\lib\gdbm" /libpath:"..\..\..\..\base\win32" /libpath:"..\..\..\..\lib\musicbrainz"
+# SUBTRACT BASE LINK32 /profile
+# ADD LINK32 fabaselib.lib gdbm.lib version.lib wsock32.lib comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib musicbrainz.lib /nologo /base:"0x12200000" /subsystem:windows /dll /debug /machine:I386 /out:"download.ui" /pdbtype:sept /libpath:"..\..\..\..\lib\gdbm" /libpath:"..\..\..\..\base\win32" /libpath:"..\..\..\..\lib\musicbrainz"
+# SUBTRACT LINK32 /profile
+# Begin Special Build Tool
+SOURCE="$(InputPath)"
+PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                           ..\..\..\..\base\win32\prj\plugins	copy download.ui                             ..\..\..\..\base\win32\prj\plugins
+# End Special Build Tool
+
 !ENDIF 
 
 # Begin Target
@@ -164,6 +198,7 @@ PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir            
 # Name "download - Win32 Debug"
 # Name "download - Win32 NASM Debug"
 # Name "download - Win32 NASM Release"
+# Name "download - Win32 NASM Debug MS STL"
 # Begin Group "source"
 
 # PROP Default_Filter ""
@@ -206,6 +241,18 @@ InputPath=..\..\..\..\config\config.win32
 
 !ELSEIF  "$(CFG)" == "download - Win32 NASM Release"
 
+# Begin Custom Build
+InputPath=..\..\..\..\config\config.win32
+
+"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "download - Win32 NASM Debug MS STL"
+
+# PROP BASE Intermediate_Dir "Debug"
+# PROP Intermediate_Dir "Debug"
 # Begin Custom Build
 InputPath=..\..\..\..\config\config.win32
 

@@ -22,6 +22,13 @@
    $Id$
 ____________________________________________________________________________*/ 
 
+// The debugger can't handle symbols more than 255 characters long.
+// STL often creates symbols longer than that.
+// When symbols are longer than 255 characters, the warning is disabled.
+#ifdef WIN32
+#pragma warning(disable:4786)
+#endif
+
 #include <math.h>
 #include <stdio.h>
 #include <string>

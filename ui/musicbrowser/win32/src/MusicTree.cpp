@@ -1762,8 +1762,8 @@ void MusicBrowserUI::TVBeginDrag(HWND hwnd, NM_TREEVIEW* nmtv)
         
         items.clear();
 
-        GetSelectedFavoritesItems(&items);
-        GetSelectedStreamItems(&items);
+        //GetSelectedFavoritesItems(&items);
+        //GetSelectedStreamItems(&items);
 
         for(i = items.begin(); i != items.end(); i++)
         {

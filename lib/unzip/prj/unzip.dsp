@@ -4,7 +4,7 @@
 
 # TARGTYPE "Win32 (x86) Static Library" 0x0104
 
-CFG=unzip - Win32 NASM Debug
+CFG=unzip - Win32 NASM Debug MS STL
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
@@ -13,7 +13,7 @@ CFG=unzip - Win32 NASM Debug
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "unzip.mak" CFG="unzip - Win32 NASM Debug"
+!MESSAGE NMAKE /f "unzip.mak" CFG="unzip - Win32 NASM Debug MS STL"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
@@ -21,6 +21,7 @@ CFG=unzip - Win32 NASM Debug
 !MESSAGE "unzip - Win32 Debug" (based on "Win32 (x86) Static Library")
 !MESSAGE "unzip - Win32 NASM Debug" (based on "Win32 (x86) Static Library")
 !MESSAGE "unzip - Win32 NASM Release" (based on "Win32 (x86) Static Library")
+!MESSAGE "unzip - Win32 NASM Debug MS STL" (based on "Win32 (x86) Static Library")
 !MESSAGE 
 
 # Begin Project
@@ -122,6 +123,29 @@ LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo /out:"unzip.lib"
 # ADD LIB32 /nologo /out:"..\unzip.lib"
 
+!ELSEIF  "$(CFG)" == "unzip - Win32 NASM Debug MS STL"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 1
+# PROP BASE Output_Dir "Debug"
+# PROP BASE Intermediate_Dir "Debug"
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 1
+# PROP Output_Dir "Debug"
+# PROP Intermediate_Dir "Debug"
+# PROP Target_Dir ""
+# ADD BASE CPP /nologo /MDd /W3 /GX /Z7 /Od /I "..\include" /I "..\..\zlib\include" /I "..\..\..\config" /D "_DEBUG" /D "_WINDOWS" /D "WIN32" /D "NOMINMAX" /YX /FD /c
+# ADD CPP /nologo /MDd /W3 /GX /Z7 /Od /I "..\include" /I "..\..\zlib\include" /I "..\..\..\config" /D "_DEBUG" /D "_WINDOWS" /D "WIN32" /YX /FD /c
+# ADD BASE RSC /l 0x409
+# ADD RSC /l 0x409
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LIB32=link.exe -lib
+# ADD BASE LIB32 /nologo /out:"..\unzip.lib"
+# ADD LIB32 /nologo /out:"..\unzip.lib"
+
 !ENDIF 
 
 # Begin Target
@@ -130,6 +154,7 @@ LIB32=link.exe -lib
 # Name "unzip - Win32 Debug"
 # Name "unzip - Win32 NASM Debug"
 # Name "unzip - Win32 NASM Release"
+# Name "unzip - Win32 NASM Debug MS STL"
 # Begin Source File
 
 SOURCE=..\src\zip_header.cpp

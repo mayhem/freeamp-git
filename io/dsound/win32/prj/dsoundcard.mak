@@ -1,15 +1,15 @@
 # Microsoft Developer Studio Generated NMAKE File, Based on dsoundcard.dsp
 !IF "$(CFG)" == ""
-CFG=dsoundcard - Win32 NASM Debug
-!MESSAGE No configuration specified. Defaulting to dsoundcard - Win32 NASM Debug.
+CFG=dsoundcard - Win32 NASM Debug MS STL
+!MESSAGE No configuration specified. Defaulting to dsoundcard - Win32 NASM Debug MS STL.
 !ENDIF 
 
-!IF "$(CFG)" != "dsoundcard - Win32 Release" && "$(CFG)" != "dsoundcard - Win32 Debug" && "$(CFG)" != "dsoundcard - Win32 NASM Debug" && "$(CFG)" != "dsoundcard - Win32 NASM Release"
+!IF "$(CFG)" != "dsoundcard - Win32 Release" && "$(CFG)" != "dsoundcard - Win32 Debug" && "$(CFG)" != "dsoundcard - Win32 NASM Debug" && "$(CFG)" != "dsoundcard - Win32 NASM Release" && "$(CFG)" != "dsoundcard - Win32 NASM Debug MS STL"
 !MESSAGE Invalid configuration "$(CFG)" specified.
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "dsoundcard.mak" CFG="dsoundcard - Win32 NASM Debug"
+!MESSAGE NMAKE /f "dsoundcard.mak" CFG="dsoundcard - Win32 NASM Debug MS STL"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
@@ -17,6 +17,7 @@ CFG=dsoundcard - Win32 NASM Debug
 !MESSAGE "dsoundcard - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "dsoundcard - Win32 NASM Debug" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "dsoundcard - Win32 NASM Release" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "dsoundcard - Win32 NASM Debug MS STL" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE 
 !ERROR An invalid configuration is specified.
 !ENDIF 
@@ -66,7 +67,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MD /W3 /GX /O2 /Ob2 /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\dsoundcard.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MD /W3 /GX /O2 /Ob2 /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /D "NDEBUG" /D "_WINDOWS" /D "WIN32" /D "NOMINMAX" /Fp"$(INTDIR)\dsoundcard.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o /win32 "NUL" 
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\dsound.res" /d "NDEBUG" 
 BSC32=bscmake.exe
@@ -108,11 +109,11 @@ INTDIR=.\Debug
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : ".\dsoundcard.pmo"
+ALL : "..\..\..\..\config\config.h" ".\dsoundcard.pmo"
 
 !ELSE 
 
-ALL : "fabaselib - Win32 Debug" ".\dsoundcard.pmo"
+ALL : "fabaselib - Win32 Debug" "..\..\..\..\config\config.h" ".\dsoundcard.pmo"
 
 !ENDIF 
 
@@ -133,11 +134,12 @@ CLEAN :
 	-@erase "$(OUTDIR)\dsoundcard.pdb"
 	-@erase ".\dsoundcard.ilk"
 	-@erase ".\dsoundcard.pmo"
+	-@erase "..\..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MDd /W3 /GX /Od /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\dsoundcard.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MDd /W3 /GX /Od /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /D "_DEBUG" /D "_WINDOWS" /D "WIN32" /D "NOMINMAX" /Fp"$(INTDIR)\dsoundcard.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o /win32 "NUL" 
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\dsound.res" /d "_DEBUG" 
 BSC32=bscmake.exe
@@ -167,7 +169,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "fabaselib - Win32 Debug" ".\dsoundcard.pmo"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 Debug" "..\..\..\..\config\config.h" ".\dsoundcard.pmo"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                        ..\..\..\..\base\win32\prj\plugins
 	copy dsoundcard.pmo               ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -179,11 +181,11 @@ INTDIR=.\Debug
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : ".\dsoundcard.pmo"
+ALL : "..\..\..\..\config\config.h" ".\dsoundcard.pmo"
 
 !ELSE 
 
-ALL : "fabaselib - Win32 NASM Debug" ".\dsoundcard.pmo"
+ALL : "fabaselib - Win32 NASM Debug" "..\..\..\..\config\config.h" ".\dsoundcard.pmo"
 
 !ENDIF 
 
@@ -204,11 +206,12 @@ CLEAN :
 	-@erase "$(OUTDIR)\dsoundcard.pdb"
 	-@erase ".\dsoundcard.ilk"
 	-@erase ".\dsoundcard.pmo"
+	-@erase "..\..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MDd /W3 /GX /Od /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\dsoundcard.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MDd /W3 /GX /Od /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /D "_DEBUG" /D "_WINDOWS" /D "WIN32" /D "NOMINMAX" /Fp"$(INTDIR)\dsoundcard.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o /win32 "NUL" 
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\dsound.res" /d "_DEBUG" 
 BSC32=bscmake.exe
@@ -238,7 +241,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Debug" ".\dsoundcard.pmo"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Debug" "..\..\..\..\config\config.h" ".\dsoundcard.pmo"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                        ..\..\..\..\base\win32\prj\plugins
 	copy dsoundcard.pmo               ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -278,7 +281,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MD /W3 /GX /O2 /Ob2 /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\dsoundcard.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MD /W3 /GX /O2 /Ob2 /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /D "NDEBUG" /D "_WINDOWS" /D "WIN32" /D "NOMINMAX" /Fp"$(INTDIR)\dsoundcard.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o /win32 "NUL" 
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\dsound.res" /d "NDEBUG" 
 BSC32=bscmake.exe
@@ -311,6 +314,78 @@ ALL : $(DS_POSTBUILD_DEP)
 $(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Release" "..\..\..\..\config\config.h" ".\dsoundcard.pmo"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                    ..\..\..\..\base\win32\prj\plugins
 	copy dsoundcard.pmo                               ..\..\..\..\base\win32\prj\plugins
+	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
+
+!ELSEIF  "$(CFG)" == "dsoundcard - Win32 NASM Debug MS STL"
+
+OUTDIR=.\Debug
+INTDIR=.\Debug
+
+!IF "$(RECURSE)" == "0" 
+
+ALL : "..\..\..\..\config\config.h" ".\dsoundcard.pmo"
+
+!ELSE 
+
+ALL : "fabaselib - Win32 NASM Debug MS STL" "..\..\..\..\config\config.h" ".\dsoundcard.pmo"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fabaselib - Win32 NASM Debug MS STLCLEAN" 
+!ELSE 
+CLEAN :
+!ENDIF 
+	-@erase "$(INTDIR)\dsound.res"
+	-@erase "$(INTDIR)\dsoundcardpmo.obj"
+	-@erase "$(INTDIR)\eventbuffer.obj"
+	-@erase "$(INTDIR)\pipeline.obj"
+	-@erase "$(INTDIR)\pmo.obj"
+	-@erase "$(INTDIR)\pullbuffer.obj"
+	-@erase "$(INTDIR)\vc60.idb"
+	-@erase "$(OUTDIR)\dsoundcard.exp"
+	-@erase "$(OUTDIR)\dsoundcard.lib"
+	-@erase "$(OUTDIR)\dsoundcard.pdb"
+	-@erase ".\dsoundcard.ilk"
+	-@erase ".\dsoundcard.pmo"
+	-@erase "..\..\..\..\config\config.h"
+
+"$(OUTDIR)" :
+    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
+
+CPP_PROJ=/nologo /MDd /W3 /GX /Od /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /D "_DEBUG" /D "_WINDOWS" /D "WIN32" /Fp"$(INTDIR)\dsoundcard.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o /win32 "NUL" 
+RSC_PROJ=/l 0x409 /fo"$(INTDIR)\dsound.res" /d "_DEBUG" 
+BSC32=bscmake.exe
+BSC32_FLAGS=/nologo /o"$(OUTDIR)\dsoundcard.bsc" 
+BSC32_SBRS= \
+	
+LINK32=link.exe
+LINK32_FLAGS=fabaselib.lib dsound.lib winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x10100000" /subsystem:windows /dll /incremental:yes /pdb:"$(OUTDIR)\dsoundcard.pdb" /debug /machine:I386 /def:".\dsoundcard.def" /out:"dsoundcard.pmo" /implib:"$(OUTDIR)\dsoundcard.lib" /pdbtype:sept /libpath:"..\..\..\..\base\win32" 
+DEF_FILE= \
+	".\dsoundcard.def"
+LINK32_OBJS= \
+	"$(INTDIR)\dsoundcardpmo.obj" \
+	"$(INTDIR)\eventbuffer.obj" \
+	"$(INTDIR)\pipeline.obj" \
+	"$(INTDIR)\pmo.obj" \
+	"$(INTDIR)\pullbuffer.obj" \
+	"$(INTDIR)\dsound.res" \
+	"..\..\..\..\base\win32\fabaselib.lib"
+
+".\dsoundcard.pmo" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+    $(LINK32) @<<
+  $(LINK32_FLAGS) $(LINK32_OBJS)
+<<
+
+SOURCE="$(InputPath)"
+DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
+
+ALL : $(DS_POSTBUILD_DEP)
+
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Debug MS STL" "..\..\..\..\config\config.h" ".\dsoundcard.pmo"
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                        ..\..\..\..\base\win32\prj\plugins
+	copy dsoundcard.pmo               ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 
@@ -355,7 +430,7 @@ $(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Release" "..\..\..\..\config\confi
 !ENDIF 
 
 
-!IF "$(CFG)" == "dsoundcard - Win32 Release" || "$(CFG)" == "dsoundcard - Win32 Debug" || "$(CFG)" == "dsoundcard - Win32 NASM Debug" || "$(CFG)" == "dsoundcard - Win32 NASM Release"
+!IF "$(CFG)" == "dsoundcard - Win32 Release" || "$(CFG)" == "dsoundcard - Win32 Debug" || "$(CFG)" == "dsoundcard - Win32 NASM Debug" || "$(CFG)" == "dsoundcard - Win32 NASM Release" || "$(CFG)" == "dsoundcard - Win32 NASM Debug MS STL"
 
 !IF  "$(CFG)" == "dsoundcard - Win32 Release"
 
@@ -403,6 +478,18 @@ $(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Release" "..\..\..\..\config\confi
 "fabaselib - Win32 NASM ReleaseCLEAN" : 
    cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Release" RECURSE=1 CLEAN 
+   cd "..\..\..\io\dsound\win32\prj"
+
+!ELSEIF  "$(CFG)" == "dsoundcard - Win32 NASM Debug MS STL"
+
+"fabaselib - Win32 NASM Debug MS STL" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug MS STL" 
+   cd "..\..\..\io\dsound\win32\prj"
+
+"fabaselib - Win32 NASM Debug MS STLCLEAN" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug MS STL" RECURSE=1 CLEAN 
    cd "..\..\..\io\dsound\win32\prj"
 
 !ENDIF 
@@ -453,6 +540,17 @@ InputPath=..\..\..\..\config\config.win32
 << 
 	
 
+!ELSEIF  "$(CFG)" == "dsoundcard - Win32 NASM Debug MS STL"
+
+InputPath=..\..\..\..\config\config.win32
+
+"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	<<tempfile.bat 
+	@echo off 
+	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
+<< 
+	
+
 !ENDIF 
 
 SOURCE=..\res\dsound.rc
@@ -483,6 +581,13 @@ SOURCE=..\res\dsound.rc
 
 "$(INTDIR)\dsound.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\dsound.res" /i "\Local\src\freeamp\io\dsound\win32\res" /d "NDEBUG" $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "dsoundcard - Win32 NASM Debug MS STL"
+
+
+"$(INTDIR)\dsound.res" : $(SOURCE) "$(INTDIR)"
+	$(RSC) /l 0x409 /fo"$(INTDIR)\dsound.res" /i "\Local\src\freeamp\io\dsound\win32\res" /d "_DEBUG" $(SOURCE)
 
 
 !ENDIF 

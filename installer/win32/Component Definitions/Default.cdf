@@ -5,7 +5,7 @@ Version=2.10.000
 
 [System DLLs]
 OBJECT=No
-DESCRIPTION=These components are System DLLs you might need in order to use the player.
+DESCRIPTION=This component installs the system DLLs you might need in order to use the player.
 STATUS=
 VISIBLE=Yes
 DISK=ANYDISK
@@ -63,7 +63,7 @@ component20=Playlist Formats
 
 [MetaData\ID3v1]
 OBJECT=No
-DESCRIPTION=This component  reads metadata in the ID3v1 format.
+DESCRIPTION=This component reads metadata in the ID3v1 format.
 STATUS=
 VISIBLE=Yes
 DISK=ANYDISK
@@ -205,7 +205,7 @@ HANDLERONUnInstalled=
 
 [MetaData\ID3v2]
 OBJECT=No
-DESCRIPTION=This component  reads metadata in the ID3v2 format.
+DESCRIPTION=This component reads metadata in the ID3v2 format.
 STATUS=
 VISIBLE=Yes
 DISK=ANYDISK
@@ -443,7 +443,7 @@ HANDLERONUnInstalled=
 
 [Default Plugins]
 OBJECT=No
-DESCRIPTION=Base set of plugins that are required for the application to run.
+DESCRIPTION=These are the base set of plugins that are required for the application to run.
 STATUS=
 VISIBLE=Yes
 DISK=ANYDISK
@@ -651,7 +651,7 @@ HANDLERONUnInstalled=
 
 [Default Theme]
 OBJECT=No
-DESCRIPTION=This is the default theme file for the player, defining how it looks. Head over to http://www.freeamp.org to check out other cool themes that are available for download.
+DESCRIPTION=This is the default theme file for the player, defining how it looks. Head over to http://www.freeamp.org/ to check out other cool themes that are available for download.
 STATUS=
 VISIBLE=Yes
 DISK=ANYDISK
@@ -686,7 +686,7 @@ HANDLERONUnInstalled=
 
 [Foreign Themes]
 OBJECT=No
-DESCRIPTION=These components allow the player to use other player's themes or skins to change how the player looks.
+DESCRIPTION=These components allow the player to use other players' themes or skins to change how the player looks.
 STATUS=
 VISIBLE=Yes
 DISK=ANYDISK
