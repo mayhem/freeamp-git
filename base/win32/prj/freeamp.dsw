@@ -131,6 +131,9 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name toolbar
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name misc
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -202,6 +205,18 @@ Package=<4>
 ###############################################################################
 
 Project: "m3u"=..\..\..\plm\playlist\m3u\prj\m3u.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "misc"=..\..\..\plm\metadata\misc\prj\misc.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

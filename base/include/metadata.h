@@ -124,6 +124,14 @@ class MetaData {
 
 };
 
+typedef enum MetaDataOrder {
+    MetaDataOrder_First  =    0,  // for some reason this plugin should be called before others
+    MetaDataOrder_Low    =    25, // not very reliable, perhaps parsing the filename
+    MetaDataOrder_Medium =    50, // not too reliable, perhaps limited in the amount of data allowed
+    MetaDataOrder_High   =    75, // reliable, no restrictions on length of data
+    MetaDataOrder_Last   =    100 // for some reason this plugin should be called after others
+} MetaDataOrder;
+
 class MetaDataFormat {
  public:
     MetaDataFormat(FAContext *context) {}
@@ -131,6 +139,7 @@ class MetaDataFormat {
 
     virtual bool ReadMetaData(const char* url, MetaData* metadata) = 0;
     virtual bool WriteMetaData(const char* url, const MetaData& metadata) = 0;
+    virtual MetaDataOrder Order() = 0;
 };
 
 

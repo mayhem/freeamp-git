@@ -47,6 +47,7 @@ using namespace std;
 #include "registrar.h"
 #include "event.h"
 #include "eventdata.h"
+#include "musicbrowser.h"
 
 
 // Function object used for sorting PlaylistItems in PlaylistManager
@@ -1682,21 +1683,41 @@ MetaDataThreadFunction(vector<PlaylistItem*>* list)
 
             if(item)
             {
-                MetaData metadata = item->GetMetaData();
-                MetaDataFormat* mdf = NULL;
-                // const RegistryItem* module = NULL;
-                uint32 numFormats;
+                MetaData metadata;
+                MetaData* dbData = NULL;
 
-                numFormats = m_metadataFormats.size();
+                // is there any metadata stored for this item in the music db?
+                dbData = m_context->browser->ReadMetaDataFromDatabase(item->URL().c_str());
 
-                for(uint32 i = 0; i < numFormats; i++)
+                if(dbData)
                 {
-                    mdf = m_metadataFormats[i];
+                    metadata = *dbData;
+                    delete dbData;
+                }
+                else // if not look to see if the file contains metadata
+                {
+                    metadata = item->GetMetaData();
+                    MetaDataFormat* mdf = NULL;
+                    uint32 numFormats;
 
-                    if(mdf)
+                    numFormats = m_metadataFormats.size();
+
+                    for(uint32 i = 0; i < numFormats; i++)
                     {
-                        mdf->ReadMetaData(item->URL().c_str(), &metadata);
+                        mdf = m_metadataFormats[i];
+
+                        if(mdf)
+                        {
+                            mdf->ReadMetaData(item->URL().c_str(), &metadata);
+                        }
                     }
+                }
+
+                // check to see if the song length is unknown
+                // and if so calculate it.
+                if(metadata.Time() == 0)
+                {
+
                 }
 
                 m_mutex.Acquire();
