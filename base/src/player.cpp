@@ -155,6 +155,8 @@ void Player::SetTerminationSemaphore(Semaphore *pSem) {
 
 /* return true if parsing was successful, false otherwise. */
 
+typedef char *pchar;
+
 bool Player::SetArgs(int32 argc, char** argv){
     Vector<char *> argVector;
 
@@ -218,7 +220,7 @@ bool Player::SetArgs(int32 argc, char** argv){
     }
     m_argc = argVector.NumElements();
     if (m_argc) {
-	m_argv = new (char *)[m_argc];
+	m_argv = new pchar[m_argc];
 	for(int f = 0;f < m_argc;f++) {
 	    m_argv[f] = argVector.ElementAt(f);
 	    //cerr << "Adding argument (" << f << "): " << m_argv[f] << endl;

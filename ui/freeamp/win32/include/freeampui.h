@@ -36,6 +36,7 @@ ____________________________________________________________________________*/
 #include "mutex.h"
 #include "queue.h"
 #include "playlist.h"
+#include "errors.h"
 
 enum { STATE_Stopped = 1, STATE_Playing, STATE_Paused };
 
@@ -44,7 +45,7 @@ class FreeAmpUI : public UserInterface {
     FreeAmpUI();
     ~FreeAmpUI();
 
-    virtual void Init() {}
+    virtual Error Init() { return kError_NoErr; }
     virtual void SetTarget(EventQueue*);
     virtual int32 AcceptEvent(Event *);
     virtual void SetArgs(int32,char **);
