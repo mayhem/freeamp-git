@@ -12,19 +12,6 @@ From the source:
 
   See the document INSTALL
 
-From binaries:
-
-  Run "./install-freeamp" from this directory
-
-  Or alternatively, if you prefer to install the files manually:
-    - Move freeamp to /usr/local/bin (or, somewhere else in your path)
-    - Move the plugins directory (complete with contents) to
-        /usr/local/lib/freeamp
-    - If you do not have ALSA installed, remove alsa.pmo from the
-        /usr/local/lib/freeamp/plugins directory.
-    - If you do not have EsounD installed, remove esound.pmo from the
-        /usr/local/lib/freeamp/plugins directory.
-
 
 USING FREEAMP:
 ----------------------------------------------------------------------
@@ -54,10 +41,6 @@ FreeAmp 2.1 for Win32 and Linux:
 
   The small buttons to the left of the primary audio controls control
   shuffle and repeat modes.
-
-
-  
-
 
 
 ABOUT FreeAmp:

@@ -1,8 +1,38 @@
-Changes for Linux and Windows version 2.0.8
+Changes for Linux and Windows version 2.1.0 beta 7
 --------------------------------------------------------------------
 
-- Fixed the HTTP error issue with single-click downloading.
-- Fixed some issues with playing some mp3 files.
+- Fix a bunch of problems related to the Relatable features
+- Fix the horribly broken Coca-Cola themes
+- Fix icecast titlestreaming
+- id3 tags are now saves properly on linux
+
+Changes for Linux and Windows version 2.1.0 beta 6
+--------------------------------------------------------------------
+
+- FreeAmp lives!
+- Full Vorbis support (www. )
+- Relatable playlist features - see http://www.relatable.com
+
+Changes for Linux and Windows version 2.1.0 beta 5
+--------------------------------------------------------------------
+
+- Reworking the Panel subsystem again, with default theme changes
+- Add track numbers or '?' to the music tree
+- Use gdk-pixbuf on linux to load any image file format in themes
+- New help files, in HTML
+- Partial support for K-jofol themes (on linux only)
+- Fixes to the winamp skin converter
+
+Changes for Linux and Windows version 2.1.0 beta 4
+--------------------------------------------------------------------
+
+- New structure to 'My Streams' in the music tree, now it's grabbed
+  off of freeamp.org
+- Fixed a number of bugs in the GTK UIs
+- Reworking of 'Panel' subsystem, as used by the equalizer in the default theme
+- Bugfixes to the equalizer
+- Multiselect in the Linux MusicBrowser 
+- Rewritten linux information editor
 
 Changes for Linux and Windows version 2.1.0 beta 3
 --------------------------------------------------------------------
@@ -11,6 +41,13 @@ Changes for Linux and Windows version 2.1.0 beta 3
 - Fixed lots of bugs... for details go to:
 
 http://www.freeamp.org/bugzilla/buglist.cgi?bug_status=RESOLVED&bug_status=VERIFIED&bug_status=CLOSED&email1=&emailtype1=substring&emailassigned_to1=1&email2=&emailtype2=substring&emailreporter2=1&bugidtype=include&bug_id=&changedin=&votes=&chfield=resolution&chfieldfrom=5%2F18%2F2000&chfieldto=5%2F30%2F2000&chfieldvalue=&product=FreeAmp&short_desc=&short_desc_type=substring&long_desc=&long_desc_type=substring&bug_file_loc=&bug_file_loc_type=substring&field0-0-0=noop&type0-0-0=noop&value0-0-0=&cmdtype=doit&newqueryname=&order=Reuse+same+sort+as+last+time
+
+Changes for Linux and Windows version 2.1.0 beta 2
+--------------------------------------------------------------------
+
+- Mainly bugfixes from beta 1
+- Font fixes for the Win32 freeamp ui
+- Enhancements to 'Watch this Directory'
 
 Changes for Linux and Windows version 2.1.0 beta 1
 --------------------------------------------------------------------
@@ -26,6 +63,13 @@ release:
     - CD Burning support
     - Playlist view in theme
     - Icecast stream listing (waiting on the server side xml changes)
+
+
+Changes for Linux and Windows version 2.0.8
+--------------------------------------------------------------------
+
+- Fixed the HTTP error issue with single-click downloading.
+- Fixed some issues with playing some mp3 files.
 
 
 Changes for Linux and Windows version 2.0.7

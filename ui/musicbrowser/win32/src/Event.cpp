@@ -73,17 +73,15 @@ void MusicBrowserUI::AskSignatureDialog(void)
     char numtracks[10];
     sprintf(numtracks, "%d", m_context->catalog->GetNumNeedingSigs());
     string message = "Relatable's audio recognition technology enables "
-                     the_BRANDING" to create unique 'signatures' for the music "
-                     "files on your hard drive. It lets the player identify "
-                     "each song file, even if the file is not properly tagged. "
-                     "This helps everyone receive recommendations, since the "
-                     "system is sure what music you have. Signaturing will "
-                     "carry on in the background for a few minutes, and takes "
-                     "less than 2 seconds per music file. You can stop it by "
-                     "selecting 'Stop Signaturing' from the Relatable menu in "
-                     "'My Music'. " +
-                     string("You need to signature ") + string(numtracks) +
-                     string(" track(s).  Do it?");
+                      the_BRANDING" to create unique digital 'signatures' for "
+                      "the music files on your computer. Doing so helps ensure "
+                      "that you and other users receive accurate music "
+                      "recommendations. Signaturing takes about 2 seconds per "
+                      "music file and will work in the background. To "
+                      "discontinue signaturing, select 'Stop Signaturing' from "
+                      "the Relatable menu in 'My Music'. " +
+                      string("Relatable will now signature ") + 
+                      string(numtracks) + string(" track(s).  Proceed?");
 
     int ret = MessageBox(m_hWnd, message.c_str(), caption.c_str(),
                          MB_YESNO|MB_ICONQUESTION);

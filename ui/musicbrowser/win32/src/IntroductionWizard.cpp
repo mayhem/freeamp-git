@@ -678,8 +678,9 @@ static BOOL CALLBACK IntroWizardRelatable(HWND hwnd,
                                 "we're continually adding safeguards to protect our users. To\n"
                                 "enjoy these features and help us test the system, just opt-in.\n"
                                 "You will never be contacted by Relatable or anyone else (unless\n"
-                                "you ask, of course!). That's Relatable's privacy promise. Please\n"
-                                "feel free to ask any questions at info@relatable.com.";
+                                "you ask, of course!). That's Relatable's privacy promise. If you\n"
+                                "have any questions, please contact us at info@relatable.com";
+				
             switch(ctrlId)
             {
                 case IDC_RELATABLE_TEXT1:
@@ -711,7 +712,7 @@ static BOOL CALLBACK IntroWizardRelatable(HWND hwnd,
                     DeleteObject(font);
                     break;
                 }
-                case IDC_RELATABLE_CAPTION1:
+                //case IDC_RELATABLE_CAPTION1:
                 case IDC_RELATABLE_CAPTION2:
                 {
                     HFONT font, oldFont;

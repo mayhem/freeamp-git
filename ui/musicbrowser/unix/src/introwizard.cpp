@@ -297,13 +297,15 @@ GtkWidget *IntroWizardUI::RelatablePage(void)
    GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
    gtk_widget_show(vbox);
 
-   GtkWidget *label = gtk_label_new("Check out Relatable's new recommendation features");
+/*
+   GtkWidget *caption = gtk_label_new("Check out Relatable's new recommendation features");
    gtk_label_set_line_wrap(GTK_LABEL(label), FALSE);
    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
    gtk_widget_show(label);
+*/
 
-   label = gtk_label_new("This version of FreeAmp offers Relatable features that automatically recommend music playlists and streams. It's our first public test of an exciting new approach to discovering music. Relatable's system 'learns' listener preferences through FreeAmp and compares them with the preferences of like-minded listeners. Like virtual 'word of mouth', Relatable introduces you to music that people like you have enjoyed.");
+   GtkWidget *label = gtk_label_new("This version of FreeAmp offers Relatable features that automatically recommend music playlists and streams. It's our first public test of an exciting new approach to discovering music. Relatable's system 'learns' listener preferences through FreeAmp and compares them with the preferences of like-minded listeners. Like virtual 'word of mouth', Relatable introduces you to music that people like you have enjoyed.");
    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
@@ -315,7 +317,7 @@ GtkWidget *IntroWizardUI::RelatablePage(void)
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
    gtk_widget_show(label);
 
-   label = gtk_label_new("Please note that Relatable profiles are totally anonymous and individual profiles are never shared with third parties. We don't collect any personally identifiable information. Feel free to check our code on that. Each anonymous music profile is stored on Relatable's secure servers, and we're continually adding safeguards to protect our users. To enjoy these features and help us test the system, just opt in. You will never be contacted by Relatable or anyone else (unless you ask, of course!). That's Relatable's privacy promise. Please feel free to ask any questions at info@relatable.com.");
+   label = gtk_label_new("Please note that Relatable profiles are totally anonymous and individual profiles are never shared with third parties. We don't collect any personally identifiable information. Feel free to check our code on that. Each anonymous music profile is stored on Relatable's secure servers, and we're continually adding safeguards to protect our users. To enjoy these features and help us test the system, just opt in. You will never be contacted by Relatable or anyone else (unless you ask, of course!). That's Relatable's privacy promise. If you have any questions, please contact us at info@relatable.com.");
    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
@@ -362,18 +364,18 @@ GtkWidget *IntroWizardUI::RelatableTwoPage(void)
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
    gtk_widget_show(label);
 
-   label = gtk_label_new("You can create a profile below. Or you can select the \"Profiles\" tab under \"Options\" and create and save multiple profiles. Then just start listening to music. After you have listened for a while, hit the \"Suggest\" button to view and listen to a recommended list of songs. You can also check out \"Recommended Streams\" on the music browser window. Learn more about Relatable features in the help menu.");
+   label = gtk_label_new("Enter a profile name in the window below.  Then start listening to music. After you have listened for a while, hit the \"Suggest\" button to view a personalized music playlist. If you'd like, check out the \"Recommended Streams\" item in the My Music tree.");
    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
    gtk_widget_show(label);
 
-   label = gtk_label_new("For more information, please review our \"Read-me\" file or \nsend questions to: freeamptest@relatable.com");
+   label = gtk_label_new("Note: You can create additional music profiles by selecting 'Relatable Profiles' under the Options menu in the My Music window.  Check our the 'Help' menu for more information on all Relatable features, or drop us a note with questions to info@relatable.com");
    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
    gtk_widget_show(label);
-
+		  
    GtkWidget *hbox = gtk_hbox_new(FALSE, 5);
    gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, FALSE, 5);
    gtk_widget_show(hbox);
@@ -386,7 +388,7 @@ GtkWidget *IntroWizardUI::RelatableTwoPage(void)
    gtk_box_pack_start(GTK_BOX(hbox), profileEntry, FALSE, FALSE, 0);
    gtk_widget_show(profileEntry);
 
-   GtkWidget *button = gtk_button_new_with_label(" To the Web Page!");
+   GtkWidget *button = gtk_button_new_with_label(" Relatable Web Page ");
    gtk_signal_connect(GTK_OBJECT(button), "clicked",
                       GTK_SIGNAL_FUNC(relatable_web), this);
    gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 0);

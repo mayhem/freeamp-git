@@ -252,7 +252,6 @@ class GTKPreferenceWindow : public PreferenceWindow
       GtkWidget *mainWindow;
       GtkWidget *pmoOptionMenu;
 
-      int32 numPMOs;
       bool  done;
 
       void UpdateProfileList(void);

@@ -1170,6 +1170,7 @@ GtkWidget *GTKPreferenceWindow::CreateStreaming(void)
 
 void GTKPreferenceWindow::SetPMO(int newsel)
 {
+    newsel = (m_PMOnames->size() - 1) - newsel;
     proposedValues.defaultPMO = (*m_PMOnames)[newsel];
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
@@ -1188,7 +1189,7 @@ static void pmo_select(GtkWidget *item, GTKPreferenceWindow *p)
         i++;
     }
  
-    p->SetPMO(p->numPMOs - i - 1);
+    p->SetPMO(i);
 }
 
 void GTKPreferenceWindow::AlsaSet(void)
@@ -1234,27 +1235,31 @@ GtkWidget *GTKPreferenceWindow::CreatePlugins(void)
     GSList *group = NULL;
     GtkWidget *menuitem;
     uint32 outputIndex = 0;
+    uint32 iLoop = 0;
 
     while (pmo && (item = pmo->GetItem(i++))) {
         if (!strncmp("cd.pmo", item->Name(), 7) ||
             !strncmp("signature.pmo", item->Name(), 13))
             continue;
 
-        menuitem = gtk_radio_menu_item_new_with_label(group, item->Name());
+	m_PMOnames->push_back(string(item->Name()));
+    }
+
+    vector<string>::iterator vsi = m_PMOnames->begin();
+    for (; vsi != m_PMOnames->end(); vsi++, iLoop++) {
+        menuitem = gtk_radio_menu_item_new_with_label(group, (*vsi).c_str());
         gtk_signal_connect(GTK_OBJECT(menuitem), "activate",
                            GTK_SIGNAL_FUNC(pmo_select), this);
         group = gtk_radio_menu_item_group(GTK_RADIO_MENU_ITEM(menuitem));
         gtk_menu_append(GTK_MENU(pmoMenu), menuitem);
-        if (originalValues.defaultPMO == item->Name()) {
+        if (originalValues.defaultPMO == (*vsi)) {
             gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menuitem), TRUE);
 
-            outputIndex = i - 1;
+            outputIndex = iLoop;
         }
-        m_PMOnames->push_back(string(item->Name()));
         gtk_widget_show(menuitem);
     }
 
-    numPMOs = i - 2;
     gtk_option_menu_set_menu(GTK_OPTION_MENU(pmoOptionMenu), pmoMenu);
     gtk_table_attach(GTK_TABLE(table), pmoOptionMenu, 1, 2, 1, 2, GTK_FILL,
                      GTK_FILL, 5, 5);
