@@ -85,10 +85,8 @@ Create(thread_function function, void* arg, bool detach)
     {
 	result = false;
     }
-    if (detach) {
-        cout << "detaching\n";
+    if (detach) 
         pthread_detach(m_threadHandle);
-    }
 
     return result;
 }

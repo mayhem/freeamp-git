@@ -65,11 +65,11 @@ MusicCatalog::MusicCatalog(FAContext *context, char *databasepath)
     m_streams = new vector<PlaylistItem *>;
     m_watchTimer = NULL;
    
-    if (databasepath)
-        SetDatabase(databasepath);
-
     m_timeout = 0;
     context->prefs->GetWatchThisDirTimeout(&m_timeout);
+
+    if (databasepath)
+        SetDatabase(databasepath);
 }
 
 void MusicCatalog::StartTimer(void)
@@ -85,8 +85,14 @@ MusicCatalog::~MusicCatalog()
 {
     ClearCatalog();
 
+    m_catMutex->Acquire();
+
     if(m_watchTimer)
         m_context->timerManager->StopTimer(m_watchTimer);
+
+    delete m_artistList;
+    delete m_unsorted;
+    delete m_streams;
 
     if (m_database)
         delete m_database;
@@ -616,9 +622,10 @@ void MusicCatalog::SetDatabase(const char *path)
 
     if (m_database) {
         RePopulateFromDatabase();
-        if (m_timeout != 0)
+        if (m_timeout == 0)
             PruneDatabase(true, true);
-        Sort();
+        else
+            Sort();
     }
 }
 

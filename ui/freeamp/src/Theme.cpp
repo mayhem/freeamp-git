@@ -386,7 +386,7 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
 #ifdef WIN32         
           ((Win32Window *)m_pWindow)->ConvertTo256Color(m_pBitmaps);
 #endif       
-   
+  
           m_pWindow->VulcanMindMeld(pNewWindow);
        }   
        m_bThemeLoaded = true;

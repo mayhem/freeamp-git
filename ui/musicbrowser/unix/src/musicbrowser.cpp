@@ -121,10 +121,11 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
                 mainBrowser->ShowMusicBrowser();
             break; }
         case CMD_AddFiles:
+        case CMD_EditCurrentPlaylistItemInfo:
         case INFO_MusicCatalogRegenerating:
         case INFO_MusicCatalogDoneRegenerating:
         case INFO_PlaylistCurrentItemInfo:
-        case INFO_PlaylistItemUpdated:
+        case INFO_PlaylistItemsUpdated:
         case INFO_PlaylistItemMoved:
         case INFO_CDDiscStatus: 
         case INFO_PrefsChanged: {

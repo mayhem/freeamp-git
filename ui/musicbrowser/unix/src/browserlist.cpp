@@ -88,48 +88,57 @@ void GTKMusicBrowser::RenumberPlaylistList(int starting)
     gtk_clist_thaw(GTK_CLIST(playlistList));
 }
 
-void GTKMusicBrowser::UpdatePlaylistItem(PlaylistItem *item)
+void GTKMusicBrowser::UpdatePlaylistItems(const vector<PlaylistItem *> *items)
 {
-    if (!item)
+    if (!items)
         return;
 
-    uint32 pos = m_plm->IndexOf(item);
+    vector<PlaylistItem *>::const_iterator i = items->begin();
 
-    if (pos == kInvalidIndex)
-        return;
+    uint32 minpos = kInvalidIndex;
 
-    MetaData mdata = item->GetMetaData();
-    char *iText[4];
-    char position[10];
-    char *title;
-    char *artist;
-    char length[50];
+    for (; i != items->end(); i++)  {
+        uint32 pos = m_plm->IndexOf(*i);
+ 
+        if (pos == kInvalidIndex)
+            continue;
 
-    sprintf(position, "%d", pos + 1);
-    title = (char *)mdata.Title().c_str();
-    artist = (char *)mdata.Artist().c_str();
+        if (pos < minpos)
+            minpos = pos;
 
-    if (mdata.Time() == 0)
-        sprintf(length, "Unknown");
-    else {
-        int secs = mdata.Time();
-        if (secs > 3600)
-           sprintf(length, "%d:%02d:%02d", secs / 3600, (secs / 60) % 60,
-                    secs % 60);
-        else
-            sprintf(length, "%d:%02d", (secs / 60) % 60, secs % 60);
+        MetaData mdata = (*i)->GetMetaData();
+        char *iText[4];
+        char position[10];
+        char *title;
+        char *artist;
+        char length[50];
+
+        sprintf(position, "%d", pos + 1);
+        title = (char *)mdata.Title().c_str();
+        artist = (char *)mdata.Artist().c_str();
+
+        if (mdata.Time() == 0)
+            sprintf(length, "Unknown");
+        else {
+            int secs = mdata.Time();
+            if (secs > 3600)
+                sprintf(length, "%d:%02d:%02d", secs / 3600, (secs / 60) % 60,
+                        secs % 60);
+            else
+                sprintf(length, "%d:%02d", (secs / 60) % 60, secs % 60);
+        }
+
+        iText[0] = position;
+        iText[1] = title;
+        iText[2] = artist;
+        iText[3] = length;
+
+        for (uint32 count = 0; count < 4; count++)
+            gtk_clist_set_text(GTK_CLIST(playlistList), pos, count, iText[count]);
     }
 
-    iText[0] = position;
-    iText[1] = title;
-    iText[2] = artist;
-    iText[3] = length;
-
-    for (uint32 count = 0; count < 4; count++)
-         gtk_clist_set_text(GTK_CLIST(playlistList), pos, count, iText[count]);
-
     if (m_bCDMode)
-        RenumberPlaylistList(pos);
+        RenumberPlaylistList(minpos);
 }
 
 void GTKMusicBrowser::AddPlaylistItems(vector<PlaylistItem *> *items)
