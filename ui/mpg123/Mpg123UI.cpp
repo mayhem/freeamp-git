@@ -321,7 +321,7 @@ void Mpg123UI::ProcessArgs() {
 		    cout << "use HTTP proxy " << pc << endl;
 		    break;
 		case 'z':
-		    m_plm->SetShuffle(SHUFFLE_SHUFFLED);
+		    m_plm->SetShuffle(SHUFFLE_RANDOM);
 		    //cout << "shuffle play (with wildcards) " << endl;
 		    break;
 		case 'Z':
@@ -340,7 +340,7 @@ void Mpg123UI::ProcessArgs() {
 	    }
 	} else {
 	    //ut << "Adding: " <<m_argv[i] << endl;
-	    m_plm->Add(m_argv[i],0);
+	    m_plm->AddItem(m_argv[i],0);
 	    addedStuff++;
 	}
     }

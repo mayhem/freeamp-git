@@ -143,7 +143,7 @@ void cmdlineUI::keyboardServiceFunction(void *pclcio) {
 	    case 's':
 	    case 'S': {
 		if (pMe->m_plm) {
-		    pMe->m_plm->SetShuffle(SHUFFLE_SHUFFLED);
+		    pMe->m_plm->SetShuffle(SHUFFLE_RANDOM);
 		    pMe->m_plm->SetFirst();
 		}
 		Event *e = new Event(CMD_Stop);
@@ -212,7 +212,7 @@ void cmdlineUI::ProcessArgs() {
 	if (pc[0] == '-') {
 	    processSwitch(&(pc[0]));
 	} else {
-	    m_plm->Add(pc,0);
+	    m_plm->AddItem(pc,0);
 	}
     }
     m_plm->SetFirst();

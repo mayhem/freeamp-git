@@ -51,20 +51,6 @@ typedef enum
 }
 PlayerState;
 
-const int iID3TitleLength = 30;
-const int iID3ArtistLength = 30;
-const int iID3AlbumLength = 30;
-struct ID3Tag
-{
-   char szTag[3];
-   char szTitle[iID3TitleLength];
-   char szArtist[iID3ArtistLength];
-   char szAlbum[iID3AlbumLength];
-   char szYear[4];
-   char szComment[30];
-   char cGenre;
-}; 
-
 class     Player:public EventQueue, Properties, PropertyWatcher
 {
 

@@ -476,7 +476,7 @@ void FreeAmpUI::ParseArgs() {
             }
         } else {
 	    if (m_startupType == PRIMARY_UI) {
-		m_plm->Add(arg,0);
+		m_plm->AddItem(arg,0);
 	    }
 	}
     }
@@ -485,7 +485,7 @@ void FreeAmpUI::ParseArgs() {
     }
     if (m_startupType == PRIMARY_UI) {
 	if(shuffle) 
-	    m_plm->SetShuffle(SHUFFLE_SHUFFLED);
+	    m_plm->SetShuffle(SHUFFLE_RANDOM);
 	
 	if(autoplay)
 	    m_playerEQ->AcceptEvent(new Event(CMD_Play));
@@ -662,7 +662,7 @@ int32 FreeAmpUI::AcceptEvent(Event *e) {
 		case SHUFFLE_NOT_SHUFFLED:
 		    m_lcdWindow->ClearIcon(FALcdWindow::SHUFFLE);
 		    break;
-		case SHUFFLE_SHUFFLED:
+		case SHUFFLE_RANDOM:
 		    m_lcdWindow->SetIcon(FALcdWindow::SHUFFLE);
 		    break;
 		default:

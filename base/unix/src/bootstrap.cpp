@@ -62,7 +62,6 @@ int main(int argc, char **argv) {
     //testBuffer();
     //testHashTable();
     //exit(1);
-
     Preferences *prefs = new Preferences();
     Registrar *registrar= new Registrar();
     LMCRegistry *lmc;

@@ -414,7 +414,7 @@ void LcdUI::ProcessArgs() {
 	if (pc[0] == '-') {
 	    processSwitch(&(pc[0]));
 	} else {
-	    m_plm->Add(pc,0);
+	    m_plm->AddItem(pc,0);
 	}
     }
     m_plm->SetFirst();

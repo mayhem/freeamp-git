@@ -1028,6 +1028,10 @@ ChangePosition(int32 position)
    ENSURE_INITIALIZED;
    Error     error = kError_NoErr;
 
+
+   if (IsStreaming())
+      return kError_FileSeekNotSupported;
+
    m_seekMutex->Acquire(WAIT_FOREVER);
 
    int32     dummy;

@@ -43,6 +43,8 @@ ____________________________________________________________________________*/
 Player   *Player::m_thePlayer = NULL;
 LogFile *g_Log = NULL;
 
+#define DB printf("%s:%d\n", __FILE__, __LINE__);
+
 const char *szPlaylistExt = ".M3U";
 
 #define DB //printf("%s:%d\n", __FILE__, __LINE__);
@@ -63,9 +65,10 @@ Player *Player::GetPlayer()
 Player::Player():
 EventQueue()
 {
+DB
    g_Log = new LogFile("freeamp.log");
    assert(g_Log);
-
+DB
    // cout << "Creating player..." << endl;
    m_eventSem = new Semaphore();
    m_eventQueue = new Queue < Event * >();
@@ -92,6 +95,7 @@ EventQueue()
 
    m_lmc = NULL;
    m_ui = NULL;
+DB
 
    m_argUIList = new List < char *>();
 
@@ -103,6 +107,7 @@ EventQueue()
    m_didUsage = false;
    m_autoplay = true;
 
+DB
    m_props.RegisterPropertyWatcher("pcm_volume", (PropertyWatcher *) this);
 }
 
@@ -175,6 +180,7 @@ SetArgs(int32 argc, char **argv)
    char     *arg = NULL;
    char     *argUI = NULL;
 
+DB
 #ifndef WIN32
    
    if (argc == 1)
@@ -201,6 +207,7 @@ SetArgs(int32 argc, char **argv)
    justGotArgvZero = true;
 #endif
 
+DB
    argList.AddItem(argv[0]);
    for (int32 i = 1; i < argc; i++)
    {
@@ -320,6 +327,7 @@ SetArgs(int32 argc, char **argv)
       }
    }
 
+DB
    return true;
 }
 
@@ -407,6 +415,7 @@ SetPreferences(Preferences * pP)
 void      Player::
 Run()
 {
+DB
    int32     uiListIndex = 0;
    Preferences *prefs;
    char     *name = NULL;
@@ -459,6 +468,7 @@ Run()
       strcpy(name, m_argUIList->ItemAt(uiListIndex));
    }
 
+DB
    if (IsntError(error))
    {
       while (*name)
@@ -503,6 +513,7 @@ Run()
             *name = '\0';
          }
       }
+DB
       if (!uisActivated)
       {
 #ifdef WIN32
@@ -528,6 +539,7 @@ Run()
          AcceptEvent(e);
       }
    }
+DB
    m_eventServiceThread = Thread::CreateThread();
    m_eventServiceThread->Create(Player::EventServiceThreadFunc, this);
 
@@ -944,7 +956,8 @@ void Player::GetMediaTitle(Event *pEventArg)
      RegistryItem          *pRegItem;
      PhysicalMediaInput    *pPmi;
      char                   szTitle[1024];
-     ID3Tag                 sID3Tag;
+     unsigned char          szTagBuffer[128];
+     Id3TagInfo            *pID3Tag;
      Error                  eRet;
 
      szTitle[0] = 0;
@@ -957,13 +970,15 @@ void Player::GetMediaTitle(Event *pEventArg)
      {
          pPmi = (PhysicalMediaInput *)pRegItem->InitFunction()(g_Log);
 
+         pPmi->SetTarget((EventQueue *)this);
          eRet = pPmi->SetTo(pItem->URL());
          if (!IsError(eRet))
          {
-            eRet = pPmi->GetID3v1Tag((unsigned char *)&sID3Tag);
-
+            eRet = pPmi->GetID3v1Tag(szTagBuffer);
             if (!IsError(eRet))
             {
+                pID3Tag = new Id3TagInfo((char *)szTagBuffer);
+
                 /*OutputDebugString(sID3Tag.szArtist);
                 OutputDebugString("\r\n");
                 OutputDebugString(sID3Tag.szAlbum);
@@ -971,8 +986,7 @@ void Player::GetMediaTitle(Event *pEventArg)
                 OutputDebugString(sID3Tag.szTitle);
                 OutputDebugString("\r\n");*/
 
-                strncpy(szTitle, sID3Tag.szArtist, iID3ArtistLength);
-                szTitle[iID3ArtistLength] = 0;
+                strcpy(szTitle, pID3Tag->m_artist);
 
                 //kill trailing spaces
                 char *pFoo = &(szTitle[strlen(szTitle)-1]);
@@ -985,8 +999,7 @@ void Player::GetMediaTitle(Event *pEventArg)
 
                 strcat(szTitle, " - ");
 
-                strncat(szTitle, sID3Tag.szTitle, iID3TitleLength);
-                szTitle[iID3TitleLength] = 0;
+                strcat(szTitle, pID3Tag->m_songName);
 
                 //kill trailing spaces
                 pFoo = &(szTitle[strlen(szTitle)-1]);
@@ -996,6 +1009,8 @@ void Player::GetMediaTitle(Event *pEventArg)
                     *pFoo = '\0';
                     pFoo--;
                 }
+
+                delete pID3Tag;
              }
          }
 
