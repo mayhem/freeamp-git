@@ -225,10 +225,10 @@ if test "$isunix" = "false"  ; then
   OSINC="-Ibase/$host_os/include -Iui/freeamp/$host_os"
   OSDEP="$host_os"
 else
-  OSDEPSRC=`find base/unix/src \( -name '*.c' -or -name '*.cpp' \) -print`
+  OSDEPSRC=`find base/unix/src \( -name '*.c' -o -name '*.cpp' \) -print`
 fi
 
-OSDEPSRC="$OSDEPSRC `find base/$OSDEP/src \( -name '*.c' -or		\
+OSDEPSRC="$OSDEPSRC `find base/$OSDEP/src \( -name '*.c' -o		\
 					     -name '*.cpp' \) -print`"
 OSDEPOBJ=`echo $OSDEPSRC | sed -e 's,\.cp*,.o,g' | xargs echo`
 dnl I know. This is an abominable way to generate a dependency list.
