@@ -1130,6 +1130,7 @@ CreatePMO(const PlaylistItem * pc, Event * pC)
    // FIXME: Should probably have a user definable default LMC
       lmc_item = m_lmcRegistry->GetItem(0);
 
+  
    if (pmi_item)
    {
       pmi = (PhysicalMediaInput *) pmi_item->InitFunction()(m_context);
@@ -1314,21 +1315,6 @@ ChangePosition(Event *pEvent)
 
 void 
 Player::
-GetMediaInfo(Event *pEvent)
-{
-     const PlaylistItem *pItem;
-
-     if (m_playerState == PlayerState_Stopped)
-     {
-         pItem = m_plm->GetCurrentItem();
-         if (pItem)
-            CreatePMO(pItem, pEvent);
-     }
-     delete pEvent;
-}
-
-void 
-Player::
 HandleQueryState()
 {
     if (m_playerState == PlayerState_Playing)
@@ -1366,7 +1352,9 @@ Play(Event *pEvent)
     {
        pItem = m_plm->GetCurrentItem();
        if (pItem)
+       {
           CreatePMO(pItem, pEvent);
+       }   
 
        if (!m_pmo)
           return;
@@ -1406,9 +1394,13 @@ Next(Event *pEvent)
    if (m_playerState != PlayerState_Stopped)
    {
        if (m_playerState == PlayerState_Paused)
+       {
           AcceptEvent(new Event(CMD_PlayPaused));
+       }   
        else
+       { 
           AcceptEvent(new Event(CMD_Play));
+       }   
    }
 
    delete pEvent;
@@ -1559,12 +1551,6 @@ HandleMediaInfo(Event *pEvent)
 
    ReleaseUIManipLock();
 
-   if (m_autoplay)
-   {
-      m_autoplay = false;
-      AcceptEvent(new Event(CMD_Play));
-   }
-
    delete pEvent;
 }
 
@@ -1684,10 +1670,6 @@ ServiceEvent(Event * pC)
 
         case CMD_ChangePosition:
             ChangePosition(pC);
-            break;
-
-        case CMD_PLMGetMediaInfo:
-            GetMediaInfo(pC);
             break;
 
         case CMD_PlayPaused:

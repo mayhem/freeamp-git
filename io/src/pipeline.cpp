@@ -99,19 +99,33 @@ void PipelineUnit::SetPropManager(Properties * p)
     m_pMutex->Release();
 }
 
-void PipelineUnit::ReportError(const char *szError)
+void PipelineUnit::ReportError(const char * format, ...)
 {
     assert(m_pTarget);
 
-    m_pTarget->AcceptEvent(new ErrorMessageEvent(szError));
+    char szBuffer[4096];
+    va_list argptr;
+
+    va_start(argptr, format);
+    vsprintf(szBuffer, format, argptr);
+    va_end(argptr);
+
+    m_pTarget->AcceptEvent(new ErrorMessageEvent(szBuffer));
     m_pTarget->AcceptEvent(new Event(INFO_DoneOutputting));
 }   
 
-void PipelineUnit::ReportStatus(const char *szError)
+void PipelineUnit::ReportStatus(const char * format, ...)
 {
     assert(m_pTarget);
 
-    m_pTarget->AcceptEvent(new StatusMessageEvent(szError));
+    char szBuffer[4096];
+    va_list argptr;
+
+    va_start(argptr, format);
+    vsprintf(szBuffer, format, argptr);
+    va_end(argptr);
+
+    m_pTarget->AcceptEvent(new StatusMessageEvent(szBuffer));
 }   
 
 void PipelineUnit::Pause(void)

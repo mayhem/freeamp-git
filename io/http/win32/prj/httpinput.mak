@@ -54,6 +54,7 @@ CLEAN :"fabaselib - Win32 ReleaseCLEAN"
 !ELSE 
 CLEAN :
 !ENDIF 
+	-@erase "$(INTDIR)\debug.obj"
 	-@erase "$(INTDIR)\http.res"
 	-@erase "$(INTDIR)\httpinput.obj"
 	-@erase "$(INTDIR)\pipeline.obj"
@@ -127,6 +128,7 @@ LINK32_FLAGS=fabaselib.lib wsock32.lib kernel32.lib user32.lib gdi32.lib\
 DEF_FILE= \
 	".\httpinput.def"
 LINK32_OBJS= \
+	"$(INTDIR)\debug.obj" \
 	"$(INTDIR)\http.res" \
 	"$(INTDIR)\httpinput.obj" \
 	"$(INTDIR)\pipeline.obj" \
@@ -171,6 +173,7 @@ CLEAN :"fabaselib - Win32 DebugCLEAN"
 !ELSE 
 CLEAN :
 !ENDIF 
+	-@erase "$(INTDIR)\debug.obj"
 	-@erase "$(INTDIR)\http.res"
 	-@erase "$(INTDIR)\httpinput.obj"
 	-@erase "$(INTDIR)\pipeline.obj"
@@ -247,6 +250,7 @@ LINK32_FLAGS=fabaselib.lib wsock32.lib kernel32.lib user32.lib gdi32.lib\
 DEF_FILE= \
 	".\httpinput.def"
 LINK32_OBJS= \
+	"$(INTDIR)\debug.obj" \
 	"$(INTDIR)\http.res" \
 	"$(INTDIR)\httpinput.obj" \
 	"$(INTDIR)\pipeline.obj" \
@@ -291,6 +295,7 @@ CLEAN :"fabaselib - Win32 NASM DebugCLEAN"
 !ELSE 
 CLEAN :
 !ENDIF 
+	-@erase "$(INTDIR)\debug.obj"
 	-@erase "$(INTDIR)\http.res"
 	-@erase "$(INTDIR)\httpinput.obj"
 	-@erase "$(INTDIR)\pipeline.obj"
@@ -367,6 +372,7 @@ LINK32_FLAGS=fabaselib.lib wsock32.lib kernel32.lib user32.lib gdi32.lib\
 DEF_FILE= \
 	".\httpinput.def"
 LINK32_OBJS= \
+	"$(INTDIR)\debug.obj" \
 	"$(INTDIR)\http.res" \
 	"$(INTDIR)\httpinput.obj" \
 	"$(INTDIR)\pipeline.obj" \
@@ -411,6 +417,7 @@ CLEAN :"fabaselib - Win32 NASM ReleaseCLEAN"
 !ELSE 
 CLEAN :
 !ENDIF 
+	-@erase "$(INTDIR)\debug.obj"
 	-@erase "$(INTDIR)\http.res"
 	-@erase "$(INTDIR)\httpinput.obj"
 	-@erase "$(INTDIR)\pipeline.obj"
@@ -484,6 +491,7 @@ LINK32_FLAGS=fabaselib.lib wsock32.lib kernel32.lib user32.lib gdi32.lib\
 DEF_FILE= \
 	".\httpinput.def"
 LINK32_OBJS= \
+	"$(INTDIR)\debug.obj" \
 	"$(INTDIR)\http.res" \
 	"$(INTDIR)\httpinput.obj" \
 	"$(INTDIR)\pipeline.obj" \
@@ -546,11 +554,21 @@ InputPath=..\..\..\..\config\config.win32
 
 !ENDIF 
 
+SOURCE=..\..\..\..\base\src\debug.cpp
+DEP_CPP_DEBUG=\
+	"..\..\..\..\base\include\debug.h"\
+	
+
+"$(INTDIR)\debug.obj" : $(SOURCE) $(DEP_CPP_DEBUG) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
 SOURCE=..\..\httpinput.cpp
 
 !IF  "$(CFG)" == "httpinput - Win32 Release"
 
 DEP_CPP_HTTPI=\
+	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
@@ -650,6 +668,7 @@ DEP_CPP_HTTPI=\
 !ELSEIF  "$(CFG)" == "httpinput - Win32 NASM Release"
 
 DEP_CPP_HTTPI=\
+	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
@@ -687,6 +706,7 @@ SOURCE=..\..\..\src\pipeline.cpp
 !IF  "$(CFG)" == "httpinput - Win32 Release"
 
 DEP_CPP_PIPEL=\
+	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
@@ -723,6 +743,7 @@ DEP_CPP_PIPEL=\
 !ELSEIF  "$(CFG)" == "httpinput - Win32 Debug"
 
 DEP_CPP_PIPEL=\
+	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
@@ -759,6 +780,7 @@ DEP_CPP_PIPEL=\
 !ELSEIF  "$(CFG)" == "httpinput - Win32 NASM Debug"
 
 DEP_CPP_PIPEL=\
+	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
@@ -795,6 +817,7 @@ DEP_CPP_PIPEL=\
 !ELSEIF  "$(CFG)" == "httpinput - Win32 NASM Release"
 
 DEP_CPP_PIPEL=\
+	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\

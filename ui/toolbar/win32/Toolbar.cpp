@@ -423,8 +423,9 @@ AddTrayIcon()
 				 NIF_TIP;					// there is tooltip specified
 	nid.uCallbackMessage = UWM_TRAY;        // that's what we will receive in wndProc
 	nid.hIcon = m_trayIcon;
-
-	strcpy(nid.szTip, m_trayTooltip);
+    
+	strncpy(nid.szTip, m_trayTooltip, 63);
+    nid.szTip[63] = 0;
 
 	rc = Shell_NotifyIcon(NIM_ADD, &nid);	// this adds the icon
 }
@@ -455,7 +456,8 @@ SetTrayTooltip(char *str)
 	nid.hWnd = m_hWnd;
 	nid.uID = 1;
 	nid.uFlags = NIF_TIP;				// just change tip
-	strcpy(nid.szTip, m_trayTooltip);
+	strncpy(nid.szTip, m_trayTooltip, 63);
+    nid.szTip[63] = 0;
 	Shell_NotifyIcon(NIM_MODIFY, &nid); // now, modify our tooltip
 }
 

@@ -117,7 +117,7 @@ bool ObsInput::CanHandle(const char *szUrl, char *szTitle)
    return bRet;
 }
 
-Error ObsInput::Prepare(PullBuffer *&pBuffer, bool bStartThread)
+Error ObsInput::Prepare(PullBuffer *&pBuffer)
 {
     int iBufferSize = iDefaultBufferSize;
     Error result;
@@ -139,15 +139,12 @@ Error ObsInput::Prepare(PullBuffer *&pBuffer, bool bStartThread)
     result = Open();
     if (!IsError(result))
     {
-        if (bStartThread)
-        {
-            result = Run();
-            if (IsError(result))
-            {
-                ReportError("Could not run the input plugin.");
-                return result;
-            }
-        }
+       result = Run();
+       if (IsError(result))
+       {
+           ReportError("Could not run the input plugin.");
+           return result;
+       }
     }
     else
     {

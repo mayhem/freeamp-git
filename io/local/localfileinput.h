@@ -49,7 +49,7 @@ class LocalFileInput:public PhysicalMediaInput
    virtual Error Seek(int32 & rtn, int32 offset, int32 origin);
    virtual Error GetLength(size_t &iSize);
 
-   virtual Error Prepare(PullBuffer *&pBuffer, bool bStartThread);
+   virtual Error Prepare(PullBuffer *&pBuffer);
    virtual Error SetTo(const char *url);
    virtual Error Close(void);
    virtual void  Clear(void);

@@ -62,8 +62,8 @@ public:
     virtual void  SetPropManager(Properties *);
     virtual void  SetInputBuffer(PullBuffer *pBuffer);
 
-    virtual void  ReportError(const char *szError);
-    virtual void  ReportStatus(const char *szError);
+    virtual void  ReportError(const char * format, ...);
+    virtual void  ReportStatus(const char * format, ...);
     virtual void  DebugPrint(void);
 
 protected:

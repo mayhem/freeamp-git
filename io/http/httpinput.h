@@ -61,7 +61,7 @@ class HttpInput:public PhysicalMediaInput
    HttpInput(char *path);
    virtual ~ HttpInput(void);
 
-   virtual Error Prepare(PullBuffer *&pBuffer, bool bStartThread);  
+   virtual Error Prepare(PullBuffer *&pBuffer);  
    virtual Error Run(void);  
 
    virtual bool  CanHandle(const char *szUrl, char *szTitle);

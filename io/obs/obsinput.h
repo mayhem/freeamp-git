@@ -77,7 +77,7 @@ class ObsInput :public PhysicalMediaInput
    ObsInput(char *path);
    virtual ~ObsInput(void);
 
-   virtual Error Prepare(PullBuffer *&pBuffer, bool bStartThread);
+   virtual Error Prepare(PullBuffer *&pBuffer);
    virtual Error Run(void);
 
    virtual bool  CanHandle(const char *szUrl, char *szTitle);

@@ -58,6 +58,7 @@ ____________________________________________________________________________*/
 #include "facontext.h"
 #include "log.h"
 #include "tstream.h"
+#include "debug.h"
 
 const int iBufferSize = 8192;
 const int iOverflowSize = 1536;
@@ -87,7 +88,7 @@ const char cDirSepChar = '\\';
 const char cDirSepChar = '/';
 #endif
 
-#define DB printf("%s:%d\n", __FILE__, __LINE__);
+#define DB Debug_v("%s:%d\n", __FILE__, __LINE__);
 
 #ifndef min
 #define min(a,b) ((a) < (b) ? (a) : (b))
@@ -165,7 +166,7 @@ bool HttpInput::CanHandle(const char *szUrl, char *szTitle)
     return bRet;
 }
 
-Error HttpInput::Prepare(PullBuffer *&pBuffer, bool bStartThread)
+Error HttpInput::Prepare(PullBuffer *&pBuffer)
 {
     int32 iBufferSize = iDefaultBufferSize;
     Error result;
@@ -183,26 +184,14 @@ Error HttpInput::Prepare(PullBuffer *&pBuffer, bool bStartThread)
                                      m_pContext);
     assert(m_pOutputBuffer);
 
-    result = Open();
-    if (!IsError(result))
-    {
-        if (bStartThread)
-        {
-            result = Run();
-            if (IsError(result))
-            {
-                LogError("Could not run the input plugin.");
-                return result;
-            }
-        }
-    }
-    else
-    {
-       LogError("Could not open the specified stream.");
-       return result;
-    }
-
     pBuffer = m_pOutputBuffer;
+
+    result = Run();
+    if (IsError(result))
+    {
+        ReportError("Could not initialize http streaming plugin.");
+        return result;
+    }
 
     return kError_NoErr;
 } 
@@ -250,16 +239,6 @@ bool HttpInput::PauseLoop(bool bLoop)
    return bRet;
 } 
 
-void HttpInput::LogError(char *szErrorMsg)
-{
-#ifdef WIN32 
-	MessageBox(NULL, szErrorMsg, "Streaming Error", MB_OK);
-#else
-    ReportError(szErrorMsg);
-#endif
-    m_pContext->log->Error("%s\n", szErrorMsg);
-}
-
 // NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
 // The function gethostbyname_r() differs greatly from system to system
 // and on linux it seems to behave quite erratically. I've elected to
@@ -298,7 +277,8 @@ Error HttpInput::Open(void)
 {
     char                szHostName[iMaxHostNameLen+1], *szFile, *szQuery;
     char                szLocalName[iMaxHostNameLen+1];
-    char               *pInitialBuffer, szStreamName[255], szSourceAddr[100];
+    char               *pInitialBuffer, szSourceAddr[100];
+    char               *szStreamName, *szStreamUrl;
     unsigned            iPort;
     int                 iRet, iRead = 0, iConnect;
     struct sockaddr_in  sAddr, sSourceAddr;
@@ -309,15 +289,15 @@ Error HttpInput::Open(void)
     struct timeval      sTv;
     bool                bUseTitleStreaming = true, bUseAltNIC = false;
 
-    szStreamName[0] = 0;
+    szStreamName = NULL;
+    szStreamUrl = NULL;
     if (!m_bUseProxy)
     {
         iRet = sscanf(m_path, "http://%[^:/]:%d", szHostName, &iPort);
         if (iRet < 1)
         {
-           LogError("Bad URL format. URL format: http:<host name>"
-                              ":[port][/path]");
-           m_pContext->log->Error("Badly formatted URL: %s\n", m_path);
+           ReportError("Bad URL format. URL format: http:<host name>"
+                       ":[port][/path]. Please check the URL and try again.");
            return (Error)httpError_BadUrl;
         }
         szFile = strchr(m_path + 7, '/');
@@ -327,10 +307,9 @@ Error HttpInput::Open(void)
         iRet = sscanf(m_szProxyHost, "http://%[^:/]:%d", szHostName, &iPort);
         if (iRet < 1)
         {
-           LogError("Bad Proxy URL format. URL format: http:"
-                                "<host name>:[port]");
-           m_pContext->log->Error("Badly formatted Proxy URL: %s\n", 
-                m_szProxyHost);
+           ReportError("Bad Proxy URL format. URL format: http:"
+                       "<host name>:[port]. Please check your proxy settings "
+                       "in the Options.");
            return (Error)httpError_BadUrl;
         }
         szFile = m_path;
@@ -341,12 +320,13 @@ Error HttpInput::Open(void)
 
      memset(&sAddr, 0, sizeof(struct sockaddr_in));
 
+     ReportStatus("Looking up host %s...", szHostName);
+
      eRet = GetHostByName(szHostName, &sHost);
      if (eRet != kError_NoErr)
      {
           sprintf(m_szError, "Cannot find host %s\n", szHostName);
-          LogError(m_szError);
-          m_pContext->log->Error("Cannot find host %s\n", szHostName);
+          ReportError(m_szError);
           return (Error)httpError_CustomError;
      }
 
@@ -354,10 +334,11 @@ Error HttpInput::Open(void)
      sAddr.sin_family= sHost.h_addrtype;
      sAddr.sin_port= htons((unsigned short)iPort); 
 
+     ReportStatus("Contacting host %s...", szHostName);
      m_hHandle = socket(sHost.h_addrtype,SOCK_STREAM,0);
      if (m_hHandle < 0)
      {
-          LogError("Cannot create socket");
+          ReportError("Cannot create socket. Is TCP/IP networking properly installed?");
           return (Error)httpError_CannotOpenSocket;
      }    
 
@@ -380,8 +361,7 @@ Error HttpInput::Open(void)
          {
              close(m_hHandle);
              m_hHandle= -1;
-             perror("Error");
-             ReportError("Cannot bind the socket.");
+             ReportError("Cannot bind the socket. Please make sure that your TCP/IP networking is correctly configured.");
              return kError_CannotBind;
          }  
      }   
@@ -395,6 +375,7 @@ Error HttpInput::Open(void)
 #else
     fcntl(m_hHandle, F_SETFL, fcntl(m_hHandle, F_GETFL) | O_NONBLOCK);
 #endif
+
     iConnect = connect(m_hHandle,(const sockaddr *)&sAddr,sizeof(sAddr));
     for(; iConnect && !m_bExit;)
     {
@@ -409,7 +390,7 @@ Error HttpInput::Open(void)
 
         if (iRet < 0)
         { 
-           LogError("Cannot connect socket");
+           ReportError("Cannot connect to host: %s", szHostName);
            closesocket(m_hHandle);
            return (Error)httpError_CannotConnect;
         }
@@ -453,15 +434,17 @@ Error HttpInput::Open(void)
 
     strcat(szQuery, "\n");
 
+    ReportStatus("Requesting stream...");
+
     iRet = send(m_hHandle, szQuery, strlen(szQuery), 0);
     if (iRet != (int)strlen(szQuery))
     {
         delete szQuery;
-        LogError("Cannot write to socket");
+        ReportError("Cannot send data to host: %s", szHostName);
         closesocket(m_hHandle);
         return (Error)httpError_SocketWrite;
     }
-	 delete szQuery;
+	delete szQuery;
 
     pInitialBuffer = new char[iInitialBufferSize + 1];
     for(;!m_bExit;)
@@ -477,7 +460,7 @@ Error HttpInput::Open(void)
         iRead = recv(m_hHandle, pInitialBuffer, iInitialBufferSize, 0);
         if (iRead < 0)
         {
-            LogError("Cannot read from socket");
+            ReportError("Cannot receive data from host: %s", szHostName);
             closesocket(m_hHandle);
             return (Error)httpError_SocketRead;
         }
@@ -493,14 +476,11 @@ Error HttpInput::Open(void)
 
 		  if (iRet != iICY_OK)
 		  {
-            char szErr[255];
+            ReportError("This stream is not available: %s\n", m_szError);
 
-            sprintf(szErr, "This stream is not available: %s\n", m_szError);
-            LogError(szErr);
-
-		      delete pInitialBuffer;
-		      closesocket(m_hHandle);
-				return (Error)httpError_CustomError;
+		    delete pInitialBuffer;
+		    closesocket(m_hHandle);
+			return (Error)httpError_CustomError;
 		  }
 
         pHeaderData = new char[iHeaderSize];
@@ -539,7 +519,7 @@ Error HttpInput::Open(void)
                 iRead = recv(m_hHandle, pInitialBuffer, iInitialBufferSize, 0);
                 if (iRead < 0)
                 {
-                    LogError("Cannot read from socket");
+                    ReportError("Cannot receive data from host: %s", szHostName);
                     closesocket(m_hHandle);
                     return (Error)httpError_SocketRead;
                 }
@@ -553,14 +533,28 @@ Error HttpInput::Open(void)
         if (pPtr)
         {
             pPtr += strlen("icy-name:");
-            sscanf(pPtr, "%254[^\r\n]", szStreamName);
+            szStreamName = new char[strlen(pPtr) + 1];
+            sscanf(pPtr, " %[^\r\n]", szStreamName);
         }
 
         pPtr = strstr(pHeaderData, "icy-url");
         if (pPtr)
         {
             pPtr += strlen("icy-url:");
+            szStreamUrl = new char[strlen(pPtr) + 1];
+            sscanf(pPtr, " %[^\r\n]", szStreamUrl);
         }
+        
+        if (strlen(szStreamName))
+        {
+           StreamInfoEvent *e;
+           
+           e = new StreamInfoEvent(szStreamName ? szStreamName : "", 
+                                   szStreamUrl ? szStreamUrl : "");
+           m_pTarget->AcceptEvent(e);
+           delete szStreamName;
+           delete szStreamUrl;
+        }   
 
         pPtr = strstr(pHeaderData, "x-audiocast-udpport:");
         if (pPtr)
@@ -582,26 +576,19 @@ Error HttpInput::Open(void)
 
         if (sscanf(pInitialBuffer, " %*s %d %255[^\n\r]", &iRet, m_szError) != 2)
         {
-            char szErr[255];
+            ReportError("Unknown server response.\n");
 
-            sprintf(szErr, "Unknown server response.\n");
-            LogError(szErr);
-
-		      delete pInitialBuffer;
-		      closesocket(m_hHandle);
-				return (Error)httpError_CustomError;
-		  }
-		  if (iRet != iICY_OK)
-		  {
-            char szErr[255];
-
-            sprintf(szErr, "This stream is not available: %s\n", m_szError);
-            LogError(szErr);
-
-		      delete pInitialBuffer;
-		      closesocket(m_hHandle);
-				return (Error)httpError_CustomError;
-		  }
+		    delete pInitialBuffer;
+		    closesocket(m_hHandle);
+            return (Error)httpError_CustomError;
+		}
+		if (iRet != iICY_OK)
+		{
+            ReportError("This stream is not available: %s\n", m_szError);
+		    delete pInitialBuffer;
+		    closesocket(m_hHandle);
+			return (Error)httpError_CustomError;
+		}
        
         // Its a regular HTTP download. Let's save the bytes we've
         // read into the pullbuffer.
@@ -652,6 +639,8 @@ Error HttpInput::Open(void)
         m_fpSave = fopen(szFile, "wb");
     }
 
+    ReportStatus("");
+
     return kError_NoErr;
 }
 
@@ -669,6 +658,12 @@ void HttpInput::WorkerThread(void)
    struct timeval  sTv;
 
    static int      iSize = 0;
+
+   eError = Open();
+   if (IsError(eError) || m_bExit)
+   {
+      return;
+   }   
 
    m_pSleepSem->Wait(); 
 
@@ -706,7 +701,7 @@ void HttpInput::WorkerThread(void)
              iRet = fwrite(pBuffer, sizeof(char), iRead, m_fpSave);
              if (iRet != iRead)
              {
-                 LogError("Cannot save http stream to disk. Disk full?");
+                 ReportError("Cannot save http stream to disk. Disk full?");
                  break;
              }
           }

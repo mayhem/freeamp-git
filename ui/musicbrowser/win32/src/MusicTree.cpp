@@ -378,7 +378,7 @@ void MusicBrowserUI::FillPlaylists(void)
             continue;
 
         _splitpath((char *)(*i).c_str(), NULL, NULL, szBase, NULL);   
-        oData.m_oPlaylistName = szBase;
+        oData.m_oPlaylistName = string(szBase);
         oData.m_oPlaylistPath = *i;
 
         sInsert.item.pszText = szBase;

@@ -61,7 +61,7 @@ public:
     virtual Error Close(void);
     virtual Error Open(void) = 0;
     virtual const char* Url(void) const = 0;
-    virtual Error Prepare(PullBuffer *&pBuffer, bool bStartThread = true) = 0;
+    virtual Error Prepare(PullBuffer *&pBuffer) = 0;
 
     virtual Error Seek(int32 & rtn, int32 offset, int32 origin)
                   { return kError_FileSeekNotSupported; };

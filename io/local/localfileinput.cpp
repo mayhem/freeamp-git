@@ -89,7 +89,7 @@ LocalFileInput::~LocalFileInput()
 
 }
 
-Error LocalFileInput::Prepare(PullBuffer *&pBuffer, bool bStartThread)
+Error LocalFileInput::Prepare(PullBuffer *&pBuffer)
 {
     int32 iBufferSize = iDefaultBufferSize;
     Error result;
@@ -110,14 +110,11 @@ Error LocalFileInput::Prepare(PullBuffer *&pBuffer, bool bStartThread)
     result = Open();
     if (!IsError(result))
     {
-        if (bStartThread)
+        result = Run();
+        if (IsError(result))
         {
-            result = Run();
-            if (IsError(result))
-            {
-                ReportError("Could not run the input plugin.");
-                return result;
-            }
+            ReportError("Could not run the input plugin.");
+            return result;
         }
     }
     else
