@@ -151,11 +151,10 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData, bool bUseCollection)
     bool    ret;
     vector<string> args;
     char    temp[10], guid[40];
-    UUID     u;
 
     o.SetServer(string("www.musicbrainz.org"), 80);
 
-    u.uuid_ascii((UUID::uuid_t)pmetaData->GUID().c_str(),  guid);
+    uuid_ascii((uuid_t)pmetaData->GUID().c_str(), guid);
 
     args.push_back(pmetaData->Title());
     args.push_back(string(guid));
