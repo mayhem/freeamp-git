@@ -65,7 +65,7 @@ static void PrintMutexDebugInfo(int sig)
 #endif
 
 #if ( (defined(__GNU_LIBRARY__) && !defined(_SEM_SEMUN_UNDEFINED)) \
-    || (defined(__FreeBSD__)) || defined(irix)))
+    || (defined(__FreeBSD__)) || (defined(irix)))
 #else
 union semun 
 {
