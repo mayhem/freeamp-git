@@ -89,7 +89,7 @@ void MusicCatalog::StartTimer(void)
 
 MusicCatalog::~MusicCatalog()
 {
-    ClearCatalog();
+//    ClearCatalog();
     StopSearchMusic();
 
     m_mutex->Acquire();
@@ -99,9 +99,9 @@ MusicCatalog::~MusicCatalog()
     if(m_watchTimer)
         m_context->timerManager->StopTimer(m_watchTimer);
 
-    delete m_artistList;
-    delete m_unsorted;
-    delete m_streams;
+//    delete m_artistList;
+//    delete m_unsorted;
+//    delete m_streams;
 
     if (m_database)
         delete m_database;
