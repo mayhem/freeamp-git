@@ -31,6 +31,9 @@ ____________________________________________________________________________*/
 static const int32 c_majorVersion = 1;
 static const int32 c_minorVersion = 0;
 
+// argFlags bits
+#define FAC_ARGFLAGS_SAVE_STREAMS 1
+
 class FAContext
 {
  public:
@@ -38,7 +41,8 @@ class FAContext
 	: majorVersion(c_majorVersion),
 	  minorVersion(c_minorVersion),
 	  prefs(0),
-	  log(0) { }
+	  log(0),
+	  argFlags(0) { }
     
     ~FAContext()
     {
@@ -53,6 +57,7 @@ class FAContext
     int32 majorVersion, minorVersion;
     Preferences *prefs;
     LogFile *log;
+    uint32 argFlags;
 };
 
 #endif // _FACONTEXT_H_

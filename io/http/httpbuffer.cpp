@@ -394,7 +394,7 @@ Error HttpBuffer::Open(void)
     bool bSave;
     unsigned  size = 255;
     m_context->prefs->GetPrefBoolean(kSaveStreamsPref, &bSave);
-    if (bSave)
+    if (bSave || (m_context->argFlags & FAC_ARGFLAGS_SAVE_STREAMS))
     {
         char szPath[255], szFile[255];
         int i;

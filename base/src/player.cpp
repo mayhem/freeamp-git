@@ -220,8 +220,9 @@ SetArgs(int32 argc, char **argv)
             {
                Usage(argv[0]);
                exit(0);
-               argList.AddItem(argv[i]);
             }
+	    else
+	       goto normalArg;
             break;
          case 'u':
          case 'U':
@@ -248,8 +249,17 @@ SetArgs(int32 argc, char **argv)
                   }
                   m_argUIList->AddItem(argUI);
                }
+	       else
+		  goto normalArg;
                break;
             }
+	 case 's':
+	 case 'S':
+	    if (!strcmp(&(arg[2]), "ave"))
+		m_context->argFlags |= FAC_ARGFLAGS_SAVE_STREAMS;
+	    else
+		goto normalArg;
+	    break;
 #if 0				// We use the prefs file now
          case 'p':
             if (!strcmp(&(arg[2]), "rop"))
@@ -284,13 +294,13 @@ SetArgs(int32 argc, char **argv)
                }
             }
             else
-            {
-               argList.AddItem(argv[i]);
-            }
+	       goto normalArg;
             break;
 #endif
          default:
-             argList.AddItem(argv[i]);
+	 normalArg:
+            argList.AddItem(argv[i]);
+	    break;
          }
       }
       else
@@ -337,7 +347,7 @@ Usage(const char *progname)
       return;
 
    printf("FreeAmp version " FREEAMP_VERSION " -- Usage:\n\n");
-   printf("freeamp [-ui <UI plugin name>] <MP3 file/stream> "
+   printf("freeamp [-save] [-ui <UI plugin name>] <MP3 file/stream> "
 	  "[MP3 file/stream] ...\n\n");
    printf("Example command line:\n\n");
    printf("   freeamp -ui freeamp-linux.ui mysong1.mp3 mysong2.mp3\n\n");

@@ -54,7 +54,7 @@ FreeAmp 1.2.3 for Win32:
 
 FreeAmp version 1.2.3 for Linux:
 
-freeamp [-ui <UI plugin name>] <MP3 file/stream> [MP3 file/stream] ...
+freeamp [-save] [-ui <UI plugin name>] <MP3 file/stream> [MP3 file/stream] ...
 
 Example command line:
    freeamp -ui freeamp-linux mysong1.mp3 mysong2.mp3
@@ -91,6 +91,13 @@ Notes:
          LogInput: false
          LogOutput: false
          LogPerformance: false
+         SaveStreams: false
+         SaveStreamsDirectory: .
+
+  * If you pass "-save" on the command line, or if the "SaveStreams"
+    preference is set, then all SHOUTcast/HTTP streams will be saved
+    to files in the directory specified by the "SaveStreamsDirectory"
+    preference.
 
   * If no "-ui" parameters are specified on the command-line, the
     "UI" preference will be used if you're running X (ie, if the

@@ -578,7 +578,7 @@ echo "$ac_t""$host" 1>&6
 
 
 cat >> confdefs.h <<EOF
-#define FREEAMP_VERSION "1.2.2"
+#define FREEAMP_VERSION "1.2.3"
 EOF
 
 
