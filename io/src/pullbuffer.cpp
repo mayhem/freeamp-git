@@ -166,7 +166,7 @@ void PullBuffer::WrapPointer(void *&pBuffer)
 
    pPtr = (char *)pBuffer;
 
-   if (pPtr > (char *)((int)m_pPullBuffer + m_iBufferSize))
+   if (pPtr >= (char *)((int)m_pPullBuffer + m_iBufferSize))
 	   pPtr -= m_iBufferSize;
 
    pBuffer = (void *)pPtr;
@@ -286,7 +286,9 @@ Error PullBuffer::BeginWrite(void *&pBuffer, size_t &iBytesToWrite)
       }
 
       if (iBytesToWrite < m_iWriteTriggerSize)
+	  {
          eError = kError_BufferTooSmall;
+	  }
       else
       if (iBytesToWrite > m_iWriteTriggerSize)
          iBytesToWrite = m_iWriteTriggerSize;
@@ -323,10 +325,12 @@ Error PullBuffer::EndWrite(size_t iBytesWritten)
               m_iWriteIndex - m_iBufferSize);
 
    m_iWriteIndex %= m_iBufferSize;
+   assert(m_iWriteIndex >= 0 && (uint32)m_iWriteIndex < m_iBufferSize);
    m_iBytesInBuffer += iBytesWritten;
 
    //printf("%08X: bytesinbuffer: %d byteswritten %d buffsize: %d\n", 
    //   pthread_self(), m_iBytesInBuffer, iBytesWritten, m_iBufferSize);
+
    
    assert(m_iBytesInBuffer <= m_iBufferSize);
 

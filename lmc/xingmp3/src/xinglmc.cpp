@@ -314,7 +314,7 @@ int32 XingLMC::GetVolume(void)
    if (m_output)
       return m_output->GetVolume();
    else
-      return 0;
+      return -1;
 }
 
 bool XingLMC::IsStreaming()

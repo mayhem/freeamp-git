@@ -23,6 +23,7 @@ ____________________________________________________________________________*/
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+#include <stdlib.h>
 #include <assert.h>
 
 #include "log.h"
@@ -49,6 +50,8 @@ LogFile::~LogFile(void)
 {
     if (m_fpLog)
        fclose(m_fpLog);
+	if (m_szLogFile)
+	   free(m_szLogFile);
 }
 
 bool LogFile::Open(void)

@@ -31,13 +31,14 @@ ____________________________________________________________________________*/
 #include "SoundCardPMO.h"
 #include "eventdata.h"
 #include "log.h"
+#include "debug.hpp"
 
 LogFile  *g_Log;
 
-const int iBufferSize = 256 * 1024;
-const int iOverflowSize = 24 * 1024;
-const int iWriteTriggerSize = 18432;
-const int iWriteToCard = 8 * 1024;
+const int iDefaultBufferSize = 512 * 1024;
+const int iOrigBufferSize = 64 * 1024;
+const int iOverflowSize = 0;
+const int iWriteTriggerSize = 4192;
 
 Mutex *g_pHeaderMutex;
 
@@ -72,7 +73,8 @@ MCICallBack(HWAVEOUT hwo, UINT msg, DWORD dwInstance,
 }
 
 SoundCardPMO::SoundCardPMO() :
-              EventBuffer(iBufferSize, iOverflowSize, iWriteTriggerSize)
+              EventBuffer(iOrigBufferSize, iOverflowSize, 
+				          iWriteTriggerSize)
 {
    m_wfex = NULL;
    m_wavehdr_array = NULL;
@@ -108,18 +110,11 @@ SoundCardPMO::~SoundCardPMO()
 {
    if (m_initialized)
    {
-//      char     *buf = new char[m_data_size];
-
-//      memset(buf, 0x00, m_data_size);
-
-//      Write(buf);
-
-      while (waveOutClose(m_hwo) == WAVERR_STILLPLAYING)
+      waveOutPause(m_hwo);
+	  while (waveOutClose(m_hwo) == WAVERR_STILLPLAYING)
       {
          Sleep(SLEEPTIME);
       }
-
-//      delete[]buf;
 
       // Unprepare and free the header memory.
       for (uint32 j = 0; j < m_num_headers; j++)
@@ -158,13 +153,31 @@ Error SoundCardPMO::Init(OutputInfo * info)
 {
    Error     result = kError_UnknownErr;
    MMRESULT  mmresult = 0;
+   int       iNewSize = iDefaultBufferSize;
+   PropValue *pProp;
 
    m_channels = info->number_of_channels;
    m_samples_per_second = info->samples_per_second;
    m_data_size = info->max_buffer_size;
+
+   m_propManager->GetProperty("OutputBuffer", &pProp);
+   if (pProp)
+   {
+       iNewSize = atoi(((StringPropValue *)pProp)->GetString()) * 1024;
+   }
+
+   iNewSize -= iNewSize % m_data_size;
+   result = Resize(iNewSize, 0, m_data_size);
+   if (IsError(result))
+   {
+	   ReportError("Internal buffer sizing error occurred.");
+	   g_Log->Error("Resize output buffer failed.");
+       return result;
+   }
+
    m_iBytesPerSample = info->number_of_channels * (info->bits_per_sample / 8);
 
-   m_num_headers = 16;
+   m_num_headers = 32;
    m_hdr_size = sizeof(WAVEHDR);
    m_wavehdr_array = new LPWAVEHDR[m_num_headers];
 
@@ -264,17 +277,7 @@ Error SoundCardPMO::Resume()
 
 Error SoundCardPMO::SetPropManager(Properties * p)
 {
-   PropValue *pProp;
-   int        iNewSize;
-
    m_propManager = p;
-   m_propManager->GetProperty("OutputBuffer", &pProp);
-   if (pProp)
-   {
-       iNewSize = atoi(((StringPropValue *)pProp)->GetString()) * 1024;
-       if (iNewSize > iBufferSize)
-           Resize(iNewSize, iOverflowSize, iWriteTriggerSize);
-   }
 
    return kError_NoErr;
 }
@@ -370,7 +373,9 @@ Error SoundCardPMO::Write(void *pBuffer)
 
    wavhdr = NextHeader();
    if (!wavhdr)
+   {
 	  return kError_Interrupt;
+   }
 
    wavhdr->dwBufferLength = m_data_size;
    wavhdr->lpData = (char *)pBuffer;
@@ -404,7 +409,6 @@ Error SoundCardPMO::AllocHeader(void *&pBuffer)
 	WrapPointer(pBuffer);
 
 	m_iOffset += m_data_size;
-//	Debug_v("Alloc offset: %d", m_iOffset);
 
 	return kError_NoErr;
 }
@@ -425,7 +429,6 @@ Error SoundCardPMO::FreeHeader()
 	   return eRet;
 
 	m_iOffset -= m_data_size;
-//	Debug_v("Free offset: %d", m_iOffset);
 
 	return kError_NoErr;
 }
@@ -438,18 +441,15 @@ WAVEHDR *SoundCardPMO::NextHeader()
 
    assert(m_initialized);
 
-   for(;;)
+   for(; !m_bExit;)
    {
        g_pHeaderMutex->Acquire();
        for(iLoop = 0; iLoop < m_num_headers; iLoop++)
 	   {
-//		   Debug_v("hdr[%d]: %d Tail+1: %d",
-//		           iLoop, m_wavehdr_array[iLoop]->dwUser, m_iTail + 1);
-
 		   if ((int)m_wavehdr_array[iLoop]->dwUser < 0 &&
 		      (-(int)m_wavehdr_array[iLoop]->dwUser) == m_iTail + 1)
 		  {
-//   			  Debug_v("Free %d", m_iTail + 1);
+   			  //Debug_v("Free %d", m_iTail + 1);
 			  eRet = FreeHeader();
 			  if (IsError(eRet))
 			  {
@@ -464,7 +464,7 @@ WAVEHDR *SoundCardPMO::NextHeader()
              result = m_wavehdr_array[iLoop];
              result->dwUser = ++m_iHead;
 
-//			 Debug_v("Alloc %d", m_iHead);
+			 //Debug_v("Alloc %d", m_iHead);
 
              g_pHeaderMutex->Release();
 
@@ -475,6 +475,8 @@ WAVEHDR *SoundCardPMO::NextHeader()
 
 	   usleep(10000);
    }
+
+   return NULL;
 }
 
 void SoundCardPMO::StartWorkerThread(void *pVoidBuffer)
@@ -487,6 +489,8 @@ void SoundCardPMO::WorkerThread(void)
    void       *pBuffer;
    Error       eErr;
    Event      *pEvent;
+
+   SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
 
    m_bPause = false;
    for(; !m_bExit;)
@@ -503,7 +507,11 @@ void SoundCardPMO::WorkerThread(void)
 
           if (pEvent->Type() == PMO_Init)
 		  {
-              Init(((PMOInitEvent *)pEvent)->GetInfo());
+              if (IsError(Init(((PMOInitEvent *)pEvent)->GetInfo())))
+			  {
+				  delete pEvent;
+				  break;
+			  }
 		  }
 		  delete pEvent;
 

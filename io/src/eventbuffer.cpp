@@ -53,12 +53,15 @@ Error EventBuffer::BeginRead(void *&pBuffer, size_t &iBytesWanted)
 
 
    if (pEvent && pEvent->iIndex == iReadIndex)
+   {
       return kError_EventPending;
+   }
 
    if (!pEvent)
+   {
        return PullBuffer::BeginRead(pBuffer, iBytesWanted, false);
+   }
 
-   //printf("iReadIndex: %d EventIndex: %d\n", iReadIndex, pEvent->iIndex);
 
    if (pEvent->iIndex > iReadIndex)
       iMaxBytes = pEvent->iIndex - iReadIndex;
@@ -67,6 +70,7 @@ Error EventBuffer::BeginRead(void *&pBuffer, size_t &iBytesWanted)
 
    if (iBytesWanted > iMaxBytes)
       iBytesWanted = iMaxBytes;
+
 
    return PullBuffer::BeginRead(pBuffer, iBytesWanted);
 }
@@ -82,6 +86,7 @@ Error EventBuffer::BeginWrite(void *&pBuffer, size_t &iBytesWanted)
        if (eRet == kError_BufferTooSmall)
        {
            m_pWriteSem->Wait();
+
            continue;
        }
 

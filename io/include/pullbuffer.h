@@ -90,7 +90,7 @@ class PullBuffer
       bool           m_bEOS, m_bReadOpPending, m_bWriteOpPending;
       unsigned char *m_pPullBuffer;
       size_t         m_iBytesInBuffer, m_iOverflowSize, m_iBufferSize;
-      size_t         m_iWriteTriggerSize;
+      size_t         m_iWriteTriggerSize, m_iOrigBufferSize;
 };
 
 #endif

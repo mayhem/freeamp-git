@@ -37,6 +37,7 @@ ____________________________________________________________________________*/
 #include "registrar.h"
 #include "preferences.h"
 #include "properties.h"
+#include "volume.h"
 #include "log.h"
 
 Player   *Player::m_thePlayer = NULL;
@@ -48,8 +49,7 @@ LogFile *g_Log = NULL;
                              }
 
 
-Player   *Player::
-GetPlayer()
+Player *Player::GetPlayer()
 {
    if (m_thePlayer == NULL)
    {
@@ -822,6 +822,9 @@ void Player::CreateLMC(PlayListItem * pc, Event * pC)
    }
 
    iVolume = lmc->GetVolume();
+   if (iVolume < 0)
+	   iVolume = VolumeManager::GetVolume();
+
    m_props.SetProperty("pcm_volume", new Int32PropValue(iVolume));
 
    m_lmc = lmc;
@@ -1308,6 +1311,9 @@ PropertyChange(const char *pProp, PropValue * ppv)
 
       if (m_lmc)
          m_lmc->SetVolume(newVol);
+	  else
+	     VolumeManager::SetVolume(newVol);
+
 
       rtn = kError_NoErr;
    }
