@@ -270,7 +270,7 @@ void infoeditorUI::DisplayInfo(void)
    gtk_container_add(GTK_CONTAINER(vbox), hbox);
    gtk_widget_show(hbox);
 
-   m_okButton = gtk_button_new_with_label("Okay");
+   m_okButton = gtk_button_new_with_label("OK");
    gtk_signal_connect(GTK_OBJECT(m_okButton), "clicked",
                       GTK_SIGNAL_FUNC(info_ok_button_event), this);
    gtk_container_add(GTK_CONTAINER(hbox), m_okButton);
