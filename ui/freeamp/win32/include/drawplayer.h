@@ -89,10 +89,13 @@ typedef struct ControlInfo{
 #define kModeControl        5
 #define kMinimizeControl    6
 #define kCloseControl       7
-#define kVolumeControl      8
-#define kSeekControl        9
-#define kPlaylistControl    10
-#define kDisplayControl     11
+#define kRepeatControl      8
+#define kShuffleControl     9
+#define kOpenControl        10
+#define kVolumeControl      11
+#define kSeekControl        12
+#define kPlaylistControl    13
+#define kDisplayControl     14
+#define kFinalControl       15
 
-
-#define kNumControls        10
+#define kNumControls        13

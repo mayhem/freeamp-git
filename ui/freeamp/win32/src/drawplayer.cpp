@@ -57,6 +57,30 @@ LRESULT WINAPI MainWndProc( HWND, UINT, WPARAM, LPARAM );
 
 extern HINSTANCE g_hInst;		//  Program instance handle
 
+typedef struct Color{
+    short   r;
+    short   g;
+    short   b;
+    short   a;
+}Color;
+
+Color g_buttonColorArray[] = {
+        {0,   0,   255, 0}, // kPlayControl
+        {255, 255, 0,   0}, // kPauseControl
+        {0,   255, 0,   0}, // kLastControl
+        {0,   255, 255, 0}, // kNextControl
+        {0,   0,   255, 0}, // kStopControl
+        {128, 128, 0,   0}, // kModeControl
+        {128, 0,   128, 0}, // kMinimizeControl
+        {0,   0,   128, 0}, // kCloseControl
+        {0,   128, 128, 0}, // kRepeatControl
+        {0,   128, 0,   0}, // kShuffleControl
+        {255, 127, 0,   0}, // kOpenControl
+        {255, 0,   255, 0}, // kVolumeControl
+        {128, 0,   0,   0}, // kSeekControl
+        {255, 0,   0,   0}, // kPlaylistControl
+        {128, 128, 128, 0}, // kDisplayControl
+};
 
 ControlInfo g_buttonStateArray[kNumControls];
 DisplayInfo g_displayInfo;
@@ -73,12 +97,18 @@ static HBITMAP lastButtonBitmap;
 static HBITMAP modeButtonBitmap;
 static HBITMAP minimizeButtonBitmap;
 static HBITMAP closeButtonBitmap;
-static HRGN displayRegion;
+static HBITMAP repeatButtonBitmap;
+static HBITMAP shuffleButtonBitmap;
+static HBITMAP openButtonBitmap;
 static HBITMAP playerMask;
 static HBITMAP smallFont, largeFont;
+static HBITMAP logoBitmap;
+
+static HRGN displayRegion;
+static HRGN* g_controlRegions = NULL;
+
 static HDC tempDC;
 static HCURSOR dialCursor, arrowCursor, currentCursor;
-static HBITMAP logoBitmap;
 static HPALETTE palette = NULL;
 
 void DrawPlayer(HDC hdc, ControlInfo* state)
@@ -183,7 +213,7 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
         case Intro: // hard coded hack just to look good <grin>
         {         
             int32 xIntroPos = displayRect.left + 32;
-            int32 yIntroPos = displayRect.top + 5;
+            int32 yIntroPos = displayRect.top + 6;
 
             SelectObject(memdc, logoBitmap);
 
@@ -220,6 +250,11 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
             g_displayInfo.seconds = 26;
             g_displayInfo.volume = 85;*/
 
+
+#define descriptionY    26
+#define valueY          25    
+#define descriptionX    
+
         case Volume:
         {
             char volString[] = "volume";
@@ -233,7 +268,7 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
             {
                 BitBlt( bufferdc, 
                         offset, 
-                        26, 
+                        descriptionY, 
                         smallFontWidth[volString[i] - 32], 
                         10,
                         memdc, 
@@ -255,7 +290,7 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
             {
                 BitBlt( bufferdc, 
                         offset, 
-                        25, 
+                        valueY, 
                         largeFontWidth[valueString[i] - 32], 
                         12,
                         memdc, 
@@ -275,7 +310,7 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
             char labelString[] = "current time";
             char valueString[12];
 
-            int32 offset = displayRect.left + 3;
+            int32 offset = displayRect.left + 1;
     
             SelectObject(memdc, smallFont);
 
@@ -283,7 +318,7 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
             {
                 BitBlt( bufferdc, 
                         offset, 
-                        26, 
+                        descriptionY, 
                         smallFontWidth[labelString[i] - 32], 
                         10,
                         memdc, 
@@ -316,7 +351,7 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
             {
                 BitBlt( bufferdc, 
                         offset, 
-                        25, 
+                        valueY, 
                         largeFontWidth[valueString[i] - 32], 
                         12,
                         memdc, 
@@ -335,7 +370,7 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
             char labelString[] = "seek time";
             char valueString[12];
 
-            int32 offset = displayRect.left + 3;
+            int32 offset = displayRect.left + 1;
     
             SelectObject(memdc, smallFont);
 
@@ -343,7 +378,7 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
             {
                 BitBlt( bufferdc, 
                         offset, 
-                        26, 
+                        descriptionY, 
                         smallFontWidth[labelString[i] - 32], 
                         10,
                         memdc, 
@@ -376,7 +411,7 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
             {
                 BitBlt( bufferdc, 
                         offset, 
-                        25, 
+                        valueY, 
                         largeFontWidth[valueString[i] - 32], 
                         12,
                         memdc, 
@@ -395,7 +430,7 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
             char labelString[] = "remaining time";
             char valueString[12];
 
-            int32 offset = displayRect.left + 3;
+            int32 offset = displayRect.left + 1;
     
             SelectObject(memdc, smallFont);
 
@@ -403,7 +438,7 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
             {
                 BitBlt( bufferdc, 
                         offset, 
-                        26, 
+                        descriptionY, 
                         smallFontWidth[labelString[i] - 32], 
                         10,
                         memdc, 
@@ -445,7 +480,7 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
             {
                 BitBlt( bufferdc, 
                         offset, 
-                        25, 
+                        valueY, 
                         largeFontWidth[valueString[i] - 32], 
                         12,
                         memdc, 
@@ -464,7 +499,7 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
             char labelString[] = "total time";
             char valueString[12];
 
-            int32 offset = displayRect.left + 3;
+            int32 offset = displayRect.left + 1;
     
             SelectObject(memdc, smallFont);
 
@@ -472,7 +507,7 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
             {
                 BitBlt( bufferdc, 
                         offset, 
-                        26, 
+                        descriptionY, 
                         smallFontWidth[labelString[i] - 32], 
                         10,
                         memdc, 
@@ -505,7 +540,7 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
             {
                 BitBlt( bufferdc, 
                         offset, 
-                        25, 
+                        valueY, 
                         largeFontWidth[valueString[i] - 32], 
                         12,
                         memdc, 
@@ -522,7 +557,7 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
 
     if(g_displayInfo.state != Intro)
     {
-        int32 offset = displayRect.left + 3;
+        int32 offset = displayRect.left + 1;
 
         SelectObject(memdc, smallFont);
 
@@ -559,6 +594,9 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
                 case kModeControl:
                 case kMinimizeControl:
                 case kCloseControl:
+                case kRepeatControl:
+                case kShuffleControl:
+                case kOpenControl:
                 {
                     int32 srcOffset = 0;
 
@@ -566,11 +604,11 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
                     
                     if( g_buttonStateArray[i].state == Selected )
                     {
-                        srcOffset = 14;
+                        srcOffset = 13;
                     }
                     else if( g_buttonStateArray[i].state == Pressed )
                     {
-                        srcOffset = 28;
+                        srcOffset = 26;
                     }
 
                     BitBlt( bufferdc, 
@@ -767,8 +805,186 @@ LoadResourceBitmap (HINSTANCE hInstance,
 	return (hBitmapFinal);
 }
 
+static HRGN
+DetermineRegion(HBITMAP bitmap, 
+			    Color* color)
+{
+	HRGN result = NULL;
+    HRGN scanline = NULL;
+    COLORREF regionColor = RGB(color->r, color->g, color->b);
+    HBITMAP oldBitmap;
+    BITMAP bmp;
+    HDC hdc;
+    int32 width, height;
 
+    GetObject(bitmap, sizeof(BITMAP), (LPSTR)&bmp);
+    width = bmp.bmWidth; 
+    height = bmp.bmHeight;
 
+    hdc = CreateCompatibleDC(NULL);
+
+    oldBitmap = (HBITMAP)SelectObject(hdc, bitmap);
+
+    // empty region
+    result = CreateRectRgn(0,0,0,0);
+
+    for(int32 y = 0; y < height; y++)
+    {
+        bool scanning = false;
+        int32 start;
+
+        for(int32 x = 0; x < width; x++)
+        {
+            COLORREF pixel = GetPixel(hdc, x, y);
+
+            if(pixel == regionColor)
+            {
+                if(scanning)
+                    continue;
+                else
+                {
+                    scanning = true;
+                    start = x;
+                }
+            }
+            else if(scanning)
+            {
+                scanning = false;
+                // regions are non-inclusive of their bottom & right edges
+                // so need to add one to values
+                scanline = CreateRectRgn(start, y, x, y + 1);
+
+                CombineRgn( result,
+                            result,
+                            scanline,
+                            RGN_OR);
+
+            }
+
+        }
+
+        // last pixel in scanline is included in region...
+        if(scanning)
+        {
+            scanline = CreateRectRgn(start, y, x, y + 1);
+
+            CombineRgn( result,
+                        result,
+                        scanline,
+                        RGN_OR);
+        }
+    }
+
+    SelectObject(hdc, oldBitmap);
+    DeleteDC(hdc);
+
+	return result;
+}
+
+static HRGN*
+DetermineRegions(   HBITMAP bitmap, 
+			        Color* color,
+                    int32 numColors)
+{
+	HRGN* result = NULL;
+    HRGN scanline = NULL;
+    COLORREF* regionColors;// = RGB(color->r, color->g, color->b);
+    HBITMAP oldBitmap;
+    BITMAP bmp;
+    HDC hdc;
+    int32 width, height;
+    int32 i;
+
+    regionColors = new COLORREF[numColors];
+
+    for(i = 0; i < numColors; i++)
+    {
+        regionColors[i] = RGB(color[i].r, color[i].g, color[i].b);
+    }
+
+    result = new HRGN[numColors];
+
+    for(i = 0; i < numColors; i++)
+    {
+        // empty region
+        result[i] = CreateRectRgn(0,0,0,0);
+    }
+
+    GetObject(bitmap, sizeof(BITMAP), (LPSTR)&bmp);
+    width = bmp.bmWidth; 
+    height = bmp.bmHeight;
+
+    hdc = CreateCompatibleDC(NULL);
+
+    oldBitmap = (HBITMAP)SelectObject(hdc, bitmap);
+
+    COLORREF black = RGB(0, 0, 0);
+    COLORREF white = RGB(255, 255, 255);
+
+    for(int32 y = 0; y < height; y++)
+    {
+        bool scanning = false;
+        int32 scanIndex;
+        int32 start;
+
+        for(int32 x = 0; x < width; x++)
+        {
+            COLORREF pixel = GetPixel(hdc, x, y);
+
+            if(scanning )
+            {
+                if(pixel == regionColors[scanIndex])
+                    continue;
+                else
+                {
+                    scanning = false;
+                    // regions are non-inclusive of their bottom & right edges
+                    // so need to add one to values
+                    scanline = CreateRectRgn(start, y, x, y + 1);
+
+                    CombineRgn( result[scanIndex],
+                                result[scanIndex],
+                                scanline,
+                                RGN_OR);
+                }
+            }
+            else
+            {
+                if(pixel != black && pixel != white)
+                {
+                    for(i = 0; i < numColors; i++)
+                    {
+                        if(pixel == regionColors[i])
+                        {
+                            scanIndex = i;
+                            scanning = true;
+                            start = x;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        // last pixel in scanline is included in region...
+        if(scanning)
+        {
+            scanline = CreateRectRgn(start, y, x, y + 1);
+
+            CombineRgn( result[scanIndex],
+                        result[scanIndex],
+                        scanline,
+                        RGN_OR);
+        }
+    }
+
+    SelectObject(hdc, oldBitmap);
+    DeleteDC(hdc);
+
+    delete [] regionColors;
+
+	return result;
+}
 
 LRESULT WINAPI MainWndProc( HWND hwnd, 
                             UINT msg, 
@@ -790,11 +1006,15 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
             InitCommonControls();
 
-			HRGN bodyRegion, capRegion, playerRegion, tempRegion;
+			HRGN bodyRegion, capRegion, playerRegion;
             int32 i;
             int32 xPos, yPos;
    
             // Create the region and apply it to the window
+
+            // empty region to begin with...
+            playerRegion = CreateRectRgn(0,0,0,0);
+
             capRegion = CreateEllipticRgn(  0,
                                             0,
                                             CAP_CIRCUMFERENCE + 1,
@@ -804,8 +1024,6 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                                         0,
                                         BODY_WIDTH,
                                         BODY_HEIGHT);
-
-            playerRegion = bodyRegion;
 
             OffsetRgn(bodyRegion, CAP_CIRCUMFERENCE/2, 0);
 
@@ -858,6 +1076,10 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                 modeButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_MODE_256), &palette);
                 minimizeButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_MINIMIZE_256), &palette);
                 closeButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_CLOSE_256), &palette);
+                
+                repeatButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_REPEAT_256), &palette);
+                shuffleButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_SHUFFLE_256), &palette);
+                openButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_OPEN_256), &palette);
 
 			}
             else
@@ -879,19 +1101,29 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                 modeButtonBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_MODE));
                 minimizeButtonBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_MINIMIZE));
                 closeButtonBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_CLOSE));
+
+                repeatButtonBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_REPEAT));
+                shuffleButtonBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_SHUFFLE));
+                openButtonBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_OPEN));
             }
             
             playerMask = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_PLAYER_MASK));
 
+            g_controlRegions = DetermineRegions(    playerMask,
+                                                    g_buttonColorArray,
+                                                    kFinalControl);
+
             tempDC = CreateCompatibleDC(NULL);
 
-            for(i = 0; i < 5; i++)
+            for(i = 0; i < kNumControls; i++)
             {
                 g_buttonStateArray[i].control_id = i;
                 g_buttonStateArray[i].dirty = FALSE;
                 g_buttonStateArray[i].enabled = TRUE;
                 g_buttonStateArray[i].shown = TRUE;
                 g_buttonStateArray[i].state = Deactivated;
+                g_buttonStateArray[i].region = g_controlRegions[i];
+                    //DetermineRegion(playerMask, &(g_buttonColorArray[i]));
 
                 if(i == kPlayControl)
                     g_buttonStateArray[i].bitmap = playButtonBitmap;
@@ -903,104 +1135,31 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                     g_buttonStateArray[i].bitmap = nextButtonBitmap;
                 else if(i == kLastControl)
                     g_buttonStateArray[i].bitmap = lastButtonBitmap;
+                else if(i == kModeControl)
+                    g_buttonStateArray[i].bitmap = modeButtonBitmap;
+                else if(i == kMinimizeControl)
+                    g_buttonStateArray[i].bitmap = minimizeButtonBitmap;
+                else if(i == kCloseControl)
+                    g_buttonStateArray[i].bitmap = closeButtonBitmap;
+                else if(i == kRepeatControl)
+                    g_buttonStateArray[i].bitmap = repeatButtonBitmap;
+                else if(i == kShuffleControl)
+                    g_buttonStateArray[i].bitmap = shuffleButtonBitmap;
+                else if(i == kOpenControl)
+                    g_buttonStateArray[i].bitmap = openButtonBitmap;
+                else if(i == kVolumeControl || i == kSeekControl )
+                    g_buttonStateArray[i].bitmap = dialBitmap;
 
             } 
 
             // stop shown when play is pressed
             g_buttonStateArray[kStopControl].shown = FALSE;
 
-            for(i = 5; i < 8; i++)
-            {
-                g_buttonStateArray[i].control_id = i;
-                g_buttonStateArray[i].dirty = FALSE;
-                g_buttonStateArray[i].enabled = TRUE;
-                g_buttonStateArray[i].shown = TRUE;
-                g_buttonStateArray[i].state = Deactivated;
-
-                if(i == kModeControl)
-                    g_buttonStateArray[i].bitmap = modeButtonBitmap;
-                else if(i == kMinimizeControl)
-                    g_buttonStateArray[i].bitmap = minimizeButtonBitmap;
-                else if(i == kCloseControl)
-                    g_buttonStateArray[i].bitmap = closeButtonBitmap;
-            } 
-
-            for(i = 8; i < 10; i++)
-            {
-                g_buttonStateArray[i].control_id = i;
-                g_buttonStateArray[i].dirty = FALSE;
-                g_buttonStateArray[i].enabled = TRUE;
-                g_buttonStateArray[i].shown = TRUE;
-                g_buttonStateArray[i].state = Deactivated;
-                g_buttonStateArray[i].bitmap = dialBitmap;
-            } 
-
-            // play buttons
-            tempRegion = CreateEllipticRgn( 29,15,50,36);
-            g_buttonStateArray[0].region = tempRegion;
-            tempRegion = CreateEllipticRgn( 29,15,50,36);
-            g_buttonStateArray[4].region = tempRegion;
-            tempRegion = CreateEllipticRgn( 56,15,77,36);
-            g_buttonStateArray[1].region = tempRegion;
-            tempRegion = CreateEllipticRgn( 82,15,103,36);
-            g_buttonStateArray[2].region = tempRegion;
-            tempRegion = CreateEllipticRgn( 109,15,130,36);
-            g_buttonStateArray[3].region = tempRegion;
-
-            // system buttons
-            int32 systemButtonsOffset = LEFT_SECTION + 2*DIAL_SECTION + MID_SECTION;
-
-            tempRegion = CreateEllipticRgn( systemButtonsOffset + 9,
-                                            18,
-                                            systemButtonsOffset + 9 + 13,
-                                            33);
-            g_buttonStateArray[5].region = tempRegion;
-
-            tempRegion = CreateEllipticRgn( systemButtonsOffset + 25,
-                                            18,
-                                            systemButtonsOffset + 25 + 13,
-                                            33);
-            g_buttonStateArray[6].region = tempRegion;
-
-            tempRegion = CreateEllipticRgn( systemButtonsOffset + 41,
-                                            18,
-                                            systemButtonsOffset + 41 + 13,
-                                            33);
-            g_buttonStateArray[7].region = tempRegion;
-
-            // dials
-            int32 dialOffset = LEFT_SECTION;
-
-            tempRegion = CreateRectRgn( dialOffset,0,dialOffset + DIAL_SECTION,50);
-            g_buttonStateArray[8].region = tempRegion;
-            dialOffset = LEFT_SECTION + DIAL_SECTION + MID_SECTION;
-            tempRegion = CreateRectRgn( dialOffset,
-                                        0,
-                                        dialOffset + DIAL_SECTION,
-                                        50);
-            g_buttonStateArray[9].region = tempRegion;
-
-            hwndTooltip = CreateWindowEx( WS_EX_TOPMOST,
-                                        TOOLTIPS_CLASS, 
-                                        NULL, 
-                                        0, 
-                                        CW_USEDEFAULT, 
-                                        CW_USEDEFAULT, 
-                                        CW_USEDEFAULT, 
-                                        CW_USEDEFAULT, 
-                                        NULL, 
-                                        (HMENU) NULL, 
-                                        g_hInst, 
-                                        NULL);
-
             // display
             int32 displayOffset = LEFT_SECTION + DIAL_SECTION + 19;
 
-            displayRegion = CreateRectRgn(  displayOffset, 
-                                            11,
-                                            displayOffset + 139,
-                                            38);
-
+            displayRegion = g_controlRegions[kDisplayControl];
+             
             g_displayInfo.state = Intro;
             strcpy(g_displayInfo.path, "Welcome to FreeAmp");
             g_displayInfo.frame = 0;
@@ -1013,8 +1172,21 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
             g_displayInfo.volume = (int32)(100 * ((float)LOWORD(g_displayInfo.volume)/(float)0xffff));
 
-
             // tooltip support
+            hwndTooltip = CreateWindowEx(WS_EX_TOPMOST,
+                                        TOOLTIPS_CLASS, 
+                                        NULL, 
+                                        0, 
+                                        CW_USEDEFAULT, 
+                                        CW_USEDEFAULT, 
+                                        CW_USEDEFAULT, 
+                                        CW_USEDEFAULT, 
+                                        NULL, 
+                                        (HMENU) NULL, 
+                                        g_hInst, 
+                                        NULL);
+
+            
             RECT toolRect;
             TOOLINFO ti;
 
@@ -1204,6 +1376,17 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
             DeleteObject(middleBitmap);
             DeleteObject(rightBitmap);
             DeleteObject(dialBitmap);
+            DeleteObject(playButtonBitmap);
+            DeleteObject(stopButtonBitmap);
+            DeleteObject(pauseButtonBitmap);
+            DeleteObject(nextButtonBitmap);
+            DeleteObject(lastButtonBitmap);
+            DeleteObject(modeButtonBitmap);
+            DeleteObject(minimizeButtonBitmap);
+            DeleteObject(closeButtonBitmap);
+            DeleteObject(repeatButtonBitmap);
+            DeleteObject(shuffleButtonBitmap);
+            DeleteObject(openButtonBitmap);
             DeleteObject(playerMask);
             DeleteObject(smallFont); 
             DeleteObject(largeFont);
@@ -1211,9 +1394,15 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
             DeleteObject(displayRegion);
 
+            DeleteObject(palette);
 
-            if(palette)
-                DeleteObject(palette);
+            if(g_controlRegions)
+            {
+                for(int32 i = 0; i < kFinalControl; i++)
+                    DeleteObject(g_controlRegions[i]);
+
+                delete [] g_controlRegions;
+            }
 
             PostQuitMessage( 0 );             
             break;
@@ -1542,11 +1731,20 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
                 switch (idCtrl) 
                 { 
+                    case kRepeatControl:
+                        lpttt->lpszText = "Repeat"; 
+                        break;
+                    case kShuffleControl:
+                        lpttt->lpszText = "Shuffle"; 
+                        break;
+                    case kOpenControl:
+                        lpttt->lpszText = "Open..."; 
+                        break;
                     case kModeControl:
                         lpttt->lpszText = "Change Player Mode (disabled)"; 
                         break;
                     case kMinimizeControl:
-                        lpttt->lpszText = "Minimize."; 
+                        lpttt->lpszText = "Minimize"; 
                         break;
                     case kCloseControl:
                         lpttt->lpszText = "Close"; 
@@ -1567,7 +1765,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                         lpttt->lpszText = "Next Song"; 
                         break;
                     case kLastControl:
-                        lpttt->lpszText = "Previous Song."; 
+                        lpttt->lpszText = "Previous Song"; 
                         break;
                     case kPlaylistControl:
                         lpttt->lpszText = "Display Playlist (disabled)"; 
@@ -1620,7 +1818,17 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 		{
 			switch(wParam)
 	        {
-		        case kModeControl:
+                case kRepeatControl:
+                {
+			        break;        
+		        }
+
+                case kShuffleControl:
+                {
+			        break;        
+		        }
+
+		        case kOpenControl:
 		        {
                     OPENFILENAME ofn;
 					char szTitle[] = "Open Audio File";
@@ -1698,8 +1906,13 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
 					delete [] filelist;
 
-                    g_buttonStateArray[kModeControl].state = Deactivated;
+                    g_buttonStateArray[kOpenControl].state = Deactivated;
 
+			        break;        
+		        }
+
+                case kModeControl:
+                {
 			        break;        
 		        }
 

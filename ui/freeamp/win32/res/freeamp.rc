@@ -104,6 +104,12 @@ IDB_NEXT_256            BITMAP  DISCARDABLE     "next_buttons256.bmp"
 IDB_PAUSE_256           BITMAP  DISCARDABLE     "pause_buttons256.bmp"
 IDB_PLAY_256            BITMAP  DISCARDABLE     "play_buttons256.bmp"
 IDB_CLOSE_256           BITMAP  DISCARDABLE     "close_buttons256.bmp"
+IDB_OPEN                BITMAP  DISCARDABLE     "open_buttons.bmp"
+IDB_REPEAT              BITMAP  DISCARDABLE     "repeat_buttons.bmp"
+IDB_SHUFFLE             BITMAP  DISCARDABLE     "shuffle_buttons.bmp"
+IDB_SHUFFLE_256         BITMAP  DISCARDABLE     "shuffle_buttons256.bmp"
+IDB_REPEAT_256          BITMAP  DISCARDABLE     "repeat_buttons256.bmp"
+IDB_OPEN_256            BITMAP  DISCARDABLE     "open_buttons256.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
