@@ -117,7 +117,7 @@ void infoeditorUI::DoApplyInfoEdit(void)
 
         if (newmeta != oldmeta) {
             (*i)->SetMetaData(&newmeta);
-            if (m_plm)
+            if (m_plm) 
                 m_plm->UpdateTrackMetaData(*i, true);
             m_context->catalog->UpdateSong(*i);
         }

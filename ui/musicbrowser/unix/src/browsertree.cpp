@@ -1471,6 +1471,8 @@ void GTKMusicBrowser::TreeRightClick(int x, int y, uint32 time)
             itemfact = favPopup;
             break;
         case kTreeTrack:
+	case kTreeArtist:
+	case kTreeAlbum:
             itemfact = trackPopup;
             break;
         case kTreePlaylist:
@@ -1479,8 +1481,6 @@ void GTKMusicBrowser::TreeRightClick(int x, int y, uint32 time)
         case kTreeMyMusic:
         case kTreeAll:
         case kTreeUncat:
-        case kTreeArtist:
-        case kTreeAlbum:
             itemfact = otherPopup;
             break;
         case kTreeStreamsHead:

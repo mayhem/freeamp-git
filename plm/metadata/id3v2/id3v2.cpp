@@ -454,7 +454,7 @@ bool ID3v2::WriteMetaData(const char* url, const MetaData& metadata)
         ID3Field_SetASCII(pField, (char *)metadata.Comment().c_str());
     }
 
-    sprintf(dummy, "%d", metadata.Time());
+    sprintf(dummy, "%d", metadata.Time() * 1000);
     pFrame = ID3Tag_FindFrameWithID(pTag, ID3FID_SONGLEN);
     if (!pFrame)
     {

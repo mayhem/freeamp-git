@@ -1339,7 +1339,7 @@ void GTKMusicBrowser::PopUpInfoEditor(PlaylistItem *editee)
             }
         }
         if (list) {
-            infoeditorUI *infoedit = new infoeditorUI(m_context, NULL, list);
+            infoeditorUI *infoedit = new infoeditorUI(m_context, m_plm, list);
             infoedit->DisplayInfo();
         }
     }
