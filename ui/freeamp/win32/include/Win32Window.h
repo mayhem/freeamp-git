@@ -62,6 +62,7 @@ class Win32Window : public Window
 
 	 virtual HWND  GetWindowHandle(void);
              void  SaveWindowPos(Pos &oPos);
+             void  DropFiles(HDROP dropHandle);
 
     protected:
     

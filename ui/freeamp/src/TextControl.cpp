@@ -32,6 +32,13 @@ static TransitionInfo pTransitions[] =
 {  
     { CS_Normal,    CT_SetValue,         CS_Normal    },
     { CS_Normal,    CT_Timer,            CS_Normal    },
+    { CS_Normal,    CT_MouseEnter,       CS_MouseOver },
+    { CS_MouseOver, CT_SetValue,         CS_MouseOver },
+    { CS_MouseOver, CT_Timer,            CS_MouseOver },
+    { CS_MouseOver, CT_MouseLeave,       CS_Normal    },
+    { CS_MouseOver, CT_MouseLButtonDown, CS_Pressed   },
+    { CS_Pressed,   CT_MouseLButtonUp,   CS_MouseOver },
+    { CS_Pressed,   CT_MouseLeave,       CS_Normal    },
     { CS_Normal,    CT_Hide,             CS_Hidden    },
     { CS_Hidden,    CT_Show,             CS_Normal    },
     { CS_LastState, CT_LastTransition,   CS_LastState } 
@@ -86,12 +93,21 @@ void TextControl::Init(void)
 void TextControl::Transition(ControlTransitionEnum  eTrans,
                              Pos                   *pMousePos)
 {
+	if (m_eCurrentState == CS_MouseOver && 
+        eTrans == CT_MouseLButtonUp)
+       m_pParent->SendControlMessage(this, CM_Pressed);
+
     switch(eTrans)
     {
+        case CT_MouseEnter:
+            m_pParent->SendControlMessage(this, CM_MouseEnter);
+            break;
+        case CT_MouseLeave:
+            m_pParent->SendControlMessage(this, CM_MouseLeave);
+            break;
         case CT_SetValue:
             TextChanged();
             break;
-
         case CT_Timer:
             MarqueeText();
             break;

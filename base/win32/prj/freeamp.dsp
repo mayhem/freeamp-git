@@ -222,59 +222,20 @@ SOURCE=..\..\src\thread.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\src\updatemanager.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\src\utility.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\win32updatemanager.cpp
 # End Source File
 # End Group
 # Begin Group "system"
 
 # PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\..\..\config\config.win32
-
-!IF  "$(CFG)" == "freeamp - Win32 Release"
-
-# Begin Custom Build
-InputPath=..\..\..\config\config.win32
-
-"..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\config\config.win32 ..\..\..\config\config.h
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
-
-# Begin Custom Build
-InputPath=..\..\..\config\config.win32
-
-"..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\config\config.win32 ..\..\..\config\config.h
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
-
-# Begin Custom Build
-InputPath=..\..\..\config\config.win32
-
-"..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\config\config.win32 ..\..\..\config\config.h
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
-
-# Begin Custom Build
-InputPath=..\..\..\config\config.win32
-
-"..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\config\config.win32 ..\..\..\config\config.h
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
 # Begin Source File
 
 SOURCE=..\src\mutex.cpp

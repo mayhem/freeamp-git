@@ -35,6 +35,8 @@ char *strdup_new(const char *str);
 char *FreeampDir(Preferences *prefs);
 Error FilePathToURL(const char* path, char* url, uint32* length);
 Error URLToFilePath(const char* url, char* path, uint32* length);
+void ToUpper(char *s);
+void ToLower(char *s);
 
 
 #endif /* INCLUDED_UTILITY_H */

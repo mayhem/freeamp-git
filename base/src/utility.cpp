@@ -24,6 +24,7 @@ ____________________________________________________________________________*/
 #include <assert.h>
 #include <string.h>
 #include <time.h>
+#include <ctype.h>
 #include <stdio.h>
 
 #ifdef WIN32
@@ -410,3 +411,19 @@ Error URLToFilePath(const char* url, char* path, uint32* length)
 
     return result;
 }
+
+void ToUpper(char *s)
+{
+    char *p;
+    
+    for(p = s; *p != NULL; p++)
+       *p = toupper(*p);
+}       
+
+void ToLower(char *s)
+{
+    char *p;
+    
+    for(p = s; *p != NULL; p++)
+       *p = tolower(*p);
+}       

@@ -3,6 +3,7 @@
    FreeAmp - The Free MP3 Player
 
    Copyright (C) 1999 EMusic.com
+   Portions Copyright (C) 1999 Valters Vingolds
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,6 +23,8 @@
 ____________________________________________________________________________*/
 
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #ifndef WIN32
 #include <unistd.h>
 #endif
@@ -44,6 +47,7 @@ ____________________________________________________________________________*/
 #include "debug.h"
 #include "PreferenceWindow.h"
 #include "playlist.h"
+#include "player.h"
 
 void WorkerThreadStart(void* arg);
 
@@ -56,7 +60,7 @@ extern    "C"
 {
    UserInterface *Initialize(FAContext * context)
    {
-	  //Debug_v("##Clear");
+	  Debug_v("##Clear");
       return new FreeAmpTheme(context);
    }
 }
@@ -74,6 +78,7 @@ FreeAmpTheme::FreeAmpTheme(FAContext * context)
    m_iSeekPos = -1;
    m_bPlayShown = true;
    m_oTitle = string("");
+   m_eTimeDisplayState = kNormal;
 
    LoadFreeAmpTheme();
 }
@@ -191,12 +196,10 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
       }   
       case INFO_DoneOutputting:
       {
-         string oTime("0:00:00");
-         
          m_iSeekPos = 0;
-         m_iTotalSeconds = 0;
+         m_iTotalSeconds = -1;
          m_pWindow->ControlIntValue(string("Seek"), true, m_iSeekPos);
-         m_pWindow->ControlStringValue(string("Time"), true, oTime);
+         UpdateTimeDisplay();
          
          break;
       }   
@@ -231,31 +234,21 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
 
          break;
       }
-      
+ 
+      case INFO_PlaylistItemUpdated :
+      {
+         PlaylistItemUpdatedEvent *pInfo = 
+            (PlaylistItemUpdatedEvent *)e;
+
+         UpdateMetaData(pInfo->Item());
+         break;
+      }
       case INFO_PlaylistCurrentItemInfo:
       {
-         const PlaylistItem *pItem;
-
          PlaylistCurrentItemInfoEvent *pInfo = 
             (PlaylistCurrentItemInfoEvent *)e;
-         pItem = pInfo->Item();
-    
-         if (pItem->GetMetaData().Title().length() > 0 || 
-             pItem->GetMetaData().Artist().length() > 0)
-         {
-             string oText;
-             
-             m_oTitle = pItem->GetMetaData().Title();
-             if (pItem->GetMetaData().Artist().length() > 0)
-                m_oTitle += string(" -- ") + pItem->GetMetaData().Artist();
 
-             m_pWindow->ControlStringValue(string("Title"), true, m_oTitle);
-             oText = string(BRANDING": ") + m_oTitle;
-             m_pWindow->SetTitle(oText);
-         }    
-         else
-             m_oTitle = "";
-                    
+         UpdateMetaData(pInfo->Item());
          break;
       }
       
@@ -294,7 +287,6 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
       {
          MediaTimeInfoEvent *info = (MediaTimeInfoEvent *) e;
          int                 iSeconds;
-         char                szText[100];
          string              oName("Time"), oText;
 
          iSeconds = (info->m_hours * 3600) + (info->m_minutes * 60) + 
@@ -303,10 +295,7 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
              break;
              
          m_iCurrentSeconds = iSeconds;            
-         sprintf(szText, "%d:%02d:%02d", info->m_hours, 
-              info->m_minutes, info->m_seconds);
-         oText = string(szText);
-         m_pWindow->ControlStringValue(oName, true, oText);
+         UpdateTimeDisplay();
 
          if (m_iTotalSeconds > 0)
          {
@@ -601,7 +590,24 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
        
        return kError_NoErr;
    }    
+   if (oControlName == string("Time") && eMesg == CM_Pressed)
+   {
+       string oName("Info"), oDesc;
        
+       if (m_eTimeDisplayState == kNormal)
+       {
+           m_eTimeDisplayState = kTimeRemaining;
+           oDesc = "Time remaining";
+       }    
+       else     
+       { 
+           m_eTimeDisplayState = kNormal;
+           oDesc = "Current time";
+       }    
+       
+       m_pWindow->ControlStringValue("Info", true, oDesc);
+       UpdateTimeDisplay();                      
+   }
    
    return kError_NoErr;
 }
@@ -610,7 +616,7 @@ void FreeAmpTheme::InitControls(void)
 {
 	bool   bSet;
     int    iState;
-    string oWelcome("Welcome to "BRANDING"!");
+    string oWelcome("Welcome to the "BRANDING" player!");
     
     assert(m_pWindow);
     
@@ -641,9 +647,6 @@ void FreeAmpTheme::InitControls(void)
         m_pWindow->ControlStringValue(string("Title"), true, oWelcome);
     else    
         m_pWindow->ControlStringValue(string("Title"), true, m_oTitle);
-        
-    //oWelcome = "Current time";
-    //m_pWindow->ControlStringValue(string("TimeType"), true, oWelcome);
 }
 
 // This function gets called after the window object is created,
@@ -766,4 +769,129 @@ void FreeAmpTheme::ShowOptions(void)
     pWindow->Show(m_pWindow);
           
     delete pWindow;
+}
+
+void FreeAmpTheme::UpdateTimeDisplay(void)
+{
+    string oText;
+    char   szText[20];
+    int    iSeconds;
+    
+    if (m_eTimeDisplayState == kTimeRemaining &&
+        m_iTotalSeconds > 0)
+    {    
+        iSeconds = m_iTotalSeconds - m_iCurrentSeconds;
+        sprintf(szText, "(%d:%02d:%02d)", 
+                iSeconds / 3600,
+                (iSeconds % 3600) / 60,
+                iSeconds % 60);
+    }    
+    else    
+        sprintf(szText, "%d:%02d:%02d", 
+                m_iCurrentSeconds / 3600,
+                (m_iCurrentSeconds % 3600) / 60,
+                m_iCurrentSeconds % 60);
+            
+    oText = string(szText);
+    m_pWindow->ControlStringValue("Time", true, oText);
+}
+
+void FreeAmpTheme::UpdateMetaData(const PlaylistItem *pItem)
+{
+    if (pItem->GetMetaData().Title().length() > 0 || 
+        pItem->GetMetaData().Artist().length() > 0)
+    {
+        string oText;
+        
+        m_oTitle = pItem->GetMetaData().Title();
+        if (pItem->GetMetaData().Artist().length() > 0)
+           m_oTitle += string(" -- ") + pItem->GetMetaData().Artist();
+
+        m_pWindow->ControlStringValue(string("Title"), true, m_oTitle);
+        oText = string(BRANDING": ") + m_oTitle;
+        m_pWindow->SetTitle(oText);
+    }    
+    else
+        m_oTitle = "";
+}
+
+void FreeAmpTheme::DropFiles(vector<string> *pFileList)
+{
+    char                     ext[MAX_PATH];
+    vector<string>::iterator i;
+    
+    for(i = pFileList->begin(); i != pFileList->end(); i++)
+    {
+        char          *pExtension = NULL;
+        vector<char*>  fileList;
+        struct _stat   st;
+
+        _stat((*i).c_str(), &st);
+        if(st.st_mode & _S_IFDIR)
+        {
+            HANDLE          findFileHandle = NULL;
+            WIN32_FIND_DATA findData;
+            char            findPath[MAX_PATH + 1];
+
+            strcpy(findPath, (*i).c_str());
+            strcat(findPath, DIR_MARKER_STR);
+            strcat(findPath, "*.*");
+
+            findFileHandle = FindFirstFile(findPath, &findData);
+            if(findFileHandle != INVALID_HANDLE_VALUE)
+            {
+                do
+                {
+                    pExtension = strrchr(findData.cFileName, '.');
+                    if (!pExtension)
+                       continue;
+                    
+                    strcpy(ext, pExtension + 1);
+                    ToUpper(ext);   
+                    if (m_pContext->player->IsSupportedExtension(ext))
+                    {   
+                       strcpy(findPath, (*i).c_str());
+                       strcat(findPath, DIR_MARKER_STR);
+                       strcat(findPath, findData.cFileName);
+                       m_pContext->plm->AddItem(findPath);
+                    }   
+
+                }while(FindNextFile(findFileHandle, &findData));
+
+                FindClose(findFileHandle);
+            }
+        }
+        else
+        {
+            PlaylistFormatInfo     oInfo;              
+            char                   ext[MAX_PATH];
+            int                    j;
+            Error                  eRet = kError_NoErr;
+            
+            pExtension = strrchr((*i).c_str(), '.');
+            if (!pExtension)
+               continue;
+            
+            strcpy(ext, pExtension + 1);
+            ToUpper(ext);
+            for(j = 0; ; j++)
+            {
+               eRet = m_pContext->plm->GetSupportedPlaylistFormats(&oInfo, j);
+               if (IsError(eRet))
+                  break;
+            
+               if (strcasecmp(oInfo.GetExtension(), ext) == 0)
+                  break;   
+            }
+            if (!IsError(eRet))
+            {
+               m_pContext->plm->ReadPlaylist((*i).c_str());
+            }   
+            else   
+               if (m_pContext->player->IsSupportedExtension(ext))
+               {
+                   m_pContext->plm->AddItem((*i).c_str(),0);
+               }    
+        }
+    }
 }

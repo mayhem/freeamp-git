@@ -180,7 +180,7 @@ bool Win32Bitmap::IsPosVisible(Pos &oPos)
    hMemDC = CreateCompatibleDC(hRootDC);
    ReleaseDC(NULL, hRootDC);
 
-   hSaved = SelectObject(hMemDC, m_hMaskBitmap);
+   hSaved = (HBITMAP)SelectObject(hMemDC, m_hMaskBitmap);
    sColor = GetPixel(hMemDC, oPos.x, oPos.y);
    SelectObject(hMemDC, hSaved);
    DeleteDC(hMemDC);

@@ -456,9 +456,6 @@ $(DS_POSTBUILD_DEP) : ".\update.exe"
  || "$(CFG)" == "update - Win32 NASM Debug" || "$(CFG)" ==\
  "update - Win32 NASM Release"
 SOURCE=..\main.cpp
-
-!IF  "$(CFG)" == "update - Win32 Release"
-
 DEP_CPP_MAIN_=\
 	"..\..\..\base\include\errors.h"\
 	"..\..\..\base\include\facontext.h"\
@@ -466,12 +463,17 @@ DEP_CPP_MAIN_=\
 	"..\..\..\base\include\preferences.h"\
 	"..\..\..\base\include\thread.h"\
 	"..\..\..\base\include\updatemanager.h"\
-	"..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\base\win32\include\Mutex.h"\
 	"..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\base\win32\include\win32prefs.h"\
-	"..\..\..\config\config.h"\
-	"..\..\..\lib\xml\include\parse.h"\
+	"..\..\..\lib\xml\include\Parse.h"\
 	
+NODEP_CPP_MAIN_=\
+	"..\..\..\base\include\config.h"\
+	
+
+!IF  "$(CFG)" == "update - Win32 Release"
+
 
 "$(INTDIR)\main.obj" : $(SOURCE) $(DEP_CPP_MAIN_) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
@@ -479,19 +481,6 @@ DEP_CPP_MAIN_=\
 
 !ELSEIF  "$(CFG)" == "update - Win32 Debug"
 
-DEP_CPP_MAIN_=\
-	"..\..\..\base\include\errors.h"\
-	"..\..\..\base\include\facontext.h"\
-	"..\..\..\base\include\log.h"\
-	"..\..\..\base\include\preferences.h"\
-	"..\..\..\base\include\thread.h"\
-	"..\..\..\base\include\updatemanager.h"\
-	"..\..\..\base\win32\include\mutex.h"\
-	"..\..\..\base\win32\include\semaphore.h"\
-	"..\..\..\base\win32\include\win32prefs.h"\
-	"..\..\..\config\config.h"\
-	"..\..\..\lib\xml\include\parse.h"\
-	
 
 "$(INTDIR)\main.obj" : $(SOURCE) $(DEP_CPP_MAIN_) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
@@ -499,19 +488,6 @@ DEP_CPP_MAIN_=\
 
 !ELSEIF  "$(CFG)" == "update - Win32 NASM Debug"
 
-DEP_CPP_MAIN_=\
-	"..\..\..\base\include\errors.h"\
-	"..\..\..\base\include\facontext.h"\
-	"..\..\..\base\include\log.h"\
-	"..\..\..\base\include\preferences.h"\
-	"..\..\..\base\include\thread.h"\
-	"..\..\..\base\include\updatemanager.h"\
-	"..\..\..\base\win32\include\mutex.h"\
-	"..\..\..\base\win32\include\semaphore.h"\
-	"..\..\..\base\win32\include\win32prefs.h"\
-	"..\..\..\config\config.h"\
-	"..\..\..\lib\xml\include\parse.h"\
-	
 
 "$(INTDIR)\main.obj"	"$(INTDIR)\main.sbr" : $(SOURCE) $(DEP_CPP_MAIN_)\
  "$(INTDIR)"
@@ -520,19 +496,6 @@ DEP_CPP_MAIN_=\
 
 !ELSEIF  "$(CFG)" == "update - Win32 NASM Release"
 
-DEP_CPP_MAIN_=\
-	"..\..\..\base\include\errors.h"\
-	"..\..\..\base\include\facontext.h"\
-	"..\..\..\base\include\log.h"\
-	"..\..\..\base\include\preferences.h"\
-	"..\..\..\base\include\thread.h"\
-	"..\..\..\base\include\updatemanager.h"\
-	"..\..\..\base\win32\include\mutex.h"\
-	"..\..\..\base\win32\include\semaphore.h"\
-	"..\..\..\base\win32\include\win32prefs.h"\
-	"..\..\..\config\config.h"\
-	"..\..\..\lib\xml\include\parse.h"\
-	
 
 "$(INTDIR)\main.obj" : $(SOURCE) $(DEP_CPP_MAIN_) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
@@ -541,14 +504,16 @@ DEP_CPP_MAIN_=\
 !ENDIF 
 
 SOURCE=..\..\..\base\src\preferences.cpp
-
-!IF  "$(CFG)" == "update - Win32 Release"
-
 DEP_CPP_PREFE=\
 	"..\..\..\base\include\errors.h"\
 	"..\..\..\base\include\preferences.h"\
-	"..\..\..\config\config.h"\
 	
+NODEP_CPP_PREFE=\
+	"..\..\..\base\include\config.h"\
+	
+
+!IF  "$(CFG)" == "update - Win32 Release"
+
 
 "$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
@@ -556,11 +521,6 @@ DEP_CPP_PREFE=\
 
 !ELSEIF  "$(CFG)" == "update - Win32 Debug"
 
-DEP_CPP_PREFE=\
-	"..\..\..\base\include\errors.h"\
-	"..\..\..\base\include\preferences.h"\
-	"..\..\..\config\config.h"\
-	
 
 "$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
@@ -568,11 +528,6 @@ DEP_CPP_PREFE=\
 
 !ELSEIF  "$(CFG)" == "update - Win32 NASM Debug"
 
-DEP_CPP_PREFE=\
-	"..\..\..\base\include\errors.h"\
-	"..\..\..\base\include\preferences.h"\
-	"..\..\..\config\config.h"\
-	
 
 "$(INTDIR)\preferences.obj"	"$(INTDIR)\preferences.sbr" : $(SOURCE)\
  $(DEP_CPP_PREFE) "$(INTDIR)"
@@ -581,11 +536,6 @@ DEP_CPP_PREFE=\
 
 !ELSEIF  "$(CFG)" == "update - Win32 NASM Release"
 
-DEP_CPP_PREFE=\
-	"..\..\..\base\include\errors.h"\
-	"..\..\..\base\include\preferences.h"\
-	"..\..\..\config\config.h"\
-	
 
 "$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
@@ -594,15 +544,17 @@ DEP_CPP_PREFE=\
 !ENDIF 
 
 SOURCE=..\..\..\base\win32\src\win32prefs.cpp
-
-!IF  "$(CFG)" == "update - Win32 Release"
-
 DEP_CPP_WIN32=\
 	"..\..\..\base\include\errors.h"\
 	"..\..\..\base\include\preferences.h"\
 	"..\..\..\base\win32\include\win32prefs.h"\
-	"..\..\..\config\config.h"\
 	
+NODEP_CPP_WIN32=\
+	"..\..\..\base\include\config.h"\
+	
+
+!IF  "$(CFG)" == "update - Win32 Release"
+
 
 "$(INTDIR)\win32prefs.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
@@ -610,12 +562,6 @@ DEP_CPP_WIN32=\
 
 !ELSEIF  "$(CFG)" == "update - Win32 Debug"
 
-DEP_CPP_WIN32=\
-	"..\..\..\base\include\errors.h"\
-	"..\..\..\base\include\preferences.h"\
-	"..\..\..\base\win32\include\win32prefs.h"\
-	"..\..\..\config\config.h"\
-	
 
 "$(INTDIR)\win32prefs.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
@@ -623,12 +569,6 @@ DEP_CPP_WIN32=\
 
 !ELSEIF  "$(CFG)" == "update - Win32 NASM Debug"
 
-DEP_CPP_WIN32=\
-	"..\..\..\base\include\errors.h"\
-	"..\..\..\base\include\preferences.h"\
-	"..\..\..\base\win32\include\win32prefs.h"\
-	"..\..\..\config\config.h"\
-	
 
 "$(INTDIR)\win32prefs.obj"	"$(INTDIR)\win32prefs.sbr" : $(SOURCE)\
  $(DEP_CPP_WIN32) "$(INTDIR)"
@@ -637,12 +577,6 @@ DEP_CPP_WIN32=\
 
 !ELSEIF  "$(CFG)" == "update - Win32 NASM Release"
 
-DEP_CPP_WIN32=\
-	"..\..\..\base\include\errors.h"\
-	"..\..\..\base\include\preferences.h"\
-	"..\..\..\base\win32\include\win32prefs.h"\
-	"..\..\..\config\config.h"\
-	
 
 "$(INTDIR)\win32prefs.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)

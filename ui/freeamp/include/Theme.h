@@ -73,6 +73,7 @@ class Theme : public Parse
       virtual void  HandleKeystroke(unsigned char cKey) = 0;
       virtual void  InitControls(void) = 0;
       virtual void  InitWindow(void) = 0;
+      virtual void  DropFiles(vector<string> *pFileList) = 0;
       virtual void  SetDefaultFont(const string &oFont);
 
     protected:

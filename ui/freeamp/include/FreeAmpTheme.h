@@ -32,6 +32,12 @@ ____________________________________________________________________________*/
 #include "Theme.h"
 #include "ThemeManager.h"
 
+enum TimeDisplayState
+{
+    kNormal,
+    kTimeRemaining
+};
+
 class FreeAmpTheme : public UserInterface, public Theme
 {
     public:
@@ -47,6 +53,7 @@ class FreeAmpTheme : public UserInterface, public Theme
         virtual void  HandleKeystroke(unsigned char cKey);
         virtual Error HandleControlMessage(string &oControlName, 
                                            ControlMessageEnum eMesg);
+        virtual void  DropFiles(vector<string> *pFileList);
         virtual void  InitControls(void);
         virtual void  InitWindow(void);
                 void  ShowOptions(void);
@@ -58,6 +65,8 @@ class FreeAmpTheme : public UserInterface, public Theme
         void             ParseArgs();
         void             ReloadTheme(void);
         void             SetVolume(int iVolume);
+        void             UpdateTimeDisplay(void);
+        void             UpdateMetaData(const PlaylistItem *pItem);
 
         FAContext       *m_pContext;
         int              m_iCurrentSeconds, m_iTotalSeconds, m_iSeekSeconds;
@@ -67,6 +76,7 @@ class FreeAmpTheme : public UserInterface, public Theme
         Pos              m_oWindowPos;
         bool             m_bSeekInProgress, m_bPlayShown;
         string           m_oCurrentWindow, m_oTitle;
+        TimeDisplayState m_eTimeDisplayState;
 };
 
 #endif

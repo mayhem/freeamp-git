@@ -3,6 +3,7 @@
    FreeAmp - The Free MP3 Player
 
    Copyright (C) 1999 EMusic
+   Portions Copyright (C) 1999 Valters Vingolds
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -80,6 +81,8 @@ static LRESULT WINAPI MainWndProc(HWND hwnd, UINT msg,
             ui->Init();
             
             SetTimer(hwnd, 0, 250, NULL);
+            // We want people to be able to drop files on the player
+            DragAcceptFiles(hwnd, TRUE);
             
             break;
         }
@@ -191,6 +194,9 @@ static LRESULT WINAPI MainWndProc(HWND hwnd, UINT msg,
             ui->Keystroke((unsigned char)wParam);
             break;
         }
+        case WM_DROPFILES:
+            ui->DropFiles((HDROP) wParam);
+            break;
 
         default:
             result = DefWindowProc( hwnd, msg, wParam, lParam );
@@ -484,3 +490,25 @@ Error Win32Window::Restore(void)
     return kError_NoErr;
 }
 
+
+void Win32Window::DropFiles(HDROP dropHandle)
+{
+    int32 count;
+    char  file[MAX_PATH + 1];
+    vector<string> oFileList;
+
+    count = DragQueryFile(  dropHandle,
+                            -1L,
+                            file,
+                            sizeof(file));
+
+    for(int32 i = 0; i < count; i++)
+    {
+        DragQueryFile(  dropHandle,
+                        i,
+                        file,
+                        sizeof(file));
+        oFileList.push_back(string(file));
+    }
+    m_pTheme->DropFiles(&oFileList);
+}
