@@ -65,6 +65,7 @@ CLEAN :
 	-@erase "$(INTDIR)\MultiStateControl.obj"
 	-@erase "$(INTDIR)\Parse.obj"
 	-@erase "$(INTDIR)\PixFontControl.obj"
+	-@erase "$(INTDIR)\PixTimeControl.obj"
 	-@erase "$(INTDIR)\SliderControl.obj"
 	-@erase "$(INTDIR)\TextControl.obj"
 	-@erase "$(INTDIR)\Theme.obj"
@@ -87,7 +88,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\res" /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /I "..\..\..\..\lib\gdbm" /I "..\..\..\..\lib\xml\include" /I "..\..\..\..\lib\zlib\include" /I "..\..\..\..\lib\unzip\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\freeampui.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\res" /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /I "..\..\..\..\lib\gdbm" /I "..\..\..\..\lib\xml\include" /I "..\..\..\..\lib\zlib\include" /I "..\..\..\..\lib\unzip\include" /I "..\..\..\..\lib\http\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\freeampui.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32 
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\freeampui.res" /d "NDEBUG" 
 BSC32=bscmake.exe
@@ -105,11 +106,14 @@ LINK32_OBJS= \
 	"$(INTDIR)\Control.obj" \
 	"$(INTDIR)\DialControl.obj" \
 	"$(INTDIR)\Font.obj" \
+	"$(INTDIR)\ForeignTheme.obj" \
 	"$(INTDIR)\FreeAmpTheme.obj" \
 	"$(INTDIR)\Headlines.obj" \
 	"$(INTDIR)\Median.obj" \
 	"$(INTDIR)\MultiStateControl.obj" \
 	"$(INTDIR)\Parse.obj" \
+	"$(INTDIR)\PixFontControl.obj" \
+	"$(INTDIR)\PixTimeControl.obj" \
 	"$(INTDIR)\SliderControl.obj" \
 	"$(INTDIR)\TextControl.obj" \
 	"$(INTDIR)\Theme.obj" \
@@ -124,8 +128,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32Window.obj" \
 	"$(INTDIR)\Window.obj" \
 	"$(INTDIR)\freeampui.res" \
-	"$(INTDIR)\PixFontControl.obj" \
-	"$(INTDIR)\ForeignTheme.obj" \
 	"..\..\..\..\lib\zlib\zlib.lib" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\unzip\unzip.lib"
@@ -179,6 +181,7 @@ CLEAN :
 	-@erase "$(INTDIR)\MultiStateControl.obj"
 	-@erase "$(INTDIR)\Parse.obj"
 	-@erase "$(INTDIR)\PixFontControl.obj"
+	-@erase "$(INTDIR)\PixTimeControl.obj"
 	-@erase "$(INTDIR)\SliderControl.obj"
 	-@erase "$(INTDIR)\TextControl.obj"
 	-@erase "$(INTDIR)\Theme.obj"
@@ -203,7 +206,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\res" /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /I "..\..\..\..\lib\gdbm" /I "..\..\..\..\lib\xml\include" /I "..\..\..\..\lib\zlib\include" /I "..\..\..\..\lib\unzip\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\freeampui.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\res" /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /I "..\..\..\..\lib\gdbm" /I "..\..\..\..\lib\xml\include" /I "..\..\..\..\lib\zlib\include" /I "..\..\..\..\lib\unzip\include" /I "..\..\..\..\lib\http\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\freeampui.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32 
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\freeampui.res" /d "_DEBUG" 
 BSC32=bscmake.exe
@@ -221,11 +224,14 @@ LINK32_OBJS= \
 	"$(INTDIR)\Control.obj" \
 	"$(INTDIR)\DialControl.obj" \
 	"$(INTDIR)\Font.obj" \
+	"$(INTDIR)\ForeignTheme.obj" \
 	"$(INTDIR)\FreeAmpTheme.obj" \
 	"$(INTDIR)\Headlines.obj" \
 	"$(INTDIR)\Median.obj" \
 	"$(INTDIR)\MultiStateControl.obj" \
 	"$(INTDIR)\Parse.obj" \
+	"$(INTDIR)\PixFontControl.obj" \
+	"$(INTDIR)\PixTimeControl.obj" \
 	"$(INTDIR)\SliderControl.obj" \
 	"$(INTDIR)\TextControl.obj" \
 	"$(INTDIR)\Theme.obj" \
@@ -240,8 +246,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32Window.obj" \
 	"$(INTDIR)\Window.obj" \
 	"$(INTDIR)\freeampui.res" \
-	"$(INTDIR)\PixFontControl.obj" \
-	"$(INTDIR)\ForeignTheme.obj" \
 	"..\..\..\..\lib\zlib\zlib.lib" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\unzip\unzip.lib"
@@ -295,6 +299,7 @@ CLEAN :
 	-@erase "$(INTDIR)\MultiStateControl.obj"
 	-@erase "$(INTDIR)\Parse.obj"
 	-@erase "$(INTDIR)\PixFontControl.obj"
+	-@erase "$(INTDIR)\PixTimeControl.obj"
 	-@erase "$(INTDIR)\SliderControl.obj"
 	-@erase "$(INTDIR)\TextControl.obj"
 	-@erase "$(INTDIR)\Theme.obj"
@@ -319,7 +324,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\res" /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /I "..\..\..\..\lib\gdbm" /I "..\..\..\..\lib\xml\include" /I "..\..\..\..\lib\zlib\include" /I "..\..\..\..\lib\unzip\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\freeampui.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\res" /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /I "..\..\..\..\lib\gdbm" /I "..\..\..\..\lib\xml\include" /I "..\..\..\..\lib\zlib\include" /I "..\..\..\..\lib\unzip\include" /I "..\..\..\..\lib\http\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\freeampui.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32 
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\freeampui.res" /d "_DEBUG" 
 BSC32=bscmake.exe
@@ -337,11 +342,14 @@ LINK32_OBJS= \
 	"$(INTDIR)\Control.obj" \
 	"$(INTDIR)\DialControl.obj" \
 	"$(INTDIR)\Font.obj" \
+	"$(INTDIR)\ForeignTheme.obj" \
 	"$(INTDIR)\FreeAmpTheme.obj" \
 	"$(INTDIR)\Headlines.obj" \
 	"$(INTDIR)\Median.obj" \
 	"$(INTDIR)\MultiStateControl.obj" \
 	"$(INTDIR)\Parse.obj" \
+	"$(INTDIR)\PixFontControl.obj" \
+	"$(INTDIR)\PixTimeControl.obj" \
 	"$(INTDIR)\SliderControl.obj" \
 	"$(INTDIR)\TextControl.obj" \
 	"$(INTDIR)\Theme.obj" \
@@ -356,8 +364,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32Window.obj" \
 	"$(INTDIR)\Window.obj" \
 	"$(INTDIR)\freeampui.res" \
-	"$(INTDIR)\PixFontControl.obj" \
-	"$(INTDIR)\ForeignTheme.obj" \
 	"..\..\..\..\lib\zlib\zlib.lib" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\unzip\unzip.lib"
@@ -411,6 +417,7 @@ CLEAN :
 	-@erase "$(INTDIR)\MultiStateControl.obj"
 	-@erase "$(INTDIR)\Parse.obj"
 	-@erase "$(INTDIR)\PixFontControl.obj"
+	-@erase "$(INTDIR)\PixTimeControl.obj"
 	-@erase "$(INTDIR)\SliderControl.obj"
 	-@erase "$(INTDIR)\TextControl.obj"
 	-@erase "$(INTDIR)\Theme.obj"
@@ -433,7 +440,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\res" /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /I "..\..\..\..\lib\gdbm" /I "..\..\..\..\lib\xml\include" /I "..\..\..\..\lib\zlib\include" /I "..\..\..\..\lib\unzip\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\freeampui.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\res" /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /I "..\..\..\..\lib\gdbm" /I "..\..\..\..\lib\xml\include" /I "..\..\..\..\lib\zlib\include" /I "..\..\..\..\lib\unzip\include" /I "..\..\..\..\lib\http\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\freeampui.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32 
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\freeampui.res" /d "NDEBUG" 
 BSC32=bscmake.exe
@@ -451,11 +458,14 @@ LINK32_OBJS= \
 	"$(INTDIR)\Control.obj" \
 	"$(INTDIR)\DialControl.obj" \
 	"$(INTDIR)\Font.obj" \
+	"$(INTDIR)\ForeignTheme.obj" \
 	"$(INTDIR)\FreeAmpTheme.obj" \
 	"$(INTDIR)\Headlines.obj" \
 	"$(INTDIR)\Median.obj" \
 	"$(INTDIR)\MultiStateControl.obj" \
 	"$(INTDIR)\Parse.obj" \
+	"$(INTDIR)\PixFontControl.obj" \
+	"$(INTDIR)\PixTimeControl.obj" \
 	"$(INTDIR)\SliderControl.obj" \
 	"$(INTDIR)\TextControl.obj" \
 	"$(INTDIR)\Theme.obj" \
@@ -470,8 +480,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32Window.obj" \
 	"$(INTDIR)\Window.obj" \
 	"$(INTDIR)\freeampui.res" \
-	"$(INTDIR)\PixFontControl.obj" \
-	"$(INTDIR)\ForeignTheme.obj" \
 	"..\..\..\..\lib\zlib\zlib.lib" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\unzip\unzip.lib"
@@ -657,6 +665,12 @@ SOURCE=..\..\..\..\lib\xml\src\Parse.cpp
 SOURCE=..\..\src\PixFontControl.cpp
 
 "$(INTDIR)\PixFontControl.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\..\src\PixTimeControl.cpp
+
+"$(INTDIR)\PixTimeControl.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
