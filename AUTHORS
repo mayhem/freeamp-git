@@ -148,6 +148,8 @@ Michael Rich <istan@alltel.net>
 
 "Chris Kuklewicz" <chrisk@mit.edu>
 * patch to StopTimer to properly handle NULL timers.
+* patch to fix multiple Edit/Remove Items from segfaulting
+* patch to work around GTK bug wrt. hiding scrollbars
 
 "Robert Hart" <ab6rah@bath.ac.uk>
 * patch to grab track numbers from filenames

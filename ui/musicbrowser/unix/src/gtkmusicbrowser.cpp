@@ -766,6 +766,9 @@ void GTKMusicBrowser::ExpandCollapseEvent(void)
             gtk_paned_set_position(GTK_PANED(masterBox), lastPanedPosition);
             gtk_paned_set_handle_size(GTK_PANED(masterBox), lastPanedHandle);
         }
+        gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(musicBrowserWindow),
+                                       GTK_POLICY_AUTOMATIC, 
+                                       GTK_POLICY_AUTOMATIC);
         title += string(" - My Music: ");
         GtkWidget *w = gtk_item_factory_get_widget(menuFactory,
                                                    "/View/View Playlist Only");
@@ -778,6 +781,8 @@ void GTKMusicBrowser::ExpandCollapseEvent(void)
         lastPanedHandle = ((GtkPaned *)masterBox)->handle_size;
         gtk_paned_set_position(GTK_PANED(masterBox), 0);
         gtk_paned_set_handle_size(GTK_PANED(masterBox), 0);
+        gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(musicBrowserWindow),
+                                       GTK_POLICY_NEVER, GTK_POLICY_NEVER);
         title += string(" - Playlist Editor: ");
         GtkWidget *w = gtk_item_factory_get_widget(menuFactory,
                                                    "/View/View Playlist Only");
