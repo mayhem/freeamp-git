@@ -64,7 +64,6 @@ class     ObsInput:public PhysicalMediaInput
    {
       return m_path;
    }
-   virtual const char *GetErrorString(int32);
    virtual Error SetPropManager(Properties *p) 
 	{ 
 	   m_propManager = p; 

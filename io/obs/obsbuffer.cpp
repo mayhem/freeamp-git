@@ -37,6 +37,7 @@ ____________________________________________________________________________*/
 #endif
 
 #include "obsbuffer.h"
+#include "obsinput.h"
 #include "log.h"
 
 extern LogFile *g_Log;
@@ -59,13 +60,13 @@ static char *g_ErrorArray[5] =
 };
 
 ObsBuffer::ObsBuffer(size_t iBufferSize, size_t iOverFlowSize, 
-                     size_t iWriteTriggerSize, char *szFile) :
+                     size_t iWriteTriggerSize, char *szFile, ObsInput *m_pObs) :
         StreamBuffer(iBufferSize, iOverFlowSize, iWriteTriggerSize)
 {
     m_hHandle = -1;
     m_pBufferThread = NULL;
     m_pID3Tag = NULL;
-    m_szError = new char[iMaxErrorLen];
+    m_pObs = m_pObs;
 
     strcpy(m_szUrl, szFile);
 }
@@ -87,8 +88,6 @@ ObsBuffer::~ObsBuffer(void)
 
     if (m_pID3Tag)
        delete m_pID3Tag;
-
-    delete m_szError;
 }
 
 Error ObsBuffer::Open(void)
@@ -100,11 +99,18 @@ Error ObsBuffer::Open(void)
 
     iRet = sscanf(m_szUrl, "rtp://%[^:]:%d", szAddr, &iPort);
     if (iRet < 2)
+    {
+        m_pObs->ReportError("Invalid URL. URL format: rtp://<multicast addr>"
+                          "[:port]");
         return (Error)obsError_BadUrl;
+    }
 
     m_hHandle = socket( AF_INET, SOCK_DGRAM, 0 );
     if (m_hHandle < 0)
+    {
+       m_pObs->ReportError("Cannot create socket.");
        return (Error)obsError_CannotCreateSocket;
+    }
 
     m_pSin = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in));
     assert(m_pSin);
@@ -120,6 +126,7 @@ Error ObsBuffer::Open(void)
     {
        close(m_hHandle);
        m_hHandle= -1;
+       m_pObs->ReportError("Cannot set socket options.");
        return (Error)obsError_CannotSetSocketOpts;
     }
 
@@ -129,6 +136,7 @@ Error ObsBuffer::Open(void)
     {
        close(m_hHandle);
        m_hHandle= -1;
+       m_pObs->ReportError("Cannot bind the socket.");
        return (Error)obsError_CannotBind;
     }
 
@@ -140,6 +148,7 @@ Error ObsBuffer::Open(void)
     {
        close(m_hHandle);
        m_hHandle= -1;
+       m_pObs->ReportError("Cannot set socket options.");
        return (Error)obsError_CannotSetSocketOpts;
     }
 
@@ -150,7 +159,7 @@ Error ObsBuffer::Open(void)
     memset(m_pID3Tag, 0, sizeof(ID3Tag));
     memcpy(m_pID3Tag->szTag, "TAG", 3);
 
-    strcpy(m_pID3Tag->szTitle, "Obsequieum");
+    strcpy(m_pID3Tag->szTitle, "RTP Stream");
 
     fcntl(m_hHandle, F_SETFL, fcntl(m_hHandle, F_GETFL) | O_NONBLOCK);
 
@@ -273,15 +282,4 @@ void ObsBuffer::WorkerThread(void)
    close(m_hHandle);
    m_hHandle = -1;
    g_Log->Log(LogInput, "Worker thread done");
-}
-
-const char *ObsBuffer::
-GetErrorString(int32 error)
-{
-   if ((error <= obsError_MinimumError) || (error >= obsError_MaximumError))
-   {
-      return g_ErrorArray[0];
-   }
-
-   return g_ErrorArray[error - obsError_MinimumError];
 }

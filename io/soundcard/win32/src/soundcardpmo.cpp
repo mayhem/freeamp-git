@@ -29,27 +29,29 @@ ____________________________________________________________________________*/
 /* project headers */
 #include "config.h"
 #include "SoundCardPMO.h"
+#include "eventdata.h"
+#include "log.h"
 
+LogFile  *g_Log;  
+
+const int iBufferSize = 256 * 1024;
+const int iOverflowSize = 24 * 1024;
+const int iWriteTriggerSize = 18432;
+const int iWriteToCard = 8 * 1024; 
 
 HANDLE MCISemaphore;
 
-extern "C" {
-
-PhysicalMediaOutput* Initialize() 
+extern    "C"
 {
-    return new SoundCardPMO();
+   PhysicalMediaOutput *Initialize(LogFile * pLog)
+   {
+      g_Log = pLog;
+      return new SoundCardPMO();
+   }
 }
 
-}
-
-static 
-void 
-CALLBACK 
-MCICallBack(HWAVEOUT hwo, 
-			UINT msg,
-			DWORD dwInstance,
-			DWORD dwParam1,
-			DWORD dwParam2)
+static void CALLBACK MCICallBack(HWAVEOUT hwo, UINT msg, DWORD dwInstance,
+			                        DWORD dwParam1, DWORD dwParam2)
 {
 	switch(msg)
 	{
@@ -57,16 +59,14 @@ MCICallBack(HWAVEOUT hwo,
 		{
 			LPWAVEHDR lpWaveHdr = (LPWAVEHDR) dwParam1;
 			waveOutUnprepareHeader(hwo, lpWaveHdr, sizeof(WAVEHDR));
-			//cerr << "Releasing: WAVHDR #" << lpWaveHdr->dwUser << endl;
 			lpWaveHdr->dwUser = 0;
 			ReleaseSemaphore(MCISemaphore, 1, NULL);
-            break;
+         break;
 		}
 	}
 }
 
-SoundCardPMO::
-SoundCardPMO()
+SoundCardPMO::SoundCardPMO()
 {
 	m_wfex				= NULL;
 	m_wavehdr_array		= NULL;

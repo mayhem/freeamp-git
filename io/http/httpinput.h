@@ -32,7 +32,7 @@ ____________________________________________________________________________*/
 #include "pmi.h"
 #include "httpbuffer.h"
 
-class     HttpInput:public PhysicalMediaInput
+class HttpInput:public PhysicalMediaInput
 {
    public:
 
@@ -66,7 +66,6 @@ class     HttpInput:public PhysicalMediaInput
    {
       return m_path;
    }
-   virtual const char *GetErrorString(int32);
 
    virtual Error SetPropManager(Properties *p) 
 	{ 

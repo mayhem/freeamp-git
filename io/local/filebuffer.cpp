@@ -101,22 +101,22 @@ Error FileBuffer::Open(void)
         switch (errno)
         {
             case EACCES:
+               g_Log->Error("Access to the file was denied.\n");
                return kError_FileNoAccess;
                break;
 
-            case EEXIST:
-               return kError_FileExists;
-               break;
-
             case EINVAL:
+               g_Log->Error("Internal error: The file could not be opened.\n");
                return kError_FileInvalidArg;
                break;
 
             case EMFILE:
+               g_Log->Error("Internal error: The file could not be opened.\n");
                return kError_FileNoHandles;
                break;
 
             case ENOENT:
+               g_Log->Error("File not found.\n");
                return kError_FileNotFound;
                break;
 
@@ -174,6 +174,7 @@ Error FileBuffer::Run(void)
        m_pBufferThread = Thread::CreateThread();
        if (!m_pBufferThread)
        {
+           g_Log->Error("Could not create filebuffer thread.");
            return (Error)kError_CreateThreadFailed;
        }
        m_pBufferThread->Create(FileBuffer::StartWorkerThread, this);

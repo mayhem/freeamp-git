@@ -60,12 +60,14 @@ enum
    httpError_MaximumError
 };
 
+class HttpInput;
 class HttpBuffer : public StreamBuffer
 {
     public:
 
                HttpBuffer(size_t iBufferSize, size_t iOverFlowSize,
-                          size_t iWriteTriggerSize, char *szFile);
+                          size_t iWriteTriggerSize, char *szFile,
+                          HttpInput *pHttp);
       virtual ~HttpBuffer(void);
 
       Error    Open(void);
@@ -85,6 +87,7 @@ class HttpBuffer : public StreamBuffer
       Thread         *m_pBufferThread;
       bool            m_bLoop;
       ID3Tag         *m_pID3Tag;
+      HttpInput      *m_pHttp;
 
     public:
 

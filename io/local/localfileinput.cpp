@@ -72,22 +72,7 @@ PhysicalMediaInput()
 {
    if (path)
    {
-      int32     len = strlen(path) + 1;
-      m_path = new char[len];
-
-      if (m_path)
-      {
-         memcpy(m_path, path, len);
-      }
-
-      m_pPullBuffer = new FileBuffer(iBufferSize, iOverflowSize, 
-                                      iTriggerSize, path);
-      assert(m_pPullBuffer);
-
-      // Hmmm. Error gets lost here. I don't want to mess with
-      // the current infrastructure at the moment, and it doesn't
-      // seem to be used...
-      m_pPullBuffer->Open();
+      assert(0);
    }
    else
    {
@@ -158,8 +143,15 @@ SetTo(char *url)
          assert(m_pPullBuffer);
 
          result = m_pPullBuffer->Open();
-         if (result == kError_NoErr)
+         if (!IsError(result))
+         {
              result = m_pPullBuffer->Run();
+             if (IsError(result))
+                 ReportError("Could run the input plugin.");
+         }
+         else
+             ReportError("Could not open the specified file.");
+
 
       }
    }

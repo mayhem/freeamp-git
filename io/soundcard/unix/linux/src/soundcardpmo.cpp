@@ -56,34 +56,14 @@ extern    "C"
    }
 }
 
-static char *g_ErrorArray[8] =
-{
-   "Unknown Error Code",
-   "Cannot open the sound device (/dev/dsp).",
-   "fcntl F_GETFL on /dev/dsp failed",
-   "fcntl F_SETFL on /dev/dsp failed"
-   "ioctl reset failed",
-   "config of samplesize failed",
-   "config of stereo failed",
-   "config of speed failed"
-};
-
-const char *SoundCardPMO::
-GetErrorString(int32 error)
-{
-   if ((error <= pmoError_MinimumError) || (error >= pmoError_MaximumError))
-   {
-      return g_ErrorArray[0];
-   }
-   return g_ErrorArray[error - pmoError_MinimumError];
-}
-
 SoundCardPMO::SoundCardPMO() :
               EventBuffer(iBufferSize, iOverflowSize, iWriteTriggerSize)
 {
    m_properlyInitialized = false;
 
    myInfo = new OutputInfo();
+   memset(myInfo, 0, sizeof(OutputInfo));
+
    m_bPause = false;
    m_pBufferThread = NULL;
 
@@ -190,12 +170,14 @@ Error SoundCardPMO::Init(OutputInfo * info)
       {
          if (errno == EBUSY)
          {
-            g_Log->Error("Audio device busy!\n");
+            ReportError("Audio device is busy. Please make sure that "
+                        "another program is not using the device.");
             return (Error) pmoError_DeviceOpenFailed;
          }
          else
          {
-            g_Log->Error("Cannot open audio device!\n");
+            ReportError("Cannot open audio device. Please make sure that "
+                        "the audio device is properly configured.");
             return (Error) pmoError_DeviceOpenFailed;
          }
       }
@@ -206,6 +188,7 @@ Error SoundCardPMO::Init(OutputInfo * info)
 
    if ((flags = fcntl(fd, F_GETFL, 0)) < 0)
    {
+      ReportError("Cannot get the flags on the audio device.");
       return (Error) pmoError_IOCTL_F_GETFL;
    }
 
@@ -213,6 +196,7 @@ Error SoundCardPMO::Init(OutputInfo * info)
 
    if (fcntl(fd, F_SETFL, flags) < 0)
    {
+      ReportError("Cannot set the no delay flag on the audio device.");
       return (Error) pmoError_IOCTL_F_SETFL;
    }
 
@@ -232,20 +216,24 @@ Error SoundCardPMO::Init(OutputInfo * info)
 
    if (ioctl(audio_fd, SNDCTL_DSP_RESET, &junkvar) == -1)
    {
+      ReportError("Cannot reset the soundcard.");
       return (Error) pmoError_IOCTL_SNDCTL_DSP_RESET;
    }
 
    if (ioctl(audio_fd, SNDCTL_DSP_SAMPLESIZE, &play_precision) == -1)
    {
+      ReportError("Cannot set the soundcard's sample size.");
       return (Error) pmoError_IOCTL_SNDCTL_DSP_SAMPLESIZE;
    }
 
    if (ioctl(audio_fd, SNDCTL_DSP_STEREO, &play_stereo) == -1)
    {
+      ReportError("Cannot set the soundcard to stereo.");
       return (Error) pmoError_IOCTL_SNDCTL_DSP_STEREO;
    }
    if (ioctl(audio_fd, SNDCTL_DSP_SPEED, &play_sample_rate) == -1)
    {
+      ReportError("Cannot set the soundcard's sampling speed.");
       return (Error) pmoError_IOCTL_SNDCTL_DSP_SPEED;
    }
    myInfo->bits_per_sample = info->bits_per_sample;
@@ -253,7 +241,6 @@ Error SoundCardPMO::Init(OutputInfo * info)
    myInfo->samples_per_second = info->samples_per_second;
    myInfo->max_buffer_size = info->max_buffer_size;
    m_properlyInitialized = true;
-
 
    audio_buf_info sInfo;
    ioctl(audio_fd, SNDCTL_DSP_GETOSPACE, &sInfo);
@@ -271,6 +258,7 @@ Error SoundCardPMO::Reset(bool user_stop)
    {
       if (ioctl(audio_fd, SNDCTL_DSP_RESET, &a) == -1)
       {
+         ReportError("Cannot reset the soundcard.");
          return (Error)pmoError_IOCTL_SNDCTL_DSP_RESET;
       }
       Init(NULL);
@@ -279,6 +267,7 @@ Error SoundCardPMO::Reset(bool user_stop)
    {
       if (ioctl(audio_fd, SNDCTL_DSP_SYNC, &a) == -1)
       {
+         ReportError("Cannot reset the soundcard.");
          return (Error)pmoError_IOCTL_SNDCTL_DSP_RESET;
       }
    }
@@ -319,6 +308,9 @@ void SoundCardPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
                               m_iBytesPerSample; 
    }
    m_iLastFrame = pEvent->GetFrameNumber();
+
+   if (myInfo->samples_per_second <= 0)
+      return;
 
    ioctl(audio_fd, SNDCTL_DSP_GETOSPACE, &info);
 
@@ -387,6 +379,7 @@ void SoundCardPMO::WorkerThread(void)
           
       if (IsError(eErr))
       {
+          ReportError("Internal error occured.");
           g_Log->Error("Cannot read from buffer in PMO worker tread: %d\n",
               eErr);
           break;
@@ -417,6 +410,7 @@ void SoundCardPMO::WorkerThread(void)
       if (iCopied < iToCopy)
       {
          EndRead(0);
+         ReportError("Could not write sound data to the soundcard.");
          g_Log->Error("Failed to write to the soundcard: %s\n", strerror(errno))
 ;
          break;

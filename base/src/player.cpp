@@ -47,14 +47,6 @@ LogFile *g_Log = NULL;
                                SendToUI(ev); ReleaseUIManipLock(); delete ev; \
                              }
 
-#ifndef WIN32
-#define DISPLAY_ERROR(s,e) { if (e & 0xFFFF0000) { cout << s->GetErrorString(e)         \
-                             << endl;} else { cout << "Error Number " << e << endl; } }
-#else
-#define DISPLAY_ERROR(s,e) { if (e & 0xFFFF0000) { MessageBox(NULL,s->GetErrorString(e), \
-                             NULL,MB_OK);} else { char foo[1024];sprintf(foo,            \
-                             "ErrorNumber %d",e); MessageBox(NULL,foo,NULL,MB_OK); } }
-#endif
 
 Player   *Player::
 GetPlayer()
@@ -744,6 +736,7 @@ void Player::CreateLMC(PlayListItem * pc, Event * pC)
    {
       pmi = (PhysicalMediaInput *) pmi_item->InitFunction()(g_Log);
       pmi->SetPropManager((Properties *) this);
+      pmi->SetTarget((EventQueue *)this);
    }
 
    item = m_pmoRegistry->GetItem(0);
@@ -761,19 +754,16 @@ void Player::CreateLMC(PlayListItem * pc, Event * pC)
 
       if ((error = lmc->SetTarget((EventQueue *) this)) != kError_NoErr)
       {
-         DISPLAY_ERROR(lmc, error);
          goto epilogue;
       }
       if ((error = lmc->SetPMI(pmi)) != kError_NoErr)
       {
-         DISPLAY_ERROR(lmc, error);
          goto epilogue;
       }
       pmi = NULL;
 
       if ((error = lmc->SetPMO(pmo)) != kError_NoErr)
       {
-         DISPLAY_ERROR(lmc, error);
          goto epilogue;
       }
       pmo = NULL;
@@ -791,13 +781,11 @@ void Player::CreateLMC(PlayListItem * pc, Event * pC)
 
    if ((error = lmc->Pause()) != kError_NoErr)
    {
-      DISPLAY_ERROR(lmc, error);
       goto epilogue;
    }
 
    if ((error = lmc->Decode(m_plm->GetSkip())) != kError_NoErr)
    {
-      DISPLAY_ERROR(lmc, error);
       goto epilogue;
    }
 
@@ -806,7 +794,6 @@ void Player::CreateLMC(PlayListItem * pc, Event * pC)
    {
       if ((error = lmc->Pause()) != kError_NoErr)
       {
-         DISPLAY_ERROR(lmc, error);
          goto epilogue;
       }
       if (SetState(STATE_Paused))
@@ -1168,13 +1155,15 @@ void Player::SendVisBuf(Event *pEvent)
 
 void Player::LMCError(Event *pEvent)
 {      
+#ifndef WIN32
+   printf("Error: %s\n", ((LMCErrorEvent *) pEvent)->GetError()); 
+#else
+   MessageBox(NULL, ((LMCErrorEvent *) pEvent)->GetError() ,NULL,MB_OK); 
+#endif
    if (m_lmc)
-   {
-      cout << m_lmc->GetErrorString(((LMCErrorEvent *) pEvent)->GetError()) << endl;
-   }
-   Event  *e = new Event(CMD_Stop);
-   AcceptEvent(e);
-   delete pEvent;
+      Stop(pEvent);
+   else
+      delete pEvent;
 }
 
 int32 Player::ServiceEvent(Event * pC)

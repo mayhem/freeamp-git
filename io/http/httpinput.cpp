@@ -54,36 +54,19 @@ extern    "C"
       return new HttpInput();
    }
 }
-HttpInput::
-HttpInput():
-PhysicalMediaInput()
+HttpInput::HttpInput():
+           PhysicalMediaInput()
 {
    m_path = NULL;
    m_pPullBuffer = NULL;
 }
 
-HttpInput::
-HttpInput(char *path):
-PhysicalMediaInput()
+HttpInput::HttpInput(char *path):
+           PhysicalMediaInput()
 {
    if (path)
    {
-      int32     len = strlen(path) + 1;
-      m_path = new char[len];
-
-      if (m_path)
-      {
-         memcpy(m_path, path, len);
-      }
-
-      m_pPullBuffer = new HttpBuffer(iBufferSize, iOverflowSize, 
-                                      iTriggerSize, path);
-      assert(m_pPullBuffer);
-
-      // Hmmm. Error gets lost here. I don't want to mess with
-      // the current infrastructure at the moment, and it doesn't
-      // seem to be used...
-      m_pPullBuffer->Open();
+      assert(0);
    }
    else
    {
@@ -92,8 +75,7 @@ PhysicalMediaInput()
    }
 }
 
-HttpInput::
-~HttpInput()
+HttpInput::~HttpInput()
 {
    if (m_path)
    {
@@ -107,14 +89,12 @@ HttpInput::
    }
 }
 
-bool HttpInput::
-CanHandle(char *szUrl)
+bool HttpInput::CanHandle(char *szUrl)
 {
    return strncmp(szUrl, "http://", 7) == 0;
 }
 
-Error     HttpInput::
-SetTo(char *url)
+Error HttpInput::SetTo(char *url)
 {
    Error     result = kError_NoErr;
 
@@ -147,13 +127,12 @@ SetTo(char *url)
       if (IsntError(result))
       {
          m_pPullBuffer = new HttpBuffer(iBufferSize, iOverflowSize, 
-                                         iTriggerSize, url);
+                                         iTriggerSize, url, this);
          assert(m_pPullBuffer);
 
          result = m_pPullBuffer->Open();
          if (result == kError_NoErr)
              result = m_pPullBuffer->Run();
-
       }
    }
    else
@@ -238,13 +217,3 @@ Close(void)
 
    return kError_NoErr;
 }
-
-const char *HttpInput::
-GetErrorString(int32 error)
-{
-   if (m_pPullBuffer == NULL)
-      return NULL;
-
-   return m_pPullBuffer->GetErrorString(error);
-}
-

@@ -104,8 +104,6 @@ class     XingLMC:public LogicalMediaConverter
    virtual Error SetPMO(PhysicalMediaOutput *);
    virtual Error SetTarget(EventQueue *);
    virtual Error InitDecoder();
-   virtual const char *GetErrorString(int32);
-
 
    virtual Error SetEQData(float *);
    virtual Error SetEQData(bool);
@@ -125,7 +123,6 @@ class     XingLMC:public LogicalMediaConverter
    int32       m_frameWaitTill;
    Semaphore  *m_pauseSemaphore;
    AUDIO       m_audioMethods;
-   EventQueue *m_target;
    Mutex      *m_seekMutex;
    Queue <XingCommand *> *m_xcqueue;
    PhysicalMediaInput *m_input;

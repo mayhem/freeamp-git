@@ -26,7 +26,7 @@ ____________________________________________________________________________*/
 #define _LMC_H_
 
 #include "errors.h"
-#include "event.h"
+#include "eventdata.h"
 #include "pmo.h"
 #include "pmi.h"
 #include "properties.h"
@@ -57,7 +57,17 @@ class LogicalMediaConverter {
     virtual Error SetEQData(float *) = 0;
     virtual Error SetEQData(bool) = 0;
 
-    virtual const char *GetErrorString(int32 /*error*/) = 0;
+    virtual void  ReportError(const char *szError)
+                  {
+                     assert(m_target);
+
+                     m_target->AcceptEvent(new LMCErrorEvent(szError));
+                  };
+
+    protected:
+     
+      EventQueue *m_target;
 };
 
 #endif // _LMC_H_
+

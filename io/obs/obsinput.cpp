@@ -58,36 +58,19 @@ extern    "C"
       return new ObsInput();
    }
 }
-ObsInput::
-ObsInput():
-PhysicalMediaInput()
+ObsInput::ObsInput(): 
+          PhysicalMediaInput()
 {
    m_path = NULL;
    m_pPullBuffer = NULL;
 }
 
-ObsInput::
-ObsInput(char *path):
-PhysicalMediaInput()
+ObsInput::ObsInput(char *path):
+          PhysicalMediaInput()
 {
    if (path)
    {
-      int32     len = strlen(path) + 1;
-      m_path = new char[len];
-
-      if (m_path)
-      {
-         memcpy(m_path, path, len);
-      }
-
-      m_pPullBuffer = new ObsBuffer(iBufferSize, iOverflowSize, 
-                                      iTriggerSize, path);
-      assert(m_pPullBuffer);
-
-      // Hmmm. Error gets lost here. I don't want to mess with
-      // the current infrastructure at the moment, and it doesn't
-      // seem to be used...
-      m_pPullBuffer->Open();
+      assert(0);
    }
    else
    {
@@ -96,8 +79,7 @@ PhysicalMediaInput()
    }
 }
 
-ObsInput::
-~ObsInput()
+ObsInput::~ObsInput()
 {
    if (m_path)
    {
@@ -111,14 +93,12 @@ ObsInput::
    }
 }
 
-bool ObsInput::
-CanHandle(char *szUrl)
+bool ObsInput::CanHandle(char *szUrl)
 {
    return strncmp(szUrl, "rtp://", 6) == 0;
 }
 
-Error     ObsInput::
-SetTo(char *url)
+Error ObsInput::SetTo(char *url)
 {
    Error     result = kError_NoErr;
 
@@ -151,11 +131,11 @@ SetTo(char *url)
       if (IsntError(result))
       {
          m_pPullBuffer = new ObsBuffer(iBufferSize, iOverflowSize, 
-                                         iTriggerSize, url);
+                                       iTriggerSize, url, this);
          assert(m_pPullBuffer);
 
          result = m_pPullBuffer->Open();
-         if (result == kError_NoErr)
+         if (!IsError(result))
             result = m_pPullBuffer->Run();
       }
    }
@@ -234,13 +214,3 @@ Close(void)
 
    return kError_NoErr;
 }
-
-const char *ObsInput::
-GetErrorString(int32 error)
-{
-   if (m_pPullBuffer == NULL)
-      return NULL;
-
-   return m_pPullBuffer->GetErrorString(error);
-}
-

@@ -64,7 +64,6 @@ class SoundCardPMO:public PhysicalMediaOutput, public EventBuffer
    virtual Error Resume();
    virtual void  WaitToQuit();
    virtual Error Clear();
-   virtual const char *GetErrorString(int32);
    virtual Error SetPropManager(Properties * p);
 
    static void   StartWorkerThread(void *);

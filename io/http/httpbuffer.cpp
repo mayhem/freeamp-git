@@ -39,6 +39,7 @@ ____________________________________________________________________________*/
 #endif
 
 #include "httpbuffer.h"
+#include "httpinput.h"
 #include "log.h"
 
 extern LogFile *g_Log;
@@ -58,19 +59,9 @@ const int iTransmitTimeout = 60;
 #define min(a,b) ((a) < (b) ? (a) : (b))
 #endif
 
-static char *g_ErrorArray[9] =
-{
-   "Invalid URL. URL format: http://<host>[:port][/path]",
-   "Cannot find host.",
-   "Cannot open socket.",
-   "Cannot connect to host.",
-   "Failed to read data from socket.",
-   "Failed to write data to socket.",
-	"Bummer, dude! :-)"
-};
-
 HttpBuffer::HttpBuffer(size_t iBufferSize, size_t iOverFlowSize, 
-                       size_t iWriteTriggerSize, char *szFile) :
+                       size_t iWriteTriggerSize, char *szFile, 
+                       HttpInput *pHttp) :
           StreamBuffer(iBufferSize, iOverFlowSize, iWriteTriggerSize)
 {
     m_hHandle = -1;
@@ -78,6 +69,7 @@ HttpBuffer::HttpBuffer(size_t iBufferSize, size_t iOverFlowSize,
     m_pBufferThread = NULL;
     m_pID3Tag = NULL;
 	 m_szError = new char[iMaxErrorLen];
+    m_pHttp = pHttp;
 
     strcpy(m_szUrl, szFile);
 }
@@ -109,10 +101,12 @@ HttpBuffer::~HttpBuffer(void)
 void HttpBuffer::LogError(char *szErrorMsg)
 {
 #ifdef WIN32
-    g_Log->Error("%s: %d\n", szErrorMsg, WSAGetLastError());
+    sprintf(m_szError, "%s: %s", szErrorMsg, WSAGetLastError());
 #else
-    g_Log->Error("%s: %s\n", szErrorMsg, strerror(errno));
+    sprintf(m_szError, "%s: %s", szErrorMsg, strerror(errno));
 #endif
+    m_pHttp->ReportError(m_szError);
+    g_Log->Error("%s\n", m_szError);
 }
 
 // NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
@@ -182,6 +176,8 @@ Error HttpBuffer::Open(void)
     iRet = sscanf(m_szUrl, "http://%[^:/]:%d", szHostName, &iPort);
     if (iRet < 1)
     {
+        m_pHttp->ReportError("Bad URL format. URL format: http:<host name>"
+                             ":[port][/path]");
         g_Log->Error("Badly formatted URL: %s\n", m_szUrl);
         return (Error)httpError_BadUrl;
     }
@@ -196,6 +192,7 @@ Error HttpBuffer::Open(void)
     if (eRet != kError_NoErr)
     {
        sprintf(m_szError, "Cannot find host %s\n", szHostName);
+       m_pHttp->ReportError(m_szError);
        g_Log->Error("Cannot find host %s\n", szHostName);
        return (Error)httpError_CustomError;
     }
@@ -495,22 +492,4 @@ void HttpBuffer::WorkerThread(void)
    shutdown(m_hHandle, 2);
    close(m_hHandle);
    m_hHandle = -1;
-}
-
-const char *HttpBuffer::
-GetErrorString(int32 error)
-{
-   if ((error <= httpError_MinimumError) || (error >= httpError_MaximumError))
-   {
-      return g_ErrorArray[0];
-   }
-
-   // The following is not terribly wise. But without re-doing the
-	// entire error system, there isn't much I can do. 
-	if (error == httpError_CustomError)
-	{
-	   return m_szError;   
-   }
-
-   return g_ErrorArray[error - httpError_MinimumError];
 }
