@@ -369,6 +369,7 @@ class     MpegInfoEvent:public Event
    int32     m_stereo;
    int32     m_modeExt;
    int32     m_crc;
+   int32     m_wav;
              public:
              MpegInfoEvent()
    {
@@ -390,6 +391,7 @@ class     MpegInfoEvent:public Event
       m_emphasis = emph;
       m_stereo = stereo;
       m_modeExt = mode_ext;
+      m_wav = 0;
    }
    int32     GetTotalFrames()
    {
@@ -446,6 +448,14 @@ class     MpegInfoEvent:public Event
    int32     GetCRC()
    {
       return m_crc;
+   }
+   int32     GetWAV()
+   {
+      return m_wav;
+   }
+   void      SetWAV(int wav)
+   {
+      m_wav = wav;
    }
    virtual ~MpegInfoEvent()
    {

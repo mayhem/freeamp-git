@@ -639,7 +639,9 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
 
          text = new char[100];
          m_fSecondsPerFrame = info->GetSecondsPerFrame();
-         if (info->GetBitRate() == 1411200)
+         if (info->GetWAV())
+              sprintf(text, "WAV Audio");
+         else if (info->GetBitRate() == 1411200)
               sprintf(text, "CD Audio");
          else if (info->GetBitRate() == 0)
               sprintf(text, "VBR %ldkHz %s", 

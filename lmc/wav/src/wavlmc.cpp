@@ -322,6 +322,7 @@ Error WavLMC::ExtractMediaInfo()
        m_frameBytes,
        m_WaveFormat.nAvgBytesPerSec * 8, m_WaveFormat.nSamplesPerSec, 0,
       0, m_WaveFormat.nChannels, 0, 0, 0, 1, 0);
+   mie->SetWAV(1);
    if (mie)
    {
        pMIE->AddChildEvent((Event *) mie);
