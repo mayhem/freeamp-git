@@ -38,80 +38,40 @@ ____________________________________________________________________________*/
 #endif // HAVE_UNISTD_H
 
 /* project headers */
+#include "pipeline.h"
 #include "config.h"
 #include "errors.h"
 #include "eventdata.h"
-#include "properties.h"
 
 #define SEEK_FROM_START		SEEK_SET
 #define SEEK_FROM_CURRENT	SEEK_CUR
 #define SEEK_FROM_END		SEEK_END
 
-class PhysicalMediaInput {
-
+class PhysicalMediaInput : public PipelineUnit
+{
 public:
-            PhysicalMediaInput() { m_target = NULL; }
+            PhysicalMediaInput(FAContext *context) :
+                  PipelineUnit(context) { };
     virtual ~PhysicalMediaInput() { }
-    virtual Error BeginRead(void* & /*buf*/, size_t &/*bytesneeded*/) 
-	               { return kError_GotDefaultMethod; }
-    virtual Error EndRead(size_t /*bytesused*/) 
-	               { return kError_GotDefaultMethod; }
-    virtual Error Seek(int32 &/*seeked to*/,int32 offset, int32 origin) 
-	               {return kError_GotDefaultMethod;}
-    virtual Error GetLength(size_t &iSize)
-	               {return kError_GotDefaultMethod;}
+
+    virtual Error Prepare(PullBuffer *&pInputBuffer, 
+                          bool bStartThread = true) = 0;
+    virtual Error Seek(int32 & rtn, int32 offset, int32 origin)
+                  { return kError_FileSeekNotSupported; };
 	 virtual Error GetID3v1Tag(unsigned char *pTag)
 	               {return kError_GotDefaultMethod;}
-    
 	 virtual bool  CanHandle(char *szUrl, char *szTitle)
 	               {return false;}
-
+    virtual Error GetLength(size_t &iSize)
+                  { return kError_FileSeekNotSupported; };
 	 virtual bool  IsStreaming(void)
 	               {return false;}
-    virtual Error SetBufferSize(size_t iSize)
-	               {return kError_GotDefaultMethod;}
-    virtual int32 GetBufferPercentage()
-	               {return 0;};
-    virtual int32 GetNumBytesInBuffer()
-	               {return 0;};
-    virtual Error DiscardBytes()
-	               {return kError_NoErr;};
-	 virtual void  Pause()
-	               { };
-	 virtual bool  Resume()
-	               { return false; };
-	 virtual void  Break()
-	               { };
-	 virtual bool  CachePMI()
-	               { return false; };
 
-	 virtual Error SetPropManager(Properties *) = 0;
-		 
-    virtual Error SetTo(char* url, bool bStartThread = true) = 0;
-    virtual Error SetTarget(EventQueue *target)
-                  { m_target = target; return kError_NoErr; };
+    virtual Error SetTo(char* url) = 0;
     virtual Error Close(void) = 0;
     virtual const char* Url(void) const = 0;
 
-    virtual void  ReportError(const char *szError)
-                  {
-                     assert(m_target);
-
-                     m_target->AcceptEvent(new LMCErrorEvent(szError));
-                  };
-
     protected:
-     
-        EventQueue *m_target;
 };
 
 #endif /* _PMI_H_ */
-
-
-
-
-
-
-
-
-

@@ -42,6 +42,9 @@ ____________________________________________________________________________*/
 #include "volume.h"
 #include "facontext.h"
 #include "log.h"
+#include "pmo.h"
+
+#define DB printf("%s:%d\n", __FILE__, __LINE__);
 
 Player   *Player::m_thePlayer = NULL;
 
@@ -91,6 +94,7 @@ EventQueue()
    m_pmoRegistry = NULL;
    m_uiRegistry = NULL;
 
+   m_pmo = NULL;
    m_lmc = NULL;
    m_ui = NULL;
 
@@ -122,12 +126,12 @@ Player::
       m_eventServiceThread = NULL;
    }
 
-   if (m_lmc)
+   if (m_pmo)
    {
-      m_lmc->Stop();
-      delete    m_lmc;
+      m_pmo->Pause();
+      delete    m_pmo;
 
-      m_lmc = NULL;
+      m_pmo = NULL;
    }
 
    TYPICAL_DELETE(m_eventSem);
@@ -808,7 +812,7 @@ ChoosePMI(char *szUrl, char *szTitle)
 
 void 
 Player::
-CreateLMC(PlayListItem * pc, Event * pC)
+CreatePMO(PlayListItem * pc, Event * pC)
 {
    Error     error = kError_NoErr;
    Event    *e;
@@ -822,12 +826,12 @@ CreateLMC(PlayListItem * pc, Event * pC)
    if (!pc)
    {
       m_plm->SetFirst();
-      if (m_lmc)
+      if (m_pmo)
       {
-         m_lmc->Stop();
-         delete m_lmc;
+         m_pmo->Pause();
+         delete m_pmo;
 
-         m_lmc = NULL;
+         m_pmo = NULL;
       }
       if (SetState(PlayerState_Stopped))
       {
@@ -843,12 +847,12 @@ CreateLMC(PlayListItem * pc, Event * pC)
       delete e;
    }
 
-   if (m_lmc)
+   if (m_pmo)
    {
-      m_lmc->Stop();
-      delete    m_lmc;
+      m_pmo->Pause();
+      delete    m_pmo;
 
-      m_lmc = NULL;
+      m_pmo = NULL;
    }
 
    pmi_item = ChoosePMI(pc->URL());
@@ -861,6 +865,7 @@ CreateLMC(PlayListItem * pc, Event * pC)
 
    lmc_item = m_lmcRegistry->GetItem(0);
 
+DB
    if (pmi_item)
    {
       pmi = (PhysicalMediaInput *) pmi_item->InitFunction()(m_context);
@@ -888,6 +893,7 @@ CreateLMC(PlayListItem * pc, Event * pC)
    if(!item)
       item = m_pmoRegistry->GetItem(0);
 
+DB
    if (item)
    {
       pmo = (PhysicalMediaOutput *) item->InitFunction()(m_context);
@@ -900,45 +906,32 @@ CreateLMC(PlayListItem * pc, Event * pC)
    {
       lmc = (LogicalMediaConverter *) lmc_item->InitFunction()(m_context);
 
-      if ((error = lmc->SetTarget((EventQueue *) this)) != kError_NoErr)
-      {
-         goto epilogue;
-      }
-      if ((error = lmc->SetPMI(pmi)) != kError_NoErr)
-      {
-         goto epilogue;
-      }
-      pmi = NULL;
-
-      if ((error = lmc->SetPMO(pmo)) != kError_NoErr)
-      {
-         goto epilogue;
-      }
-      pmo = NULL;
-
-      error = lmc->SetTo(pc->URL());
-      if (IsError(error))
-      {
-         m_context->log->Error("Cannot initialize input lmc: %d\n", error);
-
-         goto epilogue;
-      }
-
       lmc->SetPropManager((Properties *) this);
+      lmc->SetTarget((EventQueue *) this);
    }
+DB
 
-   if ((error = lmc->Pause()) != kError_NoErr)
+   lmc->SetPMI(pmi);
+   lmc->SetPMO(pmo);
+
+   pmo->SetPMI(pmi);
+   pmo->SetLMC(lmc);
+
+   pmi = NULL;
+DB
+
+   error = pmo->SetTo(pc->URL());
+   if (IsError(error))
    {
+      m_context->log->Error("Cannot initialize pmo: %d\n", error);
       goto epilogue;
    }
 
-   if ((error = lmc->Decode(m_plm->GetSkip())) != kError_NoErr)
-   {
-      goto epilogue;
-   }
-
+   m_pmo = pmo;
+   pmo = NULL;
    m_lmc = lmc;
    lmc = NULL;
+DB
 
    epilogue:
 
@@ -952,6 +945,7 @@ CreateLMC(PlayListItem * pc, Event * pC)
 
    if (lmc)
        delete lmc;
+DB
 }
 
 void 
@@ -962,10 +956,10 @@ DoneOutputting(Event *pEvent)
    // outputting whatever.  Now, go on to next
    // piece in playlist
 
-   if (m_lmc)
+   if (m_pmo)
    {
-      delete m_lmc;
-      m_lmc = NULL;
+      delete m_pmo;
+      m_pmo = NULL;
    }
 
    if (SetState(PlayerState_Stopped))
@@ -1002,13 +996,13 @@ void
 Player::
 Stop(Event *pEvent)
 {
-    if (m_lmc)
+    if (m_pmo)
     {
-       m_lmc->Stop();
+       m_pmo->Pause();
 
-       delete    m_lmc;
+       delete    m_pmo;
  
-       m_lmc = NULL;
+       m_pmo = NULL;
     }
 
     if (SetState(PlayerState_Stopped))
@@ -1047,8 +1041,8 @@ void
 Player::
 ChangePosition(Event *pEvent)
 {
-    if (m_lmc)
-       m_lmc->ChangePosition(((ChangePositionEvent *) pEvent)->GetPosition());
+    if (m_pmo)
+       m_pmo->ChangePosition(((ChangePositionEvent *) pEvent)->GetPosition());
 
     delete pEvent;
 }
@@ -1063,7 +1057,7 @@ GetMediaInfo(Event *pEvent)
      {
          pItem = m_plm->GetCurrent();
          if (pItem)
-            CreateLMC(pItem, pEvent);
+            CreatePMO(pItem, pEvent);
      }
      delete pEvent;
 }
@@ -1092,7 +1086,7 @@ GetMediaTitle(Event *pEventArg)
          pPmi = (PhysicalMediaInput *)pRegItem->InitFunction()(m_context);
 
          pPmi->SetTarget((EventQueue *)this);
-         eRet = pPmi->SetTo(pItem->URL(), false);
+         eRet = pPmi->SetTo(pItem->URL());
          if (!IsError(eRet))
          {
             eRet = pPmi->GetID3v1Tag(szTagBuffer);
@@ -1131,8 +1125,8 @@ Play(Event *pEvent)
 
     if (m_playerState == PlayerState_Playing)
     {
-       delete m_lmc;
-       m_lmc = NULL;
+       delete m_pmo;
+       m_pmo = NULL;
 
        if (SetState(PlayerState_Stopped))
        {
@@ -1140,13 +1134,13 @@ Play(Event *pEvent)
        }
     }
 
-    if (!m_lmc)
+    if (!m_pmo)
     {
        pItem = m_plm->GetCurrent();
        if (pItem)
-          CreateLMC(pItem, pEvent);
+          CreatePMO(pItem, pEvent);
 
-       if (!m_lmc)
+       if (!m_pmo)
           return;
     }
 
@@ -1160,7 +1154,7 @@ Play(Event *pEvent)
     }
     else
     {
-        m_lmc->Resume();
+        m_pmo->Resume();
         if (SetState(PlayerState_Playing))
         {
            SEND_NORMAL_EVENT(INFO_Playing);
@@ -1218,9 +1212,9 @@ void
 Player::
 Pause(Event *pEvent)
 {
-   if (m_lmc)
+   if (m_pmo)
    {
-      m_lmc->Pause();
+      m_pmo->Pause();
       if (SetState(PlayerState_Paused))
          SEND_NORMAL_EVENT(INFO_Paused);
    }
@@ -1231,9 +1225,9 @@ void
 Player::
 UnPause(Event *pEvent)
 {
-   if (m_lmc)
+   if (m_pmo)
    {
-      m_lmc->Resume();
+      m_pmo->Resume();
       if (SetState(PlayerState_Playing))
          SEND_NORMAL_EVENT(INFO_Playing);
    }
@@ -1244,7 +1238,7 @@ void
 Player::
 TogglePause(Event *pEvent)
 {
-    if (m_lmc)
+    if (m_pmo)
     {
        if (m_playerState == PlayerState_Playing)
            Pause(NULL);
@@ -1385,7 +1379,7 @@ void
 Player::
 SetEQData(Event *pEvent)
 {
-   if (m_lmc)
+   if (m_pmo)
    {
        if (((SetEqualizerDataEvent *) pEvent)->IsEQData())
            m_lmc->SetEQData(((SetEqualizerDataEvent *) pEvent)->GetEQData());
@@ -1423,8 +1417,8 @@ LMCError(Event *pEvent)
 #else
    MessageBox(NULL, ((LMCErrorEvent *) pEvent)->GetError() ,NULL,MB_OK); 
 #endif
-   if (m_lmc)
-      Stop(pEvent);
+   if (m_pmo)
+      Pause(pEvent);
    else
       delete pEvent;
 }

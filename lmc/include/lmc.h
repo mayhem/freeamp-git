@@ -24,49 +24,41 @@ ____________________________________________________________________________*/
 #ifndef _LMC_H_
 #define _LMC_H_
 
+#include "pipeline.h"
 #include "errors.h"
 #include "eventdata.h"
-#include "pmo.h"
-#include "pmi.h"
-#include "properties.h"
 
 class MediaInfoEvent;
+class PullBuffer;
+class EventBuffer;
+class PhysicalMediaInput;
+class PhysicalMediaOutput;
 
-class LogicalMediaConverter {
+class LogicalMediaConverter : public PipelineUnit
+{
  public:
+            LogicalMediaConverter(FAContext *context) :
+                      PipelineUnit(context) { };
     virtual ~LogicalMediaConverter() {}
-    virtual Error Decode(int32 iSkipNumFrames = 0) = 0;
-    virtual Error Stop() = 0;
-    virtual Error Pause() = 0;
-    virtual Error Resume() = 0;
-    virtual Error Reset() = 0;
+
+    virtual Error Prepare(PullBuffer *pInput, PullBuffer *&pOutput) = 0;
     virtual Error ChangePosition(int32) = 0;
 
-    virtual bool CanDecode() = 0;
-    virtual bool IsStreaming() = 0;
-    virtual Error ExtractMediaInfo() = 0;
-
-    virtual Error SetTo(char *url) = 0;
-    virtual Error SetPMI(PhysicalMediaInput *) = 0;
-    virtual Error SetPMO(PhysicalMediaOutput *) = 0;
-    virtual Error SetPropManager(Properties *) = 0;
-    virtual Error SetTarget(EventQueue *) = 0;
     virtual Error InitDecoder() = 0;
+
+    virtual void  SetPMI(PhysicalMediaInput *pmi) { m_pmi = pmi; };
+    virtual void  SetPMO(PhysicalMediaOutput *pmo) { m_pmo = pmo; };
 
     virtual Error SetEQData(float *) = 0;
     virtual Error SetEQData(bool) = 0;
 
-    virtual void  ReportError(const char *szError)
-                  {
-                     assert(m_target);
-
-                     m_target->AcceptEvent(new LMCErrorEvent(szError));
-                  };
-
     protected:
+
+      virtual bool  CanDecode() = 0;
+      virtual Error ExtractMediaInfo() = 0;
      
-      EventQueue *m_target;
+      PhysicalMediaInput    *m_pmi;
+      PhysicalMediaOutput   *m_pmo;
 };
 
 #endif // _LMC_H_
-

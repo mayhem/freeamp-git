@@ -57,7 +57,7 @@ class PlayListItem {
         m_DisplayString = NULL;
     }
 
-    ~PlayListItem() 
+    virtual ~PlayListItem() 
     {
 	    if (m_mie) 
         {
@@ -264,7 +264,7 @@ public:
 class PlayListManager {
  public:
     PlayListManager(EventQueue *);
-    ~PlayListManager();
+    virtual ~PlayListManager();
     // logical media units to skip at beginning
     // helps us get past id3v2 tags
     void SetSkip(int32 f) { m_skipNum = f; } 

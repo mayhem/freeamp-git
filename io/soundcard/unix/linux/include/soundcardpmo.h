@@ -55,7 +55,7 @@ enum
 
 class FAContext;
 
-class SoundCardPMO:public PhysicalMediaOutput, public EventBuffer
+class SoundCardPMO:public PhysicalMediaOutput
 {
  public:
 
@@ -63,26 +63,15 @@ class SoundCardPMO:public PhysicalMediaOutput, public EventBuffer
    virtual ~SoundCardPMO();
 
    virtual Error Init(OutputInfo * info);
-   virtual Error Pause();
-   virtual Error Resume();
-   virtual Error Break();
-   virtual void  WaitToQuit();
-   virtual Error Clear();
-   virtual Error SetPropManager(Properties * p);
    virtual VolumeManager *GetVolumeManager();
 
    static void   StartWorkerThread(void *);
-   virtual Error BeginWrite(void *&pBuffer, size_t &iBytesToWrite);
-   virtual Error EndWrite  (size_t iNumBytesWritten);
-   virtual Error AcceptEvent(Event *);
-   virtual int   GetBufferPercentage();
 
  private:
    void          WorkerThread(void); 
    virtual Error Reset(bool user_stop);
    void          HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent);
 
-   Properties  *m_propManager;
    bool         m_properlyInitialized;
    int16        buffer[OBUFFERSIZE];
    int16       *bufferp[MAXCHANNELS];
@@ -91,9 +80,9 @@ class SoundCardPMO:public PhysicalMediaOutput, public EventBuffer
    OutputInfo  *myInfo;
    int32        getprocessed(void);
    Thread      *m_pBufferThread;
-   Mutex       *m_pPauseMutex;
    int          m_iOutputBufferSize, m_iTotalBytesWritten, m_iBytesPerSample;
-   int          m_iLastFrame, m_iDataSize;
+   int          m_iLastFrame;
+   unsigned     m_iDataSize;
 };
 
 #endif /* _SOUNDCARDPMO_H_ */

@@ -41,6 +41,7 @@ ____________________________________________________________________________*/
 #include "errors.h"
 #include "xinglmc.h"
 #include "pmoevent.h"
+#include "eventbuffer.h"
 #include "event.h"
 #include "eventdata.h"
 #include "mutex.h"
@@ -51,6 +52,8 @@ ____________________________________________________________________________*/
 #include "log.h"
 
 #define DB printf("%08x: %s:%d\n", pthread_self(), __FILE__, __LINE__);
+const int iInitialOutputBufferSize = 65535;
+const int iInitialWriteTriggerSize = 8192;
 
 extern    "C"
 {
@@ -81,23 +84,6 @@ static AUDIO audio_table[2][2] =
    }
 };
 
-/* Error codes:
-
-   LMC        1000
-   HTTP   pmi 2000
-   OBS    omi 3000
-   Souund pmo 4000
-*/
-static char *g_ErrorArray[9] =
-{
-   "Unknown error code",
-   "The decoder cannot decode this MP3.",
-   "The decoder could not be initialized.",
-   "The LMC could not create the decoder thread.",
-   "A PMI error occurred."
-   "A PMO error occurred."
-};
-
 static int sample_rate_table[8] =
 {
     22050L, 24000L, 16000L, 1L, 44100L, 48000L, 32000L, 1L
@@ -112,19 +98,15 @@ const int iMaxFrameSize = 1046;
 const char *szFailRead = "Cannot read MP3 data from input plugin.";
 const char *szFailWrite = "Cannot write audio data to output buffer.";
 
-#define ENSURE_INITIALIZED if (!m_properlyInitialized) return kError_PluginNotInitialized;
-
-XingLMC::XingLMC(FAContext *context)
+XingLMC::XingLMC(FAContext *context) :
+         LogicalMediaConverter(context)
 {
-   m_context = context;
+   printf("lmc ctor\n");
+   m_pContext = context;
 
    m_input = NULL;
    m_output = NULL;
-   m_properlyInitialized = false;
-   m_target = NULL;
    m_decoderThread = NULL;
-   m_seekMutex = new Mutex();
-   m_pauseSemaphore = new Semaphore();
    m_bBufferingUp = false;
    m_iBufferUpdate = 0;
    m_iBitRate = 0;
@@ -132,163 +114,47 @@ XingLMC::XingLMC(FAContext *context)
    m_szUrl = NULL;
    m_szError = NULL;
    m_iMaxWriteSize = 0;
-   m_bExit = false;
    m_iBufferUpInterval = iDefaultBufferUpInterval;
    m_frameCounter = 0;
-   m_frameWaitTill = 0;
    m_iBufferSize = iStreamingBufferSize * 1024;
-   actually_decode = 0;
 }
 
 XingLMC::~XingLMC()
 {
-   //Debug_v("lmc dtor");
-   Stop();
-   //Debug_v("lmc stop done");
-   if (m_output)
-   {
-      delete    m_output;
-
-      m_output = NULL;
-   }
-   if (m_input)
-   {
-      delete    m_input;
-
-      m_input = NULL;
-   }
-   if (m_pauseSemaphore)
-   {
-      delete    m_pauseSemaphore;
-
-      m_pauseSemaphore = NULL;
-   }
-   if (m_seekMutex)
-   {
-      delete    m_seekMutex;
-
-      m_seekMutex = NULL;
-   }
-   if (m_szUrl)
-   {
-      free(m_szUrl);
-      m_szUrl = NULL;
-   }
-   //Debug_v("lmc dtor done");
-}
-
-Error     XingLMC::
-Stop()
-{
+   printf("lmc dtor\n");
    if (m_decoderThread)
    {
       m_bExit = true;
-      m_pauseSemaphore->Signal();
+      m_pPauseSem->Signal();
+      m_pSleepSem->Signal();
 
-	  //printf("output break\n");
-      m_output->Break();
-	  //printf("output pause\n");
-      m_output->Pause();
-	  //printf("input break\n");
-      m_input->Break();
-
-	  //printf("decode join\n");
-      m_decoderThread->Join();  // wait for thread to exit
-	  //printf("decode joined\n");
-      m_context->log->Log(LogDecode, "LMC: Decoder thread exited.\n");
-
-	  //printf("delete input\n");
-      delete m_input;
-      m_input = NULL;
-
-	  //printf("delete output\n");
-      delete m_output;
-      m_output = NULL;
-
-	  //printf("delete thread\n");
-      delete    m_decoderThread;
-	  //printf("stop done\n");
+      m_decoderThread->Join();
+      m_pContext->log->Log(LogDecode, "LMC: Decoder thread exited.\n");
 
       m_decoderThread = NULL;
    }
+}
+
+Error XingLMC::Prepare(PullBuffer *pInputBuffer, PullBuffer *&pOutBuffer)
+{
+   m_pInputBuffer = pInputBuffer;
+
+   m_pOutputBuffer = new EventBuffer(iInitialOutputBufferSize, 0, 
+                                    iInitialWriteTriggerSize, m_pContext);
+
+   if (!m_decoderThread)
+   {
+      m_decoderThread = Thread::CreateThread();
+      if (!m_decoderThread)
+      {
+         return (Error) lmcError_DecoderThreadFailed;
+      }
+      m_decoderThread->Create(XingLMC::DecodeWorkerThreadFunc, this);
+   }
+
+   pOutBuffer =  m_pOutputBuffer;
 
    return kError_NoErr;
-}
-
-Error XingLMC::Pause()
-{
-   m_output->Pause();
-   m_input->Pause();
-
-   return kError_NoErr;
-}
-
-Error XingLMC::Resume()
-{
-   if (m_input->Resume())
-      m_output->Clear();
-
-   m_output->Resume();
-
-   return kError_NoErr;
-}
-
-Error XingLMC::Reset()
-{
-   ENSURE_INITIALIZED;
-   return kError_NoErr;
-}
-
-
-Error XingLMC::SetTarget(EventQueue * eq)
-{
-   if (m_target = eq)
-   {
-      return kError_NoErr;
-   }
-   else
-   {
-      return kError_NullValueInvalid;
-   }
-}
-
-Error XingLMC::SetTo(char *szUrl)
-{
-   m_szUrl = strdup(szUrl);
-
-   return kError_NoErr;
-}
-
-Error XingLMC::SetPMI(PhysicalMediaInput * i)
-{
-   if (m_input = i)
-   {
-      return kError_NoErr;
-   }
-   else
-   {
-      return kError_NullValueInvalid;
-   }
-}
-
-Error XingLMC::SetPMO(PhysicalMediaOutput * o)
-{
-   if (m_output = o)
-   {
-      return kError_NoErr;
-   }
-   else
-   {
-      return kError_NullValueInvalid;
-   }
-}
-
-bool XingLMC::IsStreaming()
-{
-   if (!m_input)
-	   return false;
-
-   return m_input->IsStreaming();
 }
 
 Error XingLMC::AdvanceBufferToNextFrame()
@@ -317,9 +183,9 @@ Error XingLMC::AdvanceBufferToNextFrame()
            pBuffer++, iCount++)
                ; // <=== Empty body!
  
-       m_context->log->Log(LogDecode, "Skipped %d bytes in advance frame.\n", iCount + 1);
-       if (m_input)
-           m_input->EndRead(iCount + 1);
+       m_pContext->log->Log(LogDecode, "Skipped %d bytes in advance frame.\n", 
+                           iCount + 1);
+       m_pInputBuffer->EndRead(iCount + 1);
 
        if (iCount != 0 && iCount < iNumBytes - 1)
        {
@@ -364,16 +230,14 @@ Error XingLMC::GetHeadInfo()
                                     m_frameBytes + iForward + m_sMpegHead.pad,
                                     iNumBytes - (m_frameBytes + iForward), 
                                     &sHead, &iBitRate, &iForward);
-              if (m_input)
-                 m_input->EndRead(0);
+              m_pInputBuffer->EndRead(0);
 
               if (iFrameBytes > 0 && iFrameBytes < 1050 &&
                   m_sMpegHead.option == 1)
                  return kError_NoErr;
            }
            else
-              if (m_input)
-                  m_input->EndRead(0);
+              m_pInputBuffer->EndRead(0);
 
            AdvanceBufferToNextFrame();
        }
@@ -391,19 +255,12 @@ bool XingLMC::CanDecode()
 {
    Error      Err;
    int32      dummy;
-   bool       bRet = false;
 
-   if (!m_input)
+   if (!m_pInputBuffer)
    {
-      m_context->log->Error("CanDecode() called, with no PMI set.\n");
+      m_pContext->log->Error("CanDecode() called, with no PMI set.\n");
       return false;
    }
-
-   if (IsError(m_context->prefs->GetInputBufferSize(&m_iBufferSize)))
-       m_iBufferSize = iStreamingBufferSize;
-
-   m_iBufferSize *= 1024;
-   m_input->SetBufferSize(m_iBufferSize);
 
    if (!m_input->IsStreaming())
        m_input->Seek(dummy, 0, SEEK_FROM_START);
@@ -411,11 +268,11 @@ bool XingLMC::CanDecode()
    Err = GetHeadInfo();
    if (Err != kError_NoErr)
    {
-       m_context->log->Log(LogDecode, "GetHeadInfo() in CanDecode() could not find the sync marker.\n");
+       m_pContext->log->Log(LogDecode, "GetHeadInfo() in CanDecode() could not find the sync marker.\n");
        return false;
    }
 
-   if (IsError(m_context->prefs->
+   if (IsError(m_pContext->prefs->
 	       GetStreamBufferInterval(&m_iBufferUpInterval)))
       m_iBufferUpInterval = iDefaultBufferUpInterval;
 
@@ -527,8 +384,8 @@ Error XingLMC::ExtractMediaInfo()
        return kError_OutOfMemory;
    }
 
-   if (m_target)
-      m_target->AcceptEvent(pMIE);
+   if (m_pTarget)
+      m_pTarget->AcceptEvent(pMIE);
 
    return kError_NoErr;
 }
@@ -537,11 +394,10 @@ Error XingLMC::InitDecoder()
 {
    Error          Err;
 
-   if (!m_target || !m_input || !m_output)
+   if (!m_pTarget || !m_input || !m_output || !m_pInputBuffer || m_pOutputBuffer)
    {
       return kError_NullValueInvalid;
    }
-   m_properlyInitialized = false;
 
    if (m_frameBytes < 0)
    {
@@ -585,34 +441,17 @@ Error XingLMC::InitDecoder()
 
          info->max_buffer_size = m_iMaxWriteSize;
 
-         m_output->AcceptEvent(new PMOInitEvent(info));
+         ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(new PMOInitEvent(info));
    }
    else
    {
-      m_context->log->Log(LogDecode, "Audio decode init failed.\n");
+      m_pContext->log->Log(LogDecode, "Audio decode init failed.\n");
       return (Error) lmcError_AudioDecodeInitFailed;
    }
 
-   m_properlyInitialized = true;
    return (Error) kError_NoErr;
 }
 
-Error XingLMC::Decode(int32 iSkipNumFrames)
-{   
-   m_frameWaitTill = iSkipNumFrames;
-
-   if (!m_decoderThread)
-   {
-      m_decoderThread = Thread::CreateThread();
-      if (!m_decoderThread)
-      {
-         return (Error) lmcError_DecoderThreadFailed;
-      }
-      m_decoderThread->Create(XingLMC::DecodeWorkerThreadFunc, this);
-   }
-
-   return kError_NoErr;
-}
 
 #if MP3_PROF
 extern "C"
@@ -643,7 +482,7 @@ void XingLMC::DecodeWorkerThreadFunc(void *pxlmc)
 
 void XingLMC::DecodeWork()
 {
-   bool           result = true, bRet;
+   bool           bRet;
    int32          in_bytes, out_bytes;
    size_t         iBytesNeeded;
    size_t         iOutBytesNeeded;
@@ -652,27 +491,14 @@ void XingLMC::DecodeWork()
    int            iLoop = 0, iValue;
    IN_OUT         x = {0, 0};
 
+   m_pSleepSem->Wait();
+
    in_bytes = out_bytes = 0;
-
-   if (!m_input || !m_target || !m_output)
-      return;
-
-   Err = m_input->SetTo(m_szUrl);
-   if (Err == kError_Interrupt)
-      return;
-
-   if (IsError(Err))
-   {
-       m_context->log->Error("PMI initialization failed: %s\n", m_szError);
-       ReportError("Cannot initialize the input plugin.\n");
-
-       return;
-   }
 
    bRet = CanDecode();
    if (!bRet)
    {
-       m_context->log->Error("CanDecode returned false.\n");
+       m_pContext->log->Error("CanDecode returned false.\n");
        ReportError("This LMC cannot decode this media\n");
        return;
    }
@@ -683,7 +509,7 @@ void XingLMC::DecodeWork()
 
    if (IsError(Err))
    {
-       m_context->log->Error("ExtractMediaInfo failed: %d\n", Err);
+       m_pContext->log->Error("ExtractMediaInfo failed: %d\n", Err);
        ReportError("This LMC cannot decode this media\n");
 
        return;
@@ -695,57 +521,69 @@ void XingLMC::DecodeWork()
 
    if (IsError(Err))
    {
-       m_context->log->Error("Initializing the decoder failed: %d\n", Err);
+       m_pContext->log->Error("Initializing the decoder failed: %d\n", Err);
        ReportError("Initializing the decoder failed.");
 
        return;
    }
 
-
-   m_context->prefs->GetDecoderThreadPriority(&iValue);
-
+   m_pContext->prefs->GetDecoderThreadPriority(&iValue);
    m_decoderThread->SetPriority(iValue);
-
 
    for (m_frameCounter = 0; !m_bExit;)
    {
-      if (m_frameCounter >= m_frameWaitTill)
+      if (m_bPause)
       {
-         actually_decode = 1;
+          m_pPauseSem->Wait();
+          if (m_bExit)
+              break;
       }
 
-      m_seekMutex->Acquire(WAIT_FOREVER);
-
-
-      m_output->AcceptEvent(new PMOTimeInfoEvent(m_frameCounter));
+      ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(
+             new PMOTimeInfoEvent(m_frameCounter));
 
       for(iLoop = 0; !m_bExit && iLoop < iMaxDecodeRetries; iLoop++)
 		{
           x.in_bytes = 0;
           iOutBytesNeeded = m_iMaxWriteSize;
-          Err = m_output->BeginWrite(pOutBuffer, iOutBytesNeeded);
+          Err = m_pOutputBuffer->BeginWrite(pOutBuffer, iOutBytesNeeded);
           if (Err == kError_Interrupt)
              break;
 
+          if (Err == kError_BufferTooSmall)
+          {
+              m_pOutputBuffer->EndWrite(0);
+              if (Sleep())
+                  break;
+
+              continue;
+          }
           if (Err != kError_NoErr)
           {
-              m_seekMutex->Release();
               ReportError(szFailWrite);
-              m_context->log->Error("LMC: Cannot write to eventbuffer: %s (%d)\n", 
+              m_pContext->log->Error("LMC: Cannot write to eventbuffer: %s (%d)\n", 
                         m_szError, Err); 
               return;
           }
 
           iBytesNeeded = iMaxFrameSize;
-          Err = BeginRead(pBuffer, iBytesNeeded);
+          Err = m_pInputBuffer->BeginRead(pBuffer, iBytesNeeded);
           if (Err == kError_Interrupt || Err == kError_InputUnsuccessful)
              break;
 
+          if (Err == kError_NoDataAvail)
+          {
+              m_pInputBuffer->EndRead(0);
+              if (Sleep())
+                  break;
+
+              continue;
+          }
+
           if (Err != kError_NoErr)
           {
-              m_seekMutex->Release();
               ReportError(szFailRead);
-              m_context->log->Error("LMC: Cannot read from pullbuffer: %s\n", m_szError); 
+              m_pContext->log->Error("LMC: Cannot read from pullbuffer: %s\n", m_szError); 
               return;
           }
 
@@ -753,24 +591,23 @@ void XingLMC::DecodeWork()
                                     (short *)pOutBuffer);
           if (x.in_bytes == 0)
 		    {
-             if (m_input)
-                 m_input->EndRead(x.in_bytes);
-             if (m_output)
+             if (m_pInputBuffer)
+                 m_pInputBuffer->EndRead(x.in_bytes);
+             if (m_pOutputBuffer)
              {
-                 Err = m_output->EndWrite(x.in_bytes);
+                 Err = m_pOutputBuffer->EndWrite(x.in_bytes);
                  if (Err == kError_Interrupt)
                     break;
 
                  if (IsError(Err))
                  {
-                     m_seekMutex->Release();
-                     m_context->log->Error("lmc: EndWrite returned %d\n", Err);
+                     m_pContext->log->Error("lmc: EndWrite returned %d\n", Err);
                      ReportError(szFailWrite);
                      
                      return;
                  }
              }
-             m_context->log->Log(LogDecode, "Audio decode failed. Resetting the decoder.\n");
+             m_pContext->log->Log(LogDecode, "Audio decode failed. Resetting the decoder.\n");
              m_audioMethods.decode_init(&m_sMpegHead, m_frameBytes,
 				                           0, 0, 0, 24000);
 
@@ -780,8 +617,7 @@ void XingLMC::DecodeWork()
 
              if (Err != kError_NoErr)
              {
-                 m_seekMutex->Release();
-                 m_context->log->Error("LMC: Cannot advance to next frame: %d\n", Err);
+                 m_pContext->log->Error("LMC: Cannot advance to next frame: %d\n", Err);
                  ReportError("Cannot advance to next frame. Possible media corruption?");
 
                  return;
@@ -792,9 +628,9 @@ void XingLMC::DecodeWork()
 			    break;
           }
       }
-      if (m_input)
-         m_input->EndRead(x.in_bytes);
-      if (m_output)
+      if (m_pInputBuffer)
+         m_pInputBuffer->EndRead(x.in_bytes);
+      if (m_pOutputBuffer)
       {
 #if __BYTE_ORDER != __LITTLE_ENDIAN
          x.out_bytes = cvt_to_wave(pOutBuffer, x.out_bytes);
@@ -802,22 +638,21 @@ void XingLMC::DecodeWork()
 
 #define _VISUAL_ENABLE_
 #ifdef  _VISUAL_ENABLE_
-         if (m_target)
-             m_target->AcceptEvent(new SendVisBufEvent(x.out_bytes,
+         if (m_pTarget)
+             m_pTarget->AcceptEvent(new SendVisBufEvent(x.out_bytes,
                            pOutBuffer,x.out_bytes));
 #endif  //_VISUAL_ENABLE_
 #undef  _VISUAL_ENABLE_
 
 
-		 //Debug_v("writing %d bytes", x.out_bytes);
-         Err = m_output->EndWrite(x.out_bytes);
+		  //Debug_v("writing %d bytes", x.out_bytes);
+         Err = m_pOutputBuffer->EndWrite(x.out_bytes);
          if (Err == kError_Interrupt || Err == kError_YouScrewedUp)
             break;
 
          if (IsError(Err))
          {
-             m_seekMutex->Release();
-             m_context->log->Error("lmc: EndWrite returned %d\n", Err);
+             m_pContext->log->Error("lmc: EndWrite returned %d\n", Err);
              ReportError(szFailWrite);
                      
              return;
@@ -826,8 +661,7 @@ void XingLMC::DecodeWork()
 
       if (iLoop == iMaxDecodeRetries)
       {
-         m_seekMutex->Release();
-         m_context->log->Error("LMC: Maximum number of retries reached"
+         m_pContext->log->Error("LMC: Maximum number of retries reached"
                       " while trying to decode.\n");
          ReportError("Cannot decode this MP3. Is the MP3 corrupted?");
 
@@ -841,16 +675,12 @@ void XingLMC::DecodeWork()
       m_frameCounter++;
 
       in_bytes += x.in_bytes;
-      m_seekMutex->Release();
    }
    if (m_bExit)
 	  return;
 
 
-   m_output->AcceptEvent(new PMOQuitEvent());
-   m_output->WaitToQuit();
-
-   m_target->AcceptEvent(new Event(INFO_DoneOutputting));
+   ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(new PMOQuitEvent());
 
    return;
 }
@@ -860,14 +690,13 @@ Error XingLMC::BeginRead(void *&pBuffer, unsigned int iBytesNeeded,
                          bool bBufferUp)
 {
    time_t iNow;
-   bool   bBuffering = false;
    int32  iInPercent, iOutPercent;
 
-   if (m_input && (!m_input->IsStreaming() || m_iBitRate <= 0))
-	    return m_input->BeginRead(pBuffer, iBytesNeeded);
+   if (m_input && m_pInputBuffer && (!m_input->IsStreaming() || m_iBitRate <= 0))
+	    return m_pInputBuffer->BeginRead(pBuffer, iBytesNeeded);
 
-   iInPercent = m_input->GetBufferPercentage();
-   iOutPercent = m_output->GetBufferPercentage();
+   iInPercent = m_pInputBuffer->GetBufferPercentage();
+   iOutPercent = m_pOutputBuffer->GetBufferPercentage();
 
    time(&iNow);
   	if (iNow != m_iBufferUpdate)
@@ -883,19 +712,19 @@ Error XingLMC::BeginRead(void *&pBuffer, unsigned int iBytesNeeded,
    // a host that is sending data too quicky. Clock-drift-a-moo!
    if (iOutPercent > 90 && iInPercent > 90)
    {
-       m_input->DiscardBytes();
+       m_pInputBuffer->DiscardBytes();
    }
 
    if (bBufferUp && iInPercent < 5 && iOutPercent < 5)
    {
-       int iBufferUpBytes;
+       unsigned iBufferUpBytes;
 
        assert(m_iBufferSize > 0);
        assert(m_iBufferUpInterval > 0);
        assert(m_iBitRate > 0);
 
        iBufferUpBytes = (m_iBitRate * m_iBufferUpInterval * 1000) / 8192;
-       if (iBufferUpBytes > m_iBufferSize)
+       if (iBufferUpBytes > (unsigned)m_iBufferSize)
           iBufferUpBytes = (m_iBufferSize * 10) / 8;
        //printf("iBufferUpBytes: %d Interval: %d bitrate: %d\n",
        //   iBufferUpBytes, m_iBufferUpInterval, m_iBitRate);
@@ -904,37 +733,35 @@ Error XingLMC::BeginRead(void *&pBuffer, unsigned int iBytesNeeded,
        for(; !m_bExit;)
        {
            sleep(1);
-           iInPercent = m_input->GetBufferPercentage();
-           iOutPercent = m_output->GetBufferPercentage();
+           iInPercent = m_pInputBuffer->GetBufferPercentage();
+           iOutPercent = m_pOutputBuffer->GetBufferPercentage();
   	        printf("Input: %3d%% Output: %3d%%\r", iInPercent, iOutPercent);
            fflush(stdout);
            
-           //printf("In: %d Needed: %d               \n", 
-           //   m_input->GetNumBytesInBuffer(), iBufferUpBytes);
-           if (m_input->GetNumBytesInBuffer() >= iBufferUpBytes)
+           if (m_pInputBuffer->GetNumBytesInBuffer() >= iBufferUpBytes)
               break;
-           if (m_input->GetBufferPercentage() > 90)
+           if (m_pInputBuffer->GetBufferPercentage() > 90)
            {
                printf("iBufferUpBytes: %d Interval: %d bitrate: %d\n",
                      iBufferUpBytes, m_iBufferUpInterval, m_iBitRate);
                printf("iBufferPercentage: %d\n",
-                      m_input->GetBufferPercentage());
+                      m_pInputBuffer->GetBufferPercentage());
                break;
            }
        }
        printf("Done buffering up.              \n");
    }
 
-	return m_input->BeginRead(pBuffer, iBytesNeeded);
+	return m_pInputBuffer->BeginRead(pBuffer, iBytesNeeded);
 }
 		
-	//if (m_target)
-	//    m_target->AcceptEvent(new StreamBufferEvent(bBuffering, 
+	//if (m_pTarget)
+	//    m_pTarget->AcceptEvent(new StreamBufferEvent(bBuffering, 
    //    iPercent));
-	//if (m_target)
-	//    m_target->AcceptEvent(new StreamBufferEvent(true, iPercent));
-	//if (m_target)
-	//    m_target->AcceptEvent(new StreamBufferEvent(false, iPercent));
+	//if (m_pTarget)
+	//    m_pTarget->AcceptEvent(new StreamBufferEvent(true, iPercent));
+	//if (m_pTarget)
+	//    m_pTarget->AcceptEvent(new StreamBufferEvent(false, iPercent));
 
 #define _EQUALIZER_ENABLE_
 #ifdef  _EQUALIZER_ENABLE_
@@ -950,7 +777,6 @@ int enableEQ = false;
 	   }
 
 Error XingLMC::SetEQData(float *arrayEQ) {
-    ENSURE_INITIALIZED;
     Error error = kError_NoErr;
         for(int i=0; i<32; i++)
                 equalizer[i] = arrayEQ[i];
@@ -958,7 +784,6 @@ Error XingLMC::SetEQData(float *arrayEQ) {
 }
 
 Error XingLMC::SetEQData(bool enable) {
-    ENSURE_INITIALIZED;
     Error error = kError_NoErr;
         enableEQ = enable;
         return error;
@@ -966,32 +791,12 @@ Error XingLMC::SetEQData(bool enable) {
 #endif  //_EQUALIZER_ENABLE_
 #undef  _EQUALIZER_ENABLE_
 
-
-
-Error     XingLMC::
-ChangePosition(int32 position)
+Error XingLMC::ChangePosition(int32 position)
 {
-   ENSURE_INITIALIZED;
-   Error     error = kError_NoErr;
-
-
-   if (IsStreaming())
-      return kError_FileSeekNotSupported;
-
-   m_seekMutex->Acquire(WAIT_FOREVER);
-
-   int32     dummy;
-
-   m_output->Pause();
-
-   m_output->Clear();
-
-   m_input->Seek(dummy, position * m_frameBytes, SEEK_FROM_START);
    m_frameCounter = position;
 
-   m_output->Resume();
+   int32 dummy;
+   m_input->Seek(dummy, position * m_frameBytes, SEEK_FROM_START);
 
-   m_seekMutex->Release();
-
-   return error;
+   return kError_NoErr;
 }

@@ -28,13 +28,15 @@ ____________________________________________________________________________*/
 #include <stdlib.h>
 
 /* project headers */
+#include "thread.h"
 #include "config.h"
 #include "pmi.h"
-#include "filebuffer.h"
 
+const int32 iMaxFileNameLen = 255;
+const int32 iID3TagSize = 128;
 class FAContext;
 
-class     LocalFileInput:public PhysicalMediaInput
+class LocalFileInput:public PhysicalMediaInput
 {
    public:
 
@@ -42,48 +44,40 @@ class     LocalFileInput:public PhysicalMediaInput
    LocalFileInput(char *path);
    virtual ~ LocalFileInput(void);
 
-   virtual Error BeginRead(void *&buf, size_t &bytesneeded);
-   virtual Error EndRead(size_t bytesused);
-
+   virtual Error Run(void);
    virtual Error Seek(int32 & rtn, int32 offset, int32 origin);
-   virtual Error GetLength(size_t &iSize); // filesize - ID3tag if any
+   virtual Error GetLength(size_t &iSize); 
    virtual Error GetID3v1Tag(unsigned char *pTag);
 
 	virtual bool  CanHandle(char *szUrl, char *szTitle);
 	virtual bool  IsStreaming(void)
 	              { return false; };
-   virtual Error SetBufferSize(size_t iNewSize)
-                 { return kError_NoErr; };
 
-   virtual Error SetTo(char *url, bool bStartThread = true);
+   virtual Error Prepare(PullBuffer *&pBuffer, bool bStartThread = true);
+
+   virtual Error SetTo(char *url);
    virtual Error Close(void);
+   virtual void  Clear(void);
    virtual const char *Url(void) const
    {
       return m_path;
    }
    
-   virtual Error SetPropManager(Properties *p) 
-	{ 
-	   m_propManager = p; 
-		if (p) 
-		   return kError_NoErr; 
-		else 
-		   return kError_UnknownErr; 
-	};
 
- protected:
-   FAContext  *m_context;
+   void           WorkerThread(void);
 
  private:
-   Properties *m_propManager;
-   FileBuffer *m_pPullBuffer;
-   char       *m_path;
+
+   static   void  StartWorkerThread(void *);
+   virtual  Error Open(void);
+
+   char           *m_path;
+   FILE           *m_fpFile;
+   Thread         *m_pBufferThread;
+   bool            m_bLoop;
+   size_t          m_iFileSize;
+   unsigned char  *m_pID3Tag;
+
 };
 
 #endif /* _LOCALFILEINPUT_H_ */
-
-
-
-
-
-

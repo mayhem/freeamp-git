@@ -59,7 +59,7 @@ class Player : public EventQueue, Properties, PropertyWatcher
 
  public:
    static Player *GetPlayer(FAContext *context);
-            ~Player();
+   virtual  ~Player();
 
    int32     RegisterActiveUI(UserInterface * ui);
    int32     RegisterLMCs(LMCRegistry * registry);
@@ -99,7 +99,7 @@ class Player : public EventQueue, Properties, PropertyWatcher
    PlayerState  State() const { return m_playerState; }
 
    int32     ServiceEvent(Event *);
-   void      CreateLMC(PlayListItem * pc, Event * pC);
+   void      CreatePMO(PlayListItem * pc, Event * pC);
    void      GetVolumeManager();
 
    FAContext *m_context;
@@ -164,6 +164,7 @@ class Player : public EventQueue, Properties, PropertyWatcher
    PlayListManager *m_plm;
    VolumeManager   *m_pVolumeManager;
 
+   PhysicalMediaOutput *m_pmo;
    LogicalMediaConverter *m_lmc;
    UserInterface *m_ui;
 

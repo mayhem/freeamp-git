@@ -45,8 +45,8 @@ EventBuffer::~EventBuffer(void)
 
 Error EventBuffer::BeginRead(void *&pBuffer, size_t &iBytesWanted)
 {
-   BufferEvent *pEvent;
-   int          iReadIndex, iMaxBytes;
+   BufferEvent   *pEvent;
+   int   iReadIndex, iMaxBytes;
 
    pEvent = m_pQueue->Peek();
    iReadIndex = GetReadIndex();
@@ -58,7 +58,7 @@ Error EventBuffer::BeginRead(void *&pBuffer, size_t &iBytesWanted)
 
    if (!pEvent)
    {
-       return PullBuffer::BeginRead(pBuffer, iBytesWanted, false);
+       return PullBuffer::BeginRead(pBuffer, iBytesWanted);
    }
 
    if (pEvent->iIndex > iReadIndex)
@@ -72,34 +72,6 @@ Error EventBuffer::BeginRead(void *&pBuffer, size_t &iBytesWanted)
    return PullBuffer::BeginRead(pBuffer, iBytesWanted);
 }
 
-Error EventBuffer::BeginWrite(void *&pBuffer, size_t &iBytesWanted)
-{
-   Error  eRet;
-   size_t iBytesAvail;
-
-   for(;!m_bExit;)
-   {
-       eRet = PullBuffer::BeginWrite(pBuffer, iBytesAvail);
-       if (eRet == kError_BufferTooSmall)
-       {
-           m_pWriteSem->Wait();
-
-           continue;
-       }
-
-       if (iBytesAvail < iBytesWanted)
-       {
-           PullBuffer::EndWrite(0);
-           m_pWriteSem->Wait();
-           continue;
-       }
-
-       return eRet;
-   }
-
-   return kError_Interrupt;
-}
-
 Error EventBuffer::AcceptEvent(Event *pPMOEvent)
 {
    BufferEvent *pEvent;
@@ -109,7 +81,6 @@ Error EventBuffer::AcceptEvent(Event *pPMOEvent)
    pEvent->pEvent = pPMOEvent;
 
    m_pQueue->Write(pEvent);
-   m_pReadSem->Signal();
 
 	return kError_NoErr;
 }

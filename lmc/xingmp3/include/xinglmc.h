@@ -71,72 +71,50 @@ enum
    lmcError_MaximumError
 };
 
-class FAContext;
-
 class     XingLMC:public LogicalMediaConverter
 {
 
    public:
-//      XingLMC(PhysicalMediaInput* input, PhysicalMediaOutput* output,EventCallback callback, void* cookie);
-   XingLMC(FAContext *context);
+            XingLMC(FAContext *context);
+   virtual ~XingLMC();
 
-   virtual ~ XingLMC();
-
-   virtual Error Decode(int iSkipNumFrames = 0);
-   virtual Error Stop();
-   virtual Error Pause();
-   virtual Error Resume();
-   virtual Error Reset();
    virtual Error ChangePosition(int32 position);
 
    virtual bool  CanDecode();
-   virtual bool  IsStreaming();
    virtual Error ExtractMediaInfo();
 
-   virtual Error SetTo(char *url);
-   virtual Error SetPMI(PhysicalMediaInput *);
-   virtual Error SetPMO(PhysicalMediaOutput *);
-   virtual Error SetTarget(EventQueue *);
+   virtual void  SetPMI(PhysicalMediaInput *pmi) { m_input = pmi; };
+   virtual void  SetPMO(PhysicalMediaOutput *pmo) { m_output = pmo; };
+   virtual Error Prepare(PullBuffer *pInputBuffer, PullBuffer *&pOutBuffer);
    virtual Error InitDecoder();
 
    virtual Error SetEQData(float *);
    virtual Error SetEQData(bool);
 
-   virtual Error SetPropManager(Properties *p) { m_propManager = p; if (p) return kError_NoErr; else return kError_UnknownErr; }
-
- protected:
-   FAContext  *m_context;
-
  private:
-   Properties *m_propManager;
 
-   static void DecodeWorkerThreadFunc(void *);
-   void        DecodeWork();
-	Error       BeginRead(void *&pBuffer, unsigned int iBytesNeeded,
-                         bool bBufferUp = true);
-	Error       AdvanceBufferToNextFrame();
-	Error       GetHeadInfo();
+   static void          DecodeWorkerThreadFunc(void *);
+   void                 DecodeWork();
+	Error                BeginRead(void *&pBuffer, unsigned int iBytesNeeded,
+                             bool bBufferUp = true);
+	Error                AdvanceBufferToNextFrame();
+	Error                GetHeadInfo();
 
-   bool        m_properlyInitialized, m_bExit;
-   int32       m_frameWaitTill;
-   Semaphore  *m_pauseSemaphore;
-   AUDIO       m_audioMethods;
-   Mutex      *m_seekMutex;
-   PhysicalMediaInput *m_input;
+   PhysicalMediaInput  *m_input;
    PhysicalMediaOutput *m_output;
 
-   int       m_iMaxWriteSize;
-   int       m_frameBytes, m_iBufferUpInterval, m_iBufferSize;
-	MPEG_HEAD m_sMpegHead;
-	int32     m_iBitRate;
-   bool      m_isPaused, m_bBufferingUp;
-   Thread   *m_decoderThread;
+   int                  m_iMaxWriteSize;
+   int                  m_frameBytes, m_iBufferUpInterval, m_iBufferSize;
+	MPEG_HEAD            m_sMpegHead;
+	int32                m_iBitRate;
+   bool                 m_bBufferingUp;
+   Thread              *m_decoderThread;
 
-   int32     m_frameCounter;
-	time_t    m_iBufferUpdate;
-   char     *m_szUrl;
-   const char *m_szError;
-
+   int32                m_frameCounter;
+	time_t               m_iBufferUpdate;
+   char                *m_szUrl;
+   const char          *m_szError;
+   AUDIO                m_audioMethods; 
 };
 
 #endif /* _XINGLMC_H */

@@ -46,7 +46,7 @@ plugins plugins-cc: $(PLUGINS) $(OSDEPPLUGINS)
 
 #
 # localfileinput is a nice simple example of a plugin dependency.
-LFIOBJ = io/local/filebuffer.o io/local/localfileinput.o
+LFIOBJ = io/local/localfileinput.o io/src/pipeline.o
 
 plugins/localfileinput-$(HOST_OS).pmi: $(LFIOBJ)
 	$(LINKMOD) -o $@ $(LFIOBJ)
@@ -56,7 +56,7 @@ plugins/localfileinput-$(HOST_OS).pmi: $(LFIOBJ)
 
 #
 # here's httpinput
-HTTPOBJ = io/http/httpinput.o io/http/httpbuffer.o
+HTTPOBJ = io/http/httpinput.o io/http/httpbuffer.o io/src/pipeline.o
 
 plugins/httpinput-$(HOST_OS).pmi: $(HTTPOBJ)
 	$(LINKMOD) -o $@ $(HTTPOBJ)
@@ -65,7 +65,7 @@ plugins/httpinput-$(HOST_OS).pmi: $(HTTPOBJ)
 #	$(CXXCOMPILE) $(FPIC) -o $(*).o -c ${*:%.o=%}.c
 
 # obsinput
-OBSPMI = io/obs/obsbuffer.o io/obs/obsinput.o
+OBSPMI = io/obs/obsbuffer.o io/obs/obsinput.o io/src/pipeline.o
 
 plugins/obsinput-$(HOST_OS).pmi: $(OBSPMI)
 	$(LINKMOD) -o $@ $(OBSPMI)
@@ -79,19 +79,22 @@ SCPMOlinuxOBJ = io/soundcard/unix/linux/src/ossvolume.o
 SCPMObeosOBJ = io/soundcard/beos/src/ringbuffer.o 
 #SCPMObeosOBJ+=io/soundcard/beos/src/soundutils.o io/soundcard/beos/TestRing.o
 
-SCPMOOBJ = io/soundcard/$(OSDEP)/src/soundcardpmo.o $(SCPMO$(HOST_OS)OBJ)
+SCPMOOBJ = io/soundcard/$(OSDEP)/src/soundcardpmo.o io/src/pmo.o \
+           io/src/pipeline.o $(SCPMO$(HOST_OS)OBJ)
 
 plugins/soundcard-$(HOST_OS).pmo: $(SCPMOOBJ)
 	$(LINKMOD) -o $@ $(SCPMOOBJ)
 
 # alsa
-ALSAOBJ = io/alsa/$(OSDEP)/src/alsapmo.o io/alsa/$(OSDEP)/src/alsavolume.o
+ALSAOBJ = io/alsa/$(OSDEP)/src/alsapmo.o io/alsa/$(OSDEP)/src/alsavolume.o \
+          io/src/pipeline.o
 
 plugins/alsa-$(HOST_OS).pmo: $(ALSAOBJ)
 	$(LINKMOD) -o $@ $(ALSAOBJ) -lasound
 
 # esound
-ESNDOBJ = io/esound/src/esdvolume.o io/esound/src/esoundpmo.o
+ESNDOBJ = io/esound/src/esdvolume.o io/esound/src/esoundpmo.o \
+          io/src/pipeline.o
 
 plugins/esound-$(HOST_OS).pmo: $(ESNDOBJ)
 	$(LINKMOD) -o $@ $(ESNDOBJ) -lesd
@@ -151,7 +154,7 @@ XINGLMCOBJC = lmc/xingmp3/src/cdct.o lmc/xingmp3/src/cupl3.o \
   lmc/xingmp3/src/cwinm.o lmc/xingmp3/src/icdct.o lmc/xingmp3/src/mdct.o \
   lmc/xingmp3/src/uph.o lmc/xingmp3/src/cup.o lmc/xingmp3/src/dec8.o \
   lmc/xingmp3/src/isbt.o lmc/xingmp3/src/l3dq.o lmc/xingmp3/src/mhead.o \
-  lmc/xingmp3/src/upsf.o lmc/xingmp3/src/iwinm.o
+  lmc/xingmp3/src/upsf.o lmc/xingmp3/src/iwinm.o io/src/pipeline.o
 
 XINGLMCOBJC += @XINGASM@
 #assembly lang code, if we need it

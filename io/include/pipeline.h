@@ -21,8 +21,8 @@
 	$Id$
 ____________________________________________________________________________*/
 
-#ifndef _PMO_H_
-#define _PMO_H_
+#ifndef _PIPELINE_H_
+#define _PIPELINE_H_
 
 /* system headers */
 #include <stdlib.h>
@@ -40,57 +40,50 @@ ____________________________________________________________________________*/
 
 /* project headers */
 #include "semaphore.h"
-#include "pipeline.h"
 #include "mutex.h"
-#include "eventdata.h"
 #include "config.h"
 #include "errors.h"
-#include "properties.h"
-#include "volume.h"
 #include "facontext.h"
-#include "lmc.h"
-#include "pmi.h"
+#include "event.h"
+#include "properties.h"
+#include "pullbuffer.h"
 
-#define MAXCHANNELS		2
-
-
-typedef struct OutputInfo
-{
-	uint32 bits_per_sample;
-	uint32 number_of_channels;
-	uint32 samples_per_second;
-	uint32 max_buffer_size;
-
-}OutputInfo;
-
-class EventBuffer;
-class PullBuffer;
-
-class PhysicalMediaOutput : public PipelineUnit
+class PipelineUnit
 {
 public:
-            PhysicalMediaOutput(FAContext *context);
-    virtual ~PhysicalMediaOutput();
+            PipelineUnit(FAContext *);
+    virtual ~PipelineUnit();
 
-    virtual Error Init(OutputInfo* /*info*/) = 0;
-    virtual VolumeManager *GetVolumeManager() = 0;
-
-    virtual Error Reset(bool bUserReset) = 0;
     virtual void  Pause(void);
-    virtual Error ChangePosition(int32);
+    virtual void  Resume(void);
+    virtual void  Wake(void);
+    virtual void  Clear(void);
 
-    virtual void  SetLMC(LogicalMediaConverter *pLMC);
-    virtual void  SetPMI(PhysicalMediaInput *pPMI);
-    virtual Error SetTo(char *url);  
+    virtual void  SetPropManager(Properties *);
+    virtual void  SetTarget(EventQueue *target);
+    virtual void  SetInputBuffer(PullBuffer *pBuffer);
 
-    virtual const char *GetErrorString(int32) { return NULL; };
+    virtual void  ReportError(const char *szError);
+    virtual void  DebugPrint(void);
 
 protected:
 
-    virtual bool  WasteTime();
+    virtual bool  Sleep(void);
 
-    PhysicalMediaInput    *m_pPmi;
-    LogicalMediaConverter *m_pLmc;
+    Semaphore             *m_pSleepSem;
+    Semaphore             *m_pPauseSem;
+    Mutex                 *m_pMutex;
+
+    EventQueue            *m_pTarget;
+    PullBuffer            *m_pOutputBuffer; 
+    PullBuffer            *m_pInputBuffer;
+    Properties            *m_pPropManager;
+    bool                   m_bPause, m_bExit;
+    FAContext             *m_pContext;
+
+private:
+ 
+    bool                   m_bSleeping;
 };
 
 #endif /* _PMO_H_ */

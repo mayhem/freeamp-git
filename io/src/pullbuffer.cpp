@@ -59,8 +59,6 @@ PullBuffer::PullBuffer(size_t iBufferSize,
    m_pPullBuffer = new unsigned char[m_iBufferSize + iOverflowSize];
    assert(m_pPullBuffer != NULL);
 
-   m_pWriteSem = new Semaphore();
-   m_pReadSem = new Semaphore();
    m_pMutex = new Mutex();
 }
 
@@ -68,20 +66,14 @@ PullBuffer::~PullBuffer(void)
 {
    // In case anyone is blocked on a BeginRead 
    m_bExit = true;
-   m_pReadSem->Signal();
-   m_pWriteSem->Signal();
 
    delete m_pPullBuffer;
-   delete m_pWriteSem;
-   delete m_pReadSem;
    delete m_pMutex;
 }
 
 void PullBuffer::BreakBlocks(void)
 {
    m_bExit = true;
-   m_pReadSem->Signal();
-   m_pWriteSem->Signal();
 }
 
 Error PullBuffer::Clear(void)
@@ -104,8 +96,6 @@ Error PullBuffer::Clear(void)
    m_bEOS = false;
    m_iReadIndex =  m_iWriteIndex = 0;
    m_iBytesInBuffer = 0;
-
-   m_pWriteSem->Signal();
 
    m_pMutex->Release();
 
@@ -221,8 +211,6 @@ Error PullBuffer::Resize(size_t iNewSize,
    m_iOverflowSize = iNewOverflowSize;
    m_iWriteTriggerSize = iNewWriteTriggerSize;
    m_iWriteIndex = m_iBytesInBuffer;
-
-   m_pWriteSem->Signal();
 
    m_pMutex->Release();
 
@@ -342,11 +330,6 @@ Error PullBuffer::EndWrite(size_t iBytesWritten)
    
    assert(m_iBytesInBuffer <= m_iBufferSize);
 
-   m_pReadSem->Signal();
-
-   if (m_iBufferSize - m_iBytesInBuffer >= m_iWriteTriggerSize && !m_bEOS)
-      m_pWriteSem->Signal();
-
    m_bWriteOpPending = false;
 
    m_context->log->Log(LogInput, "EndWrite: ReadIndex: %d WriteIndex %d\n", m_iReadIndex, m_iWriteIndex);
@@ -355,7 +338,7 @@ Error PullBuffer::EndWrite(size_t iBytesWritten)
    return kError_NoErr;
 }
 
-Error PullBuffer::BeginRead(void *&pBuffer, size_t &iBytesNeeded, bool bBlock)
+Error PullBuffer::BeginRead(void *&pBuffer, size_t &iBytesNeeded)
 {
    assert(m_pPullBuffer != NULL);
    assert(m_bReadOpPending == false);
@@ -380,12 +363,6 @@ Error PullBuffer::BeginRead(void *&pBuffer, size_t &iBytesNeeded, bool bBlock)
       if (iBytesNeeded > m_iBytesInBuffer)
       {
           m_pMutex->Release();
-
-          if (bBlock)
-          {
-             m_pReadSem->Wait();
-             continue;
-          }
 
           return kError_NoDataAvail;
       }
@@ -442,9 +419,6 @@ Error PullBuffer::EndRead(size_t iBytesUsed)
    m_bReadOpPending = false;
 
    m_context->log->Log(LogInput, "EndRead: ReadIndex: %d WriteIndex %d\n", m_iReadIndex, m_iWriteIndex);
-
-   if (iBytesUsed >= 0 && !m_bEOS)
-       m_pWriteSem->Signal();
 
    m_pMutex->Release();
 

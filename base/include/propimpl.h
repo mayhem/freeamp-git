@@ -45,7 +45,7 @@ class PropertiesImpl : public Properties {
     Mutex m_lock;
  public:
     PropertiesImpl();
-    ~PropertiesImpl();
+    virtual ~PropertiesImpl();
     virtual Error GetProperty(const char *, PropValue **);
     virtual Error SetProperty(const char *, PropValue *);
     virtual Error RegisterPropertyWatcher(const char *, PropertyWatcher *);

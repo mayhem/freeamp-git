@@ -948,9 +948,6 @@ ExpandM3U(char *szM3UFile, List<char *> &MP3List)
                 }
              }
 
-             OutputDebugString(szLine);             
-             OutputDebugString("\r\n");
-
 			 szMP3 = new char[strlen(szLine) + 1];
 			 strcpy(szMP3, szLine);
 			 MP3List.AddItem(szMP3);
@@ -979,7 +976,7 @@ ExportToM3U(const char* file)
         int32 i = 0;
         PlayListItem* item = NULL;
 
-        while(item = m_list->ItemAt(i++))
+        while((item = m_list->ItemAt(i++)))
         {
             fprintf(fp, "%s%s", item->URL(), LINE_END_MARKER_STR);
             result = kError_NoErr;

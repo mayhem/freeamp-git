@@ -53,7 +53,6 @@ class EventBuffer : public PullBuffer
       virtual  Event     *GetEvent(void);
       virtual  Event     *PeekEvent(void);
       virtual  Error      BeginRead(void *&pBuffer, size_t &iNumBytes);
-      virtual  Error      BeginWrite(void *&pBuffer, size_t &iNumBytes);
 
     protected:
      

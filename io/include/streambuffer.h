@@ -41,7 +41,6 @@ class StreamBuffer : public PullBuffer
 			    FAContext *context);
       virtual ~StreamBuffer(void);
 
-//      virtual  Error    BeginRead  (void *&pBuffer, size_t &iBytesNeeded);
       virtual  Error    BeginWrite (void *&pBuffer, size_t &iBytesNeeded);
 
       virtual  bool     IsBufferingUp(int iBytesNeeded);
