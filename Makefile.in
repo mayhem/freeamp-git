@@ -445,12 +445,6 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 include @top_srcdir@/config/Makefile.header
 
-#freeamp.o : freeamp.cpp
-#	  c++ $(CXXFLAGS) -c freeamp.cpp
-#
-#freeamp.c : 
-#	  true
-
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
