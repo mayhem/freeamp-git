@@ -159,7 +159,7 @@ class MusicCatalog : public EventQueue
     vector<string> *m_playlists;
     vector<PlaylistItem *> *m_streams;
 
-    set<PlaylistItem *> *m_sigs;
+    set<string> *m_sigs;
 
     multimap<string, string, less<string> > *m_guidTable;
     APSInterface *m_APSInterface;

@@ -119,7 +119,7 @@ class Player : public EventQueue, Properties, PropertyWatcher
     void        SyncLog();
 
     static void generate_sigs_function(void *arg);
-    void        GenerateSigsWork(set<PlaylistItem *> *items);
+    void        GenerateSigsWork(set<string> *items);
 
     FAContext *m_context;
 

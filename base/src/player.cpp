@@ -92,7 +92,7 @@ EventQueue()
 
     char *m_faDir = FreeampDir(m_context->prefs);
 
-    m_APSInterface = new APSInterface(m_faDir);
+    m_APSInterface = new APSInterface(m_faDir); 
     m_context->aps = m_APSInterface;
 
     delete [] m_faDir;
@@ -1267,7 +1267,7 @@ ChoosePMI(const char *szUrl, char *szTitle)
 typedef struct GenerateSigsStruct {
     Player *player;
     Thread *thread;
-    set<PlaylistItem *> *tracks;
+    set<string> *tracks;
 } GenerateSigsStruct;
 
 void 
@@ -1275,7 +1275,7 @@ Player::
 GenerateSignature(Event *pEvent)
 {
     GenerateSignatureEvent *gse = (GenerateSignatureEvent *)pEvent;
-    set<PlaylistItem *> *tracks = gse->Tracks();
+    set<string> *tracks = gse->Tracks();
 
     Thread *thread = Thread::CreateThread();
     if (thread) {
@@ -1301,10 +1301,10 @@ generate_sigs_function(void *arg)
 
 void 
 Player::
-GenerateSigsWork(set<PlaylistItem *> *items)
+GenerateSigsWork(set<string> *items)
 {
     cout << "Generating signatures for " << items->size() << " tracks.\n";
-    set<PlaylistItem *>::iterator i = items->begin();
+    set<string>::iterator i = items->begin();
     for (; i != items->end(); i++) 
     {
         Error  error = kError_NoErr;
@@ -1315,12 +1315,8 @@ GenerateSigsWork(set<PlaylistItem *> *items)
         RegistryItem *lmc_item = NULL;
         RegistryItem *item = NULL;
 
-        PlaylistItem *pc = *i;
-        if (!pc)
-            continue;
-
-        string url = pc->URL();
-        //string url = string("file:///music/Various Artists/Sounds_of_Wood_&_Steel_2/09_Opportunity_(T.J._Baden).mp3");
+        string url = *i;
+ cout << url << endl;
 
         pmi_item = ChoosePMI(url.c_str());
         if (!pmi_item)
@@ -1375,11 +1371,16 @@ GenerateSigsWork(set<PlaylistItem *> *items)
         lmc->SetEQData(m_eqValues);
         lmc->SetEQData(m_eqEnabled);
 
+        m_signatureSem->Wait();
+      
+        m_sigspmo = pmo; 
+
         error = pmo->SetTo(url.c_str());
         if (error == kError_FileNotFound) {
             delete pmo;
             delete lmc;
             delete pmi;
+            m_signatureSem->Signal();
             continue;
         }
 
@@ -1392,15 +1393,13 @@ GenerateSigsWork(set<PlaylistItem *> *items)
             delete pmo;
             delete lmc;
             delete pmi;
+            m_signatureSem->Signal();
             continue;
         }
-
-        m_signatureSem->Wait();
 
         string browserInfo = "Generating signature for " + url;
         AcceptEvent(new BrowserMessageEvent(browserInfo.c_str()));
 
-        m_sigspmo = pmo;
         pmo->Resume();
 
         while (m_sigspmo) 
@@ -1412,10 +1411,6 @@ GenerateSigsWork(set<PlaylistItem *> *items)
         m_signatureSem->Signal();
     }
 
-    while (items->size() > 0) {
-        delete *(items->begin());
-        items->erase(items->begin());
-    }
     delete items;
 }
 
@@ -1609,6 +1604,15 @@ DoneOutputting(Event *pEvent)
    // LMC or PMO sends this when its done
    // outputting whatever.  Now, go on to next
    // piece in playlist
+
+   if (m_sigspmo && pEvent->Type() == INFO_DoneOutputtingDueToError) 
+   {
+      delete m_sigspmo;
+      m_sigspmo = NULL;
+      m_signatureSem->Signal();
+   
+      return;  
+   }
 
    if (m_pmo)
    {

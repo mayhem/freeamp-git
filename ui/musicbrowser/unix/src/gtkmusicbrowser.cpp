@@ -1478,14 +1478,14 @@ Error GTKMusicBrowser::AcceptEvent(Event *e)
             }
             break; } 
         case INFO_SearchMusicDone: {
-            if (m_initialized) {
+            if (m_initialized && isVisible) {
                 gdk_threads_enter();
                 SetStatusText("");
                 gdk_threads_leave();
             }
             break; }
         case INFO_BrowserMessage: {
-            if (m_initialized) {
+            if (m_initialized && isVisible) {
                 gdk_threads_enter();
                 SetStatusText(((BrowserMessageEvent *)e)->GetBrowserMessage());
                 gdk_threads_leave();
