@@ -205,7 +205,7 @@ Error XingLMC::ExtractMediaInfo(MediaInfoEvent **pMIE) {
 								   head.prot,
 								   head.emphasis,
 								   head.mode,
-								   head.mode_ext);
+								   (float)head.mode_ext);
 			if (mie) {
 				(*pMIE)->AddChildEvent((Event *)mie);
 				mie = NULL;
