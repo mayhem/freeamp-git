@@ -3,7 +3,7 @@
 # -------------------------------------------------------------------------
 %define name    freeamp
 %define cname   FreeAmp
-%define version 2.1.rc6
+%define version 2.1.0
 %define release 1
 %define prefix  /usr  
 
