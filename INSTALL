@@ -11,17 +11,12 @@ Linux:
 	changed by providing the --bindir switch on the configure command 
 	line.  do a ./configure --help for more info) :
 
-	make install
+	make install  
+	  (freeamp is installed to $(bindir), as set above)
 
-	plugins (located in the plugins directory where you built
-	freeamp) must be copied to a directory named 'plugins'.
-	This 'plugins' directory is a subdirectory of either:
-	a) a directory in the built-in seach path:
-	   .:~/.freeamp:LIBDIR/freeamp
-	   (where LIBDIR is either /usr/local/lib or the one you
-	   specified as --libdir= to ./configure)
-	b) the search path specified by the environment variable
-	   FREEAMP_PATH
+	make install_plugins
+	  (plugins are installed to $(libdir)/freeamp/plugins, as set
+	  above)
 
 	you may also wish to enable mpg123 compatability mode by
 	invoking freeamp as 'mpg123'  (i.e. do a ln -s freeamp mpg123

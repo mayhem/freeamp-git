@@ -61,6 +61,21 @@ INCLUDES = -I@top_srcdir@/base/include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS)
 CXXFLAGS = $(EXTRA_CXXFLAGS) -D__@target_os@__ -Wl,-export-dynamic
 
 
+install_plugins:
+	$(mkinstalldirs) $(DESTDIR)$(libdir)/freeamp/plugins
+	@list=`ls plugins/*.*`; for p in $$list; do \
+	  if test -f $$p; then \
+	    echo "  $(INSTALL_PROGRAM) $$p $(DESTDIR)$(libdir)/freeamp/`echo $$p|sed '$(transform)'`"; \
+	     $(INSTALL_PROGRAM) $$p $(DESTDIR)$(libdir)/freeamp/`echo $$p|sed '$(transform)'`; \
+	  else :; fi; \
+	done
 
+uninstall_plugins:
+	@list=`ls plugins/*.*`; for p in $$list; do \
+	  if test -f $(DESTDIR)$(libdir)/freeamp/$$p; then \
+	    echo "  rm -f $(DESTDIR)$(libdir)/freeamp/`echo $$p|sed '$(transform)'`"; \
+	    rm -f $(DESTDIR)$(libdir)/freeamp/`echo $$p|sed '$(transform)'`; \
+	  else :; fi; \
+	done
 
 

@@ -437,6 +437,23 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 include @top_srcdir@/config/Makefile.header
 
+install_plugins:
+	$(mkinstalldirs) $(DESTDIR)$(libdir)/freeamp/plugins
+	@list=`ls plugins/*.*`; for p in $$list; do \
+	  if test -f $$p; then \
+	    echo "  $(INSTALL_PROGRAM) $$p $(DESTDIR)$(libdir)/freeamp/`echo $$p|sed '$(transform)'`"; \
+	     $(INSTALL_PROGRAM) $$p $(DESTDIR)$(libdir)/freeamp/`echo $$p|sed '$(transform)'`; \
+	  else :; fi; \
+	done
+
+uninstall_plugins:
+	@list=`ls plugins/*.*`; for p in $$list; do \
+	  if test -f $(DESTDIR)$(libdir)/freeamp/$$p; then \
+	    echo "  rm -f $(DESTDIR)$(libdir)/freeamp/`echo $$p|sed '$(transform)'`"; \
+	    rm -f $(DESTDIR)$(libdir)/freeamp/`echo $$p|sed '$(transform)'`; \
+	  else :; fi; \
+	done
+
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
