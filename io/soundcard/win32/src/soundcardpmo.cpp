@@ -278,26 +278,26 @@ void SoundCardPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
 
 bool SoundCardPMO::WaitForDrain(void)
 {
-   unsigned iLoop;
+   unsigned iLoop, iNumHeadersPending = 0;
 
    for(; !m_bExit && !m_bPause; )
    {   
        g_pHeaderMutex->Acquire();
 
-	   for(iLoop = 0; iLoop < m_num_headers; iLoop++)
+	   for(iLoop = 0, iNumHeadersPending = 0; iLoop < m_num_headers; iLoop++)
        {
-           if ((int)m_wavehdr_array[iLoop]->dwUser >= 0)
-			   break;
+           if ((int)m_wavehdr_array[iLoop]->dwUser > 0)
+               iNumHeadersPending++;
 	   }
 	   g_pHeaderMutex->Release();
-
-	   if (iLoop == m_num_headers)
+   
+       if (iNumHeadersPending == 0)
 	   {
 		  return true;
 	   }
 	   WasteTime();
    }
- 
+
    return false;
 }
 
@@ -547,7 +547,7 @@ void SoundCardPMO::WorkerThread(void)
     
               if (pEvent->Type() == PMO_Quit) 
               {
-                  delete pEvent;
+				  delete pEvent;
                   if (WaitForDrain())
 				  {
                      m_pTarget->AcceptEvent(new Event(INFO_DoneOutputting));
