@@ -35,7 +35,7 @@ ALLLDADD = @top_srcdir@/base/unix/@target_os@/src/*.o \
 	  @top_srcdir@/ui/cmdline/*.o \
 	  @top_srcdir@/lmc/xingmp3/src/*.o \
 	  @top_srcdir@/ui/dummy/src/*.o \
-	  -lpthread -lm
+	  -lpthread -lm -ldl
 FALDADD = @top_srcdir@/base/src/*.o $(ALLLDADD)
 DSLDADD = @top_srcdir@/base/src/player.o @top_srcdir@/base/src/playlist.o @top_srcdir@/base/src/command.o @top_srcdir@/base/src/thread.o $(ALLLDADD)
 MYDEPS = @top_srcdir@/base/unix/@target_os@/src/libfasys.a \

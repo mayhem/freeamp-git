@@ -83,7 +83,7 @@ SUBDIRS = base io ui lmc
 @AM_HAVE_WIN32_FALSE@	  @top_srcdir@/ui/cmdline/*.o \
 @AM_HAVE_WIN32_FALSE@	  @top_srcdir@/lmc/xingmp3/src/*.o \
 @AM_HAVE_WIN32_FALSE@	  @top_srcdir@/ui/dummy/src/*.o \
-@AM_HAVE_WIN32_FALSE@	  -lpthread -lm
+@AM_HAVE_WIN32_FALSE@	  -lpthread -lm -ldl
 @AM_HAVE_WIN32_FALSE@FALDADD = @top_srcdir@/base/src/*.o $(ALLLDADD)
 @AM_HAVE_WIN32_FALSE@DSLDADD = @top_srcdir@/base/src/player.o @top_srcdir@/base/src/playlist.o @top_srcdir@/base/src/command.o @top_srcdir@/base/src/thread.o $(ALLLDADD)
 @AM_HAVE_WIN32_FALSE@MYDEPS = @top_srcdir@/base/unix/@target_os@/src/libfasys.a \
