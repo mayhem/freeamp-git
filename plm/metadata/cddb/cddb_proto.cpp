@@ -940,8 +940,7 @@ int CDDB::cddb_read_disc_data(struct disc_data *outdata)
 
     if (cddb_read_data(outdata) < 0) 
         cddb_generate_unknown_entry(outdata);
-    else 
-        cddb_write_data(outdata);
+    cddb_write_data(outdata);
 
     return 0;
 }

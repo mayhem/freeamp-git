@@ -1067,20 +1067,34 @@ void GTKMusicBrowser::UpdateCDTree(PlaylistItem *update)
     gtk_clist_freeze(GTK_CLIST(musicBrowserTree));
     GdkPixmap *pixmap;
     GdkBitmap *mask;
+    
     MetaData mdata = (MetaData)update->GetMetaData();
-    gtk_ctree_node_get_pixtext(musicBrowserTree, find, 0, NULL, NULL, &pixmap,
-                               &mask);
-    gtk_ctree_node_set_pixtext(musicBrowserTree, find, 0, mdata.Title().c_str(),
-                               5, pixmap, mask); 
-    gtk_ctree_node_get_pixtext(musicBrowserTree, CDTree, 0, NULL, NULL, &pixmap,
-                               &mask);
-    char *tempstr = new char[mdata.Album().size() + mdata.Artist().size() + 10];
-    sprintf(tempstr, "%s (%s)", mdata.Album().c_str(), mdata.Artist().c_str());
-    gtk_ctree_node_set_pixtext(musicBrowserTree, CDTree, 0, tempstr, 5, pixmap,
-                               mask);
-    gtk_clist_thaw(GTK_CLIST(musicBrowserTree));
+    if (mdata.Title().size() > 0) { 
+        gtk_ctree_node_get_pixtext(musicBrowserTree, find, 0, NULL, NULL, 
+                                   &pixmap, &mask);
+        gtk_ctree_node_set_pixtext(musicBrowserTree, find, 0, 
+                                   mdata.Title().c_str(), 5, pixmap, mask); 
+    }
+
+    char *tempstr = new char[mdata.Album().size() + mdata.Artist().size() + 50];
+    if (mdata.Album().size() > 0) 
+        sprintf(tempstr, "%s ", mdata.Album().c_str());
+    else
+        sprintf(tempstr, "Unknown Album ");
+    strcat(tempstr, "(");
+    if (mdata.Artist().size() > 0) 
+        strcat(tempstr, mdata.Artist().c_str());
+    else
+        strcat(tempstr, "Unknown Artist");
+    strcat(tempstr, ")");
+
+    gtk_ctree_node_get_pixtext(musicBrowserTree, CDTree, 0, NULL, NULL, 
+                               &pixmap, &mask);
+    gtk_ctree_node_set_pixtext(musicBrowserTree, CDTree, 0, tempstr, 5, 
+                               pixmap, mask);
 
     delete [] tempstr;
+    gtk_clist_thaw(GTK_CLIST(musicBrowserTree));
 }
 
 void GTKMusicBrowser::RegenerateCDTree(void)
@@ -1107,7 +1121,7 @@ void GTKMusicBrowser::RegenerateCDTree(void)
     PlaylistItem *newitem;
 
     for (uint32 tracknum = 1; tracknum <= CD_numtracks; tracknum++) {
-        sprintf(url, "/%d.cda", tracknum);
+        sprintf(url, "file://%d.cda", tracknum);
         newitem = new PlaylistItem(url);
 
         name[0] = (char *)newitem->URL().c_str();
