@@ -78,13 +78,13 @@ RegistryItem::
 ~RegistryItem()
 {
     if(m_path)
-        delete m_path;
+        delete [] m_path;
 
     if(m_name)
-        delete m_name;
+        delete [] m_name;
 
     if(m_description)
-        delete m_description;
+        delete [] m_description;
 }
 
 void 
@@ -94,7 +94,7 @@ SetPath(char* path)
     if(path)
     {
         if(m_path)
-            delete m_path;
+            delete [] m_path;
 
         m_path = new char [strlen(path) + 1];
 
@@ -109,7 +109,7 @@ SetName(char* name)
     if(name)
     {
         if(m_name)
-            delete m_name;
+            delete [] m_name;
 
         m_name = new char [strlen(name) + 1];
 
@@ -125,7 +125,7 @@ SetDescription(char* description)
     if(description)
     {
         if(m_description)
-            delete m_description;
+            delete [] m_description;
 
         m_description = new char [strlen(description) + 1];
 
