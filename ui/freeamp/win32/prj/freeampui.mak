@@ -97,7 +97,7 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\freeampui.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=fabaselib.lib zlib.lib unzip.lib gdbm.lib version.lib wsock32.lib winmm.lib comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x12000000" /subsystem:windows /dll /incremental:no /pdb:"$(OUTDIR)\freeamp.pdb" /machine:I386 /def:".\freeampui.def" /out:"freeamp.ui" /implib:"$(OUTDIR)\freeamp.lib" /libpath:"..\..\..\..\lib\unzip" /libpath:"..\..\..\..\lib\zlib" /libpath:"..\..\..\..\lib\gdbm" /libpath:"..\..\..\..\base\win32" 
+LINK32_FLAGS=fabaselib.lib zlib.lib unzip.lib gdbm.lib shlwapi.lib version.lib wsock32.lib winmm.lib comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x12000000" /subsystem:windows /dll /incremental:no /pdb:"$(OUTDIR)\freeamp.pdb" /machine:I386 /def:".\freeampui.def" /out:"freeamp.ui" /implib:"$(OUTDIR)\freeamp.lib" /libpath:"..\..\..\..\lib\unzip" /libpath:"..\..\..\..\lib\zlib" /libpath:"..\..\..\..\lib\gdbm" /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
 	".\freeampui.def"
 LINK32_OBJS= \
@@ -156,11 +156,11 @@ INTDIR=.\Debug
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : ".\freeamp.ui"
+ALL : "..\..\..\..\config\config.h" ".\freeamp.ui"
 
 !ELSE 
 
-ALL : "unzip - Win32 Debug" "fabaselib - Win32 Debug" "zlib - Win32 Debug" ".\freeamp.ui"
+ALL : "unzip - Win32 Debug" "fabaselib - Win32 Debug" "zlib - Win32 Debug" "..\..\..\..\config\config.h" ".\freeamp.ui"
 
 !ENDIF 
 
@@ -205,6 +205,7 @@ CLEAN :
 	-@erase "$(OUTDIR)\freeamp.pdb"
 	-@erase ".\freeamp.ilk"
 	-@erase ".\freeamp.ui"
+	-@erase "..\..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -217,7 +218,7 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\freeampui.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=fabaselib.lib zlib.lib unzip.lib gdbm.lib version.lib wsock32.lib winmm.lib comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x12000000" /subsystem:windows /dll /incremental:yes /pdb:"$(OUTDIR)\freeamp.pdb" /debug /machine:I386 /def:".\freeampui.def" /out:"freeamp.ui" /implib:"$(OUTDIR)\freeamp.lib" /pdbtype:sept /libpath:"..\..\..\..\lib\unzip" /libpath:"..\..\..\..\lib\zlib" /libpath:"..\..\..\..\lib\gdbm" /libpath:"..\..\..\..\base\win32" 
+LINK32_FLAGS=fabaselib.lib zlib.lib unzip.lib gdbm.lib shlwapi.lib version.lib wsock32.lib winmm.lib comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x12000000" /subsystem:windows /dll /incremental:yes /pdb:"$(OUTDIR)\freeamp.pdb" /debug /machine:I386 /def:".\freeampui.def" /out:"freeamp.ui" /implib:"$(OUTDIR)\freeamp.lib" /pdbtype:sept /libpath:"..\..\..\..\lib\unzip" /libpath:"..\..\..\..\lib\zlib" /libpath:"..\..\..\..\lib\gdbm" /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
 	".\freeampui.def"
 LINK32_OBJS= \
@@ -264,7 +265,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "unzip - Win32 Debug" "fabaselib - Win32 Debug" "zlib - Win32 Debug" ".\freeamp.ui"
+$(DS_POSTBUILD_DEP) : "unzip - Win32 Debug" "fabaselib - Win32 Debug" "zlib - Win32 Debug" "..\..\..\..\config\config.h" ".\freeamp.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                          ..\..\..\..\base\win32\prj\plugins
 	copy freeamp.ui                                         ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -337,7 +338,7 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\freeampui.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=fabaselib.lib zlib.lib unzip.lib gdbm.lib version.lib wsock32.lib winmm.lib comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x12000000" /subsystem:windows /dll /incremental:yes /pdb:"$(OUTDIR)\freeamp.pdb" /debug /machine:I386 /def:".\freeampui.def" /out:"freeamp.ui" /implib:"$(OUTDIR)\freeamp.lib" /pdbtype:sept /libpath:"..\..\..\..\lib\unzip" /libpath:"..\..\..\..\lib\zlib" /libpath:"..\..\..\..\lib\gdbm" /libpath:"..\..\..\..\base\win32" 
+LINK32_FLAGS=fabaselib.lib zlib.lib unzip.lib gdbm.lib shlwapi.lib version.lib wsock32.lib winmm.lib comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x12000000" /subsystem:windows /dll /incremental:yes /pdb:"$(OUTDIR)\freeamp.pdb" /debug /machine:I386 /def:".\freeampui.def" /out:"freeamp.ui" /implib:"$(OUTDIR)\freeamp.lib" /pdbtype:sept /libpath:"..\..\..\..\lib\unzip" /libpath:"..\..\..\..\lib\zlib" /libpath:"..\..\..\..\lib\gdbm" /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
 	".\freeampui.def"
 LINK32_OBJS= \
@@ -455,7 +456,7 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\freeampui.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=fabaselib.lib zlib.lib unzip.lib gdbm.lib version.lib wsock32.lib winmm.lib comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x12000000" /subsystem:windows /dll /incremental:no /pdb:"$(OUTDIR)\freeamp.pdb" /machine:I386 /def:".\freeampui.def" /out:"freeamp.ui" /implib:"$(OUTDIR)\freeamp.lib" /libpath:"..\..\..\..\lib\unzip" /libpath:"..\..\..\..\lib\zlib" /libpath:"..\..\..\..\lib\gdbm" /libpath:"..\..\..\..\base\win32" 
+LINK32_FLAGS=fabaselib.lib zlib.lib unzip.lib gdbm.lib shlwapi.lib version.lib wsock32.lib winmm.lib comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x12000000" /subsystem:windows /dll /incremental:no /pdb:"$(OUTDIR)\freeamp.pdb" /machine:I386 /def:".\freeampui.def" /out:"freeamp.ui" /implib:"$(OUTDIR)\freeamp.lib" /libpath:"..\..\..\..\lib\unzip" /libpath:"..\..\..\..\lib\zlib" /libpath:"..\..\..\..\lib\gdbm" /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
 	".\freeampui.def"
 LINK32_OBJS= \
@@ -778,7 +779,7 @@ SOURCE=..\res\freeampui.rc
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
 
 
-"$(INTDIR)\freeampui.res" : $(SOURCE) "$(INTDIR)" "..\..\..\..\config\config.h"
+"$(INTDIR)\freeampui.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\freeampui.res" /i "\Local\src\freeamp\ui\freeamp\win32\res" /d "_DEBUG" $(SOURCE)
 
 

@@ -162,9 +162,6 @@ Package=<4>
     Project_Dep_Name id3v1
     End Project Dependency
     Begin Project Dependency
-    Project_Dep_Name id3v2
-    End Project Dependency
-    Begin Project Dependency
     Project_Dep_Name m3u
     End Project Dependency
     Begin Project Dependency

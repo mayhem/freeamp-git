@@ -44,8 +44,6 @@ using namespace std;
 #include "registrar.h"
 #include "resource.h"
 
-typedef set<string> PortableSet;
-
 typedef struct PrefsStruct 
 {
     // page 1
@@ -63,7 +61,6 @@ typedef struct PrefsStruct
     bool playImmediately;
     bool reclaimFiletypes;
     bool askReclaimFiletypes;
-    string saveMusicDirectory;
     bool convertUnderscores;
 
     // page 2
@@ -74,8 +71,13 @@ typedef struct PrefsStruct
     string proxyServer;
     bool useAlternateIP;
     string alternateIP;
-    
+
     // page 3
+    string saveMusicDirectory;
+    bool watchForNewMusic;
+    set<string> watchDirectories;
+    
+    // page 4
     bool enableLogging;
     bool logMain;
     bool logInput;
@@ -83,14 +85,14 @@ typedef struct PrefsStruct
     bool logDecoder;
     bool logPerformance;
 
-    //page 4
-    PortableSet portablePlayers;
+    //page 5
+    set<string> portablePlayers;
 
-	// page 5
+	// page 6
     string defaultFont;
     string currentTheme;
 
-    // page 6
+    // page 7
     bool checkForUpdates;
 
 
@@ -137,6 +139,9 @@ typedef struct PrefsStruct
             savePlaylistOnExit == pref.savePlaylistOnExit &&
             playImmediately == pref.playImmediately &&
             convertUnderscores == pref.convertUnderscores &&
+
+            watchForNewMusic == pref.watchForNewMusic &&
+            watchDirectories == pref.watchDirectories &&
 
             true
         );

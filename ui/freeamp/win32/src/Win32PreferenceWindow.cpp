@@ -31,6 +31,7 @@ ____________________________________________________________________________*/
 /* system headers */
 #include <windows.h>
 #include <windowsx.h>
+#include <shlwapi.h>
 #include <shlobj.h>
 #include <commctrl.h>
 #include <stdlib.h>
@@ -373,7 +374,6 @@ void Win32PreferenceWindow::GetPrefsValues(PrefsStruct* values)
     {
         *cp = 0x00;
         values->portablePlayers.insert(string(name));
-        //MessageBox(NULL, name, "name", MB_OK);
 
         cp++;
         name = cp;
@@ -382,12 +382,41 @@ void Win32PreferenceWindow::GetPrefsValues(PrefsStruct* values)
     if(*name)
     {
         values->portablePlayers.insert(string(name));
-        //MessageBox(NULL, name, "name", MB_OK);
     }
 
-    //values->portablePlayers = buffer;
     size = bufferSize;
 
+    if(kError_BufferTooSmall == m_prefs->GetWatchThisDirectory(buffer, &size))
+    {
+        bufferSize = size;
+        buffer = (char*)realloc(buffer, bufferSize);
+        m_prefs->GetWatchThisDirectory(buffer, &size);
+    }
+
+    cp = buffer;
+    name = cp;
+
+    while(cp = strchr(cp, ';'))
+    {
+        *cp = 0x00;
+        values->watchDirectories.insert(string(name));
+
+        cp++;
+        name = cp;
+    }
+
+    if(*name)
+    {
+        values->watchDirectories.insert(string(name));
+    }
+
+    int32 timeOut;
+
+    m_prefs->GetWatchThisDirTimeout(&timeOut);
+    values->watchForNewMusic = (timeOut != 0);
+
+
+    size = bufferSize;
     m_pThemeMan->GetCurrentTheme(values->currentTheme);
 
     // get the other m_prefs
@@ -454,16 +483,19 @@ void Win32PreferenceWindow::SavePrefsValues(PrefsStruct* values)
     m_prefs->SetAskToReclaimFiletypes(values->askReclaimFiletypes);
     m_prefs->SetReclaimFiletypes(values->reclaimFiletypes);
 
-    PortableSet::const_iterator i;
+    set<string>::const_iterator i;
     string portableList;
 
-    for(i = values->portablePlayers.begin(); i != values->portablePlayers.end(); i++)
+    for(i = values->portablePlayers.begin(); 
+        i != values->portablePlayers.end(); 
+        i++)
     {
         portableList += *i;
         portableList += ";";
     }
 
     m_prefs->SetUsersPortablePlayers(portableList.c_str());
+
     m_prefs->SetShowToolbarTextLabels(values->useTextLabels);
     m_prefs->SetShowToolbarImages(values->useImages);
 
@@ -471,14 +503,22 @@ void Win32PreferenceWindow::SavePrefsValues(PrefsStruct* values)
     m_prefs->SetPlayImmediately(values->playImmediately);
     m_prefs->SetConvertUnderscoresToSpaces(values->convertUnderscores);
 
+    string dirList;
 
-    // this gets called by each page unfortunately
-    // so save some effort by only doing it once
-    if(*values != m_currentValues) 
+    for(i = values->watchDirectories.begin(); 
+        i != values->watchDirectories.end(); 
+        i++)
     {
-        m_pContext->target->AcceptEvent(new Event(INFO_PrefsChanged));
-        m_currentValues = m_proposedValues = *values;
+        dirList += *i;
+        dirList += ";";
     }
+
+    m_prefs->SetWatchThisDirectory(dirList.c_str());
+
+    m_prefs->SetWatchThisDirTimeout((values->watchForNewMusic ? kDefaultWatchThisDirTimeout : 0));
+
+    m_pContext->target->AcceptEvent(new Event(INFO_PrefsChanged));
+    m_currentValues = m_proposedValues = *values;
 }
 
 void Win32PreferenceWindow::LaunchHelp(HWND hwnd, uint32 topic)
@@ -696,36 +736,23 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
                                             WPARAM wParam, 
                                             LPARAM lParam)      
 {
-    bool result = false;
-    static HWND hwndAskReclaimFiletypes = NULL;
-    static HWND hwndReclaimFiletypes = NULL;
-    static HWND hwndSaveMusicDir = NULL;
-    static HWND hwndStayOnTop = NULL;
-    static HWND hwndLiveInTray = NULL;
-    static HWND hwndTextOnly = NULL;
-    static HWND hwndImagesOnly = NULL;
-    static HWND hwndTextAndImages = NULL;
-    static HWND hwndSavePlaylistOnExit = NULL;
-    static HWND hwndDefaultAction = NULL;
-    static HWND hwndConvertUnderscores = NULL;
-    
+    bool result = false;    
 
     switch(msg)
     {
         case WM_INITDIALOG:
         {
             // get the handles to all our controls
-            hwndStayOnTop = GetDlgItem(hwnd, IDC_STAYONTOP);
-            hwndLiveInTray = GetDlgItem(hwnd, IDC_TRAY);
-            hwndAskReclaimFiletypes = GetDlgItem(hwnd, IDC_ASKRECLAIM);
-            hwndReclaimFiletypes = GetDlgItem(hwnd, IDC_RECLAIMFILETYPES);
-            hwndSaveMusicDir = GetDlgItem(hwnd, IDC_SAVEMUSICDIR);
-            hwndTextOnly = GetDlgItem(hwnd, IDC_TEXTONLY);
-            hwndImagesOnly = GetDlgItem(hwnd, IDC_IMAGESONLY);
-            hwndTextAndImages = GetDlgItem(hwnd, IDC_TEXTANDIMAGES);
-            hwndSavePlaylistOnExit = GetDlgItem(hwnd, IDC_SAVECURRENTLIST);
-            hwndDefaultAction = GetDlgItem(hwnd, IDC_DEFAULTACTION);
-            //hwndConvertUnderscores = GetDlgItem(hwnd, IDC_UNDERSCORES);
+            HWND hwndStayOnTop = GetDlgItem(hwnd, IDC_STAYONTOP);
+            HWND hwndLiveInTray = GetDlgItem(hwnd, IDC_TRAY);
+            HWND hwndAskReclaimFiletypes = GetDlgItem(hwnd, IDC_ASKRECLAIM);
+            HWND hwndReclaimFiletypes = GetDlgItem(hwnd, IDC_RECLAIMFILETYPES);
+            HWND hwndTextOnly = GetDlgItem(hwnd, IDC_TEXTONLY);
+            HWND hwndImagesOnly = GetDlgItem(hwnd, IDC_IMAGESONLY);
+            HWND hwndTextAndImages = GetDlgItem(hwnd, IDC_TEXTANDIMAGES);
+            HWND hwndSavePlaylistOnExit = GetDlgItem(hwnd, IDC_SAVECURRENTLIST);
+            HWND hwndDefaultAction = GetDlgItem(hwnd, IDC_DEFAULTACTION);
+            HWND hwndConvertUnderscores = GetDlgItem(hwnd, IDC_UNDERSCORES);
 
 
             Button_SetCheck(hwndStayOnTop, m_originalValues.stayOnTop);
@@ -738,7 +765,7 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
 
             Button_SetCheck(hwndDefaultAction, !m_originalValues.playImmediately);
 
-            //Button_SetCheck(hwndConvertUnderscores, m_originalValues.convertUnderscores);
+            Button_SetCheck(hwndConvertUnderscores, m_originalValues.convertUnderscores);
 
             Button_SetCheck(hwndTextOnly, 
                 m_originalValues.useTextLabels && !m_originalValues.useImages);
@@ -746,9 +773,6 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
                 !m_originalValues.useTextLabels && m_originalValues.useImages);
             Button_SetCheck(hwndTextAndImages, 
                 m_originalValues.useTextLabels && m_originalValues.useImages);
-
-            Edit_SetText(hwndSaveMusicDir, 
-                         m_originalValues.saveMusicDirectory.c_str());
             
             break;
         }
@@ -761,11 +785,13 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
 
         case WM_COMMAND:
         {
+            HWND hwndCtrl = (HWND) lParam;
+
             switch(LOWORD(wParam))
             {
                 case IDC_TEXTONLY:
                 {
-                    if(Button_GetCheck(hwndTextOnly) == BST_CHECKED)
+                    if(Button_GetCheck(hwndCtrl) == BST_CHECKED)
                     {
                         m_proposedValues.useTextLabels = true;
                         m_proposedValues.useImages = false;
@@ -785,7 +811,7 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
 
                 case IDC_IMAGESONLY:
                 {
-                    if(Button_GetCheck(hwndImagesOnly) == BST_CHECKED)
+                    if(Button_GetCheck(hwndCtrl) == BST_CHECKED)
                     {
                         m_proposedValues.useTextLabels = false;
                         m_proposedValues.useImages = true;
@@ -805,7 +831,7 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
 
                 case IDC_TEXTANDIMAGES:
                 {
-                    if(Button_GetCheck(hwndTextAndImages) == BST_CHECKED)
+                    if(Button_GetCheck(hwndCtrl) == BST_CHECKED)
                     {
                         m_proposedValues.useTextLabels = true;
                         m_proposedValues.useImages = true;
@@ -823,9 +849,9 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
                     break;
                 }
 
-                /*case IDC_UNDERSCORES:
+                case IDC_UNDERSCORES:
                 {
-                    if(Button_GetCheck(hwndConvertUnderscores) == BST_CHECKED)
+                    if(Button_GetCheck(hwndCtrl) == BST_CHECKED)
                     {
                         m_proposedValues.convertUnderscores = true;
                     }
@@ -844,11 +870,11 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
                     }
 
                     break;
-                }*/
+                }
 
                 case IDC_DEFAULTACTION:
                 {
-                    if(Button_GetCheck(hwndDefaultAction) == BST_CHECKED)
+                    if(Button_GetCheck(hwndCtrl) == BST_CHECKED)
                     {
                         m_proposedValues.playImmediately = false;
                     }
@@ -871,7 +897,7 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
 
                 case IDC_SAVECURRENTLIST:
                 {
-                    if(Button_GetCheck(hwndSavePlaylistOnExit) == BST_CHECKED)
+                    if(Button_GetCheck(hwndCtrl) == BST_CHECKED)
                     {
                         m_proposedValues.savePlaylistOnExit = true;
                     }
@@ -894,7 +920,7 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
 
                 case IDC_STAYONTOP:
                 {
-                    if(Button_GetCheck(hwndStayOnTop) == BST_CHECKED)
+                    if(Button_GetCheck(hwndCtrl) == BST_CHECKED)
                     {
                         m_proposedValues.stayOnTop = true;
                     }
@@ -917,7 +943,7 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
 
                 case IDC_TRAY:
                 {
-                    if(Button_GetCheck(hwndLiveInTray) == BST_CHECKED)
+                    if(Button_GetCheck(hwndCtrl) == BST_CHECKED)
                     {
                         m_proposedValues.liveInTray = true;
                     }
@@ -940,7 +966,7 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
 
                 case IDC_RECLAIMFILETYPES:
                 {
-                    if(Button_GetCheck(hwndReclaimFiletypes) == BST_CHECKED)
+                    if(Button_GetCheck(hwndCtrl) == BST_CHECKED)
                     {
                         m_proposedValues.reclaimFiletypes = true;
                     }
@@ -963,7 +989,7 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
 
                 case IDC_ASKRECLAIM:
                 {
-                    if(Button_GetCheck(hwndAskReclaimFiletypes) == BST_CHECKED)
+                    if(Button_GetCheck(hwndCtrl) == BST_CHECKED)
                     {
                         m_proposedValues.askReclaimFiletypes = true;
                     }
@@ -983,67 +1009,7 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
 
                     break;
                 }
-
-                case IDC_SAVEMUSICDIR:
-                {
-                    if(HIWORD(wParam) == EN_CHANGE)
-                    {
-                        char temp[MAX_PATH];
-
-                        Edit_GetText(   hwndSaveMusicDir, 
-                                        temp,
-                                        MAX_PATH);
-
-                        m_proposedValues.saveMusicDirectory = temp;
-
-                        if(m_proposedValues != m_currentValues)
-                        {
-                            PropSheet_Changed(GetParent(hwnd), hwnd);
-                        }
-                        else
-                        {
-                            PropSheet_UnChanged(GetParent(hwnd), hwnd);
-                        }
-                    }
-
-                    break;
-                }
-
-                case IDC_BROWSE:
-                {
-                    LPMALLOC pMalloc;
-
-                    if(SUCCEEDED(SHGetMalloc(&pMalloc)))
-                    {
-                        BROWSEINFO bi; 
-                        LPITEMIDLIST browseId;
-                        char displayName[MAX_PATH + 1];
-
-                        bi.hwndOwner = hwnd;
-                        bi.pidlRoot = NULL;
-                        bi.pszDisplayName = displayName;
-                        bi.lpszTitle = "Please select the folder to which you want to save music.";
-                        bi.ulFlags = BIF_RETURNONLYFSDIRS;
-                        bi.lpfn = NULL;
-
-                        browseId = SHBrowseForFolder(&bi);
-            
-                        if(browseId)
-                        {
-                            char temp[MAX_PATH];
-
-                            SHGetPathFromIDList(browseId, temp);
-                            
-                            m_proposedValues.saveMusicDirectory = temp;
-
-                            Edit_SetText(hwndSaveMusicDir, temp);
-
-                            pMalloc->Free(browseId);
-                        }
-                    }
                 
-                    break;
-                } 
             }
 
             break;
@@ -1307,8 +1273,7 @@ bool Win32PreferenceWindow::PrefStreamingProc(HWND hwnd,
 
                     Button_Enable(hwndSaveStreamsDirectory, enabled); 
                     Button_Enable(hwndBrowse, enabled);
-                    Button_Enable(  hwndSaveLocationText,enabled);
-
+                    Button_Enable(hwndSaveLocationText,enabled);
 
                     if(m_proposedValues != m_currentValues)
                     {
@@ -2098,11 +2063,108 @@ bool Win32PreferenceWindow::PrefDirectoryProc(HWND hwnd,
                                               LPARAM lParam)      
 {
     bool result = false;
+    static HWND hwndSaveMusicDir = NULL;
+    static HWND hwndWatchDirs = NULL;
+    static HWND hwndList = NULL;
+    static HWND hwndAddDir = NULL;
+    static HWND hwndRemoveDir = NULL;
     
     switch(msg)
     {
         case WM_INITDIALOG:
         {
+            hwndSaveMusicDir = GetDlgItem(hwnd, IDC_SAVEMUSICDIR);
+            hwndWatchDirs = GetDlgItem(hwnd, IDC_WATCHDIRS);
+            hwndList = GetDlgItem(hwnd, IDC_DIRLIST);
+            hwndAddDir = GetDlgItem(hwnd, IDC_ADDDIR);
+            hwndRemoveDir = GetDlgItem(hwnd, IDC_REMOVEDIR);
+
+            Edit_SetText(hwndSaveMusicDir, 
+                         m_originalValues.saveMusicDirectory.c_str());
+
+            HINSTANCE hinst = (HINSTANCE) GetWindowLong(hwnd, GWL_HINSTANCE);
+
+            // get our folder image
+            HIMAGELIST imageList = ImageList_Create(16, 13, ILC_COLOR24|ILC_MASK, 2, 0);
+
+            HBITMAP bmp;
+            bmp = LoadBitmap(hinst, MAKEINTRESOURCE(IDB_FOLDER));
+            ImageList_AddMasked(imageList, bmp, RGB(255,0,0));
+            DeleteObject(bmp);
+
+            ListView_SetImageList(hwndList, imageList, LVSIL_SMALL);             
+
+            // add our columns
+            RECT rect;
+            GetClientRect(hwndList, &rect);
+
+            LV_COLUMN lvc;
+
+            lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_SUBITEM;
+            lvc.fmt = LVCFMT_LEFT; // left align column
+            lvc.cx = (rect.right-rect.left); // width of column in pixels
+            lvc.iSubItem = 0;
+
+            ListView_InsertColumn(hwndList, 0, &lvc);
+
+            // add items to dir list
+            LV_ITEM lv_item;
+            HDC hdc = GetDC(hwndList);
+            
+            lv_item.mask = LVIF_PARAM | LVIF_STATE | LVIF_TEXT;
+            lv_item.state = 0;
+            lv_item.iSubItem = 0;
+
+            set<string>::const_iterator i;
+            char path[MAX_PATH];
+
+            for(i = m_originalValues.watchDirectories.begin(); 
+                i != m_originalValues.watchDirectories.end(); 
+                i++)
+            {
+                   
+                strcpy(path, (*i).c_str());
+                PathCompactPath(hdc, path, lvc.cx);
+
+                lv_item.pszText = path;
+                lv_item.cchTextMax = strlen(lv_item.pszText);
+                lv_item.iItem = ListView_GetItemCount(hwndList);
+                lv_item.lParam = (LPARAM) new string(*i);
+
+                ListView_InsertItem(hwndList, &lv_item);
+            }
+
+            ReleaseDC(hwndList, hdc);
+
+            Button_SetCheck(hwndWatchDirs, m_originalValues.watchForNewMusic);
+            Button_Enable(hwndList, m_originalValues.watchForNewMusic);
+            Button_Enable(hwndAddDir, m_originalValues.watchForNewMusic);
+            Button_Enable(hwndRemoveDir, m_originalValues.watchForNewMusic);
+
+            break;
+        }
+
+        case WM_DESTROY:
+        {
+            uint32 count = ListView_GetItemCount(hwndList);
+            
+            for(uint32 i = 0; i < count; i++)
+            {
+                LV_ITEM item;
+
+                item.mask = LVIF_PARAM;
+                item.iItem = i;
+                item.lParam = 0;
+
+                if(ListView_GetItem(hwndList, &item))
+                {
+                    if(item.lParam)
+                    {
+                        delete (string*)item.lParam;
+                        break;
+                    }
+                }
+            }
 
             break;
         }
@@ -2111,25 +2173,208 @@ bool Win32PreferenceWindow::PrefDirectoryProc(HWND hwnd,
         {
             switch(LOWORD(wParam))
             {
-                case IDC_GOTOFREEAMP:
+                case IDC_SAVEMUSICDIR:
                 {
-                    ShellExecute(   hwnd, 
-                                    "open", 
-                                    "http://www.freeamp.org/", 
-                                    NULL, 
-                                    NULL, 
-                                    SW_SHOWNORMAL);
+                    if(HIWORD(wParam) == EN_CHANGE)
+                    {
+                        char temp[MAX_PATH];
+
+                        Edit_GetText(   hwndSaveMusicDir, 
+                                        temp,
+                                        MAX_PATH);
+
+                        m_proposedValues.saveMusicDirectory = temp;
+
+                        if(m_proposedValues != m_currentValues)
+                        {
+                            PropSheet_Changed(GetParent(hwnd), hwnd);
+                        }
+                        else
+                        {
+                            PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                        }
+                    }
+
                     break;
                 }
 
-                case IDC_GOTOEMUSIC:
+                case IDC_BROWSE:
                 {
-                    ShellExecute(   hwnd, 
-                                    "open", 
-                                    "http://www.emusic.com/", 
-                                    NULL, 
-                                    NULL, 
-                                    SW_SHOWNORMAL);
+                    LPMALLOC pMalloc;
+
+                    if(SUCCEEDED(SHGetMalloc(&pMalloc)))
+                    {
+                        BROWSEINFO bi; 
+                        LPITEMIDLIST browseId;
+                        char displayName[MAX_PATH + 1];
+
+                        bi.hwndOwner = hwnd;
+                        bi.pidlRoot = NULL;
+                        bi.pszDisplayName = displayName;
+                        bi.lpszTitle = "Please select the folder to which you want to save music.";
+                        bi.ulFlags = BIF_RETURNONLYFSDIRS;
+                        bi.lpfn = NULL;
+
+                        browseId = SHBrowseForFolder(&bi);
+            
+                        if(browseId)
+                        {
+                            char temp[MAX_PATH];
+
+                            SHGetPathFromIDList(browseId, temp);
+                            
+                            m_proposedValues.saveMusicDirectory = temp;
+
+                            Edit_SetText(hwndSaveMusicDir, temp);
+
+                            pMalloc->Free(browseId);
+                        }
+                    }
+                
+                    break;
+                }
+                
+                case IDC_WATCHDIRS:
+                {
+                    BOOL enabled;
+
+                    if(Button_GetCheck(hwndWatchDirs) == BST_CHECKED)
+                    {
+                        m_proposedValues.watchForNewMusic = true;
+                    }
+                    else
+                    {
+                        m_proposedValues.watchForNewMusic = false;
+                    }
+
+                    enabled = (m_proposedValues.watchForNewMusic ? TRUE : FALSE);
+
+                    Button_Enable(hwndList, enabled); 
+                    Button_Enable(hwndAddDir, enabled);
+                    Button_Enable(hwndRemoveDir,enabled);
+
+                    if(m_proposedValues != m_currentValues)
+                    {
+                        PropSheet_Changed(GetParent(hwnd), hwnd);
+                    }
+                    else
+                    {
+                        PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                    }
+
+                    break;
+                }
+
+                case IDC_REMOVEDIR:
+                {
+                    uint32 index = 0;
+                    uint32 count = ListView_GetItemCount(hwndList);
+
+                    for(index = 0; index < count; index++)
+                    {
+                        LV_ITEM item;
+
+                        item.mask = LVIF_PARAM|LVIF_STATE;
+                        item.stateMask = LVIS_SELECTED;
+                        item.iItem = index;
+                        item.lParam = 0;
+
+                        if(ListView_GetItem(hwndList, &item))
+                        {
+                            if(item.state & LVIS_SELECTED && item.lParam)
+                            {
+                                string* s = (string*)item.lParam;
+                                set<string>::iterator i;
+
+                                i = m_proposedValues.watchDirectories.find(*s);
+
+                                if(i != m_proposedValues.watchDirectories.end())
+                                {
+                                    m_proposedValues.watchDirectories.erase(i);
+                                }
+
+                                delete s;
+
+                                ListView_DeleteItem(hwndList, index);
+                                break;
+                            }
+                        }  
+                    }
+
+                    if(m_proposedValues != m_currentValues)
+                    {
+                        PropSheet_Changed(GetParent(hwnd), hwnd);
+                    }
+                    else
+                    {
+                        PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                    }
+
+                    break;
+                }
+
+                case IDC_ADDDIR:
+                {
+                    LPMALLOC pMalloc;
+
+                    if(SUCCEEDED(SHGetMalloc(&pMalloc)))
+                    {
+                        BROWSEINFO bi; 
+                        LPITEMIDLIST browseId;
+                        char displayName[MAX_PATH + 1];
+
+                        bi.hwndOwner = hwnd;
+                        bi.pidlRoot = NULL;
+                        bi.pszDisplayName = displayName;
+                        bi.lpszTitle = "Please select a folder you wish to watch for music.";
+                        bi.ulFlags = BIF_RETURNONLYFSDIRS;
+                        bi.lpfn = NULL;
+
+                        browseId = SHBrowseForFolder(&bi);
+            
+                        if(browseId)
+                        {
+                            char temp[MAX_PATH];
+
+                            SHGetPathFromIDList(browseId, temp);
+                            
+                            m_proposedValues.watchDirectories.insert(string(temp));
+
+                            // add items to dir list
+                            LV_ITEM lv_item;
+                            HDC hdc = GetDC(hwndList);
+            
+                            lv_item.mask = LVIF_PARAM | LVIF_STATE | LVIF_TEXT;
+                            lv_item.state = 0;
+                            lv_item.iSubItem = 0;
+                            lv_item.lParam = (LPARAM) new string(temp);
+
+                            RECT rect;
+                            GetClientRect(hwndList, &rect);
+                   
+                            PathCompactPath(hdc, temp, rect.right - rect.left);
+
+                            lv_item.pszText = temp;
+                            lv_item.cchTextMax = strlen(lv_item.pszText);
+                            lv_item.iItem = ListView_GetItemCount(hwndList);
+
+                            ListView_InsertItem(hwndList, &lv_item);
+
+                            ReleaseDC(hwndList, hdc);
+
+                            pMalloc->Free(browseId);
+                        }
+
+                        if(m_proposedValues != m_currentValues)
+                        {
+                            PropSheet_Changed(GetParent(hwnd), hwnd);
+                        }
+                        else
+                        {
+                            PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                        }
+                    }
+                
                     break;
                 }
             }
@@ -3601,9 +3846,8 @@ bool Win32PreferenceWindow::PrefPluginsProc(HWND hwnd,
     bool result = false;
     static HWND hwndList = NULL;
     static HWND hwndPMO = NULL;
-    static HIMAGELIST imageList = NULL;
-    static PortableSet originalSet;
-    static PortableSet currentSet;
+    static set<string> originalSet;
+    static set<string> currentSet;
 
     
     switch(msg)
@@ -3655,7 +3899,7 @@ bool Win32PreferenceWindow::PrefPluginsProc(HWND hwnd,
             HINSTANCE hinst = (HINSTANCE) GetWindowLong(hwnd, GWL_HINSTANCE);
 
             // get our checkbox images
-            imageList = ImageList_Create(16, 16, ILC_COLOR24|ILC_MASK, 2, 0);
+            HIMAGELIST imageList = ImageList_Create(16, 16, ILC_COLOR24|ILC_MASK, 2, 0);
 
             HBITMAP bmp;
             bmp = LoadBitmap(hinst, MAKEINTRESOURCE(IDB_UNCHECKED));
@@ -3692,7 +3936,7 @@ bool Win32PreferenceWindow::PrefPluginsProc(HWND hwnd,
 
                 p->plugin = item->Name();
 
-                PortableSet::iterator i;
+                set<string>::iterator i;
 
                 i = m_originalValues.portablePlayers.find(string(item->Name()));
 

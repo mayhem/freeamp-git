@@ -92,6 +92,8 @@ extern const char* kWatchThisDirTimeoutPref;
 extern const char* kWriteID3v1Pref;
 extern const char* kWriteID3v2Pref;
 
+extern const int32 kDefaultWatchThisDirTimeout;
+
 class LibDirFindHandle;
 
 class Preferences {
