@@ -195,16 +195,16 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
     // Select the first item in the list of returned items
     mb_Select(o, MB_SelectExchangedData);
 
-    mb_GetResultData(o, MB_GetArtistName, temp, 255);
-    pmetaData->SetArtist(temp);
-    mb_GetResultData(o, MB_GetTrackName, temp, 255);
-    pmetaData->SetTitle(temp);
-    mb_GetResultData(o, MB_GetAlbumName, temp, 255);
-    pmetaData->SetAlbum(temp);
-    mb_GetResultData(o, MB_GetGenre, temp, 255);
-    pmetaData->SetGenre(temp);
-    mb_GetResultData(o, MB_GetDescription, temp, 255);
-    pmetaData->SetComment(temp);
+    if (mb_GetResultData(o, MB_GetArtistName, temp, 255))
+        pmetaData->SetArtist(temp);
+    if (mb_GetResultData(o, MB_GetTrackName, temp, 255))
+        pmetaData->SetTitle(temp);
+    if (mb_GetResultData(o, MB_GetAlbumName, temp, 255))
+        pmetaData->SetAlbum(temp);
+    if (mb_GetResultData(o, MB_GetGenre, temp, 255))
+        pmetaData->SetGenre(temp);
+    if (mb_GetResultData(o, MB_GetDescription, temp, 255))
+        pmetaData->SetComment(temp);
     pmetaData->SetYear(mb_GetResultInt(o, MB_GetYear));
     pmetaData->SetTrack(mb_GetResultInt(o, MB_GetTrackNum));
     pmetaData->SetLength(mb_GetResultInt(o, MB_GetDuration));

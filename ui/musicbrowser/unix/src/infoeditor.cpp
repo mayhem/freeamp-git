@@ -308,7 +308,8 @@ void infoeditorUI::DisplayInfo(void)
    gtk_widget_show(label);
 
    GtkWidget *combo = gtk_combo_new();
-   gtk_combo_set_popdown_strings(GTK_COMBO(combo), galbumlist);
+   if (galbumlist)
+       gtk_combo_set_popdown_strings(GTK_COMBO(combo), galbumlist);
    m_albumEntry = GTK_COMBO(combo)->entry;
    if (!m_albums)
       gtk_entry_set_text(GTK_ENTRY(m_albumEntry), "<Multiple Albums Selected>");
@@ -327,7 +328,8 @@ void infoeditorUI::DisplayInfo(void)
    gtk_widget_show(label);
 
    combo = gtk_combo_new();
-   gtk_combo_set_popdown_strings(GTK_COMBO(combo), gartistlist);
+   if (gartistlist)
+       gtk_combo_set_popdown_strings(GTK_COMBO(combo), gartistlist);
    m_artistEntry = GTK_COMBO(combo)->entry;
    if (!m_artists) 
       gtk_entry_set_text(GTK_ENTRY(m_artistEntry), "<Multiple Artists Selected>");
@@ -366,7 +368,8 @@ void infoeditorUI::DisplayInfo(void)
    gtk_widget_show(label);
 
    combo = gtk_combo_new();
-   gtk_combo_set_popdown_strings(GTK_COMBO(combo), ggenrelist);
+   if (ggenrelist)
+       gtk_combo_set_popdown_strings(GTK_COMBO(combo), ggenrelist);
    m_genreEntry = GTK_COMBO(combo)->entry;
    if (!m_genres) 
       gtk_entry_set_text(GTK_ENTRY(m_genreEntry), "<Multiple Genres Selected>");
