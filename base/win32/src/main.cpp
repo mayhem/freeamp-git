@@ -114,7 +114,7 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
 
     PlayList* playlist = new PlayList();
 
-	playlist->Add("..\\..\\..\\test\\crown.mp3",0);
+	playlist->Add("..\\..\\..\\test\\jules.mp3",0);
 	
     playlist->SetFirst();
     Player::GetPlayer()->AcceptEvent(new Event(CMD_SetPlaylist,playlist));
