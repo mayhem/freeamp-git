@@ -49,6 +49,7 @@ class ID3v2 : public MetaDataFormat
  private:
 
      void HandleFrame(char *tag, char *frameData, MetaData *metadata);
+     void LookupGenre(int genreId, char* genre);
      FAContext* m_context;
 };
 

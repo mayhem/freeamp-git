@@ -45,6 +45,139 @@ ____________________________________________________________________________*/
 #include "id3v2.h"
 
 const int iDataFieldLen = 1024;
+const int genreOther = 12;
+const int genreMax = 126; 
+
+const char *genreList[] = 
+{
+     "Blues",
+     "Classic Rock",
+     "Country",
+     "Dance",
+     "Disco",
+     "Funk",
+     "Grunge",
+     "Hip-Hop",
+     "Jazz",
+     "Metal",
+     "New Age",
+     "Oldies",
+     "Other",
+     "Pop",
+     "R&B",
+     "Rap",
+     "Reggae",
+     "Rock",
+     "Techno",
+     "Industrial",
+     "Alternative",
+     "Ska",
+     "Death Metal",
+     "Pranks",
+     "Soundtrack",
+     "Euro-Techno",
+     "Ambient",
+     "Trip-Hop",
+     "Vocal",
+     "Jazz+Funk",
+     "Fusion",
+     "Trance",
+     "Classical",
+     "Instrumental",
+     "Acid",
+     "House",
+     "Game",
+     "Sound Clip",
+     "Gospel",
+     "Noise",
+     "AlternRock",
+     "Bass",
+     "Soul",
+     "Punk",
+     "Space",
+     "Meditative",
+     "Instrumental Pop",
+     "Instrumental Rock",
+     "Ethnic",
+     "Gothic",
+     "Darkwave",
+     "Techno-Industrial",
+     "Electronic",
+     "Pop-Folk",
+     "Eurodance",
+     "Dream",
+     "Southern Rock",
+     "Comedy",
+     "Cult",
+     "Gangsta",
+     "Top 40",
+     "Christian Rap",
+     "Pop/Funk",
+     "Jungle",
+     "Native American",
+     "Cabaret",
+     "New Wave",
+     "Psychadelic",
+     "Rave",
+     "Showtunes",
+     "Trailer",
+     "Lo-Fi",
+     "Tribal",
+     "Acid Punk",
+     "Acid Jazz",
+     "Polka",
+     "Retro",
+     "Musical",
+     "Rock & Roll",
+     "Hard Rock",
+     "Folk",
+     "Folk-Rock",
+     "National Folk",
+     "Swing",
+     "Fast Fusion",
+     "Bebob",
+     "Latin",
+     "Revival",
+     "Celtic",
+     "Bluegrass",
+     "Avantgarde",
+     "Gothic Rock",
+     "Progressive Rock",
+     "Psychedelic Rock",
+     "Symphonic Rock",
+     "Slow Rock",
+     "Big Band",
+     "Chorus",
+     "Easy Listening",
+     "Acoustic",
+     "Humour",
+     "Speech",
+     "Chanson",
+     "Opera",
+     "Chamber Music",
+     "Sonata",
+     "Symphony",
+     "Booty Bass",
+     "Primus",
+     "Porn Groove",
+     "Satire",
+     "Slow Jam",
+     "Club",
+     "Tango",
+     "Samba",
+     "Folklore",
+     "Ballad",
+     "Power Ballad",
+     "Rhythmic Soul",
+     "Freestyle",
+     "Duet",
+     "Punk Rock",
+     "Drum Solo",
+     "Acapella",
+     "Euro-House",
+     "Dance Hall",
+     "\0"
+};
 
 extern "C"
 {
@@ -161,6 +294,54 @@ bool ID3v2::ReadMetaData(const char* url, MetaData* metadata)
         ID3Field_GetASCII(pField, pData, iDataFieldLen, 1); 
         if (strlen(pData) > 0)
            metadata->SetSize(atoi(pData));
+    }
+    pFrame = ID3Tag_FindFrameWithID(pTag, ID3FID_TRACKNUM);
+    if (pFrame)
+    {
+        pData[0] = 0;
+        pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
+        ID3Field_GetASCII(pField, pData, iDataFieldLen, 1); 
+        if (strlen(pData) > 0)
+           metadata->SetTrack(atoi(pData));
+    }
+    pFrame = ID3Tag_FindFrameWithID(pTag, ID3FID_TRACKNUM);
+    if (pFrame)
+    {
+        pData[0] = 0;
+        pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
+        ID3Field_GetASCII(pField, pData, iDataFieldLen, 1); 
+        if (strlen(pData) > 0)
+           metadata->SetTrack(atoi(pData));
+    }
+    pFrame = ID3Tag_FindFrameWithID(pTag, ID3FID_CONTENTTYPE);
+    if (pFrame)
+    {
+        char genre[255];
+        int  genreId, ret;
+
+        pData[0] = 0;
+        pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
+        ID3Field_GetASCII(pField, pData, iDataFieldLen, 1); 
+        if (strlen(pData) > 0)
+        {
+           genre[0] = 0;
+           ret = sscanf(pData, "(%d)%[^\n]", &genreId, genre);
+           if (ret > 0)
+           {
+               if (ret == 2)
+                   metadata->SetGenre(genre);
+               else
+               if (genreId != genreOther)
+               {
+                   LookupGenre(genreId, genre);
+                   metadata->SetGenre(genre);
+               }
+           }
+           else
+           {
+               metadata->SetGenre(pData);
+           }
+        }
     }
 
     delete pData;
@@ -322,11 +503,37 @@ bool ID3v2::WriteMetaData(const char* url, const MetaData& metadata)
         ID3Field_SetASCII(pField, dummy);
     }
 
+    sprintf(dummy, "(12)%s", metadata.Genre().c_str());
+    pFrame = ID3Tag_FindFrameWithID(pTag, ID3FID_CONTENTTYPE);
+    if (!pFrame)
+    {
+        pFrame = ID3Frame_NewID(ID3FID_CONTENTTYPE);
+        pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
+        ID3Field_SetASCII(pField, dummy);
+        ID3Tag_AttachFrame(pTag, pFrame);
+    }
+    else
+    {
+        pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
+        ID3Field_SetASCII(pField, dummy);
+    }
+
     err = ID3Tag_UpdateByTagType(pTag, whichTags);
 
     ID3Tag_Delete(pTag);
 
     return err == ID3E_NoError;
+}
+
+void ID3v2::LookupGenre(int genreId, char* genre)
+{
+    if (genreId < 0 || genreId > genreMax)
+    {
+        genre[0] = 0;
+        return;
+    }
+
+    strcpy(genre, genreList[genreId]);
 }
 
 #else
