@@ -1717,6 +1717,8 @@ ServiceEvent(Event * pC)
         case INFO_PlaylistRepeat:
         case INFO_PlaylistUpdated:
         case INFO_PlaylistItemUpdated:
+        case INFO_PlaylistItemAdded:
+        case INFO_PlaylistItemRemoved:
         case INFO_PlaylistCurrentItemInfo:
         case INFO_BufferStatus:
         case INFO_SearchMusicDone:

@@ -712,7 +712,7 @@ Error PlaylistManager::AddItems(vector<PlaylistItem*>* list, uint32 index, bool 
 
         vector<PlaylistItem *>::iterator i = list->begin();
         for (; i != list->end(); i++)
-            m_context->target->AcceptEvent(new PlaylistItemRemovedEvent(*i));
+            m_context->target->AcceptEvent(new PlaylistItemAddedEvent(*i));
 
         result = kError_NoErr;
     }
