@@ -1200,6 +1200,10 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
     CheckForCD();
 
     m_initialized = true;
+	
+	// UGLY hack to fix threading issue with win98 osr2 creating blank my music tree
+    m_context->target->AcceptEvent(new Event(INFO_MusicCatalogCleared));
+
 }
 
 void MusicBrowserUI::AddToolbarButtons(bool textLabels, bool images)
