@@ -174,7 +174,7 @@ DownloadManager::~DownloadManager()
 // Functions for adding items to Download Manager
 // Adding an item implicitly queues it for
 // downloading.
-Error DownloadManager::AddItem(const char* url)
+Error DownloadManager::AddItem(const char* url, const char* filename)
 {
     Error result = kError_InvalidParam;
 
@@ -184,7 +184,17 @@ Error DownloadManager::AddItem(const char* url)
     {
         result = kError_OutOfMemory;
 
-        DownloadItem* item = new DownloadItem(url);
+        if(!filename)
+        {
+            filename = strrchr(url, '/');
+
+            if(filename)
+                filename++;
+            else
+                filename = url;
+        }
+
+        DownloadItem* item = new DownloadItem(url, filename);
 
         if(item)
         {
@@ -523,6 +533,22 @@ DownloadItem* DownloadManager::GetNextQueuedItem()
     return result;
 }
 
+static int32 GetContentLengthFromHeader(const char* buffer)
+{
+    int32 result = -1;
+
+    char* cp = strstr(buffer, "Content-Length:");
+
+    if(cp)
+    {
+        cp += strlen("Content-Length:") + 1;
+
+        result = atoi(cp);
+    }
+
+    return result;
+}
+
 const uint8 kHttpPort = 80;
 const uint32 kMaxHostNameLen = 64;
 
@@ -843,6 +869,11 @@ Error DownloadManager::Download(DownloadItem* item)
                     {
                         result = kError_UnknownErr;
 
+                        int32 fileSize = GetContentLengthFromHeader(buffer);
+
+                        if(fileSize > 0)
+                            item->SetTotalBytes(fileSize);
+
                         cout << destPath << endl;
 
                         int openFlags = O_BINARY|O_CREAT|O_RDWR|O_APPEND;
@@ -853,7 +884,7 @@ Error DownloadManager::Download(DownloadItem* item)
                             openFlags |= O_TRUNC;
                         }
 
-                        int fd = open(destPath, openFlags);
+                        int fd = open(destPath, openFlags, S_IREAD | S_IWRITE);
 
                         if(fd >= 0)
                         {

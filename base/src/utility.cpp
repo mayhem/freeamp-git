@@ -237,11 +237,12 @@ void RFC822GMTTimeString(struct tm* time, char buf[32])
                            "Jul", "Aug", "Sep", "Oct",  "Nov", "Dec"};
 
     // Example: Sun, 06 Nov 1994 08:49:37 GMT
-    const char* k822Format = "%s, %2d %s %4d %2d:%2d:%2d GMT";
+    const char* k822Format = "%s, %02d %s %4d %02d:%02d:%02d GMT";
 
     sprintf(buf, k822Format, day[time->tm_wday],
                              time->tm_mday,
                              month[time->tm_mon],
+                             time->tm_year + 1900,
                              time->tm_hour,
                              time->tm_min,
                              time->tm_sec);

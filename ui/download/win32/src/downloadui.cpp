@@ -532,10 +532,15 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             //LV_ITEM* item = (LV_ITEM*)dis->itemData;
             DownloadItem* dli = (DownloadItem*)dis->itemData;
 
+            string displayString;
+
+            if(dli->GetMetaData().Title().size())
+                displayString = dli->GetMetaData().Title();
+            else
+                displayString = dli->DestinationFile();
+
             // Check to see if the string fits in the clip rect.
             // If not, truncate the string and add "...".
-            string displayString = dli->GetMetaData().Title();
-
             CalcStringEllipsis(dis->hDC, 
                                displayString, 
                                ListView_GetColumnWidth(m_hwndList, 0) - (cxImage + 1));
@@ -768,7 +773,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                     break;
             }
 
-            uint32 pad = 0;
+            uint32 pad = kPrePadding;
 
             if(progressWidth)
                 pad = (progressWidth + kElementPadding);
@@ -1195,6 +1200,51 @@ BOOL DownloadUI::Command(int32 command, HWND src)
 			break;
 		}
 
+        case IDC_ADDURL:
+		{
+            HWND hwndURL = GetDlgItem(m_hwnd, IDC_URL);
+
+			uint32 length = GetWindowTextLength(hwndURL) + 1; // + 0x00
+
+            if(length)
+            {
+                char* sp = NULL;
+                char* url = new char[length + 7]; // http://
+                
+                GetWindowText(hwndURL, url + 7, length);
+
+                if(sp = strstr(url + 7, "://"))
+                {
+                    if(strncasecmp(url + 7, "http://", 7))
+                    {
+                        MessageBox(m_hwnd, 
+                                   "Only HTTP downloads are supported at this time.",
+                                   "Invalid protocol",
+                                   MB_OK|MB_ICONINFORMATION);
+                        break;
+                    }
+
+                    sp = url + 7;
+                }
+                else
+                {
+                    memcpy(url, "http://", 7);
+                    sp = url;
+                }
+
+                /*MessageBox(m_hwnd, 
+                           sp,
+                           "url",
+                           MB_OK|MB_ICONINFORMATION);*/
+
+
+                m_dlm->AddItem(sp);
+            
+                delete [] url;
+            }
+			break;
+		}
+
 		case IDC_CLOSE:
 		{
 			SendMessage(m_hwnd, WM_CLOSE, 0, 0);
@@ -1404,7 +1454,7 @@ uint32 DownloadUI::CalcStringEllipsis(HDC hdc, string& displayString, int32 colu
 
     // If the width of the string is greater than the column width shave
     // the string and add the ellipsis
-    if(sizeString.cx > columnWidth)
+    if(sizeString.cx >= columnWidth)
     {
         GetTextExtentPoint32(hdc, szEllipsis, strlen(szEllipsis), &sizeEllipsis);
        
@@ -1414,7 +1464,7 @@ uint32 DownloadUI::CalcStringEllipsis(HDC hdc, string& displayString, int32 colu
 
             GetTextExtentPoint32(hdc, temp.c_str(), temp.size(), &sizeString);
             
-            if ((uint32)(sizeString.cx + sizeEllipsis.cx) <= columnWidth)
+            if((sizeString.cx + sizeEllipsis.cx) < columnWidth)
             {
                 // The string with the ellipsis finally fits                
                 // Concatenate the two strings and break out of the loop

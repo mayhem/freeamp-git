@@ -183,7 +183,7 @@ class DownloadManager {
     // Functions for adding items to Download Manager
     // Adding an item implicitly queues it for
     // downloading.
-    Error AddItem(const char* url);
+    Error AddItem(const char* url, const char* filename = NULL);
     Error AddItem(DownloadItem* item);
     Error AddItems(vector<DownloadItem*>* list);
 
