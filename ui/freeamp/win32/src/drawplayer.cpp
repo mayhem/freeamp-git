@@ -962,20 +962,22 @@ void DrawDisplay(HDC hdc, DisplayInfo* state)
 
 void UpdateControls(HWND hwnd)
 {
-    //HDC hdc = GetDC(hwnd);
+    /*HDC hdc = GetDC(hwnd);
 
-    //DrawPlayer(hdc, g_buttonStateArray, false);
+    DrawPlayer(hdc, g_buttonStateArray, false);
 
-    //ReleaseDC(hwnd, hdc);
+    ReleaseDC(hwnd, hdc);*/
 }
 
 void UpdateDisplay(HWND hwnd)
 {
-    HDC hdc = GetDC(hwnd);
+    InvalidateRgn(hwnd, g_displayRegion, FALSE);
+
+    /*HDC hdc = GetDC(hwnd);
 
     DrawDisplay(hdc, &g_displayInfo);
 
-    ReleaseDC(hwnd, hdc);
+    ReleaseDC(hwnd, hdc);*/
 }
 
 static HPALETTE 
@@ -1563,7 +1565,8 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                         multiplier += .55;
                     }
 
-                    DrawDisplay(hdc, &g_displayInfo);
+                    InvalidateRgn(hwnd, g_displayRegion, FALSE);
+                    //DrawDisplay(hdc, &g_displayInfo);
 
                     ReleaseDC(hwnd, hdc);
 
@@ -1609,7 +1612,9 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                         g_displayInfo.scrollOffset = 0;
                     }
 
-                    DrawDisplay(hdc, &g_displayInfo);
+                    InvalidateRgn(hwnd, g_displayRegion, FALSE);
+
+                    //DrawDisplay(hdc, &g_displayInfo);
 
                     ReleaseDC(hwnd, hdc);
 
@@ -1644,7 +1649,8 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                     g_displayInfo.seekminutes = minutes;
                     g_displayInfo.seekseconds = seconds;
 
-                    DrawDisplay(hdc, &g_displayInfo);
+                    InvalidateRgn(hwnd, g_displayRegion, FALSE);
+                    //DrawDisplay(hdc, &g_displayInfo);
 
                     ReleaseDC(hwnd, hdc);
 
@@ -1791,17 +1797,11 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                         g_displayInfo.state = RemainingTime;
                     else if(g_displayInfo.state == RemainingTime)
                         g_displayInfo.state = TotalTime;
+
+                    InvalidateRgn(hwnd, g_displayRegion, FALSE);
                 }
 
             }
-
-            hdc = GetDC(hwnd);
-
-            //DrawPlayer(hdc, g_buttonStateArray, false);
-
-            DrawDisplay(hdc, &g_displayInfo);
-
-            ReleaseDC(hwnd, hdc);
 
             pressed = FALSE;
             ReleaseCapture();
@@ -1850,11 +1850,6 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                     g_buttonStateArray[i].state = Pressed;
                     g_buttonStateArray[i].dirty = TRUE;
                     InvalidateRgn(hwnd, g_buttonStateArray[i].region, FALSE);
-
-                    //hdc = GetDC(hwnd);
-                    //DrawPlayer(hdc, g_buttonStateArray, false);
-                    //ReleaseDC(hwnd, hdc);
-
                 }
             } 
 
@@ -1954,6 +1949,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
                     g_buttonStateArray[i].dirty = TRUE;
                     InvalidateRgn(hwnd, g_buttonStateArray[i].region, FALSE);
+                    InvalidateRgn(hwnd, g_displayRegion, FALSE);
                     dirtyPlayer = true;
                     dirtyDisplay = true;
 
@@ -2004,19 +2000,6 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                         dirtyPlayer = true;
                     }
                 }
-            }
-
-            if(dirtyPlayer || dirtyDisplay)
-            {
-                HDC hdc = GetDC(hwnd);
-
-                if(dirtyDisplay)
-                    DrawDisplay(hdc, &g_displayInfo);
-
-                //if(dirtyPlayer)
-                    //DrawPlayer(hdc, g_buttonStateArray, false);
-
-                ReleaseDC(hwnd, hdc);
             }
            
             break;
