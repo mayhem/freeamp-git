@@ -73,7 +73,7 @@ plugins/localfileinput.pmi: $(LFIOBJ)
 
 #
 # here's httpinput
-HTTPOBJ  = io/src/pmi.o io/http/httpinput.o io/src/pipeline.o io/src/tstream.o
+HTTPOBJ  = io/src/pmi.o io/http/httpinput.o io/src/pipeline.o io/src/tstream.lo
 
 plugins/httpinput.pmi: $(HTTPOBJ)
 	$(LINKMOD) -o $@ $(HTTPOBJ) $(STATICLD)
@@ -82,7 +82,7 @@ plugins/httpinput.pmi: $(HTTPOBJ)
 #	$(CXXCOMPILE) $(FPIC) -o $(*).o -c ${*:%.o=%}.c
 
 # obsinput
-OBSPMI  = io/src/pmi.o io/obs/obsinput.o io/src/pipeline.o io/src/tstream.o
+OBSPMI  = io/src/pmi.o io/obs/obsinput.o io/src/pipeline.o io/src/tstream.lo
 
 plugins/obsinput.pmi: $(OBSPMI)
 	$(LINKMOD) -o $@ $(OBSPMI) $(STATICLD)
@@ -152,7 +152,7 @@ FREEAMPUIOBJ += ui/freeamp/unix/src/GTKCanvas.o ui/freeamp/unix/src/ttfont.o
 FREEAMPUIOBJ += ui/freeamp/unix/src/ThemeManager.o 
 FREEAMPUIOBJ += ui/freeamp/unix/src/GTKPreferenceWindow.o
 FREEAMPUIOBJ += ui/freeamp/unix/src/GTKFileSelector.o  
-FREEAMPUIOBJ += lib/zlib/lib/libzlib.a lib/xml/lib/libfaxml.a
+FREEAMPUIOBJ += lib/zlib/lib/libzlib.a lib/xml/src/Parse.lo
 
 plugins/freeamp.ui: $(FREEAMPUIOBJ)
 	$(LINKMOD) -o $@ $(FREEAMPUIOBJ) $(GTK_LIBS) $(TTF_LIBS)
@@ -271,7 +271,7 @@ plugins/pmp300.ppp: $(PMP300OBJ)
 
 #rmo
 
-RMPOBJ = dlm/rmp/rmp.o lib/xml/lib/libfaxml.a 
+RMPOBJ = dlm/rmp/rmp.o lib/xml/src/Parse.lo 
 
 plugins/rmp.dlf: $(RMPOBJ)
 	$(LINKMOD) -o $@ $(RMPOBJ) $(STATICLD) 

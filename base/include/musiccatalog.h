@@ -116,8 +116,16 @@ class MusicCatalog : public EventQueue
 
     Database *m_database;
     PlaylistManager *m_plm;
- 
-    bool m_acceptItemChanged;
+
+    bool   m_inUpdateSong;
+    bool   m_acceptItemChanged;
     uint32 m_itemWaitCount;
+
+    PlaylistItem *m_newItem;
+    PlaylistItem *m_oldItem;
+    ArtistList *m_newArtist;
+    ArtistList *m_oldArtist;
+    AlbumList *m_newAlbum;
+    AlbumList *m_oldAlbum;
 };
 #endif

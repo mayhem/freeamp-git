@@ -147,24 +147,20 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
             else
                 mainBrowser->ShowMusicBrowser();
             break; }
-        case CMD_AddFiles: {
-            mainBrowser->AcceptEvent(event);
-            break; }
-        case INFO_Paused:
-        case INFO_Stopped:
-        case INFO_Playing: {
-            if (mainBrowser->Visible())
-                mainBrowser->AcceptEvent(event);
-            break; }
+        case CMD_AddFiles:
+        case INFO_PlaylistCurrentItemInfo: 
         case INFO_PrefsChanged: {
             mainBrowser->AcceptEvent(event);
             vector<GTKMusicBrowser *>::iterator i = browserWindows.begin();
             for (; i != browserWindows.end(); i++)
-                if ((*i)->Visible())
                     (*i)->AcceptEvent(event);
             break; }
+        case INFO_Paused:
+        case INFO_Stopped:
+        case INFO_Playing:
         case INFO_MusicCatalogPlaylistAdded:
         case INFO_MusicCatalogPlaylistRemoved:
+        case INFO_MusicCatalogTrackChanged:
         case INFO_MusicCatalogTrackRemoved: 
         case INFO_MusicCatalogTrackAdded: {
             if (mainBrowser->Visible())

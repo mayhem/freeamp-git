@@ -589,6 +589,34 @@ public:
     const AlbumList *Album() const { return m_album; }
 };
 
+class MusicCatalogTrackChangedEvent : public Event {
+private:
+    const PlaylistItem *m_newItem;
+    const PlaylistItem *m_oldItem; 
+    const ArtistList *m_newArtist;
+    const ArtistList *m_oldArtist;
+    const AlbumList *m_newAlbum;
+    const AlbumList *m_oldAlbum;
+public:
+    MusicCatalogTrackChangedEvent(const PlaylistItem *oldItem,
+                                  const PlaylistItem *newItem,
+                                  const ArtistList *oldArtist,
+                                  const ArtistList *newArtist,
+                                  const AlbumList *oldAlbum,
+                                  const AlbumList *newAlbum)
+    { m_type = INFO_MusicCatalogTrackChanged; m_oldItem = oldItem; 
+      m_newItem = newItem; m_oldArtist = oldArtist; m_newArtist = newArtist; 
+      m_oldAlbum = oldAlbum; m_newAlbum = newAlbum; }
+    virtual ~MusicCatalogTrackChangedEvent() {}
+
+    const PlaylistItem *NewItem() const { return m_newItem; }
+    const PlaylistItem *OldItem() const { return m_oldItem; }
+    const ArtistList *NewArtist() const { return m_newArtist; }
+    const ArtistList *OldArtist() const { return m_oldArtist; }
+    const AlbumList *NewAlbum() const { return m_newAlbum; }
+    const AlbumList *OldAlbum() const { return m_oldAlbum; }
+};
+
 class MusicCatalogPlaylistAddedEvent : public Event {
 private:
     string m_item;
@@ -610,7 +638,6 @@ public:
 
     const string Item() const { return m_item; }
 };
-
 
 class PlaylistItemAddedEvent : public Event {
   private:

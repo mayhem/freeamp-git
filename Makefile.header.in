@@ -86,9 +86,12 @@ CXXCOMPILE += $(RELOC)
 
 CXXLINK = $(CXXLD) $(CXXFLAGS) $(LDFLAGS) $(RELOC) -o $@
 
-.SUFFIXES: .S .c .cpp .o .s .doh .asm .asm1
+.SUFFIXES: .S .c .cpp .lo .o .s .doh .asm .asm1
 
 .cpp.o:
+	$(CXXCOMPILE) -c $< -o $@
+
+.cpp.lo:
 	$(CXXCOMPILE) -c $< -o $@
 
 .cpp.doh:

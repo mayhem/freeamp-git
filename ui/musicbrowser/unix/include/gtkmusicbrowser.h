@@ -118,6 +118,8 @@ class GTKMusicBrowser {
 
     bool master;
 
+    uint32 m_playingindex;
+
     PlaylistManager *m_plm;
     MusicCatalog *m_musicCatalog;
  

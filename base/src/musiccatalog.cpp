@@ -61,6 +61,7 @@ MusicCatalog::MusicCatalog(FAContext *context, char *databasepath)
     m_context = context;
     m_plm = context->plm;
     m_mutex = new Mutex();
+    m_inUpdateSong = false;
     m_acceptItemChanged = false;
     m_artistList = new vector<ArtistList *>;
     m_unsorted = new vector<PlaylistItem *>;
@@ -204,7 +205,7 @@ Error MusicCatalog::RemoveSong(const char *url)
         for (; i != m_unsorted->end(); i++)
             if (url == (*i)->URL())
             {
-                m_context->target->AcceptEvent(new MusicCatalogTrackRemovedEvent(*i, NULL, NULL));     
+                AcceptEvent(new MusicCatalogTrackRemovedEvent(*i, NULL, NULL));     
                 m_unsorted->erase(i);
                 break;
             }
@@ -234,7 +235,7 @@ Error MusicCatalog::RemoveSong(const char *url)
                         for (; k != trList->end() && !found; k++)
                             if (url == (*k)->URL())
                             {
-                                m_context->target->AcceptEvent(new MusicCatalogTrackRemovedEvent(*k, *i, *j));
+                                AcceptEvent(new MusicCatalogTrackRemovedEvent(*k, *i, *j));
                                 trList->erase(k);
                                 found = true;
                                 break;
@@ -283,7 +284,7 @@ Error MusicCatalog::AddSong(const char *url)
 
     if ((meta->Artist().size() == 0) || (meta->Artist() == " ")) {
         m_unsorted->push_back(newtrack);
-        m_context->target->AcceptEvent(new MusicCatalogTrackAddedEvent(newtrack, NULL, NULL));
+        AcceptEvent(new MusicCatalogTrackAddedEvent(newtrack, NULL, NULL));
     }
     else {
         if (meta->Album() == " " || meta->Album().size() == 0)
@@ -312,7 +313,7 @@ Error MusicCatalog::AddSong(const char *url)
                             }
                         }
                         (*j)->m_trackList->push_back(newtrack);
-                        m_context->target->AcceptEvent(new MusicCatalogTrackAddedEvent(newtrack, *i, *j));
+                        AcceptEvent(new MusicCatalogTrackAddedEvent(newtrack, *i, *j));
                         break;
                      }
                 }
@@ -321,7 +322,7 @@ Error MusicCatalog::AddSong(const char *url)
                     newalbum->name = meta->Album();
                     newalbum->m_trackList->push_back(newtrack);
                     alList->push_back(newalbum);
-                    m_context->target->AcceptEvent(new MusicCatalogTrackAddedEvent(newtrack, (*i), newalbum));
+                    AcceptEvent(new MusicCatalogTrackAddedEvent(newtrack, (*i), newalbum));
                     break;
                 }
             }
@@ -334,7 +335,7 @@ Error MusicCatalog::AddSong(const char *url)
             newalbum->m_trackList->push_back(newtrack);
             newartist->m_albumList->push_back(newalbum);
             m_artistList->push_back(newartist);
-            m_context->target->AcceptEvent(new MusicCatalogTrackAddedEvent(newtrack, newartist, newalbum));
+            AcceptEvent(new MusicCatalogTrackAddedEvent(newtrack, newartist, newalbum));
         }
     }
     return kError_NoErr;
@@ -347,6 +348,8 @@ Error MusicCatalog::UpdateSong(PlaylistItem *item)
     if (!m_database->Working())
         return kError_DatabaseNotWorking;
 
+    m_inUpdateSong = true;
+
     Error err = RemoveSong(item->URL().c_str());
     
     if (IsError(err))
@@ -356,7 +359,16 @@ Error MusicCatalog::UpdateSong(PlaylistItem *item)
 
     m_database->Sync();
 
-    return AddSong(item->URL().c_str());
+    err = AddSong(item->URL().c_str());
+
+    if (IsError(err))
+        return err;
+
+    m_inUpdateSong = false;
+
+    m_context->target->AcceptEvent(new MusicCatalogTrackChangedEvent(m_oldItem, m_newItem, m_oldArtist, m_newArtist, m_oldAlbum, m_newAlbum));
+
+    return kError_NoErr;
 }
 
 Error MusicCatalog::Remove(const char *url)
@@ -774,6 +786,32 @@ MetaData *MusicCatalog::ReadMetaDataFromDatabase(const char *url)
 int32 MusicCatalog::AcceptEvent(Event *e)
 {
     switch (e->Type()) {
+        case INFO_MusicCatalogTrackRemoved: {
+            if (m_inUpdateSong) {
+                MusicCatalogTrackRemovedEvent *mctr = 
+                                             (MusicCatalogTrackRemovedEvent *)e;
+                m_oldItem = (PlaylistItem *)mctr->Item();
+                m_oldArtist = (ArtistList *)mctr->Artist();
+                m_oldAlbum = (AlbumList *)mctr->Album();
+     
+                delete e;
+            }
+            else 
+                m_context->target->AcceptEvent(e);
+            break; }
+        case INFO_MusicCatalogTrackAdded: {
+            if (m_inUpdateSong) {
+                MusicCatalogTrackAddedEvent *mcta =
+                                             (MusicCatalogTrackAddedEvent *)e;
+                m_newItem = (PlaylistItem *)mcta->Item();
+                m_newArtist = (ArtistList *)mcta->Artist();
+                m_newAlbum = (AlbumList *)mcta->Album();
+
+                delete e;
+            }
+            else 
+                m_context->target->AcceptEvent(e);
+            break; }
         case INFO_PlaylistItemUpdated: {
             if (m_acceptItemChanged) {
                 PlaylistItemUpdatedEvent *piu = (PlaylistItemUpdatedEvent *)e;
@@ -796,9 +834,8 @@ int32 MusicCatalog::AcceptEvent(Event *e)
             m_context->target->AcceptEvent(new BrowserMessageEvent(info.c_str()));
             Sort();
             m_context->target->AcceptEvent(new Event(INFO_SearchMusicDone));
-            break;
-
             delete e;
+            break;
         } 
     }
     return 0; 

@@ -21,7 +21,7 @@ lib/gdbm/lib/libfagdbm.a: $(GDBMOBJ)
 	+test -d lib/gdbm/lib || mkdir lib/gdbm/lib
 	$(LIBMOD) $@ $(GDBMOBJ)
 
-PARSEOBJ += lib/xml/src/Parse.o
+PARSEOBJ = lib/xml/src/Parse.o
 
 lib/xml/lib/libfaxml.a: $(PARSEOBJ)
 	+test -d lib/xml/lib || mkdir lib/xml/lib

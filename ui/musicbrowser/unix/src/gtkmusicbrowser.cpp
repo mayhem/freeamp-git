@@ -1805,6 +1805,7 @@ void GTKMusicBrowser::CreatePlaylist(void)
 void GTKMusicBrowser::DeleteListEvent(void)
 {
     m_plm->RemoveAll();
+    m_context->target->AcceptEvent(new Event(CMD_Stop));
     UpdatePlaylistList();
     m_currentindex = kInvalidIndex;
 }
@@ -1919,7 +1920,9 @@ void GTKMusicBrowser::SetClickState(ClickState newState)
 void GTKMusicBrowser::DeleteEvent(void)
 {
     m_plm->RemoveItem(m_currentindex);
-    m_currentindex = m_plm->GetCurrentIndex();
+    if ((m_currentindex = m_plm->GetCurrentIndex()) == m_playingindex)
+        if (m_currentindex != kInvalidIndex)
+            m_context->target->AcceptEvent(new Event(CMD_NextMediaPiece));
     UpdatePlaylistList();
 }
 
@@ -2113,6 +2116,7 @@ GTKMusicBrowser::GTKMusicBrowser(FAContext *context, MusicBrowserUI *masterUI,
     pauseState = 0;
     stopState = 1;
     musicBrowserTree = NULL;
+    m_playingindex = kInvalidIndex;
 
     parentUI = masterUI;
  
@@ -2222,7 +2226,7 @@ int32 GTKMusicBrowser::AcceptEvent(Event *e)
 {
     switch (e->Type()) {
         case INFO_PrefsChanged: {
-            if (m_initialized) {
+            if (m_initialized && isVisible) {
                 gdk_threads_enter();
                 SetToolbarType();
                 gdk_threads_leave();
@@ -2243,31 +2247,39 @@ int32 GTKMusicBrowser::AcceptEvent(Event *e)
             }
             break; }
         case CMD_AddFiles: {
-            AddFileCMD();
+            if (master)
+                AddFileCMD();
             break; }
         case INFO_Playing: {
             pauseState = 0;
             stopState = 0;
-            gdk_threads_enter();
-            UpdatePlayPause();
-            gdk_threads_leave();
+            if (master) {
+                gdk_threads_enter();
+                UpdatePlayPause();
+                gdk_threads_leave();
+            }
             break; }
         case INFO_Stopped: {
             stopState = 1;
             pauseState = 0;
-            gdk_threads_enter();
-            UpdatePlayPause();
-            gdk_threads_leave();
+            if (master) {
+                gdk_threads_enter();
+                UpdatePlayPause();
+                gdk_threads_leave();
+            }
             break; }
         case INFO_Paused: {
             pauseState = 1;
             stopState = 0;
-            gdk_threads_enter();
-            UpdatePlayPause();
-            gdk_threads_leave();
+            if (master) {
+                gdk_threads_enter();
+                UpdatePlayPause();
+                gdk_threads_leave();
+            }
             break; }    
         case INFO_MusicCatalogTrackAdded:
         case INFO_MusicCatalogTrackRemoved:
+        case INFO_MusicCatalogTrackChanged:
         case INFO_MusicCatalogPlaylistRemoved:
         case INFO_MusicCatalogPlaylistAdded: {
             if (m_initialized) {
@@ -2275,7 +2287,10 @@ int32 GTKMusicBrowser::AcceptEvent(Event *e)
                 UpdateCatalog();
                 gdk_threads_leave();
             }
-            break; }   
+            break; }
+        case INFO_PlaylistCurrentItemInfo: {
+            m_playingindex = m_plm->GetCurrentIndex();
+            break; } 
         default:
             break;
     }
