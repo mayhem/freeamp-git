@@ -25,8 +25,8 @@ ____________________________________________________________________________*/
 #include <stdio.h>
 #include <unistd.h>
 
-#include <curses.h>
 #include <termios.h>
+#include <signal.h>
 
 
 #include "cmdlineUI.h"

@@ -28,14 +28,10 @@ ____________________________________________________________________________*/
 
 #include <signal.h>
 
-#include <curses.h>
-#include <termios.h>
-
 
 #include "Mpg123UI.h"
 #include "event.h"
 #include "eventdata.h"
-#include "player.h"
 #include "playlist.h"
 
 void mysigterm(int);
