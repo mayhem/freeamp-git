@@ -1,0 +1,8 @@
+[TopDir]
+file0=..\..\base\win32\prj\tools\MakeTheme.exe
+file1=..\..\base\win32\prj\tools\ThemeHowTo.txt
+
+[General]
+Type=FILELIST
+Version=1.00.000
+
