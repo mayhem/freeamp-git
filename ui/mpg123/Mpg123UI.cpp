@@ -2,7 +2,7 @@
     
     FreeAmp - The Free MP3 Player
 
-    Portions Copyright (C) 1998-1999 EMusic.com
+    Portions Copyright (C) 1998-2000 EMusic.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -79,7 +79,7 @@ Init(int32 startup_level)
       // cout << endl << "mpg123 0.59k command line compatability mode" << endl 
       // << endl;
       cerr << "High Performance MPEG 1.0/2.0/2.5 Audio Player for Layer 1, 2 and 3" << endl;
-      cerr << "Version 0.05 (1998/Oct/06).  " << endl;
+      cerr << "Version 2.0.2 (2000/Feb/04).  " << endl;
       cerr << "Copyrights EMusic, XingTech. See 'README' for more!" << endl;
       cerr << "This software is distributed under the GNU GPL." << endl;
       signal(SIGTERM, mysigterm);
@@ -212,6 +212,9 @@ DisplayStuff()
    if (!m_mediaInfo_set)
       return;
 
+   if (!m_mpegInfo_set)
+      return;
+
    char     *path = m_mediaInfo->m_filename;
    char     *pLastSlash = strrchr(path, '/');
    char     *dir = NULL;
@@ -220,19 +223,17 @@ DisplayStuff()
    if (pLastSlash)
    {
       *pLastSlash = '\0';
-      fname = (char *) ((int) pLastSlash + 1);
+      fname = pLastSlash + 1;
       dir = path;
    }
    else
    {
       fname = path;
    }
+
    strncpy(fileName, fname, 511);
    fileName[511] = '\0';
-
-   if (!m_mpegInfo_set)
-      return;
-
+   
 /*    if (m_id3Tag.m_containsInfo) {
    fprintf(stderr,"Title  : %30s  Artist: %s\n",m_id3Tag.m_songName,m_id3Tag.m_artist);
    fprintf(stderr,"Album  : %30s  Year: %4s, Genre: %d\n",m_id3Tag.m_album,m_id3Tag.m_year,(int)m_id3Tag.m_genre);
