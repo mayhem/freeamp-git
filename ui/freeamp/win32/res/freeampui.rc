@@ -37,24 +37,27 @@ BEGIN
     CONTROL         "Show FreeAmp icon in the system tray instead of the taskbar.",
                     IDC_TRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,157,
                     207,10
-    GROUPBOX        "Miscellaneous",IDC_STATIC,3,133,227,38
-    GROUPBOX        "Save Music Folder",IDC_STATIC,3,3,227,39
-    EDITTEXT        IDC_SAVEMUSICDIR,11,19,160,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "Browse...",IDC_BROWSE,175,19,50,14
-    GROUPBOX        "File Associations",IDC_STATIC,3,49,227,38
+    GROUPBOX        "Miscellaneous",IDC_STATIC,3,121,227,50
+    GROUPBOX        "Save Music Folder",IDC_STATIC,3,3,227,34
+    EDITTEXT        IDC_SAVEMUSICDIR,11,16,160,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Browse...",IDC_BROWSE,175,16,50,14
+    GROUPBOX        "File Associations",IDC_STATIC,3,44,227,38
     CONTROL         "Reclaim stolen music file associations when application starts.",
                     IDC_RECLAIMFILETYPES,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,18,61,209,10
+                    WS_TABSTOP,18,56,209,10
     CONTROL         "Ask before reclaiming music file associations.",
                     IDC_ASKRECLAIM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,
-                    73,157,10
-    GROUPBOX        "Show Toolbars As",IDC_STATIC,3,94,227,32
+                    68,157,10
+    GROUPBOX        "Show Toolbars As",IDC_STATIC,3,89,227,26
     CONTROL         "Text only",IDC_TEXTONLY,"Button",BS_AUTORADIOBUTTON,178,
-                    108,43,10
+                    100,43,10
     CONTROL         "Images only",IDC_IMAGESONLY,"Button",BS_AUTORADIOBUTTON,
-                    101,108,53,10
+                    101,100,53,10
     CONTROL         "Text and images",IDC_TEXTANDIMAGES,"Button",
-                    BS_AUTORADIOBUTTON,11,108,66,10
+                    BS_AUTORADIOBUTTON,11,100,66,10
+    CONTROL         "Save current playlist when exiting the application.",
+                    IDC_SAVECURRENTLIST,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,18,133,171,10
 END
 
 IDD_PREF_DEBUG DIALOG DISCARDABLE  0, 0, 233, 174

@@ -332,6 +332,8 @@ class MusicBrowserUI : public UserInterface
 
     MetaData            m_editTrackMetaData;
     DeviceInfo*         m_portableDevice;
+
+    bool                m_autoPlayHack;
 };
 
 #endif

@@ -515,6 +515,7 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
     static HWND hwndTextOnly = NULL;
     static HWND hwndImagesOnly = NULL;
     static HWND hwndTextAndImages = NULL;
+    static HWND hwndSavePlaylistOnExit = NULL;
     
 
     switch(msg)
@@ -534,6 +535,7 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
             hwndTextOnly = GetDlgItem(hwnd, IDC_TEXTONLY);
             hwndImagesOnly = GetDlgItem(hwnd, IDC_IMAGESONLY);
             hwndTextAndImages = GetDlgItem(hwnd, IDC_TEXTANDIMAGES);
+            hwndSavePlaylistOnExit = GetDlgItem(hwnd, IDC_SAVECURRENTLIST);
 
 
             Button_SetCheck(hwndStayOnTop, m_originalValues.stayOnTop);
@@ -541,6 +543,8 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
 
             Button_SetCheck(hwndReclaimFiletypes, m_originalValues.reclaimFiletypes);
             Button_SetCheck(hwndAskReclaimFiletypes, m_originalValues.askReclaimFiletypes);
+
+            Button_SetCheck(hwndSavePlaylistOnExit, m_originalValues.savePlaylistOnExit);
 
             Button_SetCheck(hwndTextOnly, 
                 m_originalValues.useTextLabels && !m_originalValues.useImages);
@@ -617,6 +621,29 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
                     {
                         m_proposedValues.useTextLabels = true;
                         m_proposedValues.useImages = true;
+                    }
+
+                    if(m_proposedValues != m_currentValues)
+                    {
+                        PropSheet_Changed(GetParent(hwnd), hwnd);
+                    }
+                    else
+                    {
+                        PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                    }
+
+                    break;
+                }
+
+                case IDC_SAVECURRENTLIST:
+                {
+                    if(Button_GetCheck(hwndSavePlaylistOnExit) == BST_CHECKED)
+                    {
+                        m_proposedValues.savePlaylistOnExit = true;
+                    }
+                    else
+                    {
+                        m_proposedValues.savePlaylistOnExit = false;
                     }
 
                     if(m_proposedValues != m_currentValues)

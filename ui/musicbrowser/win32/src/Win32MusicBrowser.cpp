@@ -129,7 +129,39 @@ MusicBrowserUI::MusicBrowserUI(FAContext      *context,
     Init();
 
     if (m_pParent == NULL)
+    {
        m_oPlm = m_context->plm;
+
+       if(!m_oPlm->CountItems())
+       {
+            bool savePlaylist = true;
+
+            m_context->prefs->GetSaveCurrentPlaylistOnExit(&savePlaylist);
+
+            if(savePlaylist)
+            {
+                char path[MAX_PATH];
+                char url[MAX_PATH + 7];
+                uint32 length = sizeof(path);
+
+                m_context->prefs->GetInstallDirectory(path, &length);
+
+                strcat(path, "\\freeamp.m3u");
+
+                length = sizeof(url);
+                FilePathToURL(path, url, &length);
+
+                vector<PlaylistItem*> items;
+
+                m_oPlm->ReadPlaylist(url, &items);
+
+                m_initialCount = items.size();
+                m_autoPlayHack = true;
+
+                m_oPlm->AddItems(&items);
+            }           
+       }
+    }
     else
     {
        m_oPlm = new PlaylistManager(m_context);   
@@ -180,6 +212,8 @@ void MusicBrowserUI::Init()
     m_hMusicCatalog = NULL;
     m_hPortableItem = NULL;
     m_hNewPortableItem = NULL;
+
+    m_autoPlayHack = false;
 }
 
 MusicBrowserUI::~MusicBrowserUI()

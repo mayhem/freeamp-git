@@ -81,7 +81,6 @@ CLEAN :
 	-@erase "$(INTDIR)\Win32Font.obj"
 	-@erase "$(INTDIR)\Win32MessageDialog.obj"
 	-@erase "$(INTDIR)\Win32PreferenceWindow.obj"
-	-@erase "$(INTDIR)\win32updatemanager.obj"
 	-@erase "$(INTDIR)\Win32Window.obj"
 	-@erase "$(INTDIR)\Window.obj"
 	-@erase "$(OUTDIR)\freeamp.exp"
@@ -138,7 +137,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32Font.obj" \
 	"$(INTDIR)\Win32MessageDialog.obj" \
 	"$(INTDIR)\Win32PreferenceWindow.obj" \
-	"$(INTDIR)\win32updatemanager.obj" \
 	"$(INTDIR)\Win32Window.obj" \
 	"$(INTDIR)\Window.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
@@ -157,8 +155,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 Release" "fabaselib - Win32 Release"\
  "zlib - Win32 Release" ".\freeamp.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                 ..\..\..\..\base\win32\prj\plugins
-	copy freeamp.ui                                ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                  ..\..\..\..\base\win32\prj\plugins
+	copy freeamp.ui                                 ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
@@ -205,7 +203,6 @@ CLEAN :
 	-@erase "$(INTDIR)\Win32Font.obj"
 	-@erase "$(INTDIR)\Win32MessageDialog.obj"
 	-@erase "$(INTDIR)\Win32PreferenceWindow.obj"
-	-@erase "$(INTDIR)\win32updatemanager.obj"
 	-@erase "$(INTDIR)\Win32Window.obj"
 	-@erase "$(INTDIR)\Window.obj"
 	-@erase "$(OUTDIR)\freeamp.exp"
@@ -264,7 +261,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32Font.obj" \
 	"$(INTDIR)\Win32MessageDialog.obj" \
 	"$(INTDIR)\Win32PreferenceWindow.obj" \
-	"$(INTDIR)\win32updatemanager.obj" \
 	"$(INTDIR)\Win32Window.obj" \
 	"$(INTDIR)\Window.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
@@ -283,8 +279,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 Debug" "fabaselib - Win32 Debug"\
  "zlib - Win32 Debug" ".\freeamp.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                 ..\..\..\..\base\win32\prj\plugins
-	copy freeamp.ui                                ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                  ..\..\..\..\base\win32\prj\plugins
+	copy freeamp.ui                                 ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Debug"
@@ -331,7 +327,6 @@ CLEAN :
 	-@erase "$(INTDIR)\Win32Font.obj"
 	-@erase "$(INTDIR)\Win32MessageDialog.obj"
 	-@erase "$(INTDIR)\Win32PreferenceWindow.obj"
-	-@erase "$(INTDIR)\win32updatemanager.obj"
 	-@erase "$(INTDIR)\Win32Window.obj"
 	-@erase "$(INTDIR)\Window.obj"
 	-@erase "$(OUTDIR)\freeamp.exp"
@@ -390,7 +385,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32Font.obj" \
 	"$(INTDIR)\Win32MessageDialog.obj" \
 	"$(INTDIR)\Win32PreferenceWindow.obj" \
-	"$(INTDIR)\win32updatemanager.obj" \
 	"$(INTDIR)\Win32Window.obj" \
 	"$(INTDIR)\Window.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
@@ -409,8 +403,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 NASM Debug" "fabaselib - Win32 NASM Debug"\
  "zlib - Win32 NASM Debug" ".\freeamp.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                 ..\..\..\..\base\win32\prj\plugins
-	copy freeamp.ui                                ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                  ..\..\..\..\base\win32\prj\plugins
+	copy freeamp.ui                                 ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Release"
@@ -456,7 +450,6 @@ CLEAN :
 	-@erase "$(INTDIR)\Win32Font.obj"
 	-@erase "$(INTDIR)\Win32MessageDialog.obj"
 	-@erase "$(INTDIR)\Win32PreferenceWindow.obj"
-	-@erase "$(INTDIR)\win32updatemanager.obj"
 	-@erase "$(INTDIR)\Win32Window.obj"
 	-@erase "$(INTDIR)\Window.obj"
 	-@erase "$(OUTDIR)\freeamp.exp"
@@ -513,7 +506,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32Font.obj" \
 	"$(INTDIR)\Win32MessageDialog.obj" \
 	"$(INTDIR)\Win32PreferenceWindow.obj" \
-	"$(INTDIR)\win32updatemanager.obj" \
 	"$(INTDIR)\Win32Window.obj" \
 	"$(INTDIR)\Window.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
@@ -532,8 +524,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 NASM Release"\
  "fabaselib - Win32 NASM Release" "zlib - Win32 NASM Release" ".\freeamp.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                 ..\..\..\..\base\win32\prj\plugins
-	copy freeamp.ui                                ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                  ..\..\..\..\base\win32\prj\plugins
+	copy freeamp.ui                                 ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 
@@ -985,9 +977,6 @@ DEP_CPP_DIALC=\
 !ENDIF 
 
 SOURCE=..\..\src\Font.cpp
-
-!IF  "$(CFG)" == "freeampui - Win32 Release"
-
 DEP_CPP_FONT_=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
@@ -998,47 +987,6 @@ DEP_CPP_FONT_=\
  "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
-
-DEP_CPP_FONT_=\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\config\config.h"\
-	"..\..\include\Font.h"\
-	
-
-"$(INTDIR)\Font.obj" : $(SOURCE) $(DEP_CPP_FONT_) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Debug"
-
-DEP_CPP_FONT_=\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\config\config.h"\
-	"..\..\include\Font.h"\
-	
-
-"$(INTDIR)\Font.obj" : $(SOURCE) $(DEP_CPP_FONT_) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Release"
-
-DEP_CPP_FONT_=\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\config\config.h"\
-	"..\..\include\Font.h"\
-	
-
-"$(INTDIR)\Font.obj" : $(SOURCE) $(DEP_CPP_FONT_) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 SOURCE=..\..\src\FreeAmpTheme.cpp
 
@@ -1069,10 +1017,12 @@ DEP_CPP_FREEA=\
 	"..\..\..\..\base\include\registrar.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\updatemanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\help.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\base\win32\include\win32updatemanager.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\io\include\pipeline.h"\
 	"..\..\..\..\io\include\pullbuffer.h"\
@@ -1134,10 +1084,12 @@ DEP_CPP_FREEA=\
 	"..\..\..\..\base\include\registrar.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\updatemanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\help.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\base\win32\include\win32updatemanager.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\io\include\pipeline.h"\
 	"..\..\..\..\io\include\pullbuffer.h"\
@@ -1191,10 +1143,12 @@ DEP_CPP_FREEA=\
 	"..\..\..\..\base\include\registrar.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\updatemanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\help.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\base\win32\include\win32updatemanager.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\io\include\pipeline.h"\
 	"..\..\..\..\io\include\pullbuffer.h"\
@@ -1248,10 +1202,12 @@ DEP_CPP_FREEA=\
 	"..\..\..\..\base\include\registrar.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\updatemanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\help.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\base\win32\include\win32updatemanager.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\io\include\pipeline.h"\
 	"..\..\..\..\io\include\pullbuffer.h"\
@@ -2438,140 +2394,6 @@ NODEP_CPP_WIN32P=\
 
 !ENDIF 
 
-SOURCE=..\..\..\..\base\win32\src\win32updatemanager.cpp
-
-!IF  "$(CFG)" == "freeampui - Win32 Release"
-
-DEP_CPP_WIN32U=\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\base\include\event.h"\
-	"..\..\..\..\base\include\eventdata.h"\
-	"..\..\..\..\base\include\facontext.h"\
-	"..\..\..\..\base\include\log.h"\
-	"..\..\..\..\base\include\metadata.h"\
-	"..\..\..\..\base\include\playlist.h"\
-	"..\..\..\..\base\include\playlistformat.h"\
-	"..\..\..\..\base\include\plmevent.h"\
-	"..\..\..\..\base\include\portabledevice.h"\
-	"..\..\..\..\base\include\preferences.h"\
-	"..\..\..\..\base\include\registry.h"\
-	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\include\updatemanager.h"\
-	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\mutex.h"\
-	"..\..\..\..\base\win32\include\semaphore.h"\
-	"..\..\..\..\base\win32\include\win32updatemanager.h"\
-	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
-	"..\..\..\..\lib\zlib\include\zconf.h"\
-	"..\..\..\..\lib\zlib\include\zlib.h"\
-	{$(INCLUDE)}"sys\types.h"\
-	
-
-"$(INTDIR)\win32updatemanager.obj" : $(SOURCE) $(DEP_CPP_WIN32U) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
-
-DEP_CPP_WIN32U=\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\base\include\event.h"\
-	"..\..\..\..\base\include\eventdata.h"\
-	"..\..\..\..\base\include\facontext.h"\
-	"..\..\..\..\base\include\log.h"\
-	"..\..\..\..\base\include\metadata.h"\
-	"..\..\..\..\base\include\playlist.h"\
-	"..\..\..\..\base\include\playlistformat.h"\
-	"..\..\..\..\base\include\plmevent.h"\
-	"..\..\..\..\base\include\portabledevice.h"\
-	"..\..\..\..\base\include\preferences.h"\
-	"..\..\..\..\base\include\registry.h"\
-	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\include\updatemanager.h"\
-	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\mutex.h"\
-	"..\..\..\..\base\win32\include\semaphore.h"\
-	"..\..\..\..\base\win32\include\win32updatemanager.h"\
-	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
-	"..\..\..\..\lib\zlib\include\zconf.h"\
-	"..\..\..\..\lib\zlib\include\zlib.h"\
-	
-
-"$(INTDIR)\win32updatemanager.obj" : $(SOURCE) $(DEP_CPP_WIN32U) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Debug"
-
-DEP_CPP_WIN32U=\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\base\include\event.h"\
-	"..\..\..\..\base\include\eventdata.h"\
-	"..\..\..\..\base\include\facontext.h"\
-	"..\..\..\..\base\include\log.h"\
-	"..\..\..\..\base\include\metadata.h"\
-	"..\..\..\..\base\include\playlist.h"\
-	"..\..\..\..\base\include\playlistformat.h"\
-	"..\..\..\..\base\include\plmevent.h"\
-	"..\..\..\..\base\include\portabledevice.h"\
-	"..\..\..\..\base\include\preferences.h"\
-	"..\..\..\..\base\include\registry.h"\
-	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\include\updatemanager.h"\
-	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\mutex.h"\
-	"..\..\..\..\base\win32\include\semaphore.h"\
-	"..\..\..\..\base\win32\include\win32updatemanager.h"\
-	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
-	"..\..\..\..\lib\zlib\include\zconf.h"\
-	"..\..\..\..\lib\zlib\include\zlib.h"\
-	
-
-"$(INTDIR)\win32updatemanager.obj" : $(SOURCE) $(DEP_CPP_WIN32U) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Release"
-
-DEP_CPP_WIN32U=\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\base\include\event.h"\
-	"..\..\..\..\base\include\eventdata.h"\
-	"..\..\..\..\base\include\facontext.h"\
-	"..\..\..\..\base\include\log.h"\
-	"..\..\..\..\base\include\metadata.h"\
-	"..\..\..\..\base\include\playlist.h"\
-	"..\..\..\..\base\include\playlistformat.h"\
-	"..\..\..\..\base\include\plmevent.h"\
-	"..\..\..\..\base\include\portabledevice.h"\
-	"..\..\..\..\base\include\preferences.h"\
-	"..\..\..\..\base\include\registry.h"\
-	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\include\updatemanager.h"\
-	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\mutex.h"\
-	"..\..\..\..\base\win32\include\semaphore.h"\
-	"..\..\..\..\base\win32\include\win32updatemanager.h"\
-	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
-	"..\..\..\..\lib\zlib\include\zconf.h"\
-	"..\..\..\..\lib\zlib\include\zlib.h"\
-	{$(INCLUDE)}"sys\types.h"\
-	
-
-"$(INTDIR)\win32updatemanager.obj" : $(SOURCE) $(DEP_CPP_WIN32U) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
-
 SOURCE=..\src\Win32Window.cpp
 
 !IF  "$(CFG)" == "freeampui - Win32 Release"
@@ -2812,6 +2634,7 @@ SOURCE=..\res\freeampui.rc
 DEP_RSC_FREEAM=\
 	"..\res\checked.bmp"\
 	"..\res\icon1.ico"\
+	"..\res\info.ico"\
 	"..\res\unchecked.bmp"\
 	
 
