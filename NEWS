@@ -1,4 +1,5 @@
-3-4-1999	Optimized x86 mp3 code for Linux and Windows
-1-11-1999	Added alsa-linux.pmo
-10-8-1998       FreeAmp v0.5 is released to developers with the Xing decoder.
-7-2-1998	FreeAmp is first released to developers.
+3-7-1999  Release Linux 1.2 version. General optimizations and streaming support
+3-4-1999	 Optimized x86 mp3 code for Linux and Windows
+1-11-1999 Added alsa-linux.pmo -- this is currently not working
+10-8-1998 FreeAmp v0.5 is released to developers with the Xing decoder.
+7-2-1998	 FreeAmp is first released to developers.

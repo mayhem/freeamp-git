@@ -1,0 +1,29 @@
+Changes for Linux version 1.2:
+--------------------------------------------------------------------
+
+- Added assembly decoder optimizations, input and output buffering. FreeAmp
+  should now be able to play audio uninterrupted, unless the load
+  on the machine gets too great. FreeAmp is now much less processor 
+  intensive, while consuming more memory.
+
+- Added support for SHOUTcast, HTTP and RTP streaming. You can now specify
+  a file, an http://, or a rtp:// on the command line. For more information
+  on SHOUTcast, please see http://icecast.linuxpower.org or
+  http://www.shoutcast.com
+
+- Logging support. Using the Logging, LogInput, LogDecode properties
+  the user can now log debug information and errors to the file freeamp.log.
+  This will allow the freeamp team to debug problems with versions of FreeAmp
+  in the field.
+
+- VBR stream support. FreeAmp handles VBR streams correctly. It might
+  have done this in previous versions too, but it does it better now. :-)
+
+- stdin support. To accept an mp3 stream from stdin, invoke freeamp like
+  this:
+
+      freeamp file://- < myfile.mp3
+
+- Added properties for logging and buffering. See README for details.
+
+- Added autoplay support.

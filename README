@@ -1,9 +1,12 @@
 This documents how to get you up, running and using FreeAmp.  It also
 explains a bit about where we are coming from.
 
-Send feedback/questions to info@freeamp.org
+Send feedback to info@freeamp.org. If you have any questions, please
+check the web site at http://www.freeamp.org for answers to common
+problems before sending us mail.
 
 INSTALLATION:
+----------------------------------------------------------------------
 
 From the source:
 
@@ -16,9 +19,46 @@ From binaries:
     /usr/local/lib/freeamp  (see first note under the Linux section below)
 
 
-FreeAmp Linux 1.1.0 (12-12-98) Usage:
+USING FREEAMP:
+----------------------------------------------------------------------
 
-  freeamp [-ui <ui plugin name>] <song1.mp3> [song2.mp3]...
+FreeAmp version 1.20 -- Usage:
+
+freeamp [-ui <UI plugin name>] [-prop <PropertyName>=<PropertyValue>]
+        <MP3 file/stream> [MP3 file/stream] ...
+
+The following properties can be set:
+
+  InputBuffer      - the size (in Kb) of the input buffer
+  OutputBuffer     - the size (in Kb) of the output buffer
+  BufferUpInterval - how many seconds to buffer up for streaming
+  Logging          - a value of 'yes' turns on logging
+  LoggingInput     - a value of 'yes' logs input events
+  LoggingDecode    - a value of 'yes' logs decode events
+
+Example command line:
+
+   freeamp -prop OutputBuffer=256 mysong1.mp3 mysong2.mp3
+
+Notes:
+
+  * The default output buffer size is set to 512Kb. If you have a machine
+    that is not using X, or you are constrained in the amount of memory
+    you have, you can specify a smaller output buffer like:
+
+       freeamp -prop OutputBuffer=<size>
+
+    Where size is in kbytes.
+
+  * To play an SHOUTcast/http stream, specify the HTTP URL on the
+    command line. For example:
+
+       freeamp http://206.178.45.2:8000    
+
+  * To play an RTP/multicast stream, specify the RTP URL on the command
+    line. Example:
+
+       freeamp rtp://225.2.1.5:4420    
 
   * FreeAmp looks for the plugin directory in:
    - the current directory, then
@@ -80,17 +120,23 @@ FreeAmp Win32 1.0.0 (11-9-98) Usage:
 
 
 ABOUT FreeAmp:
+----------------------------------------------------------------------
 
-FreeAmp is an Open Source effort to build the best digital audio
-player available.  In the interest of supporting the free software
-community, while at the same time fostering the growth of the online
-delivery of music, GoodNoise Corporation, The Internet Record Company,
-is funding both the freeamp.org domain and the efforts of three
-developers: Mark B. Elrod, Brett Thomas, and Jason Woodward.
+FreeAmp is an Open Source effort to build the best digital audio player
+available.  In the interest of supporting the free software community, while at
+the same time fostering the growth of the online delivery of music, GoodNoise
+Corporation, The Internet Record Company, is funding both the FreeAmp.org
+domain and the efforts of the FreeAmp team. The FreeAmp team consists of:
+Mark B. Elrod, Robert Kaye, Brett Thomas, Jason Woodward, and Mark Weaver. 
 
-FreeAmp is being released under the GPL (www.gnu.org).  As is provided
-by the GPL, all our (GoodNoise's) and your efforts toward FreeAmp will
-be released back to the community at large.
+Other people have also contributed to FreeAmp. Bill Yuan in China has
+contributed the RainPlay user interface and Gabor Fleischer in Hungary has
+contributed Linux ALSA support. If you feel like contributing to the project,
+please check out our developer pages. 
+
+FreeAmp is being released under the GPL.  As is provided by the GPL, all of
+GoodNoise's and your efforts toward FreeAmp will be released back to the
+community at large. 
 
 The current development and release versions of FreeAmp can be found
 at http://www.freeamp.org.
@@ -106,5 +152,4 @@ subscribe
 To make feature suggestions, send mail to freeamp-features@freeamp.org, or,
 better yet, if you are able, add the feature yourself and send us the
 updates!
-
 
