@@ -271,9 +271,10 @@ Error AlsaPMO::Init(OutputInfo* info) {
 Error AlsaPMO::Reset(bool user_stop) {
 
     if (user_stop) 
-    {
         snd_pcm_drain_playback(ai->handle);
-    }
+    else
+        snd_pcm_flush_playback(ai->handle);
+
     return kError_NoErr;
 }
 
