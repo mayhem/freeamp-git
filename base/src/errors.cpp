@@ -92,6 +92,8 @@ const char* ErrorString[] = {
     "Duplicate database item", //                   kError_DuplicateItem = 65,
     "The requested item was not found", //          kError_ItemNotFound = 66,
     "The requested file was not found", //          kError_HTTPFileNotFound  = 67,
+    "Failed to initialize your CD-ROM", //          kError_CDInitFailed = 68;
+    "Cannot play CD track",             //          kError_InvalidTrack = 69,
 
     "kError_LastError", //            = 9999
 };

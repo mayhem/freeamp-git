@@ -36,6 +36,7 @@ PLUGINS += plugins/httpinput.pmi
 PLUGINS += plugins/obsinput.pmi
 
 PLUGINS += plugins/soundcard.pmo
+PLUGINS += plugins/cd.pmo
 
 PLUGINS += plugins/freeampcmd.ui
 PLUGINS += plugins/mpg123.ui
@@ -43,6 +44,7 @@ PLUGINS += plugins/lcd.ui
 PLUGINS += plugins/irman.ui
 
 PLUGINS += plugins/xingmp3.lmc
+PLUGINS += plugins/cd.lmc
 
 PLUGINS += plugins/id3v1.mdf
 PLUGINS += plugins/id3v2.mdf
@@ -104,7 +106,8 @@ plugins/soundcard.pmo: $(SCPMOOBJ)
 ALSAOBJ  = io/alsa/$(OSDEP)/src/alsapmo.o io/src/pipeline.o io/src/pmo.o
 
 plugins/alsa.pmo: $(ALSAOBJ)
-	$(LINKMOD) -o $@ $(ALSAOBJ) -lasound $(STATICLD)
+	$(LINKMOD) -o $@ $(ALSAOBJ) -lasound 
+#	$(LINKMOD) -o $@ $(ALSAOBJ) $(STATICLD) /usr/lib/libasound.a
 
 # esound
 ESNDOBJ  = io/esound/src/esoundpmo.o io/src/pipeline.o io/src/pmo.o
@@ -113,6 +116,12 @@ plugins/esound.pmo: $(ESNDOBJ)
 	$(LINKMOD) -o $@ $(ESNDOBJ) $(ESD_LIBS)
 #	$(LINKMOD) -o $@ $(ESNDOBJ) $(STATICLD) /usr/lib/libesd.a /usr/lib/libaudiofile.a
 
+# cd
+CDPMOOBJ  = io/cd/unix/src/cdpmo.o io/cd/unix/src/cdaudio.o io/src/pipeline.o 
+CDPMOOBJ += io/src/pmo.o
+
+plugins/cd.pmo: $(CDPMOOBJ)
+	$(LINKMOD) -o $@ $(CDPMOOBJ) $(STATICLD)
 #
 # UI section
 
@@ -201,6 +210,13 @@ plugins/irman.ui: $(IRMANUIOBJ)
 
 #
 # LMC section
+
+# dummy lmc for cd audio
+
+CDLMCOBJ = lmc/cd/src/cdlmc.o
+
+plugins/cd.lmc: $(CDLMCOBJ)
+	$(LINKMOD) -o $@ $(CDLMCOBJ) $(STATICLD)
 
 # the XING decoder objs and dependencies:
 # This is kinda nasty, since there's C, C++, and asm, oh my!

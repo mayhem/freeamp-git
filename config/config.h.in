@@ -45,6 +45,20 @@ ____________________________________________________________________________*/
 #define HAVE_IO_H 0
 #define HAVE_ERRNO_H 0
 
+/* cdaudio stuff */
+#undef HAVE_GETMNTENT
+#undef STDC_HEADERS
+#undef IRIX_CDAUDIO
+#undef HAVE_GETMNTINFO
+#undef HAVE_LINUX_CDROM_H
+#undef HAVE_IO_CAM_CDROM_H
+#undef HAVE_LINUX_UCDROM_H
+#undef HAVE_MNTENT_H
+#undef HAVE_SYS_CDIO_H
+#undef HAVE_SYS_MOUNT_H
+#undef HAVE_SYS_MNTENT_H
+#undef HAVE_SYS_UCRED_H
+
 /* gdbm stuff */
 
 #undef const

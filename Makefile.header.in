@@ -63,7 +63,7 @@ LIBMOD = @LIBMOD@
 
 OSDEPOBJ = @OSDEPOBJ@
 
-INCLUDES = -I$(srcdir)/lib/gdbm -I$(srcdir)/base/include -Iconfig -I$(srcdir)/io/include -I$(srcdir)/ui/include -I$(srcdir)/lmc/include $(OSINC) -I$(srcdir)/io/soundcard/$(OSDEP)/include -I$(srcdir)/ui/lcd/include -I$(srcdir)/ui/irman/include -I$(srcdir)/lmc/xingmp3/include -I$(srcdir)/plm/portable/pmp300/sba -I$(srcdir)/lib/xml/include -I$(srcdir)/lib/zlib/include
+INCLUDES = -I$(srcdir)/lib/gdbm -I$(srcdir)/base/include -Iconfig -I$(srcdir)/io/include -I$(srcdir)/ui/include -I$(srcdir)/lmc/include $(OSINC) -I$(srcdir)/io/soundcard/$(OSDEP)/include -I$(srcdir)/ui/lcd/include -I$(srcdir)/ui/irman/include -I$(srcdir)/lmc/xingmp3/include -I$(srcdir)/lmc/cd/include -I$(srcdir)/plm/portable/pmp300/sba -I$(srcdir)/lib/xml/include -I$(srcdir)/lib/zlib/include -I$(srcdir)/io/cd/include -I$(srcdir)/io/cd/unix/include
 CXXFLAGS = $(EXTRA_CXXFLAGS)
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(srcdir)/config/mkinstalldirs

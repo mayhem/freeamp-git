@@ -35,6 +35,14 @@ AC_PROG_INSTALL
 AC_CHECK_PROGS(PERL, perl)
 AC_CHECK_PROGS(NASM, nasm)
 
+dnl libcdaudio stuff
+AC_HEADER_STDC
+AC_CHECK_HEADERS(linux/cdrom.h linux/ucdrom.h sys/cdio.h io/cam/cdrom.h mntent.h sys/mntent.h sys/ucred.h sys/mount.h)
+AC_CHECK_FUNCS(getmntinfo)
+AC_FUNC_GETMNTENT
+
+AC_C_CONST
+
 dnl Checks for libraries.
 
 dnl Checks for header files.
@@ -92,6 +100,9 @@ case "$host_os" in
     CFLAGS="$CFLAGS -Wno-multichar -Wno-ctor-dtor-privacy"
     LINKMOD='g++ -nostart -Xlinker -soname=${@F} freeamp'
     isunix="false"
+    ;;
+  irix*)
+    AC_DEFINE(IRIX_CDAUDIO)
     ;;
   linux*)
     AC_DEFINE(HAVE_LINUX)

@@ -96,6 +96,8 @@ typedef enum Error
     kError_DuplicateItem        = 65,
     kError_ItemNotFound         = 66,
     kError_HTTPFileNotFound     = 67,
+    kError_CDInitFailed         = 68,
+    kError_InvalidTrack         = 69,
 
     kError_LastError            = 9999
 };
