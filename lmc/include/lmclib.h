@@ -50,7 +50,7 @@ bool ChangePosition(LMCRef ref, int32 pos);
 void Cleanup(LMCRef ref);
 
 #ifdef __cplusplus
-// extern "C"
+} // extern "C"
 #endif
 
 #endif /* _LMCLIB_H_ */

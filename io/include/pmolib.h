@@ -42,7 +42,7 @@ void Clear(PMORef ref);
 void Cleanup(PMORef ref);
 
 #ifdef __cplusplus
-// extern "C"
+} // extern "C"
 #endif
 
 #endif /* _PMOLIB_H_ */

@@ -76,7 +76,7 @@ typedef struct PMO{
 }PMO, *PMORef;
 
 #ifdef __cplusplus
-// extern "C" 
+} // extern "C" 
 #endif
 
 #endif /* _PMO_H_ */

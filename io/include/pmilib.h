@@ -43,7 +43,7 @@ const char* Url(PMIRef ref);
 void Cleanup(PMIRef ref);
 
 #ifdef __cplusplus
-// extern "C"
+} // extern "C"
 #endif
 
 #endif /* _PMILIB_H_ */

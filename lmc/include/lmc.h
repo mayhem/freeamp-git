@@ -70,7 +70,7 @@ typedef struct LMC{
 }LMC, *LMCRef;
 
 #ifdef __cplusplus
-// extern "C"
+} // extern "C"
 #endif
 
 #endif // _LMC_H_
