@@ -61,6 +61,7 @@ extern const char* kAlternateNICAddressPref;
 extern const char* kUseTitleStreamingPref;  
 extern const char* kThemePathPref;
 extern const char* kMainWindowPosPref;
+extern const char* kWindowModePref;
 extern const char* kThemeDefaultFontPref;
 extern const char* kSaveMusicDirPref;
 extern const char* kDatabaseDirPref;
