@@ -53,10 +53,10 @@ class Win32Bitmap : public Bitmap
     protected:
 
      void          CreateMaskBitmap(void);
-
     
      HBITMAP  m_hBitmap;
      HBITMAP  m_hMaskBitmap;
+	 void    *m_pBitmapData;
 };
 
 #endif

@@ -197,6 +197,7 @@ void FreeAmpTheme::LoadFreeAmpTheme(void)
        GetErrorString(oErr);
        oMessage += oErr;
        oBox.Show(oMessage.c_str(), string(BRANDING), kMessageOk);
+       m_pContext->target->AcceptEvent(new Event(CMD_QuitPlayer));
    }
 }
 

@@ -593,7 +593,6 @@ DEP_CPP_DOWNL=\
 	"..\..\include\facontext.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musiccatalog.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
 	"..\..\include\plmevent.h"\
@@ -605,6 +604,9 @@ DEP_CPP_DOWNL=\
 	"..\..\include\utility.h"\
 	"..\include\mutex.h"\
 	"..\include\semaphore.h"\
+	
+NODEP_CPP_DOWNL=\
+	"..\..\include\musicbrowser.h"\
 	
 
 "$(INTDIR)\downloadmanager.obj" : $(SOURCE) $(DEP_CPP_DOWNL) "$(INTDIR)"\
@@ -626,7 +628,6 @@ DEP_CPP_DOWNL=\
 	"..\..\include\facontext.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musiccatalog.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
 	"..\..\include\plmevent.h"\
@@ -638,6 +639,9 @@ DEP_CPP_DOWNL=\
 	"..\..\include\utility.h"\
 	"..\include\mutex.h"\
 	"..\include\semaphore.h"\
+	
+NODEP_CPP_DOWNL=\
+	"..\..\include\musicbrowser.h"\
 	
 
 "$(INTDIR)\downloadmanager.obj" : $(SOURCE) $(DEP_CPP_DOWNL) "$(INTDIR)"\
@@ -802,7 +806,6 @@ DEP_CPP_MUSIC=\
 	"..\..\include\hashtable.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musiccatalog.h"\
 	"..\..\include\player.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
@@ -817,6 +820,9 @@ DEP_CPP_MUSIC=\
 	"..\..\include\utility.h"\
 	"..\include\mutex.h"\
 	"..\include\semaphore.h"\
+	
+NODEP_CPP_MUSIC=\
+	"..\..\include\musicbrowser.h"\
 	
 
 "$(INTDIR)\musiccatalog.obj" : $(SOURCE) $(DEP_CPP_MUSIC) "$(INTDIR)"\
@@ -844,7 +850,6 @@ DEP_CPP_MUSIC=\
 	"..\..\include\hashtable.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musiccatalog.h"\
 	"..\..\include\player.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
@@ -859,6 +864,9 @@ DEP_CPP_MUSIC=\
 	"..\..\include\utility.h"\
 	"..\include\mutex.h"\
 	"..\include\semaphore.h"\
+	
+NODEP_CPP_MUSIC=\
+	"..\..\include\musicbrowser.h"\
 	
 
 "$(INTDIR)\musiccatalog.obj" : $(SOURCE) $(DEP_CPP_MUSIC) "$(INTDIR)"\
@@ -1027,7 +1035,6 @@ DEP_CPP_PLAYE=\
 	"..\..\include\hashtable.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musiccatalog.h"\
 	"..\..\include\player.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
@@ -1043,6 +1050,9 @@ DEP_CPP_PLAYE=\
 	"..\..\include\utility.h"\
 	"..\include\mutex.h"\
 	"..\include\semaphore.h"\
+	
+NODEP_CPP_PLAYE=\
+	"..\..\include\musicbrowser.h"\
 	
 
 "$(INTDIR)\player.obj" : $(SOURCE) $(DEP_CPP_PLAYE) "$(INTDIR)"\
@@ -1072,7 +1082,6 @@ DEP_CPP_PLAYE=\
 	"..\..\include\hashtable.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musiccatalog.h"\
 	"..\..\include\player.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
@@ -1088,6 +1097,9 @@ DEP_CPP_PLAYE=\
 	"..\..\include\utility.h"\
 	"..\include\mutex.h"\
 	"..\include\semaphore.h"\
+	
+NODEP_CPP_PLAYE=\
+	"..\..\include\musicbrowser.h"\
 	
 
 "$(INTDIR)\player.obj" : $(SOURCE) $(DEP_CPP_PLAYE) "$(INTDIR)"\
@@ -1194,7 +1206,6 @@ DEP_CPP_PLAYL=\
 	"..\..\include\facontext.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musiccatalog.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
 	"..\..\include\plmevent.h"\
@@ -1205,6 +1216,9 @@ DEP_CPP_PLAYL=\
 	"..\..\include\thread.h"\
 	"..\..\include\utility.h"\
 	"..\include\mutex.h"\
+	
+NODEP_CPP_PLAYL=\
+	"..\..\include\musicbrowser.h"\
 	
 
 "$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"\
@@ -1224,7 +1238,6 @@ DEP_CPP_PLAYL=\
 	"..\..\include\facontext.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musiccatalog.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
 	"..\..\include\plmevent.h"\
@@ -1235,6 +1248,9 @@ DEP_CPP_PLAYL=\
 	"..\..\include\thread.h"\
 	"..\..\include\utility.h"\
 	"..\include\mutex.h"\
+	
+NODEP_CPP_PLAYL=\
+	"..\..\include\musicbrowser.h"\
 	
 
 "$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"\
@@ -1339,8 +1355,8 @@ SOURCE=..\..\src\propimpl.cpp
 
 DEP_CPP_PROPI=\
 	"..\..\..\config\config.h"\
+	"..\..\include\debug.h"\
 	"..\..\include\errors.h"\
-	"..\..\include\hashtable.h"\
 	"..\..\include\properties.h"\
 	"..\..\include\propimpl.h"\
 	"..\include\mutex.h"\
@@ -1353,33 +1369,15 @@ DEP_CPP_PROPI=\
 
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 Debug"
 
-DEP_CPP_PROPI=\
-	"..\..\..\config\config.h"\
-	"..\..\include\errors.h"\
-	"..\..\include\hashtable.h"\
-	"..\..\include\properties.h"\
-	"..\..\include\propimpl.h"\
-	"..\include\mutex.h"\
-	
 
-"$(INTDIR)\propimpl.obj" : $(SOURCE) $(DEP_CPP_PROPI) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\propimpl.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Debug"
 
-DEP_CPP_PROPI=\
-	"..\..\..\config\config.h"\
-	"..\..\include\errors.h"\
-	"..\..\include\hashtable.h"\
-	"..\..\include\properties.h"\
-	"..\..\include\propimpl.h"\
-	"..\include\mutex.h"\
-	
 
-"$(INTDIR)\propimpl.obj" : $(SOURCE) $(DEP_CPP_PROPI) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\propimpl.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1387,8 +1385,8 @@ DEP_CPP_PROPI=\
 
 DEP_CPP_PROPI=\
 	"..\..\..\config\config.h"\
+	"..\..\include\debug.h"\
 	"..\..\include\errors.h"\
-	"..\..\include\hashtable.h"\
 	"..\..\include\properties.h"\
 	"..\..\include\propimpl.h"\
 	"..\include\mutex.h"\

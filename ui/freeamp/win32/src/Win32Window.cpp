@@ -370,9 +370,7 @@ Error Win32Window::VulcanMindMeld(Window *pOther)
     sRect.top = oRect.y1;
     sRect.right = oRect.y2;
 
-	// Invalidate the complete old window to ensure a redraw
-    if (oRect.Width() > 0 && oRect.Height() > 0)
-       InvalidateRect(m_hWnd, NULL, true);
+    InvalidateRect(NULL, &sRect, true);
     
     eRet = Window::VulcanMindMeld(pOther);
     m_pMindMeldMutex->Release();

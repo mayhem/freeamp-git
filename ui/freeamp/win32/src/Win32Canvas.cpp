@@ -251,7 +251,6 @@ void Win32Canvas::Paint(HDC hDC, Rect &oRect)
    
    DeleteObject(SelectObject(hMemDC, m_pBufferBitmap->GetBitmapHandle()));
    
-#if 0
    if (GetDeviceCaps(hDC, RASTERCAPS) & RC_PALETTE)
    {
       SetStretchBltMode(hDC, HALFTONE);
@@ -259,14 +258,12 @@ void Win32Canvas::Paint(HDC hDC, Rect &oRect)
       {
          m_hPal = CreateHalftonePalette(hDC);
       }   
-      SelectPalette(hDC, m_hPal, false);
+      SelectPalette(hDC, m_hPal, true);
       RealizePalette(hDC);
    }
    StretchBlt(hDC, oRect.x1, oRect.y1, oRect.Width(), oRect.Height(),
               hMemDC, oRect.x1, oRect.y1, oRect.Width(), oRect.Height(), SRCCOPY);
-#endif   
-   BitBlt(hDC, oRect.x1, oRect.y1, oRect.Width(), oRect.Height(),
-          hMemDC, oRect.x1, oRect.y1, SRCCOPY);
+
    DeleteDC(hMemDC);       
 }
 

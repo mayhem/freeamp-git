@@ -134,7 +134,7 @@ SOURCE=..\config\config.win32
 InputPath=..\config\config.win32
 
 "..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\config\config.win32 ..\config\config.h
+	if not exist ..\config\config.h copy ..\config\config.win32 ..\config\config.h
 
 # End Custom Build
 
@@ -144,7 +144,7 @@ InputPath=..\config\config.win32
 InputPath=..\config\config.win32
 
 "..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\config\config.win32 ..\config\config.h
+	if not exist ..\config\config.h copy ..\config\config.win32 ..\config\config.h
 
 # End Custom Build
 
@@ -154,7 +154,7 @@ InputPath=..\config\config.win32
 InputPath=..\config\config.win32
 
 "..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\config\config.win32 ..\config\config.h
+	if not exist ..\config\config.h copy ..\config\config.win32 ..\config\config.h
 
 # End Custom Build
 
@@ -164,7 +164,7 @@ InputPath=..\config\config.win32
 InputPath=..\config\config.win32
 
 "..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\config\config.win32 ..\config\config.h
+	if not exist ..\config\config.h copy ..\config\config.win32 ..\config\config.h
 
 # End Custom Build
 

@@ -74,7 +74,10 @@ MessageDialogReturnEnum MessageDialog::
 
     if (IsError(m_context->props->GetProperty("MainWindow", 
                 (PropValue **)&pProp)))
+    {
+       iType |= MB_SETFOREGROUND;            
        hWnd = NULL;
+    }   
     else
        hWnd = (HWND)pProp->GetInt32();
 

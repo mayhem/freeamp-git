@@ -32,16 +32,30 @@ Win32Bitmap::Win32Bitmap(string &oName)
    m_oBitmapName = oName;
    m_hBitmap = NULL;
    m_hMaskBitmap = NULL;
+   m_pBitmapData = NULL;
 }
 
 Win32Bitmap::Win32Bitmap(int iWidth, int iHeight, string &oName)
            :Bitmap(oName)
 {
    HDC hDc;
-
+   BITMAPINFO sInfo;
+   
+   sInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER); 
+   sInfo.bmiHeader.biWidth = iWidth; 
+   sInfo.bmiHeader.biHeight = iHeight; 
+   sInfo.bmiHeader.biPlanes = 1; 
+   sInfo.bmiHeader.biBitCount = 24;
+   sInfo.bmiHeader.biCompression = BI_RGB; 
+   sInfo.bmiHeader.biSizeImage = 0; 
+   sInfo.bmiHeader.biXPelsPerMeter = 0; 
+   sInfo.bmiHeader.biYPelsPerMeter = 0; 
+   sInfo.bmiHeader.biClrUsed = 0; 
+   sInfo.bmiHeader.biClrImportant = 0; 
    
    hDc = GetDC(NULL);
-   m_hBitmap = CreateCompatibleBitmap(hDc, iWidth, iHeight);
+   m_hBitmap = CreateDIBSection(hDc, &sInfo, DIB_RGB_COLORS, 
+                                &m_pBitmapData, NULL, NULL);
    ReleaseDC(NULL, hDc);
    m_hMaskBitmap = NULL;
 }
@@ -57,7 +71,7 @@ Win32Bitmap::~Win32Bitmap(void)
 Error Win32Bitmap::LoadBitmapFromDisk(string &oFile)
 {
    m_hBitmap = (HBITMAP)LoadImage(NULL, oFile.c_str(), IMAGE_BITMAP,
-                                  0, 0, LR_LOADFROMFILE);
+                                  0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
    if (m_hBitmap == NULL)
    	   return kError_LoadBitmapFailed;
 
@@ -207,6 +221,15 @@ Error Win32Bitmap::BlitRect(Bitmap *pOther, Rect &oSrcRect,
    BitBlt(hDestDC, oDestRect.x1, oDestRect.y1, 
           oDestRect.Width(), oDestRect.Height(),
    	      hSrcDC, oSrcRect.x1, oSrcRect.y1, SRCCOPY);
+   
+   //if (GetDeviceCaps(hDestDC, RASTERCAPS) & RC_PALETTE)
+   //   SetStretchBltMode(hDestDC, HALFTONE);
+   //
+   //StretchBlt(hDestDC, oDestRect.x1, oDestRect.y1, 
+   //           oDestRect.Width(), oDestRect.Height(),
+   //	          hSrcDC, oSrcRect.x1, oSrcRect.y1, 
+   //           oSrcRect.Width(), oSrcRect.Height(), 
+   //           SRCCOPY);
 
    DeleteDC(hSrcDC);
    DeleteDC(hDestDC);

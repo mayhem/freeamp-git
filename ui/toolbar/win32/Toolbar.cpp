@@ -298,6 +298,7 @@ TrayNotify(int32 notifyMessage)
 {
     switch(notifyMessage)
     {
+        case WM_LBUTTONDBLCLK:
         case WM_LBUTTONUP:
         {
             Int32PropValue *pProp;
