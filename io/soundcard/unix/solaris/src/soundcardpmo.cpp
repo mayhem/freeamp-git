@@ -317,7 +317,7 @@ void SoundCardPMO::WorkerThread(void)
    Error       eErr;
    size_t      iRet;
    Event      *pEvent;
-   audio_info info;
+   //   audio_info info;
    bool        bPerfWarn = false;
 
    // Don't do anything until resume is called.
