@@ -52,7 +52,6 @@ public:
     virtual ~SoundCardPMO();
     
     virtual Error Init(OutputInfo* info);
-    virtual Error Write(int32&,void*,int32);
     virtual Error Pause();
     virtual Error Resume();
     virtual Error Break();
@@ -69,11 +68,14 @@ public:
 
     
  private:
-	WAVEHDR* NextHeader();
 
 	void          WorkerThread(void); 
     virtual Error Reset(bool user_stop);
     void          HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent);
+    WAVEHDR      *NextHeader();
+    Error         FreeHeader();
+    Error         AllocHeader(void *&pBuffer);
+    Error         Write(void *pBuffer);
 
  private:
 	Properties *    m_propManager;
@@ -98,6 +100,7 @@ public:
     bool            m_bPause;
     int             m_iOutputBufferSize, m_iTotalBytesWritten, m_iBytesPerSample;
     int             m_iLastFrame;
+	int             m_iHead, m_iTail, m_iOffset;
 };
 
 #endif /* _SOUNDCARDPMO_H_ */

@@ -56,8 +56,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                     ..\..\..\..\base\win32\prj\plugins	copy simple.ui\
-       ..\..\..\..\base\win32\prj\plugins
+                      ..\..\..\..\base\win32\prj\plugins	copy simple.ui\
+        ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "simple - Win32 Debug"
@@ -85,11 +85,12 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /pdbtype:sept
 # ADD LINK32 comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"simple.ui" /pdbtype:sept
+# SUBTRACT LINK32 /profile
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                     ..\..\..\..\base\win32\prj\plugins	copy simple.ui\
-       ..\..\..\..\base\win32\prj\plugins
+                      ..\..\..\..\base\win32\prj\plugins	copy simple.ui\
+        ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
@@ -172,6 +173,13 @@ SOURCE=..\res\about8.bmp
 # Begin Source File
 
 SOURCE=..\res\simple.rc
+
+!IF  "$(CFG)" == "simple - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "simple - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # End Target

@@ -57,7 +57,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\base\win32\prj\plugins mkdir\
-                   ..\..\base\win32\prj\plugins	copy rainplay.ui     ..\..\base\win32\prj\plugins
+                    ..\..\base\win32\prj\plugins	copy rainplay.ui     ..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "Rainplay - Win32 Debug"
@@ -85,10 +85,11 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:windows /dll /debug /machine:I386 /pdbtype:sept
 # ADD LINK32 winmm.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"rainplay.ui" /pdbtype:sept
+# SUBTRACT LINK32 /profile
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\base\win32\prj\plugins mkdir\
-                   ..\..\base\win32\prj\plugins	copy rainplay.ui     ..\..\base\win32\prj\plugins
+                    ..\..\base\win32\prj\plugins	copy rainplay.ui     ..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 

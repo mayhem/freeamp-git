@@ -118,6 +118,9 @@ Event *EventBuffer::GetEvent()
    Event       *pPMOEvent;
 
    pEvent = m_pQueue->Read();
+   if (pEvent == NULL)
+	  return NULL;
+
    pPMOEvent = pEvent->pEvent;
    delete pEvent;
 

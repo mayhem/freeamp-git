@@ -73,6 +73,7 @@ class PullBuffer
 		         {
 					    return (100 * m_iBytesInBuffer) / m_iBufferSize;
 					};
+      void     WrapPointer(void *&pBuffer);
 
     protected:
 

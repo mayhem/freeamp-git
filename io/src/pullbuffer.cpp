@@ -160,6 +160,19 @@ int PullBuffer::GetWriteIndex(void)
    return iRet;
 }
 
+void PullBuffer::WrapPointer(void *&pBuffer)
+{
+   char *pPtr;
+
+   pPtr = (char *)pBuffer;
+
+   if (pPtr > (char *)((int)m_pPullBuffer + m_iBufferSize))
+	   pPtr -= m_iBufferSize;
+
+   pBuffer = (void *)pPtr;
+}
+
+
 Error PullBuffer::Resize(size_t iNewSize, 
                          size_t iNewOverflowSize, 
                          size_t iNewWriteTriggerSize)

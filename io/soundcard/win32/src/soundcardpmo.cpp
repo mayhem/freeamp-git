@@ -37,9 +37,9 @@ LogFile  *g_Log;
 const int iBufferSize = 256 * 1024;
 const int iOverflowSize = 24 * 1024;
 const int iWriteTriggerSize = 18432;
-const int iWriteToCard = 16 * 1024;
+const int iWriteToCard = 8 * 1024;
 
-HANDLE    MCISemaphore;
+Mutex *g_pHeaderMutex;
 
 extern    "C"
 {
@@ -60,9 +60,12 @@ MCICallBack(HWAVEOUT hwo, UINT msg, DWORD dwInstance,
       {
          LPWAVEHDR lpWaveHdr = (LPWAVEHDR) dwParam1;
 
+         g_pHeaderMutex->Acquire();
+
          waveOutUnprepareHeader(hwo, lpWaveHdr, sizeof(WAVEHDR));
-         lpWaveHdr->dwUser = 0;
-         ReleaseSemaphore(MCISemaphore, 1, NULL);
+         lpWaveHdr->dwUser = -((int)lpWaveHdr->dwUser);
+         g_pHeaderMutex->Release();
+
          break;
       }
    }
@@ -87,7 +90,11 @@ SoundCardPMO::SoundCardPMO() :
    m_pBufferThread = NULL;
    m_bExit = false;
    m_pPauseMutex = new Mutex(); 
+   g_pHeaderMutex = new Mutex(); 
    m_iTotalBytesWritten = 0;
+   m_iHead = 0;
+   m_iTail = 0;
+   m_iOffset = 0;
 
    if (!m_pBufferThread)
    {
@@ -101,31 +108,27 @@ SoundCardPMO::~SoundCardPMO()
 {
    if (m_initialized)
    {
-      char     *buf = new char[m_data_size];
-      int32     wrote;
+//      char     *buf = new char[m_data_size];
 
-      memset(buf, 0x00, m_data_size);
+//      memset(buf, 0x00, m_data_size);
 
-      Write(wrote, buf, m_data_size);
-
-      delete[]buf;
+//      Write(buf);
 
       while (waveOutClose(m_hwo) == WAVERR_STILLPLAYING)
       {
          Sleep(SLEEPTIME);
       }
 
-      CloseHandle(MCISemaphore);
+//      delete[]buf;
 
       // Unprepare and free the header memory.
       for (uint32 j = 0; j < m_num_headers; j++)
       {
-         delete[]m_wavehdr_array[j]->lpData;
          delete    m_wavehdr_array[j];
       }
 
-      delete[]m_wavehdr_array;
-      delete    m_wfex;
+      delete []m_wavehdr_array;
+      delete m_wfex;
    }
 
    m_bExit = true;
@@ -144,6 +147,11 @@ SoundCardPMO::~SoundCardPMO()
       delete m_pPauseMutex;
       m_pPauseMutex = NULL;
    }
+   if (g_pHeaderMutex)
+   {
+      delete g_pHeaderMutex;
+      g_pHeaderMutex = NULL;
+   }
 }
 
 Error SoundCardPMO::Init(OutputInfo * info)
@@ -156,7 +164,7 @@ Error SoundCardPMO::Init(OutputInfo * info)
    m_data_size = info->max_buffer_size;
    m_iBytesPerSample = info->number_of_channels * (info->bits_per_sample / 8);
 
-   m_num_headers = 4;
+   m_num_headers = 16;
    m_hdr_size = sizeof(WAVEHDR);
    m_wavehdr_array = new LPWAVEHDR[m_num_headers];
 
@@ -196,15 +204,6 @@ Error SoundCardPMO::Init(OutputInfo * info)
       if (!temp)
       {
          result = kError_OutOfMemory;
-         // cerr << "error allocating WAVEHDR" << endl;
-         break;
-      }
-
-      temp->lpData = new char[m_data_size];
-
-      if (!temp->lpData)
-      {
-         result = kError_OutOfMemory;
          break;
       }
 
@@ -214,16 +213,12 @@ Error SoundCardPMO::Init(OutputInfo * info)
 
       temp->dwLoops = 0;
       temp->dwFlags = NULL;
-
-      // cerr << i << ": dwUser = " << temp->dwUser << endl;
    }
 
    for (i = 0; i < m_channels; i++)
    {
       m_buffer[i] = i * m_channels;
    }
-
-   MCISemaphore = CreateSemaphore(NULL, m_num_headers, m_num_headers, "MCISemaphore");
 
    m_initialized = true;
 
@@ -349,8 +344,122 @@ void SoundCardPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
       return;
 
    pmtpi = new MediaTimeInfoEvent(hours, minutes, seconds, 0,
-                                  iTotalTime, 0);
+                                  (float)iTotalTime, 0);
    m_target->AcceptEvent(pmtpi);
+}
+
+Error SoundCardPMO::Write(void *pBuffer)
+{
+   Error    result = kError_NoErr;
+   WAVEHDR *wavhdr = NULL;
+
+   wavhdr = NextHeader();
+   if (!wavhdr)
+	  return kError_Interrupt;
+
+   wavhdr->dwBufferLength = m_data_size;
+   wavhdr->lpData = (char *)pBuffer;
+
+   // Prepare & write newest header
+   waveOutPrepareHeader(m_hwo, wavhdr, m_hdr_size);
+   m_pPauseMutex->Acquire(WAIT_FOREVER);
+
+   waveOutWrite(m_hwo, wavhdr, m_hdr_size);
+
+   m_pPauseMutex->Release();
+
+   return result;
+}
+
+Error SoundCardPMO::AllocHeader(void *&pBuffer)
+{
+	Error    eRet;
+	unsigned iRead;
+
+	iRead = m_iOffset + m_data_size;
+	eRet = BeginRead(pBuffer, iRead);
+	if (eRet != kError_NoErr)
+	   return eRet;
+
+	eRet = EndRead(0);
+	if (eRet != kError_NoErr)
+	   return eRet;
+
+	pBuffer = (char *)pBuffer + m_iOffset;
+	WrapPointer(pBuffer);
+
+	m_iOffset += m_data_size;
+//	Debug_v("Alloc offset: %d", m_iOffset);
+
+	return kError_NoErr;
+}
+
+Error SoundCardPMO::FreeHeader()
+{
+	Error     eRet;
+	void     *pBuffer;
+	unsigned  iRead;
+
+	iRead = m_data_size;
+	eRet = BeginRead(pBuffer, iRead);
+	if (eRet != kError_NoErr)
+	   return eRet;
+
+	eRet = EndRead(iRead);
+	if (eRet != kError_NoErr)
+	   return eRet;
+
+	m_iOffset -= m_data_size;
+//	Debug_v("Free offset: %d", m_iOffset);
+
+	return kError_NoErr;
+}
+
+WAVEHDR *SoundCardPMO::NextHeader()
+{
+   WAVEHDR  *result = NULL;
+   unsigned  iLoop;
+   Error     eRet;
+
+   assert(m_initialized);
+
+   for(;;)
+   {
+       g_pHeaderMutex->Acquire();
+       for(iLoop = 0; iLoop < m_num_headers; iLoop++)
+	   {
+//		   Debug_v("hdr[%d]: %d Tail+1: %d",
+//		           iLoop, m_wavehdr_array[iLoop]->dwUser, m_iTail + 1);
+
+		   if ((int)m_wavehdr_array[iLoop]->dwUser < 0 &&
+		      (-(int)m_wavehdr_array[iLoop]->dwUser) == m_iTail + 1)
+		  {
+//   			  Debug_v("Free %d", m_iTail + 1);
+			  eRet = FreeHeader();
+			  if (IsError(eRet))
+			  {
+                 g_pHeaderMutex->Release();
+				 return NULL;
+			  }
+			  m_wavehdr_array[iLoop]->dwUser = 0;
+			  m_iTail++;
+		  }
+          if (!m_wavehdr_array[iLoop]->dwUser)
+		  {
+             result = m_wavehdr_array[iLoop];
+             result->dwUser = ++m_iHead;
+
+//			 Debug_v("Alloc %d", m_iHead);
+
+             g_pHeaderMutex->Release();
+
+             return result;
+		  }
+	   }
+       g_pHeaderMutex->Release();
+
+	   usleep(10000);
+   }
 }
 
 void SoundCardPMO::StartWorkerThread(void *pVoidBuffer)
@@ -361,17 +470,32 @@ void SoundCardPMO::StartWorkerThread(void *pVoidBuffer)
 void SoundCardPMO::WorkerThread(void)
 {
    void       *pBuffer;
-   size_t      iToCopy, iCopied;
    Error       eErr;
-   int         iRet;
    Event      *pEvent;
-   OutputInfo *pInfo;
 
    m_bPause = false;
    for(; !m_bExit;)
    {
-      iToCopy = iWriteToCard;
-      eErr = BeginRead(pBuffer, iToCopy);
+	  if (!m_initialized)
+	  {
+          pEvent = GetEvent();
+
+		  if (pEvent == NULL)
+		  {
+              m_pReadSem->Wait();
+			  continue;
+		  }
+
+          if (pEvent->Type() == PMO_Init)
+		  {
+              Init(((PMOInitEvent *)pEvent)->GetInfo());
+		  }
+		  delete pEvent;
+
+		  continue;
+	  }
+
+      eErr = AllocHeader(pBuffer);
       if (eErr == kError_InputUnsuccessful || eErr == kError_NoDataAvail)
       {
           m_pReadSem->Wait();
@@ -383,7 +507,9 @@ void SoundCardPMO::WorkerThread(void)
           pEvent = GetEvent();
 
           if (pEvent->Type() == PMO_Init)
+		  {
               Init(((PMOInitEvent *)pEvent)->GetInfo());
+		  }
 
           if (pEvent->Type() == PMO_Reset)
               Reset(false);
@@ -411,59 +537,7 @@ void SoundCardPMO::WorkerThread(void)
           break;
       }
 
-      Write(iRet, pBuffer, iToCopy);
-
-      EndRead(iToCopy);
+      Write(pBuffer);
    }
 }    
-
-Error SoundCardPMO::Write(int32 & wrote, void *pBuffer, int32 length)
-{
-   Error    result = kError_NoErr;
-   WAVEHDR *wavhdr = NULL;
-
-   WaitForSingleObject(MCISemaphore, 10000);
-
-   wavhdr = NextHeader();
-
-   if (length > (int32) m_data_size)
-   {
-      length = m_data_size;
-      result = kError_UnknownErr;
-   }
-
-   wavhdr->dwBufferLength = length;
-   memcpy(wavhdr->lpData, pBuffer, length);
-
-   // Prepare & write newest header
-   waveOutPrepareHeader(m_hwo, wavhdr, m_hdr_size);
-   m_pPauseMutex->Acquire(WAIT_FOREVER);
-   waveOutWrite(m_hwo, wavhdr, m_hdr_size);
-   m_pPauseMutex->Release();
-   wrote = length;
-
-   return result;
-}
-
-WAVEHDR *SoundCardPMO::NextHeader()
-{
-   WAVEHDR  *result = NULL;
-
-   do
-   {
-      if (m_index >= m_num_headers)
-         m_index = 0;
-
-      if (!m_wavehdr_array[m_index]->dwUser)
-      {
-         result = m_wavehdr_array[m_index++];
-         result->dwUser = m_index;
-         break;
-      }
-
-   }
-   while (m_wavehdr_array[m_index++]->dwUser);
-
-   return result;
-}
 
