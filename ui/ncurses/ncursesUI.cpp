@@ -221,6 +221,8 @@ Error ncursesUI::AcceptEvent(Event *e) {
                 m_playerEQ->AcceptEvent(e);
                 break; }
             case CMD_Cleanup: {
+                if (m_startupLevel == PRIMARY_UI) 
+                   tcsetattr(stdinfd, TCSANOW, &normalTTY);
                 Event *e = new Event(INFO_ReadyToDieUI);
                 m_playerEQ->AcceptEvent(e);
                 break; }

@@ -72,6 +72,9 @@ bool CDDB::ReadMetaData(const char* url, MetaData* metadata)
         if (strncasecmp(".CDA", ext, 4))
             return retvalue;
 
+        if (metadata->Time() != 0)
+            return retvalue;
+
         Registry *pmoRegistry = m_context->player->GetPMORegistry();
         RegistryItem *pmo_item = NULL;
         int32 i = 0;
