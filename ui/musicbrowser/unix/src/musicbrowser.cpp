@@ -23,6 +23,7 @@ ____________________________________________________________________________*/
 
 #include "musicbrowserui.h"
 #include "gtkmusicbrowser.h" 
+#include "missingfileui.h"
 #include "infoeditor.h"
 #include "eventdata.h"
 #include "player.h"
@@ -208,6 +209,13 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
             for (; i != browserWindows.end(); i++)
                 if ((*i)->Visible())
                     (*i)->AcceptEvent(event);
+            break; }
+        case INFO_FileNotFound: {
+            MissingFileEvent *mfe = (MissingFileEvent *)event;
+            
+            MissingFileUI *mfui = new MissingFileUI(m_context, mfe->Item());
+            mfui->Run();
+
             break; }
         default:
             break;
