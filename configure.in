@@ -211,14 +211,7 @@ OSDEP="unix/$host_os"
 if test "$isunix" = "false"  ; then
   OSINC="-I$srcdir/base/$host_os/include -I$srcdir/ui/freeamp/$host_os"
   OSDEP="$host_os"
-dnl else
-dnl  OSDEPSRC=`find base/unix/src \( -name '*.c' -o -name '*.cpp' \) -print`
 fi
-
-dnl oSDEPSRC="$OSDEPSRC `find base/$OSDEP/src \( -name '*.c' -o		\dnl 					     -name '*.cpp' \) -print`"
-dnl OSDEPOBJ=`echo $OSDEPSRC | sed -e 's,\.cp*,.o,g' | xargs echo`
-dnl I know. This is an abominable way to generate a dependency list.
-dnl it's either here or hardcoded in a Makefile, though.
 
 dnl AC_SUBST(OSDEPSRC)
 AC_SUBST(OSDEPOBJ)
@@ -497,6 +490,9 @@ else
 fi
 
 dnl *****
+
+AC_CHECK_LIB(musicbrainz, mb_GenerateSignature, ,
+  AC_MSG_ERROR([FreeAmp requires that the MusicBrainz client library be installed.]))
 
 #AM_CONDITIONAL(AM_HAVE_LINUXTHREADS, test "$hblt" = "true")
 

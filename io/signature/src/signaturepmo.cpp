@@ -38,6 +38,8 @@ ____________________________________________________________________________*/
 #include "log.h"
 #include "debug.h"
 
+#include "aps.h"
+
 #define DB Debug_v("%s:%d", __FILE__, __LINE__);
 
 extern "C"
@@ -53,16 +55,8 @@ SignaturePMO(FAContext *context):
      PhysicalMediaOutput(context)
 {
     m_pBufferThread       = NULL;
-    m_iTotalBytesWritten  = 0;
-    m_iFinishedFFTs       = 0;
-    m_iZeroCrossings      = 0;
-    m_dEnergySum          = 0.0;
-    m_bLastNeg            = false;
-    m_pFFT                = NULL;
-    m_downmixBuffer       = NULL;
 
-    for (int i = 0; i < iFFTPoints; i++)
-        m_iSpectrum[i] = 0;
+    m_MB = new MusicBrainz;
 
     if (!m_pBufferThread)
     {
@@ -71,6 +65,7 @@ SignaturePMO(FAContext *context):
        m_pBufferThread->Create(SignaturePMO::StartWorkerThread, this);
     }
 
+    m_collID = context->aps->GetCollectionId();
     m_initialized = false;
 }
 
@@ -87,15 +82,10 @@ SignaturePMO::
      delete m_pBufferThread;
      m_pBufferThread = NULL;
   }
-  if (m_pFFT)
+  if (m_MB)
   {
-     delete m_pFFT;
-     m_pFFT = NULL;
-  }
-  if (m_downmixBuffer)
-  {
-     delete m_downmixBuffer;
-     m_downmixBuffer = NULL;
+     delete m_MB;
+     m_MB = NULL;
   }
 }
 
@@ -116,32 +106,12 @@ Error
 SignaturePMO::
 Init(OutputInfo* info)
 {
-   m_samples_per_second = info->samples_per_second;
-   m_data_size          = info->max_buffer_size;
-   m_iBytesPerSample = info->number_of_channels * (info->bits_per_sample >> 3);
-   m_number_of_channels = info->number_of_channels;
-   m_bits_per_sample = info->bits_per_sample;
+   m_data_size = info->max_buffer_size;
 
-   m_downmix_size = m_data_size;
-   if (m_samples_per_second != 11025)
-       m_downmix_size = m_downmix_size * 11025 / m_samples_per_second;
+   m_MB->SetPCMDataInfo(info->samples_per_second, info->number_of_channels,
+                        info->bits_per_sample);
 
-   if (info->bits_per_sample != 8)
-       m_downmix_size /= 2;
-
-   if (info->number_of_channels != 1)
-       m_downmix_size /= 2;
-
-   if (m_downmix_size % iFFTPoints != 0)
-       m_maxloop = iFFTPoints / (m_downmix_size % iFFTPoints);
-   else
-       m_maxloop = 1;
-
-   m_downmix_size *= m_maxloop;
-
-   m_downmixBuffer = new unsigned char[m_downmix_size];
-   m_loopcount = 0;
-
+   m_strGUID = "";
    m_initialized = true;
    return kError_NoErr;
 }
@@ -160,6 +130,7 @@ Resume()
    PhysicalMediaOutput::Resume();
 
    m_url = m_pPmi->Url();
+cout << "m_url " << m_url << endl;
 }
 
 Error
@@ -196,7 +167,7 @@ WorkerThread(void)
     void*   pBuffer;
     Error   eErr;
     Event*  pEvent;
-    bool    bSetLastNeg = false;
+    bool    bDone = false;
     bool    bGotPMOQuit = false;
 
     // Don't do anything until resume is called.
@@ -250,20 +221,12 @@ WorkerThread(void)
             if (m_bPause || m_bExit)
                 break;
        
-            if ((m_iFinishedFFTs) >= iMaxFFTs || (bGotPMOQuit)) {
-                int iNumSamples = m_iTotalBytesWritten;
-                float fLength = iNumSamples / (float)11025;
-                float fAverageZeroCrossing = m_iZeroCrossings / fLength;
-                float fEnergy = m_dEnergySum / (float)iNumSamples;
-
-                for (int i = 0; i < iFFTPoints; i++)
-                    m_iSpectrum[i] = m_iSpectrum[i] / m_iFinishedFFTs;
-
-                AudioSignatureGeneratedEvent *asge;
-                asge = new AudioSignatureGeneratedEvent(m_url, fEnergy,
-                                                        fAverageZeroCrossing,
-                                                        fLength, m_iSpectrum,
-                                                        this);
+            if (bDone || bGotPMOQuit) {
+cout << "fa done sig\n";
+                AudioSignatureGeneratedEvent *asge = 
+                             new AudioSignatureGeneratedEvent(m_url, m_strGUID,
+                                                              this);
+                 
                 Quit();
                 m_pTarget->AcceptEvent(asge);
                 return;
@@ -292,6 +255,8 @@ WorkerThread(void)
    
                 if (pEvent->Type() == PMO_Quit) {
                     bGotPMOQuit = true;
+
+                    m_MB->GenerateSignatureNow(m_strGUID, m_collID);
                     continue;
                 }
                 if (pEvent->Type() == PMO_Error)
@@ -324,108 +289,9 @@ WorkerThread(void)
             continue;
         }
 
-        int writeoffset = (m_downmix_size / m_maxloop) * m_loopcount;
-        int maxwrite = m_downmix_size / m_maxloop;
-        int readpos = 0;
-        int writepos = 0;
-        int rate_change = m_samples_per_second / 11025;
-        signed short lsample, rsample;
-        unsigned char ls, rs;
-
-        if (m_bits_per_sample == 16) {
-            if (m_number_of_channels == 2) {
-                while (writepos < maxwrite) {
-                    readpos  = writepos * rate_change;
-                    readpos *= 2;
-
-                    lsample = ((signed short *)pBuffer)[readpos++];
-                    rsample = ((signed short *)pBuffer)[readpos++];
-
-                    lsample /= 256; lsample += 127;
-                    rsample /= 256; rsample += 127;
- 
-                    m_downmixBuffer[writeoffset + writepos++] = 
-                                                      (lsample + rsample) / 2;
-                }
-            }
-            else {
-                while (writepos < maxwrite) {
-                    readpos = writepos * rate_change;
-           
-                    lsample = ((signed short *)pBuffer)[readpos];
-                    lsample /= 256; lsample += 127;
-
-                    m_downmixBuffer[writeoffset + writepos++] = lsample;
-                }
-            }
-        }
-        else {
-            if (m_number_of_channels == 2) {
-                while (writepos < maxwrite) {
-                    readpos  = writepos * rate_change;
-                    readpos /= 2;
-
-                    ls = ((unsigned char *)pBuffer)[readpos++];
-                    rs = ((unsigned char *)pBuffer)[readpos++];
-
-                    m_downmixBuffer[writeoffset + writepos++] = (ls + rs) / 2;
-                }
-            }
-            else {
-                while (writepos < maxwrite) {
-                    readpos = writepos * rate_change;
-                    ls = ((unsigned char *)pBuffer)[readpos];
-                    m_downmixBuffer[writeoffset + writepos++] = ls;
-                }
-            }
-        }
-
-        m_loopcount++;
-
-        if (m_loopcount == m_maxloop) {
-            m_loopcount = 0;
-            if (!bSetLastNeg) {
-                if (*(char *)m_downmixBuffer <= 0)
-                    m_bLastNeg = true;
-                bSetLastNeg = true;
-            }
-
-            if (!m_pFFT) {
-                m_pFFT = new FFT(iFFTPoints, 11025);
-                m_pFFT->CopyIn((char *)m_downmixBuffer, iFFTPoints);
-                m_pFFT->Transform();
-            }
-
-            char *pCurrent = (char *)m_downmixBuffer;
-            char *pBegin = pCurrent;
-            int  iFFTs = m_downmix_size / iFFTPoints;
-            int  j, k;
-     
-            for (j = 0; j < iFFTs; j++, m_iFinishedFFTs++) {
-
-                m_pFFT->CopyIn(pCurrent, iFFTPoints);
-                m_pFFT->Transform();
-
-                for (k = 0; k < iFFTPoints; k++)
-                    m_iSpectrum[k] += (int)m_pFFT->GetIntensity(k);
-
-                while (pCurrent < pBegin + iFFTPoints) 
-                {
-                    m_dEnergySum += ((*pCurrent) * (*pCurrent));
-                    if (m_bLastNeg && (*pCurrent > 0)) 
-                    {
-                        m_bLastNeg = false;
-                        m_iZeroCrossings++;
-                    }
-                    else if (!m_bLastNeg && (*pCurrent <= 0))
-                        m_bLastNeg = true;
-                    pCurrent++;
-                }
-                pBegin = pCurrent;
-            }
-
-            m_iTotalBytesWritten += m_downmix_size;
-        }
+        if (m_MB->GenerateSignature((char *)pBuffer, m_data_size, m_strGUID, 
+                                    m_collID)) 
+            bDone = true;
 
         m_pInputBuffer->EndRead(m_data_size);
      

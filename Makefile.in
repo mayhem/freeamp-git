@@ -43,24 +43,6 @@ lib/http/lib/libfahttp.a: $(HTTPOBJ)
 	+test -d lib/http/lib || mkdir lib/http/lib
 	$(LIBMOD) $@ $(HTTPOBJ)
 
-MUSICBRAINZOBJ = lib/musicbrainz/expat/xmlparse/hashtable.o
-MUSICBRAINZOBJ += lib/musicbrainz/expat/xmlparse/xmlparse.o
-MUSICBRAINZOBJ += lib/musicbrainz/expat/xmltok/xmlrole.o
-MUSICBRAINZOBJ += lib/musicbrainz/expat/xmltok/xmltok.o
-MUSICBRAINZOBJ += lib/musicbrainz/osdep/cdi_$(HOST_OS).o
-MUSICBRAINZOBJ += lib/musicbrainz/lib/base64.o
-MUSICBRAINZOBJ += lib/musicbrainz/lib/sha_func.o
-MUSICBRAINZOBJ += lib/musicbrainz/lib/cdindex.o 
-MUSICBRAINZOBJ += lib/musicbrainz/lib/mb_http.o
-MUSICBRAINZOBJ += lib/musicbrainz/lib/xql.o
-#MUSICBRAINZOBJ += lib/musicbrainz/lib/cdi.o
-MUSICBRAINZOBJ += lib/musicbrainz/lib/diskid.o
-MUSICBRAINZOBJ += lib/musicbrainz/lib/xparse.o
-
-lib/musicbrainz/lib/libmusicbrainz.a: $(MUSICBRAINZOBJ)
-	+test -d lib/musicbrainz/lib || mkdir lib/musicbrainz/lib
-	$(LIBMOD) $@ $(MUSICBRAINZOBJ)
-
 FREEAMPunixOBJ  = base/unix/src/bootstrap.o base/unix/src/unixprefs.o
 FREEAMPunixOBJ += base/unix/src/win32impl.o base/unix/src/pthreadthread.o
 FREEAMPunixOBJ += base/unix/src/debug.o base/unix/src/mutex.o 
@@ -76,10 +58,10 @@ FREEAMPbeosOBJ += base/beos/src/mutex.o base/beos/src/semaphore.o
 FREEAMPbeosOBJ += base/beos/src/utility.o base/beos/src/freeampapp.o
 FREEAMPbeosOBJ += base/beos/src/win32impl.o
 
-APSOBJ  = base/aps/FAMetaUnit.o base/aps/apsinterface.o base/aps/sigclient.o
+APSOBJ  = base/aps/FAMetaUnit.o base/aps/apsinterface.o 
 APSOBJ += base/aps/apsplaylist.o base/aps/gencrc.o base/aps/hosttonet.o 
 APSOBJ += base/aps/nettohost.o base/aps/comsocket.o base/aps/apsconvert.o
-APSOBJ += base/aps/YPClient.o base/aps/sigxdr.o base/aps/uuid.o
+APSOBJ += base/aps/YPClient.o base/aps/uuid.o
 APSOBJ += base/aps/slclient.o
 
 FREEAMPOBJ =  base/src/log.o base/src/player.o base/src/musiccatalog.o
@@ -94,12 +76,11 @@ FREEAMPOBJ += base/src/timer.o base/src/missingfile.o io/src/pipeline.o
 FREEAMPOBJ += $(FREEAMP$(HOST_OS)OBJ) $(APSOBJ)
 FREEAMPOBJ += lib/gdbm/lib/libfagdbm.a lib/xml/lib/libfaxml.a 
 FREEAMPOBJ += lib/zlib/lib/libzlib.a lib/http/lib/libfahttp.a
-FREEAMPOBJ += lib/musicbrainz/lib/libmusicbrainz.a
 
 FREEAMPlinuxLIBS = -ldl -lpthread
 FREEAMPsolarisLIBS = -ldl -lpthread
 FREEAMPfreebsdLIBS = -pthread
-UNIXFREEAMPLIBS = $(FREEAMP$(HOST_OS)LIBS) $(EXTRALIBS)
+UNIXFREEAMPLIBS = $(FREEAMP$(HOST_OS)LIBS) -lmusicbrainz $(EXTRALIBS)
 
 BEOSFREEAMPLIBS = -lbe -lroot
 BEOSFREEAMPPOSTLINK = util/beos/buildresources.pl -o freeamp -s "application/x-vnd.freeamp.freeamp" base/beos/res/freeamp_app.rsrc
@@ -202,7 +183,7 @@ uninstall-docs:
 	${RM} -rf $(DESTDIR)$(datadir)/freeamp/help
 
 depend:
-	makedepend -- $(DEFS) $(INCLUDES) $(CFLAGS) -- `echo $(FREEAMPOBJ) | sed -e 's,\.o,.cpp,g'`
+	makedepend -- $(DEFS) -I/usr/include/g++-3 $(INCLUDES) $(CFLAGS) -- `echo $(FREEAMPOBJ) | sed -e 's,\.o,.cpp,g'`
 	+$(PIMAKE) depend
 
 Makefile: $(srcdir)/Makefile.in $(srcdir)/Makefile-plugins.in

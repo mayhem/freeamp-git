@@ -186,6 +186,8 @@ public:
     /** Convenience function to just get the status of the OnOff flag */
     bool GetTurnedOnFlag(void) { return m_bRelatableOn; }
 
+    string GetCollectionId(void) { return m_strCollectionID; }
+
 protected:
     /** Helper function to save the profile alias map */
     int WriteProfileMap(const char* pczFile);

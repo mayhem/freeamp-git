@@ -56,7 +56,7 @@ ____________________________________________________________________________*/
 #include <math.h>
 #include "utility.h"
 
-#include "cdindex.h"
+#include <musicbrainz/musicbrainz.h>
 
 #include "slclient.h" // FIXME: remove before b9
 
@@ -154,7 +154,7 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
 
     m_pSema->Wait();
 
-    CDIndex o;
+    MusicBrainz o;
     string  error, data;
     bool    ret;
     vector<string> args;
@@ -178,7 +178,7 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
     args.push_back(pmetaData->Genre());
     args.push_back(pmetaData->Comment());
 
-    ret = o.Query(string(MBExchangeMetadata), &args);
+    ret = o.Query(string(MB_ExchangeMetadata), &args);
     if (!ret)
     {
         o.GetQueryError(error);
@@ -195,16 +195,16 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
 
     // Now start the data extraction process.
     // Select the first item in the list of returned items
-    o.Select(MBSelectExchangedData);
+    o.Select(MB_SelectExchangedData);
 
-    pmetaData->SetArtist(o.Data(MBGetArtistName).c_str());
-    pmetaData->SetTitle(o.Data(MBGetTrackName).c_str());
-    pmetaData->SetAlbum(o.Data(MBGetAlbumName).c_str());
-    pmetaData->SetGenre(o.Data(MBGetGenre).c_str());
-    pmetaData->SetComment(o.Data(MBGetDescription).c_str());
-    pmetaData->SetYear(o.DataInt(MBGetYear));
-    pmetaData->SetTrack(o.DataInt(MBGetTrackNum));
-    pmetaData->SetLength(o.DataInt(MBGetDuration));
+    pmetaData->SetArtist(o.Data(MB_GetArtistName).c_str());
+    pmetaData->SetTitle(o.Data(MB_GetTrackName).c_str());
+    pmetaData->SetAlbum(o.Data(MB_GetAlbumName).c_str());
+    pmetaData->SetGenre(o.Data(MB_GetGenre).c_str());
+    pmetaData->SetComment(o.Data(MB_GetDescription).c_str());
+    pmetaData->SetYear(o.DataInt(MB_GetYear));
+    pmetaData->SetTrack(o.DataInt(MB_GetTrackNum));
+    pmetaData->SetLength(o.DataInt(MB_GetDuration));
 
     m_pSema->Signal();
 

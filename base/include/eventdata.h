@@ -783,28 +783,19 @@ public:
 class AudioSignatureGeneratedEvent : public Event {
 private:
     string m_url;
-    float  m_energy;
-    float  m_zxing;
-    float  m_length;
-    int    m_spectrum[32];
+    string m_strGUID;
     PhysicalMediaOutput *m_pmo;
 
 public:
-    AudioSignatureGeneratedEvent(string &url, float energy, float zxing,
-                                 float length, int spectrum[32],
+    AudioSignatureGeneratedEvent(string &url, string &GUID,
                                  PhysicalMediaOutput *pmo)
-    { m_type = INFO_AudioSignatureGenerated; m_url = url; m_energy = energy;
-      m_zxing = zxing; m_length = length;
-      for (int i = 0; i < 32; i++) m_spectrum[i] = spectrum[i];
+    { m_type = INFO_AudioSignatureGenerated; m_url = url; m_strGUID = GUID;
       m_pmo = pmo;
     }
     virtual ~AudioSignatureGeneratedEvent() {}
      
     const string Url() const { return m_url; }
-    const float  Energy() const { return m_energy; }
-    const float  ZXing() const { return m_zxing; }
-    const float  Length() const { return m_length; }
-    const int   *Spectrum() const { return m_spectrum; }
+    const string GUID() const { return m_strGUID; }
     PhysicalMediaOutput *PMO() { return m_pmo; }
 };
 

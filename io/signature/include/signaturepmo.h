@@ -40,10 +40,7 @@ ____________________________________________________________________________*/
 #include "facontext.h"
 #include "preferences.h"
 
-#include "sigfft.h"
-
-const int iFFTPoints = 32;
-const int iMaxFFTs   = 9000;
+#include <musicbrainz/musicbrainz.h>
 
 class SignaturePMO : public PhysicalMediaOutput
 {
@@ -71,27 +68,15 @@ public:
 
   void            Clear(void);
 
-  uint32          m_samples_per_second, m_samples_per_frame;
   uint32          m_data_size;
-  uint32          m_downmix_size;
-  uint32          m_loopcount;
-  uint32          m_maxloop;
   string          m_url;
-  unsigned char  *m_downmixBuffer;
 
   Thread*         m_pBufferThread;
   bool            m_initialized;
-  int             m_iTotalBytesWritten, m_iBytesPerSample;
-  int             m_bits_per_sample;
-  int             m_number_of_channels;
-  int             m_iFinishedFFTs;
 
-  int             m_iZeroCrossings;
-  double          m_dEnergySum;
-  bool            m_bLastNeg; 
-  bool            m_bSetLastNeg;
-  int             m_iSpectrum[iFFTPoints];
-  FFT            *m_pFFT;
+  MusicBrainz    *m_MB;
+  string          m_strGUID;
+  string          m_collID;
 };
 
 #endif /* INCLUDED_SIGNATUREPMOO_H_ */

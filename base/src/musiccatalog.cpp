@@ -1360,11 +1360,7 @@ Error MusicCatalog::AcceptEvent(Event *e)
                                      (AudioSignatureGeneratedEvent *)e;
 
             //cout << "got audio sig for: " << asge->Url() << endl;
-            AudioSig *sig = new AudioSig(asge->Energy(), asge->ZXing(),
-                                         asge->Length(), 
-                                         (int *)asge->Spectrum());
-            string GUID = "";
-            m_context->aps->APSLookupSignature(sig, GUID);
+            string GUID = asge->GUID();
 
             if (GUID != "") {
                 m_sigs->erase(asge->Url());
@@ -1384,15 +1380,8 @@ Error MusicCatalog::AcceptEvent(Event *e)
                     data = new MetaData;
 
                 if (data->GUID() != "") { 
-                    if (strncmp(data->GUID().c_str(), GUID.c_str(), 16)) {
+                    if (strncmp(data->GUID().c_str(), GUID.c_str(), 16)) 
                         cout << "ERROR! " << url << " has 2 GUIDs!\n";
-                        cout << data->GUID() << ". " << GUID << ".\n";
-                        cout << asge->Energy() << " " << asge->ZXing() <<
-                                " " << asge->Length() << endl;
-                        for (int i = 0; i < 32; i++)
-                            cout << asge->Spectrum()[i] << " " ;
-                        cout << endl;
-                    }
                 }
                 data->SetGUID(GUID.c_str());
 
