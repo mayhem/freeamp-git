@@ -159,6 +159,32 @@ int Http::WriteToFile(unsigned char *buffer, unsigned int size)
     return fwrite(buffer, sizeof(unsigned char), size, m_file);
 }
 
+static void
+EncodeURI(string & URI)
+{
+   string::size_type convert = 0;
+   const char *legalCharacters =
+
+      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/?.";
+
+   if (strncmp(URI.c_str(), "http://", 7) == 0)
+       convert = URI.find(string("/"), 7);
+
+   while ((convert = URI.find_first_not_of(legalCharacters, convert)) !=
+          string::npos)
+   {
+      string    hex = "%";
+      char      num[8];
+
+      sprintf(num, "%02x", URI[convert] & 0xFF);
+      hex += num;
+
+      URI.replace(convert, 1, hex);
+
+      convert += hex.length();
+   }
+}
+
 Error Http::Download(const string &url, bool fileDownload)
 {
     Error          result = kError_InvalidParam;
@@ -169,7 +195,7 @@ Error Http::Download(const string &url, bool fileDownload)
     struct         sockaddr_in  addr;
     struct         hostent      host;
     SOCKET         s = -1;
-    char*          file = NULL;
+    string         file;
     bool           useProxy;
     unsigned int   bytesReceived = 0;
 
@@ -194,15 +220,16 @@ Error Http::Download(const string &url, bool fileDownload)
                                "http://%[^:/]:%hu", hostname, &port);
 
             strcpy(proxyname, url.c_str());
-            file = proxyname;
+            file = string(proxyname);
         }
         else
         {
             numFields = sscanf(url.c_str(), 
                            "http://%[^:/]:%hu", hostname, &port);
 
-            file = strchr(url.c_str() + 7, '/');
+            file = string(strchr(url.c_str() + 7, '/'));
         }
+        EncodeURI(file);
 
         if(numFields < 1)
         {
@@ -291,12 +318,12 @@ Error Http::Download(const string &url, bool fileDownload)
             // the magic 256 is enough for a time field that
             // we got from the server
             char* query = new char[ strlen(kHTTPQuery) + 
-                                    strlen(file) +
+                                    file.length() +
                                     strlen(localname) +
                                     strlen(FREEAMP_VERSION)+
                                     2];
         
-            sprintf(query, kHTTPQuery, file, localname, FREEAMP_VERSION);
+            sprintf(query, kHTTPQuery, file.c_str(), localname, FREEAMP_VERSION);
             strcat(query, "\r\n");
 
             int count;
