@@ -71,10 +71,11 @@ APSInterface::APSInterface(char *profilePath, const char* pIP,
     m_pActiveProfiles = new vector<string>;
 
     m_pLogFile = NULL;
-    m_profilePath = string(profilePath) + string(DIR_MARKER_STR) +
-                    string("profiles.txt");
+    m_profilePath = string(profilePath);
+    string savedProfiles = m_profilePath + string(DIR_MARKER_STR) +
+                           string("profiles.txt");
 
-    LoadProfileMap(m_profilePath.c_str()); // could be made into a configurable option
+    LoadProfileMap(savedProfiles.c_str()); // could be made into a configurable option
 
     m_pYpClient = new YPClient;
     m_pYpClient->SetAddress(m_strIP.c_str(), nAPSYPPort);
@@ -91,7 +92,9 @@ APSInterface::APSInterface(char *profilePath, const char* pIP,
 
 APSInterface::~APSInterface()
 {
-    WriteProfileMap(m_profilePath.c_str());
+    string savedProfiles = m_profilePath + string(DIR_MARKER_STR) +
+                           string("profiles.txt");
+    WriteProfileMap(savedProfiles.c_str());
 
     if (m_pYpClient != NULL) 
     {
@@ -316,7 +319,10 @@ void APSInterface::WriteToLog(const string& strGUID, int nEventType)
     if (m_pLogFile == NULL)
     {
         // name the logfile after the profile alias
-        m_pLogFile = new fstream(m_strCurrentProfile.c_str(), 
+        string logfilename = m_profilePath + string(DIR_MARKER_STR) +
+                             m_strCurrentProfile;
+
+        m_pLogFile = new fstream(logfilename.c_str(), 
                                  ios_base::out | ios_base::app);
     }
 
@@ -351,7 +357,10 @@ int APSInterface::ChangeProfile(const char *pczUserName)
 
         CombineProfile(pczUserName);
 
-        m_pLogFile = new fstream(pczUserName, ios_base::out | ios_base::app);
+        string logfilename = m_profilePath + string(DIR_MARKER_STR) + 
+                             string(pczUserName);
+        m_pLogFile = new fstream(logfilename.c_str(), 
+                                 ios_base::out | ios_base::app);
         return APS_NOERROR;
     }
     else
@@ -421,10 +430,12 @@ int APSInterface::DeleteProfile(const char *pczNewName, bool bServerToo)
     if (pczNewName == NULL) 
         return APS_PARAMERROR;
 
+    string logfilename = m_profilePath + string(DIR_MARKER_STR) + 
+                         string((*m_pProfileMap)[pczNewName]);
 #ifdef WIN32
-    DeleteFile((*m_pProfileMap)[pczNewName].c_str());
+    DeleteFile(logfilename.c_str());
 #else
-    unlink((*m_pProfileMap)[pczNewName].c_str());
+    unlink(logfilename.c_str());
 #endif
 
     m_pProfileMap->erase(pczNewName);
@@ -594,7 +605,10 @@ int APSInterface::SyncLog()
         delete m_pLogFile;
         m_pLogFile = NULL;
     }
-    fstream fIn(m_strCurrentProfile.c_str(), ios_base::in);
+    string logfilename = m_profilePath + string(DIR_MARKER_STR) +
+                         m_strCurrentProfile;
+
+    fstream fIn(logfilename.c_str(), ios_base::in);
        
     TempRecord.strGUID = "blah";
     // Does this deal with the spaces between fields or the binary bits in the 
@@ -618,7 +632,7 @@ int APSInterface::SyncLog()
     if (nRes == 0)
     {
        // empty the log file
-       fIn.open(m_strCurrentProfile.c_str(), ios_base::out | ios_base::trunc);
+       fIn.open(logfilename.c_str(), ios_base::out | ios_base::trunc);
        fIn.close();
     }
                       

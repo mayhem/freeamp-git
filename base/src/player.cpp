@@ -95,7 +95,7 @@ EventQueue()
     m_APSInterface = new APSInterface(m_faDir);
     m_context->aps = m_APSInterface;
 
-    delete m_faDir;
+    delete [] m_faDir;
 
     // cout << "Creating player..." << endl;
     m_eventSem = new Semaphore();
