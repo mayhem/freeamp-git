@@ -73,7 +73,7 @@ beosThread::Lock( void )
 inline void
 beosThread::Unlock( void )
 {
-	Unlock();
+	m_lock.Unlock();
 }
 
 // Utility functions.
