@@ -489,7 +489,7 @@ TreeViewWndProc(HWND hwnd,
                 
                 if(ctrlKeyPressed)
                 {
-                    TreeView_Select(hwnd, item, TVGN_CARET);
+                    /*TreeView_Select(hwnd, item, TVGN_CARET);
 
                     if(focusItem)
                     {
@@ -499,7 +499,7 @@ TreeViewWndProc(HWND hwnd,
                         tv_item.state = TVIS_SELECTED;
 
                         TreeView_SetItem(hwnd, &tv_item);
-                    }
+                    }*/
 
                     return TRUE;
                 }
@@ -583,29 +583,115 @@ TreeViewWndProc(HWND hwnd,
                 }
                 else
                 {
-                    if(!wasSelected)
+                    // need to iterate all the items and 
+                    // make sure they aren't selected
+                    HTREEITEM rootItem = TreeView_GetRoot(hwnd);
+
+                    if(rootItem)
                     {
-                        // need to iterate all the items and 
-                        // make sure they aren't selected
-                        HTREEITEM rootItem = TreeView_GetRoot(hwnd);
-
-                        if(rootItem)
+                        do
                         {
-                            do
-                            {
-                                tv_item.hItem = rootItem;
-                                tv_item.mask = TVIF_STATE;
-                                tv_item.stateMask = TVIS_SELECTED | TVIS_EXPANDEDONCE;
-                                tv_item.state = TVIS_EXPANDEDONCE;
+                            tv_item.hItem = rootItem;
+                            tv_item.mask = TVIF_STATE;
+                            tv_item.stateMask = TVIS_SELECTED | TVIS_EXPANDEDONCE;
+                            tv_item.state = TVIS_EXPANDEDONCE;
 
-                                TreeView_SetBranch(hwnd, &tv_item);
-                                
-                            }while(rootItem = TreeView_GetNextSibling(hwnd, rootItem));
-                        }
+                            TreeView_SetBranch(hwnd, &tv_item);
+                            
+                        }while(rootItem = TreeView_GetNextSibling(hwnd, rootItem));
                     }
+
+                    // need to set this back cause windows won't
+                    // set it if it is already the focus item and
+                    // we just deselected it
+                    if(wasSelected && wasFocus)
+                    {
+                        tv_item.hItem = focusItem;
+                        tv_item.mask = TVIF_STATE;
+                        tv_item.stateMask = TVIS_SELECTED;
+                        tv_item.state = TVIS_SELECTED;
+
+                        TreeView_SetItem(hwnd, &tv_item);
+                    }
+
+                    
                 }
             }
                     
+            break;
+        }
+
+        case WM_LBUTTONUP:
+        {
+            bool shiftKeyPressed = IsShiftDown();
+            bool ctrlKeyPressed = IsCtrlDown();
+
+            HTREEITEM item;
+            TV_HITTESTINFO hti;
+
+            hti.pt.x = LOWORD(lParam);
+            hti.pt.y = HIWORD(lParam);
+        
+            item = TreeView_HitTest(hwnd, &hti);  
+
+            if(item && (hti.flags & TVHT_ONITEM))
+            {
+                HTREEITEM focusItem = TreeView_GetSelection(hwnd);
+                TV_ITEM tv_item;
+
+                tv_item.hItem = focusItem;
+                tv_item.mask = TVIF_STATE;
+                tv_item.stateMask = TVIS_SELECTED;
+
+                TreeView_GetItem(hwnd, &tv_item);
+
+                bool wasFocusSelected = (tv_item.state & TVIS_SELECTED) != 0;
+
+                tv_item.hItem = item;
+                tv_item.mask = TVIF_STATE;
+                tv_item.stateMask = TVIS_SELECTED;
+
+                TreeView_GetItem(hwnd, &tv_item);
+
+                bool wasFocus = item == focusItem;
+                bool wasSelected = (tv_item.state & TVIS_SELECTED) != 0;
+                
+                if(ctrlKeyPressed)
+                {
+                    TreeView_Select(hwnd, item, TVGN_CARET);
+
+                    if(wasSelected)
+                    {
+                        tv_item.hItem = item;
+                        tv_item.mask = TVIF_STATE;
+                        tv_item.stateMask = TVIS_SELECTED;
+                        tv_item.state = 0;
+
+                        TreeView_SetItem(hwnd, &tv_item);
+                    }
+
+
+                    if(!wasFocus && wasFocusSelected || !wasSelected)
+                    {
+                        tv_item.hItem = focusItem;
+                        tv_item.mask = TVIF_STATE;
+                        tv_item.stateMask = TVIS_SELECTED;
+                        tv_item.state = TVIS_SELECTED;
+
+                        TreeView_SetItem(hwnd, &tv_item);
+                    }
+
+                    return TRUE;
+                }
+            }
+                    
+            break;
+        }
+
+        case WM_SETFOCUS:
+        case WM_KILLFOCUS:
+        {
+            InvalidateRect(hwnd, NULL, TRUE);
             break;
         }
 
