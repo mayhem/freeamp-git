@@ -11,18 +11,39 @@
  *                                                                  *
  ********************************************************************
 
- function: predefined encoding modes
+ function: PCM data envelope analysis and manipulation
  last mod: $Id$
 
  ********************************************************************/
 
-#ifndef _V_MODES_H_
-#define _V_MODES_H_
+#ifndef _V_ENVELOPE_
+#define _V_ENVELOPE_
 
-#include "vorbis/mode_A.h"
-#include "vorbis/mode_B.h"
-#include "vorbis/mode_C.h"
-#include "vorbis/mode_D.h"
-#include "vorbis/mode_E.h"
+#include "iir.h"
+#include "smallft.h"
+
+#define EORDER 16
+
+typedef struct {
+  int ch;
+  int winlength;
+  int searchstep;
+  double minenergy;
+
+  IIR_state *iir;
+  double    **filtered;
+  long storage;
+  long current;
+
+  drft_lookup drft;
+  double *window;
+} envelope_lookup;
+
+extern void _ve_envelope_init(envelope_lookup *e,vorbis_info *vi);
+extern void _ve_envelope_clear(envelope_lookup *e);
+extern long _ve_envelope_search(vorbis_dsp_state *v,long searchpoint);
+extern void _ve_envelope_shift(envelope_lookup *e,long shift);
+
 
 #endif
+

@@ -11,18 +11,34 @@
  *                                                                  *
  ********************************************************************
 
- function: predefined encoding modes
+ function: miscellaneous prototypes
  last mod: $Id$
 
  ********************************************************************/
 
-#ifndef _V_MODES_H_
-#define _V_MODES_H_
+#ifndef _V_RANDOM_H_
+#define _V_RANDOM_H_
+#include "vorbis/codec.h"
 
-#include "vorbis/mode_A.h"
-#include "vorbis/mode_B.h"
-#include "vorbis/mode_C.h"
-#include "vorbis/mode_D.h"
-#include "vorbis/mode_E.h"
+extern void *_vorbis_block_alloc(vorbis_block *vb,long bytes);
+extern void _vorbis_block_ripcord(vorbis_block *vb);
+extern void _analysis_output(char *base,int i,double *v,int n,int bark,int dB);
+
+#ifdef DEBUG_LEAKS
+extern void *_VDBG_malloc(void *ptr,long bytes,char *file,long line); 
+extern void _VDBG_free(void *ptr,char *file,long line); 
+
+#ifndef MISC_C 
+#undef malloc
+#undef calloc
+#undef realloc
+#undef free
+
+#define malloc(x) _VDBG_malloc(NULL,(x),__FILE__,__LINE__)
+#define calloc(x,y) _VDBG_malloc(NULL,(x)*(y),__FILE__,__LINE__)
+#define realloc(x,y) _VDBG_malloc((x),(y),__FILE__,__LINE__)
+#define free(x) _VDBG_free((x),__FILE__,__LINE__)
+#endif
+#endif
 
 #endif

@@ -11,18 +11,18 @@
  *                                                                  *
  ********************************************************************
 
- function: predefined encoding modes
- last mod: $Id$
+  function: LSP (also called LSF) conversion routines
+  last mod: $Id$
 
  ********************************************************************/
 
-#ifndef _V_MODES_H_
-#define _V_MODES_H_
 
-#include "vorbis/mode_A.h"
-#include "vorbis/mode_B.h"
-#include "vorbis/mode_C.h"
-#include "vorbis/mode_D.h"
-#include "vorbis/mode_E.h"
+#ifndef _V_LSP_H_
+#define _V_LSP_H_
 
+extern void vorbis_lpc_to_lsp(double *lpc,double *lsp,int m);
+extern void vorbis_lsp_to_curve(double *curve,int n,
+				double *lsp,int m,double amp,
+				double *w);
+  
 #endif

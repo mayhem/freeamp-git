@@ -11,18 +11,22 @@
  *                                                                  *
  ********************************************************************
 
- function: predefined encoding modes
+ function: spectrum envelope and residue code/decode
  last mod: $Id$
 
  ********************************************************************/
 
-#ifndef _V_MODES_H_
-#define _V_MODES_H_
+#ifndef _V_SPECT_H_
+#define _V_SPECT_H_
 
-#include "vorbis/mode_A.h"
-#include "vorbis/mode_B.h"
-#include "vorbis/mode_C.h"
-#include "vorbis/mode_D.h"
-#include "vorbis/mode_E.h"
+extern int  _vs_spectrum_encode(vorbis_block *vb,double amp,double *lsp);
+extern int  _vs_spectrum_decode(vorbis_block *vb,double *amp,double *lsp);
+extern void _vs_residue_quantize(double *data,double *curve,
+				 vorbis_info *vi,int n);
+extern int  _vs_residue_encode(vorbis_block *vb,double *data);
+extern int  _vs_residue_decode(vorbis_block *vb,double *data);
+
+extern void _vs_residue_train(vorbis_block *vb,double *data,double *curve,
+			      int n);
 
 #endif

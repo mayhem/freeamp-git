@@ -11,18 +11,42 @@
  *                                                                  *
  ********************************************************************
 
- function: predefined encoding modes
+ function: random psychoacoustics (not including preecho)
  last mod: $Id$
 
  ********************************************************************/
 
-#ifndef _V_MODES_H_
-#define _V_MODES_H_
+#ifndef _V_PSY_H_
+#define _V_PSY_H_
+#include "smallft.h"
 
-#include "vorbis/mode_A.h"
-#include "vorbis/mode_B.h"
-#include "vorbis/mode_C.h"
-#include "vorbis/mode_D.h"
-#include "vorbis/mode_E.h"
+#ifndef EHMER_MAX
+#define EHMER_MAX 56
+#endif
+
+typedef struct {
+  int n;
+  struct vorbis_info_psy *vi;
+
+  double ***tonecurves;
+  double **peakatt;
+  double **noiseatt;
+
+  double *ath;
+  int    *octave;
+  double *bark;
+
+} vorbis_look_psy;
+
+extern void   _vp_psy_init(vorbis_look_psy *p,vorbis_info_psy *vi,int n,long rate);
+extern void   _vp_psy_clear(vorbis_look_psy *p);
+extern void  *_vi_psy_dup(void *source);
+extern void   _vi_psy_free(vorbis_info_psy *i);
+extern void   _vp_compute_mask(vorbis_look_psy *p,double *f, 
+			       double *floor,
+			       double *decay);
+extern void _vp_apply_floor(vorbis_look_psy *p,double *f,double *flr);
 
 #endif
+
+

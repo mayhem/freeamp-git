@@ -11,18 +11,25 @@
  *                                                                  *
  ********************************************************************
 
- function: predefined encoding modes
+ function: fft transform
  last mod: $Id$
 
- ********************************************************************/
+********************************************************************/
 
-#ifndef _V_MODES_H_
-#define _V_MODES_H_
+#ifndef _V_SMFT_H_
+#define _V_SMFT_H_
 
-#include "vorbis/mode_A.h"
-#include "vorbis/mode_B.h"
-#include "vorbis/mode_C.h"
-#include "vorbis/mode_D.h"
-#include "vorbis/mode_E.h"
+#include "vorbis/codec.h"
+
+typedef struct {
+  int n;
+  double *trigcache;
+  int *splitcache;
+} drft_lookup;
+
+extern void drft_forward(drft_lookup *l,double *data);
+extern void drft_backward(drft_lookup *l,double *data);
+extern void drft_init(drft_lookup *l,int n);
+extern void drft_clear(drft_lookup *l);
 
 #endif

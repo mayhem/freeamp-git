@@ -11,18 +11,41 @@
  *                                                                  *
  ********************************************************************
 
- function: predefined encoding modes
+ function: time backend 0 (dummy)
  last mod: $Id$
 
  ********************************************************************/
 
-#ifndef _V_MODES_H_
-#define _V_MODES_H_
+#include <stdlib.h>
+#include <string.h>
+#include "vorbis/codec.h"
+#include "registry.h"
+#include "misc.h"
 
-#include "vorbis/mode_A.h"
-#include "vorbis/mode_B.h"
-#include "vorbis/mode_C.h"
-#include "vorbis/mode_D.h"
-#include "vorbis/mode_E.h"
+static void pack (vorbis_info_time *i,oggpack_buffer *opb){
+}
+static vorbis_info_time *unpack (vorbis_info *vi,oggpack_buffer *opb){
+  return "";
 
-#endif
+}
+static vorbis_look_time *look (vorbis_dsp_state *vd,vorbis_info_mode *mi,
+                              vorbis_info_time *i){
+  return "";
+}
+static void free_info(vorbis_info_time *i){
+}
+static void free_look(vorbis_look_time *i){
+}
+static int forward(vorbis_block *vb,vorbis_look_time *i,
+		    double *in,double *out){
+  return(0);
+}
+static int inverse(vorbis_block *vb,vorbis_look_time *i,
+		    double *in,double *out){
+  return(0);
+}
+
+/* export hooks */
+vorbis_func_time time0_exportbundle={
+  &pack,&unpack,&look,&free_info,&free_look,&forward,&inverse
+};

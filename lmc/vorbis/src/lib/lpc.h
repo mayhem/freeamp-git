@@ -11,18 +11,35 @@
  *                                                                  *
  ********************************************************************
 
- function: predefined encoding modes
- last mod: $Id$
+  function: LPC low level routines
+  last mod: $Id$
 
  ********************************************************************/
 
-#ifndef _V_MODES_H_
-#define _V_MODES_H_
+#ifndef _V_LPC_H_
+#define _V_LPC_H_
 
-#include "vorbis/mode_A.h"
-#include "vorbis/mode_B.h"
-#include "vorbis/mode_C.h"
-#include "vorbis/mode_D.h"
-#include "vorbis/mode_E.h"
+#include "vorbis/codec.h"
+#include "smallft.h"
+
+typedef struct lpclook{
+  /* en/decode lookups */
+  drft_lookup fft;
+
+  int ln;
+  int m;
+
+} lpc_lookup;
+
+extern void lpc_init(lpc_lookup *l,long mapped, int m);
+extern void lpc_clear(lpc_lookup *l);
+
+/* simple linear scale LPC code */
+extern double vorbis_lpc_from_data(double *data,double *lpc,int n,int m);
+extern double vorbis_lpc_from_curve(double *curve,double *lpc,lpc_lookup *l);
+
+extern void vorbis_lpc_predict(double *coeff,double *prime,int m,
+			       double *data,long n);
+
 
 #endif

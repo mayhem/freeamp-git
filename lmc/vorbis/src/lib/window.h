@@ -11,18 +11,15 @@
  *                                                                  *
  ********************************************************************
 
- function: predefined encoding modes
+ function: window functions
  last mod: $Id$
 
  ********************************************************************/
 
-#ifndef _V_MODES_H_
-#define _V_MODES_H_
+#ifndef _V_WINDOW_
+#define _V_WINDOW_
 
-#include "vorbis/mode_A.h"
-#include "vorbis/mode_B.h"
-#include "vorbis/mode_C.h"
-#include "vorbis/mode_D.h"
-#include "vorbis/mode_E.h"
+#define VI_WINDOWB 1
+extern double *_vorbis_window(int type,int window,int left,int right);
 
 #endif

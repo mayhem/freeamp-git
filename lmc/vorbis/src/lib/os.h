@@ -1,3 +1,5 @@
+#ifndef _OS_H
+#define _OS_H
 /********************************************************************
  *                                                                  *
  * THIS FILE IS PART OF THE Ogg Vorbis SOFTWARE CODEC SOURCE CODE.  *
@@ -11,18 +13,53 @@
  *                                                                  *
  ********************************************************************
 
- function: predefined encoding modes
+ function: #ifdef jail to whip a few platforms into the UNIX ideal.
  last mod: $Id$
 
  ********************************************************************/
 
-#ifndef _V_MODES_H_
-#define _V_MODES_H_
+#include <math.h>
+#ifndef _V_IFDEFJAIL_H_
+#define _V_IFDEFJAIL_H_
 
-#include "vorbis/mode_A.h"
-#include "vorbis/mode_B.h"
-#include "vorbis/mode_C.h"
-#include "vorbis/mode_D.h"
-#include "vorbis/mode_E.h"
+#ifndef M_PI
+#define M_PI (3.1415926539)
+#endif
+
+#ifndef __GNUC__
+#ifdef _WIN32
+#  include <malloc.h>
+#  define rint(x)   (floor((x)+0.5)) 
+#endif
+#endif
+
+#ifdef _WIN32
+#  define FAST_HYPOT(a, b) sqrt((a)*(a) + (b)*(b))
+#else /* if not _WIN32 */
+#  define FAST_HYPOT hypot
+#endif
 
 #endif
+
+#ifdef USE_ALLOCA_H
+#include <alloca.h>
+#endif
+
+#ifdef USE_MEMORY_H
+#include <memory.h>
+#endif
+
+#ifndef min
+#  define min(x,y)  ((x)>(y)?(y):(x))
+#endif
+
+#ifndef max
+#  define max(x,y)  ((x)<(y)?(y):(x))
+#endif
+
+#include "../include/vorbis/os_types.h"
+
+#endif /* _OS_H */
+
+
+

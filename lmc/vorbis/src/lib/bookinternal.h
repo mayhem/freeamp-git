@@ -11,18 +11,29 @@
  *                                                                  *
  ********************************************************************
 
- function: predefined encoding modes
+ function: basic codebook pack/unpack/code/decode operations
  last mod: $Id$
 
  ********************************************************************/
 
-#ifndef _V_MODES_H_
-#define _V_MODES_H_
+#ifndef _V_INT_CODEBOOK_H_
+#define _V_INT_CODEBOOK_H_
 
-#include "vorbis/mode_A.h"
-#include "vorbis/mode_B.h"
-#include "vorbis/mode_C.h"
-#include "vorbis/mode_D.h"
-#include "vorbis/mode_E.h"
+#include "vorbis/codebook.h"
+#include "bitwise.h"
+
+extern int vorbis_staticbook_pack(const static_codebook *c,oggpack_buffer *b);
+extern int vorbis_staticbook_unpack(oggpack_buffer *b,static_codebook *c);
+
+extern int vorbis_book_encode(codebook *book, int a, oggpack_buffer *b);
+extern int vorbis_book_errorv(codebook *book, double *a);
+extern int vorbis_book_encodev(codebook *book, int best,double *a, 
+			       oggpack_buffer *b);
+extern int vorbis_book_encodevs(codebook *book, double *a, oggpack_buffer *b,
+				int step,int stagetype);
+
+extern long vorbis_book_decode(codebook *book, oggpack_buffer *b);
+extern long vorbis_book_decodevs(codebook *book, double *a, oggpack_buffer *b,
+				 int step,int stagetype);
 
 #endif
