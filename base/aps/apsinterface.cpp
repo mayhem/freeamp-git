@@ -35,6 +35,7 @@ ____________________________________________________________________________*/
 #include "aps.h"
 #include "apsplaylist.h"
 #include "apsmetadata.h"
+#include "uuid.h"
 #include <strstream>
 
 #ifdef WIN32
@@ -51,6 +52,8 @@ ____________________________________________________________________________*/
 #include "sigclient.h"
 #include <math.h>
 #include "utility.h"
+
+#include "cdindex.h"
 
 #ifndef WIN32
 #define ios_base ios
@@ -140,121 +143,62 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData, bool bUseCollection)
 {
     if (pmetaData == NULL) 
         return APS_PARAMERROR;
-    string strCollectionID = "NOT_OPTED_IN1111";
-    if (m_strCollectionID.size() == 16)
-        strCollectionID = m_strCollectionID;
 
     m_pSema->Wait();
 
-    // Client socket will send pBuffer to server.
-    COMSocket TheSock;
-    int nErr = SOCKET_ERROR;
-    int nNumRetries = 0;
-    while ( (nErr == SOCKET_ERROR) && (nNumRetries < 2) && 
-            (m_nMetaFailures < 10))  // If error re-try two times with a 3 
-                                     // second sleep time.
+    CDIndex o;
+    string  error, data;
+    bool    ret;
+    vector<string> args;
+    char    temp[10], guid[40];
+    UUID     u;
+
+    o.SetServer(string("www.musicbrainz.org"), 80);
+
+    u.uuid_ascii((UUID::uuid_t)pmetaData->GUID().c_str(),  guid);
+
+    args.push_back(pmetaData->Title());
+    args.push_back(string(guid));
+    args.push_back(pmetaData->Filename());
+    args.push_back(pmetaData->Artist());
+    args.push_back(pmetaData->Album());
+    sprintf(temp, "%d", pmetaData->Track());
+    args.push_back(string(temp));
+    sprintf(temp, "%d", pmetaData->Length());
+    args.push_back(string(temp));
+    sprintf(temp, "%d", pmetaData->Year());
+    args.push_back(string(temp));
+    args.push_back(pmetaData->Genre());
+    args.push_back(pmetaData->Comment());
+
+    ret = o.Query(string(ExchangeMetadata), &args);
+    if (!ret)
     {
-        nErr = TheSock.Connect("209.249.187.199", 4321, SOCK_STREAM);
-        if (nErr == SOCKET_ERROR)
-        {
-            nNumRetries++;
-            m_nMetaFailures++;
-            if (m_nMetaFailures == 10)
-            {
-                //MessageBox(NULL, "MetaData Server Temporarily down. Disabling MetaData Lookups until next restart., "Network Error", MB_OK | MB_SYSTEMMODAL);
-                break;
-            }
-            Sleep(3000);
-        }
-        else
-        {
-            m_nMetaFailures = 0;
-            vector<APSMetaData*> APSList;
-            APSList.push_back(pmetaData);
-
-            int nBufferLen = 0;
-            const char* pBuffer = NULL;
-            pBuffer = HostToNet(&APSList, strCollectionID, nBufferLen);
-
-            if (nBufferLen == 4096)
-            {
-                return 1;
-            }
-
-            int nBytes = 0;
-
-            nErr = TheSock.Write(pBuffer, nBufferLen, &nBytes);
-
-            char* pBuffer2;
-            pBuffer2 = new char[4096];
-            memset(pBuffer2, 0, 4096);
-            //int nBytes2 = 0;
-
-            vector<APSMetaData*>* pNewAPSList = NULL;
-
-            int nErr = TheSock.NBRead(pBuffer2, 4095, &nBytes, 90);
-
-            if (nErr == 0)
-            {
-                fstream fin("test.txt", 
-                            ios_base::in | ios_base::out | ios_base::app);
-                fin << "NBRead timed out " << endl;
-
-                nErr = SOCKET_ERROR;
-            }
-            else
-            {
-                // this needs decrufting
-                pNewAPSList = NetToHost(pBuffer2, strCollectionID);
-
-                if (pNewAPSList->size() == 1)
-		{
-                    *pmetaData = *(*pNewAPSList)[0];
-                }
-                else if (pNewAPSList->size() > 1)
-                {
-                    // Let user pick from multiple result set.
-                    // For now, the first item from the vector will be chosen.
-                    // TODO: Create a dialog box and let the user choose from 
-                    // result set.
-	            *pmetaData = *(*pNewAPSList)[0];
-		}
-		
-                // clean up
-                for (vector<APSMetaData*>::iterator i = pNewAPSList->begin(); 
-                     i != pNewAPSList->end(); i++)
-	            delete *i;
-
-                pNewAPSList->erase(pNewAPSList->begin(), pNewAPSList->end());
-                if (pNewAPSList != NULL)
-                {
-                    delete pNewAPSList;
-                    pNewAPSList = NULL;
-                }
-
-                break;
-            }
-
-            delete [] pBuffer2;
-        }
+         o.GetQueryError(error);
+         return APS_NETWORKERROR;
     }
-	
+
+    // This query should always return one item
+    if (o.GetNumItems() == 0)
+    {
+        return APS_GENERALERROR;
+    }
+
+    // Now start the data extraction process.
+    // Select the first item in the list of returned items
+    o.Select(SelectExchangedData);
+
+    pmetaData->SetArtist(o.Data(GetArtistName).c_str());
+    pmetaData->SetTitle(o.Data(GetTrackName).c_str());
+    pmetaData->SetAlbum(o.Data(GetAlbumName).c_str());
+    pmetaData->SetGenre(o.Data(GetGenre).c_str());
+    pmetaData->SetComment(o.Data(GetDescription).c_str());
+    pmetaData->SetYear(o.DataInt(GetYear));
+    pmetaData->SetTrack(o.DataInt(GetTrackNum));
+    pmetaData->SetLength(o.DataInt(GetDuration));
+
     m_pSema->Signal();
 
-    // Debug logging code
-    fstream fin("test.txt", ios_base::in | ios_base::out | ios_base::app);
-    if (pmetaData->GUID().size() != 16)
-    {
-        fin << "wrong GUID len for " << pmetaData->Filename() << " guid of : " 
-            << pmetaData->GUID() << endl;
-    }
-    else
-    {
-        fstream fout("success.txt", 
-                     ios_base::in | ios_base::out | ios_base::app);
-        fout << pmetaData->Filename() << endl;
-        fout << pmetaData->GUID() << endl;
-    }
     return APS_NOERROR;
 }
 

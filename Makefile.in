@@ -43,6 +43,24 @@ lib/http/lib/libfahttp.a: $(HTTPOBJ)
 	+test -d lib/http/lib || mkdir lib/http/lib
 	$(LIBMOD) $@ $(HTTPOBJ)
 
+MUSICBRAINZOBJ = lib/musicbrainz/expat/xmlparse/hashtable.o
+MUSICBRAINZOBJ += lib/musicbrainz/expat/xmlparse/xmlparse.o
+MUSICBRAINZOBJ += lib/musicbrainz/expat/xmltok/xmlrole.o
+MUSICBRAINZOBJ += lib/musicbrainz/expat/xmltok/xmltok.o
+MUSICBRAINZOBJ += lib/musicbrainz/osdep/cdi_linux.o
+MUSICBRAINZOBJ += lib/musicbrainz/lib/base64.o
+MUSICBRAINZOBJ += lib/musicbrainz/lib/sha_func.o
+MUSICBRAINZOBJ += lib/musicbrainz/lib/cdindex.o 
+MUSICBRAINZOBJ += lib/musicbrainz/lib/http.o
+MUSICBRAINZOBJ += lib/musicbrainz/lib/xql.o
+MUSICBRAINZOBJ += lib/musicbrainz/lib/cdi.o
+MUSICBRAINZOBJ += lib/musicbrainz/lib/diskid.o
+MUSICBRAINZOBJ += lib/musicbrainz/lib/xmlparse.o
+
+lib/musicbrainz/lib/libmusicbrainz.a: $(MUSICBRAINZOBJ)
+	+test -d lib/musicbrainz/lib || mkdir lib/musicbrainz/lib
+	$(LIBMOD) $@ $(MUSICBRAINZOBJ)
+
 FREEAMPunixOBJ  = base/unix/src/bootstrap.o base/unix/src/unixprefs.o
 FREEAMPunixOBJ += base/unix/src/win32impl.o base/unix/src/pthreadthread.o
 FREEAMPunixOBJ += base/unix/src/debug.o base/unix/src/mutex.o 
@@ -60,7 +78,7 @@ FREEAMPbeosOBJ += base/beos/src/win32impl.o
 APSOBJ  = base/aps/FAMetaUnit.o base/aps/apsinterface.o base/aps/sigclient.o
 APSOBJ += base/aps/apsplaylist.o base/aps/gencrc.o base/aps/hosttonet.o 
 APSOBJ += base/aps/nettohost.o base/aps/comsocket.o base/aps/apsconvert.o
-APSOBJ += base/aps/YPClient.o base/aps/sigxdr.o 
+APSOBJ += base/aps/YPClient.o base/aps/sigxdr.o base/aps/uuid.o
 
 FREEAMPOBJ =  base/src/log.o base/src/player.o base/src/musiccatalog.o
 FREEAMPOBJ += base/src/playlist.o base/src/propimpl.o base/src/registrar.o
@@ -74,6 +92,7 @@ FREEAMPOBJ += base/src/timer.o base/src/missingfile.o io/src/pipeline.o
 FREEAMPOBJ += $(FREEAMP$(HOST_OS)OBJ) $(APSOBJ)
 FREEAMPOBJ += lib/gdbm/lib/libfagdbm.a lib/xml/lib/libfaxml.a 
 FREEAMPOBJ += lib/zlib/lib/libzlib.a lib/http/lib/libfahttp.a
+FREEAMPOBJ += lib/musicbrainz/lib/libmusicbrainz.a
 
 UNIXFREEAMPLIBS = -ldl -lpthread $(EXTRALIBS)
 BEOSFREEAMPLIBS = -lbe -lroot
@@ -120,7 +139,7 @@ freeamp: $(FREEAMPOBJ) $(freeamp_DEPENDENCIES)
 clean: freeamp-clean plugins-clean
 
 clean-freeamp freeamp-clean:
-	-rm -f $(FREEAMPOBJ) freeamp $(ZLIBOBJ) $(GDBMOBJ) $(PARSEOBJ) $(HTTPOBJ) 
+	-rm -f $(FREEAMPOBJ) freeamp $(ZLIBOBJ) $(GDBMOBJ) $(PARSEOBJ) $(HTTPOBJ) $(MUSICBRAINZOBJ) 
 
 plugins: plugins-cc
 
