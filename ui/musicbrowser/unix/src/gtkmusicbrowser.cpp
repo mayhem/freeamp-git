@@ -1217,7 +1217,7 @@ void GTKMusicBrowser::LoadPlaylist(string &oPlaylist)
         char *PlaylistURL = new char[length];
         if (IsntError(FilePathToURL(oPlaylist.c_str(), PlaylistURL, &length))) {
             m_plm->ReadPlaylist(PlaylistURL);
-            m_currentListName = oPlaylist;
+            m_currentListName = PlaylistURL;
             UpdatePlaylistList();
         }
         delete [] PlaylistURL;
@@ -1527,7 +1527,7 @@ void GTKMusicBrowser::PopUpInfoEditor(PlaylistItem *editee)
 
 void GTKMusicBrowser::SaveCurrentPlaylist(char *path)
 {
-    if (path)
+    if (path != NULL)
         m_currentListName = path;
 
     if (m_currentListName.length() == 0)
@@ -1666,7 +1666,7 @@ void GTKMusicBrowser::Close(void)
     }
 
     gdk_threads_leave();
- 
+
     SaveCurrentPlaylist(NULL);
 }
 

@@ -144,11 +144,11 @@ AC_DEFINE_UNQUOTED(HOST_CPU, "${host_cpu}")
 
 dnl the following is to so that the right includes (and only the right
 dnl includes) are added in at compile time.
-OSINC="-Ibase/unix/include -Ibase/unix/$host_os/include"
+OSINC="-I$srcdir/base/unix/include -I$srcdir/base/unix/$host_os/include"
 OSDEP="unix/$host_os"
 
 if test "$isunix" = "false"  ; then
-  OSINC="-Ibase/$host_os/include -Iui/freeamp/$host_os"
+  OSINC="-I$srcdir/base/$host_os/include -I$srcdir/ui/freeamp/$host_os"
   OSDEP="$host_os"
 dnl else
 dnl  OSDEPSRC=`find base/unix/src \( -name '*.c' -o -name '*.cpp' \) -print`
@@ -181,7 +181,7 @@ if test "$have_esound" = "true"; then
      ESD_LIBS=`$ESD_CONFIG --libs`
      ESOUNDPLUGIN=plugins/esound.pmo
      OSDEPPLUGINS="$OSDEPPLUGINS $ESOUNDPLUGIN"
-     OSINC="$OSINC -Iio/esound/include"
+     OSINC="$OSINC -I$srcdir/io/esound/include"
   fi
 fi
 
@@ -262,9 +262,9 @@ if test "$have_gtk" = "true"; then
   OSDEPPLUGINS="$OSDEPPLUGINS plugins/musicbrowser.ui"
   OSDEPPLUGINS="$OSDEPPLUGINS plugins/freeamp.ui MakeTheme"
   OSDEPPLUGINS="$OSDEPPLUGINS plugins/download.ui"
-  OSINC="$OSINC -Iui/musicbrowser/unix/include"
-  OSINC="$OSINC -Iui/freeamp/include -Iui/freeamp/unix/include"
-  OSINC="$OSINC -Iui/download/unix/include"
+  OSINC="$OSINC -I$srcdir/ui/musicbrowser/unix/include"
+  OSINC="$OSINC -I$srcdir/ui/freeamp/include -I$srcdir/ui/freeamp/unix/include"
+  OSINC="$OSINC -I$srcdir/ui/download/unix/include"
   CFLAGS="$CFLAGS $GTK_CFLAGS"
   AC_DEFINE(HAVE_GTK)
 else
@@ -408,7 +408,7 @@ AC_CHECK_HEADER(sys/asoundlib.h,
 ALSAPMOPLUGIN=plugins/alsa.pmo
 if test "$have_alsa" = "true"; then
   OSDEPPLUGINS="$OSDEPPLUGINS $ALSAPMOPLUGIN";
-  OSINC="$OSINC -Iio/alsa/$OSDEP/include"
+  OSINC="$OSINC -I$srcdir/io/alsa/$OSDEP/include"
   AC_MSG_RESULT([compiling alsa soundcard plugin])
 fi
 
@@ -433,5 +433,5 @@ fi
 AC_SUBST(XINGASM)
 
 AC_CONFIG_HEADER(config/config.h)
-AC_OUTPUT(Makefile Makefile-plugins config/Makefile.header)
+AC_OUTPUT(Makefile Makefile-plugins Makefile.header)
 touch .config.check

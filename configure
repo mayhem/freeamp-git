@@ -1874,11 +1874,11 @@ EOF
 
 
 
-OSINC="-Ibase/unix/include -Ibase/unix/$host_os/include"
+OSINC="-I$srcdir/base/unix/include -I$srcdir/base/unix/$host_os/include"
 OSDEP="unix/$host_os"
 
 if test "$isunix" = "false"  ; then
-  OSINC="-Ibase/$host_os/include -Iui/freeamp/$host_os"
+  OSINC="-I$srcdir/base/$host_os/include -I$srcdir/ui/freeamp/$host_os"
   OSDEP="$host_os"
 fi
 
@@ -1972,7 +1972,7 @@ fi
      ESD_LIBS=`$ESD_CONFIG --libs`
      ESOUNDPLUGIN=plugins/esound.pmo
      OSDEPPLUGINS="$OSDEPPLUGINS $ESOUNDPLUGIN"
-     OSINC="$OSINC -Iio/esound/include"
+     OSINC="$OSINC -I$srcdir/io/esound/include"
   fi
 fi
 
@@ -2181,9 +2181,9 @@ if test "$have_gtk" = "true"; then
   OSDEPPLUGINS="$OSDEPPLUGINS plugins/musicbrowser.ui"
   OSDEPPLUGINS="$OSDEPPLUGINS plugins/freeamp.ui MakeTheme"
   OSDEPPLUGINS="$OSDEPPLUGINS plugins/download.ui"
-  OSINC="$OSINC -Iui/musicbrowser/unix/include"
-  OSINC="$OSINC -Iui/freeamp/include -Iui/freeamp/unix/include"
-  OSINC="$OSINC -Iui/download/unix/include"
+  OSINC="$OSINC -I$srcdir/ui/musicbrowser/unix/include"
+  OSINC="$OSINC -I$srcdir/ui/freeamp/include -I$srcdir/ui/freeamp/unix/include"
+  OSINC="$OSINC -I$srcdir/ui/download/unix/include"
   CFLAGS="$CFLAGS $GTK_CFLAGS"
   cat >> confdefs.h <<\EOF
 #define HAVE_GTK 1
@@ -2556,7 +2556,7 @@ fi
 ALSAPMOPLUGIN=plugins/alsa.pmo
 if test "$have_alsa" = "true"; then
   OSDEPPLUGINS="$OSDEPPLUGINS $ALSAPMOPLUGIN";
-  OSINC="$OSINC -Iio/alsa/$OSDEP/include"
+  OSINC="$OSINC -I$srcdir/io/alsa/$OSDEP/include"
   echo "$ac_t""compiling alsa soundcard plugin" 1>&6
 fi
 
@@ -2688,7 +2688,7 @@ done
 ac_given_srcdir=$srcdir
 ac_given_INSTALL="$INSTALL"
 
-trap 'rm -fr `echo "Makefile Makefile-plugins config/Makefile.header config/config.h" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
+trap 'rm -fr `echo "Makefile Makefile-plugins Makefile.header config/config.h" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
 cat >> $CONFIG_STATUS <<EOF
 
@@ -2795,7 +2795,7 @@ EOF
 
 cat >> $CONFIG_STATUS <<EOF
 
-CONFIG_FILES=\${CONFIG_FILES-"Makefile Makefile-plugins config/Makefile.header"}
+CONFIG_FILES=\${CONFIG_FILES-"Makefile Makefile-plugins Makefile.header"}
 EOF
 cat >> $CONFIG_STATUS <<\EOF
 for ac_file in .. $CONFIG_FILES; do if test "x$ac_file" != x..; then

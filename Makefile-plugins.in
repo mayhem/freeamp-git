@@ -3,7 +3,7 @@
 
 RELOC = @FPIC@
 
-include config/Makefile.header
+include Makefile.header
 
 plugins-install install_plugins: install-plugins
 
@@ -27,7 +27,7 @@ uninstall_plugins uninstall-plugins:
 OSDEPPLUGINS = @OSDEPPLUGINS@
 
 clean-plugins plugins-clean:
-	-rm -f $(ZLIBOBJ) $(MUSICBROWSEROBJ) $(MAKETHEMEOBJ) $(LFIOBJ) $(HTTPOBJ) $(OBSPMI) $(SCPMOOBJ) $(ALSAOBJ) $(ESNDOBJ) $(DOWNLOADUIOBJ) $(CMDUIOBJ) $(MPG123UIOBJ) $(NCURSESUIOBJ) $(LCDUIOBJ) $(IRMANUIOBJ) $(FREEAMPUIOBJ) $(ID3V1OBJ) $(ID3V2OBJ) $(M3UOBJ) $(PMP300OBJ) $(XINGLMCOBJ) MakeTheme plugins/*.*
+	-rm -f $(RMPOBJ) $(MISCOBJ) $(ZLIBOBJ) $(MUSICBROWSEROBJ) $(MAKETHEMEOBJ) $(LFIOBJ) $(HTTPOBJ) $(OBSPMI) $(SCPMOOBJ) $(ALSAOBJ) $(ESNDOBJ) $(DOWNLOADUIOBJ) $(CMDUIOBJ) $(MPG123UIOBJ) $(NCURSESUIOBJ) $(LCDUIOBJ) $(IRMANUIOBJ) $(FREEAMPUIOBJ) $(ID3V1OBJ) $(ID3V2OBJ) $(M3UOBJ) $(PMP300OBJ) $(XINGLMCOBJ) MakeTheme plugins/*.*
 
 PLUGINS =  lib/zlib/lib/libzlib.a
 PLUGINS += plugins/localfileinput.pmi
@@ -104,7 +104,6 @@ plugins/alsa.pmo: $(ALSAOBJ)
 ESNDOBJ = io/esound/src/esoundpmo.o io/src/pipeline.o io/src/pmo.o
 
 plugins/esound.pmo: $(ESNDOBJ)
-	echo "$(ESD_LIBS)"
 	$(LINKMOD) -o $@ $(ESNDOBJ) $(ESD_LIBS)
 
 #

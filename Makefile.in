@@ -5,7 +5,7 @@
 FPIC=
 # RELOC = null for freeamp main; RELOC = -fpic for plugins.
 
-include config/Makefile.header
+include Makefile.header
 
 GDBMOBJ  = lib/gdbm/bucket.o lib/gdbm/falloc.o lib/gdbm/findkey.o
 GDBMOBJ += lib/gdbm/gdbmclose.o lib/gdbm/gdbmdelete.o lib/gdbm/gdbmerrno.o
@@ -49,7 +49,7 @@ FREEAMPOBJ += $(FREEAMP$(HOST_OS)OBJ)
 FREEAMPOBJ += $(GDBMOBJ) $(PARSEOBJ)
 #FREEAMPOBJ += $(OSDEPOBJ)
 
-all: freeamp plugins
+all: dirs freeamp plugins
 
 #CYGWINFREEAMPLIBS =
 UNIXFREEAMPLIBS = -ldl -lpthread $(EXTRALIBS)
@@ -57,6 +57,24 @@ BEOSFREEAMPLIBS = -lbe -lroot
 
 FREEAMPLIBS = $($(OSTYPE)FREEAMPLIBS)
 
+# hack hack hack
+DIRECTORIES  = base/beos/src base/src base/unix/src base/unix/linux/src 
+DIRECTORIES += base/unix/solaris/src dlm/rmp io/alsa/unix/linux/src
+DIRECTORIES += io/esound/src io/http io/local io/obs io/src 
+DIRECTORIES += io/soundcard/beos/src io/soundcard/unix/linux/src
+DIRECTORIES += io/soundcard/solaris/src lib/gdbm lib/xml/src lib/zlib/src
+DIRECTORIES += lmc/xingmp3/src plm/metadata/id3v1 plm/metadata/id3v2 
+DIRECTORIES += plm/metadata/misc plm/playlist/m3u plm/portable/pmp300/sba 
+DIRECTORIES += ui/cmdline ui/download/unix/src ui/freeamp/beos/src 
+DIRECTORIES += ui/freeamp/src ui/freeamp/tools/src ui/freeamp/unix/src
+DIRECTORIES += ui/irman/src ui/lcd/src ui/musicbrowser/unix/src ui/ncurses
+DIRECTORIES += ui/mpg123
+
+dirs:
+	for p in $(DIRECTORIES); do \
+	  test -d $$p || mkdir -p $$p; \
+        done
+          
 freeamp: $(FREEAMPOBJ) $(freeamp_DEPENDENCIES)
 	@rm -f freeamp
 	$(CXXLINK) $(FREEAMPOBJ) $(LDFLAGS) -ldl -lpthread $(EXTRALIBS)
@@ -74,7 +92,7 @@ plugins-cc install-plugins clean-plugins plugins-install plugins-clean:
 
 distclean: clean
 	-rm -f config.status Makefile config.cache config/config.h
-	-rm -f config/Makefile.header Makefile-plugins
+	-rm -f Makefile.header Makefile-plugins
 
 install: install-freeamp install-themes install-plugins
 
@@ -87,10 +105,10 @@ install-freeamp: freeamp
 
 install-themes:
 	$(mkinstalldirs) $(DESTDIR)$(datadir)/freeamp/themes
-	@list=`ls themes/*.*`; for p in $$list; do \
+	@list=`ls $(srcdir)/themes/*.*`; for p in $$list; do \
 	  if test -f $$p; then \
-	    echo "  $(INSTALL_PROGRAM) $$p $(DESTRIR)$(datadir)/freeamp/`echo $$p|sed '$(transform)'`"; \
-	    $(INSTALL_PROGRAM) $$p $(DESTDIR)$(datadir)/freeamp/`echo $$p|sed '$(transform)'`; \
+	    echo "  $(INSTALL_PROGRAM) $$p $(DESTRIR)$(datadir)/freeamp/themes/${basename $$p}"; \
+	    $(INSTALL_PROGRAM) $$p $(DESTDIR)$(datadir)/freeamp/themes/${basename $$p}; \
 	  else :; fi; \
 	done
 
@@ -98,8 +116,8 @@ depend:
 	makedepend -- $(DEFS) $(INCLUDES) $(CFLAGS) -- `echo $(FREEAMPOBJ) | sed -e 's,\.o,.cpp,g'`
 	+$(PIMAKE) depend
 
-Makefile: Makefile.in Makefile-plugins.in
-	./config.status
+Makefile: $(srcdir)/Makefile.in $(srcdir)/Makefile-plugins.in
+	cd $(top_builddir) && ./config.status
 	echo 'Makefile has been rebuilt; please run `make` again.'
 
 

@@ -159,7 +159,8 @@ Error ThemeZip::CompressThemeZip(const string &oDestFile,
        // last, create checksum
        memcpy(TarRecord.header.chksum,CHKBLANKS,8);
        int ctr,sum;
-       for(ctr=sum=0;ctr<sizeof(tar_record);ctr++) sum+=TarRecord.charptr[ctr];
+       for (ctr = sum = 0; ctr < (int)sizeof(tar_record); ctr++) 
+           sum += TarRecord.charptr[ctr];
        sprintf(TarRecord.header.chksum,"%6o",sum);
 
        if (gzwrite(pOut, (void *)&TarRecord, sizeof(tar_record)) != sizeof(tar_record))
@@ -229,7 +230,7 @@ Error ThemeZip::CompressThemeZip(const string &oDestFile,
 #define ISSPACE(Char) (__isascii (Char) && isspace (Char))
 
 
-from_oct (int digs, char *where)
+int from_oct (int digs, char *where)
 {
   long value;
 
@@ -288,7 +289,8 @@ Error ThemeZip::DecompressThemeZip(const string &oSrcFile,
        }
        // check if we are done
        int ctr,sum;
-       for(ctr=sum=0; ctr<sizeof(tar_record); ctr++) sum+=TarRecord.charptr[ctr];
+       for (ctr = sum = 0; ctr < (int)sizeof(tar_record); ctr++) 
+            sum += TarRecord.charptr[ctr];
        if(sum==0)
        {
            // empty record detected, done
@@ -298,7 +300,8 @@ Error ThemeZip::DecompressThemeZip(const string &oSrcFile,
        // check if checksum is still OK
        int our_sum = from_oct(6,TarRecord.header.chksum);
        memcpy(TarRecord.header.chksum,CHKBLANKS,8);
-       for(ctr=sum=0;ctr<sizeof(tar_record);ctr++) sum+=TarRecord.charptr[ctr];
+       for (ctr = sum = 0; ctr < (int)sizeof(tar_record); ctr++) 
+            sum += TarRecord.charptr[ctr];
        if(sum!=our_sum)
        {
            gzclose(pIn);
