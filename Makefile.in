@@ -55,6 +55,7 @@ FREEAMPOBJ += base/src/prefixprefs.o base/src/preferences.o
 FREEAMPOBJ += base/src/debug.o base/src/utility.o base/src/database.o 
 FREEAMPOBJ += base/src/downloadmanager.o base/src/errors.o
 FREEAMPOBJ += io/src/pullbuffer.o io/src/streambuffer.o io/src/tstream.o
+FREEAMPOBJ += base/src/undomanager.o
 FREEAMPOBJ += $(FREEAMP$(HOST_OS)OBJ)
 FREEAMPOBJ += lib/gdbm/lib/libfagdbm.a lib/xml/lib/libfaxml.a
 

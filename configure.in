@@ -304,6 +304,7 @@ if test "$have_esound" = "true"; then
   OSINC="$OSINC -I$srcdir/io/esound/include"
 else
   AC_MSG_RESULT(no)
+  
   ESD_LIBS=""
   have_esound="false"
 fi
@@ -321,9 +322,15 @@ if test "$have_freetype" = "true"; then
   AC_CHECK_LIB(ttf, TT_Init_FreeType, have_freetype="true", 
                have_freetype = "false", -lm)
 fi
+
 if test "$have_freetype" = "true"; then
   TTF_LIBS="-lttf"
   AC_DEFINE(HAVE_FREETYPE)
+else
+  echo "WARNING: You don't have FreeType installed.  This means that FreeAmp"
+  echo "will fall back on X fonts.  To make FreeAmp's GUI interface all pretty,"
+  echo "you need FreeType.  Get the latest stable version at: "
+  echo "http://www.freetype.org/download.htm"
 fi
  
 AC_SUBST(TTF_LIBS)
@@ -377,6 +384,10 @@ int main()
     LIBS="$ac_save_LIBS" 
     if test "$have_gtk" = "false"; then
        AC_MSG_RESULT(no)
+       echo "WARNING: You have an old version of the EsounD software.  If you"
+       echo "want EsounD support in FreeAmp, please upgrade to the latest"
+       echo "version, which can be found at:"
+       echo "ftp://ftp.gnome.org/pub/GNOME/stable/sources/esound"
     else
        AC_MSG_RESULT(yes)
     fi
