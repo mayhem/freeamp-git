@@ -21,12 +21,20 @@
 	$Id$
 ____________________________________________________________________________*/
 
+// The debugger can't handle symbols more than 255 characters long.
+// STL often creates symbols longer than that.
+// When symbols are longer than 255 characters, the warning is disabled.
+#ifdef WIN32
+#pragma warning(disable:4786) 
+#endif
+
 #include <assert.h>
 #include <time.h>
 #include <ctype.h>
 #include <stdio.h>
 
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -36,14 +44,14 @@ using namespace std;
 #include <shlobj.h>
 #define MKDIR(z) mkdir(z)
 #else
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <unistd.h>
 #define MKDIR(z) mkdir(z, 0755)
 #endif
 
 #include "config.h"
 #include "utility.h"
+#include <sys/types.h>
+#include <sys/stat.h>
 
 void CreateDirectoryPath(const char* path)
 {
@@ -491,6 +499,84 @@ void LaunchBrowser(char* url)
 #endif
 
 #ifdef WIN32
+
+void FindMusicFiles(const char* rootPath, 
+                    vector<string>& urls, 
+                    vector<string>& queries)
+{
+    HANDLE findFileHandle = NULL;
+    WIN32_FIND_DATA findData;
+    string findPath;
+    string::size_type pos;
+
+    vector<string>::iterator query = queries.begin();
+
+    // first run each query on this directory
+    for(;query != queries.end(); query++)
+    {
+        findPath = rootPath;
+        findPath += DIR_MARKER_STR;
+        pos = findPath.size();
+        findPath += *query;
+
+        findFileHandle = FindFirstFile(findPath.c_str(), &findData);
+
+        if(findFileHandle != INVALID_HANDLE_VALUE)
+        {
+            do
+            {
+                findPath.replace(pos, 
+                                 findPath.size() - pos, 
+                                 findData.cFileName);
+                
+                char url[MAX_PATH + 8];
+                uint32 length = sizeof(url);
+
+                FilePathToURL(findPath.c_str(), url, &length);
+
+                urls.push_back(url);
+
+            }while(FindNextFile(findFileHandle, &findData));
+
+            FindClose(findFileHandle);
+        }
+    }
+
+    // next find all the directories in this directory and
+    // and run the queries on them
+    findPath.replace(pos, 
+                     findPath.size() - pos, 
+                     "*.*");
+
+    findFileHandle = FindFirstFile(findPath.c_str(), &findData);
+
+    if(findFileHandle != INVALID_HANDLE_VALUE)
+    {
+        do
+        {
+            if(strcmp(findData.cFileName, ".") && 
+               strcmp(findData.cFileName, ".."))
+            {
+                findPath.replace(pos, 
+                                 findPath.size() - pos, 
+                                 findData.cFileName);
+                struct stat st;
+
+                stat(findPath.c_str(), &st);
+
+                if(st.st_mode & _S_IFDIR)
+                {
+                    FindMusicFiles(findPath.c_str(),
+                                   urls,
+                                   queries);
+                }
+            }
+
+        }while(FindNextFile(findFileHandle, &findData));
+
+        FindClose(findFileHandle);
+    }
+}
 
 bool ResolveLink(string& path)
 {

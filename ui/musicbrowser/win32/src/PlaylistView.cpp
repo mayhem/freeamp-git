@@ -648,12 +648,49 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
                 {
                     uint32 length = sizeof(url);
                     strcpy(path, url);
-                    FilePathToURL(path, url, &length);
+
+                    // if this is a file drop it could be
+                    // a couple things: a link, a dir, or 
+                    // an mp3
+
+                    char* extension = NULL;
+
+                    extension = strrchr(path, '.');
+
+                    if(extension && strcasecmp(extension, ".lnk") == 0)
+                    { 
+                        string link = path;
+
+                        ResolveLink(link);
+
+                        strcpy(path, link.c_str());
+                    }
+
+                    struct stat st;
+
+                    stat(path, &st);
+
+                    if(st.st_mode & _S_IFDIR)
+                    {
+                        vector<string> query;
+
+                        query.push_back("*.mp1");
+                        query.push_back("*.mp2");
+                        query.push_back("*.mp3");
+
+                        ::SetCursor(LoadCursor(NULL, IDC_WAIT));
+                        FindMusicFiles(path, fileList, query);
+                        ::SetCursor(LoadCursor(NULL, IDC_ARROW));
+
+                        continue;
+                    }
+                    else
+                    {
+                        FilePathToURL(path, url, &length);
+                    }
                 }
 
                 fileList.push_back(url);
-
-                //MessageBox(NULL, url, "url", MB_OK);
             }
 
             // we know that we are gonna be adding a 
@@ -681,14 +718,8 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
 
                 middle = itemRect.top + (itemRect.bottom - itemRect.top)/2;
 
-                if(hti.pt.y < middle)
-                {
-                    //index 
-                }
-                else
-                {
+                if(hti.pt.y >= middle)
                     index++; 
-                }
 
                 m_oPlm->AddItems(fileList, index);
             }

@@ -226,6 +226,7 @@ class MusicBrowserUI : public UserInterface
     void    AddUncatagorizedTrackURLs(vector<string>* urls);
     void    AddSelectedPlaylistItems(vector<string>* urls);
     void    TVBeginDrag(HWND hwnd, NM_TREEVIEW* nmtv);
+    void    MusicCatalogItemAdded(const PlaylistItem* item);
 
 
     // Data members

@@ -572,7 +572,7 @@ private:
     const PlaylistItem* m_item;
 public:
     MusicCatalogTrackRemovedEvent(const PlaylistItem* item)
-    { m_type = INFO_MusicCatalogTrackAdded; m_item = item; }
+    { m_type = INFO_MusicCatalogTrackRemoved; m_item = item; }
     virtual ~MusicCatalogTrackRemovedEvent() {}
 
     const PlaylistItem* Item() const { return m_item; }

@@ -56,7 +56,7 @@ INT WINAPI DllMain (HINSTANCE hInstance,
                     ULONG ul_reason_being_called,
                     LPVOID lpReserved)
 {
-	switch (ul_reason_being_called)
+	switch(ul_reason_being_called)
 	{
 		case DLL_PROCESS_ATTACH:
 			g_hinst = hInstance;
@@ -201,6 +201,40 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
             m_playerEQ->AcceptEvent(new Event(INFO_ReadyToDieUI));
             break; 
         }
+
+        case INFO_MusicCatalogTrackAdded:
+        {
+            MusicCatalogTrackAddedEvent* pie = (MusicCatalogTrackAddedEvent*)event;
+
+            MusicCatalogItemAdded(pie->Item());
+            
+            break; 
+        }
+
+        case INFO_MusicCatalogTrackRemoved:
+        {
+            MusicCatalogTrackRemovedEvent* pie = (MusicCatalogTrackRemovedEvent*)event;
+
+            
+            break; 
+        }
+
+        case INFO_MusicCatalogPlaylistAdded:
+        {
+            MusicCatalogPlaylistAddedEvent* pie = (MusicCatalogPlaylistAddedEvent*)event;
+
+            
+            break; 
+        }
+
+        case INFO_MusicCatalogPlaylistRemoved:
+        {
+            MusicCatalogPlaylistRemovedEvent* pie = (MusicCatalogPlaylistRemovedEvent*)event;
+
+            
+            break; 
+        }
+
 
         case INFO_PlaylistItemAdded:
         {
@@ -363,6 +397,7 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
             
             break; 
         }
+
         case INFO_BrowserMessage: 
         {
             const char* cancelMsg = "(Press ESC to Cancel)  ";
@@ -379,6 +414,7 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
 
             break; 
         }
+
         case CMD_TogglePlaylistUI: 
         {
             if (m_initialized && isVisible)
@@ -401,6 +437,7 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
                 ExpandCollapseEvent();
             break; 
         }
+
         case CMD_ToggleMusicBrowserUI: 
         {
             if (m_initialized && isVisible) 
@@ -424,7 +461,6 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
                 ExpandCollapseEvent();
             break; 
         }
-
 
         case INFO_PlaylistRepeat:
 		{

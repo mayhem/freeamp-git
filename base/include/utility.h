@@ -25,6 +25,7 @@ ____________________________________________________________________________*/
 #define INCLUDED_UTILITY_H
 
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -47,6 +48,9 @@ void LaunchBrowser(char* url);
 #endif
 
 #ifdef WIN32
+void FindMusicFiles(const char* rootPath, 
+                    vector<string>& urls, 
+                    vector<string>& queries); 
 bool ResolveLink(string& path);
 #endif
 

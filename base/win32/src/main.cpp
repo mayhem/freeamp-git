@@ -53,7 +53,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 					 int cmdShow)
 {
     HANDLE runOnceMutex;
-
+    
     g_hinst = hInstance;
 
     runOnceMutex = CreateMutex(	NULL,
@@ -305,13 +305,10 @@ static LRESULT WINAPI HiddenWndProc(HWND hwnd,
 
                 if(giveToDLM)
                     dlm->ReadDownloadFile(url);
-                else
-                if(giveToTheme)
+                else if(giveToTheme)
                     context->target->AcceptEvent(new LoadThemeEvent(url, ""));
                 else
-                {
                     plm->AddItem(url);
-                }    
             }
             
             break;
