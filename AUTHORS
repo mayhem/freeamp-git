@@ -125,3 +125,7 @@ Other major contributors and their contributions:
 
 "Tero Koskinen" <tkoskine@gnwmail.com>
 * wrote cxunzip, the basis for the code in lib/unzip
+
+Michael Rich <istan@alltel.net>
+* AlphNT porting/installer builds
+* WAV output plugin
