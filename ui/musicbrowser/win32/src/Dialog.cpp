@@ -1177,7 +1177,7 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
     {
         bool viewMusicBrowser = true;
 
-        m_context->prefs->GetViewMusicBrowser(&viewMusicBrowser);
+        m_context->prefs->GetPrefBoolean(kViewMusicBrowserPref, &viewMusicBrowser);
 
         if(!viewMusicBrowser)
         {
@@ -1408,8 +1408,8 @@ void MusicBrowserUI::CreateToolbar()
         MAKELPARAM(buttonRect.right - buttonRect.left, sizeString.cy + 6));
 
     bool useTextLabels, useImages;
-    m_context->prefs->GetShowToolbarTextLabels(&useTextLabels);
-    m_context->prefs->GetShowToolbarImages(&useImages);
+    m_context->prefs->GetPrefBoolean(kShowToolbarTextLabelsPref, &useTextLabels);
+    m_context->prefs->GetPrefBoolean(kShowToolbarImagesPref, &useImages);
 
     AddToolbarButtons(useTextLabels, useImages);
 }
@@ -2233,7 +2233,7 @@ FileOpenDialog(HWND hwnd,
                     url_list.insert(url_list.begin(), item);
                     int32 numToRemember = 10;
 
-                    m_context->prefs->GetNumberOfURLsToRemember(&numToRemember);
+                    m_context->prefs->GetPrefInt32(kNumberOfURLsToRememberPref, &numToRemember);
 
                     if(url_list.size() > numToRemember)
                     {

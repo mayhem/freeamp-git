@@ -90,19 +90,19 @@ CDPMO::~CDPMO()
    cd_finish(m_cdDesc);
 }
 
-void CDPMO::SetVolume(int32 left, int32 right)
+void CDPMO::SetPrefInt32(kVolumePref, int32 left, int32 right)
 {
     if (m_cdDesc != "")
     {
-        m_volume->SetVolume( left, right );
+        m_volume->SetPrefInt32(kVolumePref,  left, right );
     }
 }
 
-void CDPMO::GetVolume(int &left, int &right)
+void CDPMO::GetPrefInt32(kVolumePref, int &left, int &right)
 {
     if (m_cdDesc != "")
     {
-        m_volume->GetVolume( left, right );
+        m_volume->GetPrefInt32(kVolumePref,  left, right );
     }
 } 
 
@@ -161,7 +161,7 @@ Error CDPMO::Init(OutputInfo *info)
    cddbid = 0;
    cdindexid = "";
 
-   if (IsError(m_pContext->prefs->GetCDDevicePath(device, &len))) {
+   if (IsError(m_pContext->prefs->GetPrefString(kCDDevicePathPref, device, &len))) {
        CDInfoEvent *cie = new CDInfoEvent(tracks, cddbid, (char *)cdindexid.c_str());
        m_pTarget->AcceptEvent(cie);
 	   m_locker.Release();
@@ -363,7 +363,7 @@ void CDPMO::WorkerThread(void)
 
    m_locker.Acquire();
 
-   if (IsError(m_pContext->prefs->GetCDDevicePath(device, &len))) {
+   if (IsError(m_pContext->prefs->GetPrefString(kCDDevicePathPref, device, &len))) {
 	   m_locker.Release();
        return;
    }

@@ -178,7 +178,7 @@ bool Misc::ReadMetaData(const char* url, MetaData* metadata)
     // do we need to convert underscores?
     bool convertUnderscores = false;
 
-    m_context->prefs->GetConvertUnderscoresToSpaces(&convertUnderscores);
+    m_context->prefs->GetPrefBoolean(kConvertUnderscoresToSpacesPref, &convertUnderscores);
 
     if(convertUnderscores)
     {

@@ -187,7 +187,7 @@ void FreeAmpTheme::WorkerThread(void)
     Error  eRet;
     int32  iValue;
 
-    m_pContext->prefs->GetTimeDisplay(&iValue);
+    m_pContext->prefs->GetPrefInt32(kTimeDisplayPref, &iValue);
     if (iValue)
        m_eTimeDisplayState = kTimeRemaining;
 
@@ -198,7 +198,7 @@ void FreeAmpTheme::WorkerThread(void)
 
     bool checkForUpdates = false;
 
-    m_pContext->prefs->GetCheckForUpdates(&checkForUpdates);
+    m_pContext->prefs->GetPrefBoolean(kCheckForUpdatesPref, &checkForUpdates);
 
     if(checkForUpdates)
     {
@@ -218,7 +218,7 @@ void FreeAmpTheme::WorkerThread(void)
     else     
        m_pContext->target->AcceptEvent(new Event(CMD_QuitPlayer));
    
-    m_pContext->prefs->SetTimeDisplay(m_eTimeDisplayState == kTimeRemaining);
+    m_pContext->prefs->SetPrefInt32(kTimeDisplayPref, m_eTimeDisplayState == kTimeRemaining);
 }
 
 void WorkerThreadStart(void* arg)
@@ -909,7 +909,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
            m_bVolumeChangeInProgress = false;
 
        m_pWindow->ControlIntValue(oControlName, false, iVol);
-       SetVolume(iVol, m_iBalance);
+       SetPrefInt32(kVolumePref, iVol, m_iBalance);
            
        return kError_NoErr;
    }    
@@ -919,7 +919,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
        int iBal;
 
        m_pWindow->ControlIntValue(oControlName, false, iBal);
-       SetVolume(m_iVolume, iBal);
+       SetPrefInt32(kVolumePref, m_iVolume, iBal);
            
        return kError_NoErr;
    }    
@@ -940,7 +940,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
            m_iMuteVolume = -1;
            iState = 0;
        }
-       SetVolume(m_iVolume, m_iBalance);
+       SetPrefInt32(kVolumePref, m_iVolume, m_iBalance);
        m_pWindow->ControlIntValue(oControlName, true, iState);
        return kError_NoErr;
    }
@@ -1235,7 +1235,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
        if (m_oHeadlineUrl.length() == 0)
           return kError_NoErr;
 
-       m_pContext->prefs->GetPlayImmediately(&bPlay);
+       m_pContext->prefs->GetPrefBoolean(kPlayImmediatelyPref, &bPlay);
        if (bPlay)
        {
            m_pContext->target->AcceptEvent(new Event(CMD_Stop));
@@ -1467,7 +1467,7 @@ void FreeAmpTheme::ReloadTheme(void)
     delete [] szTemp;
 }
 
-void FreeAmpTheme::SetVolume(int iVolume, int iBalance)
+void FreeAmpTheme::SetPrefInt32(kVolumePref, int iVolume, int iBalance)
 {       
     string oVol("Volume: ");
     char   szPercent[40];
@@ -1734,7 +1734,7 @@ void FreeAmpTheme::DropFiles(vector<string> *pFileList)
     ext = new char[_MAX_PATH];
     url = new char[_MAX_PATH + 7];
 
-    m_pContext->prefs->GetPlayImmediately(&bPlay);
+    m_pContext->prefs->GetPrefBoolean(kPlayImmediatelyPref, &bPlay);
     
     countbefore = m_pContext->plm->CountItems();
 

@@ -585,301 +585,301 @@ GetInputBufferSize(int32* value)
 
 Error 
 Preferences::
-SetInputBufferSize(int32 value)
+SetPrefInt32(kInputBufferSizePref, int32 value)
 {
     return SetPrefInt32(kInputBufferSizePref, value);
 }
 
 Error 
 Preferences::
-GetOutputBufferSize(int32* value)
+GetPrefInt32(kOutputBufferSizePref, int32* value)
 {
     return GetPrefInt32(kOutputBufferSizePref, value);
 }
 
 Error 
 Preferences::
-SetOutputBufferSize(int32 value)
+SetPrefInt32(kOutputBufferSizePref, int32 value)
 {
     return SetPrefInt32(kOutputBufferSizePref, value);
 }
 
 Error 
 Preferences::
-GetStreamBufferInterval(int32* value)
+GetPrefInt32(kStreamBufferIntervalPref, int32* value)
 {
     return GetPrefInt32(kStreamBufferIntervalPref, value);
 }
 
 Error 
 Preferences::
-SetStreamBufferInterval(int32 value)
+SetPrefInt32(kStreamBufferIntervalPref, int32 value)
 {
     return SetPrefInt32(kStreamBufferIntervalPref, value);
 }
 
 Error 
 Preferences::
-GetDecoderThreadPriority(int32* value)
+GetPrefInt32(kDecoderThreadPriorityPref, int32* value)
 {
     return GetPrefInt32(kDecoderThreadPriorityPref, value);
 }
 
 Error 
 Preferences::
-SetDecoderThreadPriority(int32 value)
+SetPrefInt32(kDecoderThreadPriorityPref, int32 value)
 {
     return SetPrefInt32(kDecoderThreadPriorityPref, value);
 }
 
 Error 
 Preferences::
-SetUseDebugLog(bool value)
+SetPrefBoolean(kUseDebugLogPref, bool value)
 {
     return SetPrefBoolean(kUseDebugLogPref, value);
 }
 
 Error 
 Preferences::
-GetUseDebugLog(bool* value)
+GetPrefBoolean(kUseDebugLogPref, bool* value)
 {
     return GetPrefBoolean(kUseDebugLogPref, value);
 }
 
 Error 
 Preferences::
-SetLogMain(bool value)
+SetPrefBoolean(kLogMainPref, bool value)
 {
     return SetPrefBoolean(kLogMainPref, value);
 }
 
 Error 
 Preferences::
-GetLogMain(bool* value)
+GetPrefBoolean(kLogMainPref, bool* value)
 {
     return GetPrefBoolean(kLogMainPref, value);
 }
 
 Error 
 Preferences::
-SetLogDecode(bool value)
+SetPrefBoolean(kLogDecodePref, bool value)
 {
     return SetPrefBoolean(kLogDecodePref, value);
 }
 
 Error 
 Preferences::
-GetLogDecode(bool* value)
+GetPrefBoolean(kLogDecodePref, bool* value)
 {
     return GetPrefBoolean(kLogDecodePref, value);
 }
 
 Error 
 Preferences::
-SetLogInput(bool value)
+SetPrefBoolean(kLogInputPref, bool value)
 {
     return SetPrefBoolean(kLogInputPref, value);
 }
 
 Error 
 Preferences::
-GetLogInput(bool* value)
+GetPrefBoolean(kLogInputPref, bool* value)
 {
     return GetPrefBoolean(kLogInputPref, value);
 }
 
 Error 
 Preferences::
-SetLogOutput(bool value)
+SetPrefBoolean(kLogOutputPref, bool value)
 {
     return SetPrefBoolean(kLogOutputPref, value);
 }
 
 Error 
 Preferences::
-GetLogOutput(bool* value)
+GetPrefBoolean(kLogOutputPref, bool* value)
 {
     return GetPrefBoolean(kLogOutputPref, value);
 }
 
 Error 
 Preferences::
-SetLogPerformance(bool value)
+SetPrefBoolean(kLogPerformancePref, bool value)
 {
     return SetPrefBoolean(kLogPerformancePref, value);
 }
 
 Error 
 Preferences::
-GetLogPerformance(bool* value)
+GetPrefBoolean(kLogPerformancePref, bool* value)
 {
     return GetPrefBoolean(kLogPerformancePref, value);
 }
 
 Error 
 Preferences::
-GetSaveStreams(bool* value)
+GetPrefBoolean(kSaveStreamsPref, bool* value)
 {
     return GetPrefBoolean(kSaveStreamsPref, value);
 }
 
 Error 
 Preferences::
-SetSaveStreams(bool value)
+SetPrefBoolean(kSaveStreamsPref, bool value)
 {
     return SetPrefBoolean(kSaveStreamsPref, value);
 }
 
 Error 
 Preferences::
-GetSaveStreamsDirectory(char* path, uint32* len)
+GetPrefString(kSaveStreamsDirPref, char* path, uint32* len)
 {
     return GetPrefString(kSaveStreamsDirPref, path, len);
 }
 
 Error 
 Preferences::
-SetSaveStreamsDirectory(const char* path)
+SetPrefString(kSaveStreamsDirPref, const char* path)
 {
     return SetPrefString(kSaveStreamsDirPref, path);
 }
 
 Error
 Preferences::
-GetUseProxyServer(bool* value)
+GetPrefBoolean(kUseProxyPref, bool* value)
 {
     return GetPrefBoolean(kUseProxyPref, value);
 }
 
 Error
 Preferences::
-SetUseProxyServer(bool value)
+SetPrefBoolean(kUseProxyPref, bool value)
 {
     return SetPrefBoolean(kUseProxyPref, value);
 }
 
 Error
 Preferences::
-GetProxyServerAddress(char* host, uint32* len)
+GetPrefString(kProxyHostPref, char* host, uint32* len)
 {
     return GetPrefString(kProxyHostPref, host, len);
 }
 
 Error
 Preferences::
-SetProxyServerAddress(const char* host)
+SetPrefString(kProxyHostPref, const char* host)
 {
     return SetPrefString(kProxyHostPref, host);
 }
 
 Error
 Preferences::
-GetCDDBServerAddress(char* host, uint32* len)
+GetPrefString(kCDDBServerPref, char* host, uint32* len)
 {
     return GetPrefString(kCDDBServerPref, host, len);
 }
 
 Error
 Preferences::
-SetCDDBServerAddress(const char* host)
+SetPrefString(kCDDBServerPref, const char* host)
 {
     return SetPrefString(kCDDBServerPref, host);
 }
 
 Error
 Preferences::
-GetPrebufferLength(int32* value)
+GetPrefInt32(kPreBufferPref, int32* value)
 {
     return GetPrefInt32(kPreBufferPref, value);
 }
 
 Error
 Preferences::
-SetPrebufferLength(int32 value)
+SetPrefInt32(kPreBufferPref, int32 value)
 {
     return SetPrefInt32(kPreBufferPref, value);
 }
 
 Error
 Preferences::
-GetUseAlternateNIC(bool* value)
+GetPrefBoolean(kUseAlternateNICPref, bool* value)
 {
     return GetPrefBoolean(kUseAlternateNICPref, value);
 }
 
 Error
 Preferences::
-SetUseAlternateNIC(bool value)
+SetPrefBoolean(kUseAlternateNICPref, bool value)
 {
     return SetPrefBoolean(kUseAlternateNICPref, value);
 }
 
 Error
 Preferences::
-GetAlternateNICAddress(char* address, uint32* len)
+GetPrefString(kAlternateNICAddressPref, char* address, uint32* len)
 {
     return GetPrefString(kAlternateNICAddressPref, address, len);
 }
 
 Error
 Preferences::
-SetAlternateNICAddress(const char* address)
+SetPrefString(kAlternateNICAddressPref, const char* address)
 {
     return SetPrefString(kAlternateNICAddressPref, address);
 }
 
 Error
 Preferences::
-GetThemeDefaultFont(char* font, uint32* len)
+GetPrefString(kThemeDefaultFontPref, char* font, uint32* len)
 {
     return GetPrefString(kThemeDefaultFontPref, font, len);
 }
 
 Error
 Preferences::
-SetThemeDefaultFont(const char* font)
+SetPrefString(kThemeDefaultFontPref, const char* font)
 {
     return SetPrefString(kThemeDefaultFontPref, font);
 }
 
 Error
 Preferences::
-GetThemePath(char* path, uint32* len)
+GetPrefString(kThemePathPref, char* path, uint32* len)
 {
     return GetPrefString(kThemePathPref, path, len);
 }
 
 Error
 Preferences::
-SetThemePath(const char* path)
+SetPrefString(kThemePathPref, const char* path)
 {
     return SetPrefString(kThemePathPref, path);
 }
 
 Error
 Preferences::
-GetCheckForUpdates(bool* value)
+GetPrefBoolean(kCheckForUpdatesPref, bool* value)
 {
     return GetPrefBoolean(kCheckForUpdatesPref, value);
 }
 
 Error
 Preferences::
-SetCheckForUpdates(bool value)
+SetPrefBoolean(kCheckForUpdatesPref, bool value)
 {
     return SetPrefBoolean(kCheckForUpdatesPref, value);
 }
 
 Error
 Preferences::
-GetPlaylistRepeat(int32* value)
+GetPrefInt32(kPlaylistRepeatPref, int32* value)
 {
     return GetPrefInt32(kPlaylistRepeatPref, value);
 }
 
 Error
 Preferences::
-SetPlaylistRepeat(int32 value)
+SetPrefInt32(kPlaylistRepeatPref, int32 value)
 {
     return SetPrefInt32(kPlaylistRepeatPref, value);
 }
@@ -887,182 +887,182 @@ SetPlaylistRepeat(int32 value)
 
 Error
 Preferences::
-GetPlaylistShuffle(bool* value)
+GetPrefBoolean(kPlaylistShufflePref, bool* value)
 {
     return GetPrefBoolean(kPlaylistShufflePref, value);
 }
 
 Error
 Preferences::
-SetPlaylistShuffle(bool value)
+SetPrefBoolean(kPlaylistShufflePref, bool value)
 {
     return SetPrefBoolean(kPlaylistShufflePref, value);
 }
 
 Error
 Preferences::
-GetTimeDisplay(int32* value)
+GetPrefInt32(kTimeDisplayPref, int32* value)
 {
     return GetPrefInt32(kTimeDisplayPref, value);
 }
 
 Error
 Preferences::
-SetTimeDisplay(int32 value)
+SetPrefInt32(kTimeDisplayPref, int32 value)
 {
     return SetPrefInt32(kTimeDisplayPref, value);
 }
 
 Error
 Preferences::
-GetVolume(int32* value)
+GetPrefInt32(kVolumePref, int32* value)
 {
     return GetPrefInt32(kVolumePref, value);
 }
 
 Error
 Preferences::
-SetVolume(int32 value)
+SetPrefInt32(kVolumePref, int32 value)
 {
     return SetPrefInt32(kVolumePref, value);
 }
 
 Error
 Preferences::
-GetUsersName(char* name, uint32* len)
+GetPrefString(kUserNamePref, char* name, uint32* len)
 {
     return GetPrefString(kUserNamePref, name, len);
 }
 
 Error
 Preferences::
-SetUsersName(const char* name)
+SetPrefString(kUserNamePref, const char* name)
 {
     return SetPrefString(kUserNamePref, name);
 }
 
 Error 
 Preferences::
-GetSaveMusicDirectory(char* path, uint32* len)
+GetPrefString(kSaveMusicDirPref, char* path, uint32* len)
 {
     return GetPrefString(kSaveMusicDirPref, path, len);
 }
 
 Error 
 Preferences::
-SetSaveMusicDirectory(const char* path)
+SetPrefString(kSaveMusicDirPref, const char* path)
 {
     return SetPrefString(kSaveMusicDirPref, path);
 }
 
 Error
 Preferences::
-GetCDDevicePath(char* path, uint32* len)
+GetPrefString(kCDDevicePathPref, char* path, uint32* len)
 {
     return GetPrefString(kCDDevicePathPref, path, len);
 }
 
 Error
 Preferences::
-SetCDDevicePath(const char* path)
+SetPrefString(kCDDevicePathPref, const char* path)
 {
     return SetPrefString(kCDDevicePathPref, path);
 }
 
 Error
 Preferences::
-GetReclaimFiletypes(bool* value)
+GetPrefBoolean(kReclaimFiletypesPref, bool* value)
 {
     return GetPrefBoolean(kReclaimFiletypesPref, value);
 }
 
 Error
 Preferences::
-SetReclaimFiletypes(bool value)
+SetPrefBoolean(kReclaimFiletypesPref, bool value)
 {
     return SetPrefBoolean(kReclaimFiletypesPref, value);
 }
 
 Error
 Preferences::
-GetAskToReclaimFiletypes(bool* value)
+GetPrefBoolean(kAskToReclaimFiletypesPref, bool* value)
 {
     return GetPrefBoolean(kAskToReclaimFiletypesPref, value);
 }
 
 Error
 Preferences::
-SetAskToReclaimFiletypes(bool value)
+SetPrefBoolean(kAskToReclaimFiletypesPref, bool value)
 {
     return SetPrefBoolean(kAskToReclaimFiletypesPref, value);
 }
 
 Error 
 Preferences::
-GetUsersPortablePlayers(char* list, uint32* len)
+GetPrefString(kUsersPortablePlayersPref, char* list, uint32* len)
 {
     return GetPrefString(kUsersPortablePlayersPref, list, len);
 }
 
 Error 
 Preferences::
-SetUsersPortablePlayers(const char* list)
+SetPrefString(kUsersPortablePlayersPref, const char* list)
 {
     return SetPrefString(kUsersPortablePlayersPref, list);
 }
 
 Error
 Preferences::
-GetShowToolbarTextLabels(bool* value)
+GetPrefBoolean(kShowToolbarTextLabelsPref, bool* value)
 {
     return GetPrefBoolean(kShowToolbarTextLabelsPref, value);
 }
 
 Error
 Preferences::
-SetShowToolbarTextLabels(bool value)
+SetPrefBoolean(kShowToolbarTextLabelsPref, bool value)
 {
     return SetPrefBoolean(kShowToolbarTextLabelsPref, value);
 }
 
 Error
 Preferences::
-GetShowToolbarImages(bool* value)
+GetPrefBoolean(kShowToolbarImagesPref, bool* value)
 {
     return GetPrefBoolean(kShowToolbarImagesPref, value);
 }
 
 Error
 Preferences::
-SetShowToolbarImages(bool value)
+SetPrefBoolean(kShowToolbarImagesPref, bool value)
 {
     return SetPrefBoolean(kShowToolbarImagesPref, value);
 }
 
 Error
 Preferences::
-GetSaveCurrentPlaylistOnExit(bool* value)
+GetPrefBoolean(kSaveCurrentPlaylistOnExitPref, bool* value)
 {
     return GetPrefBoolean(kSaveCurrentPlaylistOnExitPref, value);
 }
 
 Error
 Preferences::
-SetSaveCurrentPlaylistOnExit(bool value)
+SetPrefBoolean(kSaveCurrentPlaylistOnExitPref, bool value)
 {
     return SetPrefBoolean(kSaveCurrentPlaylistOnExitPref, value);
 }
 
 Error
 Preferences::
-GetViewMusicBrowser(bool* value)
+GetPrefBoolean(kViewMusicBrowserPref, bool* value)
 {
     return GetPrefBoolean(kViewMusicBrowserPref, value);
 }
 
 Error
 Preferences::
-SetViewMusicBrowser(bool value)
+SetPrefBoolean(kViewMusicBrowserPref, bool value)
 {
     return SetPrefBoolean(kViewMusicBrowserPref, value);
 }
@@ -1070,182 +1070,182 @@ SetViewMusicBrowser(bool value)
 
 Error
 Preferences::
-GetPlayImmediately(bool* value)
+GetPrefBoolean(kPlayImmediatelyPref, bool* value)
 {
     return GetPrefBoolean(kPlayImmediatelyPref, value);
 }
 
 Error
 Preferences::
-SetPlayImmediately(bool value)
+SetPrefBoolean(kPlayImmediatelyPref, bool value)
 {
     return SetPrefBoolean(kPlayImmediatelyPref, value);
 }
 
 Error
 Preferences::
-GetNumberOfURLsToRemember(int32* value)
+GetPrefInt32(kNumberOfURLsToRememberPref, int32* value)
 {
     return GetPrefInt32(kNumberOfURLsToRememberPref, value);
 }
 
 Error
 Preferences::
-SetNumberOfURLsToRemember(int32 value)
+SetPrefInt32(kNumberOfURLsToRememberPref, int32 value)
 {
     return SetPrefInt32(kNumberOfURLsToRememberPref, value);
 }
 
 Error
 Preferences::
-GetConvertUnderscoresToSpaces(bool* value)
+GetPrefBoolean(kConvertUnderscoresToSpacesPref, bool* value)
 {
     return GetPrefBoolean(kConvertUnderscoresToSpacesPref, value);
 }
 
 Error
 Preferences::
-SetConvertUnderscoresToSpaces(bool value)
+SetPrefBoolean(kConvertUnderscoresToSpacesPref, bool value)
 {
     return SetPrefBoolean(kConvertUnderscoresToSpacesPref, value);
 }
 
 Error
 Preferences::
-GetAllowMultipleInstances(bool* value)
+GetPrefBoolean(kAllowMultipleInstancesPref, bool* value)
 {
     return GetPrefBoolean(kAllowMultipleInstancesPref, value);
 }
 
 Error
 Preferences::
-SetAllowMultipleInstances(bool value)
+SetPrefBoolean(kAllowMultipleInstancesPref, bool value)
 {
     return SetPrefBoolean(kAllowMultipleInstancesPref, value);
 }
 
 Error 
 Preferences::
-GetWAVOutDirectory(char* path, uint32* len)
+GetPrefString(kWAVOutputPathPref, char* path, uint32* len)
 {
     return GetPrefString(kWAVOutputPathPref, path, len);
 }
 
 Error 
 Preferences::
-SetWAVOutDirectory(const char* path)
+SetPrefString(kWAVOutputPathPref, const char* path)
 {
     return SetPrefString(kWAVOutputPathPref, path);
 }
 
 Error
 Preferences::
-GetAudioCDLength(int32* value)
+GetPrefInt32(kAudioCDLengthPref, int32* value)
 {
     return GetPrefInt32(kAudioCDLengthPref, value);
 }
 
 Error
 Preferences::
-SetAudioCDLength(int32 value)
+SetPrefInt32(kAudioCDLengthPref, int32 value)
 {
     return SetPrefInt32(kAudioCDLengthPref, value);
 }
 
 Error
 Preferences::
-GetWatchThisDirectory(char* path, uint32* len)
+GetPrefString(kWatchThisDirectoryPref, char* path, uint32* len)
 {
     return GetPrefString(kWatchThisDirectoryPref, path, len);
 }
 
 Error
 Preferences::
-SetWatchThisDirectory(const char* path)
+SetPrefString(kWatchThisDirectoryPref, const char* path)
 {
     return SetPrefString(kWatchThisDirectoryPref, path);
 }
 
 Error
 Preferences::
-GetWatchThisDirTimeout(int32* value)
+GetPrefInt32(kWatchThisDirTimeoutPref, int32* value)
 {
     return GetPrefInt32(kWatchThisDirTimeoutPref, value);
 }
 
 Error
 Preferences::
-SetWatchThisDirTimeout(int32 value)
+SetPrefInt32(kWatchThisDirTimeoutPref, int32 value)
 {
     return SetPrefInt32(kWatchThisDirTimeoutPref, value);
 }
 
 Error
 Preferences::
-GetWriteID3v1(bool* value)
+GetPrefBoolean(kWriteID3v1Pref, bool* value)
 {
     return GetPrefBoolean(kWriteID3v1Pref, value);
 }
 
 Error
 Preferences::
-SetWriteID3v1(bool value)
+SetPrefBoolean(kWriteID3v1Pref, bool value)
 {
     return SetPrefBoolean(kWriteID3v1Pref, value);
 }
 
 Error
 Preferences::
-GetWriteID3v2(bool* value)
+GetPrefBoolean(kWriteID3v2Pref, bool* value)
 {
     return GetPrefBoolean(kWriteID3v2Pref, value);
 }
 
 Error
 Preferences::
-SetWriteID3v2(bool value)
+SetPrefBoolean(kWriteID3v2Pref, bool value)
 {
     return SetPrefBoolean(kWriteID3v2Pref, value);
 }
 
 Error
 Preferences::
-GetEqualizerSettings(char* settings, uint32* len)
+GetPrefString(kEqualizerSettingsPref, char* settings, uint32* len)
 {
     return GetPrefString(kEqualizerSettingsPref, settings, len);
 }
 
 Error
 Preferences::
-SetEqualizerSettings(const char* settings)
+SetPrefString(kEqualizerSettingsPref, const char* settings)
 {
     return SetPrefString(kEqualizerSettingsPref, settings);
 }
 
 Error
 Preferences::
-GetSavedPlaylistPosition(uint32* value)
+GetPrefInt32(kSavedPlaylistPositionPref, uint32* value)
 {
     return GetPrefInt32(kSavedPlaylistPositionPref, (int32*)value);
 }
 
 Error
 Preferences::
-SetSavedPlaylistPosition(uint32 value)
+SetPrefInt32(kSavedPlaylistPositionPref, uint32 value)
 {
     return SetPrefInt32(kSavedPlaylistPositionPref, (int32)value);
 }
 
 Error
 Preferences::
-GetCloseDLMOnComplete(bool* value)
+GetPrefBoolean(kCloseDLMOnCompletePref, bool* value)
 {
     return GetPrefBoolean(kCloseDLMOnCompletePref, value);
 }
 
 Error
 Preferences::
-SetCloseDLMOnComplete(bool value)
+SetPrefBoolean(kCloseDLMOnCompletePref, bool value)
 {
     return SetPrefBoolean(kCloseDLMOnCompletePref, value);
 }

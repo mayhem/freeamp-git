@@ -80,7 +80,7 @@ void GTKMusicBrowser::RenumberPlaylistList(int starting)
         if (starting >= 1)
             totaltime = *(int *)(gtk_clist_get_row_data(GTK_CLIST(playlistList),
                                                         starting - 1));
-        m_context->prefs->GetAudioCDLength(&maxCDtime);
+        m_context->prefs->GetPrefInt32(kAudioCDLengthPref, &maxCDtime);
     }
 
     for (int i = starting; i < GTK_CLIST(playlistList)->rows; i++) {
@@ -268,7 +268,7 @@ void GTKMusicBrowser::UpdatePlaylistList(void)
 
     int32 totaltime = 0;
     int32 maxCDtime = 0;
-    m_context->prefs->GetAudioCDLength(&maxCDtime);
+    m_context->prefs->GetPrefInt32(kAudioCDLengthPref, &maxCDtime);
 
     int row = 0;
 

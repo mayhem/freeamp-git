@@ -99,7 +99,7 @@ SoundCardPMO::~SoundCardPMO()
    }
 }
 
-void SoundCardPMO::SetVolume(int32 v)
+void SoundCardPMO::SetPrefInt32(kVolumePref, int32 v)
 {
   struct audio_info ainfo;
   int mixFd = open("/dev/audioctl",O_RDWR | O_NONBLOCK);
@@ -111,7 +111,7 @@ void SoundCardPMO::SetVolume(int32 v)
   }
 }
 
-int32 SoundCardPMO::GetVolume()
+int32 SoundCardPMO::GetPrefInt32(kVolumePref, )
 {
   struct audio_info ainfo;
   int mixFd = open("/dev/audioctl",O_RDWR);

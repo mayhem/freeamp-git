@@ -75,7 +75,7 @@ void Equalizer::LoadSettings(void)
    int    enabled, i;
    uint32 len = 255;
 
-   m_context->prefs->GetEqualizerSettings(settings, &len);
+   m_context->prefs->GetPrefString(kEqualizerSettingsPref, settings, &len);
 
    sscanf(settings, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
         &enabled, &m_sliders[0], &m_sliders[1], &m_sliders[2],
@@ -100,7 +100,7 @@ void Equalizer::SaveSettings(void)
         m_enabled, m_sliders[0], m_sliders[1], m_sliders[2],
         m_sliders[3], m_sliders[4], m_sliders[5], m_sliders[6],
         m_sliders[7], m_sliders[8], m_sliders[9]);
-   m_context->prefs->SetEqualizerSettings(settings);
+   m_context->prefs->SetPrefString(kEqualizerSettingsPref, settings);
 }
 
 void Equalizer::InitControls(Window *pWindow) 

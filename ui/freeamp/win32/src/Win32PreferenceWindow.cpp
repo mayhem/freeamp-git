@@ -312,61 +312,61 @@ void Win32PreferenceWindow::GetPrefsValues(PrefsStruct* values)
     values->defaultUI = buffer;
     size = bufferSize;
 
-    if(kError_BufferTooSmall == m_prefs->GetProxyServerAddress(buffer, &size))
+    if(kError_BufferTooSmall == m_prefs->GetPrefString(kProxyHostPref, buffer, &size))
     {
         bufferSize = size;
         buffer = (char*)realloc(buffer, bufferSize);
-        m_prefs->GetProxyServerAddress(buffer, &size);
+        m_prefs->GetPrefString(kProxyHostPref, buffer, &size);
     }
 
     values->proxyServer = buffer;
     size = bufferSize;
 
-    if(kError_BufferTooSmall == m_prefs->GetSaveStreamsDirectory(buffer, &size))
+    if(kError_BufferTooSmall == m_prefs->GetPrefString(kSaveStreamsDirPref, buffer, &size))
     {
         bufferSize = size;
         buffer = (char*)realloc(buffer, bufferSize);
-        m_prefs->GetSaveStreamsDirectory(buffer, &size);
+        m_prefs->GetPrefString(kSaveStreamsDirPref, buffer, &size);
     }
 
     values->saveStreamsDirectory = buffer;
     size = bufferSize;
 
-    if(kError_BufferTooSmall == m_prefs->GetAlternateNICAddress(buffer, &size))
+    if(kError_BufferTooSmall == m_prefs->GetPrefString(kAlternateNICAddressPref, buffer, &size))
     {
         bufferSize = size;
         buffer = (char*)realloc(buffer, bufferSize);
-        m_prefs->GetAlternateNICAddress(buffer, &size);
+        m_prefs->GetPrefString(kAlternateNICAddressPref, buffer, &size);
     }
 
     values->alternateIP = buffer;
     size = bufferSize;
 
-    if(kError_BufferTooSmall == m_prefs->GetThemeDefaultFont(buffer, &size))
+    if(kError_BufferTooSmall == m_prefs->GetPrefString(kThemeDefaultFontPref, buffer, &size))
     {
         bufferSize = size;
         buffer = (char*)realloc(buffer, bufferSize);
-        m_prefs->GetThemeDefaultFont(buffer, &size);
+        m_prefs->GetPrefString(kThemeDefaultFontPref, buffer, &size);
     }
 
     values->defaultFont = buffer;
     size = bufferSize;
 
-    if(kError_BufferTooSmall == m_prefs->GetSaveMusicDirectory(buffer, &size))
+    if(kError_BufferTooSmall == m_prefs->GetPrefString(kSaveMusicDirPref, buffer, &size))
     {
         bufferSize = size;
         buffer = (char*)realloc(buffer, bufferSize);
-        m_prefs->GetSaveMusicDirectory(buffer, &size);
+        m_prefs->GetPrefString(kSaveMusicDirPref, buffer, &size);
     }
 
     values->saveMusicDirectory = buffer;
     size = bufferSize;
 
-    if(kError_BufferTooSmall == m_prefs->GetUsersPortablePlayers(buffer, &size))
+    if(kError_BufferTooSmall == m_prefs->GetPrefString(kUsersPortablePlayersPref, buffer, &size))
     {
         bufferSize = size;
         buffer = (char*)realloc(buffer, bufferSize);
-        m_prefs->GetUsersPortablePlayers(buffer, &size);
+        m_prefs->GetPrefString(kUsersPortablePlayersPref, buffer, &size);
     }
 
     char* cp = buffer;
@@ -388,11 +388,11 @@ void Win32PreferenceWindow::GetPrefsValues(PrefsStruct* values)
 
     size = bufferSize;
 
-    if(kError_BufferTooSmall == m_prefs->GetWatchThisDirectory(buffer, &size))
+    if(kError_BufferTooSmall == m_prefs->GetPrefString(kWatchThisDirectoryPref, buffer, &size))
     {
         bufferSize = size;
         buffer = (char*)realloc(buffer, bufferSize);
-        m_prefs->GetWatchThisDirectory(buffer, &size);
+        m_prefs->GetPrefString(kWatchThisDirectoryPref, buffer, &size);
     }
 
     cp = buffer;
@@ -414,7 +414,7 @@ void Win32PreferenceWindow::GetPrefsValues(PrefsStruct* values)
 
     int32 timeOut;
 
-    m_prefs->GetWatchThisDirTimeout(&timeOut);
+    m_prefs->GetPrefInt32(kWatchThisDirTimeoutPref, &timeOut);
     values->watchForNewMusic = (timeOut != 0);
 
 
@@ -422,29 +422,29 @@ void Win32PreferenceWindow::GetPrefsValues(PrefsStruct* values)
     m_pThemeMan->GetCurrentTheme(values->currentTheme);
 
     // get the other m_prefs
-    m_prefs->GetDecoderThreadPriority(&values->decoderThreadPriority);
+    m_prefs->GetPrefInt32(kDecoderThreadPriorityPref, &values->decoderThreadPriority);
     m_prefs->GetInputBufferSize(&values->inputBufferSize);
-    m_prefs->GetOutputBufferSize(&values->outputBufferSize);
-    m_prefs->GetPrebufferLength(&values->preBufferLength);
+    m_prefs->GetPrefInt32(kOutputBufferSizePref, &values->outputBufferSize);
+    m_prefs->GetPrefInt32(kPreBufferPref, &values->preBufferLength);
     m_prefs->GetStayOnTop(&values->stayOnTop);
     m_prefs->GetLiveInTray(&values->liveInTray);
-    m_prefs->GetSaveStreams(&values->saveStreams);
-    m_prefs->GetUseProxyServer(&values->useProxyServer);
-    m_prefs->GetUseAlternateNIC(&values->useAlternateIP);
-    m_prefs->GetUseDebugLog(&values->enableLogging);
-    m_prefs->GetLogMain(&values->logMain);
-    m_prefs->GetLogDecode(&values->logDecoder);
-    m_prefs->GetLogInput(&values->logInput);
-    m_prefs->GetLogOutput(&values->logOutput);
-    m_prefs->GetLogPerformance(&values->logPerformance);
-    m_prefs->GetCheckForUpdates(&values->checkForUpdates);
-    m_prefs->GetAskToReclaimFiletypes(&values->askReclaimFiletypes);
-    m_prefs->GetReclaimFiletypes(&values->reclaimFiletypes);
-    m_prefs->GetShowToolbarTextLabels(&values->useTextLabels);
-    m_prefs->GetShowToolbarImages(&values->useImages);
-    m_prefs->GetSaveCurrentPlaylistOnExit(&values->savePlaylistOnExit);
-    m_prefs->GetPlayImmediately(&values->playImmediately);
-    m_prefs->GetConvertUnderscoresToSpaces(&values->convertUnderscores);
+    m_prefs->GetPrefBoolean(kSaveStreamsPref, &values->saveStreams);
+    m_prefs->GetPrefBoolean(kUseProxyPref, &values->useProxyServer);
+    m_prefs->GetPrefBoolean(kUseAlternateNICPref, &values->useAlternateIP);
+    m_prefs->GetPrefBoolean(kUseDebugLogPref, &values->enableLogging);
+    m_prefs->GetPrefBoolean(kLogMainPref, &values->logMain);
+    m_prefs->GetPrefBoolean(kLogDecodePref, &values->logDecoder);
+    m_prefs->GetPrefBoolean(kLogInputPref, &values->logInput);
+    m_prefs->GetPrefBoolean(kLogOutputPref, &values->logOutput);
+    m_prefs->GetPrefBoolean(kLogPerformancePref, &values->logPerformance);
+    m_prefs->GetPrefBoolean(kCheckForUpdatesPref, &values->checkForUpdates);
+    m_prefs->GetPrefBoolean(kAskToReclaimFiletypesPref, &values->askReclaimFiletypes);
+    m_prefs->GetPrefBoolean(kReclaimFiletypesPref, &values->reclaimFiletypes);
+    m_prefs->GetPrefBoolean(kShowToolbarTextLabelsPref, &values->useTextLabels);
+    m_prefs->GetPrefBoolean(kShowToolbarImagesPref, &values->useImages);
+    m_prefs->GetPrefBoolean(kSaveCurrentPlaylistOnExitPref, &values->savePlaylistOnExit);
+    m_prefs->GetPrefBoolean(kPlayImmediatelyPref, &values->playImmediately);
+    m_prefs->GetPrefBoolean(kConvertUnderscoresToSpacesPref, &values->convertUnderscores);
 
     free(buffer);
 }
@@ -453,35 +453,35 @@ void Win32PreferenceWindow::SavePrefsValues(PrefsStruct* values)
 {
     m_prefs->SetDefaultPMO(values->defaultPMO.c_str());
     m_prefs->SetDefaultUI(values->defaultUI.c_str());
-    m_prefs->SetDecoderThreadPriority(values->decoderThreadPriority);
-    m_prefs->SetInputBufferSize(values->inputBufferSize);
-    m_prefs->SetOutputBufferSize(values->outputBufferSize);
-    m_prefs->SetPrebufferLength(values->preBufferLength);
+    m_prefs->SetPrefInt32(kDecoderThreadPriorityPref, values->decoderThreadPriority);
+    m_prefs->SetPrefInt32(kInputBufferSizePref, values->inputBufferSize);
+    m_prefs->SetPrefInt32(kOutputBufferSizePref, values->outputBufferSize);
+    m_prefs->SetPrefInt32(kPreBufferPref, values->preBufferLength);
     m_prefs->SetStayOnTop(values->stayOnTop);
     m_prefs->SetLiveInTray(values->liveInTray);
 
-    m_prefs->SetSaveStreams(values->saveStreams);
-    m_prefs->SetSaveStreamsDirectory(values->saveStreamsDirectory.c_str());
-    m_prefs->SetProxyServerAddress(values->proxyServer.c_str());
-    m_prefs->SetUseProxyServer(values->useProxyServer);
-    m_prefs->SetAlternateNICAddress(values->alternateIP.c_str());
-    m_prefs->SetUseAlternateNIC(values->useAlternateIP);
+    m_prefs->SetPrefBoolean(kSaveStreamsPref, values->saveStreams);
+    m_prefs->SetPrefString(kSaveStreamsDirPref, values->saveStreamsDirectory.c_str());
+    m_prefs->SetPrefString(kProxyHostPref, values->proxyServer.c_str());
+    m_prefs->SetPrefBoolean(kUseProxyPref, values->useProxyServer);
+    m_prefs->SetPrefString(kAlternateNICAddressPref, values->alternateIP.c_str());
+    m_prefs->SetPrefBoolean(kUseAlternateNICPref, values->useAlternateIP);
 
-    m_prefs->SetUseDebugLog(values->enableLogging);
-    m_prefs->SetLogMain(values->logMain);
-    m_prefs->SetLogDecode(values->logDecoder);
-    m_prefs->SetLogInput(values->logInput);
-    m_prefs->SetLogOutput(values->logOutput);
-    m_prefs->SetLogPerformance(values->logPerformance);
+    m_prefs->SetPrefBoolean(kUseDebugLogPref, values->enableLogging);
+    m_prefs->SetPrefBoolean(kLogMainPref, values->logMain);
+    m_prefs->SetPrefBoolean(kLogDecodePref, values->logDecoder);
+    m_prefs->SetPrefBoolean(kLogInputPref, values->logInput);
+    m_prefs->SetPrefBoolean(kLogOutputPref, values->logOutput);
+    m_prefs->SetPrefBoolean(kLogPerformancePref, values->logPerformance);
 
-    m_prefs->SetThemeDefaultFont(values->defaultFont.c_str());
+    m_prefs->SetPrefString(kThemeDefaultFontPref, values->defaultFont.c_str());
     if (m_oThemeList[values->currentTheme].length() > 0)
        m_pThemeMan->UseTheme(m_oThemeList[values->currentTheme]);
 
-    m_prefs->SetCheckForUpdates(values->checkForUpdates);
-    m_prefs->SetSaveMusicDirectory(values->saveMusicDirectory.c_str());
-    m_prefs->SetAskToReclaimFiletypes(values->askReclaimFiletypes);
-    m_prefs->SetReclaimFiletypes(values->reclaimFiletypes);
+    m_prefs->SetPrefBoolean(kCheckForUpdatesPref, values->checkForUpdates);
+    m_prefs->SetPrefString(kSaveMusicDirPref, values->saveMusicDirectory.c_str());
+    m_prefs->SetPrefBoolean(kAskToReclaimFiletypesPref, values->askReclaimFiletypes);
+    m_prefs->SetPrefBoolean(kReclaimFiletypesPref, values->reclaimFiletypes);
 
     set<string>::const_iterator i;
     string portableList;
@@ -494,14 +494,14 @@ void Win32PreferenceWindow::SavePrefsValues(PrefsStruct* values)
         portableList += ";";
     }
 
-    m_prefs->SetUsersPortablePlayers(portableList.c_str());
+    m_prefs->SetPrefString(kUsersPortablePlayersPref, portableList.c_str());
 
-    m_prefs->SetShowToolbarTextLabels(values->useTextLabels);
-    m_prefs->SetShowToolbarImages(values->useImages);
+    m_prefs->SetPrefBoolean(kShowToolbarTextLabelsPref, values->useTextLabels);
+    m_prefs->SetPrefBoolean(kShowToolbarImagesPref, values->useImages);
 
-    m_prefs->SetSaveCurrentPlaylistOnExit(values->savePlaylistOnExit);
-    m_prefs->SetPlayImmediately(values->playImmediately);
-    m_prefs->SetConvertUnderscoresToSpaces(values->convertUnderscores);
+    m_prefs->SetPrefBoolean(kSaveCurrentPlaylistOnExitPref, values->savePlaylistOnExit);
+    m_prefs->SetPrefBoolean(kPlayImmediatelyPref, values->playImmediately);
+    m_prefs->SetPrefBoolean(kConvertUnderscoresToSpacesPref, values->convertUnderscores);
 
     string dirList;
 
@@ -513,9 +513,9 @@ void Win32PreferenceWindow::SavePrefsValues(PrefsStruct* values)
         dirList += ";";
     }
 
-    m_prefs->SetWatchThisDirectory(dirList.c_str());
+    m_prefs->SetPrefString(kWatchThisDirectoryPref, dirList.c_str());
 
-    m_prefs->SetWatchThisDirTimeout((values->watchForNewMusic ? kDefaultWatchThisDirTimeout : 0));
+    m_prefs->SetPrefInt32(kWatchThisDirTimeoutPref, (values->watchForNewMusic ? kDefaultWatchThisDirTimeout : 0));
 
     m_pContext->target->AcceptEvent(new Event(INFO_PrefsChanged));
     m_currentValues = m_proposedValues = *values;

@@ -138,7 +138,7 @@ Error ThemeManager::UseTheme(string &oThemeFile)
         }
     }
 
-    m_pContext->prefs->SetThemePath((char *)oThemeFile.c_str());
+    m_pContext->prefs->SetPrefString(kThemePathPref, (char *)oThemeFile.c_str());
     m_oCurrentTheme = string(dir);
     
     return kError_NoErr;

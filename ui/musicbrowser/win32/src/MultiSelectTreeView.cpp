@@ -412,7 +412,7 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
 
                 bool playNow;
 
-                m_context->prefs->GetPlayImmediately(&playNow);
+                m_context->prefs->GetPrefBoolean(kPlayImmediatelyPref, &playNow);
 
                 if(treedata && treedata->IsTrack())
                 {

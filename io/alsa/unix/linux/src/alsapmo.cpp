@@ -180,7 +180,7 @@ AlsaPMO::~AlsaPMO()
 }
 
 
-void AlsaPMO::SetVolume(int32 left, int32 right)
+void AlsaPMO::SetPrefInt32(kVolumePref, int32 left, int32 right)
 {
    int   err;
    snd_mixer_t *pMixer;
@@ -216,7 +216,7 @@ void AlsaPMO::SetVolume(int32 left, int32 right)
    snd_mixer_close(pMixer);
 } 
 
-void AlsaPMO::GetVolume(int32 &left, int32 &right)
+void AlsaPMO::GetPrefInt32(kVolumePref, int32 &left, int32 &right)
 {
    int   err;
    snd_mixer_t *pMixer = NULL;

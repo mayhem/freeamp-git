@@ -119,7 +119,7 @@ SoundCardPMO::~SoundCardPMO()
 }
 
 int32
-SoundCardPMO::GetVolume( void )
+SoundCardPMO::GetPrefInt32(kVolumePref,  void )
 {
 	PRINT(( "SoundCardPMO::GetVolume\n" ));
     if ( !m_player )
@@ -131,12 +131,12 @@ SoundCardPMO::GetVolume( void )
 }
 
 void
-SoundCardPMO::SetVolume( int32 volume )
+SoundCardPMO::SetPrefInt32(kVolumePref,  int32 volume )
 {
 	PRINT(( "SoundCardPMO::SetVolume\n" ));
     if ( m_player )
     {
-        m_player->SetVolume( float( volume ) / 100.0 );
+        m_player->SetPrefInt32(kVolumePref,  float( volume ) / 100.0 );
     }
 	s_lastVolume = volume;
 }
@@ -263,7 +263,7 @@ SoundCardPMO::Init( OutputInfo* info )
 	m_dummyPlayerThread = Thread::CreateThread();
 	m_dummyPlayerThread->Create( _DummyPlayerHook, this );
 #else
-    m_player->SetVolume( float( s_lastVolume ) / 100.0 );
+    m_player->SetPrefInt32(kVolumePref,  float( s_lastVolume ) / 100.0 );
 	m_player->Start();
 	m_player->SetHasData( true );
 #endif

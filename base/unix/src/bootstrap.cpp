@@ -108,7 +108,7 @@ int main(int argc, char **argv)
              << " of ~/.freeamp/preferences\n";
 
     bool allow_mult = false;
-    context->prefs->GetAllowMultipleInstances(&allow_mult);
+    context->prefs->GetPrefBoolean(kAllowMultipleInstancesPref, &allow_mult);
 
 #if defined(solaris)
     allow_mult = true;
@@ -244,7 +244,7 @@ int main(int argc, char **argv)
                     int iItems = context->plm->CountItems();
                     bool bPlay;
 
-                    context->prefs->GetPlayImmediately(&bPlay);
+                    context->prefs->GetPrefBoolean(kPlayImmediatelyPref, &bPlay);
                     for(i = 0, pPtr = pCmdLine; *pPtr; i++)
                     {
                         if (i == 0)

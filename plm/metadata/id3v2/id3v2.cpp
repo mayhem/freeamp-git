@@ -367,8 +367,8 @@ bool ID3v2::WriteMetaData(const char* url, const MetaData& metadata)
     if (strcasecmp(ptr, ".mp3"))
         return false;  
 
-    m_context->prefs->GetWriteID3v1(&bWriteID3v1);
-    m_context->prefs->GetWriteID3v2(&bWriteID3v2);
+    m_context->prefs->GetPrefBoolean(kWriteID3v1Pref, &bWriteID3v1);
+    m_context->prefs->GetPrefBoolean(kWriteID3v2Pref, &bWriteID3v2);
 
     whichTags = (bWriteID3v1) ? ID3TT_ID3V1 : 0;
     whichTags |= (bWriteID3v2) ? ID3TT_ID3V2 : 0;

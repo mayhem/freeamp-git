@@ -196,8 +196,8 @@ void InitializeGTK(FAContext *context)
     }
 
     bool reclaimFileTypes, askBeforeReclaiming;
-    context->prefs->GetReclaimFiletypes(&reclaimFileTypes);
-    context->prefs->GetAskToReclaimFiletypes(&askBeforeReclaiming);
+    context->prefs->GetPrefBoolean(kReclaimFiletypesPref, &reclaimFileTypes);
+    context->prefs->GetPrefBoolean(kAskToReclaimFiletypesPref, &askBeforeReclaiming);
 
     if (reclaimFileTypes)
         ReclaimFileTypes(context, askBeforeReclaiming);

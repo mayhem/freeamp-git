@@ -36,7 +36,7 @@ VolumeManager()
 
 int32
 DSoundVolumeManager::
-GetVolume(void)
+GetPrefInt32(kVolumePref, void)
 {
     
 
@@ -45,7 +45,7 @@ GetVolume(void)
 
 void
 DSoundVolumeManager::
-SetVolume(int32 v)
+SetPrefInt32(kVolumePref, int32 v)
 {
    
 }

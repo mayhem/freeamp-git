@@ -1593,14 +1593,14 @@ Timer(int32 timerID)
             else if(volume < 0)
                 volume = 0;
 
-            m_volumeInfoView->SetVolume(volume);
+            m_volumeInfoView->SetPrefInt32(kVolumePref, volume);
 
             m_target->AcceptEvent(new VolumeEvent(CMD_SetVolume, volume));
 
             /*MMRESULT result;
             //float percent = (float)volume/(float)100;
 
-			result = waveOutSetVolume( (HWAVEOUT)WAVE_MAPPER, 
+			result = waveOutSetPrefInt32(kVolumePref,  (HWAVEOUT)WAVE_MAPPER, 
                                         MAKELPARAM( 0xFFFF*volume/100, 
                                                     0xFFFF*volume/100));*/
 
@@ -3008,7 +3008,7 @@ AcceptEvent(Event* event)
             case INFO_VolumeInfo:
             {
                 VolumeEvent* volumeEvent = (VolumeEvent*)event;
-                m_volumeInfoView->SetVolume(volumeEvent->GetVolume());
+                m_volumeInfoView->SetPrefInt32(kVolumePref, volumeEvent->GetPrefInt32(kVolumePref, ));
                 break;
             }
 
@@ -3300,10 +3300,10 @@ void
 FreeAmpUI::
 ReadPreferences()
 {
-    m_prefs->GetUseDebugLog(&m_log);
+    m_prefs->GetPrefBoolean(kUseDebugLogPref, &m_log);
 
     if(m_log)
-        m_prefs->GetLogMain(&m_log);
+        m_prefs->GetPrefBoolean(kLogMainPref, &m_log);
 
     m_prefs->GetStayOnTop(&m_onTop);
     m_prefs->GetLiveInTray(&m_liveInTray);

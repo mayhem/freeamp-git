@@ -32,14 +32,14 @@ ____________________________________________________________________________*/
 #include "volume.h"
 
 void
-VolumeManager::SetVolume(int32 v)
+VolumeManager::SetPrefInt32(kVolumePref, int32 v)
 {
 	PRINT(( "SetVolume\n" ));
 	return;
 }
 
 int32
-VolumeManager::GetVolume()
+VolumeManager::GetPrefInt32(kVolumePref, )
 {
 	PRINT(( "GetVolume\n" ));
 	return 0;

@@ -244,8 +244,8 @@ PlaylistManager::PlaylistManager(FAContext* context)
     m_sortType = kPlaylistSortType_Ascending;
     m_time = 0;
 
-    m_context->prefs->GetPlaylistShuffle(&m_shuffle);
-    m_context->prefs->GetPlaylistRepeat((int32*)&m_repeatMode);
+    m_context->prefs->GetPrefBoolean(kPlaylistShufflePref, &m_shuffle);
+    m_context->prefs->GetPrefInt32(kPlaylistRepeatPref, (int32*)&m_repeatMode);
 
     Registrar registrar;
 
@@ -416,8 +416,8 @@ PlaylistManager::~PlaylistManager()
 
     m_mutex.Release();
 
-    m_context->prefs->SetPlaylistShuffle(m_shuffle);
-    m_context->prefs->SetPlaylistRepeat(m_repeatMode);
+    m_context->prefs->SetPrefBoolean(kPlaylistShufflePref, m_shuffle);
+    m_context->prefs->SetPrefInt32(kPlaylistRepeatPref, m_repeatMode);
 }
 
 

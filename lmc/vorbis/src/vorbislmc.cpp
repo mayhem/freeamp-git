@@ -170,7 +170,7 @@ Error VorbisLMC::InitDecoder()
    m_rate = vi->rate;
    m_section = -1;
 
-   m_pContext->prefs->GetOutputBufferSize(&iNewSize);
+   m_pContext->prefs->GetPrefInt32(kOutputBufferSizePref, &iNewSize);
    iNewSize = max(iNewSize, iMinimumOutputBufferSize);
    iNewSize *= 1024;
 
@@ -317,7 +317,7 @@ void VorbisLMC::DecodeWork()
        }
    }
 
-   m_pContext->prefs->GetDecoderThreadPriority(&iValue);
+   m_pContext->prefs->GetPrefInt32(kDecoderThreadPriorityPref, &iValue);
    m_decoderThread->SetPriority(iValue);
 
    bytesCopied = 0;

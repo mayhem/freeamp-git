@@ -92,30 +92,30 @@ GetPrefsValues(Preferences* prefs,
     prefs->GetDefaultPMO(values->defaultPMO, &size);
     size = 256;
     prefs->GetDefaultUI(values->defaultUI, &size);
-    prefs->GetDecoderThreadPriority(&values->decoderThreadPriority);
+    prefs->GetPrefInt32(kDecoderThreadPriorityPref, &values->decoderThreadPriority);
     prefs->GetInputBufferSize(&values->inputBufferSize);
-    prefs->GetOutputBufferSize(&values->outputBufferSize);
-    prefs->GetPrebufferLength(&values->preBufferLength);
+    prefs->GetPrefInt32(kOutputBufferSizePref, &values->outputBufferSize);
+    prefs->GetPrefInt32(kPreBufferPref, &values->preBufferLength);
     prefs->GetStayOnTop(&values->stayOnTop);
     prefs->GetLiveInTray(&values->liveInTray);
 
-    prefs->GetStreamBufferInterval(&values->streamInterval);
-    prefs->GetSaveStreams(&values->saveStreams);
+    prefs->GetPrefInt32(kStreamBufferIntervalPref, &values->streamInterval);
+    prefs->GetPrefBoolean(kSaveStreamsPref, &values->saveStreams);
     size = 256;
-    prefs->GetProxyServerAddress(values->proxyServer, &size);
-    prefs->GetUseProxyServer(&values->useProxyServer);
+    prefs->GetPrefString(kProxyHostPref, values->proxyServer, &size);
+    prefs->GetPrefBoolean(kUseProxyPref, &values->useProxyServer);
     size = MAX_PATH;
-    prefs->GetSaveStreamsDirectory(values->saveStreamsDirectory, &size);
+    prefs->GetPrefString(kSaveStreamsDirPref, values->saveStreamsDirectory, &size);
     size = 16;
-    prefs->GetAlternateNICAddress(values->alternateIP, &size);
-    prefs->GetUseAlternateNIC(&values->useAlternateIP);
+    prefs->GetPrefString(kAlternateNICAddressPref, values->alternateIP, &size);
+    prefs->GetPrefBoolean(kUseAlternateNICPref, &values->useAlternateIP);
 
-    prefs->GetUseDebugLog(&values->enableLogging);
-    prefs->GetLogMain(&values->logMain);
-    prefs->GetLogDecode(&values->logDecoder);
-    prefs->GetLogInput(&values->logInput);
-    prefs->GetLogOutput(&values->logOutput);
-    prefs->GetLogPerformance(&values->logPerformance);
+    prefs->GetPrefBoolean(kUseDebugLogPref, &values->enableLogging);
+    prefs->GetPrefBoolean(kLogMainPref, &values->logMain);
+    prefs->GetPrefBoolean(kLogDecodePref, &values->logDecoder);
+    prefs->GetPrefBoolean(kLogInputPref, &values->logInput);
+    prefs->GetPrefBoolean(kLogOutputPref, &values->logOutput);
+    prefs->GetPrefBoolean(kLogPerformancePref, &values->logPerformance);
 }
 
 static 
@@ -125,27 +125,27 @@ SavePrefsValues(Preferences* prefs,
 {
     prefs->SetDefaultPMO(values->defaultPMO);
     prefs->SetDefaultUI(values->defaultUI);
-    prefs->SetDecoderThreadPriority(values->decoderThreadPriority);
-    prefs->SetInputBufferSize(values->inputBufferSize);
-    prefs->SetOutputBufferSize(values->outputBufferSize);
-    prefs->SetPrebufferLength(values->preBufferLength);
+    prefs->SetPrefInt32(kDecoderThreadPriorityPref, values->decoderThreadPriority);
+    prefs->SetPrefInt32(kInputBufferSizePref, values->inputBufferSize);
+    prefs->SetPrefInt32(kOutputBufferSizePref, values->outputBufferSize);
+    prefs->SetPrefInt32(kPreBufferPref, values->preBufferLength);
     prefs->SetStayOnTop(values->stayOnTop);
     prefs->SetLiveInTray(values->liveInTray);
 
-    prefs->SetStreamBufferInterval(values->streamInterval);
-    prefs->SetSaveStreams(values->saveStreams);
-    prefs->SetSaveStreamsDirectory(values->saveStreamsDirectory);
-    prefs->SetProxyServerAddress(values->proxyServer);
-    prefs->SetUseProxyServer(values->useProxyServer);
-    prefs->SetAlternateNICAddress(values->alternateIP);
-    prefs->SetUseAlternateNIC(values->useAlternateIP);
+    prefs->SetPrefInt32(kStreamBufferIntervalPref, values->streamInterval);
+    prefs->SetPrefBoolean(kSaveStreamsPref, values->saveStreams);
+    prefs->SetPrefString(kSaveStreamsDirPref, values->saveStreamsDirectory);
+    prefs->SetPrefString(kProxyHostPref, values->proxyServer);
+    prefs->SetPrefBoolean(kUseProxyPref, values->useProxyServer);
+    prefs->SetPrefString(kAlternateNICAddressPref, values->alternateIP);
+    prefs->SetPrefBoolean(kUseAlternateNICPref, values->useAlternateIP);
 
-    prefs->SetUseDebugLog(values->enableLogging);
-    prefs->SetLogMain(values->logMain);
-    prefs->SetLogDecode(values->logDecoder);
-    prefs->SetLogInput(values->logInput);
-    prefs->SetLogOutput(values->logOutput);
-    prefs->SetLogPerformance(values->logPerformance);
+    prefs->SetPrefBoolean(kUseDebugLogPref, values->enableLogging);
+    prefs->SetPrefBoolean(kLogMainPref, values->logMain);
+    prefs->SetPrefBoolean(kLogDecodePref, values->logDecoder);
+    prefs->SetPrefBoolean(kLogInputPref, values->logInput);
+    prefs->SetPrefBoolean(kLogOutputPref, values->logOutput);
+    prefs->SetPrefBoolean(kLogPerformancePref, values->logPerformance);
 }
 
 

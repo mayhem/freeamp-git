@@ -83,7 +83,7 @@ Error DownloadUI::AcceptEvent(Event *e)
             if (m_initialized && isVisible) {
                 bool close = gtk_toggle_button_get_active(
                                      GTK_TOGGLE_BUTTON(m_closeComplete));
-                m_prefs->SetCloseDLMOnComplete(close);
+                m_prefs->SetPrefBoolean(kCloseDLMOnCompletePref, close);
                 gtk_widget_hide(m_downloadUI);
                 isVisible = false;
             }
@@ -203,7 +203,7 @@ void DownloadUI::UpdateOverallProgress(void)
         bool set = gtk_toggle_button_get_active(
                                           GTK_TOGGLE_BUTTON(m_closeComplete));
         if (set) {
-            m_prefs->SetCloseDLMOnComplete(set);
+            m_prefs->SetPrefBoolean(kCloseDLMOnCompletePref, set);
             gtk_widget_hide(m_downloadUI);
             isVisible = false;
         }

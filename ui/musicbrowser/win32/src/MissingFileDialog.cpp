@@ -175,7 +175,7 @@ BOOL MissingFileDialog::DialogProc(HWND hwnd,
                                     "*.*\0"
                                     "\0";
 
-                    m_context->prefs->GetSaveMusicDirectory(initialDir, &size);
+                    m_context->prefs->GetPrefString(kSaveMusicDirPref, initialDir, &size);
 
                     // Setup open file dialog box structure
                     ofn.lStructSize       = sizeof(OPENFILENAME);

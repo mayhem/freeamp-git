@@ -297,7 +297,7 @@ void GTKMusicBrowser::ShowOptions(int page)
 void GTKMusicBrowser::AddFileCMD()
 {
     bool playNow = true;
-    m_context->prefs->GetPlayImmediately(&playNow);
+    m_context->prefs->GetPrefBoolean(kPlayImmediatelyPref, &playNow);
 
     FileSelector *filesel = new FileSelector("Select a file to play");
     if (filesel->Run(false)) {
@@ -934,7 +934,7 @@ void GTKMusicBrowser::AddTracksPlaylistEvent(vector<PlaylistItem *> *newlist,
 
     if (master && (m_plm->CountItems() == 0)) {
         bool playNow = false;
-        m_context->prefs->GetPlayImmediately(&playNow);
+        m_context->prefs->GetPrefBoolean(kPlayImmediatelyPref, &playNow);
 
         if (playNow)
             play = true;
@@ -959,7 +959,7 @@ void GTKMusicBrowser::AddTracksDoubleClick(vector<PlaylistItem *> *newlist)
 {
     bool playNow = false;
 
-    m_context->prefs->GetPlayImmediately(&playNow);
+    m_context->prefs->GetPrefBoolean(kPlayImmediatelyPref, &playNow);
 
     if (playNow) {
         DeleteListEvent();
@@ -1234,12 +1234,12 @@ GTKMusicBrowser::GTKMusicBrowser(FAContext *context, MusicBrowserUI *masterUI,
 
     if (master) {
         bool saveOnExit;
-        m_context->prefs->GetSaveCurrentPlaylistOnExit(&saveOnExit);
+        m_context->prefs->GetPrefBoolean(kSaveCurrentPlaylistOnExitPref, &saveOnExit);
 
         if (saveOnExit) {
             LoadPlaylist(playlistURL);
             uint32 pos = 0; 
-            m_context->prefs->GetSavedPlaylistPosition(&pos);
+            m_context->prefs->GetPrefInt32(kSavedPlaylistPositionPref, &pos);
 
             m_plm->SetCurrentIndex(pos);   
         }
@@ -1274,7 +1274,7 @@ void GTKMusicBrowser::ShowMusicBrowser(void)
     if (master) {  
          bool viewMusicBrowser = true;
 
-         m_context->prefs->GetViewMusicBrowser(&viewMusicBrowser);
+         m_context->prefs->GetPrefBoolean(kViewMusicBrowserPref, &viewMusicBrowser);
          
          if ((viewMusicBrowser == true) && (m_state == kStateCollapsed))
 	     ExpandCollapseEvent();
@@ -1297,11 +1297,11 @@ void GTKMusicBrowser::Close(bool inMain)
 
     if (master) {
         bool saveOnExit = false;
-        m_context->prefs->GetSaveCurrentPlaylistOnExit(&saveOnExit);
+        m_context->prefs->GetPrefBoolean(kSaveCurrentPlaylistOnExitPref, &saveOnExit);
 
         if (saveOnExit && m_plm) {
             SaveCurrentPlaylist(NULL);
-            m_context->prefs->SetSavedPlaylistPosition(m_plm->GetCurrentIndex());
+            m_context->prefs->SetPrefInt32(kSavedPlaylistPositionPref, m_plm->GetCurrentIndex());
         }
     }
     else {
@@ -1336,7 +1336,7 @@ void GTKMusicBrowser::Close(bool inMain)
             parentUI->WindowClose(this);
         
         if (master)
-            m_context->prefs->SetViewMusicBrowser(m_state == kStateExpanded);
+            m_context->prefs->SetPrefBoolean(kViewMusicBrowserPref, m_state == kStateExpanded);
     }
 
     gdk_threads_leave();

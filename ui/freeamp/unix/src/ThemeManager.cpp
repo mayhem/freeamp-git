@@ -44,7 +44,7 @@ ThemeManager::ThemeManager(FAContext *pContext)
     m_bDevelTheme = false;
 
     szThemePath[0] = 0;
-    eRet = pContext->prefs->GetThemePath(szThemePath, &len);
+    eRet = pContext->prefs->GetPrefString(kThemePathPref, szThemePath, &len);
     if (IsError(eRet) || strlen(szThemePath) == 0) {
         GetDefaultTheme(m_oCurrentTheme);
     }
@@ -184,7 +184,7 @@ Error ThemeManager::UseTheme(string &oThemeFile)
         }
     }
 
-    m_pContext->prefs->SetThemePath((char *)oThemeFile.c_str());
+    m_pContext->prefs->SetPrefString(kThemePathPref, (char *)oThemeFile.c_str());
     m_oCurrentTheme = string(dir);
     
     return kError_NoErr;

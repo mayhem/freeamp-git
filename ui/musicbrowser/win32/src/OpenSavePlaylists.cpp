@@ -136,7 +136,7 @@ bool MusicBrowserUI::SaveNewPlaylist(string &oName)
         char szName[256];
         length = sizeof(szName);
 
-        m_context->prefs->GetUsersName(szName, &length);
+        m_context->prefs->GetPrefString(kUserNamePref, szName, &length);
 
         while(*szName && isspace(*szName))
         {

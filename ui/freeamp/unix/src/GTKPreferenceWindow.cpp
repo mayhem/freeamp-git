@@ -354,77 +354,77 @@ void GTKPreferenceWindow::GetPrefsValues(Preferences* prefs,
     size = bufferSize;
 
     prefs->GetInputBufferSize(&values->inputBufferSize);
-    prefs->GetOutputBufferSize(&values->outputBufferSize);
-    prefs->GetPrebufferLength(&values->preBufferLength);
+    prefs->GetPrefInt32(kOutputBufferSizePref, &values->outputBufferSize);
+    prefs->GetPrefInt32(kPreBufferPref, &values->preBufferLength);
 
-    prefs->GetSaveStreams(&values->saveStreams);
+    prefs->GetPrefBoolean(kSaveStreamsPref, &values->saveStreams);
     
-    if (kError_BufferTooSmall == prefs->GetProxyServerAddress(buffer, &size)) {
+    if (kError_BufferTooSmall == prefs->GetPrefString(kProxyHostPref, buffer, &size)) {
         buffer = (char *)realloc(buffer, size);
-        prefs->GetProxyServerAddress(buffer, &size);
+        prefs->GetPrefString(kProxyHostPref, buffer, &size);
     }
     values->proxyServer = buffer;
 
-    prefs->GetUseProxyServer(&values->useProxyServer);
+    prefs->GetPrefBoolean(kUseProxyPref, &values->useProxyServer);
 
     size = bufferSize;
 
-    if(kError_BufferTooSmall == prefs->GetSaveStreamsDirectory(buffer, &size)) {
+    if(kError_BufferTooSmall == prefs->GetPrefString(kSaveStreamsDirPref, buffer, &size)) {
         size++;
         buffer = (char*)realloc(buffer, size);
-        prefs->GetSaveStreamsDirectory(buffer, &size);
+        prefs->GetPrefString(kSaveStreamsDirPref, buffer, &size);
     }
     values->saveStreamsDirectory = buffer;
     
     size = bufferSize;
 
-    if(kError_BufferTooSmall == prefs->GetAlternateNICAddress(buffer, &size)) {
+    if(kError_BufferTooSmall == prefs->GetPrefString(kAlternateNICAddressPref, buffer, &size)) {
         buffer = (char*)realloc(buffer, size);
-        prefs->GetAlternateNICAddress(buffer, &size);
+        prefs->GetPrefString(kAlternateNICAddressPref, buffer, &size);
     }
 
     values->alternateIP = buffer;
     size = bufferSize;
 
-    prefs->GetUseAlternateNIC(&values->useAlternateIP);
+    prefs->GetPrefBoolean(kUseAlternateNICPref, &values->useAlternateIP);
 
-    prefs->GetUseDebugLog(&values->enableLogging);
-    prefs->GetLogMain(&values->logMain);
-    prefs->GetLogDecode(&values->logDecoder);
-    prefs->GetLogInput(&values->logInput);
-    prefs->GetLogOutput(&values->logOutput);
-    prefs->GetLogPerformance(&values->logPerformance);
+    prefs->GetPrefBoolean(kUseDebugLogPref, &values->enableLogging);
+    prefs->GetPrefBoolean(kLogMainPref, &values->logMain);
+    prefs->GetPrefBoolean(kLogDecodePref, &values->logDecoder);
+    prefs->GetPrefBoolean(kLogInputPref, &values->logInput);
+    prefs->GetPrefBoolean(kLogOutputPref, &values->logOutput);
+    prefs->GetPrefBoolean(kLogPerformancePref, &values->logPerformance);
 
-    if(kError_BufferTooSmall == prefs->GetThemeDefaultFont(buffer, &size)) {
+    if(kError_BufferTooSmall == prefs->GetPrefString(kThemeDefaultFontPref, buffer, &size)) {
         size++;
         buffer = (char*)realloc(buffer, size);
-        prefs->GetThemeDefaultFont(buffer, &size);
+        prefs->GetPrefString(kThemeDefaultFontPref, buffer, &size);
     }
 
     values->defaultFont = buffer;
     size = bufferSize;
 
-    if(kError_BufferTooSmall == prefs->GetSaveMusicDirectory(buffer, &size)) {
+    if(kError_BufferTooSmall == prefs->GetPrefString(kSaveMusicDirPref, buffer, &size)) {
         buffer = (char*)realloc(buffer, size);
-        prefs->GetSaveMusicDirectory(buffer, &size);
+        prefs->GetPrefString(kSaveMusicDirPref, buffer, &size);
     }
     values->saveMusicDirectory = buffer;
     size = bufferSize;
 
     m_pThemeMan->GetCurrentTheme(values->currentTheme);
 
-    prefs->GetShowToolbarTextLabels(&values->useTextLabels);
-    prefs->GetShowToolbarImages(&values->useImages);
-    prefs->GetSaveCurrentPlaylistOnExit(&values->savePlaylistOnExit);
-    prefs->GetPlayImmediately(&values->playImmediately);
-    prefs->GetAllowMultipleInstances(&values->allowMultipleInstances);
+    prefs->GetPrefBoolean(kShowToolbarTextLabelsPref, &values->useTextLabels);
+    prefs->GetPrefBoolean(kShowToolbarImagesPref, &values->useImages);
+    prefs->GetPrefBoolean(kSaveCurrentPlaylistOnExitPref, &values->savePlaylistOnExit);
+    prefs->GetPrefBoolean(kPlayImmediatelyPref, &values->playImmediately);
+    prefs->GetPrefBoolean(kAllowMultipleInstancesPref, &values->allowMultipleInstances);
 
-    if(kError_BufferTooSmall == prefs->GetSaveMusicDirectory(buffer, &size))
+    if(kError_BufferTooSmall == prefs->GetPrefString(kSaveMusicDirPref, buffer, &size))
     {
         size++;
         bufferSize = size;
         buffer = (char*)realloc(buffer, bufferSize);
-        prefs->GetSaveMusicDirectory(buffer, &size);
+        prefs->GetPrefString(kSaveMusicDirPref, buffer, &size);
     }
 
     values->saveMusicDirectory = buffer;
@@ -452,9 +452,9 @@ void GTKPreferenceWindow::GetPrefsValues(Preferences* prefs,
     values->watchThisDirectory = buffer;
     size = bufferSize;
 
-    if(kError_BufferTooSmall == prefs->GetUsersPortablePlayers(buffer, &size)) {
+    if(kError_BufferTooSmall == prefs->GetPrefString(kUsersPortablePlayersPref, buffer, &size)) {
         buffer = (char*)realloc(buffer, size);
-        prefs->GetUsersPortablePlayers(buffer, &size);
+        prefs->GetPrefString(kUsersPortablePlayersPref, buffer, &size);
     }
 
     char* cp = buffer;
@@ -472,42 +472,42 @@ void GTKPreferenceWindow::GetPrefsValues(Preferences* prefs,
 
     free(buffer);
 
-    prefs->GetAskToReclaimFiletypes(&values->askReclaimFiletypes);
-    prefs->GetReclaimFiletypes(&values->reclaimFiletypes);
-    prefs->GetWatchThisDirTimeout(&values->watchThisDirTimeout);
+    prefs->GetPrefBoolean(kAskToReclaimFiletypesPref, &values->askReclaimFiletypes);
+    prefs->GetPrefBoolean(kReclaimFiletypesPref, &values->reclaimFiletypes);
+    prefs->GetPrefInt32(kWatchThisDirTimeoutPref, &values->watchThisDirTimeout);
 }
 
 void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs, 
                                           PrefsStruct* values)
 {
-    prefs->SetShowToolbarTextLabels(values->useTextLabels);
-    prefs->SetShowToolbarImages(values->useImages);
-    prefs->SetSaveCurrentPlaylistOnExit(values->savePlaylistOnExit);
-    prefs->SetPlayImmediately(values->playImmediately);
-    prefs->SetAllowMultipleInstances(values->allowMultipleInstances);
-    prefs->SetAskToReclaimFiletypes(values->askReclaimFiletypes);
-    prefs->SetReclaimFiletypes(values->reclaimFiletypes);
+    prefs->SetPrefBoolean(kShowToolbarTextLabelsPref, values->useTextLabels);
+    prefs->SetPrefBoolean(kShowToolbarImagesPref, values->useImages);
+    prefs->SetPrefBoolean(kSaveCurrentPlaylistOnExitPref, values->savePlaylistOnExit);
+    prefs->SetPrefBoolean(kPlayImmediatelyPref, values->playImmediately);
+    prefs->SetPrefBoolean(kAllowMultipleInstancesPref, values->allowMultipleInstances);
+    prefs->SetPrefBoolean(kAskToReclaimFiletypesPref, values->askReclaimFiletypes);
+    prefs->SetPrefBoolean(kReclaimFiletypesPref, values->reclaimFiletypes);
 
     prefs->SetDefaultPMO(values->defaultPMO.c_str());
-    prefs->SetInputBufferSize(values->inputBufferSize);
-    prefs->SetOutputBufferSize(values->outputBufferSize);
-    prefs->SetPrebufferLength(values->preBufferLength);
+    prefs->SetPrefInt32(kInputBufferSizePref, values->inputBufferSize);
+    prefs->SetPrefInt32(kOutputBufferSizePref, values->outputBufferSize);
+    prefs->SetPrefInt32(kPreBufferPref, values->preBufferLength);
 
-    prefs->SetSaveStreams(values->saveStreams);
-    prefs->SetSaveStreamsDirectory(values->saveStreamsDirectory.c_str());
-    prefs->SetProxyServerAddress(values->proxyServer.c_str());
-    prefs->SetUseProxyServer(values->useProxyServer);
-    prefs->SetAlternateNICAddress(values->alternateIP.c_str());
-    prefs->SetUseAlternateNIC(values->useAlternateIP);
+    prefs->SetPrefBoolean(kSaveStreamsPref, values->saveStreams);
+    prefs->SetPrefString(kSaveStreamsDirPref, values->saveStreamsDirectory.c_str());
+    prefs->SetPrefString(kProxyHostPref, values->proxyServer.c_str());
+    prefs->SetPrefBoolean(kUseProxyPref, values->useProxyServer);
+    prefs->SetPrefString(kAlternateNICAddressPref, values->alternateIP.c_str());
+    prefs->SetPrefBoolean(kUseAlternateNICPref, values->useAlternateIP);
 
-    prefs->SetUseDebugLog(values->enableLogging);
-    prefs->SetLogMain(values->logMain);
-    prefs->SetLogDecode(values->logDecoder);
-    prefs->SetLogInput(values->logInput);
-    prefs->SetLogOutput(values->logOutput);
-    prefs->SetLogPerformance(values->logPerformance);
+    prefs->SetPrefBoolean(kUseDebugLogPref, values->enableLogging);
+    prefs->SetPrefBoolean(kLogMainPref, values->logMain);
+    prefs->SetPrefBoolean(kLogDecodePref, values->logDecoder);
+    prefs->SetPrefBoolean(kLogInputPref, values->logInput);
+    prefs->SetPrefBoolean(kLogOutputPref, values->logOutput);
+    prefs->SetPrefBoolean(kLogPerformancePref, values->logPerformance);
 
-    prefs->SetThemeDefaultFont(values->defaultFont.c_str());
+    prefs->SetPrefString(kThemeDefaultFontPref, values->defaultFont.c_str());
 
     prefs->SetPrefString(kALSADevicePref, values->alsaOutput.c_str());
 
@@ -520,9 +520,9 @@ void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs,
     }
     m_pThemeMan->UseTheme(m_oThemeList[values->currentTheme]);
 
-    prefs->SetSaveMusicDirectory(values->saveMusicDirectory.c_str());
-    prefs->SetWatchThisDirectory(values->watchThisDirectory.c_str());
-    prefs->SetWatchThisDirTimeout(values->watchThisDirTimeout);
+    prefs->SetPrefString(kSaveMusicDirPref, values->saveMusicDirectory.c_str());
+    prefs->SetPrefString(kWatchThisDirectoryPref, values->watchThisDirectory.c_str());
+    prefs->SetPrefInt32(kWatchThisDirTimeoutPref, values->watchThisDirTimeout);
 
     PortableSet::const_iterator j = values->portablePlayers.begin();
     string portableList;
@@ -531,7 +531,7 @@ void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs,
         portableList += *j;
         portableList += ";";
     }
-    prefs->SetUsersPortablePlayers(portableList.c_str());
+    prefs->SetPrefString(kUsersPortablePlayersPref, portableList.c_str());
 
     prefs->SetDefaultPMO(values->defaultPMO.c_str());
     
@@ -1331,7 +1331,7 @@ GtkWidget *GTKPreferenceWindow::CreatePlugins(void)
     return pane;
 }
 
-void GTKPreferenceWindow::SetInputBufferSize(int newvalue)
+void GTKPreferenceWindow::SetPrefInt32(kInputBufferSizePref, int newvalue)
 {
     proposedValues.inputBufferSize = newvalue;
     gtk_widget_set_sensitive(applyButton, TRUE);
@@ -1341,10 +1341,10 @@ static void input_buffer_change(GtkWidget *w, GTKPreferenceWindow *p)
 {
     char *text = gtk_entry_get_text(GTK_ENTRY(w));
     int newdata = atoi(text);
-    p->SetInputBufferSize(newdata);
+    p->SetPrefInt32(kInputBufferSizePref, newdata);
 }
 
-void GTKPreferenceWindow::SetOutputBufferSize(int newvalue)
+void GTKPreferenceWindow::SetPrefInt32(kOutputBufferSizePref, int newvalue)
 {
     proposedValues.outputBufferSize = newvalue;
     gtk_widget_set_sensitive(applyButton, TRUE);
@@ -1354,7 +1354,7 @@ static void output_buffer_change(GtkWidget *w, GTKPreferenceWindow *p)
 {
     char *text = gtk_entry_get_text(GTK_ENTRY(w));
     int newdata = atoi(text);
-    p->SetOutputBufferSize(newdata);
+    p->SetPrefInt32(kOutputBufferSizePref, newdata);
 }
 
 void GTKPreferenceWindow::SetPreBufferLength(int newvalue)

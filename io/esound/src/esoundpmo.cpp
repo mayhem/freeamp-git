@@ -114,7 +114,7 @@ EsounDPMO::~EsounDPMO()
    }
 }
 
-void EsounDPMO::GetVolume(int32 &left, int32 &right)
+void EsounDPMO::GetPrefInt32(kVolumePref, int32 &left, int32 &right)
 {
    left = right = -1;
 
@@ -141,7 +141,7 @@ void EsounDPMO::GetVolume(int32 &left, int32 &right)
    }
 }
 
-void EsounDPMO::SetVolume(int32 left, int32 right)
+void EsounDPMO::SetPrefInt32(kVolumePref, int32 left, int32 right)
 {
    if (mixer_fd > 0)
    {

@@ -512,10 +512,10 @@ Error UpdateManager::DownloadInfo(string& info,
     const char* file = NULL;
     uint32 length;
 
-    m_context->prefs->GetUseProxyServer(&useProxy);
+    m_context->prefs->GetPrefBoolean(kUseProxyPref, &useProxy);
 
     length = sizeof(proxyname);
-    m_context->prefs->GetProxyServerAddress(proxyname, &length);
+    m_context->prefs->GetPrefString(kProxyHostPref, proxyname, &length);
 
     if(useProxy)
     {
@@ -853,10 +853,10 @@ Error UpdateManager::DownloadItem(UpdateItem* item,
 
             result = kError_NoErr;  
 
-            m_context->prefs->GetUseProxyServer(&useProxy);
+            m_context->prefs->GetPrefBoolean(kUseProxyPref, &useProxy);
 
             length = sizeof(proxyname);
-            m_context->prefs->GetProxyServerAddress(proxyname, &length);
+            m_context->prefs->GetPrefString(kProxyHostPref, proxyname, &length);
 
             if(useProxy)
             {

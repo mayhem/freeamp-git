@@ -64,7 +64,7 @@ void toggle_vis_internal(GtkWidget *widget, DownloadUI *p)
 void DownloadUI::CloseWindow(void)
 {
     bool close = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_closeComplete));
-    m_prefs->SetCloseDLMOnComplete(close);
+    m_prefs->SetPrefBoolean(kCloseDLMOnCompletePref, close);
     gtk_widget_destroy(m_downloadUI);
 }
 
@@ -495,7 +495,7 @@ void DownloadUI::CreateDownloadUI(void)
     m_closeComplete = gtk_check_button_new_with_label("Close the Download Manager  when all downloads finish");
     gtk_box_pack_start(GTK_BOX(vbox), m_closeComplete, FALSE, FALSE, 1);
     bool set = false;
-    m_prefs->GetCloseDLMOnComplete(&set);
+    m_prefs->GetPrefBoolean(kCloseDLMOnCompletePref, &set);
     if (set)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_closeComplete), TRUE);
     gtk_widget_show(m_closeComplete);

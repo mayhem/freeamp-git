@@ -168,14 +168,14 @@ bool SoundCardPMO::SetupVolumeControl( HWND hWnd)
     return !!m_volume;
 }
 
-void SoundCardPMO::GetVolume(int32 &left, int32 &right) 
+void SoundCardPMO::GetPrefInt32(kVolumePref, int32 &left, int32 &right) 
 {
-    m_volume->GetVolume(left, right);
+    m_volume->GetPrefInt32(kVolumePref, left, right);
 }
 
-void SoundCardPMO::SetVolume(int32 left, int32 right) 
+void SoundCardPMO::SetPrefInt32(kVolumePref, int32 left, int32 right) 
 {
-    m_volume->SetVolume(left, right);
+    m_volume->SetPrefInt32(kVolumePref, left, right);
 }
 
 Error SoundCardPMO::Init(OutputInfo * info)
@@ -522,7 +522,7 @@ void SoundCardPMO::WorkerThread(void)
    // Wait for prebuffer period
    PreBuffer();
 
-   m_pContext->prefs->GetDecoderThreadPriority(&iValue);
+   m_pContext->prefs->GetPrefInt32(kDecoderThreadPriorityPref, &iValue);
    m_pBufferThread->SetPriority(iValue);
 
    for(; !m_bExit;)

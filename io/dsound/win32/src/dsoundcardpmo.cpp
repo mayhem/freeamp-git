@@ -314,7 +314,7 @@ bool DSoundCardPMO::SetupVolumeControl(void)
 
 void
 DSoundCardPMO::
-GetVolume(int32 &left, int32 &right)
+GetPrefInt32(kVolumePref, int32 &left, int32 &right)
 {
     MIXERCONTROLDETAILS_UNSIGNED mxcdVolume[2];
     MIXERCONTROLDETAILS mxcd;
@@ -341,7 +341,7 @@ GetVolume(int32 &left, int32 &right)
 
 void
 DSoundCardPMO::
-SetVolume(int32 left, int32 right)
+SetPrefInt32(kVolumePref, int32 left, int32 right)
 {
     DWORD dwLeft, dwRight;
     
@@ -907,7 +907,7 @@ WorkerThread(void)
    // Wait for prebuffer period
    PreBuffer();
 
-   m_pContext->prefs->GetDecoderThreadPriority(&iValue);
+   m_pContext->prefs->GetPrefInt32(kDecoderThreadPriorityPref, &iValue);
    m_pBufferThread->SetPriority(iValue);
 
    for(; !m_bExit;)

@@ -656,13 +656,13 @@ void MusicBrowserUI::FillPortables()
     insert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
                         TVIF_SELECTEDIMAGE | TVIF_PARAM; 
 
-    if(kError_BufferTooSmall == m_context->prefs->GetUsersPortablePlayers(buffer, &size))
+    if(kError_BufferTooSmall == m_context->prefs->GetPrefString(kUsersPortablePlayersPref, buffer, &size))
     {
         buffer = (char*)malloc(size);
 
         if(buffer)
         {
-            m_context->prefs->GetUsersPortablePlayers(buffer, &size);
+            m_context->prefs->GetPrefString(kUsersPortablePlayersPref, buffer, &size);
             char* cp = buffer;
             char* name = cp;
 

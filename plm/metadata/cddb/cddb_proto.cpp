@@ -382,15 +382,15 @@ int CDDB::cddb_read_serverlist(struct cddb_conf *conf,
     struct cddb_host proxy_host;
     bool useproxy;
 
-    m_context->prefs->GetUseProxyServer(&useproxy);
+    m_context->prefs->GetPrefBoolean(kUseProxyPref, &useproxy);
     conf->conf_proxy = CDDB_PROXY_DISABLED;
     if (useproxy) {
         conf->conf_proxy = CDDB_PROXY_ENABLED;
-        if (IsError(m_context->prefs->GetProxyServerAddress(host, &length))) {
+        if (IsError(m_context->prefs->GetPrefString(kProxyHostPref, host, &length))) {
             delete [] host;
             host = new char[length];
 
-            if (IsError(m_context->prefs->GetProxyServerAddress(host, &length)))
+            if (IsError(m_context->prefs->GetPrefString(kProxyHostPref, host, &length)))
             {
                 conf->conf_proxy = CDDB_PROXY_DISABLED;
             }
@@ -406,10 +406,10 @@ int CDDB::cddb_read_serverlist(struct cddb_conf *conf,
         }
     }
 
-    if (IsError(m_context->prefs->GetCDDBServerAddress(host, &length))) {
+    if (IsError(m_context->prefs->GetPrefString(kCDDBServerPref, host, &length))) {
         delete [] host;
         host = new char[length];
-        if (IsError(m_context->prefs->GetCDDBServerAddress(host, &length))) {
+        if (IsError(m_context->prefs->GetPrefString(kCDDBServerPref, host, &length))) {
             delete [] host;
             return -1;
         }

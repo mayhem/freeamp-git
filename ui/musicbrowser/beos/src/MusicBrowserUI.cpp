@@ -208,7 +208,7 @@ void
 MusicBrowserUI::AddFiles( const vector<string>& files )
 {
     bool playNow = true;
-    m_context->prefs->GetPlayImmediately( &playNow );
+    m_context->prefs->GetPrefBoolean(kPlayImmediatelyPref,  &playNow );
 
     vector<string>::const_iterator i;
     for ( i = files.begin(); i != files.end(); i++ )

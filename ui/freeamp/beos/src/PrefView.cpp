@@ -212,7 +212,7 @@ PrefView::MessageReceived( BMessage* message )
             BEntry entry( &ref );
             BPath path;
             entry.GetPath( &path );
-            SetSaveMusicDirectory( path.Path() );
+            SetPrefString(kSaveMusicDirPref,  path.Path() );
 
             // need to delete file panel myself.
             delete m_filePanel;
@@ -221,7 +221,7 @@ PrefView::MessageReceived( BMessage* message )
         break;
     case MSG_SET_CHECK_FOR_UPDATES:
         message->PrintToStream();
-        SetCheckForUpdates( (message->FindInt32( "be:value" ) == B_CONTROL_ON) );
+        SetPrefBoolean(kCheckForUpdatesPref,  (message->FindInt32( "be:value" ) == B_CONTROL_ON) );
         break;
     case MSG_SET_RECLAIM_FILETYPES:
         m_proposedValues.reclaimFiletypes =
@@ -282,7 +282,7 @@ PrefView::MessageReceived( BMessage* message )
         }
         break;
     case MSG_SET_DECODER_PRIORITY:
-        SetDecoderThreadPriority( message->FindInt32( "be:value" ) );
+        SetPrefInt32(kDecoderThreadPriorityPref,  message->FindInt32( "be:value" ) );
         break;
     default:
         BView::MessageReceived( message );
@@ -331,61 +331,61 @@ PrefView::GetPrefsValues(Preferences* prefs,
     values->defaultUI = buffer;
     size = bufferSize;
 
-    if(kError_BufferTooSmall == prefs->GetProxyServerAddress(buffer, &size))
+    if(kError_BufferTooSmall == prefs->GetPrefString(kProxyHostPref, buffer, &size))
     {
         bufferSize = size;
         buffer = (char*)realloc(buffer, bufferSize);
-        prefs->GetProxyServerAddress(buffer, &size);
+        prefs->GetPrefString(kProxyHostPref, buffer, &size);
     }
 
     values->proxyServer = buffer;
     size = bufferSize;
 
-    if(kError_BufferTooSmall == prefs->GetSaveStreamsDirectory(buffer, &size))
+    if(kError_BufferTooSmall == prefs->GetPrefString(kSaveStreamsDirPref, buffer, &size))
     {
         bufferSize = size;
         buffer = (char*)realloc(buffer, bufferSize);
-        prefs->GetSaveStreamsDirectory(buffer, &size);
+        prefs->GetPrefString(kSaveStreamsDirPref, buffer, &size);
     }
 
     values->saveStreamsDirectory = buffer;
     size = bufferSize;
 
-    if(kError_BufferTooSmall == prefs->GetAlternateNICAddress(buffer, &size))
+    if(kError_BufferTooSmall == prefs->GetPrefString(kAlternateNICAddressPref, buffer, &size))
     {
         bufferSize = size;
         buffer = (char*)realloc(buffer, bufferSize);
-        prefs->GetAlternateNICAddress(buffer, &size);
+        prefs->GetPrefString(kAlternateNICAddressPref, buffer, &size);
     }
 
     values->alternateIP = buffer;
     size = bufferSize;
 
-    if(kError_BufferTooSmall == prefs->GetThemeDefaultFont(buffer, &size))
+    if(kError_BufferTooSmall == prefs->GetPrefString(kThemeDefaultFontPref, buffer, &size))
     {
         bufferSize = size;
         buffer = (char*)realloc(buffer, bufferSize);
-        prefs->GetThemeDefaultFont(buffer, &size);
+        prefs->GetPrefString(kThemeDefaultFontPref, buffer, &size);
     }
 
     values->defaultFont = buffer;
     size = bufferSize;
 
-    if(kError_BufferTooSmall == prefs->GetSaveMusicDirectory(buffer, &size))
+    if(kError_BufferTooSmall == prefs->GetPrefString(kSaveMusicDirPref, buffer, &size))
     {
         bufferSize = size;
         buffer = (char*)realloc(buffer, bufferSize);
-        prefs->GetSaveMusicDirectory(buffer, &size);
+        prefs->GetPrefString(kSaveMusicDirPref, buffer, &size);
     }
 
     values->saveMusicDirectory = buffer;
     size = bufferSize;
 
-    if(kError_BufferTooSmall == prefs->GetUsersPortablePlayers(buffer, &size))
+    if(kError_BufferTooSmall == prefs->GetPrefString(kUsersPortablePlayersPref, buffer, &size))
     {
         bufferSize = size;
         buffer = (char*)realloc(buffer, bufferSize);
-        prefs->GetUsersPortablePlayers(buffer, &size);
+        prefs->GetPrefString(kUsersPortablePlayersPref, buffer, &size);
     }
 
     char* cp = buffer;
@@ -413,29 +413,29 @@ PrefView::GetPrefsValues(Preferences* prefs,
     m_themeMan->GetCurrentTheme(values->currentTheme);
 
     // get the other prefs
-    prefs->GetDecoderThreadPriority(&values->decoderThreadPriority);
+    prefs->GetPrefInt32(kDecoderThreadPriorityPref, &values->decoderThreadPriority);
     prefs->GetInputBufferSize(&values->inputBufferSize);
-    prefs->GetOutputBufferSize(&values->outputBufferSize);
-    prefs->GetPrebufferLength(&values->preBufferLength);
+    prefs->GetPrefInt32(kOutputBufferSizePref, &values->outputBufferSize);
+    prefs->GetPrefInt32(kPreBufferPref, &values->preBufferLength);
     prefs->GetStayOnTop(&values->stayOnTop);
     prefs->GetLiveInTray(&values->liveInTray);
-    prefs->GetStreamBufferInterval(&values->streamInterval);
-    prefs->GetSaveStreams(&values->saveStreams);
-    prefs->GetUseProxyServer(&values->useProxyServer);
-    prefs->GetUseAlternateNIC(&values->useAlternateIP);
-    prefs->GetUseDebugLog(&values->enableLogging);
-    prefs->GetLogMain(&values->logMain);
-    prefs->GetLogDecode(&values->logDecoder);
-    prefs->GetLogInput(&values->logInput);
-    prefs->GetLogOutput(&values->logOutput);
-    prefs->GetLogPerformance(&values->logPerformance);
-    prefs->GetCheckForUpdates(&values->checkForUpdates);
-    prefs->GetAskToReclaimFiletypes(&values->askReclaimFiletypes);
-    prefs->GetReclaimFiletypes(&values->reclaimFiletypes);
-    prefs->GetShowToolbarTextLabels(&values->useTextLabels);
-    prefs->GetShowToolbarImages(&values->useImages);
-    prefs->GetSaveCurrentPlaylistOnExit(&values->savePlaylistOnExit);
-    prefs->GetPlayImmediately( &values->playImmediately );
+    prefs->GetPrefInt32(kStreamBufferIntervalPref, &values->streamInterval);
+    prefs->GetPrefBoolean(kSaveStreamsPref, &values->saveStreams);
+    prefs->GetPrefBoolean(kUseProxyPref, &values->useProxyServer);
+    prefs->GetPrefBoolean(kUseAlternateNICPref, &values->useAlternateIP);
+    prefs->GetPrefBoolean(kUseDebugLogPref, &values->enableLogging);
+    prefs->GetPrefBoolean(kLogMainPref, &values->logMain);
+    prefs->GetPrefBoolean(kLogDecodePref, &values->logDecoder);
+    prefs->GetPrefBoolean(kLogInputPref, &values->logInput);
+    prefs->GetPrefBoolean(kLogOutputPref, &values->logOutput);
+    prefs->GetPrefBoolean(kLogPerformancePref, &values->logPerformance);
+    prefs->GetPrefBoolean(kCheckForUpdatesPref, &values->checkForUpdates);
+    prefs->GetPrefBoolean(kAskToReclaimFiletypesPref, &values->askReclaimFiletypes);
+    prefs->GetPrefBoolean(kReclaimFiletypesPref, &values->reclaimFiletypes);
+    prefs->GetPrefBoolean(kShowToolbarTextLabelsPref, &values->useTextLabels);
+    prefs->GetPrefBoolean(kShowToolbarImagesPref, &values->useImages);
+    prefs->GetPrefBoolean(kSaveCurrentPlaylistOnExitPref, &values->savePlaylistOnExit);
+    prefs->GetPrefBoolean(kPlayImmediatelyPref,  &values->playImmediately );
 
     free(buffer);
 }
@@ -446,36 +446,36 @@ PrefView::SavePrefsValues( Preferences* prefs,
 {
     prefs->SetDefaultPMO(values->defaultPMO.c_str());
     prefs->SetDefaultUI(values->defaultUI.c_str());
-    prefs->SetDecoderThreadPriority(values->decoderThreadPriority);
-    prefs->SetInputBufferSize(values->inputBufferSize);
-    prefs->SetOutputBufferSize(values->outputBufferSize);
-    prefs->SetPrebufferLength(values->preBufferLength);
+    prefs->SetPrefInt32(kDecoderThreadPriorityPref, values->decoderThreadPriority);
+    prefs->SetPrefInt32(kInputBufferSizePref, values->inputBufferSize);
+    prefs->SetPrefInt32(kOutputBufferSizePref, values->outputBufferSize);
+    prefs->SetPrefInt32(kPreBufferPref, values->preBufferLength);
     prefs->SetStayOnTop(values->stayOnTop);
     prefs->SetLiveInTray(values->liveInTray);
 
-    prefs->SetStreamBufferInterval(values->streamInterval);
-    prefs->SetSaveStreams(values->saveStreams);
-    prefs->SetSaveStreamsDirectory(values->saveStreamsDirectory.c_str());
-    prefs->SetProxyServerAddress(values->proxyServer.c_str());
-    prefs->SetUseProxyServer(values->useProxyServer);
-    prefs->SetAlternateNICAddress(values->alternateIP.c_str());
-    prefs->SetUseAlternateNIC(values->useAlternateIP);
+    prefs->SetPrefInt32(kStreamBufferIntervalPref, values->streamInterval);
+    prefs->SetPrefBoolean(kSaveStreamsPref, values->saveStreams);
+    prefs->SetPrefString(kSaveStreamsDirPref, values->saveStreamsDirectory.c_str());
+    prefs->SetPrefString(kProxyHostPref, values->proxyServer.c_str());
+    prefs->SetPrefBoolean(kUseProxyPref, values->useProxyServer);
+    prefs->SetPrefString(kAlternateNICAddressPref, values->alternateIP.c_str());
+    prefs->SetPrefBoolean(kUseAlternateNICPref, values->useAlternateIP);
 
-    prefs->SetUseDebugLog(values->enableLogging);
-    prefs->SetLogMain(values->logMain);
-    prefs->SetLogDecode(values->logDecoder);
-    prefs->SetLogInput(values->logInput);
-    prefs->SetLogOutput(values->logOutput);
-    prefs->SetLogPerformance(values->logPerformance);
+    prefs->SetPrefBoolean(kUseDebugLogPref, values->enableLogging);
+    prefs->SetPrefBoolean(kLogMainPref, values->logMain);
+    prefs->SetPrefBoolean(kLogDecodePref, values->logDecoder);
+    prefs->SetPrefBoolean(kLogInputPref, values->logInput);
+    prefs->SetPrefBoolean(kLogOutputPref, values->logOutput);
+    prefs->SetPrefBoolean(kLogPerformancePref, values->logPerformance);
 
-    prefs->SetThemeDefaultFont(values->defaultFont.c_str());
+    prefs->SetPrefString(kThemeDefaultFontPref, values->defaultFont.c_str());
     if (m_themeList[values->currentTheme].length() > 0)
        m_themeMan->UseTheme(m_themeList[values->currentTheme]);
 
-    prefs->SetCheckForUpdates(values->checkForUpdates);
-    prefs->SetSaveMusicDirectory(values->saveMusicDirectory.c_str());
-    prefs->SetAskToReclaimFiletypes(values->askReclaimFiletypes);
-    prefs->SetReclaimFiletypes(values->reclaimFiletypes);
+    prefs->SetPrefBoolean(kCheckForUpdatesPref, values->checkForUpdates);
+    prefs->SetPrefString(kSaveMusicDirPref, values->saveMusicDirectory.c_str());
+    prefs->SetPrefBoolean(kAskToReclaimFiletypesPref, values->askReclaimFiletypes);
+    prefs->SetPrefBoolean(kReclaimFiletypesPref, values->reclaimFiletypes);
 
     PortableSet::const_iterator i;
     string portableList;
@@ -486,12 +486,12 @@ PrefView::SavePrefsValues( Preferences* prefs,
         portableList += ";";
     }
 
-    prefs->SetUsersPortablePlayers(portableList.c_str());
-    prefs->SetShowToolbarTextLabels(values->useTextLabels);
-    prefs->SetShowToolbarImages(values->useImages);
+    prefs->SetPrefString(kUsersPortablePlayersPref, portableList.c_str());
+    prefs->SetPrefBoolean(kShowToolbarTextLabelsPref, values->useTextLabels);
+    prefs->SetPrefBoolean(kShowToolbarImagesPref, values->useImages);
 
-    prefs->SetSaveCurrentPlaylistOnExit(values->savePlaylistOnExit);
-    prefs->SetPlayImmediately( values->playImmediately );
+    prefs->SetPrefBoolean(kSaveCurrentPlaylistOnExitPref, values->savePlaylistOnExit);
+    prefs->SetPrefBoolean(kPlayImmediatelyPref,  values->playImmediately );
 
     // this gets called by each page unfortunately
     // so save some effort by only doing it once
@@ -838,20 +838,20 @@ PrefView::CreateAboutPane( void )
 // ----------------------------------------------------
 
 void
-PrefView::SetSaveMusicDirectory( const char* path )
+PrefView::SetPrefString(kSaveMusicDirPref,  const char* path )
 {
     m_proposedValues.saveMusicDirectory = string( path );
     m_saveMusicFolder->SetText( path );
 }
 
 void
-PrefView::SetCheckForUpdates( bool flag )
+PrefView::SetPrefBoolean(kCheckForUpdatesPref,  bool flag )
 {
     m_proposedValues.checkForUpdates = flag;
 }
 
 void
-PrefView::SetDecoderThreadPriority( int32 prio )
+PrefView::SetPrefInt32(kDecoderThreadPriorityPref,  int32 prio )
 {
     m_proposedValues.decoderThreadPriority = prio;
 }

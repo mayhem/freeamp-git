@@ -163,8 +163,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 
     bool reclaimFileTypes, askBeforeReclaiming;
     uint32 length = sizeof(path);
-    context->prefs->GetReclaimFiletypes(&reclaimFileTypes);
-    context->prefs->GetAskToReclaimFiletypes(&askBeforeReclaiming);
+    context->prefs->GetPrefBoolean(kReclaimFiletypesPref, &reclaimFileTypes);
+    context->prefs->GetPrefBoolean(kAskToReclaimFiletypesPref, &askBeforeReclaiming);
     context->prefs->GetInstallDirectory(path, &length);
     strcat(path, "\\freeamp.exe");
 
@@ -470,7 +470,7 @@ static LRESULT WINAPI HiddenWndProc(HWND hwnd,
 
             bool playNow = false;
 
-            context->prefs->GetPlayImmediately(&playNow);
+            context->prefs->GetPrefBoolean(kPlayImmediatelyPref, &playNow);
             
             // If a single theme or rpm file gets passed, don't affect 
             // the play queue

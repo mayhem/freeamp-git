@@ -67,7 +67,7 @@ MusicCatalog::MusicCatalog(FAContext *context, char *databasepath)
     m_watchTimer = NULL;
    
     m_timeout = 0;
-    context->prefs->GetWatchThisDirTimeout(&m_timeout);
+    context->prefs->GetPrefInt32(kWatchThisDirTimeoutPref, &m_timeout);
 
     if (databasepath)
         SetDatabase(databasepath);
@@ -1111,7 +1111,7 @@ Error MusicCatalog::AcceptEvent(Event *e)
         }
         case INFO_PrefsChanged: {
             int32 watchtimeout = 0;
-            m_context->prefs->GetWatchThisDirTimeout(&watchtimeout);
+            m_context->prefs->GetPrefInt32(kWatchThisDirTimeoutPref, &watchtimeout);
             if (m_timeout != watchtimeout) {
                 m_timeout = watchtimeout;
                 if (m_timeout != 0) 
@@ -1143,7 +1143,7 @@ void MusicCatalog::WatchTimer(void)
     char *watchDir = new char[_MAX_PATH];
     uint32 length = _MAX_PATH;
 
-    m_context->prefs->GetWatchThisDirectory(watchDir, &length);
+    m_context->prefs->GetPrefString(kWatchThisDirectoryPref, watchDir, &length);
 
     vector<string> searchPaths;
 

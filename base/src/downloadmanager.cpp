@@ -658,14 +658,14 @@ Error DownloadManager::Download(DownloadItem* item)
 
             result = kError_NoErr;  
 
-            m_context->prefs->GetUseProxyServer(&useProxy);
+            m_context->prefs->GetPrefBoolean(kUseProxyPref, &useProxy);
 
             if(useProxy)
             {
                 char proxy[kMaxURLLen + 1] = {0x00};
 
                 length = sizeof(proxy);
-                m_context->prefs->GetProxyServerAddress(proxy, &length);
+                m_context->prefs->GetPrefString(kProxyHostPref, proxy, &length);
 
                 numFields = sscanf(proxy, 
                                    "http://%[^:/]:%hu", proxyname, &port);

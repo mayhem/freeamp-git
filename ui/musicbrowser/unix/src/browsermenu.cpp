@@ -622,8 +622,8 @@ void GTKMusicBrowser::CreateMenu(GtkWidget *topbox)
 void GTKMusicBrowser::SetToolbarType(void)
 {
     bool useText, useImages;
-    m_context->prefs->GetShowToolbarTextLabels(&useText);
-    m_context->prefs->GetShowToolbarImages(&useImages);
+    m_context->prefs->GetPrefBoolean(kShowToolbarTextLabelsPref, &useText);
+    m_context->prefs->GetPrefBoolean(kShowToolbarImagesPref, &useImages);
 
     if (useText && useImages)
         gtk_toolbar_set_style(GTK_TOOLBAR(toolbar), GTK_TOOLBAR_BOTH);
