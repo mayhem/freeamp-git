@@ -398,18 +398,18 @@ void MusicBrowserUI::EditInfoEvent()
 
     for(track = items.begin(); track != items.end(); track++)
     {
-        MetaData metadata = (*track)->GetMetaData();
+        MetaData metadataCheck = (*track)->GetMetaData();
 
-        if(metadata.Artist() != metadata.Artist())
+        if(metadata.Artist() != metadataCheck.Artist())
             sameArtist = false;
 
-        if(metadata.Album() != metadata.Album())
+        if(metadata.Album() != metadataCheck.Album())
             sameAlbum = false;
 
-        if(metadata.Genre() != metadata.Genre())
+        if(metadata.Genre() != metadataCheck.Genre())
             sameGenre = false;
 
-        if(metadata.Year() != metadata.Year())
+        if(metadata.Year() != metadataCheck.Year())
             sameYear = false;
     }
 
