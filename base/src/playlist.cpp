@@ -383,7 +383,8 @@ Error PlaylistManager::SetCurrentIndex(uint32 index)
 void PlaylistManager::InternalSetCurrentIndex(uint32 index)
 {
     m_current = index;
-    m_context->target->AcceptEvent(new PlaylistCurrentItemInfoEvent(GetCurrentItem(), this));
+    if (index != kInvalidIndex) 
+        m_context->target->AcceptEvent(new PlaylistCurrentItemInfoEvent(GetCurrentItem(), this));
 }
 
 uint32 PlaylistManager::GetCurrentIndex()

@@ -355,8 +355,9 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
       {
          PlaylistCurrentItemInfoEvent *pInfo = 
             (PlaylistCurrentItemInfoEvent *)e;
-
-         UpdateMetaData(pInfo->Item());
+ 
+         if (pInfo->Item())
+             UpdateMetaData(pInfo->Item());
          break;
       }
       
