@@ -1,12 +1,14 @@
 :Base FreeAmp.hlp>Main
-:Title FreeAmp Player
+:Title FreeAmp Player 2.0
 1 Overview
 2 Getting Help=Getting_Help>Main
 2 What is FreeAmp?=What_is_FreeAmp_>Main
 2 What is My Music?=What_is_My_Music?>Main
 2 What is a Playlist?=What_is_a_Playlist_>Main
 2 What Kind of MP3 Files Can I Play?=What_Kind_of_MP3_Files_Can_I_Play_>Main
-1 Getting Started
+2 What is Streaming?=What_is_Streaming_>Main
+2 What are ID3 Tags?=What_are_ID3_Tags_>Main
+2 What are Themes?=What_are_Themes_>Main
 1 Configuring FreeAmp Settings
 2 Configuring FreeAmp Settings=Configuring_FreeAmp_Settings>Main
 2 Setting the Folder Location to Save Your Music=Setting_the_Folder_Location_to_Save_Your_Music>Main
@@ -17,7 +19,7 @@
 2 Working with the My Music Collection Folders=Working_with_the_My_Music_Collection_Folders>Main
 2 Removing a Track from Your Music Collection=Removing_a_Track_from_Your_Music_Collection>Main
 2 Removing a Playlist from Your Music Collection=Removing_a_Playlist_from_Your_Music_Collection>Main
-2 Deleting an MP3 File From Your Computer=Deleting_an_MP3_File_From_Your_Computer>Main
+2 Deleting an MP3 File from Your Computer=Deleting_an_MP3_File_from_Your_Computer>Main
 1 Creating and Modifying Playlists
 2 Creating a New Playlist=Creating_a_New_Playlist>Main
 2 Opening a Playlist=Opening_a_Playlist>Main
@@ -25,10 +27,10 @@
 2 Editing the Currently Playing Playlist=Editing_the_Currently_Playing_Playlist>Main
 2 Saving a Playlist=Saving_a_Playlist
 2 Clearing a Playlist=Clearing_a_Playlist>Main
-2 Changing the Order of Files in a Playlist=Changing_the_Order_of_Files_in_a_Playlist>Main
-2 Sorting Files in the Playlist=Sorting_Files_in_the_Playlist>Main
-1 Playing Files
-2 Playing Files=Playing_Files>Main
+2 Changing the Order of Tracks in a Playlist=Changing_the_Order_of_Tracks_in_a_Playlist>Main
+2 Sorting Tracks in the Playlist=Sorting_Tracks_in_the_Playlist>Main
+1 Playing Music
+2 Playing Music=Playing_Music>Main
 2 Beginning Playback Automatically=Beginning_Playback_Automatically>Main
 2 Repeating Playback=Repeating_Playback>Main
 2 Playing Tracks in Random Order=Playing_Tracks_in_Random_Order>Main
@@ -59,9 +61,9 @@
 2 Preferences - General=Preferences_General>Main
 2 Preferences - Themes=Preferences_Themes>Main
 2 Preferences - Streaming=Preferences_Streaming
+2 Preferences - Plugins=Preferences_Plugins>Main
 2 Preferences - Update=Preferences_Update
 2 Preferences - Advanced=Preferences_Advanced>Main
-2 Preferences - Plugins=Preferences_Plugins>Main
 2 Preferences - About=Preferences_About>Main
 2 Download Manager=Download_Manager>Main
 2 Keyboard Shortcuts=Keyboard_Shortcuts>Main
@@ -75,3 +77,5 @@
 2 Updating FreeAmp=Updating_FreeAmp>Main
 1 Glossary of Terms
 2 Glossary=Glossary>Main
+1 Technical Support
+2 Technical Support=Technical_Support>Main
