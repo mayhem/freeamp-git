@@ -28,6 +28,14 @@ ____________________________________________________________________________*/
 
 #include "config.h"
 #include "errors.h"
+#include "vector.h"
+#include "win32impl.h"
+
+class LibDirFindHandle {
+ public:
+    Vector <char *> *m_pLibDirs;
+    int32 m_current;
+};
 
 
 class Preferences {
@@ -42,6 +50,10 @@ class Preferences {
     Error GetDefaultUI(char* name, uint32* len);
     Error SetDefaultUI(char* path);
 
+    HANDLE GetFirstLibDir(char *path, uint32 *len);
+    Error GetNextLibDir(HANDLE hLibDirFind,char *path, uint32 *len);
+    Error GetLibDirClose(HANDLE hLibDirFind);
+
  protected:
     Error GetPrefString(const char* pref, char* buf, uint32* len);
     Error SetPrefString(const char* pref, char* buf);
@@ -52,3 +64,8 @@ class Preferences {
 };
 
 #endif /* _PREFERENCES_H */
+
+
+
+
+

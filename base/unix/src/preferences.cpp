@@ -160,3 +160,19 @@ Error Preferences::SetPrefString(const char* pref, char* buf) {
     return error;
 #endif
 }
+
+HANDLE Preferences::GetFirstLibDir(char *path, uint32 *len) {
+    getcwd(path,*len);
+    return (HANDLE)1;
+}
+
+
+Error Preferences::GetNextLibDir(HANDLE hLibDirFind,char *path, uint32 *len) {
+
+    return kError_NoMoreLibDirs;
+}
+
+Error Preferences::GetLibDirClose(HANDLE hLibDirFind) {
+
+    return kError_NoErr;
+}
