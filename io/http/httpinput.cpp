@@ -453,8 +453,7 @@ EncodeURI(string & URI)
 {
    string::size_type convert = 0;
    const char *legalCharacters =
-
-      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/?.";
+      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/?&=-.";
 
    if (strncmp(URI.c_str(), "http://", 7) == 0)
        convert = URI.find(string("/"), 7);
@@ -676,6 +675,7 @@ HttpInput::Open(void)
               "Icy-MetaData:1\r\n"
               "User-Agent: FreeAmp/%s\r\n", szHostName, FREEAMP_VERSION);
    }
+      puts(szQuery);
 
    m_pContext->prefs->GetPrefBoolean(kUseTitleStreamingPref,
                                      &bUseTitleStreaming);
