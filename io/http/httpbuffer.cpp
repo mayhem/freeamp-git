@@ -105,7 +105,15 @@ HttpBuffer::~HttpBuffer(void)
 void HttpBuffer::LogError(char *szErrorMsg)
 {
 #ifdef WIN32
-    sprintf(m_szError, "%s: %s", szErrorMsg, WSAGetLastError());
+	char *lpMessageBuffer;
+
+    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL,
+                  WSAGetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                  (LPTSTR) &lpMessageBuffer, 0, NULL );
+
+    sprintf(m_szError, "%s: %s", szErrorMsg, lpMessageBuffer);
+	LocalFree(lpMessageBuffer);
+
 #else
     sprintf(m_szError, "%s: %s", szErrorMsg, strerror(errno));
 #endif
@@ -249,13 +257,14 @@ Error HttpBuffer::Open(void)
                 szHostName);
 
     iRet = send(m_hHandle, szQuery, strlen(szQuery), 0);
-    delete szQuery;
     if (iRet != strlen(szQuery))
     {
+		delete szQuery;
         LogError("Cannot write to socket");
         closesocket(m_hHandle);
         return (Error)httpError_SocketWrite;
     }
+	delete szQuery;
 
     pInitialBuffer = new char[iInitialBufferSize + 1];
 
