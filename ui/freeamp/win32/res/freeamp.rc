@@ -47,7 +47,64 @@ BEGIN
                     IDC_STATIC,4,3,211,24
 END
 
-IDD_PREF1 DIALOG DISCARDABLE  0, 0, 218, 159
+IDD_PREF1 DIALOG DISCARDABLE  0, 0, 218, 167
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "General"
+FONT 8, "MS Sans Serif"
+BEGIN
+    COMBOBOX        IDC_UI,73,13,125,50,CBS_DROPDOWNLIST | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "User Interface:",IDC_STATIC,19,15,48,8
+    COMBOBOX        IDC_PMO,73,31,125,54,CBS_DROPDOWNLIST | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Output:",IDC_STATIC,42,32,25,8
+    GROUPBOX        "Plug-Ins",IDC_STATIC,3,2,212,48
+    GROUPBOX        "Decoder Priority",IDC_STATIC,3,54,212,43
+    CONTROL         "Slider1",IDC_PRIORITY,"msctls_trackbar32",TBS_AUTOTICKS | 
+                    WS_TABSTOP,48,65,121,15
+    GROUPBOX        "Buffer Sizes",IDC_STATIC,3,102,212,62
+    EDITTEXT        IDC_INPUT,111,114,25,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Input Buffer Size:",IDC_STATIC,51,116,57,8
+    EDITTEXT        IDC_OUTPUT,111,130,25,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Output Buffer Size:",IDC_STATIC,46,132,60,8
+    LTEXT           "Kilobytes",IDC_STATIC,141,116,29,8
+    LTEXT           "Kilobytes",IDC_STATIC,141,132,29,8
+    LTEXT           "Low",IDC_STATIC,47,83,14,8
+    LTEXT           "Normal",IDC_STATIC,80,83,23,8
+    LTEXT           "High",IDC_STATIC,119,83,16,8
+    LTEXT           "Realtime",IDC_STATIC,146,83,28,8
+    EDITTEXT        IDC_STREAM_INTERVAL,111,146,25,12,ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    LTEXT           "Buffer Streams For",IDC_STATIC,46,148,59,8
+    LTEXT           "Seconds",IDC_STATIC,141,148,29,8
+END
+
+IDD_PREF2 DIALOG DISCARDABLE  0, 0, 218, 159
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Debug"
+FONT 8, "MS Sans Serif"
+BEGIN
+    GROUPBOX        "",IDC_STATIC,3,90,212,65
+    LTEXT           " ",IDC_STATIC,9,89,8,8
+    CONTROL         "Enable Logging",IDC_LOG,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,11,89,63,10
+    LTEXT           "If you are experiencing a problem with FreeAmp it is possible to log what the program is doing in order to help us track down the cause. When you enable logging a file is created in the program's install",
+                    IDC_STATIC,3,5,212,24
+    LTEXT           "directory called freeamp.log. You should send us the log file when you report a bug.",
+                    IDC_STATIC,3,29,212,17
+    CONTROL         "Log input from PMIs (e.g. File, HTTP, ShoutCAST)",
+                    IDC_LOGINPUT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,
+                    106,174,10
+    CONTROL         "Log output from PMOs (e.g. Wave, DirectSound)",
+                    IDC_LOGOUTPUT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,
+                    122,169,10
+    CONTROL         "Log decoding process (e.g. MP3, CDDA)",IDC_LOGDECODER,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,138,145,10
+    LTEXT           "You have the ability to narrow the logging to a particular portion of FreeAmp by selecting the various logging options. If you are not sure in which portion of the program the problem is occuring you can simply enable all the logging options.",
+                    IDC_STATIC,3,49,212,32
+END
+
+IDD_PREF1_OLD DIALOG DISCARDABLE  0, 0, 218, 159
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "General"
 FONT 8, "MS Sans Serif"
@@ -61,14 +118,18 @@ BEGIN
     GROUPBOX        "Plug-Ins",IDC_STATIC,3,5,212,53
     GROUPBOX        "Decoder",IDC_STATIC,3,66,212,90
     CONTROL         "Slider1",IDC_PRIORITY,"msctls_trackbar32",TBS_AUTOTICKS | 
-                    WS_TABSTOP,48,87,121,14
+                    WS_TABSTOP,48,86,121,15
     GROUPBOX        "Priority",IDC_STATIC,39,77,138,36
-    EDITTEXT        IDC_INPUT,112,119,25,12,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "Input Buffer Size:",IDC_STATIC,46,121,57,8
-    EDITTEXT        IDC_OUTPUT,112,137,25,12,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "Output Buffer Size:",IDC_STATIC,47,139,60,8
-    LTEXT           "Kilobytes",IDC_STATIC,142,121,29,8
-    LTEXT           "Kilobytes",IDC_STATIC,142,139,29,8
+    EDITTEXT        IDC_INPUT,111,119,25,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Input Buffer Size:",IDC_STATIC,51,121,57,8
+    EDITTEXT        IDC_OUTPUT,111,137,25,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Output Buffer Size:",IDC_STATIC,46,139,60,8
+    LTEXT           "Kilobytes",IDC_STATIC,141,121,29,8
+    LTEXT           "Kilobytes",IDC_STATIC,141,139,29,8
+    LTEXT           "Low",IDC_STATIC,47,103,14,8
+    LTEXT           "Normal",IDC_STATIC,80,103,23,8
+    LTEXT           "High",IDC_STATIC,119,103,16,8
+    LTEXT           "Realtime",IDC_STATIC,146,103,28,8
 END
 
 
@@ -217,6 +278,22 @@ END
 GUIDELINES DESIGNINFO DISCARDABLE 
 BEGIN
     IDD_PREF1, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 215
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 164
+    END
+
+    IDD_PREF2, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 215
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 155
+    END
+
+    IDD_PREF1_OLD, DIALOG
     BEGIN
         LEFTMARGIN, 3
         RIGHTMARGIN, 215

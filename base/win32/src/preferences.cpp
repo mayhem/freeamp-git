@@ -43,15 +43,17 @@ const char* kMinimizeToTrayPref = "MinimizeToTray";
 const char* kInputBufferSizePref = "InputBufferSize";
 const char* kOutputBufferSizePref = "OutputBufferSize";
 const char* kStreamBufferIntervalPref = "StreamBufferInterval";
+const char* kDecoderThreadPriorityPref = "DecoderThreadPriority";
 
 // default values
 const char*  kDefaultUI = "freeamp.ui";
 const char*  kDefaultPMO = "soundcard.pmo";
 const bool   kDefaultStayOnTop = false;
 const bool   kDefaultMinimizeToTray = false;
-const int32  kDefaultInputBufferSize = 512;
+const int32  kDefaultInputBufferSize = 64;
 const int32  kDefaultOutputBufferSize = 512;
-const int32  kDefaultStreamBufferInterval = 15;
+const int32  kDefaultStreamBufferInterval = 3;
+const int32  kDefaultDecoderThreadPriority = 1;
 
 
 
@@ -297,7 +299,12 @@ Initialize()
             SetPrefInt32(kOutputBufferSizePref, kDefaultOutputBufferSize);
 
             // set default for streaming buffer interval
-            SetPrefInt32(kStreamBufferIntervalPref, kDefaultStreamBufferInterval);
+            SetPrefInt32(   kStreamBufferIntervalPref, 
+                            kDefaultStreamBufferInterval);
+
+            // set default for decoder thread priority
+            SetPrefInt32(   kDecoderThreadPriorityPref, 
+                            kDefaultDecoderThreadPriority);
 
             error = kError_NoErr;
         }
@@ -440,6 +447,20 @@ Preferences::
 SetStreamBufferInterval(int32 value)
 {
     return SetPrefInt32(kStreamBufferIntervalPref, value);
+}
+
+Error 
+Preferences::
+GetDecoderThreadPriority(int32* value)
+{
+    return GetPrefInt32(kDecoderThreadPriorityPref, value);
+}
+
+Error 
+Preferences::
+SetDecoderThreadPriority(int32 value)
+{
+    return SetPrefInt32(kDecoderThreadPriorityPref, value);
 }
 
 Error

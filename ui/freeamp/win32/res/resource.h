@@ -81,12 +81,19 @@
 #define IDD_PREF1                       193
 #define IDD_OPENURL                     219
 #define IDD_SAVERIO                     220
+#define IDD_PREF2                       221
+#define IDD_PREF1_OLD                   222
 #define IDC_SAVE_RIO                    1002
 #define IDC_UI                          1005
 #define IDC_PMO                         1006
 #define IDC_PRIORITY                    1007
 #define IDC_INPUT                       1008
+#define IDC_LOGOUTPUT                   1009
 #define IDC_OUTPUT                      1010
+#define IDC_LOG                         1010
+#define IDC_STREAM_INTERVAL             1011
+#define IDC_LOGINPUT                    1012
+#define IDC_LOGDECODER                  1013
 #define IDC_OPEN_URL                    1029
 #define IDC_ITEM                        40001
 #define IDC_ABOUT                       40002
@@ -104,7 +111,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        194
 #define _APS_NEXT_COMMAND_VALUE         40007
-#define _APS_NEXT_CONTROL_VALUE         1009
+#define _APS_NEXT_CONTROL_VALUE         1015
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -40,6 +40,7 @@ extern const char* kMinimizeToTrayPref;
 extern const char* kInputBufferSizePref;
 extern const char* kOutputBufferSizePref;
 extern const char* kStreamBufferIntervalPref;
+extern const char* kDecoderThreadPriorityPref;
 
 
 class Preferences {
@@ -88,6 +89,9 @@ class Preferences {
 
     Error GetStreamBufferInterval(int32* value);
     Error SetStreamBufferInterval(int32 value);
+
+    Error GetDecoderThreadPriority(int32* value);
+    Error SetDecoderThreadPriority(int32 value);
 
  protected:
     

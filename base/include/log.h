@@ -45,6 +45,7 @@ class LogFile
         virtual ~LogFile(void);
 
         bool     Open(void);
+        bool     Close(void);
         void     ClearLogLevel(void) 
                  { m_iLogLevelFlags = 0; };
         void     AddLogLevel(int iLogLevelFlags);

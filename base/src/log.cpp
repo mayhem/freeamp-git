@@ -64,6 +64,19 @@ bool LogFile::Open(void)
     return m_fpLog != NULL;
 }
 
+bool LogFile::Close(void)
+{
+    if (m_fpLog == NULL)
+        return false;
+    else
+    {
+        fclose(m_fpLog);
+        m_fpLog = NULL;
+    }
+
+    return true;
+}
+
 void LogFile::AddLogLevel(int iLogLevelFlags)
 {
     if (iLogLevelFlags < 0 || iLogLevelFlags >= LogLast)
