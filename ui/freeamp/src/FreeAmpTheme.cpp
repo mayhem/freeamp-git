@@ -1029,6 +1029,19 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
               
        return kError_NoErr;
    }    
+   if (oControlName == string("Preamp") && eMesg == CM_SliderUpdate)
+   {
+       string oName("Info"), oDesc;
+       char   szText[20];
+       int    iPos;
+
+       m_pWindow->ControlIntValue(oControlName, false, iPos);
+       sprintf(szText, "%d db", ((iPos - 50) * 10) / 25);
+       oDesc = string(szText);
+       m_pWindow->ControlStringValue(oName, true, oDesc);
+                                
+       return kError_NoErr;
+   }    
    if (oControlName == string("PlayPause") && eMesg == CM_Pressed)
    {
        int iState = 0;
