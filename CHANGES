@@ -7,9 +7,16 @@ Changes for Linux and Windows version 1.3.0:
 - Added HTTP proxy support (thanks to Alan Cutter for the patch)
 - Improved audio pipeline with much clearer model and common base classes
 - Added support for selecting network card for streaming plugins
-- Added Enlightened Sound Daemon support. Thanks for Isaac Richards (Linux)
-- Added icecast style titlestreaming support
-- Added ncurses UI for unix
+- Added Linux Enlightened Sound Daemon support. (thanks go to Isaac Richards)
+- Added icecast style title streaming support
+- Added ncurses UI for unix (thanks go to Stephan Auerhahn)
+- Fixed lots of the volume bugs for win98/95
+- Fixed "tray menu hanging around" bug
+- Fixed "Lack of changelog"... here it is!
+- You can now use FreeAmp to play files directly from Netscape
+- Random playing is now actually random and non repeating, repeating,
+  repeating, repeating...
+
 
 Changes for Linux and Windows version 1.2.3:
 --------------------------------------------------------------------
