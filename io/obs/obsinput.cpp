@@ -47,7 +47,7 @@ ____________________________________________________________________________*/
 LogFile *g_Log;
 
 const int iBufferSize = 8192;
-const int iOverflowSize = 1024;
+const int iOverflowSize = 1536;
 const int iTriggerSize = 1024;
 
 extern    "C"

@@ -50,8 +50,8 @@ extern    "C"
 
 static char *g_ErrorArray[8] =
 {
-   "Invalid Error Code",
-   "dsp device open failed",
+   "Unknown Error Code",
+   "Cannot open the sound device (/dev/dsp).",
    "fcntl F_GETFL on /dev/dsp failed",
    "fcntl F_SETFL on /dev/dsp failed"
    "ioctl reset failed",

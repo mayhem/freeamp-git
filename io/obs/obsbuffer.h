@@ -59,7 +59,7 @@ struct RTPHeader
 
 enum
 {
-   obsError_MinimumError = 0x00010000,
+   obsError_MinimumError = 3000,
    obsError_BadUrl,
    obsError_CannotSetSocketOpts,
    obsError_CannotCreateSocket,

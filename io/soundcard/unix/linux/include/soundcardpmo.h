@@ -38,7 +38,7 @@ ____________________________________________________________________________*/
 static const uint32 OBUFFERSIZE = 2 * 1152;
 
 enum {
-    pmoError_MinimumError = 0x00010000,
+    pmoError_MinimumError = 4000,
     pmoError_DeviceOpenFailed,
     pmoError_IOCTL_F_GETFL,
     pmoError_IOCTL_F_SETFL,

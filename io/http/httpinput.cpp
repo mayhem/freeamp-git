@@ -44,7 +44,7 @@ ____________________________________________________________________________*/
 #include "httpinput.h"
 
 const int iBufferSize = 8192;
-const int iOverflowSize = 1464;
+const int iOverflowSize = 1536;
 const int iTriggerSize = 1024;
 
 extern    "C"

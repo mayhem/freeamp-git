@@ -70,15 +70,12 @@ AUDIO;
 
 enum
 {
-   lmcError_MinimumError = 0x00010000,
-   lmcError_HeadInfoReturnedZero,
+   lmcError_MinimumError = 1000,
+   lmcError_DecodeFailed,
    lmcError_AudioDecodeInitFailed,
-   lmcError_BSFillFailed,
    lmcError_DecoderThreadFailed,
-   lmcError_OutputWriteFailed,
-   lmcError_DecodeDidntDecode,
-   lmcError_ID3ReadFailed,
-   lmcError_OutputInitializeFailed,
+   lmcError_PMIError,
+   lmcError_PMOError,
    lmcError_MaximumError
 };
 
@@ -147,6 +144,7 @@ class     XingLMC:public LogicalMediaConverter
    int32     m_frameCounter;
 	time_t    m_iBufferUpdate;
    char     *m_szUrl;
+   const char *m_szError;
 
 };
 

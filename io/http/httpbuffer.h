@@ -49,7 +49,7 @@ struct ID3Tag
 
 enum
 {
-   httpError_MinimumError = 0x00010000,
+   httpError_MinimumError = 2000,
    httpError_BadUrl,
    httpError_GetHostByNameFailed,
    httpError_CannotOpenSocket,

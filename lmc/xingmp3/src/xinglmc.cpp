@@ -82,17 +82,21 @@ static AUDIO audio_table[2][2] =
    }
 };
 
+/* Error codes:
+
+   LMC        1000
+   HTTP   pmi 2000
+   OBS    omi 3000
+   Souund pmo 4000
+*/
 static char *g_ErrorArray[9] =
 {
-   "Invalid Error Code",
-   "head_info2 return 0 bytes/frame",
-   "audio.decode_init failed",
-   "bs_fill() failed",
-   "creation of decoder thread failed",
-   "output didn't return the same number of bytes we wrote",
-   "decoder method didn't return anything",
-   "seeking and reading ID3v1(.1) tag failed",
-   "output initialization failed"
+   "Unknown error code",
+   "The decoder cannot decode this MP3.",
+   "The decoder could not be initialized.",
+   "The LMC could not create the decoder thread.",
+   "A PMI error occurred."
+   "A PMO error occurred."
 };
 
 static int sample_rate_table[8] =
@@ -101,7 +105,7 @@ static int sample_rate_table[8] =
 };
 
 const int ID3_TAG_SIZE = 128;
-const int iMaxDecodeRetries = 65535;
+const int iMaxDecodeRetries = 32;
 const int iStreamingBufferSize = 3;  // in seconds
 const int iMaxFrameSize = 1046;
 
@@ -121,6 +125,7 @@ XingLMC::XingLMC()
 	m_iBufferUpdate = 0;
 	m_iBitRate = 0;
 	m_frameBytes = -1;
+   m_szUrl = NULL;
    m_szUrl = NULL;
 
    m_pcmBuffer = NULL;
@@ -173,7 +178,6 @@ XingLMC::~XingLMC()
       free(m_szUrl);
       m_szUrl = NULL;
    }
-
 }
 
 Error     XingLMC::
@@ -288,6 +292,12 @@ bool XingLMC::IsStreaming()
 
 const char *XingLMC::GetErrorString(int32 error)
 {
+   if (error == lmcError_PMIError && m_input)
+      return m_szError;
+       
+   if (error == lmcError_PMOError && m_output)
+      return m_szError;
+       
    if ((error <= lmcError_MinimumError) || (error >= lmcError_MaximumError))
    {
       return g_ErrorArray[0];
@@ -307,24 +317,20 @@ Error XingLMC::AdvanceBufferToNextFrame()
    Err = BeginRead(pBufferBase, iNumBytes);
    if (Err != kError_NoErr)
    {
-	    return Err;
+       printf("%d\n", Err);
+       m_szError = m_input->GetErrorString(Err);
+	    return (Error)lmcError_PMIError;
    }
 
    for(;;)
    {
 		 pBuffer = ((unsigned char *)pBufferBase) + 1;
 
-       //for(int i = 0; i<20; i++)
-       //   printf("%02X ", pBuffer[i] & 0xFF);
-       //printf("\n");
-	    
        for(iCount = 0; iCount < iNumBytes - 1 &&
            !(*pBuffer == 0xFF && (*(pBuffer+1) & 0xF0) == 0xF0); 
            pBuffer++, iCount++)
                ; // <=== Empty body!
  
-       //printf("iNumBytes: %d iCount: %d\n", iNumBytes, iCount);
-
        g_Log->Log(LogDecode, "Skipped %d bytes in advance frame.\n", iCount + 1);
        if (m_input)
            m_input->EndRead(iCount + 1);
@@ -335,10 +341,12 @@ Error XingLMC::AdvanceBufferToNextFrame()
        }
 
        iNumBytes = iMaxFrameSize;
-       BeginRead(pBufferBase, iNumBytes);
+       Err = BeginRead(pBufferBase, iNumBytes);
        if (Err != kError_NoErr)
        {
-	        return Err;
+           printf("%d\n", Err);
+           m_szError = m_input->GetErrorString(Err);
+	        return (Error)lmcError_PMIError;
        }
    }
 
@@ -384,11 +392,12 @@ Error XingLMC::GetHeadInfo()
        }
 		 else
 		 {
-		     return Err;
+           m_szError = m_input->GetErrorString(Err);
+	        return (Error)lmcError_PMIError;
        }
    }
 
-   return (Error)lmcError_HeadInfoReturnedZero;
+   return (Error)lmcError_DecodeFailed;
 }
 
 bool XingLMC::CanDecode()
@@ -577,8 +586,9 @@ Error XingLMC::InitDecoder()
          Error     error = m_output->Init(&info);
          if (error != kError_NoErr)
          {
-            g_Log->Error("PMO->Init() returned an error: %s\n", m_output->GetErrorString(error));
-            return (Error) lmcError_OutputInitializeFailed;
+            m_szError = m_output->GetErrorString(error);
+            g_Log->Error("PMO->Init() returned an error: %s\n", m_szError); 
+            return (Error) lmcError_PMOError;
          }
 
          m_pcmBuffer = new unsigned char[info.max_buffer_size];
@@ -672,8 +682,9 @@ void XingLMC::DecodeWork()
 
    if (IsError(Err))
    {
-       g_Log->Error("PMI initialization failed: %d\n", Err);
-       m_target->AcceptEvent(new LMCErrorEvent(this,Err));
+       m_szError = m_input->GetErrorString(Err);
+       g_Log->Error("PMI initialization failed: %s\n", m_szError);
+       m_target->AcceptEvent(new LMCErrorEvent(this,(Error)lmcError_PMIError));
 
        return;
    }
@@ -682,7 +693,8 @@ void XingLMC::DecodeWork()
    if (!bRet)
    {
        g_Log->Error("CanDecode returned false. This LMC cannot decode this media\n");
-       m_target->AcceptEvent(new LMCErrorEvent(this,Err));
+       m_target->AcceptEvent(new LMCErrorEvent(this,
+                             (Error)lmcError_DecodeFailed));
 
        return;
    }
@@ -774,8 +786,10 @@ void XingLMC::DecodeWork()
           if (Err != kError_NoErr)
           {
               m_seekMutex->Release();
-              g_Log->Error("LMC: Cannot read from pullbuffer: %d\n", Err); 
-              m_target->AcceptEvent(new LMCErrorEvent(this,Err));
+              m_szError = m_input->GetErrorString(Err);
+              m_target->AcceptEvent(new LMCErrorEvent(this,
+                                    (Error)lmcError_PMIError));
+              g_Log->Error("LMC: Cannot read from pullbuffer: %s\n", m_szError); 
 
               return;
           }
@@ -798,7 +812,7 @@ void XingLMC::DecodeWork()
              if (Err != kError_NoErr)
              {
                  m_seekMutex->Release();
-                 g_Log->Error("LMC: Cannot advance to next frame.\n");
+                 g_Log->Error("LMC: Cannot advance to next frame: %d\n", Err);
                  m_target->AcceptEvent(new LMCErrorEvent(this,Err));
 
                  return;
@@ -815,8 +829,10 @@ void XingLMC::DecodeWork()
       if (iLoop == iMaxDecodeRetries)
       {
          m_seekMutex->Release();
-         g_Log->Error("LMC: Maximum number of retries reached while trying to decode.\n");
-         m_target->AcceptEvent(new LMCErrorEvent(this, (Error) lmcError_DecodeDidntDecode));
+         g_Log->Error("LMC: Maximum number of retries reached"
+                      " while trying to decode.\n");
+         m_target->AcceptEvent(new LMCErrorEvent(this, 
+              (Error)lmcError_DecodeFailed));
 
          return;
       }
@@ -843,8 +859,11 @@ void XingLMC::DecodeWork()
             if (error != kError_NoErr)
             {
                m_seekMutex->Release();
-               m_target->AcceptEvent(new LMCErrorEvent(this, (Error) lmcError_OutputWriteFailed));
-               g_Log->Error("LMC: Cannot write to output plugin.\n");
+               m_szError = m_output->GetErrorString(error);
+               m_target->AcceptEvent(new LMCErrorEvent(this, 
+                       (Error)lmcError_PMOError));
+               g_Log->Error("LMC: Cannot write to output plugin: %s\n",
+                           m_szError);
                return;
             }
 
@@ -873,8 +892,11 @@ void XingLMC::DecodeWork()
 
       if (error != kError_NoErr)
       {
-         m_target->AcceptEvent(new LMCErrorEvent(this, (Error) lmcError_OutputWriteFailed));
-         g_Log->Error("LMC: Cannot write to output plugin.\n");
+         m_szError = m_output->GetErrorString(error);
+         m_target->AcceptEvent(new LMCErrorEvent(this, 
+                   (Error)lmcError_PMOError));
+         g_Log->Error("LMC: Cannot write to output plugin: %s\n",
+               m_szError);
          return;
       }
 #define _VISUAL_ENABLE_
