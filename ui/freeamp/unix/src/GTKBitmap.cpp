@@ -128,12 +128,12 @@ Error GTKBitmap::LoadBitmapFromDisk(string &oFile)
     gulong rmask = 0xff, gmask = 0xff, bmask = 0xff;
     gulong rshift = 0, gshift = 0, bshift = 0;
 
-    if (stat(oFile.c_str(), &statbuf) == -1)
+    if (stat(oFile.c_str(), &statbuf) == -1) 
         return kError_LoadBitmapFailed;
     size = statbuf.st_size;
 
     file = fopen(oFile.c_str(), "rb");
-    if (!file)
+    if (!file) 
         return kError_LoadBitmapFailed;
 
     if (fread(type, 1, 2, file) != 2) {

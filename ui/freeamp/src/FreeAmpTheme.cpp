@@ -27,6 +27,8 @@ ____________________________________________________________________________*/
 #include <sys/stat.h>
 #ifndef WIN32
 #include <unistd.h>
+#define _stat stat
+#define _S_IFDIR S_IFDIR
 #endif
 #include "config.h"
 #include "downloadmanager.h"

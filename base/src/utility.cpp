@@ -416,7 +416,7 @@ void ToUpper(char *s)
 {
     char *p;
     
-    for(p = s; *p != NULL; p++)
+    for(p = s; *p != '\0'; p++)
        *p = toupper(*p);
 }       
 
@@ -424,6 +424,6 @@ void ToLower(char *s)
 {
     char *p;
     
-    for(p = s; *p != NULL; p++)
+    for(p = s; *p != '\0'; p++)
        *p = tolower(*p);
 }       

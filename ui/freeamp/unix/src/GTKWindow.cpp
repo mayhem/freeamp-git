@@ -170,7 +170,6 @@ Error GTKWindow::VulcanMindMeld(Window *pOther)
 
     m_pCanvas->GetBackgroundRect(oRect);
     pOther->GetWindowPosition(oRect);
-    SetWindowPosition(oRect);
     GdkBitmap *mask = ((GTKCanvas *)m_pCanvas)->GetMask();
 
     gdk_threads_enter();

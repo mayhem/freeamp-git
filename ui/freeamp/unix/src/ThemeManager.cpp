@@ -64,18 +64,16 @@ Error ThemeManager::GetThemeList(map<string, string> &oThemeFileMap)
     oThemePath = oThemeBasePath + string("/*.fat");    
 
     handle = FindFirstFile((char *)oThemePath.c_str(), &find);
-    if(handle == INVALID_HANDLE_VALUE)
-        return kError_NoErr;
+    if(handle != INVALID_HANDLE_VALUE)
+        do {
+   	    oThemeFile = oThemeBasePath + string("/") + string(find.cFileName);
+    	    ptr = strrchr(find.cFileName, '.');
+            if (ptr)
+               *ptr = 0;
 
-    do {
-	oThemeFile = oThemeBasePath + string("/") + string(find.cFileName);
-    	ptr = strrchr(find.cFileName, '.');
-        if (ptr)
-           *ptr = 0;
-
-        oThemeFileMap[find.cFileName] = oThemeFile;
-    }
-    while(FindNextFile(handle, &find));
+            oThemeFileMap[find.cFileName] = oThemeFile;
+        }
+        while(FindNextFile(handle, &find));
 
     oThemeBasePath = FreeampDir(NULL) + string("/themes");
 
@@ -84,32 +82,28 @@ Error ThemeManager::GetThemeList(map<string, string> &oThemeFileMap)
         mkdir(oThemeBasePath.c_str(), 0755);
     oThemePath = oThemeBasePath + string("/*.fat");
     handle = FindFirstFile((char *)oThemePath.c_str(), &find);
-    if(handle == INVALID_HANDLE_VALUE)
-        return kError_NoErr;
-
-    do {
-        oThemeFile = oThemeBasePath + string("/") + string(find.cFileName);
-        ptr = strrchr(find.cFileName, '.');
-        if (ptr)
-           *ptr = 0;
-        oThemeFileMap[find.cFileName] = oThemeFile;
-    }
-    while(FindNextFile(handle, &find));
+    if(handle != INVALID_HANDLE_VALUE)
+        do {
+            oThemeFile = oThemeBasePath + string("/") + string(find.cFileName);
+            ptr = strrchr(find.cFileName, '.');
+            if (ptr)
+               *ptr = 0;
+            oThemeFileMap[find.cFileName] = oThemeFile;
+        }
+        while(FindNextFile(handle, &find));
 
     oThemeBasePath = "./themes";
     oThemePath = oThemeBasePath + string("/*.fat");
     handle = FindFirstFile((char *)oThemePath.c_str(), &find);
-    if(handle == INVALID_HANDLE_VALUE)
-        return kError_NoErr;
-
-    do {
-        oThemeFile = oThemeBasePath + string("/") + string(find.cFileName);
-        ptr = strrchr(find.cFileName, '.');
-        if (ptr)
-           *ptr = 0;
-        oThemeFileMap[find.cFileName] = oThemeFile;
-    }
-    while(FindNextFile(handle, &find));
+    if(handle != INVALID_HANDLE_VALUE)
+        do {
+            oThemeFile = oThemeBasePath + string("/") + string(find.cFileName);
+            ptr = strrchr(find.cFileName, '.');
+            if (ptr)
+               *ptr = 0;
+            oThemeFileMap[find.cFileName] = oThemeFile;
+        }
+        while(FindNextFile(handle, &find));
 
     return kError_NoErr;
 }

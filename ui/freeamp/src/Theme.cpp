@@ -394,7 +394,7 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
        pBitmap = new BeOSBitmap(oAttrMap["Name"]);
 #endif
 
-	   if (oAttrMap.find("TransColor") != oAttrMap.end())
+       if (oAttrMap.find("TransColor") != oAttrMap.end())
        {
            eRet = ParseColor(oAttrMap["TransColor"], oColor);
            if (eRet == kError_NoErr)
@@ -402,7 +402,7 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
        }
 
            
-	   if (oAttrMap.find("File") == oAttrMap.end())
+       if (oAttrMap.find("File") == oAttrMap.end())
        {
            m_oLastError = string("the <Bitmap> tag needs a File attribute");
            return kError_ParseError;
