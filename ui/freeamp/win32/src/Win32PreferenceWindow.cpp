@@ -1936,6 +1936,8 @@ bool Win32PreferenceWindow::PrefProfileProc(HWND hwnd,
                         APSInterface *pAPS = m_pContext->aps;
                         if (pAPS)
                         {
+							vector<string> *profiles = pAPS->GetKnownProfiles();
+
                             int nRes = pAPS->CreateProfile(szCurSel);
                             SendDlgItemMessage(hwnd, IDC_PROFILE_LIST,
                                                LB_ADDSTRING, NULL, 
@@ -1943,6 +1945,12 @@ bool Win32PreferenceWindow::PrefProfileProc(HWND hwnd,
                             SendDlgItemMessage(hwnd, IDC_PROFILE_LIST,
                                                LB_SELECTSTRING, -1,
                                                (LPARAM)(LPCTSTR)szCurSel);
+
+							if (!profiles || profiles->size() == 0)
+								m_pContext->target->AcceptEvent(new Event(INFO_UnsignaturedTracksExist));
+
+							if (profiles)
+								delete profiles;
                         }
                     }
                     break;
