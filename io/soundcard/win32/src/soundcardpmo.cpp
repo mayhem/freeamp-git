@@ -97,6 +97,7 @@ SoundCardPMO::SoundCardPMO() :
    m_iTail = 0;
    m_iOffset = 0;
    m_iLastFrame = -1;
+   m_bPaused = false;
 
    if (!m_pBufferThread)
    {
@@ -111,6 +112,7 @@ SoundCardPMO::~SoundCardPMO()
    m_bExit = true;
    m_pWriteSem->Signal();
    m_pReadSem->Signal();
+
    m_pPauseMutex->Release();
 
    if (m_pBufferThread)
@@ -121,7 +123,8 @@ SoundCardPMO::~SoundCardPMO()
 
    if (m_initialized)
    {
-      waveOutReset(m_hwo);
+	  waveOutReset(m_hwo);
+
 	  while (waveOutClose(m_hwo) == WAVERR_STILLPLAYING)
       {
          Sleep(SLEEPTIME);
@@ -263,16 +266,24 @@ Error SoundCardPMO::Break()
 
 Error SoundCardPMO::Pause()
 {
+   if (m_bPaused)
+      return kError_NoErr;
+
    m_pPauseMutex->Acquire();
    waveOutPause(m_hwo);
+   m_bPaused = true;
 
    return kError_NoErr;
 }
 
 Error SoundCardPMO::Resume()
 {
+   if (!m_bPaused)
+      return kError_NoErr;
+
    m_pPauseMutex->Release();
    waveOutRestart(m_hwo);
+   m_bPaused = false;
 
    return kError_NoErr;
 }

@@ -95,7 +95,7 @@ public:
 	uint32			m_data_size;
 	uint32			m_num_headers;
 	bool			m_user_stop;
-	bool			m_initialized;
+	bool			m_initialized, m_bPaused;
 
     Thread         *m_pBufferThread;
     Mutex          *m_pPauseMutex;
