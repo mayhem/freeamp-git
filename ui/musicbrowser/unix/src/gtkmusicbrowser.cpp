@@ -24,6 +24,7 @@ ____________________________________________________________________________*/
 #include "config.h"
 
 #include <gtk/gtk.h>
+#include <gdk/gdkkeysyms.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <iostream>
@@ -1820,6 +1821,12 @@ void GTKMusicBrowser::UpdatePlaylistList(void)
     gtk_clist_thaw(GTK_CLIST(playlistList));
 }
 
+void list_keypress(GtkWidget *w, GdkEventKey *ev, GTKMusicBrowser *p)
+{
+    if (ev->keyval == GDK_Delete)
+        p->DeleteEvent();
+}
+
 void GTKMusicBrowser::CreatePlaylistList(GtkWidget *box)
 {
     static char *titles[] =
@@ -1850,6 +1857,8 @@ void GTKMusicBrowser::CreatePlaylistList(GtkWidget *box)
                        GTK_SIGNAL_FUNC(list_drag_rec_internal), this);
     gtk_signal_connect(GTK_OBJECT(playlistList), "drag_motion",
                        GTK_SIGNAL_FUNC(list_drag_motion_internal), this);
+    gtk_signal_connect(GTK_OBJECT(playlistList), "key_press_event",
+                       GTK_SIGNAL_FUNC(list_keypress), this);
 
     gtk_clist_columns_autosize(GTK_CLIST(playlistList));
     gtk_widget_show(playlistList);
@@ -2181,6 +2190,9 @@ void GTKMusicBrowser::SetClickState(ClickState newState)
                                  "/Edit/Edit Info"), FALSE);
         gtk_widget_set_sensitive(toolUp, FALSE);
         gtk_widget_set_sensitive(toolDown, FALSE);
+        gtk_clist_unselect_all(GTK_CLIST(playlistList));
+        if (musicBrowserTree)
+            gtk_clist_unselect_all(GTK_CLIST(musicBrowserTree));
     }
 
     if (!master) {
