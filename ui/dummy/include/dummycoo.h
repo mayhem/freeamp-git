@@ -28,10 +28,9 @@ ____________________________________________________________________________*/
 #include "player.h"
 #include "semaphore.h"
 
-class DummyCOO : public COO {
+class DummyCOO : public UserInterface {
  public:
-    virtual int32 acceptCOOEvent(Event *);
-    virtual void setArgs(int a, char**b) {}
+    virtual int32 AcceptEvent(Event *);
     DummyCOO(Semaphore*);
     virtual ~DummyCOO();
 

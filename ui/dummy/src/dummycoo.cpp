@@ -32,7 +32,7 @@ DummyCOO::~DummyCOO() {
     //cout << "DummyCOO: being deleted..." << endl;
 }
 
-int32 DummyCOO::acceptCOOEvent(Event *pe) {
+int32 DummyCOO::AcceptEvent(Event *pe) {
     if (pe) {
   	//cout << "DummyCOO::acceptEvent: processing " << pe->getEvent() << "..." << endl;
         switch (pe->getEvent()) {

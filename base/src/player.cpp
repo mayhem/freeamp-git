@@ -57,10 +57,10 @@ Player::Player() {
     event_service_thread = Thread::CreateThread();
     event_service_thread->Create(Player::EventServiceThreadFunc,this);
     //cout << "Started event thread" << endl;
-    cio_vector = new Vector<CIO *>();
-    coo_vector = new Vector<COO *>();
-    cio_death_vector = new Vector<CIO *>();
-    coo_death_vector = new Vector<COO *>();
+    cio_vector = new Vector<EventQueue *>();
+    coo_vector = new Vector<EventQueue *>();
+    cio_death_vector = new Vector<EventQueue *>();
+    coo_death_vector = new Vector<EventQueue *>();
     //cout << "Created vectors" << endl;
     coManipLock = new Mutex();
     m_lmcMutex = new Mutex();
@@ -206,16 +206,11 @@ void Player::EventServiceThreadFunc(void *pPlayer) {
     // Time to quit!!!
 }
 
-int32 Player::RegisterCOO(COO *ed) {
-    //cout << "Registering a COO..." << endl;
+int32 Player::RegisterCOO(EventQueue* queue) {
     GetCOManipLock();
-//    cout << "Got comaniplock" << endl;
-    if (coo_vector && ed) {
-        //cout << "about to insert..>" << endl;
-        coo_vector->insert(ed);
-        //cout <<"inserted" << endl;
+    if (coo_vector && queue) {
+        coo_vector->insert(queue);
         ReleaseCOManipLock();
-        //cout <<"released" << endl;
         return 0;
     } else {
         ReleaseCOManipLock();
@@ -223,10 +218,10 @@ int32 Player::RegisterCOO(COO *ed) {
     }
 }
 
-int32 Player::RegisterCIO(CIO *ed) {
+int32 Player::RegisterCIO(EventQueue* queue) {
     GetCOManipLock();
-    if (cio_vector) {
-        cio_vector->insert(ed);
+    if (cio_vector && queue) {
+        cio_vector->insert(queue);
         ReleaseCOManipLock();
         return 0;
     } else {
@@ -307,8 +302,7 @@ void Player::ReleaseCOManipLock() {
 }
 
 int32 Player::AcceptEvent(Event *e) {
-    Event* copy = new Event(*e);
-    event_queue->write(copy);
+    event_queue->write(e);
     event_sem->Signal();
     return 0;
 }
@@ -533,99 +527,102 @@ int32 Player::ServiceEvent(Event *pC) {
             }
 	    
 	    case INFO_ReadyToDieCOO: {
-		if (!imQuitting) 
-                    return 0;
+		    if (!imQuitting) 
+                return 0;
 		
-                if (pC->getArgument()) {
-		    COO *pCOO = (COO *)(pC->getArgument());
-		    //printf("having %x killed(COO)\n",pCOO);
-		    coo_death_vector->insert(pCOO);
-                }
-		
-		quitWaitingFor--;
-		
-		if (quitWaitingFor) 
-                    return 0;
-		
-                GetCOManipLock();
-                //cout << "got comaniplock " << endl;
-                Event* pe = new Event(CMD_Terminate);
-                //cout << "sending to coo's" << endl;
-                SendToCOO(pe);
-                //cout << "done sending to coo's" << endl;
-                delete pe;
-                //cout << "ending inforeadytodieCOO" << endl;
-                return 1;
-		break; 
+            if (pC->getArgument()) {
+		        EventQueue *pCOO = (EventQueue *)(pC->getArgument());
+		        //printf("having %x killed(COO)\n",pCOO);
+		        coo_death_vector->insert(pCOO);
             }
+		
+		    quitWaitingFor--;
+		
+		    if (quitWaitingFor) 
+                return 0;
+		
+            GetCOManipLock();
+            //cout << "got comaniplock " << endl;
+            Event* pe = new Event(CMD_Terminate);
+            //cout << "sending to coo's" << endl;
+            SendToCOO(pe);
+            //cout << "done sending to coo's" << endl;
+            delete pe;
+            //cout << "ending inforeadytodieCOO" << endl;
+            return 1;
+            break; 
+        }
 	    
 	    case INFO_ReadyToDieCIO: {
-                if (!imQuitting) return 0;
-                if (pC->getArgument()) {
-		    CIO *pCIO = (CIO *)(pC->getArgument());
-		    //printf("having %x killed (CIO)\n",pCIO);
-		    cio_death_vector->insert(pCIO);
-                }
-		
-		quitWaitingFor--;
-		if (quitWaitingFor) 
-                    return 0;
-		
-		GetCOManipLock();
-		//cout << "got COManipLock" << endl;
-		Event* pe = new Event(CMD_Terminate);
-		SendToCOO(pe);
-		delete pe;
-		//cout << "ending InfoReadyToDie..." << endl;
-		return 1;
-		break; 
+            if (!imQuitting) 
+                return 0;
+
+            if (pC->getArgument()) {
+		        EventQueue *pCIO = (EventQueue *)(pC->getArgument());
+		        //printf("having %x killed (CIO)\n",pCIO);
+		        cio_death_vector->insert(pCIO);
             }
+		
+		    quitWaitingFor--;
+
+		    if (quitWaitingFor) 
+                return 0;
+		
+		    GetCOManipLock();
+		    //cout << "got COManipLock" << endl;
+		    Event* pe = new Event(CMD_Terminate);
+		    SendToCOO(pe);
+		    delete pe;
+		    //cout << "ending InfoReadyToDie..." << endl;
+		    return 1;
+		    break; 
+        }
 	    
 	    case INFO_MediaVitalStats: {
-		// decoder doesn't yet grab song title...
-		//cout << "Servicing media vital stats..." << endl;
-		GetCOManipLock();
-		//cout << "got lock" << endl;
-		SendToCOO(pC);
-		//cout << "sent to all" << endl;
-		ReleaseCOManipLock();
-		//cout << "Released manip lock..." << endl;
-		delete ((MediaVitalInfo *)pC->getArgument());
-		//cout << "Done servicing mediavitalstats event" << endl;
-		return 0;
-		break; 
-            }
+		    // decoder doesn't yet grab song title...
+		    //cout << "Servicing media vital stats..." << endl;
+		    GetCOManipLock();
+		    //cout << "got lock" << endl;
+		    SendToCOO(pC);
+		    //cout << "sent to all" << endl;
+		    ReleaseCOManipLock();
+		    //cout << "Released manip lock..." << endl;
+		    delete ((MediaVitalInfo *)pC->getArgument());
+		    //cout << "Done servicing mediavitalstats event" << endl;
+		    return 0;
+		    break; 
+        }
 	    
 	    case INFO_MediaTimePosition: {
-		GetCOManipLock();
-		SendToCOO(pC);
-		ReleaseCOManipLock();
-		delete ((MediaTimePositionInfo *)pC->getArgument());
-		return 0;
-		break; 
-            }
+		    GetCOManipLock();
+		    SendToCOO(pC);
+		    ReleaseCOManipLock();
+		    delete ((MediaTimePositionInfo *)pC->getArgument());
+		    return 0;
+		    break; 
+        }
 	    
-            default:
-		cout << "serviceEvent: Unknown event (i.e. I don't do anything with it): " << pC->getEvent() << "  Passing..." << endl;
-		return 0;
-		break;
+        default:
+		    cout << "serviceEvent: Unknown event (i.e. I don't do anything with it): " << pC->getEvent() << "  Passing..." << endl;
+		    return 0;
+		    break;
 		
         }
     } 
     else {
-	cout << "serviceEvent: passed NULL event!!!" << endl;
-	return 255;
+	    cout << "serviceEvent: passed NULL event!!!" << endl;
+	    return 255;
     }
 }
 void Player::SendToCIOCOO(Event *pe) {
     int32 i;
     
     for (i = 0;i<cio_vector->numElements();i++) {
-	cio_vector->elementAt(i)->acceptCIOEvent(pe);
+	cio_vector->elementAt(i)->AcceptEvent(pe);
     }
     
     for (i = 0;i<coo_vector->numElements();i++) {
-	coo_vector->elementAt(i)->acceptCOOEvent(pe);
+	coo_vector->elementAt(i)->AcceptEvent(pe);
     }
 }
 
@@ -633,7 +630,7 @@ void Player::SendToCOO(Event *pe) {
     //cout << "Sending a " << pe->getEvent() << endl;
     for (int32 i=0;i<coo_vector->numElements();i++) {
 	    //cout << "sending to " << i << endl;
-	    coo_vector->elementAt(i)->acceptCOOEvent(pe);
+	    coo_vector->elementAt(i)->AcceptEvent(pe);
 	    //cout << "done from " << i << endl;
     }
 }

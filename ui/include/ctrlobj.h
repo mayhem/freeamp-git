@@ -27,25 +27,23 @@ ____________________________________________________________________________*/
 #include "event.h"
 
 
-class CommandInterface {
+class UserInterface : public EventQueue {
  public:
     virtual int32 AcceptEvent(Event *) = 0;
-    virtual void SetTarget(EventQueue* queue);
-    virtual ~CommandInterface() {}
+    virtual ~UserInterface() {}
 };
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct CIO{
+typedef struct UI{
     void*   ref;
 
-    void    (*SetTarget)        (struct CIO*, EventQueue*);
-    int32   (*AcceptEvent)      (struct CIO*, Event *);
-    void    (*Cleanup)          (struct CIO*);
+    EventQueue* (*Target)   (struct UI);
+    void        (*Cleanup)  (struct UI*);
 
-}CIO, *CIORef;
+}UI, *UIRef;
 
 #ifdef __cplusplus
 } // extern "C"
