@@ -110,8 +110,7 @@ plugins/esound.pmo: $(ESNDOBJ)
 
 # download manager ui
 DOWNLOADUIOBJ = ui/download/unix/src/downloadui.o \
-                ui/download/unix/src/gtkdownloadui.o \
-                base/src/utility.o
+                ui/download/unix/src/gtkdownloadui.o 
 
 plugins/download.ui: $(DOWNLOADUIOBJ)
 	$(LINKMOD) -o $@ $(DOWNLOADUIOBJ) $(GTK_LIBS)
@@ -123,8 +122,7 @@ MUSICBROWSEROBJ = ui/musicbrowser/unix/src/gtkmusicbrowser.o \
                   ui/musicbrowser/unix/src/fileselector.o \
                   ui/musicbrowser/unix/src/browsermenu.o \
                   ui/musicbrowser/unix/src/musicsearch.o \
-                  ui/freeamp/unix/src/GTKMessageDialog.o \
-                  base/src/utility.o
+                  ui/freeamp/unix/src/GTKMessageDialog.o 
 
 plugins/musicbrowser.ui: $(MUSICBROWSEROBJ)
 	$(LINKMOD) -o $@ $(MUSICBROWSEROBJ) $(GTK_LIBS)
@@ -142,8 +140,7 @@ FREEAMPUIOBJ = ui/freeamp/src/Theme.doh ui/freeamp/src/Bitmap.o \
                ui/freeamp/unix/src/GTKWindow.o ui/freeamp/unix/src/GTKBitmap.o \
                ui/freeamp/unix/src/GTKCanvas.o \
 	       ui/freeamp/unix/src/ThemeManager.o \
-               ui/freeamp/unix/src/GTKPreferenceWindow.o \
-               base/src/utility.o
+               ui/freeamp/unix/src/GTKPreferenceWindow.o 
 
 plugins/freeamp.ui: $(FREEAMPUIOBJ)
 	$(LINKMOD) -o $@ $(FREEAMPUIOBJ) lib/zlib/lib/libzlib.a $(GTK_LIBS)
