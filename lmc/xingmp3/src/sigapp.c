@@ -69,9 +69,8 @@ static unsigned int pcm_bufbytes;
 static unsigned int pcm_trigger = (PCM_BUFBYTES - 2500 * sizeof(short));
 static int handout = -1;
 
-/****************************/
+/*------------------------------------------*/
 static int bs_fill();
-
 int       ff_decode(char *filename,
                     char *fileout,
                     int reduction_code,
@@ -83,25 +82,6 @@ int       cvt_to_wave_test();
 int       write_pcm_header_wave(int handout,
                               int samprate, int channels, int bits, int type);
 int       write_pcm_tailer_wave(int handout, unsigned int pcm_bytes);
-
-/*------------------------------------------*/
-int 
-main(int argc, char *argv[])
-{
-   char sig[37];
-
-   if (argc < 2)
-   {
-       printf("Usage: sigapp <mp3 file>\n");
-       exit(0);
-   }
- 
-   if (ff_decode(argv[1], sig, 0, 0, 0, 24000, 0))
-   {
-       printf("%s\n", sig);
-   }
-   return 0;
-}
 
 int ff_decode(char *filename, char ascii_sig[37],
           int reduction_code, int convert_code, int decode8_flag,
