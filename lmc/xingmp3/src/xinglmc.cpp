@@ -42,7 +42,10 @@ extern "C" {
 #include "port.h"
 
 int wait_n_times;
+extern int called_times;
 }
+
+ 
 
 #define TEST_TIME 0
 
@@ -175,6 +178,8 @@ XingLMC()
     m_bsBuffer = NULL;
     m_bsBufPtr = m_bsBuffer;
     m_bsBuffer = new unsigned char[BS_BUFBYTES];
+
+    m_frameCounter = 0;
 }
 
 XingLMC::~XingLMC() {
@@ -282,6 +287,7 @@ void XingLMC::DecodeWorkerThreadFunc(void *pxlmc) {
 #else
 #define CHECK_COMMAND
 #endif
+
 void XingLMC::DecodeWork() {
     //cout << "XingLMC::Decode: Starting decode..." << endl;
     bool result = true;
@@ -303,12 +309,14 @@ void XingLMC::DecodeWork() {
     }
 #endif // TEST_TIME
 
-    for (int32 u = 0;;) {
+    for (m_frameCounter = 0;;) {
+        //vErrorOut(bg_blue|fg_red, "lmc frame: %d\r\n",m_frameCounter);
+
 //	cout << "I'm at: " << m_input->Seek(m_input, 0,SEEK_FROM_CURRENT) << endl;
-	if (u >= wait_n_times) {
+	if (m_frameCounter >= wait_n_times) {
 	    double tpf = (double)1152 / (double)44100;
-	    float totalTime = (float)((double)u * (double)tpf);
-	    MediaTimePositionInfo *pmtpi = new MediaTimePositionInfo(totalTime,u);
+	    float totalTime = (float)((double)m_frameCounter * (double)tpf);
+	    MediaTimePositionInfo *pmtpi = new MediaTimePositionInfo(totalTime,m_frameCounter);
 	    Event *e = new Event(INFO_MediaTimePosition,pmtpi);
 	    SEND_EVENT(e);
 	}
@@ -326,7 +334,7 @@ void XingLMC::DecodeWork() {
 	m_bsBufPtr += x.in_bytes;
 	m_bsBufBytes -= x.in_bytes;
 	m_pcmBufBytes += x.out_bytes;
-	u++;
+	m_frameCounter++;
 	int32 nwrite = 0;
 //.byte 0x0f,0x31
 	// should be rdtsc
@@ -351,7 +359,7 @@ void XingLMC::DecodeWork() {
 	    for (int i=0;i<PIECES;i++) {
 		pv = (void *)((int32)m_pcmBuffer + (writeBlockLength*i));
 		CHECK_COMMAND;
-		if (u >= wait_n_times) 
+		if (m_frameCounter >= wait_n_times) 
 		    thisTime = m_output->Write(m_output, pv,writeBlockLength);
 #if TEST_TIME
 		__asm__ ("rdtsc" : "=d" (upper), "=a" (lower));
@@ -363,7 +371,7 @@ void XingLMC::DecodeWork() {
 		cout << lower << endl;
 #endif // TEST_TIME
 		nwrite += thisTime;
-		if (u < wait_n_times) thisTime = writeBlockLength;
+		if (m_frameCounter < wait_n_times) thisTime = writeBlockLength;
 		if (thisTime != writeBlockLength) {
 		    cout << "this time didn't work..." << endl;
 		    break;
@@ -373,7 +381,7 @@ void XingLMC::DecodeWork() {
 	    if ((nwrite == writeBlockLength*PIECES) && md) {
 		pv = (void *)((int32)m_pcmBuffer + (writeBlockLength*PIECES));
 		CHECK_COMMAND;
-		if (u > wait_n_times) 
+		if (m_frameCounter > wait_n_times) 
 		    thisTime = m_output->Write(m_output, pv,md);
 #if TEST_TIME
 		__asm__ ("rdtsc" : "=d" (upper), "=a" (lower));
@@ -388,7 +396,8 @@ void XingLMC::DecodeWork() {
 		nwrite += thisTime;
 	    }
 #endif    
-	    if (u < wait_n_times) nwrite = (int32)m_pcmBufBytes;
+	    if (m_frameCounter < wait_n_times) 
+            nwrite = (int32)m_pcmBufBytes;
 	    if (nwrite != (int32)m_pcmBufBytes) {
 		cout << "XingLMC: Write Error: bytes = " << nwrite << " pcmbufbytes: " << m_pcmBufBytes << endl;
 		// WRITE ERROR
@@ -436,13 +445,16 @@ void XingLMC::Reset() {
 
 }
 
-
 bool XingLMC::ChangePosition(int32 position) {
+    m_seekMutex->Acquire(WAIT_FOREVER);
     m_bsBufBytes = 0;
     m_bsBufPtr = m_bsBuffer;
     m_input->Seek(m_input, 0,SEEK_FROM_START);
-    
+    m_frameCounter = 0;
+    called_times = 0;
     wait_n_times = position;
+    m_seekMutex->Release();
+
     return true;
 }
 

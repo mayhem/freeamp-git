@@ -421,9 +421,15 @@ int32 Player::ServiceEvent(Event *pC) {
 		    SEND_NORMAL_EVENT(INFO_Stopped);
                 }
                 return 0;
-		break;
+		    break;
 	    }
 	    
+        case CMD_ChangePosition: {
+            m_lmcRef->ChangePosition(m_lmcRef, (int32) pC->GetArgument());        
+            return 0;
+		    break;
+	    }
+
 	    case CMD_Play: {
 		PlayListItem *pc = m_myPlayList->GetCurrent();
         Error error = kError_NoErr;

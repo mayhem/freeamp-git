@@ -261,14 +261,14 @@ void
 SoundCardPMO::
 Pause()
 {
-     waveOutPause(m_hwo);
+     //waveOutPause(m_hwo);
 }
 
 void 
 SoundCardPMO::
 Resume()
 {
-    waveOutRestart(m_hwo);
+    //waveOutRestart(m_hwo);
 }
 
 

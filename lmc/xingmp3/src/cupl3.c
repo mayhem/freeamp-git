@@ -764,7 +764,7 @@ IN_OUT L3audio_decode(unsigned char *bs, unsigned char *pcm)
    return decode_function(bs, pcm);
 }
 
-static int called_times = 0;
+int called_times = 0;
 extern int wait_n_times;
 
 /*--------------------------------------------------------------------*/

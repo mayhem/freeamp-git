@@ -215,7 +215,7 @@ void PlayList::ShuffleOrder() {
     OrderListItem *order_item;
 
     //remember the song that m_current is "really" pointing at
-    int32 actual_current;
+    int32 actual_current, i;
     if ((m_current >=0) && (m_current < element_count)) {
 	order_item = m_pOrderList->ElementAt(m_current);
 	if (order_item) {
@@ -223,7 +223,7 @@ void PlayList::ShuffleOrder() {
 	}
     }
 
-    for (int32 i = 0;i < element_count;i++) {
+    for (i = 0;i < element_count;i++) {
 	order_item = m_pOrderList->ElementAt(i);
 	order_item->m_index = i;
 	order_item->m_random = (int32) rand();
@@ -231,7 +231,7 @@ void PlayList::ShuffleOrder() {
 
     QuickSortOrderList(0, element_count - 1);
 
-    for (int32 i = 0;i < element_count; i++) {
+    for (i = 0;i < element_count; i++) {
 	order_item = m_pOrderList->ElementAt(i);
 	if (order_item->m_index == actual_current) {
 	    m_current = i;

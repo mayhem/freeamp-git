@@ -41,7 +41,6 @@ ____________________________________________________________________________*/
 #include "about.h"
 #include "resource.h"
 
-
 HINSTANCE g_hInstance = NULL;
 
 BOOL CALLBACK MainProc(	HWND hwnd, 
@@ -295,6 +294,7 @@ AcceptEvent(Event* event)
 						        TBM_SETPOS,
 						        (WPARAM)TRUE,
 						        (LPARAM)pmtp->m_frame);
+
                 }
 
 	            break; 
@@ -370,7 +370,7 @@ SetArgs(int32 argc, char** argv)
     playlist->SetFirst();
 
     if(shuffle) 
-	    playlist->Shuffle();
+        playlist->SetOrder(PlayList::ORDER_SHUFFLED);
     
     m_target->AcceptEvent(m_target, new Event(CMD_SetPlaylist,playlist));
 
@@ -680,8 +680,8 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 											TBM_GETPOS, 
 											0, 
 											0);
-
-					//player->SeekToPosition(position);
+                    
+                    m_ui->m_target->AcceptEvent( m_ui->m_target, new Event(CMD_ChangePosition, (void*)position));
 		  	
 					m_ui->m_scrolling = false;
 					break;

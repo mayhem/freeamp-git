@@ -95,6 +95,8 @@ private:
     int32                   m_frameBytes;
     bool                    m_isPaused;
     Thread*                 m_decoderThread;
+
+    int32                   m_frameCounter;
 };
 
 #endif /* _XINGLMC_H */
