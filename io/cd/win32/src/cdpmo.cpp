@@ -60,13 +60,6 @@ CDPMO::CDPMO(FAContext *context) :
    cddbid = 0;
    sentData = false;
    trackDone = false;
-
-   if (!m_pBufferThread)
-   {
-      m_pBufferThread = Thread::CreateThread();
-      assert(m_pBufferThread);
-      m_pBufferThread->Create(CDPMO::StartWorkerThread, this);
-   }
 }
 
 CDPMO::~CDPMO()
@@ -76,6 +69,7 @@ CDPMO::~CDPMO()
    if (m_pBufferThread)
    {
       m_pBufferThread->Join();
+	  cd_finish(m_thcdDesc);
       delete m_pBufferThread;
    }
 
@@ -145,6 +139,13 @@ Error CDPMO::SetTo(const char *url)
        return kError_InvalidTrack;
    }
 
+   if (!m_pBufferThread)
+   {
+      m_pBufferThread = Thread::CreateThread();
+      assert(m_pBufferThread);
+      m_pBufferThread->Create(CDPMO::StartWorkerThread, this);
+   }
+ 
    m_locker.Acquire();
    cd_play_track(m_cdDesc, m_track, m_track);
    m_locker.Release();
@@ -301,7 +302,7 @@ void CDPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
    struct disc_timeval val;
 
    m_locker.Acquire();
-   if (cd_stat(m_cdDesc, &disc, false) < 0) {
+   if (cd_stat(m_thcdDesc, &disc, false) < 0) {
        trackDone = true;
 	   m_locker.Release();
        return;
@@ -313,7 +314,7 @@ void CDPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
        return;
    }
 
-   cd_stat(m_cdDesc, &disc);
+   cd_stat(m_thcdDesc, &disc);
    m_locker.Release();
 
    if (!sentData) {
@@ -363,6 +364,30 @@ void CDPMO::StartWorkerThread(void *pVoidBuffer)
 
 void CDPMO::WorkerThread(void)
 {
+   char device[256];
+   uint32 len = 256;
+
+   m_locker.Acquire();
+
+   if (IsError(m_pContext->prefs->GetCDDevicePath(device, &len))) {
+	   m_locker.Release();
+       return;
+   }
+
+   m_thcdDesc = device;
+   if (m_thcdDesc == "") 
+	   m_thcdDesc = "cdaudio";
+   
+   sprintf(device, "%d_th", GetCurrentThreadId());
+   m_thcdDesc += device; 
+
+   if (cd_init_device(m_thcdDesc) != 0) {
+ 	   m_locker.Release();
+       return;
+   }
+
+   m_locker.Release();
+
    for(; !m_bExit;)
    {
       if (!m_properlyInitialized)

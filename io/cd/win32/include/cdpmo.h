@@ -79,6 +79,8 @@ class CDPMO:public PhysicalMediaOutput
    Thread       *m_pBufferThread;
 
    string        m_cdDesc;
+   string        m_thcdDesc;
+
    int           m_track;
    bool          sentData;
    bool          trackDone;
