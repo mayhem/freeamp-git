@@ -283,12 +283,7 @@ void MusicBrowserUI::MusicSearchDone()
     HMENU        hMenu;
     MENUITEMINFO sItem;
     
-    if (m_bSearchInProgress)
-        SendMessage(m_hStatus, SB_SETTEXT, 0, 
-                    (LPARAM)"Music search completed.");
-    else                
-        SendMessage(m_hStatus, SB_SETTEXT, 0, 
-                    (LPARAM)"Music search interrupted -- your database may be incomplete.");
+    SendMessage(m_hStatus, SB_SETTEXT, 0, (LPARAM)"Music search completed.");
 
     hMenu = GetMenu(m_hWnd);
     hMenu = GetSubMenu(hMenu, 0);
@@ -299,10 +294,9 @@ void MusicBrowserUI::MusicSearchDone()
     sItem.cch = strlen(sItem.dwTypeData);
     SetMenuItemInfo(hMenu, ID_FILE_SEARCHFORMUSIC, false, &sItem);
                     
-    SetWindowText(GetDlgItem(m_hWnd, IDC_SEARCH), "Music Search");
     m_bSearchInProgress = false;
                 
-    InitTree();
+    //InitTree();
     TreeView_Expand(GetDlgItem(m_hWnd, IDC_MUSICTREE), 
                     m_hPlaylistItem, TVE_EXPAND);
     TreeView_Expand(GetDlgItem(m_hWnd, IDC_MUSICTREE), 
