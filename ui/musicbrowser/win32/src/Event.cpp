@@ -493,6 +493,28 @@ void MusicBrowserUI::EditInfoEvent()
     }
 }
 
+void MusicBrowserUI::EjectCDEvent()
+{
+    char mciCommand[128];
+    char mciReturn[128];
+
+    sprintf(mciCommand, "sysinfo cdaudio quantity wait");
+
+    mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
+	
+    if (atoi(mciReturn) <= 0)
+        return;
+
+    sprintf(mciCommand, "open cdaudio shareable alias cd1 wait");
+    mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
+
+    sprintf(mciCommand, "set cd1 door open");
+    mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
+
+    sprintf(mciCommand, "close cd1 wait");
+    mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
+}
+
 int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
 {
     int32 result = 0;
@@ -716,7 +738,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
 
             case NM_RCLICK:
             {
-                HMENU menu;
+                HMENU mainMenu, cdMenu, streamMenu;
                 HMENU subMenu;
                 POINT sPoint;
                 uint32 trackCount = 0;
@@ -727,94 +749,120 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
             
                 GetCursorPos(&sPoint);
 
-                menu = LoadMenu(g_hinst, MAKEINTRESOURCE(IDR_TVPOPUP));
-                subMenu = GetSubMenu(menu, 0);
+                TV_HITTESTINFO tv_htinfo;
 
-                if(m_pParent)
+                tv_htinfo.pt = sPoint;
+
+                ScreenToClient(m_hMusicView, &tv_htinfo.pt);
+                TreeView_HitTest(m_hMusicView, &tv_htinfo);
+
+                mainMenu = LoadMenu(g_hinst, MAKEINTRESOURCE(IDR_TVPOPUP));
+                cdMenu = LoadMenu(g_hinst, MAKEINTRESOURCE(IDR_TVPOPUP1));
+                streamMenu = LoadMenu(g_hinst, MAKEINTRESOURCE(IDR_TVPOPUP2));
+
+
+                if(tv_htinfo.hItem == m_hFavoritesItem || 
+                   TreeView_GetParent(m_hMusicView, tv_htinfo.hItem) == m_hFavoritesItem)
                 {
-                    DeleteMenu(subMenu, ID_POPUP_ADDTRACK_PLAY, MF_BYCOMMAND);
+                    subMenu = GetSubMenu(streamMenu, 0);
                 }
-
-                if( IsItemSelected(m_hMyMusicItem) ||
-                    IsItemSelected(m_hPlaylistItem) ||
-                    IsItemSelected(m_hAllItem) ||
-                    IsItemSelected(m_hUncatItem) ||
-                    (IsItemSelected(m_hNewPlaylistItem) && !(playlistCount + trackCount)))
+                else if(tv_htinfo.hItem == m_hCDItem ||
+                        TreeView_GetParent(m_hMusicView, tv_htinfo.hItem) == m_hCDItem)
                 {
-                    EnableMenuItem(subMenu,
-                                   ID_POPUP_REMOVE,
-                                   MF_BYCOMMAND|MF_GRAYED);
+                    subMenu = GetSubMenu(cdMenu, 0);
                 }
-
-
-                if( playlistCount > 1 ||
-                    IsItemSelected(m_hMyMusicItem) ||
-                    IsItemSelected(m_hPlaylistItem) ||
-                    IsItemSelected(m_hAllItem) ||
-                    IsItemSelected(m_hUncatItem) ||
-                    (IsItemSelected(m_hNewPlaylistItem) && !(playlistCount + trackCount)))
+                else
                 {
-                    EnableMenuItem(subMenu,
-                                   ID_POPUP_EDITINFO,
-                                   MF_BYCOMMAND|MF_GRAYED);    
-                }
+                    subMenu = GetSubMenu(mainMenu, 0);
 
+                    if(m_pParent)
+                    {
+                        DeleteMenu(subMenu, ID_POPUP_ADDTRACK_PLAY, MF_BYCOMMAND);
+                    }
 
-                if( trackCount > 1 ||
-                    playlistCount > 1 ||
-                    IsItemSelected(m_hMyMusicItem) ||
-                    IsItemSelected(m_hPlaylistItem) ||
-                    IsItemSelected(m_hAllItem) ||
-                    IsItemSelected(m_hUncatItem) ||
-                    IsItemSelected(m_hNewPlaylistItem))
-                {
-                    EnableMenuItem(subMenu,
-                                   ID_POPUP_RENAME,
-                                   MF_BYCOMMAND|MF_GRAYED);                         
-                }
-
-                if(trackCount == 0)
-                {
-                    EnableMenuItem(subMenu,
-                                   ID_POPUP_EDITINFO,
-                                   MF_BYCOMMAND|MF_GRAYED);
-
-                    if( IsItemSelected(m_hNewPlaylistItem) &&
-                        playlistCount == 1)
+                    if( IsItemSelected(m_hMyMusicItem) ||
+                        IsItemSelected(m_hPlaylistItem) ||
+                        IsItemSelected(m_hAllItem) ||
+                        IsItemSelected(m_hUncatItem) ||
+                        (IsItemSelected(m_hNewPlaylistItem) && !(playlistCount + trackCount)))
                     {
                         EnableMenuItem(subMenu,
-                                   ID_POPUP_ADDTRACK,
-                                   MF_BYCOMMAND|MF_GRAYED);
+                                       ID_POPUP_REMOVE,
+                                       MF_BYCOMMAND|MF_GRAYED);
+                    }
 
-                        EnableMenuItem(subMenu,
-                                   ID_POPUP_ADDTRACK_PLAY,
-                                   MF_BYCOMMAND|MF_GRAYED);
 
+                    if( playlistCount > 1 ||
+                        IsItemSelected(m_hMyMusicItem) ||
+                        IsItemSelected(m_hPlaylistItem) ||
+                        IsItemSelected(m_hAllItem) ||
+                        IsItemSelected(m_hUncatItem) ||
+                        (IsItemSelected(m_hNewPlaylistItem) && !(playlistCount + trackCount)))
+                    {
                         EnableMenuItem(subMenu,
-                                   ID_POPUP_REMOVE,
-                                   MF_BYCOMMAND|MF_GRAYED);
+                                       ID_POPUP_EDITINFO,
+                                       MF_BYCOMMAND|MF_GRAYED);    
+                    }
 
-                        EnableMenuItem(subMenu,
-                                   ID_POPUP_RENAME,
-                                   MF_BYCOMMAND|MF_GRAYED);
 
+                    if( trackCount > 1 ||
+                        playlistCount > 1 || (trackCount && playlistCount) ||
+                        IsItemSelected(m_hMyMusicItem) ||
+                        IsItemSelected(m_hPlaylistItem) ||
+                        IsItemSelected(m_hAllItem) ||
+                        IsItemSelected(m_hUncatItem) ||
+                        IsItemSelected(m_hNewPlaylistItem))
+                    {
                         EnableMenuItem(subMenu,
-                                   ID_POPUP_EDITPLAYLIST,
-                                   MF_BYCOMMAND|MF_GRAYED);
+                                       ID_POPUP_RENAME,
+                                       MF_BYCOMMAND|MF_GRAYED);                         
+                    }
+
+                    if(trackCount == 0)
+                    {
+                        EnableMenuItem(subMenu,
+                                       ID_POPUP_EDITINFO,
+                                       MF_BYCOMMAND|MF_GRAYED);
+
+                        if( IsItemSelected(m_hNewPlaylistItem) &&
+                            playlistCount == 1)
+                        {
+                            EnableMenuItem(subMenu,
+                                       ID_POPUP_ADDTRACK,
+                                       MF_BYCOMMAND|MF_GRAYED);
+
+                            EnableMenuItem(subMenu,
+                                       ID_POPUP_ADDTRACK_PLAY,
+                                       MF_BYCOMMAND|MF_GRAYED);
+
+                            EnableMenuItem(subMenu,
+                                       ID_POPUP_REMOVE,
+                                       MF_BYCOMMAND|MF_GRAYED);
+
+                            EnableMenuItem(subMenu,
+                                       ID_POPUP_RENAME,
+                                       MF_BYCOMMAND|MF_GRAYED);
+
+                            EnableMenuItem(subMenu,
+                                       ID_POPUP_EDITPLAYLIST,
+                                       MF_BYCOMMAND|MF_GRAYED);
+                        }
+                    }
+
+                    if(!playlistCount || trackCount)
+                    {
+                        DeleteMenu(subMenu, ID_POPUP_EDITPLAYLIST, MF_BYCOMMAND);
                     }
                 }
 
-                if(!playlistCount || trackCount)
-                {
-                    DeleteMenu(subMenu, ID_POPUP_EDITPLAYLIST, MF_BYCOMMAND);
-                }
-
                 TrackPopupMenu(subMenu, 
-                               TPM_LEFTALIGN|TPM_LEFTBUTTON, 
+                               TPM_LEFTALIGN|TPM_RIGHTBUTTON,
                                sPoint.x, sPoint.y, 
                                0, m_hWnd, NULL);
 
-                DestroyMenu(menu);
+                DestroyMenu(mainMenu);
+                DestroyMenu(cdMenu);
+                DestroyMenu(streamMenu);
 
                 break;
             }
@@ -1157,7 +1205,8 @@ void MusicBrowserUI::AddTrackEvent(void)
     }
 
     GetSelectedPlaylistItems(&urls);
-    //GetSelectedStreamItems(&urls);
+    GetSelectedStreamItems(&urls);
+    GetSelectedCDItems(&urls);
 
     // we know that we are gonna be adding a 
     // bunch of items so let windows know.

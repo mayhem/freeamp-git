@@ -271,6 +271,10 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                 case ID_EDIT_EDITINFO:
                     EditInfoEvent();
                     return 1;
+
+                case ID_POPUP_EJECT:
+                    EjectCDEvent();
+                    return 1;
                 
                 case ID_VIEW_MUSICCATALOG:
                     ExpandCollapseEvent();

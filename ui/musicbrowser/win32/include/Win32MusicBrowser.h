@@ -237,7 +237,8 @@ class MusicBrowserUI : public UserInterface
     void  EditInfoEvent();
     void  RenameEvent();
     void  PlayNowEvent();
-    bool  DeleteFromDrive(const char* url);    
+    bool  DeleteFromDrive(const char* url);
+    void  EjectCDEvent();
 
     // Functions in PlaylistView.cpp
     void  PlaylistListItemAdded(const PlaylistItem* item);
