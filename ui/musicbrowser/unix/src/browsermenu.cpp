@@ -312,8 +312,9 @@ static void delete_sel(GTKMusicBrowser *p, guint action, GtkWidget *w)
         }
     }
     else if (p->GetClickState() == kContextBrowser) {
-        vector<TreeData *>::iterator i = p->mbSelections->begin();
-        for (; i != p->mbSelections->end(); i++) {
+        vector<TreeData *> local_mbSelections(*(p->mbSelections));
+        vector<TreeData *>::iterator i = local_mbSelections.begin();
+        for (; i != local_mbSelections.end(); i++) {
             TreeNodeType type = (*i)->type;
             
             if (type == kTreePlaylist) 
