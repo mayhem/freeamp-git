@@ -49,7 +49,7 @@ ____________________________________________________________________________*/
 #define SEEK_FROM_END		SEEK_END
 
 const int32 iDefaultBufferSize = 65536;
-const int32 iDefaultOverflowSize = 8192; 
+const int32 iDefaultOverflowSize = 16384; 
 
 class PhysicalMediaInput : public PipelineUnit
 {
