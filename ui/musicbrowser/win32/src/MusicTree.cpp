@@ -413,12 +413,80 @@ int32 MusicBrowserUI::GetCurrentItemFromMousePos(void)
     return -1;
 }
 
-void MusicBrowserUI::MusicCatalogItemAdded(const PlaylistItem* item)
+HTREEITEM MusicBrowserUI::FindArtist(const ArtistList* artist)
+{
+    HTREEITEM result = NULL;
+    HWND hwnd = m_hMusicCatalog;
+
+    TV_ITEM tv_item;
+
+    tv_item.hItem = m_hUncatItem;
+    tv_item.mask = TVIF_PARAM;
+
+    // this should retrieve the first artist
+    tv_item.hItem = TreeView_GetNextSibling(hwnd, tv_item.hItem);
+
+    BOOL success;
+
+    do
+    {
+        success = TreeView_GetItem(hwnd, &tv_item);
+
+        if(success)
+        {
+            if(artist == m_oTreeIndex.Data(tv_item.lParam).m_pArtist)
+            {
+                result = tv_item.hItem;
+                break;
+            }
+        }
+
+    }while(success && (tv_item.hItem = TreeView_GetNextSibling(hwnd, tv_item.hItem)));
+    
+    return result;
+}
+
+HTREEITEM MusicBrowserUI::FindAlbum(HTREEITEM artistItem, const AlbumList* album)
+{
+    HTREEITEM result = NULL;
+    HWND hwnd = m_hMusicCatalog;
+
+    TV_ITEM tv_item;
+
+    tv_item.hItem = NULL;
+    tv_item.mask = TVIF_PARAM;
+
+    // this should retrieve the first artist
+    tv_item.hItem = TreeView_GetChild(m_hMusicCatalog, artistItem);
+
+    BOOL success;
+
+    do
+    {
+        success = TreeView_GetItem(hwnd, &tv_item);
+
+        if(success)
+        {
+            if(album == m_oTreeIndex.Data(tv_item.lParam).m_pAlbum)
+            {
+                result = tv_item.hItem;
+                break;
+            }
+        }
+
+    }while(success && (tv_item.hItem = TreeView_GetNextSibling(hwnd, tv_item.hItem)));
+    
+    return result;
+}
+
+void MusicBrowserUI::MusicCatalogItemAdded(const ArtistList* artist,
+                                           const AlbumList* album,
+                                           const PlaylistItem* item)
 {
     const MetaData meta = item->GetMetaData();
 
     // can we catagorize this track?
-    if((meta.Artist().size() == 0) || (meta.Artist() == " ")) 
+    if(!artist) 
     {
         // nope, stick in uncatagorized
         TV_INSERTSTRUCT sInsert;
@@ -426,7 +494,7 @@ void MusicBrowserUI::MusicCatalogItemAdded(const PlaylistItem* item)
         MetaData        oData;
 
         sInsert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
-                     TVIF_SELECTEDIMAGE | TVIF_PARAM; 
+                            TVIF_SELECTEDIMAGE | TVIF_PARAM; 
 
         oCrossRef.m_iLevel = 3;
         oCrossRef.m_pArtist = NULL;
@@ -449,62 +517,139 @@ void MusicBrowserUI::MusicCatalogItemAdded(const PlaylistItem* item)
         sInsert.item.lParam = m_oTreeIndex.Add(oCrossRef);
         sInsert.hInsertAfter = TVI_SORT;
         sInsert.hParent = m_hUncatItem;
-        TreeView_InsertItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sInsert);
+        TreeView_InsertItem(m_hMusicCatalog, &sInsert);
     }
     else 
     {
-        TV_ITEM tv_item;
-
-        /*tv_item.hItem = root;
-        tv_item.mask = TVIF_STATE|TVIF_PARAM;
-        tv_item.stateMask = TVIS_SELECTED;
-        tv_item.state = 0;
-
-        do
-        {
-            result = TreeView_GetItem(hwnd, &tv_item);
-
-            HTREEITEM childItem = TreeView_GetChild(hwnd, tv_item.hItem);
-
-            if(result && (tv_item.state & TVIS_SELECTED))
-            {
-                AddTrackURLs(&tv_item, urls);
-            }
-            else if(result && childItem)
-            {
-                FindSelectedItems(hwnd, childItem, urls);        
-            }
-
-        }while(result && (tv_item.hItem = TreeView_GetNextSibling(hwnd, tv_item.hItem)));
-
         // yep, search for it
-        bool found_artist = false;
-        bool found_album = false;
-        const vector<ArtistList*>* artistList = m_context->browser->
-                                                m_catalog->GetMusicList();
-        vector<ArtistList*>::const_iterator artist = artistList->begin();
+        HTREEITEM artistItem, albumItem;
 
-        for(; artist != artistList->end(); artist++) 
+        artistItem = FindArtist(artist);
+
+        if(artistItem)
         {
-            if(meta.Artist() == (*artist)->name) 
+            albumItem = FindAlbum(artistItem, album);
+
+            if(albumItem)
             {
-                found_artist = true;
-                vector<AlbumList*>* albumList = (*artist)->m_albumList;
-                vector<AlbumList*>::iterator album = albumList->begin();
-
-                for(; album != albumList->end(); album++) 
+                if(TreeView_GetChild(m_hMusicCatalog, albumItem))
                 {
-                    if(meta.Album() == (*album)->name) 
-                    {
-                        found_album = true;
-                        break;
-                    }
-                }
+                    TV_INSERTSTRUCT sInsert;
+                    TreeData        oCrossRef;
+                    MetaData        oData;
 
-                break;
+                    sInsert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
+                                        TVIF_SELECTEDIMAGE | TVIF_PARAM; 
+
+                    oCrossRef.m_iLevel = 3;
+                    oCrossRef.m_pArtist = (ArtistList*)artist;
+                    oCrossRef.m_pAlbum = (AlbumList*)album;
+    
+                    oCrossRef.m_pTrack = (PlaylistItem*)item;
+                    oData = item->GetMetaData();
+
+                    if (oData.Title() == string(" ") || 
+                        oData.Title().length() == 0)
+                        sInsert.item.pszText = "Unknown";
+                    else    
+                        sInsert.item.pszText = (char *)(oData.Title().c_str());
+    
+                    sInsert.item.cchTextMax = oData.Title().length();
+                    sInsert.item.iImage = 4;
+                    sInsert.item.iSelectedImage = 4;
+                    sInsert.item.cChildren= 0;
+                    sInsert.item.lParam = m_oTreeIndex.Add(oCrossRef);
+                    sInsert.hInsertAfter = TVI_SORT;
+                    sInsert.hParent = albumItem;
+                    TreeView_InsertItem(m_hMusicCatalog, &sInsert);
+                }
             }
-        }*/
+            else // might need to add the album
+            {
+                if(TreeView_GetChild(m_hMusicCatalog, artistItem))
+                {
+                    TV_INSERTSTRUCT sInsert;
+                    TreeData        oCrossRef; 
+
+                    oCrossRef.m_pArtist = (ArtistList*)artist;
+                    oCrossRef.m_pAlbum = (AlbumList*)album;
+
+                    if (album->name == string(" ") || 
+                        album->name.length() == 0)
+                        sInsert.item.pszText = "Unknown";
+                    else    
+                        sInsert.item.pszText = (char *)album->name.c_str();
+    
+                    sInsert.item.cchTextMax = album->name.length();
+                    sInsert.item.iImage = 3;
+                    sInsert.item.iSelectedImage = 3;
+                    sInsert.item.cChildren= 1;
+                    sInsert.item.lParam = m_oTreeIndex.Add(oCrossRef);
+                    sInsert.hInsertAfter = TVI_SORT;
+                    sInsert.hParent = artistItem;
+                    TreeView_InsertItem(m_hMusicCatalog, &sInsert);
+                }
+            }
+        }
+        else // might need to add the artist
+        {
+            if(TreeView_GetNextSibling(m_hMusicCatalog, m_hUncatItem))
+            {
+                TV_INSERTSTRUCT sInsert;
+                TreeData        oCrossRef;
+
+                sInsert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
+                             TVIF_SELECTEDIMAGE | TVIF_PARAM; 
+
+                oCrossRef.m_iLevel = 1;
+                oCrossRef.m_pArtist = (ArtistList*)artist;
+
+                sInsert.item.pszText = (char *)artist->name.c_str();
+                sInsert.item.cchTextMax = artist->name.length();
+                sInsert.item.iImage = 2;
+                sInsert.item.iSelectedImage = 2;
+                sInsert.item.cChildren= 1;
+                sInsert.item.lParam = m_oTreeIndex.Add(oCrossRef);
+                sInsert.hInsertAfter = TVI_SORT;
+                sInsert.hParent = m_hCatalogItem;
+                TreeView_InsertItem(m_hMusicCatalog, &sInsert);
+            }       
+        }
     }
+
+    // put it under "All Tracks"
+    if(TreeView_GetChild(m_hMusicCatalog, m_hAllItem))
+    {
+        TV_INSERTSTRUCT sInsert;
+        TreeData        oCrossRef;
+        MetaData        oData;
+
+        sInsert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
+                            TVIF_SELECTEDIMAGE | TVIF_PARAM; 
+
+        oCrossRef.m_iLevel = 3;
+        oCrossRef.m_pArtist = (ArtistList*)artist;
+        oCrossRef.m_pAlbum = (AlbumList*)album;
+
+        oCrossRef.m_pTrack = (PlaylistItem*)item;
+        oData = item->GetMetaData();
+
+        if (oData.Title() == string(" ") || 
+            oData.Title().length() == 0)
+            sInsert.item.pszText = "Unknown";
+        else    
+            sInsert.item.pszText = (char *)(oData.Title().c_str());
+
+        sInsert.item.cchTextMax = oData.Title().length();
+        sInsert.item.iImage = 4;
+        sInsert.item.iSelectedImage = 4;
+        sInsert.item.cChildren= 0;
+        sInsert.item.lParam = m_oTreeIndex.Add(oCrossRef);
+        sInsert.hInsertAfter = TVI_SORT;
+        sInsert.hParent = m_hAllItem;
+        TreeView_InsertItem(m_hMusicCatalog, &sInsert);
+    }
+
 }
 
 void MusicBrowserUI::AddAllTrackURLs(vector<string>* urls)

@@ -393,7 +393,6 @@ void MusicBrowserUI::ImportTracksAndPlaylists(void)
 
         for(i = oFileList.begin(); i != oFileList.end(); i++)
             m_context->browser->m_catalog->AddSong((*i).c_str());
-        InitTree();    
     }
 }
 

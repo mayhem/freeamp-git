@@ -265,7 +265,7 @@ Error MusicCatalog::AddSong(const char *url)
     MetaData *meta = m_context->browser->ReadMetaDataFromDatabase(url);
 
     if (!meta) {
-        PlaylistItem *newtrack = new PlaylistItem(url);
+        newtrack = new PlaylistItem(url);
         m_context->plm->RetrieveMetaData(newtrack);
 
         while (newtrack->GetState() != kPlaylistItemState_Normal)

@@ -206,7 +206,7 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
         {
             MusicCatalogTrackAddedEvent* pie = (MusicCatalogTrackAddedEvent*)event;
 
-            MusicCatalogItemAdded(pie->Item());
+            MusicCatalogItemAdded(pie->Artist(), pie->Album(), pie->Item());
             
             break; 
         }
