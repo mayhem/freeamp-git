@@ -803,30 +803,6 @@ void XingLMC::DecodeWork()
                   break;
           }
 
-          x.in_bytes = 0;
-          Err = m_pOutputBuffer->BeginWrite(pOutBuffer, m_iMaxWriteSize);
-          if (Err == kError_Interrupt)
-          {
-              break;
-          }
-          if (Err == kError_BufferTooSmall)
-          {
-              if (Sleep())
-                 break;
-
-              continue;
-          }
-          if (Err != kError_NoErr)
-          {
-              if (m_decodeInfo.sendInfo)
-                  ReportError(szFailWrite);
-              else
-                  ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(new PMOErrorEvent());
-              m_pContext->log->Error("LMC: Cannot write to eventbuffer: %s (%d)\n", 
-                        m_szError, Err); 
-              return;
-          }
-
           if (iMaxFrameSize > (int)m_pInputBuffer->GetNumBytesInBuffer() &&
               m_pInputBuffer->GetNumBytesInBuffer() > 0 &&
               m_pInputBuffer->IsEndOfStream())
@@ -837,13 +813,11 @@ void XingLMC::DecodeWork()
           Err = BeginRead(pBuffer, iReadSize);
           if (Err == kError_Interrupt)
           {
-              m_pOutputBuffer->EndWrite(0);
               break;
           }
 
           if (Err == kError_EndOfStream)
           {
-              m_pOutputBuffer->EndWrite(0);
               ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(new PMOQuitEvent());
 
               // Hang around until we're told to leave in case
@@ -862,7 +836,6 @@ void XingLMC::DecodeWork()
           }
           if (Err == kError_NoDataAvail)
           {
-              m_pOutputBuffer->EndWrite(0);
               if (Sleep())
                   break;
 
@@ -873,6 +846,33 @@ void XingLMC::DecodeWork()
           {
               ReportError(szFailRead);
               m_pContext->log->Error("LMC: Cannot read from pullbuffer: %s\n", m_szError); 
+              return;
+          }
+
+          x.in_bytes = 0;
+          Err = m_pOutputBuffer->BeginWrite(pOutBuffer, m_iMaxWriteSize);
+          if (Err == kError_Interrupt)
+          {
+              m_pInputBuffer->EndRead(0);
+              break;
+          }
+          if (Err == kError_BufferTooSmall)
+          {
+              m_pInputBuffer->EndRead(0);
+              if (Sleep())
+                 break;
+
+              continue;
+          }
+          if (Err != kError_NoErr)
+          {
+              m_pInputBuffer->EndRead(0);
+              if (m_decodeInfo.sendInfo)
+                  ReportError(szFailWrite);
+              else
+                  ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(new PMOErrorEvent());
+              m_pContext->log->Error("LMC: Cannot write to eventbuffer: %s (%d)\n", 
+                        m_szError, Err); 
               return;
           }
 
