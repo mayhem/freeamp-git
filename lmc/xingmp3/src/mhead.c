@@ -62,22 +62,28 @@ static int find_sync(unsigned char *buf, int n);
 static int sync_scan(unsigned char *buf, int n, int i0);
 static int sync_test(unsigned char *buf, int n, int isync, int padbytes);
 
+// jdw
+extern unsigned int g_jdw_additional;
+
 /*--------------------------------------------------------------*/
 int head_info(unsigned char *buf, unsigned int n, MPEG_HEAD * h)
 {
    int framebytes;
    int mpeg25_flag;
-
+  
    if (n > 10000)
       n = 10000;		/* limit scan for free format */
 
+
+
    h->sync = 0;
-   if ((buf[0] == 0xFF) && ((buf[1] & 0xF0) == 0xF0))
+   //if ((buf[0] == 0xFF) && ((buf[1] & 0xF0) == 0xF0))
+   if ((buf[0] == 0xFF) && ((buf[0+1] & 0xF0) == 0xF0))
    {
       mpeg25_flag = 0;		// mpeg 1 & 2
 
    }
-   else if ((buf[0] == 0xFF) && ((buf[1] & 0xF0) == 0xE0))
+   else if ((buf[0] == 0xFF) && ((buf[0+1] & 0xF0) == 0xE0))
    {
       mpeg25_flag = 1;		// mpeg 2.5
 
@@ -89,19 +95,19 @@ int head_info(unsigned char *buf, unsigned int n, MPEG_HEAD * h)
    if (mpeg25_flag)
       h->sync = 2;		//low bit clear signals mpeg25 (as in 0xFFE)
 
-   h->id = (buf[1] & 0x08) >> 3;
-   h->option = (buf[1] & 0x06) >> 1;
-   h->prot = (buf[1] & 0x01);
+   h->id = (buf[0+1] & 0x08) >> 3;
+   h->option = (buf[0+1] & 0x06) >> 1;
+   h->prot = (buf[0+1] & 0x01);
 
-   h->br_index = (buf[2] & 0xf0) >> 4;
-   h->sr_index = (buf[2] & 0x0c) >> 2;
-   h->pad = (buf[2] & 0x02) >> 1;
-   h->private_bit = (buf[2] & 0x01);
-   h->mode = (buf[3] & 0xc0) >> 6;
-   h->mode_ext = (buf[3] & 0x30) >> 4;
-   h->cr = (buf[3] & 0x08) >> 3;
-   h->original = (buf[3] & 0x04) >> 2;
-   h->emphasis = (buf[3] & 0x03);
+   h->br_index = (buf[0+2] & 0xf0) >> 4;
+   h->sr_index = (buf[0+2] & 0x0c) >> 2;
+   h->pad = (buf[0+2] & 0x02) >> 1;
+   h->private_bit = (buf[0+2] & 0x01);
+   h->mode = (buf[0+3] & 0xc0) >> 6;
+   h->mode_ext = (buf[0+3] & 0x30) >> 4;
+   h->cr = (buf[0+3] & 0x08) >> 3;
+   h->original = (buf[0+3] & 0x04) >> 2;
+   h->emphasis = (buf[0+3] & 0x03);
 
 
 // if( mpeg25_flag ) {
@@ -163,8 +169,26 @@ int head_info(unsigned char *buf, unsigned int n, MPEG_HEAD * h)
    else
       framebytes = find_sync(buf, n);	/* free format */
 
-   return framebytes;
+  return framebytes;
 }
+
+int head_info3(unsigned char *buf, unsigned int n, MPEG_HEAD *h, int *br, unsigned int *searchForward) {
+	unsigned int pBuf = 0;
+	// jdw insertion...
+   while ((pBuf < n) && !(
+		  (buf[pBuf] == 0xFF) && 
+		  ((buf[pBuf+1] & 0xE0) == 0xE0) )
+		 ) {
+		pBuf++;
+   }
+
+   if (pBuf == n) return 0;
+
+   *searchForward = pBuf;
+   return head_info2(&(buf[pBuf]),n,h,br);
+
+}
+
 /*--------------------------------------------------------------*/
 int head_info2(unsigned char *buf, unsigned int n, MPEG_HEAD * h, int *br)
 {

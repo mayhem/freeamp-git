@@ -103,6 +103,7 @@ private:
     int32 bs_fill();
     void bs_clear();
 private:
+	uint32					m_searchAhead;
     bool                    m_properlyInitialized;
     int32                   m_frameWaitTill;
     Semaphore *             m_pauseSemaphore;

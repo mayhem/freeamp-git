@@ -117,7 +117,7 @@ Error XingLMC::InitDecoder() {
 	MPEG_HEAD head;
 	int32 bitrate;
 	// parse MPEG header
-	m_frameBytes = head_info2(m_bsBuffer, m_bsBufBytes, &head, &bitrate);
+	m_frameBytes = head_info3(m_bsBuffer, m_bsBufBytes, &head, &bitrate,&m_searchAhead);
 	if (m_frameBytes == 0) {
 	    return (Error)lmcError_HeadInfoReturnedZero;
 	}
@@ -332,6 +332,8 @@ void XingLMC::DecodeWork() {
     in_bytes = out_bytes = 0;
 
 
+	//m_bsBufPtr = &(m_bsBufPtr[g_jdw_additional]);
+
     for (m_frameCounter = 0;;) {
 	if (m_frameCounter >= m_frameWaitTill) {
 	    actually_decode = 1;
@@ -341,7 +343,7 @@ void XingLMC::DecodeWork() {
 	    float totalTime = (float)((double)m_frameCounter * (double)tpf);
 	    int32 hours = (int32)(totalTime/3600);
 	    int32 minutes = ((int32)totalTime - hours) / 60;
-        int32 seconds = totalTime - hours*3600 - minutes*60;
+        int32 seconds = (int32)totalTime - hours*3600 - minutes*60;
 	    MediaTimeInfoEvent *pmtpi = new MediaTimeInfoEvent(hours,minutes,seconds,0,totalTime,m_frameCounter);
 	    if (m_target) {
 		m_target->AcceptEvent(pmtpi);
@@ -371,15 +373,22 @@ void XingLMC::DecodeWork() {
 	//}
 	if (m_bsBufBytes < m_frameBytes) 
 	    break; // end of file
-	IN_OUT x = m_audioMethods.decode(m_bsBufPtr, (short *) (m_pcmBuffer + m_pcmBufBytes));
+	//if (m_frameCounter == 0) {
+		//m_bsBufPtr = &(m_bsBufPtr[g_jdw_additional]);
+		//MessageBox(NULL,"Set it...", NULL, MB_OK);
+	//}
+	IN_OUT x = m_audioMethods.decode(&(m_bsBufPtr[m_searchAhead]), (short *) (m_pcmBuffer + m_pcmBufBytes));
+
 	if (x.in_bytes <= 0) {
 	    if (m_target) m_target->AcceptEvent(new LMCErrorEvent(this,(Error)lmcError_DecodeDidntDecode));
 	    return;
 	}
-	m_bsBufPtr += x.in_bytes;
-	m_bsBufBytes -= x.in_bytes;
+	m_bsBufPtr += x.in_bytes + m_searchAhead;
+	m_bsBufBytes -= x.in_bytes + m_searchAhead;
 	m_pcmBufBytes += x.out_bytes;
+	m_searchAhead = 0;
 	m_frameCounter++;
+
 	int32 nwrite = 0;
 
 	if (m_pcmBufBytes > m_pcmTrigger) {
