@@ -25,9 +25,10 @@ ____________________________________________________________________________*/
 #define INCLUDED_GTKPREFERENCEWINDOW_H__
 
 #include <map>
-#include <gtk/gtk.h>
-
+#include <set>
 using namespace std;
+
+#include <gtk/gtk.h>
 
 #include "config.h"
 #include "PreferenceWindow.h"
@@ -36,13 +37,14 @@ using namespace std;
 #include "log.h"
 #include "registrar.h"
 
+typedef set<string> PortableSet;
+
 typedef struct PrefsStruct 
 {
     Preferences* prefs;
 
     // page 1
-    char defaultUI[256];
-    char defaultPMO[256];
+    string defaultPMO;
     int32 inputBufferSize;
     int32 outputBufferSize;
     int32 preBufferLength;
@@ -50,11 +52,11 @@ typedef struct PrefsStruct
     // page 2
     int32 streamInterval;
     bool saveStreams;
-    char saveStreamsDirectory[_MAX_PATH + 1];
+    string saveStreamsDirectory;
     bool useProxyServer;
-    char proxyServer[256]; // is there a domain name length limit???
+    string proxyServer; // is there a domain name length limit???
     bool useAlternateIP;
-    char alternateIP[16];
+    string alternateIP;
     
     // page 3
     bool enableLogging;
@@ -65,22 +67,45 @@ typedef struct PrefsStruct
     bool logPerformance;
 
     // page 5
-    char   defaultFont[256];
-    bool   fontChanged;
+    string defaultFont;
     string currentTheme;
     int    listboxIndex;
-    
-    PrefsStruct()
+   
+    string saveMusicDirectory;
+    PortableSet portablePlayers;
+
+    bool operator == (const struct PrefsStruct& pref)
     {
-        memset(defaultUI, 0x00, sizeof(defaultUI));
-        memset(defaultPMO, 0x00, sizeof(defaultPMO));
-        memset(saveStreamsDirectory, 0x00, sizeof(saveStreamsDirectory));
-        memset(proxyServer, 0x00, sizeof(proxyServer));
-        memset(alternateIP, 0x00, sizeof(alternateIP));
-        memset(defaultFont, 0x00, sizeof(defaultFont));
-        currentTheme = "";
+        return (
+            defaultPMO == pref.defaultPMO &&
+            inputBufferSize == pref.inputBufferSize &&
+            outputBufferSize == pref.outputBufferSize &&
+            preBufferLength == pref.preBufferLength &&
+            streamInterval == pref.streamInterval &&
+            saveStreams == pref.saveStreams &&
+            saveStreamsDirectory == pref.saveStreamsDirectory &&
+            useProxyServer == pref.useProxyServer &&
+            proxyServer == pref.proxyServer &&
+            useAlternateIP == pref.useAlternateIP &&
+            alternateIP == pref.alternateIP &&
+            enableLogging == pref.enableLogging &&
+            logMain == pref.logMain &&
+            logInput == pref.logInput &&
+            logOutput == pref.logOutput &&
+            logDecoder == pref.logDecoder &&
+            logPerformance == pref.logPerformance &&
+            defaultFont == pref.defaultFont &&
+            currentTheme == pref.currentTheme &&
+            saveMusicDirectory == pref.saveMusicDirectory &&
+            portablePlayers == pref.portablePlayers &&
+            true
+        );
     }
 
+    bool operator != (const struct PrefsStruct& pref)
+    {
+        return ! (*this == pref);
+    }
 } PrefsStruct;
 
 class GTKPreferenceWindow : public PreferenceWindow
@@ -102,6 +127,8 @@ class GTKPreferenceWindow : public PreferenceWindow
   protected:
     
       PrefsStruct  currentValues;
+      PrefsStruct  originalValues;
+      PrefsStruct  proposedValues;
 
       map<string, string> m_oThemeList;
 

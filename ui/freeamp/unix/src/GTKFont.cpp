@@ -32,27 +32,33 @@ GTKFont::GTKFont(string &oName, string &oFace, string &oDefault) :
     
     char *dup = strdup(m_oFace.c_str());
     char *token = strtok(dup, ",");
-    bool found = false;
+    bool gdkfound = false;
+    bool ttffound = false;
     gdk_threads_enter();
     for (;;) {
-        if (found = ListFonts(token))
+        if (gdkfound = ListFonts(token))
             break;
         token = strtok(NULL, ",");
         if (token == NULL)
             break;
     }
-    gdk_threads_leave();
-    if (found) {
+    gdk_threads_leave(); 
+    if (gdkfound) {
         m_oFace = token;
         type = kFontTypeGdk;
+    }
+    else if (ttffound) { 
+        m_oFace = token;
+        type = kFontTypeTTF;
     }
     else {
         m_oFace = m_oDefault;
         type = kFontTypeGdk;
     }
-    free(dup);
+//    free(dup);
 
     gfont = NULL;
+    ttfont = NULL;
     bold = false;
     italic = false;
     underline = false;
@@ -61,59 +67,89 @@ GTKFont::GTKFont(string &oName, string &oFace, string &oDefault) :
 
 Error GTKFont::Load(int iFontHeight, bool bBold, bool bItalic)
 {
-    if (bold != bBold || italic != bItalic || size != iFontHeight || !gfont) {
-        bold = bBold;
-        italic = bItalic;
-        size = iFontHeight;
-        gdk_threads_enter();
-        if (gfont)
-            gdk_font_unref(gfont);
-        string fontname = BuildFontString(bold, italic, size);
-        gfont = gdk_font_load(fontname.c_str());
-        if (!gfont) {
-            fontname = "-*-" + m_oFace + string("-*");
+    if (type == kFontTypeGdk) {
+        if (bold != bBold || italic != bItalic || size != iFontHeight || 
+            !gfont) {
+            bold = bBold;
+            italic = bItalic;
+            size = iFontHeight;
+            gdk_threads_enter();
+            if (gfont)
+                gdk_font_unref(gfont);
+            string fontname = BuildFontString(bold, italic, size);
             gfont = gdk_font_load(fontname.c_str());
             if (!gfont) {
-                gfont = gdk_font_load("default");  
+                fontname = "-*-" + m_oFace + string("-*");
+                gfont = gdk_font_load(fontname.c_str());
                 if (!gfont) {
-                    gdk_threads_leave();
-                    cout << "oops, couldn't load _any_ fonts...\n";
-                    return kError_YouScrewedUp;
+                    gfont = gdk_font_load("default");  
+                    if (!gfont) {
+                        gdk_threads_leave();
+                        cout << "oops, couldn't load _any_ fonts...\n";
+                        return kError_YouScrewedUp;
+                    }
                 }
-            }
-        } 
-        gdk_threads_leave();
+            } 
+            gdk_threads_leave();
+        }
     }
+#ifdef HAVE_FREETYPE
+    else {
+        if (ttfont)
+            Efont_free(ttfont);
+        ttfont = Efont_load("/tmp/asimov.ttf", iFontHeight - 3);
+        if (!ttfont) {
+            cout << "ERROR loading ttfn";
+            return kError_YouScrewedUp;
+        }
+    }
+#endif
     return kError_NoErr;
 }
 
 int GTKFont::GetLength(string &oText)
 {
-    assert(gfont);
-    
-    gdk_threads_enter();
-    int retvalue = gdk_string_measure(gfont, oText.c_str());
-    gdk_threads_leave();
- 
+    int retvalue = 0;
+
+    if (type == kFontTypeGdk) {
+        gdk_threads_enter();
+        retvalue = gdk_string_measure(gfont, oText.c_str());
+        gdk_threads_leave();
+    } 
+#ifdef HAVE_FREETYPE
+    else if (type == kFontTypeTTF) {
+        Efont_extents(ttfont, (char *)oText.c_str(), NULL, NULL, &retvalue, 
+                      NULL, NULL, NULL, NULL);
+    }
+#endif
     return retvalue;
 }
 
 int GTKFont::GetHeight(string &oText)
 {
-    assert(gfont);
-   
-    gdk_threads_enter();
-    int retvalue = gdk_string_height(gfont, oText.c_str());
-    gdk_threads_leave();
-   
+    int retvalue = 0;
+
+    if (type == kFontTypeGdk) {   
+       gdk_threads_enter();
+       retvalue = gdk_string_height(gfont, oText.c_str());
+       gdk_threads_leave();
+    }
+#ifdef HAVE_FREETYPE
+    else if (type == kFontTypeTTF) {
+       int ascent = 0, descent = 0;
+       Efont_extents(ttfont, (char *)oText.c_str(), &ascent, &descent, NULL, 
+                     NULL, NULL, NULL, NULL);
+       retvalue = ascent + descent;
+    }
+#endif
     return retvalue;
 }
 
 void GTKFont::Render(Rect &oClipRect, string &oText, int iOffset, 
                      const Color &oColor, GTKBitmap *bitmap, bool bUnderline)
 {
-    assert(gfont);
-
+    if (!bitmap->GetBitmap())
+        return;
     gdk_threads_enter();
     GdkGC *gc = gdk_gc_new((GdkWindow *)bitmap->GetBitmap());
     gdk_rgb_gc_set_foreground(gc, (oColor.red << 16) | (oColor.green << 8) |
@@ -127,11 +163,19 @@ void GTKFont::Render(Rect &oClipRect, string &oText, int iOffset,
 
     gdk_gc_set_clip_rectangle(gc, &clipRect);
 
-    gdk_draw_string(bitmap->GetBitmap(), gfont, gc, oClipRect.x1 + iOffset, 
-                    oClipRect.y1 + oClipRect.Height() - 3, oText.c_str());
+    if (type == kFontTypeGdk) {
+       gdk_draw_string(bitmap->GetBitmap(), gfont, gc, oClipRect.x1 + iOffset, 
+                       oClipRect.y1 + oClipRect.Height() - 3, oText.c_str());
 
-// TODO: Underline...
-
+    // TODO: Underline...
+    }
+#ifdef HAVE_FREETYPE
+    else if (type == kFontTypeTTF) {
+       EFont_draw_string(bitmap->GetBitmap(), gc, oClipRect.x1 + iOffset, 
+                         oClipRect.y1 + oClipRect.Height() - 3, 
+                         (char *)oText.c_str(), ttfont);
+    }
+#endif
     gdk_flush();
     gdk_gc_unref(gc);
     gdk_threads_leave();
@@ -161,8 +205,15 @@ string GTKFont::BuildFontString(bool bBold, bool bItalic, int iFontHeight)
 GTKFont::~GTKFont(void)
 {
     gdk_threads_enter();
-    if (type == kFontTypeGdk)
+    if (type == kFontTypeGdk) {
         if (gfont)
             gdk_font_unref(gfont);
+    }
+#ifdef HAVE_FREETYPE
+    else {
+        if (ttfont)
+            Efont_free(ttfont);
+    }
+#endif
     gdk_threads_leave();
 }

@@ -42,11 +42,10 @@ ThemeManager::~ThemeManager(void)
 Error ThemeManager::GetDefaultTheme(string &oThemePath)
 {
     char              dir[MAX_PATH];
-    uint32            len = sizeof(dir);
+    map<string, string> oThemeList;
 
-    m_pContext->prefs->GetInstallDirectory(dir, &len);
-    oThemePath = string(dir);
-    oThemePath += string("/../share/freeamp/themes/freeamp.fat");    
+    GetThemeList(oThemeList);
+    oThemePath = oThemeList["freeamp"];
 
     return kError_NoErr;
 }

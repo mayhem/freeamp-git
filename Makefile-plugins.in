@@ -141,14 +141,12 @@ FREEAMPUIOBJ = ui/freeamp/src/Theme.doh ui/freeamp/src/Bitmap.o \
                ui/freeamp/unix/src/GTKFont.o ui/freeamp/unix/src/GTKUtility.o \
                ui/freeamp/unix/src/GTKMessageDialog.o \
                ui/freeamp/unix/src/GTKWindow.o ui/freeamp/unix/src/GTKBitmap.o \
-               ui/freeamp/unix/src/GTKCanvas.o \
+               ui/freeamp/unix/src/GTKCanvas.o ui/freeamp/unix/src/ttfont.o \
 	       ui/freeamp/unix/src/ThemeManager.o \
                ui/freeamp/unix/src/GTKPreferenceWindow.o 
 
 plugins/freeamp.ui: $(FREEAMPUIOBJ)
-	$(LINKMOD) -o $@ $(FREEAMPUIOBJ) lib/zlib/lib/libzlib.a $(GTK_LIBS)
-
-#        $(LINKMOD) -o $@ $(FREEAMPUIOBJ) lib/zlib/lib/libzlib.a -L/usr/lib -L/usr/X11R6/lib -rdynamic /usr/lib/libgtk_g.a /usr/lib/libgdk_g.a /usr/lib/libgmodule_g.a /usr/lib/libgthread_g.a /usr/lib/libglib_g.a -lpthread -ldl -lXi -lXext -lX11 -lm
+	$(LINKMOD) -o $@ $(FREEAMPUIOBJ) lib/zlib/lib/libzlib.a $(GTK_LIBS) $(TTF_LIBS)
 
 # MakeTheme, only built if we're building freeamp.ui
 

@@ -71,7 +71,9 @@ void pref_cancel_click(GtkWidget *w, GTKPreferenceWindow *p)
 
 bool GTKPreferenceWindow::Show(Window *pWindow)
 {
-    GetPrefsValues(m_pContext->prefs, &currentValues);
+    GetPrefsValues(m_pContext->prefs, &originalValues);
+
+    currentValues = proposedValues = originalValues;
 
     gdk_threads_enter();
     mainWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -158,26 +160,53 @@ bool GTKPreferenceWindow::Show(Window *pWindow)
 void GTKPreferenceWindow::GetPrefsValues(Preferences* prefs, 
                                          PrefsStruct* values)
 {
-    uint32 size = 256;
+    uint32 bufferSize = 1;
+    uint32 size;
 
-    values->prefs = prefs;
+    char *buffer = (char *)malloc(bufferSize);
 
-    prefs->GetDefaultPMO(values->defaultPMO, &size);
-    size = 256;
-    prefs->GetDefaultUI(values->defaultUI, &size);
+    size = bufferSize;
+
+    if (kError_BufferTooSmall == prefs->GetDefaultPMO(buffer, &size)) {
+        buffer = (char *)realloc(buffer, size);
+        prefs->GetDefaultPMO(buffer, &size);
+    }
+    values->defaultPMO = buffer;
+    size = bufferSize;
+
     prefs->GetInputBufferSize(&values->inputBufferSize);
     prefs->GetOutputBufferSize(&values->outputBufferSize);
     prefs->GetPrebufferLength(&values->preBufferLength);
 
     prefs->GetStreamBufferInterval(&values->streamInterval);
     prefs->GetSaveStreams(&values->saveStreams);
-    size = 256;
-    prefs->GetProxyServerAddress(values->proxyServer, &size);
+    
+    if (kError_BufferTooSmall == prefs->GetProxyServerAddress(buffer, &size)) {
+        buffer = (char *)realloc(buffer, size);
+        prefs->GetProxyServerAddress(buffer, &size);
+    }
+    values->proxyServer = buffer;
+
     prefs->GetUseProxyServer(&values->useProxyServer);
-    size = _MAX_PATH;
-    prefs->GetSaveStreamsDirectory(values->saveStreamsDirectory, &size);
-    size = 16;
-    prefs->GetAlternateNICAddress(values->alternateIP, &size);
+
+    size = bufferSize;
+
+    if(kError_BufferTooSmall == prefs->GetSaveStreamsDirectory(buffer, &size)) {
+        buffer = (char*)realloc(buffer, size);
+        prefs->GetSaveStreamsDirectory(buffer, &size);
+    }
+    values->saveStreamsDirectory = buffer;
+    
+    size = bufferSize;
+
+    if(kError_BufferTooSmall == prefs->GetAlternateNICAddress(buffer, &size)) {
+        buffer = (char*)realloc(buffer, size);
+        prefs->GetAlternateNICAddress(buffer, &size);
+    }
+
+    values->alternateIP = buffer;
+    size = bufferSize;
+
     prefs->GetUseAlternateNIC(&values->useAlternateIP);
 
     prefs->GetUseDebugLog(&values->enableLogging);
@@ -187,28 +216,67 @@ void GTKPreferenceWindow::GetPrefsValues(Preferences* prefs,
     prefs->GetLogOutput(&values->logOutput);
     prefs->GetLogPerformance(&values->logPerformance);
 
-    size = 256;
-    prefs->GetThemeDefaultFont(values->defaultFont, &size);
+    if(kError_BufferTooSmall == prefs->GetThemeDefaultFont(buffer, &size)) {
+        buffer = (char*)realloc(buffer, size);
+        prefs->GetThemeDefaultFont(buffer, &size);
+    }
+
+    values->defaultFont = buffer;
+    size = bufferSize;
+
+    if(kError_BufferTooSmall == prefs->GetSaveMusicDirectory(buffer, &size)) {
+        buffer = (char*)realloc(buffer, size);
+        prefs->GetSaveMusicDirectory(buffer, &size);
+    }
+    values->saveMusicDirectory = buffer;
+
     m_pThemeMan->GetCurrentTheme(values->currentTheme);
+
+    if(kError_BufferTooSmall == prefs->GetSaveMusicDirectory(buffer, &size))
+    {
+        bufferSize = size;
+        buffer = (char*)realloc(buffer, bufferSize);
+        prefs->GetSaveMusicDirectory(buffer, &size);
+    }
+
+    values->saveMusicDirectory = buffer;
+    size = bufferSize;
+
+    if(kError_BufferTooSmall == prefs->GetUsersPortablePlayers(buffer, &size)) {
+        buffer = (char*)realloc(buffer, size);
+        prefs->GetUsersPortablePlayers(buffer, &size);
+    }
+
+    char* cp = buffer;
+    char* name = cp;
+
+    while ((cp = strchr(cp, ';'))) {
+        *cp = 0x00;
+        values->portablePlayers.insert(string(name));
+        cp++;
+        name = cp;
+    }
+
+    if (*name) 
+        values->portablePlayers.insert(string(name));
+
+    free(buffer);
 }
 
 void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs, 
                                           PrefsStruct* values)
 {
-    prefs = values->prefs;
-
-    prefs->SetDefaultPMO(values->defaultPMO);
-    prefs->SetDefaultUI(values->defaultUI);
+    prefs->SetDefaultPMO(values->defaultPMO.c_str());
     prefs->SetInputBufferSize(values->inputBufferSize);
     prefs->SetOutputBufferSize(values->outputBufferSize);
     prefs->SetPrebufferLength(values->preBufferLength);
 
     prefs->SetStreamBufferInterval(values->streamInterval);
     prefs->SetSaveStreams(values->saveStreams);
-    prefs->SetSaveStreamsDirectory(values->saveStreamsDirectory);
-    prefs->SetProxyServerAddress(values->proxyServer);
+    prefs->SetSaveStreamsDirectory(values->saveStreamsDirectory.c_str());
+    prefs->SetProxyServerAddress(values->proxyServer.c_str());
     prefs->SetUseProxyServer(values->useProxyServer);
-    prefs->SetAlternateNICAddress(values->alternateIP);
+    prefs->SetAlternateNICAddress(values->alternateIP.c_str());
     prefs->SetUseAlternateNIC(values->useAlternateIP);
 
     prefs->SetUseDebugLog(values->enableLogging);
@@ -218,7 +286,7 @@ void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs,
     prefs->SetLogOutput(values->logOutput);
     prefs->SetLogPerformance(values->logPerformance);
 
-    prefs->SetThemeDefaultFont(values->defaultFont);
+    prefs->SetThemeDefaultFont(values->defaultFont.c_str());
 
     map<string, string>::iterator i;
     int32 iLoop = 0;
@@ -228,19 +296,31 @@ void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs,
              currentValues.currentTheme = (*i).first;
     }
     m_pThemeMan->UseTheme(m_oThemeList[values->currentTheme]);
+
+    prefs->SetSaveMusicDirectory(values->saveMusicDirectory.c_str());
+
+    PortableSet::const_iterator j = values->portablePlayers.begin();
+    string portableList;
+
+    for (; j != values->portablePlayers.end(); j++) {
+        portableList += *j;
+        portableList += ";";
+    }
+    prefs->SetUsersPortablePlayers(portableList.c_str());
+
+    if (*values != currentValues) {
+        m_pContext->target->AcceptEvent(new Event(INFO_PrefsChanged));
+        currentValues = proposedValues = *values;
+    }
 }
 
 void pmo_select(GtkWidget *item, GTKPreferenceWindow *p)
 {
 }
 
-void ui_select(GtkWidget *item, GTKPreferenceWindow *p)
-{
-}
-
 void GTKPreferenceWindow::SetInputBufferSize(int newvalue)
 {
-    currentValues.inputBufferSize = newvalue;
+    proposedValues.inputBufferSize = newvalue;
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
@@ -254,7 +334,7 @@ void input_buffer_change(GtkWidget *w, GTKPreferenceWindow *p)
 
 void GTKPreferenceWindow::SetOutputBufferSize(int newvalue)
 {
-    currentValues.outputBufferSize = newvalue;
+    proposedValues.outputBufferSize = newvalue;
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
@@ -268,7 +348,7 @@ void output_buffer_change(GtkWidget *w, GTKPreferenceWindow *p)
 
 void GTKPreferenceWindow::SetPreBufferLength(int newvalue)
 {
-    currentValues.preBufferLength = newvalue;
+    proposedValues.preBufferLength = newvalue;
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
@@ -316,7 +396,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage1(void)
         gtk_widget_show(menuitem);
 
         gtk_menu_append(GTK_MENU(menu), menuitem);
-        if (!strcmp(currentValues.defaultPMO, item->Name()))
+        if (originalValues.defaultPMO == item->Name())
             pos = i;
     }
     gtk_option_menu_set_menu(GTK_OPTION_MENU(optionmenu), menu);
@@ -343,7 +423,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage1(void)
     gtk_widget_show(label);
 
     GtkWidget *entry = gtk_entry_new();
-    value = currentValues.inputBufferSize;
+    value = originalValues.inputBufferSize;
     sprintf(tempstr, "%d", value);
     gtk_entry_set_text(GTK_ENTRY(entry), tempstr);
     gtk_entry_set_max_length(GTK_ENTRY(entry), 4);
@@ -360,7 +440,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage1(void)
     gtk_widget_show(label);
 
     entry = gtk_entry_new();
-    value = currentValues.outputBufferSize;
+    value = originalValues.outputBufferSize;
     sprintf(tempstr, "%d", value);
     gtk_entry_set_text(GTK_ENTRY(entry), tempstr);
     gtk_entry_set_max_length(GTK_ENTRY(entry), 4);
@@ -377,7 +457,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage1(void)
     gtk_widget_show(label);
 
     entry = gtk_entry_new();
-    value = currentValues.preBufferLength;
+    value = originalValues.preBufferLength;
     sprintf(tempstr, "%d", value);
     gtk_entry_set_text(GTK_ENTRY(entry), tempstr);
     gtk_entry_set_max_length(GTK_ENTRY(entry), 2);
@@ -392,7 +472,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage1(void)
 
 void GTKPreferenceWindow::SetStreamInterval(int newvalue)
 {
-    currentValues.streamInterval = newvalue;
+    proposedValues.streamInterval = newvalue;
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
@@ -409,7 +489,7 @@ void GTKPreferenceWindow::SaveLocalToggle(int active)
     gtk_widget_set_sensitive(saveStreamLabel, active);
     gtk_widget_set_sensitive(saveStreamBox, active);
 //    gtk_widget_set_sensitive(saveBrowseBox, active);
-    currentValues.saveStreams = active;
+    proposedValues.saveStreams = active;
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
@@ -426,7 +506,7 @@ void GTKPreferenceWindow::ProxyToggle(int active)
     gtk_widget_set_sensitive(proxyColon, active);
     gtk_widget_set_sensitive(proxyAddyLabel, active);
     gtk_widget_set_sensitive(proxyPortLabel, active);
-    currentValues.useProxyServer = active;
+    proposedValues.useProxyServer = active;
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
@@ -446,7 +526,7 @@ void GTKPreferenceWindow::AltIPToggle(int active)
     gtk_widget_set_sensitive(ipThreeBox, active);
     gtk_widget_set_sensitive(ipPeriod3, active);
     gtk_widget_set_sensitive(ipFourBox, active);
-    currentValues.useAlternateIP = active;
+    proposedValues.useAlternateIP = active;
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
@@ -458,7 +538,7 @@ void alt_ip_toggle(GtkWidget *w, GTKPreferenceWindow *p)
 
 void GTKPreferenceWindow::SaveLocalSet(char *newpath)
 {
-    strcpy(currentValues.saveStreamsDirectory, newpath);
+    proposedValues.saveStreamsDirectory = newpath;
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
@@ -473,10 +553,9 @@ void GTKPreferenceWindow::ProxyAddySet()
     char *name = gtk_entry_get_text(GTK_ENTRY(proxyAddyBox));
     char *port = gtk_entry_get_text(GTK_ENTRY(proxyPortBox));
 
-    strcpy(currentValues.proxyServer, name);
+    proposedValues.proxyServer = name;
     if (*port) {
-        strcat(currentValues.proxyServer, ":");
-        strcat(currentValues.proxyServer, port);
+        proposedValues.proxyServer += string(":") + string(port);
     }
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
@@ -493,24 +572,24 @@ void GTKPreferenceWindow::AltIPSet()
     char *three = gtk_entry_get_text(GTK_ENTRY(ipThreeBox));
     char *four = gtk_entry_get_text(GTK_ENTRY(ipFourBox));
     if (*one)
-        strcpy(currentValues.alternateIP, one);
+        proposedValues.alternateIP = one;
     else
-        strcpy(currentValues.alternateIP, "0");
-    strcat(currentValues.alternateIP, ".");
+        proposedValues.alternateIP = "0";
+    proposedValues.alternateIP += ".";
     if (*two)
-        strcpy(currentValues.alternateIP, two);
+        proposedValues.alternateIP += two;
     else
-        strcpy(currentValues.alternateIP, "0");
-    strcat(currentValues.alternateIP, ".");
+        proposedValues.alternateIP += "0";
+    proposedValues.alternateIP += ".";
     if (*three)
-        strcpy(currentValues.alternateIP, three);
+        proposedValues.alternateIP += three;
     else
-        strcpy(currentValues.alternateIP, "0");
-    strcat(currentValues.alternateIP, ".");
+        proposedValues.alternateIP += "0";
+    proposedValues.alternateIP += ".";
     if (*four)
-        strcpy(currentValues.alternateIP, four);
+        proposedValues.alternateIP += four;
     else
-        strcpy(currentValues.alternateIP, "0");
+        proposedValues.alternateIP += "0";
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
@@ -542,7 +621,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage2(void)
     char tempstr[256];
 
     GtkWidget *entry = gtk_entry_new();
-    value = currentValues.streamInterval;
+    value = originalValues.streamInterval;
     sprintf(tempstr, "%d", value);
     gtk_entry_set_text(GTK_ENTRY(entry), tempstr);
     gtk_entry_set_max_length(GTK_ENTRY(entry), 2);
@@ -560,7 +639,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage2(void)
     gtk_container_add(GTK_CONTAINER(pane), check);
     gtk_signal_connect(GTK_OBJECT(check), "toggled",
                        GTK_SIGNAL_FUNC(save_local_toggle), this);
-    if (currentValues.saveStreams)
+    if (originalValues.saveStreams)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), TRUE);
     gtk_widget_show(check);
 
@@ -580,7 +659,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage2(void)
 
     char copys[256];
 
-    strncpy(copys, currentValues.saveStreamsDirectory, 256);
+    strncpy(copys, originalValues.saveStreamsDirectory.c_str(), 256);
     saveStreamBox = gtk_entry_new();
     gtk_entry_set_text(GTK_ENTRY(saveStreamBox), copys); 
     gtk_entry_set_max_length(GTK_ENTRY(saveStreamBox), 64);
@@ -589,7 +668,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage2(void)
     gtk_box_pack_start(GTK_BOX(vbox), saveStreamBox, FALSE, FALSE, 0);
     gtk_widget_show(saveStreamBox);
 
-    if (!currentValues.saveStreams) {
+    if (!originalValues.saveStreams) {
         gtk_widget_set_sensitive(saveStreamLabel, FALSE);
         gtk_widget_set_sensitive(saveStreamBox, FALSE);
 //        gtk_widget_set_sensitive(saveBrowseBox, FALSE);
@@ -599,7 +678,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage2(void)
     gtk_container_add(GTK_CONTAINER(pane), check);
     gtk_signal_connect(GTK_OBJECT(check), "toggled",
                        GTK_SIGNAL_FUNC(proxy_toggle), this);
-    if (currentValues.useProxyServer)
+    if (originalValues.useProxyServer)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), TRUE);
     gtk_widget_show(check);
 
@@ -633,7 +712,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage2(void)
     gtk_widget_show(hbox);
 
     char *port = NULL;
-    strncpy(tempstr, currentValues.proxyServer, 256);
+    strncpy(tempstr, originalValues.proxyServer.c_str(), 256);
     port = strrchr(tempstr, ':');
     if (port) {
         *port = '\0';
@@ -660,7 +739,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage2(void)
     gtk_box_pack_start(GTK_BOX(hbox), proxyPortBox, FALSE, FALSE, 0);
     gtk_widget_show(proxyPortBox);
 
-    if (!currentValues.useProxyServer) {
+    if (!originalValues.useProxyServer) {
         gtk_widget_set_sensitive(proxyAddyBox, FALSE);
         gtk_widget_set_sensitive(proxyPortBox, FALSE);
         gtk_widget_set_sensitive(proxyColon, FALSE);
@@ -672,7 +751,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage2(void)
     gtk_container_add(GTK_CONTAINER(pane), check);
     gtk_signal_connect(GTK_OBJECT(check), "toggled",
                        GTK_SIGNAL_FUNC(alt_ip_toggle), this);
-    if (currentValues.useAlternateIP)
+    if (originalValues.useAlternateIP)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), TRUE);
     gtk_widget_show(check);
 
@@ -693,7 +772,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage2(void)
     char *ip[4];
     int32 i = 1;
 
-    strncpy(tempstr, currentValues.alternateIP, 256);
+    strncpy(tempstr, originalValues.alternateIP.c_str(), 256);
     ip[0] = tempstr;
     dot = tempstr;
 
@@ -752,7 +831,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage2(void)
     gtk_box_pack_start(GTK_BOX(hbox), ipFourBox, TRUE, FALSE, 0);
     gtk_widget_show(ipFourBox);
 
-    if (!currentValues.useAlternateIP) {
+    if (!originalValues.useAlternateIP) {
         gtk_widget_set_sensitive(ipLabel, FALSE);
         gtk_widget_set_sensitive(ipOneBox, FALSE);
         gtk_widget_set_sensitive(ipPeriod1, FALSE);
@@ -773,7 +852,7 @@ void GTKPreferenceWindow::LogToggle(int active)
     gtk_widget_set_sensitive(logPMO, active);
     gtk_widget_set_sensitive(logLMC, active);
     gtk_widget_set_sensitive(logPerf, active);
-    currentValues.enableLogging = active;
+    proposedValues.enableLogging = active;
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
@@ -785,7 +864,7 @@ void log_toggle(GtkWidget *w, GTKPreferenceWindow *p)
 
 void GTKPreferenceWindow::GeneralToggle(int active)
 {
-    currentValues.logMain = active;
+    proposedValues.logMain = active;
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
@@ -796,7 +875,7 @@ void general_toggle(GtkWidget *w, GTKPreferenceWindow *p)
 }
 void GTKPreferenceWindow::PMIToggle(int active)
 {
-    currentValues.logInput = active;
+    proposedValues.logInput = active;
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
@@ -808,7 +887,7 @@ void pmi_toggle(GtkWidget *w, GTKPreferenceWindow *p)
 
 void GTKPreferenceWindow::PMOToggle(int active)
 {
-    currentValues.logOutput = active;
+    proposedValues.logOutput = active;
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
@@ -820,7 +899,7 @@ void pmo_toggle(GtkWidget *w, GTKPreferenceWindow *p)
 
 void GTKPreferenceWindow::LMCToggle(int active)
 {
-    currentValues.logDecoder = active;
+    proposedValues.logDecoder = active;
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
@@ -832,7 +911,7 @@ void lmc_toggle(GtkWidget *w, GTKPreferenceWindow *p)
 
 void GTKPreferenceWindow::PerfToggle(int active)
 {
-    currentValues.logPerformance = active;
+    proposedValues.logPerformance = active;
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
@@ -866,7 +945,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage3(void)
     gtk_container_add(GTK_CONTAINER(pane), check);
     gtk_signal_connect(GTK_OBJECT(check), "toggled",
                        GTK_SIGNAL_FUNC(log_toggle), this);
-    if (currentValues.enableLogging)
+    if (originalValues.enableLogging)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), TRUE);
     gtk_widget_show(check);
 
@@ -884,7 +963,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage3(void)
     gtk_container_add(GTK_CONTAINER(vbox), logGeneral);
     gtk_signal_connect(GTK_OBJECT(logGeneral), "toggled",
                        GTK_SIGNAL_FUNC(general_toggle), this);
-    if (currentValues.logMain)
+    if (originalValues.logMain)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(logGeneral), TRUE);
     gtk_widget_show(logGeneral);
 
@@ -893,7 +972,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage3(void)
     gtk_container_add(GTK_CONTAINER(vbox), logPMI);
     gtk_signal_connect(GTK_OBJECT(logPMI), "toggled",
                        GTK_SIGNAL_FUNC(pmi_toggle), this);
-    if (currentValues.logInput)
+    if (originalValues.logInput)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(logPMI), TRUE);
     gtk_widget_show(logPMI);
 
@@ -902,7 +981,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage3(void)
     gtk_container_add(GTK_CONTAINER(vbox), logPMO);
     gtk_signal_connect(GTK_OBJECT(logPMO), "toggled",
                        GTK_SIGNAL_FUNC(pmo_toggle), this);
-    if (currentValues.logOutput)
+    if (originalValues.logOutput)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(logPMO), TRUE);
     gtk_widget_show(logPMO);
 
@@ -911,7 +990,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage3(void)
     gtk_container_add(GTK_CONTAINER(vbox), logLMC);
     gtk_signal_connect(GTK_OBJECT(logLMC), "toggled",
                        GTK_SIGNAL_FUNC(lmc_toggle), this);
-    if (currentValues.logDecoder)
+    if (originalValues.logDecoder)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(logLMC), TRUE);
     gtk_widget_show(logLMC);
 
@@ -920,7 +999,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage3(void)
     gtk_container_add(GTK_CONTAINER(vbox), logPerf);
     gtk_signal_connect(GTK_OBJECT(logPerf), "toggled",
                        GTK_SIGNAL_FUNC(perf_toggle), this);
-    if (currentValues.logPerformance)
+    if (originalValues.logPerformance)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(logPerf), TRUE);
     gtk_widget_show(logPerf);
 
@@ -952,7 +1031,7 @@ GtkWidget *GTKPreferenceWindow::CreateAbout(void)
 
 void GTKPreferenceWindow::SelectTheme(int row)
 {
-    currentValues.listboxIndex = row;
+    proposedValues.listboxIndex = row;
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
@@ -990,7 +1069,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage5(void)
     map<string, string>::iterator i;
     currentValues.listboxIndex = 0;
 
-    m_pThemeMan->GetCurrentTheme(currentValues.currentTheme);
+    m_pThemeMan->GetCurrentTheme(originalValues.currentTheme);
     m_oThemeList.clear();
 
     m_pThemeMan->GetThemeList(m_oThemeList);
@@ -998,11 +1077,11 @@ GtkWidget *GTKPreferenceWindow::CreatePage5(void)
          char *Text[1];
          Text[0] = (char *)((*i).first.c_str());
          gtk_clist_append(GTK_CLIST(list), Text);
-         if ((*i).first == currentValues.currentTheme)
+         if ((*i).first == originalValues.currentTheme)
              currentValues.listboxIndex = iLoop;
     }
 
-    gtk_clist_select_row(GTK_CLIST(list), currentValues.listboxIndex, 1);
+    gtk_clist_select_row(GTK_CLIST(list), originalValues.listboxIndex, 1);
 
     return pane;
 }

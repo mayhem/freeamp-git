@@ -83,7 +83,7 @@ void drop_file(GtkWidget *w, GdkDragContext *context, gint x, gint y,
 {
     gdk_threads_leave();
     if (data->data) {
-        p->DropFiles((char *)data->data);
+        ui->DropFiles((char *)data->data);
     }
     gdk_threads_enter();
 }

@@ -187,6 +187,22 @@ fi
 
 AC_SUBST(ESD_LIBS)
 
+dnl optional freetype support..
+
+AC_CHECK_HEADER(freetype.h, have_freetype="true", have_freetype="false")
+
+TTF_LIBS=""
+if test "$have_freetype" = "true"; then
+  AC_CHECK_LIB(ttf, TT_Init_FreeType, have_freetype="true", 
+               have_freetype = "false", -lm)
+fi
+if test "$have_freetype" = "true"; then
+  TTF_LIBS="-lttf"
+  AC_DEFINE(HAVE_FREETYPE)
+fi
+ 
+AC_SUBST(TTF_LIBS)
+ 
 dnl gtk+ junk
 
 have_gtk="true"

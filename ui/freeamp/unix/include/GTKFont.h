@@ -24,6 +24,8 @@ ____________________________________________________________________________*/
 #ifndef INCLUDED_GTKFONT_H__
 #define INCLUDED_GTKFONT_H__
 
+#include "config.h"
+
 #include <string>
 #include <gdk/gdk.h>
 #include "GTKBitmap.h"
@@ -31,6 +33,12 @@ ____________________________________________________________________________*/
 using namespace std;
 
 #include "Font.h"
+
+#ifdef HAVE_FREETYPE
+extern "C" {
+#include "ttfont.h"
+}
+#endif
 
 enum FontTypeEnum 
 {
@@ -58,6 +66,9 @@ class GTKFont : public Font
       FontTypeEnum type;
 
       GdkFont *gfont;
+#ifdef HAVE_FREETYPE
+      Efont   *ttfont;
+#endif
       string   BuildFontString(bool bBold, bool bItalic, int iFontHeight);
 
       bool bold;
