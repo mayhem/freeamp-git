@@ -266,7 +266,11 @@ SetArgs(int32 argc, char **argv)
         char* arg = argv[i];
 
         // is this an option?
-        if(arg[0] == '-' || arg[0] == '/')
+        if(arg[0] == '-' 
+#ifdef WIN32
+        	|| arg[0] == '/'
+#endif   
+			)
         {
             switch(arg[1])
             {
@@ -406,12 +410,12 @@ SetArgs(int32 argc, char **argv)
                         else
                         if(giveToTheme)
                         {
-                            char szSavedTheme[MAX_PATH], szNewTheme[MAX_PATH];
-                            uint32 iLen = MAX_PATH;   
+                            char szSavedTheme[_MAX_PATH], szNewTheme[_MAX_PATH];
+                            uint32 iLen = _MAX_PATH;   
 
                             m_context->prefs->GetPrefString(kThemePathPref, 
                                  szSavedTheme, &iLen);
-                            iLen = MAX_PATH;   
+                            iLen = _MAX_PATH;   
                             URLToFilePath(url, szNewTheme, &iLen); 
                             m_context->prefs->SetPrefString(kThemePathPref, 
                                szNewTheme);
@@ -432,13 +436,19 @@ SetArgs(int32 argc, char **argv)
                 }
 #else
                 strcpy(path, arg);
+                
+                printf("Path: %s\r\n", path);
 
                 // make sure we have an absolute path
                 ResolvePath(&path);
+                
+                printf("Resolved: %s\r\n", path);
 
                 // format this path as a URL
                 uint32 length = _MAX_PATH;
                 FilePathToURL(path, url, &length);
+                
+                printf("URL: %s\r\n", url);
 
                 // who needs to get this, plm or dlm?
                 bool giveToDLM = false;
@@ -470,19 +480,22 @@ SetArgs(int32 argc, char **argv)
                     m_dlm->ReadDownloadFile(url);
                 else if (giveToTheme)
                 {
-                    char szSavedTheme[MAX_PATH], szNewTheme[MAX_PATH];
-                    uint32 iLen = MAX_PATH;   
+                    char szSavedTheme[_MAX_PATH], szNewTheme[_MAX_PATH];
+                    uint32 iLen = _MAX_PATH;   
 
                     m_context->prefs->GetPrefString(kThemePathPref, 
                                                     szSavedTheme, &iLen);
-                    iLen = MAX_PATH;   
+                    iLen = _MAX_PATH;   
                     URLToFilePath(url, szNewTheme, &iLen); 
                     m_context->prefs->SetPrefString(kThemePathPref, szNewTheme);
 
                     AcceptEvent(new LoadThemeEvent(url, szSavedTheme));
                 }
                 else 
+                {
+                	printf("AddItem: %s\r\n", url);
                     m_plm->AddItem(url); 
+               	}	
 #endif
             }
         }
@@ -520,7 +533,7 @@ Player::
 CompareNames(const char *p1, const char *p2)
 {
 // windows plugins and unix plugins are named differently...
-#ifdef WIN32
+#if defined( WIN32 ) || defined ( __BEOS__ )
     return strcasecmp(p1, p2);
 #else
     // ut << "Comparing: " << p1 << " to " << p2 << endl;
