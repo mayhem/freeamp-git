@@ -206,7 +206,7 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
         {
             MusicCatalogTrackAddedEvent* pie = (MusicCatalogTrackAddedEvent*)event;
 
-            MusicCatalogItemAdded(pie->Artist(), pie->Album(), pie->Item());
+            MusicCatalogTrackAdded(pie->Artist(), pie->Album(), pie->Item());
             
             break; 
         }
@@ -222,7 +222,8 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
         case INFO_MusicCatalogPlaylistAdded:
         {
             MusicCatalogPlaylistAddedEvent* pie = (MusicCatalogPlaylistAddedEvent*)event;
-
+            
+            MusicCatalogPlaylistAdded(pie->Item());
             
             break; 
         }

@@ -392,7 +392,19 @@ void MusicBrowserUI::ImportTracksAndPlaylists(void)
         vector<string>::iterator i;
 
         for(i = oFileList.begin(); i != oFileList.end(); i++)
-            m_context->browser->m_catalog->AddSong((*i).c_str());
+        {
+            char* ext = NULL;
+            char path[MAX_PATH];
+
+            strcpy(path, (*i).c_str());
+
+            ext = strrchr(path, '.');
+            
+            if(ext && m_oPlm->IsSupportedPlaylistFormat(++ext))
+                m_context->browser->m_catalog->AddPlaylist((*i).c_str());
+            else
+                m_context->browser->m_catalog->AddSong((*i).c_str());
+        }
     }
 }
 
