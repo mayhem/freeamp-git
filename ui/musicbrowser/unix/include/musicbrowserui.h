@@ -49,7 +49,7 @@ class MusicBrowserUI : public UserInterface {
     void CreateNewEditor(string & newPlaylist);
     void WindowClose(GTKMusicBrowser *oldUI);
 
-    void StartSearch(void);
+    void StartSearch(bool runMain = true);
 
  protected:
     FAContext *m_context;

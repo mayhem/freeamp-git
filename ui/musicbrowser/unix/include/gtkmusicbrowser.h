@@ -37,15 +37,21 @@ ____________________________________________________________________________*/
 class FAContext;
 class MusicBrowserUI;
 
-#define STATE_COLLAPSED 0
-#define STATE_EXPANDED  1
+typedef enum {
+    kStateCollapsed,
+    kStateExpanded
+} MusicBrowserView;
 
-#define CONTEXT_PLAYLIST 0
-#define CONTEXT_BROWSER  1
+typedef enum {
+    kContextPlaylist,
+    kContextBrowser
+} ClickState;
 
-#define MB_NONE     0
-#define MB_PLAYLIST 1
-#define MB_TRACK    2
+typedef enum {
+    kClickNone,
+    kClickPlaylist,
+    kClickTrack
+} TreeClickState;
 
 class GTKMusicBrowser {
  public:
@@ -66,9 +72,6 @@ class GTKMusicBrowser {
     int m_playlistLastSort;
     string m_currentListName;
 
-    int32 clickState;
-    int32 mbState;
-    
     char *mbSelName;
     PlaylistItem *mbSel;
  
@@ -94,7 +97,9 @@ class GTKMusicBrowser {
     PlaylistManager *m_plm;
     MusicCatalog *m_musicCatalog;
  
-    int32 m_state;
+    MusicBrowserView m_state;
+    ClickState m_clickState;
+    TreeClickState m_mbState;
 
     /* Widget creation */
     void CreateExpanded(void);
@@ -110,7 +115,8 @@ class GTKMusicBrowser {
     GtkWidget *musicBrowserTree;
     GtkWidget *playlistList;
     GtkWidget *playlistOMenu;
-    GtkWidget *playlistMenu;    
+    GtkWidget *playlistMenu;
+    GtkItemFactory *menuFactory;
 
     void SetStatusText(const char *text);
     GtkWidget *statusBar;
@@ -120,6 +126,12 @@ class GTKMusicBrowser {
     GtkWidget *playlistSubTree;
   
   public:
+    ClickState GetClickState() { return m_clickState; }
+    void SetClickState(ClickState newState);
+
+    TreeClickState GetTreeClick() { return m_mbState; }
+    void SetTreeClick(TreeClickState newState) { m_mbState = newState; }
+
     /* event callbacks */
     void ReadPlaylist(char *filename, vector<PlaylistItem *> *plist);
 
@@ -138,7 +150,7 @@ class GTKMusicBrowser {
     void AddTrackPlaylistEvent(PlaylistItem *newitem);
     void AddTracksPlaylistEvent(vector<PlaylistItem *> *newlist);
     void PlayEvent();
-    void StartMusicSearch();
+    void StartMusicSearch(bool runMain = true);
     void SortPlaylistEvent(PlaylistSortKey order, PlaylistSortType type);
     void PopUpInfoEditor(PlaylistItem *editee = NULL);
     void SaveCurrentPlaylist(char *path = NULL);

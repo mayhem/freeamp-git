@@ -24,35 +24,34 @@ ____________________________________________________________________________*/
 #include <gtk/gtk.h>
 #include <unistd.h>
 
-#include "MessageDialog.h"
+#include "gtkmessagedialog.h"
 
 
-MessageDialog::MessageDialog(void)
+GTKMessageDialog::GTKMessageDialog(void)
 {
 }
 
-MessageDialog::~MessageDialog(void)
+GTKMessageDialog::~GTKMessageDialog(void)
 {
 
 }
 
-MessageDialogReturnEnum MessageDialog::
+MessageDialogReturnEnum GTKMessageDialog::
                         Show(const char        *szMessage, 
                              const char        *szTitle, 
-                             MessageDialogEnum  eType)
+                             MessageDialogEnum  eType,
+                             bool inMain)
 {
     string oMessage(szMessage), oTitle(szTitle);
     
-    return Show(oMessage, oTitle, eType);
+    return Show(oMessage, oTitle, eType, inMain);
 }
 
-static gboolean message_destroy(GtkWidget *widget)
+static gboolean message_destroy(GtkWidget *widget, gpointer p)
 {
-    return FALSE;
-}
-
-static gboolean message_quit(GtkWidget *widget)
-{
+    bool inmain = (bool)p;
+    if (inmain)
+        gtk_main_quit();
     return FALSE;
 }
 
@@ -81,17 +80,16 @@ static void retry_click(GtkWidget *w, int *ret)
     *ret = 5;
 }
 
-MessageDialogReturnEnum MessageDialog::
+MessageDialogReturnEnum GTKMessageDialog::
                         Show(const string      &oMessage, 
                              const string      &oTitle, 
-                             MessageDialogEnum  eType)
+                             MessageDialogEnum  eType,
+                             bool inMain)
 {
-    gdk_threads_enter();
-
     GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_modal(GTK_WINDOW(window), TRUE);
     gtk_signal_connect(GTK_OBJECT(window), "destroy",
-                       GTK_SIGNAL_FUNC(message_destroy), NULL);
+                       GTK_SIGNAL_FUNC(message_destroy), (gpointer)inMain);
     gtk_window_set_title(GTK_WINDOW(window), oTitle.c_str());
     gtk_container_set_border_width(GTK_CONTAINER(window), 5);
 
@@ -183,10 +181,16 @@ MessageDialogReturnEnum MessageDialog::
 
     gtk_widget_show(window);
 
-    gdk_threads_leave();
+    if (!inMain)
+        gdk_threads_leave();
+    else
+        gtk_main();
 
     while (iRet == 0)
         usleep(20);
+
+    if (!inMain)
+        gdk_threads_enter();
 
     switch (iRet) {
         case 1:

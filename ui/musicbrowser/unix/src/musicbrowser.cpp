@@ -161,14 +161,14 @@ void MusicBrowserUI::WindowClose(GTKMusicBrowser *oldUI)
         browserWindows.erase(loc);
 }
 
-void MusicBrowserUI::StartSearch(void)
+void MusicBrowserUI::StartSearch(bool runMain)
 {
     if (searching)
         return;
 
     searching = new musicsearchUI(m_context);
 
-    searching->Show();
+    searching->Show(runMain);
 
     searching = NULL;
 }

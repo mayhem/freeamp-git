@@ -35,7 +35,7 @@ class musicsearchUI {
     musicsearchUI(FAContext *);
    ~musicsearchUI();
   
-    void Show();
+    void Show(bool runMain = true);
 
     int32 AcceptEvent(Event *);
  
@@ -50,6 +50,7 @@ class musicsearchUI {
     bool custom;
     bool searchInProgress;
     bool searchDone;
+    bool m_main;
 
  protected:
     FAContext *m_context;

@@ -566,7 +566,7 @@ void MusicBrowser::DoSearchMusic(char *path)
                     char *url = new char[urlLength];
 
                     if (IsntError(FilePathToURL(file.c_str(), url, &urlLength)))
-                        m_database->Insert(file.c_str(), "P");
+                        m_database->Insert(url, "P");
 
                     delete [] url;
                 }

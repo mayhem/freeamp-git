@@ -24,13 +24,6 @@ ____________________________________________________________________________*/
 #ifndef INCLUDED_MESSAGEDIALOG_H__
 #define INCLUDED_MESSAGEDIALOG_H__
 
-// The debugger can't handle symbols more than 255 characters long.
-// STL often creates symbols longer than that.
-// When symbols are longer than 255 characters, the warning is disabled.
-#ifdef WIN32
-#pragma warning(disable:4786)
-#endif
-
 #include <string>
 
 using namespace std;
@@ -54,19 +47,21 @@ enum MessageDialogReturnEnum
     kMessageReturnUnknown
 };
 
-class MessageDialog
+class GTKMessageDialog
 {
   public:
     
-                MessageDialog(void);
-       virtual ~MessageDialog(void);                  
+                GTKMessageDialog(void);
+       virtual ~GTKMessageDialog(void);                  
 
        MessageDialogReturnEnum Show(const char *szMessage, 
                                     const char *szTitle, 
-                                    MessageDialogEnum eType);
+                                    MessageDialogEnum eType,
+                                    bool inMain = false);
        MessageDialogReturnEnum Show(const string &oMessage, 
                                     const string &oTitle, 
-                                    MessageDialogEnum eType);
+                                    MessageDialogEnum eType,
+                                    bool inMain = false);
 
 };
 

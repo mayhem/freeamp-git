@@ -78,7 +78,7 @@ void CreateMenuItems(GtkItemFactory *item_factory, void *p)
      {"/_Edit/Randomize Playlist",NULL,         sort_random, 0, 0 },
 
      {"/_View",                 NULL,           0,         0, "<Branch>" },
-     {"/_View/View music browser",NULL,         catalog_tog, 0, 0 },
+     {"/_View/View Music Browser",NULL,         catalog_tog, 0, 0 },
 
      {"/_Sort",                 NULL,           0,         0, "<Branch>" },
      {"/_Sort/Artist",          NULL,           sort_artist, 0, 0 },

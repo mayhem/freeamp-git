@@ -32,9 +32,11 @@ ____________________________________________________________________________*/
 #include "musicbrowser.h"
 #include "musicsearchui.h"
 
-gboolean search_delete_event(GtkWidget *widget, GdkEvent *event, gpointer data)
+gboolean search_delete_event(GtkWidget *widget, gpointer p) 
 {
-    gtk_main_quit();
+    bool quitmain = (bool)p;
+    if (quitmain) 
+        gtk_main_quit();
     return FALSE;
 }
 
@@ -55,6 +57,8 @@ void start_search_button_event(GtkWidget *widget, musicsearchUI *p)
 
 void search_cancel_button_event(GtkWidget *widget, musicsearchUI *p)
 {
+    if (p->searchInProgress)
+        p->EndSearch();
     delete p;
 }
 
@@ -133,7 +137,7 @@ musicsearchUI::musicsearchUI(FAContext *context)
     m_context = context;
 }
 
-void musicsearchUI::Show(void)
+void musicsearchUI::Show(bool runMain)
 {
    GtkWidget *vbox;
    GtkWidget *hbox;
@@ -144,10 +148,12 @@ void musicsearchUI::Show(void)
    searchPath = "/";
    custom = false;
 
+   m_main = runMain;
+
    m_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
    gtk_window_set_title(GTK_WINDOW(m_window), BRANDING" - Search For Music");
    gtk_signal_connect(GTK_OBJECT(m_window), "destroy",
-                      GTK_SIGNAL_FUNC(search_delete_event), this);
+                      GTK_SIGNAL_FUNC(search_delete_event), (void *)runMain);
    gtk_container_set_border_width(GTK_CONTAINER(m_window), 5);
 
    vbox = gtk_vbox_new(FALSE, 5);
@@ -227,7 +233,7 @@ void musicsearchUI::Show(void)
    gtk_container_add(GTK_CONTAINER(vbox), hbox);
    gtk_widget_show(hbox);
 
-   GtkWidget *button = gtk_button_new_with_label("Cancel");
+   GtkWidget *button = gtk_button_new_with_label("Quit");
    gtk_signal_connect(GTK_OBJECT(button), "clicked",
                       GTK_SIGNAL_FUNC(search_cancel_button_event), this);
    gtk_container_add(GTK_CONTAINER(hbox), button);
@@ -245,7 +251,8 @@ void musicsearchUI::Show(void)
 
    gtk_widget_show(m_window);
 
-   gtk_main();
+   if (runMain)
+       gtk_main();
 }
 
 musicsearchUI::~musicsearchUI()
