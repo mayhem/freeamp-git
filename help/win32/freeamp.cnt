@@ -1,5 +1,5 @@
 :Base FreeAmp.hlp>Main
-:Title FreeAmp Player 2.0
+:Title FreeAmp Player 2.0.1
 1 Overview
 2 Getting Help=Getting_Help>Main
 2 What is FreeAmp?=What_is_FreeAmp_>Main
@@ -12,6 +12,7 @@
 1 Configuring FreeAmp Settings
 2 Configuring FreeAmp Settings=Configuring_FreeAmp_Settings>Main
 2 Setting the Folder Location to Save Your Music=Setting_the_Folder_Location_to_Save_Your_Music>Main
+2 Setting the Default Playlist Queue Option=Setting_the_Default_Playlist_Queue_Option>Main
 2 Setting FreeAmp to Stay on Top of Other Applications=Setting_FreeAmp_to_Stay_on_Top_of_Other_Applications>Main
 1 Creating and Managing Your Music Collection
 2 Searching for Music on Your Computer=Searching_for_Music_on_Your_Computer>Main
@@ -24,6 +25,8 @@
 2 Creating a New Playlist=Creating_a_New_Playlist>Main
 2 Opening a Playlist=Opening_a_Playlist>Main
 2 Adding Tracks to a Playlist=Adding_Tracks_to_a_Playlist>Main
+2 Adding Items to the Bottom of the Playlist Queue=Adding_Items_to_the_Bottom_of_the_Playlist_Queue>Main
+2 Adding Items to the Playlist for Immediate Playback=Adding_Items_to_the_Playlist_for_Immediate_Playback>Main
 2 Editing the Currently Playing Playlist=Editing_the_Currently_Playing_Playlist>Main
 2 Saving a Playlist=Saving_a_Playlist
 2 Clearing a Playlist=Clearing_a_Playlist>Main
