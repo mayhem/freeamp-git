@@ -3,8 +3,9 @@ Changes for Linux and Windows version 2.1.0 beta 10
 - The playlist can now be customized to change/reorder the fields that are 
   shown. (win32 patch contributed by Steve Kemp)
 - ORBit-based corba UI contributed by Martin Enlund
-- Almost fully working QNX port, see README.qnx
+- Almost completely functional QNX port, see README.qnx
 - The IRIX port is almost running...
+- The Solaris port works again (on solaris 7, at least)
 
 Changes for Linux and Windows version 2.1.0 beta 9
 --------------------------------------------------------------------

@@ -15,11 +15,14 @@ XINGLMCOBJS = lmc/xingmp3/src/cdct.o lmc/xingmp3/src/cupl3.o \
 XINGLMCOBJS += @XINGASM@
 
 TOWAVOBJS = $(XINGLMCOBJS) lmc/xingmp3/src/towave.o
-SIGAPPOBJS = $(XINGLMCOBJS) lmc/xingmp3/src/sigapp.o lmc/xingmp3/src/sigmain.o plm/metadata/id3v2/id3v2.o
+SIGAPPOBJS  = $(XINGLMCOBJS) lmc/xingmp3/src/sigapp.o lmc/xingmp3/src/sigmain.o 
+SIGAPPOBJS += plm/metadata/id3v2/id3v2.o plm/metadata/id3v1/id3v1.o
+
+CFLAGS += -DCOMPILING_SIGAPP
 #CFLAGS += -DHAVE_ID3V2
 
 towav: $(TOWAVOBJS)
 	gcc -o towav $(TOWAVOBJS) -lm
 
 sigapp: $(SIGAPPOBJS)
-	g++ -o sigapp $(SIGAPPOBJS) -lmusicbrainz -lm
+	g++ -o sigapp $(SIGAPPOBJS) -lid3 -lmusicbrainz -lm

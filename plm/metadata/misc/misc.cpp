@@ -46,7 +46,7 @@ ____________________________________________________________________________*/
 #include "pmi.h"
 
 
-
+#ifndef COMPILING_SIGAPP
 extern "C"
 {
    MetaDataFormat *Initialize(FAContext* context)
@@ -54,6 +54,7 @@ extern "C"
       return new Misc(context);
    }
 }
+#endif
 
 Misc::Misc(FAContext* context):MetaDataFormat(context)
 {

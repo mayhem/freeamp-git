@@ -224,6 +224,7 @@ const char* genre_strings[] = {
 
 #define kNumGenres sizeof(genre_strings)/sizeof(char*)
 
+#ifndef COMPILING_SIGAPP
 extern "C"
 {
    MetaDataFormat *Initialize(FAContext* context)
@@ -231,6 +232,7 @@ extern "C"
       return new ID3v1(context);
    }
 }
+#endif
 
 ID3v1::ID3v1(FAContext* context):MetaDataFormat(context)
 {

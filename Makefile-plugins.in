@@ -374,13 +374,13 @@ plugins/vorbis.lmc: $(VORBISOBJ) lmc/vorbis/src/lib/libvorbis.la
 # MDF section 
 
 #id3v1
-ID3V1OBJ = plm/metadata/id3v1/id3v1.o 
+ID3V1OBJ = plm/metadata/id3v1/id3v1.lo 
 
 plugins/id3v1.mdf: $(ID3V1OBJ)
 	$(LINKMOD) -o $@ $(ID3V1OBJ) $(STATICLD)
 
 #id3v2
-ID3V2OBJ = plm/metadata/id3v2/id3v2.o
+ID3V2OBJ = plm/metadata/id3v2/id3v2.lo
 
 plugins/id3v2.mdf: $(ID3V2OBJ)
 	$(LINKMOD) -o $@ $(ID3V2OBJ) $(STATICLD) @ID3LIB@
@@ -392,7 +392,7 @@ plugins/vorbis.mdf: $(VORBISMDFOBJ) lmc/vorbis/src/lib/libvorbis.la
 	$(LINKMOD) -o $@ $(VORBISMDFOBJ) lmc/vorbis/src/lib/libvorbis.la $(STATICLD)
 
 #misc
-MISCOBJ = plm/metadata/misc/misc.o 
+MISCOBJ = plm/metadata/misc/misc.lo 
 
 plugins/misc.mdf: $(MISCOBJ)
 	$(LINKMOD) -o $@ $(MISCOBJ) $(STATICLD)
