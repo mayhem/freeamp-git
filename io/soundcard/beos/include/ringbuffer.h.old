@@ -1,0 +1,37 @@
+// $Id$
+//
+#ifndef _RING_BUFFER_H
+#define _RING_BUFFER_H
+
+#include "pullbuffer.h"
+
+class RingBuffer : public PullBuffer
+{
+public:
+				RingBuffer(	size_t	bufferSize,
+							size_t	overFlowSize,
+							size_t	writeTriggerSize );
+	virtual		~RingBuffer();
+	ssize_t		Write( const void* data, size_t length );
+	size_t		Read( void* data, size_t length );
+
+protected:
+	void		WriteWait( void );
+	void		ReadWait( void );
+
+private:
+};
+
+inline void
+RingBuffer::WriteWait( void )
+{
+	m_pWriteSem->Wait();
+}
+
+inline void
+RingBuffer::ReadWait( void )
+{
+	m_pReadSem->Wait();
+}
+
+#endif // _RING_BUFFER_H

@@ -1,9 +1,7 @@
-
 /*____________________________________________________________________________
 	
 	FreeAmp - The Free MP3 Player
-
-	Portions Copyright (C) 1998 GoodNoise
+	Portions copyright (C) 1998 GoodNoise
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -22,25 +20,25 @@
 	$Id$
 ____________________________________________________________________________*/
 
+#ifndef MUTEX_H
+#define MUTEX_H
 
-#include <iostream.h>
+#include <support/Locker.h>
 
-#include "lmc/xingmp3/include/xinglmc.h"
-#include "base/unix/linux/include/soundcardpmo.h"
-#include "io/local/localfileinput.h"
+#define WAIT_FOREVER -1
 
+class Mutex
+{
+public:
+					Mutex( bool createOwned = false );
+					~Mutex();
+	bool			Acquire( long timeout = WAIT_FOREVER );
+	void			Release();
+	void			DumpMutex(void);
 
+ private:
+	thread_id		m_myTid;
+	BLocker			m_lock;
+};
 
-int main(int argc, char **argv) {
-    if (argc == 0) return 255;
-    cout << "Playing " << argv[1] << " for testing..." << endl;
-    LocalFileInput *pLFI = new LocalFileInput(argv[1]);
-    SoundCardPMO *pSCO = new SoundCardPMO();
-    XingLMC *myLMC = new XingLMC();
-    myLMC->SetPMI(pLFI);
-    myLMC->SetPMO(pSCO);
-    myLMC->Init();
-    myLMC->DecodeWork();
-    delete myLMC;
-    return 0;
-}
+#endif /* MUTEX_H */

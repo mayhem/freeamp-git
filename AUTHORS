@@ -15,3 +15,6 @@ Other major contributors and their contributions:
 "Gabor Fleischer" <flocsy@usa.net>
 * alsa-linux.pmo: Output to ALSA 1:1 and keep 1:0 to pure programs
 
+
+"Hiromasa Kato" <hiro@eng.iastate.edu>
+* preliminary BeOS port

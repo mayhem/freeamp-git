@@ -1,3 +1,4 @@
+
 /*____________________________________________________________________________
 	
 	FreeAmp - The Free MP3 Player
@@ -21,3 +22,29 @@
 	$Id$
 ____________________________________________________________________________*/
 
+
+
+#ifndef _SEMAPHORE_H_
+#define _SEMAPHORE_H_
+
+#include <kernel/OS.h>
+#include "mutex.h"
+
+class Semaphore
+{
+public:
+			Semaphore( int cnt = 1 );
+			Semaphore( const char* name, int cnt = 1);
+			~Semaphore();
+    void	Wait();
+    bool	Wait( long timeout );
+    void	Signal();
+
+protected:
+
+private:
+	int		count;
+	sem_id	mutex;
+};
+
+#endif // _SEMAPHORE_H_
