@@ -36,7 +36,7 @@ const char* HostToNet(vector<APSMetaData*>* pAPSList, string& strCollectionGUID,
     if (pAPSList->size() > 0)
     {
         APSMetaData m_APSMetaData;
-        cout << "pAPSList->size(): " << pAPSList->size() << endl;
+        //cout << "pAPSList->size(): " << pAPSList->size() << endl;
  
         vector<uint16_t*>* pnFieldList = new vector<uint16_t*>;
         vector<uint16_t*>* pnNetList = new vector<uint16_t*>;
@@ -49,7 +49,7 @@ const char* HostToNet(vector<APSMetaData*>* pAPSList, string& strCollectionGUID,
         int nOffset = sizeof(char) * 2 + sizeof(uint16_t) + sizeof(uint16_t);
         int i = 0;
 
-        cout << "total size: " << nTotalSize << endl;
+        //cout << "total size: " << nTotalSize << endl;
         for (unsigned int j = 0; j < pAPSList->size(); j++)
         {
             uint16_t* pnFieldSize = new uint16_t[m_APSMetaData.NumFields()];
@@ -93,15 +93,15 @@ const char* HostToNet(vector<APSMetaData*>* pAPSList, string& strCollectionGUID,
             }
         }
 
-        cout << "offset: " << nOffset << endl;
+        //cout << "offset: " << nOffset << endl;
         // Add collection GUID to buffer.
         memcpy(&pBuffer[nOffset], strCollectionGUID.c_str(), nGUIDSize);
         nOffset += nGUIDSize;
 
-        cout << "TotalSize " << nTotalSize << " Offset: " << nOffset << endl;
+        //cout << "TotalSize " << nTotalSize << " Offset: " << nOffset << endl;
 
         uint16_t nCRC = GenCRC(pBuffer, nTotalSize-sizeof(uint16_t));
-        cout << "CRC1: " << nCRC << endl;
+        //cout << "CRC1: " << nCRC << endl;
         nCRC = htons(nCRC);
         memcpy(&pBuffer[nTotalSize - sizeof(uint16_t)], &nCRC, sizeof(uint16_t));
 
@@ -127,7 +127,7 @@ const char* HostToNet(vector<APSMetaData*>* pAPSList, string& strCollectionGUID,
     }
     else
     {
-        cout << "ERROR: APSList is empty.  Program aborted." << endl;
+        //cout << "ERROR: APSList is empty.  Program aborted." << endl;
         exit(1);
     }
 }

@@ -260,6 +260,9 @@ Control *Panel::ControlFromPos(Pos &oPos)
     bool                        bShown;
     Control                    *pControl;
 
+    if (m_bIsHidden)
+       return NULL;
+
     for(i = m_oControls.begin(); i != m_oControls.end(); i++)
     {
         (*i)->Show(false, bShown);

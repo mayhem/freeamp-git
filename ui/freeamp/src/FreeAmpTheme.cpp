@@ -1592,7 +1592,11 @@ void FreeAmpTheme::HandleKeystroke(unsigned char cKey)
      case '@':
      {
         string oText("-23:59:59");
-        m_pWindow->ControlStringValue("Time", true, oText);
+        if (m_pWindow->DoesControlExist("TimeRemaining"))
+           m_pWindow->ControlStringValue("TimeRemaining", true, oText);
+        else
+           m_pWindow->ControlStringValue("Time", true, oText);
+
         break;
      }    
 

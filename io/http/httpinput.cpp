@@ -145,7 +145,7 @@ HttpInput::HttpInput(FAContext *context):
     m_iMetaDataInterval = 0;
     m_uBytesReceived = 0;
 #ifdef WIN32
-	m_hWnd = NULL;
+    m_hWnd = NULL;
 #endif
 
     m_pContext->prefs->GetPrefBoolean(kUseProxyPref, &m_bUseProxy);
@@ -164,7 +164,7 @@ HttpInput::~HttpInput()
 {
 #ifdef WIN32
     if (m_hWnd)
-	    PostMessage(m_hWnd, WM_QUIT, 0, 0);
+        PostMessage(m_hWnd, WM_QUIT, 0, 0);
 #endif
 
     m_bExit = true;
@@ -238,10 +238,10 @@ Error HttpInput::Close(void)
 {
 #ifdef WIN32
     if (m_hWnd)
-	    PostMessage(m_hWnd, WM_QUIT, 0, 0);
+        PostMessage(m_hWnd, WM_QUIT, 0, 0);
 #endif
 
-	delete m_pOutputBuffer;
+    delete m_pOutputBuffer;
     m_pOutputBuffer = NULL;
  
     if (m_hHandle >= 0)
@@ -292,10 +292,10 @@ Error HttpInput::Win32GetHostByName(char *szHostName, struct hostent *pHostInfo)
 {
     WNDCLASS wc;
     MSG      msg;
-	HWND     hWnd;
-	HANDLE   hHandle;
-	char     szBuffer[MAXGETHOSTSTRUCT];
-	int      result = -1;
+    HWND     hWnd;
+    HANDLE   hHandle;
+    char     szBuffer[MAXGETHOSTSTRUCT];
+    int      result = -1;
 
     memset(&wc, 0x00, sizeof(WNDCLASS));
 
@@ -309,46 +309,46 @@ Error HttpInput::Win32GetHostByName(char *szHostName, struct hostent *pHostInfo)
 
     result = RegisterClass(&wc);
 
-	hWnd = CreateWindow(wc.lpszClassName, "Fuss", 
+    hWnd = CreateWindow(wc.lpszClassName, "Fuss", 
                         WS_OVERLAPPEDWINDOW,
                         CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-		                NULL, NULL, g_hinst, NULL);
-	if (hWnd == NULL)
+                        NULL, NULL, g_hinst, NULL);
+    if (hWnd == NULL)
         return kError_NoDataAvail;
 
-	m_hWnd = hWnd;
-	hHandle = WSAAsyncGetHostByName(hWnd, WM_WINDOWS_IS_DONE_PICKING_ITS_BUTT, szHostName, 
-		                            szBuffer, MAXGETHOSTSTRUCT);
-	if (hHandle == NULL)
-	{
-		DestroyWindow(hWnd);
+    m_hWnd = hWnd;
+    hHandle = WSAAsyncGetHostByName(hWnd, WM_WINDOWS_IS_DONE_PICKING_ITS_BUTT, szHostName, 
+                                    szBuffer, MAXGETHOSTSTRUCT);
+    if (hHandle == NULL)
+    {
+        DestroyWindow(hWnd);
         return kError_NoDataAvail;
-	}
+    }
 
     while( GetMessage( &msg, NULL, 0, 0 ))
     {
         TranslateMessage( &msg );
 
-		if (msg.message == WM_WINDOWS_IS_DONE_PICKING_ITS_BUTT)
-			result = WSAGETASYNCERROR(msg.lParam);
+        if (msg.message == WM_WINDOWS_IS_DONE_PICKING_ITS_BUTT)
+            result = WSAGETASYNCERROR(msg.lParam);
 
         DispatchMessage( &msg );
     }
 
-	m_hWnd = NULL;
-	DestroyWindow(hWnd);
+    m_hWnd = NULL;
+    DestroyWindow(hWnd);
 
 
-	if (m_bExit)
-		return kError_Interrupt;
+    if (m_bExit)
+        return kError_Interrupt;
 
-	if (result == 0)
+    if (result == 0)
     {
-	    memcpy(pHostInfo, szBuffer, sizeof(struct hostent));
+        memcpy(pHostInfo, szBuffer, sizeof(struct hostent));
         return kError_NoErr;
-	}
+    }
 
-	return kError_NoDataAvail;
+    return kError_NoDataAvail;
 }
 
 static LRESULT WINAPI WndProc(HWND hwnd, UINT msg, 
@@ -360,12 +360,12 @@ static LRESULT WINAPI WndProc(HWND hwnd, UINT msg,
     {
         case WM_WINDOWS_IS_DONE_PICKING_ITS_BUTT:
         {
-			PostMessage(hwnd, WM_QUIT, 0, 0);
-		}
+            PostMessage(hwnd, WM_QUIT, 0, 0);
+        }
         default:
             return DefWindowProc( hwnd, msg, wParam, lParam );
-	}
-	return result;
+    }
+    return result;
 }
 
 #endif
@@ -381,14 +381,14 @@ Error HttpInput::GetHostByName(char *szHostName, struct hostent *pResult)
     Error eRet;
 
     eRet = Win32GetHostByName(szHostName, &TempHostent);
-	if (eRet == kError_Interrupt)
+    if (eRet == kError_Interrupt)
         return eRet;
 
     if (IsError(eRet))
-		pTemp = NULL;
-	else
+        pTemp = NULL;
+    else
         pTemp = &TempHostent;
-	
+    
 #else
     pTemp = gethostbyname(szHostName);
 #endif
@@ -861,8 +861,8 @@ void HttpInput::WorkerThread(void)
           usleep(10000);
           continue;
       }
-
-        
+       
+      DB
       eError = m_pOutputBuffer->BeginWrite(pBuffer, iReadSize);
       if (eError == kError_NoErr)
       {
@@ -904,6 +904,11 @@ void HttpInput::WorkerThread(void)
               iMaxReadBytes = iReadSize;
               
           iRead = recv(m_hHandle, (char *)pBuffer, iMaxReadBytes, 0);
+          if (iRead == 0)
+          {
+             m_pOutputBuffer->SetEndOfStream(true);
+             m_pOutputBuffer->EndWrite(0);
+          }
           if (iRead < 0)
           {
 #ifdef WIN32
@@ -911,7 +916,9 @@ void HttpInput::WorkerThread(void)
 #else
              if (errno == EAGAIN)
 #endif
+             {
                  iRead = 0;
+             }
           }
           if (iRead < 0)
           {
@@ -939,6 +946,7 @@ void HttpInput::WorkerThread(void)
               break;
           }
       }
+      DB
       if (eError == kError_BufferTooSmall)
       {
           if (m_bLoop)
