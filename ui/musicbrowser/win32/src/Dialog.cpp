@@ -562,8 +562,7 @@ void MusicBrowserUI::SizeWindow(int iType, int iWidth, int iHeight)
     uint32 clientHeight, clientWidth;
     uint32 controlHeight, controlWidth;
     uint32 statusbarHeight;
-    RECT oldListViewRect, newListViewRect;
-    int32 headerResizeAmount;
+    RECT oldListViewRect;
 
     GetWindowRect(m_hWnd, &windowRect);
     windowHeight = windowRect.bottom - windowRect.top;
@@ -647,85 +646,6 @@ void MusicBrowserUI::SizeWindow(int iType, int iWidth, int iHeight)
                            SWP_NOZORDER);
                            
     EndDeferWindowPos(hdwp);
-
-    // Resize the listview headers
-
-#if 0
-
-#define LENGTH_COLUMN_WIDTH 60
-#define INDEX_COLUMN_WIDTH 25
-#define FIXED_COLUMN_WIDTH (LENGTH_COLUMN_WIDTH + INDEX_COLUMN_WIDTH)
-
-    RECT sRect;
-
-    GetClientRect(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), &sRect);
-
-    int32 remainder = (sRect.right-sRect.left - FIXED_COLUMN_WIDTH)%3;
-    
-    int32 width = (sRect.right-sRect.left - FIXED_COLUMN_WIDTH)/3;
-    ListView_SetColumnWidth(m_hPlaylistView, 1, width);
-    ListView_SetColumnWidth(m_hPlaylistView, 2, width);
-    ListView_SetColumnWidth(m_hPlaylistView, 3, width);
-    
-    width = LENGTH_COLUMN_WIDTH + remainder;
-    ListView_SetColumnWidth(m_hPlaylistView, 4, width);
-
-#endif
-
-    /*GetClientRect(m_hPlaylistView, &newListViewRect);
-    
-    headerResizeAmount = (newListViewRect.right - newListViewRect.left) - 
-                         (oldListViewRect.right - oldListViewRect.left);
-
-    
-    int32 eachHeaderAmount = headerResizeAmount/3;
-    int32 titleExtraAmount = headerResizeAmount%3;
-    int32 width;
-
-    if(eachHeaderAmount)
-    {
-        width = ListView_GetColumnWidth(m_hPlaylistView, 1);
-        width += eachHeaderAmount;    
-        ListView_SetColumnWidth(m_hPlaylistView, 1, width);
-
-        width = ListView_GetColumnWidth(m_hPlaylistView, 2);
-        width += eachHeaderAmount;
-        ListView_SetColumnWidth(m_hPlaylistView, 2, width);
-
-        width = ListView_GetColumnWidth(m_hPlaylistView, 3);
-        width += eachHeaderAmount;
-        ListView_SetColumnWidth(m_hPlaylistView, 3, width);
-    }
-    
-    if(titleExtraAmount)
-    {
-        char buf[256];
-        wsprintf(buf, "%d ",titleExtraAmount);
-        OutputDebugString(buf);
-
-        static uint32 lastColumn = 1;
-
-        while(titleExtraAmount)
-        {
-            width = ListView_GetColumnWidth(m_hPlaylistView, lastColumn);
-       
-            if(titleExtraAmount > 0)
-            {
-                width += 1;
-                titleExtraAmount--;
-            }
-            else
-            {
-                width -= 1;
-                titleExtraAmount++;
-            }
-
-            ListView_SetColumnWidth(m_hPlaylistView, lastColumn, width);
-
-            if(++lastColumn > 3)
-                lastColumn = 1;
-        }
-    }*/
 }
 
 void MusicBrowserUI::GetMinMaxInfo(MINMAXINFO *pInfo)
