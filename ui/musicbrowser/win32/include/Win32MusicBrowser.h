@@ -151,6 +151,7 @@ class MusicBrowserUI : public UserInterface
     int32                m_currentindex, m_currentplaying;
   	HWND                 m_hWnd, m_hStatus, m_hParent, m_hToolbar, m_hRebar;
     HWND                 m_hMusicCatalog, m_hPlaylistView;
+    HWND                 m_hPlaylistTitle, m_hMusicCatalogTitle;
     PlaylistManager     *m_oPlm;
     bool                 m_initialized, isVisible, m_bListChanged, 
                          m_bSearchInProgress, m_bDragging;

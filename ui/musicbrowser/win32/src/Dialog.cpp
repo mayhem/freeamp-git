@@ -355,36 +355,64 @@ void MusicBrowserUI::Close(void)
 
 void MusicBrowserUI::ExpandCollapseEvent(void)
 {
-    RECT         sWindow;
     HMENU        hMenu;
     MENUITEMINFO sItem;
-    
-    GetWindowRect(m_hWnd, &sWindow);
+    RECT catalogRect, playlistRect, titleRect;
+
+    GetWindowRect(m_hMusicCatalog, &catalogRect);
+    GetWindowRect(m_hPlaylistView, &playlistRect);
+    GetWindowRect(m_hPlaylistTitle, &titleRect);
+    MapWindowPoints(NULL, m_hWnd, (LPPOINT)&catalogRect, 2);
+    MapWindowPoints(NULL, m_hWnd, (LPPOINT)&playlistRect, 2);
+    MapWindowPoints(NULL, m_hWnd, (LPPOINT)&titleRect, 2);
+
     if (m_state == STATE_COLLAPSED)
     {
        m_state = STATE_EXPANDED;
        SetWindowText(m_hWnd, BRANDING " - Music Browser");
        sItem.dwTypeData = "View &playlist only";
-       
-       SetWindowPos(m_hWnd, NULL, 0, 0, 
-        			(sWindow.right - sWindow.left) + m_iCollapseMoveAmount,
-                    sWindow.bottom - sWindow.top,
-                    SWP_NOMOVE);
-       
-	   MoveControls(m_iCollapseMoveAmount);
+
+       ShowWindow(m_hMusicCatalog, SW_SHOW);
+       ShowWindow(m_hMusicCatalogTitle, SW_SHOW);
+
+       MoveWindow(m_hPlaylistView, 
+                  catalogRect.left + m_iCollapseMoveAmount, 
+                  catalogRect.top, 
+        	      (playlistRect.right - playlistRect.left) - m_iCollapseMoveAmount,
+                  playlistRect.bottom - playlistRect.top,
+                  TRUE);
+
+       MoveWindow(m_hPlaylistTitle, 
+                  titleRect.left + m_iCollapseMoveAmount, 
+                  titleRect.top, 
+        	      (titleRect.right - titleRect.left) - m_iCollapseMoveAmount,
+                  titleRect.bottom - titleRect.top,
+                  TRUE);
     }            
     else
     {                
        m_state = STATE_COLLAPSED;
        SetWindowText(m_hWnd, BRANDING " - Playlist Manager");
        sItem.dwTypeData = "View &music browser";
+
+       ShowWindow(m_hMusicCatalog, SW_HIDE);
+       ShowWindow(m_hMusicCatalogTitle, SW_HIDE);
+
+       m_iCollapseMoveAmount = playlistRect.left - catalogRect.left;
        
-       SetWindowPos(m_hWnd, NULL, 0, 0, 
-        			(sWindow.right - sWindow.left) - m_iCollapseMoveAmount,
-                    sWindow.bottom - sWindow.top,
-                    SWP_NOMOVE);
-       
-	   MoveControls(-m_iCollapseMoveAmount);
+       MoveWindow(m_hPlaylistView, 
+                  catalogRect.left, 
+                  catalogRect.top, 
+        	      (playlistRect.right - playlistRect.left) + m_iCollapseMoveAmount,
+                  playlistRect.bottom - playlistRect.top,
+                  TRUE);
+
+       MoveWindow(m_hPlaylistTitle, 
+                  titleRect.left - m_iCollapseMoveAmount, 
+                  titleRect.top, 
+        	      (titleRect.right - titleRect.left) + m_iCollapseMoveAmount,
+                  titleRect.bottom - titleRect.top,
+                  TRUE);
     }
 
     hMenu = GetMenu(m_hWnd);
@@ -491,6 +519,19 @@ void MusicBrowserUI::SizeWindow(int iType, int iWidth, int iHeight)
                            SWP_NOZORDER);
 
 
+    // Current Playlist Title
+    GetWindowRect(m_hPlaylistTitle, &controlRect); 
+    MapWindowPoints(NULL, m_hWnd, (LPPOINT)&controlRect, 2);
+    controlHeight = controlRect.bottom - controlRect.top;
+    controlWidth = controlRect.right - controlRect.left;
+
+    hdwp = DeferWindowPos(hdwp, m_hPlaylistTitle, NULL,
+                           controlRect.left,
+                           controlRect.top,
+                           clientRect.right - controlRect.left,
+                           controlHeight,
+                           SWP_NOZORDER);
+
                            
 
     EndDeferWindowPos(hdwp);
@@ -522,6 +563,8 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
     m_hWnd = hWnd;
     m_hMusicCatalog = GetDlgItem(m_hWnd, IDC_MUSICTREE);
     m_hPlaylistView = GetDlgItem(m_hWnd, IDC_PLAYLISTBOX);
+    m_hPlaylistTitle = GetDlgItem(m_hWnd, IDC_PLAYLISTTITLE);
+    m_hMusicCatalogTitle = GetDlgItem(m_hWnd, IDC_MUSICCATALOGTEXT);
 
     hShell = GetModuleHandle("SHELL32.DLL");
     
@@ -679,14 +722,13 @@ void MusicBrowserUI::CreateToolbar(void)
 
 	// Insert band into rebar
 	SendMessage(m_hRebar, RB_INSERTBAND, (UINT) -1, (LPARAM) &rbb);
-
 }
 
 void MusicBrowserUI::SetTitles(void)
 {
     if (m_pParent == NULL)
     {
-       SetWindowText(GetDlgItem(m_hWnd, IDC_PLAYLISTTITLE), 
+       SetWindowText(m_hPlaylistTitle, 
                      "Currently listening to:");
        SetWindowText(m_hWnd, 
                      BRANDING " - My Music");
@@ -706,7 +748,7 @@ void MusicBrowserUI::SetTitles(void)
        }
        
        oTitle = string("Editing playlist: ") + oName;
-       SetWindowText(GetDlgItem(m_hWnd, IDC_PLAYLISTTITLE), 
+       SetWindowText(m_hPlaylistTitle, 
                      oTitle.c_str());
        oTitle = string(BRANDING " - Editing ") + oName;
        SetWindowText(m_hWnd, oTitle.c_str());
