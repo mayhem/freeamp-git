@@ -33,7 +33,7 @@ else
        mkdir freeamp-$version/plugins
        cp freeamp freeamp-$version
        cp plugins/*.pmo plugins/*.pmi plugins/*.lmc plugins/*.ui freeamp-$version/plugins
-       cp AUTHORS CHANGES COPYING ChangeLog INSTALL NEWS README freeamp-$version
+       cp AUTHORS CHANGES COPYING ChangeLog INSTALL NEWS README install-freeamp freeamp-$version
        tar -czf freeamp-$version-$osname-$extra.tar.gz freeamp-$version
        rm -rf freeamp-$version
    fi
