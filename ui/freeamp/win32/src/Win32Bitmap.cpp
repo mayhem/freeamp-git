@@ -532,7 +532,7 @@ void Win32Bitmap::BlitIt(int x, int y)
    hDestDC = GetDC(NULL);
    hSrcDC = CreateCompatibleDC(hDestDC);
    
-   SelectObject(hSrcDC, m_hBitmap);
+   SelectObject(hSrcDC, m_hMaskBitmap);
 
    BitBlt(hDestDC, x, y, 
           m_iWidth, m_iHeight,

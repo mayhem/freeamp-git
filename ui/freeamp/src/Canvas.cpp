@@ -84,10 +84,10 @@ void Canvas::InitBackgrounds(vector<Panel *> *pPanels)
 
     for(i = pPanels->begin(); i != pPanels->end(); i++)
     {
-        if ((*i)->m_bIsOpen)
+        if (!(*i)->m_bIsOpen)
         {
             m_pBGBitmap->MakeTransparent((*i)->m_oOpenRect);
-            if (!(*i)->m_pClosedBitmap)
+            if ((*i)->m_pClosedBitmap)
             {
                 oDestRect.x1 = (*i)->m_oOffset.x;
                 oDestRect.y1 = (*i)->m_oOffset.y;

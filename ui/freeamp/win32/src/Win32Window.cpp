@@ -97,7 +97,7 @@ static LRESULT WINAPI MainWndProc(HWND hwnd, UINT msg,
             assert(ui != NULL);
           
             result = SetWindowLong(hwnd, GWL_USERDATA, (LONG)ui);
-            ui->Init();
+            //ui->Init();
             
             SetTimer(hwnd, 0, 250, NULL);
             // We want people to be able to drop files on the player
