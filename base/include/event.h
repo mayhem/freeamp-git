@@ -41,8 +41,8 @@ class Event {
     Event(const Event &);
 
     ~Event();
-    int32 getEvent();
-    void *getArgument();
+    int32 GetEvent();
+    void *GetArgument();
     
 };
 

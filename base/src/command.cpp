@@ -49,11 +49,11 @@ Event::Event(const Event &c) {
 
 Event::~Event() { }
 
-int32 Event::getEvent() {
+int32 Event::GetEvent() {
     return event;
 }
 
-void *Event::getArgument() {
+void *Event::GetArgument() {
     return arg;
 }
 

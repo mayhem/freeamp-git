@@ -35,7 +35,7 @@ DummyCOO::~DummyCOO() {
 int32 DummyCOO::AcceptEvent(Event *pe) {
     if (pe) {
   	//cout << "DummyCOO::acceptEvent: processing " << pe->getEvent() << "..." << endl;
-        switch (pe->getEvent()) {
+        switch (pe->GetEvent()) {
 	        case CMD_Terminate:
 	            m_termSemaphore->Signal();
 	            break;

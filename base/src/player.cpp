@@ -321,7 +321,7 @@ bool Player::SetState(PlayerState ps) {
 int32 Player::ServiceEvent(Event *pC) {
     if (pC) {
 	//cout << "Player: serviceEvent: servicing Event: " << pC->GetEvent() << endl;
-	switch (pC->getEvent()) {
+	switch (pC->GetEvent()) {
 	    case INFO_DoneOutputting: {  // LMC or PMO sends this when its done outputting whatever.  Now, go on to next piece in playlist
                 if (SetState(STATE_Stopped)) {
 		    SEND_NORMAL_EVENT(INFO_Stopped);
@@ -501,7 +501,7 @@ int32 Player::ServiceEvent(Event *pC) {
 	    }
 	    
 	    case CMD_SetPlaylist:
-		myPlayList = (PlayList *)pC->getArgument();
+		myPlayList = (PlayList *)pC->GetArgument();
 		//myPlayList->SetFirst();  // Should be done by object creating the playlist
 		return 0;
 		break;
@@ -530,8 +530,8 @@ int32 Player::ServiceEvent(Event *pC) {
 		    if (!imQuitting) 
                 return 0;
 		
-            if (pC->getArgument()) {
-		        EventQueue *pCOO = (EventQueue *)(pC->getArgument());
+            if (pC->GetArgument()) {
+		        EventQueue *pCOO = (EventQueue *)(pC->GetArgument());
 		        //printf("having %x killed(COO)\n",pCOO);
 		        coo_death_vector->insert(pCOO);
             }
@@ -557,8 +557,8 @@ int32 Player::ServiceEvent(Event *pC) {
             if (!imQuitting) 
                 return 0;
 
-            if (pC->getArgument()) {
-		        EventQueue *pCIO = (EventQueue *)(pC->getArgument());
+            if (pC->GetArgument()) {
+		        EventQueue *pCIO = (EventQueue *)(pC->GetArgument());
 		        //printf("having %x killed (CIO)\n",pCIO);
 		        cio_death_vector->insert(pCIO);
             }
@@ -587,7 +587,7 @@ int32 Player::ServiceEvent(Event *pC) {
 		    //cout << "sent to all" << endl;
 		    ReleaseCOManipLock();
 		    //cout << "Released manip lock..." << endl;
-		    delete ((MediaVitalInfo *)pC->getArgument());
+		    delete ((MediaVitalInfo *)pC->GetArgument());
 		    //cout << "Done servicing mediavitalstats event" << endl;
 		    return 0;
 		    break; 
@@ -597,13 +597,13 @@ int32 Player::ServiceEvent(Event *pC) {
 		    GetCOManipLock();
 		    SendToCOO(pC);
 		    ReleaseCOManipLock();
-		    delete ((MediaTimePositionInfo *)pC->getArgument());
+		    delete ((MediaTimePositionInfo *)pC->GetArgument());
 		    return 0;
 		    break; 
         }
 	    
         default:
-		    cout << "serviceEvent: Unknown event (i.e. I don't do anything with it): " << pC->getEvent() << "  Passing..." << endl;
+		    cout << "serviceEvent: Unknown event (i.e. I don't do anything with it): " << pC->GetEvent() << "  Passing..." << endl;
 		    return 0;
 		    break;
 		
@@ -627,7 +627,7 @@ void Player::SendToCIOCOO(Event *pe) {
 }
 
 void Player::SendToCOO(Event *pe) {
-    //cout << "Sending a " << pe->getEvent() << endl;
+    //cout << "Sending a " << pe->GetEvent() << endl;
     for (int32 i=0;i<coo_vector->numElements();i++) {
 	    //cout << "sending to " << i << endl;
 	    coo_vector->elementAt(i)->AcceptEvent(pe);
@@ -654,14 +654,14 @@ void Player::testQueue() {
     AcceptEvent(pC);
 
     pC = event_queue->read();
-    cout << "testQueue: " << pC->getEvent() << endl;
+    cout << "testQueue: " << pC->GetEvent() << endl;
     delete pC;
     pC = event_queue->read();
-    cout << "testQueue: " << pC->getEvent() << endl;
+    cout << "testQueue: " << pC->GetEvent() << endl;
     delete pC;
     cout << "testQueue: isEmpty(): " << event_queue->isEmpty() << endl;
     pC = event_queue->read();
-    cout << "testQueue: " << pC->getEvent() << endl;
+    cout << "testQueue: " << pC->GetEvent() << endl;
     delete pC;
     pC = event_queue->read();
     if (pC) {
