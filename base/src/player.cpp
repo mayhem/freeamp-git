@@ -722,11 +722,11 @@ void Player::CreateLMC(PlayListItem * pc, Event * pC)
       m_lmc = NULL;
    }
 
-   pmi_item = ChoosePMI(pc->m_url);
+   pmi_item = ChoosePMI(pc->URL());
    if (!pmi_item)
    {
       g_Log->Error("Cannot determine what pmi to use for %s\n",
-                   pc->m_url);
+                   pc->URL());
       return;
    }
 
@@ -768,7 +768,7 @@ void Player::CreateLMC(PlayListItem * pc, Event * pC)
       }
       pmo = NULL;
 
-      error = lmc->SetTo(pc->m_url);
+      error = lmc->SetTo(pc->URL());
       if (IsError(error))
       {
          g_Log->Error("Cannot initialize input lmc: %d\n", error);
