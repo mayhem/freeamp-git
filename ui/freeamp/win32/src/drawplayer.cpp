@@ -962,11 +962,11 @@ void DrawDisplay(HDC hdc, DisplayInfo* state)
 
 void UpdateControls(HWND hwnd)
 {
-    HDC hdc = GetDC(hwnd);
+    //HDC hdc = GetDC(hwnd);
 
-    DrawPlayer(hdc, g_buttonStateArray, false);
+    //DrawPlayer(hdc, g_buttonStateArray, false);
 
-    ReleaseDC(hwnd, hdc);
+    //ReleaseDC(hwnd, hdc);
 }
 
 void UpdateDisplay(HWND hwnd)
@@ -1662,7 +1662,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
             
             hdc = BeginPaint( hwnd, &ps );
 
-            DrawPlayer(hdc, g_buttonStateArray, true);
+            DrawPlayer(hdc, g_buttonStateArray, (ps.fErase == TRUE));
             DrawDisplay(hdc, &g_displayInfo);
             
             EndPaint( hwnd, &ps );          
@@ -1767,12 +1767,16 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                     {
                         g_buttonStateArray[i].state = Selected;
                         g_buttonStateArray[i].dirty = TRUE;
+
+                        InvalidateRgn(hwnd, g_buttonStateArray[i].region, FALSE);
+
 						SendMessage(hwnd,WM_COMMAND,g_buttonStateArray[i].control_id,0);
                     }
                     else if(g_buttonStateArray[i].state != Activated)
                     {
                         g_buttonStateArray[i].state = Deactivated;
                         g_buttonStateArray[i].dirty = TRUE;
+                        InvalidateRgn(hwnd, g_buttonStateArray[i].region, FALSE);
                     }
                 }
 
@@ -1793,7 +1797,8 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
             hdc = GetDC(hwnd);
 
-            DrawPlayer(hdc, g_buttonStateArray, false);
+            //DrawPlayer(hdc, g_buttonStateArray, false);
+
             DrawDisplay(hdc, &g_displayInfo);
 
             ReleaseDC(hwnd, hdc);
@@ -1844,12 +1849,11 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                     g_buttonStateArray[i].oldstate = g_buttonStateArray[i].state;
                     g_buttonStateArray[i].state = Pressed;
                     g_buttonStateArray[i].dirty = TRUE;
+                    InvalidateRgn(hwnd, g_buttonStateArray[i].region, FALSE);
 
-                    hdc = GetDC(hwnd);
-
-                    DrawPlayer(hdc, g_buttonStateArray, false);
-
-                    ReleaseDC(hwnd, hdc);
+                    //hdc = GetDC(hwnd);
+                    //DrawPlayer(hdc, g_buttonStateArray, false);
+                    //ReleaseDC(hwnd, hdc);
 
                 }
             } 
@@ -1949,6 +1953,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                     }
 
                     g_buttonStateArray[i].dirty = TRUE;
+                    InvalidateRgn(hwnd, g_buttonStateArray[i].region, FALSE);
                     dirtyPlayer = true;
                     dirtyDisplay = true;
 
@@ -1960,12 +1965,14 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                     {
                         g_buttonStateArray[i].state = Pressed;
                         g_buttonStateArray[i].dirty = TRUE;
+                        InvalidateRgn(hwnd, g_buttonStateArray[i].region, FALSE);
                         dirtyPlayer = true;
                     }
                     else if( PtInRegion(g_buttonStateArray[i].region, pressPt.x, pressPt.y) )
                     {
                         g_buttonStateArray[i].state = g_buttonStateArray[i].oldstate;
                         g_buttonStateArray[i].dirty = TRUE;
+                        InvalidateRgn(hwnd, g_buttonStateArray[i].region, FALSE);
                         dirtyPlayer = true;
                     }
                 }
@@ -1982,6 +1989,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                         {
                             g_buttonStateArray[i].state = Selected;
                             g_buttonStateArray[i].dirty = TRUE;
+                            InvalidateRgn(hwnd, g_buttonStateArray[i].region, FALSE);
                             dirtyPlayer = true;
                         }
 
@@ -1992,6 +2000,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                     {
                         g_buttonStateArray[i].state = Deactivated;
                         g_buttonStateArray[i].dirty = TRUE;
+                        InvalidateRgn(hwnd, g_buttonStateArray[i].region, FALSE);
                         dirtyPlayer = true;
                     }
                 }
@@ -2004,8 +2013,8 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                 if(dirtyDisplay)
                     DrawDisplay(hdc, &g_displayInfo);
 
-                if(dirtyPlayer)
-                    DrawPlayer(hdc, g_buttonStateArray, false);
+                //if(dirtyPlayer)
+                    //DrawPlayer(hdc, g_buttonStateArray, false);
 
                 ReleaseDC(hwnd, hdc);
             }
