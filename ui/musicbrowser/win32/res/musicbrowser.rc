@@ -191,6 +191,7 @@ IDB_CATALOG             BITMAP  DISCARDABLE     "catalog.bmp"
 IDB_ARTIST              BITMAP  DISCARDABLE     "artist.bmp"
 IDB_TRACK               BITMAP  DISCARDABLE     "track.bmp"
 IDB_ALBUM               BITMAP  DISCARDABLE     "album.bmp"
+IDB_BITMAP1             BITMAP  DISCARDABLE     "bitmap1.bmp"
 
 #ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////

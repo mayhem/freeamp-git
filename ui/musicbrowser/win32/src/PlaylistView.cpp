@@ -475,36 +475,39 @@ void MusicBrowserUI::UpdatePlaylistListItem(const PlaylistItem* item)
     uint32        index = m_oPlm->IndexOf(item);
     HWND          hwnd = GetDlgItem(m_hWnd, IDC_PLAYLISTBOX);
 
-    sItem.mask = LVIF_TEXT;
-    sItem.iItem = index;
+    if(index != kInvalidIndex)
+    {
+        sItem.mask = LVIF_TEXT;
+        sItem.iItem = index;
 
-    // Update Title
-    sItem.pszText = (char*)item->GetMetaData().Title().c_str();
-    sItem.cchTextMax = item->GetMetaData().Title().length();
-    sItem.iSubItem = 1;
-    ListView_SetItem(hwnd, &sItem);
+        // Update Title
+        sItem.pszText = (char*)item->GetMetaData().Title().c_str();
+        sItem.cchTextMax = item->GetMetaData().Title().length();
+        sItem.iSubItem = 1;
+        ListView_SetItem(hwnd, &sItem);
 
-    // Update Artist
-    sItem.pszText = (char*)item->GetMetaData().Artist().c_str();
-    sItem.cchTextMax = item->GetMetaData().Artist().length();
-    sItem.iSubItem = 2;
-    ListView_SetItem(hwnd, &sItem);
+        // Update Artist
+        sItem.pszText = (char*)item->GetMetaData().Artist().c_str();
+        sItem.cchTextMax = item->GetMetaData().Artist().length();
+        sItem.iSubItem = 2;
+        ListView_SetItem(hwnd, &sItem);
 
-    // Update Album
-    sItem.pszText = (char*)item->GetMetaData().Album().c_str();
-    sItem.cchTextMax = item->GetMetaData().Album().length();
-    sItem.iSubItem = 3;
-    ListView_SetItem(hwnd, &sItem);
+        // Update Album
+        sItem.pszText = (char*)item->GetMetaData().Album().c_str();
+        sItem.cchTextMax = item->GetMetaData().Album().length();
+        sItem.iSubItem = 3;
+        ListView_SetItem(hwnd, &sItem);
 
-    // Update Time
-    if (item->GetMetaData().Time() != 0)
-        sprintf(szText, "%d", item->GetMetaData().Time());
-    else    
-        strcpy(szText, "Unknown");
-    sItem.pszText = szText;
-    sItem.cchTextMax = strlen(szText);
-    sItem.iSubItem = 4;
-    ListView_SetItem(hwnd, &sItem);
+        // Update Time
+        if (item->GetMetaData().Time() != 0)
+            sprintf(szText, "%d", item->GetMetaData().Time());
+        else    
+            strcpy(szText, "Unknown");
+        sItem.pszText = szText;
+        sItem.cchTextMax = strlen(szText);
+        sItem.iSubItem = 4;
+        ListView_SetItem(hwnd, &sItem);
+    }
 }
 
 void MusicBrowserUI::AddPlaylistListItem(const PlaylistItem* item)
@@ -514,47 +517,50 @@ void MusicBrowserUI::AddPlaylistListItem(const PlaylistItem* item)
     uint32        index = m_oPlm->IndexOf(item);
     HWND          hwnd = GetDlgItem(m_hWnd, IDC_PLAYLISTBOX);
 
-    sprintf(szText, "%d", index + 1);
+    if(index != kInvalidIndex)
+    {
+        sprintf(szText, "%d", index + 1);
 
-    sItem.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM;
-    sItem.pszText = szText;
-    sItem.cchTextMax = strlen(szText);
-    sItem.iSubItem = 0;
-    sItem.iItem = index;
-    sItem.lParam = index;
-    sItem.iImage = 0;
+        sItem.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM;
+        sItem.pszText = szText;
+        sItem.cchTextMax = strlen(szText);
+        sItem.iSubItem = 0;
+        sItem.iItem = index;
+        sItem.lParam = index;
+        sItem.iImage = 0;
 
-    ListView_InsertItem(hwnd, &sItem);
+        ListView_InsertItem(hwnd, &sItem);
 
-    sItem.mask = LVIF_TEXT;
+        sItem.mask = LVIF_TEXT;
 
-    // Update Title
-    sItem.pszText = (char*)item->GetMetaData().Title().c_str();
-    sItem.cchTextMax = item->GetMetaData().Title().length();
-    sItem.iSubItem = 1;
-    ListView_SetItem(hwnd, &sItem);
+        // Update Title
+        sItem.pszText = (char*)item->GetMetaData().Title().c_str();
+        sItem.cchTextMax = item->GetMetaData().Title().length();
+        sItem.iSubItem = 1;
+        ListView_SetItem(hwnd, &sItem);
 
-    // Update Artist
-    sItem.pszText = (char*)item->GetMetaData().Artist().c_str();
-    sItem.cchTextMax = item->GetMetaData().Artist().length();
-    sItem.iSubItem = 2;
-    ListView_SetItem(hwnd, &sItem);
+        // Update Artist
+        sItem.pszText = (char*)item->GetMetaData().Artist().c_str();
+        sItem.cchTextMax = item->GetMetaData().Artist().length();
+        sItem.iSubItem = 2;
+        ListView_SetItem(hwnd, &sItem);
 
-    // Update Album
-    sItem.pszText = (char*)item->GetMetaData().Album().c_str();
-    sItem.cchTextMax = item->GetMetaData().Album().length();
-    sItem.iSubItem = 3;
-    ListView_SetItem(hwnd, &sItem);
+        // Update Album
+        sItem.pszText = (char*)item->GetMetaData().Album().c_str();
+        sItem.cchTextMax = item->GetMetaData().Album().length();
+        sItem.iSubItem = 3;
+        ListView_SetItem(hwnd, &sItem);
 
-    // Update Time
-    if (item->GetMetaData().Time() != 0)
-        sprintf(szText, "%d", item->GetMetaData().Time());
-    else    
-        strcpy(szText, "Unknown");
-    sItem.pszText = szText;
-    sItem.cchTextMax = strlen(szText);
-    sItem.iSubItem = 4;
-    ListView_SetItem(hwnd, &sItem);
+        // Update Time
+        if (item->GetMetaData().Time() != 0)
+            sprintf(szText, "%d", item->GetMetaData().Time());
+        else    
+            strcpy(szText, "Unknown");
+        sItem.pszText = szText;
+        sItem.cchTextMax = strlen(szText);
+        sItem.iSubItem = 4;
+        ListView_SetItem(hwnd, &sItem);
+    }
 }
 
 void MusicBrowserUI::UpdatePlaylistList(void)

@@ -729,10 +729,7 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
                                     (LPARAM)&nm_treeview);
 
                         return TRUE;
-
-                        //MessageBox(NULL, "drag", "hey", MB_OK);
                     }
-                
                 }
             }
 

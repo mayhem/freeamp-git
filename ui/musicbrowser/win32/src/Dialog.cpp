@@ -56,12 +56,20 @@ static int pControls[] =
 };   
 
 TBBUTTON tbButtons[] = {
-	{ 7, ID_FILE_SEARCHFORMUSIC, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+    { 0, ID_FILE_NEWPLAYLIST, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+    { 2, ID_FILE_SAVEPLAYLIST, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
 	{ 0, 0, TBSTATE_ENABLED, TBSTYLE_SEP, 0L, 0},
-	{ 0, ID_FILE_NEWPLAYLIST, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 1},
-	{ 1, ID_FILE_IMPORT, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 2},
-	{ 3, ID_EDIT_REMOVE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 3},
-	{ 4, ID_EDIT_EDIT, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 4}
+    { 1, ID_FILE_IMPORT, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+	{ 12, ID_EDIT_REMOVE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+	{ 5, ID_EDIT_EDIT, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+    { 0, 0, TBSTATE_ENABLED, TBSTYLE_SEP, 0L, 0},
+    { 1, ID_EDIT_ADDTRACK, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+    { 1, ID_EDIT_ADDTRACK, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+    { 9, ID_EDIT_MOVEUP, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+    { 10, ID_EDIT_MOVEDOWN, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+    { 11, ID_EDIT_CLEARPLAYLIST, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0}
+	
+    
 };
 
 static BOOL CALLBACK MainDlgProc(HWND hwnd, UINT msg, 
@@ -766,26 +774,40 @@ void MusicBrowserUI::CreateToolbar(void)
     // backward compatibility. 
     SendMessage(m_hToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM) sizeof(TBBUTTON), 0); 
 
+    SendMessage(m_hToolbar, TB_SETBITMAPSIZE, 0, MAKELPARAM(16, 16)); 
+
     TBADDBITMAP tbab; 
 
-    // Add the bitmap containing button images to the toolbar. 
+    // Add the bitmap containing button images to the toolbar.
     tbab.hInst = g_hinst; 
     tbab.nID   = IDB_TOOLBAR; 
-    SendMessage(m_hToolbar, TB_ADDBITMAP, (WPARAM) 8, (WPARAM) &tbab); 
+    SendMessage(m_hToolbar, TB_ADDBITMAP, (WPARAM) 13, (WPARAM) &tbab);
 
     int32 index;
-    index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Music Search");
-    tbButtons[0].iString = index;
     index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"New Playlist");
-    tbButtons[2].iString = index;
-    index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Import Playlist");
+    tbButtons[0].iString = index;
+    index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Save Playlist");
+    tbButtons[1].iString = index;
+    index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Import Item");
     tbButtons[3].iString = index;
     index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Remove Item");
     tbButtons[4].iString = index;
-    index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Edit playlist");
+    index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Edit Item");
     tbButtons[5].iString = index;
+    index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Add Item");
+    tbButtons[7].iString = index;
+    index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Add File");
+    tbButtons[8].iString = index;
+    index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Move Up");
+    tbButtons[9].iString = index;
+    index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Move Down");
+    tbButtons[10].iString = index;
+    index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Clear Playlist");
+    tbButtons[11].iString = index;
+    
+    
 
-    SendMessage(m_hToolbar, TB_ADDBUTTONS, (WPARAM) 6, (LPARAM) &tbButtons);
+    SendMessage(m_hToolbar, TB_ADDBUTTONS, (WPARAM) 12, (LPARAM) &tbButtons);
     SendMessage(m_hToolbar, TB_AUTOSIZE, (WPARAM) 0, (LPARAM) 0);
 
     //GetClientRect(m_hRebar, &dummyRect);
