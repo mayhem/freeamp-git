@@ -177,7 +177,7 @@ keyboardServiceFunction(void *pclcio)
             int32     cf = int32((pMe->m_currSeconds + STEP_SIZE) / pMe->m_secondsPerFrame);
 
             if (cf > pMe->m_totalFrames)
-               cf = pMe->m_totalFrames;
+               cf = pMe->m_totalFrames - 1;
             Event    *e = new ChangePositionEvent(cf);
 
             pMe->m_currSeconds += STEP_SIZE;
