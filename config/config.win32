@@ -24,6 +24,9 @@ ____________________________________________________________________________*/
 #ifndef CONFIG_H
 #define CONFIG_H
 
+// name of company
+#define BRANDING_COMPANY "FreeAmp"
+
 // name of player
 #define BRANDING "FreeAmp"
 
