@@ -844,6 +844,8 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
 
         case WM_SIZE:
         {
+            LockWindowUpdate(hwnd);
+
             int32 oldWidth = 0;
 
             oldWidth += ListView_GetColumnWidth(hwnd, 0);
@@ -899,6 +901,8 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
                         lastColumn = 1;
                 }
             }
+
+            LockWindowUpdate(NULL);
             
             break;
         }

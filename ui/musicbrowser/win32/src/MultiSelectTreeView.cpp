@@ -189,6 +189,9 @@ TreeViewWndProc(HWND hwnd,
 {
     MusicBrowserUI* ui = (MusicBrowserUI*)GetProp(hwnd, "this" );
 
+    //if(msg == 0x110c)
+    //    return 0;
+
     return ui->TreeViewWndProc(hwnd, msg, wParam, lParam);
 }
 

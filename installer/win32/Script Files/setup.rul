@@ -313,7 +313,7 @@ begin
                 @ERROR_COMPONENT + " " + svComponent + "\n" +
                 @ERROR_FILEGROUP + " " + svFileGroup + "\n" +
                 @ERROR_FILE      + " " + svFile;
-            SprintfBox( SEVERE, @TITLE_CAPTIONBAR, szErrMsg, nResult );
+            SprintfBox( SEVERE, @PRODUCT_NAME + " Setup", szErrMsg, nResult );
             bInstallAborted = TRUE;
             return nResult;
     endswitch;
@@ -368,8 +368,6 @@ begin
 		
 	// First set up the default registry entries
 	nResult = CreateRegistrySet("MainSet");
-    nResult = CreateRegistrySet("SimpleSet");
-    nResult = CreateRegistrySet("RainPlaySet");
     nResult = CreateRegistrySet("FreeAmpSet");
 	nResult = CreateRegistrySet("DSoundSet");
 	nResult = CreateRegistrySet("SoundCardSet");
@@ -548,7 +546,7 @@ begin
     // Append product version to appropriate strings
     svProductName = @PRODUCT_NAME + " " + @PRODUCT_VERSION + @VERSION_STRING_SPECIAL;
     svFolderName = @FOLDER_NAME;// + " " + @PRODUCT_VERSION;
-    svMainTitle = @TITLE_MAIN + " " + @PRODUCT_VERSION + @VERSION_STRING_SPECIAL;
+    svMainTitle = svProductName;
     svUninstallDisplayName = @UNINST_DISPLAY_NAME + " " + @PRODUCT_VERSION + @VERSION_STRING_SPECIAL;
     svUninstallKey = @UNINST_KEY + " " + @PRODUCT_VERSION + @VERSION_STRING_SPECIAL;
 
@@ -589,7 +587,7 @@ begin
     Enable( INDVFILESTATUS );
     SetTitle( svMainTitle, 24, WHITE );
 
-    SetTitle( @TITLE_CAPTIONBAR, 0, BACKGROUNDCAPTION ); // Caption bar text.
+    SetTitle( @PRODUCT_NAME + " Setup", 0, BACKGROUNDCAPTION ); // Caption bar text.
 
     Enable( BACKGROUND );
 
@@ -1002,6 +1000,9 @@ end;
 // --- include script file section ---
 
 #include "sddialog.rul"
+
+
+
 
 
 
