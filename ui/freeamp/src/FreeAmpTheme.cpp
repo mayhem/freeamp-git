@@ -105,6 +105,7 @@ FreeAmpTheme::FreeAmpTheme(FAContext * context)
    m_pUpdateThread = NULL;
    m_pOptionsThread = NULL;
    m_bInOptions = false;
+   m_bPaused = false;
 
 #if defined( WIN32 )
     m_pUpdateMan = new Win32UpdateManager(m_pContext);
@@ -277,6 +278,8 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
          m_pWindow->ControlEnable(string("Stop"), true, bEnable);
          
          m_bPlayShown = false;
+         m_bPaused = false;
+         
          break;
       }   
       case INFO_Paused:
@@ -288,6 +291,7 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
          
          m_pWindow->ControlIntValue(string("PlayPause"), true, iState);
          iState = e->Type() == INFO_Paused ? 1 : 0;
+         m_bPaused = e->Type() == INFO_Paused;
          m_pWindow->ControlIntValue(string("PlayStop"), true, iState);
          m_pWindow->ControlIntValue(string("MPause"), true, iState);
          m_pWindow->ControlEnable(string("Play"), true, bEnable);
@@ -918,6 +922,8 @@ void FreeAmpTheme::InitControls(void)
     iState = m_bPlayShown ? 0 : 1;
     m_pWindow->ControlIntValue(string("PlayPause"), true, iState);
     m_pWindow->ControlIntValue(string("PlayStop"), true, iState);
+    
+    iState = m_bPaused ? 1 : 0;
     m_pWindow->ControlIntValue(string("MPause"), true, iState);
     bEnable = m_bPlayShown;
     m_pWindow->ControlEnable(string("Play"), true, bEnable);
