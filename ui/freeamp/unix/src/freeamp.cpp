@@ -201,7 +201,7 @@ void FreeAmpUI::Init()
 	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),leftside,&left_side_pixmap,NULL,NULL);
 	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),dials,&dials_pixmap,NULL,NULL);
 
-	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),lcd,&lcd_pixmap,NULL,NULL);  // just for building total image
+	//XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),lcd,&lcd_pixmap,NULL,NULL);  // just for building total image
 	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),lcd_upper_frame,&lcd_upper_pixmap,NULL,NULL);
 	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),lcd_display,&lcd_display_pixmap,NULL,NULL);
 	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),playlist_drawer,&playlist_drawer_pixmap,NULL,NULL);
@@ -233,8 +233,14 @@ void FreeAmpUI::Init()
 	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),logo256,&m_iconPixmap,NULL,NULL);
 	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),leftside256,&left_side_pixmap,NULL,NULL);
 	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),dials256,&dials_pixmap,NULL,NULL);
-	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),lcd256,&lcd_pixmap,NULL,NULL); // just for building total image
+	//XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),lcd256,&lcd_pixmap,NULL,NULL); // just for building total image
 	
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),lcd_upper_frame256,&lcd_upper_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),lcd_display256,&lcd_display_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),playlist_drawer256,&playlist_drawer_pixmap,NULL,NULL);
+	lcd_upper_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow->GetWindow(),(char *)lcd_upper_frame_mask_bits,lcd_upper_frame_mask_width,lcd_upper_frame_mask_height);
+	playlist_drawer_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow->GetWindow(),(char *)playlist_drawer_mask_bits,playlist_drawer_mask_width,playlist_drawer_mask_height);
+
 	player_full_mask_pixmap =XCreateBitmapFromData(m_display,m_mainWindow->GetWindow(),(char *)player_full_mask_bits,PLAYER_FULL_MASK_WIDTH,PLAYER_FULL_MASK_HEIGHT);
 	
 	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),rightside256,&right_side_pixmap,NULL,NULL);
@@ -265,11 +271,8 @@ void FreeAmpUI::Init()
     int x=0;
     XCopyArea(m_display,left_side_pixmap,m_doubleBufferPixmap,m_gc,0,0,LEFT_SIDE_WIDTH,LEFT_SIDE_HEIGHT,x,0);
     x+=LEFT_SIDE_WIDTH;
-    XCopyArea(m_display,dials_pixmap,m_doubleBufferPixmap,m_gc,0,0,SINGLE_DIAL_WIDTH,DIALS_HEIGHT,x,0);
     x+=SINGLE_DIAL_WIDTH;
-    XCopyArea(m_display,lcd_pixmap,m_doubleBufferPixmap,m_gc,0,0,LCD_WIDTH,LCD_HEIGHT,x,0);
-    x+=LCD_WIDTH;
-    XCopyArea(m_display,dials_pixmap,m_doubleBufferPixmap,m_gc,0,0,SINGLE_DIAL_WIDTH,DIALS_HEIGHT,x,0);
+    x+=LCD_UPPER_WIDTH;
     x+=SINGLE_DIAL_WIDTH;
     XCopyArea(m_display,right_side_pixmap,m_doubleBufferPixmap,m_gc,0,0,RIGHT_SIDE_WIDTH,RIGHT_SIDE_HEIGHT,x,0);
     x+=RIGHT_SIDE_WIDTH;
@@ -495,13 +498,13 @@ int32 FreeAmpUI::AcceptEvent(Event *e) {
 	    int32 m = (s % 3600) / 60;
 	    s = ((s % 3600) % 60);
 	    m_lcdWindow->SetTotalTime(h,m,s);
-	    m_lcdWindow->Draw();
+	    m_lcdWindow->Draw(FALcdWindow::FullRedraw);
 	    break;
 	}
 	case INFO_MediaTimeInfo: {
 	    MediaTimeInfoEvent *info = (MediaTimeInfoEvent *)e;
 	    m_lcdWindow->SetCurrentTime(info->m_hours,info->m_minutes,info->m_seconds);
-	    m_lcdWindow->Draw();
+	    m_lcdWindow->Draw(FALcdWindow::TimeOnly);
 	    break;
 	}
 	default:

@@ -124,13 +124,22 @@ class FALcdWindow : public FAWindow {
     Pixmap m_mainTextMask;
     Pixmap m_iconMask;
 
+    GC m_timeGC;
+
     bool m_insideDisplay;
 
     int32 m_totalHours, m_totalMinutes, m_totalSeconds;
     int32 m_currHours, m_currMinutes, m_currSeconds;
 
-    void BlitText(Drawable d, int32 x, int32 y, const char *text, int32 font);
+    void BlitText(Drawable d, GC gc, int32 x, int32 y, const char *text, int32 font);
     void SetState(int32);
+    void DrawIntroState(int32);
+    void DrawVolumeState(int32);
+    void DrawCurrentTimeState(int32);
+    void DrawSeekTimeState(int32);
+    void DrawRemainingTimeState(int32);
+    void DrawTotalTimeState(int32);
+
   public:
     enum {
 	IntroState,
@@ -141,7 +150,10 @@ class FALcdWindow : public FAWindow {
 	TotalTimeState,
 	MaxState
     };
-
+    enum {
+	FullRedraw,
+	TimeOnly
+    };
     FALcdWindow(Display *,int32,GC,Window,int32,int32,int32,int32);
     virtual ~FALcdWindow();
     virtual void DoEvent(XEvent);
@@ -154,7 +166,7 @@ class FALcdWindow : public FAWindow {
     void SetTotalTime(int32 h, int32 m, int32 s);
 
     void SetDisplayState(int32);
-    void Draw();
+    void Draw(int32);
 };
 
 class FADialWindow : public FAWindow {

@@ -54,7 +54,7 @@ Pixmap left_side_pixmap;
 #define LCD_UPPER_WIDTH 190
 #define LCD_UPPER_HEIGHT 25
 #include "lcd_upper_frame.xpm"
-// #include "lcd_upper_frame256.xpm"
+#include "lcd_upper_frame256.xpm"
 #include "lcd_upper_frame_mask.xbm"
 Pixmap lcd_upper_pixmap;
 Pixmap lcd_upper_mask_pixmap;
@@ -64,26 +64,15 @@ Pixmap lcd_upper_mask_pixmap;
 #define LCD_DISPLAY_WIDTH 159
 #define LCD_DISPLAY_HEIGHT 31
 #include "lcd_display.xpm"
-// #include "lcd_display256.xpm"
+#include "lcd_display256.xpm"
 Pixmap lcd_display_pixmap;
-
-// JUST FOR BUILDING TOTAL IMAGE AT STARTUP:
-#define LCD_X 149
-#define LCD_Y 0
-#define LCD_WIDTH 190
-#define LCD_HEIGHT 51
-#include "lcd.xpm"
-#include "lcd256.xpm"
-Pixmap lcd_pixmap;
-
-// END
 
 #define PLAYLIST_DRAWER_X 149
 #define PLAYLIST_DRAWER_Y 25
 #define PLAYLIST_DRAWER_WIDTH 190
 #define PLAYLIST_DRAWER_HEIGHT 26
 #include "playlist_drawer.xpm"
-// #include "playlist_drawer256.xpm"
+#include "playlist_drawer256.xpm"
 #include "playlist_drawer_mask.xbm"
 Pixmap playlist_drawer_pixmap;
 Pixmap playlist_drawer_mask_pixmap;
