@@ -57,7 +57,7 @@ void infoeditorUI::DoApplyInfoEdit(void)
     newmeta.SetSize(oldmeta.Size());
 
     m_playlistItem->SetMetaData(&newmeta);
-
+    m_context->plm->UpdateTrackMetaData(m_playlistItem, true);
     m_context->catalog->UpdateSong(m_playlistItem);
 }
 
