@@ -109,6 +109,7 @@
 #define IDC_USEPROXY                    1023
 #define IDC_PROXYADDRESS                1024
 #define IDC_COLON_TEXT                  1025
+#define IDC_PREBUFFER                   1026
 #define IDC_OPEN_URL                    1029
 #define IDC_ITEM                        40001
 #define IDC_ABOUT                       40002
@@ -129,9 +130,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        194
+#define _APS_NEXT_RESOURCE_VALUE        195
 #define _APS_NEXT_COMMAND_VALUE         40013
-#define _APS_NEXT_CONTROL_VALUE         1026
+#define _APS_NEXT_CONTROL_VALUE         1027
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

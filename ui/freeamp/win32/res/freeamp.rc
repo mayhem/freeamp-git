@@ -47,7 +47,7 @@ BEGIN
                     IDC_STATIC,4,3,211,24
 END
 
-IDD_PREF1 DIALOG DISCARDABLE  0, 0, 233, 159
+IDD_PREF1 DIALOG DISCARDABLE  0, 0, 233, 174
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "General"
 FONT 8, "MS Sans Serif"
@@ -62,7 +62,7 @@ BEGIN
     GROUPBOX        "Decoder Priority",IDC_STATIC,3,54,227,52
     CONTROL         "Slider1",IDC_PRIORITY,"msctls_trackbar32",TBS_AUTOTICKS | 
                     WS_TABSTOP,9,66,214,15
-    GROUPBOX        "Buffer Sizes",IDC_STATIC,3,110,136,46
+    GROUPBOX        "Buffer Sizes",IDC_STATIC,3,110,136,60
     EDITTEXT        IDC_INPUT,73,122,25,12,ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "Input Buffer Size:",IDC_STATIC,13,124,57,8
     EDITTEXT        IDC_OUTPUT,73,138,25,12,ES_AUTOHSCROLL | ES_NUMBER
@@ -74,91 +74,94 @@ BEGIN
     LTEXT           "High",IDC_STATIC,175,84,16,8
     LTEXT           "Realtime",IDC_STATIC,199,84,28,8
     CONTROL         "Manifest in Tray instead of Taskbar",IDC_TRAY,"Button",
-                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,153,135,75,
+                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,153,145,75,
                     17
     CONTROL         "Stay on top",IDC_STAYONTOP,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,153,122,52,10
-    GROUPBOX        "Misc",IDC_STATIC,145,110,85,46
+                    WS_TABSTOP,153,126,52,10
+    GROUPBOX        "Misc",IDC_STATIC,145,110,85,60
     LTEXT           "Idle",IDC_STATIC,10,84,12,8
     CTEXT           "Below Normal",IDC_STATIC,69,84,29,15
     CTEXT           "Above Normal",IDC_STATIC,135,84,27,16
+    EDITTEXT        IDC_PREBUFFER,73,154,25,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Prebuffer Streams:",IDC_STATIC,9,156,59,8
+    LTEXT           "Seconds",IDC_STATIC,103,156,29,8
 END
 
-IDD_PREF3 DIALOG DISCARDABLE  0, 0, 233, 159
+IDD_PREF3 DIALOG DISCARDABLE  0, 0, 233, 174
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Debug"
 FONT 8, "MS Sans Serif"
 BEGIN
-    GROUPBOX        "",IDC_STATIC,3,81,227,74
-    LTEXT           " ",IDC_STATIC,9,81,8,8
+    GROUPBOX        "",IDC_STATIC,3,84,227,86
+    LTEXT           " ",IDC_STATIC,9,84,8,8
     CONTROL         "Enable Logging",IDC_LOG,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,11,80,63,10
+                    WS_TABSTOP,11,83,63,10
     LTEXT           "If you are experiencing a problem with FreeAmp it is possible to log what the program is doing in order to help us track down the cause. When you enable logging a file is created in the program's install directory ",
                     IDC_STATIC,3,3,227,24
     LTEXT           "called freeamp.log. You should send us the log file when you report a bug.",
                     IDC_STATIC,3,27,227,17
     CONTROL         "Log input from PMIs (e.g. File, HTTP, ShoutCAST)",
                     IDC_LOGINPUT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,
-                    105,174,10
+                    112,174,10
     CONTROL         "Log output from PMOs (e.g. Wave, DirectSound)",
                     IDC_LOGOUTPUT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,
-                    117,169,10
+                    126,169,10
     CONTROL         "Log decoding process (e.g. MP3, CDDA)",IDC_LOGDECODER,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,129,145,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,140,145,10
     LTEXT           "You have the ability to narrow the logging to a particular portion of FreeAmp by selecting the various logging options. If you are not sure in which portion of the program the problem is occuring you can simply enable all the logging options.",
-                    IDC_STATIC,3,44,227,32
+                    IDC_STATIC,3,46,227,32
     CONTROL         "Log performance issues (e.g. Timings, Buffer Under/Overflows)",
                     IDC_LOGPERFORMANCE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    13,141,213,10
+                    13,154,213,10
     CONTROL         "Log general player errors (e.g. Loading plugins)",
-                    IDC_LOGMAIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,93,
+                    IDC_LOGMAIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,98,
                     163,10
 END
 
-IDD_PREF2 DIALOG DISCARDABLE  0, 0, 233, 159
+IDD_PREF2 DIALOG DISCARDABLE  0, 0, 233, 174
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Streaming"
 FONT 8, "MS Sans Serif"
 BEGIN
-    GROUPBOX        "",IDC_STATIC,3,33,227,63
-    LTEXT           " ",IDC_STATIC,9,33,8,8
+    GROUPBOX        "",IDC_STATIC,3,39,227,65
+    LTEXT           " ",IDC_STATIC,9,39,8,8
     CONTROL         "Save Streams Locally",IDC_SAVESTREAMS,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,11,33,76,10
-    EDITTEXT        IDC_STREAM_INTERVAL,117,12,25,12,ES_AUTOHSCROLL | 
+                    BS_AUTOCHECKBOX | WS_TABSTOP,11,38,83,10
+    EDITTEXT        IDC_STREAM_INTERVAL,117,15,25,12,ES_AUTOHSCROLL | 
                     ES_NUMBER
-    LTEXT           "Buffer Streams For",IDC_STATIC,57,14,59,8
-    LTEXT           "Seconds",IDC_STATIC,146,14,29,8
-    EDITTEXT        IDC_STREAMSAVEDIR,11,57,210,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "Browse...",IDC_BROWSE,171,77,50,14
-    LTEXT           "Save Location:",IDC_SAVELOCATION_TEXT,11,45,49,8
-    GROUPBOX        "Buffer Sizes",IDC_STATIC,3,3,227,26
-    GROUPBOX        "",IDC_STATIC,3,100,227,55
-    LTEXT           " ",IDC_STATIC,9,101,8,8
+    LTEXT           "Buffer Streams For",IDC_STATIC,57,17,59,8
+    LTEXT           "Seconds",IDC_STATIC,146,17,29,8
+    EDITTEXT        IDC_STREAMSAVEDIR,11,62,210,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Browse...",IDC_BROWSE,171,82,50,14
+    LTEXT           "Save Location:",IDC_SAVELOCATION_TEXT,11,51,49,8
+    GROUPBOX        "Buffer Sizes",IDC_STATIC,3,3,227,30
+    GROUPBOX        "",IDC_STATIC,3,110,227,59
+    LTEXT           " ",IDC_STATIC,9,111,8,8
     CONTROL         "Use Proxy Server",IDC_USEPROXY,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,11,100,64,10
-    EDITTEXT        IDC_PROXYADDRESS,11,127,173,14,ES_AUTOHSCROLL
-    CTEXT           ":",IDC_COLON_TEXT,184,129,8,8
-    EDITTEXT        IDC_PORT,193,127,29,14,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "Port:",IDC_PORT_TEXT,193,116,15,8
-    LTEXT           "Proxy Address:",IDC_PROXYADDRESS_TEXT,11,116,47,8
+                    WS_TABSTOP,11,110,69,10
+    EDITTEXT        IDC_PROXYADDRESS,11,141,173,14,ES_AUTOHSCROLL
+    CTEXT           ":",IDC_COLON_TEXT,185,143,8,8
+    EDITTEXT        IDC_PORT,193,141,29,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Port:",IDC_PORT_TEXT,193,130,15,8
+    LTEXT           "Proxy Address:",IDC_PROXYADDRESS_TEXT,11,130,47,8
 END
 
-IDD_PREF4 DIALOG DISCARDABLE  0, 0, 233, 159
+IDD_PREF4 DIALOG DISCARDABLE  0, 0, 233, 174
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "About"
 FONT 8, "MS Sans Serif"
 BEGIN
     LTEXT           "FreeAmp is an Open Source effort to build the best digital audio player available.  In the interest of supporting the free software community, while at the same time fostering the growth of the online delivery of music, EMusic",
-                    IDC_STATIC,3,27,227,25
+                    IDC_STATIC,3,28,227,25
     LTEXT           "THE Source for Downloadable Music, is funding both the FreeAmp.org \ndomain and the efforts of the FreeAmp team. The FreeAmp team consists of: Mark B. Elrod, Robert Kaye, Brett Thomas, Jason Woodward, and Mark H. Weaver.",
-                    IDC_STATIC,3,51,227,33
+                    IDC_STATIC,3,52,227,33
     LTEXT           "Other people have also contributed to FreeAmp:",
-                    IDC_STATIC,3,89,227,9
+                    IDC_STATIC,3,92,227,9
     LTEXT           "FreeAmp is being released under the terms of the GPL. As is provided by the GPL, all of EMusic's and your efforts toward FreeAmp will be released back to the community at large.",
-                    IDC_STATIC,3,130,227,25
+                    IDC_STATIC,3,137,227,25
     LTEXT           "Alan Cutter, Gabor Fleischer, Jean-Michel HERVE, Hiromasa Kato, Michael Bruun Petersen, Sylvain Rebaud, The Snowblind Alliance, Tom Spindler, Valters Vingolds, and Bill Yuan.",
-                    IDC_STATIC,3,100,227,30
-    LTEXT           "version 1.2.3",IDC_STATIC,97,14,38,8
+                    IDC_STATIC,3,104,227,30
+    LTEXT           "version 1.3",IDC_STATIC,98,14,36,8
     LTEXT           "FreeAmp",IDC_STATIC,102,5,29,8
 END
 
@@ -323,7 +326,7 @@ BEGIN
         LEFTMARGIN, 3
         RIGHTMARGIN, 230
         TOPMARGIN, 3
-        BOTTOMMARGIN, 156
+        BOTTOMMARGIN, 171
     END
 
     IDD_PREF3, DIALOG
@@ -331,7 +334,7 @@ BEGIN
         LEFTMARGIN, 3
         RIGHTMARGIN, 230
         TOPMARGIN, 3
-        BOTTOMMARGIN, 155
+        BOTTOMMARGIN, 170
     END
 
     IDD_PREF2, DIALOG
@@ -339,7 +342,7 @@ BEGIN
         LEFTMARGIN, 3
         RIGHTMARGIN, 230
         TOPMARGIN, 3
-        BOTTOMMARGIN, 155
+        BOTTOMMARGIN, 169
     END
 
     IDD_PREF4, DIALOG
@@ -347,7 +350,7 @@ BEGIN
         LEFTMARGIN, 3
         RIGHTMARGIN, 230
         TOPMARGIN, 3
-        BOTTOMMARGIN, 155
+        BOTTOMMARGIN, 170
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -360,8 +363,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,2,3,0
- PRODUCTVERSION 1,2,3,0
+ FILEVERSION 1,3,0,0
+ PRODUCTVERSION 1,3,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -379,13 +382,13 @@ BEGIN
             VALUE "Comments", "For the latest version go to http://www.freeamp.org\0"
             VALUE "CompanyName", "FreeAmp Open Source Development Effort\0"
             VALUE "FileDescription", "FreeAmp\0"
-            VALUE "FileVersion", "1.2.3\0"
+            VALUE "FileVersion", "1.3\0"
             VALUE "InternalName", "FreeAmp\0"
             VALUE "LegalCopyright", "Copyright © GoodNoise Corporation 1999\0"
             VALUE "LegalTrademarks", "FreeAmp, GoodNoise\0"
             VALUE "OriginalFilename", "freeamp.ui\0"
             VALUE "ProductName", "FreeAmp\0"
-            VALUE "ProductVersion", "1.2.3\0"
+            VALUE "ProductVersion", "1.3\0"
         END
     END
     BLOCK "VarFileInfo"

@@ -47,6 +47,7 @@ typedef struct PrefsStruct {
     char defaultPMO[256];
     int32 inputBufferSize;
     int32 outputBufferSize;
+    int32 preBufferLength;
     int32 decoderThreadPriority;
     bool stayOnTop;
     bool liveInTray;
@@ -93,6 +94,7 @@ GetPrefsValues(Preferences* prefs,
     prefs->GetDecoderThreadPriority(&values->decoderThreadPriority);
     prefs->GetInputBufferSize(&values->inputBufferSize);
     prefs->GetOutputBufferSize(&values->outputBufferSize);
+    prefs->GetPrebufferLength(&values->preBufferLength);
     prefs->GetStayOnTop(&values->stayOnTop);
     prefs->GetLiveInTray(&values->liveInTray);
 
@@ -123,6 +125,7 @@ SavePrefsValues( Preferences* prefs,
     prefs->SetDecoderThreadPriority(values->decoderThreadPriority);
     prefs->SetInputBufferSize(values->inputBufferSize);
     prefs->SetOutputBufferSize(values->outputBufferSize);
+    prefs->SetPrebufferLength(values->preBufferLength);
     prefs->SetStayOnTop(values->stayOnTop);
     prefs->SetLiveInTray(values->liveInTray);
 
@@ -158,6 +161,7 @@ PrefPage1Proc(  HWND hwnd,
     static HWND hwndPriority = NULL;
     static HWND hwndInput = NULL;
     static HWND hwndOutput = NULL;
+    static HWND hwndPrebuffer = NULL;
     static HWND hwndStayOnTop = NULL;
     static HWND hwndLiveInTray = NULL;
     
@@ -176,6 +180,7 @@ PrefPage1Proc(  HWND hwnd,
             hwndPriority = GetDlgItem(hwnd, IDC_PRIORITY);
             hwndInput = GetDlgItem(hwnd, IDC_INPUT);
             hwndOutput = GetDlgItem(hwnd, IDC_OUTPUT);
+            hwndPrebuffer = GetDlgItem(hwnd, IDC_PREBUFFER);
             hwndStayOnTop = GetDlgItem(hwnd, IDC_STAYONTOP);
             hwndLiveInTray = GetDlgItem(hwnd, IDC_TRAY);
 
@@ -239,6 +244,11 @@ PrefPage1Proc(  HWND hwnd,
             sprintf(temp, "%d", value);
             Edit_LimitText(hwndOutput, 4);
             Edit_SetText(hwndOutput, temp);
+
+            value = originalValues.preBufferLength;
+            sprintf(temp, "%d", value);
+            Edit_LimitText(hwndPrebuffer, 2);
+            Edit_SetText(hwndPrebuffer, temp);
 
             Button_SetCheck(hwndStayOnTop, originalValues.stayOnTop);
 
@@ -333,6 +343,31 @@ PrefPage1Proc(  HWND hwnd,
                         Edit_GetText(hwndOutput, text, sizeof(text));
 
                         currentValues.outputBufferSize = atoi(text);
+
+                        if(memcmp(  &originalValues, 
+                                    &currentValues, 
+                                    sizeof(PrefsStruct)))
+                        {
+                            PropSheet_Changed(GetParent(hwnd), hwnd);
+                        }
+                        else
+                        {
+                            PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                        }
+                    }
+
+                    break;
+                }
+
+                case IDC_PREBUFFER:
+                {
+                    if(HIWORD(wParam) == EN_CHANGE)
+                    {
+                        char text[128];
+
+                        Edit_GetText(hwndPrebuffer, text, sizeof(text));
+
+                        currentValues.preBufferLength = atoi(text);
 
                         if(memcmp(  &originalValues, 
                                     &currentValues, 
