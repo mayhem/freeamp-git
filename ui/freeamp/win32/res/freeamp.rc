@@ -74,7 +74,7 @@ END
 //
 
 IDB_DIALS               BITMAP  DISCARDABLE     "dials.bmp"
-IDB_PLAYER_MASK         BITMAP  DISCARDABLE     "player_mask.bmp"
+IDB_CONTROL_MASK_MID    BITMAP  DISCARDABLE     "control_mask_mid.bmp"
 IDB_MID                 BITMAP  DISCARDABLE     "lcd.bmp"
 IDB_LEFT                BITMAP  DISCARDABLE     "leftside.bmp"
 IDB_RIGHT               BITMAP  DISCARDABLE     "rightside.bmp"
@@ -117,6 +117,18 @@ IDB_REPEAT_ICON         BITMAP  DISCARDABLE     "repeat_icon.bmp"
 IDB_REPEAT_ICON_256     BITMAP  DISCARDABLE     "repeat_icon256.bmp"
 IDB_SHUFFLED_ICON       BITMAP  DISCARDABLE     "shuffled_icon.bmp"
 IDB_REPEAT_ALL_ICON     BITMAP  DISCARDABLE     "all_icon.bmp"
+IDB_WINDOW_MASK_MID     BITMAP  DISCARDABLE     "window_mask_mid.bmp"
+IDB_BODY                BITMAP  DISCARDABLE     "body.bmp"
+IDB_BODY256             BITMAP  DISCARDABLE     "body256.bmp"
+IDB_TIME_BACK           BITMAP  DISCARDABLE     "time_background.bmp"
+IDB_DRAWER_MASK         BITMAP  DISCARDABLE     "drawer_mask.bmp"
+IDB_DRAWER              BITMAP  DISCARDABLE     "drawer.bmp"
+IDB_PLAYLIST_BODY       BITMAP  DISCARDABLE     "playlist_back.bmp"
+IDB_PLAYLIST_CONTROL_MASK BITMAP  DISCARDABLE     "playlist_control_mask.bmp"
+IDB_PANEL_BACKING_MASK  BITMAP  DISCARDABLE     "panel_backing_mask.bmp"
+IDB_PANEL_BACKING       BITMAP  DISCARDABLE     "panel_backing.bmp"
+IDB_TITLE_BACK          BITMAP  DISCARDABLE     "title_background.bmp"
+IDB_SCROLLBAR           BITMAP  DISCARDABLE     "scrollbar.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
