@@ -60,7 +60,6 @@ typedef struct OutputInfo
     uint32 samples_per_second;
     uint32 max_buffer_size;
     uint32 samples_per_frame;
-    string devicename;
 }OutputInfo;
 
 class EventBuffer;
