@@ -136,7 +136,6 @@ void MusicBrowserUI::InitTree(void)
     insert.hParent = temp;
     m_hShoutCastItem = TreeView_InsertItem(m_hMusicView, &insert);
 
-    /*
     insert.item.pszText = kPortables;
     insert.item.cchTextMax = lstrlen(insert.item.pszText);
     insert.item.iImage = 7;
@@ -146,7 +145,6 @@ void MusicBrowserUI::InitTree(void)
     insert.hInsertAfter = TVI_LAST;
     insert.hParent = NULL;
     m_hPortableItem = TreeView_InsertItem(m_hMusicView, &insert);
-    */
 }
 
 void MusicBrowserUI::FillArtists(void)

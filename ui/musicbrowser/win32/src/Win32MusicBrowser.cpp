@@ -313,7 +313,6 @@ void MusicBrowserUI::MusicSearchDone()
                     
     m_bSearchInProgress = false;
                 
-    //InitTree();
     TreeView_Expand(m_hMusicView,m_hPlaylistItem, TVE_EXPAND);
     TreeView_Expand(m_hMusicView,m_hMyMusicItem, TVE_EXPAND);
 }
@@ -344,10 +343,10 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
             AddToolbarButtons(useTextLabels, useImages);
             UpdateButtonStates();
 
-            /*if(TreeView_GetChild(m_hMusicView, m_hPortableItem) != NULL)
+            if(TreeView_GetChild(m_hMusicView, m_hPortableItem) != NULL)
             {    
                 FillPortables();
-            }*/
+            }
             break;
         }
 

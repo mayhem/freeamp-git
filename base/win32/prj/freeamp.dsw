@@ -21,7 +21,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "cdinput"=..\..\..\io\cd\win32\prj\cdinput.dsp - Package Owner=<4>
+Project: "cdlmc"=..\..\..\lmc\cd\win32\prj\cdlmc.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -33,7 +33,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "cdlmc"=..\..\..\lmc\cd\win32\prj\cdlmc.dsp - Package Owner=<4>
+Project: "cdoutput"=..\..\..\io\cd\win32\prj\cdoutput.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -189,10 +189,10 @@ Package=<4>
     Project_Dep_Name winamp
     End Project Dependency
     Begin Project Dependency
-    Project_Dep_Name cdinput
+    Project_Dep_Name cdlmc
     End Project Dependency
     Begin Project Dependency
-    Project_Dep_Name cdlmc
+    Project_Dep_Name cdoutput
     End Project Dependency
 }}}
 

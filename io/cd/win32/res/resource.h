@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Developer Studio generated include file.
-// Used by cdinput.rc
+// Used by cdoutput.rc
 //
 #define IDI_ICON1                       101
 
