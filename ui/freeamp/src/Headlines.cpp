@@ -46,6 +46,7 @@ ____________________________________________________________________________*/
 #endif  
 
 #include "Headlines.h"
+#include "Http.h"
 #include "eventdata.h"
 #include "event.h"
 #include "debug.h"
@@ -157,9 +158,10 @@ Error Headlines::Download(void)
 {
     string oPage;
     Error  eRet;
+    Http   oDownload(m_pContext);
 
     m_pContext->target->AcceptEvent(new StatusMessageEvent("Downloading headlines..."));
-    eRet = DownloadHeadlines(m_oInfo.m_oUrl, oPage);
+    eRet = oDownload.DownloadToString(m_oInfo.m_oUrl, oPage);
     if (eRet != kError_NoErr)
     {
        m_pContext->target->AcceptEvent(new StatusMessageEvent("Headline download failed."));
@@ -215,197 +217,3 @@ Error Headlines::EndElement(string &oElement)
 
     return kError_NoErr;
 }
-
-const uint8 kHttpPort = 80;
-const uint32 kMaxHostNameLen = 64;
-
-Error Headlines::DownloadHeadlines(string &oUrl, string &oPage)
-{
-    Error result = kError_InvalidParam;
-
-    char hostname[kMaxHostNameLen + 1];
-    char localname[kMaxHostNameLen + 1];
-    char proxyname[kMaxHostNameLen + 1];
-    unsigned short port;
-    struct sockaddr_in  addr;
-    struct hostent      host;
-    SOCKET s = -1;
-    bool useProxy;
-    char *buffer = NULL, *file;
-
-    int32 numFields;
-    uint32 length;
-
-    result = kError_NoErr;  
-
-    m_pContext->prefs->GetUseProxyServer(&useProxy);
-
-    length = sizeof(proxyname);
-    m_pContext->prefs->GetProxyServerAddress(proxyname, &length);
-
-    if(useProxy)
-    {
-         numFields = sscanf(proxyname, "http://%[^:/]:%hu", hostname, &port);
-
-         strcpy(proxyname, oUrl.c_str());
-         file = proxyname;
-    }
-    else
-    {
-         numFields = sscanf(oUrl.c_str(), "http://%[^:/]:%hu", hostname, &port);
-         file = strchr(oUrl.c_str() + 7, '/');
-    }
-
-    if(numFields < 1)
-    {
-         result = kError_InvalidURL;     
-    }
-
-    if(numFields < 2)
-    {
-         port = kHttpPort;
-    }            
-
-    // get hostname
-    if(IsntError(result))
-    {
-        struct hostent* hostByName;
-        struct hostent  hostByIP;
-
-        //*m_debug << "gethostbyname: " << hostname << endl;
-        hostByName = gethostbyname(hostname);
-
-        // On some stacks a numeric IP address
-        // will not parse with gethostbyname.  
-        // If that didn't work try to convert it as a
-        // numeric address before giving up.
-        if(!hostByName)
-        {
-            static unsigned long ip;
-            static char *addr_ptr[2] = {(char*)&ip, NULL};
-
-            if((ip = inet_addr(hostname)) < 0) 
-                result =  kError_CantFindHost;
-            else
-            {
-                hostByIP.h_length = sizeof(uint32);
-                hostByIP.h_addrtype = AF_INET;
-                hostByIP.h_addr_list = (char**)&addr_ptr;
-                hostByName = &hostByIP;
-            }
-        }
-
-        if(IsntError(result))
-        {
-            memcpy(&host, hostByName, sizeof(struct hostent));
-        }
-    }
-
-    // open socket
-    if(IsntError(result))
-    {
-        memset(&addr, 0x00, sizeof(struct sockaddr_in));
-        memcpy(&addr.sin_addr, host.h_addr, host.h_length);
-        addr.sin_family= host.h_addrtype;
-        addr.sin_port= htons(port); 
-
-        s = socket(host.h_addrtype, SOCK_STREAM, 0);
-
-        if(s < 0)
-            result = kError_CantCreateSocket;
-    }
-
-    // connect and send request
-    if(IsntError(result))
-    {
-        if(connect(s,(const struct sockaddr*)&addr, sizeof(struct sockaddr)))
-            result = kError_CannotBind;
-
-        if(IsntError(result))
-        {
-            gethostname(localname, kMaxHostNameLen);    
-
-            const char* kHTTPQuery = "GET %s HTTP/1.1\n"
-                                     "Host: %s\n"
-                                     "Accept: */*\n" 
-                                     "User-Agent: FreeAmp/%s\n\n";
-
-            // the magic 58 is enough for fixed length time in
-            // HTTP time format + 2 terabyte length range numbers.
-            // the 2 extra bytes on the end is an extra \n and 0x00 byte
-            char* query = new char[ strlen(kHTTPQuery) +
-                                    strlen(file) +
-                                    strlen(localname) +
-                                        strlen(FREEAMP_VERSION)+ 2];
-
-            sprintf(query, kHTTPQuery, file, localname, FREEAMP_VERSION);  
-
-            int count;
-
-            count = send(s, query, strlen(query), 0);
-            if(count != (int)strlen(query))
-            {
-                result = kError_IOError;
-            }
-
-            delete [] query;
-        }
-    }
-
-    // receive response
-    if(IsntError(result))
-    {
-        uint32 bufferSize = 4096;
-        int count;
-        uint32 total = 0;
-
-        buffer = (char*)malloc(bufferSize);
-
-        result = kError_OutOfMemory;
-
-        if(buffer)
-        {
-            result = kError_NoErr;
-
-            for(;;)
-            {
-                if(total >= bufferSize - 1)
-                {
-                    bufferSize *= 2;
-
-                    buffer = (char*) realloc(buffer, bufferSize);
-                    if(!buffer)
-                    {
-                        result = kError_OutOfMemory;
-                        break;
-                    }
-                }
-
-                count = recv(s, buffer + total, bufferSize - total - 1, 0);
-                if(count > 0)
-                    total += count;
-                else
-                    break;
-            }
-
-            if (IsntError(result))
-            {
-                buffer[total] = 0;
-
-                if (strstr(buffer, "\r\n\r\n"))
-                   oPage = string(strstr(buffer, "\r\n\r\n") + 2);
-                else
-                   oPage = string(buffer);
-            }
-        }
-    }
-
-    // cleanup
-    if(s > 0)
-        closesocket(s);
-
-    free(buffer);
-
-    return result;
-}
-

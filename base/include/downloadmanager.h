@@ -201,6 +201,8 @@ class DownloadItem {
 	bool   m_normalDownload;
 };
 
+struct sockaddr;
+
 class DownloadManager {
 
  public:

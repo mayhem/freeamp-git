@@ -574,6 +574,7 @@ static void GetContentTimeFromHeader(const char* buffer, string &mTime)
 
 const uint8 kHttpPort = 80;
 const uint32 kMaxHostNameLen = 64;
+const uint32 kMaxURLLen = 1024;
 
 static bool IsHTTPHeaderComplete(char* buffer, uint32 length)
 {
@@ -604,14 +605,12 @@ Error DownloadManager::Download(DownloadItem* item)
 {
     Error result = kError_InvalidParam;
 
-    //*m_debug << "Downloading Item: " << item->SourceURL() << endl;
     assert(item);
-
     if(item)
     {
         char hostname[kMaxHostNameLen + 1];
         char localname[kMaxHostNameLen + 1];
-        char proxyname[kMaxHostNameLen + 1];
+        char proxyname[kMaxURLLen + 1];
         unsigned short port;
         struct sockaddr_in  addr;
         struct hostent      host;
@@ -631,7 +630,7 @@ Error DownloadManager::Download(DownloadItem* item)
         
         if(-1 != stat(destPath, &st))
         {
-            if (st.st_size >= (int)item->GetTotalBytes())
+            if ((unsigned int)st.st_size >= item->GetTotalBytes())
             {
                if(destPath)
                    delete [] destPath;
@@ -658,8 +657,8 @@ Error DownloadManager::Download(DownloadItem* item)
             {
                 numFields = sscanf(proxyname, 
                                    "http://%[^:/]:%hu", hostname, &port);
-
-                strcpy(proxyname, item->SourceURL().c_str());
+                strncpy(proxyname, item->SourceURL().c_str(), kMaxURLLen);
+                proxyname[kMaxURLLen - 1] = 0;
                 file = proxyname;
             }
             else
@@ -834,7 +833,6 @@ Error DownloadManager::Download(DownloadItem* item)
                 err = Send(s, query, strlen(query), 0, count, item);
                 if (IsError(err))
                     result = kError_UserCancel; 
-
                 if(count != (int)strlen(query))
                 {
                     result = kError_IOError;
@@ -921,13 +919,12 @@ Error DownloadManager::Download(DownloadItem* item)
                         result = kError_UnknownErr;
 
                         int32 fileSize = GetContentLengthFromHeader(buffer);
-
-
+                
                         //cout << destPath << endl;
 
                         int openFlags = O_BINARY|O_CREAT|O_RDWR|O_APPEND;
 
-                        if(returnCode != 206) // server oked partial download
+                        if(returnCode != 206) // server didn't ok partial
                         {
                             string mTime;
 
@@ -1589,6 +1586,14 @@ Error DownloadManager::Connect(int hHandle, const sockaddr *pAddr,
 #endif
 
     iRet = connect(hHandle, (const sockaddr *)pAddr,sizeof(*pAddr));
+#ifndef WIN32
+    if (iRet == -1 && errno != EINPROGRESS)
+    {
+       perror("connect");
+       return kError_NoErr;
+    }
+#endif
+
     for(; iRet && !m_exit && 
         item->GetState() == kDownloadItemState_Downloading;)
     {
@@ -1609,7 +1614,7 @@ Error DownloadManager::Connect(int hHandle, const sockaddr *pAddr,
     
     if (m_exit || item->GetState() != kDownloadItemState_Downloading)
        return kError_Interrupt;
-       
+      
     return kError_NoErr;
 }
 
@@ -1666,6 +1671,7 @@ Error DownloadManager::Send(int hHandle, char *pBuffer, int iSize,
         iRead = send(hHandle, pBuffer, iSize, iFlags);
         if (iRead < 0)
         {
+           perror("Send failed:");
            return kError_NoErr;
         }
         break;
