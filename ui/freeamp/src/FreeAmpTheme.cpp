@@ -433,7 +433,9 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
       }
       case CMD_ShowPreferences:
       {
-      	 ShowOptions();
+         ShowPreferencesEvent* prefsEvent = (ShowPreferencesEvent*)e;
+
+      	 ShowOptions(prefsEvent->GetDefaultPage());
       	 break;
       }
       
@@ -887,12 +889,12 @@ void FreeAmpTheme::HandleKeystroke(unsigned char cKey)
     }
 }
 
-void FreeAmpTheme::ShowOptions(void)
+void FreeAmpTheme::ShowOptions(uint32 defaultPage)
 {
     PreferenceWindow *pWindow;
        
 #ifdef WIN32
-    pWindow = new Win32PreferenceWindow(m_pContext, m_pThemeMan);
+    pWindow = new Win32PreferenceWindow(m_pContext, m_pThemeMan, defaultPage);
 #elif defined(__BEOS__)
     pWindow = new BeOSPreferenceWindow(m_pContext, m_pThemeMan);
 #else

@@ -213,16 +213,6 @@ BEGIN
         MENUITEM "by L&ocation",                ID_SORT_LOCATION
         MENUITEM "&Randomly",                   ID_SORT_RANDOMIZE
     END
-    POPUP "&Window"
-    BEGIN
-        MENUITEM "&Next",                       ID_WINDOW_NEXT
-        MENUITEM "&Previous",                   ID_WINDOW_PREVIOUS
-        MENUITEM SEPARATOR
-        MENUITEM "&Cascade",                    ID_WINDOW_CASCADE
-        MENUITEM "Tile &Horizontally",          ID_WINDOW_TILEHORIZONTALLY
-        MENUITEM "Tile &Vertically",            ID_WINDOW_TILEVERTICALLY
-        MENUITEM SEPARATOR
-    END
     POPUP "&Help"
     BEGIN
         MENUITEM "&Contents",                   ID_HELP_CONTENTS
@@ -243,6 +233,87 @@ BEGIN
         MENUITEM "&Add to playlist",            ID_ADD
         MENUITEM "&Edit",                       ID_EDIT_EDIT
         MENUITEM "&Remove",                     ID_EDIT_REMOVE
+    END
+END
+
+IDR_MENU2 MENU DISCARDABLE 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New Playlist...",            ID_FILE_NEWPLAYLIST
+        MENUITEM "&Open Playlist...",           ID_FILE_OPENPLAYLIST
+        MENUITEM "Save Playlist",               ID_FILE_SAVEPLAYLIST
+        MENUITEM "Save Playlist &As ...",       ID_FILE_SAVEASPLAYLIST
+        MENUITEM SEPARATOR
+        MENUITEM "&Import Tracks and Playlists...", ID_FILE_IMPORT
+        MENUITEM "&Export Playlist...",         ID_FILE_EXPORTPLAYLIST
+        MENUITEM SEPARATOR
+        MENUITEM "Search for &Music...",        ID_FILE_SEARCHFORMUSIC
+        MENUITEM SEPARATOR
+        MENUITEM "&Close",                      ID_FILE_CLOSEPLAYLIST
+    END
+    POPUP "E&dit"
+    BEGIN
+        MENUITEM "&Add Selected Tracks and Playlists", ID_EDIT_ADDTRACK
+        MENUITEM "Add &File From Disk...",      ID_EDIT_ADDFILE
+        MENUITEM "&Remove Items",               ID_EDIT_REMOVE
+        MENUITEM SEPARATOR
+        MENUITEM "Move &Up",                    ID_EDIT_MOVEUP
+        MENUITEM "Move &Down",                  ID_EDIT_MOVEDOWN
+        MENUITEM SEPARATOR
+        MENUITEM "&Edit Playlist...",           ID_EDIT_EDITPLAYLIST
+        MENUITEM "Edit Track and Playlist Info...", ID_EDIT_EDITINFO
+    END
+    POPUP "&View"
+    BEGIN
+        MENUITEM "View &playlist only",         ID_VIEW_MUSICCATALOG
+        MENUITEM "Options...",                  ID_VIEW_OPTIONS
+    END
+    POPUP "&Controls"
+    BEGIN
+        MENUITEM "Play",                        ID_CONTROLS_PLAYPAUSE
+        MENUITEM "Stop",                        ID_CONTROLS_STOP
+        MENUITEM SEPARATOR
+        MENUITEM "Next Song",                   ID_CONTROLS_NEXTSONG
+        MENUITEM "Previous Song",               ID_CONTROLS_PREVIOUSSONG
+        MENUITEM SEPARATOR
+        MENUITEM "Shuffle",                     ID_CONTROLS_SHUFFLE
+        MENUITEM SEPARATOR
+        MENUITEM "Repeat None",                 ID_CONTROLS_REPEATNONE
+        MENUITEM "Repeat One",                  ID_CONTROLS_REPEATONE
+        MENUITEM "Repeat All",                  ID_CONTROLS_REPEATALL
+    END
+    POPUP "&Sort Playlist"
+    BEGIN
+        MENUITEM "by &Artist",                  ID_SORT_ARTIST
+        MENUITEM "by Al&bum",                   ID_SORT_ALBUM
+        MENUITEM "by &Title",                   ID_SORT_TITLE
+        MENUITEM "by &Year",                    ID_SORT_YEAR
+        MENUITEM "by Trac&k",                   ID_SORT_TRACK
+        MENUITEM "by &Genre",                   ID_SORT_GENRE
+        MENUITEM "by &Length",                  ID_SORT_LENGTH
+        MENUITEM "by L&ocation",                ID_SORT_LOCATION
+        MENUITEM "&Randomly",                   ID_SORT_RANDOMIZE
+    END
+    POPUP "&Window"
+    BEGIN
+        MENUITEM "&Next",                       ID_WINDOW_NEXT
+        MENUITEM "&Previous",                   ID_WINDOW_PREVIOUS
+        MENUITEM SEPARATOR
+        MENUITEM "&Cascade",                    ID_WINDOW_CASCADE
+        MENUITEM "Tile &Horizontally",          ID_WINDOW_TILEHORIZONTALLY
+        MENUITEM "Tile &Vertically",            ID_WINDOW_TILEVERTICALLY
+        MENUITEM SEPARATOR
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&Contents",                   ID_HELP_CONTENTS
+        MENUITEM "&Search...",                  ID_HELP_SEARCH
+        MENUITEM SEPARATOR
+        MENUITEM "&FreeAmp Website",            ID_HELP_FREEAMPWEBSITE
+        MENUITEM "&EMusic.com Website",         ID_HELP_EMUSICCOMWEBSITE
+        MENUITEM SEPARATOR
+        MENUITEM "About...",                    ID_HELP_ABOUT
     END
 END
 

@@ -140,7 +140,8 @@ class Win32PreferenceWindow : public PreferenceWindow
     public:
 
                Win32PreferenceWindow(FAContext *context,
-                                     ThemeManager *pThemeMan);
+                                     ThemeManager *pThemeMan, 
+                                     uint32 defaultPage = 0);
       virtual ~Win32PreferenceWindow(void); 
       
 
@@ -196,6 +197,7 @@ class Win32PreferenceWindow : public PreferenceWindow
       PrefsStruct  m_originalValues;
       PrefsStruct  m_currentValues;
       PrefsStruct  m_proposedValues;
+      uint32       m_defaultPage;
     
       map<string, string> m_oThemeList;
 };

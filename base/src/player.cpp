@@ -1758,6 +1758,7 @@ ServiceEvent(Event * pC)
         case INFO_DownloadItemNewState:
         case INFO_DownloadItemProgress:
         case CMD_AddFiles:
+        case CMD_ShowPreferences:
             SendEventToUI(pC);
             break;
 

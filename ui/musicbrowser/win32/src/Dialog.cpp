@@ -33,6 +33,7 @@ ____________________________________________________________________________*/
 #include "Win32MusicBrowser.h"
 #include "DropSource.h"
 #include "DropObject.h"
+#include "eventdata.h"
 #include "debug.h"
 
 #define WM_EMPTYDBCHECK WM_USER + 69
@@ -242,7 +243,7 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                     return 1;
 
                 case ID_VIEW_OPTIONS:
-                    m_context->target->AcceptEvent(new Event(CMD_ShowPreferences));
+                    m_context->target->AcceptEvent(new ShowPreferencesEvent());
                     return 1;
                     
 
@@ -257,6 +258,7 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                     PlayerControlsEvent(LOWORD(wParam));
                     return 1;
 
+
                 case ID_SORT_ARTIST:
                 case ID_SORT_ALBUM:
                 case ID_SORT_TITLE:
@@ -268,6 +270,48 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                 case ID_SORT_RANDOMIZE:
                 case IDC_RANDOMIZE:
                     SortEvent(LOWORD(wParam));
+                    return 1;
+
+
+                case ID_HELP_CONTENTS:
+                case ID_HELP_SEARCH:
+                {
+                    string            oHelpFile;
+                    char              dir[MAX_PATH];
+                    uint32            len = sizeof(dir);
+
+                    m_context->prefs->GetInstallDirectory(dir, &len);
+                    oHelpFile = string(dir);
+                    oHelpFile += string("\\freeamp.hlp");    
+
+                    WinHelp(m_hWnd, oHelpFile.c_str(), HELP_FINDER, 0);
+                    return 1;
+                }
+
+                //case ID_HELP_SEARCH:
+                //    ShowHelp(0);
+                //    return 1;
+
+                case ID_HELP_FREEAMPWEBSITE:
+                    ShellExecute(   hwnd, 
+                                    "open", 
+                                    "http://www.freeamp.org/", 
+                                    NULL, 
+                                    NULL, 
+                                    SW_SHOWNORMAL);
+                    return 1;
+
+                case ID_HELP_EMUSICCOMWEBSITE:
+                    ShellExecute(   hwnd, 
+                                    "open", 
+                                    "http://www.emusic.com/", 
+                                    NULL, 
+                                    NULL, 
+                                    SW_SHOWNORMAL);
+                    return 1;
+
+                case ID_HELP_ABOUT:
+                    m_context->target->AcceptEvent(new ShowPreferencesEvent(6));
                     return 1;
             }    
         }     
@@ -1268,11 +1312,21 @@ void MusicBrowserUI::UpdateButtonMenuStates()
     }
 
     // what about items which deal with the treeview?
+
+    EnableMenuItem(hMenu, ID_EDIT_ADDTRACK, MF_GRAYED);
+    SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
+            ID_EDIT_ADDTRACK, 0); 
+
     HTREEITEM treeSelect = TreeView_GetSelection(m_hMusicCatalog);
 
     if(treeSelect && m_hMusicCatalog == GetFocus())
     {
-        EnableMenuItem(hMenu, ID_EDIT_ADDTRACK, MF_ENABLED );
+        if(treeSelect != m_hNewPlaylistItem)
+        {
+            EnableMenuItem(hMenu, ID_EDIT_ADDTRACK, MF_ENABLED );
+            SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
+                        ID_EDIT_ADDTRACK, MAKELPARAM(TRUE, 0)); 
+        }
 
         if(treeSelect != m_hNewPlaylistItem && 
            treeSelect != m_hCatalogItem)
@@ -1339,7 +1393,6 @@ void MusicBrowserUI::UpdateButtonMenuStates()
     }
     else
     {
-        EnableMenuItem(hMenu, ID_EDIT_ADDTRACK, MF_GRAYED );
         EnableMenuItem(hMenu, ID_EDIT_EDITPLAYLIST, MF_GRAYED);
     }
 
@@ -1411,7 +1464,18 @@ void MusicBrowserUI::UpdateButtonMenuStates()
 
 }
 
+void MusicBrowserUI::ShowHelp(uint32 topic)
+{
+    string            oHelpFile;
+    char              dir[MAX_PATH];
+    uint32            len = sizeof(dir);
 
+    m_context->prefs->GetInstallDirectory(dir, &len);
+    oHelpFile = string(dir);
+    oHelpFile += string("\\freeamp.hlp");    
+
+    WinHelp(m_hWnd, oHelpFile.c_str(), HELP_CONTEXT, topic);
+}        
 
 
 static

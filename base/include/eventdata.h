@@ -707,4 +707,15 @@ private:
     DownloadItem* m_item;
 };
 
+class ShowPreferencesEvent:public Event
+{
+ private:
+   int32 m_page;
+ public:
+   ShowPreferencesEvent(int32 page = 0)
+   { m_type = CMD_ShowPreferences; m_page = page; }
+   int32 GetDefaultPage() const{ return m_page; }
+   virtual ~ ShowPreferencesEvent(){ }
+};
+
 #endif /* _EVENTDATA_H_ */

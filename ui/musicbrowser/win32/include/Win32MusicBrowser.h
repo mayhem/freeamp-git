@@ -158,6 +158,7 @@ class MusicBrowserUI : public UserInterface
     void   BeginDrag(HWND hwnd, NM_TREEVIEW* nmtv);
     uint32 CalcStringEllipsis(HDC hdc, string& displayString, 
                                  int32 columnWidth);
+    void   ShowHelp(uint32 topic);
 
 
     // Functions in OpenSavePlaylist.cpp

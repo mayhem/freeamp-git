@@ -19,6 +19,7 @@
 #define IDB_BITMAP1                     116
 #define IDR_TRACKPOPUP                  119
 #define IDD_MUSICSEARCH                 120
+#define IDR_MENU2                       120
 #define IDD_SAVEPLAYLIST                121
 #define IDD_OPENURL                     219
 #define IDB_PLAYING                     542

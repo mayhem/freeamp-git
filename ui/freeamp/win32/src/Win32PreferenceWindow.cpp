@@ -134,10 +134,12 @@ PrefDebugCallback(HWND hwnd,
 }            
 
 Win32PreferenceWindow::Win32PreferenceWindow(FAContext *context,
-                                             ThemeManager *pThemeMan) :
+                                             ThemeManager *pThemeMan,
+                                             uint32 defaultPage) :
      PreferenceWindow(context, pThemeMan)
 {     
 	g_pCurrentPrefWindow = this;
+    m_defaultPage = defaultPage;
 }
 
 Win32PreferenceWindow::~Win32PreferenceWindow(void)
@@ -238,7 +240,7 @@ bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent, Preferences* pre
     psh.pszIcon = NULL;
     psh.pszCaption = BRANDING" Preferences";
     psh.nPages = sizeof(psp)/sizeof(PROPSHEETPAGE);
-    psh.nStartPage = 0;
+    psh.nStartPage = m_defaultPage;
     psh.ppsp = psp;
     psh.pfnCallback = NULL;
 
