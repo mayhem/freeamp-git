@@ -2,18 +2,18 @@
 group16=M3U Playlist
 group0=System DLLs
 group1=Help Files
-group2=ID3v1 MetaData
-group3=PLS Playlist
+group2=PLS Playlist
+group3=ID3v1 MetaData
 group4=Program Executable Files
-group5=Theme Tools
-group6=Direct Sound Output
-group10=Soundcard Output
+group5=Direct Sound Output
+group6=Theme Tools
+group10=OBS Input
 group7=Default Plugins
 group11=CDDB MetaData
-group8=OBS Input
-group12=WinAmp Skin Support
+group8=Soundcard Output
+group12=Wave File Output
 group9=ID3v2 MetaData
-group13=Wave File Output
+group13=WinAmp Skin Support
 group14=Default Theme
 group15=HTTP Input
 
@@ -45,7 +45,7 @@ COMPRESSDLL=
 POTENTIALLY=No
 MISC=
 
-[PLS Playlist]
+[ID3v1 MetaData]
 SELFREGISTERING=No
 HTTPLOCATION=
 LANGUAGE=
@@ -59,7 +59,7 @@ COMPRESSDLL=
 POTENTIALLY=No
 MISC=
 
-[ID3v1 MetaData]
+[PLS Playlist]
 SELFREGISTERING=No
 HTTPLOCATION=
 LANGUAGE=
@@ -87,7 +87,7 @@ COMPRESSDLL=
 POTENTIALLY=No
 MISC=
 
-[Direct Sound Output]
+[Theme Tools]
 SELFREGISTERING=No
 HTTPLOCATION=
 LANGUAGE=
@@ -101,7 +101,7 @@ COMPRESSDLL=
 POTENTIALLY=No
 MISC=
 
-[Theme Tools]
+[Direct Sound Output]
 SELFREGISTERING=No
 HTTPLOCATION=
 LANGUAGE=
@@ -129,7 +129,7 @@ COMPRESSDLL=
 POTENTIALLY=No
 MISC=
 
-[Soundcard Output]
+[OBS Input]
 SELFREGISTERING=No
 HTTPLOCATION=
 LANGUAGE=
@@ -157,7 +157,7 @@ COMPRESSDLL=
 POTENTIALLY=No
 MISC=
 
-[OBS Input]
+[Soundcard Output]
 SELFREGISTERING=No
 HTTPLOCATION=
 LANGUAGE=
@@ -185,7 +185,7 @@ COMPRESSDLL=
 POTENTIALLY=No
 MISC=
 
-[Wave File Output]
+[WinAmp Skin Support]
 SELFREGISTERING=No
 HTTPLOCATION=
 LANGUAGE=
@@ -199,7 +199,7 @@ COMPRESSDLL=
 POTENTIALLY=No
 MISC=
 
-[WinAmp Skin Support]
+[Wave File Output]
 SELFREGISTERING=No
 HTTPLOCATION=
 LANGUAGE=

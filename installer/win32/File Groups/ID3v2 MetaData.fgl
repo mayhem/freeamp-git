@@ -1,6 +1,5 @@
 [TopDir]
 file0=..\..\base\win32\prj\plugins\id3v2.mdf
-file1=..\..\base\win32\prj\id3lib.dll
 
 [General]
 Type=FILELIST
