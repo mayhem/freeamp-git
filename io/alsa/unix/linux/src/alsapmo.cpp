@@ -31,15 +31,6 @@
 
 ____________________________________________________________________________*/
 
-/*
-To the developers:
-I have left a lot of "#ifdef DEBUG" parts in to make it easier to debug.
-You should put "#define DEBUG" either here or into alsapmo.h.
-
-I also left the code from soundcardpmo. They are not needed, just for fun.
-You will find them in the "#else" part of "#ifdef ALSA".
-*/
-
 /* system headers */
 #include <stdlib.h>
 #include <iostream.h>
@@ -100,14 +91,10 @@ const char *AlsaPMO::GetErrorString(int32 error) {
 AlsaPMO::AlsaPMO() :
         EventBuffer(iOrigBufferSize, iOverflowSize, iWriteTriggerSize)
 {
-#ifdef DEBUG
-    cout << "AlsaPMO::AlsaPMO:Creating scpmo" << endl;
-#endif
-    m_properlyInitialized = false;
-    myInfo = new OutputInfo();
+   m_properlyInitialized = false;
+   myInfo = new OutputInfo();
    memset(myInfo, 0, sizeof(OutputInfo));
 
-//   m_bPause = false;
    m_pBufferThread = NULL;
 
    m_pPauseMutex = new Mutex();
@@ -132,7 +119,6 @@ AlsaPMO::AlsaPMO() :
     ai->alsa_format.rate = (unsigned)-1;
     ai->alsa_format.channels = (unsigned)-1;
     ai->device = NULL;
-//    ai->device=strdup(ALSA_DEVICE);  // JDW - moved to Init so we can grabp the ALSA-device Property
     ai->format = -1;
     ai->channels = -1;
     ai->rate = -1;
@@ -141,22 +127,10 @@ AlsaPMO::AlsaPMO() :
 //    ai->mixer_id=SND_MIXER_ID_MASTER;
 //    ai->channel;
 
-#ifdef DEBUG
-    cout << "AlsaPMO::AlsaPMO:Done creation of the AlsaPMO..." << endl;
-#endif
 }
 
-AlsaPMO::~AlsaPMO() {
-#ifdef DEBUG
-    cout << "AlsaPMO::~AlsaPMO:begin:";
-#ifdef DEBUG2
-        struct timeval tv;
-        struct timezone tz;
-        gettimeofday(&tv,&tz);
-        cout<<""<<tv.tv_sec<<","<<tv.tv_usec;
-#endif
-cout<<endl;
-#endif
+AlsaPMO::~AlsaPMO() 
+{
    m_bExit = true;
    m_pWriteSem->Signal();
    m_pReadSem->Signal();
@@ -174,31 +148,10 @@ cout<<endl;
       m_pPauseMutex = NULL;
    }
 
-//?    Reset(false);
-
-#ifdef DEBUG
-    cout << "AlsaPMO::~AlsaPMO:close-:";
-#ifdef DEBUG2
-        gettimeofday(&tv,&tz);
-        cout<<""<<tv.tv_sec<<","<<tv.tv_usec;
-#endif
-cout<<endl;
-#endif
     int err;
     if ((err=snd_pcm_close(ai->handle)) < 0) {
-#ifdef DEBUG
-            cout<<"AlsaPMO::~AlsaPMO:close failed: "<<snd_strerror(err)<<endl;
-#endif
             (Error)pmoError_ALSA_DeviceCloseFailed;
     }
-#ifdef DEBUG
-    cout << "AlsaPMO::~AlsaPMO:close+:";
-#ifdef DEBUG2
-        gettimeofday(&tv,&tz);
-        cout<<""<<tv.tv_sec<<","<<tv.tv_usec;
-#endif
-cout<<endl;
-#endif
     if (myInfo) {
         delete myInfo;
         myInfo = NULL;
@@ -207,14 +160,6 @@ cout<<endl;
         delete ai;
         ai = NULL;
     }
-#ifdef DEBUG
-    cout << "AlsaPMO::~AlsaPMO:done:";
-#ifdef DEBUG2
-        gettimeofday(&tv,&tz);
-        cout<<""<<tv.tv_sec<<","<<tv.tv_usec;
-#endif
-cout<<endl;
-#endif
 }
 
 void AlsaPMO::WaitToQuit()
@@ -302,36 +247,11 @@ int AlsaPMO::GetBufferPercentage()
    return PullBuffer::GetBufferPercentage();
 }
 
-Error AlsaPMO::Pause() {
-#ifdef DEBUG
-cout<<"AlsaPMO::Pause:mutex-:";
-#ifdef DEBUG2
-        struct timeval tv;
-        struct timezone tz;
-        gettimeofday(&tv,&tz);
-        cout<<""<<tv.tv_sec<<","<<tv.tv_usec;
-#endif
-cout<<endl;
-#endif
+Error AlsaPMO::Pause() 
+{
    m_pPauseMutex->Acquire();
-#ifdef DEBUG
-cout<<"AlsaPMO::Pause:mutex+:";
-#ifdef DEBUG2
-        gettimeofday(&tv,&tz);
-        cout<<""<<tv.tv_sec<<","<<tv.tv_usec;
-#endif
-cout<<endl;
-#endif
 //   if (m_properlyInitialized)
 //       Reset(true);
-#ifdef DEBUG
-cout<<"AlsaPMO::Pause:reset+:";
-#ifdef DEBUG2
-        gettimeofday(&tv,&tz);
-        cout<<""<<tv.tv_sec<<","<<tv.tv_usec;
-#endif
-cout<<endl;
-#endif
 }
 
 Error AlsaPMO::Resume() {
@@ -352,23 +272,6 @@ Error AlsaPMO::Init(OutputInfo* info) {
     char scard[128], sdevice[128];
     int err;
     char mixer_id[13]=SND_MIXER_ID_MASTER;
-
-#ifdef DEBUG
-    cout << "AlsaPMO::Init:";
-#ifdef DEBUG2
-        struct timeval tv;
-        struct timezone tz;
-        gettimeofday(&tv,&tz);
-        cout<<""<<tv.tv_sec<<","<<tv.tv_usec;
-#endif
-cout<<endl;
-    if (info) {
-        cout << " OI: bits_per_sample: " << info->bits_per_sample << endl;
-        cout << " OI: number_of_channels: " << info->number_of_channels << endl;
-        cout << " OI: samples_per_second: " << info->samples_per_second << endl;
-        cout << " OI: max_buffer_size: " << info->max_buffer_size << endl;
-    }
-#endif
 
     m_properlyInitialized = false;
     if (!info) {
@@ -413,9 +316,6 @@ cout<<endl;
                         if (strchr(scard,':')) *strchr(scard,':') = '\0';
                         card = snd_card_name(scard);
                         if (card < 0) {
-#ifdef DEBUG
-                                cerr<<"wrong Alsa card number: "<<scard<<endl;
-#endif
                                 return (Error)pmoError_ALSA_CardNumber;
                         }
                         strncpy(sdevice, strchr(ai->device, ':') + 1, sizeof(sdevice)-1);
@@ -425,20 +325,12 @@ cout<<endl;
                 sdevice[sizeof(sdevice)-1] = '\0';
                 device = atoi(sdevice);
                 if (!isdigit(sdevice[0]) || device < 0 || device > 31) {
-#ifdef DEBUG
-                        cerr<<"wrong device number: "<<sdevice<<endl;
-#endif
                         return (Error)pmoError_ALSA_DeviceNumber;
                 }
-#ifdef DEBUG
-cout<<"AlsaPMO::Init:device="<<ai->device<<" -> "<<card<<":"<<device<<endl;
-#endif
+            printf("opening alsa card %d device %d\n", card, device);
         }
         if((err=snd_pcm_open(&ai->handle, card, device, SND_PCM_OPEN_PLAYBACK)) < 0 )
         {
-#ifdef DEBUG
-            cout<<"AlsaPMO::Init:open failed: "<<snd_strerror(err)<<endl;
-#endif
             ReportError("Audio device is busy. Please make sure that "
                         "another program is not using the device.");
 //            ReportError("Cannot open audio device. Please make sure that "
@@ -457,15 +349,9 @@ cout<<"AlsaPMO::Init:device="<<ai->device<<" -> "<<card<<":"<<device<<endl;
             case 0 : strncpy(mixer_id,SND_MIXER_ID_PCM,sizeof(mixer_id));break;
             case 1 : strncpy(mixer_id,SND_MIXER_ID_PCM1,sizeof(mixer_id));break;
         }
-#ifdef DEBUG
-cout<<"AlsaPMO::Init:mixer_id="<<mixer_id<<endl;
-#endif
 //      err = snd_mixer_open(&ai->mixer_handle,card,device);
         err = snd_mixer_open(&ai->mixer_handle,0,0);
         if (err < 0) {
-#ifdef DEBUG
-cout<<"AlsaPMO::Init:snd_mixer_open err("<<err<<")="<<snd_strerror(err)<<endl;
-#endif
                 ReportError("Cannot open mixer device.");
                 return (Error)pmoError_ALSA_MixerOpenFailed;
         }
@@ -475,18 +361,12 @@ cout<<"AlsaPMO::Init:snd_mixer_open err("<<err<<")="<<snd_strerror(err)<<endl;
         snd_mixer_info_t mixer_info;
         err = snd_mixer_info( ai->mixer_handle, &mixer_info );
         if (err < 0) {
-#ifdef DEBUG
-cout<<"AlsaPMO::Init:snd_mixer_info err"<<endl;
-#endif
                 ReportError("Cannot get mixer info.");
                 snd_mixer_close( ai->mixer_handle );
                 return (Error)pmoError_ALSA_Mixer_Info;
         }
 
         ai->pcm = snd_mixer_channel( ai->mixer_handle, mixer_id );
-#ifdef DEBUG
-cout<<"AlsaPMO::Init:pcm="<<ai->pcm<<endl;
-#endif
     }
 
     channels = info->number_of_channels;
@@ -509,33 +389,12 @@ cout<<"AlsaPMO::Init:pcm="<<ai->pcm<<endl;
    snd_pcm_playback_status(&ai->handle,&aInfo);
    m_iOutputBufferSize = aInfo.fragment_size * aInfo.fragments;
    m_iBytesPerSample = info->number_of_channels * (info->bits_per_sample / 8);
-#ifdef DEBUG
-cout<<"AlsaPMO::Init:fragmentsize="<<aInfo.fragment_size<<"\n\tfragments="<<aInfo.fragments<<
-"\n\tchannels="<<info->number_of_channels<<"\n\tbits_ps="<<info->bits_per_sample<<
-"\n\tOutputBufferSize="<<m_iOutputBufferSize<<"\n\tBytesPerSample="<<
-m_iBytesPerSample<<endl;
-#endif
 
     m_properlyInitialized = true;
     return kError_NoErr;
 }
 
 Error AlsaPMO::Reset(bool user_stop) {
-#ifdef DEBUG
-    cout << "AlsaPMO::Reset:";
-#ifdef DEBUG2
-        struct timeval tv;
-        struct timezone tz;
-        gettimeofday(&tv,&tz);
-        cout<<""<<tv.tv_sec<<","<<tv.tv_usec;
-#endif
-cout<<endl;
-#endif
-
-//    audio_set_format(ai);
-//    audio_set_channels(ai);
-//    audio_set_rate(ai);
-///    audio_set_all(ai);
 
     if (user_stop) {
         Init(NULL);
@@ -581,25 +440,8 @@ void AlsaPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
 
    snd_pcm_playback_status_t ainfo;
    snd_pcm_playback_status(&ai->handle,&ainfo);
-//   iTotalTime = (m_iTotalBytesWritten - (ainfo.fragments * ainfo.fragment_size)) /
-//   iTotalTime = (m_iTotalBytesWritten - (ainfo.count)) /
-//   iTotalTime = (m_iTotalBytesWritten - (ainfo.queue)) /
-//   iTotalTime = (m_iTotalBytesWritten + ainfo.scount) /
-//   iTotalTime = ainfo.scount /
    iTotalTime = (m_iTotalBytesWritten) /
                 (m_iBytesPerSample * myInfo->samples_per_second);
-//     struct timeval time;
-//     gettimeofday(&time,NULL);
-//     iTotalTime = time.tv_usec-ainfo.stime.tv_usec;
-//   iTotalTime = time.tv_sec - ainfo.stime.tv_sec; 
-
-//cout<<"fragments="<<ainfo.fragments<<endl;
-//cout<<"queue="<<ainfo.queue<<"\ncount="<<ainfo.count<<endl;
-//cout<<"TotalTime="<<iTotalTime<<endl;
-//cout<<"stime="<<ainfo.stime.tv_sec<<endl;
-//cout<<"scount           ="<<ainfo.scount<<endl;
-//cout<<"TotalBytesWritten= "<<m_iTotalBytesWritten<<endl;
-//cout<<"kulonbseg="<<ainfo.scount-m_iTotalBytesWritten<<endl;
 
    hours = iTotalTime / 3600;
    minutes = (iTotalTime / 60) % 60;
@@ -655,28 +497,29 @@ void AlsaPMO::WorkerThread(void)
           continue;
       }
 
-DB
       iToCopy = m_iDataSize;
       m_pPauseMutex->Acquire();
-DB
 
       eErr = BeginRead(pBuffer, iToCopy);
-      if (eErr == kError_InputUnsuccessful || eErr == kError_NoDataAvail || 
-          iToCopy < m_iDataSize)
+      if (eErr == kError_InputUnsuccessful || eErr == kError_NoDataAvail)
+      {
+          m_pPauseMutex->Release();
+          m_pReadSem->Wait();
+          continue;
+      }
+      if (iToCopy < m_iDataSize)
       {
           EndRead(0);
           m_pPauseMutex->Release();
           m_pReadSem->Wait();
           continue;
       }
-DB
       if (eErr == kError_Interrupt)
       {
           m_pPauseMutex->Release();
           break;
       }
           
-DB
       if (eErr == kError_EventPending)
       {
           m_pPauseMutex->Release();
@@ -714,31 +557,34 @@ DB
           break;
       }
 
-      iRet = snd_pcm_playback_status(ai->handle,&ainfo);
-      if (ainfo.count < iToCopy)
+      for(;;)
       {
-          EndRead(0);
-          m_pPauseMutex->Release();
+          iRet = snd_pcm_playback_status(ai->handle,&ainfo);
+          if (ainfo.count < iToCopy)
+          {
+              EndRead(0);
+              m_pPauseMutex->Release();
 
-          usleep(10000);
+              usleep(10000);
 
-          for(;!m_bExit;)
-             if (m_pPauseMutex->Acquire(10000))
-                 break;
-          if (m_bExit)
-             iToCopy = 0;
+              for(;!m_bExit;)
+                 if (m_pPauseMutex->Acquire(10000))
+                     break;
+              if (m_bExit)
+                 iToCopy = 0;
 
-          // If beginread returns an error, break out...
-          if (BeginRead(pBuffer, iToCopy) != kError_NoErr)
-             iToCopy = 0;
+              // If beginread returns an error, break out...
+              if (BeginRead(pBuffer, iToCopy) != kError_NoErr)
+                 iToCopy = 0;
 
-          continue;
+              continue;
+          }
+          break;
       }
 
       iCopied = snd_pcm_write(ai->handle,pBuffer,iToCopy);
       if (iCopied > 0)
           m_iTotalBytesWritten += iCopied;
-      printf("\nbytes written: %d\n",m_iTotalBytesWritten);
 
       // Was iToCopy set to zero? If so, we got cleared and should
       // start from the top
@@ -814,47 +660,21 @@ cout<<"AlsaPMO::audio_set_all: format="<<ai->format<<",rate="<<ai->rate<<",chann
         ai->alsa_format.rate=ai->rate;
         ai->alsa_format.channels = ai->channels;
 
-#ifdef DEBUG2
-        struct timeval tv;
-        struct timezone tz;
-        gettimeofday(&tv,&tz);
-        cout<<"AlsaPMO::audio_set_all:Before all2:"<<tv.tv_sec<<","<<tv.tv_usec<<endl;
-#endif
         if((err=snd_pcm_playback_format(ai->handle, &ai->alsa_format)) < 0 ) {
-#ifdef DEBUG
-            cout<<"AlsaPMO::audio_set_all:audio_set_all failed: "<<snd_strerror(err)<<endl;
-#endif
 //          ReportError("Cannot reset the soundcard.");
             ReportError("Cannot get audio format.");
             return (Error)pmoError_IOCTL_SNDCTL_DSP_RESET;
         }
-#ifdef DEBUG2
-        gettimeofday(&tv,&tz);
-        cout<<"AlsaPMO::audio_set_all:Before all3:"<<tv.tv_sec<<","<<tv.tv_usec<<endl;
-#endif
 //      audio_set_playback_params2(ai);
 //      int err;
         snd_pcm_playback_info_t pi;
         snd_pcm_playback_params_t pp;
 
-#ifdef DEBUG2
-//      struct timeval tv;
-//      struct timezone tz;
-        gettimeofday(&tv,&tz);
-        cout<<"AlsaPMO::audio_set_all:Before allA:"<<tv.tv_sec<<","<<tv.tv_usec<<endl;
-#endif
         if((err=snd_pcm_playback_info(ai->handle, &pi)) < 0 )
         {
-#ifdef DEBUG
-                cerr<<"audio_set_playback_params: playback info failed: "<<snd_strerror(err)<<endl;
-#endif
                 ReportError("Cannot get audio info.");
                 return (Error)pmoError_ALSA_Playback_Info;
         }
-#ifdef DEBUG2
-        gettimeofday(&tv,&tz);
-        cout<<"AlsaPMO::audio_set_all:Before allB:"<<tv.tv_sec<<","<<tv.tv_usec<<endl;
-#endif
 
         bzero(&pp, sizeof(pp));
         pp.fragment_size = pi.buffer_size/4;
@@ -865,20 +685,8 @@ cout<<"AlsaPMO::audio_set_all: format="<<ai->format<<",rate="<<ai->rate<<",chann
 
         if((err=snd_pcm_playback_params(ai->handle, &pp)) < 0 )
         {
-#ifdef DEBUG
-                cerr<<"audio_set_playback_params: playback params failed: "<<snd_strerror(err)<<endl;
-#endif
                 ReportError("Cannot set audio params.");
                 return (Error)pmoError_ALSA_Playback_Params;
         }
-#ifdef DEBUG2
-        gettimeofday(&tv,&tz);
-        cout<<"AlsaPMO::audio_set_all:Before allC:"<<tv.tv_sec<<","<<tv.tv_usec<<endl;
-#endif
-//      return 0;
-#ifdef DEBUG2
-        gettimeofday(&tv,&tz);
-        cout<<"AlsaPMO::audio_set_all:Before all4:"<<tv.tv_sec<<","<<tv.tv_usec<<endl;
-#endif
         return 0;
 }

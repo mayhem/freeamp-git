@@ -250,6 +250,7 @@ Error PullBuffer::BeginWrite(void *&pBuffer, size_t &iBytesToWrite)
    assert(m_pPullBuffer != NULL);
    assert(m_iReadIndex >= 0 && (uint32)m_iReadIndex < m_iBufferSize);
    assert(m_iWriteIndex >= 0 && (uint32)m_iWriteIndex < m_iBufferSize);
+   assert(m_bWriteOpPending == false);
 
    m_pMutex->Acquire();
 
@@ -300,7 +301,9 @@ Error PullBuffer::BeginWrite(void *&pBuffer, size_t &iBytesToWrite)
    assert(m_iBytesInBuffer + iBytesToWrite <= m_iBufferSize);
 
    if (eError == kError_NoErr)
+   {
       m_bWriteOpPending = true;
+   }
 
    m_pMutex->Release();
   
@@ -351,6 +354,7 @@ Error PullBuffer::EndWrite(size_t iBytesWritten)
 Error PullBuffer::BeginRead(void *&pBuffer, size_t &iBytesNeeded, bool bBlock)
 {
    assert(m_pPullBuffer != NULL);
+   assert(m_bReadOpPending == false);
    Error  eError = kError_UnknownErr;
    size_t iOverflow;
 
@@ -410,7 +414,9 @@ Error PullBuffer::BeginRead(void *&pBuffer, size_t &iBytesNeeded, bool bBlock)
    }   
 
    if (eError == kError_NoErr)
+   {
       m_bReadOpPending = true;
+   }
 
    m_pMutex->Release();
 
