@@ -27,7 +27,7 @@ ____________________________________________________________________________*/
 /* system headers */
 #include <stdlib.h>
 
-/* project headers */
+/* project headers */   
 #include "config.h"
 #include "ui.h"
 #include "semaphore.h"
@@ -36,57 +36,167 @@ ____________________________________________________________________________*/
 #include "mutex.h"
 #include "queue.h"
 #include "playlist.h"
-#include "errors.h"
-#include "properties.h"
+#include "control.h"
+#include "controlinfo.h"
+#include "view.h"
+#include "dib.h"
+#include "linkedlist.h"
+
+#include "bitmapview.h"
+#include "buttonview.h"
+#include "dialview.h"
+#include "statusview.h"
+#include "textview.h"
+#include "timeview.h"
+#include "volumeview.h"
+#include "listview.h"
+#include "scrollview.h"
 
 enum { STATE_Stopped = 1, STATE_Playing, STATE_Paused };
+
 
 class FreeAmpUI : public UserInterface {
  public:
     FreeAmpUI();
     ~FreeAmpUI();
 
-    virtual Error Init(int32 startup_type) { return kError_NoErr; }
-    virtual void SetTarget(EventQueue*);
-    virtual int32 AcceptEvent(Event *);
-    virtual void SetArgs(int32,char **);
-	virtual void SetPlayListManager(PlayListManager *);
+    virtual void Init() {}
+    virtual void SetTarget(EventQueue* eq){m_target = eq;}
+    virtual int32 AcceptEvent(Event*);
+    virtual void SetArgs(int32,char**);
+	virtual void SetPlayListManager(PlayListManager*);
 
-    virtual Error SetPropManager(Properties *p) { m_propManager = p; if (p) return kError_NoErr; else return kError_UnknownErr; }
+    void SetWindowHandle(HWND hwnd){m_hwnd = hwnd;}
+    HCURSOR SetCursor(HCURSOR cursor)
+    {HCURSOR result = m_cursor; m_cursor = cursor; return result;}
 
+    HCURSOR Cursor(void) const { return m_cursor;}
 
-    void CreateUI();
+    /* handle window messages */
+    void Create();
+    void Destroy();
+    int32 Paint();
+    int32 HitTest(int32 xPos, int32 yPos);
+    bool MouseMove(int32 xPos, int32 yPos, int32 modifiers);
+    bool LeftButtonDown(int32 xPos, int32 yPos, int32 modifiers);
+    bool LeftButtonUp(int32 xPos, int32 yPos, int32 modifiers);
+    void Command(int32 command, View* source);
+    void Notify(int32 command, LPNMHDR notifyMsgHdr);
 
-    static BOOL CALLBACK MainProc(	HWND hwnd, 
-						            UINT msg, 
-						            WPARAM wParam, 
-						            LPARAM lParam );
-    
-    void SetHwnd(HWND hwnd);
-
-    Semaphore*      m_uiSemaphore;
-
-    bool            m_scrolling;
-
-    EventQueue*     m_target;
-	int32			m_state;
-	PlayListManager *m_plm;
-    float			m_secondsPerFrame;
 
  protected:
-      static void UIThreadFunc(void *);
+    static void ui_thread_function(void*);
+    void UIThreadFunction();
 
+    void LoadBitmaps();
+    void DeleteBitmaps();
+    void InitializeRegions();
+    void DeleteRegions();
+
+    void CreateControls();
+
+ public:
+    Semaphore*          m_uiSemaphore;
+
+    bool                m_scrolling;
+
+    EventQueue*         m_target;
+	int32			    m_state;
+	PlayListManager*    m_plm;
+    float			    m_secondsPerFrame;
 
  private:
-	 Properties *   m_propManager;
-    int32			m_totalSeconds;
-    
-    Thread*         m_uiThread;
 
-    HWND            m_hwnd;
+    Thread*             m_uiThread;
+    HWND                m_hwnd;
+    HCURSOR             m_cursor;
 
-    
+    LinkedList<View*>*  m_viewList;
+
+    HRGN                m_windowRegion;
+    HRGN                m_playerRegion;
+    HRGN                m_playListRegion;
+    HRGN                m_playlistBodyRegion;
+
+    HRGN                m_controlRegions[kNumControls];
+
+    BITMAPINFO          m_bufferBitmapInfo;
+    void*               m_bufferBits;
+
+    DIB*                m_playerCanvas;
+    DIB*                m_bodyBitmap;
+    DIB*                m_playlistBodyBitmap;
+    DIB*                m_playBitmap;
+    DIB*                m_stopBitmap;
+    DIB*                m_pauseBitmap;
+    DIB*                m_nextBitmap;
+    DIB*                m_lastBitmap;
+    DIB*                m_modeBitmap;
+    DIB*                m_minimizeBitmap;
+    DIB*                m_closeBitmap;
+    DIB*                m_repeatBitmap;
+    DIB*                m_shuffleBitmap;
+    DIB*                m_openBitmap;
+    DIB*                m_dialBitmap;
+    DIB*                m_shuffleIconBitmap;
+    DIB*                m_repeatIconBitmap;
+    DIB*                m_repeatAllIconBitmap;
+
+    DIB*                m_smallFontBitmap;
+    DIB*                m_largeFontBitmap;
+    DIB*                m_timeBackgroundBitmap;
+
+    DIB*                m_panelBackingBitmap;
+    DIB*                m_panelBackingMaskBitmap;
+
+    DIB*                m_drawerBitmap;
+    DIB*                m_drawerMaskBitmap;
+
+    DIB*                m_scrollbarBitmap;
+
+
+	int32			    m_width;
+	int32			    m_height;
+
+    View*               m_captureView;
+
+    BitmapView*         m_backgroundView;
+    BitmapView*         m_playlistBackView;
+
+    ButtonView*         m_playView;
+    ButtonView*         m_stopView;
+    ButtonView*         m_pauseView;
+    ButtonView*         m_nextView;
+    ButtonView*         m_lastView;
+
+    ButtonView*         m_modeView;
+    ButtonView*         m_minimizeView;
+    ButtonView*         m_closeView;
+    ButtonView*         m_repeatView;
+    ButtonView*         m_shuffleView;
+    ButtonView*         m_openView;
+
+    DialView*           m_volumeView;
+    DialView*           m_seekView;
+
+    StatusView*         m_shuffleIconView;
+    StatusView*         m_repeatIconView;
+    StatusView*         m_repeatAllIconView;
+
+    TextView*           m_songTitleView;
+
+    TimeView*           m_timeView;
+    VolumeView*         m_volumeInfoView;
+
+    BitmapView*         m_drawerView;
+    BitmapView*         m_panelBackingView;
+
+    ListView*           m_playlistView;
+
+    ScrollView*         m_scrollbarView;
+
+
 };
 
 
-#endif // _SIMPLE_UI_H_
+#endif /* _FREEAMP_UI_H_ */
