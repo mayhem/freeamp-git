@@ -40,7 +40,6 @@ ____________________________________________________________________________*/
 
 
 #include "lmc.h"
-#include "xinglmc.h"
 
 typedef enum {
     STATE_Paused = 1,

@@ -42,7 +42,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /I "..\..\\" /I "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o NUL /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /o NUL /win32
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
@@ -68,7 +68,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /I "..\..\\" /I "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /I "..\..\\" /I "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /o NUL /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /o NUL /win32
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
@@ -132,89 +132,97 @@ SOURCE=..\..\..\..\base\src\thread.cpp
 
 SOURCE=..\..\..\..\base\win32\src\win32thread.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=.\xing.def
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\src\xinglib.cpp
+# End Source File
 # End Group
 # Begin Group "decoder"
 
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\..\cdct.c
+SOURCE=..\..\src\cdct.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\csbt.c
+SOURCE=..\..\src\csbt.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\cup.c
+SOURCE=..\..\src\cup.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\cupl3.c
+SOURCE=..\..\src\cupl3.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\cwinm.c
+SOURCE=..\..\src\cwinm.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\dec8.c
+SOURCE=..\..\src\dec8.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\hwin.c
+SOURCE=..\..\src\hwin.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\icdct.c
+SOURCE=..\..\src\icdct.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\isbt.c
+SOURCE=..\..\src\isbt.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\iup.c
+SOURCE=..\..\src\iup.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\iwinm.c
+SOURCE=..\..\src\iwinm.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\l3dq.c
+SOURCE=..\..\src\l3dq.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\l3init.c
+SOURCE=..\..\src\l3init.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\mdct.c
+SOURCE=..\..\src\mdct.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\mhead.c
+SOURCE=..\..\src\mhead.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\msis.c
+SOURCE=..\..\src\msis.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\uph.c
+SOURCE=..\..\src\uph.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\upsf.c
+SOURCE=..\..\src\upsf.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\wavep.c
+SOURCE=..\..\src\wavep.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\xinglmc.cpp
+SOURCE=..\..\src\xinglmc.cpp
 # End Source File
 # End Group
 # End Target
