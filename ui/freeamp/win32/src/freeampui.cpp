@@ -28,6 +28,7 @@ ____________________________________________________________________________*/
 #include <windowsx.h>
 #include <assert.h>
 #include <commctrl.h>
+#include <commdlg.h>
 #include <shellapi.h>
 #include <stdio.h>
 #include <string.h>
@@ -141,6 +142,11 @@ MainWndProc(HWND hwnd,
         case WM_NOTIFY:
             ui->Notify(wParam, (LPNMHDR)lParam);
             break;
+
+        case WM_DROPFILES:
+            ui->DropFiles((HDROP) wParam);
+			break;
+		
 
         case WM_TIMER:
         {
@@ -449,29 +455,58 @@ KeyDown(int32 keyCode)
 
 void 
 FreeAmpUI::
+DropFiles(HDROP dropHandle)
+{
+	int32 count;
+	char szFile[MAX_PATH + 1];
+
+	count = DragQueryFile(	dropHandle,
+							-1L,
+							szFile,
+							sizeof(szFile));
+
+	m_target->AcceptEvent(new Event(CMD_Stop));
+
+	for(int32 i = 0; i < count; i++)
+	{
+		DragQueryFile(	dropHandle,
+						i,
+						szFile,
+						sizeof(szFile));
+
+		m_plm->Add(szFile,0);
+		//m_plm->SetFirst();
+	}
+
+	if(count) 
+    {
+		//m_target->AcceptEvent(new Event(CMD_Play));
+        //SendMessage(m_hwnd, WM_COMMAND, kPlayControl,0);
+	}
+}
+
+void 
+FreeAmpUI::
 Command(int32 command, 
         View* source)
 {
     switch(command)
     {
         case kPlayControl:
-        {
-            //MessageBox(NULL, "kPlayControl", "Command Received...", MB_OK);
-            m_stopView->Show();
-            m_playView->Hide();
+        {            
+            m_target->AcceptEvent(new Event(CMD_Play));
             break;
         }
 
         case kStopControl:
-        {
-            //MessageBox(NULL, "kStopControl", "Command Received...", MB_OK);
-            m_playView->Show();
-            m_stopView->Hide();
+        {            
+            m_target->AcceptEvent(new Event(CMD_Stop));
             break;
         }
 
         case kPauseControl:
         {
+            m_target->AcceptEvent(new Event(CMD_TogglePause));
             break;
         }
 
@@ -525,9 +560,85 @@ Command(int32 command,
         }
 
         case kOpenControl:
-        {
-            break;
-        }
+		{
+            OPENFILENAME ofn;
+			char szTitle[] = "Open Audio File";
+			char szFilter[] =
+			"MPEG Audio Streams (.mp1, .mp2, .mp3, .mpp)\0"
+			"*.mp1;*.mp2;*.mp3;*.mpp\0"
+			//"Playlists (.txt, .lst, .m3u)\0"
+			//"*.lst;*.m3u;*.txt\0"
+			"All Files (*.*)\0"
+			"*.*\0";
+			const int32 kBufferSize = MAX_PATH * 128;
+			char* filelist = new char[kBufferSize];
+			
+			*filelist = 0x00;
+
+			// Setup open file dialog box structure
+			ofn.lStructSize       = sizeof(OPENFILENAME);
+			ofn.hwndOwner         = m_hwnd;
+			ofn.hInstance         = (HINSTANCE)GetWindowLong(m_hwnd, 
+													GWL_HINSTANCE);
+			ofn.lpstrFilter       = szFilter;
+			ofn.lpstrCustomFilter = NULL;
+			ofn.nMaxCustFilter    = 0;
+			ofn.nFilterIndex      = 1;
+			ofn.lpstrFile         = filelist;
+			ofn.nMaxFile          = kBufferSize;
+			ofn.lpstrFileTitle    = NULL;
+			ofn.nMaxFileTitle     = 0;
+			ofn.lpstrInitialDir   = "";
+			ofn.lpstrTitle        = szTitle;
+			ofn.Flags             = OFN_FILEMUSTEXIST | 
+									OFN_PATHMUSTEXIST |
+  	     				   			OFN_HIDEREADONLY | 
+									OFN_ALLOWMULTISELECT |
+									OFN_EXPLORER;
+			ofn.nFileOffset       = 0;
+			ofn.nFileExtension    = 0;
+			ofn.lpstrDefExt       = "MP*";
+			ofn.lCustData         = 0;
+			ofn.lpfnHook          = NULL;
+			ofn.lpTemplateName    = NULL;
+
+			if(GetOpenFileName(&ofn))
+			{
+				char file[MAX_PATH + 1];
+				char* cp = NULL;
+
+				strcpy(file, filelist);
+				strcat(file, "\\");
+
+				cp = filelist + ofn.nFileOffset;
+				m_plm->RemoveAll();
+				while(*cp)
+				{
+					strcpy(file + ofn.nFileOffset, cp);
+
+					m_plm->Add(file,0);
+
+					cp += strlen(cp) + 1;
+				}
+
+                if(m_state == STATE_Playing)
+                {
+                    m_target->AcceptEvent(new Event(CMD_Stop));
+                    m_target->AcceptEvent(new Event(CMD_Play));
+                }
+                else
+                {
+					;
+                }
+                //EnableWindow(m_ui->m_hwndPlay, TRUE);
+			}
+
+            m_plm->SetFirst();
+
+			delete [] filelist;
+
+			break;        
+		}
 
         case kPlaylistControl:
         {
@@ -1229,14 +1340,16 @@ LoadBitmaps()
         m_scrollbarBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_SCROLLBAR));
     }
 
-    /*DIB test;
-    DIB mask;
+    DIB test;
 
-    test.Load(g_hinst, MAKEINTRESOURCE(IDB_TEST));
-    mask.Load(g_hinst, MAKEINTRESOURCE(IDB_TESTMASK));
+    test.Load(g_hinst, MAKEINTRESOURCE(IDB_CONTROL_MASK_MID));
 
-    Renderer::Fill(&m_playerCanvas, 255,0,0);
-    Renderer::Copy(&m_playerCanvas, &test, &m_bodyBitmap);*/
+    Color color;
+
+    test.Pixel(0,0,&color);
+    test.Pixel(136,0,&color);
+    test.Pixel(34,26,&color);
+    test.Pixel(336,41,&color);
 
 
     DeleteDC(bufferdc);
@@ -1248,32 +1361,30 @@ LoadBitmaps()
 void 
 FreeAmpUI::
 InitializeRegions()
-{
+{ 
     // first determine what the shape of the window is going to be
-    HBITMAP windowMask = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_WINDOW_MASK_MID));
+    DIB windowMask;
+    windowMask.Load(g_hinst, MAKEINTRESOURCE(IDB_WINDOW_MASK_MID));
     Color color = {0,0,0,0};
 
-    m_windowRegion = DetermineRegion(windowMask, &color);
-    DeleteObject(windowMask);
+    m_windowRegion = DetermineRegion(&windowMask, &color);
 
     // next determine what the shape and where the controls are
-    HBITMAP controlMask = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_CONTROL_MASK_MID));
+    DIB controlMask;
+    
+    controlMask.Load(g_hinst, MAKEINTRESOURCE(IDB_CONTROL_MASK_MID));
 
-    DetermineControlRegions(controlMask,
+    DetermineControlRegions(&controlMask,
                             m_controlRegions,
 			                g_controlColors,
                             kNumControls);
 
-    DeleteObject(controlMask);
+    controlMask.Load(g_hinst, MAKEINTRESOURCE(IDB_PLAYLIST_CONTROL_MASK));
 
-    controlMask = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_PLAYLIST_CONTROL_MASK));
-
-    DetermineControlRegions(controlMask,
+    DetermineControlRegions(&controlMask,
                             &m_controlRegions[kPlaylistDisplayControl],
 			                &g_controlColors[kPlaylistDisplayControl],
                             kNumControls - kPlaylistDisplayControl);
-
-    DeleteObject(controlMask);
 
     // then determine what is the player body and what is a control
     m_playerRegion = CreateRectRgn(0,0,0,0);
@@ -1390,16 +1501,23 @@ AcceptEvent(Event* event)
 
             case INFO_Playing: 
             {   
+                m_state = STATE_Playing;
+                m_stopView->Show();
+                m_playView->Hide();
 	            break; 
             }
 
             case INFO_Paused: 
             {
+                m_state = STATE_Paused;
 	            break; 
             }
 
             case INFO_Stopped: 
             {
+                m_state = STATE_Stopped;
+                m_playView->Show();
+                m_stopView->Hide();
 	            break; 
             }
 
@@ -1429,6 +1547,12 @@ AcceptEvent(Event* event)
 	            break; 
             }
 
+            case INFO_PlayListUpdated:
+            {
+                //MessageBox(m_hwnd, "INFO_PlayListUpdated", "hey!", MB_OK);
+                break;
+            }
+            
             case INFO_PlayListDonePlay:
             {
                 break;

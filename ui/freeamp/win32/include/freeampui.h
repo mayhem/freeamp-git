@@ -25,6 +25,11 @@ ____________________________________________________________________________*/
 #define _FREEAMP_UI_H_
 
 /* system headers */
+#define STRICT
+#define WIN32_LEAN_AND_MEAN 
+#include <windows.h>
+#include <windowsx.h>
+#include <shellapi.h>
 #include <stdlib.h>
 
 /* project headers */   
@@ -87,6 +92,7 @@ class FreeAmpUI : public UserInterface {
     void Command(int32 command, View* source);
     void Notify(int32 command, LPNMHDR notifyMsgHdr);
     void KeyDown(int32 keyCode);
+    void DropFiles(HDROP dropHandle);
 
 
  protected:
@@ -107,10 +113,11 @@ class FreeAmpUI : public UserInterface {
 
     EventQueue*         m_target;
 	int32			    m_state;
-	PlayListManager*    m_plm;
+	
     float			    m_secondsPerFrame;
 
  private:
+    PlayListManager*    m_plm;
     Properties*         m_propManager;
     Thread*             m_uiThread;
     HWND                m_hwnd;

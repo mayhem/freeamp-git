@@ -27,99 +27,274 @@ ____________________________________________________________________________*/
 #include "dib.h"
 
 
-DIB::DIB()
+DIB::
+DIB()
 {
-    m_handle = NULL;
     m_bits = NULL;
+    m_bitmapInfo = NULL;
     m_height = 0;
     m_width = 0;
     m_bytesPerLine = 0;
     m_bitCount = 0;
 }
 
-DIB::~DIB()
+DIB::
+~DIB()
 {
-    
+    if(m_bits)
+    {
+        free(m_bits);
+        m_bits = NULL;
+    }
+
+    if(m_bitmapInfo)
+    {
+        free(m_bitmapInfo);
+        m_bitmapInfo = NULL;
+    }
 }
 
 
-bool DIB::Create(uint32 width, 
-				 uint32 height, 
-				 uint32 bitsPerPixel)
+bool 
+DIB::
+Create( uint32 width, 
+	    uint32 height, 
+	    uint32 bitsPerPixel)
 {
 	bool result = false;
+
+    if(m_bits)
+    {
+        free(m_bits);
+        m_bits = NULL;
+    }
+
+    if(m_bitmapInfo)
+    {
+        free(m_bitmapInfo);
+        m_bitmapInfo = NULL;
+    }
 
     m_width = width;
     m_height = height;
     m_bitCount = bitsPerPixel;
 
-    HDC hdc = CreateCompatibleDC(NULL);
+    m_bytesPerLine = (m_width * BytesPerPixel()) + (m_width%4);
 
-	m_bitmapInfo.bmiHeader.biSize = sizeof BITMAPINFOHEADER;
-    m_bitmapInfo.bmiHeader.biWidth = m_width;
-    m_bitmapInfo.bmiHeader.biHeight = m_height;
-    m_bitmapInfo.bmiHeader.biPlanes = 1;
-    m_bitmapInfo.bmiHeader.biBitCount = m_bitCount;
-    m_bitmapInfo.bmiHeader.biCompression = BI_RGB;
-    m_bitmapInfo.bmiHeader.biSizeImage = 0;    
-    m_bitmapInfo.bmiHeader.biXPelsPerMeter = 0;
-    m_bitmapInfo.bmiHeader.biYPelsPerMeter = 0;
-    m_bitmapInfo.bmiHeader.biClrUsed = 0;
-    m_bitmapInfo.bmiHeader.biClrImportant = 0;
+    m_bits = (BYTE*)malloc(m_bytesPerLine * m_height);
+
+    m_bitmapInfo = (BITMAPINFO*)malloc( sizeof BITMAPINFO + 
+                                        sizeof RGBQUAD *
+                                        NumberOfPaletteEntries());
+
+    if(m_bits && m_bitmapInfo)
+    {
+        result = true;
+
+        // fill in the important header information
+	    m_bitmapInfo->bmiHeader.biSize = sizeof BITMAPINFOHEADER;
+        m_bitmapInfo->bmiHeader.biWidth = m_width;
+        m_bitmapInfo->bmiHeader.biHeight = m_height;
+        m_bitmapInfo->bmiHeader.biPlanes = 1;
+        m_bitmapInfo->bmiHeader.biBitCount = m_bitCount;
+        m_bitmapInfo->bmiHeader.biCompression = BI_RGB;
+        m_bitmapInfo->bmiHeader.biSizeImage = 0;    
+        m_bitmapInfo->bmiHeader.biXPelsPerMeter = 0;
+        m_bitmapInfo->bmiHeader.biYPelsPerMeter = 0;
+        m_bitmapInfo->bmiHeader.biClrUsed = 0;
+        m_bitmapInfo->bmiHeader.biClrImportant = 0;
+
+        // do we need a palette?
+        if(NumberOfPaletteEntries())
+        {
+            int32 multiple = 256/NumberOfPaletteEntries();
+
+            // create a simple gray scale
+            for(int32 i = 0; i < NumberOfPaletteEntries(); i++)
+            {
+                m_bitmapInfo->bmiColors[i].rgbBlue = i * multiple;
+                m_bitmapInfo->bmiColors[i].rgbGreen = i * multiple;
+                m_bitmapInfo->bmiColors[i].rgbRed = i * multiple;
+                m_bitmapInfo->bmiColors[i].rgbReserved = 0;
+            }
+        }
+    }
+    else
+    {
+        if(m_bits)
+        {
+            free(m_bits);
+            m_bits = NULL;
+        }
+
+        if(m_bitmapInfo)
+        {
+            free(m_bitmapInfo);
+            m_bitmapInfo = NULL;
+        }
+    }
+    
 
     
-    m_handle = CreateDIBSection(   
-                        hdc, 
-                        &m_bitmapInfo,
-                        DIB_RGB_COLORS,
-                        &m_bits,
-                        NULL,
-                        NULL);
-
-    GetObject(m_handle, sizeof DIBSECTION, &m_dibSection);
-
-    m_bytesPerLine = m_dibSection.dsBm.bmWidthBytes;
-
-    DeleteDC(hdc);
-
 	return result;
 }
 
-
-bool DIB::Load(HANDLE module, LPCTSTR resource)
+bool 
+DIB::
+Load(HANDLE module, LPCTSTR resource)
 {
     bool result = false;
+    HRSRC rsrcHandle = NULL;
+	HGLOBAL globalHandle = NULL;
+    BITMAPINFOHEADER* bitmapInfoHeader = NULL;
 
-    m_handle = LoadImage(   module,
-                            resource,
-                            IMAGE_BITMAP, 
-							0, 0, 
-							LR_CREATEDIBSECTION);
-
-    if(m_handle)
+    if(m_bits)
     {
-        GetObject(m_handle, sizeof DIBSECTION, &m_dibSection);
+        free(m_bits);
+        m_bits = NULL;
+    }
 
-	    m_bits = (BYTE*)m_dibSection.dsBm.bmBits;
-	    m_height = m_dibSection.dsBmih.biHeight;
-	    m_width = m_dibSection.dsBmih.biWidth;
-	    //m_bytesPerLine = m_dibSection.dsBm.bmWidthBytes;
-	    m_bitCount = m_dibSection.dsBmih.biBitCount;
-        m_bytesPerLine = (m_width * BytesPerPixel()) + (m_width%4);
+    if(m_bitmapInfo)
+    {
+        free(m_bitmapInfo);
+        m_bitmapInfo = NULL;
+    }
 
-        memcpy(&m_bitmapInfo, &m_dibSection.dsBmih, sizeof BITMAPINFOHEADER);
+    if(rsrcHandle = FindResource(module, resource, RT_BITMAP))
+    {
+        if(globalHandle = LoadResource(module, rsrcHandle))
+        {
+            bitmapInfoHeader = (BITMAPINFOHEADER*)LockResource(globalHandle);
 
-	    result = true;
+            if(bitmapInfoHeader)
+            {
+                m_width = bitmapInfoHeader->biWidth;
+                m_height = bitmapInfoHeader->biHeight;
+                m_bitCount = bitmapInfoHeader->biBitCount;
+                m_bitmapInfo = (BITMAPINFO*)bitmapInfoHeader; // just temporary...
+                // so we can calculate this...
+                int32 numEntries = NumberOfPaletteEntries();
+
+                m_bytesPerLine = (m_width * BytesPerPixel()) + (m_width%4);
+
+                m_bits = (BYTE*)malloc(m_bytesPerLine * m_height);
+
+                m_bitmapInfo = (BITMAPINFO*)malloc( sizeof BITMAPINFO + 
+                                                    sizeof RGBQUAD *
+                                                    numEntries);
+
+                if(m_bits && m_bitmapInfo)
+                {
+                    result = true;
+
+                    memcpy( m_bitmapInfo, 
+                            bitmapInfoHeader,   
+                            sizeof BITMAPINFO + 
+                            sizeof RGBQUAD *
+                            numEntries);
+
+                    BYTE* bits = ((BYTE*)bitmapInfoHeader + 
+                                    bitmapInfoHeader->biSize + 
+                                    numEntries * 
+                                    sizeof RGBQUAD);
+
+                    memcpy(m_bits, bits, m_bytesPerLine * m_height);
+                }
+                else
+                {
+                   if(m_bits)
+                    {
+                        free(m_bits);
+                        m_bits = NULL;
+                    }
+
+                    if(m_bitmapInfo)
+                    {
+                        free(m_bitmapInfo);
+                        m_bitmapInfo = NULL;
+                    }
+                }
+                
+                UnlockResource(globalHandle);
+            }
+        }
     }
 
     return result;
 }
 
-BYTE* DIB::Bits(int32 x, int32 y)
+
+int32
+DIB::
+NumberOfPaletteEntries() const
+{
+    int32 result = 0;
+
+    if(m_bitmapInfo && m_bitmapInfo->bmiHeader.biClrUsed)
+        result =  m_bitmapInfo->bmiHeader.biClrUsed;
+    else
+    {
+	    /* return number of colors based on bits per pixel */
+	    switch (m_bitCount)
+	    {
+		    case 1:
+			    result = 2;
+
+		    case 4:
+			    result = 16;
+
+		    case 8:
+			    result = 256;
+	    }
+    }
+
+    return result;
+}
+
+BYTE* 
+DIB::
+Bits(int32 x, int32 y)
 {
     BYTE* result = (BYTE*) m_bits;
 
-    result += m_bytesPerLine*(m_height - y - 1) + x*BytesPerPixel();
+    int32 temp = x*BytesPerPixel();
+
+    result += m_bytesPerLine*(m_height - y - 1) + temp;
 
     return result;
+}
+
+void 
+DIB::
+Pixel(int32 x, int32 y, Color* color)
+{
+    BYTE* bits = Bits(x,y);
+
+    if(BitsPerPixel() == 24)
+    {
+        color->b = bits[0];
+        color->g = bits[1];
+        color->r = bits[2];
+        color->a = 0;
+    }
+    else
+    {
+        int32 index = *bits;
+        
+        color->b = BitmapInfo()->bmiColors[index].rgbBlue;
+        color->g = BitmapInfo()->bmiColors[index].rgbGreen;
+        color->r = BitmapInfo()->bmiColors[index].rgbRed;
+        color->a = BitmapInfo()->bmiColors[index].rgbReserved;
+    }
+}
+
+uint32 
+DIB::
+Pixel(int32 x, int32 y)
+{
+    Color color;
+
+    Pixel(x, y, &color);
+
+    return color.Pack();
 }

@@ -34,24 +34,16 @@ ____________________________________________________________________________*/
 #include "utility.h"
 
 HRGN
-DetermineRegion(HBITMAP bitmap, 
+DetermineRegion(DIB* bitmap, 
 			    Color* color)
 {
 	HRGN result = NULL;
     HRGN scanline = NULL;
-    COLORREF regionColor = RGB(color->r, color->g, color->b);
-    HBITMAP oldBitmap;
-    BITMAP bmp;
-    HDC hdc;
+    uint32 regionColor = color->Pack();
     int32 width, height;
 
-    GetObject(bitmap, sizeof(BITMAP), (LPSTR)&bmp);
-    width = bmp.bmWidth; 
-    height = bmp.bmHeight;
-
-    hdc = CreateCompatibleDC(NULL);
-
-    oldBitmap = SelectBitmap(hdc, bitmap);
+    width = bitmap->Width(); 
+    height = bitmap->Height();
 
     // empty region
     result = CreateRectRgn(0,0,0,0);
@@ -63,7 +55,7 @@ DetermineRegion(HBITMAP bitmap,
 
         for(int32 x = 0; x < width; x++)
         {
-            COLORREF pixel = GetPixel(hdc, x, y);
+            uint32 pixel = bitmap->Pixel(x, y);
 
             if(pixel == regionColor)
             {
@@ -103,23 +95,17 @@ DetermineRegion(HBITMAP bitmap,
         }
     }
 
-    SelectObject(hdc, oldBitmap);
-    DeleteDC(hdc);
-
 	return result;
 }
 
 void
-DetermineControlRegions(HBITMAP bitmap, 
+DetermineControlRegions(DIB* bitmap, 
                         HRGN* controlRegions,
 			            Color* controlColors,
                         int32 numControls)
 {
     HRGN scanline = NULL;
-    COLORREF* regionColors;// = RGB(color->r, color->g, color->b);
-    HBITMAP oldBitmap;
-    BITMAP bmp;
-    HDC hdc;
+    uint32* regionColors;// = RGB(color->r, color->g, color->b);
     int32 width, height;
     int32 i;
 
@@ -129,22 +115,18 @@ DetermineControlRegions(HBITMAP bitmap,
         controlRegions[i] = CreateRectRgn(0,0,0,0);
     }
 
-    regionColors = new COLORREF[numControls];
+    regionColors = new uint32[numControls];
+
+    width = bitmap->Width(); 
+    height = bitmap->Height();
 
     for(i = 0; i < numControls; i++)
     {
-        regionColors[i] = RGB(controlColors[i].r, controlColors[i].g, controlColors[i].b);
+        regionColors[i] = controlColors[i].Pack();
     }
 
-    GetObject(bitmap, sizeof(BITMAP), (LPSTR)&bmp);
-    width = bmp.bmWidth; 
-    height = bmp.bmHeight;
-
-    hdc = CreateCompatibleDC(NULL);
-    oldBitmap = SelectBitmap(hdc, bitmap);
-
-    COLORREF black = RGB(0, 0, 0);
-    COLORREF white = RGB(255, 255, 255);
+    uint32 black = RGB(0, 0, 0);
+    uint32 white = RGB(255, 255, 255);
 
     for(int32 y = 0; y < height; y++)
     {
@@ -154,7 +136,7 @@ DetermineControlRegions(HBITMAP bitmap,
 
         for(int32 x = 0; x < width; x++)
         {
-            COLORREF pixel = GetPixel(hdc, x, y);
+            uint32 pixel = bitmap->Pixel(x,y);
 
             if(scanning )
             {
@@ -195,10 +177,6 @@ DetermineControlRegions(HBITMAP bitmap,
                     {
                         if(pixel == regionColors[i])
                         {
-                            //int32 r = GetRValue(pixel);
-                            //int32 g = GetGValue(pixel);
-                            //int32 b = GetBValue(pixel);
-
                             scanIndex = i;
                             scanning = true;
                             start = x;
@@ -220,9 +198,6 @@ DetermineControlRegions(HBITMAP bitmap,
                         RGN_OR);
         }
     }
-
-    SelectObject(hdc, oldBitmap);
-    DeleteDC(hdc);
 
     delete [] regionColors;
 }

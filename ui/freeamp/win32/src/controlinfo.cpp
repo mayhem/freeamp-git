@@ -45,7 +45,7 @@ Color g_controlColors[] = {
         {128, 0,   0,   0}, // kSeekControl
         {255, 0,   0,   0}, // kPlaylistControl
         {128, 128, 128, 0}, // kSongTitleControl
-        {42,  63,  85,  0}, // kSongInfoControl
+        {0,   191, 85,  0}, // kSongInfoControl
         {255, 255, 85,  0}, // kRepeatStatusControl
         {0,   191, 255, 0}, // kRepeatAllStatusControl
         {255, 95,  170, 0}, // kShuffleStatusControl

@@ -24,24 +24,14 @@ ____________________________________________________________________________*/
 #ifndef _UTILITY_H_
 #define _UTILITY_H_
 
-typedef struct Color{
-    short   r;
-    short   g;
-    short   b;
-    short   a;
-
- public: 
-     void Set(short rvalue, short gvalue, short bvalue, short avalue)
-     {r = rvalue; g = gvalue, b = bvalue; a = avalue;}
-}Color;
-
+#include "dib.h"
 
 HRGN
-DetermineRegion(HBITMAP bitmap, 
+DetermineRegion(DIB* bitmap, 
 			    Color* color);
 
 void
-DetermineControlRegions(HBITMAP bitmap, 
+DetermineControlRegions(DIB* bitmap, 
                         HRGN controlRegions[],
 			            Color controlColors[],
                         int32 numControls);
