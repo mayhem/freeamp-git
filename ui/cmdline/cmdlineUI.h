@@ -59,6 +59,7 @@ class cmdlineUI : public UserInterface {
    Thread *keyboardListenThread;
    PlayListManager *m_plm;
    int32 m_lastIndexPlayed;
+   bool m_id3InfoPrinted;
 };
 
 

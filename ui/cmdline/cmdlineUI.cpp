@@ -69,6 +69,7 @@ cmdlineUI::cmdlineUI(FAContext *context) {
     m_plm = NULL;
     m_playerEQ = NULL;
     m_lastIndexPlayed = -1;
+    m_id3InfoPrinted = false;
 
     keyboardListenThread = NULL;
 }
@@ -179,6 +180,7 @@ int32 cmdlineUI::AcceptEvent(Event *e) {
 		MediaInfoEvent *pmvi = (MediaInfoEvent *)e;
 		if (pmvi && m_lastIndexPlayed != pmvi->m_indexOfSong) {
 		    m_lastIndexPlayed = pmvi->m_indexOfSong;
+		    m_id3InfoPrinted = false;
 		    cout << "Playing: " << pmvi->m_filename << endl;
 		}
 		break; }
@@ -186,7 +188,8 @@ int32 cmdlineUI::AcceptEvent(Event *e) {
 		ID3TagEvent *ite = (ID3TagEvent *)e;
 		if (ite) {
 		    Id3TagInfo ti = ite->GetId3Tag();
-		    if (ti.m_containsInfo) {
+		    if (ti.m_containsInfo && !m_id3InfoPrinted) {
+		    	m_id3InfoPrinted = true;
 			cout << "Title  : " << ti.m_songName << endl;
 			cout << "Artist : " << ti.m_artist << endl;
 			cout << "Album  : " << ti.m_album << endl;
