@@ -426,7 +426,22 @@ void GTKWindow::DropFiles(char *filename)
 {
     vector<string> oFileList;
     if (filename) {
-        oFileList.push_back(string(filename));
+        char *filereturn = new char[strlen(filename) + 1];
+        strcpy(filereturn, filename);
+        char *temp = strtok(filename, "\n");
+        do {
+            char *realname = strchr(temp, ':');
+            realname++;
+            if (realname && *realname) {
+                uint32 length = strlen(realname);
+                if (realname[length - 1] == '\r')
+                    realname[length - 1] = '\0';
+                oFileList.push_back(string(realname));
+            }
+        }
+        while ((temp = strtok(NULL, "\n")));
+        delete [] filereturn;
+
         m_pTheme->DropFiles(&oFileList);
     }
 } 

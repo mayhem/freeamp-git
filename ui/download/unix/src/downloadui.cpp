@@ -95,6 +95,7 @@ void DownloadUI::GTKEventService(void)
         m_context->gtkInitialized = true;
 
 	g_thread_init(NULL);
+        gtk_set_locale();
 	gtk_init(&m_context->argc, &m_context->argv);
 	gdk_rgb_init();
 

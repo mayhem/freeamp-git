@@ -103,6 +103,7 @@ void MusicBrowserUI::GTKEventService(void)
     if (!m_context->gtkInitialized) {
         m_context->gtkInitialized = true;
         g_thread_init(NULL);
+        gtk_set_locale();
         gtk_init(&m_argc, &m_argv);
         gdk_rgb_init();
         weAreGTK = true;
