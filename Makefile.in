@@ -85,11 +85,11 @@ SUBDIRS = base io ui lmc
 @AM_HAVE_WIN32_FALSE@	  -lpthread -lm
 @AM_HAVE_WIN32_FALSE@FALDADD = @top_srcdir@/base/src/*.o $(ALLLDADD)
 @AM_HAVE_WIN32_FALSE@DSLDADD = @top_srcdir@/base/src/player.o @top_srcdir@/base/src/playlist.o @top_srcdir@/base/src/command.o $(ALLLDADD)
-@AM_HAVE_WIN32_FALSE@MYDEPS = @top_srcdir@/base/unix/@target_os@/src/*.o \
-@AM_HAVE_WIN32_FALSE@         @top_srcdir@/base/src/*.o \
-@AM_HAVE_WIN32_FALSE@         @top_srcdir@/io/local/*.o \
-@AM_HAVE_WIN32_FALSE@         @top_srcdir@/ui/cmdline/*.o \
-@AM_HAVE_WIN32_FALSE@         @top_srcdir@/lmc/xingmp3/*.o
+@AM_HAVE_WIN32_FALSE@MYDEPS = @top_srcdir@/base/unix/@target_os@/src/libfasys.a \
+@AM_HAVE_WIN32_FALSE@         @top_srcdir@/base/src/libfabase.a \
+@AM_HAVE_WIN32_FALSE@         @top_srcdir@/io/local/libfaiolocal.a \
+@AM_HAVE_WIN32_FALSE@         @top_srcdir@/ui/cmdline/libfauicmdline.a \
+@AM_HAVE_WIN32_FALSE@         @top_srcdir@/lmc/xingmp3/libfalmcxingmp3.a 
 @AM_HAVE_WIN32_FALSE@TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
 
 bin_PROGRAMS = $(PRG)
@@ -99,7 +99,7 @@ freeamp_DEPENDENCIES = $(MYDEPS)
 
 decspeed_SOURCES = decoder_speed.cpp
 decspeed_LDADD = $(DSLDADD)
-decspeed_DEPENDENCIES = # $(MYDEPS)
+decspeed_DEPENDENCIES = $(MYDEPS)
 
 INCLUDES = -I@top_srcdir@/base/include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) -I@top_srcdir@/io/include -I@top_srcdir@/ui/include -I@top_srcdir@/lmc/include
 CXXFLAGS = $(EXTRA_CXXFLAGS) -D__@target_os@__

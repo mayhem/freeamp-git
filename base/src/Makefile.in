@@ -75,16 +75,12 @@ VERSION = @VERSION@
 target_os = @target_os@
 
 @AM_HAVE_WIN32_TRUE@TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
-@AM_HAVE_WIN32_TRUE@PRG =
 @AM_HAVE_WIN32_TRUE@FILES = 
 @AM_HAVE_WIN32_FALSE@TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
-@AM_HAVE_WIN32_FALSE@PRG = freeamp
 @AM_HAVE_WIN32_FALSE@FILES = player.cpp bootstrap.cpp command.cpp buffer.cpp playlist.cpp hashtable.cpp
-@AM_HAVE_WIN32_FALSE@DEPS = @top_srcdir@/base/unix/@target_os@/src/libfasys.a
-@AM_HAVE_WIN32_FALSE@MYLDADD = @top_srcdir@/base/unix/@target_os@/src/libfasys.a -lpthread
 
-noinst_LIBRARIES = libfacore.a
-libfacore_a_SOURCES = $(FILES)
+noinst_LIBRARIES = libfabase.a
+libfabase_a_SOURCES = $(FILES)
 
 INCLUDES = -I@top_srcdir@/base/include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) -I@top_srcdir@/io/include -I@top_srcdir@/ui/include -I@top_srcdir@/lmc/include
 CXXFLAGS = -D__@target_os@__ $(EXTRA_CXXFLAGS)
@@ -98,12 +94,12 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I../../config
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-libfacore_a_LIBADD = 
-@AM_HAVE_WIN32_TRUE@cond0libfacore_a_OBJECTS = 
-@AM_HAVE_WIN32_FALSE@cond1libfacore_a_OBJECTS =  player.o bootstrap.o \
+libfabase_a_LIBADD = 
+@AM_HAVE_WIN32_TRUE@cond0libfabase_a_OBJECTS = 
+@AM_HAVE_WIN32_FALSE@cond1libfabase_a_OBJECTS =  player.o bootstrap.o \
 @AM_HAVE_WIN32_FALSE@command.o buffer.o playlist.o hashtable.o
-libfacore_a_OBJECTS =  $(cond0libfacore_a_OBJECTS) \
-$(cond1libfacore_a_OBJECTS)
+libfabase_a_OBJECTS =  $(cond0libfabase_a_OBJECTS) \
+$(cond1libfabase_a_OBJECTS)
 AR = ar
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 CXXLINK = $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@
@@ -117,8 +113,8 @@ GZIP = --best
 DEP_FILES =  .deps/bootstrap.P .deps/buffer.P .deps/command.P \
 .deps/hashtable.P .deps/player.P .deps/playlist.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
-SOURCES = $(libfacore_a_SOURCES)
-OBJECTS = $(libfacore_a_OBJECTS)
+SOURCES = $(libfabase_a_SOURCES)
+OBJECTS = $(libfabase_a_OBJECTS)
 
 all: Makefile $(LIBRARIES)
 
@@ -157,10 +153,10 @@ distclean-compile:
 
 maintainer-clean-compile:
 
-libfacore.a: $(libfacore_a_OBJECTS) $(libfacore_a_DEPENDENCIES)
-	-rm -f libfacore.a
-	$(AR) cru libfacore.a $(libfacore_a_OBJECTS) $(libfacore_a_LIBADD)
-	$(RANLIB) libfacore.a
+libfabase.a: $(libfabase_a_OBJECTS) $(libfabase_a_DEPENDENCIES)
+	-rm -f libfabase.a
+	$(AR) cru libfabase.a $(libfabase_a_OBJECTS) $(libfabase_a_LIBADD)
+	$(RANLIB) libfabase.a
 .cpp.o:
 	$(CXXCOMPILE) -c $<
 

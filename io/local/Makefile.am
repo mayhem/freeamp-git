@@ -30,12 +30,12 @@ MYLIBS =
 TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
 else
 FILES = localfileinput.cpp
-MYLIBS = libfaio.a
+MYLIBS = libfaiolocal.a
 TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
 endif
 
 noinst_LIBRARIES = $(MYLIBS)
-libfaio_a_SOURCES = $(FILES)
+libfaiolocal_a_SOURCES = $(FILES)
 
 INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS)
 CXXFLAGS = $(EXTRA_CXXFLAGS) -D__@target_os@__

@@ -78,11 +78,11 @@ target_os = @target_os@
 @AM_HAVE_WIN32_TRUE@MYLIBS = 
 @AM_HAVE_WIN32_TRUE@TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
 @AM_HAVE_WIN32_FALSE@FILES = localfileinput.cpp
-@AM_HAVE_WIN32_FALSE@MYLIBS = libfaio.a
+@AM_HAVE_WIN32_FALSE@MYLIBS = libfaiolocal.a
 @AM_HAVE_WIN32_FALSE@TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
 
 noinst_LIBRARIES = $(MYLIBS)
-libfaio_a_SOURCES = $(FILES)
+libfaiolocal_a_SOURCES = $(FILES)
 
 INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS)
 CXXFLAGS = $(EXTRA_CXXFLAGS) -D__@target_os@__
@@ -96,10 +96,11 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I../../config
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-libfaio_a_LIBADD = 
-@AM_HAVE_WIN32_TRUE@cond0libfaio_a_OBJECTS = 
-@AM_HAVE_WIN32_FALSE@cond1libfaio_a_OBJECTS =  localfileinput.o
-libfaio_a_OBJECTS =  $(cond0libfaio_a_OBJECTS) $(cond1libfaio_a_OBJECTS)
+libfaiolocal_a_LIBADD = 
+@AM_HAVE_WIN32_TRUE@cond0libfaiolocal_a_OBJECTS = 
+@AM_HAVE_WIN32_FALSE@cond1libfaiolocal_a_OBJECTS =  localfileinput.o
+libfaiolocal_a_OBJECTS =  $(cond0libfaiolocal_a_OBJECTS) \
+$(cond1libfaiolocal_a_OBJECTS)
 AR = ar
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 CXXLINK = $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@
@@ -112,8 +113,8 @@ TAR = tar
 GZIP = --best
 DEP_FILES =  .deps/localfileinput.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
-SOURCES = $(libfaio_a_SOURCES)
-OBJECTS = $(libfaio_a_OBJECTS)
+SOURCES = $(libfaiolocal_a_SOURCES)
+OBJECTS = $(libfaiolocal_a_OBJECTS)
 
 all: Makefile $(LIBRARIES)
 
@@ -152,10 +153,10 @@ distclean-compile:
 
 maintainer-clean-compile:
 
-libfaio.a: $(libfaio_a_OBJECTS) $(libfaio_a_DEPENDENCIES)
-	-rm -f libfaio.a
-	$(AR) cru libfaio.a $(libfaio_a_OBJECTS) $(libfaio_a_LIBADD)
-	$(RANLIB) libfaio.a
+libfaiolocal.a: $(libfaiolocal_a_OBJECTS) $(libfaiolocal_a_DEPENDENCIES)
+	-rm -f libfaiolocal.a
+	$(AR) cru libfaiolocal.a $(libfaiolocal_a_OBJECTS) $(libfaiolocal_a_LIBADD)
+	$(RANLIB) libfaiolocal.a
 .cpp.o:
 	$(CXXCOMPILE) -c $<
 

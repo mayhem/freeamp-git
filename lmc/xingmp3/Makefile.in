@@ -79,11 +79,11 @@ target_os = @target_os@
 @AM_HAVE_WIN32_TRUE@TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
 @AM_HAVE_WIN32_FALSE@FILES = cdct.c cupl3.c hwin.c iup.c l3init.c msis.c wavep.c csbt.c cwinm.c icdct.c mdct.c uph.c cup.c dec8.c isbt.c l3dq.c mhead.c \
 @AM_HAVE_WIN32_FALSE@        upsf.c iwinm.c xinglmc.cpp
-@AM_HAVE_WIN32_FALSE@MYLIBS = libfalmc.a
+@AM_HAVE_WIN32_FALSE@MYLIBS = libfalmcxingmp3.a
 @AM_HAVE_WIN32_FALSE@TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
 
 noinst_LIBRARIES = $(MYLIBS)
-libfalmc_a_SOURCES = $(FILES)
+libfalmcxingmp3_a_SOURCES = $(FILES)
 
 INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) -I@top_srcdir@/io/include -I@top_srcdir@/ui/include
 CXXFLAGS = $(EXTRA_CXXFLAGS) -D__@target_os@__
@@ -98,14 +98,14 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I../../config
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-libfalmc_a_LIBADD = 
-@AM_HAVE_WIN32_TRUE@cond0libfalmc_a_OBJECTS = 
-@AM_HAVE_WIN32_FALSE@cond1libfalmc_a_OBJECTS =  cdct.o cupl3.o hwin.o \
-@AM_HAVE_WIN32_FALSE@iup.o l3init.o msis.o wavep.o csbt.o cwinm.o \
-@AM_HAVE_WIN32_FALSE@icdct.o mdct.o uph.o cup.o dec8.o isbt.o l3dq.o \
-@AM_HAVE_WIN32_FALSE@mhead.o upsf.o iwinm.o xinglmc.o
-libfalmc_a_OBJECTS =  $(cond0libfalmc_a_OBJECTS) \
-$(cond1libfalmc_a_OBJECTS)
+libfalmcxingmp3_a_LIBADD = 
+@AM_HAVE_WIN32_TRUE@cond0libfalmcxingmp3_a_OBJECTS = 
+@AM_HAVE_WIN32_FALSE@cond1libfalmcxingmp3_a_OBJECTS =  cdct.o cupl3.o \
+@AM_HAVE_WIN32_FALSE@hwin.o iup.o l3init.o msis.o wavep.o csbt.o \
+@AM_HAVE_WIN32_FALSE@cwinm.o icdct.o mdct.o uph.o cup.o dec8.o isbt.o \
+@AM_HAVE_WIN32_FALSE@l3dq.o mhead.o upsf.o iwinm.o xinglmc.o
+libfalmcxingmp3_a_OBJECTS =  $(cond0libfalmcxingmp3_a_OBJECTS) \
+$(cond1libfalmcxingmp3_a_OBJECTS)
 AR = ar
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 CXXLINK = $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@
@@ -124,8 +124,8 @@ DEP_FILES =  .deps/cdct.P .deps/csbt.P .deps/cup.P .deps/cupl3.P \
 .deps/mhead.P .deps/msis.P .deps/uph.P .deps/upsf.P .deps/wavep.P \
 .deps/xinglmc.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
-SOURCES = $(libfalmc_a_SOURCES)
-OBJECTS = $(libfalmc_a_OBJECTS)
+SOURCES = $(libfalmcxingmp3_a_SOURCES)
+OBJECTS = $(libfalmcxingmp3_a_OBJECTS)
 
 all: Makefile $(LIBRARIES)
 
@@ -164,10 +164,10 @@ distclean-compile:
 
 maintainer-clean-compile:
 
-libfalmc.a: $(libfalmc_a_OBJECTS) $(libfalmc_a_DEPENDENCIES)
-	-rm -f libfalmc.a
-	$(AR) cru libfalmc.a $(libfalmc_a_OBJECTS) $(libfalmc_a_LIBADD)
-	$(RANLIB) libfalmc.a
+libfalmcxingmp3.a: $(libfalmcxingmp3_a_OBJECTS) $(libfalmcxingmp3_a_DEPENDENCIES)
+	-rm -f libfalmcxingmp3.a
+	$(AR) cru libfalmcxingmp3.a $(libfalmcxingmp3_a_OBJECTS) $(libfalmcxingmp3_a_LIBADD)
+	$(RANLIB) libfalmcxingmp3.a
 .cpp.o:
 	$(CXXCOMPILE) -c $<
 
