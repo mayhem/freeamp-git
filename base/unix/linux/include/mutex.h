@@ -33,14 +33,15 @@ public:
 	Mutex(bool createOwned = false);
 	~Mutex();
 
-
 	bool Acquire(long timeout = WAIT_FOREVER);
 	void Release();
 	void DumpMutex(void);
 
  private:
 	pthread_mutex_t m_mutex;
-	pthread_t myTid;
+   pthread_cond_t  m_tCond;
+   int             m_iBusy;
+	pthread_t       m_tOwner;
 };
 
 #endif /* MUTEX_H */

@@ -372,7 +372,6 @@ void AlsaPMO::WorkerThread(void)
 
           continue;
       }
-
       iToCopy = m_iDataSize;
       m_pPauseMutex->Acquire();
 
@@ -444,8 +443,12 @@ void AlsaPMO::WorkerThread(void)
               usleep(10000);
 
               for(;!m_bExit;)
+              {
                  if (m_pPauseMutex->Acquire(10000))
+                 {
                      break;
+                 }
+              }
               if (m_bExit)
                  iToCopy = 0;
 
