@@ -57,6 +57,7 @@ const char*  kDefaultUI = "freeamp.ui";
 const char*  kDefaultTextUI = "freeampcmd.ui";
 const char*  kDefaultPMO = "soundcard.pmo";
 const char*  kDefaultALSADevice = "1:1";
+const char*  kDefaultESOUNDHost = "localhost";
 
 
 class LibDirFindHandle {
@@ -504,7 +505,12 @@ SetDefaults()
     size = sizeof(buf);
     if (GetPrefString(kALSADevicePref, buf, &size) == kError_NoPrefValue)
         SetPrefString(kALSADevicePref, kDefaultALSADevice);
-    
+   
+    // set default ESD host
+    size = sizeof(buf); 
+    if (GetPrefString(kESOUNDHostPref, buf, &size) == kError_NoPrefValue)
+        SetPrefString(kESOUNDHostPref, kDefaultESOUNDHost);
+
     Preferences::SetDefaults();
 
     return kError_NoErr;

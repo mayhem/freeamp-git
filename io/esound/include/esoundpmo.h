@@ -62,7 +62,9 @@ class EsounDPMO:public PhysicalMediaOutput
      void          HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent);
 
      bool         m_properlyInitialized;
-     int   audio_fd;
+     int          audio_fd, mixer_fd, stream_id;
+     char         stream_name[ESD_NAME_MAX];
+     char        *m_espeaker;
      OutputInfo  *myInfo;
      Thread      *m_pBufferThread;
      int          m_iBytesPerSample;

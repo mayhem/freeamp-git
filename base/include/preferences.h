@@ -34,6 +34,7 @@ extern const char* kUIPref;
 extern const char* kTextUIPref;
 extern const char* kPMOPref;
 extern const char* kALSADevicePref;
+extern const char* kESOUNDHostPref;
 extern const char* kOpenSaveDirPref;
 extern const char* kStayOnTopPref;
 extern const char* kLiveInTrayPref;

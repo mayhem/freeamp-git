@@ -250,7 +250,8 @@ void TitleStreamServer::WorkerThread(void)
    char           *ptr, *szTitle = NULL, *szURL = NULL;
    fd_set          sSet; 
    struct timeval  sTv; 
-   int             iRet, iStructSize;
+   int             iRet;
+   unsigned int    iStructSize;
 
    for(; !m_bExit; ) 
    {

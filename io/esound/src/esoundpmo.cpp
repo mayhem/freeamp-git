@@ -29,6 +29,7 @@ ____________________________________________________________________________*/
 #include <time.h>
 #include <assert.h>
 #include <esd.h>
+#include <unistd.h>
 
 /* project headers */
 #include <config.h>
@@ -52,6 +53,7 @@ extern    "C"
 EsounDPMO::EsounDPMO(FAContext *context) :
         PhysicalMediaOutput(context)
 {
+   uint32 hostNameSize = 128;
    m_properlyInitialized = false;
 
    myInfo = new OutputInfo();
@@ -65,6 +67,16 @@ EsounDPMO::EsounDPMO(FAContext *context) :
    m_iDataSize = 0;
    m_iVolume = 100;
    audio_fd = -1;
+   mixer_fd = -1;
+   m_espeaker = NULL;
+
+   char *ESPEAKER = (char *)malloc(hostNameSize);
+   m_pContext->prefs->GetPrefString(kESOUNDHostPref, ESPEAKER, &hostNameSize);
+
+   if (strncmp(ESPEAKER, "localhost", hostNameSize))
+      m_espeaker = strdup(ESPEAKER);      
+   
+   free(ESPEAKER);
 
    if (!m_pBufferThread)
    {
@@ -87,6 +99,13 @@ EsounDPMO::~EsounDPMO()
    }
 
    close(audio_fd);
+   close(mixer_fd);
+   
+   if (m_espeaker)
+   {
+      free(m_espeaker);
+      m_espeaker = NULL;
+   }
 
    if (myInfo)
    {
@@ -98,18 +117,35 @@ EsounDPMO::~EsounDPMO()
 
 int32 EsounDPMO::GetVolume()
 {
+   if (mixer_fd > 0)
+   {
+      esd_info_t *info;
+      esd_player_info_t *plr;
+
+      info = esd_get_all_info(mixer_fd);
+
+      if (!info) 
+         return m_iVolume;
+
+      for (plr = info->player_list; plr; plr = plr->next)
+          if (!strncmp(stream_name, plr->name, ESD_NAME_MAX))
+          {
+             m_iVolume = (plr->left_vol_scale + plr->right_vol_scale) / 2;
+             break;
+          }
+      m_iVolume = 50 * m_iVolume / ESD_VOLUME_BASE;
+      esd_free_all_info(info);
+   }
    return m_iVolume;
 }
 
 void EsounDPMO::SetVolume(int32 v)
 {
-   int esd = esd_open_sound(NULL);
-   if ((esd > 0) && (v != m_iVolume))
+   if (mixer_fd > 0)
    {
       m_iVolume = v;
       v = ESD_VOLUME_BASE * (v & 0xff) / 50;
-      esd_set_stream_pan(esd, audio_fd, v, v);
-      close(esd);
+      esd_set_stream_pan(mixer_fd, stream_id, v, v);
    }
 }
 
@@ -141,8 +177,10 @@ Error EsounDPMO::Init(OutputInfo * info)
       return (Error) pmoError_DeviceOpenFailed;
    }
 
+   sprintf(stream_name, "FreeAMP%d", getpid());
+
    audio_fd = esd_play_stream( esd_format, info->samples_per_second,
-                               NULL, "FreeAMP" );
+                               m_espeaker, stream_name );
    if (audio_fd < 0)
    {
       ReportError("Unable to connect to EsounD server.");
@@ -156,6 +194,28 @@ Error EsounDPMO::Init(OutputInfo * info)
    m_properlyInitialized = true;
 
    m_iBytesPerSample = info->number_of_channels * (info->bits_per_sample / 8);
+
+   mixer_fd = esd_open_sound(m_espeaker);
+   if (mixer_fd > 0) 
+   {
+      esd_info_t *info;
+      esd_player_info_t *plr;
+
+      info = esd_get_all_info(mixer_fd);
+      if (!info)
+      {
+         mixer_fd = -1; 
+         return kError_NoErr;
+      }
+      
+      for (plr = info->player_list; plr; plr = plr->next)
+         if (!strncmp(stream_name, plr->name, ESD_NAME_MAX))
+         {
+            stream_id = plr->source_id;
+            break;
+         }
+      esd_free_all_info(info);
+   }
 
    return kError_NoErr;
 }

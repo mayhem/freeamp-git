@@ -33,6 +33,7 @@ const char* kUIPref = "UI";
 const char* kTextUIPref = "TextUI";
 const char* kPMOPref = "PMO";
 const char* kALSADevicePref = "ALSADevice";
+const char* kESOUNDHostPref = "EsounDHost";
 const char* kOpenSaveDirPref = "OpenSaveDirectory";
 const char* kStayOnTopPref = "StayOnTop";
 const char* kLiveInTrayPref = "LiveInTray";
