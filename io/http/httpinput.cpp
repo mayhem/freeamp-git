@@ -240,13 +240,6 @@ bool HttpInput::PauseLoop(bool bLoop)
    return bRet;
 } 
 
-// NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
-// The function gethostbyname_r() differs greatly from system to system
-// and on linux it seems to behave quite erratically. I've elected to
-// use gethostbyname() (the non-reentrant version) because it works,
-// and I don't see two threads conflicting each other during a gethostbyname
-// lookup in FreeAmp.
-// NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
 Error GetHostByName(char *szHostName, struct hostent *pResult)
 {
     struct hostent *pTemp;
@@ -289,6 +282,7 @@ Error HttpInput::Open(void)
     fd_set              sSet; 
     struct timeval      sTv;
     bool                bUseTitleStreaming = true, bUseAltNIC = false;
+    int                 iHeaderBytes = 0, iCurHeaderSize = 1024;
 
     szStreamName = NULL;
     szStreamUrl = NULL;
@@ -477,8 +471,7 @@ Error HttpInput::Open(void)
     if (sscanf(pInitialBuffer, " %*s %d %255[^\n\r]", &iRet, m_szError))
     {
         void *pData;
-        int   iHeaderBytes = 0, iCurHeaderSize = iHeaderSize;
-
+        
         if (iRet != iICY_OK)
         {
             ReportStatus("");
@@ -489,6 +482,9 @@ Error HttpInput::Open(void)
             return (Error)httpError_CustomError;
         }
 
+        //for(int i = 0; i < 25; i++)
+        //    Debug_v("%c - %d", pInitialBuffer[i], pInitialBuffer[i]);
+
         pHeaderData = new char[iHeaderSize];
         for(;;)
         {
@@ -497,7 +493,8 @@ Error HttpInput::Open(void)
                 char *pNew;
 
                 iCurHeaderSize += iHeaderSize;
-                pNew = new char[iCurHeaderSize];
+                pNew = new char[iCurHeaderSize + 1];
+                memset(pNew, 0, iCurHeaderSize + 1);
                 memcpy(pNew, pHeaderData, iHeaderBytes);
                 delete pHeaderData;
                 pHeaderData = pNew;
@@ -630,8 +627,12 @@ Error HttpInput::Open(void)
         }
 
         m_fpSave = fopen(szFile, "wb");
+        if (m_fpSave == NULL)
+            ReportError("Cannot open file to save HTTP stream. Check "
+                        "the save streams locally setting in the "
+                        "options dialog.");
         
-        if (pHeaderData)
+        if (pHeaderData && m_fpSave)
         {
             iRet = fwrite((char *)pHeaderData + strlen(pHeaderData) + 1, 
                           sizeof(char), iRead, m_fpSave);
