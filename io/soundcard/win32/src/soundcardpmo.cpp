@@ -114,18 +114,20 @@ SoundCardPMO::~SoundCardPMO()
    {
       waveOutReset(m_hwo);
 
+      for(int iLoop = 0; iLoop < m_num_headers; iLoop++)
+      {
+          if ((int)m_wavehdr_array[iLoop].dwUser < 0)
+		  {
+              waveOutUnprepareHeader(m_hwo, &m_wavehdr_array[iLoop], sizeof(WAVEHDR));
+		  }
+      }
+
       while (waveOutClose(m_hwo) == WAVERR_STILLPLAYING)
       {
          usleep(100000);
       }
 
-      // Unprepare and free the header memory.
-      for (uint32 j = 0; j < m_num_headers; j++)
-      {
-         delete    m_wavehdr_array[j];
-      }
-
-      delete []m_wavehdr_array;
+      delete m_wavehdr_array;
       delete m_wfex;
    }
    if (g_pHeaderMutex)
@@ -171,10 +173,9 @@ Error SoundCardPMO::Init(OutputInfo * info)
    m_iBytesPerSample = info->number_of_channels * (info->bits_per_sample / 8);
 
    m_num_headers = (m_pInputBuffer->GetBufferSize() / m_data_size) - 1;
-   //m_num_headers = 32;
    
    m_hdr_size = sizeof(WAVEHDR);
-   m_wavehdr_array = new LPWAVEHDR[m_num_headers];
+   m_wavehdr_array = new WAVEHDR[m_num_headers];
 
    m_wfex = new WAVEFORMATEX;
 
@@ -200,24 +201,14 @@ Error SoundCardPMO::Init(OutputInfo * info)
 
    uint32    i;
 
+   m_wavehdr_array = new WAVEHDR[m_num_headers];
    for (i = 0; i < m_num_headers; i++)
    {
-      m_wavehdr_array[i] = new WAVEHDR;
-
-      LPWAVEHDR temp = m_wavehdr_array[i];
-
-      if (!temp)
-      {
-         result = kError_OutOfMemory;
-         break;
-      }
-
-      temp->dwBufferLength = m_data_size;
-      temp->dwBytesRecorded = 0;
-      temp->dwUser = 0;         // If played, dwUser = 1
-
-      temp->dwLoops = 0;
-      temp->dwFlags = NULL;
+      m_wavehdr_array[i].dwBufferLength = m_data_size;
+      m_wavehdr_array[i].dwBytesRecorded = 0;
+      m_wavehdr_array[i].dwUser = 0;   
+      m_wavehdr_array[i].dwLoops = 0;
+      m_wavehdr_array[i].dwFlags = NULL;
    }
    m_iBytesPerSample = info->number_of_channels * (info->bits_per_sample / 8);
 
@@ -286,7 +277,7 @@ bool SoundCardPMO::WaitForDrain(void)
 
 	   for(iLoop = 0, iNumHeadersPending = 0; iLoop < m_num_headers; iLoop++)
        {
-           if ((int)m_wavehdr_array[iLoop]->dwUser > 0)
+           if ((int)m_wavehdr_array[iLoop].dwUser > 0)
                iNumHeadersPending++;
 	   }
 	   g_pHeaderMutex->Release();
@@ -413,10 +404,10 @@ WAVEHDR *SoundCardPMO::NextHeader(bool bFreeHeadersOnly)
        g_pHeaderMutex->Acquire();
        for(iLoop = 0; iLoop < m_num_headers; iLoop++)
        {
-           if ((int)m_wavehdr_array[iLoop]->dwUser < 0 &&
-              (-(int)m_wavehdr_array[iLoop]->dwUser) == m_iTail + 1)
+           if ((int)m_wavehdr_array[iLoop].dwUser < 0 &&
+              (-(int)m_wavehdr_array[iLoop].dwUser) == m_iTail + 1)
           {
-              waveOutUnprepareHeader(m_hwo, m_wavehdr_array[iLoop], sizeof(WAVEHDR));
+              waveOutUnprepareHeader(m_hwo, &m_wavehdr_array[iLoop], sizeof(WAVEHDR));
 
               eRet = FreeHeader();
               if (IsError(eRet))
@@ -425,12 +416,12 @@ WAVEHDR *SoundCardPMO::NextHeader(bool bFreeHeadersOnly)
                  return NULL;
               }
 
-              m_wavehdr_array[iLoop]->dwUser = 0;
+              m_wavehdr_array[iLoop].dwUser = 0;
               m_iTail++;
           }
-          if (!bFreeHeadersOnly && !m_wavehdr_array[iLoop]->dwUser)
+          if (!bFreeHeadersOnly && !m_wavehdr_array[iLoop].dwUser)
           {
-             result = m_wavehdr_array[iLoop];
+             result = &m_wavehdr_array[iLoop];
              result->dwUser = ++m_iHead;
 
              g_pHeaderMutex->Release();
@@ -552,7 +543,6 @@ void SoundCardPMO::WorkerThread(void)
 				  {
                      m_pTarget->AcceptEvent(new Event(INFO_DoneOutputting));
 				  }
-
                   return;
               }
  

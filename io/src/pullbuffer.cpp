@@ -315,7 +315,6 @@ Error PullBuffer::EndWrite(size_t iBytesWritten)
    
    m_iBytesToWrite = 0;
 
-   m_context->log->Log(LogInput, "EndWrite: ReadIndex: %d WriteIndex %d\n", m_iReadIndex, m_iWriteIndex);
    m_pMutex->Release();
 
    return kError_NoErr;
@@ -421,8 +420,6 @@ Error PullBuffer::EndRead(size_t iBytesUsed)
    assert(m_iBytesInBuffer <= m_iBufferSize);
 
    m_iBytesToRead = 0;
-
-   m_context->log->Log(LogInput, "EndRead: ReadIndex: %d WriteIndex %d\n", m_iReadIndex, m_iWriteIndex);
 
    m_pMutex->Release();
 

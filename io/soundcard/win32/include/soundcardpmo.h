@@ -71,7 +71,7 @@ public:
 //    FAContext*      m_context;
 
 	WAVEFORMATEX*	m_wfex;
-	LPWAVEHDR*		m_wavehdr_array;
+	WAVEHDR*		m_wavehdr_array;
 	HWAVEOUT		m_hwo;
 
 	uint32			m_buffer[MAXCHANNELS];
