@@ -182,9 +182,9 @@ Error M3U::ReadPlaylist(const char* url,
                             strcpy(path, entry);
                         }
                         
-                        // make it a url so we can add it to the playlist right
-                        uint32 urlLength = strlen(path) + 15;
-                        char *itemurl = new char[urlLength];
+                        // make it a url so we can add it to the playlist
+                        length = strlen(path) + 15;
+                        char *itemurl = new char[length];
 
                         if (IsntError(FilePathToURL(path, itemurl, &length)))
                             strcpy(path, itemurl);
