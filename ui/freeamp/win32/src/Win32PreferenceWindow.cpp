@@ -2746,7 +2746,7 @@ void Win32PreferenceWindow::LoadThemeListBox(HWND hwnd)
 			char *temps = new char[(*i).second.size() + 1];
 			strcpy(temps, (*i).second.c_str());
 			char *name = strrchr(temps, '.');
-			if (name) 
+			if (name)  
 				*name = '\0';
 			name = strrchr(temps, '\\'); 
 			if (name) {
@@ -2756,6 +2756,8 @@ void Win32PreferenceWindow::LoadThemeListBox(HWND hwnd)
 						SendDlgItemMessage(hwnd, IDC_THEMELISTBOX, LB_SETCURSEL, index, 0);
 				}
 			}
+
+			delete [] temps;
 		}
     }                      
      

@@ -287,7 +287,7 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
         delete pZip;
     }    
 
-    if (!IsError(eRet))
+	if (!IsError(eRet))
     {
        string                      oTemp;
        vector<Window *>::iterator  i;
@@ -297,9 +297,9 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
        // Is this a reload, as opposed to a new load?
        if (m_pWindows)
        {
-          vector<Window *> *oWindows;
-          vector<Bitmap *> *oBitmaps;
-          vector<Font *>   *oFonts;
+          vector<Window *> *oWindows = NULL;
+          vector<Bitmap *> *oBitmaps = NULL;
+          vector<Font *>   *oFonts = NULL;
           
           oWindows = m_pWindows;
 
@@ -310,22 +310,21 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
           for(i = m_pWindows->begin(); i != m_pWindows->end(); i++)
           {
               (*i)->GetName(oTemp);
+              if (oTemp == string("MainWindow"))
+                  pMainWindow = *i;
               if (oTemp == oWindowName)
               {
                   pNewWindow = *i;
                   break;
               }    
-              if (oTemp == string("MainWindow"))
-                  pMainWindow = *i;
           }
 
           // If we can't find the proper mode, switch to mainwindow
-          if (!pNewWindow)
+          if (!pNewWindow) 
              pNewWindow = pMainWindow;
-          
+
           // Save the old bitmaps and fonts
-          if (m_pFonts)
-              oFonts = m_pFonts;
+          oFonts = m_pFonts;
           oBitmaps = m_pBitmaps;
 
           // Accept the new bitmaps and font.
@@ -349,7 +348,7 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
           // everything *should* be fine.
 
           // Now delete the old crap
-          while(oFonts->size() > 0)
+          while(oFonts && oFonts->size() > 0)
           {
              delete (*oFonts)[0];
              oFonts->erase(oFonts->begin());

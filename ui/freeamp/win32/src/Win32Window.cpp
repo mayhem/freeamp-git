@@ -494,7 +494,7 @@ Error Win32Window::VulcanMindMeld(Window *pOther)
     eRet = Window::VulcanMindMeld(pOther);
     m_pMindMeldMutex->Release();
 
-    if (m_hPal)
+    if (m_hPal) 
        ((Win32Canvas *)m_pCanvas)->SetPalette(m_hPal);
 
     if (IsError(eRet))

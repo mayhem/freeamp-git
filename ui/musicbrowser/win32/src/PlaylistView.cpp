@@ -25,7 +25,7 @@ ____________________________________________________________________________*/
 // STL often creates symbols longer than that.
 // When symbols are longer than 255 characters, the warning is disabled.
 #ifdef WIN32
-#pragma warning(disable:4786)
+#pragma warning(disable:4786) 
 #endif
 
 #include <windows.h>
@@ -1027,10 +1027,6 @@ void MusicBrowserUI::ResizeHeader(HWND hwnd, uint32 column)
         ReleaseDC(hwnd, hdc);
 
         textLength += 5;
-
-		char blah[1025];
-		sprintf(blah, "resizing %d to %d", column, textLength);
-		MessageBox(hwnd, blah, blah, MB_OK|MB_SETFOREGROUND);
 
         if(column < m_columnInfo.GetNColumns()) 
         {
