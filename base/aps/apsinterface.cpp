@@ -196,9 +196,9 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
         URLToFilePath((char *)pmetaData->Filename().c_str(), file, &len);
         mb_CalculateBitprint(o, file, &info);
     
-        args[0] = strdup(pmetaData->Title().c_str());
-        args[1] = strdup(pmetaData->Artist().c_str());
-        args[2] = strdup(pmetaData->Album().c_str());
+        args[0] = strdup(pmetaData->Artist().c_str());
+        args[1] = strdup(pmetaData->Album().c_str());
+        args[2] = strdup(pmetaData->Title().c_str());
         sprintf(temp, "%d", pmetaData->Track());
         args[3] = strdup(temp);
         args[4] = strdup(guid);
@@ -223,7 +223,7 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
             args[14] = strdup(temp);
             sprintf(temp, "%d", info.bitrate);
             args[15] = strdup(temp);
-            sprintf(temp, "%d", info.stereo);
+            sprintf(temp, "%d", info.stereo ? 2 : 1);
             args[16] = strdup(temp);
             sprintf(temp, "%d", info.vbr);
             args[17] = strdup(temp);
@@ -254,14 +254,29 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
     // Now start the data extraction process.
     if (mb_GetResultData(o, MBE_MEGetAlbumName, temp, 255))
         pmetaData->SetAlbum(temp);
+    else
+        pmetaData->SetAlbum("Unknown");
+       
     if (mb_GetResultData(o, MBE_MEGetArtistName, temp, 255))
         pmetaData->SetArtist(temp);
+    else
+        pmetaData->SetArtist("Unknown");
+
     if (mb_GetResultData(o, MBE_MEGetTrackName, temp, 255))
         pmetaData->SetTitle(temp);
+    else
+        pmetaData->SetTitle("Unknown");
+
     if (mb_GetResultData(o, MBE_MEGetGenre, temp, 255))
         pmetaData->SetGenre(temp);
+    else
+        pmetaData->SetGenre("Unknown");
+
     if (mb_GetResultData(o, MBE_MEGetDescription, temp, 255))
         pmetaData->SetComment(temp);
+    else
+        pmetaData->SetComment("Unknown");
+
     pmetaData->SetYear(mb_GetResultInt(o, MBE_MEGetYear));
     pmetaData->SetTrack(mb_GetResultInt(o, MBE_MEGetTrackNum));
     pmetaData->SetLength(mb_GetResultInt(o, MBE_MEGetDuration) / 1000);
