@@ -473,16 +473,16 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                 pToolTipText->lpszText = "Save current playlist";
                 return true;
             case ID_FILE_IMPORT:
-                pToolTipText->lpszText = "Import tracks from disk";
+                pToolTipText->lpszText = "Import tracks and playlists from disk";
                 return true;
             case ID_EDIT_REMOVE:
-                pToolTipText->lpszText = "Remove selected tracks or playlists";
+                pToolTipText->lpszText = "Remove selected tracks and playlists";
                 return true;
             case ID_EDIT_EDITINFO:
                 pToolTipText->lpszText = "Edit track or playlist info";
                 return true;
             case ID_EDIT_ADDTRACK:
-                pToolTipText->lpszText = "Add selected tracks or playlists to playlist";
+                pToolTipText->lpszText = "Add selected tracks and playlists to playlist";
                 return true;
             case ID_EDIT_ADDFILE:
                 pToolTipText->lpszText = "Add file from disk to playlist ";
@@ -770,8 +770,12 @@ void MusicBrowserUI::PlayerControlsEvent(int command)
             m_context->target->AcceptEvent(new Event(CMD_NextMediaPiece));
             break;
 
+        case ID_CONTROLS_NORMALORDER:
+            m_oPlm->SetShuffleMode(false);
+            break;
+
         case ID_CONTROLS_SHUFFLE:
-            m_oPlm->ToggleShuffleMode();
+            m_oPlm->SetShuffleMode(true);
             break;
 
         case ID_CONTROLS_REPEATNONE:
@@ -840,6 +844,9 @@ void MusicBrowserUI::ChangeShuffleMode(bool shuffled)
     item.fMask = MIIM_STATE;
     item.fState = shuffled ? MFS_CHECKED:MFS_UNCHECKED;
     SetMenuItemInfo(menu, ID_CONTROLS_SHUFFLE, false, &item);
+    
+    item.fState = shuffled ? MFS_UNCHECKED: MFS_CHECKED;
+    SetMenuItemInfo(menu, ID_CONTROLS_NORMALORDER, false, &item);
 }
 
 void MusicBrowserUI::ChangeRepeatMode(RepeatMode mode)

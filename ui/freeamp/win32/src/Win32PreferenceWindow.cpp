@@ -133,6 +133,23 @@ PrefDebugCallback(HWND hwnd,
 	return g_pCurrentPrefWindow->PrefDebugProc(hwnd, msg, wParam, lParam);
 }            
 
+static int CALLBACK PropSheetProc( HWND hwnd, UINT msg, LPARAM lParam)
+{
+    if(msg == PSCB_INITIALIZED)
+    {
+        //DLGTEMPLATE* dlg = (DLGTEMPLATE*)lParam;
+
+        //dlg->dwExtendedStyle ^= WS_EX_CONTEXTHELP;
+        LONG style = GetWindowLong(GetParent(hwnd), GWL_EXSTYLE);
+
+        style ^= WS_EX_CONTEXTHELP;
+
+        SetWindowLong(GetParent(hwnd), GWL_EXSTYLE, style);
+    }
+
+    return 0;
+}
+
 Win32PreferenceWindow::Win32PreferenceWindow(FAContext *context,
                                              ThemeManager *pThemeMan,
                                              uint32 defaultPage) :
@@ -501,7 +518,23 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
 
             Edit_SetText(hwndSaveMusicDir, 
                          m_originalValues.saveMusicDirectory.c_str());
+
+
+            LONG style = GetWindowLong(GetParent(hwnd), GWL_EXSTYLE);
+
+            style ^= WS_EX_CONTEXTHELP;
+
+            SetWindowLong(GetParent(hwnd), GWL_EXSTYLE, style);
             
+            break;
+        }
+
+        case WM_KEYDOWN:
+        {
+            if(VK_F1 == wParam)
+            {
+                PropSheet_PressButton(hwnd, PSBTN_HELP);
+            }
             break;
         }
 

@@ -34,7 +34,7 @@ ____________________________________________________________________________*/
 #include "DropSource.h"
 #include "DropObject.h"
 #include "eventdata.h"
-#include "debug.h"
+#include "help.h"
 
 #define WM_EMPTYDBCHECK WM_USER + 69
  
@@ -251,6 +251,7 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                 case ID_CONTROLS_STOP:
                 case ID_CONTROLS_PREVIOUSSONG:
                 case ID_CONTROLS_NEXTSONG:
+                case ID_CONTROLS_NORMALORDER:
                 case ID_CONTROLS_SHUFFLE:
                 case ID_CONTROLS_REPEATNONE:
                 case ID_CONTROLS_REPEATONE:
@@ -282,9 +283,11 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
 
                     m_context->prefs->GetInstallDirectory(dir, &len);
                     oHelpFile = string(dir);
-                    oHelpFile += string("\\freeamp.hlp");    
+                    oHelpFile += string("\\");    
+                    oHelpFile += string(HELP_FILE);    
 
-                    WinHelp(m_hWnd, oHelpFile.c_str(), HELP_FINDER, 0);
+                    //WinHelp(m_hWnd, oHelpFile.c_str(), HELP_FINDER, 0);
+                    WinHelp(m_hWnd, oHelpFile.c_str(), HELP_CONTEXT, Music_Browser);
                     return 1;
                 }
 
@@ -487,8 +490,8 @@ void MusicBrowserUI::ExpandCollapseEvent(void)
     if (m_state == STATE_COLLAPSED)
     {
        m_state = STATE_EXPANDED;
-       SetWindowText(m_hWnd, BRANDING " - Music Browser");
-       sItem.dwTypeData = "View &playlist only";
+       SetWindowText(m_hWnd,  "My Music - " BRANDING);
+       sItem.dwTypeData = "View &Playlist Only";
 
        ShowWindow(m_hMusicCatalog, SW_SHOW);
        ShowWindow(m_hMusicCatalogTitle, SW_SHOW);
@@ -510,8 +513,8 @@ void MusicBrowserUI::ExpandCollapseEvent(void)
     else
     {                
        m_state = STATE_COLLAPSED;
-       SetWindowText(m_hWnd, BRANDING " - Playlist Manager");
-       sItem.dwTypeData = "View &music browser";
+       SetWindowText(m_hWnd, "Playlist - " BRANDING);
+       sItem.dwTypeData = "View &Music Browser";
 
        ShowWindow(m_hMusicCatalog, SW_HIDE);
        ShowWindow(m_hMusicCatalogTitle, SW_HIDE);
@@ -903,15 +906,15 @@ void MusicBrowserUI::CreateToolbar(void)
     tbButtons[0].iString = index;
     index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Save Playlist");
     tbButtons[1].iString = index;
-    index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Import Item");
+    index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Import Items");
     tbButtons[3].iString = index;
-    index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Remove Item");
+    index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Remove Items");
     tbButtons[4].iString = index;
     index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Edit Info");
     tbButtons[5].iString = index;
-    index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Add Item");
+    index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Add Items");
     tbButtons[7].iString = index;
-    index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Add File");
+    index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Add Files");
     tbButtons[8].iString = index;
     index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Move Up");
     tbButtons[9].iString = index;
@@ -954,7 +957,7 @@ void MusicBrowserUI::SetTitles(void)
        SetWindowText(m_hPlaylistTitle, 
                      "Currently listening to:");
        SetWindowText(m_hWnd, 
-                     BRANDING " - My Music");
+                     "My Music - " BRANDING);
     }   
     else
     {
@@ -973,7 +976,7 @@ void MusicBrowserUI::SetTitles(void)
        oTitle = string("Editing playlist: ") + oName;
        SetWindowText(m_hPlaylistTitle, 
                      oTitle.c_str());
-       oTitle = string(BRANDING " - Editing ") + oName;
+       oTitle = "Editing " + oName + " - " + BRANDING;
        SetWindowText(m_hWnd, oTitle.c_str());
     }   
 }
@@ -1461,6 +1464,9 @@ void MusicBrowserUI::UpdateButtonMenuStates()
     
     sMenuItem.fState = m_oPlm->GetShuffleMode() ? MFS_CHECKED:MFS_UNCHECKED;
     SetMenuItemInfo(hMenu, ID_CONTROLS_SHUFFLE, false, &sMenuItem);
+ 
+    sMenuItem.fState = m_oPlm->GetShuffleMode() ? MFS_UNCHECKED: MFS_CHECKED;
+    SetMenuItemInfo(hMenu, ID_CONTROLS_NORMALORDER, false, &sMenuItem);
 
 }
 

@@ -475,7 +475,9 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
 
         case CMD_AddFiles:
         {
-            AddFileEvent();
+            //SendMessage(m_hWnd, WM_COMMAND, ID_EDIT_ADDFILE, 0);
+            //AddFileEvent();
+            //MessageBox(NULL, "CMD_AddFiles", "Event", MB_OK);
             break;
         }
 

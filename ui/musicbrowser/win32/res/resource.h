@@ -105,6 +105,7 @@
 #define ID_VIEW_OPTIONS                 40059
 #define ID_EDIT_EDITPLAYLIST            40060
 #define ID_FILE_CLOSEPLAYLIST           40061
+#define ID_CONTROLS_NORMALORDER         40063
 #define IDS_URL                         65535
 
 // Next default values for new objects
@@ -112,7 +113,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        122
-#define _APS_NEXT_COMMAND_VALUE         40062
+#define _APS_NEXT_COMMAND_VALUE         40064
 #define _APS_NEXT_CONTROL_VALUE         1021
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

@@ -1254,6 +1254,8 @@ BOOL DownloadUI::Command(int32 command, HWND src)
                 m_dlm->AddItem(sp);
             
                 delete [] url;
+                
+                SetWindowText(hwndURL, "");
             }
 			break;
 		}

@@ -98,11 +98,6 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             oldAlign = SetTextAlign(dis->hDC, TA_CENTER | TA_TOP );
 
             UINT left = rcClip.left + (ListView_GetColumnWidth(hwndList, 0)/2);
-            RECT indexColumnRect;
-
-            GetClientRect(hwndList, &indexColumnRect);
-            indexColumnRect.top = rcClip.top;
-            indexColumnRect.right = indexColumnRect.left + ListView_GetColumnWidth(hwndList, 0);
             
             SetTextColor(dis->hDC, GetSysColor(COLOR_INFOTEXT));
             SetBkColor(dis->hDC, GetSysColor(COLOR_INFOBK ));
@@ -110,7 +105,7 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             ExtTextOut( dis->hDC, 
                         left, rcClip.top + 1,
                         ETO_CLIPPED | ETO_OPAQUE,
-                        &indexColumnRect, 
+                        &rcClip, 
                         displayString.c_str(),
                         displayString.size(),
                         NULL);
@@ -119,7 +114,7 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
 
             
             // Move over to the next column
-            rcClip.left += ListView_GetColumnWidth(hwndList, 0);
+            rcClip.left += ListView_GetColumnWidth(hwndList, 0) - 1;
 
             // Check to see if this item is selected
             if(dis->itemState & ODS_SELECTED && GetFocus() == hwndList)

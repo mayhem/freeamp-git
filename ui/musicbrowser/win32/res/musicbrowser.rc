@@ -29,9 +29,9 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 IDD_MUSICBROWSER DIALOGEX 0, 0, 480, 250
 STYLE DS_CENTER | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | 
     WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
-CAPTION "FreeAmp - My Music"
+CAPTION "My Music - FreeAmp"
 MENU IDR_MENU1
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Sans Serif"
 BEGIN
     CONTROL         "Tree1",IDC_MUSICTREE,"SysTreeView32",TVS_HASBUTTONS | 
                     TVS_HASLINES | TVS_LINESATROOT | TVS_SHOWSELALWAYS | 
@@ -160,13 +160,13 @@ BEGIN
     BEGIN
         MENUITEM "&New Playlist...",            ID_FILE_NEWPLAYLIST
         MENUITEM "&Open Playlist...",           ID_FILE_OPENPLAYLIST
-        MENUITEM "Save Playlist",               ID_FILE_SAVEPLAYLIST
+        MENUITEM "&Save Playlist",              ID_FILE_SAVEPLAYLIST
         MENUITEM "Save Playlist &As ...",       ID_FILE_SAVEASPLAYLIST
         MENUITEM SEPARATOR
         MENUITEM "&Import Tracks and Playlists...", ID_FILE_IMPORT
         MENUITEM "&Export Playlist...",         ID_FILE_EXPORTPLAYLIST
         MENUITEM SEPARATOR
-        MENUITEM "Search for &Music...",        ID_FILE_SEARCHFORMUSIC
+        MENUITEM "Search Computer for &Music...", ID_FILE_SEARCHFORMUSIC
         MENUITEM SEPARATOR
         MENUITEM "&Close",                      ID_FILE_CLOSEPLAYLIST
     END
@@ -184,22 +184,23 @@ BEGIN
     END
     POPUP "&View"
     BEGIN
-        MENUITEM "View &playlist only",         ID_VIEW_MUSICCATALOG
-        MENUITEM "Options...",                  ID_VIEW_OPTIONS
+        MENUITEM "View &Playlist Only",         ID_VIEW_MUSICCATALOG
+        MENUITEM "&Options...",                 ID_VIEW_OPTIONS
     END
     POPUP "&Controls"
     BEGIN
-        MENUITEM "Play",                        ID_CONTROLS_PLAYPAUSE
-        MENUITEM "Stop",                        ID_CONTROLS_STOP
+        MENUITEM "Play The CurrentTrack",       ID_CONTROLS_PLAYPAUSE
+        MENUITEM "Stop The Current Track",      ID_CONTROLS_STOP
         MENUITEM SEPARATOR
-        MENUITEM "Next Song",                   ID_CONTROLS_NEXTSONG
-        MENUITEM "Previous Song",               ID_CONTROLS_PREVIOUSSONG
+        MENUITEM "Move To Previous Track",      ID_CONTROLS_PREVIOUSSONG
+        MENUITEM "Move To Next Track",          ID_CONTROLS_NEXTSONG
         MENUITEM SEPARATOR
-        MENUITEM "Shuffle",                     ID_CONTROLS_SHUFFLE
+        MENUITEM "Play Tracks In Normal Order", ID_CONTROLS_NORMALORDER
+        MENUITEM "Play Tracks In Random Order", ID_CONTROLS_SHUFFLE
         MENUITEM SEPARATOR
-        MENUITEM "Repeat None",                 ID_CONTROLS_REPEATNONE
-        MENUITEM "Repeat One",                  ID_CONTROLS_REPEATONE
-        MENUITEM "Repeat All",                  ID_CONTROLS_REPEATALL
+        MENUITEM "Repeat No Tracks",            ID_CONTROLS_REPEATNONE
+        MENUITEM "Repeat Current Track",        ID_CONTROLS_REPEATONE
+        MENUITEM "Repeat All Tracks",           ID_CONTROLS_REPEATALL
     END
     POPUP "&Sort Playlist"
     BEGIN
@@ -266,7 +267,7 @@ BEGIN
     END
     POPUP "&View"
     BEGIN
-        MENUITEM "View &playlist only",         ID_VIEW_MUSICCATALOG
+        MENUITEM "View &Playlist Only",         ID_VIEW_MUSICCATALOG
         MENUITEM "Options...",                  ID_VIEW_OPTIONS
     END
     POPUP "&Controls"
