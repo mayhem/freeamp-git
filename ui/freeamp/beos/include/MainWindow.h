@@ -34,12 +34,13 @@ public:
                         MainWindow( BRect frame, const char* name );
     virtual             ~MainWindow();
     virtual bool        QuitRequested( void );
-    virtual void        WaitForQuit( void );
+    virtual void        WaitForQuit( BRect* windowRectOnExit );
 
 protected:
 
 private:
     Semaphore*          m_quitSem;
+    BRect               m_frame;
 };
 
 #endif // INCLUDED_BEOSMAINWINDOW_H

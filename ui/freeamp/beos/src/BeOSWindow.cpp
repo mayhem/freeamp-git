@@ -3,6 +3,7 @@
    FreeAmp - The Free MP3 Player
 
    Copyright (C) 1999 EMusic
+   Portions Copyright (C) 1999 Hiromasa Kato
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,7 +22,6 @@
    $Id$
 ____________________________________________________________________________*/ 
 
-#include <stdio.h>
 #define DEBUG 0
 
 #include <be/support/Debug.h>
@@ -41,7 +41,6 @@ BeOSWindow::BeOSWindow( Theme* pTheme, string& oName )
     m_canvasView( NULL )
 {
     CHECK_POINT_MSG( "BeOSWindow ctor" );
-    PRINT(( "i am %x\n", this ));
     if ( m_bIsVulcanMindMeldHost ) { PRINT(( "and i am the host\n" )); }
     m_pCanvas = new BeOSCanvas( this );
 }
@@ -81,7 +80,9 @@ BeOSWindow::VulcanMindMeld( Window* other )
     else
     {
         windowAlreadyRunning = true;
+        m_mainWindow->Lock();
         m_mainWindow->RemoveChild( m_mainWindow->ChildAt( 0 ) );
+        m_mainWindow->Unlock();
     }
 
     // make myself parent of the canvas
@@ -93,8 +94,7 @@ BeOSWindow::VulcanMindMeld( Window* other )
     m_mainWindow->AddChild( m_canvasView );
 
     GetCanvas()->GetBackgroundRect( rect );
-    other->GetWindowPosition( rect );
-    SetWindowPosition( rect );
+    m_mainWindow->ResizeTo( rect.x2 - rect.x1 - 1, rect.y2 - rect.y1 - 1 );
 
     if ( !windowAlreadyRunning )
     {
@@ -111,7 +111,7 @@ BeOSWindow::Run( Pos& oWindowPos )
 
     Rect rect;
     GetCanvas()->GetBackgroundRect( rect );
-    BRect brect( rect.x1, rect.y1, rect.x2, rect.y2 );
+    BRect brect( rect.x1, rect.y1, rect.x2 - 1, rect.y2 - 1 );
     brect.OffsetTo( oWindowPos.x, oWindowPos.y );
     m_mainWindow->Show();
     m_mainWindow->MoveTo( brect.left, brect.top );
@@ -122,7 +122,9 @@ BeOSWindow::Run( Pos& oWindowPos )
 
     Init();
 
-    m_mainWindow->WaitForQuit();
+    m_mainWindow->WaitForQuit( &brect );
+    oWindowPos.x = brect.left;
+    oWindowPos.y = brect.top;
 
     return kError_NoErr;
 }
@@ -217,6 +219,34 @@ BeOSWindow::Restore( void )
     return kError_NoErr;
 }
 
+#if 0
+bool
+BeOSWindow::LButtonDown( void )
+{
+    CHECK_POINT;
+    BPoint p;
+    uint32 buttons;
+
+    if ( !m_mainWindow ) return false;
+
+    m_mainWindow->Lock();
+    m_canvasView->GetMouse( &p, &buttons, false );
+    m_mainWindow->Unlock();
+
+    return ( buttons & B_PRIMARY_MOUSE_BUTTON );
+}
+
+Error
+BeOSWindow::GetDesktopSize( int& x, int& y )
+{
+    BScreen screen;
+    x = screen.Frame().IntegerWidth() + 1;
+    x = screen.Frame().IntegerHeight() + 1;
+
+    return kError_NoErr;
+}
+
+#endif
 bool  
 BeOSWindow::LButtonDown(void)
 {
@@ -240,6 +270,12 @@ BeOSWindow::GetDesktopSize(int32 &iX, int32 &iY)
 }
 
 void
+BeOSWindow::BringWindowToFront( void )
+{
+    m_mainWindow->Activate( true );
+}
+
+void
 BeOSWindow::HandleMouseLButtonDown( Pos& oPos )
 {
     Window::HandleMouseLButtonDown( oPos );
@@ -254,8 +290,7 @@ BeOSWindow::HandleMouseLButtonUp( Pos& oPos )
 Error
 BeOSWindow::SetMousePos( Pos& oMousePos )
 {
-    CHECK_POINT_MSG( "SetMousePos" );
-    assert( 0 );
+    CHECK_POINT_MSG( "SetMousePos NOT SUPPORTED!!" );
     return kError_NoErr;
 }
 
@@ -305,6 +340,12 @@ BeOSWindow::GetWindowPosition( Rect& oWindowRect )
     oWindowRect.y2 = int( frame.bottom );
 
     return kError_NoErr;
+}
+
+BWindow*
+BeOSWindow::GetBWindow( void )
+{
+    return m_mainWindow;
 }
 
 // vi: set ts=4:

@@ -52,6 +52,7 @@ public:
     virtual Error   Restore( void );
     virtual bool  LButtonDown(void);
 	virtual Error GetDesktopSize(int32 &iX, int32 &iY);
+    virtual void    BringWindowToFront( void );
 
     // These functions should be called from the OS dependent event
     // loop to handle mouse messages
@@ -64,6 +65,7 @@ public:
     virtual Error   SetWindowPosition( Rect& oWindowRect );
     virtual Error   GetWindowPosition( Rect& oWindowRect );
 
+    BWindow*        GetBWindow( void );
 protected:
 
 private:

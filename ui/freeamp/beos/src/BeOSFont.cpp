@@ -29,8 +29,9 @@ ____________________________________________________________________________*/
 #define CHECK_POINT CHECK_POINT_MSG("")
 #define CHECK_POINT_MSG(a) PRINT(( "File %s Line %d: %s\n", __FILE__, __LINE__, a ))
 
-BeOSFont::BeOSFont( string& oName, string& oFace, string& oDefault )
-:   Font( oName, oFace, oDefault )
+BeOSFont::BeOSFont( string& oName, string& oFace, string& oFile,
+                    string& oDefault )
+:   Font( oName, oFace, oFile, oDefault )
 {
     CHECK_POINT;
     PRINT(( "%s, %s, %s\n", oName.c_str(), oFace.c_str(), oDefault.c_str() ));

@@ -3,6 +3,7 @@
    FreeAmp - The Free MP3 Player
 
    Copyright (C) 1999 EMusic
+   Copyright (C) 1999 Hiromasa Kato
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -24,7 +25,11 @@ ____________________________________________________________________________*/
 #ifndef INCLUDED_BEOSPREFERENCEWINDOW_H__
 #define INCLUDED_BEOSPREFERENCEWINDOW_H__
 
+#define BEOSPREF 0
 #include "PreferenceWindow.h"
+
+class PrefWindow;
+class PrefView;
 
 class BeOSPreferenceWindow : public PreferenceWindow
 {
@@ -37,6 +42,8 @@ public:
 protected:
 
 private:
+    PrefWindow*     m_prefWindow;
+    PrefView*       m_prefView;
 };
 
 #endif // INCLUDED_BEOSPREFERENCEWINDOW_H__

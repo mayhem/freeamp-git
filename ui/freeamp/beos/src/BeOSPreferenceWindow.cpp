@@ -3,6 +3,7 @@
    FreeAmp - The Free MP3 Player
 
    Copyright (C) 1999 EMusic
+   Copyright (C) 1999 Hiromasa Kato
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,19 +23,52 @@
 ____________________________________________________________________________*/ 
 
 #include "BeOSPreferenceWindow.h"
+#include "BeOSWindow.h"
+#if BEOSPREF
+#include "PrefWindow.h"
+#include "PrefView.h"
+#endif
+
+#define DEBUG 1
+#if DEBUG
+#include <be/support/Debug.h>
+#define CHECK_POINT CHECK_POINT_MSG("")
+#define CHECK_POINT_MSG(a) PRINT(( "File:%s Line:%d :%s\n", __FILE__, __LINE__, a ))
+#else
+#define CHECK_POINT (void)
+#define CHECK_POINT_MSG(a) (void)
+#endif
 
 BeOSPreferenceWindow::BeOSPreferenceWindow( FAContext* context,
                                             ThemeManager* themeMan )
-:   PreferenceWindow( context, themeMan )
+:   PreferenceWindow( context, themeMan ),
+    m_prefWindow( NULL )
 {
 }
 
 BeOSPreferenceWindow::~BeOSPreferenceWindow()
 {
+    CHECK_POINT;
 }
 
 bool
 BeOSPreferenceWindow::Show( Window* parent )
 {
+#if BEOSPREF
+    if ( PrefWindow::IsRunning() ) return true;
+
+    if ( !m_prefWindow )
+    {
+        BRect r( 100, 100, 600, 500 );
+        m_prefWindow = new PrefWindow( r, "Preference" );
+        r.OffsetTo( B_ORIGIN );
+        m_prefView = new PrefView( m_pContext, m_pThemeMan,
+                                   r, "PrefView" );
+        m_prefWindow->AddChild( m_prefView );
+    }
+
+    m_prefWindow->Show();
+
+#endif
     return true;
 }

@@ -114,6 +114,7 @@ BeOSBitmap::LoadBitmapFromDisk( string& oFile )
         CHECK_POINT_MSG( "error loading bitmap" );
         return kError_LoadBitmapFailed;
     }
+    PRINT(( "Bitmap's colorspace is %x\n", loadedBitmap->ColorSpace() ));
 
     if ( m_hasOffscreenView )
     {
@@ -170,6 +171,7 @@ BeOSBitmap::MaskBlitRect( Bitmap* pSrcBitmap, Rect& oSrcRect, Rect& oDestRect )
 {
     BBitmap* srcBitmap = ((BeOSBitmap*)pSrcBitmap)->GetBBitmap();
 
+    PRINT(( "src cmap(%s,%x) %x, dst cmap %x\n", m_oBitmapName.c_str(), pSrcBitmap, srcBitmap->ColorSpace(), m_bitmap->ColorSpace() ));
     assert( m_bitmap );
     assert( m_bitmap->ColorSpace() == srcBitmap->ColorSpace() );
 

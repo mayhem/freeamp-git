@@ -33,7 +33,8 @@ using namespace std;
 class BeOSFont : public Font
 {
 public:
-                    BeOSFont( string& oName, string& oFace, string& oDefault );
+                    BeOSFont( string& oName, string& oFace, string& oFile,
+                              string& oDefault );
     virtual         ~BeOSFont();
     BFont*          GetBFont( void ) { return &m_font; }
 

@@ -43,12 +43,15 @@ MainWindow::~MainWindow()
 bool
 MainWindow::QuitRequested( void )
 {
+    m_frame = Frame();
     m_quitSem->Signal();
     return true;
 }
 
 void
-MainWindow::WaitForQuit( void )
+MainWindow::WaitForQuit( BRect* windowRectOnExit )
 {
     m_quitSem->Wait();
+
+    *windowRectOnExit = m_frame;
 }
