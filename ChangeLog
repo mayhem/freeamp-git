@@ -1,3 +1,187 @@
+2000-10-06 04:45  ijr
+
+	* base/include/help.h,
+	ui/freeamp/win32/src/Win32PreferenceWindow.cpp:
+
+	- link the help button on the musicbrowser page to the proper help file html
+	
+2000-10-06 04:21  ijr
+
+	* help/unix/: freeamphelp.tar.gz, relatablehelp.tar.gz:
+
+	- updated help files for rc2
+	
+2000-10-06 04:14  ijr
+
+	* base/src/musiccatalog.cpp:
+
+	- blah
+	
+2000-10-06 03:48  robert
+
+	* lmc/: vorbis/src/vorbislmc.cpp, vorbis/src/lib/vorbisfile.c,
+	xingmp3/src/xinglmc.cpp:
+
+	Changed things so the player won't stop on a corrupted track, and
+	also prevent vorbis messages to be sent to the client during sigging.
+	
+2000-10-06 02:49  ijr
+
+	* ui/musicbrowser/win32/src/Event.cpp:
+
+	- and the 75% stuff works on 'doze.  I'm done =)
+	
+2000-10-06 02:16  ijr
+
+	* CHANGES, base/aps/apsinterface.cpp, base/include/musiccatalog.h,
+	base/src/musiccatalog.cpp, base/src/player.cpp,
+	lmc/xingmp3/src/sigapp.c,
+	ui/musicbrowser/unix/src/gtkmusicbrowser.cpp,
+	ui/musicbrowser/win32/src/Event.cpp,
+	ui/musicbrowser/win32/src/Win32MusicBrowser.cpp:
+
+	- should be just about my final commit for RC2
+	
+2000-10-05 13:14  ijr
+
+	* base/src/registrar.cpp, base/src/registry.cpp,
+	io/local/localfileinput.cpp, lmc/xingmp3/src/xinglmc.cpp:
+
+	- this should fix the seg on exit on linux
+	
+2000-10-05 10:03  robert
+
+	* lmc/xingmp3/src/xinglmc.cpp:
+
+	Attempting to fix the stream deadlock issue
+	
+2000-10-05 05:29  ijr
+
+	* ui/: freeamp/win32/res/freeampui.rc,
+	freeamp/win32/res/resource.h,
+	freeamp/win32/src/Win32PreferenceWindow.cpp,
+	musicbrowser/win32/include/Win32MusicBrowser.h,
+	musicbrowser/win32/res/musicbrowser.rc,
+	musicbrowser/win32/res/resource.h,
+	musicbrowser/win32/src/Dialog.cpp,
+	musicbrowser/win32/src/Event.cpp:
+
+	- tip popup on win32
+	- mirror all the Relatable menu updates to win32 (ie., about menu, learn
+	  disabled by default, link to options dialog on menu..)
+	- add relatable button to About pane.
+	
+2000-10-05 04:47  ijr
+
+	* AUTHORS, Makefile.in, base/include/player.h,
+	base/include/preferences.h, base/src/player.cpp,
+	base/src/preferences.cpp, io/http/httpinput.cpp,
+	io/http/httpinput.h, io/include/pmi.h, io/local/localfileinput.cpp,
+	io/local/localfileinput.h, io/obs/obsinput.cpp, io/obs/obsinput.h,
+	ui/freeamp/unix/src/GTKBitmap.cpp, ui/freeamp/unix/src/ttfont.cpp,
+	ui/musicbrowser/unix/include/gtkmusicbrowser.h,
+	ui/musicbrowser/unix/src/browsermenu.cpp,
+	ui/musicbrowser/unix/src/browsertree.cpp,
+	ui/musicbrowser/unix/src/gtkmusicbrowser.cpp:
+
+	- buncha little changes.
+	
+2000-10-05 02:07  robert
+
+	* ui/freeamp/src/TextControl.cpp:
+
+	Keep the stupid time indicator from marqeeing
+	
+2000-10-04 17:44  ijr
+
+	* Makefile.in, base/src/musiccatalog.cpp:
+
+	- mem leak closure
+	
+2000-10-04 17:08  robert
+
+	* io/src/tstream.cpp:
+
+	More title streaming fuss
+	
+2000-10-04 15:49  ijr
+
+	* configure.in, base/include/utility.h, base/src/utility.cpp,
+	ui/musicbrowser/unix/include/gtkmusicbrowser.h,
+	ui/musicbrowser/unix/src/browserlist.cpp,
+	ui/musicbrowser/unix/src/browsermenu.cpp,
+	ui/musicbrowser/unix/src/gtkmusicbrowser.cpp:
+
+	- linux tipper thingie
+	
+2000-10-04 13:03  ijr
+
+	* base/include/help.h, plm/metadata/id3v2/id3v2.cpp,
+	ui/freeamp/win32/res/freeampui.rc,
+	ui/freeamp/win32/src/Win32PreferenceWindow.cpp:
+
+	- fix the id3v2 stuff
+	- fix bugs #1009 and #1039 (minor options dialog changes)
+	
+2000-10-04 05:29  ijr
+
+	* Makefile.header.in:
+
+	- move OSINC to the end of the Includes line
+	
+2000-10-04 05:18  ijr
+
+	* ui/musicbrowser/: unix/src/browsertree.cpp, win32/src/Event.cpp:
+
+	- fix a freebsd issue, update some text on a dialog
+	
+2000-10-03 03:32  robert
+
+	* lmc/xingmp3/src/sigmain.cpp:
+
+	Added a -n (no submit metadata) flag to sigapp
+	
+2000-10-02 16:53  robert
+
+	* CHANGES:
+
+	Changed from beta 10 to rc1
+	
+2000-10-02 15:40  ijr
+
+	* plm/metadata/id3v2/id3v2.cpp:
+
+	- this should hopefully fix the id3v2 stuff
+	
+2000-10-02 12:11  robert
+
+	* configure, configure.in, installer/unix/linux/freeamp-rh6x.spec:
+
+	Tweaking autoconf to be happy
+	
+2000-10-02 10:28  robert
+
+	* configure, configure.in, installer/unix/linux/freeamp-rh6x.spec:
+
+	The orb/orbit.h check was being done twice...
+	
+2000-10-02 09:16  sward
+
+	* config/config.win32, help/win32/freeampwin32help.zip,
+	help/win32/help.zip, help/win32/relatablewin32help.zip,
+	lib/musicbrainz/musicbrainz.dll, lib/musicbrainz/musicbrainz.lib,
+	lib/musicbrainz/musicbrainz/mb_c.h,
+	lib/musicbrainz/musicbrainz/queries.h,
+	plm/metadata/id3v2/id3v2.cpp:
+
+	Updated win32 help files, and fixed id3v2 stuff for windows.
+	
+2000-10-02 06:56  ijr
+
+	* ChangeLog:
+
+	- a ChangeLog, an actual ChangeLog
+	
 2000-10-02 06:47  ijr
 
 	* configure, configure.in:
@@ -4320,24 +4504,11 @@
 	base/src/musiccatalog.cpp, base/src/thread.cpp, base/src/timer.cpp,
 	base/unix/include/mutex.h, base/unix/include/pthreadthread.h,
 	base/unix/include/semaphore.h, base/unix/include/utility.h,
-	base/unix/linux/include/linuxthread.h,
-	base/unix/linux/include/mutex.h,
-	base/unix/linux/include/semaphore.h,
-	base/unix/linux/include/utility.h, base/unix/linux/src/debug.cpp,
-	base/unix/linux/src/linuxthread.cpp, base/unix/linux/src/mem.c,
-	base/unix/linux/src/mutex.cpp, base/unix/linux/src/semaphore.cpp,
-	base/unix/linux/src/utility.cpp, base/unix/solaris/include/mutex.h,
-	base/unix/solaris/include/semaphore.h,
-	base/unix/solaris/include/solaristhread.h,
-	base/unix/solaris/include/utility.h,
-	base/unix/solaris/src/debug.cpp, base/unix/solaris/src/mutex.cpp,
-	base/unix/solaris/src/semaphore.cpp,
-	base/unix/solaris/src/solaristhread.cpp,
-	base/unix/solaris/src/utility.cpp, base/unix/src/bootstrap.cpp,
-	base/unix/src/debug.cpp, base/unix/src/mutex.cpp,
-	base/unix/src/pthreadthread.cpp, base/unix/src/semaphore.cpp,
-	base/unix/src/utility.cpp, base/unix/src/win32impl.cpp,
-	config/config.h.in, io/cd/unix/src/cdpmo.cpp,
+	base/unix/src/bootstrap.cpp, base/unix/src/debug.cpp,
+	base/unix/src/mutex.cpp, base/unix/src/pthreadthread.cpp,
+	base/unix/src/semaphore.cpp, base/unix/src/utility.cpp,
+	base/unix/src/win32impl.cpp, config/config.h.in,
+	io/cd/unix/src/cdpmo.cpp,
 	io/soundcard/unix/solaris/src/soundcardpmo.cpp,
 	io/src/pullbuffer.cpp, lib/gdbm/gdbmopen.c,
 	plm/metadata/cddb/cddb.h, ui/irman/include/ir.h:
@@ -4402,11 +4573,9 @@
 
 	Added the icecast directory parsing stuff
 	
-2000-05-01 08:20  robert
+2000-05-01 08:21  robert
 
-	* base/: unix/linux/include/semaphore.h,
-	unix/linux/src/semaphore.cpp, win32/include/semaphore.h,
-	win32/src/semaphore.cpp:
+	* base/win32/: include/semaphore.h, src/semaphore.cpp:
 
 	Added changes for a ms argument to Wait(). Wait() now returns bool if the
 	lock was acquired, false if it timed out.
@@ -5682,54 +5851,6 @@
 
 	* check for total==0
 	
-2000-03-01 14:59  robert
-
-	* netscape/win32/src/freeamp.bmp:
-
-	file freeamp.bmp was initially added on branch release-2-0-5-devel.
-	
-2000-03-01 14:59  robert
-
-	* netscape/win32/src/resource.h:
-
-	file resource.h was initially added on branch release-2-0-5-devel.
-	
-2000-03-01 14:59  robert
-
-	* netscape/win32/src/npfreeamp.c:
-
-	file npfreeamp.c was initially added on branch release-2-0-5-devel.
-	
-2000-03-01 14:59  robert
-
-	* netscape/win32/prj/netscape.dsp:
-
-	file netscape.dsp was initially added on branch release-2-0-5-devel.
-	
-2000-03-01 14:59  robert
-
-	* netscape/win32/src/npfreeamp.rc:
-
-	file npfreeamp.rc was initially added on branch release-2-0-5-devel.
-	
-2000-03-01 14:59  robert
-
-	* netscape/win32/prj/netscape.mak:
-
-	file netscape.mak was initially added on branch release-2-0-5-devel.
-	
-2000-03-01 14:59  robert
-
-	* netscape/win32/src/emusic.bmp:
-
-	file emusic.bmp was initially added on branch release-2-0-5-devel.
-	
-2000-03-01 14:59  robert
-
-	* netscape/win32/src/npfreeamp.def:
-
-	file npfreeamp.def was initially added on branch release-2-0-5-devel.
-	
 2000-03-01 12:08  hiro
 
 	* ui/freeamp/beos/src/ThemeManager.cpp:
@@ -5862,8 +5983,7 @@
 	base/include/preferences.h, base/include/utility.h,
 	base/src/musiccatalog.cpp, base/src/player.cpp,
 	base/src/playlist.cpp, base/src/preferences.cpp,
-	base/src/utility.cpp, base/unix/linux/include/semaphore.h,
-	base/unix/linux/src/semaphore.cpp, base/unix/src/bootstrap.cpp,
+	base/src/utility.cpp, base/unix/src/bootstrap.cpp,
 	base/win32/prj/fabaselib.mak, base/win32/prj/freeamp.mak,
 	base/win32/res/freeamp.rc, base/win32/src/main.cpp,
 	base/win32/src/win32updatemanager.cpp, config/config.h.in,
@@ -6170,8 +6290,7 @@
 	
 2000-02-16 17:03  ijr
 
-	* configure, configure.in, base/unix/linux/include/mutex.h,
-	base/unix/linux/src/mutex.cpp, base/unix/src/bootstrap.cpp:
+	* configure, configure.in, base/unix/src/bootstrap.cpp:
 
 	- better mutex debugging stuff
 	
@@ -6229,11 +6348,9 @@
 2000-02-15 18:20  ijr
 
 	* configure, configure.in, base/include/queue.h,
-	base/src/database.cpp, base/src/player.cpp,
-	base/unix/linux/include/mutex.h,
-	base/unix/linux/src/linuxthread.cpp, base/unix/linux/src/mutex.cpp,
-	config/config.h.in, ui/freeamp/include/Control.h,
-	ui/freeamp/include/Window.h, ui/freeamp/unix/include/ttfont.h,
+	base/src/database.cpp, base/src/player.cpp, config/config.h.in,
+	ui/freeamp/include/Control.h, ui/freeamp/include/Window.h,
+	ui/freeamp/unix/include/ttfont.h,
 	ui/freeamp/unix/src/GTKUtility.cpp, ui/freeamp/unix/src/ttfont.cpp,
 	ui/lcd/src/lcdui.cpp:
 
@@ -11646,19 +11763,7 @@
 	Rainplay.mak, Rainplay.rc, RainplayDlg.cpp, RainplayDlg.h,
 	RainplayUI.cpp, RainplayUI.h, Rainplaylib.cpp, ReadMe.txt,
 	StdAfx.cpp, StdAfx.h, VisualView.cpp, active.cpp, active.h,
-	cthread.h, resource.h, Equalizer/EQDlg.cpp, Equalizer/EQDlg.h,
-	PlayList/PlayListDlg.cpp, PlayList/PlayListDlg.h,
-	Preferences/PreferencesDlg.cpp, Preferences/optionsetupdlg.cpp,
-	Preferences/optionsetupdlg.h, Preferences/preferencesdlg.h,
-	VisualView/VisualView.cpp, VisualView/VisualView.h,
-	VisualView/fft/Complex.h, VisualView/fft/Fft.cpp,
-	VisualView/fft/Fft.h, res/About.bmp, res/MainUp.bmp,
-	res/Maindown.bmp, res/Rainplay.ico, res/Rainplay.rc2,
-	skins/FusionDigideck/MainDown.bmp, skins/FusionDigideck/MainUp.bmp,
-	skins/FusionDigideck/Skin.ini, skins/Zdeck LCD/Fonts.zip,
-	skins/Zdeck LCD/Skin.ini, skins/Zdeck LCD/maindown.bmp, skins/Zdeck
-	LCD/mainup.bmp, skins/visions/MainUp.bmp,
-	skins/visions/Maindown.bmp, skins/visions/SKIN.INI:
+	cthread.h, resource.h:
 
 	* Removed Rainplay UI since it is no longer supported.
 	
@@ -12335,23 +12440,10 @@
 	base/src/registrar.cpp, base/src/registry.cpp, base/src/thread.cpp,
 	base/src/updatemanager.cpp, base/src/utility.cpp,
 	base/unix/include/unixprefs.h, base/unix/include/win32impl.h,
-	base/unix/linux/include/linuxthread.h,
-	base/unix/linux/include/mutex.h,
-	base/unix/linux/include/semaphore.h,
-	base/unix/linux/include/utility.h, base/unix/linux/src/debug.cpp,
-	base/unix/linux/src/linuxthread.cpp, base/unix/linux/src/mutex.cpp,
-	base/unix/linux/src/semaphore.cpp, base/unix/linux/src/utility.cpp,
-	base/unix/solaris/include/mutex.h,
-	base/unix/solaris/include/semaphore.h,
-	base/unix/solaris/include/solaristhread.h,
-	base/unix/solaris/include/utility.h,
-	base/unix/solaris/src/debug.cpp, base/unix/solaris/src/mutex.cpp,
-	base/unix/solaris/src/semaphore.cpp,
-	base/unix/solaris/src/solaristhread.cpp,
-	base/unix/solaris/src/utility.cpp, base/unix/src/bootstrap.cpp,
-	base/unix/src/unixprefs.cpp, base/unix/src/win32impl.cpp,
-	base/win32/include/mutex.h, base/win32/include/semaphore.h,
-	base/win32/include/win32prefs.h, base/win32/include/win32thread.h,
+	base/unix/src/bootstrap.cpp, base/unix/src/unixprefs.cpp,
+	base/unix/src/win32impl.cpp, base/win32/include/mutex.h,
+	base/win32/include/semaphore.h, base/win32/include/win32prefs.h,
+	base/win32/include/win32thread.h,
 	base/win32/include/win32updatemanager.h,
 	base/win32/prj/freeamp.dsp, base/win32/prj/freeamp.dsw,
 	base/win32/prj/freeamp.mak, base/win32/res/freeamp.rc,
@@ -12398,9 +12490,7 @@
 	io/obs/obsinput.h, io/obs/win32/prj/obsinput.mak,
 	io/obs/win32/res/obs.rc, io/rio/RIO CODE HAS MOVED.txt,
 	io/rio/app.cpp, io/rio/playlist.txt, io/rio/readme.txt,
-	io/rio/rio.cpp, io/rio/rio.txt, io/rio/win32/makefile,
-	io/rio/win32/portio.c, io/rio/win32/sources,
-	io/rio/win32/i386/free/portio.sys,
+	io/rio/rio.cpp, io/rio/rio.txt,
 	io/soundcard/beos/include/soundcardpmo.h,
 	io/soundcard/beos/include/soundutils.h,
 	io/soundcard/beos/src/soundcardpmo.cpp,
@@ -12443,42 +12533,41 @@
 	lib/zlib/src/inftrees.c, lib/zlib/src/infutil.c,
 	lib/zlib/src/trees.c, lib/zlib/src/uncompr.c, lib/zlib/src/zutil.c,
 	lmc/include/lmc.h, lmc/include/lmcregistry.h,
-	lmc/src/lmcregistry.cpp, lmc/xingmp3/include/L3.h,
-	lmc/xingmp3/include/htable.h, lmc/xingmp3/include/itype.h,
-	lmc/xingmp3/include/jdw.h, lmc/xingmp3/include/mhead.h,
-	lmc/xingmp3/include/port.h, lmc/xingmp3/include/tableawd.h,
-	lmc/xingmp3/include/xinglmc.h, lmc/xingmp3/src/cdct.c,
-	lmc/xingmp3/src/csbt.c, lmc/xingmp3/src/csbtL3.c,
-	lmc/xingmp3/src/csbtb.c, lmc/xingmp3/src/cup.c,
-	lmc/xingmp3/src/cupL1.c, lmc/xingmp3/src/cupini.c,
-	lmc/xingmp3/src/cupl3.c, lmc/xingmp3/src/cwin.c,
-	lmc/xingmp3/src/cwinb.c, lmc/xingmp3/src/cwinm.c,
-	lmc/xingmp3/src/dec8.c, lmc/xingmp3/src/hwin.c,
-	lmc/xingmp3/src/icdct.c, lmc/xingmp3/src/isbt.c,
-	lmc/xingmp3/src/isbtb.c, lmc/xingmp3/src/iup.c,
-	lmc/xingmp3/src/iupL1.c, lmc/xingmp3/src/iupini.c,
-	lmc/xingmp3/src/iwinQ.c, lmc/xingmp3/src/iwinbQ.c,
-	lmc/xingmp3/src/iwinm.c, lmc/xingmp3/src/l3dq.c,
-	lmc/xingmp3/src/l3init.c, lmc/xingmp3/src/mdct.c,
-	lmc/xingmp3/src/mhead.c, lmc/xingmp3/src/msis.c,
-	lmc/xingmp3/src/towave.c, lmc/xingmp3/src/uph.c,
-	lmc/xingmp3/src/upsf.c, lmc/xingmp3/src/wavep.c,
-	lmc/xingmp3/src/wcvt.c, lmc/xingmp3/src/xinglmc.cpp,
-	lmc/xingmp3/win32/prj/xing.mak, lmc/xingmp3/win32/res/xing.rc,
-	plm/metadata/id3v1/id3v1.cpp, plm/metadata/id3v1/id3v1.h,
-	plm/metadata/id3v1/prj/id3v1.def, plm/metadata/id3v1/prj/id3v1.dsp,
-	plm/metadata/id3v1/prj/id3v1.dsw, plm/metadata/id3v1/prj/id3v1.mak,
-	plm/metadata/id3v1/res/id3v1.rc, plm/metadata/id3v1/res/resource.h,
-	plm/metadata/id3v2/id3v2.cpp, plm/metadata/id3v2/id3v2.h,
-	plm/metadata/id3v2/prj/id3v2.def, plm/metadata/id3v2/prj/id3v2.dsp,
-	plm/metadata/id3v2/prj/id3v2.dsw, plm/metadata/id3v2/prj/id3v2.mak,
-	plm/metadata/id3v2/res/id3v2.rc, plm/metadata/id3v2/res/resource.h,
-	plm/playlist/m3u/m3u.cpp, plm/playlist/m3u/m3u.h,
-	plm/playlist/m3u/prj/m3u.def, plm/playlist/m3u/prj/m3u.dsp,
-	plm/playlist/m3u/prj/m3u.dsw, plm/playlist/m3u/prj/m3u.mak,
-	plm/playlist/m3u/res/m3u.rc, plm/playlist/m3u/res/resource.h,
-	plm/portable/pmp300/pmp300.cpp, plm/portable/pmp300/pmp300.h,
-	plm/portable/pmp300/prj/pmp300.def,
+	lmc/xingmp3/include/L3.h, lmc/xingmp3/include/htable.h,
+	lmc/xingmp3/include/itype.h, lmc/xingmp3/include/jdw.h,
+	lmc/xingmp3/include/mhead.h, lmc/xingmp3/include/port.h,
+	lmc/xingmp3/include/tableawd.h, lmc/xingmp3/include/xinglmc.h,
+	lmc/xingmp3/src/cdct.c, lmc/xingmp3/src/csbt.c,
+	lmc/xingmp3/src/csbtL3.c, lmc/xingmp3/src/csbtb.c,
+	lmc/xingmp3/src/cup.c, lmc/xingmp3/src/cupL1.c,
+	lmc/xingmp3/src/cupini.c, lmc/xingmp3/src/cupl3.c,
+	lmc/xingmp3/src/cwin.c, lmc/xingmp3/src/cwinb.c,
+	lmc/xingmp3/src/cwinm.c, lmc/xingmp3/src/dec8.c,
+	lmc/xingmp3/src/hwin.c, lmc/xingmp3/src/icdct.c,
+	lmc/xingmp3/src/isbt.c, lmc/xingmp3/src/isbtb.c,
+	lmc/xingmp3/src/iup.c, lmc/xingmp3/src/iupL1.c,
+	lmc/xingmp3/src/iupini.c, lmc/xingmp3/src/iwinQ.c,
+	lmc/xingmp3/src/iwinbQ.c, lmc/xingmp3/src/iwinm.c,
+	lmc/xingmp3/src/l3dq.c, lmc/xingmp3/src/l3init.c,
+	lmc/xingmp3/src/mdct.c, lmc/xingmp3/src/mhead.c,
+	lmc/xingmp3/src/msis.c, lmc/xingmp3/src/towave.c,
+	lmc/xingmp3/src/uph.c, lmc/xingmp3/src/upsf.c,
+	lmc/xingmp3/src/wavep.c, lmc/xingmp3/src/wcvt.c,
+	lmc/xingmp3/src/xinglmc.cpp, lmc/xingmp3/win32/prj/xing.mak,
+	lmc/xingmp3/win32/res/xing.rc, plm/metadata/id3v1/id3v1.cpp,
+	plm/metadata/id3v1/id3v1.h, plm/metadata/id3v1/prj/id3v1.def,
+	plm/metadata/id3v1/prj/id3v1.dsp, plm/metadata/id3v1/prj/id3v1.dsw,
+	plm/metadata/id3v1/prj/id3v1.mak, plm/metadata/id3v1/res/id3v1.rc,
+	plm/metadata/id3v1/res/resource.h, plm/metadata/id3v2/id3v2.cpp,
+	plm/metadata/id3v2/id3v2.h, plm/metadata/id3v2/prj/id3v2.def,
+	plm/metadata/id3v2/prj/id3v2.dsp, plm/metadata/id3v2/prj/id3v2.dsw,
+	plm/metadata/id3v2/prj/id3v2.mak, plm/metadata/id3v2/res/id3v2.rc,
+	plm/metadata/id3v2/res/resource.h, plm/playlist/m3u/m3u.cpp,
+	plm/playlist/m3u/m3u.h, plm/playlist/m3u/prj/m3u.def,
+	plm/playlist/m3u/prj/m3u.dsp, plm/playlist/m3u/prj/m3u.dsw,
+	plm/playlist/m3u/prj/m3u.mak, plm/playlist/m3u/res/m3u.rc,
+	plm/playlist/m3u/res/resource.h, plm/portable/pmp300/pmp300.cpp,
+	plm/portable/pmp300/pmp300.h, plm/portable/pmp300/prj/pmp300.def,
 	plm/portable/pmp300/prj/pmp300.dsp,
 	plm/portable/pmp300/prj/pmp300.dsw,
 	plm/portable/pmp300/prj/pmp300.mak,
@@ -12558,60 +12647,6 @@
 	ui/freeamp/unix/include/freeamp-x11.h,
 	ui/freeamp/unix/include/graphics.h,
 	ui/freeamp/unix/include/windowhash.h,
-	ui/freeamp/unix/res/all_icon.xpm,
-	ui/freeamp/unix/res/all_icon256.xpm,
-	ui/freeamp/unix/res/big_font.xpm,
-	ui/freeamp/unix/res/big_font256.xpm,
-	ui/freeamp/unix/res/close_buttons.xpm,
-	ui/freeamp/unix/res/close_buttons256.xpm,
-	ui/freeamp/unix/res/dials.xpm, ui/freeamp/unix/res/dials256.xpm,
-	ui/freeamp/unix/res/foo.xpm, ui/freeamp/unix/res/full.xpm,
-	ui/freeamp/unix/res/last_buttons.xpm,
-	ui/freeamp/unix/res/last_buttons256.xpm,
-	ui/freeamp/unix/res/lcd.xpm, ui/freeamp/unix/res/lcd256.xpm,
-	ui/freeamp/unix/res/lcd_display.xpm,
-	ui/freeamp/unix/res/lcd_display256.xpm,
-	ui/freeamp/unix/res/lcd_display_mask.xbm,
-	ui/freeamp/unix/res/lcd_icons_mask.xbm,
-	ui/freeamp/unix/res/lcd_upper_frame.xpm,
-	ui/freeamp/unix/res/lcd_upper_frame256.xpm,
-	ui/freeamp/unix/res/lcd_upper_frame_mask.xbm,
-	ui/freeamp/unix/res/leftside.xpm,
-	ui/freeamp/unix/res/leftside256.xpm, ui/freeamp/unix/res/logo.xpm,
-	ui/freeamp/unix/res/logo256.xpm,
-	ui/freeamp/unix/res/major_button_mask.xbm,
-	ui/freeamp/unix/res/minimize_buttons.xpm,
-	ui/freeamp/unix/res/minimize_buttons256.xpm,
-	ui/freeamp/unix/res/minor_button_mask.xbm,
-	ui/freeamp/unix/res/mode_buttons.xpm,
-	ui/freeamp/unix/res/mode_buttons256.xpm,
-	ui/freeamp/unix/res/next_buttons.xpm,
-	ui/freeamp/unix/res/next_buttons256.xpm,
-	ui/freeamp/unix/res/open_buttons.xpm,
-	ui/freeamp/unix/res/open_buttons256.xpm,
-	ui/freeamp/unix/res/pause_buttons.xpm,
-	ui/freeamp/unix/res/pause_buttons256.xpm,
-	ui/freeamp/unix/res/play_buttons.xpm,
-	ui/freeamp/unix/res/play_buttons256.xpm,
-	ui/freeamp/unix/res/player_full_mask.xbm,
-	ui/freeamp/unix/res/playlist_drawer.xpm,
-	ui/freeamp/unix/res/playlist_drawer256.xpm,
-	ui/freeamp/unix/res/playlist_drawer_mask.xbm,
-	ui/freeamp/unix/res/repeat_buttons.xpm,
-	ui/freeamp/unix/res/repeat_buttons256.xpm,
-	ui/freeamp/unix/res/repeat_icon.xpm,
-	ui/freeamp/unix/res/repeat_icon256.xpm,
-	ui/freeamp/unix/res/rightside.xpm,
-	ui/freeamp/unix/res/rightside256.xpm,
-	ui/freeamp/unix/res/shuffle_buttons.xpm,
-	ui/freeamp/unix/res/shuffle_buttons256.xpm,
-	ui/freeamp/unix/res/shuffled_icon.xpm,
-	ui/freeamp/unix/res/shuffled_icon256.xpm,
-	ui/freeamp/unix/res/small_font.xpm,
-	ui/freeamp/unix/res/small_font256.xpm,
-	ui/freeamp/unix/res/stop_buttons.xpm,
-	ui/freeamp/unix/res/stop_buttons256.xpm,
-	ui/freeamp/unix/res/strip_static.pl,
 	ui/freeamp/unix/src/GTKBitmap.cpp,
 	ui/freeamp/unix/src/GTKCanvas.cpp, ui/freeamp/unix/src/GTKFont.cpp,
 	ui/freeamp/unix/src/GTKMessageDialog.cpp,
@@ -12735,11 +12770,10 @@
 	ui/freeamp/win32/src/textview.cpp,
 	ui/freeamp/win32/src/timeview.cpp,
 	ui/freeamp/win32/src/utility.cpp, ui/freeamp/win32/src/view.cpp,
-	ui/freeamp/win32/src/volumeview.cpp, ui/gtk/freeamp-gtk.cpp,
-	ui/gtk/freeamp-gtk.h, ui/include/ui.h, ui/include/uiregistry.h,
-	ui/irman/include/irmanui.h, ui/irman/src/irmanui.cpp,
-	ui/lcd/include/lcdui.h, ui/lcd/src/lcdui.cpp,
-	ui/mpg123/Mpg123UI.cpp, ui/mpg123/Mpg123UI.h,
+	ui/freeamp/win32/src/volumeview.cpp, ui/include/ui.h,
+	ui/include/uiregistry.h, ui/irman/include/irmanui.h,
+	ui/irman/src/irmanui.cpp, ui/lcd/include/lcdui.h,
+	ui/lcd/src/lcdui.cpp, ui/mpg123/Mpg123UI.cpp, ui/mpg123/Mpg123UI.h,
 	ui/musicbrowser/src/musicbrowser.cpp,
 	ui/musicbrowser/unix/include/browsermenu.h,
 	ui/musicbrowser/unix/include/fileselector.h,
@@ -12765,18 +12799,16 @@
 	ui/rainplay/PlayListDlg.cpp, ui/rainplay/Rainplay.dsp,
 	ui/rainplay/Rainplay.mak, ui/rainplay/Rainplay.rc,
 	ui/rainplay/RainplayDlg.cpp, ui/rainplay/RainplayUI.cpp,
-	ui/rainplay/RainplayUI.h, ui/rainplay/PlayList/PlayListDlg.cpp,
-	ui/rainplay/Preferences/optionsetupdlg.cpp,
-	ui/simple/src/simplelib.cpp, ui/simple/win32/include/about.h,
+	ui/rainplay/RainplayUI.h, ui/simple/win32/include/about.h,
 	ui/simple/win32/include/prefdialog.h,
 	ui/simple/win32/include/simpleui.h, ui/simple/win32/prj/simple.dsp,
 	ui/simple/win32/prj/simple.mak, ui/simple/win32/res/simple.rc,
 	ui/simple/win32/src/about.cpp, ui/simple/win32/src/main.cpp,
 	ui/simple/win32/src/prefdialog.cpp,
-	ui/simple/win32/src/simpleui.cpp, ui/src/uiregistry.cpp,
-	ui/toolbar/win32/Toolbar.cpp, ui/toolbar/win32/Toolbar.h,
-	ui/toolbar/win32/icon1.ico, ui/toolbar/win32/resource.h,
-	ui/toolbar/win32/toolbar.rc, ui/toolbar/win32/include/Toolbar.h,
+	ui/simple/win32/src/simpleui.cpp, ui/toolbar/win32/Toolbar.cpp,
+	ui/toolbar/win32/Toolbar.h, ui/toolbar/win32/icon1.ico,
+	ui/toolbar/win32/resource.h, ui/toolbar/win32/toolbar.rc,
+	ui/toolbar/win32/include/Toolbar.h,
 	ui/toolbar/win32/prj/toolbar.def, ui/toolbar/win32/prj/toolbar.dsp,
 	ui/toolbar/win32/prj/toolbar.mak, ui/toolbar/win32/src/Toolbar.cpp,
 	update/win32/main.cpp, update/win32/prj/update.dsp,
@@ -14594,6 +14626,12 @@
 	
 1999-08-06 01:31  hiro
 
+	* ui/freeamp/beos/include/playerview.h:
+
+	file playerview.h was initially added on branch beos-branch-2.
+	
+1999-08-06 01:31  hiro
+
 	* ui/freeamp/beos/include/resourceutils.h:
 
 	file resourceutils.h was initially added on branch beos-branch-2.
@@ -14606,15 +14644,9 @@
 	
 1999-08-06 01:31  hiro
 
-	* ui/freeamp/beos/res/stop_glow.png:
+	* ui/freeamp/beos/include/tristatebutton.h:
 
-	file stop_glow.png was initially added on branch beos-branch-2.
-	
-1999-08-06 01:31  hiro
-
-	* ui/freeamp/beos/res/stop_on.png:
-
-	file stop_on.png was initially added on branch beos-branch-2.
+	file tristatebutton.h was initially added on branch beos-branch-2.
 	
 1999-08-06 01:31  hiro
 
@@ -14624,57 +14656,15 @@
 	
 1999-08-06 01:31  hiro
 
+	* ui/freeamp/beos/src/freeamp-beos.cpp:
+
+	file freeamp-beos.cpp was initially added on branch beos-branch-2.
+	
+1999-08-06 01:31  hiro
+
 	* ui/freeamp/beos/src/playerview.cpp:
 
 	file playerview.cpp was initially added on branch beos-branch-2.
-	
-1999-08-06 01:31  hiro
-
-	* ui/freeamp/beos/res/play_glow.png:
-
-	file play_glow.png was initially added on branch beos-branch-2.
-	
-1999-08-06 01:31  hiro
-
-	* ui/freeamp/beos/res/body.png:
-
-	file body.png was initially added on branch beos-branch-2.
-	
-1999-08-06 01:31  hiro
-
-	* ui/freeamp/beos/include/tristatebutton.h:
-
-	file tristatebutton.h was initially added on branch beos-branch-2.
-	
-1999-08-06 01:31  hiro
-
-	* ui/freeamp/beos/res/close_off.png:
-
-	file close_off.png was initially added on branch beos-branch-2.
-	
-1999-08-06 01:31  hiro
-
-	* ui/freeamp/beos/res/play_on.png:
-
-	file play_on.png was initially added on branch beos-branch-2.
-	
-1999-08-06 01:31  hiro
-
-	* ui/freeamp/beos/res/pause_glow.png:
-
-	file pause_glow.png was initially added on branch beos-branch-2.
-	
-1999-08-06 01:31  hiro
-
-	* ui/freeamp/beos/res/next_glow.png:
-
-	file next_glow.png was initially added on branch beos-branch-2.
-	
-1999-08-06 01:31  hiro
-
-	* ui/freeamp/beos/src/resourceutils.cpp:
-
-	file resourceutils.cpp was initially added on branch beos-branch-2.
 	
 1999-08-06 01:31  hiro
 
@@ -14684,39 +14674,9 @@
 	
 1999-08-06 01:31  hiro
 
-	* ui/freeamp/beos/res/next_off.png:
+	* ui/freeamp/beos/src/resourceutils.cpp:
 
-	file next_off.png was initially added on branch beos-branch-2.
-	
-1999-08-06 01:31  hiro
-
-	* ui/freeamp/beos/include/freeamp-beos.h:
-
-	file freeamp-beos.h was initially added on branch beos-branch-2.
-	
-1999-08-06 01:31  hiro
-
-	* ui/freeamp/beos/res/pause_on.png:
-
-	file pause_on.png was initially added on branch beos-branch-2.
-	
-1999-08-06 01:31  hiro
-
-	* ui/freeamp/beos/res/next_on.png:
-
-	file next_on.png was initially added on branch beos-branch-2.
-	
-1999-08-06 01:31  hiro
-
-	* ui/freeamp/beos/res/stop_off.png:
-
-	file stop_off.png was initially added on branch beos-branch-2.
-	
-1999-08-06 01:31  hiro
-
-	* ui/freeamp/beos/res/BuildResource:
-
-	file BuildResource was initially added on branch beos-branch-2.
+	file resourceutils.cpp was initially added on branch beos-branch-2.
 	
 1999-08-06 01:31  hiro
 
@@ -14726,63 +14686,15 @@
 	
 1999-08-06 01:31  hiro
 
+	* ui/freeamp/beos/include/freeamp-beos.h:
+
+	file freeamp-beos.h was initially added on branch beos-branch-2.
+	
+1999-08-06 01:31  hiro
+
 	* ui/freeamp/beos/src/tristatebutton.cpp:
 
 	file tristatebutton.cpp was initially added on branch beos-branch-2.
-	
-1999-08-06 01:31  hiro
-
-	* ui/freeamp/beos/include/playerview.h:
-
-	file playerview.h was initially added on branch beos-branch-2.
-	
-1999-08-06 01:31  hiro
-
-	* ui/freeamp/beos/res/close_glow.png:
-
-	file close_glow.png was initially added on branch beos-branch-2.
-	
-1999-08-06 01:31  hiro
-
-	* ui/freeamp/beos/res/play_off.png:
-
-	file play_off.png was initially added on branch beos-branch-2.
-	
-1999-08-06 01:31  hiro
-
-	* ui/freeamp/beos/res/close_on.png:
-
-	file close_on.png was initially added on branch beos-branch-2.
-	
-1999-08-06 01:31  hiro
-
-	* ui/freeamp/beos/src/freeamp-beos.cpp:
-
-	file freeamp-beos.cpp was initially added on branch beos-branch-2.
-	
-1999-08-06 01:31  hiro
-
-	* ui/freeamp/beos/res/prev_glow.png:
-
-	file prev_glow.png was initially added on branch beos-branch-2.
-	
-1999-08-06 01:31  hiro
-
-	* ui/freeamp/beos/res/prev_off.png:
-
-	file prev_off.png was initially added on branch beos-branch-2.
-	
-1999-08-06 01:31  hiro
-
-	* ui/freeamp/beos/res/pause_off.png:
-
-	file pause_off.png was initially added on branch beos-branch-2.
-	
-1999-08-06 01:31  hiro
-
-	* ui/freeamp/beos/res/prev_on.png:
-
-	file prev_on.png was initially added on branch beos-branch-2.
 	
 1999-08-06 00:18  elrod
 
@@ -15584,14 +15496,6 @@
 
 	* fixed url's in playlist files not being added
 	
-1999-05-25 15:00  dogcow
-
-	* experimental/: Makefile.in, README.experimental, configure,
-	configure.in:
-
-	No longer needed, since the makefile stuff is now committed to the main
-	branch.
-	
 1999-05-25 13:40  mhw
 
 	* Makefile-plugins.in, configure, configure.in:
@@ -15608,29 +15512,24 @@
 
 	* base/Makefile.in, base/beos/Makefile.in,
 	base/beos/src/Makefile.in, base/src/Makefile.in,
-	base/unix/Makefile.in, base/unix/linux/Makefile.in,
-	base/unix/linux/src/Makefile.in, base/unix/linux/src/mutex.cpp,
-	base/unix/solaris/Makefile, base/unix/solaris/Makefile.in,
-	base/unix/solaris/src/Makefile, base/unix/solaris/src/Makefile.in,
-	base/unix/src/Makefile.in, base/win32/Makefile.in,
-	config/Makefile.header, io/Makefile.in, io/alsa/Makefile.in,
-	io/alsa/unix/Makefile.in, io/alsa/unix/linux/Makefile.in,
-	io/alsa/unix/linux/src/Makefile.in, io/http/Makefile.in,
-	io/local/Makefile.in, io/obs/Makefile.in, io/soundcard/Makefile.in,
-	io/soundcard/beos/src/Makefile.in, io/soundcard/unix/Makefile.in,
-	io/soundcard/unix/linux/Makefile.in,
+	base/unix/Makefile.in, base/unix/src/Makefile.in,
+	base/win32/Makefile.in, config/Makefile.header, io/Makefile.in,
+	io/alsa/Makefile.in, io/alsa/unix/Makefile.in,
+	io/alsa/unix/linux/Makefile.in, io/alsa/unix/linux/src/Makefile.in,
+	io/http/Makefile.in, io/local/Makefile.in, io/obs/Makefile.in,
+	io/soundcard/Makefile.in, io/soundcard/beos/src/Makefile.in,
+	io/soundcard/unix/Makefile.in, io/soundcard/unix/linux/Makefile.in,
 	io/soundcard/unix/linux/src/Makefile.in,
 	io/soundcard/unix/solaris/Makefile,
 	io/soundcard/unix/solaris/Makefile.in,
 	io/soundcard/unix/solaris/src/Makefile,
 	io/soundcard/unix/solaris/src/Makefile.in, io/src/Makefile.in,
-	lmc/Makefile.in, lmc/src/Makefile.in, lmc/xingmp3/Makefile.in,
+	lmc/Makefile.in, lmc/xingmp3/Makefile.in,
 	lmc/xingmp3/src/Makefile.in, ui/Makefile.in,
 	ui/cmdline/Makefile.in, ui/freeamp/Makefile.in,
 	ui/freeamp/unix/Makefile.in, ui/freeamp/unix/src/Makefile.in,
-	ui/gtk/Makefile.in, ui/irman/Makefile.in, ui/irman/src/Makefile.in,
-	ui/lcd/Makefile.in, ui/lcd/src/Makefile.in, ui/mpg123/Makefile.in,
-	ui/src/Makefile.in:
+	ui/irman/Makefile.in, ui/irman/src/Makefile.in, ui/lcd/Makefile.in,
+	ui/lcd/src/Makefile.in, ui/mpg123/Makefile.in:
 
 	- Added #include <errno.h> to base/unix/linux/src/mutex.cpp
 	  This is needed for glibc-2.1
@@ -15642,9 +15541,6 @@
 	configure, configure.in, base/Makefile.am, base/beos/Makefile.am,
 	base/beos/src/Makefile.am, base/src/Makefile.am,
 	base/src/playlist.cpp, base/unix/Makefile.am,
-	base/unix/linux/Makefile.am, base/unix/linux/src/Makefile.am,
-	base/unix/solaris/Makefile.am, base/unix/solaris/include/mutex.h,
-	base/unix/solaris/src/Makefile.am, base/unix/solaris/src/mutex.cpp,
 	base/unix/src/Makefile.am, base/win32/Makefile.am,
 	config/Makefile.header, config/Makefile.header.in, io/Makefile.am,
 	io/alsa/Makefile.am, io/alsa/unix/Makefile.am,
@@ -15657,20 +15553,18 @@
 	io/soundcard/unix/linux/src/Makefile.am,
 	io/soundcard/unix/solaris/Makefile.am,
 	io/soundcard/unix/solaris/src/Makefile.am, io/src/Makefile.am,
-	lmc/Makefile.am, lmc/src/Makefile.am, lmc/xingmp3/Makefile.am,
+	lmc/Makefile.am, lmc/xingmp3/Makefile.am,
 	lmc/xingmp3/src/Makefile.am, ui/Makefile.am,
 	ui/cmdline/Makefile.am, ui/freeamp/Makefile.am,
 	ui/freeamp/unix/Makefile.am, ui/freeamp/unix/src/Makefile.am,
-	ui/gtk/Makefile.am, ui/irman/Makefile.am, ui/irman/src/Makefile.am,
-	ui/lcd/Makefile.am, ui/lcd/src/Makefile.am, ui/mpg123/Makefile.am,
-	ui/src/Makefile.am:
+	ui/irman/Makefile.am, ui/irman/src/Makefile.am, ui/lcd/Makefile.am,
+	ui/lcd/src/Makefile.am, ui/mpg123/Makefile.am:
 
 	Merged the no-more-automake branch into the trunk
 	
 1999-05-24 10:38  robert
 
-	* base/unix/linux/include/mutex.h, base/unix/linux/src/mutex.cpp,
-	io/alsa/unix/linux/src/alsapmo.cpp:
+	* io/alsa/unix/linux/src/alsapmo.cpp:
 
 	This mutex wrapper has been rewritten. It now uses portable recursive mutexes
 	and it should be much easier to read since it doesn't have a huge #define
@@ -15763,13 +15657,6 @@
 
 	* test check-in to see if commit notification works
 	
-1999-05-02 17:23  dogcow
-
-	* experimental/Makefile.in:
-
-	It's helpful to have 'install-plugins' and 'install-freeamp' actually
-	have 'plugins' and 'freeamp' dependencies. Duh.
-	
 1999-05-01 12:24  mhw
 
 	* util/foo:
@@ -15790,31 +15677,11 @@
 	
 	Seek still does not work, though, for inscrutible reasons.
 	
-1999-04-29 16:06  dogcow
-
-	* experimental/: Makefile.in, configure, configure.in:
-
-	I'm a ninny.
-	
-	The logic condition to check for x11 is now fixed, and properly disables
-	the x11 plugin and -lXpm if xpm is not found.
-	
 1999-04-29 14:22  mhw
 
 	* CHANGES, util/gas2intel:
 
 	Trivial whitespace changes for testing the server-side loginfo script
-	
-1999-04-28 14:36  dogcow
-
-	* base/unix/solaris/src/mutex.cpp, experimental/Makefile.in,
-	experimental/configure.in:
-
-	Added support for using sun cc in linking;
-	
-	Added testefor PTHREAD_MUTEX_ERRORCHECK which doesn't exist on solaris less
-	than 2.7! Looks like I better hunt down the multiple locking problems after
-	all.
 	
 1999-04-27 22:16  elrod
 
@@ -15903,7 +15770,6 @@
 
 	* CHANGES, NEWS, README, configure, configure.in,
 	base/include/facontext.h, base/src/player.cpp,
-	experimental/configure, experimental/configure.in,
 	io/http/httpbuffer.cpp:
 
 	Switch version number to 1.2.3
@@ -15978,14 +15844,6 @@
 
 	Fixed MPEG 2.5 playback/streaming.
 	
-1999-04-26 14:52  dogcow
-
-	* experimental/Makefile.in:
-
-	added dependency for volume.o. this will not work with the linux soundcardpmo
-	stuff, because I'm too lazy right now to stick another `find` into configure
-	to properly deal with differently-named volume module bits.
-	
 1999-04-26 14:37  robert
 
 	* base/win32/prj/freeamp.dsp, io/http/httpbuffer.cpp,
@@ -16009,20 +15867,13 @@
 	
 1999-04-26 08:48  robert
 
-	* base/unix/linux/src/volume.cpp, base/win32/src/volume.cpp,
-	io/alsa/unix/linux/include/alsapmo.h,
+	* base/win32/src/volume.cpp, io/alsa/unix/linux/include/alsapmo.h,
 	io/alsa/unix/linux/include/alsavolume.h,
 	io/alsa/unix/linux/src/alsapmo.cpp,
 	io/alsa/unix/linux/src/alsavolume.cpp:
 
 	More minor tweaks to the ALSA PMO. Also removed volume.cpp for Win32 and
 	Linux. Volume management is now done exclusively in the PMO.
-	
-1999-04-26 02:34  dogcow
-
-	* base/unix/solaris/src/volume.cpp:
-
-	whack whack whack. moved to pmo.
 	
 1999-04-26 02:31  dogcow
 
@@ -16094,8 +15945,7 @@
 	* base/include/event.h, base/include/eventdata.h,
 	base/include/player.h, base/include/preferences.h,
 	base/include/volume.h, base/src/player.cpp,
-	base/src/preferences.cpp, base/unix/linux/src/Makefile.am,
-	base/unix/linux/src/Makefile.in, base/unix/src/unixprefs.cpp,
+	base/src/preferences.cpp, base/unix/src/unixprefs.cpp,
 	io/alsa/unix/linux/include/alsapmo.h,
 	io/alsa/unix/linux/include/alsavolume.h,
 	io/alsa/unix/linux/src/Makefile.am,
@@ -16127,8 +15977,7 @@
 	
 1999-04-22 19:17  mhw
 
-	* Makefile.in, NEWS, README, configure, configure.in,
-	experimental/configure, experimental/configure.in:
+	* Makefile.in, NEWS, README, configure, configure.in:
 
 	- Changed Linux version number from 1.2.1 to 1.2.2
 	
@@ -16168,58 +16017,21 @@
 
 	* Makefile.in, configure, configure.in, base/src/player.cpp,
 	base/unix/src/unixprefs.cpp, config/config.h.in,
-	experimental/Makefile.in, experimental/configure,
-	experimental/configure.in, lmc/xingmp3/src/Makefile.am,
-	lmc/xingmp3/src/Makefile.in, lmc/xingmp3/src/cdct.c,
-	lmc/xingmp3/src/cdctasm.asm, lmc/xingmp3/src/cwin.c,
-	lmc/xingmp3/src/cwin8asm.asm, lmc/xingmp3/src/cwinasm.asm,
-	lmc/xingmp3/src/mdctasm.asm, lmc/xingmp3/src/msisasm.asm:
+	lmc/xingmp3/src/Makefile.am, lmc/xingmp3/src/Makefile.in,
+	lmc/xingmp3/src/cdct.c, lmc/xingmp3/src/cdctasm.asm,
+	lmc/xingmp3/src/cwin.c, lmc/xingmp3/src/cwin8asm.asm,
+	lmc/xingmp3/src/cwinasm.asm, lmc/xingmp3/src/mdctasm.asm,
+	lmc/xingmp3/src/msisasm.asm:
 
 	- Merged ASM_FDCT32 and ASM_WINDOW_DUAL into a single ASM_X86_OLD macro
 	- Moved ASM_X86 and ASM_X86_OLD macros from Makefiles into config.h
 	- AC_HOST_OS --> HOST_OS and AC_HOST_CPU --> HOST_CPU
 	- Added GPL headers and RCS ids to new asm files
 	
-1999-04-22 01:15  dogcow
-
-	* experimental/Makefile.in:
-
-	aiee, cutnpaste got me again. changed spaces to tab.
-	
-1999-04-22 01:12  dogcow
-
-	* experimental/Makefile.in:
-
-	whoops. accidentally zorched the .asm.asm1: dependencies.
-	
-1999-04-22 01:10  dogcow
-
-	* experimental/Makefile.in:
-
-	whacked OSLINK; added $(LDFLAGS) to $(LINKMOD)
-	
-	(and why is there a seperate LINKMOD and CXXLINK? That's rather complex,
-	but suffice it to say there's some seperation of function and are some
-	hysterical raisins.)
-	
-1999-04-22 01:03  dogcow
-
-	* experimental/: configure, configure.in:
-
-	changed '-or' to '-o' in find.
-	
-1999-04-22 00:10  mhw
-
-	* experimental/: Makefile.in, configure, configure.in:
-
-	- Add support for the new NASM code to the experimental Makefile setup
-	- Use expr instead of awk to pattern match
-	- Added -Wl,--export-dynamic linker flag under Linux
-	
 1999-04-21 21:51  mhw
 
 	* configure, configure.in, config/Makefile.header,
-	config/config.h.in, experimental/configure.in:
+	config/config.h.in:
 
 	Added a HAVE_LINUX_LIBC5 preprocessor macro to config.h
 	
@@ -16244,8 +16056,7 @@
 	
 1999-04-21 20:02  robert
 
-	* base/unix/linux/src/volume.cpp,
-	io/alsa/unix/linux/src/alsapmo.cpp,
+	* io/alsa/unix/linux/src/alsapmo.cpp,
 	ui/freeamp/unix/src/freeamp.cpp:
 
 	Made freeamp.cpp use the VolumeManager functions, and made the VM change
@@ -16261,10 +16072,8 @@
 
 	* AUTHORS, README, configure, configure.in,
 	base/beos/src/beosprefs.cpp, base/beos/src/utility.cpp,
-	base/src/player.cpp, base/unix/linux/src/utility.cpp,
-	base/unix/solaris/src/utility.cpp, base/unix/src/unixprefs.cpp,
-	config/config.h.in, experimental/configure,
-	experimental/configure.in, ui/freeamp/unix/src/freeamp.cpp:
+	base/src/player.cpp, base/unix/src/unixprefs.cpp,
+	config/config.h.in, ui/freeamp/unix/src/freeamp.cpp:
 
 	- Inserted Mark B. Elrod's middle initial in the AUTHORS file
 	- A few minor corrections to the README
@@ -16351,20 +16160,6 @@
 
 	added ".h" to an include
 	
-1999-04-20 23:53  dogcow
-
-	* experimental/: Makefile.in, README.experimental, configure,
-	configure.in:
-
-	Changes to my experimental makefile stuff that work with the merge of
-	mark's updates.
-	
-1999-04-20 23:48  dogcow
-
-	* base/unix/solaris/src/volume.cpp:
-
-	This now does something approaching sane.
-	
 1999-04-20 22:50  elrod
 
 	* io/soundcard/unix/solaris/: include/soundcardpmo.h,
@@ -16399,7 +16194,6 @@
 	base/src/Makefile.in, base/src/preferences.cpp,
 	base/src/prefixprefs.cpp, base/src/registrar.cpp,
 	base/unix/Makefile.in, base/unix/include/unixprefs.h,
-	base/unix/linux/Makefile.in, base/unix/linux/src/Makefile.in,
 	base/unix/src/Makefile.am, base/unix/src/Makefile.in,
 	base/unix/src/bootstrap.cpp, base/unix/src/unixprefs.cpp,
 	base/win32/include/preferences.h, base/win32/include/win32prefs.h,
@@ -16438,19 +16232,18 @@
 	io/soundcard/win32/prj/soundcard.mak,
 	io/soundcard/win32/src/soundcardpmo.cpp, io/src/Makefile.in,
 	io/src/eventbuffer.cpp, io/src/pullbuffer.cpp,
-	io/src/streambuffer.cpp, lmc/Makefile.in, lmc/src/Makefile.in,
-	lmc/xingmp3/Makefile.in, lmc/xingmp3/include/xinglmc.h,
-	lmc/xingmp3/src/Makefile.am, lmc/xingmp3/src/Makefile.in,
-	lmc/xingmp3/src/cdct.c, lmc/xingmp3/src/cdctasm.asm,
-	lmc/xingmp3/src/cwin.c, lmc/xingmp3/src/cwin8asm.asm,
-	lmc/xingmp3/src/cwinasm.asm, lmc/xingmp3/src/cwinb.c,
-	lmc/xingmp3/src/hwin.c, lmc/xingmp3/src/isbt.c,
-	lmc/xingmp3/src/mdct.c, lmc/xingmp3/src/mdctasm.asm,
-	lmc/xingmp3/src/msis.c, lmc/xingmp3/src/msisasm.asm,
-	lmc/xingmp3/src/x86intel.asm, lmc/xingmp3/src/x86intel.c,
-	lmc/xingmp3/src/xinglmc.cpp, lmc/xingmp3/win32/prj/xing.dsp,
-	lmc/xingmp3/win32/prj/xing.mak, ui/Makefile.in,
-	ui/cmdline/Makefile.in, ui/cmdline/cmdlineUI.cpp,
+	io/src/streambuffer.cpp, lmc/Makefile.in, lmc/xingmp3/Makefile.in,
+	lmc/xingmp3/include/xinglmc.h, lmc/xingmp3/src/Makefile.am,
+	lmc/xingmp3/src/Makefile.in, lmc/xingmp3/src/cdct.c,
+	lmc/xingmp3/src/cdctasm.asm, lmc/xingmp3/src/cwin.c,
+	lmc/xingmp3/src/cwin8asm.asm, lmc/xingmp3/src/cwinasm.asm,
+	lmc/xingmp3/src/cwinb.c, lmc/xingmp3/src/hwin.c,
+	lmc/xingmp3/src/isbt.c, lmc/xingmp3/src/mdct.c,
+	lmc/xingmp3/src/mdctasm.asm, lmc/xingmp3/src/msis.c,
+	lmc/xingmp3/src/msisasm.asm, lmc/xingmp3/src/x86intel.asm,
+	lmc/xingmp3/src/x86intel.c, lmc/xingmp3/src/xinglmc.cpp,
+	lmc/xingmp3/win32/prj/xing.dsp, lmc/xingmp3/win32/prj/xing.mak,
+	ui/Makefile.in, ui/cmdline/Makefile.in, ui/cmdline/cmdlineUI.cpp,
 	ui/cmdline/cmdlineUI.h, ui/freeamp/Makefile.in,
 	ui/freeamp/unix/Makefile.in, ui/freeamp/unix/include/freeamp-x11.h,
 	ui/freeamp/unix/src/Makefile.in, ui/freeamp/unix/src/fawindow.cpp,
@@ -16462,8 +16255,7 @@
 	ui/freeamp/win32/prj/freeampui.mak,
 	ui/freeamp/win32/src/freeampui.cpp,
 	ui/freeamp/win32/src/prefdialog.cpp,
-	ui/freeamp/win32/src/utility.cpp, ui/gtk/Makefile.in,
-	ui/gtk/freeamp-gtk.cpp, ui/gtk/freeamp-gtk.h, ui/irman/Makefile.in,
+	ui/freeamp/win32/src/utility.cpp, ui/irman/Makefile.in,
 	ui/irman/include/irmanui.h, ui/irman/src/Makefile.in,
 	ui/irman/src/irmanui.cpp, ui/lcd/Makefile.in,
 	ui/lcd/include/lcdui.h, ui/lcd/src/Makefile.in,
@@ -16472,10 +16264,8 @@
 	ui/rainplay/Rainplay.dsp, ui/rainplay/Rainplay.mak,
 	ui/rainplay/RainplayDlg.cpp, ui/rainplay/RainplayDlg.h,
 	ui/rainplay/RainplayUI.cpp, ui/rainplay/RainplayUI.h,
-	ui/rainplay/Preferences/PreferencesDlg.cpp,
-	ui/rainplay/Preferences/preferencesdlg.h,
 	ui/simple/win32/include/simpleui.h, ui/simple/win32/prj/simple.mak,
-	ui/simple/win32/src/simpleui.cpp, ui/src/Makefile.in:
+	ui/simple/win32/src/simpleui.cpp:
 
 	* merge of mark weaver's changes
 	
@@ -16536,14 +16326,6 @@
 
 	file cdctasm.asm was initially added on branch unix-prefs-branch-1.
 	
-1999-04-19 22:22  dogcow
-
-	* experimental/: Makefile.in, README.experimental, configure,
-	configure.in:
-
-	Experimental makefile stuff.
-	Use at your own risk. (It seems to work for me, though.)
-	
 1999-04-19 20:09  dogcow
 
 	* base/src/thread.cpp, io/src/pullbuffer.cpp:
@@ -16556,13 +16338,6 @@
 	ui/irman/src/ircmd.c:
 
 	minor portability changes
-	
-1999-04-19 16:57  robert
-
-	* base/unix/linux/src/linuxthread.cpp:
-
-	This fixed the make process. It no longer complains about the INSTALL
-	file missing, and linuxthread.cpp doesn't break the compile anymore
 	
 1999-04-19 16:30  elrod
 
@@ -16621,39 +16396,6 @@
 	* fixed problem with minimizing when in tray mode
 	* changed URL on welcome screen to point to GPL stuff, not Open Source
 	
-1999-04-17 22:03  dogcow
-
-	* base/unix/solaris/: Makefile, Makefile.in:
-
-	whoops. corrected solaris checkin.
-	
-1999-04-17 22:02  dogcow
-
-	* base/unix/solaris/: Makefile.am, Makefile.in:
-
-	last of the solaris commits for now
-	
-1999-04-17 22:01  dogcow
-
-	* base/unix/solaris/include/: mutex.h, semaphore.h,
-	solaristhread.h, utility.h:
-
-	even more solaris commits.
-	
-1999-04-17 22:01  dogcow
-
-	* base/unix/solaris/src/: Makefile, Makefile.am, Makefile.in,
-	debug.cpp, mutex.cpp, semaphore.cpp, solaristhread.cpp,
-	utility.cpp, volume.cpp:
-
-	more solaris commits
-	
-1999-04-17 22:00  dogcow
-
-	* base/unix/solaris/Makefile:
-
-	solaris commits.
-	
 1999-04-16 20:13  elrod
 
 	* ui/freeamp/win32/: include/freeampui.h, res/freeamp.rc,
@@ -16671,8 +16413,6 @@
 1999-04-16 02:46  elrod
 
 	* README, base/include/errors.h, base/include/thread.h,
-	base/unix/linux/include/linuxthread.h,
-	base/unix/linux/src/linuxthread.cpp,
 	base/win32/include/preferences.h, base/win32/include/win32thread.h,
 	base/win32/prj/freeamp.dsp, base/win32/prj/freeamp.dsw,
 	base/win32/prj/freeamp.mak, base/win32/src/preferences.cpp,
@@ -16843,8 +16583,7 @@
 	
 1999-04-11 21:55  elrod
 
-	* ui/rainplay/: Rainplay.dsp, Rainplay.mak,
-	Preferences/PreferencesDlg.cpp:
+	* ui/rainplay/: Rainplay.dsp, Rainplay.mak:
 
 	* modified prefs dialog to use prefs object for changing ui's
 	* added preferences.cpp to project file
@@ -16866,9 +16605,8 @@
 	
 1999-04-08 18:42  elrod
 
-	* io/rio/win32/portio.c, ui/freeamp/win32/include/utility.h,
-	ui/freeamp/win32/src/freeampui.cpp,
-	ui/freeamp/win32/src/utility.cpp:
+	* ui/freeamp/win32/: include/utility.h, src/freeampui.cpp,
+	src/utility.cpp:
 
 	* added support for loading portio.sys driver for NT
 	
@@ -16877,19 +16615,6 @@
 	* ui/freeamp/unix/src/freeamp.cpp:
 
 	Included windowmaker docking patch
-	
-1999-04-08 06:59  elrod
-
-	* io/rio/win32/i386/free/portio.sys:
-
-	* we don't want to force people to install the DDK... I would not wish that
-	  upon anyone! <grin>
-	
-1999-04-08 06:53  elrod
-
-	* io/rio/win32/: makefile, portio.c, sources:
-
-	* added initial run at port io access device driver for winNT
 	
 1999-04-08 00:39  elrod
 
@@ -17009,7 +16734,7 @@
 	ui/freeamp/win32/res/freeamp.rc, ui/freeamp/win32/res/resource.h,
 	ui/freeamp/win32/src/freeampui.cpp,
 	ui/freeamp/win32/src/listview.cpp, ui/rainplay/RainplayDlg.cpp,
-	ui/rainplay/RainplayUI.cpp, ui/rainplay/PlayList/PlayListDlg.cpp:
+	ui/rainplay/RainplayUI.cpp:
 
 	* changed STATE Enum to PlayerState ENUM
 	* reformated player code slightly to be consistent
@@ -17296,7 +17021,7 @@
 1999-03-18 21:19  elrod
 
 	* base/win32/prj/freeamp.dsw, ui/rainplay/RainplayDlg.cpp,
-	ui/rainplay/RainplayUI.cpp, ui/rainplay/PlayList/PlayListDlg.cpp:
+	ui/rainplay/RainplayUI.cpp:
 
 	* enabled rainplay ui in build process
 	* fixed places in rainplay ui where playlist manager api changed
@@ -17488,11 +17213,10 @@
 1999-03-16 19:30  robert
 
 	* base/include/player.h, base/src/player.cpp,
-	base/unix/linux/src/Makefile.am, base/unix/linux/src/Makefile.in,
-	base/unix/linux/src/volume.cpp, base/unix/src/bootstrap.cpp,
-	lmc/xingmp3/src/xinglmc.cpp, ui/cmdline/cmdlineUI.cpp,
-	ui/freeamp/unix/src/freeamp.cpp, ui/irman/src/irmanui.cpp,
-	ui/lcd/src/lcdui.cpp, ui/mpg123/Mpg123UI.cpp:
+	base/unix/src/bootstrap.cpp, lmc/xingmp3/src/xinglmc.cpp,
+	ui/cmdline/cmdlineUI.cpp, ui/freeamp/unix/src/freeamp.cpp,
+	ui/irman/src/irmanui.cpp, ui/lcd/src/lcdui.cpp,
+	ui/mpg123/Mpg123UI.cpp:
 
 	Fixed compile problems caused by changes to the playlist manager
 	
@@ -17733,9 +17457,8 @@
 1999-03-07 12:59  robert
 
 	* base/include/player.h, base/include/volume.h,
-	base/src/player.cpp, base/unix/linux/src/Makefile.am,
-	base/unix/linux/src/Makefile.in, base/unix/linux/src/volume.cpp,
-	base/win32/src/volume.cpp, io/include/pmo.h, io/obs/obsbuffer.cpp,
+	base/src/player.cpp, base/win32/src/volume.cpp, io/include/pmo.h,
+	io/obs/obsbuffer.cpp,
 	io/soundcard/unix/linux/include/soundcardpmo.h,
 	io/soundcard/unix/linux/src/soundcardpmo.cpp,
 	io/soundcard/win32/include/soundcardpmo.h,
@@ -17814,8 +17537,8 @@
 	
 1999-03-06 15:12  robert
 
-	* base/include/playlist.h, base/unix/linux/src/mutex.cpp,
-	io/http/httpbuffer.cpp, io/http/httpinput.cpp, io/obs/obsinput.cpp,
+	* base/include/playlist.h, io/http/httpbuffer.cpp,
+	io/http/httpinput.cpp, io/obs/obsinput.cpp,
 	io/soundcard/unix/linux/include/soundcardpmo.h,
 	io/soundcard/unix/linux/src/soundcardpmo.cpp,
 	io/src/pullbuffer.cpp, lmc/xingmp3/src/xinglmc.cpp,
@@ -18319,13 +18042,12 @@
 
 	* Makefile.am, Makefile.in, configure, configure.in,
 	base/Makefile.in, base/src/Makefile.am, base/src/Makefile.in,
-	base/unix/Makefile.in, base/unix/linux/Makefile.in,
-	base/unix/linux/src/Makefile.am, base/unix/linux/src/Makefile.in,
-	base/unix/src/Makefile.am, base/unix/src/Makefile.in,
-	base/unix/src/bootstrap.cpp, base/unix/src/win32impl.cpp,
-	config/Makefile.header, config/config.h.in, io/Makefile.in,
-	io/alsa/Makefile.in, io/alsa/unix/Makefile.in,
-	io/alsa/unix/linux/Makefile.in, io/alsa/unix/linux/src/Makefile.am,
+	base/unix/Makefile.in, base/unix/src/Makefile.am,
+	base/unix/src/Makefile.in, base/unix/src/bootstrap.cpp,
+	base/unix/src/win32impl.cpp, config/Makefile.header,
+	config/config.h.in, io/Makefile.in, io/alsa/Makefile.in,
+	io/alsa/unix/Makefile.in, io/alsa/unix/linux/Makefile.in,
+	io/alsa/unix/linux/src/Makefile.am,
 	io/alsa/unix/linux/src/Makefile.in, io/http/Makefile.am,
 	io/http/Makefile.in, io/local/Makefile.am, io/local/Makefile.in,
 	io/obs/Makefile.am, io/obs/Makefile.in, io/soundcard/Makefile.in,
@@ -18333,8 +18055,7 @@
 	io/soundcard/unix/linux/src/Makefile.am,
 	io/soundcard/unix/linux/src/Makefile.in,
 	io/soundcard/unix/linux/src/soundcardpmo.cpp, io/src/Makefile.am,
-	io/src/Makefile.in, lmc/Makefile.in, lmc/src/Makefile.am,
-	lmc/src/Makefile.in, lmc/xingmp3/Makefile.in,
+	io/src/Makefile.in, lmc/Makefile.in, lmc/xingmp3/Makefile.in,
 	lmc/xingmp3/src/Makefile.am, lmc/xingmp3/src/Makefile.in,
 	lmc/xingmp3/src/cdct.c, lmc/xingmp3/src/cwin.c,
 	lmc/xingmp3/src/cwinm.c, lmc/xingmp3/src/x86gas.s,
@@ -18342,11 +18063,10 @@
 	ui/cmdline/Makefile.am, ui/cmdline/Makefile.in,
 	ui/freeamp/Makefile.in, ui/freeamp/unix/Makefile.in,
 	ui/freeamp/unix/src/Makefile.am, ui/freeamp/unix/src/Makefile.in,
-	ui/gtk/Makefile.am, ui/gtk/Makefile.in, ui/irman/Makefile.in,
-	ui/irman/src/Makefile.am, ui/irman/src/Makefile.in,
-	ui/lcd/Makefile.in, ui/lcd/src/Makefile.am, ui/lcd/src/Makefile.in,
-	ui/mpg123/Makefile.am, ui/mpg123/Makefile.in, ui/src/Makefile.am,
-	ui/src/Makefile.in:
+	ui/irman/Makefile.in, ui/irman/src/Makefile.am,
+	ui/irman/src/Makefile.in, ui/lcd/Makefile.in,
+	ui/lcd/src/Makefile.am, ui/lcd/src/Makefile.in,
+	ui/mpg123/Makefile.am, ui/mpg123/Makefile.in:
 
 	- Added optimized x86 assembly code which speeds up the
 	  MP3 decoder by about 35% on my K6
@@ -18489,32 +18209,11 @@
 
 	bill's update to do eq stuff.
 	
-1999-01-31 01:14  elrod
-
-	* ui/rainplay/skins/Zdeck LCD/: Fonts.zip, Skin.ini, maindown.bmp,
-	mainup.bmp:
-
-	* added files for Bill Yuan
-	
-1999-01-31 01:10  elrod
-
-	* ui/rainplay/: Equalizer/EQDlg.cpp, Equalizer/EQDlg.h,
-	PlayList/PlayListDlg.cpp, PlayList/PlayListDlg.h,
-	Preferences/PreferencesDlg.cpp, Preferences/optionsetupdlg.cpp,
-	Preferences/optionsetupdlg.h, Preferences/preferencesdlg.h,
-	VisualView/VisualView.cpp, VisualView/VisualView.h,
-	VisualView/fft/Complex.h, VisualView/fft/Fft.cpp,
-	VisualView/fft/Fft.h:
-
-	* added files for Bill Yuan
-	
 1999-01-31 00:59  elrod
 
 	* ui/rainplay/: MainFaceDescribe.h, Rainplay.dsp, Rainplay.rc,
 	RainplayDlg.cpp, RainplayDlg.h, RainplayUI.cpp, RainplayUI.h,
-	ReadMe.txt, resource.h, res/MainUp.bmp, res/Maindown.bmp,
-	res/Rainplay.ico, skins/FusionDigideck/MainDown.bmp,
-	skins/FusionDigideck/MainUp.bmp:
+	ReadMe.txt, resource.h:
 
 	* code check-in for Bill Yuan
 	
@@ -18620,8 +18319,7 @@
 
 	* base/include/event.h, base/include/player.h,
 	base/include/volume.h, base/src/player.cpp,
-	base/unix/linux/src/Makefile.am, base/unix/linux/src/Makefile.in,
-	base/unix/linux/src/volume.cpp, ui/irman/src/irmanui.cpp:
+	ui/irman/src/irmanui.cpp:
 
 	added volume manager, set up pcm_volume property.
 	
@@ -18708,18 +18406,16 @@
 1999-01-19 11:10  jdw
 
 	* Makefile.in, base/Makefile.in, base/src/Makefile.in,
-	base/unix/Makefile.in, base/unix/linux/Makefile.in,
-	base/unix/linux/src/Makefile.in, base/unix/src/Makefile.in,
-	io/Makefile.in, io/http/Makefile.in, io/local/Makefile.in,
+	base/unix/Makefile.in, base/unix/src/Makefile.in, io/Makefile.in,
+	io/http/Makefile.in, io/local/Makefile.in,
 	io/soundcard/Makefile.in, io/soundcard/unix/Makefile.in,
 	io/soundcard/unix/linux/Makefile.in,
 	io/soundcard/unix/linux/src/Makefile.in, io/src/Makefile.in,
-	lmc/Makefile.in, lmc/src/Makefile.in, lmc/xingmp3/Makefile.in,
+	lmc/Makefile.in, lmc/xingmp3/Makefile.in,
 	lmc/xingmp3/src/Makefile.in, ui/Makefile.in,
 	ui/cmdline/Makefile.in, ui/freeamp/Makefile.in,
 	ui/freeamp/unix/Makefile.in, ui/freeamp/unix/src/Makefile.in,
-	ui/gtk/Makefile.am, ui/gtk/Makefile.in, ui/lcd/Makefile.in,
-	ui/lcd/src/Makefile.in, ui/mpg123/Makefile.in, ui/src/Makefile.in:
+	ui/lcd/Makefile.in, ui/lcd/src/Makefile.in, ui/mpg123/Makefile.in:
 
 	fixed buggy makefile.in 's
 	
@@ -18731,8 +18427,7 @@
 	Rainplay.dsp, Rainplay.h, Rainplay.mak, Rainplay.rc,
 	RainplayDlg.cpp, RainplayDlg.h, RainplayUI.cpp, RainplayUI.h,
 	Rainplaylib.cpp, ReadMe.txt, StdAfx.cpp, StdAfx.h, VisualView.cpp,
-	VisualView.h, active.cpp, active.h, cthread.h, resource.h,
-	skins/FusionDigideck/Skin.ini:
+	VisualView.h, active.cpp, active.h, cthread.h, resource.h:
 
 	* fix jason's bonehead checkin
 	
@@ -18752,7 +18447,6 @@
 
 	* Makefile.in, configure, configure.in, base/Makefile.in,
 	base/include/errors.h, base/src/Makefile.in, base/unix/Makefile.in,
-	base/unix/linux/Makefile.in, base/unix/linux/src/Makefile.in,
 	base/unix/src/Makefile.in, base/unix/src/bootstrap.cpp,
 	io/Makefile.am, io/Makefile.in, io/http/Makefile.am,
 	io/http/Makefile.in, io/http/httpbuffer.cpp, io/http/httpbuffer.h,
@@ -18764,13 +18458,11 @@
 	io/soundcard/unix/linux/src/Makefile.in,
 	io/soundcard/unix/linux/src/soundcardpmo.cpp, io/src/Makefile.am,
 	io/src/Makefile.in, io/src/pullbuffer.cpp, lmc/Makefile.in,
-	lmc/src/Makefile.in, lmc/xingmp3/Makefile.in,
-	lmc/xingmp3/include/xinglmc.h, lmc/xingmp3/src/Makefile.in,
-	lmc/xingmp3/src/xinglmc.cpp, ui/Makefile.in,
-	ui/cmdline/Makefile.in, ui/freeamp/Makefile.in,
+	lmc/xingmp3/Makefile.in, lmc/xingmp3/include/xinglmc.h,
+	lmc/xingmp3/src/Makefile.in, lmc/xingmp3/src/xinglmc.cpp,
+	ui/Makefile.in, ui/cmdline/Makefile.in, ui/freeamp/Makefile.in,
 	ui/freeamp/unix/Makefile.in, ui/freeamp/unix/src/Makefile.in,
-	ui/gtk/Makefile.in, ui/lcd/Makefile.in, ui/lcd/src/Makefile.in,
-	ui/mpg123/Makefile.in, ui/src/Makefile.in:
+	ui/lcd/Makefile.in, ui/lcd/src/Makefile.in, ui/mpg123/Makefile.in:
 
 	rob's manly streaming additions. pullbuffer.cpp/.h is the new
 	single reader/single writer circular buffer.
@@ -18809,7 +18501,7 @@
 	ui/rainplay/StdAfx.h, ui/rainplay/VisualView.cpp,
 	ui/rainplay/VisualView.h, ui/rainplay/active.cpp,
 	ui/rainplay/active.h, ui/rainplay/cthread.h,
-	ui/rainplay/resource.h, ui/rainplay/skins/FusionDigideck/Skin.ini:
+	ui/rainplay/resource.h:
 
 	latest rainplay stuff
 	
@@ -18821,27 +18513,14 @@
 
 	* new files added by Bill Yuan for EQ and Playlist support
 	
-1999-01-16 22:06  elrod
-
-	* ui/rainplay/res/About.bmp:
-
-	* added file for Bill Yuan
-	
 1999-01-16 22:03  elrod
 
 	* ui/rainplay/: BmpSize.cpp, BmpSize.h, MainFaceDescribe.h,
 	Rainplay.cpp, Rainplay.dsp, Rainplay.mak, Rainplay.rc,
 	RainplayDlg.cpp, RainplayDlg.h, RainplayUI.cpp, RainplayUI.h,
-	ReadMe.txt, resource.h, res/MainUp.bmp, res/Maindown.bmp,
-	skins/FusionDigideck/Skin.ini:
+	ReadMe.txt, resource.h:
 
 	* updated files for rainplay UI from Bill Yuan
-	
-1998-12-14 21:24  jdw
-
-	* ui/freeamp/unix/res/: leftside.xpm, rightside.xpm:
-
-	pixmap update to remove unix artifacts on circular edges
 	
 1998-12-14 20:57  jdw
 
@@ -18907,11 +18586,9 @@
 	lmc/xingmp3/src/Makefile.am, lmc/xingmp3/src/Makefile.in,
 	lmc/xingmp3/src/xinglmc.cpp, ui/cmdline/Makefile.am,
 	ui/cmdline/Makefile.in, ui/freeamp/unix/include/fawindow.h,
-	ui/freeamp/unix/res/lcd_display256.xpm,
 	ui/freeamp/unix/src/Makefile.am, ui/freeamp/unix/src/Makefile.in,
 	ui/freeamp/unix/src/fawindow.cpp, ui/freeamp/unix/src/freeamp.cpp,
-	ui/gtk/Makefile.am, ui/gtk/Makefile.in, ui/gtk/freeamp-gtk.cpp,
-	ui/gtk/freeamp-gtk.h, ui/mpg123/Makefile.am, ui/mpg123/Makefile.in:
+	ui/mpg123/Makefile.am, ui/mpg123/Makefile.in:
 
 	makefile updates, some unix debuggin
 	
@@ -18931,12 +18608,11 @@
 
 	* INSTALL, Makefile.in, README, configure, configure.in,
 	base/src/Makefile.in, base/src/player.cpp,
-	base/unix/linux/src/Makefile.in, base/unix/src/Makefile.in,
-	io/local/Makefile.in, io/soundcard/unix/linux/src/Makefile.in,
-	io/src/Makefile.in, lmc/src/Makefile.in,
+	base/unix/src/Makefile.in, io/local/Makefile.in,
+	io/soundcard/unix/linux/src/Makefile.in, io/src/Makefile.in,
 	lmc/xingmp3/src/Makefile.in, ui/cmdline/Makefile.in,
 	ui/freeamp/unix/src/Makefile.in, ui/freeamp/unix/src/freeamp.cpp,
-	ui/gtk/Makefile.in, ui/mpg123/Makefile.in, ui/src/Makefile.in:
+	ui/mpg123/Makefile.in:
 
 	X11 v1.1.0 release candidate
 	
@@ -18946,8 +18622,8 @@
 	io/soundcard/unix/linux/src/Makefile.am,
 	io/soundcard/unix/linux/src/Makefile.in,
 	lmc/xingmp3/src/Makefile.am, lmc/xingmp3/src/Makefile.in,
-	ui/cmdline/Makefile.am, ui/cmdline/Makefile.in, ui/gtk/Makefile.am,
-	ui/gtk/Makefile.in, ui/mpg123/Makefile.am, ui/mpg123/Makefile.in:
+	ui/cmdline/Makefile.am, ui/cmdline/Makefile.in,
+	ui/mpg123/Makefile.am, ui/mpg123/Makefile.in:
 
 	updated unix build to create plugins directory before copying there.
 	
@@ -18960,53 +18636,6 @@
 	base/unix/src/bootstrap.cpp, ui/cmdline/cmdlineUI.h,
 	ui/freeamp/unix/include/freeamp-x11.h,
 	ui/freeamp/unix/include/graphics.h,
-	ui/freeamp/unix/res/all_icon.xpm,
-	ui/freeamp/unix/res/all_icon256.xpm,
-	ui/freeamp/unix/res/big_font.xpm,
-	ui/freeamp/unix/res/big_font256.xpm,
-	ui/freeamp/unix/res/close_buttons.xpm,
-	ui/freeamp/unix/res/close_buttons256.xpm,
-	ui/freeamp/unix/res/dials.xpm, ui/freeamp/unix/res/dials256.xpm,
-	ui/freeamp/unix/res/foo.xpm, ui/freeamp/unix/res/full.xpm,
-	ui/freeamp/unix/res/last_buttons.xpm,
-	ui/freeamp/unix/res/last_buttons256.xpm,
-	ui/freeamp/unix/res/lcd.xpm, ui/freeamp/unix/res/lcd256.xpm,
-	ui/freeamp/unix/res/lcd_display.xpm,
-	ui/freeamp/unix/res/lcd_display256.xpm,
-	ui/freeamp/unix/res/lcd_upper_frame.xpm,
-	ui/freeamp/unix/res/lcd_upper_frame256.xpm,
-	ui/freeamp/unix/res/leftside.xpm,
-	ui/freeamp/unix/res/leftside256.xpm, ui/freeamp/unix/res/logo.xpm,
-	ui/freeamp/unix/res/logo256.xpm,
-	ui/freeamp/unix/res/minimize_buttons.xpm,
-	ui/freeamp/unix/res/minimize_buttons256.xpm,
-	ui/freeamp/unix/res/mode_buttons.xpm,
-	ui/freeamp/unix/res/mode_buttons256.xpm,
-	ui/freeamp/unix/res/next_buttons.xpm,
-	ui/freeamp/unix/res/next_buttons256.xpm,
-	ui/freeamp/unix/res/open_buttons.xpm,
-	ui/freeamp/unix/res/open_buttons256.xpm,
-	ui/freeamp/unix/res/pause_buttons.xpm,
-	ui/freeamp/unix/res/pause_buttons256.xpm,
-	ui/freeamp/unix/res/play_buttons.xpm,
-	ui/freeamp/unix/res/play_buttons256.xpm,
-	ui/freeamp/unix/res/playlist_drawer.xpm,
-	ui/freeamp/unix/res/playlist_drawer256.xpm,
-	ui/freeamp/unix/res/repeat_buttons.xpm,
-	ui/freeamp/unix/res/repeat_buttons256.xpm,
-	ui/freeamp/unix/res/repeat_icon.xpm,
-	ui/freeamp/unix/res/repeat_icon256.xpm,
-	ui/freeamp/unix/res/rightside.xpm,
-	ui/freeamp/unix/res/rightside256.xpm,
-	ui/freeamp/unix/res/shuffle_buttons.xpm,
-	ui/freeamp/unix/res/shuffle_buttons256.xpm,
-	ui/freeamp/unix/res/shuffled_icon.xpm,
-	ui/freeamp/unix/res/shuffled_icon256.xpm,
-	ui/freeamp/unix/res/small_font.xpm,
-	ui/freeamp/unix/res/small_font256.xpm,
-	ui/freeamp/unix/res/stop_buttons.xpm,
-	ui/freeamp/unix/res/stop_buttons256.xpm,
-	ui/freeamp/unix/res/strip_static.pl,
 	ui/freeamp/unix/src/Makefile.am, ui/freeamp/unix/src/Makefile.in,
 	ui/freeamp/unix/src/fawindow.cpp, ui/freeamp/unix/src/freeamp.cpp,
 	ui/freeamp/unix/src/res.cpp, ui/include/ui.h, ui/mpg123/Mpg123UI.h:
@@ -19034,8 +18663,7 @@
 	
 1998-11-25 12:53  jdw
 
-	* ui/freeamp/unix/: res/small_font256.xpm, src/fawindow.cpp,
-	src/freeamp.cpp:
+	* ui/freeamp/unix/src/: fawindow.cpp, freeamp.cpp:
 
 	switch case without break bug fix
 	
@@ -19045,8 +18673,7 @@
 	ui/cmdline/Makefile.in, ui/freeamp/unix/include/fawindow.h,
 	ui/freeamp/unix/include/freeamp-x11.h,
 	ui/freeamp/unix/src/Makefile.am, ui/freeamp/unix/src/Makefile.in,
-	ui/freeamp/unix/src/fawindow.cpp, ui/freeamp/unix/src/freeamp.cpp,
-	ui/gtk/Makefile.am:
+	ui/freeamp/unix/src/fawindow.cpp, ui/freeamp/unix/src/freeamp.cpp:
 
 	Everything X11 is functional.  Now, bring out the bugs.
 	
@@ -19064,18 +18691,14 @@
 1998-11-22 19:05  jdw
 
 	* ui/freeamp/unix/: include/fawindow.h, include/graphics.h,
-	res/lcd_display256.xpm, res/lcd_upper_frame256.xpm,
-	res/lcd_upper_frame_mask.xbm, res/playlist_drawer256.xpm,
-	res/playlist_drawer_mask.xbm, src/fawindow.cpp, src/freeamp.cpp:
+	src/fawindow.cpp, src/freeamp.cpp:
 
 	more X11 updates
 	
 1998-11-22 15:50  jdw
 
 	* ui/freeamp/unix/: include/fawindow.h, include/freeamp-x11.h,
-	include/graphics.h, res/lcd_display.xpm, res/lcd_upper_frame.xpm,
-	res/lcd_upper_frame_mask.xbm, res/playlist_drawer.xpm,
-	res/playlist_drawer_mask.xbm, src/fawindow.cpp, src/freeamp.cpp:
+	include/graphics.h, src/fawindow.cpp, src/freeamp.cpp:
 
 	more X11 updates.  lookin good :)
 	
@@ -19085,9 +18708,6 @@
 	ui/freeamp/unix/include/font_width.h,
 	ui/freeamp/unix/include/freeamp-x11.h,
 	ui/freeamp/unix/include/graphics.h,
-	ui/freeamp/unix/res/lcd_display_mask.xbm,
-	ui/freeamp/unix/res/lcd_icons_mask.xbm,
-	ui/freeamp/unix/res/small_font.xpm,
 	ui/freeamp/unix/src/fawindow.cpp, ui/freeamp/unix/src/freeamp.cpp:
 
 	more X11 updates
@@ -19136,36 +18756,13 @@
 	
 1998-11-16 18:36  jdw
 
-	* ui/freeamp/unix/: res/all_icon.xpm, res/all_icon256.xpm,
-	res/big_font.xpm, res/big_font256.xpm, res/close_buttons.xpm,
-	res/close_buttons256.xpm, res/dials256.xpm, res/foo.xpm,
-	res/last_buttons.xpm, res/last_buttons256.xpm, res/lcd256.xpm,
-	res/leftside256.xpm, res/logo256.xpm, res/minimize_buttons.xpm,
-	res/minimize_buttons256.xpm, res/minor_button_mask.xbm,
-	res/mode_buttons.xpm, res/mode_buttons256.xpm,
-	res/next_buttons.xpm, res/next_buttons256.xpm,
-	res/open_buttons.xpm, res/open_buttons256.xpm,
-	res/pause_buttons.xpm, res/pause_buttons256.xpm,
-	res/play_buttons256.xpm, res/repeat_buttons.xpm,
-	res/repeat_buttons256.xpm, res/repeat_icon.xpm,
-	res/repeat_icon256.xpm, res/rightside256.xpm,
-	res/shuffle_buttons.xpm, res/shuffle_buttons256.xpm,
-	res/shuffled_icon.xpm, res/shuffled_icon256.xpm,
-	res/small_font.xpm, res/small_font256.xpm, res/stop_buttons.xpm,
-	res/stop_buttons256.xpm, src/freeamp.cpp:
+	* ui/freeamp/unix/src/freeamp.cpp:
 
 	added 256 color support
 	
-1998-11-16 14:41  jdw
-
-	* ui/freeamp/unix/res/player_full_mask.xbm:
-
-	more X updates
-	
 1998-11-16 14:03  jdw
 
-	* ui/freeamp/unix/: res/major_button_mask.xbm,
-	res/play_buttons.xpm, src/freeamp.cpp:
+	* ui/freeamp/unix/src/freeamp.cpp:
 
 	x11 gui updates
 	
@@ -19187,13 +18784,8 @@
 	* configure, configure.in, ui/Makefile.am, ui/Makefile.in,
 	ui/freeamp/Makefile.am, ui/freeamp/Makefile.in,
 	ui/freeamp/unix/Makefile.am, ui/freeamp/unix/Makefile.in,
-	ui/freeamp/unix/res/dials.xpm, ui/freeamp/unix/res/full.xpm,
-	ui/freeamp/unix/res/lcd.xpm, ui/freeamp/unix/res/leftside.xpm,
-	ui/freeamp/unix/res/logo.xpm,
-	ui/freeamp/unix/res/player_full_mask.xbm,
-	ui/freeamp/unix/res/rightside.xpm, ui/freeamp/unix/src/Makefile.am,
-	ui/freeamp/unix/src/Makefile.in, ui/freeamp/unix/src/freeamp.cpp,
-	ui/gtk/Makefile.am, ui/gtk/Makefile.in:
+	ui/freeamp/unix/src/Makefile.am, ui/freeamp/unix/src/Makefile.in,
+	ui/freeamp/unix/src/freeamp.cpp:
 
 	added X11 to freeamp ui
 	
@@ -19203,24 +18795,16 @@
 
 	stupid uninitialized value junk in configure.in
 	
-1998-11-15 12:26  jdw
-
-	* base/unix/linux/src/: linuxthread.cpp, semaphore.cpp:
-
-	one last broken slackware pthreads distribution bug.
-	
 1998-11-15 12:21  jdw
 
-	* configure, configure.in, base/unix/linux/src/mutex.cpp,
-	config/config.h.in:
+	* configure, configure.in, config/config.h.in:
 
 	another pthreads detection fix.  this time, the broke slackware /usr/include/pthread.h header
 	detection
 	
 1998-11-15 11:47  jdw
 
-	* configure, configure.in, lmc/Makefile.am, lmc/Makefile.in,
-	ui/gtk/Makefile.am, ui/gtk/Makefile.in:
+	* configure, configure.in, lmc/Makefile.am, lmc/Makefile.in:
 
 	added `gtk-config --cflags` to the INCLUDE line in ui/gtk/Makefile.am
 	
@@ -19492,8 +19076,7 @@
 1998-11-06 23:05  jdw
 
 	* ui/: cmdline/cmdlineUI.cpp, cmdline/cmdlineUI.h,
-	gtk/freeamp-gtk.cpp, gtk/freeamp-gtk.h, mpg123/Mpg123UI.cpp,
-	mpg123/Mpg123UI.h:
+	mpg123/Mpg123UI.cpp, mpg123/Mpg123UI.h:
 
 	updated linux UIs for PlayListManager
 	
@@ -19584,7 +19167,7 @@
 	
 1998-11-05 16:07  jdw
 
-	* configure, configure.in, ui/gtk/freeamp-gtk.cpp:
+	* configure, configure.in:
 
 	small update to gtk stuff
 	
@@ -19651,14 +19234,9 @@
 
 	[no log message]
 	
-1998-11-02 19:23  elrod
+1998-11-02 19:26  elrod
 
-	* ui/rainplay/skins/FusionDigideck/MainDown.bmp,
-	ui/rainplay/skins/FusionDigideck/MainUp.bmp,
-	ui/rainplay/skins/FusionDigideck/Skin.ini,
-	ui/rainplay/skins/visions/MainUp.bmp,
-	ui/rainplay/skins/visions/Maindown.bmp,
-	ui/rainplay/skins/visions/SKIN.INI, base/win32/prj/freeamp.dsw:
+	* base/win32/prj/freeamp.dsw:
 
 	* initial check-in of rainplay ui
 	
@@ -19668,8 +19246,7 @@
 	Rainplay.cpp, Rainplay.def, Rainplay.dsp, Rainplay.dsw, Rainplay.h,
 	Rainplay.mak, Rainplay.rc, RainplayDlg.cpp, RainplayDlg.h,
 	RainplayUI.cpp, RainplayUI.h, Rainplaylib.cpp, ReadMe.txt,
-	StdAfx.cpp, StdAfx.h, resource.h, res/MainUp.bmp, res/Maindown.bmp,
-	res/Rainplay.ico, res/Rainplay.rc2:
+	StdAfx.cpp, StdAfx.h, resource.h:
 
 	* initial check-in of rainplay ui
 	
@@ -19756,8 +19333,8 @@
 1998-11-01 15:05  jdw
 
 	* base/include/eventdata.h, lmc/xingmp3/src/xinglmc.cpp,
-	ui/cmdline/cmdlineUI.cpp, ui/gtk/freeamp-gtk.cpp,
-	ui/mpg123/Mpg123UI.cpp, ui/mpg123/Mpg123UI.h:
+	ui/cmdline/cmdlineUI.cpp, ui/mpg123/Mpg123UI.cpp,
+	ui/mpg123/Mpg123UI.h:
 
 	added more info to mpg123
 	
@@ -19837,30 +19414,21 @@
 
 	* Makefile.in, acinclude.m4, aclocal.m4, configure, configure.in,
 	base/Makefile.in, base/src/Makefile.in, base/unix/Makefile.in,
-	base/unix/linux/Makefile.in, base/unix/linux/src/Makefile.in,
 	base/unix/src/Makefile.in, io/Makefile.in, io/local/Makefile.in,
 	io/soundcard/Makefile.in, io/soundcard/unix/Makefile.in,
 	io/soundcard/unix/linux/Makefile.in,
 	io/soundcard/unix/linux/src/Makefile.in, io/src/Makefile.in,
-	lmc/Makefile.in, lmc/src/Makefile.in, lmc/xingmp3/Makefile.in,
+	lmc/Makefile.in, lmc/xingmp3/Makefile.in,
 	lmc/xingmp3/src/Makefile.in, ui/Makefile.in,
-	ui/cmdline/Makefile.in, ui/gtk/Makefile.am, ui/gtk/Makefile.in,
-	ui/mpg123/Makefile.in, ui/src/Makefile.in:
+	ui/cmdline/Makefile.in, ui/mpg123/Makefile.in:
 
 	added GTK+ checking to configure
-	
-1998-10-28 12:40  jdw
-
-	* ui/gtk/freeamp-gtk.cpp:
-
-	updates to freeamp gtk ui
 	
 1998-10-27 18:27  jdw
 
 	* configure, configure.in, base/src/player.cpp, ui/Makefile.am,
-	ui/Makefile.in, ui/cmdline/cmdlineUI.h, ui/gtk/Makefile.am,
-	ui/gtk/Makefile.in, ui/gtk/freeamp-gtk.cpp, ui/gtk/freeamp-gtk.h,
-	ui/include/ui.h, ui/mpg123/Mpg123UI.h:
+	ui/Makefile.in, ui/cmdline/cmdlineUI.h, ui/include/ui.h,
+	ui/mpg123/Mpg123UI.h:
 
 	added beginning simple GTK UI.. for now ./configure --enable-gtk
 	
@@ -19945,10 +19513,10 @@
 	base/include/hashtable.h, base/include/mediavitalinfo.h,
 	base/include/player.h, base/include/registry.h,
 	base/src/Makefile.am, base/src/Makefile.in, base/src/command.cpp,
-	base/src/player.cpp, base/unix/linux/src/linuxthread.cpp,
-	io/include/pmilib.h, io/include/pmolib.h, io/local/Makefile.am,
-	io/local/Makefile.in, io/local/localfileinput.cpp,
-	io/local/localfilelib.cpp, io/soundcard/soundcardlib.cpp,
+	base/src/player.cpp, io/include/pmilib.h, io/include/pmolib.h,
+	io/local/Makefile.am, io/local/Makefile.in,
+	io/local/localfileinput.cpp, io/local/localfilelib.cpp,
+	io/soundcard/soundcardlib.cpp,
 	io/soundcard/unix/linux/src/Makefile.am,
 	io/soundcard/unix/linux/src/Makefile.in,
 	io/soundcard/unix/linux/src/soundcardlib.cpp,
@@ -19992,10 +19560,7 @@
 
 	* Makefile.am, Makefile.in, configure, configure.in,
 	base/include/event.h, base/include/player.h, base/src/player.cpp,
-	base/unix/src/bootstrap.cpp, ui/Makefile.am, ui/Makefile.in,
-	ui/dummy/Makefile.am, ui/dummy/Makefile.in,
-	ui/dummy/include/dummyui.h, ui/dummy/src/Makefile.am,
-	ui/dummy/src/Makefile.in, ui/dummy/src/dummyui.cpp:
+	base/unix/src/bootstrap.cpp, ui/Makefile.am, ui/Makefile.in:
 
 	removed dummyUI by passing in termination semaphore to Player
 	
@@ -20077,12 +19642,10 @@
 	base/unix/src/Makefile.am, base/unix/src/Makefile.in,
 	config/config.h.in, io/local/Makefile.am, io/local/Makefile.in,
 	io/soundcard/unix/linux/src/Makefile.am,
-	io/soundcard/unix/linux/src/Makefile.in, lmc/src/Makefile.am,
-	lmc/src/Makefile.in, lmc/xingmp3/src/Makefile.am,
-	lmc/xingmp3/src/Makefile.in, ui/cmdline/Makefile.am,
-	ui/cmdline/Makefile.in, ui/dummy/src/Makefile.am,
-	ui/dummy/src/Makefile.in, ui/mpg123/Makefile.am,
-	ui/mpg123/Makefile.in, ui/src/Makefile.am, ui/src/Makefile.in:
+	io/soundcard/unix/linux/src/Makefile.in,
+	lmc/xingmp3/src/Makefile.am, lmc/xingmp3/src/Makefile.in,
+	ui/cmdline/Makefile.am, ui/cmdline/Makefile.in,
+	ui/mpg123/Makefile.am, ui/mpg123/Makefile.in:
 
 	first update to make it more cross unixy.  removed the -D __@target_os@__ junk
 	
@@ -20144,8 +19707,7 @@
 	
 1998-10-19 22:20  elrod
 
-	* ui/simple/: include/simpleui.h, win32/include/simpleui.h,
-	win32/src/simpleui.cpp:
+	* ui/simple/win32/: include/simpleui.h, src/simpleui.cpp:
 
 	[no log message]
 	
@@ -20162,9 +19724,7 @@
 	base/win32/src/main.cpp, base/win32/src/mutex.cpp,
 	io/soundcard/soundcardlib.cpp,
 	ui/cmdline/win32/include/consoleCIO.h,
-	ui/cmdline/win32/include/consoleCOO.h, ui/dummy/include/dummyui.h,
-	ui/dummy/src/dummyui.cpp, ui/include/uilib.h,
-	ui/simple/include/simpleui.h, ui/simple/src/simplelib.cpp,
+	ui/cmdline/win32/include/consoleCOO.h, ui/include/uilib.h,
 	ui/simple/win32/prj/simple.dsp, ui/simple/win32/src/simpleui.cpp:
 
 	[no log message]
@@ -20185,8 +19745,7 @@
 	* base/include/player.h, base/src/player.cpp,
 	base/unix/src/bootstrap.cpp, ui/cmdline/CommandLineCIO.cpp,
 	ui/cmdline/cmdlineUI.cpp, ui/cmdline/cmdlineUI.h,
-	ui/dummy/include/dummyui.h, ui/include/ctrlobj.h, ui/include/ui.h,
-	ui/mpg123/Mpg123UI.h:
+	ui/include/ctrlobj.h, ui/include/ui.h, ui/mpg123/Mpg123UI.h:
 
 	moved ctrlobj.h to ui.h
 	removed #include "player.h" where it didn't really need it...
@@ -20216,21 +19775,13 @@
 
 	* base/unix/src/bootstrap.cpp, base/unix/src/preferences.cpp,
 	base/unix/src/win32impl.cpp, ui/cmdline/Mpg123UI.cpp,
-	ui/cmdline/Mpg123UI.h, ui/dummy/src/Makefile.am,
-	ui/dummy/src/Makefile.in:
+	ui/cmdline/Mpg123UI.h:
 
 	more linux updates to shared lib issues...
 	
 1998-10-19 04:01  elrod
 
-	* base/include/player.h, base/src/player.cpp,
-	base/win32/src/main.cpp, ui/simple/include/simpleui.h:
-
-	[no log message]
-	
-1998-10-19 01:47  elrod
-
-	* ui/simple/include/simpleui.h:
+	* base/: include/player.h, src/player.cpp, win32/src/main.cpp:
 
 	[no log message]
 	
@@ -20241,19 +19792,12 @@
 	base/win32/src/main.cpp, base/win32/src/preferences.cpp,
 	lmc/include/lmc.h, lmc/include/lmclib.h,
 	lmc/xingmp3/include/xinglmc.h, lmc/xingmp3/src/xinglib.cpp,
-	lmc/xingmp3/src/xinglmc.cpp, ui/dummy/include/dummyui.h,
-	ui/dummy/src/dummyui.cpp, ui/include/ctrlobj.h, ui/include/uilib.h,
-	ui/simple/win32/prj/simple.dsp, ui/simple/win32/src/main.cpp:
+	lmc/xingmp3/src/xinglmc.cpp, ui/include/ctrlobj.h,
+	ui/include/uilib.h, ui/simple/win32/prj/simple.dsp,
+	ui/simple/win32/src/main.cpp:
 
 	* woohoo... finally have the gui stuff up and running... not very pretty
 	  but we can go back and rewrite it later!
-	
-1998-10-18 21:52  elrod
-
-	* ui/dummy/: include/dummycoo.h, include/dummyui.h,
-	src/dummycoo.cpp, src/dummyui.cpp:
-
-	[no log message]
 	
 1998-10-18 18:29  elrod
 
@@ -20348,7 +19892,6 @@
 1998-10-17 13:18  elrod
 
 	* base/: include/registrar.h, src/registrar.cpp,
-	unix/linux/include/utility.h, unix/linux/src/utility.cpp,
 	win32/include/utility.h, win32/src/utility.cpp:
 
 	* changed #include "error.h" to #include "errors.h"
@@ -20375,9 +19918,7 @@
 1998-10-17 11:26  jdw
 
 	* base/src/bootstrap.cpp, base/src/player.cpp,
-	base/src/win32impl.cpp, base/unix/linux/include/soundcardpmo.h,
-	base/unix/linux/src/Makefile.am, base/unix/linux/src/Makefile.in,
-	base/unix/linux/src/mem.c,
+	base/src/win32impl.cpp,
 	io/soundcard/unix/linux/include/soundcardpmo.h,
 	io/soundcard/unix/linux/src/soundcardlib.cpp,
 	io/soundcard/unix/linux/src/soundcardpmo.cpp,
@@ -20395,12 +19936,11 @@
 1998-10-16 16:33  jdw
 
 	* Makefile.am, Makefile.in, configure, configure.in,
-	base/unix/linux/src/Makefile.am, base/unix/linux/src/Makefile.in,
-	base/unix/linux/src/soundcardpmo.cpp, io/Makefile.am,
-	io/Makefile.in, io/local/Makefile.am, io/local/Makefile.in,
-	io/local/localfilelib.cpp, io/soundcard/Makefile.am,
-	io/soundcard/Makefile.in, io/soundcard/unix/Makefile.am,
-	io/soundcard/unix/Makefile.in, io/soundcard/unix/linux/Makefile.am,
+	io/Makefile.am, io/Makefile.in, io/local/Makefile.am,
+	io/local/Makefile.in, io/local/localfilelib.cpp,
+	io/soundcard/Makefile.am, io/soundcard/Makefile.in,
+	io/soundcard/unix/Makefile.am, io/soundcard/unix/Makefile.in,
+	io/soundcard/unix/linux/Makefile.am,
 	io/soundcard/unix/linux/Makefile.in,
 	io/soundcard/unix/linux/include/soundcardpmo.h,
 	io/soundcard/unix/linux/src/Makefile.am,
@@ -20417,14 +19957,13 @@
 	lmc/xingmp3/src/Makefile.am, lmc/xingmp3/src/Makefile.in,
 	ui/cmdline/Makefile.am, ui/cmdline/Makefile.in,
 	ui/cmdline/Mpg123UI.cpp, ui/cmdline/Mpg123UI.h,
-	ui/dummy/include/dummycoo.h, ui/include/ctrlobj.h:
+	ui/include/ctrlobj.h:
 
 	Mpg123 UI is now in its own lib.
 	
 1998-10-16 15:28  jdw
 
-	* io/src/Makefile.am, io/src/Makefile.in, lmc/src/Makefile.in,
-	ui/src/Makefile.am, ui/src/Makefile.in:
+	* io/src/: Makefile.am, Makefile.in:
 
 	update ust ab it
 	
@@ -20434,16 +19973,12 @@
 	base/include/event.h, base/include/player.h, base/src/Makefile.am,
 	base/src/Makefile.in, base/src/bootstrap.cpp, base/src/player.cpp,
 	base/src/registrar.cpp, base/src/win32impl.cpp,
-	base/unix/linux/include/utility.h, base/unix/linux/src/Makefile.am,
-	base/unix/linux/src/Makefile.in, base/unix/linux/src/utility.cpp,
 	config/Makefile.header, io/Makefile.am, io/Makefile.in,
-	lmc/Makefile.am, lmc/Makefile.in, lmc/src/Makefile.am,
-	lmc/xingmp3/src/Makefile.am, lmc/xingmp3/src/Makefile.in,
-	lmc/xingmp3/src/xinglib.cpp, ui/Makefile.am, ui/Makefile.in,
-	ui/cmdline/Makefile.am, ui/cmdline/Makefile.in,
-	ui/cmdline/Mpg123UI.cpp, ui/cmdline/Mpg123UI.h,
-	ui/dummy/include/dummycoo.h, ui/dummy/src/dummycoo.cpp,
-	ui/include/ctrlobj.h:
+	lmc/Makefile.am, lmc/Makefile.in, lmc/xingmp3/src/Makefile.am,
+	lmc/xingmp3/src/Makefile.in, lmc/xingmp3/src/xinglib.cpp,
+	ui/Makefile.am, ui/Makefile.in, ui/cmdline/Makefile.am,
+	ui/cmdline/Makefile.in, ui/cmdline/Mpg123UI.cpp,
+	ui/cmdline/Mpg123UI.h, ui/include/ctrlobj.h:
 
 	got rid of UI stuff, added shared libs beginning on linux
 	
@@ -20460,16 +19995,14 @@
 	
 1998-10-16 13:35  elrod
 
-	* base/include/event.h, base/src/command.cpp, base/src/player.cpp,
-	ui/dummy/src/dummycoo.cpp:
+	* base/: include/event.h, src/command.cpp, src/player.cpp:
 
 	[no log message]
 	
 1998-10-16 13:29  elrod
 
 	* base/include/player.h, base/src/player.cpp,
-	lmc/xingmp3/src/xinglmc.cpp, ui/dummy/include/dummycoo.h,
-	ui/dummy/src/dummycoo.cpp, ui/include/ctrlobj.h,
+	lmc/xingmp3/src/xinglmc.cpp, ui/include/ctrlobj.h,
 	ui/include/uilib.h:
 
 	* making the last round of major changes with attempt to define UI stuff
@@ -20627,20 +20160,19 @@
 	* base/include/error.h, base/include/player.h,
 	base/include/registry.h, base/src/bootstrap.cpp,
 	base/src/player.cpp, base/src/registry.cpp,
-	base/unix/linux/include/mutex.h, base/win32/include/mutex.h,
-	base/win32/include/registrar.h, base/win32/include/semaphore.h,
-	base/win32/prj/freeamp.dsp, base/win32/src/main.cpp,
-	base/win32/src/registrar.cpp, base/win32/src/semaphore.cpp,
-	io/include/pmi.h, io/include/pmilib.h, io/include/pmiregistry.h,
-	io/include/pmo.h, io/include/pmolib.h, io/include/pmoregistry.h,
+	base/win32/include/mutex.h, base/win32/include/registrar.h,
+	base/win32/include/semaphore.h, base/win32/prj/freeamp.dsp,
+	base/win32/src/main.cpp, base/win32/src/registrar.cpp,
+	base/win32/src/semaphore.cpp, io/include/pmi.h,
+	io/include/pmilib.h, io/include/pmiregistry.h, io/include/pmo.h,
+	io/include/pmolib.h, io/include/pmoregistry.h,
 	io/local/localfilelib.cpp, io/soundcard/soundcardlib.cpp,
 	io/soundcard/win32/include/soundcardpmo.h,
 	io/soundcard/win32/src/soundcardpmo.cpp, io/src/pmiregistry.cpp,
 	io/src/pmoregistry.cpp, lmc/include/lmc.h, lmc/include/lmclib.h,
-	lmc/include/lmcregistry.h, lmc/src/lmcregistry.cpp,
-	lmc/xingmp3/include/xinglmc.h, lmc/xingmp3/src/xinglib.cpp,
-	lmc/xingmp3/src/xinglmc.cpp, ui/include/uiregistry.h,
-	ui/src/uiregistry.cpp:
+	lmc/include/lmcregistry.h, lmc/xingmp3/include/xinglmc.h,
+	lmc/xingmp3/src/xinglib.cpp, lmc/xingmp3/src/xinglmc.cpp,
+	ui/include/uiregistry.h:
 
 	* wow, i look at this list and i cry...
 	* basically all this implements using shared libs for our components...
@@ -20670,9 +20202,8 @@
 
 	* Makefile.am, Makefile.in, configure, configure.in,
 	decoder_speed.cpp, base/src/Makefile.am, base/src/Makefile.in,
-	base/unix/linux/src/soundcardpmo.cpp, lmc/xingmp3/Makefile.am,
-	lmc/xingmp3/Makefile.in, lmc/xingmp3/src/Makefile.am,
-	lmc/xingmp3/src/Makefile.in:
+	lmc/xingmp3/Makefile.am, lmc/xingmp3/Makefile.in,
+	lmc/xingmp3/src/Makefile.am, lmc/xingmp3/src/Makefile.in:
 
 	Updating build so elrod's changes compile under linux
 	
@@ -20702,9 +20233,7 @@
 	
 1998-10-14 00:10  elrod
 
-	* base/include/mediavitalinfo.h,
-	base/unix/linux/include/soundcardpmo.h,
-	base/unix/linux/src/soundcardpmo.cpp, io/include/pmo.h,
+	* base/include/mediavitalinfo.h, io/include/pmo.h,
 	io/soundcard/win32/include/soundcardpmo.h,
 	io/soundcard/win32/prj/soundcard.dsp,
 	io/soundcard/win32/src/soundcardpmo.cpp, lmc/include/lmclib.h,
@@ -20797,14 +20326,10 @@
 
 	* Makefile.am, Makefile.in, configure, configure.in,
 	base/src/Makefile.am, base/src/Makefile.in, base/src/thread.cpp,
-	base/unix/linux/include/linuxthread.h,
-	base/unix/linux/src/Makefile.am, base/unix/linux/src/Makefile.in,
-	base/unix/linux/src/linuxthread.cpp, io/local/Makefile.am,
-	io/local/Makefile.in, lmc/xingmp3/Makefile.am,
-	lmc/xingmp3/Makefile.in, ui/cmdline/CommandLineCIO.cpp,
-	ui/cmdline/Makefile.am, ui/cmdline/Makefile.in,
-	ui/dummy/src/Makefile.am, ui/dummy/src/Makefile.in,
-	ui/include/CommandLineCIO.h:
+	io/local/Makefile.am, io/local/Makefile.in,
+	lmc/xingmp3/Makefile.am, lmc/xingmp3/Makefile.in,
+	ui/cmdline/CommandLineCIO.cpp, ui/cmdline/Makefile.am,
+	ui/cmdline/Makefile.in, ui/include/CommandLineCIO.h:
 
 	linux compile of new thread stuff, added -D_REENTRANT
 	
@@ -20833,20 +20358,12 @@
 
 	* rearranged how we are doing threads...
 	
-1998-10-13 15:43  elrod
-
-	* base/unix/linux/: include/linuxthread.h, include/thread.h,
-	src/linuxthread.cpp, src/thread.cpp:
-
-	* rearranged the way we were doing threads
-	
 1998-10-13 15:09  jdw
 
 	* base/include/event.h, base/include/player.h,
 	base/src/bootstrap.cpp, base/src/player.cpp,
 	lmc/xingmp3/xinglmc.cpp, ui/cmdline/CommandLineCIO.cpp,
-	ui/cmdline/Mpg123UI.cpp, ui/cmdline/cmdlinecoo.cpp,
-	ui/dummy/src/dummycoo.cpp:
+	ui/cmdline/Mpg123UI.cpp, ui/cmdline/cmdlinecoo.cpp:
 
 	Moved all Player methods to UpperCase
 	
@@ -20855,8 +20372,7 @@
 	* decoder_speed.cpp, base/include/event.h, base/include/player.h,
 	base/src/player.cpp, lmc/include/lmc.h, lmc/include/xinglmc.h,
 	lmc/xingmp3/xinglmc.cpp, ui/cmdline/CommandLineCIO.cpp,
-	ui/cmdline/Mpg123UI.cpp, ui/cmdline/cmdlinecoo.cpp,
-	ui/dummy/src/dummycoo.cpp:
+	ui/cmdline/Mpg123UI.cpp, ui/cmdline/cmdlinecoo.cpp:
 
 	[no log message]
 	
@@ -20870,9 +20386,7 @@
 
 	* Makefile.am, Makefile.in, configure, configure.in,
 	base/src/Makefile.am, base/src/Makefile.in, base/src/bootstrap.cpp,
-	base/src/player.cpp, ui/Makefile.am, ui/Makefile.in,
-	ui/dummy/Makefile.am, ui/dummy/Makefile.in,
-	ui/dummy/src/Makefile.am, ui/dummy/src/Makefile.in:
+	base/src/player.cpp, ui/Makefile.am, ui/Makefile.in:
 
 	finished elrod's move of dummycoo to its own include and src home
 	
@@ -20903,13 +20417,6 @@
 	* fixed path append bug in registrar
 	* added new default pref to utility.cpp
 	
-1998-10-13 02:13  elrod
-
-	* ui/dummy/: include/dummycoo.h, src/dummycoo.cpp:
-
-	* moved DummyCOO into the ui directory
-	* got rid of the global semaphore.. now need to pass one in
-	
 1998-10-13 01:49  elrod
 
 	* base/src/player.cpp:
@@ -20928,8 +20435,7 @@
 	base/win32/src/utility.cpp, io/include/pmiregistry.h,
 	io/include/pmoregistry.h, io/src/pmiregistry.cpp,
 	io/src/pmoregistry.cpp, lmc/include/lmcregistry.h,
-	lmc/src/lmcregistry.cpp, ui/include/uiregistry.h,
-	ui/src/uiregistry.cpp:
+	ui/include/uiregistry.h:
 
 	* modified the formatting in some files to add indentions
 	* added a whole bunch of foundation files
@@ -21036,19 +20542,11 @@
 	base/src/bootstrap.cpp, base/src/buffer.cpp, base/src/command.cpp,
 	base/src/freeamp, base/src/player.cpp, base/src/playlist.cpp,
 	base/unix/Makefile.am, base/unix/Makefile.in,
-	base/unix/linux/Makefile.am, base/unix/linux/Makefile.in,
-	base/unix/linux/include/mutex.h,
-	base/unix/linux/include/semaphore.h,
-	base/unix/linux/include/soundcardpmo.h,
-	base/unix/linux/include/thread.h, base/unix/linux/src/Makefile.am,
-	base/unix/linux/src/Makefile.in, base/unix/linux/src/debug.cpp,
-	base/unix/linux/src/mutex.cpp, base/unix/linux/src/semaphore.cpp,
-	base/unix/linux/src/soundcardpmo.cpp,
-	base/unix/linux/src/thread.cpp, base/win32/Makefile.am,
-	base/win32/Makefile.in, base/win32/include/mutex.h,
-	base/win32/include/semaphore.h, base/win32/include/soundcardpmo.h,
-	base/win32/include/thread.h, base/win32/prj/freeamp.dsp,
-	base/win32/prj/freeamp.dsw, base/win32/prj/freeamp_console.dsp,
+	base/win32/Makefile.am, base/win32/Makefile.in,
+	base/win32/include/mutex.h, base/win32/include/semaphore.h,
+	base/win32/include/soundcardpmo.h, base/win32/include/thread.h,
+	base/win32/prj/freeamp.dsp, base/win32/prj/freeamp.dsw,
+	base/win32/prj/freeamp_console.dsp,
 	base/win32/prj/freeamp_console.dsw, base/win32/src/mutex.cpp,
 	base/win32/src/semaphore.cpp, base/win32/src/sound.cpp,
 	base/win32/src/soundcardpmo.cpp, base/win32/src/thread.cpp,
