@@ -26,6 +26,7 @@ ____________________________________________________________________________*/
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <windowsx.h>
+#include <shlobj.h>
 #include <assert.h>
 #include <commctrl.h>
 #include <commdlg.h>
@@ -856,6 +857,76 @@ InitMenuPopup(HMENU menuHandle,
     }*/
 }
 
+static void ResolveLink(char* buf, int32 length)
+{
+    assert(buf);
+
+    if(buf)
+    {
+        HRESULT hres = NULL;
+
+        hres = CoInitialize(NULL);
+
+        if(SUCCEEDED(hres))
+        {
+            IShellLink* psl = NULL;
+
+            // Get a pointer to the IShellLink interface
+            hres = CoCreateInstance(CLSID_ShellLink, 
+                                    NULL, 
+                                    CLSCTX_INPROC_SERVER, 
+                                    IID_IShellLink, 
+                                    (void**)&psl);
+
+            if(SUCCEEDED(hres))
+            {
+                IPersistFile* ppf;
+
+                // Get a pointer to the IPersistFile interface
+                hres = psl->QueryInterface(IID_IPersistFile, (void**)&ppf);
+
+                if(SUCCEEDED(hres))
+                {
+                    WORD wsz[MAX_PATH];
+
+                    // Ensure string is UNICODE
+                    MultiByteToWideChar(CP_ACP, 
+                                        0, 
+                                        buf, 
+                                        -1, 
+                                        wsz, 
+                                        MAX_PATH);
+
+                    // Load Shortcut
+                    hres = ppf->Load(wsz, STGM_READ);
+
+                    if(SUCCEEDED(hres))
+                    {
+                        // Resolve the link
+                        hres = psl->Resolve(NULL, SLR_ANY_MATCH|SLR_NO_UI);
+                
+                        if(SUCCEEDED(hres))
+                        {
+                            WIN32_FIND_DATA wfd;
+
+                            // Resolve the link
+                            hres = psl->GetPath(buf,length,&wfd, 0);
+                        }
+                    }
+
+                    // Release the IPersist Interface
+                    ppf->Release();
+                }
+        
+                // Release the IShellLink Interface
+                psl->Release();
+            }
+
+            CoUninitialize(); 
+        }
+    }
+}
+
 void 
 FreeAmpUI::
 DropFiles(HDROP dropHandle)
@@ -879,6 +950,14 @@ DropFiles(HDROP dropHandle)
 						sizeof(file));
 
         char* pExtension = NULL;
+
+        pExtension = strrchr(file, '.');
+
+        if(pExtension && strcasecmp(pExtension, ".lnk") == 0)
+        { 
+            ResolveLink(file, sizeof(file));
+        }
+
         List<char*> fileList;
         struct stat st;
 
