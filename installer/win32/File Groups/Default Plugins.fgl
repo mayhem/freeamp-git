@@ -4,6 +4,7 @@ file1=..\..\base\win32\prj\plugins\download.ui
 file2=..\..\base\win32\prj\plugins\musicbrowser.ui
 file3=..\..\base\win32\prj\plugins\xing.lmc
 file4=..\..\base\win32\prj\plugins\fileinput.pmi
+file5=..\..\base\win32\prj\plugins\misc.mdf
 
 [General]
 Type=FILELIST

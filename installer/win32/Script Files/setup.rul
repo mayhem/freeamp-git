@@ -348,6 +348,7 @@ end;
 function SetupRegistry()
     NUMBER nResult;
 	STRING szKey, szNetscapeKey1, szNetscapeKey2, szReclaimFileTypes;
+	STRING szUserName;
 	BOOL bInLocalMachine, bInCurrentUser;
 begin
 
@@ -374,8 +375,8 @@ begin
 			" v" + @PRODUCT_VERSION + "\\Main";
 			
 	// Create the ones that are dynamic
-	RegDBSetKeyValueEx(szKey, "UserFirstName", REGDB_STRING, svFirstName, -1);
-	RegDBSetKeyValueEx(szKey, "UserLastName", REGDB_STRING, svLastName, -1);
+	szUserName = svFirstName + " " + svLastName;
+	RegDBSetKeyValueEx(szKey, "UserName", REGDB_STRING, szUserName, -1);	
 	
 	if(bReclaimFileTypes = TRUE) then
 		szReclaimFileTypes = "1";
@@ -917,6 +918,7 @@ end;
 // --- include script file section ---
 
 #include "sddialog.rul"
+
 
 
 
