@@ -38,6 +38,7 @@ ____________________________________________________________________________*/
 #include <fcntl.h>
 #endif
 
+#include "config.h"
 #include "httpbuffer.h"
 #include "httpinput.h"
 #include "facontext.h"
@@ -140,7 +141,7 @@ Error GetHostByName(char *szHostName, struct hostent *pResult)
     return kError_NoErr;
 #endif
 
-#ifdef __linux__
+#if defined(__linux__) && !HAVE_LINUX_LIBC5
     char               *pDummyBuf;
     struct hostent     *pRes;
     int                 iErrno, iRet;
@@ -153,7 +154,7 @@ Error GetHostByName(char *szHostName, struct hostent *pResult)
     return (iRet < 0) ? kError_NoDataAvail : kError_NoErr;
 #endif
 
-#ifdef __solaris__
+#if (defined(__linux__) && HAVE_LINUX_LIBC5) || defined(__solaris__)
     char               *pDummyBuf;
     struct hostent     *pRes;
     int                 iErrno, iRet;
