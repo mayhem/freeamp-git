@@ -114,6 +114,7 @@ class MusicBrowserUI : public UserInterface {
     /* gtk-specific code in callbacl*/
     void ExpandCollapseEvent();
     void ToggleVisEvent();
+    void ToggleVisEventDestroyed();
 
     /* no gtk specific code */
     void DeleteListEvent();

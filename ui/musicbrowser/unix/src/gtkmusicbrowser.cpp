@@ -539,21 +539,22 @@ void music_search()
 
 void MusicBrowserUI::CreateExpanded(void)
 {
-    GtkWidget *hbox;
     GtkWidget *browserlabel;
     GtkWidget *browservbox;
     GtkWidget *button;
+    GtkWidget *hbox;
 
     if (m_browserCreated)
         return;
 
     m_browserCreated = true;
 
-    masterBrowserBox = gtk_vbox_new(FALSE, 5);
+    masterBrowserBox = gtk_vbox_new(FALSE, 0);
     gtk_box_pack_start(GTK_BOX(masterBox), masterBrowserBox, TRUE, TRUE, 0);
+    gtk_widget_show(masterBrowserBox);
 
     hbox = gtk_hbox_new(FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(masterBrowserBox), hbox, FALSE, FALSE, 6);
+    gtk_box_pack_start(GTK_BOX(masterBrowserBox), hbox, FALSE, FALSE, 5);
     gtk_widget_show(hbox);
 
     browserlabel = gtk_label_new("My Music Catalog:");
@@ -582,10 +583,6 @@ void MusicBrowserUI::CreateExpanded(void)
     gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(musicBrowserWindow),
                                           musicBrowserTree);
     gtk_widget_show(musicBrowserTree);
-
-    hbox = gtk_hbox_new(FALSE, 5);
-    gtk_box_pack_start(GTK_BOX(masterBrowserBox), hbox, FALSE, FALSE, 0);
-    gtk_widget_show(hbox);
 }
 
 void MusicBrowserUI::ExpandCollapseEvent(void)
@@ -623,9 +620,16 @@ void MusicBrowserUI::ToggleVisEvent(void)
     delete e;
 }
 
-void toggle_vis_internal(GtkWidget *widget, MusicBrowserUI *p)
+void MusicBrowserUI::ToggleVisEventDestroyed(void)
 {
-    p->ToggleVisEvent();
+    ToggleVisEvent();
+    m_initialized = false;
+}
+
+gboolean toggle_vis_destroy(GtkWidget *w, MusicBrowserUI *p)
+{
+    p->ToggleVisEventDestroyed();
+    return FALSE;
 }
 
 void delete_list_internal(GtkWidget *widget, MusicBrowserUI *p)
@@ -925,7 +929,8 @@ void MusicBrowserUI::CreatePlaylistList(GtkWidget *box)
                        GTK_SIGNAL_FUNC(list_drag_rec_internal), this);
     gtk_signal_connect(GTK_OBJECT(playlistList), "drag_motion",
                        GTK_SIGNAL_FUNC(list_drag_motion_internal), this);
-    
+
+    gtk_clist_columns_autosize(GTK_CLIST(playlistList));
     gtk_widget_show(playlistList);
 
     m_currentindex = (uint32)m_plm->GetCurrentIndex();
@@ -963,7 +968,6 @@ void MusicBrowserUI::CreatePlaylist(void)
 {
     GtkWidget *vbox;
     GtkWidget *buttonvbox;
-    GtkWidget *hbox;
     GtkWidget *playlistwindow;
     GtkWidget *controlhbox;
     GtkWidget *arrow;
@@ -975,16 +979,15 @@ void MusicBrowserUI::CreatePlaylist(void)
     gtk_window_set_title(GTK_WINDOW(musicBrowser), BRANDING" - Playlist Editor");
     gtk_window_set_policy(GTK_WINDOW(musicBrowser), TRUE, TRUE, TRUE);
     gtk_signal_connect(GTK_OBJECT(musicBrowser), "destroy",
-                       GTK_SIGNAL_FUNC(toggle_vis_internal), this);
-    gtk_container_set_border_width(GTK_CONTAINER(musicBrowser), 5);
-
+                       GTK_SIGNAL_FUNC(toggle_vis_destroy), this);
+    gtk_container_set_border_width(GTK_CONTAINER(musicBrowser), 0);
 
     vbox = gtk_vbox_new(FALSE, 0);
     gtk_container_add(GTK_CONTAINER(musicBrowser), vbox);
     gtk_widget_show(vbox);
 
     statusBar = gtk_statusbar_new();
-    gtk_box_pack_end(GTK_BOX(vbox), statusBar, FALSE, TRUE, 5);
+    gtk_box_pack_end(GTK_BOX(vbox), statusBar, FALSE, TRUE, 0);
     gtk_widget_show(statusBar);
 
     CreateMenu(vbox);
@@ -993,35 +996,23 @@ void MusicBrowserUI::CreatePlaylist(void)
     gtk_box_pack_start(GTK_BOX(vbox), masterBox, TRUE, TRUE, 0);
     gtk_widget_show(masterBox);
 
-    masterPlaylistBox = gtk_vbox_new(FALSE, 5);
+    masterPlaylistBox = gtk_hbox_new(FALSE, 5);
     gtk_box_pack_end(GTK_BOX(masterBox), masterPlaylistBox, TRUE, TRUE, 0);
+    gtk_container_set_border_width(GTK_CONTAINER(masterPlaylistBox), 5);
     gtk_widget_show(masterPlaylistBox);
-
-    hbox = gtk_hbox_new(FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(masterPlaylistBox), hbox, FALSE, FALSE, 0);
-    gtk_widget_show(hbox);
-
-    vbox = gtk_vbox_new(FALSE, 0);
-    gtk_container_add(GTK_CONTAINER(masterPlaylistBox), vbox);
-    gtk_container_set_border_width(GTK_CONTAINER(vbox), 5);
-    gtk_widget_show(vbox);
-
-    hbox = gtk_hbox_new(FALSE, 5);
-    gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
-    gtk_widget_show(hbox);
 
     playlistwindow = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(playlistwindow),
                                    GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_box_pack_start(GTK_BOX(hbox), playlistwindow, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(masterPlaylistBox), playlistwindow, TRUE, TRUE, 5);
     gtk_widget_set_usize(playlistwindow, 200, 200);
     gtk_widget_show(playlistwindow);
 
     CreatePlaylistList(playlistwindow);
 
     buttonvbox = gtk_vbox_new(FALSE, 10);
-    gtk_container_set_border_width(GTK_CONTAINER(buttonvbox), 5);
-    gtk_box_pack_start(GTK_BOX(hbox), buttonvbox, FALSE, FALSE, 0);
+    gtk_container_set_border_width(GTK_CONTAINER(buttonvbox), 0);
+    gtk_box_pack_start(GTK_BOX(masterPlaylistBox), buttonvbox, FALSE, FALSE, 0);
     gtk_widget_show(buttonvbox);
 
     button = gtk_button_new();
@@ -1069,12 +1060,6 @@ void MusicBrowserUI::CreatePlaylist(void)
     controlhbox = gtk_hbox_new(FALSE, 5);
     gtk_box_pack_start(GTK_BOX(masterPlaylistBox), controlhbox, FALSE, FALSE, 0);
     gtk_widget_show(controlhbox);
-
-    button = gtk_button_new_with_label("  Close  ");
-    gtk_box_pack_end(GTK_BOX(controlhbox), button, FALSE, FALSE, 3);
-    gtk_signal_connect(GTK_OBJECT(button), "clicked",
-                       GTK_SIGNAL_FUNC(toggle_vis_internal), this);
-    gtk_widget_show(button);
 
     gtk_widget_show(musicBrowser);
 
