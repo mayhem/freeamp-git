@@ -116,10 +116,12 @@ MusicBrowserUI::AcceptEvent( Event* event )
                 m_mainBrowser->PostMessage( &msg );
             }
             break;
-        case INFO_PlaylistItemUpdated:
+#if 0
+        case INFO_PlaylistItemsUpdated:
             PRINT(( "INFO_PlaylistItemUpdated\n" ));
             BroadcastToAllBrowsers( MBMSG_PLAYLIST_ITEM_UPDATED, event );
             break;
+#endif
         case INFO_PlaylistUpdated: // not used?
             PRINT(( "INFO_PlaylistUpdated\n" ));
             BroadcastToAllBrowsers( MBMSG_PLAYLIST_UPDATED, event );

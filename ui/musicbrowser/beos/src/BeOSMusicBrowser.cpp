@@ -310,6 +310,7 @@ BeOSMusicBrowser::MessageReceived( BMessage* message )
             m_playlistView->SetCurrentlyPlaying(
                                 message->FindInt32( "index" ) );
             break;
+#if 0
         case MBMSG_PLAYLIST_ITEM_UPDATED:
         {
             PlaylistItemUpdatedEvent* piue;
@@ -320,6 +321,7 @@ BeOSMusicBrowser::MessageReceived( BMessage* message )
             }
             break;
         }
+#endif
         case MBMSG_PLAYLIST_SORTED:
         {
             PlaylistSortedEvent* pse;
