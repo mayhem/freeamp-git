@@ -903,7 +903,7 @@ DeleteSelection()
     bool result = false;
 
     // remove selected items from list
-    List<ListItem*>* selectList = new List<ListItem*>();
+    //List<ListItem*>* selectList = new List<ListItem*>();
     List<PlayListItem*>* playlistList = new List<PlayListItem*>();
 
     FreeAmpUI* ui = (FreeAmpUI*)GetWindowLong(Window(), GWL_USERDATA);
@@ -923,7 +923,7 @@ DeleteSelection()
 
             playlistItem = (PlayListItem*)listItem->UserValue();
 
-            playlistList->AddItem(playlistItem, 0);
+            playlistList->AddItem(playlistItem);
 
             delete listItem;
         }

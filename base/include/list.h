@@ -262,8 +262,9 @@ AddItem(T &item, int32 index)
 		        delete [] m_list;
 
 		        m_list = pNewObjs;
-		        memset(&(m_list[m_insertionPoint+1]),0,m_insertionPoint + m_threshhold - 2);
-		        m_currentLength += m_threshhold;
+                m_currentLength += m_threshhold;
+
+		        memset(&(m_list[m_insertionPoint+1]),0, m_currentLength - m_insertionPoint - 1);
 	        } 
             else 
             {
