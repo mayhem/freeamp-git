@@ -31,7 +31,7 @@ ____________________________________________________________________________*/
 #include <windows.h>
 #include "mmsystem.h"
 
-#include "cdaudio.h"
+ #include "cdaudio.h"
 
 /* Return the version of libcdaudio */
 long cdaudio_getversion(void)
@@ -54,7 +54,15 @@ cd_init_device(string device_name)
 	   return -1;
 
    sprintf(mciCommand, "open cdaudio shareable alias %s wait", device_name.c_str());
-   mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
+   int ret = mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
+
+   if (ret != 0) 
+   {
+	   mciGetErrorString(ret, mciCommand, 128);
+	   sprintf(mciReturn, "error opening %s", device_name.c_str());
+	   MessageBox(NULL, mciReturn, mciCommand, MB_OK|MB_SETFOREGROUND);
+	   return -1;
+   }
 
    return 0;
 }
@@ -265,7 +273,7 @@ cd_play_track(string cd_desc, int starttrack, int endtrack)
    int numtracks = atoi(mciReturn);
 
    if (endtrack < numtracks)
-       sprintf(mciPlay, "play %s from %d to %d", cd_desc.c_str(), starttrack, endtrack + 1);
+       sprintf(mciPlay, "play %s from %d:0 to %d:0", cd_desc.c_str(), starttrack, endtrack + 1);
    else
 	   sprintf(mciPlay, "play %s from %d", cd_desc.c_str(), starttrack);
    sprintf(mciCommand, "set %s time format tmsf wait", cd_desc.c_str());
@@ -395,11 +403,16 @@ cd_update(struct disc_info *disc, struct disc_status status)
    disc->disc_mode = status.status_mode;
    memcpy(&disc->disc_time, &status.status_disc_time, sizeof(struct disc_timeval));
    memcpy(&disc->disc_track_time, &status.status_track_time, sizeof(struct disc_timeval));
-   
-   disc->disc_current_track = 0;
-   while(disc->disc_current_track < disc->disc_total_tracks && 
-          cd_msf_to_frames(disc->disc_time) >= cd_msf_to_frames(disc->disc_track[disc->disc_current_track].track_pos) )
-     disc->disc_current_track++;
-  
+
+   if (status.status_current_track != 0)
+	   disc->disc_current_track = status.status_current_track;
+   else {
+       disc->disc_current_track = 0;
+       while(disc->disc_current_track < disc->disc_total_tracks && 
+             cd_msf_to_frames(disc->disc_time) >= 
+			     cd_msf_to_frames(disc->disc_track[disc->disc_current_track].track_pos) )
+           disc->disc_current_track++;
+   }
+
    return 0;
 }

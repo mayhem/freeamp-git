@@ -36,6 +36,7 @@ ____________________________________________________________________________*/
 #include "log.h"
 
 #include <windows.h>
+#include <time.h>
 
 #define DB printf("%s:%d\n", __FILE__, __LINE__);
 
@@ -175,7 +176,7 @@ Error CDPMO::Init(OutputInfo *info)
    if (m_cdDesc == "") 
 	   m_cdDesc = "cdaudio";
    
-   sprintf(device, "%d", GetCurrentThreadId());
+   sprintf(device, "%d_%d", GetCurrentThreadId(), time(NULL));
    m_cdDesc += device;
 
    if ((initreturn = cd_init_device(m_cdDesc)) != 0) {
@@ -292,7 +293,7 @@ Error CDPMO::ChangePosition(int32 newposition)
 
 void CDPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
 {
-   if (m_cdDesc == "" || m_track < 0)
+   if (m_thcdDesc == "" || m_track < 0)
       return;
 
    struct disc_info disc;
@@ -331,6 +332,7 @@ void CDPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
    }
 
    if (m_track != disc.disc_current_track) {
+	   cd_stop(m_thcdDesc);
        trackDone = true;
 	   return;
    }
@@ -375,7 +377,7 @@ void CDPMO::WorkerThread(void)
    if (m_thcdDesc == "") 
 	   m_thcdDesc = "cdaudio";
    
-   sprintf(device, "%d_th", GetCurrentThreadId());
+   sprintf(device, "%d_%d", GetCurrentThreadId(), time(NULL));
    m_thcdDesc += device; 
 
    if (cd_init_device(m_thcdDesc) != 0) {
@@ -384,7 +386,6 @@ void CDPMO::WorkerThread(void)
    }
 
    m_locker.Release();
-
    for(; !m_bExit;)
    {
       if (!m_properlyInitialized)
@@ -403,4 +404,8 @@ void CDPMO::WorkerThread(void)
           usleep(10000);
       }
    }
+
+   m_locker.Acquire();
+   cd_finish(m_thcdDesc);
+   m_locker.Release();
 }
