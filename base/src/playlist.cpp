@@ -100,6 +100,9 @@ class UndoMove : public UndoItem {
     uint32 m_newIndex, m_oldIndex;
 };
 
+#ifndef lstrcmpi
+#define lstrcmpi strcasecmp
+#endif
 
 // Function object used for sorting PlaylistItems in PlaylistManager
 bool PlaylistItemSort::operator() (PlaylistItem* item1, 
@@ -119,19 +122,22 @@ bool PlaylistItemSort::operator() (PlaylistItem* item1,
         {
             case kPlaylistSortKey_Artist:
             {
-                result = m1.Artist() < m2.Artist();
+                //result = m1.Artist() < m2.Artist();
+                result = (lstrcmpi(m1.Artist().c_str(), m2.Artist().c_str()) < 0);
                 break;
             }
 
             case kPlaylistSortKey_Album:
             {
-                result = m1.Album() < m2.Album();
+                //result = m1.Album() < m2.Album();
+                result = (lstrcmpi(m1.Album().c_str(), m2.Album().c_str()) < 0);
                 break;
             }
 
             case kPlaylistSortKey_Title:
             {
-                result = m1.Title() < m2.Title();
+                //result = m1.Title() < m2.Title();
+                result = (lstrcmpi(m1.Title().c_str(), m2.Title().c_str()) < 0);
                 break;
             }
 
@@ -149,7 +155,8 @@ bool PlaylistItemSort::operator() (PlaylistItem* item1,
 
             case kPlaylistSortKey_Genre:
             {
-                result = m1.Genre() < m2.Genre();
+                //result = m1.Genre() < m2.Genre();
+                result = (lstrcmpi(m1.Genre().c_str(), m2.Genre().c_str()) < 0);
                 break;
             }
 
@@ -176,7 +183,7 @@ bool PlaylistItemSort::operator() (PlaylistItem* item1,
                 pos = item2->URL().find_last_of('/');
                 file2 = item2->URL().substr(pos + 1);
 
-                result = (lstrcmpi(file1.c_str(), file2.c_str()) > 0);
+                result = (lstrcmpi(file1.c_str(), file2.c_str()) < 0);
                 break;
             }
 
@@ -1612,7 +1619,7 @@ Error PlaylistManager::Sort(PlaylistSortKey key, PlaylistSortType type)
     if(IsntError(result))
     {
         if(kPlaylistKey_MasterPlaylist == GetActivePlaylist() && currentItem)
-            InternalSetCurrentIndex(IndexOf(currentItem));
+            SetCurrentIndex(IndexOf(currentItem));
            
         m_context->target->AcceptEvent(new PlaylistSortedEvent(key, this));
 
