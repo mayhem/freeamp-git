@@ -114,19 +114,13 @@ Error RMP::BeginElement(string &oElement, AttrMap &oAttrMap)
 
     if (m_oPath == string("/PACKAGE/TRACKLIST/TRACK"))
     {
-       delete m_pMetaData;
-       m_pMetaData = new MetaData();
+        delete m_pMetaData;
+        m_pMetaData = new MetaData();
     }
-    if (m_oPath == string("/PACKAGE/SERVER/COOKIE"))
+    if (m_oPath == string("/PACKAGE/COOKIE"))
     {
-        if(m_oCookie.size())
-        {
-            m_oCookie += "; ";
-        }
-
-        m_oCookie += oAttrMap["NAME"];
-        m_oCookie += "=";
-        m_oCookie += oAttrMap["VALUE"];
+        m_oCookieName = ""; 
+        m_oCookieValue = ""; 
 
         return kError_NoErr;
     }
@@ -165,6 +159,11 @@ Error RMP::PCData(string &oData)
     {
         m_oTrackId = oData;
     	m_pMetaData->SetTrack(atoi(oData.c_str()));
+        return kError_NoErr;
+    }
+    if (m_oPath == string("/PACKAGE/TRACKLIST/TRACK/DIR"))
+    {
+        m_oTrackDir = oData;
         return kError_NoErr;
     }
     if (m_oPath == string("/PACKAGE/TRACKLIST/TRACK/TITLE"))
@@ -207,6 +206,18 @@ Error RMP::PCData(string &oData)
     	m_pMetaData->SetTime(atoi(oData.c_str()));
         return kError_NoErr;
     }
+    if (m_oPath == string("/PACKAGE/COOKIE/NAME"))
+    {
+        m_oCookieName = oData; 
+
+        return kError_NoErr;
+    }
+    if (m_oPath == string("/PACKAGE/COOKIE/VALUE"))
+    {
+        m_oCookieValue = oData; 
+
+        return kError_NoErr;
+    }
         
     return kError_NoErr;
 }
@@ -216,6 +227,18 @@ Error RMP::EndElement(string &oElement)
 {
     char *pPtr;
     int   iOffset;
+  
+    if (m_oPath == string("/PACKAGE/COOKIE"))
+    {
+        if(m_oCookie.size())
+        {
+            m_oCookie += "; ";
+        }
+
+        m_oCookie += m_oCookieName;
+        m_oCookie += "=";
+        m_oCookie += m_oCookieValue;
+    }
     
     pPtr = strrchr(m_oPath.c_str(), '/');
     if (pPtr == NULL)
@@ -224,7 +247,7 @@ Error RMP::EndElement(string &oElement)
     iOffset = pPtr - m_oPath.c_str();
     m_oPath.erase(iOffset, m_oPath.length() - iOffset);   
 
-    if (oElement == string("PACKAGE"))
+    if (oElement == string("TRACK"))
     {
         DownloadItem *pItem;
         string        oFinal = "http://";
@@ -233,7 +256,7 @@ Error RMP::EndElement(string &oElement)
         oFinal += m_oLocation;
       
         MangleLocation(oFinal);
-        
+
         pItem = new DownloadItem(oFinal.c_str(), 
                                  m_oFileName.c_str(),
                                  m_pMetaData);
@@ -272,4 +295,9 @@ void RMP::MangleLocation(string &oLocation)
     iPos = oLocation.find(oPattern, 0);
     if (iPos != string::npos)
         oLocation.replace(iPos, 4, m_oPackageId);
+        
+    oPattern = "%d";
+    iPos = oLocation.find(oPattern, 0);
+    if (iPos != string::npos)
+        oLocation.replace(iPos, 2, m_oTrackDir);
 }

@@ -44,6 +44,7 @@ using namespace std;
 #include "errors.h"
 #include "help.h"
 #include "resource.h"
+#include "debug.h"
 
 static const int32 kProgressHeight = 8;
 static const int32 kProgressWidth = 7;
@@ -167,10 +168,9 @@ int32 DownloadUI::AcceptEvent(Event* event)
                         {
                             DownloadItem* dli = (DownloadItem*)item.lParam;
 
-                            if(dli->GetState() == kDownloadItemState_Queued ||
-                               dli->GetState() == kDownloadItemState_Downloading)
+                            if(dli->GetState() == kDownloadItemState_Downloading)
                             {
-                                m_dlm->CancelDownload(dli, false);  
+                                m_dlm->CancelDownload(dli, true);  
                             }
                         }
                     }
@@ -1480,6 +1480,15 @@ BOOL DownloadUI::Command(int32 command, HWND src)
 
 		case IDC_CLOSE:
 		{
+            if (GetAsyncKeyState(VK_SHIFT) < 0)
+            {
+                ShowWindow(GetDlgItem(m_hwnd, IDC_DLMTEXT), SW_HIDE);
+                ShowWindow(GetDlgItem(m_hwnd, IDC_FREETRACKS), SW_HIDE);
+                ShowWindow(GetDlgItem(m_hwnd, IDC_URL), SW_SHOW);
+                ShowWindow(GetDlgItem(m_hwnd, IDC_ADDURL), SW_SHOW);
+                break;
+            }
+
 			SendMessage(m_hwnd, WM_CLOSE, 0, 0);
 			break;
 		}

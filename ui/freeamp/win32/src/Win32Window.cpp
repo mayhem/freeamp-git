@@ -118,6 +118,9 @@ LRESULT Win32Window::WindowProc(HWND hwnd, UINT msg,
 {
     LRESULT result = 0;
 
+    if (m_bMindMeldInProgress)
+        return 0;
+
     switch (msg)
     {
 		case WM_CLOSE:
@@ -275,6 +278,7 @@ Win32Window::Win32Window(Theme *pTheme, string &oName)
     m_pMindMeldMutex = new Mutex();
     m_bMouseInWindow = false;
     m_hPal = NULL;
+    m_bMindMeldInProgress = false;
 }
 
 Win32Window::~Win32Window(void)
@@ -402,6 +406,7 @@ Error Win32Window::VulcanMindMeld(Window *pOther)
     RECT     sRect;
 
     m_pMindMeldMutex->Acquire();
+    m_bMindMeldInProgress = true;
 
 	oRect.x1 = oRect.x2 = oRect.y1 = oRect.y2 = 0;
 	GetWindowPosition(oRect);
@@ -419,7 +424,10 @@ Error Win32Window::VulcanMindMeld(Window *pOther)
        ((Win32Canvas *)m_pCanvas)->SetPalette(m_hPal);
 
     if (IsError(eRet))
+    {
+       m_bMindMeldInProgress = false;
        return eRet;
+    }   
 
     if (m_hWnd)
     {   
@@ -441,6 +449,8 @@ Error Win32Window::VulcanMindMeld(Window *pOther)
         UpdateWindow(m_hWnd);
     }    
 
+    m_bMindMeldInProgress = false;
+
     return kError_NoErr;
 }
 
@@ -449,6 +459,9 @@ void Win32Window::Paint(void)
     PAINTSTRUCT ps;
     HDC         hDc;
     Rect        oRect;
+
+    if (m_bMindMeldInProgress)
+       return;
     
 	hDc = BeginPaint(m_hWnd, &ps);
     oRect.x1 = ps.rcPaint.left;
@@ -462,6 +475,9 @@ void Win32Window::Paint(void)
 
 void Win32Window::TimerEvent(void)
 {
+    if (m_bMindMeldInProgress)
+       return;
+       
     Window::TimerEvent();
 }
 
@@ -472,7 +488,7 @@ void Win32Window::SaveWindowPos(Pos &oPos)
 
 Error Win32Window::Close(void)
 {
-	if (!m_hWnd)
+	if (!m_hWnd || m_bMindMeldInProgress)
        return kError_YouScrewedUp;
        
 	SendMessage(m_hWnd, WM_CLOSE, 0, 0);
@@ -482,7 +498,7 @@ Error Win32Window::Close(void)
 
 Error Win32Window::Enable(void)
 {
-	if (!m_hWnd)
+	if (!m_hWnd || m_bMindMeldInProgress)
        return kError_YouScrewedUp;
        
 	return EnableWindow(m_hWnd, false) ? kError_NoErr : kError_InvalidParam;
@@ -490,28 +506,28 @@ Error Win32Window::Enable(void)
 
 Error Win32Window::Disable(void)
 {
-	if (!m_hWnd)
+	if (!m_hWnd || m_bMindMeldInProgress)
        return kError_YouScrewedUp;
 	return EnableWindow(m_hWnd, true) ? kError_NoErr : kError_InvalidParam;
 }
 
 Error Win32Window::Show(void)
 {
-	if (!m_hWnd)
+	if (!m_hWnd || m_bMindMeldInProgress)
        return kError_YouScrewedUp;
 	return ShowWindow(m_hWnd, SW_SHOWNORMAL) ? kError_NoErr : kError_InvalidParam;
 }
 
 Error Win32Window::Hide(void)
 {
-	if (!m_hWnd)
+	if (!m_hWnd || m_bMindMeldInProgress)
        return kError_YouScrewedUp;
 	return ShowWindow(m_hWnd, SW_HIDE) ? kError_NoErr : kError_InvalidParam;
 }
 
 Error Win32Window::SetTitle(string &oTitle)
 {
-	if (!m_hWnd)
+	if (!m_hWnd || m_bMindMeldInProgress)
        return kError_YouScrewedUp;
        
 	return SetWindowText(m_hWnd, oTitle.c_str()) ? kError_NoErr : kError_InvalidParam;
@@ -519,7 +535,7 @@ Error Win32Window::SetTitle(string &oTitle)
 
 Error Win32Window::CaptureMouse(bool bCapture)
 {
-	if (!m_hWnd)
+	if (!m_hWnd || m_bMindMeldInProgress)
        return kError_YouScrewedUp;
        
 	if (bCapture)
@@ -587,7 +603,7 @@ Error Win32Window::GetWindowPosition(Rect &oWindowRect)
 
 Error Win32Window::Minimize(void)
 {
-	if (!m_hWnd)
+	if (!m_hWnd || m_bMindMeldInProgress)
        return kError_YouScrewedUp;
 
     ShowWindow(m_hWnd, SW_MINIMIZE);
@@ -599,7 +615,7 @@ Error Win32Window::Minimize(void)
 
 Error Win32Window::Restore(void)
 {
-	if (!m_hWnd)
+	if (!m_hWnd || m_bMindMeldInProgress)
        return kError_YouScrewedUp;
        
     ShowWindow(m_hWnd, SW_RESTORE);
@@ -614,6 +630,12 @@ void Win32Window::DropFiles(HDROP dropHandle)
     char  file[MAX_PATH + 1];
     vector<string> oFileList;
 
+    if (m_bMindMeldInProgress)
+    {
+       DragFinish(dropHandle);
+       return;
+    }   
+
     count = DragQueryFile(  dropHandle,
                             -1L,
                             file,
@@ -627,6 +649,8 @@ void Win32Window::DropFiles(HDROP dropHandle)
                         sizeof(file));
         oFileList.push_back(string(file));
     }
+    
+    DragFinish(dropHandle);
     m_pTheme->DropFiles(&oFileList);
 }
 
@@ -634,6 +658,9 @@ void
 Win32Window::
 Notify(int32 command, LPNMHDR notifyMsgHdr)
 {
+    if (m_bMindMeldInProgress)
+       return;
+       
     if(notifyMsgHdr->code == TTN_NEEDTEXT)
     {
         int32 idCtrl = notifyMsgHdr->idFrom;
@@ -672,6 +699,9 @@ CreateTooltips()
     TOOLINFO ti;
     vector<Control *>::iterator i;
     uint32 uCtr;
+
+    if (m_bMindMeldInProgress)
+       return;
 
     //
     // check if we have been here
@@ -753,7 +783,7 @@ void Win32Window::SetStayOnTop(bool bStay)
 {
     Window::SetStayOnTop(bStay);
 
-    if (m_hWnd == NULL)
+    if (m_hWnd == NULL || m_bMindMeldInProgress)
        return;
 
     if (m_bStayOnTop)
@@ -768,7 +798,7 @@ void Win32Window::SetLiveInToolbar(bool bLive)
     
     Window::SetLiveInToolbar(bLive);
 
-    if (m_hWnd == NULL)
+    if (m_hWnd == NULL || m_bMindMeldInProgress)
        return;
 
     ShowWindow(m_hWnd, FALSE);
@@ -788,6 +818,9 @@ void Win32Window::SetLiveInToolbar(bool bLive)
 
 bool Win32Window::LButtonDown(void)
 {
+    if (m_bMindMeldInProgress)
+       return false;
+       
     return GetAsyncKeyState(VK_LBUTTON) < 0;
 }
 
@@ -798,6 +831,9 @@ void Win32Window::MouseLeaveCheck(void)
     Pos   oPos;
     HDC   hDc;
     
+    if (m_bMindMeldInProgress)
+       return;
+       
     GetWindowPosition(oRect);
     GetCursorPos(&sPos);
     oPos.x = sPos.x;
@@ -830,6 +866,9 @@ Error Win32Window::GetDesktopSize(int32 &iX, int32 &iY)
 
 void Win32Window::BringWindowToFront(void)
 {
+    if (m_bMindMeldInProgress)
+       return;
+       
     ShowWindow(m_hWnd, SW_RESTORE);
     SetForegroundWindow(m_hWnd);
 }
@@ -840,6 +879,9 @@ void Win32Window::AddToSystemMenu(HWND hWnd)
     MENUITEMINFO sInfo;
     BOOL         bRet;
     
+    if (m_bMindMeldInProgress)
+       return;
+       
     hMenu = GetSystemMenu(hWnd, false);
     hPopup = LoadMenu(g_hinst, MAKEINTRESOURCE(IDM_TRAY));
     hPopup = GetSubMenu(hPopup, 0);

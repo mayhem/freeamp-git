@@ -79,6 +79,7 @@ using namespace std;
 #include "event.h"
 #include "eventdata.h"
 #include "musiccatalog.h"
+#include "debug.h"
 
 
 DownloadManager::DownloadManager(FAContext* context)
@@ -443,6 +444,11 @@ Error DownloadManager::ReadDownloadFile(char* url,
                 }
             }
         }
+        
+        char   path[255];
+        uint32 length = sizeof(path);
+        URLToFilePath(url, path, &length);
+        unlink(path);
     }
 
     return result;
@@ -911,7 +917,7 @@ Error DownloadManager::Download(DownloadItem* item)
 
                         int openFlags = O_BINARY|O_CREAT|O_RDWR|O_APPEND;
 
-                        if(returnCode == 200) // always whole file
+                        if(returnCode != 206) // server oked partial download
                         {
                             item->SetBytesReceived(0);
                             openFlags |= O_TRUNC;
@@ -1251,7 +1257,7 @@ void DownloadManager::SaveResumableDownloadItems()
     uint32 length = sizeof(path);
 
     m_context->prefs->GetPrefString(kDatabaseDirPref, path, &length);
-    
+
     if(DoesDBDirExist(path))
     {
         strcat(path, DIR_MARKER_STR);
@@ -1270,7 +1276,9 @@ void DownloadManager::SaveResumableDownloadItems()
             {
                 item = m_itemList[index];
 
-                if(item && item->GetState() == kDownloadItemState_Paused)
+                if(item && 
+                  (item->GetState() == kDownloadItemState_Paused ||
+                   item->GetState() == kDownloadItemState_Queued))
                 {
                     ostringstream ost;
                     char num[256];
@@ -1278,7 +1286,7 @@ void DownloadManager::SaveResumableDownloadItems()
                     MetaData metadata = item->GetMetaData();
 
                     // write out the number of elements we have
-                    ost << 15 << kDatabaseDelimiter;
+                    ost << 16 << kDatabaseDelimiter;
                     // next record the length of each element
                     ost << item->SourceURL().size() << kDatabaseDelimiter;
                     ost << item->SourceCookie().size() << kDatabaseDelimiter;
@@ -1305,6 +1313,8 @@ void DownloadManager::SaveResumableDownloadItems()
                     ost << strlen(num) << kDatabaseDelimiter;
                     sprintf(num, "%ld", metadata.Size());
                     ost << strlen(num) << kDatabaseDelimiter;
+                    sprintf(num, "%ld", item->GetState());
+                    ost << strlen(num) << kDatabaseDelimiter;
 
                     // now stuff all the data in there
                     ost << item->SourceURL();
@@ -1322,12 +1332,16 @@ void DownloadManager::SaveResumableDownloadItems()
                     ost << metadata.Track();
                     ost << metadata.Time();
                     ost << metadata.Size();
+                    
+                    sprintf(num, "%ld", item->GetState());
+                    ost << num;
                     ost << '\0';     
-          
+                    
+                    sprintf(num, "%ld", index);
 #ifdef WIN32 
-                    database.Insert(path, (char*)ost.str().c_str());  
+                    database.Insert(num, (char*)ost.str().c_str());  
 #else
-                    database.Insert(path, (char*)ost.str());
+                    database.Insert(num, (char*)ost.str());
 #endif
                 }
             }
@@ -1337,8 +1351,8 @@ void DownloadManager::SaveResumableDownloadItems()
 
 void DownloadManager::LoadResumableDownloadItems()
 {
-    char path[_MAX_PATH];
-    uint32 length = sizeof(path);
+    char   path[_MAX_PATH];
+    uint32 index = 0, length = sizeof(path);
 
     m_context->prefs->GetPrefString(kDatabaseDirPref, path, &length);
 
@@ -1352,13 +1366,13 @@ void DownloadManager::LoadResumableDownloadItems()
         if(database.Working())
         {
             char *key = NULL;
-
-            while((key = database.NextKey(key))) 
+            
+            while (key = database.NextKey(key))
             {
                 char* value = database.Value(key);
 
-                if(!value)
-                    continue;
+                if (!value)
+                   continue;
 
                 uint32 numFields = 0;
                 int offset = 0;
@@ -1371,7 +1385,6 @@ void DownloadManager::LoadResumableDownloadItems()
                    int temp;
  
                    sscanf(value + offset, " %lu %n", &fieldLength[i], &temp);
-                   printf("field %lu: %lu\n", i, fieldLength[i]);
                    if (i == numFields - 1) {
                        char intholder[10];
                        sprintf(intholder, "%lu", fieldLength[i]);
@@ -1437,6 +1450,9 @@ void DownloadManager::LoadResumableDownloadItems()
                         case 14:
                             metadata.SetSize(atoi(data.substr(count, fieldLength[j]).c_str()));
                             break;
+                        case 15:
+                            item->SetState((DownloadItemState)atoi(data.substr(count, fieldLength[j]).c_str()));
+                            break;
                         default:
                             break;
 
@@ -1450,13 +1466,13 @@ void DownloadManager::LoadResumableDownloadItems()
                 fieldLength = NULL;
 
                 item->SetMetaData(&metadata);
-                item->SetState(kDownloadItemState_Paused);
 
                 m_itemList.push_back(item);
                 SendItemAddedMessage(item);
-
-                database.Remove(key);
             }
+            
+            while (key = database.NextKey(NULL))
+                database.Remove(key);
         }
     }
 }

@@ -60,7 +60,8 @@ class RMP : public DownloadFormat, public Parse {
      vector<DownloadItem*> *m_pList;
      string                 m_oPath, m_oFileName, m_oLocation;
 	 string                 m_oPackageId, m_oListId, m_oTrackId;  
-     string                 m_oPlaylist, m_oServer, m_oCookie;
+     string                 m_oPlaylist, m_oServer, m_oTrackDir;
+	 string                 m_oCookie, m_oCookieName, m_oCookieValue;
      MetaData              *m_pMetaData;
 };
 

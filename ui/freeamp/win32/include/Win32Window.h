@@ -91,6 +91,7 @@ class Win32Window : public Window
      Pos      m_oWindowPos;
      Mutex   *m_pMindMeldMutex;
 	 bool     m_bMouseInWindow;
+     bool     m_bMindMeldInProgress;
 };
 
 #endif

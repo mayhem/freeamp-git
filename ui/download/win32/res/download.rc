@@ -52,7 +52,7 @@ END
 // Dialog
 //
 
-IDD_DIALOG DIALOGEX 0, 0, 274, 210
+IDD_DIALOG DIALOGEX 0, 0, 276, 210
 STYLE DS_NOIDLEMSG | DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | WS_CLIPCHILDREN | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "Download Manager - FreeAmp"
@@ -69,14 +69,16 @@ BEGIN
     PUSHBUTTON      "Resume",IDC_RESUME,102,192,50,14,WS_DISABLED
     PUSHBUTTON      "Pause",IDC_PAUSE,52,192,50,14,WS_DISABLED
     DEFPUSHBUTTON   "Close",IDC_CLOSE,222,192,50,14
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDVERT,160,192,1,16
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDFRAME,160,191,2,16
     CONTROL         "",IDC_OVERALL_PROGRESS,"Button",BS_OWNERDRAW,2,110,270,
                     11
     PUSHBUTTON      "Help",IDC_SHOWHELP,169,192,50,14
     CONTROL         "http://www.emusic.com/music/free.html",IDC_FREETRACKS,
                     "Button",BS_OWNERDRAW | BS_FLAT | WS_TABSTOP,2,18,270,11
     LTEXT           "The Download Manager enables you to download music from sites that support the RMP or RealJukebox download format. To try it check out the free music at",
-                    IDC_STATIC,2,2,270,17
+                    IDC_DLMTEXT,2,2,270,17
+    PUSHBUTTON      "Add URL",IDC_ADDURL,221,7,50,14,NOT WS_VISIBLE
+    EDITTEXT        IDC_URL,2,7,216,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
 END
 
 
@@ -90,6 +92,7 @@ GUIDELINES DESIGNINFO DISCARDABLE
 BEGIN
     IDD_DIALOG, DIALOG
     BEGIN
+        RIGHTMARGIN, 274
         BOTTOMMARGIN, 208
     END
 END

@@ -141,6 +141,7 @@ class Window
       bool                      m_bIsVulcanMindMeldHost;
       Rect                      m_oMoveStart;
 	  int32                     m_iDesktopWidth, m_iDesktopHeight;
+	  bool                      m_bMindMeldInProgress;
 };
 
 #endif

@@ -81,7 +81,7 @@ extern    "C"
 {
    UserInterface *Initialize(FAContext * context)
    {
-      Debug_v("##Clear");
+      //Debug_v("##Clear");
       return new FreeAmpTheme(context);
    }
 }
@@ -288,16 +288,20 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
       }   
       case INFO_Playing:
       {
-         bool bEnable = false;
+         bool bEnable;
+         int  iState;
          
-         int iState = 1;
+         iState = 1;
          m_pWindow->ControlIntValue(string("PlayPause"), true, iState);
+         iState = 1;
          m_pWindow->ControlIntValue(string("PlayStop"), true, iState);
          iState = 0;
          m_pWindow->ControlIntValue(string("MPause"), true, iState);
+         bEnable = false;
          m_pWindow->ControlEnable(string("Play"), true, bEnable);
          bEnable = true;
          m_pWindow->ControlEnable(string("Pause"), true, bEnable);
+         bEnable = true;
          m_pWindow->ControlEnable(string("Stop"), true, bEnable);
          
          m_bPlayShown = false;
@@ -312,16 +316,20 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
          bool bEnable = true;
          string oEmpty("");
          
+         iState = 0;
          m_pWindow->ControlIntValue(string("PlayPause"), true, iState);
-         iState = e->Type() == INFO_Paused ? 1 : 0;
          m_bPaused = e->Type() == INFO_Paused;
+         iState = e->Type() == INFO_Paused ? 1 : 0;
          m_pWindow->ControlIntValue(string("PlayStop"), true, iState);
+         iState = e->Type() == INFO_Paused ? 1 : 0;
          m_pWindow->ControlIntValue(string("MPause"), true, iState);
+         bEnable = true;
          m_pWindow->ControlEnable(string("Play"), true, bEnable);
          
          
          bEnable = false;
          m_pWindow->ControlEnable(string("Pause"), true, bEnable);
+         bEnable = false;
          m_pWindow->ControlEnable(string("Stop"), true, bEnable);
          m_bPlayShown = true;
          m_pWindow->ControlStringValue("BufferInfo", true, oEmpty);
@@ -725,6 +733,9 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
            return kError_NoErr;
        }
        m_pWindow->ControlIntValue(oControlName, false, iState);
+       if (iState > 1)
+          iState = 1;
+       
        if (iState == 0)
            m_pContext->target->AcceptEvent(new Event(CMD_Play));
 	   else

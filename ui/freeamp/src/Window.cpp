@@ -53,6 +53,7 @@ Window::Window(Theme *pTheme, string &oName)
     m_pCaptureControl = NULL;
     m_pMouseDownControl = NULL;
     m_bIsVulcanMindMeldHost = false;
+    m_bMindMeldInProgress = false;
 }
 
 Window::~Window(void)
@@ -116,6 +117,9 @@ void Window::AddControl(Control *pControl)
 {
     string oName;
 
+    if (m_bMindMeldInProgress)
+       return;
+
     pControl->GetName(oName);
     m_oControlMap.insert(pair<string, Control *>(oName, pControl));
     m_oControls.push_back(pControl);
@@ -123,6 +127,9 @@ void Window::AddControl(Control *pControl)
 
 void Window::ClearControls(void)
 {
+    if (m_bMindMeldInProgress)
+       return;
+       
     while(m_oControls.size() > 0)
     {
         delete m_oControls[0];
@@ -146,6 +153,9 @@ Error Window::ControlEnable(const string &oTarget, bool bSet, bool &bEnable)
     ControlMapIterator i;
     int                j;
 
+    if (m_bMindMeldInProgress)
+       return kError_InvalidParam;
+       
     for(i = m_oControlMap.find(oTarget), j = 0; 
         j != m_oControlMap.count(oTarget); j++, i++) 
     {
@@ -164,6 +174,9 @@ Error Window::ControlShow(const string &oTarget, bool bSet, bool &bShow)
     ControlMapIterator  i;
     int                 j;
 
+    if (m_bMindMeldInProgress)
+       return kError_InvalidParam;
+       
     for(i = m_oControlMap.find(oTarget), j = 0; 
         j != m_oControlMap.count(oTarget); j++, i++) 
     {
@@ -187,6 +200,9 @@ Error Window::ControlIntValue(const string &oTarget, bool bSet, int &iValue)
     ControlMapIterator  i;
     int                 j;
 
+    if (m_bMindMeldInProgress)
+       return kError_InvalidParam;
+       
     for(i = m_oControlMap.find(oTarget), j = 0; 
         j != m_oControlMap.count(oTarget); j++, i++) 
     {
@@ -201,6 +217,9 @@ Error Window::ControlStringValue(const string &oTarget, bool bSet, string &oValu
     ControlMapIterator  i;
     int                 j;
 
+    if (m_bMindMeldInProgress)
+       return kError_InvalidParam;
+       
     for(i = m_oControlMap.find(oTarget), j = 0; 
         j != m_oControlMap.count(oTarget); j++, i++) 
     {
@@ -215,6 +234,9 @@ Error Window::ControlGetDesc(const string &oTarget, string &oDesc)
     ControlMapIterator  i;
     int                 j;
 
+    if (m_bMindMeldInProgress)
+       return kError_InvalidParam;
+       
     for(i = m_oControlMap.find(oTarget), j = 0; 
         j != m_oControlMap.count(oTarget); j++, i++) 
     {
@@ -230,6 +252,9 @@ Error Window::ControlGetTip(const string &oTarget, string &oTip)
     ControlMapIterator  i;
     int                 j;
 
+    if (m_bMindMeldInProgress)
+       return kError_InvalidParam;
+       
     for(i = m_oControlMap.find(oTarget), j = 0; 
         j != m_oControlMap.count(oTarget); j++, i++) 
     {
@@ -244,6 +269,9 @@ Error Window::SendControlMessage(Control *pControl,
                                  ControlMessageEnum eMesg)
 {
     string oControlName;
+
+    if (m_bMindMeldInProgress)
+       return kError_InvalidParam;
    
     pControl->GetName(oControlName);
 
@@ -252,6 +280,9 @@ Error Window::SendControlMessage(Control *pControl,
 
 bool Window::DoesControlExist(const string &oName)
 {
+    if (m_bMindMeldInProgress)
+       return false;
+       
     return m_oControlMap.find(oName) != m_oControlMap.end();
 }
 
@@ -259,6 +290,9 @@ Control *Window::ControlFromPos(Pos &oPos)
 {
     vector<Control *>::iterator i;
     bool                        bShown;
+
+    if (m_bMindMeldInProgress)
+       return NULL;
 
     for(i = m_oControls.begin(); i != m_oControls.end(); i++)
     {
@@ -272,12 +306,18 @@ Control *Window::ControlFromPos(Pos &oPos)
 
 Error Window::StartMouseCapture(Control *pControl)
 {
+    if (m_bMindMeldInProgress)
+       return kError_InvalidParam;
+       
     m_pCaptureControl = pControl;
     return CaptureMouse(true);
 }
 
 Error Window::EndMouseCapture(void)
 {
+    if (m_bMindMeldInProgress)
+       return kError_InvalidParam;
+       
     m_pCaptureControl = NULL;
     return CaptureMouse(false);
 }
@@ -287,6 +327,9 @@ void Window::HandleMouseMove(Pos &oScreenPos)
     Control *pControl;
     Pos      oPos;
     Rect     oRect;
+
+    if (m_bMindMeldInProgress)
+       return;
 
     if (m_bWindowMove)
     {
@@ -415,6 +458,9 @@ void Window::HandleMouseLButtonDown(Pos &oScreenPos)
     Rect     oRect;
     Pos      oPos;
 
+    if (m_bMindMeldInProgress)
+       return;
+
     GetWindowPosition(oRect);
     oPos.x = oScreenPos.x - oRect.x1;
     oPos.y = oScreenPos.y - oRect.y1;
@@ -454,6 +500,9 @@ void Window::HandleMouseLButtonUp(Pos &oScreenPos)
     Pos      oPos;
     Rect     oRect;
 
+    if (m_bMindMeldInProgress)
+       return;
+
     GetWindowPosition(oRect);
     oPos.x = oScreenPos.x - oRect.x1;
     oPos.y = oScreenPos.y - oRect.y1;
@@ -490,6 +539,9 @@ void Window::HandleMouseLButtonUp(Pos &oScreenPos)
 // this ElvisHasLeftTheBuilding()?
 void Window::MouseHasLeftWindow(void)
 {
+    if (m_bMindMeldInProgress)
+       return;
+
     if (m_pMouseInControl)
     {
        m_pMouseInControl->AcceptTransition(CT_MouseLeave);
@@ -511,6 +563,9 @@ void Window::TimerEvent(void)
 {
     vector<Control *>::iterator i;
 
+    if (m_bMindMeldInProgress)
+       return;
+
     for(i = m_oControls.begin(); i != m_oControls.end(); i++)
     {
         if ((*i)->WantsTimingMessages())
@@ -520,21 +575,33 @@ void Window::TimerEvent(void)
 
 void Window::SetStayOnTop(bool bStay)
 {
+    if (m_bMindMeldInProgress)
+       return;
+
     m_bStayOnTop = bStay;
 }
 
 void Window::SetLiveInToolbar(bool bLive)
 {
+    if (m_bMindMeldInProgress)
+       return;
+
     m_bLiveInToolbar = bLive;
 }
 
 void Window::Keystroke(unsigned char cKey)
 {
+    if (m_bMindMeldInProgress)
+       return;
+
     m_pTheme->HandleKeystroke(cKey);
 }
 
 bool Window::MenuCommand(uint32 uCommand)
 {
+    if (m_bMindMeldInProgress)
+       return true;
+
     return m_pTheme->HandleMenuCommand(uCommand);
 }
 

@@ -164,7 +164,7 @@ void MultiStateControl::Transition(ControlTransitionEnum  eTrans,
           m_pParent->SendControlMessage(this, CM_MouseLeave);
           break;
        case CT_SetValue:
-       	  m_iState = min(max(m_iValue, 0), m_iNumStates);
+       	  m_iState = min(max(m_iValue, 0), m_iNumStates - 1);
           break;
        case CT_Hide:
        {
