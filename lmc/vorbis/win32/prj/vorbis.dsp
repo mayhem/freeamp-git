@@ -55,7 +55,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x11800000" /subsystem:windows /dll /machine:I386 /out:"vorbis.lmc" /libpath:"..\..\..\..\base\win32"
+# ADD LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib vorbislib.lib /nologo /base:"0x11800000" /subsystem:windows /dll /machine:I386 /out:"vorbis.lmc" /libpath:"..\..\..\..\base\win32" /libpath:"..\..\..\..\lmc\vorbis\win32"
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                    ..\..\..\..\base\win32\prj\plugins	copy vorbis.lmc                            ..\..\..\..\base\win32\prj\plugins
@@ -85,7 +85,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x11800000" /subsystem:windows /dll /debug /machine:I386 /out:"vorbis.lmc" /pdbtype:sept /libpath:"..\..\..\..\base\win32"
+# ADD LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib vorbislib.lib /nologo /base:"0x11800000" /subsystem:windows /dll /debug /machine:I386 /out:"vorbis.lmc" /pdbtype:sept /libpath:"..\..\..\..\base\win32" /libpath:"..\..\..\..\lmc\vorbis\win32"
 # SUBTRACT LINK32 /profile /nodefaultlib
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
@@ -117,7 +117,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386 /out:"vorbis.lmc"
-# ADD LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x11800000" /subsystem:windows /dll /machine:I386 /out:"vorbis.lmc" /libpath:"..\..\..\..\base\win32"
+# ADD LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib vorbislib.lib /nologo /base:"0x11800000" /subsystem:windows /dll /machine:I386 /out:"vorbis.lmc" /libpath:"..\..\..\..\base\win32" /libpath:"..\..\..\..\lmc\vorbis\win32"
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                    ..\..\..\..\base\win32\prj\plugins	copy vorbis.lmc                            ..\..\..\..\base\win32\prj\plugins
@@ -149,7 +149,7 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"vorbis.lmc" /pdbtype:sept
 # SUBTRACT BASE LINK32 /profile /nodefaultlib
-# ADD LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x11800000" /subsystem:windows /dll /debug /machine:I386 /out:"vorbis.lmc" /pdbtype:sept /libpath:"..\..\..\..\base\win32"
+# ADD LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib vorbislib.lib /nologo /base:"0x11800000" /subsystem:windows /dll /debug /machine:I386 /out:"vorbis.lmc" /pdbtype:sept /libpath:"..\..\..\..\base\win32" /libpath:"..\..\..\..\lmc\vorbis\win32"
 # SUBTRACT LINK32 /profile /nodefaultlib
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
@@ -245,148 +245,6 @@ SOURCE=..\res\vorbis.rc
 # Begin Source File
 
 SOURCE=..\..\src\vorbislmc.cpp
-# ADD CPP /I "..\include\vorbis"
-# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
-# End Source File
-# End Group
-# Begin Group "decoder source"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\..\src\lib\analysis.c
-# ADD CPP /I "..\include\vorbis"
-# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\lib\barkmel.c
-# ADD CPP /I "..\include\vorbis"
-# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\lib\bitwise.c
-# ADD CPP /I "..\include\vorbis"
-# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\lib\block.c
-# ADD CPP /I "..\include\vorbis"
-# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\lib\codebook.c
-# ADD CPP /I "..\include\vorbis"
-# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\lib\envelope.c
-# ADD CPP /I "..\include\vorbis"
-# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\lib\floor0.c
-# ADD CPP /I "..\include\vorbis"
-# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\lib\framing.c
-# ADD CPP /I "..\include\vorbis"
-# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\lib\iir.c
-# ADD CPP /I "..\include\vorbis"
-# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\lib\info.c
-# ADD CPP /I "..\include\vorbis"
-# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\lib\lpc.c
-# ADD CPP /I "..\include\vorbis"
-# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\lib\lsp.c
-# ADD CPP /I "..\include\vorbis"
-# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\lib\mapping0.c
-# ADD CPP /I "..\include\vorbis"
-# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\lib\mdct.c
-# ADD CPP /I "..\include\vorbis"
-# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\lib\psy.c
-# ADD CPP /I "..\include\vorbis"
-# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\lib\registry.c
-# ADD CPP /I "..\include\vorbis"
-# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\lib\res0.c
-# ADD CPP /I "..\include\vorbis"
-# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\lib\sharedbook.c
-# ADD CPP /I "..\include\vorbis"
-# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\lib\smallft.c
-# ADD CPP /I "..\include\vorbis"
-# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\lib\synthesis.c
-# ADD CPP /I "..\include\vorbis"
-# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\lib\time0.c
-# ADD CPP /I "..\include\vorbis"
-# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\lib\vorbisfile.c
-# ADD CPP /I "..\include\vorbis"
-# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\lib\window.c
 # ADD CPP /I "..\include\vorbis"
 # SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
 # End Source File

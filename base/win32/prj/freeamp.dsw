@@ -533,6 +533,36 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name fabaselib
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name vorbislib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "vorbislib"=..\..\..\LMC\VORBIS\WIN32\PRJ\vorbislib.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "vorbismdf"=..\..\..\plm\metadata\vorbis\prj\vorbismdf.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name vorbislib
+    End Project Dependency
 }}}
 
 ###############################################################################
