@@ -652,7 +652,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
             //int32 lParam;
             //lParam = GetCurrentItemFromMousePos();
 
-            TV_ITEM sItem;
+            /*TV_ITEM sItem;
             TV_HITTESTINFO tv_htinfo;
 
 
@@ -688,7 +688,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                 {
                     m_context->target->AcceptEvent(new ShowPreferencesEvent(3));
                 }
-            }
+            }*/
         }
         /*
 	    if (pTreeView->hdr.code == ??)

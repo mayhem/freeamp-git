@@ -34,6 +34,7 @@ ____________________________________________________________________________*/
 #include "Win32MusicBrowser.h"
 #include "DropSource.h"
 #include "DropObject.h"
+#include "eventdata.h"
 
 #define IsCtrlDown()  (GetKeyState(VK_CONTROL) < 0)
 #define IsShiftDown()  (GetKeyState(VK_SHIFT) < 0)
@@ -352,6 +353,50 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
 
         case WM_RBUTTONUP:
         {
+            break;
+        }
+
+        case WM_LBUTTONDBLCLK:
+        {
+            TV_ITEM sItem;
+            TV_HITTESTINFO tv_htinfo;
+
+            //GetCursorPos(&tv_htinfo.pt);
+            //ScreenToClient(m_hMusicCatalog, &tv_htinfo.pt);
+            tv_htinfo.pt.x =  LOWORD(lParam);
+            tv_htinfo.pt.y =  HIWORD(lParam);
+
+
+            if(TreeView_HitTest(m_hMusicCatalog, &tv_htinfo))
+            {
+                sItem.hItem = TreeView_GetSelection(m_hMusicCatalog); 
+                sItem.mask = TVIF_PARAM | TVIF_HANDLE;
+                TreeView_GetItem(m_hMusicCatalog, &sItem);
+
+                if(m_oTreeIndex.IsTrack(sItem.lParam))
+                {
+                    PlaylistItem *item;
+                
+                    item = new PlaylistItem(*m_oTreeIndex.Data(sItem.lParam).m_pTrack);
+                    m_oPlm->AddItem(item, false);
+                } 
+                else if(m_oTreeIndex.IsPlaylist(sItem.lParam))
+                {
+                    m_oPlm->ReadPlaylist(m_oTreeIndex.Data(sItem.lParam).m_oPlaylistPath.c_str());
+                }
+                else if(m_oTreeIndex.IsPortable(sItem.lParam))
+                {
+                    EditPortablePlaylist(m_oTreeIndex.Data(sItem.lParam).m_pPortable);
+                }
+                else if(tv_htinfo.hItem == m_hNewPlaylistItem)
+                {
+                    NewPlaylist();
+                }
+                else if(tv_htinfo.hItem == m_hNewPortableItem)
+                {
+                    m_context->target->AcceptEvent(new ShowPreferencesEvent(3));
+                }
+            }
             break;
         }
 

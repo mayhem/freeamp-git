@@ -519,6 +519,14 @@ SOURCE=..\res\music1.ico
 # End Source File
 # Begin Source File
 
+SOURCE=..\res\music10.ico
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\music11.ico
+# End Source File
+# Begin Source File
+
 SOURCE=..\res\music2.ico
 # End Source File
 # Begin Source File
@@ -536,6 +544,18 @@ SOURCE=..\res\music5.ico
 # Begin Source File
 
 SOURCE=..\res\music6.ico
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\music7.ico
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\music8.ico
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\music9.ico
 # End Source File
 # Begin Source File
 
@@ -961,25 +981,5 @@ SOURCE=..\..\include\utility.h
 SOURCE=..\include\win32prefs.h
 # End Source File
 # End Group
-# Begin Source File
-
-SOURCE=..\res\music10.ico
-# End Source File
-# Begin Source File
-
-SOURCE=..\res\music11.ico
-# End Source File
-# Begin Source File
-
-SOURCE=..\res\music7.ico
-# End Source File
-# Begin Source File
-
-SOURCE=..\res\music8.ico
-# End Source File
-# Begin Source File
-
-SOURCE=..\res\music9.ico
-# End Source File
 # End Target
 # End Project
