@@ -33,9 +33,9 @@ ____________________________________________________________________________*/
 #include "queue.h"
 
 
-//#include "localfileinput.h"
-//#include "soundcardpmo.h"
-//#include "xinglmc.h"
+#include "localfileinput.h"
+#include "soundcardpmo.h"
+#include "xinglmc.h"
 #include "semaphore.h"
 
 #include "eventdata.h"
@@ -258,14 +258,14 @@ int32 Player::serviceEvent(Event *pC) {
 
 	            PhysicalMediaInput* pmi = NULL;
 	            //cout << "Done deleting myLMC" << endl;
-	            //if(pc->type == 0)
-	            //	pmi = new LocalFileInput(pc->url);
+	            if(pc->type == 0)
+	            	pmi = new LocalFileInput(pc->url);
 
 	            //cout << "New PMI..." << endl;
-	            //SoundCardPMO *scPMO = new SoundCardPMO();
+	            SoundCardPMO *scPMO = new SoundCardPMO();
 	            //cout << "New scPMO..." << endl;
-	            //myLMC = new MAPlayLMC(lfPMI,scPMO);
-	            //myLMC = new XingLMC(pmi,scPMO);
+	            myLMC = new MAPlayLMC(lfPMI,scPMO);
+	            myLMC = new XingLMC(pmi,scPMO);
 	            //cout << "Created xing..." << endl;
 	            if (setState(STATE_Playing)) {
 	                SEND_NORMAL_EVENT(INFO_Playing);
