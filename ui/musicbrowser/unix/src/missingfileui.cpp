@@ -81,11 +81,11 @@ static void browse_select(GtkWidget *w, MissingFileUI *p)
     }
 }
 
-void MissingFileUI::ChangeTextEntry(const char *entry, bool set)
+void MissingFileUI::ChangeTextEntry(const char *text, bool set)
 {
-    m_entryText = entry;
+    m_entryText = text;
     if (set)
-        gtk_entry_set_text(GTK_ENTRY(m_entry), entry);
+        gtk_entry_set_text(GTK_ENTRY(m_entry), text);
 }
 
 static void entry_change(GtkWidget *w, MissingFileUI *p)
@@ -97,7 +97,7 @@ static void entry_change(GtkWidget *w, MissingFileUI *p)
 static void browse_click(GtkWidget *w, MissingFileUI *p)
 {
     FileSelector *filesel = new FileSelector("Browse to Missing File");
-    if (filesel->Run(false)) {
+    if (filesel->Run()) {
         string filepath = filesel->GetReturnPath();
         struct stat st;
 
@@ -211,7 +211,7 @@ void MissingFileUI::Run(void)
 
     m_browse = gtk_button_new_with_label("Browse");
     gtk_signal_connect(GTK_OBJECT(m_browse), "clicked",
-                       GTK_SIGNAL_FUNC(browse_click), &iRet);
+                       GTK_SIGNAL_FUNC(browse_click), this);
     gtk_box_pack_end(GTK_BOX(hbox), m_browse, FALSE, FALSE, 0);
     gtk_widget_show(m_browse);
    

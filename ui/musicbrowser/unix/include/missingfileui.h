@@ -40,7 +40,7 @@ class MissingFileUI {
  
     void SetFunc(int func);
     void EnableEntry(bool enable);
-    void ChangeTextEntry(const char *entry, bool set = false);
+    void ChangeTextEntry(const char *text, bool set = false);
 
  protected:
     FAContext *m_context;

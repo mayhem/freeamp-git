@@ -50,7 +50,7 @@ typedef enum
 {
    PlayerState_Paused = 1,
    PlayerState_Playing,
-   PlayerState_Stopped,
+   PlayerState_Stopped
 }
 PlayerState;
 
