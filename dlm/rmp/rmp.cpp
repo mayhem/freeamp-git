@@ -206,6 +206,16 @@ Error RMP::PCData(string &oData)
     	m_pMetaData->SetTime(atoi(oData.c_str()));
         return kError_NoErr;
     }
+	if (m_oPath == string("/PACKAGE/TRACKLIST/TRACK/FORMAT"))
+    {
+		uint32 bumpItUp = 0;
+
+		if(*oData.c_str() == '.')
+			bumpItUp = 1;
+
+    	m_pMetaData->SetFormatExtension(oData.c_str() + bumpItUp);
+        return kError_NoErr;
+    }
     if (m_oPath == string("/PACKAGE/COOKIE/NAME"))
     {
         m_oCookieName = oData; 

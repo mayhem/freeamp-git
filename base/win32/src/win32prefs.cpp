@@ -28,7 +28,7 @@ ____________________________________________________________________________*/
 // location
 const HKEY  kMainKey = HKEY_CURRENT_USER;
 const char* kFreeAmpKey = "SOFTWARE\\"BRANDING_COMPANY;
-const char* kFreeAmpVersionKey = BRANDING" v"FREEAMP_VERSION;
+const char* kFreeAmpVersionKey = BRANDING" v"FREEAMP_MAJOR_VERSION"."FREEAMP_MINOR_VERSION;
 const char* kMainComponentKey = "Main";
 
 // default values

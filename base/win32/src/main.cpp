@@ -42,6 +42,7 @@ ____________________________________________________________________________*/
 
 void CreateHiddenWindow(void* arg);
 void SendCommandLineToHiddenWindow(void);
+bool SendCommandLineToRealJukebox(void);
 void ReclaimFileTypes(const char* path, bool askBeforeReclaiming);
 
 const char* kHiddenWindow = "FreeAmp Hidden Window";
@@ -56,6 +57,11 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     HANDLE runOnceMutex;
     
     g_hinst = hInstance;
+
+	if(SendCommandLineToRealJukebox())
+	{
+		return 0;
+	}
 
     runOnceMutex = CreateMutex(	NULL,
 							    TRUE,
@@ -155,6 +161,154 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	WSACleanup();
 
 	return 0;
+}
+
+
+bool SendCommandLineToRealJukebox()
+{
+	bool result = false;
+
+	Registrar registrar;
+	Registry formatRegistry;
+	Win32Prefs prefs;
+	vector<DownloadFormatInfo*> formats;
+
+	// init
+    registrar.SetSubDir("plugins");
+    registrar.SetSearchString("*.dlf");
+    registrar.InitializeRegistry(&formatRegistry, &prefs);
+
+    const RegistryItem* module = NULL;
+    DownloadFormat* dlf = NULL;
+    int32 i = 0;
+
+    while((module = formatRegistry.GetItem(i++)))
+    {
+        dlf = (DownloadFormat*) module->InitFunction()(NULL);
+
+        if(dlf)
+        {
+            DownloadFormatInfo dlfi;
+
+            uint32 index = 0;
+
+            // error != kError_NoMoreFormats
+            while(IsntError(dlf->GetSupportedFormats(&dlfi, index++)))
+            {
+                dlfi.SetRef(dlf);
+                formats.push_back(new DownloadFormatInfo(dlfi));
+            }
+        }
+    }
+
+	vector<DownloadFormatInfo*>::iterator dlfIter;
+
+	if(__argc > 1)
+    {
+        char* extension;
+
+		extension = strrchr(__argv[1], '.');
+
+		if(extension)
+        {
+			extension++;
+
+			for(dlfIter = formats.begin(); 
+				dlfIter != formats.end(); 
+				dlfIter++)
+			{
+				if(!strcasecmp(extension, (*dlfIter)->GetExtension()))
+                {
+					vector<DownloadItem*> items;
+					char url[MAX_PATH + 7];
+					uint32 size = sizeof(url);
+					Error err;
+
+					err = FilePathToURL(__argv[1], url, &size);
+
+					if(IsntError(err))
+					{
+						(*dlfIter)->GetRef()->ReadDownloadFile(url, 
+															   &items);
+
+						vector<DownloadItem*>::iterator dliIter;
+
+						for(dliIter = items.begin(); 
+							dliIter != items.end(); 
+							dliIter++)
+						{
+							MetaData metadata = (*dliIter)->GetMetaData();
+
+							if(	strcasecmp("mp3", metadata.FormatExtension().c_str()) &&
+								strcasecmp("mp2", metadata.FormatExtension().c_str()) &&
+								strcasecmp("mp1", metadata.FormatExtension().c_str()) &&
+								strcasecmp("m3u", metadata.FormatExtension().c_str()) &&
+								strcasecmp("pls", metadata.FormatExtension().c_str()) )
+							{
+                                bool rjFound = false;
+
+								result = true;
+
+								LONG regErr;
+								HKEY key;
+
+								regErr = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
+													  "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\realjbox.exe",
+													  0, 
+													  KEY_ALL_ACCESS,
+													  &key);
+
+                                if(regErr == ERROR_SUCCESS)
+                                {
+                                    char buf[MAX_PATH*2];
+                                    DWORD len = sizeof(buf);
+                                    DWORD type;
+
+                                    regErr = RegQueryValueEx(key,
+                                                             NULL, 
+                                                             NULL, 
+                                                             &type, 
+                                                             (LPBYTE)buf, 
+                                                             &len);
+
+                                    if(result == ERROR_SUCCESS)
+                                    {
+                                        rjFound = true;
+
+                                        strcat(buf, "/m application/vnd.rn-rn_music_package ");
+                                        strcat(buf, __argv[1]);
+
+                                        WinExec(buf, SW_NORMAL);
+                                    }
+                                }
+
+                                if(!rjFound)
+                                {
+                                    MessageBox(NULL, The_BRANDING" does not support the formats "
+                                                     "contained in this Music Package.  The download "
+                                                     "will be aborted.", "Unsupported Formats", MB_OK);
+                                }
+							}
+						}
+					}
+
+                    break;
+                }
+			}
+
+		}
+    }
+
+	// clean up
+	for(dlfIter = formats.begin(); 
+		dlfIter != formats.end(); 
+		dlfIter++)
+	{
+		delete (*dlfIter)->GetRef();
+		delete (*dlfIter);
+	}
+
+	return result;
 }
 
 static BOOL CALLBACK EnumWndProc(HWND hwnd, LPARAM lParam)

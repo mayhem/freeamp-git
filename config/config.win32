@@ -36,8 +36,11 @@ ____________________________________________________________________________*/
 #define The_BRANDING "FreeAmp"
 #define the_BRANDING "FreeAmp"
 
-// uncomment this line if branding version != FreeAmp version
-//#define BRANDING_VERSION "2.0.1"
+// uncomment these lines if branding version != FreeAmp version
+//#define BRANDING_MAJOR_VERSION "2"
+//#define BRANDING_MINOR_VERSION "0"
+//#define BRANDING_REVISION_VERSION "1"
+//#define BRANDING_VERSION BRANDING_MAJOR_VERSION"."BRANDING_MINOR_VERSION"."BRANDING_REVISION_VERSION
 
 #define BRANDING_URL "http://www.freeamp.org"
 #define BRANDING_UPDATE_SERVER "fatman.freeamp.org"
@@ -49,7 +52,10 @@ ____________________________________________________________________________*/
 #include <limits.h>
 
 #define FREEAMP_PATH_ENV "FREEAMP_PATH"
-#define FREEAMP_VERSION "2.0.1"
+#define FREEAMP_MAJOR_VERSION "2"
+#define FREEAMP_MINOR_VERSION "0"
+#define FREEAMP_REVISION_VERSION "1"
+#define FREEAMP_VERSION FREEAMP_MAJOR_VERSION"."FREEAMP_MINOR_VERSION"."FREEAMP_REVISION_VERSION
 
 #ifndef BRANDING_VERSION
 #define BRANDING_VERSION FREEAMP_VERSION

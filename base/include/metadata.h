@@ -69,6 +69,10 @@ class MetaData {
     Error GetGenre(char* buf, uint32* len) { return SetBuffer(buf, m_genre.c_str(), len); }
     const string& Genre() const { return m_genre; }
 
+	Error SetFormatExtension(const char* extension){ m_extension = extension; return kError_NoErr; }
+    Error GetFormatExtension(char* buf, uint32* len) { return SetBuffer(buf, m_extension.c_str(), len); }
+    const string& FormatExtension() const { return m_extension; }
+
     Error SetYear(uint32 year) { m_year = year; return kError_NoErr;}
     uint32 Year() const { return m_year; }
 
@@ -93,7 +97,8 @@ class MetaData {
                    m_year == data.m_year &&
                    m_track == data.m_track &&
                    m_time == data.m_time &&
-                   m_size == data.m_size );
+                   m_size == data.m_size &&
+				   m_extension == data.m_extension);
 
         return result;
     }
@@ -139,6 +144,7 @@ class MetaData {
     string m_title;
     string m_genre;
     string m_comment;
+	string m_extension;
     uint32 m_year;
     uint32 m_track;
     uint32 m_time;
