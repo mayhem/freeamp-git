@@ -57,6 +57,7 @@ class DownloadUI : public UserInterface {
     void ResumeEvent(void);
     void SelChangeEvent(int row);
     void ShowHelp(void);
+    void CloseWindow(void);
 
     bool doQuitNow;
 

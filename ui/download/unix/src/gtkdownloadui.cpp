@@ -35,16 +35,24 @@ ____________________________________________________________________________*/
 
 void DownloadUI::ToggleVisEvent(void)
 {
-    Event *e = new Event(CMD_ToggleDownloadUI);
-    gdk_threads_leave();
-    AcceptEvent(e);
-    gdk_threads_enter();
-    delete e;
+    m_initialized = false;
+    isVisible = false;
+    m_currentindex = 0;
 }
 
 void toggle_vis_internal(GtkWidget *widget, DownloadUI *p)
 {
     p->ToggleVisEvent();
+}
+
+void DownloadUI::CloseWindow(void)
+{
+    gtk_widget_destroy(m_downloadUI);
+}
+
+void close_internal(GtkWidget *widget, DownloadUI *p)
+{
+    p->CloseWindow();
 }
 
 void DownloadUI::UpdateInfo(void)
@@ -431,7 +439,7 @@ void DownloadUI::CreateDownloadUI(void)
     m_CloseButton = gtk_button_new_with_label("  Close  ");
     gtk_box_pack_end(GTK_BOX(hbox), m_CloseButton, FALSE, FALSE, 5);
     gtk_signal_connect(GTK_OBJECT(m_CloseButton), "clicked",
-                       GTK_SIGNAL_FUNC(toggle_vis_internal), this);
+                       GTK_SIGNAL_FUNC(close_internal), this);
     gtk_widget_show(m_CloseButton);
 
     m_helpButton = gtk_button_new_with_label("  Help  ");
