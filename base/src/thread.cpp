@@ -20,8 +20,9 @@
 	
 	$Id$
 ____________________________________________________________________________*/
-
+#ifdef WIN32
 #include <process.h>
+#endif
 
 #include "config.h"
 #include "thread.h"

@@ -28,12 +28,6 @@ ____________________________________________________________________________*/
 #include "linuxthread.h"
 #include "mutex.h"
 
-void linuxThread::SetDieImmediately() {
-    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS,NULL);
-}
-void linuxThread::ClearDieImmediately() {
-    pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED,NULL);
-}
 void linuxThread::Join() {
     pthread_join(m_threadHandle,NULL);
 }
@@ -59,6 +53,23 @@ linuxThread::
     }
 }
 
+void *
+linuxThread::
+internalThreadFunction(void* arg)
+{
+    linuxThread* thread = (linuxThread*) arg;
+    thread->InternalThreadFunction();
+    return NULL;
+}
+
+void *
+linuxThread::
+InternalThreadFunction()
+{
+    m_function(m_arg);
+
+    return 0;
+}
 
 bool 
 linuxThread::
@@ -66,8 +77,9 @@ Create(thread_function function, void* arg)
 {
 //    cout << "Thread: Create" << endl;
     bool result = true;
-
-    if(pthread_create(&m_threadHandle, NULL, function, arg))
+    m_function = function;
+    m_arg = arg;
+    if(pthread_create(&m_threadHandle, NULL,linuxThread::internalThreadFunction, this))
     {
 //	cout << "Create failed!!" << endl;
 	result = false;

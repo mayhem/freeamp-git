@@ -58,7 +58,7 @@ CommandLineCIO::CommandLineCIO() {
     tcsetattr(stdinfd, TCSANOW, &rawTTY);
 
 
-    keyboardListenThread = new Thread();
+    keyboardListenThread = Thread::CreateThread();
     keyboardListenThread->Create(CommandLineCIO::keyboardServiceFunction,this);
     
     cout << endl << "Command Line Interface" << endl << endl;
@@ -80,7 +80,7 @@ CommandLineCIO::~CommandLineCIO() {
     }
 }
 
-void *CommandLineCIO::keyboardServiceFunction(void *pclcio) {
+void CommandLineCIO::keyboardServiceFunction(void *pclcio) {
     CommandLineCIO *pMe = (CommandLineCIO *)pclcio;
     char *pkey = new char[1];
     char chr;

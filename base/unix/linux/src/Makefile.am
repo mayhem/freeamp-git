@@ -25,15 +25,19 @@
 include @top_srcdir@/config/Makefile.header
 
 if AM_HAVE_LINUX
-FILES = thread.cpp mutex.cpp debug.cpp soundcardpmo.cpp semaphore.cpp
+FILES = linuxthread.cpp mutex.cpp debug.cpp soundcardpmo.cpp semaphore.cpp
 MYLIBS = libfasys.a
 else
 FILES = 
 MYLIBS = 
 endif
 
+if AM_HAVE_LINUXTHREADS
+REENT = -D_REENTRANT
+endif
+
 noinst_LIBRARIES = $(MYLIBS)
 libfasys_a_SOURCES = $(FILES)
 
 INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I@top_srcdir@/io/include -I@top_srcdir@/ui/include
-CXXFLAGS = $(EXTRA_CXXFLAGS) -D__@target_os@__
+CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT) -D__@target_os@__

@@ -32,14 +32,18 @@ TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
 FILES = 
 else
 TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
-FILES = player.cpp bootstrap.cpp command.cpp buffer.cpp playlist.cpp hashtable.cpp
+FILES = player.cpp bootstrap.cpp command.cpp buffer.cpp playlist.cpp hashtable.cpp thread.cpp
+endif
+
+if AM_HAVE_LINUXTHREADS
+REENT = -D_REENTRANT
 endif
 
 noinst_LIBRARIES = libfabase.a
 libfabase_a_SOURCES = $(FILES)
 
 INCLUDES = -I@top_srcdir@/base/include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) -I@top_srcdir@/io/include -I@top_srcdir@/ui/include -I@top_srcdir@/lmc/include -I@top_srcdir@/ui/dummy/include
-CXXFLAGS = -D__@target_os@__ $(EXTRA_CXXFLAGS)
+CXXFLAGS = -D__@target_os@__ $(REENT) $(EXTRA_CXXFLAGS)
 
 
 

@@ -42,11 +42,11 @@ public:
 	virtual void Suspend();
 	virtual void Resume();
 	virtual void Join();
-	virtual static void SetDieImmediately(); // for pthreads, must set PTHREAD_CANCEL_ASYNCHRONOUS for proper operation
-	virtual static void ClearDieImmediately();
 	virtual Priority GetPriority() const;
 	virtual Priority SetPriority(Priority priority);
 
+	static void *internalThreadFunction(void *);
+	void *InternalThreadFunction();
 
 private:
 	Priority	m_priority;
@@ -54,6 +54,8 @@ private:
 	unsigned	m_threadId;
 	bool        m_suspended;
 	Mutex *     m_suspendMutex;
+	thread_function m_function;
+	void *m_arg;
 };
 
 #endif /* _LINUX_THREAD_H */

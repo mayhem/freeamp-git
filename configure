@@ -1499,7 +1499,9 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
   cat >> confdefs.h <<\EOF
 #define HAVE_BASELINUXTHREADS 1
 EOF
- echo "$ac_t""yes" 1>&6
+ 
+hblt=true
+echo "$ac_t""yes" 1>&6
 else
   rm -rf conftest*
   echo "$ac_t""no" 1>&6
@@ -1508,9 +1510,9 @@ rm -f conftest*
 
 
 echo $ac_n "checking for LinuxThreads w/ErrorCheck Mutex""... $ac_c" 1>&6
-echo "configure:1512: checking for LinuxThreads w/ErrorCheck Mutex" >&5
+echo "configure:1514: checking for LinuxThreads w/ErrorCheck Mutex" >&5
 cat > conftest.$ac_ext <<EOF
-#line 1514 "configure"
+#line 1516 "configure"
 #include "confdefs.h"
 #include <pthread.h>
 EOF
@@ -1529,6 +1531,15 @@ rm -f conftest*
 
 
 
+
+
+if test "$hblt" = "true"; then
+  AM_HAVE_LINUXTHREADS_TRUE=
+  AM_HAVE_LINUXTHREADS_FALSE='#'
+else
+  AM_HAVE_LINUXTHREADS_TRUE='#'
+  AM_HAVE_LINUXTHREADS_FALSE=
+fi
 
 # Check whether --enable-cmdline or --disable-cmdline was given.
 if test "${enable_cmdline+set}" = set; then
@@ -1733,6 +1744,8 @@ s%@CC@%$CC%g
 s%@CXX@%$CXX%g
 s%@RANLIB@%$RANLIB%g
 s%@CPP@%$CPP%g
+s%@AM_HAVE_LINUXTHREADS_TRUE@%$AM_HAVE_LINUXTHREADS_TRUE%g
+s%@AM_HAVE_LINUXTHREADS_FALSE@%$AM_HAVE_LINUXTHREADS_FALSE%g
 s%@AM_ENABLE_CMDLINE_TRUE@%$AM_ENABLE_CMDLINE_TRUE%g
 s%@AM_ENABLE_CMDLINE_FALSE@%$AM_ENABLE_CMDLINE_FALSE%g
 s%@AM_HAVE_WIN32_TRUE@%$AM_HAVE_WIN32_TRUE%g

@@ -35,7 +35,7 @@ class CommandLineCIO : public CIO {
     CommandLineCIO();
     virtual int32 acceptCIOEvent(Event *);
     virtual void setArgs(int argc, char **argv);
-    static void *keyboardServiceFunction(void *);
+    static void keyboardServiceFunction(void *);
     ~CommandLineCIO();
  private:
     void processSwitch(char *);

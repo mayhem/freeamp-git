@@ -82,12 +82,14 @@ target_os = @target_os@
 @AM_HAVE_WIN32_FALSE@MYLIBS = libfalmcxingmp3.a
 @AM_HAVE_WIN32_FALSE@TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
 
+@AM_HAVE_LINUXTHREADS_TRUE@REENT = -D_REENTRANT
+
 noinst_LIBRARIES = $(MYLIBS)
 libfalmcxingmp3_a_SOURCES = $(FILES)
 
 INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) -I@top_srcdir@/io/include -I@top_srcdir@/ui/include
-CXXFLAGS = $(EXTRA_CXXFLAGS) -D__@target_os@__
-CFLAGS = $(EXTRA_CFLAGS) -D__@target_os@__
+CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT) -D__@target_os@__
+CFLAGS = $(EXTRA_CFLAGS) $(REENT) -D__@target_os@__
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = ../../config/config.h
 CONFIG_CLEAN_FILES = 

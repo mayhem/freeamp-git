@@ -74,16 +74,18 @@ RANLIB = @RANLIB@
 VERSION = @VERSION@
 target_os = @target_os@
 
-@AM_HAVE_LINUX_TRUE@FILES = thread.cpp mutex.cpp debug.cpp soundcardpmo.cpp semaphore.cpp
+@AM_HAVE_LINUX_TRUE@FILES = linuxthread.cpp mutex.cpp debug.cpp soundcardpmo.cpp semaphore.cpp
 @AM_HAVE_LINUX_TRUE@MYLIBS = libfasys.a
 @AM_HAVE_LINUX_FALSE@FILES = 
 @AM_HAVE_LINUX_FALSE@MYLIBS = 
+
+@AM_HAVE_LINUXTHREADS_TRUE@REENT = -D_REENTRANT
 
 noinst_LIBRARIES = $(MYLIBS)
 libfasys_a_SOURCES = $(FILES)
 
 INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I@top_srcdir@/io/include -I@top_srcdir@/ui/include
-CXXFLAGS = $(EXTRA_CXXFLAGS) -D__@target_os@__
+CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT) -D__@target_os@__
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = ../../../../config/config.h
 CONFIG_CLEAN_FILES = 
@@ -96,8 +98,8 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 libfasys_a_LIBADD = 
 @AM_HAVE_LINUX_FALSE@cond0libfasys_a_OBJECTS = 
-@AM_HAVE_LINUX_TRUE@cond1libfasys_a_OBJECTS =  thread.o mutex.o debug.o \
-@AM_HAVE_LINUX_TRUE@soundcardpmo.o semaphore.o
+@AM_HAVE_LINUX_TRUE@cond1libfasys_a_OBJECTS =  linuxthread.o mutex.o \
+@AM_HAVE_LINUX_TRUE@debug.o soundcardpmo.o semaphore.o
 libfasys_a_OBJECTS =  $(cond0libfasys_a_OBJECTS) \
 $(cond1libfasys_a_OBJECTS)
 AR = ar
@@ -110,8 +112,8 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP = --best
-DEP_FILES =  .deps/debug.P .deps/mutex.P .deps/semaphore.P \
-.deps/soundcardpmo.P .deps/thread.P
+DEP_FILES =  .deps/debug.P .deps/linuxthread.P .deps/mutex.P \
+.deps/semaphore.P .deps/soundcardpmo.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 SOURCES = $(libfasys_a_SOURCES)
 OBJECTS = $(libfasys_a_OBJECTS)
