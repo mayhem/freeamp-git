@@ -3982,7 +3982,7 @@ bool Win32PreferenceWindow::PrefBrowserProc(HWND hwnd,
         case UWM_HELP:
         case WM_HELP:
         {
-            //ShowHelp(m_pContext, Preferences_Advanced);
+            ShowHelp(m_pContext, Preferences_MusicBrowser);
             break;
         }
 
@@ -3994,7 +3994,7 @@ bool Win32PreferenceWindow::PrefBrowserProc(HWND hwnd,
             {
                 case PSN_HELP:
                 {
-         //           ShowHelp(m_pContext, Preferences_Advanced);
+                    ShowHelp(m_pContext, Preferences_MusicBrowser);
                     break;
                 }
                 case PSN_SETACTIVE:
