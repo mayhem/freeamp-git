@@ -376,6 +376,7 @@ void Player::EventServiceThreadFunc(void *pPlayer) {
     while (rtnVal == 0) {   // serviceEvent will return 1 if error or time to quit.
         //cout << "About to Read queue..." << endl;
         pP->m_eventSem->Wait();
+	//cout << "Wait returned..." << endl;
         pC = pP->m_eventQueue->Read();
         //cout << "Read queue..." << endl;
         if (pC) {
@@ -471,6 +472,9 @@ void Player::ReleaseUIManipLock() {
 }
 
 int32 Player::AcceptEvent(Event *e) {
+    if (e) {
+	//cout << "Accepting event: " << e->Type() << endl;
+    }
     m_eventQueue->Write(e);
     m_eventSem->Signal();
     return 0;

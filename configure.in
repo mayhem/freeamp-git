@@ -293,6 +293,7 @@ AC_OUTPUT(Makefile base/Makefile base/src/Makefile io/Makefile
 	  lmc/xingmp3/src/Makefile lmc/src/Makefile io/src/Makefile ui/src/Makefile
 	  io/soundcard/Makefile io/soundcard/unix/Makefile io/soundcard/unix/linux/Makefile
 	  io/soundcard/unix/linux/src/Makefile base/unix/src/Makefile ui/mpg123/Makefile ui/gtk/Makefile
+	  ui/lcd/Makefile ui/lcd/src/Makefile
 )
 
 
