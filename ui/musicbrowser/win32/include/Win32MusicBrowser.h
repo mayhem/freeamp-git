@@ -84,6 +84,12 @@ SavePlaylistDlgProc(HWND hwnd,
                     WPARAM wParam, 
                     LPARAM lParam);
 
+BOOL CALLBACK 
+RemoveTracksDlgProc(HWND hwnd, 
+                    UINT msg, 
+                    WPARAM wParam, 
+                    LPARAM lParam);
+
 class MusicBrowserUI : public UserInterface 
 {
  public:
@@ -120,7 +126,12 @@ class MusicBrowserUI : public UserInterface
                             WPARAM wParam, 
                             LPARAM lParam);
 
-    BOOL SavePlaylistDlgProc(HWND hwnd, 
+    BOOL RemoveTracksDlgProc(HWND hwnd, 
+                             UINT msg, 
+                             WPARAM wParam, 
+                             LPARAM lParam);
+
+     BOOL SavePlaylistDlgProc(HWND hwnd, 
                              UINT msg, 
                              WPARAM wParam, 
                              LPARAM lParam);
