@@ -215,6 +215,11 @@ static void unpackL1()
 
 }
 /*-------------------------------------------------------------------------*/
+
+#ifdef _MSC_VER
+#pragma warning(disable: 4056)
+#endif
+
 int i_audio_decode_initL1(MPEG_HEAD * h, int framebytes_arg,
 		   int reduction_code, int transform_code, int convert_code,
 			  int freq_limit)
@@ -323,4 +328,9 @@ int i_audio_decode_initL1(MPEG_HEAD * h, int framebytes_arg,
 
    return 1;
 }
+
+#ifdef _MSC_VER
+#pragma warning(default: 4056)
+#endif
+
 /*---------------------------------------------------------*/

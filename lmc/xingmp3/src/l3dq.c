@@ -110,6 +110,11 @@ float *quant_init_subblock_addr()
    return look_subblock;
 }
 /*=============================================================*/
+
+#ifdef _MSC_VER
+#pragma warning(disable: 4056)
+#endif
+
 void dequant(SAMPLE Sample[], int *nsamp,
 	     SCALEFACT * sf,
 	     GR * gr,
@@ -249,4 +254,9 @@ block type = 2  short blocks
 
    return;
 }
+
+#ifdef _MSC_VER
+#pragma warning(default: 4056)
+#endif
+
 /*-------------------------------------------------------------*/
