@@ -68,7 +68,7 @@ class Preferences {
           { *bValue = false; return kError_NoErr; };
     Error  GetLogOutput(bool *bValue)
           { *bValue = false; return kError_NoErr; };
-    Error  GetLogPerf(bool *bValue)
+    Error  GetLogPerformance(bool *bValue)
           { *bValue = false; return kError_NoErr; };
     Error  GetUseDebugLog(bool *bValue)
           { *bValue = false; return kError_NoErr; };
