@@ -136,23 +136,14 @@ Error ObsInput::Prepare(PullBuffer *&pBuffer)
                                      m_pContext);
     assert(m_pOutputBuffer);
 
-    result = Open();
-    if (!IsError(result))
-    {
-       result = Run();
-       if (IsError(result))
-       {
-           ReportError("Could not run the input plugin.");
-           return result;
-       }
-    }
-    else
-    {
-       ReportError("Could not open the specified file.");
-       return result;
-    }
-
     pBuffer = m_pOutputBuffer;
+
+    result = Run();
+    if (IsError(result))
+    {
+        ReportError("Could not initialize rtp streaming plugin.");
+        return result;
+    }
 
     return kError_NoErr;
 }  
@@ -179,6 +170,8 @@ Error ObsInput::Open(void)
     char   szAddr[100], szSourceAddr[100];
     bool   bUseTitleStreaming = false, bUseAltNIC = false;;
 
+    ReportStatus("Setting up RTP stream...");
+
     iRet = sscanf(m_path, "rtp://%[^:]:%d", szAddr, &iPort);
     if (iRet < 2)
     {
@@ -189,7 +182,7 @@ Error ObsInput::Open(void)
     m_hHandle = socket( AF_INET, SOCK_DGRAM, 0 );
     if (m_hHandle < 0)
     {
-       ReportError("Cannot create socket.");
+       ReportError("Cannot create socket. Is TCP/IP networking properly installed?");
        return (Error)obsError_CannotCreateSocket;
     }
 
@@ -221,7 +214,7 @@ Error ObsInput::Open(void)
     {
        close(m_hHandle);
        m_hHandle= -1;
-       ReportError("Cannot set socket options.");
+       ReportError("Cannot set socket options. Is TCP/IP networking properly installed?");
        return (Error)obsError_CannotSetSocketOpts;
     }
 
@@ -231,7 +224,7 @@ Error ObsInput::Open(void)
     {
        close(m_hHandle);
        m_hHandle= -1;
-       ReportError("Cannot bind the socket.");
+       ReportError("Cannot bind the socket. Is TCP/IP networking properly installed?");
        return (Error)obsError_CannotBind;
     }
 
@@ -243,7 +236,7 @@ Error ObsInput::Open(void)
     {
        close(m_hHandle);
        m_hHandle= -1;
-       ReportError("Cannot set socket options.");
+       ReportError("Cannot set socket multicast options. Is TCP/IP networking properly installed?");
        return (Error)obsError_CannotSetSocketOpts;
     }
 
@@ -312,8 +305,17 @@ void ObsInput::WorkerThread(void)
    Error           eError;
    fd_set          sSet;
    struct timeval  sTv;
+   bool            bFirstPacket = true;
+
+   eError = Open();
+   if (IsError(eError) || m_bExit)
+   {
+      return;
+   }   
 
    m_pSleepSem->Wait(); 
+
+   ReportStatus("Listening for RTP stream...");
 
    pTemp = new unsigned char[iMAX_PACKET_SIZE];
    pHeader = (RTPHeader *)pTemp;
@@ -347,6 +349,12 @@ void ObsInput::WorkerThread(void)
       {
          m_pOutputBuffer->SetEndOfStream(true);
          break;
+      }
+
+      if (bFirstPacket)
+      {
+          ReportStatus("Playing RTP stream...");
+          bFirstPacket = false;
       }
 
       for(;;)

@@ -49,6 +49,8 @@ PhysicalMediaOutput::PhysicalMediaOutput(FAContext *context) :
 {
     m_pPmi = NULL;
     m_pLmc = NULL;
+	m_iBufferUpdate = -1;
+    m_pPmiBuffer = NULL;
 
     if (context->prefs->GetPrefInt32(kPreBufferPref, &m_iPreBuffer) == 
         kError_NoPrefValue)
@@ -74,7 +76,6 @@ PhysicalMediaOutput::~PhysicalMediaOutput()
 Error PhysicalMediaOutput::SetTo(const char *url)
 {
     Error       eRet;
-    PullBuffer *pBuffer;
 
     m_pMutex->Acquire();
 
@@ -82,10 +83,10 @@ Error PhysicalMediaOutput::SetTo(const char *url)
     assert(m_pLmc != NULL);
 
     m_pPmi->SetTo(url);
-    eRet = m_pPmi->Prepare(pBuffer);
+    eRet = m_pPmi->Prepare(m_pPmiBuffer);
     if (!IsError(eRet))
     {
-         eRet = m_pLmc->Prepare(pBuffer, m_pInputBuffer);
+         eRet = m_pLmc->Prepare(m_pPmiBuffer, m_pInputBuffer);
     }     
 
     m_pMutex->Release();
@@ -173,3 +174,20 @@ Error PhysicalMediaOutput::ChangePosition(int32 position)
 
    return error;
 }  
+
+void PhysicalMediaOutput::UpdateBufferStatus(void)
+{
+   time_t iNow;
+
+   if (m_pPmi->IsStreaming())
+   {
+      time(&iNow);
+      if (iNow != m_iBufferUpdate)
+      {
+          m_pTarget->AcceptEvent(new StreamBufferEvent(false, 
+                            m_pPmiBuffer->GetBufferPercentage(), 
+                            m_pInputBuffer->GetBufferPercentage()));
+          m_iBufferUpdate = iNow;
+      }
+   }   
+}

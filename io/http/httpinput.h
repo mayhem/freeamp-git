@@ -67,6 +67,9 @@ class HttpInput:public PhysicalMediaInput
    virtual bool  CanHandle(const char *szUrl, char *szTitle);
    virtual bool  IsStreaming(void)
                  { return m_bIsStreaming; };
+   virtual bool  UseBufferReduction(void)
+                 { return m_bUseBufferReduction; };
+				 
    virtual bool  PauseLoop(bool bLoop);  
    virtual Error Close(void);
    virtual const char *Url(void) const
@@ -92,6 +95,7 @@ private:
    char           *m_szError;
    bool            m_bUseProxy, m_bIsStreaming;
    char            m_szProxyHost[iMaxUrlLen];
+   bool            m_bUseBufferReduction;
 };
 
 #endif /* _HTTPFILEINPUT_H_ */

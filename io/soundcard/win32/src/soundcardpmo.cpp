@@ -494,6 +494,7 @@ void SoundCardPMO::WorkerThread(void)
       {
 		  if (m_bPause || m_bExit)
 			  break;
+
 	      
           eErr = AllocHeader(pBuffer);
 		  if (eErr == kError_EndOfStream || eErr == kError_Interrupt)
@@ -555,6 +556,7 @@ void SoundCardPMO::WorkerThread(void)
       Write(pBuffer);
 	  m_pLmc->Wake();
 
+      UpdateBufferStatus();
    }
    m_pContext->log->Log(LogDecode, "PMO: Soundcard thread exiting\n");
 }    

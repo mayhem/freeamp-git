@@ -923,6 +923,7 @@ WorkerThread(void)
 
       Write(pBuffer);
 	  m_pLmc->Wake();
+      UpdateBufferStatus();
   }
 
   m_pContext->log->Log(LogOutput, "PMO: Soundcard thread exiting\n");

@@ -119,7 +119,7 @@ Error LocalFileInput::Prepare(PullBuffer *&pBuffer)
     }
     else
     {
-       ReportError("Could not open the specified file.");
+       ReportError("Cannot open file %s.", m_path);
        return result;
     }
 

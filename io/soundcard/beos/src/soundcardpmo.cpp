@@ -594,6 +594,7 @@ SoundCardPMO::Player(
 	PRINT(( "SoundCardPMO::Player: %d bytes copied\n", bytesCopied ));
 
 	m_pauseLock.Unlock();
+    UpdateBufferStatus();
 
 	return;
 }

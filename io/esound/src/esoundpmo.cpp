@@ -404,6 +404,7 @@ void EsounDPMO::WorkerThread(void)
       m_iTotalBytesWritten += iRet;
       m_pInputBuffer->EndRead(iRet);
       m_pLmc->Wake();
+      UpdateBufferStatus();
    }
 }
   

@@ -90,10 +90,13 @@ protected:
 
     virtual bool  WasteTime();
     virtual void  PreBuffer();
+    virtual void  UpdateBufferStatus(void);
 
     PhysicalMediaInput    *m_pPmi;
     LogicalMediaConverter *m_pLmc;
     int32                  m_iPreBuffer;
+	int                    m_iBufferUpdate;
+	PullBuffer            *m_pPmiBuffer;
 };
 
 #endif /* _PMO_H_ */

@@ -65,11 +65,13 @@ public:
 
     virtual Error Seek(int32 & rtn, int32 offset, int32 origin)
                   { return kError_FileSeekNotSupported; };
-	 virtual bool  CanHandle(const char *szUrl, char *szTitle)
+    virtual bool  CanHandle(const char *szUrl, char *szTitle)
 	               {return false;}
     virtual Error GetLength(size_t &iSize)
                   { return kError_FileSeekNotSupported; };
-	 virtual bool  IsStreaming(void)
+    virtual bool  IsStreaming(void)
+	               {return false;}
+    virtual bool  UseBufferReduction(void)
 	               {return false;}
     virtual bool  PauseLoop(bool bLoop) { return false; };
 

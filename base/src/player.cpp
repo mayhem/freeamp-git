@@ -1240,9 +1240,8 @@ CreatePMO(const PlaylistItem * pc, Event * pC)
    {
       char szErr[1024];
 
-      sprintf(szErr, "Cannot initialize pmo: %d\n", error);
+      sprintf(szErr, "Cannot setup the audio decode process: %d\n", error);
       m_context->log->Error(szErr);
-      AcceptEvent(new ErrorMessageEvent(szErr));
 
       goto epilogue;
    }

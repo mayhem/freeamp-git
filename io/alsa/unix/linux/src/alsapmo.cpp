@@ -521,6 +521,7 @@ void AlsaPMO::WorkerThread(void)
 
       m_pInputBuffer->EndRead(iRet);
       m_pLmc->Wake();
+      UpdateBufferStatus();
    }
 }
 

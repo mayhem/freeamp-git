@@ -116,6 +116,7 @@ HttpInput::HttpInput(FAContext *context):
     m_fpSave = NULL;
     m_szError = new char[iMaxErrorLen];
     m_pTitleStream = NULL;
+    m_bUseBufferReduction = true;
 
     m_pContext->prefs->GetPrefBoolean(kUseProxyPref, &m_bUseProxy);
     if (m_bUseProxy)
@@ -276,7 +277,7 @@ Error GetHostByName(char *szHostName, struct hostent *pResult)
 Error HttpInput::Open(void)
 {
     char                szHostName[iMaxHostNameLen+1], *szFile, *szQuery;
-    char                szLocalName[iMaxHostNameLen+1];
+    char                szLocalName[iMaxHostNameLen+1], *pEnd;
     char               *pInitialBuffer, szSourceAddr[100];
     char               *szStreamName, *szStreamUrl;
     unsigned            iPort;
@@ -284,7 +285,7 @@ Error HttpInput::Open(void)
     struct sockaddr_in  sAddr, sSourceAddr;
     struct hostent      sHost;
     Error               eRet;
-    void               *pPtr;
+    char               *pHeaderData = NULL, *pPtr;
     fd_set              sSet; 
     struct timeval      sTv;
     bool                bUseTitleStreaming = true, bUseAltNIC = false;
@@ -403,10 +404,14 @@ Error HttpInput::Open(void)
     szQuery = new char[iMaxUrlLen];
 
     if (szFile)
-        sprintf(szQuery, "GET %s HTTP/1.0\n", szFile);
+        sprintf(szQuery, "GET %s HTTP/1.0\n"
+                         "Host: %s\n"
+                         "Accept: */*\n" 
+                         "User-Agent: "BRANDING"/%s\n", 
+                         szFile, szLocalName, FREEAMP_VERSION);
     else
         sprintf(szQuery, "GET / HTTP/1.0\n"
-                         "Host %s\n"
+                         "Host: %s\n"
                          "Accept: */*\n" 
                          "User-Agent: "BRANDING"/%s\n", 
                          szLocalName, FREEAMP_VERSION);
@@ -469,23 +474,22 @@ Error HttpInput::Open(void)
     if (m_bExit)
         return (Error)kError_Interrupt;
 
-    if (sscanf(pInitialBuffer, " ICY %d %255[^\n\r]", &iRet, m_szError))
+    if (sscanf(pInitialBuffer, " %*s %d %255[^\n\r]", &iRet, m_szError))
     {
-        char *pHeaderData, *pPtr;
+        void *pData;
         int   iHeaderBytes = 0, iCurHeaderSize = iHeaderSize;
 
-		  if (iRet != iICY_OK)
-		  {
+        if (iRet != iICY_OK)
+        {
+            ReportStatus("");
             ReportError("This stream is not available: %s\n", m_szError);
-
-		    delete pInitialBuffer;
-		    closesocket(m_hHandle);
-			return (Error)httpError_CustomError;
-		  }
+            
+            delete pInitialBuffer;
+            closesocket(m_hHandle);
+            return (Error)httpError_CustomError;
+        }
 
         pHeaderData = new char[iHeaderSize];
-
-        // This is a SHOUTcast stream
         for(;;)
         {
             if (iHeaderBytes + iRead > iCurHeaderSize)
@@ -502,9 +506,18 @@ Error HttpInput::Open(void)
             memcpy(pHeaderData + iHeaderBytes, pInitialBuffer, iRead);
             iHeaderBytes += iRead;
 
-            if (strstr(pHeaderData, "\r\n\r\n") ||
-                strstr(pHeaderData, "\n\n"))
+            pEnd = strstr(pHeaderData, "\r\n\r\n");
+            if (pEnd)
+            {    
+                *(pEnd + 3) = 0;
                 break;
+            }    
+            pEnd = strstr(pHeaderData, "\n\n");
+            if (pEnd)
+            {    
+                *(pEnd + 1) = 0;
+                break;
+            }    
                
             for(;!m_bExit;)
             {
@@ -545,14 +558,20 @@ Error HttpInput::Open(void)
             sscanf(pPtr, " %[^\r\n]", szStreamUrl);
         }
         
-        if (strlen(szStreamName))
+        // If this is a stream from a web server and not a shout/ice
+        // server we don't want to use buffer reduction when the
+        // input buffers fill up
+        if (strstr(pHeaderData, "Server:") &&
+            strstr(pHeaderData, "Date:"))
+            m_bUseBufferReduction = false;
+        
+        if (szStreamName && strlen(szStreamName))
         {
            StreamInfoEvent *e;
            
            e = new StreamInfoEvent(szStreamName ? szStreamName : (char *)"", 
                                    szStreamUrl ? szStreamUrl : (char *)"");
            m_pTarget->AcceptEvent(e);
-           delete szStreamName;
            delete szStreamUrl;
         }   
 
@@ -563,43 +582,14 @@ Error HttpInput::Open(void)
                 m_pTitleStream->Run(sAddr.sin_addr, atoi(pPtr + 20));
         }
 
-        delete pHeaderData;
-
-        // Don't bother saving the beginning of the frame -- the
-        // data in a shoutcast stream does not necessarily start on
-        // a frame boundary. Adding extra logic for the case that
-        // the stream does start on a boundary doesn't make sense.
-    }
-    else
-    {
-        unsigned int iSize;
-
-        if (sscanf(pInitialBuffer, " %*s %d %255[^\n\r]", &iRet, m_szError) != 2)
+        // Let's save the bytes we've read into the pullbuffer.
+        iRead = iHeaderBytes - strlen(pHeaderData) - 1;
+        if (iRead > 0)
         {
-            ReportError("Unknown server response.\n");
-
-		    delete pInitialBuffer;
-		    closesocket(m_hHandle);
-            return (Error)httpError_CustomError;
-		}
-		if (iRet != iICY_OK)
-		{
-            ReportError("This stream is not available: %s\n", m_szError);
-		    delete pInitialBuffer;
-		    closesocket(m_hHandle);
-			return (Error)httpError_CustomError;
-		}
-       
-        // Its a regular HTTP download. Let's save the bytes we've
-        // read into the pullbuffer.
-        iSize = iRead;
-        m_pOutputBuffer->BeginWrite(pPtr, iSize);
-        memcpy(pPtr, pInitialBuffer, iRead);
-        m_pOutputBuffer->EndWrite(iRead);
-
-        // This is not a case where we are really streaming -- its
-        // a lot closer to a normal file playback
-        m_bIsStreaming = false;
+            m_pOutputBuffer->BeginWrite(pData, iRead);
+            memcpy(pData, (char *)pHeaderData + strlen(pHeaderData) + 1, iRead);
+            m_pOutputBuffer->EndWrite(iRead);
+        }    
     }
 
     delete pInitialBuffer;
@@ -612,8 +602,11 @@ Error HttpInput::Open(void)
         char szPath[255], szFile[255];
         unsigned i;
 					
-        if (szStreamName[0] == 0)
+        if (szStreamName == NULL)
+        {
+           szStreamName = new char[255];
            sprintf(szStreamName, "%s:%d", szHostName, iPort);
+        }   
 
         for(i = 0; i < strlen(szStreamName); i++)
            if (strchr("\\/?*{}[]()*|:<>\"'", szStreamName[i]))
@@ -637,7 +630,21 @@ Error HttpInput::Open(void)
         }
 
         m_fpSave = fopen(szFile, "wb");
+        
+        if (pHeaderData)
+        {
+            iRet = fwrite((char *)pHeaderData + strlen(pHeaderData) + 1, 
+                          sizeof(char), iRead, m_fpSave);
+            if (iRet != iRead)
+            {
+               delete pHeaderData;
+               ReportError("Cannot save http stream to disk. Disk full?");
+               return kError_WriteFile;
+            }
+        }    
     }
+    delete pHeaderData;
+    delete szStreamName;
 
     ReportStatus("");
 
