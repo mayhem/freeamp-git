@@ -56,6 +56,7 @@ public:
     virtual Error SetTo(char* url) = 0;
     virtual Error Close(void) = 0;
     virtual const char* Url(void) const = 0;
+    virtual const char *GetErrorString(int32) = 0;
 };
 
 #endif /* _PMI_H_ */

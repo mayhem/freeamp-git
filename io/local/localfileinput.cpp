@@ -186,7 +186,9 @@ Close(void)
 	return kError_NoErr;
 }
 
-
+const char *LocalFileInput::GetErrorString(int32 error) {
+    return NULL;
+}
 
 
 

@@ -351,7 +351,7 @@ void XingLMC::DecodeWork() {
 	    XingCommand *xc = m_xcqueue->Read();
 	    switch (*xc) {
 		case XING_Stop: 
-		    if (m_target) m_target->AcceptEvent(new Event(INFO_DoneOutputting));
+		    //if (m_target) m_target->AcceptEvent(new Event(INFO_DoneOutputting));
 		    return;
 		case XING_Pause:
 		    m_output->Pause();

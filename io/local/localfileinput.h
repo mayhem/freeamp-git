@@ -41,7 +41,7 @@ public:
 	virtual Error SetTo(char* url);
 	virtual Error Close(void);
 	virtual const char* Url(void) const { return m_path; }
-	
+	virtual const char *GetErrorString(int32);
 private:
 	int m_fd;
 	char* m_path;
