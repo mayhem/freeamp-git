@@ -1,3 +1,17 @@
+Changes for Linux and Windows version 2.0 beta 5
+--------------------------------------------------------------------
+
+- Help files for both Linux and Win32 have been updated.
+- TrueType font support for Linux themes.
+- Updated default FreeAmp theme to use transparent buttons.
+- Added vertical slider capability to themes.
+- Editing metadata in the music browser nows works a lot better.
+- Linux music browser has snazzy new icons in the tree control.
+- Preference to set toolbar look: Icons, Text, or Both.
+- My Music window remembers its state.
+- New example theme, Aquatica... you gotta check this one out!
+- Again, Lots and lots of bug fixes.
+
 Changes for Linux and Windows version 2.0 beta 4
 --------------------------------------------------------------------
 
