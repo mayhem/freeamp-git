@@ -37,12 +37,10 @@ ____________________________________________________________________________*/
 
 GTKPreferenceWindow::GTKPreferenceWindow(FAContext *context,
                                          ThemeManager *pThemeMan,
-                                         uint32 defaultPage,
-                                         bool inEventLoop) :
+                                         uint32 defaultPage) :
      PreferenceWindow(context, pThemeMan)
 {     
     startPage = defaultPage;
-    eventLoop = inEventLoop;
     done = false;
 }
 
@@ -80,7 +78,7 @@ void pref_apply_click(GtkWidget *w, GTKPreferenceWindow *p)
 void GTKPreferenceWindow::CancelInfo(void)
 {
     if (currentValues != originalValues)
-        SavePrefsValues(m_pContext->prefs, &proposedValues);
+        SavePrefsValues(m_pContext->prefs, &originalValues);
 }
 
 void pref_cancel_click(GtkWidget *w, GTKPreferenceWindow *p)
@@ -136,7 +134,7 @@ bool GTKPreferenceWindow::Show(Window *pWindow)
     mainWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_modal(GTK_WINDOW(mainWindow), TRUE);
     gtk_signal_connect(GTK_OBJECT(mainWindow), "destroy",
-                       GTK_SIGNAL_FUNC(pref_destroy), (gpointer)eventLoop);
+                       GTK_SIGNAL_FUNC(pref_destroy), (gpointer)false);
     gtk_window_set_title(GTK_WINDOW(mainWindow), BRANDING" - Preferences");
 
     GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
@@ -222,15 +220,9 @@ bool GTKPreferenceWindow::Show(Window *pWindow)
 
     firsttime = false;
 
-    if (eventLoop) {
-        gtk_main();
+    while (!done) {
         gdk_threads_leave();
-    }
-    else {
-        while (!done) {
-            gdk_threads_leave();
-            usleep(20);
-        }
+        usleep(20);
     }
 
     gdk_threads_enter();
@@ -463,17 +455,20 @@ void GTKPreferenceWindow::SetToolbar(bool text, bool pics)
 
 void text_selected(GtkWidget *w, GTKPreferenceWindow *p)
 {
-    p->SetToolbar(true, false);
+    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w)))
+        p->SetToolbar(true, false);
 }
 
 void images_selected(GtkWidget *w, GTKPreferenceWindow *p)
 {
-    p->SetToolbar(false, true);
+    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w)))
+        p->SetToolbar(false, true);
 }
 
 void both_selected(GtkWidget *w, GTKPreferenceWindow *p)
 {
-    p->SetToolbar(true, true);
+    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w)))
+        p->SetToolbar(true, true);
 }
 
 GtkWidget *GTKPreferenceWindow::CreatePage1(void)

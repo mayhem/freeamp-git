@@ -2179,6 +2179,7 @@ void GTKMusicBrowser::ShowMusicBrowser(void)
              ExpandCollapseEvent();
     }
 
+    SetToolbarType();
     gdk_threads_leave();
 }
 

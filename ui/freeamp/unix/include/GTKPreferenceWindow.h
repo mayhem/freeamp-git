@@ -124,8 +124,7 @@ class GTKPreferenceWindow : public PreferenceWindow
 
                GTKPreferenceWindow(FAContext *context,
                                    ThemeManager *pThemeMan,
-                                   uint32 defaultPage,
-                                   bool inEventLoop);
+                                   uint32 defaultPage);
       virtual ~GTKPreferenceWindow(void); 
       
       virtual  bool Show(Window *pParent);

@@ -289,11 +289,13 @@ Error MusicCatalog::AddSong(const char *url)
     else {
         bool changed = false;
         if (meta->Album() == " " || meta->Album().size() == 0) {
-            meta->SetAlbum("Unknown");
+            string unknownstr = string("Unknown");
+            meta->SetAlbum(unknownstr.c_str());
             changed = true;
         }
         if (meta->Title() == " " || meta->Title().size() == 0) {
-            meta->SetTitle("Unknown");
+            string unknownstr = string("Unknown");
+            meta->SetTitle(unknownstr.c_str());
             changed = true;
         }
   

@@ -64,8 +64,7 @@ class FreeAmpTheme : public UserInterface, public Theme
         virtual void  InitControls(void);
         virtual void  InitWindow(void);
         virtual void  PostWindowCreate(void);
-                void  ShowOptions(uint32 defaultPage = 0, 
-                                  bool   inEventLoop = true);
+                void  ShowOptions(uint32 defaultPage = 0);
 
         void  WorkerThread(void);
 

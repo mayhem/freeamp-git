@@ -145,7 +145,7 @@ void GTKCanvas::Paint(Rect &oRect)
 {
     assert(m_pParent);
     GtkWidget *w = m_pParent->GetWindow();
-    if (!w->window)
+    if (!w->window || !m_pBufferBitmap)
         return;
     gdk_threads_enter();
     gdk_window_set_back_pixmap(w->window, m_pBufferBitmap->GetBitmap(), 0);
