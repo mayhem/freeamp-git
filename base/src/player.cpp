@@ -896,6 +896,8 @@ void Player::DoneOutputting(Event *pEvent)
        SEND_NORMAL_EVENT(INFO_Stopped);
    }
 
+   SEND_NORMAL_EVENT(INFO_DoneOutputting);
+
    if (m_plm->HasAnotherSong())
    {
       AcceptEvent(new Event(CMD_NextMediaPiece));
@@ -910,7 +912,10 @@ void Player::DoneOutputting(Event *pEvent)
       }
    }
    else
+   {
       m_plm->SetFirst();
+      SEND_NORMAL_EVENT(INFO_PlayListDonePlay);
+   }
    
    delete pEvent;
 }

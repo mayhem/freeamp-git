@@ -2112,6 +2112,12 @@ AcceptEvent(Event* event)
 					strncat(foo,info->GetId3Tag().m_songName,sizeof(foo)-strlen(foo));
 
                     m_songTitleView->SetText(foo);
+
+                    char title[256] = "FreeAmp - ";
+
+                    strncat(title, m_songTitleView->Text(), sizeof(title) - strlen(title));
+
+                    SetWindowText(m_hwnd, title);
 				}
 
 				break;
@@ -2129,6 +2135,8 @@ AcceptEvent(Event* event)
 
 				char *foo = strrchr(info->m_filename,'\\');
 
+                char title[256] = "FreeAmp - ";
+
 				if(foo) 
 				{
 					m_songTitleView->SetText(++foo);
@@ -2138,6 +2146,9 @@ AcceptEvent(Event* event)
 					m_songTitleView->SetText(info->m_filename);
 				}
 
+                strncat(title, m_songTitleView->Text(), sizeof(title) - strlen(title));
+
+                SetWindowText(m_hwnd, title);
                 //OutputDebugString(m_songTitleView->Text());
                 //OutputDebugString("\r\n");
 
@@ -2208,6 +2219,7 @@ AcceptEvent(Event* event)
             {
                 m_timeView->SetCurrentTime(0,0,0);
                 m_currentFrame = 0;
+                SetWindowText(m_hwnd, "FreeAmp");
                 break;
             }
 
