@@ -31,21 +31,46 @@ ____________________________________________________________________________*/
 
 // project includes
 #include "config.h"
+#include "utility.h"
 #include "resource.h"
+#include "Win32MusicBrowser.h"
 
-BOOL CALLBACK RemoveTracksDlgProc(HWND hwnd, 
-                                  UINT msg, 
-                                  WPARAM wParam, 
-                                  LPARAM lParam )
+
+BOOL CALLBACK EditTrackInfoDlgProc(HWND hwnd, 
+                                   UINT msg, 
+                                   WPARAM wParam, 
+                                   LPARAM lParam )
 {
-    BOOL result = FALSE;
-    static bool* deleteTracks = false;
+    MusicBrowserUI* ui = (MusicBrowserUI*)GetWindowLong(hwnd, GWL_USERDATA);
 
     switch (msg)
     {
         case WM_INITDIALOG:
         {
-            deleteTracks = (bool*)lParam;
+            ui = (MusicBrowserUI*)lParam;
+            assert(ui != NULL);
+            SetWindowLong(hwnd, GWL_USERDATA, (LONG)ui);
+            break;
+        }            
+    }
+
+    return ui->EditTrackInfoDlgProc(hwnd, msg, wParam, lParam);
+}        
+
+
+
+BOOL MusicBrowserUI::EditTrackInfoDlgProc(HWND hwnd, 
+                                          UINT msg, 
+                                          WPARAM wParam, 
+                                          LPARAM lParam )
+{
+    BOOL result = FALSE;
+
+    switch (msg)
+    {
+        case WM_INITDIALOG:
+        {
+            
             break;
         }      
 
@@ -61,8 +86,6 @@ BOOL CALLBACK RemoveTracksDlgProc(HWND hwnd,
                 {
                     HWND hwndDelete = GetDlgItem(hwnd, IDC_DELETE);
                     
-                    *deleteTracks = (BST_CHECKED == Button_GetCheck(hwndDelete));
-
                     EndDialog(hwnd, TRUE);
                     break;
                 }
@@ -73,4 +96,19 @@ BOOL CALLBACK RemoveTracksDlgProc(HWND hwnd,
     }
 
     return result;
+}
+
+void MusicBrowserUI::CreateArtistList(vector<string>& artists)
+{
+
+}
+
+void MusicBrowserUI::CreateAlbumList(vector<string>& albums)
+{
+
+}
+
+void MusicBrowserUI::CreateGenreList(set<string> genres)
+{
+
 }

@@ -31,6 +31,12 @@ ____________________________________________________________________________*/
 #pragma warning(disable:4786)
 #endif
 
+#include <vector>
+#include <string>
+#include <set>
+
+using namespace std;
+
 #include "config.h"
 #include "ui.h"
 #include "event.h"
@@ -90,6 +96,12 @@ RemoveTracksDlgProc(HWND hwnd,
                     WPARAM wParam, 
                     LPARAM lParam);
 
+BOOL CALLBACK 
+EditTrackInfoDlgProc(HWND hwnd, 
+                     UINT msg, 
+                     WPARAM wParam, 
+                     LPARAM lParam);
+
 class MusicBrowserUI : public UserInterface 
 {
  public:
@@ -126,15 +138,15 @@ class MusicBrowserUI : public UserInterface
                             WPARAM wParam, 
                             LPARAM lParam);
 
-    BOOL RemoveTracksDlgProc(HWND hwnd, 
+    BOOL SavePlaylistDlgProc(HWND hwnd, 
                              UINT msg, 
                              WPARAM wParam, 
                              LPARAM lParam);
 
-     BOOL SavePlaylistDlgProc(HWND hwnd, 
-                             UINT msg, 
-                             WPARAM wParam, 
-                             LPARAM lParam);
+    BOOL EditTrackInfoDlgProc(HWND hwnd, 
+                              UINT msg, 
+                              WPARAM wParam, 
+                              LPARAM lParam);
 
     
 
@@ -257,38 +269,45 @@ class MusicBrowserUI : public UserInterface
     void UpdateAlbumName(AlbumList* album, const char* name);
     void UpdateArtistName(ArtistList* artist, const char* name);
 
+    // Functions in EditTrackInfoDialog.cpp
+    void CreateArtistList(vector<string>& artists);
+    void CreateAlbumList(vector<string>& albums);
+    void CreateGenreList(set<string> genres);
+    
 
     // Data members
-    EventQueue          *m_playerEQ;
-    int32                m_state, m_startupType, m_playerState;
-    int32                m_currentplaying;
-  	HWND                 m_hWnd, m_hStatus, m_hParent, m_hToolbar, m_hRebar;
-    HWND                 m_hMusicCatalog, m_hPlaylistView;
-    HWND                 m_hPlaylistTitle, m_hMusicCatalogTitle;
-    PlaylistManager     *m_oPlm;
-    bool                 m_initialized, isVisible, m_bListChanged, 
-                         m_bSearchInProgress, m_bDragging;
-    string               m_currentListName, m_activeListName;
-    Thread              *m_uiThread;
-    POINT                m_sMinSize;
-    HTREEITEM	         m_hPlaylistItem, m_hCatalogItem;
-    HTREEITEM            m_hAllItem, m_hUncatItem;
-    TreeDataIndex        m_oTreeIndex;
-    int                  m_iCollapseMoveAmount;
-    HCURSOR              m_hSavedCursor, m_hDragCursor, m_hNoDropCursor;
-    HCURSOR              m_hSplitterCursor, m_hPointerCursor, m_hCurrentCursor;
-    MusicBrowserUI      *m_pParent;
+    EventQueue*         m_playerEQ;
+    int32               m_state, m_startupType, m_playerState;
+    int32               m_currentplaying;
+  	HWND                m_hWnd, m_hStatus, m_hParent, m_hToolbar, m_hRebar;
+    HWND                m_hMusicCatalog, m_hPlaylistView;
+    HWND                m_hPlaylistTitle, m_hMusicCatalogTitle;
+    PlaylistManager*    m_oPlm;
+    bool                m_initialized, isVisible, m_bListChanged, 
+                        m_bSearchInProgress, m_bDragging;
+    string              m_currentListName, m_activeListName;
+    Thread*             m_uiThread;
+    POINT               m_sMinSize;
+    HTREEITEM	        m_hPlaylistItem, m_hCatalogItem;
+    HTREEITEM           m_hAllItem, m_hUncatItem;
+    TreeDataIndex       m_oTreeIndex;
+    int                 m_iCollapseMoveAmount;
+    HCURSOR             m_hSavedCursor, m_hDragCursor, m_hNoDropCursor;
+    HCURSOR             m_hSplitterCursor, m_hPointerCursor, m_hCurrentCursor;
+    MusicBrowserUI*     m_pParent;
     vector<MusicBrowserUI*> m_oWindowList;
-    bool                 m_overSplitter;
-    bool                 m_trackSplitter;
-    RECT                 m_splitterRect;
-    HBRUSH               m_splitterBrush;
+    bool                m_overSplitter;
+    bool                m_trackSplitter;
+    RECT                m_splitterRect;
+    HBRUSH              m_splitterBrush;
 
-    HWND                 m_hPlaylistHeader;
-    DropTarget*          m_playlistDropTarget;
-    vector<string>       m_searchPathList;
-    HTREEITEM            m_hNewPlaylistItem;  
-    uint32               m_initialCount;
+    HWND                m_hPlaylistHeader;
+    DropTarget*         m_playlistDropTarget;
+    vector<string>      m_searchPathList;
+    HTREEITEM           m_hNewPlaylistItem;  
+    uint32              m_initialCount;
+
+    MetaData            m_editTrackMetaData;
 };
 
 #endif

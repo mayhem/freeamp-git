@@ -63,6 +63,7 @@ CLEAN :
 	-@erase "$(INTDIR)\DropObject.obj"
 	-@erase "$(INTDIR)\DropSource.obj"
 	-@erase "$(INTDIR)\DropTarget.obj"
+	-@erase "$(INTDIR)\EditTrackInfoDialog.obj"
 	-@erase "$(INTDIR)\EnumFormatEtc.obj"
 	-@erase "$(INTDIR)\Event.obj"
 	-@erase "$(INTDIR)\MultiSelectTreeView.obj"
@@ -113,6 +114,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\DropObject.obj" \
 	"$(INTDIR)\DropSource.obj" \
 	"$(INTDIR)\DropTarget.obj" \
+	"$(INTDIR)\EditTrackInfoDialog.obj" \
 	"$(INTDIR)\EnumFormatEtc.obj" \
 	"$(INTDIR)\Event.obj" \
 	"$(INTDIR)\MultiSelectTreeView.obj" \
@@ -139,8 +141,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 Release" "fabaselib - Win32 Release"\
  ".\musicbrowser.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                      ..\..\..\..\base\win32\prj\plugins
-	copy musicbrowser.ui                                                                        ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                       ..\..\..\..\base\win32\prj\plugins
+	copy musicbrowser.ui                                                                         ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 Debug"
@@ -168,6 +170,7 @@ CLEAN :
 	-@erase "$(INTDIR)\DropObject.obj"
 	-@erase "$(INTDIR)\DropSource.obj"
 	-@erase "$(INTDIR)\DropTarget.obj"
+	-@erase "$(INTDIR)\EditTrackInfoDialog.obj"
 	-@erase "$(INTDIR)\EnumFormatEtc.obj"
 	-@erase "$(INTDIR)\Event.obj"
 	-@erase "$(INTDIR)\MultiSelectTreeView.obj"
@@ -219,6 +222,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\DropObject.obj" \
 	"$(INTDIR)\DropSource.obj" \
 	"$(INTDIR)\DropTarget.obj" \
+	"$(INTDIR)\EditTrackInfoDialog.obj" \
 	"$(INTDIR)\EnumFormatEtc.obj" \
 	"$(INTDIR)\Event.obj" \
 	"$(INTDIR)\MultiSelectTreeView.obj" \
@@ -245,8 +249,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 Debug" "fabaselib - Win32 Debug"\
  ".\musicbrowser.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                      ..\..\..\..\base\win32\prj\plugins
-	copy musicbrowser.ui                                                                        ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                       ..\..\..\..\base\win32\prj\plugins
+	copy musicbrowser.ui                                                                         ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Debug"
@@ -275,6 +279,7 @@ CLEAN :
 	-@erase "$(INTDIR)\DropObject.obj"
 	-@erase "$(INTDIR)\DropSource.obj"
 	-@erase "$(INTDIR)\DropTarget.obj"
+	-@erase "$(INTDIR)\EditTrackInfoDialog.obj"
 	-@erase "$(INTDIR)\EnumFormatEtc.obj"
 	-@erase "$(INTDIR)\Event.obj"
 	-@erase "$(INTDIR)\MultiSelectTreeView.obj"
@@ -326,6 +331,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\DropObject.obj" \
 	"$(INTDIR)\DropSource.obj" \
 	"$(INTDIR)\DropTarget.obj" \
+	"$(INTDIR)\EditTrackInfoDialog.obj" \
 	"$(INTDIR)\EnumFormatEtc.obj" \
 	"$(INTDIR)\Event.obj" \
 	"$(INTDIR)\MultiSelectTreeView.obj" \
@@ -352,8 +358,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 NASM Debug" "fabaselib - Win32 NASM Debug"\
  ".\musicbrowser.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                      ..\..\..\..\base\win32\prj\plugins
-	copy musicbrowser.ui                                                                        ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                       ..\..\..\..\base\win32\prj\plugins
+	copy musicbrowser.ui                                                                         ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Release"
@@ -382,6 +388,7 @@ CLEAN :
 	-@erase "$(INTDIR)\DropObject.obj"
 	-@erase "$(INTDIR)\DropSource.obj"
 	-@erase "$(INTDIR)\DropTarget.obj"
+	-@erase "$(INTDIR)\EditTrackInfoDialog.obj"
 	-@erase "$(INTDIR)\EnumFormatEtc.obj"
 	-@erase "$(INTDIR)\Event.obj"
 	-@erase "$(INTDIR)\MultiSelectTreeView.obj"
@@ -432,6 +439,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\DropObject.obj" \
 	"$(INTDIR)\DropSource.obj" \
 	"$(INTDIR)\DropTarget.obj" \
+	"$(INTDIR)\EditTrackInfoDialog.obj" \
 	"$(INTDIR)\EnumFormatEtc.obj" \
 	"$(INTDIR)\Event.obj" \
 	"$(INTDIR)\MultiSelectTreeView.obj" \
@@ -458,8 +466,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 NASM Release"\
  "fabaselib - Win32 NASM Release" ".\musicbrowser.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                      ..\..\..\..\base\win32\prj\plugins
-	copy musicbrowser.ui                                                                        ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                       ..\..\..\..\base\win32\prj\plugins
+	copy musicbrowser.ui                                                                         ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 
@@ -848,6 +856,142 @@ DEP_CPP_DROPT=\
 "$(INTDIR)\DropTarget.obj" : $(SOURCE) $(DEP_CPP_DROPT) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+SOURCE=..\src\EditTrackInfoDialog.cpp
+
+!IF  "$(CFG)" == "musicbrowser - Win32 Release"
+
+DEP_CPP_EDITT=\
+	"..\..\..\..\base\include\database.h"\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\musicbrowser.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
+	"..\..\..\include\ui.h"\
+	"..\include\dataindex.h"\
+	"..\include\droptarget.h"\
+	"..\include\win32musicbrowser.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
+	
+
+"$(INTDIR)\EditTrackInfoDialog.obj" : $(SOURCE) $(DEP_CPP_EDITT) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "musicbrowser - Win32 Debug"
+
+DEP_CPP_EDITT=\
+	"..\..\..\..\base\include\database.h"\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\musicbrowser.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
+	"..\..\..\include\ui.h"\
+	"..\include\dataindex.h"\
+	"..\include\droptarget.h"\
+	"..\include\win32musicbrowser.h"\
+	
+
+"$(INTDIR)\EditTrackInfoDialog.obj" : $(SOURCE) $(DEP_CPP_EDITT) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Debug"
+
+DEP_CPP_EDITT=\
+	"..\..\..\..\base\include\database.h"\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\musicbrowser.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
+	"..\..\..\include\ui.h"\
+	"..\include\dataindex.h"\
+	"..\include\droptarget.h"\
+	"..\include\win32musicbrowser.h"\
+	
+
+"$(INTDIR)\EditTrackInfoDialog.obj" : $(SOURCE) $(DEP_CPP_EDITT) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Release"
+
+DEP_CPP_EDITT=\
+	"..\..\..\..\base\include\database.h"\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\musicbrowser.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
+	"..\..\..\include\ui.h"\
+	"..\include\dataindex.h"\
+	"..\include\droptarget.h"\
+	"..\include\win32musicbrowser.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
+	
+
+"$(INTDIR)\EditTrackInfoDialog.obj" : $(SOURCE) $(DEP_CPP_EDITT) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\src\EnumFormatEtc.cpp
 DEP_CPP_ENUMF=\
@@ -1715,29 +1859,7 @@ SOURCE=..\src\RemoveTracksDialog.cpp
 !IF  "$(CFG)" == "musicbrowser - Win32 Release"
 
 DEP_CPP_REMOV=\
-	"..\..\..\..\base\include\database.h"\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\base\include\event.h"\
-	"..\..\..\..\base\include\facontext.h"\
-	"..\..\..\..\base\include\log.h"\
-	"..\..\..\..\base\include\metadata.h"\
-	"..\..\..\..\base\include\musicbrowser.h"\
-	"..\..\..\..\base\include\playlist.h"\
-	"..\..\..\..\base\include\playlistformat.h"\
-	"..\..\..\..\base\include\plmevent.h"\
-	"..\..\..\..\base\include\portabledevice.h"\
-	"..\..\..\..\base\include\preferences.h"\
-	"..\..\..\..\base\include\properties.h"\
-	"..\..\..\..\base\include\registry.h"\
-	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
-	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -1749,29 +1871,7 @@ DEP_CPP_REMOV=\
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 Debug"
 
 DEP_CPP_REMOV=\
-	"..\..\..\..\base\include\database.h"\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\base\include\event.h"\
-	"..\..\..\..\base\include\facontext.h"\
-	"..\..\..\..\base\include\log.h"\
-	"..\..\..\..\base\include\metadata.h"\
-	"..\..\..\..\base\include\musicbrowser.h"\
-	"..\..\..\..\base\include\playlist.h"\
-	"..\..\..\..\base\include\playlistformat.h"\
-	"..\..\..\..\base\include\plmevent.h"\
-	"..\..\..\..\base\include\portabledevice.h"\
-	"..\..\..\..\base\include\preferences.h"\
-	"..\..\..\..\base\include\properties.h"\
-	"..\..\..\..\base\include\registry.h"\
-	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
-	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
 	
 
 "$(INTDIR)\RemoveTracksDialog.obj" : $(SOURCE) $(DEP_CPP_REMOV) "$(INTDIR)"
@@ -1781,29 +1881,7 @@ DEP_CPP_REMOV=\
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Debug"
 
 DEP_CPP_REMOV=\
-	"..\..\..\..\base\include\database.h"\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\base\include\event.h"\
-	"..\..\..\..\base\include\facontext.h"\
-	"..\..\..\..\base\include\log.h"\
-	"..\..\..\..\base\include\metadata.h"\
-	"..\..\..\..\base\include\musicbrowser.h"\
-	"..\..\..\..\base\include\playlist.h"\
-	"..\..\..\..\base\include\playlistformat.h"\
-	"..\..\..\..\base\include\plmevent.h"\
-	"..\..\..\..\base\include\portabledevice.h"\
-	"..\..\..\..\base\include\preferences.h"\
-	"..\..\..\..\base\include\properties.h"\
-	"..\..\..\..\base\include\registry.h"\
-	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
-	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
 	
 
 "$(INTDIR)\RemoveTracksDialog.obj" : $(SOURCE) $(DEP_CPP_REMOV) "$(INTDIR)"
@@ -1813,29 +1891,7 @@ DEP_CPP_REMOV=\
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Release"
 
 DEP_CPP_REMOV=\
-	"..\..\..\..\base\include\database.h"\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\base\include\event.h"\
-	"..\..\..\..\base\include\facontext.h"\
-	"..\..\..\..\base\include\log.h"\
-	"..\..\..\..\base\include\metadata.h"\
-	"..\..\..\..\base\include\musicbrowser.h"\
-	"..\..\..\..\base\include\playlist.h"\
-	"..\..\..\..\base\include\playlistformat.h"\
-	"..\..\..\..\base\include\plmevent.h"\
-	"..\..\..\..\base\include\portabledevice.h"\
-	"..\..\..\..\base\include\preferences.h"\
-	"..\..\..\..\base\include\properties.h"\
-	"..\..\..\..\base\include\registry.h"\
-	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
-	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	

@@ -25,7 +25,7 @@
 #define IDD_OPENURL                     219
 #define IDD_DELETETRACKS                220
 #define IDD_REMOVETRACKS                220
-#define IDD_EDITINFO                    221
+#define IDD_EDITINFO                    259
 #define IDB_PLAYING                     542
 #define IDB_CATALOG                     543
 #define IDB_ARTIST                      544
@@ -52,9 +52,17 @@
 #define IDC_DUMMYCONTROL                1018
 #define IDC_LIMITTEXT                   1019
 #define IDC_NAME                        1020
+#define IDC_YEAR                        1023
+#define IDC_SPIN1                       1024
 #define IDC_OPEN_URL                    1029
 #define IDC_BROWSE                      1110
 #define IDC_DRIVES                      1231
+#define IDC_ALBUM                       1462
+#define IDC_ARTIST                      1463
+#define IDC_GENRE                       1464
+#define IDC_TRACK                       1466
+#define IDC_TITLE                       1476
+#define IDC_COMMENT                     1477
 #define IDC_DIRECTORY                   1531
 #define ID_FILE_NEWPLAYLIST             40001
 #define ID_FILE_OPENPLAYLIST            40002
@@ -118,7 +126,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        123
 #define _APS_NEXT_COMMAND_VALUE         40064
-#define _APS_NEXT_CONTROL_VALUE         1023
+#define _APS_NEXT_CONTROL_VALUE         1025
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
