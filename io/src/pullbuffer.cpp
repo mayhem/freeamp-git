@@ -231,8 +231,8 @@ Error PullBuffer::BeginWrite(void *&pBuffer, size_t &iBytesToWrite)
    Error eError = kError_NoErr;
 
    assert(m_pPullBuffer != NULL);
-   assert(m_iReadIndex >= 0 && m_iReadIndex < m_iBufferSize);
-   assert(m_iWriteIndex >= 0 && m_iWriteIndex < m_iBufferSize);
+   assert(m_iReadIndex >= 0 && (uint32)m_iReadIndex < m_iBufferSize);
+   assert(m_iWriteIndex >= 0 && (uint32)m_iWriteIndex < m_iBufferSize);
 
    m_pMutex->Acquire();
 
@@ -243,7 +243,8 @@ Error PullBuffer::BeginWrite(void *&pBuffer, size_t &iBytesToWrite)
    if (m_iWriteIndex > m_iReadIndex)
    {
        iBytesToWrite = m_iBufferSize - m_iWriteIndex + 
-                       min(m_iReadIndex, m_iOverflowSize);
+                            min((uint32)m_iReadIndex, m_iOverflowSize);
+
        if (iBytesToWrite > m_iWriteTriggerSize)
           iBytesToWrite = m_iWriteTriggerSize;
 
@@ -295,7 +296,7 @@ Error PullBuffer::EndWrite(size_t iBytesWritten)
    }
 
    m_iWriteIndex = m_iWriteIndex + iBytesWritten;
-   if (m_iWriteIndex > m_iBufferSize)
+   if ((uint32)m_iWriteIndex > m_iBufferSize)
       memmove(m_pPullBuffer, m_pPullBuffer + m_iBufferSize,
               m_iWriteIndex - m_iBufferSize);
 
