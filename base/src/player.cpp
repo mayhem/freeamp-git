@@ -943,7 +943,7 @@ void Player::GetMediaTitle(Event *pEventArg)
      PlayListItem          *pItem;
      RegistryItem          *pRegItem;
      PhysicalMediaInput    *pPmi;
-     char                   szTitle[255];
+     char                   szTitle[1024];
      ID3Tag                 sID3Tag;
      Error                  eRet;
 
@@ -960,23 +960,54 @@ void Player::GetMediaTitle(Event *pEventArg)
          eRet = pPmi->SetTo(pItem->URL());
          if (!IsError(eRet))
          {
-             eRet = pPmi->GetID3v1Tag((unsigned char *)&sID3Tag);
-             if (!IsError(eRet))
-             {
-                 strncpy(szTitle, sID3Tag.szTitle, iID3TitleLength);
-                 szTitle[iID3TitleLength] = 0;
-             }
-             else
-                 strcpy(szTitle, pItem->URL());
+            eRet = pPmi->GetID3v1Tag((unsigned char *)&sID3Tag);
 
+            if (!IsError(eRet))
+            {
+                /*OutputDebugString(sID3Tag.szArtist);
+                OutputDebugString("\r\n");
+                OutputDebugString(sID3Tag.szAlbum);
+                OutputDebugString("\r\n");
+                OutputDebugString(sID3Tag.szTitle);
+                OutputDebugString("\r\n");*/
+
+                strncpy(szTitle, sID3Tag.szArtist, iID3ArtistLength);
+                szTitle[iID3ArtistLength] = 0;
+
+                //kill trailing spaces
+                char *pFoo = &(szTitle[strlen(szTitle)-1]);
+
+                while ((pFoo >= szTitle) && pFoo && (*pFoo == ' ')) 
+                {
+                    *pFoo = '\0';
+                    pFoo--;
+                }
+
+                strcat(szTitle, " - ");
+
+                strncat(szTitle, sID3Tag.szTitle, iID3TitleLength);
+                szTitle[iID3TitleLength] = 0;
+
+                //kill trailing spaces
+                pFoo = &(szTitle[strlen(szTitle)-1]);
+
+                while ((pFoo >= szTitle) && pFoo && (*pFoo == ' ')) 
+                {
+                    *pFoo = '\0';
+                    pFoo--;
+                }
+             }
          }
-         else
-            strcpy(szTitle, pItem->URL());
 
          delete pPmi;
      }
 
-     pItem->SetDisplayString(szTitle);
+     if(*szTitle)
+     {
+        pItem->SetDisplayString(szTitle);
+
+        SendEventToUI(new PlayListItemUpdatedEvent(pItem) );
+     }
 
      delete pEvent;
 }

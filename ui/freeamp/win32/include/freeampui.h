@@ -121,6 +121,9 @@ class FreeAmpUI : public UserInterface {
 
     void UpdatePlayList();
 
+    bool OpenSong(List<char*>* filelist);
+
+
  public:
     
 	

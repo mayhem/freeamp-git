@@ -43,6 +43,9 @@ class StringItem : public ListItem {
 
     virtual	void DrawItem(DIB* canvas, RECT* bounds);
 
+    char* Text() const { return m_text; }
+    void SetText(char* text);
+
  private:
     DIB*                m_fontBitmap;
     DIB*                m_textBitmap;

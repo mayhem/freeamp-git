@@ -2,7 +2,9 @@
 // Microsoft Developer Studio generated include file.
 // Used by freeamp.rc
 //
+#define IDC_BROWSE                      3
 #define IDI_EXE_ICON                    101
+#define IDC_URL                         101
 #define IDB_DIALS                       104
 #define IDC_DIAL                        104
 #define IDB_CONTROL_MASK_MID            105
@@ -66,15 +68,16 @@
 #define IDB_PANEL_BACKING_256           178
 #define IDB_PLAYLIST_BODY_256           179
 #define IDB_DRAWER_256                  180
+#define IDD_OPENSONG                    181
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        181
+#define _APS_NEXT_RESOURCE_VALUE        182
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1000
+#define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

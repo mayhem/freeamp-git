@@ -112,7 +112,23 @@ class PlayListItem {
 
     char* StringForPlayerToDisplay() const 
 	{ 
-		return m_DisplayString ? m_DisplayString : "";
+        char* result = NULL;
+
+        if(m_DisplayString)
+            result = m_DisplayString;
+        else if(m_url)
+        {
+            result = strrchr(m_url, '\\');
+
+            if(result)
+                result++;
+            else
+                result = m_url;
+        }
+        else
+            result = "";
+
+		return result;
 	}
 
     void SetDisplayString(char *pDisplayString)
@@ -206,7 +222,16 @@ enum RepeatMode {
 	REPEAT_LAST_ENUM
 };
 
+class PlayListItemUpdatedEvent : public Event {
+private:
+	PlayListItem* m_item;
+public:
+	PlayListItemUpdatedEvent(PlayListItem* item) 
+    { m_type = INFO_PlayListItemUpdated; m_item = item; }
+	virtual ~PlayListItemUpdatedEvent() {}
 
+	PlayListItem* UpdatedItem() { return m_item; }
+};
 
 class PlayListRepeatEvent : public Event {
 private:

@@ -521,10 +521,10 @@ DropFiles(HDROP dropHandle)
         }
         else
         {
+            /*OutputDebugString(file);
+            OutputDebugString("\r\n");*/
             m_plm->AddItem(file,0);
         }
-
-		
 	}
 
 	if(count) 
@@ -604,65 +604,18 @@ Command(int32 command,
 
         case kOpenControl:
 		{
-            OPENFILENAME ofn;
-			char szTitle[] = "Open Audio File";
-			char szFilter[] =
-			"MPEG Audio Streams (.mpg, .mp1, .mp2, .mp3, .mpp)\0"
-			"*.mpg;*.mp1;*.mp2;*.mp3;*.mpp\0"
-			"Playlists (.m3u)\0"
-			"*.m3u\0"
-			"All Files (*.*)\0"
-			"*.*\0";
-			const int32 kBufferSize = MAX_PATH * 128;
-			char* filelist = new char[kBufferSize];
-			
-			*filelist = 0x00;
+            List<char*> fileList;
 
-			// Setup open file dialog box structure
-			ofn.lStructSize       = sizeof(OPENFILENAME);
-			ofn.hwndOwner         = m_hwnd;
-			ofn.hInstance         = (HINSTANCE)GetWindowLong(m_hwnd, 
-													GWL_HINSTANCE);
-			ofn.lpstrFilter       = szFilter;
-			ofn.lpstrCustomFilter = NULL;
-			ofn.nMaxCustFilter    = 0;
-			ofn.nFilterIndex      = 1;
-			ofn.lpstrFile         = filelist;
-			ofn.nMaxFile          = kBufferSize;
-			ofn.lpstrFileTitle    = NULL;
-			ofn.nMaxFileTitle     = 0;
-			ofn.lpstrInitialDir   = "";
-			ofn.lpstrTitle        = szTitle;
-			ofn.Flags             = OFN_FILEMUSTEXIST | 
-									OFN_PATHMUSTEXIST |
-  	     				   			OFN_HIDEREADONLY | 
-									OFN_ALLOWMULTISELECT |
-									OFN_EXPLORER;
-			ofn.nFileOffset       = 0;
-			ofn.nFileExtension    = 0;
-			ofn.lpstrDefExt       = "MP*";
-			ofn.lCustData         = 0;
-			ofn.lpfnHook          = NULL;
-			ofn.lpTemplateName    = NULL;
-
-			if(GetOpenFileName(&ofn))
+			if(OpenSong(&fileList))
 			{
-				char file[MAX_PATH + 1];
-				char* cp = NULL;
-                List<char*> fileList;
-
-
-				strcpy(file, filelist);
-				strcat(file, "\\");
-
-				cp = filelist + ofn.nFileOffset;
+                List<char*> m3uFileList;
+                char* file = NULL;
+                int32 i = 0;
 
 				m_plm->MakeEmpty();
 
-				while(*cp)
+				while(file = fileList.ItemAt(i++))
 				{
-					strcpy(file + ofn.nFileOffset, cp);
-
                     char* pExtension = NULL;
 
                     pExtension = strrchr(file, '.');
@@ -671,7 +624,7 @@ Command(int32 command,
                     { 
                         Error error;
 
-                        error = m_plm->ExpandM3U(file, fileList);
+                        error = m_plm->ExpandM3U(file, m3uFileList);
 
                         if(IsError(error))
                         {
@@ -682,9 +635,10 @@ Command(int32 command,
                             char* item = NULL;
                             int32 i = 0;
 
-                            while(item = fileList.ItemAt(i++))
+                            while(item = m3uFileList.ItemAt(i++))
                             {
                                 m_plm->AddItem(item,0);
+                                delete [] item;
                             }
                         }
                     }
@@ -693,7 +647,7 @@ Command(int32 command,
                         m_plm->AddItem(file,0);
                     }
 
-					cp += strlen(cp) + 1;
+                    delete [] file;
 				}
 
                 if(m_state == STATE_Playing)
@@ -708,8 +662,6 @@ Command(int32 command,
 			}
 
             m_plm->SetFirst();
-
-			delete [] filelist;
 
 			break;        
 		}
@@ -977,6 +929,14 @@ Notify(int32 command, LPNMHDR notifyMsgHdr)
                     case DIAL_BUTTON_UP:
                     {
                         KillTimer(m_hwnd, TIMER_SEEK_POSITION);
+
+                        int32 seconds = (int32)ceil(m_secondsPerFrame * m_seekFrame);
+			            int32 hours = seconds / 3600;
+			            int32 minutes = seconds / 60 - hours * 60;
+			            seconds = seconds - minutes * 60 - hours * 3600;
+
+                        m_timeView->SetCurrentTime(hours, minutes, seconds);
+
                         m_timeView->SetDisplay(m_lastTimeDisplay);
                         m_seekView->SetPosition(0);
 
@@ -2024,6 +1984,7 @@ AcceptEvent(Event* event)
                 {
 					char foo[1024];
 					strncpy(foo,info->GetId3Tag().m_artist,sizeof(foo)-1);
+
 					//kill trailing spaces
 					char *pFoo = &(foo[strlen(foo)-1]);
 
@@ -2035,7 +1996,21 @@ AcceptEvent(Event* event)
 
 					strncat(foo," - ",sizeof(foo)-strlen(foo));
 
+					strncat(foo,info->GetId3Tag().m_album,sizeof(foo)-strlen(foo));
+
+					// kill trailing spaces
+					pFoo = &(foo[strlen(foo)-1]);
+
+					while ((pFoo >= foo) && pFoo && (*pFoo == ' ')) 
+                    {
+						*pFoo = '\0';
+						pFoo--;
+					}
+
+                    strncat(foo," - ",sizeof(foo)-strlen(foo));
+
 					strncat(foo,info->GetId3Tag().m_songName,sizeof(foo)-strlen(foo));
+
 					// kill trailing spaces
 					pFoo = &(foo[strlen(foo)-1]);
 
@@ -2108,6 +2083,32 @@ AcceptEvent(Event* event)
             case INFO_PlayListUpdated:
             {
                 UpdatePlayList();
+                break;
+            }
+
+            case INFO_PlayListItemUpdated:
+            {
+                PlayListItemUpdatedEvent* updateEvent = (PlayListItemUpdatedEvent*)event;
+
+                PlayListItem* updateItem = updateEvent->UpdatedItem();
+
+                if(updateItem)
+                {
+                    int32 i = 0;
+
+                    StringItem* listItem;
+
+                    while(listItem = (StringItem*)m_playlistView->ItemAt(i++))
+                    {
+                        if(updateItem == (PlayListItem*) listItem->UserValue())
+                        {
+                            listItem->SetText(updateItem->StringForPlayerToDisplay());
+                            m_playlistView->Invalidate();
+
+                            break;
+                        }
+                    }
+                }
                 break;
             }
             
@@ -2196,6 +2197,10 @@ UpdatePlayList()
         int32 playlistCount = m_plm->CountItems();
         int32 listviewCount = m_playlistView->CountItems();
 
+        /*char buffer[256];
+        sprintf(buffer, "playlist count %d\r\nlistview count %d\r\n", playlistCount, listviewCount);
+        OutputDebugString(buffer);*/
+
         if(playlistCount != listviewCount)      
         {
             int32 i = 0;
@@ -2217,6 +2222,9 @@ UpdatePlayList()
                 item->SetUserValue(playlistItem);
 
                 m_playlistView->AddItem(item);
+
+                /*OutputDebugString(playlistItem->StringForPlayerToDisplay());
+                OutputDebugString("\r\n");*/
             }
         }       
         else
@@ -2235,8 +2243,6 @@ UpdatePlayList()
                 }
             }
 
-
-
             if(different)
             {
                 PlayListItem* playlistItem;
@@ -2247,7 +2253,7 @@ UpdatePlayList()
 
                 while(playlistItem = m_plm->ItemAt(i++))
                 {
-                    MediaInfoEvent* info = playlistItem->GetMediaInfo();
+                    //MediaInfoEvent* info = playlistItem->GetMediaInfo();
 
                     //char buffer[256];
                     //sprintf(buffer, "This is StringItem #%d", i);
@@ -2259,11 +2265,182 @@ UpdatePlayList()
                     item->SetUserValue(playlistItem);
 
                     m_playlistView->AddItem(item);
+                    /*OutputDebugString(playlistItem->StringForPlayerToDisplay());
+                    OutputDebugString("\r\n");*/
                 }
             }
 
         }
     }
+}
+typedef struct _OpenSongStruct{
+    char* filelist;
+    int32 bufferSize;
+}OpenSongStruct;
+
+static
+BOOL
+CALLBACK
+OpenSongDialogProc( HWND hwnd, 
+                    UINT msg, 
+                    WPARAM wParam, 
+                    LPARAM lParam )
+{
+    BOOL result = FALSE;
+    static List<char*>* fileList = NULL;
+    switch (msg)
+    {
+        case WM_INITDIALOG:
+        {
+            // When we create the dlg we pass in a pointer to our
+            // OpenSongStruct...
+            // Tuck away the pointer in a safe place
+            
+            fileList = (List<char*>*)lParam;
+          
+            break;
+        }
+
+        case WM_COMMAND:
+        {
+            switch(wParam)
+            {
+                case IDC_BROWSE:
+                {            
+                    ShowWindow(hwnd, SW_HIDE);
+
+                    OPENFILENAME ofn;
+	                char szTitle[] = "Open Audio File";
+	                char szFilter[] =
+	                "MPEG Audio Streams (.mpg, .mp1, .mp2, .mp3, .mpp)\0"
+	                "*.mpg;*.mp1;*.mp2;*.mp3;*.mpp\0"
+	                "Playlists (.m3u)\0"
+	                "*.m3u\0"
+	                "All Files (*.*)\0"
+	                "*.*\0";
+                    const int32 kBufferSize = MAX_PATH * 128;
+                    char* fileBuffer = new char[kBufferSize];
+			
+			        *fileBuffer = 0x00;
+
+	                // Setup open file dialog box structure
+	                ofn.lStructSize       = sizeof(OPENFILENAME);
+	                ofn.hwndOwner         = hwnd;
+	                ofn.hInstance         = (HINSTANCE)GetWindowLong(hwnd, 
+											                GWL_HINSTANCE);
+	                ofn.lpstrFilter       = szFilter;
+	                ofn.lpstrCustomFilter = NULL;
+	                ofn.nMaxCustFilter    = 0;
+	                ofn.nFilterIndex      = 1;
+	                ofn.lpstrFile         = fileBuffer;
+	                ofn.nMaxFile          = kBufferSize;
+	                ofn.lpstrFileTitle    = NULL;
+	                ofn.nMaxFileTitle     = 0;
+	                ofn.lpstrInitialDir   = "";
+	                ofn.lpstrTitle        = szTitle;
+	                ofn.Flags             = OFN_FILEMUSTEXIST | 
+							                OFN_PATHMUSTEXIST |
+  	     				   	                OFN_HIDEREADONLY | 
+							                OFN_ALLOWMULTISELECT |
+							                OFN_EXPLORER;
+	                ofn.nFileOffset       = 0;
+	                ofn.nFileExtension    = 0;
+	                ofn.lpstrDefExt       = "MP*";
+	                ofn.lCustData         = 0;
+	                ofn.lpfnHook          = NULL;
+	                ofn.lpTemplateName    = NULL;
+
+                    if(GetOpenFileName(&ofn))
+                    {
+
+                        char file[MAX_PATH + 1];
+				        char* cp = NULL;
+
+				        strncpy(file, fileBuffer, ofn.nFileOffset);
+
+				        cp = fileBuffer + ofn.nFileOffset;
+
+				        while(*cp)
+				        {
+					        strcpy(file + ofn.nFileOffset, cp);
+
+                            char* foo = new char[strlen(file) + 1];
+
+                            strcpy(foo, file);
+
+                            fileList->AddItem(foo);
+
+					        cp += strlen(cp) + 1;
+				        }
+
+
+                        EndDialog(hwnd, TRUE);
+                    }
+                    else
+                    {
+                        ShowWindow(hwnd, SW_SHOW);
+                    }
+
+                    delete [] fileBuffer;
+
+                    break;
+                }
+
+                case IDOK:
+                {         
+                    char url[2048];
+
+                    if(GetDlgItemText( hwnd,
+                                    IDC_URL,
+                                    url,
+                                    sizeof(url)))
+                    {
+                        char* foo = new char[strlen(url) + 1];
+
+                        strcpy(foo, url);
+
+                        fileList->AddItem(foo);
+
+                        EndDialog(hwnd, TRUE);
+                    }
+                    else
+                    {
+                        EndDialog(hwnd, FALSE);
+                    }
+
+                    break;
+                }
+
+                case IDCANCEL:
+                {            
+                    EndDialog(hwnd, FALSE);
+                    break;
+                }
+            }
+            break;
+        }
+    }
+
+    return result;
+}
+
+bool
+FreeAmpUI::
+OpenSong(List<char*>* filelist)
+{
+    bool result = false;
+    HINSTANCE hinst = (HINSTANCE)GetWindowLong(m_hwnd, GWL_HINSTANCE);
+
+    if(DialogBoxParam(  hinst, 
+                        MAKEINTRESOURCE(IDD_OPENSONG), 
+                        m_hwnd,
+                        OpenSongDialogProc,
+                        (LPARAM)filelist))
+    {
+        result = true;
+    }
+
+    return result;
 }
 
 void

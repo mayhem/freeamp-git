@@ -451,6 +451,7 @@ AddItem(char *url, int32 type)
             pTitle->SetPlayListItem(item);
             m_target->AcceptEvent(pTitle);
             m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
+            OutputDebugString("AddItem::AcceptEvent(INFO_PlayListUpdated)\r\n");
         }  
     }
 
