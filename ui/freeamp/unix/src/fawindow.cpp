@@ -153,6 +153,8 @@ DoEvent(XEvent e)
    switch (e.type)
    {
    case MotionNotify:
+      while (XCheckTypedEvent(m_display, e.type, &e))
+         ; // speed up 
       if (e.xmotion.state & Button1Mask)
       {
           XMoveWindow(m_display, m_me, e.xmotion.x_root - m_buttonClickSpotX, e.xmotion.y_root - m_buttonClickSpotY);

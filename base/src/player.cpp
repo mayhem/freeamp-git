@@ -741,6 +741,59 @@ SetState(PlayerState ps)
    return true;
 }
 
+char *
+Player::
+GetExtension(char *title)
+{
+   char *temp_ext;
+   char *ext_return = NULL;
+
+   temp_ext = strrchr(title, '.');
+   if (temp_ext)
+   {
+      temp_ext = temp_ext + 1;
+      ext_return = new char [strlen(temp_ext) + 1];
+      strcpy(ext_return, temp_ext);
+   }
+   return ext_return;
+}
+
+RegistryItem *
+Player::
+ChooseLMC(char *szUrl, char *szTitle)
+{
+   LogicalMediaConverter *lmc;
+   RegistryItem *lmc_item, *ret = NULL;
+   int       iLoop;
+   int       iItems;
+   char     *iExt;
+
+   iItems = m_lmcRegistry->GetNumItems();
+
+   iExt = GetExtension(szUrl);
+   if (!iExt)
+      return ret;
+
+   for (iLoop = 0; iLoop < iItems; iLoop++)
+   {
+      lmc_item = m_lmcRegistry->GetItem(iLoop);
+
+      lmc = (LogicalMediaConverter *) lmc_item->InitFunction()(m_context);
+      if (lmc->CanHandleExt(iExt))
+      {
+         ret = lmc_item;
+         delete lmc;
+
+         break;
+      }
+      delete lmc;
+   }
+
+   delete iExt;
+
+   return ret;
+}
+
 RegistryItem *
 Player::
 ChoosePMI(char *szUrl, char *szTitle)
@@ -837,7 +890,10 @@ CreatePMO(PlayListItem * pc, Event * pC)
       return;
    }
 
-   lmc_item = m_lmcRegistry->GetItem(0);
+   lmc_item = ChooseLMC(pc->URL());
+   if (!lmc_item)
+   // FIXME: Should probably have a user definable default LMC
+      lmc_item = m_lmcRegistry->GetItem(0);
 
    if (pmi_item)
    {

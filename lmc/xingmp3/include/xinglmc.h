@@ -92,6 +92,7 @@ class     XingLMC:public LogicalMediaConverter
    virtual Error SetEQData(float *);
    virtual Error SetEQData(bool);
 
+   virtual bool CanHandleExt(char *ext);
  private:
 
    static void          DecodeWorkerThreadFunc(void *);

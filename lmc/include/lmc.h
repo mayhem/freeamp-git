@@ -51,6 +51,8 @@ class LogicalMediaConverter : public PipelineUnit
 
     virtual Error SetEQData(float *) = 0;
     virtual Error SetEQData(bool) = 0;
+    
+    virtual bool CanHandleExt(char *ext) = 0;
 
     protected:
 

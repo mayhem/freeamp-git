@@ -35,7 +35,7 @@ ____________________________________________________________________________*/
 #include <stdio.h>
 #include <iostream.h>
 #include <assert.h>
-
+#include <string.h>
 
 #include "config.h"
 #include "errors.h"
@@ -266,6 +266,25 @@ Error XingLMC::GetHeadInfo()
    }
 
    return (Error)lmcError_DecodeFailed;
+}
+
+/*
+ * Quick function to determine if this LMC can handle a file, by looking at
+ * the file extension.  This might be better done by a hashtable outside of
+ * the LMC, but this is good for now. - ijr
+ */
+bool XingLMC::CanHandleExt(char *ext)
+{
+   bool ret = false;
+   if (!strncasecmp(ext, "MP3", 3))
+      ret = true;
+   else if (!strncasecmp(ext, "MP2", 3))
+      ret = true;
+   else if (!strncasecmp(ext, "MP1", 3))
+      ret = true;
+   else if (!strncasecmp(ext, "MPG", 3))
+      ret = true;
+   return ret;
 }
 
 Error XingLMC::CanDecode()

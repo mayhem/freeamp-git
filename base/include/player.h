@@ -77,6 +77,7 @@ class Player : public EventQueue, Properties, PropertyWatcher
    void      testQueue();
    static void EventServiceThreadFunc(void *);
    virtual int32 AcceptEvent(Event *);
+   virtual RegistryItem *ChooseLMC(char *szUrl, char *szTitle = NULL);
    virtual RegistryItem *ChoosePMI(char *szUrl, char *szTitle = NULL);
 
    // Properties
@@ -103,7 +104,8 @@ class Player : public EventQueue, Properties, PropertyWatcher
    FAContext *m_context;
 
  private:
-
+   char *GetExtension(char *title);
+   
    // These are event loop handling functions
    void DoneOutputting(Event *pEvent) ;
    void Stop(Event *pEvent);
