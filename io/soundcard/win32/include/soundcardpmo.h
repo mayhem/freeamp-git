@@ -64,6 +64,7 @@ public:
     Error         Write(void *pBuffer);
 	void          Pause(void);
 	void          Resume(void);
+	void          Clear(void);
 	bool          WaitForDrain(void);
 
  private:

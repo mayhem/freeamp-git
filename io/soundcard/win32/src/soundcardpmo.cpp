@@ -305,6 +305,14 @@ void SoundCardPMO::Resume(void)
 	PhysicalMediaOutput::Resume();
 }
 
+void SoundCardPMO::Clear(void)
+{
+	if (m_initialized)
+	   waveOutReset(m_hwo);
+	
+	PhysicalMediaOutput::Clear();
+}
+
 Error SoundCardPMO::Reset(bool user_stop)
 {
    waveOutPause(m_hwo);

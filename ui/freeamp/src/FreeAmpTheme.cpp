@@ -421,6 +421,11 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
          
       	 break;
       }
+      case CMD_ShowPreferences:
+      {
+      	 ShowOptions();
+      	 break;
+      }
       
       default:
          break;
@@ -431,8 +436,6 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
 Error FreeAmpTheme::HandleControlMessage(string &oControlName, 
                                          ControlMessageEnum eMesg)
 {
-//   char szTemp[255];
-
    if (eMesg == CM_MouseEnter)
    {
        string oName("Info"), oDesc("");
@@ -491,6 +494,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
    	   int    iValue, iFrame;
        
        m_pWindow->ControlIntValue(oControlName, false, iValue);
+       
        iFrame = (int)(((float)iValue * (float)m_iTotalSeconds) / 
                       ((float)100 * m_fSecondsPerFrame));
        m_bSeekInProgress = false;
@@ -507,7 +511,9 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
        string oName("Time"), oText("");
    	   int    iValue, iTime;
        
+       
        m_pWindow->ControlIntValue(oControlName, false, iValue);
+       
        iTime = (iValue * m_iTotalSeconds) / 100;
        UpdateTimeDisplay(iTime);
        m_bSeekInProgress = true;
@@ -565,9 +571,9 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
        m_pContext->target->AcceptEvent(new Event(CMD_ToggleMusicBrowserUI));
        return kError_NoErr;
    }
-   if (oControlName == string("Playlist") && eMesg == CM_Pressed)
+   if (oControlName == string("Files") && eMesg == CM_Pressed)
    {
-       m_pContext->target->AcceptEvent(new Event(CMD_TogglePlaylistUI));
+       m_pContext->target->AcceptEvent(new Event(CMD_AddFiles));
        return kError_NoErr;
    }
    if (oControlName == string("Download") && eMesg == CM_Pressed)

@@ -141,7 +141,7 @@ void PhysicalMediaOutput::PreBuffer(void)
 
 bool PhysicalMediaOutput::WasteTime()
 {
-    usleep(10000);
+    usleep(1000);
 
     return m_bExit || m_bPause;
 }       
@@ -159,6 +159,7 @@ Error PhysicalMediaOutput::ChangePosition(int32 position)
    m_pLmc->Pause();
    m_pPmi->Pause();
 
+   Clear();
    m_pLmc->Clear();
    m_pPmi->Clear();
 

@@ -37,6 +37,7 @@ ____________________________________________________________________________*/
 #include "eventbuffer.h"
 #include "facontext.h"
 #include "log.h"
+#include "debug.h"
 
 #define DB printf("%s:%d\n", __FILE__, __LINE__); 
 
