@@ -132,6 +132,12 @@ APSInterface::~APSInterface()
     }
 }
 
+void APSInterface::SetProxy(string strAddr, int nPort)
+{
+    if (m_pYpClient)
+        m_pYpClient->SetProxy(strAddr, nPort);
+}
+
 int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
 {
     if (pmetaData == NULL) 

@@ -84,7 +84,10 @@ public:
     APSInterface(char *profilePath, const char* pYpIP  = "209.249.187.199", 
                  const char* pSigIP = "209.249.187.199");
     virtual ~APSInterface(); // to be or not to be virtual....
-       
+ 
+    /** Set the proxy url.  Use "" to disable. */   
+    void SetProxy(string strAddr, int nPort);
+    
     /** Attempts to finish filling in the metadata Record, 
         by comparing the record/filenames against a master music 
         database. */ 

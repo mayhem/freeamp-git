@@ -108,6 +108,35 @@ Init(OutputInfo* info)
 {
    m_data_size = info->max_buffer_size;
 
+   bool useProxy = false;
+   m_pContext->prefs->GetPrefBoolean(kUseProxyPref, &useProxy);
+   if (useProxy)
+   {
+       uint32 size = 1024;
+       char *buffer = (char *)malloc(size);
+
+       if (kError_BufferTooSmall == m_pContext->prefs->GetPrefString(
+                                                 kProxyHostPref, buffer, &size))
+       {
+           buffer = (char *)realloc(buffer, size);
+           m_pContext->prefs->GetPrefString(kProxyHostPref, buffer, &size);
+       }
+
+       char *port = strrchr(buffer, ':');
+       if (port) {
+           *port = '\0';
+           port++;
+       }
+
+       string proxyAddr = string(buffer, strlen(buffer) + 1);
+       int nPort = 80;
+       if (port && *port)
+           nPort = atoi(port);
+
+       free(buffer);
+       mb_SetProxy(m_MB, (char *)proxyAddr.c_str(), nPort);
+   }
+
    mb_SetPCMDataInfo(m_MB, info->samples_per_second, 
                     info->number_of_channels,
                      info->bits_per_sample);

@@ -31,7 +31,7 @@ ____________________________________________________________________________*/
 
 using namespace std;
 
-class COMSocket;
+class COMHTTPSocket;
 class Mutex;
 // Any other class declares for function params go here
 typedef vector<pair<string, string> > StreamList;
@@ -43,6 +43,8 @@ public:
    ~YPClient();
     void SetAddress(string strIP, int nPort) 
     { m_strIP = strIP, m_nPort = nPort; }
+    void SetProxy(string strAddr, int nPort)
+    { m_proxyAddr = strAddr; m_proxyPort = nPort; }
     int SoundsLike(APSPlaylist& ResultList, APSPlaylist& SeedList, 
 			string& strCollectionID);
     int GeneratePlayList(APSPlaylist& ResultList, APSPlaylist& SeedList,
@@ -60,10 +62,12 @@ protected:
     int Disconnect();
 
 private:
-    COMSocket* m_pSocket;
+    COMHTTPSocket* m_pSocket;
     Mutex* m_pMutex;
     string m_strIP;
     int m_nPort;
+    string m_proxyAddr;
+    int m_proxyPort;
 };
 
 #endif

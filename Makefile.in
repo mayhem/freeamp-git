@@ -63,7 +63,7 @@ FREEAMPbeosOBJ += base/beos/src/win32impl.o
 APSOBJ  = base/aps/FAMetaUnit.o base/aps/apsinterface.o 
 APSOBJ += base/aps/apsplaylist.o base/aps/gencrc.o base/aps/hosttonet.o 
 APSOBJ += base/aps/nettohost.o base/aps/comsocket.o base/aps/apsconvert.o
-APSOBJ += base/aps/YPClient.o base/aps/uuid.o
+APSOBJ += base/aps/YPClient.o base/aps/uuid.o base/aps/comhttpsocket.o
 
 FREEAMPOBJ =  base/src/log.o base/src/player.o base/src/musiccatalog.o
 FREEAMPOBJ += base/src/playlist.o base/src/propimpl.o base/src/registrar.o

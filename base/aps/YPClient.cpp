@@ -25,12 +25,7 @@ ____________________________________________________________________________*/
 #endif
 
 #include "YPClient.h"
-
-#ifdef WIN32
-#include "wincomsocket.h"
-#else
-#include "comsocket.h"
-#endif
+#include "comhttpsocket.h"
 
 #include "mutex.h"
 #include "automutex.h"
@@ -56,7 +51,7 @@ using namespace std;
 
 YPClient::YPClient()
 {
-    m_pSocket = new COMSocket;
+    m_pSocket = new COMHTTPSocket;
     m_pMutex = new Mutex;
 }
 
@@ -72,7 +67,22 @@ YPClient::~YPClient()
 
 int YPClient::Connect(string& strIP, int nPort)
 {
-    int nErr = m_pSocket->Connect(strIP.c_str(), nPort, SOCK_STREAM);
+    if (m_proxyAddr.empty())
+        m_pSocket->SetProxy(NULL);
+    else {
+        char *proxyurl = new char[m_proxyAddr.size() + 128];
+        sprintf(proxyurl, "http://%s:%d", m_proxyAddr.c_str(), m_proxyPort);
+        m_pSocket->SetProxy(proxyurl);
+        delete [] proxyurl;
+    }
+
+    char *url = new char[strIP.size() + 128]; // ample space;
+    sprintf(url, "http://%s/cgi-bin/gateway/gateway?%d", strIP.c_str(), nPort);
+    //sprintf(url, "http://209.249.187.200/cgi-bin/gateway?%d", nPort);
+    int nErr = m_pSocket->Connect(url);
+
+    delete [] url;
+
     if (nErr == -1)
     {
         return -1;

@@ -100,6 +100,37 @@ Player(FAContext *context) : EventQueue()
 
     delete [] m_faDir;
 
+    bool useProxy = false;
+    m_context->prefs->GetPrefBoolean(kUseProxyPref, &useProxy);
+    if (useProxy)
+    {
+       uint32 size = 1024;
+       char *buffer = (char *)malloc(size);
+
+       if (kError_BufferTooSmall == m_context->prefs->GetPrefString(
+                                                 kProxyHostPref, buffer, &size))
+       {
+           buffer = (char *)realloc(buffer, size);
+           m_context->prefs->GetPrefString(kProxyHostPref, buffer, &size);
+       }
+   
+       char *port = strrchr(buffer, ':');
+       if (port) {
+           *port = '\0';
+           port++;
+       }
+
+       string proxyAddr = string(buffer, strlen(buffer) + 1);
+       int nPort = 80;
+       if (port && *port)
+           nPort = atoi(port);
+
+       free(buffer);
+       m_APSInterface->SetProxy(proxyAddr.c_str(), nPort);
+    }
+    else
+       m_APSInterface->SetProxy("", 0);
+
     m_signatureThread = NULL;
     m_bKillSignature = false;
 
@@ -2239,6 +2270,38 @@ HandlePrefsChanged(Event *pEvent)
  
     m_cdTimerActive = pollCD;
 #endif
+
+    bool useProxy = false;
+    m_context->prefs->GetPrefBoolean(kUseProxyPref, &useProxy);
+    if (useProxy)
+    {
+       uint32 size = 1024;
+       char *buffer = (char *)malloc(size);
+
+       if (kError_BufferTooSmall == m_context->prefs->GetPrefString(
+                                                 kProxyHostPref, buffer, &size))
+       {
+           buffer = (char *)realloc(buffer, size);
+           m_context->prefs->GetPrefString(kProxyHostPref, buffer, &size);
+       }
+
+       char *port = strrchr(buffer, ':');
+       if (port) {
+           *port = '\0';
+           port++;
+       }
+
+       string proxyAddr = string(buffer, strlen(buffer) + 1);
+       int nPort = 80;
+       if (port && *port)
+           nPort = atoi(port);
+
+       free(buffer);
+       m_APSInterface->SetProxy(proxyAddr.c_str(), nPort);
+    }
+    else
+       m_APSInterface->SetProxy("", 0);
+
 
     SendEventToUI(pEvent);
     SendEventToCatalog(pEvent);
