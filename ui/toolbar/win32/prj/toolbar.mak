@@ -32,6 +32,10 @@ NULL=
 NULL=nul
 !ENDIF 
 
+CPP=cl.exe
+MTL=midl.exe
+RSC=rc.exe
+
 !IF  "$(CFG)" == "toolbar - Win32 Release"
 
 OUTDIR=.\Release
@@ -58,8 +62,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
-CPP_PROJ=/nologo /MT /W3 /GX /O2 /I "..\include" /I "..\..\include" /I\
+CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\include" /I "..\..\include" /I\
  "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I\
  "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I\
  "..\..\..\..\ui\include" /I "..\..\..\..\lib\xml\include" /I "..\res" /D\
@@ -67,40 +70,7 @@ CPP_PROJ=/nologo /MT /W3 /GX /O2 /I "..\include" /I "..\..\include" /I\
  /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\toolbar.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\toolbar.bsc" 
@@ -162,8 +132,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
-CPP_PROJ=/nologo /MTd /W3 /Gm /GX /Zi /Od /I "..\include" /I "..\..\include" /I\
+CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\include" /I "..\..\include" /I\
  "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I\
  "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I\
  "..\..\..\..\ui\include" /I "..\..\..\..\lib\xml\include" /I "..\res" /D\
@@ -171,40 +140,7 @@ CPP_PROJ=/nologo /MTd /W3 /Gm /GX /Zi /Od /I "..\include" /I "..\..\include" /I\
  /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\toolbar.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\toolbar.bsc" 
@@ -266,8 +202,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
-CPP_PROJ=/nologo /MTd /W3 /Gm /GX /Zi /Od /I "..\include" /I "..\..\include" /I\
+CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\include" /I "..\..\include" /I\
  "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I\
  "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I\
  "..\..\..\..\ui\include" /I "..\..\..\..\lib\xml\include" /I "..\res" /D\
@@ -275,40 +210,7 @@ CPP_PROJ=/nologo /MTd /W3 /Gm /GX /Zi /Od /I "..\include" /I "..\..\include" /I\
  /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\toolbar.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\toolbar.bsc" 
@@ -367,8 +269,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
-CPP_PROJ=/nologo /MT /W3 /GX /O2 /I "..\include" /I "..\..\include" /I\
+CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\include" /I "..\..\include" /I\
  "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I\
  "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I\
  "..\..\..\..\ui\include" /I "..\..\..\..\lib\xml\include" /I "..\res" /D\
@@ -376,40 +277,7 @@ CPP_PROJ=/nologo /MT /W3 /GX /O2 /I "..\include" /I "..\..\include" /I\
  /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\toolbar.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\toolbar.bsc" 
@@ -443,6 +311,36 @@ $(DS_POSTBUILD_DEP) : ".\toolbar.ui"
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 
+
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
 
 
 !IF "$(CFG)" == "toolbar - Win32 Release" || "$(CFG)" ==\
@@ -471,7 +369,7 @@ DEP_CPP_TOOLB=\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\include\ui.h"\
-	"..\Toolbar.h"\
+	"..\toolbar.h"\
 	
 
 "$(INTDIR)\Toolbar.obj" : $(SOURCE) $(DEP_CPP_TOOLB) "$(INTDIR)"
@@ -499,7 +397,7 @@ DEP_CPP_TOOLB=\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\include\ui.h"\
-	"..\Toolbar.h"\
+	"..\toolbar.h"\
 	
 
 "$(INTDIR)\Toolbar.obj" : $(SOURCE) $(DEP_CPP_TOOLB) "$(INTDIR)"
@@ -527,7 +425,7 @@ DEP_CPP_TOOLB=\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\include\ui.h"\
-	"..\Toolbar.h"\
+	"..\toolbar.h"\
 	
 
 "$(INTDIR)\Toolbar.obj" : $(SOURCE) $(DEP_CPP_TOOLB) "$(INTDIR)"
@@ -555,7 +453,7 @@ DEP_CPP_TOOLB=\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\include\ui.h"\
-	"..\Toolbar.h"\
+	"..\toolbar.h"\
 	
 
 "$(INTDIR)\Toolbar.obj" : $(SOURCE) $(DEP_CPP_TOOLB) "$(INTDIR)"
@@ -574,7 +472,7 @@ DEP_RSC_TOOLBA=\
 
 "$(INTDIR)\toolbar.res" : $(SOURCE) $(DEP_RSC_TOOLBA) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\toolbar.res" /i\
- "\FreeAmp\freeamp\ui\toolbar\win32" /d "NDEBUG" $(SOURCE)
+ "\Local\src\freeamp\ui\toolbar\win32" /d "NDEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "toolbar - Win32 Debug"
@@ -582,7 +480,7 @@ DEP_RSC_TOOLBA=\
 
 "$(INTDIR)\toolbar.res" : $(SOURCE) $(DEP_RSC_TOOLBA) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\toolbar.res" /i\
- "\FreeAmp\freeamp\ui\toolbar\win32" /d "_DEBUG" $(SOURCE)
+ "\Local\src\freeamp\ui\toolbar\win32" /d "_DEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "toolbar - Win32 NASM Debug"
@@ -590,7 +488,7 @@ DEP_RSC_TOOLBA=\
 
 "$(INTDIR)\toolbar.res" : $(SOURCE) $(DEP_RSC_TOOLBA) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\toolbar.res" /i\
- "\FreeAmp\freeamp\ui\toolbar\win32" /d "_DEBUG" $(SOURCE)
+ "\Local\src\freeamp\ui\toolbar\win32" /d "_DEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "toolbar - Win32 NASM Release"
@@ -598,7 +496,7 @@ DEP_RSC_TOOLBA=\
 
 "$(INTDIR)\toolbar.res" : $(SOURCE) $(DEP_RSC_TOOLBA) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\toolbar.res" /i\
- "\FreeAmp\freeamp\ui\toolbar\win32" /d "NDEBUG" $(SOURCE)
+ "\Local\src\freeamp\ui\toolbar\win32" /d "NDEBUG" $(SOURCE)
 
 
 !ENDIF 
