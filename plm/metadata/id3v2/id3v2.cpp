@@ -254,7 +254,7 @@ bool ID3v2::ReadMetaData(const char* url, MetaData* metadata)
     int num = 1;
 #endif
 
-    pData = new char[iDataFieldLen];
+    pData = new char[iDataFieldLen + 1];
 
     pFrame = ID3Tag_FindFrameWithID(pTag, ID3FID_TITLE);
     if (pFrame)
