@@ -284,36 +284,6 @@ AC_SUBST(LINKMOD)
 AC_SUBST(build_cpu)
 AC_SUBST(CFLAGS)
 
-gtk="false"
-
-AC_ARG_ENABLE(gtk,
-	      [  --enable-gtk            Build GTK+ version of FreeAmp],
-              [case "${enableval}" in
-		yes) gtk="true" ;;
-		no)  gtk="false" ;;
-		*) gtk="true";
-		   EXTRALIBS="$EXTRALIBS $enableval";
-		   ;;
-	      esac])
-
-if test "$gtk" = "true"; then
-  AC_MSG_RESULT("Enabling GTK UI")
-  EXTRALIBS="$EXTRALIBS -lgtk"
-  OSDEPPLUGINS="$OSDEPPLUGINS plugins/gtk.ui"
-fi
-
-dnl Check for GTK+
-dnl ****
-#AM_PATH_GTK(1.0.6	, echo "             GTK+ compilation enabled", 
-dnl                   AC_MSG_ERROR(GTK+ distribution not found.)
-#gtk="false"
-#echo GTK+ compilation disabled
-#)
-#fi
-
-#AM_CONDITIONAL(AM_ENABLE_GTK, test "$gtk" = "true")
-
-
 AC_CHECK_HEADER(esd.h, have_esound="true", have_esound="false")
 
 if test "$have_esound" = "true"; then

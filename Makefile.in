@@ -60,7 +60,8 @@ plugins-cc install-plugins clean-plugins plugins-install plugins-clean:
 	+$(PIMAKE) $@
 
 distclean: clean
-	-rm -f config.status Makefile config.cache
+	-rm -f config.cache config.log config.status config/config.h
+	-rm -f Makefile Makefile-plugins config/Makefile.header
 
 install: install-freeamp install-plugins
 

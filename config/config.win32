@@ -129,4 +129,8 @@ typedef short			int32;
 #endif
 #endif /* NULL */
 
+#ifdef WIN32
+typedef int socklen_t;
+#endif
+
 #endif /* CONFIG_H */

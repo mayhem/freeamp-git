@@ -56,13 +56,14 @@ PrefixPrefs::
 SetDefaults()
 {
     // Nothing to do
+    return kError_NoErr;
 }
 
 Error
 PrefixPrefs::
 Save()
 {
-    m_parent->Save();
+    return m_parent->Save();
 }
 
 Preferences *

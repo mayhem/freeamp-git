@@ -41,7 +41,7 @@ ____________________________________________________________________________*/
 // (among others) which will in turn use delete to reclaim the memory.
 // This is NOT VALID! A strdup()ed string must be free()ed, not deleted!
 // WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
-char *strdup_new(char *str)
+char *strdup_new(const char *str)
 {
     char *n;
 

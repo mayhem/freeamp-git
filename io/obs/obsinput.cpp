@@ -314,7 +314,7 @@ void ObsInput::StartWorkerThread(void *pVoidBuffer)
 void ObsInput::WorkerThread(void)
 {
    int             iRead, iPacketNum = -1, iCurrNum, iRet, iHeaderSize;
-   int            iStructSize;
+   socklen_t       iStructSize;
    RTPHeader      *pHeader;
    void           *pBuffer;
    unsigned        char *pTemp;
