@@ -6,6 +6,8 @@
 <Bitmap Name="Volume" File="volume.bmp"/>
 <Bitmap Name="Text" File="text.bmp"/>
 <Bitmap Name="Numbers" File="numbers.bmp"/>
+<Bitmap Name="MonoSter" File="monoster.bmp"/>
+<Bitmap Name="PlayPaus" File="playpaus.bmp"/>
 
 <ThemeInfo Name="Winamp Base" Author="Isaac Richards" 
            EMail="info@freeamp.org" WebPage="http://www.freeamp.org"/>
@@ -190,6 +192,46 @@ None||Repeat current"/>
             <FontMap Map="0123456789 _:()-'!_+\/[]^&%.=$#"/>
             <FontMap Map="ежд?*                          "/>
         </PixmapFontControl>
+        <ButtonControl Name="StereoIndicator">
+                <Info Desc="" Tip=""/>
+            <Position Pos="239, 41"/>
+            <ControlStateBitmap Rect="0, 12, 28, 23" State="Disabled"
+                                Name="MonoSter"/>
+            <ControlStateBitmap Rect="0, 0, 28, 11" State="Normal"
+                                Name="MonoSter"/>
+        </ButtonControl>
+        <ButtonControl Name="MonoIndicator">
+                <Info Desc="" Tip=""/>
+            <Position Pos="212, 41"/>
+            <ControlStateBitmap Rect="29, 12, 57, 23" State="Disabled"
+                                Name="MonoSter"/>
+            <ControlStateBitmap Rect="29, 0, 57, 11" State="Normal"
+                                Name="MonoSter"/>
+        </ButtonControl>
+        <ButtonControl Name="PlayIndicator">
+                <Info Desc="" Tip=""/>
+            <Position Pos="26, 28"/>
+            <ControlStateBitmap Rect="27, 0, 35, 8" State="Disabled"
+                                Name="PlayPaus"/>
+            <ControlStateBitmap Rect="0, 0, 8, 8" State="Normal"
+                                Name="PlayPaus"/>
+        </ButtonControl>
+        <ButtonControl Name="PauseIndicator">
+                <Info Desc="" Tip=""/>
+            <Position Pos="26, 28"/>
+            <ControlStateBitmap Rect="27, 0, 35, 8" State="Disabled"
+                                Name="PlayPaus"/>
+            <ControlStateBitmap Rect="9, 0, 17, 8" State="Normal"
+                                Name="PlayPaus"/>
+        </ButtonControl>
+        <ButtonControl Name="StopIndicator">
+                <Info Desc="" Tip=""/>
+            <Position Pos="26, 28"/>
+            <ControlStateBitmap Rect="27, 0, 35, 8" State="Disabled"
+                                Name="PlayPaus"/>
+            <ControlStateBitmap Rect="18, 0, 26, 8" State="Normal"
+                                Name="PlayPaus"/>
+        </ButtonControl>
     </Controls>
 </Window>
 
