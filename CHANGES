@@ -1,3 +1,9 @@
+Changes for Linux and Windows version 2.0.8
+--------------------------------------------------------------------
+
+- Fixed the HTTP error issue with single-click downloading.
+- Fixed some issues with playing some mp3 files.
+
 Changes for Linux and Windows version 2.1.0 beta 3
 --------------------------------------------------------------------
 
