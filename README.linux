@@ -27,5 +27,5 @@ change the following lines to look like these:
   EsounDHost: localhost 
 
 If you don't have an EsoundD server running locally, change the EsounDHost
-setting to the name of your EsoudnD server.
+setting to the name of your EsounD server.
 
