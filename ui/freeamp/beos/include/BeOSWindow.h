@@ -50,8 +50,8 @@ public:
     virtual Error   HideMouse( bool bHide );
     virtual Error   Minimize( void );
     virtual Error   Restore( void );
-    virtual bool  LButtonDown(void);
-	virtual Error GetDesktopSize(int32 &iX, int32 &iY);
+    virtual bool    LButtonDown(void);
+    virtual Error   GetDesktopSize(int32 &iX, int32 &iY);
     virtual void    BringWindowToFront( void );
 
     // These functions should be called from the OS dependent event

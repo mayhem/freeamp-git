@@ -28,15 +28,10 @@ ____________________________________________________________________________*/
 #include "PrefWindow.h"
 #include "PrefView.h"
 #endif
-
-#if DEBUG
 #include <be/support/Debug.h>
+
 #define CHECK_POINT CHECK_POINT_MSG("")
 #define CHECK_POINT_MSG(a) PRINT(( "File:%s Line:%d :%s\n", __FILE__, __LINE__, a ))
-#else
-#define CHECK_POINT (void)
-#define CHECK_POINT_MSG(a) (void)
-#endif
 
 BeOSPreferenceWindow::BeOSPreferenceWindow( FAContext* context,
                                             ThemeManager* themeMan )
