@@ -1,0 +1,8 @@
+Due to a couple of issues with automake, in order to build on solaris
+you need to use the configure and Makefile.in in experimental/; i.e.
+cp experimental/Makefile.in experimental/configure .
+./configure --whatever
+
+also, see README.experimental.
+
+$Id$
