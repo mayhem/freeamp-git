@@ -131,6 +131,11 @@ Error GTKWindow::Run(Pos &oPos)
     if (m_oWindowPos.y > iMaxY || m_oWindowPos.y + oRect.Height() < 0)
        m_oWindowPos.y = 0;
 
+    if (m_oWindowPos.x == -1 && m_oWindowPos.y == -1) {
+        m_oWindowPos.x = iMaxX - (oRect.Width()) / 2;
+        m_oWindowPos.y = iMaxY - (oRect.Height()) / 2;
+    }
+
     gtk_widget_set_uposition(mainWindow, m_oWindowPos.x, m_oWindowPos.y);
     gtk_widget_set_usize(mainWindow, oRect.Width(), oRect.Height());
     gdk_threads_leave();
@@ -172,7 +177,6 @@ Error GTKWindow::VulcanMindMeld(Window *pOther)
         return eRet;
 
     m_pCanvas->GetBackgroundRect(oRect);
-    pOther->GetWindowPosition(oRect);
     GdkBitmap *mask = ((GTKCanvas *)m_pCanvas)->GetMask();
 
     gdk_threads_enter();

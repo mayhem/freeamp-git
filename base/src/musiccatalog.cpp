@@ -444,8 +444,10 @@ void MusicBrowser::PruneDatabase(void)
             char *filename = new char[length];
 
             if (IsntError(URLToFilePath(key, filename, &length)))
-                if (-1 == stat(key, &st))
+                if (-1 == stat(filename, &st)) {
                     m_database->Remove(key);
+                    key = NULL;
+                }
 
             delete [] filename;
         }
