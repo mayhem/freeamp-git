@@ -435,8 +435,11 @@ Error HttpInput::Open(void)
     if (szFile)
         sprintf(szQuery, "GET %s HTTP/1.0\n", szFile);
     else
-        sprintf(szQuery, "GET / HTTP/1.0\nHost %s\nAccept: */*\n", 
-                szLocalName);
+        sprintf(szQuery, "GET / HTTP/1.0\n"
+                         "Host %s\n"
+                         "Accept: */*\n" 
+                         "User-Agent: FreeAmp/%s\n", 
+                         szLocalName, FREEAMP_VERSION);
 
     m_pContext->prefs->GetPrefBoolean(kUseTitleStreamingPref, &bUseTitleStreaming);
     if (bUseTitleStreaming)
