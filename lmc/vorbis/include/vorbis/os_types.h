@@ -22,7 +22,7 @@
 #define vorbis_size32_t int
 #endif
 
-#if defined (_WIN32) 
+#if defined (WIN32) 
 #if !defined(__GNUC__)
 
 /* MSVC/Borland */

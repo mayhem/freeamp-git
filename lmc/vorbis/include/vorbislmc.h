@@ -71,7 +71,7 @@ class VorbisLMC : public LogicalMediaConverter
  
  private:
 
-   static int    SeekWrapper(void *stream, int64_t offset, int whence);
+   static int    SeekWrapper(void *stream, ogg_int64_t offset, int whence);
    static long   TellWrapper(void *stream);
    static int CloseWrapper(void *stream);
    static size_t ReadWrapper(void *buf, size_t size, size_t num, void *stream);
