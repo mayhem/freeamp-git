@@ -141,11 +141,11 @@ uninstall-local: uninstall_plugins
 
 plugins-install install_plugins: install-plugins
 
-install-freeamp:
+install-freeamp: freeamp
 	$(mkinstalldirs) $(DESTDIR)$(bindir)
 	$(INSTALL_PROGRAM) freeamp $(DESTDIR)$(bindir)
 
-install-plugins:
+install-plugins: plugins
 	$(mkinstalldirs) $(DESTDIR)$(libdir)/freeamp/plugins
 	@list=`ls plugins/*.*`; for p in $$list; do \
 	  if test -f $$p; then \
