@@ -22,6 +22,7 @@
 ____________________________________________________________________________*/
 
 #include <iostream.h>
+#include <stdlib.h>
 #include <assert.h>
 
 #include "event.h"
@@ -38,10 +39,10 @@ ____________________________________________________________________________*/
 #include "preferences.h"
 #include "properties.h"
 #include "volume.h"
+#include "facontext.h"
 #include "log.h"
 
 Player   *Player::m_thePlayer = NULL;
-LogFile *g_Log = NULL;
 
 const char *szPlaylistExt = ".M3U";
 
@@ -52,21 +53,18 @@ const char *szPlaylistExt = ".M3U";
 
 Player *
 Player::
-GetPlayer()
+GetPlayer(FAContext *context)
 {
    if (m_thePlayer == NULL)
-   {
-      m_thePlayer = new Player();
-   }
+      m_thePlayer = new Player(context);
    return m_thePlayer;
 }
 
 Player::
-Player():
+Player(FAContext *context):
 EventQueue()
 {
-   g_Log = new LogFile("freeamp.log");
-   assert(g_Log);
+   m_context = context;
    // cout << "Creating player..." << endl;
    m_eventSem = new Semaphore();
    m_eventQueue = new Queue < Event * >();
@@ -98,7 +96,6 @@ EventQueue()
 
    m_argc = 0;
    m_argv = NULL;
-   m_prefs = NULL;
    m_pTermSem = NULL;
 
    m_didUsage = false;
@@ -153,8 +150,6 @@ Player::
    TYPICAL_DELETE(m_pmiRegistry);
    TYPICAL_DELETE(m_pmoRegistry);
    TYPICAL_DELETE(m_uiRegistry);
-   TYPICAL_DELETE(m_prefs);
-   TYPICAL_DELETE(g_Log);
 }
 
 void      
@@ -187,6 +182,7 @@ SetArgs(int32 argc, char **argv)
        exit(0);
    }
 
+#if 0
    // grab the UI name from how we are invoked.
    argUI = new char[strlen(argv[0]) + 1 + 3];
    char     *pBegin = strrchr(argv[0], '/');
@@ -199,11 +195,12 @@ SetArgs(int32 argc, char **argv)
    {
       pBegin = argv[0];
    }
-   // sprintf(m_argUI,"%s",pBegin);
    strcpy(argUI, pBegin);
    m_argUIList->AddItem(argUI);
-   justGotArgvZero = true;
 #endif
+
+   justGotArgvZero = true;
+#endif	// ndef WIN32
 
    argList.AddItem(argv[0]);
    for (int32 i = 1; i < argc; i++)
@@ -411,75 +408,61 @@ CompareNames(const char *p1, const char *p2)
 
 void      
 Player::
-SetPreferences(Preferences * pP)
-{
-   m_prefs = pP;
-}
-
-Preferences* 
-Player::
-GetPreferences() const
-{
-    return m_prefs;
-}
-
-void      
-Player::
 Run()
 {
    int32     uiListIndex = 0;
-   Preferences *prefs;
    char     *name = NULL;
    uint32    len = 256;
    Error     error = kError_NoErr;
    int32     uisActivated = 0;
    bool      bValue;
 
-   prefs = new Preferences;
-
-   prefs->GetUseDebugLog(&bValue);
+   m_context->prefs->GetUseDebugLog(&bValue);
    if (bValue)
-      g_Log->Open();
+      m_context->log->Open();
    
-   prefs->GetLogInput(&bValue);
+   m_context->prefs->GetLogInput(&bValue);
    if (bValue)
-      g_Log->AddLogLevel(LogInput);
+      m_context->log->AddLogLevel(LogInput);
    
-   prefs->GetLogOutput(&bValue);
+   m_context->prefs->GetLogOutput(&bValue);
    if (bValue)
-      g_Log->AddLogLevel(LogOutput);
+      m_context->log->AddLogLevel(LogOutput);
    
-   prefs->GetLogDecode(&bValue);
+   m_context->prefs->GetLogDecode(&bValue);
    if (bValue)
-      g_Log->AddLogLevel(LogDecode);
+      m_context->log->AddLogLevel(LogDecode);
    
-   prefs->GetLogPerformance(&bValue);
+   m_context->prefs->GetLogPerformance(&bValue);
    if (bValue)
-      g_Log->AddLogLevel(LogPerf);
+      m_context->log->AddLogLevel(LogPerf);
    
    // which ui should we instantiate first??
    if (m_argUIList->CountItems() == 0)
    {
+      const char *pref = kUIPref;
       name = new char[len];
 
-
-      while ((error = prefs->GetDefaultUI(name, &len)) ==
+#ifdef unix
+      if (!getenv("DISPLAY"))
+	  pref = kTextUIPref;
+#endif
+      while ((error = m_context->prefs->GetPrefString(pref, name, &len)) ==
              kError_BufferTooSmall)
       {
-         delete[]name;
+         delete[] name;
          len++;
 
          name = new char[len];
       }
-
    }
    else
    {
-      name = new char[1024];
+      char *orig = m_argUIList->ItemAt(uiListIndex);
+      name = new char[strlen(orig) + 1];
 
-      strcpy(name, m_argUIList->ItemAt(uiListIndex));
+      strcpy(name, orig);
    }
-   delete    prefs;
 
    if (IsntError(error))
    {
@@ -493,14 +476,15 @@ Run()
          {
             if (!CompareNames(item->Name(), name))
             {
-               m_ui = (UserInterface *) item->InitFunction()(g_Log);
+               m_ui = (UserInterface *) item->InitFunction()(m_context);
 
                m_ui->SetTarget((EventQueue *) this);
                m_ui->SetPropManager((Properties *) this);
                m_ui->SetPlayListManager(m_plm);
                m_ui->SetArgs(m_argc, m_argv);
-               Error     er = m_ui->Init((uiListIndex == 0) ? PRIMARY_UI : SECONDARY_UI_STARTUP);  
-               if (er == kError_NoErr)
+               Error     er = m_ui->Init((uisActivated == 0) ? PRIMARY_UI
+					 : SECONDARY_UI_STARTUP);
+               if (IsntError(er))
                {
                   RegisterActiveUI(m_ui);
                   uisActivated++;
@@ -532,14 +516,14 @@ Run()
          char      bar[MAX_PATH];
          uint32    size = MAX_PATH - 1;
 
-         m_prefs->GetInstallDirectory(bar, &size);
+         m_context->prefs->GetInstallDirectory(bar, &size);
          sprintf(foo, "No UI plugin matched 'plugins\\%s' or 'plugins\\%s.ui' in '%s'.  FreeAmp will quit.", name, name, bar);
          MessageBox(NULL, foo, "FreeAmp Error", MB_OK);
 #else
          const char *thePath = getenv(FREEAMP_PATH_ENV);
 
          if (thePath == NULL)
-          thePath = Preferences::GetLibDirs();
+          thePath = m_context->prefs->GetLibDirs();
          cerr << "No UI plugin in '" << thePath << "' matched 'plugins/" << name << "' or 'plugins/" << name << ".ui'" << endl;
          cerr << "FreeAmp will quit." << endl;
 #endif
@@ -778,7 +762,7 @@ ChoosePMI(char *szUrl, char *szTitle)
    {
       pmi_item = m_pmiRegistry->GetItem(iLoop);
 
-      pmi = (PhysicalMediaInput *) pmi_item->InitFunction()(g_Log);
+      pmi = (PhysicalMediaInput *) pmi_item->InitFunction()(m_context);
       if (pmi->CanHandle(szUrl, szTitle))
       {
          ret = pmi_item;
@@ -844,8 +828,8 @@ CreateLMC(PlayListItem * pc, Event * pC)
    pmi_item = ChoosePMI(pc->URL());
    if (!pmi_item)
    {
-      g_Log->Error("Cannot determine what pmi to use for %s\n",
-                   pc->URL());
+      m_context->log->Error("Cannot determine what pmi to use for %s\n",
+			    pc->URL());
       return;
    }
 
@@ -853,7 +837,7 @@ CreateLMC(PlayListItem * pc, Event * pC)
 
    if (pmi_item)
    {
-      pmi = (PhysicalMediaInput *) pmi_item->InitFunction()(g_Log);
+      pmi = (PhysicalMediaInput *) pmi_item->InitFunction()(m_context);
       pmi->SetPropManager((Properties *) this);
       pmi->SetTarget((EventQueue *)this);
    }
@@ -861,7 +845,7 @@ CreateLMC(PlayListItem * pc, Event * pC)
    char defaultPMO[256];
    uint32 size = sizeof(defaultPMO);
 
-   m_prefs->GetDefaultPMO(defaultPMO, &size);
+   m_context->prefs->GetDefaultPMO(defaultPMO, &size);
 
    int32 i = 0;
 
@@ -880,7 +864,7 @@ CreateLMC(PlayListItem * pc, Event * pC)
 
    if (item)
    {
-      pmo = (PhysicalMediaOutput *) item->InitFunction()(g_Log);
+      pmo = (PhysicalMediaOutput *) item->InitFunction()(m_context);
       pmo->SetPropManager((Properties *) this);
       pmo->SetTarget((EventQueue *)this);
    }
@@ -888,7 +872,7 @@ CreateLMC(PlayListItem * pc, Event * pC)
    error = kError_NoErr;
    if (lmc_item)
    {
-      lmc = (LogicalMediaConverter *) lmc_item->InitFunction()(g_Log);
+      lmc = (LogicalMediaConverter *) lmc_item->InitFunction()(m_context);
 
       if ((error = lmc->SetTarget((EventQueue *) this)) != kError_NoErr)
       {
@@ -909,7 +893,7 @@ CreateLMC(PlayListItem * pc, Event * pC)
       error = lmc->SetTo(pc->URL());
       if (IsError(error))
       {
-         g_Log->Error("Cannot initialize input lmc: %d\n", error);
+         m_context->log->Error("Cannot initialize input lmc: %d\n", error);
 
          goto epilogue;
       }
@@ -1061,7 +1045,7 @@ GetMediaTitle(Event *pEventArg)
      pRegItem = ChoosePMI(pItem->URL(), szTitle);
      if (!strlen(szTitle))
      {
-         pPmi = (PhysicalMediaInput *)pRegItem->InitFunction()(g_Log);
+         pPmi = (PhysicalMediaInput *)pRegItem->InitFunction()(m_context);
 
          pPmi->SetTarget((EventQueue *)this);
          eRet = pPmi->SetTo(pItem->URL(), false);
@@ -1511,7 +1495,8 @@ ServiceEvent(Event * pC)
 #undef  _VISUAL_ENABLE_
 
       default:
-           g_Log->Error("serviceEvent: Unknown event: %d\n", pC->Type());
+           m_context->log->Error("serviceEvent: Unknown event: %d\n",
+				 pC->Type());
            delete  pC;
            break;
    }
