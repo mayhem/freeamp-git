@@ -36,38 +36,19 @@ RSC=rc.exe
 OUTDIR=.\Release
 INTDIR=.\Release
 
-ALL : ".\cd.lmc"
+ALL : "..\..\..\..\config\config.h" ".\cd.lmc"
 
 
 CLEAN :
-	-@erase "$(INTDIR)\cdct.obj"
 	-@erase "$(INTDIR)\cdlmc.obj"
 	-@erase "$(INTDIR)\cdlmc.res"
-	-@erase "$(INTDIR)\csbt.obj"
-	-@erase "$(INTDIR)\cup.obj"
-	-@erase "$(INTDIR)\cupl3.obj"
-	-@erase "$(INTDIR)\cwinm.obj"
-	-@erase "$(INTDIR)\dec8.obj"
-	-@erase "$(INTDIR)\eventbuffer.obj"
-	-@erase "$(INTDIR)\hwin.obj"
-	-@erase "$(INTDIR)\icdct.obj"
-	-@erase "$(INTDIR)\isbt.obj"
-	-@erase "$(INTDIR)\iup.obj"
-	-@erase "$(INTDIR)\iwinm.obj"
-	-@erase "$(INTDIR)\l3dq.obj"
-	-@erase "$(INTDIR)\l3init.obj"
-	-@erase "$(INTDIR)\mdct.obj"
-	-@erase "$(INTDIR)\mhead.obj"
-	-@erase "$(INTDIR)\msis.obj"
 	-@erase "$(INTDIR)\pipeline.obj"
 	-@erase "$(INTDIR)\pullbuffer.obj"
-	-@erase "$(INTDIR)\uph.obj"
-	-@erase "$(INTDIR)\upsf.obj"
 	-@erase "$(INTDIR)\vc60.idb"
-	-@erase "$(INTDIR)\wavep.obj"
 	-@erase "$(OUTDIR)\cd.exp"
 	-@erase "$(OUTDIR)\cd.lib"
 	-@erase ".\cd.lmc"
+	-@erase "..\..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -84,30 +65,10 @@ LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg
 DEF_FILE= \
 	".\cdlmc.def"
 LINK32_OBJS= \
-	"$(INTDIR)\eventbuffer.obj" \
-	"$(INTDIR)\pipeline.obj" \
-	"$(INTDIR)\pullbuffer.obj" \
-	"$(INTDIR)\cdct.obj" \
-	"$(INTDIR)\csbt.obj" \
-	"$(INTDIR)\cup.obj" \
-	"$(INTDIR)\cupl3.obj" \
-	"$(INTDIR)\cwinm.obj" \
-	"$(INTDIR)\dec8.obj" \
-	"$(INTDIR)\hwin.obj" \
-	"$(INTDIR)\icdct.obj" \
-	"$(INTDIR)\isbt.obj" \
-	"$(INTDIR)\iup.obj" \
-	"$(INTDIR)\iwinm.obj" \
-	"$(INTDIR)\l3dq.obj" \
-	"$(INTDIR)\l3init.obj" \
-	"$(INTDIR)\mdct.obj" \
-	"$(INTDIR)\mhead.obj" \
-	"$(INTDIR)\msis.obj" \
-	"$(INTDIR)\uph.obj" \
-	"$(INTDIR)\upsf.obj" \
-	"$(INTDIR)\wavep.obj" \
+	"$(INTDIR)\cdlmc.res" \
 	"$(INTDIR)\cdlmc.obj" \
-	"$(INTDIR)\cdlmc.res"
+	"$(INTDIR)\pipeline.obj" \
+	"$(INTDIR)\pullbuffer.obj"
 
 ".\cd.lmc" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -119,9 +80,9 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\cd.lmc"
+$(DS_POSTBUILD_DEP) : "..\..\..\..\config\config.h" ".\cd.lmc"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                    ..\..\..\..\base\win32\prj\plugins
-	copy cdlmc.lmc                            ..\..\..\..\base\win32\prj\plugins
+	copy cd.lmc                            ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "cdlmc - Win32 Debug"
@@ -133,32 +94,12 @@ ALL : "..\..\..\..\config\config.h" ".\cd.lmc"
 
 
 CLEAN :
-	-@erase "$(INTDIR)\cdct.obj"
 	-@erase "$(INTDIR)\cdlmc.obj"
 	-@erase "$(INTDIR)\cdlmc.res"
-	-@erase "$(INTDIR)\csbt.obj"
-	-@erase "$(INTDIR)\cup.obj"
-	-@erase "$(INTDIR)\cupl3.obj"
-	-@erase "$(INTDIR)\cwinm.obj"
-	-@erase "$(INTDIR)\dec8.obj"
-	-@erase "$(INTDIR)\eventbuffer.obj"
-	-@erase "$(INTDIR)\hwin.obj"
-	-@erase "$(INTDIR)\icdct.obj"
-	-@erase "$(INTDIR)\isbt.obj"
-	-@erase "$(INTDIR)\iup.obj"
-	-@erase "$(INTDIR)\iwinm.obj"
-	-@erase "$(INTDIR)\l3dq.obj"
-	-@erase "$(INTDIR)\l3init.obj"
-	-@erase "$(INTDIR)\mdct.obj"
-	-@erase "$(INTDIR)\mhead.obj"
-	-@erase "$(INTDIR)\msis.obj"
 	-@erase "$(INTDIR)\pipeline.obj"
 	-@erase "$(INTDIR)\pullbuffer.obj"
-	-@erase "$(INTDIR)\uph.obj"
-	-@erase "$(INTDIR)\upsf.obj"
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(INTDIR)\vc60.pdb"
-	-@erase "$(INTDIR)\wavep.obj"
 	-@erase "$(OUTDIR)\cd.exp"
 	-@erase "$(OUTDIR)\cd.lib"
 	-@erase "$(OUTDIR)\cd.pdb"
@@ -181,30 +122,10 @@ LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg
 DEF_FILE= \
 	".\cdlmc.def"
 LINK32_OBJS= \
-	"$(INTDIR)\eventbuffer.obj" \
-	"$(INTDIR)\pipeline.obj" \
-	"$(INTDIR)\pullbuffer.obj" \
-	"$(INTDIR)\cdct.obj" \
-	"$(INTDIR)\csbt.obj" \
-	"$(INTDIR)\cup.obj" \
-	"$(INTDIR)\cupl3.obj" \
-	"$(INTDIR)\cwinm.obj" \
-	"$(INTDIR)\dec8.obj" \
-	"$(INTDIR)\hwin.obj" \
-	"$(INTDIR)\icdct.obj" \
-	"$(INTDIR)\isbt.obj" \
-	"$(INTDIR)\iup.obj" \
-	"$(INTDIR)\iwinm.obj" \
-	"$(INTDIR)\l3dq.obj" \
-	"$(INTDIR)\l3init.obj" \
-	"$(INTDIR)\mdct.obj" \
-	"$(INTDIR)\mhead.obj" \
-	"$(INTDIR)\msis.obj" \
-	"$(INTDIR)\uph.obj" \
-	"$(INTDIR)\upsf.obj" \
-	"$(INTDIR)\wavep.obj" \
+	"$(INTDIR)\cdlmc.res" \
 	"$(INTDIR)\cdlmc.obj" \
-	"$(INTDIR)\cdlmc.res"
+	"$(INTDIR)\pipeline.obj" \
+	"$(INTDIR)\pullbuffer.obj"
 
 ".\cd.lmc" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -218,7 +139,7 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "..\..\..\..\config\config.h" ".\cd.lmc"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                    ..\..\..\..\base\win32\prj\plugins
-	copy cdlmc.lmc                            ..\..\..\..\base\win32\prj\plugins
+	copy cd.lmc                            ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "cdlmc - Win32 NASM Release"
@@ -230,31 +151,11 @@ ALL : "..\..\..\..\config\config.h" ".\cd.lmc"
 
 
 CLEAN :
-	-@erase "$(INTDIR)\cdct.obj"
 	-@erase "$(INTDIR)\cdlmc.obj"
 	-@erase "$(INTDIR)\cdlmc.res"
-	-@erase "$(INTDIR)\csbt.obj"
-	-@erase "$(INTDIR)\cup.obj"
-	-@erase "$(INTDIR)\cupl3.obj"
-	-@erase "$(INTDIR)\cwinm.obj"
-	-@erase "$(INTDIR)\dec8.obj"
-	-@erase "$(INTDIR)\eventbuffer.obj"
-	-@erase "$(INTDIR)\hwin.obj"
-	-@erase "$(INTDIR)\icdct.obj"
-	-@erase "$(INTDIR)\isbt.obj"
-	-@erase "$(INTDIR)\iup.obj"
-	-@erase "$(INTDIR)\iwinm.obj"
-	-@erase "$(INTDIR)\l3dq.obj"
-	-@erase "$(INTDIR)\l3init.obj"
-	-@erase "$(INTDIR)\mdct.obj"
-	-@erase "$(INTDIR)\mhead.obj"
-	-@erase "$(INTDIR)\msis.obj"
 	-@erase "$(INTDIR)\pipeline.obj"
 	-@erase "$(INTDIR)\pullbuffer.obj"
-	-@erase "$(INTDIR)\uph.obj"
-	-@erase "$(INTDIR)\upsf.obj"
 	-@erase "$(INTDIR)\vc60.idb"
-	-@erase "$(INTDIR)\wavep.obj"
 	-@erase "$(OUTDIR)\cd.exp"
 	-@erase "$(OUTDIR)\cd.lib"
 	-@erase ".\cd.lmc"
@@ -275,35 +176,10 @@ LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg
 DEF_FILE= \
 	".\cdlmc.def"
 LINK32_OBJS= \
-	"$(INTDIR)\eventbuffer.obj" \
-	"$(INTDIR)\pipeline.obj" \
-	"$(INTDIR)\pullbuffer.obj" \
-	"$(INTDIR)\cdct.obj" \
-	"$(INTDIR)\csbt.obj" \
-	"$(INTDIR)\cup.obj" \
-	"$(INTDIR)\cupl3.obj" \
-	"$(INTDIR)\cwinm.obj" \
-	"$(INTDIR)\dec8.obj" \
-	"$(INTDIR)\hwin.obj" \
-	"$(INTDIR)\icdct.obj" \
-	"$(INTDIR)\isbt.obj" \
-	"$(INTDIR)\iup.obj" \
-	"$(INTDIR)\iwinm.obj" \
-	"$(INTDIR)\l3dq.obj" \
-	"$(INTDIR)\l3init.obj" \
-	"$(INTDIR)\mdct.obj" \
-	"$(INTDIR)\mhead.obj" \
-	"$(INTDIR)\msis.obj" \
-	"$(INTDIR)\uph.obj" \
-	"$(INTDIR)\upsf.obj" \
-	"$(INTDIR)\wavep.obj" \
-	"$(INTDIR)\cdlmc.obj" \
 	"$(INTDIR)\cdlmc.res" \
-	"$(INTDIR)\cdctasm.obj" \
-	"$(INTDIR)\cwin8asm.obj" \
-	"$(INTDIR)\cwinasm.obj" \
-	"$(INTDIR)\mdctasm.obj" \
-	"$(INTDIR)\msisasm.obj"
+	"$(INTDIR)\cdlmc.obj" \
+	"$(INTDIR)\pipeline.obj" \
+	"$(INTDIR)\pullbuffer.obj"
 
 ".\cd.lmc" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -317,7 +193,7 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "..\..\..\..\config\config.h" ".\cd.lmc"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                    ..\..\..\..\base\win32\prj\plugins
-	copy cdlmc.lmc                            ..\..\..\..\base\win32\prj\plugins
+	copy cd.lmc                            ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "cdlmc - Win32 NASM Debug"
@@ -325,42 +201,21 @@ $(DS_POSTBUILD_DEP) : "..\..\..\..\config\config.h" ".\cd.lmc"
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
-ALL : "..\..\..\..\config\config.h" ".\cd.lmc"
+ALL : ".\cd.lmc"
 
 
 CLEAN :
-	-@erase "$(INTDIR)\cdct.obj"
 	-@erase "$(INTDIR)\cdlmc.obj"
 	-@erase "$(INTDIR)\cdlmc.res"
-	-@erase "$(INTDIR)\csbt.obj"
-	-@erase "$(INTDIR)\cup.obj"
-	-@erase "$(INTDIR)\cupl3.obj"
-	-@erase "$(INTDIR)\cwinm.obj"
-	-@erase "$(INTDIR)\dec8.obj"
-	-@erase "$(INTDIR)\eventbuffer.obj"
-	-@erase "$(INTDIR)\hwin.obj"
-	-@erase "$(INTDIR)\icdct.obj"
-	-@erase "$(INTDIR)\isbt.obj"
-	-@erase "$(INTDIR)\iup.obj"
-	-@erase "$(INTDIR)\iwinm.obj"
-	-@erase "$(INTDIR)\l3dq.obj"
-	-@erase "$(INTDIR)\l3init.obj"
-	-@erase "$(INTDIR)\mdct.obj"
-	-@erase "$(INTDIR)\mhead.obj"
-	-@erase "$(INTDIR)\msis.obj"
 	-@erase "$(INTDIR)\pipeline.obj"
 	-@erase "$(INTDIR)\pullbuffer.obj"
-	-@erase "$(INTDIR)\uph.obj"
-	-@erase "$(INTDIR)\upsf.obj"
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(INTDIR)\vc60.pdb"
-	-@erase "$(INTDIR)\wavep.obj"
 	-@erase "$(OUTDIR)\cd.exp"
 	-@erase "$(OUTDIR)\cd.lib"
 	-@erase "$(OUTDIR)\cd.pdb"
 	-@erase ".\cd.ilk"
 	-@erase ".\cd.lmc"
-	-@erase "..\..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -377,35 +232,10 @@ LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg
 DEF_FILE= \
 	".\cdlmc.def"
 LINK32_OBJS= \
-	"$(INTDIR)\eventbuffer.obj" \
-	"$(INTDIR)\pipeline.obj" \
-	"$(INTDIR)\pullbuffer.obj" \
-	"$(INTDIR)\cdct.obj" \
-	"$(INTDIR)\csbt.obj" \
-	"$(INTDIR)\cup.obj" \
-	"$(INTDIR)\cupl3.obj" \
-	"$(INTDIR)\cwinm.obj" \
-	"$(INTDIR)\dec8.obj" \
-	"$(INTDIR)\hwin.obj" \
-	"$(INTDIR)\icdct.obj" \
-	"$(INTDIR)\isbt.obj" \
-	"$(INTDIR)\iup.obj" \
-	"$(INTDIR)\iwinm.obj" \
-	"$(INTDIR)\l3dq.obj" \
-	"$(INTDIR)\l3init.obj" \
-	"$(INTDIR)\mdct.obj" \
-	"$(INTDIR)\mhead.obj" \
-	"$(INTDIR)\msis.obj" \
-	"$(INTDIR)\uph.obj" \
-	"$(INTDIR)\upsf.obj" \
-	"$(INTDIR)\wavep.obj" \
-	"$(INTDIR)\cdlmc.obj" \
 	"$(INTDIR)\cdlmc.res" \
-	"$(INTDIR)\cdctasm.obj" \
-	"$(INTDIR)\cwin8asm.obj" \
-	"$(INTDIR)\cwinasm.obj" \
-	"$(INTDIR)\mdctasm.obj" \
-	"$(INTDIR)\msisasm.obj"
+	"$(INTDIR)\cdlmc.obj" \
+	"$(INTDIR)\pipeline.obj" \
+	"$(INTDIR)\pullbuffer.obj"
 
 ".\cd.lmc" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -417,9 +247,9 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "..\..\..\..\config\config.h" ".\cd.lmc"
+$(DS_POSTBUILD_DEP) : ".\cd.lmc"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                    ..\..\..\..\base\win32\prj\plugins
-	copy cdlmc.lmc                            ..\..\..\..\base\win32\prj\plugins
+	copy cd.lmc                            ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 
@@ -465,6 +295,12 @@ $(DS_POSTBUILD_DEP) : "..\..\..\..\config\config.h" ".\cd.lmc"
 
 
 !IF "$(CFG)" == "cdlmc - Win32 Release" || "$(CFG)" == "cdlmc - Win32 Debug" || "$(CFG)" == "cdlmc - Win32 NASM Release" || "$(CFG)" == "cdlmc - Win32 NASM Debug"
+SOURCE=..\..\src\cdlmc.cpp
+
+"$(INTDIR)\cdlmc.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
 SOURCE=..\res\cdlmc.rc
 
 !IF  "$(CFG)" == "cdlmc - Win32 Release"
@@ -545,313 +381,17 @@ InputPath=..\..\..\..\config\config.win32
 
 !ENDIF 
 
-SOURCE=..\..\..\..\io\src\eventbuffer.cpp
-
-"$(INTDIR)\eventbuffer.obj" : $(SOURCE) "$(INTDIR)" "..\..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
 SOURCE=..\..\..\..\io\src\pipeline.cpp
 
-"$(INTDIR)\pipeline.obj" : $(SOURCE) "$(INTDIR)" "..\..\..\..\config\config.h"
+"$(INTDIR)\pipeline.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\..\..\..\io\src\pullbuffer.cpp
 
-"$(INTDIR)\pullbuffer.obj" : $(SOURCE) "$(INTDIR)" "..\..\..\..\config\config.h"
+"$(INTDIR)\pullbuffer.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-SOURCE=..\..\src\cdct.c
-
-"$(INTDIR)\cdct.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\..\src\cdlmc.cpp
-
-"$(INTDIR)\cdlmc.obj" : $(SOURCE) "$(INTDIR)" "..\..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\..\src\csbt.c
-
-"$(INTDIR)\csbt.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\..\src\cup.c
-
-"$(INTDIR)\cup.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\..\src\cupl3.c
-
-"$(INTDIR)\cupl3.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\..\src\cwinm.c
-
-"$(INTDIR)\cwinm.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\..\src\dec8.c
-
-"$(INTDIR)\dec8.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\..\src\hwin.c
-
-"$(INTDIR)\hwin.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\..\src\icdct.c
-
-"$(INTDIR)\icdct.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\..\src\isbt.c
-
-"$(INTDIR)\isbt.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\..\src\iup.c
-
-"$(INTDIR)\iup.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\..\src\iwinm.c
-
-"$(INTDIR)\iwinm.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\..\src\l3dq.c
-
-"$(INTDIR)\l3dq.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\..\src\l3init.c
-
-"$(INTDIR)\l3init.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\..\src\mdct.c
-
-"$(INTDIR)\mdct.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\..\src\mhead.c
-
-"$(INTDIR)\mhead.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\..\src\msis.c
-
-"$(INTDIR)\msis.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\..\src\uph.c
-
-"$(INTDIR)\uph.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\..\src\upsf.c
-
-"$(INTDIR)\upsf.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\..\src\wavep.c
-
-"$(INTDIR)\wavep.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\..\src\cdctasm.asm
-
-!IF  "$(CFG)" == "cdlmc - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 NASM Release"
-
-IntDir=.\Release
-InputPath=..\..\src\cdctasm.asm
-InputName=cdctasm
-
-"$(INTDIR)\cdctasm.obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	<<tempfile.bat 
-	@echo off 
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-<< 
-	
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 NASM Debug"
-
-IntDir=.\Debug
-InputPath=..\..\src\cdctasm.asm
-InputName=cdctasm
-
-"$(INTDIR)\cdctasm.obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	<<tempfile.bat 
-	@echo off 
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-<< 
-	
-
-!ENDIF 
-
-SOURCE=..\..\src\cwin8asm.asm
-
-!IF  "$(CFG)" == "cdlmc - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 NASM Release"
-
-IntDir=.\Release
-InputPath=..\..\src\cwin8asm.asm
-InputName=cwin8asm
-
-"$(INTDIR)\cwin8asm.obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	<<tempfile.bat 
-	@echo off 
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-<< 
-	
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 NASM Debug"
-
-IntDir=.\Debug
-InputPath=..\..\src\cwin8asm.asm
-InputName=cwin8asm
-
-"$(INTDIR)\cwin8asm.obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	<<tempfile.bat 
-	@echo off 
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-<< 
-	
-
-!ENDIF 
-
-SOURCE=..\..\src\cwinasm.asm
-
-!IF  "$(CFG)" == "cdlmc - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 NASM Release"
-
-IntDir=.\Release
-InputPath=..\..\src\cwinasm.asm
-InputName=cwinasm
-
-"$(INTDIR)\cwinasm.obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	<<tempfile.bat 
-	@echo off 
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-<< 
-	
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 NASM Debug"
-
-IntDir=.\Debug
-InputPath=..\..\src\cwinasm.asm
-InputName=cwinasm
-
-"$(INTDIR)\cwinasm.obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	<<tempfile.bat 
-	@echo off 
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-<< 
-	
-
-!ENDIF 
-
-SOURCE=..\..\src\mdctasm.asm
-
-!IF  "$(CFG)" == "cdlmc - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 NASM Release"
-
-IntDir=.\Release
-InputPath=..\..\src\mdctasm.asm
-InputName=mdctasm
-
-"$(INTDIR)\mdctasm.obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	<<tempfile.bat 
-	@echo off 
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-<< 
-	
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 NASM Debug"
-
-IntDir=.\Debug
-InputPath=..\..\src\mdctasm.asm
-InputName=mdctasm
-
-"$(INTDIR)\mdctasm.obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	<<tempfile.bat 
-	@echo off 
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-<< 
-	
-
-!ENDIF 
-
-SOURCE=..\..\src\msisasm.asm
-
-!IF  "$(CFG)" == "cdlmc - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 NASM Release"
-
-IntDir=.\Release
-InputPath=..\..\src\msisasm.asm
-InputName=msisasm
-
-"$(INTDIR)\msisasm.obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	<<tempfile.bat 
-	@echo off 
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-<< 
-	
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 NASM Debug"
-
-IntDir=.\Debug
-InputPath=..\..\src\msisasm.asm
-InputName=msisasm
-
-"$(INTDIR)\msisasm.obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	<<tempfile.bat 
-	@echo off 
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-<< 
-	
-
-!ENDIF 
 
 
 !ENDIF 

@@ -58,7 +58,7 @@ LINK32=link.exe
 # ADD LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x11800000" /subsystem:windows /dll /machine:I386 /out:"cd.lmc" /libpath:"..\..\..\..\base\win32"
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                    ..\..\..\..\base\win32\prj\plugins	copy cdlmc.lmc                            ..\..\..\..\base\win32\prj\plugins
+PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                    ..\..\..\..\base\win32\prj\plugins	copy cd.lmc                            ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "cdlmc - Win32 Debug"
@@ -89,7 +89,7 @@ LINK32=link.exe
 # SUBTRACT LINK32 /profile /nodefaultlib
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                    ..\..\..\..\base\win32\prj\plugins	copy cdlmc.lmc                            ..\..\..\..\base\win32\prj\plugins
+PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                    ..\..\..\..\base\win32\prj\plugins	copy cd.lmc                            ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "cdlmc - Win32 NASM Release"
@@ -120,7 +120,7 @@ LINK32=link.exe
 # ADD LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x11800000" /subsystem:windows /dll /machine:I386 /out:"cd.lmc" /libpath:"..\..\..\..\base\win32"
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                    ..\..\..\..\base\win32\prj\plugins	copy cdlmc.lmc                            ..\..\..\..\base\win32\prj\plugins
+PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                    ..\..\..\..\base\win32\prj\plugins	copy cd.lmc                            ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "cdlmc - Win32 NASM Debug"
@@ -153,7 +153,7 @@ LINK32=link.exe
 # SUBTRACT LINK32 /profile /nodefaultlib
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                    ..\..\..\..\base\win32\prj\plugins	copy cdlmc.lmc                            ..\..\..\..\base\win32\prj\plugins
+PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                    ..\..\..\..\base\win32\prj\plugins	copy cd.lmc                            ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
@@ -164,9 +164,13 @@ PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir            
 # Name "cdlmc - Win32 Debug"
 # Name "cdlmc - Win32 NASM Release"
 # Name "cdlmc - Win32 NASM Debug"
-# Begin Group "general source"
+# Begin Group "source"
 
 # PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\src\cdlmc.cpp
+# End Source File
 # Begin Source File
 
 SOURCE=.\cdlmc.def
@@ -224,298 +228,11 @@ InputPath=..\..\..\..\config\config.win32
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\..\io\src\eventbuffer.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\..\..\io\src\pipeline.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\..\..\io\src\pullbuffer.cpp
-# End Source File
-# End Group
-# Begin Group "decoder"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\..\src\cdct.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\cdlmc.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\csbt.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\cup.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\cupl3.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\cwinm.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\dec8.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\hwin.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\icdct.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\isbt.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\iup.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\iwinm.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\l3dq.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\l3init.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\mdct.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\mhead.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\msis.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\uph.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\upsf.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\wavep.c
-# End Source File
-# End Group
-# Begin Group "Assembly Files"
-
-# PROP Default_Filter "asm"
-# Begin Source File
-
-SOURCE=..\..\src\cdctasm.asm
-
-!IF  "$(CFG)" == "cdlmc - Win32 Release"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 NASM Release"
-
-# Begin Custom Build
-IntDir=.\Release
-InputPath=..\..\src\cdctasm.asm
-InputName=cdctasm
-
-"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 NASM Debug"
-
-# Begin Custom Build
-IntDir=.\Debug
-InputPath=..\..\src\cdctasm.asm
-InputName=cdctasm
-
-"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\cwin8asm.asm
-
-!IF  "$(CFG)" == "cdlmc - Win32 Release"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 NASM Release"
-
-# Begin Custom Build
-IntDir=.\Release
-InputPath=..\..\src\cwin8asm.asm
-InputName=cwin8asm
-
-"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 NASM Debug"
-
-# Begin Custom Build
-IntDir=.\Debug
-InputPath=..\..\src\cwin8asm.asm
-InputName=cwin8asm
-
-"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\cwinasm.asm
-
-!IF  "$(CFG)" == "cdlmc - Win32 Release"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 NASM Release"
-
-# Begin Custom Build
-IntDir=.\Release
-InputPath=..\..\src\cwinasm.asm
-InputName=cwinasm
-
-"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 NASM Debug"
-
-# Begin Custom Build
-IntDir=.\Debug
-InputPath=..\..\src\cwinasm.asm
-InputName=cwinasm
-
-"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\mdctasm.asm
-
-!IF  "$(CFG)" == "cdlmc - Win32 Release"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 NASM Release"
-
-# Begin Custom Build
-IntDir=.\Release
-InputPath=..\..\src\mdctasm.asm
-InputName=mdctasm
-
-"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 NASM Debug"
-
-# Begin Custom Build
-IntDir=.\Debug
-InputPath=..\..\src\mdctasm.asm
-InputName=mdctasm
-
-"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\msisasm.asm
-
-!IF  "$(CFG)" == "cdlmc - Win32 Release"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 NASM Release"
-
-# Begin Custom Build
-IntDir=.\Release
-InputPath=..\..\src\msisasm.asm
-InputName=msisasm
-
-"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "cdlmc - Win32 NASM Debug"
-
-# Begin Custom Build
-IntDir=.\Debug
-InputPath=..\..\src\msisasm.asm
-InputName=msisasm
-
-"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-
-# End Custom Build
-
-!ENDIF 
-
 # End Source File
 # End Group
 # End Target

@@ -58,7 +58,7 @@ LINK32=link.exe
 # ADD LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib /nologo /base:"0x11900000" /subsystem:windows /dll /machine:I386 /out:"cd.pmi" /libpath:"..\..\..\..\base\win32"
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                          ..\..\..\..\base\win32\prj\plugins	copy cdinput.pmi                     ..\..\..\..\base\win32\prj\plugins
+PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                          ..\..\..\..\base\win32\prj\plugins	copy cd.pmi                     ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "cdinput - Win32 Debug"
@@ -89,7 +89,7 @@ LINK32=link.exe
 # SUBTRACT LINK32 /profile
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                          ..\..\..\..\base\win32\prj\plugins	copy cdinput.pmi                     ..\..\..\..\base\win32\prj\plugins
+PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                          ..\..\..\..\base\win32\prj\plugins	copy cd.pmi                     ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "cdinput - Win32 NASM Debug"
@@ -122,7 +122,7 @@ LINK32=link.exe
 # SUBTRACT LINK32 /profile
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                          ..\..\..\..\base\win32\prj\plugins	copy cdinput.pmi                     ..\..\..\..\base\win32\prj\plugins
+PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                          ..\..\..\..\base\win32\prj\plugins	copy cd.pmi                     ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "cdinput - Win32 NASM Release"
@@ -153,7 +153,7 @@ LINK32=link.exe
 # ADD LINK32 fabaselib.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x11900000" /subsystem:windows /dll /machine:I386 /out:"cd.pmi" /libpath:"..\..\..\..\base\win32"
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                          ..\..\..\..\base\win32\prj\plugins	copy cdinput.pmi                     ..\..\..\..\base\win32\prj\plugins
+PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                          ..\..\..\..\base\win32\prj\plugins	copy cd.pmi                     ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
@@ -218,10 +218,6 @@ InputPath=..\..\..\..\config\config.win32
 
 !ENDIF 
 
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\localcdinput.cpp
 # End Source File
 # Begin Source File
 

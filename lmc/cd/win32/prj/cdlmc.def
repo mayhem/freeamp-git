@@ -1,6 +1,6 @@
 ; cdlmc.def : Declares the module parameters for the DLL.
 
-LIBRARY      "cdlmc"
+LIBRARY      "cd"
 DESCRIPTION  'CDDA Media Library'
 
 EXPORTS

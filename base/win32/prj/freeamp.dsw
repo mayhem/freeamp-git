@@ -188,6 +188,12 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name winamp
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name cdinput
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name cdlmc
+    End Project Dependency
 }}}
 
 ###############################################################################
