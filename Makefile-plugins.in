@@ -232,7 +232,7 @@ UNIXFREEAMPUIOBJ += ui/freeamp/unix/src/ThemeManager.o
 UNIXFREEAMPUIOBJ += ui/freeamp/unix/src/GTKPreferenceWindow.o 
 UNIXFREEAMPUIOBJ += ui/freeamp/unix/src/GTKFileSelector.o  
 UNIXFREEAMPUIOBJ += ui/musicbrowser/unix/src/gtkmessagedialog.o
-UNIXFREEAMPUILIBS = $(GTK_LIBS) $(TTF_LIBS) $(GDK_PIXBUF_LIBS)
+UNIXFREEAMPUILIBS = $(TTF_LIBS) $(GDK_PIXBUF_LIBS)
 
 BEOSFREEAMPUIOBJ  = ui/freeamp/beos/src/BeOSWindow.o
 BEOSFREEAMPUIOBJ += ui/freeamp/beos/src/BeOSBitmap.o

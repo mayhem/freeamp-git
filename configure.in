@@ -802,6 +802,7 @@ AC_MSG_CHECKING(for GDK_PIXBUF - version >= $min_gdk_pixbuf_version)
 no_gdk_pixbuf=""
 if test "$GDK_PIXBUF_CONFIG" = "no" ; then
   no_gdk_pixbuf=yes
+  GDK_PIXBUF_LIBS=$GTK_LIBS
 else
   GDK_PIXBUF_CFLAGS=`$GDK_PIXBUF_CONFIG $gdk_pixbufconf_args --cflags`
   GDK_PIXBUF_LIBS=`$GDK_PIXBUF_CONFIG $gdk_pixbufconf_args --libs`
@@ -920,7 +921,7 @@ else
      fi
    fi
    GDK_PIXBUF_CFLAGS=""
-   GDK_PIXBUF_LIBS=""
+   GDK_PIXBUF_LIBS=$GTK_LIBS
 fi
 
 AC_SUBST(GDK_PIXBUF_CFLAGS)
