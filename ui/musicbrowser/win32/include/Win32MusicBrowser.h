@@ -290,6 +290,7 @@ class MusicBrowserUI : public UserInterface
     void    FillPortables();
     void    FillWiredPlanet();
     void    FillStreams();
+    void    FillRelatable();
     void    UpdateStreams(vector<FreeAmpStreamInfo> &list);
     HTREEITEM MusicBrowserUI::CreateStreamFolder(string& treePath);
     void    FillFavorites();
@@ -368,6 +369,7 @@ class MusicBrowserUI : public UserInterface
     HTREEITEM           m_hNewPlaylistItem, m_hNewPortableItem;
     HTREEITEM           m_hWiredPlanetItem, m_hShoutCastItem, m_hIceCastItem;
     HTREEITEM           m_hFavoritesItem, m_hNewFavoritesItem;
+    HTREEITEM           m_hRelatableItem;
     int                 m_iCollapseMoveAmount;
     HCURSOR             m_hSavedCursor, m_hDragCursor, m_hNoDropCursor;
     HCURSOR             m_hSplitterCursor, m_hPointerCursor, m_hCurrentCursor;

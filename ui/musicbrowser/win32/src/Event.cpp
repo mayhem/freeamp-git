@@ -972,6 +972,10 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                     {
                         FillPortables();
                     }
+                    else if(pTreeView->itemNew.hItem == m_hRelatableItem)
+                    {
+                        FillRelatable();
+                    }
                 }
 
                 break;

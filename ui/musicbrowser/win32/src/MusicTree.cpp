@@ -59,6 +59,7 @@ char* kUncatagorized = "Uncategorized Tracks";
 char* kPlaylists = "My Playlists";
 char* kStreams = "Streams";
 char* kFavoriteStreams = "My Favorite Streams";
+char* kRecommendedStreams = "Recommended Streams";
 char* kPortables = "My Portables";
 char* kNewPlaylist = "Create a New Playlist...";
 char* kNewPortable = "Setup a Portable Player...";
@@ -560,6 +561,42 @@ void MusicBrowserUI::FillPlaylists()
     m_hNewPlaylistItem = TreeView_InsertItem(m_hMusicView, &insert);
 }
 
+void MusicBrowserUI::FillRelatable()
+{
+    TV_INSERTSTRUCT      insert;
+    StreamList           streams;
+    StreamList::iterator i;
+    TreeData             data;
+
+    insert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
+                       TVIF_SELECTEDIMAGE | TVIF_PARAM;
+
+    m_context->aps->APSGetStreams(&streams);
+
+    data.m_iLevel = 1;
+
+    for(i = streams.begin(); i != streams.end(); i++)
+    {
+        PlaylistItem* stream = new PlaylistItem((*i).second.c_str());
+        MetaData metadata;
+
+        metadata.SetTitle((*i).first.c_str());
+        stream->SetMetaData(&metadata);
+
+        data.m_pStream = stream;
+
+        insert.item.pszText = (char*)stream->GetMetaData().Title().c_str();
+        insert.item.cchTextMax = strlen(insert.item.pszText);
+        insert.item.iImage = 8;
+        insert.item.iSelectedImage = 8;
+        insert.item.cChildren= 0;
+        insert.item.lParam = (LPARAM) new TreeData(data);
+        insert.hInsertAfter = TVI_SORT;
+        insert.hParent = m_hRelatableItem;
+        TreeView_InsertItem(m_hMusicView, &insert);
+    }
+}
+
 void MusicBrowserUI::FillFavorites()
 {
     TV_INSERTSTRUCT                        insert;
@@ -627,6 +664,16 @@ void MusicBrowserUI::FillStreams()
     insert.hInsertAfter = TVI_FIRST;
     insert.hParent = m_hStreamsItem;
     m_hFavoritesItem = TreeView_InsertItem(m_hMusicView, &insert);
+
+    insert.item.pszText = kRecommendedStreams;
+    insert.item.cchTextMax = lstrlen(insert.item.pszText);
+    insert.item.iImage = 14;
+    insert.item.iSelectedImage = 14;
+    insert.item.cChildren = 1;
+    insert.item.lParam = NULL;
+    insert.hInsertAfter = TVI_LAST;
+    insert.hParent = m_hStreamsItem;
+    m_hRelatableItem = TreeView_InsertItem(m_hMusicView, &insert);
 
     m_fillStreamsThread = Thread::CreateThread();
 	m_fillStreamsThread->Create(MusicBrowserUI::streams_timer, this);
@@ -768,7 +815,7 @@ void MusicBrowserUI::UpdateStreams(vector<FreeAmpStreamInfo> &list)
 {
     HTREEITEM treeItem;
 
-    while(treeItem = TreeView_GetNextSibling(m_hMusicView, m_hFavoritesItem))
+    while(treeItem = TreeView_GetNextSibling(m_hMusicView, m_hRelatableItem))
     {
         TreeView_DeleteItem(m_hMusicView, treeItem);
     }
