@@ -28,7 +28,7 @@ ____________________________________________________________________________*/
 #define Music_Browser                 "music_browser_entry.html"
 #define Music_Browser_Drive_Selection "drive_selection_entry.html"
 #define Download_Manager              "download_manager_entry.html"
-#define Preferences_General           "preferences_general_entry.thml"
+#define Preferences_General           "preferences_general_entry.html"
 #define Preferences_Themes            "preferences_themes_entry.html"
 #define Preferences_Streaming         "preferences_streaming_entry.html"
 #define Preferences_Update            "preferences_update_entry.html"
