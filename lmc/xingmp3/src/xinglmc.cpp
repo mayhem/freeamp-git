@@ -409,14 +409,22 @@ void XingLMC::DecodeWork() {
 		//m_bsBufPtr = &(m_bsBufPtr[g_jdw_additional]);
 		//MessageBox(NULL,"Set it...", NULL, MB_OK);
 	//}
-	IN_OUT x = m_audioMethods.decode(&(m_bsBufPtr[m_searchAhead]), (short *) (m_pcmBuffer + m_pcmBufBytes));
+	IN_OUT x = {0,0};
+	if (m_bsBufPtr[m_searchAhead] != 'T') {
+		x = m_audioMethods.decode(&(m_bsBufPtr[m_searchAhead]), (short *) (m_pcmBuffer + m_pcmBufBytes));
 
-	if (x.in_bytes <= 0) {
-	    if (m_target) m_target->AcceptEvent(new LMCErrorEvent(this,(Error)lmcError_DecodeDidntDecode));
-	    return;
+		if (x.in_bytes <= 0) {
+			if (m_target) m_target->AcceptEvent(new LMCErrorEvent(this,(Error)lmcError_DecodeDidntDecode));
+			return;
+		}
+		m_bsBufPtr += x.in_bytes + m_searchAhead;
+		m_bsBufBytes -= x.in_bytes + m_searchAhead;
+	} else {
+		if ((m_bsBufPtr[m_searchAhead + 1] == 'A') && (m_bsBufPtr[m_searchAhead + 2] == 'G')) {
+			m_bsBufPtr += 128 + m_searchAhead;
+			m_bsBufBytes -= 128 + m_searchAhead;
+		}
 	}
-	m_bsBufPtr += x.in_bytes + m_searchAhead;
-	m_bsBufBytes -= x.in_bytes + m_searchAhead;
 	m_pcmBufBytes += x.out_bytes;
 	m_searchAhead = 0;
 	m_frameCounter++;

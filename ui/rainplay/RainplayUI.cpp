@@ -18,18 +18,18 @@ CRainplayUI::
 CRainplayUI():
 UserInterface()
 {
-	m_uiSemaphore = new Semaphore();
+	//m_uiSemaphore = new Semaphore();
 
 	m_uiThread = Thread::CreateThread();
 	m_uiThread->Create(UIThreadFunc,this);
-	m_uiSemaphore->Wait();
+	//m_uiSemaphore->Wait();
 }
 
 CRainplayUI::
 ~CRainplayUI()
 {
 	delete m_Dlg;
-	delete m_uiSemaphore;
+	//delete m_uiSemaphore;
 }
 
 void 
@@ -75,6 +75,7 @@ AcceptEvent(Event* event)
 				break;
 
 			case CMD_Cleanup:
+				m_target->AcceptEvent(new Event(INFO_ReadyToDieUI));
 				break;
 
 			default:
@@ -103,8 +104,8 @@ CreateUI()
 	m_Dlg = new CRainplayDlg;
 	m_Dlg->DoModal();
 	
-	AfxMessageBox("Use rbutton to select menu\n");
-	//m_target->AcceptEvent(new Event(CMD_QuitPlayer));
+	//AfxMessageBox("Use rbutton to select menu\n");
+	m_target->AcceptEvent(new Event(CMD_QuitPlayer));
 }
 
 void 
