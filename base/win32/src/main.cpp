@@ -41,8 +41,8 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
 		 				LPSTR lpszCmdLine, 
 						int cmdShow)
 {
-   // Initialize Windows Registry
-   InitWindowsRegistry();
+    // Initialize Windows Registry
+    InitWindowsRegistry();
 
     // find all the plug-ins we use
     LMCRegistry* lmc;

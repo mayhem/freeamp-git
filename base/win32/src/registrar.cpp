@@ -98,7 +98,7 @@ Error RegisterPMOs(PMORegistry* registry)
         char search[MAX_PATH];
 
         strcpy(search, dir);
-        strcat(search, "\\pmo\\*.pmo");
+        strcat(search, "\\io\\*.pmo");
 
         handle = FindFirstFile(search, &find);
 
@@ -146,7 +146,7 @@ Error RegisterPMIs(PMIRegistry* registry)
         char search[MAX_PATH];
 
         strcpy(search, dir);
-        strcat(search, "\\pmi\\*.pmi");
+        strcat(search, "\\io\\*.pmi");
 
         handle = FindFirstFile(search, &find);
 
