@@ -112,7 +112,14 @@ BOOL MusicBrowserUI::MusicSearchDlgProc(HWND hwnd,
             Edit_SetText(hwndDirectory, kAllFolders);
 
             break;
-        }      
+        }   
+        
+        case WM_HELP:
+        {
+            SendMessage(hwnd, WM_COMMAND, IDHELP, 0);
+            result = TRUE;
+            break;
+        }
 
         case WM_COMMAND:
         {

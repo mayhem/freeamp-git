@@ -14,6 +14,7 @@
 #define IDI_ARROW                       106
 #define IDC_NODROP                      106
 #define IDI_BLANK                       107
+#define IDD_INTROWIZARD_HELLO           107
 #define IDI_ACTIVELIST                  109
 #define IDR_POPUP                       110
 #define IDR_TVPOPUP                     110
@@ -33,6 +34,10 @@
 #define IDD_DELETETRACKS                220
 #define IDD_REMOVETRACKS                220
 #define IDD_EDITINFO                    259
+#define IDD_INTROWIZARD_SEARCH          261
+#define IDD_INTROWIZARD_PLAYLIST        262
+#define IDD_INTROWIZARD_DONE            263
+#define IDD_INTROWIZARD_BROWSER         264
 #define IDB_PLAYING                     542
 #define IDB_CATALOG                     543
 #define IDB_ARTIST                      544
@@ -66,6 +71,8 @@
 #define IDC_SPIN2                       1029
 #define IDC_SPINTRACK                   1029
 #define IDC_SHOWHELP                    1030
+#define IDC_CAPTION                     1031
+#define IDC_TEXT                        1032
 #define IDC_BROWSE                      1110
 #define IDC_DRIVES                      1231
 #define IDC_ALBUM                       1462
@@ -148,9 +155,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        129
+#define _APS_NEXT_RESOURCE_VALUE        130
 #define _APS_NEXT_COMMAND_VALUE         40076
-#define _APS_NEXT_CONTROL_VALUE         1031
+#define _APS_NEXT_CONTROL_VALUE         1033
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

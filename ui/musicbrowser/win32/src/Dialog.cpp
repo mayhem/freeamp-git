@@ -1074,7 +1074,7 @@ void MusicBrowserUI::SetTitles(void)
     if (m_pParent == NULL)
     {
        SetWindowText(m_hPlaylistTitle, 
-                     "Currently listening to:");
+                     "Currently Listening To:");
        SetWindowText(m_hWnd, 
                      "My Music - " BRANDING);
     }   
@@ -1330,7 +1330,7 @@ void MusicBrowserUI::UpdateButtonMenuStates()
     int32        lParam;
     HTREEITEM    hDummy;
 
-    lParam = GetMusicTreeSelection(hDummy);
+    lParam = GetMusicTreeSelection(&hDummy);
 
     EnableMenuItem(hMenu, ID_FILE_EXPORTPLAYLIST, 
                    m_oTreeIndex.IsPlaylist(lParam) ? 

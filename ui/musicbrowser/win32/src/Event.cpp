@@ -1154,6 +1154,8 @@ void MusicBrowserUI::EmptyDBCheck(void)
                        "Populate My Music", MB_YESNO);
     if (iRet == IDYES)
         StartStopMusicSearch();
+
+    //IntroductionWizard();
 }
 
 void MusicBrowserUI::EditPlaylistEvent(void)
@@ -1199,7 +1201,7 @@ void MusicBrowserUI::RemoveFromDiskEvent(void)
     char      szBase[MAX_PATH];
     HTREEITEM hItem;
 
-    lParam = GetMusicTreeSelection(hItem);
+    lParam = GetMusicTreeSelection(&hItem);
     if (m_oTreeIndex.IsTrack(lParam))
     {
         _splitpath(m_oTreeIndex.Data(lParam).m_pTrack->URL().c_str(),

@@ -210,10 +210,23 @@ BOOL MusicBrowserUI::EditTrackInfoDlgProc(HWND hwnd,
             break;
         }      
 
+        case WM_HELP:
+        {
+            ShowHelp(Edit_Info);
+            result = TRUE;
+            break;
+        }
+
         case WM_COMMAND:
         {
             switch(LOWORD(wParam))
             {
+                case IDHELP:
+                {
+                    ShowHelp(Edit_Info);
+                    break;
+                }
+
                 case IDCANCEL:
                     EndDialog(hwnd, FALSE);
                     break;
@@ -300,13 +313,7 @@ BOOL MusicBrowserUI::EditTrackInfoDlgProc(HWND hwnd,
                         }
                     }
                     break;
-                }
-
-                case IDC_SHOWHELP:
-                {
-                    ShowHelp(Edit_Info);
-                    break;
-                }
+                }                
             }
   
             break;

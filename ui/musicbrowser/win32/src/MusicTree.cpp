@@ -342,7 +342,7 @@ void MusicBrowserUI::FillUncatTracks(void)
     }
 }
 
-int32 MusicBrowserUI::GetMusicTreeSelection(HTREEITEM hItem)
+int32 MusicBrowserUI::GetMusicTreeSelection(HTREEITEM* hItem)
 {
     TV_ITEM sItem;
     
@@ -350,13 +350,13 @@ int32 MusicBrowserUI::GetMusicTreeSelection(HTREEITEM hItem)
     sItem.hItem = TreeView_GetSelection(m_hMusicCatalog);
     if (sItem.hItem)
     {
-       hItem = sItem.hItem;
+       *hItem = sItem.hItem;
        TreeView_GetItem(m_hMusicCatalog, &sItem);
        return sItem.lParam;   
     }
     else
     {
-       hItem = NULL;
+       *hItem = NULL;
        return -1;
     }   
 }   

@@ -278,6 +278,42 @@ Error MusicBrowserUI::Init(int32 startup_level)
 }
 
 
+void MusicBrowserUI::MusicSearchDone()
+{
+    HMENU        hMenu;
+    MENUITEMINFO sItem;
+    
+    if (m_bSearchInProgress)
+        SendMessage(m_hStatus, SB_SETTEXT, 0, 
+                    (LPARAM)"Music search completed.");
+    else                
+        SendMessage(m_hStatus, SB_SETTEXT, 0, 
+                    (LPARAM)"Music search interrupted -- your database may be incomplete.");
+
+    hMenu = GetMenu(m_hWnd);
+    hMenu = GetSubMenu(hMenu, 0);
+    sItem.cbSize = sizeof(MENUITEMINFO);
+    sItem.fMask = MIIM_TYPE;
+    sItem.fType = MFT_STRING;
+    sItem.dwTypeData = "Search Computer for &Music...";
+    sItem.cch = strlen(sItem.dwTypeData);
+    SetMenuItemInfo(hMenu, ID_FILE_SEARCHFORMUSIC, false, &sItem);
+                    
+    SetWindowText(GetDlgItem(m_hWnd, IDC_SEARCH), "Music Search");
+    m_bSearchInProgress = false;
+                
+    InitTree();
+    TreeView_Expand(GetDlgItem(m_hWnd, IDC_MUSICTREE), 
+                    m_hPlaylistItem, TVE_EXPAND);
+    TreeView_Expand(GetDlgItem(m_hWnd, IDC_MUSICTREE), 
+                    m_hCatalogItem, TVE_EXPAND);
+}
+
+void MusicBrowserUI::DisplayBrowserMessage(const char* msg)
+{
+    SendMessage(m_hStatus, SB_SETTEXT, 0, (LPARAM)msg);
+}
+
 int32 MusicBrowserUI::AcceptEvent(Event *event)
 {
     switch (event->Type()) 
@@ -287,6 +323,14 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
             bool useTextLabels, useImages;
             m_context->prefs->GetShowToolbarTextLabels(&useTextLabels);
             m_context->prefs->GetShowToolbarImages(&useImages);
+
+            vector<MusicBrowserUI *>::iterator i;
+
+            for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
+            {
+                (*i)->AddToolbarButtons(useTextLabels, useImages);
+                (*i)->UpdateButtonMenuStates();
+            }
 
             AddToolbarButtons(useTextLabels, useImages);
             UpdateButtonMenuStates();
@@ -549,34 +593,14 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
 
         case INFO_SearchMusicDone: 
         {
-            HMENU        hMenu;
-            MENUITEMINFO sItem;
-            
-            if (m_bSearchInProgress)
-                SendMessage(m_hStatus, SB_SETTEXT, 0, 
-                            (LPARAM)"Music search completed.");
-            else                
-                SendMessage(m_hStatus, SB_SETTEXT, 0, 
-                            (LPARAM)"Music search interrupted -- your database may be incomplete.");
+            vector<MusicBrowserUI *>::iterator i;
 
-            hMenu = GetMenu(m_hWnd);
-            hMenu = GetSubMenu(hMenu, 0);
-            sItem.cbSize = sizeof(MENUITEMINFO);
-            sItem.fMask = MIIM_TYPE;
-            sItem.fType = MFT_STRING;
-            sItem.dwTypeData = "Search for &Music...";
-            sItem.cch = strlen(sItem.dwTypeData);
-            SetMenuItemInfo(hMenu, ID_FILE_SEARCHFORMUSIC, false, &sItem);
-                            
-            SetWindowText(GetDlgItem(m_hWnd, IDC_SEARCH), "Music Search");
-            m_bSearchInProgress = false;
-                        
-            InitTree();
-            TreeView_Expand(GetDlgItem(m_hWnd, IDC_MUSICTREE), 
-                            m_hPlaylistItem, TVE_EXPAND);
-            TreeView_Expand(GetDlgItem(m_hWnd, IDC_MUSICTREE), 
-                            m_hCatalogItem, TVE_EXPAND);
-            
+            for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
+            {
+                (*i)->MusicSearchDone();
+            }
+
+            MusicSearchDone();
             break; 
         }
 
@@ -592,7 +616,14 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
 
             message += ((BrowserMessageEvent *)event)->GetBrowserMessage();
 
-            SendMessage(m_hStatus, SB_SETTEXT, 0, (LPARAM)message.c_str());
+            vector<MusicBrowserUI *>::iterator i;
+
+            for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
+            {
+                (*i)->DisplayBrowserMessage(message.c_str());
+            }
+
+            DisplayBrowserMessage(message.c_str());
 
             break; 
         }
@@ -622,7 +653,9 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
 
         case CMD_ToggleMusicBrowserUI: 
         {
-            if (m_initialized && isVisible) 
+            ShowBrowser(true);
+
+            /*if (m_initialized && isVisible) 
             {
 				HideBrowser();
                 isVisible = false;
@@ -638,7 +671,7 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
                 {
                     m_initialized = true;
                 }
-            }
+            }*/
 
             //if (m_state == STATE_COLLAPSED)
                 //ExpandCollapseEvent();
