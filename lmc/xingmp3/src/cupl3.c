@@ -542,9 +542,9 @@ static void unpack_main(MPEG *m, unsigned char *pcm, int igr)
          unpack_sf_sub_MPEG2(m, &m->cupl.sf[igr][ch],
 			 &m->cupl.side_info.gr[igr][ch], m->cupl.is_mode & ch, &m->cupl.is_sf_info);
 
-      if (m->eq.enableEQ)
+      if (m->eq->enableEQ)
       {
-	      m->cupl.side_info.gr[igr][ch].global_gain += m->eq.EQ_gain_adjust;
+	      m->cupl.side_info.gr[igr][ch].global_gain += m->eq->EQ_gain_adjust;
       }
 
 /*--- huff data ---*/

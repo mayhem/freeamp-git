@@ -204,10 +204,23 @@ static AUDIO_DECODE_ROUTINE decode_routine_table[4] =
 
 extern void cup3_init(MPEG *m);
 
-void mpeg_init(MPEG *m)
+void mpeg_init(MPEG *m, int init_eq)
 {
    int i;
+   eq_info *temp = NULL;
+
+   /* If we're not supposed to init the eq, then save the eq pointer */
+   if (!init_eq)
+      temp = m->eq;
+
+   /* Clear the struct */
 	memset(m, 0, sizeof(MPEG));
+
+   /* Possibly restore the eq pointer, otherwise alloc a new one */
+   if (!init_eq)
+      m->eq = temp;
+   else
+      m->eq = malloc(sizeof(eq_info));
 
 	m->cup.nsb_limit = 6;
 	m->cup.nbat[0] = 3;
@@ -229,10 +242,20 @@ void mpeg_init(MPEG *m)
 	m->csbt.first_pass = 1;
 	cup3_init(m);
 
-   m->eq.enableEQ = 0;
-   for(i = 0; i < 32; i++)
-      m->eq.equalizer[i] = 1.0;
-   m->eq.EQ_gain_adjust = 1.0;
+   if (init_eq)
+   {
+       m->eq->enableEQ = 0;
+       for(i = 0; i < 32; i++)
+           m->eq->equalizer[i] = 1.0;
+       m->eq->EQ_gain_adjust = 1.0;
+   }
+}
+
+/*---------------------------------------------------------*/
+
+void mpeg_cleanup(MPEG *m)
+{
+   free(m->eq);
 }
 
 /*---------------------------------------------------------*/

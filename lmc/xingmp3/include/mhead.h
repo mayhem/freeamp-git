@@ -197,7 +197,7 @@ struct _mpeg
 		float coef32[31];	/* 32 pt dct coefs */
 	} cdct;
 
-   eq_info eq;
+   eq_info *eq;
 };
 
 typedef int (*CVT_FUNCTION_8) (void *mv, unsigned char *pcm);
@@ -275,7 +275,8 @@ extern "C"
 #endif
 
 
-   void mpeg_init(MPEG *m);
+   void mpeg_init(MPEG *m, int init_eq);
+   void mpeg_cleanup(MPEG *m);
    int head_info(unsigned char *buf, unsigned int n, MPEG_HEAD * h);
    int head_info2(unsigned char *buf,
 	   unsigned int n, MPEG_HEAD * h, int *br);

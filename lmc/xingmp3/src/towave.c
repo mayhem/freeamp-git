@@ -1,27 +1,27 @@
 /*____________________________________________________________________________
-	
-	FreeAmp - The Free MP3 Player
+        
+        FreeAmp - The Free MP3 Player
 
         MP3 Decoder originally Copyright (C) 1995-1997 Xing Technology
         Corp.  http://www.xingtech.com
 
-	Portions Copyright (C) 1998-1999 EMusic.com
+        Portions Copyright (C) 1998-1999 EMusic.com
 
-	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; either version 2 of the License, or
-	(at your option) any later version.
+        This program is free software; you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation; either version 2 of the License, or
+        (at your option) any later version.
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+        This program is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-	
-	$Id$
+        You should have received a copy of the GNU General Public License
+        along with this program; if not, write to the Free Software
+        Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+        
+        $Id$
 ____________________________________________________________________________*/
 
 /* ------------------------------------------------------------------------
@@ -134,10 +134,10 @@ decode (standard decoder) reduction_code:
 #ifdef WIN32
 #include <io.h>
 #endif
-#include <fcntl.h>		/* file open flags */
-#include <sys/types.h>		/* someone wants for port */
-#include <sys/stat.h>		/* forward slash for portability */
-#include "mhead.h"		/* mpeg header structure, decode protos */
+#include <fcntl.h>              /* file open flags */
+#include <sys/types.h>          /* someone wants for port */
+#include <sys/stat.h>           /* forward slash for portability */
+#include "mhead.h"              /* mpeg header structure, decode protos */
 
 #define NEED_KBHIT
 
@@ -159,14 +159,14 @@ extern unsigned int global_cycles;
 
 #endif
 
-float equalizer[32] = {
-    1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-    1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-    1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-    1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+float     equalizer[32] = {
+   1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+   1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+   1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+   1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
 };
-int enableEQ = 0;
-float EQ_gain_adjust = 1.0;
+int       enableEQ = 0;
+float     EQ_gain_adjust = 1.0;
 
 /*********  bitstream buffer */
 #define BS_BUFBYTES 60000U
@@ -188,41 +188,37 @@ static int handout = -1;
 /****************************/
 static int bs_fill();
 
-
 static int out_help();
 static int out_mpeg_info(MPEG_HEAD * h, int bitrate_arg);
-int ff_decode(char *filename,
-	      char *fileout,
-	      int reduction_code,
-	      int convert_code,
-	      int decode8_flag,
-	      int freq_limit,
-	      int integer_decode);
-int cvt_to_wave_test();
-int write_pcm_header_wave(int handout,
-			  int samprate, int channels, int bits, int type);
-int write_pcm_tailer_wave(int handout, unsigned int pcm_bytes);
+int       ff_decode(char *filename,
 
+                    char *fileout,
+                    int reduction_code,
+                    int convert_code,
+                    int decode8_flag, int freq_limit, int integer_decode);
+int       cvt_to_wave_test();
+int       write_pcm_header_wave(int handout,
+                                int samprate, int channels, int bits, int type);
+int       write_pcm_tailer_wave(int handout, unsigned int pcm_bytes);
 
 /*------------------------------------------*/
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
-   int i, k;
-   char *filename;
-   char *fileout;
-   int convert_code;
-   int reduction_code;
-   int freq_limit;
-   int integer_decode;
-   int decode8_flag;		/* decode to 8KHz */
+   int       i, k;
+   char     *filename;
+   char     *fileout;
+   int       convert_code;
+   int       reduction_code;
+   int       freq_limit;
+   int       integer_decode;
+   int       decode8_flag;      /* decode to 8KHz */
 
-   printf(
-	    "\n  file-file MPEG Layer I/II/III audio decode v3.04/32"
-	    "\n Copyright 1995-98 Xing Technology Corp."
-	    "\n"
-      "\n useage: towave mpeg_file pcm_file -Cconvert_code -Rreduction_code"
-	    "\n                 -I -D8 -HELP "
-      );
+   printf("\n  file-file MPEG Layer I/II/III audio decode v3.04/32"
+          "\n Copyright 1995-98 Xing Technology Corp."
+          "\n"
+          "\n useage: towave mpeg_file pcm_file -Cconvert_code -Rreduction_code"
+          "\n                 -I -D8 -HELP ");
 
 /****** process command line args */
    filename = default_file;
@@ -231,126 +227,125 @@ int main(int argc, char *argv[])
    reduction_code = 0;
    freq_limit = 24000;
    integer_decode = 0;
-   decode8_flag = 0;		/* decode to 8KHz */
+   decode8_flag = 0;            /* decode to 8KHz */
    for (k = 0, i = 1; i < argc; i++)
    {
       if (argv[i][0] != '-')
       {
-	 if (k == 0)
-	    filename = argv[i];
-	 if (k == 1)
-	    fileout = argv[i];
-	 k++;
-	 continue;
+         if (k == 0)
+            filename = argv[i];
+         if (k == 1)
+            fileout = argv[i];
+         k++;
+         continue;
       }
       switch (argv[i][1])
       {
-	 case 'h':
-	 case 'H':
-	    out_help();
-	    return 0;
-	 case 'c':
-	 case 'C':
-	    convert_code = atoi(argv[i] + 2);
-	    break;
-	 case 'r':
-	 case 'R':
-	    reduction_code = atoi(argv[i] + 2);
-	    break;
-	 case 'f':
-	 case 'F':
-	    freq_limit = atoi(argv[i] + 2);
-	    break;
-	 case 'i':
-	 case 'I':
-	    integer_decode = 1;
-	    break;
-	 case 'd':
-	 case 'D':
-	    if (atoi(argv[i] + 2) == 8)
-	       decode8_flag = 1;
-	    break;
+      case 'h':
+      case 'H':
+         out_help();
+         return 0;
+      case 'c':
+      case 'C':
+         convert_code = atoi(argv[i] + 2);
+         break;
+      case 'r':
+      case 'R':
+         reduction_code = atoi(argv[i] + 2);
+         break;
+      case 'f':
+      case 'F':
+         freq_limit = atoi(argv[i] + 2);
+         break;
+      case 'i':
+      case 'I':
+         integer_decode = 1;
+         break;
+      case 'd':
+      case 'D':
+         if (atoi(argv[i] + 2) == 8)
+            decode8_flag = 1;
+         break;
       }
    }
-
 
    printf("\n  <press any key to stop decoder>");
 
 /******** decode *********/
    ff_decode(filename, fileout,
-	     reduction_code, convert_code, decode8_flag,
-	     freq_limit, integer_decode);
+             reduction_code, convert_code, decode8_flag,
+             freq_limit, integer_decode);
 /*************************/
-
 
 /*---- timing test --------*/
 #ifdef TIME_TEST
    if (tot_cycles_n)
    {
-    // ms per frame
+      // ms per frame
       tot_cycles = (1.0 / 266000.0) * tot_cycles / tot_cycles_n;
       if (tot_cycles > 5.0)
-	 printf("\n ave frame time ms = %8.1lf", tot_cycles);
+         printf("\n ave frame time ms = %8.1lf", tot_cycles);
       else
-	 printf("\n ave frame time ms = %8.2lf", tot_cycles);
+         printf("\n ave frame time ms = %8.2lf", tot_cycles);
    }
 #endif
-
-
 
    printf("\n");
    return 0;
 }
+
 /*-------------------------------------------------------------*/
-static int out_help()
+static int
+out_help()
 {
 
    printf("\n"
-	  "\n -D8 option decode8 (8Ks output) convert_code:"
-	  "\n    convert_code = 4*bit_code + chan_code"
-	  "\n        bit_code:   1 = 16 bit linear pcm"
-	  "\n                    2 =  8 bit (unsigned) linear pcm"
-	  "\n                    3 = u-law (8 bits unsigned)"
-	  "\n        chan_code:  0 = convert two chan to mono"
-	  "\n                    1 = convert two chan to mono"
-	  "\n                    2 = convert two chan to left chan"
-	  "\n                    3 = convert two chan to right chan"
-	  "\n decode (standard decoder) convert_code:"
-	  "\n              0 = two chan output"
-	  "\n              1 = convert two chan to mono"
-	  "\n              2 = convert two chan to left chan"
-	  "\n              3 = convert two chan to right chan"
-	  "\n              (higher bits ignored)"
-	  "\n decode (standard decoder) reduction_code:"
-	  "\n              0 = full sample rate output"
-	  "\n              1 = half rate"
-	  "\n              2 = quarter rate"
-	  "\n -I  option selects integer decoder"
-      );
+          "\n -D8 option decode8 (8Ks output) convert_code:"
+          "\n    convert_code = 4*bit_code + chan_code"
+          "\n        bit_code:   1 = 16 bit linear pcm"
+          "\n                    2 =  8 bit (unsigned) linear pcm"
+          "\n                    3 = u-law (8 bits unsigned)"
+          "\n        chan_code:  0 = convert two chan to mono"
+          "\n                    1 = convert two chan to mono"
+          "\n                    2 = convert two chan to left chan"
+          "\n                    3 = convert two chan to right chan"
+          "\n decode (standard decoder) convert_code:"
+          "\n              0 = two chan output"
+          "\n              1 = convert two chan to mono"
+          "\n              2 = convert two chan to left chan"
+          "\n              3 = convert two chan to right chan"
+          "\n              (higher bits ignored)"
+          "\n decode (standard decoder) reduction_code:"
+          "\n              0 = full sample rate output"
+          "\n              1 = half rate"
+          "\n              2 = quarter rate"
+          "\n -I  option selects integer decoder");
 
    return 1;
 }
+
 /*-------------------------------------------------------------*/
-int ff_decode(char *filename, char *fileout,
-	      int reduction_code, int convert_code, int decode8_flag,
-	      int freq_limit, int integer)
+int
+ff_decode(char *filename, char *fileout,
+          int reduction_code, int convert_code, int decode8_flag,
+          int freq_limit, int integer)
 {
-   int framebytes;
-   int u;
+   int       framebytes;
+   int       u;
    MPEG_HEAD head;
-   MPEG m;
+   MPEG      m;
    unsigned int nwrite;
-   IN_OUT x;
-   int in_bytes, out_bytes;
-   DEC_INFO decinfo;
-   int bitrate;
+   IN_OUT    x;
+   int       in_bytes, out_bytes;
+   DEC_INFO  decinfo;
+   int       bitrate;
 
 /*------------------------------------------*/
 /*   typedef struct
    {
       int (*decode_init) (MPEG_HEAD * h, int framebytes_arg,
-			  int reduction_code, int transform_code,
-			  int convert_code, int freq_limit);
+                          int reduction_code, int transform_code,
+                          int convert_code, int freq_limit);
       void (*decode_info) (DEC_INFO * info);
         IN_OUT(*decode) (unsigned char *bs, short *pcm);
    }
@@ -359,12 +354,12 @@ int ff_decode(char *filename, char *fileout,
    static AUDIO audio_table[2][2] =
    {
       {
-	 {audio_decode_init, audio_decode_info, audio_decode},
-	 {audio_decode8_init, audio_decode8_info, audio_decode8},
+         {audio_decode_init, audio_decode_info, audio_decode},
+         {audio_decode8_init, audio_decode8_info, audio_decode8},
       },
       {
-	 {i_audio_decode_init, i_audio_decode_info, i_audio_decode},
-	 {audio_decode8_init, audio_decode8_info, audio_decode8},
+         {i_audio_decode_init, i_audio_decode_info, i_audio_decode},
+         {audio_decode8_init, audio_decode8_info, audio_decode8},
       }
    };
 */
@@ -381,8 +376,7 @@ int ff_decode(char *filename, char *fileout,
       audio = audio_table[integer & 1][0]; */
 /*-----------------------*/
 
-
-   mpeg_init(&m);
+   mpeg_init(&m, 1);
    in_bytes = out_bytes = 0;
 /*-----------------------*/
    handout = -1;
@@ -427,9 +421,9 @@ int ff_decode(char *filename, char *fileout,
 /*--- display mpeg info --*/
    out_mpeg_info(&head, bitrate);
 
-
 /*---- create pcm file ------*/
-   handout = open(fileout, O_RDWR | O_BINARY | O_CREAT | O_TRUNC, S_IREAD | S_IWRITE);
+   handout =
+      open(fileout, O_RDWR | O_BINARY | O_CREAT | O_TRUNC, S_IREAD | S_IWRITE);
    handout = open(fileout, O_WRONLY | O_BINARY);
 /*
    {
@@ -441,32 +435,32 @@ int ff_decode(char *filename, char *fileout,
        int junkvar = 0;
        int flags;
        if ((fd = open("/dev/dsp", O_WRONLY | O_SYNC, 0)) < 0) {
-	   if (errno == EBUSY) {
-	       printf("Audio device busy!\n");
-	       exit(1);
-	   } else {
-	       printf("Can't open /dev/dsp for writing");
-	       exit(1);
-	   }
+           if (errno == EBUSY) {
+               printf("Audio device busy!\n");
+               exit(1);
+           } else {
+               printf("Can't open /dev/dsp for writing");
+               exit(1);
+           }
        }
        
        if ((flags = fcntl(fd,F_GETFL,0)) < 0) {
-	   printf("fcntl F_GETFL on /dev/audio failed");
-	   exit(1);
+           printf("fcntl F_GETFL on /dev/audio failed");
+           exit(1);
        }
        flags &= ~O_NDELAY;
        
        if (fcntl(fd, F_SETFL, flags) < 0) {
-	   printf("fcntl F_SETFL on /dev/audio failed");
-	   exit(1);
+           printf("fcntl F_SETFL on /dev/audio failed");
+           exit(1);
        }
        
        handout = fd;
 
        
        if (handout < 0) {
-	   printf ("Internal error, LinuxObuffer::handout has to be initialized\nby LinuxObuffer::class_suitable()!\n");
-	   exit (1);
+           printf ("Internal error, LinuxObuffer::handout has to be initialized\nby LinuxObuffer::class_suitable()!\n");
+           exit (1);
        }
        
        // configure the device:
@@ -475,29 +469,29 @@ int ff_decode(char *filename, char *fileout,
        //int play_sample_rate = info->samples_per_second;
        //int junkvar = 0;
        if (ioctl(handout, SNDCTL_DSP_RESET, &junkvar) == -1) {
-	   printf("hosed during ioctl reset\n");
-	   exit(1);
+           printf("hosed during ioctl reset\n");
+           exit(1);
        } 
        
        if(ioctl(handout, SNDCTL_DSP_SAMPLESIZE, &play_precision) == -1) {
-	   printf("config of samplesize failed");
-	   exit(1);
+           printf("config of samplesize failed");
+           exit(1);
        }
        if(ioctl(handout, SNDCTL_DSP_STEREO, &play_stereo) == -1) {
-	   printf("config of stereo failed");
-	   exit(1);
+           printf("config of stereo failed");
+           exit(1);
        }
        if (ioctl(handout, SNDCTL_DSP_SPEED, &play_sample_rate) == -1) {
-	   printf("config of speed failed");
-	   exit(1);
+           printf("config of speed failed");
+           exit(1);
        }
        
    }
 */
    if (handout < 0)
    {
-       printf("\n CANNOT CREATE OUTPUT FILE\n");
-       goto abort;
+      printf("\n CANNOT CREATE OUTPUT FILE\n");
+      goto abort;
    }
 /*---- allocate pcm buffer --------*/
    pcm_buffer = malloc(PCM_BUFBYTES);
@@ -509,7 +503,7 @@ int ff_decode(char *filename, char *fileout,
 
 /*---- init decoder -------*/
    if (!audio_decode_init(&m, &head, framebytes,
-			  reduction_code, 0, convert_code, freq_limit))
+                          reduction_code, 0, convert_code, freq_limit))
    {
       printf("\n DECODER INIT FAIL \n");
       goto abort;
@@ -524,7 +518,8 @@ int ff_decode(char *filename, char *fileout,
 
 /*---- write pcm header -------*/
    if (!write_pcm_header_wave(handout,
-	    decinfo.samprate, decinfo.channels, decinfo.bits, decinfo.type))
+                              decinfo.samprate, decinfo.channels, decinfo.bits,
+                              decinfo.type))
    {
       printf("\n FILE WRITE ERROR\n");
       goto abort;
@@ -539,9 +534,9 @@ int ff_decode(char *filename, char *fileout,
    for (u = 0;;)
    {
       if (!bs_fill())
-	 break;
+         break;
       if (bs_bufbytes < framebytes)
-	 break;			/* end of file */
+         break;                 /* end of file */
 #ifdef TIME_TEST
       set_clock();
 #endif
@@ -553,8 +548,8 @@ int ff_decode(char *filename, char *fileout,
 #endif
       if (x.in_bytes <= 0)
       {
-	 printf("\n BAD SYNC IN MPEG FILE\n");
-	 break;
+         printf("\n BAD SYNC IN MPEG FILE\n");
+         break;
       }
       bs_bufptr += x.in_bytes;
       bs_bufbytes -= x.in_bytes;
@@ -562,25 +557,27 @@ int ff_decode(char *filename, char *fileout,
       u++;
       if (pcm_bufbytes > pcm_trigger)
       {
-	 pcm_bufbytes = cvt_to_wave(pcm_buffer, pcm_bufbytes);
-	 do {
-	     nwrite = write(handout, pcm_buffer, pcm_bufbytes);
-	     usleep(10000);
-	 } while (errno == EAGAIN);
-	 if (nwrite != pcm_bufbytes)
-	 {
-	    printf("\n FILE WRITE ERROR\n");
-	    break;
-	 }
-	 out_bytes += pcm_bufbytes;
-	 pcm_bufbytes = 0;
+         pcm_bufbytes = cvt_to_wave(pcm_buffer, pcm_bufbytes);
+         do
+         {
+            nwrite = write(handout, pcm_buffer, pcm_bufbytes);
+            usleep(10000);
+         }
+         while (errno == EAGAIN);
+         if (nwrite != pcm_bufbytes)
+         {
+            printf("\n FILE WRITE ERROR\n");
+            break;
+         }
+         out_bytes += pcm_bufbytes;
+         pcm_bufbytes = 0;
       }
       if (kbhit())
-	 break;
+         break;
       in_bytes += x.in_bytes;
       if ((u & 63) == 1)
-	 printf("\r frames %6ld   bytes in %6ld    bytes out %6ld",
-		u, in_bytes, out_bytes);
+         printf("\r frames %6ld   bytes in %6ld    bytes out %6ld",
+                u, in_bytes, out_bytes);
    }
 /*---------------*/
 
@@ -590,36 +587,38 @@ int ff_decode(char *filename, char *fileout,
       nwrite = write(handout, pcm_buffer, pcm_bufbytes);
       if (nwrite != pcm_bufbytes)
       {
-	 printf("\n FILE WRITE ERROR\n");
+         printf("\n FILE WRITE ERROR\n");
       }
       out_bytes += pcm_bufbytes;
       pcm_bufbytes = 0;
    }
    printf("\n frames %6ld   bytes in %6ld    bytes out %6ld",
-	  u, in_bytes, out_bytes);
+          u, in_bytes, out_bytes);
 
 /*---- write pcm tailer -------*/
    write_pcm_tailer_wave(handout, out_bytes);
 
-
    printf("\n    output file: %s", fileout);
 
  abort:
+   mpeg_cleanup(&m);
    close(handle);
    close(handout);
    free(bs_buffer);
    free(pcm_buffer);
    while (kbhit())
-      getch();			/* purge key board */
+      getch();                  /* purge key board */
    return 1;
 }
+
 /*-------------------------------------------------------------*/
-static int bs_fill()
+static int
+bs_fill()
 {
    unsigned int nread;
 
    if (bs_bufbytes < 0)
-      bs_bufbytes = 0;		// signed var could be negative
+      bs_bufbytes = 0;          // signed var could be negative
 
    if (bs_bufbytes < bs_trigger)
    {
@@ -628,9 +627,9 @@ static int bs_fill()
       if ((nread + 1) == 0)
       {
 /*-- test for -1 = error --*/
-	 bs_trigger = 0;
-	 printf("\n FILE_READ_ERROR\n");
-	 return 0;
+         bs_trigger = 0;
+         printf("\n FILE_READ_ERROR\n");
+         return 0;
       }
       bs_bufbytes += nread;
       bs_bufptr = bs_buffer;
@@ -638,18 +637,18 @@ static int bs_fill()
 
    return 1;
 }
+
 /*------------------------------------------------------------------*/
-static int out_mpeg_info(MPEG_HEAD * h, int bitrate_arg)	/* info only */
+static int
+out_mpeg_info(MPEG_HEAD * h, int bitrate_arg)   /* info only */
 {
-   int bitrate;
-   int samprate;
-   static char *Layer_msg[] =
-   {"INVALID", "III", "II", "I"};
-   static char *mode_msg[] =
-   {"STEREO", "JOINT", "DUAL", "MONO"};
-   static int sr_table[8] =
-   {22050L, 24000L, 16000L, 1L,
-    44100L, 48000L, 32000L, 1L};
+   int       bitrate;
+   int       samprate;
+   static char *Layer_msg[] = { "INVALID", "III", "II", "I" };
+   static char *mode_msg[] = { "STEREO", "JOINT", "DUAL", "MONO" };
+   static int sr_table[8] = { 22050L, 24000L, 16000L, 1L,
+      44100L, 48000L, 32000L, 1L
+   };
 
    bitrate = bitrate_arg / 1000;
    printf("\n Layer %s ", Layer_msg[h->option]);
@@ -657,7 +656,7 @@ static int out_mpeg_info(MPEG_HEAD * h, int bitrate_arg)	/* info only */
    printf("  %s ", mode_msg[h->mode]);
    samprate = sr_table[4 * h->id + h->sr_index];
    if ((h->sync & 1) == 0)
-      samprate = samprate / 2;	// mpeg25
+      samprate = samprate / 2;  // mpeg25
 
    printf(" %d ", samprate);
    printf("  %dKb ", bitrate);
@@ -668,8 +667,10 @@ static int out_mpeg_info(MPEG_HEAD * h, int bitrate_arg)	/* info only */
 
    return 0;
 }
+
 /*------------------------------------------------------------------*/
-int dummy()
+int
+dummy()
 {
    return 0;
 }

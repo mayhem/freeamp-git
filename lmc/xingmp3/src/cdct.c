@@ -103,9 +103,9 @@ void fdct32(MPEG *m, float x[], float c[])
    float *src = x;
 
    int i;
-   if (m->eq.enableEQ) {
+   if (m->eq->enableEQ) {
        for(i=0; i<32; i++)
-	   b[i] = x[i] * m->eq.equalizer[i];
+	   b[i] = x[i] * m->eq->equalizer[i];
        src = b;
    }
 
