@@ -58,6 +58,9 @@ class DialView : public View {
 
     virtual void Invoke(void);
 
+    int32 Position() const { return m_position; }
+    void SetPosition(int32 position);
+
  protected:
     
  private:

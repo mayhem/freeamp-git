@@ -99,6 +99,10 @@ class FreeAmpUI : public UserInterface {
     void KeyDown(int32 keyCode);
     void DropFiles(HDROP dropHandle);
     void CancelMode();
+    void Timer(int32 timerID);
+
+    bool MouseCaptured() const { return m_mouseCaptured; }
+    void SetMouseCapture(bool capture) { m_mouseCaptured = capture; }
 
  protected:
     static void ui_thread_function(void*);
@@ -121,15 +125,21 @@ class FreeAmpUI : public UserInterface {
     
 	
  private:
-	uint32				m_totalFrames;
-    uint32              m_currentFrame;
+	int32				m_totalFrames;
+    int32               m_currentFrame;
+    int32               m_seekFrame;
     float			    m_secondsPerFrame;
+
+    int32               m_seekAcceleration;
+    int32               m_volumeAcceleration;
 
     TimeDisplay         m_lastTimeDisplay;
 
     Semaphore*          m_uiSemaphore;
     int32			    m_state;
     EventQueue*         m_target;
+
+    bool                m_mouseCaptured;
 
 
     PlayListManager*    m_plm;

@@ -169,9 +169,12 @@ void
 VolumeView::
 SetVolume(int32 volume)
 {
-    m_volume = volume;
+    if(volume != m_volume)
+    {
+        m_volume = volume;
 
-    Invalidate();
+        Invalidate();
+    }
 }
 
 void 

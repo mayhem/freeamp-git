@@ -53,6 +53,8 @@ ____________________________________________________________________________*/
 #include "stringitem.h"
 
 #define TIMER_MOUSE_POSITION    0
+#define TIMER_SEEK_POSITION     1
+#define TIMER_VOLUME_POSITION   2
 
 
 HINSTANCE g_hinst = NULL;
@@ -98,7 +100,6 @@ MainWndProc(HWND hwnd,
 {
     LRESULT result = 0;
     FreeAmpUI* ui = (FreeAmpUI*)GetWindowLong(hwnd, GWL_USERDATA);
-    static bool mouseCaptured = false;
 
     switch (msg)
     {
@@ -171,41 +172,14 @@ MainWndProc(HWND hwnd,
         case WM_DROPFILES:
             ui->DropFiles((HDROP) wParam);
 			break;
-		
 
         case WM_TIMER:
-        {
-            switch(wParam)
-            {
-                case TIMER_MOUSE_POSITION:
-                {
-                    bool pointInWindow;
-                    POINT pt;
-
-                    GetCursorPos(&pt);
-
-                    ScreenToClient(hwnd, &pt);
-
-                    pointInWindow = ui->MouseMove(pt.x, pt.y, 0);
-        
-                    if(!pointInWindow)
-                    {
-                        KillTimer(hwnd, TIMER_MOUSE_POSITION);
-                        mouseCaptured = false;
-                    }
-
-                    break;
-                }
-            }
-
+            ui->Timer(wParam);
             break;
-        }
 
         case WM_CANCELMODE:
-        {
             ui->CancelMode();
             break;
-        }
 
         case WM_NCHITTEST:
         {
@@ -222,10 +196,10 @@ MainWndProc(HWND hwnd,
 
         case WM_MOUSEMOVE:
         {
-            if(!mouseCaptured)
+            if(!ui->MouseCaptured())
             {
                 SetTimer(hwnd, TIMER_MOUSE_POSITION, 500, NULL);
-                mouseCaptured = true;
+                ui->SetMouseCapture(true);
             }
 
             ui->MouseMove(LOWORD(lParam), HIWORD(lParam), wParam);
@@ -245,7 +219,7 @@ MainWndProc(HWND hwnd,
             ui->MouseMove(pt.x, pt.y, 0);
 
             KillTimer(hwnd, TIMER_MOUSE_POSITION);
-            mouseCaptured = false;
+            ui->SetMouseCapture(false);
             break;
         }
 
@@ -285,6 +259,8 @@ UserInterface()
     m_windowRegion  = NULL;
     m_playerRegion  = NULL;
     m_viewList      = NULL;
+
+    m_mouseCaptured = false;
 
     m_playerCanvas  = NULL;
     m_bodyBitmap    = NULL;
@@ -360,6 +336,7 @@ UserInterface()
 	m_secondsPerFrame	= 0;
 	m_totalFrames		= 0;
     m_currentFrame      = 0;
+    m_seekFrame         = 0;
 
     m_state = STATE_Stopped;
 
@@ -943,14 +920,13 @@ Notify(int32 command, LPNMHDR notifyMsgHdr)
                         uint32 volume;
                         MMRESULT result;
 
-                        //result = waveOutSetVolume((HWAVEOUT)WAVE_MAPPER, MAKELONG(0x5000, 0x5000));
-
                         result = waveOutGetVolume((HWAVEOUT)WAVE_MAPPER, (DWORD*)&volume);
 
                         if(result == MMSYSERR_NOERROR) 
                         {
                             volume = (uint32)(100 * ((float)LOWORD(volume)/(float)0xffff));
                             m_volumeInfoView->SetVolume(volume);
+                            SetTimer(m_hwnd, TIMER_VOLUME_POSITION, 200, NULL);
                         }
                         else
                         {
@@ -962,13 +938,20 @@ Notify(int32 command, LPNMHDR notifyMsgHdr)
 
                     case DIAL_BUTTON_UP:
                     {
+                        KillTimer(m_hwnd, TIMER_VOLUME_POSITION);
                         m_timeView->Show();
                         m_volumeInfoView->Hide();
+                        m_volumeView->SetPosition(0);
                         break;
                     }
 
                     case DIAL_MOVE:
                     {
+                        /*char buffer[256];
+                        wsprintf(buffer,"position = %d\r\n", m_volumeView->Position());
+                        OutputDebugString(buffer);*/
+
+                        m_volumeAcceleration = m_volumeView->Position() / 5;
 
                         break;
                     }
@@ -991,18 +974,44 @@ Notify(int32 command, LPNMHDR notifyMsgHdr)
 
                         m_timeView->SetDisplay(DisplaySeekTime);
                         m_timeView->SetSeekTime(hours, minutes, seconds);
+
+                        // oops broken with new buffering scheme
+                        // let's try to calculate this...
+                        // NOTE: won't work for VBR files...grrrr
+                        //m_seekFrame = m_currentFrame;
+
+                        int32 currentTimeInSeconds = hours * 3600;
+			            currentTimeInSeconds += minutes * 60;
+			            currentTimeInSeconds += seconds;
+
+                        m_seekFrame = (int32)((float)currentTimeInSeconds/m_secondsPerFrame);
+
+                        /*char buffer[256];
+                        wsprintf(buffer,"m_seekFrame = %d\r\n", m_seekFrame);
+                        OutputDebugString(buffer);*/
+
+                        SetTimer(m_hwnd, TIMER_SEEK_POSITION, 100, NULL);
                         break;
                     }
 
                     case DIAL_BUTTON_UP:
                     {
+                        KillTimer(m_hwnd, TIMER_SEEK_POSITION);
                         m_timeView->SetDisplay(m_lastTimeDisplay);
+                        m_seekView->SetPosition(0);
+
+                        if(m_state == STATE_Playing)
+                        {
+                            m_target->AcceptEvent(new ChangePositionEvent(m_seekFrame));
+                        }
+
                         break;
                     }
 
                     case DIAL_MOVE:
                     {
-                        m_timeView->SetSeekTime(0, 11, 36);
+                        m_seekAcceleration = m_seekView->Position() / 5;
+
                         break;
                     }
                 }
@@ -1038,6 +1047,80 @@ CancelMode()
         }
     }
 
+}
+
+void
+FreeAmpUI::
+Timer(int32 timerID)
+{
+    switch(timerID)
+    {
+        case TIMER_MOUSE_POSITION:
+        {
+            bool pointInWindow;
+            POINT pt;
+
+            GetCursorPos(&pt);
+
+            ScreenToClient(m_hwnd, &pt);
+
+            pointInWindow = MouseMove(pt.x, pt.y, 0);
+
+            if(!pointInWindow)
+            {
+                KillTimer(m_hwnd, TIMER_MOUSE_POSITION);
+                SetMouseCapture(false);
+            }
+
+            break;
+        }
+
+        case TIMER_SEEK_POSITION:
+        {
+            m_seekFrame += m_seekAcceleration*20*abs(m_seekAcceleration);
+
+            if(m_seekFrame < 0)
+                m_seekFrame = 0;
+            else if(m_seekFrame > m_totalFrames)
+                m_seekFrame = m_totalFrames;
+
+            //sprintf(foo,"position: %d\r\n",position);
+			//OutputDebugString(foo);
+
+            int32 seconds = (int32)ceil(m_secondsPerFrame * m_seekFrame);
+			int32 hours = seconds / 3600;
+			int32 minutes = seconds / 60 - hours * 60;
+			seconds = seconds - minutes * 60 - hours * 3600;
+
+            //sprintf(foo,"seconds: %d\r\n",seconds);
+
+            m_timeView->SetSeekTime(hours, minutes, seconds);
+            break;
+        }
+
+        case TIMER_VOLUME_POSITION:
+        {
+            int32 volume = m_volumeInfoView->Volume();
+
+            volume += m_volumeAcceleration;
+
+            if(volume > 100)
+                volume = 100;
+            else if(volume < 0)
+                volume = 0;
+
+            m_volumeInfoView->SetVolume(volume);
+
+            MMRESULT result;
+            //float percent = (float)volume/(float)100;
+
+			result = waveOutSetVolume( (HWAVEOUT)WAVE_MAPPER, 
+                                        MAKELPARAM( 0xFFFF*volume/100, 
+                                                    0xFFFF*volume/100));
+
+            break;
+        }
+    }
 }
 
 bool
