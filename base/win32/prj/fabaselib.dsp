@@ -130,6 +130,9 @@ LIB32=link.exe -lib
 # Name "fabaselib - Win32 Debug"
 # Name "fabaselib - Win32 NASM Debug"
 # Name "fabaselib - Win32 NASM Release"
+# Begin Group "src"
+
+# PROP Default_Filter "c;cpp"
 # Begin Source File
 
 SOURCE=..\..\aps\apsconvert.cpp
@@ -145,10 +148,6 @@ SOURCE=..\..\aps\apsplaylist.cpp
 # Begin Source File
 
 SOURCE=..\..\aps\comhttpsocket.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\aps\comhttpsocket.h
 # End Source File
 # Begin Source File
 
@@ -325,5 +324,270 @@ SOURCE=..\..\aps\wincomsocket.cpp
 
 SOURCE=..\..\aps\ypclient.cpp
 # End Source File
+# End Group
+# Begin Group "include"
+
+# PROP Default_Filter "h"
+# Begin Source File
+
+SOURCE=..\..\..\..\..\include\algobase.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\aps\aps.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\aps\apsconvert.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\aps\apsmetadata.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\aps\apsplaylist.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\aps\apsutility.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\aps\automutex.h
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\..\..\..\Program Files\Microsoft Visual Studio\VC98\Include\BASETSD.H"
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lib\musicbrainz\musicbrainz\bitprint.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\aps\comhttpsocket.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\config\config.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\database.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\debug.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\downloadformat.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\downloadmanager.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\event.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\eventdata.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\facontext.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\aps\FAMetaUnit.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lib\gdbm\gdbm_fa.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\..\include\hashtable.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\..\include\heap.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lib\http\include\Http.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lmc\include\lmc.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\log.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lib\musicbrainz\musicbrainz\mb_c.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\metadata.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\missingfile.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\musiccatalog.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\mutex.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lib\xml\include\Parse.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\io\include\pipeline.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\player.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\playlist.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\playlistformat.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\plmevent.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\io\include\pmi.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\io\include\pmo.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\portabledevice.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\preferences.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\properties.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\propimpl.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\io\include\pullbuffer.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lib\musicbrainz\musicbrainz\queries.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\registrar.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\registry.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\semaphore.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\..\include\stl_config.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\..\include\tempbuf.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\thread.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\timer.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\..\include\tree.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\..\include\type_traits.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\ui\include\ui.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\undomanager.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\updatemanager.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\utility.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\aps\uuid.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\win32prefs.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\win32thread.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\win32updatemanager.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\aps\wincomsocket.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\aps\YPClient.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lib\zlib\include\zconf.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lib\zlib\include\zlib.h
+# End Source File
+# End Group
 # End Target
 # End Project

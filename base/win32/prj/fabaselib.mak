@@ -137,7 +137,7 @@ LIB32_OBJS= \
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
-ALL : "..\..\..\config\config.h" "..\fabaselib.lib"
+ALL : "..\fabaselib.lib"
 
 
 CLEAN :
@@ -179,7 +179,6 @@ CLEAN :
 	-@erase "$(INTDIR)\wincomsocket.obj"
 	-@erase "$(INTDIR)\ypclient.obj"
 	-@erase "..\fabaselib.lib"
-	-@erase "..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -239,7 +238,7 @@ LIB32_OBJS= \
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
-ALL : "..\..\..\config\config.h" "..\fabaselib.lib"
+ALL : "..\fabaselib.lib"
 
 
 CLEAN :
@@ -281,7 +280,6 @@ CLEAN :
 	-@erase "$(INTDIR)\wincomsocket.obj"
 	-@erase "$(INTDIR)\ypclient.obj"
 	-@erase "..\fabaselib.lib"
-	-@erase "..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"

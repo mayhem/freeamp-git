@@ -864,6 +864,8 @@ Error PlaylistManager::AddItem(PlaylistItem* item, uint32 index, bool queryForMe
 
     if(item && index != kInvalidIndex)
     {
+		const PlaylistItem* currentItem = GetCurrentItem();
+
         m_activeList->insert(m_activeList->begin() + index,item);
 
         if(kPlaylistKey_MasterPlaylist == GetActivePlaylist())
@@ -874,7 +876,8 @@ Error PlaylistManager::AddItem(PlaylistItem* item, uint32 index, bool queryForMe
                 InternalSetCurrentIndex(0);
             else if(index <= m_current)
             {
-                InternalSetCurrentIndex(m_current + 1);
+				SetCurrentIndex(IndexOf(currentItem));
+                //SetCurrentIndex(m_current + 1);
             }
         }
 
@@ -967,6 +970,8 @@ Error PlaylistManager::AddItems(vector<PlaylistItem*>* list, uint32 index, bool 
 
     if(list && index != kInvalidIndex)
     {
+		const PlaylistItem* currentItem = GetCurrentItem();
+
         m_activeList->insert(m_activeList->begin() + index,
                              list->begin(), 
                              list->end());
@@ -979,7 +984,8 @@ Error PlaylistManager::AddItems(vector<PlaylistItem*>* list, uint32 index, bool 
                 InternalSetCurrentIndex(0);
             else if(index <= m_current)
             {
-                InternalSetCurrentIndex(m_current + list->size());
+				SetCurrentIndex(IndexOf(currentItem));
+                //SetCurrentIndex(m_current + list->size());
             }
         }
 
@@ -1085,15 +1091,15 @@ Error PlaylistManager::RemoveItem(uint32 index)
             
             if(newIndex != kInvalidIndex)
             {
-                InternalSetCurrentIndex(newIndex);
+                SetCurrentIndex(newIndex);
             }
             else if(m_current != kInvalidIndex && m_current >= m_activeList->size())
             {
-                InternalSetCurrentIndex(m_activeList->size() - 1);
+                SetCurrentIndex(m_activeList->size() - 1);
             }
             else
             {
-                InternalSetCurrentIndex(m_current);
+                SetCurrentIndex(m_current);
             }
         }
 
@@ -1183,15 +1189,15 @@ Error PlaylistManager::RemoveItems(uint32 index, uint32 count)
             
             if(newIndex != kInvalidIndex)
             {
-                InternalSetCurrentIndex(newIndex);
+                SetCurrentIndex(newIndex);
             }
             else if(m_current != kInvalidIndex && m_current >= m_activeList->size())
             {
-                InternalSetCurrentIndex(m_activeList->size() - 1);
+                SetCurrentIndex(m_activeList->size() - 1);
             }
             else
             {
-                InternalSetCurrentIndex(m_current);
+                SetCurrentIndex(m_current);
             }
         }
 
@@ -1279,15 +1285,15 @@ Error PlaylistManager::RemoveItems(vector<PlaylistItem*>* items)
             
             if(newIndex != kInvalidIndex)
             {
-                InternalSetCurrentIndex(newIndex);
+                SetCurrentIndex(newIndex);
             }
             else if(m_current != kInvalidIndex && m_current >= m_activeList->size())
             {
-                InternalSetCurrentIndex(m_activeList->size() - 1);
+                SetCurrentIndex(m_activeList->size() - 1);
             }
             else
             {
-                InternalSetCurrentIndex(m_current);
+                SetCurrentIndex(m_current);
             }
         }
     }
@@ -2435,7 +2441,7 @@ void PlaylistManager::AddItemToShuffleList(PlaylistItem* item)
 
 void PlaylistManager::AddItemsToShuffleList(vector<PlaylistItem*>* list)
 {
-    ShuffleIt(list);
+	ShuffleIt(list);
 
     m_shuffleList.insert(m_shuffleList.end(),
                          list->begin(), 
