@@ -102,6 +102,33 @@ extern    "C"
    }
 }
 
+#ifdef WIN32
+HINSTANCE g_hinst = NULL;
+INT WINAPI DllMain (HINSTANCE hInstance,
+                    ULONG ul_reason_being_called,
+                    LPVOID lpReserved)
+{
+    switch (ul_reason_being_called)
+    {
+        case DLL_PROCESS_ATTACH:
+            g_hinst = hInstance;
+            break;
+
+        case DLL_THREAD_ATTACH:
+            break;
+
+        case DLL_THREAD_DETACH:
+            break;
+
+        case DLL_PROCESS_DETACH:
+            break;
+    }
+
+    return 1;                 
+}
+#endif
+
+
 HttpInput::HttpInput(FAContext *context):
            PhysicalMediaInput(context)
 {
@@ -117,6 +144,9 @@ HttpInput::HttpInput(FAContext *context):
     m_bUseBufferReduction = true;
     m_iMetaDataInterval = 0;
     m_uBytesReceived = 0;
+#ifdef WIN32
+	m_hWnd = NULL;
+#endif
 
     m_pContext->prefs->GetPrefBoolean(kUseProxyPref, &m_bUseProxy);
     if (m_bUseProxy)
@@ -132,6 +162,11 @@ HttpInput::HttpInput(FAContext *context):
 
 HttpInput::~HttpInput()
 {
+#ifdef WIN32
+    if (m_hWnd)
+	    PostMessage(m_hWnd, WM_QUIT, 0, 0);
+#endif
+
     m_bExit = true;
     m_pSleepSem->Signal();
     m_pPauseSem->Signal();
@@ -201,7 +236,12 @@ Error HttpInput::Prepare(PullBuffer *&pBuffer)
 
 Error HttpInput::Close(void)
 {
-    delete m_pOutputBuffer;
+#ifdef WIN32
+    if (m_hWnd)
+	    PostMessage(m_hWnd, WM_QUIT, 0, 0);
+#endif
+
+	delete m_pOutputBuffer;
     m_pOutputBuffer = NULL;
  
     if (m_hHandle >= 0)
@@ -242,14 +282,116 @@ bool HttpInput::PauseLoop(bool bLoop)
    return bRet;
 } 
 
-Error GetHostByName(char *szHostName, struct hostent *pResult)
+#ifdef WIN32
+#define WM_WINDOWS_IS_DONE_PICKING_ITS_BUTT (WM_USER + 1)
+
+static LRESULT WINAPI WndProc(HWND hwnd, UINT msg, 
+                              WPARAM wParam, LPARAM lParam );
+
+Error HttpInput::Win32GetHostByName(char *szHostName, struct hostent *pHostInfo)
+{
+    WNDCLASS wc;
+    MSG      msg;
+	HWND     hWnd;
+	HANDLE   hHandle;
+	char     szBuffer[MAXGETHOSTSTRUCT];
+	int      result = -1;
+
+    memset(&wc, 0x00, sizeof(WNDCLASS));
+
+    wc.style = CS_HREDRAW | CS_VREDRAW;
+    wc.lpfnWndProc = WndProc;
+    wc.hInstance = g_hinst;
+    wc.hCursor = NULL;
+    wc.hIcon = NULL;
+    wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+    wc.lpszClassName = "WindowsSucks";
+
+    result = RegisterClass(&wc);
+
+	hWnd = CreateWindow(wc.lpszClassName, "Fuss", 
+                        WS_OVERLAPPEDWINDOW,
+                        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+		                NULL, NULL, g_hinst, NULL);
+	if (hWnd == NULL)
+        return kError_NoDataAvail;
+
+	m_hWnd = hWnd;
+	hHandle = WSAAsyncGetHostByName(hWnd, WM_WINDOWS_IS_DONE_PICKING_ITS_BUTT, szHostName, 
+		                            szBuffer, MAXGETHOSTSTRUCT);
+	if (hHandle == NULL)
+	{
+		DestroyWindow(hWnd);
+        return kError_NoDataAvail;
+	}
+
+    while( GetMessage( &msg, NULL, 0, 0 ))
+    {
+        TranslateMessage( &msg );
+
+		if (msg.message == WM_WINDOWS_IS_DONE_PICKING_ITS_BUTT)
+			result = WSAGETASYNCERROR(msg.lParam);
+
+        DispatchMessage( &msg );
+    }
+
+	m_hWnd = NULL;
+	DestroyWindow(hWnd);
+
+
+	if (m_bExit)
+		return kError_Interrupt;
+
+	if (result == 0)
+    {
+	    memcpy(pHostInfo, szBuffer, sizeof(struct hostent));
+        return kError_NoErr;
+	}
+
+	return kError_NoDataAvail;
+}
+
+static LRESULT WINAPI WndProc(HWND hwnd, UINT msg, 
+                              WPARAM wParam, LPARAM lParam )
+{
+    LRESULT result = 0;
+
+    switch (msg)
+    {
+        case WM_WINDOWS_IS_DONE_PICKING_ITS_BUTT:
+        {
+			PostMessage(hwnd, WM_QUIT, 0, 0);
+		}
+        default:
+            return DefWindowProc( hwnd, msg, wParam, lParam );
+	}
+	return result;
+}
+
+#endif
+
+Error HttpInput::GetHostByName(char *szHostName, struct hostent *pResult)
 {
     struct hostent *pTemp;
     struct hostent TempHostent;
     static unsigned long IP_Adr;
     static char *AdrPtrs[2] = {(char *) &IP_Adr, NULL };
+	Error  eRet;
 
+#ifdef WIN32
+    eRet = Win32GetHostByName(szHostName, &TempHostent);
+	if (eRet == kError_Interrupt)
+        return eRet;
+
+    if (IsError(eRet))
+		pTemp = NULL;
+	else
+        pTemp = &TempHostent;
+	
+#else
     pTemp = gethostbyname(szHostName);
+#endif
+
     if (pTemp == NULL) 
     {
         // That didn't work.  On some stacks a numeric IP address
