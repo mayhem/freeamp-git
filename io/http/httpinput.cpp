@@ -632,14 +632,14 @@ Error HttpInput::Open(void)
                         "the save streams locally setting in the "
                         "options dialog.");
         
-        if (pHeaderData && m_fpSave)
+        if (pHeaderData && m_fpSave && iRead > 0)
         {
             iRet = fwrite((char *)pHeaderData + strlen(pHeaderData) + 1, 
                           sizeof(char), iRead, m_fpSave);
             if (iRet != iRead)
             {
                delete pHeaderData;
-               ReportError("Cannot save http stream to disk. Disk full?");
+               ReportError("Cannot save http stream to disk. Disk full? (1)");
                return kError_WriteFile;
             }
         }    
@@ -709,7 +709,7 @@ void HttpInput::WorkerThread(void)
              iRet = fwrite(pBuffer, sizeof(char), iRead, m_fpSave);
              if (iRet != iRead)
              {
-                 ReportError("Cannot save http stream to disk. Disk full?");
+                 ReportError("Cannot save http stream to disk. Disk full? (2)");
                  break;
              }
           }
