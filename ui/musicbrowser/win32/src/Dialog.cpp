@@ -212,11 +212,7 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                     return 1;
 
                 case ID_EDIT_REMOVE:
-                    MessageBox(hwnd, 
-                               "This feature is not yet implemented under win32.", 
-                               "doh!", 
-                               MB_OK);
-                    //RemoveEvent();
+                    RemoveEvent();
                     return 1;
 
                 case ID_EDIT_MOVEUP:

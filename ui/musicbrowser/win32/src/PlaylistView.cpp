@@ -67,7 +67,11 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
 
             ListView_GetItem(hwndList, &lv_item);
 
-            item = (PlaylistItem*) lv_item.lParam;
+            //item = (PlaylistItem*) lv_item.lParam;
+            item = m_oPlm->ItemAt(dis->itemID);
+
+            if(item == NULL)
+                return FALSE;
 
             // is this the current index? if so make it bold ...
             // btw, we only do this if it is the primary browser
@@ -97,15 +101,19 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
 
             oldAlign = SetTextAlign(dis->hDC, TA_CENTER | TA_TOP );
 
-            UINT left = rcClip.left + (ListView_GetColumnWidth(hwndList, 0)/2);
+            RECT indexRect = rcClip;
+
+            indexRect.right = indexRect.left + ListView_GetColumnWidth(hwndList, 0) - 1;
+
+            UINT left = indexRect.left + (ListView_GetColumnWidth(hwndList, 0)/2);
             
             SetTextColor(dis->hDC, GetSysColor(COLOR_INFOTEXT));
             SetBkColor(dis->hDC, GetSysColor(COLOR_INFOBK ));
 
             ExtTextOut( dis->hDC, 
-                        left, rcClip.top + 1,
+                        left, indexRect.top + 1,
                         ETO_CLIPPED | ETO_OPAQUE,
-                        &rcClip, 
+                        &indexRect, 
                         displayString.c_str(),
                         displayString.size(),
                         NULL);
@@ -114,7 +122,7 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
 
             
             // Move over to the next column
-            rcClip.left += ListView_GetColumnWidth(hwndList, 0) - 1;
+            rcClip.left += ListView_GetColumnWidth(hwndList, 0);
 
             // Check to see if this item is selected
             if(dis->itemState & ODS_SELECTED && GetFocus() == hwndList)
@@ -340,7 +348,7 @@ void MusicBrowserUI::PlaylistListItemRemoved(const PlaylistItem* item,
     // item has already been deleted when we get this 
     // msg so don't access it. only use it for comparison
 
-    if(0)//oldIndex != kInvalidIndex)
+    if(oldIndex != kInvalidIndex)
     {
         LV_ITEM sItem;
         
@@ -350,14 +358,8 @@ void MusicBrowserUI::PlaylistListItemRemoved(const PlaylistItem* item,
         sItem.lParam = 0;
 
         ListView_GetItem(m_hPlaylistView, &sItem);
-
-        // we may have already deleted this item
-        // this tries to prevent a race condition 
-        // on delete....
-        if(item == (PlaylistItem*)sItem.lParam)
-        {
-            ListView_DeleteItem(m_hPlaylistView, oldIndex);
-        }
+        
+        ListView_DeleteItem(m_hPlaylistView, oldIndex);
 
         if(oldIndex >= ListView_GetItemCount(m_hPlaylistView))
             oldIndex = ListView_GetItemCount(m_hPlaylistView) - 1;
@@ -370,33 +372,9 @@ void MusicBrowserUI::PlaylistListItemRemoved(const PlaylistItem* item,
     }
 }
 
-static
-int CALLBACK LVCompareFunc(LPARAM lParam1, 
-                           LPARAM lParam2, 
-	                       LPARAM lParamSort)
-{
-    int result = 0;
-    PlaylistManager* plm = (PlaylistManager*)lParamSort;
-    PlaylistItem* item1 = (PlaylistItem*)lParam1;
-    PlaylistItem* item2 = (PlaylistItem*)lParam2;
-    uint32 index1 = plm->IndexOf(item1);
-    uint32 index2 = plm->IndexOf(item2);
-    
-    if(index1 < index2)
-        result = -1;
-    else if(index2 < index1)
-        result = 1;
-    
-    return result;
-}
-
 void MusicBrowserUI::PlaylistListSorted(void)
 {
-    // instead of just removing all and then adding 
-    // again lets try to use the sort feature of the 
-    // list and sort on index;
-    ListView_SortItems(m_hPlaylistView, LVCompareFunc, (LPARAM)m_oPlm);
-
+    ListView_RedrawItems(m_hPlaylistView, 0, ListView_GetItemCount(m_hPlaylistView) - 1);
     m_bListChanged = true;
     UpdateButtonMenuStates();
 }
@@ -420,11 +398,9 @@ void MusicBrowserUI::AddPlaylistListItem(const PlaylistItem* item)
 
     if(index != kInvalidIndex)
     {
-        sItem.mask = LVIF_IMAGE | LVIF_PARAM;
+        sItem.mask = 0;
         sItem.iSubItem = 0;
         sItem.iItem = index;
-        sItem.lParam = (LPARAM)item;
-        sItem.iImage = 0;
 
         ListView_InsertItem(hwnd, &sItem);
 

@@ -66,7 +66,7 @@ void MusicBrowserUI::DeleteEvent(void)
             if(state & LVIS_SELECTED)
             {
                 found++;
-                ListView_DeleteItem(m_hPlaylistView, index);
+                /*ListView_DeleteItem(m_hPlaylistView, index);
 
                 uint32 oldIndex = index;
 
@@ -76,7 +76,7 @@ void MusicBrowserUI::DeleteEvent(void)
                 ListView_SetItemState(m_hPlaylistView, oldIndex, LVIS_SELECTED, LVIS_SELECTED);
                 ListView_RedrawItems(m_hPlaylistView, oldIndex, ListView_GetItemCount(m_hPlaylistView) - 1);
 
-                m_bListChanged = true;
+                m_bListChanged = true;*/
                 
                 m_oPlm->RemoveItem(index);
             }
@@ -485,7 +485,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                 pToolTipText->lpszText = "Add selected tracks and playlists to playlist";
                 return true;
             case ID_EDIT_ADDFILE:
-                pToolTipText->lpszText = "Add file from disk to playlist ";
+                pToolTipText->lpszText = "Add files from disk to playlist";
                 return true;
             case ID_EDIT_MOVEUP:
                 pToolTipText->lpszText = "Move selected playlist items up";
@@ -545,7 +545,9 @@ void MusicBrowserUI::SortEvent(int id)
             m_oPlm->GetPlaylistSortType() == PlaylistSortType_Ascending)
             ? PlaylistSortType_Descending : PlaylistSortType_Ascending;
 
+    ::SetCursor(LoadCursor(NULL, IDC_WAIT));
     m_oPlm->Sort(newKey, type);
+    ::SetCursor(LoadCursor(NULL, IDC_ARROW));
 }
 
 void MusicBrowserUI::ToggleVisEvent(void)
