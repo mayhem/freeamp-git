@@ -948,7 +948,9 @@ Error XingLMC::BeginRead(void *&pBuffer, unsigned int iBytesNeeded,
                                                     iOutPercent));
 
            if (m_pInputBuffer->GetNumBytesInBuffer() >= iBufferUpBytes)
+           {
                break;
+           }    
            if (m_pInputBuffer->GetBufferPercentage() > 90)
            {
                break;

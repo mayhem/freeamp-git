@@ -64,10 +64,10 @@ class PullBuffer
                {
                    return m_iBufferSize;
                };
-      int32    GetBufferPercentage(void)
-		         {
-					    return (100 * m_iBytesInBuffer) / m_iBufferSize;
-					};
+      virtual int32 GetBufferPercentage(void)
+		       {
+			       return (100 * m_iBytesInBuffer) / m_iBufferSize;
+			   };
       void     WrapPointer(void *&pBuffer);
 
     protected:
@@ -78,6 +78,7 @@ class PullBuffer
       FAContext *m_context;
       Mutex     *m_pMutex;
       bool       m_bExit;
+      size_t     m_iBytesInBuffer, m_iOverflowSize, m_iBufferSize;
 
     private:
 
@@ -87,7 +88,6 @@ class PullBuffer
       bool           m_bEOS;
       size_t         m_iBytesToWrite, m_iBytesToRead;
       unsigned char *m_pPullBuffer;
-      size_t         m_iBytesInBuffer, m_iOverflowSize, m_iBufferSize;
 };
 
 #endif

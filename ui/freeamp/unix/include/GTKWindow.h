@@ -54,7 +54,8 @@ class GTKWindow : public Window
      virtual Error Minimize(void);
      virtual Error Restore(void);
      virtual bool  LButtonDown(void);    
- 
+     virtual Error GetDesktopSize(int32 &iX, int32 &iY);
+
      GtkWidget *GetWindow(void) { return mainWindow; }
    
      void MouseLeaveCheck(void); 

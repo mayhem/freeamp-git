@@ -112,6 +112,7 @@ class Window
       virtual Error Minimize(void) = 0;
       virtual Error Restore(void) = 0;
 	  virtual bool  LButtonDown(void) = 0;
+	  virtual Error GetDesktopSize(int &iX, int &iY) = 0;
       
       // Mouse position is in screen coordinates
       virtual Error SetMousePos(Pos &oMousePos) = 0;
@@ -135,6 +136,7 @@ class Window
       bool                      m_bStayOnTop, m_bLiveInToolbar;
       bool                      m_bIsVulcanMindMeldHost;
       Rect                      m_oMoveStart;
+	  int32                     m_iDesktopWidth, m_iDesktopHeight;
 };
 
 #endif

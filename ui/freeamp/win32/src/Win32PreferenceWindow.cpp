@@ -870,20 +870,10 @@ bool Win32PreferenceWindow::PrefStreamingProc(HWND hwnd,
             Button_Enable(  hwndColon, 
                             m_originalValues.useProxyServer);
 
-            char* dot = NULL;
-            char* ip[4];
-            int32 i = 1;
-
-            strcpy(temp, m_originalValues.alternateIP.c_str());
-            ip[0] = temp;
-            dot = temp;
-
-            while(dot = strchr(dot, '.'))
-            {
-                *dot = 0x00;
-                ip[i++] = ++dot;
-            }
-
+            char ip[4][10];
+			sscanf(m_originalValues.alternateIP.c_str(), "%[^.].%[^.].%[^.].%[^.]",
+				   ip[0], ip[1], ip[2], ip[3]);
+            
             Edit_SetText(hwndAlternateIPAddress1, ip[0]);
             Edit_SetText(hwndAlternateIPAddress2, ip[1]);
             Edit_SetText(hwndAlternateIPAddress3, ip[2]);
@@ -1178,11 +1168,11 @@ bool Win32PreferenceWindow::PrefStreamingProc(HWND hwnd,
 
                         if(*ip)
                         {
-                            m_proposedValues.alternateIP += ip;
+                            m_proposedValues.alternateIP = ip;
                         }
                         else
                         {
-                            m_proposedValues.alternateIP += "0";
+                            m_proposedValues.alternateIP = "0";
                         }
 
                         m_proposedValues.alternateIP += ".";
