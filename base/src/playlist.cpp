@@ -65,7 +65,7 @@ void PlayList::Add(char *pc, int type) {
 }
 
 void PlayList::Shuffle(void) {
-    double count= (double) pMediaElems->numElements() - 1;
+    double count= (double) pMediaElems->numElements();
     if (count < 2) {
 	return;
     }
