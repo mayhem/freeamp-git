@@ -45,8 +45,8 @@ using namespace std;
 #include "FooCast.h"
 
 char* kMyMusic = "My Music";
-char* kAllTracks = "<All>";
-char* kUncatagorized = "<Uncategorized>";
+char* kAllTracks = "All Tracks";
+char* kUncatagorized = "Uncategorized Tracks";
 char* kPlaylists = "My Playlists";
 char* kStreams = "My Favorite Streams";
 char* kPortables = "My Portables";
