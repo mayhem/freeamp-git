@@ -254,6 +254,12 @@ Error Win32Window::Run(Pos &oPos)
     if (m_oWindowPos.y > iMaxY || m_oWindowPos.y + oRect.Height() < 0)
        m_oWindowPos.y = 0;
 
+    if(m_oWindowPos.x < 0 || m_oWindowPos.y < 0)
+    {
+        m_oWindowPos.x = (iMaxX - oRect.Width())/2;
+        m_oWindowPos.y = (iMaxY - oRect.Height())/2;
+    }
+
     if (m_bLiveInToolbar)
         m_hWnd = CreateWindowEx(WS_EX_TOOLWINDOW,
                               szAppName, 

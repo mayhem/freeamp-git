@@ -54,8 +54,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,0,0,0
- PRODUCTVERSION 2,0,0,0
+ FILEVERSION 2,0,0,1
+ PRODUCTVERSION 2,0,0,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -73,13 +73,13 @@ BEGIN
             VALUE "Comments", "For the latest version go to http://www.freeamp.org\0"
             VALUE "CompanyName", "FreeAmp Open Source Development Effort\0"
             VALUE "FileDescription", "The RMP Download plugin enable FreeAmp to read RMP files which allow it to download entire albums without having to click on each individual song file.\0"
-            VALUE "FileVersion", "2.0 beta 1\0"
+            VALUE "FileVersion", "2.0 beta 2\0"
             VALUE "InternalName", "FreeAmp\0"
             VALUE "LegalCopyright", "http://www.gnu.org/copyleft/gpl.html\0"
             VALUE "LegalTrademarks", "FreeAmp\0"
             VALUE "OriginalFilename", "rmp.dlf\0"
             VALUE "ProductName", "FreeAmp\0"
-            VALUE "ProductVersion", "2.0 beta 1\0"
+            VALUE "ProductVersion", "2.0 beta 2\0"
         END
     END
     BLOCK "VarFileInfo"

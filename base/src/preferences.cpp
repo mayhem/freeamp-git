@@ -86,7 +86,7 @@ const bool  kDefaultUseNIC = false;
 const char *kDefaultNICAddress = "192.168.1.1";
 const bool  kDefaultUseTitleStreaming = true;
 const char *kDefaultThemePath = "";  
-const char *kDefaultMainWindowPos = "100,100";  
+const char *kDefaultMainWindowPos = "-1,-1";  
 #ifdef WIN32
 const char *kDefaultThemeDefaultFont = "Arial";
 #else
