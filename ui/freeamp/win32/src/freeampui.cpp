@@ -449,7 +449,7 @@ UserInterface()
 
     m_uiSemaphore = new Semaphore();
 
-    /*LEAK-2*/m_uiThread = Thread::CreateThread();
+    m_uiThread = Thread::CreateThread();
     m_uiThread->Create(ui_thread_function, this);
 
     m_uiSemaphore->Wait();
@@ -471,6 +471,9 @@ FreeAmpUI::
 
     if(m_prevSongInfoText)
         delete [] m_prevSongInfoText;
+
+    if(m_uiThread)
+        delete m_uiThread;
 }
 
 void 
