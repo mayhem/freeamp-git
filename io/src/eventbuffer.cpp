@@ -136,5 +136,5 @@ void EventBuffer::SetBytesInUse(uint32 iBytesInUse)
 
 int32 EventBuffer::GetBufferPercentage(void)
 {
-   return (100 * (m_iBytesInBuffer - m_iBytesInUse)) / m_iBufferSize;
+   return (100 * m_iBytesInBuffer) / m_iBufferSize;
 }
