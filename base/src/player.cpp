@@ -54,7 +54,6 @@ Player::Player() {
     m_eventServiceThread->Create(Player::EventServiceThreadFunc,this);
     //cout << "Started event thread" << endl;
     m_uiVector = new Vector<UIRef>();
-    m_uiDeathVector = new Vector<UIRef>();
     //cout << "Created vectors" << endl;
     m_uiManipLock = new Mutex();
     m_lmcMutex = new Mutex();
@@ -114,17 +113,15 @@ Player::~Player() {
     // Delete CIOs
     //cout << "Player: deleting CIOs" << endl;
     if (m_uiVector) {
-        //cio_vector->DeleteAll();
+	for(int i=0;i<m_uiVector->NumElements();i++) {
+	    m_uiVector->ElementAt(i)->Cleanup(m_uiVector->ElementAt(i));
+	}
+        m_uiVector->DeleteAll();
         delete m_uiVector;
         m_uiVector = NULL;
     }
 
-    // NEED TO FIX: MEMORY LEAK!!!!! Iterate and call UIRef->Cleanup() before DeleteAll()???
-    if (m_uiDeathVector) {
-        m_uiDeathVector->DeleteAll();
-        delete m_uiDeathVector;
-        m_uiDeathVector = NULL;
-    }
+
     //cout << "Player: deleting CIO/COO manipulation lock" << endl;
     if (m_uiManipLock) {
         delete m_uiManipLock;
@@ -612,12 +609,6 @@ int32 Player::ServiceEvent(Event *pC) {
 	    case INFO_ReadyToDieUI: {
 		if (!m_imQuitting) 
 		    return 0;
-		
-		if (pC->GetArgument()) {
-		    UIRef pUI = (UIRef)(pC->GetArgument());
-		    //printf("having %x killed(COO)\n",pCOO);
-		    m_uiDeathVector->Insert(pUI);
-		}
 		
 		m_quitWaitingFor--;
 		

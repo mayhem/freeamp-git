@@ -91,7 +91,6 @@ class Player {
                                              // their "Ready To Die" infos.
     int32                   m_imQuitting;
     Vector<UIRef>*          m_uiVector;
-    Vector<UIRef>*          m_uiDeathVector;
     
     Mutex*                  m_uiManipLock;
     Mutex*                  m_lmcMutex;

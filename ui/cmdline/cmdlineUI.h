@@ -20,25 +20,32 @@
 	
 	$Id$
 ____________________________________________________________________________*/
+// CommandLineCIO.h
 
-// CommandLineCOO.h
 
-
-#ifndef _COMMANDLINECOO_H_
-#define _COMMANDLINECOO_H_
+#ifndef _COMMANDLINECIO_H_
+#define _COMMANDLINECIO_H_
 
 #include "ctrlobj.h"
 #include "event.h"
+#include "thread.h"
+#include "playlist.h"
 
-class CommandLineCOO : public COO {
+class cmdlineUI : public UserInterface {
  public:
-    CommandLineCOO();
-    virtual int32 acceptCOOEvent(Event *);
-    virtual void setArgs(int, char **);
-    ~CommandLineCOO();
+    cmdlineUI();
+    virtual int32 AcceptEvent(Event *);
+    virtual void SetArgs(int argc, char **argv);
+    virtual void SetRef(UIRef uir) { return; }
+    virtual void SetTarget(EventQueueRef eqr) { m_playerEQ = eqr; }
+    static void keyboardServiceFunction(void *);
+    virtual ~cmdlineUI();
  private:
-
+    EventQueueRef m_playerEQ;
+    void processSwitch(char *);
+    Thread *keyboardListenThread;
+    PlayList *mypl;
 };
 
 
-#endif // _COMMANDLINECOO_H_
+#endif // _COMMANDLINECIO_H_

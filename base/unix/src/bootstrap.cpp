@@ -38,7 +38,7 @@ void testVector();
 void testHashTable();
 
 bool CompareName(const char *p1, const char *p2) {
-    cout << "Comparing " << p1 << " to " << p2 << endl;
+    //cout << "Comparing " << p1 << " to " << p2 << endl;
     int32 i=0; int32 j=0;
     if(!p1 ||!p2) return false;
     while ((p1[i] == p2[j]) && p1[i] && p2[j]) {

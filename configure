@@ -1686,7 +1686,7 @@ trap 'rm -fr `echo "Makefile base/Makefile base/src/Makefile io/Makefile
 	  io/local/Makefile ui/cmdline/Makefile lmc/Makefile lmc/xingmp3/Makefile
 	  lmc/xingmp3/src/Makefile lmc/src/Makefile io/src/Makefile ui/src/Makefile
 	  io/soundcard/Makefile io/soundcard/unix/Makefile io/soundcard/unix/linux/Makefile
-	  io/soundcard/unix/linux/src/Makefile base/unix/src/Makefile
+	  io/soundcard/unix/linux/src/Makefile base/unix/src/Makefile ui/mpg123/Makefile
  config/config.h" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
 cat >> $CONFIG_STATUS <<EOF
@@ -1802,7 +1802,7 @@ CONFIG_FILES=\${CONFIG_FILES-"Makefile base/Makefile base/src/Makefile io/Makefi
 	  io/local/Makefile ui/cmdline/Makefile lmc/Makefile lmc/xingmp3/Makefile
 	  lmc/xingmp3/src/Makefile lmc/src/Makefile io/src/Makefile ui/src/Makefile
 	  io/soundcard/Makefile io/soundcard/unix/Makefile io/soundcard/unix/linux/Makefile
-	  io/soundcard/unix/linux/src/Makefile base/unix/src/Makefile
+	  io/soundcard/unix/linux/src/Makefile base/unix/src/Makefile ui/mpg123/Makefile
 "}
 EOF
 cat >> $CONFIG_STATUS <<\EOF

@@ -77,7 +77,7 @@ target_os = @target_os@
 @AM_HAVE_WIN32_TRUE@FILES = 
 @AM_HAVE_WIN32_TRUE@MYLIBS = 
 @AM_HAVE_WIN32_TRUE@TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
-@AM_HAVE_WIN32_FALSE@FILES = Mpg123UI.cpp
+@AM_HAVE_WIN32_FALSE@FILES = cmdlineUI.cpp
 @AM_HAVE_WIN32_FALSE@MYLIBS = libfauicmdline.a
 @AM_HAVE_WIN32_FALSE@TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
 
@@ -100,7 +100,7 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 libfauicmdline_a_LIBADD = 
 @AM_HAVE_WIN32_TRUE@cond0libfauicmdline_a_OBJECTS = 
-@AM_HAVE_WIN32_FALSE@cond1libfauicmdline_a_OBJECTS =  Mpg123UI.o
+@AM_HAVE_WIN32_FALSE@cond1libfauicmdline_a_OBJECTS =  cmdlineUI.o
 libfauicmdline_a_OBJECTS =  $(cond0libfauicmdline_a_OBJECTS) \
 $(cond1libfauicmdline_a_OBJECTS)
 AR = ar
@@ -113,7 +113,7 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP = --best
-DEP_FILES =  .deps/Mpg123UI.P
+DEP_FILES =  .deps/cmdlineUI.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 SOURCES = $(libfauicmdline_a_SOURCES)
 OBJECTS = $(libfauicmdline_a_OBJECTS)
@@ -303,11 +303,11 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 include @top_srcdir@/config/Makefile.header
 
-all-local: mpg123-local
+all-local: cmdline-local
 
-mpg123-local: Mpg123UI.o
-	gcc -shared -Wl,-soname,mpg123-@target_os@.ui -o mpg123-@target_os@.ui Mpg123UI.o
-	cp mpg123-@target_os@.ui @top_srcdir@/ui
+cmdline-local: cmdlineUI.o
+	gcc -shared -Wl,-soname,freeamp-@target_os@.ui -o freeamp-@target_os@.ui cmdlineUI.o
+	cp freeamp-@target_os@.ui @top_srcdir@/ui
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

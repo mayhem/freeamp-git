@@ -22,5 +22,5 @@
 ##
 ############################################################################
 
-SUBDIRS = cmdline dummy src
+SUBDIRS = cmdline dummy src mpg123
 
