@@ -49,7 +49,7 @@ public:
     
     virtual Error Init(OutputInfo* info);
     virtual Error Reset(bool user_stop);
-    virtual int32 Write(void*,int32);
+    virtual Error Write(int32&,void*,int32);
     virtual Error Pause();
     virtual Error Resume();
     

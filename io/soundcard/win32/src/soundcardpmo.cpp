@@ -59,8 +59,8 @@ MCICallBack(HWAVEOUT hwo,
 			//cerr << "Releasing: WAVHDR #" << lpWaveHdr->dwUser << endl;
 			lpWaveHdr->dwUser = 0;
 			ReleaseSemaphore(MCISemaphore, 1, NULL);
+            break;
 		}
-      break;
 	}
 }
 
@@ -88,12 +88,13 @@ SoundCardPMO::
     if(m_initialized)
 	{
         char* buf = new char [m_data_size];
+        int32 wrote;
 
         memset(buf, 0x00, m_data_size);
 
         //for(int32 i = 0; i < 5; i++)
        // {
-            Write(buf, m_data_size);
+            Write(wrote, buf, m_data_size);
         //}
 
         delete [] buf;
@@ -217,10 +218,12 @@ Reset(bool user_stop)
 	return result;
 }
 
-int32 
+Error 
 SoundCardPMO::
-Write(void *pBuffer,int32 length) 
+Write(int32& wrote, void *pBuffer,int32 length) 
 {
+    Error result = kError_NoErr;
+
 	//cerr << "WriteThis: " << length << " bytes" << endl;
 	WaitForSingleObject(MCISemaphore, 10000);
 
@@ -229,7 +232,10 @@ Write(void *pBuffer,int32 length)
 	wavhdr = NextHeader();
 
 	if(length > (int32)m_data_size)
+    {
 		length = m_data_size;
+        result = kError_UnknownErr;
+    }
 
 	wavhdr->dwBufferLength = length;
 	memcpy(wavhdr->lpData, pBuffer, length);
@@ -239,7 +245,8 @@ Write(void *pBuffer,int32 length)
 	waveOutWrite(m_hwo, wavhdr, m_hdr_size);
 	
 	//cerr << "Wrote: " << length << " bytes" << endl;
-    return length;
+    wrote = length;
+    return result;
 }
 
 WAVEHDR* 
