@@ -32,7 +32,7 @@ ____________________________________________________________________________*/
 class PlayListItem {
  public:
     char url[512];
-    int type;
+    int32 type;
 };
 
 class PlayList {

@@ -30,7 +30,7 @@ ____________________________________________________________________________*/
 #include <iostream.h>
 
 /* project headers */
-#include <config.h>
+#include "config.h"
 #include "xinglmc.h"
 #include "event.h"
 #include "eventdata.h"

@@ -35,7 +35,9 @@ portable version
 #include <stdio.h>
 #include <float.h>
 #include <math.h>
-//#include <io.h>
+#ifdef WIN32
+#include <io.h>
+#endif
 #include "port.h"
 
 typedef struct

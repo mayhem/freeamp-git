@@ -262,7 +262,7 @@ WriteThis(void *pBuffer,int32 length)
 
 	wavhdr = NextHeader();
 
-	if(length > m_data_size)
+	if(length > (int32)m_data_size)
 		length = m_data_size;
 
 	wavhdr->dwBufferLength = length;

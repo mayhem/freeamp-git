@@ -58,17 +58,21 @@ public:
  private:
 	void wave_swap();
 
+	WAVEHDR* NextHeader();
+
 private:
 	WAVEFORMATEX*	m_wfex;
 	LPWAVEHDR*		m_wavehdr_array;
 	HWAVEOUT		m_hwo;
 
+	uint32			m_index;
 	uint32			m_buffer[MAXCHANNELS];
 	uint32			m_channels;
 	uint32			m_buffer_count;
 	uint32			m_hdr_size;
 	uint32			m_fillup;
 	uint32			m_data_size;
+	uint32			m_num_headers;
 	bool			m_user_stop;
 	bool			m_initialized;
 
