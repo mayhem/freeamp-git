@@ -248,6 +248,31 @@ AcceptEvent(Event* event)
 				break; 
             }
 
+            case INFO_PlaylistItemsUpdated:
+            {
+               PlaylistItemsUpdatedEvent *pInfo =
+                  (PlaylistItemsUpdatedEvent *)e;
+      
+               vector<PlaylistItem*>::const_iterator i = 
+                          pInfo->Items()->begin();
+               for(; i != pInfo->Items()->end(); i++)
+               {
+                  if((*i) == m_context->plm->GetCurrentItem())
+                  {
+                      UpdateMetaData(*i);
+                      break;
+                  }
+               }
+            
+               break;
+            }
+            case INFO_PlaylistCurrentItemInfo:
+            {
+               if (m_context->plm->GetCurrentIndex() != kInvalidIndex)
+                   UpdateMetaData(m_context->plm->GetCurrentItem());
+                     break;
+            }
+
             case INFO_StreamInfo:
             { 
                 StreamInfoEvent *info = (StreamInfoEvent*)event;
@@ -278,6 +303,33 @@ AcceptEvent(Event* event)
     } 
 
     return result;
+}
+
+void ToolbarUI::UpdateMetaData(const PlaylistItem *pItem)
+{
+    bool bEnable;
+    string oTitle("");
+
+    if (pItem->GetMetaData().Title().length() > 0 ||
+        pItem->GetMetaData().Artist().length() > 0)
+    {
+        oTitle = pItem->GetMetaData().Title();
+        if (pItem->GetMetaData().Artist().length() > 0)
+           oTitle += string(" - ") + pItem->GetMetaData().Artist();
+    }   
+    else
+    {
+        string url;
+        char path[MAX_PATH];
+        uint32 len = MAX_PATH;
+
+        url = pItem->URL();
+        URLToFilePath(url.c_str(), path, len);
+        oTitle = string(path);
+    }
+
+    oTitle = string(BRANDING": ") + oTitle;
+    SetTrayTooltip(m_oTitle.c_str());
 }
 
 void ToolbarUI::SetupToolIcon(void)

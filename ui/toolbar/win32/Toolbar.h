@@ -72,6 +72,7 @@ class ToolbarUI : public UserInterface
     void AddTrayIcon();
     void RemoveTrayIcon();
     void SetTrayTooltip(char *str);
+    void UpdateMetaData(const PlaylistItem *pItem);
 
  private:
 
