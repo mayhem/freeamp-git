@@ -157,7 +157,7 @@ Error Headlines::Download(void)
     string oPage;
     Error  eRet;
     Http   oDownload(m_pContext);
-    vector<string>::iterator i;
+    //vector<string>::iterator i;
 
     m_pContext->target->AcceptEvent(new StatusMessageEvent("Downloading headlines..."));
     eRet = oDownload.DownloadToString(m_oInfo.m_oUrl, oPage);

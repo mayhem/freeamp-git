@@ -445,7 +445,8 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
             AddToolbarButtons(useTextLabels, useImages);
             UpdateButtonStates();
 
-            if(TreeView_GetChild(m_hMusicView, m_hPortableItem) != NULL)
+            if(m_hPortableItem && 
+               TreeView_GetChild(m_hMusicView, m_hPortableItem) != NULL)
             {    
                 FillPortables();
             }
