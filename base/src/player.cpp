@@ -66,7 +66,7 @@ EventQueue() {
     //cout << "Created mutex" << endl;
     m_imQuitting = 0;
     m_quitWaitingFor = 0;
-    m_plm = NULL;
+    m_plm = new PlayListManager();
     m_playerState = STATE_Stopped;
 
     m_lmcRegistry = NULL;
