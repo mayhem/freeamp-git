@@ -43,7 +43,7 @@ class BitmapView : public View {
                 DIB* maskBitmap = NULL,
                 int32 command = -1);
 
-    ~BitmapView();
+    virtual ~BitmapView();
 
     // Tell the view to render itself into a bitmap
     virtual void Draw(DIB* canvas, RECT* invalidRect);

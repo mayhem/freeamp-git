@@ -67,7 +67,7 @@ class TextView : public View {
 
     virtual void Invoke(void);
 
-    void SetText(char* text);
+    void SetText(const char* text);
     char* Text(void) const { return m_text; }
 
 

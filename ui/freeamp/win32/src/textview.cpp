@@ -232,7 +232,7 @@ Invoke()
 
 void 
 TextView::
-SetText(char* text)
+SetText(const char* text)
 {
     assert(text);
 

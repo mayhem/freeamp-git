@@ -54,7 +54,28 @@ ____________________________________________________________________________*/
 #define TIMER_MOUSE_POSITION    0
 #define TIMER_SEEK_POSITION     1
 #define TIMER_VOLUME_POSITION   2
+#define TIMER_SHOW_STATUS_INFO  3
 
+#define kMenuStayOnTop  666
+
+const char* kAudioFileFilter =
+            "MPEG Audio Streams (.mpg, .mp1, .mp2, .mp3, .mpp)\0"
+            "*.mpg;*.mp1;*.mp2;*.mp3;*.mpp\0"
+            "Playlists (.m3u)\0"
+            "*.m3u\0"
+            "All Files (*.*)\0"
+            "*.*\0";
+
+const char* kOpenAudioFileTitle = "Open Audio File";
+
+const char* kPlaylistFileFilter =
+            "Playlists (.m3u)\0"
+            "*.m3u\0"
+            "All Files (*.*)\0"
+            "*.*\0";
+
+const char* kOpenPlaylistFileTitle = "Open Playlist File";
+const char* kSavePlaylistFileTitle = "Save Playlist File";
 
 HINSTANCE g_hinst = NULL;
 
@@ -154,6 +175,12 @@ MainWndProc(HWND hwnd,
 
             break;
         }
+
+        case WM_INITMENUPOPUP:
+            ui->InitMenuPopup(  (HMENU) wParam,
+                                (uint32)LOWORD(lParam),
+                                (HIWORD(lParam) != 0));
+            break;
 
         case WM_SETCURSOR:
             SetCursor(ui->Cursor());
@@ -354,6 +381,8 @@ UserInterface()
     m_currentFrame      = 0;
     m_seekFrame         = 0;
 
+    m_prevSongInfoText = NULL;
+
     m_state = STATE_Stopped;
 
     for(int32 i = 0; i < kNumControls; i++)
@@ -377,6 +406,8 @@ FreeAmpUI::
 {
     DeleteBitmaps();
     DeleteRegions();
+
+    //DeleteControls();
 
     if(m_viewList)
     {
@@ -489,6 +520,65 @@ KeyDown(int32 keyCode)
             break;
     }
 
+}
+
+void 
+FreeAmpUI::
+InitMenuPopup(HMENU menuHandle, 
+              uint32 position, 
+              bool systemMenu)
+{
+    /*if(systemMenu)
+    {
+        MENUITEMINFO mii;
+        uint32 state = 0;
+        Preferences prefs;
+        bool stayOnTop;
+        char szStayOnTop[] = "Stay On Top";
+        char buffer[256];
+
+        prefs.GetStayOnTop(&stayOnTop);
+
+        GetMenuString(  menuHandle, 
+                        0, 
+                        buffer, 
+                        sizeof(buffer), 
+                        MF_BYPOSITION);
+
+        if(strcmp(buffer, szStayOnTop))
+        {
+            mii.cbSize = sizeof(MENUITEMINFO);
+            mii.fMask = MIIM_TYPE;
+            mii.fType = MFT_SEPARATOR;
+
+            InsertMenuItem( menuHandle, 
+                            0, 
+                            TRUE, 
+                            &mii);
+
+            mii.cbSize = sizeof(MENUITEMINFO);
+            mii.fMask = MIIM_TYPE|MIIM_STATE|MIIM_ID ;
+            mii.fType = MFT_STRING;
+            mii.fState = (stayOnTop ? MFS_CHECKED : MFS_UNCHECKED);
+            mii.dwTypeData = szStayOnTop;
+            mii.cch = strlen(szStayOnTop);
+            mii.wID = kMenuStayOnTop;
+
+            InsertMenuItem( menuHandle, 
+                            0, 
+                            TRUE,
+                            &mii);
+        }
+
+        mii.cbSize = sizeof(MENUITEMINFO);
+        mii.fMask = MIIM_STATE;
+        mii.fState = (stayOnTop ? MFS_CHECKED : MFS_UNCHECKED);
+
+        SetMenuItemInfo(menuHandle, 
+                        0, 
+                        TRUE, 
+                        &mii);
+    }*/
 }
 
 void 
@@ -622,15 +712,12 @@ Command(int32 command,
         case kAddControl:
         {
             List<char*> fileList;
-            char fileFilter[] =
-            "MPEG Audio Streams (.mpg, .mp1, .mp2, .mp3, .mpp)\0"
-            "*.mpg;*.mp1;*.mp2;*.mp3;*.mpp\0"
-            "Playlists (.m3u)\0"
-            "*.m3u\0"
-            "All Files (*.*)\0"
-            "*.*\0";
+            
 
-            if(FileOpenDialog(m_hwnd, &fileList, fileFilter))
+            if(FileOpenDialog(  m_hwnd, 
+                                kOpenAudioFileTitle,
+                                kAudioFileFilter,
+                                &fileList))
             {
                 AddFileListToPlayList(&fileList);
             }
@@ -647,16 +734,23 @@ Command(int32 command,
         case kSaveControl:
         {
             char file[MAX_PATH + 1];
-            char fileFilter[] =
-            "Playlists (.m3u)\0"
-            "*.m3u\0"
-            "All Files (*.*)\0"
-            "*.*\0";
+            
             uint32 size = sizeof(file);
 
-            if(FileSaveDialog(m_hwnd, file, &size, fileFilter))
+            if(FileSaveDialog(  m_hwnd,
+                                kSavePlaylistFileTitle,
+                                kPlaylistFileFilter,
+                                file, 
+                                &size))
             {
-               m_plm->ExportAsM3U(file);
+                if(strcmp(file, kSaveToRio))
+                {
+                    m_plm->ExportToM3U(file);
+                }
+                else
+                {
+                    m_plm->ExportToRio();
+                }
             }
            
             break;
@@ -665,15 +759,11 @@ Command(int32 command,
         case kLoadControl:
         {
             List<char*> fileList;
-            char fileFilter[] =
-            "Playlists (.m3u)\0"
-            "*.m3u\0"
-            "MPEG Audio Streams (.mpg, .mp1, .mp2, .mp3, .mpp)\0"
-            "*.mpg;*.mp1;*.mp2;*.mp3;*.mpp\0"
-            "All Files (*.*)\0"
-            "*.*\0";
-
-            if(FileOpenDialog(m_hwnd, &fileList, fileFilter))
+           
+            if(FileOpenDialog(  m_hwnd,
+                                kOpenPlaylistFileTitle,
+                                kPlaylistFileFilter,
+                                &fileList))
             {
                 m_plm->MakeEmpty();
 
@@ -688,7 +778,10 @@ Command(int32 command,
 		{
             List<char*> fileList;
 
-			if(OpenSong(&fileList))
+			if(FileOpenDialog(  m_hwnd, 
+                                kOpenAudioFileTitle,
+                                kAudioFileFilter,
+                                &fileList))
 			{
                 m_plm->MakeEmpty();
 
@@ -812,6 +905,12 @@ Command(int32 command,
             TimeView* view = (TimeView*)source;
 
             view->ToggleDisplay();
+            break;
+        }
+
+        case kMenuStayOnTop:
+        {
+            //OutputDebugString("StayOnTop\r\n");
             break;
         }
     }
@@ -1047,6 +1146,15 @@ Timer(int32 timerID)
 {
     switch(timerID)
     {
+        case TIMER_SHOW_STATUS_INFO:
+        {
+            if(m_prevSongInfoText)
+                m_songTitleView->SetText(m_prevSongInfoText);
+
+            KillTimer(m_hwnd, TIMER_SHOW_STATUS_INFO);
+            break;
+        }
+
         case TIMER_MOUSE_POSITION:
         {
             bool pointInWindow;
@@ -1466,6 +1574,9 @@ CreateControls()
 
 	m_songTitleView->SetText("Welcome to FreeAmp");
 
+    m_prevSongInfoText = new char [strlen(m_songTitleView->Text() + 1)];
+    strcpy(m_prevSongInfoText, m_songTitleView->Text());
+
     /*LEAK*/m_timeView = new TimeView(  m_hwnd, 
                                 m_backgroundView, 
                                 m_controlRegions[kSongInfoControl], 
@@ -1878,7 +1989,7 @@ CreateTooltips()
                                 CW_USEDEFAULT, 
                                 CW_USEDEFAULT, 
                                 CW_USEDEFAULT, 
-                                NULL, 
+                                m_hwnd, 
                                 (HMENU) NULL, 
                                 hinst, 
                                 NULL);
@@ -2025,6 +2136,48 @@ DeleteBitmaps()
 
 void 
 FreeAmpUI::
+DeleteControls()
+{
+    delete m_backgroundView;
+
+    delete m_playView;
+    delete m_stopView;
+    delete m_pauseView;
+    delete m_nextView;
+    delete m_lastView;
+
+    delete m_modeView;
+    delete m_minimizeView;
+    delete m_closeView;
+    delete m_repeatView;
+    delete m_shuffleView;
+    delete m_openView;
+    delete m_volumeView;
+    delete m_seekView;
+
+    delete m_shuffleIconView;
+    delete m_repeatIconView;
+    delete m_repeatAllIconView;
+
+    delete m_songTitleView;
+    delete m_timeView;
+    delete m_volumeInfoView;
+
+    delete m_drawerView;
+    delete m_panelBackingView;
+
+    delete m_playlistView;
+
+    delete m_scrollbarView;
+
+    delete m_addView;
+    delete m_deleteView;
+    delete m_saveView;
+    delete m_loadView;
+}
+
+void 
+FreeAmpUI::
 DeleteRegions()
 {
     
@@ -2144,6 +2297,12 @@ AcceptEvent(Event* event)
 
                     m_songTitleView->SetText(foo);
 
+                    if(m_prevSongInfoText)
+                        delete m_prevSongInfoText;
+
+                    m_prevSongInfoText = new char [strlen(m_songTitleView->Text() + 1)];
+                    strcpy(m_prevSongInfoText, m_songTitleView->Text());
+
                     char title[256] = "FreeAmp - ";
 
                     strncat(title, m_songTitleView->Text(), sizeof(title) - strlen(title));
@@ -2176,6 +2335,12 @@ AcceptEvent(Event* event)
 				{
 					m_songTitleView->SetText(info->m_filename);
 				}
+
+                if(m_prevSongInfoText)
+                        delete m_prevSongInfoText;
+
+                m_prevSongInfoText = new char [strlen(m_songTitleView->Text() + 1)];
+                strcpy(m_prevSongInfoText, m_songTitleView->Text());
 
                 strncat(title, m_songTitleView->Text(), sizeof(title) - strlen(title));
 
@@ -2257,6 +2422,15 @@ AcceptEvent(Event* event)
                 m_timeView->SetCurrentTime(0,0,0);
                 m_currentFrame = 0;
                 SetWindowText(m_hwnd, "FreeAmp");
+                break;
+            }
+
+            case INFO_StatusMessage:
+            {
+                StatusMessageEvent* statusEvent = (StatusMessageEvent*)event;
+                KillTimer(m_hwnd, TIMER_SHOW_STATUS_INFO);
+                SetTimer(m_hwnd, TIMER_SHOW_STATUS_INFO, 5000, NULL);
+                m_songTitleView->SetText(statusEvent->GetStatusMessage());
                 break;
             }
 
@@ -2458,114 +2632,6 @@ UpdatePlayList()
 
         }
     }
-}
-
-static
-BOOL
-CALLBACK
-OpenSongDialogProc( HWND hwnd, 
-                    UINT msg, 
-                    WPARAM wParam, 
-                    LPARAM lParam )
-{
-    BOOL result = FALSE;
-    static List<char*>* fileList = NULL;
-    switch (msg)
-    {
-        case WM_INITDIALOG:
-        {
-            // When we create the dlg we pass in a pointer to our
-            // OpenSongStruct...
-            // Tuck away the pointer in a safe place
-            
-            fileList = (List<char*>*)lParam;
-          
-            break;
-        }
-
-        case WM_COMMAND:
-        {
-            switch(wParam)
-            {
-                case IDC_BROWSE:
-                {            
-                    char fileFilter[] =
-                    "MPEG Audio Streams (.mpg, .mp1, .mp2, .mp3, .mpp)\0"
-                    "*.mpg;*.mp1;*.mp2;*.mp3;*.mpp\0"
-                    "Playlists (.m3u)\0"
-                    "*.m3u\0"
-                    "All Files (*.*)\0"
-                    "*.*\0";
-
-                    ShowWindow(hwnd, SW_HIDE);
-
-                    if(FileOpenDialog(hwnd, fileList, fileFilter))
-                    {
-                        EndDialog(hwnd, TRUE);
-                    }
-                    else
-                    {
-                        ShowWindow(hwnd, SW_SHOW);
-                    }
-
-                    break;
-                }
-
-                case IDOK:
-                {         
-                    char url[2048];
-
-                    if(GetDlgItemText(  hwnd,
-                                        IDC_URL,
-                                        url,
-                                        sizeof(url)))
-                    {
-                        char* foo = new char[strlen(url) + 1];
-
-                        strcpy(foo, url);
-
-                        fileList->AddItem(foo);
-
-                        EndDialog(hwnd, TRUE);
-                    }
-                    else
-                    {
-                        EndDialog(hwnd, FALSE);
-                    }
-
-                    break;
-                }
-
-                case IDCANCEL:
-                {            
-                    EndDialog(hwnd, FALSE);
-                    break;
-                }
-            }
-            break;
-        }
-    }
-
-    return result;
-}
-
-bool
-FreeAmpUI::
-OpenSong(List<char*>* fileList)
-{
-    bool result = false;
-    HINSTANCE hinst = (HINSTANCE)GetWindowLong(m_hwnd, GWL_HINSTANCE);
-
-    if(DialogBoxParam(  hinst, 
-                        MAKEINTRESOURCE(IDD_OPENSONG), 
-                        m_hwnd,
-                        OpenSongDialogProc,
-                        (LPARAM)fileList))
-    {
-        result = true;
-    }
-
-    return result;
 }
 
 void

@@ -1361,6 +1361,7 @@ int32 Player::ServiceEvent(Event * pC)
            return ReadyToDieUI(pC);
 
       case INFO_UserMessage:
+      case INFO_StatusMessage:
            UserMessage(pC);
            break;
 

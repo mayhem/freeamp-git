@@ -25,11 +25,18 @@ ____________________________________________________________________________*/
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <sys/stat.h>
+
 
 #include "playlist.h"
 #include "event.h"
 #include "eventdata.h"
 #include "mutex.h"
+#include "thread.h"
+#include "win32thread.h"
+
+#include "std.h"
+#include "rio.h"
 
 PlayListManager::
 PlayListManager(EventQueue * pPlayer)
@@ -919,7 +926,6 @@ ExpandM3U(char *szM3UFile, List<char *> &MP3List)
 
 		 if (strlen(szLine))
 		 {
-			 //LEAK
 			 szMP3 = new char[strlen(szLine) + 1];
 			 strcpy(szMP3, szLine);
 			 MP3List.AddItem(szMP3);
@@ -934,7 +940,7 @@ ExpandM3U(char *szM3UFile, List<char *> &MP3List)
 
 Error
 PlayListManager::
-ExportAsM3U(const char* file)
+ExportToM3U(const char* file)
 {
     Error result = kError_FileNotFound;
     FILE* fp;
@@ -956,4 +962,142 @@ ExportAsM3U(const char* file)
     }
 
 	return result;
+}
+
+Error
+PlayListManager::
+ExportToRio()
+{
+    Error result = kError_NoErr;
+    
+    Thread::CreateThread()->Create(rio_thread_function, this);
+
+	return result;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// return file size
+static long GetFileSize( char* pszPathFile )
+{
+	long lReturn = 0;
+
+	FILE* fpFile = fopen( pszPathFile, "rb" );
+	if ( fpFile )
+	{
+		struct stat sStat;
+		if ( !stat(pszPathFile, &sStat) )
+			lReturn = sStat.st_size;
+
+		fclose( fpFile );
+	}
+
+	return lReturn;
+}
+
+
+BOOL
+PlayListManager:: 
+ProgressCallBack( int pos, int count)
+{
+    char foo[1024];
+    int32 percentDone = (100 * pos)/count;
+    sprintf(foo, "%d%% - %s", percentDone, m_txSong);
+    m_target->AcceptEvent(new StatusMessageEvent(foo));
+    return TRUE;
+}
+
+BOOL
+PlayListManager:: 
+progress_call_back( int pos, int count, void* cookie)
+{
+    PlayListManager* plm = (PlayListManager*)cookie;
+
+	return plm->ProgressCallBack(pos, count);
+}
+
+void
+PlayListManager::
+RioThreadFunction()
+{
+    int32 ports[] = { 0x378, 0x278, 0x03BC };
+    bool rioPresent = false;
+
+    CRio* rio = new CRio;
+
+    // try to find the rio
+
+    m_target->AcceptEvent(new StatusMessageEvent("Searching for Rio..."));
+
+    for(int32 count = 0; count < sizeof(ports); count++)
+    {
+        if(rio->Set(ports[count]) && rio->CheckPresent())
+        {
+            rioPresent = true;
+            break;
+        }
+    }
+
+    if(rioPresent)
+    {
+        m_target->AcceptEvent(new StatusMessageEvent("Rio found!"));
+
+        if(rio->RxDirectory())
+        {
+            rio->RemoveAllFiles();
+
+            rio->TxDirectory();
+
+            CDirBlock& cDirBlock = rio->GetDirectoryBlock();
+	        CDirHeader& cDirHeader = cDirBlock.m_cDirHeader;
+            int32 lSizeAvailable = (int32)cDirHeader.m_usCount32KBlockAvailable * CRIO_SIZE_32KBLOCK;
+	        int32 lSizeCurrent = (int32)cDirHeader.m_usCount32KBlockUsed * CRIO_SIZE_32KBLOCK;
+	        int32 iCountEntryCurrent = cDirHeader.m_usCountEntry;
+            
+            int32 i = 0;
+            PlayListItem* item = NULL;
+
+            while(item = m_list->ItemAt(i++))
+            {
+                // get file size
+		        int32 lSize = GetFileSize( item->URL() );
+
+                // check space
+		        lSizeCurrent += lSize;
+
+                if( lSizeCurrent > lSizeAvailable )
+                {
+                    break;
+                }
+
+                // check enough entries
+		        ++iCountEntryCurrent;
+
+                if( iCountEntryCurrent > CRIO_MAX_DIRENTRY )
+                {
+                    break;
+                }
+
+                m_txSong = item->StringForPlayerToDisplay();
+
+                char foo[1024];
+                sprintf(foo, "0%% - %s", m_txSong);
+                m_target->AcceptEvent(new StatusMessageEvent(foo));
+                
+                rio->TxFile(item->URL(), progress_call_back, this);
+            }
+
+            rio->TxDirectory();
+        }
+    }
+
+    delete rio;
+}
+
+void 
+PlayListManager::
+rio_thread_function(void* arg)
+{
+    PlayListManager* plm = (PlayListManager*)arg;
+
+    plm->RioThreadFunction();
 }

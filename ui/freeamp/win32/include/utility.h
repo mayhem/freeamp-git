@@ -33,6 +33,8 @@ ____________________________________________________________________________*/
 #include "list.h"
 #include "dib.h"
 
+extern const char* kSaveToRio;
+
 HRGN
 DetermineRegion(DIB* bitmap, 
 			    Color* color);
@@ -43,14 +45,16 @@ DetermineControlRegions(DIB* bitmap,
 			            Color controlColors[],
                         int32 numControls);
 
-bool FileOpenDialog(HWND hwndParent, 
-                    List<char*>* fileList,
-                    char* filter);
+bool FileOpenDialog(HWND hwnd, 
+                    const char* filter,
+                    const char* title,
+                    List<char*>* fileList);
 
-bool FileSaveDialog(HWND hwndParent, 
-                    char* buffer,
-                    uint32* bufferLength,
-                    char* filter);
+bool FileSaveDialog(HWND hwnd, 
+                    const char* filter,
+                    const char* title,
+                    char* path,
+                    uint32* pathLength);
 
 
 #endif /* _UTILITY_H_ */

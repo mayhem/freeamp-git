@@ -122,6 +122,10 @@ SOURCE=..\..\src\registrar.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\io\rio\rio.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\src\thread.cpp
 # End Source File
 # Begin Source File

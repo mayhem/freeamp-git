@@ -106,6 +106,7 @@ class EventQueue {
 
 #define CMD_PLMGetMediaTitle      45 // sent by PlayListManager to player to get title about a particular playlistitem
 
+#define INFO_StatusMessage      46 // sent to UIs so they can display status info
 #endif // _EVENT_H_
 
 

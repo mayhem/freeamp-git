@@ -58,8 +58,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
-               ..\..\..\..\base\win32\prj\plugins
+                                 ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
+                ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
@@ -91,8 +91,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
-               ..\..\..\..\base\win32\prj\plugins
+                                 ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
+                ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
@@ -190,6 +190,10 @@ SOURCE=..\..\..\..\base\win32\src\preferences.cpp
 # Begin Source File
 
 SOURCE=..\src\renderer.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\io\rio\rio.cpp
 # End Source File
 # Begin Source File
 

@@ -25,6 +25,10 @@ NULL=
 NULL=nul
 !ENDIF 
 
+CPP=cl.exe
+MTL=midl.exe
+RSC=rc.exe
+
 !IF  "$(CFG)" == "simple - Win32 Release"
 
 OUTDIR=.\Release
@@ -50,6 +54,7 @@ CLEAN :
 	-@erase "$(INTDIR)\about.obj"
 	-@erase "$(INTDIR)\mutex.obj"
 	-@erase "$(INTDIR)\playlist.obj"
+	-@erase "$(INTDIR)\rio.obj"
 	-@erase "$(INTDIR)\semaphore.obj"
 	-@erase "$(INTDIR)\simple.res"
 	-@erase "$(INTDIR)\simpleui.obj"
@@ -63,7 +68,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\res" /I "..\include" /I\
  "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I\
  "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I\
@@ -72,40 +76,7 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\res" /I "..\include" /I\
  /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\simple.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\simple.bsc" 
@@ -123,6 +94,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\about.obj" \
 	"$(INTDIR)\mutex.obj" \
 	"$(INTDIR)\playlist.obj" \
+	"$(INTDIR)\rio.obj" \
 	"$(INTDIR)\semaphore.obj" \
 	"$(INTDIR)\simple.res" \
 	"$(INTDIR)\simpleui.obj" \
@@ -144,8 +116,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "xing - Win32 Release" "soundcard - Win32 Release"\
  "fileinput - Win32 Release" ".\simple.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                     ..\..\..\..\base\win32\prj\plugins
-	copy simple.ui       ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                       ..\..\..\..\base\win32\prj\plugins
+	copy simple.ui         ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "simple - Win32 Debug"
@@ -173,6 +145,7 @@ CLEAN :
 	-@erase "$(INTDIR)\about.obj"
 	-@erase "$(INTDIR)\mutex.obj"
 	-@erase "$(INTDIR)\playlist.obj"
+	-@erase "$(INTDIR)\rio.obj"
 	-@erase "$(INTDIR)\semaphore.obj"
 	-@erase "$(INTDIR)\simple.res"
 	-@erase "$(INTDIR)\simpleui.obj"
@@ -189,7 +162,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\res" /I "..\include" /I\
  "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I\
  "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I\
@@ -198,6 +170,51 @@ CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\res" /I "..\include" /I\
  /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
+MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
+RSC_PROJ=/l 0x409 /fo"$(INTDIR)\simple.res" /d "_DEBUG" 
+BSC32=bscmake.exe
+BSC32_FLAGS=/nologo /o"$(OUTDIR)\simple.bsc" 
+BSC32_SBRS= \
+	
+LINK32=link.exe
+LINK32_FLAGS=comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
+ comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
+ odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /incremental:yes\
+ /pdb:"$(OUTDIR)\simple.pdb" /debug /machine:I386 /def:".\simpleui.def"\
+ /out:"simple.ui" /implib:"$(OUTDIR)\simple.lib" /pdbtype:sept 
+DEF_FILE= \
+	".\simpleui.def"
+LINK32_OBJS= \
+	"$(INTDIR)\about.obj" \
+	"$(INTDIR)\mutex.obj" \
+	"$(INTDIR)\playlist.obj" \
+	"$(INTDIR)\rio.obj" \
+	"$(INTDIR)\semaphore.obj" \
+	"$(INTDIR)\simple.res" \
+	"$(INTDIR)\simpleui.obj" \
+	"$(INTDIR)\thread.obj" \
+	"$(INTDIR)\win32thread.obj" \
+	"..\..\..\..\io\local\win32\prj\Debug\fileinput.lib" \
+	"..\..\..\..\io\soundcard\win32\prj\Debug\soundcard.lib" \
+	"..\..\..\..\lmc\xingmp3\win32\prj\Debug\xing.lib"
+
+".\simple.ui" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+    $(LINK32) @<<
+  $(LINK32_FLAGS) $(LINK32_OBJS)
+<<
+
+SOURCE=$(InputPath)
+DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
+
+ALL : $(DS_POSTBUILD_DEP)
+
+$(DS_POSTBUILD_DEP) : "xing - Win32 Debug" "soundcard - Win32 Debug"\
+ "fileinput - Win32 Debug" ".\simple.ui"
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                       ..\..\..\..\base\win32\prj\plugins
+	copy simple.ui         ..\..\..\..\base\win32\prj\plugins
+	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
+
+!ENDIF 
 
 .c{$(CPP_OBJS)}.obj::
    $(CPP) @<<
@@ -229,53 +246,6 @@ CPP_SBRS=.
    $(CPP_PROJ) $< 
 <<
 
-MTL=midl.exe
-MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
-RSC_PROJ=/l 0x409 /fo"$(INTDIR)\simple.res" /d "_DEBUG" 
-BSC32=bscmake.exe
-BSC32_FLAGS=/nologo /o"$(OUTDIR)\simple.bsc" 
-BSC32_SBRS= \
-	
-LINK32=link.exe
-LINK32_FLAGS=comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
- comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
- odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /incremental:yes\
- /pdb:"$(OUTDIR)\simple.pdb" /debug /machine:I386 /def:".\simpleui.def"\
- /out:"simple.ui" /implib:"$(OUTDIR)\simple.lib" /pdbtype:sept 
-DEF_FILE= \
-	".\simpleui.def"
-LINK32_OBJS= \
-	"$(INTDIR)\about.obj" \
-	"$(INTDIR)\mutex.obj" \
-	"$(INTDIR)\playlist.obj" \
-	"$(INTDIR)\semaphore.obj" \
-	"$(INTDIR)\simple.res" \
-	"$(INTDIR)\simpleui.obj" \
-	"$(INTDIR)\thread.obj" \
-	"$(INTDIR)\win32thread.obj" \
-	"..\..\..\..\io\local\win32\prj\Debug\fileinput.lib" \
-	"..\..\..\..\io\soundcard\win32\prj\Debug\soundcard.lib" \
-	"..\..\..\..\lmc\xingmp3\win32\prj\Debug\xing.lib"
-
-".\simple.ui" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
-    $(LINK32) @<<
-  $(LINK32_FLAGS) $(LINK32_OBJS)
-<<
-
-SOURCE=$(InputPath)
-DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
-
-ALL : $(DS_POSTBUILD_DEP)
-
-$(DS_POSTBUILD_DEP) : "xing - Win32 Debug" "soundcard - Win32 Debug"\
- "fileinput - Win32 Debug" ".\simple.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                     ..\..\..\..\base\win32\prj\plugins
-	copy simple.ui       ..\..\..\..\base\win32\prj\plugins
-	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
-
-!ENDIF 
-
 
 !IF "$(CFG)" == "simple - Win32 Release" || "$(CFG)" == "simple - Win32 Debug"
 SOURCE=..\src\about.cpp
@@ -294,14 +264,14 @@ SOURCE=..\..\..\..\config\config.win32
 
 InputPath=..\..\..\..\config\config.win32
 
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ELSEIF  "$(CFG)" == "simple - Win32 Debug"
 
 InputPath=..\..\..\..\config\config.win32
 
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ENDIF 
@@ -324,14 +294,20 @@ DEP_CPP_PLAYL=\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
 	"..\..\..\..\base\include\id3v1.h"\
+	"..\..\..\..\base\include\list.h"\
+	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\registry.h"\
-	"..\..\..\..\base\include\vector.h"\
+	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\win32thread.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\io\include\pmi.h"\
-	"..\..\..\..\io\include\pmo.h"\
-	"..\..\..\..\lmc\include\lmc.h"\
+	"..\..\..\..\io\include\rio.h"\
+	"..\..\..\..\io\include\std.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"\
@@ -346,18 +322,53 @@ DEP_CPP_PLAYL=\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
 	"..\..\..\..\base\include\id3v1.h"\
+	"..\..\..\..\base\include\list.h"\
+	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\registry.h"\
-	"..\..\..\..\base\include\vector.h"\
+	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\win32thread.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\io\include\pmi.h"\
-	"..\..\..\..\io\include\pmo.h"\
-	"..\..\..\..\lmc\include\lmc.h"\
+	"..\..\..\..\io\include\rio.h"\
+	"..\..\..\..\io\include\std.h"\
 	
 
 "$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"\
  "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
+SOURCE=..\..\..\..\io\rio\rio.cpp
+
+!IF  "$(CFG)" == "simple - Win32 Release"
+
+DEP_CPP_RIO_C=\
+	"..\..\..\..\io\include\binary.h"\
+	"..\..\..\..\io\include\rio.h"\
+	"..\..\..\..\io\include\rioioctl.h"\
+	"..\..\..\..\io\include\std.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
+	
+
+"$(INTDIR)\rio.obj" : $(SOURCE) $(DEP_CPP_RIO_C) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "simple - Win32 Debug"
+
+DEP_CPP_RIO_C=\
+	"..\..\..\..\io\include\binary.h"\
+	"..\..\..\..\io\include\rio.h"\
+	"..\..\..\..\io\include\std.h"\
+	
+
+"$(INTDIR)\rio.obj" : $(SOURCE) $(DEP_CPP_RIO_C) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -381,17 +392,17 @@ DEP_CPP_SIMPL=\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
 	"..\..\..\..\base\include\id3v1.h"\
+	"..\..\..\..\base\include\list.h"\
+	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\queue.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\include\vector.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\io\include\pmi.h"\
-	"..\..\..\..\io\include\pmo.h"\
-	"..\..\..\..\lmc\include\lmc.h"\
 	"..\..\..\include\ui.h"\
 	"..\include\about.h"\
 	"..\include\simpleui.h"\
@@ -409,17 +420,17 @@ DEP_CPP_SIMPL=\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
 	"..\..\..\..\base\include\id3v1.h"\
+	"..\..\..\..\base\include\list.h"\
+	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\queue.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\include\vector.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\io\include\pmi.h"\
-	"..\..\..\..\io\include\pmo.h"\
-	"..\..\..\..\lmc\include\lmc.h"\
 	"..\..\..\include\ui.h"\
 	"..\include\about.h"\
 	"..\include\simpleui.h"\
@@ -433,6 +444,25 @@ DEP_CPP_SIMPL=\
 !ENDIF 
 
 SOURCE=..\..\..\..\base\src\thread.cpp
+
+!IF  "$(CFG)" == "simple - Win32 Release"
+
+DEP_CPP_THREA=\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\win32\include\win32thread.h"\
+	"..\..\..\..\config\config.h"\
+	
+NODEP_CPP_THREA=\
+	"..\..\..\..\base\src\linuxthread.h"\
+	
+
+"$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "simple - Win32 Debug"
+
 DEP_CPP_THREA=\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\win32thread.h"\
@@ -444,35 +474,19 @@ DEP_CPP_THREA=\
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
-SOURCE=..\..\..\..\base\win32\src\win32thread.cpp
-
-!IF  "$(CFG)" == "simple - Win32 Release"
-
-DEP_CPP_WIN32=\
-	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\win32thread.h"\
-	"..\..\..\..\config\config.h"\
-	
-
-"$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "simple - Win32 Debug"
-
-DEP_CPP_WIN32=\
-	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\win32thread.h"\
-	"..\..\..\..\config\config.h"\
-	
-
-"$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
 !ENDIF 
+
+SOURCE=..\..\..\..\base\win32\src\win32thread.cpp
+DEP_CPP_WIN32=\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\win32\include\win32thread.h"\
+	"..\..\..\..\config\config.h"\
+	
+
+"$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
 
 SOURCE=..\res\simple.rc
 DEP_RSC_SIMPLE=\

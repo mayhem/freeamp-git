@@ -25,18 +25,23 @@ ____________________________________________________________________________*/
 
 #include "preferences.h"
 
-
+// location
 const HKEY  kMainKey = HKEY_CURRENT_USER;
 const char* kPrefsKey = "SOFTWARE\\FreeAmp\\FreeAmp v1.2";
 const char* kFreeAmpKey = "SOFTWARE\\FreeAmp";
 const char* kFreeAmpVersionKey = "FreeAmp v1.2";
+
+// preferences
 const char* kInstallDirPref = "InstallDirectory";
 const char* kUIPref = "UI";
 const char* kPMOPref = "PMO";
 const char* kOpenSaveDirPref = "OpenSaveDirectory";
+const char* kStayOnTopPref = "StayOnTop";
 
+// default values
 const char* kDefaultUI = "freeamp.ui";
 const char* kDefaultPMO = "soundcard.pmo";
+const bool  kDefaultStayOnTop = false;
 
 
 Preferences::
@@ -157,6 +162,9 @@ Initialize()
             // set default open/save dlg path value
             SetPrefString(kOpenSaveDirPref, cwd);
 
+            // set default for window staying on top
+            SetPrefBoolean(kStayOnTopPref, kDefaultStayOnTop);
+
              error = kError_NoErr;
         }
         else
@@ -228,6 +236,20 @@ SetOpenSaveDirectory(char* path)
     return SetPrefString(kOpenSaveDirPref, path);
 }
 
+Error 
+Preferences::
+GetStayOnTop(bool* value)
+{
+    return GetPrefBoolean(kStayOnTopPref, value);
+}
+
+Error 
+Preferences::
+SetStayOnTop(bool value)
+{
+    return SetPrefBoolean(kStayOnTopPref, value);
+}
+
 Error
 Preferences::
 GetPrefString(const char* pref, char* buf, uint32* len)
@@ -236,7 +258,7 @@ GetPrefString(const char* pref, char* buf, uint32* len)
 	DWORD   type;
 	LONG    result;
 
-    if(!buf || !len)
+    if(!buf || !len || !pref)
     {
         error = kError_InvalidParam;
         return error;
@@ -274,7 +296,7 @@ SetPrefString(const char* pref, const char* buf)
     Error   error = kError_UnknownErr;
 	LONG    result;
 
-    if(!buf)
+    if(!buf || !pref)
     {
         error = kError_InvalidParam;
         return error;
@@ -289,6 +311,84 @@ SetPrefString(const char* pref, const char* buf)
                                 REG_SZ, 
                                 (LPBYTE)buf, 
                                 strlen(buf) + 1);
+
+        if(result == ERROR_SUCCESS)
+            error = kError_NoErr;
+    }
+    else
+    {
+        error = kError_NoPrefs;
+    }
+  
+    return error;
+}
+
+Error 
+Preferences::
+GetPrefBoolean(const char* pref, bool* value)
+{
+    Error   error = kError_UnknownErr;
+	DWORD   type;
+	LONG    result;
+    DWORD   buf = 0;
+    DWORD   len = sizeof(DWORD);
+
+    if(!value || !pref)
+    {
+        error = kError_InvalidParam;
+        return error;
+    }
+
+	if(m_prefsKey)
+	{
+		result = RegQueryValueEx(   m_prefsKey,
+                                    pref, 
+                                    NULL, 
+                                    &type, 
+                                    (LPBYTE)&buf, 
+                                    (DWORD*)&len);
+
+        if(result == ERROR_SUCCESS)
+        {
+            error = kError_NoErr;
+
+            *value = (buf == 0 ? false : true);
+        }
+        else if(result == ERROR_MORE_DATA)
+            error = kError_BufferTooSmall;    
+    }
+    else
+    {
+        error = kError_NoPrefs;
+    }
+  
+    return error;
+}
+
+Error
+Preferences:: 
+SetPrefBoolean(const char* pref, bool value)
+{
+    Error   error = kError_UnknownErr;
+	LONG    result;
+    DWORD   buf = (value ? 1 : 0);
+
+    if(!pref)
+    {
+        error = kError_InvalidParam;
+        return error;
+    }
+
+
+	if(m_prefsKey)
+	{
+		// set install directory value
+        result = RegSetValueEx( m_prefsKey,
+                                pref, 
+                                NULL, 
+                                REG_DWORD , 
+                                (LPBYTE)&buf, 
+                                sizeof(DWORD));
 
         if(result == ERROR_SUCCESS)
             error = kError_NoErr;

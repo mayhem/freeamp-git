@@ -34,6 +34,8 @@ ____________________________________________________________________________*/
 #include "utility.h"
 #include "preferences.h"
 
+const char* kSaveToRio = "<<< Save To Rio >>>";
+
 HRGN
 DetermineRegion(DIB* bitmap, 
 			    Color* color)
@@ -203,15 +205,83 @@ DetermineControlRegions(DIB* bitmap,
     delete [] regionColors;
 }
 
+                        
+static
+UINT 
+APIENTRY 
+OpenFileHookProc(   HWND hwnd, 
+                    UINT msg, 
+                    WPARAM wParam, 
+                    LPARAM lParam)
+{
+    UINT result = 0;
+    static OPENFILENAME* ofn = NULL;
+
+    switch(msg)
+    {
+        case WM_INITDIALOG:
+        {
+            ofn = (OPENFILENAME*)lParam;
+
+            break;
+        }
+
+        case WM_COMMAND:
+        {
+            switch(wParam)
+            {
+                case IDC_OPEN_URL:
+                {
+                    if(GetDlgItemText(  hwnd,
+                                        IDC_URL,
+                                        ofn->lpstrFile,
+                                        ofn->nMaxFile))
+                    {
+                        PostMessage(GetParent(hwnd), 
+                                    WM_COMMAND, 
+                                    IDCANCEL,
+                                    0);
+
+                        ofn->lCustData = 1;
+                    }
+                    
+                    result = 1;
+                    break;
+                }
+            }
+
+            break;
+        }
+
+        case WM_NOTIFY:
+        {
+            OFNOTIFY* notify = (OFNOTIFY*)lParam;
+
+            switch(notify->hdr.code)
+            {
+                case CDN_FILEOK:
+                {
+                    
+                    break;
+                }
+            }
+
+            break;
+        }
+    }
+
+    return result;
+}
+
 bool 
-FileOpenDialog(HWND hwndParent, 
-               List<char*>* fileList,
-               char* filter)
+FileOpenDialog(HWND hwnd, 
+               const char* title,
+               const char* filter,
+               List<char*>* fileList)
 {
     bool result = false;
     Preferences prefs;
     OPENFILENAME ofn;
-    char szTitle[] = "Open Audio File";
     char szInitialDir[MAX_PATH + 1];
     uint32 initialDirSize = sizeof(szInitialDir);
     const int32 kBufferSize = MAX_PATH * 128;
@@ -223,8 +293,8 @@ FileOpenDialog(HWND hwndParent,
 
     // Setup open file dialog box structure
     ofn.lStructSize       = sizeof(OPENFILENAME);
-    ofn.hwndOwner         = hwndParent;
-    ofn.hInstance         = (HINSTANCE)GetWindowLong(hwndParent, 
+    ofn.hwndOwner         = hwnd;
+    ofn.hInstance         = (HINSTANCE)GetWindowLong(hwnd, 
                                                      GWL_HINSTANCE);
     ofn.lpstrFilter       = filter;
     ofn.lpstrCustomFilter = NULL;
@@ -235,47 +305,60 @@ FileOpenDialog(HWND hwndParent,
     ofn.lpstrFileTitle    = NULL;
     ofn.nMaxFileTitle     = 0;
     ofn.lpstrInitialDir   = szInitialDir;
-    ofn.lpstrTitle        = szTitle;
+    ofn.lpstrTitle        = title;
     ofn.Flags             = OFN_FILEMUSTEXIST | 
 					        OFN_PATHMUSTEXIST |
   	     			        OFN_HIDEREADONLY | 
 					        OFN_ALLOWMULTISELECT |
-					        OFN_EXPLORER;
+					        OFN_EXPLORER |
+                            OFN_ENABLEHOOK |
+                            OFN_ENABLETEMPLATE;
     ofn.nFileOffset       = 0;
     ofn.nFileExtension    = 0;
     ofn.lpstrDefExt       = "MP3";
     ofn.lCustData         = 0;
-    ofn.lpfnHook          = NULL;
-    ofn.lpTemplateName    = NULL;
+    ofn.lpfnHook          = OpenFileHookProc;
+    ofn.lpTemplateName    = MAKEINTRESOURCE(IDD_OPENURL);
 
-    if(GetOpenFileName(&ofn))
+    if(GetOpenFileName(&ofn) || ofn.lCustData)
     {
         char file[MAX_PATH + 1];
         char* cp = NULL;
 
-        strncpy(file, fileBuffer, ofn.nFileOffset);
-
-        if(*(fileBuffer + ofn.nFileOffset - 1) != DIR_MARKER)
-            strcat(file, DIR_MARKER_STR);
-
-        cp = fileBuffer + ofn.nFileOffset;
-
-        while(*cp)
+        if(ofn.lCustData) // URL
         {
-	        strcpy(file + ofn.nFileOffset, cp);
+            char* foo = new char[strlen(fileBuffer) + 1];
 
-            char* foo = new char[strlen(file) + 1];
-
-            strcpy(foo, file);
+            strcpy(foo, fileBuffer);
 
             fileList->AddItem(foo);
-
-	        cp += strlen(cp) + 1;
         }
+        else // potential list of files
+        {
+            strncpy(file, fileBuffer, ofn.nFileOffset);
 
-        *(fileBuffer + ofn.nFileOffset - 1) = 0x00;
+            if(*(fileBuffer + ofn.nFileOffset - 1) != DIR_MARKER)
+                strcat(file, DIR_MARKER_STR);
 
-        prefs.SetOpenSaveDirectory(fileBuffer);
+            cp = fileBuffer + ofn.nFileOffset;
+
+            while(*cp)
+            {
+	            strcpy(file + ofn.nFileOffset, cp);
+
+                char* foo = new char[strlen(file) + 1];
+
+                strcpy(foo, file);
+
+                fileList->AddItem(foo);
+
+	            cp += strlen(cp) + 1;
+            }
+
+            *(fileBuffer + ofn.nFileOffset - 1) = 0x00;
+
+            prefs.SetOpenSaveDirectory(fileBuffer);
+        }
 
         result = true;
     }
@@ -285,28 +368,89 @@ FileOpenDialog(HWND hwndParent,
     return result;
 }
 
+static
+UINT 
+APIENTRY 
+SaveFileHookProc(   HWND hwnd, 
+                    UINT msg, 
+                    WPARAM wParam, 
+                    LPARAM lParam)
+{
+    UINT result = 0;
+    static OPENFILENAME* ofn = NULL;
+
+    switch(msg)
+    {
+        case WM_INITDIALOG:
+        {
+            ofn = (OPENFILENAME*)lParam;
+
+            break;
+        }
+
+        case WM_COMMAND:
+        {
+            switch(wParam)
+            {
+                case IDC_SAVE_RIO:
+                {
+                    PostMessage(GetParent(hwnd), 
+                                WM_COMMAND, 
+                                IDCANCEL,
+                                0);
+
+                    ofn->lCustData = 1;
+                    
+                    result = 1;
+                    break;
+                }
+            }
+
+            break;
+        }
+
+        case WM_NOTIFY:
+        {
+            OFNOTIFY* notify = (OFNOTIFY*)lParam;
+
+            switch(notify->hdr.code)
+            {
+                case CDN_FILEOK:
+                {
+                    
+                    break;
+                }
+            }
+
+            break;
+        }
+    }
+
+    return result;
+}
+
 bool 
-FileSaveDialog(HWND hwndParent, 
-               char* buffer,
-               uint32* bufferLength,
-               char* filter)
+FileSaveDialog(HWND hwnd, 
+               const char* filter,
+               const char* title,
+               char* path,
+               uint32* pathLength)
 {
     bool result = false;
     Preferences prefs;
     OPENFILENAME ofn;
-    char szTitle[] = "Save Playlist";
     char szInitialDir[MAX_PATH + 1];
     char szFile[MAX_PATH + 1] = {0x00};
     uint32 initialDirSize = sizeof(szInitialDir);
   
-    *buffer = 0x00;
+    *path = 0x00;
 
     prefs.GetOpenSaveDirectory(szInitialDir, &initialDirSize);
 
     // Setup open file dialog box structure
     ofn.lStructSize       = sizeof(OPENFILENAME);
-    ofn.hwndOwner         = hwndParent;
-    ofn.hInstance         = (HINSTANCE)GetWindowLong(hwndParent, 
+    ofn.hwndOwner         = hwnd;
+    ofn.hInstance         = (HINSTANCE)GetWindowLong(hwnd, 
                                                      GWL_HINSTANCE);
     ofn.lpstrFilter       = filter;
     ofn.lpstrCustomFilter = NULL;
@@ -317,32 +461,41 @@ FileSaveDialog(HWND hwndParent,
     ofn.lpstrFileTitle    = NULL;
     ofn.nMaxFileTitle     = 0;
     ofn.lpstrInitialDir   = szInitialDir;
-    ofn.lpstrTitle        = szTitle;
+    ofn.lpstrTitle        = title;
     ofn.Flags             = OFN_HIDEREADONLY | 
                             OFN_OVERWRITEPROMPT |
-					        OFN_EXPLORER;
+					        OFN_EXPLORER|
+                            OFN_ENABLEHOOK |
+                            OFN_ENABLETEMPLATE;
     ofn.nFileOffset       = 0;
     ofn.nFileExtension    = 0;
     ofn.lpstrDefExt       = "M3U";
     ofn.lCustData         = 0;
-    ofn.lpfnHook          = NULL;
-    ofn.lpTemplateName    = NULL;
+    ofn.lpfnHook          = SaveFileHookProc;
+    ofn.lpTemplateName    = MAKEINTRESOURCE(IDD_SAVERIO);;
 
-    if(GetSaveFileName(&ofn))
+    if(GetSaveFileName(&ofn) || ofn.lCustData)
     {
-        if(*bufferLength > strlen(szFile))
+        if(ofn.lCustData)
         {
-            strcpy(buffer, szFile);
-            result = true;
+            strcpy(path, kSaveToRio);
         }
         else
         {
-            *bufferLength = strlen(szFile) + 1;
+            if(*pathLength > strlen(szFile))
+            {
+                strcpy(path, szFile);
+                result = true;
+            }
+            else
+            {
+                *pathLength = strlen(szFile) + 1;
+            }
+
+            *(szFile + ofn.nFileOffset - 1) = 0x00;
+
+            prefs.SetOpenSaveDirectory(szFile);
         }
-
-        *(szFile + ofn.nFileOffset - 1) = 0x00;
-
-        prefs.SetOpenSaveDirectory(szFile);
 
         result = true;
     }

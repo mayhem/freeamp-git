@@ -39,6 +39,26 @@ BEGIN
     PUSHBUTTON      "&Browse...",IDC_BROWSE,213,5,40,12
 END
 
+IDD_OPENURL DIALOG FIXED IMPURE  0, 0, 280, 21
+STYLE DS_3DLOOK | DS_CONTROL | WS_CHILD | WS_CLIPSIBLINGS
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "",IDS_URL,"Static",SS_ETCHEDHORZ,-2,0,282,1
+    LTEXT           "URL:",IDS_URL,6,6,17,8
+    EDITTEXT        IDC_URL,29,4,188,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Open URL",IDC_OPEN_URL,222,3,50,13
+END
+
+IDD_SAVERIO DIALOG FIXED IMPURE  0, 0, 280, 29
+STYLE DS_3DLOOK | DS_CONTROL | WS_CHILD | WS_CLIPSIBLINGS
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,-2,0,282,1
+    PUSHBUTTON      "Save To Rio",IDC_SAVE_RIO,222,8,50,13
+    LTEXT           "NOTE: This is extremely ALPHA support for the Rio. Pressing the ""Save To Rio"" button will clear the current contents of your Rio and upload the playlist currently selected in FreeAmp. Use at your own risk!",
+                    IDC_STATIC,4,3,211,24
+END
+
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////

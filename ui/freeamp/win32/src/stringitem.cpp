@@ -146,6 +146,19 @@ SetText(char* text)
         }
 
         SetWidth(textLength);
+
+        if(IsSelected())
+        {
+           Renderer::Fill(  m_textBitmap,
+                            0, 
+                            0,     
+                            Width(),      
+                            Height(), 
+                            121,    
+                            131,
+                            153,
+                            100);
+        }
     }
 }
 

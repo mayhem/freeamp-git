@@ -318,7 +318,8 @@ class PlayListManager {
     const PlayListItem** Items() const;
 
     Error ExpandM3U(char *szM3UFile, List<char *> &MP3List);
-    Error ExportAsM3U(const char* file);
+    Error ExportToM3U(const char* file);
+    Error ExportToRio(void);
 
 
  protected:
@@ -336,6 +337,12 @@ class PlayListManager {
     inline void GetPLManipLock() { m_mutex->Acquire(WAIT_FOREVER); }
     inline void ReleasePLManipLock() { m_mutex->Release(); }
 
+    static void rio_thread_function(void*);
+    void RioThreadFunction();
+
+    static BOOL progress_call_back( int pos, int count, void* cookie);
+    BOOL ProgressCallBack( int pos, int count);
+
  private:
     
     EventQueue*			    m_target;
@@ -347,6 +354,8 @@ class PlayListManager {
     
     ShuffleMode             m_order;
     RepeatMode              m_repeat;
+
+    char*                   m_txSong;
 
     
 };

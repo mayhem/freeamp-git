@@ -51,9 +51,15 @@ class Preferences {
     Error GetOpenSaveDirectory(char* path, uint32* len);
     Error SetOpenSaveDirectory(char* path);
 
+    Error GetStayOnTop(bool* value);
+    Error SetStayOnTop(bool value);
+
  protected:
     Error GetPrefString(const char* pref, char* buf, uint32* len);
     Error SetPrefString(const char* pref, const char* buf);
+
+    Error GetPrefBoolean(const char* pref, bool* value);
+    Error SetPrefBoolean(const char* pref, bool value);
 
  private:
      HKEY   m_prefsKey;

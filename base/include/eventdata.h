@@ -60,6 +60,29 @@ class UserMessageEvent : public Event {
     }
 };
 
+class StatusMessageEvent : public Event {
+ private:
+    char *m_info;
+ public:
+    virtual ~StatusMessageEvent() { 
+	if (m_info) {
+	    delete m_info;
+	    m_info = NULL;
+	}
+    }
+    StatusMessageEvent() {
+	m_type = INFO_StatusMessage;
+	m_info = "";
+    }
+    StatusMessageEvent(const char *info) {
+	m_type = INFO_StatusMessage;
+	m_info = strdup(info);
+    }
+    const char *GetStatusMessage() {
+	return m_info;
+    }
+};
+
 class PlayListItem;
 class PLMGetMediaTitleEvent : public Event
 {
