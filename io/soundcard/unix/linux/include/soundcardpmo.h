@@ -47,9 +47,7 @@ public:
     
     virtual bool Init(OutputInfo* info);
     virtual bool Reset(bool user_stop);
-    virtual void Append(uint32 channel, int16 value);
-    virtual int32 Write();
-    virtual int32 WriteThis(void *,int32);
+    virtual int32 Write(void *,int32);
     virtual void Clear();
     
     

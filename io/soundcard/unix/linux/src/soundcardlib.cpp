@@ -62,7 +62,9 @@ int32 Write(PMORef ref, void* buf, int32 len)
 { 
     PhysicalMediaOutput* pmo = (PhysicalMediaOutput*)ref->ref;
 
-    return pmo->Write(buf, len);
+    int32 rtn = pmo->Write(buf, len);
+
+    return rtn;
 }
 
 void Clear(PMORef ref)

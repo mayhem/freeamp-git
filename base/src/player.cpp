@@ -287,7 +287,7 @@ bool Player::SetState(PlayerState ps) {
 
 int32 Player::ServiceEvent(Event *pC) {
     if (pC) {
-	cout << "Player: serviceEvent: servicing Event: " << pC->GetEvent() << endl;
+	//cout << "Player: serviceEvent: servicing Event: " << pC->GetEvent() << endl;
 	switch (pC->GetEvent()) {
 	    case INFO_DoneOutputting: {  // LMC or PMO sends this when its done outputting whatever.  Now, go on to next piece in playlist
                 if (SetState(STATE_Stopped)) {

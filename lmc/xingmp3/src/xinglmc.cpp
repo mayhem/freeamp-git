@@ -146,7 +146,9 @@ void XingLMC::Init() {
 	    info.number_of_channels = decinfo.channels;
 	    info.samples_per_second = decinfo.samprate;
 	    info.max_buffer_size = (info.number_of_channels * 2 * 1152) << 5;
+	    //cout << "about to send to output..." << endl;
 	    m_output->Init(m_output, &info);
+	    //cout << "back from the dead..." << endl;
 	} else {
 	    cout << "Couldn't init decoder..." << endl;
 	    return;

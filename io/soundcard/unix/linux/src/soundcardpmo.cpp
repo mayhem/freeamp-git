@@ -49,6 +49,7 @@ SoundCardPMO::SoundCardPMO() {
 	    exit(1);
 	}
     }
+    //cout << "Done creation of the SoundCardPMO..." << endl;
 }
 
 SoundCardPMO::~SoundCardPMO() {
@@ -77,6 +78,9 @@ bool SoundCardPMO::Init(OutputInfo* info) {
     if (!info) {
 	info = myInfo;
     }
+    
+    
+
     int fd = audio_fd;
     int flags;
     if ((flags = fcntl(fd,F_GETFL,0)) < 0) {
@@ -138,14 +142,7 @@ bool SoundCardPMO::Reset(bool user_stop) {
     }
 }
 
-void SoundCardPMO::Append(uint32 channel, int16 value) {
-
-    *bufferp[channel] = value;
-    bufferp[channel] += channels;
-}
-
-
-int32 SoundCardPMO::WriteThis(void *pBuffer,int32 length) {
+int32 SoundCardPMO::Write(void *pBuffer,int32 length) {
     int32 actual = 0;
     int32 actualThisTime = 0;
     int32 writeBlockLength = length / PIECES;
@@ -163,16 +160,6 @@ int32 SoundCardPMO::WriteThis(void *pBuffer,int32 length) {
     }
     return actual;
 }
-
-int32 SoundCardPMO::Write() {
-    int32 rtnval = WriteThis(buffer,(int)((char *)bufferp[0] - (char *)buffer));
-    if (rtnval >= 0) {
-	for (int i=0;i<channels;i++)
-	    bufferp[i] = buffer + i;
-    }
-    return rtnval;
-}
-
 
 void SoundCardPMO::Clear() { }
 

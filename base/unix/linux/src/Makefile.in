@@ -74,7 +74,7 @@ RANLIB = @RANLIB@
 VERSION = @VERSION@
 target_os = @target_os@
 
-@AM_HAVE_LINUX_TRUE@FILES = linuxthread.cpp mutex.cpp debug.cpp semaphore.cpp utility.cpp
+@AM_HAVE_LINUX_TRUE@FILES = linuxthread.cpp mutex.cpp debug.cpp semaphore.cpp utility.cpp mem.c
 @AM_HAVE_LINUX_TRUE@MYLIBS = libfasys.a
 @AM_HAVE_LINUX_FALSE@FILES = 
 @AM_HAVE_LINUX_FALSE@MYLIBS = 
@@ -99,12 +99,15 @@ LIBS = @LIBS@
 libfasys_a_LIBADD = 
 @AM_HAVE_LINUX_FALSE@cond0libfasys_a_OBJECTS = 
 @AM_HAVE_LINUX_TRUE@cond1libfasys_a_OBJECTS =  linuxthread.o mutex.o \
-@AM_HAVE_LINUX_TRUE@debug.o semaphore.o utility.o
+@AM_HAVE_LINUX_TRUE@debug.o semaphore.o utility.o mem.o
 libfasys_a_OBJECTS =  $(cond0libfasys_a_OBJECTS) \
 $(cond1libfasys_a_OBJECTS)
 AR = ar
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 CXXLINK = $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@
+CFLAGS = @CFLAGS@
+COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)
+LINK = $(CC) $(CFLAGS) $(LDFLAGS) -o $@
 DIST_COMMON =  Makefile.am Makefile.in
 
 
@@ -112,7 +115,7 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP = --best
-DEP_FILES =  .deps/debug.P .deps/linuxthread.P .deps/mutex.P \
+DEP_FILES =  .deps/debug.P .deps/linuxthread.P .deps/mem.P .deps/mutex.P \
 .deps/semaphore.P .deps/utility.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 SOURCES = $(libfasys_a_SOURCES)
