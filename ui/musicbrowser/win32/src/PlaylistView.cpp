@@ -1003,17 +1003,61 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
         {
             int idCtrl = wParam; 
             HD_NOTIFY* hdn = (HD_NOTIFY*) lParam; 
+            static int32 itemTrack = -1;
+            static int32 oldWidth = 0;
 
             if(hdn->hdr.code == HDN_BEGINTRACKW)
             {
-                if(hdn->iItem == 0)
+                if(hdn->iItem == 0 || hdn->iItem == 4)
                     return TRUE; 
+
+                oldWidth = ListView_GetColumnWidth(hwnd, hdn->iItem);
+
+                itemTrack = hdn->iItem;
+            }
+            else if(hdn->hdr.code == HDN_ITEMCHANGINGW)
+            {
+                if(hdn->pitem->mask & HDI_WIDTH)                    
+                {
+                    if(hdn->iItem == itemTrack)
+                    {
+                        int32 currentWidth = ListView_GetColumnWidth(hwnd, hdn->iItem);
+                        int32 nextHeaderWidth = ListView_GetColumnWidth(hwnd, hdn->iItem + 1);
+
+                        int32 headerResizeAmount = hdn->pitem->cxy - currentWidth;
+
+                        if(nextHeaderWidth - headerResizeAmount < 1)
+                        {
+                            return TRUE;
+                        }
+                    }
+                }
+            }
+            else if(hdn->hdr.code == HDN_ITEMCHANGEDW)
+            {
+                if(hdn->iItem == itemTrack)
+                {
+                    int32 newWidth = ListView_GetColumnWidth(hwnd, hdn->iItem);
+                    
+                    int32 headerResizeAmount = newWidth - oldWidth;
+
+                    int32 nextHeaderWidth = ListView_GetColumnWidth(hwnd, hdn->iItem + 1);
+
+                    nextHeaderWidth -= headerResizeAmount;
+
+                    ListView_SetColumnWidth(hwnd, hdn->iItem + 1, nextHeaderWidth);
+
+                    oldWidth = newWidth;
+                }
+            }
+            else if(hdn->hdr.code == HDN_ENDTRACKW)
+            {
+                itemTrack = -1;   
+                oldWidth = 0;
             }
 
             break;
         }
-
-        
     } 
 	
 	//  Pass all non-custom messages to old window proc
