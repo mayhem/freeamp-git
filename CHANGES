@@ -1,3 +1,14 @@
+Changes for Linux and Windows version 2.1.0 beta 9
+--------------------------------------------------------------------
+
+- Added support for changing the volume with the mouse wheel in windows.
+- The average vorbis bitrate is updated every 3 seconds.
+- Updated to the latest and greatest Vorbis code.
+- Added support for reading Vorbis metadata. No write support yet.
+- Fixed a bug where FreeAmp would keep playing some tracks indefinitely
+- Fixed a win32 bug where FreeAmp crashed when it loaded a playlist that
+  has a track missing.
+
 Changes for Linux and Windows version 2.1.0 beta 8
 --------------------------------------------------------------------
 
