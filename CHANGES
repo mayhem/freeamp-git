@@ -1,3 +1,12 @@
+Changes for Linux version 1.2.1:
+--------------------------------------------------------------------
+- Incorporated x86 assembly MP3 decoder optimizations from
+  "Jean-Michel HERVE" <tuo_stg@hotmail.com>
+
+- Added support for a preferences file in ~/.freeamp_prefs
+  The command-line properties are no longer supported.
+  See the README for more information.
+
 Changes for Windows version 1.2.1:
 --------------------------------------------------------------------
 - Fixed minimization bugs

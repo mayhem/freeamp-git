@@ -355,91 +355,92 @@ UnixPrefs()
     strcat(m_prefsFilePath, suffix);
 
     FILE *prefsFile = fopen(m_prefsFilePath, "r");
-    if (!prefsFile)
+    if (!prefsFile && errno != ENOENT)
     {
-	if (errno == ENOENT)
-	{
-	    SetDefaults();
-	    Save();
-	}
-	return;
+	fprintf(stderr, "Error opening %s: %s\n",
+		m_prefsFilePath, strerror(errno));
     }
 
-
-    UnixPrefEntry *entry = new UnixPrefEntry;
-    char buffer[1024];
-    char *p;
-    int lineNumber = 0;
-
-    while (fgets(buffer, sizeof(buffer) - 1, prefsFile))
+    if (prefsFile)
     {
-	lineNumber++;
+	UnixPrefEntry *entry = new UnixPrefEntry;
+	char buffer[1024];
+	char *p;
+	int lineNumber = 0;
 
-	p = buffer;
-	while (*p && isspace(*p))
-	    p++;
-
-	if (*p == '#')
+	while (fgets(buffer, sizeof(buffer) - 1, prefsFile))
 	{
-	    // No data on this line, skip to the end of the comment
-	    while (*p)
-		p++;
-	}
+	    lineNumber++;
 
-	if (p > buffer)
-	    AppendToString(&entry->prefix, buffer, p - buffer);
-
-	if (*p)
-	{
-	    char *end;
-	    char *out;
-	    int32 length;
-
-	    entry->key = ReadQuotableString(p, (const char **)&end, ":#");
-	    if (entry->key && !m_ht.Value(entry->key))
-		m_ht.Insert(entry->key, entry);
-	    else if (!m_errorLineNumber)
-		m_errorLineNumber = lineNumber;
-	    p = end;
-
-	    while (*p && isspace(*p))
-		p++;
-	    if (*p == ':')
-		p++;
-	    else if (!m_errorLineNumber)
-		m_errorLineNumber = lineNumber;
+	    p = buffer;
 	    while (*p && isspace(*p))
 		p++;
 
-	    AppendToString(&entry->separator, end, p - end);
-
-	    entry->value = ReadQuotableString(p, (const char **)&end, "#");
-	    if (!entry->value && !m_errorLineNumber)
-		m_errorLineNumber = lineNumber;
-	    p = end;
-
-	    length = strlen(p);
-	    if (p[length - 1] != '\n')
+	    if (*p == '#')
 	    {
-		p[length++] = '\n';
-		p[length] = '\0';
+		// No data on this line, skip to the end of the comment
+		    while (*p)
+			p++;
 	    }
-	    AppendToString(&entry->suffix, p, length);
 
-	    m_entries.AddItem(entry);
-	    entry = new UnixPrefEntry;
+	    if (p > buffer)
+		AppendToString(&entry->prefix, buffer, p - buffer);
+
+	    if (*p)
+	    {
+		char *end;
+		char *out;
+		int32 length;
+		
+		entry->key = ReadQuotableString(p, (const char **)&end, ":#");
+		if (entry->key && !m_ht.Value(entry->key))
+		    m_ht.Insert(entry->key, entry);
+		else if (!m_errorLineNumber)
+		    m_errorLineNumber = lineNumber;
+		p = end;
+		
+		while (*p && isspace(*p))
+		    p++;
+		if (*p == ':')
+		    p++;
+		else if (!m_errorLineNumber)
+		    m_errorLineNumber = lineNumber;
+		while (*p && isspace(*p))
+		    p++;
+		
+		AppendToString(&entry->separator, end, p - end);
+		
+		entry->value = ReadQuotableString(p, (const char **)&end, "#");
+		if (!entry->value && !m_errorLineNumber)
+		    m_errorLineNumber = lineNumber;
+		p = end;
+		
+		length = strlen(p);
+		if (p[length - 1] != '\n')
+		{
+		    p[length++] = '\n';
+		    p[length] = '\0';
+		}
+		AppendToString(&entry->suffix, p, length);
+		
+		m_entries.AddItem(entry);
+		entry = new UnixPrefEntry;
+	    }
 	}
+
+	if (entry->prefix)
+	    m_entries.AddItem(entry);
+	else
+	    delete entry;
+	
+	if (m_errorLineNumber)
+	    m_saveEnable = false;
+	
+	fclose(prefsFile);
     }
 
-    if (entry->prefix)
-	m_entries.AddItem(entry);
-    else
-	delete entry;
-
-    if (m_errorLineNumber)
-	m_saveEnable = false;
-
-    fclose(prefsFile);
+    SetDefaults();
+    Save();
 
     // Test(this);
 }
@@ -456,23 +457,38 @@ Error
 UnixPrefs::
 SetDefaults()
 {
+    char buf[1024];
+    uint32 size;
+
     // set install directory value
-    SetPrefString(kInstallDirPref, UNIX_LIBDIR);
+    size = sizeof(buf);
+    if (GetPrefString(kInstallDirPref, buf, &size) == kError_NoPrefs)
+	SetPrefString(kInstallDirPref, UNIX_LIBDIR);
 
     // set default freeamp library path value
-    SetPrefString(kLibraryPathPref, kDefaultLibraryPath);
+    size = sizeof(buf);
+    if (GetPrefString(kLibraryPathPref, buf, &size) == kError_NoPrefs)
+	SetPrefString(kLibraryPathPref, kDefaultLibraryPath);
     
     // set default ui value
-    SetPrefString(kUIPref, kDefaultUI);
+    size = sizeof(buf);
+    if (GetPrefString(kUIPref, buf, &size) == kError_NoPrefs)
+	SetPrefString(kUIPref, kDefaultUI);
     
     // set default text ui value
-    SetPrefString(kTextUIPref, kDefaultTextUI);
+    size = sizeof(buf);
+    if (GetPrefString(kTextUIPref, buf, &size) == kError_NoPrefs)
+	SetPrefString(kTextUIPref, kDefaultTextUI);
     
     // set default pmo value
-    SetPrefString(kPMOPref, kDefaultPMO);
+    size = sizeof(buf);
+    if (GetPrefString(kPMOPref, buf, &size) == kError_NoPrefs)
+	SetPrefString(kPMOPref, kDefaultPMO);
 
     // set default ALSA device
-    SetPrefString(kALSADevicePref, kDefaultALSADevice);
+    size = sizeof(buf);
+    if (GetPrefString(kALSADevicePref, buf, &size) == kError_NoPrefs)
+	SetPrefString(kALSADevicePref, kDefaultALSADevice);
     
     Preferences::SetDefaults();
 }
@@ -583,14 +599,14 @@ GetPrefString(const char* pref, char* buf, uint32* len)
     int32 index;
 
     m_mutex.Acquire();
-	
+
     buf[0] = '\0';
     entry = m_ht.Value(pref);
     if (!entry || !entry->value)
     {
 	*len = 0;
 	m_mutex.Release();
-	return kError_NoErr;	// XXX: Should this return an error?
+	return kError_NoPrefs;
     }
 
     char *value = entry->value;

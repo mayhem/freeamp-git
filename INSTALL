@@ -2,6 +2,11 @@ The installation of FreeAmp is fairly straight forward.
 
 
 Linux:
+	You'll need perl and nasm in order to compile the latest MP3
+	decoder assembly optimizations.  If you don't have nasm, you can
+	still compile successfully, but you'll only be able to use some of
+	the older optimizations written in gas.
+
 	Under Linux you must first build the binary:
 
 	./configure

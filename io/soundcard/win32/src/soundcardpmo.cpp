@@ -156,18 +156,15 @@ Error SoundCardPMO::Init(OutputInfo * info)
 {
    Error     result = kError_UnknownErr;
    MMRESULT  mmresult = 0;
-   int       iNewSize = iDefaultBufferSize;
+   int32     iNewSize = iDefaultBufferSize;
    PropValue *pProp;
 
    m_channels = info->number_of_channels;
    m_samples_per_second = info->samples_per_second;
    m_data_size = info->max_buffer_size;
 
-   m_propManager->GetProperty("OutputBuffer", &pProp);
-   if (pProp)
-   {
-       iNewSize = atoi(((StringPropValue *)pProp)->GetString()) * 1024;
-   }
+   m_context->prefs->GetOutputBufferSize(&iNewSize);
+   iNewSize *= 1024;
 
    iNewSize -= iNewSize % m_data_size;
    result = Resize(iNewSize, 0, m_data_size);

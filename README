@@ -52,33 +52,56 @@ FreeAmp 1.2 for Win32:
   * just under the display is the playlist drawer, click it to access playlist functions
 
 
-FreeAmp version 1.20 for Linux:
+FreeAmp version 1.2.1 for Linux:
 
-freeamp [-ui <UI plugin name>] [-prop <PropertyName>=<PropertyValue>]
-        <MP3 file/stream> [MP3 file/stream] ...
-
-The following properties can be set:
-
-  InputBuffer      - the size (in Kb) of the input buffer
-  OutputBuffer     - the size (in Kb) of the output buffer
-  BufferUpInterval - how many seconds to buffer up for streaming
-  Logging          - a value of 'yes' turns on logging
-  LoggingInput     - a value of 'yes' logs input events
-  LoggingDecode    - a value of 'yes' logs decode events
+freeamp [-ui <UI plugin name>] <MP3 file/stream> [MP3 file/stream] ...
 
 Example command line:
-
-   freeamp -prop OutputBuffer=256 mysong1.mp3 mysong2.mp3
+   freeamp -ui freeamp-linux mysong1.mp3 mysong2.mp3
 
 Notes:
 
-  * The default output buffer size is set to 512Kb. If you have a machine
-    that is not using X, or you are constrained in the amount of memory
-    you have, you can specify a smaller output buffer like:
+  * The preferences, including values which used to be set on the command
+    line using "-prop", are stored in ~/.freeamp_prefs
 
-       freeamp -prop OutputBuffer=<size>
+    This file will be created with default values the first time you
+    run freeamp.  Whitespace and comments starting with "#" are
+    ignored.  Otherwise, each line is of the form "<key>: <value>".
+    Both keys and values may be within double-quotes if needed.
+    Within quoted strings, backslash prefixes special characters.  The
+    following escapes are possible: "\n", "\t", "\\", "\"", as well as
+    backslash followed by 3 octal digits.  Any character other than
+    NUL is allowed.
 
-    Where size is in kbytes.
+    The default values are as follows:
+
+         InstallDirectory: /usr/local/lib
+         LibraryPath: .:~/.freeamp:/usr/local/lib/freeamp
+         UI: freeamp-linux.ui
+         TextUI: freeampcmd-linux.ui
+         PMO: soundcard-linux.pmo
+         ALSADevice: 1:0
+         InputBufferSize: 64
+         OutputBufferSize: 512
+         StreamBufferInterval: 3
+         DecoderThreadPriority: 1
+         UseDebugLog: false
+         LogMain: false
+         LogDecode: false
+         LogInput: false
+         LogOutput: false
+         LogPerformance: false
+
+  * If no "-ui" parameters are specified on the command-line, the
+    "UI" preference will be used if you're running X (ie, if the
+    DISPLAY environment variable is set).  Otherwise, the "TextUI"
+    preference will be used.  This means that you can now successfully
+    run freeamp in text mode without specifying a "-ui" option.
+
+  * The default output buffer size is set to 512Kb. If you have a
+    machine that is not using X, or you are constrained in the amount
+    of memory you have, specify a lower buffer size by editing the
+    .freeamp_prefs file.
 
   * To play an SHOUTcast/http stream, specify the HTTP URL on the
     command line. For example:
@@ -90,12 +113,12 @@ Notes:
 
        freeamp rtp://225.2.1.5:4420    
 
-  * FreeAmp looks for the plugin directory in:
-   - the current directory, then
-   - ~/.freeamp, then
-   - /usr/local/lib/freeamp
-   _or_
-   in the path specified by the environment variable FREEAMP_PATH
+  * FreeAmp looks for the plugin directory using the "LibraryPath"
+    preference, unless overridden by the FREEAMP_PATH environment
+    variable.  The default path is:
+       - the current directory, then
+       - ~/.freeamp, then
+       - /usr/local/lib/freeamp
   
   * at the moment, the only way to modify the playlist in Linux is via 
     the command line when FreeAmp is started (playlist modification will

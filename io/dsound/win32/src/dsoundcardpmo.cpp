@@ -261,7 +261,7 @@ Init(OutputInfo* info)
   HRESULT       hResult;
   DSBUFFERDESC  DSBufferInfo;
   Error         result  = kError_UnknownErr;
-  int           iNewSize = iDefaultBufferSize;
+  int32         iNewSize = iDefaultBufferSize;
   PropValue     *pProp;
 
   if ((m_bDSEnumFailed) || (m_nNbDSDevices == 0) || (m_pDSDevices == NULL))
@@ -276,11 +276,9 @@ Init(OutputInfo* info)
     m_hMainWndHandle = (HWND) atoi(((StringPropValue *)pProp)->GetString());
   }
 
-  m_propManager->GetProperty("OutputBuffer", &pProp);
-  if (pProp)
-  {
-    iNewSize = atoi(((StringPropValue *)pProp)->GetString()) * 1024;
-  }
+  m_context->prefs->GetOutputBufferSize(&iNewSize);
+  iNewSize *= 1024;
+
   iNewSize -= iNewSize % m_data_size;
   result = Resize(iNewSize, 0, m_data_size);
   if (IsError(result))

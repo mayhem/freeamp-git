@@ -58,3 +58,6 @@ Other major contributors and their contributions:
 
 "Valters Vingolds" <Valters_Vingolds@swh-t.lv>
 * Allow the win32 FreeAmp UI to exist in the system tray
+
+"Jean-Michel HERVE" <tuo_stg@hotmail.com>
+* x86 assembly optimized MP3 decoder

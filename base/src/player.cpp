@@ -25,6 +25,7 @@ ____________________________________________________________________________*/
 #include <stdlib.h>
 #include <assert.h>
 
+#include "config.h"
 #include "event.h"
 #include "lmc.h"
 #include "player.h"
@@ -248,6 +249,7 @@ SetArgs(int32 argc, char **argv)
                }
                break;
             }
+#if 0				// We use the prefs file now
          case 'p':
             if (!strcmp(&(arg[2]), "rop"))
             {
@@ -285,6 +287,7 @@ SetArgs(int32 argc, char **argv)
                argList.AddItem(argv[i]);
             }
             break;
+#endif
          default:
              argList.AddItem(argv[i]);
          }
@@ -332,34 +335,14 @@ Usage(const char *progname)
    if (m_didUsage)
       return;
 
-   printf("FreeAmp version 1.20 -- Usage:\n\n");
-   printf("freeamp [-ui <UI plugin name>] "
-          "[-prop <PropertyName>=<PropertyValue>]\n");
-   printf("        <MP3 file/stream> [MP3 file/stream] ...\n\n");
-   printf("The following properties can be set:\n\n");
-   printf("  InputBuffer      - the size (in Kb) of the input buffer\n");
-   printf("  OutputBuffer     - the size (in Kb) of the output buffer\n");
-   printf("  BufferUpInterval - how many seconds to buffer up for streaming\n");
-   printf("  Logging          - a value of 'yes' turns on logging\n");
-   printf("  LoggingInput     - a value of 'yes' logs input events\n");
-   printf("  LoggingDecode    - a value of 'yes' logs decode events\n\n");
+   printf("FreeAmp version 1.2.1 -- Usage:\n\n");
+   printf("freeamp [-ui <UI plugin name>] <MP3 file/stream> "
+	  "[MP3 file/stream] ...\n\n");
    printf("Example command line:\n\n");
-   printf("   freeamp -prop OutputBuffer=256 mysong1.mp3 mysong2.mp3\n\n");
-   printf("Note:\n\n");
-   printf("   The default output buffer size is set to 512Kb.\n\n");
+   printf("   freeamp -ui freeamp-linux.ui mysong1.mp3 mysong2.mp3\n\n");
 
    m_didUsage = true;
 }
-
-#ifdef __linux__
-#define ARCH_NAME "linux"
-#elif defined(solaris)
-#define ARCH_NAME "solaris"
-#elif defined(beos)
-#define ARCH_NAME "beos"
-#else
-#define ARCH_NAME "unknown"
-#endif
 
 int32     
 Player::
@@ -382,7 +365,7 @@ CompareNames(const char *p1, const char *p2)
          // no plugin.ui match, try  plugin-arch.ui
          char      foo[512];
 
-         sprintf(foo, "%s-%s.ui", p2, ARCH_NAME);
+         sprintf(foo, "%s-%s.ui", p2, AC_HOST_OS);
          // cout << "Comparing: " << p1 << " to " << foo << endl;
          if (strcmp(p1, foo))
          {

@@ -218,11 +218,9 @@ Error SoundCardPMO::Init(OutputInfo * info)
       }
 
       m_iDataSize = info->max_buffer_size;
-      m_propManager->GetProperty("OutputBuffer", &pProp);
-      if (pProp)
-      {
-          iNewSize = atoi(((StringPropValue *)pProp)->GetString()) * 1024;
-      }
+
+      m_context->prefs->GetOutputBufferSize(&iNewSize);
+      iNewSize *= 1024;
 
       iNewSize -= iNewSize % m_iDataSize;
       result = Resize(iNewSize, 0, m_iDataSize);

@@ -255,14 +255,15 @@ Initialize()
                                     &disposition);
         }
 
-        if(result == ERROR_SUCCESS)
-            error = SetDefaults();
-        else
+        if(result != ERROR_SUCCESS)
             error = kError_NoPrefs;
 
         RegCloseKey(freeampKey);
         RegCloseKey(versionKey);
     }
+
+    SetDefaults();
+    Save();
 
     return error;
 }
@@ -271,22 +272,34 @@ Error
 Win32Prefs::
 SetDefaults()
 {
-    char    cwd[MAX_PATH]= {0x00};
+    char cwd[MAX_PATH]= {0x00};
+    int32 dummyInt;
+    bool dummyBool;
+    char buf[1024];
+    uint32 size;
 
     // Where are we starting the program from?
     GetCurrentDirectory(sizeof(cwd), cwd);
 
     // set install directory value
-    SetPrefString(kInstallDirPref, cwd);  // XXX: Use real value for Unix
+    size = sizeof(buf);
+    if (GetPrefString(kInstallDirPref, buf, &size) == kError_NoPrefs)
+	SetPrefString(kInstallDirPref, cwd);
     
     // set default ui value
-    SetPrefString(kUIPref, kDefaultUI);
+    size = sizeof(buf);
+    if (GetPrefString(kUIPref, buf, &size) == kError_NoPrefs)
+	SetPrefString(kUIPref, kDefaultUI);
     
     // set default pmo value
-    SetPrefString(kPMOPref, kDefaultPMO);
+    size = sizeof(buf);
+    if (GetPrefString(kPMOPref, buf, &size) == kError_NoPrefs)
+	SetPrefString(kPMOPref, kDefaultPMO);
 
     // set default open/save dlg path value
-    SetPrefString(kOpenSaveDirPref, cwd); // XXX: What for Unix?
+    size = sizeof(buf);
+    if (GetPrefString(kOpenSaveDirPref, buf, &size) == kError_NoPrefs)
+	SetPrefString(kOpenSaveDirPref, cwd);
 
     // set default for window staying on top
     SetPrefBoolean(kStayOnTopPref, kDefaultStayOnTop);

@@ -65,27 +65,40 @@ Error
 Preferences::
 SetDefaults()
 {
+    int32 dummyInt;
+    bool dummyBool;
+
     // set default for input buffer size
-    SetPrefInt32(kInputBufferSizePref, kDefaultInputBufferSize);
+    if (GetPrefInt32(kInputBufferSizePref, &dummyInt) == kError_NoPrefs)
+	SetPrefInt32(kInputBufferSizePref, kDefaultInputBufferSize);
 
     // set default for output buffer size
-    SetPrefInt32(kOutputBufferSizePref, kDefaultOutputBufferSize);
+    if (GetPrefInt32(kOutputBufferSizePref, &dummyInt) == kError_NoPrefs)
+	SetPrefInt32(kOutputBufferSizePref, kDefaultOutputBufferSize);
 
     // set default for streaming buffer interval
-    SetPrefInt32(   kStreamBufferIntervalPref, 
-		    kDefaultStreamBufferInterval);
+    if (GetPrefInt32(kStreamBufferIntervalPref, &dummyInt) == kError_NoPrefs)
+	SetPrefInt32(kStreamBufferIntervalPref, 
+		     kDefaultStreamBufferInterval);
 
     // set default for decoder thread priority
-    SetPrefInt32(   kDecoderThreadPriorityPref, 
-		    kDefaultDecoderThreadPriority);
+    if (GetPrefInt32(kDecoderThreadPriorityPref, &dummyInt) == kError_NoPrefs)
+	SetPrefInt32(kDecoderThreadPriorityPref, 
+		     kDefaultDecoderThreadPriority);
 
     // set defaults for logging
-    SetPrefBoolean(kUseDebugLogPref, kDefaultLogging);
-    SetPrefBoolean(kLogMainPref, kDefaultLogging);
-    SetPrefBoolean(kLogDecodePref, kDefaultLogging);
-    SetPrefBoolean(kLogInputPref, kDefaultLogging);
-    SetPrefBoolean(kLogOutputPref, kDefaultLogging);
-    SetPrefBoolean(kLogPerformancePref, kDefaultLogging);
+    if (GetPrefBoolean(kUseDebugLogPref, &dummyBool) == kError_NoPrefs)
+	SetPrefBoolean(kUseDebugLogPref, kDefaultLogging);
+    if (GetPrefBoolean(kLogMainPref, &dummyBool) == kError_NoPrefs)
+	SetPrefBoolean(kLogMainPref, kDefaultLogging);
+    if (GetPrefBoolean(kLogDecodePref, &dummyBool) == kError_NoPrefs)
+	SetPrefBoolean(kLogDecodePref, kDefaultLogging);
+    if (GetPrefBoolean(kLogInputPref, &dummyBool) == kError_NoPrefs)
+	SetPrefBoolean(kLogInputPref, kDefaultLogging);
+    if (GetPrefBoolean(kLogOutputPref, &dummyBool) == kError_NoPrefs)
+	SetPrefBoolean(kLogOutputPref, kDefaultLogging);
+    if (GetPrefBoolean(kLogPerformancePref, &dummyBool) == kError_NoPrefs)
+	SetPrefBoolean(kLogPerformancePref, kDefaultLogging);
 
     return kError_NoErr;
 }
