@@ -51,7 +51,10 @@ typedef enum Error
     kError_FileSeekNotSupported = 20,
     kError_OutputUnsuccessful = 21,
     kError_InitFailed = 22,
-    kError_InitFailedSafely
+    kError_InitFailedSafely = 23,
+    kError_NoDataAvail = 24,
+    kError_SeekFailed = 25,
+    kError_CreateThreadFailed = 26
 }Error;
 
 

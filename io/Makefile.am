@@ -22,5 +22,5 @@
 ##
 ############################################################################
 
-SUBDIRS = local src soundcard
+SUBDIRS = local http src soundcard
 

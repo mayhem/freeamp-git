@@ -30,21 +30,21 @@ ____________________________________________________________________________*/
 /* project headers */
 #include "config.h"
 #include "pmi.h"
-#include "filebuffer.h"
+#include "httpbuffer.h"
 
-class     LocalFileInput:public PhysicalMediaInput
+class     HttpInput:public PhysicalMediaInput
 {
    public:
 
-   LocalFileInput();
-   LocalFileInput(char *path);
-   virtual ~ LocalFileInput(void);
+   HttpInput();
+   HttpInput(char *path);
+   virtual ~ HttpInput(void);
 
    virtual Error BeginRead(void *&buf, size_t &bytesneeded);
    virtual Error EndRead(size_t bytesused);
 
    virtual Error Seek(int32 & rtn, int32 offset, int32 origin);
-   virtual Error GetLength(size_t &iSize); // filesize - ID3tag if any
+   virtual Error GetLength(size_t &iSize); 
    virtual bool  GetID3v1Tag(unsigned char *pTag);
 
    virtual Error SetTo(char *url);
@@ -57,7 +57,7 @@ class     LocalFileInput:public PhysicalMediaInput
 
    private:
 
-   FileBuffer *m_pPullBuffer;
+   HttpBuffer *m_pPullBuffer;
    char       *m_path;
 };
 

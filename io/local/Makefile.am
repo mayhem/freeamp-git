@@ -34,7 +34,7 @@ FILES =
 MYLIBS = 
 TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
 else
-FILES = localfileinput.cpp
+FILES = localfileinput.cpp filebuffer.cpp
 MYLIBS = libfaio.a
 TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
 

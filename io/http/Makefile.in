@@ -33,7 +33,7 @@ pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
 
-top_builddir = ../../..
+top_builddir = ../..
 
 ACLOCAL = @ACLOCAL@
 AUTOCONF = @AUTOCONF@
@@ -69,25 +69,31 @@ RANLIB = @RANLIB@
 VERSION = @VERSION@
 target_os = @target_os@
 
+PLUGIN_DIR = @top_srcdir@/plugins/
+PLUGIN_NAME = httpinput-@target_os@.pmi
+PLUGIN_FULL_NAME = $(PLUGIN_DIR)$(PLUGIN_NAME)
+
 @AM_HAVE_WIN32_TRUE@FILES = 
 @AM_HAVE_WIN32_TRUE@MYLIBS = 
-@AM_HAVE_WIN32_FALSE@FILES = preferences.cpp bootstrap.cpp win32impl.cpp
-@AM_HAVE_WIN32_FALSE@MYLIBS = libfaunix.a
+@AM_HAVE_WIN32_TRUE@TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
+@AM_HAVE_WIN32_FALSE@FILES = httpinput.cpp httpbuffer.cpp
+@AM_HAVE_WIN32_FALSE@MYLIBS = libfaio.a
+@AM_HAVE_WIN32_FALSE@TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
 
 @AM_HAVE_LINUXTHREADS_TRUE@REENT = -D_REENTRANT
 
 noinst_LIBRARIES = $(MYLIBS)
-libfaunix_a_SOURCES = $(FILES)
+libfaio_a_SOURCES = $(FILES)
 
-INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I@top_srcdir@/io/include -I@top_srcdir@/ui/include -I@top_srcdir@/base/unix/@target_os@/include -I@top_srcdir@/ui/dummy/include -I@top_srcdir@/lmc/include
-CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT) -DUNIX_LIBDIR="\"@libdir@\""
+INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS)
+CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT)
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
-CONFIG_HEADER = ../../../config/config.h
+CONFIG_HEADER = ../../config/config.h
 CONFIG_CLEAN_FILES = 
 LIBRARIES =  $(noinst_LIBRARIES)
 
 
-DEFS = @DEFS@ -I. -I$(srcdir) -I../../../config
+DEFS = @DEFS@ -I. -I$(srcdir) -I../../config
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
@@ -95,10 +101,9 @@ X_CFLAGS = @X_CFLAGS@
 X_LIBS = @X_LIBS@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
 X_PRE_LIBS = @X_PRE_LIBS@
-libfaunix_a_LIBADD = 
-@AM_HAVE_WIN32_TRUE@libfaunix_a_OBJECTS = 
-@AM_HAVE_WIN32_FALSE@libfaunix_a_OBJECTS =  preferences.o bootstrap.o \
-@AM_HAVE_WIN32_FALSE@win32impl.o
+libfaio_a_LIBADD = 
+@AM_HAVE_WIN32_TRUE@libfaio_a_OBJECTS = 
+@AM_HAVE_WIN32_FALSE@libfaio_a_OBJECTS =  httpinput.o httpbuffer.o
 AR = ar
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 CXXLINK = $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@
@@ -109,17 +114,17 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP = --best
-DEP_FILES =  .deps/bootstrap.P .deps/preferences.P .deps/win32impl.P
+DEP_FILES =  .deps/httpbuffer.P .deps/httpinput.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
-SOURCES = $(libfaunix_a_SOURCES)
-OBJECTS = $(libfaunix_a_OBJECTS)
+SOURCES = $(libfaio_a_SOURCES)
+OBJECTS = $(libfaio_a_OBJECTS)
 
 default: all
 
 .SUFFIXES:
 .SUFFIXES: .c .cpp .o
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --gnu base/unix/src/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu io/http/Makefile
 
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
@@ -148,10 +153,10 @@ distclean-compile:
 
 maintainer-clean-compile:
 
-libfaunix.a: $(libfaunix_a_OBJECTS) $(libfaunix_a_DEPENDENCIES)
-	rm -f libfaunix.a
-	$(AR) cru libfaunix.a $(libfaunix_a_OBJECTS) $(libfaunix_a_LIBADD)
-	$(RANLIB) libfaunix.a
+libfaio.a: $(libfaio_a_OBJECTS) $(libfaio_a_DEPENDENCIES)
+	rm -f libfaio.a
+	$(AR) cru libfaio.a $(libfaio_a_OBJECTS) $(libfaio_a_LIBADD)
+	$(RANLIB) libfaio.a
 .cpp.o:
 	$(CXXCOMPILE) -c $<
 
@@ -177,13 +182,13 @@ maintainer-clean-tags:
 
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 
-subdir = base/unix/src
+subdir = io/http
 
 distdir: $(DISTFILES)
 	here=`cd $(top_builddir) && pwd`; \
 	top_distdir=`cd $(top_distdir) && pwd`; \
 	cd $(top_srcdir) \
-	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu base/unix/src/Makefile
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu io/http/Makefile
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  test -f $(distdir)/$$file \
@@ -239,7 +244,7 @@ install: install-exec install-data all
 
 uninstall: 
 
-all: Makefile $(LIBRARIES)
+all: Makefile $(LIBRARIES) all-local
 
 install-strip:
 	$(MAKE) INSTALL_PROGRAM='$(INSTALL_PROGRAM) -s' INSTALL_SCRIPT='$(INSTALL_PROGRAM)' install
@@ -289,6 +294,13 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
 include @top_srcdir@/config/Makefile.header
+
+@AM_HAVE_WIN32_FALSE@all-local : $(PLUGIN_FULL_NAME)
+
+@AM_HAVE_WIN32_FALSE@$(PLUGIN_FULL_NAME) : $(libfaio_a_OBJECTS)
+@AM_HAVE_WIN32_FALSE@	@mkdir -p @top_srcdir@/plugins
+@AM_HAVE_WIN32_FALSE@	gcc -shared -Wl,-soname,$(PLUGIN_NAME) -o $(PLUGIN_FULL_NAME) $(libfaio_a_OBJECTS)
+@AM_HAVE_WIN32_FALSE@	@chmod 644 $(PLUGIN_FULL_NAME)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

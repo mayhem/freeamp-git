@@ -41,29 +41,29 @@ ____________________________________________________________________________*/
 #endif // HAVE_UNISTD_H
 
 /* project headers */
-#include "localfileinput.h"
+#include "httpinput.h"
 
-const int32 iBufferSize = 65536;
-const int32 iOverflowSize = 8192;
-const int32 iTriggerSize = 8192;
+const int iBufferSize = 65536;
+const int iOverflowSize = 8192;
+const int iTriggerSize = 8192;
 
 extern    "C"
 {
    PhysicalMediaInput *Initialize()
    {
-      return new LocalFileInput();
+      return new HttpInput();
    }
 }
-LocalFileInput::
-LocalFileInput():
+HttpInput::
+HttpInput():
 PhysicalMediaInput()
 {
    m_path = NULL;
    m_pPullBuffer = NULL;
 }
 
-LocalFileInput::
-LocalFileInput(char *path):
+HttpInput::
+HttpInput(char *path):
 PhysicalMediaInput()
 {
    if (path)
@@ -76,7 +76,7 @@ PhysicalMediaInput()
          memcpy(m_path, path, len);
       }
 
-      m_pPullBuffer = new FileBuffer(iBufferSize, iOverflowSize, 
+      m_pPullBuffer = new HttpBuffer(iBufferSize, iOverflowSize, 
                                       iTriggerSize, path);
       assert(m_pPullBuffer);
 
@@ -92,8 +92,8 @@ PhysicalMediaInput()
    }
 }
 
-LocalFileInput::
-~LocalFileInput()
+HttpInput::
+~HttpInput()
 {
    if (m_path)
    {
@@ -108,7 +108,7 @@ LocalFileInput::
 }
 
 
-Error     LocalFileInput::
+Error     HttpInput::
 SetTo(char *url)
 {
    Error     result = kError_NoErr;
@@ -141,7 +141,7 @@ SetTo(char *url)
 
       if (IsntError(result))
       {
-         m_pPullBuffer = new FileBuffer(iBufferSize, iOverflowSize, 
+         m_pPullBuffer = new HttpBuffer(iBufferSize, iOverflowSize, 
                                          iTriggerSize, url);
          assert(m_pPullBuffer);
 
@@ -159,37 +159,48 @@ SetTo(char *url)
    return result;
 }
 
-Error LocalFileInput::
+Error HttpInput::
 GetLength(size_t &iSize)
 {
-    return m_pPullBuffer->GetLength(iSize);
+    iSize = 0;
+
+    return kError_FileSeekNotSupported;
 }
 
-bool LocalFileInput::
+bool HttpInput::
 GetID3v1Tag(unsigned char *pTag)
 {
-   return m_pPullBuffer->GetID3v1Tag(pTag);
+    return m_pPullBuffer->GetID3v1Tag(pTag);
 }
 
-Error LocalFileInput::
+Error HttpInput::
 BeginRead(void *&buf, size_t &bytesneeded)
 {
    return m_pPullBuffer->BeginRead(buf, bytesneeded);
 }
 
-Error LocalFileInput::
+Error HttpInput::
 EndRead(size_t bytesused)
 {
    return m_pPullBuffer->EndRead(bytesused);
 }
 
-Error     LocalFileInput::
+Error     HttpInput::
 Seek(int32 & rtn, int32 offset, int32 origin)
 {
-   return m_pPullBuffer->Seek(rtn, offset, origin);
+    rtn = 0;
+
+    // RAK: HACK HACK HACK HACK HACK HACK HACK!!!!!!
+    if (offset == 0)
+    {
+        rtn = 0;
+        return kError_NoErr;
+    }
+
+    return kError_FileSeekNotSupported;
 }
 
-Error     LocalFileInput::
+Error     HttpInput::
 Close(void)
 {
    delete m_pPullBuffer;
@@ -198,8 +209,12 @@ Close(void)
    return kError_NoErr;
 }
 
-const char *LocalFileInput::
+const char *HttpInput::
 GetErrorString(int32 error)
 {
-   return NULL;
+   if (m_pPullBuffer == NULL)
+      return NULL;
+
+   return m_pPullBuffer->GetErrorString(error);
 }
+

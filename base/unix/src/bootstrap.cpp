@@ -149,7 +149,7 @@ void testVector() {
     pVect2->DeleteAll();
     if (pVect2->ElementAt(0) != NULL) {
 	cout << "Final Test failed!! (2nd one)" << endl;
-    }
+   }
     cout << "Ending testVector..." << endl;
 }
 #endif

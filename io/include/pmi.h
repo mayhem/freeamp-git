@@ -51,8 +51,17 @@ class PhysicalMediaInput {
 
 public:
     virtual ~PhysicalMediaInput() { }
-    virtual Error Read(int32 &/*bytes read*/,void* /*buf*/, size_t /*numbytes*/) {return kError_GotDefaultMethod;}
-    virtual Error Seek(int32 &/*seeked to*/,int32 offset, int32 origin) {return kError_GotDefaultMethod;}
+    virtual Error BeginRead(void* & /*buf*/, size_t &/*bytesneeded*/) 
+	               { return kError_GotDefaultMethod; }
+    virtual Error EndRead(size_t /*bytesused*/) 
+	               { return kError_GotDefaultMethod; }
+    virtual Error Seek(int32 &/*seeked to*/,int32 offset, int32 origin) 
+	               {return kError_GotDefaultMethod;}
+    virtual Error GetLength(size_t &iSize)
+	               {return kError_GotDefaultMethod;}
+	 virtual bool  GetID3v1Tag(unsigned char *pTag)
+	               {return kError_GotDefaultMethod;}
+		 
     virtual Error SetTo(char* url) = 0;
     virtual Error Close(void) = 0;
     virtual const char* Url(void) const = 0;

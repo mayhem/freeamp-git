@@ -71,7 +71,12 @@ SoundCardPMO::SoundCardPMO() {
 }
 
 SoundCardPMO::~SoundCardPMO() {
-    Reset(false);
+
+    //RAK: I took out the reset here. According to the docs
+	 // (http://www.se.opensound.com/pguide/audio.html) close() does
+	 // a reset automagically.
+    //Reset(false);
+
     //cout << "Deleting scpmo... " << endl;
     close(audio_fd);
     if (myInfo) {
@@ -168,12 +173,22 @@ Error SoundCardPMO::Init(OutputInfo* info) {
 Error SoundCardPMO::Reset(bool user_stop) {
     //cout << "Reset..." << endl;
     int a;
-    if (ioctl(audio_fd,SNDCTL_DSP_RESET,&a) == -1) {
-	return (Error)pmoError_IOCTL_SNDCTL_DSP_RESET;
+
+	 if (user_stop)
+	 {
+         if (ioctl(audio_fd,SNDCTL_DSP_RESET,&a) == -1) 
+			{
+	          return (Error)pmoError_IOCTL_SNDCTL_DSP_RESET;
+         }
+	      Init(NULL);
     }
-    if (user_stop) {
-	Init(NULL);
-    }
+	 else
+	 {
+         if (ioctl(audio_fd,SNDCTL_DSP_SYNC,&a) == -1) 
+			{
+	          return (Error)pmoError_IOCTL_SNDCTL_DSP_RESET;
+         }
+	 }
     return kError_NoErr;
 }
 

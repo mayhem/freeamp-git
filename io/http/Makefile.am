@@ -24,28 +24,38 @@
 
 include @top_srcdir@/config/Makefile.header
 
+PLUGIN_DIR = @top_srcdir@/plugins/
+PLUGIN_NAME = httpinput-@target_os@.pmi
+PLUGIN_FULL_NAME = $(PLUGIN_DIR)$(PLUGIN_NAME)
+
+
 if AM_HAVE_WIN32
 FILES = 
 MYLIBS = 
 TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
 else
-FILES = pmiregistry.cpp pmoregistry.cpp pullbuffer.cpp
-MYLIBS = libfaiosrc.a
+FILES = httpinput.cpp httpbuffer.cpp
+MYLIBS = libfaio.a
 TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
+
+all-local : $(PLUGIN_FULL_NAME)
+
+$(PLUGIN_FULL_NAME) : $(libfaio_a_OBJECTS)
+	@mkdir -p @top_srcdir@/plugins
+	gcc -shared -Wl,-soname,$(PLUGIN_NAME) -o $(PLUGIN_FULL_NAME) $(libfaio_a_OBJECTS)
+	@chmod 644 $(PLUGIN_FULL_NAME)
+
 endif
 
 if AM_HAVE_LINUXTHREADS
 REENT = -D_REENTRANT
 endif
 
-
 noinst_LIBRARIES = $(MYLIBS)
-libfaiosrc_a_SOURCES = $(FILES)
+libfaio_a_SOURCES = $(FILES)
 
-INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) -I@top_srcdir@/io/include -I@top_srcdir@/ui/include -I@top_srcdir@/lmc/include
-CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT) -D__@target_os@__
-CFLAGS = $(EXTRA_CFLAGS) $(REENT) -D__@target_os@__
-
+INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS)
+CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT)
 
 
 
