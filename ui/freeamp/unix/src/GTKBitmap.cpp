@@ -99,7 +99,7 @@ GTKBitmap::~GTKBitmap(void)
         gdk_gc_unref(m_GC);
     m_GC = NULL; 
 
-    if (m_cache)
+    if (m_image && m_cache)
         gdk_image_destroy(m_image);
     gdk_threads_leave();
 }
@@ -138,6 +138,7 @@ Error GTKBitmap::LoadBitmapFromDisk(string &oFile)
     }
 
     m_cache = false;
+    m_image = NULL;
 
 #ifdef USING_GDKPIXBUF
     GdkPixbuf *pixbuf;

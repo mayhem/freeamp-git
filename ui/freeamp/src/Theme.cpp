@@ -1206,7 +1206,8 @@ DB
 
        if (oAttrMap.find("Pos") != oAttrMap.end() &&
            m_eCurrentControl != eButtonControl &&
-           m_eCurrentControl != eMultiStateControl)
+           m_eCurrentControl != eMultiStateControl &&
+           m_eCurrentControl != ePixSliderControl)
        {
            m_oLastError = string("the Pos attribute in the <Position> tag can only be used "
                                  "for a MultiStateControl or a ButtonControl");

@@ -121,7 +121,7 @@ void PixSliderControl::Init(void)
     }    
     m_oMutex.Release();
     
-    if (!m_bActivationReveal)
+    if (!m_bActivationReveal) 
         BlitFrame(CS_Normal, m_iState);
 }
 
@@ -141,18 +141,19 @@ void PixSliderControl::Transition(ControlTransitionEnum  eTrans,
        case CT_MouseLeave:
           m_pParent->SendControlMessage(this, CM_MouseLeave);
           break;
-       case CT_SetValue:
+       case CT_SetValue: {
           if (m_iValue < 0 || m_iValue > 100)
               return;
-          
-          m_iState = min(max(m_iValue, 0), m_iNumStates - 1);
+         
+          int temp = m_iValue * m_iNumStates / 100; 
+          m_iState = min(temp, m_iNumStates - 1);
 
-         if (!m_bActivationReveal)
-             BlitFrame(m_eCurrentState, m_iState);
+         if (!m_bActivationReveal) 
+             BlitFrame(CS_Normal, m_iState);
          else
              DrawReveal((float)m_iValue * 2.55);
 
-         return;
+         return; }
        case CT_Hide:
        {
        	  Rect oRect = m_oRect;
@@ -187,7 +188,7 @@ void PixSliderControl::Transition(ControlTransitionEnum  eTrans,
     }
 
     if (!m_bActivationReveal)
-        BlitFrame(m_eCurrentState, m_iState);
+        BlitFrame(CS_Normal, m_iState);
     else if (pMousePos)
         DrawReveal(*pMousePos);
     else
@@ -220,6 +221,11 @@ int PixSliderControl::GetStateNum(Pos &oPos)
         statenum = -1;
     else
         statenum = ((color.red + color.green + color.blue) / 3) & 0xFF;
+
+    if (!m_bActivationReveal) {
+        int temp = statenum * m_iNumStates / 255;
+        statenum = min(m_iNumStates - 1, temp);
+    }
 
     return statenum;
 }

@@ -164,6 +164,9 @@ Error KJofol::ConvertToNative(string &oDir)
         else if (!strcasecmp(left, "PreferencesButton")) {
             Button(right, "Options", "Open the optionswindow", "Options");
         }
+        else if (!strcasecmp(left, "PlaylistButton")) {
+            Button(right, "MyMusic", "Browse my music collection", "MyMusic");
+        }
         else if (!strcasecmp(left, "FontImage")) {
             KJofol_Font f = fonts["Default"];
             f.image = right;
@@ -231,6 +234,28 @@ Error KJofol::ConvertToNative(string &oDir)
         }
         else if (!strcasecmp(left, "SeekImage")) {
             Seek(right);
+        }
+        else if (!strcasecmp(left, "VolumeControlType")) {
+            if (!strcasecmp(right, "BMP")) {
+                m_bmpvolume = true; 
+                m_understandvolume = true;
+            }
+        }
+        else if (!strcasecmp(left, "VolumeControlImage")) {
+            info["VolumeBMPImage"] = right;
+        }
+        else if (!strcasecmp(left, "VolumeControlImagePosition")) {
+            info["VolumeBMPPos"] = right;
+        }
+        else if (!strcasecmp(left, "VolumeControlImageXSize")) {
+            m_volxsize = atoi(right);
+        }
+        else if (!strcasecmp(left, "VolumeControlImageNb")) {
+            m_volnum = atoi(right);
+        }
+        else if (!strcasecmp(left, "VolumeControlButton")) {
+            if (m_understandvolume && m_bmpvolume)
+                VolumeBMP(right);
         }
         else
             cout << "don't understand: " << line << endl;
@@ -535,3 +560,45 @@ void KJofol::Seek(char *desc)
     sprintf(outline, "</PixSliderControl>\n");
     Write(outline, 2);
 }
+
+void KJofol::VolumeBMP(char *desc)
+{
+    char outline[_MAX_PATH];
+    char rect[256];
+    Rect volrect;
+    string pixname = info["VolumeBMPImage"];
+
+    sscanf(desc, "%i %i %i %i %s", &volrect.x1, &volrect.y1, &volrect.x2,
+           &volrect.y2, rect);
+    
+    sprintf(rect, "%d, %d, %d, %d", volrect.x1, volrect.y1, volrect.x2,
+            volrect.y2);
+
+    sprintf(outline, "<PixSliderControl Name=\"Volume\" NumStates=\"%d\" Reveal=\"no\">\n", m_volnum);
+    Write(outline, 2);
+    sprintf(outline, "<Info Desc=\"Change Volume\" Tip=\"Volume\"/>\n");
+    Write(outline, 4);
+    sprintf(outline, "<Position Pos=\"%d, %d\"/>\n", volrect.x1, volrect.y1);
+    Write(outline, 3);
+
+    volrect.y1 = 0;
+    volrect.y2 = bmp_sizes[pixname].y;
+    for (int i = 0; i < m_volnum; i++) {
+        volrect.x1 = i * m_volxsize;
+        volrect.x2 = (i + 1) * m_volxsize - 1;
+        sprintf(rect, "%d, %d, %d, %d", volrect.x1, volrect.y1, volrect.x2, 
+                volrect.y2);
+        sprintf(outline, "<ControlStateBitmap Rect=\"%s\" State=\"Normal\" StateNum=\"%d\" Name=\"%s\"/>\n", rect, i, pixname.c_str());
+        Write(outline, 3);
+    }
+
+    Pos pos = bmp_sizes[info["VolumeBMPPos"]];
+    sprintf(rect, "0, 0, %d, %d", pos.x, pos.y);
+
+    sprintf(outline, "<ActivationBitmap Rect=\"%s\" Name=\"%s\"/>\n", rect, info["VolumeBMPPos"].c_str());
+    Write(outline, 3);
+
+    sprintf(outline, "</PixSliderControl>\n");
+    Write(outline, 2);
+}
+
