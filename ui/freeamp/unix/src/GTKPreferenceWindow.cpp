@@ -1353,7 +1353,7 @@ void GTKPreferenceWindow::AddThemeEvent(const char *newpath)
     string newThemeFile = newpath;
     Error err = m_pThemeMan->AddTheme(newThemeFile);
 
-    if (IsntError(err)) {
+    if (IsError(err)) {
         MessageDialog oBox(m_pContext);
         string        oErr, oMessage;
 

@@ -314,8 +314,12 @@ AC_SUBST(ESD_LIBS)
 
 dnl optional freetype support..
 
-AC_CHECK_HEADERS(freetype.h freetype/freetype.h, have_freetype="true", 
-                 have_freetype="false")
+AC_CHECK_HEADERS(freetype.h, have_freetype="true", have_freetype="false")
+
+if test "$have_freetype" = "false"; then
+  AC_CHECK_HEADERS(freetype/freetype.h, have_freetype="true", 
+                    have_freetype="false")
+fi
 
 TTF_LIBS=""
 if test "$have_freetype" = "true"; then
