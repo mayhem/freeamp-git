@@ -1,9 +1,9 @@
 # -------------------------------------------------------------------------
 # Global defines
 # -------------------------------------------------------------------------
-%define name    relatable
-%define cname   Relatable
-%define version 2.1.beta9
+%define name    freeamp
+%define cname   FreeAmp
+%define version 2.1.rc1
 %define release 1
 %define prefix  /usr  
 
@@ -57,12 +57,12 @@ Requires:    alsa >= 0.5.0
 # Extras Package defines
 # -------------------------------------------------------------------------
 %package     extras
-Summary:     Freeamp - All the remaining plugins (mpg123 ui, cmdline ui, ncurses ui, irman, lcd)
+Summary:     Freeamp - All the remaining plugins (mpg123 ui, cmdline ui, ncurses ui, irman, lcd, corbaui)
 Group:       Applications/Multimedia
 Requires:    %{name} = %{version}
 
 %description extras
-All the remaining plugins (mpg123 ui, cmdline ui, ncurses ui, irman, lcd)
+All the remaining plugins (mpg123 ui, cmdline ui, ncurses ui, irman, lcd, corbaui)
 
 
 # -------------------------------------------------------------------------

@@ -417,8 +417,6 @@ save_CPPFLAGS="$CPPFLAGS"
 CPPFLAGS="$CPPFLAGS -I/usr/local/include"
 AC_LANG_SAVE
 AC_LANG_C
-AC_CHECK_HEADERS(orb/orbit.h, have_orbit="true", have_orbit="false")
-
 AC_CHECK_HEADERS(freetype.h, have_freetype="true", have_freetype="false")
 
 if test "$have_freetype" = "false"; then
