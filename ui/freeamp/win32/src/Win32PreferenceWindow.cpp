@@ -531,7 +531,7 @@ bool Win32PreferenceWindow::MainProc(HWND hwnd,
 
             EnableWindow(hwndApply, FALSE);
 
-			result = TRUE;
+			//result = true;
 
 			break;
 		}

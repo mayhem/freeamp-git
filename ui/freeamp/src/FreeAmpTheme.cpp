@@ -721,12 +721,6 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
 Error FreeAmpTheme::HandleControlMessage(string &oControlName, 
                                          ControlMessageEnum eMesg)
 {
-   if (m_bInOptions)
-   {
-       m_pWindow->BringWindowToFront();
-       return kError_NoErr;
-   }    
-
    if (oControlName == string("WindowStatus")) 
    {
        bool bEnable;
@@ -769,7 +763,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
        m_pWindow->ControlStringValue(oName, true, oEmpty);
                                 
        return kError_NoErr;
-   } 
+   }
    if (oControlName == string("Minimize") && eMesg == CM_Pressed)
    {
        m_pWindow->Minimize();
