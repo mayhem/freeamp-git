@@ -39,7 +39,6 @@ ____________________________________________________________________________*/
 #include "registrar.h"
 #include "preferences.h"
 #include "properties.h"
-#include "volume.h"
 #include "facontext.h"
 #include "log.h"
 #include "pmo.h"
@@ -88,7 +87,6 @@ EventQueue()
    m_quitWaitingFor = 0;
    m_plm = new PlayListManager((EventQueue *) this);
    m_playerState = PlayerState_Stopped;
-   m_pVolumeManager = NULL;
 
    m_lmcRegistry = NULL;
    m_pmiRegistry = NULL;
@@ -107,6 +105,8 @@ EventQueue()
 
    m_didUsage = false;
    m_autoplay = true;
+
+   m_iVolume = -1;
 
    m_props.RegisterPropertyWatcher("pcm_volume", (PropertyWatcher *) this);
 }
@@ -436,8 +436,6 @@ Run()
    if (bValue)
       m_context->log->AddLogLevel(LogPerf);
 
-   GetVolumeManager();
-   
    // which ui should we instantiate first??
    if (m_argUIList->CountItems() == 0)
    {
@@ -539,37 +537,6 @@ Run()
    m_eventServiceThread->Create(Player::EventServiceThreadFunc, this);
 
    delete[]name;
-}
-
-void Player::GetVolumeManager()
-{
-   char          defaultPMO[256];
-   uint32        size = sizeof(defaultPMO);
-   RegistryItem *item;
-   int32         i = 0;
-   PhysicalMediaOutput *pmo = NULL;
-
-   m_context->prefs->GetDefaultPMO(defaultPMO, &size);
-
-   while (NULL != (item = m_pmoRegistry->GetItem(i++)))
-   {
-        if(!strcmp(defaultPMO, item->Name()))
-        {
-            break;
-        }
-   }
-
-   // if the default isn't around then just use first one 
-   // is there a better way?
-   if(!item)
-      item = m_pmoRegistry->GetItem(0);
-
-   if (item)
-   {
-      pmo = (PhysicalMediaOutput *) item->InitFunction()(m_context);
-      m_pVolumeManager = pmo->GetVolumeManager();
-      delete pmo;
-   }
 }
 
 void 
@@ -904,6 +871,12 @@ CreatePMO(PlayListItem * pc, Event * pC)
       pmo = (PhysicalMediaOutput *) item->InitFunction()(m_context);
       pmo->SetPropManager((Properties *) this);
       pmo->SetTarget((EventQueue *)this);
+      if (m_iVolume < 0)
+         m_iVolume = pmo->GetVolume();
+      else
+      {
+         pmo->SetVolume(m_iVolume);
+      }
    }
 
    error = kError_NoErr;
@@ -1026,12 +999,21 @@ void
 Player::
 GetVolume(Event *pEvent)
 {
+    int iVolume = 0;
+
     delete pEvent;
-    if (m_pVolumeManager) 
+    if (m_pmo) 
     {
-       int32 iVolume = m_pVolumeManager->GetVolume();
-       SendToUI(new VolumeEvent(INFO_VolumeInfo,iVolume));
+       iVolume = m_iVolume = m_pmo->GetVolume();
     }
+    else
+    {
+       if (m_iVolume < 0)
+          iVolume = 0;
+       else
+          iVolume = m_iVolume;
+    }
+    SendToUI(new VolumeEvent(INFO_VolumeInfo,iVolume));
 }
 
 void
@@ -1039,10 +1021,11 @@ Player::
 SetVolume(Event *pEvent)
 {
     int32 v=((VolumeEvent *) pEvent)->GetVolume();
-    if (m_pVolumeManager) 
+    if (m_pmo) 
     {
-        m_pVolumeManager->SetVolume(v);
+        m_pmo->SetVolume(v);
     }
+    m_iVolume = v;
     delete pEvent;
 }
 

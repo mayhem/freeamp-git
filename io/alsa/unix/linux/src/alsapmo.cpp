@@ -38,7 +38,6 @@ ____________________________________________________________________________*/
 /* project headers */
 #include <config.h>
 #include "alsapmo.h"
-#include "alsavolume.h"
 #include "facontext.h"
 #include "log.h"
 
@@ -56,6 +55,8 @@ AlsaPMO::AlsaPMO(FAContext *context) :
 {
 	uint32 deviceNameSize = 128;
    char scard[128];
+   void *pMixer;
+   char  mixer_id[13]=SND_MIXER_ID_MASTER;
 
    m_properlyInitialized = false;
    myInfo = new OutputInfo();
@@ -115,6 +116,26 @@ AlsaPMO::AlsaPMO(FAContext *context) :
    else
        m_iCard = m_iDevice = 0;
 
+
+   switch (m_iDevice)
+   {
+       case 0:
+          strncpy(mixer_id,SND_MIXER_ID_PCM,sizeof(mixer_id));
+          break;
+       case 1:
+          strncpy(mixer_id,SND_MIXER_ID_PCM1,sizeof(mixer_id));
+          break;
+   }
+
+   snd_mixer_open(&pMixer, m_iCard, 0);
+   m_iChannel = snd_mixer_channel(pMixer, mixer_id );
+   if (m_iChannel < 0)
+   {
+       strncpy(mixer_id,SND_MIXER_ID_PCM,sizeof(mixer_id));
+       m_iChannel = snd_mixer_channel(pMixer, mixer_id );
+   }
+   snd_mixer_close(pMixer);
+
    delete ai->device;
 }
 
@@ -141,10 +162,53 @@ AlsaPMO::~AlsaPMO()
     }
 }
 
-VolumeManager *AlsaPMO::GetVolumeManager()
+
+void AlsaPMO::SetVolume(int32 iVolume)
 {
-   return new ALSAVolumeManager(m_iCard, m_iDevice);
-}
+   int   err;
+   void *pMixer;
+   snd_mixer_channel_t channel;
+
+   err = snd_mixer_open(&pMixer, m_iCard, 0);
+   if (err < 0)
+      return;
+
+   if (m_iChannel >= 0)
+   {
+      err = snd_mixer_channel_read(pMixer, m_iChannel, &channel);
+      if (err < 0)
+         return;
+
+      channel.left=channel.right=iVolume;
+      snd_mixer_channel_write(pMixer, m_iChannel, &channel);
+   }
+   snd_mixer_close(pMixer);
+} 
+
+int32 AlsaPMO::GetVolume()
+{
+   int   err;
+   void *pMixer = NULL;
+   snd_mixer_channel_t channel;
+
+   err = snd_mixer_open(&pMixer, m_iCard, 0);
+   if (err != 0)
+   {
+      return 0;
+   }
+
+   if (m_iChannel >= 0)
+   {
+      err = snd_mixer_channel_read(pMixer, m_iChannel, &channel);
+      if (err < 0)
+         return 0;
+   }
+   else
+      return 0;
+
+   snd_mixer_close(pMixer);
+   return channel.left;
+} 
 
 Error AlsaPMO::Init(OutputInfo* info) {
     int err;

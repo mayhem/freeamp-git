@@ -46,7 +46,6 @@ ____________________________________________________________________________*/
 #include "config.h"
 #include "errors.h"
 #include "properties.h"
-#include "volume.h"
 #include "facontext.h"
 #include "lmc.h"
 #include "pmi.h"
@@ -73,7 +72,8 @@ public:
     virtual ~PhysicalMediaOutput();
 
     virtual Error Init(OutputInfo* /*info*/) = 0;
-    virtual VolumeManager *GetVolumeManager() = 0;
+    virtual int32 GetVolume(void) = 0;
+    virtual void  SetVolume(int32) = 0;
 
     virtual Error Reset(bool bUserReset) = 0;
     virtual void  Pause(void);

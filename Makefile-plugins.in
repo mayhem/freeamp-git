@@ -74,7 +74,7 @@ plugins/obsinput-$(HOST_OS).pmi: $(OBSPMI)
 # PMO section
 
 SCPMOsolarisOBJ = io/soundcard/unix/solaris/src/volume.o
-SCPMOlinuxOBJ = io/soundcard/unix/linux/src/ossvolume.o
+SCPMOlinuxOBJ = 
 
 SCPMObeosOBJ = io/soundcard/beos/src/ringbuffer.o 
 #SCPMObeosOBJ+=io/soundcard/beos/src/soundutils.o io/soundcard/beos/TestRing.o
@@ -86,8 +86,7 @@ plugins/soundcard-$(HOST_OS).pmo: $(SCPMOOBJ)
 	$(LINKMOD) -o $@ $(SCPMOOBJ)
 
 # alsa
-ALSAOBJ = io/alsa/$(OSDEP)/src/alsapmo.o io/alsa/$(OSDEP)/src/alsavolume.o \
-          io/src/pipeline.o io/src/pmo.o
+ALSAOBJ = io/alsa/$(OSDEP)/src/alsapmo.o io/src/pipeline.o io/src/pmo.o
 
 plugins/alsa-$(HOST_OS).pmo: $(ALSAOBJ)
 	$(LINKMOD) -o $@ $(ALSAOBJ) -lasound

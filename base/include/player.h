@@ -40,7 +40,6 @@ ____________________________________________________________________________*/
 #include "preferences.h"
 #include "properties.h"
 #include "propimpl.h"
-#include "volume.h"
 
 #include "lmc.h"
 
@@ -100,7 +99,6 @@ class Player : public EventQueue, Properties, PropertyWatcher
 
    int32     ServiceEvent(Event *);
    void      CreatePMO(PlayListItem * pc, Event * pC);
-   void      GetVolumeManager();
 
    FAContext *m_context;
 
@@ -153,7 +151,7 @@ class Player : public EventQueue, Properties, PropertyWatcher
    // and COO's haven't sent in 
    // their "Ready To Die" infos.
 
-   int32     m_imQuitting;
+   int32     m_imQuitting, m_iVolume;
    List < UserInterface * >*m_uiList;
 
    Mutex    *m_uiManipLock;
@@ -162,7 +160,6 @@ class Player : public EventQueue, Properties, PropertyWatcher
    Mutex    *m_pmoMutex;
    Mutex    *m_uiMutex;
    PlayListManager *m_plm;
-   VolumeManager   *m_pVolumeManager;
 
    PhysicalMediaOutput *m_pmo;
    LogicalMediaConverter *m_lmc;

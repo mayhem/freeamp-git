@@ -89,10 +89,11 @@ public:
     AlsaPMO(FAContext *context);
     virtual ~AlsaPMO();
     
-    virtual VolumeManager *GetVolumeManager();
     virtual Error Init(OutputInfo* info);
     static void   StartWorkerThread(void *);
     virtual void  Pause(void);
+            void  SetVolume(int32);
+            int32 GetVolume(void);
 
  private:
 
@@ -111,7 +112,7 @@ public:
     int          m_iOutputBufferSize, m_iBytesPerSample;
     int          m_iTotalFragments, m_iBaseTime;
     int          m_iDataSize;
-    int          m_iCard, m_iDevice;
+    int          m_iCard, m_iDevice, m_iChannel;
  
     struct audio_info_struct *ai;
     int audio_set_all(struct audio_info_struct *);
