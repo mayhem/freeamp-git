@@ -273,7 +273,7 @@ FileOpenDialog(HWND hwndParent,
 	        cp += strlen(cp) + 1;
         }
 
-        //*(fileBuffer + ofn.nFileOffset - 1) = 0x00;
+        *(fileBuffer + ofn.nFileOffset - 1) = 0x00;
 
         prefs.SetOpenSaveDirectory(fileBuffer);
 
