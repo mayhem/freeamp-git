@@ -171,6 +171,7 @@ Error VorbisLMC::InitDecoder()
    m_section = -1;
 
    m_pContext->prefs->GetOutputBufferSize(&iNewSize);
+   iNewSize = max(iNewSize, iMinimumOutputBufferSize);
    iNewSize *= 1024;
 
    result = m_pOutputBuffer->Resize(iNewSize, iNewSize / 6);

@@ -645,6 +645,7 @@ Error XingLMC::InitDecoder()
          info->max_buffer_size = m_iMaxWriteSize;
 
          m_pContext->prefs->GetOutputBufferSize(&iNewSize);
+         iNewSize = max(iNewSize, iMinimumOutputBufferSize);
          iNewSize *= 1024;
    
          //iNewSize -= iNewSize % (m_iMaxWriteSize * 16);
@@ -785,6 +786,7 @@ void XingLMC::DecodeWork()
           }
 
           if (iMaxFrameSize > (int)m_pInputBuffer->GetNumBytesInBuffer() &&
+              m_pInputBuffer->GetNumBytesInBuffer() > 0 &&
               m_pInputBuffer->IsEndOfStream())
               iReadSize = m_pInputBuffer->GetNumBytesInBuffer();
           else
