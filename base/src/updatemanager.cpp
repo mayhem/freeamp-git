@@ -137,6 +137,32 @@ Error UpdateManager::RetrieveLatestVersionInfo(UMCallBackFunction function,
     {
         result = InternalRetrieveLatestVersionInfo(function, cookie);
 
+        if(IsntError(result))
+        {
+            if(function)
+            {
+                UMEvent event;
+
+                memset(&event, 0x00, sizeof(UMEvent));
+                event.type = kUMEvent_Done;
+                event.eventString = "Received latest version info from server.";
+                function(&event, cookie);
+            }
+        }
+        else
+        {
+            if(function)
+            {
+                UMEvent event;
+
+                memset(&event, 0x00, sizeof(UMEvent));
+                event.type = kUMEvent_Error;
+                event.data.errorData.errorCode = result;
+                function(&event, cookie);
+            }
+
+        }
+
         m_mutex.Release();
     }
 
@@ -178,8 +204,11 @@ Error UpdateManager::UpdateComponents(UMCallBackFunction function,
     
     if(m_mutex.Acquire(0))
     {
+        uint32 downloadCount = 0;
+
         // make sure we have latest info
-        result = InternalRetrieveLatestVersionInfo(function, cookie);
+        //result = InternalRetrieveLatestVersionInfo(function, cookie);
+        result = kError_NoErr;
 
         if(IsntError(result))
         {
@@ -232,10 +261,53 @@ Error UpdateManager::UpdateComponents(UMCallBackFunction function,
                      currentMinorVersion == localMinorVersion &&
                      currentRevisionVersion > localRevisionVersion))
                 {
-                    DownloadItem(item, function, cookie);
+                    result = DownloadItem(item, function, cookie);
+
+                    if(IsntError(result))
+                    {
+                        downloadCount++;
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
         }
+
+        if(IsntError(result))
+        {
+            if(function)
+            {
+                UMEvent event;
+
+                memset(&event, 0x00, sizeof(UMEvent));
+                event.type = kUMEvent_Done;
+
+                if(downloadCount)
+                    event.eventString = "Finished retrieving latest components.";
+                else
+                    event.eventString = "There are no new versions available at this time.";
+                function(&event, cookie);
+            }
+        }
+        else
+        {
+            if(function)
+            {
+                UMEvent event;
+
+                memset(&event, 0x00, sizeof(UMEvent));
+                event.type = kUMEvent_Error;
+                event.data.errorData.errorCode = result;
+                function(&event, cookie);
+            }
+
+        }
+
+
+        if(!downloadCount)
+            result = kError_NoItemsUpdated;
 
         m_mutex.Release();
     }
@@ -871,7 +943,7 @@ Error UpdateManager::DownloadItem(UpdateItem* item,
 
                         int openFlags = O_BINARY|O_CREAT|O_RDWR|O_TRUNC;
 
-                        int fd = open(destPath, openFlags);
+                        int fd = open(destPath, openFlags, S_IREAD | S_IWRITE);
 
                         if(fd >= 0)
                         {
@@ -946,6 +1018,7 @@ Error UpdateManager::DownloadItem(UpdateItem* item,
                                 //cout << "bytes recvd:" << count << endl;
 
                             }while(count > 0 && IsntError(result));
+                            
 
                             close(fd);  
                             
@@ -964,7 +1037,7 @@ Error UpdateManager::DownloadItem(UpdateItem* item,
 
                                 if (gzfd == NULL)
                                     result = kError_FileNotFound;
-                                else if((fd = open(destPath, openFlags)) >=0)
+                                else if((fd = open(destPath, openFlags, S_IREAD | S_IWRITE)) >=0)
                                 {
                                     do
                                     {

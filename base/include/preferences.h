@@ -67,6 +67,7 @@ extern const char* kMainWindowPosPref;
 extern const char* kThemeDefaultFontPref;
 extern const char* kSaveMusicDirPref;
 extern const char* kDatabaseDirPref;
+extern const char* kCheckForUpdatesPref;
 
 class LibDirFindHandle;
 
@@ -188,6 +189,9 @@ class Preferences {
 
     Error GetThemePath(char*path, uint32* len);
     Error SetThemePath(char*path);
+
+    Error GetCheckForUpdates(bool* value);
+    Error SetCheckForUpdates(bool value);
     
 };
 

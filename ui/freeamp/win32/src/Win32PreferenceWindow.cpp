@@ -30,6 +30,10 @@ ____________________________________________________________________________*/
 #include <stdlib.h>
 #include <assert.h>
 
+#include <sstream>
+
+using namespace std;
+
 #include "eventdata.h"
 #include "thread.h"
 #include "win32updatemanager.h"
@@ -45,8 +49,6 @@ const char* kThemeFileFilter =
             "*.fat\0"
             "All Files (*.*)\0"
             "*.*\0";
-
-UpdateManager* g_updateManager = NULL;
 
 uint32 CalcStringEllipsis(HDC hdc, string& displayString, int32 columnWidth);
 
@@ -159,6 +161,12 @@ bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent, Preferences* pre
     psp[2].pszTitle = NULL;
     psp[2].lParam = (LPARAM)prefs;
 
+    UpdateManager* updateManager = NULL;
+
+    updateManager = new Win32UpdateManager(m_pContext);
+    updateManager->DetermineLocalVersions();
+    updateManager->SetPlatform(string("WIN32"));
+
     psp[3].dwSize = sizeof(PROPSHEETPAGE);
     psp[3].dwFlags = 0;
     psp[3].hInstance = hinst;
@@ -166,7 +174,7 @@ bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent, Preferences* pre
     psp[3].pszIcon = NULL;
     psp[3].pfnDlgProc = PrefPage6Callback;
     psp[3].pszTitle = NULL;
-    psp[3].lParam = (LPARAM)prefs;
+    psp[3].lParam = (LPARAM)updateManager;
 
     psp[4].dwSize = sizeof(PROPSHEETPAGE);
     psp[4].dwFlags = 0;
@@ -201,14 +209,9 @@ bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent, Preferences* pre
 
     currentValues = originalValues;
 
-    g_updateManager = new Win32UpdateManager(m_pContext);
-    g_updateManager->DetermineLocalVersions();
-    g_updateManager->SetPlatform(string("WIN32"));
-
     result = (PropertySheet(&psh) > 0);
 
-    delete g_updateManager;
-    g_updateManager = NULL;
+    delete updateManager;
 
     return result;
 }
@@ -249,6 +252,8 @@ void Win32PreferenceWindow::GetPrefsValues(Preferences* prefs,
     size = 64;
     prefs->GetThemeDefaultFont(values->defaultFont, &size);
     m_pThemeMan->GetCurrentTheme(values->currentTheme);
+
+    prefs->GetCheckForUpdates(&values->checkForUpdates);
 }
 
 void Win32PreferenceWindow::SavePrefsValues(Preferences* prefs, 
@@ -280,6 +285,8 @@ void Win32PreferenceWindow::SavePrefsValues(Preferences* prefs,
 
     prefs->SetThemeDefaultFont(values->defaultFont);
     m_pThemeMan->UseTheme(m_oThemeList[currentValues.currentTheme]);
+
+    prefs->SetCheckForUpdates(values->checkForUpdates);
 }
 
 bool Win32PreferenceWindow::PrefPage1Proc(HWND hwnd, 
@@ -1708,6 +1715,7 @@ bool Win32PreferenceWindow::PrefPage5Proc(HWND hwnd,
                     
                     if (ChooseFont(&sFont))
                     {
+                        memset(currentValues.defaultFont, 0x00, 64);
                     	strcpy(currentValues.defaultFont, 
                                sLogFont.lfFaceName);
                         currentValues.fontChanged = true;
@@ -1766,11 +1774,128 @@ bool Win32PreferenceWindow::PrefPage5Proc(HWND hwnd,
     return result;
 }
 
+typedef struct ThreadStruct {
+    Thread* thread;
+    UpdateManager* um;
+    HWND hwndList;
+}ThreadStruct;
+
+static bool callback_function(UMEvent* event, void* userData)
+{
+    ThreadStruct* ts = (ThreadStruct*)userData;
+    HWND hwndParent = GetParent(ts->hwndList);
+    HWND hwndStatus = GetDlgItem(hwndParent, IDC_STATUS);
+
+    switch(event->type)
+    {
+        case kUMEvent_Status:
+        {
+            ostringstream ost;
+
+            ost << " Status: " << event->eventString << endl;
+
+            SetWindowText(hwndStatus, ost.str().c_str());
+            break;
+        }
+
+        case kUMEvent_Progress:
+        {
+            UMEventProgressData data = event->data.progressData;
+
+            ostringstream ost;
+
+            ost << " Downloading "; 
+
+            
+            if(data.item)
+            {
+                ost << data.item->GetLocalFileName() << " -  Progress: ";      
+            }
+
+            float total;
+            float recvd;
+            uint32 percent;
+            
+            ost.precision(2);
+            ost.flags(ios_base::fixed);
+
+            total = data.total;
+            recvd = data.position;
+            percent= (uint32)recvd/total*100;
+
+            if(total >= 1048576)
+            {
+                total /= 1048576;
+                recvd /= 1048576;
+                ost  << percent << "% (" << recvd << " of "<< total << " MB) ";
+            }
+            else if(total >= 1024)
+            {
+                total /= 1024;
+                recvd /= 1024;
+                ost << percent << "% ("<< recvd << " of "<< total << " MB)";
+            }
+            else
+            {
+                ost << percent << "% (" << data.position << " of " << 
+                    data.total << " Bytes)";
+            }
+
+            SetWindowText(hwndStatus, ost.str().c_str());
+            break;
+        }
+
+        case kUMEvent_Done:
+        {
+            ostringstream ost;
+
+            ost << " Status: " << event->eventString << endl;
+
+            SetWindowText(hwndStatus, ost.str().c_str());
+            break;
+        }
+
+        case kUMEvent_Error:
+        {
+            UMEventErrorData data = event->data.errorData;
+
+            ostringstream ost;
+
+            ost << " Error: An error of type " <<  data.errorCode << " occurred.";
+
+            SetWindowText(hwndStatus, ost.str().c_str());
+
+            break;
+        }
+    }
+
+    return true;
+}
+
 static void check_function(void* arg)
 {
-    UpdateManager* um = (UpdateManager*)arg;
+    ThreadStruct* ts = (ThreadStruct*)arg;
 
-    um->RetrieveLatestVersionInfo();
+    ts->um->RetrieveLatestVersionInfo(callback_function, ts);
+
+    ListView_RedrawItems(ts->hwndList, 0, ListView_GetItemCount(ts->hwndList) - 1);
+
+    delete ts->thread;
+    delete ts;
+}
+
+static void update_function(void* arg)
+{
+    ThreadStruct* ts = (ThreadStruct*)arg;
+
+    ts->um->RetrieveLatestVersionInfo();
+
+    ListView_RedrawItems(ts->hwndList, 0, ListView_GetItemCount(ts->hwndList) - 1);
+
+    ts->um->UpdateComponents(callback_function, ts);
+
+    delete ts->thread;
+    delete ts;
 }
 
 bool Win32PreferenceWindow::PrefPage6Proc(HWND hwnd, 
@@ -1780,11 +1905,13 @@ bool Win32PreferenceWindow::PrefPage6Proc(HWND hwnd,
 {
     bool result = false;
     static PROPSHEETPAGE* psp = NULL;
+    static UpdateManager* um = NULL;
     static Preferences* prefs = NULL;
     static HWND hwndList = NULL;
     static HWND hwndDescription = NULL;
     static HWND hwndUpdate = NULL;
     static HWND hwndCheck = NULL;
+    static HWND hwndAutoCheck = NULL;
     const char* kNoSelection = "No component is selected.";
 
     
@@ -1794,12 +1921,15 @@ bool Win32PreferenceWindow::PrefPage6Proc(HWND hwnd,
         {
             // remember these for later...
             psp = (PROPSHEETPAGE*)lParam;
-            prefs = (Preferences*)psp->lParam;
+            um = (UpdateManager*)psp->lParam;
+            prefs = m_pContext->prefs;
+
 
             hwndList = GetDlgItem(hwnd, IDC_LIST);
             hwndDescription = GetDlgItem(hwnd, IDC_DESCRIPTION);
             hwndUpdate = GetDlgItem(hwnd, IDC_UPDATE);
             hwndCheck = GetDlgItem(hwnd, IDC_CHECK);
+            hwndAutoCheck = GetDlgItem(hwnd, IDC_AUTOCHECK);
 
             // Init our controls
 
@@ -1838,7 +1968,7 @@ bool Win32PreferenceWindow::PrefPage6Proc(HWND hwnd,
             UpdateItem* item = NULL;
             uint32 i = 0;
 
-            while(item = g_updateManager->ItemAt(i++))
+            while(item = um->ItemAt(i++))
             {
                 lv_item.mask = LVIF_PARAM | LVIF_STATE;
                 lv_item.state = 0;
@@ -1862,22 +1992,35 @@ bool Win32PreferenceWindow::PrefPage6Proc(HWND hwnd,
             {
                 case IDC_UPDATE:
                 {
-                
+                    Thread* thread = Thread::CreateThread();
+
+                    if(thread)
+                    {
+                        ThreadStruct* ts = new ThreadStruct;
+
+                        ts->thread = thread;
+                        ts->um = um;
+                        ts->hwndList = hwndList;
+
+                        thread->Create(update_function, ts);
+                    }
                 	break;
                 }
 
                 case IDC_CHECK:
                 {
-                    /*Thread* thread = Thread::CreateThread();
+                    Thread* thread = Thread::CreateThread();
 
                     if(thread)
                     {
-                        thread->Create(check_function, m_pContext->updateManager);
-                    }*/
+                        ThreadStruct* ts = new ThreadStruct;
 
-                    g_updateManager->RetrieveLatestVersionInfo();
-                    ListView_RedrawItems(hwndList, 0, ListView_GetItemCount(hwndList) - 1);
-                    
+                        ts->thread = thread;
+                        ts->um = um;
+                        ts->hwndList = hwndList;
+
+                        thread->Create(check_function, ts);
+                    }
                     break;
                 }                
             }
