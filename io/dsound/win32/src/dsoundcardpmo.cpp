@@ -19,7 +19,7 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-  $Id: dsoundcardpmo.h,v 1. 1998/11/11 00:00:00 sr
+  $Id$
 ____________________________________________________________________________*/
 
 /* system headers */
