@@ -26,8 +26,9 @@ ____________________________________________________________________________*/
 #ifndef _ALSAPMO_H_
 #define _ALSAPMO_H_
 
-#define ALSA
-#define DEBUG
+//#define DEBUG
+//#define DEBUG2
+//#define ALSA
 
 /* ALSA_DEVICE=1:0 is normal /dev/dsp          */
 /* ALSA_DEVICE=1:1 is alsa's advanced device   */
@@ -38,7 +39,7 @@ ____________________________________________________________________________*/
 
 /* system headers */
 #include <stdlib.h>
-#ifdef ALSA
+
 #include <sys/asoundlib.h>
 
 #define AUDIO_FORMAT_SIGNED_16    0x110
@@ -48,14 +49,15 @@ ____________________________________________________________________________*/
 #define AUDIO_FORMAT_ULAW_8       0x4
 #define AUDIO_FORMAT_ALAW_8       0x8
 
-#endif
-
 /* project headers */
 #include <config.h>
+#include "thread.h"
+//#include "semaphore.h"
 #include "pmo.h"
-#include "properties.h"
+//#include "pmoevent.h"
+#include "eventbuffer.h"
+///#include "properties.h"
 
-#ifdef ALSA
 struct audio_info_struct
 {
     void *handle;
@@ -65,8 +67,11 @@ struct audio_info_struct
     int format;
     int channels;
     long rate;
+    void * mixer_handle;
+    int pcm;
+//    char mixer_id[13];
+    snd_mixer_channel_t channel;
 };
-#endif
 
 #define BIT_SELECT  0x1f
 #define SLEEPTIME   256
@@ -82,52 +87,65 @@ enum {
     pmoError_IOCTL_SNDCTL_DSP_SAMPLESIZE,
     pmoError_IOCTL_SNDCTL_DSP_STEREO,
     pmoError_IOCTL_SNDCTL_DSP_SPEED,
-#ifdef ALSA
     pmoError_ALSA_CardNumber,
     pmoError_ALSA_DeviceNumber,
     pmoError_ALSA_Playback_Info,
     pmoError_ALSA_Playback_Params,
     pmoError_ALSA_DeviceCloseFailed,
-#endif
+    pmoError_ALSA_MixerOpenFailed,
+    pmoError_ALSA_Mixer_Info,
     pmoError_MaximumError
 };
 
-class AlsaPMO : public PhysicalMediaOutput{
-
+class AlsaPMO : public PhysicalMediaOutput, public EventBuffer
+{
 public:
-    AlsaPMO();
+	    AlsaPMO();
     virtual ~AlsaPMO();
     
     virtual Error Init(OutputInfo* info);
-    virtual Error Reset(bool user_stop);
-    virtual Error Write(int32 &,void *,int32);
+//    virtual Error Write(int32 &,void *,int32);
     virtual Error Pause();
     virtual Error Resume();
-    virtual const char *GetErrorString(int32);
-    virtual Error SetPropManager(Properties *p) { m_propManager = p; if (p) return kError_NoErr; else return kError_UnknownErr; }
+   virtual Error Break();
+   virtual void  WaitToQuit();
+   virtual Error Clear();
+   virtual Error SetPropManager(Properties * p);
+   virtual void  SetVolume(int32);
+   virtual int32 GetVolume(void);
+
+   static void   StartWorkerThread(void *);
+   virtual Error BeginWrite(void *&pBuffer, size_t &iBytesToWrite);
+   virtual Error EndWrite  (size_t iNumBytesWritten);
+   virtual Error AcceptEvent(Event *);
+   virtual int   GetBufferPercentage();
+
  private:
+
+   void          WorkerThread(void); 
+   virtual Error Reset(bool user_stop);
+   void          HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent);
+//   int		OpenMixer();
+
     Properties *m_propManager;
-    bool m_properlyInitialized;
-    int16 buffer[OBUFFERSIZE];
-    int16 *bufferp[MAXCHANNELS];
-    uint32 channels;
+    bool	m_properlyInitialized;
+    int16	buffer[OBUFFERSIZE];
+    int16	*bufferp[MAXCHANNELS];
+    uint32	channels;
+#ifdef SOUNDCARD
     static int audio_fd;
+#endif
     OutputInfo *myInfo;
     int32 getprocessed(void);
+   Thread      *m_pBufferThread;
+   Mutex       *m_pPauseMutex;
+//   Semaphore   *m_pPauseSem;
+//   bool         m_bPause;
+   int          m_iOutputBufferSize, m_iTotalBytesWritten, m_iBytesPerSample;
+   int          m_iLastFrame;
  
-#ifdef ALSA
     struct audio_info_struct *ai;
-    static int audio_set_all(struct audio_info_struct *);
-//    static int audio_set_rate(struct audio_info_struct *);
-//    static int audio_set_format(struct audio_info_struct *);
-//    static int audio_set_channels(struct audio_info_struct *);
-//    static int audio_set_playback_params(struct audio_info_struct *);
-#endif
+    int audio_set_all(struct audio_info_struct *);
 };
 
 #endif /* _ALSAPMO_H_ */
-
-
-
-
-
