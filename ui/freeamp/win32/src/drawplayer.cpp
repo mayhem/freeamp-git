@@ -258,7 +258,22 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
                 case kOpenControl:
                 {
                     int32 srcOffset = 0;
+                    
+                    int32 id = g_buttonStateArray[i].control_id;
 
+                    if(id == kModeControl)
+                        OutputDebugString("Drawing kModeControl\r\n");
+                    else if(id == kMinimizeControl)
+                        OutputDebugString("Drawing kMinimizeControl\r\n");
+                    else if(id == kCloseControl)
+                        OutputDebugString("Drawing kCloseControl\r\n");
+                    else if(id == kRepeatControl)
+                        OutputDebugString("Drawing kRepeatControl\r\n");
+                    else if(id == kShuffleControl)
+                        OutputDebugString("Drawing kShuffleControl\r\n");
+                    else if(id == kOpenControl)
+                        OutputDebugString("Drawing kOpenControl\r\n");
+                   
                     SelectObject(memdc, g_buttonStateArray[i].bitmap);
                     
                     if( g_buttonStateArray[i].state == Selected )
@@ -335,6 +350,13 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
                 case kVolumeControl:
                 case kSeekControl:
                 {
+                    int32 id = g_buttonStateArray[i].control_id;
+
+                    if(id == kVolumeControl)
+                        OutputDebugString("Drawing kVolumeControl\r\n");
+                    else if(id == kSeekControl)
+                        OutputDebugString("Drawing kSeekControl\r\n");
+
                     if( g_buttonStateArray[i].state == Selected )
                     {
                         //currentCursor = dialCursor;
