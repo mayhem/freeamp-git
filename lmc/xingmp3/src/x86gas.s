@@ -298,7 +298,7 @@ fdct32:		#%% proc
 	movl (%ebx,%eax),%ebp
 	movl %ebp,(%esi,%edx)	# f[p] = x2[q]
 	flds (%edi,%eax)	# push x[q]
-	fadd %st,%st(1)
+	fadd
 	fxch
 	fstps 4(%esi,%edx)	# f[p + 4] = x[q] + x[q + 4]
 	subl $4,%eax		# q -= 4
