@@ -45,6 +45,10 @@ class Registrar {
     void SetSearchString(const char* search){m_search = search;}
     const char* SearchString(void) const {return m_search;}
 
+#ifdef WIN32
+    void GetPluginDescription(char* file, RegistryItem* item);
+#endif
+
  private:
     const char* m_subdir;
     const char* m_search;
