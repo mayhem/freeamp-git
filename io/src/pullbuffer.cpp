@@ -453,6 +453,7 @@ Error PullBuffer::EndRead(size_t iBytesUsed)
 
 Error PullBuffer::DiscardBytes()
 {
+   int iBytesToDiscard;
 
    for(;;)
    {
@@ -468,12 +469,13 @@ Error PullBuffer::DiscardBytes()
         break;
    }
 
-   if (m_iBytesInBuffer < m_iWriteTriggerSize)
+   iBytesToDiscard = m_iBytesInBuffer - (m_iBufferSize / 2);
+   if (iBytesToDiscard > 0)
    {
-      m_iReadIndex = (m_iReadIndex + m_iWriteTriggerSize) % m_iBufferSize;
-    	m_iBytesInBuffer -= m_iWriteTriggerSize;
+      m_iReadIndex = (m_iReadIndex + iBytesToDiscard) % m_iBufferSize;
+    	m_iBytesInBuffer -= iBytesToDiscard;
       assert(m_iBytesInBuffer <= m_iBufferSize);
-      m_context->log->Log(LogInput, "Discarding %d bytes.\n", m_iWriteTriggerSize);
+      m_context->log->Log(LogInput, "Discarding %d bytes.\n", iBytesToDiscard);
    }
 
    m_pMutex->Release();

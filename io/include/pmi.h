@@ -74,6 +74,8 @@ public:
 	               {return 0;};
     virtual int32 GetNumBytesInBuffer()
 	               {return 0;};
+    virtual Error DiscardBytes()
+	               {return kError_NoErr;};
 	 virtual void  Pause()
 	               { };
 	 virtual bool  Resume()

@@ -205,6 +205,14 @@ int32 ObsInput::GetNumBytesInBuffer()
    return 0;
 }
 
+Error ObsInput::DiscardBytes()
+{
+   if (m_pPullBuffer)
+       return m_pPullBuffer->DiscardBytes();
+
+   return kError_NoErr;
+}
+
 void ObsInput::Pause()
 {
    if (m_pPullBuffer)

@@ -54,6 +54,7 @@ class     ObsInput:public PhysicalMediaInput
                  { return true; };
 	virtual int32 GetBufferPercentage();
 	virtual int32 GetNumBytesInBuffer();
+   virtual Error DiscardBytes();
 	virtual Error SetBufferSize(size_t iNewSize);
 	virtual void  Pause();
 	virtual bool  Resume();
