@@ -91,7 +91,7 @@ HANDLE Preferences::GetFirstLibDir(char *path, uint32 *len) {
 	pPart = pCol + sizeof(char);
     }
 
-    pPath = pldfh->m_pLibDirs->ElementAt(0);
+    pPath = pldfh->m_pLibDirs->ItemAt(0);
     if (pPath) {
 	strncpy(path,pPath,*len);
 	*len = strlen(pPath);
@@ -124,7 +124,7 @@ Error Preferences::GetNextLibDir(HANDLE hLibDirFind,char *path, uint32 *len) {
     if (hLibDirFind) {
 	LibDirFindHandle *pldfh = (LibDirFindHandle *)hLibDirFind;
 	pldfh->m_current++;
-	char *pPath = pldfh->m_pLibDirs->ElementAt(pldfh->m_current);
+	char *pPath = pldfh->m_pLibDirs->ItemAt(pldfh->m_current);
 	if (pPath) {
 	    strncpy(path,pPath,*len);
 	    *len = strlen(pPath);
