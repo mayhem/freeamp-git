@@ -1,0 +1,23 @@
+$Id$
+
+TO BUILD FREEAMP ON BEOS
+
+In Makefile-plugins.in, comment out the lines that say:
+
+PLUGINS += plugins/obsinput.pmi
+PLUGINS += plugins/cd.pmo
+PLUGINS += plugins/lcd.ui
+PLUGINS += plugins/irman.ui
+PLUGINS += plugins/cddb.mdf
+
+These plugins above are not yet ported, or cannot be ported to BeOS,
+such as obsinput which requires ip multicast support. This should
+be available as soon as the BONE supports multicast, hopefully.
+These should really be done automatically from the configure script,
+I am just lazy to do that yet.
+
+Then follow the ritual as usual:
+
+./configure
+make
+
