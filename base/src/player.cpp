@@ -1500,7 +1500,7 @@ GenerateSigsWork(set<string> *items)
 	URLToFilePath(url.c_str(), realname, &reallen);
         if (-1 == stat(realname, &st)) {
             delete [] realname;
-            m_context->catalog->RemoveSong(url);
+            m_context->catalog->RemoveSong(url.c_str());
             items->erase(url);
 	    continue;
 	}

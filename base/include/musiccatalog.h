@@ -139,7 +139,7 @@ class MusicCatalog : public EventQueue
     static void prune_thread_function(void *arg);
     static void mb_lookup_thread(void *arg);
     
-    void DoMBLookup(string url, string GUID);
+    void DoMBLookup(const string &url, const string &GUID);
     void MBLookupThread(void);
     void PruneThread(bool sendmessages);
 
@@ -158,7 +158,7 @@ class MusicCatalog : public EventQueue
  private:
     void GenerateSignature(PlaylistItem *track);
 
-    bool CaseCompare(string s1, string s2);
+    bool CaseCompare(const string &s1, const string &s2);
 
     Mutex *m_catMutex;
     Mutex *m_timerMutex;

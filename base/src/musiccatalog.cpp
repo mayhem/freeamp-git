@@ -493,7 +493,7 @@ Error MusicCatalog::AddStream(const char *url)
     return kError_NoErr;
 }
 
-bool MusicCatalog::CaseCompare(string s1, string s2)
+bool MusicCatalog::CaseCompare(const string &s1, const string &s2)
 {
     if (s1.length() == s2.length()) {
         for (uint32 i = 0; i < s1.length(); i++) {
@@ -1492,7 +1492,7 @@ void MusicCatalog::MBLookupThread(void)
     m_MBLookupThreadActive = false;
 }
 
-void MusicCatalog::DoMBLookup(string url, string GUID)
+void MusicCatalog::DoMBLookup(const string &url, const string &GUID)
 {
     if (GUID != "") {
         MetaData *data = ReadMetaDataFromDatabase(url.c_str());
