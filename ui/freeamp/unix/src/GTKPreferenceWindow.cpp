@@ -2320,6 +2320,9 @@ GtkWidget *GTKPreferenceWindow::CreateCD(void)
     gtk_container_add(GTK_CONTAINER(pane), pollCD);
     gtk_signal_connect(GTK_OBJECT(pollCD), "toggled",
                        GTK_SIGNAL_FUNC(pollcd_toggle), this);
+    if (originalValues.pollCD)
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pollCD),
+                                     TRUE);
     gtk_widget_show(pollCD);
 
     GtkWidget *temphbox = gtk_hbox_new(FALSE, 5);

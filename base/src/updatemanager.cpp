@@ -80,9 +80,9 @@ typedef ostrstream ostringstream;
 const char* kUpdateServer = BRANDING_UPDATE_SERVER;
 const char* kUpdatePath = BRANDING_UPDATE_PATH;
 const char* kUpdateFile = BRANDING_UPDATE_PATH"/version_info.xml";
-const char* kUpdateRequest = "GET %s HTTP/1.0\n"
-                             "Host: %s\n"
-                             "User-Agent: FreeAmp/%s\n" // we do not want to change this for branding
+const char* kUpdateRequest = "GET %s HTTP/1.0\r\n"
+                             "Host: %s\r\n"
+                             "User-Agent: FreeAmp/%s\r\n" // we do not want to change this for branding
                              "\n";
 const uint8 kUpdatePort = 80;
 
@@ -998,11 +998,11 @@ Error UpdateManager::DownloadItem(UpdateItem* item,
             {
                 gethostname(localname, kMaxHostNameLen);    
 
-                const char* kHTTPQuery = "GET %s HTTP/1.0\n"
-                                         "Host: %s\n"
-                                         "Accept: */*\n" 
-                                         "User-Agent: FreeAmp/%s\n"
-                                         "\n";
+                const char* kHTTPQuery = "GET %s HTTP/1.0\r\n"
+                                         "Host: %s\r\n"
+                                         "Accept: */*\r\n" 
+                                         "User-Agent: FreeAmp/%s\r\n"
+                                         "\r\n";
                                              
                 char* query = new char[ strlen(kHTTPQuery) + 
                                         strlen(file) +

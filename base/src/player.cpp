@@ -160,7 +160,7 @@ Player(FAContext *context) : EventQueue()
 
     bool pollCD = false;
     m_context->prefs->GetPrefBoolean(kCheckCDAutomaticallyPref, &pollCD);
- 
+
     if (pollCD)
         m_context->timerManager->StartTimer(&m_cdTimer, cd_timer, 5, this);
 
@@ -2470,8 +2470,6 @@ void Player::CDTimer()
 
     if (!pmoRegistry)
         return;
-
-    cout << "tick\n";
 
     while(NULL != (pmo_item = pmoRegistry->GetItem(i++))) 
     {

@@ -54,7 +54,6 @@ ____________________________________________________________________________*/
 #define DB Debug_v("%s:%d\n",  __FILE__, __LINE__);
 
 const int iInitialOutputBufferSize = 64512;
-static Semaphore m_xingSem(SEM_UNLOCKED);
 
 extern    "C"
 {
@@ -104,8 +103,6 @@ const char *szCannotDecode = The_BRANDING" cannot play this file/stream. This fi
 XingLMC::XingLMC(FAContext *context) :
          LogicalMediaConverter(context)
 {
-   m_xingSem.Wait(3000);
-
    m_pContext = context;
 
    m_decoderThread = NULL;
@@ -150,7 +147,6 @@ XingLMC::~XingLMC()
       delete m_pXingHeader->toc;
       delete m_pXingHeader;
    }
-   m_xingSem.Signal();
 }
 
 Error XingLMC::Prepare(PullBuffer *pInputBuffer, PullBuffer *&pOutBuffer)

@@ -581,18 +581,18 @@ Error HttpInput::Open(void)
     szQuery = new char[iMaxUrlLen];
 
     if (szFile)
-        sprintf(szQuery, "GET %s HTTP/1.0\n"
-                         "Host: %s\n"
-                         "Accept: */*\n" 
-                         "icy-metadata:1\n" 
-                         "User-Agent: FreeAmp/%s\n", 
+        sprintf(szQuery, "GET %s HTTP/1.0\r\n"
+                         "Host: %s\r\n"
+                         "Accept: */*\r\n" 
+                         "icy-metadata:1\r\n" 
+                         "User-Agent: FreeAmp/%s\r\n", 
                          szFile, szHostName, FREEAMP_VERSION);
     else
-        sprintf(szQuery, "GET / HTTP/1.0\n"
-                         "Host: %s\n"
-                         "Accept: */*\n" 
-                         "icy-metadata:1\n" 
-                         "User-Agent: FreeAmp/%s\n", 
+        sprintf(szQuery, "GET / HTTP/1.0\r\n"
+                         "Host: %s\r\n"
+                         "Accept: */*\r\n" 
+                         "icy-metadata:1\r\n" 
+                         "User-Agent: FreeAmp/%s\r\n", 
                          szHostName, FREEAMP_VERSION);
 
     m_pContext->prefs->GetPrefBoolean(kUseTitleStreamingPref, &bUseTitleStreaming);
@@ -606,7 +606,7 @@ Error HttpInput::Open(void)
         eRet = m_pTitleStream->Init(iPort);
         if (IsntError(eRet))
         {
-            sprintf(szQuery + strlen(szQuery), "x-audiocast-udpport: %d\n", 
+            sprintf(szQuery + strlen(szQuery), "x-audiocast-udpport: %d\r\n", 
                     iPort); 
         }
         else
@@ -616,7 +616,7 @@ Error HttpInput::Open(void)
         }
     }
 
-    strcat(szQuery, "\n");
+    strcat(szQuery, "\r\n");
 
     ReportStatus("Requesting stream...");
 

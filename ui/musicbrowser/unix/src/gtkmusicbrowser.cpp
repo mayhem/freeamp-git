@@ -1226,6 +1226,7 @@ void GTKMusicBrowser::AddTracksDoubleClick(vector<PlaylistItem *> *newlist)
 
 void GTKMusicBrowser::PlayEvent(void)
 {
+    m_context->target->AcceptEvent(new Event(CMD_Stop));
     m_plm->SetCurrentIndex(m_lastindex);
     m_context->target->AcceptEvent(new Event(CMD_Play));
 }

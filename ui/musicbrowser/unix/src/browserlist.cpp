@@ -790,10 +790,7 @@ void GTKMusicBrowser::PlaylistRightClick(int x, int y, uint32 time)
 
     string url = sel->URL();
     if (url.find("http://") < url.length() || url.find("rtp://") < url.length())
-    {
         gtk_item_factory_popup(playlist2Popup, x, y, 3, time);
-cout << "stream context\n";
-    }
     else
         gtk_item_factory_popup(playlistPopup, x, y, 3, time);
 }
