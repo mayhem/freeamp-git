@@ -571,7 +571,10 @@ static int unpack_side_MPEG2(int igr)
    {
       side_info.gr[igr][ch].part2_3_length = bitget(12);
       side_info.gr[igr][ch].big_values = bitget(9);
-      side_info.gr[igr][ch].global_gain = bitget(8) + gain_adjust;
+	  
+	  assert(side_info.gr[igr][ch].big_values < 288); // to catch corrupt sideband data
+      
+	  side_info.gr[igr][ch].global_gain = bitget(8) + gain_adjust;
       if (ms_mode)
 	 side_info.gr[igr][ch].global_gain -= 2;
       side_info.gr[igr][ch].scalefac_compress = bitget(9);
@@ -616,7 +619,11 @@ static int unpack_side_MPEG2(int igr)
       }
       side_info.gr[igr][ch].preflag = 0;
       side_info.gr[igr][ch].scalefac_scale = bitget(1);
-      side_info.gr[igr][ch].count1table_select = bitget(1);
+	  
+	  /* To catch corrupt scalefac data */
+	  assert((side_info.gr[igr][ch].scalefac_scale < 16) && (side_info.gr[igr][ch].scalefac_scale >= 0)); 
+      
+	  side_info.gr[igr][ch].count1table_select = bitget(1);
    }
 
 /* return  bytes in header + side info */
