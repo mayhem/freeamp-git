@@ -361,6 +361,8 @@ class GTKMusicBrowser {
     void AddNewStream(void);
 
     void HandleSignature(void);
+
+    void TipArtist(PlaylistItem *tipee = NULL);
 };
 
 #endif

@@ -511,6 +511,11 @@ static void emusic_web(GTKMusicBrowser *p, guint action, GtkWidget *w)
     LaunchBrowser("http://www.emusic.com/");
 }
 
+static void relatable_web(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+    LaunchBrowser("http://www.relatable.com/");
+}
+
 static void show_about(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
     p->ShowOptions(9);
@@ -631,6 +636,7 @@ void GTKMusicBrowser::CreateMenu(GtkWidget *topbox)
      {"/_Help/sep9",            NULL,           0,          0, "<Separator>" },
      {"/_Help/_FreeAmp Web Site", NULL,         (void(*)(...))freeamp_web, 0, 0 },
      {"/_Help/_EMusic.com Web Site", NULL,       (void(*)(...))emusic_web, 0, 0 },
+     {"/_Help/_Relatable Web Site", NULL,        (void(*)(...))relatable_web, 0, 0 },
      {"/_Help/sep10",           NULL,           0,          0, "<Separator>" },
      {"/_Help/_About",           NULL,           (void(*)(...))show_about, 0, 0 }
     };

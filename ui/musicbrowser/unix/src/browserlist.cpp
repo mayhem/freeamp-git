@@ -999,6 +999,11 @@ static void add_fav_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
     p->AddPLStreamToFavs();
 }
 
+static void tip_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+    p->TipArtist();
+}
+
 void GTKMusicBrowser::PlaylistRightClick(int x, int y, uint32 time)
 {
     if (m_lastindex == kInvalidIndex)
@@ -1054,7 +1059,9 @@ void GTKMusicBrowser::CreatePlaylistList(GtkWidget *box)
      {"/sep1",         NULL,      0,                        0, "<Separator>" },
      {"/Remove",       NULL,      (void(*)(...))delete_pop,     0, 0 },
      {"/sep2",         NULL,      0,                        0, "<Separator>" },
-     {"/Edit Info",    NULL,      (void(*)(...))edit_pop,      0, 0 }
+     {"/Edit Info",    NULL,      (void(*)(...))edit_pop,      0, 0 },
+     {"/sep3",         NULL,      0,                        0, "<Separator>" },
+     {"/Tip This Artist", NULL,   (void(*)(...))tip_pop,       0, 0 }
     };
  
     int nmenu_items = sizeof(popup_items) / sizeof(popup_items[0]);

@@ -1375,6 +1375,35 @@ void GTKMusicBrowser::SortPlaylistEvent(PlaylistSortKey order, PlaylistSortType
         m_plm->Sort(order, type);
 }
 
+void GTKMusicBrowser::TipArtist(PlaylistItem *tipee)
+{
+   PlaylistItem *tip = NULL;
+   if (tipee)
+       tip = tipee;
+
+   if (!tip) {
+       if (GetClickState() == kContextPlaylist) {
+           if (m_lastindex == kInvalidIndex)
+               return;
+
+           tip = m_plm->ItemAt(*(m_plSelected.begin()));
+       }
+       else
+           return;
+   }
+   
+   string artistname = tip->GetMetaData().Artist();
+
+   if (artistname.size() == 0 || artistname == "Unknown")
+       return;
+
+   string encoded;
+   ReplaceSpaces(artistname, encoded);
+   string url = string("http://www.fairtunes.com/servlet/ArtistLookupServlet?redirectPage=http://www.fairtunes.com/search.jsp&searchTerms=") + encoded;
+
+   LaunchBrowser(url.c_str());
+}
+
 void GTKMusicBrowser::PopUpInfoEditor(PlaylistItem *editee)
 {
     if (editee) {

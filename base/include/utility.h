@@ -52,6 +52,8 @@ Error URLToFilePath(const char* url, char* path, uint32* length);
 void ToUpper(char *s);
 void ToLower(char *s);
 
+void ReplaceSpaces(string &in, string &encoded); // "Blah blah" to "Blah%20blah"
+
 #ifndef WIN32
 void LaunchBrowser(const char* url);
 bool CopyFile(const char *pExistingFileName, 

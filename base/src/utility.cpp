@@ -466,6 +466,26 @@ void ToLower(char *s)
        *p = tolower(*p);
 }      
 
+void ReplaceSpaces(string &in, string &encoded)
+{
+    encoded = "";
+    
+    for (unsigned int i = 0; i < in.size(); i++)
+    {
+        if (in[i] == ' ')
+            encoded += "%20";
+        else if ((unsigned char)in[i] > 127)
+        {
+            char enc[10];
+            sprintf(enc, "%%%02X", in[i] & 0xFF);
+            enc[3] = 0;
+            encoded += enc;
+        }
+        else
+            encoded += in[i];
+    }
+}
+
 #ifdef WIN32
 #elif __BEOS__
 
