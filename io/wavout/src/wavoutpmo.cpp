@@ -102,7 +102,7 @@ Error
 WavOutPMO::
 Init(OutputInfo* info)
 {
-   unsigned int len;
+   uint32 len;
     
    m_samples_per_second  = info->samples_per_second;
    m_data_size           = info->max_buffer_size;
