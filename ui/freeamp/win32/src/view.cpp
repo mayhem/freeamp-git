@@ -27,6 +27,7 @@ ____________________________________________________________________________*/
 #include <windows.h>
 #include <windowsx.h>
 #include <assert.h>
+#include <stdlib.h>
 
 /* project headers */
 #include "config.h"
@@ -84,7 +85,8 @@ View::
 PointInView(int32 x, int32 y)
 {
     assert(m_viewRegion);
-    return (PtInRegion(m_viewRegion, x, y) == TRUE);
+
+    return ( PtInRegion(m_viewRegion, x, y) != 0 );
 }
 
 void 

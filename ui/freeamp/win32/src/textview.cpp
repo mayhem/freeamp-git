@@ -327,6 +327,8 @@ SetText(char* text)
     }
 
     LeaveCriticalSection(&m_criticalSection);
+
+    Invalidate();
 }
 
 void 

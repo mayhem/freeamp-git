@@ -30,6 +30,15 @@ ____________________________________________________________________________*/
 #define TimeType_TimeOnRight    2
 #define TimeType_TimeOnLeft     4 
 
+typedef enum {	
+	DisplayFirstToggleTime = 0,
+    DisplayCurrentTime = DisplayFirstToggleTime,
+    DisplayRemainingTime,
+	DisplayTotalTime, 
+	DisplayLastToggleTime,
+    DisplaySeekTime
+}TimeDisplay;
+
 
 class TimeView : public View {
  public:
@@ -71,17 +80,33 @@ class TimeView : public View {
     void SetLabel(char* label);
     char* label(void) const { return m_label; }
 
-    void SetTime(   int32 hours, 
-                    int32 minutes, 
-                    int32 seconds);
+    void SetCurrentTime(int32 hours, 
+						int32 minutes, 
+						int32 seconds);
 
-    void Time(  int32* hours, 
-                int32* minutes, 
-                int32* seconds);
+    void CurrentTime(	int32* hours, 
+						int32* minutes, 
+						int32* seconds);
 
-    int32 Hours(void) const { return m_hours; }
-    int32 Minutes(void) const { return m_minutes; }
-    int32 Seconds(void) const { return m_seconds; }
+    int32 CurrentHours(void) const { return m_currentHours; }
+    int32 CurrentMinutes(void) const { return m_currentMinutes; }
+    int32 CurrentSeconds(void) const { return m_currentSeconds; }
+
+	void SetTotalTime(	int32 hours, 
+						int32 minutes, 
+						int32 seconds);
+
+    void TotalTime(	int32* hours, 
+					int32* minutes, 
+					int32* seconds);
+
+    int32 TotalHours(void) const { return m_totalHours; }
+    int32 TotalMinutes(void) const { return m_totalMinutes; }
+    int32 TotalSeconds(void) const { return m_totalSeconds; }
+
+    void SetSeekTime(   int32 hours, 
+					    int32 minutes, 
+						int32 seconds);
 
     DIB* TimeFont() const { return m_timeFontBitmap; }
     int32 TimeFontWidth(char c) { return m_timeFontWidths[c - 32];}
@@ -94,12 +119,18 @@ class TimeView : public View {
     int32 Flags(void) const { return m_flags; }
     void SetFlags(int32 flags) { m_flags = flags; }
 
+	TimeDisplay Display() const { return m_display; }
+	void SetDisplay(TimeDisplay display);
+	void ToggleDisplay();
+
  protected:
-    
+    void CreateTimeString();
+
  private:
     //DIB*            m_backgroundBitmap;
     //DIB*            m_viewBitmap;
 
+	TimeDisplay		m_display;
     DIB*            m_timeFontBitmap;
     int32*          m_timeFontWidths;
     int32           m_timeFontHeight;
@@ -114,9 +145,18 @@ class TimeView : public View {
     bool            m_pressed;
     int32           m_command;
     int32           m_flags;
-    int32           m_hours;
-    int32           m_minutes;
-    int32           m_seconds;
+    
+	int32			m_totalHours;
+	int32			m_totalMinutes;
+	int32			m_totalSeconds;
+
+	int32			m_currentHours;
+	int32			m_currentMinutes;
+	int32           m_currentSeconds;
+
+    int32			m_seekHours;
+	int32			m_seekMinutes;
+	int32           m_seekSeconds;
 
     char*           m_label;
     char            m_time[12]; // i should probably do this dynamically

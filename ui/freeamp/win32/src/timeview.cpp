@@ -66,17 +66,19 @@ View(hwnd, parent, viewRegion)
     m_labelFontWidths = labelFontWidths;
     m_labelFontHeight = labelFontHeight;
 
+
     /*m_viewBitmap = new DIB;
     m_viewBitmap->Create(   Width(),
                             Height(),
                             backgroundBitmap->BitsPerPixel());*/
 
-    SetTime(0,0,0);
-
     m_label = NULL;
 
-    SetLabel("");
+    SetCurrentTime(0,0,0);
+    SetTotalTime(0,0,0);
+    SetSeekTime(0,0,0);
 
+    SetDisplay(DisplayCurrentTime);
 }
 
 TimeView::
@@ -116,11 +118,12 @@ View(hwnd, parent, viewRect)
                             Height(),
                             backgroundBitmap->BitsPerPixel());*/
 
-    SetTime(0,0,0);
+	m_label = NULL;
 
-    m_label = NULL;
+    SetCurrentTime(0,0,0);
+    SetTotalTime(0,0,0);
 
-    SetLabel("");
+    SetDisplay(DisplayCurrentTime);
 }
 
 TimeView::
@@ -179,24 +182,196 @@ SetLabel(char* label)
 
 void 
 TimeView::
-SetTime(int32 hours, 
-        int32 minutes, 
-        int32 seconds)
+SetCurrentTime( int32 hours, 
+                int32 minutes, 
+                int32 seconds)
 {
-    m_hours = hours;
-    m_minutes = minutes;
-    m_seconds = seconds;
+    m_currentHours = hours;
+    m_currentMinutes = minutes;
+    m_currentSeconds = seconds;
 
-    if(m_hours)
+    CreateTimeString();
+
+    Invalidate();
+}
+
+void 
+TimeView::
+SetTotalTime(   int32 hours, 
+                int32 minutes, 
+                int32 seconds)
+{
+    m_totalHours = hours;
+    m_totalMinutes = minutes;
+    m_totalSeconds = seconds;
+
+    CreateTimeString();
+
+    Invalidate();
+}
+
+void 
+TimeView::
+SetSeekTime(int32 hours, 
+			int32 minutes, 
+			int32 seconds)
+{
+    m_seekHours = hours;
+    m_seekMinutes = minutes;
+    m_seekSeconds = seconds;
+
+    CreateTimeString();
+
+    Invalidate();
+
+}
+
+void 
+TimeView::
+CurrentTime(int32* hours, 
+            int32* minutes, 
+            int32* seconds)
+{
+    *hours = m_currentHours;
+    *minutes = m_currentMinutes;
+    *seconds = m_currentSeconds;
+}
+
+void 
+TimeView::
+TotalTime(  int32* hours, 
+            int32* minutes, 
+            int32* seconds)
+{
+    *hours = m_totalHours;
+    *minutes = m_totalMinutes;
+    *seconds = m_totalSeconds;
+}
+void 
+TimeView::
+SetDisplay(TimeDisplay display) 
+{ 
+	if(display != m_display)
+	{
+		m_display = display; 
+
+        switch(m_display)
+        {
+            case DisplayCurrentTime:
+                SetLabel("current");
+                break;
+
+            case DisplayTotalTime:
+                SetLabel("total");
+                break;
+
+            case DisplayRemainingTime:
+                SetLabel("remaining");
+                break;
+
+            case DisplaySeekTime:
+                SetLabel("seek");
+                break;
+        
+        }
+
+        CreateTimeString();
+		Invalidate();
+	}
+}
+
+void
+TimeView::
+ToggleDisplay()
+{
+    int32 foo = (int32)m_display;
+
+    m_display = (TimeDisplay)++foo;
+
+	if(m_display == DisplayLastToggleTime)
+		m_display = DisplayFirstToggleTime;
+
+    switch(m_display)
     {
-        wsprintf(m_time, "%d:%.02d:%.02d",  m_hours,
-                                            m_minutes,
-                                            m_seconds);
+        case DisplayCurrentTime:
+            SetLabel("current");
+            break;
+
+        case DisplayTotalTime:
+            SetLabel("total");
+            break;
+
+        case DisplayRemainingTime:
+            SetLabel("remaining");
+            break;
+    
+    }
+
+    CreateTimeString();
+	Invalidate();
+}
+
+void 
+TimeView::
+CreateTimeString()
+{
+    int32 hours = 0;
+    int32 minutes = 0;
+    int32 seconds = 0;
+
+    switch(m_display)
+    {
+        case DisplayCurrentTime:
+            hours = m_currentHours;
+            minutes = m_currentMinutes;
+            seconds = m_currentSeconds;
+            break;
+
+        case DisplayTotalTime:
+            hours = m_totalHours;
+            minutes = m_totalMinutes;
+            seconds = m_totalSeconds;
+            break;
+
+        case DisplayRemainingTime:
+        {
+            int32 totalTimeInSeconds = m_totalHours * 3600;
+			totalTimeInSeconds += m_totalMinutes * 60;
+			totalTimeInSeconds += m_totalSeconds;
+
+			int32 currentTimeInSeconds = m_currentHours * 3600;
+			currentTimeInSeconds += m_currentMinutes * 60;
+			currentTimeInSeconds += m_currentSeconds;
+
+			int32 remainingTimeInSeconds = totalTimeInSeconds - 
+											currentTimeInSeconds;
+
+			hours = remainingTimeInSeconds / 3600;
+			minutes = (remainingTimeInSeconds - 
+						(hours * 3600)) / 60;
+			seconds = remainingTimeInSeconds - 
+						(hours * 3600) - 
+						(minutes * 60);
+            break;
+        }
+    
+        case DisplaySeekTime:
+            hours = m_seekHours;
+            minutes = m_seekMinutes;
+            seconds = m_seekSeconds;
+            break;
+    }
+
+    if(hours)
+    {
+        wsprintf(m_time, "%d:%.02d:%.02d",  hours,
+                                            minutes,
+                                            seconds);
     }
     else
     {
-         wsprintf(m_time, "%.02d:%.02d",    m_minutes,
-                                            m_seconds);
+         wsprintf(m_time, "%.02d:%.02d",    minutes,
+                                            seconds);
     }
 
     // calculate how long the string is in pixels
@@ -207,19 +382,6 @@ SetTime(int32 hours,
     {
         m_timeLength += m_timeFontWidths[m_time[i] - 32];
     }
-
-    Invalidate();
-}
-
-void 
-TimeView::
-Time(   int32* hours, 
-        int32* minutes, 
-        int32* seconds)
-{
-    *hours = m_hours;
-    *minutes = m_minutes;
-    *seconds = m_seconds;
 }
 
 void 

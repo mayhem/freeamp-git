@@ -59,7 +59,9 @@ ____________________________________________________________________________*/
 #include "listview.h"
 #include "scrollview.h"
 
-enum { STATE_Stopped = 1, STATE_Playing, STATE_Paused };
+enum {	STATE_Stopped = 0, 
+		STATE_Playing, 
+		STATE_Paused };
 
 
 class FreeAmpUI : public UserInterface {
@@ -117,9 +119,13 @@ class FreeAmpUI : public UserInterface {
     
 	
  private:
-    
-    Semaphore*          m_uiSemaphore;
+	uint32				m_totalFrames;
+    uint32              m_currentFrame;
     float			    m_secondsPerFrame;
+
+    TimeDisplay         m_lastTimeDisplay;
+
+    Semaphore*          m_uiSemaphore;
     int32			    m_state;
     EventQueue*         m_target;
 

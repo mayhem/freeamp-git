@@ -357,6 +357,10 @@ UserInterface()
 	m_width			= 0;
 	m_height		= 0;
 
+	m_secondsPerFrame	= 0;
+	m_totalFrames		= 0;
+    m_currentFrame      = 0;
+
     for(int32 i = 0; i < kNumControls; i++)
     {
         m_controlRegions[i] = NULL;
@@ -509,7 +513,6 @@ DropFiles(HDROP dropHandle)
 						sizeof(szFile));
 
 		m_plm->AddItem(szFile, 0);
-		//m_plm->SetFirst();
 	}
 
 	if(count) 
@@ -546,11 +549,13 @@ Command(int32 command,
 
         case kLastControl:
         {
+			m_target->AcceptEvent(new Event(CMD_PrevMediaPiece));
             break;
         }
 
         case kNextControl:
         {
+			m_target->AcceptEvent(new Event(CMD_NextMediaPiece));
             break;
         }
 
@@ -584,12 +589,24 @@ Command(int32 command,
             m_repeatIconView->On( repeat );
             m_repeatAllIconView->On( all );
 
+			if(repeat && all)
+				m_plm->SetRepeat(REPEAT_ALL);
+			else if(repeat)
+				m_plm->SetRepeat(REPEAT_CURRENT);
+			else
+				m_plm->SetRepeat(REPEAT_NOT);
             break;
         }
 
         case kShuffleControl:
         {
             m_shuffleIconView->On(!m_shuffleIconView->Status());
+
+			if(m_shuffleIconView->Status())
+				m_plm->SetShuffle(SHUFFLE_RANDOM);
+			else
+				m_plm->SetShuffle(SHUFFLE_NOT_SHUFFLED);
+
             break;
         }
 
@@ -598,10 +615,10 @@ Command(int32 command,
             OPENFILENAME ofn;
 			char szTitle[] = "Open Audio File";
 			char szFilter[] =
-			"MPEG Audio Streams (.mp1, .mp2, .mp3, .mpp)\0"
-			"*.mp1;*.mp2;*.mp3;*.mpp\0"
-			//"Playlists (.txt, .lst, .m3u)\0"
-			//"*.lst;*.m3u;*.txt\0"
+			"MPEG Audio Streams (.mpg, .mp1, .mp2, .mp3, .mpp)\0"
+			"*.mpg;*.mp1;*.mp2;*.mp3;*.mpp\0"
+			"Playlists (.m3u)\0"
+			"*.m3u\0"
 			"All Files (*.*)\0"
 			"*.*\0";
 			const int32 kBufferSize = MAX_PATH * 128;
@@ -666,7 +683,6 @@ Command(int32 command,
                 {
 					;
                 }
-                //EnableWindow(m_ui->m_hwndPlay, TRUE);
 			}
 
             m_plm->SetFirst();
@@ -768,35 +784,8 @@ Command(int32 command,
         case kSongInfoControl:
         {
             TimeView* view = (TimeView*)source;
-            static int32 infoType = 0;
 
-            infoType++;
-
-            if(infoType >= 3)
-                infoType = 0;
-
-            if(infoType == 0)
-            {
-                view->SetLabel("current");
-                view->SetTime(1, 45, 33);
-                //view->Show();
-
-            }
-            else if(infoType == 1)
-            {
-                view->SetLabel("remaining");
-                view->SetTime(99, 41, 33);
-            }
-            else if(infoType == 2)
-            {
-                view->SetLabel("total");
-                view->SetTime(9, 45, 18);
-            }
-            else if(infoType == 3)
-            {
-                //view->Hide();
-            }
-            
+            view->ToggleDisplay();
             break;
         }
     }
@@ -841,20 +830,26 @@ Notify(int32 command, LPNMHDR notifyMsgHdr)
             {
                 case DIAL_BUTTON_DOWN:
                 {
-                    m_timeView->SetLabel("seek");
-                    m_timeView->SetTime(0, 11, 36);
+                    int32 hours = m_timeView->CurrentHours();
+                    int32 minutes = m_timeView->CurrentMinutes();
+                    int32 seconds = m_timeView->CurrentSeconds();
+
+                    m_lastTimeDisplay = m_timeView->Display();
+
+                    m_timeView->SetDisplay(DisplaySeekTime);
+                    m_timeView->SetSeekTime(hours, minutes, seconds);
                     break;
                 }
 
                 case DIAL_BUTTON_UP:
                 {
-                    m_timeView->SetLabel("current");
-                    m_timeView->SetTime(21, 15, 26);
+                    m_timeView->SetDisplay(m_lastTimeDisplay);
                     break;
                 }
 
                 case DIAL_MOVE:
                 {
+                    m_timeView->SetSeekTime(0, 11, 36);
                     break;
                 }
             }
@@ -908,7 +903,7 @@ MouseMove(int32 xPos,
     pt.y = yPos;
 
     /*char buffer[256];
-    wsprintf(buffer,"x = %d\r\ny = %d \r\n\r\n", xPos, yPos);
+    wsprintf(buffer,"x = %d   y = %d \r\n", xPos, yPos);
     OutputDebugString(buffer);*/
 
     GetClientRect(m_hwnd, &rect);
@@ -931,21 +926,22 @@ MouseMove(int32 xPos,
             if( viewItem->Member()->PointInView(xPos, yPos) && 
                 viewItem->Member()->Visible() &&
                 viewItem->Member()->Enabled())
-            {
-                if(m_mouseView != viewItem->Member())
-                {
-                    if(m_mouseView)
-                        m_mouseView->MouseLeft();
 
-                    m_mouseView = viewItem->Member();
+			{
+				if(m_mouseView != viewItem->Member())
+				{
+					if(m_mouseView)
+						m_mouseView->MouseLeft();
 
-                    m_mouseView->MouseEntered();
-                }
+					m_mouseView = viewItem->Member();
 
-                viewItem->Member()->MouseMove(xPos, yPos, modifiers);
+					m_mouseView->MouseEntered();
+				}
 
-                break;
-            }
+				viewItem->Member()->MouseMove(xPos, yPos, modifiers);
+
+				break;
+			}
 
         }while(viewItem = m_viewList->PriorItem(viewItem) );
 
@@ -1072,6 +1068,15 @@ Paint()
 					m_playerCanvas->BitmapInfo(),
 					DIB_RGB_COLORS,
 					SRCCOPY);
+
+	/*HBRUSH brush = CreateSolidBrush(RGB(0,0,0));
+	FillRgn(hdc, m_windowRegion, brush);
+
+	for(int32 i = 0; i < kNumControls; i++)
+	{
+		HBRUSH brush = CreateSolidBrush(g_controlColors[i].Pack());
+		int32 ret = FillRgn(hdc, m_controlRegions[i], brush);
+	}*/
 
     EndPaint( m_hwnd, &ps );    
     
@@ -1200,7 +1205,7 @@ CreateControls()
                                     kSongTitleControl,
                                     TextType_MouseWiggle);
 
-    m_songTitleView->SetText("Testing...1...2...3...4...5...6...7..8...9...0");
+	m_songTitleView->SetText("Welcome to FreeAmp");
 
     m_timeView = new TimeView(  m_hwnd, 
                                 m_backgroundView, 
@@ -1700,21 +1705,96 @@ AcceptEvent(Event* event)
 
 			case INFO_MPEGInfo: 
 			{
+				MpegInfoEvent *info = (MpegInfoEvent*)event;
+
+				m_totalFrames = info->GetTotalFrames();
+
+                m_secondsPerFrame = info->GetSecondsPerFrame();
+
 				break;
 			}
 
 			case INFO_ID3TagInfo:
 			{
+                ID3TagEvent *info = (ID3TagEvent*)event;
+
+				if(info->GetId3Tag().m_containsInfo) 
+                {
+					char foo[1024];
+					strncpy(foo,info->GetId3Tag().m_artist,sizeof(foo)-1);
+					//kill trailing spaces
+					char *pFoo = &(foo[strlen(foo)-1]);
+
+					while ((pFoo >= foo) && pFoo && (*pFoo == ' ')) 
+                    {
+						*pFoo = '\0';
+						pFoo--;
+					}
+
+					strncat(foo," - ",sizeof(foo)-strlen(foo));
+
+					strncat(foo,info->GetId3Tag().m_songName,sizeof(foo)-strlen(foo));
+					// kill trailing spaces
+					pFoo = &(foo[strlen(foo)-1]);
+
+					while ((pFoo >= foo) && pFoo && (*pFoo == ' ')) 
+                    {
+						*pFoo = '\0';
+						pFoo--;
+					}
+
+                    m_songTitleView->SetText(foo);
+				}
+
 				break;
 			}
 
             case INFO_MediaInfo: 
             {
+				MediaInfoEvent *info = (MediaInfoEvent*)event;
+
+				int32 seconds = (int32)ceil(info->m_totalSeconds);
+				int32 hours = seconds / 3600;
+				int32 minutes = (seconds - (hours * 3600)) / 60;
+
+				seconds = seconds - (hours * 3600) - (minutes * 60);
+
+				char *foo = strrchr(info->m_filename,'\\');
+
+				if(foo) 
+				{
+					m_songTitleView->SetText(++foo);
+				} 
+				else 
+				{
+					m_songTitleView->SetText(info->m_filename);
+				}
+
+                //OutputDebugString(m_songTitleView->Text());
+                //OutputDebugString("\r\n");
+
+                m_timeView->SetTotalTime(hours, minutes, seconds);
+			    m_timeView->SetCurrentTime(0, 0, 0);
+
+				//m_indexOfSong = info->m_indexOfSong;
+				//m_totalSongs = info->m_totalSongs;
+
 				break; 
             }
 
             case INFO_MediaTimeInfo: 
             {
+                MediaTimeInfoEvent* info = (MediaTimeInfoEvent*)event;
+ 
+				int32 seconds = (int32)ceil(info->m_totalSeconds);
+				int32 hours = seconds / 3600;
+				int32 minutes = (seconds - (hours * 3600)) / 60;
+				seconds = seconds - (hours * 3600) - (minutes * 60);
+
+                m_timeView->SetCurrentTime(hours, minutes, seconds);
+				
+				m_currentFrame = info->m_frame;
+
 	            break; 
             }
 
@@ -1725,13 +1805,14 @@ AcceptEvent(Event* event)
 
             case INFO_PlayListUpdated:
             {
-                //MessageBox(m_hwnd, "INFO_PlayListUpdated", "hey!", MB_OK);
                 UpdatePlayList();
                 break;
             }
             
             case INFO_PlayListDonePlay:
             {
+                m_timeView->SetCurrentTime(0,0,0);
+                m_currentFrame = 0;
                 break;
             }
 
