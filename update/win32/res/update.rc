@@ -78,8 +78,10 @@ BEGIN
             VALUE "LegalCopyright", "http://www.gnu.org/copyleft/gpl.html\0"
             VALUE "LegalTrademarks", "update\0"
             VALUE "OriginalFilename", "update.exe\0"
+            VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "Update Application\0"
-            VALUE "ProductVersion", "2.1.0.1\0"
+            VALUE "ProductVersion", "2.1\0"
+            VALUE "SpecialBuild", "\0"
         END
     END
     BLOCK "VarFileInfo"
