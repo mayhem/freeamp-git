@@ -928,7 +928,7 @@ AC_SUBST(CFLAGS)
 AC_LANG_SAVE
 AC_LANG_CPLUSPLUS
 AC_CHECK_LIB(musicbrainz, mb_New, ,
-  AC_MSG_ERROR([FreeAmp requires that the MusicBrainz client library be installed.]))
+  AC_MSG_ERROR([FreeAmp requires that the MusicBrainz client library be installed.]),-ldl)
 AC_LANG_RESTORE
 
 AC_CONFIG_HEADER(config/config.h)
