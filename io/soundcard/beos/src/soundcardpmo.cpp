@@ -21,12 +21,15 @@
 	$Id$
 ____________________________________________________________________________*/
 
+#define DEBUG 0
 
 /* system headers */
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
 #include <iostream.h>
+
+/* BeOS Kits */
 #include <media/SoundPlayer.h>
 #include <support/Debug.h>
 
@@ -34,133 +37,208 @@ ____________________________________________________________________________*/
 #include <config.h>
 #include "soundcardpmo.h"
 #include "soundutils.h"
-#include "ringbuffer.h"
 #include "thread.h"
+#include "mutex.h"
+#include "facontext.h"
+#include "log.h"
 
-const uint32 PCMBUFFERSIZE = 8 * 4096;
-const int32 BUFFER_SIZE		= 65536;
-const int32 OVERFLOW_SIZE	= 9216;
-const int32 TRIGGER_SIZE	= 9216;
+LogFile*	g_Log;
 
 extern "C" {
+
 PhysicalMediaOutput* Initialize(FAContext *context)
 {
 	return new SoundCardPMO(context);
 }
+
 } /* extern "C" */
 
-static char * g_ErrorArray[8] = {
-	"Invalid Error Code",
-	"dsp device open failed",
-	"fcntl F_GETFL on /dev/dsp failed",
-	"fcntl F_SETFL on /dev/dsp failed"
-	"ioctl reset failed",
-	"config of samplesize failed",
-	"config of stereo failed",
-	"config of speed failed"
-};
-
-const char *
-SoundCardPMO::GetErrorString( int32 error )
-{
-	if ((error <= pmoError_MinimumError) || (error >= pmoError_MaximumError))
-	{
-		return g_ErrorArray[0];
-	}
-	return g_ErrorArray[error - pmoError_MinimumError];
-}
-
-SoundCardPMO::SoundCardPMO(FAContext *context)
-:	m_buffer( NULL ),
+SoundCardPMO::SoundCardPMO( FAContext* context )
+:	PhysicalMediaOutput( context ),
 	m_player( NULL ),
-	m_pcmBuffer( NULL )
+	m_dataSize( 0 ),
+	m_eventSem( "EventSem" ),
+	m_pauseLock( "pause lock" )
 {
-    m_context = context;
-	m_buffer    = new RingBuffer( BUFFER_SIZE );
-//	m_player    = new BSoundPlayer( "Freeamp", _PlayerHook, NULL, this );
-	m_pcmBuffer = new int16[ PCMBUFFERSIZE ];
+	PRINT(( "SoundCardPMO::ctor\n" ));
 	m_properlyInitialized = false;
-	myInfo = new OutputInfo();
+
+	m_outputInfo = new OutputInfo();
+
+	m_context = context;
+
+	m_eventBufferThread = Thread::CreateThread();
+	m_eventBufferThread->Create( _EventBufferThreadHook, this );
 }
 
 SoundCardPMO::~SoundCardPMO()
 {
-	if ( myInfo )
-	{
-		delete myInfo;
-		myInfo = NULL;
-	}
+	PRINT(( "SoundCardPMO::dtor\n" ));
 
-	if ( m_buffer )
-	{
-		delete m_buffer;
-		m_buffer = NULL;
-	}
+	Lock();
 
+	m_bExit = true;
+	m_pSleepSem->Signal();
+	m_pPauseSem->Signal();
+//	m_pauseMutex.Release();
+	m_pauseLock.Unlock();
+
+	PRINT(( "SoundCardPMO::~SoundCardPMO\n" ));
 	if ( m_player )
 	{
+		PRINT(( "SoundCardPMO::~SoundCardPMO:stopping\n" ));
+		m_player->SetHasData( false );
+		m_player->Stop();	// blocks till it's done
+		PRINT(( "SoundCardPMO::~SoundCardPMO:stopped\n" ));
+
 		delete m_player;
 		m_player = NULL;
 	}
 
-	if ( m_pcmBuffer )
+	if ( m_outputInfo )
 	{
-		delete[] m_pcmBuffer;
-		m_pcmBuffer = NULL;
+		delete m_outputInfo;
+		m_outputInfo = NULL;
 	}
 
-	PRINT(( "SoundCardPMO::!SoundCardPMO done\n" ));
+	if ( m_eventBufferThread )
+	{
+		delete m_eventBufferThread;
+		m_eventBufferThread = NULL;
+	}
+
+#if DEBUG_SAVE_PCM
+	fclose( m_pcmSaveFile );
+#endif
+	PRINT(( "SoundCardPMO::~SoundCardPMO done\n" ));
 }
 
-Error
-SoundCardPMO::Pause()
+int32
+SoundCardPMO::GetVolume( void )
 {
-	return Reset( true );
+	PRINT(( "SoundCardPMO::GetVolume\n" ));
+	int32	volume = 0;
+	return volume;
 }
 
-Error
-SoundCardPMO::Resume()
+void
+SoundCardPMO::SetVolume( int32 volume )
 {
-	return kError_NoErr;
+	PRINT(( "SoundCardPMO::SetVolume\n" ));
+}
+
+void
+SoundCardPMO::Pause( void )
+{
+	PRINT(( "SoundCardPMO::Pause\n" ));
+	PhysicalMediaOutput::Pause();
+//	m_pauseMutex.Acquire();
+	m_pauseLock.Lock();
+
+	if ( m_player )
+	{
+		m_player->SetHasData( false );
+		m_player->Stop();
+	}
+
+	if ( false && m_properlyInitialized )
+	{
+		Reset( true );
+	}
+}
+
+void
+SoundCardPMO::Resume( void )
+{
+	PRINT(( "SoundCardPMO::Resume\n" ));
+	PhysicalMediaOutput::Resume();
+//	m_pauseMutex.Release();
+	m_pauseLock.Unlock();
+
+	if ( m_player )
+	{
+		m_player->Start();
+		m_player->SetHasData( true );
+	}
+	PRINT(( "SoundCardPMO::Resume done\n" ));
+}
+
+bool
+SoundCardPMO::WaitForDrain( void )
+{
+	PRINT(( "SoundCardPMO::WaitForDrain:**************************************\n" ));
+#if 0
+	if ( m_eventBufferThread )
+	{
+		m_eventBufferThread->Join();
+		delete m_eventBufferThread;
+		m_eventBufferThread = NULL;
+	}
+	PRINT(( "SoundCardPMO::WaitForDrain:event buffer terminated\n" ));
+#endif
+
+	if ( m_player )
+	{
+		m_player->SetHasData( false );
+		m_player->Stop();
+	}
+	PRINT(( "SoundCardPMO::WaitForDrain:sound player terminated\n" ));
+
+	return true;
 }
 
 Error
 SoundCardPMO::Init( OutputInfo* info )
 {
-	cout << "initialize..." << endl;
-	cout << "OI: bits_per_sample: " << info->bits_per_sample << endl;
-	cout << "OI: number_of_channels: " << info->number_of_channels << endl;
-	cout << "OI: samples_per_second: " << info->samples_per_second << endl;
-	cout << "OI: max_buffer_size: " << info->max_buffer_size << endl;
+	PRINT(( "SoundCardPMO::Init\n" ));
+	PRINT(( "OI: bits_per_sample: %d\n", info->bits_per_sample ));
+	PRINT(( "OI: number_of_channels: %d\n", info->number_of_channels ));
+	PRINT(( "OI: samples_per_second: %d\n", info->samples_per_second ));
+	PRINT(( "OI: max_buffer_size: %d\n", info->max_buffer_size ));
 
 	m_properlyInitialized = false;
 	if ( !info )
 	{
-		info = myInfo;
+		info = m_outputInfo;
 	}
 	else
 	{
-		// got info, so this is the beginning...
+		// got info, so this is the beginning..
+		m_dataSize = info->max_buffer_size;
 	}
-	
-	myInfo->bits_per_sample = info->bits_per_sample;
-	myInfo->number_of_channels = info->number_of_channels;
-	myInfo->samples_per_second = info->samples_per_second;
-	myInfo->max_buffer_size = info->max_buffer_size;
 
-	if ( ::get_audio_format( myInfo, &m_format ) < B_NO_ERROR )
+	m_outputInfo->bits_per_sample = info->bits_per_sample;
+	m_outputInfo->number_of_channels = info->number_of_channels;
+	m_outputInfo->samples_per_second = info->samples_per_second;
+	m_outputInfo->max_buffer_size = info->max_buffer_size;
+
+	if ( ::get_audio_format( m_outputInfo, &m_format ) < B_NO_ERROR )
 	{
 		printf( "error in output info\n" );
 	}
+
 	if ( m_player )
 	{
 		delete m_player;
 	}
-	m_player = new BSoundPlayer( &m_format, "FreeAmp", _PlayerHook, NULL, this );
+
+	m_player = new BSoundPlayer(
+							&m_format,
+							"FreeAmp",
+							_PlayerHook,
+							_NotifierHook,
+							this
+							);
+
+	if ( m_player->InitCheck() < B_NO_ERROR )
+	{
+		PRINT(( "SoundPlayerPMO::Init:error constructing BSOundPlayer\n" ));
+		return kError_InitFailed;
+	}
 
 	printf( "Frame Rate : %f\n", m_format.frame_rate );
-	printf( "Format : %x\n", m_format.format );
-	printf( "Channel Count : %d\n", m_format.channel_count );
+	printf( "Format : %x\n", (int)m_format.format );
+	printf( "Channel Count : %d\n", (int)m_format.channel_count );
 
 #if USE_DUMMY_PLAYER
 	m_dummyPlayerThread = Thread::CreateThread();
@@ -168,6 +246,10 @@ SoundCardPMO::Init( OutputInfo* info )
 #else
 	m_player->Start();
 	m_player->SetHasData( true );
+#endif
+
+#if DEBUG_SAVE_PCM
+	m_pcmSaveFile = fopen( "freeamp.pcmsave", "w" );
 #endif
 
 	m_properlyInitialized = true;
@@ -178,10 +260,25 @@ SoundCardPMO::Init( OutputInfo* info )
 Error
 SoundCardPMO::Reset( bool user_stop )
 {
-	cout << "Reset..." << endl;
+	PRINT(( "SoundCardPMO::Reset...\n" ));
 
-	m_player->SetHasData( false );
-	m_player->Stop();
+#if USE_DUMMY_PLAYER
+#else
+	if ( !m_player ) return kError_YouScrewedUp;
+
+	if ( m_player )
+	{
+		m_player->SetHasData( false );
+		PRINT(( "SetHasData done\n" ));
+		m_player->Stop( false );
+		PRINT(( "player stop done\n" ));
+	}
+
+	if ( false &&  m_eventBufferThread )
+	{
+		m_eventSem.Signal();
+		m_eventBufferThread->Join();
+	}
 
 	if ( user_stop )
 	{
@@ -189,33 +286,107 @@ SoundCardPMO::Reset( bool user_stop )
 	else
 	{
 	}
+#endif
 
 	return kError_NoErr;
 }
 
-Error
-SoundCardPMO::Write( int32& rtn, void* inBuf, int32 inLength )
+void
+SoundCardPMO::HandleTimeInfoEvent( PMOTimeInfoEvent* pEvent )
 {
-	size_t	bytesWritten;
-	size_t	bytesToWrite;
-	void*	bufHead;
-	Error	error;
+	printf( "SoundCardPMO::HandleTimeInfoEvent: FIXME\n" );
+}
 
-#if 0
-	if ( !m_player->HasData() )
+void
+SoundCardPMO::_EventBufferThreadHook( void* arg )
+{
+	return ((SoundCardPMO*)arg)->EventBufferThread();
+}
+
+void
+SoundCardPMO::EventBufferThread( void )
+{
+	PRINT(( "SoundCardPMO::EventBufferThread:enter\n" ));
+
+	// Don't do anything until resume is called.
+	m_pPauseSem->Wait();
+
+	PRINT(( "SoundCardPMO::EventBufferThread: okay now ready to spin!\n" ));
+
+	// don't know why this is necessary, but m_pInputBuffer is
+	// still null sometimes.
+	EventBuffer* eb = NULL;
+	while ( !eb )
 	{
-		m_player->Start();
-		m_player->SetHasData( true );
+		if ( m_bExit ) return;
+		eb = dynamic_cast<EventBuffer*>( m_pInputBuffer );
+		WasteTime();
 	}
-#endif
 
-	bytesWritten = m_buffer->Write( inBuf, inLength );
-	PRINT(( "%d bytes written\n", bytesWritten ));
-	if ( bytesWritten != inLength )
+	// Handles event.
+	while ( !m_bExit )
 	{
-	}
 
-	return kError_NoErr;
+		// First, wait for the PMO_Init event to propagate.
+		if ( !m_properlyInitialized )
+		{
+			PRINT(( "SoundCardPMO::EventBufferThread:fetching possible init event\n" ));
+			Event* event = eb->GetEvent();
+			if ( event == NULL )
+			{
+				m_pLmc->Wake();
+				WasteTime();
+				continue;
+			}
+
+			if ( event->Type() == PMO_Init )
+			{
+				if ( IsError( Init( ((PMOInitEvent*)event)->GetInfo() ) ) )
+				{
+					delete event;
+					break;
+				}
+			}
+			delete event;
+
+			continue;
+		}
+
+		// Now, work hand in hand with the Player method, dealing with
+		// events as requested by the Player method.
+		m_eventSem.Wait();
+		PRINT(( "SoundCardPMO::EventBufferThread:event is waiting to be dispatched\n" ));
+		Event*	event = eb->GetEvent();
+		if ( event != NULL )
+		{
+			if ( event->Type() == PMO_Init )
+			{
+				PRINT(( "SoundCardPMO::EventBufferThread:PMO_Init recv'd\n" ));
+			}
+			else if ( event->Type() == PMO_Reset )
+			{
+				PRINT(( "SoundCardPMO::EventBufferThread:PMO_Reset recv'd\n" ));
+			}
+			else if ( event->Type() == PMO_Info )
+			{
+				PRINT(( "SoundCardPMO::EventBufferThread:PMO_Info recv'd\n" ));
+			}
+			else if ( event->Type() == PMO_Quit )
+			{
+				PRINT(( "SoundCardPMO::EventBufferThread:PMO_Quit recv'd\n" ));
+				delete event;
+				m_eventSem.Signal();
+				if ( WaitForDrain() )
+				{
+					m_pTarget->AcceptEvent( new Event( INFO_DoneOutputting ) );
+				}
+				return;
+			}
+			delete event;
+		}
+		m_eventSem.Signal();	// tell Player I'm done with the event.
+	}
+	PRINT(( "SoundCardPMO::EventBufferThread:exiting\n" ));
 }
 
 void
@@ -227,20 +398,37 @@ SoundCardPMO::_DummyPlayerHook( void* arg )
 void
 SoundCardPMO::DummyPlayer( void )
 {
-	bool	done = false;
-	size_t	bytesRead;
-	uint8	buf[ 4096 ];
+	void*			bufferIn;
+	size_t			bytesToCopy = m_dataSize;
+	size_t			bytesCopied = 0;
+	Error			err;
+	EventBuffer*	eb = (EventBuffer*)m_pInputBuffer;
 
-	while ( !done )
+	while ( !m_bExit )
 	{
-		bytesRead = m_buffer->Read( buf, 4096 );
-		PRINT(( "Dummy: %d bytes read\n", bytesRead ));
-		if ( bytesRead == 0 )
+		m_pauseLock.Lock();
+
+		err = eb->BeginRead( bufferIn, bytesToCopy );
+		if ( err == kError_EventPending )
 		{
-			done = true;
-			PRINT(( "Dummy: done\n" ));
+			Event* event = eb->GetEvent();
+			delete event;
 		}
-		snooze( 10000 );
+		else
+		{
+			if ( IsError( err ) )
+			{
+				PRINT(( "SoundCardPMO::DummyPlayer: read failed(%d)\n", err ));
+				bytesCopied = 0;
+			}
+			else
+			{
+				bytesCopied = bytesToCopy;
+			}
+			eb->EndRead( bytesCopied );
+		}
+		m_pauseLock.Unlock();
+		PRINT(( "FIXME: %d bytes read\n", bytesCopied ));
 	}
 }
 
@@ -257,36 +445,138 @@ SoundCardPMO::_PlayerHook(
 
 void
 SoundCardPMO::Player(
-				void*							buffer,
+				void*							bufferOut,
 				size_t							size,
 				const media_raw_audio_format&	format
 				)
 {
-	PRINT(( "%d bytes reading %f Hz\n", size, format.frame_rate ));
-	float*	buf = (float*)buffer;
-	size_t	floatSize = size / 4;
-	uint32	channelCount = format.channel_count;
-	uint32	numSamples = floatSize;
+	Error	err;
+	size_t	bytesToCopy;
+	size_t	bytesCopied;
+	void*	bufferIn;
+//	bool	perfWarn = false;
 
 	if ( format.format != m_format.format )
 	{
-		printf( "invalid format\n" );
+		PRINT(( "SoundCardPMO::Player:invalid format\n" ));
 		return;
 	}
 
-	size_t	bytesToRead = numSamples * channelCount;
-	size_t	bytesRead;
-	bytesRead = m_buffer->Read( (void*)m_pcmBuffer, bytesToRead, false );
-	if ( bytesRead < bytesToRead )
+	bytesToCopy = size;
+
+	if ( m_pauseLock.LockWithTimeout( 0.1e6 ) != B_OK )
 	{
-		PRINT(( "only %d bytes read\n", bytesRead ));
-		memset( (m_pcmBuffer + bytesRead), 0, (bytesToRead - bytesRead) );
+		return;
 	}
 
-	float*	destPtr = buf;
-	int16*	srcPtr = m_pcmBuffer;
-	for ( int i = 0; i < numSamples; i++ )
+//	PRINT(( "SoundCardPMO::Player:trying to read %d bytes\n", bytesToCopy ));
+	EventBuffer*	eb = (EventBuffer*)m_pInputBuffer;
+	if ( !eb )
 	{
-		*destPtr++ = ( (float)(*srcPtr++) ) / 32767.0;
+		PRINT(( "SoundCardPMO::Player:null m_pInputBuffer\n" ));
+		return;
+	}
+
+//	err = eb->BeginRead( bufferIn, bytesToCopy );
+//	while ( err == kError_EventPending )
+	for ( int retry = 0; retry < 10; retry++ )
+	{
+		bytesToCopy = size;
+		err = eb->BeginRead( bufferIn, bytesToCopy );
+		if ( IsntError( err ) )
+		{
+			break;
+		}
+
+		if ( err == kError_EventPending )
+		{
+			Event*	event = eb->PeekEvent();
+			switch ( event->Type() )
+			{
+			case PMO_Init:
+				PRINT(( "SoundCardPMO::Player: PMO_Init recv'd\n" ));
+				m_eventSem.Signal();
+				m_eventSem.Wait();
+				break;
+			case PMO_Reset:
+				PRINT(( "SoundCardPMO::Player: PMO_Reset recv'd\n" ));
+				m_eventSem.Signal();
+				m_eventSem.Wait();
+				break;
+			case PMO_Info:
+				//PRINT(( "SoundCardPMO::Player: PMO_Info recv'd\n" ));
+				event = eb->GetEvent();
+				delete event;
+				break;
+			case PMO_Quit:
+				PRINT(( "SoundCardPMO::Player: PMO_Quit recv'd\n" ));
+				m_eventSem.Signal();
+				m_eventSem.Wait();
+				break;
+			}
+		}
+		else if ( err == kError_NoDataAvail )
+		{
+			PRINT(( "SoundCardPMO::Player: killing some time to wait for data to pour in\n" ));
+			m_pLmc->Wake();
+			WasteTime();
+		}
+//		bytesToCopy = size;
+//		err = eb->BeginRead( bufferIn, bytesToCopy );
+	}
+
+	if ( IsError( err ) )
+	{
+		PRINT(( "SoundCardPMO::Player: error reading from the buffer(%d)\n", err ));
+		bytesCopied = 0;
+	}
+	else
+	{
+		if ( bytesToCopy < size )
+		{
+			PRINT(( "SoundCardPMO::Player: end of data?\n" ));
+		}
+		memcpy( bufferOut, bufferIn, bytesToCopy );
+#if DEBUG_SAVE_PCM
+		fwrite( bufferIn, 1, bytesToCopy, m_pcmSaveFile );
+#endif
+		bytesCopied = bytesToCopy;
+	}
+	eb->EndRead( bytesCopied );
+	m_pauseLock.Unlock();
+	PRINT(( "SoundCardPMO::Player: %d bytes copied\n", bytesCopied ));
+
+	return;
+}
+
+void
+SoundCardPMO::_NotifierHook(
+				void*						cookie,
+				BSoundPlayer::sound_player_notification
+											what,
+				...
+				)
+{
+	((SoundCardPMO*)cookie)->Notifier( what );
+}
+
+void
+SoundCardPMO::Notifier( BSoundPlayer::sound_player_notification what )
+{
+	switch ( what )
+	{
+	case BSoundPlayer::B_STARTED:
+		PRINT(( "Notifier: SoundPlayer started\n" ));
+		break;
+	case BSoundPlayer::B_STOPPED:
+		PRINT(( "Notifier: SoundPlayer stoped\n" ));
+		break;
+	case BSoundPlayer::B_SOUND_DONE:
+		PRINT(( "Notifier: SoundPlayer sound done\n" ));
+		break;
+	default:
+		PRINT(( "Notifier: unknown event is reported\n" ));
+		break;
 	}
 }
+// vi: set ts=4:

@@ -23,6 +23,10 @@ ____________________________________________________________________________*/
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <be/app/Application.h>
 
 #include "config.h"
 #include "player.h"
@@ -77,8 +81,24 @@ int main(int argc, char **argv) {
     //testBuffer();
     //testHashTable();
 
+	// *** BeOS specific section begin ***
+
+	// Add the current directory to the ADDON_PATH environment var.
+	char*	old_addon_path = getenv( "ADDON_PATH" );
+	char*	new_addon_path = new char[ strlen( old_addon_path ) + 20 ];
+	sprintf( new_addon_path, "ADDON_PATH=%s:.", old_addon_path );
+	if ( putenv( new_addon_path ) != 0 )
+	{
+		cerr << "couldn't add . to the environment variable ADDON_PATH" << endl;
+	}
+
+	// BSoundPlayer needs BApplication.
+	BApplication*	app = new BApplication( "application/x-vnd.freeamp-freeamp" );
+
+	// *** BeOS specific section end ***
+
     FAContext *context = new FAContext;
-    context->prefs = new UnixPrefs();
+    context->prefs = new BeOSPrefs();
     context->log = new LogFile("freeamp.log");
     Registrar *registrar= new Registrar();
     LMCRegistry *lmc;

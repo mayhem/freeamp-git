@@ -27,61 +27,53 @@ ____________________________________________________________________________*/
 /* system headers */
 #include <stdlib.h>
 #include <stdio.h>
+
+/* BeOS Kits */
 #include <media/MediaDefs.h>
+#include <media/SoundPlayer.h>
 
 /* project headers */
 #include <config.h>
+#include "mutex.h"
 #include "pmo.h"
+#include "pmoevent.h"
+#include "pullbuffer.h"
+#include "eventbuffer.h"
 
-#define BIT_SELECT  0x1f
-#define SLEEPTIME   256
 #define USE_DUMMY_PLAYER 0
+#define DEBUG_SAVE_PCM 0
 
-enum {
-    pmoError_MinimumError = 0x00010000,
-    pmoError_DeviceOpenFailed,
-    pmoError_IOCTL_F_GETFL,
-    pmoError_IOCTL_F_SETFL,
-    pmoError_IOCTL_SNDCTL_DSP_RESET,
-    pmoError_IOCTL_SNDCTL_DSP_SAMPLESIZE,
-    pmoError_IOCTL_SNDCTL_DSP_STEREO,
-    pmoError_IOCTL_SNDCTL_DSP_SPEED,
-    pmoError_MaximumError
-};
-
-class BSoundPlayer;
-class RingBuffer;
 class Thread;
 class FAContext;
+class VolumeManager;
 
 class SoundCardPMO : public PhysicalMediaOutput
 {
 public:
-							SoundCardPMO(FAContext *context);
+							SoundCardPMO( FAContext* context );
 	virtual					~SoundCardPMO();
-    
-	virtual Error			Init(OutputInfo* info);
-	virtual Error			Reset(bool user_stop);
-	virtual Error			Write(int32 &,void *,int32);
-	virtual Error			Pause();
-	virtual Error 			Resume();
-	virtual const char*		GetErrorString(int32);
-	virtual Error			SetPropManager(Properties *p)
-							{
-								m_propManager = p;
-								if ( p )
-									return kError_NoErr;
-								else
-									return kError_UnknownErr;
-							}
+	virtual Error			Init( OutputInfo* info );
+	virtual int32			GetVolume( void );
+	virtual void			SetVolume( int32 volume );
+	virtual void			Pause( void );
+	virtual void 			Resume( void );
 
 protected:
+	void					Lock( void );
+	void					Unlock( void );
 	FAContext *				m_context;
 
 private:
+	virtual Error			Reset( bool user_stop );
+	void					HandleTimeInfoEvent( PMOTimeInfoEvent* pEvent );
+	bool					WaitForDrain( void );
+
+	static void				_EventBufferThreadHook( void* arg );
+	void					EventBufferThread( void );
+
 	static void				_DummyPlayerHook( void* arg );
 	void					DummyPlayer( void );
-	Thread*					m_dummyPlayerThread;
+
 	static void				_PlayerHook(
 								void*							cookie,
 								void*							buffer,
@@ -93,15 +85,45 @@ private:
 								size_t							size,
 								const media_raw_audio_format&	format
 								);
+	static void				_NotifierHook(
+								void*							cookie,
+								BSoundPlayer::sound_player_notification
+																what,
+								...
+								);
+	void					Notifier(
+								BSoundPlayer::sound_player_notification
+																what
+								);
 
+	Thread*					m_eventBufferThread;
+	Thread*					m_dummyPlayerThread;
 	Properties *			m_propManager;
 	bool					m_properlyInitialized;
 	uint32					channels;
-	OutputInfo *			myInfo;
+	OutputInfo *			m_outputInfo;
 	media_raw_audio_format	m_format;
-	RingBuffer *			m_buffer;
-	BSoundPlayer*			m_player;
-	int16*					m_pcmBuffer;
+	BSoundPlayer *			m_player;
+	Mutex					m_lock;
+//	Mutex					m_pauseMutex;
+	size_t					m_dataSize;
+	Semaphore				m_eventSem;
+	BLocker					m_pauseLock;
+#if DEBUG_SAVE_PCM
+	FILE*					m_pcmSaveFile;
+#endif
 };
+
+inline void
+SoundCardPMO::Lock( void )
+{
+	m_lock.Acquire();
+}
+
+inline void
+SoundCardPMO::Unlock( void )
+{
+	m_lock.Release();
+}
 
 #endif /* _SOUNDCARDPMO_H_ */

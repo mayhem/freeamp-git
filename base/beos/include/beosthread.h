@@ -25,15 +25,18 @@ ____________________________________________________________________________*/
 #define _BEOS_THREAD_H
 
 #include <kernel/OS.h>
+#include <support/Locker.h>
 #include "thread.h"
 
 #include "mutex.h"
 
-class beosThread : public Thread{
+typedef uint32 Priority;
 
+class beosThread : public Thread
+{
 public:
 						beosThread();
-						~beosThread();
+	virtual				~beosThread();
 
 	virtual bool		Create(thread_function function, void* arg);
 	virtual void		Destroy();
@@ -42,20 +45,38 @@ public:
 	virtual void		Join();
 	virtual Priority	GetPriority() const;
 	virtual Priority	SetPriority(Priority priority);
+	virtual void		DumpThreadInfo( void ) const;
 
 	static int32		internalThreadFunction(void *);
 	void *				InternalThreadFunction();
 
+protected:
+	bool				Lock( void );
+	void				Unlock( void );
+
 private:
 	Priority			m_priority;
-//	pthread_t			m_threadHandle;
 	thread_id			m_threadHandle;
 	unsigned			m_threadId;
 	bool				m_suspended;
-	Mutex *				m_suspendMutex;
+	BLocker				m_lock;
 	thread_function		m_function;
 	void *				m_arg;
 };
+
+// Inline functions
+
+inline bool
+beosThread::Lock( void )
+{
+	return m_lock.Lock();
+}
+
+inline void
+beosThread::Unlock( void )
+{
+	Unlock();
+}
 
 // Utility functions.
 
@@ -63,6 +84,7 @@ inline
 int32
 beos_priority( Priority freeamp_prio )
 {
+#if 0
 	switch ( freeamp_prio ) {
 	case Idle:
 		return B_NORMAL_PRIORITY;
@@ -89,6 +111,8 @@ beos_priority( Priority freeamp_prio )
 		return B_NORMAL_PRIORITY;
 		break;
 	}
+#endif
+	return B_NORMAL_PRIORITY;
 }
 
 #endif /* _BEOS_THREAD_H */

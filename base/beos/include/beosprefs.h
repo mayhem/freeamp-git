@@ -3,6 +3,7 @@
 	FreeAmp - The Free MP3 Player
 
 	Portions Copyright (C) 1998-1999 GoodNoise
+	Portions Copyright (C) 1999 Mark H. Weaver <mhw@netris.org>
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -28,14 +29,37 @@ ____________________________________________________________________________*/
 #include "config.h"
 #include "errors.h"
 #include "list.h"
+#include "preferences.h"
+#include "hashtable.h"
 #include "win32impl.h"
+#include "mutex.h"
 
+class BeOSPrefEntry
+{
+public:
+    BeOSPrefEntry() : prefix(0), key(0), separator(0), value(0), suffix(0) { }
+    ~BeOSPrefEntry();
 
-class BeOSPrefs : public Preferences {
+    char *prefix;	// Preceeding comments and indentation
+    char *key;
+    char *separator;
+    char *value;
+    char *suffix;	// Trailing space and comment (including NL)
+};
 
- public:
+class BeOSPrefs : public Preferences
+{
+public:
     BeOSPrefs();
     ~BeOSPrefs();
+
+    virtual Error SetDefaults();
+    virtual Error Save();
+
+    virtual Preferences *ComponentPrefs(const char *componentName);
+
+    virtual Error GetPrefString(const char* pref, char* buf, uint32* len);
+    virtual Error SetPrefString(const char* pref, const char* buf);
 
     virtual LibDirFindHandle *GetFirstLibDir(char *path, uint32 *len);
     virtual Error GetNextLibDir(LibDirFindHandle *hLibDirFind,
@@ -44,13 +68,19 @@ class BeOSPrefs : public Preferences {
 
     virtual const char *GetLibDirs();
 
- protected:
-    Error GetPrefString(const char* pref, char* buf, uint32* len);
-    Error SetPrefString(const char* pref, char* buf);
+    int GetErrorLineNumber() const { return m_errorLineNumber; }
 
- private:
-//     HKEY   m_prefsKey;
+private:
+    Mutex m_mutex;
+
     static char *m_libDirs;
+
+    char *m_prefsFilePath;
+    bool m_saveEnable, m_changed;
+    int m_errorLineNumber;	// 0 if no error
+
+    List<BeOSPrefEntry *> m_entries;
+    HashTable<BeOSPrefEntry *> m_ht;
 };
 
 #endif /* _BEOSPREFS_H */

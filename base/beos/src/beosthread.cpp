@@ -24,42 +24,56 @@ ____________________________________________________________________________*/
 
 #include "config.h"
 
-//#include <pthread.h>
 #include <signal.h>
 #include <iostream.h>
 
 #include "beosthread.h"
 #include "mutex.h"
+#include <support/Autolock.h>
+#define DEBUG 0
 #include <support/Debug.h>
 
 void
 beosThread::Join()
 {
 	status_t	thread_return_value;
+	PRINT(( "beosThread::Join\n" ));
 
-//	pthread_join(m_threadHandle,NULL);
-	wait_for_thread( m_threadHandle, &thread_return_value );
+	BAutolock	autolock( m_lock );
+	if ( !autolock.IsLocked() )
+	{
+		perror( "beosThread::Join:coulnd't lock the thread" );
+	}
+
+	if ( wait_for_thread( m_threadHandle, &thread_return_value ) < B_NO_ERROR )
+	{
+		PRINT(( "Thread::Join failed\n" ));
+	}
 }
 
 beosThread::
 beosThread():
 Thread()
 {
-    m_priority		= Normal;
+//    m_priority		= Normal;
+    m_priority		= 0;
     m_threadHandle	= (thread_id) NULL;
     m_threadId		= 0;
     m_suspended		= false;
-    m_suspendMutex	= new Mutex();
+//    m_suspendMutex	= new Mutex();
 }
 
 beosThread::
 ~beosThread()
 {
 	//pthread_cancel(m_threadHandle);
+	Destroy();
+#if 0
 	if ( m_suspendMutex ) {
 		delete m_suspendMutex;
 		m_suspendMutex = NULL;
 	}
+#endif
 }
 
 int32
@@ -90,19 +104,12 @@ bool
 beosThread::
 Create( thread_function function, void* arg )
 {
-#if 0
-//    cout << "Thread: Create" << endl;
-    bool result = true;
-    m_function = function;
-    m_arg = arg;
-    if(pthread_create(&m_threadHandle, NULL,beosThread::internalThreadFunction, this))
-    {
-//	cout << "Create failed!!" << endl;
-	result = false;
-    }
-//    cout << "Thread: Create: done" << endl;
-    return result;
-#endif
+	BAutolock	autolock( m_lock );
+	if ( !autolock.IsLocked() )
+	{
+		perror( "beosThread::Create:couldn't lock the thread" );
+	}
+
 	bool	result = true;
 	m_function = function;
 	m_arg = arg;
@@ -133,7 +140,6 @@ void
 beosThread::
 Destroy()
 {
-//	pthread_cancel(m_threadHandle);
 	kill_thread( m_threadHandle );
 }
 
@@ -141,26 +147,47 @@ void
 beosThread::
 Suspend()
 {
-    m_suspendMutex->Acquire( WAIT_FOREVER );
-    if ( !m_suspended ) {
-//		pthread_kill(m_threadHandle, SIGSTOP);
-		suspend_thread( m_threadHandle );
-		m_suspended = true;
-    }
-    m_suspendMutex->Release();
+//    m_suspendMutex->Acquire( WAIT_FOREVER );
+	PRINT(( "beosThread::Suspend\n" ));
+	if ( Lock() )
+	{
+		if ( !m_suspended ) {
+//			pthread_kill(m_threadHandle, SIGSTOP);
+			suspend_thread( m_threadHandle );
+			m_suspended = true;
+		}
+		Unlock();
+	}
+	else
+	{
+		perror( "beosThread::Suspend:couldn't lock the thread" );
+	}
+//	m_suspendMutex->Release();
+	PRINT(( "beosThread::Suspend done\n" ));
 }
 
 void 
 beosThread::
 Resume()
 {
-    m_suspendMutex->Acquire(WAIT_FOREVER);
-    if (m_suspended) {
-//		pthread_kill(m_threadHandle, SIGCONT);
-		resume_thread( m_threadHandle );
-		m_suspended = false;
-    }
-    m_suspendMutex->Release();
+//    m_suspendMutex->Acquire(WAIT_FOREVER);
+	PRINT(( "beosThread::Resume\n" ));
+	if ( Lock() )
+	{
+		if ( m_suspended )
+		{
+//			pthread_kill(m_threadHandle, SIGCONT);
+			resume_thread( m_threadHandle );
+			m_suspended = false;
+		}
+		Unlock();
+	}
+	else
+	{
+		perror( "beosThread::Resume:couldn't lock the thread" );
+	}
+//    m_suspendMutex->Release();
+	PRINT(( "beosThread::Resume done\n" ));
 }
 
 
@@ -178,3 +205,9 @@ SetPriority(Priority priority)
     return((Priority) 0);
 }
 
+void
+beosThread::
+DumpThreadInfo( void ) const
+{
+	printf( "Thread ID = %d, %x\n", m_threadHandle, m_threadHandle );
+}

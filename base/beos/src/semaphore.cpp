@@ -24,10 +24,12 @@ ____________________________________________________________________________*/
 
 #include "config.h"
 
-#include <kernel/OS.h>
-#include <support/Debug.h>
+#define DEBUG 0
+#include <be/kernel/OS.h>
+#include <be/support/Debug.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <iostream.h>
 
 #include "semaphore.h"
@@ -63,14 +65,17 @@ Semaphore::~Semaphore()
 
 void Semaphore::Wait()
 {
+	status_t	err;
 #if SEM_DEBUG
-	int32	tc;
+	int32		tc;
 	get_sem_count( mutex, &tc );
 	PRINT(( "Semaphore::Wait:id(%d):count(%d)\n", mutex, tc ));
 #endif
-	if ( acquire_sem( mutex ) < B_NO_ERROR )
+	if ( ( err = acquire_sem( mutex ) ) < B_NO_ERROR )
 	{
-		perror( "Semaphore::Wait: couldn't acquire sem" );
+		puts( "Sem::Wait:couldn't acquire sem" );
+		DEBUGGER(( "Semaphore::Wait: couldn't acquire sem : %s\n",
+					strerror( err ) ));
 	}
 #if SEM_DEBUG
 	get_sem_count( mutex, &tc );
@@ -96,14 +101,17 @@ bool Semaphore::Wait( long timeout )
 
 void Semaphore::Signal()
 {
+	status_t	err;
 #if SEM_DEBUG
-	int32	tc;
+	int32		tc;
 	get_sem_count( mutex, &tc );
 	PRINT(( "Semaphore::Signal:id(%d):count(%d)\n", mutex, tc ));
 #endif
-	if ( release_sem( mutex ) < B_NO_ERROR )
+	if ( ( err = release_sem( mutex ) ) < B_NO_ERROR )
 	{
-		perror( "Semaphore::Signal: couldn't release sem" );
+		puts( "Sem::Signal:couldn't acquire sem" );
+		DEBUGGER(( "Semaphore::Signal: couldn't release sem : %s\n",
+					strerror( err ) ));
 	}
 #if SEM_DEBUG
 	get_sem_count( mutex, &tc );

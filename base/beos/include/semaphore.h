@@ -39,6 +39,7 @@ public:
     void	Wait();
     bool	Wait( long timeout );
     void	Signal();
+	sem_id	ID( void ) const { return mutex; }
 
 protected:
 
