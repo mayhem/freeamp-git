@@ -25,6 +25,7 @@ ____________________________________________________________________________*/
 #include "timer.h"
 
 #ifdef __linux__
+#include <unistd.h>
 #define GoToSleep(x) usleep(x*1000)
 #elif defined(WIN32)
 #include <windows.h>

@@ -56,8 +56,6 @@ class MusicBrowserUI : public UserInterface {
     void SearchClose(void);
     void WizardClose(void);
 
-    void DoCDCheck(void);
-
     bool doQuitNow;
 
  protected:
