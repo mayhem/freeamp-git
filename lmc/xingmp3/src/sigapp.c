@@ -96,6 +96,7 @@ int ff_decode(char *filename, char ascii_sig[37],
    int       bitrate, ret = 0;
    char      sig[17];
    musicbrainz_t mb = 0;
+   unsigned  int skip;
 
 
 /*------------------------------------------*/
@@ -164,12 +165,14 @@ int ff_decode(char *filename, char ascii_sig[37],
    if (!bs_fill())
       goto abort;
 /*---- parse mpeg header  -------*/
-   framebytes = head_info2(bs_buffer, bs_bufbytes, &head, &bitrate);
+   framebytes = head_info3(bs_buffer, bs_bufbytes, &head, &bitrate, &skip);
    if (framebytes == 0)
    {
       printf("\n BAD OR UNSUPPORTED MPEG FILE\n");
       goto abort;
    }
+   bs_bufptr += skip;
+   bs_bufbytes -= skip;
 
 /*---- allocate pcm buffer --------*/
    pcm_buffer = malloc(PCM_BUFBYTES);
@@ -203,7 +206,7 @@ int ff_decode(char *filename, char ascii_sig[37],
       if (x.in_bytes <= 0)
       {
          printf("\n BAD SYNC IN MPEG FILE\n");
-         break;
+         goto abort;
       }
       bs_bufptr += x.in_bytes;
       bs_bufbytes -= x.in_bytes;

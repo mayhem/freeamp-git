@@ -190,7 +190,7 @@ int main(int argc, char *argv[])
        {
            m.SetGUID(sig);
            printf("Signature: %s\n", sig);
-           submit_metadata(&m);
+           //submit_metadata(&m);
        }
        else
        {
