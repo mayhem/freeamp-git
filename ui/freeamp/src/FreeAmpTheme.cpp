@@ -117,6 +117,9 @@ FreeAmpTheme::FreeAmpTheme(FAContext * context)
    m_bShowBuffers = m_bPaused = false;
    m_iFramesSinceSeek = 2;
 
+   m_eq = new Equalizer(context);
+   m_eq->LoadSettings();
+
 #if defined( WIN32 )
     m_pUpdateMan = new Win32UpdateManager(m_pContext);
     m_pUpdateMan->DetermineLocalVersions();
@@ -141,6 +144,13 @@ FreeAmpTheme::FreeAmpTheme(FAContext * context)
 
 FreeAmpTheme::~FreeAmpTheme()
 {
+
+    if (m_eq)
+    {
+        m_eq->SaveSettings();
+        delete m_eq;
+        m_eq = NULL;
+    }
     if (m_pOptionsThread)
     {  
         delete m_pOptionsThread;
@@ -1105,6 +1115,33 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
        ShowThemeCredits();
        return kError_NoErr;
    }
+
+   if (strncmp(oControlName.c_str(), "Eq", 2) == 0 && eMesg == CM_ValueChanged)
+   {
+       int iValue;
+
+       m_pWindow->ControlIntValue(oControlName, false, iValue);
+       m_eq->ChangeValue(atoi(oControlName.c_str() + 2), iValue); 
+       return kError_NoErr;
+   }
+   if (oControlName == string("EqEnable") && eMesg == CM_Pressed)
+   {
+       int iState;
+
+       m_pWindow->ControlIntValue(oControlName, false, iState);
+       if (iState == 0)
+       {
+           m_eq->Enable(true);
+           iState = 1;
+       }
+       else
+       {
+           m_eq->Enable(false);
+           iState = 0;
+       }
+       m_pWindow->ControlIntValue(oControlName, true, iState);
+       return kError_NoErr;
+   }
   
    return kError_NoErr;
 }
@@ -1206,6 +1243,10 @@ void FreeAmpTheme::InitControls(void)
     m_pWindow->ControlEnable(string("PauseIndicator"), true, bEnable);
     bEnable = true;
     m_pWindow->ControlEnable(string("StopIndicator"), true, bEnable);
+
+    iState = m_eq->IsEnabled() == true; 
+    m_pWindow->ControlIntValue(string("EqEnable"), true, iState);
+    m_eq->InitControls(m_pWindow);
 }
 
 // This function gets called after the window object is created,

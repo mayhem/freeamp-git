@@ -570,7 +570,7 @@ if test "$curses" != ""; then
 	AC_SUBST(CURSES)
 fi
 
-AC_CHECK_LIB(id3, Find__7ID3_Tag11ID3_FrameID, 
+AC_CHECK_LIB(id3, ID3Tag_Link, 
    [ AC_DEFINE(HAVE_ID3V2) 
      ID3LIB="-lid3" 
      AC_SUBST(ID3LIB)

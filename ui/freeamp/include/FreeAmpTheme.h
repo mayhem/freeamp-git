@@ -38,6 +38,7 @@ ____________________________________________________________________________*/
 #include "playlist.h"
 #include "Theme.h"
 #include "ThemeManager.h"
+#include "Equalizer.h"
 
 enum TimeDisplayState
 {
@@ -47,8 +48,8 @@ enum TimeDisplayState
 
 enum FreeAmpMenuCommand
 {
-    kMCMyMusic = 6900,
-    kMCPlay    = 6901,
+   kMCMyMusic = 6900,
+   kMCPlay    = 6901,
 	kMCStop    = 6902,
 	kMCPause   = 6903,
 	kMCNext    = 6904,
@@ -107,6 +108,7 @@ class FreeAmpTheme : public UserInterface, public Theme
         string           m_oCurrentWindow, m_oTitle, m_oStreamInfo, m_oHeadlineUrl;
         TimeDisplayState m_eTimeDisplayState;
         UpdateManager   *m_pUpdateMan;
+        Equalizer       *m_eq;
 };
 
 #endif

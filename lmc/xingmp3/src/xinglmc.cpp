@@ -1018,9 +1018,6 @@ Error XingLMC::EndRead(size_t iBytesUsed)
 }
 
 		
-#define _EQUALIZER_ENABLE_
-#ifdef  _EQUALIZER_ENABLE_
-
 extern "C" {
 float equalizer[32] = {
     1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
@@ -1043,8 +1040,6 @@ Error XingLMC::SetEQData(bool enable) {
         enableEQ = enable;
         return error;
 }
-#endif  //_EQUALIZER_ENABLE_
-#undef  _EQUALIZER_ENABLE_
 
 Error XingLMC::ChangePosition(int32 position)
 {

@@ -451,16 +451,16 @@ class     MpegInfoEvent:public Event
 
 };
 
-#define _EQUALIZER_ENABLE_
-#ifdef  _EQUALIZER_ENABLE_
 class     SetEqualizerDataEvent:public Event
 {
    private:
-   float    *m_eq;
-   bool      m_enable;
-   bool      m_IsEQData;
-             public:
-             SetEqualizerDataEvent(bool enable)
+      float    *m_eq;
+      bool      m_enable;
+      bool      m_IsEQData;
+
+   public:
+
+   SetEqualizerDataEvent(bool enable)
    {
       m_type = CMD_SetEQData;
       m_enable = enable;
@@ -488,8 +488,6 @@ class     SetEqualizerDataEvent:public Event
    {
    }
 };
-#endif // _EQUALIZER_ENABLE_
-#undef  _EQUALIZER_ENABLE_
 
 #define _VISUAL_ENABLE_
 #ifdef  _VISUAL_ENABLE_

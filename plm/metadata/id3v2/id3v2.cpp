@@ -37,13 +37,7 @@ ____________________________________________________________________________*/
 #include "utility.h"
 
 #ifdef HAVE_ID3V2
-
-#ifndef WIN32
-#include <id3/tag.h>
-#else
-#include <tag.h>
-#endif
-
+#include <id3.h>
 #endif
 
 #include "id3v2.h"
@@ -71,11 +65,11 @@ ID3v2::~ID3v2()
 #ifdef HAVE_ID3V2
 bool ID3v2::ReadMetaData(const char* url, MetaData* metadata)
 {
-    ID3_Tag   *pTag;
-    ID3_Frame *pFrame;
-    luint      ret;
-    char      *pData;
-    luint      len = 100;
+    ID3Tag   *pTag;
+    ID3Frame *pFrame;
+    luint     ret;
+    char     *pData;
+    ID3Field *pField;
 
     assert(url);
     assert(metadata);
@@ -85,88 +79,86 @@ bool ID3v2::ReadMetaData(const char* url, MetaData* metadata)
 
     URLToFilePath(url, path, &length);
 
-    pTag = new ID3_Tag;
-    ret = pTag->Link(path);
+    pTag = ID3Tag_New();
+    ret = ID3Tag_Link(pTag, path);
     if (ret <= 0)
     {
-        delete pTag;
+        ID3Tag_Delete(pTag);
         return false;
     }
 
     pData = new char[iDataFieldLen];
 
-    pFrame = pTag->Find(ID3FID_TITLE);
+    pFrame = ID3Tag_FindFrameWithID(pTag, ID3FID_TITLE);
     if (pFrame)
     {
         pData[0] = 0;
-        pFrame->Field(ID3FN_TEXT).Get(pData, len);
+        pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
+        ID3Field_GetASCII(pField, pData, iDataFieldLen, 0); 
         if (strlen(pData) > 0)
            metadata->SetTitle(pData);
     }
-
-    pFrame = pTag->Find(ID3FID_ALBUM);
+    pFrame = ID3Tag_FindFrameWithID(pTag, ID3FID_ALBUM);
     if (pFrame)
     {
         pData[0] = 0;
-        pFrame->Field(ID3FN_TEXT).Get(pData, len);
+        pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
+        ID3Field_GetASCII(pField, pData, iDataFieldLen, 0); 
         if (strlen(pData) > 0)
            metadata->SetAlbum(pData);
     }
-    pFrame = pTag->Find(ID3FID_LEADARTIST);
+    pFrame = ID3Tag_FindFrameWithID(pTag, ID3FID_LEADARTIST);
     if (pFrame)
     {
         pData[0] = 0;
-        pFrame->Field(ID3FN_TEXT).Get(pData, len);
+        pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
+        ID3Field_GetASCII(pField, pData, iDataFieldLen, 0); 
         if (strlen(pData) > 0)
            metadata->SetArtist(pData);
     }
-    pFrame = pTag->Find(ID3FID_SONGLEN);
+    pFrame = ID3Tag_FindFrameWithID(pTag, ID3FID_SONGLEN);
     if (pFrame)
     {
         pData[0] = 0;
-        pFrame->Field(ID3FN_TEXT).Get(pData, len);
-        if (strlen(pData) > 0)
-           metadata->SetTime(atoi(pData) / 1000);
+        pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
+        metadata->SetTime(ID3Field_GetINT(pField)); 
     }
-    pFrame = pTag->Find(ID3FID_YEAR);
+    pFrame = ID3Tag_FindFrameWithID(pTag, ID3FID_YEAR);
     if (pFrame)
     {
         pData[0] = 0;
-        pFrame->Field(ID3FN_TEXT).Get(pData, len);
-        if (strlen(pData) > 0)
-           metadata->SetYear(atoi(pData));
+        pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
+        metadata->SetYear(ID3Field_GetINT(pField)); 
     }
-    pFrame = pTag->Find(ID3FID_SIZE);
+    pFrame = ID3Tag_FindFrameWithID(pTag, ID3FID_SIZE);
     if (pFrame)
     {
         pData[0] = 0;
-        pFrame->Field(ID3FN_TEXT).Get(pData, len);
-        if (strlen(pData) > 0)
-           metadata->SetSize(atoi(pData));
+        pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
+        metadata->SetSize(ID3Field_GetINT(pField)); 
     }
 
     delete pData;
-    delete pTag;
+    ID3Tag_Delete(pTag);
 
     return true;
 }
 
 bool ID3v2::WriteMetaData(const char* url, const MetaData& metadata)
 {
-    ID3_Tag   *pTag;
-    ID3_Frame *pFrame;
-    vector<ID3_Frame *> cleanupList;
-    vector<ID3_Frame *>::iterator i;
-    char       dummy[20];
-    bool       bWriteID3v1, bWriteID3v2;
-    luint      whichTags;
+    ID3Tag   *pTag;
+    ID3Frame *pFrame;
+    ID3Field *pField;
+    ID3_Err   err;
+    char      dummy[20];
+    bool      bWriteID3v1, bWriteID3v2;
+    luint     whichTags;
 
     m_context->prefs->GetWriteID3v1(&bWriteID3v1);
     m_context->prefs->GetWriteID3v2(&bWriteID3v2);
 
-    whichTags = (bWriteID3v1 && bWriteID3v2) ? BOTH_ID3_TAGS :
-                (bWriteID3v1) ? V1_TAG :
-                (bWriteID3v2) ? V2_TAG : 0;
+    whichTags = (bWriteID3v1) ? ID3TT_ID3V1 : 0;
+    whichTags |= (bWriteID3v2) ? ID3TT_ID3V2 : 0;
 
     if (!whichTags)
         return true;
@@ -178,98 +170,101 @@ bool ID3v2::WriteMetaData(const char* url, const MetaData& metadata)
 
     URLToFilePath(url, path, &length);
 
-    pTag = new ID3_Tag;
-    pTag->Link(path);
+    pTag = ID3Tag_New();
+    ID3Tag_Link(pTag, path);
 
-    pFrame = pTag->Find(ID3FID_TITLE);
+    pFrame = ID3Tag_FindFrameWithID(pTag, ID3FID_TITLE);
     if (!pFrame)
     {
-        pFrame = new ID3_Frame(ID3FID_TITLE);
-        pFrame->Field(ID3FN_TEXT).Set(metadata.Title().c_str());
-        pTag->AddFrame(pFrame);
-        cleanupList.push_back(pFrame);
+        pFrame = ID3Frame_NewID(ID3FID_TITLE);
+        pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
+        ID3Field_SetASCII(pField, (char *)metadata.Title().c_str());
+        ID3Tag_AttachFrame(pTag, pFrame);
     }
     else
     {
-        pFrame->Field(ID3FN_TEXT).Set(metadata.Title().c_str());
+        pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
+        ID3Field_SetASCII(pField, (char *)metadata.Title().c_str());
     }
    
-    pFrame = pTag->Find(ID3FID_ALBUM);
+    pFrame = ID3Tag_FindFrameWithID(pTag, ID3FID_ALBUM);
     if (!pFrame)
     {
-        pFrame = new ID3_Frame(ID3FID_ALBUM);
-        pFrame->Field(ID3FN_TEXT).Set(metadata.Album().c_str());
-        pTag->AddFrame(pFrame);
-        cleanupList.push_back(pFrame);
+        pFrame = ID3Frame_NewID(ID3FID_ALBUM);
+        pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
+        ID3Field_SetASCII(pField, (char *)metadata.Album().c_str());
+        ID3Tag_AttachFrame(pTag, pFrame);
     }
     else
     {
-        pFrame->Field(ID3FN_TEXT).Set(metadata.Title().c_str());
+        pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
+        ID3Field_SetASCII(pField, (char *)metadata.Album().c_str());
     }
 
-    pFrame = pTag->Find(ID3FID_LEADARTIST);
+    pFrame = ID3Tag_FindFrameWithID(pTag, ID3FID_LEADARTIST);
     if (!pFrame)
     {
-        pFrame = new ID3_Frame(ID3FID_LEADARTIST);
-        pFrame->Field(ID3FN_TEXT).Set(metadata.Album().c_str());
-        pTag->AddFrame(pFrame);
-        cleanupList.push_back(pFrame);
+        pFrame = ID3Frame_NewID(ID3FID_LEADARTIST);
+        pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
+        ID3Field_SetASCII(pField, (char *)metadata.Artist().c_str());
+        ID3Tag_AttachFrame(pTag, pFrame);
     }
     else
     {
-        pFrame->Field(ID3FN_TEXT).Set(metadata.Title().c_str());
+        pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
+        ID3Field_SetASCII(pField, (char *)metadata.Artist().c_str());
     }
 
     sprintf(dummy, "%d", metadata.Size());
-    pFrame = pTag->Find(ID3FID_SONGLEN);
+    pFrame = ID3Tag_FindFrameWithID(pTag, ID3FID_SONGLEN);
     if (!pFrame)
     {
-        pFrame = new ID3_Frame(ID3FID_SONGLEN);
-        pFrame->Field(ID3FN_TEXT).Set(dummy);
-        pTag->AddFrame(pFrame);
-        cleanupList.push_back(pFrame);
+        pFrame = ID3Frame_NewID(ID3FID_SONGLEN);
+        pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
+        ID3Field_SetASCII(pField, dummy);
+        ID3Tag_AttachFrame(pTag, pFrame);
     }
     else
     {
-        pFrame->Field(ID3FN_TEXT).Set(dummy);
+        pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
+        ID3Field_SetASCII(pField, dummy);
     }
 
     sprintf(dummy, "%d", metadata.Year());
-    pFrame = pTag->Find(ID3FID_YEAR);
+    pFrame = ID3Tag_FindFrameWithID(pTag, ID3FID_YEAR);
     if (!pFrame)
     {
-        pFrame = new ID3_Frame(ID3FID_YEAR);
-        pFrame->Field(ID3FN_TEXT).Set(dummy);
-        pTag->AddFrame(pFrame);
-        cleanupList.push_back(pFrame);
+        pFrame = ID3Frame_NewID(ID3FID_YEAR);
+        pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
+        ID3Field_SetASCII(pField, dummy);
+        ID3Tag_AttachFrame(pTag, pFrame);
     }
     else
     {
-        pFrame->Field(ID3FN_TEXT).Set(dummy);
+        pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
+        ID3Field_SetASCII(pField, dummy);
     }
 
     sprintf(dummy, "%d", metadata.Size());
-    pFrame = pTag->Find(ID3FID_SIZE);
+    pFrame = ID3Tag_FindFrameWithID(pTag, ID3FID_SIZE);
     if (!pFrame)
     {
-        pFrame = new ID3_Frame(ID3FID_SIZE);
-        pFrame->Field(ID3FN_TEXT).Set(dummy);
-        pTag->AddFrame(pFrame);
-        cleanupList.push_back(pFrame);
+        pFrame = ID3Frame_NewID(ID3FID_SIZE);
+        pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
+        ID3Field_SetASCII(pField, dummy);
+        ID3Tag_AttachFrame(pTag, pFrame);
     }
     else
     {
-        pFrame->Field(ID3FN_TEXT).Set(dummy);
+        pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
+        ID3Field_SetASCII(pField, dummy);
     }
 
-    whichTags = pTag->Update(whichTags);
+    err = ID3Tag_UpdateByTagType(pTag, whichTags);
 
     delete pTag;
 
-    for(i = cleanupList.begin(); i != cleanupList.end(); i++)
-       delete i;
-
-    return whichTags != NO_TAG;
+    return err == ID3E_NoError;
 }
 
 #else

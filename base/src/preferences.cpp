@@ -85,6 +85,7 @@ const char* kWatchThisDirectoryPref = "WatchThisDirectory";
 const char* kWatchThisDirTimeoutPref = "WatchThisDirectoryTimeout";
 const char* kWriteID3v1Pref = "WriteID3v1Tags";
 const char* kWriteID3v2Pref = "WriteID3v2Tags";
+const char* kEqualizerSettingsPref = "EqualizerSettings";
 
 //logging
 const char* kUseDebugLogPref = "UseDebugLog";
@@ -146,6 +147,7 @@ const int32 kDefaultAudioCDLength = 4440; // 74 minutes
 const int32 kDefaultWatchThisDirTimeout = 600000;
 const bool  kDefaultWriteID3v1 = true;
 const bool  kDefaultWriteID3v2 = true;
+const char* kDefaultEqualizerSettings = "1,50,50,50,50,50,50,50,50,50,50";
 
 Error
 Preferences::
@@ -326,7 +328,7 @@ SetDefaults()
     if (GetPrefBoolean(kAllowMultipleInstancesPref, &dummyBool) == kError_NoPrefValue)
         SetPrefBoolean(kAllowMultipleInstancesPref, kDefaultAllowMultipleInstances);
 
-	dummyInt = 255;
+	 dummyInt = 255;
     if (GetPrefString(kWAVOutputPathPref, dummyString, 
         (uint32 *)&dummyInt) == kError_NoPrefValue)
         SetPrefString(kWAVOutputPathPref, kDefaultWAVOutPath);
@@ -336,6 +338,17 @@ SetDefaults()
 
     if (GetPrefInt32(kWatchThisDirTimeoutPref, &dummyInt) == kError_NoPrefValue)
         SetPrefInt32(kWatchThisDirTimeoutPref, kDefaultWatchThisDirTimeout);
+
+    if (GetPrefBoolean(kWriteID3v1Pref, &dummyBool) == kError_NoPrefValue)
+        SetPrefBoolean(kWriteID3v1Pref, kDefaultWriteID3v1);
+
+    if (GetPrefBoolean(kWriteID3v2Pref, &dummyBool) == kError_NoPrefValue)
+        SetPrefBoolean(kWriteID3v2Pref, kDefaultWriteID3v2);
+
+	 dummyInt = 255;
+    if (GetPrefString(kEqualizerSettingsPref, dummyString, 
+        (uint32 *)&dummyInt) == kError_NoPrefValue)
+        SetPrefString(kEqualizerSettingsPref, kDefaultEqualizerSettings);
 
     return kError_NoErr;
 }
@@ -1168,6 +1181,20 @@ Preferences::
 SetWriteID3v2(bool value)
 {
     return SetPrefBoolean(kWriteID3v2Pref, value);
+}
+
+Error
+Preferences::
+GetEqualizerSettings(char* settings, uint32* len)
+{
+    return GetPrefString(kEqualizerSettingsPref, settings, len);
+}
+
+Error
+Preferences::
+SetEqualizerSettings(const char* settings)
+{
+    return SetPrefString(kEqualizerSettingsPref, settings);
 }
 
 LibDirFindHandle *

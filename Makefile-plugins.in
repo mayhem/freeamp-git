@@ -198,6 +198,7 @@ FREEAMPUIOBJ += ui/freeamp/src/FreeAmpTheme.o ui/freeamp/src/ThemeZip.o
 FREEAMPUIOBJ += ui/freeamp/src/MultiStateControl.o ui/freeamp/src/Headlines.o
 FREEAMPUIOBJ += ui/freeamp/src/ForeignTheme.o base/src/utility.lo
 FREEAMPUIOBJ += ui/freeamp/src/PixFontControl.o ui/freeamp/src/PixTimeControl.o
+FREEAMPUIOBJ += ui/freeamp/src/Equalizer.o
 FREEAMPUIOBJ += lib/zlib/lib/libzlib.la lib/xml/src/Parse.lo
 FREEAMPUIOBJ += lib/unzip/lib/libunzip.la lib/http/lib/libfahttp.a
 FREEAMPUIOBJ += $($(OSTYPE)FREEAMPUIOBJ)

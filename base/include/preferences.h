@@ -91,6 +91,7 @@ extern const char* kWatchThisDirectoryPref;
 extern const char* kWatchThisDirTimeoutPref;
 extern const char* kWriteID3v1Pref;
 extern const char* kWriteID3v2Pref;
+extern const char* kEqualizerSettingsPref;
 
 extern const int32 kDefaultWatchThisDirTimeout;
 
@@ -294,6 +295,9 @@ class Preferences {
 
     Error GetWriteID3v2(bool* value);
     Error SetWriteID3v2(bool value);
+
+    Error GetEqualizerSettings(char* settings, uint32* len);
+    Error SetEqualizerSettings(const char* settings);
 };
 
 #endif /* _PREFERENCES_H */
