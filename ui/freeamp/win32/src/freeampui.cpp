@@ -2849,12 +2849,19 @@ SetArgs(int32 argc, char** argv)
 
             handle = FindFirstFile( arg, &data);
 
+            // find long filename for item
             if(handle != INVALID_HANDLE_VALUE)
             {
                 m_plm->AddItem(data.cFileName,0);
 
                 FindClose(handle);
             }
+            else
+            {
+                // probably a URL... should do more checking though
+                m_plm->AddItem(arg,0);
+            }
+      
 
             count++;
 	    }
