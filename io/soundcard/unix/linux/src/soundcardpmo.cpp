@@ -138,6 +138,13 @@ Error SoundCardPMO::Init(OutputInfo * info)
    }
    else
    {
+      if (audio_fd > 0)
+      {
+          Reset(false);
+          close(audio_fd);
+          audio_fd = -1;
+      }
+
       // got info, so this is the beginning...
 #ifdef __FreeBSD__
       if ((audio_fd = open("/dev/dsp", O_WRONLY, 0)) < 0)
