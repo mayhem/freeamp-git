@@ -122,7 +122,8 @@ MessageDialogReturnEnum GTKMessageDialog::
                              bool inMain)
 {
     GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_modal(GTK_WINDOW(window), TRUE);
+    if (inMain)
+        gtk_window_set_modal(GTK_WINDOW(window), TRUE);
     gtk_signal_connect(GTK_OBJECT(window), "destroy",
                        GTK_SIGNAL_FUNC(message_destroy), (gpointer)inMain);
     gtk_window_set_title(GTK_WINDOW(window), oTitle.c_str());

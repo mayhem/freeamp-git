@@ -97,7 +97,8 @@ MessageDialogReturnEnum MessageDialog::
 
     int iRet = 0;
     GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_modal(GTK_WINDOW(window), TRUE);
+    if (InEventLoop)
+        gtk_window_set_modal(GTK_WINDOW(window), TRUE);
     gtk_signal_connect(GTK_OBJECT(window), "destroy",
                        GTK_SIGNAL_FUNC(message_destroy), (gpointer)InEventLoop);
     gtk_signal_connect(GTK_OBJECT(window), "delete_event",
@@ -195,7 +196,7 @@ MessageDialogReturnEnum MessageDialog::
 
     if (!InEventLoop) {
         gdk_threads_leave();
-        while (iRet == 0)
+        while (iRet == 0) 
             usleep(20);
     }
     else {
