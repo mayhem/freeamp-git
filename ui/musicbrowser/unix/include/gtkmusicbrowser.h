@@ -136,6 +136,8 @@ class GTKMusicBrowser {
     bool iSetRepeatMode;
 
     uint32 m_playingindex;
+ 
+    bool m_bIgnoringMusicCatalogMessages;
 
     PlaylistManager *m_plm;
     MusicCatalog *m_musicCatalog;

@@ -144,7 +144,7 @@ void Headlines::WorkerThread(void)
             m_iIndex = m_iIndex % m_oHeadlines.size();
             m_pContext->target->AcceptEvent(new HeadlineMessageEvent(
                     m_oHeadlines[m_iIndex].c_str(),
-                    (m_iIndex >= m_oHeadlineURLs.size()) ? "" : 
+                    (m_iIndex >= (int)m_oHeadlineURLs.size()) ? "" : 
                      m_oHeadlineURLs[m_iIndex].c_str()));
                                        
             m_iIndex++;

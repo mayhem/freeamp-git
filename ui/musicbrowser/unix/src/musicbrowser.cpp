@@ -209,6 +209,8 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
                 mainBrowser->ShowMusicBrowser();
             break; }
         case CMD_AddFiles:
+        case INFO_MusicCatalogRegenerating:
+        case INFO_MusicCatalogDoneRegenerating:
         case INFO_PlaylistCurrentItemInfo:
         case INFO_PlaylistItemUpdated:
         case INFO_CDDiscStatus: 

@@ -1072,7 +1072,6 @@ void GTKMusicBrowser::UpdateCDTree(PlaylistItem *update)
     if (!find) {
         return;
     }
-    gtk_clist_freeze(GTK_CLIST(musicBrowserTree));
     GdkPixmap *pixmap;
     GdkBitmap *mask;
     
@@ -1102,7 +1101,6 @@ void GTKMusicBrowser::UpdateCDTree(PlaylistItem *update)
                                pixmap, mask);
 
     delete [] tempstr;
-    gtk_clist_thaw(GTK_CLIST(musicBrowserTree));
 }
 
 void GTKMusicBrowser::RegenerateCDTree(void)
@@ -2777,6 +2775,7 @@ GTKMusicBrowser::GTKMusicBrowser(FAContext *context, MusicBrowserUI *masterUI,
     CD_DiscID = 0;
     CD_numtracks = 0;
     CDTracks = new vector<PlaylistItem *>;
+    m_bIgnoringMusicCatalogMessages = false;
 
     parentUI = masterUI;
  
@@ -3003,7 +3002,7 @@ Error GTKMusicBrowser::AcceptEvent(Event *e)
             break; }
         case INFO_MusicCatalogTrackAdded: {
             MusicCatalogTrackAddedEvent *mct = (MusicCatalogTrackAddedEvent *)e;
-            if (m_initialized) {
+            if (m_initialized && !m_bIgnoringMusicCatalogMessages) {
                 gdk_threads_enter();
                 AddCatTrack((ArtistList *)mct->Artist(), 
                             (AlbumList *)mct->Album(), 
@@ -3014,7 +3013,7 @@ Error GTKMusicBrowser::AcceptEvent(Event *e)
         case INFO_MusicCatalogPlaylistAdded: {
             MusicCatalogPlaylistAddedEvent *mcp = 
                               (MusicCatalogPlaylistAddedEvent *)e;
-            if (m_initialized) {
+            if (m_initialized && !m_bIgnoringMusicCatalogMessages) {
                 gdk_threads_enter();
                 AddCatPlaylist((string)mcp->Item());
                 gdk_threads_leave();
@@ -3058,6 +3057,7 @@ Error GTKMusicBrowser::AcceptEvent(Event *e)
             if (m_initialized) {
                 gdk_threads_enter();
                 ClearTree();
+                RegenerateCDTree();
                 gdk_threads_leave();
             }
             break; }
@@ -3139,6 +3139,17 @@ Error GTKMusicBrowser::AcceptEvent(Event *e)
             }
             m_playingindex = temp;
             break; } 
+        case INFO_MusicCatalogRegenerating: {
+            m_bIgnoringMusicCatalogMessages = true;
+            break; }
+        case INFO_MusicCatalogDoneRegenerating: {
+            m_bIgnoringMusicCatalogMessages = false;
+            if (isVisible) {
+                gdk_threads_enter();
+                UpdateCatalog();
+                gdk_threads_leave();
+            }
+            break; }
         default:
             break;
     }

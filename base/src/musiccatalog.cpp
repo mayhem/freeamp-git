@@ -1045,6 +1045,7 @@ Error MusicCatalog::AcceptEvent(Event *e)
             }
             break; }
         case INFO_SearchMusicDone: {
+            m_context->target->AcceptEvent(new Event(INFO_MusicCatalogRegenerating));
             m_database->Sync();
             string info = "Pruning the Music Catalog Database...";
             m_context->target->AcceptEvent(new BrowserMessageEvent(info.c_str()));
@@ -1056,6 +1057,7 @@ Error MusicCatalog::AcceptEvent(Event *e)
             m_context->target->AcceptEvent(new BrowserMessageEvent(info.c_str()));
             Sort();
             m_context->target->AcceptEvent(new Event(INFO_SearchMusicDone));
+            m_context->target->AcceptEvent(new Event(INFO_MusicCatalogDoneRegenerating));
             delete e;
             break;
         } 
