@@ -49,6 +49,7 @@ LogFile *g_Log;
 const int iBufferSize = 8192;
 const int iOverflowSize = 1536;
 const int iTriggerSize = 1024;
+const char *szDefaultStreamTitle = "RTP Stream";
 
 extern    "C"
 {
@@ -93,9 +94,16 @@ ObsInput::~ObsInput()
    }
 }
 
-bool ObsInput::CanHandle(char *szUrl)
+bool ObsInput::CanHandle(char *szUrl, char *szTitle)
 {
-   return strncmp(szUrl, "rtp://", 6) == 0;
+   bool bRet;
+
+   bRet = strncmp(szUrl, "rtp://", 6) == 0;
+   if (szTitle && bRet)
+      strcpy(szTitle, szDefaultStreamTitle);
+
+
+   return bRet;
 }
 
 Error ObsInput::SetTo(char *url)

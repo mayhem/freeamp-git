@@ -49,6 +49,7 @@ class PlayListItem {
 	    m_pmi = NULL;
 	    m_pmiRegItem = NULL;
 	    m_lmcRegItem = NULL;
+        m_DisplayString = NULL;
     }
 
     ~PlayListItem() 
@@ -73,6 +74,11 @@ class PlayListItem {
 	        delete m_url;
 	        m_url = NULL;
 	    }
+        if (m_DisplayString)
+        {
+            delete m_DisplayString;
+            m_DisplayString = NULL;
+        }
     }
 
     char* URL() const { return m_url;}
@@ -106,12 +112,16 @@ class PlayListItem {
 
     char* StringForPlayerToDisplay() const 
 	{ 
-		char *pPtr;
-
-		pPtr = strrchr(m_url, '\\');
-
-		return pPtr ? pPtr + 1 : "";
+		return m_DisplayString ? m_DisplayString : "";
 	}
+    void SetDisplayString(char *pDisplayString)
+    {
+        if (m_DisplayString)
+            delete m_DisplayString;
+
+        m_DisplayString = new char[strlen(pDisplayString) + 1];
+        strcpy(m_DisplayString, pDisplayString);
+    }
 
 
     RegistryItem *GetPMIRegistryItem() { return m_pmiRegItem; }
@@ -129,7 +139,7 @@ class PlayListItem {
     MediaInfoEvent *m_mie;
     PhysicalMediaInput *m_pmi;
 
-    char* m_url;
+    char* m_url, *m_DisplayString;
     int32 m_type;
     int32 m_startFrame;
 };

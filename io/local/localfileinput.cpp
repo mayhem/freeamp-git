@@ -93,9 +93,15 @@ LocalFileInput::~LocalFileInput()
    }
 }
 
-bool LocalFileInput::CanHandle(char *szUrl)
+bool LocalFileInput::CanHandle(char *szUrl, char *szTitle)
 {
-   return strncmp(szUrl, "file://", 7) == 0;
+   bool bRet;
+
+   bRet = strncmp(szUrl, "file://", 7) == 0;
+   if (szTitle && bRet)
+      *szTitle = 0;
+
+   return bRet;
 }
 
 Error     LocalFileInput::SetTo(char *url)

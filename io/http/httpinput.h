@@ -47,7 +47,7 @@ class HttpInput:public PhysicalMediaInput
    virtual Error GetLength(size_t &iSize); 
    virtual Error GetID3v1Tag(unsigned char *pTag);
 
-   virtual bool  CanHandle(char *szUrl);
+   virtual bool  CanHandle(char *szUrl, char *szTitle);
    virtual bool  IsStreaming(void)
                  { return true; };
 	virtual int32 GetBufferPercentage();

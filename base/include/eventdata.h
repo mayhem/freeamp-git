@@ -60,6 +60,34 @@ class UserMessageEvent : public Event {
     }
 };
 
+class PlayListItem;
+class PLMGetMediaTitleEvent : public Event
+{
+public:
+
+	         PLMGetMediaTitleEvent(void)
+             {
+     		    m_type = CMD_PLMGetMediaTitle;
+		     }
+
+	virtual ~PLMGetMediaTitleEvent(void)
+             { };
+
+	void     SetPlayListItem(PlayListItem *pItem)
+	         {
+                m_pItem = pItem;
+             }
+    PlayListItem *GetPlayListItem(void)
+             {
+                return m_pItem;
+              }
+
+private:
+
+    PlayListItem *m_pItem;    
+
+};
+
 class MediaInfoEvent : public Event {
  public:
     List<Event *> *m_childEvents;

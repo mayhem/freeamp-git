@@ -51,6 +51,20 @@ typedef enum
 }
 PlayerState;
 
+const int iID3TitleLength = 30;
+const int iID3ArtistLength = 30;
+const int iID3AlbumLength = 30;
+struct ID3Tag
+{
+   char szTag[3];
+   char szTitle[iID3TitleLength];
+   char szArtist[iID3ArtistLength];
+   char szAlbum[iID3AlbumLength];
+   char szYear[4];
+   char szComment[30];
+   char cGenre;
+}; 
+
 class     Player:public EventQueue, Properties, PropertyWatcher
 {
 
@@ -72,7 +86,7 @@ class     Player:public EventQueue, Properties, PropertyWatcher
    void      testQueue();
    static void EventServiceThreadFunc(void *);
    virtual int32 AcceptEvent(Event *);
-   virtual RegistryItem *ChoosePMI(char *szUrl);
+   virtual RegistryItem *ChoosePMI(char *szUrl, char *szTitle = NULL);
 
    // Properties
    virtual Error GetProperty(const char *, PropValue **);
@@ -112,6 +126,7 @@ class     Player:public EventQueue, Properties, PropertyWatcher
    void HandleMediaTimeInfo(Event *pEvent);
    void SendEventToUI(Event *pEvent);
    void LMCError(Event *pEvent);
+   void GetMediaTitle(Event *pEvent);
 
    #define _EQUALIZER_ENABLE_
    #ifdef  _EQUALIZER_ENABLE_

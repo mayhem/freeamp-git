@@ -47,7 +47,7 @@ class     LocalFileInput:public PhysicalMediaInput
    virtual Error GetLength(size_t &iSize); // filesize - ID3tag if any
    virtual Error GetID3v1Tag(unsigned char *pTag);
 
-	virtual bool  CanHandle(char *szUrl);
+	virtual bool  CanHandle(char *szUrl, char *szTitle);
 	virtual bool  IsStreaming(void)
 	              { return false; };
    virtual Error SetBufferSize(size_t iNewSize)

@@ -59,6 +59,12 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name freeampdev
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name httpinput
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name obsinput
+    End Project Dependency
 }}}
 
 ###############################################################################

@@ -691,7 +691,7 @@ bool Player::SetState(PlayerState ps)
    return true;
 }
 
-RegistryItem *Player::ChoosePMI(char *szUrl)
+RegistryItem *Player::ChoosePMI(char *szUrl, char *szTitle)
 {
    PhysicalMediaInput *pmi;
    RegistryItem *pmi_item, *ret = NULL;
@@ -700,7 +700,7 @@ RegistryItem *Player::ChoosePMI(char *szUrl)
 
    if (strstr(szUrl, "://") == NULL)
    {
-      szNewUrl = new char[strlen(szUrl) + strlen("file:// ")];
+      szNewUrl = new char[strlen(szUrl) + strlen("file:// ") + 1];
 
       sprintf(szNewUrl, "file://%s", szUrl);
 
@@ -712,7 +712,7 @@ RegistryItem *Player::ChoosePMI(char *szUrl)
       pmi_item = m_pmiRegistry->GetItem(iLoop);
 
       pmi = (PhysicalMediaInput *) pmi_item->InitFunction()(g_Log);
-      if (pmi->CanHandle(szUrl))
+      if (pmi->CanHandle(szUrl, szTitle))
       {
          ret = pmi_item;
          delete pmi;
@@ -932,6 +932,50 @@ void Player::GetMediaInfo(Event *pEvent)
          if (pItem)
             CreateLMC(pItem, pEvent);
      }
+     delete pEvent;
+}
+
+void Player::GetMediaTitle(Event *pEventArg)
+{
+     PLMGetMediaTitleEvent *pEvent;
+     PlayListItem          *pItem;
+     RegistryItem          *pRegItem;
+     PhysicalMediaInput    *pPmi;
+     char                   szTitle[255];
+     ID3Tag                 sID3Tag;
+     Error                  eRet;
+
+     szTitle[0] = 0;
+
+     pEvent = (PLMGetMediaTitleEvent *)pEventArg;
+
+     pItem = pEvent->GetPlayListItem();
+     pRegItem = ChoosePMI(pItem->URL(), szTitle);
+     if (!strlen(szTitle))
+     {
+         pPmi = (PhysicalMediaInput *)pRegItem->InitFunction()(g_Log);
+
+         eRet = pPmi->SetTo(pItem->URL());
+         if (!IsError(eRet))
+         {
+             eRet = pPmi->GetID3v1Tag((unsigned char *)&sID3Tag);
+             if (!IsError(eRet))
+             {
+                 strncpy(szTitle, sID3Tag.szTitle, iID3TitleLength);
+                 szTitle[iID3TitleLength] = 0;
+             }
+             else
+                 strcpy(szTitle, pItem->URL());
+
+         }
+         else
+            strcpy(szTitle, pItem->URL());
+
+         delete pPmi;
+     }
+
+     pItem->SetDisplayString(szTitle);
+
      delete pEvent;
 }
 
@@ -1231,6 +1275,10 @@ int32 Player::ServiceEvent(Event * pC)
 
       case CMD_PLMGetMediaInfo:
            GetMediaInfo(pC);
+           break;
+
+      case CMD_PLMGetMediaTitle:
+           GetMediaTitle(pC);
            break;
 
       case CMD_PlayPaused:

@@ -447,9 +447,9 @@ AddItem(char *url, int32 type)
 
             result = kError_NoErr;
 
-            //PLMGetMediaInfoEvent *gmi = new PLMGetMediaInfoEvent();
-            //gmi->SetPlayListItem(item);
-            //m_target->AcceptEvent(gmi);
+            PLMGetMediaTitleEvent *pTitle = new PLMGetMediaTitleEvent();
+            pTitle->SetPlayListItem(item);
+            m_target->AcceptEvent(pTitle);
             m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
         }  
     }
@@ -489,9 +489,9 @@ AddItem(char *url,int32 type, int32 index)
 
                 result = kError_NoErr;
 
-                //PLMGetMediaInfoEvent *gmi = new PLMGetMediaInfoEvent();
-                //gmi->SetPlayListItem(item);
-                //m_target->AcceptEvent(gmi);
+                PLMGetMediaTitleEvent *pTitle = new PLMGetMediaTitleEvent();
+                pTitle->SetPlayListItem(item);
+                m_target->AcceptEvent(pTitle);
                 m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
             }  
         }
@@ -519,9 +519,9 @@ AddItem(PlayListItem* item)
             m_current = 0;
         }
 
-        //PLMGetMediaInfoEvent *gmi = new PLMGetMediaInfoEvent();
-        //gmi->SetPlayListItem(item);
-        //m_target->AcceptEvent(gmi);
+        PLMGetMediaTitleEvent *pTitle = new PLMGetMediaTitleEvent();
+        pTitle->SetPlayListItem(item);
+        m_target->AcceptEvent(pTitle);
         m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
 
         result = kError_NoErr;
@@ -553,9 +553,9 @@ AddItem(PlayListItem* item, int32 index)
                 m_current = 0;
             }
 
-            //PLMGetMediaInfoEvent *gmi = new PLMGetMediaInfoEvent();
-            //gmi->SetPlayListItem(item);
-            //m_target->AcceptEvent(gmi);
+            PLMGetMediaTitleEvent *pTitle = new PLMGetMediaTitleEvent();
+            pTitle->SetPlayListItem(item);
+            m_target->AcceptEvent(pTitle);
             m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
 
             result = kError_NoErr;
@@ -572,6 +572,7 @@ PlayListManager::
 AddList(List<PlayListItem*>* items)
 {
     Error result = kError_UnknownErr;
+    int   i;
 
     GetPLManipLock();
     
@@ -584,9 +585,13 @@ AddList(List<PlayListItem*>* items)
             m_current = 0;
         }
 
-        //PLMGetMediaInfoEvent *gmi = new PLMGetMediaInfoEvent();
-        //gmi->SetPlayListItem(item);
-        //m_target->AcceptEvent(gmi);
+
+        for(i = 0; i < items->CountItems(); i++)
+        {
+            PLMGetMediaTitleEvent *pTitle = new PLMGetMediaTitleEvent();
+            pTitle->SetPlayListItem(items->ItemAt(i));
+            m_target->AcceptEvent(pTitle);
+        }
         m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
 
         result = kError_NoErr;
@@ -602,6 +607,7 @@ PlayListManager::
 AddList(List<PlayListItem*>* items, int32 index)
 {
     Error result = kError_UnknownErr;
+    int   i;
 
     GetPLManipLock();
 
@@ -618,9 +624,12 @@ AddList(List<PlayListItem*>* items, int32 index)
                 m_current = 0;
             }
 
-            //PLMGetMediaInfoEvent *gmi = new PLMGetMediaInfoEvent();
-            //gmi->SetPlayListItem(item);
-            //m_target->AcceptEvent(gmi);
+            for(i = 0; i < items->CountItems(); i++)
+            {
+               PLMGetMediaTitleEvent *pTitle = new PLMGetMediaTitleEvent();
+               pTitle->SetPlayListItem(items->ItemAt(i));
+               m_target->AcceptEvent(pTitle);
+            }
             m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
 
             result = kError_NoErr;

@@ -66,7 +66,7 @@ public:
 	 virtual Error GetID3v1Tag(unsigned char *pTag)
 	               {return kError_GotDefaultMethod;}
     
-	 virtual bool  CanHandle(char *szUrl)
+	 virtual bool  CanHandle(char *szUrl, char *szTitle)
 	               {return false;}
 
 	 virtual bool  IsStreaming(void)

@@ -49,6 +49,7 @@ LogFile *g_Log;
 const int iBufferSize = 8192;
 const int iOverflowSize = 1536;
 const int iTriggerSize = 1024;
+const char *szDefaultStreamTitle = "SHOUTcast Stream";
 
 extern    "C"
 {
@@ -93,9 +94,16 @@ HttpInput::~HttpInput()
    }
 }
 
-bool HttpInput::CanHandle(char *szUrl)
+bool HttpInput::CanHandle(char *szUrl, char *szTitle)
 {
-   return strncmp(szUrl, "http://", 7) == 0;
+   bool bRet;
+
+   bRet = strncmp(szUrl, "http://", 7) == 0;
+
+   if (szTitle && bRet)
+      strcpy(szTitle, szDefaultStreamTitle);
+
+   return bRet;
 }
 
 Error HttpInput::SetTo(char *url)

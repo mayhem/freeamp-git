@@ -103,6 +103,8 @@ class EventQueue {
 #define INFO_BufferingEnd         42 // Network rebuffering just stopped
 #define INFO_BufferStatus         43 // Buffer percent full information
 
+#define CMD_PLMGetMediaTitle      44 // sent by PlayListManager to player to get title about a particular playlistitem
+
 #endif // _EVENT_H_
 
 
