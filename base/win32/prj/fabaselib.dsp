@@ -203,6 +203,10 @@ SOURCE=..\..\src\log.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\src\missingfile.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\src\musiccatalog.cpp
 # End Source File
 # Begin Source File

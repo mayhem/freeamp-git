@@ -84,11 +84,15 @@
 #define IDC_TEXT2                       1036
 #define IDC_LOCATIONTEXT                1039
 #define IDC_RADIO1                      1040
+#define IDC_REMOVE                      1040
 #define IDC_RADIO2                      1041
+#define IDC_LOCATE                      1041
 #define IDC_EDIT1                       1042
+#define IDC_PATH                        1042
 #define IDC_BUTTON1                     1043
 #define IDC_RADIO3                      1044
 #define IDC_EDIT2                       1045
+#define IDC_MISSINGTRACK                1045
 #define IDC_BUTTON2                     1046
 #define IDC_BROWSE                      1110
 #define IDC_DRIVES                      1231

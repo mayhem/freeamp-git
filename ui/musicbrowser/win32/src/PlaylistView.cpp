@@ -34,6 +34,10 @@ ____________________________________________________________________________*/
 #include <sys/stat.h>
 #include <direct.h>
 
+#include <algorithm>
+
+using namespace std;
+
 #include "config.h"
 #include "utility.h"
 #include "resource.h"
@@ -548,61 +552,58 @@ void MusicBrowserUI::PlaylistListItemUpdated(const PlaylistItem* item)
         //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_plm->CanRedo() ? MF_ENABLED : MF_GRAYED));
     }
 
-    string s = item->URL().substr(item->URL().size() - 4);
+    vector<PlaylistItem*>::iterator i;
 
-    if(!item->URL().compare(item->URL().size() - 4, 4, ".cda"))
+    i = find(m_cdTracks->begin(), m_cdTracks->end(), item);
+
+    if(i != m_cdTracks->end())
     {
-        vector<PlaylistItem*>::iterator i = m_cdTracks->begin();
-        
-        for(; i != m_cdTracks->end(); i++)
+        if((*i)->URL() == item->URL())
         {
-            if((*i)->URL() == item->URL())
+            MetaData metadata = item->GetMetaData();
+            (*i)->SetMetaData(&metadata);
+
+            TV_ITEM tv_item;
+            BOOL success;
+
+            tv_item.hItem = TreeView_GetChild(m_hMusicView, m_hCDItem);
+            tv_item.mask = TVIF_PARAM;
+
+            do
             {
-                MetaData metadata = item->GetMetaData();
-                (*i)->SetMetaData(&metadata);
+                success = TreeView_GetItem(m_hMusicView, &tv_item);
 
-                TV_ITEM tv_item;
-                BOOL success;
-
-                tv_item.hItem = TreeView_GetChild(m_hMusicView, m_hCDItem);
-                tv_item.mask = TVIF_PARAM;
-
-                do
+                if(success)
                 {
-                    success = TreeView_GetItem(m_hMusicView, &tv_item);
+                    TreeData* treedata = (TreeData*)tv_item.lParam;
 
-                    if(success)
+                    if(treedata && item->URL() == treedata->m_pTrack->URL())
                     {
-                        TreeData* treedata = (TreeData*)tv_item.lParam;
-
-                        if(treedata && item->URL() == treedata->m_pTrack->URL())
+                        if(metadata.Title().size())
                         {
-                            if(metadata.Title().size())
-                            {
-                                tv_item.mask = TVIF_TEXT;
-                                tv_item.pszText = (char*)(metadata.Title().c_str());
-                                tv_item.cchTextMax = strlen(tv_item.pszText);
+                            tv_item.mask = TVIF_TEXT;
+                            tv_item.pszText = (char*)(metadata.Title().c_str());
+                            tv_item.cchTextMax = strlen(tv_item.pszText);
 
-                                TreeView_SetItem(m_hMusicView, &tv_item);
-                            }
-                            break;
+                            TreeView_SetItem(m_hMusicView, &tv_item);
                         }
+                        break;
                     }
+                }
 
-                }while(success && 
-                       (tv_item.hItem = TreeView_GetNextSibling(m_hMusicView, 
-                                                                tv_item.hItem)));
-                string CD;
+            }while(success && 
+                   (tv_item.hItem = TreeView_GetNextSibling(m_hMusicView, 
+                                                            tv_item.hItem)));
+            string CD;
 
-                CD = (metadata.Album().size() ? metadata.Album() : "Unknown Album");
-                CD += " by ";
-                CD += (metadata.Artist().size() ? metadata.Artist() : "Unknown Artist");
+            CD = (metadata.Album().size() ? metadata.Album() : "Unknown Album");
+            CD += " by ";
+            CD += (metadata.Artist().size() ? metadata.Artist() : "Unknown Artist");
 
-                tv_item.hItem = m_hCDItem;
-                tv_item.pszText = (char*)(CD.c_str());
-                tv_item.cchTextMax = strlen(tv_item.pszText);
-                TreeView_SetItem(m_hMusicView, &tv_item);
-            }
+            tv_item.hItem = m_hCDItem;
+            tv_item.pszText = (char*)(CD.c_str());
+            tv_item.cchTextMax = strlen(tv_item.pszText);
+            TreeView_SetItem(m_hMusicView, &tv_item);
         }
     }
 }

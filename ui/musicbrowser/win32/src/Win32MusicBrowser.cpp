@@ -44,6 +44,7 @@ using namespace std;
 #include "Win32MusicBrowser.h"
 #include "debug.h"
 #include "eventdata.h"
+#include "MissingFileDialog.h"
 
 HINSTANCE g_hinst = NULL;
 const int iSpacer = 15;
@@ -369,6 +370,18 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
 {
     switch(event->Type()) 
     {
+        case INFO_FileNotFound: 
+        {
+            MissingFileEvent* mfe = (MissingFileEvent*)event;
+            
+            MissingFileDialog* mf= new MissingFileDialog(m_context, 
+                                                         m_hWnd, 
+                                                         mfe->Item());
+            mf->Show();
+
+            break; 
+        }
+
         case INFO_CDDiscStatus:
         {
             CDInfoEvent* cie = (CDInfoEvent*)event;

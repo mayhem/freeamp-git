@@ -260,6 +260,10 @@ SOURCE=..\src\IntroductionWizard.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\src\MissingFileDialog.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\MultiSelectTreeView.cpp
 # End Source File
 # Begin Source File
@@ -513,6 +517,14 @@ SOURCE=..\..\..\..\base\include\log.h
 # Begin Source File
 
 SOURCE=..\..\..\..\base\include\metadata.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\missingfile.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\MissingFileDialog.h
 # End Source File
 # Begin Source File
 

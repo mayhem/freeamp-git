@@ -45,6 +45,7 @@ CLEAN :
 	-@erase "$(INTDIR)\errors.obj"
 	-@erase "$(INTDIR)\Http.obj"
 	-@erase "$(INTDIR)\log.obj"
+	-@erase "$(INTDIR)\missingfile.obj"
 	-@erase "$(INTDIR)\musiccatalog.obj"
 	-@erase "$(INTDIR)\mutex.obj"
 	-@erase "$(INTDIR)\Parse.obj"
@@ -101,7 +102,8 @@ LIB32_OBJS= \
 	"$(INTDIR)\win32thread.obj" \
 	"$(INTDIR)\win32updatemanager.obj" \
 	"$(INTDIR)\Http.obj" \
-	"$(INTDIR)\Parse.obj"
+	"$(INTDIR)\Parse.obj" \
+	"$(INTDIR)\missingfile.obj"
 
 "..\fabaselib.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
     $(LIB32) @<<
@@ -123,6 +125,7 @@ CLEAN :
 	-@erase "$(INTDIR)\errors.obj"
 	-@erase "$(INTDIR)\Http.obj"
 	-@erase "$(INTDIR)\log.obj"
+	-@erase "$(INTDIR)\missingfile.obj"
 	-@erase "$(INTDIR)\musiccatalog.obj"
 	-@erase "$(INTDIR)\mutex.obj"
 	-@erase "$(INTDIR)\Parse.obj"
@@ -179,7 +182,8 @@ LIB32_OBJS= \
 	"$(INTDIR)\win32thread.obj" \
 	"$(INTDIR)\win32updatemanager.obj" \
 	"$(INTDIR)\Http.obj" \
-	"$(INTDIR)\Parse.obj"
+	"$(INTDIR)\Parse.obj" \
+	"$(INTDIR)\missingfile.obj"
 
 "..\fabaselib.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
     $(LIB32) @<<
@@ -201,6 +205,7 @@ CLEAN :
 	-@erase "$(INTDIR)\errors.obj"
 	-@erase "$(INTDIR)\Http.obj"
 	-@erase "$(INTDIR)\log.obj"
+	-@erase "$(INTDIR)\missingfile.obj"
 	-@erase "$(INTDIR)\musiccatalog.obj"
 	-@erase "$(INTDIR)\mutex.obj"
 	-@erase "$(INTDIR)\Parse.obj"
@@ -256,7 +261,8 @@ LIB32_OBJS= \
 	"$(INTDIR)\win32thread.obj" \
 	"$(INTDIR)\win32updatemanager.obj" \
 	"$(INTDIR)\Http.obj" \
-	"$(INTDIR)\Parse.obj"
+	"$(INTDIR)\Parse.obj" \
+	"$(INTDIR)\missingfile.obj"
 
 "..\fabaselib.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
     $(LIB32) @<<
@@ -278,6 +284,7 @@ CLEAN :
 	-@erase "$(INTDIR)\errors.obj"
 	-@erase "$(INTDIR)\Http.obj"
 	-@erase "$(INTDIR)\log.obj"
+	-@erase "$(INTDIR)\missingfile.obj"
 	-@erase "$(INTDIR)\musiccatalog.obj"
 	-@erase "$(INTDIR)\mutex.obj"
 	-@erase "$(INTDIR)\Parse.obj"
@@ -334,7 +341,8 @@ LIB32_OBJS= \
 	"$(INTDIR)\win32thread.obj" \
 	"$(INTDIR)\win32updatemanager.obj" \
 	"$(INTDIR)\Http.obj" \
-	"$(INTDIR)\Parse.obj"
+	"$(INTDIR)\Parse.obj" \
+	"$(INTDIR)\missingfile.obj"
 
 "..\fabaselib.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
     $(LIB32) @<<
@@ -465,6 +473,12 @@ SOURCE=..\..\..\lib\http\src\Http.cpp
 SOURCE=..\..\src\log.cpp
 
 "$(INTDIR)\log.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\..\src\missingfile.cpp
+
+"$(INTDIR)\missingfile.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

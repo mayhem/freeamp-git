@@ -62,6 +62,7 @@ CLEAN :
 	-@erase "$(INTDIR)\FooCast.obj"
 	-@erase "$(INTDIR)\Icecast.obj"
 	-@erase "$(INTDIR)\IntroductionWizard.obj"
+	-@erase "$(INTDIR)\MissingFileDialog.obj"
 	-@erase "$(INTDIR)\MultiSelectTreeView.obj"
 	-@erase "$(INTDIR)\musicbrowser.res"
 	-@erase "$(INTDIR)\MusicSearchDialog.obj"
@@ -112,6 +113,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32MusicBrowser.obj" \
 	"$(INTDIR)\musicbrowser.res" \
 	"$(INTDIR)\Icecast.obj" \
+	"$(INTDIR)\MissingFileDialog.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\gdbm\gdbm.lib"
 
@@ -161,6 +163,7 @@ CLEAN :
 	-@erase "$(INTDIR)\FooCast.obj"
 	-@erase "$(INTDIR)\Icecast.obj"
 	-@erase "$(INTDIR)\IntroductionWizard.obj"
+	-@erase "$(INTDIR)\MissingFileDialog.obj"
 	-@erase "$(INTDIR)\MultiSelectTreeView.obj"
 	-@erase "$(INTDIR)\musicbrowser.res"
 	-@erase "$(INTDIR)\MusicSearchDialog.obj"
@@ -212,6 +215,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32MusicBrowser.obj" \
 	"$(INTDIR)\musicbrowser.res" \
 	"$(INTDIR)\Icecast.obj" \
+	"$(INTDIR)\MissingFileDialog.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\gdbm\gdbm.lib"
 
@@ -261,6 +265,7 @@ CLEAN :
 	-@erase "$(INTDIR)\FooCast.obj"
 	-@erase "$(INTDIR)\Icecast.obj"
 	-@erase "$(INTDIR)\IntroductionWizard.obj"
+	-@erase "$(INTDIR)\MissingFileDialog.obj"
 	-@erase "$(INTDIR)\MultiSelectTreeView.obj"
 	-@erase "$(INTDIR)\musicbrowser.res"
 	-@erase "$(INTDIR)\MusicSearchDialog.obj"
@@ -311,6 +316,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32MusicBrowser.obj" \
 	"$(INTDIR)\musicbrowser.res" \
 	"$(INTDIR)\Icecast.obj" \
+	"$(INTDIR)\MissingFileDialog.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\gdbm\gdbm.lib"
 
@@ -360,6 +366,7 @@ CLEAN :
 	-@erase "$(INTDIR)\FooCast.obj"
 	-@erase "$(INTDIR)\Icecast.obj"
 	-@erase "$(INTDIR)\IntroductionWizard.obj"
+	-@erase "$(INTDIR)\MissingFileDialog.obj"
 	-@erase "$(INTDIR)\MultiSelectTreeView.obj"
 	-@erase "$(INTDIR)\musicbrowser.res"
 	-@erase "$(INTDIR)\MusicSearchDialog.obj"
@@ -410,6 +417,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32MusicBrowser.obj" \
 	"$(INTDIR)\musicbrowser.res" \
 	"$(INTDIR)\Icecast.obj" \
+	"$(INTDIR)\MissingFileDialog.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\gdbm\gdbm.lib"
 
@@ -582,6 +590,12 @@ SOURCE=..\..\src\Icecast.cpp
 SOURCE=..\src\IntroductionWizard.cpp
 
 "$(INTDIR)\IntroductionWizard.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\src\MissingFileDialog.cpp
+
+"$(INTDIR)\MissingFileDialog.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
