@@ -66,5 +66,14 @@ depend:
 	makedepend -- $(DEFS) $(INCLUDES) $(CFLAGS) -- `echo $(FREEAMPOBJ) | sed -e 's,\.o,.cpp,g'`
 	+$(PIMAKE) depend
 
+Makefile: Makefile.in Makefile-plugins.in
+	./config.status
+	make -$(MAKEFLAGS)
+
+#Makefile: configure.in configure
+#	./config.status --recheck
+#	./config.status
+#	make -$(MAKEFLAGS)
+
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
