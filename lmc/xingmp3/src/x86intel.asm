@@ -38,7 +38,6 @@ extern _coef32:dword
 _TEXT	segment para public use32 'CODE'
 
 public _window_dual
-
 	align 16
 _window_dual proc near
 	push ebp
@@ -300,29 +299,35 @@ LastInRange:
 _window_dual endp
 
 public _fdct32
-
 	align 16
 _fdct32 proc near
 	push ebp
 	push edi
 	push esi
 	push ebx
-	sub esp,8
+	sub esp,140
 	mov ecx,_coef32-128	; coef = coef32 - (32 * 4)
 	mov DWORD PTR [esp+4],1		; m = 1
 	mov ebp,16		; n = 32 / 2
 
+	mov edi,DWORD PTR [esp+160]	; edi = x
+	mov esi,DWORD PTR [esp+164]	; esi = f
+	lea ebx,DWORD PTR [esp+12]
+	mov DWORD PTR [esp+164],ebx	; From now on, use temp buf instead of orig x
+	jmp ForwardLoopStart
+
 	align 4
 ForwardOuterLoop:
+	mov edi,DWORD PTR [esp+160]	; edi = x
+	mov esi,DWORD PTR [esp+164]	; esi = f
+	mov DWORD PTR [esp+164],edi	; Exchange mem versions of f/x for next iter
+ForwardLoopStart:
+	mov DWORD PTR [esp+160],esi
 	mov ebx,DWORD PTR [esp+4]	; ebx = m (temporarily)
-	mov esi,DWORD PTR [esp+32]	; esi = f
 	mov DWORD PTR [esp+0],ebx	; mi = m
-	mov edi,DWORD PTR [esp+28]	; edi = x
 	sal ebx,1		; Double m for next iter
 	lea ecx,DWORD PTR [ecx+ebp*8]	; coef += n * 8
 	mov DWORD PTR [esp+4],ebx	; Store doubled m
-	mov DWORD PTR [esp+28],esi	; Exchange mem versions of f/x for next iter
-	mov DWORD PTR [esp+32],edi
 	lea ebx,DWORD PTR [esi+ebp*4]	; ebx = f2 = f + n * 4
 	sal ebp,3		; n *= 8
 
@@ -379,13 +384,13 @@ ForwardInnerLoop1:
 
 	align 4
 BackOuterLoop:
-	mov esi,DWORD PTR [esp+32]	; esi = f
+	mov esi,DWORD PTR [esp+164]	; esi = f
 	mov DWORD PTR [esp+0],ebx	; mi = m
-	mov edi,DWORD PTR [esp+28]	; edi = x
+	mov edi,DWORD PTR [esp+160]	; edi = x
 	mov DWORD PTR [esp+4],ebx	; Store m
-	mov DWORD PTR [esp+28],esi	; Exchange mem versions of f/x for next iter
+	mov DWORD PTR [esp+160],esi	; Exchange mem versions of f/x for next iter
 	mov ebx,edi
-	mov DWORD PTR [esp+32],edi
+	mov DWORD PTR [esp+164],edi
 	sub ebx,ebp		; ebx = x2 = x - n
 	sal ebp,1		; n *= 2
 
@@ -410,7 +415,7 @@ BackInnerLoop:
 	sub edx,8		; p -= 8
 	jge BackInnerLoop	; Jump back if p >= 0
 
-	fstp DWORD PTR [esp-4]		; Pop (XXX is there a better way to do this?)
+	fstp DWORD PTR [esp+8]		; Pop (XXX is there a better way to do this?)
 	add esi,ebp		; f += n
 	add ebx,ebp		; x2 += n
 	add edi,ebp		; x += n
@@ -422,7 +427,7 @@ BackInnerLoop:
 	jg BackOuterLoop	; Jump back if m > 0
 
 
-	add esp,8
+	add esp,140
 	pop ebx
 	pop esi
 	pop edi

@@ -27,7 +27,6 @@
 #%% extern coef32,dword
 
 .globl window_dual
-
 	.align 16
 window_dual:	#%% proc
 	pushl %ebp
@@ -195,29 +194,35 @@ window_dual:	#%% proc
 #%% endp
 
 .globl fdct32
-
 	.align 16
 fdct32:		#%% proc
 	pushl %ebp
 	pushl %edi
 	pushl %esi
 	pushl %ebx
-	subl $8,%esp
+	subl $140,%esp
 	movl $coef32-128,%ecx	# coef = coef32 - (32 * 4)
 	movl $1,4(%esp)		# m = 1
 	movl $16,%ebp		# n = 32 / 2
+	
+	movl 160(%esp),%edi	# edi = x
+	movl 164(%esp),%esi	# esi = f
+	leal 12(%esp),%ebx
+	movl %ebx,164(%esp)	# From now on, use temp buf instead of orig x
+	jmp .ForwardLoopStart
 
 	.align 4
 .ForwardOuterLoop:
+	movl 160(%esp),%edi	# edi = x
+	movl 164(%esp),%esi	# esi = f
+	movl %edi,164(%esp)	# Exchange mem versions of f/x for next iter
+.ForwardLoopStart:
+	movl %esi,160(%esp)
 	movl 4(%esp),%ebx	# ebx = m (temporarily)
-	movl 32(%esp),%esi	# esi = f
 	movl %ebx,0(%esp)	# mi = m
-	movl 28(%esp),%edi	# edi = x
 	sall $1,%ebx		# Double m for next iter
 	leal (%ecx,%ebp,8),%ecx	# coef += n * 8
 	movl %ebx,4(%esp)	# Store doubled m
-	movl %esi,28(%esp)	# Exchange mem versions of f/x for next iter
-	movl %edi,32(%esp)
 	leal (%esi,%ebp,4),%ebx	# ebx = f2 = f + n * 4
 	sall $3,%ebp		# n *= 8
 
@@ -274,13 +279,13 @@ fdct32:		#%% proc
 
 	.align 4
 .BackOuterLoop:
-	movl 32(%esp),%esi	# esi = f
+	movl 164(%esp),%esi	# esi = f
 	movl %ebx,0(%esp)	# mi = m
-	movl 28(%esp),%edi	# edi = x
+	movl 160(%esp),%edi	# edi = x
 	movl %ebx,4(%esp)	# Store m
-	movl %esi,28(%esp)	# Exchange mem versions of f/x for next iter
+	movl %esi,160(%esp)	# Exchange mem versions of f/x for next iter
 	movl %edi,%ebx
-	movl %edi,32(%esp)
+	movl %edi,164(%esp)
 	subl %ebp,%ebx		# ebx = x2 = x - n
 	sall $1,%ebp		# n *= 2
 
@@ -305,7 +310,7 @@ fdct32:		#%% proc
 	subl $8,%edx		# p -= 8
 	jge .BackInnerLoop	# Jump back if p >= 0
 
-	fstps -4(%esp)		# Pop (XXX is there a better way to do this?)
+	fstps 8(%esp)		# Pop (XXX is there a better way to do this?)
 	addl %ebp,%esi		# f += n
 	addl %ebp,%ebx		# x2 += n
 	addl %ebp,%edi		# x += n
@@ -317,7 +322,7 @@ fdct32:		#%% proc
 	jg .BackOuterLoop	# Jump back if m > 0
 
 
-	addl $8,%esp
+	addl $140,%esp
 	popl %ebx
 	popl %esi
 	popl %edi
