@@ -72,7 +72,7 @@ BEGIN
     CONTROL         "Log general player errors (e.g. Loading plugins)",
                     IDC_LOGMAIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,98,
                     163,10
-    CONTROL         "Log input from PMIs (e.g. File, HTTP, ShoutCAST)",
+    CONTROL         "Log input from PMIs (e.g. File, HTTP, SHOUTcast, icecast)",
                     IDC_LOGINPUT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,
                     112,174,10
     CONTROL         "Log output from PMOs (e.g. Wave, DirectSound)",
@@ -102,8 +102,8 @@ BEGIN
     LTEXT           "Seconds",IDC_STATIC,146,16,29,8
     GROUPBOX        "",IDC_STATIC,3,39,227,42
     LTEXT           " ",IDC_STATIC,9,41,8,8
-    CONTROL         "Save Shoutcast Streams Locally",IDC_SAVESTREAMS,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,11,39,116,10
+    CONTROL         "Save SHOUTcast/icecast Streams Locally",IDC_SAVESTREAMS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,39,149,10
     LTEXT           "Save Location:",IDC_SAVELOCATION_TEXT,11,51,49,8
     EDITTEXT        IDC_STREAMSAVEDIR,11,61,160,14,ES_AUTOHSCROLL
     PUSHBUTTON      "Browse...",IDC_BROWSE,175,61,50,14
@@ -334,8 +334,7 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_EXE_ICON            ICON    DISCARDABLE     "icon1.ico"
-IDI_INFO                ICON    FIXED IMPURE    "info.ico"
-
+IDI_INFO                ICON    DISCARDABLE     "info.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //

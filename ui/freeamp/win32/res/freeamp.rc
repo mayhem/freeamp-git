@@ -99,7 +99,7 @@ BEGIN
     CONTROL         "Log general player errors (e.g. Loading plugins)",
                     IDC_LOGMAIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,98,
                     163,10
-    CONTROL         "Log input from PMIs (e.g. File, HTTP, ShoutCAST)",
+    CONTROL         "Log input from PMIs (e.g. File, HTTP, SHOUTcast, icecast)",
                     IDC_LOGINPUT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,
                     112,174,10
     CONTROL         "Log output from PMOs (e.g. Wave, DirectSound)",

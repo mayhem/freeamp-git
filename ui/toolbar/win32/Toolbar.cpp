@@ -310,7 +310,7 @@ TrayNotify(int32 notifyMessage)
                hWnd = (HWND)pProp->GetInt32();
 
             ShowWindow(hWnd, SW_RESTORE);
-            SetWindowPos(hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE|SWP_NOMOVE);
+            SetForegroundWindow(hWnd);
             
 			break;
         }
