@@ -1,3 +1,15 @@
+Changes for version 2.1.0 final
+--------------------------------------------------------------------
+
+- Upgraded the code that interfaces with the musicbrainz client library.
+- Fixed a streaming bug where it never finish buffering small files.
+- Fixed a couple of minor theme alignment issues
+- Fixed bugs where metadata was not written to ID3v1/v2 tags.
+- Fixed bug where ID3v1 tags were favored over ID3v2 tags.
+- Added a right client context menu to the main freeamp ui
+- Improved the Ogg/Vorbis streaming support
+
+
 Changes for version 2.1.0 rc6
 --------------------------------------------------------------------
 - Added support for mouse wheel volume adjustment in linux
