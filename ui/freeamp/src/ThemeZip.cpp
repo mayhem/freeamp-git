@@ -35,6 +35,7 @@ ____________________________________________________________________________*/
 #include <unistd.h>
 #undef socklen_t
 #include <netinet/in.h>
+#include "win32impl.h"
 #endif
 
 #include "zlib.h"
@@ -273,8 +274,6 @@ long from_oct (int digs, char *where)
 
 Error ThemeZip::DecompressTheme(const string &oSrcFile, const string &oDestPath)
 {
-    char *ext;
-
     char buf[4];
     FILE *f;
     
@@ -619,6 +618,44 @@ Error ThemeZip::CleanupThemeZip(void)
 
    return kError_NoErr;
 }      
+
+Error ThemeZip::CleanupThemeZip(string &oDir)
+{
+   WIN32_FIND_DATA find;
+   HANDLE handle;
+   string oBaseDir;
+
+   oBaseDir = oDir + string(DIR_MARKER_STR) + string("*");
+#ifdef WIN32
+   oBaseDir += string(".*");
+#endif
+   handle = FindFirstFile((char *)oBaseDir.c_str(), &find);
+   if (handle != INVALID_HANDLE_VALUE) {
+       do {
+           string rmfile = oDir + string(DIR_MARKER_STR) + 
+                           string(find.cFileName);
+           if (!strcmp(".", find.cFileName) || !strcmp("..", find.cFileName))
+               continue;
+           if (!(find.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+               if (unlink(rmfile.c_str())) {
+                   FindClose(handle);
+                   return kError_UnlinkFailed;
+               }
+           }
+           else {
+               if (rmdir(rmfile.c_str())) {
+                   CleanupThemeZip(rmfile);
+                   if (rmdir(rmfile.c_str())) {
+                       FindClose(handle);
+                       return kError_UnlinkFailed;
+                   }
+               }
+           }
+       } while (FindNextFile(handle, &find));
+       FindClose(handle);
+   }
+   return kError_NoErr;
+}
 
 #if 0
 void main(int argc, char **argv)

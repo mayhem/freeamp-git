@@ -48,6 +48,7 @@ ____________________________________________________________________________*/
 #include "VSliderControl.h"
 #include "TextControl.h"
 #include "MultiStateControl.h"
+#include "PixFontControl.h"
 #include "ThemeZip.h"
 #include "MessageDialog.h"
 #include "debug.h"
@@ -270,7 +271,7 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
         oCompleteFile = oTempPath + string(DIR_MARKER_STR) 
 	                + string("theme.xml");
         eRet = Parse::ParseFile(oCompleteFile);
-        pZip->CleanupThemeZip();
+        pZip->CleanupThemeZip(oTempPath);
         rmdir(oTempPath.c_str());
         delete pZip;
     }    
@@ -811,6 +812,59 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
        return kError_NoErr;
     }
 
+    if (oElement == string("PixmapFontControl"))
+    {
+       m_bPosDefined = m_bBitmapDefined = m_bInfoDefined = false;
+       
+       if (m_pCurrentControl)
+       {
+           m_oLastError = string("Controls cannot be nested");
+           return kError_InvalidParam;
+       }
+
+       if (oAttrMap.find("Name") == oAttrMap.end())
+       {
+           m_oLastError = string("the <PixmapFontControl> tag needs a Name attribute");
+           return kError_ParseError;
+       }
+
+       m_eCurrentControl = ePixFontControl;
+       m_pCurrentControl = new PixFontControl(m_pCurrentWindow, 
+                                              oAttrMap["Name"]);
+
+       bool bCase = false;
+       if (oAttrMap.find("IgnoreCase") != oAttrMap.end())
+          bCase = strcasecmp(oAttrMap["IgnoreCase"].c_str(), "yes") == 0;
+
+       if (bCase) 
+           ((PixFontControl *)m_pCurrentControl)->SetIgnoreCase(true);
+
+       return kError_NoErr;
+    }
+
+    if (oElement == string("FontMap"))
+    {
+       char *row;
+
+       if (m_pCurrentControl == NULL || m_eCurrentControl != ePixFontControl)
+       {
+           m_oLastError = string("The <FontMap> tag must be inside of a "
+                                 "<PixFontControl> tag");
+           return kError_InvalidParam;
+       }
+
+       if (oAttrMap.find("Map") == oAttrMap.end())
+       {
+           m_oLastError = string("the <FontMap> tag needs a Map attribute");
+           return kError_ParseError;
+       }
+ 
+       row = (char *)oAttrMap["Map"].c_str();
+       ((PixFontControl *)m_pCurrentControl)->AddMapRow(row);
+    
+       return kError_NoErr;
+    }
+
     if (oElement == string("Style"))
     {
        Color  oColor(0, 0, 0);
@@ -825,7 +879,7 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
            return kError_InvalidParam;
        }
 
-	   if (oAttrMap.find("Font") == oAttrMap.end())
+       if (oAttrMap.find("Font") == oAttrMap.end())
        {
            m_oLastError = string("the <Style> tag needs a Font attribute");
            return kError_ParseError;
@@ -1273,7 +1327,8 @@ Error Theme::EndElement(string &oElement)
         oElement == string("Info") ||
         oElement == string("ControlBitmap") ||
         oElement == string("ControlStateBitmap") ||
-        oElement == string("SliderTroughBitmap"))
+        oElement == string("SliderTroughBitmap") ||
+        oElement == string("FontMap"))
     {
        if (m_pCurrentControl == NULL)
        {
@@ -1290,7 +1345,8 @@ Error Theme::EndElement(string &oElement)
         oElement == string("SliderControl") ||
         oElement == string("VSliderControl") ||
         oElement == string("MultiStateControl") ||
-        oElement == string("TextControl")) 
+        oElement == string("TextControl") ||
+        oElement == string("PixmapFontControl")) 
     {
        if (!m_bPosDefined)
        {
@@ -1302,7 +1358,8 @@ Error Theme::EndElement(string &oElement)
            m_oLastError = string("The Control is missing the <ControlBitmap> tag");
            return kError_InvalidParam;
        }
-       if (!m_bInfoDefined && m_eCurrentControl != eTextControl)
+       if (!m_bInfoDefined && (m_eCurrentControl != eTextControl && 
+                               m_eCurrentControl != ePixFontControl))
        {
            m_oLastError = string("The Control is missing the <Info> tag");
            return kError_InvalidParam;

@@ -170,6 +170,7 @@ FREEAMPUIOBJ += ui/freeamp/src/DialControl.o ui/freeamp/src/Font.o
 FREEAMPUIOBJ += ui/freeamp/src/FreeAmpTheme.o ui/freeamp/src/ThemeZip.o 
 FREEAMPUIOBJ += ui/freeamp/src/MultiStateControl.o ui/freeamp/src/Headlines.o
 FREEAMPUIOBJ += ui/freeamp/src/ForeignTheme.o base/src/utility.lo
+FREEAMPUIOBJ += ui/freeamp/src/PixFontControl.o
 FREEAMPUIOBJ += lib/zlib/lib/libzlib.la lib/xml/src/Parse.lo
 FREEAMPUIOBJ += lib/unzip/lib/libunzip.la
 FREEAMPUIOBJ += $($(OSTYPE)FREEAMPUIOBJ)
@@ -206,10 +207,11 @@ plugins/freeamp.ui: $(FREEAMPUIOBJ)
 
 # MakeTheme, only built if we're building freeamp.ui
 
-MAKETHEMEOBJ = ui/freeamp/tools/src/MakeTheme.o ui/freeamp/src/ThemeZip.o
+MAKETHEMEOBJ  = ui/freeamp/tools/src/MakeTheme.o ui/freeamp/src/ThemeZip.o
+MAKETHEMEOBJ += lib/zlib/lib/libzlib.a lib/unzip/lib/libunzip.la
 
 MakeTheme: $(MAKETHEMEOBJ)
-	$(CXXLINK) $(MAKETHEMEOBJ) lib/zlib/lib/libzlib.a lib/unzip/lib/libunzip.la 
+	$(CXXLINK) $(MAKETHEMEOBJ)
 
 # cmdline
 CMDUIOBJ = ui/cmdline/cmdlineUI.o 

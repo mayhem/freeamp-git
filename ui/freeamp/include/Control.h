@@ -184,7 +184,6 @@ class Control
 
       // this is cute
       vector<map<ControlStateEnum, Rect> > m_oStateBitmapRect;
-
 };
 
 #endif

@@ -56,6 +56,7 @@ enum ControlTypeEnum
     eVSliderControl,
     eDialControl,
     eMultiStateControl,
+    ePixFontControl,
     
     eUndefinedControl
 };

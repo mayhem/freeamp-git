@@ -21,8 +21,8 @@
    $Id$
 ____________________________________________________________________________*/ 
 
-#ifndef INCLUDED_THEMEZIP_H__
-#define INCLUDED_THEMEZIP_H__
+#ifndef INCLUDED_PIXFONTCONTROL_H__
+#define INCLUDED_PIXFONTCONTROL_H__
 
 // The debugger can't handle symbols more than 255 characters long.
 // STL often creates symbols longer than that.
@@ -31,35 +31,47 @@ ____________________________________________________________________________*/
 #pragma warning(disable:4786)
 #endif
 
-#include <string>
 #include <vector>
-#include "errors.h"
-
 using namespace std;
 
-class ThemeZip
+#include "Control.h"
+#include "Canvas.h"
+#include "errors.h"
+
+typedef struct {
+   int row;
+   int col;
+} PixFontLocation;
+
+class PixFontControl : public Control
 {
     public:
 
-               ThemeZip(void);
-      virtual ~ThemeZip(void);
+               PixFontControl(Window *pWindow, string &oName); 
+      virtual ~PixFontControl(void);
+      
+      void Transition(ControlTransitionEnum eTrans, Pos *pMousePos);
+      virtual void Init(void);
+      virtual bool UseToDragWindow(void);
 
-      virtual  Error CompressThemeZip(const string &oDestFile, 
-                                      vector<string *> &oFileList);
-      virtual  Error DecompressTheme(const string &oSrcFile,
-                                     const string &oDestPath);
-      virtual  Error CleanupThemeZip(void);    
-      virtual  Error CleanupThemeZip(string &oDir); 
-      virtual  Error GetDescriptiveName(const string &oSrcFile, 
-                                        string &oDescriptiveName);
+      void AddMapRow(char *row);
+      void SetDefaultLetter(char new_default) { m_Default = new_default; }
+      void SetIgnoreCase(bool setting) { m_bNoCase = setting; }
 
-    protected:
-     
     private:
-          Error DecompressZip(const string &oSrcFile, const string &oDestFile);
-          Error DecompressGZ(const string &oSrcFile, const string &oDestFile);
 
-	  vector<string> m_oCreatedFiles;
+      void BlitLetter(char letter, Rect oDestRect);
+      int  BlitString(string &oText, int iOffset);
+      void TextChanged(void);
+      void MarqueeText(void);
+
+      vector<char *>  m_Fontmap;
+      uint32          m_NumRows;
+      int             m_LetterWidth, m_LetterHeight;
+      bool            m_bNoCase;
+      char            m_Default;
+      PixFontLocation m_lettermap[256];
+      int             m_iMarqueePos;
 };
 
 #endif

@@ -49,8 +49,8 @@ const int m_iMarqueeScrollIncrement = 5;
 TextControl::TextControl(Window *pWindow, string &oName) : 
              Control(pWindow, oName, pTransitions)
 {
-	m_pFont = NULL;
-	m_iMarqueePos = 0;
+    m_pFont = NULL;
+    m_iMarqueePos = 0;
     m_bStyleSet = false;
 }
 
@@ -66,10 +66,10 @@ void TextControl::SetStyle(Font *pFont, string &oAlign,
     m_bUnderline = bUnderline;
     m_pFont = pFont;
        
-	if (strcasecmp(oAlign.c_str(), "right") == 0)
+    if (strcasecmp(oAlign.c_str(), "right") == 0)
        m_eAlign = eRight;
     else   
-	if (strcasecmp(oAlign.c_str(), "center") == 0)
+    if (strcasecmp(oAlign.c_str(), "center") == 0)
        m_eAlign = eCenter;
     else   
        m_eAlign = eLeft;
