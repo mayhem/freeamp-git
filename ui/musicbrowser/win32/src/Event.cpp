@@ -151,7 +151,15 @@ void MusicBrowserUI::RemoveEvent(void)
             if(state & LVIS_SELECTED)
             {
                 found++;
+                bool isCurrent = (m_oPlm->GetCurrentIndex() == index);
+
+                if(isCurrent)
+                    m_context->target->AcceptEvent(new Event(CMD_Stop));
+
                 m_oPlm->RemoveItem(index);
+
+                if(isCurrent)
+                    m_context->target->AcceptEvent(new Event(CMD_Play));
             }
 
             index--;
