@@ -13,6 +13,14 @@ Linux:
 
 	make install
 
+	plugins (located in the plugins directory where you built
+	freeamp) must be copied to a directory named 'plugins'.
+	This 'plugins' directory is a subdirectory of either:
+	a) a directory in the built-in seach path:
+	   .:~/.freeamp:/usr/local/lib/freeamp
+	b) the search path specified by the environment variable
+	   FREEAMP_PATH
+
 	you may also wish to enable mpg123 compatability mode by
 	invoking freeamp as 'mpg123'  (i.e. do a ln -s freeamp mpg123
 	to make a symbolic link, then do a ./mpg123)  This makes it
