@@ -32,6 +32,8 @@ New features for final release:
 - Fonts can now be embedded. We found a way to legally protect ourselves
   even if people upload Themes with copyrighted (without a free license
   to distribute) font embedded in them.
+- There is now a PlayStop button as well as a PlayPause button. Works
+  just like the PlayPause button, but with stop instead of Pause.
 
 GETTING STARTED
 
@@ -722,6 +724,7 @@ Available Control Names
 MultiStateControls:
 
 PlayPause     -- Play/Pause button
+PlayStop      -- Play/Stop button
 Repeat        -- Repeat None/Repeat One/Repeat All
 Shuffle       -- Normal/Shuffle mode
 
@@ -774,18 +777,18 @@ This is the current Emusic theme.xml file:
 <Window Name="MainWindow">
     <BackgroundBitmap Name="Background" Rect="0, 0, 327, 161"/>
     <Controls>
-        <MultiStateControl Name="PlayPause" NumStates="2">
-        	<Info Desc="Play the current track||Pause the current track" Tip="Play||Pause"/>
-            <Position Pos="228,124"/>
-            <ControlBitmap Rect="0,96,119,159" Name="Buttons"/>
-        </MultiStateControl>
         <ButtonControl Name="Logo" URL="http://www.emusic.com">
         	<Info Desc="Go to the EMusic web site" Tip="EMusic"/>
             <Position Pos="17,126"/>
             <ControlBitmap Rect="0,236,327,260" Name="Buttons"/>
         </ButtonControl>
-        <ButtonControl Name="Stop">
-        	<Info Desc="Stop the current track" Tip="Stop"/>
+        <MultiStateControl Name="PlayStop" NumStates="2">
+        	<Info Desc="Play the current track||Stop the current track" Tip="Play||Stop"/>
+            <Position Pos="228,124"/>
+            <ControlBitmap Rect="0,96,119,159" Name="Buttons"/>
+        </MultiStateControl>
+        <ButtonControl Name="Pause">
+        	<Info Desc="Pause the current track" Tip="Pause"/>
             <Position Pos="258,124"/>
             <ControlBitmap Rect="0,64,119,95" Name="Buttons"/>
         </ButtonControl>
