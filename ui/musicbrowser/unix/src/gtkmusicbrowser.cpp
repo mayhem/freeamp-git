@@ -321,7 +321,7 @@ void GTKMusicBrowser::AddFileCMD()
                     delete [] filereturn;
                 }
             }
-            delete ext;
+            delete [] ext;
             delete [] tempurl;
         }
 

@@ -65,13 +65,18 @@ static void add_tool(GtkWidget *widget, GTKMusicBrowser *p)
                     char *first= strtok(filereturn, "\n");
 
                     while ((temp = strtok(NULL, "\n"))) {
+                        if (ext)
+                            delete [] ext;
                         ext = p->GetContext()->player->GetExtension(temp);
                         if (ext &&
-                           p->GetContext()->player->IsSupportedExtension(ext)) {
+                            p->GetContext()->player->IsSupportedExtension(ext)) 
+                        {
                             p->AddTrackPlaylistEvent(temp);
                             p->m_currentindex++;
                         }
                     }
+                    if (ext)
+                        delete [] ext;
                     ext = p->GetContext()->player->GetExtension(first);
                     if (ext &&
                         p->GetContext()->player->IsSupportedExtension(ext))
@@ -79,8 +84,9 @@ static void add_tool(GtkWidget *widget, GTKMusicBrowser *p)
                 }
                 delete [] filereturn;
             }
-       }
-       delete [] tempurl;
+        }
+        delete [] tempurl;
+        delete [] ext;
     }
     delete filesel;
 }

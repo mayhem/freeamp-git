@@ -1025,16 +1025,9 @@ static void tree_drag_begin(GtkWidget *w, GdkDragContext *context,
     if (node)
         gtk_ctree_select(ctree, node);
 
-    vector<PlaylistItem *> *newlist = p->GetTreeSelection();
-
-    if (newlist->size() == 0)
-        return;
-
-    vector<PlaylistItem *> *test =
-         (vector<PlaylistItem *> *)g_dataset_get_data(context,
-                                                      "tree-drag-source");
+    void *test = g_dataset_get_data(context, "tree-drag-source");
     if (!test)
-        g_dataset_set_data_full(context, "tree-drag-source", newlist,
+        g_dataset_set_data_full(context, "tree-drag-source", p,
                                 tree_source_destroy);
 }
 
@@ -1043,9 +1036,9 @@ static void tree_drag_data_get(GtkWidget *w, GdkDragContext *context,
                                guint time, GtkWidget *widget)
 {
     if (selection_data->target == gdk_atom_intern("tree-drag", FALSE)) {
-        vector<PlaylistItem *> *newlist =
-                (vector<PlaylistItem *> *)g_dataset_get_data(context,
-                                                             "tree-drag-source");
+        GTKMusicBrowser *p = (GTKMusicBrowser *)g_dataset_get_data(context,
+                                                            "tree-drag-source");
+        vector<PlaylistItem *> *newlist = p->GetTreeSelection();
         gtk_selection_data_set(selection_data, selection_data->target,
                                0, (guchar *)&newlist, sizeof(vector<PlaylistItem *>*));
     }
@@ -1082,6 +1075,9 @@ static void tree_clicked(GtkWidget *widget, GdkEventButton *event,
 
         GtkCTreeNode *node = GTK_CTREE_NODE(g_list_nth(clist->row_list, row));
         TreeData *data = (TreeData *)gtk_ctree_node_get_row_data(ctree, node);
+        if (!data)
+            return;
+
         p->SetTreeClick(data->type);
 
         if (event->button == 3) {
@@ -1097,6 +1093,9 @@ static void ctree_selected(GtkCTree *ctree, GtkCTreeNode *node, gint col,
                           GTKMusicBrowser *p)
 {
     TreeData *data = (TreeData *)gtk_ctree_node_get_row_data(ctree, node);
+    if (!data)
+        return;
+
     bool found = false;
     vector<TreeData *>::iterator i = p->mbSelections->begin();
     for (; i != p->mbSelections->end(); i++) {
@@ -1114,6 +1113,9 @@ static void ctree_unselected(GtkCTree *ctree, GtkCTreeNode *node, gint col,
                             GTKMusicBrowser *p)
 {
     TreeData *data = (TreeData *)gtk_ctree_node_get_row_data(ctree, node);
+    if (!data)
+        return;
+
     vector<TreeData *>::iterator i = p->mbSelections->begin();
     for (; i != p->mbSelections->end(); i++) {
         if (*i == data) {
@@ -1522,7 +1524,7 @@ void GTKMusicBrowser::CreateTree(void)
     gtk_drag_source_set(GTK_WIDGET(musicBrowserTree), GDK_BUTTON1_MASK,
                         &tree_target_table, 1, GDK_ACTION_MOVE);
     gtk_signal_connect(GTK_OBJECT(musicBrowserTree), "drag_data_get",
-                             GTK_SIGNAL_FUNC(tree_drag_data_get), this);
+                       GTK_SIGNAL_FUNC(tree_drag_data_get), this);
     gtk_signal_connect(GTK_OBJECT(musicBrowserTree), "drag_begin",
                        GTK_SIGNAL_FUNC(tree_drag_begin), this);
     gtk_signal_connect(GTK_OBJECT(musicBrowserTree), "tree_expand",

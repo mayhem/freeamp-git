@@ -21,8 +21,12 @@
     $Id$
 ____________________________________________________________________________*/
 
-#include "fileselector.h"
+#include "config.h"
+
 #include <unistd.h>
+
+#include "fileselector.h"
+#include "utility.h"
 
 FileSelector::FileSelector(const char *windowtitle)
 {
@@ -65,6 +69,18 @@ void FileSelector::AddEvent()
     GList *row = GTK_CLIST(gfile->file_list)->row_list;
     gint rownum = 0;
     char *temp, *path_temp;
+
+    char *rawtext = gtk_entry_get_text(GTK_ENTRY(gfile->selection_entry));
+    if (!strncasecmp("http://", rawtext, 7) ||
+        !strncasecmp("rtp://", rawtext, 6)) {
+        returnpath = strdup_new(rawtext);
+        gtk_widget_destroy(GTK_WIDGET(gfile));
+
+        ok = true;
+        done = true;
+
+        return;
+    }
 
     returnpath = gtk_file_selection_get_filename(gfile);
     path_temp = strdup(returnpath.c_str());
