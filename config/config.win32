@@ -53,6 +53,7 @@ ____________________________________________________________________________*/
 #define usleep(x) ::Sleep(x/1000)
 #define strcasecmp(a,b) stricmp(a,b)
 #define strncasecmp(a,b,c) strnicmp(a,b,c)
+typedef int socklen_t;
 #endif
 
 /* define our datatypes */
@@ -129,8 +130,5 @@ typedef short			int32;
 #endif
 #endif /* NULL */
 
-#ifdef WIN32
-typedef int socklen_t;
-#endif
 
 #endif /* CONFIG_H */
