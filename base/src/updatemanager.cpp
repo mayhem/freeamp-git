@@ -219,13 +219,18 @@ bool UpdateManager::IsUpdateAvailable()
             uint32 localMajorVersion, currentMajorVersion;
             uint32 localMinorVersion, currentMinorVersion;
             uint32 localRevisionVersion, currentRevisionVersion;
+            uint32 localFileVersion, currentFileVersion; 
             int32 numFields;
 
             item = *i;
             
             numFields = sscanf(item->GetLocalFileVersion().c_str(),
-                   "%lu.%lu.%lu", 
-                   &localMajorVersion,&localMinorVersion,&localRevisionVersion);
+                   "%lu.%lu.%lu.%lu", 
+                   &localMajorVersion,&localMinorVersion,
+                   &localRevisionVersion, &localFileVersion);
+
+            if(numFields < 4)
+                localFileVersion = 0;
 
             if(numFields < 3)
                 localRevisionVersion = 0;
@@ -237,8 +242,12 @@ bool UpdateManager::IsUpdateAvailable()
                 localMajorVersion = 0;
             
             numFields = sscanf(item->GetCurrentFileVersion().c_str(),
-                   "%lu.%lu.%lu", 
-                   &currentMajorVersion,&currentMinorVersion,&currentRevisionVersion);
+                   "%lu.%lu.%lu.%lu", 
+                   &currentMajorVersion,&currentMinorVersion,
+                   &currentRevisionVersion, &currentFileVersion);
+
+            if(numFields < 4)
+                currentFileVersion = 0;
 
             if(numFields < 3)
                 currentRevisionVersion = 0;
@@ -255,7 +264,11 @@ bool UpdateManager::IsUpdateAvailable()
                  currentMinorVersion > localMinorVersion) ||
                 (currentMajorVersion == localMajorVersion && 
                  currentMinorVersion == localMinorVersion &&
-                 currentRevisionVersion > localRevisionVersion))
+                 currentRevisionVersion > localRevisionVersion) ||
+                (currentMajorVersion == localMajorVersion && 
+                 currentMinorVersion == localMinorVersion &&
+                 currentRevisionVersion == localRevisionVersion &&
+                 currentFileVersion > localFileVersion))
             {
                 result = true;
                 break;
@@ -292,13 +305,18 @@ Error UpdateManager::UpdateComponents(UMCallBackFunction function,
                 uint32 localMajorVersion, currentMajorVersion;
                 uint32 localMinorVersion, currentMinorVersion;
                 uint32 localRevisionVersion, currentRevisionVersion;
+                uint32 localFileVersion, currentFileVersion; 
                 int32 numFields;
 
                 item = *i;
-                
+            
                 numFields = sscanf(item->GetLocalFileVersion().c_str(),
-                       "%lu.%lu.%lu", 
-                       &localMajorVersion,&localMinorVersion,&localRevisionVersion);
+                       "%lu.%lu.%lu.%lu", 
+                       &localMajorVersion,&localMinorVersion,
+                       &localRevisionVersion, &localFileVersion);
+
+                if(numFields < 4)
+                    localFileVersion = 0;
 
                 if(numFields < 3)
                     localRevisionVersion = 0;
@@ -308,10 +326,14 @@ Error UpdateManager::UpdateComponents(UMCallBackFunction function,
 
                 if(numFields < 1)
                     localMajorVersion = 0;
-                
+            
                 numFields = sscanf(item->GetCurrentFileVersion().c_str(),
-                       "%lu.%lu.%lu", 
-                       &currentMajorVersion,&currentMinorVersion,&currentRevisionVersion);
+                       "%lu.%lu.%lu.%lu", 
+                       &currentMajorVersion,&currentMinorVersion,
+                       &currentRevisionVersion, &currentFileVersion);
+
+                if(numFields < 4)
+                    currentFileVersion = 0;
 
                 if(numFields < 3)
                     currentRevisionVersion = 0;
@@ -328,7 +350,11 @@ Error UpdateManager::UpdateComponents(UMCallBackFunction function,
                      currentMinorVersion > localMinorVersion) ||
                     (currentMajorVersion == localMajorVersion && 
                      currentMinorVersion == localMinorVersion &&
-                     currentRevisionVersion > localRevisionVersion))
+                     currentRevisionVersion > localRevisionVersion) ||
+                    (currentMajorVersion == localMajorVersion && 
+                     currentMinorVersion == localMinorVersion &&
+                     currentRevisionVersion == localRevisionVersion &&
+                     currentFileVersion > localFileVersion))
                 {
                     result = DownloadItem(item, function, cookie);
 

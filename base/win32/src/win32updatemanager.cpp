@@ -218,8 +218,9 @@ Error Win32UpdateManager::GetFileVersions(const char* path)
                                 uint32 major = HIWORD(fileInfo->dwFileVersionMS);
                                 uint32 minor = LOWORD(fileInfo->dwFileVersionMS);
                                 uint32 rev = HIWORD(fileInfo->dwFileVersionLS);
+                                uint32 file = LOWORD(fileInfo->dwFileVersionLS);
 
-                                ost << major << "." << minor << "." << rev;
+                                ost << major << "." << minor << "." << rev << "." << file;
                                 
                                 item->SetLocalFileVersion(ost.str());
 
