@@ -102,7 +102,7 @@ SoundCardPMO::~SoundCardPMO()
 void SoundCardPMO::SetVolume(int32 v)
 {
   struct audio_info ainfo;
-  int mixFd = open("/dev/audioctl",O_RDWR);
+  int mixFd = open("/dev/audioctl",O_RDWR | O_NONBLOCK);
   if (mixFd != -1) {
     ioctl(mixFd, AUDIO_GETINFO, &ainfo);
     ainfo.play.gain = v;
@@ -140,7 +140,7 @@ Error SoundCardPMO::Init(OutputInfo * info)
    else
    {
       // got info, so this is the beginning...
-      if ((audio_fd = open("/dev/audio", O_WRONLY | O_SYNC, 0)) < 0)
+      if ((audio_fd = open("/dev/audio", O_WRONLY, 0)) < 0)
       {
          if (errno == EBUSY)
          {
@@ -274,13 +274,17 @@ void SoundCardPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
 {
    MediaTimeInfoEvent *pmtpi;
    int32               hours, minutes, seconds;
-   int                 iTotalTime = 0;
+   int                 x, iTotalTime = 0;
    audio_info          info;
 
    if (pEvent->GetFrameNumber() != m_iLastFrame + 1)
    {
        m_iTotalBytesWritten = 1152 * pEvent->GetFrameNumber() * 
                               m_iBytesPerSample; 
+       AUDIO_INITINFO(&info);
+       info.play.samples = m_iTotalBytesWritten / 4;
+       x = ioctl(audio_fd, AUDIO_SETINFO, &info);
+       //       printf("x == %d (%s)\n", x, strerror(errno));
    }
    m_iLastFrame = pEvent->GetFrameNumber();
 
@@ -289,7 +293,8 @@ void SoundCardPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
 
    ioctl(audio_fd, AUDIO_GETINFO, &info);
 
-   iTotalTime = (info.play.samples * 4) /
+   // why 4? 2 bytes x 2 channels
+   iTotalTime = (info.play.samples * 4) / 
                 (m_iBytesPerSample * myInfo->samples_per_second);
 
    hours = iTotalTime / 3600;
