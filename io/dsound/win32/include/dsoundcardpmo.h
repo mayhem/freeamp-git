@@ -27,9 +27,9 @@ ____________________________________________________________________________*/
 #define _DSOUNDCARDPMO_H_
 
 /* system headers */
-#include <stdlib.h>
 #include <windows.h>
 #include <dsound.h>
+#include <stdlib.h>
 
 /* project headers */
 #include "config.h"

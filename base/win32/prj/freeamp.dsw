@@ -24,6 +24,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "dsoundcard"=..\..\..\io\dsound\win32\prj\dsoundcard.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "fileinput"=..\..\..\io\local\win32\prj\fileinput.dsp - Package Owner=<4>
 
 Package=<5>

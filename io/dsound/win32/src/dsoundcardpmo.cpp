@@ -31,7 +31,7 @@ ____________________________________________________________________________*/
 
 /* project headers */
 #include "config.h"
-#include "DSoundCardPMO.h"
+#include "dsoundcardpmo.h"
 #include "eventdata.h"
 #include "log.h"
 
