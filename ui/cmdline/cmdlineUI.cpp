@@ -285,6 +285,7 @@ AcceptEvent(Event * e)
                m_id3InfoPrinted = false;
                cout << "Playing: " << pmvi->m_filename << endl;
             }
+            m_totalSeconds = (int)pmvi->m_totalSeconds;
             break;
          }
       case INFO_MediaTimeInfo:
@@ -302,23 +303,14 @@ AcceptEvent(Event * e)
             m_totalFrames = info->GetTotalFrames();
             break;
          }
-/*          case INFO_ID3TagInfo: {
-   ID3TagEvent *ite = (ID3TagEvent *)e;
-   if (ite) {
-   Id3TagInfo ti = ite->GetId3Tag();
-   if (ti.m_containsInfo && !m_id3InfoPrinted) {
-   m_id3InfoPrinted = true;
-   cout << "Title  : " << ti.m_songName << endl;
-   cout << "Artist : " << ti.m_artist << endl;
-   cout << "Album  : " << ti.m_album << endl;
-   cout << "Year   : " << ti.m_year << endl;
-   cout << "Comment: " << ti.m_comment << endl;
-   }
-   }
-   break;
-   }
-       */ default:
-         break;
+      case INFO_VorbisInfo:
+         {
+            VorbisInfoEvent *info = (VorbisInfoEvent *) e;
+
+            m_secondsPerFrame = info->GetSecondsPerFrame();
+            m_totalFrames = (int)(m_totalSeconds / m_secondsPerFrame); 
+            break;
+         }
       }
    }
    return kError_NoErr;

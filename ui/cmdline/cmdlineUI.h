@@ -60,6 +60,7 @@ class     cmdlineUI:public UserInterface
    float     m_secondsPerFrame;
    int32     m_currSeconds;
    int32     m_totalFrames;
+   int32     m_totalSeconds;
 };
 
 #endif // _COMMANDLINECIO_H_
