@@ -33,7 +33,6 @@ using namespace std;
 
 #include "mbcd.h"
 #include "player.h"
-#include "event.h"
 
 const int iDataLen = 256;
 
@@ -156,8 +155,7 @@ bool MusicBrainzCD::LookupCD(void)
     if (!ret)
     {
        mb_GetQueryError(o, error, iDataLen);
-       //m_context->target->AcceptEvent(new BrowserMessage(error));
-       printf("%s\n", error);
+       m_context->target->AcceptEvent(new BrowserMessageEvent(error));
        return false;
     }
 
@@ -168,7 +166,6 @@ bool MusicBrainzCD::LookupCD(void)
     if (!mb_GetResultData(o, MB_LocalGetTrackLengths, trackLens, 1024))
     {
        mb_GetQueryError(o, error, iDataLen);
-       printf("\n\nCannot get track lengths: %s\n", error);
        return false;
     }
 
@@ -184,25 +181,26 @@ bool MusicBrainzCD::LookupCD(void)
     if (ReadFromCache(db, diskId, m_trackLens, rdf) &&
         mb_SetResultRDF(o, (char *)rdf.c_str()))
     { 
-        //printf("Found in cache\n");
+        m_context->target->AcceptEvent(new 
+              BrowserMessageEvent("Retrieved CD from local cache."));
     }
     else
     {
+        m_context->target->AcceptEvent(new 
+                 BrowserMessageEvent("Sending query to MusicBrainz..."));
         ret = mb_Query(o, MB_GetCDInfo);
         if (!ret)
         {
            mb_GetQueryError(o, error, iDataLen);
-           //m_context->target->AcceptEvent(new BrowserMessage(error));
-           printf("%s\n", error);
+           m_context->target->AcceptEvent(new BrowserMessageEvent(error));
            delete db;
            return false;
         }
     
         if (mb_GetNumItems(o) == 0)
         {
-           //m_context->target->AcceptEvent(new 
-           //          BrowserMessage("CD not found."));
-           printf("CD not found\n");
+           m_context->target->AcceptEvent(new 
+                     BrowserMessageEvent("CD not found."));
            delete db;
            return false;
         }  
@@ -211,9 +209,14 @@ bool MusicBrainzCD::LookupCD(void)
         result = new char[ret];
         if (mb_GetResultRDF(o, result, ret))
         {
+            m_context->target->AcceptEvent(new 
+                  BrowserMessageEvent("Found CD."));
             WriteToCache(db, diskId, m_trackLens, result); 
         }
         delete result;
+
+        m_context->target->AcceptEvent(new 
+              BrowserMessageEvent("Query failed."));
     }
     delete db;
 
