@@ -255,6 +255,20 @@ void MusicBrowserUI::BitziLookup(const string &URL)
     BrowserEnum            browser = eBrowserNetscape;
     char                   error[255];
     int                    ret;
+    char                   path[_MAX_PATH];
+    uint32                 length = sizeof(path);
+
+    URLToFilePath(URL.c_str(), path, &length);
+    if (access(path, F_OK))
+    {
+         GTKMessageDialog *dialog = new GTKMessageDialog();
+  
+         gdk_threads_enter();
+         dialog->Show("Cannot lookup the current item. Please select a "
+                      "file to lookup.", "Bitzi Lookup Error", kMessageOk); 
+         gdk_threads_leave();
+         return;
+    }
   
     error[0] = 0;
     bc = bitcollider_init(false);
@@ -267,10 +281,6 @@ void MusicBrowserUI::BitziLookup(const string &URL)
         if (!submission)
             strcpy(error, "Cannot create submission. ");
         {
-            char path[_MAX_PATH];
-            uint32 length = sizeof(path);
-
-            URLToFilePath(URL.c_str(), path, &length);
             ret = analyze_file(submission, path, false);
             if (!ret)
                 strcpy(error, "Cannot analyze file. ");

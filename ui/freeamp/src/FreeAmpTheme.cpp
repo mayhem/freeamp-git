@@ -1201,9 +1201,6 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
    }
    if (oControlName == string("BitziLookup") && eMesg == CM_Pressed)
    {
-       if (m_oFileName.length() == 0)
-          return kError_NoErr;
-           
        m_pContext->target->AcceptEvent(new 
                    BitziLookupEvent(m_oFileName));
        return kError_NoErr;
