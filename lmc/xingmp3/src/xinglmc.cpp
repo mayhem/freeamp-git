@@ -790,38 +790,38 @@ BeginRead(void *&pBuffer, unsigned int iBytesNeeded)
 	    if (iNow != m_iBufferUpdate)
 	    {
 	        //if (m_target)
-		     //    m_target->AcceptEvent(new StreamBufferEvent(bBuffering, 
-           //    iPercent));
-
+		//    m_target->AcceptEvent(new StreamBufferEvent(bBuffering, 
+		//    iPercent));
+		
 	        printf("Buffer: %d%%  \r", m_input->GetBufferPercentage());
-		     fflush(stdout);
-           m_iBufferUpdate = iNow;
+		fflush(stdout);
+		m_iBufferUpdate = iNow;
 	    }
 
 	    Err = m_input->BeginRead(pBuffer, iBytesNeeded);
 	    if (Err == kError_BufferingUp)
 	    {
-		     if (!bBuffering)
-			  {
-			     printf("Buffering up.\n");
-				  //if (m_target)
-		        //    m_target->AcceptEvent(new StreamBufferEvent(true, iPercent));
-           }
-
-		     bBuffering = true;
-
-		     sleep(1);
-			  continue;
+		if (!bBuffering)
+		{
+		    printf("Buffering up.\n");
+		    //if (m_target)
+		    //    m_target->AcceptEvent(new StreamBufferEvent(true, iPercent));
+		}
+		
+		bBuffering = true;
+		
+		sleep(1);
+		continue;
 	    }
-		 break;
+	    break;
 	}
 
 	if (bBuffering)
 	{
 	    //if (m_target)
-		 //    m_target->AcceptEvent(new StreamBufferEvent(false, iPercent));
-
-       printf("Done buffering up.\n");
+	    //    m_target->AcceptEvent(new StreamBufferEvent(false, iPercent));
+	    
+	    printf("Done buffering up.\n");
 	}
 
 	return Err;

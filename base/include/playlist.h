@@ -192,8 +192,14 @@ class PlayListManager {
     void SetRepeat(RepeatMode rp);
     ShuffleMode GetOrder() {return m_order;}
     RepeatMode GetRepeat() {return m_repeat;}
-	Error ToggleRepeat();
-	Error ToggleShuffle();
+    Error ToggleRepeat();
+    Error ToggleShuffle();
+
+    
+    Error AddAt(char *url, int32 type, int32 at);
+    Error RemoveItem(int32 at);
+    PlayListItem *ItemAt(int32);
+    
 
  private:
     

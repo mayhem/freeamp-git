@@ -269,7 +269,7 @@ template<class T> T Vector<T>::RemoveElementAt(int32 e) {
 }
 
 template<class T> int32 Vector<T>::DeleteElementAt(int32 e) {
-    T* p = removeElementAt(e);
+    T p = RemoveElementAt(e);
     if (p) {
 	delete p;
 	return 0;

@@ -78,71 +78,154 @@ Error PlayListManager::RemoveAll() {
 }
 
 void PlayListManager::Add(char *pc, int type) {
-	GetPLManipLock();
+    GetPLManipLock();
     if (pc) {
-		PlayListItem* item = new PlayListItem();
-		if (!item) {
-			cerr << "Out of memory!" << endl;
-			exit(1);
-		}
-		int len = strlen(pc) + 1;
-		if(item->m_url = new char[len]) {
-			memcpy(item->m_url,pc,len);
-		} else {
-			//XXX FIXME Uhhh...what if we run out of memory?
-			// --jdw:  then we're screwwwwwwwed
-			cerr << "Out of memory!\n";
-			exit(1);
-		}
-		item->m_type = type;
-		m_pMediaElems->Insert(item);
-		if (m_pMediaElems->NumElements() == 1) {
-			m_current = 0; // set current to first
-		}
-		// add a corresponding element to the order list
-		OrderListItem *orderItem = new OrderListItem();
-		orderItem->m_indexToRealVector = m_pMediaElems->NumElements() - 1;
-		m_pOrderList->Insert(orderItem);
-
-		PLMGetMediaInfoEvent *gmi = new PLMGetMediaInfoEvent();
-		gmi->SetPlayListItem(item);
-		m_target->AcceptEvent(gmi);
-		m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
+	PlayListItem* item = new PlayListItem();
+	if (!item) {
+	    cerr << "Out of memory!" << endl;
+	    exit(1);
 	}
-	ReleasePLManipLock();
+	int len = strlen(pc) + 1;
+	if(item->m_url = new char[len]) {
+	    memcpy(item->m_url,pc,len);
+	} else {
+	    //XXX FIXME Uhhh...what if we run out of memory?
+	    // --jdw:  then we're screwwwwwwwed
+	    cerr << "Out of memory!\n";
+	    exit(1);
+	}
+	item->m_type = type;
+	m_pMediaElems->Insert(item);
+	if (m_pMediaElems->NumElements() == 1) {
+	    m_current = 0; // set current to first
+	}
+	// add a corresponding element to the order list
+	OrderListItem *orderItem = new OrderListItem();
+	orderItem->m_indexToRealVector = m_pMediaElems->NumElements() - 1;
+	m_pOrderList->Insert(orderItem);
+
+	PLMGetMediaInfoEvent *gmi = new PLMGetMediaInfoEvent();
+	gmi->SetPlayListItem(item);
+	m_target->AcceptEvent(gmi);
+	m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
+    }
+    ReleasePLManipLock();
+}
+
+Error PlayListManager::AddAt(char *pc, int type, int32 at) {
+    Error rtn = kError_UnknownErr;
+    GetPLManipLock();
+    if ((at >= 0) && (at <= m_pMediaElems->NumElements())) {
+	if (pc) {
+	    PlayListItem *item = new PlayListItem();
+	    if (!item) {
+		cerr << "Out of memory!!!" << endl;
+		exit(1);
+	    }
+	    int len = strlen(pc) + 1;
+	    if (item->m_url = new char[len]) {
+		memcpy(item->m_url,pc,len);
+	    } else {
+		cerr << "Out of memory!" << endl;
+		exit(1);
+	    }
+	    item->m_type = type;
+	    if (m_order == SHUFFLE_SHUFFLED) {
+		m_pMediaElems->Insert(item); // put the real thing at the end
+	    } else {
+		m_pMediaElems->InsertAt(at,item);
+	    }
+	    if (m_pMediaElems->NumElements() == 1) {
+		m_current = 0;
+	    }
+
+	    OrderListItem *orderItem = new OrderListItem();
+	    if (m_order == SHUFFLE_SHUFFLED) {
+		orderItem->m_indexToRealVector = m_pMediaElems->NumElements() -1;
+		m_pOrderList->InsertAt(at,orderItem);
+	    } else {
+		orderItem->m_indexToRealVector = at;
+		m_pOrderList->InsertAt(at,orderItem);
+	    }
+	    
+	    PLMGetMediaInfoEvent *gmi = new PLMGetMediaInfoEvent();
+	    gmi->SetPlayListItem(item);
+	    m_target->AcceptEvent(gmi);
+	    m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
+
+	    rtn = kError_NoErr;
+	}
+    }
+    ReleasePLManipLock();
+    return rtn;
+}
+
+Error PlayListManager::RemoveItem(int32 at) {
+    Error rtn = kError_UnknownErr;
+    GetPLManipLock();
+    if ((at >= 0) && (at < m_pMediaElems->NumElements())) {
+	if (m_order == SHUFFLE_SHUFFLED) {
+	    int32 realOne = m_pOrderList->ElementAt(at)->m_indexToRealVector;
+	    m_pOrderList->DeleteElementAt(at);
+	    m_pMediaElems->DeleteElementAt(realOne);
+	} else {
+	    // just delete the last element.  when not shuffled, the ordered vector isn't used
+	    m_pMediaElems->DeleteElementAt(at);
+	    m_pOrderList->DeleteElementAt(m_pOrderList->NumElements() - 1);
+	}
+	m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
+	rtn = kError_NoErr;
+    }
+    ReleasePLManipLock();
+    return rtn;
+}
+
+PlayListItem *PlayListManager::ItemAt(int32 at) {
+    PlayListItem *rtn = NULL;
+    GetPLManipLock();
+    if ((at >= 0) && (at < m_pMediaElems->NumElements())) {
+	if (m_order == SHUFFLE_SHUFFLED) {
+	    int32 realOne = m_pOrderList->ElementAt(at)->m_indexToRealVector;
+	    rtn = m_pMediaElems->ElementAt(realOne);
+	} else {
+	    rtn = m_pMediaElems->ElementAt(at);
+	}
+    }
+    ReleasePLManipLock();
+    return rtn;    
 }
 
 PlayListItem *PlayListManager::GetCurrent() {
-	GetPLManipLock();
-	PlayListItem *pli = NULL;
+    GetPLManipLock();
+    PlayListItem *pli = NULL;
     if ((m_current < 0) || (m_current >= m_pMediaElems->NumElements())) {
-		;
+	;
+    } else {
+	if (m_order == SHUFFLE_SHUFFLED) {
+	    pli = m_pMediaElems->ElementAt((m_pOrderList->ElementAt(m_current))->m_indexToRealVector);
 	} else {
-		if (m_order == SHUFFLE_SHUFFLED) {
-			pli = m_pMediaElems->ElementAt((m_pOrderList->ElementAt(m_current))->m_indexToRealVector);
-		} else {
-			pli = m_pMediaElems->ElementAt(m_current);
-		}
+	    pli = m_pMediaElems->ElementAt(m_current);
 	}
+    }
 	
-	ReleasePLManipLock();
-	return pli;
+    ReleasePLManipLock();
+    return pli;
 }
 
 void PlayListManager::SetFirst() { 
-	GetPLManipLock();
-	int32 elems = m_pMediaElems->NumElements();
-	if (elems) {
-		if (m_order == SHUFFLE_RANDOM) {
-			SetNext();
-		} else {
-			m_current = 0; 
-		}
-	    SendInfoToPlayer();
+    GetPLManipLock();
+    int32 elems = m_pMediaElems->NumElements();
+    if (elems) {
+	if (m_order == SHUFFLE_RANDOM) {
+	    SetNext();
 	} else {
-		m_current = -1;
+	    m_current = 0; 
 	}
-	ReleasePLManipLock();
+	SendInfoToPlayer();
+    } else {
+	m_current = -1;
+    }
+    ReleasePLManipLock();
 }
 
 bool PlayListManager::NextIsSame() {
@@ -173,147 +256,147 @@ bool PlayListManager::NextIsSame() {
 }
 
 void PlayListManager::SetNext() { 
-	GetPLManipLock();
-	int32 elems = m_pMediaElems->NumElements();
-	if (elems) {
-		if (!(m_repeat == REPEAT_CURRENT)) {
-			int32 count = m_pOrderList->NumElements();
-			if (count != 0) {
-				if (SHUFFLE_RANDOM == m_order) { 
-					m_current = (int32) (( (double)count * rand()) / (RAND_MAX+1.0));
-				} else {
-					m_current++;
-					if ((m_current >= count) && (m_repeat == REPEAT_ALL)) {
-						m_current = 0;
-					} 
-				}
-				SendInfoToPlayer();
-			}
+    GetPLManipLock();
+    int32 elems = m_pMediaElems->NumElements();
+    if (elems) {
+	if (!(m_repeat == REPEAT_CURRENT)) {
+	    int32 count = m_pOrderList->NumElements();
+	    if (count != 0) {
+		if (SHUFFLE_RANDOM == m_order) { 
+		    m_current = (int32) (( (double)count * rand()) / (RAND_MAX+1.0));
+		} else {
+		    m_current++;
+		    if ((m_current >= count) && (m_repeat == REPEAT_ALL)) {
+			m_current = 0;
+		    } 
 		}
-	} else {
-		m_current = -1;
+		SendInfoToPlayer();
+	    }
 	}
-	ReleasePLManipLock();
+    } else {
+	m_current = -1;
+    }
+    ReleasePLManipLock();
 }
 
 void PlayListManager::SetPrev() {
-	GetPLManipLock();
-	int32 elems = m_pMediaElems->NumElements();
-	if (elems) {
-		if (!(m_repeat == REPEAT_CURRENT)) {
-			int32 count = m_pOrderList->NumElements();
-			if (m_order == SHUFFLE_RANDOM) {
-				SetNext();
-			} else {
-				m_current--;
-				if ((m_current < 0) && (m_repeat == REPEAT_ALL)) {
-					m_current = count - 1;
-				}
-			}
-			SendInfoToPlayer();
+    GetPLManipLock();
+    int32 elems = m_pMediaElems->NumElements();
+    if (elems) {
+	if (!(m_repeat == REPEAT_CURRENT)) {
+	    int32 count = m_pOrderList->NumElements();
+	    if (m_order == SHUFFLE_RANDOM) {
+		SetNext();
+	    } else {
+		m_current--;
+		if ((m_current < 0) && (m_repeat == REPEAT_ALL)) {
+		    m_current = count - 1;
 		}
-	} else {
-		m_current = -1;
+	    }
+	    SendInfoToPlayer();
 	}
-	ReleasePLManipLock();
+    } else {
+	m_current = -1;
+    }
+    ReleasePLManipLock();
 }
 
 void PlayListManager::SendInfoToPlayer() {
     PlayListItem *pli = GetCurrent();
     if (pli) {
-		MediaInfoEvent *mie = pli->GetMediaInfo();
-		if (mie) {
-			m_target->AcceptEvent(mie);
-		} else {
-			MediaInfoEvent *pMIE = new MediaInfoEvent(pli->m_url,0);
-			m_target->AcceptEvent(pMIE);
-		}
+	MediaInfoEvent *mie = pli->GetMediaInfo();
+	if (mie) {
+	    m_target->AcceptEvent(mie);
+	} else {
+	    MediaInfoEvent *pMIE = new MediaInfoEvent(pli->m_url,0);
+	    m_target->AcceptEvent(pMIE);
+	}
     }
 }
 
 void PlayListManager::SendShuffleModeToPlayer() {
-	m_target->AcceptEvent(new PlayListShuffleEvent(m_order));
+    m_target->AcceptEvent(new PlayListShuffleEvent(m_order));
 }
 
 void PlayListManager::SendRepeatModeToPlayer() {
-	m_target->AcceptEvent(new PlayListRepeatEvent(m_repeat));
+    m_target->AcceptEvent(new PlayListRepeatEvent(m_repeat));
 }
 
 void PlayListManager::SetShuffle(ShuffleMode oop) {
-	GetPLManipLock();
-	if ((oop >= 0) && (oop < SHUFFLE_INTERNAL_NUMBER)) {
-		int32 elems = m_pOrderList->NumElements();
-		switch (oop) {
-		case SHUFFLE_SHUFFLED:
-			// reshuffle
-			ShuffleOrder();
-			break;
-		case SHUFFLE_NOT_SHUFFLED:
-			// m_current points into the ordered list, restore it to 'correct' element
+    GetPLManipLock();
+    if ((oop >= 0) && (oop < SHUFFLE_INTERNAL_NUMBER)) {
+	int32 elems = m_pOrderList->NumElements();
+	switch (oop) {
+	    case SHUFFLE_SHUFFLED:
+		// reshuffle
+		ShuffleOrder();
+		break;
+	    case SHUFFLE_NOT_SHUFFLED:
+		// m_current points into the ordered list, restore it to 'correct' element
 
-			if (m_order == SHUFFLE_SHUFFLED) {
-				if ((elems > 0) && (m_current >= 0) && (m_current < elems)) {
-					m_current = (m_pOrderList->ElementAt(m_current))->m_indexToRealVector;
-				} else {
-					m_current = -1;
-				}
-			}
-			break;
-		default:
-			break;
+		if (m_order == SHUFFLE_SHUFFLED) {
+		    if ((elems > 0) && (m_current >= 0) && (m_current < elems)) {
+			m_current = (m_pOrderList->ElementAt(m_current))->m_indexToRealVector;
+		    } else {
+			m_current = -1;
+		    }
 		}
-		m_order = oop;
-		SendShuffleModeToPlayer();
+		break;
+	    default:
+		break;
 	}
-	ReleasePLManipLock();
+	m_order = oop;
+	SendShuffleModeToPlayer();
+    }
+    ReleasePLManipLock();
 }
 
 void PlayListManager::SetRepeat(RepeatMode rp) {
-	GetPLManipLock();
+    GetPLManipLock();
     m_repeat = rp;
-	SendRepeatModeToPlayer();
-	ReleasePLManipLock();
+    SendRepeatModeToPlayer();
+    ReleasePLManipLock();
 }
 
 void PlayListManager::ShuffleOrder() {
     int32 element_count = m_pOrderList->NumElements();
     if (element_count < 1) {
-		return;
+	return;
     }
 
     OrderListItem *order_item;
 
     //remember the song that m_current is "really" pointing at
     int32 actual_current, i;
-	if (m_current == -1) {
-		actual_current = -1;
-	} else if (m_order == SHUFFLE_SHUFFLED) {
-		actual_current = (m_pOrderList->ElementAt(m_current))->m_indexToRealVector;
-	} else {
-		actual_current = m_current;
-	}
+    if (m_current == -1) {
+	actual_current = -1;
+    } else if (m_order == SHUFFLE_SHUFFLED) {
+	actual_current = (m_pOrderList->ElementAt(m_current))->m_indexToRealVector;
+    } else {
+	actual_current = m_current;
+    }
 
     for (i = 0;i < element_count;i++) {
-		order_item = m_pOrderList->ElementAt(i);
-		order_item->m_indexToRealVector = i;
-		order_item->m_random = (int32) rand();
+	order_item = m_pOrderList->ElementAt(i);
+	order_item->m_indexToRealVector = i;
+	order_item->m_random = (int32) rand();
     }
 
     QuickSortOrderList(0, element_count - 1);
 
 
-	// set proper current pointer
-	if (actual_current == -1) {
-		m_current = -1;
-	} else {
-		for (i = 0;i < element_count; i++) {
-			order_item = m_pOrderList->ElementAt(i);
-			if (order_item->m_indexToRealVector == actual_current) {
-				m_current = i;
-				break;
-			}
-		}
+    // set proper current pointer
+    if (actual_current == -1) {
+	m_current = -1;
+    } else {
+	for (i = 0;i < element_count; i++) {
+	    order_item = m_pOrderList->ElementAt(i);
+	    if (order_item->m_indexToRealVector == actual_current) {
+		m_current = i;
+		break;
+	    }
 	}
+    }
 }
 
 void PlayListManager::QuickSortOrderList(int32 first, int32 last) {
