@@ -42,7 +42,7 @@ const char*  kDefaultLibraryPath = ".:~/.freeamp:" UNIX_LIBDIR "/freeamp";
 const char*  kDefaultUI = "freeamp-" AC_HOST_OS ".ui";
 const char*  kDefaultTextUI = "freeampcmd-" AC_HOST_OS ".ui";
 const char*  kDefaultPMO = "soundcard-" AC_HOST_OS ".pmo";
-const char*  kDefaultALSADevice = "1:0";
+const char*  kDefaultALSADevice = "1:1";
 
 
 class LibDirFindHandle {

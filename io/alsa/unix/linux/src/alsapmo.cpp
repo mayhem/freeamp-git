@@ -286,8 +286,7 @@ Error AlsaPMO::Init(OutputInfo* info) {
 	m_context->prefs->GetPrefString(kALSADevicePref, ai->device,
 					&deviceNameSize);
 
-        m_iDataSize = info->max_buffer_size;
-
+   m_iDataSize = info->max_buffer_size;
 	m_context->prefs->GetOutputBufferSize(&iNewSize);
 	iNewSize *= 1024;
 
@@ -303,24 +302,27 @@ Error AlsaPMO::Init(OutputInfo* info) {
            return result;
         }
 
-        if(ai->device) {        /* parse ALSA device name */
-                if(strchr(ai->device,':')) {    /* card with device */
-                        strncpy(scard, ai->device, sizeof(scard)-1);
-                        scard[sizeof(scard)-1] = '\0';
-                        if (strchr(scard,':')) *strchr(scard,':') = '\0';
-                        card = snd_card_name(scard);
-                        if (card < 0) {
-                                return (Error)pmoError_ALSA_CardNumber;
-                        }
-                        strncpy(sdevice, strchr(ai->device, ':') + 1, sizeof(sdevice)-1);
-                } else {
-                        strncpy(sdevice, ai->device, sizeof(sdevice)-1);
-                }
-                sdevice[sizeof(sdevice)-1] = '\0';
-                device = atoi(sdevice);
-                if (!isdigit(sdevice[0]) || device < 0 || device > 31) {
-                        return (Error)pmoError_ALSA_DeviceNumber;
-                }
+        if (ai->device)
+        {
+            if (sscanf(ai->device, "%[^:]: %d", scard, &device) != 2)
+            {
+               ReportError("The ALSADevice statement in the preference file"
+                           "is improperly formatted. Format: ALSADevice: "
+                           "[card name/card number]:[device number]");
+               return (Error)pmoError_ALSA_CardNumber;
+            }
+
+            card = snd_card_name(scard);
+            if (card < 0) 
+            {
+                ReportError("Invalid ALSA card name/number specified.");
+                return (Error)pmoError_ALSA_CardNumber;
+            }
+            if (device < 0 || device > 31) 
+            {
+                ReportError("Invalid ALSA device number specified.");
+                return (Error)pmoError_ALSA_DeviceNumber;
+            }
         }
         if((err=snd_pcm_open(&ai->handle, card, device, SND_PCM_OPEN_PLAYBACK)) < 0 )
         {

@@ -345,7 +345,7 @@ Error FreeAmpUI::Init(int32 startup_type)
      * XTextProperty structures and set their other 
      * fields properly. */
 
-    char *window_name = "FreeAmp v1.1.0";
+    char *window_name = "FreeAmp v1.2.1";
     char *icon_name = "FreeAmp";
     XTextProperty windowName, iconName;
 
