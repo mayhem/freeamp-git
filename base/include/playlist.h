@@ -178,6 +178,14 @@ class PlaylistItemSort : public binary_function<PlaylistItem*, PlaylistItem*, bo
     PlaylistSortKey m_sortKey;
 };
 
+class MetaDataSort : public binary_function<PlaylistItem*, PlaylistItem*, bool> {
+
+ public:
+    MetaDataSort() { }
+
+    bool operator() (MetaDataFormat* item1, MetaDataFormat* item2) const;
+};
+
 class PlaylistManager {
 
  public:

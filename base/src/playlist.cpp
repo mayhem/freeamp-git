@@ -126,6 +126,22 @@ bool PlaylistItemSort::operator() (PlaylistItem* item1,
     return result;
 }
 
+// Function object used for ordering MetaDataFormats in PlaylistManager
+bool MetaDataSort::operator() (MetaDataFormat* item1, 
+                               MetaDataFormat* item2) const
+{
+    bool result = true;
+
+    assert(item1);
+    assert(item2);
+
+    if(item1 && item2)
+    {
+        result = item1->Order() < item2->Order();
+    }
+
+    return result;
+}
 
 // Implementation of the PlaylistManager Class
 PlaylistManager::PlaylistManager(FAContext* context)
@@ -168,6 +184,8 @@ PlaylistManager::PlaylistManager(FAContext* context)
             m_metadataFormats.push_back(mdf);
         }
     }
+
+    sort(m_metadataFormats.begin(), m_metadataFormats.end(), MetaDataSort());
 
     i = 0;
     PlaylistFormat* plf = NULL;
