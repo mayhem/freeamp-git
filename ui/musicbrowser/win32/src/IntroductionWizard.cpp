@@ -251,7 +251,7 @@ static BOOL CALLBACK IntroWizardHello(HWND hwnd,
 	return result;
 }   
 
-static BOOL CALLBACK IntroWizardSearch(HWND hwnd, 
+static BOOL CALLBACK IntroWizardSearch(HWND hwnd,
                                         UINT msg, 
                                         WPARAM wParam, 
                                         LPARAM lParam)
