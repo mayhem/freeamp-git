@@ -35,6 +35,59 @@ ____________________________________________________________________________*/
 #include "resource.h"
 #include "Win32MusicBrowser.h"
 
+static
+LRESULT WINAPI 
+EditWndProc( HWND hwnd, 
+             UINT msg, 
+             WPARAM wParam, 
+             LPARAM lParam)
+{
+    WNDPROC lpOldProc = (WNDPROC)GetProp(hwnd, "oldproc" );
+
+    switch(msg)
+	{
+		case WM_DESTROY:   
+		{
+			//  Put back old window proc and
+			SetWindowLong( hwnd, GWL_WNDPROC, (DWORD)lpOldProc );
+
+			// remove window property
+			RemoveProp( hwnd, "oldproc" ); 
+
+			break;
+        }
+
+        /*case WM_GETDLGCODE:
+        {
+            return DLGC_WANTALLKEYS;
+        }*/
+
+        case WM_CHAR:
+        {
+            if( wParam == '\\'  ||
+                wParam == '/'   ||
+                wParam == ':'   ||
+                wParam == '*'   ||
+                wParam == '?'   ||
+                wParam == '\"'  ||
+                wParam == '<'   ||
+                wParam == '>'   ||
+                wParam == '|' )
+            {
+                return 1;
+            }
+            
+
+            break;
+        }
+
+
+    }
+
+    return CallWindowProc((int (__stdcall *)(void))lpOldProc, hwnd, msg, wParam, lParam );
+}
+
+
 
 BOOL CALLBACK SavePlaylistDlgProc(HWND hwnd, 
                                   UINT msg, 
@@ -55,6 +108,15 @@ BOOL CALLBACK SavePlaylistDlgProc(HWND hwnd,
             SetFocus(hwndName);
             Edit_SetText(hwndName, szName);
             Edit_SetSel(hwndName, 0, -1);
+
+            SetProp(hwndName, 
+                    "oldproc",
+                    (HANDLE)GetWindowLong(hwndName, GWL_WNDPROC));
+
+	        // Subclass the window so we can handle bad characters
+	        SetWindowLong(hwndName, 
+			              GWL_WNDPROC, 
+                          (DWORD)::EditWndProc);  
             
             return FALSE;
             break;
