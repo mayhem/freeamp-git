@@ -1009,5 +1009,9 @@ SOURCE=..\..\include\utility.h
 SOURCE=..\include\win32prefs.h
 # End Source File
 # End Group
+# Begin Source File
+
+SOURCE=..\res\music19.ico
+# End Source File
 # End Target
 # End Project

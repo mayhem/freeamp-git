@@ -576,7 +576,7 @@ const char* kFileTypes[][5] = {
     {".m3u", "M3UPlaylistFile", "audio/x-mpegurl", "M3U Playlist File", "16"},
     {".pls", "PLSPlaylistFile", "audio/x-scpls", "PLS Playlist File", "17"},
     {".rmp", "RealMusicPackage", "application/vnd.rn-rn_music_package", "Real Music Package", "4"},
-    {".fat", "FreeAmpTheme", "application/x-freeamp-theme", "FreeAmp Theme File", "16"},
+    {".fat", "FreeAmpTheme", "application/x-freeamp-theme", "FreeAmp Theme File", "19"},
     {NULL, NULL}
 };
 

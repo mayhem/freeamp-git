@@ -1008,6 +1008,7 @@ DEP_RSC_FREEA=\
 	"..\res\music16.ico"\
 	"..\res\music17.ico"\
 	"..\res\music18.ico"\
+	"..\res\music19.ico"\
 	"..\res\music2.ico"\
 	"..\res\music3.ico"\
 	"..\res\music4.ico"\
