@@ -35,6 +35,30 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name simple
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name freeampui
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "freeampui"=..\..\..\ui\freeamp\win32\prj\freeampui.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name fileinput
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name soundcard
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name xing
+    End Project Dependency
 }}}
 
 ###############################################################################

@@ -1,24 +1,26 @@
-# Microsoft Developer Studio Project File - Name="simple" - Package Owner=<4>
+# Microsoft Developer Studio Project File - Name="freeampui" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 5.00
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Dynamic-Link Library" 0x0102
 
-CFG=simple - Win32 Debug
+CFG=freeampui - Win32 Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
-!MESSAGE NMAKE /f "simple.mak".
+!MESSAGE NMAKE /f "freeampui.mak".
 !MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "simple.mak" CFG="simple - Win32 Debug"
+!MESSAGE NMAKE /f "freeampui.mak" CFG="freeampui - Win32 Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "simple - Win32 Release" (based on "Win32 (x86) Dynamic-Link Library")
-!MESSAGE "simple - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "freeampui - Win32 Release" (based on\
+ "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "freeampui - Win32 Debug" (based on\
+ "Win32 (x86) Dynamic-Link Library")
 !MESSAGE 
 
 # Begin Project
@@ -28,7 +30,7 @@ CPP=cl.exe
 MTL=midl.exe
 RSC=rc.exe
 
-!IF  "$(CFG)" == "simple - Win32 Release"
+!IF  "$(CFG)" == "freeampui - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
@@ -42,7 +44,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /I "..\res" /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /I "..\res" /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o NUL /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /o NUL /win32
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
@@ -52,15 +54,15 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386 /out:"simple.ui"
+# ADD LINK32 winmm.lib comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386 /out:"freeamp.ui"
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                  ..\..\..\..\base\win32\prj\plugins	copy simple.ui\
-    ..\..\..\..\base\win32\prj\plugins
+                   ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
+  ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
-!ELSEIF  "$(CFG)" == "simple - Win32 Debug"
+!ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -84,32 +86,28 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"simple.ui" /pdbtype:sept
+# ADD LINK32 winmm.lib comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"freeamp.ui" /pdbtype:sept
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                  ..\..\..\..\base\win32\prj\plugins	copy simple.ui\
-    ..\..\..\..\base\win32\prj\plugins
+                   ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
+  ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
 
 # Begin Target
 
-# Name "simple - Win32 Release"
-# Name "simple - Win32 Debug"
+# Name "freeampui - Win32 Release"
+# Name "freeampui - Win32 Debug"
 # Begin Group "source"
 
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\src\about.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\..\..\config\config.win32
 
-!IF  "$(CFG)" == "simple - Win32 Release"
+!IF  "$(CFG)" == "freeampui - Win32 Release"
 
 # Begin Custom Build
 InputPath=..\..\..\..\config\config.win32
@@ -119,9 +117,8 @@ InputPath=..\..\..\..\config\config.win32
 
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "simple - Win32 Debug"
+!ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
 
-# PROP Intermediate_Dir "Debug"
 # Begin Custom Build
 InputPath=..\..\..\..\config\config.win32
 
@@ -132,6 +129,29 @@ InputPath=..\..\..\..\config\config.win32
 
 !ENDIF 
 
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\drawplayer.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\freeamp.rc
+
+!IF  "$(CFG)" == "freeampui - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\freeampui.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\freeampui.def
 # End Source File
 # Begin Source File
 
@@ -143,15 +163,11 @@ SOURCE=..\..\..\..\base\src\playlist.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\..\base\win32\src\preferences.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\base\win32\src\semaphore.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\src\simpleui.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\simpleui.def
 # End Source File
 # Begin Source File
 
@@ -167,11 +183,51 @@ SOURCE=..\..\..\..\base\win32\src\win32thread.cpp
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\res\about8.bmp
+SOURCE=..\res\arrow.cur
 # End Source File
 # Begin Source File
 
-SOURCE=..\res\simple.rc
+SOURCE=..\res\big_font.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\dials.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\lcd.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\leftside.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\logo.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\player.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\player_buttons.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\player_mask.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\rightside.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\small_font.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\system_buttons.bmp
 # End Source File
 # End Group
 # End Target
