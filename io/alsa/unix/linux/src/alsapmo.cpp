@@ -442,6 +442,13 @@ cout<<"AlsaPMO::Init:device="<<ai->device<<" -> "<<card<<":"<<device<<endl;
 //                        "the audio device is properly configured.");
 	    return (Error)pmoError_DeviceOpenFailed;
 	}
+#define SND_PCM_BLOCK_MODE_NON_BLOCKING		(0)
+#define SND_PCM_BLOCK_MODE_BLOCKING		(1)
+	snd_pcm_block_mode(ai->handle,SND_PCM_BLOCK_MODE_NON_BLOCKING);
+	if ((err=snd_pcm_playback_time(ai->handle,1))!=0) {
+		ReportError("Can't enable playback time.");
+	    return (Error)pmoError_DeviceOpenFailed;
+	}
 //Here comes the VolumeManager stuff's setup
 	switch (device) {
 	    case 0 : strncpy(mixer_id,SND_MIXER_ID_PCM,sizeof(mixer_id));break;
@@ -574,12 +581,22 @@ void AlsaPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
 //   iTotalTime = (m_iTotalBytesWritten - (ainfo.fragments * ainfo.fragment_size)) /
 //   iTotalTime = (m_iTotalBytesWritten - (ainfo.count)) /
 //   iTotalTime = (m_iTotalBytesWritten - (ainfo.queue)) /
+//   iTotalTime = (m_iTotalBytesWritten + ainfo.scount) /
+//   iTotalTime = ainfo.scount /
    iTotalTime = (m_iTotalBytesWritten) /
                 (m_iBytesPerSample * myInfo->samples_per_second);
-//cout<<"queue="<<ainfo.queue<<"\ncount="<<ainfo.count;
-//cout<<"\nTotalTime="<<iTotalTime<<endl;
-//cout<<"stime="<<ainfo.stime.tv_sec;
-//cout<<"\nscount="<<ainfo.scount<<endl;
+//     struct timeval time;
+//     gettimeofday(&time,NULL);
+//     iTotalTime = time.tv_usec-ainfo.stime.tv_usec;
+//   iTotalTime = time.tv_sec - ainfo.stime.tv_sec; 
+
+//cout<<"fragments="<<ainfo.fragments<<endl;
+//cout<<"queue="<<ainfo.queue<<"\ncount="<<ainfo.count<<endl;
+//cout<<"TotalTime="<<iTotalTime<<endl;
+//cout<<"stime="<<ainfo.stime.tv_sec<<endl;
+//cout<<"scount           ="<<ainfo.scount<<endl;
+//cout<<"TotalBytesWritten= "<<m_iTotalBytesWritten<<endl;
+//cout<<"kulonbseg="<<ainfo.scount-m_iTotalBytesWritten<<endl;
 
    hours = iTotalTime / 3600;
    minutes = (iTotalTime / 60) % 60;
@@ -673,11 +690,26 @@ cout<<"AlsaPMO::WorkerThread:"<<endl;
       iCopied = 0;
       do
       {
-          snd_pcm_playback_status_t ainfo;
-          snd_pcm_playback_status(&ai->handle,&ainfo);
-//          if(ainfo.queue < iToCopy)
-#ifdef THIS_IS_NEVER_TRUE
-          if(0)
+//          snd_pcm_playback_status_t ainfo;
+//          snd_pcm_playback_status(&ai->handle,&ainfo);
+//          if(ainfo.count==0)
+          iRet = snd_pcm_write(ai->handle,pBuffer,iToCopy);
+/*
+//if(iRet<=0)
+if (iRet<iToCopy)
+{
+//cout<<"iToCopy="<<iToCopy<<" != iRet="<<iRet<<endl;
+cout<<"-"<<endl;
+} else {cout<<"*"<<endl;}
+*/
+          if (iRet > 0)
+          {
+              pBuffer = ((char *)pBuffer + iRet);
+              iCopied += iRet;
+              m_iTotalBytesWritten += iRet;
+          }
+//          if(iRet<=0)
+          if(iRet<=iToCopy)
           {
               EndRead(0);
               m_pPauseMutex->Release();
@@ -696,16 +728,9 @@ cout<<"AlsaPMO::WorkerThread:"<<endl;
 
               continue;
           }
-#endif
-          iRet = snd_pcm_write(ai->handle,pBuffer,iToCopy);
-          if (iRet > 0)
-          {
-              pBuffer = ((char *)pBuffer + iRet);
-              iCopied += iRet;
-              m_iTotalBytesWritten += iRet;
-          }
       }
       while (iCopied < iToCopy /*&& (errno == EINTR || errno == 0)*/);
+//      while (iCopied < iToCopy && iRet >=0);
 
       // Was iToCopy set to zero? If so, we got cleared and should
       // start from the top
@@ -715,16 +740,6 @@ cout<<"AlsaPMO::WorkerThread:"<<endl;
          continue;
       }
 
-/*?
-      if (m_bPause)
-      {
-         Reset(true);
-         EndRead(iCopied);
-         m_pPauseSem->Wait();
-         m_bPause = false;
-         continue;
-      }
-*/
       if (iCopied < iToCopy)
       {
          EndRead(0);
