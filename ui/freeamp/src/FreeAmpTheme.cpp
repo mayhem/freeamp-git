@@ -634,6 +634,15 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
        m_pWindow->ControlStringValue("Info", true, oDesc);
        UpdateTimeDisplay();                      
    }
+   if (oControlName == string("Logo") && eMesg == CM_Pressed)
+   {
+#ifdef WIN32   
+       ShellExecute(NULL, "open", BRANDING_URL,
+                    NULL, NULL, SW_SHOWNORMAL);
+#else
+       LaunchBrowser(BRANDING_URL);
+#endif
+   }
    
    return kError_NoErr;
 }

@@ -117,7 +117,7 @@ class Control
  
       void  SetParent(Window *pParent);
       void  SetRect(Rect &oRect);
-      void  SetBitmap(Bitmap *pBitmap, Rect &oBitmapRect);
+      void  SetBitmap(Bitmap *pBitmap, Rect &oBitmapRect, bool bHoriz = true);
       void  GetName(string &oName);
       void  SetDesc(const string &oDesc);
       void  SetTip(const string &oTip);
@@ -149,6 +149,8 @@ class Control
       // Args: iFrame: Which frame to blit
       //       iNumFrames: how many frames in the x direction in the bitmap
       virtual void BlitFrame(int iFrame, int iNumFrames, Rect *pRect = NULL); 
+      virtual void BlitFrameHoriz(int iFrame, int iNumFrames, Rect *pRect = NULL);
+      virtual void BlitFrameVert(int iFrame, int iNumFrames, Rect *pRect = NULL);
       virtual void BlitMultiStateFrame(int iFrame, int iNumFramesInBitmap,
                                        int iRow, int iNumRowsInBitmap);  
 
@@ -159,6 +161,7 @@ class Control
       vector<TransitionInfo> m_oTransitions;
       Window                *m_pParent;
       bool                   m_bShow, m_bEnable, m_bWantsTimingMessages;
+      bool                   m_bHorizontalBitmap;
       int                    m_iValue;
       string                 m_oValue;
 };

@@ -62,8 +62,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                ..\..\..\..\base\win32\prj\plugins	copy dsoundcard.pmo\
-                           ..\..\..\..\base\win32\prj\plugins
+                                 ..\..\..\..\base\win32\prj\plugins	copy dsoundcard.pmo\
+                            ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "dsoundcard - Win32 Debug"
@@ -94,8 +94,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                    ..\..\..\..\base\win32\prj\plugins	copy dsoundcard.pmo\
-           ..\..\..\..\base\win32\prj\plugins
+                     ..\..\..\..\base\win32\prj\plugins	copy dsoundcard.pmo\
+            ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "dsoundcard - Win32 NASM Debug"
@@ -127,8 +127,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                    ..\..\..\..\base\win32\prj\plugins	copy dsoundcard.pmo\
-           ..\..\..\..\base\win32\prj\plugins
+                     ..\..\..\..\base\win32\prj\plugins	copy dsoundcard.pmo\
+            ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "dsoundcard - Win32 NASM Release"
@@ -160,8 +160,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                ..\..\..\..\base\win32\prj\plugins	copy dsoundcard.pmo\
-                           ..\..\..\..\base\win32\prj\plugins
+                                 ..\..\..\..\base\win32\prj\plugins	copy dsoundcard.pmo\
+                            ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
@@ -218,6 +218,10 @@ InputPath=..\..\..\..\config\config.win32
 
 !ENDIF 
 
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\src\debug.cpp
 # End Source File
 # Begin Source File
 

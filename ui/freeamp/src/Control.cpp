@@ -158,10 +158,11 @@ void Control::SetRect(Rect &oRect)
     m_oRect = oRect;
 }
 
-void Control::SetBitmap(Bitmap *pBitmap, Rect &oBitmapRect)
+void Control::SetBitmap(Bitmap *pBitmap, Rect &oBitmapRect, bool bHoriz)
 {
     m_pBitmap = pBitmap;
     m_oBitmapRect = oBitmapRect;
+    m_bHorizontalBitmap = bHoriz;
 }
 
 void Control::GetName(string &oName)
@@ -179,6 +180,14 @@ void Control::Erase(void)
 
 void Control::BlitFrame(int iFrame, int iNumFramesInBitmap, Rect *pRect)
 {
+	if (m_bHorizontalBitmap)
+		BlitFrameHoriz(iFrame,iNumFramesInBitmap,pRect);
+	else
+		BlitFrameVert(iFrame,iNumFramesInBitmap,pRect);
+}
+
+void Control::BlitFrameHoriz(int iFrame, int iNumFramesInBitmap, Rect *pRect)
+{
     Canvas *pCanvas;
     int     iFrameWidth;
     Rect    oFrameRect, oDestRect;
@@ -193,6 +202,33 @@ void Control::BlitFrame(int iFrame, int iNumFramesInBitmap, Rect *pRect)
     oFrameRect.x1 += iFrame * iFrameWidth;
     oFrameRect.x2 = oFrameRect.x1 + iFrameWidth + 1;
     oFrameRect.y2++;
+
+    oDestRect.x2++;
+    oDestRect.y2++;
+
+    pCanvas = m_pParent->GetCanvas();
+    pCanvas->MaskBlitRect(m_pBitmap, oFrameRect, oDestRect);
+    
+    pCanvas->Invalidate(oDestRect);
+    pCanvas->Update();
+}
+
+void Control::BlitFrameVert(int iFrame, int iNumFramesInBitmap, Rect *pRect)
+{
+    Canvas *pCanvas;
+    int     iFrameHeight;
+    Rect    oFrameRect, oDestRect;
+
+    if (pRect == NULL)
+        oDestRect = m_oRect;
+    else
+        oDestRect = *pRect;
+
+    iFrameHeight = (m_oBitmapRect.Height() + 1) / iNumFramesInBitmap;
+    oFrameRect = m_oBitmapRect;
+    oFrameRect.y1 += iFrame * iFrameHeight;
+    oFrameRect.y2 = oFrameRect.y1 + iFrameHeight + 1;
+    oFrameRect.x2++;
 
     oDestRect.x2++;
     oDestRect.y2++;

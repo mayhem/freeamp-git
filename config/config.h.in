@@ -28,6 +28,7 @@ ____________________________________________________________________________*/
 
 
 #define BRANDING "FreeAmp"
+#define BRANDING_URL "http://www.freeamp.org"
 
 #define FREEAMP_PATH_ENV "FREEAMP_PATH"
 #define FREEAMP_VERSION "unknown"

@@ -22,6 +22,7 @@
 #define IDC_ADD                         1008
 #define IDC_DOWN                        1009
 #define IDC_NEWLIST                     1010
+#define IDC_SAVELIST                    1010
 #define IDC_CLEARLIST                   1011
 #define IDC_MUSICCATALOGTEXT            1012
 #define IDC_PLAYLISTTEXT                1013

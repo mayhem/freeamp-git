@@ -30,28 +30,23 @@ IDD_MUSICBROWSER DIALOGEX 0, 0, 359, 180
 STYLE DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Music Browser"
 MENU IDR_MENU1
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "Close",IDOK,307,153,50,14
     CONTROL         "Tree1",IDC_MUSICTREE,"SysTreeView32",TVS_HASBUTTONS | 
                     TVS_HASLINES | WS_BORDER | WS_TABSTOP,2,19,134,149,
                     WS_EX_CLIENTEDGE
     LTEXT           "My Music Catalog:",IDC_MUSICCATALOGTEXT,4,6,59,8
-    LTEXT           "Playlist:",IDC_PLAYLISTTEXT,142,6,24,8
+    LTEXT           "Currently listening to:",IDC_PLAYLISTTEXT,142,6,66,8
     PUSHBUTTON      "&Up",IDC_UP,307,21,50,14
-    PUSHBUTTON      "D&elete",IDC_DELETE,307,69,50,14
-    PUSHBUTTON      "&Add",IDC_ADD,307,55,50,14
-    PUSHBUTTON      "&Down",IDC_DOWN,307,35,50,14
-    PUSHBUTTON      "&New List",IDC_NEWLIST,307,108,50,14
-    PUSHBUTTON      "Clear List",IDC_CLEARLIST,307,123,50,14
+    PUSHBUTTON      "D&elete",IDC_DELETE,307,99,50,14
+    PUSHBUTTON      "&Add",IDC_ADD,307,73,50,14
+    PUSHBUTTON      "&Down",IDC_DOWN,307,47,50,14
+    PUSHBUTTON      "&Save List",IDC_SAVELIST,307,125,50,14
+    PUSHBUTTON      "Clear List",IDC_CLEARLIST,307,151,50,14
     CONTROL         "List1",IDC_PLAYLISTBOX,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | WS_BORDER | WS_TABSTOP,138,19,166,149,
                     WS_EX_CLIENTEDGE
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,0,357,1
-    PUSHBUTTON      "&Randomize",IDC_RANDOMIZE,307,88,50,14
-    PUSHBUTTON      "Music Search",IDC_SEARCH,84,4,50,13
-    EDITTEXT        IDC_PLAYLISTNAME,169,4,134,13,ES_AUTOHSCROLL | 
-                    ES_READONLY
 END
 
 IDD_OPENURL DIALOG FIXED IMPURE  0, 0, 280, 21
@@ -166,50 +161,6 @@ IDI_ACTIVELIST          ICON    DISCARDABLE     "active.ico"
 
 IDC_DRAG                CURSOR  DISCARDABLE     "drag.cur"
 IDC_NODROP              CURSOR  DISCARDABLE     "nodrop.cur"
-
-#ifndef _MAC
-/////////////////////////////////////////////////////////////////////////////
-//
-// Version
-//
-
-VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,0,0,0
- PRODUCTVERSION 2,0,0,0
- FILEFLAGSMASK 0x3fL
-#ifdef _DEBUG
- FILEFLAGS 0x1L
-#else
- FILEFLAGS 0x0L
-#endif
- FILEOS 0x40004L
- FILETYPE 0x1L
- FILESUBTYPE 0x0L
-BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "040904b0"
-        BEGIN
-            VALUE "Comments", "For the latest version go to http://www.freeamp.org\0"
-            VALUE "CompanyName", "FreeAmp Open Source Development Effort\0"
-            VALUE "FileDescription", "The Music Browser user interface provides an easy way for users to manage their music collection.\0"
-            VALUE "FileVersion", "2.0 beta 1\0"
-            VALUE "InternalName", "FreeAmp\0"
-            VALUE "LegalCopyright", "http://www.gnu.org/copyleft/gpl.html\0"
-            VALUE "LegalTrademarks", "FreeAmp\0"
-            VALUE "OriginalFilename", "musicbrowser.ui\0"
-            VALUE "ProductName", "FreeAmp\0"
-            VALUE "ProductVersion", "2.0 beta 1\0"
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x409, 1200
-    END
-END
-
-#endif    // !_MAC
-
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 

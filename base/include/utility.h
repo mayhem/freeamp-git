@@ -38,5 +38,8 @@ Error URLToFilePath(const char* url, char* path, uint32* length);
 void ToUpper(char *s);
 void ToLower(char *s);
 
+#ifndef WIN32
+void LaunchBrowser(char* url);
+#endif
 
 #endif /* INCLUDED_UTILITY_H */

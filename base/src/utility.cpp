@@ -31,6 +31,7 @@ ____________________________________________________________________________*/
 #include <direct.h>
 #define MKDIR(z) mkdir(z)
 #else
+#include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #define MKDIR(z) mkdir(z, 0755)
@@ -426,3 +427,44 @@ void ToLower(char *s)
     for(p = s; *p != '\0'; p++)
        *p = tolower(*p);
 }      
+
+#ifndef WIN32
+void LaunchBrowser(char* url)
+{
+   char         url2[URL_SIZE];
+   char         lockfile[255];
+   int          lockfile_fd;
+   struct stat  sb;
+   char        *home, *browser;
+
+   browser = "netscape";
+   sprintf(url2, "openURL(%s)", url);
+
+   if (strcmp(browser, "netscape") == 0)
+   {
+      home=getenv("HOME");
+      if(!home)
+         home="/";
+
+      sprintf(lockfile,"%.200s/.netscape/lock",home);
+      if(fork()>0)
+         _exit(0);
+
+      if((lockfile_fd=lstat(lockfile, &sb))!=-1)
+      {
+         execlp("netscape", "netscape", "-remote", url2, NULL);
+      } else
+      {
+         execlp("netscape", "netscape", url, NULL);
+      }
+      perror("Could not launch netscape");
+   }
+   else
+   {
+      char command[256];
+      sprintf(command, "%s \"%s\"", browser, url);
+
+      system(command);
+   }
+}
+#endif

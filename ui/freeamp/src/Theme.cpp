@@ -754,7 +754,8 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
     if (oElement == string("ControlBitmap"))
     {
        Bitmap *pBitmap = NULL;
-       Rect oRect;
+       Rect    oRect;
+       bool    bHoriz = true;
 
        if (m_pCurrentControl == NULL)
        {
@@ -772,6 +773,12 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
        {
            m_oLastError = string("the <ControlBitmap> tag needs a Name attribute");
            return kError_ParseError;
+       }        
+       
+       if (oAttrMap.find("Style") != oAttrMap.end())
+       {
+           if (oAttrMap["Style"] == string("Vert"))
+               bHoriz = false;
        }        
 
        eRet = ParseRect(oAttrMap["Rect"], oRect);
@@ -791,7 +798,7 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
            return kError_InvalidParam;
        }
 
-       m_pCurrentControl->SetBitmap(pBitmap, oRect);
+       m_pCurrentControl->SetBitmap(pBitmap, oRect, bHoriz);
        return kError_NoErr;
     }
 
