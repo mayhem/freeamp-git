@@ -126,25 +126,7 @@ DownloadManager::DownloadManager(FAContext* context)
     context->prefs->GetInstallDirectory(path, &length);
     strcat(path, "\\DownloadLog.txt");
 
-    //m_debug = new ofstream(path);
-
-
-    /*MetaData md;
-
-    md.SetArtist("The Crystal Method");
-    md.SetAlbum("Vegas");
-    md.SetGenre("Electronica");
-    md.SetTitle("Trip Like I Do");
-
-    DownloadItem* dli = new DownloadItem("http://www.blah.com","a.mp3", &md);
-    dli->SetTotalBytes(2221568);
-    dli->SetBytesReceived(54432);
-    dli->SetState(kDownloadItemState_Paused);
-
-    m_itemList.push_back(dli);*/
-
     m_runDownloadThread = true;
-
     m_downloadThread = Thread::CreateThread();
 
     if(m_downloadThread)
@@ -301,7 +283,7 @@ Error DownloadManager::QueueDownload(DownloadItem* item,
         {
             item->SetState(kDownloadItemState_Queued);
             SendStateChangedMessage(item);
-            
+
             if (m_downloadsPaused && bDownloadNow)
                for(index = 0; index < m_itemList.size(); index++)
                    if (m_itemList[index] == item)
@@ -1023,11 +1005,7 @@ Error DownloadManager::Download(DownloadItem* item)
 
                             *end = 0x00;
 
-                            //cout << cp << endl;
-
-                            //*m_debug << "redirected: " << cp << endl;
-
-                            if(305 == returnCode) // proxy
+                            if (305 == returnCode) // proxy
                             {
                                 char* proxy = new char[strlen(cp) + 
                                                        strlen(item->SourceURL().c_str()) + 1];
@@ -1484,11 +1462,7 @@ void DownloadManager::LoadResumableDownloadItems()
                 fieldLength = NULL;
 
                 item->SetMetaData(&metadata);
-
                 m_itemList.push_back(item);
-//                if (item->GetState() == kDownloadItemState_Queued)
-//                    m_queueList.push_back(item);
-                    
                 SendItemAddedMessage(item);
             }
             

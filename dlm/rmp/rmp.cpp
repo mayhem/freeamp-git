@@ -215,7 +215,7 @@ Error RMP::PCData(string &oData)
     if (m_oPath == string("/PACKAGE/COOKIE/VALUE"))
     {
         m_oCookieValue = oData; 
-
+        
         return kError_NoErr;
     }
         
@@ -232,11 +232,11 @@ Error RMP::EndElement(string &oElement)
     {
         if(m_oCookie.size())
         {
-            m_oCookie += "; ";
+            m_oCookie += string("; ");
         }
 
         m_oCookie += m_oCookieName;
-        m_oCookie += "=";
+        m_oCookie += string("=");
         m_oCookie += m_oCookieValue;
     }
     
@@ -265,6 +265,7 @@ Error RMP::EndElement(string &oElement)
         pItem->SetSourceCookie(m_oCookie.c_str());
 
 		m_pList->push_back(pItem);
+        delete m_pMetaData;
         m_pMetaData = NULL;
     }
        

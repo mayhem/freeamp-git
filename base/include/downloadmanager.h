@@ -80,7 +80,6 @@ class DownloadItem {
         if(metadata)
 		{
             SetMetaData(metadata);
-			delete metadata;
         }
 
         m_state = kDownloadItemState_Null;
