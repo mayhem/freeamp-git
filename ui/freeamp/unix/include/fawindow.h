@@ -74,6 +74,16 @@ class FAMainWindow : public FAWindow {
     virtual void DoEvent(XEvent);
 };
 
+class FADumbWindow : public FAWindow {
+ private:
+    void Draw();
+ public:
+    FADumbWindow(Display *, int32,GC, Window,int32,int32,int32,int32);
+    virtual ~FADumbWindow();
+    virtual void DoEvent(XEvent);
+};
+
+
 typedef void (*action_function)(void *);
 
 class FATriStateWindow : public FAWindow {
@@ -93,6 +103,8 @@ class FATriStateWindow : public FAWindow {
     void SetActivated();
     void ClearActivated();
     void SetClickAction(action_function,void *);
+    void SetCurrentTime(int32 h, int32 m, int32 s);
+    void SetTotalTime(int32 h, int32 m, int32 s);
     virtual void DoEvent(XEvent);
 };
 
@@ -108,18 +120,26 @@ class FALcdWindow : public FAWindow {
     int *m_largeFontWidth;
     Pixmap m_largeFontPixmap;
     Pixmap m_doubleBufferPixmap;
-    void Draw();
     int32 m_displayState;
     Pixmap m_mainTextMask;
     Pixmap m_iconMask;
- public:
+
+    bool m_insideDisplay;
+
+    int32 m_totalHours, m_totalMinutes, m_totalSeconds;
+    int32 m_currHours, m_currMinutes, m_currSeconds;
+
+    void BlitText(Drawable d, int32 x, int32 y, const char *text, int32 font);
+    void SetState(int32);
+  public:
     enum {
 	IntroState,
 	VolumeState,
 	CurrentTimeState,
 	SeekTimeState,
 	RemainingTimeState,
-	TotalTimeState	
+	TotalTimeState,
+	MaxState
     };
 
     FALcdWindow(Display *,int32,GC,Window,int32,int32,int32,int32);
@@ -130,9 +150,23 @@ class FALcdWindow : public FAWindow {
     void SetLargeFontPixmap(Pixmap);
     void SetLargeFontWidth(int *);
     void SetMainText(const char *);
+    void SetCurrentTime(int32 h, int32 m, int32 s);
+    void SetTotalTime(int32 h, int32 m, int32 s);
 
-    void BlitText(Drawable d, int32 x, int32 y, const char *text, int32 font);
     void SetDisplayState(int32);
+    void Draw();
+};
+
+class FADialWindow : public FAWindow {
+ private:
+    void Draw();
+    int32 m_buttonClickSpotX, m_buttonClickSpotY;
+    int32 m_currentDial;
+ public:
+    FADialWindow(Display *, int32,GC, Window,int32,int32,int32,int32);
+    virtual ~FADialWindow();
+    virtual void DoEvent(XEvent);
+
 
 };
 

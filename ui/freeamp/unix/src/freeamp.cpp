@@ -188,69 +188,78 @@ void FreeAmpUI::Init()
     m_openButton->SetPartialHeight(OPEN_BUTTON_HEIGHT);
 
 
-    m_lcdWindow = new FALcdWindow(m_display,m_screenNum,m_gc,m_mainWindow->GetWindow(),LCD_X,LCD_Y,LCD_WIDTH,LCD_HEIGHT);
+//    m_lcdWindow = new FALcdWindow(m_display,m_screenNum,m_gc,m_mainWindow->GetWindow(),LCD_X,LCD_Y,LCD_WIDTH,LCD_HEIGHT);
+    m_lcdUpperWindow = new FADumbWindow(m_display,m_screenNum,m_gc,m_mainWindow->GetWindow(),LCD_UPPER_X,LCD_UPPER_Y,LCD_UPPER_WIDTH,LCD_UPPER_HEIGHT);
+    m_playListDrawerWindow = new FADumbWindow(m_display,m_screenNum,m_gc,m_mainWindow->GetWindow(),PLAYLIST_DRAWER_X,PLAYLIST_DRAWER_Y,PLAYLIST_DRAWER_WIDTH,PLAYLIST_DRAWER_HEIGHT);
+    m_lcdWindow = new FALcdWindow(m_display,m_screenNum,m_gc,m_mainWindow->GetWindow(),LCD_DISPLAY_X,LCD_DISPLAY_Y,LCD_DISPLAY_WIDTH,LCD_DISPLAY_HEIGHT);
 
-    switch (display_depth) {
-	case 16:
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),logo,&m_iconPixmap,NULL,NULL);	    
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),leftside,&left_side_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),dials,&dials_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),lcd,&lcd_pixmap,NULL,NULL);
-	    
-	    player_full_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow->GetWindow(),(char *)player_full_mask_bits,PLAYER_FULL_MASK_WIDTH,PLAYER_FULL_MASK_HEIGHT);
+    m_volumeWindow = new FADialWindow(m_display,m_screenNum,m_gc,m_mainWindow->GetWindow(), VOLUME_DIAL_X,VOLUME_DIAL_Y,SINGLE_DIAL_WIDTH,DIALS_HEIGHT);
+    m_seekWindow = new FADialWindow(m_display,m_screenNum,m_gc,m_mainWindow->GetWindow(), SEEK_DIAL_X,SEEK_DIAL_Y,SINGLE_DIAL_WIDTH,DIALS_HEIGHT);
 
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),rightside,&right_side_pixmap,NULL,NULL);
+    if (display_depth >= 15) {
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),logo,&m_iconPixmap,NULL,NULL);	    
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),leftside,&left_side_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),dials,&dials_pixmap,NULL,NULL);
 
-	    major_button_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow->GetWindow(),(char *)major_button_mask_bits,MAJOR_BUTTON_MASK_WIDTH,MAJOR_BUTTON_MASK_HEIGHT);
-	    minor_button_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow->GetWindow(),(char *)minor_button_mask_bits,MINOR_BUTTON_MASK_WIDTH,MINOR_BUTTON_MASK_HEIGHT);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),play_buttons,&play_buttons_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),stop_buttons,&stop_buttons_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),pause_buttons,&pause_buttons_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),last_buttons,&prev_buttons_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),next_buttons,&next_buttons_pixmap,NULL,NULL);
-
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),mode_buttons,&mode_buttons_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),minimize_buttons,&minimize_buttons_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),close_buttons,&close_buttons_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),repeat_buttons,&repeat_buttons_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),shuffle_buttons,&shuffle_buttons_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),open_buttons,&open_buttons_pixmap,NULL,NULL);
-
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),small_font,&small_font_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),big_font,&big_font_pixmap,NULL,NULL);
-	    break;
-	case 8:
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),logo256,&m_iconPixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),leftside256,&left_side_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),dials256,&dials_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),lcd256,&lcd_pixmap,NULL,NULL);
-	    
-	    player_full_mask_pixmap =XCreateBitmapFromData(m_display,m_mainWindow->GetWindow(),(char *)player_full_mask_bits,PLAYER_FULL_MASK_WIDTH,PLAYER_FULL_MASK_HEIGHT);
-
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),rightside256,&right_side_pixmap,NULL,NULL);
-
-	    major_button_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow->GetWindow(),(char *)major_button_mask_bits,MAJOR_BUTTON_MASK_WIDTH,MAJOR_BUTTON_MASK_HEIGHT);
-	    minor_button_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow->GetWindow(),(char *)minor_button_mask_bits,MINOR_BUTTON_MASK_WIDTH,MINOR_BUTTON_MASK_HEIGHT);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),play_buttons256,&play_buttons_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),stop_buttons256,&stop_buttons_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),pause_buttons256,&pause_buttons_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),last_buttons256,&prev_buttons_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),next_buttons256,&next_buttons_pixmap,NULL,NULL);
-
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),mode_buttons256,&mode_buttons_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),minimize_buttons256,&minimize_buttons_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),close_buttons256,&close_buttons_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),repeat_buttons256,&repeat_buttons_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),shuffle_buttons256,&shuffle_buttons_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),open_buttons256,&open_buttons_pixmap,NULL,NULL);
-
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),small_font256,&small_font_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),big_font256,&big_font_pixmap,NULL,NULL);
-	    break;
-	default:
-	    cerr << "Only know how to deal with bit depths of 8 or 16 (256 or 65535 colors)!!!" << endl;
-	    m_playerEQ->AcceptEvent(new Event(CMD_QuitPlayer));
-	    return;
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),lcd,&lcd_pixmap,NULL,NULL);  // just for building total image
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),lcd_upper_frame,&lcd_upper_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),lcd_display,&lcd_display_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),playlist_drawer,&playlist_drawer_pixmap,NULL,NULL);
+	lcd_upper_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow->GetWindow(),(char *)lcd_upper_frame_mask_bits,lcd_upper_frame_mask_width,lcd_upper_frame_mask_height);
+	playlist_drawer_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow->GetWindow(),(char *)playlist_drawer_mask_bits,playlist_drawer_mask_width,playlist_drawer_mask_height);
+	
+	player_full_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow->GetWindow(),(char *)player_full_mask_bits,PLAYER_FULL_MASK_WIDTH,PLAYER_FULL_MASK_HEIGHT);
+	
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),rightside,&right_side_pixmap,NULL,NULL);
+	
+	major_button_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow->GetWindow(),(char *)major_button_mask_bits,MAJOR_BUTTON_MASK_WIDTH,MAJOR_BUTTON_MASK_HEIGHT);
+	minor_button_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow->GetWindow(),(char *)minor_button_mask_bits,MINOR_BUTTON_MASK_WIDTH,MINOR_BUTTON_MASK_HEIGHT);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),play_buttons,&play_buttons_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),stop_buttons,&stop_buttons_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),pause_buttons,&pause_buttons_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),last_buttons,&prev_buttons_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),next_buttons,&next_buttons_pixmap,NULL,NULL);
+	
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),mode_buttons,&mode_buttons_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),minimize_buttons,&minimize_buttons_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),close_buttons,&close_buttons_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),repeat_buttons,&repeat_buttons_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),shuffle_buttons,&shuffle_buttons_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),open_buttons,&open_buttons_pixmap,NULL,NULL);
+	
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),small_font,&small_font_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),big_font,&big_font_pixmap,NULL,NULL);
+    } else if (display_depth >= 8) {
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),logo256,&m_iconPixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),leftside256,&left_side_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),dials256,&dials_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),lcd256,&lcd_pixmap,NULL,NULL); // just for building total image
+	
+	player_full_mask_pixmap =XCreateBitmapFromData(m_display,m_mainWindow->GetWindow(),(char *)player_full_mask_bits,PLAYER_FULL_MASK_WIDTH,PLAYER_FULL_MASK_HEIGHT);
+	
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),rightside256,&right_side_pixmap,NULL,NULL);
+	
+	major_button_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow->GetWindow(),(char *)major_button_mask_bits,MAJOR_BUTTON_MASK_WIDTH,MAJOR_BUTTON_MASK_HEIGHT);
+	minor_button_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow->GetWindow(),(char *)minor_button_mask_bits,MINOR_BUTTON_MASK_WIDTH,MINOR_BUTTON_MASK_HEIGHT);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),play_buttons256,&play_buttons_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),stop_buttons256,&stop_buttons_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),pause_buttons256,&pause_buttons_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),last_buttons256,&prev_buttons_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),next_buttons256,&next_buttons_pixmap,NULL,NULL);
+	
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),mode_buttons256,&mode_buttons_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),minimize_buttons256,&minimize_buttons_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),close_buttons256,&close_buttons_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),repeat_buttons256,&repeat_buttons_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),shuffle_buttons256,&shuffle_buttons_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),open_buttons256,&open_buttons_pixmap,NULL,NULL);
+	
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),small_font256,&small_font_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),big_font256,&big_font_pixmap,NULL,NULL);
+    } else {
+	cerr << "Only know how to deal with bit depths  >= 8 !!!" << endl;
+	m_playerEQ->AcceptEvent(new Event(CMD_QuitPlayer));
+	return;
     }
 
     int x=0;
@@ -278,11 +287,18 @@ void FreeAmpUI::Init()
     m_shuffleButton->SetPixmap(shuffle_buttons_pixmap);
     m_openButton->SetPixmap(open_buttons_pixmap);
 
-    m_lcdWindow->SetPixmap(lcd_pixmap);
+    m_volumeWindow->SetPixmap(dials_pixmap);
+    m_seekWindow->SetPixmap(dials_pixmap);
+
+    m_lcdUpperWindow->SetPixmap(lcd_upper_pixmap);
+    m_lcdUpperWindow->SetMask(lcd_upper_mask_pixmap);
+    m_lcdWindow->SetPixmap(lcd_display_pixmap);
     m_lcdWindow->SetSmallFontPixmap(small_font_pixmap);
     m_lcdWindow->SetSmallFontWidth(smallFontWidth);
     m_lcdWindow->SetLargeFontPixmap(big_font_pixmap);
     m_lcdWindow->SetLargeFontWidth(largeFontWidth);
+    m_playListDrawerWindow->SetPixmap(playlist_drawer_pixmap);
+    m_playListDrawerWindow->SetMask(playlist_drawer_mask_pixmap);
 
     size_hints->flags = PPosition | PSize | PMinSize;
     size_hints->min_width = TOTAL_WIDTH;
@@ -339,7 +355,13 @@ void FreeAmpUI::Init()
     m_shuffleButton->SelectInput(tmpMask);
     m_openButton->SelectInput(tmpMask);
 
+    m_volumeWindow->SelectInput(tmpMask | PointerMotionMask);
+    m_seekWindow->SelectInput(tmpMask | PointerMotionMask);
+
     m_lcdWindow->SelectInput(tmpMask);
+
+    m_lcdUpperWindow->SelectInput(ExposureMask);
+    m_playListDrawerWindow->SelectInput(ExposureMask);
 
     // set up shape
     XSetForeground(m_display,m_gc,BlackPixel(m_display,m_screenNum));
@@ -395,8 +417,11 @@ void FreeAmpUI::X11EventService() {
     m_windowHash->Insert(m_repeatButton->GetWindow(),(FAWindow *)m_repeatButton);
     m_windowHash->Insert(m_shuffleButton->GetWindow(),(FAWindow *)m_shuffleButton);
     m_windowHash->Insert(m_openButton->GetWindow(),(FAWindow *)m_openButton);
+    m_windowHash->Insert(m_lcdUpperWindow->GetWindow(),(FAWindow *)m_lcdUpperWindow);
     m_windowHash->Insert(m_lcdWindow->GetWindow(),(FAWindow *)m_lcdWindow);
-
+    m_windowHash->Insert(m_playListDrawerWindow->GetWindow(),(FAWindow *)m_playListDrawerWindow);
+    m_windowHash->Insert(m_volumeWindow->GetWindow(),(FAWindow *)m_volumeWindow);
+    m_windowHash->Insert(m_seekWindow->GetWindow(),(FAWindow *)m_seekWindow);
     /* Display window */
     m_mainWindow->MapWindow();
     m_playButton->MapWindow();
@@ -409,7 +434,11 @@ void FreeAmpUI::X11EventService() {
     m_repeatButton->MapWindow();
     m_shuffleButton->MapWindow();
     m_openButton->MapWindow();
+    m_lcdUpperWindow->MapWindow();
     m_lcdWindow->MapWindow();
+    m_playListDrawerWindow->MapWindow();
+    m_volumeWindow->MapWindow();
+    m_seekWindow->MapWindow();
 
     fprintf(stderr,"Main window ID: %x\n",m_mainWindow->GetWindow());
     fprintf(stderr,"Play Button ID: %x\n",m_playButton->GetWindow());
@@ -433,7 +462,7 @@ void FreeAmpUI::X11EventService() {
 }
 
 int32 FreeAmpUI::AcceptEvent(Event *e) {
-    cout << "Got Event " << e->Type() << endl;
+    //cout << "Got Event " << e->Type() << endl;
     switch (e->Type()) {
 	case CMD_Cleanup: {
 	    m_done = true;
@@ -461,6 +490,18 @@ int32 FreeAmpUI::AcceptEvent(Event *e) {
 	    char *pFoo = strrchr(info->m_filename,'/');
 	    pFoo = (pFoo ? ++pFoo : info->m_filename);
 	    m_lcdWindow->SetMainText(pFoo);
+	    int32 s = (int32)info->m_totalSeconds;
+	    int32 h = s / 3600;
+	    int32 m = (s % 3600) / 60;
+	    s = ((s % 3600) % 60);
+	    m_lcdWindow->SetTotalTime(h,m,s);
+	    m_lcdWindow->Draw();
+	    break;
+	}
+	case INFO_MediaTimeInfo: {
+	    MediaTimeInfoEvent *info = (MediaTimeInfoEvent *)e;
+	    m_lcdWindow->SetCurrentTime(info->m_hours,info->m_minutes,info->m_seconds);
+	    m_lcdWindow->Draw();
 	    break;
 	}
 	default:

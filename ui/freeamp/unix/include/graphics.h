@@ -49,6 +49,25 @@ Pixmap right_side_pixmap;
 #include "leftside256.xpm"
 Pixmap left_side_pixmap;
 
+#define LCD_UPPER_X 149
+#define LCD_UPPER_Y 0
+#define LCD_UPPER_WIDTH 190
+#define LCD_UPPER_HEIGHT 25
+#include "lcd_upper_frame.xpm"
+// #include "lcd_upper_frame256.xpm"
+#include "lcd_upper_frame_mask.xbm"
+Pixmap lcd_upper_pixmap;
+Pixmap lcd_upper_mask_pixmap;
+
+#define LCD_DISPLAY_X (LCD_UPPER_X + 16)
+#define LCD_DISPLAY_Y (LCD_UPPER_Y + 8)
+#define LCD_DISPLAY_WIDTH 159
+#define LCD_DISPLAY_HEIGHT 31
+#include "lcd_display.xpm"
+// #include "lcd_display256.xpm"
+Pixmap lcd_display_pixmap;
+
+// JUST FOR BUILDING TOTAL IMAGE AT STARTUP:
 #define LCD_X 149
 #define LCD_Y 0
 #define LCD_WIDTH 190
@@ -57,6 +76,22 @@ Pixmap left_side_pixmap;
 #include "lcd256.xpm"
 Pixmap lcd_pixmap;
 
+// END
+
+#define PLAYLIST_DRAWER_X 149
+#define PLAYLIST_DRAWER_Y 25
+#define PLAYLIST_DRAWER_WIDTH 190
+#define PLAYLIST_DRAWER_HEIGHT 26
+#include "playlist_drawer.xpm"
+// #include "playlist_drawer256.xpm"
+#include "playlist_drawer_mask.xbm"
+Pixmap playlist_drawer_pixmap;
+Pixmap playlist_drawer_mask_pixmap;
+
+#define VOLUME_DIAL_X LEFT_SIDE_WIDTH
+#define VOLUME_DIAL_Y 0
+#define SEEK_DIAL_X LEFT_SIDE_WIDTH + SINGLE_DIAL_WIDTH + LCD_UPPER_WIDTH
+#define SEEK_DIAL_Y 0
 #define DIALS_WIDTH 66
 #define DIALS_HEIGHT 51
 #define SINGLE_DIAL_WIDTH 11
@@ -64,7 +99,7 @@ Pixmap lcd_pixmap;
 #include "dials256.xpm"
 Pixmap dials_pixmap;
 
-#define TOTAL_WIDTH (LEFT_SIDE_WIDTH + SINGLE_DIAL_WIDTH + LCD_WIDTH + SINGLE_DIAL_WIDTH + RIGHT_SIDE_WIDTH)
+#define TOTAL_WIDTH (LEFT_SIDE_WIDTH + SINGLE_DIAL_WIDTH + LCD_UPPER_WIDTH + SINGLE_DIAL_WIDTH + RIGHT_SIDE_WIDTH)
 #define TOTAL_HEIGHT 51
 
 #include "player_full_mask.xbm"
@@ -183,5 +218,8 @@ Pixmap small_font_pixmap;
 #include "big_font.xpm"
 #include "big_font256.xpm"
 Pixmap big_font_pixmap;
+
+
+
 
 #endif // _GRAPHICS_H_

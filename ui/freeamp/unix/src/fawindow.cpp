@@ -116,6 +116,40 @@ void FAMainWindow::Draw() {
     }
 }
 
+FADumbWindow::FADumbWindow(Display *display, int32 screen_num,GC gc, Window parent,int32 x,int32 y,int32 w, int32 h) {
+    m_display = display;
+    m_screenNum = screen_num;
+    m_gc = gc;
+    m_parent = parent;
+    m_xParent = x;
+    m_yParent = y;
+    m_width = w;
+    m_height = h;
+    m_me = XCreateSimpleWindow(m_display,m_parent,m_xParent,m_yParent,m_width,m_height,0,BlackPixel(m_display,m_screenNum),WhitePixel(m_display,m_screenNum));
+    //fprintf(stderr,"created main win\n");
+}
+FADumbWindow::~FADumbWindow() { }
+
+void FADumbWindow::DoEvent(XEvent e) {
+    //cout << "Got Event" << endl;
+    switch (e.type) {
+	case Expose:
+	    if (e.xexpose.count != 0)
+		return;
+	    Draw();
+	    break;
+    }
+}
+
+void FADumbWindow::Draw() {
+    //cout << "attempting to draw" << endl;
+    if (m_mapped) {
+	//cout << "drawing..." << endl;
+	XCopyArea(m_display,m_pixmap,m_me,m_gc,0,0,m_width,m_height,0,0);
+	XFlush(m_display);
+    }
+}
+
 FATriStateWindow::FATriStateWindow(Display *display, int32 screen_num,GC gc, Window parent,int32 x,int32 y,int32 w, int32 h) {
     m_display = display;
     m_screenNum = screen_num;
@@ -239,22 +273,24 @@ FALcdWindow::FALcdWindow(Display *display, int32 screen_num,GC gc, Window parent
     m_yParent = y;
     m_width = w;
     m_height = h;
+    m_gc = gc;
     m_me = XCreateSimpleWindow(m_display,m_parent,m_xParent,m_yParent,m_width,m_height,0,BlackPixel(m_display,m_screenNum),WhitePixel(m_display,m_screenNum));
     m_doubleBufferPixmap = XCreatePixmap(m_display,m_me,m_width,m_height,DefaultDepth(m_display,m_screenNum));
 
-    XGCValues gcv;
-    gcv.fill_style = FillSolid;
-    gcv.foreground = 1;
-    gcv.background = 0;
-    m_gc = XCreateGC(m_display,m_me, GCForeground | GCBackground | GCFillStyle,&gcv);
+//    XGCValues gcv;
+//    gcv.fill_style = FillSolid;
+//    gcv.foreground = 1;
+//    gcv.background = 0;
+//    m_gc = XCreateGC(m_display,m_me, GCForeground | GCBackground | GCFillStyle,&gcv);
 
 
-    m_mainTextMask = XCreateBitmapFromData(m_display,m_me,(char *)lcd_display_mask_bits,lcd_display_mask_width,lcd_display_mask_height);
-    m_iconMask = XCreateBitmapFromData(m_display,m_me,(char *)lcd_icons_mask_bits,lcd_icons_mask_width,lcd_icons_mask_height);
+//    m_mainTextMask = XCreateBitmapFromData(m_display,m_me,(char *)lcd_display_mask_bits,lcd_display_mask_width,lcd_display_mask_height);
+//    m_iconMask = XCreateBitmapFromData(m_display,m_me,(char *)lcd_icons_mask_bits,lcd_icons_mask_width,lcd_icons_mask_height);
 
     m_text = new char[19];
     strcpy(m_text,"Welcome to FreeAmp");
     m_displayState = TotalTimeState;
+    m_totalHours = m_totalMinutes = m_totalSeconds = m_currHours = m_currMinutes = m_currSeconds = 0;
 };
 
 FALcdWindow::~FALcdWindow() { 
@@ -272,12 +308,25 @@ void FALcdWindow::DoEvent(XEvent e) {
 	    break;
 	case ButtonPress:
 	    break;
-	case ButtonRelease:
-	    break;
+	case ButtonRelease: {
+	    if (m_insideDisplay) {
+		int32 nextStateArray[] = { 5, 5, 4, 2, 5, 2};
+		SetState(nextStateArray[m_displayState]);
+	    }
+	    break;  }
 	case EnterNotify:
+	    m_insideDisplay = true;
 	    break;
 	case LeaveNotify:
+	    m_insideDisplay = false;
 	    break;
+    }
+}
+
+void FALcdWindow::SetState(int32 state) {
+    if (m_displayState != state) {
+	m_displayState = state;
+	Draw();
     }
 }
 
@@ -286,7 +335,6 @@ void FALcdWindow::SetMainText(const char *pText) {
     int32 l = strlen(pText);
     m_text = new char[l+1];
     memcpy(m_text,pText,l*sizeof(char));
-    Draw();
 }
 
 void FALcdWindow::SetSmallFontPixmap(Pixmap p) {
@@ -305,45 +353,109 @@ void FALcdWindow::SetLargeFontWidth(int *i) {
     m_largeFontWidth = i;
 }
 
+void FALcdWindow::SetCurrentTime(int32 h, int32 m, int32 s) {
+    m_currHours = h;
+    m_currMinutes = m;
+    m_currSeconds = s;
+}
+
+void FALcdWindow::SetTotalTime(int32 h, int32 m, int32 s) {
+    m_totalHours = h;
+    m_totalMinutes = m;
+    m_totalSeconds = s;
+}
+
+#define UPPER_LEFT_X 4
+#define UPPER_LEFT_Y 2
+
+#define DESCRIPTION_TEXT_X 4
+#define DESCRIPTION_TEXT_Y 18
+
+#define RIGHT_SIDE_CLIP 142
+
 void FALcdWindow::Draw() {
     if (!m_mapped) return;
-    XSetClipMask(m_display,m_gc,None);
+//    XSetClipMask(m_display,m_gc,None);
     XCopyArea(m_display,m_pixmap,m_doubleBufferPixmap,m_gc,0,0,m_width,m_height,0,0);
 
     cerr << "Drawing text: " << m_text << endl;
 
     switch (m_displayState) {
 	case IntroState: {
-	    XSetClipMask(m_display,m_gc,m_mainTextMask);
-	    BlitText(m_doubleBufferPixmap,20,10,m_text,SmallFont);
+//	    XSetClipMask(m_display,m_gc,m_mainTextMask);
+	    BlitText(m_doubleBufferPixmap,UPPER_LEFT_X,UPPER_LEFT_Y,"Welcome To FreeAmp",SmallFont);
 	    break;
 	}
 	case VolumeState: {
-	    XSetClipMask(m_display,m_gc,m_mainTextMask);
-	    BlitText(m_doubleBufferPixmap,20,10,m_text,SmallFont);
+//	    XSetClipMask(m_display,m_gc,m_mainTextMask);
+	    BlitText(m_doubleBufferPixmap,UPPER_LEFT_X,UPPER_LEFT_Y,m_text,SmallFont);
+	    BlitText(m_doubleBufferPixmap,DESCRIPTION_TEXT_X,DESCRIPTION_TEXT_Y,"volume",SmallFont);
+
 	    break;
 	}
 	case CurrentTimeState: {
-	    XSetClipMask(m_display,m_gc,m_mainTextMask);
-	    BlitText(m_doubleBufferPixmap,20,10,m_text,SmallFont);
+//	    XSetClipMask(m_display,m_gc,m_mainTextMask);
+	    BlitText(m_doubleBufferPixmap,UPPER_LEFT_X,UPPER_LEFT_Y,m_text,SmallFont);
+	    BlitText(m_doubleBufferPixmap,DESCRIPTION_TEXT_X,DESCRIPTION_TEXT_Y,"current time",SmallFont);
+	    if (m_currHours) {
+		char foo[16];
+		sprintf(foo,"%d:%.02d:%.02d",m_currHours,m_currMinutes,m_currSeconds);
+		BlitText(m_doubleBufferPixmap,75,DESCRIPTION_TEXT_Y - 1,foo,LargeFont);
+	    } else {
+		char foo[16];
+		sprintf(foo,"%.02d:%.02d",m_currMinutes,m_currSeconds);
+		BlitText(m_doubleBufferPixmap,85,DESCRIPTION_TEXT_Y - 1, foo, LargeFont);
+	    }
 	    
 	    break;
 	}
 	case SeekTimeState: {
-	    XSetClipMask(m_display,m_gc,m_mainTextMask);
-	    BlitText(m_doubleBufferPixmap,20,10,m_text,SmallFont);
-	    
+//	    XSetClipMask(m_display,m_gc,m_mainTextMask);
+	    BlitText(m_doubleBufferPixmap,UPPER_LEFT_X,UPPER_LEFT_Y,m_text,SmallFont);
+	    BlitText(m_doubleBufferPixmap,DESCRIPTION_TEXT_X,DESCRIPTION_TEXT_Y,"seek time",SmallFont);
+    
 	    break;
 	}
 	case RemainingTimeState: {
-	    XSetClipMask(m_display,m_gc,m_mainTextMask);
-	    BlitText(m_doubleBufferPixmap,20,10,m_text,SmallFont);
+//	    XSetClipMask(m_display,m_gc,m_mainTextMask);
+	    BlitText(m_doubleBufferPixmap,UPPER_LEFT_X,UPPER_LEFT_Y,m_text,SmallFont);
+	    int32 totalSeconds = m_totalHours * 3600;
+	    totalSeconds += m_totalMinutes * 60;
+	    totalSeconds += m_totalSeconds;
+	    int32 currSeconds = m_currHours * 3600;
+	    currSeconds += m_currMinutes * 60;
+	    currSeconds += m_currSeconds;
 	    
+	    int32 displaySeconds = totalSeconds - currSeconds;
+	    int32 displayHours = displaySeconds / 3600;
+	    int32 displayMinutes = (displaySeconds - (displayHours * 3600)) / 60;
+	    displaySeconds = displaySeconds - (displayHours * 3600) - (displayMinutes * 60);
+	    BlitText(m_doubleBufferPixmap,DESCRIPTION_TEXT_X,DESCRIPTION_TEXT_Y,"remaining time",SmallFont);
+	    if (displayHours) {
+		char foo[16];
+		sprintf(foo,"%d:%.02d:%.02d",displayHours,displayMinutes,displaySeconds);
+		BlitText(m_doubleBufferPixmap,75,DESCRIPTION_TEXT_Y - 1,foo,LargeFont);
+	    } else {
+		char foo[16];
+		sprintf(foo,"%.02d:%.02d",displayMinutes,displaySeconds);
+		BlitText(m_doubleBufferPixmap,85,DESCRIPTION_TEXT_Y - 1, foo, LargeFont);
+	    }
+    
 	    break;
 	}
 	case TotalTimeState: {
-	    XSetClipMask(m_display,m_gc,m_mainTextMask);
-	    BlitText(m_doubleBufferPixmap,20,10,m_text,SmallFont);
+//	    XSetClipMask(m_display,m_gc,m_mainTextMask);
+	    BlitText(m_doubleBufferPixmap,UPPER_LEFT_X,UPPER_LEFT_Y,m_text,SmallFont);
+	    BlitText(m_doubleBufferPixmap,DESCRIPTION_TEXT_X,DESCRIPTION_TEXT_Y,"total time",SmallFont);
+	    if (m_totalHours) {
+		char foo[16];
+		sprintf(foo,"%d:%.02d:%.02d",m_totalHours,m_totalMinutes,m_totalSeconds);
+		BlitText(m_doubleBufferPixmap,75,DESCRIPTION_TEXT_Y - 1,foo,LargeFont);
+	    } else {
+		char foo[16];
+		sprintf(foo,"%.02d:%.02d",m_totalMinutes,m_totalSeconds);
+		BlitText(m_doubleBufferPixmap,85,DESCRIPTION_TEXT_Y - 1, foo, LargeFont);
+	    }
 	    break;
 	}
     }
@@ -357,6 +469,8 @@ void FALcdWindow::BlitText(Drawable d, int32 x, int32 y, const char *text, int32
 	case LargeFont: {
 	    int32 offset = x;
 	    for (int i=0;text[i];i++) {
+		if ((offset + m_largeFontWidth[text[i] - 32]) > RIGHT_SIDE_CLIP)
+		    break;
 		XCopyArea(m_display,m_largeFontPixmap,d,m_gc,
 			  0,(text[i] - 32)*12,
 			  m_largeFontWidth[text[i] - 32], 12,
@@ -368,6 +482,8 @@ void FALcdWindow::BlitText(Drawable d, int32 x, int32 y, const char *text, int32
 	case SmallFont: {
 	    int32 offset = x;
 	    for (int i=0;text[i];i++) {
+		if ((offset + m_smallFontWidth[text[i] - 32]) > RIGHT_SIDE_CLIP)
+		    break;
 		XCopyArea(m_display,m_smallFontPixmap,d,m_gc,
 			  0,(text[i] - 32)*10,
 			  m_smallFontWidth[text[i] - 32], 10,
@@ -379,6 +495,53 @@ void FALcdWindow::BlitText(Drawable d, int32 x, int32 y, const char *text, int32
     }
 }
 
+FADialWindow::FADialWindow(Display *display, int32 screen_num,GC gc, Window parent,int32 x,int32 y,int32 w, int32 h) {
+    m_display = display;
+    m_screenNum = screen_num;
+    m_gc = gc;
+    m_parent = parent;
+    m_xParent = x;
+    m_yParent = y;
+    m_width = w;
+    m_height = h;
+    m_me = XCreateSimpleWindow(m_display,m_parent,m_xParent,m_yParent,m_width,m_height,0,BlackPixel(m_display,m_screenNum),WhitePixel(m_display,m_screenNum));
+    //fprintf(stderr,"created main win\n");
+    m_currentDial = 0;
+}
+FADialWindow::~FADialWindow() { }
+
+void FADialWindow::DoEvent(XEvent e) {
+    //cout << "Got Event" << endl;
+    switch (e.type) {
+	case MotionNotify:
+	    if (e.xmotion.state & Button1Mask) {
+		//XMoveWindow(m_display,m_me,e.xmotion.x_root-m_buttonClickSpotX,e.xmotion.y_root-m_buttonClickSpotY);
+		int32 tmpInts[] = { 5, 4, 3, 2, 1, 0 };
+		int32 tmpInt = (e.xmotion.y_root - m_buttonClickSpotY) % 6;
+		m_currentDial = tmpInts[tmpInt];
+		Draw();
+	    }
+	    break;
+	case Expose:
+	    if (e.xexpose.count != 0)
+		return;
+	    Draw();
+	    break;
+	case ButtonPress:
+	    m_buttonClickSpotX = e.xbutton.x;
+	    m_buttonClickSpotY = e.xbutton.y;
+	    break;
+    }
+}
+
+void FADialWindow::Draw() {
+    //cout << "attempting to draw" << endl;
+    if (m_mapped) {
+	//cout << "drawing..." << endl;
+	XCopyArea(m_display,m_pixmap,m_me,m_gc,m_currentDial * m_width,0,m_width,m_height,0,0);
+	XFlush(m_display);
+    }
+}
 
 
 
