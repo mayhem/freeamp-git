@@ -254,6 +254,7 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                     ClearPlaylistEvent();
                     return 1;
 
+                case ID_POPUP_EDITPLAYLIST:
                 case ID_EDIT_EDITPLAYLIST:
                     EditPlaylistEvent();
                     return 1;
