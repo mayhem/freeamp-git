@@ -892,16 +892,29 @@ void FreeAmpTheme::UpdateTimeDisplay(void)
         m_iTotalSeconds > 0)
     {    
         iSeconds = m_iTotalSeconds - m_iCurrentSeconds;
-        sprintf(szText, "(%d:%02d:%02d)", 
-                iSeconds / 3600,
-                (iSeconds % 3600) / 60,
-                iSeconds % 60);
+        if (iSeconds > 3600)
+            sprintf(szText, "-%d:%02d:%02d", 
+                    iSeconds / 3600,
+                    (iSeconds % 3600) / 60,
+                    iSeconds % 60);
+        else                
+            sprintf(szText, "-%02d:%02d", 
+                    (iSeconds % 3600) / 60,
+                    iSeconds % 60);
+                
     }    
     else    
-        sprintf(szText, "%d:%02d:%02d", 
-                m_iCurrentSeconds / 3600,
-                (m_iCurrentSeconds % 3600) / 60,
-                m_iCurrentSeconds % 60);
+    {
+        if (m_iCurrentSeconds > 3600)
+           sprintf(szText, "%d:%02d:%02d", 
+                   m_iCurrentSeconds / 3600,
+                   (m_iCurrentSeconds % 3600) / 60,
+                   m_iCurrentSeconds % 60);
+        else           
+           sprintf(szText, "%02d:%02d", 
+                   (m_iCurrentSeconds % 3600) / 60,
+                   m_iCurrentSeconds % 60);
+    }
             
     oText = string(szText);
     m_pWindow->ControlStringValue("Time", true, oText);
@@ -1036,6 +1049,7 @@ void FreeAmpTheme::PostWindowCreate(void)
     pProp = new Int32PropValue((int)((Win32Window *)m_pWindow)->GetWindowHandle());
     m_pContext->props->SetProperty("MainWindow", pProp);
 #endif
+    m_pWindow->SetTitle(string(BRANDING));
 }
 
 void FreeAmpTheme::ShowHelp(void)

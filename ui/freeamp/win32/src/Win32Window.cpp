@@ -22,6 +22,13 @@
    $Id$
 ____________________________________________________________________________*/ 
 
+// The debugger can't handle symbols more than 255 characters long.
+// STL often creates symbols longer than that.
+// When symbols are longer than 255 characters, the warning is disabled.
+#ifdef WIN32
+#pragma warning(disable:4786)
+#endif
+
 #include <stdio.h>
 #include "Theme.h"
 #include "Win32Window.h"
@@ -116,8 +123,15 @@ LRESULT Win32Window::WindowProc(HWND hwnd, UINT msg,
             oPos.y = oRect.y1;
             SaveWindowPos(oPos);
             PostQuitMessage(0);
+            
+            m_pTheme->HandleControlMessage(string("Quit"), CM_Pressed);
+            
             break;
-        }    
+        }   
+        
+        case WM_QUIT:
+            Debug_v("wm_quit");
+            break;
 
 		case WM_TIMER:
             m_pMindMeldMutex->Acquire();
@@ -243,6 +257,7 @@ Error Win32Window::Run(Pos &oPos)
     HRGN     hRgn;
     HDC      hDc;
     int      iMaxX, iMaxY;
+	Canvas  *pCanvas;
 
 	m_oWindowPos = oPos;
 
@@ -263,17 +278,22 @@ Error Win32Window::Run(Pos &oPos)
 	iMaxY = GetDeviceCaps(hDc, VERTRES);
     ReleaseDC(NULL, hDc);
     
-    GetCanvas()->GetBackgroundRect(oRect);
-    
-    if (m_oWindowPos.x > iMaxX || m_oWindowPos.x + oRect.Width() < 0)
-       m_oWindowPos.x = 0;
-    if (m_oWindowPos.y > iMaxY || m_oWindowPos.y + oRect.Height() < 0)
-       m_oWindowPos.y = 0;
-
-    if(m_oWindowPos.x < 0 || m_oWindowPos.y < 0)
+	
+    pCanvas = GetCanvas();
+	if (pCanvas)
     {
-        m_oWindowPos.x = (iMaxX - oRect.Width())/2;
-        m_oWindowPos.y = (iMaxY - oRect.Height())/2;
+		pCanvas->GetBackgroundRect(oRect);
+    
+        if (m_oWindowPos.x > iMaxX || m_oWindowPos.x + oRect.Width() < 0)
+            m_oWindowPos.x = 0;
+        if (m_oWindowPos.y > iMaxY || m_oWindowPos.y + oRect.Height() < 0)
+            m_oWindowPos.y = 0;
+
+        if(m_oWindowPos.x < 0 || m_oWindowPos.y < 0)
+		{    
+            m_oWindowPos.x = (iMaxX - oRect.Width())/2;
+            m_oWindowPos.y = (iMaxY - oRect.Height())/2;
+        }
     }
 
     if (m_bLiveInToolbar)
@@ -583,9 +603,7 @@ Notify(int32 command, LPNMHDR notifyMsgHdr)
 
         m_oControls[idCtrl]->GetTip(strTip);
         if(strTip.length())
-        {
-            strcpy(lpttt->szText,strTip.c_str()); // if tip is there
-        }
+           strncpy(lpttt->szText,strTip.c_str(),80); // if tip is there
     }
 }
 

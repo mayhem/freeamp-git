@@ -50,6 +50,8 @@ ThemeManager::ThemeManager(FAContext *pContext)
     if (IsError(eRet) || strlen(szThemePath) == 0)
     {
         GetDefaultTheme(m_oCurrentTheme);
+     	_splitpath(m_oCurrentTheme.c_str(), NULL, NULL, szThemePath, NULL);
+        m_oCurrentTheme = szThemePath;
     }    
     else
     {
@@ -61,6 +63,11 @@ ThemeManager::ThemeManager(FAContext *pContext)
            m_bDevelTheme = true;
            m_oDevelTheme = m_oCurrentTheme;
            m_oCurrentTheme = THEME_IN_DEVEL;
+        }   
+        else
+        {
+     	   _splitpath(m_oCurrentTheme.c_str(), NULL, NULL, szThemePath, NULL);
+           m_oCurrentTheme = szThemePath;
         }   
     }    
 }
@@ -129,7 +136,10 @@ Error ThemeManager::UseTheme(string &oThemeFile)
     }   
 
     m_pContext->prefs->SetThemePath((char *)oThemeFile.c_str());
-	m_oCurrentTheme = string(dir);
+    if (oThemeFile == m_oDevelTheme)
+        m_oCurrentTheme = THEME_IN_DEVEL;
+    else    
+        m_oCurrentTheme = string(dir);
     
 	return kError_NoErr;
 }

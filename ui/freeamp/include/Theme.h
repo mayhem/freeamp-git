@@ -105,7 +105,7 @@ class Theme : public Parse
       vector<Window *> *m_pWindows, *m_pParsedWindows;
       vector<Bitmap *> *m_pBitmaps, *m_pParsedBitmaps;
       vector<Font *>   *m_pFonts, *m_pParsedFonts;
-      bool              m_bReloadTheme, m_bReloadWindow;
+      bool              m_bReloadTheme, m_bReloadWindow, m_bThemeLoaded;
       string            m_oReloadWindow, m_oReloadFile;
       ControlTypeEnum   m_eCurrentControl;
       string            m_oDefaultFont;

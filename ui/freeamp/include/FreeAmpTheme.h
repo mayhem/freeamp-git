@@ -24,6 +24,13 @@ ____________________________________________________________________________*/
 #ifndef INCLUDED_FREEAMP_THEME_H
 #define INCLUDED_FREEAMP_THEME_H
 
+// The debugger can't handle symbols more than 255 characters long.
+// STL often creates symbols longer than that.
+// When symbols are longer than 255 characters, the warning is disabled.
+#ifdef WIN32
+#pragma warning(disable:4786)
+#endif
+
 #include "ui.h"
 #include "thread.h"
 #include "facontext.h"
