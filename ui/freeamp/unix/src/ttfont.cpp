@@ -53,6 +53,8 @@
 
 
 Mutex ttfLock;
+static char         have_engine = 0;
+static TT_Engine    engine;
 
 #define TT_VALID(handle) ((handle).z != NULL)
 
@@ -102,7 +104,8 @@ duplicate_raster(TT_Raster_Map * rmap)
 static void
 clear_raster(TT_Raster_Map * rmap)
 {
-   memset(rmap->bitmap, 0, rmap->size);
+   if (rmap->bitmap)
+       memset(rmap->bitmap, 0, rmap->size);
 }
 
 static void
@@ -539,6 +542,11 @@ Efont_free(Efont * f)
       free(f->glyphs_cached);
    free(f);
 
+   have_engine--;
+
+   if (!have_engine)
+       TT_Done_FreeType(engine);
+
    ttfLock.Release();
 }
 
@@ -548,8 +556,6 @@ Efont_load(char *file, int size)
    TT_Error            error;
    TT_CharMap          char_map;
    TT_Glyph_Metrics    metrics;
-   static TT_Engine    engine;
-   static char         have_engine = 0;
    int                 dpi = 96;
    Efont              *f;
    unsigned short      i, n, code, load_flags;
@@ -565,15 +571,19 @@ Efont_load(char *file, int size)
            ttfLock.Release();
 	   return NULL;
         }
-	have_engine = 1;
      }
+   have_engine++;
    f = (Efont *)malloc(sizeof(Efont));
    f->engine = engine;
    error = TT_Open_Face(f->engine, file, &f->face);
    if (error)
      {
 	free(f);
-/*      fprintf(stderr, "Unable to open font\n"); */
+        have_engine--;
+ 
+        if (!have_engine)
+            TT_Done_FreeType(engine);
+
         ttfLock.Release();
 	return NULL;
      }
@@ -582,6 +592,11 @@ Efont_load(char *file, int size)
      {
 	TT_Close_Face(f->face);
 	free(f);
+        have_engine--;
+
+        if (!have_engine)
+            TT_Done_FreeType(engine);
+
         ttfLock.Release();
 /*      fprintf(stderr, "Unable to get face properties\n"); */
 	return NULL;
@@ -591,6 +606,11 @@ Efont_load(char *file, int size)
      {
 	TT_Close_Face(f->face);
 	free(f);
+        have_engine--;
+
+        if (!have_engine)
+            TT_Done_FreeType(engine);
+
         ttfLock.Release();
 /*      fprintf(stderr, "Unable to create instance\n"); */
 	return NULL;
@@ -616,9 +636,12 @@ Efont_load(char *file, int size)
 	num_glyphs = f->properties.num_Glyphs;
 	TT_Done_Instance(f->instance);
 	TT_Close_Face(f->face);
+        have_engine--;
 	free(f);
+        if (!have_engine)
+            TT_Done_FreeType(engine);
+
         ttfLock.Release();
-/*      fprintf(stderr, "Sorry, but this font doesn't contain any Unicode mapping table\n"); */
 	return NULL;
      }
    f->num_glyph = 128;

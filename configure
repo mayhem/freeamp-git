@@ -2333,7 +2333,7 @@ cmdline="true"
 isunix="true"
 OSLINK=""
 FPIC="-fPIC"
-LINKMOD="$CC -shared"
+LINKMOD="$CXX -shared"
 LIBMOD="ar -r"
 OSTYPE="UNIX";
 

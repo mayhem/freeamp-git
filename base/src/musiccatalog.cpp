@@ -94,7 +94,7 @@ MusicCatalog::~MusicCatalog()
     for(p = m_streams->begin(); p != m_streams->end(); p++)
        delete (*p);
     delete m_streams;
-    
+
     delete m_playlists;
     delete m_mutex;
     delete m_catMutex;
@@ -541,10 +541,24 @@ Error MusicCatalog::Add(const char *url)
 void MusicCatalog::ClearCatalog()
 {
     m_catMutex->Acquire();
+
+    vector<ArtistList *>::iterator a;
+    vector<PlaylistItem *>::iterator p;
+
+    for(a = m_artistList->begin(); a != m_artistList->end(); a++)
+       delete (*a);
     delete m_artistList;
+
+    for(p = m_unsorted->begin(); p != m_unsorted->end(); p++)
+       delete (*p);
     delete m_unsorted;
+
     delete m_playlists;
+
+    for(p = m_streams->begin(); p != m_streams->end(); p++)
+       delete (*p);
     delete m_streams;
+
     m_artistList = new vector<ArtistList *>;
     m_unsorted = new vector<PlaylistItem *>;
     m_playlists = new vector<string>;

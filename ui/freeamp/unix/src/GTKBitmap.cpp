@@ -221,16 +221,26 @@ Error GTKBitmap::LoadBitmapFromDisk(string &oFile)
     fseek(file, offset, SEEK_SET);
     gdk_threads_enter();
     buffer = (guchar *)g_malloc(imgsize);
-    data = (guchar *)g_malloc0((w * 3 * h) + 3); // +3 is just for safety
+    if (!buffer) {
+        fclose(file);
+        gdk_threads_leave();
+        return kError_LoadBitmapFailed;
+    }   
+    data = (guchar *)g_malloc0((w * 3 * h) + 3);
+    if (!data) {
+        fclose(file);
+        g_free(buffer);
+        gdk_threads_leave();
+        return kError_LoadBitmapFailed;
+    }
     gdk_threads_leave();
+
     fread(buffer, imgsize, 1, file);
     fclose(file);
     buffer_ptr = buffer;
     buffer_end = buffer + imgsize;
 
     data_end = data + (w * 3 * h);
-    if (!data) 
-        return kError_LoadBitmapFailed;
     ptr = data + ((h - 1) * w * 3);
 
     if (bitcount == 4) {

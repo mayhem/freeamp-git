@@ -119,9 +119,10 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
             mainBrowser->Close(false);
             delete mainBrowser;
 
-            vector<GTKMusicBrowser *>::iterator i = browserWindows.begin();
-            for (; i != browserWindows.end(); i++) {
-                (*i)->Close(false);
+            while (browserWindows.size() > 0) {
+                browserWindows[0]->Close(false);
+                delete browserWindows[0];
+                browserWindows.erase(browserWindows.begin());
             }
 
             if (weAreGTK) 

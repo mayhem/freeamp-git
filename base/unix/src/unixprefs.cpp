@@ -386,6 +386,8 @@ UnixPrefs()
     if (file_exists(old_prefsFilePath))
         rename(old_prefsFilePath, m_prefsFilePath);
 
+    delete [] old_prefsFilePath;
+
     FILE *prefsFile = fopen(m_prefsFilePath, "r");
     if (!prefsFile && errno != ENOENT)
     {
