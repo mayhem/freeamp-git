@@ -2924,7 +2924,18 @@ SetArgs(int32 argc, char** argv)
             // find long filename for item
             if(handle != INVALID_HANDLE_VALUE)
             {
-                m_plm->AddItem(data.cFileName,0);
+                char path[MAX_PATH];
+                char* cp = NULL;
+
+                strcpy(path, arg);
+                cp = strrchr(path, '\\');
+
+                if(cp)
+                {
+                    strcpy(cp + 1, data.cFileName);
+                }
+
+                m_plm->AddItem(path,0);
 
                 FindClose(handle);
             }
@@ -2977,7 +2988,15 @@ FilesReceived(char* array, int32 count)
 
         if(handle != INVALID_HANDLE_VALUE)
         {
-            strcpy(foo, data.cFileName);
+            char* cp = NULL;
+
+            cp = strrchr(foo, '\\');
+
+            if(cp)
+            {
+                strcpy(cp + 1, data.cFileName);
+            }
+
             FindClose(handle);
         }
 
