@@ -312,11 +312,12 @@ void Mpg123UI::SetArgs(int argc, char **argv) {
 		    cout << "use HTTP proxy " << pc << endl;
 		    break;
 		case 'z':
-		    m_plm->SetOrder(PlayListManager::ORDER_SHUFFLED);
+		    m_plm->SetShuffle(SHUFFLE_SHUFFLED);
 		    //cout << "shuffle play (with wildcards) " << endl;
 		    break;
 		case 'Z':
-		    m_plm->SetOrder(PlayListManager::ORDER_RANDOM);
+		    // random play has been temporarily disabled.
+		    //m_plm->SetShuffle(PlayListManager::ORDER_RANDOM);
 		    //cout << "Random Play" << endl;
 		    break;
 		case 'u':

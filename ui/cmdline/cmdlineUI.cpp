@@ -133,7 +133,7 @@ void cmdlineUI::keyboardServiceFunction(void *pclcio) {
 	    case 's':
 	    case 'S': {
 		if (pMe->m_plm) {
-		    pMe->m_plm->SetOrder(PlayListManager::ORDER_SHUFFLED);
+		    pMe->m_plm->SetShuffle(SHUFFLE_SHUFFLED);
 		    pMe->m_plm->SetFirst();
 		}
 		Event *e = new Event(CMD_Stop);
