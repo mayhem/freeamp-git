@@ -1810,7 +1810,15 @@ void FreeAmpTheme::DropFiles(vector<string> *pFileList)
 
                 m_pContext->plm->AddItem(url);
                 
-            }    
+            }
+            else if (!strcasecmp("fat", ext) ||
+                     !strcasecmp("zip", ext)) 
+            {
+                length = _MAX_PATH + 7;
+                FilePathToURL((*i).c_str(), url, &length);
+
+                m_pContext->player->AddTheme(url); 
+            }   
         }
     }
     
