@@ -257,9 +257,10 @@ typedef short			int32;
 #define MAX_PATH 4096
 #endif
 
-#ifndef socklen_t
-#undef socklen_t
-#endif
+#undef ACCEPT_ARG2
+#undef ACCEPT_ARG3
+
+#define fa_socklen_t ACCEPT_ARG3
 
 /* kludges for beos */
 #if HAVE_BEOS

@@ -22,7 +22,6 @@
 ____________________________________________________________________________*/
 
 #include "config.h"
-#undef socklen_t
 
 #include <stdio.h>
 #include <stdlib.h>

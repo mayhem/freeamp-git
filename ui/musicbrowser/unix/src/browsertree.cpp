@@ -28,7 +28,6 @@ ____________________________________________________________________________*/
 #ifdef WIN32
 #include <io.h>
 #else
-#undef socklen_t
 #include <sys/socket.h>
 #include <netdb.h>
 #include <unistd.h>

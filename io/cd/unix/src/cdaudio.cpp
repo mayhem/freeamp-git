@@ -27,7 +27,6 @@ ____________________________________________________________________________*/
 /* hacked from libcdaudio */
 
 #include <config.h>
-#undef socklen_t
 
 #include <stdio.h>
 #include <stdarg.h>

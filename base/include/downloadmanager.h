@@ -34,7 +34,6 @@ ____________________________________________________________________________*/
 #ifdef WIN32
 #include <io.h>
 #else
-#undef socklen_t
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <sys/socket.h>

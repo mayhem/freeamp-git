@@ -50,13 +50,6 @@ ____________________________________________________________________________*/
 #include "log.h"
 #include "eventdata.h"
 
-#ifdef irix
-#ifdef socklen_t
-#undef socklen_t
-#endif
-#define socklen_t int
-#endif
-
 #if !defined(WIN32) && !defined(__BEOS__)
 #define closesocket(s) close(s)
 #endif
@@ -270,7 +263,7 @@ WorkerThread(void)
    fd_set    sSet;
    struct timeval sTv;
    int       iRet, go_on = 1;
-   socklen_t iStructSize;
+   fa_socklen_t iStructSize;
 
    for (; !m_bExit;)
    {

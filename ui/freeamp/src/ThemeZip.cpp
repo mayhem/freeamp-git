@@ -34,7 +34,6 @@ ____________________________________________________________________________*/
 #define TRUE 1
 #define FALSE 0
 #include <unistd.h>
-#undef socklen_t
 #include <netinet/in.h>
 #include "win32impl.h"
 #endif
