@@ -190,7 +190,7 @@ case "$host_os" in
   linux*)
     host_os="linux"
     AC_DEFINE(HAVE_LINUX)
-    LDFLAGS="$LDFLAGS -Wl,-export-dynamic"
+    LDFLAGS="$LDFLAGS -Wl,-export-dynamic -L/usr/lib"
     CFLAGS="$CFLAGS"
     ;;
   *qnx*)
@@ -721,11 +721,12 @@ if test "$have_alsa" = "true"; then
   AC_MSG_RESULT([compiling alsa pmo plugin])
 fi
 
-dnl AC_CHECK_LIB(vorbis, ogg_sync_init,
-dnl  OSDEPPLUGINS="$OSDEPPLUGINS plugins/vorbis.lmc";
-dnl  OSINC="$OSINC -I$srcdir/lmc/vorbis/include"
-dnl  AC_MSG_RESULT([compiling vorbis codec plugin])
-dnl )
+AC_CHECK_LIB(vorbisfile, ov_info,
+ OSDEPPLUGINS="$OSDEPPLUGINS plugins/vorbis.lmc";
+ OSDEPPLUGINS="$OSDEPPLUGINS plugins/vorbis.mdf";
+ OSINC="$OSINC -I$srcdir/lmc/vorbis/include"
+ AC_MSG_RESULT([compiling vorbis codec plugin]),, -lvorbis
+)
 
 ID3_LIBS=""
 AC_CHECK_LIB(z, uncompress,

@@ -1630,7 +1630,7 @@ else
 int main() {
 
 /* Ultrix mips cc rejects this.  */
-typedef int charset[2]; const charset x;
+typedef int charset[2]; const charset x = {0,0};
 /* SunOS 4.1.1 cc rejects this.  */
 char const *const *ccp;
 char **p;
@@ -2191,7 +2191,7 @@ else
 int main() {
 
 /* Ultrix mips cc rejects this.  */
-typedef int charset[2]; const charset x;
+typedef int charset[2]; const charset x = {0,0};
 /* SunOS 4.1.1 cc rejects this.  */
 char const *const *ccp;
 char **p;
@@ -3011,7 +3011,7 @@ EOF
 #define HAVE_LINUX 1
 EOF
 
-    LDFLAGS="$LDFLAGS -Wl,-export-dynamic"
+    LDFLAGS="$LDFLAGS -Wl,-export-dynamic -L/usr/lib"
     CFLAGS="$CFLAGS"
     ;;
   *qnx*)
@@ -4349,10 +4349,54 @@ if test "$have_alsa" = "true"; then
   echo "$ac_t""compiling alsa pmo plugin" 1>&6
 fi
 
+echo $ac_n "checking for ov_info in -lvorbisfile""... $ac_c" 1>&6
+echo "configure:4354: checking for ov_info in -lvorbisfile" >&5
+ac_lib_var=`echo vorbisfile'_'ov_info | sed 'y%./+-%__p_%'`
+if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  ac_save_LIBS="$LIBS"
+LIBS="-lvorbisfile -lvorbis
+ $LIBS"
+cat > conftest.$ac_ext <<EOF
+#line 4363 "configure"
+#include "confdefs.h"
+/* Override any gcc2 internal prototype to avoid an error.  */
+/* We use char because int might match the return type of a gcc2
+    builtin and then its argument prototype would still apply.  */
+char ov_info();
+
+int main() {
+ov_info()
+; return 0; }
+EOF
+if { (eval echo configure:4374: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+  rm -rf conftest*
+  eval "ac_cv_lib_$ac_lib_var=yes"
+else
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
+  rm -rf conftest*
+  eval "ac_cv_lib_$ac_lib_var=no"
+fi
+rm -f conftest*
+LIBS="$ac_save_LIBS"
+
+fi
+if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
+  echo "$ac_t""yes" 1>&6
+  OSDEPPLUGINS="$OSDEPPLUGINS plugins/vorbis.lmc";
+ OSDEPPLUGINS="$OSDEPPLUGINS plugins/vorbis.mdf";
+ OSINC="$OSINC -I$srcdir/lmc/vorbis/include"
+ echo "$ac_t""compiling vorbis codec plugin" 1>&6
+else
+  echo "$ac_t""no" 1>&6
+fi
+
 
 ID3_LIBS=""
 echo $ac_n "checking for uncompress in -lz""... $ac_c" 1>&6
-echo "configure:4356: checking for uncompress in -lz" >&5
+echo "configure:4400: checking for uncompress in -lz" >&5
 ac_lib_var=`echo z'_'uncompress | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -4360,7 +4404,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lz  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 4364 "configure"
+#line 4408 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -4371,7 +4415,7 @@ int main() {
 uncompress()
 ; return 0; }
 EOF
-if { (eval echo configure:4375: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:4419: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -4401,7 +4445,7 @@ fi
 
 ARTS_LIBS=""
 echo $ac_n "checking for arts_init in -lartsc""... $ac_c" 1>&6
-echo "configure:4405: checking for arts_init in -lartsc" >&5
+echo "configure:4449: checking for arts_init in -lartsc" >&5
 ac_lib_var=`echo artsc'_'arts_init | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -4409,7 +4453,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lartsc  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 4413 "configure"
+#line 4457 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -4420,7 +4464,7 @@ int main() {
 arts_init()
 ; return 0; }
 EOF
-if { (eval echo configure:4424: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:4468: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -4509,7 +4553,7 @@ fi
 # Extract the first word of "gdk-pixbuf-config", so it can be a program name with args.
 set dummy gdk-pixbuf-config; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:4513: checking for $ac_word" >&5
+echo "configure:4557: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_path_GDK_PIXBUF_CONFIG'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -4544,7 +4588,7 @@ fi
 
 min_gdk_pixbuf_version=0.8.0
 echo $ac_n "checking for GDK_PIXBUF - version >= $min_gdk_pixbuf_version""... $ac_c" 1>&6
-echo "configure:4548: checking for GDK_PIXBUF - version >= $min_gdk_pixbuf_version" >&5
+echo "configure:4592: checking for GDK_PIXBUF - version >= $min_gdk_pixbuf_version" >&5
 no_gdk_pixbuf=""
 if test "$GDK_PIXBUF_CONFIG" = "no" ; then
   no_gdk_pixbuf=yes
@@ -4568,7 +4612,7 @@ else
   echo $ac_n "cross compiling; assumed OK... $ac_c"
 else
   cat > conftest.$ac_ext <<EOF
-#line 4572 "configure"
+#line 4616 "configure"
 #include "confdefs.h"
 
 #include <stdio.h>
@@ -4626,7 +4670,7 @@ int main ()
 
 
 EOF
-if { (eval echo configure:4630: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:4674: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
 then
   :
 else
@@ -4663,7 +4707,7 @@ else
         CFLAGS="$CFLAGS $GDK_PIXBUF_CFLAGS"
         LIBS="$LIBS $GDK_PIXBUF_LIBS"
         cat > conftest.$ac_ext <<EOF
-#line 4667 "configure"
+#line 4711 "configure"
 #include "confdefs.h"
 
 #include <stdio.h>
@@ -4673,7 +4717,7 @@ int main() {
  return 0; 
 ; return 0; }
 EOF
-if { (eval echo configure:4677: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:4721: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
    echo "*** The test program compiled, but did not run. This usually means"
         echo "*** that the run-time linker is not finding GDK_PIXBUF or finding the wrong"
@@ -4718,7 +4762,7 @@ ac_link='${CXX-g++} -o conftest${ac_exeext} $CXXFLAGS $CPPFLAGS $LDFLAGS conftes
 cross_compiling=$ac_cv_prog_cxx_cross
 
 echo $ac_n "checking for mb_New in -lmusicbrainz""... $ac_c" 1>&6
-echo "configure:4722: checking for mb_New in -lmusicbrainz" >&5
+echo "configure:4766: checking for mb_New in -lmusicbrainz" >&5
 ac_lib_var=`echo musicbrainz'_'mb_New | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -4726,7 +4770,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lmusicbrainz  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 4730 "configure"
+#line 4774 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 #ifdef __cplusplus
@@ -4740,7 +4784,7 @@ int main() {
 mb_New()
 ; return 0; }
 EOF
-if { (eval echo configure:4744: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:4788: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else

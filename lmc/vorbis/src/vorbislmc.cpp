@@ -430,6 +430,49 @@ void VorbisLMC::DecodeWork()
           {
              assert(0);
           }
+
+          vorbis_comment *comment;
+
+          comment = ov_comment(&m_vf, -1);
+          if (comment)
+          {
+              PlaylistItem *plItem = m_pContext->plm->GetCurrentItem();
+              MetaData mdata = plItem->GetMetaData();
+
+              char *temp;
+              temp = vorbis_comment_query(comment, "title", 0);
+              if (temp)
+              {
+                  string iso;
+                  iso = ConvertToISO(temp);
+                  mdata.SetTitle(iso.c_str());
+              }
+
+              temp = vorbis_comment_query(comment, "artist", 0);
+              if (temp)
+              {
+                  string iso;
+                  iso = ConvertToISO(temp);
+                  mdata.SetArtist(iso.c_str());
+              }
+
+              temp = vorbis_comment_query(comment, "album", 0);
+              if (temp)
+              {
+                  string iso;
+                  iso = ConvertToISO(temp);
+                  mdata.SetAlbum(iso.c_str());
+              }
+
+              temp = vorbis_comment_query(comment, "tracknumber", 0);
+              if (temp)
+                  mdata.SetTrack(atoi(temp));
+
+              plItem->SetMetaData(&mdata);
+              m_pContext->target->AcceptEvent(
+                     new PlaylistCurrentItemInfoEvent(plItem, m_pContext->plm));
+
+          }
       }
       m_pOutputBuffer->EndWrite(ret);
       bytesCopied += ret;
@@ -528,5 +571,47 @@ Error VorbisLMC::SetDecodeInfo(DecodeInfo &info)
 {
     m_decodeInfo = info;
     return kError_NoErr;
+}
+
+const string VorbisLMC::ConvertToISO(const char *utf8)
+{
+   unsigned char *in, *buf;
+   unsigned char *out, *end;
+   string               ret;
+
+   in = (unsigned char *)utf8;
+   buf = out = new unsigned char[strlen(utf8) + 1];
+   end = in + strlen(utf8);
+   for(;*in != 0x00 && in <= end; in++, out++)
+   {
+       if (*in < 0x80)
+       {  /* lower 7-bits unchanged */
+          *out = *in;
+       }
+       else
+       if (*in > 0xC3)
+       { /* discard anything above 0xFF */
+          *out = '?';
+       }
+       else
+       if (*in & 0xC0)
+       { /* parse upper 7-bits */
+          if (in >= end)
+            *out = 0;
+          else
+          {
+            *out = (((*in) & 0x1F) << 6) | (0x3F & (*(++in)));
+          }
+       }
+       else
+       {
+          *out = '?';  /* this should never happen */
+       }
+   }
+   *out = 0x00; /* append null */
+   ret = string((char *)buf);
+   delete buf;
+
+   return ret;
 }
 

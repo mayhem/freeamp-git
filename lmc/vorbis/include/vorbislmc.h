@@ -79,6 +79,8 @@ class VorbisLMC : public LogicalMediaConverter
    long   Tell(void);
    size_t Read(void *buf, size_t size, size_t num);
 
+   const string ConvertToISO(const char *utf8);
+
    static void          DecodeWorkerThreadFunc(void *);
    void                 DecodeWork();
 

@@ -33,7 +33,6 @@ clean-plugins plugins-clean:
 
 PLUGINS =  lib/zlib/lib/libzlib.la
 PLUGINS += lib/unzip/lib/libunzip.la
-PLUGINS += lmc/vorbis/src/lib/libvorbis.la
 PLUGINS += plugins/localfileinput.pmi
 PLUGINS += plugins/httpinput.pmi
 PLUGINS += plugins/obsinput.pmi
@@ -48,12 +47,10 @@ PLUGINS += plugins/lcd.ui
 PLUGINS += plugins/irman.ui
 
 PLUGINS += plugins/xingmp3.lmc
-PLUGINS += plugins/vorbis.lmc
 
 PLUGINS += plugins/mbcd.mdf
 PLUGINS += plugins/id3v1.mdf
 PLUGINS += plugins/id3v2.mdf
-PLUGINS += plugins/vorbis.mdf
 PLUGINS += plugins/misc.mdf
 
 PLUGINS += plugins/m3u.plf
@@ -373,8 +370,8 @@ lmc/vorbis/src/lib/libvorbis.la: $(VORBISLIBOBJ)
 
 # vorbis lmc
 VORBISOBJ = lmc/vorbis/src/vorbislmc.o
-plugins/vorbis.lmc: $(VORBISOBJ) lmc/vorbis/src/lib/libvorbis.la
-	$(LINKMOD) -o $@ $(VORBISOBJ) lmc/vorbis/src/lib/libvorbis.la $(STATICLD)
+plugins/vorbis.lmc: $(VORBISOBJ) 
+	$(LINKMOD) -o $@ $(VORBISOBJ) -lvorbis -lvorbisfile $(STATICLD)
 
 # MDF section 
 
@@ -423,8 +420,8 @@ plugins/id3v2.mdf: $(ID3V2OBJ)
 #vorbis
 VORBISMDFOBJ = plm/metadata/vorbis/vorbis.o
 
-plugins/vorbis.mdf: $(VORBISMDFOBJ) lmc/vorbis/src/lib/libvorbis.la
-	$(LINKMOD) -o $@ $(VORBISMDFOBJ) lmc/vorbis/src/lib/libvorbis.la $(STATICLD)
+plugins/vorbis.mdf: $(VORBISMDFOBJ) 
+	$(LINKMOD) -o $@ $(VORBISMDFOBJ) -lvorbis -lvorbisfile $(STATICLD)
 
 #misc
 MISCOBJ = plm/metadata/misc/misc.lo 
