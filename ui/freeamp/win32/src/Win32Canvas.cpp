@@ -27,6 +27,14 @@ ____________________________________________________________________________*/
 #include "Win32Font.h"
 #include "debug.h"
 
+#ifndef min
+#define min _cpp_min 
+#endif
+
+#ifndef max
+#define max _cpp_max
+#endif
+
 #define DB Debug_v("%s:%d\n", __FILE__, __LINE__);
 
 Win32Canvas::Win32Canvas(Win32Window *pParent)

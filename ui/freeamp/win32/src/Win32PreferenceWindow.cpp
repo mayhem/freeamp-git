@@ -730,7 +730,11 @@ bool Win32PreferenceWindow::MainProc(HWND hwnd,
             {
                 case IDCANCEL:
                     //PostQuitMessage(0);
-                    SavePrefsValues(&m_originalValues);
+
+					// 
+					//  No changed message needs to be broadcast, really.
+                    //
+					//SavePrefsValues(&m_originalValues);
                     EndDialog(hwnd, FALSE);
                     break;
 
