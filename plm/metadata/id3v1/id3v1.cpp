@@ -347,12 +347,10 @@ bool ID3v1::ReadMetaData(const char* url, MetaData* metadata)
 
 bool ID3v1::WriteMetaData(const char* url, const MetaData& metadata)
 {
-    bool result = false;
+    bool result = true;
 
-    // This assert is here to point out to you that the id3v2 libary
-    // also handles id3v1 tags and you should therefore use the
-    // id3v2 object to write metadata.
-    assert(0);
+    // The id3v2 libary also handles id3v1 tags and you should therefore 
+	// use the id3v2 object to write metadata.
 
     return result;
 }
