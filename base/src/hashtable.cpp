@@ -27,6 +27,8 @@ ____________________________________________________________________________*/
 #include <iostream.h>
 #include <string.h>
 
+#if 0
+
 #include "hashtable.h"
 
 HashTable::HashTable(int32 slots) {
@@ -115,3 +117,5 @@ int32 HashTable::hashkey(const char *key) {
     }
     return -1;
 }
+
+#endif // 0

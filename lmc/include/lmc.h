@@ -29,6 +29,7 @@ ____________________________________________________________________________*/
 #include "event.h"
 #include "pmo.h"
 #include "pmi.h"
+#include "properties.h"
 
 class MediaInfoEvent;
 
@@ -47,6 +48,7 @@ class LogicalMediaConverter {
 
     virtual Error SetPMI(PhysicalMediaInput *) = 0;
     virtual Error SetPMO(PhysicalMediaOutput *) = 0;
+    virtual Error SetPropManager(Properties *) = 0;
     virtual Error SetTarget(EventQueue *) = 0;
     virtual Error InitDecoder() = 0;
 

@@ -35,7 +35,7 @@ ____________________________________________________________________________*/
 #include "registrar.h"
 #include "preferences.h"
 #include "lmc.h"
-
+#include "properties.h"
 
 Player *Player::m_thePlayer = NULL;
 
@@ -334,6 +334,7 @@ void Player::Run(){
 		    m_ui = (UserInterface *)item->InitFunction()();
 		    
 		    m_ui->SetTarget((EventQueue *)this);
+		    m_ui->SetPropManager((Properties *)this);
 		    m_ui->SetPlayListManager(m_plm);
 		    m_ui->SetArgs(m_argc, m_argv);
 		    Error er = m_ui->Init((uiVectorIndex == 0) ? PRIMARY_UI : SECONDARY_UI_STARTUP); // call it the primary if we're looking at the first ui
@@ -562,12 +563,14 @@ int32 Player::ServiceEvent(Event *pC) {
 			error = pmi->SetTo(gmi->GetPlayListItem()->m_url);
 			//cout << "trying: " << gmi->GetPlayListItem()->m_url << endl;
 			if (IsntError(error)) {
+			    pmi->SetPropManager((Properties *)this);
 			    lmc_item = m_lmcRegistry->GetItem(0);
 			    if (lmc_item) {
 				LogicalMediaConverter *lmc = (LogicalMediaConverter *)lmc_item->InitFunction()();
 				if (lmc) {
 				    error = lmc->SetPMI(pmi);
 				    if (IsntError(error)) {
+					lmc->SetPropManager((Properties *)this);
 					if (lmc->CanDecode()) {
 					    //cout << "yep" << endl;
 					    MediaInfoEvent *mie = NULL;
@@ -645,7 +648,7 @@ int32 Player::ServiceEvent(Event *pC) {
 				if(pmi_item) {
 					pmi = (PhysicalMediaInput *)pmi_item->InitFunction()();
 					error = pmi->SetTo(pc->m_url);
-			
+					pmi->SetPropManager((Properties *)this);
 					if(IsError(error))
 					{
 						delete pmi;
@@ -657,12 +660,13 @@ int32 Player::ServiceEvent(Event *pC) {
 		    
 				if(item) {
 					pmo = (PhysicalMediaOutput *)item->InitFunction()();
+					pmo->SetPropManager((Properties *)this);
 				}
 		    
 			    error = kError_NoErr;
 				if(lmc_item) {
 					m_lmc = (LogicalMediaConverter *)lmc_item->InitFunction()();
-			
+					
 				if ((error = m_lmc->SetTarget((EventQueue *)this)) != kError_NoErr) {
 					DISPLAY_ERROR(m_lmc,error);
 					return 0;
@@ -675,6 +679,7 @@ int32 Player::ServiceEvent(Event *pC) {
 				    DISPLAY_ERROR(m_lmc,error);
 				    return 0;
 				}
+				m_lmc->SetPropManager((Properties *)this);
 		    }
 		    
 		    if ((error = m_lmc->InitDecoder()) != kError_NoErr) {
@@ -948,6 +953,18 @@ void Player::SendToUI(Event *pe) {
     for (i = 0;i<m_uiVector->NumElements();i++) {
 	m_uiVector->ElementAt(i)->AcceptEvent(pe);
     }
+}
+
+Error Player::GetProperty(const char *pProp, void **ppVal) {
+    return m_props.GetProperty(pProp,ppVal);
+}
+
+Error Player::SetProperty(const char *pProp, void *pVal, bool deleteWhenDone) {
+    return m_props.SetProperty(pProp,pVal,deleteWhenDone);
+}
+
+Error Player::RegisterPropertyWatcher(const char *pProp, PropertyWatcher *pPropWatch) {
+    return m_props.RegisterPropertyWatcher(pProp, pPropWatch);
 }
 
 /*

@@ -111,7 +111,9 @@ class     XingLMC:public LogicalMediaConverter
    virtual Error SetEQData(bool);
 
 
-   private:
+   virtual Error SetPropManager(Properties *p) { m_propManager = p; if (p) return kError_NoErr; else return kError_UnknownErr; }
+ private:
+   Properties *m_propManager;
 
    static void DecodeWorkerThreadFunc(void *);
    void      DecodeWork();

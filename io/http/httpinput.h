@@ -55,10 +55,15 @@ class     HttpInput:public PhysicalMediaInput
    }
    virtual const char *GetErrorString(int32);
 
-   private:
+   virtual Error SetPropManager(Properties *p) { m_propManager = p; if (p) return kError_NoErr; else return kError_UnknownErr; }
+ private:
+   Properties *m_propManager;
 
    HttpBuffer *m_pPullBuffer;
    char       *m_path;
 };
 
 #endif /* _LOCALFILEINPUT_H_ */
+
+
+

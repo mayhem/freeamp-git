@@ -152,6 +152,7 @@ Error LcdUI::Init(int32 startupType) {
     sock_send_string(m_sock, "widget_add FA artist string\n");
     sock_send_string(m_sock, "widget_set FA songname 1 1 {Welcome To FreeAmp}\n");
     sock_send_string(m_sock, "widget_set FA timeline 4 1 {total       00:00:00}\n");
+    sock_send_string(m_sock, "widget_del FA heartbeat\n");
 #else 
     lcd.string(1,1," Welcome To FreeAmp");
     lcd.flush();

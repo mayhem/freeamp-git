@@ -45,7 +45,9 @@ class Mpg123UI : public UserInterface {
     ~Mpg123UI();
 
     static EventQueue *m_playerEQ;
+   virtual Error SetPropManager(Properties *p) { m_propManager = p; if (p) return kError_NoErr; else return kError_UnknownErr; }
  private:
+   Properties *m_propManager;
     int32 m_argc;
     char **m_argv;
     int32 m_startupType;

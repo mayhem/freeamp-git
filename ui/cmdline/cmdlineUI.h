@@ -41,15 +41,17 @@ class cmdlineUI : public UserInterface {
     virtual void SetPlayListManager(PlayListManager *);
     static void keyboardServiceFunction(void *);
     virtual ~cmdlineUI();
+   virtual Error SetPropManager(Properties *p) { m_propManager = p; if (p) return kError_NoErr; else return kError_UnknownErr; }
  private:
-    void ProcessArgs();
-    int32 m_startupLevel;
-    int32 m_argc;
-    char **m_argv;
-    EventQueue *m_playerEQ;
-    void processSwitch(char *);
-    Thread *keyboardListenThread;
-    PlayListManager *m_plm;
+   Properties *m_propManager;
+   void ProcessArgs();
+   int32 m_startupLevel;
+   int32 m_argc;
+   char **m_argv;
+   EventQueue *m_playerEQ;
+   void processSwitch(char *);
+   Thread *keyboardListenThread;
+   PlayListManager *m_plm;
 };
 
 

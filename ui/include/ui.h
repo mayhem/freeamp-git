@@ -42,6 +42,7 @@ class UserInterface : public EventQueue {
     virtual void SetTarget(EventQueue *) = 0;
     virtual void SetPlayListManager(PlayListManager *) = 0;
     virtual Error Init(int32) = 0;
+    virtual Error SetPropManager(Properties *) = 0;
     virtual ~UserInterface() {}
 };
 

@@ -41,6 +41,7 @@ ____________________________________________________________________________*/
 /* project headers */
 #include "config.h"
 #include "errors.h"
+#include "properties.h"
 
 #define MAXCHANNELS		2
 
@@ -64,6 +65,7 @@ public:
     virtual Error Pause(){ return kError_GotDefaultMethod;}
     virtual Error Resume(){ return kError_GotDefaultMethod; }
     virtual const char *GetErrorString(int32) { return NULL; }
+    virtual Error SetPropManager(Properties *) = 0;
 };
 
 #endif /* _PMO_H_ */

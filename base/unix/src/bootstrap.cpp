@@ -155,17 +155,23 @@ void testVector() {
 #endif
 
 void testHashTable() {
-    HashTable *pHT = new HashTable();
+    HashTable<int32 *> *pHT = new HashTable<int32 *>();
     cout << "Adding 'foo'->1" << endl;
     char *foo = "foo";
     char *bar = "bar";
-    pHT->Insert(foo,(void *)1);
+    int32 *bb = new int32;
+    *bb = 1;
+    pHT->Insert(foo,bb);
     cout << "Adding 'bar'->2" << endl;
-    pHT->Insert(bar,(void *)2);
+    int32 *bc = new int32;
+    *bc = 2;
+    pHT->Insert(bar,bc);
 
-    int out = (int32) pHT->Value(foo);
-    cout << "out 1:  " << out << endl;
-    out = (int32) pHT->Value(bar);
-    cout << "out 2:  " << out << endl;
+    int32 *out = pHT->Value(foo);
+    cout << "out 1:  " << *out << endl;
+    out = pHT->Value(bar);
+    cout << "out 2:  " << *out << endl;
     exit(1);
 }
+
+

@@ -61,7 +61,9 @@ public:
     virtual Error Pause();
     virtual Error Resume();
     virtual const char *GetErrorString(int32);
+   virtual Error SetPropManager(Properties *p) { m_propManager = p; if (p) return kError_NoErr; else return kError_UnknownErr; }
  private:
+   Properties *m_propManager;
     bool m_properlyInitialized;
     int16 buffer[OBUFFERSIZE];
     int16 *bufferp[MAXCHANNELS];

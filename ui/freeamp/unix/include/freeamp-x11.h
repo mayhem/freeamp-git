@@ -55,7 +55,9 @@ class FreeAmpUI : public UserInterface {
     virtual ~FreeAmpUI();
 
     EventQueue *m_playerEQ;
+   virtual Error SetPropManager(Properties *p) { m_propManager = p; if (p) return kError_NoErr; else return kError_UnknownErr; }
  private:
+   Properties *m_propManager;
     int32 m_startupType;
     void Usage();
     bool m_noStartUp;

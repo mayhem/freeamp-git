@@ -46,7 +46,7 @@ InitializeRegistry(Registry* registry, Preferences* prefs)
 {
     Error error = kError_NoErr;
     char dir[MAX_PATH];
-    HashTable *pHT = new HashTable();
+    HashTable<int32 *> *pHT = new HashTable<int32 *>();
 
     if(registry == NULL)
         error = kError_InvalidParam;
@@ -176,7 +176,9 @@ InitializeRegistry(Registry* registry, Preferences* prefs)
                         item->SetInitFunction(init);
 			totalFilesFound++;
 #ifndef WIN32
-			pHT->Insert(find.cFileName,(void *)1);
+			int32 *pInt = new int32;
+			*pInt = 1;
+			pHT->Insert(find.cFileName,pInt);
 #endif
                     }
                 }
