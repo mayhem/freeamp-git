@@ -293,3 +293,147 @@ LastInRange:
   }
 }
 
+/*--------------------------------------------------------------------------- */
+
+#define L_mi 0
+#define L_m 4
+#define L_dummy 8
+#define L_in 12
+#define L_out 16
+#define L_buf 20	/* Temporary buffer */
+#define L_locals 148	/* Bytes used for locals */
+void fdct32(float in[], float out[])
+{
+__asm {
+
+	mov edi,in		; edi = x
+	mov esi,out		; esi = f
+	push ebp
+	sub esp,L_locals
+
+;	lea ecx,coef32-128	; coef = coef32 - (32 * 4)
+	lea ecx,coef32
+	sub ecx,128		; coef = coef32 - (32 * 4)
+	mov DWORD PTR [esp+4],1		; m = 1
+	mov ebp,16		; n = 32 / 2
+
+	lea ebx,DWORD PTR [esp+L_buf]
+	mov DWORD PTR [esp+L_out],ebx	; From now on, use temp buf instead of orig x
+	jmp ForwardLoopStart
+
+	align 4
+ForwardOuterLoop:
+	mov edi,DWORD PTR [esp+L_in]	; edi = x
+	mov esi,DWORD PTR [esp+L_out]	; esi = f
+	mov DWORD PTR [esp+L_out],edi	; Exchange mem versions of f/x for next iter
+ForwardLoopStart:
+	mov DWORD PTR [esp+L_in],esi
+	mov ebx,DWORD PTR [esp+L_m]	; ebx = m (temporarily)
+	mov DWORD PTR [esp+L_mi],ebx	; mi = m
+	sal ebx,1		; Double m for next iter
+	lea ecx,DWORD PTR [ecx+ebp*8]	; coef += n * 8
+	mov DWORD PTR [esp+L_m],ebx	; Store doubled m
+	lea ebx,DWORD PTR [esi+ebp*4]	; ebx = f2 = f + n * 4
+	sal ebp,3		; n *= 8
+
+	align 4
+ForwardMiddleLoop:
+	mov eax,ebp		; q = n
+	xor edx,edx		; p = 0
+	test eax,8
+	jnz ForwardInnerLoop1
+
+	align 4
+ForwardInnerLoop:
+	sub eax,4		; q -= 4
+	fld DWORD PTR [edi+eax]	; push x[q]
+	fld DWORD PTR [edi+edx]	; push x[p]
+	fld st(1)		; Duplicate top two stack entries
+	fld st(1)
+	faddp st(1),st
+	fstp DWORD PTR [esi+edx]	; f[p] = x[p] + x[q]
+	fsubrp st(1),st
+	fmul DWORD PTR [ecx+edx]
+	fstp DWORD PTR [ebx+edx]	; f2[p] = coef[p] * (x[p] - x[q])
+	add edx,4		; p += 4
+
+ForwardInnerLoop1:
+	sub eax,4		; q -= 4
+	fld DWORD PTR [edi+eax]	; push x[q]
+	fld DWORD PTR [edi+edx]	; push x[p]
+	fld st(1)		; Duplicate top two stack entries
+	fld st(1)
+	faddp st(1),st
+	fstp DWORD PTR [esi+edx]	; f[p] = x[p] + x[q]
+	fsubrp st(1),st
+	fmul DWORD PTR [ecx+edx]
+	fstp DWORD PTR [ebx+edx]	; f2[p] = coef[p] * (x[p] - x[q])
+	add edx,4		; p += 4
+
+	cmp edx,eax
+	jb ForwardInnerLoop	; Jump back if (p < q)
+
+	add esi,ebp		; f += n
+	add ebx,ebp		; f2 += n
+	add edi,ebp		; x += n
+	dec DWORD PTR [esp+L_mi]		; mi--
+	jg ForwardMiddleLoop	; Jump back if mi > 0
+
+	sar ebp,4		; n /= 16
+	jg ForwardOuterLoop	; Jump back if n > 0
+
+
+; Setup back loop
+	mov ebx,8		; ebx = m = 8 (temporarily)
+	mov ebp,ebx		; n = 4 * 2
+
+	align 4
+BackOuterLoop:
+	mov esi,DWORD PTR [esp+L_out]	; esi = f
+	mov DWORD PTR [esp+L_mi],ebx	; mi = m
+	mov edi,DWORD PTR [esp+L_in]	; edi = x
+	mov DWORD PTR [esp+L_m],ebx	; Store m
+	mov DWORD PTR [esp+L_in],esi	; Exchange mem versions of f/x for next iter
+	mov ebx,edi
+	mov DWORD PTR [esp+L_out],edi
+	sub ebx,ebp		; ebx = x2 = x - n
+	sal ebp,1		; n *= 2
+
+	align 4
+BackMiddleLoop:
+	mov ecx,DWORD PTR [ebx+ebp-4]
+	mov DWORD PTR [esi+ebp-8],ecx	; f[n - 8] = x2[n - 4]
+	fld DWORD PTR [edi+ebp-4]	; push x[n - 4]
+	fst DWORD PTR [esi+ebp-4]	; f[n - 4] = x[n - 4], without popping
+	lea eax,DWORD PTR [ebp-8]	; q = n - 8
+	lea edx,DWORD PTR [ebp-16]	; p = n - 16
+
+	align 4
+BackInnerLoop:
+	mov ecx,DWORD PTR [ebx+eax]
+	mov DWORD PTR [esi+edx],ecx	; f[p] = x2[q]
+	fld DWORD PTR [edi+eax]	; push x[q]
+	fadd st(1),st
+	fxch 
+	fstp DWORD PTR [esi+edx+4]	; f[p + 4] = x[q] + x[q + 4]
+	sub eax,4		; q -= 4
+	sub edx,8		; p -= 8
+	jge BackInnerLoop	; Jump back if p >= 0
+
+	fstp DWORD PTR [esp+L_dummy]	; Pop (XXX is there a better way to do this?)
+	add esi,ebp		; f += n
+	add ebx,ebp		; x2 += n
+	add edi,ebp		; x += n
+	dec DWORD PTR [esp+L_mi]		; mi--
+	jg BackMiddleLoop	; Jump back if mi > 0
+
+	mov ebx,DWORD PTR [esp+L_m]	; ebx = m (temporarily)
+	sar ebx,1		; Halve m for next iter
+	jg BackOuterLoop	; Jump back if m > 0
+
+	add esp,L_locals
+	pop ebp
+
+  }
+}
+

@@ -308,6 +308,15 @@ LastInRange:
 _window_dual endp
 
 ;---------------------------------------------------------------------------
+
+L_mi EQU 0
+L_m EQU 4
+L_dummy EQU 8
+L_buf EQU 12	; Temporary buffer
+L_in EQU 160
+L_out EQU 164
+L_locals EQU 140	; Bytes used for locals
+
 public _fdct32
 	align 16
 _fdct32 proc near
@@ -315,31 +324,34 @@ _fdct32 proc near
 	push edi
 	push esi
 	push ebx
-	sub esp,140
-;	leal coef32-128,%ecx	# coef = coef32 - (32 * 4)
+	sub esp,L_locals
+
+	mov edi,DWORD PTR [esp+L_in]	; edi = x
+	mov esi,DWORD PTR [esp+L_out]	; esi = f
+
+
+;	lea ecx,_coef32-128	; coef = coef32 - (32 * 4)
 	lea ecx,_coef32
 	sub ecx,128		; coef = coef32 - (32 * 4)
 	mov DWORD PTR [esp+4],1		; m = 1
 	mov ebp,16		; n = 32 / 2
 
-	mov edi,DWORD PTR [esp+160]	; edi = x
-	mov esi,DWORD PTR [esp+164]	; esi = f
-	lea ebx,DWORD PTR [esp+12]
-	mov DWORD PTR [esp+164],ebx	; From now on, use temp buf instead of orig x
+	lea ebx,DWORD PTR [esp+L_buf]
+	mov DWORD PTR [esp+L_out],ebx	; From now on, use temp buf instead of orig x
 	jmp ForwardLoopStart
 
 	align 4
 ForwardOuterLoop:
-	mov edi,DWORD PTR [esp+160]	; edi = x
-	mov esi,DWORD PTR [esp+164]	; esi = f
-	mov DWORD PTR [esp+164],edi	; Exchange mem versions of f/x for next iter
+	mov edi,DWORD PTR [esp+L_in]	; edi = x
+	mov esi,DWORD PTR [esp+L_out]	; esi = f
+	mov DWORD PTR [esp+L_out],edi	; Exchange mem versions of f/x for next iter
 ForwardLoopStart:
-	mov DWORD PTR [esp+160],esi
-	mov ebx,DWORD PTR [esp+4]	; ebx = m (temporarily)
-	mov DWORD PTR [esp+0],ebx	; mi = m
+	mov DWORD PTR [esp+L_in],esi
+	mov ebx,DWORD PTR [esp+L_m]	; ebx = m (temporarily)
+	mov DWORD PTR [esp+L_mi],ebx	; mi = m
 	sal ebx,1		; Double m for next iter
 	lea ecx,DWORD PTR [ecx+ebp*8]	; coef += n * 8
-	mov DWORD PTR [esp+4],ebx	; Store doubled m
+	mov DWORD PTR [esp+L_m],ebx	; Store doubled m
 	lea ebx,DWORD PTR [esi+ebp*4]	; ebx = f2 = f + n * 4
 	sal ebp,3		; n *= 8
 
@@ -383,7 +395,7 @@ ForwardInnerLoop1:
 	add esi,ebp		; f += n
 	add ebx,ebp		; f2 += n
 	add edi,ebp		; x += n
-	dec DWORD PTR [esp+0]		; mi--
+	dec DWORD PTR [esp+L_mi]		; mi--
 	jg ForwardMiddleLoop	; Jump back if mi > 0
 
 	sar ebp,4		; n /= 16
@@ -396,13 +408,13 @@ ForwardInnerLoop1:
 
 	align 4
 BackOuterLoop:
-	mov esi,DWORD PTR [esp+164]	; esi = f
-	mov DWORD PTR [esp+0],ebx	; mi = m
-	mov edi,DWORD PTR [esp+160]	; edi = x
-	mov DWORD PTR [esp+4],ebx	; Store m
-	mov DWORD PTR [esp+160],esi	; Exchange mem versions of f/x for next iter
+	mov esi,DWORD PTR [esp+L_out]	; esi = f
+	mov DWORD PTR [esp+L_mi],ebx	; mi = m
+	mov edi,DWORD PTR [esp+L_in]	; edi = x
+	mov DWORD PTR [esp+L_m],ebx	; Store m
+	mov DWORD PTR [esp+L_in],esi	; Exchange mem versions of f/x for next iter
 	mov ebx,edi
-	mov DWORD PTR [esp+164],edi
+	mov DWORD PTR [esp+L_out],edi
 	sub ebx,ebp		; ebx = x2 = x - n
 	sal ebp,1		; n *= 2
 
@@ -427,24 +439,26 @@ BackInnerLoop:
 	sub edx,8		; p -= 8
 	jge BackInnerLoop	; Jump back if p >= 0
 
-	fstp DWORD PTR [esp+8]		; Pop (XXX is there a better way to do this?)
+	fstp DWORD PTR [esp+L_dummy]	; Pop (XXX is there a better way to do this?)
 	add esi,ebp		; f += n
 	add ebx,ebp		; x2 += n
 	add edi,ebp		; x += n
-	dec DWORD PTR [esp+0]		; mi--
+	dec DWORD PTR [esp+L_mi]		; mi--
 	jg BackMiddleLoop	; Jump back if mi > 0
 
-	mov ebx,DWORD PTR [esp+4]	; ebx = m (temporarily)
+	mov ebx,DWORD PTR [esp+L_m]	; ebx = m (temporarily)
 	sar ebx,1		; Halve m for next iter
 	jg BackOuterLoop	; Jump back if m > 0
 
 
-	add esp,140
+; Restore regs and return
+	add esp,L_locals
 	pop ebx
 	pop esi
 	pop edi
 	pop ebp
 	ret 
 _fdct32 endp
+
 _TEXT	ends
 	end
