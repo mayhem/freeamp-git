@@ -784,7 +784,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
    {
        ShowHelp();
    }
-   
+  
    return kError_NoErr;
 }
 
@@ -1191,11 +1191,10 @@ void FreeAmpTheme::ShowHelp(void)
         LaunchBrowser((char *)oHelpFile.c_str());
     else
     {
-//          MessageDialog oBox(m_pContext);
-//        string        oMessage(szCantFindHelpError);
+          MessageDialog oBox(m_pContext);
+          string        oMessage(szCantFindHelpError);
 
-//        oBox.Show(oMessage.c_str(), string(BRANDING), kMessageOk);
-          cout << szCantFindHelpError << endl;
+          oBox.Show(oMessage.c_str(), string(BRANDING), kMessageOk, true);
     }
 #endif
 }

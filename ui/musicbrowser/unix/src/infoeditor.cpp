@@ -58,8 +58,7 @@ void infoeditorUI::DoApplyInfoEdit(void)
 
     m_playlistItem->SetMetaData(&newmeta);
 
-    m_context->browser->WriteMetaDataToDatabase(m_playlistItem->URL().c_str(),
-                                                newmeta);
+    m_context->browser->m_catalog->UpdateSong(m_playlistItem);
 }
 
 gint info_delete_event(GtkWidget *widget, GdkEvent *event, gpointer data)

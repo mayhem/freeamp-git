@@ -38,17 +38,19 @@ MessageDialog::~MessageDialog(void)
 MessageDialogReturnEnum MessageDialog::
                         Show(const char        *szMessage, 
                              const char        *szTitle, 
-                             MessageDialogEnum  eType)
+                             MessageDialogEnum  eType,
+                             bool               InEventLoop)
 {
     string oMessage(szMessage), oTitle(szTitle);
     
-    return Show(oMessage, oTitle, eType);
+    return Show(oMessage, oTitle, eType, InEventLoop);
 }
 
 MessageDialogReturnEnum MessageDialog::
                         Show(const string      &oMessage, 
                              const string      &oTitle, 
-                             MessageDialogEnum  eType)
+                             MessageDialogEnum  eType,
+                             bool               InEventLoop)
 {
 	int             iRet, iType;
     Int32PropValue *pProp;

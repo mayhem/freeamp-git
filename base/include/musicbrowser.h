@@ -74,6 +74,8 @@ class MusicCatalog
     Error AddSong(const char *url);
     Error Add(const char *url);    
 
+    Error UpdateSong(PlaylistItem *item);
+
     Error RePopulateFromDatabase();
 
     Error RemovePlaylist(const char *url);

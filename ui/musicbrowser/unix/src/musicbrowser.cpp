@@ -148,8 +148,13 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
             else
                 mainBrowser->ShowMusicBrowser();
             break; }
-        case CMD_AddFiles: {
-            mainBrowser->AcceptEvent(event);
+        case CMD_AddFiles:
+        case INFO_Paused:
+        case INFO_Stopped:
+        case INFO_Playing:
+        case INFO_MusicCatalogTrackAdded: {
+            if (mainBrowser->Visible())
+                mainBrowser->AcceptEvent(event);
             break; }
         default:
             break;
@@ -161,7 +166,7 @@ void MusicBrowserUI::CreateNewEditor(string & newPlaylist)
 {
     GTKMusicBrowser *newUI = new GTKMusicBrowser(m_context, this, newPlaylist);
     gdk_threads_leave();
-    newUI->ShowPlaylist();
+    newUI->ShowMusicBrowser();
     gdk_threads_enter();
     browserWindows.push_back(newUI);
 }

@@ -572,12 +572,19 @@ public:
 class MusicCatalogTrackRemovedEvent : public Event {
 private:
     const PlaylistItem* m_item;
+    const ArtistList *m_artist;
+    const AlbumList *m_album;
 public:
-    MusicCatalogTrackRemovedEvent(const PlaylistItem* item)
-    { m_type = INFO_MusicCatalogTrackRemoved; m_item = item; }
+    MusicCatalogTrackRemovedEvent(const PlaylistItem *item,
+                                  const ArtistList *artist,
+                                  const AlbumList *album)
+    { m_type = INFO_MusicCatalogTrackRemoved; m_item = item;
+      m_artist = artist; m_album = album; }
     virtual ~MusicCatalogTrackRemovedEvent() {}
 
-    const PlaylistItem* Item() const { return m_item; }
+    const PlaylistItem *Item() const { return m_item; }
+    const ArtistList *Artist() const { return m_artist; }
+    const AlbumList *Album() const { return m_album; }
 };
 
 class MusicCatalogPlaylistAddedEvent : public Event {

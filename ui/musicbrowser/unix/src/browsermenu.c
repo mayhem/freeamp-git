@@ -86,7 +86,7 @@ void CreateMenuItems(GtkItemFactory *item_factory, void *p)
      {"/_Edit/sep4",            NULL,           0,         0, "<Separator>" },
      {"/_Edit/Clear Playlist",  NULL,           clear_list, 0, 0 },
      {"/_Edit/Randomize Playlist",NULL,         sort_random, 0, 0 },
-     {"/_Edit/sep5",            NULL,           0,         0, 0 },
+     {"/_Edit/sep5",            NULL,           0,         0, "<Separator>" },
      {"/_Edit/Edit Track Info and Playlists..", NULL, infoedit,  0, 0 },
 
      {"/_View",                 NULL,           0,         0, "<Branch>" },

@@ -92,7 +92,8 @@ MessageDialogReturnEnum GTKMessageDialog::
                        GTK_SIGNAL_FUNC(message_destroy), (gpointer)inMain);
     gtk_window_set_title(GTK_WINDOW(window), oTitle.c_str());
     gtk_container_set_border_width(GTK_CONTAINER(window), 5);
-
+    gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_MOUSE);
+ 
     GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
     gtk_container_add(GTK_CONTAINER(window), vbox);
     gtk_widget_show(vbox);

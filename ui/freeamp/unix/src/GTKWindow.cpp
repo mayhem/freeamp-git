@@ -340,6 +340,13 @@ Error GTKWindow::GetWindowPosition(Rect &oWindowRect)
     gdk_window_get_position(mainWindow->window, &oWindowRect.x1, 
                             &oWindowRect.y1);
     gdk_threads_leave();
+
+    Rect oRect;
+
+    GetCanvas()->GetBackgroundRect(oRect);
+    oWindowRect.x2 = oWindowRect.x1 + oRect.Width();
+    oWindowRect.y2 = oWindowRect.y1 + oRect.Height();
+
     return kError_NoErr;
 }
 
@@ -387,5 +394,8 @@ void GTKWindow::MouseLeaveCheck(void)
 
 Error GTKWindow::GetDesktopSize(int32 &iX, int32 &iY)
 {
-    return kError_InvalidParam;
+    iX = gdk_screen_width();
+    iY = gdk_screen_height();
+
+    return kError_NoErr;
 }

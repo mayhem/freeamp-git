@@ -150,7 +150,8 @@ FREEAMPUIOBJ += ui/freeamp/unix/src/GTKMessageDialog.o
 FREEAMPUIOBJ += ui/freeamp/unix/src/GTKWindow.o ui/freeamp/unix/src/GTKBitmap.o 
 FREEAMPUIOBJ += ui/freeamp/unix/src/GTKCanvas.o ui/freeamp/unix/src/ttfont.o 
 FREEAMPUIOBJ += ui/freeamp/unix/src/ThemeManager.o 
-FREEAMPUIOBJ += ui/freeamp/unix/src/GTKPreferenceWindow.o 
+FREEAMPUIOBJ += ui/freeamp/unix/src/GTKPreferenceWindow.o
+FREEAMPUIOBJ += ui/freeamp/unix/src/GTKFileSelector.o  
 FREEAMPUIOBJ += lib/zlib/lib/libzlib.a lib/xml/lib/libfaxml.a
 
 plugins/freeamp.ui: $(FREEAMPUIOBJ)

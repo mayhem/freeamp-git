@@ -27,7 +27,7 @@ ____________________________________________________________________________*/
 #include "MessageDialog.h"
 
 
-MessageDialog::MessageDialog(FAContext *context);
+MessageDialog::MessageDialog(FAContext *context)
 {
 }
 
@@ -39,15 +39,19 @@ MessageDialog::~MessageDialog(void)
 MessageDialogReturnEnum MessageDialog::
                         Show(const char        *szMessage, 
                              const char        *szTitle, 
-                             MessageDialogEnum  eType)
+                             MessageDialogEnum  eType, 
+                             bool               InEventLoop)
 {
     string oMessage(szMessage), oTitle(szTitle);
     
-    return Show(oMessage, oTitle, eType);
+    return Show(oMessage, oTitle, eType, InEventLoop);
 }
 
-static gboolean message_destroy(GtkWidget *widget)
+static gboolean message_destroy(GtkWidget *widget, gpointer p)
 {
+    bool inmain = (bool)p;
+    if (inmain)
+        gtk_main_quit();
     return FALSE;
 }
 
@@ -79,16 +83,19 @@ static void retry_click(GtkWidget *w, int *ret)
 MessageDialogReturnEnum MessageDialog::
                         Show(const string      &oMessage, 
                              const string      &oTitle, 
-                             MessageDialogEnum  eType)
+                             MessageDialogEnum  eType,
+                             bool               InEventLoop)
 {
-    gdk_threads_enter();
+    if (!InEventLoop)
+        gdk_threads_enter();
 
     GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_modal(GTK_WINDOW(window), TRUE);
     gtk_signal_connect(GTK_OBJECT(window), "destroy",
-                       GTK_SIGNAL_FUNC(message_destroy), NULL);
+                       GTK_SIGNAL_FUNC(message_destroy), (gpointer)InEventLoop);
     gtk_window_set_title(GTK_WINDOW(window), oTitle.c_str());
     gtk_container_set_border_width(GTK_CONTAINER(window), 5);
+    gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_MOUSE);
 
     GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
     gtk_container_add(GTK_CONTAINER(window), vbox);
@@ -178,7 +185,12 @@ MessageDialogReturnEnum MessageDialog::
 
     gtk_widget_show(window);
 
-    gdk_threads_leave();
+    if (!InEventLoop)
+        gdk_threads_leave();
+    else {
+        gtk_main();
+        gdk_threads_leave();
+    }
 
     while (iRet == 0)
         usleep(20);

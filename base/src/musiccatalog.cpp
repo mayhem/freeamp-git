@@ -202,6 +202,7 @@ Error MusicCatalog::RemoveSong(const char *url)
             if (url == (*i)->URL())
             {
                 m_unsorted->erase(i);
+                m_context->target->AcceptEvent(new MusicCatalogTrackRemovedEvent(*i, NULL, NULL));                
                 break;
             }
     }
@@ -231,6 +232,7 @@ Error MusicCatalog::RemoveSong(const char *url)
                             if (url == (*k)->URL())
                             {
                                 trList->erase(k);
+                                m_context->target->AcceptEvent(new MusicCatalogTrackRemovedEvent(*k, *i, *j));
                                 found = true;
                                 break;
                             }    
@@ -331,6 +333,28 @@ Error MusicCatalog::AddSong(const char *url)
         }
     }
     return kError_NoErr;
+}
+
+Error MusicCatalog::UpdateSong(PlaylistItem *item)
+{
+    Database *dbase = m_context->browser->GetDatabase();
+    assert(dbase);
+    assert(item);
+
+    if (!dbase->Working())
+        return kError_DatabaseNotWorking;
+
+    Error err = RemoveSong(item->URL().c_str());
+    
+    if (IsError(err))
+        return err;
+   
+    m_context->browser->WriteMetaDataToDatabase(item->URL().c_str(), 
+                                                item->GetMetaData());
+
+    dbase->Sync();
+
+    return AddSong(item->URL().c_str());
 }
 
 Error MusicCatalog::Remove(const char *url)

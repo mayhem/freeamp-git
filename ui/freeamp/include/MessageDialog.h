@@ -64,10 +64,12 @@ class MessageDialog
 
        MessageDialogReturnEnum Show(const char *szMessage, 
                                     const char *szTitle, 
-                                    MessageDialogEnum eType);
+                                    MessageDialogEnum eType,
+                                    bool InEventLoop = false);
        MessageDialogReturnEnum Show(const string &oMessage, 
                                     const string &oTitle, 
-                                    MessageDialogEnum eType);
+                                    MessageDialogEnum eType,
+                                    bool InEventLoop = false);
 
   private:
   

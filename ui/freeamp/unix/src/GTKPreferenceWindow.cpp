@@ -30,6 +30,8 @@ ____________________________________________________________________________*/
 #include "eventdata.h"
 #include "GTKPreferenceWindow.h"
 #include "GTKWindow.h"
+#include "GTKFileSelector.h"
+#include "MessageDialog.h"
 
 GTKPreferenceWindow::GTKPreferenceWindow(FAContext *context,
                                          ThemeManager *pThemeMan) :
@@ -84,6 +86,8 @@ void pref_close_click(GtkWidget *w, GTKPreferenceWindow *p)
 bool GTKPreferenceWindow::Show(Window *pWindow)
 {
     GetPrefsValues(m_pContext->prefs, &originalValues);
+     
+    fontDialog = NULL;
 
     currentValues = proposedValues = originalValues;
 
@@ -1010,10 +1014,141 @@ void GTKPreferenceWindow::SelectTheme(int row)
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
+
 void theme_click(GtkWidget *w, int row, int column, GdkEventButton *button,
                  GTKPreferenceWindow *p)
 {
     p->SelectTheme(row);
+}
+
+void GTKPreferenceWindow::AddThemeEvent(const char *newpath)
+{
+    string newThemeFile = newpath;
+    Error err = m_pThemeMan->AddTheme(newThemeFile);
+
+    if (IsntError(err)) {
+        MessageDialog oBox(m_pContext);
+        string        oErr, oMessage;
+
+        oErr = ErrorString[err];
+        oMessage = "Couldn't Add Theme for the Following Reason: " + oErr;
+
+        oBox.Show(oMessage.c_str(), "Add Theme Error", kMessageOk, true);
+    }
+    else
+        UpdateThemeList();
+}
+
+void add_theme_press(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    GTKFileSelector *filesel = new GTKFileSelector("Select a Theme to Add");
+    if (filesel->Run(true)) {
+        char *returnpath = filesel->GetReturnPath();
+        p->AddThemeEvent(returnpath);
+    }
+    delete filesel;
+}
+
+void GTKPreferenceWindow::DeleteThemeEvent(void)
+{
+    map<string, string>::iterator i;
+    int32 iLoop = 0;
+    string themeToDelete;
+
+    for (i = m_oThemeList.begin(); i != m_oThemeList.end(); i++, iLoop++) {
+         if (iLoop == proposedValues.listboxIndex)
+             themeToDelete = (*i).first;
+    }
+    Error err = m_pThemeMan->DeleteTheme(m_oThemeList[themeToDelete]);
+
+    if (IsntError(err)) {
+        MessageDialog oBox(m_pContext);
+        string        oErr, oMessage;
+
+        oErr = ErrorString[err];
+        oMessage = "Couldn't Delete the Theme for Because: " 
+                   + oErr;
+
+        oBox.Show(oMessage.c_str(), "Delete Theme Error", kMessageOk, true);
+    }
+    else
+        UpdateThemeList();
+}
+
+void delete_theme_press(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    p->DeleteThemeEvent();
+}
+
+void GTKPreferenceWindow::UpdateThemeList(void)
+{
+    int iLoop = 0;
+    map<string, string>::iterator i;
+    proposedValues.listboxIndex = 0;
+
+    m_pThemeMan->GetCurrentTheme(originalValues.currentTheme);
+    m_oThemeList.clear();
+
+    m_pThemeMan->GetThemeList(m_oThemeList);
+    for (i = m_oThemeList.begin(); i != m_oThemeList.end(); i++, iLoop++) {
+         char *Text[1];
+         Text[0] = (char *)((*i).first.c_str());
+         gtk_clist_append(GTK_CLIST(themeList), Text);
+         if ((*i).first == originalValues.currentTheme)
+             proposedValues.listboxIndex = currentValues.listboxIndex = iLoop;
+    }
+
+    gtk_clist_select_row(GTK_CLIST(themeList), proposedValues.listboxIndex, 1);
+}
+
+void GTKPreferenceWindow::SetFont()
+{
+    char *font_name = gtk_font_selection_dialog_get_font_name(
+                                         GTK_FONT_SELECTION_DIALOG(fontDialog));
+    if (font_name) {
+        char realfontname[128];
+        char *marker1, *marker2;
+        int length;
+   
+        marker1 = strchr(font_name + 1, '-');
+        marker2 = strchr(marker1 + 1, '-');
+
+        marker1++;
+        length = strlen(marker1) - strlen(marker2);
+
+        strncpy(realfontname, marker1, length);
+        realfontname[length] = '\0';
+        proposedValues.defaultFont = string(realfontname);
+        g_free(font_name);
+    }
+    gtk_widget_destroy(fontDialog);
+}
+
+void font_ok(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    p->SetFont();
+}
+
+void GTKPreferenceWindow::ChooseFont(void)
+{
+    fontDialog = gtk_font_selection_dialog_new("FreeAmp Default Font Selection Dialog");
+    gtk_window_set_position(GTK_WINDOW(fontDialog), GTK_WIN_POS_MOUSE);
+    gtk_window_set_modal(GTK_WINDOW(fontDialog), TRUE);
+
+    gtk_signal_connect(GTK_OBJECT(fontDialog), "destroy",
+                       GTK_SIGNAL_FUNC(gtk_widget_destroyed), &fontDialog);
+    gtk_signal_connect_object(GTK_OBJECT(GTK_FONT_SELECTION_DIALOG(fontDialog)->                              cancel_button), "clicked",
+                              GTK_SIGNAL_FUNC(gtk_widget_destroy), 
+                              GTK_OBJECT(fontDialog));
+    gtk_signal_connect(GTK_OBJECT(GTK_FONT_SELECTION_DIALOG(fontDialog)->
+                       ok_button), "clicked", GTK_SIGNAL_FUNC(font_ok),
+                       this);
+    gtk_widget_show(fontDialog);
+}
+
+void choose_font_press(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    p->ChooseFont();
 }
 
 GtkWidget *GTKPreferenceWindow::CreatePage5(void)
@@ -1027,36 +1162,73 @@ GtkWidget *GTKPreferenceWindow::CreatePage5(void)
     gtk_container_add(GTK_CONTAINER(pane), frame);
     gtk_widget_show(frame);
 
+    GtkWidget *hbox = gtk_hbox_new(FALSE, 5);
+    gtk_container_add(GTK_CONTAINER(frame), hbox);
+    gtk_widget_show(hbox);
+
     GtkWidget *listwindow = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(listwindow),
                                    GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_container_add(GTK_CONTAINER(frame), listwindow);
+    gtk_box_pack_start(GTK_BOX(hbox), listwindow, TRUE, TRUE, 5);
     gtk_widget_set_usize(listwindow, 200, 200);
     gtk_widget_show(listwindow);
 
-    GtkWidget *list = gtk_clist_new(1);
-    gtk_signal_connect(GTK_OBJECT(list), "select_row",
+    themeList = gtk_clist_new(1);
+    gtk_signal_connect(GTK_OBJECT(themeList), "select_row",
                        GTK_SIGNAL_FUNC(theme_click), this);
-    gtk_container_add(GTK_CONTAINER(listwindow), list);
-    gtk_widget_show(list);
+    gtk_container_add(GTK_CONTAINER(listwindow), themeList);
+    gtk_widget_show(themeList);
 
-    int iLoop = 0;
-    map<string, string>::iterator i;
-    proposedValues.listboxIndex = 0;
+    UpdateThemeList();
 
-    m_pThemeMan->GetCurrentTheme(originalValues.currentTheme);
-    m_oThemeList.clear();
+    GtkWidget *vbox = gtk_vbox_new(FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(hbox), vbox, FALSE, FALSE, 5);
+    gtk_widget_show(vbox);
 
-    m_pThemeMan->GetThemeList(m_oThemeList);
-    for (i = m_oThemeList.begin(); i != m_oThemeList.end(); i++, iLoop++) {
-         char *Text[1];
-         Text[0] = (char *)((*i).first.c_str());
-         gtk_clist_append(GTK_CLIST(list), Text);
-         if ((*i).first == originalValues.currentTheme)
-             proposedValues.listboxIndex = currentValues.listboxIndex = iLoop;
-    }
+    GtkWidget *button = gtk_button_new_with_label("Add Theme");
+    gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 5);
+    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                       GTK_SIGNAL_FUNC(add_theme_press), this);
+    gtk_widget_show(button);
 
-    gtk_clist_select_row(GTK_CLIST(list), proposedValues.listboxIndex, 1);
+    button = gtk_button_new_with_label("Delete Theme");
+    gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 5);
+    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                       GTK_SIGNAL_FUNC(delete_theme_press), this);
+    gtk_widget_show(button);
+
+    frame = gtk_frame_new("Default Font");
+    gtk_container_set_border_width(GTK_CONTAINER(frame), 5);
+    gtk_container_add(GTK_CONTAINER(pane), frame);
+    gtk_widget_show(frame);
+
+    vbox = gtk_vbox_new(FALSE, 5);
+    gtk_container_add(GTK_CONTAINER(frame), vbox);
+    gtk_widget_show(vbox);
+
+    GtkWidget *textlabel = gtk_label_new(NULL);
+    gtk_label_set_line_wrap(GTK_LABEL(textlabel), TRUE);
+    gtk_label_set_text(GTK_LABEL(textlabel), "A theme may specify a font type that is not installed on your system.  The default font will by substituted in place of the missing font.");
+    gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_LEFT);
+    gtk_box_pack_start(GTK_BOX(vbox), textlabel, FALSE, FALSE, 5);
+    gtk_widget_show(textlabel);
+
+    hbox = gtk_hbox_new(FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 5);
+    gtk_widget_show(hbox);
+
+    textlabel = gtk_label_new(NULL);
+    gtk_label_set_line_wrap(GTK_LABEL(textlabel), TRUE);
+    gtk_label_set_text(GTK_LABEL(textlabel), "Note: Only the font name will be used.  The font will appear in the style specified in the theme.");
+    gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_LEFT);
+    gtk_box_pack_start(GTK_BOX(hbox), textlabel, FALSE, FALSE, 5);
+    gtk_widget_show(textlabel);
+
+    button = gtk_button_new_with_label("Choose Font");
+    gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 5);
+    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                       GTK_SIGNAL_FUNC(choose_font_press), this);
+    gtk_widget_show(button);
 
     return pane;
 }

@@ -166,11 +166,21 @@ class GTKPreferenceWindow : public PreferenceWindow
 
       GtkWidget *pmoMenu;
 
+      GtkWidget *themeList;
+
+      GtkWidget *fontDialog;
+
   public:
       GtkWidget *mainWindow;
       GtkWidget *pmoOptionMenu;
 
       int32 numPMOs;
+
+      void UpdateThemeList(void);
+      void AddThemeEvent(const char *newpath);
+      void DeleteThemeEvent(void);
+      void ChooseFont(void);
+      void SetFont(void);
 
       void ApplyInfo(void);
       void CancelInfo(void);
