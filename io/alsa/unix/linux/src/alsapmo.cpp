@@ -542,7 +542,10 @@ void AlsaPMO::WorkerThread(void)
           break;
       }
       if (m_bExit)
+      {
+          m_pInputBuffer->EndRead(0);
           return;
+      }
 
       if (m_bPause)
       {
