@@ -75,11 +75,9 @@ END
 
 IDB_DIALS               BITMAP  DISCARDABLE     "dials.bmp"
 IDB_CONTROL_MASK_MID    BITMAP  DISCARDABLE     "control_mask_mid.bmp"
-IDB_RIGHT               BITMAP  DISCARDABLE     "rightside.bmp"
 IDB_BIG_FONT            BITMAP  DISCARDABLE     "big_font.bmp"
 IDB_SMALL_FONT          BITMAP  DISCARDABLE     "small_font.bmp"
 IDB_LOGO                BITMAP  DISCARDABLE     "logo.bmp"
-IDB_RIGHT_256           BITMAP  DISCARDABLE     "rightside256.bmp"
 IDB_DIALS_256           BITMAP  DISCARDABLE     "dials256.bmp"
 IDB_SMALL_FONT_256      BITMAP  DISCARDABLE     "small_font256.bmp"
 IDB_LOGO_256            BITMAP  DISCARDABLE     "logo256.bmp"
