@@ -2588,11 +2588,6 @@ RetrieveMetaDataNow(PlaylistItem* item)
                 mdf->ReadMetaData(item->URL().c_str(), &metadata);
         }
 
-        FAMetaUnit faTemp(&metadata, item->URL().c_str());
-        int nRes = m_context->aps->APSFillMetaData(&faTemp);
-        if (nRes == 0)
-            faTemp.GetMetaData(&metadata);
-
         item->SetMetaData(&metadata);
         item->SetState(kPlaylistItemState_Normal);
     }
