@@ -63,6 +63,7 @@ class Window
       void    Keystroke(unsigned char cKey);
       bool    MenuCommand(uint32 uCommand);
       void    VolumeChanged(void);
+	  void    EnableTimer(bool bEnable);
 
       virtual void SetStayOnTop(bool bStay);
       virtual void SetLiveInToolbar(bool bLive);
@@ -142,7 +143,7 @@ class Window
       bool                      m_bIsVulcanMindMeldHost;
       Rect                      m_oMoveStart;
 	  int32                     m_iDesktopWidth, m_iDesktopHeight;
-	  bool                      m_bMindMeldInProgress;
+	  bool                      m_bMindMeldInProgress, m_bTimerEnabled;
 };
 
 #endif

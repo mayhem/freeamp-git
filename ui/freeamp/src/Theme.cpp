@@ -190,6 +190,9 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
     Error    eRet;
     struct   _stat buf;
 
+    if (m_pWindow)
+       m_pWindow->EnableTimer(false);
+
     if (_stat(oFile.c_str(), &buf) == 0 && (buf.st_mode & _S_IFDIR))
     {
         SetThemePath(oFile);
@@ -348,6 +351,9 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
        }   
        m_bThemeLoaded = true;
     }   
+
+    if (m_pWindow)
+       m_pWindow->EnableTimer(true);
        
     return eRet;
 }

@@ -415,6 +415,8 @@ Error Win32Window::VulcanMindMeld(Window *pOther)
     m_pMindMeldMutex->Acquire();
     m_bMindMeldInProgress = true;
 
+    KillTimer(m_hWnd, 0);
+
 	oRect.x1 = oRect.x2 = oRect.y1 = oRect.y2 = 0;
 	GetWindowPosition(oRect);
     sRect.left = oRect.x1;
@@ -433,6 +435,7 @@ Error Win32Window::VulcanMindMeld(Window *pOther)
     if (IsError(eRet))
     {
        m_bMindMeldInProgress = false;
+       SetTimer(m_hWnd, 0, 250, NULL);
        return eRet;
     }   
 
@@ -456,6 +459,7 @@ Error Win32Window::VulcanMindMeld(Window *pOther)
         UpdateWindow(m_hWnd);
     }    
 
+    SetTimer(m_hWnd, 0, 250, NULL);
     m_bMindMeldInProgress = false;
 
     return kError_NoErr;
@@ -482,6 +486,9 @@ void Win32Window::Paint(void)
 
 void Win32Window::TimerEvent(void)
 {
+    if (!m_bTimerEnabled)
+       return;
+       
     if (m_bMindMeldInProgress)
        return;
        

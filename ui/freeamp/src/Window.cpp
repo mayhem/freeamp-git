@@ -571,7 +571,7 @@ void Window::TimerEvent(void)
 {
     vector<Control *>::iterator i;
 
-    if (m_bMindMeldInProgress)
+    if (m_bMindMeldInProgress || !m_bTimerEnabled)
        return;
 
     for(i = m_oControls.begin(); i != m_oControls.end(); i++)
@@ -580,6 +580,11 @@ void Window::TimerEvent(void)
             (*i)->AcceptTransition(CT_Timer);
     }        
 }
+
+void Window::EnableTimer(bool bEnable)
+{
+    m_bTimerEnabled = bEnable;
+}  
 
 void Window::SetStayOnTop(bool bStay)
 {

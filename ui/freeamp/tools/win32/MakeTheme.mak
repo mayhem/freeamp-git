@@ -33,9 +33,6 @@ NULL=
 NULL=nul
 !ENDIF 
 
-CPP=cl.exe
-RSC=rc.exe
-
 !IF  "$(CFG)" == "MakeTheme - Win32 Release"
 
 OUTDIR=.\Release
@@ -75,12 +72,45 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
+CPP=cl.exe
 CPP_PROJ=/nologo /ML /W3 /GX /O2 /I "../../include" /I\
  "../../../../lib/zlib/include" /I "../../../../config" /I\
  "../../../../base/include" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS"\
  /Fp"$(INTDIR)\MakeTheme.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
+
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\MakeTheme.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\MakeTheme.bsc" 
@@ -121,9 +151,9 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : ".\MakeTheme.exe"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                   ..\..\..\..\base\win32\prj\tools
-	copy MakeTheme.exe    ..\..\..\..\base\win32\prj\tools
-	copy ..\..\howto\ThemeHowTo.txt    ..\..\..\..\base\win32\prj\tools
+   IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                    ..\..\..\..\base\win32\prj\tools
+	copy MakeTheme.exe     ..\..\..\..\base\win32\prj\tools
+	copy ..\..\howto\ThemeHowTo.txt     ..\..\..\..\base\win32\prj\tools
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 Debug"
@@ -168,12 +198,45 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
+CPP=cl.exe
 CPP_PROJ=/nologo /MLd /W3 /Gm /GX /Zi /Od /I "../../include" /I\
  "../../../../lib/zlib/include" /I "../../../../config" /I\
  "../../../../base/include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS"\
  /Fp"$(INTDIR)\MakeTheme.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
+
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\MakeTheme.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\MakeTheme.bsc" 
@@ -215,9 +278,9 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : ".\MakeTheme.exe"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                   ..\..\..\..\base\win32\prj\tools
-	copy MakeTheme.exe    ..\..\..\..\base\win32\prj\tools
-	copy ..\..\howto\ThemeHowTo.txt    ..\..\..\..\base\win32\prj\tools
+   IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                    ..\..\..\..\base\win32\prj\tools
+	copy MakeTheme.exe     ..\..\..\..\base\win32\prj\tools
+	copy ..\..\howto\ThemeHowTo.txt     ..\..\..\..\base\win32\prj\tools
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Debug"
@@ -262,12 +325,45 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
+CPP=cl.exe
 CPP_PROJ=/nologo /MLd /W3 /Gm /GX /Zi /Od /I "../../include" /I\
  "../../../../lib/zlib/include" /I "../../../../config" /I\
  "../../../../base/include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS"\
  /Fp"$(INTDIR)\MakeTheme.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
+
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\MakeTheme.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\MakeTheme.bsc" 
@@ -309,9 +405,9 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : ".\MakeTheme.exe"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                   ..\..\..\..\base\win32\prj\tools
-	copy MakeTheme.exe    ..\..\..\..\base\win32\prj\tools
-	copy ..\..\howto\ThemeHowTo.txt    ..\..\..\..\base\win32\prj\tools
+   IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                    ..\..\..\..\base\win32\prj\tools
+	copy MakeTheme.exe     ..\..\..\..\base\win32\prj\tools
+	copy ..\..\howto\ThemeHowTo.txt     ..\..\..\..\base\win32\prj\tools
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Release"
@@ -353,12 +449,45 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
+CPP=cl.exe
 CPP_PROJ=/nologo /ML /W3 /GX /O2 /I "../../include" /I\
  "../../../../lib/zlib/include" /I "../../../../config" /I\
  "../../../../base/include" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS"\
  /Fp"$(INTDIR)\MakeTheme.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
+
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\MakeTheme.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\MakeTheme.bsc" 
@@ -399,42 +528,12 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : ".\MakeTheme.exe"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                   ..\..\..\..\base\win32\prj\tools
-	copy MakeTheme.exe    ..\..\..\..\base\win32\prj\tools
-	copy ..\..\howto\ThemeHowTo.txt    ..\..\..\..\base\win32\prj\tools
+   IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                    ..\..\..\..\base\win32\prj\tools
+	copy MakeTheme.exe     ..\..\..\..\base\win32\prj\tools
+	copy ..\..\howto\ThemeHowTo.txt     ..\..\..\..\base\win32\prj\tools
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
 
 
 !IF "$(CFG)" == "MakeTheme - Win32 Release" || "$(CFG)" ==\
@@ -546,28 +645,28 @@ SOURCE=..\..\..\..\config\config.win32
 
 InputPath=..\..\..\..\config\config.win32
 
-"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 Debug"
 
 InputPath=..\..\..\..\config\config.win32
 
-"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Debug"
 
 InputPath=..\..\..\..\config\config.win32
 
-"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Release"
 
 InputPath=..\..\..\..\config\config.win32
 
-"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ENDIF 
@@ -1174,10 +1273,8 @@ DEP_CPP_MAKET=\
 
 DEP_CPP_MAKET=\
 	"..\..\..\..\base\include\errors.h"\
-	"..\..\include\ThemeZip.h"\
-	
-NODEP_CPP_MAKET=\
 	"..\..\..\..\config\config.h"\
+	"..\..\include\ThemeZip.h"\
 	
 
 "$(INTDIR)\MakeTheme.obj" : $(SOURCE) $(DEP_CPP_MAKET) "$(INTDIR)"\
@@ -1246,12 +1343,10 @@ DEP_CPP_THEME=\
 DEP_CPP_THEME=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\include\ThemeZip.h"\
-	
-NODEP_CPP_THEME=\
-	"..\..\..\..\config\config.h"\
 	
 
 "$(INTDIR)\ThemeZip.obj" : $(SOURCE) $(DEP_CPP_THEME) "$(INTDIR)"\
