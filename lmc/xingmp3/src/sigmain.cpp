@@ -41,6 +41,7 @@ ____________________________________________________________________________*/
 #include "plm/metadata/id3v1/id3v1.h"
 #include "plm/metadata/id3v2/id3v2.h"
 #include "musicbrainz/mb_c.h"
+#include "sigmp3.h"
 
 extern "C"
 {
@@ -101,9 +102,34 @@ Error URLToFilePath(const char* url, char* path, uint32* length)
 
 bool get_metadata(char *file, MetaData *m)
 {
-   ID3v1    id31(NULL);
-   ID3v2    id3(NULL); // NULL means we can't call the WriteMetaData function
-   string   url("file://");
+   ID3v1           id31(NULL);
+   ID3v2           id3(NULL);
+   string          url("file://");
+   FILE           *source;
+   unsigned char   buffer[4096];
+   int             bytes;
+   mp3_info        mcontext;
+
+   source = fopen(file, "rb");
+   if (source == NULL)
+      return false;
+
+   mp3_init(&mcontext);
+
+   fseek(source, 0, SEEK_SET);
+   for(;;)
+   {
+       bytes = fread(buffer, 1, 4096, source);
+       if (bytes <= 0)
+       {
+          break;
+       }
+       mp3_update(&mcontext, buffer, bytes);
+   }   
+   mp3_final(&mcontext);
+
+   if (mcontext.duration > 0)
+      m->SetTime(mcontext.duration);
 
    url += string(file);
    id31.ReadMetaData(url.c_str(), m);
@@ -134,7 +160,8 @@ void submit_metadata(MetaData *pmetaData)
    }
 
    o = mb_New();
-   mb_SetServer(o, MUSICBRAINZ_SERVER, MUSICBRAINZ_PORT);
+   //mb_SetServer(o, MUSICBRAINZ_SERVER, MUSICBRAINZ_PORT);
+   mb_SetServer(o, "musicbrainz.eorbit.net", MUSICBRAINZ_PORT);
 
    args[0] = strdup(pmetaData->Title().c_str());
    args[1] = strdup(pmetaData->GUID().c_str());
