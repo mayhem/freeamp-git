@@ -415,7 +415,7 @@ Error HttpInput::GetHostByName(char *szHostName, struct hostent *pResult)
 Error HttpInput::Open(void)
 {
     char                szHostName[iMaxHostNameLen+1], *szFile, *szQuery;
-    char                szLocalName[iMaxHostNameLen+1], *pEnd;
+    char                *pEnd;
     char               *pInitialBuffer, szSourceAddr[100];
     char               *szStreamName, *szStreamUrl;
     unsigned            iPort;
@@ -541,7 +541,6 @@ Error HttpInput::Open(void)
     if (m_bExit)
         return (Error)kError_Interrupt;
 
-    gethostname(szLocalName, iMaxHostNameLen);    
     szQuery = new char[iMaxUrlLen];
 
     if (szFile)
@@ -550,14 +549,14 @@ Error HttpInput::Open(void)
                          "Accept: */*\r\n" 
                          "icy-metadata:1\r\n" 
                          "User-Agent: FreeAmp/%s\r\n", 
-                         szFile, szLocalName, FREEAMP_VERSION);
+                         szFile, szHostName, FREEAMP_VERSION);
     else
         sprintf(szQuery, "GET / HTTP/1.0\r\n"
                          "Host: %s\r\n"
                          "Accept: */*\r\n" 
                          "icy-metadata:1\r\n" 
                          "User-Agent: FreeAmp/%s\r\n", 
-                         szLocalName, FREEAMP_VERSION);
+                         szHostName, FREEAMP_VERSION);
 
     m_pContext->prefs->GetPrefBoolean(kUseTitleStreamingPref, &bUseTitleStreaming);
     if (bUseTitleStreaming)
