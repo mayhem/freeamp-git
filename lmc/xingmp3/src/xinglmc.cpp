@@ -627,14 +627,14 @@ Error XingLMC::InitDecoder()
          info->bits_per_sample = decinfo.bits;
          info->number_of_channels = decinfo.channels;
          info->samples_per_second = decinfo.samprate;
-         m_iMaxWriteSize = (info->number_of_channels * 
-			                (decinfo.bits / 8) * 1152);
 
-//		 if (decinfo.samprate < 44100)
-//			    m_iMaxWriteSize = 1152;
+		 if (m_sMpegHead.id)
+             m_iMaxWriteSize = (info->number_of_channels * 
+	    		               (decinfo.bits / 8) * 1152);
+		 else
+             m_iMaxWriteSize = (info->number_of_channels * 
+	    		               (decinfo.bits / 8) * 576);
 
-//		 Debug_v("CH: %d BT: %d", decinfo.channels, decinfo.bits);
-//		 Debug_v("Data unit size: %d", m_iMaxWriteSize);
          info->max_buffer_size = m_iMaxWriteSize;
 
          pEvent = new PMOInitEvent(info);
@@ -802,20 +802,6 @@ void XingLMC::DecodeWork()
           x.in_bytes = 0;
           iOutBytesNeeded = m_iMaxWriteSize;
           Err = m_output->BeginWrite(pOutBuffer, iOutBytesNeeded);
-//		  if (Err == kError_BufferTooSmall)
-//		  {
-//			  usleep(10000);
-//			  iLoop--;
-//			  continue;
-//		  }
-//		  if (Err == kError_NoErr && iOutBytesNeeded < m_iMaxWriteSize)
-//		  {
-//			  m_output->EndWrite(0);
-//			  usleep(10000);
-//			  iLoop--;
-//			  continue;
-//		  }
-
           if (Err == kError_Interrupt)
              break;
 
@@ -844,7 +830,7 @@ void XingLMC::DecodeWork()
           x = m_audioMethods.decode((unsigned char *)pBuffer, 
                                     (short *)pOutBuffer);
           if (x.in_bytes == 0)
-			 {
+		  {
              if (m_input)
                  m_input->EndRead(x.in_bytes);
              if (m_output)
@@ -1051,7 +1037,7 @@ ChangePosition(int32 position)
    m_output->Clear();
 
    m_input->Seek(dummy, position * m_frameBytes, SEEK_FROM_START);
-	m_frameCounter = position;
+   m_frameCounter = position;
 
    m_output->Resume();
 
