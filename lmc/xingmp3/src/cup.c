@@ -169,7 +169,7 @@ void sbt_dual(float *sample, short *pcm, int n);
 static SBT_FUNCTION sbt = sbt_mono;
 
 
-typedef IN_OUT(*AUDIO_DECODE_ROUTINE) (void *bitstream, void *pcm);
+typedef IN_OUT(*AUDIO_DECODE_ROUTINE) (unsigned char *bs, signed short *pcm);
 IN_OUT L2audio_decode(unsigned char *bs, signed short *pcm);
 static AUDIO_DECODE_ROUTINE audio_decode_routine = L2audio_decode;
 
@@ -323,28 +323,28 @@ static void unpack_sf()		/* unpack scale factor */
    }				/* end switch */
 }
 /*-------------------------------------------------------------------------*/
-#define UNPACK_N(n) s[k]     =  cs_factor[i][k]*(load(n)-((1 << n-1) -1));   \
-    s[k+64]  =  cs_factor[i][k]*(load(n)-((1 << n-1) -1));   \
-    s[k+128] =  cs_factor[i][k]*(load(n)-((1 << n-1) -1));   \
+#define UNPACK_N(n) s[k]     =  cs_factor[i][k]*(load(n)-((1 << (n-1)) -1));   \
+    s[k+64]  =  cs_factor[i][k]*(load(n)-((1 << (n-1)) -1));   \
+    s[k+128] =  cs_factor[i][k]*(load(n)-((1 << (n-1)) -1));   \
     goto dispatch;
 #define UNPACK_N2(n) mac_load_check(3*n);                                         \
-    s[k]     =  cs_factor[i][k]*(mac_load(n)-((1 << n-1) -1));   \
-    s[k+64]  =  cs_factor[i][k]*(mac_load(n)-((1 << n-1) -1));   \
-    s[k+128] =  cs_factor[i][k]*(mac_load(n)-((1 << n-1) -1));   \
+    s[k]     =  cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1));   \
+    s[k+64]  =  cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1));   \
+    s[k+128] =  cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1));   \
     goto dispatch;
 #define UNPACK_N3(n) mac_load_check(2*n);                                         \
-    s[k]     =  cs_factor[i][k]*(mac_load(n)-((1 << n-1) -1));   \
-    s[k+64]  =  cs_factor[i][k]*(mac_load(n)-((1 << n-1) -1));   \
+    s[k]     =  cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1));   \
+    s[k+64]  =  cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1));   \
     mac_load_check(n);                                           \
-    s[k+128] =  cs_factor[i][k]*(mac_load(n)-((1 << n-1) -1));   \
+    s[k+128] =  cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1));   \
     goto dispatch;
-#define UNPACKJ_N(n) tmp        =  (load(n)-((1 << n-1) -1));                 \
+#define UNPACKJ_N(n) tmp        =  (load(n)-((1 << (n-1)) -1));                \
     s[k]       =  cs_factor[i][k]*tmp;                       \
     s[k+1]     =  cs_factor[i][k+1]*tmp;                     \
-    tmp        =  (load(n)-((1 << n-1) -1));                 \
+    tmp        =  (load(n)-((1 << (n-1)) -1));                 \
     s[k+64]    =  cs_factor[i][k]*tmp;                       \
     s[k+64+1]  =  cs_factor[i][k+1]*tmp;                     \
-    tmp        =  (load(n)-((1 << n-1) -1));                 \
+    tmp        =  (load(n)-((1 << (n-1)) -1));                 \
     s[k+128]   =  cs_factor[i][k]*tmp;                       \
     s[k+128+1] =  cs_factor[i][k+1]*tmp;                     \
     k++;       /* skip right chan dispatch */                \

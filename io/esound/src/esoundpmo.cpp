@@ -33,17 +33,13 @@ ____________________________________________________________________________*/
 /* project headers */
 #include <config.h>
 #include "esoundpmo.h"
+#include "lmc.h"
 #include "eventdata.h"
 #include "facontext.h"
 #include "log.h"
 
 #define PIECES 50
-#define DB //printf("%s:%d\n", __FILE__, __LINE__);
-
-const int iDefaultBufferSize = 512 * 1024;
-const int iOrigBufferSize = 64 * 1024;
-const int iOverflowSize = 0;
-const int iWriteTriggerSize = 8 * 1024;
+#define DB printf("%s:%d\n", __FILE__, __LINE__);
 
 extern    "C"
 {
@@ -54,8 +50,7 @@ extern    "C"
 }
 
 EsounDPMO::EsounDPMO(FAContext *context) :
-              EventBuffer(iOrigBufferSize, iOverflowSize,
-			  iWriteTriggerSize, context)
+        PhysicalMediaOutput(context)
 {
    m_properlyInitialized = false;
 
@@ -64,12 +59,12 @@ EsounDPMO::EsounDPMO(FAContext *context) :
 
    m_pBufferThread = NULL;
 
-   m_pPauseMutex = new Mutex();
    m_iOutputBufferSize = 0;
    m_iTotalBytesWritten = 0;
    m_iBytesPerSample = 0;
    m_iLastFrame = -1;
    m_iDataSize = 0;
+   audio_fd = -1;
 
    if (!m_pBufferThread)
    {
@@ -82,9 +77,8 @@ EsounDPMO::EsounDPMO(FAContext *context) :
 EsounDPMO::~EsounDPMO()
 {
    m_bExit = true;
-   m_pWriteSem->Signal();
-   m_pReadSem->Signal();
-   m_pPauseMutex->Release();
+   m_pSleepSem->Signal();   
+   m_pPauseSem->Signal();
 
    if (m_pBufferThread)
    {
@@ -92,14 +86,7 @@ EsounDPMO::~EsounDPMO()
       delete m_pBufferThread;
    }
 
-   if (m_pPauseMutex)
-   {
-      delete m_pPauseMutex;
-      m_pPauseMutex = NULL;
-   }
-
-   esd_close(audio_fd);
-   audio_fd = -1;
+   close(audio_fd);
 
    if (myInfo)
    {
@@ -111,63 +98,11 @@ EsounDPMO::~EsounDPMO()
 
 VolumeManager *EsounDPMO::GetVolumeManager()
 {
-   return new ESDVolumeManager();
-}
-
-void EsounDPMO::WaitToQuit()
-{
-   if (m_pBufferThread)
-   {
-      m_pBufferThread->Join();
-      delete m_pBufferThread;
-      m_pBufferThread = NULL;
-   }
-}
-
-Error EsounDPMO::SetPropManager(Properties * p)
-{
-   m_propManager = p;
-   return kError_NoErr;
-}
-
-int EsounDPMO::GetBufferPercentage()
-{
-   return PullBuffer::GetBufferPercentage();
-}
-
-int EsounDPMO::audio_fd = -1;
-
-Error EsounDPMO::Pause()
-{
-   //printf("Got pause\n");
-   m_pPauseMutex->Acquire();
-   //printf("Got pause mutex\n");
-
-   if (m_properlyInitialized)
-       Reset(true);
-}
-
-Error EsounDPMO::Resume()
-{
-   m_pPauseMutex->Release();
-
-   return kError_NoErr;
-}
-
-Error EsounDPMO::Break()
-{
-   m_bExit = true;
-   PullBuffer::BreakBlocks();
-
-   return kError_NoErr;
+   return new ESDVolumeManager(audio_fd);
 }
 
 Error EsounDPMO::Init(OutputInfo * info)
 {
-   PropValue *pProp;
-   int        iNewSize = iDefaultBufferSize;
-   Error      result;
-
    m_properlyInitialized = false;
 
    if (!info)
@@ -179,33 +114,13 @@ Error EsounDPMO::Init(OutputInfo * info)
       // got info, so this is the beginning...
 
       m_iDataSize = info->max_buffer_size;
-
-      m_context->prefs->GetOutputBufferSize(&iNewSize);
-      iNewSize *= 1024;
-
-      iNewSize -= iNewSize % m_iDataSize;
-      result = Resize(iNewSize, 0, m_iDataSize);
-      if (IsError(result))
-      {
-         ReportError("Internal buffer sizing error occurred.");
-         m_context->log->Error("Resize output buffer failed.");
-         return result;
-      }
    }
-
-   int       fd = audio_fd;
-   int       flags;
 
    channels = info->number_of_channels;
 
-   for (int i = 0; i < info->number_of_channels; ++i)
-      bufferp[i] = buffer + i;
-
    // configure the device:
-   int       play_sample_rate = info->samples_per_second;
+   int       esd_format = ESD_STREAM | ESD_PLAY | ESD_BITS16;
 
-   int       esd_format = 0;
-   esd_format |= ESD_BITS16;
    if (info->number_of_channels == 2)
       esd_format |= ESD_STEREO;
    else if (info->number_of_channels == 1)
@@ -230,7 +145,7 @@ Error EsounDPMO::Init(OutputInfo * info)
    myInfo->max_buffer_size = info->max_buffer_size;
    m_properlyInitialized = true;
 
-   m_iOutputBufferSize = iDefaultBufferSize; // arbitrary
+   m_iOutputBufferSize = ESD_BUF_SIZE; 
    m_iBytesPerSample = info->number_of_channels * (info->bits_per_sample / 8);
 
    return kError_NoErr;
@@ -239,26 +154,6 @@ Error EsounDPMO::Init(OutputInfo * info)
 Error EsounDPMO::Reset(bool user_stop)
 {
    return kError_NoErr;
-}
-
-Error EsounDPMO::BeginWrite(void *&pBuffer, size_t &iBytesToWrite)
-{
-   return EventBuffer::BeginWrite(pBuffer, iBytesToWrite);
-}
-
-Error EsounDPMO::EndWrite(size_t iNumBytesWritten)
-{
-   return EventBuffer::EndWrite(iNumBytesWritten);
-}
-
-Error EsounDPMO::AcceptEvent(Event *pEvent)
-{
-   return EventBuffer::AcceptEvent(pEvent);
-}
-
-Error EsounDPMO::Clear()
-{
-   return EventBuffer::Clear();
 }
 
 void EsounDPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
@@ -277,8 +172,10 @@ void EsounDPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
    if (myInfo->samples_per_second <= 0 || pEvent->GetFrameNumber() < 3)
       return;
 
-    // should take into account what is in the esd buffers
-   iTotalTime = m_iTotalBytesWritten / (m_iBytesPerSample * myInfo->samples_per_second);
+    // This should take into account what is in the esd buffers, but the
+    // esd buffers are virtually nothing, so it's all basically been played
+   iTotalTime = m_iTotalBytesWritten / 
+      (m_iBytesPerSample * myInfo->samples_per_second);
 
    hours = iTotalTime / 3600;
    minutes = (iTotalTime / 60) % 60;
@@ -291,7 +188,7 @@ void EsounDPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
 
    pmtpi = new MediaTimeInfoEvent(hours, minutes, seconds, 0, 
                                   iTotalTime, 0);
-   m_target->AcceptEvent(pmtpi);
+   m_pTarget->AcceptEvent(pmtpi);
 }
 
 void EsounDPMO::StartWorkerThread(void *pVoidBuffer)
@@ -302,12 +199,16 @@ void EsounDPMO::StartWorkerThread(void *pVoidBuffer)
 void EsounDPMO::WorkerThread(void)
 {
    void       *pBuffer;
-   size_t      iToCopy, iCopied;
    Error       eErr;
    size_t      iRet;
    Event      *pEvent;
-   OutputInfo *pInfo;
    bool           bPerfWarn = false;
+
+   // Don't do anything until resume is called
+   m_pPauseSem->Wait();
+
+   // Wait a specified prebuffer time...
+   PreBuffer();
 
    // The following should be abstracted out into the general thread
    // classes:
@@ -320,13 +221,22 @@ void EsounDPMO::WorkerThread(void)
 
    for(; !m_bExit;)
    {
+      if (m_bPause)
+      {
+          m_pPauseSem->Wait();
+          continue;
+      }
+
+      // Loop until we get an Init event from the LMC
       if (!m_properlyInitialized)
       {
-          pEvent = GetEvent();
+          pEvent = ((EventBuffer *)m_pInputBuffer)->GetEvent();
 
           if (pEvent == NULL)
           {
-              m_pReadSem->Wait();
+              m_pLmc->Wake();
+              WasteTime();
+
               continue;
           }
 
@@ -342,128 +252,87 @@ void EsounDPMO::WorkerThread(void)
 
           continue;
       }
- 
-      iToCopy = m_iDataSize;
 
-      m_pPauseMutex->Acquire();
-
-      eErr = BeginRead(pBuffer, iToCopy);
-      if (eErr == kError_InputUnsuccessful || eErr == kError_NoDataAvail ||
-          iToCopy < m_iDataSize)
+      for(;;)
       {
-          if (!bPerfWarn)
+          eErr = ((EventBuffer *)m_pInputBuffer)->BeginRead(pBuffer, 
+                                                            m_iDataSize);
+          if (eErr == kError_EndOfStream || eErr == kError_Interrupt)
+             break;
+      
+          if (eErr == kError_NoDataAvail)
           {
-              time_t t;
+             m_pLmc->Wake();
 
-              time(&t);
-              m_context->log->Log(LogPerf, "Output buffer underflow: %s", 
-                         ctime(&t));
-              bPerfWarn = true;
-          }
+             if (!bPerfWarn)
+             {
+                 time_t t;
 
-          EndRead(0);
-          m_pPauseMutex->Release();
-          m_pReadSem->Wait();
-          continue;
-      }
-      if (eErr == kError_Interrupt)
-      {
-          m_pPauseMutex->Release();
-          break;
-      }
-          
-      if (eErr == kError_EventPending)
-      {
-          m_pPauseMutex->Release();
+                 time(&t);
+                 m_pContext->log->Log(LogPerf, "Output buffer underflow: %s", 
+                           ctime(&t));
+                 bPerfWarn = true;
+             }
 
-          pEvent = GetEvent();
+             WasteTime();
+             continue;
+         }
+         
+         // Is there an event pending that we need to take care of
+         // before we play this block of samples? 
+         if (eErr == kError_EventPending)
+         {
+             pEvent = ((EventBuffer *)m_pInputBuffer)->GetEvent();
 
-          if (pEvent->Type() == PMO_Init)
-              Init(((PMOInitEvent *)pEvent)->GetInfo());
+             if (pEvent->Type() == PMO_Init)
+                 Init(((PMOInitEvent *)pEvent)->GetInfo());
 
-          if (pEvent->Type() == PMO_Reset)
-              Reset(false);
+             if (pEvent->Type() == PMO_Info) 
+                HandleTimeInfoEvent((PMOTimeInfoEvent *)pEvent);
 
-          if (pEvent->Type() == PMO_Info) 
-              HandleTimeInfoEvent((PMOTimeInfoEvent *)pEvent);
+             if (pEvent->Type() == PMO_Quit) 
+             {
+                 delete pEvent;
+                 m_pTarget->AcceptEvent(new Event(INFO_DoneOutputting));
+              
+                 return;
+             }
+  
+             delete pEvent;
 
-          if (pEvent->Type() == PMO_Quit) 
-          {
-              Reset(false);
-              delete pEvent;
-              break;
-          }
- 
-          delete pEvent;
+             continue;
+         }
 
-          continue;
-      }
-          
-      if (IsError(eErr))
-      {
-          m_pPauseMutex->Release();
-
-          ReportError("Internal error occured.");
-          m_context->log->Error("Cannot read from buffer in PMO worker tread: %d\n",
-              eErr);
-          break;
-      }
-      bPerfWarn = false;
-
-      iCopied = 0;
-      do
-      {
-/*          ioctl(audio_fd, SNDCTL_DSP_GETOSPACE, &info);
-          if (info.fragments * info.fragsize < iToCopy)
-          {
-              EndRead(0);
-              m_pPauseMutex->Release();
-
-              usleep(10000);
-
-              for(;!m_bExit;)
-                 if (m_pPauseMutex->Acquire(10000))
-                     break;
-              if (m_bExit)
-                 iToCopy = 0;
-
-              // If beginread returns an error, break out...
-              if (BeginRead(pBuffer, iToCopy) != kError_NoErr)
-                 iToCopy = 0;
-
-              continue;
-          }
-*/          
-          iRet = write(audio_fd, pBuffer, iToCopy);
-          if (iRet > 0)
-          {
-              pBuffer = ((char *)pBuffer + iRet);
-              iCopied += iRet;
-              m_iTotalBytesWritten += iRet;
-          }
-      }
-      while (iCopied < iToCopy && (errno == EINTR || errno == 0));
-
-      // Was iToCopy set to zero? If so, we got cleared and should
-      // start from the top
-      if (iToCopy == 0)
-      {
-         m_pPauseMutex->Release();
-         continue;
-      }
-
-      if (iCopied < iToCopy)
-      {
-         EndRead(0);
-         m_pPauseMutex->Release();
-         ReportError("Could not write sound data to the soundcard.");
-         m_context->log->Error("Failed to write to the soundcard: %s\n", strerror(errno))
-;
+         if (IsError(eErr))
+         {
+             ReportError("Internal error occured.");
+             m_pContext->log->Error("Cannot read from buffer in PMO "
+                                  "worker tread: %d\n", eErr);
+             break;
+         }
+         bPerfWarn = false;
          break;
       }
-      EndRead(iCopied);
+  
+      if (m_bExit || m_bPause)
+      {
+          m_pInputBuffer->EndRead(0);
+          continue;
+      }
 
-      m_pPauseMutex->Release();
+      iRet = write(audio_fd, pBuffer, m_iDataSize);
+      if (iRet < 0) 
+      {
+          m_pInputBuffer->EndRead(0);
+          ReportError("Could not write sound data to EsounD.");
+          m_pContext->log->Error("Failed to write to EsounD: %s\n",
+                                strerror(errno));
+          break; 
+      }
+
+      m_iTotalBytesWritten += iRet;
+      m_pInputBuffer->EndRead(iRet);
+      m_pLmc->Wake();
    }
 }
-
+  

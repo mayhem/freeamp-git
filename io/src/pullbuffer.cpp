@@ -395,7 +395,7 @@ Error PullBuffer::BeginRead(void *&pBuffer, size_t iBytesNeeded)
    } 
    if (m_iOverflowSize != 0 && iOverflow > 0)
    {
-       assert(m_iOverflowSize >= iOverflow);
+       assert(m_iOverflowSize >= (size_t)iOverflow);
        memcpy(m_pPullBuffer + m_iBufferSize, m_pPullBuffer, iOverflow);
    }
 

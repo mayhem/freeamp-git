@@ -145,9 +145,11 @@ void dequant(SAMPLE Sample[], int *nsamp,
       }
    }
 /* fill in cb_info -- */
+   /* This doesn't seem used anywhere...
    cb_info->lb_type = gr->block_type;
    if (gr->block_type == 2)
       cb_info->lb_type;
+   */
    cb_info->cbs0 = cbs0;
    cb_info->ncbl = ncbl;
 

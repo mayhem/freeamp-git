@@ -110,7 +110,7 @@ Error FreeAmpUI::Init(int32 startup_type)
     }
 
     XSizeHints *size_hints;
-    XIconSize *size_list;
+    // XIconSize *size_list;
     XWMHints *wm_hints;
     XClassHint *class_hints;
     int32 display_depth;

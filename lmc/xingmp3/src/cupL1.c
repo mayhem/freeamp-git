@@ -85,9 +85,9 @@ static void unpack_sfL1(void)	/* unpack scale factor */
 /*-- done --*/
 }
 /*-------------------------------------------------------------------------*/
-#define UNPACKL1_N(n) s[k]     =  cs_factorL1[k]*(load(n)-((1 << n-1) -1));    \
+#define UNPACKL1_N(n) s[k]     =  cs_factorL1[k]*(load(n)-((1 << (n-1)) -1));  \
     goto dispatch;
-#define UNPACKL1J_N(n) tmp        =  (load(n)-((1 << n-1) -1));                 \
+#define UNPACKL1J_N(n) tmp        =  (load(n)-((1 << (n-1)) -1));                 \
     s[k]       =  cs_factorL1[k]*tmp;                        \
     s[k+1]     =  cs_factorL1[k+1]*tmp;                      \
     k++;                                                     \

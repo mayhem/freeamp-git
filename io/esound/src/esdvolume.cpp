@@ -31,33 +31,29 @@ ____________________________________________________________________________*/
 
 #include "esdvolume.h"
 
-ESDVolumeManager::ESDVolumeManager()
+ESDVolumeManager::ESDVolumeManager(int iStream)
                  :VolumeManager()
 {
-
+   this->iStream = iStream;
+   this->iVolume = ESD_VOLUME_BASE;
 }
 
-void ESDVolumeManager::SetVolume(int32 v) 
-{ // This OSS code will work for the moment.
-    int mixFd = open("/dev/mixer",O_RDWR);
-    if (mixFd != -1) 
-    {
-        v |= (v << 8);
-        ioctl(mixFd, SOUND_MIXER_WRITE_PCM, &v);
-        close(mixFd);
-    }
-}
-
-int32 ESDVolumeManager::GetVolume() 
+void ESDVolumeManager::SetVolume(int32 v)
 {
-    int mixFd = open("/dev/mixer",O_RDWR);
-    int volume = 0;
-    if (mixFd != -1) 
+    int esd = esd_open_sound(NULL);
+    iVolume = v;
+    if (esd > 0)
     {
-        	ioctl(mixFd, SOUND_MIXER_READ_PCM, &volume);
-        	volume &= 0xFF;
-        	close(mixFd);
+/* do nothing for now...
+        v = ESD_VOLUME_BASE * (v & 0xff) / 50;
+        esd_set_stream_pan(esd, iStream, v, v); */
+        close(esd);
     }
-    return volume;
+
+}
+
+int32 ESDVolumeManager::GetVolume()
+{
+    return iVolume;
 }
 

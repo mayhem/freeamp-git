@@ -31,10 +31,14 @@ class ESDVolumeManager : public VolumeManager
 {
     public:
 
-    ESDVolumeManager();
+    ESDVolumeManager(int iStream);
 
     virtual void SetVolume(int32);
     virtual int32 GetVolume(void);
+    
+    private:
+    
+    int iStream, iVolume;
 };
 
 #endif // _ESDVOLUME_H_

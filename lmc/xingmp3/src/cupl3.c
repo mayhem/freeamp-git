@@ -60,10 +60,10 @@ TO DO: Test mixed blocks (mixed long/short)
 
 /*====================================================================*/
 static int mp_sr20_table[2][4] =
-{441, 480, 320, -999, 882, 960, 640, -999};
+{{441, 480, 320, -999}, {882, 960, 640, -999}};
 static int mp_br_tableL3[2][16] =
-{0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, 0,	/* mpeg 2 */
- 0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0};
+{{0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, 0},	/* mpeg 2 */
+ {0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0}};
 
 /*====================================================================*/
 
@@ -132,7 +132,7 @@ static int nsamp[2][2];		/* must start = 0, for nsamp[igr_prev] */
 extern SAMPLE sample[2][2][576];
 static float yout[576];		/* hybrid out, sbt in */
 
-typedef void (*SBT_FUNCTION) (float *sample, void *pcm, int n);
+typedef void (*SBT_FUNCTION) (float *sample, short *pcm, int ch);
 void sbt_dual_L3(float *sample, short *pcm, int n);
 static SBT_FUNCTION sbt_L3 = sbt_dual_L3;
 
@@ -1043,19 +1043,19 @@ void sbtB8_dual_L3(float *sample, unsigned char *pcm, int ch);
 
 static SBT_FUNCTION sbt_table[2][3][2] =
 {
-   (SBT_FUNCTION) sbt_mono_L3,
-   (SBT_FUNCTION) sbt_dual_L3,
-   (SBT_FUNCTION) sbt16_mono_L3,
-   (SBT_FUNCTION) sbt16_dual_L3,
-   (SBT_FUNCTION) sbt8_mono_L3,
-   (SBT_FUNCTION) sbt8_dual_L3,
+{{ (SBT_FUNCTION) sbt_mono_L3,
+   (SBT_FUNCTION) sbt_dual_L3 } ,
+ { (SBT_FUNCTION) sbt16_mono_L3,
+   (SBT_FUNCTION) sbt16_dual_L3 } ,
+ { (SBT_FUNCTION) sbt8_mono_L3,
+   (SBT_FUNCTION) sbt8_dual_L3 }} ,
 /*-- 8 bit output -*/
-   (SBT_FUNCTION) sbtB_mono_L3,
-   (SBT_FUNCTION) sbtB_dual_L3,
-   (SBT_FUNCTION) sbtB16_mono_L3,
-   (SBT_FUNCTION) sbtB16_dual_L3,
-   (SBT_FUNCTION) sbtB8_mono_L3,
-   (SBT_FUNCTION) sbtB8_dual_L3,
+{{ (SBT_FUNCTION) sbtB_mono_L3,
+   (SBT_FUNCTION) sbtB_dual_L3 },
+ { (SBT_FUNCTION) sbtB16_mono_L3,
+   (SBT_FUNCTION) sbtB16_dual_L3 },
+ { (SBT_FUNCTION) sbtB8_mono_L3,
+   (SBT_FUNCTION) sbtB8_dual_L3 }}
 };
 
 
@@ -1086,7 +1086,7 @@ int L3audio_decode_init(MPEG_HEAD * h, int framebytes_arg,
 			int freq_limit)
 {
    int i, j, k;
-   static int first_pass = 1;
+   // static int first_pass = 1;
    int samprate;
    int limit;
    int bit_code;

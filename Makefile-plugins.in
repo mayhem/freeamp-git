@@ -94,10 +94,10 @@ plugins/alsa-$(HOST_OS).pmo: $(ALSAOBJ)
 
 # esound
 ESNDOBJ = io/esound/src/esdvolume.o io/esound/src/esoundpmo.o \
-          io/src/pipeline.o
+          io/src/pipeline.o io/src/pmo.o
 
 plugins/esound-$(HOST_OS).pmo: $(ESNDOBJ)
-	$(LINKMOD) -o $@ $(ESNDOBJ) -lesd
+	$(LINKMOD) -o $@ $(ESNDOBJ) $(ESD_LIBS)
 
 #
 # UI section

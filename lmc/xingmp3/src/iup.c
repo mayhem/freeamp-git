@@ -359,31 +359,31 @@ static void unpack_sf()		/* unpack scale factor */
 /*--- unpack multiply note ------------------------------------------------*/
 /*--- 16bit x 16bit mult --> 32bit  or better required---------------------*/
 #define UNPACK_N(n)                                          \
-    s[k]     =  (cs_factor[i][k]*(load(n)-((1 << n-1) -1)))>>(n-1);   \
-    s[k+64]  =  (cs_factor[i][k]*(load(n)-((1 << n-1) -1)))>>(n-1);   \
-    s[k+128] =  (cs_factor[i][k]*(load(n)-((1 << n-1) -1)))>>(n-1);   \
+    s[k]     =  ((cs_factor[i][k]*(load(n)-((1 << (n-1)) -1)))>>(n-1));   \
+    s[k+64]  =  ((cs_factor[i][k]*(load(n)-((1 << (n-1)) -1)))>>(n-1));   \
+    s[k+128] =  ((cs_factor[i][k]*(load(n)-((1 << (n-1)) -1)))>>(n-1));   \
     goto dispatch;
 #define UNPACK_N2(n)                                             \
     mac_load_check(3*n);                                         \
-    s[k]     =  (cs_factor[i][k]*(mac_load(n)-((1 << n-1) -1)))>>(n-1);   \
-    s[k+64]  =  (cs_factor[i][k]*(mac_load(n)-((1 << n-1) -1)))>>(n-1);   \
-    s[k+128] =  (cs_factor[i][k]*(mac_load(n)-((1 << n-1) -1)))>>(n-1);   \
+    s[k]     =  (cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1)))>>(n-1);   \
+    s[k+64]  =  (cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1)))>>(n-1);   \
+    s[k+128] =  (cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1)))>>(n-1);   \
     goto dispatch;
 #define UNPACK_N3(n)                                             \
     mac_load_check(2*n);                                         \
-    s[k]     =  (cs_factor[i][k]*(mac_load(n)-((1 << n-1) -1)))>>(n-1);   \
-    s[k+64]  =  (cs_factor[i][k]*(mac_load(n)-((1 << n-1) -1)))>>(n-1);   \
+    s[k]     =  (cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1)))>>(n-1);   \
+    s[k+64]  =  (cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1)))>>(n-1);   \
     mac_load_check(n);                                           \
-    s[k+128] =  (cs_factor[i][k]*(mac_load(n)-((1 << n-1) -1)))>>(n-1);   \
+    s[k+128] =  (cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1)))>>(n-1);   \
     goto dispatch;
 #define UNPACKJ_N(n)                                         \
-    tmp        =  (load(n)-((1 << n-1) -1));                 \
+    tmp        =  (load(n)-((1 << (n-1)) -1));                 \
     s[k]       =  (cs_factor[i][k]*tmp)>>(n-1);                       \
     s[k+1]     =  (cs_factor[i][k+1]*tmp)>>(n-1);                     \
-    tmp        =  (load(n)-((1 << n-1) -1));                 \
+    tmp        =  (load(n)-((1 << (n-1)) -1));                 \
     s[k+64]    =  (cs_factor[i][k]*tmp)>>(n-1);                       \
     s[k+64+1]  =  (cs_factor[i][k+1]*tmp)>>(n-1);                     \
-    tmp        =  (load(n)-((1 << n-1) -1));                 \
+    tmp        =  (load(n)-((1 << (n-1)) -1));                 \
     s[k+128]   =  (cs_factor[i][k]*tmp)>>(n-1);                       \
     s[k+128+1] =  (cs_factor[i][k+1]*tmp)>>(n-1);                     \
     k++;       /* skip right chan dispatch */                \

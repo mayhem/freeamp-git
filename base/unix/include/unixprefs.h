@@ -77,8 +77,8 @@ class UnixPrefs : public Preferences
     static char *m_libDirs;
 
     char *m_prefsFilePath;
+    int m_errorLineNumber;      // 0 if no error
     bool m_saveEnable, m_changed;
-    int m_errorLineNumber;	// 0 if no error
 
     List<UnixPrefEntry *> m_entries;
     HashTable<UnixPrefEntry *> m_ht;

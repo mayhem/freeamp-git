@@ -49,7 +49,7 @@ Layer 3 audio
 /* quad required 10 bit w/signs  must have (MAXBITS+2) >= 10   */
 #define MAXBITS 9
 
-static HUFF_ELEMENT huff_table_0[] =
+static HUFF_ELEMENT huff_table_0[4] =
 {0, 0, 0, 64};			/* dummy must not use */
 
 #include "htable.h"
@@ -57,16 +57,16 @@ static HUFF_ELEMENT huff_table_0[] =
 /*-- 6 bit lookup (purgebits, value) --*/
 static unsigned char quad_table_a[][2] =
 {
-   6, 11, 6, 15, 6, 13, 6, 14, 6, 7, 6, 5, 5, 9,
-   5, 9, 5, 6, 5, 6, 5, 3, 5, 3, 5, 10, 5, 10,
-   5, 12, 5, 12, 4, 2, 4, 2, 4, 2, 4, 2, 4, 1,
-   4, 1, 4, 1, 4, 1, 4, 4, 4, 4, 4, 4, 4, 4,
-   4, 8, 4, 8, 4, 8, 4, 8, 1, 0, 1, 0, 1, 0,
-   1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,
-   1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,
-   1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,
-   1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,
-   1, 0,
+  {6, 11}, {6, 15}, {6, 13}, {6, 14}, {6, 7}, {6, 5}, {5, 9},
+  {5, 9}, {5, 6}, {5, 6}, {5, 3}, {5, 3}, {5, 10}, {5, 10},
+  {5, 12}, {5, 12}, {4, 2}, {4, 2}, {4, 2}, {4, 2}, {4, 1},
+  {4, 1}, {4, 1}, {4, 1}, {4, 4}, {4, 4}, {4, 4}, {4, 4},
+  {4, 8}, {4, 8}, {4, 8}, {4, 8}, {1, 0}, {1, 0}, {1, 0},
+  {1, 0}, {1, 0}, {1, 0}, {1, 0}, {1, 0}, {1, 0}, {1, 0},
+  {1, 0}, {1, 0}, {1, 0}, {1, 0}, {1, 0}, {1, 0}, {1, 0},
+  {1, 0}, {1, 0}, {1, 0}, {1, 0}, {1, 0}, {1, 0}, {1, 0},
+  {1, 0}, {1, 0}, {1, 0}, {1, 0}, {1, 0}, {1, 0}, {1, 0},
+  {1, 0},
 };
 
 
@@ -128,13 +128,14 @@ static HUFF_SETUP table_look[] =
 extern BITDAT bitdat;
 
 /*------------- get n bits from bitstream -------------*/
+/* unused
 static unsigned int bitget(int n)
 {
    unsigned int x;
 
    if (bitdat.bits < n)
-   {				/* refill bit buf if necessary */
-      while (bitdat.bits <= 24)
+   {			*/	/* refill bit buf if necessary */
+/*      while (bitdat.bits <= 24)
       {
 	 bitdat.bitbuf = (bitdat.bitbuf << 8) | *bitdat.bs_ptr++;
 	 bitdat.bits += 8;
@@ -145,7 +146,7 @@ static unsigned int bitget(int n)
    bitdat.bitbuf -= x << bitdat.bits;
    return x;
 }
-
+*/
 /*----- get n bits  - checks for n+2 avail bits (linbits+sign) -----*/
 static unsigned int bitget_lb(int n)
 {
@@ -185,12 +186,15 @@ static unsigned int bitget2(int n)
    return x;
 }
 /*------------- remove n bits from bitstream ---------*/
+/* unused
 static void bitget_purge(int n)
 {
    bitdat.bits -= n;
    bitdat.bitbuf -= (bitdat.bitbuf >> bitdat.bits) << bitdat.bits;
 }
+*/
 /*------------- get 1 bit from bitstream NO CHECK -------------*/
+/* unused
 static unsigned int bitget_1bit()
 {
    unsigned int x;
@@ -200,6 +204,7 @@ static unsigned int bitget_1bit()
    bitdat.bitbuf -= x << bitdat.bits;
    return x;
 }
+*/
 /*========================================================*/
 /*========================================================*/
 #define mac_bitget_check(n) if( bitdat.bits < (n) ) {                   \

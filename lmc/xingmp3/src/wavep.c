@@ -37,6 +37,8 @@ portable version
 #include <math.h>
 #ifdef WIN32
 #include <io.h>
+#else
+#include <unistd.h>
 #endif
 #include "port.h"
 
@@ -61,7 +63,7 @@ BYTE_WAVE;
 static BYTE_WAVE wave =
 {
    "RIFF",
-   sizeof(BYTE_WAVE) - 8, 0, 0, 0,
+   {(sizeof(BYTE_WAVE) - 8), 0, 0, 0},
    "WAVE",
    "fmt ",
    16, 0, 0, 0,

@@ -19,7 +19,7 @@ static unsigned char *ir_read_code(unsigned long timeout);
 static int ir_hex_to_int(unsigned char hex);
 
 /* flag to enable use of higher level functions */
-static ir_enabled=0;
+static int ir_enabled=0;
 
 /* output hex digits */
 static char ir_hexdigit[16] = {

@@ -149,7 +149,7 @@ typedef struct
 {
    int cbtype;			/* long=0 short=1 */
    int cbmax;			/* max crit band */
-   int lb_type;			/* long block type 0 1 3 */
+//   int lb_type;			/* long block type 0 1 3 */
    int cbs0;			/* short band start index 0 3 12 (12=no shorts */
    int ncbl;			/* number long cb's 0 8 21 */
    int cbmax_s[3];		/* cbmax by individual short blocks */

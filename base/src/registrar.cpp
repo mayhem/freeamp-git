@@ -211,7 +211,7 @@ CleanupRegistry(Registry* registry)
     RegistryItem*   item    = NULL;
     int32           index   = 0;
 
-    while(item = registry->GetItem(index++))
+    while((item = registry->GetItem(index++)))
     {
         HMODULE module = NULL;
 

@@ -308,10 +308,19 @@ AC_ARG_WITH(esound,
   esac])
 
 if test "$esound" = "true"; then
-  AC_MSG_RESULT("Enabling esound PMO")
-  EXTRALIBS="$EXTRALIBS -lesound"
-  OSDEPPLUGINS="$OSDEPPLUGINS plugins/esound.pmo"
+  AC_PATH_PROG(ESD_CONFIG, esd-config, no)
+  if test "$ESD_CONFIG" = "no" ; then
+     esound="false"
+  else
+     ESD_LIBS=`$ESD_CONFIG --libs`
+     EXTRALIBS="$EXTRALIBS $ESD_LIBS"
+     ESOUNDPLUGIN=plugins/esound-${host_os}.pmo
+     OSDEPPLUGINS="$OSDEPPLUGINS $ESOUNDPLUGIN"
+     OSINC="$OSINC -Iio/esound/include"
+  fi
 fi
+
+AC_SUBST(ESD_LIBS)
 
 mp3prof="false"
 
@@ -427,7 +436,7 @@ if test "$isunix" = "false" -o "$x11" = "false"; then
   AC_MSG_WARN([not compiling freeamp-$host_os ui plugin])
 else
   OSDEPPLUGINS="$OSDEPPLUGINS $FAUIPLUGIN";
-  EXTRALIBS="-lXpm"
+  EXTRALIBS="$EXTRALIBS -lXpm"
 fi
 
 
@@ -453,6 +462,7 @@ fi
 
 AC_SUBST(EXTRALIBS)
 AC_SUBST(OSDEPPLUGINS)
+AC_SUBST(OSINC)
 
 if expr "$host_cpu" : "i.86$" > /dev/null; then
   if test -n "$NASM"; then

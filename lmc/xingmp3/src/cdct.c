@@ -100,10 +100,10 @@ extern int enableEQ;
 
 void fdct32(float x[], float c[])
 {
-   float a[32];			/* ping pong buffers */
-   float b[32];
+   //float a[32];			/* ping pong buffers */
+   //float b[32];
    float *src = x;
-   int p, q;
+   //int p, q;
 
 #ifdef  _EQUALIZER_ENABLE_
    int i;

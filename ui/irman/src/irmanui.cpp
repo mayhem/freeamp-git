@@ -168,7 +168,7 @@ void IRManUI::irServiceFunction(void *pclcio) {
 			        int32 vol = ((Int32PropValue *) pv)->GetInt32(); 
              
 			        vol += 5;
-			        if (vol > 100) vol == 100;
+			        if (vol > 100) vol = 100;
 			        Int32PropValue *ipv = new Int32PropValue(vol);
 			        pMe->m_propManager->SetProperty("pcm_volume",(PropValue *)ipv);
              }
@@ -181,7 +181,7 @@ void IRManUI::irServiceFunction(void *pclcio) {
              {
 			        int32 vol = ((Int32PropValue *) pv)->GetInt32(); 
 			        vol -= 5;
-			        if (vol < 0) vol == 0;
+			        if (vol < 0) vol = 0;
 			        Int32PropValue *ipv = new Int32PropValue(vol);
 			        pMe->m_propManager->SetProperty("pcm_volume",(PropValue *)ipv);
              }

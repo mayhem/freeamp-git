@@ -390,7 +390,7 @@ UnixPrefs()
             if (*p)
             {
                 char *end;
-                char *out;
+                // char *out;
                 int32 length;
                 
                 entry->key = ReadQuotableString(p, (const char **)&end, ":#");
@@ -597,7 +597,7 @@ UnixPrefs::
 GetPrefString(const char* pref, char* buf, uint32* len)
 {
     UnixPrefEntry *entry;
-    int32 index;
+    // int32 index;
 
     m_mutex.Acquire();
 
