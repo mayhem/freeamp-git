@@ -26,6 +26,9 @@ ____________________________________________________________________________*/
 #include <iostream.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
+#include <sys/types.h>
+#include <stropts.h>
+#include <sys/conf.h>
 #include <sys/audioio.h>
 #include <errno.h>
 #include <string.h>
@@ -127,7 +130,7 @@ void SoundCardPMO::WaitToQuit()
 
 Error SoundCardPMO::SetPropManager(Properties * p)
 {
-   PropValue *pProp;
+  //   PropValue *pProp;
 
    m_propManager = p;
    return kError_NoErr;
@@ -147,9 +150,15 @@ int SoundCardPMO::audio_fd = -1;
 
 Error SoundCardPMO::Pause()
 {
-   //printf("Got pause\n");
-   // m_pPauseMutex->Acquire();
-   //printf("Got pause mutex\n");
+  struct audio_info ainfo;
+  int err;
+
+printf("Got pause\n");
+//m_pPauseMutex->Acquire();
+   AUDIO_INITINFO(&ainfo);
+   ainfo.play.pause = 1;
+   err = ioctl(audio_fd, AUDIO_SETINFO, &ainfo);
+printf("Got pause mutex (%d)\n", err);
 
    if (m_properlyInitialized)
        Reset(true);
@@ -158,9 +167,17 @@ Error SoundCardPMO::Pause()
 
 Error SoundCardPMO::Resume()
 {
-  //   m_pPauseMutex->Release();
+  struct audio_info ainfo;
+  int err;
 
-   return kError_NoErr;
+  //m_pPauseMutex->Release();
+  //printf("released pause\n");
+  
+  AUDIO_INITINFO(&ainfo);
+  ainfo.play.pause = 0;
+  err = ioctl(audio_fd, AUDIO_SETINFO, &ainfo);
+printf("released pause (%d)\n", err);
+  return kError_NoErr;
 }
 
 Error SoundCardPMO::Break()
@@ -240,16 +257,15 @@ Error SoundCardPMO::Init(OutputInfo * info)
 
    // configure the device:
    int       play_precision = 16;
-   int       play_stereo = channels - 1;
+   //   int       play_stereo = channels - 1;
    int       play_sample_rate = info->samples_per_second;
-
-   int       junkvar = 0;
 
    // note that there's actually the fctl I_FLSUHSTREAMS
    // that'll immediately purge the audio buffer, instead
    // of waiting for the buffer to play itself out.
 
-   if (ioctl(audio_fd, AUDIO_DRAIN, &audinf) == -1)
+   //   if (ioctl(audio_fd, AUDIO_DRAIN, &audinf) == -1)
+   if (ioctl(audio_fd, I_FLUSH, FLUSHRW) == -1)
    {
       ReportError("Cannot reset the soundcard.");
       return (Error) pmoError_IOCTL_AUDIO_DRAIN;
@@ -292,7 +308,8 @@ Error SoundCardPMO::Reset(bool user_stop)
 
    if (user_stop)
    {
-      if (ioctl(audio_fd, AUDIO_DRAIN, &a) == -1)
+     //      if (ioctl(audio_fd, AUDIO_DRAIN, &a) == -1)
+      if (ioctl(audio_fd, I_FLUSH, FLUSHRW) == -1)
       {
          ReportError("Cannot reset the soundcard.");
          return (Error)pmoError_IOCTL_AUDIO_DRAIN;
@@ -301,7 +318,8 @@ Error SoundCardPMO::Reset(bool user_stop)
    }
    else
    {
-      if (ioctl(audio_fd, AUDIO_DRAIN, &a) == -1)
+     //      if (ioctl(audio_fd, AUDIO_DRAIN, &a) == -1)
+      if (ioctl(audio_fd, I_FLUSH, FLUSHRW) == -1)
       {
          ReportError("Cannot reset the soundcard.");
          return (Error)pmoError_IOCTL_AUDIO_DRAIN;
@@ -378,22 +396,22 @@ void SoundCardPMO::WorkerThread(void)
    Error       eErr;
    size_t      iRet;
    Event      *pEvent;
-   OutputInfo *pInfo;
-   audio_info info;
+   // OutputInfo *pInfo;
+   //   audio_info info;
 
    for(; !m_bExit;)
    {
       iToCopy = iWriteToCard;
 
       //printf("before pause mutex acquire\n");
-      // m_pPauseMutex->Acquire();
+      //      m_pPauseMutex->Acquire();
       //printf("after pause mutex acquire\n");
 
       eErr = BeginRead(pBuffer, iToCopy);
       //printf("after begin read\n");
       if (eErr == kError_InputUnsuccessful || eErr == kError_NoDataAvail)
       {
-	//          m_pPauseMutex->Release();
+	//	  m_pPauseMutex->Release();
           m_pReadSem->Wait();
           continue;
       }
@@ -405,7 +423,7 @@ void SoundCardPMO::WorkerThread(void)
           
       if (eErr == kError_EventPending)
       {
-	//          m_pPauseMutex->Release();
+	//	  m_pPauseMutex->Release();
 
           pEvent = GetEvent();
 
@@ -432,7 +450,7 @@ void SoundCardPMO::WorkerThread(void)
           
       if (IsError(eErr))
       {
-	//          m_pPauseMutex->Release();
+	//	  m_pPauseMutex->Release();
 
           ReportError("Internal error occured.");
           m_context->log->Error("Cannot read from buffer in PMO worker thread: %d\n",
@@ -460,11 +478,11 @@ void SoundCardPMO::WorkerThread(void)
 
               usleep(10000);
 
-              for(;!m_bExit;)
-		//                 if (m_pPauseMutex->Acquire(10000))
-                     break;
-              if (m_bExit)
-                 iToCopy = 0;
+                // for(;!m_bExit;)
+		//		if (m_pPauseMutex->Acquire(10000))
+		//                     break;
+              // if (m_bExit)
+	      //  iToCopy = 0;
 
               // If beginread returns an error, break out...
               if (BeginRead(pBuffer, iToCopy) != kError_NoErr)
@@ -487,7 +505,7 @@ void SoundCardPMO::WorkerThread(void)
       if (iCopied < iToCopy)
       {
          EndRead(0);
-	 //         m_pPauseMutex->Release();
+	 //	 m_pPauseMutex->Release();
          ReportError("Could not write sound data to the soundcard.");
          m_context->log->Error("Failed to write to the soundcard: %s\n", strerror(errno))
 ;
