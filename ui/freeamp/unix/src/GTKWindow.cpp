@@ -156,6 +156,9 @@ Error GTKWindow::Run(Pos &oPos)
     quitLoop = false;
     while (!quitLoop) 
        sleep(1);
+
+    oPos = m_oWindowPos;
+
     return kError_NoErr;
 }
 

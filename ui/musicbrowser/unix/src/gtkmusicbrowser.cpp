@@ -854,17 +854,26 @@ void MusicBrowserUI::UpdatePlaylistList(void)
         char length[50];
 
         if (mdata.Title() == "" || mdata.Title() == " ") {
-            char *filename = new char[_MAX_PATH];
+            char *urlname = new char[_MAX_PATH];
             char *tempdir = strrchr(item->URL().c_str(), '/');
             if (tempdir)
-                strcpy(filename, tempdir + 1);
+                strcpy(urlname, tempdir + 1);
             else 
-                strcpy(filename, item->URL().c_str());
-            tempdir = strrchr(filename, '.');
+                strcpy(urlname, item->URL().c_str());
+            tempdir = strrchr(urlname, '.');
             if (tempdir)
                 *tempdir = '\0';
-            mdata.SetTitle(filename);
+            
+            uint32 filelength = strlen(urlname) + 1;
+            char *filename = new char[filelength];
+
+            if (URLToFilePath(urlname, filename, &filelength) != kError_NoErr)
+                mdata.SetTitle(filename);
+            else
+                mdata.SetTitle(urlname);
+
             delete [] filename;
+            delete [] urlname;
         }
         title = (char *)mdata.Title().c_str();
         artist = (char *)mdata.Artist().c_str();
@@ -879,6 +888,7 @@ void MusicBrowserUI::UpdatePlaylistList(void)
 
     gtk_clist_columns_autosize(GTK_CLIST(playlistList));
     gtk_clist_select_row(GTK_CLIST(playlistList), m_currentindex, 0);
+    gtk_clist_moveto(GTK_CLIST(playlistList), m_currentindex, 0, 0.5, -1);
     gtk_clist_thaw(GTK_CLIST(playlistList));
 }
 
@@ -959,7 +969,14 @@ void MusicBrowserUI::LoadPlaylist(string &oPlaylist)
     if (m_currentListName.length() != 0)
         SaveCurrentPlaylist(NULL);
 
-    m_plm->ReadPlaylist((char *)oPlaylist.c_str());
+    uint32 length = _MAX_PATH;
+    char *PlaylistURL = new char[length];
+    FilePathToURL(oPlaylist.c_str(), PlaylistURL, &length);
+
+    m_plm->ReadPlaylist(PlaylistURL);
+
+    delete [] PlaylistURL;
+
     m_currentListName = oPlaylist;
     UpdatePlaylistList();
 }
@@ -1077,6 +1094,7 @@ void MusicBrowserUI::GTKEventService(void)
     string lastPlaylist = FreeampDir(m_context->prefs);
     lastPlaylist += "/currentlist.m3u";
     LoadPlaylist(lastPlaylist);
+
     weAreGTK = false;
     m_context->gtkLock.Acquire();
     if (!m_context->gtkInitialized) {

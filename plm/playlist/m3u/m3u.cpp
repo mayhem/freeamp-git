@@ -117,7 +117,7 @@ Error M3U::ReadPlaylist(const char* url,
 	    
         result = kError_FileNotFound;
 
-	    fp = fopen(path, "rb");
+        fp = fopen(path, "rb");
 
         if(fp)
         {
@@ -134,7 +134,8 @@ Error M3U::ReadPlaylist(const char* url,
                 // to swap files by changing the path 
                 // separator as necessary
                 if( strncmp(entry, "http://", 7) &&
-                    strncmp(entry, "rtp://", 6))
+                    strncmp(entry, "rtp://", 6) &&
+                    strncmp(entry, "file://", 7))
                 {
                     for (index = strlen(entry) - 1; index >=0; index--)
                     {
@@ -164,7 +165,8 @@ Error M3U::ReadPlaylist(const char* url,
                         (strncmp(entry + 1, ":\\", 2) &&
                          strncmp(entry, DIR_MARKER_STR, 1)) &&
                         (strncmp(entry, "http://", 7) &&
-                         strncmp(entry, "rtp://", 6)) )
+                         strncmp(entry, "rtp://", 6) &&
+                         strncmp(entry, "file://", 7)) )
                     {
                         strcpy(path, root);
                         strcat(path, entry);
@@ -180,7 +182,7 @@ Error M3U::ReadPlaylist(const char* url,
                 }
             }
 
-	        fclose(fp);
+            fclose(fp);
 
             result = kError_NoErr;
         }
@@ -216,9 +218,9 @@ Error M3U::WritePlaylist(const char* url, PlaylistFormatInfo* format,
 
             result = kError_FileNoAccess;
 
-	        fp = fopen(path, "wb");
+            fp = fopen(path, "wb");
 
-	        if(fp)
+            if(fp)
             {
                 uint32 index;
                 uint32 count;
@@ -233,7 +235,7 @@ Error M3U::WritePlaylist(const char* url, PlaylistFormatInfo* format,
                                         LINE_END_MARKER_STR);
                 }
 
-	            fclose(fp);
+                fclose(fp);
 
                 result = kError_NoErr;
             }

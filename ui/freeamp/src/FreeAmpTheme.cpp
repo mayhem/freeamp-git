@@ -117,8 +117,8 @@ void FreeAmpTheme::WorkerThread(void)
        sprintf(szTemp, "%d,%d", m_oWindowPos.x, m_oWindowPos.y);
        m_pContext->prefs->SetPrefString(kMainWindowPosPref, szTemp);
    }    
-
-   m_pContext->target->AcceptEvent(new Event(CMD_QuitPlayer));
+   else   
+       m_pContext->target->AcceptEvent(new Event(CMD_QuitPlayer));
 }
 
 void WorkerThreadStart(void* arg)

@@ -507,7 +507,7 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
            return kError_InvalidParam;
        }
 
-	   if (oAttrMap.find("Rect") == oAttrMap.end())
+       if (oAttrMap.find("Rect") == oAttrMap.end())
        {
            m_oLastError = string("the <BackgroundBitmap> tag needs a Rect attribute");
            return kError_ParseError;
@@ -526,6 +526,7 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
 
        return kError_NoErr;
     }
+
     if (oElement == string("Controls"))
     {
        if (m_pCurrentWindow == NULL)

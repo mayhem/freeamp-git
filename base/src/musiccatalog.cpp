@@ -98,9 +98,14 @@ void MusicCatalog::AddSong(const char *path)
         return;
 
     PlaylistItem *newtrack;
+
+    uint32 urlLength = strlen(path) + 20;
+    char *pathURL = new char[urlLength];
+    FilePathToURL(path, pathURL, &urlLength);
+
     MetaData *meta = m_context->browser->ReadMetaDataFromDatabase((char *)path);
     if (!meta) {
-        PlaylistItem *newtrack = new PlaylistItem(path);
+        PlaylistItem *newtrack = new PlaylistItem(pathURL);
         m_context->plm->RetrieveMetaData(newtrack);
         while (newtrack->GetState() != kPlaylistItemState_Normal)
             usleep(5);
@@ -109,7 +114,7 @@ void MusicCatalog::AddSong(const char *path)
         meta = m_context->browser->ReadMetaDataFromDatabase((char *)path);
     }
     else
-        newtrack = new PlaylistItem(path, meta);
+        newtrack = new PlaylistItem(pathURL, meta);
 
     if (meta->Artist() == " ") {
         m_unsorted->push_back(newtrack);
@@ -365,8 +370,8 @@ void MusicBrowser::DoSearchMusic(char *path)
 
                     char *tempurl = new char[file.length() + 15];
                     uint32 length = file.length() + 15;
-
                     FilePathToURL(file.c_str(), tempurl, &length);
+
                     PlaylistItem *plist = new PlaylistItem(tempurl);
                     m_plm->RetrieveMetaData(plist);
 

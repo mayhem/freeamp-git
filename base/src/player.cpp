@@ -630,7 +630,7 @@ Run()
                    m_ui = NULL;
                }
             }
-            if (!CompareNames(item->Name(), musicBrowserName))
+            else if (!CompareNames(item->Name(), musicBrowserName))
             {
                m_ui = (UserInterface *) item->InitFunction()(m_context);
               
@@ -640,8 +640,13 @@ Run()
                    RegisterActiveUI(m_ui);
                    m_browserUI = m_ui;
                }
+               else
+               {
+                   delete m_ui;
+                   m_ui = NULL;
+               }
             }
-            if (!CompareNames(item->Name(), name))
+            else if (!CompareNames(item->Name(), name))
             {
                m_ui = (UserInterface *) item->InitFunction()(m_context);
 

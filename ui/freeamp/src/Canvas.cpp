@@ -26,8 +26,8 @@ ____________________________________________________________________________*/
 
 Canvas::Canvas(void)
 {
-	m_pBGBitmap = NULL;
-	m_pMaskBitmap = NULL;
+    m_pBGBitmap = NULL;
+    m_pMaskBitmap = NULL;
 }
 
 Canvas::~Canvas(void)
@@ -41,7 +41,7 @@ void Canvas::SetBackgroundRect(Rect &oRect)
 
 void Canvas::SetBackgroundBitmap(Bitmap *pBitmap)
 {
-	delete m_pBGBitmap;
+    delete m_pBGBitmap;
     m_pBGBitmap = pBitmap;
 }
 
