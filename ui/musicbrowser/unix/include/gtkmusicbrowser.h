@@ -197,7 +197,7 @@ class GTKMusicBrowser {
 
     void CreateNewEditor(char *playlisturl);
 
-    void ShowOptions(void);
+    void ShowOptions(int page = 0);
     void StopMenu(void);
     void PlayMenu(void);
     void NextMenu(void);

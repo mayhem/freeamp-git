@@ -34,18 +34,25 @@ ____________________________________________________________________________*/
 #include "MessageDialog.h"
 
 GTKPreferenceWindow::GTKPreferenceWindow(FAContext *context,
-                                         ThemeManager *pThemeMan) :
+                                         ThemeManager *pThemeMan,
+                                         uint32 defaultPage,
+                                         bool inEventLoop) :
      PreferenceWindow(context, pThemeMan)
 {     
+    startPage = defaultPage;
+    eventLoop = inEventLoop;
+    done = false;
 }
 
 GTKPreferenceWindow::~GTKPreferenceWindow(void)
 {
 } 
 
-static gboolean pref_destroy(GtkWidget *widget)
+static gboolean pref_destroy(GtkWidget *widget, gpointer p)
 {
-    gtk_main_quit();
+    bool runmain = (bool)p;
+    if (runmain)
+        gtk_main_quit();
     return FALSE;
 }
 
@@ -59,6 +66,7 @@ void pref_ok_click(GtkWidget *w, GTKPreferenceWindow *p)
 {
     p->ApplyInfo();
     gtk_widget_destroy(p->mainWindow);
+    p->done = true;
 }
 
 void pref_apply_click(GtkWidget *w, GTKPreferenceWindow *p)
@@ -76,11 +84,13 @@ void pref_cancel_click(GtkWidget *w, GTKPreferenceWindow *p)
 {
     p->CancelInfo();
     gtk_widget_destroy(p->mainWindow);
+    p->done = true;
 }
 
 void pref_close_click(GtkWidget *w, GTKPreferenceWindow *p)
 {
     gtk_widget_destroy(p->mainWindow);
+    p->done = true;
 }
 
 bool GTKPreferenceWindow::Show(Window *pWindow)
@@ -95,7 +105,7 @@ bool GTKPreferenceWindow::Show(Window *pWindow)
     mainWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_modal(GTK_WINDOW(mainWindow), TRUE);
     gtk_signal_connect(GTK_OBJECT(mainWindow), "destroy",
-                       GTK_SIGNAL_FUNC(pref_destroy), NULL);
+                       GTK_SIGNAL_FUNC(pref_destroy), (gpointer)eventLoop);
     gtk_window_set_title(GTK_WINDOW(mainWindow), BRANDING" - Preferences");
 
     GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
@@ -173,11 +183,18 @@ bool GTKPreferenceWindow::Show(Window *pWindow)
     gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 0);
     gtk_widget_show(button);
 
+    gtk_notebook_set_page(GTK_NOTEBOOK(notebook), startPage);
+
     gtk_widget_show(mainWindow);
 
     gdk_threads_leave();
 
-    gtk_main();
+    if (eventLoop)
+        gtk_main();
+    else {
+        while (!done)
+            usleep(20);
+    }
 
     gdk_threads_leave();
 }

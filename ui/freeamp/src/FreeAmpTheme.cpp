@@ -459,7 +459,7 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
       case CMD_ShowPreferences:
       {
           ShowPreferencesEvent* prefsEvent = (ShowPreferencesEvent*)e;
-      	 ShowOptions(prefsEvent->GetDefaultPage());
+      	 ShowOptions(prefsEvent->GetDefaultPage(), false);
       	 break;
       }
 
@@ -669,7 +669,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
    }
    if (oControlName == string("Options") && eMesg == CM_Pressed)
    {
-   	   ShowOptions();
+       ShowOptions(0, true);
 
        return kError_NoErr;
    }
@@ -958,7 +958,7 @@ void FreeAmpTheme::HandleKeystroke(unsigned char cKey)
         
      case 'o':
      case 'O':
-     	ShowOptions();
+     	ShowOptions(0, true);
         break;
 
      case 'c':
@@ -978,7 +978,7 @@ void FreeAmpTheme::HandleKeystroke(unsigned char cKey)
     }
 }
 
-void FreeAmpTheme::ShowOptions(uint32 defaultPage)
+void FreeAmpTheme::ShowOptions(uint32 defaultPage, bool inEventLoop)
 {
     PreferenceWindow *pWindow;
        
@@ -987,7 +987,8 @@ void FreeAmpTheme::ShowOptions(uint32 defaultPage)
 #elif defined(__BEOS__)
     pWindow = new BeOSPreferenceWindow(m_pContext, m_pThemeMan);
 #else
-    pWindow = new GTKPreferenceWindow(m_pContext, m_pThemeMan);
+    pWindow = new GTKPreferenceWindow(m_pContext, m_pThemeMan, defaultPage, 
+                                      inEventLoop);
 #endif       
     pWindow->Show(m_pWindow);
           

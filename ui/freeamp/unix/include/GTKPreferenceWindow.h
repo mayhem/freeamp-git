@@ -116,7 +116,9 @@ class GTKPreferenceWindow : public PreferenceWindow
   public:
 
                GTKPreferenceWindow(FAContext *context,
-                                   ThemeManager *pThemeMan);
+                                   ThemeManager *pThemeMan,
+                                   uint32 defaultPage,
+                                   bool inEventLoop);
       virtual ~GTKPreferenceWindow(void); 
       
       virtual  bool Show(Window *pParent);
@@ -136,6 +138,9 @@ class GTKPreferenceWindow : public PreferenceWindow
       map<string, string> m_oThemeList;
 
   private:
+      bool   eventLoop;
+      uint32 startPage;
+
       GtkWidget *CreatePage1(void);
       GtkWidget *CreatePage2(void);
       GtkWidget *CreatePage3(void);
@@ -175,6 +180,7 @@ class GTKPreferenceWindow : public PreferenceWindow
       GtkWidget *pmoOptionMenu;
 
       int32 numPMOs;
+      bool  done;
 
       void UpdateThemeList(void);
       void AddThemeEvent(const char *newpath);

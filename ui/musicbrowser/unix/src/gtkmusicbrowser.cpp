@@ -142,6 +142,7 @@ void emusic_web(GTKMusicBrowser *p, guint action, GtkWidget *w)
 
 void show_about(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
+    p->ShowOptions(4);
 }
 
 void stop_menu(GTKMusicBrowser *p, guint action, GtkWidget *w)
@@ -192,9 +193,9 @@ void options_show(GTKMusicBrowser *p, guint action, GtkWidget *w)
     p->ShowOptions();
 }
 
-void GTKMusicBrowser::ShowOptions()
+void GTKMusicBrowser::ShowOptions(int page)
 {
-    m_context->target->AcceptEvent(new ShowPreferencesEvent());
+    m_context->target->AcceptEvent(new ShowPreferencesEvent(page));
 }
 
 TreeData *GTKMusicBrowser::NewTreeData(int type, MusicCatalog *cat, 
