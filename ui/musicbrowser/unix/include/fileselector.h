@@ -35,7 +35,7 @@ class FileSelector {
  public:
     FileSelector(char *);
   
-    bool Run();
+    bool Run(bool runMain = true);
     void SetExtended() { extended = true; }
     char *GetReturnPath() { if (returnpath != "")
                                 return (char *)returnpath.c_str(); 
@@ -47,10 +47,12 @@ class FileSelector {
     string title;
     bool extended;
     bool ok;
+    bool done;
 
     GtkWidget *filesel;
  public:
     void AddEvent();
+    void CancelEvent();
 };
    
 

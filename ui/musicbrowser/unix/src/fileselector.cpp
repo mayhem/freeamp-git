@@ -22,6 +22,7 @@
 ____________________________________________________________________________*/
 
 #include "fileselector.h"
+#include <unistd.h>
 
 FileSelector::FileSelector(char *windowtitle)
 {
@@ -29,17 +30,32 @@ FileSelector::FileSelector(char *windowtitle)
     returnpath = "";
     extended = false;
     ok = false;
+    done = false;
 }
 
-gboolean filesel_destroy(GtkWidget *widget)
+gboolean filesel_destroy(GtkWidget *widget, gpointer p)
 {
-    gtk_main_quit();
+    bool runmain = (bool)p;
+    if (runmain)
+        gtk_main_quit();
     return FALSE;
 }
 
 void ok_internal(GtkWidget *widget, FileSelector *p)
 {
     p->AddEvent();
+}
+
+void cancel_internal(GtkWidget *widget, FileSelector *p)
+{
+    p->CancelEvent();
+}
+
+void FileSelector::CancelEvent()
+{
+    gtk_widget_destroy(filesel);
+    ok = false;
+    done = true;
 }
 
 void FileSelector::AddEvent()
@@ -83,27 +99,36 @@ void FileSelector::AddEvent()
     free(path_temp);
 
     ok = true;
+    done = true;
 }
 
-bool FileSelector::Run(void)
+bool FileSelector::Run(bool runMain)
 {
+    if (!runMain)
+        gdk_threads_enter();
+
     filesel = gtk_file_selection_new(title.c_str());
 
     gtk_window_set_modal(GTK_WINDOW(filesel), TRUE);
     gtk_signal_connect(GTK_OBJECT(filesel), "destroy",
-                       GTK_SIGNAL_FUNC(filesel_destroy), NULL);
-    gtk_signal_connect_object(GTK_OBJECT(GTK_FILE_SELECTION(filesel)->cancel_button),
-                       "clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy),
-                       GTK_OBJECT(filesel));
+                       GTK_SIGNAL_FUNC(filesel_destroy), (gpointer)runMain);
+    gtk_signal_connect(GTK_OBJECT(GTK_FILE_SELECTION(filesel)->cancel_button),
+                       "clicked", GTK_SIGNAL_FUNC(cancel_internal), this);
     gtk_signal_connect(GTK_OBJECT(GTK_FILE_SELECTION(filesel)->ok_button),
-                       "clicked", GTK_SIGNAL_FUNC(ok_internal),
-                       this);
+                       "clicked", GTK_SIGNAL_FUNC(ok_internal), this);
 
     if (extended)
-        gtk_clist_set_selection_mode(GTK_CLIST(GTK_FILE_SELECTION(filesel)->file_list), GTK_SELECTION_EXTENDED);
+        gtk_clist_set_selection_mode(GTK_CLIST(GTK_FILE_SELECTION(filesel)->
+                                     file_list), GTK_SELECTION_EXTENDED);
     gtk_widget_show(filesel);
 
-    gtk_main();
+    if (runMain)
+        gtk_main();
+    else {
+        gdk_threads_leave();
+        while (!done)
+            usleep(20);
+    }
 
     if (ok)
        return true;

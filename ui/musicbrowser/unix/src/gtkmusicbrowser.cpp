@@ -686,6 +686,46 @@ static void music_search_tool(GtkWidget *w, GTKMusicBrowser *p)
 }
 */
 
+void GTKMusicBrowser::AddFileCMD()
+{
+    FileSelector *filesel = new FileSelector("Select a file to play");
+    if (filesel->Run(false)) {
+        char *returnpath = filesel->GetReturnPath();
+        char *ext = m_context->player->GetExtension(returnpath);
+        uint32 length = strlen(returnpath) + 10;
+        char *tempurl = new char[length];
+        if (IsntError(FilePathToURL(returnpath, tempurl, &length))) {
+
+            DeleteListEvent();
+
+            if (!strncmp("M3U", ext, 3)) {
+                string tobeloaded = tempurl;
+                LoadPlaylist(tobeloaded);
+            }
+            else {
+                char *filereturn = strdup_new(filesel->GetReturnPath());
+                if (filereturn) {
+                    char *temp;
+                    char *first= strtok(filereturn, "\n");
+
+                    while ((temp = strtok(NULL, "\n"))) {
+                        AddTrackPlaylistEvent(temp);
+                        m_currentindex++;
+                    }
+                    AddTrackPlaylistEvent(first);
+                }
+                delete [] filereturn;
+            }
+        }
+        delete [] tempurl;
+        delete ext;
+
+        m_currentindex = 0; 
+        PlayEvent();
+    }
+    delete filesel;
+}
+
 static void import_tool(GtkWidget *w, GTKMusicBrowser *p)
 {
     FileSelector *filesel = new FileSelector("Import a file to the Music Catalog");
@@ -1815,6 +1855,9 @@ int32 GTKMusicBrowser::AcceptEvent(Event *e)
                 SetStatusText(((BrowserMessageEvent *)e)->GetBrowserMessage());
                 gdk_threads_leave();
             }
+            break; }
+        case CMD_AddFiles: {
+            AddFileCMD();
             break; }
         default:
             break;

@@ -242,7 +242,9 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
                 m_oTitle = szWelcomeMsg;
                 
                 m_pWindow->ControlStringValue("Title", true, m_oTitle);
-                m_pWindow->SetTitle(string(BRANDING));
+                
+                string title = BRANDING;
+                m_pWindow->SetTitle(title);
             }    
          }
          

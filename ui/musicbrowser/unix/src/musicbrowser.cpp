@@ -137,6 +137,9 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
             else
                 mainBrowser->ShowMusicBrowser();
             break; }
+        case CMD_AddFiles: {
+            mainBrowser->AcceptEvent(event);
+            break; }
         default:
             break;
     }

@@ -101,7 +101,7 @@ distclean: clean
 	-rm -f config.status Makefile config.cache config/config.h
 	-rm -f Makefile.header Makefile-plugins
 
-install: install-freeamp install-themes install-plugins
+install: install-freeamp install-themes install-plugins install-docs
 
 install-freeamp: freeamp
 	$(mkinstalldirs) $(DESTDIR)$(bindir)
@@ -118,6 +118,10 @@ install-themes:
 	    $(INSTALL_PROGRAM) $$p $(DESTDIR)$(datadir)/freeamp/themes/`basename $$p`; \
 	  else :; fi; \
 	done
+
+install-docs:
+	$(mkinstalldirs) $(DESTDIR)$(libdir)/freeamp
+	gzip -d -c < $(srcdir)/help/unix/freeamphelp.tar.gz | (cd $(DESTDIR)$(libdir)/freeamp; rm -rf help; tar -xmf -)
 
 depend:
 	makedepend -- $(DEFS) $(INCLUDES) $(CFLAGS) -- `echo $(FREEAMPOBJ) | sed -e 's,\.o,.cpp,g'`

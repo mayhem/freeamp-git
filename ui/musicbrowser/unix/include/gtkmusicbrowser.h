@@ -135,12 +135,11 @@ class GTKMusicBrowser {
     /* event callbacks */
     void ReadPlaylist(char *filename, vector<PlaylistItem *> *plist);
 
-    /* gtk-specific code in callbacl*/
     void ExpandCollapseEvent();
     void ToggleVisEvent();
     void ToggleVisEventDestroyed();
 
-    /* no gtk specific code */
+    void AddFileCMD();
     void DeleteListEvent();
     void DeleteEvent();
     void MoveUpEvent();

@@ -1735,6 +1735,7 @@ ServiceEvent(Event * pC)
         case INFO_DownloadItemRemoved:
         case INFO_DownloadItemNewState:
         case INFO_DownloadItemProgress:
+        case CMD_AddFiles:
             SendEventToUI(pC);
             break;
 
