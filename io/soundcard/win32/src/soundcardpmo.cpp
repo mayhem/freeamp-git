@@ -122,12 +122,6 @@ SoundCardPMO::~SoundCardPMO()
    m_pSleepSem->Signal();
    m_pPauseSem->Signal();
 
-   if (m_pBufferThread)
-   {
-      m_pBufferThread->Join();
-      delete m_pBufferThread;
-   }
-  
    if (m_initialized)
    {
       mixerClose(m_hmixer);
@@ -148,6 +142,11 @@ SoundCardPMO::~SoundCardPMO()
 
       delete m_wavehdr_array;
       delete m_wfex;
+   }
+   if (m_pBufferThread)
+   {
+      m_pBufferThread->Join();
+      delete m_pBufferThread;
    }
    if (g_pHeaderMutex)
    {
