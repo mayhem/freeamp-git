@@ -20,8 +20,8 @@
 	$Id$
 ____________________________________________________________________________*/
 
-#ifndef ERROR_H
-#define ERROR_H
+#ifndef INCLUDED_ERROR_H
+#define INCLUDED_ERROR_H
 
 #include "config.h"
 
@@ -95,6 +95,7 @@ typedef enum Error
     kError_DatabaseNotWorking   = 64,
     kError_DuplicateItem        = 65,
     kError_ItemNotFound         = 66,
+    kError_HTTPFileNotFound     = 67,
 
     kError_LastError            = 9999
 };
@@ -103,6 +104,6 @@ typedef enum Error
 #define IsError( err )		( (err) != kError_NoErr )
 #define IsntError( err )	( (err) == kError_NoErr )
 
+extern const char* ErrorString[];
 
-
-#endif /* ERROR_H */
+#endif /* INCLUDED_ERROR_H */

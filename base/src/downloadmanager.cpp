@@ -1029,7 +1029,7 @@ Error DownloadManager::Download(DownloadItem* item)
                                 break;
 
                             case 404:
-                                result = kError_FileNotFound;
+                                result = kError_HTTPFileNotFound;
                                 break;
 
                             case 416:

@@ -182,6 +182,10 @@ SOURCE=..\..\src\downloadmanager.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\src\errors.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\src\log.cpp
 # End Source File
 # Begin Source File

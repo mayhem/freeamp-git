@@ -41,6 +41,7 @@ using namespace std;
 #include "event.h"
 #include "eventdata.h"
 #include "playlist.h"
+#include "errors.h"
 #include "resource.h"
 
 static const int32 kProgressHeight = 8;
@@ -759,8 +760,10 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                         SetTextColor(dis->hDC, RGB(192, 0, 0));
 
                     ostringstream ost;
+                    int32 index = (int32)dli->GetDownloadError();
 
-                    ost << "Error: " <<  dli->GetDownloadError();
+                    ost << "Error: " <<  ErrorString[index];
+
                     displayString = ost.str();
                     break;
                 }
