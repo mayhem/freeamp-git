@@ -39,7 +39,10 @@ ____________________________________________________________________________*/
 #include "eventdata.h"
 #include "playlist.h"
 #include "about.h"
+#include "prefdialog.h"
 #include "resource.h"
+
+#define UWM_TRAY  WM_USER + 666
 
 HINSTANCE g_hInstance = NULL;
 
@@ -88,6 +91,7 @@ SimpleUI(FAContext *context):
      UserInterface()
 {
     m_context = context;
+    m_prefs = context->prefs;
     m_scrolling = false;
 
     m_uiSemaphore = new Semaphore();
@@ -149,6 +153,7 @@ AcceptEvent(Event* event)
 				EnableWindow(m_hwndPause, TRUE);
 				EnableWindow(m_hwndSlider, TRUE);
 
+                m_state = UIState_Playing;
 	            break; 
             }
 
@@ -161,6 +166,8 @@ AcceptEvent(Event* event)
 				EnableWindow(m_hwndStop, TRUE);
 				EnableWindow(m_hwndPause, FALSE);
 				EnableWindow(m_hwndSlider, TRUE);
+
+                m_state = UIState_Paused;
 	            break; 
             }
 
@@ -183,6 +190,8 @@ AcceptEvent(Event* event)
                 char timeString[256] = "00:00:00";
 
                 SetWindowText(m_hwndCurrent, timeString);
+
+                m_state = UIState_Stopped;
 
 	            break; 
             }
@@ -251,6 +260,7 @@ AcceptEvent(Event* event)
 						    (LPARAM)0);
 
                 SetWindowText(m_hwnd, info->m_filename);
+                SetTrayTooltip(info->m_filename);
 
 		        /*totalFrames = info->totalFrames;
 		        totalTime = info->totalTime;
@@ -452,6 +462,117 @@ UIThreadFunc(void* arg)
     ui->CreateUI();
 }
 
+void 
+SimpleUI::
+ReadPreferences()
+{
+    m_prefs->GetStayOnTop(&m_onTop);
+    m_prefs->GetLiveInTray(&m_liveInTray);
+
+    SetWindowPos(   m_hwnd, 
+                    (m_onTop ? HWND_TOPMOST: HWND_NOTOPMOST), 
+                    0, 0, 0, 0, 
+                    SWP_NOMOVE|SWP_NOSIZE);
+
+    if(m_liveInTray)
+    {
+        ShowWindow(m_hwnd, FALSE);
+        AddTrayIcon();
+    }
+    else
+    {
+        ShowWindow(m_hwnd, TRUE);
+        RemoveTrayIcon();
+    }
+
+
+    // what follows is a sad hack that actually makes windows 
+    // refresh the toolbar correctly...
+    //ShowWindow(m_hwnd, FALSE);
+
+    /*LONG styles, extendedStyles;
+
+    styles = GetWindowLong(m_hwnd, GWL_STYLE);
+    extendedStyles = GetWindowLong(m_hwnd, GWL_EXSTYLE);
+
+    if(extendedStyles & WS_EX_TOOLWINDOW)
+    {
+        if(!m_liveInTray)       
+        {
+            extendedStyles ^= WS_EX_TOOLWINDOW;
+            RemoveTrayIcon();
+        }
+    }
+    else 
+    {
+        if(m_liveInTray)
+        {
+            extendedStyles |= WS_EX_TOOLWINDOW;
+            AddTrayIcon();
+        }
+
+    }
+
+    SetWindowLong(m_hwnd, GWL_STYLE, WS_VISIBLE);
+    SetWindowLong(m_hwnd, GWL_STYLE, styles);
+    SetWindowLong(m_hwnd, GWL_EXSTYLE, extendedStyles);
+
+    ShowWindow(m_hwnd, TRUE);*/
+
+}
+
+void 
+SimpleUI::
+AddTrayIcon()
+{
+	NOTIFYICONDATA nid;
+	int rc;
+
+	// Fill out NOTIFYICONDATA structure
+	nid.cbSize = sizeof(NOTIFYICONDATA);	// sanitycheck
+	nid.hWnd = m_hwnd;					    // window to receive notifications
+	nid.uID = 1;							// application defined identifier for icon
+	nid.uFlags = NIF_MESSAGE |				// uCallbackMessage is valid, use it
+				 NIF_ICON |					// hIcon is valid, use it
+				 NIF_TIP;					// there is tooltip specified
+	nid.uCallbackMessage = UWM_TRAY;        // that's what we will receive in wndProc
+	nid.hIcon = m_trayIcon;
+
+	strcpy(nid.szTip, m_trayTooltip);
+
+	rc = Shell_NotifyIcon(NIM_ADD, &nid);	// this adds the icon
+}
+
+void
+SimpleUI::
+RemoveTrayIcon()
+{
+	NOTIFYICONDATA nid;
+	nid.cbSize = sizeof(NOTIFYICONDATA);
+	nid.hWnd = m_hwnd;
+	nid.uID = 1;
+	nid.uFlags = NIF_ICON;
+	nid.hIcon = m_trayIcon;
+
+	Shell_NotifyIcon(NIM_DELETE, &nid);
+}
+
+void
+SimpleUI::
+SetTrayTooltip(char *str)
+{
+	NOTIFYICONDATA nid;
+
+    strncpy(m_trayTooltip, str, sizeof(m_trayTooltip));
+
+	nid.cbSize = sizeof(NOTIFYICONDATA);
+	nid.hWnd = m_hwnd;
+	nid.uID = 1;
+	nid.uFlags = NIF_TIP;				// just change tip
+	strcpy(nid.szTip, m_trayTooltip);
+	Shell_NotifyIcon(NIM_MODIFY, &nid); // now, modify our tooltip
+}
+
 
 BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd, 
 						            UINT msg, 
@@ -493,6 +614,12 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
             m_ui = (SimpleUI*)lParam;
 
             m_ui->SetHwnd(hwnd);
+
+            m_ui->m_trayIcon = LoadIcon(g_hInstance, MAKEINTRESOURCE(IDI_EXE_ICON));
+
+            m_ui->ReadPreferences();
+
+            m_ui->SetTrayTooltip("Welcome to FreeAmp");
 
 			result = TRUE;
 
@@ -632,31 +759,13 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 					break;
 				}
 
-				case IDC_EDIT_CURRENTPLAYLIST:
+                case IDC_EDIT_PREFS:
 				{
 					HINSTANCE hinst = (HINSTANCE)GetWindowLong(hwnd, GWL_HINSTANCE);
 					
-					/*PlayList* playlist = player->CurrentPlayList();
-
-					DialogBoxParam(	hinst, 
-									MAKEINTRESOURCE(IDD_PLAYLISTEDITOR),
-									NULL,
-									PlayListProc,
-									(LPARAM)playlist);*/
-					break;
-				}
-
-				case IDC_EDIT_PLAYLISTFILE:
-				{
-					HINSTANCE hinst = (HINSTANCE)GetWindowLong(hwnd, GWL_HINSTANCE);
-					
-					/*PlayList* playlist = player->CurrentPlayList();
-
-					DialogBoxParam(	hinst, 
-									MAKEINTRESOURCE(IDD_PLAYLISTEDITOR),
-									NULL,
-									PlayListProc,
-									(LPARAM)playlist);*/
+                    if(DisplayPreferences(hwnd, m_ui->m_prefs))
+                        m_ui->ReadPreferences();
+				
 					break;
 				}
 
@@ -670,6 +779,81 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 			result = TRUE;
 			break;
 		}
+
+        case UWM_TRAY:
+        {
+            switch(lParam)
+            {
+                case WM_LBUTTONUP:
+                {
+                    ShowWindow( hwnd, SW_NORMAL);
+			        SetForegroundWindow(hwnd);
+			        break;
+                }
+
+                case WM_RBUTTONUP:
+                {
+                    HMENU menuHandle, popupHandle;
+                    HINSTANCE hinst = (HINSTANCE)GetWindowLong(hwnd, GWL_HINSTANCE);
+                    POINT pt;
+
+                    // need mouse coordinates relative to screen
+                    GetCursorPos(&pt);
+          
+                    // load the menu and retrieve its popup
+                    menuHandle = LoadMenu(hinst, MAKEINTRESOURCE(IDM_TRAY));
+                    popupHandle = GetSubMenu(menuHandle, 0);
+
+                    if(m_ui->m_state != UIState_Stopped)
+                    {
+                        MENUITEMINFO mii;
+
+                        memset(&mii, 0x00, sizeof(MENUITEMINFO));
+
+                        mii.cbSize = sizeof(MENUITEMINFO);
+                        mii.fMask = MIIM_TYPE|MIIM_ID ;
+                        mii.fType = MFT_STRING;
+                        mii.dwTypeData = "Stop";
+                        mii.cch = strlen("Stop");
+                        mii.wID = IDC_STOP;
+
+                        SetMenuItemInfo(popupHandle, 
+                                        4,
+                                        TRUE,
+                                        &mii);
+                    }
+
+                    if(m_ui->m_state == UIState_Paused)
+                    {
+                        MENUITEMINFO mii;
+
+                        memset(&mii, 0x00, sizeof(MENUITEMINFO));
+
+                        mii.cbSize = sizeof(MENUITEMINFO);
+                        mii.fMask = MIIM_STATE;
+                        mii.fState = MFS_CHECKED;
+
+                        SetMenuItemInfo(popupHandle, 
+                                        5,
+                                        TRUE,
+                                        &mii);
+                    }
+
+                    // display the popup
+                    TrackPopupMenu( popupHandle,			
+					                TPM_RIGHTBUTTON,
+					                pt.x, 
+                                    pt.y,       
+					                0,  
+					                hwnd,
+					                NULL);
+
+			        break;
+                }
+
+            }
+            break;
+        }
 
 		case WM_DROPFILES:
 		{
@@ -769,6 +953,12 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 			result = TRUE;
 			break;
 		}
+
+        case WM_DESTROY:
+        {
+            m_ui->RemoveTrayIcon();
+            break;
+        }
 	
 	}
 

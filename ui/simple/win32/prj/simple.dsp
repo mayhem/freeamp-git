@@ -60,8 +60,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                        ..\..\..\..\base\win32\prj\plugins	copy simple.ui\
-          ..\..\..\..\base\win32\prj\plugins
+                         ..\..\..\..\base\win32\prj\plugins	copy simple.ui\
+           ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "simple - Win32 Debug"
@@ -93,8 +93,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                        ..\..\..\..\base\win32\prj\plugins	copy simple.ui\
-          ..\..\..\..\base\win32\prj\plugins
+                         ..\..\..\..\base\win32\prj\plugins	copy simple.ui\
+           ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "simple - Win32 NASM Debug"
@@ -128,8 +128,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                        ..\..\..\..\base\win32\prj\plugins	copy simple.ui\
-          ..\..\..\..\base\win32\prj\plugins
+                         ..\..\..\..\base\win32\prj\plugins	copy simple.ui\
+           ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "simple - Win32 NASM Release"
@@ -161,8 +161,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                        ..\..\..\..\base\win32\prj\plugins	copy simple.ui\
-          ..\..\..\..\base\win32\prj\plugins
+                         ..\..\..\..\base\win32\prj\plugins	copy simple.ui\
+           ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
@@ -240,6 +240,22 @@ SOURCE=..\..\..\..\base\src\playlist.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\src\prefdialog.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\src\preferences.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\src\registrar.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\src\registry.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\io\rio\rio.cpp
 # End Source File
 # Begin Source File
@@ -260,6 +276,10 @@ SOURCE=..\..\..\..\base\src\thread.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\..\base\win32\src\win32prefs.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\base\win32\src\win32thread.cpp
 # End Source File
 # End Group
@@ -275,5 +295,9 @@ SOURCE=..\res\about8.bmp
 SOURCE=..\res\simple.rc
 # End Source File
 # End Group
+# Begin Source File
+
+SOURCE=..\res\icon1.ico
+# End Source File
 # End Target
 # End Project
