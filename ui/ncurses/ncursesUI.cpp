@@ -79,7 +79,6 @@ ncursesUI::ncursesUI(FAContext *context) {
     m_lastIndexPlayed = -1;
     m_id3InfoPrinted = false;
     m_mediaInfo_set = false;
-    m_mediaInfo = NULL;
     m_mpegInfo_set = false;
     totalFrames = 0;
     
@@ -134,7 +133,6 @@ ncursesUI::~ncursesUI() {
         delete keyboardListenThread;
         keyboardListenThread = NULL;
     }
-    delete m_mediaInfo;
 }
 
 void ncursesUI::keyboardServiceFunction(void *pclcio) {
@@ -219,8 +217,7 @@ int32 ncursesUI::AcceptEvent(Event *e) {
                 MediaInfoEvent *pmvi = (MediaInfoEvent *)e;
                 if (pmvi)
                 {
-                       m_mediaInfo = new MediaInfoEvent(*pmvi);
-                    totalTime = m_mediaInfo->m_totalSeconds;
+                    totalTime = pmvi->m_totalSeconds;
                     m_mediaInfo_set = true;
                 }
                 if (pmvi && m_lastIndexPlayed != pmvi->m_indexOfSong) {

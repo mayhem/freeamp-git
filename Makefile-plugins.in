@@ -93,7 +93,7 @@ plugins/alsa.pmo: $(ALSAOBJ)
 ESNDOBJ = io/esound/src/esoundpmo.o io/src/pipeline.o io/src/pmo.o
 
 plugins/esound.pmo: $(ESNDOBJ)
-	$(LINKMOD) -o $@ $(ESNDOBJ) $(ESD_LIBS)
+	$(LINKMOD) -o $@ $(ESNDOBJ) @ESD_LIBS@
 
 #
 # UI section
@@ -132,14 +132,14 @@ plugins/irman.ui: $(IRMANUIOBJ)
 GTKUIOBJ = ui/gtk/freeamp-gtk.o
 
 plugins/gtk.ui: $(GTKUIOBJ)
-	$(LINKMOD) -o $@ $(GTKUIOBJ)
+	$(LINKMOD) -o $@ $(GTKUIOBJ) -lgtk
 
 # The studly X11 freeamp interface
 FREEAMPUIOBJ = ui/freeamp/unix/src/freeamp.o ui/freeamp/unix/src/windowhash.o
 FREEAMPUIOBJ += ui/freeamp/unix/src/res.o ui/freeamp/unix/src/fawindow.o
 
 plugins/freeamp.ui: $(FREEAMPUIOBJ)
-	$(LINKMOD) -o $@ $(FREEAMPUIOBJ) $(X_LIBS) $(X_EXTRA_LIBS)
+	$(LINKMOD) -o $@ $(FREEAMPUIOBJ) $(X_LIBS) $(X_EXTRA_LIBS) -lXpm
 
 
 #

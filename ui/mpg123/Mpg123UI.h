@@ -55,13 +55,12 @@ class Mpg123UI : public UserInterface {
  private:
     Properties *m_propManager;
     int32 m_argc;
-    char **m_argv;
+    char **m_argv, *m_filename;
     int32 m_startupType;
     void ProcessArgs();
 
     PlayListManager *m_plm;
     void DisplayStuff();
-    MediaInfoEvent *m_mediaInfo;
     bool m_mediaInfo_set;
     MpegInfoEvent m_mpegInfo;
     bool m_mpegInfo_set;
