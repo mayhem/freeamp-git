@@ -637,14 +637,11 @@ AC_ARG_ENABLE(mutex-debug, [  --enable-mutex-debug    Enable verbose mutex debug
 AC_ARG_ENABLE(dmalloc,     [  --enable-dmalloc        Enable debugging with dmalloc], AC_DEFINE(USING_DMALLOC), )
 
 if test "x$enable_dmalloc" = "xyes"; then
-    DMALLOCOBJ="/usr/local/lib/dmalloccc.o"
-    DMALLOCLIB="-ldmallocth"
+    DMALLOCLIB="-ldmallocxx"
 else
-    DMALLOCOBJ=""
     DMALLOCLIB=""
 fi
 
-AC_SUBST(DMALLOCOBJ)
 AC_SUBST(DMALLOCLIB)
 
 AC_CONFIG_HEADER(config/config.h)

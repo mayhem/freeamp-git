@@ -3625,13 +3625,10 @@ fi
 
 
 if test "x$enable_dmalloc" = "xyes"; then
-    DMALLOCOBJ="/usr/local/lib/dmalloccc.o"
-    DMALLOCLIB="-ldmallocth"
+    DMALLOCLIB="-ldmallocxx"
 else
-    DMALLOCOBJ=""
     DMALLOCLIB=""
 fi
-
 
 
 
@@ -3804,7 +3801,6 @@ s%@ID3LIB@%$ID3LIB%g
 s%@EXTRALIBS@%$EXTRALIBS%g
 s%@OSDEPPLUGINS@%$OSDEPPLUGINS%g
 s%@XINGASM@%$XINGASM%g
-s%@DMALLOCOBJ@%$DMALLOCOBJ%g
 s%@DMALLOCLIB@%$DMALLOCLIB%g
 
 CEOF

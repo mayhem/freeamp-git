@@ -129,3 +129,6 @@ Other major contributors and their contributions:
 Michael Rich <istan@alltel.net>
 * AlphNT porting/installer builds
 * WAV output plugin
+
+"Terje Malmedal" <tm@funcom.com>
+* fix for displaying European characters in the linux freeamp ui

@@ -368,7 +368,6 @@ void GTKPreferenceWindow::GetPrefsValues(Preferences* prefs,
     prefs->GetOutputBufferSize(&values->outputBufferSize);
     prefs->GetPrebufferLength(&values->preBufferLength);
 
-    prefs->GetStreamBufferInterval(&values->streamInterval);
     prefs->GetSaveStreams(&values->saveStreams);
     
     if (kError_BufferTooSmall == prefs->GetProxyServerAddress(buffer, &size)) {
@@ -505,7 +504,6 @@ void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs,
     prefs->SetOutputBufferSize(values->outputBufferSize);
     prefs->SetPrebufferLength(values->preBufferLength);
 
-    prefs->SetStreamBufferInterval(values->streamInterval);
     prefs->SetSaveStreams(values->saveStreams);
     prefs->SetSaveStreamsDirectory(values->saveStreamsDirectory.c_str());
     prefs->SetProxyServerAddress(values->proxyServer.c_str());
@@ -795,20 +793,6 @@ GtkWidget *GTKPreferenceWindow::CreateGeneral(void)
     return pane;
 }
 
-void GTKPreferenceWindow::SetStreamInterval(int newvalue)
-{
-    proposedValues.streamInterval = newvalue;
-    gtk_widget_set_sensitive(applyButton, TRUE);
-}
-
-static void stream_interval_change(GtkWidget *w, GTKPreferenceWindow *p)
-{
-    char *text = gtk_entry_get_text(GTK_ENTRY(w));
-    int newdata = atoi(text);
-
-    p->SetStreamInterval(newdata);
-}
-
 void GTKPreferenceWindow::SaveLocalToggle(int active)
 {
     gtk_widget_set_sensitive(saveStreamLabel, active);
@@ -952,37 +936,6 @@ GtkWidget *GTKPreferenceWindow::CreateStreaming(void)
     gtk_container_set_border_width(GTK_CONTAINER(pane), 5);
     gtk_widget_show(pane);
 
-    GtkWidget *frame = gtk_frame_new("Buffer Sizes");
-    gtk_container_add(GTK_CONTAINER(pane), frame);
-    gtk_widget_show(frame);
-
-    GtkWidget *hbox = gtk_hbox_new(FALSE, 5);
-    gtk_container_add(GTK_CONTAINER(frame), hbox);
-    gtk_container_set_border_width(GTK_CONTAINER(hbox), 5);
-    gtk_widget_show(hbox);
-
-    GtkWidget *label = gtk_label_new("Buffer Streams For ");
-    gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 5);
-    gtk_widget_show(label);
-
-    int value;
-    char tempstr[256];
-
-    GtkWidget *entry = gtk_entry_new();
-    value = originalValues.streamInterval;
-    sprintf(tempstr, "%d", value);
-    gtk_entry_set_text(GTK_ENTRY(entry), tempstr);
-    gtk_entry_set_max_length(GTK_ENTRY(entry), 2);
-    gtk_widget_set_usize(entry, 32, 0);
-    gtk_signal_connect(GTK_OBJECT(entry), "changed",
-                       GTK_SIGNAL_FUNC(stream_interval_change), this);
-    gtk_box_pack_start(GTK_BOX(hbox), entry, FALSE, FALSE, 0);
-    gtk_widget_show(entry);
-
-    label = gtk_label_new(" Seconds");
-    gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 5);
-    gtk_widget_show(label);
-
     GtkWidget *check = gtk_check_button_new_with_label("Save SHOUTCast/icecast Streams Locally");
     gtk_container_add(GTK_CONTAINER(pane), check);
     gtk_signal_connect(GTK_OBJECT(check), "toggled",
@@ -991,7 +944,7 @@ GtkWidget *GTKPreferenceWindow::CreateStreaming(void)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), TRUE);
     gtk_widget_show(check);
 
-    frame = gtk_frame_new(NULL);
+    GtkWidget *frame = gtk_frame_new(NULL);
     gtk_container_add(GTK_CONTAINER(pane), frame);
     gtk_widget_show(frame);
 
@@ -1049,7 +1002,7 @@ GtkWidget *GTKPreferenceWindow::CreateStreaming(void)
     gtk_container_add(GTK_CONTAINER(frame), vbox);
     gtk_widget_show(vbox);
 
-    hbox = gtk_hbox_new(FALSE, 0);
+    GtkWidget *hbox = gtk_hbox_new(FALSE, 0);
     gtk_container_set_border_width(GTK_CONTAINER(hbox), 0);
     gtk_container_add(GTK_CONTAINER(vbox), hbox);
     gtk_widget_show(hbox);
@@ -1070,6 +1023,8 @@ GtkWidget *GTKPreferenceWindow::CreateStreaming(void)
     gtk_widget_show(hbox);
 
     char *port = NULL;
+    char tempstr[256];
+
     strncpy(tempstr, originalValues.proxyServer.c_str(), 256);
     port = strrchr(tempstr, ':');
     if (port) {

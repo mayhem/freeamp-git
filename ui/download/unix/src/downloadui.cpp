@@ -61,53 +61,7 @@ Error DownloadUI::Init(int32 startup_level)
     if (!getenv("DISPLAY"))
         return kError_InitFailedSafely;
 
-    gtkThread = Thread::CreateThread();
-    gtkThread->Create(DownloadUI::UIThreadFunc, this);
-
     return kError_NoErr;
-}
-
-void DownloadUI::UIThreadFunc(void *p) 
-{
-    assert(p);
-    ((DownloadUI *)p)->GTKEventService();
-}
-
-void DownloadUI::SetRunning(void)
-{
-    m_context->gtkRunning = true;
-}
-
-static int download_timeout(DownloadUI *p)
-{
-    p->SetRunning();
-    if (p->doQuitNow)
-        gtk_main_quit();
-}
-
-void DownloadUI::GTKEventService(void)
-{
-    weAreGTK = false;
-    doQuitNow = false;
-
-    m_context->gtkLock.Acquire();
-    if (!m_context->gtkInitialized) {
-        m_context->gtkInitialized = true;
-
-	g_thread_init(NULL);
-        gtk_set_locale();
-	gtk_init(&m_context->argc, &m_context->argv);
-	gdk_rgb_init();
-
-	weAreGTK = true;
-    }
-    m_context->gtkLock.Release();
-
-    if (weAreGTK) {
-        gtk_timeout_add(250, download_timeout, this);
-        gtk_main();
-        gdk_threads_leave();
-    }
 }
 
 Error DownloadUI::AcceptEvent(Event *e)
@@ -115,11 +69,6 @@ Error DownloadUI::AcceptEvent(Event *e)
     
     switch (e->Type()) {
         case CMD_Cleanup: {
-            if (weAreGTK) 
-                doQuitNow = true;
-
-            gtkThread->Join();
-           
             for (uint32 i = 0; i < downloadList.size(); i++) {
                 DownloadItem *dli = downloadList[i];
                 if (dli->GetState() == kDownloadItemState_Downloading) {

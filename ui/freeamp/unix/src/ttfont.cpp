@@ -643,7 +643,7 @@ Efont_load(char *file, int size)
         ttfLock.Release();
 	return NULL;
      }
-   f->num_glyph = 128;
+   f->num_glyph = f->properties.num_Glyphs;
    f->glyphs = (TT_Glyph *) malloc(f->num_glyph * sizeof(TT_Glyph));
    memset(f->glyphs, 0, f->num_glyph * sizeof(TT_Glyph));
    f->glyphs_cached = 

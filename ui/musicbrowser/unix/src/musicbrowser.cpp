@@ -62,60 +62,11 @@ Error MusicBrowserUI::Init(int32 startup_level)
 
     m_playerEQ = m_context->target;
 
-    m_argc = m_context->argc;
-    m_argv = m_context->argv;
-
     string URL = string("file://") + FreeampDir(NULL) +
                  string("/currentlist.m3u");
     mainBrowser = new GTKMusicBrowser(m_context, this, URL);
 
-    gtkThread = Thread::CreateThread();
-    gtkThread->Create(MusicBrowserUI::gtkServiceFunction, this);
-
     return kError_NoErr;
-}
-
-void MusicBrowserUI::gtkServiceFunction(void *p)
-{
-    assert(p);
-    ((MusicBrowserUI *)p)->GTKEventService();
-}
-
-void MusicBrowserUI::SetRunning(void)
-{
-    m_context->gtkRunning = true;
-}
-
-static int musicbrowser_timeout(MusicBrowserUI *p)
-{
-    p->SetRunning();
-    if (p->doQuitNow)
-        gtk_main_quit();
-
-    return TRUE;
-}
-
-void MusicBrowserUI::GTKEventService(void)
-{
-    weAreGTK = false;
-    doQuitNow = false;
- 
-    m_context->gtkLock.Acquire();
-    if (!m_context->gtkInitialized) {
-        m_context->gtkInitialized = true;
-        g_thread_init(NULL);
-        gtk_set_locale();
-        gtk_init(&m_argc, &m_argv);
-        gdk_rgb_init();
-        weAreGTK = true;
-    }
-    m_context->gtkLock.Release();
-
-    if (weAreGTK) {
-        gtk_timeout_add(250, musicbrowser_timeout, this);
-        gtk_main();
-        gdk_threads_leave();
-    }
 }
 
 Error MusicBrowserUI::AcceptEvent(Event *event)
@@ -131,15 +82,11 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
                 browserWindows.erase(browserWindows.begin());
             }
 
-            if (weAreGTK) 
-                doQuitNow = true;
-
             if (searching)
                 searching->Close();
             if (wiz)
                 wiz->Close();
 
-            gtkThread->Join();
             m_playerEQ->AcceptEvent(new Event(INFO_ReadyToDieUI));
             break; }
         case INFO_SearchMusicDone:

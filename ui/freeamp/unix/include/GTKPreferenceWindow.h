@@ -2,7 +2,7 @@
 
    FreeAmp - The Free MP3 Player
 
-   Copyright (C) 1999 EMusic
+   Copyright (C) 1999-2000 EMusic
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -52,7 +52,6 @@ typedef struct PrefsStruct
     bool  askReclaimFiletypes;
 
     // page 2
-    int32 streamInterval;
     bool saveStreams;
     string saveStreamsDirectory;
     bool useProxyServer;
@@ -103,7 +102,6 @@ typedef struct PrefsStruct
             inputBufferSize == pref.inputBufferSize &&
             outputBufferSize == pref.outputBufferSize &&
             preBufferLength == pref.preBufferLength &&
-            streamInterval == pref.streamInterval &&
             saveStreams == pref.saveStreams &&
             saveStreamsDirectory == pref.saveStreamsDirectory &&
             useProxyServer == pref.useProxyServer &&
@@ -257,7 +255,6 @@ class GTKPreferenceWindow : public PreferenceWindow
       void SetOutputBufferSize(int newvalue);
       void SetPreBufferLength(int newvalue);
 
-      void SetStreamInterval(int newvalue);
       void SaveLocalToggle(int active);
       void SaveLocalSet(char *newpath, bool set);
       void ProxyAddySet(void);

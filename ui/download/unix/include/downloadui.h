@@ -49,7 +49,6 @@ class DownloadUI : public UserInterface {
     virtual Error Init(int32 startup_type);
     virtual Error AcceptEvent(Event*);
  
-    void GTKEventService(void);
     void ToggleVisEvent(void);
     void UpdateDownloadList(void);
     void CancelEvent(void);
@@ -58,26 +57,18 @@ class DownloadUI : public UserInterface {
     void SelChangeEvent(int row);
     void ShowHelp(void);
     void CloseWindow(void);
-    void SetRunning(void);
-
-    bool doQuitNow;
-
  protected:
 
     void ParseArgs(int32 argc, char** argv);
-
-    static void UIThreadFunc(void *);
 
  private:
     FAContext*	        m_context;
     PlaylistManager*    m_plm;
     Preferences*        m_prefs;
     Properties*         m_propManager;
-    Thread*             gtkThread;
     EventQueue*         m_target;
     DownloadManager*    m_dlm;
 
-    bool weAreGTK;
     bool m_initialized;
     bool isVisible;
    

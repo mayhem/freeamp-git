@@ -42,7 +42,6 @@ class MusicBrowserUI : public UserInterface {
     MusicBrowserUI(FAContext *);
     virtual Error AcceptEvent(Event *);
     virtual Error Init(int32);
-    static void gtkServiceFunction(void *);
     virtual ~MusicBrowserUI();
  
     EventQueue *m_playerEQ;
@@ -51,31 +50,20 @@ class MusicBrowserUI : public UserInterface {
     void WindowClose(GTKMusicBrowser *oldUI);
 
     void StartSearch(bool runMain = true, bool intro = false);
-    void SetRunning(void);
   
     void SearchClose(void);
     void WizardClose(void);
-
-    bool doQuitNow;
 
  protected:
     FAContext *m_context;
 
  private:
     bool isVisible;
-    bool weAreGTK;
 
     Properties *m_propManager;
     int32 m_startupType;
 
     bool m_initialized;
-
-    void GTKEventService(void);
-
-    int32 m_argc;
-    char **m_argv;
-
-    Thread *gtkThread;
 
     GTKMusicBrowser *mainBrowser;
     vector<GTKMusicBrowser *> browserWindows;

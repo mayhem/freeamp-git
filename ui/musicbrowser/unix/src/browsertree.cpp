@@ -2,7 +2,7 @@
 
         FreeAmp - The Free MP3 Player
 
-        Portions Copyright (C) 1999 EMusic.com
+        Portions Copyright (C) 1999-2000 EMusic.com
 
         This program is free software; you can redistribute it and/or modify
         it under the terms of the GNU General Public License as published by
@@ -58,11 +58,10 @@ ____________________________________________________________________________*/
 #include "../res/uncatagorized_pix.xpm"
 #include "../res/cd_pix.xpm"
 #include "../res/icecast_pix.xpm"
-#include "../res/shoutcast_pix.xpm"
+//#include "../res/shoutcast_pix.xpm"
 #include "../res/streams_pix.xpm"
 #include "../res/wiredplanet_pix.xpm"
-
-FAContext *BADContext = NULL;
+#include "../res/favorites_pix.xpm"
 
 const string icecastURL = "http://yp.icecast.org/yplist_long.xml";
 
@@ -166,7 +165,7 @@ vector<PlaylistItem *> *GTKMusicBrowser::GetTreeSelection(void)
             break; }
         case kTreePlaylist: {
             char *fname = (char *)data->playlistname.c_str();
-            BADContext->plm->ReadPlaylist(fname, newlist);
+            m_plm->ReadPlaylist(fname, newlist);
             break; }
         case kTreeUncat: {
             MusicCatalog *cat = data->catalog;
@@ -922,7 +921,7 @@ void GTKMusicBrowser::CreateMainTreeItems(void)
 
     pixmap = gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, &mask,
                                           &style->bg[GTK_STATE_NORMAL],
-                                          streams_pix);
+                                          favorites_pix);
     name[0] = "Favorites";
     favoritesTree = gtk_ctree_insert_node(musicBrowserTree, streamTree, NULL, 
                                           name, 5, pixmap, mask, pixmap, mask, 
@@ -946,6 +945,7 @@ void GTKMusicBrowser::CreateMainTreeItems(void)
     wiredplanetSpace = gtk_ctree_insert_node(musicBrowserTree, wiredplanetTree, 
                                              NULL, NULL, 5, NULL, NULL, NULL, 
                                              NULL, true, false);
+
     pixmap = gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, &mask,
                                           &style->bg[GTK_STATE_NORMAL],
                                           icecast_pix);
@@ -962,9 +962,11 @@ void GTKMusicBrowser::CreateMainTreeItems(void)
                                          name, 5, NULL, NULL, NULL, NULL, true,
                                          false);
 
+/*
     pixmap = gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, &mask,
                                           &style->bg[GTK_STATE_NORMAL],
                                           shoutcast_pix);
+
     name[0] = "Shoutcast";
     shoutcastTree = gtk_ctree_insert_node(musicBrowserTree, streamTree, NULL, 
                                        name, 5,
@@ -978,6 +980,7 @@ void GTKMusicBrowser::CreateMainTreeItems(void)
                                            name, 5, NULL, NULL, NULL, NULL, 
                                            true, false);
 
+*/
     pixmap = gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, &mask,
                                           &style->bg[GTK_STATE_NORMAL],
                                           cd_pix);
@@ -1585,8 +1588,6 @@ void GTKMusicBrowser::CreateTreePopups(void)
 
 void GTKMusicBrowser::CreateTree(void)
 {
-    BADContext = m_context;
-
     GtkTargetEntry tree_target_table = {"tree-drag", 0, 1};
 
     musicBrowserTree = GTK_CTREE(gtk_ctree_new(1, 0));
