@@ -759,6 +759,12 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
    	       int iState = 0;
              m_pWindow->ControlIntValue(string("Mute"), false, iState);
          }
+
+         char VolumeText[255];
+         sprintf(VolumeText, "%d%%", m_iVolume);
+         string oVol = string(VolumeText);
+         m_pWindow->ControlStringValue(string("VolumeText"), true, oVol);
+
          break;
       }
 
@@ -1498,6 +1504,8 @@ void FreeAmpTheme::SetVolume(int iVolume, int iBalance)
         sprintf(szPercent, "%d%%", iVolume);
         oVol += string(szPercent);
         m_pWindow->ControlStringValue(string("Info"), true, oVol);
+        oVol = string(szPercent);
+        m_pWindow->ControlStringValue(string("VolumeText"), true, oVol);
     }
     else
     {

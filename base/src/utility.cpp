@@ -89,7 +89,7 @@ void CreateDirectoryPath(const char* path)
     delete [] temp;
 }
 
-static bool IsRelative(const char* path)
+bool IsRelative(const char* path)
 {
     bool result = false;
 

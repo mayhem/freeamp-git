@@ -24,6 +24,8 @@ ____________________________________________________________________________*/
 // The debugger can't handle symbols more than 255 characters long.
 // STL often creates symbols longer than that.
 // When symbols are longer than 255 characters, the warning is disabled.
+#include "config.h"
+
 #ifdef WIN32
 #pragma warning(disable:4786)
 #endif
@@ -55,8 +57,7 @@ ____________________________________________________________________________*/
 #include "MessageDialog.h"
 #include "debug.h"
 #include "ForeignTheme.h"
-
-#include "config.h"
+#include "utility.h"
 
 #define DB Debug_v("%s:%d\n", __FILE__, __LINE__);
 

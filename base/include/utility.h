@@ -42,6 +42,7 @@ using namespace std;
 #include "preferences.h"
 
 void CreateDirectoryPath(const char* path);
+bool IsRelative(const char *path);
 void ResolvePath(char** path);
 void RFC822GMTTimeString(struct tm* time, char buf[32]);
 char *strdup_new(const char *str);

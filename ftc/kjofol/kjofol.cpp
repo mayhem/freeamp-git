@@ -67,6 +67,8 @@ static char deffontmap[] =
 "            <FontMap Map=\"ежд?*                          \"/>";
 static char timefontmap[] =
 "            <FontMap Map=\"0123456789: \"/>";
+static char volfontmap[] =
+"            <FontMap Map=\"0123456789% \"/>";
 
 KJofol::KJofol(FAContext *context):ThemeFormat(context)
 {
@@ -130,6 +132,8 @@ void KJofol::ParseRCFile(string rcfile, string windowname, bool dock)
     char line[_MAX_PATH];
     char outline[_MAX_PATH];
     char left[_MAX_PATH], right[_MAX_PATH];
+    int seekfields = 0;
+    string seekinfo;
 
     infile = fopen(rcfile.c_str(), "r");
     if (!infile)
@@ -256,6 +260,32 @@ void KJofol::ParseRCFile(string rcfile, string windowname, bool dock)
             f.transparent = atoi(right);
             fonts["Time"] = f;
         }
+       else if (!strcasecmp(left, "VolumeFontImage")) {
+            KJofol_Font f = fonts["Volume"];
+            f.image = right;
+            f.fontmap = volfontmap;
+            fonts["Volume"] = f;
+        }
+        else if (!strcasecmp(left, "VolumeFontSize")) {
+            KJofol_Font f = fonts["Volume"];
+            ParsePosition(right, f.size);
+            f.width = f.size.x * 12 - 1;
+            f.height = f.size.y - 1;
+            fonts["Volume"] = f;
+        }
+        else if (!strcasecmp(left, "VolumeFontSpacing")) {
+            KJofol_Font f = fonts["Volume"];
+            f.spacing = atoi(right);
+            fonts["Volume"] = f;
+        }
+        else if (!strcasecmp(left, "VolumeFontTransparent")) {
+            KJofol_Font f = fonts["Volume"];
+            f.transparent = atoi(right);
+            fonts["Volume"] = f;
+        }
+        else if (!strcasecmp(left, "VolumeText")) {
+            HandleTextWindow(right, "VolumeText", fonts["Volume"]);
+        }
         else if (!strcasecmp(left, "FilenameWindow")) {
             HandleTextWindow(right, "Title", fonts["Default"]);
         }
@@ -274,9 +304,11 @@ void KJofol::ParseRCFile(string rcfile, string windowname, bool dock)
         }
         else if (!strcasecmp(left, "SeekRegion")) {
             ParseRect(right, m_seekrect);
+            seekfields++;
         }
         else if (!strcasecmp(left, "SeekImage")) {
-            Seek(right);
+            seekinfo = right;
+            seekfields++;
         }
         else if (!strcasecmp(left, "VolumeControlType")) {
             if (!strncasecmp(right, "BMP", 3)) {
@@ -323,12 +355,18 @@ void KJofol::ParseRCFile(string rcfile, string windowname, bool dock)
         }
         else if (!strcasecmp(left, "About")) {
         }
+        else if (!strncasecmp(left, "Pitch", 5)) {
+        }
         else
             cout << "don't understand: " << line << endl;
 
         if (m_bmpvolume && m_bmpvolfields == 6) {
             VolumeBMP();
             m_bmpvolume = false;
+        }
+        if (seekfields == 2) {
+            Seek((char *)seekinfo.c_str());
+            seekfields = 0;
         }
     }
 
@@ -391,7 +429,7 @@ void KJofol::BuildImageList(string &oDir)
                     strcasecmp("zip", ext) && strcasecmp("txt", ext) &&
                     strcasecmp("dck", ext) && strcasecmp("wsh", ext) &&
                     strcasecmp("ttf", ext) && strcasecmp("pls", ext) &&
-                    find.cFileName[0] != '.') 
+                    strcasecmp("pl", ext) && find.cFileName[0] != '.') 
                     HandleBitmap(oDir, find.cFileName);
             }
         }
@@ -476,8 +514,8 @@ void KJofol::HandleBitmap(string &oDir, char *name)
 
     bmp_sizes[name] = pos;
 
-    pos.x--;
-    pos.y--;
+    pos.x -= 2;
+    pos.y -= 2;
     pBitmap->GetColor(pos, color);
 
     char trans[32];

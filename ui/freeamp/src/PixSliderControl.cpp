@@ -137,10 +137,10 @@ void PixSliderControl::Transition(ControlTransitionEnum  eTrans,
     {
        case CT_MouseEnter:
           m_pParent->SendControlMessage(this, CM_MouseEnter);
-          break;
+          return;
        case CT_MouseLeave:
           m_pParent->SendControlMessage(this, CM_MouseLeave);
-          break;
+          return;
        case CT_SetValue: {
           if (m_iValue < 0 || m_iValue > 100)
               return;
@@ -164,7 +164,7 @@ void PixSliderControl::Transition(ControlTransitionEnum  eTrans,
            pCanvas = m_pParent->GetCanvas();
            pCanvas->Erase(oRect);
            pCanvas->Invalidate(oRect);
-       	  break;
+       	   return;
        }   
 
        default:
