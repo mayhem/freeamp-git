@@ -240,7 +240,8 @@ Error LocalFileInput::Seek(int32 &iRet, int32 iPos, int32 iFrom)
 
 void LocalFileInput::Clear(void) 
 { 
-    fseek(m_fpFile, SEEK_SET, 0); 
+	if (m_fpFile)
+       fseek(m_fpFile, SEEK_SET, 0); 
     m_pOutputBuffer->Clear();
     PipelineUnit::Clear();
 }
