@@ -92,7 +92,7 @@ void VSliderControl::Transition(ControlTransitionEnum  eTrans,
        {
        	   int iNewPos;	
 
-           iNewPos = (m_iValue * m_iRange) / 100;
+           iNewPos = ((100 - m_iValue) * m_iRange) / 100;
            if (iNewPos == m_iCurrentPos)
                return;
                
@@ -127,7 +127,7 @@ void VSliderControl::Transition(ControlTransitionEnum  eTrans,
 	        m_pParent->HideMouse(false);
 	        m_oOrigin.y = -1;
 	    }    
-        m_iValue = (m_iCurrentPos * 100) / m_iRange;
+        m_iValue = 100 - ((m_iCurrentPos * 100) / m_iRange);
         m_pParent->SendControlMessage(this, CM_ValueChanged);
     }    
 
@@ -176,7 +176,7 @@ void VSliderControl::HandleJump(ControlTransitionEnum  eTrans,
     m_iCurrentPos = iNewPos;
     m_oLastPos = *pPos;
     
-    m_iValue = (m_iCurrentPos * 100) / m_iRange;
+    m_iValue = 100 - ((m_iCurrentPos * 100) / m_iRange);
     m_bIsDrag = true;
 }
 
@@ -210,7 +210,7 @@ void VSliderControl::HandleDrag(ControlTransitionEnum  eTrans,
     m_iCurrentPos = iNewPos;
     m_oLastPos = *pPos;
     
-	m_iValue = (m_iCurrentPos * 100) / m_iRange;
+	m_iValue = 100 - ((m_iCurrentPos * 100) / m_iRange);
     m_pParent->SendControlMessage(this, CM_SliderUpdate);
 }
 
