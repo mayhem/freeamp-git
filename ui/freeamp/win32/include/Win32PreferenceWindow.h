@@ -195,8 +195,9 @@ class Win32PreferenceWindow : public PreferenceWindow
                void LoadThemeListBox  (HWND hwnd);
     
     
-      PrefsStruct  originalValues;
-      PrefsStruct  currentValues;
+      PrefsStruct  m_originalValues;
+      PrefsStruct  m_currentValues;
+      PrefsStruct  m_proposedValues;
     
       map<string, string> m_oThemeList;
 };
