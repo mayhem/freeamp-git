@@ -1590,10 +1590,10 @@ CreatePMO(const PlaylistItem * pc, Event * pC)
    }
 
    lmc_item = ChooseLMC(pc->URL().c_str());
-   if (!lmc_item)
+   if (!lmc_item) 
    // FIXME: Should probably have a user definable default LMC
-      lmc_item = m_lmcRegistry->GetItem(0);
-  
+      lmc_item = ChooseLMC("blah.mp3");
+
    if (pmi_item)
    {
       pmi = (PhysicalMediaInput *) pmi_item->InitFunction()(m_context);
