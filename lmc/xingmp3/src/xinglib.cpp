@@ -24,22 +24,22 @@ ____________________________________________________________________________*/
 #include "lmclib.h"
 #include "xinglmc.h"
 
-void Initialize(LMCRef* ref, LMCFunctionTable* table)
+void Initialize(LMCRef ref)
 {
-    if(ref && table)
+    if(ref)
     {
         LMC* lmc = new XingLMC;
-        *ref = lmc;
+        ref->ref = lmc;
 
-        table->SetPMI = SetPMI;
-        table->SetPMO = SetPMO;
-        table->SetInfoEventQueue = SetInfoEventQueue;
-        table->Decode = Decode;
-        table->Stop = Stop;
-        table->Pause = Pause;
-        table->Resume = Resume;
-        table->Reset = Reset;
-        table->ChangePosition = ChangePosition;
+        ref->SetPMI = SetPMI;
+        ref->SetPMO = SetPMO;
+        ref->SetInfoEventQueue = SetInfoEventQueue;
+        ref->Decode = Decode;
+        ref->Stop = Stop;
+        ref->Pause = Pause;
+        ref->Resume = Resume;
+        ref->Reset = Reset;
+        ref->ChangePosition = ChangePosition;
 
         lmc->Init();
     }

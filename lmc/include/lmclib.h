@@ -32,33 +32,23 @@ ____________________________________________________________________________*/
 
 extern "C" {
 
-typedef void* LMCRef;
+typedef struct LMCSTRUCT{
+    void*   ref;
+    void    (*SetPMI)            (struct LMCSTRUCT*, PhysicalMediaInput*);
+    void    (*SetPMO)            (struct LMCSTRUCT*, PhysicalMediaOutput*);
+    void    (*SetInfoEventQueue) (struct LMCSTRUCT*, EventQueue*);
 
-typedef void (*SETPMIFUNC)  (LMCRef, PhysicalMediaInput*);
-typedef void (*SETPMOFUNC)  (LMCRef, PhysicalMediaOutput*);
-typedef void (*SETINFOFUNC) (LMCRef, EventQueue*);
+    bool    (*Decode)            (struct LMCSTRUCT*);
+    void    (*Stop)              (struct LMCSTRUCT*);
+    void    (*Pause)             (struct LMCSTRUCT*);
+    void    (*Resume)            (struct LMCSTRUCT*);
+    void    (*Reset)             (struct LMCSTRUCT*);
+    bool    (*ChangePosition)    (struct LMCSTRUCT*, int32);
 
-typedef bool (*DECODEFUNC)  (LMCRef);
-typedef void (*STOPFUNC)    (LMCRef);
-typedef void (*PAUSEFUNC)   (LMCRef);
-typedef void (*RESUMEFUNC)  (LMCRef);
-typedef void (*RESETFUNC)   (LMCRef);
-typedef bool (*CHANGEPOSFUNC)  (LMCRef, int32);
+}LMCSTRUCT, *LMCRef;
 
-typedef struct LMCFunctionTable{
-    SETPMIFUNC      SetPMI;
-    SETPMOFUNC      SetPMO;
-    SETINFOFUNC     SetInfoEventQueue;
-    DECODEFUNC      Decode;
-    STOPFUNC        Stop;
-    PAUSEFUNC       Pause;
-    RESUMEFUNC      Resume;
-    RESETFUNC       Reset;
-    CHANGEPOSFUNC   ChangePosition;
 
-}LMCFunctionTable;
-
-void Initialize(LMCRef* ref, LMCFunctionTable*);
+void Initialize(LMCRef ref);
 
 
 void SetPMI(LMCRef ref, PhysicalMediaInput*);
