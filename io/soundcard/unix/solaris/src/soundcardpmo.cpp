@@ -176,6 +176,7 @@ Error SoundCardPMO::Pause()
 
    if (m_properlyInitialized)
        Reset(true);
+   return kError_NoErr;
 }
 
 Error SoundCardPMO::Resume()
@@ -199,6 +200,7 @@ Error SoundCardPMO::Init(OutputInfo * info)
    struct audio_info sInfo;
    m_properlyInitialized = false;
    int32 iNewSize;
+   int err;
 
    m_context->prefs->GetOutputBufferSize(&iNewSize);
    iNewSize *= 1024;
@@ -243,7 +245,8 @@ Error SoundCardPMO::Init(OutputInfo * info)
       return (Error) pmoError_IOCTL_AUDIO_GETINFO;
    }
 
-   audinf.play.buffer_size = 0;           // SYNC;
+   /* This makes no sense under solaris.
+   audinf.play.buffer_size = 0;
 
    if (ioctl(ctlfd, AUDIO_SETINFO, &audinf) < 0)
    {
@@ -251,17 +254,23 @@ Error SoundCardPMO::Init(OutputInfo * info)
       return (Error) pmoError_IOCTL_AUDIO_SETINFO;
    }
 
+   */
+
    channels = info->number_of_channels;
 
-   for (int i = 0; i < info->number_of_channels; ++i)
+   for (unsigned int i = 0; i < info->number_of_channels; ++i)
       bufferp[i] = buffer + i;
 
    // configure the device:
    int       play_precision = 16;
-//   int       play_stereo = channels - 1;
+   int       play_stereo = channels - 1;
    int       play_sample_rate = info->samples_per_second;
 
    int       junkvar = 0;
+
+   // note that there's actually the fctl I_FLSUHSTREAMS
+   // that'll immediately purge the audio buffer, instead
+   // of waiting for the buffer to play itself out.
 
    if (ioctl(audio_fd, AUDIO_DRAIN, &audinf) == -1)
    {
@@ -269,14 +278,17 @@ Error SoundCardPMO::Init(OutputInfo * info)
       return (Error) pmoError_IOCTL_AUDIO_DRAIN;
    }
 
+   AUDIO_INITINFO(&audinf);
    audinf.play.precision = play_precision;
    audinf.play.channels = channels;
    audinf.play.sample_rate = play_sample_rate;
+   audinf.play.encoding = AUDIO_ENCODING_LINEAR;
 
-   if (ioctl(ctlfd, AUDIO_SETINFO, &audinf) == -1)
+   if ((err = ioctl(audio_fd, AUDIO_SETINFO, &audinf)) == -1)
    {
       ReportError("Cannot set the soundcard's options.");
-      return (Error) pmoError_IOCTL_AUDIO_SETINFO;
+      fprintf(stderr, "%s(%d)\n", strerror(errno), err);
+      //     return (Error) pmoError_IOCTL_AUDIO_SETINFO;
    }
 
    myInfo->bits_per_sample = info->bits_per_sample;
