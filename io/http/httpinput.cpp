@@ -428,7 +428,6 @@ HttpInput::GetHostByName(char *szHostName, struct hostent * pResult)
 #else
    pTemp = gethostbyname(szHostName);
 #endif
-pTemp = NULL;
 
    if (pTemp == NULL)
    {
