@@ -69,13 +69,17 @@ Error ThemeManager::GetDefaultTheme(string &oThemePath)
 
     GetThemeList(oThemeList);
 
-    string themeName = BRANDING_DEFAULT_THEME;
+    char themeName = new char[strlen(BRANDING_DEFAULT_THEME) + 1];
+    strcpy(themeName, BRANDING_DEFAULT_THEME);
     char *dot;
 
-    if ((dot = strchr(themeName.c_str(), '.')))
+    if ((dot = strchr(themeName, '.')))
         *dot = '\0';
 
-    oThemePath = oThemeList[themeName];
+    string strName = themeName;
+    oThemePath = oThemeList[strName];
+
+    delete [] themeName;
 
     return kError_NoErr;
 }
