@@ -60,7 +60,6 @@ CLEAN :
 	-@erase "$(INTDIR)\EnumFormatEtc.obj"
 	-@erase "$(INTDIR)\Event.obj"
 	-@erase "$(INTDIR)\FavoriteDialog.obj"
-	-@erase "$(INTDIR)\FooCast.obj"
 	-@erase "$(INTDIR)\Icecast.obj"
 	-@erase "$(INTDIR)\IntroductionWizard.obj"
 	-@erase "$(INTDIR)\MissingFileDialog.obj"
@@ -102,7 +101,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\EditTrackInfoDialog.obj" \
 	"$(INTDIR)\EnumFormatEtc.obj" \
 	"$(INTDIR)\Event.obj" \
-	"$(INTDIR)\FooCast.obj" \
 	"$(INTDIR)\IntroductionWizard.obj" \
 	"$(INTDIR)\MultiSelectTreeView.obj" \
 	"$(INTDIR)\MusicSearchDialog.obj" \
@@ -163,7 +161,6 @@ CLEAN :
 	-@erase "$(INTDIR)\EnumFormatEtc.obj"
 	-@erase "$(INTDIR)\Event.obj"
 	-@erase "$(INTDIR)\FavoriteDialog.obj"
-	-@erase "$(INTDIR)\FooCast.obj"
 	-@erase "$(INTDIR)\Icecast.obj"
 	-@erase "$(INTDIR)\IntroductionWizard.obj"
 	-@erase "$(INTDIR)\MissingFileDialog.obj"
@@ -206,7 +203,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\EditTrackInfoDialog.obj" \
 	"$(INTDIR)\EnumFormatEtc.obj" \
 	"$(INTDIR)\Event.obj" \
-	"$(INTDIR)\FooCast.obj" \
 	"$(INTDIR)\IntroductionWizard.obj" \
 	"$(INTDIR)\MultiSelectTreeView.obj" \
 	"$(INTDIR)\MusicSearchDialog.obj" \
@@ -267,7 +263,6 @@ CLEAN :
 	-@erase "$(INTDIR)\EnumFormatEtc.obj"
 	-@erase "$(INTDIR)\Event.obj"
 	-@erase "$(INTDIR)\FavoriteDialog.obj"
-	-@erase "$(INTDIR)\FooCast.obj"
 	-@erase "$(INTDIR)\Icecast.obj"
 	-@erase "$(INTDIR)\IntroductionWizard.obj"
 	-@erase "$(INTDIR)\MissingFileDialog.obj"
@@ -309,7 +304,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\EditTrackInfoDialog.obj" \
 	"$(INTDIR)\EnumFormatEtc.obj" \
 	"$(INTDIR)\Event.obj" \
-	"$(INTDIR)\FooCast.obj" \
 	"$(INTDIR)\IntroductionWizard.obj" \
 	"$(INTDIR)\MultiSelectTreeView.obj" \
 	"$(INTDIR)\MusicSearchDialog.obj" \
@@ -370,7 +364,6 @@ CLEAN :
 	-@erase "$(INTDIR)\EnumFormatEtc.obj"
 	-@erase "$(INTDIR)\Event.obj"
 	-@erase "$(INTDIR)\FavoriteDialog.obj"
-	-@erase "$(INTDIR)\FooCast.obj"
 	-@erase "$(INTDIR)\Icecast.obj"
 	-@erase "$(INTDIR)\IntroductionWizard.obj"
 	-@erase "$(INTDIR)\MissingFileDialog.obj"
@@ -412,7 +405,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\EditTrackInfoDialog.obj" \
 	"$(INTDIR)\EnumFormatEtc.obj" \
 	"$(INTDIR)\Event.obj" \
-	"$(INTDIR)\FooCast.obj" \
 	"$(INTDIR)\IntroductionWizard.obj" \
 	"$(INTDIR)\MultiSelectTreeView.obj" \
 	"$(INTDIR)\MusicSearchDialog.obj" \
@@ -586,12 +578,6 @@ SOURCE=..\src\Event.cpp
 SOURCE=..\src\FavoriteDialog.cpp
 
 "$(INTDIR)\FavoriteDialog.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\src\FooCast.cpp
-
-"$(INTDIR)\FooCast.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

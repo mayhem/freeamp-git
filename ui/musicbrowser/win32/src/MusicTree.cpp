@@ -727,8 +727,6 @@ void MusicBrowserUI::FillWiredPlanet()
 
 void MusicBrowserUI::FillIceCast(vector<IcecastStreamInfo> &list)
 {
-    //FooCast* fooCast = new FooCast(m_hMusicView, m_hIceCastItem);
-
     HTREEITEM treeItem;
 
     while(treeItem = TreeView_GetChild(m_hMusicView, m_hIceCastItem))

@@ -252,10 +252,6 @@ SOURCE=..\src\FavoriteDialog.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\FooCast.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\src\Icecast.cpp
 # End Source File
 # Begin Source File
@@ -501,10 +497,6 @@ SOURCE=..\..\..\..\base\include\facontext.h
 # Begin Source File
 
 SOURCE=..\include\FavoriteDialog.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\FooCast.h
 # End Source File
 # Begin Source File
 
