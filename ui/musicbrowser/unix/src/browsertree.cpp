@@ -1363,12 +1363,27 @@ GtkCTreeNode *GTKMusicBrowser::StreamGetParentNode(string treePath)
     
 void GTKMusicBrowser::FillStreams(void)
 {
+    GdkCursor *cursor;
+    
     if (streamExpanded)
         return;
 
+    cursor = gdk_cursor_new (GDK_WATCH);
+    gdk_window_set_cursor (musicBrowserWindow->window, cursor);
+    gdk_cursor_destroy (cursor);
+
     gdk_threads_leave();
+    Event *e = new BrowserMessageEvent("Downloading streams information...");
+    AcceptEvent(e);
+    delete e;
     StreamTimer();
+    e = new BrowserMessageEvent("Downloaded stream information.");
+    AcceptEvent(e);
+    delete e;
     gdk_threads_enter();
+
+    gdk_window_set_cursor (musicBrowserWindow->window, NULL);
+
     //if (!stream_timer_started)
     //    m_context->timerManager->StartTimer(&stream_timer, stream_timer_func, 
     //                                        1, this);
