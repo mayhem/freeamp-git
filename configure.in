@@ -421,6 +421,13 @@ if test "$have_gtk" = "true"; then
   OSINC="$OSINC -I$srcdir/ui/download/unix/include"
   CFLAGS="$CFLAGS $GTK_CFLAGS"
   AC_DEFINE(HAVE_GTK)
+elif test "$host_os" = "beos"; then
+  #OSDEPPLUGINS="$OSDEPPLUGINS plugins/musicbrowser.ui"
+  OSDEPPLUGINS="$OSDEPPLUGINS plugins/freeamp.ui MakeTheme"
+  OSINC="$OSINC -Iui/musicbrowser/beos/include"
+  # freeampui's Font.h and friends conflict with Be API, thus the junk below.
+  OSINC="-Iui/freeamp/include -I- -Iui/freeamp/beos/include $OSINC"
+  OSINC="$OSINC -Iconfig -Iio/local -Iio/http -Iui/cmdline -Ilmc/xingmp3/src -Iplm/metadata/id3v1 -Iplm/metadata/id3v2 -Iplm/metadata/misc -Iplm/playlist/m3u -Iplm/playlist/pls -Idlm/rmp/"
 else
   GTK_CFLAGS=""
   GTK_LIBS=""

@@ -94,7 +94,7 @@ plugins/obsinput.pmi: $(OBSPMI)
 # PMO section
 
 SCPMObeosOBJ=io/soundcard/beos/src/soundutils.o
-SCPMObeosLIB="-lmedia -lbe -lroot"
+SCPMObeosLIB=-lmedia -lbe -lroot
 
 SCPMOOBJ  = io/soundcard/$(OSDEP)/src/soundcardpmo.o io/src/pmo.o
 SCPMOOBJ += io/src/pipeline.o $(SCPMO$(HOST_OS)OBJ)
@@ -135,17 +135,24 @@ plugins/download.ui: $(DOWNLOADUIOBJ)
 #	$(LINKMOD) -o $@ $(DOWNLOADUIOBJ) $(STATICLD)
 
 # musicbrowser ui
-MUSICBROWSEROBJ  = ui/musicbrowser/unix/src/gtkmusicbrowser.o
-MUSICBROWSEROBJ += ui/musicbrowser/unix/src/musicbrowser.o 
-MUSICBROWSEROBJ += ui/musicbrowser/unix/src/infoeditor.o 
-MUSICBROWSEROBJ += ui/musicbrowser/unix/src/fileselector.o 
-MUSICBROWSEROBJ += ui/musicbrowser/unix/src/browsermenu.o 
-MUSICBROWSEROBJ += ui/musicbrowser/unix/src/musicsearch.o 
-MUSICBROWSEROBJ += ui/musicbrowser/unix/src/gtkmessagedialog.o 
-MUSICBROWSEROBJ += ui/musicbrowser/unix/src/introwizard.o
+UNIXMUSICBROWSEROBJ  = ui/musicbrowser/unix/src/gtkmusicbrowser.o 
+UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/musicbrowser.o 
+UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/infoeditor.o 
+UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/fileselector.o 
+UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/browsermenu.o 
+UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/musicsearch.o 
+UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/gtkmessagedialog.o 
+UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/introwizard.o
+UNIXMUSICBROWSERLIBS = $(GTK_LIBS)
+
+BEOSMUSICBROWSEROBJ  =
+BEOSMUSICBROWSERLIBS =
+
+MUSICBROWSEROBJ = $($(OSTYPE)MUSICBROWSEROBJ)
+MUSICBROWSERLIBS = $($(OSTYPE)MUSICBROWSERLIBS)
 
 plugins/musicbrowser.ui: $(MUSICBROWSEROBJ)
-	$(LINKMOD) -o $@ $(MUSICBROWSEROBJ) $(GTK_LIBS)
+	$(LINKMOD) -o $@ $(MUSICBROWSEROBJ) $(MUSICBROWSERLIBS)
 #	$(LINKMOD) -o $@ $(MUSICBROWSEROBJ) $(STATICLD) 
 
 # freeamp ui
@@ -157,17 +164,37 @@ FREEAMPUIOBJ += ui/freeamp/src/Control.o ui/freeamp/src/TextControl.o
 FREEAMPUIOBJ += ui/freeamp/src/DialControl.o ui/freeamp/src/Font.o 
 FREEAMPUIOBJ += ui/freeamp/src/FreeAmpTheme.o ui/freeamp/src/ThemeZip.o 
 FREEAMPUIOBJ += ui/freeamp/src/MultiStateControl.o ui/freeamp/src/Headlines.o
-FREEAMPUIOBJ += ui/freeamp/unix/src/GTKFont.o ui/freeamp/unix/src/GTKUtility.o 
-FREEAMPUIOBJ += ui/freeamp/unix/src/GTKMessageDialog.o 
-FREEAMPUIOBJ += ui/freeamp/unix/src/GTKWindow.o ui/freeamp/unix/src/GTKBitmap.o 
-FREEAMPUIOBJ += ui/freeamp/unix/src/GTKCanvas.o ui/freeamp/unix/src/ttfont.o 
-FREEAMPUIOBJ += ui/freeamp/unix/src/ThemeManager.o 
-FREEAMPUIOBJ += ui/freeamp/unix/src/GTKPreferenceWindow.o
-FREEAMPUIOBJ += ui/freeamp/unix/src/GTKFileSelector.o  
-FREEAMPUIOBJ += lib/zlib/lib/libzlib.la lib/xml/src/Parse.lo
+FREEAMPUIOBJ += lib/zlib/lib/libzlib.a lib/xml/src/Parse.lo
+FREEAMPUIOBJ += $($(OSTYPE)FREEAMPUIOBJ)
+FREEAMPUILIBS = $($(OSTYPE)FREEAMPUILIBS)
+
+UNIXFREEAMPUIOBJ += ui/freeamp/unix/src/GTKFont.o
+UNIXFREEAMPUIOBJ += ui/freeamp/unix/src/GTKUtility.o 
+UNIXFREEAMPUIOBJ += ui/freeamp/unix/src/GTKMessageDialog.o 
+UNIXFREEAMPUIOBJ += ui/freeamp/unix/src/GTKWindow.o
+UNIXFREEAMPUIOBJ += ui/freeamp/unix/src/GTKBitmap.o 
+UNIXFREEAMPUIOBJ += ui/freeamp/unix/src/GTKCanvas.o
+UNIXFREEAMPUIOBJ += ui/freeamp/unix/src/ttfont.o 
+UNIXFREEAMPUIOBJ += ui/freeamp/unix/src/ThemeManager.o 
+UNIXFREEAMPUIOBJ += ui/freeamp/unix/src/GTKPreferenceWindow.o 
+UNIXFREEAMPUIOBJ += ui/freeamp/unix/src/GTKFileSelector.o  
+UNIXFREEAMPUILIBS = $(GTK_LIBS) $(TTF_LIBS)
+
+BEOSFREEAMPUIOBJ = ui/freeamp/beos/src/BeOSWindow.o \
+                   ui/freeamp/beos/src/BeOSBitmap.o \
+                   ui/freeamp/beos/src/BeOSMessageDialog.o \
+                   ui/freeamp/beos/src/BeOSCanvas.o \
+                   ui/freeamp/beos/src/BeOSFont.o \
+                   ui/freeamp/beos/src/BeOSPreferenceWindow.o \
+                   ui/freeamp/beos/src/MainWindow.o \
+                   ui/freeamp/beos/src/CanvasView.o \
+                   ui/freeamp/beos/src/ThemeManager.o \
+                   ui/freeamp/beos/src/PrefWindow.o \
+                   ui/freeamp/beos/src/PrefView.o
+BEOSFREEAMPUILIBS = -ltranslation -ltracker -lbe
 
 plugins/freeamp.ui: $(FREEAMPUIOBJ)
-	$(LINKMOD) -o $@ $(FREEAMPUIOBJ) $(GTK_LIBS) $(TTF_LIBS)
+	$(LINKMOD) -o $@ $(FREEAMPUIOBJ) $(FREEAMPUILIBS)
 #	$(LINKMOD) -o $@ $(FREEAMPUIOBJ) $(STATICLD)
 
 # MakeTheme, only built if we're building freeamp.ui
