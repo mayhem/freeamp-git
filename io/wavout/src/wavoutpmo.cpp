@@ -141,7 +141,7 @@ Init(OutputInfo* info)
       strcpy(path, "unknown.wav");
 
    len = _MAX_PATH;
-   m_pContext->prefs->GetPrefString(kWAVOutputPathPref, base, &len);
+   m_pContext->prefs->GetPrefString(kSaveMusicDirPref, base, &len);
    strcat(base, DIR_MARKER_STR);
    strcat(base, path);
 

@@ -85,7 +85,6 @@ const char* kCheckCDAutomaticallyPref = "AutoUpdateCD";
 const char* kMBServerPref = "MBServer";
 const char* kConvertUnderscoresToSpacesPref = "ConvertUnderscoresToSpaces";
 const char* kAllowMultipleInstancesPref = "AllowMultipleInstances";
-const char* kWAVOutputPathPref = "WAVOutputPath";
 const char* kAudioCDLengthPref = "AudioCDLength";
 const char* kWatchThisDirectoryPref = "WatchThisDirectory";
 const char* kWatchThisDirTimeoutPref = "WatchThisDirectoryTimeout";
@@ -161,7 +160,6 @@ const int32 kDefaultNumberOfURLsToRemember = 10;
 const char* kDefaultMBServer = "http://www.musicbrainz.org:80";
 const bool kDefaultConvertUnderscoresToSpaces = true;
 const bool kDefaultAllowMultipleInstances = false;
-const char* kDefaultWAVOutPath = ".";
 const int32 kDefaultAudioCDLength = 4440; // 74 minutes
 const int32 kDefaultWatchThisDirTimeout = 600000;
 const bool  kDefaultWriteID3v1 = true;
@@ -357,11 +355,6 @@ SetDefaults()
 
     if (GetPrefBoolean(kAllowMultipleInstancesPref, &dummyBool) == kError_NoPrefValue)
         SetPrefBoolean(kAllowMultipleInstancesPref, kDefaultAllowMultipleInstances);
-
-	dummyInt = 255;
-    if (GetPrefString(kWAVOutputPathPref, dummyString, 
-        (uint32 *)&dummyInt) == kError_NoPrefValue)
-        SetPrefString(kWAVOutputPathPref, kDefaultWAVOutPath);
 
     if (GetPrefInt32(kAudioCDLengthPref, &dummyInt) == kError_NoPrefValue)
         SetPrefInt32(kAudioCDLengthPref, kDefaultAudioCDLength);
