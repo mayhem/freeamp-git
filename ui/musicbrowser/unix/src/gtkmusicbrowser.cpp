@@ -1345,7 +1345,6 @@ void GTKMusicBrowser::UpdateCatalog(void)
 
     RegenerateCDTree();
  
-    } 
     gtk_ctree_sort_recursive(musicBrowserTree, playlistTree);
     gtk_clist_thaw(GTK_CLIST(musicBrowserTree));
 
