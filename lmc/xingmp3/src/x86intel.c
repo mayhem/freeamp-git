@@ -45,7 +45,7 @@ __asm {
 	mov DWORD PTR [esp+L_pcm],ecx
 
 	mov ebp,511		; ebp = 511
-	lea ecx,_wincoef	; coef = wincoef
+	lea ecx,wincoef	; coef = wincoef
 	add esi,16		; si = vb_ptr + 16
 	mov ebx,esi
 	add ebx,32
