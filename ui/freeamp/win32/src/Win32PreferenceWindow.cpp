@@ -488,6 +488,26 @@ void Win32PreferenceWindow::SavePrefsValues(Preferences* prefs,
     }
 }
 
+void Win32PreferenceWindow::BangOnThemes(void)
+{
+    map<string, string>::iterator i;
+    string oTemp;
+    
+    for(i = m_oThemeList.begin(); i != m_oThemeList.end(); i++)
+    {
+        if ((*i).first.length() > 0)
+        {
+           oTemp = (*i).first;
+           Debug_v("BangOn loading: '%s' -> %s", 
+               oTemp.c_str(), m_oThemeList[oTemp].c_str());
+           m_pThemeMan->UseTheme(m_oThemeList[oTemp]);
+        }   
+           
+        m_pContext->target->AcceptEvent(new Event(INFO_PrefsChanged));
+        Sleep(5000);
+    }    
+}
+
 void Win32PreferenceWindow::LaunchHelp(HWND hwnd, uint32 topic)
 {
     string            oHelpFile;

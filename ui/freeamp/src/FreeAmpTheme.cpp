@@ -164,6 +164,8 @@ void FreeAmpTheme::WorkerThread(void)
     Error  eRet;
     int32  iValue;
 
+    Debug_v("UI Theme: %d", GetCurrentThreadId());
+
     m_pContext->prefs->GetTimeDisplay(&iValue);
     if (iValue)
        m_eTimeDisplayState = kTimeRemaining;
@@ -206,11 +208,12 @@ void WorkerThreadStart(void* arg)
 
 void FreeAmpTheme::LoadFreeAmpTheme(void)
 {
-   char          szTemp[255];
+   char         *szTemp;
    uint32        iLen = 255;
    string        oThemePath;
    Error         eRet;
 
+   szTemp = new char[iLen];
    m_pContext->prefs->GetPrefString(kThemePathPref, szTemp, &iLen);
    oThemePath = szTemp;
    
@@ -245,6 +248,8 @@ void FreeAmpTheme::LoadFreeAmpTheme(void)
    }
    if (eRet == kError_InvalidParam)
        m_pContext->target->AcceptEvent(new Event(CMD_QuitPlayer));
+       
+   delete szTemp;    
 }
 
 
@@ -309,6 +314,11 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
          m_pWindow->ControlEnable(string("Pause"), true, bEnable);
          bEnable = true;
          m_pWindow->ControlEnable(string("Stop"), true, bEnable);
+   
+         bEnable = true;
+         m_pWindow->ControlEnable(string("Volume"), true, bEnable);
+         m_pWindow->ControlEnable(string("VolumePlus"), true, bEnable);
+         m_pWindow->ControlEnable(string("VolumeMinus"), true, bEnable);
          
          m_bPlayShown = false;
          m_bPaused = false;
@@ -359,6 +369,11 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
                 string title = BRANDING;
                 m_pWindow->SetTitle(title);
             }    
+            
+            bEnable = false;
+            m_pWindow->ControlEnable(string("Volume"), true, bEnable);
+            m_pWindow->ControlEnable(string("VolumePlus"), true, bEnable);
+            m_pWindow->ControlEnable(string("VolumeMinus"), true, bEnable);
          }
          
          break;
@@ -398,9 +413,6 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
          m_pContext->target->AcceptEvent(new Event(CMD_GetVolume));
 
          bSet = true;
-         m_pWindow->ControlEnable(string("Volume"), true, bSet);
-         m_pWindow->ControlEnable(string("VolumePlus"), true, bSet);
-         m_pWindow->ControlEnable(string("VolumeMinus"), true, bSet);
 
          break;
       }
@@ -431,16 +443,18 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
       
       case INFO_StreamInfo:
       {
-         char szTitle[100];
+         char *szTitle;
          string oName("Title"), oText;
 
          StreamInfoEvent *pInfo = (StreamInfoEvent *) e;
 
+         szTitle = new char[100];
          pInfo->GetTitle(szTitle, 100);
          m_oTitle = string(szTitle);
          m_pWindow->ControlStringValue(oName, true, m_oTitle);
          oText = string(BRANDING": ") + string(szTitle);
          m_pWindow->SetTitle(oText);
+         delete szTitle;
 
          break;
       }
@@ -458,9 +472,10 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
       case INFO_BufferStatus:
       {
          StreamBufferEvent *info = (StreamBufferEvent *) e;
-         char szTemp[100];
+         char *szTemp;
          string oName("BufferInfo"), oText;
 
+         szTemp = new char[100];
          sprintf(szTemp, "I: %3ld O: %3ld %c", 
                  (long int)info->GetInputPercent(),
                  (long int)info->GetOutputPercent(),
@@ -471,6 +486,7 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
              oName = string("StreamInfo");
 
          m_pWindow->ControlStringValue(oName, true, oText);
+         delete szTemp;
 
          break;
       }
@@ -504,8 +520,9 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
       case INFO_MPEGInfo:
       {
          MpegInfoEvent *info = (MpegInfoEvent *) e;
-         char           text[100];
+         char          *text;
 
+         text = new char[100];
          m_fSecondsPerFrame = info->GetSecondsPerFrame();
          if (info->GetBitRate() == 0)
               sprintf(text, "VBR %ldkhz %s", 
@@ -519,6 +536,7 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
 
          m_oStreamInfo = text;
          m_pWindow->ControlStringValue("StreamInfo", true, m_oStreamInfo);
+         delete text;
       
          break;
       }
@@ -583,11 +601,14 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
 
       case CMD_LoadTheme:
       {
-          char          szSavedTheme[_MAX_PATH], szNewTheme[_MAX_PATH];
+          char         *szSavedTheme, *szNewTheme;
           uint32        iLen = _MAX_PATH;
           string        oThemePath;
           MessageDialog oBox(m_pContext);
 	      string        oMessage(szKeepThemeMessage);
+
+          szSavedTheme = new char[iLen];
+          szNewTheme = new char[iLen];
 
           LoadThemeEvent *pInfo = (LoadThemeEvent *)e;
           URLToFilePath(pInfo->URL(), szNewTheme, &iLen);
@@ -606,17 +627,23 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
           if (oBox.Show(oMessage.c_str(), string(BRANDING), kMessageYesNo) == 
               kMessageReturnYes)
           {
-              ThemeManager oMan(m_pContext);
-              string       oThemePath(szNewTheme);
+              ThemeManager *pMan;
+              string        oThemePath(szNewTheme);
               
-              if (!IsError(oMan.AddTheme(oThemePath)))
+              pMan = new ThemeManager(m_pContext);
+              if (!IsError(pMan->AddTheme(oThemePath)))
                   m_pContext->prefs->SetPrefString(kThemePathPref, oThemePath.c_str());
+              delete pMan;    
           }
           else
           {
               m_pContext->prefs->SetPrefString(kThemePathPref, szSavedTheme);
               ReloadTheme();
           }
+          
+          delete szSavedTheme;
+          delete szNewTheme;
+          
           break;
       }
       
@@ -679,7 +706,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
            
        if (eMesg == CM_ValueChanged)
            m_bVolumeChangeInProgress = false;
-           
+
        m_pWindow->ControlIntValue(oControlName, false, iVol);
        SetVolume(iVol);
            
@@ -1060,10 +1087,12 @@ void FreeAmpTheme::InitWindow(void)
 
 void FreeAmpTheme::ReloadTheme(void)
 {
-    char          szTemp[255];
+    char         *szTemp;
     uint32        iLen = 255;
     string        oThemePath, oThemeFile("theme.xml");
     Error         eRet;
+
+    szTemp = new char[iLen];
 
     m_pContext->prefs->GetPrefString(kThemePathPref, szTemp, &iLen);
     oThemePath = szTemp;
@@ -1082,6 +1111,8 @@ void FreeAmpTheme::ReloadTheme(void)
         oMessage += oErr;
         oBox.Show(oMessage.c_str(), string(BRANDING), kMessageOk);
     }	
+    
+    delete szTemp;
 }
 
 void FreeAmpTheme::SetVolume(int iVolume)
@@ -1099,6 +1130,22 @@ void FreeAmpTheme::SetVolume(int iVolume)
     oVol += string(szPercent);
     m_pWindow->ControlStringValue(string("Info"), true, oVol);
 }    
+
+const char *aThemes[] =
+{
+     "D:\\FREEAMP\\FREEAMP\\BASE\\WIN32\\PRJ\\THEMES\\Aquatica.fat",
+     "D:\\FREEAMP\\FREEAMP\\BASE\\WIN32\\PRJ\\THEMES\\FreeAmpClassic.fat",
+     "D:\\FREEAMP\\FREEAMP\\BASE\\WIN32\\PRJ\\THEMES\\FreeAmp.fat",
+     "D:\\FREEAMP\\FREEAMP\\BASE\\WIN32\\PRJ\\THEMES\\EMusic.fat",
+     "D:\\FREEAMP\\FREEAMP\\BASE\\WIN32\\PRJ\\THEMES\\Minimalist.fat",
+     "D:\\FREEAMP\\FREEAMP\\BASE\\WIN32\\PRJ\\THEMES\\Visions.fat",
+     "D:\\FREEAMP\\FREEAMP\\BASE\\WIN32\\PRJ\\THEMES\\Stereo.fat",
+     "D:\\FREEAMP\\FREEAMP\\BASE\\WIN32\\PRJ\\THEMES\\office.fat",
+     "D:\\FREEAMP\\FREEAMP\\BASE\\WIN32\\PRJ\\THEMES\\giger.fat",
+     "D:\\FREEAMP\\FREEAMP\\BASE\\WIN32\\PRJ\\THEMES\\emusich.fat",
+     "D:\\FREEAMP\\FREEAMP\\BASE\\WIN32\\PRJ\\THEMES\\freeamph.fat",
+     "\0"
+};
 
 void FreeAmpTheme::HandleKeystroke(unsigned char cKey)
 {
@@ -1169,6 +1216,30 @@ void FreeAmpTheme::HandleKeystroke(unsigned char cKey)
      case '!':
      {
         m_bShowBuffers = !m_bShowBuffers;
+        break;
+     }    
+     
+     case '#':
+     {
+        int i, j;
+        string oTheme;
+
+        for(j = 0; j < 10; j++)
+        {
+           Debug_v("j: %d", j);   
+           for(i = 0; ; i++)
+           {
+              if (strlen(aThemes[i]) == 0)
+                 break;
+
+              Debug_v("i: %d", i);   
+                 
+              oTheme = aThemes[i];
+              m_pThemeMan->UseTheme(oTheme);
+              AcceptEvent(new Event(INFO_PrefsChanged));
+              Sleep(3000);
+           }   
+        }   
         break;
      }    
    }
@@ -1292,10 +1363,13 @@ void FreeAmpTheme::UpdateMetaData(const PlaylistItem *pItem)
 
 void FreeAmpTheme::DropFiles(vector<string> *pFileList)
 {
-    char                     ext[_MAX_PATH];
-    char                     url[_MAX_PATH + 7];
+    char                    *ext;
+    char                    *url;
     uint32                   length, countbefore;
     vector<string>::iterator i;
+    
+    ext = new char[_MAX_PATH];
+    url = new char[_MAX_PATH + 7];
     
     countbefore = m_pContext->plm->CountItems();
     for(i = pFileList->begin(); i != pFileList->end(); i++)
@@ -1391,6 +1465,9 @@ void FreeAmpTheme::DropFiles(vector<string> *pFileList)
     
     if (countbefore == 0)
         m_pContext->target->AcceptEvent(new Event(CMD_Play));
+        
+    delete ext;
+    delete url;    
 }
 
 void FreeAmpTheme::PostWindowCreate(void)
@@ -1408,9 +1485,11 @@ void FreeAmpTheme::PostWindowCreate(void)
 
 void FreeAmpTheme::ShowHelp(void)
 {
-    string            oHelpFile;
-    char              dir[_MAX_PATH];
-    uint32            len = sizeof(dir);
+    string  oHelpFile;
+    char   *dir;
+    uint32  len = sizeof(dir);
+
+    dir = new char[_MAX_PATH];
     
     m_pContext->prefs->GetInstallDirectory(dir, &len);
     oHelpFile = string(dir);
@@ -1444,6 +1523,7 @@ void FreeAmpTheme::ShowHelp(void)
           oBox.Show(oMessage.c_str(), string(BRANDING), kMessageOk, true);
     }
 #endif
+    delete dir;
 }
 
 void FreeAmpTheme::update_thread(void* arg)

@@ -156,6 +156,8 @@ class Win32PreferenceWindow : public PreferenceWindow
       virtual ~Win32PreferenceWindow(void); 
       
 
+               void BangOnThemes(void);
+
                void LaunchHelp(HWND hwnd, uint32 topic);
       virtual  bool Show(Window *pParent);
 

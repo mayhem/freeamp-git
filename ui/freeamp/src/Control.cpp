@@ -72,6 +72,7 @@ Control::~Control(void)
 Error Control::Show(bool bSet, bool &bShow)
 {
     m_oMutex.Acquire();
+
     if (bSet)
     {
         m_bShow = bShow;
@@ -92,7 +93,7 @@ Error Control::Show(bool bSet, bool &bShow)
 Error Control::Enable(bool bSet, bool &bEnable)
 {
     m_oMutex.Acquire();
-    
+
     if (bSet)
     {
         m_bEnable = bEnable;
@@ -129,7 +130,7 @@ Error Control::IntValue(bool bSet, int &iValue)
         iValue = m_iValue;
     
     m_oMutex.Release();
-    
+
     return kError_NoErr;
 }
 

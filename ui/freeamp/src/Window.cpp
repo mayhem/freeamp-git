@@ -54,6 +54,10 @@ Window::Window(Theme *pTheme, string &oName)
     m_pMouseDownControl = NULL;
     m_bIsVulcanMindMeldHost = false;
     m_bMindMeldInProgress = false;
+    
+	m_pUsageMutex = new Mutex();
+	m_pUsageSem = new Semaphore();
+	m_iUsageCount = 0;
 }
 
 Window::~Window(void)
@@ -63,6 +67,63 @@ Window::~Window(void)
        delete m_pCanvas;
        ClearControls();
     }   
+
+	delete m_pUsageMutex;
+	delete m_pUsageSem;
+}
+
+void Window::IncUsageRef(void)
+{
+    for(;;)
+    {
+        m_pUsageMutex->Acquire();
+    
+        if (m_iUsageCount < 0)
+        {
+            m_pUsageMutex->Release();
+            m_pUsageSem->Wait();
+        }
+        else
+            break;
+    }    
+       
+    m_iUsageCount++;
+    
+    m_pUsageMutex->Release();
+}
+
+void Window::DecUsageRef(void)
+{
+    m_pUsageMutex->Acquire();
+    m_iUsageCount--;
+    m_pUsageSem->Signal(); 
+    m_pUsageMutex->Release();
+}
+
+void Window::LockUsageRef(void)
+{
+    for(;;)
+    {
+        m_pUsageMutex->Acquire();
+    
+        if (m_iUsageCount > 0)
+        {
+            m_pUsageMutex->Release();
+            m_pUsageSem->Wait();
+        }
+        else
+            break;
+    }    
+    m_iUsageCount = -1;
+    m_pUsageMutex->Release();
+}
+
+void Window::UnlockUsageRef(void)
+{
+    m_pUsageMutex->Acquire();
+    m_iUsageCount = 0;
+    m_pUsageSem->Signal(); 
+    m_pUsageMutex->Release();
 }
 
 void Window::VulcanMindMeldHost(bool bHost)
@@ -81,7 +142,9 @@ Error Window::VulcanMindMeld(Window *pOther)
     vector<Control *>::iterator i;
     ControlMapIterator          j;
     string                      oName;
-    
+
+    LockUsageRef();
+
     m_oName = pOther->m_oName;
     m_pTheme = pOther->m_pTheme;
 
@@ -101,6 +164,9 @@ Error Window::VulcanMindMeld(Window *pOther)
         m_oControlMap.insert(pair<string, Control *>((*j).first, (*j).second));
         
     m_pCanvas = pOther->m_pCanvas;
+
+    UnlockUsageRef();
+    
     Init();   
    
     return kError_NoErr;
@@ -109,6 +175,8 @@ Error Window::VulcanMindMeld(Window *pOther)
 void Window::Init(void)
 {
     vector<Control *>::iterator i;
+
+    IncUsageRef();
 
     m_pCanvas->Init();
 
@@ -119,24 +187,26 @@ void Window::Init(void)
     }    
         
     m_pTheme->InitControls();    
+    
+    DecUsageRef();
 }
 
 void Window::AddControl(Control *pControl)
 {
     string oName;
 
-    if (m_bMindMeldInProgress)
-       return;
+    IncUsageRef();
 
     pControl->GetName(oName);
     m_oControlMap.insert(pair<string, Control *>(oName, pControl));
     m_oControls.push_back(pControl);
+
+    DecUsageRef();
 }
 
 void Window::ClearControls(void)
 {
-    if (m_bMindMeldInProgress)
-       return;
+    IncUsageRef();
        
     while(m_oControls.size() > 0)
     {
@@ -144,6 +214,8 @@ void Window::ClearControls(void)
         m_oControls.erase(m_oControls.begin());
     }
     m_oControlMap.clear();
+
+    DecUsageRef();
 }
 
 Canvas *Window::GetCanvas(void)
@@ -161,14 +233,15 @@ Error Window::ControlEnable(const string &oTarget, bool bSet, bool &bEnable)
     ControlMapIterator i;
     int                j;
 
-    if (m_bMindMeldInProgress)
-       return kError_InvalidParam;
+    IncUsageRef();
        
     for(i = m_oControlMap.find(oTarget), j = 0; 
         j != (int)m_oControlMap.count(oTarget); j++, i++) 
     {
          (*i).second->Enable(bSet, bEnable);
     }        
+
+    DecUsageRef();
 
     return (j == 0) ? kError_InvalidParam : kError_NoErr;
 }
@@ -182,8 +255,7 @@ Error Window::ControlShow(const string &oTarget, bool bSet, bool &bShow)
     ControlMapIterator  i;
     int                 j;
 
-    if (m_bMindMeldInProgress)
-       return kError_InvalidParam;
+    IncUsageRef();
        
     for(i = m_oControlMap.find(oTarget), j = 0; 
         j != (int)m_oControlMap.count(oTarget); j++, i++) 
@@ -200,6 +272,8 @@ Error Window::ControlShow(const string &oTarget, bool bSet, bool &bShow)
     	    pControl->AcceptTransition(CT_MouseEnter);
     }        
 
+    DecUsageRef();
+
     return (j == 0) ? kError_InvalidParam : kError_NoErr;
 }
 
@@ -208,14 +282,15 @@ Error Window::ControlIntValue(const string &oTarget, bool bSet, int &iValue)
     ControlMapIterator  i;
     int                 j;
 
-    if (m_bMindMeldInProgress)
-       return kError_InvalidParam;
+    IncUsageRef();
        
     for(i = m_oControlMap.find(oTarget), j = 0; 
         j != (int)m_oControlMap.count(oTarget); j++, i++) 
     {
          (*i).second->IntValue(bSet, iValue);
     }        
+
+    DecUsageRef();
 
     return (j == 0) ? kError_InvalidParam : kError_NoErr;
 }
@@ -225,14 +300,15 @@ Error Window::ControlStringValue(const string &oTarget, bool bSet, string &oValu
     ControlMapIterator  i;
     int                 j;
 
-    if (m_bMindMeldInProgress)
-       return kError_InvalidParam;
+    IncUsageRef();
        
     for(i = m_oControlMap.find(oTarget), j = 0; 
         j != (int)m_oControlMap.count(oTarget); j++, i++) 
     {
          (*i).second->StringValue(bSet, oValue);
     }        
+
+    DecUsageRef();
 
     return (j == 0) ? kError_InvalidParam : kError_NoErr;
 }
@@ -242,15 +318,17 @@ Error Window::ControlGetDesc(const string &oTarget, string &oDesc)
     ControlMapIterator  i;
     int                 j;
 
-    if (m_bMindMeldInProgress)
-       return kError_InvalidParam;
+    IncUsageRef();
        
     for(i = m_oControlMap.find(oTarget), j = 0; 
         j != (int)m_oControlMap.count(oTarget); j++, i++) 
     {
          (*i).second->GetDesc(oDesc);
+         DecUsageRef();
          return kError_NoErr;
     }        
+
+    DecUsageRef();
 
     return kError_InvalidParam;
 }
@@ -260,15 +338,17 @@ Error Window::ControlGetTip(const string &oTarget, string &oTip)
     ControlMapIterator  i;
     int                 j;
 
-    if (m_bMindMeldInProgress)
-       return kError_InvalidParam;
+    IncUsageRef();
        
     for(i = m_oControlMap.find(oTarget), j = 0; 
         j != (int)m_oControlMap.count(oTarget); j++, i++) 
     {
          (*i).second->GetTip(oTip);
+         DecUsageRef();
          return kError_NoErr;
     }        
+
+    DecUsageRef();
 
     return kError_InvalidParam;
 }
@@ -277,56 +357,69 @@ Error Window::SendControlMessage(Control *pControl,
                                  ControlMessageEnum eMesg)
 {
     string oControlName;
+    Error  eRet;
 
-    if (m_bMindMeldInProgress)
-       return kError_InvalidParam;
-   
+    IncUsageRef();
+
     pControl->GetName(oControlName);
 
-    return m_pTheme->HandleControlMessage(oControlName, eMesg);
+    eRet = m_pTheme->HandleControlMessage(oControlName, eMesg);
+    DecUsageRef();
+    
+    return eRet;
 }
 
 bool Window::DoesControlExist(const string &oName)
 {
-    if (m_bMindMeldInProgress)
-       return false;
-       
-    return m_oControlMap.find(oName) != m_oControlMap.end();
+    bool bRet;
+
+    IncUsageRef();
+    bRet = m_oControlMap.find(oName) != m_oControlMap.end();
+    DecUsageRef();
+    
+    return bRet;
 }
 
 Control *Window::ControlFromPos(Pos &oPos)
 {
     vector<Control *>::iterator i;
     bool                        bShown;
+    Control                    *pControl;
 
-    if (m_bMindMeldInProgress)
-       return NULL;
-
+    IncUsageRef();
+    
     for(i = m_oControls.begin(); i != m_oControls.end(); i++)
     {
         (*i)->Show(false, bShown);
         if ((*i)->PosInControl(oPos) && bShown) 
-            return (*i);
+        {
+            pControl = (*i);
+            DecUsageRef();
+        
+            return pControl;
+        }    
     }        
+
+    DecUsageRef();
 
     return NULL;
 }
 
 Error Window::StartMouseCapture(Control *pControl)
 {
-    if (m_bMindMeldInProgress)
-       return kError_InvalidParam;
-       
+    IncUsageRef();
     m_pCaptureControl = pControl;
+    DecUsageRef();
+    
     return CaptureMouse(true);
 }
 
 Error Window::EndMouseCapture(void)
 {
-    if (m_bMindMeldInProgress)
-       return kError_InvalidParam;
-       
+    IncUsageRef();
     m_pCaptureControl = NULL;
+    DecUsageRef();
+    
     return CaptureMouse(false);
 }
 
@@ -336,8 +429,7 @@ void Window::HandleMouseMove(Pos &oScreenPos)
     Pos      oPos;
     Rect     oRect;
 
-    if (m_bMindMeldInProgress)
-       return;
+    IncUsageRef();
 
     if (m_bWindowMove)
     {
@@ -383,6 +475,7 @@ void Window::HandleMouseMove(Pos &oScreenPos)
 
        m_oMovePos = oScreenPos;
        SetWindowPosition(oActualPos);
+       DecUsageRef();
        
        return; 
     }
@@ -400,6 +493,7 @@ void Window::HandleMouseMove(Pos &oScreenPos)
     if (m_pCaptureControl)
     {
        m_pCaptureControl->AcceptTransition(CT_MouseMove, &oPos);
+       DecUsageRef();
        return;
     }
 
@@ -446,6 +540,7 @@ void Window::HandleMouseMove(Pos &oScreenPos)
        }
 
        pControl->AcceptTransition(CT_MouseMove, &oPos);
+       DecUsageRef();
        return;
     }
     else
@@ -456,6 +551,7 @@ void Window::HandleMouseMove(Pos &oScreenPos)
            m_pMouseInControl = NULL;
        }
     }
+    DecUsageRef();
 
     return;
 }
@@ -466,8 +562,7 @@ void Window::HandleMouseLButtonDown(Pos &oScreenPos)
     Rect     oRect;
     Pos      oPos;
 
-    if (m_bMindMeldInProgress)
-       return;
+    IncUsageRef();
 
     GetWindowPosition(oRect);
     oPos.x = oScreenPos.x - oRect.x1;
@@ -476,6 +571,7 @@ void Window::HandleMouseLButtonDown(Pos &oScreenPos)
     if (m_pCaptureControl)
     {
        m_pCaptureControl->AcceptTransition(CT_MouseLButtonDown, &oPos);
+       DecUsageRef();
        return;
     }
 
@@ -485,6 +581,7 @@ void Window::HandleMouseLButtonDown(Pos &oScreenPos)
        m_bLButtonDown = true;
        m_pMouseDownControl = pControl;
        pControl->AcceptTransition(CT_MouseLButtonDown, &oPos);
+       DecUsageRef();
        return;
     }
 
@@ -499,6 +596,8 @@ void Window::HandleMouseLButtonDown(Pos &oScreenPos)
     if (IsError(GetDesktopSize(m_iDesktopWidth, m_iDesktopHeight)))
        m_iDesktopWidth = m_iDesktopHeight = 0;
 
+    DecUsageRef();
+
     return;
 }
 
@@ -508,8 +607,7 @@ void Window::HandleMouseLButtonUp(Pos &oScreenPos)
     Pos      oPos;
     Rect     oRect;
 
-    if (m_bMindMeldInProgress)
-       return;
+    IncUsageRef();
 
     GetWindowPosition(oRect);
     oPos.x = oScreenPos.x - oRect.x1;
@@ -521,6 +619,7 @@ void Window::HandleMouseLButtonUp(Pos &oScreenPos)
 #ifndef HAVE_GTK
        CaptureMouse(false);
 #endif        
+       DecUsageRef();
   
        return; 
     }
@@ -530,6 +629,7 @@ void Window::HandleMouseLButtonUp(Pos &oScreenPos)
     if (m_pCaptureControl)
     {
        m_pCaptureControl->AcceptTransition(CT_MouseLButtonUp, &oPos);
+       DecUsageRef();
        return;
     }
 
@@ -537,9 +637,12 @@ void Window::HandleMouseLButtonUp(Pos &oScreenPos)
     if (pControl)
     {
        pControl->AcceptTransition(CT_MouseLButtonUp, &oPos);
+       DecUsageRef();
        return;
     }
 
+    DecUsageRef();
+    
     return;
 }
 
@@ -547,13 +650,13 @@ void Window::HandleMouseLButtonUp(Pos &oScreenPos)
 // this ElvisHasLeftTheBuilding()?
 void Window::MouseHasLeftWindow(void)
 {
-    if (m_bMindMeldInProgress)
-       return;
+    IncUsageRef();
 
     if (m_pMouseInControl)
     {
        m_pMouseInControl->AcceptTransition(CT_MouseLeave);
        m_pMouseInControl = NULL;
+       DecUsageRef();
        return;
     }
     if (!m_pMouseInControl)
@@ -565,65 +668,71 @@ void Window::MouseHasLeftWindow(void)
        if (m_pMouseInControl)
           m_pMouseInControl->AcceptTransition(CT_MouseEnter);
     }      
+    DecUsageRef();
 }
 
 void Window::TimerEvent(void)
 {
     vector<Control *>::iterator i;
 
-    if (m_bMindMeldInProgress || !m_bTimerEnabled)
+    if (!m_bTimerEnabled)
        return;
+
+    IncUsageRef();
 
     for(i = m_oControls.begin(); i != m_oControls.end(); i++)
     {
         if ((*i)->WantsTimingMessages())
             (*i)->AcceptTransition(CT_Timer);
-    }        
+    }  
+    
+    DecUsageRef();
 }
 
 void Window::EnableTimer(bool bEnable)
 {
+    IncUsageRef();
     m_bTimerEnabled = bEnable;
+    DecUsageRef();
 }  
 
 void Window::SetStayOnTop(bool bStay)
 {
-    if (m_bMindMeldInProgress)
-       return;
-
+    IncUsageRef();
     m_bStayOnTop = bStay;
+    DecUsageRef();
 }
 
 void Window::SetLiveInToolbar(bool bLive)
 {
-    if (m_bMindMeldInProgress)
-       return;
-
+    IncUsageRef();
     m_bLiveInToolbar = bLive;
+    DecUsageRef();
 }
 
 void Window::Keystroke(unsigned char cKey)
 {
-    if (m_bMindMeldInProgress)
-       return;
-
+//    IncUsageRef();
     m_pTheme->HandleKeystroke(cKey);
+//    DecUsageRef();
 }
 
 bool Window::MenuCommand(uint32 uCommand)
 {
-    if (m_bMindMeldInProgress)
-       return true;
+    bool bRet;
 
-    return m_pTheme->HandleMenuCommand(uCommand);
+    IncUsageRef();
+    bRet = m_pTheme->HandleMenuCommand(uCommand);
+    DecUsageRef();
+    
+    return bRet;
 }
 
 void Window::VolumeChanged(void)
 {
-    if (m_bMindMeldInProgress)
-       return;
-
+    IncUsageRef();
     m_pTheme->VolumeChanged();
+    DecUsageRef();
 }
 
 void Window::GetReloadWindowPos(Rect &oOldRect, int iNewWidth, int iNewHeight, 

@@ -129,6 +129,11 @@ class Window
       Control *ControlFromPos(Pos &oPos);
       void     GetReloadWindowPos(Rect &oOldRect, int iNewWidth, int iNewHeight, 
                                   Rect &oNewRect);
+
+      void     IncUsageRef(void);
+	  void     DecUsageRef(void);
+	  void     LockUsageRef(void);
+	  void     UnlockUsageRef(void);
      
       string                    m_oName;
       vector<Control *>         m_oControls;
@@ -144,6 +149,9 @@ class Window
       Rect                      m_oMoveStart;
 	  int32                     m_iDesktopWidth, m_iDesktopHeight;
 	  bool                      m_bMindMeldInProgress, m_bTimerEnabled;
+	  Mutex                    *m_pUsageMutex;
+	  Semaphore                *m_pUsageSem;
+	  int32                     m_iUsageCount;
 };
 
 #endif

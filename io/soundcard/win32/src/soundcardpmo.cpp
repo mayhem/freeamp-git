@@ -222,15 +222,15 @@ int32 SoundCardPMO::GetVolume()
 	if (ret != MMSYSERR_NOERROR)
 		return 0;
 
-	return ((mxcdVolume.dwValue - m_dwMinimum) * 100) / 
-            (m_dwMaximum - m_dwMinimum);
+    return  (int)(((float)((mxcdVolume.dwValue - m_dwMinimum) * 100) /  
+                  (float)(m_dwMaximum - m_dwMinimum)) + 0.5); 
 }
 
 void SoundCardPMO::SetVolume(int32 volume) 
 {
     DWORD dwVal;
     
-    dwVal = m_dwMinimum + ((m_dwMaximum - m_dwMinimum) * volume / 100);
+    dwVal = (volume * (m_dwMaximum - m_dwMinimum) / 100);
 
 	MIXERCONTROLDETAILS_UNSIGNED mxcdVolume = { dwVal };
 	MIXERCONTROLDETAILS mxcd;
@@ -299,12 +299,6 @@ Error SoundCardPMO::Init(OutputInfo * info)
       m_wavehdr_array[i].dwFlags = NULL;
    }
    m_iBytesPerSample = info->number_of_channels * (info->bits_per_sample / 8);
-
-//   if (IsntError(m_pContext->props->GetProperty("CurrentVolume", 
-//                (PropValue **)&pProp)))
-//   {
-//      SetVolume(pProp->GetInt32());
-//   }   
 
    m_initialized = true;
 
