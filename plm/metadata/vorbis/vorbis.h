@@ -35,8 +35,6 @@ using namespace std;
 #include "facontext.h"
 
 #include "metadata.h"
-#include "vorbis/codec.h"
-//#include "bitwise.h" 
 
 class Vorbis : public MetaDataFormat {
  public:
@@ -49,7 +47,6 @@ class Vorbis : public MetaDataFormat {
 
  private:
 
-    bool    ReadHeader(const char *url, vorbis_comment &vc);
 };
 
 
