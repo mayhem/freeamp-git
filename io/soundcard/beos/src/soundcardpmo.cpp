@@ -59,7 +59,9 @@ SoundCardPMO::SoundCardPMO( FAContext* context )
 	m_dataSize( 0 ),
 	m_eventSem( "EventSem" ),
 	m_pauseLock( "pause lock" ),
-    m_timeBase( 0 )
+    m_bytesPerSample( 0 ),
+    m_lastFrame( -1 ),
+    m_totalBytesWritten( 0 )
 {
 	PRINT(( "SoundCardPMO::ctor\n" ));
 	m_properlyInitialized = false;
@@ -70,13 +72,14 @@ SoundCardPMO::SoundCardPMO( FAContext* context )
 
 	m_eventBufferThread = Thread::CreateThread();
 	m_eventBufferThread->Create( _EventBufferThreadHook, this );
+    m_eventBufferThread->SetPriority( B_REAL_TIME_PRIORITY ); // FIXME: don't use beos native prio
 }
 
 SoundCardPMO::~SoundCardPMO()
 {
-	PRINT(( "SoundCardPMO::dtor\n" ));
-
 	Lock();
+
+	PRINT(( "SoundCardPMO::dtor\n" ));
 
 	m_bExit = true;
 	m_pSleepSem->Signal();
@@ -143,7 +146,6 @@ SoundCardPMO::Pause( void )
 
 	if ( m_player )
 	{
-        m_timeBase += m_player->CurrentTime();
 		m_player->SetHasData( false );
 		m_player->Stop();
 	}
@@ -200,6 +202,8 @@ SoundCardPMO::WaitForDrain( void )
 Error
 SoundCardPMO::Init( OutputInfo* info )
 {
+    Lock();
+
 	PRINT(( "SoundCardPMO::Init\n" ));
 	PRINT(( "OI: bits_per_sample: %d\n", info->bits_per_sample ));
 	PRINT(( "OI: number_of_channels: %d\n", info->number_of_channels ));
@@ -221,6 +225,8 @@ SoundCardPMO::Init( OutputInfo* info )
 	m_outputInfo->number_of_channels = info->number_of_channels;
 	m_outputInfo->samples_per_second = info->samples_per_second;
 	m_outputInfo->max_buffer_size = info->max_buffer_size;
+
+    m_bytesPerSample = info->number_of_channels * ( info->bits_per_sample / 8 );
 
 	if ( ::get_audio_format( m_outputInfo, &m_format ) < B_NO_ERROR )
 	{
@@ -264,6 +270,8 @@ SoundCardPMO::Init( OutputInfo* info )
 
 	m_properlyInitialized = true;
 
+    Unlock();
+
 	return kError_NoErr;
 }
 
@@ -302,7 +310,7 @@ SoundCardPMO::Reset( bool user_stop )
 }
 
 void
-SoundCardPMO::HandleTimeInfoEvent( PMOTimeInfoEvent* pEvent )
+SoundCardPMO::HandleTimeInfoEvent( PMOTimeInfoEvent* event )
 {
     int32 hours, minutes, seconds, total;
     MediaTimeInfoEvent* mtie;
@@ -310,7 +318,20 @@ SoundCardPMO::HandleTimeInfoEvent( PMOTimeInfoEvent* pEvent )
 
     if ( !m_player ) return;
 
-    total = ( m_player->CurrentTime() + m_timeBase ) / 1000000;
+    if ( event->GetFrameNumber() != m_lastFrame + 1 )
+    {
+        m_totalBytesWritten = 1152 * event->GetFrameNumber() * m_bytesPerSample;
+    }
+    m_lastFrame = event->GetFrameNumber();
+
+    if ( m_outputInfo->samples_per_second <= 0 || event->GetFrameNumber() < 2 )
+    {
+        return;
+    }
+
+    total = m_totalBytesWritten /
+            ( m_bytesPerSample * m_outputInfo->samples_per_second );
+    total %= 86400;
 
     hours = total / 3600;
     minutes = (total / 60) % 60;
@@ -570,8 +591,10 @@ SoundCardPMO::Player(
 		bytesCopied = bytesToCopy;
 	}
 	eb->EndRead( bytesCopied );
-	m_pauseLock.Unlock();
+    m_totalBytesWritten += bytesCopied;
 	PRINT(( "SoundCardPMO::Player: %d bytes copied\n", bytesCopied ));
+
+	m_pauseLock.Unlock();
 
 	return;
 }

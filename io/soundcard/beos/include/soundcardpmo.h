@@ -109,7 +109,9 @@ private:
 	size_t					m_dataSize;
 	Semaphore				m_eventSem;
 	BLocker					m_pauseLock;
-    bigtime_t               m_timeBase;
+    int32                   m_bytesPerSample;
+    int32                   m_lastFrame;
+    int64                   m_totalBytesWritten;
 #if DEBUG_SAVE_PCM
 	FILE*					m_pcmSaveFile;
 #endif
@@ -128,3 +130,4 @@ SoundCardPMO::Unlock( void )
 }
 
 #endif /* _SOUNDCARDPMO_H_ */
+// vi: set ts=4:
