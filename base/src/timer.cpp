@@ -30,6 +30,9 @@ ____________________________________________________________________________*/
 #elif defined(WIN32)
 #include <windows.h>
 #define GoToSleep(x) Sleep(x)
+#elif defined(HAVE_BEOS)
+#include <be/kernel/OS.h>
+#define GoToSleep(x) snooze(x*1000)
 #else
     #error GoToSleep needs to be defined for this platform
 #endif
