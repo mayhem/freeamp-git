@@ -10,6 +10,11 @@
 #define IDI_MUSIC5                      106
 #define IDI_MUSIC6                      107
 #define IDI_WARN                        207
+#define IDI_MUSIC7                      208
+#define IDI_MUSIC8                      209
+#define IDI_MUSIC9                      210
+#define IDI_MUSIC10                     211
+#define IDI_MUSIC11                     212
 #define IDD_RECLAIMFILETYPES            220
 #define IDC_CHECK                       1007
 

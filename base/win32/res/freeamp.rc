@@ -63,6 +63,11 @@ IDI_MUSIC4              ICON    DISCARDABLE     "music4.ico"
 IDI_MUSIC5              ICON    DISCARDABLE     "music5.ico"
 IDI_MUSIC6              ICON    DISCARDABLE     "music6.ico"
 IDI_WARN                ICON    DISCARDABLE     "warn.ico"
+IDI_MUSIC7              ICON    DISCARDABLE     "music7.ico"
+IDI_MUSIC8              ICON    DISCARDABLE     "music8.ico"
+IDI_MUSIC9              ICON    DISCARDABLE     "music9.ico"
+IDI_MUSIC10             ICON    DISCARDABLE     "music10.ico"
+IDI_MUSIC11             ICON    DISCARDABLE     "music11.ico"
 
 #ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
