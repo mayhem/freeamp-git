@@ -83,7 +83,7 @@ public:
        
     /** IP of APS Servers can be overwridden in constructor. */
     APSInterface(const char* pYpIP  = "209.249.187.199", 
-                 const char* pSigIP = "209.248.187.199");
+                 const char* pSigIP = "209.249.187.199");
     virtual ~APSInterface(); // to be or not to be virtual....
        
     /** Submit an AudioSig structure to the Signature server, and get the
