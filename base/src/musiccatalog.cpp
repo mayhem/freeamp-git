@@ -77,15 +77,16 @@ MusicCatalog::MusicCatalog(FAContext *context, char *databasepath)
 
     m_timeout = 0;
     context->prefs->GetWatchThisDirTimeout(&m_timeout);
-    if (m_timeout) {
+    if (m_timeout) 
         m_watchTimer = new WatchDirectoryTimer(context, m_timeout);
-        m_watchTimer->SleepFirst();
-        m_watchTimer->Start();
-    }
-    else {
+    else 
         m_watchTimer = new WatchDirectoryTimer(context, 300000);
-        m_watchTimer->Stop();
-    }
+}
+
+void MusicCatalog::StartTimer(void)
+{
+    if (m_timeout > 0)
+        m_watchTimer->Start();
 }
 
 MusicCatalog::~MusicCatalog()

@@ -85,9 +85,14 @@ typedef struct PrefsStruct
 
     string alsaOutput;
 
+    string watchThisDirectory;
+    int32  watchThisDirTimeout;
+
     bool operator == (const struct PrefsStruct& pref)
     {
         return (
+            watchThisDirTimeout == pref.watchThisDirTimeout &&
+            watchThisDirectory == pref.watchThisDirectory &&
             convertUnderscores == pref.convertUnderscores &&
             allowMultipleInstances == pref.allowMultipleInstances &&
             playImmediately == pref.playImmediately &&
@@ -217,6 +222,8 @@ class GTKPreferenceWindow : public PreferenceWindow
 
       GtkWidget *paneVbox;
       GtkWidget *visiblePane;
+  
+      GtkWidget *watchDirBox;
 
       GtkCTree *prefTree;
 
@@ -274,6 +281,9 @@ class GTKPreferenceWindow : public PreferenceWindow
       void ReclaimTypesToggle(int active);
       void AskReclaimToggle(int active);
 
+      void WatchDirSet(char *newpath, bool set);
+      void SetWatchTimeout(int32 timeout);
+ 
       FAContext *GetContext(void) { return m_pContext; }
 };
 

@@ -91,6 +91,7 @@ class MusicCatalog : public EventQueue
     MusicCatalog(FAContext *context, char *databasepath = NULL);
     virtual ~MusicCatalog();
 
+    void StartTimer(void);
     void SetDatabase(const char *path);
 
     void SearchMusic(vector<string> &pathList, bool bBrowserMessages = true);

@@ -866,6 +866,7 @@ Run()
    m_eventServiceThread->Create(Player::EventServiceThreadFunc, this);
 
    m_cdTimer->Start();
+   m_context->catalog->StartTimer();
 
    delete[] name;
    delete[] musicBrowserName;

@@ -453,6 +453,17 @@ void GTKPreferenceWindow::GetPrefsValues(Preferences* prefs,
     values->alsaOutput = buffer;
     size = bufferSize;
 
+    if(kError_BufferTooSmall == prefs->GetPrefString(kWatchThisDirectoryPref,
+                                                     buffer, &size)) {
+        size++;
+        bufferSize = size;
+        buffer = (char*)realloc(buffer, bufferSize);
+        prefs->GetPrefString(kWatchThisDirectoryPref, buffer, &size);
+    }
+
+    values->watchThisDirectory = buffer;
+    size = bufferSize;
+
     if(kError_BufferTooSmall == prefs->GetUsersPortablePlayers(buffer, &size)) {
         buffer = (char*)realloc(buffer, size);
         prefs->GetUsersPortablePlayers(buffer, &size);
@@ -475,6 +486,7 @@ void GTKPreferenceWindow::GetPrefsValues(Preferences* prefs,
 
     prefs->GetAskToReclaimFiletypes(&values->askReclaimFiletypes);
     prefs->GetReclaimFiletypes(&values->reclaimFiletypes);
+    prefs->GetWatchThisDirTimeout(&values->watchThisDirTimeout);
 }
 
 void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs, 
@@ -522,6 +534,8 @@ void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs,
     m_pThemeMan->UseTheme(m_oThemeList[values->currentTheme]);
 
     prefs->SetSaveMusicDirectory(values->saveMusicDirectory.c_str());
+    prefs->SetWatchThisDirectory(values->watchThisDirectory.c_str());
+    prefs->SetWatchThisDirTimeout(values->watchThisDirTimeout);
 
     PortableSet::const_iterator j = values->portablePlayers.begin();
     string portableList;
@@ -1820,6 +1834,74 @@ static void save_music_browse(GtkWidget *w, GTKPreferenceWindow *p)
     delete filesel;
 }
 
+void GTKPreferenceWindow::WatchDirSet(char *newpath, bool set)
+{
+    proposedValues.saveMusicDirectory = newpath;
+    gtk_widget_set_sensitive(applyButton, TRUE);
+    if (set)
+        gtk_entry_set_text(GTK_ENTRY(watchDirBox), newpath);
+}
+
+static void watch_dir_change(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    char *text = gtk_entry_get_text(GTK_ENTRY(w));
+    p->WatchDirSet(text, false);
+}
+
+static void watch_dir_browse(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    GTKFileSelector *filesel = new GTKFileSelector("Select a New Directory");
+    if (filesel->Run(true)) {
+        char *returnpath = filesel->GetReturnPath();
+
+        struct stat st;
+
+        if (stat(returnpath, &st)) {
+            if (S_ISDIR(st.st_mode))
+                p->WatchDirSet(returnpath, true);
+            else {
+                MessageDialog oBox(p->GetContext());
+                oBox.Show("Please select a directory to have "the_BRANDING
+                          " watch for updated music files.",
+                          "Watch This Directory Browse Error", kMessageOk, 
+                          true);
+            }
+        }
+    }
+    delete filesel;
+}
+
+void GTKPreferenceWindow::SetWatchTimeout(int32 timeout)
+{
+    proposedValues.watchThisDirTimeout = timeout;
+    if (!firsttime)
+        gtk_widget_set_sensitive(applyButton, TRUE);
+}
+
+static void never_timeout_selected(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w)))
+        p->SetWatchTimeout(0);
+}
+
+static void one_timeout_selected(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w)))
+        p->SetWatchTimeout(60000);
+}
+
+static void five_timeout_selected(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w)))
+        p->SetWatchTimeout(300000);
+}
+
+static void ten_timeout_selected(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w)))
+        p->SetWatchTimeout(600000);
+}
+
 GtkWidget *GTKPreferenceWindow::CreateDirectories(void)
 {
     GtkWidget *pane = gtk_vbox_new(FALSE, 5);
@@ -1855,6 +1937,95 @@ GtkWidget *GTKPreferenceWindow::CreateDirectories(void)
     gtk_signal_connect(GTK_OBJECT(button), "clicked",
                        GTK_SIGNAL_FUNC(save_music_browse), this);
     gtk_widget_show(button);
+
+    frame = gtk_frame_new("Watch This Directory");
+    gtk_box_pack_start(GTK_BOX(pane), frame, FALSE, FALSE, 5);
+    gtk_widget_show(frame);
+
+    vbox = gtk_vbox_new(FALSE, 0);
+    gtk_container_set_border_width(GTK_CONTAINER(vbox), 5);
+    gtk_container_add(GTK_CONTAINER(frame), vbox);
+    gtk_widget_show(vbox);
+
+    temphbox = gtk_hbox_new(FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(vbox), temphbox, FALSE, FALSE, 5);
+    gtk_widget_show(temphbox);
+
+    strncpy(copys, originalValues.watchThisDirectory.c_str(), 256);
+    watchDirBox = gtk_entry_new();
+    gtk_entry_set_text(GTK_ENTRY(watchDirBox), copys);
+    gtk_entry_set_max_length(GTK_ENTRY(watchDirBox), 64);
+    gtk_signal_connect(GTK_OBJECT(watchDirBox), "changed",
+                       GTK_SIGNAL_FUNC(watch_dir_change), this);
+    gtk_box_pack_start(GTK_BOX(temphbox), watchDirBox, TRUE, TRUE, 0);
+    gtk_widget_show(watchDirBox);
+
+    button = gtk_button_new_with_label(" Browse ");
+    gtk_box_pack_start(GTK_BOX(temphbox), button, FALSE, FALSE, 5);
+    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                       GTK_SIGNAL_FUNC(watch_dir_browse), this);
+    gtk_widget_show(button);
+
+    GtkWidget *label = gtk_label_new("Update Frequency:");
+    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 5);
+    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+    gtk_widget_show(label);
+
+    temphbox = gtk_hbox_new(FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(vbox), temphbox, FALSE, FALSE, 5);
+    gtk_widget_show(temphbox);
+
+    bool setSomething = false;
+
+    button = gtk_radio_button_new_with_label(NULL, "Never");
+    if (originalValues.watchThisDirTimeout == 0) {
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
+        setSomething = true;
+    }
+    gtk_box_pack_start(GTK_BOX(temphbox), button, FALSE, FALSE, 0);
+    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                       GTK_SIGNAL_FUNC(never_timeout_selected), this);
+    gtk_widget_show(button);
+
+    button = gtk_radio_button_new_with_label(
+                             gtk_radio_button_group(GTK_RADIO_BUTTON(button)),
+                             "One Minute");
+    if (originalValues.watchThisDirTimeout == 60000) {
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
+        setSomething = true;
+    }
+    gtk_box_pack_start(GTK_BOX(temphbox), button, FALSE, FALSE, 0);
+    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                       GTK_SIGNAL_FUNC(one_timeout_selected), this);
+    gtk_widget_show(button);
+
+
+    button = gtk_radio_button_new_with_label(
+                             gtk_radio_button_group(GTK_RADIO_BUTTON(button)),
+                             "5 Minutes");
+    if (originalValues.watchThisDirTimeout == 300000) {
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
+        setSomething  = true;
+    }
+    gtk_box_pack_start(GTK_BOX(temphbox), button, FALSE, FALSE, 0);
+    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                       GTK_SIGNAL_FUNC(five_timeout_selected), this);
+    gtk_widget_show(button);
+
+    button = gtk_radio_button_new_with_label(
+                             gtk_radio_button_group(GTK_RADIO_BUTTON(button)),
+                             "10 Minutes");
+    if (originalValues.watchThisDirTimeout == 600000) {
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
+        setSomething  = true;
+    }
+    gtk_box_pack_start(GTK_BOX(temphbox), button, FALSE, FALSE, 0);
+    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                       GTK_SIGNAL_FUNC(ten_timeout_selected), this);
+    gtk_widget_show(button);
+
+    if (!setSomething)
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
 
     return pane;
 }
