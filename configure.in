@@ -70,7 +70,11 @@ AC_HAVE_HEADERS(sys/file.h string.h stdlib.h memory.h fcntl.h)
 
 dnl end checks for gdbm
 
-AC_CHECK_TYPE(socklen_t, unsigned int)
+if test $host_os = "beos"; then
+  AC_CHECK_TYPE(socklen_t, int)
+else
+  AC_CHECK_TYPE(socklen_t, unsigned int)
+fi
 
 dnl ******************
 dnl Check for dynamic loading library
