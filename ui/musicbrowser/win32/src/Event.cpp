@@ -123,11 +123,11 @@ void MusicBrowserUI::GenPlaylistEvent(vector<PlaylistItem*>* pSeed)
     if (!m_context->aps)
         return;
 
-    if ((seed) && (!seed->empty())) {
+    if ((pSeed) && (!pSeed->empty())) {
         APSPlaylist InputPlaylist;
         vector<PlaylistItem *>::iterator i;
 
-        for (i = seed->begin(); i != seed->end(); i++)
+        for (i = pSeed->begin(); i != pSeed->end(); i++)
             InputPlaylist.Insert((*i)->GetMetaData().GUID().c_str(),
                                  (*i)->URL().c_str());
 
@@ -157,9 +157,9 @@ void MusicBrowserUI::GenPlaylistEvent(vector<PlaylistItem*>* pSeed)
                 PlaylistItem *testitem = m_plm->ItemAt(z);
                 bool remove = true;
 
-                if ((seed) && (!seed->empty())) {
-                    vector<PlaylistItem *>::iterator i = seed->begin();
-                    for (; i != seed->end(); i++) {
+                if ((pSeed) && (!pSeed->empty())) {
+                    vector<PlaylistItem *>::iterator i = pSeed->begin();
+                    for (; i != pSeed->end(); i++) {
                         if ((*i)->GetMetaData().GUID() ==
                              testitem->GetMetaData().GUID()) {
                             remove = false;

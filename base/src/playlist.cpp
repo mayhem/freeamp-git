@@ -2462,11 +2462,6 @@ MetaDataThreadFunction(vector<PlaylistItem*>* list)
                             mdf->ReadMetaData(item->URL().c_str(), &metadata);
                         }
                     }
-
-                    FAMetaUnit faTemp(&metadata, item->URL().c_str());
-                    int nRes = m_context->aps->APSFillMetaData(&faTemp);
-                    if (nRes == 0)
-                        faTemp.GetMetaData(&metadata);
                 }                
 
                 m_mutex.Acquire();

@@ -150,6 +150,9 @@ EditLabelWndProc(HWND hwnd,
 
 void MusicBrowserUI::EditItemLabel(HWND hwnd, HTREEITEM item)
 {
+    if (item == NULL)
+        return;
+
     g_editItem = item;
 
     bool isPlaylist = false;

@@ -138,7 +138,7 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData, bool bUseCollection)
 {
     if (pmetaData == NULL) 
         return APS_PARAMERROR;
-    string strCollectionID = "NOT_OPTED_IN    ";
+    string strCollectionID = "NOT_OPTED_IN1111";
     if (m_strCollectionID.size() == 16)
         strCollectionID = m_strCollectionID;
 
@@ -263,6 +263,12 @@ int APSInterface::APSLookupSignature(AudioSig *sig, string &strGUID)
 
     m_pMutex->Acquire();
     int nRes = m_pSigClient->GetSignature(sig, strGUID);
+
+    fstream fout("sigs.txt", ios_base::out | ios_base::app);
+    fout << "GetSignature returned: " << nRes << " and filled in " <<
+            strGUID.size() << " : " << strGUID << endl;
+    fout.close();
+
     m_pMutex->Release();
 
     return nRes;
@@ -281,7 +287,7 @@ int APSInterface::APSGetPlaylist(APSPlaylist* pPlayList,
     if (!m_strCurrentProfile.empty())
         strUID = (*m_pProfileMap)[m_strCurrentProfile];
     if (strUID.empty())
-        strUID = "NOT_OPTED_IN    "; // 16 char aggregate query id
+        strUID = "NOT_OPTED_IN1111"; // 16 char aggregate query id
 
     int nRes = m_pYpClient->GeneratePlayList(*pResultList, *pPlayList, 
                                              nMaxItems, bLocalOnly, strUID,
@@ -303,7 +309,7 @@ int APSInterface::APSSubmitPlaylist(APSPlaylist* pPlayList)
         strUID = (*m_pProfileMap)[m_strCurrentProfile];
 
     if (strUID.empty())
-        strUID = "NOT_OPTED_IN    ";        // 16 char aggregate query id
+        strUID = "NOT_OPTED_IN1111";        // 16 char aggregate query id
     int nRes = m_pYpClient->SubmitPlaylist(*pPlayList, strUID);
     m_pMutex->Release();
 
@@ -380,10 +386,20 @@ int APSInterface::APSGetStreams(vector<pair<string, string> >* pResultList)
         strUID = (*m_pProfileMap)[m_strCurrentProfile];
        
     if (strUID.empty()) 
-        strUID = "NOT_OPTED_IN    ";        // 16 char aggregate query id
+        strUID = "NOT_OPTED_IN1111";        // 16 char aggregate query id
        
     int nRes = m_pYpClient->GetStreams(*pResultList, strUID);
        
+    fstream fout("test.txt", ios_base::in | ios_base::out | ios_base::app);
+    fout << "GetStream returned: " << nRes << " and filled in " <<
+            pResultList->size() << " items:" << endl;
+    vector<pair<string, string> >::iterator i;
+    for (i = pResultList->begin(); i != pResultList->end(); i++)
+    {
+        fout << (*i).first << " : " << (*i).second << endl;
+    }
+    fout.close();
+
     m_pMutex->Release();
 
     return nRes;
@@ -431,7 +447,7 @@ int APSInterface::DeleteProfile(const char *pczNewName, bool bServerToo)
         return APS_PARAMERROR;
 
     string logfilename = m_profilePath + string(DIR_MARKER_STR) + 
-                         string((*m_pProfileMap)[pczNewName]);
+                         string(pczNewName);
 #ifdef WIN32
     DeleteFile(logfilename.c_str());
 #else

@@ -314,7 +314,7 @@ void Panel::ShowAllControls(void)
 
     for (i = m_oControlMap.begin(); i != m_oControlMap.end(); i++)
     {
-         i->second->Init();
-         i->second->AcceptTransition(m_bIsHidden ? CT_Hide : CT_Show);
+         (*i).second->Init();
+         (*i).second->AcceptTransition(m_bIsHidden ? CT_Hide : CT_Show);
     }        
 }

@@ -1357,6 +1357,19 @@ void GTKMusicBrowser::FillRelatable(bool force)
     if (relatableSpace)
         gtk_ctree_remove_node(musicBrowserTree, relatableSpace);
     relatableSpace = NULL;
+
+    GtkCTreeRow *row = GTK_CTREE_ROW(relatableTree);
+    int expanded = row->expanded;
+
+    if (force) {
+        GtkCTreeNode *todelete = row->children;
+
+        while (todelete) {
+            gtk_ctree_remove_node(musicBrowserTree, todelete);
+            todelete = row->children;
+        }
+    }
+
     relatableExpanded = true;
 
     char *name[1];
@@ -1389,6 +1402,9 @@ void GTKMusicBrowser::FillRelatable(bool force)
         gtk_ctree_node_set_row_data_full(musicBrowserTree, stream, data,
                                          (GtkDestroyNotify)kill_treedata);
     }
+    if (expanded)
+        gtk_ctree_expand(musicBrowserTree, relatableTree);
+
     gtk_clist_thaw(GTK_CLIST(musicBrowserTree));
 }
 
