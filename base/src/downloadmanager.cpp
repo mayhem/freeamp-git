@@ -990,11 +990,6 @@ Error DownloadManager::Download(DownloadItem* item)
                                        SendProgressMessage(item);
                                    }
 
-if (item->GetBytesReceived() > 900000 && 
-    item->GetBytesReceived() < 902000 && 
-    rand() % 2)
-     result = kError_IOError;
-
                                 if(count < 0) 
                                     result = kError_IOError;
                                 
