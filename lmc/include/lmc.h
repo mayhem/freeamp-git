@@ -40,7 +40,7 @@ class EventBuffer;
 class PhysicalMediaInput;
 class PhysicalMediaOutput;
 
-const int iMinimumOutputBufferSize = 64;
+const int32 iMinimumOutputBufferSize = 64;
 
 class LogicalMediaConverter : public PipelineUnit
 {

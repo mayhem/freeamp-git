@@ -53,8 +53,8 @@ public:
 							SoundCardPMO( FAContext* context );
 	virtual					~SoundCardPMO();
 	virtual Error			Init( OutputInfo* info );
-	virtual int32			GetVolume( void );
-	virtual void			SetVolume( int32 volume );
+	virtual void			GetVolume( int32& left, int32& right );
+	virtual void			SetVolume( int32 left, int32 right );
 	virtual void			Pause( void );
 	virtual void 			Resume( void );
 
