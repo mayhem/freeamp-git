@@ -1990,7 +1990,7 @@ bool Win32PreferenceWindow::PrefThemeProc(HWND hwnd,
 typedef struct ThreadStruct {
     Thread* thread;
     FAContext* context;
-    UpdateManager* um;
+    Win32UpdateManager* um;
     HWND hwndList;
     bool cancel;
 }ThreadStruct;
@@ -2279,7 +2279,7 @@ bool Win32PreferenceWindow::PrefUpdateProc(HWND hwnd,
 {
     bool result = false;
     static PROPSHEETPAGE* psp = NULL;
-    static UpdateManager* um = NULL;
+    static Win32UpdateManager* um = NULL;
     static Preferences* prefs = NULL;
     static HWND hwndList = NULL;
     static HWND hwndDescription = NULL;
@@ -2296,7 +2296,7 @@ bool Win32PreferenceWindow::PrefUpdateProc(HWND hwnd,
         {
             // remember these for later...
             psp = (PROPSHEETPAGE*)lParam;
-            um = (UpdateManager*)psp->lParam;
+            um = (Win32UpdateManager*)psp->lParam;
             prefs = m_pContext->prefs;
 
 
@@ -2476,12 +2476,17 @@ bool Win32PreferenceWindow::PrefUpdateProc(HWND hwnd,
             uint32 localMajorVersion, currentMajorVersion;
             uint32 localMinorVersion, currentMinorVersion;
             uint32 localRevisionVersion, currentRevisionVersion;
+            uint32 localFileVersion, currentFileVersion; 
             int32 numFields;
             bool currentVersionMoreRecent = false;
             
             numFields = sscanf(item->GetLocalFileVersion().c_str(),
-                   "%lu.%lu.%lu", 
-                   &localMajorVersion,&localMinorVersion,&localRevisionVersion);
+                   "%lu.%lu.%lu.%lu",
+                   &localMajorVersion,&localMinorVersion,
+                   &localRevisionVersion,&localFileVersion);
+
+            if(numFields < 4)
+                localFileVersion = 0;
 
             if(numFields < 3)
                 localRevisionVersion = 0;
@@ -2493,8 +2498,12 @@ bool Win32PreferenceWindow::PrefUpdateProc(HWND hwnd,
                 localMajorVersion = 0;
             
             numFields = sscanf(item->GetCurrentFileVersion().c_str(),
-                   "%d.%d.%d", 
-                   &currentMajorVersion,&currentMinorVersion,&currentRevisionVersion);
+                   "%lu.%lu.%lu.%lu",
+                   &currentMajorVersion,&currentMinorVersion,
+                   &currentRevisionVersion,&currentFileVersion);
+
+            if(numFields < 4)
+                currentFileVersion = 0;
 
             if(numFields < 3)
                 currentRevisionVersion = 0;
@@ -2511,7 +2520,11 @@ bool Win32PreferenceWindow::PrefUpdateProc(HWND hwnd,
                  currentMinorVersion > localMinorVersion) ||
                 (currentMajorVersion == localMajorVersion && 
                  currentMinorVersion == localMinorVersion &&
-                 currentRevisionVersion > localRevisionVersion))
+                 currentRevisionVersion > localRevisionVersion) ||
+                (currentMajorVersion == localMajorVersion && 
+                 currentMinorVersion == localMinorVersion &&
+                 currentRevisionVersion == localRevisionVersion &&
+                 currentFileVersion > localFileVersion))
             {
                 currentVersionMoreRecent = true;
             }
