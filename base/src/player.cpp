@@ -1207,7 +1207,8 @@ DoneOutputting(Event *pEvent)
 
    if (m_plm->HasAnotherItem())
    {
-      AcceptEvent(new Event(CMD_NextMediaPiece));
+      //AcceptEvent(new Event(CMD_NextMediaPiece));
+      m_plm->GotoNextItem(false);
 
       if (m_playerState == PlayerState_Paused)
       {

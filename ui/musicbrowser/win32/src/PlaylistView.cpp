@@ -83,6 +83,7 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             uint32 uiFlags = ILD_TRANSPARENT;
             RECT rcClip;
             HIMAGELIST himl;
+            HFONT boldFont = NULL, oldFont = NULL;
             int32 cxImage = 0, cyImage = 0;
 
             // Get Image List
@@ -104,6 +105,20 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             lv_item.pszText = buf;
             lv_item.cchTextMax = 2;
             lv_item.lParam = NULL;
+
+            // is this the current index? if so make it bold ...
+            if(dis->itemID == m_oPlm->GetCurrentIndex())
+            {
+                LOGFONT lf;
+
+                GetObject(GetWindowFont(hwndList), sizeof(LOGFONT), &lf);
+
+                lf.lfWeight = FW_BOLD;
+
+                boldFont = CreateFontIndirect(&lf);
+
+                oldFont = (HFONT)SelectObject(dis->hDC, boldFont);
+            }
 
             // Item index
             //ListView_GetItemText(hwndList, dis->itemID, 0, buf, 1024);
@@ -258,6 +273,12 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             // Move over to the next column
             rcClip.left += ListView_GetColumnWidth(hwndList, 4);
 
+            // If we changed font undo it
+            if(dis->itemID == m_oPlm->GetCurrentIndex())
+            {
+                SelectObject(dis->hDC, oldFont);
+                DeleteObject(boldFont);
+            }
 
             // If we changed the colors for the selected item, undo it
             if(dis->itemState & ODS_SELECTED)
@@ -283,8 +304,8 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
     return result;
 }
 
-#define LENGTH_COLUMN_WIDTH 55
-#define INDEX_COLUMN_WIDTH 30
+#define LENGTH_COLUMN_WIDTH 60
+#define INDEX_COLUMN_WIDTH 25
 #define FIXED_COLUMN_WIDTH (LENGTH_COLUMN_WIDTH + INDEX_COLUMN_WIDTH)
 
 void MusicBrowserUI::InitList(void)
@@ -682,19 +703,53 @@ ListViewWndProc(HWND hwnd,
             break;
         }
 
+        case WM_ERASEBKGND:
+        {
+            HDC hdc = (HDC) wParam;
+
+            //HWND hwndHeader = FindWindowEx(hwnd, NULL, WC_HEADER, NULL);
+
+            //if(hwndHeader /* && !ListView_GetItemCount(hwnd) */)
+            {
+                //RECT headerRect;
+                
+                //GetWindowRect(hwndHeader, &headerRect);
+
+                RECT rectClient, rectColumn;
+
+                GetClientRect(hwnd, &rectClient);
+                rectColumn = rectClient;
+
+                //rectColumn.top += (headerRect.bottom - headerRect.top);
+                rectColumn.right = rectColumn.left + ListView_GetColumnWidth(hwnd, 0);
+                rectClient.left = rectColumn.right;
+
+                FillRect(hdc, &rectClient, (HBRUSH)GetClassLong(hwnd, GCL_HBRBACKGROUND));
+
+                FillRect(hdc, &rectColumn, (HBRUSH)(COLOR_INFOBK + 1));
+            }
+
+            return TRUE;
+            break;
+        }
+#if 0
         case WM_PAINT:
         {
-            LRESULT result = CallWindowProc((int (__stdcall *)(void))lpOldProc, hwnd, msg, wParam, lParam );
+            PAINTSTRUCT ps;
+
+            HDC hdc = BeginPaint(hwnd, &ps);
+
+            LRESULT result = CallWindowProc((int (__stdcall *)(void))lpOldProc, hwnd, msg, (WPARAM)hdc, lParam );
             
             HWND hwndHeader = FindWindowEx(hwnd, NULL, WC_HEADER, NULL);
 
-            if(hwndHeader && !ListView_GetItemCount(hwnd))
+            if(hwndHeader /* && !ListView_GetItemCount(hwnd) */)
             {
                 RECT headerRect;
                 
                 GetWindowRect(hwndHeader, &headerRect);
         
-                HDC hdc;
+                //HDC hdc;
 
                 hdc = GetDC(hwnd);
 
@@ -707,15 +762,16 @@ ListViewWndProc(HWND hwnd,
             
                 FillRect(hdc, &rect, (HBRUSH)(COLOR_INFOBK + 1));
 
-                ReleaseDC(hwnd, hdc);
+                //ReleaseDC(hwnd, hdc);
                
             }
 
+            EndPaint(hwnd, &ps);
             
             return result;
             break;
         }
-
+#endif
         case WM_NOTIFY:
         {
             int idCtrl = wParam; 
