@@ -91,9 +91,12 @@ typedef struct PrefsStruct
     string CDDevicePath;
     string CDDBServer;
 
+    string playlistHeaders;
+    
     bool operator == (const struct PrefsStruct& pref)
     {
         return (
+            playlistHeaders == pref.playlistHeaders &&
             CDDevicePath == pref.CDDevicePath &&
             CDDBServer == pref.CDDBServer &&
             pollCD == pref.pollCD &&
@@ -192,6 +195,7 @@ class GTKPreferenceWindow : public PreferenceWindow
       GtkWidget *CreateDirectories(void);
       GtkWidget *CreateProfiles(void);
       GtkWidget *CreateCD(void);
+      GtkWidget *CreatePlaylistHeaders(void);
       
       GtkWidget *saveMusicBox;
 

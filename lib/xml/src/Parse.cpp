@@ -110,6 +110,7 @@ int Parse::Scanf(const char *szFormat, char *szData)
     strcat(szCustomFormat, "%n");
 
     iOffset = 0;
+    assert(m_uScanOffset <= m_oXML.size());
     iRet = sscanf(m_oXML.c_str() + m_uScanOffset, szCustomFormat, 
                   szData, &iOffset);
     if (iRet > 0 || iOffset > 0)
@@ -125,7 +126,7 @@ bool Parse::Eof(void)
     if (m_fpFile)
        return feof(m_fpFile) != 0;
 
-    if (m_uScanOffset == m_oXML.size())
+    if (m_uScanOffset >= m_oXML.size())
        return true;
 
     return false;

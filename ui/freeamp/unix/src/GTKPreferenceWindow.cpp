@@ -299,8 +299,12 @@ bool GTKPreferenceWindow::Show(Window *pWindow)
                             pane);
     AddPane(opane);
 
+    pane = CreatePlaylistHeaders();
+    opane = new OptionsPane("Playlist", "Playlist Preferences", 8, pane);
+    AddPane(opane);
+
     pane = CreateAbout();
-    opane = new OptionsPane("About", " About "The_BRANDING, 8, pane);
+    opane = new OptionsPane("About", " About "The_BRANDING, 9, pane);
     AddPane(opane);
 
     GtkWidget *separator = gtk_hseparator_new();
@@ -2366,6 +2370,15 @@ GtkWidget *GTKPreferenceWindow::CreateCD(void)
                        GTK_SIGNAL_FUNC(cddb_server_change), this);
     gtk_box_pack_start(GTK_BOX(temphbox), cddbServer, TRUE, TRUE, 0);
     gtk_widget_show(cddbServer);
+
+    return pane;
+}
+
+GtkWidget *GTKPreferenceWindow::CreatePlaylistHeaders(void)
+{
+    GtkWidget *pane = gtk_vbox_new(FALSE, 5);
+    gtk_container_set_border_width(GTK_CONTAINER(pane), 5);
+    gtk_widget_show(pane);
 
     return pane;
 }

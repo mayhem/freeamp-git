@@ -101,6 +101,9 @@ Error FreeAmpStreams::BeginElement(string &oElement, AttrMap &oAttrMap)
 
 Error FreeAmpStreams::PCData(string &data)
 {
+    if (m_info == NULL)
+        return kError_InvalidParam;
+
     if (m_curElement == string("Url"))
     {
         m_info->m_streamUrl = data;

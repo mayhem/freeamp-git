@@ -90,7 +90,7 @@ Error Http::DownloadToString(const string &url, string &page)
 
     eRet = Download(url, false);
     if (IsntError(eRet))
-        page = string((char *)m_buffer);
+        page = string((char *)m_buffer, m_bytesInBuffer);
 
     if (m_buffer)
     {
