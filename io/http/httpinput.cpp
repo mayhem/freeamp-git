@@ -144,6 +144,7 @@ HttpInput::HttpInput(FAContext *context):
     m_bUseBufferReduction = true;
     m_iMetaDataInterval = 0;
     m_uBytesReceived = 0;
+	m_bExit = false;
 #ifdef WIN32
     m_hWnd = NULL;
 #endif
@@ -334,13 +335,20 @@ Error HttpInput::Win32GetHostByName(char *szHostName, struct hostent *pHostInfo)
 
         DispatchMessage( &msg );
     }
+	
+	if (m_bExit)
+	{
+		WSACancelAsyncRequest(hHandle);
+	}
 
     m_hWnd = NULL;
     DestroyWindow(hWnd);
 
 
     if (m_bExit)
-        return kError_Interrupt;
+    {    
+		return kError_Interrupt;
+	}
 
     if (result == 0)
     {
@@ -524,8 +532,6 @@ Error HttpInput::Open(void)
 
 #ifndef WIN32
         int error = errno;
-
-        if (error != EINPROGRESS)
 #else
 		int error = WSAGetLastError();
 
