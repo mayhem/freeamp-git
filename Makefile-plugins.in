@@ -35,6 +35,7 @@ PLUGINS += plugins/obsinput-$(HOST_OS).pmi
 PLUGINS += plugins/soundcard-$(HOST_OS).pmo
 PLUGINS += plugins/freeampcmd-$(HOST_OS).ui
 PLUGINS += plugins/mpg123-$(HOST_OS).ui
+PLUGINS += plugins/ncurses-$(HOST_OS).ui
 PLUGINS += plugins/lcd-$(HOST_OS).ui
 PLUGINS += plugins/irman-$(HOST_OS).ui
 PLUGINS += plugins/xingmp3-$(HOST_OS).lmc
@@ -111,6 +112,12 @@ MPG123UIOBJ = ui/mpg123/Mpg123UI.o
 plugins/mpg123-$(HOST_OS).ui: $(MPG123UIOBJ)
 	$(LINKMOD) -o $@ $(MPG123UIOBJ)
 
+# ncurses ui
+NCURSESUIOBJ = ui/ncurses/ncursesUI.o
+
+plugins/ncurses-$(HOST_OS).ui: $(NCURSESUIOBJ)
+	$(LINKMOD) -o $@ $(NCURSESUIOBJ) -lncurses
+
 # lcd ui
 LCDUIOBJ = ui/lcd/src/lcdui.o ui/lcd/src/sockets.o
 
@@ -164,7 +171,7 @@ plugins/xingmp3-$(HOST_OS).lmc: $(XINGLMCOBJ)
 	$(LINKMOD) -o $@ $(XINGLMCOBJ)
 
 depend:
-	makedepend -fMakefile-plugins -- $(DEFS) $(INCLUDES) $(CFLAGS) -- `echo $(LFIOBJ) $(HTTPOBJ) $(SCPMOOBJ) $(ALSAOBJ) $(ESNDOBJ) $(CMDUIOBJ) $(MPG123UIOBJ) $(LCDUIOBJ) $(IRMANUIOBJ) $(GTKUIOBJ) $(FREEAMPUIOBJ) $(XINGLMCOBJ) | sed -e 's,\.o,.cpp,g'`
+	makedepend -fMakefile-plugins -- $(DEFS) $(INCLUDES) $(CFLAGS) -- `echo $(LFIOBJ) $(HTTPOBJ) $(SCPMOOBJ) $(ALSAOBJ) $(ESNDOBJ) $(CMDUIOBJ) $(MPG123UIOBJ) $(NCURSESUIOBJ) $(LCDUIOBJ) $(IRMANUIOBJ) $(GTKUIOBJ) $(FREEAMPUIOBJ) $(XINGLMCOBJ) | sed -e 's,\.o,.cpp,g'`
  
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 

@@ -36,8 +36,8 @@ hybrid window/filter
 #include <float.h>
 #include <math.h>
 
-#ifdef ASM_X86
 extern int band_limit_nsb;
+#ifdef ASM_X86
 extern int hybrid_asm(float xin[], float xprev[], float y[18][32],
 	   int btype, int nlong, int ntot, int nprev);
 extern void FreqInvert_asm(float y[18][32], int n);

@@ -73,3 +73,6 @@ Other major contributors and their contributions:
 
 "Skip Hansen" <shansen@earthlink.net>
 * HTTP numeric IP patch for Win93 OSR2 and Win NT
+
+"Stephan Auerhahn" <palpatine@midi.net>
+* ncurses UNIX interface

@@ -457,6 +457,9 @@ FALcdWindow::FALcdWindow(Display * display, int32 screen_num, GC gc, Window pare
    m_wiggleLeft = false;
    m_displayState = CurrentTimeState;
    m_totalHours = m_totalMinutes = m_totalSeconds = m_currHours = m_currMinutes = m_currSeconds = 0;
+   m_bufferingup = false;
+   m_inputbuf = -1;
+   m_outputbuf = -1;
 };
 
 FALcdWindow::~FALcdWindow()
@@ -532,6 +535,13 @@ SetMainText(const char *pText)
    m_text[l] = '\0';
    m_mainTextWiggleBegin = 0;
    m_mainTextWiggleDrewAll = true;
+}
+
+void FALcdWindow::SetBufferStatus(bool bBufferingUp, int iInput, int iOutput)
+{
+   m_bufferingup = bBufferingUp;
+   m_inputbuf = iInput;
+   m_outputbuf = iOutput;
 }
 
 // returns false if it didn't need to wiggle the text
@@ -738,9 +748,20 @@ DrawCurrentTimeState(int32 type)
    switch (type)
    {
    case FullRedraw:
+      char szText[100];
       XCopyArea(m_display, m_pixmap, m_doubleBufferPixmap, m_gc, 0, 0, m_width, m_height, 0, 0);
       m_mainTextWiggleDrewAll = BlitText(m_doubleBufferPixmap, m_gc, UPPER_LEFT_X, UPPER_LEFT_Y, &(m_text[m_mainTextWiggleBegin]), SmallFont);
-      BlitText(m_doubleBufferPixmap, m_gc, DESCRIPTION_TEXT_X, DESCRIPTION_TEXT_Y, "current", SmallFont);
+      if (m_inputbuf > -1)
+      {
+          sprintf(szText, "%% %d,%d", m_inputbuf, m_outputbuf);
+          if (m_bufferingup )
+              strcat(szText, "+");
+      }
+      else
+          strcpy(szText, "current");
+
+      BlitText(m_doubleBufferPixmap, m_gc, DESCRIPTION_TEXT_X, 
+               DESCRIPTION_TEXT_Y, szText, SmallFont);
       BlitIcons(m_doubleBufferPixmap);
    case TimeOnly:
       UpdateTimeDisplay(m_currHours, m_currMinutes, m_currSeconds);

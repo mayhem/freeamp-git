@@ -261,7 +261,7 @@ void TitleStreamServer::WorkerThread(void)
       {
           iStructSize = sizeof(struct sockaddr_in);
           iRet = recvfrom(m_hHandle, buf, 255, 0, (struct sockaddr *)m_pSin, 
-                          (int32 *)&iStructSize);
+                          (uint32 *)&iStructSize);
       }
       else
           iRet = recv(m_hHandle, buf, 255, 0);

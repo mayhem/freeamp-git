@@ -8,6 +8,8 @@ Changes for Linux and Windows version 1.3.0:
 - Improved audio pipeline with much clearer model and common base classes
 - Added support for selecting network card for streaming plugins
 - Added Enlightened Sound Daemon support. Thanks for Isaac Richards (Linux)
+- Added icecast style titlestreaming support
+- Added ncurses UI for unix
 
 Changes for Linux and Windows version 1.2.3:
 --------------------------------------------------------------------

@@ -17,62 +17,68 @@
 	You should have received a copy of the GNU General Public License
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-	
-	$Id$
+
+----------------------------------------------------------------------------
+ncurses user interface by stephan auerhahn (palpatine@midi.net)
+
+this is a hacked up version of cmdlineUI.h
 ____________________________________________________________________________*/
 
-// Mpg123UI.h
+
+// ncursesUI.h
 
 
-#ifndef _Mpg123UI_H_
-#define _Mpg123UI_H_
+#ifndef _NCURSESUI_H_
+#define _NCURSESUI_H_
 
 #include "ui.h"
 #include "event.h"
-#include "eventdata.h"
+#include "thread.h"
 #include "playlist.h"
 
 class FAContext;
 
-class Mpg123UI : public UserInterface {
+class ncursesUI : public UserInterface {
  public:
-    Mpg123UI(FAContext *context);
-
+    ncursesUI(FAContext *context);
     virtual int32 AcceptEvent(Event *);
     virtual void SetArgs(int argc, char **argv);
-    virtual void SetTarget(EventQueue *);
+    virtual void SetTarget(EventQueue *eqr) { m_playerEQ = eqr; }
     virtual Error Init(int32);
     virtual void SetPlayListManager(PlayListManager *);
-    
-    ~Mpg123UI();
-
-    static EventQueue *m_playerEQ;
+    static void keyboardServiceFunction(void *);
+    virtual ~ncursesUI();
    virtual Error SetPropManager(Properties *p) { m_propManager = p; if (p) return kError_NoErr; else return kError_UnknownErr; }
 
  protected:
-    FAContext *m_context;
+   FAContext *m_context;
 
  private:
-    Properties *m_propManager;
-    int32 m_argc;
-    char **m_argv;
-    int32 m_startupType;
-    void ProcessArgs();
-
-    PlayListManager *m_plm;
-    void DisplayStuff();
-    MediaInfoEvent *m_mediaInfo;
-    bool m_mediaInfo_set;
-    MpegInfoEvent m_mpegInfo;
-    bool m_mpegInfo_set;
-    Id3TagInfo m_id3Tag;
-    bool verboseMode;
-    int32 totalFrames;
-    float totalTime;
-    int32 skipFirst;
-    char fileName[512];
-    float lastSeconds;
+   Properties *m_propManager;
+   void ProcessArgs();
+   void showInfo();
+   int32 m_startupLevel;
+   int32 m_argc;
+   char **m_argv;
+   EventQueue *m_playerEQ;
+   void processSwitch(char *);
+   Thread *keyboardListenThread;
+   PlayListManager *m_plm;
+   int32 m_lastIndexPlayed;
+   bool m_id3InfoPrinted;
+   float totalTime;
+   int totalFrames;
+   MpegInfoEvent m_mpegInfo;
+   bool m_mpegInfo_set;
+   MediaInfoEvent *m_mediaInfo;
+   bool m_mediaInfo_set;
+   float lastSeconds;
+   int titleStart;
+   int titleDir;
+   char title[1024];
+   int counter;
 };
 
 
-#endif // _Mpg123UI_H_
+#endif // _COMMANDLINECIO_H_
+

@@ -142,6 +142,8 @@ class FALcdWindow : public FAWindow {
     XRectangle m_repeatAllRect;
     GC m_timeGC;
     GC m_iconGC;
+    bool m_bufferingup;
+    int m_inputbuf, m_outputbuf;
 
     bool m_insideDisplay;
 
@@ -195,6 +197,7 @@ class FALcdWindow : public FAWindow {
     void SetLargeFontPixmap(Pixmap);
     void SetLargeFontWidth(int *);
     void SetMainText(const char *);
+    void SetBufferStatus(bool bBufferingUp, int iInput, int iOutput);
     bool WiggleMainText();
     void SetCurrentTime(int32 h, int32 m, int32 s);
     void SetTotalTime(int32 h, int32 m, int32 s);

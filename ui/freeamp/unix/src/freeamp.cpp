@@ -611,7 +611,7 @@ int32 FreeAmpUI::AcceptEvent(Event *e) {
 	}
    case INFO_StreamInfo:
    { 
-       char szTitle[100], szURL[100];
+       char szTitle[100];
 
        StreamInfoEvent *pInfo = (StreamInfoEvent *)e;
 
@@ -624,6 +624,19 @@ int32 FreeAmpUI::AcceptEvent(Event *e) {
 	    XUnlockDisplay(m_display);
 
 	    break;
+   }
+   case INFO_BufferStatus:
+   {
+	    StreamBufferEvent *info = (StreamBufferEvent *)e;
+
+       m_lcdWindow->SetBufferStatus(info->IsBufferingUp(),
+                                    info->GetInputPercent(),
+                                    info->GetOutputPercent());
+	    XLockDisplay(m_display);
+	    m_lcdWindow->Draw(FALcdWindow::FullRedraw);
+	    XUnlockDisplay(m_display);
+
+       break;
    }
 	case INFO_MediaTimeInfo: {
 	    MediaTimeInfoEvent *info = (MediaTimeInfoEvent *)e;

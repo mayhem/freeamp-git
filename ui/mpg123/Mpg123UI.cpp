@@ -49,6 +49,7 @@ EventQueue *Mpg123UI::m_playerEQ = NULL;
 Mpg123UI::Mpg123UI(FAContext *context) {
     m_context = context;
     m_mediaInfo_set = false;
+    m_mediaInfo = NULL;
     m_mpegInfo_set = false;
 
     verboseMode = false;
@@ -58,13 +59,14 @@ Mpg123UI::Mpg123UI(FAContext *context) {
 
 }
 
+
 Error Mpg123UI::Init(int32 startup_level) {
     if ((m_startupType = startup_level) == PRIMARY_UI) {
 	ProcessArgs();
 	//cout << endl << "mpg123 0.59k command line compatability mode" << endl << endl;
 	cerr << "High Performance MPEG 1.0/2.0/2.5 Audio Player for Layer 1, 2 and 3" << endl;
-	cerr << "Version 0.05 (1998/Oct/06).  Written by Jason Woodward, Mark Elrod, others." << endl;
-	cerr << "Copyrights GoodNoise, XingTech. See 'README' for more!" << endl;
+	cerr << "Version 0.05 (1998/Oct/06).  " << endl;
+	cerr << "Copyrights EMusic, XingTech. See 'README' for more!" << endl;
 	cerr << "This software is distributed under the GNU GPL." << endl;
 	signal(SIGTERM,mysigterm);
 	signal(SIGINT,mysigint);
@@ -89,6 +91,7 @@ Mpg123UI::~Mpg123UI() {
     if (m_playerEQ) {
 	delete m_playerEQ;
 	m_playerEQ = NULL;
+    delete m_mediaInfo;
     }
 }
 
@@ -121,11 +124,11 @@ int32 Mpg123UI::AcceptEvent(Event *e) {
 	    case INFO_MediaInfo: {
 		MediaInfoEvent *pmvi = (MediaInfoEvent *)e;
 		if (pmvi) {
-		    m_mediaInfo = *pmvi;
+		    m_mediaInfo = new MediaInfoEvent(*pmvi);
 		    m_mediaInfo_set = true;
 		    DisplayStuff();
 		}
-		totalTime = m_mediaInfo.m_totalSeconds;
+		totalTime = m_mediaInfo->m_totalSeconds;
 		break;
 	    }
 	    case INFO_MediaTimeInfo: {
@@ -159,7 +162,7 @@ int32 Mpg123UI::AcceptEvent(Event *e) {
 void Mpg123UI::DisplayStuff() {
     if (!m_mpegInfo_set) return;
     if (!m_mediaInfo_set) return;
-    char *path = m_mediaInfo.m_filename;
+    char *path = m_mediaInfo->m_filename;
     char *pLastSlash = strrchr(path,'/');
     char *dir = NULL;
     char *fname = NULL;

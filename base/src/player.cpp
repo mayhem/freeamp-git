@@ -1553,8 +1553,6 @@ ServiceEvent(Event * pC)
       case INFO_PlayListShuffle:
       case INFO_PlayListRepeat:
       case INFO_PlayListUpdated:
-      case INFO_BufferingBegin:
-      case INFO_BufferingEnd:
       case INFO_BufferStatus:
            SendEventToUI(pC);
            break;
