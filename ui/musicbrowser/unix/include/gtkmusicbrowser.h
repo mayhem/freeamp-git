@@ -373,6 +373,7 @@ class GTKMusicBrowser {
     void AddStreamToFavs(void);
     void AddPLStreamToFavs(void);
     void AddNewStream(void);
+    void VisitWebsite(void);
 
     void HandleSignature(void);
 

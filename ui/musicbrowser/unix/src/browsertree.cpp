@@ -1267,6 +1267,7 @@ void GTKMusicBrowser::HandleStreamList(vector<FreeAmpStreamInfo> &list)
         MetaData metadata;
 
         newitem->SetURL(i->m_streamUrl.c_str());
+        newitem->SetWebURL(i->m_webUrl.c_str());
         metadata.SetTitle(i->m_name.c_str());
         metadata.SetArtist(i->m_webUrl.c_str());
         metadata.SetComment(i->m_desc.c_str());
@@ -1583,6 +1584,11 @@ static void add_fav_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
     p->AddStreamToFavs();
 }
 
+static void visit_website_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+    p->VisitWebsite();
+}
+
 static void eject_cd_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
     p->EjectCD();
@@ -1625,7 +1631,8 @@ void GTKMusicBrowser::CreateTreePopups(void)
      {"/Add to Playlist",NULL,    (GtkItemFactoryCallback)add_pop,       0, 0 },
      {"/Add and Play Now",NULL,   (GtkItemFactoryCallback)add_play_pop,  0, 0 },
      {"/sep1",         NULL,      0,                        0, "<Separator>" },
-     {"/Add To Favorites", NULL,  (GtkItemFactoryCallback)add_fav_pop,   0, 0 }
+     {"/Add To Favorites", NULL,  (GtkItemFactoryCallback)add_fav_pop,   0, 0 },
+     {"/Visit Website", NULL,     (GtkItemFactoryCallback)visit_website_pop,0, 0 }
     };
     int nstream_items = sizeof(stream_items) / sizeof(stream_items[0]);
 

@@ -502,6 +502,18 @@ void GTKMusicBrowser::AddStreamToFavs(void)
     }
 }
 
+void GTKMusicBrowser::VisitWebsite(void)
+{
+    vector<TreeData *>::iterator i = mbSelections->begin();
+    for (; i != mbSelections->end(); i++) {
+        if ((*i)->type != kTreeStream)
+            continue;
+
+        PlaylistItem *stream = (*i)->track;
+        LaunchBrowser(stream->WebURL().c_str());
+    }
+}
+
 static gboolean add_new_destroy(GtkWidget *w, gpointer p)
 {
     gtk_main_quit();
