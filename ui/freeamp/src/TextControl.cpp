@@ -95,7 +95,7 @@ void TextControl::Init(void)
 void TextControl::Transition(ControlTransitionEnum  eTrans,
                              Pos                   *pMousePos)
 {
-	if (m_eCurrentState == CS_MouseOver && 
+    if (m_eCurrentState == CS_MouseOver && 
         eTrans == CT_MouseLButtonUp)
        m_pParent->SendControlMessage(this, CM_Pressed);
 
@@ -124,7 +124,7 @@ void TextControl::TextChanged(void)
     Canvas *pCanvas;
     int    iRet;
     
-	m_iMarqueePos = 0;
+    m_iMarqueePos = 0;
     pCanvas = m_pParent->GetCanvas();
 
     pCanvas->Erase(m_oRect);

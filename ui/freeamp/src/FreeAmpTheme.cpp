@@ -1324,6 +1324,6 @@ void FreeAmpTheme::OptionsThread(uint32 defaultPage)
     pWindow->Show(m_pWindow);
 
     delete pWindow;
-    
+   
     m_bInOptions = false;
 }

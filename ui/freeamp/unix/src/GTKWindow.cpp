@@ -105,7 +105,7 @@ void drop_file(GtkWidget *w, GdkDragContext *context, gint x, gint y,
 static gint do_timeout(GTKWindow *ui)
 {
     ui->m_pMindMeldMutex->Acquire();
-//    ui->MouseLeaveCheck();
+    ui->MouseLeaveCheck();
     ui->TimerEvent();
     ui->m_pMindMeldMutex->Release();
     

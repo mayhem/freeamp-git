@@ -157,13 +157,13 @@ GTKFont::GTKFont(FAContext *context, string &oName, string &oFace,
 
 Error GTKFont::Load(int iFontHeight, bool bBold, bool bItalic)
 {
+    gdk_threads_enter();
     if (type == kFontTypeGdk) {
         if (bold != bBold || italic != bItalic || size != iFontHeight || 
             !gfont) {
             bold = bBold;
             italic = bItalic;
             size = iFontHeight;
-            gdk_threads_enter();
             if (gfont)
                 gdk_font_unref(gfont);
             string fontname = BuildFontString(bold, italic, size);
@@ -195,12 +195,14 @@ Error GTKFont::Load(int iFontHeight, bool bBold, bool bItalic)
                 Efont_free(ttfont);
             ttfont = Efont_load((char *)m_oFace.c_str(), iFontHeight - 3);
             if (!ttfont) {
-                cout << "ERROR loading ttf\n";
+                gdk_threads_leave();
+                cout << "ERROR loading ttf " << m_oFace << "\n";
                 return kError_YouScrewedUp;
             }
         }
     }
 #endif
+    gdk_threads_leave();
     return kError_NoErr;
 }
 
@@ -208,17 +210,16 @@ int GTKFont::GetLength(string &oText)
 {
     int retvalue = 0;
 
-    if (type == kFontTypeGdk) {
-        gdk_threads_enter();
+    gdk_threads_enter();
+    if (type == kFontTypeGdk) 
         retvalue = gdk_string_measure(gfont, oText.c_str());
-        gdk_threads_leave();
-    } 
 #ifdef HAVE_FREETYPE
     else if (type == kFontTypeTTF) {
         Efont_extents(ttfont, (char *)oText.c_str(), NULL, NULL, &retvalue, 
                       NULL, NULL, NULL, NULL);
     }
 #endif
+    gdk_threads_leave();
     return retvalue;
 }
 
@@ -226,11 +227,9 @@ int GTKFont::GetHeight(string &oText)
 {
     int retvalue = 0;
 
-    if (type == kFontTypeGdk) {   
-       gdk_threads_enter();
+    gdk_threads_enter();
+    if (type == kFontTypeGdk)
        retvalue = gdk_string_height(gfont, oText.c_str());
-       gdk_threads_leave();
-    }
 #ifdef HAVE_FREETYPE
     else if (type == kFontTypeTTF) {
        int ascent = 0, descent = 0;
@@ -239,6 +238,7 @@ int GTKFont::GetHeight(string &oText)
        retvalue = ascent + descent;
     }
 #endif
+    gdk_threads_leave();
     return retvalue;
 }
 

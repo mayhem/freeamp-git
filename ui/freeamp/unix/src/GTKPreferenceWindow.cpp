@@ -39,14 +39,13 @@ GTKPreferenceWindow::GTKPreferenceWindow(FAContext *context,
                                          ThemeManager *pThemeMan,
                                          uint32 defaultPage) :
      PreferenceWindow(context, pThemeMan)
-{     
+{    
     startPage = defaultPage;
     done = false;
 }
 
 GTKPreferenceWindow::~GTKPreferenceWindow(void)
 {
-    done = true;
 } 
 
 static gboolean pref_destroy(GtkWidget *widget, gpointer p)
@@ -74,7 +73,7 @@ void pref_apply_click(GtkWidget *w, GTKPreferenceWindow *p)
 
 void GTKPreferenceWindow::CancelInfo(void)
 {
-    if (currentValues != originalValues)
+    if (currentValues != originalValues) 
         SavePrefsValues(m_pContext->prefs, &originalValues);
 }
 
@@ -126,7 +125,6 @@ bool GTKPreferenceWindow::Show(Window *pWindow)
     currentValues = proposedValues = originalValues;
 
     gdk_threads_enter();
-    ((GTKWindow *)pWindow)->ModifyTimer(true);
 
     mainWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_modal(GTK_WINDOW(mainWindow), TRUE);
@@ -217,14 +215,10 @@ bool GTKPreferenceWindow::Show(Window *pWindow)
 
     firsttime = false;
 
-    while (!done) {
-        gdk_threads_leave();
-        usleep(20);
-    }
-
-    gdk_threads_enter();
-    ((GTKWindow *)pWindow)->ModifyTimer(false);
     gdk_threads_leave();
+
+    while (!done) 
+        usleep(20);
 
     return true;
 }
@@ -1032,7 +1026,8 @@ GtkWidget *GTKPreferenceWindow::CreatePage3(void)
         if (originalValues.defaultPMO == item->Name()) {
             gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menuitem), TRUE);
 
-            proposedValues.outputIndex = i - 1;
+            originalValues.outputIndex = currentValues.outputIndex = 
+                                         proposedValues.outputIndex = i - 1;
         }
         gtk_widget_show(menuitem);
     }

@@ -493,9 +493,9 @@ Error GTKBitmap::LoadBitmapFromDisk(string &oFile)
     gdk_draw_rgb_image(m_Bitmap, m_GC, 0, 0, w, h, GDK_RGB_DITHER_MAX, data, 
                        w * 3);
 
+    gdk_threads_leave();
     g_free(data);
     g_free(buffer);
-    gdk_threads_leave();
 
     return kError_NoErr;
 }
