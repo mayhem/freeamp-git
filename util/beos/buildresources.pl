@@ -64,15 +64,15 @@ foreach $file ( @ARGV )
         $rsrcfile = $mwbressrc;
         $rsrcfile =~ s/\..*$/\.rsrc/;
         echo_and_run( "cd $resdir; mwbres -o $rsrcfile $mwbressrc" );
-        $rsrc = "$resdir/$rsrcfile";
+        push @rsrcs, "$resdir/$rsrcfile";
     }
     if ( $file =~ /.+\.rsrc$/ )
     {
         print "$file -> xres\n";
-        $rsrc = $file;
+        push @rsrcs, $file;
     }
-    echo_and_run( "xres -o $binary $rsrc" );
 }
+echo_and_run( "xres -o $binary @rsrcs" );
 
 # Set the version
 
