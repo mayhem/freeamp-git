@@ -48,6 +48,7 @@ protected:
 
 private:
     static uint8    s_cursorBits[68];
+    static BCursor* s_cursor;
     bool            m_tracking;
     BPoint          m_hotSpot;
     vector<BView*>  m_prev;

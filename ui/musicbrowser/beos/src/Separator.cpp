@@ -23,6 +23,7 @@ ____________________________________________________________________________*/
 
 #include "Separator.h"
 #include <be/app/Application.h>
+#include <be/app/Cursor.h>
 #define DEBUG 1
 #include <be/support/Debug.h>
 
@@ -64,6 +65,9 @@ Separator::s_cursorBits[68] = {
     0x03, 0x80,
     0x00, 0x00,
 };
+
+BCursor*
+Separator::s_cursor = new BCursor( Separator::s_cursorBits );
 
 Separator::Separator( BRect frame, const char* name, uint32 resizingMode )
 :   BView( frame, name, resizingMode, B_WILL_DRAW | B_FRAME_EVENTS ),
@@ -117,11 +121,7 @@ Separator::MouseMoved( BPoint p, uint32 transit, const BMessage* message )
 {
     if ( transit == B_ENTERED_VIEW )
     {
-        be_app->SetCursor( s_cursorBits );
-    }
-    else if ( transit == B_EXITED_VIEW )
-    {
-        be_app->SetCursor( B_HAND_CURSOR );
+        SetViewCursor( s_cursor );
     }
 
     if ( !m_tracking ) return;
@@ -156,7 +156,6 @@ void
 Separator::MouseUp( BPoint p )
 {
     m_tracking = false;
-    be_app->SetCursor( B_HAND_CURSOR );
 }
 
 void
