@@ -1493,6 +1493,19 @@ GenerateSigsWork(set<string> *items)
             url = plitem->URL();
         }
 
+
+	    struct stat st;
+	    uint32 reallen = strlen(url.c_str()) + 1;
+	    char *realname = new char[reallen];
+	    URLToFilePath(url.c_str(), realname, &reallen);
+        if (-1 == stat(realname, &st)) {
+            delete [] realname;
+			items->erase(url);
+		    continue;
+		}
+
+		delete [] realname;
+
         pmi_item = ChoosePMI(url.c_str());
         if (!pmi_item)
         {
@@ -1503,6 +1516,7 @@ GenerateSigsWork(set<string> *items)
            m_context->log->Error(szErr);
            AcceptEvent(new ErrorMessageEvent(szErr));
 
+		   items->erase(url);
            continue;
         }
 
@@ -1522,7 +1536,7 @@ GenerateSigsWork(set<string> *items)
 
         if (!item) {
             delete pmi;
-            return;
+            break;
         }
 
         pmo = (PhysicalMediaOutput *) item->InitFunction()(m_context);
@@ -1557,6 +1571,7 @@ GenerateSigsWork(set<string> *items)
             delete lmc;
             delete pmi;
             m_sigspmo = NULL;
+			items->erase(url);
             continue;
         }
 
