@@ -39,11 +39,13 @@ ____________________________________________________________________________*/
 Equalizer::Equalizer(FAContext *context)
 {
 
-   m_context = context;
-   m_settingsChanged = false;
-   m_enabled = false;
+    m_context = context;
+    m_settingsChanged = false;
+    m_enabled = false;
 
-	for(int i=0; i<32; i++)
+    int i;
+
+	for(i=0; i<32; i++)
 		m_equalizer[i] = 1.0;
 	for(i=0; i<10; i++)
 		m_sliders[i] = 0;
@@ -83,7 +85,7 @@ void Equalizer::LoadSettings(void)
    for(i = 0; i < 10; i++)
       ChangeValue(i, m_sliders[i]);
 
-   Enable((bool)enabled);
+   Enable((enabled != 0));
    m_settingsChanged = false;
 }
 
