@@ -52,7 +52,7 @@ FreeAmp 1.2 for Win32:
   * just under the display is the playlist drawer, click it to access playlist functions
 
 
-FreeAmp version 1.2.1 for Linux:
+FreeAmp version 1.2.2 for Linux:
 
 freeamp [-ui <UI plugin name>] <MP3 file/stream> [MP3 file/stream] ...
 
