@@ -38,5 +38,6 @@ ____________________________________________________________________________*/
 #define Preferences_Directory         "preferences_directory_entry.html"
 #define Preferences_Relatable         "preferences_relatable_entry.html"
 #define Edit_Info                     "edit_info_entry.html"
+#define Preferences_RelatableFeatures "what_are_relatable_features_entry.html"
 
 #endif

@@ -1887,6 +1887,12 @@ bool Win32PreferenceWindow::PrefProfileProc(HWND hwnd,
             InvalidateRect(hwndProfileList, NULL, true);
             break;
         }
+		case UWM_HELP:
+		case WM_HELP:
+		{
+			ShowHelp(m_pContext, Preferences_Relatable);
+			break;
+		}
         case WM_COMMAND:
         {
             switch(LOWORD(wParam))
@@ -1943,9 +1949,9 @@ bool Win32PreferenceWindow::PrefProfileProc(HWND hwnd,
 
                     break;
                 }
-                case IDC_PROFILE_HELP:
+                case IDC_PROFILE_HELP: 
                 {
-                    ShowHelp(m_pContext, Preferences_Relatable);
+                    ShowHelp(m_pContext, Preferences_RelatableFeatures);
                     break;
                 }
                 case IDC_ADDPROFILE:

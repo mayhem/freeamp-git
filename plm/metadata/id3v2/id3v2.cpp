@@ -240,10 +240,12 @@ bool ID3v2::ReadMetaData(const char* url, MetaData* metadata)
     }
 */
 
-    int num = 1;
-    if (ID3LIB_PATCH_VERSION >= 13 || ID3LIB_MINOR_VERSION > 7 ||
-        ID3LIB_MAJOR_VERSION > 3) 
-        num = 0;
+#if (ID3LIB_PATCH_VERSION >= 13) || (ID3LIB_MINOR_VERSION > 7) || \
+    (ID3LIB_MAJOR_VERSION > 3)
+    int num = 0;
+#else
+	int num = 1;
+#endif
 
     pData = new char[iDataFieldLen];
 

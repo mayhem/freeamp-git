@@ -355,17 +355,19 @@ END
 
 IDD_PREF_BROWSER DIALOG DISCARDABLE  0, 0, 233, 174
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Browser"
+CAPTION "MusicBrowser"
 FONT 8, "MS Sans Serif"
 BEGIN
-    LTEXT           "Available Columns",IDC_STATIC,9,11,58,8
-    LTEXT           "Current Columns",IDC_STATIC,137,11,52,8
-    LISTBOX         IDC_AVAILABLE_COLUMN_LIST,3,26,90,107,
+    LTEXT           "Available Columns",IDC_STATIC,9,38,58,8
+    LTEXT           "Current Columns",IDC_STATIC,137,38,52,8
+    LISTBOX         IDC_AVAILABLE_COLUMN_LIST,3,53,90,107,
                     LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    LISTBOX         IDC_CURRENT_COLUMN_LIST,134,26,90,107,
+    LISTBOX         IDC_CURRENT_COLUMN_LIST,134,53,90,107,
                     LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "<<",IDC_REMOVE_COLUMN,99,35,30,15
-    PUSHBUTTON      ">>",IDC_ADD_COLUMN,99,54,30,15
+    PUSHBUTTON      "<<",IDC_REMOVE_COLUMN,99,62,30,15
+    PUSHBUTTON      ">>",IDC_ADD_COLUMN,99,81,30,15
+    LTEXT           "With this, you can select which columns are visible on the Playlist portion of the 'MyMusic' window.",
+                    IDC_STATIC,3,9,227,25
 END
 
 
