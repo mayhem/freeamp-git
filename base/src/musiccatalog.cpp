@@ -1295,6 +1295,8 @@ Error MusicCatalog::AcceptEvent(Event *e)
             }
             else if (!m_bSurpressAddMessages)
                 m_context->target->AcceptEvent(e);
+            else
+                delete e;
             break; }
         case INFO_SearchMusicDone: {
             m_context->target->AcceptEvent(new Event(INFO_MusicCatalogRegenerating));

@@ -77,6 +77,7 @@ FREEAMPOBJ += base/src/timer.o base/src/missingfile.o io/src/pipeline.o
 FREEAMPOBJ += $(FREEAMP$(HOST_OS)OBJ) $(APSOBJ)
 FREEAMPOBJ += lib/gdbm/lib/libfagdbm.a lib/xml/src/Parse.o 
 FREEAMPOBJ += lib/zlib/lib/libzlib.a lib/http/src/Http.o
+#FREEAMPOBJ += LeakTracer.o
 #FREEAMPOBJ += dmallocc.o
 
 FREEAMPlinuxLIBS = -ldl -lpthread 
