@@ -42,6 +42,7 @@
 #define IDC_LOGINPUT                    1012
 #define IDC_LOGDECODER                  1013
 #define IDC_LOGPERFORMANCE              1014
+#define IDC_PREBUFFER                   1014
 #define IDC_LOGMAIN                     1015
 #define IDC_TRAY                        1015
 #define IDC_SAVESTREAMS                 1016
@@ -49,6 +50,12 @@
 #define IDC_STAYONTOP                   1017
 #define IDC_BROWSE                      1018
 #define IDC_SAVELOCATION_TEXT           1019
+#define IDC_PORT                        1020
+#define IDC_PROXYADDRESS_TEXT           1021
+#define IDC_PORT_TEXT                   1022
+#define IDC_USEPROXY                    1023
+#define IDC_PROXYADDRESS                1024
+#define IDC_COLON_TEXT                  1025
 #define IDC_FIND                        20156
 #define IDC_RECENTF1                    31000
 #define IDC_SELECTALL                   32901
@@ -75,7 +82,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        108
 #define _APS_NEXT_COMMAND_VALUE         40041
-#define _APS_NEXT_CONTROL_VALUE         1014
+#define _APS_NEXT_CONTROL_VALUE         1015
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
