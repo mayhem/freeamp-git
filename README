@@ -67,8 +67,8 @@ Notes:
    _or_
    in the path specified by the environment variable FREEAMP_PATH
   
-  * at the moment, the only way to modify the playlist is via the
-    command line when FreeAmp is started (playlist modification will
+  * at the moment, the only way to modify the playlist in Linux is via 
+    the command line when FreeAmp is started (playlist modification will
     be in the next version)
   * Move between files in the playlist using the |< and >| buttons
   * Play by pressing the > button
