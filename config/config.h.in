@@ -50,7 +50,7 @@ ____________________________________________________________________________*/
 #define BRANDING_APP_NAME "freeamp"
 
 #define FREEAMP_PATH_ENV "FREEAMP_PATH"
-#define FREEAMP_VERSION "2.1.1"
+#define FREEAMP_VERSION "2.1.2"
 
 #ifndef BRANDING_VERSION
 #define BRANDING_VERSION FREEAMP_VERSION

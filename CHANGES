@@ -1,3 +1,13 @@
+Changes for version 2.1.2 
+--------------------------------------------------------------------
+
+- Fixed makefile problem so that wavlmc.o gets removed
+- Added support for saving the fileselector path between invocations
+  of the dialog. (Ed Sweetman)
+- Added support for recursively adding files when selecting a folder
+  to add to the database (Ed Sweetman)
+
+
 Changes for version 2.1.1 
 --------------------------------------------------------------------
 
