@@ -148,7 +148,7 @@ void Win32Bitmap::CreateMaskBitmap(void)
    BITMAP      sInfo;
    BITMAPINFO *pInfo, *pMaskInfo;
    HDC         hRootDC, hMemDC;
-   int         iRet, iLine, iCol;
+   int         iLine, iCol;
    char       *pData, *pMaskData;
    Color       sTrans, *pColorPtr;
    COLORREF   *pColorRefPtr;
@@ -193,37 +193,45 @@ void Win32Bitmap::CreateMaskBitmap(void)
    pColorRefPtr[0] = RGB(255,255,255);
    pColorRefPtr[1] = RGB(0,0,0);
 
-   pData = new char[sInfo.bmWidth * 4];
-   pMaskData = new char[(sInfo.bmWidth / 8) + 4];
-   for(iLine = 0; iLine < sInfo.bmHeight; iLine++)
+   int imageSpan  = ((((sInfo.bmWidth * 24) + 31) & ~31) >> 3);
+   int maskSpan   = ((((sInfo.bmWidth * 1 ) + 31) & ~31) >> 3);
+   int nImageSize = imageSpan  * sInfo.bmHeight;
+   int nMaskSize  = maskSpan   * sInfo.bmHeight;
+   
+   pData     = new char[nImageSize];
+   pMaskData = new char[nMaskSize]; 
+   memset (pMaskData, 0, nMaskSize);
+ 
+   if (GetDIBits(hMemDC, m_hBitmap, 0, sInfo.bmHeight, pData, pInfo, DIB_RGB_COLORS))
    {
-       iRet = GetDIBits(hMemDC, m_hBitmap, 
-                        (sInfo.bmHeight - 1) - iLine, 1, 
-                        pData, pInfo, DIB_RGB_COLORS);
-       if (!iRet)
+       char* pImagePtr = pData;     // points to current line of image
+       char* pMaskPtr  = pMaskData; // points to current line of mask
+       char* pMaskCol;              // points to current column of mask
+ 
+       for (iLine = 0; iLine<sInfo.bmHeight; iLine++) 
        {
-          break;
-       }   
-
-       memset(pMaskData, 0x00, (sInfo.bmWidth / 8) + 4);
-       for(iCol = 0, pColorPtr = (Color *)pData; 
-           iCol < sInfo.bmWidth; iCol++, pColorPtr++)
-       {    
-          if (pColorPtr->red != m_oTransColor.blue ||
-              pColorPtr->green != m_oTransColor.green ||
-              pColorPtr->blue != m_oTransColor.red)
-          {
-             pMaskData[iCol / 8] |= (0x80 >> (iCol % 8));
-          }   
-       }      
-             
-       iRet = SetDIBits(hMemDC, m_hMaskBitmap, 
-                        (sInfo.bmHeight - 1) - iLine, 1, 
-                        pMaskData, pMaskInfo, DIB_RGB_COLORS);
-       if (!iRet)
-       {
-          break;
-       }   
+           pColorPtr = (Color*)pImagePtr; // reset image column pointer
+           pMaskCol  = pMaskPtr;    // reset mask column to beginning of line
+ 
+           for (iCol = 0; iCol<sInfo.bmWidth; iCol++)
+           {
+             if (iCol && (iCol%8==0)) // increment mask column every 8 bits
+             {
+                 pMaskCol++;
+             }
+             if (pColorPtr->red != m_oTransColor.blue ||
+                 pColorPtr->green != m_oTransColor.green ||
+                 pColorPtr->blue != m_oTransColor.red)
+             {
+                 *pMaskCol |= (0x80 >> (iCol % 8)); // set the correct mask bit
+             }
+             pColorPtr++;             // increment image column pointer
+           }
+           pImagePtr += imageSpan;    // add span to image line pointer
+           pMaskPtr  += maskSpan;     // add span to mask line pointer
+       }
+       SetDIBits(hMemDC, m_hMaskBitmap, 0, sInfo.bmHeight, pMaskData, pMaskInfo,
+                 DIB_RGB_COLORS);
    }
 
    delete pData;

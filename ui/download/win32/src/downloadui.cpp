@@ -156,7 +156,7 @@ DownloadUI::~DownloadUI()
         DeleteObject(m_progressBitmap);
 
     if(m_handCursor)
-        DeleteObject(m_handCursor);
+        DestroyCursor(m_handCursor);
 
     delete m_uiSemaphore;
     delete m_uiThread;

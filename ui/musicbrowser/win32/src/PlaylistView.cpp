@@ -263,14 +263,21 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                 else if ( stricmp( columnText, YEAR_COLUMN ) == 0 )
                 {
                     char buf[16];
-                    if (item->GetMetaData().Year() != 0)
-                    {
-                        int32 year = item->GetMetaData().Year();
-                        if (year)
-                            sprintf(buf, "%d", year );
-                        else
-                            sprintf(buf, "Unknown");
-                    }
+                    int32 year = item->GetMetaData().Year();
+                    if (year)
+                        sprintf(buf, "%d", year );
+                    else
+                        sprintf(buf, "Unknown");
+                    displayString = buf;
+                }
+                else if ( stricmp( columnText, TRACK_COLUMN ) == 0 )
+                {
+                    char buf[16];
+                    int32 track = item->GetMetaData().Track();
+                    if(track)
+                        sprintf(buf, "%d", track );
+                    else
+                        sprintf(buf, "Unknown");
                     displayString = buf;
                 }
                 else
@@ -988,16 +995,24 @@ void MusicBrowserUI::ResizeHeader(HWND hwnd, uint32 column)
             else if ( stricmp( columnText, YEAR_COLUMN ) == 0 )
             {
                 char buf[16];
-                if(metadata.Year() != 0)
-                {
-                    int32 year = metadata.Year();
-                    if(year)
-                        sprintf(buf, "%d", year );
-                    else
-                        sprintf(buf, "Unknown");
+                int32 year = metadata.Year();
+                if(year)
+                    sprintf(buf, "%d", year );
+                else
+                    sprintf(buf, "Unknown");
 
-                    text = buf;
-                }
+                text = buf;
+            }
+            else if ( stricmp( columnText, TRACK_COLUMN) == 0 )
+            {
+                char buf[16];
+                int32 track = metadata.Track();
+                if (track)
+                    sprintf(buf, "%d", track );
+                else
+                    sprintf(buf, "Unknown");
+
+                text = buf;
             }
             else
             {

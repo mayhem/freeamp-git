@@ -286,8 +286,8 @@ void MusicBrowserUI::Init()
 MusicBrowserUI::~MusicBrowserUI()
 {
     DeleteObject(m_splitterBrush);
-    DeleteObject(m_hSplitterCursor);
-    DeleteObject(m_hPointerCursor);
+    DestroyCursor(m_hSplitterCursor);
+    DestroyCursor(m_hPointerCursor);
 
     if(m_streamsTimer)
         m_context->timerManager->StopTimer(m_streamsTimer);

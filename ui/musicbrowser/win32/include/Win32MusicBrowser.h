@@ -66,7 +66,7 @@ class FAContext;
 #define IDC_TOOLBAR        13001
 #define TOOLBAR_INDENT	   8
 
-#define ALBUM_COLUMN      "Album"
+#define ALBUM_COLUMN       "Album"
 #define ARTIST_COLUMN      "Artist"
 #define COMMENT_COLUMN     "Comment"
 #define GENRE_COLUMN       "Genre"
@@ -74,6 +74,7 @@ class FAContext;
 #define TIME_COLUMN        "Time"
 #define TITLE_COLUMN       "Title"
 #define YEAR_COLUMN        "Year"
+#define TRACK_COLUMN       "Track"
 
 bool operator<(const TreeData &A, const TreeData &b);
 bool operator==(const TreeData &A, const TreeData &b);
