@@ -49,7 +49,7 @@ using namespace std;
 #include "DropSource.h"
 #include "DropObject.h"
 #include "registrar.h"
-#include "FooCast.h"
+#include "Http.h"
 
 char* kMyMusic = "My Music";
 char* kAllTracks = "All Tracks";
@@ -143,7 +143,7 @@ void MusicBrowserUI::InitTree()
     insert.hParent = m_hStreamsItem;
     m_hIceCastItem = TreeView_InsertItem(m_hMusicView, &insert);
    
-    insert.item.pszText = kShoutCast;
+    /*insert.item.pszText = kShoutCast;
     insert.item.cchTextMax = lstrlen(insert.item.pszText);
     insert.item.iImage = 11;
     insert.item.iSelectedImage = 11;
@@ -151,7 +151,7 @@ void MusicBrowserUI::InitTree()
     insert.item.lParam = NULL;
     insert.hInsertAfter = TVI_LAST;
     insert.hParent = m_hStreamsItem;
-    m_hShoutCastItem = TreeView_InsertItem(m_hMusicView, &insert);
+    m_hShoutCastItem = TreeView_InsertItem(m_hMusicView, &insert);*/
 
     insert.item.pszText = kPortables;
     insert.item.cchTextMax = lstrlen(insert.item.pszText);
@@ -387,15 +387,13 @@ void MusicBrowserUI::RefreshCDList(vector<PlaylistItem*>* trackList)
     TreeView_SetItem(m_hMusicView, &tv_item);
 }
 
-unsigned long __stdcall 
+void
 MusicBrowserUI::
 fill_all_tracks(void* arg)
 {
     MusicBrowserUI* ui = (MusicBrowserUI*) arg;
 
 	ui->FillAllTracks();
-
-    return 0;
 }
 
 void MusicBrowserUI::FillAllTracks()
@@ -488,12 +486,13 @@ void MusicBrowserUI::FillAllTracks()
         insert.item.iSelectedImage = 4;
         insert.item.cChildren= 0;
         insert.item.lParam = (LPARAM) new TreeData(data);
-        insert.hInsertAfter = TVI_LAST;
+        insert.hInsertAfter = TVI_SORT;
         insert.hParent = m_hAllItem;
         TreeView_InsertItem(m_hMusicView, &insert);
     }
 
-    TreeView_SortChildren(m_hMusicView, m_hAllItem, 0);
+    //TreeView_SortChildren(m_hMusicView, m_hAllItem, 0);
+    delete m_fillAllThread;
 }
 
 void MusicBrowserUI::FillUncatTracks()
@@ -646,7 +645,6 @@ void MusicBrowserUI::FillWiredPlanet()
         PlaylistItem* stream = new PlaylistItem;
         MetaData metadata;
 
-
         stream->SetURL(urls[i]);
         metadata.SetTitle(stations[i]);
         metadata.SetArtist("Wired Planet");
@@ -659,17 +657,64 @@ void MusicBrowserUI::FillWiredPlanet()
         insert.item.iImage = 8;
         insert.item.iSelectedImage = 8;
         insert.item.cChildren= 0;
-        insert.item.lParam = (LPARAM) new TreeData(data);;
+        insert.item.lParam = (LPARAM) new TreeData(data);
         insert.hInsertAfter = TVI_SORT;
         insert.hParent = m_hWiredPlanetItem;
         TreeView_InsertItem(m_hMusicView, &insert);
     }
-
 }
 
-void MusicBrowserUI::FillIceCast()
+void MusicBrowserUI::FillIceCast(vector<IcecastStreamInfo> &list)
 {
-    FooCast* fooCast = new FooCast(m_hMusicView, m_hIceCastItem);
+    //FooCast* fooCast = new FooCast(m_hMusicView, m_hIceCastItem);
+
+    HTREEITEM treeItem;
+
+    while(treeItem = TreeView_GetChild(m_hMusicView, m_hIceCastItem))
+    {
+        TreeView_DeleteItem(m_hMusicView, treeItem);
+    }
+
+    TV_INSERTSTRUCT insert;
+    TreeData        data;
+
+    data.m_iLevel = 1;
+
+    insert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
+                        TVIF_SELECTEDIMAGE | TVIF_PARAM;
+
+
+    vector<IcecastStreamInfo>::iterator i = list.begin();
+
+    for(; i != list.end(); i++)
+    {
+        PlaylistItem* stream = new PlaylistItem;
+        MetaData metadata;
+
+        stream->SetURL(i->m_streamUrl.c_str());
+        metadata.SetTitle(i->m_name.c_str());
+        metadata.SetArtist(i->m_webUrl.c_str());
+        metadata.SetComment(i->m_desc.c_str());
+        stream->SetMetaData(&metadata);
+
+        data.m_pStream = stream;
+
+        insert.item.pszText = (char*)i->m_webUrl.c_str();
+        insert.item.cchTextMax = strlen(insert.item.pszText);
+        insert.item.iImage = 8;
+        insert.item.iSelectedImage = 8;
+        insert.item.cChildren= 0;
+        insert.item.lParam = (LPARAM) new TreeData(data);
+        insert.hInsertAfter = TVI_SORT;
+        insert.hParent = m_hIceCastItem;
+        TreeView_InsertItem(m_hMusicView, &insert);
+    }
+
+    if(m_fillIceCastThread)
+    {
+        delete m_fillIceCastThread;
+        m_fillIceCastThread = NULL;
+    }
 }
 
 void MusicBrowserUI::FillPortables()
@@ -768,6 +813,34 @@ void MusicBrowserUI::FillPortables()
         insert.hInsertAfter = TVI_FIRST;
         insert.hParent = m_hPortableItem;
         m_hNewPortableItem = TreeView_InsertItem(m_hMusicView, &insert);
+    }
+}
+
+void MusicBrowserUI::icecast_timer(void *arg)
+{
+    MusicBrowserUI *ui = (MusicBrowserUI*)arg;
+    ui->IceCastTimer();
+}
+
+void MusicBrowserUI::IceCastTimer()
+{
+    Error error;
+    Http icecastDownload(m_context);
+    string page;
+    vector<IcecastStreamInfo> list;
+    IcecastStreams icecastStream;
+    const string icecastURL = "http://yp.icecast.org/yplist_long.xml";
+
+    error = icecastDownload.DownloadToString(icecastURL, page);
+
+    if(IsntError(error))
+    {
+        icecastStream.ParseStreamXML(page, list);
+
+        if(list.size() > 0)
+        {
+            FillIceCast(list);
+        }
     }
 }
 

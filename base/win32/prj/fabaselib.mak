@@ -43,9 +43,11 @@ CLEAN :
 	-@erase "$(INTDIR)\debug.obj"
 	-@erase "$(INTDIR)\downloadmanager.obj"
 	-@erase "$(INTDIR)\errors.obj"
+	-@erase "$(INTDIR)\Http.obj"
 	-@erase "$(INTDIR)\log.obj"
 	-@erase "$(INTDIR)\musiccatalog.obj"
 	-@erase "$(INTDIR)\mutex.obj"
+	-@erase "$(INTDIR)\Parse.obj"
 	-@erase "$(INTDIR)\player.obj"
 	-@erase "$(INTDIR)\playlist.obj"
 	-@erase "$(INTDIR)\preferences.obj"
@@ -68,7 +70,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\..\..\lib\zlib\include" /I "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\fabaselib.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\..\..\lib\http\include" /I "..\..\..\lib\zlib\include" /I "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\fabaselib.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\fabaselib.bsc" 
 BSC32_SBRS= \
@@ -91,13 +93,15 @@ LIB32_OBJS= \
 	"$(INTDIR)\registry.obj" \
 	"$(INTDIR)\semaphore.obj" \
 	"$(INTDIR)\thread.obj" \
+	"$(INTDIR)\timer.obj" \
 	"$(INTDIR)\undomanager.obj" \
 	"$(INTDIR)\updatemanager.obj" \
 	"$(INTDIR)\utility.obj" \
 	"$(INTDIR)\win32prefs.obj" \
 	"$(INTDIR)\win32thread.obj" \
 	"$(INTDIR)\win32updatemanager.obj" \
-	"$(INTDIR)\timer.obj"
+	"$(INTDIR)\Http.obj" \
+	"$(INTDIR)\Parse.obj"
 
 "..\fabaselib.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
     $(LIB32) @<<
@@ -109,7 +113,7 @@ LIB32_OBJS= \
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
-ALL : "..\fabaselib.lib"
+ALL : "..\..\..\config\config.h" "..\fabaselib.lib"
 
 
 CLEAN :
@@ -117,9 +121,11 @@ CLEAN :
 	-@erase "$(INTDIR)\debug.obj"
 	-@erase "$(INTDIR)\downloadmanager.obj"
 	-@erase "$(INTDIR)\errors.obj"
+	-@erase "$(INTDIR)\Http.obj"
 	-@erase "$(INTDIR)\log.obj"
 	-@erase "$(INTDIR)\musiccatalog.obj"
 	-@erase "$(INTDIR)\mutex.obj"
+	-@erase "$(INTDIR)\Parse.obj"
 	-@erase "$(INTDIR)\player.obj"
 	-@erase "$(INTDIR)\playlist.obj"
 	-@erase "$(INTDIR)\preferences.obj"
@@ -137,11 +143,12 @@ CLEAN :
 	-@erase "$(INTDIR)\win32thread.obj"
 	-@erase "$(INTDIR)\win32updatemanager.obj"
 	-@erase "..\fabaselib.lib"
+	-@erase "..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MDd /W3 /GX /Z7 /Od /I "..\..\..\lib\zlib\include" /I "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\fabaselib.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MDd /W3 /GX /Z7 /Od /I "..\..\..\lib\http\include" /I "..\..\..\lib\zlib\include" /I "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\fabaselib.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\fabaselib.bsc" 
 BSC32_SBRS= \
@@ -164,13 +171,15 @@ LIB32_OBJS= \
 	"$(INTDIR)\registry.obj" \
 	"$(INTDIR)\semaphore.obj" \
 	"$(INTDIR)\thread.obj" \
+	"$(INTDIR)\timer.obj" \
 	"$(INTDIR)\undomanager.obj" \
 	"$(INTDIR)\updatemanager.obj" \
 	"$(INTDIR)\utility.obj" \
 	"$(INTDIR)\win32prefs.obj" \
 	"$(INTDIR)\win32thread.obj" \
 	"$(INTDIR)\win32updatemanager.obj" \
-	"$(INTDIR)\timer.obj"
+	"$(INTDIR)\Http.obj" \
+	"$(INTDIR)\Parse.obj"
 
 "..\fabaselib.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
     $(LIB32) @<<
@@ -190,9 +199,11 @@ CLEAN :
 	-@erase "$(INTDIR)\debug.obj"
 	-@erase "$(INTDIR)\downloadmanager.obj"
 	-@erase "$(INTDIR)\errors.obj"
+	-@erase "$(INTDIR)\Http.obj"
 	-@erase "$(INTDIR)\log.obj"
 	-@erase "$(INTDIR)\musiccatalog.obj"
 	-@erase "$(INTDIR)\mutex.obj"
+	-@erase "$(INTDIR)\Parse.obj"
 	-@erase "$(INTDIR)\player.obj"
 	-@erase "$(INTDIR)\playlist.obj"
 	-@erase "$(INTDIR)\preferences.obj"
@@ -214,7 +225,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MDd /W3 /GX /Z7 /Od /I "..\..\..\lib\zlib\include" /I "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\fabaselib.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MDd /W3 /GX /Z7 /Od /I "..\..\..\lib\http\include" /I "..\..\..\lib\zlib\include" /I "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\fabaselib.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\fabaselib.bsc" 
 BSC32_SBRS= \
@@ -237,13 +248,15 @@ LIB32_OBJS= \
 	"$(INTDIR)\registry.obj" \
 	"$(INTDIR)\semaphore.obj" \
 	"$(INTDIR)\thread.obj" \
+	"$(INTDIR)\timer.obj" \
 	"$(INTDIR)\undomanager.obj" \
 	"$(INTDIR)\updatemanager.obj" \
 	"$(INTDIR)\utility.obj" \
 	"$(INTDIR)\win32prefs.obj" \
 	"$(INTDIR)\win32thread.obj" \
 	"$(INTDIR)\win32updatemanager.obj" \
-	"$(INTDIR)\timer.obj"
+	"$(INTDIR)\Http.obj" \
+	"$(INTDIR)\Parse.obj"
 
 "..\fabaselib.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
     $(LIB32) @<<
@@ -263,9 +276,11 @@ CLEAN :
 	-@erase "$(INTDIR)\debug.obj"
 	-@erase "$(INTDIR)\downloadmanager.obj"
 	-@erase "$(INTDIR)\errors.obj"
+	-@erase "$(INTDIR)\Http.obj"
 	-@erase "$(INTDIR)\log.obj"
 	-@erase "$(INTDIR)\musiccatalog.obj"
 	-@erase "$(INTDIR)\mutex.obj"
+	-@erase "$(INTDIR)\Parse.obj"
 	-@erase "$(INTDIR)\player.obj"
 	-@erase "$(INTDIR)\playlist.obj"
 	-@erase "$(INTDIR)\preferences.obj"
@@ -288,7 +303,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\..\..\lib\zlib\include" /I "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\fabaselib.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\..\..\lib\http\include" /I "..\..\..\lib\zlib\include" /I "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\fabaselib.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\fabaselib.bsc" 
 BSC32_SBRS= \
@@ -311,13 +326,15 @@ LIB32_OBJS= \
 	"$(INTDIR)\registry.obj" \
 	"$(INTDIR)\semaphore.obj" \
 	"$(INTDIR)\thread.obj" \
+	"$(INTDIR)\timer.obj" \
 	"$(INTDIR)\undomanager.obj" \
 	"$(INTDIR)\updatemanager.obj" \
 	"$(INTDIR)\utility.obj" \
 	"$(INTDIR)\win32prefs.obj" \
 	"$(INTDIR)\win32thread.obj" \
 	"$(INTDIR)\win32updatemanager.obj" \
-	"$(INTDIR)\timer.obj"
+	"$(INTDIR)\Http.obj" \
+	"$(INTDIR)\Parse.obj"
 
 "..\fabaselib.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
     $(LIB32) @<<
@@ -439,6 +456,12 @@ SOURCE=..\..\src\errors.cpp
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+SOURCE=..\..\..\lib\http\src\Http.cpp
+
+"$(INTDIR)\Http.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
 SOURCE=..\..\src\log.cpp
 
 "$(INTDIR)\log.obj" : $(SOURCE) "$(INTDIR)"
@@ -454,6 +477,12 @@ SOURCE=..\..\src\musiccatalog.cpp
 SOURCE=..\src\mutex.cpp
 
 "$(INTDIR)\mutex.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\..\..\lib\xml\src\Parse.cpp
+
+"$(INTDIR)\Parse.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

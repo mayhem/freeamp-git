@@ -36,10 +36,21 @@ RSC=rc.exe
 OUTDIR=.\Release
 INTDIR=.\Release
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : ".\m3u.plf"
 
+!ELSE 
 
+ALL : "fabaselib - Win32 Release" ".\m3u.plf"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fabaselib - Win32 ReleaseCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\m3u.obj"
 	-@erase "$(INTDIR)\m3u.res"
 	-@erase "$(INTDIR)\vc60.idb"
@@ -63,7 +74,8 @@ DEF_FILE= \
 	".\m3u.def"
 LINK32_OBJS= \
 	"$(INTDIR)\m3u.obj" \
-	"$(INTDIR)\m3u.res"
+	"$(INTDIR)\m3u.res" \
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\m3u.plf" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -75,7 +87,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\m3u.plf"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 Release" ".\m3u.plf"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                ..\..\..\..\base\win32\prj\plugins
 	copy m3u.plf       ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -85,10 +97,21 @@ $(DS_POSTBUILD_DEP) : ".\m3u.plf"
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : ".\m3u.plf"
 
+!ELSE 
 
+ALL : "fabaselib - Win32 Debug" ".\m3u.plf"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fabaselib - Win32 DebugCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\m3u.obj"
 	-@erase "$(INTDIR)\m3u.res"
 	-@erase "$(INTDIR)\vc60.idb"
@@ -115,7 +138,8 @@ DEF_FILE= \
 	".\m3u.def"
 LINK32_OBJS= \
 	"$(INTDIR)\m3u.obj" \
-	"$(INTDIR)\m3u.res"
+	"$(INTDIR)\m3u.res" \
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\m3u.plf" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -127,7 +151,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\m3u.plf"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 Debug" ".\m3u.plf"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                ..\..\..\..\base\win32\prj\plugins
 	copy m3u.plf       ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -137,10 +161,21 @@ $(DS_POSTBUILD_DEP) : ".\m3u.plf"
 OUTDIR=.\Release
 INTDIR=.\Release
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : ".\m3u.plf"
 
+!ELSE 
 
+ALL : "fabaselib - Win32 NASM Release" ".\m3u.plf"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fabaselib - Win32 NASM ReleaseCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\m3u.obj"
 	-@erase "$(INTDIR)\m3u.res"
 	-@erase "$(INTDIR)\vc60.idb"
@@ -164,7 +199,8 @@ DEF_FILE= \
 	".\m3u.def"
 LINK32_OBJS= \
 	"$(INTDIR)\m3u.obj" \
-	"$(INTDIR)\m3u.res"
+	"$(INTDIR)\m3u.res" \
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\m3u.plf" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -176,7 +212,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\m3u.plf"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Release" ".\m3u.plf"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                ..\..\..\..\base\win32\prj\plugins
 	copy m3u.plf       ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -186,10 +222,21 @@ $(DS_POSTBUILD_DEP) : ".\m3u.plf"
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : ".\m3u.plf"
 
+!ELSE 
 
+ALL : "fabaselib - Win32 NASM Debug" ".\m3u.plf"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fabaselib - Win32 NASM DebugCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\m3u.obj"
 	-@erase "$(INTDIR)\m3u.res"
 	-@erase "$(INTDIR)\vc60.idb"
@@ -216,7 +263,8 @@ DEF_FILE= \
 	".\m3u.def"
 LINK32_OBJS= \
 	"$(INTDIR)\m3u.obj" \
-	"$(INTDIR)\m3u.res"
+	"$(INTDIR)\m3u.res" \
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\m3u.plf" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -228,7 +276,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\m3u.plf"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Debug" ".\m3u.plf"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                ..\..\..\..\base\win32\prj\plugins
 	copy m3u.plf       ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -311,6 +359,56 @@ SOURCE=..\res\m3u.rc
 "$(INTDIR)\m3u.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\m3u.res" /i "\Local\src\freeamp\plm\playlist\m3u\res" /d "_DEBUG" $(SOURCE)
 
+
+!ENDIF 
+
+!IF  "$(CFG)" == "m3u - Win32 Release"
+
+"fabaselib - Win32 Release" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Release" 
+   cd "..\..\..\plm\playlist\m3u\prj"
+
+"fabaselib - Win32 ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Release" RECURSE=1 CLEAN 
+   cd "..\..\..\plm\playlist\m3u\prj"
+
+!ELSEIF  "$(CFG)" == "m3u - Win32 Debug"
+
+"fabaselib - Win32 Debug" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Debug" 
+   cd "..\..\..\plm\playlist\m3u\prj"
+
+"fabaselib - Win32 DebugCLEAN" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Debug" RECURSE=1 CLEAN 
+   cd "..\..\..\plm\playlist\m3u\prj"
+
+!ELSEIF  "$(CFG)" == "m3u - Win32 NASM Release"
+
+"fabaselib - Win32 NASM Release" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Release" 
+   cd "..\..\..\plm\playlist\m3u\prj"
+
+"fabaselib - Win32 NASM ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Release" RECURSE=1 CLEAN 
+   cd "..\..\..\plm\playlist\m3u\prj"
+
+!ELSEIF  "$(CFG)" == "m3u - Win32 NASM Debug"
+
+"fabaselib - Win32 NASM Debug" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug" 
+   cd "..\..\..\plm\playlist\m3u\prj"
+
+"fabaselib - Win32 NASM DebugCLEAN" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug" RECURSE=1 CLEAN 
+   cd "..\..\..\plm\playlist\m3u\prj"
 
 !ENDIF 
 

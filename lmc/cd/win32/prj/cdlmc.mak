@@ -65,10 +65,10 @@ LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg
 DEF_FILE= \
 	".\cdlmc.def"
 LINK32_OBJS= \
-	"$(INTDIR)\cdlmc.res" \
 	"$(INTDIR)\cdlmc.obj" \
 	"$(INTDIR)\pipeline.obj" \
-	"$(INTDIR)\pullbuffer.obj"
+	"$(INTDIR)\pullbuffer.obj" \
+	"$(INTDIR)\cdlmc.res"
 
 ".\cd.lmc" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -90,7 +90,7 @@ $(DS_POSTBUILD_DEP) : "..\..\..\..\config\config.h" ".\cd.lmc"
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
-ALL : "..\..\..\..\config\config.h" ".\cd.lmc"
+ALL : ".\cd.lmc"
 
 
 CLEAN :
@@ -105,7 +105,6 @@ CLEAN :
 	-@erase "$(OUTDIR)\cd.pdb"
 	-@erase ".\cd.ilk"
 	-@erase ".\cd.lmc"
-	-@erase "..\..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -122,10 +121,10 @@ LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg
 DEF_FILE= \
 	".\cdlmc.def"
 LINK32_OBJS= \
-	"$(INTDIR)\cdlmc.res" \
 	"$(INTDIR)\cdlmc.obj" \
 	"$(INTDIR)\pipeline.obj" \
-	"$(INTDIR)\pullbuffer.obj"
+	"$(INTDIR)\pullbuffer.obj" \
+	"$(INTDIR)\cdlmc.res"
 
 ".\cd.lmc" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -137,7 +136,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "..\..\..\..\config\config.h" ".\cd.lmc"
+$(DS_POSTBUILD_DEP) : ".\cd.lmc"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                    ..\..\..\..\base\win32\prj\plugins
 	copy cd.lmc                            ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -176,10 +175,10 @@ LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg
 DEF_FILE= \
 	".\cdlmc.def"
 LINK32_OBJS= \
-	"$(INTDIR)\cdlmc.res" \
 	"$(INTDIR)\cdlmc.obj" \
 	"$(INTDIR)\pipeline.obj" \
-	"$(INTDIR)\pullbuffer.obj"
+	"$(INTDIR)\pullbuffer.obj" \
+	"$(INTDIR)\cdlmc.res"
 
 ".\cd.lmc" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -232,10 +231,10 @@ LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg
 DEF_FILE= \
 	".\cdlmc.def"
 LINK32_OBJS= \
-	"$(INTDIR)\cdlmc.res" \
 	"$(INTDIR)\cdlmc.obj" \
 	"$(INTDIR)\pipeline.obj" \
-	"$(INTDIR)\pullbuffer.obj"
+	"$(INTDIR)\pullbuffer.obj" \
+	"$(INTDIR)\cdlmc.res"
 
 ".\cd.lmc" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<

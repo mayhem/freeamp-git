@@ -36,10 +36,21 @@ RSC=rc.exe
 OUTDIR=.\Release
 INTDIR=.\Release
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : ".\pmp300.ppp"
 
+!ELSE 
 
+ALL : "fabaselib - Win32 Release" "riolib - Win32 Release" ".\pmp300.ppp"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"riolib - Win32 ReleaseCLEAN" "fabaselib - Win32 ReleaseCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\pmp300.obj"
 	-@erase "$(INTDIR)\pmp300.res"
 	-@erase "$(INTDIR)\vc60.idb"
@@ -63,7 +74,9 @@ DEF_FILE= \
 	".\pmp300.def"
 LINK32_OBJS= \
 	"$(INTDIR)\pmp300.obj" \
-	"$(INTDIR)\pmp300.res"
+	"$(INTDIR)\pmp300.res" \
+	"..\sba\riolib.lib" \
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\pmp300.ppp" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -75,7 +88,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\pmp300.ppp"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 Release" "riolib - Win32 Release" ".\pmp300.ppp"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                 ..\..\..\..\base\win32\prj\plugins
 	copy pmp300.ppp        ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -85,10 +98,21 @@ $(DS_POSTBUILD_DEP) : ".\pmp300.ppp"
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : ".\pmp300.ppp"
 
+!ELSE 
 
+ALL : "fabaselib - Win32 Debug" "riolib - Win32 Debug" ".\pmp300.ppp"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"riolib - Win32 DebugCLEAN" "fabaselib - Win32 DebugCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\pmp300.obj"
 	-@erase "$(INTDIR)\pmp300.res"
 	-@erase "$(INTDIR)\vc60.idb"
@@ -115,7 +139,9 @@ DEF_FILE= \
 	".\pmp300.def"
 LINK32_OBJS= \
 	"$(INTDIR)\pmp300.obj" \
-	"$(INTDIR)\pmp300.res"
+	"$(INTDIR)\pmp300.res" \
+	"..\sba\riolib.lib" \
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\pmp300.ppp" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -127,7 +153,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\pmp300.ppp"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 Debug" "riolib - Win32 Debug" ".\pmp300.ppp"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                 ..\..\..\..\base\win32\prj\plugins
 	copy pmp300.ppp        ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -137,10 +163,21 @@ $(DS_POSTBUILD_DEP) : ".\pmp300.ppp"
 OUTDIR=.\Release
 INTDIR=.\Release
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : ".\pmp300.ppp"
 
+!ELSE 
 
+ALL : "fabaselib - Win32 NASM Release" "riolib - Win32 NASM Release" ".\pmp300.ppp"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"riolib - Win32 NASM ReleaseCLEAN" "fabaselib - Win32 NASM ReleaseCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\pmp300.obj"
 	-@erase "$(INTDIR)\pmp300.res"
 	-@erase "$(INTDIR)\vc60.idb"
@@ -164,7 +201,9 @@ DEF_FILE= \
 	".\pmp300.def"
 LINK32_OBJS= \
 	"$(INTDIR)\pmp300.obj" \
-	"$(INTDIR)\pmp300.res"
+	"$(INTDIR)\pmp300.res" \
+	"..\sba\riolib.lib" \
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\pmp300.ppp" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -176,7 +215,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\pmp300.ppp"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Release" "riolib - Win32 NASM Release" ".\pmp300.ppp"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                 ..\..\..\..\base\win32\prj\plugins
 	copy pmp300.ppp        ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -186,10 +225,21 @@ $(DS_POSTBUILD_DEP) : ".\pmp300.ppp"
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : ".\pmp300.ppp"
 
+!ELSE 
 
+ALL : "fabaselib - Win32 NASM Debug" "riolib - Win32 NASM Debug" ".\pmp300.ppp"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"riolib - Win32 NASM DebugCLEAN" "fabaselib - Win32 NASM DebugCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\pmp300.obj"
 	-@erase "$(INTDIR)\pmp300.res"
 	-@erase "$(INTDIR)\vc60.idb"
@@ -216,7 +266,9 @@ DEF_FILE= \
 	".\pmp300.def"
 LINK32_OBJS= \
 	"$(INTDIR)\pmp300.obj" \
-	"$(INTDIR)\pmp300.res"
+	"$(INTDIR)\pmp300.res" \
+	"..\sba\riolib.lib" \
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\pmp300.ppp" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -228,7 +280,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\pmp300.ppp"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Debug" "riolib - Win32 NASM Debug" ".\pmp300.ppp"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                 ..\..\..\..\base\win32\prj\plugins
 	copy pmp300.ppp        ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -311,6 +363,106 @@ SOURCE=..\res\pmp300.rc
 "$(INTDIR)\pmp300.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\pmp300.res" /i "\Local\src\freeamp\plm\portable\pmp300\res" /d "_DEBUG" $(SOURCE)
 
+
+!ENDIF 
+
+!IF  "$(CFG)" == "pmp300 - Win32 Release"
+
+"riolib - Win32 Release" : 
+   cd "\Local\src\freeamp\plm\portable\pmp300\sba\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\riolib.mak CFG="riolib - Win32 Release" 
+   cd "..\..\prj"
+
+"riolib - Win32 ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\plm\portable\pmp300\sba\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\riolib.mak CFG="riolib - Win32 Release" RECURSE=1 CLEAN 
+   cd "..\..\prj"
+
+!ELSEIF  "$(CFG)" == "pmp300 - Win32 Debug"
+
+"riolib - Win32 Debug" : 
+   cd "\Local\src\freeamp\plm\portable\pmp300\sba\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\riolib.mak CFG="riolib - Win32 Debug" 
+   cd "..\..\prj"
+
+"riolib - Win32 DebugCLEAN" : 
+   cd "\Local\src\freeamp\plm\portable\pmp300\sba\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\riolib.mak CFG="riolib - Win32 Debug" RECURSE=1 CLEAN 
+   cd "..\..\prj"
+
+!ELSEIF  "$(CFG)" == "pmp300 - Win32 NASM Release"
+
+"riolib - Win32 NASM Release" : 
+   cd "\Local\src\freeamp\plm\portable\pmp300\sba\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\riolib.mak CFG="riolib - Win32 NASM Release" 
+   cd "..\..\prj"
+
+"riolib - Win32 NASM ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\plm\portable\pmp300\sba\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\riolib.mak CFG="riolib - Win32 NASM Release" RECURSE=1 CLEAN 
+   cd "..\..\prj"
+
+!ELSEIF  "$(CFG)" == "pmp300 - Win32 NASM Debug"
+
+"riolib - Win32 NASM Debug" : 
+   cd "\Local\src\freeamp\plm\portable\pmp300\sba\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\riolib.mak CFG="riolib - Win32 NASM Debug" 
+   cd "..\..\prj"
+
+"riolib - Win32 NASM DebugCLEAN" : 
+   cd "\Local\src\freeamp\plm\portable\pmp300\sba\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\riolib.mak CFG="riolib - Win32 NASM Debug" RECURSE=1 CLEAN 
+   cd "..\..\prj"
+
+!ENDIF 
+
+!IF  "$(CFG)" == "pmp300 - Win32 Release"
+
+"fabaselib - Win32 Release" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Release" 
+   cd "..\..\..\plm\portable\pmp300\prj"
+
+"fabaselib - Win32 ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Release" RECURSE=1 CLEAN 
+   cd "..\..\..\plm\portable\pmp300\prj"
+
+!ELSEIF  "$(CFG)" == "pmp300 - Win32 Debug"
+
+"fabaselib - Win32 Debug" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Debug" 
+   cd "..\..\..\plm\portable\pmp300\prj"
+
+"fabaselib - Win32 DebugCLEAN" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Debug" RECURSE=1 CLEAN 
+   cd "..\..\..\plm\portable\pmp300\prj"
+
+!ELSEIF  "$(CFG)" == "pmp300 - Win32 NASM Release"
+
+"fabaselib - Win32 NASM Release" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Release" 
+   cd "..\..\..\plm\portable\pmp300\prj"
+
+"fabaselib - Win32 NASM ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Release" RECURSE=1 CLEAN 
+   cd "..\..\..\plm\portable\pmp300\prj"
+
+!ELSEIF  "$(CFG)" == "pmp300 - Win32 NASM Debug"
+
+"fabaselib - Win32 NASM Debug" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug" 
+   cd "..\..\..\plm\portable\pmp300\prj"
+
+"fabaselib - Win32 NASM DebugCLEAN" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug" RECURSE=1 CLEAN 
+   cd "..\..\..\plm\portable\pmp300\prj"
 
 !ENDIF 
 

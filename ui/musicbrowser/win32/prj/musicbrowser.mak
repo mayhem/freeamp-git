@@ -60,6 +60,7 @@ CLEAN :
 	-@erase "$(INTDIR)\EnumFormatEtc.obj"
 	-@erase "$(INTDIR)\Event.obj"
 	-@erase "$(INTDIR)\FooCast.obj"
+	-@erase "$(INTDIR)\Icecast.obj"
 	-@erase "$(INTDIR)\IntroductionWizard.obj"
 	-@erase "$(INTDIR)\MultiSelectTreeView.obj"
 	-@erase "$(INTDIR)\musicbrowser.res"
@@ -79,7 +80,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\res" /I "..\..\..\..\lib\gdbm" /I "..\..\..\..\lmc\include" /I "..\..\..\..\io\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\musicbrowser.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\res" /I "..\..\..\..\lib\gdbm" /I "..\..\..\..\lmc\include" /I "..\..\..\..\io\include" /I "..\..\..\..\lib\http\include" /I "..\..\..\..\lib\xml\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\musicbrowser.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32 
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\musicbrowser.res" /d "NDEBUG" 
 BSC32=bscmake.exe
@@ -110,6 +111,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\SavePlaylistDialog.obj" \
 	"$(INTDIR)\Win32MusicBrowser.obj" \
 	"$(INTDIR)\musicbrowser.res" \
+	"$(INTDIR)\Icecast.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\gdbm\gdbm.lib"
 
@@ -135,11 +137,11 @@ INTDIR=.\Debug
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : ".\musicbrowser.ui"
+ALL : "..\..\..\..\config\config.h" ".\musicbrowser.ui"
 
 !ELSE 
 
-ALL : "gdbm - Win32 Debug" "fabaselib - Win32 Debug" ".\musicbrowser.ui"
+ALL : "gdbm - Win32 Debug" "fabaselib - Win32 Debug" "..\..\..\..\config\config.h" ".\musicbrowser.ui"
 
 !ENDIF 
 
@@ -157,6 +159,7 @@ CLEAN :
 	-@erase "$(INTDIR)\EnumFormatEtc.obj"
 	-@erase "$(INTDIR)\Event.obj"
 	-@erase "$(INTDIR)\FooCast.obj"
+	-@erase "$(INTDIR)\Icecast.obj"
 	-@erase "$(INTDIR)\IntroductionWizard.obj"
 	-@erase "$(INTDIR)\MultiSelectTreeView.obj"
 	-@erase "$(INTDIR)\musicbrowser.res"
@@ -174,11 +177,12 @@ CLEAN :
 	-@erase "$(OUTDIR)\musicbrowser.pdb"
 	-@erase ".\musicbrowser.ilk"
 	-@erase ".\musicbrowser.ui"
+	-@erase "..\..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\res" /I "..\..\..\..\lib\gdbm" /I "..\..\..\..\lmc\include" /I "..\..\..\..\io\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\musicbrowser.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\res" /I "..\..\..\..\lib\gdbm" /I "..\..\..\..\lmc\include" /I "..\..\..\..\io\include" /I "..\..\..\..\lib\http\include" /I "..\..\..\..\lib\xml\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\musicbrowser.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32 
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\musicbrowser.res" /d "_DEBUG" 
 BSC32=bscmake.exe
@@ -207,6 +211,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\SavePlaylistDialog.obj" \
 	"$(INTDIR)\Win32MusicBrowser.obj" \
 	"$(INTDIR)\musicbrowser.res" \
+	"$(INTDIR)\Icecast.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\gdbm\gdbm.lib"
 
@@ -220,7 +225,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "gdbm - Win32 Debug" "fabaselib - Win32 Debug" ".\musicbrowser.ui"
+$(DS_POSTBUILD_DEP) : "gdbm - Win32 Debug" "fabaselib - Win32 Debug" "..\..\..\..\config\config.h" ".\musicbrowser.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                                     ..\..\..\..\base\win32\prj\plugins
 	copy musicbrowser.ui                                                                                       ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -254,6 +259,7 @@ CLEAN :
 	-@erase "$(INTDIR)\EnumFormatEtc.obj"
 	-@erase "$(INTDIR)\Event.obj"
 	-@erase "$(INTDIR)\FooCast.obj"
+	-@erase "$(INTDIR)\Icecast.obj"
 	-@erase "$(INTDIR)\IntroductionWizard.obj"
 	-@erase "$(INTDIR)\MultiSelectTreeView.obj"
 	-@erase "$(INTDIR)\musicbrowser.res"
@@ -275,7 +281,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\res" /I "..\..\..\..\lib\gdbm" /I "..\..\..\..\lmc\include" /I "..\..\..\..\io\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\musicbrowser.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\res" /I "..\..\..\..\lib\gdbm" /I "..\..\..\..\lmc\include" /I "..\..\..\..\io\include" /I "..\..\..\..\lib\http\include" /I "..\..\..\..\lib\xml\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\musicbrowser.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32 
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\musicbrowser.res" /d "_DEBUG" 
 BSC32=bscmake.exe
@@ -304,6 +310,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\SavePlaylistDialog.obj" \
 	"$(INTDIR)\Win32MusicBrowser.obj" \
 	"$(INTDIR)\musicbrowser.res" \
+	"$(INTDIR)\Icecast.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\gdbm\gdbm.lib"
 
@@ -329,11 +336,11 @@ INTDIR=.\Release
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : ".\musicbrowser.ui"
+ALL : "..\..\..\..\config\config.h" ".\musicbrowser.ui"
 
 !ELSE 
 
-ALL : "gdbm - Win32 NASM Release" "fabaselib - Win32 NASM Release" ".\musicbrowser.ui"
+ALL : "gdbm - Win32 NASM Release" "fabaselib - Win32 NASM Release" "..\..\..\..\config\config.h" ".\musicbrowser.ui"
 
 !ENDIF 
 
@@ -351,6 +358,7 @@ CLEAN :
 	-@erase "$(INTDIR)\EnumFormatEtc.obj"
 	-@erase "$(INTDIR)\Event.obj"
 	-@erase "$(INTDIR)\FooCast.obj"
+	-@erase "$(INTDIR)\Icecast.obj"
 	-@erase "$(INTDIR)\IntroductionWizard.obj"
 	-@erase "$(INTDIR)\MultiSelectTreeView.obj"
 	-@erase "$(INTDIR)\musicbrowser.res"
@@ -365,11 +373,12 @@ CLEAN :
 	-@erase "$(OUTDIR)\musicbrowser.exp"
 	-@erase "$(OUTDIR)\musicbrowser.lib"
 	-@erase ".\musicbrowser.ui"
+	-@erase "..\..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\res" /I "..\..\..\..\lib\gdbm" /I "..\..\..\..\lmc\include" /I "..\..\..\..\io\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\musicbrowser.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\res" /I "..\..\..\..\lib\gdbm" /I "..\..\..\..\lmc\include" /I "..\..\..\..\io\include" /I "..\..\..\..\lib\http\include" /I "..\..\..\..\lib\xml\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\musicbrowser.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32 
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\musicbrowser.res" /d "NDEBUG" 
 BSC32=bscmake.exe
@@ -400,6 +409,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\SavePlaylistDialog.obj" \
 	"$(INTDIR)\Win32MusicBrowser.obj" \
 	"$(INTDIR)\musicbrowser.res" \
+	"$(INTDIR)\Icecast.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\gdbm\gdbm.lib"
 
@@ -413,7 +423,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "gdbm - Win32 NASM Release" "fabaselib - Win32 NASM Release" ".\musicbrowser.ui"
+$(DS_POSTBUILD_DEP) : "gdbm - Win32 NASM Release" "fabaselib - Win32 NASM Release" "..\..\..\..\config\config.h" ".\musicbrowser.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                                     ..\..\..\..\base\win32\prj\plugins
 	copy musicbrowser.ui                                                                                       ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -560,6 +570,12 @@ SOURCE=..\src\Event.cpp
 SOURCE=..\src\FooCast.cpp
 
 "$(INTDIR)\FooCast.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\..\src\Icecast.cpp
+
+"$(INTDIR)\Icecast.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

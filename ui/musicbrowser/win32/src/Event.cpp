@@ -615,16 +615,8 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                     }
                     else if(pTreeView->itemNew.hItem == m_hAllItem)
                     {
-                        //FillAllTracks();
-						
-						DWORD threadId;
-
-						::CreateThread( NULL,
-										0,
-										fill_all_tracks,
-										this,
-										0,
-										&threadId);
+                        m_fillAllThread = Thread::CreateThread();
+	                    m_fillAllThread->Create(MusicBrowserUI::fill_all_tracks, this);						
                     }
                     else if(pTreeView->itemNew.hItem == m_hUncatItem)
                     {
@@ -644,7 +636,13 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                     }
                     else if(pTreeView->itemNew.hItem == m_hIceCastItem)
                     {
-                        FillIceCast();
+                        m_fillIceCastThread = Thread::CreateThread();
+	                    m_fillIceCastThread->Create(MusicBrowserUI::icecast_timer, this);
+                        
+                        m_context->timerManager->StartTimer(&m_iceCastTimer,
+                                                            icecast_timer,
+                                                            60,
+                                                            this);
                     }
                     else if(pTreeView->itemNew.hItem == m_hWiredPlanetItem)
                     {

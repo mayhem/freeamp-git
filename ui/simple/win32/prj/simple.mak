@@ -36,10 +36,21 @@ RSC=rc.exe
 OUTDIR=.\Release
 INTDIR=.\Release
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : ".\simple.ui"
 
+!ELSE 
 
+ALL : "xing - Win32 Release" "soundcard - Win32 Release" "fileinput - Win32 Release" ".\simple.ui"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fileinput - Win32 ReleaseCLEAN" "soundcard - Win32 ReleaseCLEAN" "xing - Win32 ReleaseCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\about.obj"
 	-@erase "$(INTDIR)\mutex.obj"
 	-@erase "$(INTDIR)\playlist.obj"
@@ -85,7 +96,10 @@ LINK32_OBJS= \
 	"$(INTDIR)\thread.obj" \
 	"$(INTDIR)\win32prefs.obj" \
 	"$(INTDIR)\win32thread.obj" \
-	"$(INTDIR)\simple.res"
+	"$(INTDIR)\simple.res" \
+	"..\..\..\..\io\local\win32\prj\Release\fileinput.lib" \
+	"..\..\..\..\io\soundcard\win32\prj\Release\soundcard.lib" \
+	"..\..\..\..\lmc\xingmp3\win32\prj\Release\xing.lib"
 
 ".\simple.ui" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -97,7 +111,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\simple.ui"
+$(DS_POSTBUILD_DEP) : "xing - Win32 Release" "soundcard - Win32 Release" "fileinput - Win32 Release" ".\simple.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins
 	copy simple.ui                 ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -107,10 +121,21 @@ $(DS_POSTBUILD_DEP) : ".\simple.ui"
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : "..\..\..\..\config\config.h" ".\simple.ui"
 
+!ELSE 
 
+ALL : "xing - Win32 Debug" "soundcard - Win32 Debug" "fileinput - Win32 Debug" "..\..\..\..\config\config.h" ".\simple.ui"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fileinput - Win32 DebugCLEAN" "soundcard - Win32 DebugCLEAN" "xing - Win32 DebugCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\about.obj"
 	-@erase "$(INTDIR)\mutex.obj"
 	-@erase "$(INTDIR)\playlist.obj"
@@ -160,7 +185,10 @@ LINK32_OBJS= \
 	"$(INTDIR)\thread.obj" \
 	"$(INTDIR)\win32prefs.obj" \
 	"$(INTDIR)\win32thread.obj" \
-	"$(INTDIR)\simple.res"
+	"$(INTDIR)\simple.res" \
+	"..\..\..\..\io\local\win32\prj\Debug\fileinput.lib" \
+	"..\..\..\..\io\soundcard\win32\prj\Debug\soundcard.lib" \
+	"..\..\..\..\lmc\xingmp3\win32\prj\Debug\xing.lib"
 
 ".\simple.ui" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -172,7 +200,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "..\..\..\..\config\config.h" ".\simple.ui"
+$(DS_POSTBUILD_DEP) : "xing - Win32 Debug" "soundcard - Win32 Debug" "fileinput - Win32 Debug" "..\..\..\..\config\config.h" ".\simple.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins
 	copy simple.ui                 ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -182,10 +210,21 @@ $(DS_POSTBUILD_DEP) : "..\..\..\..\config\config.h" ".\simple.ui"
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : "..\..\..\..\config\config.h" ".\simple.ui"
 
+!ELSE 
 
+ALL : "xing - Win32 NASM Debug" "soundcard - Win32 NASM Debug" "fileinput - Win32 NASM Debug" "..\..\..\..\config\config.h" ".\simple.ui"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fileinput - Win32 NASM DebugCLEAN" "soundcard - Win32 NASM DebugCLEAN" "xing - Win32 NASM DebugCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\about.obj"
 	-@erase "$(INTDIR)\mutex.obj"
 	-@erase "$(INTDIR)\playlist.obj"
@@ -235,7 +274,10 @@ LINK32_OBJS= \
 	"$(INTDIR)\thread.obj" \
 	"$(INTDIR)\win32prefs.obj" \
 	"$(INTDIR)\win32thread.obj" \
-	"$(INTDIR)\simple.res"
+	"$(INTDIR)\simple.res" \
+	"..\..\..\..\io\local\win32\prj\Debug\fileinput.lib" \
+	"..\..\..\..\io\soundcard\win32\prj\Debug\soundcard.lib" \
+	"..\..\..\..\lmc\xingmp3\win32\prj\Debug\xing.lib"
 
 ".\simple.ui" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -247,7 +289,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "..\..\..\..\config\config.h" ".\simple.ui"
+$(DS_POSTBUILD_DEP) : "xing - Win32 NASM Debug" "soundcard - Win32 NASM Debug" "fileinput - Win32 NASM Debug" "..\..\..\..\config\config.h" ".\simple.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins
 	copy simple.ui                 ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -257,10 +299,21 @@ $(DS_POSTBUILD_DEP) : "..\..\..\..\config\config.h" ".\simple.ui"
 OUTDIR=.\Release
 INTDIR=.\Release
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : "..\..\..\..\config\config.h" ".\simple.ui"
 
+!ELSE 
 
+ALL : "xing - Win32 NASM Release" "soundcard - Win32 NASM Release" "fileinput - Win32 NASM Release" "..\..\..\..\config\config.h" ".\simple.ui"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fileinput - Win32 NASM ReleaseCLEAN" "soundcard - Win32 NASM ReleaseCLEAN" "xing - Win32 NASM ReleaseCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\about.obj"
 	-@erase "$(INTDIR)\mutex.obj"
 	-@erase "$(INTDIR)\playlist.obj"
@@ -307,7 +360,10 @@ LINK32_OBJS= \
 	"$(INTDIR)\thread.obj" \
 	"$(INTDIR)\win32prefs.obj" \
 	"$(INTDIR)\win32thread.obj" \
-	"$(INTDIR)\simple.res"
+	"$(INTDIR)\simple.res" \
+	"..\..\..\..\io\local\win32\prj\Release\fileinput.lib" \
+	"..\..\..\..\io\soundcard\win32\prj\Release\soundcard.lib" \
+	"..\..\..\..\lmc\xingmp3\win32\prj\Release\xing.lib"
 
 ".\simple.ui" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -319,7 +375,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "..\..\..\..\config\config.h" ".\simple.ui"
+$(DS_POSTBUILD_DEP) : "xing - Win32 NASM Release" "soundcard - Win32 NASM Release" "fileinput - Win32 NASM Release" "..\..\..\..\config\config.h" ".\simple.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins
 	copy simple.ui                 ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -516,6 +572,156 @@ SOURCE=..\res\simple.rc
 "$(INTDIR)\simple.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\simple.res" /i "\Local\src\freeamp\ui\simple\win32\res" /d "NDEBUG" $(SOURCE)
 
+
+!ENDIF 
+
+!IF  "$(CFG)" == "simple - Win32 Release"
+
+"fileinput - Win32 Release" : 
+   cd "\Local\src\freeamp\io\local\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fileinput.mak CFG="fileinput - Win32 Release" 
+   cd "..\..\..\..\ui\simple\win32\prj"
+
+"fileinput - Win32 ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\io\local\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fileinput.mak CFG="fileinput - Win32 Release" RECURSE=1 CLEAN 
+   cd "..\..\..\..\ui\simple\win32\prj"
+
+!ELSEIF  "$(CFG)" == "simple - Win32 Debug"
+
+"fileinput - Win32 Debug" : 
+   cd "\Local\src\freeamp\io\local\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fileinput.mak CFG="fileinput - Win32 Debug" 
+   cd "..\..\..\..\ui\simple\win32\prj"
+
+"fileinput - Win32 DebugCLEAN" : 
+   cd "\Local\src\freeamp\io\local\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fileinput.mak CFG="fileinput - Win32 Debug" RECURSE=1 CLEAN 
+   cd "..\..\..\..\ui\simple\win32\prj"
+
+!ELSEIF  "$(CFG)" == "simple - Win32 NASM Debug"
+
+"fileinput - Win32 NASM Debug" : 
+   cd "\Local\src\freeamp\io\local\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fileinput.mak CFG="fileinput - Win32 NASM Debug" 
+   cd "..\..\..\..\ui\simple\win32\prj"
+
+"fileinput - Win32 NASM DebugCLEAN" : 
+   cd "\Local\src\freeamp\io\local\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fileinput.mak CFG="fileinput - Win32 NASM Debug" RECURSE=1 CLEAN 
+   cd "..\..\..\..\ui\simple\win32\prj"
+
+!ELSEIF  "$(CFG)" == "simple - Win32 NASM Release"
+
+"fileinput - Win32 NASM Release" : 
+   cd "\Local\src\freeamp\io\local\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fileinput.mak CFG="fileinput - Win32 NASM Release" 
+   cd "..\..\..\..\ui\simple\win32\prj"
+
+"fileinput - Win32 NASM ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\io\local\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fileinput.mak CFG="fileinput - Win32 NASM Release" RECURSE=1 CLEAN 
+   cd "..\..\..\..\ui\simple\win32\prj"
+
+!ENDIF 
+
+!IF  "$(CFG)" == "simple - Win32 Release"
+
+"soundcard - Win32 Release" : 
+   cd "\Local\src\freeamp\io\soundcard\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\soundcard.mak CFG="soundcard - Win32 Release" 
+   cd "..\..\..\..\ui\simple\win32\prj"
+
+"soundcard - Win32 ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\io\soundcard\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\soundcard.mak CFG="soundcard - Win32 Release" RECURSE=1 CLEAN 
+   cd "..\..\..\..\ui\simple\win32\prj"
+
+!ELSEIF  "$(CFG)" == "simple - Win32 Debug"
+
+"soundcard - Win32 Debug" : 
+   cd "\Local\src\freeamp\io\soundcard\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\soundcard.mak CFG="soundcard - Win32 Debug" 
+   cd "..\..\..\..\ui\simple\win32\prj"
+
+"soundcard - Win32 DebugCLEAN" : 
+   cd "\Local\src\freeamp\io\soundcard\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\soundcard.mak CFG="soundcard - Win32 Debug" RECURSE=1 CLEAN 
+   cd "..\..\..\..\ui\simple\win32\prj"
+
+!ELSEIF  "$(CFG)" == "simple - Win32 NASM Debug"
+
+"soundcard - Win32 NASM Debug" : 
+   cd "\Local\src\freeamp\io\soundcard\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\soundcard.mak CFG="soundcard - Win32 NASM Debug" 
+   cd "..\..\..\..\ui\simple\win32\prj"
+
+"soundcard - Win32 NASM DebugCLEAN" : 
+   cd "\Local\src\freeamp\io\soundcard\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\soundcard.mak CFG="soundcard - Win32 NASM Debug" RECURSE=1 CLEAN 
+   cd "..\..\..\..\ui\simple\win32\prj"
+
+!ELSEIF  "$(CFG)" == "simple - Win32 NASM Release"
+
+"soundcard - Win32 NASM Release" : 
+   cd "\Local\src\freeamp\io\soundcard\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\soundcard.mak CFG="soundcard - Win32 NASM Release" 
+   cd "..\..\..\..\ui\simple\win32\prj"
+
+"soundcard - Win32 NASM ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\io\soundcard\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\soundcard.mak CFG="soundcard - Win32 NASM Release" RECURSE=1 CLEAN 
+   cd "..\..\..\..\ui\simple\win32\prj"
+
+!ENDIF 
+
+!IF  "$(CFG)" == "simple - Win32 Release"
+
+"xing - Win32 Release" : 
+   cd "\Local\src\freeamp\lmc\xingmp3\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\xing.mak CFG="xing - Win32 Release" 
+   cd "..\..\..\..\ui\simple\win32\prj"
+
+"xing - Win32 ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\lmc\xingmp3\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\xing.mak CFG="xing - Win32 Release" RECURSE=1 CLEAN 
+   cd "..\..\..\..\ui\simple\win32\prj"
+
+!ELSEIF  "$(CFG)" == "simple - Win32 Debug"
+
+"xing - Win32 Debug" : 
+   cd "\Local\src\freeamp\lmc\xingmp3\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\xing.mak CFG="xing - Win32 Debug" 
+   cd "..\..\..\..\ui\simple\win32\prj"
+
+"xing - Win32 DebugCLEAN" : 
+   cd "\Local\src\freeamp\lmc\xingmp3\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\xing.mak CFG="xing - Win32 Debug" RECURSE=1 CLEAN 
+   cd "..\..\..\..\ui\simple\win32\prj"
+
+!ELSEIF  "$(CFG)" == "simple - Win32 NASM Debug"
+
+"xing - Win32 NASM Debug" : 
+   cd "\Local\src\freeamp\lmc\xingmp3\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\xing.mak CFG="xing - Win32 NASM Debug" 
+   cd "..\..\..\..\ui\simple\win32\prj"
+
+"xing - Win32 NASM DebugCLEAN" : 
+   cd "\Local\src\freeamp\lmc\xingmp3\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\xing.mak CFG="xing - Win32 NASM Debug" RECURSE=1 CLEAN 
+   cd "..\..\..\..\ui\simple\win32\prj"
+
+!ELSEIF  "$(CFG)" == "simple - Win32 NASM Release"
+
+"xing - Win32 NASM Release" : 
+   cd "\Local\src\freeamp\lmc\xingmp3\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\xing.mak CFG="xing - Win32 NASM Release" 
+   cd "..\..\..\..\ui\simple\win32\prj"
+
+"xing - Win32 NASM ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\lmc\xingmp3\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\xing.mak CFG="xing - Win32 NASM Release" RECURSE=1 CLEAN 
+   cd "..\..\..\..\ui\simple\win32\prj"
 
 !ENDIF 
 

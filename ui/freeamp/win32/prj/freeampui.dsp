@@ -412,6 +412,10 @@ SOURCE=..\..\..\..\base\include\downloadmanager.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\include\Equalizer.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\base\include\errors.h
 # End Source File
 # Begin Source File

@@ -36,10 +36,21 @@ RSC=rc.exe
 OUTDIR=.\Release
 INTDIR=.\Release
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : ".\toolbar.ui"
 
+!ELSE 
 
+ALL : "fabaselib - Win32 Release" ".\toolbar.ui"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fabaselib - Win32 ReleaseCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\debug.obj"
 	-@erase "$(INTDIR)\Toolbar.obj"
 	-@erase "$(INTDIR)\toolbar.res"
@@ -65,7 +76,8 @@ DEF_FILE= \
 LINK32_OBJS= \
 	"$(INTDIR)\debug.obj" \
 	"$(INTDIR)\Toolbar.obj" \
-	"$(INTDIR)\toolbar.res"
+	"$(INTDIR)\toolbar.res" \
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\toolbar.ui" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -77,7 +89,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\toolbar.ui"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 Release" ".\toolbar.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                        ..\..\..\..\base\win32\prj\plugins
 	copy toolbar.ui                                          ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -87,10 +99,21 @@ $(DS_POSTBUILD_DEP) : ".\toolbar.ui"
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : ".\toolbar.ui"
 
+!ELSE 
 
+ALL : "fabaselib - Win32 Debug" ".\toolbar.ui"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fabaselib - Win32 DebugCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\debug.obj"
 	-@erase "$(INTDIR)\Toolbar.obj"
 	-@erase "$(INTDIR)\toolbar.res"
@@ -119,7 +142,8 @@ DEF_FILE= \
 LINK32_OBJS= \
 	"$(INTDIR)\debug.obj" \
 	"$(INTDIR)\Toolbar.obj" \
-	"$(INTDIR)\toolbar.res"
+	"$(INTDIR)\toolbar.res" \
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\toolbar.ui" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -131,7 +155,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\toolbar.ui"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 Debug" ".\toolbar.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                        ..\..\..\..\base\win32\prj\plugins
 	copy toolbar.ui                                          ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -141,10 +165,21 @@ $(DS_POSTBUILD_DEP) : ".\toolbar.ui"
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : ".\toolbar.ui"
 
+!ELSE 
 
+ALL : "fabaselib - Win32 NASM Debug" ".\toolbar.ui"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fabaselib - Win32 NASM DebugCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\debug.obj"
 	-@erase "$(INTDIR)\Toolbar.obj"
 	-@erase "$(INTDIR)\toolbar.res"
@@ -173,7 +208,8 @@ DEF_FILE= \
 LINK32_OBJS= \
 	"$(INTDIR)\debug.obj" \
 	"$(INTDIR)\Toolbar.obj" \
-	"$(INTDIR)\toolbar.res"
+	"$(INTDIR)\toolbar.res" \
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\toolbar.ui" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -185,7 +221,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\toolbar.ui"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Debug" ".\toolbar.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                        ..\..\..\..\base\win32\prj\plugins
 	copy toolbar.ui                                          ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -195,10 +231,21 @@ $(DS_POSTBUILD_DEP) : ".\toolbar.ui"
 OUTDIR=.\Release
 INTDIR=.\Release
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : ".\toolbar.ui"
 
+!ELSE 
 
+ALL : "fabaselib - Win32 NASM Release" ".\toolbar.ui"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fabaselib - Win32 NASM ReleaseCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\debug.obj"
 	-@erase "$(INTDIR)\Toolbar.obj"
 	-@erase "$(INTDIR)\toolbar.res"
@@ -224,7 +271,8 @@ DEF_FILE= \
 LINK32_OBJS= \
 	"$(INTDIR)\debug.obj" \
 	"$(INTDIR)\Toolbar.obj" \
-	"$(INTDIR)\toolbar.res"
+	"$(INTDIR)\toolbar.res" \
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\toolbar.ui" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -236,7 +284,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\toolbar.ui"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Release" ".\toolbar.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                        ..\..\..\..\base\win32\prj\plugins
 	copy toolbar.ui                                          ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -325,6 +373,56 @@ SOURCE=..\toolbar.rc
 "$(INTDIR)\toolbar.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\toolbar.res" /i "\Local\src\freeamp\ui\toolbar\win32" /d "NDEBUG" $(SOURCE)
 
+
+!ENDIF 
+
+!IF  "$(CFG)" == "toolbar - Win32 Release"
+
+"fabaselib - Win32 Release" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Release" 
+   cd "..\..\..\ui\toolbar\win32\prj"
+
+"fabaselib - Win32 ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Release" RECURSE=1 CLEAN 
+   cd "..\..\..\ui\toolbar\win32\prj"
+
+!ELSEIF  "$(CFG)" == "toolbar - Win32 Debug"
+
+"fabaselib - Win32 Debug" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Debug" 
+   cd "..\..\..\ui\toolbar\win32\prj"
+
+"fabaselib - Win32 DebugCLEAN" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Debug" RECURSE=1 CLEAN 
+   cd "..\..\..\ui\toolbar\win32\prj"
+
+!ELSEIF  "$(CFG)" == "toolbar - Win32 NASM Debug"
+
+"fabaselib - Win32 NASM Debug" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug" 
+   cd "..\..\..\ui\toolbar\win32\prj"
+
+"fabaselib - Win32 NASM DebugCLEAN" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug" RECURSE=1 CLEAN 
+   cd "..\..\..\ui\toolbar\win32\prj"
+
+!ELSEIF  "$(CFG)" == "toolbar - Win32 NASM Release"
+
+"fabaselib - Win32 NASM Release" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Release" 
+   cd "..\..\..\ui\toolbar\win32\prj"
+
+"fabaselib - Win32 NASM ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Release" RECURSE=1 CLEAN 
+   cd "..\..\..\ui\toolbar\win32\prj"
 
 !ENDIF 
 

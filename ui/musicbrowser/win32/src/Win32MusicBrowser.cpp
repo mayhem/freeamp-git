@@ -247,6 +247,10 @@ void MusicBrowserUI::Init()
         m_cdTracks = new vector<PlaylistItem*>;
     else
         m_cdTracks = NULL;
+
+    m_iceCastTimer = NULL;
+    m_fillAllThread = NULL;
+    m_fillIceCastThread = NULL;
 }
 
 MusicBrowserUI::~MusicBrowserUI()

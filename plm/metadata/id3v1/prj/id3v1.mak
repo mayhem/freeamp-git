@@ -36,10 +36,21 @@ RSC=rc.exe
 OUTDIR=.\Release
 INTDIR=.\Release
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : ".\id3v1.mdf"
 
+!ELSE 
 
+ALL : "fabaselib - Win32 Release" ".\id3v1.mdf"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fabaselib - Win32 ReleaseCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\id3v1.obj"
 	-@erase "$(INTDIR)\id3v1.res"
 	-@erase "$(INTDIR)\vc60.idb"
@@ -63,7 +74,8 @@ DEF_FILE= \
 	".\id3v1.def"
 LINK32_OBJS= \
 	"$(INTDIR)\id3v1.obj" \
-	"$(INTDIR)\id3v1.res"
+	"$(INTDIR)\id3v1.res" \
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\id3v1.mdf" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -75,7 +87,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\id3v1.mdf"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 Release" ".\id3v1.mdf"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins
 	copy id3v1.mdf      ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -85,10 +97,21 @@ $(DS_POSTBUILD_DEP) : ".\id3v1.mdf"
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : ".\id3v1.mdf"
 
+!ELSE 
 
+ALL : "fabaselib - Win32 Debug" ".\id3v1.mdf"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fabaselib - Win32 DebugCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\id3v1.obj"
 	-@erase "$(INTDIR)\id3v1.res"
 	-@erase "$(INTDIR)\vc60.idb"
@@ -115,7 +138,8 @@ DEF_FILE= \
 	".\id3v1.def"
 LINK32_OBJS= \
 	"$(INTDIR)\id3v1.obj" \
-	"$(INTDIR)\id3v1.res"
+	"$(INTDIR)\id3v1.res" \
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\id3v1.mdf" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -127,7 +151,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\id3v1.mdf"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 Debug" ".\id3v1.mdf"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins
 	copy id3v1.mdf      ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -137,10 +161,21 @@ $(DS_POSTBUILD_DEP) : ".\id3v1.mdf"
 OUTDIR=.\Release
 INTDIR=.\Release
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : ".\id3v1.mdf"
 
+!ELSE 
 
+ALL : "fabaselib - Win32 NASM Release" ".\id3v1.mdf"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fabaselib - Win32 NASM ReleaseCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\id3v1.obj"
 	-@erase "$(INTDIR)\id3v1.res"
 	-@erase "$(INTDIR)\vc60.idb"
@@ -164,7 +199,8 @@ DEF_FILE= \
 	".\id3v1.def"
 LINK32_OBJS= \
 	"$(INTDIR)\id3v1.obj" \
-	"$(INTDIR)\id3v1.res"
+	"$(INTDIR)\id3v1.res" \
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\id3v1.mdf" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -176,7 +212,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\id3v1.mdf"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Release" ".\id3v1.mdf"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins
 	copy id3v1.mdf      ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -186,10 +222,21 @@ $(DS_POSTBUILD_DEP) : ".\id3v1.mdf"
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : ".\id3v1.mdf"
 
+!ELSE 
 
+ALL : "fabaselib - Win32 NASM Debug" ".\id3v1.mdf"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fabaselib - Win32 NASM DebugCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\id3v1.obj"
 	-@erase "$(INTDIR)\id3v1.res"
 	-@erase "$(INTDIR)\vc60.idb"
@@ -216,7 +263,8 @@ DEF_FILE= \
 	".\id3v1.def"
 LINK32_OBJS= \
 	"$(INTDIR)\id3v1.obj" \
-	"$(INTDIR)\id3v1.res"
+	"$(INTDIR)\id3v1.res" \
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\id3v1.mdf" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -228,7 +276,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\id3v1.mdf"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Debug" ".\id3v1.mdf"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins
 	copy id3v1.mdf      ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -311,6 +359,56 @@ SOURCE=..\res\id3v1.rc
 "$(INTDIR)\id3v1.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\id3v1.res" /i "\Local\src\freeamp\plm\metadata\id3v1\res" /d "_DEBUG" $(SOURCE)
 
+
+!ENDIF 
+
+!IF  "$(CFG)" == "id3v1 - Win32 Release"
+
+"fabaselib - Win32 Release" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Release" 
+   cd "..\..\..\plm\metadata\id3v1\prj"
+
+"fabaselib - Win32 ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Release" RECURSE=1 CLEAN 
+   cd "..\..\..\plm\metadata\id3v1\prj"
+
+!ELSEIF  "$(CFG)" == "id3v1 - Win32 Debug"
+
+"fabaselib - Win32 Debug" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Debug" 
+   cd "..\..\..\plm\metadata\id3v1\prj"
+
+"fabaselib - Win32 DebugCLEAN" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Debug" RECURSE=1 CLEAN 
+   cd "..\..\..\plm\metadata\id3v1\prj"
+
+!ELSEIF  "$(CFG)" == "id3v1 - Win32 NASM Release"
+
+"fabaselib - Win32 NASM Release" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Release" 
+   cd "..\..\..\plm\metadata\id3v1\prj"
+
+"fabaselib - Win32 NASM ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Release" RECURSE=1 CLEAN 
+   cd "..\..\..\plm\metadata\id3v1\prj"
+
+!ELSEIF  "$(CFG)" == "id3v1 - Win32 NASM Debug"
+
+"fabaselib - Win32 NASM Debug" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug" 
+   cd "..\..\..\plm\metadata\id3v1\prj"
+
+"fabaselib - Win32 NASM DebugCLEAN" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug" RECURSE=1 CLEAN 
+   cd "..\..\..\plm\metadata\id3v1\prj"
 
 !ENDIF 
 

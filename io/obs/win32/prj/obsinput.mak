@@ -108,11 +108,11 @@ INTDIR=.\Debug
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : "..\..\..\..\config\config.h" ".\obsinput.pmi"
+ALL : ".\obsinput.pmi"
 
 !ELSE 
 
-ALL : "fabaselib - Win32 Debug" "..\..\..\..\config\config.h" ".\obsinput.pmi"
+ALL : "fabaselib - Win32 Debug" ".\obsinput.pmi"
 
 !ENDIF 
 
@@ -134,7 +134,6 @@ CLEAN :
 	-@erase "$(OUTDIR)\obsinput.pdb"
 	-@erase ".\obsinput.ilk"
 	-@erase ".\obsinput.pmi"
-	-@erase "..\..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -169,7 +168,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "fabaselib - Win32 Debug" "..\..\..\..\config\config.h" ".\obsinput.pmi"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 Debug" ".\obsinput.pmi"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                         ..\..\..\..\base\win32\prj\plugins
 	copy obsinput.pmi                    ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -181,11 +180,11 @@ INTDIR=.\Debug
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : "..\..\..\..\config\config.h" ".\obsinput.pmi"
+ALL : ".\obsinput.pmi"
 
 !ELSE 
 
-ALL : "fabaselib - Win32 NASM Debug" "..\..\..\..\config\config.h" ".\obsinput.pmi"
+ALL : "fabaselib - Win32 NASM Debug" ".\obsinput.pmi"
 
 !ENDIF 
 
@@ -207,7 +206,6 @@ CLEAN :
 	-@erase "$(OUTDIR)\obsinput.pdb"
 	-@erase ".\obsinput.ilk"
 	-@erase ".\obsinput.pmi"
-	-@erase "..\..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -242,7 +240,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Debug" "..\..\..\..\config\config.h" ".\obsinput.pmi"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Debug" ".\obsinput.pmi"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                         ..\..\..\..\base\win32\prj\plugins
 	copy obsinput.pmi                    ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"

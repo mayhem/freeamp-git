@@ -94,7 +94,7 @@ $(DS_POSTBUILD_DEP) : "..\..\..\..\config\config.h" ".\cd.pmo"
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
-ALL : ".\cd.pmo"
+ALL : "..\..\..\..\config\config.h" ".\cd.pmo"
 
 
 CLEAN :
@@ -112,6 +112,7 @@ CLEAN :
 	-@erase "$(OUTDIR)\cd.pdb"
 	-@erase ".\cd.ilk"
 	-@erase ".\cd.pmo"
+	-@erase "..\..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -144,7 +145,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\cd.pmo"
+$(DS_POSTBUILD_DEP) : "..\..\..\..\config\config.h" ".\cd.pmo"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                          ..\..\..\..\base\win32\prj\plugins
 	copy cd.pmo                 ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"

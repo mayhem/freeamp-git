@@ -63,8 +63,8 @@ LINK32_FLAGS=fabaselib.lib version.lib gdbm.lib wsock32.lib kernel32.lib user32.
 DEF_FILE= \
 	".\dde.def"
 LINK32_OBJS= \
-	"$(INTDIR)\dde.res" \
-	"$(INTDIR)\DDE_UI.obj"
+	"$(INTDIR)\DDE_UI.obj" \
+	"$(INTDIR)\dde.res"
 
 ".\dde.ui" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -86,7 +86,7 @@ $(DS_POSTBUILD_DEP) : "..\..\..\..\config\config.h" ".\dde.ui"
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
-ALL : ".\dde.ui"
+ALL : "..\..\..\..\config\config.h" ".\dde.ui"
 
 
 CLEAN :
@@ -99,6 +99,7 @@ CLEAN :
 	-@erase "$(OUTDIR)\dde.pdb"
 	-@erase ".\dde.ilk"
 	-@erase ".\dde.ui"
+	-@erase "..\..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -113,8 +114,8 @@ BSC32_SBRS= \
 LINK32=link.exe
 LINK32_FLAGS=fabaselib.lib version.lib gdbm.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x10900000" /subsystem:windows /dll /incremental:yes /pdb:"$(OUTDIR)\dde.pdb" /debug /machine:I386 /def:".\dde.def" /out:"dde.ui" /implib:"$(OUTDIR)\dde.lib" /pdbtype:sept /libpath:"..\..\..\..\lib\gdbm" /libpath:"..\..\..\..\base\win32" 
 LINK32_OBJS= \
-	"$(INTDIR)\dde.res" \
-	"$(INTDIR)\DDE_UI.obj"
+	"$(INTDIR)\DDE_UI.obj" \
+	"$(INTDIR)\dde.res"
 
 ".\dde.ui" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -126,7 +127,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\dde.ui"
+$(DS_POSTBUILD_DEP) : "..\..\..\..\config\config.h" ".\dde.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                                     ..\..\..\..\base\win32\prj\plugins
 	copy dde.ui                                                                                       ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -163,8 +164,8 @@ BSC32_SBRS= \
 LINK32=link.exe
 LINK32_FLAGS=fabaselib.lib version.lib gdbm.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x10900000" /subsystem:windows /dll /incremental:yes /pdb:"$(OUTDIR)\dde.pdb" /debug /machine:I386 /def:".\dde.def" /out:"dde.ui" /implib:"$(OUTDIR)\dde.lib" /pdbtype:sept /libpath:"..\..\..\..\lib\gdbm" /libpath:"..\..\..\..\base\win32" 
 LINK32_OBJS= \
-	"$(INTDIR)\dde.res" \
-	"$(INTDIR)\DDE_UI.obj"
+	"$(INTDIR)\DDE_UI.obj" \
+	"$(INTDIR)\dde.res"
 
 ".\dde.ui" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -186,7 +187,7 @@ $(DS_POSTBUILD_DEP) : ".\dde.ui"
 OUTDIR=.\Release
 INTDIR=.\Release
 
-ALL : ".\dde.ui"
+ALL : "..\..\..\..\config\config.h" ".\dde.ui"
 
 
 CLEAN :
@@ -196,6 +197,7 @@ CLEAN :
 	-@erase "$(OUTDIR)\dde.exp"
 	-@erase "$(OUTDIR)\dde.lib"
 	-@erase ".\dde.ui"
+	-@erase "..\..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -212,8 +214,8 @@ LINK32_FLAGS=fabaselib.lib version.lib gdbm.lib wsock32.lib kernel32.lib user32.
 DEF_FILE= \
 	".\dde.def"
 LINK32_OBJS= \
-	"$(INTDIR)\dde.res" \
-	"$(INTDIR)\DDE_UI.obj"
+	"$(INTDIR)\DDE_UI.obj" \
+	"$(INTDIR)\dde.res"
 
 ".\dde.ui" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -225,7 +227,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\dde.ui"
+$(DS_POSTBUILD_DEP) : "..\..\..\..\config\config.h" ".\dde.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                                     ..\..\..\..\base\win32\prj\plugins
 	copy dde.ui                                                                                       ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"

@@ -48,6 +48,8 @@ using namespace std;
 #include "musiccatalog.h"
 #include "DataIndex.h"
 #include "DropTarget.h"
+#include "timer.h"
+#include "Icecast.h"
 
 class FAContext;
 
@@ -158,6 +160,9 @@ class MusicBrowserUI : public UserInterface
                     bool allowURL);
     
     const PlaylistManager* PLManager() const { return m_plm; }
+
+    static void icecast_timer(void* arg);
+    void IceCastTimer();
  
  protected:
     FAContext *m_context;
@@ -263,12 +268,12 @@ class MusicBrowserUI : public UserInterface
     void    FillAlbums(TV_ITEM *pItem);
     void    FillPlaylists();
     void    FillTracks(TV_ITEM *pItem);
-	static unsigned long __stdcall fill_all_tracks(void* arg);
+	static void fill_all_tracks(void* arg);
     void    FillAllTracks();
     void    FillUncatTracks();
     void    FillPortables();
     void    FillWiredPlanet();
-    void    FillIceCast();
+    void    FillIceCast(vector<IcecastStreamInfo> &list);
     int32   GetCurrentItemFromMousePos();
     void    GetSelectedMusicTreeItems(vector<PlaylistItem*>* items);
     BOOL    FindSelectedItems(HTREEITEM root, vector<PlaylistItem*>* items);
@@ -360,6 +365,10 @@ class MusicBrowserUI : public UserInterface
     vector<PlaylistItem*>* m_cdTracks;
 
     uint32              m_cdId;
+    TimerRef            m_iceCastTimer;
+    Thread*             m_fillAllThread;
+    Thread*             m_fillIceCastThread;
+
 };
 
 #endif

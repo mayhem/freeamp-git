@@ -35,7 +35,7 @@ RSC=rc.exe
 OUTDIR=.\Release
 INTDIR=.\Release
 
-ALL : "..\gdbm.lib"
+ALL : "..\config\config.h" "..\gdbm.lib"
 
 
 CLEAN :
@@ -60,6 +60,7 @@ CLEAN :
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(INTDIR)\version.obj"
 	-@erase "..\gdbm.lib"
+	-@erase "..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -102,7 +103,7 @@ LIB32_OBJS= \
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
-ALL : "..\config\config.h" "..\gdbm.lib"
+ALL : "..\gdbm.lib"
 
 
 CLEAN :
@@ -127,7 +128,6 @@ CLEAN :
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(INTDIR)\version.obj"
 	-@erase "..\gdbm.lib"
-	-@erase "..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -238,7 +238,7 @@ LIB32_OBJS= \
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
-ALL : "..\config\config.h" "..\gdbm.lib"
+ALL : "..\gdbm.lib"
 
 
 CLEAN :
@@ -263,7 +263,6 @@ CLEAN :
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(INTDIR)\version.obj"
 	-@erase "..\gdbm.lib"
-	-@erase "..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -346,7 +345,7 @@ LIB32_OBJS= \
 !IF "$(CFG)" == "gdbm - Win32 Release" || "$(CFG)" == "gdbm - Win32 Debug" || "$(CFG)" == "gdbm - Win32 NASM Release" || "$(CFG)" == "gdbm - Win32 NASM Debug"
 SOURCE=..\bucket.c
 
-"$(INTDIR)\bucket.obj" : $(SOURCE) "$(INTDIR)" "..\config\config.h"
+"$(INTDIR)\bucket.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -400,109 +399,109 @@ InputPath=..\config\config.win32
 
 SOURCE=..\falloc.c
 
-"$(INTDIR)\falloc.obj" : $(SOURCE) "$(INTDIR)" "..\config\config.h"
+"$(INTDIR)\falloc.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\findkey.c
 
-"$(INTDIR)\findkey.obj" : $(SOURCE) "$(INTDIR)" "..\config\config.h"
+"$(INTDIR)\findkey.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\gdbmclose.c
 
-"$(INTDIR)\gdbmclose.obj" : $(SOURCE) "$(INTDIR)" "..\config\config.h"
+"$(INTDIR)\gdbmclose.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\gdbmdelete.c
 
-"$(INTDIR)\gdbmdelete.obj" : $(SOURCE) "$(INTDIR)" "..\config\config.h"
+"$(INTDIR)\gdbmdelete.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\gdbmerrno.c
 
-"$(INTDIR)\gdbmerrno.obj" : $(SOURCE) "$(INTDIR)" "..\config\config.h"
+"$(INTDIR)\gdbmerrno.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\gdbmexists.c
 
-"$(INTDIR)\gdbmexists.obj" : $(SOURCE) "$(INTDIR)" "..\config\config.h"
+"$(INTDIR)\gdbmexists.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\gdbmfdesc.c
 
-"$(INTDIR)\gdbmfdesc.obj" : $(SOURCE) "$(INTDIR)" "..\config\config.h"
+"$(INTDIR)\gdbmfdesc.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\gdbmfetch.c
 
-"$(INTDIR)\gdbmfetch.obj" : $(SOURCE) "$(INTDIR)" "..\config\config.h"
+"$(INTDIR)\gdbmfetch.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\gdbmopen.c
 
-"$(INTDIR)\gdbmopen.obj" : $(SOURCE) "$(INTDIR)" "..\config\config.h"
+"$(INTDIR)\gdbmopen.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\gdbmreorg.c
 
-"$(INTDIR)\gdbmreorg.obj" : $(SOURCE) "$(INTDIR)" "..\config\config.h"
+"$(INTDIR)\gdbmreorg.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\gdbmseq.c
 
-"$(INTDIR)\gdbmseq.obj" : $(SOURCE) "$(INTDIR)" "..\config\config.h"
+"$(INTDIR)\gdbmseq.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\gdbmsetopt.c
 
-"$(INTDIR)\gdbmsetopt.obj" : $(SOURCE) "$(INTDIR)" "..\config\config.h"
+"$(INTDIR)\gdbmsetopt.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\gdbmstore.c
 
-"$(INTDIR)\gdbmstore.obj" : $(SOURCE) "$(INTDIR)" "..\config\config.h"
+"$(INTDIR)\gdbmstore.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\gdbmsync.c
 
-"$(INTDIR)\gdbmsync.obj" : $(SOURCE) "$(INTDIR)" "..\config\config.h"
+"$(INTDIR)\gdbmsync.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\global.c
 
-"$(INTDIR)\global.obj" : $(SOURCE) "$(INTDIR)" "..\config\config.h"
+"$(INTDIR)\global.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\hash.c
 
-"$(INTDIR)\hash.obj" : $(SOURCE) "$(INTDIR)" "..\config\config.h"
+"$(INTDIR)\hash.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\update.c
 
-"$(INTDIR)\update.obj" : $(SOURCE) "$(INTDIR)" "..\config\config.h"
+"$(INTDIR)\update.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\version.c
 
-"$(INTDIR)\version.obj" : $(SOURCE) "$(INTDIR)" "..\config\config.h"
+"$(INTDIR)\version.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

@@ -36,10 +36,21 @@ RSC=rc.exe
 OUTDIR=.\Release
 INTDIR=.\Release
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : ".\update.exe"
 
+!ELSE 
 
+ALL : "fabaselib - Win32 Release" ".\update.exe"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fabaselib - Win32 ReleaseCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\main.obj"
 	-@erase "$(INTDIR)\preferences.obj"
 	-@erase "$(INTDIR)\update.res"
@@ -63,7 +74,8 @@ LINK32_OBJS= \
 	"$(INTDIR)\main.obj" \
 	"$(INTDIR)\preferences.obj" \
 	"$(INTDIR)\win32prefs.obj" \
-	"$(INTDIR)\update.res"
+	"$(INTDIR)\update.res" \
+	"..\..\..\base\win32\fabaselib.lib"
 
 ".\update.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -75,7 +87,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\update.exe"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 Release" ".\update.exe"
    copy update.exe  ..\..\..\base\win32\prj
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
@@ -84,10 +96,21 @@ $(DS_POSTBUILD_DEP) : ".\update.exe"
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : ".\update.exe"
 
+!ELSE 
 
+ALL : "fabaselib - Win32 Debug" ".\update.exe"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fabaselib - Win32 DebugCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\main.obj"
 	-@erase "$(INTDIR)\preferences.obj"
 	-@erase "$(INTDIR)\update.res"
@@ -114,7 +137,8 @@ LINK32_OBJS= \
 	"$(INTDIR)\main.obj" \
 	"$(INTDIR)\preferences.obj" \
 	"$(INTDIR)\win32prefs.obj" \
-	"$(INTDIR)\update.res"
+	"$(INTDIR)\update.res" \
+	"..\..\..\base\win32\fabaselib.lib"
 
 ".\update.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -126,7 +150,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\update.exe"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 Debug" ".\update.exe"
    copy update.exe  ..\..\..\base\win32\prj
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
@@ -138,10 +162,21 @@ INTDIR=.\Debug
 OutDir=.\Debug
 # End Custom Macros
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : ".\update.exe" "$(OUTDIR)\update.bsc"
 
+!ELSE 
 
+ALL : "fabaselib - Win32 NASM Debug" ".\update.exe" "$(OUTDIR)\update.bsc"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fabaselib - Win32 NASM DebugCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\main.obj"
 	-@erase "$(INTDIR)\main.sbr"
 	-@erase "$(INTDIR)\preferences.obj"
@@ -180,7 +215,8 @@ LINK32_OBJS= \
 	"$(INTDIR)\main.obj" \
 	"$(INTDIR)\preferences.obj" \
 	"$(INTDIR)\win32prefs.obj" \
-	"$(INTDIR)\update.res"
+	"$(INTDIR)\update.res" \
+	"..\..\..\base\win32\fabaselib.lib"
 
 ".\update.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -196,7 +232,7 @@ ALL : $(DS_POSTBUILD_DEP)
 OutDir=.\Debug
 # End Custom Macros
 
-$(DS_POSTBUILD_DEP) : ".\update.exe" "$(OUTDIR)\update.bsc"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Debug" ".\update.exe" "$(OUTDIR)\update.bsc"
    copy update.exe  ..\..\..\base\win32\prj
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
@@ -205,10 +241,21 @@ $(DS_POSTBUILD_DEP) : ".\update.exe" "$(OUTDIR)\update.bsc"
 OUTDIR=.\Release
 INTDIR=.\Release
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : ".\update.exe"
 
+!ELSE 
 
+ALL : "fabaselib - Win32 NASM Release" ".\update.exe"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fabaselib - Win32 NASM ReleaseCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\main.obj"
 	-@erase "$(INTDIR)\preferences.obj"
 	-@erase "$(INTDIR)\update.res"
@@ -232,7 +279,8 @@ LINK32_OBJS= \
 	"$(INTDIR)\main.obj" \
 	"$(INTDIR)\preferences.obj" \
 	"$(INTDIR)\win32prefs.obj" \
-	"$(INTDIR)\update.res"
+	"$(INTDIR)\update.res" \
+	"..\..\..\base\win32\fabaselib.lib"
 
 ".\update.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -244,7 +292,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\update.exe"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Release" ".\update.exe"
    copy update.exe  ..\..\..\base\win32\prj
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
@@ -393,29 +441,79 @@ SOURCE=..\res\update.rc
 
 
 "$(INTDIR)\update.res" : $(SOURCE) "$(INTDIR)"
-	$(RSC) /l 0x409 /fo"$(INTDIR)\update.res" /i "\Local\src\freeamp-2-0-6\update\win32\res" /d "NDEBUG" $(SOURCE)
+	$(RSC) /l 0x409 /fo"$(INTDIR)\update.res" /i "\Local\src\freeamp\update\win32\res" /d "NDEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "update - Win32 Debug"
 
 
 "$(INTDIR)\update.res" : $(SOURCE) "$(INTDIR)"
-	$(RSC) /l 0x409 /fo"$(INTDIR)\update.res" /i "\Local\src\freeamp-2-0-6\update\win32\res" /d "_DEBUG" $(SOURCE)
+	$(RSC) /l 0x409 /fo"$(INTDIR)\update.res" /i "\Local\src\freeamp\update\win32\res" /d "_DEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "update - Win32 NASM Debug"
 
 
 "$(INTDIR)\update.res" : $(SOURCE) "$(INTDIR)"
-	$(RSC) /l 0x409 /fo"$(INTDIR)\update.res" /i "\Local\src\freeamp-2-0-6\update\win32\res" /d "_DEBUG" $(SOURCE)
+	$(RSC) /l 0x409 /fo"$(INTDIR)\update.res" /i "\Local\src\freeamp\update\win32\res" /d "_DEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "update - Win32 NASM Release"
 
 
 "$(INTDIR)\update.res" : $(SOURCE) "$(INTDIR)"
-	$(RSC) /l 0x409 /fo"$(INTDIR)\update.res" /i "\Local\src\freeamp-2-0-6\update\win32\res" /d "NDEBUG" $(SOURCE)
+	$(RSC) /l 0x409 /fo"$(INTDIR)\update.res" /i "\Local\src\freeamp\update\win32\res" /d "NDEBUG" $(SOURCE)
 
+
+!ENDIF 
+
+!IF  "$(CFG)" == "update - Win32 Release"
+
+"fabaselib - Win32 Release" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Release" 
+   cd "..\..\..\update\win32\prj"
+
+"fabaselib - Win32 ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Release" RECURSE=1 CLEAN 
+   cd "..\..\..\update\win32\prj"
+
+!ELSEIF  "$(CFG)" == "update - Win32 Debug"
+
+"fabaselib - Win32 Debug" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Debug" 
+   cd "..\..\..\update\win32\prj"
+
+"fabaselib - Win32 DebugCLEAN" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Debug" RECURSE=1 CLEAN 
+   cd "..\..\..\update\win32\prj"
+
+!ELSEIF  "$(CFG)" == "update - Win32 NASM Debug"
+
+"fabaselib - Win32 NASM Debug" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug" 
+   cd "..\..\..\update\win32\prj"
+
+"fabaselib - Win32 NASM DebugCLEAN" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug" RECURSE=1 CLEAN 
+   cd "..\..\..\update\win32\prj"
+
+!ELSEIF  "$(CFG)" == "update - Win32 NASM Release"
+
+"fabaselib - Win32 NASM Release" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Release" 
+   cd "..\..\..\update\win32\prj"
+
+"fabaselib - Win32 NASM ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Release" RECURSE=1 CLEAN 
+   cd "..\..\..\update\win32\prj"
 
 !ENDIF 
 

@@ -36,10 +36,21 @@ RSC=rc.exe
 OUTDIR=.\Release
 INTDIR=.\Release
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : ".\misc.mdf"
 
+!ELSE 
 
+ALL : "fabaselib - Win32 Release" ".\misc.mdf"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fabaselib - Win32 ReleaseCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\misc.obj"
 	-@erase "$(INTDIR)\misc.res"
 	-@erase "$(INTDIR)\vc60.idb"
@@ -63,7 +74,8 @@ DEF_FILE= \
 	".\misc.def"
 LINK32_OBJS= \
 	"$(INTDIR)\misc.obj" \
-	"$(INTDIR)\misc.res"
+	"$(INTDIR)\misc.res" \
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\misc.mdf" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -75,7 +87,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\misc.mdf"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 Release" ".\misc.mdf"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                   ..\..\..\..\base\win32\prj\plugins
 	copy misc.mdf          ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -85,10 +97,21 @@ $(DS_POSTBUILD_DEP) : ".\misc.mdf"
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : ".\misc.mdf"
 
+!ELSE 
 
+ALL : "fabaselib - Win32 Debug" ".\misc.mdf"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fabaselib - Win32 DebugCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\misc.obj"
 	-@erase "$(INTDIR)\misc.res"
 	-@erase "$(INTDIR)\vc60.idb"
@@ -115,7 +138,8 @@ DEF_FILE= \
 	".\misc.def"
 LINK32_OBJS= \
 	"$(INTDIR)\misc.obj" \
-	"$(INTDIR)\misc.res"
+	"$(INTDIR)\misc.res" \
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\misc.mdf" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -127,7 +151,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\misc.mdf"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 Debug" ".\misc.mdf"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                   ..\..\..\..\base\win32\prj\plugins
 	copy misc.mdf          ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -137,10 +161,21 @@ $(DS_POSTBUILD_DEP) : ".\misc.mdf"
 OUTDIR=.\Release
 INTDIR=.\Release
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : ".\misc.mdf"
 
+!ELSE 
 
+ALL : "fabaselib - Win32 NASM Release" ".\misc.mdf"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fabaselib - Win32 NASM ReleaseCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\misc.obj"
 	-@erase "$(INTDIR)\misc.res"
 	-@erase "$(INTDIR)\vc60.idb"
@@ -164,7 +199,8 @@ DEF_FILE= \
 	".\misc.def"
 LINK32_OBJS= \
 	"$(INTDIR)\misc.obj" \
-	"$(INTDIR)\misc.res"
+	"$(INTDIR)\misc.res" \
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\misc.mdf" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -176,7 +212,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\misc.mdf"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Release" ".\misc.mdf"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                   ..\..\..\..\base\win32\prj\plugins
 	copy misc.mdf          ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -186,10 +222,21 @@ $(DS_POSTBUILD_DEP) : ".\misc.mdf"
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : ".\misc.mdf"
 
+!ELSE 
 
+ALL : "fabaselib - Win32 NASM Debug" ".\misc.mdf"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fabaselib - Win32 NASM DebugCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\misc.obj"
 	-@erase "$(INTDIR)\misc.res"
 	-@erase "$(INTDIR)\vc60.idb"
@@ -216,7 +263,8 @@ DEF_FILE= \
 	".\misc.def"
 LINK32_OBJS= \
 	"$(INTDIR)\misc.obj" \
-	"$(INTDIR)\misc.res"
+	"$(INTDIR)\misc.res" \
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\misc.mdf" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -228,7 +276,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\misc.mdf"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Debug" ".\misc.mdf"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                   ..\..\..\..\base\win32\prj\plugins
 	copy misc.mdf          ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -311,6 +359,56 @@ SOURCE=..\res\misc.rc
 "$(INTDIR)\misc.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\misc.res" /i "\Local\src\freeamp\plm\metadata\misc\res" /d "_DEBUG" $(SOURCE)
 
+
+!ENDIF 
+
+!IF  "$(CFG)" == "misc - Win32 Release"
+
+"fabaselib - Win32 Release" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Release" 
+   cd "..\..\..\plm\metadata\misc\prj"
+
+"fabaselib - Win32 ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Release" RECURSE=1 CLEAN 
+   cd "..\..\..\plm\metadata\misc\prj"
+
+!ELSEIF  "$(CFG)" == "misc - Win32 Debug"
+
+"fabaselib - Win32 Debug" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Debug" 
+   cd "..\..\..\plm\metadata\misc\prj"
+
+"fabaselib - Win32 DebugCLEAN" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Debug" RECURSE=1 CLEAN 
+   cd "..\..\..\plm\metadata\misc\prj"
+
+!ELSEIF  "$(CFG)" == "misc - Win32 NASM Release"
+
+"fabaselib - Win32 NASM Release" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Release" 
+   cd "..\..\..\plm\metadata\misc\prj"
+
+"fabaselib - Win32 NASM ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Release" RECURSE=1 CLEAN 
+   cd "..\..\..\plm\metadata\misc\prj"
+
+!ELSEIF  "$(CFG)" == "misc - Win32 NASM Debug"
+
+"fabaselib - Win32 NASM Debug" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug" 
+   cd "..\..\..\plm\metadata\misc\prj"
+
+"fabaselib - Win32 NASM DebugCLEAN" : 
+   cd "\Local\src\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug" RECURSE=1 CLEAN 
+   cd "..\..\..\plm\metadata\misc\prj"
 
 !ENDIF 
 
