@@ -77,7 +77,7 @@ class Panel
       void    SetPanelBitmap(Bitmap *pBitmap) { m_pPanelBitmap = pBitmap; };
       Bitmap *GetPanelBitmap(void) { return m_pPanelBitmap; };
       void    TogglePanelPos(void);
-      void    SetParentWindow(Window *pWin) { m_pWindow = pWin; };
+      void    SetParentWindow(Window *pWin);
       Window *GetParentWindow(void) { return m_pWindow; };
 
       void    SetOnOpenHide(Panel *pPanel);
