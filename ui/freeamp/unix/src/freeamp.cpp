@@ -179,6 +179,8 @@ void FreeAmpUI::Init()
     m_seekWindow = new FADialWindow(m_display,m_screenNum,m_gc,m_mainWindow->GetWindow(), SEEK_DIAL_X,SEEK_DIAL_Y,SINGLE_DIAL_WIDTH,DIALS_HEIGHT);
     m_seekWindow->SetMotionFunction(SeekDialFunction,this);
 
+    //display_depth = 8;
+
     if (display_depth >= 15) {
 	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),logo,&m_iconPixmap,NULL,NULL);	    
 	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),leftside,&left_side_pixmap,NULL,NULL);
@@ -566,6 +568,7 @@ int32 FreeAmpUI::AcceptEvent(Event *e) {
 	    m_lcdWindow->SetCurrentTime(0,0,0);
 	    XLockDisplay(m_display);
 	    m_lcdWindow->Draw(FALcdWindow::FullRedraw);
+	    //cout << "Full redraw..." << endl;
 	    XUnlockDisplay(m_display);
 	    break;
 	}
@@ -581,6 +584,7 @@ int32 FreeAmpUI::AcceptEvent(Event *e) {
 	case INFO_MPEGInfo: {
 	    MpegInfoEvent *info = (MpegInfoEvent *)e;
 	    m_secondsPerFrame = info->GetSecondsPerFrame();
+	    break;
 	}
 	case INFO_PlayListRepeat: {
 	    PlayListRepeatEvent *plre = (PlayListRepeatEvent *)e;
@@ -623,6 +627,7 @@ int32 FreeAmpUI::AcceptEvent(Event *e) {
 	    XLockDisplay(m_display);
 	    m_lcdWindow->Draw(FALcdWindow::IconsOnly);
 	    XUnlockDisplay(m_display);
+	    break;
 	}
 	default:
 	    break;
