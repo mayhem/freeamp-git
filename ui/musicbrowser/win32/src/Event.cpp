@@ -171,6 +171,45 @@ void MusicBrowserUI::StartStopMusicSearch(void)
     }
 }
 
+void MusicBrowserUI::ExportPlaylistEvent()
+{
+    TV_ITEM tv_item;
+
+    // get the first playlist item
+    tv_item.hItem = TreeView_GetChild(m_hMusicCatalog, m_hPlaylistItem);
+    tv_item.mask = TVIF_STATE|TVIF_PARAM;
+    tv_item.stateMask = TVIS_SELECTED;
+    tv_item.state = 0;
+
+    if(tv_item.hItem)
+    {
+        BOOL result = FALSE;
+
+        // iterate the items and see if any are selected.
+        // for now we only grab the first one on an export
+        // but i need to figure out a good way to allow a
+        // user to export multiple items since we allow
+        // multi-select in the treeview.
+        do
+        {
+            result = TreeView_GetItem(m_hMusicCatalog, &tv_item);
+
+            if(result && (tv_item.state & TVIS_SELECTED))
+            {
+                string playlistPath;
+
+                playlistPath = m_oTreeIndex.Data(tv_item.lParam).m_oPlaylistPath;
+
+                ExportPlaylist(playlistPath);  
+                break;
+            }
+            
+        }while(result && 
+               (tv_item.hItem = TreeView_GetNextSibling(m_hMusicCatalog, 
+                                                        tv_item.hItem)));
+    }
+}
+
 int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
 {
 	NM_TREEVIEW *pTreeView;
@@ -494,10 +533,10 @@ void MusicBrowserUI::ToggleVisEvent(void)
 }
 
 
-void MusicBrowserUI::AddEvent(void)
+void MusicBrowserUI::AddTrackEvent(void)
 {
-    vector<char*>           oFileList;
-    vector<char*>::iterator i;
+    vector<string>           oFileList;
+    vector<string>::iterator i;
     Error                   eRet;
 
     if (FileOpenDialog(m_hWnd, "Add playlist item",
@@ -506,7 +545,7 @@ void MusicBrowserUI::AddEvent(void)
                        m_context->prefs))
     {
         for(i = oFileList.begin(); i != oFileList.end(); i++)
-           eRet = m_oPlm->AddItem(*i);
+           eRet = m_oPlm->AddItem((*i).c_str());
     }
 }
 
@@ -527,7 +566,7 @@ void MusicBrowserUI::EmptyDBCheck(void)
         StartStopMusicSearch();
 }
 
-void MusicBrowserUI::EditEvent(void)
+void MusicBrowserUI::EditPlaylistEvent(void)
 {
     TV_ITEM   sItem;
     
@@ -610,22 +649,6 @@ void MusicBrowserUI::RemoveFromDiskEvent(void)
             TreeView_DeleteItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), hItem);
         }            
     }             
-}
-
-void MusicBrowserUI::ImportEvent(void)
-{
-    vector<char*>           oFileList;
-    vector<char*>::iterator i;
-
-    if (FileOpenDialog(m_hWnd, "Import Track",
-                       kAudioFileFilter, 
-                       &oFileList,
-                       m_context->prefs))
-    {
-        for(i = oFileList.begin(); i != oFileList.end(); i++)
-            m_context->browser->m_catalog->AddSong(*i);
-        InitTree();    
-    }
 }
 
 void MusicBrowserUI::PlayerControlsEvent(int command)

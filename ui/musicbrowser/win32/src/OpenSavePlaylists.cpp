@@ -237,7 +237,7 @@ bool MusicBrowserUI::SaveNewPlaylist(string &oName)
         {
             if(addToDB)
             {
-                m_context->browser->m_catalog->AddPlaylist(oName.c_str());        
+                m_context->browser->m_catalog->AddPlaylist(url); 
             }
 
             if(m_pParent)
@@ -303,9 +303,6 @@ void MusicBrowserUI::OpenPlaylist(void)
     {
         string playlist = sOpen.lpstrFile;
         
-        //m_context->browser->m_catalog->AddPlaylist(sOpen.lpstrFile);
-        //InitTree();
-        //FillPlaylistCombo();
         EditPlaylist(playlist);
     }
 }
@@ -344,4 +341,160 @@ void MusicBrowserUI::EditPlaylist(const string &oList)
     }   
        
     pNew->Init(SECONDARY_UI_STARTUP);
+}
+
+
+void MusicBrowserUI::ImportTracksAndPlaylists(void)
+{
+    PlaylistFormatInfo format;
+    int32 i, iOffset = 0;
+    
+    char szFilter[1024] = "MPEG Audio Streams (.mp1;.mp2;.mp3;.mpp)\0"
+                          "*.mp1;*.mp2;*.mp3;*.mpp\0";
+
+    // we need a way to iterate LMCs...
+    iOffset += strlen(szFilter) + 1; 
+    iOffset += strlen(szFilter + iOffset) + 1;  
+        
+    for(i = 0; ; i++)
+    {
+       if (m_oPlm->GetSupportedPlaylistFormats(&format, i) != kError_NoErr)
+          break;
+    
+       sprintf(szFilter + iOffset, "%s (.%s)", 
+            format.GetDescription(),
+            format.GetExtension());
+       iOffset += strlen(szFilter + iOffset) + 1;     
+
+       sprintf(szFilter + iOffset, "*.%s", 
+            format.GetExtension());
+       iOffset += strlen(szFilter + iOffset) + 1;     
+    }
+    
+    strcpy(szFilter + iOffset, "All Files (*.*)\0");
+    iOffset += strlen(szFilter + iOffset) + 1;     
+    strcpy(szFilter + iOffset, "*.*\0");
+    iOffset += strlen(szFilter + iOffset) + 1;     
+    szFilter[iOffset] = 0;
+    
+    vector<string> oFileList;
+
+    if (FileOpenDialog(m_hWnd, "Import Tracks and Playlists",
+                       szFilter, 
+                       &oFileList,
+                       m_context->prefs))
+    {
+        vector<string>::iterator i;
+
+        for(i = oFileList.begin(); i != oFileList.end(); i++)
+            m_context->browser->m_catalog->AddSong((*i).c_str());
+        InitTree();    
+    }
+}
+
+
+bool MusicBrowserUI::ExportPlaylist(string &oPlaylist)
+{
+    bool                result = false;
+    int32               i, iOffset = 0;
+    uint32              size;
+    PlaylistFormatInfo  format;
+    char                szFilter[512];
+    OPENFILENAME        sOpen;
+    char                szPlaylistDir[MAX_PATH];
+    char                szFile[MAX_PATH] = {0x00};
+    char                szInitialDir[MAX_PATH] = {0x00};
+    char                szExt[MAX_PATH] = {0x00};
+    bool                addToDB = false;
+    
+    size = MAX_PATH;
+    m_context->prefs->GetOpenSaveDirectory(szInitialDir, &size);
+
+    for(i = 0; ; i++)
+    {
+       if (m_oPlm->GetSupportedPlaylistFormats(&format, i) != kError_NoErr)
+          break;
+    
+       sprintf(szFilter + iOffset, "%s (.%s)", 
+            format.GetDescription(),
+            format.GetExtension());
+       iOffset += strlen(szFilter + iOffset) + 1;     
+
+       sprintf(szFilter + iOffset, "*.%s", 
+            format.GetExtension());
+       iOffset += strlen(szFilter + iOffset) + 1;     
+    }
+    
+    strcpy(szFilter + iOffset, "All Files (*.*)\0");
+    iOffset += strlen(szFilter + iOffset) + 1;     
+    strcpy(szFilter + iOffset, "*.*\0");
+    iOffset += strlen(szFilter + iOffset) + 1;     
+    szFilter[iOffset] = 0;
+
+    strcpy(szPlaylistDir, oPlaylist.c_str());
+
+    char* cp = NULL;
+
+    // this should be a url so search for /
+    if(cp = strrchr(szPlaylistDir, '/'))
+    {
+        strcpy(szFile, cp + 1);
+    }
+    else if(cp = strrchr(szPlaylistDir, '\\'))
+    {
+        strcpy(szFile, cp + 1);
+    }
+
+    if(cp = strrchr(szFile, '.'))
+    {
+        *cp = 0x00; // get rid of extension
+    }
+
+    sOpen.lStructSize = sizeof(OPENFILENAME);
+    sOpen.hwndOwner = m_hWnd;
+    sOpen.hInstance = NULL;
+    sOpen.lpstrFilter = szFilter;
+    sOpen.lpstrCustomFilter = NULL;
+    sOpen.nMaxCustFilter = 0;
+    sOpen.nFilterIndex = 1;
+    sOpen.lpstrInitialDir = szInitialDir;
+    sOpen.lpstrFile = szFile;
+    sOpen.nMaxFile = MAX_PATH;
+    sOpen.lpstrFileTitle = NULL;
+    sOpen.lpstrTitle = "Export Playlist As";
+    sOpen.Flags = OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY |
+                  OFN_PATHMUSTEXIST;
+    sOpen.lpstrDefExt = "m3u";
+  
+    if(GetSaveFileName(&sOpen))
+    {
+        result =  true;
+    }
+
+    if(result)
+    {
+        vector<PlaylistItem*> items;
+
+        m_oPlm->ReadPlaylist((char*)oPlaylist.c_str(), &items);
+
+        char   url[MAX_PATH + 7]; // make room for file://
+        uint32 len = sizeof(url);
+    
+        FilePathToURL(sOpen.lpstrFile, url, &len);
+        
+        if(IsError(m_oPlm->WritePlaylist(url, &items)))
+        {
+           MessageBox(m_hWnd, "Cannot save playlist to disk. Make sure there "
+                              "is room on the drive or that the directory is "
+                              "not read-only?", BRANDING, MB_OK);                              
+           result = false;
+        }
+
+        vector<PlaylistItem*>::iterator i;
+
+        for(i = items.begin(); i != items.end(); i++)
+            delete (*i);
+    }
+
+    return result;
 }
