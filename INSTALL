@@ -29,11 +29,13 @@ Windows:
 	project files and nmake makefiles are provided. Feel free to add 
 	other development environments such as Borland and Metrowerks. 
 
-	Under MS VC++ you should only have to open the project file
-	and build it. The output will go to base\win32\prj. You can 
-	run freeamp from here or move it to another directory.
-	Just make sure the plugins directory is in the same 
-	location.
+	Under MS VC++ you should open the file base\win32\prj\freeamp.dsw
+	and determine which build you want to do. If you want to take
+	advantage of the assembly optimizations you need to have NASM
+	installed and select either NASM Release or Debug as the active
+	configuration. Output will go to base\win32\prj. You can 
+	run freeamp from here or move it to another directory. Just 
+	make sure the plugins directory is in the same location.
 
   Install:   
 	In order to build the installer you will need InstallShield

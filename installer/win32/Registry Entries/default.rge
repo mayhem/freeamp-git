@@ -4,64 +4,73 @@
 HKCU0=Software\FreeAmp\FreeAmp v1.2\Main
 
 [RegisterFileTypes:HKCR:MP3AudioFile\shell\open\command]
+(Default)=S,<TARGETDIR>\freeamp.exe "%1"
 ---Comment---=
-(Default)=S,<TARGETDIR>\freeamp.exe %1
-
-[RegisterFileTypes:HKCR:PlayListFile\shell\open\command]
----Comment---=
-(Default)=S,<TARGETDIR>\freeamp.exe %1
 
 [RegisterFileTypes:HKCR:PlayListFile\DefaultIcon]
----Comment---=
 (Default)=S,<TARGETDIR>\freeamp.exe,0
+---Comment---=
+
+[RegisterFileTypes:HKCR:PlayListFile\shell\open\command]
+(Default)=S,<TARGETDIR>\freeamp.exe "%1"
+---Comment---=
+
+[RegisterFileTypes:HKCR:.m3u]
+(Default)=S,PlayListFile
+---Comment---=
+
+[RegisterFileTypes:HKCR:MP3AudioFile]
+(Default)=S,MP3 Audio File
+---Comment---=
 
 [FreeAmpSet]
 ---Comment---=
 ---FileGroup---=FreeAmp UI
 HKCU0=Software\FreeAmp\FreeAmp v1.2\Main
 
-[RegisterFileTypes:HKCR:MP3AudioFile]
----Comment---=
-(Default)=S,MP3 Audio File
-
-[RegisterFileTypes:HKCR:.m3u]
----Comment---=
-(Default)=S,PlayListFile
-
 [MainSet:HKCU:Software\FreeAmp\FreeAmp v1.2\Main]
-SaveStreams=N,0
 LogInput=N,0
----Comment---=
-(Default)=S,
+SaveStreams=N,0
 UseDebugLog=N,0
-LogMain=N,0
+(Default)=S,
+---Comment---=
 OutputBufferSize=N,512
+LogMain=N,0
 LogDecode=N,0
 UI=S,freeamp.ui
 WindowPositionWidth=N,0
-SaveStreamsDirectory=S,<TARGETDIR>
 LogOutput=N,0
-InstallDirectory=S,<TARGETDIR>
+SaveStreamsDirectory=S,<TARGETDIR>
 StreamBufferInterval=N,3
+InstallDirectory=S,<TARGETDIR>
 StayOnTop=N,0
-DecoderThreadPriority=N,4
 LiveInTray=N,0
-OpenSaveDirectory=S,<TARGETDIR>
+DecoderThreadPriority=N,4
 WindowPositionTop=N,0
+OpenSaveDirectory=S,<TARGETDIR>
 LogPerformance=N,0
-PMO=S,soundcard.pmo
-WindowPositionHeight=N,0
-WindowPositionLeft=N,0
 InputBufferSize=N,64
-
-[SoundCardSet:HKCU:Software\FreeAmp\FreeAmp v1.2\Main]
-(Default)=S,
----Comment---=
+WindowPositionLeft=N,0
+WindowPositionHeight=N,0
 PMO=S,soundcard.pmo
 
 [RegisterFileTypes:HKCR:PlayListFile]
----Comment---=
 (Default)=S,PlayList File
+---Comment---=
+
+[SoundCardSet:HKCU:Software\FreeAmp\FreeAmp v1.2\Main]
+---Comment---=
+(Default)=S,
+PMO=S,soundcard.pmo
+
+[RegisterFileTypes:HKCR:MP3AudioFile\DefaultIcon]
+(Default)=S,<TARGETDIR>\freeamp.exe,0
+---Comment---=
+
+[SimpleSet:HKCU:Software\FreeAmp\FreeAmp v1.2\Main]
+---Comment---=
+(Default)=S,
+UI=S,simple.ui
 
 [Data]
 Set0=MainSet
@@ -72,18 +81,9 @@ Set4=RainPlaySet
 Set5=FreeAmpSet
 Set6=SoundCardSet
 
-[SimpleSet:HKCU:Software\FreeAmp\FreeAmp v1.2\Main]
-(Default)=S,
----Comment---=
-UI=S,simple.ui
-
-[RegisterFileTypes:HKCR:MP3AudioFile\DefaultIcon]
----Comment---=
-(Default)=S,<TARGETDIR>\freeamp.exe,0
-
 [FreeAmpSet:HKCU:Software\FreeAmp\FreeAmp v1.2\Main]
----Comment---=
 (Default)=S,
+---Comment---=
 UI=S,freeamp.ui
 
 [SimpleSet]
@@ -96,28 +96,38 @@ HKCU0=Software\FreeAmp\FreeAmp v1.2\Main
 ---FileGroup---=Sound Card Output
 HKCU0=Software\FreeAmp\FreeAmp v1.2\Main
 
-[General]
-Type=REGISTRYDATA
-Version=1.00.000
-
 [DSoundSet]
 ---Comment---=
 ---FileGroup---=Direct Sound Output
 HKCU0=Software\FreeAmp\FreeAmp v1.2\Main
 
-[RegisterFileTypes:HKCR:.mp3]
----Comment---=
-(Default)=S,MP3AudioFile
+[General]
+Type=REGISTRYDATA
+Version=1.00.000
 
 [MainSet]
 ---Comment---=
 ---FileGroup---=
 HKCU0=Software\FreeAmp\FreeAmp v1.2\Main
 
+[RegisterFileTypes:HKCR:.mp3]
+(Default)=S,MP3AudioFile
+---Comment---=
+
+[RainPlaySet:HKCU:Software\FreeAmp\FreeAmp v1.2\Main]
+(Default)=S,
+---Comment---=
+UI=S,rainplay.ui
+
+[DSoundSet:HKCU:Software\FreeAmp\FreeAmp v1.2\Main]
+(Default)=S,
+---Comment---=
+PMO=S,dsoundcard.pmo
+
 [RegisterFileTypes]
 HKCR4=PlayListFile
----Comment---=
 HKCR5=PlayListFile\shell\open\command
+---Comment---=
 HKCR6=PlayListFile\DefaultIcon
 HKCR7=MP3AudioFile\DefaultIcon
 ---FileGroup---=Program Executable Files
@@ -125,14 +135,4 @@ HKCR0=.mp3
 HKCR1=MP3AudioFile
 HKCR2=MP3AudioFile\shell\open\command
 HKCR3=.m3u
-
-[DSoundSet:HKCU:Software\FreeAmp\FreeAmp v1.2\Main]
----Comment---=
-(Default)=S,
-PMO=S,dsoundcard.pmo
-
-[RainPlaySet:HKCU:Software\FreeAmp\FreeAmp v1.2\Main]
----Comment---=
-(Default)=S,
-UI=S,rainplay.ui
 
