@@ -55,7 +55,7 @@ class musicsearchUI {
     bool searchInProgress;
     bool searchDone;
     bool done;
-
+	FAContext *GetContext(void) { return m_context; }
     GtkWidget *m_window;
  protected:
     FAContext *m_context;

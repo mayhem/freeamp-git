@@ -77,6 +77,7 @@ typedef struct PrefsStruct
     bool useImages; 
     bool savePlaylistOnExit;
     bool playImmediately;
+    bool setLastResume;
     bool allowMultipleInstances;
  
     string saveMusicDirectory;
@@ -107,6 +108,7 @@ typedef struct PrefsStruct
             convertUnderscores == pref.convertUnderscores &&
             allowMultipleInstances == pref.allowMultipleInstances &&
             playImmediately == pref.playImmediately &&
+	    setLastResume == pref.setLastResume &&
             useTextLabels == pref.useTextLabels &&
             useImages == pref.useImages &&
             savePlaylistOnExit == pref.savePlaylistOnExit &&
@@ -316,6 +318,7 @@ class GTKPreferenceWindow : public PreferenceWindow
       void SetToolbar(bool text, bool pics);
       void SaveOnExitToggle(int active);
       void PlayImmediatelyToggle(int active);
+      void SetLastResumeToggle(int active);
       void AllowMultipleToggle(int active);
       void ConvertUnderscoresToggle(int active);
       void ReclaimTypesToggle(int active);

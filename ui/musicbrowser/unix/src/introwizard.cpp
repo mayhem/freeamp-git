@@ -188,7 +188,7 @@ static void search_entry_change(GtkWidget *w, IntroWizardUI *p)
 
 static void search_browse(GtkWidget *w, IntroWizardUI *p)
 {
-    FileSelector *filesel = new FileSelector("Select a Directory to begin searching in..");
+    FileSelector *filesel = new FileSelector(p->GetContext(),"Select a Directory to begin searching in..");
     
     if (filesel->Run()) {
         char *filepath = filesel->GetReturnPath();

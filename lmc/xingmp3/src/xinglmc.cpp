@@ -362,10 +362,6 @@ Error XingLMC::CanDecode()
        return Err;
    }
 
-   if (IsError(m_pContext->prefs->
-	       GetPrefInt32(kStreamBufferIntervalPref, &m_iBufferUpInterval)))
-      m_iBufferUpInterval = iDefaultBufferUpInterval;
-
    return kError_NoErr;
 }
 

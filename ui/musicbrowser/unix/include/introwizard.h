@@ -73,6 +73,7 @@ class IntroWizardUI {
     bool mbEnabled;
 
     GtkWidget *m_window;
+	FAContext *GetContext(void) { return m_context; }
     
  protected:
     FAContext *m_context;

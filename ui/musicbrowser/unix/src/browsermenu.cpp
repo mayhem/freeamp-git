@@ -46,7 +46,7 @@ ____________________________________________________________________________*/
 static void add_tool(GtkWidget *widget, GTKMusicBrowser *p)
 {
     p->SetClickState(kContextPlaylist);
-    FileSelector *filesel = new FileSelector("Add a Track");
+    FileSelector *filesel = new FileSelector(p->GetContext(),"Add a Track");
     filesel->SetExtended();
     if (filesel->Run()) {
         char *returnpath = filesel->GetReturnPath();
@@ -105,7 +105,7 @@ static void move_down_tool(GtkWidget *widget, GTKMusicBrowser *p)
 
 static void import_tool(GtkWidget *w, GTKMusicBrowser *p)
 {
-    FileSelector *filesel = new FileSelector("Import a Track or Playlist into My Music");
+    FileSelector *filesel = new FileSelector(p->GetContext(),"Import a Track or Playlist into My Music");
     if (filesel->Run()) {
         FAContext *m_context = p->GetContext();
         char *returnpath = filesel->GetReturnPath();
@@ -177,7 +177,7 @@ static void open_list(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
     p->SaveCurrentPlaylist();
 
-    FileSelector *filesel = new FileSelector("Open a Playlist from Disk");
+    FileSelector *filesel = new FileSelector(p->GetContext(),"Open a Playlist from Disk");
     if (filesel->Run())
         p->CreateNewEditor(filesel->GetReturnPath());
     delete filesel;
@@ -232,7 +232,7 @@ static void import_list(GTKMusicBrowser *p, guint action, GtkWidget *w)
 
 static void export_list(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
-    FileSelector *filesel = new FileSelector("Export This Playlist to Disk");
+    FileSelector *filesel = new FileSelector(p->GetContext(),"Export This Playlist to Disk");
     if (filesel->Run())
         p->SaveCurrentPlaylist(filesel->GetReturnPath());
     delete filesel;
@@ -263,7 +263,7 @@ static void add_track_tool(GtkWidget *w, GTKMusicBrowser *p)
 
 static void add_track(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {   
-    FileSelector *filesel = new FileSelector("Add a Track");
+    FileSelector *filesel = new FileSelector(p->GetContext(),"Add a Track");
     filesel->SetExtended();
     if (filesel->Run()) {
         char *filereturn = strdup_new(filesel->GetReturnPath());

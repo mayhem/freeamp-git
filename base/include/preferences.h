@@ -81,6 +81,7 @@ extern const char* kSaveCurrentPlaylistOnExitPref;
 extern const char* kViewMusicBrowserPref;
 extern const char* kWelcomePref;
 extern const char* kPlayImmediatelyPref;
+extern const char* kSetLastResumePref;
 extern const char* kNumberOfURLsToRememberPref;
 extern const char* kCDDevicePathPref;
 extern const char* kCheckCDAutomaticallyPref;

@@ -98,7 +98,7 @@ int main(int argc, char **argv)
     int        iCmdSem = -1, iCmdMem = -1;
     int        iProcess, i;
     char      *pCmdLine = NULL, *pPtr;
-
+    bool       bPlay = 0;
     union semun unsem;
     unsem.val = 0;
 #endif
@@ -239,12 +239,13 @@ int main(int argc, char **argv)
     pP->RegisterPMIs(pmi);
     pP->RegisterPMOs(pmo);
     pP->RegisterUIs(ui);
-
+    context->prefs->GetPrefBoolean(kPlayImmediatelyPref, &bPlay);
     if (pP->SetArgs(argc,argv)) 
     {
         pP->SetTerminationSemaphore(termSemaphore);
         pP->Run();
-
+	if(!bPlay)
+	    context->target->AcceptEvent(new Event(CMD_Stop));
         for(;;)
         {
             if (!termSemaphore->TimedWait(1000))
@@ -253,9 +254,6 @@ int main(int argc, char **argv)
                 if (pCmdLine && strlen(pCmdLine) > 0 && !allow_mult)
                 {
                     int iItems = context->plm->CountItems();
-                    bool bPlay;
-
-                    context->prefs->GetPrefBoolean(kPlayImmediatelyPref, &bPlay);
                     for(i = 0, pPtr = pCmdLine; *pPtr; i++)
                     {
                         if (i == 0)

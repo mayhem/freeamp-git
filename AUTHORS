@@ -198,3 +198,7 @@ Michael Rich <istan@alltel.net>
 "Chris Gray" <cgray4@cs.mcgill.ca>
 * Contributed a couple of patches for orbit compile issues and an
   unclutter bug fix.
+
+"Ed Sweetman" <ed.sweetman@wmich.edu>
+* Play immediately patch, recursive file add, remember path between file
+  selector sessions for linux.

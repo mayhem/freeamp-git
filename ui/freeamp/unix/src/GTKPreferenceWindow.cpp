@@ -447,6 +447,9 @@ void GTKPreferenceWindow::GetPrefsValues(Preferences* prefs,
     prefs->GetPrefBoolean(kShowToolbarImagesPref, &values->useImages);
     prefs->GetPrefBoolean(kSaveCurrentPlaylistOnExitPref, &values->savePlaylistOnExit);
     prefs->GetPrefBoolean(kPlayImmediatelyPref, &values->playImmediately);
+    
+    prefs->GetPrefBoolean(kSetLastResumePref, &values->setLastResume);
+    
     prefs->GetPrefBoolean(kAllowMultipleInstancesPref, &values->allowMultipleInstances);
 
     if(kError_BufferTooSmall == prefs->GetPrefString(kSaveMusicDirPref, buffer, &size))
@@ -540,6 +543,9 @@ void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs,
     prefs->SetPrefBoolean(kShowToolbarImagesPref, values->useImages);
     prefs->SetPrefBoolean(kSaveCurrentPlaylistOnExitPref, values->savePlaylistOnExit);
     prefs->SetPrefBoolean(kPlayImmediatelyPref, values->playImmediately);
+    
+    prefs->SetPrefBoolean(kSetLastResumePref, values->setLastResume);
+    
     prefs->SetPrefBoolean(kAllowMultipleInstancesPref, values->allowMultipleInstances);
     prefs->SetPrefBoolean(kAskToReclaimFiletypesPref, values->askReclaimFiletypes);
     prefs->SetPrefBoolean(kReclaimFiletypesPref, values->reclaimFiletypes);
@@ -655,6 +661,19 @@ static void play_now_toggle(GtkWidget *w, GTKPreferenceWindow *p)
 {
     int i = GTK_TOGGLE_BUTTON(w)->active;
     p->PlayImmediatelyToggle(i);
+}
+
+void GTKPreferenceWindow::SetLastResumeToggle(int active)
+{
+    proposedValues.setLastResume = active;
+    if(!firsttime)
+	gtk_widget_set_sensitive(applyButton,TRUE);
+}
+
+static void set_last_toggle(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    int i = GTK_TOGGLE_BUTTON(w)->active;
+    p->SetLastResumeToggle(i);
 }
 
 void GTKPreferenceWindow::AllowMultipleToggle(int active)
@@ -791,6 +810,14 @@ GtkWidget *GTKPreferenceWindow::CreateGeneral(void)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), TRUE);
     gtk_widget_show(check);
 
+    check = gtk_check_button_new_with_label("Open File to Last Selected");
+    gtk_box_pack_start(GTK_BOX(vbox), check, FALSE,FALSE,0);
+    gtk_signal_connect(GTK_OBJECT(check), "toggled",
+		       GTK_SIGNAL_FUNC(set_last_toggle), this);
+    if(originalValues.setLastResume)
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), TRUE);
+    gtk_widget_show(check);
+
     frame = gtk_frame_new("Miscellaneous");
     gtk_box_pack_start(GTK_BOX(pane), frame, FALSE, FALSE, 5);
     gtk_widget_show(frame);
@@ -918,7 +945,7 @@ static void save_stream_change(GtkWidget *w, GTKPreferenceWindow *p)
 
 static void save_stream_browse(GtkWidget *w, GTKPreferenceWindow *p)
 {
-    GTKFileSelector *filesel = new GTKFileSelector("Select a New Directory");
+    GTKFileSelector *filesel = new GTKFileSelector(p->GetContext(),"Select a New Directory");
     if (filesel->Run(true)) {
         char *returnpath = filesel->GetReturnPath();
  
@@ -1653,7 +1680,7 @@ void GTKPreferenceWindow::AddThemeEvent(const char *newpath)
 
 static void add_theme_press(GtkWidget *w, GTKPreferenceWindow *p)
 {
-    GTKFileSelector *filesel = new GTKFileSelector("Select a Theme to Add");
+    GTKFileSelector *filesel = new GTKFileSelector(p->GetContext(),"Select a Theme to Add");
     if (filesel->Run(true)) {
         char *returnpath = filesel->GetReturnPath();
         p->AddThemeEvent(returnpath);
@@ -2122,7 +2149,7 @@ static void save_music_change(GtkWidget *w, GTKPreferenceWindow *p)
 
 static void save_music_browse(GtkWidget *w, GTKPreferenceWindow *p)
 {
-    GTKFileSelector *filesel = new GTKFileSelector("Select a New Directory");
+    GTKFileSelector *filesel = new GTKFileSelector(p->GetContext(),"Select a New Directory");
     if (filesel->Run(true)) {
         char *returnpath = filesel->GetReturnPath();
 
@@ -2157,7 +2184,7 @@ static void watch_dir_change(GtkWidget *w, GTKPreferenceWindow *p)
 
 static void watch_dir_browse(GtkWidget *w, GTKPreferenceWindow *p)
 {
-    GTKFileSelector *filesel = new GTKFileSelector("Select a New Directory");
+    GTKFileSelector *filesel = new GTKFileSelector(p->GetContext(),"Select a New Directory");
     if (filesel->Run(true)) {
         char *returnpath = filesel->GetReturnPath();
 

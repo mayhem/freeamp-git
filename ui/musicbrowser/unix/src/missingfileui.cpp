@@ -96,7 +96,7 @@ static void entry_change(GtkWidget *w, MissingFileUI *p)
 
 static void browse_click(GtkWidget *w, MissingFileUI *p)
 {
-    FileSelector *filesel = new FileSelector("Browse to Missing File");
+    FileSelector *filesel = new FileSelector(p->GetContext(),"Browse to Missing File");
     if (filesel->Run()) {
         string filepath = filesel->GetReturnPath();
         struct stat st;

@@ -34,8 +34,7 @@ using namespace std;
 
 class FileSelector {
  public:
-    FileSelector(const char *);
-  
+    FileSelector(FAContext *,const char *);
     bool Run(bool runMain = true);
     void SetExtended() { extended = true; }
     char *GetReturnPath() { if (returnpath != "")
@@ -43,6 +42,9 @@ class FileSelector {
                             else return NULL; 
                           }
 
+ 	FAContext *GetContext(void) { return m_context; }
+ protected:
+    FAContext *m_context;
  private:
     string returnpath;
     string title;

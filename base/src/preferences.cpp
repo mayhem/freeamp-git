@@ -79,6 +79,7 @@ const char* kViewMusicBrowserPref = "ViewMusicBrowser";
 const char* kWindowModePref = "WindowMode";
 const char* kWelcomePref = "Welcome";
 const char* kPlayImmediatelyPref = "PlayImmediately";
+const char* kSetLastResumePref = "SetLastResume";
 const char* kNumberOfURLsToRememberPref = "NumberOfURLsToRemember";
 const char* kCDDevicePathPref = "CDDevice";
 const char* kCheckCDAutomaticallyPref = "AutoUpdateCD";
@@ -156,6 +157,7 @@ const bool kDefaultSaveCurrentPlaylistOnExit = false;
 const bool kDefaultViewMusicBrowser = true;
 const bool kDefaultWelcome = true;
 const bool kDefaultPlayImmediately = true;
+const bool kDefaultSetLastResume = true;
 const int32 kDefaultNumberOfURLsToRemember = 10;
 const char* kDefaultMBServer = "http://www.musicbrainz.org:80";
 const bool kDefaultConvertUnderscoresToSpaces = true;
@@ -346,6 +348,9 @@ SetDefaults()
 
     if (GetPrefBoolean(kPlayImmediatelyPref, &dummyBool) == kError_NoPrefValue)
         SetPrefBoolean(kPlayImmediatelyPref, kDefaultPlayImmediately);
+	
+    if (GetPrefBoolean(kSetLastResumePref, &dummyBool) == kError_NoPrefValue)
+	SetPrefBoolean(kSetLastResumePref, kDefaultSetLastResume);
 
     if (GetPrefInt32(kNumberOfURLsToRememberPref, &dummyInt) == kError_NoPrefValue)
         SetPrefInt32(kNumberOfURLsToRememberPref, kDefaultNumberOfURLsToRemember);

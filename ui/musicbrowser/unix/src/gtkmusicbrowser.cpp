@@ -756,7 +756,7 @@ void GTKMusicBrowser::AddFileCMD()
     bool playNow = true;
     m_context->prefs->GetPrefBoolean(kPlayImmediatelyPref, &playNow);
 
-    FileSelector *filesel = new FileSelector("Select a file to play");
+    FileSelector *filesel = new FileSelector(m_context,"Select a file to play");
     if (filesel->Run(false)) {
         char *returnpath = filesel->GetReturnPath();
         char *ext = m_context->player->GetExtension(returnpath);
@@ -1877,7 +1877,7 @@ void GTKMusicBrowser::Close(bool inMain)
             if (oBox.Show(oMessage.c_str(), "Save Confirmation", kMessageYesNo,
                           inMain) == kMessageReturnYes) {
 
-                FileSelector *filesel = new FileSelector("Save This Playlist to Disk");
+                FileSelector *filesel = new FileSelector(m_context,"Save This Playlist to Disk");
                 if (filesel->Run())
                     m_currentListName = filesel->GetReturnPath();
 
