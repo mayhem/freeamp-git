@@ -33,19 +33,19 @@ CAPTION "General"
 FONT 8, "MS Sans Serif"
 BEGIN
     CONTROL         "Remain on top of all other windows.",IDC_STAYONTOP,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,116,128,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,131,128,10
     CONTROL         "Manifest in Windows Tray instead of Taskbar.",IDC_TRAY,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,132,158,10
-    GROUPBOX        "Miscellaneous",IDC_STATIC,3,104,227,44
-    GROUPBOX        "Save Music Folder",IDC_STATIC,3,3,227,42
-    EDITTEXT        IDC_SAVEMUSICDIR,11,21,160,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "Browse...",IDC_BROWSE,175,21,50,14
-    GROUPBOX        "File Associations",IDC_STATIC,3,51,227,47
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,145,158,10
+    GROUPBOX        "Miscellaneous",IDC_STATIC,3,117,227,44
+    GROUPBOX        "Save Music Folder",IDC_STATIC,3,3,227,44
+    EDITTEXT        IDC_SAVEMUSICDIR,11,22,160,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Browse...",IDC_BROWSE,175,22,50,14
+    GROUPBOX        "File Associations",IDC_STATIC,3,60,227,44
     CONTROL         "Reclaim stolen filetypes when application starts.",
                     IDC_RECLAIMFILETYPES,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,18,65,163,10
+                    WS_TABSTOP,18,74,163,10
     CONTROL         "Ask before reclaiming filetypes.",IDC_ASKRECLAIM,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,18,80,113,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,18,88,113,10
 END
 
 IDD_PREF_DEBUG DIALOG DISCARDABLE  0, 0, 233, 174
@@ -255,10 +255,10 @@ STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Plugins"
 FONT 8, "MS Sans Serif"
 BEGIN
-    COMBOBOX        IDC_PMO,78,16,125,54,CBS_DROPDOWNLIST | CBS_SORT | 
+    COMBOBOX        IDC_PMO,78,17,125,54,CBS_DROPDOWNLIST | CBS_SORT | 
                     WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Audio Output:",IDC_STATIC,30,18,44,8
-    GROUPBOX        "Audio",IDC_STATIC,3,2,227,37
+    LTEXT           "Audio Output:",IDC_STATIC,30,19,44,8
+    GROUPBOX        "Audio",IDC_STATIC,3,3,227,37
     GROUPBOX        "Portable Devices",IDC_STATIC,3,45,227,126
     LTEXT           "Select from the list above any portable devices you own. This will enable you to edit the contents of your portable device directly from the ""My Music"" window. If you do not see your portable device",
                     IDC_STATIC,10,122,214,26
