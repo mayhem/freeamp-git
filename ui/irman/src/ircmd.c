@@ -11,6 +11,10 @@
 #include <ctype.h>
 #include <errno.h>
 
+#ifndef __IR
+#define __IR 1
+#endif
+
 #include "ir.h"
 
 /* hashtable (array of pointers to ht_entry_t) */

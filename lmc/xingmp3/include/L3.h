@@ -45,6 +45,10 @@ ____________________________________________________________________________*/
 #define LITTLE_ENDIAN 1
 #endif
 
+#ifdef sparc
+#define LITTLE_ENDIAN 0
+#endif
+
 #ifndef LITTLE_ENDIAN
 #error Layer III LITTLE_ENDIAN must be defined 0 or 1
 #endif

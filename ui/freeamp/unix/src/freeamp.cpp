@@ -30,7 +30,10 @@ ____________________________________________________________________________*/
 
 #include <X11/extensions/shape.h>
 
+#ifdef linux
 #include <linux/soundcard.h>
+#endif
+
 #include <sys/ioctl.h>
 
 #include <stdio.h>
