@@ -25,9 +25,29 @@ ____________________________________________________________________________*/
 
 #include <gtk/gtk.h>
 
+#ifdef WIN32
+#include <io.h>
+#else
+#undef socklen_t
+#include <sys/socket.h>
+#include <netdb.h>
+#include <unistd.h>
+#endif
+
+#if defined(unix) || defined(__BEOS__)
+#define SOCKET int
+#endif
+
+#if defined(unix)
+#include <arpa/inet.h>
+#define closesocket(x) close(x)
+#define O_BINARY 0
+#endif
+
 #include "gtkmusicbrowser.h"
 #include "gtkmessagedialog.h"
 #include "eventdata.h"
+#include "Http.h"
 
 #include "../res/album_pix.xpm"
 #include "../res/all_pix.xpm"
@@ -43,6 +63,8 @@ ____________________________________________________________________________*/
 #include "../res/wiredplanet_pix.xpm"
 
 FAContext *BADContext = NULL;
+
+const string icecastURL = "http://yp.icecast.org/yplist_long.xml";
 
 void kill_treedata(TreeData *dead)
 {
@@ -935,8 +957,9 @@ void GTKMusicBrowser::CreateMainTreeItems(void)
     gtk_ctree_node_set_row_data_full(musicBrowserTree, icecastTree, data,
                                      (GtkDestroyNotify)kill_treedata);
 
+    name[0] = "Searching for Stations...";
     icecastSpace = gtk_ctree_insert_node(musicBrowserTree, icecastTree, NULL,
-                                         NULL, 5, NULL, NULL, NULL, NULL, true,
+                                         name, 5, NULL, NULL, NULL, NULL, true,
                                          false);
 
     pixmap = gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, &mask,
@@ -950,8 +973,9 @@ void GTKMusicBrowser::CreateMainTreeItems(void)
     gtk_ctree_node_set_row_data_full(musicBrowserTree, shoutcastTree, data,
                                      (GtkDestroyNotify)kill_treedata);
 
+    name[0] = "Searching for Stations...";
     shoutcastSpace = gtk_ctree_insert_node(musicBrowserTree, shoutcastTree, NULL,
-                                           NULL, 5, NULL, NULL, NULL, NULL, 
+                                           name, 5, NULL, NULL, NULL, NULL, 
                                            true, false);
 
     pixmap = gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, &mask,
@@ -1121,6 +1145,7 @@ void GTKMusicBrowser::FillWiredPlanet(void)
     if (wiredplanetSpace)
         gtk_ctree_remove_node(musicBrowserTree, wiredplanetSpace);
     wiredplanetSpace = NULL;
+    wiredplanetExpanded = true;
 
     char* stations[] = {
         "Alpha 2.0", // (Downtempo / Trip-Hop)",
@@ -1201,22 +1226,128 @@ void GTKMusicBrowser::FillWiredPlanet(void)
     gtk_clist_thaw(GTK_CLIST(musicBrowserTree));
 }
 
+IceCastTimer::IceCastTimer(FAContext *context, GTKMusicBrowser *ui, 
+                           int32 timeout) : Timer(timeout)
+{
+    m_context = context;
+    m_ui = ui;
+}
+
+void IceCastTimer::Tick(void)
+{
+    Error  eRet;
+    Http   iceDownload(m_context);
+    string page;
+    vector<IcecastStreamInfo> list;
+    IcecastStreams            o;
+
+    eRet = iceDownload.DownloadToString(icecastURL, page);
+    if (eRet != kError_NoErr) {
+        cout << "Icecast download failed: " << ErrorString[eRet] << "\n";
+        return;
+    }
+
+    o.ParseStreamXML(page, list);
+
+    if (list.size() > 0) {
+        m_ui->HandleIceCastList(list);
+    }
+    else
+       cout << "no streams.\n";
+}
+
+void GTKMusicBrowser::HandleIceCastList(vector<IcecastStreamInfo> &list)
+{
+    gdk_threads_enter();
+    gtk_clist_freeze(GTK_CLIST(musicBrowserTree));
+
+    GtkCTreeRow *row = GTK_CTREE_ROW(icecastTree);
+    int expanded = row->expanded;
+
+    while (row->children) {
+        GtkCTreeNode *todelete = row->children;
+        gtk_ctree_remove_node(musicBrowserTree, todelete);
+    }
+    icecastSpace = NULL;
+   
+    char *name[1];
+    GdkPixmap *pixmap;
+    GdkBitmap *mask;
+    GtkStyle  *style = gtk_widget_get_style(musicBrowserWindow);
+    TreeData  *data;
+    GtkCTreeNode *stream;
+
+    vector<IcecastStreamInfo>::iterator i;
+
+    for (i = list.begin(); i != list.end(); i++) {
+        PlaylistItem *newitem = new PlaylistItem;
+        MetaData metadata;
+
+        newitem->SetURL(i->m_streamUrl.c_str());
+        metadata.SetTitle(i->m_name.c_str());
+        metadata.SetArtist(i->m_webUrl.c_str());
+        metadata.SetComment(i->m_desc.c_str());
+        newitem->SetMetaData(&metadata);
+
+        name[0] = (char *)i->m_name.c_str();
+
+        pixmap = gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, &mask,
+                                              &style->bg[GTK_STATE_NORMAL],
+                                              streams_pix);
+        stream = gtk_ctree_insert_node(musicBrowserTree, icecastTree, NULL,
+                                        name, 5, pixmap, mask, pixmap, mask,
+                                        true, false);
+        data = NewTreeData(kTreeStream, NULL, NULL, NULL, newitem);
+        gtk_ctree_node_set_row_data_full(musicBrowserTree, stream, data,
+                                         (GtkDestroyNotify)kill_treedata);
+    }
+    gtk_clist_thaw(GTK_CLIST(musicBrowserTree));
+
+    if (expanded)
+        gtk_ctree_expand(musicBrowserTree, icecastTree);
+
+    gdk_threads_leave();
+}
+    
 void GTKMusicBrowser::FillIceCast(void)
 {
     if (icecastExpanded)
         return;
-    if (icecastSpace)
-        gtk_ctree_remove_node(musicBrowserTree, icecastSpace);
-    icecastSpace = NULL;
+
+    if (!ice_timer)
+        ice_timer = new IceCastTimer(m_context, this, 30000);
+
+    ice_timer->Start();    
+    icecastExpanded = true;
+}
+
+void GTKMusicBrowser::CloseIceCast(void)
+{
+    if (!icecastExpanded)
+        return;
+
+    //ice_timer->Stop();
+    icecastExpanded = false;
 }
 
 void GTKMusicBrowser::FillShoutCast(void)
 {
     if (shoutcastExpanded)
         return;
-    if (shoutcastSpace)
-        gtk_ctree_remove_node(musicBrowserTree, shoutcastSpace);
-    shoutcastSpace = NULL;
+    //if (shoutcastSpace)
+    //    gtk_ctree_remove_node(musicBrowserTree, shoutcastSpace);
+    //shoutcastSpace = NULL;
+
+    shoutcastExpanded = true;
+}
+
+void GTKMusicBrowser::CloseShoutCast(void)
+{
+    if (!shoutcastExpanded)
+        return;
+
+    //shout_timer->Stop();
+    shoutcastExpanded = false;
 }
 
 static void ctree_expand(GtkWidget *widget, GList *list, GTKMusicBrowser *p)
@@ -1236,6 +1367,27 @@ static void ctree_expand(GtkWidget *widget, GList *list, GTKMusicBrowser *p)
                 break; }
             case kTreeShoutcastHead: {
                 p->FillShoutCast();
+                break; }
+            default:
+                break;
+        }
+    }
+}
+
+static void ctree_collapse(GtkWidget *widget, GList *list, GTKMusicBrowser *p)
+{
+    GtkCTree *ctree = GTK_CTREE(widget);
+
+    GtkCTreeNode *node = (GtkCTreeNode *)list;
+    TreeData *data = (TreeData *)gtk_ctree_node_get_row_data(ctree, node);
+
+    if (data) {
+        switch (data->type) {
+            case kTreeIcecastHead: {
+                p->CloseIceCast();
+                break; }
+            case kTreeShoutcastHead: {
+                p->CloseShoutCast();
                 break; }
             default:
                 break;
@@ -1457,6 +1609,8 @@ void GTKMusicBrowser::CreateTree(void)
                        GTK_SIGNAL_FUNC(tree_drag_begin), this);
     gtk_signal_connect(GTK_OBJECT(musicBrowserTree), "tree_expand",
                        GTK_SIGNAL_FUNC(ctree_expand), this);
+    gtk_signal_connect(GTK_OBJECT(musicBrowserTree), "tree_collapse",
+                       GTK_SIGNAL_FUNC(ctree_collapse), this);
     gtk_clist_set_compare_func(GTK_CLIST(musicBrowserTree), nocase_compare);
 
     gtk_clist_set_row_height(GTK_CLIST(musicBrowserTree), 16);

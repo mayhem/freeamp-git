@@ -1151,10 +1151,8 @@ void WatchDirectoryTimer::Tick(void)
    vector<string> searchPaths;
    searchPaths.push_back(watchPath);
 
-cout << "tick\n";
    m_context->catalog->PruneDirectory(watchPath);
    m_context->catalog->SearchMusic(searchPaths, false);
-cout << "tick done\n";
 
    delete [] watchDir;
 }

@@ -1064,6 +1064,7 @@ GTKMusicBrowser::GTKMusicBrowser(FAContext *context, MusicBrowserUI *masterUI,
     CDTracks = new vector<PlaylistItem *>;
     m_bIgnoringMusicCatalogMessages = false;
     m_bCDMode = cdCreationMode;
+    ice_timer = NULL;
 
     parentUI = masterUI;
  

@@ -418,6 +418,7 @@ if test "$have_gtk" = "true"; then
   OSINC="$OSINC -I$srcdir/ui/musicbrowser/unix/include"
   OSINC="$OSINC -I$srcdir/ui/freeamp/include -I$srcdir/ui/freeamp/unix/include"
   OSINC="$OSINC -I$srcdir/ui/download/unix/include"
+  OSINC="$OSINC -I$srcdir/ui/musicbrowser/include"
   CFLAGS="$CFLAGS $GTK_CFLAGS"
   AC_DEFINE(HAVE_GTK)
 elif test "$host_os" = "beos"; then

@@ -29,7 +29,7 @@ uninstall_plugins uninstall-plugins:
 OSDEPPLUGINS = @OSDEPPLUGINS@
 
 clean-plugins plugins-clean:
-	-rm -f $(WINAMPOBJ) $(CDPMOOBJ) $(CDLMCOBJ) $(UNZIPOBJ) $(CDDBOBJ) $(PLSOBJ) $(RMPOBJ) $(MISCOBJ) $(ZLIBOBJ) $(MUSICBROWSEROBJ) $(MAKETHEMEOBJ) $(LFIOBJ) $(HTTPOBJ) $(OBSPMI) $(SCPMOOBJ) $(ALSAOBJ) $(ESNDOBJ) $(DOWNLOADUIOBJ) $(CMDUIOBJ) $(MPG123UIOBJ) $(NCURSESUIOBJ) $(LCDUIOBJ) $(IRMANUIOBJ) $(FREEAMPUIOBJ) $(ID3V1OBJ) $(ID3V2OBJ) $(M3UOBJ) $(PMP300OBJ) $(XINGLMCOBJ) $(WAVPMOOBJ) MakeTheme plugins/*.*
+	-rm -f $(LIBHTTPOBJ) $(WINAMPOBJ) $(CDPMOOBJ) $(CDLMCOBJ) $(UNZIPOBJ) $(CDDBOBJ) $(PLSOBJ) $(RMPOBJ) $(MISCOBJ) $(ZLIBOBJ) $(MUSICBROWSEROBJ) $(MAKETHEMEOBJ) $(LFIOBJ) $(HTTPOBJ) $(OBSPMI) $(SCPMOOBJ) $(ALSAOBJ) $(ESNDOBJ) $(DOWNLOADUIOBJ) $(CMDUIOBJ) $(MPG123UIOBJ) $(NCURSESUIOBJ) $(LCDUIOBJ) $(IRMANUIOBJ) $(FREEAMPUIOBJ) $(ID3V1OBJ) $(ID3V2OBJ) $(M3UOBJ) $(PMP300OBJ) $(XINGLMCOBJ) $(WAVPMOOBJ) MakeTheme plugins/*.*
 
 PLUGINS =  lib/zlib/lib/libzlib.la
 PLUGINS += lib/unzip/lib/libunzip.la
@@ -156,6 +156,8 @@ UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/fileselector.o
 UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/musicsearch.o 
 UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/gtkmessagedialog.o 
 UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/introwizard.o
+UNIXMUSICBROWSEROBJ += ui/musicbrowser/src/Icecast.o
+UNIXMUSICBROWSEROBJ += lib/xml/src/Parse.lo lib/http/lib/libfahttp.la
 UNIXMUSICBROWSERLIBS = $(GTK_LIBS)
 
 BEOSMUSICBROWSEROBJ  = ui/musicbrowser/beos/src/MusicBrowserUI.o
@@ -200,7 +202,7 @@ FREEAMPUIOBJ += ui/freeamp/src/ForeignTheme.o base/src/utility.lo
 FREEAMPUIOBJ += ui/freeamp/src/PixFontControl.o ui/freeamp/src/PixTimeControl.o
 FREEAMPUIOBJ += ui/freeamp/src/Equalizer.o
 FREEAMPUIOBJ += lib/zlib/lib/libzlib.la lib/xml/src/Parse.lo
-FREEAMPUIOBJ += lib/unzip/lib/libunzip.la lib/http/lib/libfahttp.a
+FREEAMPUIOBJ += lib/unzip/lib/libunzip.la lib/http/lib/libfahttp.la
 FREEAMPUIOBJ += $($(OSTYPE)FREEAMPUIOBJ)
 FREEAMPUILIBS = $($(OSTYPE)FREEAMPUILIBS)
 
@@ -403,8 +405,16 @@ lib/unzip/lib/libunzip.la: $(UNZIPOBJ)
 	$(LIBMOD) $@ $(UNZIPOBJ)
 
 
+# libhttp section
+
+LIBHTTPOBJ = lib/http/src/Http.o
+
+lib/http/lib/libfahttp.la: $(LIBHTTPOBJ)
+	+test -d lib/http/lib || mkdir lib/http/lib
+	$(LIBMOD) $@ $(LIBHTTPOBJ)
+
 depend:
-	makedepend -fMakefile-plugins -- $(DEFS) $(INCLUDES) $(CFLAGS) -- `echo $(WAVPMOOBJ) $(UNZIPOBJ) $(WINAMPOBJ) $(LFIOBJ) $(DOWNLOADUIOBJ) $(CDDBOBJ) $(CDPMOOBJ) $(CDLMCOBJ) $(THEMEUIOBJ) $(MUSICBROWSEROBJ) $(HTTPOBJ) $(SCPMOOBJ) $(ALSAOBJ) $(ESNDOBJ) $(CMDUIOBJ) $(MPG123UIOBJ) $(NCURSESUIOBJ) $(LCDUIOBJ) $(IRMANUIOBJ) $(GTKUIOBJ) $(FREEAMPUIOBJ) $(XINGLMCOBJ) $(PMP300OBJ) $(M3UOBJ) $(ID3V1OBJ) $(ID3V2OBJ) | sed -e 's,\.o,.cpp,g' | sed -e 's,\.doh,.cpp,g'`
+	makedepend -fMakefile-plugins -- $(DEFS) $(INCLUDES) $(CFLAGS) -- `echo $(WAVPMOOBJ) $(LIBHTTPOBJ) $(UNZIPOBJ) $(WINAMPOBJ) $(LFIOBJ) $(DOWNLOADUIOBJ) $(CDDBOBJ) $(CDPMOOBJ) $(CDLMCOBJ) $(THEMEUIOBJ) $(MUSICBROWSEROBJ) $(HTTPOBJ) $(SCPMOOBJ) $(ALSAOBJ) $(ESNDOBJ) $(CMDUIOBJ) $(MPG123UIOBJ) $(NCURSESUIOBJ) $(LCDUIOBJ) $(IRMANUIOBJ) $(GTKUIOBJ) $(FREEAMPUIOBJ) $(XINGLMCOBJ) $(PMP300OBJ) $(M3UOBJ) $(ID3V1OBJ) $(ID3V2OBJ) | sed -e 's,\.o,.cpp,g' | sed -e 's,\.doh,.cpp,g'`
  
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
