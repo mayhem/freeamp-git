@@ -1557,7 +1557,7 @@ static void sort_random2(GTKMusicBrowser *p, guint action, GtkWidget *w)
 
 static void sort_random(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
-    p->SortPlaylistEvent(kPlaylistSortKey_Random, PlaylistSortType_Ascending);
+    p->SortPlaylistEvent(kPlaylistSortKey_Random, kPlaylistSortType_Ascending);
 }
 
 static void catalog_tog(GTKMusicBrowser *p, guint action, GtkWidget *w)
@@ -1597,7 +1597,7 @@ static void saveas_list(GTKMusicBrowser *p, guint action, GtkWidget *w)
     GTKMessageDialog oBox;
     string oMessage = string("What do you want to call this playlist?");
 
-    if (oBox.Show(oMessage.c_str(), "Delete Confirmation", kMessageOkCancel,
+    if (oBox.Show(oMessage.c_str(), "Save This List to Disk?", kMessageOkCancel,
                   true, true)
                   == kMessageReturnOk) {
 

@@ -1156,7 +1156,7 @@ CreatePMO(const PlaylistItem * pc, Event * pC)
    LogicalMediaConverter *lmc = NULL;
    RegistryItem *pmi_item = NULL;
    RegistryItem *lmc_item = NULL;
-   RegistryItem *item;
+   RegistryItem *item = NULL;
 
    if (!pc)
    {
@@ -1190,6 +1190,7 @@ CreatePMO(const PlaylistItem * pc, Event * pC)
       m_pmo = NULL;
    }
 
+   
    pmi_item = ChoosePMI(pc->URL().c_str());
    if (!pmi_item)
    {
@@ -1214,19 +1215,36 @@ CreatePMO(const PlaylistItem * pc, Event * pC)
       pmi->SetPropManager((Properties *) this);
    }
 
-   char defaultPMO[256];
-   uint32 size = sizeof(defaultPMO);
+   char *extension = GetExtension(pc->URL().c_str());
+   if (extension) {
+       if (!strncasecmp("CDA", extension, 3)) {
+           int32 i = 0;
 
-   m_context->prefs->GetDefaultPMO(defaultPMO, &size);
+           while (NULL != (item = m_pmoRegistry->GetItem(i++)))
+           {
+               if (!strcmp("cd.pmo", item->Name()))
+               {
+                   break;
+               }
+           }
+       }
+   }
 
-   int32 i = 0;
+   if (!item) {
+       char defaultPMO[256];
+       uint32 size = sizeof(defaultPMO);
 
-   while (NULL != (item = m_pmoRegistry->GetItem(i++)))
-   {
-        if(!strcmp(defaultPMO, item->Name()))
-        {
-            break;
-        }
+       m_context->prefs->GetDefaultPMO(defaultPMO, &size);
+
+       int32 i = 0;
+
+       while (NULL != (item = m_pmoRegistry->GetItem(i++)))
+       {
+            if(!strcmp(defaultPMO, item->Name()))
+            {
+                break;
+            }
+       }
    }
 
    // if the default isn't around then just use first one 
