@@ -850,7 +850,7 @@ void MusicCatalog::DoSearchMusic(char *path, bool bSendMessages)
                     DoSearchMusic((char *)dirtest.c_str(), bSendMessages);
                     continue;
                 }
-#endif           
+#endif          
                 fileExt = m_context->player->GetExtension(find.cFileName);
                 if (fileExt && m_plm->IsSupportedPlaylistFormat(fileExt) && 
                     strcmp("currentlist.m3u", find.cFileName))

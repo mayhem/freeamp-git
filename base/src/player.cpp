@@ -1148,7 +1148,8 @@ GetExtension(const char *title)
    char *temp_ext;
    char *ext_return = NULL;
 
-   if (strncmp(title, "file://", 7) != 0)
+   if (!strncasecmp(title, "http://", 7) || 
+       !strncasecmp(title, "rtp://", 6))
    {
        ext_return = new char[4];
        strcpy(ext_return, "MP3");
