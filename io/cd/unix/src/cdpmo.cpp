@@ -76,7 +76,7 @@ CDPMO::~CDPMO()
    cd_finish(m_cdDesc);
 }
 
-void CDPMO::SetPrefInt32(kVolumePref, int32 left, int32 right)
+void CDPMO::SetVolume( int32 left, int32 right)
 {
     if (m_cdDesc != -1)
     {
@@ -91,7 +91,7 @@ void CDPMO::SetPrefInt32(kVolumePref, int32 left, int32 right)
     }
 }
 
-void CDPMO::GetPrefInt32(kVolumePref, int32 &left, int32 &right)
+void CDPMO::GetVolume(int32 &left, int32 &right)
 {
     left = right = -1;
     if (m_cdDesc != -1)

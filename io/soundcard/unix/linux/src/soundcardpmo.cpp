@@ -99,7 +99,7 @@ SoundCardPMO::~SoundCardPMO()
    }
 }
 
-void SoundCardPMO::SetPrefInt32(kVolumePref, int32 left, int32 right)
+void SoundCardPMO::SetVolume(int32 left, int32 right)
 {
     int   mixFd = open("/dev/mixer",O_RDWR);
     int32 v;
@@ -111,7 +111,7 @@ void SoundCardPMO::SetPrefInt32(kVolumePref, int32 left, int32 right)
     }
 }
 
-void SoundCardPMO::GetPrefInt32(kVolumePref, int32 &left, int32 &right)
+void SoundCardPMO::GetVolume(int32 &left, int32 &right)
 {
     int mixFd = open("/dev/mixer",O_RDWR);
     int volume = 0;
