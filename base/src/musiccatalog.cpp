@@ -1311,6 +1311,8 @@ Error MusicCatalog::AcceptEvent(Event *e)
             string url = curl;
             delete [] curl;
        
+			m_sigs->erase(url);
+
             MetaData *data = ReadMetaDataFromDatabase(url.c_str());
             if (!data)
                 data = new MetaData;
@@ -1342,7 +1344,7 @@ Error MusicCatalog::AcceptEvent(Event *e)
             m_context->aps->APSLookupSignature(sig, GUID);
 
             if (GUID != "") {
-                m_sigs->erase(asge->Url());
+				m_sigs->erase(asge->Url());
 
                 uint32 length = asge->Url().size() + 20;
                 char *curl = new char[length];
@@ -1351,6 +1353,7 @@ Error MusicCatalog::AcceptEvent(Event *e)
                 string url = curl;
                 delete [] curl;
 
+				m_sigs->erase(url);
                 MetaData *data = ReadMetaDataFromDatabase(url.c_str());
 
                 if (!data) 
