@@ -61,6 +61,10 @@ const char* kThemeDefaultFontPref = "ThemeDefaultFont";
 const char* kSaveMusicDirPref = "SaveMusicDirectory";
 const char* kDatabaseDirPref = "DatabaseDirectory";
 const char* kCheckForUpdatesPref = "CheckForUpdates";
+const char* kPlaylistRepeatPref = "PlaylistRepeat";
+const char* kPlaylistShufflePref = "PlaylistShuffle";
+const char* kTimeDisplayPref = "TimeDisplay";
+const char* kVolumePref = "Volume";
 
 //logging
 const char* kUseDebugLogPref = "UseDebugLog";
@@ -94,6 +98,11 @@ const char *kDefaultThemeDefaultFont = "Helvetica";
 const char *kDefaultDownloadManagerUI = "download.ui";
 const char *kDefaultMusicBrowserUI = "musicbrowser.ui";
 const bool kDefaultCheckForUpdates = false;
+
+const int32 kDefaultPlaylistRepeat = 0;
+const bool kDefaultPlaylistShuffle = false;
+const int32 kDefaultTimeDisplay = 0;
+const int32 kDefaultVolume = 85;
 
 Error
 Preferences::
@@ -193,6 +202,18 @@ SetDefaults()
 
     if (GetPrefBoolean(kCheckForUpdatesPref, &dummyBool) == kError_NoPrefValue)
         SetPrefBoolean(kCheckForUpdatesPref, kDefaultCheckForUpdates);
+
+    if (GetPrefInt32(kPlaylistRepeatPref, &dummyInt) == kError_NoPrefValue)
+        SetPrefInt32(kPlaylistRepeatPref, kDefaultPlaylistRepeat);
+
+    if (GetPrefBoolean(kPlaylistShufflePref, &dummyBool) == kError_NoPrefValue)
+        SetPrefBoolean(kPlaylistShufflePref, kDefaultPlaylistShuffle);
+
+    if (GetPrefInt32(kTimeDisplayPref, &dummyInt) == kError_NoPrefValue)
+        SetPrefInt32(kTimeDisplayPref, kDefaultTimeDisplay);
+
+    if (GetPrefInt32(kVolumePref, &dummyInt) == kError_NoPrefValue)
+        SetPrefInt32(kVolumePref, kDefaultVolume);
 
     return kError_NoErr;
 }
@@ -707,6 +728,64 @@ SetCheckForUpdates(bool value)
 {
     return SetPrefBoolean(kCheckForUpdatesPref, value);
 }
+
+Error
+Preferences::
+GetPlaylistRepeat(int32* value)
+{
+    return GetPrefInt32(kPlaylistRepeatPref, value);
+}
+
+Error
+Preferences::
+SetPlaylistRepeat(int32 value)
+{
+    return SetPrefInt32(kPlaylistRepeatPref, value);
+}
+
+
+Error
+Preferences::
+GetPlaylistShuffle(bool* value)
+{
+    return GetPrefBoolean(kPlaylistShufflePref, value);
+}
+
+Error
+Preferences::
+SetPlaylistShuffle(bool value)
+{
+    return SetPrefBoolean(kPlaylistShufflePref, value);
+}
+
+Error
+Preferences::
+GetTimeDisplay(int32* value)
+{
+    return GetPrefInt32(kTimeDisplayPref, value);
+}
+
+Error
+Preferences::
+SetTimeDisplay(int32 value)
+{
+    return SetPrefInt32(kTimeDisplayPref, value);
+}
+
+Error
+Preferences::
+GetVolume(int32* value)
+{
+    return GetPrefInt32(kVolumePref, value);
+}
+
+Error
+Preferences::
+SetVolume(int32 value)
+{
+    return SetPrefInt32(kVolumePref, value);
+}
+
 
 LibDirFindHandle *
 Preferences::

@@ -68,6 +68,10 @@ extern const char* kThemeDefaultFontPref;
 extern const char* kSaveMusicDirPref;
 extern const char* kDatabaseDirPref;
 extern const char* kCheckForUpdatesPref;
+extern const char* kPlaylistRepeatPref;
+extern const char* kPlaylistShufflePref;
+extern const char* kTimeDisplayPref;
+extern const char* kVolumePref;
 
 class LibDirFindHandle;
 
@@ -192,7 +196,18 @@ class Preferences {
 
     Error GetCheckForUpdates(bool* value);
     Error SetCheckForUpdates(bool value);
-    
+
+    Error GetPlaylistRepeat(int32* value);
+    Error SetPlaylistRepeat(int32 value);
+
+    Error GetPlaylistShuffle(bool* value);
+    Error SetPlaylistShuffle(bool value);
+
+    Error GetTimeDisplay(int32* value);
+    Error SetTimeDisplay(int32 value);
+
+    Error GetVolume(int32* value);
+    Error SetVolume(int32 value);  
 };
 
 #endif /* _PREFERENCES_H */

@@ -73,9 +73,9 @@ typedef enum {
 } PlaylistKey;
 
 typedef enum {
-    kPlaylistMode_RepeatNone,
-    kPlaylistMode_RepeatOne,
-    kPlaylistMode_RepeatAll
+    kPlaylistMode_RepeatNone = 0,
+    kPlaylistMode_RepeatOne  = 1,
+    kPlaylistMode_RepeatAll  = 2
 
 } RepeatMode;
 

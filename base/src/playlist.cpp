@@ -138,6 +138,9 @@ PlaylistManager::PlaylistManager(FAContext* context)
     m_repeatMode = kPlaylistMode_RepeatNone;
     m_sortKey = kPlaylistSortKey_Random;
 
+    m_context->prefs->GetPlaylistShuffle(&m_shuffle);
+    m_context->prefs->GetPlaylistRepeat((int32*)&m_repeatMode);
+
     srand( (unsigned)time( NULL ) );
 
     Registrar registrar;
@@ -301,6 +304,9 @@ PlaylistManager::~PlaylistManager()
         delete m_portablePlayers[index]->GetRef();
         delete m_portablePlayers[index];
     }
+
+    m_context->prefs->SetPlaylistShuffle(m_shuffle);
+    m_context->prefs->SetPlaylistRepeat(m_repeatMode);
 }
 
 
