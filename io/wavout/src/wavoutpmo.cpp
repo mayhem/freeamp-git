@@ -24,7 +24,9 @@
 ____________________________________________________________________________*/
 
 /* system headers */
+#ifdef WIN32
 #include <windows.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
@@ -37,6 +39,7 @@ ____________________________________________________________________________*/
 #include "facontext.h"
 #include "log.h"
 #include "debug.h"
+#include "wav.h"
 
 #define DB Debug_v("%s:%d", __FILE__, __LINE__);
 
@@ -52,8 +55,8 @@ WavOutPMO::
 WavOutPMO(FAContext *context):
      PhysicalMediaOutput(context)
 {
-	m_pBufferThread       = NULL;
-	m_iTotalBytesWritten  = 0;
+    m_pBufferThread       = NULL;
+    m_iTotalBytesWritten  = 0;
     m_iLastTime           = -1000;
 
     if (!m_pBufferThread)
@@ -64,7 +67,7 @@ WavOutPMO(FAContext *context):
     }
 
     m_initialized = false;
-	m_Writer = new WaveWriter;
+    m_Writer = new WaveWriter;
 }
 
 WavOutPMO::
@@ -100,91 +103,91 @@ Error
 WavOutPMO::
 Init(OutputInfo* info)
 {
-    unsigned int len;
+   unsigned int len;
     
-	m_samples_per_second  = info->samples_per_second;
-	m_data_size           = info->max_buffer_size;
-	m_iBytesPerSample = info->number_of_channels * (info->bits_per_sample >> 3);
+   m_samples_per_second  = info->samples_per_second;
+   m_data_size           = info->max_buffer_size;
+   m_iBytesPerSample = info->number_of_channels * (info->bits_per_sample >> 3);
 
-	WAVEFORMATEX format;
+   WAVEFORMATEX format;
 
-	format.wBitsPerSample   = 16;
-	format.wFormatTag       = WAVE_FORMAT_PCM;
-	format.nChannels        = info->number_of_channels;
-	format.nSamplesPerSec   = m_samples_per_second;
-	format.nAvgBytesPerSec  = info->number_of_channels *
+   format.wBitsPerSample   = 16;
+   format.wFormatTag       = WAVE_FORMAT_PCM;
+   format.nChannels        = info->number_of_channels;
+   format.nSamplesPerSec   = m_samples_per_second;
+   format.nAvgBytesPerSec  = info->number_of_channels *
                               info->samples_per_second * 2;
-	format.nBlockAlign      = 4;
-	format.cbSize           = 0;
+   format.nBlockAlign      = 4;
+   format.cbSize           = 0;
 
-	char path[MAX_PATH];
-	char base[_MAX_PATH];
-	char url[_MAX_DIR];
-    char *pPtr;
+   char path[MAX_PATH];
+   char base[MAX_PATH];
+   char url[MAX_PATH];
+   char *pPtr;
 
-	// using the current file, split it apart, and rebuilt
-	// it, appending an ! to the filename, and changing the extention
-	// to wav
-	strcpy(url, m_pPmi->Url());
-    pPtr = strrchr(url, DIR_MARKER);
-    if (pPtr)
-    {
-       strcpy(path, pPtr+1);
-       pPtr = strrchr(path, '.');
-       if (pPtr)
-          *pPtr = 0;
-       strcat(path, ".wav"); 
-    }
-    else
-       strcpy(path, "unknown.wav");
+   // using the current file, split it apart, and rebuilt
+   // it, appending an ! to the filename, and changing the extention
+   // to wav
+   strcpy(url, m_pPmi->Url());
+   pPtr = strrchr(url, DIR_MARKER);
+   if (pPtr)
+   {
+      strcpy(path, pPtr+1);
+      pPtr = strrchr(path, '.');
+      if (pPtr)
+         *pPtr = 0;
+      strcat(path, ".wav"); 
+   }
+   else
+      strcpy(path, "unknown.wav");
 
-    len = _MAX_PATH;
-    m_pContext->prefs->GetWAVOutDirectory(base, &len);
-    strcat(base, DIR_MARKER_STR);
-    strcat(base, path);
+   len = _MAX_PATH;
+   m_pContext->prefs->GetWAVOutDirectory(base, &len);
+   strcat(base, DIR_MARKER_STR);
+   strcat(base, path);
 
-	m_Writer->Create(base, &format);
+   m_Writer->Create(base, &format);
 
-    m_initialized = true;
+   m_initialized = true;
 
-	return kError_NoErr;
+   return kError_NoErr;
 }
 
 void 
 WavOutPMO::
 Pause()
 {
-	PhysicalMediaOutput::Pause();
+   PhysicalMediaOutput::Pause();
 }
 
 void
 WavOutPMO::
 Resume()
 {
-	PhysicalMediaOutput::Resume();
+   PhysicalMediaOutput::Resume();
 }
 
 Error
 WavOutPMO::
 Reset(bool user_stop)
 {
-	m_Writer->Close();
-	return kError_NoErr;
+   m_Writer->Close();
+   return kError_NoErr;
 }
 
 void 
 WavOutPMO::
 Clear()
 {
-	m_Writer->Close();
-    PhysicalMediaOutput::Clear();
+   m_Writer->Close();
+   PhysicalMediaOutput::Clear();
 }
 
 void
 WavOutPMO::
 Quit()
 {
-	m_Writer->Close();
+   m_Writer->Close();
 }
 
 void
@@ -196,7 +199,7 @@ HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
   int                 iTotalTime = 0;
 
   if (m_samples_per_second <= 0)
-    return;
+     return;
 
   iTotalTime  = (m_iTotalBytesWritten) / 
                 (m_iBytesPerSample * m_samples_per_second);
@@ -206,10 +209,10 @@ HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
   seconds     = iTotalTime - hours * 3600 - minutes * 60;
 
   if (minutes < 0 || minutes > 59 || seconds < 0 || seconds > 59)
-    return;
+     return;
 
   if (iTotalTime < m_iLastTime + 10)
-    return;
+     return;
 
   pmtpi = new MediaTimeInfoEvent(hours, minutes, seconds, 0,
                                 (float)iTotalTime, 0);
@@ -264,7 +267,7 @@ WorkerThread(void)
                   delete pEvent;
                   break;
               }
-		  }
+        }
           delete pEvent;
 
           continue;
@@ -274,9 +277,9 @@ WorkerThread(void)
       // available, sleep for a little while and try again.
       for(;;)
       {
-		  if (m_bPause || m_bExit)
-			  break;
-		  
+        if (m_bPause || m_bExit)
+           break;
+        
           eErr = ((EventBuffer *)m_pInputBuffer)->BeginRead(pBuffer, m_data_size);
           if (eErr == kError_NoDataAvail)
           {
@@ -291,8 +294,8 @@ WorkerThread(void)
           if (eErr == kError_EventPending)
           {
               pEvent = ((EventBuffer *)m_pInputBuffer)->GetEvent();
-			  if (pEvent == NULL)
-				  continue;
+           if (pEvent == NULL)
+              continue;
 
               if (pEvent->Type() == PMO_Init)
                   Init(((PMOInitEvent *)pEvent)->GetInfo());
@@ -305,10 +308,10 @@ WorkerThread(void)
     
               if (pEvent->Type() == PMO_Quit) 
               {
-				  Quit();
+              Quit();
                   delete pEvent;
                   m_pTarget->AcceptEvent(new Event(INFO_DoneOutputting));
-				  
+              
                   return;
               }
  
@@ -326,8 +329,8 @@ WorkerThread(void)
           }
           break;
       }
-	  if (m_bPause || m_bExit)
-		 continue;
+     if (m_bPause || m_bExit)
+       continue;
 
       if (m_Writer->Write((char *)pBuffer, m_data_size) == 0)
       {
@@ -338,7 +341,7 @@ WorkerThread(void)
       m_iTotalBytesWritten += m_data_size;
       m_pInputBuffer->EndRead(m_data_size);
       
-	  m_pLmc->Wake();
+     m_pLmc->Wake();
       UpdateBufferStatus();
   }
 }

@@ -26,7 +26,9 @@ ____________________________________________________________________________*/
 #define INCLUDED_WAVOUTPMO_H_
 
 /* project headers */
+#ifdef WIN32
 #include <windows.h>
+#endif
 
 #include "config.h"
 #include "pmo.h"

@@ -25,6 +25,10 @@ ____________________________________________________________________________*/
 #ifndef INCLUDED_WAV_H_
 #define INCLUDED_WAV_H_
 
+#ifndef WIN32
+typedef unsigned int DWORD;
+#endif
+
 struct WaveHeader
 {
 	DWORD MainChunkID;			// it will be 'RIFF'
@@ -42,6 +46,20 @@ struct WaveHeader
 	DWORD DataLength;
 };
 
+#ifndef WIN32
+#define WAVE_FORMAT_PCM 1
+struct WAVEFORMATEX
+{
+   DWORD              cbSize;
+	unsigned short     wFormatTag;
+	unsigned short     nChannels;
+	DWORD              nSamplesPerSec;
+	DWORD              nAvgBytesPerSec;
+	unsigned short     nBlockAlign;
+	unsigned short     wBitsPerSample;
+};
+#endif
+
 class WaveWriter
 {
 public:
@@ -54,9 +72,8 @@ public:
 	DWORD Write(const char *data, DWORD data_size);
 
 private:
-	MMIOINFO	m_mmioinfoWrite;
-	MMIOINFO	m_mmioinfo;
-	HMMIO		m_hmmio;
+
+   DWORD StuffFourChars(char one, char two, char three, char four); 
 
 	FILE		*m_FP;
 	struct WaveHeader	m_WH;
