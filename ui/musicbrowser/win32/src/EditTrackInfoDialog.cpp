@@ -362,7 +362,7 @@ void EditTrackInfoDialog::Help()
 
     m_context->prefs->GetInstallDirectory(dir, &len);
     helpFile = dir;
-    helpFile += "\\freeamp.hlp";    
+    helpFile += "\\"HELP_FILE;    
 
     WinHelp(m_hwnd, helpFile.c_str(), HELP_CONTEXT, Edit_Info);
 }     

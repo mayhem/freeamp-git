@@ -1893,7 +1893,7 @@ void DownloadUI::ShowHelp(uint32 topic)
 
     m_context->prefs->GetInstallDirectory(dir, &len);
     oHelpFile = string(dir);
-    oHelpFile += string("\\freeamp.hlp");    
+    oHelpFile += string("\\"HELP_FILE);    
 
     WinHelp(m_hwnd, oHelpFile.c_str(), HELP_CONTEXT, topic);
 }        
