@@ -3,7 +3,7 @@
 # -------------------------------------------------------------------------
 %define name    freeamp
 %define cname   FreeAmp
-%define version 2.1.rc1
+%define version 2.1.rc2
 %define release 1
 %define prefix  /usr  
 
@@ -57,13 +57,24 @@ Requires:    alsa >= 0.5.0
 # Extras Package defines
 # -------------------------------------------------------------------------
 %package     extras
-Summary:     Freeamp - All the remaining plugins (mpg123 ui, cmdline ui, ncurses ui, irman, lcd, corbaui)
+Summary:     Freeamp - All the remaining plugins (mpg123 ui, cmdline ui, ncurses ui, irman, lcd)
 Group:       Applications/Multimedia
 Requires:    %{name} = %{version}
 
 %description extras
-All the remaining plugins (mpg123 ui, cmdline ui, ncurses ui, irman, lcd, corbaui)
+All the remaining plugins (mpg123 ui, cmdline ui, ncurses ui, irman, lcd)
 
+# -------------------------------------------------------------------------
+# Corba Package defines
+# -------------------------------------------------------------------------
+%package     corba
+Summary:     Freeamp - Corba remote control interface
+Group:       Applications/Multimedia
+Requires:    %{name} = %{version}
+Requires:    ORBit >= 0.5.0
+
+%description extras
+Corba remote control interface plugin
 
 # -------------------------------------------------------------------------
 # Prep and build stuff 
@@ -138,6 +149,9 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/lib/%{name}/plugins/freeampcmd.ui
 %{prefix}/lib/%{name}/plugins/mpg123.ui
 %{prefix}/lib/%{name}/plugins/ncurses.ui
+
+%files corba 
+%defattr(-,root,root)
 %{prefix}/lib/%{name}/plugins/corba.ui
 
 %changelog
