@@ -61,7 +61,7 @@ FreeAmpApp::RefsReceived( BMessage* message )
         {
             BPath path;
             entry.GetPath( &path );
-            m_context->player->HandleSingleArg( path.Path() );
+            m_context->player->HandleSingleArg( (char*)path.Path() );
         }
         i++;
     }
