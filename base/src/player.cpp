@@ -1642,6 +1642,14 @@ SendEventToUI(Event *pEvent)
    delete pEvent;
 }
 
+void
+Player::
+SendEventToCatalog(Event *pEvent)
+{
+    if (m_musicCatalog)
+        m_musicCatalog->AcceptEvent(pEvent);
+}
+
 #define _EQUALIZER_ENABLE_
 #ifdef  _EQUALIZER_ENABLE_
 void 
@@ -1782,6 +1790,11 @@ ServiceEvent(Event * pC)
             HandleMediaTimeInfo(pC);
             break;
 
+        case INFO_PlaylistItemUpdated:
+            SendEventToCatalog(pC);
+            SendEventToUI(pC);
+            break;
+
         case INFO_UserMessage:
         case INFO_StatusMessage:
         case INFO_BrowserMessage:
@@ -1791,7 +1804,6 @@ ServiceEvent(Event * pC)
         case INFO_PlaylistShuffle:
         case INFO_PlaylistRepeat:
         case INFO_PlaylistUpdated:
-        case INFO_PlaylistItemUpdated:
         case INFO_PlaylistItemAdded:
         case INFO_PlaylistItemRemoved:
         case INFO_PlaylistItemMoved:

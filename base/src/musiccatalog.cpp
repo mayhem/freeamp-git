@@ -61,6 +61,7 @@ MusicCatalog::MusicCatalog(FAContext *context, char *databasepath)
     m_context = context;
     m_plm = context->plm;
     m_mutex = new Mutex();
+    m_acceptItemChanged = false;
     m_artistList = new vector<ArtistList *>;
     m_unsorted = new vector<PlaylistItem *>;
     m_playlists = new vector<string>;
@@ -529,12 +530,21 @@ void MusicCatalog::DoSearchPaths(vector<string> &pathList)
 {
     vector<string>::iterator i;
     
+    m_acceptItemChanged = true;
+    m_itemWaitCount = 0;
+
     for(i = pathList.begin(); i != pathList.end(); i++)
         DoSearchMusic((char *)(*i).c_str());
+
+    while (m_itemWaitCount > 0)
+        usleep(5);
+    m_acceptItemChanged = false;
 }
 
 void MusicCatalog::DoSearchMusic(char *path)
 {
+    vector<PlaylistItem *> *metalist = new vector<PlaylistItem *>;
+
     WIN32_FIND_DATA find;
     HANDLE handle;
     string search = path;
@@ -609,21 +619,21 @@ void MusicCatalog::DoSearchMusic(char *path)
                     }
                        
                     PlaylistItem *plist = new PlaylistItem(tempurl);
-                    m_plm->RetrieveMetaData(plist);
+                    metalist->push_back(plist);
+                    m_itemWaitCount++;
 
-                    while (plist->GetState() != kPlaylistItemState_Normal)
-                       usleep(5);
-
-                    WriteMetaDataToDatabase(tempurl, plist->GetMetaData());
- 
                     delete [] tempurl;
-                    delete plist;
                 }
                 delete fileExt;
             }
         }
         while (FindNextFile(handle, &find) && !m_exit);
         FindClose(handle);
+
+        if (metalist->size() > 0)
+            m_plm->RetrieveMetaData(metalist);
+        else 
+            delete metalist;
     }
 }
 
@@ -764,6 +774,16 @@ MetaData *MusicCatalog::ReadMetaDataFromDatabase(const char *url)
 int32 MusicCatalog::AcceptEvent(Event *e)
 {
     switch (e->Type()) {
+        case INFO_PlaylistItemUpdated: {
+            if (m_acceptItemChanged) {
+                PlaylistItemUpdatedEvent *piu = (PlaylistItemUpdatedEvent *)e;
+                WriteMetaDataToDatabase(piu->Item()->URL().c_str(), 
+                                        (MetaData)piu->Item()->GetMetaData());
+
+                delete piu->Item();
+                m_itemWaitCount--;
+            }
+            break; }
         case INFO_SearchMusicDone: {
             m_database->Sync();
             string info = "Pruning the Music Catalog Database...";
@@ -777,9 +797,9 @@ int32 MusicCatalog::AcceptEvent(Event *e)
             Sort();
             m_context->target->AcceptEvent(new Event(INFO_SearchMusicDone));
             break;
+
+            delete e;
         } 
     }
-    delete e;
-
     return 0; 
 }

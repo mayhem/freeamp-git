@@ -132,7 +132,8 @@ class Player : public EventQueue, Properties, PropertyWatcher
     void GetMediaTitle(Event *pEvent);
     void ToggleUI(Event *pEvent);
     void HandleQueryState();
-    
+    void SendEventToCatalog(Event *pEvent);   
+ 
     #define _EQUALIZER_ENABLE_
     #ifdef  _EQUALIZER_ENABLE_
     void Player::SetEQData(Event *pEvent);
