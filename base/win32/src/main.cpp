@@ -72,7 +72,6 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
     registrar->InitializeRegistry(ui, prefs);
 
     delete registrar;
-    delete prefs;
 
     // create the player
 	Player *player = Player::GetPlayer();
@@ -91,6 +90,9 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
     // __argc and __argv are magical variables provided for us
     // in MS's STDLIB.H file. 
     player->SetArgs(__argc, __argv);
+
+    // player needs prefs for InstallDir information
+    player->SetPreferences(prefs);
 
     // kick things off... player is now in charge!
     player->Run();

@@ -33,6 +33,7 @@ ____________________________________________________________________________*/
 #include "semaphore.h"
 #include "eventdata.h"
 #include "registrar.h"
+#include "preferences.h"
 
 
 
@@ -181,6 +182,11 @@ Player::~Player() {
         m_uiRegistry = NULL;
     }
 
+    if (m_prefs) {
+	delete m_prefs;
+	m_prefs = NULL;
+    }
+
     if(m_argUI)
     {
         delete [] m_argUI;
@@ -224,12 +230,18 @@ void Player::SetArgs(int32 argc, char** argv){
                         arg[2] == 'I')
                     {
                         i++;
+			if (i >= m_argc) {
+			    cerr << "FreeAmp: -ui switch requires an argument" << endl;
+			    cerr << "FreeAmp will exit." << endl;
+			    exit(1);
+			}
+			arg = m_argv[i];
 			if (m_argUI) delete m_argUI;
                         m_argUI = new char[strlen(arg) + 1];
                         strcpy(m_argUI, arg);
                     }
-		            break;
-	            } 
+		    break;
+		} 
             }
         }
     }
@@ -246,12 +258,16 @@ int32 Player::CompareNames(const char *p1, const char *p2) {
     while ((p1[i] == p2[j]) && p1[i] && p2[j]) {
 	i++; j++;
     }
-    if ((p1[i]=='-') && (p2[j]=='.')) {
+    if ((p1[i]=='-') && ((p2[j]=='.') || (p2[j]=='\0'))) {
 	return 0;
     } else {
 	return 1;
     }
 #endif
+}
+
+void Player::SetPreferences(Preferences * pP) {
+    m_prefs = pP;
 }
 
 void Player::Run(){
@@ -288,8 +304,8 @@ void Player::Run(){
         RegistryItem* item = NULL;
 		UserInterface *ui = NULL;
         int32 i = 0;
-	    int32 uisActivated = 0;
-
+	int32 uisActivated = 0;
+	
         while(item = m_uiRegistry->GetItem(i++))
         {
             if(!CompareNames(item->Name(),name))
@@ -301,16 +317,28 @@ void Player::Run(){
                 m_ui->SetArgs(m_argc, m_argv);
 		m_ui->Init();
                 RegisterActiveUI(m_ui);
-		        uisActivated++;
+		uisActivated++;
                 break;
             }
         }
-
-	    if (!uisActivated) {
-	        cerr << "No UI's to initialize!!!" << endl;
-	        Event *e = new Event(CMD_QuitPlayer);
-	        AcceptEvent(e);
-	    }
+	
+	if (!uisActivated) {
+#ifdef WIN32
+	    char foo[1024];
+	    char bar[MAX_PATH];
+	    sprintf(foo,"No UI plugin matched 'plugins\\%s' or 'plugins\\%s.ui' in '%s'.  FreeAmp will quit.",name,name,m_prefs->GetInstallDirectory(bar,MAX_PATH-1));
+	    MessageBox(NULL,foo,"FreeAmp Error",MB_OK);
+#else
+	    const char *thePath = getenv(FREEAMP_PATH_ENV);
+	    if (thePath == NULL) thePath = Preferences::GetLibDirs();
+	    cerr << "No UI plugin in '" << thePath << "' matched 'plugins/" << name << "' or 'plugins/" << name << ".ui'" << endl;
+	    cerr << "FreeAmp will quit." << endl;
+#endif
+	    Event *e = new Event(CMD_QuitPlayer);
+	    AcceptEvent(e);
+	    e = new Event(INFO_ReadyToDieUI);
+	    AcceptEvent(e);
+	}
     }
 
     delete [] name;
@@ -677,8 +705,7 @@ int32 Player::ServiceEvent(Event *pC) {
 		    return 0;
 		
 		m_quitWaitingFor--;
-		
-		if (m_quitWaitingFor) 
+		if (m_quitWaitingFor > 0) 
 		    return 0;
 		
 		GetUIManipLock();

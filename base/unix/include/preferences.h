@@ -54,13 +54,15 @@ class Preferences {
     Error GetNextLibDir(HANDLE hLibDirFind,char *path, uint32 *len);
     Error GetLibDirClose(HANDLE hLibDirFind);
 
+    static const char *GetLibDirs();
+
  protected:
     Error GetPrefString(const char* pref, char* buf, uint32* len);
     Error SetPrefString(const char* pref, char* buf);
 
  private:
 //     HKEY   m_prefsKey;
-	
+    static char *m_libDirs;
 };
 
 #endif /* _PREFERENCES_H */

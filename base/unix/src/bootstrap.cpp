@@ -102,6 +102,7 @@ int main(int argc, char **argv) {
 
 
     pP->SetArgs(argc,argv);
+    pP->SetPreferences(prefs);
     pP->SetTerminationSemaphore(termSemaphore);
     pP->Run();
 

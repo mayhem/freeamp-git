@@ -25,6 +25,9 @@
 #include <limits.h>
 
 
+#define FREEAMP_PATH_ENV "FREEAMP_PATH"
+
+
 #define HAVE_UNISTD_H 0
 #define HAVE_IO_H 0
 

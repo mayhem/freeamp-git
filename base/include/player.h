@@ -37,7 +37,7 @@ ____________________________________________________________________________*/
 #include "pmiregistry.h"
 #include "pmoregistry.h"
 #include "uiregistry.h"
-
+#include "preferences.h"
 
 #include "lmc.h"
 
@@ -62,6 +62,7 @@ class Player : public EventQueue {
 
     void Run();
     void SetArgs(int32 argc, char** argv);
+    void SetPreferences(Preferences *);
     void SetTerminationSemaphore(Semaphore *);
     void testQueue();
     static void EventServiceThreadFunc(void *);
@@ -80,6 +81,7 @@ class Player : public EventQueue {
 
 
  private:
+    Preferences*            m_prefs;
     Semaphore*              m_pTermSem;
     static Player*          m_thePlayer;
     Semaphore*              m_eventSem;

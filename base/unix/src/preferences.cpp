@@ -74,11 +74,7 @@ HANDLE Preferences::GetFirstLibDir(char *path, uint32 *len) {
 //	cout << "Using env: " << pEnv << endl;
 	pPath = strdup(pEnv);
     } else {
-	pPath = new char[1024];
-	strcpy(pPath,".:~/.freeamp:");
-	strcat(pPath,UNIX_LIBDIR);
-	strcat(pPath,"/freeamp");
-//	cout << "Using default: " << pPath << endl;
+	pPath = strdup(GetLibDirs());
     }
     pEnv = pPath;
     LibDirFindHandle *pldfh = new LibDirFindHandle();
@@ -112,6 +108,17 @@ HANDLE Preferences::GetFirstLibDir(char *path, uint32 *len) {
     return (HANDLE)pldfh;
 }
 
+char *Preferences::m_libDirs = NULL;
+
+const char *Preferences::GetLibDirs() {
+    if (!m_libDirs) {
+	m_libDirs = new char[1024];
+	strcpy(m_libDirs,".:~/.freeamp:");
+	strcat(m_libDirs,UNIX_LIBDIR);
+	strcat(m_libDirs,"/freeamp");
+    }
+    return m_libDirs;
+}
 
 Error Preferences::GetNextLibDir(HANDLE hLibDirFind,char *path, uint32 *len) {
     if (hLibDirFind) {
