@@ -115,10 +115,6 @@ SOURCE=..\..\src\registrar.cpp
 
 SOURCE=..\..\src\thread.cpp
 # End Source File
-# Begin Source File
-
-SOURCE=..\src\utility.cpp
-# End Source File
 # End Group
 # Begin Group "system"
 
@@ -153,6 +149,10 @@ InputPath=..\..\..\config\config.win32
 # Begin Source File
 
 SOURCE=..\src\mutex.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\preferences.cpp
 # End Source File
 # Begin Source File
 
