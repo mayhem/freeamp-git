@@ -779,10 +779,17 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
 #else
        LaunchBrowser((char *)oUrl.c_str());
 #endif
+       return kError_NoErr;
    }
    if (oControlName == string("Help") && eMesg == CM_Pressed)
    {
        ShowHelp();
+       return kError_NoErr;
+   }
+   if (oControlName == string("Credits") && eMesg == CM_Pressed)
+   {
+       ShowThemeCredits();
+       return kError_NoErr;
    }
   
    return kError_NoErr;
@@ -952,6 +959,11 @@ void FreeAmpTheme::HandleKeystroke(unsigned char cKey)
      case 'o':
      case 'O':
      	ShowOptions();
+        break;
+
+     case 'c':
+     case 'C':
+        ShowThemeCredits();
         break;
  
      case 't':
@@ -1198,3 +1210,4 @@ void FreeAmpTheme::ShowHelp(void)
     }
 #endif
 }
+

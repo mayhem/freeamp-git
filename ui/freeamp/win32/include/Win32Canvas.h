@@ -60,6 +60,7 @@ class Win32Canvas : public Canvas
 
 	 Win32Bitmap *m_pBufferBitmap;
      Win32Window *m_pParent;
+	 HPALETTE     m_hPal;
 };
 
 #endif

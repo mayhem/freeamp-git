@@ -83,6 +83,8 @@ class Theme : public Parse
       virtual Error BeginElement(string &oElement, AttrMap &oAttrMap);  
       virtual Error PCData(string &oData);
       virtual Error EndElement(string &oElement);
+      void    ShowThemeCredits(void);
+	  
       ThemeManager *m_pThemeMan;
       string        m_oThemePath;
       Window       *m_pWindow;
@@ -109,6 +111,8 @@ class Theme : public Parse
       string            m_oReloadWindow, m_oReloadFile;
       ControlTypeEnum   m_eCurrentControl;
       string            m_oDefaultFont;
+	  string            m_oThemeName, m_oThemeAuthor;
+	  string            m_oAuthorEMail, m_oAuthorWebPage;
 };
 
 #endif

@@ -54,6 +54,8 @@ class ThemeManager
 
     protected:
     
+      bool          GetDescriptiveName(string &oThemeFile, string &oThemeName);
+	
     private:
 
 	  string     m_oCurrentTheme, m_oDevelTheme;

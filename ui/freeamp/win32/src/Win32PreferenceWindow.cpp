@@ -269,7 +269,6 @@ bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent, Preferences* pre
     GetPrefsValues(prefs, &m_originalValues);
 
     m_proposedValues = m_currentValues = m_originalValues;
-    
     result = (PropertySheet(&psh) > 0);
 
     delete updateManager;

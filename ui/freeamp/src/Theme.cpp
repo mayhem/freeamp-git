@@ -872,6 +872,26 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
        return kError_NoErr;
     }
 
+    if (oElement == string("ThemeInfo"))
+    {
+       if (m_pCurrentControl != NULL)
+       {
+          m_oLastError = string("The <ThemeInfo> tag must be top level tag");
+          return kError_InvalidParam;
+       }
+
+	   if (oAttrMap.find("Name") != oAttrMap.end())
+           m_oThemeName = oAttrMap["Name"];
+	   if (oAttrMap.find("Author") != oAttrMap.end())
+           m_oThemeAuthor = oAttrMap["Author"];
+	   if (oAttrMap.find("EMail") != oAttrMap.end())
+           m_oAuthorEMail = oAttrMap["EMail"];
+	   if (oAttrMap.find("WebPage") != oAttrMap.end())
+           m_oAuthorWebPage = oAttrMap["WebPage"];
+       
+       return kError_NoErr;
+    }
+
     m_oLastError = string("Invalid tag: ") + oElement;
 
     return kError_InvalidParam;
@@ -883,6 +903,7 @@ Error Theme::EndElement(string &oElement)
         oElement == string("BackgroundBitmap") ||
         oElement == string("Font") ||
         oElement == string("ChangeWindow") ||
+        oElement == string("ThemeInfo") ||
         oElement == string("MaskBitmap"))
        return kError_NoErr;
 
@@ -1047,4 +1068,27 @@ void Theme::SetDefaultFont(const string &oFont)
 
 void Theme::PostWindowCreate(void)
 {
+}
+
+void Theme::ShowThemeCredits(void)
+{
+    string oText;
+    
+    if (m_oThemeName.size() > 0)
+    {
+        oText = m_oThemeName;
+       
+        if (m_oThemeAuthor.size() > 0)
+           oText += string(" written by ") + m_oThemeAuthor;     
+
+        if (m_oAuthorEMail.size() > 0)
+           oText += string(", ") + m_oAuthorEMail;     
+
+        if (m_oAuthorWebPage.size() > 0)
+           oText += string(" (") + m_oAuthorWebPage + string(")");     
+    }   
+    else
+       oText = "<No theme credit info available>";
+       
+    m_pWindow->ControlStringValue("Title", true, oText);
 }

@@ -25,17 +25,18 @@ with your comments, or better yet head over to Bugzilla and enter a
 bug report <http://www.freeamp.org/bugzilla>.
 
 
-UPDATED FOR BETA 4 (November X, 1999)
+UPDATED FOR BETA 4 (November 19, 1999)
 
-New features for beta 3:
+New features for beta 4:
 
 - There is now support for an optional TimeRemaining TextControl. This allows
   a theme designer to give the TimeRemaining TextControl a different style/
   color than the normal Time Text Control.
 - There is also support for the StreamInfo Text Control which shows
   the bitrate, sample rate and Stereo/Mono about the current MP3.
+- There is a new ThemeInfo tag to give the theme designers credit.
 
-NEW FEATURES BEFORE RELEASE
+NEW FEATURES BEFORE RELEASE (December 10th, 1999)
 
 - TrueType font support in Linux
 
@@ -45,6 +46,8 @@ GETTING STARTED
 To get started working on FreeAmp themes, I recommend that you 
 grab FreeAmp.fat from the themes directory in your FreeAmp
 installation and decompile it using the supplied program MakeTheme:
+(If MakeTheme is not in the distribution for some reason, you can
+get it from the FreeAmp website)
 
    MakeTheme -d freeamp.fat
 
@@ -93,7 +96,8 @@ do:
 
     tar -czf mytheme.fat theme.xml *.bmp
     
-It will give you the same result.
+It will give you the same result. NOTE: You must use _gzip_ not
+the windows based pkzip or winzip.
 
 
 BITMAPS
@@ -467,6 +471,23 @@ clicks on this button. This layout must be defined in the current
 theme.
    
 
+ThemeInfo:
+----------
+
+The ThemeInfo tag allows the theme designers to give the theme a
+name and to give themselves some credit. Pressing 'C' in the theme
+ui or clicking on the Credits button brings up the credits in the
+title TextControl:
+
+   <ThemeInfo Name="FreeAmp Theme" Author="Bill Bull & Robert Kaye" 
+              EMail="info@freeamp.org" WebPage="http://www.freeamp.org"/>
+
+The Name attribute is the name of the theme, and the Author attribute
+is the name of the Author(s). The EMail and WebPage attributes are
+for authors to let the theme users know where to contact them and
+which web page may have more info about the author/theme. Only the
+Name attribute is required.
+
 
 QUICK REFERENCE
 
@@ -638,7 +659,18 @@ QUICK REFERENCE
    Bold -- Show text in boldface (Yes, No) [optional]
    Italic -- Show text in italics (Yes, No) [optional]
    Underline -- Show text underlined (Yes, No) [optional]
+
+<ThemeInfo>
+
+   -- specifies the credits for this theme
    
+   Attributes:
+   
+   Name -- The name of the theme
+   Author -- The name(s) of the theme author(s) [optional]
+   EMail -- The email address of the theme author(s) [optional]
+   WebPage -- The Web page associated with the author(s)/theme. [optional]
+      
 
 Troubleshooting:
 
@@ -679,6 +711,8 @@ Logo          -- FreeAmp logo, clicking it will open a web browser to
                  the FreeAmp site.
 Minimize      -- Minimizes FreeAmp
 ReloadTheme   -- Reload the current theme
+Credits       -- Shows the theme credits in the title field
+
 
 TextControls:
 
@@ -694,101 +728,103 @@ SliderControls:
         
 Volume        -- adjusts the volume
 Seek          -- seek in a track
-  
+
    
 APPENDIX B
 
 This is the current theme.xml file:
 
-
 <Bitmap Name="Background" File="background.bmp" TransColor="#FF0000"/>
 <Bitmap Name="Buttons" File="buttons.bmp" TransColor="#FF0000"/>
 <Font Name="San Serif" Face="Arial,Helvetica"/>
-<Font Name="Serif" Face="Arial,Helveticat"/>
+<Font Name="Serif" Face="Arial,Helvetica"/>
+
+<ThemeInfo Name="FreeAmp Theme" Author="Bill Bull & Robert Kaye" 
+           EMail="info@freeamp.org" WebPage="http://www.freeamp.org"/>
 
 <!-- This is a comment! -->
 <Window Name="MainWindow">
-    <BackgroundBitmap Name="Background" Rect="0, 0, 327, 191"/>
+    <BackgroundBitmap Name="Background" Rect="0, 0, 327, 161"/>
     <Controls>
         <MultiStateControl Name="PlayPause" NumStates="2">
-            <Info Desc="Play the current track||Pause the current track" Tip="Play||Pause"/>
+        	<Info Desc="Play the current track||Pause the current track" Tip="Play||Pause"/>
             <Position Pos="228,124"/>
             <ControlBitmap Rect="0,96,119,159" Name="Buttons"/>
         </MultiStateControl>
         <ButtonControl Name="Logo" URL="http://www.freeamp.org">
-            <Info Desc="Go to the FreeAmp web site" Tip="FreeAmp"/>
+        	<Info Desc="Go to the FreeAmp web site" Tip="FreeAmp"/>
             <Position Pos="22,128"/>
             <ControlBitmap Rect="0,236,267,255" Name="Buttons"/>
         </ButtonControl>
         <ButtonControl Name="Stop">
-            <Info Desc="Stop the current track" Tip="Stop"/>
+        	<Info Desc="Stop the current track" Tip="Stop"/>
             <Position Pos="258,124"/>
             <ControlBitmap Rect="0,64,119,95" Name="Buttons"/>
         </ButtonControl>
         <ButtonControl Name="Prev">
-            <Info Desc="Move to previous track" Tip="Prev"/>
+        	<Info Desc="Move to previous track" Tip="Prev"/>
             <Position Pos="198,124"/>
             <ControlBitmap Rect="0,0,119,31" Name="Buttons"/>
         </ButtonControl>
         <ButtonControl Name="Next">
-            <Info Desc="Move to next track" Tip="Next"/>
+        	<Info Desc="Move to next track" Tip="Next"/>
             <Position Pos="287,124"/>
             <ControlBitmap Rect="0,32,119,63" Name="Buttons"/>
-        </ButtonControl>    
+        </ButtonControl>	
         <ButtonControl Name="Quit">
-            <Info Desc="Quit FreeAmp" Tip="Quit"/>
+        	<Info Desc="Quit FreeAmp" Tip="Quit"/>
             <Position Rect="303,0,315,15"/>
             <ControlBitmap Rect="212,257,263,272" Name="Buttons"/>
         </ButtonControl>
         <ButtonControl Name="Minimize">
-            <Info Desc="Minimize FreeAmp" Tip="Minimize"/>
+        	<Info Desc="Minimize FreeAmp" Tip="Minimize"/>
             <Position Rect="289,0,301,15"/>
             <ControlBitmap Rect="159,257,210,272" Name="Buttons"/>
         </ButtonControl>
         <ButtonControl Name="Help">
-            <Info Desc="View FreeAmp help" Tip="Help"/>
+        	<Info Desc="View FreeAmp help" Tip="Help"/>
             <Position Rect="275,0,287,15"/>
             <ControlBitmap Rect="106,257,157,272" Name="Buttons"/>
         </ButtonControl>
         <ButtonControl Name="ReloadTheme">
-            <Info Desc="Reload current theme" Tip="Reload theme"/>
+        	<Info Desc="Reload current theme" Tip="Reload theme"/>
             <Position Rect="12,0,24,15"/>
             <ControlBitmap Rect="53,257,104,272" Name="Buttons"/>
         </ButtonControl>
         <!--ButtonControl Name="WindowShade"!>
-            <!--Info Desc="Change to windowshade" Tip="Windowshade"/!>
+        	<!--Info Desc="Change to windowshade" Tip="Windowshade"/!>
             <!--Position Rect="269,4,280,13"/!>
             <!--ControlBitmap Rect="0,257,51,272" Name="Buttons"/!>
             <!--ChangeWindow Window="WindowShade"/!>
         <!--/ButtonControl!>
         <ButtonControl Name="MyMusic">
-            <Info Desc="Browse my music collection" Tip="MyMusic"/>
+        	<Info Desc="Browse my music collection" Tip="MyMusic"/>
             <Position Pos="44,102"/>
             <ControlBitmap Rect="0,172,291,186" Name="Buttons"/>
         </ButtonControl>
         <ButtonControl Name="Options">
-            <Info Desc="Open the options window" Tip="Options"/>
+        	<Info Desc="Open the options window" Tip="Options"/>
             <Position Pos="119,102"/>
             <ControlBitmap Rect="0,188,263,202" Name="Buttons"/>
         </ButtonControl>
         <ButtonControl Name="Download">
-            <Info Desc="Open the download manager" Tip="Download"/>
+        	<Info Desc="Open the download manager" Tip="Download"/>
             <Position Pos="187,102"/>
             <ControlBitmap Rect="0,204,303,218" Name="Buttons"/>
         </ButtonControl>
         <ButtonControl Name="Files">
-            <Info Desc="Open files/playlists to play" Tip="Files"/>
+        	<Info Desc="Open files/playlists to play" Tip="Files"/>
             <Position Pos="265,102"/>
             <ControlBitmap Rect="0,220,207,234" Name="Buttons"/>
         </ButtonControl>
         <MultiStateControl Name="Repeat" NumStates="3">
-            <Info Desc="Repeat no tracks||Repeat current track||Repeat all tracks" 
+        	<Info Desc="Repeat no tracks||Repeat current track||Repeat all tracks" 
                   Tip="Repeat none||Repeat current||Repeat all"/>
             <Position Pos="151,126"/>
             <ControlBitmap Rect="123,11,286,85" Name="Buttons"/>
         </MultiStateControl>
         <MultiStateControl Name="Shuffle" NumStates="2">
-            <Info Desc="Play tracks in normal order||Play tracks in random order" Tip="Normal Play||Random Play"/>
+        	<Info Desc="Play tracks in normal order||Play tracks in random order" Tip="Normal Play||Random Play"/>
             <Position Pos="109,126"/>
             <ControlBitmap Rect="123,87,286,136" Name="Buttons"/>
         </MultiStateControl>
@@ -799,28 +835,28 @@ This is the current theme.xml file:
         <TextControl Name="Info">
             <Position Rect="9,53,179,67"/>
             <Style Font="San Serif"/>
-        </TextControl>   
+        </TextControl>	 
         <TextControl Name="StreamInfo">
             <Position Rect="9,40,210,52"/>
             <Style Font="San Serif"/>
         </TextControl>
         <TextControl Name="Time">
-               <Info Desc="Current time/time remaining"/>
+        	   <Info Desc="Current time/time remaining"/>
             <Position Rect="210,41,317,67"/>
             <Style Font="San Serif" Align="Right" Bold="Yes"/>
         </TextControl>
         <TextControl Name="TimeRemaining">
-               <Info Desc="Time remaining/Current Time"/>
+        	   <Info Desc="Time remaining/Current Time"/>
             <Position Rect="210,41,317,67"/>
-            <Style Font="San Serif" Align="Right" Bold="Yes" Color="#FF0000"/>
+            <Style Font="San Serif" Align="Right" Bold="Yes" Color="#666666"/>
         </TextControl>
         <SliderControl Name="Volume">  
-               <Info Desc="Change volume" Tip="Volume"/>
+        	   <Info Desc="Change volume" Tip="Volume"/>
             <Position Rect="37,80,117,88"/>
             <ControlBitmap Rect="136,0,183,8" Name="Buttons"/>
         </SliderControl>
         <SliderControl Name="Seek">
-            <Info Desc="Seek in the current track" Tip="Seek"/>
+        	<Info Desc="Seek in the current track" Tip="Seek"/>
             <Position Rect="151,80,308,88"/>
             <ControlBitmap Rect="136,0,183,8" Name="Buttons"/>
         </SliderControl>
