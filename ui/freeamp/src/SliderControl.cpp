@@ -166,7 +166,7 @@ void SliderControl::Transition(ControlTransitionEnum  eTrans,
 
        case CT_SetValue:
        {
-       	   int iNewPos, iOldPos;	
+           int iNewPos, iOldPos;    
 
            if (m_iValue < 0 || m_iValue > 100)
                return;
@@ -215,24 +215,24 @@ void SliderControl::Transition(ControlTransitionEnum  eTrans,
         m_eLastState == CS_Dragging)
     {    
         if (m_oOrigin.x != -1)
-	    {
-	    	Rect oRect;
-	 
+        {
+            Rect oRect;
+     
             m_oMutex.Release();
-	        m_pParent->GetWindowPosition(oRect);
+            m_pParent->GetWindowPosition(oRect);
             m_oMutex.Acquire();
 
-	        m_oOrigin.x = m_oRect.x1 + m_iCurrentPos + (m_iThumbWidth / 2);
-	        m_oOrigin.x += oRect.x1;
-	        m_oOrigin.y += oRect.y1;
-	        
+            m_oOrigin.x = m_oRect.x1 + m_iCurrentPos + (m_iThumbWidth / 2);
+            m_oOrigin.x += oRect.x1;
+            m_oOrigin.y += oRect.y1;
+            
             m_oMutex.Release();
-	        m_pParent->EndMouseCapture();
-	        m_pParent->HideMouse(false);
+            m_pParent->EndMouseCapture();
+            m_pParent->HideMouse(false);
             m_oMutex.Acquire();
   
-	        m_oOrigin.x = -1;
-	    }    
+            m_oOrigin.x = -1;
+        }    
         m_iValue = (m_iCurrentPos * 100) / m_iRange;
 
         m_oMutex.Release();
@@ -242,7 +242,7 @@ void SliderControl::Transition(ControlTransitionEnum  eTrans,
 
     if (m_eCurrentState == CS_Dragging && 
         m_eLastState != CS_Dragging)
-	   m_bIsDrag = oRect.IsPosInRect(*pPos);
+       m_bIsDrag = oRect.IsPosInRect(*pPos);
 
     m_oMutex.Release();
 
@@ -343,7 +343,7 @@ void SliderControl::HandleDrag(ControlTransitionEnum  eTrans,
         return;
     }
 
-	if (pPos->x < 0)
+    if (pPos->x < 0)
     {
         m_oMutex.Release();
         return;
@@ -362,10 +362,10 @@ void SliderControl::HandleDrag(ControlTransitionEnum  eTrans,
     m_iCurrentPos = iNewPos;
     m_oLastPos = *pPos;
     
-	m_iValue = (m_iCurrentPos * 100) / m_iRange;
+    m_iValue = (m_iCurrentPos * 100) / m_iRange;
     m_oMutex.Release();
 
-	MoveThumb(iOldPos, iNewPos);
+    MoveThumb(iOldPos, iNewPos);
     m_pParent->SendControlMessage(this, CM_SliderUpdate);
 }
 

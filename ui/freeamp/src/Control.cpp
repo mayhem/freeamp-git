@@ -185,7 +185,7 @@ void Control::AcceptTransition(ControlTransitionEnum eTrans, Pos *pPos)
 void Control::SetParent(Window *pParent)
 {
     m_oMutex.Acquire();
-	m_pParent = pParent;
+    m_pParent = pParent;
     m_oMutex.Release();
 }
 

@@ -88,22 +88,33 @@ void Panel::ClearControls(void)
 
 void Panel::GetControlToolTips(vector<pair<Rect, string> > &oList)
 {
-    vector<Control *>::iterator i;
-	Rect                        oRect;
-	string                      oTip;
-	pair<Rect, string>          oTemp;
+   vector<Control *>::iterator i;
+    Rect                        oRect;
+    string                      oTip;
+    pair<Rect, string>          oTemp;
 
-	if (m_bIsHidden)
-	    return;
+    if (m_bIsHidden)
+        return;
 
     for(i = m_oControls.begin(); i != m_oControls.end(); i++)
     {
         (*i)->GetTip(oTip);
         (*i)->GetRect(oRect);
-		oTemp.first = oRect;
-		oTemp.second = oTip;
-		oList.push_back(oTemp);
+        oTemp.first = oRect;
+        oTemp.second = oTip;
+        oList.push_back(oTemp);
     }
+}
+
+void Panel::SetParentWindow(Window *pWin)
+{
+    vector<Control *>::iterator i;
+
+    m_pWindow = pWin;    
+    for(i = m_oControls.begin(); i != m_oControls.end(); i++)
+    {
+        (*i)->SetParent(pWin);
+    }    
 }
 
 void Panel::GetName(string &oName)

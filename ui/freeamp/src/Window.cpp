@@ -167,6 +167,7 @@ Error Window::VulcanMindMeld(Window *pOther)
     m_oPanels.clear();
     for(k = pOther->m_oPanels.begin(); k != pOther->m_oPanels.end(); k++)
     {
+        (*k)->SetParentWindow(this);
         m_oPanels.push_back(*k);
     }    
 
@@ -483,7 +484,7 @@ void Window::HandleMouseMove(Pos &oScreenPos)
     GetWindowPosition(oRect);
     oPos.x = oScreenPos.x - oRect.x1;
     oPos.y = oScreenPos.y - oRect.y1;
-    
+   
     if (m_pCaptureControl)
     {
        m_pCaptureControl->AcceptTransition(CT_MouseMove, &oPos);
