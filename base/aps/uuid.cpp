@@ -128,5 +128,4 @@ void uuid_ascii(uuid_t1 in, char ascii[37])
             (foo.clock_seq >> 8), foo.clock_seq & 0xFF,
             foo.node[0], foo.node[1], foo.node[2],
             foo.node[3], foo.node[4], foo.node[5]);
-    printf("%s\n", ascii);
 }
