@@ -11,6 +11,36 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name unzip
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name zlib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "cdinput"=..\..\..\io\cd\win32\prj\cdinput.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "cdlmc"=..\..\..\lmc\cd\win32\prj\cdlmc.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
 }}}
 
 ###############################################################################
@@ -155,6 +185,9 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name pls
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name winamp
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -172,6 +205,9 @@ Package=<4>
     End Project Dependency
     Begin Project Dependency
     Project_Dep_Name fabaselib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name unzip
     End Project Dependency
 }}}
 
@@ -405,6 +441,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "unzip"=..\..\..\lib\unzip\prj\unzip.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "update"=..\..\..\update\win32\prj\update.dsp - Package Owner=<4>
 
 Package=<5>
@@ -416,6 +464,18 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name fabaselib
     End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "winamp"=..\..\..\ftc\winamp\prj\winamp.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
 }}}
 
 ###############################################################################

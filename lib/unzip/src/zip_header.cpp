@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+using namespace std;
+
 #include "zip_header.h"
 
 unsigned int read_byte(unsigned char *buffer,int *counter)

@@ -1,6 +1,7 @@
 #include "config.h"
 
 #ifdef WIN32
+#include <direct.h> 
 #define MKDIR(z) mkdir(z)
 #else
 #include <unistd.h>

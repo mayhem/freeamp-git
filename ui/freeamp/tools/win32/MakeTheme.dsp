@@ -44,7 +44,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /I "../../include" /I "../../../../lib/zlib/include" /I "../../../../config" /I "../../../../base/include" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /I "../../include" /I "../../../../lib/zlib/include" /I "../../../../lib/unzip/include" /I "../../../../config" /I "../../../../base/include" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -52,7 +52,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 setargv.obj kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386 /out:"MakeTheme.exe"
+# ADD LINK32 zlib.lib unzip.lib setargv.obj kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386 /out:"MakeTheme.exe" /libpath:"..\..\..\..\lib\zlib" /libpath:"..\..\..\..\lib\unzip"
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                    ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe     ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt     ..\..\..\..\base\win32\prj\tools
@@ -72,7 +72,7 @@ PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir              
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "../../include" /I "../../../../lib/zlib/include" /I "../../../../config" /I "../../../../base/include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "../../include" /I "../../../../lib/zlib/include" /I "../../../../lib/unzip/include" /I "../../../../config" /I "../../../../base/include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -80,7 +80,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 wsock32.lib setargv.obj kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /out:"MakeTheme.exe" /pdbtype:sept
+# ADD LINK32 wsock32.lib zlib.lib unzip.lib setargv.obj kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /out:"MakeTheme.exe" /pdbtype:sept /libpath:"..\..\..\..\lib\zlib" /libpath:"..\..\..\..\lib\unzip"
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                    ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe     ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt     ..\..\..\..\base\win32\prj\tools
@@ -101,7 +101,7 @@ PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir              
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /I "../../include" /I "../../../../lib/zlib/include" /I "../../../../config" /I "../../../../base/include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "../../include" /I "../../../../lib/zlib/include" /I "../../../../config" /I "../../../../base/include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "../../include" /I "../../../../lib/zlib/include" /I "../../../../lib/unzip/include" /I "../../../../config" /I "../../../../base/include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -109,7 +109,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 wsock32.lib setargv.obj kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 wsock32.lib setargv.obj kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /out:"MakeTheme.exe" /pdbtype:sept
+# ADD LINK32 wsock32.lib zlib.lib unzip.lib setargv.obj kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /out:"MakeTheme.exe" /pdbtype:sept /libpath:"..\..\..\..\lib\zlib" /libpath:"..\..\..\..\lib\unzip"
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                    ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe     ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt     ..\..\..\..\base\win32\prj\tools
@@ -130,7 +130,7 @@ PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir              
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /I "../../include" /I "../../../../lib/zlib/include" /I "../../../../config" /I "../../../../base/include" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /I "../../include" /I "../../../../lib/zlib/include" /I "../../../../lib/unzip/include" /I "../../../../config" /I "../../../../base/include" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -138,7 +138,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 setargv.obj kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 setargv.obj kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386 /out:"MakeTheme.exe"
+# ADD LINK32 zlib.lib unzip.lib setargv.obj kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386 /out:"MakeTheme.exe" /libpath:"..\..\..\..\lib\zlib" /libpath:"..\..\..\..\lib\unzip"
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                    ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe     ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt     ..\..\..\..\base\win32\prj\tools
@@ -152,14 +152,6 @@ PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir              
 # Name "MakeTheme - Win32 Debug"
 # Name "MakeTheme - Win32 NASM Debug"
 # Name "MakeTheme - Win32 NASM Release"
-# Begin Source File
-
-SOURCE=..\..\..\..\lib\zlib\src\adler32.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\lib\zlib\src\compress.c
-# End Source File
 # Begin Source File
 
 SOURCE=..\..\..\..\config\config.win32
@@ -209,42 +201,6 @@ InputPath=..\..\..\..\config\config.win32
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\..\lib\zlib\src\crc32.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\lib\zlib\src\deflate.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\lib\zlib\src\gzio.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\lib\zlib\src\infblock.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\lib\zlib\src\infcodes.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\lib\zlib\src\inffast.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\lib\zlib\src\inflate.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\lib\zlib\src\inftrees.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\lib\zlib\src\infutil.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\src\MakeTheme.cpp
 # End Source File
 # Begin Source File
@@ -254,18 +210,6 @@ SOURCE=.\MakeTheme.rc
 # Begin Source File
 
 SOURCE=..\..\src\ThemeZip.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\lib\zlib\src\trees.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\lib\zlib\src\uncompr.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\lib\zlib\src\zutil.c
 # End Source File
 # End Target
 # End Project

@@ -1,0 +1,7 @@
+;cdinput.def : Declares the module parameters for the DLL.
+
+LIBRARY      "cdinput"
+DESCRIPTION  'CDDA Input Library'
+
+EXPORTS
+	Initialize

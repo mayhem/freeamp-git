@@ -28,6 +28,7 @@ ____________________________________________________________________________*/
 #ifdef WIN32
 #include <windows.h>
 #include <winsock.h>
+#include <direct.h>
 #define unlink(a) _unlink(a)
 #else
 #define TRUE 1
