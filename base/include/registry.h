@@ -26,6 +26,9 @@ ____________________________________________________________________________*/
 
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
+#if _MSC_VER <= 1100
+#define STRICT
+#endif
 #include <windows.h>
 #endif
 

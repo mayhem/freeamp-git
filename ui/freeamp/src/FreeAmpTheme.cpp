@@ -37,6 +37,9 @@ ____________________________________________________________________________*/
 #define _stat stat
 #define _S_IFDIR S_IFDIR
 #endif
+#if defined(WIN32)
+#define STRICT
+#endif
 #include "config.h"
 #include "downloadmanager.h"
 
@@ -65,6 +68,7 @@ extern HINSTANCE g_hinst;
 #include "help.h"
 #include "properties.h"
 #include "missingfile.h"
+#include "utility.h"
 
 void WorkerThreadStart(void* arg);
 
@@ -1672,9 +1676,14 @@ void FreeAmpTheme::DropFiles(vector<string> *pFileList)
     char                    *url;
     uint32                   length, countbefore;
     vector<string>::iterator i;
+    bool                     bPlay;
+    int                      iItems;
     
     ext = new char[_MAX_PATH];
     url = new char[_MAX_PATH + 7];
+
+    m_pContext->prefs->GetPlayImmediately(&bPlay);
+    iItems = m_pContext->plm->CountItems();
     
     countbefore = m_pContext->plm->CountItems();
     for(i = pFileList->begin(); i != pFileList->end(); i++)
@@ -1686,47 +1695,24 @@ void FreeAmpTheme::DropFiles(vector<string> *pFileList)
         _stat((*i).c_str(), &st);
         if(st.st_mode & _S_IFDIR)
         {
-            HANDLE          findFileHandle = NULL;
-            WIN32_FIND_DATA findData;
-            char            findPath[_MAX_PATH + 1];
-            char*           file;
-            vector<PlaylistItem*> oList;
+            vector<string> oList, oQuery;
 
-            strcpy(findPath, (*i).c_str());
-            strcat(findPath, DIR_MARKER_STR);
-            strcat(findPath, "*.*");
+            oQuery.push_back(string("*.mp1"));
+            oQuery.push_back(string("*.mp2"));
+            oQuery.push_back(string("*.mp3")); 
 
-            file = strrchr(findPath, DIR_MARKER) + 1;
-
-            findFileHandle = FindFirstFile(findPath, &findData);
-            if(findFileHandle != INVALID_HANDLE_VALUE)
-            {
-                do
-                {
-                    pExtension = strrchr(findData.cFileName, '.');
-                    if (!pExtension)
-                       continue;
-                    
-                    strcpy(ext, pExtension + 1);
-                    ToUpper(ext);   
-                    if (m_pContext->player->IsSupportedExtension(ext))
-                    {   
-                        strcpy(findPath, (*i).c_str());
-                        strcat(findPath, DIR_MARKER_STR);
-                        strcat(findPath, findData.cFileName);
-                        
-                        length = _MAX_PATH + 7;
-                        FilePathToURL(findPath, url, &length);
-                        PlaylistItem* item = new PlaylistItem(url);
-                        oList.push_back(item);
-                    }   
-
-                }while(FindNextFile(findFileHandle, &findData));
-
-                FindClose(findFileHandle);
-            }
+            FindMusicFiles(i->c_str(), oList, oQuery); 
             if (oList.size() > 0)
-               m_pContext->plm->AddItems(&oList);
+            {
+               if (bPlay)
+               {
+                   m_pContext->target->AcceptEvent(new Event(CMD_Stop));
+                   m_pContext->plm->RemoveAll(); 
+               }
+               m_pContext->plm->AddItems(oList);
+               if (iItems == 0 || bPlay)
+                   m_pContext->target->AcceptEvent(new Event(CMD_Play));
+            }
         }
         else
         {
@@ -1756,7 +1742,14 @@ void FreeAmpTheme::DropFiles(vector<string> *pFileList)
                 length = _MAX_PATH + 7;
                 FilePathToURL((*i).c_str(), url, &length);
                 
+                if (bPlay)
+                {
+                    m_pContext->target->AcceptEvent(new Event(CMD_Stop));
+                    m_pContext->plm->RemoveAll(); 
+                }
                 m_pContext->plm->ReadPlaylist(url);
+                if (iItems == 0 || bPlay)
+                    m_pContext->target->AcceptEvent(new Event(CMD_Play));
             }   
             else   
                 if (m_pContext->player->IsSupportedExtension(ext))
@@ -1764,7 +1757,14 @@ void FreeAmpTheme::DropFiles(vector<string> *pFileList)
                     length = _MAX_PATH + 7;
                     FilePathToURL((*i).c_str(), url, &length);
                 
+                    if (bPlay)
+                    {
+                        m_pContext->target->AcceptEvent(new Event(CMD_Stop));
+                        m_pContext->plm->RemoveAll(); 
+                    }
                     m_pContext->plm->AddItem(url);
+                    if (iItems == 0 || bPlay)
+                        m_pContext->target->AcceptEvent(new Event(CMD_Play));
                 }    
         }
     }

@@ -33,7 +33,7 @@ ____________________________________________________________________________*/
         file. There is no need to flatten the beavers, either.
 
       NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
-
+*/
 /*---- towave.c --------------------------------------------
   32 bit version only
 
@@ -129,6 +129,8 @@ decode (standard decoder) reduction_code:
 #include <float.h>
 #include <math.h>
 #include <string.h>
+#include <errno.h>
+#include <unistd.h>
 #ifdef WIN32
 #include <io.h>
 #endif
@@ -141,20 +143,8 @@ decode (standard decoder) reduction_code:
 
 #include "port.h"
 
-// JDW
-#ifdef __linux__
-#include <sys/ioctl.h>
-#include <sys/soundcard.h>
-#include <fcntl.h>
-#include <errno.h>
-#endif
-// JDW
-
-
 /* time test Pentium only */
 //#define TIME_TEST
-
-int jdw = 0;
 
 static char default_file[] = "TEST.MP3";
 static char default_outfile[] = "TEST.WAV";
@@ -207,7 +197,7 @@ int write_pcm_tailer_wave(int handout, unsigned int pcm_bytes);
 
 
 /*------------------------------------------*/
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
    int i, k;
    char *filename;
@@ -429,10 +419,9 @@ int ff_decode(char *filename, char *fileout,
 
 
 /*---- create pcm file ------*/
-// JDW JDW JDW
-   // Convert to write to sound card instead...
-//   handout = open(fileout, O_RDWR | O_BINARY | O_CREAT | O_TRUNC, S_IREAD | S_IWRITE);
-//   handout = open(fileout, O_WRONLY | O_BINARY);
+   handout = open(fileout, O_RDWR | O_BINARY | O_CREAT | O_TRUNC, S_IREAD | S_IWRITE);
+   handout = open(fileout, O_WRONLY | O_BINARY);
+/*
    {
        int fd;
        int channels = 2;
@@ -494,6 +483,7 @@ int ff_decode(char *filename, char *fileout,
        }
        
    }
+*/
    if (handout < 0)
    {
        printf("\n CANNOT CREATE OUTPUT FILE\n");
@@ -523,14 +513,12 @@ int ff_decode(char *filename, char *fileout,
    printf("\n output type     = %6d", decinfo.type);
 
 /*---- write pcm header -------*/
-// JDW Sound!!
-
-//   if (!write_pcm_header_wave(handout,
-//	    decinfo.samprate, decinfo.channels, decinfo.bits, decinfo.type))
-//   {
-//      printf("\n FILE WRITE ERROR\n");
-//      goto abort;
-//   }
+   if (!write_pcm_header_wave(handout,
+	    decinfo.samprate, decinfo.channels, decinfo.bits, decinfo.type))
+   {
+      printf("\n FILE WRITE ERROR\n");
+      goto abort;
+   }
 
 /*--- init wave converter ---*/
    cvt_to_wave_init(decinfo.bits);
@@ -540,7 +528,6 @@ int ff_decode(char *filename, char *fileout,
 
    for (u = 0;;)
    {
-       jdw += 1;
       if (!bs_fill())
 	 break;
       if (bs_bufbytes < framebytes)
@@ -566,11 +553,10 @@ int ff_decode(char *filename, char *fileout,
       if (pcm_bufbytes > pcm_trigger)
       {
 	 pcm_bufbytes = cvt_to_wave(pcm_buffer, pcm_bufbytes);
-	 // JDW Sound!!
-	 //do {
+	 do {
 	     nwrite = write(handout, pcm_buffer, pcm_bufbytes);
-	     //    usleep(10000);
-	     //} while (errno == EAGAIN);
+	     usleep(10000);
+	 } while (errno == EAGAIN);
 	 if (nwrite != pcm_bufbytes)
 	 {
 	    printf("\n FILE WRITE ERROR\n");
@@ -585,7 +571,6 @@ int ff_decode(char *filename, char *fileout,
       if ((u & 63) == 1)
 	 printf("\r frames %6ld   bytes in %6ld    bytes out %6ld",
 		u, in_bytes, out_bytes);
-      //printf("%d\n",jdw);
    }
 /*---------------*/
 

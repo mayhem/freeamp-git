@@ -59,7 +59,7 @@ Win32Prefs()
     result = RegOpenKeyEx(	kMainKey,
 							prefsKey,
 							0, 
-							KEY_ALL_ACCESS,
+							KEY_WRITE|KEY_READ,
 							&m_prefsKey);
 
     delete [] prefsKey;
@@ -95,7 +95,7 @@ Win32Prefs(const char* componentName)
         result = RegOpenKeyEx(	kMainKey,
 							    prefsKey,
 							    0, 
-							    KEY_ALL_ACCESS,
+							    KEY_WRITE|KEY_READ,
 							    &m_prefsKey);
 
         delete [] prefsKey;

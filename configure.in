@@ -648,5 +648,5 @@ AC_SUBST(DMALLOCOBJ)
 AC_SUBST(DMALLOCLIB)
 
 AC_CONFIG_HEADER(config/config.h)
-AC_OUTPUT(Makefile Makefile-plugins Makefile.header)
+AC_OUTPUT(Makefile Makefile-plugins Makefile.header Makefile.towav)
 touch .config.check

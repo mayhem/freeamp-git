@@ -54,8 +54,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,0,6,0
- PRODUCTVERSION 2,0,6,0
+ FILEVERSION 2,0,7,0
+ PRODUCTVERSION 2,0,7,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -73,13 +73,13 @@ BEGIN
             VALUE "Comments", "For the latest version go to http://www.freeamp.org\0"
             VALUE "CompanyName", "FreeAmp Open Source Development Effort\0"
             VALUE "FileDescription", "The Obsequiem Input plugin is an implementation of the RTP streaming  protocol and provides FreeAmp with an interface to Obsequiem MP3 Jukeboxes.\0"
-            VALUE "FileVersion", "2.0.6.0\0"
+            VALUE "FileVersion", "2.0.7.0\0"
             VALUE "InternalName", "obsinput\0"
             VALUE "LegalCopyright", "Copyright © EMusic.com 1999\0"
             VALUE "LegalTrademarks", "FreeAmp, EMusic\0"
             VALUE "OriginalFilename", "obsinput.pmi\0"
             VALUE "ProductName", "Obsequiem (RTP) Input Plugin\0"
-            VALUE "ProductVersion", "2.0.6.0\0"
+            VALUE "ProductVersion", "2.0.7.0\0"
         END
     END
     BLOCK "VarFileInfo"

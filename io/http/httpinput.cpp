@@ -105,8 +105,6 @@ extern    "C"
 HttpInput::HttpInput(FAContext *context):
            PhysicalMediaInput(context)
 {
-    uint32 len;
-
     m_path = NULL;
     m_hHandle = -1;
     m_bLoop = false;
@@ -123,6 +121,8 @@ HttpInput::HttpInput(FAContext *context):
     m_pContext->prefs->GetPrefBoolean(kUseProxyPref, &m_bUseProxy);
     if (m_bUseProxy)
     {
+        uint32 len = iMaxUrlLen;
+
         m_pContext->prefs->GetPrefString(kProxyHostPref, m_szProxyHost, &len);
         if ( len == 0 )
             m_pContext->log->Error("useProxy is true but ProxyHost "

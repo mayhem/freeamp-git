@@ -40,7 +40,7 @@ ____________________________________________________________________________*/
 #define the_BRANDING "FreeAmp"
 
 // uncomment this line if branding version != FreeAmp version
-//#define BRANDING_VERSION "2.0.5"
+//#define BRANDING_VERSION "2.0.7"
 
 #define BRANDING_URL "http://www.freeamp.org"
 #define BRANDING_UPDATE_SERVER "fatman.freeamp.org"
@@ -50,7 +50,7 @@ ____________________________________________________________________________*/
 #define BRANDING_APP_NAME "freeamp"
 
 #define FREEAMP_PATH_ENV "FREEAMP_PATH"
-#define FREEAMP_VERSION "2.0.5"
+#define FREEAMP_VERSION "2.0.7"
 
 #ifndef BRANDING_VERSION
 #define BRANDING_VERSION FREEAMP_VERSION

@@ -1,0 +1,66 @@
+include Makefile.header
+
+#.c.o:
+#	gcc -I../include -I../../../config -c $< -o $@
+#.asm.asm1:
+#	/usr/bin/perl -pe 's/\b_//g' $< > $@
+#
+#.asm1.o:
+#	nasm -f elf -o $@ $<
+
+
+#XINGLMCOBJCWASM = cdct.o cupl3.o \
+#  hwin.o iup.o \
+#  l3init.o \
+#  msis.o wavep.o \
+#  csbt.o \
+#  cwinm.o icdct.o \
+#  mdct.o \
+#  uph.o cup.o dec8.o \
+#  isbt.o l3dq.o \
+#  mhead.o \
+#  upsf.o iwinm.o towave.o \
+#  cdctasm.o \
+#  cwinasm.o \
+#  cwin8asm.o \
+#  mdctasm.o \
+#  msisasm.o
+
+#XINGLMCOBJC = cdct.o cupl3.o \
+#  hwin.o iup.o \
+#  l3init.o \
+#  msis.o wavep.o \
+#  csbt.o \
+#  cwinm.o icdct.o \
+#  mdct.o \
+#  uph.o cup.o dec8.o \
+#  isbt.o l3dq.o \
+#  mhead.o \
+#  upsf.o iwinm.o towave.o
+
+
+XINGLMCOBJC = lmc/xingmp3/src/cdct.o lmc/xingmp3/src/cupl3.o \
+  lmc/xingmp3/src/hwin.o lmc/xingmp3/src/iup.o \
+  lmc/xingmp3/src/l3init.o \
+  lmc/xingmp3/src/msis.o lmc/xingmp3/src/wavep.o \
+  lmc/xingmp3/src/csbt.o \
+  lmc/xingmp3/src/cwinm.o lmc/xingmp3/src/icdct.o \
+  lmc/xingmp3/src/mdct.o \
+  lmc/xingmp3/src/uph.o lmc/xingmp3/src/cup.o lmc/xingmp3/src/dec8.o \
+  lmc/xingmp3/src/isbt.o lmc/xingmp3/src/l3dq.o \
+  lmc/xingmp3/src/mhead.o \
+  lmc/xingmp3/src/upsf.o lmc/xingmp3/src/iwinm.o lmc/xingmp3/src/towave.o
+
+XINGLMCOBJC += @XINGASM@
+#assembly lang code, if we need it
+
+
+towav: $(XINGLMCOBJC)
+	gcc -o towav $(XINGLMCOBJC)
+
+
+
+
+
+
+

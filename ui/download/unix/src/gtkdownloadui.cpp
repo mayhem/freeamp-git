@@ -37,7 +37,7 @@ static const char *szEMusicText =
    "The Download Manager enables you to download music from the downloadable "
    "page at the EMusic site and other sites that support RMP/"
    "RealJukebox downloads.";
-static const char *szEMusicURLText = "Go to my downloadables at EMusic";
+static const char *szEMusicURLText = "Go to your EMusic Collection page";
 static const char *szEMusicURL = "https://secure.emusic.com/perl/secure/downloadables.pl";
 
 static const char *szFreeAmpText =

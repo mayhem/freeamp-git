@@ -28,6 +28,7 @@ ____________________________________________________________________________*/
 // When symbols are longer than 255 characters, the warning is disabled.
 #ifdef WIN32
 #pragma warning(disable:4786)
+#define STRICT
 #endif
 
 #include <map>
@@ -39,6 +40,7 @@ ____________________________________________________________________________*/
 #include "Win32Bitmap.h"
 #include "Median.h"
 #include "resource.h"
+#include "utility.h"
 #include "debug.h"
 
 #define DB Debug_v("%s:%d\n", __FILE__, __LINE__);
@@ -669,6 +671,7 @@ void Win32Window::DropFiles(HDROP dropHandle)
     int32 count;
     char  file[MAX_PATH + 1];
     vector<string> oFileList;
+    char* extension = NULL;
 
     if (m_bMindMeldInProgress)
     {
@@ -687,6 +690,15 @@ void Win32Window::DropFiles(HDROP dropHandle)
                         i,
                         file,
                         sizeof(file));
+
+        extension = strrchr(file, '.');
+        if(extension && strcasecmp(extension, ".lnk") == 0)
+        { 
+            string link = string(file);
+            ResolveLink(link);
+            strcpy(file, link.c_str());
+        }
+                        
         oFileList.push_back(string(file));
     }
     

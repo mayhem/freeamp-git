@@ -57,10 +57,10 @@ bool CopyFile(const char *pExistingFileName,
               bool bFailIfExists);     // operation if file exists
 #endif
 
-#ifdef WIN32
 void FindMusicFiles(const char* rootPath, 
                     vector<string>& urls, 
                     vector<string>& queries); 
+#ifdef WIN32
 bool ResolveLink(string& path);
 #endif
 

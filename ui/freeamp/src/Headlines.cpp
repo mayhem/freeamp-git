@@ -170,7 +170,8 @@ Error Headlines::Download(void)
 
     m_pContext->target->AcceptEvent(new StatusMessageEvent(""));
     m_oHeadlines.clear(); 
-    
+
+    printf("Page: '%s'\n", oPage.c_str());
     eRet = ParseString(oPage);
     if (IsntError(eRet))
     {

@@ -76,8 +76,24 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     // should we allow FreeAmp to run?
     struct stat st;
     char path[MAX_PATH];
+    char arg0[MAX_PATH];
 
     getcwd(path, sizeof(path));
+
+    strcpy(arg0, __argv[0]);
+    char* slash = strrchr(arg0, '\\');
+
+    if(slash)
+    {
+        *slash = 0x00;
+
+        if(strcasecmp(path, arg0))
+        {
+            chdir(arg0);
+            strcpy(path, arg0);
+        }
+    }
+
     strcat(path, "\\NeedToRebootForUpdate");
     if(!stat(path, &st))
     {
@@ -288,7 +304,7 @@ bool SendCommandLineToRealJukebox()
                                 regErr = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
 													  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\realjbox.exe",
 													  0, 
-													  KEY_ALL_ACCESS,
+													  KEY_WRITE|KEY_READ,
 													  &key);
 
                                 if(regErr == ERROR_SUCCESS)
@@ -661,7 +677,7 @@ void ReclaimFileTypes(const char* path, bool askBeforeReclaiming)
         result = RegOpenKeyEx(HKEY_CLASSES_ROOT,
 							  kFileTypes[index][0],
 							  0, 
-                              KEY_ALL_ACCESS,
+                              KEY_WRITE|KEY_READ,
                               &typeKey);
 
         if(result == ERROR_SUCCESS)
@@ -735,7 +751,7 @@ void ReclaimFileTypes(const char* path, bool askBeforeReclaiming)
         result = RegOpenKeyEx(	HKEY_CLASSES_ROOT,
 							    buf,
 							    0, 
-							    KEY_ALL_ACCESS,
+							    KEY_WRITE|KEY_READ,
 							    &appKey);
 
         if(result == ERROR_SUCCESS)
@@ -837,7 +853,7 @@ void ReclaimFileTypes(const char* path, bool askBeforeReclaiming)
     result = RegOpenKeyEx(HKEY_CURRENT_USER,
                           "Software\\Netscape\\Netscape Navigator\\Viewers",
                           0, 
-                          KEY_ALL_ACCESS,
+                          KEY_WRITE|KEY_READ,
                           &appKey);
 
     if(result == ERROR_SUCCESS)

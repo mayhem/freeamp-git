@@ -1,3 +1,9 @@
+Changes for Linux and Windows version 2.0.7
+--------------------------------------------------------------------
+
+- Fixed the proxy support for the download manager.
+- Fixed crashing issues in the GTK freeamp ui.
+
 Changes for Linux and Windows version 2.0.6
 --------------------------------------------------------------------
 
