@@ -1,4 +1,3 @@
-
 /*____________________________________________________________________________
 	
 	FreeAmp - The Free MP3 Player
@@ -25,6 +24,10 @@ ____________________________________________________________________________*/
 #ifndef _PLAYLIST_H_
 #define _PLAYLIST_H_
 
+#include <assert.h>
+
+#include "config.h"
+
 #include "vector.h"
 #include "errors.h"
 #include "event.h"
@@ -34,40 +37,73 @@ ____________________________________________________________________________*/
 #include "pmi.h"
 
 class PlayListItem {
- private:
-    RegistryItem *m_pmiRegItem;
-    RegistryItem *m_lmcRegItem;
-    MediaInfoEvent *m_mie;
-	 PhysicalMediaInput *m_pmi;
 
  public:
-    char* m_url;
-    int32 m_type;
-    int32 m_startFrame;
-
-    PlayListItem() {
-	m_mie = NULL;
-	m_url = NULL;
-	m_pmi = NULL;
-	m_pmiRegItem = NULL;
-	m_lmcRegItem = NULL;
-    }
-    ~PlayListItem() {
-	if (m_mie) {
-	    delete m_mie;
+    
+    PlayListItem() 
+    {
 	    m_mie = NULL;
-	}
-	if (m_pmi) {
-	    delete m_pmi;
-	    m_pmi = NULL;
-	}
-	m_pmiRegItem = NULL;
-	m_lmcRegItem = NULL;
-	if (m_url) {
-	    delete m_url;
 	    m_url = NULL;
-	}
+	    m_pmi = NULL;
+	    m_pmiRegItem = NULL;
+	    m_lmcRegItem = NULL;
     }
+
+    ~PlayListItem() 
+    {
+	    if (m_mie) 
+        {
+	        delete m_mie;
+	        m_mie = NULL;
+	    }
+
+	    if (m_pmi) 
+        {
+	        delete m_pmi;
+	        m_pmi = NULL;
+	    }
+
+	    m_pmiRegItem = NULL;
+	    m_lmcRegItem = NULL;
+
+	    if (m_url) 
+        {
+	        delete m_url;
+	        m_url = NULL;
+	    }
+    }
+
+    char* URL() const { return m_url;}
+
+    void SetURL(char* url)
+    { 
+        assert(url);
+
+        if(url)
+        {
+            if(m_url)
+            {
+                delete [] m_url;
+                m_url = NULL;
+            }
+
+            m_url = new char[strlen(url) + 1];
+            
+            if(m_url)
+            {
+                strcpy(m_url, url);
+            }
+        }
+    }
+
+    int32 Type() const { return m_type; }
+    void SetType(int32 type) { m_type = type; }
+
+    int32 StartFrame() const { return m_startFrame; }
+    void SetStartFrame(int32 frame) { m_startFrame = frame; }
+
+    char* DisplayString() const { return m_url;}
+
 
     RegistryItem *GetPMIRegistryItem() { return m_pmiRegItem; }
     void SetPMIRegistryItem(RegistryItem *ri) { m_pmiRegItem = ri; }
@@ -77,6 +113,16 @@ class PlayListItem {
     void SetMediaInfo(MediaInfoEvent *mie) { m_mie = mie; }
     PhysicalMediaInput *GetPMI() { return m_pmi; }
     void SetPMI(PhysicalMediaInput *pmi) { m_pmi = pmi; }
+
+ private:
+    RegistryItem *m_pmiRegItem;
+    RegistryItem *m_lmcRegItem;
+    MediaInfoEvent *m_mie;
+    PhysicalMediaInput *m_pmi;
+
+    char* m_url;
+    int32 m_type;
+    int32 m_startFrame;
 };
 
 class OrderListItem {
