@@ -454,6 +454,8 @@ UserInterface()
 
     m_uiSemaphore->Wait();
     delete m_uiSemaphore;
+
+    m_prefs = new Preferences;
 }
 
 FreeAmpUI::
@@ -474,6 +476,9 @@ FreeAmpUI::
 
     if(m_uiThread)
         delete m_uiThread;
+
+    if(m_prefs)
+        delete m_prefs;
 }
 
 void 

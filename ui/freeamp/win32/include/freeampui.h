@@ -48,6 +48,7 @@ ____________________________________________________________________________*/
 #include "view.h"
 #include "dib.h"
 #include "linkedlist.h"
+#include "preferences.h"
 
 #include "bitmapview.h"
 #include "buttonview.h"
@@ -113,6 +114,7 @@ class FreeAmpUI : public UserInterface {
 
     EventQueue* Target() const { return m_target; }
     int32 State() const { return m_state; }
+    Preferences* GetPreferences() const { return m_prefs;}
 
  protected:
     static void ui_thread_function(void*);
@@ -158,6 +160,7 @@ class FreeAmpUI : public UserInterface {
 
     PlayListManager*    m_plm;
     Properties*         m_propManager;
+    Preferences*        m_prefs;
     Thread*             m_uiThread;
     HWND                m_hwnd;
     HPALETTE            m_palette;
