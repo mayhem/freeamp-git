@@ -235,6 +235,8 @@ void PhysicalMediaOutput::CheckForBufferUp(bool bForceBufferUp)
            iOutPercent = m_pInputBuffer->GetBufferPercentage(); 
            m_pTarget->AcceptEvent(new StreamBufferEvent(true, 
                                   iInPercent, iOutPercent)); 
+           if (m_pPmiBuffer->IsEndOfStream())
+              break;
        }
    }
 }
