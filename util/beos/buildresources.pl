@@ -3,7 +3,7 @@
 # A lame perl script to compile mwbres .r src and add necessary resources
 # into a binary. Written by someone who can't write perl.
 
-require 'getopt.pl';
+require 'getopts.pl';
 
 sub getdefine
 {
@@ -44,15 +44,16 @@ sub echo_and_run
     system( $cmd );
 }
 
-Getopt( 'otsr' );
+Getopts( 'o:t:s:g' );
 
 $binary = $opt_o;
 $appsig = $opt_s;
 $filetype = $opt_t;
+$nostrip = $opt_g;
 
 # strip the excess fat.
 
-echo_and_run( "strip $binary" );
+echo_and_run( "strip $binary" ) if ! $nostrip;
 
 # add the resources.
 
