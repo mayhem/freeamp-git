@@ -93,6 +93,12 @@ int YPClient::Disconnect()
     return 0;
 }
 
+int YPClient::GetSoundsLike(APSPlaylist& ResultList, APSPlaylist& SeedList,
+                            int nMaxItems, string& strUID, string& CollectionID)
+{
+    return -1;
+}
+
 int YPClient::GeneratePlayList(APSPlaylist& ResultList, APSPlaylist& SeedList,
                                int nMaxItems, int bLocalOnly, string& strUID,
                                string& CollectionID)

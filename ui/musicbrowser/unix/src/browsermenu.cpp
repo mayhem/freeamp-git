@@ -551,31 +551,6 @@ static void genslplaylistnomax(GTKMusicBrowser *p, guint action, GtkWidget *w)
     p->GenSLPlaylist(-1.0);
 }
 
-static void genslplaylist500(GTKMusicBrowser *p, guint action, GtkWidget *w)
-{
-    p->GenSLPlaylist(500.0);
-}
-
-static void genslplaylist1000(GTKMusicBrowser *p, guint action, GtkWidget *w)
-{
-    p->GenSLPlaylist(1000.0);
-}
-
-static void genslplaylist5000(GTKMusicBrowser *p, guint action, GtkWidget *w)
-{
-    p->GenSLPlaylist(5000.0);
-}
-
-static void genslplaylist10000(GTKMusicBrowser *p, guint action, GtkWidget *w)
-{
-    p->GenSLPlaylist(10000.0);
-}
-
-static void genslplaylist20000(GTKMusicBrowser *p, guint action, GtkWidget *w)
-{
-    p->GenSLPlaylist(20000.0);
-}
-
 void GTKMusicBrowser::CreateMenu(GtkWidget *topbox)
 {
     GtkItemFactoryEntry menu_items[] = {
@@ -641,12 +616,7 @@ void GTKMusicBrowser::CreateMenu(GtkWidget *topbox)
      {"/_Relatable/_Recommend Playlist", NULL,  (void(*)(...))genplaylist, 0, 0 },
      {"/_Relatable/_Learn Playlist",  NULL,  (void(*)(...))submitplaylist, 0, 0 },
      {"/_Relatable/sep",       NULL,            0,          0, "<Separator>" },
-     {"/_Relatable/SoundsLike Recommend (500)", NULL, (void(*)(...))genslplaylist500, 0, 0 },
-     {"/_Relatable/SoundsLike Recommend (1000)", NULL, (void(*)(...))genslplaylist1000, 0, 0 },
-     {"/_Relatable/SoundsLike Recommend (5000)", NULL, (void(*)(...))genslplaylist5000, 0, 0 },
-     {"/_Relatable/SoundsLike Recommend (10000)", NULL, (void(*)(...))genslplaylist10000, 0, 0 },
-     {"/_Relatable/SoundsLike Recommend (20000)", NULL, (void(*)(...))genslplaylist20000, 0, 0 },
-     {"/_Relatable/SoundsLike Recommend (no max)", NULL, (void(*)(...))genslplaylistnomax, 0, 0 },
+     {"/_Relatable/SoundsLike Recommendation", NULL, (void(*)(...))genslplaylistnomax, 0, 0 },
      {"/_Relatable/sep2",      NULL,            0,          0, "<Separator>" },
      {"/_Relatable/_Start Signaturing", NULL, (void(*)(...))signature_func, 0, 0 },
 

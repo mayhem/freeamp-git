@@ -222,8 +222,8 @@ void MusicBrowserUI::GenSLPlaylistEvent(vector<PlaylistItem*>* pSeed, float fMax
         return;
     }
 
-    vector<string> seedList;
-	vector<string> returnList;
+    APSPlaylist seedList;
+    APSPlaylist returnList;
     uint32 nResponse = 0;
 
     if ((pSeed) && (!pSeed->empty())) {
@@ -231,30 +231,24 @@ void MusicBrowserUI::GenSLPlaylistEvent(vector<PlaylistItem*>* pSeed, float fMax
         vector<PlaylistItem *>::iterator i;
 
         for (i = pSeed->begin(); i != pSeed->end(); i++)
-			seedList.push_back((*i)->GetMetaData().GUID());
+            seedList.Insert((*i)->GetMetaData().GUID().c_str(),
+                            (*i)->URL().c_str());
 
-        nResponse = m_context->aps->APSGetSoundsLike(&seedList,
-                               m_context->catalog->m_guidList, &returnList, 10,
-							   fMax);
     }
-    else {
-        nResponse = m_context->aps->APSGetSoundsLike(&seedList,
-                               m_context->catalog->m_guidList, &returnList, 10,
-							   fMax);
-    }
+    nResponse = m_context->aps->APSGetSoundsLike(&seedList, &returnList);
 
-	bool messageError = true;
+    bool messageError = true;
 
     if (nResponse == APS_NOERROR) {
-        if (returnList.size() > 0) {
-			messageError = false;
+        if (returnList.Size() > 0) {
+            messageError = false;
             vector<string> newitems;
             string strTemp;
             string strFilename;
-            vector<string>::iterator j;
+            APSPlaylist::iterator j;
 
-            for (j = returnList.begin(); j != returnList.end(); j++) {
-                strFilename = m_context->catalog->GetFilename(*j);
+            for (j = returnList.begin(); j.isvalid(); j.next()) {
+                strFilename = m_context->catalog->GetFilename(j.first);
                 if (strFilename != "")
                     newitems.push_back(strFilename.c_str());
             }
@@ -281,14 +275,14 @@ void MusicBrowserUI::GenSLPlaylistEvent(vector<PlaylistItem*>* pSeed, float fMax
         }
     }
 
-	if (messageError) {
+    if (messageError) {
       string caption = "Generate SoundsLike Playlist Error";
-	  string message;
+      string message;
 
-	  if (nResponse != APS_NOERROR) 
+      if (nResponse != APS_NOERROR) 
           message = "For some reason, the Relatable SoundsLike server returned an error.";
       else 
-		  message = "The Relatable SoundsLike server didn't return any matches.";
+	  message = "The Relatable SoundsLike server didn't return any matches.";
 
       MessageBox(m_hWnd, message.c_str(), caption.c_str(), MB_OK|MB_ICONSTOP|MB_SETFOREGROUND);
    }

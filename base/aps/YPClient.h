@@ -43,6 +43,8 @@ public:
    ~YPClient();
     void SetAddress(string strIP, int nPort) 
     { m_strIP = strIP, m_nPort = nPort; }
+    int GetSoundsLike(APSPlaylist& ResultList, APSPlaylist& SeedList,
+		      int nMaxItems, string& strUID, string& CollectionID);
     int GeneratePlayList(APSPlaylist& ResultList, APSPlaylist& SeedList,
                          int nMaxItems, int bLocalOnly, string& strUID,
                          string& CollectionID);

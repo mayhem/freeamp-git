@@ -55,7 +55,6 @@ ____________________________________________________________________________*/
 #include <math.h>
 #include <musicbrainz/mb_c.h>
 #include "utility.h"
-#include "slclient.h" // FIXME: remove before b9
 
 #ifndef WIN32
 #define ios_base ios
@@ -88,9 +87,6 @@ APSInterface::APSInterface(char *profilePath, const char* pIP,
     m_pYpClient->SetAddress(m_strIP.c_str(), nAPSYPPort);
     m_nMetaFailures = 0;
 
-    m_pSLClient = new SoundsLikeClient;
-    m_pSLClient->SetAddress(m_sigIP.c_str(), nAPSSigPort);
-
     if (!m_strCurrentProfile.empty()) {
         ChangeProfile(m_strCurrentProfile.c_str());
         //SyncLog();
@@ -107,11 +103,6 @@ APSInterface::~APSInterface()
     {
         delete m_pYpClient;
         m_pYpClient = NULL;
-    }
-    if (m_pSLClient != NULL)
-    {
-        delete m_pSLClient;
-        m_pSLClient = NULL;
     }
     if (m_pMutex != NULL) 
     {
@@ -216,27 +207,28 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
     return APS_NOERROR;
 }
 
-int APSInterface::APSGetSoundsLike(vector<string> *seedGUIDs,
-                                   vector<string> *collectionGUIDs,
-                                   vector<string> *returnGUIDs,
-                                   int items, float fMax)
+int APSInterface::APSGetSoundsLike(APSPlaylist *pSeedList,
+                                   APSPlaylist *pReturnList,
+                                   int nMaxItems)
 {
-    if ((seedGUIDs == NULL) || (collectionGUIDs == NULL) || 
-        (returnGUIDs == NULL))
+    if ((pSeedList == NULL) || (pReturnList == NULL)) 
         return APS_PARAMERROR;
 
     m_pMutex->Acquire();
 
-    vector<pair<string, float> > *blah;
-    blah = m_pSLClient->SoundsLike(seedGUIDs, collectionGUIDs, items, fMax);
+    string strUID = "";
+    if (!m_strCurrentProfile.empty())
+        strUID = (*m_pProfileMap)[m_strCurrentProfile];
+    if (strUID.empty())
+        strUID = "NOT_OPTED_IN1111"; // 16 char aggregate query id
 
-    vector<pair<string, float> >::iterator i = blah->begin();
-    for (; i != blah->end(); i++)
-        returnGUIDs->push_back((*i).first);
+    vector<pair<string, float> > *blah;
+    int nRes = m_pYpClient->GetSoundsLike(*pReturnList, *pSeedList, nMaxItems,
+                                       strUID, m_strCollectionID);
 
     m_pMutex->Release();
 
-    return APS_NOERROR;
+    return nRes;
 }
 
 int APSInterface::APSGetPlaylist(APSPlaylist* pPlayList, 
