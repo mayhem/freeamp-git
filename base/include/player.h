@@ -115,6 +115,9 @@ class Player : public EventQueue, Properties, PropertyWatcher
     static void cd_timer(void* arg);
     void        CDTimer();
 
+    static void synclog_timer(void* arg);
+    void        SyncLog();
+
     static void generate_sigs_function(void *arg);
     void        GenerateSigsWork(set<PlaylistItem *> *items);
 
@@ -210,6 +213,7 @@ class Player : public EventQueue, Properties, PropertyWatcher
     APSInterface *m_APSInterface;
 
     TimerRef m_cdTimer;
+    TimerRef m_syncTimer;
     float    m_eqValues[32];
     bool     m_eqEnabled;
 };

@@ -189,6 +189,10 @@ EventQueue()
 
     m_eqEnabled = false;
     memset(m_eqValues, 0, sizeof(m_eqValues));
+
+    // Add timer for sync-ing the log to the relatable servers
+    // only works if a profile is currently active
+    m_context->timerManager->StartTimer(&m_syncTimer, synclog_timer, 1800, this);
 }
 
 #define TYPICAL_DELETE(x) /*printf("deleting...\n");*/ if (x) { delete x; x = NULL; }
@@ -2309,3 +2313,14 @@ void Player::CDTimer()
     delete pmo;
 }
 
+void Player::synclog_timer(void* arg)
+{
+    Player* player = (Player*) arg;
+
+    player->SyncLog();
+}
+
+void Player::SyncLog()
+{
+    m_context->aps->SyncLog();
+}

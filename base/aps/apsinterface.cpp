@@ -79,8 +79,10 @@ APSInterface::APSInterface(const char* pIP, const char *pSigIP)
     m_pSigClient = new SigClient;
     m_pSigClient->SetAddress(m_sigIP.c_str(), nAPSSigPort);
 
-    if (!m_strCurrentProfile.empty()) 
+    if (!m_strCurrentProfile.empty()) {
         ChangeProfile(m_strCurrentProfile.c_str());
+        SyncLog();
+    }
 }
 
 APSInterface::~APSInterface()
