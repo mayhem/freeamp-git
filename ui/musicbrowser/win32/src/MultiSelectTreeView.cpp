@@ -202,7 +202,7 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
     static HTREEITEM dragItem = NULL;
     static bool selectedOnMouseDown = false;
 
-    //return CallWindowProc((int (__stdcall *)(void))lpOldProc, hwnd, msg, wParam, lParam );
+    //return CallWindowProc(lpOldProc, hwnd, msg, wParam, lParam );
 
 	switch(msg)
 	{
@@ -698,13 +698,6 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
         {
             UpdateButtonMenuStates();
             InvalidateRect(hwnd, NULL, TRUE);
-            break;
-        }
-
-        case WM_NOTIFY:
-        {
-            
-
             break;
         }
     } 
