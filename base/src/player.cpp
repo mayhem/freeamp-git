@@ -73,8 +73,8 @@ EventQueue()
    assert(g_Log);
 
    assert(g_Log->Open());
-   //g_Log->AddLogLevel(LogInput);
-   //g_Log->AddLogLevel(LogDecode);
+   g_Log->AddLogLevel(LogInput);
+   g_Log->AddLogLevel(LogDecode);
 
    // cout << "Creating player..." << endl;
    m_eventSem = new Semaphore();
