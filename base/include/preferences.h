@@ -89,6 +89,8 @@ extern const char* kAllowMultipleInstancesPref;
 extern const char* kAudioCDLengthPref;
 extern const char* kWatchThisDirectoryPref;
 extern const char* kWatchThisDirTimeoutPref;
+extern const char* kWriteID3v1Pref;
+extern const char* kWriteID3v2Pref;
 
 class LibDirFindHandle;
 
@@ -284,6 +286,12 @@ class Preferences {
 
     Error GetWatchThisDirTimeout(int32* value);
     Error SetWatchThisDirTimeout(int32  value);
+
+    Error GetWriteID3v1(bool* value);
+    Error SetWriteID3v1(bool value);
+
+    Error GetWriteID3v2(bool* value);
+    Error SetWriteID3v2(bool value);
 };
 
 #endif /* _PREFERENCES_H */

@@ -64,7 +64,7 @@ ____________________________________________________________________________*/
 
 #define HAVE_IO_H 1
 #define HAVE_ERRNO_H 1
-
+#define HAVE_ID3V2 1
 
 #if HAVE_UNISTD_H
 #define RD_BNRY_FLAGS O_RDONLY

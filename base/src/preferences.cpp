@@ -83,6 +83,8 @@ const char* kWAVOutputPathPref = "WAVOutputPath";
 const char* kAudioCDLengthPref = "AudioCDLength";
 const char* kWatchThisDirectoryPref = "WatchThisDirectory";
 const char* kWatchThisDirTimeoutPref = "WatchThisDirectoryTimeout";
+const char* kWriteID3v1Pref = "WriteID3v1Tags";
+const char* kWriteID3v2Pref = "WriteID3v2Tags";
 
 //logging
 const char* kUseDebugLogPref = "UseDebugLog";
@@ -142,6 +144,8 @@ const bool kDefaultAllowMultipleInstances = false;
 const char* kDefaultWAVOutPath = ".";
 const int32 kDefaultAudioCDLength = 4440; // 74 minutes
 const int32 kDefaultWatchThisDirTimeout = 600000;
+const bool  kDefaultWriteID3v1 = true;
+const bool  kDefaultWriteID3v2 = true;
 
 Error
 Preferences::
@@ -1136,6 +1140,34 @@ Preferences::
 SetWatchThisDirTimeout(int32 value)
 {
     return SetPrefInt32(kWatchThisDirTimeoutPref, value);
+}
+
+Error
+Preferences::
+GetWriteID3v1(bool* value)
+{
+    return GetPrefBoolean(kWriteID3v1Pref, value);
+}
+
+Error
+Preferences::
+SetWriteID3v1(bool value)
+{
+    return SetPrefBoolean(kWriteID3v1Pref, value);
+}
+
+Error
+Preferences::
+GetWriteID3v2(bool* value)
+{
+    return GetPrefBoolean(kWriteID3v2Pref, value);
+}
+
+Error
+Preferences::
+SetWriteID3v2(bool value)
+{
+    return SetPrefBoolean(kWriteID3v2Pref, value);
 }
 
 LibDirFindHandle *

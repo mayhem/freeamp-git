@@ -318,7 +318,7 @@ plugins/id3v1.mdf: $(ID3V1OBJ)
 ID3V2OBJ = plm/metadata/id3v2/id3v2.o
 
 plugins/id3v2.mdf: $(ID3V2OBJ)
-	$(LINKMOD) -o $@ $(ID3V2OBJ) $(STATICLD)
+	$(LINKMOD) -o $@ $(ID3V2OBJ) $(STATICLD) @ID3LIB@
 
 #misc
 MISCOBJ = plm/metadata/misc/misc.o 

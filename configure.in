@@ -569,6 +569,18 @@ if test "$curses" != ""; then
 	CURSES="$curses";
 	AC_SUBST(CURSES)
 fi
+
+AC_CHECK_LIB(id3, Find__7ID3_Tag11ID3_FrameID, 
+   [ AC_DEFINE(HAVE_ID3V2) 
+     ID3LIB="-lid3" 
+     AC_SUBST(ID3LIB)
+   ],
+   [ echo ""
+	  echo "id3lib not found. id3 support will be read-only."
+     echo "For full ID3v2 support download and install the id3lib from"
+     echo "    http://id3lib.sourceforge.net/"
+     echo ""
+   ])
 	
 dnl ****
 dnl Check for alsa
