@@ -156,6 +156,7 @@ void TextControl::TextChanged(void)
     pCanvas = m_pParent->GetCanvas();
     m_oMutex.Release();
 
+    pCanvas->SetNoScreenUpdate(true);
     pCanvas->Erase(m_oRect);
     iRet = pCanvas->RenderText(m_oRect.Height(), m_oRect, 
                                m_oValue, m_eAlign, 
@@ -173,6 +174,9 @@ void TextControl::TextChanged(void)
                            m_bItalic, m_bUnderline); 
        iRet = 0;
     }
+    pCanvas->SetNoScreenUpdate(false);
+    pCanvas->Invalidate(m_oRect);
+    pCanvas->Update();
 
     m_oMutex.Acquire();
     m_bWantsTimingMessages = (iRet > 0);
