@@ -62,6 +62,7 @@ class Window
       void    ClearControls(void);
       void    Keystroke(unsigned char cKey);
       bool    MenuCommand(uint32 uCommand);
+      void    VolumeChanged(void);
 
       virtual void SetStayOnTop(bool bStay);
       virtual void SetLiveInToolbar(bool bLive);

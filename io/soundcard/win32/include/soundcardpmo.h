@@ -55,6 +55,7 @@ public:
  
  private:
 
+    bool          SetupVolumeControl(void);
 	void          WorkerThread(void); 
     virtual Error Reset(bool user_stop);
     void          HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent);
@@ -68,11 +69,10 @@ public:
 	bool          WaitForDrain(void);
 
  private:
-//    FAContext*      m_context;
-
 	WAVEFORMATEX*	m_wfex;
 	WAVEHDR*		m_wavehdr_array;
 	HWAVEOUT		m_hwo;
+	HMIXER          m_hmixer;
 
 	uint32			m_buffer[MAXCHANNELS];
 	uint32			m_channels;
@@ -86,6 +86,9 @@ public:
     Thread         *m_pBufferThread;
     int             m_iOutputBufferSize, m_iBaseTime, m_iBytesPerSample;
 	int             m_iHead, m_iTail, m_iOffset;
+	
+	string          m_oDstLineName, m_oVolumeControlName;
+	DWORD           m_dwMinimum, m_dwMaximum, m_dwVolumeControlID;
 };
 
 #endif /* _SOUNDCARDPMO_H_ */

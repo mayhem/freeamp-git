@@ -102,3 +102,6 @@ Other major contributors and their contributions:
 "Anton Kruger" <unknown>
 * Median-cut color quantization algorithm as published in 
   Dr. Dobbs Journal September 1994
+
+"Chen Su" <chensu@hotmail.com>
+* Sample code on controlling the mixer device under Win32.

@@ -1157,6 +1157,11 @@ bool FreeAmpTheme::HandleMenuCommand(uint32 uCommand)
     return false;
 }
 
+void FreeAmpTheme::VolumeChanged(void)
+{
+    m_pContext->target->AcceptEvent(new Event(CMD_GetVolume));
+}
+
 void FreeAmpTheme::UpdateTimeDisplay(int iCurrentSeconds)
 {
     string oText;

@@ -70,6 +70,7 @@ class FreeAmpTheme : public UserInterface, public Theme
         
         virtual void  HandleKeystroke(unsigned char cKey);
         virtual bool  HandleMenuCommand(uint32 uCommand);
+        virtual void  VolumeChanged(void);
         virtual Error HandleControlMessage(string &oControlName, 
                                            ControlMessageEnum eMesg);
         virtual void  DropFiles(vector<string> *pFileList);

@@ -31,6 +31,7 @@ ____________________________________________________________________________*/
 #include <windows.h>
 #include <shellapi.h>
 #include <commctrl.h>
+#include <mmsystem.h>
 
 #include "Window.h"
 

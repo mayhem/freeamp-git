@@ -4,6 +4,7 @@
 
    Copyright (C) 1999 EMusic
    Portions Copyright (C) 1999 Valters Vingolds
+   Portions Copyright (C) 2000 Chen Su
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -257,6 +258,12 @@ LRESULT Win32Window::WindowProc(HWND hwnd, UINT msg,
             hDc = GetDC(m_hWnd);
             SelectPalette(hDc, m_hPal, false);
             RealizePalette(hDc);
+            break;
+        }
+
+        case MM_MIXM_CONTROL_CHANGE:
+        {
+            VolumeChanged();
             break;
         }
         

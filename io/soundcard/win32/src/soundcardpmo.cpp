@@ -32,7 +32,6 @@ ____________________________________________________________________________*/
 //#include "config.h"
 #include "SoundCardPMO.h"
 #include "eventdata.h"
-#include "log.h"
 #include "debug.h"
 
 #define DB Debug_v("%s:%d", __FILE__, __LINE__);
@@ -71,6 +70,10 @@ MCICallBack(HWAVEOUT hwo, UINT msg, DWORD dwInstance,
 SoundCardPMO::SoundCardPMO(FAContext *context) :
         PhysicalMediaOutput(context)
 {
+   MMRESULT mmresult = 0;
+   Int32PropValue *pProp;
+   HWND            hWnd;
+   
    m_wfex = NULL;
    m_wavehdr_array = NULL;
    m_hwo = NULL;
@@ -96,6 +99,21 @@ SoundCardPMO::SoundCardPMO(FAContext *context) :
       assert(m_pBufferThread);
       m_pBufferThread->Create(SoundCardPMO::StartWorkerThread, this);
    }
+
+   if (IsError(m_pContext->props->GetProperty("MainWindow", 
+              (PropValue **)&pProp)))
+      return;        
+   else
+      hWnd = (HWND)pProp->GetInt32();
+   
+   mmresult = mixerOpen(&m_hmixer, 0, (DWORD)hWnd, NULL, 
+                        MIXER_OBJECTF_MIXER | CALLBACK_WINDOW);
+   if (mmresult != MMSYSERR_NOERROR)
+   {
+       m_hmixer = NULL;
+       m_pContext->log->Error("Cannot open Mixer device.");
+   }    
+   SetupVolumeControl();
 }
 
 SoundCardPMO::~SoundCardPMO()
@@ -112,6 +130,7 @@ SoundCardPMO::~SoundCardPMO()
   
    if (m_initialized)
    {
+      mixerClose(m_hmixer);
       waveOutReset(m_hwo);
 
       for(int iLoop = 0; iLoop < m_num_headers; iLoop++)
@@ -137,27 +156,94 @@ SoundCardPMO::~SoundCardPMO()
    }
 }
 
-void SoundCardPMO::SetVolume(int32 volume) 
+bool SoundCardPMO::SetupVolumeControl(void)
 {
-    Int32PropValue *pProp = NULL;
+	MIXERLINE mxl;
+	MIXERCONTROL mxc;
+	MIXERLINECONTROLS mxlc;
     
-    waveOutSetVolume((HWAVEOUT)WAVE_MAPPER, 
-                     MAKELPARAM( 0xFFFF*volume/100,  
-                                 0xFFFF*volume/100));
-                                 
-    pProp = new Int32PropValue(volume);
-    m_pContext->props->SetProperty("CurrentVolume", pProp);
+	m_oDstLineName = "";
+	m_oVolumeControlName = "";
+
+	if (m_hmixer == NULL)
+		return FALSE;
+
+	mxl.cbStruct = sizeof(MIXERLINE);
+	mxl.dwComponentType = MIXERLINE_COMPONENTTYPE_SRC_WAVEOUT;
+	if (mixerGetLineInfo((HMIXEROBJ)m_hmixer,
+                         &mxl,
+                         MIXER_OBJECTF_HMIXER |
+                         MIXER_GETLINEINFOF_COMPONENTTYPE)
+		!= MMSYSERR_NOERROR)
+		return false;
+
+	mxlc.cbStruct = sizeof(MIXERLINECONTROLS);
+	mxlc.dwLineID = mxl.dwLineID;
+	mxlc.dwControlType = MIXERCONTROL_CONTROLTYPE_VOLUME;
+	mxlc.cControls = 1;
+	mxlc.cbmxctrl = sizeof(MIXERCONTROL);
+	mxlc.pamxctrl = &mxc;
+
+	if (mixerGetLineControls((HMIXEROBJ)m_hmixer,
+		     				 &mxlc,
+							 MIXER_OBJECTF_HMIXER |
+							 MIXER_GETLINECONTROLSF_ONEBYTYPE)
+		!= MMSYSERR_NOERROR)
+		return FALSE;
+
+	// record dwControlID
+	m_oDstLineName = mxl.szName;
+	m_oVolumeControlName = mxc.szName;
+	m_dwMinimum = mxc.Bounds.dwMinimum;
+	m_dwMaximum = mxc.Bounds.dwMaximum;
+	m_dwVolumeControlID = mxc.dwControlID;
+
+	return TRUE;
 }
 
 int32 SoundCardPMO::GetVolume() 
 {
-    int32 volume = 0;
+	MIXERCONTROLDETAILS_UNSIGNED mxcdVolume;
+	MIXERCONTROLDETAILS mxcd;
+    int                 ret;
+    
+	mxcd.cbStruct = sizeof(MIXERCONTROLDETAILS);
+	mxcd.dwControlID = m_dwVolumeControlID;
+	mxcd.cChannels = 1;
+	mxcd.cMultipleItems = 0;
+	mxcd.cbDetails = sizeof(MIXERCONTROLDETAILS_UNSIGNED);
+	mxcd.paDetails = &mxcdVolume;
+	ret = mixerGetControlDetails((HMIXEROBJ)m_hmixer,
+								 &mxcd,
+								 MIXER_OBJECTF_HMIXER |
+								 MIXER_GETCONTROLDETAILSF_VALUE);
+	if (ret != MMSYSERR_NOERROR)
+		return 0;
 
-    waveOutGetVolume((HWAVEOUT)WAVE_MAPPER, (DWORD*)&volume);
-    volume = (int32)(100 * ((float)LOWORD(volume)/(float)0xffff));
+	return ((mxcdVolume.dwValue - m_dwMinimum) * 100) / 
+            (m_dwMaximum - m_dwMinimum);
+}
 
-    return volume;
-} 
+void SoundCardPMO::SetVolume(int32 volume) 
+{
+    DWORD dwVal;
+    
+    dwVal = m_dwMinimum + ((m_dwMaximum - m_dwMinimum) * volume / 100);
+
+	MIXERCONTROLDETAILS_UNSIGNED mxcdVolume = { dwVal };
+	MIXERCONTROLDETAILS mxcd;
+    
+	mxcd.cbStruct = sizeof(MIXERCONTROLDETAILS);
+	mxcd.dwControlID = m_dwVolumeControlID;
+	mxcd.cChannels = 2;
+	mxcd.cMultipleItems = 0;
+	mxcd.cbDetails = sizeof(MIXERCONTROLDETAILS_UNSIGNED);
+	mxcd.paDetails = &mxcdVolume;
+    
+	mixerSetControlDetails((HMIXEROBJ)m_hmixer, &mxcd, 
+                           MIXER_OBJECTF_HMIXER | 
+                           MIXER_SETCONTROLDETAILSF_VALUE);
+}
 
 Error SoundCardPMO::Init(OutputInfo * info)
 {
@@ -212,11 +298,11 @@ Error SoundCardPMO::Init(OutputInfo * info)
    }
    m_iBytesPerSample = info->number_of_channels * (info->bits_per_sample / 8);
 
-   if (IsntError(m_pContext->props->GetProperty("CurrentVolume", 
-                (PropValue **)&pProp)))
-   {
-      SetVolume(pProp->GetInt32());
-   }   
+//   if (IsntError(m_pContext->props->GetProperty("CurrentVolume", 
+//                (PropValue **)&pProp)))
+//   {
+//      SetVolume(pProp->GetInt32());
+//   }   
 
    m_initialized = true;
 
@@ -568,7 +654,6 @@ void SoundCardPMO::WorkerThread(void)
 
       UpdateBufferStatus();
    }
-   m_pContext->log->Log(LogDecode, "PMO: Soundcard thread exiting\n");
 }    
 
 
