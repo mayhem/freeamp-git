@@ -109,7 +109,7 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                                displayString, 
                                ListView_GetColumnWidth(hwndList, 0) /*- (cxImage + 1)*/);
 
-            UINT oldAlign;
+			UINT oldAlign;
 
             oldAlign = SetTextAlign(dis->hDC, TA_CENTER | TA_TOP );
 
@@ -1076,73 +1076,6 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
 
 			break;
 		}
-
-        /*case WM_SIZE:
-        {
-            int32 oldWidth = 0;
-
-            oldWidth += ListView_GetColumnWidth(hwnd, 0);
-            oldWidth += ListView_GetColumnWidth(hwnd, 1);
-            oldWidth += ListView_GetColumnWidth(hwnd, 2);
-            oldWidth += ListView_GetColumnWidth(hwnd, 3);
-            oldWidth += ListView_GetColumnWidth(hwnd, 4);
-
-            RECT clientRect;
-
-            GetClientRect(hwnd, &clientRect);
-
-            //int32 headerResizeAmount = LOWORD(lParam) - oldWidth;
-
-            int32 headerResizeAmount = (clientRect.right - clientRect.left) - oldWidth;
-
-    
-            int32 eachHeaderAmount = headerResizeAmount/3;
-            int32 titleExtraAmount = headerResizeAmount%3;
-            int32 width;
-
-            if(eachHeaderAmount)
-            {
-                width = ListView_GetColumnWidth(m_hPlaylistView, 1);
-                width += eachHeaderAmount;    
-                ListView_SetColumnWidth(m_hPlaylistView, 1, width);
-
-                width = ListView_GetColumnWidth(m_hPlaylistView, 2);
-                width += eachHeaderAmount;
-                ListView_SetColumnWidth(m_hPlaylistView, 2, width);
-
-                width = ListView_GetColumnWidth(m_hPlaylistView, 3);
-                width += eachHeaderAmount;
-                ListView_SetColumnWidth(m_hPlaylistView, 3, width);
-            }
-    
-            if(titleExtraAmount)
-            {
-                static uint32 lastColumn = 1;
-
-                while(titleExtraAmount)
-                {
-                    width = ListView_GetColumnWidth(m_hPlaylistView, lastColumn);
-       
-                    if(titleExtraAmount > 0)
-                    {
-                        width += 1;
-                        titleExtraAmount--;
-                    }
-                    else
-                    {
-                        width -= 1;
-                        titleExtraAmount++;
-                    }
-
-                    ListView_SetColumnWidth(m_hPlaylistView, lastColumn, width);
-
-                    if(++lastColumn > 3)
-                        lastColumn = 1;
-                }
-            }
-            
-            break;
-        }*/
 
         case WM_SETFOCUS:
         case WM_KILLFOCUS:

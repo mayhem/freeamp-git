@@ -74,3 +74,8 @@ the DevStudio GUI) by exporting all the makefiles (select
 "Project | Export Makefile" and then running Microsoft's NMAKE.EXE
 on the freeamp makefile. You may need to twiddle a little bit
 to get it to work, but it's not difficult.
+
+If you are using DevStudio 6, or greater, you can also build from
+the command line by using a command line similar to this one:
+
+  MSDEV  drive:path\freeamp\base\win32\proj\freeamp.dsw /make all /out:Build-Log.txt

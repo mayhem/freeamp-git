@@ -300,9 +300,10 @@ void MusicBrowserUI::GenSLPlaylistEvent(vector<PlaylistItem*>* pSeed, float fMax
         vector<PlaylistItem *>::iterator i;
 
         for (i = pSeed->begin(); i != pSeed->end(); i++)
+		{
             seedList.Insert((*i)->GetMetaData().GUID().c_str(),
                             (*i)->URL().c_str());
-
+		}
     }
     nResponse = m_context->aps->APSGetSoundsLike(&seedList, &returnList);
 
