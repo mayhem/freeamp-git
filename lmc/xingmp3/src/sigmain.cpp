@@ -51,6 +51,8 @@ extern "C"
                     int integer_decode);
 };
 
+static int quiet = 0;
+
 /*------------------------------------------*/
 // Silly defines to make this and that happy in this little hatchet job
 const char* protocol = "file://";
@@ -120,7 +122,8 @@ void submit_metadata(MetaData *pmetaData)
        pmetaData->Album().length() == 0 ||
        pmetaData->Title().length() == 0)
    {
-       printf("A track needs to have album, artist and title metadata "
+       if (!quiet)
+           printf("A track needs to have album, artist and title metadata "
               "information in\n the id3v1/2 tag in order to be submitted "
               "using this program.\n\n");
        return;
@@ -151,11 +154,13 @@ void submit_metadata(MetaData *pmetaData)
    {
        char err[255];
        mb_GetQueryError(o, err, 255);
-       printf("Data submit error: %s\n\n", err);
+       if (!quiet)
+          printf("Data submit error: %s\n\n", err);
    }
    else
    {
-       printf("Data submitted to server.\n\n");
+       if (!quiet)
+          printf("Data submitted to server.\n\n");
    }
 
    mb_Delete(o);  
@@ -168,35 +173,48 @@ int main(int argc, char *argv[])
    char        sig[37];
    MetaData    m;
    struct stat s;
+   int         index = 1;
 
    if (argc < 2)
    {
-       printf("Usage: sigapp <mp3 file>\n");
+       printf("Usage: sigapp [-q] <mp3 file>\n");
        exit(0);
    }
 
-   if (get_metadata(argv[1], &m))
+   if (strcmp(argv[index], "-q") == 0)
    {
-       stat(argv[1], &s);
-       m.SetSize(s.st_size);
-       printf("    Title: %s\n", m.Title().c_str());
-       printf("    Album: %s\n", m.Album().c_str());
-       printf("   Artist: %s\n", m.Artist().c_str());
-       printf("    Genre: %s\n", m.Genre().c_str());
-       printf("  Comment: %s\n", m.Comment().c_str());
-       printf("    Track: %d\n", m.Track());
-       printf("     Time: %d\n", m.Time());
-       printf("     Size: %d\n", m.Size());
+       quiet = 1;
+       index++;
+   }
 
-       if (ff_decode(argv[1], sig, 0, 0, 0, 24000, 0))
+   if (get_metadata(argv[index], &m))
+   {
+       stat(argv[index], &s);
+       m.SetSize(s.st_size);
+       if (!quiet)
+       {
+          printf("    Title: %s\n", m.Title().c_str());
+          printf("    Album: %s\n", m.Album().c_str());
+          printf("   Artist: %s\n", m.Artist().c_str());
+          printf("    Genre: %s\n", m.Genre().c_str());
+          printf("  Comment: %s\n", m.Comment().c_str());
+          printf("    Track: %d\n", m.Track());
+          printf("     Time: %d\n", m.Time());
+          printf("     Size: %d\n", m.Size());
+       }
+
+       if (ff_decode(argv[index], sig, 0, 0, 0, 24000, 0))
        {
            m.SetGUID(sig);
-           printf("Signature: %s\n", sig);
+           if (!quiet)
+               printf("Signature: ");
+           printf("%s\n", sig);
            submit_metadata(&m);
        }
        else
        {
-           printf("Error calculating signature.\n");
+           if (!quiet)
+              printf("Error calculating signature.\n");
        }
    }
    else
