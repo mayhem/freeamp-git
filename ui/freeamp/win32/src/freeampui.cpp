@@ -2565,6 +2565,7 @@ UpdatePlayList()
         {
             int32 i = 0;
             PlayListItem* playlistItem;
+            List<ListItem*> listitemList;
 
             m_playlistView->MakeEmpty();
             
@@ -2581,11 +2582,15 @@ UpdatePlayList()
                                                     smallFontWidth);
                 item->SetUserValue(playlistItem);
 
-                m_playlistView->AddItem(item);
+                ListItem* i = item;
+
+                listitemList.AddItem(i);
 
                 /*OutputDebugString(playlistItem->StringForPlayerToDisplay());
                 OutputDebugString("\r\n");*/
             }
+
+            m_playlistView->AddList(&listitemList);
         }       
         else
         {
