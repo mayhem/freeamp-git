@@ -859,10 +859,9 @@ void MusicCatalog::PruneThread(bool sendmessages)
                     }
                     else {
                         m_database->Remove(key);
+                        m_trackCount--;
                         key = NULL;
                     }
-                    if (m_sigs)
-                        m_sigs->erase(key);
                 }
             }
             delete [] filename;
@@ -889,8 +888,6 @@ void MusicCatalog::PruneDirectory(string &directory)
                     if (-1 == stat(filename, &st)) {
                         Remove(key);
                         key = NULL;
-                        if (m_sigs)
-                            m_sigs->erase(key);
                     }
                 }
             }
