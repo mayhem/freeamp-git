@@ -49,6 +49,7 @@ typedef enum {
     kCommentColumn,
     kGenreColumn,
     kLocationColumn,
+    kPositionColumn,
     kTitleColumn,
     kTimeColumn
 } PlaylistColumns;
@@ -254,7 +255,12 @@ class GTKMusicBrowser {
 
     GtkWidget *artistSubTree;
     GtkWidget *playlistSubTree;
-  
+ 
+    PlaylistColumns playlistCols[8];
+    bool playlistColsChanged;
+    void ParsePlaylistCols();
+    void UpdateColumnHeaders();
+
     void UpdatePlayPause();
     TreeData *NewTreeData(TreeNodeType type, MusicCatalog *cat = NULL, 
                           ArtistList *art = NULL, AlbumList *alb = NULL, 
@@ -288,7 +294,7 @@ class GTKMusicBrowser {
     void AskSignatureDialog(void);  
     void AskOptIn(bool inMain = true);
     void StillNeedSignature(bool inMain = true);
-    
+   
   public:
 
     vector<PlaylistItem *> *GetTreeSelection(void);

@@ -1591,6 +1591,10 @@ GTKMusicBrowser::GTKMusicBrowser(FAContext *context, MusicBrowserUI *masterUI,
     stream_timer = NULL;
     m_sigsExist = false;
     m_sigsStart = true;
+    playlistColsChanged = true;
+    for (int i = 0; i < 8; i++)
+        playlistCols[i] = kEmptyColumn;
+    playlistCols[0] = kPositionColumn;
 
     mbSelections = new vector<TreeData *>;
 

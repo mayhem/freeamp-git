@@ -127,15 +127,26 @@ void GTKMusicBrowser::UpdatePlaylistItems(const vector<PlaylistItem *> *items)
             minpos = pos;
 
         MetaData mdata = (*i)->GetMetaData();
-        char *iText[4];
-        char position[10];
+        char *iText[8];
+        char position[40];
         char *title;
         char *artist;
+        char *album;
+        char *genre;
+        char location[_MAX_PATH];
+        uint32 loclength = _MAX_PATH;
+        char *comment;
         char length[50];
+        string empty = " ";
 
         sprintf(position, "%d", pos + 1);
         title = (char *)mdata.Title().c_str();
         artist = (char *)mdata.Artist().c_str();
+        album = (char *)mdata.Album().c_str();
+        genre = (char *)mdata.Genre().c_str();
+        comment = (char *)mdata.Comment().c_str();
+
+        URLToFilePath((*i)->URL().c_str(), location, &loclength);
 
         if (mdata.Time() == 0)
             sprintf(length, "Unknown");
@@ -148,12 +159,41 @@ void GTKMusicBrowser::UpdatePlaylistItems(const vector<PlaylistItem *> *items)
                 sprintf(length, "%d:%02d", (secs / 60) % 60, secs % 60);
         }
 
-        iText[0] = position;
-        iText[1] = title;
-        iText[2] = artist;
-        iText[3] = length;
+        for (int i = 0; i < 8; i++)
+        {
+            switch (playlistCols[i])
+            {
+            case kArtistColumn:
+                iText[i] = artist;
+                break;
+            case kAlbumColumn:
+                iText[i] = album;
+                break;
+            case kCommentColumn:
+                iText[i] = comment;
+                break;
+            case kGenreColumn:
+                iText[i] = genre;
+                break;
+            case kLocationColumn:
+                iText[i] = location;
+                break;
+            case kPositionColumn:
+                iText[i] = position;
+                break;
+            case kTitleColumn:
+                iText[i] = title;
+                break;
+            case kTimeColumn:
+                iText[i] = length;
+                break;
+            default:
+                iText[i] = (char *)empty.c_str();
+                break;
+            }
+        }
 
-        for (uint32 count = 0; count < 4; count++)
+        for (uint32 count = 0; count < 8; count++)
             gtk_clist_set_text(GTK_CLIST(playlistList), pos, count, iText[count]);
     }
 
@@ -183,17 +223,27 @@ void GTKMusicBrowser::AddPlaylistItems(vector<PlaylistItem *> *items)
             continue;
 
         MetaData mdata = item->GetMetaData();
-        char *iText[4];
-        char position[10];
+        char *iText[8];
+        char position[40];
         char *title;
         char *artist;
+        char *album;
+        char *genre;
+        char location[_MAX_PATH];
+        uint32 loclength = _MAX_PATH;
+        char *comment;
         char length[50];
+        string empty = " ";
 
         uint32 pos = m_plm->IndexOf(item);
-
         sprintf(position, "%d", pos + 1);
         title = (char *)mdata.Title().c_str();
         artist = (char *)mdata.Artist().c_str();
+        album = (char *)mdata.Album().c_str();
+        genre = (char *)mdata.Genre().c_str();
+        comment = (char *)mdata.Comment().c_str();
+
+        URLToFilePath(item->URL().c_str(), location, &loclength);
 
         if (mdata.Time() == 0)
             sprintf(length, "Unknown");
@@ -206,10 +256,39 @@ void GTKMusicBrowser::AddPlaylistItems(vector<PlaylistItem *> *items)
                 sprintf(length, "%d:%02d", (secs / 60) % 60, secs % 60);
         }
 
-        iText[0] = position;
-        iText[1] = title;
-        iText[2] = artist;
-        iText[3] = length;
+        for (int i = 0; i < 8; i++)
+        {
+            switch (playlistCols[i])
+            {
+            case kArtistColumn:
+                iText[i] = artist;
+                break;
+            case kAlbumColumn:
+                iText[i] = album;
+                break;
+            case kCommentColumn:
+                iText[i] = comment;
+                break;
+            case kGenreColumn:
+                iText[i] = genre;
+                break;
+            case kLocationColumn:
+                iText[i] = location;
+                break;
+            case kPositionColumn:
+                iText[i] = position;
+                break;
+            case kTitleColumn:
+                iText[i] = title;
+                break;
+            case kTimeColumn:
+                iText[i] = length;
+                break;
+            default:
+                iText[i] = (char *)empty.c_str();
+                break;
+            }
+        }
 
         gtk_clist_insert(GTK_CLIST(playlistList), pos, iText);
 
@@ -256,13 +335,112 @@ void GTKMusicBrowser::RemovePlaylistItems(vector<uint32> *indices)
     gtk_clist_thaw(GTK_CLIST(playlistList));
 }
 
+void GTKMusicBrowser::ParsePlaylistCols(void)
+{
+    unsigned int size = 100;
+    char *buffer = (char *)malloc( size );
+    if (kError_BufferTooSmall == m_context->prefs->GetPrefString(
+                                                    kPlaylistHeaderColumnsPref,
+                                                    buffer, &size))
+    {
+        int bufferSize = size;
+        buffer = (char*)realloc(buffer, bufferSize);
+        m_context->prefs->GetPrefString(kPlaylistHeaderColumnsPref, buffer, &size);
+    }
+
+    int column = 1;
+    char *token = strtok(buffer, "|");
+    while (token != NULL && column < 8)
+    {
+        PlaylistColumns newcol = kEmptyColumn;
+ 
+        if (!strcmp(token, "Artist"))
+            newcol = kArtistColumn;
+        else if (!strcmp(token, "Album"))
+            newcol = kAlbumColumn;
+        else if (!strcmp(token, "Comment"))
+            newcol = kCommentColumn;
+        else if (!strcmp(token, "Genre"))
+            newcol = kGenreColumn;
+        else if (!strcmp(token, "Location"))
+            newcol = kLocationColumn;
+        else if (!strcmp(token, "Title"))
+            newcol = kTitleColumn;
+        else if (!strcmp(token, "Time"))
+            newcol = kTimeColumn;
+        else
+            newcol = kEmptyColumn;
+
+        if (playlistCols[column] != newcol)
+            playlistColsChanged = true;
+
+        playlistCols[column] = newcol;
+        token = strtok(NULL, "|");
+        column++;
+    }
+    for (; column < 8; column++) 
+        playlistCols[column] = kEmptyColumn;
+}
+
+void GTKMusicBrowser::UpdateColumnHeaders(void)
+{
+    gtk_clist_column_titles_show(GTK_CLIST(playlistList));
+
+    for (int column = 0; column < 8; column++) 
+    {
+        string title;
+        bool visible = true;
+
+        switch (playlistCols[column]) 
+        {
+            case kArtistColumn:
+                title = "Artist";
+                break;
+            case kAlbumColumn:
+                title = "Album";
+                break;
+            case kCommentColumn:
+                title = "Comment";
+                break;
+            case kGenreColumn:
+                title = "Genre";
+                break;
+            case kLocationColumn:
+                title = "Location";
+                break;
+            case kPositionColumn:
+                title = "#";
+                break;
+            case kTitleColumn:
+                title = "Title";
+                break;
+            case kTimeColumn:
+                title = "Length"; 
+                break;
+            default:
+                title = " ";
+                visible = false;
+                break;
+        }
+        gtk_clist_set_column_title(GTK_CLIST(playlistList), column, 
+                                   title.c_str());
+        gtk_clist_set_column_visibility(GTK_CLIST(playlistList), column, 
+                                        visible);
+    }
+} 
+
 void GTKMusicBrowser::UpdatePlaylistList(void)
 {
     if (!playlistList || !m_plm)
         return;
 
+    ParsePlaylistCols();
+
     gtk_clist_freeze(GTK_CLIST(playlistList));
     gtk_clist_clear(GTK_CLIST(playlistList));
+
+    if (playlistColsChanged)
+        UpdateColumnHeaders();
 
     uint32 iLoop = m_plm->CountItems();
 
@@ -279,15 +457,26 @@ void GTKMusicBrowser::UpdatePlaylistList(void)
             continue;
 
         MetaData mdata = item->GetMetaData();
-        char *iText[4];
+        char *iText[8];
         char position[40];
         char *title;
         char *artist;
+        char *album;
+        char *genre;
+        char location[_MAX_PATH];
+        uint32 loclength = _MAX_PATH;
+        char *comment;
         char length[50];
+        string empty = " ";
 
         sprintf(position, "%d", i + 1);
         title = (char *)mdata.Title().c_str();
         artist = (char *)mdata.Artist().c_str();
+        album = (char *)mdata.Album().c_str();
+        genre = (char *)mdata.Genre().c_str();
+        comment = (char *)mdata.Comment().c_str();
+        
+        URLToFilePath(item->URL().c_str(), location, &loclength);
 
         if (mdata.Time() == 0)
             sprintf(length, "Unknown");
@@ -300,10 +489,39 @@ void GTKMusicBrowser::UpdatePlaylistList(void)
                 sprintf(length, "%d:%02d", (secs / 60) % 60, secs % 60);
         }
 
-        iText[0] = position;
-        iText[1] = title;
-        iText[2] = artist;
-        iText[3] = length;
+        for (int i = 0; i < 8; i++)
+        {
+            switch (playlistCols[i]) 
+            {
+            case kArtistColumn:
+                iText[i] = artist;
+                break;
+            case kAlbumColumn:
+                iText[i] = album;
+                break;
+            case kCommentColumn:
+                iText[i] = comment;
+                break;
+            case kGenreColumn:
+                iText[i] = genre;
+                break;
+            case kLocationColumn:
+                iText[i] = location;
+                break;
+            case kPositionColumn:
+                iText[i] = position;
+                break;
+            case kTitleColumn:
+                iText[i] = title;
+                break;
+            case kTimeColumn:
+                iText[i] = length;
+                break;
+            default:
+                iText[i] = (char *)empty.c_str();
+                break;
+            }
+        }
 
         totaltime = totaltime + mdata.Time();
 
@@ -855,12 +1073,7 @@ void GTKMusicBrowser::CreatePlaylistList(GtkWidget *box)
 
     int nmenu2_items = sizeof(popup2_items) / sizeof(popup2_items[0]);
      
-    static char *titles[] =
-    {
-      "# ", "Title", "Artist", "Length"
-    };
-
-    playlistList = gtk_clist_new_with_titles(4, titles);
+    playlistList = gtk_clist_new(8);
     gtk_container_add(GTK_CONTAINER(box), playlistList);
     gtk_signal_connect(GTK_OBJECT(playlistList), "row_move",
                        GTK_SIGNAL_FUNC(playlist_row_move_internal), this);
