@@ -44,6 +44,7 @@
 #define IDD_EDITINFO                    259
 #define IDD_INTROWIZARD_SEARCH          263
 #define IDD_INTROWIZARD_HELLO1          264
+#define IDD_MISSINGTRACK                264
 #define IDB_PLAYING                     542
 #define IDB_CATALOG                     543
 #define IDB_ARTIST                      544
@@ -82,6 +83,13 @@
 #define IDC_CAPTION2                    1035
 #define IDC_TEXT2                       1036
 #define IDC_LOCATIONTEXT                1039
+#define IDC_RADIO1                      1040
+#define IDC_RADIO2                      1041
+#define IDC_EDIT1                       1042
+#define IDC_BUTTON1                     1043
+#define IDC_RADIO3                      1044
+#define IDC_EDIT2                       1045
+#define IDC_BUTTON2                     1046
 #define IDC_BROWSE                      1110
 #define IDC_DRIVES                      1231
 #define IDC_ALBUM                       1462

@@ -93,6 +93,7 @@ extern const char* kWriteID3v1Pref;
 extern const char* kWriteID3v2Pref;
 extern const char* kEqualizerSettingsPref;
 extern const char* kSavedPlaylistPositionPref;
+extern const char* kMusicBrowserPositionPref;
 
 extern const int32 kDefaultWatchThisDirTimeout;
 

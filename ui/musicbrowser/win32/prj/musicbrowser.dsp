@@ -500,6 +500,14 @@ SOURCE=..\..\..\..\base\win32\include\help.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\..\lib\http\include\Http.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\Icecast.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\base\include\log.h
 # End Source File
 # Begin Source File
@@ -513,6 +521,10 @@ SOURCE=..\..\..\..\base\include\musiccatalog.h
 # Begin Source File
 
 SOURCE=..\..\..\..\base\win32\include\mutex.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\xml\include\Parse.h
 # End Source File
 # Begin Source File
 

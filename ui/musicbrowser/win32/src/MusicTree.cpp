@@ -380,8 +380,8 @@ void MusicBrowserUI::RefreshCDList(vector<PlaylistItem*>* trackList)
 
     tv_item.mask = TVIF_CHILDREN|TVIF_TEXT;
     tv_item.hItem = m_hCDItem;
-    tv_item.cchTextMax = strlen(insert.item.pszText);
     tv_item.pszText = (char*)(CD.c_str());
+    tv_item.cchTextMax = strlen(tv_item.pszText);
     tv_item.cChildren = (trackList->size() ? 1 : 0);
 
     TreeView_SetItem(m_hMusicView, &tv_item);
@@ -1551,7 +1551,8 @@ void MusicBrowserUI::TVBeginDrag(HWND hwnd, NM_TREEVIEW* nmtv)
         }
 
         GetSelectedPlaylistItems(urls);
-        //GetSelectedStreamItems(urls);
+        GetSelectedStreamItems(urls);
+        GetSelectedCDItems(urls);
 
         HIMAGELIST himl;
         RECT rcItem;
@@ -1680,10 +1681,14 @@ BOOL MusicBrowserUI::FindSelectedItems(HTREEITEM root, vector<PlaylistItem*>* it
     HWND hwnd = m_hMusicView;
     TV_ITEM tv_item;
 
+    char buf[256];
+
     tv_item.hItem = root;
-    tv_item.mask = TVIF_STATE|TVIF_PARAM;
+    tv_item.mask = TVIF_STATE|TVIF_PARAM|TVIF_TEXT;
     tv_item.stateMask = TVIS_SELECTED;
     tv_item.state = 0;
+    tv_item.pszText = buf;
+    tv_item.cchTextMax = sizeof(buf);
 
     do
     {
@@ -1705,6 +1710,59 @@ BOOL MusicBrowserUI::FindSelectedItems(HTREEITEM root, vector<PlaylistItem*>* it
     return result;
 }
 
+void MusicBrowserUI::GetSelectedCDItems(vector<string>* urls)
+{
+    TV_ITEM tv_root;
+
+    tv_root.hItem = m_hCDItem;
+    tv_root.mask = TVIF_STATE;
+    tv_root.stateMask = TVIS_SELECTED;
+    tv_root.state = 0;
+
+    TreeView_GetItem(m_hMusicView, &tv_root);
+
+    bool addAll = false;
+
+    // if selected then we add all the cd tracks
+    if(tv_root.state & TVIS_SELECTED)
+    {
+        addAll = true;
+    }
+
+    TV_ITEM tv_item;
+
+    // get the first cd item
+    tv_item.hItem = TreeView_GetChild(m_hMusicView, m_hCDItem);
+    tv_item.mask = TVIF_STATE|TVIF_PARAM;
+    tv_item.stateMask = TVIS_SELECTED;
+    tv_item.state = 0;
+
+    if(tv_item.hItem)
+    {
+        BOOL result = FALSE;
+
+        do
+        {
+            result = TreeView_GetItem(m_hMusicView, &tv_item);
+
+            if(result && ((tv_item.state & TVIS_SELECTED) || addAll))
+            {
+                TreeData* treedata = (TreeData*)tv_item.lParam;
+
+                if(treedata)
+                {
+                    PlaylistItem* track = treedata->m_pTrack;
+
+                    urls->push_back(track->URL());
+                }
+            }
+    
+        }while(result && 
+               (tv_item.hItem = TreeView_GetNextSibling(m_hMusicView, 
+                                                        tv_item.hItem)));
+    }
+}
+
 void MusicBrowserUI::GetSelectedStreamItems(vector<string>* urls)
 {
     TV_ITEM tv_root;
@@ -1721,7 +1779,7 @@ void MusicBrowserUI::GetSelectedStreamItems(vector<string>* urls)
     {
         TV_ITEM tv_item;
 
-        // get the first playlist item
+        // get the first stream item
         tv_item.hItem = TreeView_GetChild(m_hMusicView, m_hWiredPlanetItem);
         tv_item.mask = TVIF_STATE|TVIF_PARAM;
         tv_item.stateMask = TVIS_SELECTED;
@@ -1885,12 +1943,12 @@ void MusicBrowserUI::GetSelectedMusicTreeItems(vector<PlaylistItem*>* items)
         {
             AddAllTrackItems(items);
         }
-        else
+        else if(m_hAllItem && m_hUncatItem)
         {
             TV_ITEM tv_all;
 
             // is the "All Tracks" item selected
-            tv_all.hItem = TreeView_GetChild(m_hMusicView, rootItem);
+            tv_all.hItem = m_hAllItem;
             tv_all.mask = TVIF_STATE;
             tv_all.stateMask = TVIS_SELECTED;
             tv_all.state = 0;
@@ -1912,7 +1970,7 @@ void MusicBrowserUI::GetSelectedMusicTreeItems(vector<PlaylistItem*>* items)
                 TV_ITEM tv_uncat;
                 
                 // is the "Uncatagorized" item selected
-                tv_uncat.hItem = TreeView_GetNextSibling(m_hMusicView, tv_all.hItem);
+                tv_uncat.hItem = m_hUncatItem;
                 tv_uncat.mask = TVIF_STATE;
                 tv_uncat.stateMask = TVIS_SELECTED;
                 tv_uncat.state = 0;

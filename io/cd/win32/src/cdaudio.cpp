@@ -100,7 +100,10 @@ cd_stat(string cd_desc, struct disc_info *disc, bool read_toc)
    char mciReturn[128];
 
    sprintf(mciCommand, "status %s number of tracks wait", cd_desc.c_str());
-   mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
+   int ret = mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
+
+   char buf[256];
+   mciGetErrorString(ret, buf, sizeof(buf));
 
    int numTracks = atoi(mciReturn);
 

@@ -547,6 +547,64 @@ void MusicBrowserUI::PlaylistListItemUpdated(const PlaylistItem* item)
         //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_plm->CanUndo() ? MF_ENABLED : MF_GRAYED));
         //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_plm->CanRedo() ? MF_ENABLED : MF_GRAYED));
     }
+
+    string s = item->URL().substr(item->URL().size() - 4);
+
+    if(!item->URL().compare(item->URL().size() - 4, 4, ".cda"))
+    {
+        vector<PlaylistItem*>::iterator i = m_cdTracks->begin();
+        
+        for(; i != m_cdTracks->end(); i++)
+        {
+            if((*i)->URL() == item->URL())
+            {
+                MetaData metadata = item->GetMetaData();
+                (*i)->SetMetaData(&metadata);
+
+                TV_ITEM tv_item;
+                BOOL success;
+
+                tv_item.hItem = TreeView_GetChild(m_hMusicView, m_hCDItem);
+                tv_item.mask = TVIF_PARAM;
+
+                do
+                {
+                    success = TreeView_GetItem(m_hMusicView, &tv_item);
+
+                    if(success)
+                    {
+                        TreeData* treedata = (TreeData*)tv_item.lParam;
+
+                        if(treedata && item->URL() == treedata->m_pTrack->URL())
+                        {
+                            if(metadata.Title().size())
+                            {
+                                tv_item.mask = TVIF_TEXT;
+                                tv_item.pszText = (char*)(metadata.Title().c_str());
+                                tv_item.cchTextMax = strlen(tv_item.pszText);
+
+                                TreeView_SetItem(m_hMusicView, &tv_item);
+                            }
+                            break;
+                        }
+                    }
+
+                }while(success && 
+                       (tv_item.hItem = TreeView_GetNextSibling(m_hMusicView, 
+                                                                tv_item.hItem)));
+                string CD;
+
+                CD = (metadata.Album().size() ? metadata.Album() : "Unknown Album");
+                CD += " by ";
+                CD += (metadata.Artist().size() ? metadata.Artist() : "Unknown Artist");
+
+                tv_item.hItem = m_hCDItem;
+                tv_item.pszText = (char*)(CD.c_str());
+                tv_item.cchTextMax = strlen(tv_item.pszText);
+                TreeView_SetItem(m_hMusicView, &tv_item);
+            }
+        }
+    }
 }
 
 void MusicBrowserUI::PlaylistListItemAdded(const PlaylistItem* item)

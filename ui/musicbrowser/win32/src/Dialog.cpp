@@ -491,6 +491,16 @@ void MusicBrowserUI::Close()
 
 void MusicBrowserUI::Destroy()
 {
+    RECT rect;
+    char buf[256];
+
+    GetWindowRect(m_hWnd, &rect);
+
+    sprintf(buf, "%d,%d,%d,%d", rect.left, rect.top, 
+                rect.right - rect.left, rect.bottom - rect.top);
+
+    m_context->prefs->SetPrefString(kMusicBrowserPositionPref, buf);
+
     RevokeDragDrop(m_hPlaylistView);
     OleUninitialize(); 
 
@@ -893,8 +903,6 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
  
     ListView_SetImageList(m_hPlaylistView, hList, LVSIL_SMALL); 
 
-    InitTree();                      
-    InitList();
     SetTitles();
     CreateToolbar();
 
@@ -952,7 +960,6 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
     //CoLockObjectExternal ((IUnknown*)m_playlistDropTarget, TRUE, TRUE);
     result = RegisterDragDrop(m_hPlaylistView, m_playlistDropTarget);
     
-
     m_hStatus= CreateStatusWindow(WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS,
                                   "", m_hWnd, IDC_STATUS);
 
@@ -988,9 +995,6 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
 
     if(m_pParent == NULL)
     {
-//       string lastPlaylist = FreeampDir(m_context->prefs);
-//       lastPlaylist += "\\currentlist.m3u";
-//       LoadPlaylist(lastPlaylist);
         m_plm->SetActivePlaylist(kPlaylistKey_MasterPlaylist);
     }   
     else if(m_portableDevice)
@@ -1016,7 +1020,23 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
     }       
 
     UpdateTotalTime();
-    
+
+    // resize window
+    char buf[256];
+    uint32 size = sizeof(buf);
+    int32 x,y,h,w;
+
+    m_context->prefs->GetPrefString(kMusicBrowserPositionPref, buf, &size);
+    sscanf(buf, " %d , %d , %d , %d", &x, &y, &w, &h);
+
+    if(x != -1 && y != -1 && h != -1 && w != -1)
+    {
+        MoveWindow(hWnd, x, y, w, h, TRUE);
+    }
+
+    InitTree();
+    InitList();
+
     if(m_pParent)
     {
         ShowWindow(m_hWnd, SW_SHOW);

@@ -87,6 +87,7 @@ const char* kWriteID3v1Pref = "WriteID3v1Tags";
 const char* kWriteID3v2Pref = "WriteID3v2Tags";
 const char* kEqualizerSettingsPref = "EqualizerSettings";
 const char* kSavedPlaylistPositionPref = "SavedPlaylistPosition";
+const char* kMusicBrowserPositionPref = "MusicBrowserPosition";
 
 //logging
 const char* kUseDebugLogPref = "UseDebugLog";
@@ -150,6 +151,7 @@ const bool  kDefaultWriteID3v1 = true;
 const bool  kDefaultWriteID3v2 = true;
 const char* kDefaultEqualizerSettings = "1,50,50,50,50,50,50,50,50,50,50";
 const uint32 kDefaultSavedPlaylistPosition = 0;
+const char *kDefaultMusicBrowserPosition = "-1,-1,-1,-1";  
 
 Error
 Preferences::
@@ -330,7 +332,7 @@ SetDefaults()
     if (GetPrefBoolean(kAllowMultipleInstancesPref, &dummyBool) == kError_NoPrefValue)
         SetPrefBoolean(kAllowMultipleInstancesPref, kDefaultAllowMultipleInstances);
 
-	 dummyInt = 255;
+	dummyInt = 255;
     if (GetPrefString(kWAVOutputPathPref, dummyString, 
         (uint32 *)&dummyInt) == kError_NoPrefValue)
         SetPrefString(kWAVOutputPathPref, kDefaultWAVOutPath);
@@ -347,13 +349,18 @@ SetDefaults()
     if (GetPrefBoolean(kWriteID3v2Pref, &dummyBool) == kError_NoPrefValue)
         SetPrefBoolean(kWriteID3v2Pref, kDefaultWriteID3v2);
 
-	 dummyInt = 255;
+	dummyInt = 255;
     if (GetPrefString(kEqualizerSettingsPref, dummyString, 
         (uint32 *)&dummyInt) == kError_NoPrefValue)
         SetPrefString(kEqualizerSettingsPref, kDefaultEqualizerSettings);
 
     if (GetPrefInt32(kSavedPlaylistPositionPref, &dummyInt) == kError_NoPrefValue)
         SetPrefInt32(kSavedPlaylistPositionPref, kDefaultSavedPlaylistPosition);
+
+    dummyInt = 255;
+    if (GetPrefString(kMusicBrowserPositionPref, dummyString, 
+        (uint32 *)&dummyInt) == kError_NoPrefValue)
+        SetPrefString(kMusicBrowserPositionPref, kDefaultMusicBrowserPosition);
 
     return kError_NoErr;
 }

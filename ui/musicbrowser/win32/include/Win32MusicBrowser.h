@@ -282,6 +282,7 @@ class MusicBrowserUI : public UserInterface
     void    AddUncatagorizedTrackItems(vector<PlaylistItem*>* items);
     void    GetSelectedPlaylistItems(vector<string>* urls);
     void    GetSelectedStreamItems(vector<string>* urls);
+    void    GetSelectedCDItems(vector<string>* urls);
     void    TVBeginDrag(HWND hwnd, NM_TREEVIEW* nmtv);
     void    MusicCatalogTrackChanged(const ArtistList *oldArtist,
                                      const ArtistList *newArtist,
