@@ -40,6 +40,20 @@ using namespace std;
 #include "cdaudio.h"
 #include "cdpmo.h"
 
+void GTKMusicBrowser::AddStreamToFavs(void)
+{
+    PlaylistItem *stream = mbSelection->track;
+    m_context->catalog->WriteMetaDataToDatabase(stream->URL().c_str(),
+                                                stream->GetMetaData(),
+                                                kTypeStream);
+    m_context->catalog->AddStream(stream->URL().c_str());
+}
+
+void GTKMusicBrowser::AddNewStream(void)
+{
+
+}
+
 void GTKMusicBrowser::EjectCD(void)
 {
     Registry *pmoRegistry = m_context->player->GetPMORegistry();
@@ -428,9 +442,6 @@ void GTKMusicBrowser::DeleteListEvent(void)
 
 void GTKMusicBrowser::SetClickState(ClickState newState)
 {
-    if ((m_clickState == newState) && (newState != kContextPlaylist))
-        return;
-
     gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
                              "/File/Create New Audio CD"), FALSE);
 
@@ -1094,6 +1105,24 @@ Error GTKMusicBrowser::AcceptEvent(Event *e)
                 AddCatTrack((ArtistList *)mct->Artist(), 
                             (AlbumList *)mct->Album(), 
                             (PlaylistItem *)mct->Item(), false);
+                gdk_threads_leave();
+            }
+            break; }
+        case INFO_MusicCatalogStreamAdded: {
+            MusicCatalogStreamAddedEvent *mcsae = 
+                              (MusicCatalogStreamAddedEvent *)e;
+            if (m_initialized && !m_bIgnoringMusicCatalogMessages) {
+                gdk_threads_enter();
+                AddCatStream((PlaylistItem *)mcsae->Item());
+                gdk_threads_leave();
+            }
+            break; }
+        case INFO_MusicCatalogStreamRemoved: {
+            MusicCatalogStreamRemovedEvent *mcsre =
+                              (MusicCatalogStreamRemovedEvent *)e;
+            if (m_initialized) {
+                gdk_threads_enter();
+                RemoveCatStream((PlaylistItem *)mcsre->Item());
                 gdk_threads_leave();
             }
             break; }

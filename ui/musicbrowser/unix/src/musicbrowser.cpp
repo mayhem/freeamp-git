@@ -232,6 +232,8 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
         case INFO_MusicCatalogCleared:
         case INFO_MusicCatalogPlaylistAdded:
         case INFO_MusicCatalogPlaylistRemoved:
+        case INFO_MusicCatalogStreamAdded:
+        case INFO_MusicCatalogStreamRemoved:
         case INFO_MusicCatalogTrackChanged:
         case INFO_MusicCatalogTrackRemoved: 
         case INFO_MusicCatalogTrackAdded: {

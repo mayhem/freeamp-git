@@ -56,11 +56,13 @@ typedef enum {
    kTreeAlbum,
    kTreeTrack,
    kTreeStream,
+   kTreeFavStream,
    kTreeCD,
    kTreePlaylistHead,
    kTreePlaylist,
    kTreeCDHead,
    kTreeStreamsHead,
+   kTreeFavoriteStreamsHead,
    kTreeWiredPlanetHead,
    kTreeIcecastHead,
    kTreeShoutcastHead
@@ -178,7 +180,9 @@ class GTKMusicBrowser {
 
     GtkItemFactory *menuFactory;
     GtkItemFactory *playlistPopup;
+    GtkItemFactory *genstreamPopup;
     GtkItemFactory *streamPopup;
+    GtkItemFactory *favPopup;
     GtkItemFactory *cdPopup;
     GtkItemFactory *trackPopup;
     GtkItemFactory *playlistCatPopup;
@@ -190,6 +194,7 @@ class GTKMusicBrowser {
     GtkCTreeNode *playlistTree;
     GtkCTreeNode *CDTree;
     GtkCTreeNode *streamTree;
+    GtkCTreeNode *favoritesTree;
     GtkCTreeNode *icecastTree;
     GtkCTreeNode *shoutcastTree;
     GtkCTreeNode *wiredplanetTree;
@@ -227,6 +232,7 @@ class GTKMusicBrowser {
     GtkCTreeNode *FindNode(TreeNodeType type, ArtistList *artist,
                            AlbumList *album, PlaylistItem *item,
                            GtkCTreeNode *searchFrom = NULL);
+    GtkCTreeNode *FindStreamNode(PlaylistItem *item);
     GtkCTreeNode *FindPlaylistNode(string playlist);
 
     void CreateMainTreeItems(void);
@@ -236,6 +242,8 @@ class GTKMusicBrowser {
                      bool expand = false);
     void RemoveCatTrack(ArtistList *artist, AlbumList *album, 
                         PlaylistItem *item);
+    void AddCatStream(PlaylistItem *item);
+    void RemoveCatStream(PlaylistItem *item);
     void AddCatPlaylist(string playlist);
     void RemoveCatPlaylist(string playlist);
     void SetRepeatType(RepeatMode mode);
@@ -292,6 +300,9 @@ class GTKMusicBrowser {
 
     void CreateTreePopups(void);
     void EjectCD(void);
+
+    void AddStreamToFavs(void);
+    void AddNewStream(void);
 };
 
 #endif

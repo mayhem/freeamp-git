@@ -508,7 +508,7 @@ static void create_cd(GTKMusicBrowser *p, guint action, GtkWidget *w)
 
 static void add_stream(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
-
+    p->AddStreamToFavs();
 }
 
 static void eject_cd(GTKMusicBrowser *p, guint action, GtkWidget *w)
