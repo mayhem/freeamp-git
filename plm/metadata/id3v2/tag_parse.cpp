@@ -39,6 +39,8 @@
 #include "io_strings.h"
 #include "readers.h"
 
+#define DB printf("%s:%d\n", __FILE__, __LINE__);
+
 using namespace dami;
 
 namespace
@@ -145,6 +147,7 @@ bool id3::v2::parse(ID3_TagImpl& tag, ID3_Reader& reader)
   
   ID3_TagHeader hdr;
 
+
   io::WindowedReader wr(reader, ID3_TagHeader::SIZE);
   
   if (!hdr.Parse(wr) || wr.getCur() == beg)
@@ -238,7 +241,6 @@ void ID3_TagImpl::ParseFile()
       wr.setBeg(cur);
     } while (!wr.atEnd() && cur > last);
   }
-
   _prepended_bytes = cur - beg;
 
   cur = wr.setCur(end);
@@ -263,19 +265,21 @@ void ID3_TagImpl::ParseFile()
       _file_tags.add(ID3TT_LYRICS3);
       wr.setEnd(wr.getCur());
     }
+// RAK: I commented out the v1 parsing, because it clobbers the v2 tags!
+//      FreeAmp's v1 module can do the v1 reading...
+//    ID3D_NOTICE( "ID3_TagImpl::ParseFile(): id3v1? cur = " << wr.getCur() );
+//    if (_tags_to_parse.test(ID3TT_ID3V1) && id3::v1::parse(*this, wr))
+//    {
+//      ID3D_NOTICE( "ID3_TagImpl::ParseFile(): id3v1! cur = " << wr.getCur() );
+//      wr.setEnd(wr.getCur());
+//      _file_tags.add(ID3TT_ID3V1);
+//    }
     ID3D_NOTICE( "ID3_TagImpl::ParseFile(): lyr3v2? cur = " << wr.getCur() );
     if (_tags_to_parse.test(ID3TT_LYRICS3V2) && lyr3::v2::parse(*this, wr))
     {
       ID3D_NOTICE( "ID3_TagImpl::ParseFile(): lyr3v2! cur = " << wr.getCur() );
       _file_tags.add(ID3TT_ID3V1);
       wr.setEnd(wr.getCur());
-    }
-    ID3D_NOTICE( "ID3_TagImpl::ParseFile(): id3v1? cur = " << wr.getCur() );
-    if (_tags_to_parse.test(ID3TT_ID3V1) && id3::v1::parse(*this, wr))
-    {
-      ID3D_NOTICE( "ID3_TagImpl::ParseFile(): id3v1! cur = " << wr.getCur() );
-      wr.setEnd(wr.getCur());
-      _file_tags.add(ID3TT_ID3V1);
     }
     cur = wr.getCur();
   } while (cur != last);

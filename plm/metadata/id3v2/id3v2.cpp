@@ -42,8 +42,12 @@ ____________________________________________________________________________*/
 #include "utility.h"
 #include "debug.h"
 
+// Define the HAVE_ID3V2 since we have the support for that built right now
+#define HAVE_ID3V2
 #include "id3.h"
 #include "id3v2.h"
+
+#define DB printf("%s:%d\n", __FILE__, __LINE__);
 
 const int iDataFieldLen = 1024;
 const int genreOther = 12;
@@ -233,14 +237,6 @@ bool ID3v2::ReadMetaData(const char* url, MetaData* metadata)
 	}
 #else
     ID3Tag_Link(pTag, path);
-
-    if (!ID3Tag_HasTagType(pTag, ID3TT_ID3V1) &&
-        !ID3Tag_HasTagType(pTag, ID3TT_ID3V2) &&
-        !ID3Tag_HasTagType(pTag, ID3TT_MUSICMATCH))
-    {
-        ID3Tag_Delete(pTag);
-        return false;
-    }
 #endif
 
     pData = new char[iDataFieldLen + 1];
