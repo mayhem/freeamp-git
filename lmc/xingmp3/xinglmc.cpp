@@ -42,7 +42,7 @@ extern "C" {
 #include "port.h"
 	   }
 
-extern int wait_n_times;
+int wait_n_times;
 
 #define TEST_TIME 0
 
@@ -51,6 +51,7 @@ XingLMC::
 XingLMC(PhysicalMediaInput* input, PhysicalMediaOutput* output)
 {
     //cout << "XingLMC::XingLMC: Creating XingLMC..." << endl;
+    wait_n_times = 0;
     decoderThread = NULL;
     xcqueue = new Queue<XingCommand *>(false); 
     seek_mutex = new Mutex();
@@ -402,7 +403,12 @@ void XingLMC::Reset() {
 
 
 bool XingLMC::ChangePosition(int32 position) {
-	return true;
+    bs_bufbytes = 0;
+    bs_bufptr = bs_buffer;
+    m_input->Seek(0,SEEK_FROM_START);
+    
+    wait_n_times = position;
+    return true;
 }
 
 void XingLMC::bs_clear() {

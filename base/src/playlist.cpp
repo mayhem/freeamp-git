@@ -30,6 +30,7 @@ ____________________________________________________________________________*/
 PlayList::PlayList() {
     pMediaElems = new Vector<PlayListItem *>();
     current = -1;
+    skipNum = 0;
 }
 
 PlayList::~PlayList() {

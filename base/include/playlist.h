@@ -33,6 +33,7 @@ class PlayListItem {
  public:
     char url[512];
     int32 type;
+    int32 startFrame;
 };
 
 class PlayList {

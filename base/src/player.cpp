@@ -272,6 +272,7 @@ int32 Player::serviceEvent(Event *pC) {
 		    if (setState(STATE_Playing)) {
 			SEND_NORMAL_EVENT(INFO_Playing);
 		    }
+		    myLMC->ChangePosition(myPlayList->getSkip());
 		    myLMC->Decode();
 		    //cout << "Kicked off decoder..." << endl;
 		    

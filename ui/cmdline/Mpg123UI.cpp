@@ -41,7 +41,6 @@ ____________________________________________________________________________*/
 void mysigterm(int);
 void mysigint(int);
 
-int wait_n_times = 0;
 
 Mpg123UI::Mpg123UI() {
 
@@ -199,7 +198,6 @@ void Mpg123UI::setArgs(int argc, char **argv) {
 		    i++;
 		    pc = argv[i];
 		    skipFirst = atoi(pc);
-		    wait_n_times = skipFirst;
 		    cout << "skiping first " << skipFirst << " frames" << endl;
 		    break;
 		case 'c':
