@@ -15,7 +15,6 @@
 #define IDI_MUSIC9                      210
 #define IDI_MUSIC10                     211
 #define IDI_MUSIC11                     212
-#define IDI_MUSIC12                     213
 #define IDI_MUSIC13                     214
 #define IDI_MUSIC14                     215
 #define IDI_MUSIC15                     216
