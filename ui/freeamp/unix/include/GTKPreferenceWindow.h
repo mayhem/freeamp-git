@@ -65,6 +65,7 @@ typedef struct PrefsStruct
     bool logOutput;
     bool logDecoder;
     bool logPerformance;
+    bool convertUnderscores;
 
     // page 5
     string defaultFont;
@@ -75,7 +76,8 @@ typedef struct PrefsStruct
     bool useImages; 
     bool savePlaylistOnExit;
     bool playImmediately;
-
+    bool allowMultipleInstances;
+ 
     string saveMusicDirectory;
     PortableSet portablePlayers;
 
@@ -84,6 +86,8 @@ typedef struct PrefsStruct
     bool operator == (const struct PrefsStruct& pref)
     {
         return (
+            convertUnderscores == pref.convertUnderscores &&
+            allowMultipleInstances == pref.allowMultipleInstances &&
             playImmediately == pref.playImmediately &&
             useTextLabels == pref.useTextLabels &&
             useImages == pref.useImages &&
@@ -165,12 +169,13 @@ class GTKPreferenceWindow : public PreferenceWindow
       bool   eventLoop;
       uint32 startPage;
 
-      GtkWidget *CreatePage1(void);
-      GtkWidget *CreatePage2(void);
-      GtkWidget *CreatePage3(void);
+      GtkWidget *CreateGeneral(void);
+      GtkWidget *CreateStreaming(void);
+      GtkWidget *CreatePlugins(void);
       GtkWidget *CreateAbout(void);
-      GtkWidget *CreatePage5(void);
-      GtkWidget *CreatePage6(void);
+      GtkWidget *CreateThemes(void);
+      GtkWidget *CreateAdvanced(void);
+      GtkWidget *CreateDirectories(void);
 
       GtkWidget *saveMusicBox;
 
@@ -260,6 +265,8 @@ class GTKPreferenceWindow : public PreferenceWindow
       void SetToolbar(bool text, bool pics);
       void SaveOnExitToggle(int active);
       void PlayImmediatelyToggle(int active);
+      void AllowMultipleToggle(int active);
+      void ConvertUnderscoresToggle(int active);
 
       FAContext *GetContext(void) { return m_pContext; }
 };

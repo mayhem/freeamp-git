@@ -232,6 +232,7 @@ bool GTKPreferenceWindow::Show(Window *pWindow)
     gtk_signal_connect(GTK_OBJECT(prefTree), "button_press_event",
                        GTK_SIGNAL_FUNC(pref_tree_clicked), this);
     gtk_clist_set_row_height(GTK_CLIST(prefTree), 16);
+    gtk_clist_column_titles_passive(GTK_CLIST(prefTree));
     gtk_widget_show(GTK_WIDGET(prefTree));
 
     paneVbox = gtk_vbox_new(FALSE, 0);
@@ -268,28 +269,32 @@ bool GTKPreferenceWindow::Show(Window *pWindow)
     GtkWidget *pane;
     OptionsPane *opane;
 
-    pane = CreatePage1();
+    pane = CreateGeneral();
     opane = new OptionsPane("General", " General Preferences", 0, pane);
     AddPane(opane);
 
-    pane = CreatePage5();
+    pane = CreateThemes();
     opane = new OptionsPane("Themes", " Theme Preferences", 1, pane);
     AddPane(opane);
 
-    pane = CreatePage2();
-    opane = new OptionsPane("Streaming", " Stream Preferences", 2, pane);
+    pane = CreateDirectories();
+    opane = new OptionsPane("Directories", "Directory Preferences", 2, pane);
     AddPane(opane);
 
-    pane = CreatePage3();
-    opane = new OptionsPane("Plugins", " Plugin Preferences", 3, pane);
+    pane = CreateStreaming();
+    opane = new OptionsPane("Streaming", " Stream Preferences", 3, pane);
     AddPane(opane);
 
-    pane = CreatePage6();
-    opane = new OptionsPane("Advanced", " Advanced Preferences", 4, pane);
+    pane = CreatePlugins();
+    opane = new OptionsPane("Plugins", " Plugin Preferences", 4, pane);
+    AddPane(opane);
+
+    pane = CreateAdvanced();
+    opane = new OptionsPane("Advanced", " Advanced Preferences", 5, pane);
     AddPane(opane);
 
     pane = CreateAbout();
-    opane = new OptionsPane("About", " About "The_BRANDING, 5, pane);
+    opane = new OptionsPane("About", " About "The_BRANDING, 6, pane);
     AddPane(opane);
 
     GtkWidget *separator = gtk_hseparator_new();
@@ -424,6 +429,7 @@ void GTKPreferenceWindow::GetPrefsValues(Preferences* prefs,
     prefs->GetShowToolbarImages(&values->useImages);
     prefs->GetSaveCurrentPlaylistOnExit(&values->savePlaylistOnExit);
     prefs->GetPlayImmediately(&values->playImmediately);
+    prefs->GetAllowMultipleInstances(&values->allowMultipleInstances);
 
     if(kError_BufferTooSmall == prefs->GetSaveMusicDirectory(buffer, &size))
     {
@@ -475,6 +481,7 @@ void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs,
     prefs->SetShowToolbarImages(values->useImages);
     prefs->SetSaveCurrentPlaylistOnExit(values->savePlaylistOnExit);
     prefs->SetPlayImmediately(values->playImmediately);
+    prefs->SetAllowMultipleInstances(values->allowMultipleInstances);
 
     prefs->SetDefaultPMO(values->defaultPMO.c_str());
     prefs->SetInputBufferSize(values->inputBufferSize);
@@ -526,41 +533,6 @@ void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs,
         m_pContext->target->AcceptEvent(new Event(INFO_PrefsChanged));
         currentValues = proposedValues = *values;
     }
-}
-
-void GTKPreferenceWindow::SaveMusicSet(char *newpath, bool set)
-{
-    proposedValues.saveMusicDirectory = newpath;
-    gtk_widget_set_sensitive(applyButton, TRUE);
-    if (set)
-        gtk_entry_set_text(GTK_ENTRY(saveMusicBox), newpath);
-}
-
-static void save_music_change(GtkWidget *w, GTKPreferenceWindow *p)
-{
-    char *text = gtk_entry_get_text(GTK_ENTRY(w));
-    p->SaveMusicSet(text, false);
-}
-
-static void save_music_browse(GtkWidget *w, GTKPreferenceWindow *p)
-{
-    GTKFileSelector *filesel = new GTKFileSelector("Select a New Directory");
-    if (filesel->Run(true)) {
-        char *returnpath = filesel->GetReturnPath();
-
-        struct stat st;
-
-        if (stat(returnpath, &st)) {
-            if (S_ISDIR(st.st_mode))
-                p->SaveMusicSet(returnpath, true);
-            else {
-                MessageDialog oBox(p->GetContext());
-                oBox.Show("Please select a directory to save dowloaded music.",
-                          "Save Music Browser Error", kMessageOk, true);
-            }
-        }
-    }
-    delete filesel;
 }
 
 void GTKPreferenceWindow::SetToolbar(bool text, bool pics)
@@ -615,7 +587,33 @@ static void play_now_toggle(GtkWidget *w, GTKPreferenceWindow *p)
     p->PlayImmediatelyToggle(i);
 }
 
-GtkWidget *GTKPreferenceWindow::CreatePage1(void)
+void GTKPreferenceWindow::AllowMultipleToggle(int active)
+{
+    proposedValues.allowMultipleInstances = active;
+    if (!firsttime)
+        gtk_widget_set_sensitive(applyButton, TRUE);
+}
+
+static void allow_multiple_toggle(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    int i = GTK_TOGGLE_BUTTON(w)->active;
+    p->AllowMultipleToggle(i);
+}
+
+void GTKPreferenceWindow::ConvertUnderscoresToggle(int active)
+{
+    proposedValues.convertUnderscores = active;
+    if (!firsttime)
+        gtk_widget_set_sensitive(applyButton, TRUE);
+}
+
+static void convert_underscores_toggle(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    int i = GTK_TOGGLE_BUTTON(w)->active;
+    p->AllowMultipleToggle(i);
+}
+
+GtkWidget *GTKPreferenceWindow::CreateGeneral(void)
 {
     firsttime = true;
 
@@ -623,48 +621,18 @@ GtkWidget *GTKPreferenceWindow::CreatePage1(void)
     gtk_container_set_border_width(GTK_CONTAINER(pane), 5);
     gtk_widget_show(pane);
 
-    GtkWidget *frame = gtk_frame_new("Save Music Folder");
+    GtkWidget *frame = gtk_frame_new("Show 'My Music' Toolbars As");
     gtk_box_pack_start(GTK_BOX(pane), frame, FALSE, FALSE, 5);
     gtk_widget_show(frame);
-
-    GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
-    gtk_container_set_border_width(GTK_CONTAINER(vbox), 5);
-    gtk_container_add(GTK_CONTAINER(frame), vbox);
-    gtk_widget_show(vbox);
-
-    char copys[_MAX_PATH];
 
     GtkWidget *temphbox = gtk_hbox_new(FALSE, 5);
-    gtk_box_pack_start(GTK_BOX(vbox), temphbox, FALSE, FALSE, 5);
-    gtk_widget_show(temphbox);
-
-    strncpy(copys, originalValues.saveMusicDirectory.c_str(), 256);
-    saveMusicBox = gtk_entry_new();
-    gtk_entry_set_text(GTK_ENTRY(saveMusicBox), copys);
-    gtk_entry_set_max_length(GTK_ENTRY(saveMusicBox), 64);
-    gtk_signal_connect(GTK_OBJECT(saveMusicBox), "changed",
-                       GTK_SIGNAL_FUNC(save_music_change), this);
-    gtk_box_pack_start(GTK_BOX(temphbox), saveMusicBox, TRUE, TRUE, 0);
-    gtk_widget_show(saveMusicBox);
-
-    GtkWidget *button = gtk_button_new_with_label(" Browse ");
-    gtk_box_pack_start(GTK_BOX(temphbox), button, FALSE, FALSE, 5);
-    gtk_signal_connect(GTK_OBJECT(button), "clicked",
-                       GTK_SIGNAL_FUNC(save_music_browse), this);
-    gtk_widget_show(button);
-
-    frame = gtk_frame_new("Show 'My Music' Toolbars As");
-    gtk_box_pack_start(GTK_BOX(pane), frame, FALSE, FALSE, 5);
-    gtk_widget_show(frame);
-
-    temphbox = gtk_hbox_new(FALSE, 5);
     gtk_container_set_border_width(GTK_CONTAINER(temphbox), 5);
     gtk_container_add(GTK_CONTAINER(frame), temphbox);
     gtk_widget_show(temphbox);
 
     bool setSomething = false;
 
-    button = gtk_radio_button_new_with_label(NULL, "Text Only");
+    GtkWidget *button = gtk_radio_button_new_with_label(NULL, "Text Only");
     if (originalValues.useTextLabels && !originalValues.useImages) {
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
         setSomething = true;
@@ -702,11 +670,11 @@ GtkWidget *GTKPreferenceWindow::CreatePage1(void)
     if (!setSomething)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
 
-    frame = gtk_frame_new("Miscellaneous");
+    frame = gtk_frame_new("Playlist");
     gtk_box_pack_start(GTK_BOX(pane), frame, FALSE, FALSE, 5);
     gtk_widget_show(frame);
 
-    vbox = gtk_vbox_new(FALSE, 5);
+    GtkWidget *vbox = gtk_vbox_new(FALSE, 5);
     gtk_container_set_border_width(GTK_CONTAINER(vbox), 5);
     gtk_container_add(GTK_CONTAINER(frame), vbox);
     gtk_widget_show(vbox);
@@ -724,6 +692,31 @@ GtkWidget *GTKPreferenceWindow::CreatePage1(void)
     gtk_signal_connect(GTK_OBJECT(check), "toggled",
                        GTK_SIGNAL_FUNC(play_now_toggle), this);
     if (!originalValues.playImmediately) 
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), TRUE);
+    gtk_widget_show(check);
+
+    frame = gtk_frame_new("Miscellaneous");
+    gtk_box_pack_start(GTK_BOX(pane), frame, FALSE, FALSE, 5);
+    gtk_widget_show(frame);
+
+    vbox = gtk_vbox_new(FALSE, 5);
+    gtk_container_set_border_width(GTK_CONTAINER(vbox), 5);
+    gtk_container_add(GTK_CONTAINER(frame), vbox);
+    gtk_widget_show(vbox);
+
+    check = gtk_check_button_new_with_label("Allow multiple instances of "the_BRANDING);
+    gtk_box_pack_start(GTK_BOX(vbox), check, FALSE, FALSE, 0);
+    gtk_signal_connect(GTK_OBJECT(check), "toggled",
+                       GTK_SIGNAL_FUNC(allow_multiple_toggle), this);
+    if (originalValues.allowMultipleInstances)
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), TRUE);
+    gtk_widget_show(check);
+
+    check = gtk_check_button_new_with_label("Convert underscores to spaces");
+    gtk_box_pack_start(GTK_BOX(vbox), check, FALSE, FALSE, 0);
+    gtk_signal_connect(GTK_OBJECT(check), "toggled",
+                       GTK_SIGNAL_FUNC(convert_underscores_toggle), this);
+    if (originalValues.convertUnderscores)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), TRUE);
     gtk_widget_show(check);
 
@@ -881,7 +874,7 @@ static void ip_change(GtkWidget *w, GTKPreferenceWindow *p)
     p->AltIPSet();
 }
 
-GtkWidget *GTKPreferenceWindow::CreatePage2(void)
+GtkWidget *GTKPreferenceWindow::CreateStreaming(void)
 {
     GtkWidget *pane = gtk_vbox_new(FALSE, 5);
     gtk_container_set_border_width(GTK_CONTAINER(pane), 5);
@@ -1181,7 +1174,7 @@ static void alsa_change(GtkWidget *w, GTKPreferenceWindow *p)
     p->AlsaSet();
 }
 
-GtkWidget *GTKPreferenceWindow::CreatePage3(void)
+GtkWidget *GTKPreferenceWindow::CreatePlugins(void)
 {
     GtkWidget *pane = gtk_vbox_new(FALSE, 5);
     gtk_container_set_border_width(GTK_CONTAINER(pane), 5);
@@ -1352,7 +1345,7 @@ static void prestream_buffer_change(GtkWidget *w, GTKPreferenceWindow *p)
     p->SetPreBufferLength(newdata);
 }
 
-GtkWidget *GTKPreferenceWindow::CreatePage6(void)
+GtkWidget *GTKPreferenceWindow::CreateAdvanced(void)
 {
     GtkWidget *pane = gtk_vbox_new(FALSE, 5);
     gtk_container_set_border_width(GTK_CONTAINER(pane), 5);
@@ -1657,7 +1650,7 @@ static void choose_font_press(GtkWidget *w, GTKPreferenceWindow *p)
     p->ChooseFont();
 }
 
-GtkWidget *GTKPreferenceWindow::CreatePage5(void)
+GtkWidget *GTKPreferenceWindow::CreateThemes(void)
 {
     GtkWidget *pane = gtk_vbox_new(FALSE, 5);
     gtk_container_set_border_width(GTK_CONTAINER(pane), 5);
@@ -1736,3 +1729,76 @@ GtkWidget *GTKPreferenceWindow::CreatePage5(void)
     return pane;
 }
 
+void GTKPreferenceWindow::SaveMusicSet(char *newpath, bool set)
+{
+    proposedValues.saveMusicDirectory = newpath;
+    gtk_widget_set_sensitive(applyButton, TRUE);
+    if (set)
+        gtk_entry_set_text(GTK_ENTRY(saveMusicBox), newpath);
+}
+
+static void save_music_change(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    char *text = gtk_entry_get_text(GTK_ENTRY(w));
+    p->SaveMusicSet(text, false);
+}
+
+static void save_music_browse(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    GTKFileSelector *filesel = new GTKFileSelector("Select a New Directory");
+    if (filesel->Run(true)) {
+        char *returnpath = filesel->GetReturnPath();
+
+        struct stat st;
+
+        if (stat(returnpath, &st)) {
+            if (S_ISDIR(st.st_mode))
+                p->SaveMusicSet(returnpath, true);
+            else {
+                MessageDialog oBox(p->GetContext());
+                oBox.Show("Please select a directory to save dowloaded music.",
+                          "Save Music Browser Error", kMessageOk, true);
+            }
+        }
+    }
+    delete filesel;
+}
+
+GtkWidget *GTKPreferenceWindow::CreateDirectories(void)
+{
+    GtkWidget *pane = gtk_vbox_new(FALSE, 5);
+    gtk_container_set_border_width(GTK_CONTAINER(pane), 5);
+    gtk_widget_show(pane);
+
+    GtkWidget *frame = gtk_frame_new("Save Music Folder");
+    gtk_box_pack_start(GTK_BOX(pane), frame, FALSE, FALSE, 5);
+    gtk_widget_show(frame);
+
+    GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
+    gtk_container_set_border_width(GTK_CONTAINER(vbox), 5);
+    gtk_container_add(GTK_CONTAINER(frame), vbox);
+    gtk_widget_show(vbox);
+
+    char copys[_MAX_PATH];
+
+    GtkWidget *temphbox = gtk_hbox_new(FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(vbox), temphbox, FALSE, FALSE, 5);
+    gtk_widget_show(temphbox);
+
+    strncpy(copys, originalValues.saveMusicDirectory.c_str(), 256);
+    saveMusicBox = gtk_entry_new();
+    gtk_entry_set_text(GTK_ENTRY(saveMusicBox), copys);
+    gtk_entry_set_max_length(GTK_ENTRY(saveMusicBox), 64);
+    gtk_signal_connect(GTK_OBJECT(saveMusicBox), "changed",
+                       GTK_SIGNAL_FUNC(save_music_change), this);
+    gtk_box_pack_start(GTK_BOX(temphbox), saveMusicBox, TRUE, TRUE, 0);
+    gtk_widget_show(saveMusicBox);
+
+    GtkWidget *button = gtk_button_new_with_label(" Browse ");
+    gtk_box_pack_start(GTK_BOX(temphbox), button, FALSE, FALSE, 5);
+    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                       GTK_SIGNAL_FUNC(save_music_browse), this);
+    gtk_widget_show(button);
+
+    return pane;
+}
