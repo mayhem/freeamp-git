@@ -953,8 +953,8 @@ public:
 
 private:
 
-   const char *m_url;
-   const char *m_saved;
+   char *m_url;
+   char *m_saved;
 };
 
 class ShowPreferencesEvent:public Event

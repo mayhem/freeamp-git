@@ -528,6 +528,16 @@ void MusicBrowserUI::Destroy()
     {
         sprintf(buf, "%d,%d,%d,%d,%d", rect.left, rect.top, w, h, s);
         m_context->prefs->SetPrefString(kMusicBrowserPositionPref, buf);
+
+        int a,b,c,d;
+
+        a = ListView_GetColumnWidth(m_hPlaylistView, 1);
+        b = ListView_GetColumnWidth(m_hPlaylistView, 2);
+        c = ListView_GetColumnWidth(m_hPlaylistView, 3);
+        d = ListView_GetColumnWidth(m_hPlaylistView, 4);
+
+        sprintf(buf, "%d,%d,%d,%d", a,b,c,d);
+        m_context->prefs->SetPrefString(kMusicBrowserHeaderWidthsPref, buf);
     }
 
     RevokeDragDrop(m_hPlaylistView);
@@ -938,6 +948,9 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
     SetTitles();
     CreateToolbar();
 
+    InitTree();
+    InitList();
+
     // Subclass the listview
 
     // Set the proc address as a property 
@@ -1102,10 +1115,23 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
         	      (titleRect.right - titleRect.left),
                   titleRect.bottom - titleRect.top,
                   TRUE);
-    }
 
-    InitTree();
-    InitList();
+
+        // resize headers... only wanna do this if we resized the window
+        int32 a,b,c,d;
+
+        size = sizeof(buf);
+        m_context->prefs->GetPrefString(kMusicBrowserHeaderWidthsPref, buf, &size);
+        sscanf(buf, " %d , %d , %d , %d", &a, &b, &c, &d);
+
+        if(a >= 1 && b >= 1 && c >= 1 && d >= 1)
+        {
+            ListView_SetColumnWidth(m_hPlaylistView, 1, a);
+            ListView_SetColumnWidth(m_hPlaylistView, 2, b);
+            ListView_SetColumnWidth(m_hPlaylistView, 3, c);
+            ListView_SetColumnWidth(m_hPlaylistView, 4, d);
+        }
+    }
 
     if(m_pParent)
     {
