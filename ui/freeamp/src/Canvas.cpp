@@ -81,9 +81,10 @@ void Canvas::InitBackgrounds(vector<Panel *> *pPanels)
     }
 
     m_pBGBitmap = m_pCompleteBGBitmap->Clone();
+
     for(i = pPanels->begin(); i != pPanels->end(); i++)
     {
-        if (!(*i)->m_bIsOpen)
+        if ((*i)->m_bIsOpen)
         {
             m_pBGBitmap->MakeTransparent((*i)->m_oOpenRect);
             if ((*i)->m_pClosedBitmap)

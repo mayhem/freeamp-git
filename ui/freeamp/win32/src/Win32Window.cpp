@@ -1040,3 +1040,26 @@ void Win32Window::Create256ColorPalette(BYTE pColorMap[236][3],
                            
    delete pLog;
 }
+
+void Win32Window::PanelStateChanged(void)
+{
+    Rect   oRect;
+    RECT   sRect;
+	HRGN   hRgn;
+ 
+    Window::PanelStateChanged();
+
+    GetCanvas()->GetBackgroundRect(oRect);
+    hRgn = ((Win32Canvas *)m_pCanvas)->GetMaskRgn(); 
+    if (hRgn)
+        SetWindowRgn(m_hWnd, hRgn, true);
+
+
+    sRect.left = oRect.x1;
+    sRect.right = oRect.x2;
+    sRect.top = oRect.y1;
+    sRect.bottom = oRect.y2;
+
+	InvalidateRect(m_hWnd, &sRect, true);
+	UpdateWindow(m_hWnd);
+}

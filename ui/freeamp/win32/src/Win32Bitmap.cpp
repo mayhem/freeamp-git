@@ -37,6 +37,7 @@ Win32Bitmap::Win32Bitmap(const string &oName)
    m_hBitmap = NULL;
    m_hMaskBitmap = NULL;
    m_pBitmapData = NULL;
+   m_pMaskInfo = NULL;
 }
 
 Win32Bitmap::Win32Bitmap(int iWidth, int iHeight, const string &oName)
@@ -44,6 +45,7 @@ Win32Bitmap::Win32Bitmap(int iWidth, int iHeight, const string &oName)
 {
    HDC            hDc;
    BITMAPINFO     sBitmapInfo;
+   COLORREF      *pColorRefPtr;
 
    m_iHeight = iHeight;
    m_iWidth = iWidth;
@@ -71,18 +73,23 @@ Win32Bitmap::Win32Bitmap(int iWidth, int iHeight, const string &oName)
        m_hBitmap = CreateDIBSection(hDc, &sBitmapInfo, DIB_RGB_COLORS, 
                                     (void **)&m_pBitmapData, NULL, NULL);
 
-       sBitmapInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER); 
-       sBitmapInfo.bmiHeader.biWidth = iWidth; 
-       sBitmapInfo.bmiHeader.biHeight = iHeight; 
-       sBitmapInfo.bmiHeader.biPlanes = 1; 
-       sBitmapInfo.bmiHeader.biCompression = BI_RGB; 
-       sBitmapInfo.bmiHeader.biSizeImage = 0; 
-       sBitmapInfo.bmiHeader.biXPelsPerMeter = 0; 
-       sBitmapInfo.bmiHeader.biYPelsPerMeter = 0; 
-       sBitmapInfo.bmiHeader.biClrUsed = 0; 
-       sBitmapInfo.bmiHeader.biClrImportant = 0; 
-	   sBitmapInfo.bmiHeader.biBitCount = 1;
-       m_hMaskBitmap = CreateDIBSection(hDc, &sBitmapInfo, DIB_RGB_COLORS, 
+       m_pMaskInfo = (BITMAPINFO *)new char[sizeof(BITMAPINFOHEADER) + 
+                                       64 * sizeof(RGBQUAD)];
+       m_pMaskInfo->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+       m_pMaskInfo->bmiHeader.biWidth = iWidth;
+       m_pMaskInfo->bmiHeader.biHeight = iHeight;
+       m_pMaskInfo->bmiHeader.biPlanes = 1;
+       m_pMaskInfo->bmiHeader.biBitCount = 1;
+       m_pMaskInfo->bmiHeader.biCompression = BI_RGB;
+       m_pMaskInfo->bmiHeader.biSizeImage = 0;
+       m_pMaskInfo->bmiHeader.biXPelsPerMeter = 0;
+       m_pMaskInfo->bmiHeader.biYPelsPerMeter = 0;
+       m_pMaskInfo->bmiHeader.biClrUsed = 2;
+       m_pMaskInfo->bmiHeader.biClrImportant = 0;
+       pColorRefPtr = (COLORREF *)(&m_pMaskInfo->bmiColors);
+       pColorRefPtr[1] = RGB(255,255,255);
+       pColorRefPtr[0] = RGB(0,0,0);
+       m_hMaskBitmap = CreateDIBSection(hDc, m_pMaskInfo, DIB_RGB_COLORS, 
                                     (void **)&m_pMaskBitmapData, NULL, NULL);
    }       
    ReleaseDC(NULL, hDc);
@@ -100,6 +107,7 @@ Win32Bitmap::~Win32Bitmap(void)
        DeleteObject(m_hMaskBitmap);
        m_hMaskBitmap = NULL;
    }    
+   delete m_pMaskInfo;
 }
 
 Error Win32Bitmap::LoadBitmapFromDisk(string &oFile)
@@ -483,8 +491,7 @@ Bitmap *Win32Bitmap::Clone(void)
    oRect.x2 = m_iWidth;
    oRect.y2 = m_iHeight;
    pTemp->BlitRect(this, oRect, oRect);
-   //pTemp->BlitRectMaskBitmap(this, oRect, oRect);
-   CreateMaskBitmap();
+   pTemp->BlitRectMaskBitmap(this, oRect, oRect);
 
    return pTemp;
 }
@@ -512,3 +519,27 @@ Error Win32Bitmap::MakeTransparent(Rect &oRect)
 
    return kError_NoErr;
 }
+
+void Win32Bitmap::BlitIt(int x, int y)
+{
+   HDC hSrcDC, hDestDC;
+
+   if (m_hBitmap == NULL)
+   {
+      return;
+   }
+
+   hDestDC = GetDC(NULL);
+   hSrcDC = CreateCompatibleDC(hDestDC);
+   
+   SelectObject(hSrcDC, m_hMaskBitmap);
+
+   BitBlt(hDestDC, x, y, 
+          m_iWidth, m_iHeight,
+          hSrcDC, 0, 0,
+		  SRCCOPY);
+
+   ReleaseDC(NULL, hDestDC);
+   DeleteDC(hSrcDC);
+}
+

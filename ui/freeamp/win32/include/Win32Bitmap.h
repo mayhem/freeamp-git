@@ -61,7 +61,10 @@ class Win32Bitmap : public Bitmap
      void          SaveBitmap(char    *szFile, 
                               RGBQUAD *pColorTable);
      virtual void  SetPalette(HPALETTE hPal);
+
      
+void BlitIt(int x, int y);
+
     protected:
 
      void          CreateMaskBitmap(void);
@@ -72,6 +75,7 @@ class Win32Bitmap : public Bitmap
      int32       m_iHeight, m_iWidth;
      void       *m_pBitmapData, *m_pMaskBitmapData;
      HPALETTE    m_hPal;
+     BITMAPINFO *m_pMaskInfo;
 };
 
 #endif
