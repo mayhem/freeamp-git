@@ -26,8 +26,8 @@ FreeAmp (www.freeamp.org) is an Open Source development effort
 
 Mark B. Elrod 
 Robert Kaye
+Isaac Richards
 Brett Thomas 
-Mark H. Weaver
 Jason Woodward
 
 The development of FreeAmp is sponsored by EMusic Corp. 
@@ -58,6 +58,9 @@ Other major contributors and their contributions:
 
 "Valters Vingolds" <Valters_Vingolds@swh-t.lv>
 * Allow the win32 FreeAmp UI to exist in the system tray
+* Author of the "Liquified Visions" theme
+* Changed FreeAmp theme format to more flexible and standard tar.gz 
+* Numerous feature requests on FreeAmp themes <grin>
 
 "Jean-Michel HERVE" <tuo_stg@hotmail.com>
 * x86 assembly optimized MP3 decoder
@@ -76,3 +79,6 @@ Other major contributors and their contributions:
 
 "Stephan Auerhahn" <palpatine@midi.net>
 * ncurses UNIX interface
+
+"Mark Weaver" <mhw@netris.org>
+* Unix prefs
