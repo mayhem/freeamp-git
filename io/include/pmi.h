@@ -65,6 +65,8 @@ public:
 
     virtual Error Seek(int32 & rtn, int32 offset, int32 origin)
                   { return kError_FileSeekNotSupported; };
+    virtual Error Tell(int32 & rtn)
+                  { return kError_FileSeekNotSupported; };
     virtual bool  CanHandle(const char *szUrl, char *szTitle)
 	               {return false;}
     virtual Error GetLength(size_t &iSize)

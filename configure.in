@@ -667,6 +667,11 @@ if test "$have_alsa" = "true"; then
   AC_MSG_RESULT([compiling alsa soundcard plugin])
 fi
 
+AC_CHECK_LIB(vorbis, ogg_sync_init,
+  OSDEPPLUGINS="$OSDEPPLUGINS plugins/vorbis.lmc";
+  OSINC="$OSINC -I$srcdir/lmc/vorbis/include"
+  AC_MSG_RESULT([compiling vorbis codec plugin])
+)
 
 AC_SUBST(EXTRALIBS)
 AC_SUBST(OSDEPPLUGINS)

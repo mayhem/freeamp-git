@@ -47,6 +47,7 @@ class LocalFileInput:public PhysicalMediaInput
 	virtual bool  IsStreaming(void)
 	              { return false; };
    virtual Error Seek(int32 & rtn, int32 offset, int32 origin);
+   virtual Error Tell(int32 & rtn);
    virtual Error GetLength(size_t &iSize);
 
    virtual Error Prepare(PullBuffer *&pBuffer);

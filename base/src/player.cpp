@@ -1002,11 +1002,12 @@ RegisterLMCs(Registry * registry)
 
       lmc = (LogicalMediaConverter *)temp->InitFunction()(m_context);
       vector<char *> *extList = lmc->GetExtensions();
+      vector<char *>::iterator i;
 
-      for (uint32 iextLoop = 0; iextLoop < extList->size(); iextLoop++)
+      for (i = extList->begin(); i != extList->end(); i++)
       {
           lmc_item = new RegistryItem(*temp);
-          m_lmcExtensions->Insert((*extList)[iextLoop], lmc_item);
+          m_lmcExtensions->Insert(*i, lmc_item);
       }
 
       delete extList;
@@ -1296,7 +1297,6 @@ CreatePMO(const PlaylistItem * pc, Event * pC)
       m_pmo = NULL;
    }
 
-   
    pmi_item = ChoosePMI(pc->URL().c_str());
    if (!pmi_item)
    {

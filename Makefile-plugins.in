@@ -306,6 +306,11 @@ XINGLMCOBJ = $(XINGLMCOBJC) $(XINGLMCOBJCXX)
 plugins/xingmp3.lmc: $(XINGLMCOBJ)
 	$(LINKMOD) -o $@ $(XINGLMCOBJ) $(STATICLD)
 
+# vorbis lmc
+VORBISOBJ = lmc/vorbis/src/vorbislmc.o
+plugins/vorbis.lmc: $(VORBISOBJ)
+	$(LINKMOD) -o $@ $(VORBISOBJ) $(STATICLD) -lvorbisfile -lvorbis
+
 
 # MDF section 
 

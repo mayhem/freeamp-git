@@ -146,5 +146,6 @@ class EventQueue {
 #define INFO_CDDiscStatus             79 // sent by the CD PMO when a disc starts playing, so the MB gui knows the number of tracks, etc
 #define INFO_MusicCatalogRegenerating 80 // sent by the MC to tell the UIs to ignore it for awhile
 #define INFO_MusicCatalogDoneRegenerating 81 // sent by the MC to tell the UIs to regenerate their database
+#define INFO_VorbisInfo             82 // Used to send vorbis stream info
 #endif // _EVENT_H_
 

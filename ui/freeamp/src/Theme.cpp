@@ -334,6 +334,7 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
           // Now the window lists have been properly adjusted, so
           // adopt all the info from the new window into the existing
           // window via the VulcanMindLink 
+          printf("VMM::Window %p\n", m_pWindow);
           m_pWindow->VulcanMindMeld(pNewWindow);
           // And if god doesn't stike me down right now,
           // everything *should* be fine.

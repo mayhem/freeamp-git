@@ -116,6 +116,7 @@ FreeAmpTheme::FreeAmpTheme(FAContext * context)
    m_bInOptions = false;
    m_bShowBuffers = m_bPaused = false;
    m_iFramesSinceSeek = 2;
+   m_fSecondsPerFrame = 0;
 
    m_eq = new Equalizer(context);
    m_eq->LoadSettings();
@@ -561,7 +562,8 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
 
          iSeconds = (info->m_hours * 3600) + (info->m_minutes * 60) + 
                      info->m_seconds;
-         if (iSeconds == m_iCurrentSeconds || m_bSeekInProgress)
+         if ((iSeconds == m_iCurrentSeconds && iSeconds > 0) || 
+             m_bSeekInProgress)
              break;
 
          if (m_iFramesSinceSeek++ < 1)
@@ -594,6 +596,37 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
                    info->GetChannels() ? "Stereo" : "Mono");
          else
               sprintf(text, "%ldkbps %ldkhz %s", 
+                   (long int)(info->GetBitRate() / 1000),
+                   (long int)(info->GetSampleRate() / 1000), 
+                   info->GetChannels() ? "Stereo" : "Mono");
+
+         m_oStreamInfo = text;
+         m_pWindow->ControlStringValue("StreamInfo", true, m_oStreamInfo);
+
+         sprintf(text, "%d", info->GetBitRate() / 1000);    
+         string tempstr = text;
+         m_pWindow->ControlStringValue("BitRate", true, tempstr);
+         
+         sprintf(text, "%d", info->GetSampleRate() / 1000);
+         tempstr = text;
+         m_pWindow->ControlStringValue("SampleRate", true, tempstr);
+
+         bool bEnable = (info->GetChannels() != 0);
+         m_pWindow->ControlEnable(string("StereoIndicator"), true, bEnable);
+         bEnable = !bEnable;
+         m_pWindow->ControlEnable(string("MonoIndicator"), true, bEnable);
+         delete [] text;
+      
+         break;
+      }
+      case INFO_VorbisInfo:
+      {
+         VorbisInfoEvent *info = (VorbisInfoEvent *) e;
+         char            *text;
+
+         text = new char[100];
+         m_fSecondsPerFrame = info->GetSecondsPerFrame();
+              sprintf(text, "%ldkbps %ldkhz %s Vorbis", 
                    (long int)(info->GetBitRate() / 1000),
                    (long int)(info->GetSampleRate() / 1000), 
                    info->GetChannels() ? "Stereo" : "Mono");
@@ -824,6 +857,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
        
        iFrame = (int)(((float)iValue * (float)m_iTotalSeconds) / 
                       ((float)100 * m_fSecondsPerFrame));
+
        m_bSeekInProgress = false;
       
        m_pContext->target->AcceptEvent(new 
@@ -1764,3 +1798,19 @@ void FreeAmpTheme::OptionsThread(uint32 defaultPage)
    
     m_bInOptions = false;
 }
+
+const char *pThemes[] = 
+{
+    "/home/robert/FreeAmp/freeamp/themes/Aquatica.fat",
+    "/home/robert/FreeAmp/freeamp/themes/EMusic.fat",
+    "/home/robert/FreeAmp/freeamp/themes/FreeAmp.fat",
+    "/home/robert/FreeAmp/freeamp/themes/FreeAmpClassic.fat",
+    "/home/robert/FreeAmp/freeamp/themes/Minimalist.fat",
+    "/home/robert/FreeAmp/freeamp/themes/Visions.fat",
+    "/home/robert/FreeAmp/freeamp/themes/cchiphop.fat",
+    "/home/robert/FreeAmp/freeamp/themes/ccpolarbear.fat",
+    "/home/robert/FreeAmp/freeamp/themes/ccstompola.fat",
+    "/home/robert/FreeAmp/freeamp/themes/glass.fat",
+    "\0"
+};
+

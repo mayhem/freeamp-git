@@ -451,6 +451,40 @@ class     MpegInfoEvent:public Event
 
 };
 
+class VorbisInfoEvent:public Event
+{
+   public:
+   VorbisInfoEvent(int32 bitrate, int32 channels, int32 rate, float spf)
+   {
+      m_type = INFO_VorbisInfo;
+      m_bitrate = bitrate;
+      m_channels = channels;
+      m_rate = rate; 
+      m_secondsPerFrame = spf;
+   }
+   int32     GetBitRate()
+   {
+      return m_bitrate;
+   };
+   int32     GetSampleRate()
+   {
+      return m_rate;
+   };
+   int32     GetChannels()
+   {
+      return m_channels;
+   };
+   float     GetSecondsPerFrame()
+   {
+      return m_secondsPerFrame;
+   }
+   private:
+   int32     m_bitrate;
+   int32     m_rate;
+   int32     m_channels;
+   float     m_secondsPerFrame;
+};
+
 class     SetEqualizerDataEvent:public Event
 {
    private:

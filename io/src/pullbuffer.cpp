@@ -47,6 +47,7 @@ PullBuffer::PullBuffer(size_t iBufferSize,
    m_bExit = false;
    m_iBytesToRead = 0;
    m_iBytesToWrite = 0;
+   m_pName = NULL;
 
    m_iReadIndex =  m_iWriteIndex = 0;
    m_iBytesInBuffer = 0;
@@ -68,6 +69,13 @@ PullBuffer::~PullBuffer(void)
       delete m_pPullBuffer;
 
    delete m_pMutex;
+   delete m_pName;
+}
+
+void PullBuffer::SetName(char *name)
+{
+   m_pName = new char[strlen(name) + 1];
+   strcpy(m_pName, name);
 }
 
 Error PullBuffer::Clear(void)

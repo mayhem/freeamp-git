@@ -85,6 +85,8 @@ class FreeAmpTheme : public UserInterface, public Theme
         static void update_thread(void*);
         static void options_thread(void*);
 
+        void BangOnThemes(void);
+
     protected:
 
         void             ReloadTheme(void);
