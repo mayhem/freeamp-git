@@ -24,7 +24,7 @@ ____________________________________________________________________________*/
 #define _UTILITY_H_
 
 #include "config.h"
-#include "error.h"
+#include "errors.h"
 
 Error InitWindowsRegistry(void);
 

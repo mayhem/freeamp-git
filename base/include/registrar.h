@@ -23,7 +23,7 @@ ____________________________________________________________________________*/
 #ifndef _REGISTRAR_H_
 #define _REGISTRAR_H_
 
-#include "error.h"
+#include "errors.h"
 #include "registry.h"
 /*#include "lmcregistry.h"
 #include "pmoregistry.h"

@@ -30,7 +30,7 @@ ____________________________________________________________________________*/
 
 /* Project Includes */
 #include "utility.h"
-#include "error.h"
+#include "errors.h"
 
 #define MAIN_KEY    HKEY_CURRENT_USER
 #define SUB_KEY     "SOFTWARE\\FreeAmp\\FreeAmp v1.0"

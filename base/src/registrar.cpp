@@ -34,7 +34,7 @@ ____________________________________________________________________________*/
 #include "config.h"
 #include "registrar.h"
 #include "utility.h"
-#include "error.h"
+#include "errors.h"
 
 Error 
 Registrar::
