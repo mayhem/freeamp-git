@@ -21,19 +21,32 @@
 	$Id$
 ____________________________________________________________________________*/
 
-#ifndef _VOLUME_H_
-#define _VOLUME_H_
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <linux/soundcard.h>
+#include <sys/ioctl.h>
+#include <fcntl.h>
 
-#include "config.h"
+#include "win32volume.h"
 
-class VolumeManager 
+Win32VolumeManager::Win32VolumeManager()
+                 :VolumeManager()
 {
-    public:
 
-    VolumeManager() { ; };
+}
 
-    virtual void SetVolume(int32) = 0;
-    virtual int32 GetVolume(void) = 0;
-};
+void Win32VolumeManager::SetVolume(int32 v) 
+{
+    waveOutSetVolume((HWAVEOUT)WAVE_MAPPER , MAKELPARAM(0xFFFF*v, 0xFFFF*v)); 
+}
 
-#endif // _VOLUME_H_
+int32 Win32VolumeManager::GetVolume() 
+{
+    int32 volume = 0;
+
+    waveOutGetVolume((HWAVEOUT)WAVE_MAPPER, (DWORD*)&volume);
+    volume = (int32)(100 * ((float)LOWORD(volume)/(float)0xffff));
+
+    return volume;
+}                   

@@ -74,6 +74,7 @@ HttpBuffer::HttpBuffer(size_t iBufferSize, size_t iOverFlowSize,
     m_pID3Tag = NULL;
 	 m_szError = new char[iMaxErrorLen];
     m_pHttp = pHttp;
+    m_fpSave = NULL;
 
     strcpy(m_szUrl, szFile);
 }
@@ -95,6 +96,9 @@ HttpBuffer::~HttpBuffer(void)
        shutdown(m_hHandle, 2);
        closesocket(m_hHandle);
     }
+
+    if (m_fpSave)
+       fclose(m_fpSave);
 
     if (m_pID3Tag)
        delete m_pID3Tag;
@@ -122,14 +126,14 @@ void HttpBuffer::LogError(char *szErrorMsg)
 }
 
 // NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
-// As far as I can tell there are many different versions of gethostbyname_r
-// out there. If this code does not compile for your platform, please
-// fix one of the following sections so that it will work on your
-// system. (without breaking the existing systems, please!)
+// The function gethostbyname_r() differs greatly from system to system
+// and on linux it seems to behave quite erratically. I've elected to
+// use gethostbyname() (the non-reentrant version) because it works,
+// and I don't see two threads conflicting each other during a gethostbyname
+// lookup in FreeAmp.
 // NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
 Error GetHostByName(char *szHostName, struct hostent *pResult)
 {
-#ifdef WIN32
     struct hostent *pTemp;
 
     pTemp = gethostbyname(szHostName);
@@ -139,42 +143,13 @@ Error GetHostByName(char *szHostName, struct hostent *pResult)
     memcpy(pResult, pTemp, sizeof(struct hostent));
 
     return kError_NoErr;
-#endif
-
-#if defined(__linux__) && !HAVE_LINUX_LIBC5
-    char               *pDummyBuf;
-    struct hostent     *pRes;
-    int                 iErrno, iRet;
-
-    pDummyBuf = new char[iGetHostNameBuffer]; 
-    iRet = gethostbyname_r(szHostName, pResult, pDummyBuf, 
-                           iGetHostNameBuffer, &pRes, &iErrno);
-    delete pDummyBuf;
-
-    return (iRet < 0) ? kError_NoDataAvail : kError_NoErr;
-#endif
-
-#if (defined(__linux__) && HAVE_LINUX_LIBC5) || defined(__solaris__)
-    char               *pDummyBuf;
-    struct hostent     *pRes;
-    int                 iErrno, iRet;
-
-    pDummyBuf = new char[iGetHostNameBuffer]; 
-    pRes = gethostbyname_r(szHostName, pResult, pDummyBuf, 
-                           iGetHostNameBuffer, &iErrno);
-    delete pDummyBuf;
-
-    return (pRes == NULL) ? kError_NoDataAvail : kError_NoErr;
-#endif
 }
-// NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
-// Please read the note on top of this function
-// NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
 
 Error HttpBuffer::Open(void)
 {
     char                szHostName[iMaxHostNameLen+1], *szFile, *szQuery;
-    char               *pInitialBuffer;
+    char                szLocalName[iMaxHostNameLen+1];
+    char               *pInitialBuffer, szStreamName[255];
     unsigned            iPort;
     int                 iRet, iRead, iConnect;
     struct sockaddr_in  sAddr;
@@ -183,6 +158,8 @@ Error HttpBuffer::Open(void)
     void               *pPtr;
     fd_set              sSet; 
     struct timeval      sTv;
+
+    szStreamName[0] = 0;
 
     iRet = sscanf(m_szUrl, "http://%[^:/]:%d", szHostName, &iPort);
     if (iRet < 1)
@@ -236,6 +213,7 @@ Error HttpBuffer::Open(void)
 		     usleep(100000);
            continue;
         }
+
         if (iRet < 0)
         { 
            LogError("Cannot connect socket");
@@ -247,17 +225,16 @@ Error HttpBuffer::Open(void)
     if (m_bExit)
         return (Error)kError_Interrupt;
 
-    gethostname(szHostName, iMaxHostNameLen);    
+    gethostname(szLocalName, iMaxHostNameLen);    
     szQuery = new char[iMaxUrlLen];
 
     if (szFile)
         sprintf(szQuery, "GET %s HTTP/1.0\n\n", szFile);
     else
         sprintf(szQuery, "GET / HTTP/1.0\nHost %s\nAccept: */*\n\n", 
-                szHostName);
+                szLocalName);
 
     iRet = send(m_hHandle, szQuery, strlen(szQuery), 0);
-
     if (iRet != (int)strlen(szQuery))
     {
 		delete szQuery;
@@ -329,9 +306,6 @@ Error HttpBuffer::Open(void)
             memcpy(pHeaderData + iHeaderBytes, pInitialBuffer, iRead);
             iHeaderBytes += iRead;
 
-            //for(int i = 0; i < iHeaderBytes; i++)
-            //   printf("'%c' - '%x'\n", pHeaderData[i], pHeaderData[i]);
-
             if (strstr(pHeaderData, "\r\n\r\n") ||
                 strstr(pHeaderData, "\n\n"))
                 break;
@@ -370,6 +344,7 @@ Error HttpBuffer::Open(void)
         if (pPtr)
         {
             pPtr += strlen("icy-name:");
+            sscanf(pPtr, "%254[^\r\n]", szStreamName);
             sscanf(pPtr, "%30[^\r\n]", m_pID3Tag->szTitle);
         }
 
@@ -402,14 +377,44 @@ Error HttpBuffer::Open(void)
         BeginWrite(pPtr, iSize);
         memcpy(pPtr, pInitialBuffer, iRead);
         EndWrite(iRead);
-
-        //for(int i = 0; i < iRead; i++)
-        //   printf("%02X ", pInitialBuffer[i] & 0xFF);
-        //printf("\n");
-        //printf("%s\n", pInitialBuffer);
     }
 
     delete pInitialBuffer;
+
+    bool bSave;
+    unsigned  size = 255;
+    m_context->prefs->GetPrefBoolean(kHTTPStreamSave, &bSave);
+    if (bSave)
+    {
+        char szPath[255], szFile[255];
+
+        for(int i = 0; i < strlen(szStreamName); i++)
+           if (strchr("\\/?*{}[]()*|<>\"'", szStreamName[i]))
+               szStreamName[i] = '-';
+
+        if (szStreamName[0] == 0)
+           sprintf(szStreamName, "%s:%d", szHostName, iPort);
+
+        if (m_context->prefs->GetPrefString(kHTTPStreamSaveDir, szPath, &size) == 
+            kError_NoPrefValue)
+           strcpy(szPath, ".");
+        if (szPath[strlen(szPath) - 1] == '/' ||
+            szPath[strlen(szPath) - 1] == '\\')
+            szPath[strlen(szPath) - 1]  = 0;
+
+        for(int i = 0;; i++)
+        {
+            if (!i)
+                sprintf(szFile, "%s/%s.mp3", szPath, szStreamName);
+            else
+                sprintf(szFile, "%s/%s-%d.mp3", szPath, szStreamName, i);
+
+            if (access(szFile, F_OK))
+                break;
+        }
+
+        m_fpSave = fopen(szFile, "wb");
+    }
 
     return kError_NoErr;
 }
@@ -481,6 +486,16 @@ void HttpBuffer::WorkerThread(void)
              SetEndOfStream(true);
              EndWrite(0);
              break;
+          }
+
+          if (m_fpSave)
+          {
+             iRet = fwrite(pBuffer, sizeof(char), iRead, m_fpSave);
+             if (iRet != iRead)
+             {
+                 m_pHttp->ReportError("Cannot save http stream to disk. Disk full?");
+                 break;
+             }
           }
 
           //for(int i = 0; i<20; i++)

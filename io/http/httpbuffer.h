@@ -91,6 +91,7 @@ class HttpBuffer : public StreamBuffer
       bool            m_bLoop;
       ID3Tag         *m_pID3Tag;
       HttpInput      *m_pHttp;
+      FILE           *m_fpSave;
 };
 
 #endif

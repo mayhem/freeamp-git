@@ -43,6 +43,7 @@ ____________________________________________________________________________*/
 #include "config.h"
 #include "errors.h"
 #include "properties.h"
+#include "volume.h"
 
 #define MAXCHANNELS		2
 
@@ -62,6 +63,7 @@ public:
             PhysicalMediaOutput() { m_target = NULL; }
     virtual ~PhysicalMediaOutput() { }
     virtual Error Init(OutputInfo* /*info*/){ return kError_GotDefaultMethod; }
+    virtual VolumeManager *GetVolumeManager() = 0;
 
     virtual Error BeginWrite(void *&pBuffer, size_t &iBytesToWrite)
         { return kError_GotDefaultMethod; };
@@ -81,8 +83,6 @@ public:
     virtual void  WaitToQuit(){ };
     virtual const char *GetErrorString(int32) { return NULL; }
     virtual Error SetPropManager(Properties *) = 0;
-    virtual void  SetVolume(int32) { ; };
-    virtual int32 GetVolume(void) { return 0; };
     virtual void  ReportError(const char *szError)
                   {
                      assert(m_target);

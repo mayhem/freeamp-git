@@ -94,16 +94,17 @@ class EventQueue {
 #endif  //_VISUAL_ENABLE_
 #undef  _VISUAL_ENABLE_
 
-#define CMD_VolumeUp           40
-#define CMD_VolumeDown         41
+#define CMD_GetVolume           40
+#define CMD_SetVolume           41
 
 #define INFO_BufferingBegin       42 // Network rebuffering just started
 #define INFO_BufferingEnd         43 // Network rebuffering just stopped
 #define INFO_BufferStatus         44 // Buffer percent full information
 
 #define CMD_PLMGetMediaTitle      45 // sent by PlayListManager to player to get title about a particular playlistitem
-
 #define INFO_StatusMessage      46 // sent to UIs so they can display status info
+
+#define INFO_VolumeInfo         47
 #endif // _EVENT_H_
 
 

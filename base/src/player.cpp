@@ -84,6 +84,7 @@ EventQueue()
    m_quitWaitingFor = 0;
    m_plm = new PlayListManager((EventQueue *) this);
    m_playerState = PlayerState_Stopped;
+   m_pVolumeManager = NULL;
 
    m_lmcRegistry = NULL;
    m_pmiRegistry = NULL;
@@ -419,6 +420,8 @@ Run()
    m_context->prefs->GetLogPerformance(&bValue);
    if (bValue)
       m_context->log->AddLogLevel(LogPerf);
+
+   GetVolumeManager();
    
    // which ui should we instantiate first??
    if (m_argUIList->CountItems() == 0)
@@ -521,6 +524,37 @@ Run()
    m_eventServiceThread->Create(Player::EventServiceThreadFunc, this);
 
    delete[]name;
+}
+
+void Player::GetVolumeManager()
+{
+   char          defaultPMO[256];
+   uint32        size = sizeof(defaultPMO);
+   RegistryItem *item;
+   int32         i = 0;
+   PhysicalMediaOutput *pmo = NULL;
+
+   m_context->prefs->GetDefaultPMO(defaultPMO, &size);
+
+   while (NULL != (item = m_pmoRegistry->GetItem(i++)))
+   {
+        if(!strcmp(defaultPMO, item->Name()))
+        {
+            break;
+        }
+   }
+
+   // if the default isn't around then just use first one 
+   // is there a better way?
+   if(!item)
+      item = m_pmoRegistry->GetItem(0);
+
+   if (item)
+   {
+      pmo = (PhysicalMediaOutput *) item->InitFunction()(m_context);
+      m_pVolumeManager = pmo->GetVolumeManager();
+      delete pmo;
+   }
 }
 
 void 
@@ -894,12 +928,6 @@ CreateLMC(PlayListItem * pc, Event * pC)
       goto epilogue;
    }
 
-   iVolume = lmc->GetVolume();
-   if (iVolume < 0)
-	   iVolume = VolumeManager::GetVolume();
-
-   m_props.SetProperty("pcm_volume", new Int32PropValue(iVolume));
-
    m_lmc = lmc;
    lmc = NULL;
 
@@ -979,6 +1007,30 @@ Stop(Event *pEvent)
        SEND_NORMAL_EVENT(INFO_Stopped);
     }
 
+    delete pEvent;
+}
+
+void
+Player::
+GetVolume(Event *pEvent)
+{
+    delete pEvent;
+    if (m_pVolumeManager) 
+    {
+       int32 iVolume = m_pVolumeManager->GetVolume();
+       SendToUI(new VolumeEvent(INFO_VolumeInfo,iVolume));
+    }
+}
+
+void
+Player::
+SetVolume(Event *pEvent)
+{
+    int32 v=((VolumeEvent *) pEvent)->GetVolume();
+    if (m_pVolumeManager) 
+    {
+        m_pVolumeManager->SetVolume(v);
+    }
     delete pEvent;
 }
 
@@ -1388,6 +1440,14 @@ ServiceEvent(Event * pC)
            Stop(pC);
            break;
 
+      case CMD_GetVolume:
+           GetVolume(pC);
+           break;
+
+      case CMD_SetVolume:
+           SetVolume(pC);
+           break;
+
       case CMD_ChangePosition:
            ChangePosition(pC);
            break;
@@ -1493,18 +1553,6 @@ PropertyChange(const char *pProp, PropValue * ppv)
 {
    Error     rtn = kError_UnknownErr;
 
-   if (!strcmp(pProp, "pcm_volume"))
-   {
-      int32     newVol = ((Int32PropValue *) ppv)->GetInt32();
-
-      if (m_lmc)
-         m_lmc->SetVolume(newVol);
-	  else
-	     VolumeManager::SetVolume(newVol);
-
-
-      rtn = kError_NoErr;
-   }
    return rtn;
 }
 

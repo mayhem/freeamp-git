@@ -29,7 +29,7 @@ PLUGIN_NAME = soundcard-@host_os@.pmo
 PLUGIN_FULL_NAME = $(PLUGIN_DIR)$(PLUGIN_NAME)
 
 if AM_HAVE_LINUX
-FILES = soundcardpmo.cpp 
+FILES = soundcardpmo.cpp ossvolume.cpp
 MYLIBS = libfaio.a
 
 all-local : $(PLUGIN_FULL_NAME)

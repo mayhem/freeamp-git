@@ -283,20 +283,6 @@ Error XingLMC::SetPMO(PhysicalMediaOutput * o)
    }
 }
 
-void XingLMC::SetVolume(int32 iVolume)
-{
-   if (m_output)
-      m_output->SetVolume(iVolume);
-}
-
-int32 XingLMC::GetVolume(void)
-{
-   if (m_output)
-      return m_output->GetVolume();
-   else
-      return -1;
-}
-
 bool XingLMC::IsStreaming()
 {
    if (!m_input)

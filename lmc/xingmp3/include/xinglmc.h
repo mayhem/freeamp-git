@@ -102,9 +102,6 @@ class     XingLMC:public LogicalMediaConverter
    virtual Error SetEQData(float *);
    virtual Error SetEQData(bool);
 
-   virtual void  SetVolume(int32);
-   virtual int32 GetVolume(void);
-
    virtual Error SetPropManager(Properties *p) { m_propManager = p; if (p) return kError_NoErr; else return kError_UnknownErr; }
 
  protected:

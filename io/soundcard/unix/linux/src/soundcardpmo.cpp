@@ -111,6 +111,11 @@ SoundCardPMO::~SoundCardPMO()
    }
 }
 
+VolumeManager *SoundCardPMO::GetVolumeManager()
+{
+   return new OSSVolumeManager();
+}
+
 void SoundCardPMO::WaitToQuit()
 {
    if (m_pBufferThread)
@@ -125,33 +130,6 @@ Error SoundCardPMO::SetPropManager(Properties * p)
 {
    m_propManager = p;
    return kError_NoErr;
-}
-
-int SoundCardPMO::GetVolume()
-{
-   int mixFd = open("/dev/mixer",O_RDWR);
-   int volume = 0;
-
-   if (mixFd != -1) 
-   {
-      ioctl(mixFd, SOUND_MIXER_READ_VOLUME, &volume);
-      volume &= 0xFF;
-      close(mixFd);
-   }
-   return volume;   
-}
-
-void SoundCardPMO::SetVolume(int32 iVolume)
-{
-   int mixFd;
-
-   mixFd = open("/dev/mixer",O_RDWR);
-   if (mixFd >= 0) 
-   {
-      iVolume |= (iVolume << 8);
-      ioctl(mixFd, SOUND_MIXER_WRITE_VOLUME, &iVolume);
-      close(mixFd);
-   }    
 }
 
 int SoundCardPMO::GetBufferPercentage()

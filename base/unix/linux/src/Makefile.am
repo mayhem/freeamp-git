@@ -25,8 +25,7 @@
 include @top_srcdir@/config/Makefile.header
 
 if AM_HAVE_LINUX
-FILES = linuxthread.cpp mutex.cpp debug.cpp semaphore.cpp utility.cpp mem.c \
-        volume.cpp
+FILES = linuxthread.cpp mutex.cpp debug.cpp semaphore.cpp utility.cpp mem.c 
 MYLIBS = libfasys.a
 else
 FILES = 

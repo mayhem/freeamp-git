@@ -39,6 +39,7 @@ ____________________________________________________________________________*/
 #include "eventbuffer.h"
 #include "preferences.h"
 #include "facontext.h"
+#include "win32volume.h"
 
 #define BIT_SELECT  0x1f
 #define SLEEPTIME   256
@@ -60,8 +61,7 @@ public:
     virtual Error Clear();
 
     virtual Error SetPropManager(Properties *p);
-    virtual void  SetVolume(int32);
-    virtual int32 GetVolume(void);
+    virtual VolumeManager *GetVolumeManager();
 
     static void   StartWorkerThread(void *);
     virtual Error BeginWrite(void *&pBuffer, size_t &iBytesToWrite);

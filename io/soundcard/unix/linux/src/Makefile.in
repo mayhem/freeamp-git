@@ -79,7 +79,7 @@ PLUGIN_DIR = @top_srcdir@/plugins/
 PLUGIN_NAME = soundcard-@host_os@.pmo
 PLUGIN_FULL_NAME = $(PLUGIN_DIR)$(PLUGIN_NAME)
 
-@AM_HAVE_LINUX_TRUE@FILES = soundcardpmo.cpp 
+@AM_HAVE_LINUX_TRUE@FILES = soundcardpmo.cpp ossvolume.cpp
 @AM_HAVE_LINUX_TRUE@MYLIBS = libfaio.a
 
 @AM_HAVE_LINUX_FALSE@FILES = 
@@ -108,7 +108,7 @@ X_EXTRA_LIBS = @X_EXTRA_LIBS@
 X_PRE_LIBS = @X_PRE_LIBS@
 libfaio_a_LIBADD = 
 @AM_HAVE_LINUX_FALSE@cond0libfaio_a_OBJECTS = 
-@AM_HAVE_LINUX_TRUE@cond1libfaio_a_OBJECTS =  soundcardpmo.o
+@AM_HAVE_LINUX_TRUE@cond1libfaio_a_OBJECTS =  soundcardpmo.o ossvolume.o
 libfaio_a_OBJECTS =  $(cond0libfaio_a_OBJECTS) $(cond1libfaio_a_OBJECTS)
 AR = ar
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
@@ -120,7 +120,7 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP = --best
-DEP_FILES =  .deps/soundcardpmo.P
+DEP_FILES =  .deps/ossvolume.P .deps/soundcardpmo.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 SOURCES = $(libfaio_a_SOURCES)
 OBJECTS = $(libfaio_a_OBJECTS)

@@ -26,17 +26,6 @@ ____________________________________________________________________________*/
 #ifndef _ALSAPMO_H_
 #define _ALSAPMO_H_
 
-//#define DEBUG
-//#define DEBUG2
-//#define ALSA
-
-/* ALSA_DEVICE=1:0 is normal /dev/dsp          */
-/* ALSA_DEVICE=1:1 is alsa's advanced device   */
-/*  You can use -a <soundcard #>:<device #>... */
-/*  For example: mpg123 -a 1:0 aaa.mpg         */
-/*               mpg123 -a guspnp:1 aaa.mpg    */
-//#define ALSA_DEVICE "1:0"	// No longer used; now a preference
-
 /* system headers */
 #include <stdlib.h>
 
@@ -52,11 +41,8 @@ ____________________________________________________________________________*/
 /* project headers */
 #include <config.h>
 #include "thread.h"
-//#include "semaphore.h"
 #include "pmo.h"
-//#include "pmoevent.h"
 #include "eventbuffer.h"
-///#include "properties.h"
 
 struct audio_info_struct
 {
@@ -68,8 +54,7 @@ struct audio_info_struct
     int channels;
     long rate;
     void * mixer_handle;
-    int pcm;
-//    char mixer_id[13];
+    int mixer_channel;
     snd_mixer_channel_t channel;
 };
 
@@ -103,16 +88,14 @@ public:
     AlsaPMO(FAContext *context);
     virtual ~AlsaPMO();
     
+    virtual VolumeManager *GetVolumeManager();
     virtual Error Init(OutputInfo* info);
-//    virtual Error Write(int32 &,void *,int32);
     virtual Error Pause();
     virtual Error Resume();
    virtual Error Break();
    virtual void  WaitToQuit();
    virtual Error Clear();
    virtual Error SetPropManager(Properties * p);
-   virtual void  SetVolume(int32);
-   virtual int32 GetVolume(void);
 
    static void   StartWorkerThread(void *);
    virtual Error BeginWrite(void *&pBuffer, size_t &iBytesToWrite);
@@ -125,7 +108,6 @@ public:
    void          WorkerThread(void); 
    virtual Error Reset(bool user_stop);
    void          HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent);
-//   int		OpenMixer();
 
     Properties *m_propManager;
     bool	m_properlyInitialized;
@@ -139,11 +121,10 @@ public:
     int32 getprocessed(void);
    Thread      *m_pBufferThread;
    Mutex       *m_pPauseMutex;
-//   Semaphore   *m_pPauseSem;
-//   bool         m_bPause;
    int          m_iOutputBufferSize, m_iTotalBytesWritten, m_iBytesPerSample;
    int          m_iLastFrame;
    int          m_iDataSize;
+   int          m_iCard, m_iDevice;
  
     struct audio_info_struct *ai;
     int audio_set_all(struct audio_info_struct *);

@@ -452,9 +452,6 @@ Error FreeAmpUI::Init(int32 startup_type)
 
     m_initialized = true;
 
-
-
-
     gtkListenThread = Thread::CreateThread();
     gtkListenThread->Create(FreeAmpUI::x11ServiceFunction,this);
 
@@ -463,7 +460,6 @@ Error FreeAmpUI::Init(int32 startup_type)
     m_timerThread->Create(FreeAmpUI::TimerEventFunction,this);
     
     return kError_NoErr;
-
 }
 
 void FreeAmpUI::ParseArgs() {
@@ -662,8 +658,7 @@ int32 FreeAmpUI::AcceptEvent(Event *e) {
 	    XUnlockDisplay(m_display);
 	    break;
 	}
-	case INFO_PlayListShuffle:
-	{
+	case INFO_PlayListShuffle: {
 	    PlayListShuffleEvent *plse = (PlayListShuffleEvent *)e;
 	    
 	    switch (plse->GetShuffleMode()) 
@@ -680,6 +675,12 @@ int32 FreeAmpUI::AcceptEvent(Event *e) {
 	    XLockDisplay(m_display);
 	    m_lcdWindow->Draw(FALcdWindow::IconsOnly);
 	    XUnlockDisplay(m_display);
+	    break;
+	}
+	case INFO_VolumeInfo: {
+	    m_volume=((VolumeEvent *)e)->GetVolume();                           
+	    m_lcdWindow->SetVolume( m_volume );                                 
+	    m_lcdWindow->SetDisplayState(FALcdWindow::VolumeState);             
 	    break;
 	}
 	default:
@@ -796,9 +797,7 @@ void FreeAmpUI::openFunction(void *p) {
 // 3 = down
 // 5 = no change
 void FreeAmpUI::VolumeDialFunction(void *p, int32 c,int32 x, int32 y) {
-#ifdef solaris
- struct audio_info ainfo;
-#endif
+    FreeAmpUI *pMe = (FreeAmpUI *)p;
     //cout << "volume y: " << c << endl;
     switch (c) {
 	case 0:
@@ -809,24 +808,7 @@ void FreeAmpUI::VolumeDialFunction(void *p, int32 c,int32 x, int32 y) {
 	case 1:
 	    ((FreeAmpUI *)p)->m_oldLcdState = ((FreeAmpUI *)p)->m_lcdWindow->GetDisplayState();
 
-       ((FreeAmpUI *)p)->m_volume = VolumeManager::GetVolume();
-#if 0
-#ifdef linux
-	    ((FreeAmpUI *)p)->m_mixerFd = open("/dev/mixer",O_RDWR);
-	    ioctl( ((FreeAmpUI *)p)->m_mixerFd, SOUND_MIXER_READ_VOLUME, &( ((FreeAmpUI *)p)->m_volume ));
-#elif defined(solaris)
-	    ((FreeAmpUI *)p)->m_mixerFd = open("/dev/audioctl", O_RDWR);
-	    /* bork */
-	    ioctl(((FreeAmpUI *)p)->m_mixerFd, AUDIO_GETINFO, &ainfo);
-	    /* bork */
-            ((FreeAmpUI *)p)->m_volume = ainfo.play.gain;
-#endif
-#endif
-	    ((FreeAmpUI *)p)->m_volume &= 0xFF;
-	    ((FreeAmpUI *)p)->m_lcdWindow->SetVolume( ((FreeAmpUI *)p)->m_volume );
-    
-	    ((FreeAmpUI *)p)->m_lcdWindow->SetDisplayState(FALcdWindow::VolumeState);
-    
+	    pMe->m_playerEQ->AcceptEvent(new VolumeEvent(CMD_GetVolume));
 	    break;
 	case 2: {
 	    int foo = ((FreeAmpUI *)p)->m_volume;
@@ -838,18 +820,7 @@ void FreeAmpUI::VolumeDialFunction(void *p, int32 c,int32 x, int32 y) {
 	    ((FreeAmpUI *)p)->m_lcdWindow->Draw(FALcdWindow::TimeOnly);
 	    ((FreeAmpUI *)p)->m_volume = foo;
 
-       VolumeManager::SetVolume(foo);
-#if 0	    
-#ifdef linux
-	    foo |= (foo << 8);
-	    ioctl( ((FreeAmpUI *)p)->m_mixerFd, SOUND_MIXER_WRITE_VOLUME, &foo);
-#elif defined(solaris)
-	    ioctl(((FreeAmpUI *)p)->m_mixerFd, AUDIO_GETINFO, &ainfo);
-            ainfo.play.gain = foo;
-	    ioctl(((FreeAmpUI *)p)->m_mixerFd, AUDIO_SETINFO, &ainfo);
-#endif
-#endif
-
+	    pMe->m_playerEQ->AcceptEvent(new VolumeEvent(CMD_SetVolume,((FreeAmpUI *)p)->m_volume));
 	    break; }
 	case 3: {
 	    int foo = ((FreeAmpUI *)p)->m_volume;
@@ -861,18 +832,7 @@ void FreeAmpUI::VolumeDialFunction(void *p, int32 c,int32 x, int32 y) {
 	    ((FreeAmpUI *)p)->m_lcdWindow->Draw(FALcdWindow::TimeOnly);
 	    ((FreeAmpUI *)p)->m_volume = foo;
 
-       VolumeManager::SetVolume(foo);
-#if 0
-#ifdef linux
-	    foo |= (foo << 8);
-
-	    ioctl( ((FreeAmpUI *)p)->m_mixerFd, SOUND_MIXER_WRITE_VOLUME, &foo);
-#elif defined(solaris)
-	    ioctl(((FreeAmpUI *)p)->m_mixerFd, AUDIO_GETINFO, &ainfo);
-            ainfo.play.gain = foo;
-	    ioctl(((FreeAmpUI *)p)->m_mixerFd, AUDIO_SETINFO, &ainfo);
-#endif
-#endif
+	    pMe->m_playerEQ->AcceptEvent(new VolumeEvent(CMD_SetVolume,((FreeAmpUI *)p)->m_volume));
 	    
 	    break; }
     }

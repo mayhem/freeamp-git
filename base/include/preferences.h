@@ -51,6 +51,8 @@ extern const char* kLogDecodePref;
 extern const char* kLogInputPref;
 extern const char* kLogOutputPref;
 extern const char* kLogPerformancePref;
+extern const char* kHTTPStreamSave;
+extern const char* kHTTPStreamSaveDir;
 
 class LibDirFindHandle;
 

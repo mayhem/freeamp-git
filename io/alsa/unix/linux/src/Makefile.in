@@ -79,7 +79,7 @@ PLUGIN_DIR = @top_srcdir@/plugins/
 PLUGIN_NAME = alsa-@host_os@.pmo
 PLUGIN_FULL_NAME = $(PLUGIN_DIR)$(PLUGIN_NAME)
 
-@AM_HAVE_ALSA_TRUE@FILES = alsapmo.cpp 
+@AM_HAVE_ALSA_TRUE@FILES = alsapmo.cpp  alsavolume.cpp
 @AM_HAVE_ALSA_TRUE@MYLIBS = libfaio.a
 
 @AM_HAVE_ALSA_FALSE@FILES = 
@@ -107,7 +107,7 @@ X_LIBS = @X_LIBS@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
 X_PRE_LIBS = @X_PRE_LIBS@
 libfaio_a_LIBADD = 
-@AM_HAVE_ALSA_TRUE@cond0libfaio_a_OBJECTS =  alsapmo.o
+@AM_HAVE_ALSA_TRUE@cond0libfaio_a_OBJECTS =  alsapmo.o alsavolume.o
 @AM_HAVE_ALSA_FALSE@cond1libfaio_a_OBJECTS = 
 libfaio_a_OBJECTS =  $(cond0libfaio_a_OBJECTS) $(cond1libfaio_a_OBJECTS)
 AR = ar
@@ -120,7 +120,7 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP = --best
-DEP_FILES =  .deps/alsapmo.P
+DEP_FILES =  .deps/alsapmo.P .deps/alsavolume.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 SOURCES = $(libfaio_a_SOURCES)
 OBJECTS = $(libfaio_a_OBJECTS)

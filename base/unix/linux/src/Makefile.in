@@ -75,8 +75,7 @@ RANLIB = @RANLIB@
 VERSION = @VERSION@
 host_os = @host_os@
 
-@AM_HAVE_LINUX_TRUE@FILES = linuxthread.cpp mutex.cpp debug.cpp semaphore.cpp utility.cpp mem.c \
-@AM_HAVE_LINUX_TRUE@        volume.cpp
+@AM_HAVE_LINUX_TRUE@FILES = linuxthread.cpp mutex.cpp debug.cpp semaphore.cpp utility.cpp mem.c 
 @AM_HAVE_LINUX_TRUE@MYLIBS = libfasys.a
 @AM_HAVE_LINUX_FALSE@FILES = 
 @AM_HAVE_LINUX_FALSE@MYLIBS = 
@@ -105,7 +104,7 @@ X_PRE_LIBS = @X_PRE_LIBS@
 libfasys_a_LIBADD = 
 @AM_HAVE_LINUX_FALSE@cond0libfasys_a_OBJECTS = 
 @AM_HAVE_LINUX_TRUE@cond1libfasys_a_OBJECTS =  linuxthread.o mutex.o \
-@AM_HAVE_LINUX_TRUE@debug.o semaphore.o utility.o mem.o volume.o
+@AM_HAVE_LINUX_TRUE@debug.o semaphore.o utility.o mem.o
 libfasys_a_OBJECTS =  $(cond0libfasys_a_OBJECTS) \
 $(cond1libfasys_a_OBJECTS)
 AR = ar
@@ -122,7 +121,7 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 TAR = tar
 GZIP = --best
 DEP_FILES =  .deps/debug.P .deps/linuxthread.P .deps/mem.P .deps/mutex.P \
-.deps/semaphore.P .deps/utility.P .deps/volume.P
+.deps/semaphore.P .deps/utility.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 SOURCES = $(libfasys_a_SOURCES)
 OBJECTS = $(libfasys_a_OBJECTS)

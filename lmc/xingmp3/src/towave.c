@@ -24,6 +24,15 @@
 	$Id$
 ____________________________________________________________________________*/
 
+/* ------------------------------------------------------------------------
+
+      NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
+
+        This file exists for reference only. It is not actually used
+        in the FreeAmp project. There is no need to mess with this 
+        file. There is no need to flatten the beavers, either.
+
+      NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
 
 /*---- towave.c --------------------------------------------
   32 bit version only

@@ -1,24 +1,24 @@
 /*____________________________________________________________________________
-	
-	FreeAmp - The Free MP3 Player
+        
+        FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1998-1999 GoodNoise
+        Portions Copyright (C) 1998-1999 GoodNoise
 
-	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; either version 2 of the License, or
-	(at your option) any later version.
+        This program is free software; you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation; either version 2 of the License, or
+        (at your option) any later version.
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+        This program is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-	
-	$Id$
+        You should have received a copy of the GNU General Public License
+        along with this program; if not, write to the Free Software
+        Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+        
+        $Id$
 ____________________________________________________________________________*/
 
 #include <string.h>
@@ -44,6 +44,8 @@ const char* kWindowPositionLeftPref = "WindowPositionLeft";
 const char* kWindowPositionTopPref = "WindowPositionTop";
 const char* kWindowPositionWidthPref = "WindowPositionWidth";
 const char* kWindowPositionHeightPref = "WindowPositionHeight";
+const char* kHTTPStreamSave = "HTTPStreamSave";
+const char* kHTTPStreamSaveDir = "HTTPStreamSaveDir";
 
 //logging
 const char* kUseDebugLogPref = "UseDebugLog";
@@ -59,48 +61,57 @@ const int32  kDefaultOutputBufferSize = 512;
 const int32  kDefaultStreamBufferInterval = 3;
 const int32  kDefaultDecoderThreadPriority = 1;
 const bool   kDefaultLogging = false;
-
+const bool   kDefaultHTTPStreamSave = false;
+const char  *kDefaultHTTPStreamSaveDir = ".";
 
 Error
 Preferences::
 SetDefaults()
 {
     int32 dummyInt;
-    bool dummyBool;
+    bool  dummyBool;
+    char  dummyString[255];
+    unsigned size = 255;
 
     // set default for input buffer size
     if (GetPrefInt32(kInputBufferSizePref, &dummyInt) == kError_NoPrefValue)
-	SetPrefInt32(kInputBufferSizePref, kDefaultInputBufferSize);
+        SetPrefInt32(kInputBufferSizePref, kDefaultInputBufferSize);
 
     // set default for output buffer size
     if (GetPrefInt32(kOutputBufferSizePref, &dummyInt) == kError_NoPrefValue)
-	SetPrefInt32(kOutputBufferSizePref, kDefaultOutputBufferSize);
+        SetPrefInt32(kOutputBufferSizePref, kDefaultOutputBufferSize);
 
     // set default for streaming buffer interval
     if (GetPrefInt32(kStreamBufferIntervalPref, &dummyInt)
-	== kError_NoPrefValue)
-	SetPrefInt32(kStreamBufferIntervalPref, 
-		     kDefaultStreamBufferInterval);
+        == kError_NoPrefValue)
+        SetPrefInt32(kStreamBufferIntervalPref, 
+                     kDefaultStreamBufferInterval);
 
     // set default for decoder thread priority
     if (GetPrefInt32(kDecoderThreadPriorityPref, &dummyInt)
-	== kError_NoPrefValue)
-	SetPrefInt32(kDecoderThreadPriorityPref, 
-		     kDefaultDecoderThreadPriority);
+        == kError_NoPrefValue)
+        SetPrefInt32(kDecoderThreadPriorityPref, 
+                     kDefaultDecoderThreadPriority);
 
     // set defaults for logging
     if (GetPrefBoolean(kUseDebugLogPref, &dummyBool) == kError_NoPrefValue)
-	SetPrefBoolean(kUseDebugLogPref, kDefaultLogging);
+        SetPrefBoolean(kUseDebugLogPref, kDefaultLogging);
     if (GetPrefBoolean(kLogMainPref, &dummyBool) == kError_NoPrefValue)
-	SetPrefBoolean(kLogMainPref, kDefaultLogging);
+        SetPrefBoolean(kLogMainPref, kDefaultLogging);
     if (GetPrefBoolean(kLogDecodePref, &dummyBool) == kError_NoPrefValue)
-	SetPrefBoolean(kLogDecodePref, kDefaultLogging);
+        SetPrefBoolean(kLogDecodePref, kDefaultLogging);
     if (GetPrefBoolean(kLogInputPref, &dummyBool) == kError_NoPrefValue)
-	SetPrefBoolean(kLogInputPref, kDefaultLogging);
+        SetPrefBoolean(kLogInputPref, kDefaultLogging);
     if (GetPrefBoolean(kLogOutputPref, &dummyBool) == kError_NoPrefValue)
-	SetPrefBoolean(kLogOutputPref, kDefaultLogging);
+        SetPrefBoolean(kLogOutputPref, kDefaultLogging);
     if (GetPrefBoolean(kLogPerformancePref, &dummyBool) == kError_NoPrefValue)
-	SetPrefBoolean(kLogPerformancePref, kDefaultLogging);
+        SetPrefBoolean(kLogPerformancePref, kDefaultLogging);
+
+    if (GetPrefBoolean(kHTTPStreamSave, &dummyBool) == kError_NoPrefValue)
+        SetPrefBoolean(kHTTPStreamSave, kDefaultHTTPStreamSave);
+
+    if (GetPrefString(kHTTPStreamSaveDir, dummyString, &size) == kError_NoPrefValue)
+        SetPrefString(kHTTPStreamSaveDir, kDefaultHTTPStreamSaveDir);
 
     return kError_NoErr;
 }
@@ -117,14 +128,14 @@ GetPrefBoolean(const char* pref, bool* value)
     error = GetPrefString(pref, temp, &size);
     if (IsntError(error))
     {
-	if (0 == strcasecmp(temp, "true"))
-	    *value = true;
-	else if (0 != strcasecmp(temp, "false"))
-	{
-	    // In the case of a syntax error, pretend the preference doesn't
-	    // exist, so that it'll be replaced by a default value.
-	    error = kError_NoPrefValue;
-	}
+        if (0 == strcasecmp(temp, "true"))
+            *value = true;
+        else if (0 != strcasecmp(temp, "false"))
+        {
+            // In the case of a syntax error, pretend the preference doesn't
+            // exist, so that it'll be replaced by a default value.
+            error = kError_NoPrefValue;
+        }
     }
     return error;
 
@@ -150,11 +161,11 @@ GetPrefInt32(const char* pref, int32* value)
     error = GetPrefString(pref, temp, &size);
     if (IsntError(error))
     {
-	*value = strtol(temp, &endp, 10);
-	// In the case of a syntax error, pretend the preference doesn't
-	// exist, so that it'll be replaced by a default value.
-	if (*endp != '\0')
-	    error = kError_NoPrefValue;
+        *value = strtol(temp, &endp, 10);
+        // In the case of a syntax error, pretend the preference doesn't
+        // exist, so that it'll be replaced by a default value.
+        if (*endp != '\0')
+            error = kError_NoPrefValue;
     }
     return error;
 }
@@ -170,20 +181,20 @@ SetPrefInt32(const char* pref, int32 value)
 
     if (value < 0)
     {
-	value = -value;
-	isNeg = 1;
+        value = -value;
+        isNeg = 1;
     }
 
     *--p = '\0';
 
     do
     {
-	*--p = '0' + (value % 10);
-	value /= 10;
+        *--p = '0' + (value % 10);
+        value /= 10;
     } while (value > 0);
 
     if (isNeg)
-	*--p = '-';
+        *--p = '-';
 
     error = SetPrefString(pref, p);
 

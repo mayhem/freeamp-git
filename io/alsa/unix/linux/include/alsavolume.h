@@ -21,19 +21,24 @@
 	$Id$
 ____________________________________________________________________________*/
 
-#ifndef _VOLUME_H_
-#define _VOLUME_H_
+#ifndef _ALSAVOLUME_H_
+#define _ALSAVOLUME_H_
 
 #include "config.h"
+#include "volume.h"
 
-class VolumeManager 
+class ALSAVolumeManager : public VolumeManager
 {
     public:
 
-    VolumeManager() { ; };
+    ALSAVolumeManager(int iCard, int iDevice);
 
-    virtual void SetVolume(int32) = 0;
-    virtual int32 GetVolume(void) = 0;
+    virtual void SetVolume(int32);
+    virtual int32 GetVolume(void);
+
+    private:
+
+    int iCard, iDevice;
 };
 
-#endif // _VOLUME_H_
+#endif // _ALSAVOLUME_H_

@@ -25,10 +25,6 @@
         
         $Id$
 
- *  You can use -a <soundcard #>:<device #>...
- *  For example: mpg123 -a 1:0 aaa.mpg
- *               mpg123 -a guspnp:1 aaa.mpg
-
 ____________________________________________________________________________*/
 
 /* system headers */
@@ -42,6 +38,7 @@ ____________________________________________________________________________*/
 /* project headers */
 #include <config.h>
 #include "alsapmo.h"
+#include "alsavolume.h"
 #include "facontext.h"
 #include "log.h"
 
@@ -59,36 +56,13 @@ extern "C"
    }
 }
 
-/*
-static char * g_ErrorArray[pmoError_MaximumError] = {
-    "Invalid Error Code",
-    "dsp device open failed",
-    "fcntl F_GETFL on /dev/dsp failed",
-    "fcntl F_SETFL on /dev/dsp failed"
-    "ioctl reset failed",
-    "config of samplesize failed",
-    "config of stereo failed",
-    "config of speed failed",
-
-    "wrong card number",
-    "wrong device number",
-    "getting playback info",
-    "getting playback params",
-    "alsa device close failed"
-};
-
-const char *AlsaPMO::GetErrorString(int32 error) {
-    if ((error <= pmoError_MinimumError) || (error >= pmoError_MaximumError)) {
-        return g_ErrorArray[0];
-    }
-    return g_ErrorArray[error - pmoError_MinimumError];
-}
-*/
-
 AlsaPMO::AlsaPMO(FAContext *context) :
         EventBuffer(iOrigBufferSize, iOverflowSize,
 		    iWriteTriggerSize, context)
 {
+	uint32 deviceNameSize = 128;
+   char scard[128];
+
    m_properlyInitialized = false;
    myInfo = new OutputInfo();
    memset(myInfo, 0, sizeof(OutputInfo));
@@ -109,22 +83,48 @@ AlsaPMO::AlsaPMO(FAContext *context) :
       m_pBufferThread->Create(AlsaPMO::StartWorkerThread, this);
    }
 
-    ai = new struct audio_info_struct;
-//   ai->gain = -1;
-//   ai->output = -1;
-    ai->handle = NULL;
-    ai->alsa_format.format = (unsigned)-1;
-    ai->alsa_format.rate = (unsigned)-1;
-    ai->alsa_format.channels = (unsigned)-1;
-    ai->device = NULL;
-    ai->format = -1;
-    ai->channels = -1;
-    ai->rate = -1;
-    ai->mixer_handle=0;
-    ai->pcm=-1;
-//    ai->mixer_id=SND_MIXER_ID_MASTER;
-//    ai->channel;
+   ai = new struct audio_info_struct;
+   ai->handle = NULL;
+   ai->alsa_format.format = (unsigned)-1;
+   ai->alsa_format.rate = (unsigned)-1;
+   ai->alsa_format.channels = (unsigned)-1;
+   ai->device = NULL;
+   ai->format = -1;
+   ai->channels = -1;
+   ai->rate = -1;
+   ai->mixer_handle=0;
+   ai->mixer_channel=-1;
 
+	ai->device = (char *) malloc(deviceNameSize);
+	m_context->prefs->GetPrefString(kALSADevicePref, ai->device,
+					&deviceNameSize);
+
+   if (ai->device)
+   {
+        if (sscanf(ai->device, "%[^:]: %d", scard, &m_iDevice) != 2)
+        {
+           ReportError("The ALSADevice statement in the preference file"
+                       "is improperly formatted. Format: ALSADevice: "
+                       "[card name/card number]:[device number]");
+           return;
+        }
+
+        m_iCard = snd_card_name(scard);
+        if (m_iCard < 0) 
+        {
+            ReportError("Invalid ALSA card name/number specified.");
+            return;
+        }
+        if (m_iDevice < 0 || m_iDevice > 31) 
+        {
+            ReportError("Invalid ALSA device number specified.");
+            return;
+        }
+   }
+   else
+       m_iCard = m_iDevice = 0;
+
+   delete ai->device;
 }
 
 AlsaPMO::~AlsaPMO() 
@@ -176,68 +176,9 @@ Error AlsaPMO::SetPropManager(Properties * p)
    return kError_NoErr;
 }
 
-/*
-int AlsaPMO::OpenMixer()
+VolumeManager *AlsaPMO::GetVolumeManager()
 {
-   int err;
-   err = snd_mixer_open(&ai->mixer_handle,ai->card,ai->device);
-   if (err < 0) {
-#ifdef DEBUG
-cout<<"snd_mixer_open err"<<endl;
-#endif
-      return -1;
-   }
-//in fact i think the next step is not needed all time, just at the first
-//to get the channel into info. This could be done in constructor of
-//VolumeManager.
-   err = snd_mixer_info( ai->mixer_handle, &info );
-   if (err < 0) {
-#ifdef DEBUG
-cout<<"snd_mixer_info err"<<endl;
-#endif
-      snd_mixer_close( mixer_handle );
-      return -1;
-   }
-   pcm = snd_mixer_channel( mixer_handle, mixer_id );
-   return 0;
-}
-*/
-
-int AlsaPMO::GetVolume()
-{
-   int volume = 0;
-   int err;
-//   OpenMixer();
-   if (ai->pcm >= 0) {
-      err = snd_mixer_channel_read(ai->mixer_handle,ai->pcm,&ai->channel);
-      if (err < 0) {
-         snd_mixer_close(ai->mixer_handle);
-         return volume;
-      }
-      volume=ai->channel.left;
-   }
-//   snd_mixer_close(mixer_handle);
-   return volume;   
-}
-
-void AlsaPMO::SetVolume(int32 iVolume)
-{
-   int err;
-//   OpenMixer();
-   if (ai->pcm >= 0) {
-      err = snd_mixer_channel_read(ai->mixer_handle,ai->pcm,&ai->channel);
-      if (err < 0) {
-         snd_mixer_close(ai->mixer_handle);
-         return;
-      }
-      ai->channel.left=ai->channel.right=iVolume;
-      err = snd_mixer_channel_write(ai->mixer_handle,ai->pcm,&ai->channel);
-      if (err < 0) {
-         snd_mixer_close(ai->mixer_handle);
-         return;
-      }
-   }
-//   snd_mixer_close(mixer_handle);
+   return new ALSAVolumeManager(m_iCard, m_iDevice);
 }
 
 int AlsaPMO::GetBufferPercentage()
@@ -248,8 +189,6 @@ int AlsaPMO::GetBufferPercentage()
 Error AlsaPMO::Pause() 
 {
    m_pPauseMutex->Acquire();
-//   if (m_properlyInitialized)
-//       Reset(true);
 }
 
 Error AlsaPMO::Resume() {
@@ -266,10 +205,7 @@ Error AlsaPMO::Break()
 }
 
 Error AlsaPMO::Init(OutputInfo* info) {
-    int card=0,device=0;
-    char scard[128], sdevice[128];
     int err;
-    char mixer_id[13]=SND_MIXER_ID_MASTER;
 
     m_properlyInitialized = false;
     if (!info) {
@@ -279,18 +215,9 @@ Error AlsaPMO::Init(OutputInfo* info) {
         PropValue *pv = NULL, *pProp;
         int32      iNewSize = iDefaultBufferSize;
         Error      result;
-	uint32	   deviceNameSize = 128;
-
-	ai->device = (char *) malloc(deviceNameSize);
-	m_context->prefs->GetPrefString(kALSADevicePref, ai->device,
-					&deviceNameSize);
-
    m_iDataSize = info->max_buffer_size;
 	m_context->prefs->GetOutputBufferSize(&iNewSize);
 	iNewSize *= 1024;
-
-	// cerr << "Using ALSA device: " << ai->device << endl;
-	// cerr << "Using output buffer size: " << iNewSize << endl;
 
         iNewSize -= iNewSize % m_iDataSize;
         result = Resize(iNewSize, 0, m_iDataSize);
@@ -301,34 +228,10 @@ Error AlsaPMO::Init(OutputInfo* info) {
            return result;
         }
 
-        if (ai->device)
-        {
-            if (sscanf(ai->device, "%[^:]: %d", scard, &device) != 2)
-            {
-               ReportError("The ALSADevice statement in the preference file"
-                           "is improperly formatted. Format: ALSADevice: "
-                           "[card name/card number]:[device number]");
-               return (Error)pmoError_ALSA_CardNumber;
-            }
-
-            card = snd_card_name(scard);
-            if (card < 0) 
-            {
-                ReportError("Invalid ALSA card name/number specified.");
-                return (Error)pmoError_ALSA_CardNumber;
-            }
-            if (device < 0 || device > 31) 
-            {
-                ReportError("Invalid ALSA device number specified.");
-                return (Error)pmoError_ALSA_DeviceNumber;
-            }
-        }
-        if((err=snd_pcm_open(&ai->handle, card, device, SND_PCM_OPEN_PLAYBACK)) < 0 )
+        if((err=snd_pcm_open(&ai->handle, m_iCard, m_iDevice, SND_PCM_OPEN_PLAYBACK)) < 0 )
         {
             ReportError("Audio device is busy. Please make sure that "
                         "another program is not using the device.");
-//            ReportError("Cannot open audio device. Please make sure that "
-//                        "the audio device is properly configured.");
             return (Error)pmoError_DeviceOpenFailed;
         }
 #define SND_PCM_BLOCK_MODE_NON_BLOCKING         (0)
@@ -338,29 +241,6 @@ Error AlsaPMO::Init(OutputInfo* info) {
                 ReportError("Can't enable playback time.");
             return (Error)pmoError_DeviceOpenFailed;
         }
-//Here comes the VolumeManager stuff's setup
-        switch (device) {
-            case 0 : strncpy(mixer_id,SND_MIXER_ID_PCM,sizeof(mixer_id));break;
-            case 1 : strncpy(mixer_id,SND_MIXER_ID_PCM1,sizeof(mixer_id));break;
-        }
-//      err = snd_mixer_open(&ai->mixer_handle,card,device);
-        err = snd_mixer_open(&ai->mixer_handle,0,0);
-        if (err < 0) {
-                ReportError("Cannot open mixer device.");
-                return (Error)pmoError_ALSA_MixerOpenFailed;
-        }
-//in fact i think the next step is not needed all time, just at the first
-//to get the channel into info. This could be done in constructor of
-//VolumeManager.
-        snd_mixer_info_t mixer_info;
-        err = snd_mixer_info( ai->mixer_handle, &mixer_info );
-        if (err < 0) {
-                ReportError("Cannot get mixer info.");
-                snd_mixer_close( ai->mixer_handle );
-                return (Error)pmoError_ALSA_Mixer_Info;
-        }
-
-        ai->pcm = snd_mixer_channel( ai->mixer_handle, mixer_id );
     }
 
     channels = info->number_of_channels;

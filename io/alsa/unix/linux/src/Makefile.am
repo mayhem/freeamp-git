@@ -29,7 +29,7 @@ PLUGIN_NAME = alsa-@host_os@.pmo
 PLUGIN_FULL_NAME = $(PLUGIN_DIR)$(PLUGIN_NAME)
 
 if AM_HAVE_ALSA
-FILES = alsapmo.cpp 
+FILES = alsapmo.cpp  alsavolume.cpp
 MYLIBS = libfaio.a
 
 all-local : $(PLUGIN_FULL_NAME)

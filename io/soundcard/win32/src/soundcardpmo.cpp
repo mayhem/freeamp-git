@@ -152,6 +152,11 @@ SoundCardPMO::~SoundCardPMO()
    }
 }
 
+VolumeManager *SoundCardPMO::GetVolumeManager()
+{
+   return new Win32VolumeManager();
+}
+
 Error SoundCardPMO::Init(OutputInfo * info)
 {
    Error     result = kError_UnknownErr;
@@ -291,21 +296,6 @@ Error SoundCardPMO::SetPropManager(Properties * p)
    m_propManager = p;
 
    return kError_NoErr;
-}
-
-int32 SoundCardPMO::GetVolume(void)
-{
-    int32 volume = 0;
-
-    waveOutGetVolume((HWAVEOUT)WAVE_MAPPER, (DWORD*)&volume);
-    volume = (int32)(100 * ((float)LOWORD(volume)/(float)0xffff));
-
-    return volume;    
-}
-
-void SoundCardPMO::SetVolume(int32 v)
-{
-    waveOutSetVolume((HWAVEOUT)WAVE_MAPPER , MAKELPARAM(0xFFFF*v, 0xFFFF*v));
 }
 
 Error SoundCardPMO::Reset(bool user_stop)

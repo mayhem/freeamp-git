@@ -40,6 +40,7 @@ ____________________________________________________________________________*/
 #include "preferences.h"
 #include "properties.h"
 #include "propimpl.h"
+#include "volume.h"
 
 #include "lmc.h"
 
@@ -99,6 +100,7 @@ class Player : public EventQueue, Properties, PropertyWatcher
 
    int32     ServiceEvent(Event *);
    void      CreateLMC(PlayListItem * pc, Event * pC);
+   void      GetVolumeManager();
 
    FAContext *m_context;
 
@@ -107,6 +109,8 @@ class Player : public EventQueue, Properties, PropertyWatcher
    // These are event loop handling functions
    void DoneOutputting(Event *pEvent) ;
    void Stop(Event *pEvent);
+   void GetVolume(Event *pEvent);
+   void SetVolume(Event *pEvent);
    void ChangePosition(Event *pEvent);
    void GetMediaInfo(Event *pEvent) ;
    void Play(Event *pEvent);
@@ -158,6 +162,7 @@ class Player : public EventQueue, Properties, PropertyWatcher
    Mutex    *m_pmoMutex;
    Mutex    *m_uiMutex;
    PlayListManager *m_plm;
+   VolumeManager   *m_pVolumeManager;
 
    LogicalMediaConverter *m_lmc;
    UserInterface *m_ui;

@@ -165,6 +165,15 @@ class MediaTimeInfoEvent : public Event {
     virtual ~MediaTimeInfoEvent() {}
 };
 
+class VolumeEvent : public Event {                                            
+ private:                                                                     
+    int32 m_volume;                                                           
+ public:                                                                      
+    VolumeEvent(int32 t,int32 v=0) : m_volume(v) {m_type=t;}
+    int32 GetVolume() { return m_volume; }
+    virtual ~VolumeEvent() {}
+};                                                                            
+                                                                           
 class ChangePositionEvent : public Event {
  private:
     int32 m_frame;

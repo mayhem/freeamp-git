@@ -21,19 +21,20 @@
 	$Id$
 ____________________________________________________________________________*/
 
-#ifndef _VOLUME_H_
-#define _VOLUME_H_
+#ifndef _OSSVOLUME_H_
+#define _OSSVOLUME_H_
 
 #include "config.h"
+#include "volume.h"
 
-class VolumeManager 
+class OSSVolumeManager : public VolumeManager
 {
     public:
 
-    VolumeManager() { ; };
+    OSSVolumeManager();
 
-    virtual void SetVolume(int32) = 0;
-    virtual int32 GetVolume(void) = 0;
+    virtual void SetVolume(int32);
+    virtual int32 GetVolume(void);
 };
 
-#endif // _VOLUME_H_
+#endif // _OSSVOLUME_H_
