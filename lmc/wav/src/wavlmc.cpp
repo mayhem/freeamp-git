@@ -3,7 +3,7 @@
    FreeAmp - The Free MP3 Player
 
    Portions Copyright (C) 1998-1999 EMusic.com
-   Portions Copyright (C) 2001 "John Cantrill" <thejohncantrill@compuserve.com>
+   Portions Copyright (C) 2001 "John Cantrill" <thejohncantrill@hotmail.com>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -171,11 +171,11 @@ Error WavLMC::GetHeadInfo()
       EndRead(0);
       return Err;
    }
-   EndRead(12);
 
    ulRIFF = (unsigned long)(((unsigned long *)pBuffer)[0]);
    ulLength = (unsigned long)(((unsigned long *)pBuffer)[1]);
    ulWAVE = (unsigned long)(((unsigned long *)pBuffer)[2]);
+   EndRead(12);
 
    if(ulRIFF != MAKEFOURCC('R', 'I', 'F', 'F') || ulWAVE != MAKEFOURCC('W', 'A', 'V', 'E'))
       return kError_InputUnsuccessful;
@@ -199,9 +199,9 @@ Error WavLMC::GetHeadInfo()
          EndRead(0);
          return Err;
       }
-      EndRead(8);
       ulType   = (unsigned long)(((unsigned long *)pBuffer)[0]);
       ulLength = (unsigned long)(((unsigned long *)pBuffer)[1]);
+      EndRead(8);
 
       switch (ulType)
       {

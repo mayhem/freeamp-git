@@ -2,7 +2,11 @@ Changes for version 2.1.1
 --------------------------------------------------------------------
 
 - Fixed crashes during sigging process
+- Fixed Vorbis playback to work with Vorbis RC2
+- Added a better musicbrainz library missing error message.
 - Added John Cantrrill's WAV LMC
+- Fixed the streaming http redirect to work for more general 
+  (not just dot notation) URLS.
 
 Changes for version 2.1.0 final
 --------------------------------------------------------------------
