@@ -247,7 +247,7 @@ class MusicBrowserUI : public UserInterface
     // Functions in PlaylistView.cpp
     void  PlaylistListItemAdded(const PlaylistItem* item);
     void  PlaylistListItemsAdded(const vector<PlaylistItem*>* items);
-    void  PlaylistListItemUpdated(const PlaylistItem* item);
+    void  PlaylistListItemsUpdated(const vector<PlaylistItem*>* items);
     void  PlaylistListItemMoved(const PlaylistItem* item, 
                                 uint32 oldIndex, uint32 newIndex);
     void  PlaylistListItemRemoved(const vector<PlaylistItem*>* itemList, 

@@ -63,6 +63,7 @@ MusicCatalog::MusicCatalog(FAContext *context, char *databasepath)
     m_unsorted = new vector<PlaylistItem *>;
     m_playlists = new vector<string>;
     m_streams = new vector<PlaylistItem *>;
+    m_watchTimer = NULL;
    
     if (databasepath)
         SetDatabase(databasepath);
@@ -84,7 +85,8 @@ MusicCatalog::~MusicCatalog()
 {
     ClearCatalog();
 
-    m_context->timerManager->StopTimer(m_watchTimer);
+    if(m_watchTimer)
+        m_context->timerManager->StopTimer(m_watchTimer);
 
     if (m_database)
         delete m_database;

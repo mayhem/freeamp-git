@@ -80,7 +80,7 @@ class EventQueue {
 #define INFO_PlaylistRepeat     33 // sent by PLM to player to inform of a setting of repeat mode
 #define INFO_PlaylistShuffle    34 // sent by PLM to player to inform of a setting of shuffle mode
 #define INFO_PlaylistUpdated	35 // sent by PLM to player to inform of a playlist update
-#define INFO_PlaylistItemUpdated    36 // sent by PLM to player to inform of a playlistitem update
+#define INFO_PlaylistItemsUpdated 36 // sent by PLM to player to inform of a playlistitem update
 #define INFO_UserMessage        37 // sent by UI to Player, diseminated by Player to each UI
 #define _EQUALIZER_ENABLE_
 #ifdef  _EQUALIZER_ENABLE_

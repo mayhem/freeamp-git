@@ -1932,7 +1932,7 @@ ServiceEvent(Event * pC)
             break;
 
         case INFO_PrefsChanged:
-        case INFO_PlaylistItemUpdated:
+        case INFO_PlaylistItemsUpdated:
             SendEventToUI(pC);
             SendEventToCatalog(pC);
             delete pC;

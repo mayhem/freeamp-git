@@ -536,76 +536,85 @@ void MusicBrowserUI::PlaylistListSorted(void)
     //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_plm->CanRedo() ? MF_ENABLED : MF_GRAYED));
 }
 
-void MusicBrowserUI::PlaylistListItemUpdated(const PlaylistItem* item)
+void MusicBrowserUI::PlaylistListItemsUpdated(const vector<PlaylistItem*>* items)
 {
-    uint32        index = m_plm->IndexOf(item);
-    HWND          hwnd = GetDlgItem(m_hWnd, IDC_PLAYLISTBOX);
+    HWND   hwnd = GetDlgItem(m_hWnd, IDC_PLAYLISTBOX);
 
-    if(index != kInvalidIndex)
+    vector<PlaylistItem*>::const_iterator i = items->begin();
+
+    for(; i != items->end(); i++)
     {
-        ListView_RedrawItems(hwnd, index, index);
-        UpdateTotalTime();
+        uint32 index = m_plm->IndexOf(*i);
 
-        //HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
-
-        //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_plm->CanUndo() ? MF_ENABLED : MF_GRAYED));
-        //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_plm->CanRedo() ? MF_ENABLED : MF_GRAYED));
-    }
-
-    vector<PlaylistItem*>::iterator i;
-
-    i = find(m_cdTracks->begin(), m_cdTracks->end(), item);
-
-    if(i != m_cdTracks->end())
-    {
-        if((*i)->URL() == item->URL())
+        if(index != kInvalidIndex)
         {
-            MetaData metadata = item->GetMetaData();
-            (*i)->SetMetaData(&metadata);
+            ListView_RedrawItems(hwnd, index, index);
+            
+            //HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
 
-            TV_ITEM tv_item;
-            BOOL success;
+            //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_plm->CanUndo() ? MF_ENABLED : MF_GRAYED));
+            //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_plm->CanRedo() ? MF_ENABLED : MF_GRAYED));
+        }
+        else
+        {
+            vector<PlaylistItem*>::iterator cd;
 
-            tv_item.hItem = TreeView_GetChild(m_hMusicView, m_hCDItem);
-            tv_item.mask = TVIF_PARAM;
+            cd = find(m_cdTracks->begin(), m_cdTracks->end(), *i);
 
-            do
+            if(cd != m_cdTracks->end())
             {
-                success = TreeView_GetItem(m_hMusicView, &tv_item);
-
-                if(success)
+                if((*cd)->URL() == (*i)->URL())
                 {
-                    TreeData* treedata = (TreeData*)tv_item.lParam;
+                    MetaData metadata = (*i)->GetMetaData();
+                    (*cd)->SetMetaData(&metadata);
 
-                    if(treedata && item->URL() == treedata->m_pTrack->URL())
+                    TV_ITEM tv_item;
+                    BOOL success;
+
+                    tv_item.hItem = TreeView_GetChild(m_hMusicView, m_hCDItem);
+                    tv_item.mask = TVIF_PARAM;
+
+                    do
                     {
-                        if(metadata.Title().size())
+                        success = TreeView_GetItem(m_hMusicView, &tv_item);
+
+                        if(success)
                         {
-                            tv_item.mask = TVIF_TEXT;
-                            tv_item.pszText = (char*)(metadata.Title().c_str());
-                            tv_item.cchTextMax = strlen(tv_item.pszText);
+                            TreeData* treedata = (TreeData*)tv_item.lParam;
 
-                            TreeView_SetItem(m_hMusicView, &tv_item);
+                            if(treedata && (*i)->URL() == treedata->m_pTrack->URL())
+                            {
+                                if(metadata.Title().size())
+                                {
+                                    tv_item.mask = TVIF_TEXT;
+                                    tv_item.pszText = (char*)(metadata.Title().c_str());
+                                    tv_item.cchTextMax = strlen(tv_item.pszText);
+
+                                    TreeView_SetItem(m_hMusicView, &tv_item);
+                                }
+                                break;
+                            }
                         }
-                        break;
-                    }
+
+                    }while(success && 
+                           (tv_item.hItem = TreeView_GetNextSibling(m_hMusicView, 
+                                                                    tv_item.hItem)));
+                    string CD;
+
+                    CD = (metadata.Album().size() ? metadata.Album() : "Unknown Album");
+                    CD += " by ";
+                    CD += (metadata.Artist().size() ? metadata.Artist() : "Unknown Artist");
+
+                    tv_item.hItem = m_hCDItem;
+                    tv_item.pszText = (char*)(CD.c_str());
+                    tv_item.cchTextMax = strlen(tv_item.pszText);
+                    TreeView_SetItem(m_hMusicView, &tv_item);
                 }
-
-            }while(success && 
-                   (tv_item.hItem = TreeView_GetNextSibling(m_hMusicView, 
-                                                            tv_item.hItem)));
-            string CD;
-
-            CD = (metadata.Album().size() ? metadata.Album() : "Unknown Album");
-            CD += " by ";
-            CD += (metadata.Artist().size() ? metadata.Artist() : "Unknown Artist");
-
-            tv_item.hItem = m_hCDItem;
-            tv_item.pszText = (char*)(CD.c_str());
-            tv_item.cchTextMax = strlen(tv_item.pszText);
-            TreeView_SetItem(m_hMusicView, &tv_item);
+            }
         }
     }
+    
+    UpdateTotalTime();
 }
 
 void MusicBrowserUI::PlaylistListItemAdded(const PlaylistItem* item)
@@ -817,6 +826,7 @@ void MusicBrowserUI::UpdateTotalTime()
     uint32 total = 0;
     bool approximate = false;
 
+    /*
     for(index = 0; index < count; index++)
     {
         PlaylistItem* item = m_plm->ItemAt(index);
@@ -825,16 +835,15 @@ void MusicBrowserUI::UpdateTotalTime()
         {
             uint32 time = item->GetMetaData().Time();
 
-            /*char temp[256];
-            sprintf(temp, "%d/%d\r\n", time, total);
-            OutputDebugString(temp);*/
-
             if(!time)
                 approximate = true;
 
             total += time;
         }
     }   
+    */
+
+    total = m_plm->Time();
 
     char buf[32] = "~";
     char* time = buf;

@@ -490,18 +490,22 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
          break;
       }
  
-      case INFO_PlaylistItemUpdated :
+      case INFO_PlaylistItemsUpdated:
       {
-         int                       i;
-         PlaylistItemUpdatedEvent *pInfo = 
-            (PlaylistItemUpdatedEvent *)e;
+         PlaylistItemsUpdatedEvent *pInfo = 
+            (PlaylistItemsUpdatedEvent *)e;
 
-         i = m_pContext->plm->GetCurrentIndex();
-         if (i >= 0)
+         vector<PlaylistItem*>::const_iterator i = pInfo->Items()->begin();
+
+         for(; i != pInfo->Items()->end(); i++)
          {
-             if (m_pContext->plm->ItemAt(i) == pInfo->Item())
-                UpdateMetaData(pInfo->Item());
-         }       
+            if((*i) == m_pContext->plm->GetCurrentItem())
+            {
+                UpdateMetaData(*i);
+                break;
+            }
+         }
+         
          break;
       }
       case INFO_PlaylistCurrentItemInfo:

@@ -646,12 +646,12 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
             break; 
         }
 
-        case INFO_PlaylistItemUpdated:
+        case INFO_PlaylistItemsUpdated:
         {
-            PlaylistItemUpdatedEvent* pie = (PlaylistItemUpdatedEvent*)event;
+            PlaylistItemsUpdatedEvent* pie = (PlaylistItemsUpdatedEvent*)event;
 
             if(pie->Manager() == m_plm)
-                PlaylistListItemUpdated(pie->Item());
+                PlaylistListItemsUpdated(pie->Items());
             else
             {
                 vector<MusicBrowserUI *>::iterator i;
@@ -660,7 +660,7 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
                 {
                     if((*i)->PLManager() == pie->Manager())
                     {
-                        (*i)->PlaylistListItemUpdated(pie->Item());
+                        (*i)->PlaylistListItemsUpdated(pie->Items());
                         break;
                     }
                 }

@@ -577,10 +577,10 @@ Error HttpInput::Open(void)
         
         if (szStreamName && strlen(szStreamName))
         {
-           PlaylistItemUpdatedEvent *e;
+           PlaylistItemsUpdatedEvent *e;
            PlaylistItem *pItem;
          
-           pItem = m_pContext->plm->ItemAt(m_pContext->plm->GetCurrentIndex());
+           pItem = m_pContext->plm->GetCurrentItem();
            if (pItem && szStreamName)
            {
                MetaData oData;
@@ -589,7 +589,10 @@ Error HttpInput::Open(void)
                oData.SetTitle(szStreamName);
                pItem->SetMetaData(&oData);
            
-               e = new PlaylistItemUpdatedEvent(pItem, m_pContext->plm);
+               vector<PlaylistItem*> pl_items;
+               pl_items.push_back(pItem);
+
+               e = new PlaylistItemsUpdatedEvent(&pl_items, m_pContext->plm);
                m_pTarget->AcceptEvent(e);
            }
            delete szStreamUrl;

@@ -818,16 +818,16 @@ public:
     const PlaylistManager* Manager() const { return m_plm; }
 };
 
-class PlaylistItemUpdatedEvent : public Event {
-private:
-	const PlaylistItem* m_item;
+class PlaylistItemsUpdatedEvent : public Event {
+  private:
+    vector<PlaylistItem*> m_items;
     const PlaylistManager* m_plm;
 public:
-	PlaylistItemUpdatedEvent(const PlaylistItem* item, const PlaylistManager* plm) 
-    { m_type = INFO_PlaylistItemUpdated; m_item = item; m_plm = plm;}
-	virtual ~PlaylistItemUpdatedEvent() {}
+	PlaylistItemsUpdatedEvent(vector<PlaylistItem*>* items, const PlaylistManager* plm) 
+    { m_type = INFO_PlaylistItemsUpdated; m_items = *items; m_plm = plm;}
+	virtual ~PlaylistItemsUpdatedEvent() {}
 
-	const PlaylistItem* Item() const { return m_item; }
+	const vector<PlaylistItem*>* Items() const { return &m_items; }
     const PlaylistManager* Manager() const { return m_plm; }
 };
 

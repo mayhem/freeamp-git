@@ -234,6 +234,7 @@ PlaylistManager::PlaylistManager(FAContext* context)
     m_repeatMode = kPlaylistMode_RepeatNone;
     m_sortKey = kPlaylistSortKey_Random;
     m_sortType = kPlaylistSortType_Ascending;
+    m_time = 0;
 
     m_context->prefs->GetPlaylistShuffle(&m_shuffle);
     m_context->prefs->GetPlaylistRepeat((int32*)&m_repeatMode);
@@ -422,7 +423,7 @@ Error PlaylistManager::SetCurrentItem(PlaylistItem* item)
     return SetCurrentIndex(IndexOf(item));
 }
 
-const PlaylistItem*  PlaylistManager::GetCurrentItem()
+PlaylistItem*  PlaylistManager::GetCurrentItem()
 {
     PlaylistItem* result = NULL;
     m_mutex.Acquire();
@@ -1535,13 +1536,21 @@ Error PlaylistManager::UpdateTrackMetaData(PlaylistItem* updatedTrack, bool writ
 
     MetaData metadata = updatedTrack->GetMetaData();
 
+    vector<PlaylistItem*> pl_items;
+
     for(; i != m_activeList->end(); i++)
     {
         if((*i)->URL() == updatedTrack->URL())
         {
             (*i)->SetMetaData(&metadata);
-            m_context->target->AcceptEvent(new PlaylistItemUpdatedEvent(*i, this));
+            
+            pl_items.push_back(*i);
         }
+    }
+
+    if(pl_items.size())
+    {
+        m_context->target->AcceptEvent(new PlaylistItemsUpdatedEvent(&pl_items, this));
     }
 
     if(writeToDisk)
@@ -2211,6 +2220,24 @@ Error PlaylistManager::DownloadItemFromPortable(DeviceInfo* device,
     return result;
 }
 
+uint32 PlaylistManager::Time()
+{
+    uint32 time = 0;
+
+    //m_mutex.Acquire();
+
+    vector<PlaylistItem*>::iterator i = m_activeList->begin();
+
+    for(; i != m_activeList->end();i++)
+    {
+       time += (*i)->GetMetaData().Time();
+    }
+
+    //m_mutex.Release();
+
+    return time;
+}
+
 // Utility Functions
 bool PlaylistManager::IsEmpty()
 {
@@ -2373,6 +2400,8 @@ MetaDataThreadFunction(vector<PlaylistItem*>* list)
 
         numItems = list->size();
 
+        vector<PlaylistItem*> pl_items;
+
         for(index = 0; index < numItems; index++)
         {
             item = (*list)[index];
@@ -2420,11 +2449,19 @@ MetaDataThreadFunction(vector<PlaylistItem*>* list)
                     item->SetMetaData(&metadata);
                     item->SetState(kPlaylistItemState_Normal);
 
-                    m_context->target->AcceptEvent(new PlaylistItemUpdatedEvent(item, this));
+                    if(item == GetCurrentItem())
+                        pl_items.insert(pl_items.begin(), item);
+                    else
+                        pl_items.push_back(item);
                 }
 
                 m_mutex.Release();
             }
+        }     
+
+        if(pl_items.size())
+        {
+            m_context->target->AcceptEvent(new PlaylistItemsUpdatedEvent(&pl_items, this));
         }
 
         delete list;

@@ -214,7 +214,7 @@ class PlaylistManager {
 
     // Playlist actions
     Error SetCurrentItem(PlaylistItem* item);
-    const PlaylistItem* GetCurrentItem();
+    PlaylistItem* GetCurrentItem();
     
     Error SetCurrentIndex(uint32 index);
     uint32 GetCurrentIndex();
@@ -334,6 +334,9 @@ class PlaylistManager {
                                    const char* url,
                                    PLMCallBackFunction function = NULL,
                                    void* cookie = NULL);
+
+    uint32 Time();
+
     // Utility Functions
     bool            IsEmpty();
     uint32          CountItems();
@@ -393,6 +396,8 @@ class PlaylistManager {
     vector<DeviceInfo*>             m_portablePlayers;
 
     UndoManager m_undo;
+
+    uint32 m_time;
 
 };
 

@@ -702,7 +702,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                     else if(pTreeView->itemNew.hItem == m_hAllItem)
                     {
                         m_fillAllThread = Thread::CreateThread();
-	                    m_fillAllThread->Create(MusicBrowserUI::fill_all_tracks, this);						
+	                    m_fillAllThread->Create(MusicBrowserUI::fill_all_tracks, this);
                     }
                     else if(pTreeView->itemNew.hItem == m_hUncatItem)
                     {
