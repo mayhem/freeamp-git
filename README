@@ -22,7 +22,7 @@ From binaries:
 USING FREEAMP:
 ----------------------------------------------------------------------
 
-FreeAmp 1.2 for Win32:
+FreeAmp 1.2.3 for Win32:
 
   freeamp [options] [file 1] [file 2]...
 
@@ -52,7 +52,7 @@ FreeAmp 1.2 for Win32:
   * just under the display is the playlist drawer, click it to access playlist functions
 
 
-FreeAmp version 1.2.2 for Linux:
+FreeAmp version 1.2.3 for Linux:
 
 freeamp [-ui <UI plugin name>] <MP3 file/stream> [MP3 file/stream] ...
 
