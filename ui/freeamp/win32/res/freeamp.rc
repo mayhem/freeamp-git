@@ -111,6 +111,12 @@ IDB_SHUFFLE_256         BITMAP  DISCARDABLE     "shuffle_buttons256.bmp"
 IDB_REPEAT_256          BITMAP  DISCARDABLE     "repeat_buttons256.bmp"
 IDB_OPEN_256            BITMAP  DISCARDABLE     "open_buttons256.bmp"
 IDB_COLORS              BITMAP  DISCARDABLE     "colors.bmp"
+IDB_SHUFFLED_ICON_256   BITMAP  DISCARDABLE     "shuffled_icon256.bmp"
+IDB_REPEAT_ALL_ICON_256 BITMAP  DISCARDABLE     "all_icon256.bmp"
+IDB_REPEAT_ICON         BITMAP  DISCARDABLE     "repeat_icon.bmp"
+IDB_REPEAT_ICON_256     BITMAP  DISCARDABLE     "repeat_icon256.bmp"
+IDB_SHUFFLED_ICON       BITMAP  DISCARDABLE     "shuffled_icon.bmp"
+IDB_REPEAT_ALL_ICON     BITMAP  DISCARDABLE     "all_icon.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
