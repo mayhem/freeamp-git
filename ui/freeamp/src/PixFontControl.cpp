@@ -71,7 +71,7 @@ PixFontControl::~PixFontControl(void)
 {
     vector<char *>::iterator i;
     for (i = m_Fontmap.begin(); i != m_Fontmap.end(); i++) 
-        delete *i;
+        delete [] (*i);
 }
 
 void PixFontControl::AddMapRow(char *row)

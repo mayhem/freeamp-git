@@ -149,7 +149,7 @@ Error ThemeZip::CompressThemeZip(const string &oDestFile,
        if (pIn == NULL)
        {
            gzclose(pOut);
-           delete pBuffer;
+           delete [] pBuffer;
            return kError_FileNotFound;
        }
 
@@ -185,7 +185,7 @@ Error ThemeZip::CompressThemeZip(const string &oDestFile,
        {
            fclose(pIn);
            gzclose(pOut);
-           delete pBuffer;
+           delete [] pBuffer;
            return kError_WriteFile;
        }
 
@@ -200,7 +200,7 @@ Error ThemeZip::CompressThemeZip(const string &oDestFile,
            {
                fclose(pIn);
                gzclose(pOut);
-               delete pBuffer;
+               delete [] pBuffer;
                return kError_ReadFile;
            }
            iWrite = gzwrite(pOut, pBuffer, iBlock);
@@ -208,7 +208,7 @@ Error ThemeZip::CompressThemeZip(const string &oDestFile,
            {
                fclose(pIn);
                gzclose(pOut);
-               delete pBuffer;
+               delete [] pBuffer;
                return kError_WriteFile;
            }
 
@@ -222,7 +222,7 @@ Error ThemeZip::CompressThemeZip(const string &oDestFile,
            gzwrite(pOut,pBuffer,iPadding);
        }
    }
-   delete pBuffer;
+   delete [] pBuffer;
 
    // write end-marker (zero-ed tar-record)
    memset(&TarRecord,0,sizeof(tar_record));
@@ -344,7 +344,7 @@ Error ThemeZip::DecompressGZ(const string &oSrcFile, const string &oDestPath)
        if (gzread(pIn, &TarRecord, sizeof(tar_record)) != sizeof(tar_record))
        {
            gzclose(pIn);
-           delete pBuffer;
+           delete [] pBuffer;
            CleanupThemeZip();
            return kError_ReadFile;
        }
@@ -369,7 +369,7 @@ Error ThemeZip::DecompressGZ(const string &oSrcFile, const string &oDestPath)
        {
            // nope, something not right
            gzclose(pIn);
-           delete pBuffer;
+           delete [] pBuffer;
            CleanupThemeZip();
            return kError_NoDataAvail;
        }
@@ -383,7 +383,7 @@ Error ThemeZip::DecompressGZ(const string &oSrcFile, const string &oDestPath)
        {
            // checksum failed
            gzclose(pIn);
-           delete pBuffer;
+           delete [] pBuffer;
            CleanupThemeZip();
            return kError_NoDataAvail;
        }
@@ -408,7 +408,7 @@ Error ThemeZip::DecompressGZ(const string &oSrcFile, const string &oDestPath)
                // ... but not many:
                // this archive is likely not theme anyway!
                gzclose(pIn);
-               delete pBuffer;
+               delete [] pBuffer;
                CleanupThemeZip();
                return kError_NoDataAvail;
            }
@@ -432,7 +432,7 @@ Error ThemeZip::DecompressGZ(const string &oSrcFile, const string &oDestPath)
        if (pOut == NULL)
        {
            gzclose(pIn);
-           delete pBuffer;
+           delete [] pBuffer;
            CleanupThemeZip();
            return kError_FileNotFound;
        }
@@ -450,7 +450,7 @@ Error ThemeZip::DecompressGZ(const string &oSrcFile, const string &oDestPath)
            {
                gzclose(pIn);
                fclose(pOut);
-               delete pBuffer;
+               delete [] pBuffer;
                CleanupThemeZip();
                return kError_ReadFile;
            }
@@ -459,7 +459,7 @@ Error ThemeZip::DecompressGZ(const string &oSrcFile, const string &oDestPath)
            {
                gzclose(pIn);
                fclose(pOut);
-               delete pBuffer;
+               delete [] pBuffer;
                CleanupThemeZip();
                return kError_WriteFile;
            }
@@ -477,7 +477,7 @@ Error ThemeZip::DecompressGZ(const string &oSrcFile, const string &oDestPath)
 
    // all went fine
 
-   delete pBuffer;
+   delete [] pBuffer;
    gzclose(pIn);
 
    return kError_NoErr;
@@ -589,7 +589,7 @@ Error ThemeZip::GetDescriptiveName(const string &oSrcFile, string &oDescriptiveN
                    *pPtr = 0;
                    
                 oDescriptiveName = pText;
-                delete pText;
+                delete [] pText;
                 break;
             }
             

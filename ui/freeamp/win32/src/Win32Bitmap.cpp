@@ -107,7 +107,7 @@ Win32Bitmap::~Win32Bitmap(void)
        DeleteObject(m_hMaskBitmap);
        m_hMaskBitmap = NULL;
    }    
-   delete m_pMaskInfo;
+   delete [] m_pMaskInfo;
 }
 
 Error Win32Bitmap::LoadBitmapFromDisk(string &oFile)
@@ -234,10 +234,10 @@ void Win32Bitmap::CreateMaskBitmap(void)
                  DIB_RGB_COLORS);
    }
 
-   delete pData;
-   delete pMaskData;
-   delete pInfo;
-   delete pMaskInfo;
+   delete [] pData;
+   delete [] pMaskData;
+   delete [] pInfo;
+   delete [] pMaskInfo;
    DeleteDC(hMemDC);
 }
 
@@ -405,8 +405,8 @@ void Win32Bitmap::UpdateHistogram(WORD *pHist)
        }      
    }
 
-   delete pData;
-   delete pInfo;
+   delete [] pData;
+   delete [] pInfo;
    DeleteDC(hMemDC);
 }
 
@@ -464,9 +464,9 @@ void Win32Bitmap::ConvertTo256Color(WORD            *pHist,
 
    h8BitBitmap = CreateBitmap(sInfo.bmWidth, sInfo.bmHeight, 1, 8, p8BitData);
    
-   delete pData;
-   delete p8BitData;
-   delete pInfo;
+   delete [] pData;
+   delete [] p8BitData;
+   delete [] pInfo;
    DeleteDC(hMemDC);
 
    if (m_hBitmap)

@@ -374,8 +374,8 @@ HRGN Win32Canvas::GetMaskRgn(void)
        }
    }
    
-   delete pData;
-   delete pInfo;
+   delete [] pData;
+   delete [] pInfo;
 
    DeleteDC(hMemDC);
 
