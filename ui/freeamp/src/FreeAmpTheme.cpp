@@ -739,7 +739,10 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
          else
          {
              m_iVolume = iRight;
-             m_iBalance = 50 + (50 - (iLeft * 50 / iRight)); 
+			 if (iRight == 0)
+				 m_iBalance = 50;
+			 else
+                 m_iBalance = 50 + (50 - (iLeft * 50 / iRight)); 
          }
 
          m_pWindow->ControlIntValue(string("Volume"), true, m_iVolume);
