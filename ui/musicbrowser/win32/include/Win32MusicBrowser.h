@@ -203,7 +203,7 @@ class MusicBrowserUI : public UserInterface
     void  AddTrackEvent(void);
     void  AddFileEvent(void);
     void  EditPlaylistEvent(void);
-    void  DeleteListEvent(void);
+    void  ClearPlaylistEvent(void);
     void  SortEvent(int id);
     void  EmptyDBCheck(void);
     void  RemoveEvent(void);

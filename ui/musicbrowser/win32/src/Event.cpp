@@ -39,11 +39,9 @@ const char* kAudioFileFilter =
             "All Files (*.*)\0"
             "*.*\0";
 
-void MusicBrowserUI::DeleteListEvent(void)
+void MusicBrowserUI::ClearPlaylistEvent(void)
 {
-    m_bListChanged = true;
     m_oPlm->RemoveAll();
-    UpdateButtonMenuStates();
 }
 
 void MusicBrowserUI::RemoveEvent(void)

@@ -245,8 +245,10 @@ BEGIN
         MENUITEM "Move &Up",                    ID_EDIT_MOVEUP
         MENUITEM "Move &Down",                  ID_EDIT_MOVEDOWN
         MENUITEM SEPARATOR
+        MENUITEM "&Clear Playlist",             ID_EDIT_CLEARPLAYLIST
+        MENUITEM SEPARATOR
         MENUITEM "&Edit Playlist...",           ID_EDIT_EDITPLAYLIST
-        MENUITEM "Edit Track and Playlist Info...", ID_EDIT_EDITINFO
+        MENUITEM "Edit Track and Playlist &Info...", ID_EDIT_EDITINFO
     END
     POPUP "&View"
     BEGIN
@@ -284,8 +286,8 @@ BEGIN
     BEGIN
         MENUITEM "&Contents",                   ID_HELP_CONTENTS
         MENUITEM SEPARATOR
-        MENUITEM "&FreeAmp Web Site",            ID_HELP_FREEAMPWEBSITE
-        MENUITEM "&EMusic.com Web Site",         ID_HELP_EMUSICCOMWEBSITE
+        MENUITEM "&FreeAmp Web Site",           ID_HELP_FREEAMPWEBSITE
+        MENUITEM "&EMusic.com Web Site",        ID_HELP_EMUSICCOMWEBSITE
         MENUITEM SEPARATOR
         MENUITEM "About...",                    ID_HELP_ABOUT
     END
@@ -341,8 +343,8 @@ BEGIN
         MENUITEM "Play",                        ID_CONTROLS_PLAYPAUSE
         MENUITEM "Stop",                        ID_CONTROLS_STOP
         MENUITEM SEPARATOR
-        MENUITEM "Next Track",                   ID_CONTROLS_NEXTSONG
-        MENUITEM "Previous Track",               ID_CONTROLS_PREVIOUSSONG
+        MENUITEM "Next Track",                  ID_CONTROLS_NEXTSONG
+        MENUITEM "Previous Track",              ID_CONTROLS_PREVIOUSSONG
         MENUITEM SEPARATOR
         MENUITEM "Shuffle",                     ID_CONTROLS_SHUFFLE
         MENUITEM SEPARATOR
@@ -377,8 +379,8 @@ BEGIN
         MENUITEM "&Contents",                   ID_HELP_CONTENTS
         MENUITEM "&Search...",                  ID_HELP_SEARCH
         MENUITEM SEPARATOR
-        MENUITEM "&FreeAmp Web Site",            ID_HELP_FREEAMPWEBSITE
-        MENUITEM "&EMusic.com Web Site",         ID_HELP_EMUSICCOMWEBSITE
+        MENUITEM "&FreeAmp Web Site",           ID_HELP_FREEAMPWEBSITE
+        MENUITEM "&EMusic.com Web Site",        ID_HELP_EMUSICCOMWEBSITE
         MENUITEM SEPARATOR
         MENUITEM "About...",                    ID_HELP_ABOUT
     END
