@@ -186,5 +186,56 @@ SOURCE=.\winamp.def
 SOURCE=..\res\winamp.rc
 # End Source File
 # End Group
+# Begin Group "xml"
+
+# PROP Default_Filter "xml"
+# Begin Source File
+
+SOURCE=..\winamp_theme.xml
+
+!IF  "$(CFG)" == "winamp - Win32 Release"
+
+# Begin Custom Build
+InputPath=..\winamp_theme.xml
+
+"..\..\..\base\win32\prj\winamp_theme.xml" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\winamp_theme.xml ..\..\..\base\win32\prj
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "winamp - Win32 Debug"
+
+# Begin Custom Build
+InputPath=..\winamp_theme.xml
+
+"..\..\..\base\win32\prj\winamp_theme.xml" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\winamp_theme.xml ..\..\..\base\win32\prj
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "winamp - Win32 NASM Release"
+
+# Begin Custom Build
+InputPath=..\winamp_theme.xml
+
+"..\..\..\base\win32\prj\winamp_theme.xml" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\winamp_theme.xml ..\..\..\base\win32\prj
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "winamp - Win32 NASM Debug"
+
+# Begin Custom Build
+InputPath=..\winamp_theme.xml
+
+"..\..\..\base\win32\prj\winamp_theme.xml" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\winamp_theme.xml ..\..\..\base\win32\prj
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# End Group
 # End Target
 # End Project
