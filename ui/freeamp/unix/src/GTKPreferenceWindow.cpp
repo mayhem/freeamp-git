@@ -1168,6 +1168,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage3(void)
     gtk_box_pack_start(GTK_BOX(hbox), alsaTwoBox, FALSE, FALSE, 0);
     gtk_widget_show(alsaTwoBox);
 
+/*
     frame = gtk_frame_new("Portable Devices");
     gtk_box_pack_start(GTK_BOX(pane), frame, FALSE, FALSE, 0);
     gtk_container_set_border_width(GTK_CONTAINER(frame), 1);
@@ -1188,12 +1189,12 @@ GtkWidget *GTKPreferenceWindow::CreatePage3(void)
     gtk_container_add(GTK_CONTAINER(listwindow), list);
     gtk_widget_show(list);
 
-    GtkWidget *textlabel = gtk_label_new(NULL);
+    GtkWidget *textlabel = gtk_label_new("Select from the list above any portable devices you own.  This will enable you to edit the contents of your portable device directly from the \"My Music\" window.  If you do not see your portable device listed try checking for an update.  We might have added support for it since you installed.");
     gtk_label_set_line_wrap(GTK_LABEL(textlabel), TRUE);
-    gtk_label_set_text(GTK_LABEL(textlabel), "Select from the list above any portable devices you own.  This will enable you to edit the contents of your portable device directly from the \"My Music\" window.  If you do not see your portable device listed try checking for an update.  We might have added support for it since you installed.");
-    gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_FILL);
+    gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_LEFT);
     gtk_box_pack_start(GTK_BOX(vbox), textlabel, TRUE, FALSE, 0);
     gtk_widget_show(textlabel);
+*/
 
     return pane;
 }
@@ -1324,44 +1325,36 @@ GtkWidget *GTKPreferenceWindow::CreateAbout(void)
     gtk_container_set_border_width(GTK_CONTAINER(pane), 0);
     gtk_widget_show(pane);
 
-    GtkWidget *textlabel = gtk_label_new(NULL);
-    gtk_label_set_line_wrap(GTK_LABEL(textlabel), TRUE);
-    gtk_label_set_text(GTK_LABEL(textlabel), BRANDING);
-    gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_CENTER);
+    GtkWidget *textlabel = gtk_label_new(BRANDING);
     gtk_box_pack_start(GTK_BOX(pane), textlabel, FALSE, FALSE, 0);
     gtk_widget_show(textlabel);
 
-    textlabel = gtk_label_new(NULL);
-    gtk_label_set_line_wrap(GTK_LABEL(textlabel), TRUE);
-    gtk_label_set_text(GTK_LABEL(textlabel), "version "FREEAMP_VERSION);
-    gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_CENTER);
+    textlabel = gtk_label_new("version "BRANDING_VERSION);
     gtk_box_pack_start(GTK_BOX(pane), textlabel, FALSE, FALSE, 0);
     gtk_widget_show(textlabel);
 
-    textlabel = gtk_label_new(NULL);
-    gtk_label_set_line_wrap(GTK_LABEL(textlabel), TRUE);
-    gtk_label_set_text(GTK_LABEL(textlabel), "FreeAmp is an Open Source effort to build the best digital audio player available.  In the interest of supporting the free software community, while at the same time fostering the growth of the online delivery of music, EMusic.com, THE Source for Downloadable Music, is funding both the FreeAmp.org domain and the efforts of the FreeAmp team.  The FreeAmp team consists of: Mark B. Elrod, Robert Kaye, Isaac Richards, Brett Thomas, and Jason Woodward.");
-    gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_FILL);
+    if (strcmp(BRANDING, "FreeAmp")) {
+        textlabel = gtk_label_new("(based on FreeAmp)");
+        gtk_box_pack_start(GTK_BOX(pane), textlabel, FALSE, FALSE, 0);
+        gtk_widget_show(textlabel);
+    }       
+ 
+    textlabel = gtk_label_new("FreeAmp is an Open Source effort to build the best digital audio\nplayer available. In the interest of supporting the free software\ncommunity, while at the same time fostering the growth of the online\ndelivery of music, EMusic.com, is funding both the FreeAmp.org\ndomain and the efforts of the FreeAmp team. The FreeAmp team\nconsists of: Mark B. Elrod, Robert Kaye, Isaac Richards, Brett\nThomas, and Jason Woodward.");
+    gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_LEFT);
     gtk_box_pack_start(GTK_BOX(pane), textlabel, FALSE, FALSE, 0);
     gtk_widget_show(textlabel);
 
-    textlabel = gtk_label_new(NULL);
-    gtk_label_set_line_wrap(GTK_LABEL(textlabel), TRUE);
-    gtk_label_set_text(GTK_LABEL(textlabel), "Other people have also contributed to FreeAmp:");
-    gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_FILL);
+    textlabel = gtk_label_new("Other people have also contributed to FreeAmp:                         ");
+    gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_LEFT);
+    gtk_box_pack_start(GTK_BOX(pane), textlabel, TRUE, TRUE, 0);
+    gtk_widget_show(textlabel);
+
+    textlabel = gtk_label_new("William Bull, Alan Cutter, Gabor Fleischer, Jean-Michel HERVE,  \nHiromasa Kato, Michael Bruun Petersen, Sylvain Rebaud, The\nSnowblind Alliance, Tom Spindler, and Valters Vingolds.");
+    gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_LEFT);
     gtk_box_pack_start(GTK_BOX(pane), textlabel, FALSE, FALSE, 0);
     gtk_widget_show(textlabel);
 
-    textlabel = gtk_label_new(NULL);
-    gtk_label_set_line_wrap(GTK_LABEL(textlabel), TRUE);
-    gtk_label_set_text(GTK_LABEL(textlabel), "William Bull, Alan Cutter, Gabor Fleischer, Jean-Michel HERVE, Hiromasa Kato, Michael Bruun Petersen, Sylvain Rebaud, The Snowblind Alliance, Tom Spindler, Valters Vingolds, Bill Yuan.");
-    gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_FILL);
-    gtk_box_pack_start(GTK_BOX(pane), textlabel, FALSE, FALSE, 0);
-    gtk_widget_show(textlabel);
-
-    textlabel = gtk_label_new(NULL);
-    gtk_label_set_line_wrap(GTK_LABEL(textlabel), TRUE);
-    gtk_label_set_text(GTK_LABEL(textlabel), "FreeAmp is being released under the terms of the GPL.  As is provided by the GPL, all of EMusic.com's and your efforts toward FreeAmp will be released back to the community at large.");
+    textlabel = gtk_label_new("FreeAmp is being released under the terms of the GPL. As is\nprovided by the GPL, all of EMusic.com's and your efforts toward  \nFreeAmp will be released back to the community at large.");
     gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_FILL);
     gtk_box_pack_start(GTK_BOX(pane), textlabel, FALSE, FALSE, 0);
     gtk_widget_show(textlabel);
@@ -1374,13 +1367,13 @@ GtkWidget *GTKPreferenceWindow::CreateAbout(void)
     GtkWidget *button;
 
     button = gtk_button_new_with_label(" Visit FreeAmp.org ");
-    gtk_container_add(GTK_CONTAINER(hbox), button);
+    gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, FALSE, 5);
     gtk_signal_connect(GTK_OBJECT(button), "clicked", 
                        GTK_SIGNAL_FUNC(freeamp_press), this);
     gtk_widget_show(button);
 
     button = gtk_button_new_with_label(" Visit EMusic.com ");
-    gtk_container_add(GTK_CONTAINER(hbox), button);
+    gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, FALSE, 5);
     gtk_signal_connect(GTK_OBJECT(button), "clicked",
                        GTK_SIGNAL_FUNC(emusic_press), this);
     gtk_widget_show(button);
@@ -1588,9 +1581,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage5(void)
     gtk_container_add(GTK_CONTAINER(frame), vbox);
     gtk_widget_show(vbox);
 
-    GtkWidget *textlabel = gtk_label_new(NULL);
-    gtk_label_set_line_wrap(GTK_LABEL(textlabel), TRUE);
-    gtk_label_set_text(GTK_LABEL(textlabel), "A theme may specify a font type that is not installed on your system.  The default font will by substituted in place of the missing font.");
+    GtkWidget *textlabel = gtk_label_new("A theme may specify a font type that is not installed on your       \nsystem. The default font will by substituted in place of the\nmissing font.");
     gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_LEFT);
     gtk_box_pack_start(GTK_BOX(vbox), textlabel, TRUE, TRUE, 0);
     gtk_widget_show(textlabel);
@@ -1599,9 +1590,8 @@ GtkWidget *GTKPreferenceWindow::CreatePage5(void)
     gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 5);
     gtk_widget_show(hbox);
 
-    textlabel = gtk_label_new(NULL);
+    textlabel = gtk_label_new("Note: Only the font name will be used.  The font will appear in the style specified in the theme.");
     gtk_label_set_line_wrap(GTK_LABEL(textlabel), TRUE);
-    gtk_label_set_text(GTK_LABEL(textlabel), "Note: Only the font name will be used.  The font will appear in the style specified in the theme.");
     gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_FILL);
     gtk_box_pack_start(GTK_BOX(hbox), textlabel, FALSE, FALSE, 5);
     gtk_widget_show(textlabel);
