@@ -120,10 +120,16 @@ public:
     int32 m_sampleRate;
     int32 m_layer;
     int32 m_mpeg;
+    int32 m_channels;
+    int32 m_original;
+    int32 m_copyright;
+    int32 m_emphasis;
     int32 m_stereo;
+    int32 m_modeExt;
+    int32 m_crc;
  public:
     MpegInfoEvent() { m_type = INFO_MPEGInfo; }
-    MpegInfoEvent(int32 tf, int32 bpf, int32 br,int32 sr,int32 layer,int32 mpeg,int32 stereo) { 
+    MpegInfoEvent(int32 tf, int32 bpf, int32 br,int32 sr,int32 layer,int32 mpeg,int32 chans,int32 orig, int32 copy,int32 emph,int32 stereo, int32 mode_ext) { 
 	m_type = INFO_MPEGInfo; 
 	m_totalFrames = tf;
 	m_bytesPerFrame = bpf;
@@ -131,7 +137,12 @@ public:
 	m_sampleRate = sr;
 	m_layer = layer;
 	m_mpeg = mpeg;
+	m_channels = chans;
+	m_original = orig & 0x1;
+	m_copyright = copy & 0x1;
+	m_emphasis = emph;
 	m_stereo = stereo;
+	m_modeExt = mode_ext;
     }
     int32 GetTotalFrames() { return m_totalFrames; }
     int32 GetBytesPerFrame() { return m_bytesPerFrame; }
@@ -139,7 +150,13 @@ public:
     int32 GetSampleRate() { return m_sampleRate; }
     int32 GetLayer() { return m_layer; }
     int32 GetMpegVersion() { return m_mpeg; }
+    int32 GetChannels() { return m_channels; }
+    int32 GetOriginal() { return m_original; }
+    int32 GetCopyright() { return m_copyright; }
+    int32 GetEmphasis() { return m_emphasis; }
     int32 GetStereo() { return m_stereo; }
+    int32 GetModeExt() { return m_modeExt; }
+    int32 GetCRC() { return m_crc; }
     virtual ~MpegInfoEvent() {}
     
 };

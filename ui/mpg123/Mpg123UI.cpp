@@ -50,7 +50,7 @@ Mpg123UI::Mpg123UI() {
     m_mediaInfo_set = false;
     m_mpegInfo_set = false;
     //cout << endl << "mpg123 0.59k command line compatability mode" << endl << endl;
-    cerr << "High Performance MPEG 1.0 Audio Player for Layer 2, 3" << endl;
+    cerr << "High Performance MPEG 1.0/2.0/2.5 Audio Player for Layer 1, 2 and 3" << endl;
     cerr << "Version 0.05 (1998/Oct/06).  Written by Jason Woodward, Mark Elrod, others." << endl;
     cerr << "Copyrights GoodNoise, XingTech. See 'README' for more!" << endl;
     cerr << "This software is distributed under the GNU GPL." << endl;
@@ -173,14 +173,14 @@ void Mpg123UI::DisplayStuff() {
     static char *mpeg_string[4] = { "1.0","1.0","2.0","2.5"};
     static char *mpeg_layer[4] = { "Unknown","I", "II", "III"};
     static char *mpeg_stereo[4] = { "Stereo", "Joint-Stereo", "Dual-Channel", "Single-Channel" };
-
+    static char *mpeg_short_stereo[4] = { "stereo", "joint-stereo", "dual-channel", "mono" };
     if (verboseMode == false) {
 	// NORMAL MODE
 	if (dir) {
 	    cerr << "Directory: " << dir << "/" << endl;
 	}
 	cerr << "Playing MPEG stream from " << fileName << " ..." << endl;
-	cerr << "MPEG " << mpeg_string[m_mpegInfo.GetMpegVersion()] << " layer "<< mpeg_layer[m_mpegInfo.GetLayer()]<< ", " << m_mpegInfo.GetBitRate()/1000 << " KBit/s" << ", " << m_mpegInfo.GetSampleRate() << " Hz" << " " << mpeg_stereo[m_mpegInfo.GetStereo()] << endl;
+	cerr << "MPEG " << mpeg_string[m_mpegInfo.GetMpegVersion()] << " layer "<< mpeg_layer[m_mpegInfo.GetLayer()]<< ", " << m_mpegInfo.GetBitRate()/1000 << " KBit/s" << ", " << m_mpegInfo.GetSampleRate() << " Hz" << " " << mpeg_short_stereo[m_mpegInfo.GetStereo()] << endl;
     } else {
 	// VERBOSE MODE
 	if (dir) {
@@ -190,10 +190,11 @@ void Mpg123UI::DisplayStuff() {
 	cerr << "MPEG " << mpeg_string[m_mpegInfo.GetMpegVersion()];
 	cerr << ", Layer: " << mpeg_layer[m_mpegInfo.GetLayer()];
 	cerr << ", Freq: " << m_mpegInfo.GetSampleRate();
-	cerr << ", mode: " << mpeg_stereo[m_mpegInfo.GetStereo()] << ", modext: 3, BPF : " << m_mpegInfo.GetBytesPerFrame() << endl;
-	cerr << "Channels: 2, copyright: No, original: Yes, CRC: No, emphasis: 0." << endl;
+	cerr << ", mode: " << mpeg_stereo[m_mpegInfo.GetStereo()] << ", modext: " << m_mpegInfo.GetModeExt() << ", BPF : " << m_mpegInfo.GetBytesPerFrame() << endl;
+	cerr << "Channels: "<< m_mpegInfo.GetChannels() << ", copyright: " << (m_mpegInfo.GetCopyright() ? "Yes" : "No") << ", original: ";
+	cerr << (m_mpegInfo.GetOriginal() ? "Yes" : "No") << ", CRC: "<< (m_mpegInfo.GetCRC() ? "Yes" : "No") << ", emphasis: " << m_mpegInfo.GetEmphasis() <<"." << endl;
 	cerr << "Bitrate: " << m_mpegInfo.GetBitRate()/1000 << " KBits/s, Extension value: 0" << endl;
-	cerr << "Audio: 1:1 conversion, rate: " << m_mpegInfo.GetSampleRate() << ", encoding: signed 16 bit, channels: 2" << endl;
+	cerr << "Audio: 1:1 conversion, rate: " << m_mpegInfo.GetSampleRate() << ", encoding: signed 16 bit, channels: "<< m_mpegInfo.GetChannels() << endl;
     }
 }
 
