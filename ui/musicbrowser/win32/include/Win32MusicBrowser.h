@@ -214,6 +214,7 @@ class MusicBrowserUI : public UserInterface
     void  PlaylistListSorted(void);
     void  InitList(void);
     void  LVBeginDrag(HWND hwnd, NM_LISTVIEW* nmlv);
+    void  UpdateTotalTime(void);
     
 
     // Functions in Win32MusicBrowser.cpp

@@ -44,7 +44,7 @@
 #define IDC_MUSICCATALOGTEXT            1012
 #define IDC_PLAYLISTTEXT                1013
 #define IDC_STATUS                      1014
-#define IDC_RANDOMIZE                   1014
+#define IDC_RANDOMIZE                   1015
 #define IDC_PLAYLISTNAME                1016
 #define IDC_PLAYLISTTITLE               1017
 #define IDC_DUMMYCONTROL                1018

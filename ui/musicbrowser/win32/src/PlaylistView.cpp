@@ -42,6 +42,30 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
 
     switch(controlId)
     {
+        /*case IDC_STATUS:
+        {
+            RECT rcClip;
+            char* statusText = (char*)dis->itemData;
+
+            rcClip = dis->rcItem;
+
+            UINT oldAlign;
+
+            //oldAlign = SetTextAlign(dis->hDC, TA_RIGHT | TA_TOP );
+            
+            ExtTextOut( dis->hDC, 
+                        rcClip.left, rcClip.top + 1,
+                        ETO_CLIPPED | ETO_OPAQUE,
+                        &rcClip, 
+                        statusText,
+                        strlen(statusText),
+                        NULL);
+
+            //SetTextAlign(dis->hDC, oldAlign);
+
+            break;
+        }*/
+
         case IDC_PLAYLISTBOX:
         {
             uint32 uiFlags = ILD_TRANSPARENT;
@@ -54,7 +78,7 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             himl = ListView_GetImageList(dis->hwndItem, LVSIL_SMALL);
             ImageList_GetIconSize(himl, &cxImage, &cyImage);
 
-            rcClip = dis->rcItem;   
+            rcClip = dis->rcItem;
         
             HWND hwndList = GetDlgItem(m_hWnd, IDC_PLAYLISTBOX);
             PlaylistItem* item;
@@ -389,6 +413,7 @@ void MusicBrowserUI::PlaylistListItemRemoved(const PlaylistItem* item,
 
         m_bListChanged = true;
         UpdateButtonMenuStates();
+        UpdateTotalTime();
     }
 }
 
@@ -435,6 +460,8 @@ void MusicBrowserUI::PlaylistListItemAdded(const PlaylistItem* item)
             m_bListChanged = true;
             UpdateButtonMenuStates();
         }
+
+        UpdateTotalTime();
     }
 }
 
@@ -527,6 +554,46 @@ void MusicBrowserUI::LVBeginDrag(HWND hwnd, NM_LISTVIEW* nmlv)
     src->Release();
 
     m_playlistDropTarget->TargetIsSource(false);
+}
+
+void MusicBrowserUI::UpdateTotalTime()
+{
+    uint32 count = ListView_GetItemCount(m_hPlaylistView);
+    uint32 index = 0;
+    uint32 total = 0;
+    bool approximate = false;
+
+    for(index = 0; index < count; index++)
+    {
+        PlaylistItem* item = m_oPlm->ItemAt(index);
+
+        uint32 time = item->GetMetaData().Time();
+
+        if(!time)
+            approximate = true;
+
+        total += time;
+    }   
+
+    char buf[32] = "~";
+    char* time = buf;
+
+    // this will place a twiddle in front of the time
+    // if any of the times are zero and thus assumed 
+    // to be unknown...
+    if(approximate)
+        time++;
+
+    uint32 hours = total / 3600;
+    uint32 minutes = total / 60 - hours * 60;
+    uint32 seconds = total - minutes * 60 - hours * 3600;
+
+    if(hours)
+        sprintf(time, "%d:%02d:%02d", hours, minutes, seconds);
+    else
+        sprintf(time, "%d:%02d", minutes, seconds);
+
+    SendMessage(m_hStatus, SB_SETTEXT, 1, (LPARAM) time);
 }
 
 LRESULT WINAPI 
@@ -723,6 +790,8 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
 
                 m_oPlm->AddItems(fileList, index);
             }
+
+            SetFocus(hwnd);
 
             //char buf[256];
             //sprintf(buf, "x: %d   y: %d\r\n", pt.x, pt.y);

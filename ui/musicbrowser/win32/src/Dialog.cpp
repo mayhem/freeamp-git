@@ -564,6 +564,10 @@ void MusicBrowserUI::SizeWindow(int iType, int iWidth, int iHeight)
                            controlHeight,
                            SWP_NOZORDER);
 
+    int32 panes[2]= {0, -1};
+    panes[0] = clientRect.right - clientRect.left - 70;
+    SendMessage(m_hStatus, SB_SETPARTS, 2, (LPARAM) panes);
+
     // Tool Bar
     GetWindowRect(m_hRebar, &controlRect); 
     controlHeight = controlRect.bottom - controlRect.top;
@@ -705,8 +709,8 @@ void MusicBrowserUI::SetMinMaxInfo(void)
 void MusicBrowserUI::InitDialog(HWND hWnd)
 {
     HIMAGELIST      hList;
-    const int32     kNumPanes = 1;
-    int32           panes[kNumPanes]= {-1};
+    const int32     kNumPanes = 2;
+    int32           panes[kNumPanes]= {500, -1};
 
     m_hWnd = hWnd;
     m_hMusicCatalog = GetDlgItem(m_hWnd, IDC_MUSICTREE);
@@ -796,12 +800,18 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
     m_playlistDropTarget = new DropTarget(m_hPlaylistView);
     //CoLockObjectExternal ((IUnknown*)m_playlistDropTarget, TRUE, TRUE);
     result = RegisterDragDrop(m_hPlaylistView, m_playlistDropTarget);
+    
 
-
-    m_hStatus= CreateStatusWindow(WS_CHILD | WS_VISIBLE,
+    m_hStatus= CreateStatusWindow(WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS,
                                   "", m_hWnd, IDC_STATUS);
 
+    RECT rect;
+
+    GetClientRect(m_hWnd, &rect);
+
+    panes[0] = rect.right - rect.left - 70;
     SendMessage(m_hStatus, SB_SETPARTS, kNumPanes, (LPARAM) panes);
+    SendMessage(m_hStatus, SB_SETTEXT, 1, (LPARAM) "0:00");
 
     UpdateButtonMenuStates();
     m_context->target->AcceptEvent(new Event(CMD_QueryPlayerState));

@@ -447,9 +447,16 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
             if(pnkd->wVKey == VK_DELETE)
             {
                 DeleteEvent();  
-                //ListView_Scroll(pnkd->hdr.hwndFrom, 0, 1);
-                //SendMessage(pnkd->hdr.hwndFrom, WM_VSCROLL, 
-                //    MAKELONG(SB_LINEDOWN, 0), NULL);
+            }
+            else if(pnkd->wVKey == 'A' && (GetKeyState(VK_CONTROL) < 0))
+            {
+                uint32 count = ListView_GetItemCount(pListView->hdr.hwndFrom);
+                
+                for(uint32 index = 0; index < count; index++)
+                    ListView_SetItemState(pListView->hdr.hwndFrom,
+                                          index,
+                                          LVIS_SELECTED,
+                                          LVIS_SELECTED);
             }
 
         }
