@@ -420,6 +420,26 @@ Error HttpInput::GetHostByName(char *szHostName, struct hostent *pResult)
     return kError_NoErr;
 }
 
+static void EncodeURI(string& URI)
+{
+	const char* legalCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/?";
+
+	string::size_type convert = 0;
+	
+	while((convert = URI.find_first_not_of(legalCharacters, convert)) != string::npos)
+	{
+		string hex = "%";
+		char num[8];
+
+		sprintf(num, "%x", URI[convert]);
+		hex += num;
+		
+		URI.replace(convert, 1, hex);
+
+		convert += hex.length();
+	}
+}
+
 Error HttpInput::Open(void)
 {
     char                szHostName[iMaxHostNameLen+1], *szFile, *szQuery;
@@ -581,19 +601,30 @@ Error HttpInput::Open(void)
     szQuery = new char[iMaxUrlLen];
 
     if (szFile)
+	{
+		// Added by elrod 9/2/2000
+		// FreeAmp stores URLs but not with the characters encoded so we
+		// need to encode the url here so it can be passed correctly to 
+		// the web server
+		string temp = szFile;
+		EncodeURI(temp);
+
         sprintf(szQuery, "GET %s HTTP/1.0\r\n"
                          "Host: %s\r\n"
                          "Accept: */*\r\n" 
                          "icy-metadata:1\r\n" 
                          "User-Agent: FreeAmp/%s\r\n", 
-                         szFile, szHostName, FREEAMP_VERSION);
-    else
+                         temp.c_str(), szHostName, FREEAMP_VERSION);
+	}    
+	else
+	{
         sprintf(szQuery, "GET / HTTP/1.0\r\n"
                          "Host: %s\r\n"
                          "Accept: */*\r\n" 
                          "icy-metadata:1\r\n" 
                          "User-Agent: FreeAmp/%s\r\n", 
                          szHostName, FREEAMP_VERSION);
+	}
 
     m_pContext->prefs->GetPrefBoolean(kUseTitleStreamingPref, &bUseTitleStreaming);
     if (bUseTitleStreaming)
