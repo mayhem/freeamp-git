@@ -171,6 +171,8 @@ BOOL MissingFileDialog::DialogProc(HWND hwnd,
 
                     char filter[] = "MPEG Audio Streams (.mp1;.mp2;.mp3;.mpp)\0"
                                     "*.mp1;*.mp2;*.mp3;*.mpp\0"
+                                    "Ogg/Vorbis Files (*.ogg)\0"
+                                    "*.ogg\0"
                                     "All Files (*.*)\0"
                                     "*.*\0"
                                     "\0";

@@ -245,44 +245,150 @@ SOURCE=..\res\vorbis.rc
 # Begin Source File
 
 SOURCE=..\..\src\vorbislmc.cpp
+# ADD CPP /I "..\include\vorbis"
+# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
+# End Source File
+# End Group
+# Begin Group "decoder source"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\src\lib\analysis.c
+# ADD CPP /I "..\include\vorbis"
+# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\..\..\vorbis\vorbis_vc6\Debug\vorbis_debug.lib
-
-!IF  "$(CFG)" == "vorbis - Win32 Release"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "vorbis - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Release"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Debug"
-
-!ENDIF 
-
+SOURCE=..\..\src\lib\barkmel.c
+# ADD CPP /I "..\include\vorbis"
+# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\..\..\vorbis\vorbis_vc6\Release\vorbis.lib
+SOURCE=..\..\src\lib\bitwise.c
+# ADD CPP /I "..\include\vorbis"
+# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
+# End Source File
+# Begin Source File
 
-!IF  "$(CFG)" == "vorbis - Win32 Release"
+SOURCE=..\..\src\lib\block.c
+# ADD CPP /I "..\include\vorbis"
+# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
+# End Source File
+# Begin Source File
 
-!ELSEIF  "$(CFG)" == "vorbis - Win32 Debug"
+SOURCE=..\..\src\lib\codebook.c
+# ADD CPP /I "..\include\vorbis"
+# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
+# End Source File
+# Begin Source File
 
-# PROP Exclude_From_Build 1
+SOURCE=..\..\src\lib\envelope.c
+# ADD CPP /I "..\include\vorbis"
+# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
+# End Source File
+# Begin Source File
 
-!ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Release"
+SOURCE=..\..\src\lib\floor0.c
+# ADD CPP /I "..\include\vorbis"
+# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
+# End Source File
+# Begin Source File
 
-!ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Debug"
+SOURCE=..\..\src\lib\framing.c
+# ADD CPP /I "..\include\vorbis"
+# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
+# End Source File
+# Begin Source File
 
-# PROP Exclude_From_Build 1
+SOURCE=..\..\src\lib\iir.c
+# ADD CPP /I "..\include\vorbis"
+# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
+# End Source File
+# Begin Source File
 
-!ENDIF 
+SOURCE=..\..\src\lib\info.c
+# ADD CPP /I "..\include\vorbis"
+# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
+# End Source File
+# Begin Source File
 
+SOURCE=..\..\src\lib\lpc.c
+# ADD CPP /I "..\include\vorbis"
+# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\src\lib\lsp.c
+# ADD CPP /I "..\include\vorbis"
+# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\src\lib\mapping0.c
+# ADD CPP /I "..\include\vorbis"
+# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\src\lib\mdct.c
+# ADD CPP /I "..\include\vorbis"
+# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\src\lib\psy.c
+# ADD CPP /I "..\include\vorbis"
+# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\src\lib\registry.c
+# ADD CPP /I "..\include\vorbis"
+# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\src\lib\res0.c
+# ADD CPP /I "..\include\vorbis"
+# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\src\lib\sharedbook.c
+# ADD CPP /I "..\include\vorbis"
+# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\src\lib\smallft.c
+# ADD CPP /I "..\include\vorbis"
+# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\src\lib\synthesis.c
+# ADD CPP /I "..\include\vorbis"
+# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\src\lib\time0.c
+# ADD CPP /I "..\include\vorbis"
+# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\src\lib\vorbisfile.c
+# ADD CPP /I "..\include\vorbis"
+# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\src\lib\window.c
+# ADD CPP /I "..\include\vorbis"
+# SUBTRACT CPP /I "..\..\..\..\..\vorbis\include"
 # End Source File
 # End Group
 # End Target

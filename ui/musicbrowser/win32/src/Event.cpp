@@ -45,11 +45,12 @@ using namespace std;
 #include "apsplaylist.h"
 #include "FAMetaUnit.h"
 
-const char* kAudioFileFilter =
-            "MPEG Audio Streams (.mpg, .mp1, .mp2, .mp3, .mpp)\0"
-            "*.mpg;*.mp1;*.mp2;*.mp3;*.mpp\0"
-            "All Files (*.*)\0"
-            "*.*\0";
+//RAK: Is this still used?
+//const char* kAudioFileFilter =
+//            "MPEG Audio Streams (.mpg, .mp1, .mp2, .mp3, .mpp)\0"
+//            "*.mpg;*.mp1;*.mp2;*.mp3;*.mpp\0"
+//            "All Files (*.*)\0"
+//            "*.*\0";
 
 void MusicBrowserUI::ClearPlaylistEvent(void)
 {
@@ -1612,10 +1613,14 @@ void MusicBrowserUI::AddFileEvent(HWND hwndParent, bool playNow)
     int32 i, iOffset = 0;
 
     char szFilter[1024] = "MPEG Audio Streams (.mp1;.mp2;.mp3;.mpp)\0"
-                          "*.mp1;*.mp2;*.mp3;*.mpp\0";
+                          "*.mp1;*.mp2;*.mp3;*.mpp\0"
+                          "Ogg/Vorbis Streams (.ogg)\0"
+                          "*.ogg\0";
 
     // we need a way to iterate LMCs...
     iOffset += strlen(szFilter) + 1; 
+    iOffset += strlen(szFilter + iOffset) + 1;  
+    iOffset += strlen(szFilter + iOffset) + 1;  
     iOffset += strlen(szFilter + iOffset) + 1;  
 
     for(i = 0; ; i++)

@@ -1202,6 +1202,7 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
                         query.push_back("*.mp1");
                         query.push_back("*.mp2");
                         query.push_back("*.mp3");
+                        query.push_back("*.ogg");
 
                         ::SetCursor(LoadCursor(NULL, IDC_WAIT));
                         FindMusicFiles(path, fileList, query);

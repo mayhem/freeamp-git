@@ -189,6 +189,10 @@ Error SoundCardPMO::Init(OutputInfo * info)
    m_samples_per_frame = info->samples_per_frame;
    m_data_size = info->max_buffer_size;
 
+   Debug_v("Init event: ch: %d sr: %d spf: %d ds: %d", 
+	     m_channels, m_samples_per_second, m_samples_per_frame, m_data_size);
+
+
    m_iBytesPerSample = info->number_of_channels * (info->bits_per_sample / 8);
 
    m_num_headers = (m_pInputBuffer->GetBufferSize() / m_data_size) - 1;
@@ -610,7 +614,10 @@ void SoundCardPMO::WorkerThread(void)
                   continue;
 
               if (pEvent->Type() == PMO_Init)
+			  {
+				  Debug_v("Got init event");
                   Init(((PMOInitEvent *)pEvent)->GetInfo());
+			  }
     
               if (pEvent->Type() == PMO_Reset)
                   Reset(true);

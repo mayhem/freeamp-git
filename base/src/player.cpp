@@ -1600,12 +1600,15 @@ DoneOutputting(Event *pEvent)
    }
 
    PlaylistItem *item = m_plm->GetCurrentItem();
-   MetaData mdata = (MetaData)item->GetMetaData();
-   mdata.AddPlayCount();
-   item->SetMetaData(&mdata);
-   m_plm->UpdateTrackMetaData(item);
-   m_musicCatalog->UpdateSong(item);
-   m_APSInterface->WriteToLog(mdata.GUID());   
+   if (item)
+   {
+      MetaData mdata = (MetaData)item->GetMetaData();
+      mdata.AddPlayCount();
+      item->SetMetaData(&mdata);
+      m_plm->UpdateTrackMetaData(item);
+      m_musicCatalog->UpdateSong(item);
+      m_APSInterface->WriteToLog(mdata.GUID());   
+   }
 
    SEND_NORMAL_EVENT(INFO_DoneOutputting);
 

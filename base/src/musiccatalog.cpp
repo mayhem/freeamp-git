@@ -423,7 +423,8 @@ bool MusicCatalog::CaseCompare(string s1, string s2)
 
 void MusicCatalog::GenerateSignature(PlaylistItem *track)
 {
-    m_sigs->insert(track);
+	// RAK: This line causes a crash every time!
+    //m_sigs->insert(track);
 }
 
 Error MusicCatalog::AddSong(const char *url)
