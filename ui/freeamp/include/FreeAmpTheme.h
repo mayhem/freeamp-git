@@ -117,6 +117,7 @@ class FreeAmpTheme : public UserInterface, public Theme
         bool             m_bPaused, m_bInOptions, m_bPlayShown;
         bool             m_bShowBuffers, m_bBufferingUp;
         string           m_oCurrentWindow, m_oTitle, m_oStreamInfo, m_oHeadlineUrl;
+        string           m_themeCache;
         TimeDisplayState m_eTimeDisplayState;
         UpdateManager   *m_pUpdateMan;
         Equalizer       *m_eq;

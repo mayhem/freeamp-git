@@ -76,6 +76,14 @@ extern HINSTANCE g_hinst;
 #include "missingfile.h"
 #include "utility.h"
 
+#ifndef min
+#define min _cpp_min 
+#endif
+
+#ifndef max
+#define max _cpp_max
+#endif
+
 void WorkerThreadStart(void* arg);
 
 #define DB Debug_v("%s:%d\n", __FILE__, __LINE__);
@@ -269,6 +277,9 @@ void FreeAmpTheme::LoadFreeAmpTheme(void)
    }
    oThemePath += szTemp;
   
+   // Save the theme.
+   m_themeCache = oThemePath;
+
    eRet = LoadTheme(oThemePath, m_oCurrentWindow);
    
    if (IsError(eRet) && eRet != kError_InvalidParam)					   
@@ -762,14 +773,56 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
 
       case INFO_PrefsChanged:
       {
-         bool bValue;
+		 /*
+		  * Make sure that the theme has changed before we
+		  * bother to reload it.
+		  */
+	     char    *szTemp;
+		 uint32   iLen = 255;
+		 string   oThemePath("");
+		 struct  _stat buf;
+	     bool bValue;
 
-         ReloadTheme();
+		 szTemp = new char[iLen];
+		 m_pContext->prefs->GetPrefString(kThemePathPref, szTemp, &iLen);
 
-         m_pContext->prefs->GetPrefBoolean(kStayOnTopPref, &bValue);
-         m_pWindow->SetStayOnTop(bValue);
-         m_pContext->prefs->GetPrefBoolean(kLiveInTrayPref, &bValue);
-         m_pWindow->SetLiveInToolbar(bValue);
+	    if (strlen(szTemp) < 1) 
+		    strcpy(szTemp, BRANDING_DEFAULT_THEME);
+ 
+		if (_stat(szTemp, &buf) < 0)
+		{
+			// If the theme doesn't exist, let's try to prepend the install/theme dir
+			char   *dir;
+			uint32  len = _MAX_PATH;
+
+			dir = new char[_MAX_PATH];
+   
+			m_pContext->prefs->GetPrefString(kInstallDirPref, dir, &len);
+			oThemePath = string(dir);
+#if defined(unix)
+		    oThemePath += string(BRANDING_SHARE_PATH);
+#endif
+			oThemePath += string(DIR_MARKER_STR);    
+			oThemePath += string("themes");
+	        oThemePath += string(DIR_MARKER_STR);    
+
+			delete [] dir;
+		}
+		oThemePath += szTemp;
+
+		//
+		// Perform the reload - if necessary.
+		//
+        if ( strcmp( oThemePath.c_str(), m_themeCache.c_str() ) != 0 )
+		{
+			ReloadTheme();
+			m_themeCache = oThemePath;
+		}
+
+        m_pContext->prefs->GetPrefBoolean(kStayOnTopPref, &bValue);
+        m_pWindow->SetStayOnTop(bValue);
+        m_pContext->prefs->GetPrefBoolean(kLiveInTrayPref, &bValue);
+        m_pWindow->SetLiveInToolbar(bValue);
          
       	break;
       }

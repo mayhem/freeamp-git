@@ -26,6 +26,14 @@ ____________________________________________________________________________*/
 #include "Window.h"
 #include "debug.h"
 
+#ifndef min
+#define min _cpp_min 
+#endif
+
+#ifndef max
+#define max _cpp_max
+#endif
+
 // Bitmap info:
 // For each 'state'
 // Frame 0: Normal

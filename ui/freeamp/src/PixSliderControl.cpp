@@ -26,6 +26,14 @@ ____________________________________________________________________________*/
 #include "Window.h"
 #include "debug.h"
 
+#ifndef min
+#define min _cpp_min 
+#endif
+
+#ifndef max
+#define max _cpp_max
+#endif
+
 static TransitionInfo pTransitions[] =
 {
     { CS_Normal,     CT_MouseEnter,       CS_MouseOver  },
