@@ -57,13 +57,10 @@ ____________________________________________________________________________*/
 #include "../res/track_pix.xpm"
 #include "../res/uncatagorized_pix.xpm"
 #include "../res/cd_pix.xpm"
-#include "../res/icecast_pix.xpm"
-//#include "../res/shoutcast_pix.xpm"
 #include "../res/streams_pix.xpm"
-#include "../res/wiredplanet_pix.xpm"
 #include "../res/favorites_pix.xpm"
 
-const string icecastURL = "http://yp.icecast.org/yplist_long.xml";
+const string streamURL = "http://www.freeamp.org/streams.xml";
 
 void kill_treedata(TreeData *dead)
 {
@@ -931,56 +928,11 @@ void GTKMusicBrowser::CreateMainTreeItems(void)
     gtk_ctree_node_set_row_data_full(musicBrowserTree, favoritesTree, data,
                                      (GtkDestroyNotify)kill_treedata);
 
-    pixmap = gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, &mask,
-                                          &style->bg[GTK_STATE_NORMAL],
-                                          wiredplanet_pix);
-    name[0] = "Wired Planet";
-    wiredplanetTree = gtk_ctree_insert_node(musicBrowserTree, streamTree, NULL, 
-                                       name, 5,
-                                       pixmap, mask, pixmap, mask, false, false);
-    data = NewTreeData(kTreeWiredPlanetHead);
-    gtk_ctree_node_set_row_data_full(musicBrowserTree, wiredplanetTree, data,
-                                     (GtkDestroyNotify)kill_treedata);
-
-    wiredplanetSpace = gtk_ctree_insert_node(musicBrowserTree, wiredplanetTree, 
-                                             NULL, NULL, 5, NULL, NULL, NULL, 
-                                             NULL, true, false);
-
-    pixmap = gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, &mask,
-                                          &style->bg[GTK_STATE_NORMAL],
-                                          icecast_pix);
-    name[0] = "IceCast";
-    icecastTree = gtk_ctree_insert_node(musicBrowserTree, streamTree, NULL, 
-                                       name, 5,
-                                       pixmap, mask, pixmap, mask, false, false);
-    data = NewTreeData(kTreeIcecastHead);
-    gtk_ctree_node_set_row_data_full(musicBrowserTree, icecastTree, data,
-                                     (GtkDestroyNotify)kill_treedata);
-
     name[0] = "Searching for Stations...";
-    icecastSpace = gtk_ctree_insert_node(musicBrowserTree, icecastTree, NULL,
-                                         name, 5, NULL, NULL, NULL, NULL, true,
-                                         false);
+    streamSpace = gtk_ctree_insert_node(musicBrowserTree, streamTree, NULL,
+                                        name, 5, NULL, NULL, NULL, NULL, true,
+                                        false);
 
-/*
-    pixmap = gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, &mask,
-                                          &style->bg[GTK_STATE_NORMAL],
-                                          shoutcast_pix);
-
-    name[0] = "Shoutcast";
-    shoutcastTree = gtk_ctree_insert_node(musicBrowserTree, streamTree, NULL, 
-                                       name, 5,
-                                       pixmap, mask, pixmap, mask, false, false);
-    data = NewTreeData(kTreeShoutcastHead);
-    gtk_ctree_node_set_row_data_full(musicBrowserTree, shoutcastTree, data,
-                                     (GtkDestroyNotify)kill_treedata);
-
-    name[0] = "Searching for Stations...";
-    shoutcastSpace = gtk_ctree_insert_node(musicBrowserTree, shoutcastTree, NULL,
-                                           name, 5, NULL, NULL, NULL, NULL, 
-                                           true, false);
-
-*/
     pixmap = gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, &mask,
                                           &style->bg[GTK_STATE_NORMAL],
                                           cd_pix);
@@ -992,9 +944,7 @@ void GTKMusicBrowser::CreateMainTreeItems(void)
     gtk_ctree_node_set_row_data_full(musicBrowserTree, CDTree, data,
                                      (GtkDestroyNotify)kill_treedata);
 
-    wiredplanetExpanded = false;
-    icecastExpanded = false;
-    shoutcastExpanded = false;
+    streamExpanded = false;
 
     gtk_clist_thaw(GTK_CLIST(musicBrowserTree));
 }
@@ -1140,138 +1090,56 @@ static void tree_clicked(GtkWidget *widget, GdkEventButton *event,
     p->SetClickState(kContextBrowser);
 }
 
-void GTKMusicBrowser::FillWiredPlanet(void)
-{
-    if (wiredplanetExpanded)
-        return;
-
-    if (wiredplanetSpace)
-        gtk_ctree_remove_node(musicBrowserTree, wiredplanetSpace);
-    wiredplanetSpace = NULL;
-    wiredplanetExpanded = true;
-
-    char* stations[] = {
-        "Alpha 2.0", // (Downtempo / Trip-Hop)",
-        "Amplified", // (Punk, Garage, and Hard Alternative),
-        "Axis", // (Jazz in its many forms)",
-        "Butter", // (Melted grooves and dubbed out world-flavored Funk.),
-        "DJ Mix",
-        "Flipside",
-        "Hearts of Space",
-        "Nova Mundi", // (New Age / Ambient)",
-        "Oscillations", // (Electronic / Trance / House)",
-        "Pop 3",
-        "Red Shift", // (Drum \'n Bass / Jungle)",
-        "The Cut",
-        "The Fringe",
-        "World",
-        "Radio EMusic",
-        "Radio Epitaph",
-        "Radio Radio",
-        "Radio TMBG", // (They Might Be Giants)",
-        "Noise Pop"
-    };
-
-    char* urls[] = {
-        "http://ice1.wiredplanet.com:8001/alph",
-        "http://ice1.wiredplanet.com:8001/ampp",
-        "http://ice1.wiredplanet.com:8001/axis",
-        "http://ice1.wiredplanet.com:8001/cjwp",
-        "http://ice1.wiredplanet.com:8001/oaky",
-        "http://ice1.wiredplanet.com:8001/flip",
-        "http://ice1.wiredplanet.com:8001/hrts",
-        "http://ice1.wiredplanet.com:8001/nova",
-        "http://ice1.wiredplanet.com:8001/oscl",
-        "http://ice1.wiredplanet.com:8001/popo",
-        "http://ice1.wiredplanet.com:8001/reds",
-        "http://ice1.wiredplanet.com:8001/tcut",
-        "http://ice1.wiredplanet.com:8001/frng",
-        "http://ice1.wiredplanet.com:8001/wrld",
-        "http://ice1.wiredplanet.com:8001/emus",
-        "http://ice1.wiredplanet.com:8001/punk",
-        "http://ice1.wiredplanet.com:8001/elvi",
-        "http://ice1.wiredplanet.com:8001/tmbg",
-        "http://ice1.wiredplanet.com:8001/nois"
-    };
-
-    uint32 numStations = (sizeof(stations) / sizeof(char*));
-
-
-    char *name[1];
-    GdkPixmap *pixmap;
-    GdkBitmap *mask;
-    GtkStyle  *style = gtk_widget_get_style(musicBrowserWindow);
-    TreeData  *data;
-    GtkCTreeNode *stream;
-    gtk_clist_freeze(GTK_CLIST(musicBrowserTree));
- 
-    for (uint32 i = 0; i < numStations; i++) {
-        PlaylistItem *newitem = new PlaylistItem;
-        MetaData metadata;
-
-        newitem->SetURL(urls[i]);
-        metadata.SetTitle(stations[i]);
-        metadata.SetArtist("Wired Planet");
-        newitem->SetMetaData(&metadata);
-
-        name[0] = stations[i];
-
-        pixmap = gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, &mask,
-                                              &style->bg[GTK_STATE_NORMAL],
-                                              streams_pix);
-        stream = gtk_ctree_insert_node(musicBrowserTree, wiredplanetTree, NULL,
-                                        name, 5, pixmap, mask, pixmap, mask,
-                                        true, false);
-        data = NewTreeData(kTreeStream, NULL, NULL, NULL, newitem);
-        gtk_ctree_node_set_row_data_full(musicBrowserTree, stream, data,
-                                         (GtkDestroyNotify)kill_treedata);
-    }
-    gtk_clist_thaw(GTK_CLIST(musicBrowserTree));
-}
-
-void GTKMusicBrowser::icecast_timer(void *arg)
+void GTKMusicBrowser::stream_timer_func(void *arg)
 {
     GTKMusicBrowser *ui = (GTKMusicBrowser*)arg;
-    ui->IcecastTimer();
+    ui->StreamTimer();
 }
 
-void GTKMusicBrowser::IcecastTimer(void)
+void GTKMusicBrowser::StreamTimer(void)
 {
     Error  eRet;
-    Http   iceDownload(m_context);
+    Http   streamDownload(m_context);
     string page;
-    vector<IcecastStreamInfo> list;
-    IcecastStreams            o;
+    vector<FreeAmpStreamInfo> list;
+    FreeAmpStreams            o;
 
-cout << "ice tick\n";
-    eRet = iceDownload.DownloadToString(icecastURL, page);
+    m_context->timerManager->SetTimer(stream_timer, 30);
+
+    eRet = streamDownload.DownloadToString(streamURL, page);
     if (eRet != kError_NoErr) {
-        cout << "Icecast download failed: " << ErrorString[eRet] << "\n";
+        cout << "Stream .xml download failed: " << ErrorString[eRet] << "\n";
         return;
     }
 
-    o.ParseStreamXML(page, list);
-
-    if (list.size() > 0) {
-        HandleIceCastList(list);
+    eRet = o.ParseStreamXML(page, list);
+    
+    if (eRet != kError_NoErr) {
+        cout << "Stream .xml parse error: " << ErrorString[eRet] << "\n";
+        return;
     }
+
+    if (list.size() > 0) 
+        HandleStreamList(list);
     else
        cout << "no streams.\n";
 }
 
-void GTKMusicBrowser::HandleIceCastList(vector<IcecastStreamInfo> &list)
+void GTKMusicBrowser::HandleStreamList(vector<FreeAmpStreamInfo> &list)
 {
     gdk_threads_enter();
     gtk_clist_freeze(GTK_CLIST(musicBrowserTree));
 
-    GtkCTreeRow *row = GTK_CTREE_ROW(icecastTree);
+    GtkCTreeRow *row = GTK_CTREE_ROW(streamTree);
     int expanded = row->expanded;
+    GtkCTreeNode *sib = row->children;
 
-    while (row->children) {
-        GtkCTreeNode *todelete = row->children;
+    GtkCTreeNode *todelete = GTK_CTREE_ROW(sib)->sibling;
+    while (todelete) {
         gtk_ctree_remove_node(musicBrowserTree, todelete);
+        todelete = GTK_CTREE_ROW(sib)->sibling;
     }
-    icecastSpace = NULL;
+    streamSpace = NULL;
    
     char *name[1];
     GdkPixmap *pixmap;
@@ -1280,7 +1148,7 @@ void GTKMusicBrowser::HandleIceCastList(vector<IcecastStreamInfo> &list)
     TreeData  *data;
     GtkCTreeNode *stream;
 
-    vector<IcecastStreamInfo>::iterator i;
+    vector<FreeAmpStreamInfo>::iterator i;
 
     for (i = list.begin(); i != list.end(); i++) {
         PlaylistItem *newitem = new PlaylistItem;
@@ -1294,10 +1162,12 @@ void GTKMusicBrowser::HandleIceCastList(vector<IcecastStreamInfo> &list)
 
         name[0] = (char *)i->m_name.c_str();
 
+        GtkCTreeNode *parent = StreamGetParentNode(i->m_treePath);
+
         pixmap = gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, &mask,
                                               &style->bg[GTK_STATE_NORMAL],
                                               streams_pix);
-        stream = gtk_ctree_insert_node(musicBrowserTree, icecastTree, NULL,
+        stream = gtk_ctree_insert_node(musicBrowserTree, parent, NULL,
                                         name, 5, pixmap, mask, pixmap, mask,
                                         true, false);
         data = NewTreeData(kTreeStream, NULL, NULL, NULL, newitem);
@@ -1307,49 +1177,88 @@ void GTKMusicBrowser::HandleIceCastList(vector<IcecastStreamInfo> &list)
     gtk_clist_thaw(GTK_CLIST(musicBrowserTree));
 
     if (expanded)
-        gtk_ctree_expand(musicBrowserTree, icecastTree);
+        gtk_ctree_expand(musicBrowserTree, streamTree);
 
     gdk_threads_leave();
 }
+
+GtkCTreeNode *GTKMusicBrowser::StreamGetParentNode(string treePath)
+{
+    GtkCTreeNode *parent = streamTree;
+    char      *fullpath = strdup_new(treePath.c_str());
+    char      *slash, *nextslash = NULL, *name[1]; 
+    GdkPixmap *pixmap;
+    GdkBitmap *mask;
+    GtkStyle  *style = gtk_widget_get_style(musicBrowserWindow);
+    TreeData  *data;
+
+    slash = strchr(fullpath, '/');
+
+    while (slash) {
+        *slash = '\0';
+        slash++;
+        if (slash) {
+            nextslash = strchr(slash, '/');
+            if (nextslash)
+                *nextslash = '\0';
+
+            GtkCTreeNode *sib = GTK_CTREE_ROW(parent)->children;
+            bool found = false;            
+
+            while (sib) {   
+                GtkCListRow *row = (GtkCListRow *)GTK_CTREE_ROW(sib);
+                char *sibtext = GTK_CELL_PIXTEXT(row->cell[0])->text;
+                if (!strcasecmp(slash, sibtext)) {
+                    found = true;
+                    parent = sib;
+                    break;
+                }
+                sib = GTK_CTREE_ROW(sib)->sibling;
+            }
+            
+            if (!found) {
+                name[0] = slash;
+                pixmap = gdk_pixmap_create_from_xpm_d(
+                                              musicBrowserWindow->window,
+                                              &mask,
+                                              &style->bg[GTK_STATE_NORMAL],
+                                              favorites_pix);
+                parent = gtk_ctree_insert_node(musicBrowserTree, parent,
+                                               NULL, name, 5, pixmap, mask,
+                                               pixmap, mask, false, false);
+                data = NewTreeData(kTreeStreamFolder);
+                gtk_ctree_node_set_row_data_full(musicBrowserTree, parent, data,
+                                         (GtkDestroyNotify)kill_treedata);
+
+            }
+                                                      
+            slash = nextslash;
+        }
+    }
+   
+    delete fullpath;
+
+    return parent;
+}
     
-void GTKMusicBrowser::FillIceCast(void)
+void GTKMusicBrowser::FillStreams(void)
 {
-    if (icecastExpanded)
+    if (streamExpanded)
         return;
 
-    if (!ice_timer_started)
-        m_context->timerManager->StartTimer(&ice_timer, icecast_timer, 30, 
-                                            this);
-    ice_timer_started = true;
-    icecastExpanded = true;
+    if (!stream_timer_started)
+        m_context->timerManager->StartTimer(&stream_timer, stream_timer_func, 
+                                            1, this);
+    stream_timer_started = true;
+    streamExpanded = true;
 }
 
-void GTKMusicBrowser::CloseIceCast(void)
+void GTKMusicBrowser::CloseStreams(void)
 {
-    if (!icecastExpanded)
+    if (!streamExpanded)
         return;
 
-    icecastExpanded = false;
-}
-
-void GTKMusicBrowser::FillShoutCast(void)
-{
-    if (shoutcastExpanded)
-        return;
-    //if (shoutcastSpace)
-    //    gtk_ctree_remove_node(musicBrowserTree, shoutcastSpace);
-    //shoutcastSpace = NULL;
-
-    shoutcastExpanded = true;
-}
-
-void GTKMusicBrowser::CloseShoutCast(void)
-{
-    if (!shoutcastExpanded)
-        return;
-
-    //shout_timer->Stop();
-    shoutcastExpanded = false;
+    streamExpanded = false;
 }
 
 static void ctree_expand(GtkWidget *widget, GList *list, GTKMusicBrowser *p)
@@ -1361,14 +1270,8 @@ static void ctree_expand(GtkWidget *widget, GList *list, GTKMusicBrowser *p)
 
     if (data) {
         switch (data->type) {
-            case kTreeWiredPlanetHead: {
-                p->FillWiredPlanet();
-                break; }
-            case kTreeIcecastHead: {
-                p->FillIceCast();
-                break; }
-            case kTreeShoutcastHead: {
-                p->FillShoutCast();
+            case kTreeStreamsHead: {
+                p->FillStreams();
                 break; }
             default:
                 break;
@@ -1385,11 +1288,8 @@ static void ctree_collapse(GtkWidget *widget, GList *list, GTKMusicBrowser *p)
 
     if (data) {
         switch (data->type) {
-            case kTreeIcecastHead: {
-                p->CloseIceCast();
-                break; }
-            case kTreeShoutcastHead: {
-                p->CloseShoutCast();
+            case kTreeStreamsHead: {
+                p->CloseStreams();
                 break; }
             default:
                 break;

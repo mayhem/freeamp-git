@@ -157,7 +157,7 @@ UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/musicsearch.o
 UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/gtkmessagedialog.o 
 UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/introwizard.o
 UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/missingfileui.o
-UNIXMUSICBROWSEROBJ += ui/musicbrowser/src/Icecast.o
+UNIXMUSICBROWSEROBJ += ui/musicbrowser/src/FreeAmpStreams.o
 UNIXMUSICBROWSEROBJ += lib/xml/src/Parse.lo lib/http/lib/libfahttp.la
 UNIXMUSICBROWSERLIBS = $(GTK_LIBS)
 

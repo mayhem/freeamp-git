@@ -1064,7 +1064,8 @@ GTKMusicBrowser::GTKMusicBrowser(FAContext *context, MusicBrowserUI *masterUI,
     CDTracks = new vector<PlaylistItem *>;
     m_bIgnoringMusicCatalogMessages = false;
     m_bCDMode = cdCreationMode;
-    ice_timer_started = false;
+    stream_timer_started = false;
+    stream_timer = NULL;
 
     parentUI = masterUI;
  
@@ -1098,8 +1099,12 @@ GTKMusicBrowser::GTKMusicBrowser(FAContext *context, MusicBrowserUI *masterUI,
 
 GTKMusicBrowser::~GTKMusicBrowser(void)
 {
-    if (m_initialized)
+    if (m_initialized) {
         gtk_widget_destroy(musicBrowser);
+
+        if (stream_timer)
+            m_context->timerManager->StopTimer(stream_timer);
+    }
 }
 
 void GTKMusicBrowser::ShowPlaylist(void)

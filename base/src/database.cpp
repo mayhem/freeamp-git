@@ -42,16 +42,17 @@ Database::Database(const char *name, int version)
     assert(name);
 
     m_lock = new Mutex();
-    m_dbase = gdbm_open((char *)name, 0, GDBM_WRCREAT|GDBM_NOLOCK, S_IRWXU, 
-                        NULL);
+    m_dbase = gdbm_open((char *)name, 0, GDBM_WRCREAT|GDBM_NOLOCK|GDBM_SYNC, 
+                        S_IRWXU, NULL);
     
     assert(m_dbase);
 
     if (version >= 0) {
         if (!TestDatabaseVersion(version)) {
             gdbm_close(m_dbase);
-            m_dbase = gdbm_open((char *)name, 0, GDBM_NEWDB|GDBM_NOLOCK, 
-                                S_IRWXU, NULL);
+            m_dbase = gdbm_open((char *)name, 0, 
+                                GDBM_NEWDB|GDBM_NOLOCK|GDBM_SYNC, S_IRWXU, 
+                                NULL);
             assert(m_dbase);
         }
         StoreDatabaseVersion(version);

@@ -34,7 +34,7 @@ ____________________________________________________________________________*/
 #include "playlist.h"
 #include "musiccatalog.h"
 #include "timer.h"
-#include "Icecast.h"
+#include "FreeAmpStreams.h"
 
 class FAContext;
 class MusicBrowserUI;
@@ -65,9 +65,7 @@ typedef enum {
    kTreeCDHead,
    kTreeStreamsHead,
    kTreeFavoriteStreamsHead,
-   kTreeWiredPlanetHead,
-   kTreeIcecastHead,
-   kTreeShoutcastHead
+   kTreeStreamFolder
 } TreeNodeType;
 
 typedef struct {
@@ -112,24 +110,22 @@ class GTKMusicBrowser {
 
     vector<PlaylistItem *> *CDTracks;
 
-    void FillWiredPlanet(void);
-    void FillIceCast(void);
-    void CloseIceCast(void);
-    void HandleIceCastList(vector<IcecastStreamInfo> & list);
-    void FillShoutCast(void);
-    void CloseShoutCast(void);
+    void FillStreams(void);
+    void CloseStreams(void);
+    void HandleStreamList(vector<FreeAmpStreamInfo> & list);
 
  protected:
     FAContext *m_context;
 
-    static void icecast_timer(void *arg);
-    void IcecastTimer(void);
+    static void stream_timer_func(void *arg);
+    void StreamTimer(void);
 
  private:
     MusicBrowserUI *parentUI;
 
-    bool     ice_timer_started; 
-    TimerRef ice_timer;
+    bool     stream_timer_started; 
+    TimerRef stream_timer;
+    GtkCTreeNode *StreamGetParentNode(string treePath);
 
     uint32 CD_DiscID;
     uint32 CD_numtracks;
@@ -209,16 +205,9 @@ class GTKMusicBrowser {
     GtkCTreeNode *CDTree;
     GtkCTreeNode *streamTree;
     GtkCTreeNode *favoritesTree;
-    GtkCTreeNode *icecastTree;
-    GtkCTreeNode *shoutcastTree;
-    GtkCTreeNode *wiredplanetTree;
-    GtkCTreeNode *icecastSpace;
-    GtkCTreeNode *shoutcastSpace;
-    GtkCTreeNode *wiredplanetSpace;
+    GtkCTreeNode *streamSpace;
 
-    bool wiredplanetExpanded;
-    bool icecastExpanded;
-    bool shoutcastExpanded;
+    bool streamExpanded;
  
     GtkWidget *NewPixmap(char **data);
 
