@@ -166,7 +166,9 @@ SetNext(bool bUserAction)
                     CreateShuffleList();
                 }
 
-                ShuffleItem* item = m_shuffleList->ItemAt(m_shuffle++);
+                m_shuffle++;
+
+                ShuffleItem* item = m_shuffleList->ItemAt(m_shuffle);
 
                 if(item)
                 {
@@ -210,18 +212,14 @@ SetPrev(bool bUserAction)
             {
                 m_current = 0;
 
-                if( m_shuffleList->CountItems() != m_playList->CountItems())
+                m_shuffle--;
+
+                if( m_shuffleList->CountItems() != m_playList->CountItems() || 
+                    m_shuffle < 0)
                 {
                     CreateShuffleList();
                 }
-
-                m_shuffle--;
-
-                if(m_shuffle < 0)
-                {
-                    m_shuffle = count - 1;
-                }
-
+             
                 ShuffleItem* item = m_shuffleList->ItemAt(m_shuffle);
 
                 if(item)
