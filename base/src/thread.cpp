@@ -28,6 +28,8 @@ ____________________________________________________________________________*/
     #include "linuxthread.h"
 #elif WIN32
     #include "win32thread.h"
+#elif defined(solaris)
+    #include "solaristhread.h"
 #else
     #error thread class needs to be defined for this platform
 #endif
@@ -42,6 +44,8 @@ Thread* Thread::CreateThread()
     thread = new linuxThread();
 #elif WIN32
     thread = new win32Thread();
+#elif defined(solaris)
+    thread = new solarisThread();
 #else
     #error thread class needs to be defined for this platform
 #endif
