@@ -158,15 +158,34 @@ UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/gtkmessagedialog.o
 UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/introwizard.o
 UNIXMUSICBROWSERLIBS = $(GTK_LIBS)
 
-BEOSMUSICBROWSEROBJ  =
-BEOSMUSICBROWSERLIBS =
+BEOSMUSICBROWSEROBJ  = ui/musicbrowser/beos/src/MusicBrowserUI.o
+BEOSMUSICBROWSEROBJ += ui/musicbrowser/beos/src/BeOSMusicBrowser.o
+BEOSMUSICBROWSEROBJ += ui/musicbrowser/beos/src/MusicTreeView.o
+BEOSMUSICBROWSEROBJ += ui/musicbrowser/beos/src/PlaylistView.o
+BEOSMUSICBROWSEROBJ += ui/musicbrowser/beos/src/ToolBar.o
+BEOSMUSICBROWSEROBJ += ui/musicbrowser/beos/src/ToolBarButton.o
+BEOSMUSICBROWSEROBJ += ui/musicbrowser/beos/src/Separator.o
+BEOSMUSICBROWSEROBJ += ui/musicbrowser/beos/src/Placard.o
+BEOSMUSICBROWSEROBJ += ui/musicbrowser/beos/src/TooltipFilter.o
+BEOSMUSICBROWSEROBJ += ui/musicbrowser/beos/src/TrackItem.o
+BEOSMUSICBROWSEROBJ += ui/musicbrowser/beos/src/CollectionItem.o
+BEOSMUSICBROWSEROBJ += ui/musicbrowser/beos/src/PlaylistListItem.o
+BEOSMUSICBROWSEROBJ += ui/musicbrowser/beos/src/ResourceManager.o
+BEOSMUSICBROWSEROBJ += ui/musicbrowser/beos/src/IntroductionWizard.o
+BEOSMUSICBROWSEROBJ += ui/musicbrowser/beos/src/InfoEditor.o
+BEOSMUSICBROWSERRES  = base/beos/res/freeamp_addon.rsrc
+BEOSMUSICBROWSERRES += ui/musicbrowser/beos/res/musicbrowser.r
+BEOSMUSICBROWSERLIBS = -ltracker -ltranslation -lbe
+BEOSMUSICBROWSERPOSTLINK = util/beos/buildresources.pl -o $@ $(BEOSMUSICBROWSERRES)
 
 MUSICBROWSEROBJ = $($(OSTYPE)MUSICBROWSEROBJ)
 MUSICBROWSERLIBS = $($(OSTYPE)MUSICBROWSERLIBS)
+MUSICBROWSERPOSTLINK = $($(OSTYPE)MUSICBROWSERPOSTLINK)
 
 plugins/musicbrowser.ui: $(MUSICBROWSEROBJ)
 	$(LINKMOD) -o $@ $(MUSICBROWSEROBJ) $(MUSICBROWSERLIBS)
 #	$(LINKMOD) -o $@ $(MUSICBROWSEROBJ) $(STATICLD) 
+	$(MUSICBROWSERPOSTLINK)
 
 # freeamp ui
 FREEAMPUIOBJ  = ui/freeamp/src/Theme.doh ui/freeamp/src/Bitmap.o 
@@ -196,17 +215,17 @@ UNIXFREEAMPUIOBJ += ui/freeamp/unix/src/GTKPreferenceWindow.o
 UNIXFREEAMPUIOBJ += ui/freeamp/unix/src/GTKFileSelector.o  
 UNIXFREEAMPUILIBS = $(GTK_LIBS) $(TTF_LIBS)
 
-BEOSFREEAMPUIOBJ = ui/freeamp/beos/src/BeOSWindow.o \
-                   ui/freeamp/beos/src/BeOSBitmap.o \
-                   ui/freeamp/beos/src/BeOSMessageDialog.o \
-                   ui/freeamp/beos/src/BeOSCanvas.o \
-                   ui/freeamp/beos/src/BeOSFont.o \
-                   ui/freeamp/beos/src/BeOSPreferenceWindow.o \
-                   ui/freeamp/beos/src/MainWindow.o \
-                   ui/freeamp/beos/src/CanvasView.o \
-                   ui/freeamp/beos/src/ThemeManager.o \
-                   ui/freeamp/beos/src/PrefWindow.o \
-                   ui/freeamp/beos/src/PrefView.o
+BEOSFREEAMPUIOBJ  = ui/freeamp/beos/src/BeOSWindow.o
+BEOSFREEAMPUIOBJ += ui/freeamp/beos/src/BeOSBitmap.o
+BEOSFREEAMPUIOBJ += ui/freeamp/beos/src/BeOSMessageDialog.o
+BEOSFREEAMPUIOBJ += ui/freeamp/beos/src/BeOSCanvas.o
+BEOSFREEAMPUIOBJ += ui/freeamp/beos/src/BeOSFont.o
+BEOSFREEAMPUIOBJ += ui/freeamp/beos/src/BeOSPreferenceWindow.o
+BEOSFREEAMPUIOBJ += ui/freeamp/beos/src/MainWindow.o
+BEOSFREEAMPUIOBJ += ui/freeamp/beos/src/CanvasView.o
+BEOSFREEAMPUIOBJ += ui/freeamp/beos/src/ThemeManager.o
+BEOSFREEAMPUIOBJ += ui/freeamp/beos/src/PrefWindow.o
+BEOSFREEAMPUIOBJ += ui/freeamp/beos/src/PrefView.o
 BEOSFREEAMPUILIBS = -ltranslation -ltracker -lbe
 
 plugins/freeamp.ui: $(FREEAMPUIOBJ)

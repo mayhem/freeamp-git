@@ -3058,7 +3058,7 @@ if test "$have_gtk" = "true"; then
 EOF
 
 elif test "$host_os" = "beos"; then
-  #OSDEPPLUGINS="$OSDEPPLUGINS plugins/musicbrowser.ui"
+  OSDEPPLUGINS="$OSDEPPLUGINS plugins/musicbrowser.ui"
   OSDEPPLUGINS="$OSDEPPLUGINS plugins/freeamp.ui"
   OSINC="$OSINC -Iui/musicbrowser/beos/include"
   # freeampui's Font.h and friends conflict with Be API, thus the junk below.
