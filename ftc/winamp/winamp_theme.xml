@@ -5,6 +5,7 @@
 <Bitmap Name="Posbar" File="posbar.bmp"/>
 <Bitmap Name="Volume" File="volume.bmp"/>
 <Bitmap Name="Text" File="text.bmp"/>
+<Bitmap Name="Numbers" File="numbers.bmp"/>
 
 <ThemeInfo Name="Winamp Base" Author="Isaac Richards" 
            EMail="info@freeamp.org" WebPage="http://www.freeamp.org"/>
@@ -171,7 +172,7 @@ None||Repeat current"/>
         <PixmapFontControl Name="Title" IgnoreCase="yes">
             <Position Rect="112, 27, 261, 32"/>
             <ControlBitmap Rect="0, 0, 154, 17" Name="Text"/>
-            <FontMap Map="ABCDEFGHIJKLMNOPQRSTUVWXYZ`@   "/>
+            <FontMap Map="ABCDEFGHIJKLMNOPQRSTUVWXYZ`@@  "/>
             <FontMap Map="0123456789 _:()-'!_+\/[]^&%.=$#"/>
             <FontMap Map="ежд?*                          "/>
         </PixmapFontControl>

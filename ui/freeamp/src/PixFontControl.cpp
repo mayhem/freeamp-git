@@ -148,7 +148,7 @@ void PixFontControl::BlitLetter(char letter, Rect oDestRect)
 
     srcRect.x1 = m_lettermap[letter].col * m_LetterWidth; 
     srcRect.y1 = m_lettermap[letter].row * m_LetterHeight;
-    srcRect.x2 = srcRect.x1 + m_LetterWidth;
+    srcRect.x2 = srcRect.x1 + m_LetterWidth - 1;
     srcRect.y2 = srcRect.y2 + m_LetterHeight;
 
     oDestRect.x2++;
@@ -157,9 +157,6 @@ void PixFontControl::BlitLetter(char letter, Rect oDestRect)
     Canvas *pCanvas;
     pCanvas = m_pParent->GetCanvas();
     pCanvas->MaskBlitRect(m_pBitmap, srcRect, oDestRect);
-
-    pCanvas->Invalidate(oDestRect);
-    pCanvas->Update();
 }
 
 int PixFontControl::BlitString(string &oText, int iOffset)
@@ -206,7 +203,12 @@ int PixFontControl::BlitString(string &oText, int iOffset)
     }
     else
         currentOffset = width - m_oRect.Width();
-   
+
+    Canvas *pCanvas;
+    pCanvas = m_pParent->GetCanvas();
+    pCanvas->Invalidate(m_oRect);
+    pCanvas->Update();
+ 
     if (currentOffset > 0)
         return currentOffset;
     return 0;    
