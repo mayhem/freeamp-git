@@ -506,6 +506,8 @@ SetDefaults()
         SetPrefString(kALSADevicePref, kDefaultALSADevice);
     
     Preferences::SetDefaults();
+
+    return kError_NoErr;
 }
 
 Error
@@ -697,7 +699,7 @@ GetFirstLibDir(char *path, uint32 *len)
 //      cout << "Using env: " << pEnv << endl;
         pPath = strdup_new(pEnv);
     } else {
-        pPath = strdup_new(GetLibDirs());
+        pPath = strdup_new((char *)GetLibDirs());
     }
     pEnv = pPath;
     LibDirFindHandle *hLibDirFind = new LibDirFindHandle();
