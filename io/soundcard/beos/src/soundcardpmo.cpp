@@ -44,6 +44,8 @@ ____________________________________________________________________________*/
 
 LogFile*	g_Log;
 
+int32 SoundCardPMO::s_lastVolume = 100;
+
 extern "C" {
 
 PhysicalMediaOutput* Initialize(FAContext *context)
@@ -120,7 +122,10 @@ int32
 SoundCardPMO::GetVolume( void )
 {
 	PRINT(( "SoundCardPMO::GetVolume\n" ));
-    if ( !m_player ) return 0;
+    if ( !m_player )
+	{
+		return s_lastVolume;
+	}
 	int32 volume = int32( m_player->Volume() * 100.0 );
 	return volume;
 }
@@ -133,6 +138,7 @@ SoundCardPMO::SetVolume( int32 volume )
     {
         m_player->SetVolume( float( volume ) / 100.0 );
     }
+	s_lastVolume = volume;
 }
 
 void
@@ -249,14 +255,15 @@ SoundCardPMO::Init( OutputInfo* info )
 		return kError_InitFailed;
 	}
 
-	printf( "Frame Rate : %f\n", m_format.frame_rate );
-	printf( "Format : %x\n", (int)m_format.format );
-	printf( "Channel Count : %d\n", (int)m_format.channel_count );
+	PRINT(( "Frame Rate : %f\n", m_format.frame_rate ));
+	PRINT(( "Format : %x\n", (int)m_format.format ));
+	PRINT(( "Channel Count : %d\n", (int)m_format.channel_count ));
 
 #if USE_DUMMY_PLAYER
 	m_dummyPlayerThread = Thread::CreateThread();
 	m_dummyPlayerThread->Create( _DummyPlayerHook, this );
 #else
+    m_player->SetVolume( float( s_lastVolume ) / 100.0 );
 	m_player->Start();
 	m_player->SetHasData( true );
 #endif
@@ -311,7 +318,6 @@ SoundCardPMO::HandleTimeInfoEvent( PMOTimeInfoEvent* event )
 {
     int32 hours, minutes, seconds, total;
     MediaTimeInfoEvent* mtie;
-	PRINT(( "SoundCardPMO::HandleTimeInfoEvent: FIXME\n" ));
 
     if ( !m_player ) return;
 
@@ -399,7 +405,6 @@ SoundCardPMO::EventBufferThread( void )
 		// Now, work hand in hand with the Player method, dealing with
 		// events as requested by the Player method.
 		m_eventSem.Wait();
-		PRINT(( "SoundCardPMO::EventBufferThread:event is waiting to be dispatched\n" ));
 //		Event*	event = eb->GetEvent();
 		if ( m_event != NULL )
 		{
@@ -413,7 +418,7 @@ SoundCardPMO::EventBufferThread( void )
 			}
 			else if ( m_event->Type() == PMO_Info )
 			{
-				PRINT(( "SoundCardPMO::EventBufferThread:PMO_Info recv'd\n" ));
+				//PRINT(( "SoundCardPMO::EventBufferThread:PMO_Info recv'd\n" ));
                 HandleTimeInfoEvent( (PMOTimeInfoEvent*)m_event );
 			}
 			else if ( m_event->Type() == PMO_Quit )
@@ -591,9 +596,9 @@ SoundCardPMO::Player(
 	}
 	eb->EndRead( bytesCopied );
     m_totalBytesWritten += bytesCopied;
-	PRINT(( "SoundCardPMO::Player: %d bytes copied\n", bytesCopied ));
 
 	m_pauseLock.Unlock();
+    m_pLmc->Wake();
     UpdateBufferStatus();
 
 	return;

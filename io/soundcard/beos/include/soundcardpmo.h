@@ -112,8 +112,9 @@ private:
     int32                   m_lastFrame;
     int64                   m_totalBytesWritten;
     Event*                  m_event;
+    static int32            s_lastVolume;
 #if DEBUG_SAVE_PCM
-	FILE*					m_pcmSaveFile;
+    FILE*                   m_pcmSaveFile;
 #endif
 };
 
