@@ -256,8 +256,8 @@ bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent)
     m_pages.push_back(page);
         
     GetPrefsValues(&m_originalValues);
-
-    m_proposedValues = m_currentValues = m_originalValues;
+    GetPrefsValues(&m_currentValues);
+    GetPrefsValues(&m_proposedValues);
 
     //result = (PropertySheet(&psh) > 0);
     result = (DialogBox(hinst, 

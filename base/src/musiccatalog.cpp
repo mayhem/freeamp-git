@@ -750,9 +750,12 @@ Error MusicCatalog::RePopulateFromDatabase()
         key = m_database->NextKey(key);
     }
     m_catMutex->Release();
-    set<string> *newset = new set<string>(*m_sigs);
-    m_context->target->AcceptEvent(new GenerateSignatureEvent(newset));
-    m_sigs->erase(m_sigs->begin(), m_sigs->end());
+    if (!m_sigs->empty()) {
+        set<string> *newset = new set<string>;
+        newset->insert(m_sigs->begin(), m_sigs->end());
+        m_context->target->AcceptEvent(new GenerateSignatureEvent(newset));
+        m_sigs->erase(m_sigs->begin(), m_sigs->end());
+    }
     return kError_NoErr;
 }
 
