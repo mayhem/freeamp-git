@@ -534,6 +534,7 @@ void AlsaPMO::WorkerThread(void)
           iRet = snd_pcm_write(m_handle,pBuffer,m_iDataSize);
           if (iRet == -EAGAIN)
           {
+               CheckForBufferUp();
                WasteTime();
                continue;
           }

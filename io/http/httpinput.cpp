@@ -927,7 +927,6 @@ void HttpInput::WorkerThread(void)
    }   
 
    m_pSleepSem->Wait(); 
-int iDebugCount = 1;
 
    for(; !m_bExit;)
    {
@@ -946,17 +945,6 @@ int iDebugCount = 1;
           continue;
       }
 
-//if ((iDebugCount % 100) == 0)
-//{
-//   return;
-////   printf("Sleeping for 10 secs\n");
-//   sleep(10);
-//   printf("Back from sleep\n");
-//}
-//else
-//   printf("%04d\n", iDebugCount);
-//iDebugCount++;
-       
       eError = m_pOutputBuffer->BeginWrite(pBuffer, iReadSize);
       if (eError == kError_NoErr)
       {
