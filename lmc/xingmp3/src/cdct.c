@@ -102,10 +102,12 @@ void fdct32(float x[], float c[])
    float b[32];
    int p, q;
 #endif
+
    float *src = x;
 
 #ifdef  _EQUALIZER_ENABLE_
    int i;
+   float b[32];
    if (enableEQ) {
        for(i=0; i<32; i++)
 	   b[i] = x[i] * equalizer[i];

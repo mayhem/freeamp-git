@@ -36,14 +36,12 @@ ____________________________________________________________________________*/
 #include "preferences.h"
 #include "facontext.h"
 #include "log.h"
+#include "debug.hpp"
+
+#define DB Debug_v("%s:%d", __FILE__, __LINE__);
 
 // XXX: This can and should be gotten rid of
 static FAContext *g_Context = 0;
-
-const int iDefaultBufferSize  = 512 * 1024;
-const int iOrigBufferSize     = 64 * 1024;
-const int iOverflowSize       = 0;
-const int iWriteTriggerSize   = 4192;
 
 #define WRITESLEEPTIME        50      /*  50 msecs  */
 
@@ -145,19 +143,15 @@ DSEnumCallback( LPGUID  lpGuid,
 
 DSoundCardPMO::
 DSoundCardPMO(FAContext *context):
-     EventBuffer(iOrigBufferSize, iOverflowSize, iWriteTriggerSize, context)
+     PhysicalMediaOutput(context)
 {
   HRESULT hResult;
-
-  m_context = context;
-  m_prefs = context->prefs;
 
   m_samples_per_second  = 0;
   m_data_size           = 0;
   m_wfex                = NULL;
   m_initialized         = false;
   m_pBufferThread       = NULL;
-  m_bExit               = false;
   m_iLastFrame          = -1;
   m_iTotalBytesWritten  = 0;
 
@@ -197,8 +191,8 @@ DSoundCardPMO::
   int i;
 
   m_bExit = true;
-  m_pWriteSem->Signal();
-  m_pReadSem->Signal();
+  m_pSleepSem->Signal();
+  m_pPauseSem->Signal();
   m_pDSBufferSem->Signal();
   m_pDSWriteSem->Signal();
 
@@ -277,22 +271,10 @@ Init(OutputInfo* info)
   m_samples_per_second  = info->samples_per_second;
   m_data_size           = info->max_buffer_size;
 
-  m_propManager->GetProperty("MainHwnd", &pProp);
+  m_pPropManager->GetProperty("MainHwnd", &pProp);
   if (pProp)
   {
     m_hMainWndHandle = (HWND) atoi(((StringPropValue *)pProp)->GetString());
-  }
-
-  m_context->prefs->GetOutputBufferSize(&iNewSize);
-  iNewSize *= 1024;
-
-  iNewSize -= iNewSize % m_data_size;
-  result = Resize(iNewSize, 0, m_data_size);
-  if (IsError(result))
-  {
-    ReportError("Internal buffer sizing error occurred.");
-    m_context->log->Error("Resize output buffer failed.\n");
-    return result;
   }
 
   m_iBytesPerSample = info->number_of_channels * (info->bits_per_sample >> 3);
@@ -316,7 +298,7 @@ Init(OutputInfo* info)
 																																						DSSCL_PRIORITY);
     if (FAILED(hResult))
     {
-      m_context->log->Log(LogOutput, "error cannot set DirectSound DSSCL_PRIORITY Cooperative Level...\n");
+      m_pContext->log->Log(LogOutput, "error cannot set DirectSound DSSCL_PRIORITY Cooperative Level...\n");
       return result;
     }
 
@@ -330,7 +312,7 @@ Init(OutputInfo* info)
                                               NULL);
     if (FAILED(hResult))
     {
-      m_context->log->Log(LogOutput, "error Creating DirectSound Primary Buffer...\n");
+      m_pContext->log->Log(LogOutput, "error Creating DirectSound Primary Buffer...\n");
       return result;
     }
 
@@ -350,7 +332,7 @@ Init(OutputInfo* info)
       hResult = m_DSBufferManager.pDSPrimaryBuffer->SetFormat(&format);
       if (FAILED(hResult))
       {
-        m_context->log->Log(LogOutput, "Cannot Set DirectSound Primary Buffer Format...\n");
+        m_pContext->log->Log(LogOutput, "Cannot Set DirectSound Primary Buffer Format...\n");
         return result;
       }
     }
@@ -380,7 +362,7 @@ Init(OutputInfo* info)
                                       DSBCAPS_CTRLPAN             |
                                       DSBCAPS_CTRLVOLUME          |
                                       DSBCAPS_GETCURRENTPOSITION2 |
-                                      DSBCAPS_GLOBALFOCUS;
+									  DSBCAPS_GLOBALFOCUS;
   DSBufferInfo.dwBufferBytes      = m_DSBufferManager.dwBufferSize;
   DSBufferInfo.lpwfxFormat        = m_wfex;
 
@@ -391,7 +373,7 @@ Init(OutputInfo* info)
                                             NULL);
   if (FAILED(hResult))
   {
-    m_context->log->Log(LogOutput, "error Creating DirectSound Secondary Buffer...\n");
+    m_pContext->log->Log(LogOutput, "error Creating DirectSound Secondary Buffer...\n");
     m_DSBufferManager.pDSSecondaryBuffer = NULL;
     return result;
   }
@@ -407,35 +389,7 @@ Init(OutputInfo* info)
   return kError_NoErr;
 }
 
-void
-DSoundCardPMO::
-WaitToQuit()
-{
-  if (m_pBufferThread)
-  {
-    m_pBufferThread->Join();
-    delete m_pBufferThread;
-    m_pBufferThread = NULL;
-  }
-}
-
-int
-DSoundCardPMO::
-GetBufferPercentage()
-{
-  return PullBuffer::GetBufferPercentage();
-}
-
-Error
-DSoundCardPMO::
-Break()
-{
-  PullBuffer::BreakBlocks();
-
-  return kError_NoErr;
-}
-
-Error
+void 
 DSoundCardPMO::
 Pause()
 {
@@ -443,10 +397,10 @@ Pause()
   m_bLMCsaidToPlay = false;
   m_bIsBufferEmptyNow = false;
 
-  return kError_NoErr;
+  PhysicalMediaOutput::Pause();
 }
 
-Error
+void
 DSoundCardPMO::
 Resume()
 {
@@ -455,20 +409,9 @@ Resume()
   // otherwise, it's a seek or a stop (DSClear has been called)
   // and we let the Monitor decide to start playing when there are data
   if ((m_DSBufferManager.pDSSecondaryBuffer) && (m_bIsBufferEmptyNow == false))
-    m_DSBufferManager.pDSSecondaryBuffer->Play( 0,
-																								0,
-																								DSBPLAY_LOOPING);
+    m_DSBufferManager.pDSSecondaryBuffer->Play( 0, 0, DSBPLAY_LOOPING);
 
-  return kError_NoErr;
-}
-
-Error
-DSoundCardPMO::
-SetPropManager(Properties * p)
-{
-  m_propManager = p;
-
-  return kError_NoErr;
+  PhysicalMediaOutput::Resume();
 }
 
 Error
@@ -484,33 +427,12 @@ Reset(bool user_stop)
   return kError_NoErr;
 }
 
-Error
-DSoundCardPMO::
-BeginWrite(void *&pBuffer, size_t &iBytesToWrite)
-{
-  return EventBuffer::BeginWrite(pBuffer, iBytesToWrite);
-}
-
-Error
-DSoundCardPMO::
-EndWrite(size_t iNumBytesWritten)
-{
-  return EventBuffer::EndWrite(iNumBytesWritten);
-}
-
-Error
-DSoundCardPMO::
-AcceptEvent(Event *pEvent)
-{
-  return EventBuffer::AcceptEvent(pEvent);
-}
-
-Error
+void 
 DSoundCardPMO::
 Clear()
 {
-  DSClear();
-  return EventBuffer::Clear();
+    DSClear();
+    PhysicalMediaOutput::Clear();
 }
 
 void
@@ -530,9 +452,6 @@ HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
   if (pEvent->GetFrameNumber() != m_iLastFrame + 1)
   {
     m_iTotalBytesWritten = 1152 * pEvent->GetFrameNumber() *  m_iBytesPerSample;
-
-    //m_iTotalBytesWritten += 1152 * (pEvent->GetFrameNumber() - m_iLastFrame) *
-    //                        m_iBytesPerSample;
   }
   m_iLastFrame = pEvent->GetFrameNumber();
 
@@ -549,8 +468,7 @@ HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
 
   pmtpi = new MediaTimeInfoEvent(hours, minutes, seconds, 0,
                                 (float)iTotalTime, 0);
-  m_target->AcceptEvent(pmtpi);
-
+  m_pTarget->AcceptEvent(pmtpi);
 }
 
 Error
@@ -561,11 +479,11 @@ GetData(void *&pBuffer)
   unsigned  iRead;
 
   iRead = m_data_size;
-  eRet = BeginRead(pBuffer, iRead);
+  eRet = ((EventBuffer *)m_pInputBuffer)->BeginRead(pBuffer, iRead);
   if (eRet != kError_NoErr)
     return eRet;
 
-  eRet = EndRead(0);
+  eRet = ((EventBuffer *)m_pInputBuffer)->EndRead(0);
   if (eRet != kError_NoErr)
     return eRet;
 
@@ -585,7 +503,7 @@ Write(void *pBuffer)
     nState = DSMonitorBufferState();
     if (nState == -1 || nState == OVERFLOW || nState == STOPPING)
     {
-      Sleep(WRITESLEEPTIME);
+      ::Sleep(WRITESLEEPTIME);
     }
     else
       break;
@@ -610,7 +528,7 @@ DSWriteToSecBuffer(int32& wrote, void *pBuffer, int32 length)
   unsigned  iRead;
 
   iRead = m_data_size;
-  result = BeginRead(pBuffer, iRead);
+  result = ((EventBuffer *)m_pInputBuffer)->BeginRead(pBuffer, iRead);
   if (result != kError_NoErr)
     return result;
 
@@ -619,12 +537,11 @@ DSWriteToSecBuffer(int32& wrote, void *pBuffer, int32 length)
 
   // get a lock to a memory region to write to
   hResult = m_DSBufferManager.pDSSecondaryBuffer->Lock(	m_DSBufferManager.dwWritePtr,
-																												length,
-																												&ptr1,
-																												&dwBytes1,
-																												&ptr2,
-																												&dwBytes2,
-																												0);
+														length,
+														&ptr1,
+														&dwBytes1,
+														&ptr2,																											&dwBytes2,
+														0);
   if (hResult == DSERR_BUFFERLOST)
   {
     hResult = m_DSBufferManager.pDSSecondaryBuffer->Restore();
@@ -632,23 +549,23 @@ DSWriteToSecBuffer(int32& wrote, void *pBuffer, int32 length)
     {
       wrote = 0;
       m_pDSWriteSem->Signal();
-      m_context->log->Log(LogOutput, "Exiting DSWriteToSecBuffer with DSound error\n");
+      m_pContext->log->Log(LogOutput, "Exiting DSWriteToSecBuffer with DSound error\n");
       return result;
     }
     hResult = m_DSBufferManager.pDSSecondaryBuffer->Lock(	m_DSBufferManager.dwWritePtr,
-																													length,
-																													&ptr1,
-																													&dwBytes1,
-																													&ptr2,
-																													&dwBytes2,
-																													0);
+															length,
+															&ptr1,
+															&dwBytes1,
+															&ptr2,
+															&dwBytes2,
+															0);
   }
 
   if (FAILED(hResult))
   {
     wrote = 0;
     m_pDSWriteSem->Signal();
-    m_context->log->Log(LogOutput, "Exiting DSWriteToSecBuffer with DSound error\n");
+    m_pContext->log->Log(LogOutput, "Exiting DSWriteToSecBuffer with DSound error\n");
     return result;
   }
 
@@ -673,15 +590,12 @@ DSWriteToSecBuffer(int32& wrote, void *pBuffer, int32 length)
   }
 
   // unlock the memory region
-  m_DSBufferManager.pDSSecondaryBuffer->Unlock(	ptr1,
-																								dwBytes1,
-																								ptr2,
-																								dwBytes2);
+  m_DSBufferManager.pDSSecondaryBuffer->Unlock(	ptr1, dwBytes1, ptr2, dwBytes2);
   if (FAILED(hResult))
   {
     wrote = 0;
     m_pDSWriteSem->Signal();
-    m_context->log->Log(LogOutput, "Exiting DSWriteToSecBuffer with DSound error\n");
+    m_pContext->log->Log(LogOutput, "Exiting DSWriteToSecBuffer with DSound error\n");
     return result;
   }
 
@@ -689,7 +603,7 @@ DSWriteToSecBuffer(int32& wrote, void *pBuffer, int32 length)
   // release the write semaphore
   m_pDSWriteSem->Signal();
 
-  result = EndRead(iRead);
+  result = ((EventBuffer *)m_pInputBuffer)->EndRead(iRead);
   if (result != kError_NoErr)
     return result;
 
@@ -738,7 +652,7 @@ DSMonitorBufferState()
   switch(m_DSBufferManager.state)
   {
     case UNDERFLOW:
-//      m_context->log->Log(LogOutput, "UNDERFLOW    : %d\n", dwBuffered*100/m_DSBufferManager.dwBufferSize);
+//      m_pContext->log->Log(LogOutput, "UNDERFLOW    : %d\n", dwBuffered*100/m_DSBufferManager.dwBufferSize);
       if (dwBuffered > m_DSBufferManager.dwTrigger)
       {
         if (dwBuffered >= m_DSBufferManager.dwBufferSize)
@@ -752,16 +666,14 @@ DSMonitorBufferState()
 
         // restart the buffer
         if (m_bLMCsaidToPlay && m_bIsBufferEmptyNow)
-        m_DSBufferManager.pDSSecondaryBuffer->Play(	0,
-													0,
-													DSBPLAY_LOOPING);
+        m_DSBufferManager.pDSSecondaryBuffer->Play(	0, 0, DSBPLAY_LOOPING);
 
         m_bIsBufferEmptyNow = false;
       }
       break;
 
     case NORMAL:
-//      m_context->log->Log(LogOutput, "NORMAL       : %d\n", dwBuffered*100/m_DSBufferManager.dwBufferSize);
+//      m_pContext->log->Log(LogOutput, "NORMAL       : %d\n", dwBuffered*100/m_DSBufferManager.dwBufferSize);
       if (dwBuffered < m_DSBufferManager.dwUnderflow)
       {
         new_state = STOPPING;
@@ -780,7 +692,7 @@ DSMonitorBufferState()
     break;
 
     case OVERFLOW:
-//      m_context->log->Log(LogOutput, "OVERFLOW     : %d\n", dwBuffered*100/m_DSBufferManager.dwBufferSize);
+//      m_pContext->log->Log(LogOutput, "OVERFLOW     : %d\n", dwBuffered*100/m_DSBufferManager.dwBufferSize);
       if (dwBuffered < m_DSBufferManager.dwUnderflow)
       {
         new_state = STOPPING;
@@ -793,7 +705,7 @@ DSMonitorBufferState()
       break;
 
     case STOPPING:
-//      m_context->log->Log(LogOutput, "STOPPING     : %d\n", dwBuffered*100/m_DSBufferManager.dwBufferSize);
+//      m_pContext->log->Log(LogOutput, "STOPPING     : %d\n", dwBuffered*100/m_DSBufferManager.dwBufferSize);
       if (dwBuffered < m_DSBufferManager.dwZerofill)
       {
         Reset(true);
@@ -871,84 +783,120 @@ void
 DSoundCardPMO::
 WorkerThread(void)
 {
-  void*   pBuffer;
-  Error   eErr;
-  Event*  pEvent;
-  int32 iValue;
+   void*   pBuffer;
+   Error   eErr;
+   Event*  pEvent;
+   int32 iValue;
 
-  m_prefs->GetDecoderThreadPriority(&iValue);
+   // Don't do anything until resume is called.
+   m_pPauseSem->Wait();
 
-  PreBuffer();
+   // Wait for prebuffer period
+   PreBuffer();
 
-  m_pBufferThread->SetPriority(iValue);
+   m_pContext->prefs->GetDecoderThreadPriority(&iValue);
+   m_pBufferThread->SetPriority(iValue);
 
-  for(; !m_bExit;)
-  {
-    if (!m_initialized)
-    {
-      pEvent = GetEvent();
-
-      if (pEvent == NULL)
+   for(; !m_bExit;)
+   {
+      if (m_bPause)
       {
-        m_pReadSem->Wait();
-        continue;
+          m_pPauseSem->Wait();
+          continue;
       }
 
-      if (pEvent->Type() == PMO_Init)
+      // Loop until we get an Init event from the LMC
+      if (!m_initialized)
       {
-        if (IsError(Init(((PMOInitEvent *)pEvent)->GetInfo())))
-        {
+          pEvent = ((EventBuffer *)m_pInputBuffer)->GetEvent();
+
+          if (pEvent == NULL)
+          {
+              m_pLmc->Wake();
+              WasteTime();
+
+              continue;
+          }
+
+          if (pEvent->Type() == PMO_Init)
+          {
+              if (IsError(Init(((PMOInitEvent *)pEvent)->GetInfo())))
+              {
+                  delete pEvent;
+                  break;
+              }
+		  }
           delete pEvent;
-          break;
-        }
+
+          continue;
       }
-      delete pEvent;
 
-      continue;
-    }
-
-    eErr = GetData(pBuffer);
-    if (eErr == kError_InputUnsuccessful || eErr == kError_NoDataAvail)
-    {
-      m_pReadSem->Wait();
-      continue;
-    }
-
-    if (eErr == kError_EventPending)
-    {
-      pEvent = GetEvent();
-
-      if (pEvent->Type() == PMO_Init)
-        Init(((PMOInitEvent *)pEvent)->GetInfo());
-
-      if (pEvent->Type() == PMO_Reset)
-        Reset(false);
-
-      if (pEvent->Type() == PMO_Info)
-        HandleTimeInfoEvent((PMOTimeInfoEvent *)pEvent);
-
-      if (pEvent->Type() == PMO_Quit)
+      // Set up reading a block from the buffer. If not enough bytes are
+      // available, sleep for a little while and try again.
+      for(;;)
       {
-        Reset(false);
-        delete pEvent;
-        break;
+		  if (m_bPause || m_bExit)
+			  break;
+		  
+          eErr = GetData(pBuffer);
+		  if (eErr == kError_EndOfStream || eErr == kError_Interrupt)
+             break;
+
+
+          if (eErr == kError_NoDataAvail)
+          {
+              m_pLmc->Wake();
+    
+              WasteTime();
+              continue;
+          }
+
+          // Is there an event pending that we need to take care of
+          // before we play this block of samples?
+          if (eErr == kError_EventPending)
+          {
+              pEvent = ((EventBuffer *)m_pInputBuffer)->GetEvent();
+			  if (pEvent == NULL)
+				  continue;
+
+              if (pEvent->Type() == PMO_Init)
+                  Init(((PMOInitEvent *)pEvent)->GetInfo());
+    
+              if (pEvent->Type() == PMO_Reset)
+                  Reset(true);
+    
+              if (pEvent->Type() == PMO_Info) 
+                  HandleTimeInfoEvent((PMOTimeInfoEvent *)pEvent);
+    
+              if (pEvent->Type() == PMO_Quit) 
+              {
+                  delete pEvent;
+                  m_pTarget->AcceptEvent(new Event(INFO_DoneOutputting));
+				  
+                  return;
+              }
+ 
+              delete pEvent;
+    
+              continue;
+          }
+          
+          if (IsError(eErr))
+          {
+              ReportError("Internal error occured.");
+              m_pContext->log->Error("Cannot read from buffer in PMO "
+                                    "worker tread: %d\n", eErr);
+              return;
+          }
+          break;
       }
+	  if (m_bPause || m_bExit)
+		 continue;
 
-      delete pEvent;
-
-      continue;
-    }
-
-    if (IsError(eErr))
-    {
-      ReportError("Internal error occured.");
-      m_context->log->Error("Cannot read from buffer in PMO worker tread: %d\n",
-      eErr);
-      break;
-    }
-
-    Write(pBuffer);
+      Write(pBuffer);
+	  m_pLmc->Wake();
   }
-  m_context->log->Log(LogOutput, "PMO: Soundcard thread exiting\n");
+
+  m_pContext->log->Log(LogOutput, "PMO: Soundcard thread exiting\n");
 }
 

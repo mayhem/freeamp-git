@@ -271,7 +271,6 @@ Error XingLMC::GetHeadInfo()
 Error XingLMC::CanDecode()
 {
    Error      Err;
-   int32      dummy;
 
    if (!m_pInputBuffer)
    {

@@ -174,7 +174,7 @@ void dequant(SAMPLE Sample[], int *nsamp,
 	       Sample[i].x = xs * look_pow[ISMAX + Sample[i].s];
 	    else
 	    {
-		float tmpConst = (1.0/3.0);
+		float tmpConst = (float)(1.0/3.0);
 	       tmp = (double) Sample[i].s;
 	       Sample[i].x = (float) (xs * tmp * pow(fabs(tmp), tmpConst));
 	    }
@@ -217,7 +217,7 @@ block type = 2  short blocks
 		  buf[j][w] = xs * look_pow[ISMAX + Sample[i].s];
 	       else
 	       {
-		  float tmpConst = (1.0/3.0);
+		  float tmpConst = (float)(1.0/3.0);
 		  tmp = (double) Sample[i].s;
 		  buf[j][w] = (float) (xs * tmp * pow(fabs(tmp), tmpConst));
 	       }

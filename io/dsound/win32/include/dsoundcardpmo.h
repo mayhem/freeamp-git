@@ -1,4 +1,3 @@
-
 /*____________________________________________________________________________
 
   FreeAmp - The Free MP3 Player
@@ -70,7 +69,7 @@ typedef struct {
   LPDIRECTSOUNDBUFFER pDSSecondaryBuffer;
 } DSBufferManager;
 
-class DSoundCardPMO : public PhysicalMediaOutput, public EventBuffer
+class DSoundCardPMO : public PhysicalMediaOutput
 {
 
 public:
@@ -78,20 +77,13 @@ public:
   virtual ~DSoundCardPMO();
 
   virtual Error   Init(OutputInfo* info);
-  virtual Error   Pause();
-  virtual Error   Resume();
-  virtual Error   Break();
-  virtual void    WaitToQuit();
-  virtual Error   Clear();
 
-  virtual Error   SetPropManager(Properties *p);
+  void            Pause(void);
+  void            Resume(void);
+
   virtual VolumeManager *GetVolumeManager();
 
   static  void    StartWorkerThread(void *);
-  virtual Error   BeginWrite(void *&pBuffer, size_t &iBytesToWrite);
-  virtual Error   EndWrite  (size_t iNumBytesWritten);
-  virtual Error   AcceptEvent(Event *);
-  virtual int     GetBufferPercentage();
 
   DSBufferManager m_DSBufferManager;
   HWND            m_hMainWndHandle;
@@ -105,14 +97,11 @@ public:
   Error           GetData(void *&pBuffer);
   Error           Write(void *pBuffer);
 
+  void            Clear(void);
   void            DSClear();
   void            DSReset();
   int32           DSMonitorBufferState();
   Error           DSWriteToSecBuffer(int32&, void*, int32);
-
-  FAContext*      m_context;
-  Preferences*    m_prefs;  
-  Properties*     m_propManager;
   WAVEFORMATEX*   m_wfex;
 
   uint32          m_samples_per_second;
