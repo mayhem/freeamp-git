@@ -108,10 +108,10 @@ freeamp: $(FREEAMPOBJ) $(freeamp_DEPENDENCIES)
 	$(COMPILE) $(FPIC) -c $< -o $@
 
 .asm.asm1:
-       $(PERL) -pe 's/\b_//g' $< > $@
+	$(PERL) -pe 's/\b_//g' $< > $@
 
-.asm1.o:
-       $(NASM) -f elf -o $@ $<
+.asm1.:
+	$(NASM) -f elf -o $@ $<
 
 .s.o:
 	$(COMPILE) -c $< -o $@
