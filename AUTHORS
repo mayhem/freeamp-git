@@ -12,5 +12,6 @@ Other major contributors and their contributions:
 * ID3v1 tag parsing
 * PlayList Shuffle method
 
-
+"Gabor Fleischer" <flocsy@usa.net>
+* alsa-linux.pmo: Output to ALSA 1:1 and keep 1:0 to pure programs
 

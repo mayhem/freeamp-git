@@ -2981,6 +2981,50 @@ if test "$mitpth" = "false"; then
 fi
 
 
+echo $ac_n "checking for main in -lasound""... $ac_c" 1>&6
+echo "configure:2986: checking for main in -lasound" >&5
+ac_lib_var=`echo asound'_'main | sed 'y%./+-%__p_%'`
+if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  ac_save_LIBS="$LIBS"
+LIBS="-lasound  $LIBS"
+cat > conftest.$ac_ext <<EOF
+#line 2994 "configure"
+#include "confdefs.h"
+
+int main() {
+main()
+; return 0; }
+EOF
+if { (eval echo configure:3001: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
+  rm -rf conftest*
+  eval "ac_cv_lib_$ac_lib_var=yes"
+else
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
+  rm -rf conftest*
+  eval "ac_cv_lib_$ac_lib_var=no"
+fi
+rm -f conftest*
+LIBS="$ac_save_LIBS"
+
+fi
+if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
+  echo "$ac_t""yes" 1>&6
+    ac_tr_lib=HAVE_LIB`echo asound | sed -e 's/[^a-zA-Z0-9_]/_/g' \
+    -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
+  cat >> confdefs.h <<EOF
+#define $ac_tr_lib 1
+EOF
+
+  LIBS="-lasound $LIBS"
+
+else
+  echo "$ac_t""no" 1>&6
+fi
+
+
 
 
 if test "$hblt" = "true"; then
@@ -3160,6 +3204,8 @@ trap 'rm -fr `echo "Makefile base/Makefile base/src/Makefile io/Makefile
 	  io/soundcard/Makefile io/soundcard/unix/Makefile io/soundcard/unix/linux/Makefile
 	  io/soundcard/unix/linux/src/Makefile base/unix/src/Makefile ui/mpg123/Makefile ui/gtk/Makefile
 	  ui/lcd/Makefile ui/lcd/src/Makefile
+ 	  io/alsa/Makefile io/alsa/unix/Makefile io/alsa/unix/linux/Makefile
+ 	  io/alsa/unix/linux/src/Makefile
  config/config.h" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
 cat >> $CONFIG_STATUS <<EOF
@@ -3288,6 +3334,8 @@ CONFIG_FILES=\${CONFIG_FILES-"Makefile base/Makefile base/src/Makefile io/Makefi
 	  io/soundcard/Makefile io/soundcard/unix/Makefile io/soundcard/unix/linux/Makefile
 	  io/soundcard/unix/linux/src/Makefile base/unix/src/Makefile ui/mpg123/Makefile ui/gtk/Makefile
 	  ui/lcd/Makefile ui/lcd/src/Makefile
+ 	  io/alsa/Makefile io/alsa/unix/Makefile io/alsa/unix/linux/Makefile
+ 	  io/alsa/unix/linux/src/Makefile
 "}
 EOF
 cat >> $CONFIG_STATUS <<\EOF

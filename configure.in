@@ -262,6 +262,9 @@ fi
 
 dnl *****
 
+dnl Replace `main' with a function in -lasound:
+AC_CHECK_LIB(asound, main)
+
 AM_CONDITIONAL(AM_HAVE_LINUXTHREADS, test "$hblt" = "true")
 
 AC_ARG_ENABLE(cmdline,
@@ -294,6 +297,8 @@ AC_OUTPUT(Makefile base/Makefile base/src/Makefile io/Makefile
 	  io/soundcard/Makefile io/soundcard/unix/Makefile io/soundcard/unix/linux/Makefile
 	  io/soundcard/unix/linux/src/Makefile base/unix/src/Makefile ui/mpg123/Makefile ui/gtk/Makefile
 	  ui/lcd/Makefile ui/lcd/src/Makefile
+ 	  io/alsa/Makefile io/alsa/unix/Makefile io/alsa/unix/linux/Makefile
+ 	  io/alsa/unix/linux/src/Makefile
 )
 
 

@@ -22,5 +22,5 @@
 ##
 ############################################################################
 
-SUBDIRS = local http src soundcard alsa
+SUBDIRS = src
 

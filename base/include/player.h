@@ -75,7 +75,7 @@ class Player : public EventQueue, Properties  {
     virtual Error GetProperty(const char *, void **);
     virtual Error SetProperty(const char *, void *, bool);
     virtual Error RegisterPropertyWatcher(const char *, PropertyWatcher *);
-
+    virtual Error RemovePropertyWatcher(const char *, PropertyWatcher *);
  protected:
     Player();
     void GetUIManipLock();
