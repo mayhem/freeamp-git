@@ -21,7 +21,7 @@ Type=2
 Compress=1
 Sign=0
 Transfer=0
-Files=38
+Files=40
 
 [Engine]
 Setup=disk1\SETUP.EXE
@@ -108,180 +108,192 @@ Flags=1
 Disk=0
 
 [File 9]
+Name=freeamp.cnt
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 10]
 Name=freeamp.exe
 Path=Media\32bit\Disk Images\disk1\
 Flags=65537
 Disk=0
 
-[File 10]
+[File 11]
 Name=freeamp.fat
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
-[File 11]
-Name=freeamp.ui
-Path=Media\32bit\Disk Images\disk1\
-Flags=1
-Disk=0
-
 [File 12]
-Name=httpinput.pmi
+Name=freeamp.hlp
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
 [File 13]
-Name=id3v1.mdf
+Name=freeamp.ui
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
 [File 14]
-Name=id3v2.mdf
+Name=httpinput.pmi
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
 [File 15]
-Name=lang.dat
+Name=id3v1.mdf
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
 [File 16]
-Name=layout.bin
+Name=id3v2.mdf
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
 [File 17]
-Name=m3u.plf
+Name=lang.dat
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
 [File 18]
-Name=msvcirt.dll
+Name=layout.bin
 Path=Media\32bit\Disk Images\disk1\
-Flags=131089
+Flags=1
 Disk=0
 
 [File 19]
-Name=msvcp50d.dll
+Name=m3u.plf
 Path=Media\32bit\Disk Images\disk1\
-Flags=131089
+Flags=1
 Disk=0
 
 [File 20]
-Name=msvcrtd.dll
+Name=misc.mdf
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 21]
+Name=msvcp50.dll
 Path=Media\32bit\Disk Images\disk1\
 Flags=131089
 Disk=0
 
-[File 21]
+[File 22]
 Name=musicbrowser.ui
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
-[File 22]
+[File 23]
 Name=obsinput.pmi
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
-[File 23]
+[File 24]
 Name=os.dat
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
-[File 24]
+[File 25]
 Name=pmp300.ppp
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
-[File 25]
+[File 26]
 Name=portio.sys
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
-[File 26]
+[File 27]
 Name=ReadMe.txt
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
-[File 27]
+[File 28]
+Name=roboex32.dll
+Path=Media\32bit\Disk Images\disk1\
+Flags=131089
+Disk=0
+
+[File 29]
 Name=SETUP.EXE
 Path=Media\32bit\Disk Images\disk1\
 Flags=589825
 Disk=0
 
-[File 28]
+[File 30]
 Name=SETUP.INI
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
-[File 29]
+[File 31]
 Name=setup.ins
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
-[File 30]
+[File 32]
 Name=setup.lid
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
-[File 31]
+[File 33]
 Name=soundcard.pmo
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
-[File 32]
+[File 34]
 Name=update.exe
 Path=Media\32bit\Disk Images\disk1\
 Flags=65537
 Disk=0
 
-[File 33]
+[File 35]
 Name=xing.lmc
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
-[File 34]
+[File 36]
 Name=_INST32I.EX_
 Path=Media\32bit\Disk Images\disk1\
 Flags=524289
 Disk=0
 
-[File 35]
+[File 37]
 Name=_ISDEL.EXE
 Path=Media\32bit\Disk Images\disk1\
 Flags=589825
 Disk=0
 
-[File 36]
+[File 38]
 Name=_SETUP.DLL
 Path=Media\32bit\Disk Images\disk1\
 Flags=655377
 Disk=0
 
-[File 37]
+[File 39]
 Name=_sys1.cab
 Path=Media\32bit\Disk Images\disk1\
 Flags=2097153
 Disk=0
 
-[File 38]
+[File 40]
 Name=_user1.cab
 Path=Media\32bit\Disk Images\disk1\
 Flags=2097153

@@ -6,6 +6,8 @@ file3=..\..\Copying.txt
 file4=..\..\Changes.txt
 file5=..\..\Authors.txt
 file6=..\..\base\win32\prj\update.exe
+file7=..\..\base\win32\prj\freeamp.cnt
+file8=..\..\base\win32\prj\freeamp.hlp
 
 [General]
 Type=FILELIST

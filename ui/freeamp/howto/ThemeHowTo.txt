@@ -244,7 +244,7 @@ Window:
 -------
 
 FreeAmp supports different windows in the same theme. The theme
-that ships with Beta 2 only has one window, but later themes will
+that ships with beta 3 only has one window, but later themes will
 have support for window shades and other cool layouts. 
 
 The default window that FreeAmp opens a theme in is called 'MainWindow'.
