@@ -413,7 +413,7 @@ void MusicBrowserUI::PlaylistListItemMoved(const PlaylistItem* item,
     if(index != kInvalidIndex)
     {
         m_bListChanged = true;
-        UpdateButtonMenuStates();
+        UpdateButtonStates();
 
         //char buf[256];
         //sprintf(buf, "oldIndex: %d\tnewIndex: %d\r\n", oldIndex, newIndex);
@@ -444,7 +444,8 @@ void MusicBrowserUI::PlaylistListItemMoved(const PlaylistItem* item,
                               state,
                               LVIS_SELECTED|LVIS_FOCUSED);
 
-        ListView_RedrawItems(m_hPlaylistView, 0, ListView_GetItemCount(m_hPlaylistView) - 1);
+        ListView_RedrawItems(m_hPlaylistView, oldIndex, oldIndex);
+        ListView_RedrawItems(m_hPlaylistView, newIndex, newIndex);
 
         //HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
 
@@ -491,7 +492,7 @@ void MusicBrowserUI::PlaylistListItemRemoved(const PlaylistItem* item,
         SetFocus(m_hPlaylistView);
         m_bListChanged = true;
         UpdateTotalTime();
-        UpdateButtonMenuStates();
+        UpdateButtonStates();
 
         //HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
 
@@ -504,7 +505,7 @@ void MusicBrowserUI::PlaylistListSorted(void)
 {
     ListView_RedrawItems(m_hPlaylistView, 0, ListView_GetItemCount(m_hPlaylistView) - 1);
     m_bListChanged = true;
-    UpdateButtonMenuStates();
+    UpdateButtonStates();
 
     //HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
 
@@ -557,7 +558,7 @@ void MusicBrowserUI::PlaylistListItemAdded(const PlaylistItem* item)
             else
             {
                 m_bListChanged = true;
-                UpdateButtonMenuStates();
+                UpdateButtonStates();
             }
 
             UpdateTotalTime();
@@ -580,8 +581,7 @@ void MusicBrowserUI::PlaylistListItemsAdded(const vector<PlaylistItem*>* items)
 
     if(m_oPlm->CountItems() != count)
     {
-        uint32 newSize = ListView_GetItemCount(m_hPlaylistView);
-        newSize += items->size();
+        uint32 newSize = count + items->size();
         ListView_SetItemCount(m_hPlaylistView, newSize);
     }
 
@@ -598,10 +598,17 @@ void MusicBrowserUI::PlaylistListItemsAdded(const vector<PlaylistItem*>* items)
            !m_autoPlayHack)
             m_context->target->AcceptEvent(new Event(CMD_Play));
 
-        count = items->size();
+        // this speed up adding a lot of files by preventing
+        // the list from updating 
+        SendMessage(m_hPlaylistView, WM_SETREDRAW, FALSE, 0);
 
-        for(uint32 i = 0; i < count; i++)
+        uint32 itemcount = items->size();
+
+        for(uint32 i = 0; i < itemcount; i++)
             ListView_InsertItem(m_hPlaylistView, &lv_item);
+
+        SendMessage(m_hPlaylistView, WM_SETREDRAW, TRUE, 0);
+        ListView_RedrawItems(m_hPlaylistView, count, count + itemcount);
 
         // this skips change notification
         // for initial loading of list for
@@ -612,7 +619,7 @@ void MusicBrowserUI::PlaylistListItemsAdded(const vector<PlaylistItem*>* items)
         else
         {
             m_bListChanged = true;
-            UpdateButtonMenuStates();
+            UpdateButtonStates();
         }
 
         UpdateTotalTime();
@@ -966,7 +973,7 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
 
         case WM_SETFOCUS:
         case WM_KILLFOCUS:
-            UpdateButtonMenuStates();
+            UpdateButtonStates();
             break;
         
         case UWM_MOVEITEMS:

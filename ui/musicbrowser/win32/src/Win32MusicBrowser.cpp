@@ -331,11 +331,11 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
             for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
             {
                 (*i)->AddToolbarButtons(useTextLabels, useImages);
-                (*i)->UpdateButtonMenuStates();
+                (*i)->UpdateButtonStates();
             }
 
             AddToolbarButtons(useTextLabels, useImages);
-            UpdateButtonMenuStates();
+            UpdateButtonStates();
 
             /*if(TreeView_GetChild(m_hMusicView, m_hPortableItem) != NULL)
             {    

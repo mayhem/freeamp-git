@@ -183,7 +183,8 @@ class MusicBrowserUI : public UserInterface
     void   AddToolbarButtons(bool textLabels, bool images);
     void   ToggleVisEvent();
     void   SetTitles();
-    void   UpdateButtonMenuStates();
+    void   UpdateMenuStates();
+    void   UpdateButtonStates();
     void   MoveControls(int iPixelsToMove);
     bool   CreateMainDialog();
     Error  CloseMainDialog();

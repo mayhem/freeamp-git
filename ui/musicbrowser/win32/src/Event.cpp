@@ -635,7 +635,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
 
             case TVN_SELCHANGED:
             {
-                UpdateButtonMenuStates();
+                UpdateButtonStates();
                 break;
             }
 
@@ -904,7 +904,9 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
 
             case LVN_ITEMCHANGED:
             {
-                UpdateButtonMenuStates();
+                // update only when focus is set
+                if(pListView->uNewState&LVIS_FOCUSED)
+                    UpdateButtonStates();
                 break;
             }
 

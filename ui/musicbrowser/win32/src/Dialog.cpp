@@ -375,6 +375,12 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
             break;
         }
 
+        case WM_INITMENU:
+        {
+            UpdateMenuStates();
+            break;
+        }
+
     }
     
     return 0;
@@ -946,7 +952,7 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
     SendMessage(m_hStatus, SB_SETPARTS, kNumPanes, (LPARAM) panes);
     SendMessage(m_hStatus, SB_SETTEXT, 1, (LPARAM) "0:00");
 
-    UpdateButtonMenuStates();
+    UpdateButtonStates();
     m_context->target->AcceptEvent(new Event(CMD_QueryPlayerState));
 
     m_sMinSize.x = 500;
@@ -1461,7 +1467,116 @@ void MusicBrowserUI::MouseButtonUp(int keys, int x, int y)
     }
 }
 
-void MusicBrowserUI::UpdateButtonMenuStates()
+void MusicBrowserUI::UpdateButtonStates()
+{
+    // File Menu
+    SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
+                    ID_FILE_SAVEPLAYLIST, MAKELPARAM(m_bListChanged, 0)); 
+
+    if(m_hPlaylistView == GetFocus())
+    {
+        // Can we move items up and down?
+        uint32 index = ListView_GetItemCount(m_hPlaylistView);
+        uint32 count = ListView_GetSelectedCount(m_hPlaylistView);
+        uint32 state;
+
+        state = ListView_GetItemState(m_hPlaylistView, 
+                                      index - 1, 
+                                      LVIS_SELECTED);
+
+        SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
+                    ID_EDIT_MOVEDOWN, MAKELPARAM(!(state & LVIS_SELECTED || !count), 0)); 
+
+        state = ListView_GetItemState(m_hPlaylistView, 
+                                      0, 
+                                      LVIS_SELECTED);
+
+        SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
+                    ID_EDIT_MOVEUP, MAKELPARAM(!(state & LVIS_SELECTED || !count), 0)); 
+        
+        SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
+                    ID_EDIT_REMOVE, MAKELPARAM(count!=0, 0)); 
+
+        SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
+                    ID_EDIT_EDITINFO, MAKELPARAM(count!=0, 0)); 
+
+        SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
+            ID_EDIT_ADDTRACK, 0); 
+    }
+
+    // what about items which deal with the treeview?
+
+    //HTREEITEM treeSelect = TreeView_GetSelection(m_hMusicView);
+
+    if(m_hMusicView == GetFocus())
+    {
+        SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
+            ID_EDIT_ADDTRACK, 0); 
+
+        uint32 trackCount = 0;
+        uint32 playlistCount = 0;
+
+        trackCount = GetSelectedTrackCount();
+        playlistCount = GetSelectedPlaylistCount();
+
+        if(trackCount + playlistCount)
+        {
+
+            if(!IsItemSelected(m_hNewPlaylistItem) &&
+                !IsItemSelected(m_hNewPlaylistItem))
+            {
+                SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
+                            ID_EDIT_ADDTRACK, MAKELPARAM(TRUE, 0)); 
+            }
+
+            if(!IsItemSelected(m_hPlaylistItem) &&
+               !IsItemSelected(m_hNewPlaylistItem) && 
+               !IsItemSelected(m_hPortableItem) &&
+               !IsItemSelected(m_hNewPortableItem) &&
+               !IsItemSelected(m_hAllItem))
+            {
+                SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
+                        ID_EDIT_REMOVE, MAKELPARAM(TRUE, 0)); 
+            }
+ 
+            if(!IsItemSelected(m_hPlaylistItem) &&
+               !IsItemSelected(m_hNewPlaylistItem) && 
+               !IsItemSelected(m_hPortableItem) &&
+               !IsItemSelected(m_hNewPortableItem) &&
+               trackCount)
+            {
+                SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
+                        ID_EDIT_EDITINFO, MAKELPARAM(TRUE, 0));
+            }
+ 
+            /*if(!IsItemSelected(m_hNewPlaylistItem) && !IsItemSelected(m_hAllItem) &&
+               !IsItemSelected(m_hMyMusicItem) && !IsItemSelected(m_hUncatItem) &&
+               !IsItemSelected(m_hPlaylistItem) && !IsItemSelected(m_hPortableItem) &&
+               (playlistCount && !trackCount) &&
+               !IsItemSelected(m_hMyMusicItem) &&
+               !IsItemSelected(m_hUncatItem) &&
+               !IsItemSelected(m_hAllItem))
+            {
+                SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
+                        ID_EDIT_EDITINFO, MAKELPARAM(TRUE, 0)); 
+            }*/       
+        }
+        else
+        {
+            // Edit Menu
+            SendMessage(m_hToolbar, TB_ENABLEBUTTON, ID_EDIT_REMOVE, 0); 
+            SendMessage(m_hToolbar, TB_ENABLEBUTTON, ID_EDIT_EDITINFO, 0);    
+        }
+ 
+    }
+    
+    //SendMessage(m_hToolbar, TB_ENABLEBUTTON, ID_EDIT_EDIT, 
+    //            MAKELONG(oType.length() != 0, 0));    
+    //SendMessage(m_hToolbar, TB_ENABLEBUTTON, ID_EDIT_REMOVE, 
+    ///            MAKELONG(oType.length() != 0, 0)); 
+}
+
+void MusicBrowserUI::UpdateMenuStates()
 {
     HMENU        hMenuRoot, hMenu;
     MENUITEMINFO sMenuItem;
@@ -1476,9 +1591,6 @@ void MusicBrowserUI::UpdateButtonMenuStates()
     EnableMenuItem(hMenu, ID_FILE_SAVEPLAYLIST, 
                    m_bListChanged ? MF_ENABLED : MF_GRAYED );
 
-    SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
-                    ID_FILE_SAVEPLAYLIST, MAKELPARAM(m_bListChanged, 0)); 
-
     // start off disabled... might enable below
     EnableMenuItem(hMenu, ID_FILE_EXPORTPLAYLIST, MF_GRAYED);
 
@@ -1487,10 +1599,8 @@ void MusicBrowserUI::UpdateButtonMenuStates()
 
     // start off disabled... might enable below
     EnableMenuItem(hMenu, ID_EDIT_REMOVE, MF_GRAYED);
-    SendMessage(m_hToolbar, TB_ENABLEBUTTON, ID_EDIT_REMOVE, 0); 
 
     EnableMenuItem(hMenu, ID_EDIT_EDITINFO, MF_GRAYED);
-    SendMessage(m_hToolbar, TB_ENABLEBUTTON, ID_EDIT_EDITINFO, 0);    
 
     sMenuItem.cbSize = sizeof(MENUITEMINFO);
     sMenuItem.fMask =  MIIM_DATA|MIIM_TYPE;
@@ -1516,9 +1626,6 @@ void MusicBrowserUI::UpdateButtonMenuStates()
         EnableMenuItem(hMenu, ID_EDIT_MOVEDOWN, 
                        (state & LVIS_SELECTED) ? MF_GRAYED : MF_ENABLED );
 
-        SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
-                    ID_EDIT_MOVEDOWN, MAKELPARAM(!(state & LVIS_SELECTED), 0)); 
-
         state = ListView_GetItemState(m_hPlaylistView, 
                                       0, 
                                       LVIS_SELECTED);
@@ -1526,17 +1633,9 @@ void MusicBrowserUI::UpdateButtonMenuStates()
         EnableMenuItem(hMenu, ID_EDIT_MOVEUP, 
                        (state & LVIS_SELECTED) ? MF_GRAYED : MF_ENABLED );
 
-        SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
-                    ID_EDIT_MOVEUP, MAKELPARAM(!(state & LVIS_SELECTED), 0)); 
-        
         EnableMenuItem(hMenu, ID_EDIT_REMOVE, MF_ENABLED);
-        SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
-                    ID_EDIT_REMOVE, MAKELPARAM(TRUE, 0)); 
 
         EnableMenuItem(hMenu, ID_EDIT_EDITINFO, MF_ENABLED);
-        SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
-                    ID_EDIT_EDITINFO, MAKELPARAM(TRUE, 0)); 
-
 
 
         sMenuItem.cbSize = sizeof(MENUITEMINFO);
@@ -1551,19 +1650,11 @@ void MusicBrowserUI::UpdateButtonMenuStates()
     {    
         EnableMenuItem(hMenu, ID_EDIT_MOVEUP, MF_GRAYED);
         EnableMenuItem(hMenu, ID_EDIT_MOVEDOWN, MF_GRAYED);
-
-        SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
-                    ID_EDIT_MOVEUP, 0);    
-        SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
-                    ID_EDIT_MOVEDOWN, 0); 
-
     }
 
     // what about items which deal with the treeview?
 
     EnableMenuItem(hMenu, ID_EDIT_ADDTRACK, MF_GRAYED);
-    SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
-            ID_EDIT_ADDTRACK, 0); 
 
     //HTREEITEM treeSelect = TreeView_GetSelection(m_hMusicView);
 
@@ -1579,8 +1670,6 @@ void MusicBrowserUI::UpdateButtonMenuStates()
             !IsItemSelected(m_hNewPlaylistItem))
         {
             EnableMenuItem(hMenu, ID_EDIT_ADDTRACK, MF_ENABLED );
-            SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
-                        ID_EDIT_ADDTRACK, MAKELPARAM(TRUE, 0)); 
         }
 
         if(!IsItemSelected(m_hPlaylistItem) &&
@@ -1590,8 +1679,6 @@ void MusicBrowserUI::UpdateButtonMenuStates()
            !IsItemSelected(m_hAllItem))
         {
             EnableMenuItem(hMenu, ID_EDIT_REMOVE, MF_ENABLED);
-            SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
-                    ID_EDIT_REMOVE, MAKELPARAM(TRUE, 0)); 
         }
 
         if(!IsItemSelected(m_hPlaylistItem) &&
@@ -1601,8 +1688,6 @@ void MusicBrowserUI::UpdateButtonMenuStates()
            trackCount)
         {
             EnableMenuItem(hMenu, ID_EDIT_EDITINFO, MF_ENABLED);
-            SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
-                    ID_EDIT_EDITINFO, MAKELPARAM(TRUE, 0));
         }
 
         /*if(!IsItemSelected(m_hNewPlaylistItem) && !IsItemSelected(m_hAllItem) &&
@@ -1748,7 +1833,7 @@ void MusicBrowserUI::ShowHelp(uint32 topic)
 
     m_context->prefs->GetInstallDirectory(dir, &len);
     oHelpFile = string(dir);
-    oHelpFile += string("\\"HELP_FILE);    
+    oHelpFile += string("\\freeamp.hlp");    
 
     WinHelp(m_hWnd, oHelpFile.c_str(), HELP_CONTEXT, topic);
 }        

@@ -439,6 +439,10 @@ SOURCE=..\..\..\..\base\include\log.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\include\Median.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\include\MessageDialog.h
 # End Source File
 # Begin Source File

@@ -73,7 +73,7 @@ void MusicBrowserUI::SavePlaylist(void)
     else
     {
         m_bListChanged = false;
-        UpdateButtonMenuStates();
+        UpdateButtonStates();
     }
 }
 
@@ -328,7 +328,7 @@ bool MusicBrowserUI::SaveNewPlaylist(string &oName)
             }
 
             m_bListChanged = false;
-            UpdateButtonMenuStates();
+            UpdateButtonStates();
         }
     }
 
