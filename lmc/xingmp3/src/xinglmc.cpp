@@ -850,7 +850,7 @@ void XingLMC::DecodeWork()
       if (m_pOutputBuffer)
       {
 #if __BYTE_ORDER != __LITTLE_ENDIAN
-         x.out_bytes = cvt_to_wave(pOutBuffer, x.out_bytes);
+         x.out_bytes = cvt_to_wave((unsigned char *)pOutBuffer, x.out_bytes);
 #endif
 
 #define _VISUAL_ENABLE_
