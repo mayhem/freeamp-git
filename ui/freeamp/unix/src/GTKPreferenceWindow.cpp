@@ -287,7 +287,7 @@ bool GTKPreferenceWindow::Show(Window *pWindow)
     AddPane(opane);
 
     pane = CreateCD();
-    opane = new OptionsPane("CD Audio", "CD Audio Preferences", 5, pane);
+    opane = new OptionsPane("MusicBrainz", "MusicBrainz Preferences", 5, pane);
     AddPane(opane);
 
     pane = CreateAdvanced();
@@ -528,6 +528,7 @@ void GTKPreferenceWindow::GetPrefsValues(Preferences* prefs,
     prefs->GetPrefBoolean(kReclaimFiletypesPref, &values->reclaimFiletypes);
     prefs->GetPrefInt32(kWatchThisDirTimeoutPref, &values->watchThisDirTimeout);
     prefs->GetPrefBoolean(kCheckCDAutomaticallyPref, &values->pollCD);
+    prefs->GetPrefBoolean(kEnableMusicBrainzBitziPref, &values->enableMB);
 }
 
 void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs, 
@@ -592,6 +593,7 @@ void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs,
     prefs->SetPrefString(kUsersPortablePlayersPref, portableList.c_str());
 
     prefs->SetPrefString(kPMOPref, values->defaultPMO.c_str());
+    prefs->SetPrefBoolean(kEnableMusicBrainzBitziPref, values->enableMB);
     
     if (*values != currentValues) {
         m_pContext->target->AcceptEvent(new Event(INFO_PrefsChanged));
@@ -2353,6 +2355,19 @@ static void mb_server_change(GtkWidget *w, GTKPreferenceWindow *p)
     p->MBServerSet(text, false);
 }
 
+void GTKPreferenceWindow::EnableMBToggle(int active)
+{
+    if (!firsttime)
+        gtk_widget_set_sensitive(applyButton, TRUE);
+    proposedValues.enableMB = (bool)active;
+}
+
+static void enable_mb_toggle(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    int i = GTK_TOGGLE_BUTTON(w)->active;
+    p->EnableMBToggle(i);
+}
+
 GtkWidget *GTKPreferenceWindow::CreateCD(void)
 {
     GtkWidget *pane = gtk_vbox_new(FALSE, 5);
@@ -2406,6 +2421,16 @@ GtkWidget *GTKPreferenceWindow::CreateCD(void)
                        GTK_SIGNAL_FUNC(mb_server_change), this);
     gtk_box_pack_start(GTK_BOX(pane), mbServer, TRUE, TRUE, 0);
     gtk_widget_show(mbServer);
+
+    enableMB = gtk_check_button_new_with_label("Contribute metadata to "
+           "MusicBrainz and Bitzi");
+    gtk_container_add(GTK_CONTAINER(pane), enableMB);
+    gtk_signal_connect(GTK_OBJECT(enableMB), "toggled",
+                       GTK_SIGNAL_FUNC(enable_mb_toggle), this);
+    if (originalValues.enableMB)
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(enableMB),
+                                     TRUE);
+    gtk_widget_show(enableMB);
 
     return pane;
 }

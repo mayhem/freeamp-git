@@ -52,10 +52,12 @@ class IntroWizardUI {
     void GoToPage2();
     void GoToPage3();
     void GoToPage4();
+    void GoToPage5();
     void DeleteEvent();
     void Close();
    
     void CheckCreateProfile();
+    void SetMBPref(void);
 
     unsigned int page;
     
@@ -65,6 +67,7 @@ class IntroWizardUI {
     bool done;
 
     bool skipRelatableTwo;
+    bool mbBitziEnabled;
 
     GtkWidget *m_window;
     
@@ -86,12 +89,14 @@ class IntroWizardUI {
     GtkWidget *page2;
     GtkWidget *page3;
     GtkWidget *page4;
+    GtkWidget *page5;
    
     string searchPath;
 
     GtkWidget *IntroPage(void);
     GtkWidget *RelatablePage(void);
     GtkWidget *RelatableTwoPage(void);
+    GtkWidget *MusicBrainzBitziPage(void);
     GtkWidget *SearchPage(void);
 
     MusicBrowserUI *m_parent;

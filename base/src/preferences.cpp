@@ -100,6 +100,7 @@ const char* kPerformDBCheckPref = "PerformDBCheck";
 const char* kPlaylistHeaderColumnsPref = "PlaylistHeaderColumns";
 const char* kAdvancedRelatablePref = "UseAdvancedRelatableFeatures";
 const char* kMetadataDisplayPref = "DisplayMetadata";
+const char* kEnableMusicBrainzBitziPref = "ContributeMBBitzi";
 
 //logging
 const char* kUseDebugLogPref = "UseDebugLog";
@@ -172,6 +173,7 @@ const bool kDefaultPerformDBCheck = true;
 const char* kDefaultPlaylistHeaderColumns = "Title|Artist|Album|Time|Genre";
 const bool kDefaultAdvancedRelatable = false;
 const bool kDefaultMetadataDisplay = 1;
+const bool kDefaultEnableMusicBrainzBitzi = false;
 
 Error
 Preferences::
@@ -407,10 +409,16 @@ SetDefaults()
     if (GetPrefBoolean(kAdvancedRelatablePref, &dummyBool) == 
         kError_NoPrefValue)
         SetPrefBoolean(kAdvancedRelatablePref, kDefaultAdvancedRelatable);
-    return kError_NoErr;
 
     if (GetPrefInt32(kMetadataDisplayPref, &dummyInt) == kError_NoPrefValue)
         SetPrefInt32(kMetadataDisplayPref, kDefaultMetadataDisplay);
+
+    if (GetPrefBoolean(kEnableMusicBrainzBitziPref, &dummyBool) == 
+        kError_NoPrefValue)
+        SetPrefBoolean(kEnableMusicBrainzBitziPref, 
+                       kDefaultEnableMusicBrainzBitzi);
+
+    return kError_NoErr;
 }
 
 Error

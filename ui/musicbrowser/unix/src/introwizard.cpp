@@ -29,6 +29,7 @@ ____________________________________________________________________________*/
 
 #include "utility.h"
 #include "eventdata.h"
+#include "preferences.h"
 #include "fileselector.h"
 #include "musiccatalog.h"
 #include "introwizard.h"
@@ -61,19 +62,31 @@ void IntroWizardUI::CheckCreateProfile(void)
     }
 }
 
+void IntroWizardUI::SetMBPref(void)
+{
+    m_context->prefs->SetPrefBoolean(kEnableMusicBrainzBitziPref, 
+                                     mbBitziEnabled);
+}
+
 static void start_search_button_event(GtkWidget *widget, IntroWizardUI *p)
 {
     if (p->page == 1)
         p->GoToPage2();
-    else if (p->page == 2) {
+    else 
+    if (p->page == 2) 
+    {
         if (p->skipRelatableTwo)
-            p->GoToPage4();
+            p->GoToPage5();
         else
             p->GoToPage3();
     }
     else if (p->page == 3) {
         p->CheckCreateProfile();
         p->GoToPage4();
+    }
+    else if (p->page == 4) {
+        p->SetMBPref();
+        p->GoToPage5();
     }
     else if (p->searchDone) 
         gtk_widget_destroy(p->m_window);
@@ -92,15 +105,21 @@ static void search_cancel_button_event(GtkWidget *widget, IntroWizardUI *p)
 
 static void search_back_event(GtkWidget *widget, IntroWizardUI *p)
 {
-    if (p->page == 4) {
+    if (p->page == 5) 
+    {
         if (p->skipRelatableTwo)
             p->GoToPage2();
         else 
-            p->GoToPage3();
+            p->GoToPage4();
     }
+    else
+    if (p->page == 4)
+        p->GoToPage3();
+    else 
     if (p->page == 3)
         p->GoToPage2();
-    else if (p->page == 2)
+    else 
+    if (p->page == 2)
         p->GoToPage1();
 }
 
@@ -180,21 +199,37 @@ IntroWizardUI::IntroWizardUI(FAContext *context, MusicBrowserUI *parent)
     m_parent = parent;
 }
 
-void IntroWizardUI::GoToPage4(void)
+void IntroWizardUI::GoToPage5(void)
 {
    gtk_widget_hide(page1);
    gtk_widget_hide(page2);
    gtk_widget_hide(page3);
-   gtk_widget_show(page4);
+   gtk_widget_hide(page4);
+   gtk_widget_show(page5);
 
    gtk_widget_set_sensitive(m_backButton, TRUE);
    gtk_label_set_text(GTK_LABEL(buttonLabel), "  Start Search >  ");
+
+   page = 5;
+}
+
+void IntroWizardUI::GoToPage4(void)
+{
+   gtk_widget_hide(page5);
+   gtk_widget_hide(page3);
+   gtk_widget_hide(page2);
+   gtk_widget_hide(page1);
+   gtk_widget_show(page4);
+
+   gtk_widget_set_sensitive(m_backButton, TRUE); 
+   gtk_label_set_text(GTK_LABEL(buttonLabel), "  Next >  ");
 
    page = 4;
 }
 
 void IntroWizardUI::GoToPage3(void)
 {
+   gtk_widget_hide(page5);
    gtk_widget_hide(page4);
    gtk_widget_hide(page2);
    gtk_widget_hide(page1);
@@ -208,6 +243,7 @@ void IntroWizardUI::GoToPage3(void)
 
 void IntroWizardUI::GoToPage2(void)
 {
+   gtk_widget_hide(page5);
    gtk_widget_hide(page4);
    gtk_widget_hide(page1);
    gtk_widget_hide(page3);
@@ -221,6 +257,7 @@ void IntroWizardUI::GoToPage2(void)
 
 void IntroWizardUI::GoToPage1(void)
 {
+   gtk_widget_hide(page5);
    gtk_widget_hide(page4);
    gtk_widget_hide(page2);
    gtk_widget_hide(page3);
@@ -292,6 +329,16 @@ static void opt_out_selected(GtkWidget *w, IntroWizardUI *p)
     p->skipRelatableTwo = true;
 }
 
+static void mb_opt_in_selected(GtkWidget *w, IntroWizardUI *p)
+{
+    p->mbBitziEnabled = true;
+}
+
+static void mb_opt_out_selected(GtkWidget *w, IntroWizardUI *p)
+{
+    p->mbBitziEnabled = false;
+}
+
 GtkWidget *IntroWizardUI::RelatablePage(void)
 {
    GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
@@ -325,6 +372,7 @@ GtkWidget *IntroWizardUI::RelatablePage(void)
 
    GtkWidget *button = gtk_radio_button_new_with_label(NULL, "Enjoy Relatable Features");
    skipRelatableTwo = false;
+   mbBitziEnabled = true;
    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
    gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 2);
    gtk_signal_connect(GTK_OBJECT(button), "clicked",
@@ -358,7 +406,7 @@ GtkWidget *IntroWizardUI::RelatableTwoPage(void)
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
    gtk_widget_show(label);
 
-   label = gtk_label_new("Relatable automaticallly generates personalized playlists that are based on the files located on your computer and the music you listen to on the Web. The more you use the player, the better it works!");
+   label = gtk_label_new("Relatable automatically generates personalized playlists that are based on the files located on your computer and the music you listen to on the Web. The more you use the player, the better it works!");
    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
@@ -396,6 +444,82 @@ GtkWidget *IntroWizardUI::RelatableTwoPage(void)
 
    return vbox;
 }
+
+static void musicbrainz_web(GtkWidget *w, IntroWizardUI *p)
+{
+    LaunchBrowser("http://www.musicbrainz.org/");
+}
+
+static void bitzi_web(GtkWidget *w, IntroWizardUI *p)
+{
+    LaunchBrowser("http://www.bitzi.com/welcome/freeamp/");
+}
+
+GtkWidget *IntroWizardUI::MusicBrainzBitziPage(void)
+{
+   GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
+   gtk_widget_show(vbox);
+
+   GtkWidget *label = gtk_label_new("MusicBrainz and Bitzi Community Metadata");
+   gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+   gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+   gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
+   gtk_widget_show(label);
+
+   label = gtk_label_new("FreeAmp also supports contributing metadata from your MP3 and Vorbis files to the MusicBrainz and Bitzi community metadata projects. ");
+   gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+   gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+   gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
+   gtk_widget_show(label);
+
+   label = gtk_label_new("When you signature your music collection using the Relatable features, FreeAmp can send the metadata from your music files (artist, title, filesize, etc.) to MusicBrainz and Bitzi. Contributing your metadata will increase the usefulness of these services.");
+   gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+   gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+   gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
+   gtk_widget_show(label);
+
+   label = gtk_label_new("When you contribute to MusicBrainz and Bitzi, all of your contributions will be made publicly available using the OpenContent and OpenBits licenses, respectively. No personal information will ever be sent to MusicBrainz or Bitzi. Please visit the project websites for more details.");
+   gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+   gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+   gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
+   gtk_widget_show(label);
+		  
+   GtkWidget *hbox = gtk_hbox_new(FALSE, 5);
+   gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, FALSE, 5);
+   gtk_widget_show(hbox);
+
+   GtkWidget *button = gtk_button_new_with_label(" MusicBrainz Web Page ");
+   gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                      GTK_SIGNAL_FUNC(musicbrainz_web), this);
+   gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 0);
+   gtk_widget_show(button);
+
+   button = gtk_button_new_with_label(" Bitzi Web Page ");
+   gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                      GTK_SIGNAL_FUNC(bitzi_web), this);
+   gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 0);
+   gtk_widget_show(button);
+
+   button = gtk_radio_button_new_with_label(NULL, 
+                     "Contribute to MusicBrainz/Bitzi");
+   skipRelatableTwo = false;
+   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
+   gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 2);
+   gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                      GTK_SIGNAL_FUNC(mb_opt_in_selected), this);
+   gtk_widget_show(button);
+
+   button = gtk_radio_button_new_with_label(gtk_radio_button_group(
+                                            GTK_RADIO_BUTTON(button)),
+                                            "Cool! But I'll pass");
+   gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 2);
+   gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                      GTK_SIGNAL_FUNC(mb_opt_out_selected), this);
+   gtk_widget_show(button);
+
+   return vbox;
+}
+
 
 GtkWidget *IntroWizardUI::SearchPage(void)
 {
@@ -534,14 +658,17 @@ void IntroWizardUI::Show(bool runMain)
    page1 = IntroPage();
    page2 = RelatablePage();
    page3 = RelatableTwoPage();
-   page4 = SearchPage();
+   page4 = MusicBrainzBitziPage();
+   page5 = SearchPage();
 
    page = 1;
+   gtk_widget_hide(page5);
    gtk_widget_hide(page4);
    gtk_widget_hide(page3);
    gtk_widget_hide(page2);
    gtk_widget_hide(page1);
 
+   gtk_box_pack_end(GTK_BOX(temphbox), page5, FALSE, FALSE, 0);
    gtk_box_pack_end(GTK_BOX(temphbox), page4, FALSE, FALSE, 0);
    gtk_box_pack_end(GTK_BOX(temphbox), page3, FALSE, FALSE, 0);
    gtk_box_pack_end(GTK_BOX(temphbox), page2, FALSE, FALSE, 0);

@@ -157,6 +157,7 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
     int     i, port;
     uint32  len = MAX_PATH;
     BitprintInfo  info;
+    bool    submitMeta = false;
 
     memset(args, 0, sizeof(args));
 
@@ -171,11 +172,6 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
         strcpy(hostname, MUSICBRAINZ_SERVER);
 
     o = mb_New();
-
-    // Calculate the bitzi bitprint for this file.
-    len = MAX_PATH;
-    URLToFilePath((char *)pmetaData->Filename().c_str(), file, &len);
-    mb_CalculateBitprint(o, file, &info);
 
     mb_UseUTF8(o, 0);
     mb_SetServer(o, hostname, port);
@@ -192,48 +188,62 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
                                      guid);
     fclose(guidLogfile);
 
-    args[0] = strdup(pmetaData->Title().c_str());
-    args[1] = strdup(pmetaData->Artist().c_str());
-    args[2] = strdup(pmetaData->Album().c_str());
-    sprintf(temp, "%d", pmetaData->Track());
-    args[3] = strdup(temp);
-    args[4] = strdup(guid);
-    args[5] = strdup(pmetaData->Filename().c_str());
-    sprintf(temp, "%d", pmetaData->Year());
-    args[6] = strdup(temp);
-    args[7] = strdup(pmetaData->Genre().c_str());
-    args[8] = strdup(pmetaData->Comment().c_str());
-
-    // These are the bitzi bitpint metadata items
-    args[9] = strdup(info.bitprint);
-    args[10] = strdup(info.first20);
-    sprintf(temp, "%d", info.length);
-    args[11] = strdup(temp);
-
-    if (info.audioSha1)
+    m_context->prefs->GetPrefBoolean(kEnableMusicBrainzBitziPref, &submitMeta);
+    if (submitMeta)
     {
-        args[12] = strdup(info.audioSha1);
-        sprintf(temp, "%d", info.duration);
-        args[13] = strdup(temp);
-        sprintf(temp, "%d", info.samplerate);
-        args[14] = strdup(temp);
-        sprintf(temp, "%d", info.bitrate);
-        args[15] = strdup(temp);
-        sprintf(temp, "%d", info.stereo);
-        args[16] = strdup(temp);
-        sprintf(temp, "%d", info.vbr);
-        args[17] = strdup(temp);
-        args[18] = NULL;
+        // Calculate the bitzi bitprint for this file.
+        len = MAX_PATH;
+        URLToFilePath((char *)pmetaData->Filename().c_str(), file, &len);
+        mb_CalculateBitprint(o, file, &info);
+    
+        args[0] = strdup(pmetaData->Title().c_str());
+        args[1] = strdup(pmetaData->Artist().c_str());
+        args[2] = strdup(pmetaData->Album().c_str());
+        sprintf(temp, "%d", pmetaData->Track());
+        args[3] = strdup(temp);
+        args[4] = strdup(guid);
+        args[5] = strdup(pmetaData->Filename().c_str());
+        sprintf(temp, "%d", pmetaData->Year());
+        args[6] = strdup(temp);
+        args[7] = strdup(pmetaData->Genre().c_str());
+        args[8] = strdup(pmetaData->Comment().c_str());
+    
+        // These are the bitzi bitpint metadata items
+        args[9] = strdup(info.bitprint);
+        args[10] = strdup(info.first20);
+        sprintf(temp, "%d", info.length);
+        args[11] = strdup(temp);
+    
+        if (info.audioSha1)
+        {
+            args[12] = strdup(info.audioSha1);
+            sprintf(temp, "%d", info.duration);
+            args[13] = strdup(temp);
+            sprintf(temp, "%d", info.samplerate);
+            args[14] = strdup(temp);
+            sprintf(temp, "%d", info.bitrate);
+            args[15] = strdup(temp);
+            sprintf(temp, "%d", info.stereo);
+            args[16] = strdup(temp);
+            sprintf(temp, "%d", info.vbr);
+            args[17] = strdup(temp);
+            args[18] = NULL;
+        }
+        else
+        {
+            args[12] = NULL;
+        }
+        ret = mb_QueryWithArgs(o, MBQ_ExchangeMetadata, args);
+        for(i = 0; i < 11; i++)
+           if (args[i])
+               free(args[i]);
     }
     else
     {
-        args[12] = NULL;
+        args[0] = guid;
+        args[1] = NULL;
+        ret = mb_QueryWithArgs(o, MBQ_LookupMetadata, args);
     }
-
-    ret = mb_QueryWithArgs(o, MBQ_ExchangeMetadata, args);
-    for(i = 0; i < 11; i++)
-       if (args[i])
-           free(args[i]);
 
     if (!ret)
     {

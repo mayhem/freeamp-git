@@ -88,6 +88,7 @@ typedef struct PrefsStruct
     int32  watchThisDirTimeout;
 
     bool pollCD;
+    bool enableMB;
     string CDDevicePath;
     string MBServer;
 
@@ -132,6 +133,7 @@ typedef struct PrefsStruct
             alsaOutput == pref.alsaOutput &&
             reclaimFiletypes == pref.reclaimFiletypes &&
             askReclaimFiletypes == pref.askReclaimFiletypes &&
+            enableMB == pref.enableMB &&
             true
         );
     }
@@ -251,6 +253,7 @@ class GTKPreferenceWindow : public PreferenceWindow
       GtkWidget *pollCD;
       GtkWidget *cdPath;
       GtkWidget *mbServer;
+      GtkWidget *enableMB;
       
       vector<OptionsPane *> *paneList;
       void AddPane(OptionsPane *pane);      
@@ -321,6 +324,7 @@ class GTKPreferenceWindow : public PreferenceWindow
       void PollCDToggle(int active);
       void CDPathSet(char *newpath, bool set);
       void MBServerSet(char *newpath, bool set);
+      void EnableMBToggle(int active);
 
       void UpdatePLHeaders(void);     
       void AddPLSelection(void);
