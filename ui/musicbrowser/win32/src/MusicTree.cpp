@@ -1151,6 +1151,61 @@ void MusicBrowserUI::MusicCatalogCleared()
 	   CheckForCD();
 }
 
+void MusicBrowserUI::MusicCatalogPlaylistAdded(string item)
+{
+    // put it under playlists
+    if(TreeView_GetChild(m_hMusicView, m_hPlaylistItem))
+    {
+        TV_INSERTSTRUCT insert;
+        TreeData        data;
+        MetaData        metadata;
+        char            szBase[MAX_PATH];
+
+        _splitpath((char *)item.c_str(), NULL, NULL, szBase, NULL);  
+
+        insert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
+                            TVIF_SELECTEDIMAGE | TVIF_PARAM; 
+
+        data.m_iLevel = 1;
+
+        data.m_oPlaylistName = string(szBase);
+        data.m_oPlaylistPath = item;
+
+        insert.item.pszText = szBase;
+        insert.item.cchTextMax = strlen(szBase);
+        insert.item.iImage = 1;
+        insert.item.iSelectedImage = 1;
+        insert.item.cChildren= 0;
+        insert.item.lParam = (LPARAM) new TreeData(data);
+        insert.hInsertAfter = TVI_SORT;
+        insert.hParent = m_hPlaylistItem;
+        TreeView_InsertItem(m_hMusicView, &insert);
+
+        TreeView_DeleteItem(m_hMusicView, m_hNewPlaylistItem);
+        insert.item.pszText = kNewPlaylist;
+        insert.item.cchTextMax = strlen(kNewPlaylist);
+        insert.item.iImage = 1;
+        insert.item.iSelectedImage = 1;
+        insert.item.cChildren= 0;
+        insert.item.lParam = NULL;
+        insert.hInsertAfter = TVI_FIRST;
+        insert.hParent = m_hPlaylistItem;
+        m_hNewPlaylistItem = TreeView_InsertItem(m_hMusicView, &insert);
+    }
+}
+
+void MusicBrowserUI::MusicCatalogPlaylistRemoved(string item)
+{
+    HTREEITEM playlistItem = NULL;
+
+    playlistItem = FindPlaylist(item);
+
+    if(playlistItem)
+    {
+        TreeView_DeleteItem(m_hMusicView, playlistItem);
+    }
+}
+
 void MusicBrowserUI::MusicCatalogTrackChanged(const ArtistList *oldArtist,
                                               const ArtistList *newArtist,
                                               const AlbumList *oldAlbum,
@@ -1208,6 +1263,29 @@ void MusicBrowserUI::MusicCatalogTrackChanged(const ArtistList *oldArtist,
 
     MusicCatalogTrackAdded(newArtist,newAlbum, newItem);   
 
+
+    if(oldAlbum != newAlbum)
+    {
+        artistItem = FindArtist(newArtist);
+
+        if(artistItem)
+        {
+            if(!FindAlbum(artistItem, oldAlbum))
+            {
+                albumItem = FindAlbum(artistItem, newAlbum);
+
+                if(albumItem)
+                {
+                    if(albumState & TVIS_EXPANDED)
+                        TreeView_Expand(m_hMusicView, albumItem, TVE_EXPAND);
+
+                    //trackItem = FindTrack(albumItem, oldItem);
+                }
+            }
+        }
+    }
+
+	/*
     // is this in the uncatagorized section?
     if(!oldArtist) 
     {
@@ -1232,195 +1310,8 @@ void MusicBrowserUI::MusicCatalogTrackChanged(const ArtistList *oldArtist,
                 //trackItem = FindTrack(albumItem, oldItem);
             }
         }
-    }   
-}
-
-void MusicBrowserUI::MusicCatalogPlaylistRemoved(string item)
-{
-    HTREEITEM playlistItem = NULL;
-
-    playlistItem = FindPlaylist(item);
-
-    if(playlistItem)
-    {
-        TreeView_DeleteItem(m_hMusicView, playlistItem);
     }
-}
-
-void MusicBrowserUI::MusicCatalogPlaylistAdded(string item)
-{
-    // put it under playlists
-    if(TreeView_GetChild(m_hMusicView, m_hPlaylistItem))
-    {
-        TV_INSERTSTRUCT insert;
-        TreeData        data;
-        MetaData        metadata;
-        char            szBase[MAX_PATH];
-
-        _splitpath((char *)item.c_str(), NULL, NULL, szBase, NULL);  
-
-        insert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
-                            TVIF_SELECTEDIMAGE | TVIF_PARAM; 
-
-        data.m_iLevel = 1;
-
-        data.m_oPlaylistName = string(szBase);
-        data.m_oPlaylistPath = item;
-
-        insert.item.pszText = szBase;
-        insert.item.cchTextMax = strlen(szBase);
-        insert.item.iImage = 1;
-        insert.item.iSelectedImage = 1;
-        insert.item.cChildren= 0;
-        insert.item.lParam = (LPARAM) new TreeData(data);
-        insert.hInsertAfter = TVI_SORT;
-        insert.hParent = m_hPlaylistItem;
-        TreeView_InsertItem(m_hMusicView, &insert);
-
-        TreeView_DeleteItem(m_hMusicView, m_hNewPlaylistItem);
-        insert.item.pszText = kNewPlaylist;
-        insert.item.cchTextMax = strlen(kNewPlaylist);
-        insert.item.iImage = 1;
-        insert.item.iSelectedImage = 1;
-        insert.item.cChildren= 0;
-        insert.item.lParam = NULL;
-        insert.hInsertAfter = TVI_FIRST;
-        insert.hParent = m_hPlaylistItem;
-        m_hNewPlaylistItem = TreeView_InsertItem(m_hMusicView, &insert);
-    }
-}
-
-void MusicBrowserUI::MusicCatalogTrackRemoved(const ArtistList* artist,
-                                              const AlbumList* album,
-                                              const PlaylistItem* item)
-{
-    HTREEITEM artistItem = NULL;
-    HTREEITEM albumItem = NULL;
-    HTREEITEM trackItem = NULL;
-    bool uncatagorized = false;
-    
-
-    // is this in the uncatagorized section?
-    if(!artist) 
-    {
-        trackItem = FindTrack(m_hUncatItem, item);
-        uncatagorized = true;
-    }
-    else
-    {
-        artistItem = FindArtist(artist);
-
-        if(artistItem)
-        {
-            albumItem = FindAlbum(artistItem, album);
-
-            if(albumItem)
-            {
-                trackItem = FindTrack(albumItem, item);
-            }
-        }
-    }
-
-    if(trackItem)
-    {
-        TreeView_DeleteItem(m_hMusicView, trackItem);
-
-        if(uncatagorized)
-        {
-            if(!TreeView_GetChild(m_hMusicView, m_hUncatItem))
-            {
-                TV_ITEM tv_item;
-
-                tv_item.hItem = m_hUncatItem;
-                tv_item.mask = TVIF_CHILDREN;
-                tv_item.cChildren = 0;
-
-                TreeView_SetItem(m_hMusicView, &tv_item);
-            }
-        }
-    }
-
-    if(albumItem && !album->m_trackList->size())
-    {
-        TreeView_DeleteItem(m_hMusicView, albumItem);
-    }
-
-    if(artistItem && !artist->m_albumList->size())
-    {
-        TreeView_DeleteItem(m_hMusicView, artistItem);
-    }
-
-    trackItem = FindTrack(m_hAllItem, item);
-
-    if(trackItem)
-    {
-        TreeView_DeleteItem(m_hMusicView, trackItem);
-
-        if(!TreeView_GetChild(m_hMusicView, m_hUncatItem))
-        {
-            TV_ITEM tv_item;
-
-            tv_item.hItem = m_hAllItem;
-            tv_item.mask = TVIF_CHILDREN;
-            tv_item.cChildren = 0;
-
-            TreeView_SetItem(m_hMusicView, &tv_item);
-        }
-    }
-
-}
-
-void MusicBrowserUI::MusicCatalogStreamAdded(const PlaylistItem* item)
-{
-    if(TreeView_GetChild(m_hMusicView, m_hFavoritesItem))
-    {
-        TV_INSERTSTRUCT insert;
-        TreeData        data;
-
-        insert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
-                            TVIF_SELECTEDIMAGE | TVIF_PARAM; 
-
-        data.m_iLevel = 1;
-
-    
-        PlaylistItem* stream = new PlaylistItem(*item);
-        MetaData metadata;
-
-        data.m_pStream = stream;
-
-        insert.item.pszText = (char*)stream->GetMetaData().Title().c_str();
-        insert.item.cchTextMax = strlen(insert.item.pszText);
-        insert.item.iImage = 8;
-        insert.item.iSelectedImage = 8;
-        insert.item.cChildren= 0;
-        insert.item.lParam = (LPARAM) new TreeData(data);
-        insert.hInsertAfter = TVI_SORT;
-        insert.hParent = m_hFavoritesItem;
-        TreeView_InsertItem(m_hMusicView, &insert);
-
-        TreeView_DeleteItem(m_hMusicView, m_hNewFavoritesItem);
-        insert.item.pszText = kNewFavorite;
-        insert.item.cchTextMax = strlen(insert.item.pszText);
-        insert.item.iImage = 8;
-        insert.item.iSelectedImage = 8;
-        insert.item.cChildren= 0;
-        insert.item.lParam = NULL;
-        insert.hInsertAfter = TVI_FIRST;
-        insert.hParent = m_hFavoritesItem;
-        m_hNewFavoritesItem = TreeView_InsertItem(m_hMusicView, &insert);
-    }
-}
-
-void MusicBrowserUI::MusicCatalogStreamRemoved(const PlaylistItem* item)
-{
-    HTREEITEM streamItem = NULL;
-
-    streamItem = FindFavorite(item);
-
-    if(streamItem)
-    {
-        TreeView_DeleteItem(m_hMusicView, streamItem);
-    }
+	*/
 }
 
 void MusicBrowserUI::MusicCatalogTrackAdded(const ArtistList* artist,
@@ -1477,7 +1368,7 @@ void MusicBrowserUI::MusicCatalogTrackAdded(const ArtistList* artist,
     else 
     {
         // yep, search for it
-        HTREEITEM artistItem, albumItem;
+        HTREEITEM artistItem = NULL, albumItem = NULL;
 
         artistItem = FindArtist(artist);
 
@@ -1742,6 +1633,141 @@ void MusicBrowserUI::MusicCatalogTrackAdded(const ArtistList* artist,
             insert.hParent = m_hAllItem;
             TreeView_InsertItem(m_hMusicView, &insert);
         }
+    }
+}
+
+void MusicBrowserUI::MusicCatalogTrackRemoved(const ArtistList* artist,
+                                              const AlbumList* album,
+                                              const PlaylistItem* item)
+{
+    HTREEITEM artistItem = NULL;
+    HTREEITEM albumItem = NULL;
+    HTREEITEM trackItem = NULL;
+    bool uncatagorized = false;
+    
+
+    // is this in the uncatagorized section?
+    if(!artist) 
+    {
+        trackItem = FindTrack(m_hUncatItem, item);
+        uncatagorized = true;
+    }
+    else
+    {
+        artistItem = FindArtist(artist);
+
+        if(artistItem)
+        {
+            albumItem = FindAlbum(artistItem, album);
+
+            if(albumItem)
+            {
+                trackItem = FindTrack(albumItem, item);
+            }
+        }
+    }
+
+    if(trackItem)
+    {
+        TreeView_DeleteItem(m_hMusicView, trackItem);
+
+        if(uncatagorized)
+        {
+            if(!TreeView_GetChild(m_hMusicView, m_hUncatItem))
+            {
+                TV_ITEM tv_item;
+
+                tv_item.hItem = m_hUncatItem;
+                tv_item.mask = TVIF_CHILDREN;
+                tv_item.cChildren = 0;
+
+                TreeView_SetItem(m_hMusicView, &tv_item);
+            }
+        }
+    }
+
+    if(albumItem && !TreeView_GetChild(m_hMusicView, albumItem) 
+		/*!album->m_trackList->size()*/)
+    {
+        TreeView_DeleteItem(m_hMusicView, albumItem);
+    }
+
+    if(artistItem && !TreeView_GetChild(m_hMusicView, artistItem) 
+		/*!artist->m_albumList->size()*/)
+    {
+        TreeView_DeleteItem(m_hMusicView, artistItem);
+    }
+
+    trackItem = FindTrack(m_hAllItem, item);
+
+    if(trackItem)
+    {
+        TreeView_DeleteItem(m_hMusicView, trackItem);
+
+        if(!TreeView_GetChild(m_hMusicView, m_hUncatItem))
+        {
+            TV_ITEM tv_item;
+
+            tv_item.hItem = m_hAllItem;
+            tv_item.mask = TVIF_CHILDREN;
+            tv_item.cChildren = 0;
+
+            TreeView_SetItem(m_hMusicView, &tv_item);
+        }
+    }
+
+}
+
+void MusicBrowserUI::MusicCatalogStreamAdded(const PlaylistItem* item)
+{
+    if(TreeView_GetChild(m_hMusicView, m_hFavoritesItem))
+    {
+        TV_INSERTSTRUCT insert;
+        TreeData        data;
+
+        insert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
+                            TVIF_SELECTEDIMAGE | TVIF_PARAM; 
+
+        data.m_iLevel = 1;
+
+    
+        PlaylistItem* stream = new PlaylistItem(*item);
+        MetaData metadata;
+
+        data.m_pStream = stream;
+
+        insert.item.pszText = (char*)stream->GetMetaData().Title().c_str();
+        insert.item.cchTextMax = strlen(insert.item.pszText);
+        insert.item.iImage = 8;
+        insert.item.iSelectedImage = 8;
+        insert.item.cChildren= 0;
+        insert.item.lParam = (LPARAM) new TreeData(data);
+        insert.hInsertAfter = TVI_SORT;
+        insert.hParent = m_hFavoritesItem;
+        TreeView_InsertItem(m_hMusicView, &insert);
+
+        TreeView_DeleteItem(m_hMusicView, m_hNewFavoritesItem);
+        insert.item.pszText = kNewFavorite;
+        insert.item.cchTextMax = strlen(insert.item.pszText);
+        insert.item.iImage = 8;
+        insert.item.iSelectedImage = 8;
+        insert.item.cChildren= 0;
+        insert.item.lParam = NULL;
+        insert.hInsertAfter = TVI_FIRST;
+        insert.hParent = m_hFavoritesItem;
+        m_hNewFavoritesItem = TreeView_InsertItem(m_hMusicView, &insert);
+    }
+}
+
+void MusicBrowserUI::MusicCatalogStreamRemoved(const PlaylistItem* item)
+{
+    HTREEITEM streamItem = NULL;
+
+    streamItem = FindFavorite(item);
+
+    if(streamItem)
+    {
+        TreeView_DeleteItem(m_hMusicView, streamItem);
     }
 }
 
