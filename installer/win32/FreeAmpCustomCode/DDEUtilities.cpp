@@ -504,7 +504,6 @@ bool OpenNetscapeURLs(URLList* list)
 {
     HSZ hszServName;
 	HSZ hszTopic;
-	HSZ hszItem;
 	HCONV hConv;
     HDDEDATA hdded = NULL;
     char* szMsg;
@@ -528,6 +527,8 @@ bool OpenNetscapeURLs(URLList* list)
         //}
         //else
         //{
+        //    HSZ hszItem;
+        //
         //    wsprintf(szMsg,"%s%s",(*i).c_str() , endStuff);
 	    //    hszItem = DdeCreateStringHandle(idInst,szMsg,CP_WINANSI);
 
@@ -541,7 +542,6 @@ bool OpenNetscapeURLs(URLList* list)
 
 
     DdeFreeStringHandle(idInst, hszTopic);
-    DdeFreeStringHandle(idInst, hszItem);
     DdeFreeStringHandle(idInst, hszServName);
     delete [] szMsg;
     delete list;
