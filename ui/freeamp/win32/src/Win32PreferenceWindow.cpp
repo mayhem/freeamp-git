@@ -2116,20 +2116,23 @@ bool Win32PreferenceWindow::PrefDirectoryProc(HWND hwnd,
             lv_item.iSubItem = 0;
 
             set<string>::const_iterator i;
-            char path[MAX_PATH];
 
             for(i = m_originalValues.watchDirectories.begin(); 
                 i != m_originalValues.watchDirectories.end(); 
                 i++)
             {
-                   
-                strcpy(path, (*i).c_str());
-                PathCompactPath(hdc, path, lvc.cx);
+                SIZE sizeString;
 
-                lv_item.pszText = path;
+                GetTextExtentPoint32(hdc, (*i).c_str(), (*i).size(), &sizeString);
+
+                if(ListView_GetColumnWidth(hwndList, 0) < sizeString.cx)
+                    ListView_SetColumnWidth(hwndList, 0, sizeString.cx);
+
+                lv_item.pszText = (char*)(*i).c_str();
                 lv_item.cchTextMax = strlen(lv_item.pszText);
                 lv_item.iItem = ListView_GetItemCount(hwndList);
                 lv_item.lParam = (LPARAM) new string(*i);
+                lv_item.iSubItem = 0;
 
                 ListView_InsertItem(hwndList, &lv_item);
             }
@@ -2277,7 +2280,9 @@ bool Win32PreferenceWindow::PrefDirectoryProc(HWND hwnd,
                         item.mask = LVIF_PARAM|LVIF_STATE;
                         item.stateMask = LVIS_SELECTED;
                         item.iItem = index;
+                        item.iSubItem = 0;
                         item.lParam = 0;
+                        item.state = 0;
 
                         if(ListView_GetItem(hwndList, &item))
                         {
@@ -2296,7 +2301,7 @@ bool Win32PreferenceWindow::PrefDirectoryProc(HWND hwnd,
                                 delete s;
 
                                 ListView_DeleteItem(hwndList, index);
-                                break;
+                                //break;
                             }
                         }  
                     }
@@ -2348,11 +2353,13 @@ bool Win32PreferenceWindow::PrefDirectoryProc(HWND hwnd,
                             lv_item.state = 0;
                             lv_item.iSubItem = 0;
                             lv_item.lParam = (LPARAM) new string(temp);
-
-                            RECT rect;
-                            GetClientRect(hwndList, &rect);
                    
-                            PathCompactPath(hdc, temp, rect.right - rect.left);
+                            SIZE sizeString;
+
+                            GetTextExtentPoint32(hdc, temp, strlen(temp), &sizeString);
+
+                            if(ListView_GetColumnWidth(hwndList, 0) < sizeString.cx)
+                                ListView_SetColumnWidth(hwndList, 0, sizeString.cx);
 
                             lv_item.pszText = temp;
                             lv_item.cchTextMax = strlen(lv_item.pszText);
@@ -3447,9 +3454,9 @@ uint32 CalcStringEllipsis(HDC hdc, string& displayString, int32 columnWidth)
     // Adjust the column width to take into account the edges
     //columnWidth -= 4;
 
-    temp = displayString;        
+    temp = displayString;
 
-    GetTextExtentPoint32(hdc, temp.c_str(), temp.size(), &sizeString);       
+    GetTextExtentPoint32(hdc, temp.c_str(), temp.size(), &sizeString);
 
     // If the width of the string is greater than the column width shave
     // the string and add the ellipsis
