@@ -17,6 +17,7 @@ Linux:
 	  above)
 
 Windows:
+  Build:
 	In addition to the makefiles provided for the unix platforms
 	project files are located in the base\win32\prj directory. As of
 	the first release only MS Visual C++ 5.0 project files are 
@@ -29,6 +30,24 @@ Windows:
 	Just make sure the plugins directory is in the same 
 	location.
 
+  Install:   
+	In order to build the installer you will need InstallShield
+	Pro version 5.0 or later. The InstallShield project file is
+	in the install/win32 directory.
+
+	The first thing you need to do is run the Media Build Wizard
+	under the Build menu. Choose the package you wish to create
+	(FreeAmp 32bit Install, etc.) and click "Next" until it builds.
+
+	Next, compile the installer from the Build menu. This will place
+	the install files in:
+
+	install/win32/Media/<Package>/Disk Images/disk1
+
+	you can run the setup.exe file or use the PackageForTheWeb 
+	utility to create a self-extracting installer.
+
+  NOTE:
 	The InstallShield installer looks for the program files in the 
 	base\win32\prj directory so if you want to build an installer
 	do not remove the files.
