@@ -229,7 +229,7 @@ static int my_rand(int n)
 {
     srand( (unsigned)time( NULL ) );
 
-    return rand() % n;
+    return (int)((float)n * rand() / (RAND_MAX + 1.0));
 }
 
 // Implementation of the PlaylistManager Class
