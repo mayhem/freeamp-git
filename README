@@ -1,12 +1,12 @@
 This documents how to get you up, running and using FreeAmp.  It also
 explains a bit about where we are coming from.
 
-FreeAmp Win32 Preview (11-3-98) Usage:
-  This is a preview release of the new FreeAmp UI.  I works properly, but lacks
-  some features.  The basic usage is:
+FreeAmp Win32 1.0.0 (11-9-98) Usage:
+  This is the new FreeAmp UI.  It is simple, clean and works well.
+  The usage is as follows:
 
-  * drag a file onto the Player to add it to the playlist
-    (the first file dragged on will automatically begin playing)
+  * dragging a file (or files) onto the Player sets the playlist.
+    If the player is currently playing, it will stop.
   * move between files in the playlist using the |< and >| buttons
   * pause/play again by pressing the > button
   * stop by pressing the [] buton
@@ -17,7 +17,15 @@ FreeAmp Win32 Preview (11-3-98) Usage:
     slowly.  move it a lot vertically, and the position of the song increments quickly.)
     let up the mouse button to move to the selected point in the song.
   * clicking on the display cycles through total time, current time and time remaining.
-
+  * Of the six buttons to the right of the display, the upper left is
+    disabled (in the future will switch between modes)
+  * the upper middle minimizes the player
+  * the upper right quits the player
+  * the lower left cycles through Repeat Mode in the following order:
+    Repeat Current Song, Repeat Playlist, Repeat off.
+  * the lower middle toggles 'Shuffle' mode.
+  * the lower right presents the 'Open File' dialog.  The files
+    selected here will replace the playlist in the same fashion as drag-n-drop
 
 INSTALLATION:
 
