@@ -66,6 +66,7 @@ CLEAN :
 	-@erase "$(INTDIR)\vc50.idb"
 	-@erase "$(INTDIR)\win32prefs.obj"
 	-@erase "$(INTDIR)\win32thread.obj"
+	-@erase "$(INTDIR)\win32volume.obj"
 	-@erase "$(OUTDIR)\soundcard.exp"
 	-@erase "$(OUTDIR)\soundcard.lib"
 	-@erase ".\soundcard.pmo"
@@ -105,7 +106,8 @@ LINK32_OBJS= \
 	"$(INTDIR)\soundcardpmo.obj" \
 	"$(INTDIR)\thread.obj" \
 	"$(INTDIR)\win32prefs.obj" \
-	"$(INTDIR)\win32thread.obj"
+	"$(INTDIR)\win32thread.obj" \
+	"$(INTDIR)\win32volume.obj"
 
 ".\soundcard.pmo" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -118,8 +120,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : ".\soundcard.pmo"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                         ..\..\..\..\base\win32\prj\plugins
-	copy soundcard.pmo                    ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                          ..\..\..\..\base\win32\prj\plugins
+	copy soundcard.pmo                     ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "soundcard - Win32 Debug"
@@ -151,6 +153,7 @@ CLEAN :
 	-@erase "$(INTDIR)\vc50.pdb"
 	-@erase "$(INTDIR)\win32prefs.obj"
 	-@erase "$(INTDIR)\win32thread.obj"
+	-@erase "$(INTDIR)\win32volume.obj"
 	-@erase "$(OUTDIR)\soundcard.exp"
 	-@erase "$(OUTDIR)\soundcard.lib"
 	-@erase "$(OUTDIR)\soundcard.pdb"
@@ -192,7 +195,8 @@ LINK32_OBJS= \
 	"$(INTDIR)\soundcardpmo.obj" \
 	"$(INTDIR)\thread.obj" \
 	"$(INTDIR)\win32prefs.obj" \
-	"$(INTDIR)\win32thread.obj"
+	"$(INTDIR)\win32thread.obj" \
+	"$(INTDIR)\win32volume.obj"
 
 ".\soundcard.pmo" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -205,8 +209,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : ".\soundcard.pmo"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                         ..\..\..\..\base\win32\prj\plugins
-	copy soundcard.pmo                    ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                          ..\..\..\..\base\win32\prj\plugins
+	copy soundcard.pmo                     ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "soundcard - Win32 NASM Debug"
@@ -238,6 +242,7 @@ CLEAN :
 	-@erase "$(INTDIR)\vc50.pdb"
 	-@erase "$(INTDIR)\win32prefs.obj"
 	-@erase "$(INTDIR)\win32thread.obj"
+	-@erase "$(INTDIR)\win32volume.obj"
 	-@erase "$(OUTDIR)\soundcard.exp"
 	-@erase "$(OUTDIR)\soundcard.lib"
 	-@erase "$(OUTDIR)\soundcard.pdb"
@@ -279,7 +284,8 @@ LINK32_OBJS= \
 	"$(INTDIR)\soundcardpmo.obj" \
 	"$(INTDIR)\thread.obj" \
 	"$(INTDIR)\win32prefs.obj" \
-	"$(INTDIR)\win32thread.obj"
+	"$(INTDIR)\win32thread.obj" \
+	"$(INTDIR)\win32volume.obj"
 
 ".\soundcard.pmo" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -292,8 +298,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : ".\soundcard.pmo"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                         ..\..\..\..\base\win32\prj\plugins
-	copy soundcard.pmo                    ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                          ..\..\..\..\base\win32\prj\plugins
+	copy soundcard.pmo                     ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "soundcard - Win32 NASM Release"
@@ -324,6 +330,7 @@ CLEAN :
 	-@erase "$(INTDIR)\vc50.idb"
 	-@erase "$(INTDIR)\win32prefs.obj"
 	-@erase "$(INTDIR)\win32thread.obj"
+	-@erase "$(INTDIR)\win32volume.obj"
 	-@erase "$(OUTDIR)\soundcard.exp"
 	-@erase "$(OUTDIR)\soundcard.lib"
 	-@erase ".\soundcard.pmo"
@@ -363,7 +370,8 @@ LINK32_OBJS= \
 	"$(INTDIR)\soundcardpmo.obj" \
 	"$(INTDIR)\thread.obj" \
 	"$(INTDIR)\win32prefs.obj" \
-	"$(INTDIR)\win32thread.obj"
+	"$(INTDIR)\win32thread.obj" \
+	"$(INTDIR)\win32volume.obj"
 
 ".\soundcard.pmo" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -376,8 +384,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : ".\soundcard.pmo"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                         ..\..\..\..\base\win32\prj\plugins
-	copy soundcard.pmo                    ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                          ..\..\..\..\base\win32\prj\plugins
+	copy soundcard.pmo                     ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 
@@ -460,6 +468,7 @@ DEP_CPP_EVENT=\
 	"..\..\..\..\base\include\list.h"\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\queue.h"\
+	"..\..\..\..\base\include\volume.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
@@ -484,6 +493,7 @@ DEP_CPP_EVENT=\
 	"..\..\..\..\base\include\list.h"\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\queue.h"\
+	"..\..\..\..\base\include\volume.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
@@ -491,6 +501,7 @@ DEP_CPP_EVENT=\
 	"..\..\..\include\pmo.h"\
 	"..\..\..\include\pmoevent.h"\
 	"..\..\..\include\pullbuffer.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"\
@@ -508,6 +519,7 @@ DEP_CPP_EVENT=\
 	"..\..\..\..\base\include\list.h"\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\queue.h"\
+	"..\..\..\..\base\include\volume.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
@@ -515,6 +527,7 @@ DEP_CPP_EVENT=\
 	"..\..\..\include\pmo.h"\
 	"..\..\..\include\pmoevent.h"\
 	"..\..\..\include\pullbuffer.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"\
@@ -532,6 +545,7 @@ DEP_CPP_EVENT=\
 	"..\..\..\..\base\include\list.h"\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\queue.h"\
+	"..\..\..\..\base\include\volume.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
@@ -714,7 +728,7 @@ SOURCE=..\res\soundcard.rc
 
 "$(INTDIR)\soundcard.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\soundcard.res" /i\
- "\Local\src\freeamp\io\soundcard\win32\res" /d "NDEBUG" $(SOURCE)
+ "\TEMP\freeamp\io\soundcard\win32\res" /d "NDEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "soundcard - Win32 Debug"
@@ -722,7 +736,7 @@ SOURCE=..\res\soundcard.rc
 
 "$(INTDIR)\soundcard.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\soundcard.res" /i\
- "\Local\src\freeamp\io\soundcard\win32\res" /d "_DEBUG" $(SOURCE)
+ "\TEMP\freeamp\io\soundcard\win32\res" /d "_DEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "soundcard - Win32 NASM Debug"
@@ -730,7 +744,7 @@ SOURCE=..\res\soundcard.rc
 
 "$(INTDIR)\soundcard.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\soundcard.res" /i\
- "\Local\src\freeamp\io\soundcard\win32\res" /d "_DEBUG" $(SOURCE)
+ "\TEMP\freeamp\io\soundcard\win32\res" /d "_DEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "soundcard - Win32 NASM Release"
@@ -738,7 +752,7 @@ SOURCE=..\res\soundcard.rc
 
 "$(INTDIR)\soundcard.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\soundcard.res" /i\
- "\Local\src\freeamp\io\soundcard\win32\res" /d "NDEBUG" $(SOURCE)
+ "\TEMP\freeamp\io\soundcard\win32\res" /d "NDEBUG" $(SOURCE)
 
 
 !ENDIF 
@@ -759,6 +773,7 @@ DEP_CPP_SOUND=\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\queue.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\volume.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
@@ -767,6 +782,7 @@ DEP_CPP_SOUND=\
 	"..\..\..\include\pmoevent.h"\
 	"..\..\..\include\pullbuffer.h"\
 	"..\include\soundcardpmo.h"\
+	"..\include\win32volume.h"\
 	
 
 "$(INTDIR)\soundcardpmo.obj" : $(SOURCE) $(DEP_CPP_SOUND) "$(INTDIR)"\
@@ -788,6 +804,7 @@ DEP_CPP_SOUND=\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\queue.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\volume.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
@@ -796,6 +813,7 @@ DEP_CPP_SOUND=\
 	"..\..\..\include\pmoevent.h"\
 	"..\..\..\include\pullbuffer.h"\
 	"..\include\soundcardpmo.h"\
+	"..\include\win32volume.h"\
 	
 
 "$(INTDIR)\soundcardpmo.obj" : $(SOURCE) $(DEP_CPP_SOUND) "$(INTDIR)"\
@@ -817,6 +835,7 @@ DEP_CPP_SOUND=\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\queue.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\volume.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
@@ -825,6 +844,7 @@ DEP_CPP_SOUND=\
 	"..\..\..\include\pmoevent.h"\
 	"..\..\..\include\pullbuffer.h"\
 	"..\include\soundcardpmo.h"\
+	"..\include\win32volume.h"\
 	
 
 "$(INTDIR)\soundcardpmo.obj" : $(SOURCE) $(DEP_CPP_SOUND) "$(INTDIR)"\
@@ -846,6 +866,7 @@ DEP_CPP_SOUND=\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\queue.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\volume.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
@@ -854,6 +875,7 @@ DEP_CPP_SOUND=\
 	"..\..\..\include\pmoevent.h"\
 	"..\..\..\include\pullbuffer.h"\
 	"..\include\soundcardpmo.h"\
+	"..\include\win32volume.h"\
 	
 
 "$(INTDIR)\soundcardpmo.obj" : $(SOURCE) $(DEP_CPP_SOUND) "$(INTDIR)"\
@@ -885,6 +907,10 @@ DEP_CPP_THREA=\
 	"..\..\..\..\base\win32\include\win32thread.h"\
 	"..\..\..\..\config\config.h"\
 	
+NODEP_CPP_THREA=\
+	"..\..\..\..\base\src\linuxthread.h"\
+	"..\..\..\..\base\src\solaristhread.h"\
+	
 
 "$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"\
  "..\..\..\..\config\config.h"
@@ -897,6 +923,10 @@ DEP_CPP_THREA=\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\win32thread.h"\
 	"..\..\..\..\config\config.h"\
+	
+NODEP_CPP_THREA=\
+	"..\..\..\..\base\src\linuxthread.h"\
+	"..\..\..\..\base\src\solaristhread.h"\
 	
 
 "$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"\
@@ -1029,6 +1059,62 @@ DEP_CPP_WIN32T=\
 	
 
 "$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32T) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
+SOURCE=..\src\win32volume.cpp
+
+!IF  "$(CFG)" == "soundcard - Win32 Release"
+
+DEP_CPP_WIN32V=\
+	"..\..\..\..\base\include\volume.h"\
+	"..\..\..\..\config\config.h"\
+	"..\include\win32volume.h"\
+	
+
+"$(INTDIR)\win32volume.obj" : $(SOURCE) $(DEP_CPP_WIN32V) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "soundcard - Win32 Debug"
+
+DEP_CPP_WIN32V=\
+	"..\..\..\..\base\include\volume.h"\
+	"..\..\..\..\config\config.h"\
+	"..\include\win32volume.h"\
+	
+
+"$(INTDIR)\win32volume.obj" : $(SOURCE) $(DEP_CPP_WIN32V) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "soundcard - Win32 NASM Debug"
+
+DEP_CPP_WIN32V=\
+	"..\..\..\..\base\include\volume.h"\
+	"..\..\..\..\config\config.h"\
+	"..\include\win32volume.h"\
+	
+
+"$(INTDIR)\win32volume.obj" : $(SOURCE) $(DEP_CPP_WIN32V) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "soundcard - Win32 NASM Release"
+
+DEP_CPP_WIN32V=\
+	"..\..\..\..\base\include\volume.h"\
+	"..\..\..\..\config\config.h"\
+	"..\include\win32volume.h"\
+	
+
+"$(INTDIR)\win32volume.obj" : $(SOURCE) $(DEP_CPP_WIN32V) "$(INTDIR)"\
  "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 

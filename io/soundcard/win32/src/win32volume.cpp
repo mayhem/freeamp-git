@@ -21,12 +21,9 @@
 	$Id$
 ____________________________________________________________________________*/
 
+#include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <linux/soundcard.h>
-#include <sys/ioctl.h>
-#include <fcntl.h>
 
 #include "win32volume.h"
 

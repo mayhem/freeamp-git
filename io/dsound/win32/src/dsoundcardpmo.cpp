@@ -254,6 +254,13 @@ DSoundCardPMO::
   }
 }
 
+VolumeManager*
+DSoundCardPMO::
+GetVolumeManager()
+{
+   return new DSoundVolumeManager();
+}
+
 Error
 DSoundCardPMO::
 Init(OutputInfo* info)
@@ -462,25 +469,6 @@ SetPropManager(Properties * p)
   m_propManager = p;
 
   return kError_NoErr;
-}
-
-int32
-DSoundCardPMO::
-GetVolume(void)
-{
-  int32 volume = 0;
-
-  if (m_DSBufferManager.pDSSecondaryBuffer)
-    m_DSBufferManager.pDSSecondaryBuffer->GetVolume((LPLONG) &volume);
-  return volume;
-}
-
-void
-DSoundCardPMO::
-SetVolume(int32 v)
-{
-  if (m_DSBufferManager.pDSSecondaryBuffer)
-    m_DSBufferManager.pDSSecondaryBuffer->SetVolume((LONG) v);
 }
 
 Error

@@ -808,7 +808,6 @@ CreateLMC(PlayListItem * pc, Event * pC)
    RegistryItem *pmi_item = pc->GetPMIRegistryItem();
    RegistryItem *lmc_item = pc->GetLMCRegistryItem();
    RegistryItem *item;
-   int32           iVolume;
 
    if (!pc)
    {

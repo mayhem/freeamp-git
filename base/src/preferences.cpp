@@ -44,8 +44,8 @@ const char* kWindowPositionLeftPref = "WindowPositionLeft";
 const char* kWindowPositionTopPref = "WindowPositionTop";
 const char* kWindowPositionWidthPref = "WindowPositionWidth";
 const char* kWindowPositionHeightPref = "WindowPositionHeight";
-const char* kHTTPStreamSave = "HTTPStreamSave";
-const char* kHTTPStreamSaveDir = "HTTPStreamSaveDir";
+const char* kSaveStreamPref = "SaveStream";
+const char* kSaveStreamDirPref = "SaveStreamDirectory";
 
 //logging
 const char* kUseDebugLogPref = "UseDebugLog";
@@ -56,13 +56,13 @@ const char* kLogOutputPref = "LogOutput";
 const char* kLogPerformancePref = "LogPerformance";
 
 // default values
-const int32  kDefaultInputBufferSize = 64;
-const int32  kDefaultOutputBufferSize = 512;
-const int32  kDefaultStreamBufferInterval = 3;
-const int32  kDefaultDecoderThreadPriority = 1;
-const bool   kDefaultLogging = false;
-const bool   kDefaultHTTPStreamSave = false;
-const char  *kDefaultHTTPStreamSaveDir = ".";
+const int32 kDefaultInputBufferSize = 64;
+const int32 kDefaultOutputBufferSize = 512;
+const int32 kDefaultStreamBufferInterval = 3;
+const int32 kDefaultDecoderThreadPriority = 1;
+const bool  kDefaultLogging = false;
+const bool  kDefaultSaveStream = false;
+const char* kDefaultSaveStreamDir = ".";
 
 Error
 Preferences::
@@ -107,11 +107,11 @@ SetDefaults()
     if (GetPrefBoolean(kLogPerformancePref, &dummyBool) == kError_NoPrefValue)
         SetPrefBoolean(kLogPerformancePref, kDefaultLogging);
 
-    if (GetPrefBoolean(kHTTPStreamSave, &dummyBool) == kError_NoPrefValue)
-        SetPrefBoolean(kHTTPStreamSave, kDefaultHTTPStreamSave);
+    if (GetPrefBoolean(kSaveStreamPref, &dummyBool) == kError_NoPrefValue)
+        SetPrefBoolean(kSaveStreamPref, kDefaultSaveStream);
 
-    if (GetPrefString(kHTTPStreamSaveDir, dummyString, &size) == kError_NoPrefValue)
-        SetPrefString(kHTTPStreamSaveDir, kDefaultHTTPStreamSaveDir);
+    if (GetPrefString(kSaveStreamDirPref, dummyString, &size) == kError_NoPrefValue)
+        SetPrefString(kSaveStreamDirPref, kDefaultSaveStreamDir);
 
     return kError_NoErr;
 }
@@ -484,6 +484,35 @@ SetWindowPosition(  int32 left,
         result = SetPrefInt32(kWindowPositionHeightPref, height);
 
     return result;
+}
+
+
+Error 
+Preferences::
+GetSaveStream(bool* value)
+{
+    return GetPrefBoolean(kSaveStreamPref, value);
+}
+
+Error 
+Preferences::
+SetSaveStream(bool value)
+{
+    return SetPrefBoolean(kSaveStreamPref, value);
+}
+
+Error 
+Preferences::
+GetStreamSaveDirectory(char* path, uint32* len)
+{
+    return GetPrefString(kSaveStreamDirPref, path, len);
+}
+
+Error 
+Preferences::
+SetStreamSaveDirectory(char* path)
+{
+    return SetPrefString(kSaveStreamDirPref, path);
 }
 
 LibDirFindHandle *

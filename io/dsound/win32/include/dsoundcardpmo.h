@@ -27,6 +27,8 @@ ____________________________________________________________________________*/
 #define _DSOUNDCARDPMO_H_
 
 /* project headers */
+#include <windows.h>
+
 #include "config.h"
 #include "pmo.h"
 #include "thread.h"
@@ -36,6 +38,7 @@ ____________________________________________________________________________*/
 #include "semaphore.h"
 #include "facontext.h"
 #include "preferences.h"
+#include "dsoundvolume.h"
 
 typedef enum {
   UNDERFLOW,
@@ -82,8 +85,7 @@ public:
   virtual Error   Clear();
 
   virtual Error   SetPropManager(Properties *p);
-  virtual void    SetVolume(int32);
-  virtual int32   GetVolume(void);
+  virtual VolumeManager *GetVolumeManager();
 
   static  void    StartWorkerThread(void *);
   virtual Error   BeginWrite(void *&pBuffer, size_t &iBytesToWrite);

@@ -48,6 +48,10 @@ ____________________________________________________________________________*/
 #define closesocket(s) close(s)
 #endif
 
+#ifndef F_OK
+#define F_OK 0
+#endif
+
 const int iHttpPort = 80;
 const int iMaxHostNameLen = 64;
 const int iGetHostNameBuffer = 1024;
@@ -383,26 +387,27 @@ Error HttpBuffer::Open(void)
 
     bool bSave;
     unsigned  size = 255;
-    m_context->prefs->GetPrefBoolean(kHTTPStreamSave, &bSave);
+    m_context->prefs->GetPrefBoolean(kSaveStreamPref, &bSave);
     if (bSave)
     {
         char szPath[255], szFile[255];
+        int i;
 
-        for(int i = 0; i < strlen(szStreamName); i++)
+        for(i = 0; i < strlen(szStreamName); i++)
            if (strchr("\\/?*{}[]()*|<>\"'", szStreamName[i]))
                szStreamName[i] = '-';
 
         if (szStreamName[0] == 0)
            sprintf(szStreamName, "%s:%d", szHostName, iPort);
 
-        if (m_context->prefs->GetPrefString(kHTTPStreamSaveDir, szPath, &size) == 
+        if (m_context->prefs->GetPrefString(kSaveStreamDirPref, szPath, &size) == 
             kError_NoPrefValue)
            strcpy(szPath, ".");
         if (szPath[strlen(szPath) - 1] == '/' ||
             szPath[strlen(szPath) - 1] == '\\')
             szPath[strlen(szPath) - 1]  = 0;
 
-        for(int i = 0;; i++)
+        for(i = 0;; i++)
         {
             if (!i)
                 sprintf(szFile, "%s/%s.mp3", szPath, szStreamName);
