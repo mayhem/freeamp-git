@@ -722,8 +722,11 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
                           string("in tag <Style>");
            return kError_InvalidParam;
        }
-       
-	   if (oAttrMap.find("Color") != oAttrMap.end() && 
+
+#ifdef HAVE_GTK
+       pFont = new GTKFont(*(GTKFont *)pFont);
+#endif
+       if (oAttrMap.find("Color") != oAttrMap.end() && 
            oAttrMap["Color"] != string(""))
        {
            eRet = ParseColor(oAttrMap["Color"], oColor);
@@ -749,7 +752,7 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
                oColor, bBold, bItalic, bUnderline);
        
        return kError_NoErr;
-	}
+    }
 
     if (oElement == string("ChangeWindow"))
     {

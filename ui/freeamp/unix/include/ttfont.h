@@ -42,6 +42,8 @@ typedef struct _efont
      TT_Raster_Map     **glyphs_cached;
      int                 max_descent;
      int                 max_ascent;
+     int                 ascent;
+     int                 descent;
   }
 Efont;
 

@@ -118,17 +118,12 @@ destroy_font_raster(TT_Raster_Map * rmap)
 static TT_Raster_Map *
 calc_size(Efont * f, int *width, int *height, char *text)
 {
-   int                 i, upm, ascent, descent, pw, ph;
+   int                 i, pw, ph;
    TT_Instance_Metrics imetrics;
    TT_Glyph_Metrics    gmetrics;
    TT_Raster_Map      *rtmp;
 
    TT_Get_Instance_Metrics(f->instance, &imetrics);
-   upm = f->properties.header->Units_Per_EM;
-   ascent = (f->properties.horizontal->Ascender * imetrics.y_ppem) / upm;
-   descent = (f->properties.horizontal->Descender * imetrics.y_ppem) / upm;
-   if (descent < 0)
-      descent = -descent;
    pw = 0;
    ph = ((f->max_ascent) - f->max_descent) / 64;
 
@@ -662,6 +657,18 @@ Efont_load(char *file, int size)
 	   f->max_ascent = ((metrics.bbox.yMax + 63) & -64);
      }
 
+   TT_Instance_Metrics imetrics;
+   int upm;
+
+   TT_Get_Instance_Metrics(f->instance, &imetrics);
+   upm = f->properties.header->Units_Per_EM;
+   f->ascent = (f->properties.horizontal->Ascender * imetrics.y_ppem) / upm;
+   f->descent = (f->properties.horizontal->Descender * imetrics.y_ppem) / upm;
+   if (f->ascent < 0)
+      f->ascent = -f->ascent;
+   if (f->descent < 0)
+      f->descent = -f->descent;
+
    ttfLock.Release();
 
    return f;
@@ -673,22 +680,15 @@ Efont_extents(Efont * f, char *text, int *font_ascent_return,
 	      int *max_ascent_return, int *max_descent_return,
 	      int *lbearing_return, int *rbearing_return)
 {
-   int                 i, upm, ascent, descent, pw;
-   TT_Instance_Metrics imetrics;
+   int                 i, ascent, descent, pw;
    TT_Glyph_Metrics    gmetrics;
 
    if (!f)
       return;
 
    ttfLock.Acquire();
-   TT_Get_Instance_Metrics(f->instance, &imetrics);
-   upm = f->properties.header->Units_Per_EM;
-   ascent = (f->properties.horizontal->Ascender * imetrics.y_ppem) / upm;
-   descent = (f->properties.horizontal->Descender * imetrics.y_ppem) / upm;
-   if (ascent < 0)
-      ascent = -ascent;
-   if (descent < 0)
-      descent = -descent;
+   ascent = f->ascent;
+   descent = f->descent;
    pw = 0;
 
    for (i = 0; text[i]; i++)

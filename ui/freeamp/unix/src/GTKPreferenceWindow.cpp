@@ -51,9 +51,6 @@ GTKPreferenceWindow::~GTKPreferenceWindow(void)
 
 static gboolean pref_destroy(GtkWidget *widget, gpointer p)
 {
-    bool runmain = (bool)p;
-    if (runmain)
-        gtk_main_quit();
     return FALSE;
 }
 
@@ -134,7 +131,7 @@ bool GTKPreferenceWindow::Show(Window *pWindow)
     mainWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_modal(GTK_WINDOW(mainWindow), TRUE);
     gtk_signal_connect(GTK_OBJECT(mainWindow), "destroy",
-                       GTK_SIGNAL_FUNC(pref_destroy), (gpointer)false);
+                       GTK_SIGNAL_FUNC(pref_destroy), NULL);
     gtk_window_set_title(GTK_WINDOW(mainWindow), BRANDING" - Preferences");
 
     GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
@@ -1048,6 +1045,29 @@ GtkWidget *GTKPreferenceWindow::CreatePage3(void)
                                 proposedValues.outputIndex);
     gtk_widget_show(pmoOptionMenu);
 
+    frame = gtk_frame_new("Portable Devices");
+    gtk_box_pack_start(GTK_BOX(pane), frame, FALSE, FALSE, 0);
+    gtk_container_set_border_width(GTK_CONTAINER(frame), 1);
+    gtk_widget_show(frame);
+
+    GtkWidget *vbox = gtk_vbox_new(FALSE, 5);
+    gtk_container_add(GTK_CONTAINER(frame), vbox);
+    gtk_container_set_border_width(GTK_CONTAINER(vbox), 1);
+    gtk_widget_show(vbox);
+
+    GtkWidget *listwindow = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(listwindow),
+                                   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    gtk_box_pack_start(GTK_BOX(vbox), listwindow, TRUE, TRUE, 5);
+    gtk_widget_show(listwindow);
+
+    GtkWidget *textlabel = gtk_label_new(NULL);
+    gtk_label_set_line_wrap(GTK_LABEL(textlabel), TRUE);
+    gtk_label_set_text(GTK_LABEL(textlabel), "Select from the list above any portable devices you own.  This will enable you to edit the contents of your portable device directly from the \"My Music\" window.  If you do not see your portable device listed try checking for an update.  We might have added support for it since you installed.");
+    gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_FILL);
+    gtk_box_pack_start(GTK_BOX(vbox), textlabel, TRUE, FALSE, 0);
+    gtk_widget_show(textlabel);
+
     return pane;
 }
 
@@ -1329,7 +1349,8 @@ void GTKPreferenceWindow::UpdateThemeList(void)
          Text[0] = (char *)((*i).first.c_str());
          gtk_clist_append(GTK_CLIST(themeList), Text); 
          if ((*i).second == originalValues.currentTheme) 
-             proposedValues.listboxIndex = currentValues.listboxIndex = iLoop;
+             originalValues.listboxIndex = proposedValues.listboxIndex 
+                                         = currentValues.listboxIndex = iLoop;
     }
 
     gtk_clist_select_row(GTK_CLIST(themeList), proposedValues.listboxIndex, 0);

@@ -870,6 +870,9 @@ void GTKMusicBrowser::UpdateCatalog(void)
 
     vector<ArtistList *>::const_iterator i = artistList->begin();
     for (; i != artistList->end(); i++) {
+        if (!*i)
+            continue;
+
         GtkCTreeNode *artTree, *artItem = NULL;
 
         name[0] = (char *)(*i)->name.c_str();
@@ -884,6 +887,9 @@ void GTKMusicBrowser::UpdateCatalog(void)
 
         vector<AlbumList *>::iterator j = (*i)->m_albumList->begin();
         for (; j != (*i)->m_albumList->end(); j++) {
+            if (!*j)
+                continue;
+
             GtkCTreeNode *trackItem = NULL;
 
             name[0] = (char *)(*j)->name.c_str();
@@ -898,6 +904,9 @@ void GTKMusicBrowser::UpdateCatalog(void)
 
             vector<PlaylistItem *>::iterator k = (*j)->m_trackList->begin();
             for (;k != (*j)->m_trackList->end(); k++) {
+                if (!*k)
+                    continue;
+
                 name[0] = (char *)(*k)->GetMetaData().Title().c_str();
                 pixmap =gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, 
                                           &mask, &style->bg[GTK_STATE_NORMAL],

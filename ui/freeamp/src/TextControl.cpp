@@ -82,7 +82,9 @@ bool TextControl::StyleHasBeenSet(void)
 
 TextControl::~TextControl(void)
 {
-
+#ifdef HAVE_GTK
+    delete m_pFont;
+#endif
 }
 
 void TextControl::Init(void)

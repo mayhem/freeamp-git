@@ -269,9 +269,14 @@ void GTKFont::Render(Rect &oClipRect, string &oText, int iOffset,
     }
 #ifdef HAVE_FREETYPE
     else if (type == kFontTypeTTF) {
+       int ycoord;
+       ycoord = oClipRect.y1 + oClipRect.Height();
+       if (ttfont->ascent <= oClipRect.Height())
+           ycoord -= ttfont->descent;
+       else
+           ycoord -= ttfont->descent / 2;
        EFont_draw_string(bitmap->GetBitmap(), gc, oClipRect.x1 + iOffset, 
-                         oClipRect.y1 + oClipRect.Height() - 3, 
-                         (char *)oText.c_str(), ttfont);
+                         ycoord, (char *)oText.c_str(), ttfont);
     }
 #endif
     gdk_flush();
