@@ -252,10 +252,11 @@ SetText(char* text)
     // that will hold the pre-rendered string
     for(i = 0; m_text[i]; i++)
     {
-        if(m_text[i] < 127 && m_text[i] > 31)
+        textLength += m_fontWidths[(BYTE)(m_text[i] - 32)];
+        /*if(m_text[i] < 127 && m_text[i] > 31)
             textLength += m_fontWidths[m_text[i] - 32];
         else
-            textLength += m_fontWidths[63 - 32];
+            textLength += m_fontWidths[63 - 32];*/
     }
 
     m_needToScroll = (textLength > Width());
@@ -294,7 +295,10 @@ SetText(char* text)
         int32 y;
         int32 width;
 
-        if(m_text[i] < 127 && m_text[i] > 31)
+        y = ((BYTE)(m_text[i] - 32))*m_fontHeight;
+        width = m_fontWidths[(BYTE)(m_text[i] - 32)];
+
+        /*if(m_text[i] < 127 && m_text[i] > 31)
         {
             y = (m_text[i] - 32)*m_fontHeight;
             width = m_fontWidths[m_text[i] - 32];
@@ -303,7 +307,7 @@ SetText(char* text)
         {
             y = (63 - 32)*m_fontHeight;
             width = m_fontWidths[63 - 32];
-        }
+        }*/
 
         Renderer::Copy( m_textBitmap,
                         offset, 
