@@ -38,6 +38,7 @@ using namespace std;
 #include "config.h"
 #include "errors.h"
 #include "metadata.h"
+#include "mutex.h"
 #include "database.h"
 #include "musicbrainz/mb_c.h"
 
@@ -61,6 +62,7 @@ class MusicBrainzCD : public MetaDataFormat {
     musicbrainz_t o;
     vector<int> m_trackLens;
     int         m_nextTrack;
+	Mutex       m_mutex;
 };
 
 #endif

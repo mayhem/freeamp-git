@@ -36,7 +36,7 @@ using namespace std;
 
 const int iDataLen = 256;
 
-#define DB printf("%d\n", __LINE__);
+#define DB Debug_v("%d", __LINE__);
 
 extern "C"
 {
@@ -75,9 +75,11 @@ bool MusicBrainzCD::ReadMetaData(const char* url, MetaData* metadata)
     if (strncasecmp(".CDA", ext, 4))
        return false;
 
-    ptr = strrchr(url, DIR_MARKER);
+    ptr = strrchr(url, '/');
     if (ptr == NULL)
        return false;
+
+	m_mutex.Acquire();
 
     track = atoi(ptr + 1);
     if (track != m_nextTrack)
@@ -90,12 +92,16 @@ bool MusicBrainzCD::ReadMetaData(const char* url, MetaData* metadata)
         {
            mb_Delete(o);
            o = NULL; 
+	       m_mutex.Release();
            return false;
         }
         m_nextTrack = 1;
     }
     if (o == NULL)
+	{
+       m_mutex.Release();
        return false;
+	}
 
     mb_Select(o, MB_SelectFirstItem);  
 
@@ -140,6 +146,8 @@ bool MusicBrainzCD::ReadMetaData(const char* url, MetaData* metadata)
     }
     m_nextTrack++;
 
+	m_mutex.Release();
+
     return true;
 }
 
@@ -154,6 +162,7 @@ bool MusicBrainzCD::LookupCD(void)
     Database     *db;
     string        rdf, proxyServer;
 
+	error[0] = 0;
     m_context->prefs->GetPrefString(kDatabaseDirPref, tempDir, &length);
 
     string database = string(tempDir) + string(DIR_MARKER_STR) +
@@ -187,7 +196,6 @@ bool MusicBrainzCD::LookupCD(void)
     m_trackLens.clear();
     for(ptr = strtok(trackLens, " "); ptr; ptr = strtok(NULL, " "))
        m_trackLens.push_back(atoi(ptr));
-
     mb_GetResultData(o, MB_LocalGetId, diskId, 64);
 
     db = new Database(database.c_str());
