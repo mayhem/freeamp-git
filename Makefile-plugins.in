@@ -29,7 +29,7 @@ uninstall_plugins uninstall-plugins:
 OSDEPPLUGINS = @OSDEPPLUGINS@
 
 clean-plugins plugins-clean:
-	-rm -f $(VORBISLIBOBJ) $(VORBISOBJ) $(VORBISMDFOBJ) $(SIGNATUREPMOOBJ) $(LIBHTTPOBJ) $(KJOFOLOBJ) $(WINAMPOBJ) $(CDPMOOBJ) $(CDLMCOBJ) $(UNZIPOBJ) $(CDDBOBJ) $(PLSOBJ) $(RMPOBJ) $(MISCOBJ) $(ZLIBOBJ) $(MUSICBROWSEROBJ) $(MAKETHEMEOBJ) $(LFIOBJ) $(HTTPOBJ) $(OBSPMI) $(SCPMOOBJ) $(ALSAOBJ) $(ESNDOBJ) $(DOWNLOADUIOBJ) $(CMDUIOBJ) $(MPG123UIOBJ) $(NCURSESUIOBJ) $(LCDUIOBJ) $(IRMANUIOBJ) $(FREEAMPUIOBJ) $(ID3V1OBJ) $(ID3V2OBJ) $(M3UOBJ) $(PMP300OBJ) $(XINGLMCOBJ) $(WAVPMOOBJ) MakeTheme plugins/*.*
+	-rm -f $(CORBAUIOBJ) $(VORBISLIBOBJ) $(VORBISOBJ) $(VORBISMDFOBJ) $(SIGNATUREPMOOBJ) $(LIBHTTPOBJ) $(KJOFOLOBJ) $(WINAMPOBJ) $(CDPMOOBJ) $(CDLMCOBJ) $(UNZIPOBJ) $(CDDBOBJ) $(PLSOBJ) $(RMPOBJ) $(MISCOBJ) $(ZLIBOBJ) $(MUSICBROWSEROBJ) $(MAKETHEMEOBJ) $(LFIOBJ) $(HTTPOBJ) $(OBSPMI) $(SCPMOOBJ) $(ALSAOBJ) $(ESNDOBJ) $(DOWNLOADUIOBJ) $(CMDUIOBJ) $(MPG123UIOBJ) $(NCURSESUIOBJ) $(LCDUIOBJ) $(IRMANUIOBJ) $(FREEAMPUIOBJ) $(ID3V1OBJ) $(ID3V2OBJ) $(M3UOBJ) $(PMP300OBJ) $(XINGLMCOBJ) $(WAVPMOOBJ) MakeTheme plugins/*.*
 
 PLUGINS =  lib/zlib/lib/libzlib.la
 PLUGINS += lib/unzip/lib/libunzip.la
@@ -288,6 +288,24 @@ IRMANUIOBJ += ui/irman/src/irfunc.o ui/irman/src/irio.o
 plugins/irman.ui: $(IRMANUIOBJ)
 	$(LINKMOD) -o $@ $(IRMANUIOBJ) $(STATICLD)
 
+CORBAUIOBJ  = ui/corba/Freeamp-common.o ui/corba/corbaUI.o ui/corba/corba.o
+CORBAUIOBJ += ui/corba/Freeamp-skels.o
+
+ui/corba/Freeamp.idl:
+	cd ui/corba && $(ORBIT_IDL) Freeamp.idl
+
+ui/corba/Freeamp.h:
+	cd ui/corba && $(ORBIT_IDL) Freeamp.idl
+
+ui/corba/Freeamp-common.c: ui/corba/Freeamp.idl
+	cd ui/corba && $(ORBIT_IDL) Freeamp.idl
+
+ui/corba/Freeamp-skels.c: ui/corba/Freeamp.idl
+	cd ui/corba && $(ORBIT_IDL) Freeamp.idl
+
+plugins/corba.ui: $(CORBAUIOBJ)
+	$(LINKMOD) -o $@ $(CORBAUIOBJ) $(STATICLD) $(LDFLAGS) $(ORBIT_LIBS)
+
 #
 # LMC section
 
@@ -466,7 +484,7 @@ lib/http/lib/libfahttp.la: $(LIBHTTPOBJ)
 	$(LIBMOD) $@ $(LIBHTTPOBJ)
 
 depend:
-	makedepend -fMakefile-plugins -- $(DEFS) -I/usr/include/g++-3 $(INCLUDES) $(CFLAGS) -- `echo $(VORBISMDFOBJ) $(WAVPMOOBJ) $(VORBISLIBOBJ) $(VORBISOBJ) $(SIGNATUREPMOOBJ) $(KJOFOLOBJ) $(LIBHTTPOBJ) $(UNZIPOBJ) $(WINAMPOBJ) $(LFIOBJ) $(DOWNLOADUIOBJ) $(CDDBOBJ) $(CDPMOOBJ) $(CDLMCOBJ) $(THEMEUIOBJ) $(MUSICBROWSEROBJ) $(HTTPOBJ) $(SCPMOOBJ) $(ALSAOBJ) $(ESNDOBJ) $(CMDUIOBJ) $(MPG123UIOBJ) $(NCURSESUIOBJ) $(LCDUIOBJ) $(IRMANUIOBJ) $(GTKUIOBJ) $(FREEAMPUIOBJ) $(XINGLMCOBJ) $(PMP300OBJ) $(M3UOBJ) $(ID3V1OBJ) $(ID3V2OBJ) | sed -e 's,\.o,.cpp,g' | sed -e 's,\.doh,.cpp,g'`
+	makedepend -fMakefile-plugins -- $(DEFS) -I/usr/include/g++-3 $(INCLUDES) $(CFLAGS) -- `echo $(CORBAUIOBJ) $(VORBISMDFOBJ) $(WAVPMOOBJ) $(VORBISLIBOBJ) $(VORBISOBJ) $(SIGNATUREPMOOBJ) $(KJOFOLOBJ) $(LIBHTTPOBJ) $(UNZIPOBJ) $(WINAMPOBJ) $(LFIOBJ) $(DOWNLOADUIOBJ) $(CDDBOBJ) $(CDPMOOBJ) $(CDLMCOBJ) $(THEMEUIOBJ) $(MUSICBROWSEROBJ) $(HTTPOBJ) $(SCPMOOBJ) $(ALSAOBJ) $(ESNDOBJ) $(CMDUIOBJ) $(MPG123UIOBJ) $(NCURSESUIOBJ) $(LCDUIOBJ) $(IRMANUIOBJ) $(GTKUIOBJ) $(FREEAMPUIOBJ) $(XINGLMCOBJ) $(PMP300OBJ) $(M3UOBJ) $(ID3V1OBJ) $(ID3V2OBJ) | sed -e 's,\.o,.cpp,g' | sed -e 's,\.doh,.cpp,g'`
  
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 

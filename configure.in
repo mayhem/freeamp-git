@@ -361,7 +361,7 @@ else
 fi
  
 AC_SUBST(TTF_LIBS)
- 
+
 dnl gtk+ junk
 
 have_gtk="true"
@@ -447,6 +447,33 @@ fi
 
 AC_SUBST(GTK_CFLAGS)
 AC_SUBST(GTK_LIBS)
+
+AC_SUBST(CFLAGS)
+
+dnl orbit crap
+save_CPPFLAGS="$CPPFLAGS"
+CPPFLAGS="$CPPFLAGS $GTK_CFLAGS"
+AC_LANG_SAVE
+AC_LANG_C
+AC_CHECK_HEADERS(orb/orbit.h, have_orbit="true", have_orbit="false")
+CPPFLAGS="$save_CPPFLAGS"
+AC_LANG_RESTORE
+
+ORBIT_LIBS=""
+ORBIT_IDL=""
+
+if test "$have_orbit" = "true"; then
+  ORBIT_LIBS=`orbit-config --libs server`
+  AC_DEFINE(HAVE_ORBIT)
+  OSDEPPLUGINS="$OSDEPPLUGINS plugins/corba.ui"
+  OSINC="$OSINC `orbit-config --cflags server`"
+  ORBIT_IDL=`which orbit-idl`
+fi
+
+AC_SUBST(ORBIT_LIBS)
+AC_SUBST(ORBIT_IDL)
+
+dnl rio stuff
 
 AC_ARG_ENABLE(rio, [  --enable-rio            Compile the rio pmp300 support plugin], enable_rio=yes, enable_rio=no)
 
