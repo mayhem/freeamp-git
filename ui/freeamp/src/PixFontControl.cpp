@@ -148,10 +148,9 @@ void PixFontControl::BlitLetter(char letter, Rect oDestRect)
 
     srcRect.x1 = m_lettermap[letter].col * m_LetterWidth; 
     srcRect.y1 = m_lettermap[letter].row * m_LetterHeight;
-    srcRect.x2 = srcRect.x1 + m_LetterWidth + 1;
-    srcRect.y2 = srcRect.y1 + m_LetterHeight + 1;
+    srcRect.x2 = srcRect.x1 + m_LetterWidth - 1;
+    srcRect.y2 = srcRect.y1 + m_LetterHeight;
 
-    oDestRect.x2++;
     oDestRect.y2++;
 
     m_pParent->GetCanvas()->MaskBlitRect(m_pBitmap, srcRect, oDestRect);

@@ -57,6 +57,7 @@ enum ControlTypeEnum
     eDialControl,
     eMultiStateControl,
     ePixFontControl,
+    ePixTimeControl,
     
     eUndefinedControl
 };

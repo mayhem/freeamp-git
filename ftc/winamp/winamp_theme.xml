@@ -239,7 +239,42 @@ None||Repeat current"/>
                                 Name="Titlebar"/>
             <ControlStateBitmap Rect="27, 15, 301, 28" State="Disabled"
                                 Name="Titlebar"/>
-         </ButtonControl>
+        </ButtonControl>
+        <PixmapTimeControl Name="Time">
+            <PartName Part="Minus" Name="MinusSign"/>
+            <PartName Part="MinuteTen" Name="MinuteTens"/> 
+            <PartName Part="MinuteOne" Name="MinuteOnes"/>
+            <PartName Part="SecondTen" Name="SecondTens"/>
+            <PartName Part="SecondOne" Name="SecondOnes"/>
+        </PixmapTimeControl>
+        <ButtonControl Name="MinusSign">
+            <Info Desc="" Tip=""/>
+            <Position Pos="40, 32"/>
+            <ControlStateBitmap Rect="20, 6, 24, 7" State="Disabled"
+                                Name="Numbers"/>
+            <ControlStateBitmap Rect="9, 6, 13, 7" State="Normal"
+                                Name="Numbers"/>
+        </ButtonControl>
+        <PixmapFontControl Name="MinuteTens" IgnoreCase="yes">
+            <Position Rect="48, 26, 56, 38"/>
+            <ControlBitmap Rect="0, 0, 98, 12" Name="Numbers"/>
+            <FontMap Map="0123456789 "/>
+        </PixmapFontControl>
+        <PixmapFontControl Name="MinuteOnes" IgnoreCase="yes">
+            <Position Rect="60, 26, 68, 38"/>
+            <ControlBitmap Rect="0, 0, 98, 12" Name="Numbers"/>
+            <FontMap Map="0123456789 "/>
+        </PixmapFontControl>
+        <PixmapFontControl Name="SecondTens" IgnoreCase="yes">
+            <Position Rect="78, 26, 86, 38"/>
+            <ControlBitmap Rect="0, 0, 98, 12" Name="Numbers"/>
+            <FontMap Map="0123456789 "/>
+        </PixmapFontControl>
+        <PixmapFontControl Name="SecondOnes" IgnoreCase="yes">
+            <Position Rect="90, 26, 98, 38"/>
+            <ControlBitmap Rect="0, 0, 98, 12" Name="Numbers"/>
+            <FontMap Map="0123456789 "/>
+        </PixmapFontControl>
     </Controls>
 </Window>
 

@@ -49,6 +49,7 @@ ____________________________________________________________________________*/
 #include "TextControl.h"
 #include "MultiStateControl.h"
 #include "PixFontControl.h"
+#include "PixTimeControl.h"
 #include "ThemeZip.h"
 #include "MessageDialog.h"
 #include "debug.h"
@@ -876,6 +877,56 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
        return kError_NoErr;
     }
 
+    if (oElement == string("PixmapTimeControl"))
+    {
+       m_bPosDefined = m_bBitmapDefined = m_bInfoDefined = false;
+
+       if (m_pCurrentControl)
+       {
+           m_oLastError = string("Controls cannot be nested");
+           return kError_InvalidParam;
+       }
+
+       if (oAttrMap.find("Name") == oAttrMap.end())
+       {
+           m_oLastError = string("the <PixmapTimeControl> tag needs a Name attribute");
+           return kError_ParseError;
+       }
+
+       m_eCurrentControl = ePixTimeControl;
+       m_pCurrentControl = new PixTimeControl(m_pCurrentWindow,
+                                              oAttrMap["Name"]);
+
+       return kError_NoErr;
+    }
+
+    if (oElement == string("PartName"))
+    {
+       if (m_pCurrentControl == NULL || m_eCurrentControl != ePixTimeControl)
+       {
+           m_oLastError = string("The <PartName> tag must be inside of a "
+                                 "<PixmapTimeControl> tag");
+           return kError_InvalidParam;
+       }
+
+       if (oAttrMap.find("Part") == oAttrMap.end())
+       {
+           m_oLastError = string("the <PartName> tag needs a Part attribute");
+           return kError_ParseError;
+       }
+
+       if (oAttrMap.find("Name") == oAttrMap.end())
+       {
+           m_oLastError = string("the <PartName> tag needs a Name attribute");
+           return kError_ParseError;
+       }
+
+       ((PixTimeControl *)m_pCurrentControl)->SetPartName(oAttrMap["Part"],
+                                                          oAttrMap["Name"]);
+
+       return kError_NoErr;
+    }
+    
     if (oElement == string("Style"))
     {
        Color  oColor(0, 0, 0);
@@ -1339,7 +1390,8 @@ Error Theme::EndElement(string &oElement)
         oElement == string("ControlBitmap") ||
         oElement == string("ControlStateBitmap") ||
         oElement == string("SliderTroughBitmap") ||
-        oElement == string("FontMap"))
+        oElement == string("FontMap") ||
+        oElement == string("PartName"))
     {
        if (m_pCurrentControl == NULL)
        {
@@ -1399,6 +1451,15 @@ Error Theme::EndElement(string &oElement)
        m_pParsedWindows->push_back(m_pCurrentWindow);
            
        m_pCurrentWindow = NULL;
+
+       return kError_NoErr;
+    }
+
+    if (oElement == string("PixmapTimeControl"))
+    {
+       m_pCurrentWindow->AddControl(m_pCurrentControl);
+       m_pCurrentControl = NULL;
+       m_eCurrentControl = eUndefinedControl;
 
        return kError_NoErr;
     }
