@@ -2562,8 +2562,6 @@ void MusicBrowserUI::CheckForCD()
     RegistryItem *pmo_item = NULL;
     int32 i = 0;
 
-	Debug_v("check cd\n");
-
     if(!pmoRegistry)
         return;
 

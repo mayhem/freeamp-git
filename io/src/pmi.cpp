@@ -45,6 +45,7 @@ ____________________________________________________________________________*/
 #include "pullbuffer.h"
 #include "facontext.h"
 #include "log.h"
+#include "debug.h"
 
 #define DB printf("%s:%d\n", __FILE__, __LINE__);
 
@@ -56,7 +57,8 @@ PhysicalMediaInput::PhysicalMediaInput(FAContext *context):
 
 PhysicalMediaInput::~PhysicalMediaInput()
 {
-    m_bExit = true;
+
+    m_bExit = true; 
     m_bPause = false;
     m_pSleepSem->Signal();
     m_pPauseSem->Signal();
