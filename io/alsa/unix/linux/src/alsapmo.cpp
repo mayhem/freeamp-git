@@ -278,11 +278,7 @@ Error AlsaPMO::Init(OutputInfo* info) {
 
     audio_set_all(ai);
 
-    myInfo->bits_per_sample = info->bits_per_sample;
-    myInfo->number_of_channels = info->number_of_channels;
-    myInfo->samples_per_second = info->samples_per_second;
-    myInfo->max_buffer_size = info->max_buffer_size;
-
+    memcpy(myInfo, info, sizeof(OutputInfo));
     if (snd_pcm_playback_time(ai->handle, true))
         ReportError("Cannot set soundcard time playback mode.");
 

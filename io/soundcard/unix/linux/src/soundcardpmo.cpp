@@ -207,10 +207,7 @@ Error SoundCardPMO::Init(OutputInfo * info)
       ReportError("Cannot set the soundcard's sampling speed.");
       return (Error) pmoError_IOCTL_SNDCTL_DSP_SPEED;
    }
-   myInfo->bits_per_sample = info->bits_per_sample;
-   myInfo->number_of_channels = info->number_of_channels;
-   myInfo->samples_per_second = info->samples_per_second;
-   myInfo->max_buffer_size = info->max_buffer_size;
+   memcpy(myInfo, info, sizeof(OutputInfo));
    m_properlyInitialized = true;
 
    // PORTING: The GETOSPACE ioctl determines how much space the kernel's
