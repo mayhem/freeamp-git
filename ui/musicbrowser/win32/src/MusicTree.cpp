@@ -752,6 +752,8 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
             bool shiftKeyPressed = IsShiftDown();
             bool ctrlKeyPressed = IsCtrlDown();
 
+            SetFocus(hwnd);
+
             HTREEITEM item;
             TV_HITTESTINFO hti;
 
