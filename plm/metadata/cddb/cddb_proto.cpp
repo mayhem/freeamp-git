@@ -40,6 +40,7 @@ ____________________________________________________________________________*/
 #include <netdb.h>
 #include <pwd.h>
 #include <unistd.h>
+#define closesocket(z) close(z)
 #else
 #include <winsock.h>
 #endif // WIN32

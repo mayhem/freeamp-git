@@ -63,7 +63,11 @@ typedef enum {
    kTreeTrack,
    kTreePlaylistHead,
    kTreePlaylist,
-   kTreeCDHead
+   kTreeCDHead,
+   kTreeStreamsHead,
+   kTreeWiredPlanetHead,
+   kTreeIcecastHead,
+   kTreeShoutcastHead
 } TreeNodeType;
 
 typedef struct {
@@ -106,6 +110,10 @@ class GTKMusicBrowser {
     int stopState;
 
     vector<PlaylistItem *> *CDTracks;
+
+    void FillWiredPlanet(void);
+    void FillIceCast(void);
+    void FillShoutCast(void);
 
  protected:
     FAContext *m_context;
@@ -152,8 +160,10 @@ class GTKMusicBrowser {
     /* Widget creation */
     void CreateExpanded(void);
     void CreateMenu(GtkWidget *);
+    void CreateToolbar(GtkWidget *);
     void CreatePlaylistList(GtkWidget *);
     void CreatePlaylist(void);
+    void CreateTree(void);
 
     GtkWidget *musicBrowser;
     GtkWidget *masterBox;
@@ -176,7 +186,18 @@ class GTKMusicBrowser {
     GtkCTreeNode *uncatTree;
     GtkCTreeNode *playlistTree;
     GtkCTreeNode *CDTree;
+    GtkCTreeNode *streamTree;
+    GtkCTreeNode *icecastTree;
+    GtkCTreeNode *shoutcastTree;
+    GtkCTreeNode *wiredplanetTree;
+    GtkCTreeNode *icecastSpace;
+    GtkCTreeNode *shoutcastSpace;
+    GtkCTreeNode *wiredplanetSpace;
 
+    bool wiredplanetExpanded;
+    bool icecastExpanded;
+    bool shoutcastExpanded;
+ 
     GtkWidget *NewPixmap(char **data);
 
     GtkStyle *normStyle;
@@ -219,6 +240,8 @@ class GTKMusicBrowser {
     bool CheckEmptyDatabase(void);
     
   public:
+
+    vector<PlaylistItem *> *GetTreeSelection(void);
     bool iSetShuffleMode;
 
     ClickState GetClickState() { return m_clickState; }

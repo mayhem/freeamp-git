@@ -148,11 +148,13 @@ plugins/download.ui: $(DOWNLOADUIOBJ)
 #	$(LINKMOD) -o $@ $(DOWNLOADUIOBJ) $(STATICLD)
 
 # musicbrowser ui
-UNIXMUSICBROWSEROBJ  = ui/musicbrowser/unix/src/gtkmusicbrowser.o 
+UNIXMUSICBROWSEROBJ  = ui/musicbrowser/unix/src/gtkmusicbrowser.o
+UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/browsermenu.o
+UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/browsertree.o
+UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/browserlist.o
 UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/musicbrowser.o 
 UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/infoeditor.o 
 UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/fileselector.o 
-UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/browsermenu.o 
 UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/musicsearch.o 
 UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/gtkmessagedialog.o 
 UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/introwizard.o
