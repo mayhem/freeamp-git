@@ -237,7 +237,10 @@ Error FreeAmpUI::Init()
 	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),shuffled_icon,&shuffled_icon_pixmap,NULL,&xpma);
 	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),repeat_icon,&repeat_icon_pixmap,NULL,&xpma);
 	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),all_icon,&all_icon_pixmap,NULL,&xpma);
-    } else if (display_depth >= 8) {
+    } else { //if (display_depth >= 8) {
+	if (display_depth < 8) {
+	    fprintf(stderr, "FreeAmpUI: FreeAmp has only been tested with screen depths of 8 bits and greater\n");
+	}
 	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),logo256,&m_iconPixmap,NULL,&xpma);
 	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),leftside256,&left_side_pixmap,NULL,&xpma);
 	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),dials256,&dials_pixmap,NULL,&xpma);
@@ -275,10 +278,6 @@ Error FreeAmpUI::Init()
 	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),repeat_icon256,&repeat_icon_pixmap,NULL,&xpma);
 	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),all_icon256,&all_icon_pixmap,NULL,&xpma);
 
-    } else {
-	cerr << "Only know how to deal with bit depths  >= 8 !!!" << endl;
-	m_playerEQ->AcceptEvent(new Event(CMD_QuitPlayer));
-	return kError_InitFailed;
     }
 
     int x=0;
@@ -339,7 +338,7 @@ Error FreeAmpUI::Init()
      * XTextProperty structures and set their other 
      * fields properly. */
 
-    char *window_name = "FreeAmp v1.0.0";
+    char *window_name = "FreeAmp v1.1.0";
     char *icon_name = "FreeAmp";
     XTextProperty windowName, iconName;
 
@@ -612,6 +611,20 @@ int32 FreeAmpUI::AcceptEvent(Event *e) {
 	    m_secondsPerFrame = info->GetSecondsPerFrame();
 	    break;
 	}
+	case INFO_ID3TagInfo: {
+	    ID3TagEvent *info = (ID3TagEvent *)e;
+	    Id3TagInfo p = info->GetId3Tag();
+	    char *pEnd = &((p.m_songName)[strlen(p.m_songName)]);
+	    while ( (pEnd != p.m_songName) && (*(pEnd - sizeof(char *)) == ' ')) pEnd--;
+	    char end = *pEnd;
+	    *pEnd = '\0';
+	    m_lcdWindow->SetMainText(p.m_songName);
+	    *pEnd = end;
+	    XLockDisplay(m_display);
+	    m_lcdWindow->Draw(FALcdWindow::FullRedraw);
+	    XUnlockDisplay(m_display);
+	    break;
+	}
 	case INFO_PlayListRepeat: {
 	    PlayListRepeatEvent *plre = (PlayListRepeatEvent *)e;
 	    switch (plre->GetRepeatMode()) 
@@ -882,7 +895,7 @@ void FreeAmpUI::SeekJogAction() {
     //cout << "seek delta: " << m_seekDelta << endl;
     m_seekSeconds += m_seekDelta;
     if (m_seekSeconds < 0) m_seekSeconds = 0;
-    if (m_seekSeconds > m_totalSeconds) m_seekSeconds = 0;
+    if (m_seekSeconds > m_totalSeconds) m_seekSeconds = m_totalSeconds;
     int32 s = m_seekSeconds;
     int32 h = s / 3600;
     int32 m = (s % 3600) / 60;

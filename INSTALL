@@ -16,15 +16,6 @@ Linux:
 	  (plugins are installed to $(libdir)/freeamp/plugins, as set
 	  above)
 
-	you may also wish to enable mpg123 compatability mode by
-	invoking freeamp as 'mpg123'  (i.e. do a ln -s freeamp mpg123
-	to make a symbolic link, then do a ./mpg123)  This makes it
-	useful as a decoder for such gui mpg123 frontends as GQmpeg.
-
-	Check out GQmpeg at
-	http://www.geocities.com/SiliconValley/Haven/5235/mpeg-over.html
-
-
 Windows:
 	In addition to the makefiles provided for the unix platforms
 	project files are located in the base\win32\prj directory. As of

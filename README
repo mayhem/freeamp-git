@@ -1,9 +1,41 @@
 This documents how to get you up, running and using FreeAmp.  It also
 explains a bit about where we are coming from.
 
+INSTALLATION:
+
+  See the document INSTALL
+
+FreeAmp Linux 1.1.0 (12-2-98) Usage:
+
+  freeamp [-ui <ui plugin name>] <song1.mp3> [song2.mp3]...
+  
+  * at the moment, the only way to modify the playlist is via the
+    command line when FreeAmp is started (playlist modification will
+    be in the next version)
+  * Move between files in the playlist using the |< and >| buttons
+  * Play by pressing the > button
+  * Pause by pressing the || button
+  * Stop by pressing the [] button
+  * Change volume clicking and dragging the left dial
+  * Seek by clicking and dragging the right dial.  This dial operates
+    in a 'jog' mode.  The farther you move the dial, the faster it
+    moves forward (or backward) in the song.  Drop to set the position
+  * Click on the display to cycle through 'total time', 'current time'
+    and 'remaining time'.
+The Six buttons on the right:
+  * Upper right is currently not functional (in the future it will
+    switch between player modes)
+  * Upper middle iconifies FreeAmp
+  * Upper right closes FreeAmp
+  * Lower left toggles Repeat Mode between None, Current and All
+  * Lower middle toggles Shuffle Mode between On and Off
+  * Lower right is currently not functional (in the future it will
+    open the file-open drawer)
+
+
 FreeAmp Win32 1.0.0 (11-9-98) Usage:
-  This is the new FreeAmp UI.  It is simple, clean and works well.
-  The usage is as follows:
+
+  freeamp [options] [file 1] [file 2]...
 
   * dragging a file (or files) onto the Player sets the playlist.
     If the player is currently playing, it will stop.
@@ -27,23 +59,6 @@ FreeAmp Win32 1.0.0 (11-9-98) Usage:
   * the lower right presents the 'Open File' dialog.  The files
     selected here will replace the playlist in the same fashion as drag-n-drop
 
-INSTALLATION:
-
-  See the document INSTALL
-
-USAGE (Unix):
-
-  freeamp [options] [file 1] [file 2]...
-
-  When freeamp loads, it scans for a directory 'plugins' in the path pointed to by
-  the environment variable FREEAMP_PATH.  If FREEAMP_PATH is not set,
-  the default path is searched:  .:~/.freeamp:$(libdir)/freeamp  where
-  $(libdir) is the libdir directory set by 'configure' when freeamp
-  was built.  This is usually /usr/local/lib.  
-
-USAGE (Windows):
-
-  freeamp [options] [file 1] [file 2]...
 
 
 ABOUT FreeAmp:
@@ -73,4 +88,5 @@ subscribe
 To make feature suggestions, send mail to freeamp-features@freeamp.org, or,
 better yet, if you are able, add the feature yourself and send us the
 updates!
+
 

@@ -168,7 +168,7 @@ bool Player::SetArgs(int32 argc, char** argv){
     } else {
 	pBegin = argv[0];
     }
-    sprintf(m_argUI,"%s.ui",pBegin);
+    sprintf(m_argUI,"%s",pBegin);
 #endif
     argVector.Insert(argv[0]);
     for(int32 i = 1;i < argc; i++) 
@@ -235,21 +235,39 @@ void Player::Usage(const char *progname) {
     m_didUsage = true;
 }
 
+#ifdef __linux__
+#define ARCH_NAME "linux"
+#else
+#define ARCH_NAME "unknown"
+#endif
+
 int32 Player::CompareNames(const char *p1, const char *p2) {
 // windows plugins and unix plugins are named differently...
 #ifdef WIN32
     return strcmp(p1,p2);
 #else
-//    cout << "Comparing: " << p1 << " to " << p2 << endl;
-    int32 i=0; int32 j=0;
-    if(!p1 ||!p2) return 1;
-    while ((p1[i] == p2[j]) && p1[i] && p2[j]) {
-	i++; j++;
-    }
-    if ((p1[i]=='-') && ((p2[j]=='.') || (p2[j]=='\0'))) {
-	return 0;
+    //ut << "Comparing: " << p1 << " to " << p2 << endl;
+    if (strcmp(p1,p2)) {
+	// no direct match, try w/ .ui appended...
+	char foo[512];
+	sprintf(foo,"%s.ui",p2);
+	//ut << "Comparing: " << p1 << " to " << foo << endl;
+	if (strcmp(p1,foo)) {
+	    // no plugin.ui match, try  plugin-arch.ui
+	    char foo[512];
+	    sprintf(foo,"%s-%s.ui",p2,ARCH_NAME);
+	    //cout << "Comparing: " << p1 << " to " << foo << endl;
+	    if (strcmp(p1,foo)) {
+		// no match
+		return 1;
+	    } else {
+		return 0;
+	    }
+	} else {
+	    return 0;
+	}
     } else {
-	return 1;
+	return 0;
     }
 #endif
 }
