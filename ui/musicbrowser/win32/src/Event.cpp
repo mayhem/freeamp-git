@@ -377,6 +377,9 @@ void MusicBrowserUI::EditInfoEvent()
     else if(m_hMusicView == GetFocus())
         GetSelectedMusicTreeItems(&items); 
 
+    if(!items.size())
+        return;
+
     metadata = items[0]->GetMetaData();
 
     bool sameArtist = true;
