@@ -139,7 +139,8 @@ class MusicCatalog : public EventQueue
     static void prune_thread_function(void *arg);
     static void mb_lookup_thread(void *arg);
     
-    void MBLookupThread(string url, string GUID);
+    void DoMBLookup(string url, string GUID);
+    void MBLookupThread(void);
     void PruneThread(bool sendmessages);
 
     void DoSearchMusic(char *path, bool bSendMessages);
@@ -190,6 +191,11 @@ class MusicCatalog : public EventQueue
     TimerRef m_watchTimer;
 
     int32    m_trackCount;
+    
     int      m_pendingMBLookups;
+    Mutex   *m_MBLookupLock;
+    vector<pair<string, string> > *m_MBRequests;
+    bool     m_MBLookupThreadActive;
+    bool     m_killMBThread;
 };
 #endif

@@ -60,6 +60,7 @@ MusicCatalog::MusicCatalog(FAContext *context, char *databasepath)
     m_mutex = new Mutex();
     m_catMutex = new Mutex();
     m_timerMutex = new Mutex();
+    m_MBLookupLock = new Mutex();
     m_inUpdateSong = false;
     m_addImmediately = false;
     m_bSurpressAddMessages = false;
@@ -70,8 +71,11 @@ MusicCatalog::MusicCatalog(FAContext *context, char *databasepath)
     m_streams = new vector<PlaylistItem *>;
     m_sigs = new set<string>;
     m_guidTable = new multimap<string, string, less<string> >;
+    m_MBRequests = new vector<pair<string, string> >;
     m_watchTimer = NULL;
 
+    m_killMBThread = false;
+    m_MBLookupThreadActive = false;
     m_pendingMBLookups = 0;
     m_timeout = 0;
     context->prefs->GetPrefInt32(kWatchThisDirTimeoutPref, &m_timeout);
@@ -100,6 +104,9 @@ MusicCatalog::~MusicCatalog()
 
     if(m_watchTimer)
         m_context->timerManager->StopTimer(m_watchTimer);
+
+    if (m_MBLookupThreadActive)
+        m_killMBThread = true;
 
     delete m_artistList;
     delete m_unsorted;
@@ -1280,8 +1287,6 @@ MetaData *MusicCatalog::ReadMetaDataFromDatabase(const char *url)
 typedef struct MBLookupThreadStruct
 {
     MusicCatalog *mc;
-    string url;
-    string GUID;
     Thread *thread;
 } MBLookupTreadStruct;
 
@@ -1392,18 +1397,28 @@ Error MusicCatalog::AcceptEvent(Event *e)
 
             m_sigs->erase(url);
 
-            Thread *thread = Thread::CreateThread();
+            pair<string, string> lookup;
+            lookup = make_pair(url, asge->GUID());
 
-            if (thread) {
-                MBLookupThreadStruct *mlts = new MBLookupThreadStruct;
+            m_MBLookupLock->Acquire();
 
-                mlts->mc = this;
-                mlts->url = url;
-                mlts->GUID = asge->GUID();
-                mlts->thread = thread;
+            m_MBRequests->push_back(lookup);
 
-                thread->Create(mb_lookup_thread, mlts, true);
+            if (!m_MBLookupThreadActive)
+            {
+                Thread *thread = Thread::CreateThread();
+
+                if (thread) {
+                    MBLookupThreadStruct *mlts = new MBLookupThreadStruct;
+
+                    mlts->mc = this;
+                    mlts->thread = thread;
+
+                    thread->Create(mb_lookup_thread, mlts, true);
+                }
             }
+
+            m_MBLookupLock->Release();
             break; 
         }
     }
@@ -1414,15 +1429,45 @@ void MusicCatalog::mb_lookup_thread(void *arg)
 {
     MBLookupThreadStruct *data = (MBLookupThreadStruct *)arg;
 
-    data->mc->MBLookupThread(data->url, data->GUID);
+    data->mc->MBLookupThread();
 
     delete data->thread;
     delete data;
 }
 
-void MusicCatalog::MBLookupThread(string url, string GUID)
+void MusicCatalog::MBLookupThread(void)
 {
-    m_pendingMBLookups++;
+    m_MBLookupThreadActive = true;
+
+    while (true)
+    {
+        if (m_killMBThread)
+            break;
+
+        m_MBLookupLock->Acquire();
+        m_pendingMBLookups = m_MBRequests->size();
+        m_MBLookupLock->Release();
+
+        if (m_pendingMBLookups <= 0)
+            break;
+
+        pair<string, string> lookup;
+        m_MBLookupLock->Acquire();
+        lookup = (*m_MBRequests)[0];
+        m_MBRequests->erase(m_MBRequests->begin());
+        m_MBLookupLock->Release();
+
+        DoMBLookup(lookup.first, lookup.second);
+    }
+
+    if (m_pendingMBLookups == 0 && m_sigs->size() == 0)
+        m_context->target->AcceptEvent(new BrowserMessageEvent("Signaturing Has Completed."));
+
+    m_MBLookupThreadActive = false;
+}
+
+void MusicCatalog::DoMBLookup(string url, string GUID)
+{
     if (GUID != "") {
         MetaData *data = ReadMetaDataFromDatabase(url.c_str());
 
@@ -1457,10 +1502,6 @@ void MusicCatalog::MBLookupThread(string url, string GUID)
              << "failed.  Are you connected to the internet?  Do you need to\n"
              << "set up a proxy?\n";
     }
-    m_pendingMBLookups--;
-
-    if (m_pendingMBLookups == 0 && m_sigs->size() == 0)
-        m_context->target->AcceptEvent(new BrowserMessageEvent("Signaturing Has Completed."));
 }
 
 void MusicCatalog::watch_timer(void *arg) 
