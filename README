@@ -117,7 +117,7 @@ The Six buttons on the right:
   * Upper right closes FreeAmp
   * Lower left toggles Repeat Mode between None, Current and All
   * Lower middle toggles Shuffle Mode between On and Off
-  * Lower right is currently not functional (in the future it will
+  * Lower left is currently not functional (in the future it will
     open the file-open drawer)
 
 
