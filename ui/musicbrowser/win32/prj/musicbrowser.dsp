@@ -252,7 +252,7 @@ SOURCE=..\src\FavoriteDialog.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\src\Icecast.cpp
+SOURCE=..\..\src\FreeAmpStreams.cpp
 # End Source File
 # Begin Source File
 

@@ -60,7 +60,7 @@ CLEAN :
 	-@erase "$(INTDIR)\EnumFormatEtc.obj"
 	-@erase "$(INTDIR)\Event.obj"
 	-@erase "$(INTDIR)\FavoriteDialog.obj"
-	-@erase "$(INTDIR)\Icecast.obj"
+	-@erase "$(INTDIR)\FreeAmpStreams.obj"
 	-@erase "$(INTDIR)\IntroductionWizard.obj"
 	-@erase "$(INTDIR)\MissingFileDialog.obj"
 	-@erase "$(INTDIR)\MultiSelectTreeView.obj"
@@ -101,7 +101,9 @@ LINK32_OBJS= \
 	"$(INTDIR)\EditTrackInfoDialog.obj" \
 	"$(INTDIR)\EnumFormatEtc.obj" \
 	"$(INTDIR)\Event.obj" \
+	"$(INTDIR)\FavoriteDialog.obj" \
 	"$(INTDIR)\IntroductionWizard.obj" \
+	"$(INTDIR)\MissingFileDialog.obj" \
 	"$(INTDIR)\MultiSelectTreeView.obj" \
 	"$(INTDIR)\MusicSearchDialog.obj" \
 	"$(INTDIR)\MusicTree.obj" \
@@ -111,9 +113,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\SavePlaylistDialog.obj" \
 	"$(INTDIR)\Win32MusicBrowser.obj" \
 	"$(INTDIR)\musicbrowser.res" \
-	"$(INTDIR)\Icecast.obj" \
-	"$(INTDIR)\MissingFileDialog.obj" \
-	"$(INTDIR)\FavoriteDialog.obj" \
+	"$(INTDIR)\FreeAmpStreams.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\gdbm\gdbm.lib"
 
@@ -139,11 +139,11 @@ INTDIR=.\Debug
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : "..\..\..\..\config\config.h" ".\musicbrowser.ui"
+ALL : ".\musicbrowser.ui"
 
 !ELSE 
 
-ALL : "gdbm - Win32 Debug" "fabaselib - Win32 Debug" "..\..\..\..\config\config.h" ".\musicbrowser.ui"
+ALL : "gdbm - Win32 Debug" "fabaselib - Win32 Debug" ".\musicbrowser.ui"
 
 !ENDIF 
 
@@ -161,7 +161,7 @@ CLEAN :
 	-@erase "$(INTDIR)\EnumFormatEtc.obj"
 	-@erase "$(INTDIR)\Event.obj"
 	-@erase "$(INTDIR)\FavoriteDialog.obj"
-	-@erase "$(INTDIR)\Icecast.obj"
+	-@erase "$(INTDIR)\FreeAmpStreams.obj"
 	-@erase "$(INTDIR)\IntroductionWizard.obj"
 	-@erase "$(INTDIR)\MissingFileDialog.obj"
 	-@erase "$(INTDIR)\MultiSelectTreeView.obj"
@@ -180,7 +180,6 @@ CLEAN :
 	-@erase "$(OUTDIR)\musicbrowser.pdb"
 	-@erase ".\musicbrowser.ilk"
 	-@erase ".\musicbrowser.ui"
-	-@erase "..\..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -203,7 +202,9 @@ LINK32_OBJS= \
 	"$(INTDIR)\EditTrackInfoDialog.obj" \
 	"$(INTDIR)\EnumFormatEtc.obj" \
 	"$(INTDIR)\Event.obj" \
+	"$(INTDIR)\FavoriteDialog.obj" \
 	"$(INTDIR)\IntroductionWizard.obj" \
+	"$(INTDIR)\MissingFileDialog.obj" \
 	"$(INTDIR)\MultiSelectTreeView.obj" \
 	"$(INTDIR)\MusicSearchDialog.obj" \
 	"$(INTDIR)\MusicTree.obj" \
@@ -213,9 +214,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\SavePlaylistDialog.obj" \
 	"$(INTDIR)\Win32MusicBrowser.obj" \
 	"$(INTDIR)\musicbrowser.res" \
-	"$(INTDIR)\Icecast.obj" \
-	"$(INTDIR)\MissingFileDialog.obj" \
-	"$(INTDIR)\FavoriteDialog.obj" \
+	"$(INTDIR)\FreeAmpStreams.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\gdbm\gdbm.lib"
 
@@ -229,7 +228,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "gdbm - Win32 Debug" "fabaselib - Win32 Debug" "..\..\..\..\config\config.h" ".\musicbrowser.ui"
+$(DS_POSTBUILD_DEP) : "gdbm - Win32 Debug" "fabaselib - Win32 Debug" ".\musicbrowser.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                                     ..\..\..\..\base\win32\prj\plugins
 	copy musicbrowser.ui                                                                                       ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -263,7 +262,7 @@ CLEAN :
 	-@erase "$(INTDIR)\EnumFormatEtc.obj"
 	-@erase "$(INTDIR)\Event.obj"
 	-@erase "$(INTDIR)\FavoriteDialog.obj"
-	-@erase "$(INTDIR)\Icecast.obj"
+	-@erase "$(INTDIR)\FreeAmpStreams.obj"
 	-@erase "$(INTDIR)\IntroductionWizard.obj"
 	-@erase "$(INTDIR)\MissingFileDialog.obj"
 	-@erase "$(INTDIR)\MultiSelectTreeView.obj"
@@ -304,7 +303,9 @@ LINK32_OBJS= \
 	"$(INTDIR)\EditTrackInfoDialog.obj" \
 	"$(INTDIR)\EnumFormatEtc.obj" \
 	"$(INTDIR)\Event.obj" \
+	"$(INTDIR)\FavoriteDialog.obj" \
 	"$(INTDIR)\IntroductionWizard.obj" \
+	"$(INTDIR)\MissingFileDialog.obj" \
 	"$(INTDIR)\MultiSelectTreeView.obj" \
 	"$(INTDIR)\MusicSearchDialog.obj" \
 	"$(INTDIR)\MusicTree.obj" \
@@ -314,9 +315,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\SavePlaylistDialog.obj" \
 	"$(INTDIR)\Win32MusicBrowser.obj" \
 	"$(INTDIR)\musicbrowser.res" \
-	"$(INTDIR)\Icecast.obj" \
-	"$(INTDIR)\MissingFileDialog.obj" \
-	"$(INTDIR)\FavoriteDialog.obj" \
+	"$(INTDIR)\FreeAmpStreams.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\gdbm\gdbm.lib"
 
@@ -364,7 +363,7 @@ CLEAN :
 	-@erase "$(INTDIR)\EnumFormatEtc.obj"
 	-@erase "$(INTDIR)\Event.obj"
 	-@erase "$(INTDIR)\FavoriteDialog.obj"
-	-@erase "$(INTDIR)\Icecast.obj"
+	-@erase "$(INTDIR)\FreeAmpStreams.obj"
 	-@erase "$(INTDIR)\IntroductionWizard.obj"
 	-@erase "$(INTDIR)\MissingFileDialog.obj"
 	-@erase "$(INTDIR)\MultiSelectTreeView.obj"
@@ -405,7 +404,9 @@ LINK32_OBJS= \
 	"$(INTDIR)\EditTrackInfoDialog.obj" \
 	"$(INTDIR)\EnumFormatEtc.obj" \
 	"$(INTDIR)\Event.obj" \
+	"$(INTDIR)\FavoriteDialog.obj" \
 	"$(INTDIR)\IntroductionWizard.obj" \
+	"$(INTDIR)\MissingFileDialog.obj" \
 	"$(INTDIR)\MultiSelectTreeView.obj" \
 	"$(INTDIR)\MusicSearchDialog.obj" \
 	"$(INTDIR)\MusicTree.obj" \
@@ -415,9 +416,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\SavePlaylistDialog.obj" \
 	"$(INTDIR)\Win32MusicBrowser.obj" \
 	"$(INTDIR)\musicbrowser.res" \
-	"$(INTDIR)\Icecast.obj" \
-	"$(INTDIR)\MissingFileDialog.obj" \
-	"$(INTDIR)\FavoriteDialog.obj" \
+	"$(INTDIR)\FreeAmpStreams.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\gdbm\gdbm.lib"
 
@@ -581,9 +580,9 @@ SOURCE=..\src\FavoriteDialog.cpp
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
-SOURCE=..\..\src\Icecast.cpp
+SOURCE=..\..\src\FreeAmpStreams.cpp
 
-"$(INTDIR)\Icecast.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\FreeAmpStreams.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
