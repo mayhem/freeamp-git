@@ -595,14 +595,18 @@ void MusicBrowserUI::Destroy()
     sprintf(buf, "%d,%d,%d,%d,%d", wp.rcNormalPosition.left, wp.rcNormalPosition.top, w, h, s);
     m_context->prefs->SetPrefString(kMusicBrowserPositionPref, buf);
 
-    int a,b,c,d;
+    int a,b,c,d,e,f,g,i;
 
     a = ListView_GetColumnWidth(m_hPlaylistView, 1);
     b = ListView_GetColumnWidth(m_hPlaylistView, 2);
     c = ListView_GetColumnWidth(m_hPlaylistView, 3);
     d = ListView_GetColumnWidth(m_hPlaylistView, 4);
+    e = ListView_GetColumnWidth(m_hPlaylistView, 5);
+    f = ListView_GetColumnWidth(m_hPlaylistView, 6);
+    g = ListView_GetColumnWidth(m_hPlaylistView, 7);
+    i = ListView_GetColumnWidth(m_hPlaylistView, 8);
 
-    sprintf(buf, "%d,%d,%d,%d", a,b,c,d);
+    sprintf(buf, "%d,%d,%d,%d,%d,%d,%d,%d", a,b,c,d,e,f,g,i);
     m_context->prefs->SetPrefString(kMusicBrowserHeaderWidthsPref, buf);
 
     RevokeDragDrop(m_hPlaylistView);
@@ -1197,19 +1201,38 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
         m_splitterRect.right = playlistRect.left - 1;
 
         // resize headers... only wanna do this if we resized the window
-        int32 a,b,c,d;
+        int32 a,b,c,d,e,f,g,h;
 
         size = sizeof(buf);
         m_context->prefs->GetPrefString(kMusicBrowserHeaderWidthsPref, buf, &size);
-        sscanf(buf, " %d , %d , %d , %d", &a, &b, &c, &d);
-
-        if(a >= 1 && b >= 5 && c >= 5 && d >= 5)
+        if (sscanf(buf, " %d , %d , %d , %d , %d , %d , %d , %d", &a, &b, &c, &d,
+			                                                      &e, &f, &g, &h)
+             != 8)
         {
-            ListView_SetColumnWidth(m_hPlaylistView, 1, a);
-            ListView_SetColumnWidth(m_hPlaylistView, 2, b);
-            ListView_SetColumnWidth(m_hPlaylistView, 3, c);
-            ListView_SetColumnWidth(m_hPlaylistView, 4, d);
-        }
+		    sscanf(buf, " %d , %d , %d , %d", &a, &b, &c, &d);
+
+            if(a >= 1 && b >= 5 && c >= 5 && d >= 5)
+			{
+                ListView_SetColumnWidth(m_hPlaylistView, 1, a);
+                ListView_SetColumnWidth(m_hPlaylistView, 2, b);
+                ListView_SetColumnWidth(m_hPlaylistView, 3, c);
+                ListView_SetColumnWidth(m_hPlaylistView, 4, d);
+			}
+		}
+		else
+		{
+            if(a >= 1 && b >= 5 && c >= 5 && d >= 5)
+			{
+                ListView_SetColumnWidth(m_hPlaylistView, 1, a);
+                ListView_SetColumnWidth(m_hPlaylistView, 2, b);
+                ListView_SetColumnWidth(m_hPlaylistView, 3, c);
+                ListView_SetColumnWidth(m_hPlaylistView, 4, d);
+                ListView_SetColumnWidth(m_hPlaylistView, 5, e);
+                ListView_SetColumnWidth(m_hPlaylistView, 6, f);
+                ListView_SetColumnWidth(m_hPlaylistView, 7, g);
+                ListView_SetColumnWidth(m_hPlaylistView, 8, h);
+			}
+		}
     }
 
     if(m_pParent)
