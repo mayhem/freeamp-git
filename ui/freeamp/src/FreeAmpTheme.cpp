@@ -1738,6 +1738,17 @@ bool FreeAmpTheme::HandleMenuCommand(uint32 uCommand)
     return false;
 }
 
+void FreeAmpTheme::HandleMouseWheelChange(int iSteps)
+{
+	string oControlName("Volume");
+	int    iVol;
+
+    m_pWindow->ControlIntValue(oControlName, false, iVol);
+	iVol += iSteps * 5;
+	iVol = max(min(iVol, 100), 0);
+    SetVolume(iVol, m_iBalance);
+}
+
 void FreeAmpTheme::VolumeChanged(void)
 {
     if (!m_bVolumeChangeInProgress)

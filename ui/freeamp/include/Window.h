@@ -91,6 +91,7 @@ class Window
       virtual void  HandleMouseLButtonDown(Pos &oPos);
       virtual void  HandleMouseLButtonUp(Pos &oPos);
       virtual void  HandleMouseLButtonDoubleClick(Pos &oPos);
+      virtual void  HandleMouseWheelChange(int iSteps);
       virtual void  MouseHasEnteredWindow(void);
       virtual void  MouseHasLeftWindow(void);
 

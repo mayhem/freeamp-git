@@ -418,6 +418,11 @@ Error Window::EndMouseCapture(void)
     return CaptureMouse(false);
 }
 
+void Window::HandleMouseWheelChange(int iSteps)
+{
+    m_pTheme->HandleMouseWheelChange(iSteps);
+}
+
 void Window::HandleMouseMove(Pos &oScreenPos)
 {
     Control *pControl;

@@ -54,6 +54,10 @@ HINSTANCE g_hinst = NULL;
 
 #define IDI_EXE_ICON 101
 
+#ifndef WM_MOUSEWHEEL
+   #define WM_MOUSEWHEEL                   0x020A
+   #define WHEEL_DELTA                     120
+#endif
 
 INT WINAPI DllMain (HINSTANCE hInstance,
                     ULONG ul_reason_being_called,
@@ -185,6 +189,18 @@ LRESULT Win32Window::WindowProc(HWND hwnd, UINT msg,
             oPos.y = (int16)HIWORD(lParam);  
             m_pMindMeldMutex->Acquire();
             HandleMouseMove(oPos);
+            m_pMindMeldMutex->Release();
+
+            break;
+        }       
+
+        case WM_MOUSEWHEEL:
+        {
+            short iDelta;
+			
+			iDelta = (int)(((short)HIWORD(wParam)) / WHEEL_DELTA);
+            m_pMindMeldMutex->Acquire();
+            HandleMouseWheelChange(iDelta);
             m_pMindMeldMutex->Release();
 
             break;
@@ -373,6 +389,10 @@ Error Win32Window::Run(Pos &oPos)
             m_oWindowPos.y = (iMaxY - oRect.Height())/2;
         }
     }
+
+//	if (SystemParametersInfo(SPI_GETWHEELSCROLLINGLLINES,
+//		                     0, &m_lScrollLines, 0) == 0)
+//		 m_lScrollLines = 0;
 
     if (m_bLiveInToolbar)
         m_hWnd = CreateWindowEx(WS_EX_TOOLWINDOW,

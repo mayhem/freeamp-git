@@ -78,6 +78,7 @@ class Theme : public Parse
                                          ControlMessageEnum eMesg) = 0;
       virtual void  HandleKeystroke(unsigned char cKey) = 0;
       virtual bool  HandleMenuCommand(uint32 uCommand) = 0;
+      virtual void  HandleMouseWheelChange(int iSteps) = 0;
       virtual void  VolumeChanged(void) = 0;
       virtual void  InitControls(void) = 0;
       virtual void  InitWindow(void) = 0;
