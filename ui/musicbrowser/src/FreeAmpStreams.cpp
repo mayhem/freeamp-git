@@ -64,32 +64,36 @@ Error FreeAmpStreams::ParseStreamXML(const string &xml,
     return result;
 }
 
+Error FreeAmpStreams::ParseFileXML(const string &file, 
+                                   vector<FreeAmpStreamInfo> &list)
+{
+    Error result = kError_InvalidParam;
+
+    m_list = &list;
+    result = ParseFile(file);
+    m_list = NULL;
+
+    return result;
+}
+
 Error FreeAmpStreams::BeginElement(string &oElement, AttrMap &oAttrMap)
 {
     m_path += string("/") + oElement;
     m_curElement = oElement;
 
-    printf("Path: '%s'\n", m_path.c_str());
-
-    if (oElement == string("service"))
+    if (oElement == string("Service"))
     {
-        string name("name");
+        string name("Name");
 
         if (oAttrMap.find(name) != oAttrMap.end())
             m_treePath += string("/") + oAttrMap[name];
         else
             return kError_YouScrewedUp;
- 
-        printf("TreePath: '%s'\n", m_treePath.c_str());
     }
-    if (oElement == string("resource"))
+    if (oElement == string("Stream"))
     {
-        string href("href");
-
         delete m_info;
         m_info = new FreeAmpStreamInfo();
-        if (oAttrMap.find(href) != oAttrMap.end())
-            m_info->m_streamUrl = oAttrMap[href];
     }
 
     return kError_NoErr;
@@ -97,35 +101,35 @@ Error FreeAmpStreams::BeginElement(string &oElement, AttrMap &oAttrMap)
 
 Error FreeAmpStreams::PCData(string &data)
 {
-    if (m_curElement == string("resource"))
+    if (m_curElement == string("Url"))
+    {
+        m_info->m_streamUrl = data;
+    }
+    if (m_curElement == string("Name"))
     {
         m_info->m_name = data;
     }
-    if (m_curElement == string("url"))
+    if (m_curElement == string("WebUrl"))
     {
         m_info->m_webUrl = data;
     }
-    if (m_curElement == string("genre"))
+    if (m_curElement == string("Genre"))
     {
         m_info->m_genre = data;
     }
-    if (m_curElement == string("name"))
-    {
-        m_info->m_name = data;
-    }
-    if (m_curElement == string("description"))
+    if (m_curElement == string("Description"))
     {
         m_info->m_desc = data;
     }
-    if (m_curElement == string("bitrate"))
+    if (m_curElement == string("Bitrate"))
     {
         m_info->m_bitrate = atoi(data.c_str());
     }
-    if (m_curElement == string("users"))
+    if (m_curElement == string("Users"))
     {
         m_info->m_numUsers = atoi(data.c_str());
     }
-    if (m_curElement == string("maxusers"))
+    if (m_curElement == string("MaxUsers"))
     {
         m_info->m_maxUsers = atoi(data.c_str());
     }
@@ -141,7 +145,7 @@ Error FreeAmpStreams::EndElement(string &oElement)
     char *pPtr;
     int   iOffset;
 
-    if (oElement == string("resource"))
+    if (oElement == string("Stream"))
     {
         m_info->m_treePath = m_treePath;
         m_list->push_back(*m_info);
@@ -149,7 +153,7 @@ Error FreeAmpStreams::EndElement(string &oElement)
         m_info = NULL;
     }
 
-    if (oElement == string("service"))
+    if (oElement == string("Service"))
     {
         pPtr = strrchr(m_treePath.c_str(), '/');
         if (pPtr == NULL)
@@ -157,8 +161,6 @@ Error FreeAmpStreams::EndElement(string &oElement)
            
         iOffset = pPtr - m_treePath.c_str();
         m_treePath.erase(iOffset, m_treePath.length() - iOffset);   
-
-        printf("/TreePath: '%s'\n", m_treePath.c_str());
     }
 
     pPtr = strrchr(m_path.c_str(), '/');
@@ -173,41 +175,14 @@ Error FreeAmpStreams::EndElement(string &oElement)
 
 #if 0
 
-const char *test = 
-"<directory>\n"
-"   <service name=\"Wired Planet\">\n"
-"       <service name=\"Fuss\">\n"
-"           <resource href=\"http://icecast.server.com:8000/stream\">\n"
-"               <name>Fuss stream</name>\n"
-"               <description>This is some description</description>\n"
-"               <genre>fuss hop</genre>\n"
-"               <url>http://www.icecast.org</url>\n"
-"               <bitrate>64000</bitrate>\n"
-"               <users>316</users>\n"
-"               <maxusers>350</maxusers>\n"
-"           </resource>\n"
-"       </service>\n"
-"       <resource href=\"http://icecast.server.com:8000/stream\">\n"
-"           <name>Some stream</name>\n"
-"           <description>This is some description</description>\n"
-"           <genre>fuss hop</genre>\n"
-"           <url>http://www.icecast.org</url>\n"
-"           <bitrate>64000</bitrate>\n"
-"           <users>316</users>\n"
-"           <maxusers>350</maxusers>\n"
-"        </resource>\n"
-"   </service>\n"
-"</directory>\n";
- 
-
-void main(void)
+void main(int argc, char *argv[])
 {
     vector<FreeAmpStreamInfo>           list;
     vector<FreeAmpStreamInfo>::iterator i;
     FreeAmpStreams                      o;
     Error                               e;
 
-    e = o.ParseStreamXML(string(test), list);
+    e = o.ParseFileXML(string(argv[1]), list);
     if (IsError(e))
     {
         string err;
