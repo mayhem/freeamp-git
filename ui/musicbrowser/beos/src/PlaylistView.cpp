@@ -23,25 +23,84 @@ ____________________________________________________________________________*/
 
 #include "PlaylistView.h"
 #include "TrackItem.h"
+#include "BeOSMusicBrowser.h"
 #define DEBUG 1
 #include <be/support/Debug.h>
 
 PlaylistView::PlaylistView( BRect frame, const char* name,
                             uint32 resizingMode )
 :   BListView( frame, name, B_SINGLE_SELECTION_LIST, resizingMode ),
-    m_currentIndex( 0 )
+    m_currentIndex( 0 ),
+    m_inserter( -1 )
 {
+    SetSelectionMessage( new BMessage( MBMSG_SELECTION_CHANGED ) );
 }
 
 PlaylistView::~PlaylistView()
 {
 }
 
+void
+PlaylistView::Draw( BRect updateRect )
+{
+    BListView::Draw( updateRect );
+
+    if ( m_inserter >= 0 )
+    {
+        BRect frame( ItemFrame( m_inserter ) );
+        StrokeRect( frame );
+    }
+}
+
 bool
 PlaylistView::InitiateDrag( BPoint point, int32 index, bool wasSelected )
 {
-    PRINT(( "InitiateDrag\n" ));
-    return true;
+    CatalogItem* item = dynamic_cast<CatalogItem*>( ItemAt( index ) );
+    if ( item )
+    {
+        PRINT(( "Drag begin\n" ));
+        BMessage msg( B_SIMPLE_DATA );
+        msg.AddPointer( "CatalogItem", item );
+        BRect dragRect( ItemFrame( index ) );
+        DragMessage( &msg, dragRect, NULL );
+        if ( wasSelected )
+        {
+            BMessage sm( SelectionMessage() );
+            sm.AddPointer( "source", this );
+            Messenger().SendMessage( &sm );
+        }
+        return true;
+    }
+    return false;
+}
+
+void
+PlaylistView::MessageReceived( BMessage* message )
+{
+    switch ( message->what )
+    {
+        case B_SIMPLE_DATA:
+            break;
+        default:
+            BListView::MessageReceived( message );
+            break;
+    }
+}
+
+void
+PlaylistView::MouseMoved( BPoint point, uint32 transit,
+                          const BMessage* message )
+{
+    if ( message )
+    {
+        SetInserter( IndexOf( point ) );
+    }
+}
+
+void
+PlaylistView::MouseUp( BPoint point )
+{
+    SetInserter( -1 );
 }
 
 void
@@ -63,6 +122,15 @@ PlaylistView::SetCurrentlyPlaying( int32 index )
         item->SetCurrentlyPlaying( true );
         InvalidateItem( m_currentIndex );
     }
+}
+
+void
+PlaylistView::SetInserter( int32 index )
+{
+    PRINT(( "setting inserter at %d\n", index ));
+    InvalidateItem( m_inserter );
+    m_inserter = index;
+    InvalidateItem( m_inserter );
 }
 
 // vi: set ts=4:

@@ -42,6 +42,8 @@ MusicTreeView::MusicTreeView( BRect frame, const char* name,
     m_playlistGroup( NULL ),
     m_popUp( NULL )
 {
+    SetSelectionMessage( new BMessage( MBMSG_SELECTION_CHANGED ) );
+
     m_myMusicGroup = new CollectionItem( "My Music" );
     AddItem( m_myMusicGroup );
     m_uncategorizedGroup = new CollectionItem( "Uncategorized Tracks" );
@@ -73,8 +75,17 @@ MusicTreeView::InitiateDrag( BPoint point, int32 index, bool wasSelected )
     CatalogItem* item = dynamic_cast<CatalogItem*>( ItemAt( index ) );
     if ( item )
     {
-        BMessage dragMsg( 'drag' );
-        puts( "Drag begin" );
+        PRINT(( "Drag begin\n" ));
+        BMessage msg( B_SIMPLE_DATA );
+        msg.AddPointer( "CatalogItem", item );
+        BRect dragRect( ItemFrame( index ) );
+        DragMessage( &msg, dragRect, NULL );
+        if ( wasSelected )
+        {
+            BMessage sm( SelectionMessage() );
+            sm.AddPointer( "source", this );
+            Messenger().SendMessage( &sm );
+        }
         return true;
     }
 
@@ -216,15 +227,8 @@ MusicTreeView::FindTrackItemUnder( PlaylistItem* item, CollectionItem* group  )
 TrackItem*
 MusicTreeView::FindTrackItemInArtistGroup( PlaylistItem* item )
 {
-    // Uncategorized Tracks Group is the group immediately before artists.
-    int32 head = FullListIndexOf( m_uncategorizedGroup );
-    head += CountItemsUnder( m_uncategorizedGroup, false ) + 1;
-    // At this point, head is the index to the very first artist group.
-
-    // To get the the last index of all the artist groups, use the index to
-    // the last item under My Music group. (Artist groups are the last group
-    // in My Music.)
-    int32 tail = CountItemsUnder( m_myMusicGroup, false ) + 1;
+    int32 head, tail;
+    GetArtistGroupRange( &head, &tail );
 
     TrackItem* ti = NULL;
     bool found = false;
@@ -245,6 +249,58 @@ MusicTreeView::FindTrackItemInArtistGroup( PlaylistItem* item )
     }
 
     return found ? ti : NULL;
+}
+
+CollectionItem*
+MusicTreeView::FindArtistGroup( const char* artist )
+{
+    int32 head, tail;
+    GetArtistGroupRange( &head, &tail );
+
+    uint32 level = FullListItemAt( head )->OutlineLevel();
+    PRINT(( "artist outline level = %d\n", level ));
+
+    bool found = false;
+    for ( int32 i = head; i <= tail; i++ )
+    {
+        BListItem* li = FullListItemAt( i );
+        CatalogItem* cti;
+        if ( li->OutlineLevel() == level &&
+             ( cti = dynamic_cast<CatalogItem*>( li ) ) )
+        {
+            if ( cti->Type() == CatalogItem::ITEM_COLLECTION )
+            {
+                CollectionItem* ci = dynamic_cast<CollectionItem*>( cti );
+                if ( strcmp( ci->Text(), artist ) == 0 )
+                {
+                    found = true;
+                    PRINT(( "Found %s at %d\n", ci->Text(), i ));
+                    break;
+                }
+            }
+        }
+    }
+
+    return NULL;
+}
+
+void
+MusicTreeView::GetArtistGroupRange( int32* head, int32* tail )
+{
+    // Uncategorized Tracks Group is the group immediately before artists.
+    *head = FullListIndexOf( m_uncategorizedGroup );
+    *head += CountItemsUnder( m_uncategorizedGroup, false ) + 1;
+    // At this point, head is the index to the very first artist group.
+
+    // To get the the last index of all the artist groups, use the index to
+    // the last item under My Music group. (Artist groups are the last group
+    // in My Music.)
+    *tail = CountItemsUnder( m_myMusicGroup, false ) + 1;
+}
+
+void
+MusicTreeView::AddTrack( PlaylistItem* item )
+{
 }
 
 bool

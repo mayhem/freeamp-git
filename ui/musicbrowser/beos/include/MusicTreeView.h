@@ -55,14 +55,14 @@ public:
     void            AddArtistItem( CollectionItem* item );
     void            AddPlaylistListItem( PlaylistListItem* item );
 
-    void            AddTrack( const char* artist, const char* album,
-                              PlaylistItem* item );
+    void            AddTrack( PlaylistItem* item );
     bool            RemoveTrack( const char* artist, const char* album,
                                  const PlaylistItem* item );
     void            UpdateTrack( PlaylistItem* oldItem, PlaylistItem* newItem );
     TrackItem*      FindTrackItemUnder( PlaylistItem* item,
                                         CollectionItem* group );
     TrackItem*      FindTrackItemInArtistGroup( PlaylistItem* item );
+    CollectionItem* FindArtistGroup( const char* artist );
 
     uint32          ArtistOutlineLevel( void ) const;
     CollectionItem* MyMusicGroup( void ) const { return m_myMusicGroup; }
@@ -70,6 +70,7 @@ public:
     CollectionItem* PlaylistGroup( void ) const { return m_playlistGroup; }
 
 protected:
+    void            GetArtistGroupRange( int32* head, int32* tail );
 
 private:
     CollectionItem* m_myMusicGroup;

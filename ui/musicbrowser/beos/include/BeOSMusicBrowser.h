@@ -66,6 +66,7 @@ enum {
     MBMSG_WIZARD_GONE = 'wzgn',
     MBMSG_STOP_SEARCH = 'stps',
     MBMSG_EDIT_CATALOG_ITEM = 'edci',
+    MBMSG_SELECTION_CHANGED = 'slnc',
 
     // For debug.
     MBMSG_DEBUG_1 = 'dbg1',
@@ -126,6 +127,7 @@ private:
     bool                m_master;
     MusicTreeView*      m_musicTreeView;
     PlaylistView*       m_playlistView;
+    BListView*          m_selectedView;
     Placard*            m_placard;
     IntroductionWizard* m_wizard;
     string              m_currentListName;
