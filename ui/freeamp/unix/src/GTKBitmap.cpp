@@ -162,8 +162,8 @@ Error GTKBitmap::LoadBitmapFromDisk(string &oFile)
         return kError_NoErr;
     }
     gdk_threads_leave();
-    cout << "Gdk-Pixbuf: Falling back to native loader for " << filename 
-         << ".\n";
+    //cout << "Gdk-Pixbuf: Falling back to native loader for " << filename 
+    //     << ".\n";
 #endif
 
     FILE *file;

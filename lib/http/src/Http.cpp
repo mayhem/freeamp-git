@@ -31,6 +31,7 @@ ____________________________________________________________________________*/
 #endif
 #include <fcntl.h>    
 #include <errno.h>    
+#include <ctype.h>    
 
 #ifdef WIN32
 #include <io.h>

@@ -49,6 +49,9 @@ ____________________________________________________________________________*/
 
 #endif // ! WIN32
 
+#include <iostream>
+using namespace std;
+
 class COMServerSocket;
 
 /**Wraps the OS specifics of a client socket.

@@ -27,6 +27,7 @@ ____________________________________________________________________________*/
 #include "config.h"
 
 #include <string>
+using namespace std;
 #include <gtk/gtk.h>
 
 #include "facontext.h"

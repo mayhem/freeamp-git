@@ -225,7 +225,7 @@ size_t RenderV2ToFile(const ID3_TagImpl& tag, fstream& file)
     uchar tmpBuffer[BUFSIZ];
     while (!file)
     {
-      file.read(tmpBuffer, BUFSIZ);
+      file.read((char *)tmpBuffer, BUFSIZ);
       size_t nBytes = file.gcount();
       fwrite(tmpBuffer, 1, nBytes, tempOut);
     }
@@ -236,7 +236,7 @@ size_t RenderV2ToFile(const ID3_TagImpl& tag, fstream& file)
     while (!feof(tempOut))
     {
       size_t nBytes = fread(tmpBuffer, 1, BUFSIZ, tempOut);
-      file.write(tmpBuffer, nBytes);
+      file.write((char *)tmpBuffer, nBytes);
     }
     
     fclose(tempOut);
@@ -390,7 +390,7 @@ flags_t ID3_TagImpl::Strip(flags_t ulTagFlag)
     while (!file.eof())
     {
       size_t nBytesToRead = dami::min<size_t>(nBytesRemaining - nBytesCopied, BUFSIZ);
-      file.read(aucBuffer, nBytesToRead);
+      file.read((char *)aucBuffer, nBytesToRead);
       size_t nBytesRead = file.gcount();
 
       if (nBytesRead != nBytesToRead)
@@ -403,7 +403,7 @@ flags_t ID3_TagImpl::Strip(flags_t ulTagFlag)
       {
         long offset = nBytesRead + this->GetPrependedBytes();
         file.seekp(-offset, ios::cur);
-        file.write(aucBuffer, nBytesRead);
+        file.write((char *)aucBuffer, nBytesRead);
         file.seekg(this->GetPrependedBytes(), ios::cur);
         nBytesCopied += nBytesRead;
       }

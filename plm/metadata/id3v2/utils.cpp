@@ -25,6 +25,9 @@
 // http://download.sourceforge.net/id3lib/
 
 #include "id3config.h"
+#ifndef WIN32
+#include <unistd.h>
+#endif
 
 #if defined HAVE_ICONV_H
 # include <iconv.h>
@@ -32,6 +35,8 @@
 #endif
 
 #include "utils.h"
+#include <iostream>
+#include <fstream.h>
 
 using namespace dami;
 
@@ -196,14 +201,12 @@ size_t dami::ucslen(const unicode_t *unicode)
   return 0;
 }
 
-namespace
-{
+using namespace std;
   bool exists(String name)
   {
-    ifstream file(name.c_str(), ios::nocreate);
-    return file.is_open() != 0;
+    return access(name.c_str(), F_OK) == 0;
   }
-};
+using namespace dami;
 
 ID3_Err dami::createFile(String name, fstream& file)
 {
@@ -212,7 +215,7 @@ ID3_Err dami::createFile(String name, fstream& file)
     file.close();
   }
     
-  file.open(name.c_str(), ios::out | ios::binary | ios::trunc);
+  file.open(name.c_str(), ios_base::out | ios::binary | ios::trunc);
   if (!file)
   {
     return ID3E_ReadOnly;
@@ -271,7 +274,7 @@ ID3_Err dami::openWritableFile(String name, fstream& file)
   {
     file.close();
   }
-  file.open(name.c_str(), ios::in | ios::out | ios::binary | ios::nocreate);
+  file.open(name.c_str(), ios::in | ios::out | ios::binary);
   if (!file)
   {
     return ID3E_ReadOnly;
@@ -291,7 +294,7 @@ ID3_Err dami::openWritableFile(String name, ofstream& file)
   {
     file.close();
   }
-  file.open(name.c_str(), ios::in | ios::out | ios::binary | ios::nocreate);
+  file.open(name.c_str(), ios::in | ios::out | ios::binary );
   if (!file)
   {
     return ID3E_ReadOnly;
@@ -306,7 +309,7 @@ ID3_Err dami::openReadableFile(String name, fstream& file)
   {
     file.close();
   }
-  file.open(name.c_str(), ios::in | ios::binary | ios::nocreate);
+  file.open(name.c_str(), ios::in | ios::binary);
   if (!file)
   {
     return ID3E_NoFile;
@@ -321,7 +324,7 @@ ID3_Err dami::openReadableFile(String name, ifstream& file)
   {
     file.close();
   }
-  file.open(name.c_str(), ios::in | ios::binary | ios::nocreate);
+  file.open(name.c_str(), ios::in | ios::binary);
   if (!file)
   {
     return ID3E_NoFile;

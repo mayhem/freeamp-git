@@ -126,7 +126,7 @@ Error KJofol::ConvertToNative(string &oDir)
     }      
 
     fclose(outfile);
-cout << "done outputting " << outpath << endl;
+//cout << "done outputting " << outpath << endl;
 
     return kError_NoErr;
 }
@@ -320,9 +320,6 @@ void KJofol::ParseRCFile(string rcfile, string windowname, bool dock)
                 m_understandvolume = true;
                 m_bmpvolfields = 1;
             }
-            else {
-                cout << "don't understand BAR yet\n";
-            }
         }
         else if (!strcasecmp(left, "VolumeControlImage")) {
             info["VolumeBMPImage"] = right;
@@ -361,8 +358,6 @@ void KJofol::ParseRCFile(string rcfile, string windowname, bool dock)
         }
         else if (!strncasecmp(left, "Pitch", 5)) {
         }
-        else
-            cout << "don't understand: " << line << endl;
 
         if (m_bmpvolume && m_bmpvolfields == 6) {
             VolumeBMP();
@@ -464,26 +459,28 @@ void KJofol::ParseButton(char *orig, Rect &oRect, string &name)
     char temp1[256];
     char temp2[256];
 
-    int n = sscanf(orig, "%i %i %i %i %s %s", &oRect.x1, &oRect.y1, &oRect.x2, 
+    //int n = 
+    sscanf(orig, "%i %i %i %i %s %s", &oRect.x1, &oRect.y1, &oRect.x2, 
                    &oRect.y2, temp1, temp2);
-    if (n < 6)
-        cout << "error parsing " << orig << " for button information..\n";
+    //if (n < 6)
+    //    cout << "error parsing " << orig << " for button information..\n";
     name = temp2;
 }
 
 void KJofol::ParsePosition(char *orig, Pos &oPos)
 {
-    int n = sscanf(orig, "%i %i", &oPos.x, &oPos.y);
-    if (n < 2)
-        cout << "error parsing " << orig << " for position information..\n";
+    //int n = 
+    sscanf(orig, "%i %i", &oPos.x, &oPos.y);
+    //if (n < 2)
+    //    cout << "error parsing " << orig << " for position information..\n";
 }
 
 void KJofol::ParseRect(char *orig, Rect &oRect)
 {
-    int n = sscanf(orig, "%i %i %i %i", &oRect.x1, &oRect.y1, &oRect.x2,
-                   &oRect.y2);
-    if (n < 4)
-        cout << "error parsing " << orig << " for rectangle coords..\n";
+    //int n = 
+    sscanf(orig, "%i %i %i %i", &oRect.x1, &oRect.y1, &oRect.x2, &oRect.y2);
+    //if (n < 4)
+    //    cout << "error parsing " << orig << " for rectangle coords..\n";
 
     // hack around a broken skin used for testing..
     if (oRect.y2 < oRect.y1) 

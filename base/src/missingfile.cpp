@@ -40,8 +40,13 @@ ____________________________________________________________________________*/
 #include <string>
 
 #if !defined(WIN32)
-#include <strstream>
-typedef ostrstream ostringstream;
+#include <sys/time.h>
+#ifdef HAVE_SSTREAM
+   #include <sstream>
+#else
+   #include <strstream>
+   typedef ostrstream ostringstream;
+#endif
 #else
 #include <sstream>
 #endif

@@ -246,7 +246,7 @@ Error GTKFont::Load(int iFontHeight, bool bBold, bool bItalic)
                         gfont = gdk_font_load("fixed");
                         if (!gfont) {
                             gdk_threads_leave();
-                            cout << "oops, couldn't load _any_ fonts...\n";
+                            //cout << "oops, couldn't load _any_ fonts...\n";
                             return kError_YouScrewedUp;
                         }
                     }
@@ -263,7 +263,7 @@ Error GTKFont::Load(int iFontHeight, bool bBold, bool bItalic)
             ttfont = Efont_load((char *)m_oFace.c_str(), iFontHeight - 3);
             if (!ttfont) {
                 gdk_threads_leave();
-                cout << "ERROR loading ttf " << m_oFace << "\n";
+                //cout << "ERROR loading ttf " << m_oFace << "\n";
                 return kError_YouScrewedUp;
             }
         }

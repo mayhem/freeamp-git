@@ -28,6 +28,9 @@
 #ifndef _ID3LIB_WRITERS_H_
 #define _ID3LIB_WRITERS_H_
 
+#include <iostream>
+using namespace std;
+
 #include "writer.h"
 #include <fstream.h>
 #include <string.h>

@@ -198,7 +198,7 @@ int APSPlaylist::Remove(const char* pczElement, const char* pczNewUrl)
 
 int APSPlaylist::Remove(APSPlaylist::iterator itPlace)
 {
-    if (itPlace.m_it == NULL) 
+    if (!itPlace.isvalid()) 
         return APS_PARAMERROR;
     if (m_pPlayList->empty())
         return APS_ITEMNOTINLIST;
