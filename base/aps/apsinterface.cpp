@@ -200,8 +200,6 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
     if (mb_GetResultData(o, MB_GetAlbumName, temp, 255))
         pmetaData->SetAlbum(temp);
 
-    printf("Album: %s\n", temp);
-
     // Select the main context of the exchanged data
     mb_Select(o, MB_SelectExchangedData);
 
@@ -209,7 +207,6 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
         pmetaData->SetArtist(temp);
     if (mb_GetResultData(o, MB_GetTrackName, temp, 255))
         pmetaData->SetTitle(temp);
-    printf("Track: %s\n", temp);
     if (mb_GetResultData(o, MB_GetGenre, temp, 255))
         pmetaData->SetGenre(temp);
     if (mb_GetResultData(o, MB_GetDescription, temp, 255))
