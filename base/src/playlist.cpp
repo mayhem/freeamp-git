@@ -2480,6 +2480,33 @@ void PlaylistManager::RetrieveMetaData(vector<PlaylistItem*>* list)
     }
 }
 
+void
+PlaylistManager::
+RetrieveMetaDataNow(PlaylistItem* item)
+{
+    assert(item);
+
+    if(item)
+    {
+        MetaData metadata = item->GetMetaData();
+        MetaDataFormat* mdf = NULL;
+        uint32 numFormats;
+
+        numFormats = m_metadataFormats.size();
+
+        for (uint32 i = 0; i < numFormats; i++)
+        {
+            mdf = m_metadataFormats[i];
+
+            if (mdf)
+                mdf->ReadMetaData(item->URL().c_str(), &metadata);
+        }
+
+        item->SetMetaData(&metadata);
+        item->SetState(kPlaylistItemState_Normal);
+    }
+}
+
 
 UndoAdd::UndoAdd(PlaylistManager* plm, const string& url, uint32 index):
     m_plm(plm), m_url(url), m_index(index)

@@ -58,7 +58,6 @@ MusicCatalog::MusicCatalog(FAContext *context, char *databasepath)
     m_mutex = new Mutex();
     m_catMutex = new Mutex();
     m_inUpdateSong = false;
-    m_acceptItemChanged = false;
     m_addImmediately = false;
     m_artistList = new vector<ArtistList *>;
     m_unsorted = new vector<PlaylistItem *>;
@@ -690,6 +689,8 @@ void MusicCatalog::PruneThread(bool sendmessages)
 
 void MusicCatalog::PruneDirectory(string &directory)
 {
+    m_catMutex->Acquire();
+
     char *key = m_database->NextKey(NULL);
     struct stat st;
  
@@ -710,6 +711,7 @@ void MusicCatalog::PruneDirectory(string &directory)
         }
         key = m_database->NextKey(key);
     }
+    m_catMutex->Release();
 }
 
 typedef struct MusicSearchThreadStruct {
@@ -767,23 +769,15 @@ void MusicCatalog::DoSearchPaths(vector<string> &pathList, bool bSendMessages)
     
     if (!bSendMessages)
         m_addImmediately = true;
-    m_acceptItemChanged = true;
-    m_itemWaitCount = 0;
 
     for(i = pathList.begin(); i != pathList.end(); i++)
         DoSearchMusic((char *)(*i).c_str(), bSendMessages);
 
-    while (m_itemWaitCount > 0)
-        usleep(5);
-
-    m_acceptItemChanged = false;
     m_addImmediately = false;
 }
 
 void MusicCatalog::DoSearchMusic(char *path, bool bSendMessages)
 {
-    vector<PlaylistItem *> *metalist = new vector<PlaylistItem *>;
-
     WIN32_FIND_DATA find;
     HANDLE handle;
     string search = path;
@@ -861,6 +855,9 @@ void MusicCatalog::DoSearchMusic(char *path, bool bSendMessages)
                     if (IsntError(FilePathToURL(file.c_str(), url, &urlLength)))
                         m_database->Insert(url, "P");
 
+                    if (m_addImmediately)
+                        AddPlaylist(url);
+
                     delete [] url;
                 }
                 else if (fileExt && 
@@ -877,9 +874,14 @@ void MusicCatalog::DoSearchMusic(char *path, bool bSendMessages)
                     {
                         continue;
                     }
-                       
+                    
                     PlaylistItem *plist = new PlaylistItem(tempurl);
-                    metalist->push_back(plist);
+                    m_plm->RetrieveMetaDataNow(plist);
+
+                    WriteMetaDataToDatabase(tempurl,
+                                            (MetaData)plist->GetMetaData());   
+                    if (m_addImmediately)
+                        AddSong(tempurl);
 
                     delete [] tempurl;
                 }
@@ -888,18 +890,6 @@ void MusicCatalog::DoSearchMusic(char *path, bool bSendMessages)
         }
         while (FindNextFile(handle, &find) && !m_exit);
         FindClose(handle);
-
-        if (metalist->size() > 0) {
-            int slept = 0;
-            while (m_itemWaitCount > 30 && slept < 30) {
-                usleep(50);
-                slept++;
-            }
-            m_itemWaitCount += metalist->size();
-            m_plm->RetrieveMetaData(metalist);
-        }
-        else 
-            delete metalist;
     }
 }
 
@@ -1084,18 +1074,6 @@ Error MusicCatalog::AcceptEvent(Event *e)
             }
             else 
                 m_context->target->AcceptEvent(e);
-            break; }
-        case INFO_PlaylistItemUpdated: {
-            if (m_acceptItemChanged) {
-                PlaylistItemUpdatedEvent *piu = (PlaylistItemUpdatedEvent *)e;
-                WriteMetaDataToDatabase(piu->Item()->URL().c_str(), 
-                                        (MetaData)piu->Item()->GetMetaData());
-
-                if (m_addImmediately)
-                    Add(piu->Item()->URL().c_str());
-
-                m_itemWaitCount--;
-            }
             break; }
         case INFO_SearchMusicDone: {
             m_context->target->AcceptEvent(new Event(INFO_MusicCatalogRegenerating));

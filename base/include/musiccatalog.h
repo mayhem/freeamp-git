@@ -160,9 +160,7 @@ class MusicCatalog : public EventQueue
     PlaylistManager *m_plm;
 
     bool   m_inUpdateSong;
-    bool   m_acceptItemChanged;
     bool   m_addImmediately;
-    uint32 m_itemWaitCount;
 
     PlaylistItem *m_newItem;
     PlaylistItem *m_oldItem;

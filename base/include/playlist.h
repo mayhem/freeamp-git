@@ -343,6 +343,11 @@ class PlaylistManager {
     void RetrieveMetaData(PlaylistItem* item);
     void RetrieveMetaData(vector<PlaylistItem*>* list);
 
+    /* and for the truely selfish function that wants its data immediately,
+     * w/o spawning a thread, w/o sending messages, and no dbase lookup. 
+     */
+    void RetrieveMetaDataNow(PlaylistItem* item);
+
  protected:
     inline uint32 CheckIndex(uint32 index);
     uint32 InternalIndexOf(vector<PlaylistItem*>* list, const PlaylistItem* item);
