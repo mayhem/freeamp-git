@@ -76,6 +76,7 @@ class PullBuffer
 
       Semaphore *m_pWriteSem, *m_pReadSem;
       Mutex     *m_pMutex;
+      bool       m_bExit;
 
     private:
 

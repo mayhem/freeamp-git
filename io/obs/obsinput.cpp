@@ -152,8 +152,7 @@ SetTo(char *url)
 
          result = m_pPullBuffer->Open();
          if (result == kError_NoErr)
-             result = m_pPullBuffer->Run();
-
+            result = m_pPullBuffer->Run();
       }
    }
    else

@@ -22,6 +22,7 @@
 ____________________________________________________________________________*/
 
 #include <iostream.h>
+#include <assert.h>
 
 #include "event.h"
 #include "player.h"
@@ -36,8 +37,23 @@ ____________________________________________________________________________*/
 #include "preferences.h"
 #include "lmc.h"
 #include "properties.h"
+#include "log.h"
 
 Player *Player::m_thePlayer = NULL;
+LogFile *g_Log = NULL;
+
+#define SEND_NORMAL_EVENT(e) { Event *ev = new Event(e); GetUIManipLock();    \
+                               SendToUI(ev); ReleaseUIManipLock(); delete ev; \
+                             }
+
+#ifndef WIN32
+#define DISPLAY_ERROR(s,e) { if (e & 0xFFFF0000) { cout << s->GetErrorString(e)         \
+                             << endl;} else { cout << "Error Number " << e << endl; } } 
+#else
+#define DISPLAY_ERROR(s,e) { if (e & 0xFFFF0000) { MessageBox(NULL,s->GetErrorString(e), \
+                             NULL,MB_OK);} else { char foo[1024];sprintf(foo,            \
+                             "ErrorNumber %d",e); MessageBox(NULL,foo,NULL,MB_OK); } }
+#endif
 
 Player   *Player::
 GetPlayer()
@@ -51,7 +67,15 @@ GetPlayer()
 
 Player::
 Player():
-    EventQueue() {
+EventQueue() {
+
+    g_Log = new LogFile("freeamp.log");
+    assert(g_Log);
+
+    assert(g_Log->Open());
+    //g_Log->AddLogLevel(LogInput);
+    //g_Log->AddLogLevel(LogDecode);
+    
     //cout << "Creating player..." << endl;
     m_eventSem = new Semaphore();
     m_eventQueue = new Queue<Event *>();
@@ -162,6 +186,7 @@ Player::~Player()
 
     TYPICAL_DELETE(m_prefs);
 
+   TYPICAL_DELETE(g_Log);
 }
 
 void      Player::
@@ -616,49 +641,291 @@ SetState(PlayerState ps)
 
 RegistryItem *Player::ChoosePMI(char *szUrl)
 {
-    PhysicalMediaInput *pmi;
-    RegistryItem       *pmi_item, *ret = NULL;
-    int                 iLoop;
-    char               *szNewUrl = NULL;
+     PhysicalMediaInput *pmi;
+     RegistryItem       *pmi_item, *ret = NULL;
+     int                 iLoop;
+     char               *szNewUrl = NULL;
 
-    if (strstr(szUrl, "://") == NULL)
-    {
-	szNewUrl = new char[strlen(szUrl) + strlen("file:// ")];
-	sprintf(szNewUrl, "file://%s", szUrl);
+     if (strstr(szUrl, "://") == NULL)
+     {
+        szNewUrl = new char[strlen(szUrl) + strlen("file:// ")];
+                        sprintf(szNewUrl, "file://%s", szUrl);
 
-	szUrl = szNewUrl;
-    }
+        szUrl = szNewUrl;
+     }
 
-    for(iLoop = 0; iLoop < m_pmiRegistry->GetNumItems(); iLoop++)
-    {
-	pmi_item = m_pmiRegistry->GetItem(iLoop);
+     for(iLoop = 0; iLoop < m_pmiRegistry->GetNumItems(); iLoop++)
+     {
+         pmi_item = m_pmiRegistry->GetItem(iLoop);
 
-	pmi = (PhysicalMediaInput *)pmi_item->InitFunction()();
-	if (pmi->CanHandle(szUrl))
-	{
-	    ret = pmi_item;
-	    delete pmi;
+         pmi = (PhysicalMediaInput *)pmi_item->InitFunction()();
+         if (pmi->CanHandle(szUrl))
+         {
+              ret = pmi_item;
+              delete pmi;
 
-	    break;
-	}
-	delete pmi;
-    }
+              break;
+         }
+         delete pmi;
+     }
 
-    if (szNewUrl)
-	delete szNewUrl;
+     if (szNewUrl)
+         delete szNewUrl;
 
-    return ret;
+     return ret;
 }
 
-#define SEND_NORMAL_EVENT(e)  { Event *ev = new Event(e); GetUIManipLock(); SendToUI(ev); ReleaseUIManipLock(); delete ev;}
+void Player::GetMediaInfo(PLMGetMediaInfoEvent *gmi, PLMSetMediaInfoEvent *smi)
+{
+    RegistryItem          *pmi_item, *lmc_item = NULL;
+    Error                  error = kError_UnknownErr;
+    PhysicalMediaInput    *pmi;
+    LogicalMediaConverter *lmc;
+    MediaInfoEvent        *mie = NULL;
 
-#ifndef WIN32
-#define DISPLAY_ERROR(s,e) { if (e & 0xFFFF0000) { cout << s->GetErrorString(e) << endl;} else { cout << "Error Number " << e << endl; } }
-#else
-#define DISPLAY_ERROR(s,e) { if (e & 0xFFFF0000) { MessageBox(NULL,s->GetErrorString(e),NULL,MB_OK);} else { char foo[1024];sprintf(foo,"ErrorNumber %d",e); MessageBox(NULL,foo,NULL,MB_OK); } }
-#endif
+    smi->SetPlayListItem(gmi->GetPlayListItem());
+    pmi_item = ChoosePMI(gmi->GetPlayListItem()->m_url);
+    if (!pmi_item) 
+    {
+        g_Log->Error("Cannot determine what pmi to use for %s\n", 
+                     gmi->GetPlayListItem()->m_url);
+        return;
+    }
 
-int32 Player::ServiceEvent(Event *pC) {
+    pmi = (PhysicalMediaInput *)pmi_item->InitFunction()();
+    if (!pmi) 
+    {
+        g_Log->Error("Cannot create pmi for %s\n", gmi->GetPlayListItem()->m_url);
+        return;
+    }
+
+    error = pmi->SetTo(gmi->GetPlayListItem()->m_url);
+    if (IsError(error)) 
+    {
+        g_Log->Error("Cannot initialize pmi for %s\n", gmi->GetPlayListItem()->m_url);
+        return;
+    }
+
+    pmi->SetPropManager((Properties *)this);
+    lmc_item = m_lmcRegistry->GetItem(0);
+    if (!lmc_item)
+    {
+        g_Log->Error("Cannot find lmc for %s\n", gmi->GetPlayListItem()->m_url);
+        return;
+    }
+
+    lmc = (LogicalMediaConverter *)lmc_item->InitFunction()();
+    if (!lmc)
+    {
+        g_Log->Error("Cannot create lmc for %s\n", gmi->GetPlayListItem()->m_url);
+        return;
+    }
+
+    error = lmc->SetPMI(pmi);
+    if (IsError(error)) 
+    {
+        DISPLAY_ERROR(lmc, error);
+        g_Log->Error("Cannot set pmi into lmc for %s\n", gmi->GetPlayListItem()->m_url);
+        return;
+    }
+
+    lmc->SetPropManager((Properties *)this);
+    if (!lmc->CanDecode()) 
+    {
+        printf("There are no plug-ins to handle this media type.\n"); 
+        g_Log->Error("Cannot decode %s\n", gmi->GetPlayListItem()->m_url);
+        return;
+    }
+
+    lmc->SetPropManager((Properties *)this);
+
+    error = lmc->ExtractMediaInfo(&mie);
+    if (IsError(error)) 
+    {
+        DISPLAY_ERROR(lmc, error);
+        g_Log->Error("Cannot extract media info from %s\n", gmi->GetPlayListItem()->m_url);
+        return;
+    }
+    lmc->SetPropManager((Properties *)this);
+    smi->SetPMIRegistryItem(pmi_item);
+    smi->SetLMCRegistryItem(lmc_item);
+
+    if (lmc->IsStreaming() && pmi->CachePMI())
+    {
+        smi->SetPMI(pmi);
+        lmc->SetPMI(NULL);
+    }
+
+    smi->SetMediaInfo(mie);
+    smi->SetComplete();
+
+    delete lmc;
+}
+
+void Player::Play(PlayListItem *pc, Event *pC)
+{
+    Error                error = kError_NoErr;
+    Event               *e;
+    PhysicalMediaOutput *pmo = NULL;
+    PhysicalMediaInput  *pmi = NULL;
+    RegistryItem        *pmi_item = pc->GetPMIRegistryItem();
+    RegistryItem        *lmc_item = pc->GetLMCRegistryItem();
+    RegistryItem        *item;
+
+    if (!pc) 
+    {
+        m_plm->SetFirst();
+        if (m_lmc) 
+        {
+             m_lmc->Stop();
+             delete m_lmc;
+             m_lmc = NULL;
+        }
+        if (SetState(STATE_Stopped)) 
+        {
+             SEND_NORMAL_EVENT(INFO_Stopped);
+        }
+        GetUIManipLock();
+                    
+        e = new Event(INFO_PlayListDonePlay);
+        SendToUI(e);
+
+        ReleaseUIManipLock();
+        delete e;
+    }
+
+    if (m_lmc) 
+    {
+        m_lmc->Stop();
+        delete m_lmc;
+        m_lmc = NULL;
+    }
+
+    pmi_item = pc->GetPMIRegistryItem();
+    lmc_item = pc->GetLMCRegistryItem();
+
+    if (!pmi_item || !lmc_item)
+    {
+        if (SetState(STATE_Stopped)) 
+        {
+            SEND_NORMAL_EVENT(INFO_Stopped);
+        }
+        if (!m_plm->NextIsSame()) 
+        {
+            AcceptEvent(new Event(CMD_NextMediaPiece));
+            if (m_playerState == STATE_Paused || (pC->Type() == CMD_PlayPaused)) 
+            {
+               AcceptEvent(new Event(CMD_PlayPaused));
+            } 
+            else 
+            {
+               AcceptEvent(new Event(CMD_Play));
+            }
+        } 
+        else 
+        {
+            if (SetState(STATE_Stopped)) 
+            {
+                SEND_NORMAL_EVENT(INFO_Stopped);
+            }
+
+        }
+        return;
+    }
+
+    pmi = pc->GetPMI();
+    pc->SetPMI(NULL);
+    if (pmi_item && pmi == NULL)                    
+    {
+        pmi = (PhysicalMediaInput *)pmi_item->InitFunction()();
+        error = pmi->SetTo(pc->m_url);
+        pmi->SetPropManager((Properties *)this);
+        if(IsError(error))
+        {
+            delete pmi;
+            return;
+        }
+    }
+                    
+    item = m_pmoRegistry->GetItem(0);
+    if(item) 
+    {
+        pmo = (PhysicalMediaOutput *)item->InitFunction()();
+        pmo->SetPropManager((Properties *)this);
+    }
+                    
+    error = kError_NoErr;
+    if(lmc_item) 
+    {
+        m_lmc = (LogicalMediaConverter *)lmc_item->InitFunction()();
+                                   
+        if ((error = m_lmc->SetTarget((EventQueue *)this)) != kError_NoErr) 
+        {
+            DISPLAY_ERROR(m_lmc,error);
+            return;
+        }
+        if ((error = m_lmc->SetPMI(pmi)) != kError_NoErr) 
+        {
+            DISPLAY_ERROR(m_lmc,error);
+            return;
+        }
+        if ((error = m_lmc->SetPMO(pmo)) != kError_NoErr) 
+        {
+            DISPLAY_ERROR(m_lmc,error);
+            return;
+        }
+        m_lmc->SetPropManager((Properties *)this);
+    }
+                    
+    if ((error = m_lmc->InitDecoder()) != kError_NoErr) 
+    {
+        DISPLAY_ERROR(m_lmc,error);
+        return;
+    }
+                    
+    if (!m_lmc->IsStreaming())
+    {
+        if ((error = m_lmc->ChangePosition(m_plm->GetSkip())) != kError_NoErr) 
+        {
+            DISPLAY_ERROR(m_lmc,error);
+            delete pC;
+            return;
+        }
+    }
+
+    if ((m_playerState == STATE_Paused) || (pC->Type() == CMD_PlayPaused)) 
+    {
+        if ((error = m_lmc->Pause()) != kError_NoErr) 
+        {
+             DISPLAY_ERROR(m_lmc,error);
+             return;
+        }
+        if ((error = m_lmc->Decode()) != kError_NoErr) 
+        {
+            DISPLAY_ERROR(m_lmc,error);
+            return;
+        }
+        if (SetState(STATE_Paused)) 
+        {
+            SEND_NORMAL_EVENT(INFO_Paused);
+        }
+    } 
+    else 
+    {
+        if ((error = m_lmc->Decode()) != kError_NoErr) 
+        {
+            DISPLAY_ERROR(m_lmc,error);
+            return;
+        }
+        if (SetState(STATE_Playing)) 
+        {
+            SEND_NORMAL_EVENT(INFO_Playing);
+        }
+    }
+}
+            
+int32 Player::ServiceEvent(Event *pC) 
+{
     if (pC) {
         //cout << "Player: serviceEvent: servicing Event: " << pC->Type() << endl;
         switch (pC->Type()) {
@@ -695,228 +962,32 @@ int32 Player::ServiceEvent(Event *pC) {
                 break;
             }
 
-            case CMD_PLMGetMediaInfo: {
-                PLMGetMediaInfoEvent *gmi = (PLMGetMediaInfoEvent *)pC;
-                PLMSetMediaInfoEvent *smi = new PLMSetMediaInfoEvent();
-                smi->SetPlayListItem(gmi->GetPlayListItem());
-                RegistryItem *pmi_item = ChoosePMI(gmi->GetPlayListItem()->m_url);
-                RegistryItem *lmc_item = NULL;
-                Error error = kError_UnknownErr;
-                if (pmi_item) {
-                    PhysicalMediaInput *pmi = (PhysicalMediaInput *)pmi_item->InitFunction()();
-                    if (pmi) {
-                        error = pmi->SetTo(gmi->GetPlayListItem()->m_url);
-                        //cout << "trying: " << gmi->GetPlayListItem()->m_url << endl;
-                        if (IsntError(error)) {
-                            pmi->SetPropManager((Properties *)this);
-                            lmc_item = m_lmcRegistry->GetItem(0);
-                            if (lmc_item) {
-                                LogicalMediaConverter *lmc = (LogicalMediaConverter *)lmc_item->InitFunction()();
-                                if (lmc) {
-                                    error = lmc->SetPMI(pmi);
-                                    if (IsntError(error)) {
-                                        lmc->SetPropManager((Properties *)this);
-                                        if (lmc->CanDecode()) {
-                                            //cout << "yep" << endl;
-                                            MediaInfoEvent *mie = NULL;
-                                            error = lmc->ExtractMediaInfo(&mie);
-                                            if (IsntError(error)) {
-                                                smi->SetPMIRegistryItem(pmi_item);
-                                                smi->SetLMCRegistryItem(lmc_item);
-
-						if (lmc->IsStreaming() && pmi->CachePMI())
-						{
-						    smi->SetPMI(pmi);
-						    lmc->SetPMI(NULL);
-						}
-
-                                                smi->SetMediaInfo(mie);
-                                                smi->SetComplete();
-                                                delete lmc;
-                                            } else {
-						DISPLAY_ERROR(lmc, error);
-                                                delete lmc;
-                                            }
-                                        } else {
-					    printf("There are no plug-ins to handle "
-						   "this media type.\n"); 
-                                            delete lmc;
-                                        }
-                                    } else {
-					DISPLAY_ERROR(lmc, error);
-                                        delete lmc;
-                                    }
-                                }
-                            }
-                        } else {
-			    DISPLAY_ERROR(pmi, error);
-                            delete pmi;
-                        }
-                    }
-                }
+            case CMD_PLMGetMediaInfo: 
+            {
+                PLMSetMediaInfoEvent  *smi;
+                
+                smi = new PLMSetMediaInfoEvent();
+                GetMediaInfo((PLMGetMediaInfoEvent *)pC, smi);
                 m_plm->AcceptEvent(smi);
                 delete pC;
                 break;
             }
+
             case CMD_PlayPaused:
-            case CMD_Play: {
-		PlayListItem *pc = m_plm->GetCurrent();
-		Error error = kError_NoErr;
+            case CMD_Play: 
+            { 
+                PlayListItem *pItem;
 
-		if (pc) {
-		    if (m_lmc) {
-			m_lmc->Stop();
-			delete m_lmc;
-			m_lmc = NULL;
-		    }
-
-		    PhysicalMediaOutput *pmo = NULL;
-		    PhysicalMediaInput *pmi = NULL;
-		    RegistryItem *pmi_item = pc->GetPMIRegistryItem();
-		    RegistryItem *lmc_item = pc->GetLMCRegistryItem();
-
-		    if (!pmi_item || !lmc_item)
-		    {
-#ifdef WIN32
-			// char foo[512];
-			// sprintf(foo,"Sorry, FreeAmp currently does not support the 
-			// file %s\n\nClick Next then Play to go to the next
-			// song",pc->m_url);
-			// MessageBox(NULL,foo,"FreeAmp Error",MB_OK | MB_TASKMODAL);
-#endif
-			if (SetState(STATE_Stopped)) {
-			    SEND_NORMAL_EVENT(INFO_Stopped);
-			}
-			if (!m_plm->NextIsSame()) {
-			    AcceptEvent(new Event(CMD_NextMediaPiece));
-			    if (m_playerState == STATE_Paused || (pC->Type() == CMD_PlayPaused)) {
-				AcceptEvent(new Event(CMD_PlayPaused));
-			    } else {
-				AcceptEvent(new Event(CMD_Play));
-			    }
-			} else {
-			    if (SetState(STATE_Stopped)) {
-				SEND_NORMAL_EVENT(INFO_Stopped);
-			    }
-
-			}
-			delete pC;
-			return 0;
-		    }
-		    pmi = pc->GetPMI();
-		    pc->SetPMI(NULL);
-		    if (pmi_item && pmi == NULL)                    
-		    {
-			pmi = (PhysicalMediaInput *)pmi_item->InitFunction()();
-			error = pmi->SetTo(pc->m_url);
-			pmi->SetPropManager((Properties *)this);
-			if(IsError(error))
-			{
-			    delete pmi;
-			    break;
-			}
-		    }
-                    
-		    RegistryItem *item = m_pmoRegistry->GetItem(0);
-                    
-		    if(item) {
-			pmo = (PhysicalMediaOutput *)item->InitFunction()();
-			pmo->SetPropManager((Properties *)this);
-		    }
-                    
-		    error = kError_NoErr;
-		    if(lmc_item) {
-			m_lmc = (LogicalMediaConverter *)lmc_item->InitFunction()();
-                                        
-			if ((error = m_lmc->SetTarget((EventQueue *)this)) != kError_NoErr) {
-			    DISPLAY_ERROR(m_lmc,error);
-			    return 0;
-			}
-			if ((error = m_lmc->SetPMI(pmi)) != kError_NoErr) {
-			    DISPLAY_ERROR(m_lmc,error);
-			    return 0;
-			}
-			if ((error = m_lmc->SetPMO(pmo)) != kError_NoErr) {
-			    DISPLAY_ERROR(m_lmc,error);
-			    return 0;
-			}
-			m_lmc->SetPropManager((Properties *)this);
-                    }
-                    
-                    if ((error = m_lmc->InitDecoder()) != kError_NoErr) {
-			DISPLAY_ERROR(m_lmc,error);
-			delete pC;
-			return 0;
-                    }
-                    
-		    if (!m_lmc->IsStreaming())
-		    {
-                        if ((error = m_lmc->ChangePosition(m_plm->GetSkip())) != 
-			    kError_NoErr) {
-			    DISPLAY_ERROR(m_lmc,error);
-			    delete pC;
-			    return 0;
-			}
-                    }
-                    if ((m_playerState == STATE_Paused) || (pC->Type() == CMD_PlayPaused)) {
-			if ((error = m_lmc->Pause()) != kError_NoErr) {
-			    DISPLAY_ERROR(m_lmc,error);
-			    delete pC;
-			    return 0;
-			}
-			if ((error = m_lmc->Decode()) != kError_NoErr) {
-			    DISPLAY_ERROR(m_lmc,error);
-			    delete pC;
-			    return 0;
-			}
-			if (SetState(STATE_Paused)) {
-			    SEND_NORMAL_EVENT(INFO_Paused);
-			}
-                    } else {
-			if ((error = m_lmc->Decode()) != kError_NoErr) {
-			    DISPLAY_ERROR(m_lmc,error);
-			    delete pC;
-			    return 0;
-			}
-			if (SetState(STATE_Playing)) {
-			    SEND_NORMAL_EVENT(INFO_Playing);
-			}
-                    }
-                } else {
-                    m_plm->SetFirst();
-                    //cout << "no more in playlist..." << endl;
-                    if (m_lmc) {
-			m_lmc->Stop();
-			delete m_lmc;
-			m_lmc = NULL;
-                    }
-                    if (SetState(STATE_Stopped)) {
-			SEND_NORMAL_EVENT(INFO_Stopped);
-                    }
-                    //cout << "killed lmc" << endl;
-                    GetUIManipLock();
-                    //cout << "got lock" << endl;
-                    
-                    Event *e = new Event(INFO_PlayListDonePlay);
-                    SendToUI(e);
-                    //cout << "sent playlist done playing" << endl;
-                    ReleaseUIManipLock();
-                    //cout << "released lock" << endl;
-                    delete e;
-                    
-                    //e = new Event(CMD_QuitPlayer);
-                    //Player::GetPlayer()->AcceptEvent(e);
-                    //delete e;
-                    
-                }
-		delete pC;
-		break; 
-	    }
-            
+                pItem = m_plm->GetCurrent();
+                if (pItem)
+                    Play(pItem, pC);
+                delete pC;
+                break; 
+            }
             case CMD_NextMediaPiece:
                 m_plm->SetNext();
                 if (m_playerState != STATE_Stopped) {
-		    AcceptEvent(new Event(CMD_Play));
+		              AcceptEvent(new Event(CMD_Play));
                 }
                 delete pC;
                 break;
@@ -924,7 +995,7 @@ int32 Player::ServiceEvent(Event *pC) {
             case CMD_PrevMediaPiece:
                 m_plm->SetPrev();
                 if (m_playerState != STATE_Stopped) {
-		    AcceptEvent(new Event(CMD_Play));
+		              AcceptEvent(new Event(CMD_Play));
                 }
                 delete pC;
                 break;
@@ -1117,16 +1188,15 @@ int32 Player::ServiceEvent(Event *pC) {
 	    }
 
         }
-	return 0;
-        //cout << "Done servicing event..." << endl;
+                return 0;
     } 
     else {
-        cout << "serviceEvent: passed NULL event!!!" << endl;
         return 255;
     }
 }
 
-Error Player::PropertyChange(const char *pProp, PropValue *ppv) {
+Error Player::PropertyChange(const char *pProp, PropValue *ppv) 
+{
     Error rtn = kError_UnknownErr;
     if (!strcmp(pProp,"pcm_volume")) {
         int32 newVol = ((Int32PropValue *)ppv)->GetInt32();
@@ -1136,26 +1206,31 @@ Error Player::PropertyChange(const char *pProp, PropValue *ppv) {
     return rtn;
 }
 
-void Player::SendToUI(Event *pe) {
+void Player::SendToUI(Event *pe) 
+{
     int32 i;
     for (i = 0;i<m_uiVector->NumElements();i++) {
         m_uiVector->ElementAt(i)->AcceptEvent(pe);
     }
 }
 
-Error Player::GetProperty(const char *pProp, PropValue **ppVal) {
+Error Player::GetProperty(const char *pProp, PropValue **ppVal) 
+{
     return m_props.GetProperty(pProp,ppVal);
 }
 
-Error Player::SetProperty(const char *pProp, PropValue *pVal) {
+Error Player::SetProperty(const char *pProp, PropValue *pVal) 
+{
     return m_props.SetProperty(pProp,pVal);
 }
 
-Error Player::RegisterPropertyWatcher(const char *pProp, PropertyWatcher *pPropWatch) {
+Error Player::RegisterPropertyWatcher(const char *pProp, PropertyWatcher *pPropWatch) 
+{
     return m_props.RegisterPropertyWatcher(pProp, pPropWatch);
 }
 
-Error Player::RemovePropertyWatcher(const char *pProp, PropertyWatcher *pPropWatch) {
+Error Player::RemovePropertyWatcher(const char *pProp, PropertyWatcher *pPropWatch) 
+{
     return m_props.RemovePropertyWatcher(pProp, pPropWatch);
 }
 /*

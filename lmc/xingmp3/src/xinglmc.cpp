@@ -45,8 +45,7 @@ ____________________________________________________________________________*/
 #include "mutex.h"
 #include "semaphore.h"
 #include "lmc.h"
-
-#define DB printf("%s:%d\n", __FILE__, __LINE__);
+#include "log.h"
 
 extern    "C"
 {
@@ -96,9 +95,9 @@ static int sample_rate_table[8] =
 };
 
 const int ID3_TAG_SIZE = 128;
-const int iMaxDecodeRetries = 6;     // one partial frame and five full frames
+const int iMaxDecodeRetries = 15;
 const int iInitialBufferSize = 1100; // just larger than the largest frame size
-const int iStreamingBufferSize = 5;  // in seconds
+const int iStreamingBufferSize = 3;  // in seconds
 
 #define ENSURE_INITIALIZED if (!m_properlyInitialized) return kError_PluginNotInitialized;
 
@@ -184,7 +183,10 @@ Error XingLMC::AdvanceBufferToNextFrame()
            pBuffer++, iCount++)
                ; // <=== Empty body!
   
-       m_input->EndRead(iCount + 1);
+
+       g_Log->Log(LogDecode, "Skipped %d bytes in advance frame.\n", iCount + 1);
+       if (m_input)
+           m_input->EndRead(iCount + 1);
 
        if (iCount != 0 && iCount < iNumBytes - 1)
        {
@@ -223,29 +225,20 @@ Error XingLMC::GetHeadInfo()
            {
               MPEG_HEAD sHead;
               int       iFrameBytes, iBitRate;
-             
+            
               iFrameBytes = head_info3(((unsigned char *)pBuffer) + 
-                                       m_frameBytes,
-                                       iNumBytes - m_frameBytes, &sHead,
-                                       &iBitRate, &iForward);
-              m_input->EndRead(0);
+                                       m_frameBytes + iForward,
+                                       iNumBytes - (m_frameBytes + iForward), 
+                                       &sHead, &iBitRate, &iForward);
+              if (m_input)
+                 m_input->EndRead(0);
 
-              // Did the decoder find a bad sync marker?
-              if (iFrameBytes == m_frameBytes && iBitRate == m_iBitRate)
-              {
-			         return kError_NoErr;
-              }
-//              else
-//              {
-//                  printf("The two frame headers did not agree.\n");
-//                  printf("Header 1: Sync: %d Id: %d Br: %d\n", 
-//                      m_sMpegHead.sync, m_sMpegHead.id, m_sMpegHead.br_index);
-//                  printf("Header 2: Sync: %d Id: %d Br: %d\n\n", 
-//                      sHead.sync, sHead.id, sHead.br_index);
-//              }
+              if (iFrameBytes > 0 && iFrameBytes < 1050)
+                 return kError_NoErr;
            }
            else
-              m_input->EndRead(0);
+              if (m_input)
+                  m_input->EndRead(0);
 
            AdvanceBufferToNextFrame();
        }
@@ -276,6 +269,7 @@ CanDecode()
    Err = GetHeadInfo();
    if (Err != kError_NoErr)
    {
+       g_Log->Log(LogDecode, "GetHeadInfo() in CanDecode() could not find the sync marker.\n");
        return false;
    }
 
@@ -467,6 +461,7 @@ InitDecoder()
    }
    else
    {
+      g_Log->Log(LogDecode, "Audio decode init failed.\n");
       return (Error) lmcError_AudioDecodeInitFailed;
    }
 
@@ -553,6 +548,12 @@ Stop()
       xc[0] = XING_Stop;
       m_xcqueue->Write(xc);
       m_pauseSemaphore->Signal();
+
+      // This will cause the input plug-in to shut down and exit out of any blocked
+      // functions that the pmi might be in.
+      delete m_input;
+      m_input = NULL;
+
       m_decoderThread->Join();  // wait for thread to exit
 
       delete    m_decoderThread;
@@ -606,6 +607,9 @@ DecodeWork()
 
    in_bytes = out_bytes = 0;
 
+   if (!m_input)
+      return;
+
 	m_input->Resume();
    for (m_frameCounter = 0;;)
    {
@@ -638,10 +642,13 @@ DecodeWork()
          case XING_Stop:
             return;
          case XING_Pause:
-            m_output->Pause();
-            m_input->Pause();
+            if (m_output)
+               m_output->Pause();
+            if (m_input)
+               m_input->Pause();
             m_pauseSemaphore->Wait();
-            m_input->Resume();
+            if (m_input)
+               m_input->Resume();
             break;
          default:
             break;
@@ -652,13 +659,18 @@ DecodeWork()
 
       for(iLoop = 0; iLoop < iMaxDecodeRetries; iLoop++)
 		{
-          iBytesNeeded = m_frameBytes;
+          iBytesNeeded = m_frameBytes + 1;
           Err = BeginRead(pBuffer, iBytesNeeded);
+          if (Err == kError_Interrupt)
+             break;
+
           if (Err != kError_NoErr)
           {
               m_seekMutex->Release();
               if (m_target)
                  m_target->AcceptEvent(new LMCErrorEvent(this,Err));
+
+              g_Log->Error("LMC: Cannot read from pullbuffer.\n"); 
 
               return;
           }
@@ -667,8 +679,12 @@ DecodeWork()
                   (short *)(m_pcmBuffer + m_pcmBufBytes));
           if (x.in_bytes == 0)
 			 {
-             m_input->EndRead(x.in_bytes);
+             if (m_input)
+                 m_input->EndRead(x.in_bytes);
+             else
+                 break;
 
+             g_Log->Log(LogDecode, "Audio decode failed. Resetting the decoder.\n");
              m_audioMethods.decode_init(&m_sMpegHead, m_frameBytes,
 				                           0, 0, 0, 24000);
 
@@ -676,6 +692,7 @@ DecodeWork()
              if (Err != kError_NoErr)
              {
                  m_seekMutex->Release();
+                 g_Log->Error("LMC: Cannot advance to next frame.\n");
                  if (m_target)
                      m_target->AcceptEvent(new LMCErrorEvent(this,Err));
 
@@ -687,11 +704,15 @@ DecodeWork()
 			    break;
           }
       }
-      m_input->EndRead(x.in_bytes);
+      if (m_input)
+         m_input->EndRead(x.in_bytes);
+      else
+         break;
 
       if (iLoop == iMaxDecodeRetries)
       {
          m_seekMutex->Release();
+         g_Log->Error("LMC: Maximum number of retries reached while trying to decode.\n");
          if (m_target)
             m_target->AcceptEvent(new LMCErrorEvent(this, (Error) 
                         lmcError_DecodeDidntDecode));
@@ -719,6 +740,7 @@ DecodeWork()
                if (m_target)
                   m_target->AcceptEvent(new LMCErrorEvent(this, 
                            (Error) lmcError_OutputWriteFailed));
+               g_Log->Error("LMC: Cannot write to output plugin.\n");
                return;
             }
 
@@ -750,6 +772,7 @@ DecodeWork()
          if (m_target)
             m_target->AcceptEvent(new LMCErrorEvent(this, (Error) 
                          lmcError_OutputWriteFailed));
+         g_Log->Error("LMC: Cannot write to output plugin.\n");
          return;
       }
 #define _VISUAL_ENABLE_
@@ -784,21 +807,27 @@ BeginRead(void *&pBuffer, unsigned int iBytesNeeded)
 
    for(;;)
 	{
-	    iPercent = m_input->GetBufferPercentage();
+       if (m_input)
+    	    iPercent = m_input->GetBufferPercentage();
+       else
+          return kError_Interrupt;
 
        time(&iNow);
 	    if (iNow != m_iBufferUpdate)
 	    {
 	        //if (m_target)
-		//    m_target->AcceptEvent(new StreamBufferEvent(bBuffering, 
-		//    iPercent));
-		
-	        printf("Buffer: %d%%  \r", m_input->GetBufferPercentage());
-		fflush(stdout);
-		m_iBufferUpdate = iNow;
+		     //    m_target->AcceptEvent(new StreamBufferEvent(bBuffering, 
+           //    iPercent));
+
+	        printf("Buffer: %d%%  \r", iPercent);
+		     fflush(stdout);
+           m_iBufferUpdate = iNow;
 	    }
 
-	    Err = m_input->BeginRead(pBuffer, iBytesNeeded);
+       if (m_input)
+	        Err = m_input->BeginRead(pBuffer, iBytesNeeded);
+       else
+           Err = kError_Interrupt;
 	    if (Err == kError_BufferingUp)
 	    {
 		if (!bBuffering)
@@ -896,7 +925,11 @@ ChangePosition(int32 position)
 
    int32     dummy;
 
-   error = m_input->Seek(dummy, position * m_frameBytes, SEEK_FROM_START);
+   if (m_input)
+       error = m_input->Seek(dummy, position * m_frameBytes, SEEK_FROM_START);
+   else
+       return kError_Interrupt;
+
 	m_frameCounter = position;
 
    m_seekMutex->Release();

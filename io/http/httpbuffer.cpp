@@ -3,11 +3,13 @@
    FreeAmp - The Free MP3 Player
 
    Portions Copyright (C) 1998 GoodNoise
-                                                                                   This program is free software; you can redistribute it and/or modify
+
+   This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-                                                                                   This program is distributed in the hope that it will be useful,
+
+   This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
@@ -23,24 +25,29 @@ ____________________________________________________________________________*/
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/time.h>
+#include <errno.h>
 #ifdef WIN32
 #include <winsock.h>
 #else
-#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <fcntl.h>
 #endif
 
 #include "httpbuffer.h"
+#include "log.h"
 
 const int iHttpPort = 80;
 const int iMaxHostNameLen = 64;
 const int iGetHostNameBuffer = 1024;
 const int iBufferUpInterval = 3;
-const int iInitialBufferSize = 64;
+const int iInitialBufferSize = 128;
 const int iHeaderSize = 1024;
 const int iICY_OK = 200;
+const int iTransmitTimeout = 60;
 
 #define DB printf("%s:%d\n", __FILE__, __LINE__);
 
@@ -51,6 +58,7 @@ static char *g_ErrorArray[9] =
    "Cannot open socket.",
    "Cannot connect to host.",
    "Failed to read data from socket.",
+   "Failed to write data to socket.",
 	"Bummer, dude! :-)"
 };
 
@@ -60,7 +68,6 @@ HttpBuffer::HttpBuffer(size_t iBufferSize, size_t iOverFlowSize,
 {
     m_hHandle = -1;
     m_bLoop = false;
-    m_bExit = false;
     m_pBufferThread = NULL;
     m_pID3Tag = NULL;
 	 m_szError = new char[iMaxErrorLen];
@@ -72,6 +79,7 @@ HttpBuffer::~HttpBuffer(void)
 {
     m_bExit = true;
     m_pWriteSem->Signal();
+    m_pReadSem->Signal();
 
     if (m_pBufferThread)
     {
@@ -149,10 +157,15 @@ Error HttpBuffer::Open(void)
     Error               eRet;
     void               *pPtr;
     size_t              iSize;
+    fd_set              sSet; 
+    struct timeval      sTv;
 
     iRet = sscanf(m_szUrl, "http://%[^:/]:%d", szHostName, &iPort);
     if (iRet < 1)
+    {
+        g_Log->Error("Badly formatted URL: %s\n", m_szUrl);
         return (Error)httpError_BadUrl;
+    }
 
     if (iRet < 2)
        iPort = iHttpPort;
@@ -164,6 +177,7 @@ Error HttpBuffer::Open(void)
     if (eRet != kError_NoErr)
     {
        sprintf(m_szError, "Cannot find host %s\n", szHostName);
+       g_Log->Error("Cannot find host %s\n", szHostName);
        return (Error)httpError_CustomError;
     }
 
@@ -174,14 +188,17 @@ Error HttpBuffer::Open(void)
     m_hHandle = socket(sHost.h_addrtype,SOCK_STREAM,0);
     if (m_hHandle < 0)
     {
+       g_Log->Error("Cannot create socket: %s\n", strerror(errno));
        return (Error)httpError_CannotOpenSocket;
     }
 
     if (connect(m_hHandle,(const sockaddr *)&sAddr,sizeof sAddr) < 0)
     { 
+       g_Log->Error("Cannot connect socket: %s\n", strerror(errno));
        close(m_hHandle);
        return (Error)httpError_CannotConnect;
     }
+
 
     gethostname(szHostName, iMaxHostNameLen);    
     szQuery = new char[iMaxUrlLen];
@@ -192,17 +209,53 @@ Error HttpBuffer::Open(void)
         sprintf(szQuery, "GET / HTTP/1.0\nHost %s\nAccept: */*\n\n\n", 
                 szHostName);
 
-    send(m_hHandle, szQuery, strlen(szQuery), 0);
+    for(; !m_bExit;)
+    {
+        sTv.tv_sec = iTransmitTimeout;
+        sTv.tv_usec = 0;
+        FD_ZERO(&sSet); FD_SET(m_hHandle, &sSet);
+        iRet = select(m_hHandle + 1, NULL, &sSet, NULL, &sTv);
+        if (!iRet)
+        {
+           continue;
+        }
+        iRet = send(m_hHandle, szQuery, strlen(szQuery), 0);
+        if (iRet != strlen(szQuery))
+        {
+            g_Log->Error("Cannot write to socket: %s\n", strerror(errno));
+            close(m_hHandle);
+            return (Error)httpError_SocketWrite;
+        }
+        break;
+    } 
+    if (m_bExit)
+        return (Error)kError_Interrupt;
+
     delete szQuery;
 
     pInitialBuffer = new char[iInitialBufferSize + 1];
-    
-    iRead = recv(m_hHandle, pInitialBuffer, iInitialBufferSize, 0);
-    if (iRead < 0)
+
+    for(;!m_bExit;)
     {
-       close(m_hHandle);
-       return (Error)httpError_SocketRead;
+        sTv.tv_sec = iTransmitTimeout;
+        sTv.tv_usec = 0;
+        FD_ZERO(&sSet); FD_SET(m_hHandle, &sSet);
+        iRet = select(m_hHandle + 1, &sSet, NULL, NULL, &sTv);
+        if (!iRet)
+        {
+           continue;
+        }
+        iRead = recv(m_hHandle, pInitialBuffer, iInitialBufferSize, 0);
+        if (iRead < 0)
+        {
+            g_Log->Error("Cannot read from socket: %s\n", strerror(errno));
+            close(m_hHandle);
+            return (Error)httpError_SocketRead;
+        }
+        break;
     }
+    if (m_bExit)
+        return (Error)kError_Interrupt;
 
     if (sscanf(pInitialBuffer, " ICY %d %255[^\n\r]", &iRet, m_szError))
     {
@@ -211,6 +264,7 @@ Error HttpBuffer::Open(void)
 
 		  if (iRet != iICY_OK)
 		  {
+            g_Log->Error("This stream is not available: %s\n", m_szError);
 		      delete pInitialBuffer;
 		      close(m_hHandle);
 				return (Error)httpError_CustomError;
@@ -248,12 +302,27 @@ Error HttpBuffer::Open(void)
             if (iLoop < iHeaderBytes)
                break;
                
-            iRead = recv(m_hHandle, pInitialBuffer, iInitialBufferSize, 0);
-            if (iRead < 0)
+            for(;!m_bExit;)
             {
-               close(m_hHandle);
-               return (Error)httpError_SocketRead;
+                sTv.tv_sec = iTransmitTimeout;
+                sTv.tv_usec = 0;
+                FD_ZERO(&sSet); FD_SET(m_hHandle, &sSet);
+                iRet = select(m_hHandle + 1, &sSet, NULL, NULL, &sTv);
+                if (!iRet)
+                {
+                   continue;
+                }
+                iRead = recv(m_hHandle, pInitialBuffer, iInitialBufferSize, 0);
+                if (iRead < 0)
+                {
+                    g_Log->Error("Cannot read from socket: %s\n", strerror(errno));
+                    close(m_hHandle);
+                    return (Error)httpError_SocketRead;
+                }
+                break;
             }
+            if (m_bExit)
+                return (Error)kError_Interrupt;
         }
 
         // Let's make up a ficticous ID3 tag.
@@ -301,6 +370,8 @@ Error HttpBuffer::Open(void)
 
     delete pInitialBuffer;
 
+    fcntl(m_hHandle, F_SETFL, fcntl(m_hHandle, F_GETFL) | O_NONBLOCK);
+         
     return kError_NoErr;
 }
 
@@ -339,9 +410,14 @@ void HttpBuffer::StartWorkerThread(void *pVoidBuffer)
 
 void HttpBuffer::WorkerThread(void)
 {
-   size_t  iToCopy, iRead; 
-   void   *pBuffer;
-   Error   eError;
+   size_t          iToCopy; 
+   int             iRead, iRet;
+   void           *pBuffer;
+   Error           eError;
+   fd_set          sSet;
+   struct timeval  sTv;
+
+   FD_ZERO(&sSet);
 
    for(; !m_bExit;)
    {
@@ -349,6 +425,15 @@ void HttpBuffer::WorkerThread(void)
       {
           m_pWriteSem->Wait();
           continue;
+      }
+
+      sTv.tv_sec = 0;
+      sTv.tv_usec = 100000;  // .1 second
+      FD_SET(m_hHandle, &sSet);
+      iRet = select(m_hHandle + 1, &sSet, NULL, NULL, &sTv);
+      if (!iRet)
+      {
+         continue;
       }
           
       eError = BeginWrite(pBuffer, iToCopy);

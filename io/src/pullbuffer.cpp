@@ -27,14 +27,14 @@ ____________________________________________________________________________*/
 #include <assert.h>
 
 #include "pullbuffer.h"
-
-#define DB //printf("%s:%d\n", __FILE__, __LINE__);
+#include "log.h"
 
 PullBuffer::PullBuffer(size_t iBufferSize,
                        size_t iOverflowSize,
                        size_t iWriteTriggerSize)
 {
    m_bEOS = false;
+   m_bExit = false;
    m_bReadOpPending = false;
    m_bWriteOpPending = false;
 
@@ -56,8 +56,9 @@ PullBuffer::PullBuffer(size_t iBufferSize,
 PullBuffer::~PullBuffer(void)
 {
    // In case anyone is blocked on a BeginRead 
-   m_bEOS = true;
+   m_bExit = true;
    m_pReadSem->Signal();
+   m_pWriteSem->Signal();
 
    delete m_pPullBuffer;
    delete m_pWriteSem;
@@ -214,7 +215,7 @@ Error PullBuffer::EndWrite(size_t iBytesWritten)
 
    m_bWriteOpPending = false;
 
-   //printf("Write: ReadIndex: %d WriteIndex %d\n", m_iReadIndex, m_iWriteIndex);
+   g_Log->Log(LogInput, "EndWrite: ReadIndex: %d WriteIndex %d\n", m_iReadIndex, m_iWriteIndex);
    m_pMutex->Release();
 
 
@@ -230,6 +231,11 @@ Error PullBuffer::BeginRead(void *&pBuffer, size_t &iBytesNeeded)
    for(;;)
    {
       m_pMutex->Acquire();
+
+      if (m_bExit)
+      {
+          return kError_Interrupt;
+      }
 
       if (m_bEOS && iBytesNeeded > m_iBytesInBuffer)
       {
@@ -258,9 +264,9 @@ Error PullBuffer::BeginRead(void *&pBuffer, size_t &iBytesNeeded)
       iOverflow = (m_iReadIndex + iBytesNeeded) - m_iBufferSize; 
       if (iOverflow > m_iOverflowSize)
       {
-          printf("Overflow buffer is too small!! \n");
-          printf("Needed %d but had only %d for overflow.\n",
-               iOverflow, m_iOverflowSize);
+          g_Log->Error("Overflow buffer is too small!! \n"
+                       "Needed %d but had only %d for overflow.\n",
+                       iOverflow, m_iOverflowSize);
 
           eError = kError_InvalidParam;
           break;
@@ -299,7 +305,7 @@ Error PullBuffer::EndRead(size_t iBytesUsed)
 
    m_bReadOpPending = false;
 
-   //printf(" Read: ReadIndex: %d WriteIndex %d\n", m_iReadIndex, m_iWriteIndex);
+   g_Log->Log(LogInput, "EndRead: ReadIndex: %d WriteIndex %d\n", m_iReadIndex, m_iWriteIndex);
    m_pMutex->Release();
 
    return kError_NoErr;
@@ -307,10 +313,21 @@ Error PullBuffer::EndRead(size_t iBytesUsed)
 
 void PullBuffer::DiscardBytes()
 {
-   m_pMutex->Acquire();
+
+   for(;;)
+   {
+        m_pMutex->Acquire();
+        if (m_bReadOpPending || m_bWriteOpPending)
+        {
+            m_pMutex->Release();
+            continue;
+        }
+        break;
+   }
 
    m_iReadIndex = (m_iReadIndex + m_iWriteTriggerSize) % m_iBufferSize;
 	m_iBytesInBuffer -= m_iWriteTriggerSize;
+   g_Log->Log(LogInput, "Discarding %d bytes.\n", m_iWriteTriggerSize);
 
    m_pMutex->Release();
 }

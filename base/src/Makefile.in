@@ -81,7 +81,8 @@ target_os = @target_os@
 @AM_HAVE_WIN32_TRUE@FILES = 
 @AM_HAVE_WIN32_TRUE@INCLS = 
 @AM_HAVE_WIN32_FALSE@TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
-@AM_HAVE_WIN32_FALSE@FILES = player.cpp playlist.cpp hashtable.cpp thread.cpp registrar.cpp registry.cpp propimpl.cpp
+@AM_HAVE_WIN32_FALSE@FILES = player.cpp playlist.cpp hashtable.cpp thread.cpp registrar.cpp \
+@AM_HAVE_WIN32_FALSE@        registry.cpp propimpl.cpp log.cpp
 @AM_HAVE_WIN32_FALSE@INCLS = -I@top_srcdir@/base/unix/include
 
 @AM_HAVE_LINUXTHREADS_TRUE@REENT = -D_REENTRANT
@@ -109,7 +110,7 @@ libfabase_a_LIBADD =
 @AM_HAVE_WIN32_TRUE@cond0libfabase_a_OBJECTS = 
 @AM_HAVE_WIN32_FALSE@cond1libfabase_a_OBJECTS =  player.o playlist.o \
 @AM_HAVE_WIN32_FALSE@hashtable.o thread.o registrar.o registry.o \
-@AM_HAVE_WIN32_FALSE@propimpl.o
+@AM_HAVE_WIN32_FALSE@propimpl.o log.o
 libfabase_a_OBJECTS =  $(cond0libfabase_a_OBJECTS) \
 $(cond1libfabase_a_OBJECTS)
 AR = ar
@@ -122,8 +123,9 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP = --best
-DEP_FILES =  .deps/hashtable.P .deps/player.P .deps/playlist.P \
-.deps/propimpl.P .deps/registrar.P .deps/registry.P .deps/thread.P
+DEP_FILES =  .deps/hashtable.P .deps/log.P .deps/player.P \
+.deps/playlist.P .deps/propimpl.P .deps/registrar.P .deps/registry.P \
+.deps/thread.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 SOURCES = $(libfabase_a_SOURCES)
 OBJECTS = $(libfabase_a_OBJECTS)

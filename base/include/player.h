@@ -72,6 +72,8 @@ class Player : public EventQueue, Properties, PropertyWatcher  {
 //    static int32 AcceptEventStub(EventQueueRef ref, Event* e);
     virtual int32 AcceptEvent(Event *);
 	 virtual RegistryItem *ChoosePMI(char *szUrl);
+    virtual void GetMediaInfo(PLMGetMediaInfoEvent *pEvent, 
+                              PLMSetMediaInfoEvent *smi);
 
     // Properties
     virtual Error GetProperty(const char *, PropValue **);
@@ -89,6 +91,7 @@ class Player : public EventQueue, Properties, PropertyWatcher  {
     void Usage(const char *);
     bool SetState(PlayerState);
     int32 ServiceEvent(Event *);
+    void  Play(PlayListItem *pc, Event *pC);
 
 
  private:

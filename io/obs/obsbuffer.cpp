@@ -3,11 +3,11 @@
    FreeAmp - The Free MP3 Player
 
    Portions Copyright (C) 1998 GoodNoise
-                                                                                   This program is free software; you can redistribute it and/or modify
+   This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-                                                                                   This program is distributed in the hope that it will be useful,
+   This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
@@ -23,21 +23,26 @@ ____________________________________________________________________________*/
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/time.h>
 #ifdef WIN32
 #include <winsock.h>
 #else
-#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h> 
 #include <netdb.h>
+#include <fcntl.h>
 #endif
 
 #include "obsbuffer.h"
+#include "log.h"
 
 const int iMaxHostNameLen = 64;
 const int iGetHostNameBuffer = 1024;
 const int iInitialBufferSize = 64;
+
+const int iReadTimeout       = 10;       // in secs
 
 #define DB printf("%s:%d\n", __FILE__, __LINE__);
 
@@ -55,7 +60,6 @@ ObsBuffer::ObsBuffer(size_t iBufferSize, size_t iOverFlowSize,
         StreamBuffer(iBufferSize, iOverFlowSize, iWriteTriggerSize)
 {
     m_hHandle = -1;
-    m_bExit = false;
     m_pBufferThread = NULL;
     m_pID3Tag = NULL;
     m_szError = new char[iMaxErrorLen];
@@ -66,10 +70,14 @@ ObsBuffer::ObsBuffer(size_t iBufferSize, size_t iOverFlowSize,
 ObsBuffer::~ObsBuffer(void)
 {
     m_bExit = true;
+    g_Log->Log(LogInput, "obsbuffer dtor sleep\n");
     m_pWriteSem->Signal();
+    m_pReadSem->Signal();
+    g_Log->Log(LogInput, "obsbuffer dtor wake\n");
 
     if (m_pBufferThread)
     {
+       g_Log->Log(LogInput, "obsbuffer dtor join\n");
        m_pBufferThread->Join();
        delete m_pBufferThread;
     }
@@ -144,6 +152,8 @@ Error ObsBuffer::Open(void)
 
     strcpy(m_pID3Tag->szTitle, "Obsequieum");
 
+    fcntl(m_hHandle, F_SETFL, fcntl(m_hHandle, F_GETFL) | O_NONBLOCK);
+
     return kError_NoErr;
 }
 
@@ -184,18 +194,34 @@ void ObsBuffer::StartWorkerThread(void *pVoidBuffer)
 
 void ObsBuffer::WorkerThread(void)
 {
-   size_t  iToCopy, iRead, iStructSize, iActual; 
-   void   *pBuffer;
-   unsigned char *pTemp, *pCopy;
-   Error   eError;
+   size_t          iToCopy, iStructSize, iActual; 
+   int             iRead, iPacketNum = -1, iCurrNum, iRet;
+   RTPHeader      *pHeader;
+   void           *pBuffer;
+   unsigned        char *pTemp, *pCopy;
+   Error           eError;
+   fd_set          sSet;
+   struct timeval  sTv;
 
    pTemp = new unsigned char[iMAX_PACKET_SIZE];
+   pHeader = (RTPHeader *)pTemp;
    for(; !m_bExit;)
    {
       if (IsEndOfStream())
       {
+          g_Log->Log(LogInput, "Sleeping on EOS");
           m_pWriteSem->Wait();
           continue;
+      }
+
+      sTv.tv_sec = 0;
+      sTv.tv_usec = 100000;  // .1 second
+      FD_ZERO(&sSet);
+      FD_SET(m_hHandle, &sSet);
+      iRet = select(m_hHandle + 1, &sSet, NULL, NULL, &sTv);  
+      if (!iRet)
+      {
+         continue;
       }
 
       iStructSize = sizeof(struct sockaddr_in);
@@ -203,6 +229,7 @@ void ObsBuffer::WorkerThread(void)
                        (struct sockaddr *)m_pSin, &iStructSize);
       if (iRead <= 0)
       {
+         g_Log->Log(LogInput, "iRead is less than 0");
          SetEndOfStream(true);
          break;
       }
@@ -219,6 +246,13 @@ void ObsBuffer::WorkerThread(void)
       }
       if (eError != kError_NoErr)
          break; 
+
+      iCurrNum = ntohs(pHeader->iFlags & 0xFFFF);
+      if (iPacketNum != -1 && iPacketNum != iCurrNum - 1)
+      {
+          g_Log->Log(LogInput, "Lost packet (%d, %d)\n", iPacketNum, iCurrNum); 
+      }
+      iPacketNum = iCurrNum;
 
       iRead -= sizeof(RTPHeader);
       for(pCopy = pTemp + sizeof(RTPHeader); iRead > 0;)
@@ -248,6 +282,7 @@ void ObsBuffer::WorkerThread(void)
    delete pTemp;
    close(m_hHandle);
    m_hHandle = -1;
+   g_Log->Log(LogInput, "Worker thread done");
 }
 
 const char *ObsBuffer::

@@ -29,6 +29,8 @@ ____________________________________________________________________________*/
 
 #include "pullbuffer.h"
 
+const int iReceiveTimeout = 1;
+
 class StreamBuffer : public PullBuffer
 {
     public:

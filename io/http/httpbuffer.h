@@ -55,6 +55,7 @@ enum
    httpError_CannotOpenSocket,
    httpError_CannotConnect,
    httpError_SocketRead,
+   httpError_SocketWrite,
 	httpError_CustomError,
    httpError_MaximumError
 };
@@ -80,7 +81,7 @@ class HttpBuffer : public StreamBuffer
       int             m_hHandle;
       char            m_szUrl[iMaxUrlLen], *m_szError;
       Thread         *m_pBufferThread;
-      bool            m_bLoop, m_bExit;
+      bool            m_bLoop;
       ID3Tag         *m_pID3Tag;
 
     public:
