@@ -1995,7 +1995,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 									szFile,
 									sizeof(szFile));
 
-
+			g_ui->m_plm->RemoveAll();
 			for(int32 i = 0; i < count; i++)
 			{
 				DragQueryFile(	hDrop,
@@ -2154,7 +2154,15 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 					if ((g_displayInfo.seconds < 2) &&
 						(g_displayInfo.hours == 0) &&
 						(g_displayInfo.minutes == 0)) {
-						g_ui->m_target->AcceptEvent(new Event(CMD_PrevMediaPiece));
+						if (g_displayInfo.indexOfSong > 1) {
+							g_ui->m_target->AcceptEvent(new Event(CMD_PrevMediaPiece));
+						} else {
+							if (g_ui->m_plm->GetRepeat() != REPEAT_NOT) {
+								g_ui->m_target->AcceptEvent(new Event(CMD_PrevMediaPiece));
+							} else {
+								g_ui->m_target->AcceptEvent(new Event(CMD_Play));
+							}
+						}
 					} else {
 						g_ui->m_target->AcceptEvent(new Event(CMD_Play));
 					}

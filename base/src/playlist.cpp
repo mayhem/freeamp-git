@@ -196,12 +196,8 @@ void PlayListManager::SetShuffle(ShuffleMode oop) {
 	if ((oop >= 0) && (oop < SHUFFLE_INTERNAL_NUMBER)) {
 		switch (oop) {
 		case SHUFFLE_SHUFFLED:
-			if (m_pMediaElems->NumElements() == 0) {
-				oop = m_order;
-			} else {
-				// reshuffle
-				ShuffleOrder();
-			}
+			// reshuffle
+			ShuffleOrder();
 			break;
 		case SHUFFLE_NOT_SHUFFLED:
 			// m_current points into the ordered list, restore it to 'correct' element
