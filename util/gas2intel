@@ -142,12 +142,12 @@ while (<>) {
 	    # zero-arity instructions
 	    &lerr ("Wrong # of args\n") if ($#args != -1);
 	    $op = $1;
-	} elsif (/^(push|pop|inc|dec)([bwlq])$/) {
+	} elsif (/^(push|pop|inc|dec|neg|not)([bwlq])$/) {
 	    # unary int instructions
 	    &lerr ("Wrong # of args\n") if ($#args != 0);
 	    $op = $1;
 	    $size = $2;
-	} elsif (/^(lea|cmp|add|sub|and|or|xor|s[ha][lr]|mov)([bwlq])$/) {
+	} elsif (/^(lea|cmp|ad[dc]|s[ub]b|i?mul|i?div|and|or|xor|r[oc][lr]|s[ha][lr]|mov)([bwlq])$/) {
 	    # binary int instructions
 	    &lerr ("Wrong # of args\n") if ($#args != 1);
 	    $op = $1;
