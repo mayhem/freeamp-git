@@ -66,6 +66,7 @@ MusicCatalog::MusicCatalog(FAContext *context, char *databasepath)
     m_catMutex = new Mutex();
     m_inUpdateSong = false;
     m_acceptItemChanged = false;
+    m_addImmediately = false;
     m_artistList = new vector<ArtistList *>;
     m_unsorted = new vector<PlaylistItem *>;
     m_playlists = new vector<string>;
@@ -73,6 +74,18 @@ MusicCatalog::MusicCatalog(FAContext *context, char *databasepath)
    
     if (databasepath)
         SetDatabase(databasepath);
+
+    m_timeout = 0;
+    context->prefs->GetWatchThisDirTimeout(&m_timeout);
+    if (m_timeout) {
+        m_watchTimer = new WatchDirectoryTimer(context, m_timeout);
+        m_watchTimer->SleepFirst();
+        m_watchTimer->Start();
+    }
+    else {
+        m_watchTimer = new WatchDirectoryTimer(context, 300000);
+        m_watchTimer->Stop();
+    }
 }
 
 MusicCatalog::~MusicCatalog()
@@ -398,8 +411,10 @@ Error MusicCatalog::AddSong(const char *url)
 
         vector<PlaylistItem *>::iterator i = m_unsorted->begin();
         for (; i != m_unsorted->end(); i++)
-             if ((*i)->URL() == url)
+             if ((*i)->URL() == url) {
+                 m_catMutex->Release();
                  return kError_DuplicateItem;
+             }
 
         m_unsorted->push_back(newtrack);
         AcceptEvent(new MusicCatalogTrackAddedEvent(newtrack, NULL, NULL));
@@ -469,6 +484,7 @@ Error MusicCatalog::AddSong(const char *url)
     }
     delete meta;
     m_catMutex->Release();
+
     return kError_NoErr;
 }
 
@@ -687,13 +703,38 @@ void MusicCatalog::PruneThread(bool sendmessages)
     }
 }
 
+void MusicCatalog::PruneDirectory(string &directory)
+{
+    char *key = m_database->NextKey(NULL);
+    struct stat st;
+ 
+    while (key) {
+        if (!strncmp("file://", key, 7)) {
+            uint32 length = strlen(key) + 1;
+            char *filename = new char[length];
+            
+            if (IsntError(URLToFilePath(key, filename, &length))) {
+                if (!strncmp(directory.c_str(), filename, directory.size())) {
+                    if (-1 == stat(filename, &st)) {
+                        Remove(key);
+                        key = NULL;
+                    }
+                }
+            }
+            delete [] filename;
+        }
+        key = m_database->NextKey(key);
+    }
+}
+
 typedef struct MusicSearchThreadStruct {
     MusicCatalog *mc;
     vector<string> pathList;
+    bool bSendMessages;
     Thread *thread;
 } MusicSearchThreadStruct;
 
-void MusicCatalog::SearchMusic(vector<string> &pathList)
+void MusicCatalog::SearchMusic(vector<string> &pathList, bool bBrowserMessages)
 {
     if (!m_database->Working())
         return;
@@ -706,6 +747,7 @@ void MusicCatalog::SearchMusic(vector<string> &pathList)
         mst->mc = this;
         mst->pathList = pathList;
         mst->thread = thread;
+        mst->bSendMessages = bBrowserMessages;
 
         thread->Create(musicsearch_thread_function, mst);
     }
@@ -723,9 +765,10 @@ void MusicCatalog::musicsearch_thread_function(void *arg)
     mst->mc->m_mutex->Acquire();
 
     mst->mc->m_exit = false;
-    mst->mc->DoSearchPaths(mst->pathList);
+    mst->mc->DoSearchPaths(mst->pathList, mst->bSendMessages);
 
-    mst->mc->AcceptEvent(new Event(INFO_SearchMusicDone));
+    if (mst->bSendMessages)
+        mst->mc->AcceptEvent(new Event(INFO_SearchMusicDone));
 
     mst->mc->m_mutex->Release();
 
@@ -733,22 +776,26 @@ void MusicCatalog::musicsearch_thread_function(void *arg)
     delete mst;
 }
 
-void MusicCatalog::DoSearchPaths(vector<string> &pathList)
+void MusicCatalog::DoSearchPaths(vector<string> &pathList, bool bSendMessages)
 {
     vector<string>::iterator i;
     
+    if (!bSendMessages)
+        m_addImmediately = true;
     m_acceptItemChanged = true;
     m_itemWaitCount = 0;
 
     for(i = pathList.begin(); i != pathList.end(); i++)
-        DoSearchMusic((char *)(*i).c_str());
+        DoSearchMusic((char *)(*i).c_str(), bSendMessages);
 
     while (m_itemWaitCount > 0)
         usleep(5);
+
     m_acceptItemChanged = false;
+    m_addImmediately = false;
 }
 
-void MusicCatalog::DoSearchMusic(char *path)
+void MusicCatalog::DoSearchMusic(char *path, bool bSendMessages)
 {
     vector<PlaylistItem *> *metalist = new vector<PlaylistItem *>;
 
@@ -761,10 +808,12 @@ void MusicCatalog::DoSearchMusic(char *path)
         return;
 #endif
  
-    string *info = new string("Searching: ");
-    (*info) += path;
-    m_context->player->AcceptEvent(new BrowserMessageEvent(info->c_str()));
-    delete info;
+    if (bSendMessages) {
+        string *info = new string("Searching: ");
+        (*info) += path;
+        m_context->player->AcceptEvent(new BrowserMessageEvent(info->c_str()));
+        delete info;
+    }
    
     if (search[search.size() - 1] != DIR_MARKER)
        search.append(DIR_MARKER_STR);
@@ -794,7 +843,7 @@ void MusicCatalog::DoSearchMusic(char *path)
                         newDir.append(DIR_MARKER_STR);
                     newDir.append(find.cFileName);
 
-                    DoSearchMusic((char *)newDir.c_str());
+                    DoSearchMusic((char *)newDir.c_str(), bSendMessages);
                 }
             }
             else 
@@ -1041,6 +1090,9 @@ Error MusicCatalog::AcceptEvent(Event *e)
                 WriteMetaDataToDatabase(piu->Item()->URL().c_str(), 
                                         (MetaData)piu->Item()->GetMetaData());
 
+                if (m_addImmediately)
+                    Add(piu->Item()->URL().c_str());
+
                 m_itemWaitCount--;
             }
             break; }
@@ -1060,7 +1112,44 @@ Error MusicCatalog::AcceptEvent(Event *e)
             m_context->target->AcceptEvent(new Event(INFO_MusicCatalogDoneRegenerating));
             delete e;
             break;
-        } 
+        }
+        case INFO_PrefsChanged: {
+            int32 watchtimeout = 0;
+            m_context->prefs->GetWatchThisDirTimeout(&watchtimeout);
+            if (m_timeout != watchtimeout) {
+                m_timeout = watchtimeout;
+                if (m_timeout != 0) {
+                    m_watchTimer->Stop();
+                    m_watchTimer->Set(m_timeout);
+                    m_watchTimer->Start();
+                }
+                else 
+                    m_watchTimer->Stop();
+            }
+            break;
+        }
     }
     return kError_NoErr; 
+}
+
+WatchDirectoryTimer::WatchDirectoryTimer(FAContext *context, int32 timeout) 
+      : Timer(timeout)
+{
+   m_context = context;
+}
+
+void WatchDirectoryTimer::Tick(void)
+{
+   char *watchDir = new char[_MAX_PATH];
+   uint32 length = _MAX_PATH;
+
+   m_context->prefs->GetWatchThisDirectory(watchDir, &length);
+
+   string watchPath = watchDir;
+
+   vector<string> searchPaths;
+   searchPaths.push_back(watchDir);
+
+   m_context->catalog->PruneDirectory(watchPath);
+   m_context->catalog->SearchMusic(searchPaths, false);
 }

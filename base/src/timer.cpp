@@ -39,7 +39,7 @@ ____________________________________________________________________________*/
 
 
 Timer::Timer(uint32 milliseconds):
-m_ticks(milliseconds), m_thread(NULL), m_alive(true)
+m_ticks(milliseconds), m_thread(NULL), m_alive(true), m_sleepFirst(false)
 {
      
 }
@@ -53,6 +53,11 @@ Timer::~Timer()
         m_thread->Resume();
         m_semaphore.Wait();
     }
+}
+
+void Timer::SleepFirst(void)
+{
+    m_sleepFirst = true;
 }
 
 void Timer::Set(uint32 milliseconds)
@@ -73,19 +78,30 @@ void Timer::Start()
 
 void Timer::Stop()
 {
+#ifdef unix
+    if (m_thread) {
+        m_alive = false;
+        m_semaphore.Wait();
+        m_thread = NULL;
+    }
+#else
     if(m_thread)
         m_thread->Suspend();
+#endif
 }
 
 void Timer::ThreadFunction()
 {
+    if (m_sleepFirst)
+        GoToSleep(m_ticks);
+
     do
     {
         Tick();
 
         GoToSleep(m_ticks);
 
-    }while(m_alive);  
+    } while(m_alive);  
 
     m_semaphore.Signal();
 }

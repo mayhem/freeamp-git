@@ -159,9 +159,6 @@ EventQueue()
     m_context->props = &m_props;
     m_context->target = (EventQueue *) this;
 
-    m_musicCatalog = new MusicCatalog(m_context);
-    m_context->catalog = m_musicCatalog;
-
     // make sure the db dir exists so we have a place to store our 
     // stuff
 
@@ -175,6 +172,9 @@ EventQueue()
     {
         MKDIR(tempDir);
     }
+
+    m_musicCatalog = new MusicCatalog(m_context);
+    m_context->catalog = m_musicCatalog;
 
     string freeampdir = tempDir;
     freeampdir += DIR_MARKER_STR;
@@ -1881,6 +1881,7 @@ ServiceEvent(Event * pC)
             HandleMediaTimeInfo(pC);
             break;
 
+        case INFO_PrefsChanged:
         case INFO_PlaylistItemUpdated:
             SendEventToUI(pC);
             SendEventToCatalog(pC);
@@ -1891,7 +1892,6 @@ ServiceEvent(Event * pC)
         case INFO_StatusMessage:
         case INFO_BrowserMessage:
         case INFO_ErrorMessage:
-        case INFO_PrefsChanged:
         case INFO_StreamInfo:
         case INFO_PlaylistShuffle:
         case INFO_PlaylistRepeat:

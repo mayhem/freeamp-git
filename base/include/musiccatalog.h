@@ -32,14 +32,26 @@ using namespace std;
 #include "database.h"
 #include "metadata.h"
 #include "playlist.h"
+#include "timer.h"
+
+class FAContext;
+class Player;
+
+class WatchDirectoryTimer : public Timer {
+  public:
+    WatchDirectoryTimer(FAContext *context, int32 timeout);
+    virtual ~WatchDirectoryTimer() {}
+
+    virtual void Tick();
+
+  private:
+    FAContext *m_context;
+};
 
 typedef enum {
    kTypeTrack = 0,
    kTypeStream
 } MetadataStorageType;
-
-class FAContext;
-class Player;
 
 class AlbumList {
  public:
@@ -81,7 +93,7 @@ class MusicCatalog : public EventQueue
 
     void SetDatabase(const char *path);
 
-    void SearchMusic(vector<string> &pathList);
+    void SearchMusic(vector<string> &pathList, bool bBrowserMessages = true);
     void StopSearchMusic(void);
 
     void WriteMetaDataToDatabase(const char *url, const MetaData metadata,
@@ -116,14 +128,16 @@ class MusicCatalog : public EventQueue
 
     virtual Error AcceptEvent(Event *e);
 
+    void PruneDirectory(string &directory);
+
  protected:
     static void musicsearch_thread_function(void *arg);
     static void prune_thread_function(void *arg);
 
     void PruneThread(bool sendmessages);
 
-    void DoSearchMusic(char *path);
-    void DoSearchPaths(vector<string> &pathList);
+    void DoSearchMusic(char *path, bool bSendMessages);
+    void DoSearchPaths(vector<string> &pathList, bool bSendMessages);
     void PruneDatabase(bool sendmessages = false, bool spawn = false);
 
     bool m_exit;
@@ -146,6 +160,7 @@ class MusicCatalog : public EventQueue
 
     bool   m_inUpdateSong;
     bool   m_acceptItemChanged;
+    bool   m_addImmediately;
     uint32 m_itemWaitCount;
 
     PlaylistItem *m_newItem;
@@ -154,5 +169,8 @@ class MusicCatalog : public EventQueue
     ArtistList *m_oldArtist;
     AlbumList *m_newAlbum;
     AlbumList *m_oldAlbum;
+
+    int32                m_timeout;
+    WatchDirectoryTimer *m_watchTimer;
 };
 #endif

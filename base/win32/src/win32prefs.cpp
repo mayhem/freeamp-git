@@ -304,6 +304,16 @@ SetDefaults()
 	    SetPrefString(kSaveMusicDirPref, path);
     }
 
+    // set watch this dir value
+    size = sizeof(buf);
+    if (GetPrefString(kWatchThisDirectoryPref, buf, &size) == kError_NoPrefValue)
+    {
+        strcpy(path, cwd);
+        strcat(path, "\\");
+        strcat(path, "My Music");
+            SetPrefString(kWatchThisDirectoryPref, path);
+    }
+
     // set db directory value
     size = sizeof(buf);
     if (GetPrefString(kDatabaseDirPref, buf, &size) == kError_NoPrefValue)

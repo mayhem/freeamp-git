@@ -283,6 +283,7 @@ class GTKMusicBrowser {
     void AddTracksPlaylistEvent(vector<PlaylistItem *> *newlist, 
                                 bool end = false, bool forcePlay = false,
                                 bool forceNoPlay = false);
+    void AddTracksDoubleClick(vector<PlaylistItem *> *newlist);
     void PlayEvent();
     void StartMusicSearch(bool runMain = true, bool intro = false);
     void SortPlaylistEvent(PlaylistSortKey order, PlaylistSortType type);

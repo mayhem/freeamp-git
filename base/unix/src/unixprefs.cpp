@@ -545,6 +545,14 @@ SetDefaults()
         SetPrefString(kSaveMusicDirPref, tempdir.c_str());
     }
 
+    size = sizeof(buf);
+    if (GetPrefString(kWatchThisDirectoryPref, buf, &size) == kError_NoPrefValue) 
+    {
+        string tempdir = string(getenv("HOME"));
+        tempdir += "/MyMusic";
+        SetPrefString(kWatchThisDirectoryPref, tempdir.c_str());
+    }
+
     Preferences::SetDefaults();
 
     return kError_NoErr;

@@ -80,6 +80,8 @@ const char* kConvertUnderscoresToSpacesPref = "ConvertUnderscoresToSpaces";
 const char* kAllowMultipleInstancesPref = "AllowMultipleInstances";
 const char* kWAVOutputPathPref = "WAVOutputPath";
 const char* kAudioCDLengthPref = "AudioCDLength";
+const char* kWatchThisDirectoryPref = "WatchThisDirectory";
+const char* kWatchThisDirTimeoutPref = "WatchThisDirectoryTimeout";
 
 //logging
 const char* kUseDebugLogPref = "UseDebugLog";
@@ -137,6 +139,7 @@ const bool kDefaultConvertUnderscoresToSpaces = true;
 const bool kDefaultAllowMultipleInstances = false;
 const char* kDefaultWAVOutPath = ".";
 const int32 kDefaultAudioCDLength = 4440; // 74 minutes
+const int32 kDefaultWatchThisDirTimeout = 600000;
 
 Error
 Preferences::
@@ -319,6 +322,9 @@ SetDefaults()
 
     if (GetPrefInt32(kAudioCDLengthPref, &dummyInt) == kError_NoPrefValue)
         SetPrefInt32(kAudioCDLengthPref, kDefaultAudioCDLength);
+
+    if (GetPrefInt32(kWatchThisDirTimeoutPref, &dummyInt) == kError_NoPrefValue)
+        SetPrefInt32(kWatchThisDirTimeoutPref, kDefaultWatchThisDirTimeout);
 
     return kError_NoErr;
 }
@@ -1081,6 +1087,34 @@ Preferences::
 SetAudioCDLength(int32 value)
 {
     return SetPrefInt32(kAudioCDLengthPref, value);
+}
+
+Error
+Preferences::
+GetWatchThisDirectory(char* path, uint32* len)
+{
+    return GetPrefString(kWatchThisDirectoryPref, path, len);
+}
+
+Error
+Preferences::
+SetWatchThisDirectory(const char* path)
+{
+    return SetPrefString(kWatchThisDirectoryPref, path);
+}
+
+Error
+Preferences::
+GetWatchThisDirTimeout(int32* value)
+{
+    return GetPrefInt32(kWatchThisDirTimeoutPref, value);
+}
+
+Error
+Preferences::
+SetWatchThisDirTimeout(int32 value)
+{
+    return SetPrefInt32(kWatchThisDirTimeoutPref, value);
 }
 
 LibDirFindHandle *

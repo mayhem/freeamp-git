@@ -52,7 +52,6 @@ void mouse_move(GtkWidget *w, GdkEvent *e, GTKWindow *ui)
 void button_down(GtkWidget *w, GdkEvent *e, GTKWindow *ui)
 {
     Pos oPos;
-
     oPos.x = (int)e->button.x_root;
     oPos.y = (int)e->button.y_root;
     gdk_threads_leave();

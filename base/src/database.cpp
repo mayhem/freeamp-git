@@ -163,17 +163,15 @@ char *Database::NextKey(char *key)
     else
         returnKey = gdbm_firstkey(m_dbase);
 
-    if (!returnKey.dptr) {
-        m_lock->Release();
+    m_lock->Release();
+
+    if (!returnKey.dptr) 
         return NULL;
-    }
  
     nextKey = new char[returnKey.dsize]; 
     strcpy(nextKey, returnKey.dptr);
 
     free(returnKey.dptr);
-
-    m_lock->Release();
 
     if ((nextKey != NULL) && (!strcmp(DATABASE_VERSION_KEY, nextKey)))
         nextKey = NextKey(nextKey);

@@ -232,7 +232,6 @@ Error GTKFont::Load(int iFontHeight, bool bBold, bool bItalic)
                 fontname = BuildFontString(bold, italic, size - 1);
                 gfont = gdk_font_load(fontname.c_str());
                 if (!gfont) {
-//    cout << "fallback.. size is " << size << endl;
                     gfont = gdk_font_load("variable");  
                     if (!gfont) {
                         gfont = gdk_font_load("default");

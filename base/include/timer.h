@@ -35,6 +35,8 @@ class Timer {
     void Start();
     void Stop();
 
+    void SleepFirst(void);
+
     virtual void Tick() = 0;
 
     static void thread_function(void* arg);
@@ -45,7 +47,7 @@ class Timer {
     Thread* m_thread;
     bool m_alive;
     Semaphore m_semaphore;
-
+    bool m_sleepFirst;
 };
 
 #endif // INCLUDED_TIMER_H_

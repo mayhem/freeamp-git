@@ -28,7 +28,7 @@ FileSelector::FileSelector(char *windowtitle)
 {
     title = windowtitle;
     returnpath = "";
-    extended = false;
+    extended = true;
     ok = false;
     done = false;
 }

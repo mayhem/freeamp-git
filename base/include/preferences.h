@@ -86,6 +86,8 @@ extern const char* kCDDBServerPref;
 extern const char* kConvertUnderscoresToSpacesPref;
 extern const char* kAllowMultipleInstancesPref;
 extern const char* kAudioCDLengthPref;
+extern const char* kWatchThisDirectoryPref;
+extern const char* kWatchThisDirTimeoutPref;
 
 class LibDirFindHandle;
 
@@ -272,6 +274,12 @@ class Preferences {
 
     Error GetAudioCDLength(int32* value);
     Error SetAudioCDLength(int32  value);
+
+    Error GetWatchThisDirectory(char* path, uint32* len);
+    Error SetWatchThisDirectory(const char* path);
+
+    Error GetWatchThisDirTimeout(int32* value);
+    Error SetWatchThisDirTimeout(int32  value);
 };
 
 #endif /* _PREFERENCES_H */

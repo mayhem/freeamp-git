@@ -897,6 +897,21 @@ void GTKMusicBrowser::AddTracksPlaylistEvent(vector<PlaylistItem *> *newlist,
     }
 }
 
+void GTKMusicBrowser::AddTracksDoubleClick(vector<PlaylistItem *> *newlist)
+{
+    bool playNow = false;
+
+    m_context->prefs->GetPlayImmediately(&playNow);
+
+    if (playNow) {
+        DeleteListEvent();
+        m_currentindex = 0;
+        AddTracksPlaylistEvent(newlist, true, true);
+    }
+    else
+        AddTracksPlaylistEvent(newlist, true);
+}
+    
 void GTKMusicBrowser::PlayEvent(void)
 {
     m_plm->SetCurrentIndex(m_currentindex);

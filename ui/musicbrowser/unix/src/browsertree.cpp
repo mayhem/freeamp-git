@@ -1087,7 +1087,7 @@ static void tree_clicked(GtkWidget *widget, GdkEventButton *event,
 
     if (event->type == GDK_2BUTTON_PRESS) {
         vector<PlaylistItem *> *newlist = p->GetTreeSelection();
-        p->AddTracksPlaylistEvent(newlist, true);
+        p->AddTracksDoubleClick(newlist);
 
 //        if (p->GetTreeClick() == kTreeFavoriteStreamsHead)
 //            p->AddNewStream();

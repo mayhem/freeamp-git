@@ -591,6 +591,12 @@ void Window::HandleMouseLButtonDown(Pos &oScreenPos)
     if (pControl)
     {
        m_bLButtonDown = true;
+       if (m_pMouseInControl != pControl) {
+           if (m_pMouseInControl)
+               m_pMouseInControl->AcceptTransition(CT_MouseLeave);
+           m_pMouseInControl = pControl;
+           m_pMouseInControl->AcceptTransition(CT_MouseEnter);
+       }
        m_pMouseDownControl = pControl;
        pControl->AcceptTransition(CT_MouseLButtonDown, &oPos);
        DecUsageRef();
