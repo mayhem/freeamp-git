@@ -123,7 +123,9 @@ class UpdateManager : public Parse {
     virtual ~UpdateManager();
     
     void SetPlatform(const string& platform) { m_currentPlatform = platform; }
+    void SetArchitecture(const string& arch) { m_currentArchitecture = arch; }
     const string&  GetPlatform() { return m_currentPlatform; }
+    const string&  GetArchitecture() { return m_currentArchitecture; }
     virtual Error DetermineLocalVersions() { return kError_FeatureNotSupported; }
     Error RetrieveLatestVersionInfo(UMCallBackFunction function = NULL,
                                     void* cookie = NULL);
@@ -172,7 +174,9 @@ class UpdateManager : public Parse {
 
     string m_path;
     string m_versionPlatform;
+    string m_versionArchitecture;
     string m_currentPlatform;
+    string m_currentArchitecture;
 
 };
 

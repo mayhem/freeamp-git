@@ -221,6 +221,11 @@ bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent, Preferences* pre
     updateManager = new Win32UpdateManager(m_pContext);
     updateManager->DetermineLocalVersions();
     updateManager->SetPlatform(string("WIN32"));
+#if defined( _M_ALPHA )
+    updateManager->SetArchitecture(string("ALPHA"));
+#else
+    updateManager->SetArchitecture(string("X86"));
+#endif
 
     psp[4].dwSize = sizeof(PROPSHEETPAGE);
     psp[4].dwFlags = PSP_HASHELP;
@@ -1951,7 +1956,7 @@ static bool callback_function(UMEvent* event, void* userData)
 
             ostringstream ost;
 
-            ost << " Error: An error of type " <<  data.errorCode << " occurred.";
+            ost << " Error: " <<  ErrorString[data.errorCode];
 
             SetWindowText(hwndStatus, ost.str().c_str());
 
@@ -2027,13 +2032,14 @@ static void check_function(void* arg)
                 ListView_InsertItem(ts->hwndList, &lv_item);
             }
         }
-
-        ListView_RedrawItems(ts->hwndList, 0, ListView_GetItemCount(ts->hwndList) - 1);
     }
     else if(result == kError_UserCancel)
     {
         SetWindowText(hwndStatus, " Status: Update cancelled by user."); 
     }
+
+    ListView_RedrawItems(ts->hwndList, 0, ListView_GetItemCount(ts->hwndList) - 1);
+
 
     EnableWindow(hwndUpdate, TRUE);
     EnableWindow(hwndCancel, FALSE);

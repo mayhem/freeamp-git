@@ -70,20 +70,21 @@ typedef ostrstream ostringstream;
 
 
 const char* kUpdateServer = "fatman.freeamp.org";
-const char* kUpdatePath = "/update/freeamp/";
-const char* kUpdateFile = "/update/freeamp/version_info.xml";
+const char* kUpdatePath = "/update/test/";
+const char* kUpdateFile = "/update/test/version_info.xml";
 const char* kUpdateRequest = "GET %s HTTP/1.0\n"
                              "Host: %s\n"
                              "User-Agent: "BRANDING"/%s\n"
                              "\n";
 const uint8 kUpdatePort = 80;
 
-//extern AttrMap  oAttrMap; 
-
 UpdateManager::UpdateManager(FAContext* context)
 {
     m_runUpdateThread = true;
     m_context = context;
+
+    m_currentPlatform = "UNKNOWN";
+    m_currentArchitecture = "UNKNOWN";
 }
 
 UpdateManager::~UpdateManager()
@@ -1289,21 +1290,17 @@ inline uint32 UpdateManager::CheckIndex(uint32 index)
 // parsing code
 Error UpdateManager::BeginElement(string &element, AttrMap &attrMap)
 {
-    /*if(attrMap.size())
-    {
-        //AttrMap::iterator i = attrMap.find("NAME");
-        AttrMap::iterator i = oAttrMap.find("NAME");
-    }*/
-
 	m_path += string("/") + element;
 
 	if(m_path == "/VERSIONINFO/PLATFORM")
 	{
         m_versionPlatform = attrMap["NAME"];
+        m_versionArchitecture = attrMap["ARCHITECTURE"];
     }
 
     if(m_path == "/VERSIONINFO/PLATFORM/COMPONENT" &&
-       m_versionPlatform == m_currentPlatform)
+       m_versionPlatform == m_currentPlatform &&
+       m_versionArchitecture == m_currentArchitecture)
     {
         UpdateItem* item;
         bool foundComponent = false;
