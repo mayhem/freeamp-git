@@ -1430,18 +1430,11 @@ void GTKMusicBrowser::ToggleVisEvent(void)
     gdk_threads_enter();
 }
 
-void GTKMusicBrowser::ToggleVisEventDestroyed(void)
+static gint toggle_vis_delete_event(GtkWidget *w, GdkEvent *e, 
+                                    GTKMusicBrowser *p)
 {
-    ToggleVisEvent();
-    m_initialized = false;
-    musicBrowserTree = NULL;
-    m_browserCreated = false; 
-}
-
-static gboolean toggle_vis_destroy(GtkWidget *w, GTKMusicBrowser *p)
-{
-    p->ToggleVisEventDestroyed();
-    return FALSE;
+    p->ToggleVisEvent();
+    return TRUE;
 }
 
 static void add_tool(GtkWidget *widget, GTKMusicBrowser *p)
@@ -1948,8 +1941,8 @@ void GTKMusicBrowser::CreatePlaylist(void)
     }
     gtk_window_set_title(GTK_WINDOW(musicBrowser), titlestr.c_str());
     gtk_window_set_policy(GTK_WINDOW(musicBrowser), TRUE, TRUE, FALSE);
-    gtk_signal_connect(GTK_OBJECT(musicBrowser), "destroy",
-                       GTK_SIGNAL_FUNC(toggle_vis_destroy), this);
+    gtk_signal_connect(GTK_OBJECT(musicBrowser), "delete_event",
+                       GTK_SIGNAL_FUNC(toggle_vis_delete_event), this);
     gtk_container_set_border_width(GTK_CONTAINER(musicBrowser), 0);
     gtk_widget_realize(musicBrowser);
 
@@ -2544,7 +2537,7 @@ void GTKMusicBrowser::Close(bool inMain)
     isVisible = false;
 
     if (master) {
-        bool saveOnExit;
+        bool saveOnExit = false;
         m_context->prefs->GetSaveCurrentPlaylistOnExit(&saveOnExit);
 
         if (saveOnExit && m_plm)

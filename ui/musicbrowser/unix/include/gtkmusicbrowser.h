@@ -103,10 +103,8 @@ class GTKMusicBrowser {
     int pauseState;
     int stopState;
 
- protected:
-    FAContext *m_context;
-
  private:
+    FAContext *m_context;
     MusicBrowserUI *parentUI;
 
     bool isVisible;
@@ -209,7 +207,6 @@ class GTKMusicBrowser {
 
     void ExpandCollapseEvent();
     void ToggleVisEvent();
-    void ToggleVisEventDestroyed();
 
     void AddFileCMD();
     void DeleteListEvent();

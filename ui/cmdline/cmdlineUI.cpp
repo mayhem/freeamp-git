@@ -292,6 +292,7 @@ AcceptEvent(Event * e)
             MediaTimeInfoEvent *info = (MediaTimeInfoEvent *) e;
 
             m_currSeconds = (info->m_hours * 3600) + (info->m_minutes * 60) + info->m_seconds;
+            break;
          }
       case INFO_MPEGInfo:
          {

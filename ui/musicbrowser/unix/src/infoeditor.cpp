@@ -66,11 +66,6 @@ gint info_delete_event(GtkWidget *widget, GdkEvent *event, gpointer data)
     return FALSE;
 }
 
-void info_destroy(GtkWidget *widget, infoeditorUI *p)
-{
-    delete p;
-}
-
 void info_ok_button_event(GtkWidget *widget, infoeditorUI *p)
 {
     p->DoApplyInfoEdit();

@@ -212,8 +212,10 @@ void MusicBrowserUI::WindowClose(GTKMusicBrowser *oldUI)
     vector<GTKMusicBrowser *>::iterator
         loc = find(browserWindows.begin(), browserWindows.end(), oldUI);
 
-    if (loc != browserWindows.end())
+    if (loc != browserWindows.end()) {
+        delete *loc;
         browserWindows.erase(loc);
+    }
 }
 
 void MusicBrowserUI::StartSearch(bool runMain, bool intro)
