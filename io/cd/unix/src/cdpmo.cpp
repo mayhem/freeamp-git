@@ -203,6 +203,14 @@ struct disc_info CDPMO::GetDiscInfo(void)
     return dinfo;
 }
 
+void CDPMO::Eject(void)
+{
+    if (m_cdDesc < 0)
+        return;
+
+    cd_eject(m_cdDesc);
+}
+
 Error CDPMO::Reset(bool user_stop)
 {
    if (m_cdDesc < 0)

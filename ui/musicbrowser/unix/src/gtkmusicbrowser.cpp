@@ -37,6 +37,34 @@ using namespace std;
 #include "musicbrowserui.h"
 #include "gtkmessagedialog.h"
 
+#include "cdaudio.h"
+#include "cdpmo.h"
+
+void GTKMusicBrowser::EjectCD(void)
+{
+    Registry *pmoRegistry = m_context->player->GetPMORegistry();
+    RegistryItem *pmo_item = NULL;
+    int32 i = 0;
+
+    while (NULL != (pmo_item = pmoRegistry->GetItem(i++))) {
+        if (!strcmp("cd.pmo", pmo_item->Name())) {
+            break;
+        }
+    }
+
+    if (!pmo_item)
+        return;
+
+    PhysicalMediaOutput *pmo;
+    pmo = (PhysicalMediaOutput *)pmo_item->InitFunction()(m_context);
+    pmo->SetPropManager((Properties *)(m_context->player));
+
+    pmo->Init(NULL);
+    ((CDPMO*)pmo)->Eject();
+
+    delete pmo;
+}
+
 void GTKMusicBrowser::PlayMenu()
 {
     if (pauseState)
@@ -403,9 +431,14 @@ void GTKMusicBrowser::SetClickState(ClickState newState)
     if ((m_clickState == newState) && (newState != kContextPlaylist))
         return;
 
+    gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
+                             "/File/Create New Audio CD"), FALSE);
+
     m_clickState = newState;
     if (m_clickState == kContextPlaylist) {
         gtk_widget_set_sensitive(toolRemove, TRUE);
+        gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
+                                 "/Edit/Add Stream to Favorites"), FALSE);
         gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
                                  "/Edit/Remove Items from My Music"), FALSE);
         if (m_currentindex != 0) {
@@ -445,6 +478,8 @@ void GTKMusicBrowser::SetClickState(ClickState newState)
         gtk_widget_set_sensitive(toolDown, FALSE);
         gtk_widget_set_sensitive(toolRemove, FALSE);
         gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
+                                 "/Edit/Add Stream to Favorites"), FALSE);
+        gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
                                  "/Edit/Remove Items from My Music"), TRUE);
         gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
                                  "/Edit/Move Up"), FALSE);
@@ -452,23 +487,7 @@ void GTKMusicBrowser::SetClickState(ClickState newState)
                                  "/Edit/Move Down"), FALSE);
         gtk_clist_unselect_all(GTK_CLIST(playlistList));
 
-        if (m_mbState == kClickNone) {
-            GtkWidget *w = gtk_item_factory_get_widget(menuFactory,
-                                                 "/Edit/Edit Info");
-            gtk_container_foreach(GTK_CONTAINER(w), set_label_menu,
-                                          (gpointer)"Edit Info");
-            w = gtk_item_factory_get_widget(menuFactory,
-                                                 "/Edit/Add Items to Playlist");
-            gtk_container_foreach(GTK_CONTAINER(w), set_label_menu,
-                                          (gpointer)"Add Items to Playlist");
-            w = gtk_item_factory_get_widget(menuFactory,
-                                            "/Edit/Remove Items from My Music");
-            gtk_container_foreach(GTK_CONTAINER(w), set_label_menu,
-                                  (gpointer)"Remove Items from My Music");
-            gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
-                                     "/Edit/Edit Info"), FALSE);
-        }
-        else if (m_mbState == kClickPlaylist) {
+        if (m_mbState == kTreePlaylist) {
             GtkWidget *w = gtk_item_factory_get_widget(menuFactory,
                                                  "/Edit/Edit Info");
             gtk_container_foreach(GTK_CONTAINER(w), set_label_menu,
@@ -482,7 +501,7 @@ void GTKMusicBrowser::SetClickState(ClickState newState)
             gtk_container_foreach(GTK_CONTAINER(w), set_label_menu,
                                   (gpointer)"Remove Playlist from My Music");
         }
-        else {
+        else if (m_mbState == kTreeTrack) {
             GtkWidget *w = gtk_item_factory_get_widget(menuFactory,
                                                  "/Edit/Edit Info");
             gtk_container_foreach(GTK_CONTAINER(w), set_label_menu,
@@ -497,6 +516,58 @@ void GTKMusicBrowser::SetClickState(ClickState newState)
                                   (gpointer)"Remove Track from My Music");
             gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
                                      "/Edit/Edit Info"), TRUE);
+        }
+        else if (m_mbState == kTreeStream) {
+            gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
+                                     "/Edit/Add Stream to Favorites"), TRUE);
+            GtkWidget *w = gtk_item_factory_get_widget(menuFactory,
+                                                 "/Edit/Edit Info");
+            gtk_container_foreach(GTK_CONTAINER(w), set_label_menu,
+                                          (gpointer)"Edit Stream Info");
+            w = gtk_item_factory_get_widget(menuFactory,
+                                                 "/Edit/Add Items to Playlist");
+            gtk_container_foreach(GTK_CONTAINER(w), set_label_menu,
+                                          (gpointer)"Add Stream to Playlist");
+            w = gtk_item_factory_get_widget(menuFactory,
+                                            "/Edit/Remove Items from My Music");
+            gtk_container_foreach(GTK_CONTAINER(w), set_label_menu,
+                                  (gpointer)"Remove Stream from My Music");
+            gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
+                                     "/Edit/Edit Info"), TRUE);
+        }
+        else if (m_mbState == kTreeCD) {
+            GtkWidget *w = gtk_item_factory_get_widget(menuFactory,
+                                                 "/Edit/Edit Info");
+            gtk_container_foreach(GTK_CONTAINER(w), set_label_menu,
+                                          (gpointer)"Edit Info");
+            w = gtk_item_factory_get_widget(menuFactory,
+                                                 "/Edit/Add Items to Playlist");
+            gtk_container_foreach(GTK_CONTAINER(w), set_label_menu,
+                                          (gpointer)"Add Track to Playlist");
+            w = gtk_item_factory_get_widget(menuFactory,
+                                            "/Edit/Remove Items from My Music");
+            gtk_container_foreach(GTK_CONTAINER(w), set_label_menu,
+                                  (gpointer)"Remove Items from My Music");
+            gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
+                                     "/Edit/Edit Info"), FALSE);
+            gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
+                                    "/Edit/Remove Items from My Music"), FALSE);
+        }
+        else {
+            GtkWidget *w = gtk_item_factory_get_widget(menuFactory,
+                                                 "/Edit/Edit Info");
+            gtk_container_foreach(GTK_CONTAINER(w), set_label_menu,
+                                          (gpointer)"Edit Info");
+            w = gtk_item_factory_get_widget(menuFactory,
+                                                 "/Edit/Add Items to Playlist");
+            gtk_container_foreach(GTK_CONTAINER(w), set_label_menu,
+                                          (gpointer)"Add Items to Playlist");
+            w = gtk_item_factory_get_widget(menuFactory,
+                                            "/Edit/Remove Items from My Music");
+            gtk_container_foreach(GTK_CONTAINER(w), set_label_menu,
+                                  (gpointer)"Remove Items from My Music");
+            gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
+                                     "/Edit/Edit Info"), FALSE);
         }
     }
     else {
@@ -609,9 +680,11 @@ void GTKMusicBrowser::AddTrackPlaylistEvent(PlaylistItem *newitem)
 }
 
 void GTKMusicBrowser::AddTracksPlaylistEvent(vector<PlaylistItem *> *newlist,
-                                             bool end)
+                                             bool end, bool forcePlay, 
+                                             bool forceNoPlay)
 {
     bool play = false;
+    int playPos = 0;
 
     if (m_currentindex == kInvalidIndex)
         m_currentindex = 0;
@@ -625,11 +698,18 @@ void GTKMusicBrowser::AddTracksPlaylistEvent(vector<PlaylistItem *> *newlist,
         if (playNow)
             play = true;
     }
+    else 
+        playPos = m_currentindex;
 
     m_plm->AddItems(newlist, m_currentindex, true);
 
+    if (forceNoPlay)
+        play = false;
+    if (forcePlay)
+        play = true;
+
     if (play) {
-        m_currentindex = 0;
+        m_currentindex = playPos;
         PlayEvent();
     }
 }

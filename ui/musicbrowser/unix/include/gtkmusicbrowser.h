@@ -49,18 +49,14 @@ typedef enum {
 } ClickState;
 
 typedef enum {
-    kClickNone,
-    kClickPlaylist,
-    kClickTrack
-} TreeClickState;
-
-typedef enum {
    kTreeMyMusic,
    kTreeAll,
    kTreeUncat,
    kTreeArtist,
    kTreeAlbum,
    kTreeTrack,
+   kTreeStream,
+   kTreeCD,
    kTreePlaylistHead,
    kTreePlaylist,
    kTreeCDHead,
@@ -71,7 +67,7 @@ typedef enum {
 } TreeNodeType;
 
 typedef struct {
-    int                     type;
+    TreeNodeType            type;
     MusicCatalog           *catalog;
     ArtistList             *artist;
     AlbumList              *album;
@@ -152,7 +148,7 @@ class GTKMusicBrowser {
  
     MusicBrowserView m_state;
     ClickState m_clickState;
-    TreeClickState m_mbState;
+    TreeNodeType m_mbState;
 
     int32 lastPanedPosition;
     int32 lastPanedHandle;
@@ -179,8 +175,14 @@ class GTKMusicBrowser {
     GtkWidget *toolUp;
     GtkWidget *toolDown;
     GtkWidget *toolbar;
+
     GtkItemFactory *menuFactory;
     GtkItemFactory *playlistPopup;
+    GtkItemFactory *streamPopup;
+    GtkItemFactory *cdPopup;
+    GtkItemFactory *trackPopup;
+    GtkItemFactory *playlistCatPopup;
+    GtkItemFactory *otherPopup;
     
     GtkCTreeNode *mainTree;
     GtkCTreeNode *allTree;
@@ -214,7 +216,7 @@ class GTKMusicBrowser {
     GtkWidget *playlistSubTree;
   
     void UpdatePlayPause();
-    TreeData *NewTreeData(int type, MusicCatalog *cat = NULL, 
+    TreeData *NewTreeData(TreeNodeType type, MusicCatalog *cat = NULL, 
                           ArtistList *art = NULL, AlbumList *alb = NULL, 
                           PlaylistItem *tr = NULL, char *pname = NULL,
                           char *message = NULL,
@@ -248,8 +250,8 @@ class GTKMusicBrowser {
     ClickState GetClickState() { return m_clickState; }
     void SetClickState(ClickState newState);
 
-    TreeClickState GetTreeClick() { return m_mbState; }
-    void SetTreeClick(TreeClickState newState) { m_mbState = newState; }
+    TreeNodeType GetTreeClick() { return m_mbState; }
+    void SetTreeClick(TreeNodeType newState) { m_mbState = newState; }
 
     /* event callbacks */
     void ReadPlaylist(char *filename, vector<PlaylistItem *> *plist);
@@ -266,7 +268,8 @@ class GTKMusicBrowser {
     void AddTrackPlaylistEvent(char *path);
     void AddTrackPlaylistEvent(PlaylistItem *newitem);
     void AddTracksPlaylistEvent(vector<PlaylistItem *> *newlist, 
-                                bool end = false);
+                                bool end = false, bool forcePlay = false,
+                                bool forceNoPlay = false);
     void PlayEvent();
     void StartMusicSearch(bool runMain = true, bool intro = false);
     void SortPlaylistEvent(PlaylistSortKey order, PlaylistSortType type);
@@ -285,6 +288,10 @@ class GTKMusicBrowser {
     void SetRepeat(int numrepeat);
 
     void PlaylistRightClick(int x, int y, uint32 time);
+    void TreeRightClick(int x, int y, uint32 time);
+
+    void CreateTreePopups(void);
+    void EjectCD(void);
 };
 
 #endif

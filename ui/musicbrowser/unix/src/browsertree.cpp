@@ -44,7 +44,7 @@ ____________________________________________________________________________*/
 
 FAContext *BADContext = NULL;
 
-TreeData *GTKMusicBrowser::NewTreeData(int type, MusicCatalog *cat,
+TreeData *GTKMusicBrowser::NewTreeData(TreeNodeType type, MusicCatalog *cat,
                                        ArtistList *art, AlbumList *alb,
                                        PlaylistItem *tr, char *pname,
                                        char *message,
@@ -85,6 +85,7 @@ vector<PlaylistItem *> *GTKMusicBrowser::GetTreeSelection(void)
           return newlist;
 
       switch (data->type) {
+        case kTreeMyMusic:
         case kTreeAll: {
             MusicCatalog *cat = data->catalog;
             if (!cat)
@@ -129,6 +130,8 @@ vector<PlaylistItem *> *GTKMusicBrowser::GetTreeSelection(void)
                 newlist->push_back(item);
             }
             break; }
+        case kTreeCD:
+        case kTreeStream:
         case kTreeTrack: {
             PlaylistItem *i = new PlaylistItem(*(data->track));
             newlist->push_back(i);
@@ -436,7 +439,7 @@ void GTKMusicBrowser::UpdateCDTree(PlaylistItem *update)
     if (!CDTree)
         return;
 
-    GtkCTreeNode *find = FindNode(kTreeTrack, NULL, NULL, update, CDTree);
+    GtkCTreeNode *find = FindNode(kTreeCD, NULL, NULL, update, CDTree);
 
     if (!find) {
         return;
@@ -506,7 +509,7 @@ void GTKMusicBrowser::RegenerateCDTree(void)
         cdItem = gtk_ctree_insert_node(musicBrowserTree, CDTree, NULL, name,
                                        5, pixmap, mask, pixmap, mask, true,
                                        false);
-        data = NewTreeData(kTreeTrack, NULL, NULL, NULL, newitem);
+        data = NewTreeData(kTreeCD, NULL, NULL, NULL, newitem);
         gtk_ctree_node_set_row_data(musicBrowserTree, cdItem, data);
 
         CDTracks->push_back(newitem);
@@ -525,6 +528,9 @@ void GTKMusicBrowser::RegenerateCDTree(void)
                                pixmap, mask);
 
     gtk_clist_thaw(GTK_CLIST(musicBrowserTree));
+
+    gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
+                             "/Controls/Eject CD"), (CD_numtracks > 0));
 }
 
 void GTKMusicBrowser::ClearTree(void)
@@ -966,18 +972,18 @@ static void tree_clicked(GtkWidget *widget, GdkEventButton *event,
         int row, column;
 
         if (!gtk_clist_get_selection_info(clist, (int)event->x, (int)event->y,
-                                          &row, &column))
+                                          &row, &column)) 
             return;
 
         GtkCTreeNode *node = GTK_CTREE_NODE(g_list_nth(clist->row_list, row));
         p->mbSelection = (TreeData *)gtk_ctree_node_get_row_data(ctree, node);
+        p->SetTreeClick(p->mbSelection->type);
 
-        if (p->mbSelection->type == kTreePlaylist)
-            p->SetTreeClick(kClickPlaylist);
-        else if (p->mbSelection->type == kTreeTrack)
-            p->SetTreeClick(kClickTrack);
-        else
-            p->SetTreeClick(kClickNone);
+        if (event->button == 3) {
+            gtk_ctree_select(ctree, node);
+            p->TreeRightClick((int)event->x_root, (int)event->y_root,
+                              event->time);
+        }
     }
 
     p->SetClickState(kContextBrowser);
@@ -1064,7 +1070,7 @@ void GTKMusicBrowser::FillWiredPlanet(void)
         stream = gtk_ctree_insert_node(musicBrowserTree, wiredplanetTree, NULL,
                                         name, 5, pixmap, mask, pixmap, mask,
                                         true, false);
-        data = NewTreeData(kTreeTrack, NULL, NULL, NULL, newitem);
+        data = NewTreeData(kTreeStream, NULL, NULL, NULL, newitem);
         gtk_ctree_node_set_row_data(musicBrowserTree, stream, data);
     }
     gtk_clist_thaw(GTK_CLIST(musicBrowserTree));
@@ -1111,7 +1117,161 @@ static void ctree_expand(GtkWidget *widget, GList *list, GTKMusicBrowser *p)
         }
     }
 }
+
+void GTKMusicBrowser::TreeRightClick(int x, int y, uint32 time)
+{
+    GtkItemFactory *itemfact = NULL;
+
+    switch (mbSelection->type) {
+        case kTreeCD:
+        case kTreeCDHead:
+            itemfact = cdPopup;
+            break;
+        case kTreeStream:
+            itemfact = streamPopup;
+            break;
+        case kTreeTrack:
+            itemfact = trackPopup;
+            break;
+        case kTreePlaylist:
+            itemfact = playlistCatPopup;
+            break;
+        case kTreeMyMusic:
+        case kTreeAll:
+        case kTreeUncat:
+        case kTreeArtist:
+        case kTreeAlbum:
+            itemfact = otherPopup;
+            break;
+        default:
+            break;
+    }
+
+    if (!itemfact)
+        return;
+
+    gtk_item_factory_popup(itemfact, x, y, 3, time);
+}
+
+static void add_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+    vector<PlaylistItem *> *newlist = p->GetTreeSelection();
+    p->AddTracksPlaylistEvent(newlist, true, false, true);
+}
+
+static void add_play_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+    vector<PlaylistItem *> *newlist = p->GetTreeSelection();
+    p->AddTracksPlaylistEvent(newlist, true, true, false);
+}
+
+static void remove_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+    switch (p->GetTreeClick()) {
+        case kTreePlaylist: {
+            p->GetContext()->catalog->RemovePlaylist(p->mbSelection->playlistname.c_str());
+            break; }
+        case kTreeTrack: {
+            p->GetContext()->catalog->RemoveSong(p->mbSelection->track->URL().c_str());
+            break; }
+        default:
+            break;
+    }
+}
     
+static void add_stream_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+}
+
+static void eject_cd_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+    p->EjectCD();
+}
+
+static void edit_info_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+    switch (p->GetTreeClick()) {
+        case kTreePlaylist: {
+            p->CreateNewEditor((char *)p->mbSelection->playlistname.c_str());
+            break; }
+        case kTreeTrack: {
+            p->PopUpInfoEditor(p->mbSelection->track);
+            break; }
+        default:
+            break;
+    }
+}
+
+void GTKMusicBrowser::CreateTreePopups(void)
+{
+    GtkItemFactoryEntry stream_items[] = {
+     {"/Add To Playlist",NULL,    (void(*)())add_pop,  0, 0 },
+     {"/Add and Play Now",NULL,   (void(*)())add_play_pop,   0, 0 },
+     {"/sep1",         NULL,      0,                        0, "<Separator>" },
+     {"/Remove",       NULL,      (void(*)())remove_pop,     0, 0 },
+     {"/sep2",         NULL,      0,                        0, "<Separator>" },
+     {"/Add new stream", NULL,    (void(*)())add_stream_pop,0, 0 }
+    };
+    int nstream_items = sizeof(stream_items) / sizeof(stream_items[0]);
+
+    streamPopup = gtk_item_factory_new(GTK_TYPE_MENU, "<stream_popup>",
+                                       NULL);
+    gtk_item_factory_create_items(streamPopup, nstream_items, stream_items,
+                                  (void*)this);
+
+    GtkItemFactoryEntry cd_items[] = {
+     {"/Add To Playlist",NULL,  (void(*)())add_pop,  0, 0 },
+     {"/Add and Play Now",NULL, (void(*)())add_play_pop,   0, 0 },
+     {"/sep1",         NULL,    0,                        0, "<Separator>" },
+     {"/Eject CD",     NULL,    (void(*)())eject_cd_pop,0, 0 }
+    };
+    int ncd_items = sizeof(cd_items) / sizeof(cd_items[0]);
+
+    cdPopup = gtk_item_factory_new(GTK_TYPE_MENU, "<cd_popup>", NULL);
+    gtk_item_factory_create_items(cdPopup, ncd_items, cd_items, (void*)this);
+
+    GtkItemFactoryEntry plist_items[] = {
+     {"/Add To Playlist",NULL,  (void(*)())add_pop,  0, 0 },
+     {"/Add and Play Now",NULL, (void(*)())add_play_pop,   0, 0 },
+     {"/sep1",         NULL,    0,                        0, "<Separator>" },
+     {"/Remove",       NULL,    (void(*)())remove_pop,     0, 0 },
+     {"/sep2",         NULL,    0,                        0, "<Separator>" },
+     {"/Edit",         NULL,    (void(*)())edit_info_pop,0, 0 }
+    };
+    int nplist_items = sizeof(plist_items) / sizeof(plist_items[0]);
+
+    playlistCatPopup = gtk_item_factory_new(GTK_TYPE_MENU, "<plist_popup>", 
+                                            NULL);
+    gtk_item_factory_create_items(playlistCatPopup, nplist_items, plist_items, 
+                                  (void*)this);
+    
+    GtkItemFactoryEntry track_items[] = {
+     {"/Add To Playlist",NULL,  (void(*)())add_pop,  0, 0 },
+     {"/Add and Play Now",NULL, (void(*)())add_play_pop,   0, 0 },
+     {"/sep1",         NULL,    0,                        0, "<Separator>" },
+     {"/Remove",       NULL,    (void(*)())remove_pop,     0, 0 },
+     {"/sep2",         NULL,    0,                        0, "<Separator>" },
+     {"/Edit Info", NULL,       (void(*)())edit_info_pop,0, 0 }
+    };
+    int ntrack_items = sizeof(track_items) / sizeof(track_items[0]);
+
+    trackPopup = gtk_item_factory_new(GTK_TYPE_MENU, "<track_popup>", 
+                                            NULL);
+    gtk_item_factory_create_items(trackPopup, ntrack_items, track_items, 
+                                  (void*)this);
+
+    GtkItemFactoryEntry other_items[] = {
+     {"/Add To Playlist",NULL,  (void(*)())add_pop,  0, 0 },
+     {"/Add and Play Now",NULL, (void(*)())add_play_pop,   0, 0 },
+    };
+    int nother_items = sizeof(other_items) / sizeof(other_items[0]);
+
+    otherPopup = gtk_item_factory_new(GTK_TYPE_MENU, "<other_popup>",      
+                                            NULL);
+    gtk_item_factory_create_items(otherPopup, nother_items, other_items,      
+                                  (void*)this);
+}
+
 void GTKMusicBrowser::CreateTree(void)
 {
     BADContext = m_context;
@@ -1141,4 +1301,6 @@ void GTKMusicBrowser::CreateTree(void)
 
     gtk_clist_set_row_height(GTK_CLIST(musicBrowserTree), 16);
     CreateMainTreeItems();
+
+    CreateTreePopups();
 }

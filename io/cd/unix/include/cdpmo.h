@@ -34,8 +34,6 @@ ____________________________________________________________________________*/
 #include "pmoevent.h"
 #include "eventbuffer.h"
 
-static const uint32 OBUFFERSIZE = 2 * 1152;
-
 enum
 {
    pmoError_MinimumError = 4000,
@@ -64,6 +62,8 @@ class CDPMO:public PhysicalMediaOutput
    struct disc_info GetDiscInfo();
    uint32  GetCDDBDiscID();
    char   *GetcdindexDiscID();
+
+   void    Eject(void);
 
  private:
    void          WorkerThread(void); 
