@@ -237,8 +237,6 @@ bool MetaDataSort::operator() (MetaDataFormat* item1,
 // return an integral random number in the range 0 - (n - 1)
 static int my_rand(int n)
 {
-    srand( (unsigned)time( NULL ) );
-
     return (int)((float)n * rand() / (RAND_MAX + 1.0));
 }
 
@@ -431,6 +429,47 @@ PlaylistManager::~PlaylistManager()
     m_context->prefs->SetPrefInt32(kPlaylistRepeatPref, m_repeatMode);
 }
 
+void PlaylistManager::ShuffleIt(void)
+{
+    int max = m_shuffleList.size();
+    vector<PlaylistItem *> tempShuffled;
+
+    srand((unsigned int)time(NULL));
+    
+    int i;
+    vector<bool> usedList;
+    for (i = 0; i < max; i++)
+    {
+        usedList.push_back(false);
+    }
+
+    bool used = true;
+    int  index = 0;
+    int  lastindex = 0;
+
+    for (i = 0; i < max; i++) 
+    {
+        while (used)
+        {
+            index = (int)((double)rand() / (RAND_MAX + 1.0) * max);
+            if (usedList[index] == false)
+                used = false;
+            if (max - i > 50 && abs(index - lastindex) < 10)
+                used = true;
+        } 
+        usedList[index] = true;
+        PlaylistItem *dupe = m_shuffleList[index];
+        tempShuffled.push_back(dupe);
+        used = true;
+        lastindex = index;
+    }
+
+    m_shuffleList.erase(m_shuffleList.begin(), m_shuffleList.end());
+    vector<PlaylistItem *>::iterator iter = tempShuffled.begin();
+    for (; iter != tempShuffled.end(); iter++) 
+        m_shuffleList.push_back(*iter);
+}
+
 Error PlaylistManager::SetCurrentItem(PlaylistItem* item)
 {
     return SetCurrentIndex(IndexOf(item));
@@ -519,10 +558,7 @@ Error PlaylistManager::GotoNextItem(bool userAction)
 
                 if(m_shuffle)
                 {
-                    pointer_to_unary_function<int, int> lRand = 
-                                   pointer_to_unary_function<int, int>(my_rand);
-                    random_shuffle(m_shuffleList.begin(), m_shuffleList.end(),
-                                   lRand);
+                    ShuffleIt();
                 }
             }
             else if(index >= count)
@@ -561,11 +597,7 @@ Error PlaylistManager::GotoPreviousItem(bool userAction)
 
                 if(m_shuffle)
                 {
-                    pointer_to_unary_function<int, int> lRand =
-                                   pointer_to_unary_function<int, int>(my_rand);
-
-                    random_shuffle(m_shuffleList.begin(), m_shuffleList.end(),
-                                   lRand);
+                    ShuffleIt();
                 }
             }
             else if(index != 0)
@@ -615,10 +647,7 @@ Error PlaylistManager::SetShuffleMode(bool shuffle)
 
     if(shuffle)
     {
-        /*pointer_to_unary_function<int, int> lRand =
-                       pointer_to_unary_function<int, int>(my_rand);*/
-        random_shuffle(m_shuffleList.begin(), m_shuffleList.end());
-
+         ShuffleIt();
         if(currentItem)
             m_current = InternalIndexOf(&m_shuffleList, currentItem);
     }
@@ -1635,9 +1664,9 @@ Error PlaylistManager::Sort(PlaylistSortKey key, PlaylistSortType type)
     }
     else if(key == kPlaylistSortKey_Random)
     {
-        /*pointer_to_unary_function<int, int> lRand = 
-                       pointer_to_unary_function<int, int>(my_rand);*/
-        random_shuffle(m_activeList->begin(), m_activeList->end());
+        pointer_to_unary_function<int, int> lRand = 
+                       pointer_to_unary_function<int, int>(my_rand);
+        random_shuffle(m_activeList->begin(), m_activeList->end(), lRand);
         
         m_sortKey = key;
         m_sortType = type;
