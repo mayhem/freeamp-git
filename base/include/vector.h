@@ -48,7 +48,23 @@ class Vector {
     int32 Insert(T &);
     int32 InsertAt(int32,T &);
     int32 NumElements();
- 
+
+    bool AddVector(Vector<T> &);
+    bool AddVectorAt(Vector<T> &,int32);
+    bool RemoveElement(T &);
+    bool DeleteElement(T &);
+    bool RemoveElements(int32,int32);
+    bool DeleteElements(int32,int32);
+    int32 IndexOf(T &);
+    T FirstElement();
+    T LastElement();
+    bool HasElement(T &);
+    bool IsEmpty();
+    void DoForEach(bool (*func)(T &));
+    void DoForEach(bool (*func)(T &, void *), void *);
+    T *Elements() const { return m_pObjs; }
+    void SortItems(int (*cmp)(const T &, const T &)); // cmp returns true if first arg is 'greater' than the second ; sorts from smallest to largest according to cmp
+
  private:
     T *m_pObjs;  // pointer to array of objects
     int32 m_threshhold;
@@ -57,6 +73,130 @@ class Vector {
  
 };
 
+
+// FIXME: how to back out if one of the Inserts fails?
+template<class T> bool Vector<T>::AddVector(Vector<T> &from) {
+    bool rtn = true;
+    for(int i=0;i<from.NumElements();i++) {
+	if (Insert(from.ElementAt(i))) {
+	    rtn = false;
+	    break;
+	}
+    }
+    return rtn;
+}
+
+// FIXME: how to back out if one of the InsertAt's fails?
+template<class T> bool Vector<T>::AddVectorAt(Vector<T> &from,int32 at) {
+    bool rtn = true;
+    for(int i=0;i<from.NumElements();i++) {
+	if (InsertAt(from.ElementAt(i),at + i)) {
+	    rtn = false;
+	    break;
+	}
+    }
+    return rtn;
+}
+
+template<class T> bool Vector<T>::RemoveElement(T &elem) {
+    bool rtn = false;
+    int32 index = IndexOf(elem);
+    if (index >= 0) {
+	RemoveElementAt(index);
+	rtn = true;
+    }
+    return rtn;
+}
+
+template<class T> bool Vector<T>::DeleteElement(T &elem) {
+    bool rtn = false;
+    int32 index = IndexOf(elem);
+    if (index >= 0) {
+	DeleteElementAt(index);
+	rtn = true;
+    }
+    return rtn;
+}
+
+template<class T> bool Vector<T>::RemoveElements(int32 begin, int32 end) {
+    bool rtn = false;
+    if (!((begin >= m_insertionPoint) || (begin < 0) || (end > begin) || (end >= m_insertionPoint))) {
+	memmove(&(m_pObjs[begin]),&(m_pObjs[end+1]),sizeof(T)*(m_insertionPoint-end-1));
+	m_insertionPoint -= end-begin+1;
+	rtn = true;
+    }
+    return rtn;
+}
+template<class T> bool Vector<T>::DeleteElements(int32 begin, int32 end) {
+    bool rtn = false;
+    if (!((begin >= m_insertionPoint) || (begin < 0) || (end > begin) || (end >= m_insertionPoint))) {
+	for(int i=begin;i<=end;i++) {
+	    delete m_pObjs[i];
+	}
+	rtn = RemoveElements(begin,end);
+    }
+    return rtn;
+}
+template<class T> int32 Vector<T>::IndexOf(T &mem) {
+    int32 rtn = -1;
+    for(int i=0;i<m_insertionPoint;i++) {
+	if (m_pObjs[i] == mem) {
+	    rtn = i;
+	    break;
+	}
+    }
+    return rtn;
+}
+
+template<class T> T Vector<T>::FirstElement() {
+    if (m_insertionPoint > 0) {
+	return m_pObjs[0];
+    } else {
+	return NULL;
+    }
+}
+
+template<class T> T Vector<T>::LastElement() {
+    if (m_insertionPoint > 0) {
+	return m_pObjs[m_insertionPoint - 1];
+    } else {
+	return NULL;
+    }
+}
+
+template<class T> bool Vector<T>::HasElement(T &item) {
+    if (IndexOf(item) >= 0) {
+	return true;
+    } else {
+	return false;
+    }
+}
+
+template<class T> bool Vector<T>::IsEmpty() {
+    return !m_insertionPoint;
+}
+template<class T> void Vector<T>::DoForEach(bool (*func)(T &)) {
+    for(int i=0;i<m_insertionPoint;i++) {
+	*func(m_pObjs[i]);
+    }
+}
+
+template<class T> void Vector<T>::DoForEach(bool (*func)(T &, void *), void *arg) {
+    for(int i=0;i<m_insertionPoint;i++) {
+	*func(m_pObjs[i],arg);
+    }
+}
+
+// FIXME: just a bubble sort for now
+template<class T> void Vector<T>::SortItems(int (*cmp)(const T &, const T &)) {
+    for(int end = m_insertionPoint-2;i>= 0;end--) {
+	for(int i=0;i<end;i++) {
+	    if (*cmp(m_pObjs[i],m_pObjs[i+1])) {
+		Swap(i,i+1);
+	    }
+	}
+    }
+}
 
 template<class T> T Vector<T>::RandomElement() {
     srand((unsigned int) time (NULL));
@@ -166,6 +306,7 @@ template<class T> int32 Vector<T>::InsertAt(int32 point, T &pE) {
 
 template<class T> int32 Vector<T>::Insert(T &pE) {
 //    cout << "v:inserting" << endl;
+    int32 rtn = -1;
     if (pE) {
 	if (m_insertionPoint == (m_currentLength-1)) {
 	    //cout << "v:adding more" << endl;
@@ -183,10 +324,11 @@ template<class T> int32 Vector<T>::Insert(T &pE) {
 	m_pObjs[m_insertionPoint] = pE;
 	m_insertionPoint++;
 	//cout << "v:did it" << endl;
-	return m_insertionPoint-1;
+	rtn = 0;
     } else {
-	return -1;
+	rtn = -1;
     }
+    return rtn;
 }
 
 
