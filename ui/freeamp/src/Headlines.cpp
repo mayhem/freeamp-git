@@ -126,8 +126,6 @@ void Headlines::WorkerThread(void)
 {
     time_t t;
 
-    m_pWakeSem->Wait();
-
     for(;;)
     {
         if (m_bPause)
