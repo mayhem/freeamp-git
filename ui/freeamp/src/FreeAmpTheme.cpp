@@ -597,7 +597,7 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
          tempstr = text;
          m_pWindow->ControlStringValue("SampleRate", true, tempstr);
 
-         bool bEnable = info->GetChannels();
+         bool bEnable = (info->GetChannels() != 0);
          m_pWindow->ControlEnable(string("StereoIndicator"), true, bEnable);
          bEnable = !bEnable;
          m_pWindow->ControlEnable(string("MonoIndicator"), true, bEnable);
@@ -1541,7 +1541,7 @@ void FreeAmpTheme::DropFiles(vector<string> *pFileList)
             }
             if (!IsError(eRet))
             {
-                length = sizeof(url);
+                length = _MAX_PATH + 7;
                 FilePathToURL((*i).c_str(), url, &length);
                 
                 m_pContext->plm->ReadPlaylist(url);
