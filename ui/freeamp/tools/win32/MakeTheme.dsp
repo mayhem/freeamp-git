@@ -58,9 +58,9 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir\
-                                                 ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
-  ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
-  ..\..\..\..\base\win32\prj\tools
+                                                  ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
+   ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
+   ..\..\..\..\base\win32\prj\tools
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 Debug"
@@ -89,9 +89,9 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir\
-                                                 ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
-  ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
-  ..\..\..\..\base\win32\prj\tools
+                                                  ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
+   ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
+   ..\..\..\..\base\win32\prj\tools
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Debug"
@@ -121,9 +121,9 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir\
-                                                 ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
-  ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
-  ..\..\..\..\base\win32\prj\tools
+                                                  ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
+   ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
+   ..\..\..\..\base\win32\prj\tools
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Release"
@@ -153,9 +153,9 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir\
-                                                 ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
-  ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
-  ..\..\..\..\base\win32\prj\tools
+                                                  ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
+   ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
+   ..\..\..\..\base\win32\prj\tools
 # End Special Build Tool
 
 !ENDIF 
@@ -213,6 +213,10 @@ SOURCE=..\..\..\..\lib\zlib\src\infutil.c
 # Begin Source File
 
 SOURCE=..\src\MakeTheme.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\MakeTheme.rc
 # End Source File
 # Begin Source File
 

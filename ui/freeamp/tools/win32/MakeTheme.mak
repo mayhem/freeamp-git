@@ -33,6 +33,9 @@ NULL=
 NULL=nul
 !ENDIF 
 
+CPP=cl.exe
+RSC=rc.exe
+
 !IF  "$(CFG)" == "MakeTheme - Win32 Release"
 
 OUTDIR=.\Release
@@ -61,6 +64,7 @@ CLEAN :
 	-@erase "$(INTDIR)\inftrees.obj"
 	-@erase "$(INTDIR)\infutil.obj"
 	-@erase "$(INTDIR)\MakeTheme.obj"
+	-@erase "$(INTDIR)\MakeTheme.res"
 	-@erase "$(INTDIR)\ThemeZip.obj"
 	-@erase "$(INTDIR)\trees.obj"
 	-@erase "$(INTDIR)\uncompr.obj"
@@ -71,45 +75,13 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /ML /W3 /GX /O2 /I "../../include" /I\
  "../../../../lib/zlib/include" /I "../../../../config" /I\
  "../../../../base/include" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS"\
  /Fp"$(INTDIR)\MakeTheme.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-RSC=rc.exe
+RSC_PROJ=/l 0x409 /fo"$(INTDIR)\MakeTheme.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\MakeTheme.bsc" 
 BSC32_SBRS= \
@@ -132,6 +104,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\inftrees.obj" \
 	"$(INTDIR)\infutil.obj" \
 	"$(INTDIR)\MakeTheme.obj" \
+	"$(INTDIR)\MakeTheme.res" \
 	"$(INTDIR)\ThemeZip.obj" \
 	"$(INTDIR)\trees.obj" \
 	"$(INTDIR)\uncompr.obj" \
@@ -181,6 +154,7 @@ CLEAN :
 	-@erase "$(INTDIR)\inftrees.obj"
 	-@erase "$(INTDIR)\infutil.obj"
 	-@erase "$(INTDIR)\MakeTheme.obj"
+	-@erase "$(INTDIR)\MakeTheme.res"
 	-@erase "$(INTDIR)\ThemeZip.obj"
 	-@erase "$(INTDIR)\trees.obj"
 	-@erase "$(INTDIR)\uncompr.obj"
@@ -194,45 +168,13 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MLd /W3 /Gm /GX /Zi /Od /I "../../include" /I\
  "../../../../lib/zlib/include" /I "../../../../config" /I\
  "../../../../base/include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS"\
  /Fp"$(INTDIR)\MakeTheme.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-RSC=rc.exe
+RSC_PROJ=/l 0x409 /fo"$(INTDIR)\MakeTheme.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\MakeTheme.bsc" 
 BSC32_SBRS= \
@@ -256,6 +198,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\inftrees.obj" \
 	"$(INTDIR)\infutil.obj" \
 	"$(INTDIR)\MakeTheme.obj" \
+	"$(INTDIR)\MakeTheme.res" \
 	"$(INTDIR)\ThemeZip.obj" \
 	"$(INTDIR)\trees.obj" \
 	"$(INTDIR)\uncompr.obj" \
@@ -305,6 +248,7 @@ CLEAN :
 	-@erase "$(INTDIR)\inftrees.obj"
 	-@erase "$(INTDIR)\infutil.obj"
 	-@erase "$(INTDIR)\MakeTheme.obj"
+	-@erase "$(INTDIR)\MakeTheme.res"
 	-@erase "$(INTDIR)\ThemeZip.obj"
 	-@erase "$(INTDIR)\trees.obj"
 	-@erase "$(INTDIR)\uncompr.obj"
@@ -318,45 +262,13 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MLd /W3 /Gm /GX /Zi /Od /I "../../include" /I\
  "../../../../lib/zlib/include" /I "../../../../config" /I\
  "../../../../base/include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS"\
  /Fp"$(INTDIR)\MakeTheme.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-RSC=rc.exe
+RSC_PROJ=/l 0x409 /fo"$(INTDIR)\MakeTheme.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\MakeTheme.bsc" 
 BSC32_SBRS= \
@@ -380,6 +292,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\inftrees.obj" \
 	"$(INTDIR)\infutil.obj" \
 	"$(INTDIR)\MakeTheme.obj" \
+	"$(INTDIR)\MakeTheme.res" \
 	"$(INTDIR)\ThemeZip.obj" \
 	"$(INTDIR)\trees.obj" \
 	"$(INTDIR)\uncompr.obj" \
@@ -429,6 +342,7 @@ CLEAN :
 	-@erase "$(INTDIR)\inftrees.obj"
 	-@erase "$(INTDIR)\infutil.obj"
 	-@erase "$(INTDIR)\MakeTheme.obj"
+	-@erase "$(INTDIR)\MakeTheme.res"
 	-@erase "$(INTDIR)\ThemeZip.obj"
 	-@erase "$(INTDIR)\trees.obj"
 	-@erase "$(INTDIR)\uncompr.obj"
@@ -439,13 +353,58 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /ML /W3 /GX /O2 /I "../../include" /I\
  "../../../../lib/zlib/include" /I "../../../../config" /I\
  "../../../../base/include" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS"\
  /Fp"$(INTDIR)\MakeTheme.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
+RSC_PROJ=/l 0x409 /fo"$(INTDIR)\MakeTheme.res" /d "NDEBUG" 
+BSC32=bscmake.exe
+BSC32_FLAGS=/nologo /o"$(OUTDIR)\MakeTheme.bsc" 
+BSC32_SBRS= \
+	
+LINK32=link.exe
+LINK32_FLAGS=setargv.obj kernel32.lib user32.lib gdi32.lib winspool.lib\
+ comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
+ odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:no\
+ /pdb:"$(OUTDIR)\MakeTheme.pdb" /machine:I386 /out:"MakeTheme.exe" 
+LINK32_OBJS= \
+	"$(INTDIR)\adler32.obj" \
+	"$(INTDIR)\compress.obj" \
+	"$(INTDIR)\crc32.obj" \
+	"$(INTDIR)\deflate.obj" \
+	"$(INTDIR)\gzio.obj" \
+	"$(INTDIR)\infblock.obj" \
+	"$(INTDIR)\infcodes.obj" \
+	"$(INTDIR)\inffast.obj" \
+	"$(INTDIR)\inflate.obj" \
+	"$(INTDIR)\inftrees.obj" \
+	"$(INTDIR)\infutil.obj" \
+	"$(INTDIR)\MakeTheme.obj" \
+	"$(INTDIR)\MakeTheme.res" \
+	"$(INTDIR)\ThemeZip.obj" \
+	"$(INTDIR)\trees.obj" \
+	"$(INTDIR)\uncompr.obj" \
+	"$(INTDIR)\zutil.obj"
+
+".\MakeTheme.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+    $(LINK32) @<<
+  $(LINK32_FLAGS) $(LINK32_OBJS)
+<<
+
+SOURCE=$(InputPath)
+DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
+
+ALL : $(DS_POSTBUILD_DEP)
+
+$(DS_POSTBUILD_DEP) : ".\MakeTheme.exe"
+   IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                  ..\..\..\..\base\win32\prj\tools
+	copy MakeTheme.exe   ..\..\..\..\base\win32\prj\tools
+	copy ..\..\howto\ThemeHowTo.txt   ..\..\..\..\base\win32\prj\tools
+	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
+
+!ENDIF 
 
 .c{$(CPP_OBJS)}.obj::
    $(CPP) @<<
@@ -476,52 +435,6 @@ CPP_SBRS=.
    $(CPP) @<<
    $(CPP_PROJ) $< 
 <<
-
-RSC=rc.exe
-BSC32=bscmake.exe
-BSC32_FLAGS=/nologo /o"$(OUTDIR)\MakeTheme.bsc" 
-BSC32_SBRS= \
-	
-LINK32=link.exe
-LINK32_FLAGS=setargv.obj kernel32.lib user32.lib gdi32.lib winspool.lib\
- comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
- odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:no\
- /pdb:"$(OUTDIR)\MakeTheme.pdb" /machine:I386 /out:"MakeTheme.exe" 
-LINK32_OBJS= \
-	"$(INTDIR)\adler32.obj" \
-	"$(INTDIR)\compress.obj" \
-	"$(INTDIR)\crc32.obj" \
-	"$(INTDIR)\deflate.obj" \
-	"$(INTDIR)\gzio.obj" \
-	"$(INTDIR)\infblock.obj" \
-	"$(INTDIR)\infcodes.obj" \
-	"$(INTDIR)\inffast.obj" \
-	"$(INTDIR)\inflate.obj" \
-	"$(INTDIR)\inftrees.obj" \
-	"$(INTDIR)\infutil.obj" \
-	"$(INTDIR)\MakeTheme.obj" \
-	"$(INTDIR)\ThemeZip.obj" \
-	"$(INTDIR)\trees.obj" \
-	"$(INTDIR)\uncompr.obj" \
-	"$(INTDIR)\zutil.obj"
-
-".\MakeTheme.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
-    $(LINK32) @<<
-  $(LINK32_FLAGS) $(LINK32_OBJS)
-<<
-
-SOURCE=$(InputPath)
-DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
-
-ALL : $(DS_POSTBUILD_DEP)
-
-$(DS_POSTBUILD_DEP) : ".\MakeTheme.exe"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                  ..\..\..\..\base\win32\prj\tools
-	copy MakeTheme.exe   ..\..\..\..\base\win32\prj\tools
-	copy ..\..\howto\ThemeHowTo.txt   ..\..\..\..\base\win32\prj\tools
-	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
-
-!ENDIF 
 
 
 !IF "$(CFG)" == "MakeTheme - Win32 Release" || "$(CFG)" ==\
@@ -1248,6 +1161,12 @@ DEP_CPP_MAKET=\
 
 
 !ENDIF 
+
+SOURCE=.\MakeTheme.rc
+
+"$(INTDIR)\MakeTheme.res" : $(SOURCE) "$(INTDIR)"
+	$(RSC) $(RSC_PROJ) $(SOURCE)
+
 
 SOURCE=..\..\src\ThemeZip.cpp
 

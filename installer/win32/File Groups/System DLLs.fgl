@@ -1,6 +1,7 @@
 [TopDir]
 file0=c:\winnt\system32\msvcp50.dll
 file1=..\..\help\win32\roboex32.dll
+file2=..\..\help\win32\inetwh32.dll
 
 [General]
 Type=FILELIST
