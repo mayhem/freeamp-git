@@ -157,6 +157,7 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/lib/%{name}/plugins/wavout.pmo
 %{prefix}/lib/%{name}/plugins/winamp.ftf
 %{prefix}/lib/%{name}/plugins/xingmp3.lmc  
+%{prefix}/lib/%{name}/plugins/wav.lmc  
 
 %files esd 
 %defattr(-,root,root)
