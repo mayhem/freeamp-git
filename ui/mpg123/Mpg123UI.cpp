@@ -55,7 +55,8 @@ Mpg123UI::Mpg123UI(FAContext * context)
 
    verboseMode = false;
    totalFrames = 0;
-   lastSeconds = 0;
+   lastSeconds = -1;
+   fileName[0] = '\0';
 
    m_plm = NULL;
 
@@ -180,7 +181,7 @@ AcceptEvent(Event * e)
          }
       case INFO_Stopped:
          {
-            if (lastSeconds <= 0)
+            if (lastSeconds <= 0 || fileName[0] == '\0')
                break;
 
             int       m = (int) lastSeconds / 60;

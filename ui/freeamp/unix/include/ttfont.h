@@ -25,7 +25,11 @@ ____________________________________________________________________________*/
 #define INCLUDED_TTFONT__H_
 
 #include <gdk/gdk.h>
+#ifdef HAVE_FREETYPE_FREETYPE_H
+#include <freetype/freetype.h>
+#else
 #include <freetype.h>
+#endif
 
 typedef struct _efont
   {

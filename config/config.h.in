@@ -34,6 +34,8 @@ ____________________________________________________________________________*/
 #define FREEAMP_VERSION "unknown"
 
 #undef HAVE_GTK
+#undef HAVE_FREETYPE_FREETYPE_H
+#undef HAVE_FREETYPE_H
 #undef HAVE_FREETYPE
 
 #define HAVE_UNISTD_H 0

@@ -143,6 +143,7 @@ if test "$isunix" = "true" ; then
     AC_MSG_CHECKING(for G++ >= 2.91)
     AC_TRY_RUN([
 #include <stdlib.h>
+#include <stdio.h>
 int main() {
 #if defined (__GNUC__)
 #if (__GNUC__ == 2 && __GNUC_MINOR__ >= 91) || __GNUC__ > 2
@@ -312,7 +313,8 @@ AC_SUBST(ESD_LIBS)
 
 dnl optional freetype support..
 
-AC_CHECK_HEADER(freetype.h, have_freetype="true", have_freetype="false")
+AC_CHECK_HEADERS(freetype.h freetype/freetype.h, have_freetype="true", 
+                 have_freetype="false")
 
 TTF_LIBS=""
 if test "$have_freetype" = "true"; then
