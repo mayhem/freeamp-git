@@ -1436,15 +1436,35 @@ void GTKMusicBrowser::MoveItemEvent(int source, int dest)
 
 void GTKMusicBrowser::AddTrackPlaylistEvent(char *path)
 {
-    char *tempurl = new char[_MAX_PATH];
-    uint32 length = _MAX_PATH;
     if (m_currentindex == kInvalidIndex)
         m_currentindex = 0;
-    if (IsntError(FilePathToURL(path, tempurl, &length))) {
+
+    char *tempurl;
+    bool additReally = false;
+    bool needToDelete = false;
+
+    if ((tempurl = strstr(path, "http://")))
+        additReally = true;
+    else if ((tempurl = strstr(path, "file://")))
+        additReally = true;
+    else if ((tempurl = strstr(path, "rtp://")))
+        additReally = true;
+    else {
+        tempurl = new char[_MAX_PATH];
+        uint32 length = _MAX_PATH; 
+        if (IsntError(FilePathToURL(path, tempurl, &length))) {
+            additReally = false;
+            needToDelete = true;
+        }
+    }
+
+    if (additReally) {
         m_plm->AddItem(tempurl, m_currentindex);
         UpdatePlaylistList();
     }
-    delete [] tempurl;
+
+    if (needToDelete)
+        delete [] tempurl;
 }
 
 void GTKMusicBrowser::AddTrackPlaylistEvent(PlaylistItem *newitem)
