@@ -91,6 +91,24 @@ void key_press(GtkWidget *w, GdkEvent *e, GTKWindow *ui)
     gdk_threads_enter();
 }
 
+void enter_notify(GtkWidget *w, GdkEventCrossing *e, GTKWindow *ui)
+{
+    gdk_threads_leave();
+    ui->m_pMindMeldMutex->Acquire();
+    ui->SetMouseIn();
+    ui->m_pMindMeldMutex->Release();
+    gdk_threads_enter();
+}
+
+void leave_notify(GtkWidget *w, GdkEventCrossing *e, GTKWindow *ui)
+{
+    gdk_threads_leave();
+    ui->m_pMindMeldMutex->Acquire();
+    ui->SetMouseOut();
+    ui->m_pMindMeldMutex->Release();
+    gdk_threads_enter();
+}
+
 void drop_file(GtkWidget *w, GdkDragContext *context, gint x, gint y,
                GtkSelectionData *data, guint info, guint time, 
                GTKWindow *ui)
@@ -106,7 +124,7 @@ void drop_file(GtkWidget *w, GdkDragContext *context, gint x, gint y,
 static gint do_timeout(GTKWindow *ui)
 {
     ui->m_pMindMeldMutex->Acquire();
-    ui->MouseLeaveCheck();
+//    ui->MouseLeaveCheck();
     ui->TimerEvent();
     ui->m_pMindMeldMutex->Release();
     
@@ -127,7 +145,8 @@ GTKWindow::GTKWindow(Theme *pTheme, string &oName)
     gtk_widget_set_events(mainWindow, GDK_SUBSTRUCTURE_MASK | GDK_STRUCTURE_MASK
                           | GDK_POINTER_MOTION_MASK | GDK_BUTTON_MOTION_MASK |
                           GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
-                          GDK_KEY_PRESS_MASK);
+                          GDK_KEY_PRESS_MASK | GDK_ENTER_NOTIFY | 
+                          GDK_LEAVE_NOTIFY);
     gtk_widget_realize(mainWindow);
     gdk_window_set_decorations(mainWindow->window, (GdkWMDecoration)0);
     gdk_threads_leave();
@@ -165,6 +184,10 @@ Error GTKWindow::Run(Pos &oPos)
                       GDK_ACTION_COPY);
     gtk_signal_connect(GTK_OBJECT(mainWindow), "drag_data_received",
                        GTK_SIGNAL_FUNC(drop_file), this);
+    gtk_signal_connect(GTK_OBJECT(mainWindow), "enter_notify_event",
+                       GTK_SIGNAL_FUNC(enter_notify), this);
+    gtk_signal_connect(GTK_OBJECT(mainWindow), "leave_notify_event",
+                       GTK_SIGNAL_FUNC(leave_notify), this);
 
     iMaxX = gdk_screen_width();
     iMaxY = gdk_screen_height();
@@ -427,6 +450,7 @@ bool GTKWindow::LButtonDown(void)
 
 void GTKWindow::MouseLeaveCheck(void)
 {
+/*
     if (gdk_window_at_pointer(NULL, NULL) != mainWindow->window) {
         if (m_bMouseInWindow) 
             MouseHasLeftWindow();
@@ -437,6 +461,7 @@ void GTKWindow::MouseLeaveCheck(void)
             MouseHasEnteredWindow();
         m_bMouseInWindow = true;
     } 
+*/
 }
 
 void GTKWindow::SetMouseIn(void)
@@ -444,6 +469,13 @@ void GTKWindow::SetMouseIn(void)
     if (!m_bMouseInWindow)
         MouseHasEnteredWindow();
     m_bMouseInWindow = true;
+}
+
+void GTKWindow::SetMouseOut(void)
+{
+    if (m_bMouseInWindow)
+        MouseHasLeftWindow();
+    m_bMouseInWindow = false;
 }
 
 Error GTKWindow::GetDesktopSize(int32 &iX, int32 &iY)

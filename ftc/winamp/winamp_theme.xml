@@ -241,8 +241,17 @@ None||Repeat current"/>
                                 Name="Titlebar"/>
         </ButtonControl>
         <PixmapTimeControl Name="Time">
+            <Position Rect="40, 26, 98, 38"/>
             <PartName Part="Minus" Name="MinusSign"/>
             <PartName Part="MinuteTen" Name="MinuteTens"/> 
+            <PartName Part="MinuteOne" Name="MinuteOnes"/>
+            <PartName Part="SecondTen" Name="SecondTens"/>
+            <PartName Part="SecondOne" Name="SecondOnes"/>
+        </PixmapTimeControl>
+        <PixmapTimeControl Name="TimeRemaining">
+            <Position Rect="40, 26, 98, 38"/>
+            <PartName Part="Minus" Name="MinusSign"/>
+            <PartName Part="MinuteTen" Name="MinuteTens"/>
             <PartName Part="MinuteOne" Name="MinuteOnes"/>
             <PartName Part="SecondTen" Name="SecondTens"/>
             <PartName Part="SecondOne" Name="SecondOnes"/>
@@ -366,5 +375,12 @@ None||Repeat current"/>
             <ControlStateBitmap Rect="27, 42, 301, 55" State="Disabled"
                                 Name="Titlebar"/>
          </ButtonControl>
+        <PixmapFontControl Name="Time" IgnoreCase="yes">
+            <Position Rect="130, 4, 150, 9"/>
+            <ControlBitmap Rect="0, 0, 154, 17" Name="Text"/>
+            <FontMap Map="ABCDEFGHIJKLMNOPQRSTUVWXYZ`@@  "/>
+            <FontMap Map="0123456789 _:()-'!_+\/[]^&%.=$#"/>
+            <FontMap Map="ежд?*                          "/>
+        </PixmapFontControl>
     </Controls>
 </Window>

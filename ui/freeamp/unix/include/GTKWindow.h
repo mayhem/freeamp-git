@@ -59,7 +59,8 @@ class GTKWindow : public Window
 
      GtkWidget *GetWindow(void) { return mainWindow; }
 
-     void SetMouseIn(void);   
+     void SetMouseIn(void);
+     void SetMouseOut(void);   
      void MouseLeaveCheck(void); 
      void ModifyTimer(bool stop);
 
