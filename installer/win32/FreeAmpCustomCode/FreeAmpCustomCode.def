@@ -1,0 +1,12 @@
+; FreeAmpCustomCode.def : Declares the module parameters for the DLL.
+
+LIBRARY      "FreeAmpCustomCode"
+DESCRIPTION  'Custom Code for FreeAmp nstallshield Installer'
+
+EXPORTS
+    InitDDE
+    UninitDDE
+    RestartNetscape
+    RetrieveNetscapeURLs
+    ExitNetscape
+    OpenNetscapeURLs
