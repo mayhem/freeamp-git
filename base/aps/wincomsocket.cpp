@@ -79,7 +79,7 @@ int COMSocket::Connect(const char* pIP, int nPort, int nType, bool bBroadcast)
     }
 
     m_bConnected = true;
-    return 1;
+    return 0;
 }
 
 /** Disconnects the current socket */
@@ -97,7 +97,7 @@ int COMSocket::Disconnect()
     nErr = closesocket(m_nSocket);
     m_nSocket = INVALID_SOCKET;
     m_bConnected = false;
-    return (nErr != SOCKET_ERROR);
+    return (nErr != SOCKET_ERROR) - 1;
 }
 
 /** Checks if there is a current open connection */
@@ -120,7 +120,7 @@ int COMSocket::Read(char* pBuffer, int nLen, int* nBytesWritten)
     {
         *nBytesWritten = nErr;
     }
-    return (nErr != SOCKET_ERROR);
+    return (nErr != SOCKET_ERROR) - 1;
 }
 
 /** Reads in a non blocking fashion (ie, selects and polls) for nTimeout seconds */
@@ -146,9 +146,9 @@ int COMSocket::NBRead(char* pBuffer, int nLen, int* nBytesWritten, int nTimeout)
     }
     else
     {
-        return 0;  // FD_ISSET failed.
+        return -1;  // FD_ISSET failed.
     }
-    return 1;
+    return 0;
 }
 
 /** Writes to a socket, from buffer pBuffer, up to nLen bytes, and returns the number of written bytes in pnBytesWritten. */
@@ -164,5 +164,5 @@ int COMSocket::Write(const char* pBuffer, int nLen, int* pnBytesWritten)
     {
         *pnBytesWritten = nErr;
     }
-    return (nErr != SOCKET_ERROR);
+    return (nErr != SOCKET_ERROR) - 1;
 }
