@@ -226,6 +226,7 @@ class MusicBrowserUI : public UserInterface
     HWND                 m_hPlaylistHeader;
     DropTarget*          m_playlistDropTarget;
     vector<string>       m_searchPathList;
+    HTREEITEM            m_hNewPlaylistItem;  
 };
 
 #endif

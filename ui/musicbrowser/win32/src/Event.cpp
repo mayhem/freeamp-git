@@ -300,23 +300,43 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
         }
 	    if (pTreeView->hdr.code == NM_DBLCLK)
         {
-            int32 lParam;
-            
-            lParam = GetCurrentItemFromMousePos();
-            if (m_oTreeIndex.IsTrack(lParam))
+            //int32 lParam;
+            //lParam = GetCurrentItemFromMousePos();
+
+            TV_ITEM sItem;
+            TV_HITTESTINFO tv_htinfo;
+
+
+            GetCursorPos(&tv_htinfo.pt);
+            ScreenToClient(m_hMusicCatalog, &tv_htinfo.pt);
+
+            if(TreeView_HitTest(m_hMusicCatalog, &tv_htinfo))
             {
-                PlaylistItem *item;
+                sItem.hItem = TreeView_GetSelection(m_hMusicCatalog); 
+                sItem.mask = TVIF_PARAM | TVIF_HANDLE;
+                TreeView_GetItem(m_hMusicCatalog, &sItem);
+
+                if(m_oTreeIndex.IsTrack(sItem.lParam))
+                {
+                    PlaylistItem *item;
                 
-                item = new PlaylistItem(*m_oTreeIndex.Data(lParam).m_pTrack);
-                m_oPlm->AddItem(item, false);
-                //UpdatePlaylistList();
-                m_bListChanged = true;
-            } 
-            else if (m_oTreeIndex.IsPlaylist(lParam))
-            {
-                AddPlaylist(m_oTreeIndex.Data(lParam).m_oPlaylistPath);
-                SetFocus(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX));
+                    item = new PlaylistItem(*m_oTreeIndex.Data(sItem.lParam).m_pTrack);
+                    m_oPlm->AddItem(item, false);
+                    m_bListChanged = true;
+                } 
+                else if(m_oTreeIndex.IsPlaylist(sItem.lParam))
+                {
+                    AddPlaylist(m_oTreeIndex.Data(sItem.lParam).m_oPlaylistPath);
+                    SetFocus(m_hPlaylistView);
+                }
+                else if(tv_htinfo.hItem == m_hNewPlaylistItem)
+                {
+                    NewPlaylist();
+                }
             }
+
+
+            
         }
         
         // What is the define for -17? what is -17??

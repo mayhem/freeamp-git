@@ -352,6 +352,7 @@ void MusicBrowserUI::FillPlaylists(void)
     int                       iIndex;
     char                      szBase[MAX_PATH];
     TreeData                  oData;
+    char*                     kNewPlaylist = "Create a New Playlist...";
 
     sInsert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
                         TVIF_SELECTEDIMAGE | TVIF_PARAM; 
@@ -360,24 +361,35 @@ void MusicBrowserUI::FillPlaylists(void)
                              m_catalog->GetPlaylists(); 
 
     oData.m_iLevel = 1;
+
+    sInsert.item.pszText = kNewPlaylist;
+    sInsert.item.cchTextMax = strlen(kNewPlaylist);
+    sInsert.item.iImage = 0;
+    sInsert.item.iSelectedImage = 0;
+    sInsert.item.cChildren= 0;
+    sInsert.item.lParam = -1;
+    sInsert.hInsertAfter = TVI_SORT;
+    sInsert.hParent = m_hPlaylistItem;
+    m_hNewPlaylistItem = TreeView_InsertItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sInsert);
+
     for(i = pList->begin(), iIndex = 0; i != pList->end(); i++,iIndex++)
     {
-       if (!iIndex) 
-          continue;
+        if (!iIndex) 
+            continue;
 
-       _splitpath((char *)(*i).c_str(), NULL, NULL, szBase, NULL);   
-       oData.m_oPlaylistName = szBase;
-       oData.m_oPlaylistPath = *i;
+        _splitpath((char *)(*i).c_str(), NULL, NULL, szBase, NULL);   
+        oData.m_oPlaylistName = szBase;
+        oData.m_oPlaylistPath = *i;
 
-       sInsert.item.pszText = szBase;
-       sInsert.item.cchTextMax = strlen(szBase);
-       sInsert.item.iImage = 2;
-       sInsert.item.iSelectedImage = 2;
-       sInsert.item.cChildren= 0;
-       sInsert.item.lParam = m_oTreeIndex.Add(oData);
-       sInsert.hInsertAfter = TVI_SORT;
-       sInsert.hParent = m_hPlaylistItem;
-       TreeView_InsertItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sInsert);
+        sInsert.item.pszText = szBase;
+        sInsert.item.cchTextMax = strlen(szBase);
+        sInsert.item.iImage = 0;
+        sInsert.item.iSelectedImage = 0;
+        sInsert.item.cChildren= 0;
+        sInsert.item.lParam = m_oTreeIndex.Add(oData);
+        sInsert.hInsertAfter = TVI_SORT;
+        sInsert.hParent = m_hPlaylistItem;
+        TreeView_InsertItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sInsert);
     }    
 }
 

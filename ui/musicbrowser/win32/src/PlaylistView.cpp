@@ -568,6 +568,8 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
             sprintf(buf, "x: %d   y: %d", pt.x, pt.y);
 
             MessageBox(NULL, buf, "pt", MB_OK);*/
+
+            m_bListChanged = true;
             break;
         }
 
