@@ -18,8 +18,9 @@ Linux:
 
 	make install  
 	  (freeamp is installed to $(bindir), as set above)
-	  (plugins are installed to $(libdir)/freeamp/plugins, as set
-	  above)
+	  (plugins are installed to $(libdir)/freeamp, as set above)
+          (themes and help files are installed to $(sharedir)/freeamp,
+           as set above)
 
 Windows:
   Build:

@@ -57,6 +57,9 @@ void close_internal(GtkWidget *widget, DownloadUI *p)
 
 void DownloadUI::UpdateInfo(void)
 {
+    if (!isVisible)
+        return;
+
     DownloadItem *dli = downloadList[m_currentindex];
 
     if (!dli) {
@@ -98,7 +101,7 @@ void DownloadUI::UpdateInfo(void)
 
 void DownloadUI::UpdateDownloadList(void)
 {
-    if (!m_List)
+    if (!m_List || !isVisible)
         return;
 
     gtk_clist_freeze(GTK_CLIST(m_List));

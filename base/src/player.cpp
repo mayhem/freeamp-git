@@ -339,7 +339,7 @@ SetArgs(int32 argc, char **argv)
         else
         {
             // is this a URL we know how to handle
-            if( !strncasecmp(arg, "http://", 7) ||
+            if( !strncasecmp(arg, "http://", 7) || 
                 !strncasecmp(arg, "rtp://", 6))
             {
                 m_plm->AddItem(arg);
@@ -437,18 +437,18 @@ SetArgs(int32 argc, char **argv)
 #else
                 strcpy(path, arg);
                 
-                printf("Path: %s\r\n", path);
-
+                //printf("Path: %s\r\n", path);
+               
                 // make sure we have an absolute path
                 ResolvePath(&path);
-                
-                printf("Resolved: %s\r\n", path);
+               
+                //printf("Resolved: %s\r\n", path);
 
                 // format this path as a URL
                 uint32 length = _MAX_PATH;
                 FilePathToURL(path, url, &length);
-                
-                printf("URL: %s\r\n", url);
+            
+                //printf("URL: %s\r\n", url);
 
                 // who needs to get this, plm or dlm?
                 bool giveToDLM = false;
@@ -493,7 +493,6 @@ SetArgs(int32 argc, char **argv)
                 }
                 else 
                 {
-                	printf("AddItem: %s\r\n", url);
                     m_plm->AddItem(url); 
                	}	
 #endif

@@ -42,7 +42,7 @@ typedef struct FormatInfoStruct {
 
 } FormatInfoStruct; 
 
-FormatInfoStruct formats[] = {
+static FormatInfoStruct formats[] = {
     {"pls", "PLS Playlist Format"}
 };
 

@@ -1,15 +1,6 @@
 FreeAmp Notes for Linux users
 -----------------------------
 
-Why does the playlist not work under Linux?
-===========================================
-
-Because we haven't implemented it yet. :-(
-
-We're currently working on version 1.5 which will have a new user
-interface and cool playlist support and some other goodies. Stay tuned. 
-
-
 To use the ALSA Sound System:
 =============================
 

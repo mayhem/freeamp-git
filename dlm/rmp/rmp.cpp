@@ -39,7 +39,7 @@ typedef struct FormatInfoStruct {
 
 } FormatInfoStruct; 
 
-FormatInfoStruct formats[] = {
+static FormatInfoStruct formats[] = {
     {"rmp", "RMP Download Format"}
 };
 
@@ -101,21 +101,19 @@ Error RMP::ReadDownloadFile(const char* url, vector<DownloadItem*>* list)
         m_pList = list;
 
         result = ParseFile(string(path));
-       
         m_pList = NULL; 
         delete [] path;
     }
 
     return result;
-
 }
 
 Error RMP::BeginElement(string &oElement, AttrMap &oAttrMap)
 {
-	m_oPath += string("/") + oElement;
+    m_oPath += string("/") + oElement;
 
-	if (m_oPath == string("/PACKAGE/TRACKLIST/TRACK"))
-	{
+    if (m_oPath == string("/PACKAGE/TRACKLIST/TRACK"))
+    {
        delete m_pMetaData;
        m_pMetaData = new MetaData();
     }
@@ -133,12 +131,12 @@ Error RMP::BeginElement(string &oElement, AttrMap &oAttrMap)
         return kError_NoErr;
     }
 
-	return kError_NoErr;
+    return kError_NoErr;
 }
 
 Error RMP::PCData(string &oData)
 {
-	if (m_oPath == string("/PACKAGE/PACKAGEID"))
+    if (m_oPath == string("/PACKAGE/PACKAGEID"))
     {
         m_oPackageId = oData;
         return kError_NoErr;
@@ -153,48 +151,48 @@ Error RMP::PCData(string &oData)
     	m_oServer = oData;
         return kError_NoErr;
     }
-	if (m_oPath == string("/PACKAGE/SERVER/LOCATION"))
+    if (m_oPath == string("/PACKAGE/SERVER/LOCATION"))
     {
         m_oLocation = oData;
         return kError_NoErr;
     }
-	if (m_oPath == string("/PACKAGE/TRACKLIST/LISTID"))
+    if (m_oPath == string("/PACKAGE/TRACKLIST/LISTID"))
     {
     	m_oListId = oData;
         return kError_NoErr;
     }
-	if (m_oPath == string("/PACKAGE/TRACKLIST/TRACK/TRACKID"))
+    if (m_oPath == string("/PACKAGE/TRACKLIST/TRACK/TRACKID"))
     {
         m_oTrackId = oData;
     	m_pMetaData->SetTrack(atoi(oData.c_str()));
         return kError_NoErr;
     }
-	if (m_oPath == string("/PACKAGE/TRACKLIST/TRACK/TITLE"))
+    if (m_oPath == string("/PACKAGE/TRACKLIST/TRACK/TITLE"))
     {
     	m_pMetaData->SetTitle(oData.c_str());
         return kError_NoErr;
     }
-	if (m_oPath == string("/PACKAGE/TRACKLIST/TRACK/ALBUM"))
+    if (m_oPath == string("/PACKAGE/TRACKLIST/TRACK/ALBUM"))
     {
     	m_pMetaData->SetAlbum(oData.c_str());
         return kError_NoErr;
     }
-	if (m_oPath == string("/PACKAGE/TRACKLIST/TRACK/ARTIST"))
+    if (m_oPath == string("/PACKAGE/TRACKLIST/TRACK/ARTIST"))
     {
     	m_pMetaData->SetArtist(oData.c_str());
         return kError_NoErr;
     }
-	if (m_oPath == string("/PACKAGE/TRACKLIST/TRACK/GENRE"))
+    if (m_oPath == string("/PACKAGE/TRACKLIST/TRACK/GENRE"))
     {
     	m_pMetaData->SetGenre(oData.c_str());
         return kError_NoErr;
     }
-	if (m_oPath == string("/PACKAGE/TRACKLIST/TRACK/FILENAME"))
+    if (m_oPath == string("/PACKAGE/TRACKLIST/TRACK/FILENAME"))
     {
     	m_oFileName = oData;
         return kError_NoErr;
     }
-	if (m_oPath == string("/PACKAGE/TRACKLIST/TRACK/SIZE"))
+    if (m_oPath == string("/PACKAGE/TRACKLIST/TRACK/SIZE"))
     {
     	m_pMetaData->SetSize(atoi(oData.c_str()));
         return kError_NoErr;
@@ -210,13 +208,13 @@ Error RMP::PCData(string &oData)
         return kError_NoErr;
     }
         
-	return kError_NoErr;
+    return kError_NoErr;
 }
 
 
 Error RMP::EndElement(string &oElement)
 {
-	char *pPtr;
+    char *pPtr;
     int   iOffset;
     
     pPtr = strrchr(m_oPath.c_str(), '/');
@@ -226,7 +224,7 @@ Error RMP::EndElement(string &oElement)
     iOffset = pPtr - m_oPath.c_str();
     m_oPath.erase(iOffset, m_oPath.length() - iOffset);   
 
-	if (oElement == string("PACKAGE"))
+    if (oElement == string("PACKAGE"))
     {
         DownloadItem *pItem;
         string        oFinal = "http://";
@@ -247,12 +245,12 @@ Error RMP::EndElement(string &oElement)
         m_pMetaData = NULL;
     }
        
-	return kError_NoErr;
+    return kError_NoErr;
 }
 
 void RMP::MangleLocation(string &oLocation)
 {
-	string::size_type iPos;
+    string::size_type iPos;
     string            oPattern;
     
     oPattern = "%fid";
