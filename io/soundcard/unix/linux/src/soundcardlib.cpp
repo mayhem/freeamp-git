@@ -40,7 +40,17 @@ void Initialize(PMORef ref)
         ref->Write = Write;
         ref->Clear = Clear;
         ref->Cleanup = Cleanup;
+	ref->Resume = Resume;
+	ref->Pause = Pause;
     }
+}
+
+void Pause(PMORef ref) {
+    return;
+}
+
+void Resume(PMORef ref) {
+    return;
 }
 
 bool Init(PMORef ref, OutputInfo* info)

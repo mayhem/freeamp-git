@@ -105,7 +105,6 @@ int main(int argc, char **argv) {
     dummyRef->ref = pDCOO;
     dummyRef->AcceptEvent = pDCOO->AcceptEventStub;
     dummyRef->Cleanup = pDCOO->Cleanup;
-    pDCOO->SetRef(dummyRef);
 
     pP->RegisterActiveUI(dummyRef);
     pP->RegisterLMCs(lmc);
