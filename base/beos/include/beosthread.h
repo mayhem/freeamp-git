@@ -30,8 +30,6 @@ ____________________________________________________________________________*/
 
 #include "mutex.h"
 
-typedef uint32 Priority;
-
 class beosThread : public Thread
 {
 public:
@@ -43,8 +41,8 @@ public:
 	virtual void		Suspend();
 	virtual void		Resume();
 	virtual void		Join();
-	virtual Priority	GetPriority() const;
-	virtual Priority	SetPriority(Priority priority);
+	virtual uint32      GetPriority( void ) const;
+	virtual uint32      SetPriority( uint32 priority );
 	virtual void		DumpThreadInfo( void ) const;
 
 	static int32		internalThreadFunction(void *);
@@ -55,7 +53,7 @@ protected:
 	void				Unlock( void );
 
 private:
-	Priority			m_priority;
+	uint32              m_priority;
 	thread_id			m_threadHandle;
 	unsigned			m_threadId;
 	bool				m_suspended;
@@ -82,7 +80,7 @@ beosThread::Unlock( void )
 
 inline
 int32
-beos_priority( Priority freeamp_prio )
+beos_priority( uint32 freeamp_prio )
 {
 #if 0
 	switch ( freeamp_prio ) {

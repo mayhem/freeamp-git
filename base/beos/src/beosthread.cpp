@@ -56,7 +56,7 @@ beosThread():
 Thread()
 {
 //    m_priority		= Normal;
-    m_priority		= 0;
+    m_priority		= B_NORMAL_PRIORITY; // FIXME!!
     m_threadHandle	= (thread_id) NULL;
     m_threadId		= 0;
     m_suspended		= false;
@@ -90,10 +90,7 @@ beosThread::
 InternalThreadFunction()
 {
 	if ( !m_function ) {
-//		cout << "screwwwwwwwwwwwed..." << endl;
 		return 0;
-	} else {
-//		cout << "fine..." << endl;
 	}
 	m_function( m_arg );
 
@@ -147,12 +144,10 @@ void
 beosThread::
 Suspend()
 {
-//    m_suspendMutex->Acquire( WAIT_FOREVER );
 	PRINT(( "beosThread::Suspend\n" ));
 	if ( Lock() )
 	{
 		if ( !m_suspended ) {
-//			pthread_kill(m_threadHandle, SIGSTOP);
 			suspend_thread( m_threadHandle );
 			m_suspended = true;
 		}
@@ -162,7 +157,6 @@ Suspend()
 	{
 		perror( "beosThread::Suspend:couldn't lock the thread" );
 	}
-//	m_suspendMutex->Release();
 	PRINT(( "beosThread::Suspend done\n" ));
 }
 
@@ -170,13 +164,11 @@ void
 beosThread::
 Resume()
 {
-//    m_suspendMutex->Acquire(WAIT_FOREVER);
 	PRINT(( "beosThread::Resume\n" ));
 	if ( Lock() )
 	{
 		if ( m_suspended )
 		{
-//			pthread_kill(m_threadHandle, SIGCONT);
 			resume_thread( m_threadHandle );
 			m_suspended = false;
 		}
@@ -186,23 +178,36 @@ Resume()
 	{
 		perror( "beosThread::Resume:couldn't lock the thread" );
 	}
-//    m_suspendMutex->Release();
 	PRINT(( "beosThread::Resume done\n" ));
 }
 
 
-Priority 
+uint32 
 beosThread::
-GetPriority() const
+GetPriority( void ) const
 {
-    return((Priority) 0);
+    return m_priority;
 }
 
-Priority 
+uint32 
 beosThread::
-SetPriority(Priority priority)
+SetPriority( uint32 priority )
 {
-    return((Priority) 0);
+    uint32 old;
+
+    m_priority = priority;
+    old = (uint32)set_thread_priority( m_threadHandle, (int32)m_priority );
+
+    if ( old < 0 )
+    {
+        PRINT(( "SetPriority failed\n" ));
+    }
+    else
+    {
+        PRINT(( "Priority set to %d\n", m_priority ));
+    }
+
+    return old;
 }
 
 void
