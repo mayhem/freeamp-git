@@ -55,7 +55,7 @@ static BOOL CALLBACK IntroWizardHello(HWND hwnd,
             DRAWITEMSTRUCT* dis = (DRAWITEMSTRUCT*)lParam;
             UINT ctrlId = wParam;
             const char* kCaption1 = "Welcome!";
-            const char* kCaption2 = "What is My Music?";
+            const char* kCaption2 = "What is \'My Music\'?";
             const char* kMsg1 = "This wizard will help you begin organizing your "
                                 "music collection and get you started playing "
                                 "your music.";

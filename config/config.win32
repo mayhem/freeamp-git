@@ -35,6 +35,10 @@ ____________________________________________________________________________*/
 // EMusic Player does in order to read well.
 #define The_BRANDING "FreeAmp"
 #define the_BRANDING "FreeAmp"
+
+// uncomment this line if branding version != FreeAmp version
+//#define BRANDING_VERSION "2.0"
+
 #define BRANDING_URL "http://www.freeamp.org"
 #define BRANDING_UPDATE_SERVER "fatman.freeamp.org"
 #define BRANDING_UPDATE_PATH "/update/freeamp/"
@@ -46,6 +50,10 @@ ____________________________________________________________________________*/
 
 #define FREEAMP_PATH_ENV "FREEAMP_PATH"
 #define FREEAMP_VERSION "2.0"
+
+#ifndef BRANDING_VERSION
+#define BRANDING_VERSION FREEAMP_VERSION
+#endif
 
 #define HAVE_IO_H 1
 #define HAVE_ERRNO_H 1

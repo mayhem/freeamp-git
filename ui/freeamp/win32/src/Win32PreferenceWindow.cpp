@@ -1654,8 +1654,140 @@ bool Win32PreferenceWindow::PrefAboutProc(HWND hwnd,
             // remember these for later...
             psp = (PROPSHEETPAGE*)lParam;
             prefs = (Preferences*)psp->lParam;
-            
+
             break;
+        }
+
+        case WM_DRAWITEM:
+        {
+            DRAWITEMSTRUCT* dis = (DRAWITEMSTRUCT*)lParam;
+            UINT ctrlId = wParam;
+            HFONT font, oldFont;
+
+            font = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
+
+            oldFont = (HFONT)SelectObject(dis->hDC, font);
+
+            RECT clientRect;
+            GetClientRect(dis->hwndItem, &clientRect);
+
+            switch(ctrlId)
+            {
+                case IDC_APP:
+                {
+                    DrawText(dis->hDC, 
+                             BRANDING,
+                             strlen(BRANDING),
+                             &clientRect,
+                             DT_CENTER|DT_SINGLELINE);
+                    break;
+                }
+
+                case IDC_VERSION:
+                {
+                    char version[32];
+
+                    sprintf(version, "version %s", BRANDING_VERSION);
+
+                    DrawText(dis->hDC, 
+                             version,
+                             strlen(version),
+                             &clientRect,
+                             DT_CENTER|DT_SINGLELINE);
+                    break;
+                }
+
+                case IDC_BASED_ON_FREEAMP:
+                {
+                    if(strcmp(BRANDING, "FreeAmp"))
+                    {
+                        const char* text = "(based on FreeAmp)";
+
+                        DrawText(dis->hDC, 
+                             text,
+                             strlen(text),
+                             &clientRect,
+                             DT_CENTER|DT_SINGLELINE);
+                    }
+
+                    break;
+                }
+
+                case IDC_CREDIT:
+                {
+                    const char* credit1 =
+                        "FreeAmp is an Open Source effort to build the best "
+                        "digital audio player available. In the interest of "
+                        "supporting the free software community, while at "
+                        "the same time fostering the growth of the online "
+                        "delivery of music, EMusic.com is funding both the "
+                        "FreeAmp.org domain and the efforts of the FreeAmp "
+                        "team. The FreeAmp team consists of: Mark B. Elrod, "
+                        "Robert Kaye, Isaac Richards, Brett Thomas, and "
+                        "Jason Woodward.";
+                    const char* credit2 =
+                        "Other people have also contributed to FreeAmp:";
+                    const char* credit3 =
+                        "William Bull, Alan Cutter, Gabor Fleischer, "
+                        "Jean-Michel HERVE, Hiromasa Kato, Michael Bruun "
+                        "Petersen, Sylvain Rebaud, The Snowblind Alliance, "
+                        "Tom Spindler, and Valters Vingolds.";
+                    const char* credit4 =
+                        "FreeAmp is being released under the terms of the "
+                        "GPL. As is provided by the GPL, all of EMusic.com's "
+                        "and your efforts toward FreeAmp will be released "
+                        "back to the community at large.";
+
+                    RECT halfHeightRect = clientRect;
+                    int halfHeight = DrawText(
+                                         dis->hDC, 
+                                         credit1,
+                                         strlen(credit1),
+                                         &halfHeightRect,
+                                         DT_LEFT|DT_SINGLELINE|DT_CALCRECT)/3;
+                    int height;
+
+                    height = DrawText(
+                             dis->hDC, 
+                             credit1,
+                             strlen(credit1),
+                             &clientRect,
+                             DT_LEFT|DT_WORDBREAK);
+
+                    clientRect.top += height + halfHeight;
+
+                    height = DrawText(
+                             dis->hDC, 
+                             credit2,
+                             strlen(credit2),
+                             &clientRect,
+                             DT_LEFT|DT_WORDBREAK);
+
+                    clientRect.top += height + halfHeight;
+
+                    height = DrawText(
+                             dis->hDC, 
+                             credit3,
+                             strlen(credit3),
+                             &clientRect,
+                             DT_LEFT|DT_WORDBREAK);
+
+                    clientRect.top += height + halfHeight;
+
+                    height = DrawText(
+                             dis->hDC, 
+                             credit4,
+                             strlen(credit4),
+                             &clientRect,
+                             DT_LEFT|DT_WORDBREAK);
+
+                    break;
+                }
+            }
+
+            SelectObject(dis->hDC, oldFont);
+
+            DeleteObject(font);
         }
 
         case WM_COMMAND:
