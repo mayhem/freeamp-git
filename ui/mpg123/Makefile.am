@@ -50,4 +50,5 @@ all-local: mpg123-local
 
 mpg123-local: Mpg123UI.o
 	gcc -shared -Wl,-soname,mpg123-@target_os@.ui -o mpg123-@target_os@.ui Mpg123UI.o
+	mkdir -p @top_srcdir@/plugins
 	cp mpg123-@target_os@.ui @top_srcdir@/plugins

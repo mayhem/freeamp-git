@@ -47,6 +47,7 @@ all-local: sndcard-local
 
 sndcard-local: soundcardpmo.o 
 	gcc -shared -Wl,-soname,soundcard-@target_os@.pmo -o soundcard-@target_os@.pmo soundcardpmo.o 
+	mkdir -p @top_srcdir@/plugins
 	cp soundcard-@target_os@.pmo @top_srcdir@/plugins
 
 

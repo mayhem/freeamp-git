@@ -48,4 +48,5 @@ all-local: localfile-local
 
 localfile-local: localfileinput.o 
 	gcc -shared -Wl,-soname,localfileinput-@target_os@.pmi -o localfileinput-@target_os@.pmi localfileinput.o 
+	mkdir -p @top_srcdir@/plugins
 	cp localfileinput-@target_os@.pmi @top_srcdir@/plugins

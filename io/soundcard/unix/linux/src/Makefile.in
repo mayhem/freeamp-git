@@ -308,6 +308,7 @@ all-local: sndcard-local
 
 sndcard-local: soundcardpmo.o 
 	gcc -shared -Wl,-soname,soundcard-@target_os@.pmo -o soundcard-@target_os@.pmo soundcardpmo.o 
+	mkdir -p @top_srcdir@/plugins
 	cp soundcard-@target_os@.pmo @top_srcdir@/plugins
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

@@ -34,6 +34,7 @@ all-local: cmdline-local
 
 cmdline-local: freeamp-gtk.o
 	gcc -shared -Wl,-soname,freeampgtk-@target_os@.ui -o freeampgtk-@target_os@.ui freeamp-gtk.o $(GTK_LINK_TAIL)
+	mkdir -p @top_srcdir@/plugins
 	cp freeampgtk-@target_os@.ui @top_srcdir@/plugins
 else 
 FILES = 

@@ -50,4 +50,5 @@ all-local: cmdline-local
 
 cmdline-local: cmdlineUI.o
 	gcc -shared -Wl,-soname,freeampcmd-@target_os@.ui -o freeampcmd-@target_os@.ui cmdlineUI.o
+	mkdir -p @top_srcdir@/plugins
 	cp freeampcmd-@target_os@.ui @top_srcdir@/plugins

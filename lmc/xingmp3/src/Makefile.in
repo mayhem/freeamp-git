@@ -319,6 +319,7 @@ include @top_srcdir@/config/Makefile.header
 
 all-local: $(MYLIBS)
 	gcc -shared -Wl,-soname,xingmp3-@target_os@.lmc -o xingmp3-@target_os@.lmc *.o
+	mkdir -p @top_srcdir@/plugins
 	cp xingmp3-@target_os@.lmc @top_srcdir@/plugins
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
