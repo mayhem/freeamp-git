@@ -11,20 +11,20 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
 #define HEIGHT 51
 
-#define LEFT_SECTION    148 
-#define MID_SECTION     168
+#define LEFT_SECTION    138 
+#define MID_SECTION     175
 #define RIGHT_SECTION   83
 #define DIAL_SECTION    11
 
-#define LEFT_SECTION_RECT_WIDTH     126
+#define LEFT_SECTION_RECT_WIDTH     116
 #define RIGHT_SECTION_RECT_WIDTH    61
 
-#define BODY_WIDTH LEFT_SECTION_RECT_WIDTH + MID_SECTION + RIGHT_SECTION_RECT_WIDTH  + 2*DIAL_SECTION
+#define BODY_WIDTH (LEFT_SECTION_RECT_WIDTH + MID_SECTION + RIGHT_SECTION_RECT_WIDTH  + 2*DIAL_SECTION - 7/*??? huh ???*/)
 #define BODY_HEIGHT PLAYER_WINDOW_HEIGHT
 
 #define CAP_CIRCUMFERENCE PLAYER_WINDOW_HEIGHT
 
-#define PLAYER_WINDOW_WIDTH BODY_WIDTH + CAP_CIRCUMFERENCE
+#define PLAYER_WINDOW_WIDTH (BODY_WIDTH + CAP_CIRCUMFERENCE + 5)
 #define PLAYER_WINDOW_HEIGHT HEIGHT
 
 typedef enum{
@@ -73,16 +73,17 @@ typedef struct ControlInfo{
     ControlState    state;
     ControlState    oldstate;
     BOOL            enabled;
+    BOOL            shown;
     BOOL            dirty;
     HBITMAP         bitmap;
 
 }ControlInfo;
 
-#define kStopControl        0
-#define kPlayControl        1
+#define kPlayControl        0
+#define kPauseControl       1
 #define kLastControl        2
 #define kNextControl        3
-#define kPauseControl       4
+#define kStopControl        4
 #define kModeControl        5
 #define kMinimizeControl    6
 #define kCloseControl       7

@@ -54,6 +54,7 @@ extern DisplayInfo g_displayInfo;
 
 }
 
+FreeAmpUI *g_ui;
 
 
 extern "C" FreeAmpUI *Initialize() 
@@ -84,8 +85,6 @@ INT WINAPI DllMain (HINSTANCE hInst,
 
     return 1;                 
 }
-
-FreeAmpUI *g_ui;
 
 FreeAmpUI::
 FreeAmpUI():
@@ -144,7 +143,9 @@ AcceptEvent(Event* event)
 				EnableWindow(m_hwndPause, TRUE);
 				EnableWindow(m_hwndSlider, TRUE);
 				m_state = STATE_Playing;
-                g_buttonStateArray[kPlayControl].state = Activated;
+                g_buttonStateArray[kPlayControl].shown = FALSE;
+                g_buttonStateArray[kStopControl].shown = TRUE;
+                g_buttonStateArray[kPauseControl].state = Deactivated;
 
                 if(g_displayInfo.state == TotalTime)
                     g_displayInfo.state = CurrentTime;
@@ -162,7 +163,7 @@ AcceptEvent(Event* event)
 				EnableWindow(m_hwndPause, FALSE);
 				EnableWindow(m_hwndSlider, TRUE);
 				m_state = STATE_Paused;
-                g_buttonStateArray[kPlayControl].state = Selected;
+                g_buttonStateArray[kPauseControl].state = Activated;
 	            break; 
             }
 
@@ -190,16 +191,18 @@ AcceptEvent(Event* event)
                 g_displayInfo.state = TotalTime;
 
 				m_state = STATE_Stopped;
-                g_buttonStateArray[kPlayControl].state = Deactivated;
+                g_buttonStateArray[kPauseControl].state = Deactivated;
+                g_buttonStateArray[kPlayControl].shown = TRUE;
+                g_buttonStateArray[kStopControl].shown = FALSE;
 	            break; 
             }
 
 			case INFO_PlayList: 
-				{
-					PlayListEvent *info = (PlayListEvent *)event;
-					m_playList = info->GetPlayList();
-					break;
-				}
+			{
+				PlayListEvent *info = (PlayListEvent *)event;
+				m_playList = info->GetPlayList();
+				break;
+			}
 
 			case INFO_MPEGInfo: 
 			{

@@ -23,7 +23,6 @@ ____________________________________________________________________________*/
 
 /* system headers */
 #define STRICT
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <commctrl.h>
 #include <shellapi.h>
@@ -62,18 +61,25 @@ extern HINSTANCE g_hInst;		//  Program instance handle
 ControlInfo g_buttonStateArray[kNumControls];
 DisplayInfo g_displayInfo;
 
-static HBITMAP playerBitmap;
 static HBITMAP leftBitmap;
 static HBITMAP middleBitmap;
 static HBITMAP rightBitmap;
 static HBITMAP dialBitmap;
-static HBITMAP playerButtonsBitmap,systemButtonsBitmap;
-static HRGN closeRegion, displayRegion;
+static HBITMAP playButtonBitmap;
+static HBITMAP stopButtonBitmap;
+static HBITMAP pauseButtonBitmap;
+static HBITMAP nextButtonBitmap;
+static HBITMAP lastButtonBitmap;
+static HBITMAP modeButtonBitmap;
+static HBITMAP minimizeButtonBitmap;
+static HBITMAP closeButtonBitmap;
+static HRGN displayRegion;
 static HBITMAP playerMask;
 static HBITMAP smallFont, largeFont;
 static HDC tempDC;
 static HCURSOR dialCursor, arrowCursor, currentCursor;
 static HBITMAP logoBitmap;
+static HPALETTE palette = NULL;
 
 void DrawPlayer(HDC hdc, ControlInfo* state)
 {
@@ -83,6 +89,11 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
     BITMAP bmp;
     int32 i;
 
+    if(palette)
+    {
+        SelectPalette (hdc, palette, FALSE);
+        RealizePalette (hdc);
+    }
 
     bufferBitmap = CreateCompatibleBitmap(  hdc, 
                                             PLAYER_WINDOW_WIDTH, 
@@ -158,19 +169,22 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
 
 
     // Render Display
-#define yIntroPos   16
-#define xIntroPos   200
 #define LogoHeight  18
 #define FreeWidth   41
 #define AmpWidth    45
 
     SelectClipRgn(bufferdc, displayRegion);
 
+    RECT displayRect;
+    GetRgnBox(displayRegion, &displayRect);
+
     switch(g_displayInfo.state)
     {
         case Intro: // hard coded hack just to look good <grin>
-        {
-                              
+        {         
+            int32 xIntroPos = displayRect.left + 32;
+            int32 yIntroPos = displayRect.top + 5;
+
             SelectObject(memdc, logoBitmap);
 
 
@@ -211,7 +225,7 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
             char volString[] = "volume";
             char valueString[4];
 
-            int32 offset = 227;
+            int32 offset = displayRect.left + 50;
     
             SelectObject(memdc, smallFont);
 
@@ -233,7 +247,7 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
 
             wsprintf(valueString, "%d%%", g_displayInfo.volume);
 
-            offset = 180 ;
+            offset = displayRect.left + 3;
 
             SelectObject(memdc, largeFont);
 
@@ -261,7 +275,7 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
             char labelString[] = "current time";
             char valueString[12];
 
-            int32 offset = 180;
+            int32 offset = displayRect.left + 3;
     
             SelectObject(memdc, smallFont);
 
@@ -286,14 +300,14 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
                 wsprintf(valueString, "%d:%.02d:%.02d", g_displayInfo.hours,
                                                         g_displayInfo.minutes,
                                                         g_displayInfo.seconds);
-                offset = 250;
+                offset = displayRect.left + 73;
             }
             else
             {
                  wsprintf(valueString, "%.02d:%.02d",   g_displayInfo.minutes,
                                                         g_displayInfo.seconds);
 
-                 offset = 260;
+                 offset = displayRect.left + 83;
             }
 
             SelectObject(memdc, largeFont);
@@ -321,7 +335,7 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
             char labelString[] = "seek time";
             char valueString[12];
 
-            int32 offset = 180;
+            int32 offset = displayRect.left + 3;
     
             SelectObject(memdc, smallFont);
 
@@ -346,14 +360,14 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
                 wsprintf(valueString, "%d:%.02d:%.02d", g_displayInfo.seekhours,
                                                         g_displayInfo.seekminutes,
                                                         g_displayInfo.seekseconds);
-                offset = 250;
+                offset = displayRect.left + 73;
             }
             else
             {
                  wsprintf(valueString, "%.02d:%.02d",   g_displayInfo.seekminutes,
                                                         g_displayInfo.seekseconds);
 
-                 offset = 260;
+                 offset = displayRect.left + 83;
             }
 
             SelectObject(memdc, largeFont);
@@ -381,7 +395,7 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
             char labelString[] = "remaining time";
             char valueString[12];
 
-            int32 offset = 180;
+            int32 offset = displayRect.left + 3;
     
             SelectObject(memdc, smallFont);
 
@@ -415,14 +429,14 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
             if(displayHours)
             {
                 wsprintf(valueString, "%d:%.02d:%.02d", displayHours,displayMinutes,displaySeconds);
-                offset = 250;
+                offset = displayRect.left + 73;
             }
             else
             {
                  wsprintf(valueString, "%.02d:%.02d", displayMinutes, displaySeconds);
 				//OutputDebugString(valueString);
 				//OutputDebugString("\n");
-                 offset = 260;
+                 offset = displayRect.left + 83;
             }
 
             SelectObject(memdc, largeFont);
@@ -450,7 +464,7 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
             char labelString[] = "total time";
             char valueString[12];
 
-            int32 offset = 180;
+            int32 offset = displayRect.left + 3;
     
             SelectObject(memdc, smallFont);
 
@@ -475,14 +489,14 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
                 wsprintf(valueString, "%d:%.02d:%.02d", g_displayInfo.totalhours,
                                                         g_displayInfo.totalminutes,
                                                         g_displayInfo.totalseconds);
-                offset = 250;
+                offset = displayRect.left + 73;
             }
             else
             {
                  wsprintf(valueString, "%.02d:%.02d",   g_displayInfo.totalminutes,
                                                         g_displayInfo.totalseconds);
 
-                 offset = 260;
+                 offset = displayRect.left + 83;
             }
 
             SelectObject(memdc, largeFont);
@@ -508,7 +522,7 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
 
     if(g_displayInfo.state != Intro)
     {
-        int32 offset = 180;
+        int32 offset = displayRect.left + 3;
 
         SelectObject(memdc, smallFont);
 
@@ -532,7 +546,6 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
     SelectClipRgn(bufferdc, NULL);
 
     // Render Controls...
-    
     for(i = 0; i < kNumControls; i++)
     {
         RECT rect;
@@ -548,14 +561,9 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
                 case kCloseControl:
                 {
                     int32 srcOffset = 0;
-                    RECT srcRect;
 
-                    SelectObject(memdc, systemButtonsBitmap);
+                    SelectObject(memdc, g_buttonStateArray[i].bitmap);
                     
-                    CopyRect(&srcRect, &rect);
-
-                    OffsetRect(&srcRect, -354, -18);
-
                     if( g_buttonStateArray[i].state == Selected )
                     {
                         srcOffset = 14;
@@ -571,7 +579,7 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
                             rect.right - rect.left, 
                             rect.bottom - rect.top, 
                             memdc, 
-                            srcRect.left,
+                            0,
                             srcOffset,
                             SRCCOPY);
 
@@ -580,18 +588,14 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
                 }
 
                 case kPlayControl:
+                case kPauseControl:
                 case kStopControl:
                 case kNextControl:
                 case kLastControl:
                 {
                     int32 srcOffset = 0;
-                    RECT srcRect;
 
-                    SelectObject(memdc, playerButtonsBitmap);
-
-                    CopyRect(&srcRect, &rect);
-
-                    OffsetRect(&srcRect, -39, -15);
+                    SelectObject(memdc, g_buttonStateArray[i].bitmap);
 
                     if( g_buttonStateArray[i].state == Selected )
                     {
@@ -606,16 +610,18 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
                         srcOffset = 40;
                     }
 
-                    if(srcOffset)
-                    BitBlt(bufferdc, 
-                        rect.left, 
-                        rect.top, 
-                        rect.right - rect.left, 
-                        rect.bottom - rect.top, 
-                        memdc, 
-                        srcRect.left,
-                        srcOffset,
-                        SRCCOPY);
+                    if(g_buttonStateArray[i].shown)
+                    {
+                        BitBlt(bufferdc, 
+                            rect.left, 
+                            rect.top, 
+                            rect.right - rect.left, 
+                            rect.bottom - rect.top, 
+                            memdc, 
+                            0,
+                            srcOffset,
+                            SRCCOPY);
+                    }
 
                     currentCursor = arrowCursor;
                     break;        
@@ -687,6 +693,81 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
     DeleteObject(bufferBitmap);
 }
 
+static HPALETTE 
+CreateDIBPalette (LPBITMAPINFO lpbmi, 
+				  LPINT lpiNumColors) 
+{
+	LPBITMAPINFOHEADER lpbi;
+	LPLOGPALETTE lpPal;
+	HANDLE hLogPal;
+	HPALETTE hPal = NULL;
+	INT i;
+ 
+	lpbi = (LPBITMAPINFOHEADER)lpbmi;
+	if (lpbi->biBitCount <= 8) {
+		*lpiNumColors = (1 << lpbi->biBitCount);
+	}
+	else
+		*lpiNumColors = 0;  // No palette needed for 24 BPP DIB
+ 
+	if (*lpiNumColors) {
+		hLogPal = GlobalAlloc (GHND, sizeof (LOGPALETTE) +
+                             sizeof (PALETTEENTRY) * (*lpiNumColors));
+		lpPal = (LPLOGPALETTE) GlobalLock (hLogPal);
+		lpPal->palVersion = 0x300;
+		lpPal->palNumEntries = *lpiNumColors;
+ 
+		for (i = 0;  i < *lpiNumColors;  i++) {
+			lpPal->palPalEntry[i].peRed   = lpbmi->bmiColors[i].rgbRed;
+			lpPal->palPalEntry[i].peGreen = lpbmi->bmiColors[i].rgbGreen;
+			lpPal->palPalEntry[i].peBlue  = lpbmi->bmiColors[i].rgbBlue;
+			lpPal->palPalEntry[i].peFlags = 0;
+		}
+		hPal = CreatePalette (lpPal);
+		GlobalUnlock (hLogPal);
+		GlobalFree (hLogPal);
+   }
+   return hPal;
+}
+
+static HBITMAP 
+LoadResourceBitmap (HINSTANCE hInstance, 
+					LPSTR lpString,
+					HPALETTE* lphPalette) 
+{
+	HRSRC  hRsrc;
+	HGLOBAL hGlobal;
+	HBITMAP hBitmapFinal = NULL;
+	LPBITMAPINFOHEADER lpbi;
+	HDC hdc;
+    INT iNumColors;
+ 
+	if (hRsrc = FindResource (hInstance, lpString, RT_BITMAP)) {
+		hGlobal = LoadResource (hInstance, hRsrc);
+		lpbi = (LPBITMAPINFOHEADER)LockResource (hGlobal);
+ 
+		hdc = GetDC(NULL);
+		*lphPalette =  CreateDIBPalette ((LPBITMAPINFO)lpbi, &iNumColors);
+		if (*lphPalette) {
+			SelectPalette (hdc,*lphPalette,FALSE);
+			RealizePalette (hdc);
+		}
+ 
+		hBitmapFinal = CreateDIBitmap (hdc,
+                   (LPBITMAPINFOHEADER)lpbi,
+                   (LONG)CBM_INIT,
+                   (LPSTR)lpbi + lpbi->biSize + iNumColors * sizeof(RGBQUAD),
+                   (LPBITMAPINFO)lpbi,
+                   DIB_RGB_COLORS );
+ 
+		ReleaseDC (NULL,hdc);
+		UnlockResource (hGlobal);
+		FreeResource (hGlobal);
+	}
+	return (hBitmapFinal);
+}
+
+
 
 
 LRESULT WINAPI MainWndProc( HWND hwnd, 
@@ -744,24 +825,62 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
             arrowCursor = LoadCursor(NULL, IDC_ARROW);
             currentCursor = arrowCursor;
 
-            //playerBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_PLAYER));
-            logoBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_LOGO));
-            leftBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_LEFT));
-            middleBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_MID));
-            rightBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_RIGHT));
-            dialBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_DIALS));
-            playerButtonsBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_PLAYER_BUTTONS));
-            systemButtonsBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_SYSTEM_BUTTONS));
+            HDC hdc = GetDC(hwnd);
+            int32 numBits = 0;
+
+            if(hdc)
+			{
+				numBits = GetDeviceCaps(hdc, BITSPIXEL) * 
+					GetDeviceCaps(hdc, PLANES);
+
+				ReleaseDC(hwnd, hdc);
+			}
+
+            if(numBits == 8) 
+            {
+                logoBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_LOGO_256), &palette);
+                leftBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_LEFT_256), &palette);
+                middleBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_MID_256), &palette);
+                rightBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_RIGHT_256), &palette);
+                dialBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_DIALS_256), &palette);
+                smallFont = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_SMALL_FONT_256), &palette);
+                largeFont = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_BIG_FONT_256), &palette);
+
+                playButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_PLAY), &palette);
+                stopButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_STOP), &palette);
+                pauseButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_PAUSE), &palette);
+                nextButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_NEXT), &palette);
+                lastButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_LAST), &palette);
+
+                modeButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_MODE), &palette);
+                minimizeButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_MINIMIZE), &palette);
+                closeButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_CLOSE), &palette);
+
+			}
+            else
+            {
+                logoBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_LOGO));
+                leftBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_LEFT));
+                middleBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_MID));
+                rightBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_RIGHT));
+                dialBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_DIALS));
+                smallFont = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_SMALL_FONT));
+                largeFont = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BIG_FONT));
+
+                playButtonBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_PLAY));
+                stopButtonBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_STOP));
+                pauseButtonBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_PAUSE));
+                nextButtonBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_NEXT));
+                lastButtonBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_LAST));
+
+                modeButtonBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_MODE));
+                minimizeButtonBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_MINIMIZE));
+                closeButtonBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_CLOSE));
+            }
+            
             playerMask = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_PLAYER_MASK));
 
-            smallFont = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_SMALL_FONT));
-            largeFont = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BIG_FONT));
-
             tempDC = CreateCompatibleDC(NULL);
-
-            closeRegion = CreateEllipticRgn(0,0,14,14);
-
-            OffsetRgn(closeRegion, PLAYER_WINDOW_WIDTH - 42, 18);
 
             /*HRGN          region;
             ControlState    state;
@@ -769,22 +888,44 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
             BOOL            dirty;
             HBITMAP         bitmap;*/
 
-            for(i = 0; i < 4; i++)
+            for(i = 0; i < 5; i++)
             {
                 g_buttonStateArray[i].control_id = i;
                 g_buttonStateArray[i].dirty = FALSE;
                 g_buttonStateArray[i].enabled = TRUE;
+                g_buttonStateArray[i].shown = TRUE;
                 g_buttonStateArray[i].state = Deactivated;
-                g_buttonStateArray[i].bitmap = playerButtonsBitmap;
+
+                if(i == kPlayControl)
+                    g_buttonStateArray[i].bitmap = playButtonBitmap;
+                else if(i == kPauseControl)
+                    g_buttonStateArray[i].bitmap = pauseButtonBitmap;
+                else if(i == kStopControl)
+                    g_buttonStateArray[i].bitmap = stopButtonBitmap;
+                else if(i == kNextControl)
+                    g_buttonStateArray[i].bitmap = nextButtonBitmap;
+                else if(i == kLastControl)
+                    g_buttonStateArray[i].bitmap = lastButtonBitmap;
+
             } 
+
+            // stop shown when play is pressed
+            g_buttonStateArray[kStopControl].shown = FALSE;
 
             for(i = 5; i < 8; i++)
             {
                 g_buttonStateArray[i].control_id = i;
                 g_buttonStateArray[i].dirty = FALSE;
                 g_buttonStateArray[i].enabled = TRUE;
+                g_buttonStateArray[i].shown = TRUE;
                 g_buttonStateArray[i].state = Deactivated;
-                g_buttonStateArray[i].bitmap = systemButtonsBitmap;
+
+                if(i == kModeControl)
+                    g_buttonStateArray[i].bitmap = modeButtonBitmap;
+                else if(i == kMinimizeControl)
+                    g_buttonStateArray[i].bitmap = minimizeButtonBitmap;
+                else if(i == kCloseControl)
+                    g_buttonStateArray[i].bitmap = closeButtonBitmap;
             } 
 
             for(i = 8; i < 10; i++)
@@ -792,32 +933,63 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                 g_buttonStateArray[i].control_id = i;
                 g_buttonStateArray[i].dirty = FALSE;
                 g_buttonStateArray[i].enabled = TRUE;
+                g_buttonStateArray[i].shown = TRUE;
                 g_buttonStateArray[i].state = Deactivated;
                 g_buttonStateArray[i].bitmap = dialBitmap;
             } 
 
-            tempRegion = CreateEllipticRgn( 39,15,60,36);
+            // play buttons
+            tempRegion = CreateEllipticRgn( 29,15,50,36);
             g_buttonStateArray[0].region = tempRegion;
-            tempRegion = CreateEllipticRgn( 66,15,86,36);
+            tempRegion = CreateEllipticRgn( 29,15,50,36);
+            g_buttonStateArray[4].region = tempRegion;
+            tempRegion = CreateEllipticRgn( 56,15,77,36);
             g_buttonStateArray[1].region = tempRegion;
-            tempRegion = CreateEllipticRgn( 92,15,112,36);
+            tempRegion = CreateEllipticRgn( 82,15,103,36);
             g_buttonStateArray[2].region = tempRegion;
-            tempRegion = CreateEllipticRgn( 119,15,139,36);
+            tempRegion = CreateEllipticRgn( 109,15,130,36);
             g_buttonStateArray[3].region = tempRegion;
 
-            tempRegion = CreateEllipticRgn( 354,18,367,31);
+            // system buttons
+            int32 systemButtonsOffset = LEFT_SECTION + 2*DIAL_SECTION + MID_SECTION;
+
+            tempRegion = CreateEllipticRgn( systemButtonsOffset + 9,
+                                            18,
+                                            systemButtonsOffset + 9 + 13,
+                                            33);
             g_buttonStateArray[5].region = tempRegion;
-            tempRegion = CreateEllipticRgn( 370,18,383,31);
+
+            tempRegion = CreateEllipticRgn( systemButtonsOffset + 25,
+                                            18,
+                                            systemButtonsOffset + 25 + 13,
+                                            33);
             g_buttonStateArray[6].region = tempRegion;
-            tempRegion = CreateEllipticRgn( 386,18,399,31);
+
+            tempRegion = CreateEllipticRgn( systemButtonsOffset + 41,
+                                            18,
+                                            systemButtonsOffset + 41 + 13,
+                                            33);
             g_buttonStateArray[7].region = tempRegion;
 
-            tempRegion = CreateRectRgn( 148,0,158,50);
+            // dials
+            int32 dialOffset = LEFT_SECTION;
+
+            tempRegion = CreateRectRgn( dialOffset,0,dialOffset + DIAL_SECTION,50);
             g_buttonStateArray[8].region = tempRegion;
-            tempRegion = CreateRectRgn( 334,0,344,50);
+            dialOffset = LEFT_SECTION + DIAL_SECTION + MID_SECTION;
+            tempRegion = CreateRectRgn( dialOffset,
+                                        0,
+                                        dialOffset + DIAL_SECTION,
+                                        50);
             g_buttonStateArray[9].region = tempRegion;
 
-            displayRegion = CreateRectRgn( 177,11,316,38);
+            // display
+            int32 displayOffset = LEFT_SECTION + DIAL_SECTION + 19;
+
+            displayRegion = CreateRectRgn(  displayOffset, 
+                                            11,
+                                            displayOffset + 139,
+                                            38);
 
             g_displayInfo.state = Intro;
             strcpy(g_displayInfo.path, "Welcome to FreeAmp");
@@ -969,8 +1141,23 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
         case WM_DESTROY:
         {
-            
             DeleteDC(tempDC);
+
+            DeleteObject(leftBitmap);
+            DeleteObject(middleBitmap);
+            DeleteObject(rightBitmap);
+            DeleteObject(dialBitmap);
+            DeleteObject(playerMask);
+            DeleteObject(smallFont); 
+            DeleteObject(largeFont);
+            DeleteObject(logoBitmap);
+
+            DeleteObject(displayRegion);
+
+
+            if(palette)
+                DeleteObject(palette);
+
             PostQuitMessage( 0 );             
             break;
         }
@@ -989,15 +1176,13 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
             HDC hdc;
             int32 i;
 
-            //if(PtInRegion(closeRegion, xPos, yPos))
-               // DestroyWindow( hwnd );
-
             if(pressed)
             {
                 for(i = 0; i < kNumControls; i++)
                 {
                     if(i == kVolumeControl || i == kSeekControl )
                     {
+
                         if(PtInRegion(g_buttonStateArray[i].region, pressPt.x, pressPt.y))
                         {
                             g_buttonStateArray[i].state = Deactivated;
@@ -1018,19 +1203,19 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                                     SendMessage(hwnd,WM_COMMAND,kPlayControl,0);
                                     g_ui->m_target->AcceptEvent(new ChangePositionEvent(g_displayInfo.seekframe));
                                 }
-                                //seekframe
                             }
                         }
                     }
                     else
                     {
                         if( PtInRegion(g_buttonStateArray[i].region, xPos, yPos) &&
-                            g_buttonStateArray[i].state != Activated)
+                            PtInRegion(g_buttonStateArray[i].region, pressPt.x, pressPt.y) &&
+                            g_buttonStateArray[i].state != Activated &&
+                            g_buttonStateArray[i].shown)
                         {
                             g_buttonStateArray[i].state = Selected;
                             g_buttonStateArray[i].dirty = TRUE;
 							SendMessage(hwnd,WM_COMMAND,g_buttonStateArray[i].control_id,0);
-                            //PostMessage(hwnd, WM_COMMAND, g_buttonStateArray[i].control_id, 0);
                         }
                         else if(g_buttonStateArray[i].state != Activated)
                         {
@@ -1122,63 +1307,6 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                 
             break;
         }
-
-        /*case WM_MOUSEMOVE:
-        {   
-            WPARAM fwKeys = wParam;        // key flags 
-            LPARAM xPos = LOWORD(lParam);  // horizontal position of cursor 
-            LPARAM yPos = HIWORD(lParam);  // vertical position of cursor 
-      
-            break;
-        }*/
-
-		case WM_DROPFILES:
-		{
-			HDROP hDrop = (HDROP) wParam;
-			int32 count;
-			char szFile[MAX_PATH + 1];
-
-			count = DragQueryFile(	hDrop,
-									-1L,
-									szFile,
-									sizeof(szFile));
-
-
-			for(int32 i = 0; i < count; i++)
-			{
-				DragQueryFile(	hDrop,
-								i,
-								szFile,
-								sizeof(szFile));
-
-				if (!g_ui->m_playList) 
-                {
-					g_ui->m_playList = new PlayList();
-					g_ui->m_playList->Add(szFile,0);
-					g_ui->m_playList->SetFirst();
-					g_ui->m_target->AcceptEvent(new SetPlayListEvent(g_ui->m_playList));
-					g_ui->m_target->AcceptEvent(new Event(CMD_Play));
-				} 
-                else 
-                {
-					if (g_ui->m_playList->GetCurrent() == NULL) 
-                    {
-						g_ui->m_playList->Add(szFile,0);
-						g_ui->m_target->AcceptEvent(new SetPlayListEvent(g_ui->m_playList));
-						// first in playlist...
-						//g_ui->m_target->AcceptEvent(new Event(CMD_Play));
-                        SendMessage(hwnd, WM_COMMAND, kPlayControl,0);
-					} 
-                    else 
-                    {
-						g_ui->m_playList->Add(szFile,0);
-						g_ui->m_target->AcceptEvent(new SetPlayListEvent(g_ui->m_playList));
-					}
-				}
-			}
-
-			break;
-		}
 
         //  Tell Windows everything is the caption bar
         //  so the window can be dragged from anywhere
@@ -1288,6 +1416,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                     {
                         g_buttonStateArray[i].state = Selected;
                         g_buttonStateArray[i].dirty = TRUE;
+
                     }
                     else if(g_buttonStateArray[i].state != Activated)
                     {
@@ -1308,17 +1437,148 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
             break;
         }
 
+        case WM_DROPFILES:
+		{
+			HDROP hDrop = (HDROP) wParam;
+			int32 count;
+			char szFile[MAX_PATH + 1];
+
+			count = DragQueryFile(	hDrop,
+									-1L,
+									szFile,
+									sizeof(szFile));
+
+
+			for(int32 i = 0; i < count; i++)
+			{
+				DragQueryFile(	hDrop,
+								i,
+								szFile,
+								sizeof(szFile));
+
+				if (!g_ui->m_playList) 
+                {
+					g_ui->m_playList = new PlayList();
+					g_ui->m_playList->Add(szFile,0);
+					g_ui->m_playList->SetFirst();
+					g_ui->m_target->AcceptEvent(new SetPlayListEvent(g_ui->m_playList));
+					g_ui->m_target->AcceptEvent(new Event(CMD_Play));
+				} 
+                else 
+                {
+					if (g_ui->m_playList->GetCurrent() == NULL) 
+                    {
+						g_ui->m_playList->Add(szFile,0);
+						g_ui->m_target->AcceptEvent(new SetPlayListEvent(g_ui->m_playList));
+						// first in playlist...
+						//g_ui->m_target->AcceptEvent(new Event(CMD_Play));
+                        SendMessage(hwnd, WM_COMMAND, kPlayControl,0);
+					} 
+                    else 
+                    {
+						g_ui->m_playList->Add(szFile,0);
+						g_ui->m_target->AcceptEvent(new SetPlayListEvent(g_ui->m_playList));
+					}
+				}
+			}
+
+			break;
+		}
+
 		case WM_COMMAND:
 		{
 			switch(wParam)
 	        {
 		        case kModeControl:
 		        {
+                    OPENFILENAME ofn;
+					char szTitle[] = "Open Audio File";
+					char szFilter[] =
+					"MPEG Audio Streams (.mp1, .mp2, .mp3, .mpp)\0"
+					"*.mp1;*.mp2;*.mp3;*.mpp\0"
+					//"Playlists (.txt, .lst, .m3u)\0"
+					//"*.lst;*.m3u;*.txt\0"
+					"All Files (*.*)\0"
+					"*.*\0";
+					const int32 kBufferSize = MAX_PATH * 128;
+					char* filelist = new char[kBufferSize];
+					
+					*filelist = 0x00;
+
+					// Setup open file dialog box structure
+					ofn.lStructSize       = sizeof(OPENFILENAME);
+					ofn.hwndOwner         = hwnd;
+					ofn.hInstance         = (HINSTANCE)GetWindowLong(hwnd, 
+															GWL_HINSTANCE);
+					ofn.lpstrFilter       = szFilter;
+					ofn.lpstrCustomFilter = NULL;
+					ofn.nMaxCustFilter    = 0;
+					ofn.nFilterIndex      = 1;
+					ofn.lpstrFile         = filelist;
+					ofn.nMaxFile          = kBufferSize;
+					ofn.lpstrFileTitle    = NULL;
+					ofn.nMaxFileTitle     = 0;
+					ofn.lpstrInitialDir   = "";
+					ofn.lpstrTitle        = szTitle;
+					ofn.Flags             = OFN_FILEMUSTEXIST | 
+											OFN_PATHMUSTEXIST |
+  	     				   					OFN_HIDEREADONLY | 
+											OFN_ALLOWMULTISELECT |
+											OFN_EXPLORER;
+					ofn.nFileOffset       = 0;
+					ofn.nFileExtension    = 0;
+					ofn.lpstrDefExt       = "MP*";
+					ofn.lCustData         = 0;
+					ofn.lpfnHook          = NULL;
+					ofn.lpTemplateName    = NULL;
+
+					if(GetOpenFileName(&ofn))
+					{
+						char file[MAX_PATH + 1];
+						char* cp = NULL;
+
+						g_ui->m_playList = new PlayList();
+
+						strcpy(file, filelist);
+						strcat(file, "\\");
+
+						cp = filelist + ofn.nFileOffset;
+
+						while(*cp)
+						{
+							strcpy(file + ofn.nFileOffset, cp);
+
+					        g_ui->m_playList->Add(file,0);
+
+					        cp += strlen(cp) + 1;
+						}
+
+                        if(g_ui->m_state == STATE_Playing)
+                        {
+                            g_ui->m_target->AcceptEvent(new Event(CMD_Stop));
+						    g_ui->m_target->AcceptEvent(new SetPlayListEvent(g_ui->m_playList));
+                            g_ui->m_target->AcceptEvent(new Event(CMD_Play));
+                        }
+                        else
+                        {
+                            g_ui->m_target->AcceptEvent(new SetPlayListEvent(g_ui->m_playList));
+                        }
+                        //EnableWindow(m_ui->m_hwndPlay, TRUE);
+					}
+
+                    g_ui->m_playList->SetFirst();
+
+					delete [] filelist;
+
+                    g_buttonStateArray[kModeControl].state = Deactivated;
+
 			        break;        
 		        }
 
 		        case kMinimizeControl:
 		        {
+                    ShowWindow(hwnd, SW_MINIMIZE);
+                    g_buttonStateArray[kMinimizeControl].state = Deactivated;
 			        break;        
 		        }
 
@@ -1328,40 +1588,32 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 			        break;        
 		        }
 
+                case kPauseControl:
+                {
+                    g_ui->m_target->AcceptEvent(new Event(CMD_TogglePause));
+                    break;
+                }
+
 		        case kPlayControl:
 		        {
-			        OutputDebugString("play clicked\n");
-			        if (g_ui->m_state == STATE_Stopped) {
-				        g_ui->m_target->AcceptEvent(new Event(CMD_Play));
-                        //if(g_displayInfo.state == TotalTime)
-                            //g_displayInfo.state = CurrentTime;
-                        
-			        } else if (g_ui->m_state == STATE_Paused) {
-				        g_ui->m_target->AcceptEvent(new Event(CMD_TogglePause));
-                        
-			        } else if (g_ui->m_state == STATE_Playing) {
-				        g_ui->m_target->AcceptEvent(new Event(CMD_TogglePause));
-                        
-			        }
+		            g_ui->m_target->AcceptEvent(new Event(CMD_Play));
 			        break;        
 		        }
+
 		        case kStopControl:
 		        {
-			        OutputDebugString("stop clicked\n");
 			        g_ui->m_target->AcceptEvent(new Event(CMD_Stop));
 			        break;        
 		        }
 
 		        case kNextControl:
 		        {
-			        OutputDebugString("next clicked\n");
 			        g_ui->m_target->AcceptEvent(new Event(CMD_NextMediaPiece));
 			        break;        
 		        }
 
 		        case kLastControl:
 		        {
-			        OutputDebugString("prev clicked\n");
 			        g_ui->m_target->AcceptEvent(new Event(CMD_PrevMediaPiece));
 			        break;        
 		        }

@@ -58,8 +58,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                     ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
-    ..\..\..\..\base\win32\prj\plugins
+                      ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
+     ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
@@ -90,8 +90,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                     ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
-    ..\..\..\..\base\win32\prj\plugins
+                      ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
+     ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
@@ -232,7 +232,75 @@ SOURCE=..\res\system_buttons.bmp
 # End Group
 # Begin Source File
 
+SOURCE=..\res\big_font256.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\close_buttons.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\dials256.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=..\res\icon1.ico
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\last_buttons.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\lcd256.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\leftside256.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\logo256.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\minimize_buttons.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\mode_buttons.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\next_buttons.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\pause_buttons.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\play_buttons.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\player_buttons256.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\rightside256.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\small_font256.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\stop_buttons.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\system_buttons256.bmp
 # End Source File
 # End Target
 # End Project
