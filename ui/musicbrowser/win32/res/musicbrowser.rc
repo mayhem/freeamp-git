@@ -57,28 +57,29 @@ BEGIN
     PUSHBUTTON      "Open URL",IDC_OPEN_URL,222,3,50,13
 END
 
-IDD_MUSICSEARCH DIALOG DISCARDABLE  0, 0, 209, 127
+IDD_MUSICSEARCH DIALOG DISCARDABLE  0, 0, 254, 121
 STYLE DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
     WS_SYSMENU
 CAPTION "Search Computer for Music"
 FONT 8, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "Begin Search",IDOK,35,109,54,14
-    PUSHBUTTON      "Cancel",IDCANCEL,93,109,54,14
-    LTEXT           "&Look for music on:",IDC_STATIC,7,64,60,8
-    COMBOBOX        IDC_DRIVES,71,62,48,48,CBS_DROPDOWNLIST | WS_VSCROLL | 
+    DEFPUSHBUTTON   "Begin Search",IDOK,78,102,54,14
+    PUSHBUTTON      "Cancel",IDCANCEL,136,102,54,14
+    LTEXT           "&Look for music on:",IDC_STATIC,54,59,60,8
+    COMBOBOX        IDC_DRIVES,118,57,52,48,CBS_DROPDOWNLIST | WS_VSCROLL | 
                     WS_TABSTOP
-    PUSHBUTTON      "&Browse...",IDC_BROWSE,152,81,50,14,WS_DISABLED
-    LTEXT           "Limit search to:",IDC_LIMITTEXT,7,83,48,8
-    EDITTEXT        IDC_DIRECTORY,61,81,84,13,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "&Browse...",IDC_BROWSE,198,76,50,14,WS_DISABLED
+    LTEXT           "Limit search to:",IDC_LIMITTEXT,54,78,48,8
+    EDITTEXT        IDC_DIRECTORY,108,76,84,13,ES_AUTOHSCROLL | ES_READONLY
     LTEXT           "We will search your computer for supported music files. The files will not be moved or modified during this process. Their location will be remembered in order to provide you with an",
-                    IDC_STATIC,7,7,195,25
-    LTEXT           "organized view of your music collection. ",IDC_STATIC,7,
-                    31,195,8
-    LTEXT           "Where would you like to look for music?",IDC_STATIC,7,
+                    IDC_STATIC,54,7,195,25
+    LTEXT           "organized view of your music collection. ",IDC_STATIC,
+                    54,31,195,8
+    LTEXT           "Where would you like to look for music?",IDC_STATIC,54,
                     43,195,8
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,103,209,1
-    PUSHBUTTON      "Help",9,151,109,54,14
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,96,254,1
+    PUSHBUTTON      "Help",9,194,102,54,14
+    CONTROL         131,IDC_STATIC,"Static",SS_BITMAP,5,7,41,81
 END
 
 IDD_SAVEPLAYLIST DIALOG DISCARDABLE  0, 0, 198, 63
@@ -150,13 +151,13 @@ CAPTION "Welcome!"
 FONT 8, "MS Sans Serif"
 BEGIN
     CONTROL         "Caption 1",IDC_CAPTION1,"Button",BS_OWNERDRAW | BS_LEFT | 
-                    BS_FLAT | WS_TABSTOP,85,0,222,10
+                    BS_FLAT | WS_TABSTOP,90,0,216,10
     CONTROL         "Text",IDC_TEXT2,"Button",BS_OWNERDRAW | BS_FLAT | 
-                    WS_TABSTOP,85,45,222,116
+                    WS_TABSTOP,90,45,216,116
     CONTROL         "Text",IDC_TEXT1,"Button",BS_OWNERDRAW | BS_CENTER | 
-                    BS_FLAT | WS_TABSTOP,85,12,222,18
+                    BS_FLAT | WS_TABSTOP,90,12,216,18
     CONTROL         "Caption 2",IDC_CAPTION2,"Button",BS_OWNERDRAW | BS_LEFT | 
-                    BS_FLAT | WS_TABSTOP,85,33,222,10
+                    BS_FLAT | WS_TABSTOP,90,33,216,10
     CONTROL         130,IDC_STATIC,"Static",SS_BITMAP,0,0,81,161
 END
 
@@ -478,6 +479,7 @@ IDB_ALL                 BITMAP  DISCARDABLE     "all.bmp"
 IDB_UNCATAGORIZED       BITMAP  DISCARDABLE     "uncatagorized.bmp"
 IDB_PORTABLE            BITMAP  DISCARDABLE     "portable.bmp"
 IDB_WIZARD              BITMAP  DISCARDABLE     "wizard.bmp"
+IDB_WIZARD_SMALL        BITMAP  DISCARDABLE     "wizard_small.bmp"
 
 #ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
