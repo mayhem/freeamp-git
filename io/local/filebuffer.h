@@ -55,7 +55,7 @@ class FileBuffer : public PullBuffer
                };
       void     Clear(void);
 
-      bool     GetID3v1Tag(unsigned char *pTag);
+      Error    GetID3v1Tag(unsigned char *pTag);
 
       static   void     StartWorkerThread(void *);
 

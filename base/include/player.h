@@ -71,6 +71,7 @@ class Player : public EventQueue, Properties, PropertyWatcher  {
     static void EventServiceThreadFunc(void *);
 //    static int32 AcceptEventStub(EventQueueRef ref, Event* e);
     virtual int32 AcceptEvent(Event *);
+	 virtual RegistryItem *ChoosePMI(char *szUrl);
 
     // Properties
     virtual Error GetProperty(const char *, PropValue **);

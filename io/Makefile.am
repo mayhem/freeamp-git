@@ -22,5 +22,4 @@
 ##
 ############################################################################
 
-SUBDIRS = local http src soundcard alsa
-
+SUBDIRS = local http obs src soundcard alsa

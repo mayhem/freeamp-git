@@ -54,7 +54,8 @@ typedef enum Error
     kError_InitFailedSafely = 23,
     kError_NoDataAvail = 24,
     kError_SeekFailed = 25,
-    kError_CreateThreadFailed = 26
+    kError_CreateThreadFailed = 26,
+    kError_BufferingUp = 27
 }Error;
 
 

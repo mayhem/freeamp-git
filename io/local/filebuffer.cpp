@@ -147,15 +147,16 @@ Error FileBuffer::Open(void)
     return kError_NoErr;
 }
 
-bool FileBuffer::GetID3v1Tag(unsigned char *pTag)
+Error FileBuffer::GetID3v1Tag(unsigned char *pTag)
 {
     if (m_pID3Tag)
     { 
         memcpy(pTag, m_pID3Tag, iID3TagSize);
-        return true;
+        return kError_NoErr;
     }
 
-    return false;
+    printf("no tag!\n");
+    return kError_NoDataAvail;
 }
 
 Error FileBuffer::Run(void)

@@ -21,8 +21,8 @@
    $Id$
 ____________________________________________________________________________*/
 
-#ifndef _FILEBUFFER_H_
-#define _FILEBUFFER_H_
+#ifndef _HTTPBUFFER_H_
+#define _HTTPBUFFER_H_
 
 /* system headers */
 #include <stdlib.h>
@@ -31,9 +31,10 @@ ____________________________________________________________________________*/
 #include "errors.h"
 #include "thread.h"
 #include "semaphore.h"
-#include "pullbuffer.h"
+#include "streambuffer.h"
 
 const int iMaxUrlLen = 1024;
+const int iMaxErrorLen = 1024;
 
 struct ID3Tag
 {
@@ -54,10 +55,11 @@ enum
    httpError_CannotOpenSocket,
    httpError_CannotConnect,
    httpError_SocketRead,
+	httpError_CustomError,
    httpError_MaximumError
 };
 
-class HttpBuffer : public PullBuffer
+class HttpBuffer : public StreamBuffer
 {
     public:
 
@@ -68,8 +70,7 @@ class HttpBuffer : public PullBuffer
       Error    Open(void);
       Error    Run(void);
 
-      Error    BeginRead  (void *&pBuffer, size_t &iBytesNeeded);
-      bool     GetID3v1Tag(unsigned char *pTag);
+      Error    GetID3v1Tag(unsigned char *pTag);
 
       const char *GetErrorString(int32 error);
       static   void     StartWorkerThread(void *);
@@ -78,7 +79,7 @@ class HttpBuffer : public PullBuffer
 
 
       int             m_hHandle;
-      char            m_szUrl[iMaxUrlLen];
+      char            m_szUrl[iMaxUrlLen], *m_szError;
       Thread         *m_pBufferThread;
       bool            m_bLoop, m_bExit;
       ID3Tag         *m_pID3Tag;

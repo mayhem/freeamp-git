@@ -57,6 +57,12 @@ GetItem(int32 index)
     return m_elements->ElementAt(index);
 }
 
+int32 
+Registry::
+GetNumItems()
+{
+    return m_elements->NumElements();
+}
 
 RegistryItem::
 RegistryItem()

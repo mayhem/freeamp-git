@@ -44,6 +44,7 @@ class LogicalMediaConverter {
     virtual Error ChangePosition(int32) = 0;
 
     virtual bool CanDecode() = 0;
+    virtual bool IsStreaming() = 0;
     virtual Error ExtractMediaInfo(MediaInfoEvent **) = 0;
 
     virtual Error SetPMI(PhysicalMediaInput *) = 0;

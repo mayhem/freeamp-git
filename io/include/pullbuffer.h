@@ -50,18 +50,23 @@ class PullBuffer
       virtual  Error    BeginRead  (void *&pBuffer, size_t &iBytesNeeded);
       virtual  Error    EndRead    (size_t iBytesUsed);
 
+      virtual  void     DiscardBytes();
+
       void     Clear        (void);
       bool     IsEndOfStream(void);
       void     SetEndOfStream(bool bEOS);
-      size_t   GetNumBytesInBuffer_i(void)
+      size_t   GetNumBytesInBuffer(void)
                {
                    return m_iBytesInBuffer;
                };
-      size_t   GetBufferSize_i(void)
+      size_t   GetBufferSize(void)
                {
                    return m_iBufferSize;
                };
-
+      int32    GetBufferPercentage(void)
+		         {
+					    return (100 * m_iBytesInBuffer) / m_iBufferSize;
+					};
 
     protected:
 

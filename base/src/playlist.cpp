@@ -355,6 +355,7 @@ void PlayListManager::AcceptEvent(Event *e) {
 			// make sure pItem still exists
 			pItem->SetPMIRegistryItem(smi->GetPMIRegistryItem());
 			pItem->SetLMCRegistryItem(smi->GetLMCRegistryItem());
+			pItem->SetPMI(smi->GetPMI());
 			pItem->SetMediaInfo(smi->GetMediaInfo());
 			// if pItem is the current item, send out the info posthaste
 			if (pItem == GetCurrent()) {

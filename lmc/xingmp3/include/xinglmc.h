@@ -26,6 +26,7 @@ ____________________________________________________________________________*/
 
 /* system headers */
 #include <stdlib.h>
+#include <time.h>
 
 /* project headers */
 #include "config.h"
@@ -97,7 +98,8 @@ class     XingLMC:public LogicalMediaConverter
    virtual Error Reset();
    virtual Error ChangePosition(int32 position);
 
-   virtual bool CanDecode();
+   virtual bool  CanDecode();
+   virtual bool  IsStreaming();
    virtual Error ExtractMediaInfo(MediaInfoEvent **);
 
    virtual Error SetPMI(PhysicalMediaInput *);
@@ -116,9 +118,12 @@ class     XingLMC:public LogicalMediaConverter
    Properties *m_propManager;
 
    static void DecodeWorkerThreadFunc(void *);
-   void      DecodeWork();
+   void        DecodeWork();
+	Error       BeginRead(void *&pBuffer, unsigned int iBytesNeeded);
+	Error       AdvanceBufferToNextFrame();
+	Error       GetHeadInfo();
 
-   bool        m_properlyInitialized, m_bCannotSeek;
+   bool        m_properlyInitialized;
    int32       m_frameWaitTill;
    Semaphore  *m_pauseSemaphore;
    AUDIO       m_audioMethods;
@@ -132,11 +137,14 @@ class     XingLMC:public LogicalMediaConverter
    uint32    m_pcmBufBytes;
    uint32    m_pcmTrigger;
 
-   size_t    m_frameBytes;
-   bool      m_isPaused;
+   int       m_frameBytes;
+	MPEG_HEAD m_sMpegHead;
+	int32     m_iBitRate;
+   bool      m_isPaused, m_bBufferingUp;
    Thread   *m_decoderThread;
 
    int32     m_frameCounter;
+	time_t    m_iBufferUpdate;
 
     bool m_enableEQ;
     float m_equalizer[32];

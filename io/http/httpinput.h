@@ -21,8 +21,8 @@
         $Id$
 ____________________________________________________________________________*/
 
-#ifndef _LOCALFILEINPUT_H_
-#define _LOCALFILEINPUT_H_
+#ifndef _HTTPFILEINPUT_H_
+#define _HTTPFILEINPUT_H_
 
 /* system headers */
 #include <stdlib.h>
@@ -47,6 +47,16 @@ class     HttpInput:public PhysicalMediaInput
    virtual Error GetLength(size_t &iSize); 
    virtual Error GetID3v1Tag(unsigned char *pTag);
 
+   virtual bool  CanHandle(char *szUrl);
+   virtual bool  IsStreaming(void)
+                 { return true; };
+	virtual int32 GetBufferPercentage();
+	virtual bool  CachePMI()
+	              { return true; };
+
+   virtual void  Pause();
+   virtual void  Resume();
+
    virtual Error SetTo(char *url);
    virtual Error Close(void);
    virtual const char *Url(void) const
@@ -55,7 +65,14 @@ class     HttpInput:public PhysicalMediaInput
    }
    virtual const char *GetErrorString(int32);
 
-   virtual Error SetPropManager(Properties *p) { m_propManager = p; if (p) return kError_NoErr; else return kError_UnknownErr; }
+   virtual Error SetPropManager(Properties *p) 
+	{ 
+	   m_propManager = p; 
+		if (p) 
+		    return kError_NoErr; 
+	   else 
+		    return kError_UnknownErr; 
+	};
  private:
    Properties *m_propManager;
 
@@ -63,7 +80,4 @@ class     HttpInput:public PhysicalMediaInput
    char       *m_path;
 };
 
-#endif /* _LOCALFILEINPUT_H_ */
-
-
-
+#endif /* _HTTPFILEINPUT_H_ */

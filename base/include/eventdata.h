@@ -236,6 +236,30 @@ public:
 #endif  //_VISUAL_ENABLE_
 #undef  _VISUAL_ENABLE_
 
+class StreamBufferEvent : public Event
+{
+private:
+        bool  m_bBufferingUp;
+		  int32 m_iBufferPercent;
+public:
+
+        StreamBufferEvent(bool bBufferingUp, int32 iPercent)
+		  {
+		     m_bBufferingUp = bBufferingUp;
+			  m_iBufferPercent = iPercent;
+		  };
+		  virtual ~StreamBufferEvent() {};
+
+        bool IsBufferingUp()
+		  {
+		     return m_bBufferingUp;
+		  };
+
+		  int32 GetBufferPercent()
+		  {
+		     return m_iBufferPercent;
+		  };
+};
 
 #endif /* _EVENTDATA_H_ */
 

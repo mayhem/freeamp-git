@@ -107,6 +107,11 @@ LocalFileInput::
    }
 }
 
+bool LocalFileInput::
+CanHandle(char *szUrl)
+{
+   return strncmp(szUrl, "file://", 7) == 0;
+}
 
 Error     LocalFileInput::
 SetTo(char *url)
@@ -132,7 +137,10 @@ SetTo(char *url)
 
       if (m_path)
       {
-         memcpy(m_path, url, len);
+		   if (strncmp(url, "file://", 7) == 0)
+             memcpy(m_path, url + 7, len);
+         else
+             memcpy(m_path, url, len);
       }
       else
       {
@@ -168,12 +176,7 @@ GetLength(size_t &iSize)
 Error LocalFileInput::
 GetID3v1Tag(unsigned char *pTag)
 {
-	if (m_pPullBuffer->GetID3v1Tag(pTag)) {
-		return kError_NoErr;
-	} else {
-		return kError_UnknownErr;
-	}
-   //return m_pPullBuffer->GetID3v1Tag(pTag);
+	return m_pPullBuffer->GetID3v1Tag(pTag);
 }
 
 Error LocalFileInput::

@@ -312,7 +312,8 @@ AM_CONDITIONAL(AM_HAVE_LINUX, test "$target_os" = "linux")
 AC_OUTPUT(Makefile base/Makefile base/src/Makefile io/Makefile
           base/unix/Makefile ui/freeamp/Makefile ui/freeamp/unix/Makefile ui/freeamp/unix/src/Makefile
 	  ui/Makefile base/unix/linux/Makefile base/unix/linux/src/Makefile
-	  io/local/Makefile io/http/Makefile ui/cmdline/Makefile lmc/Makefile lmc/xingmp3/Makefile
+	  io/local/Makefile io/http/Makefile io/obs/Makefile
+	  ui/cmdline/Makefile lmc/Makefile lmc/xingmp3/Makefile
 	  lmc/xingmp3/src/Makefile lmc/src/Makefile io/src/Makefile ui/src/Makefile
 	  io/soundcard/Makefile io/soundcard/unix/Makefile io/soundcard/unix/linux/Makefile
 	  io/soundcard/unix/linux/src/Makefile base/unix/src/Makefile ui/mpg123/Makefile ui/gtk/Makefile

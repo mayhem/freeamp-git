@@ -45,8 +45,11 @@ class     LocalFileInput:public PhysicalMediaInput
 
    virtual Error Seek(int32 & rtn, int32 offset, int32 origin);
    virtual Error GetLength(size_t &iSize); // filesize - ID3tag if any
-   virtual Error  GetID3v1Tag(unsigned char *pTag);
+   virtual Error GetID3v1Tag(unsigned char *pTag);
 
+	virtual bool  CanHandle(char *szUrl);
+	virtual bool  IsStreaming(void)
+	              { return false; };
 
    virtual Error SetTo(char *url);
    virtual Error Close(void);
@@ -56,7 +59,15 @@ class     LocalFileInput:public PhysicalMediaInput
    }
    virtual const char *GetErrorString(int32);
    
-   virtual Error SetPropManager(Properties *p) { m_propManager = p; if (p) return kError_NoErr; else return kError_UnknownErr; }
+   virtual Error SetPropManager(Properties *p) 
+	{ 
+	   m_propManager = p; 
+		if (p) 
+		   return kError_NoErr; 
+		else 
+		   return kError_UnknownErr; 
+	};
+
  private:
    Properties *m_propManager;
    FileBuffer *m_pPullBuffer;

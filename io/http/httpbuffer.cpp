@@ -36,6 +36,7 @@ const int iGetHostNameBuffer = 1024;
 const int iBufferUpInterval = 3;
 const int iInitialBufferSize = 64;
 const int iHeaderSize = 1024;
+const int iICY_OK = 200;
 
 #define DB printf("%s:%d\n", __FILE__, __LINE__);
 
@@ -45,18 +46,20 @@ static char *g_ErrorArray[9] =
    "Cannot find host.",
    "Cannot open socket.",
    "Cannot connect to host.",
-   "Failed to read data from socket."
+   "Failed to read data from socket.",
+	"Bummer, dude! :-)"
 };
 
 HttpBuffer::HttpBuffer(size_t iBufferSize, size_t iOverFlowSize, 
                        size_t iWriteTriggerSize, char *szFile) :
-            PullBuffer(iBufferSize, iOverFlowSize, iWriteTriggerSize)
+          StreamBuffer(iBufferSize, iOverFlowSize, iWriteTriggerSize)
 {
     m_hHandle = -1;
     m_bLoop = false;
     m_bExit = false;
     m_pBufferThread = NULL;
     m_pID3Tag = NULL;
+	 m_szError = new char[iMaxErrorLen];
 
     strcpy(m_szUrl, szFile);
 }
@@ -77,6 +80,8 @@ HttpBuffer::~HttpBuffer(void)
 
     if (m_pID3Tag)
        delete m_pID3Tag;
+
+    delete m_szError;
 }
 
 Error HttpBuffer::Open(void)
@@ -101,6 +106,7 @@ Error HttpBuffer::Open(void)
     szFile = strchr(m_szUrl + 7, '/');
     memset(&sAddr, 0, sizeof(struct sockaddr_in));
 
+//#define USING_GDB 1
 #ifndef USING_GDB
 
     // Does anyone know how to use gethostbyname_r properly?
@@ -112,8 +118,8 @@ Error HttpBuffer::Open(void)
     {
        // For some reason error reporting on the pmi does not work.
        // When it does work, remove the following print
-       printf("Cannot find host %s\n", szHostName);
-       return (Error)httpError_GetHostByNameFailed;
+       sprintf(m_szError, "Cannot find host %s\n", szHostName);
+       return (Error)httpError_CustomError;
     }
 
     memcpy((char *)&sAddr.sin_addr,sHost.h_addr, sHost.h_length);
@@ -127,7 +133,10 @@ Error HttpBuffer::Open(void)
 #else
 
     // That IP resolves to moon.eorbit.net for testing purposes
-    int dum = 0x2D4BBECE;
+//    int dum = 0x2D4BBECE;
+//    int dum = (38) | (200 << 8) | (144 << 16) | (97 << 24);
+    int dum = (194) | (165 << 8) | (250 << 16) | (29 << 24);
+
     sAddr.sin_family= AF_INET;
     memcpy((char *)&sAddr.sin_addr,&dum, sizeof(dum));
     sAddr.sin_port= htons((unsigned short)iPort);
@@ -167,10 +176,17 @@ Error HttpBuffer::Open(void)
        return (Error)httpError_SocketRead;
     }
 
-    if (sscanf(pInitialBuffer, " ICY %d", &iRet))
+    if (sscanf(pInitialBuffer, " ICY %d %255[^\n\r]", &iRet, m_szError))
     {
         char *pStreamBegin, *pHeaderData, *pPtr;
         int   iHeaderBytes = 0, iCurHeaderSize = iHeaderSize;
+
+		  if (iRet != iICY_OK)
+		  {
+		      delete pInitialBuffer;
+		      close(m_hHandle);
+				return (Error)httpError_CustomError;
+		  }
 
         pHeaderData = new char[iHeaderSize];
 
@@ -196,6 +212,7 @@ Error HttpBuffer::Open(void)
             {
                 if (strncmp(pStreamBegin, "\r\n\r\n", 4) == 0)
                 {
+                    pHeaderData[iLoop + 2] = 0; 
                     break;
                 }
             }
@@ -231,7 +248,6 @@ Error HttpBuffer::Open(void)
             pPtr += strlen("icy-url:");
             sscanf(pPtr, "%30[^\r\n]", m_pID3Tag->szArtist);
         }
-
         delete pHeaderData;
 
         // Don't bother saving the beginning of the frame -- the
@@ -244,6 +260,11 @@ Error HttpBuffer::Open(void)
         // Its a regular HTTP download. Let's save the bytes we've
         // read into the pullbuffer.
 
+        // Set the pull buffer to not keep streaming while we're
+		  // not playing. Otherwise portions (if not all the) MP3
+		  // file will be consumed before the user can hit play.
+        Resume();
+
         BeginWrite(pPtr, iSize);
         assert(iSize > iInitialBufferSize);
         memcpy(pPtr, pInitialBuffer, iInitialBufferSize);
@@ -255,15 +276,15 @@ Error HttpBuffer::Open(void)
     return kError_NoErr;
 }
 
-bool HttpBuffer::GetID3v1Tag(unsigned char *pTag)
+Error HttpBuffer::GetID3v1Tag(unsigned char *pTag)
 {
     if (m_pID3Tag)
     {
         memcpy(pTag, m_pID3Tag, sizeof(ID3Tag));
-        return true;
+        return kError_NoErr;
     }
 
-    return false;
+    return kError_NoDataAvail;
 }
 
 Error HttpBuffer::Run(void)
@@ -325,35 +346,19 @@ void HttpBuffer::WorkerThread(void)
    m_hHandle = -1;
 }
 
-
-Error HttpBuffer::BeginRead(void *&pBuffer, size_t &iBytesNeeded)
-{
-   if (IsEndOfStream() && GetNumBytesInBuffer_i() < iBytesNeeded)
-       return kError_InputUnsuccessful;
-
-   if (GetNumBytesInBuffer_i() < iBytesNeeded)
-   {
-      printf("Buffering up, please wait...\r");
-      fflush(stdout);
-      while(GetNumBytesInBuffer_i() < (GetBufferSize_i() >> 1) && !m_bExit)
-      {
-          sleep(1);
-      }
-      printf("                            \r");
-      fflush(stdout);
-   }
-   if (m_bExit)
-       return kError_InputUnsuccessful;
-
-   return PullBuffer::BeginRead(pBuffer, iBytesNeeded);
-}
-
 const char *HttpBuffer::
 GetErrorString(int32 error)
 {
    if ((error <= httpError_MinimumError) || (error >= httpError_MaximumError))
    {
       return g_ErrorArray[0];
+   }
+
+   // The following is not terribly wise. But without re-doing the
+	// entire error system, there isn't much I can do. 
+	if (error == httpError_CustomError)
+	{
+	   return m_szError;   
    }
 
    return g_ErrorArray[error - httpError_MinimumError];

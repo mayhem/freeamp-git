@@ -72,6 +72,7 @@ class Registry {
 
     virtual void Add(RegistryItem*);
     virtual RegistryItem* GetItem(int32 index);
+	 virtual int32 GetNumItems();
 };
 
 

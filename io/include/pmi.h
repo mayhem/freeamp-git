@@ -60,8 +60,22 @@ public:
 	               {return kError_GotDefaultMethod;}
     virtual Error GetLength(size_t &iSize)
 	               {return kError_GotDefaultMethod;}
-	 virtual Error  GetID3v1Tag(unsigned char *pTag)
+	 virtual Error GetID3v1Tag(unsigned char *pTag)
 	               {return kError_GotDefaultMethod;}
+    
+	 virtual bool  CanHandle(char *szUrl)
+	               {return false;}
+
+	 virtual bool  IsStreaming(void)
+	               {return false;}
+    virtual int32 GetBufferPercentage()
+	               {return 0;};
+	 virtual void  Pause()
+	               { };
+	 virtual void  Resume()
+	               { };
+	 virtual bool  CachePMI()
+	               { return false; };
 
 	 virtual Error SetPropManager(Properties *) = 0;
 		 

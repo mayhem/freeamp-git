@@ -107,6 +107,11 @@ HttpInput::
    }
 }
 
+bool HttpInput::
+CanHandle(char *szUrl)
+{
+   return strncmp(szUrl, "http://", 7) == 0;
+}
 
 Error     HttpInput::
 SetTo(char *url)
@@ -170,11 +175,7 @@ GetLength(size_t &iSize)
 Error HttpInput::
 GetID3v1Tag(unsigned char *pTag)
 {
-    if (m_pPullBuffer->GetID3v1Tag(pTag)) {
-	return kError_NoErr;
-    } else {
-	return kError_UnknownErr;
-    }
+    return m_pPullBuffer->GetID3v1Tag(pTag);
 }
 
 Error HttpInput::
@@ -189,19 +190,28 @@ EndRead(size_t bytesused)
    return m_pPullBuffer->EndRead(bytesused);
 }
 
+int32 HttpInput::
+GetBufferPercentage()
+{
+   return m_pPullBuffer->GetBufferPercentage();
+}
+
+void HttpInput::
+Pause()
+{
+   return m_pPullBuffer->Pause();
+}
+
+void HttpInput::
+Resume()
+{
+   return m_pPullBuffer->Resume();
+}
+
 Error     HttpInput::
 Seek(int32 & rtn, int32 offset, int32 origin)
 {
-    rtn = 0;
-
-    // RAK: HACK HACK HACK HACK HACK HACK HACK!!!!!!
-    if (offset == 0)
-    {
-        rtn = 0;
-        return kError_NoErr;
-    }
-
-    return kError_FileSeekNotSupported;
+   return kError_FileSeekNotSupported;
 }
 
 Error     HttpInput::

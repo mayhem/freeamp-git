@@ -99,6 +99,10 @@ class EventQueue {
 #define CMD_VolumeUp           39
 #define CMD_VolumeDown         40
 
+#define INFO_BufferingBegin       41 // Network rebuffering just started
+#define INFO_BufferingEnd         42 // Network rebuffering just stopped
+#define INFO_BufferStatus         43 // Buffer percent full information
+
 #endif // _EVENT_H_
 
 

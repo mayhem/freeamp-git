@@ -37,6 +37,8 @@ class PlayListItem {
     RegistryItem *m_pmiRegItem;
     RegistryItem *m_lmcRegItem;
     MediaInfoEvent *m_mie;
+	 PhysicalMediaInput *m_pmi;
+
  public:
     char* m_url;
     int32 m_type;
@@ -45,6 +47,7 @@ class PlayListItem {
     PlayListItem() {
 	m_mie = NULL;
 	m_url = NULL;
+	m_pmi = NULL;
 	m_pmiRegItem = NULL;
 	m_lmcRegItem = NULL;
     }
@@ -52,6 +55,10 @@ class PlayListItem {
 	if (m_mie) {
 	    delete m_mie;
 	    m_mie = NULL;
+	}
+	if (m_pmi) {
+	    delete m_pmi;
+	    m_pmi = NULL;
 	}
 	m_pmiRegItem = NULL;
 	m_lmcRegItem = NULL;
@@ -67,6 +74,8 @@ class PlayListItem {
     void SetLMCRegistryItem(RegistryItem *ri) { m_lmcRegItem = ri; }
     MediaInfoEvent *GetMediaInfo() { return m_mie; }
     void SetMediaInfo(MediaInfoEvent *mie) { m_mie = mie; }
+    PhysicalMediaInput *GetPMI() { return m_pmi; }
+    void SetPMI(PhysicalMediaInput *pmi) { m_pmi = pmi; }
 };
 
 class OrderListItem {
@@ -95,6 +104,7 @@ class PLMSetMediaInfoEvent : public Event {
     RegistryItem *m_lmcRegItem;
     MediaInfoEvent *m_mie;
     PlayListItem *m_pli;
+	 PhysicalMediaInput *m_pmi;
  public:
     PLMSetMediaInfoEvent() {
 	m_type = CMD_PLMSetMediaInfo;
@@ -103,6 +113,7 @@ class PLMSetMediaInfoEvent : public Event {
 	m_lmcRegItem = NULL;
 	m_mie = NULL;
 	m_pli = NULL;
+	m_pmi = NULL;
     }
     virtual ~PLMSetMediaInfoEvent() {}
     void SetPlayListItem(PlayListItem *pli) { m_pli = pli; }
@@ -115,6 +126,8 @@ class PLMSetMediaInfoEvent : public Event {
     RegistryItem *GetLMCRegistryItem() { return m_lmcRegItem; }
     void SetMediaInfo(MediaInfoEvent *mie) { m_mie = mie; }
     MediaInfoEvent *GetMediaInfo() { return m_mie; }
+    PhysicalMediaInput *GetPMI() { return m_pmi; }
+    void SetPMI(PhysicalMediaInput *pmi) { m_pmi = pmi; }
 };
 
 enum ShuffleMode {
