@@ -141,7 +141,7 @@ Create( uint32 width,
 
 bool 
 DIB::
-Load(HANDLE module, LPCTSTR resource)
+Load(HANDLE module, LPCTSTR resource) 
 {
     bool result = false;
     HRSRC rsrcHandle = NULL;

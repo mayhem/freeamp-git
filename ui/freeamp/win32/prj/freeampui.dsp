@@ -245,6 +245,10 @@ SOURCE=..\..\..\..\base\win32\src\win32thread.cpp
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=..\res\all_icon.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=..\res\all_icon.bmp.bmp
 # End Source File
 # Begin Source File
@@ -265,6 +269,14 @@ SOURCE=..\res\big_font256.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=..\res\body.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\body256.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=..\res\close_buttons.bmp
 # End Source File
 # Begin Source File
@@ -277,11 +289,23 @@ SOURCE=..\res\colors.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=..\res\control_mask_mid.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=..\res\dials.bmp
 # End Source File
 # Begin Source File
 
 SOURCE=..\res\dials256.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\drawer.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\drawer_mask.bmp
 # End Source File
 # Begin Source File
 
@@ -353,6 +377,14 @@ SOURCE=..\res\open_buttons256.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=..\res\panel_backing.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\panel_backing_mask.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=..\res\pause_buttons.bmp
 # End Source File
 # Begin Source File
@@ -377,6 +409,14 @@ SOURCE=..\res\player_mask.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=..\res\playlist_back.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\playlist_control_mask.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=..\res\repeat_buttons.bmp
 # End Source File
 # Begin Source File
@@ -398,6 +438,10 @@ SOURCE=..\res\rightside.bmp
 # Begin Source File
 
 SOURCE=..\res\rightside256.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\scrollbar.bmp
 # End Source File
 # Begin Source File
 
@@ -431,10 +475,18 @@ SOURCE=..\res\stop_buttons.bmp
 
 SOURCE=..\res\stop_buttons256.bmp
 # End Source File
-# End Group
 # Begin Source File
 
-SOURCE=..\res\control_mask_mid.bmp
+SOURCE=..\res\time_background.bmp
 # End Source File
+# Begin Source File
+
+SOURCE=..\res\title_background.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\window_mask_mid.bmp
+# End Source File
+# End Group
 # End Target
 # End Project

@@ -106,6 +106,8 @@ class FreeAmpUI : public UserInterface {
 
     void CreateControls();
 
+    void UpdatePlayList();
+
  public:
     Semaphore*          m_uiSemaphore;
 
