@@ -23,10 +23,7 @@ ____________________________________________________________________________*/
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-
-#ifdef WIN32
 #include <errno.h>
-#endif
 
 #include "filebuffer.h"
 #include "log.h"
