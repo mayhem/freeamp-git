@@ -121,6 +121,7 @@ bool Vorbis::ReadMetaData(const char *url, MetaData * metadata)
             metadata->SetTrack(atoi(temp));
     }
     ov_clear(&vf);   
+    fclose(fpFile);
 
     return true;
 }
