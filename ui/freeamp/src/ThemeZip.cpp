@@ -523,6 +523,38 @@ Error ThemeZip::GetDescriptiveName(const string &oSrcFile, string &oDescriptiveN
             break; //we're done
         }
 
+        if (strcasecmp(TarRecord.header.name, "title.txt") == 0)
+        {
+            char *pText;
+            
+            iSize = from_oct(11,TarRecord.header.size);
+            if(iSize)
+            {
+                char *pPtr;
+                
+                iPadding = (iSize/512+1)*512-iSize;
+                pText = new char[iSize + iPadding + 1];
+                if (gzread(pIn, pText, iSize+iPadding) != iSize+iPadding)
+                {
+                    gzclose(pIn);
+                    return kError_ReadFile;
+                }
+                
+                pPtr = strchr(pText, '\n');
+                if (pPtr)
+                   *pPtr = 0;
+                pPtr = strchr(pText, '\r');
+                if (pPtr)
+                   *pPtr = 0;
+                   
+                oDescriptiveName = pText;
+                delete pText;
+                break;
+            }
+            
+            continue;
+        }
+
         // skip actual content
         iSize = from_oct(11,TarRecord.header.size);
         if(iSize)
