@@ -356,6 +356,10 @@ Usage(const char *progname)
 
 #ifdef __linux__
 #define ARCH_NAME "linux"
+#elif defined(sparc)
+#define ARCH_NAME "solaris"
+#elif defined(beos)
+#define ARCH_NAME "beos"
 #else
 #define ARCH_NAME "unknown"
 #endif
