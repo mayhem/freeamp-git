@@ -47,6 +47,7 @@ FREEAMPunixOBJ  = base/unix/src/bootstrap.o base/unix/src/unixprefs.o
 FREEAMPunixOBJ += base/unix/src/win32impl.o base/unix/src/pthreadthread.o
 FREEAMPunixOBJ += base/unix/src/debug.o base/unix/src/mutex.o 
 FREEAMPunixOBJ += base/unix/src/semaphore.o base/unix/src/utility.o
+FREEAMPunixOBJ += base/unix/src/browser.o
 
 FREEAMPsolarisOBJ = $(FREEAMPunixOBJ)
 FREEAMPlinuxOBJ   = $(FREEAMPunixOBJ)

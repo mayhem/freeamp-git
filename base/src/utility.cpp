@@ -48,6 +48,7 @@ using namespace std;
 #define MKDIR(z) mkdir(z)
 #else
 #include "win32impl.h"
+#include "browser.h"
 #include <unistd.h>
 #define MKDIR(z) mkdir(z, 0755)
 #define _stat stat
@@ -520,58 +521,11 @@ void LaunchBrowser(const char* url)
 #else
 void LaunchBrowser(const char* url)
 {
-    char         url2[_MAX_PATH];
-    char         lockfile[255];
-    int          lockfile_fd;
-    struct stat  sb;
-    char        *home, *browser;
-
-    browser = new char[10];
-    strcpy(browser, "netscape");
-
-    sprintf(url2, "openURL(%s)", url);
-
-    if (!strcmp(browser, "netscape"))
+    if (fork() > 0) 
     {
-        home = getenv("HOME");
-        if (!home) {
-            home = new char[5];
-            strcpy(home, "/");
-        }
-
-        sprintf(lockfile,"%.200s/.netscape/lock",home);
-        if (fork() > 0) {
-            delete [] browser;
-            delete [] home;
-            return;
-        }
-
-        if ((lockfile_fd = lstat(lockfile, &sb))!=-1)
-        {
-            execlp("netscape", "netscape", "-remote", url2, NULL);
-        } 
-        else
-        {
-            execlp("netscape", "netscape", url, NULL);
-        }
-        perror("Could not launch netscape");
-    _exit(0);
+       return;
     }
-    else
-    {
-        if (fork() > 0) {
-            delete [] browser;
-        return;
-        }
-        
-        char *command = new char[strlen(browser) + strlen(url) + 10];
-        sprintf(command, "%s \"%s\"", browser, url);
-
-        system(command);
-
-        delete [] command;
-    _exit(0);
-    }
+    launch_browser(url, eBrowserNetscape);
 }
 #endif
 
