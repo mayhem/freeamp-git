@@ -36,6 +36,7 @@ using namespace std;
 #include "pmo.h"
 #include "pmoevent.h"
 #include "eventbuffer.h"
+#include "win32volume.h"
 
 #include "mutex.h"
 
@@ -88,6 +89,9 @@ class CDPMO:public PhysicalMediaOutput
    uint32           cddbid;
    string           cdindexid;
    struct disc_info dinfo;
+
+   Win32Volume *m_volume;
+   HWND m_hWnd;
 };
 
 #endif /* _SOUNDCARDPMO_H_ */

@@ -62,15 +62,15 @@ CDPMO::CDPMO(FAContext *context) :
    trackDone = false;
    Int32PropValue *pProp;
 
-    hWnd = 0;
+    m_hWnd = 0;
 
     if (IsError(m_pContext->props->GetProperty("MainWindow", 
               (PropValue **)&pProp)))
         return;        
     else
-        hWnd = (HWND)pProp->GetInt32();
+        m_hWnd = (HWND)pProp->GetInt32();
 
-   m_volume = Win32Volume::GetInstance( Win32Volume::eCDOut, hWnd );
+   m_volume = Win32Volume::GetInstance( Win32Volume::eCDOut, m_hWnd );
 }
 
 CDPMO::~CDPMO()
