@@ -169,13 +169,20 @@ cd_poll(string cd_desc, struct disc_status *status)
    mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
 
    char *colon = strchr(mciReturn, ':');
-   colon++;
 
-   status->status_track_time.minutes = atoi(colon);
-   status->status_track_time.seconds = atoi(colon + 3);
-   status->status_track_time.frames = atoi(colon + 6);
-   status->status_current_track = atoi(mciReturn);
-
+   if (colon && colon++) {
+      status->status_track_time.minutes = atoi(colon);
+      status->status_track_time.seconds = atoi(colon + 3);
+      status->status_track_time.frames = atoi(colon + 6);
+      status->status_current_track = atoi(mciReturn);
+   }
+   else {
+      status->status_track_time.minutes = 0;
+	  status->status_track_time.seconds = 0;
+	  status->status_track_time.frames = 0;
+	  status->status_current_track = 0;
+   }
+  
    sprintf(mciCommand, "set %s time format msf wait", cd_desc.c_str());
    mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
 
