@@ -21,7 +21,9 @@
 #define IDD_MUSICSEARCH                 120
 #define IDR_MENU2                       120
 #define IDD_SAVEPLAYLIST                121
+#define IDI_WARN                        207
 #define IDD_OPENURL                     219
+#define IDD_DELETETRACKS                220
 #define IDB_PLAYING                     542
 #define IDB_CATALOG                     543
 #define IDB_ARTIST                      544
@@ -114,7 +116,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        122
 #define _APS_NEXT_COMMAND_VALUE         40064
-#define _APS_NEXT_CONTROL_VALUE         1022
+#define _APS_NEXT_CONTROL_VALUE         1023
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
