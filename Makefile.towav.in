@@ -58,4 +58,4 @@ towav: $(TOWAVOBJS)
 	gcc -o towav $(TOWAVOBJS) -lm
 
 sigapp: $(SIGAPPOBJS)
-	g++ -o sigapp $(SIGAPPOBJS) $(ID3_LIBS) -lmusicbrainz -lm
+	g++ -o sigapp $(SIGAPPOBJS) $(ID3_LIBS) -lmusicbrainz -lm -ldl

@@ -160,8 +160,7 @@ void submit_metadata(MetaData *pmetaData)
    }
 
    o = mb_New();
-   //mb_SetServer(o, MUSICBRAINZ_SERVER, MUSICBRAINZ_PORT);
-   mb_SetServer(o, "musicbrainz.eorbit.net", MUSICBRAINZ_PORT);
+   mb_SetServer(o, MUSICBRAINZ_SERVER, MUSICBRAINZ_PORT);
 
    args[0] = strdup(pmetaData->Title().c_str());
    args[1] = strdup(pmetaData->GUID().c_str());
@@ -177,7 +176,7 @@ void submit_metadata(MetaData *pmetaData)
    args[8] = strdup(pmetaData->Comment().c_str());
    args[9] = NULL;
 
-   ret = mb_QueryWithArgs(o, MB_SubmitTrack, args);
+   ret = mb_QueryWithArgs(o, MBQ_SubmitTrack, args);
    for(i = 0; i < 9; i++)
       free(args[i]);
 
@@ -203,21 +202,18 @@ void lookup_metadata(MetaData *pmetaData)
    musicbrainz_t o;
    int    ret;
    char   *args[11];
-   char    temp[255];
-   int     i;
    string  proxyServer;
 
    if (pmetaData == NULL)
        return;
 
    o = mb_New();
-   //mb_SetServer(o, MUSICBRAINZ_SERVER, MUSICBRAINZ_PORT);
-   mb_SetServer(o, "musicbrainz.eorbit.net", MUSICBRAINZ_PORT);
-
+   mb_SetServer(o, MUSICBRAINZ_SERVER, MUSICBRAINZ_PORT);
+   mb_SetDepth(o, 0);
    args[0] = strdup(pmetaData->GUID().c_str());
    args[1] = NULL;
 
-   ret = mb_QueryWithArgs(o, MB_GetTrackByGUID, args);
+   ret = mb_QueryWithArgs(o, MBQ_GetTrackByTRMId, args);
    free(args[0]);
 
    if (!ret)
@@ -256,7 +252,7 @@ int main(int argc, char *argv[])
    {
        printf("Usage: sigapp [-q] [-n] <mp3 file>\n");
        printf("  -q => quiet mode\n");
-       printf("  -n => don't submit data to musicbrainz\n");
+       printf("  -l => don't lookup data at musicbrainz\n");
        exit(0);
    }
 
@@ -266,7 +262,7 @@ int main(int argc, char *argv[])
        index++;
    }
 
-   if (strcmp(argv[index], "-n") == 0)
+   if (strcmp(argv[index], "-l") == 0)
    {
        nosubmit = 1;
        index++;
@@ -278,6 +274,7 @@ int main(int argc, char *argv[])
        m.SetSize(s.st_size);
        if (!quiet)
        {
+          printf("Local metadata:\n");
           printf("    Title: %s\n", m.Title().c_str());
           printf("    Album: %s\n", m.Album().c_str());
           printf("   Artist: %s\n", m.Artist().c_str());
@@ -299,10 +296,7 @@ int main(int argc, char *argv[])
        printf("%s\n", sig);
        if (!nosubmit)
        {
-           if (hasmeta)
-              submit_metadata(&m);
-           else
-              lookup_metadata(&m);
+           lookup_metadata(&m);
        }
 #ifdef SIG_DEBUG
        FILE *logfile = fopen("guid_mapping.txt", "a+");
