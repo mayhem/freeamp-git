@@ -148,13 +148,19 @@ keyboardServiceFunction(void *pclcio)
 
    // char *pkey = new char[1];
    char      chr;
+   int       ret;
 
    // size_t rtn;
    // int fn = STDIN_FILENO;
    for (;;)
    {
       ::getKey();
-      read(stdinfd, &chr, 1);
+      ret = read(stdinfd, &chr, 1);
+      if (ret <= 0)
+      {
+         break;
+      }
+
       switch (chr)
       {
       case 'p':

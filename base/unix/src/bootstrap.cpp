@@ -169,7 +169,7 @@ int main(int argc, char **argv)
         {
             // Set the current pid into the semaphore
             unsem.val = getpid();
-            int ret = semctl(iCmdSem, 0, SETVAL, unsem);
+            semctl(iCmdSem, 0, SETVAL, unsem);
 
             // Create the shared memory segment
             iCmdMem = shmget(tMemKey, iSharedMemSize, IPC_CREAT | 0660);
