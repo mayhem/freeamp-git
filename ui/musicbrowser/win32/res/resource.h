@@ -105,11 +105,13 @@
 #define IDC_BUTTON1                     1043
 #define IDC_RELATABLE_WEB               1043
 #define IDC_BUTTON_MB                   1043
+#define IDC_VISIT_BITZI                 1043
 #define IDC_RADIO3                      1044
 #define IDC_EDIT2                       1045
 #define IDC_MISSINGTRACK                1045
 #define IDC_BUTTON2                     1046
 #define IDC_BITZILOOKUP                 1046
+#define IDC_VISIT_MB                    1046
 #define IDC_PLAYCOUNT                   1047
 #define IDC_RELATABLE_CAPTION1          1049
 #define IDC_RELATABLE_TEXT1             1050
@@ -127,6 +129,9 @@
 #define IDC_COMMENT                     1477
 #define IDC_LOCATION                    1478
 #define IDC_DIRECTORY                   1531
+#define IDC_CONTRIBUTE_NO               1532
+#define IDC_CONTRIBUTE_YES              1533
+#define IDD_INTROWIZARD_MUSICBRAINZ     1534
 #define ID_FILE_NEWPLAYLIST             40001
 #define ID_FILE_OPENPLAYLIST            40002
 #define ID_FILE_SAVEPLAYLIST            40004
@@ -228,7 +233,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        142
 #define _APS_NEXT_COMMAND_VALUE         40101
-#define _APS_NEXT_CONTROL_VALUE         1054
+#define _APS_NEXT_CONTROL_VALUE         1055
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

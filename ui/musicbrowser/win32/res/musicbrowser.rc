@@ -225,6 +225,30 @@ BEGIN
                     BS_LEFT | BS_TOP | BS_FLAT | WS_TABSTOP,94,0,213,15
 END
 
+IDD_INTROWIZARD_MUSICBRAINZ DIALOG DISCARDABLE  0, 0, 316, 182
+STYLE WS_CHILD | WS_DISABLED | WS_CAPTION
+CAPTION "Relatable"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         130,IDC_STATIC,"Static",SS_BITMAP,2,2,81,161
+    CONTROL         "Contribute to MuiscBrainz/Bitzi",IDC_CONTRIBUTE_YES,
+                    "Button",BS_AUTORADIOBUTTON,99,158,173,8
+    CONTROL         "Cool! But I'll pass",IDC_CONTRIBUTE_NO,"Button",
+                    BS_AUTORADIOBUTTON,99,170,140,9
+    PUSHBUTTON      "Bitzi Web Site",IDC_VISIT_BITZI,213,139,87,14
+    PUSHBUTTON      "MusicBrainz Web Site",IDC_VISIT_MB,102,139,90,14
+    LTEXT           "When you contribute to MusicBrainz and Bitzi, all of your contributions will be made publicly available using the OpenContent and OpenBits licenses, respectively. No personal information will ever be sent to MusicBrainz or Bitzi.",
+                    IDC_STATIC,94,88,211,33
+    LTEXT           "When you signature your music collection using the Relatable features, FreeAmp can send the metadata from your music files (artist, title, filesize, etc.) to MusicBrainz and Bitzi. Contributing your metadata will increase the usefulness of these services.",
+                    IDC_STATIC,94,50,211,34
+    LTEXT           "Please visit the project websites for more details.",
+                    IDC_STATIC,94,124,211,8
+    LTEXT           "FreeAmp also supports contributing metadata from your MP3 and Vorbis files to the MusicBrainz and Bitzi community metadata projects.",
+                    IDC_STATIC,94,20,211,27
+    CTEXT           "MusicBrainz and Bitzi Community Metadata",IDC_STATIC,94,
+                    6,211,8
+END
+
 IDD_MISSINGTRACK DIALOG DISCARDABLE  0, 0, 257, 145
 STYLE DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
     WS_SYSMENU
@@ -339,6 +363,11 @@ BEGIN
     BEGIN
         RIGHTMARGIN, 313
         BOTTOMMARGIN, 181
+    END
+
+    IDD_INTROWIZARD_MUSICBRAINZ, DIALOG
+    BEGIN
+        RIGHTMARGIN, 314
     END
 
     IDD_MISSINGTRACK, DIALOG

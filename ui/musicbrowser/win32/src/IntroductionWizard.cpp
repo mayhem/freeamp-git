@@ -38,9 +38,11 @@ ____________________________________________________________________________*/
 
 // project includes
 #include "config.h"
+#include "preferences.h"
 #include "resource.h"
 #include "Win32MusicBrowser.h"
 
+static bool useRelatable = true;
 
 static BOOL CALLBACK IntroWizardHello(HWND hwnd, 
                                       UINT msg, 
@@ -627,6 +629,11 @@ static BOOL CALLBACK IntroWizardSearch( HWND hwnd,
 
                 case PSN_WIZBACK:
                 {
+                    if (!useRelatable)
+                    {
+                        SetWindowLong(hwnd, DWL_MSGRESULT, IDD_INTROWIZARD_RELATABLE);
+                        result = TRUE;
+                    }
                     break;
                 }
             }
@@ -781,7 +788,13 @@ static BOOL CALLBACK IntroWizardRelatable(HWND hwnd,
                 {
                     if (Button_GetCheck(hwndOptOut) == BST_CHECKED)
                     {
-                        PropSheet_RemovePage(GetParent(hwnd), 2, NULL);
+                        useRelatable = false;
+                        SetWindowLong(hwnd, DWL_MSGRESULT, IDD_INTROWIZARD_SEARCH);
+                        result = TRUE;
+                    }
+                    else
+                    {
+                        useRelatable = true;
                     }
                     break;
                 }
@@ -796,6 +809,91 @@ static BOOL CALLBACK IntroWizardRelatable(HWND hwnd,
     }
     return result;
 }
+
+
+static BOOL CALLBACK IntroWizardMusicBrainz(HWND hwnd,
+                                          UINT msg,
+                                          WPARAM wParam,
+                                          LPARAM lParam)
+{
+    BOOL result = FALSE;
+    static HWND hwndOptIn = NULL;
+    static HWND hwndOptOut = NULL;
+    static FAContext *context;
+
+    switch(msg)
+    {
+        case WM_INITDIALOG:
+        {
+            hwndOptIn = GetDlgItem(hwnd, IDC_CONTRIBUTE_YES);
+            hwndOptOut = GetDlgItem(hwnd, IDC_CONTRIBUTE_NO);
+
+            PROPSHEETPAGE *psp = (PROPSHEETPAGE*)lParam;
+            context = (FAContext *)psp->lParam;
+
+            Button_SetCheck(hwndOptIn, TRUE);
+            Button_SetCheck(hwndOptOut, FALSE);
+            break;
+        }
+        case WM_COMMAND:
+        {
+            switch(LOWORD(wParam))
+            {
+                case IDC_VISIT_BITZI:
+                {
+                  ShellExecute(hwnd, "open", "http://www.bitzi.com/welcome/freeamp", NULL,
+                               NULL, SW_SHOWNORMAL);
+                  break;
+                }
+                case IDC_VISIT_MB:
+                {
+                  ShellExecute(hwnd, "open", "http://www.musicbrainz.org", NULL,
+                               NULL, SW_SHOWNORMAL);
+                  break;
+                }
+            }
+            break;
+        }
+        case WM_NOTIFY:
+        {
+            switch(((NMHDR*)lParam)->code)
+            {
+                case PSN_KILLACTIVE:
+                {
+                    SetWindowLong(hwnd,        DWL_MSGRESULT, FALSE);
+                    result = TRUE;
+                    break;
+                }
+                case PSN_RESET:
+                {
+                    SetWindowLong(hwnd,        DWL_MSGRESULT, FALSE);
+                    break;
+                }
+
+                case PSN_SETACTIVE:
+                {
+                    PropSheet_SetWizButtons(GetParent(hwnd), PSWIZB_BACK | PSWIZB_NEXT);
+                    break;
+                }
+                case PSN_WIZNEXT:
+                {
+                    context->prefs->SetPrefBoolean(kEnableMusicBrainzBitziPref, 
+                                     Button_GetCheck(hwndOptIn) == BST_CHECKED);
+                    break;
+                }
+
+                case PSN_WIZBACK:
+                {
+                    break;
+                }
+            }
+            break;
+        }
+    }
+    return result;
+}
+
+
 
 static BOOL CALLBACK IntroWizardRelatableTwo(HWND hwnd,
                                              UINT msg,
@@ -995,7 +1093,7 @@ static BOOL CALLBACK IntroWizardRelatableTwo(HWND hwnd,
 bool MusicBrowserUI::IntroductionWizard(vector<string>* searchPaths,
                                         APSInterface *pInterface)
 {
-    PROPSHEETPAGE psp[4];
+    PROPSHEETPAGE psp[5];
     PROPSHEETHEADER psh;
 
     HINSTANCE hinst = (HINSTANCE)GetWindowLong(m_hWnd, GWL_HINSTANCE);
@@ -1030,11 +1128,20 @@ bool MusicBrowserUI::IntroductionWizard(vector<string>* searchPaths,
     psp[3].dwSize = sizeof(PROPSHEETPAGE);
     psp[3].dwFlags = 0;
     psp[3].hInstance = hinst;
-    psp[3].pszTemplate = MAKEINTRESOURCE(IDD_INTROWIZARD_SEARCH);
+    psp[3].pszTemplate = MAKEINTRESOURCE(IDD_INTROWIZARD_MUSICBRAINZ);
     psp[3].pszIcon = NULL;
-    psp[3].pfnDlgProc = IntroWizardSearch;
+    psp[3].pfnDlgProc = IntroWizardMusicBrainz;
     psp[3].pszTitle = NULL;
-    psp[3].lParam = (LPARAM)searchPaths;
+    psp[3].lParam = (LPARAM)m_context;
+
+    psp[4].dwSize = sizeof(PROPSHEETPAGE);
+    psp[4].dwFlags = 0;
+    psp[4].hInstance = hinst;
+    psp[4].pszTemplate = MAKEINTRESOURCE(IDD_INTROWIZARD_SEARCH);
+    psp[4].pszIcon = NULL;
+    psp[4].pfnDlgProc = IntroWizardSearch;
+    psp[4].pszTitle = NULL;
+    psp[4].lParam = (LPARAM)searchPaths;
 
     psh.dwSize = sizeof(PROPSHEETHEADER);
     psh.dwFlags = PSH_PROPSHEETPAGE | PSH_WIZARD | PSH_NOAPPLYNOW;

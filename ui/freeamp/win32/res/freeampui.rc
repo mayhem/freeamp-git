@@ -157,15 +157,18 @@ END
 IDD_PREF_CDAUDIO DIALOG DISCARDABLE  0, 0, 233, 174
 STYLE DS_MODALFRAME | DS_CONTROL | WS_CHILD | WS_VISIBLE | WS_CAPTION | 
     WS_SYSMENU
-CAPTION "CD Audio"
+CAPTION "MusicBrainz"
 FONT 8, "MS Sans Serif"
 BEGIN
     CONTROL         "Automatically update Audio CD item in MyMusic",
                     IDC_UPDATE_AUDIO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,
                     8,221,10
-    EDITTEXT        IDC_MB_URL,6,42,221,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_MB_URL,6,49,221,14,ES_AUTOHSCROLL
     LTEXT           "MusicBrainz server URL for Audio CD/Metadata lookups:",
-                    IDC_STATIC,7,29,217,8
+                    IDC_STATIC,7,36,217,8
+    CONTROL         "Contribute metadata to MusicBrainz and Bitzi",
+                    IDC_CONTRIBUTE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,
+                    20,218,10
 END
 
 IDD_PREF_THEME DIALOG DISCARDABLE  0, 0, 233, 174

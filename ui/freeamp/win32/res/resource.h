@@ -194,6 +194,7 @@
 #define IDC_ADD_COLUMN                  1076
 #define IDC_UPDATE_AUDIO                1078
 #define IDC_MB_URL                      1079
+#define IDC_CONTRIBUTE                  1080
 #define IDMC_MYMUSIC                    6900
 #define IDMC_PLAY                       6901
 #define IDMC_STOP                       6902
@@ -215,7 +216,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        202
 #define _APS_NEXT_COMMAND_VALUE         40017
-#define _APS_NEXT_CONTROL_VALUE         1080
+#define _APS_NEXT_CONTROL_VALUE         1081
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

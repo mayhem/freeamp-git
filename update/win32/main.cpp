@@ -32,7 +32,6 @@ ____________________________________________________________________________*/
 
 /* Project Includes */
 #include "win32prefs.h"
-#include "updatemanager.h"
 
 const char* kMessage = "An instance of "the_BRANDING" is currently running. "
                        "Please close the application before continuing the "

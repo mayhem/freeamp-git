@@ -486,6 +486,7 @@ void Win32PreferenceWindow::GetPrefsValues(PrefsStruct* values)
     m_prefs->GetPrefBoolean(kPlayImmediatelyPref, &values->playImmediately);
     m_prefs->GetPrefBoolean(kConvertUnderscoresToSpacesPref, &values->convertUnderscores);
     m_prefs->GetPrefBoolean(kCheckCDAutomaticallyPref, &values->updateCDAutomatically);
+    m_prefs->GetPrefBoolean(kEnableMusicBrainzBitziPref, &values->enableMB);
 
     free(buffer);
 }
@@ -559,6 +560,7 @@ void Win32PreferenceWindow::SavePrefsValues(PrefsStruct* values)
     m_prefs->SetPrefInt32(kWatchThisDirTimeoutPref, (values->watchForNewMusic ? kDefaultWatchThisDirTimeout : 0));
     m_prefs->SetPrefBoolean(kCheckCDAutomaticallyPref, values->updateCDAutomatically);
     m_prefs->SetPrefString(kMBServerPref, values->MBServerURL.c_str());
+    m_prefs->SetPrefBoolean(kEnableMusicBrainzBitziPref, values->enableMB);
 
     m_pContext->target->AcceptEvent(new Event(INFO_PrefsChanged));
     m_currentValues = m_proposedValues = *values;
@@ -5156,6 +5158,7 @@ bool Win32PreferenceWindow::PrefCDAudioProc(HWND hwnd,
         {
             SetWindowText(GetDlgItem(hwnd, IDC_MB_URL), m_originalValues.MBServerURL.c_str());
             Button_SetCheck(GetDlgItem(hwnd, IDC_UPDATE_AUDIO), m_originalValues.updateCDAutomatically);
+            Button_SetCheck(GetDlgItem(hwnd, IDC_CONTRIBUTE), m_originalValues.enableMB);
             break;
         }
 
@@ -5175,6 +5178,12 @@ bool Win32PreferenceWindow::PrefCDAudioProc(HWND hwnd,
                 {
 					m_proposedValues.updateCDAutomatically = 
                        Button_GetCheck(GetDlgItem(hwnd, IDC_UPDATE_AUDIO)) == BST_CHECKED;
+                    break;
+                }
+                case IDC_CONTRIBUTE:
+                {
+					m_proposedValues.enableMB = 
+                       Button_GetCheck(GetDlgItem(hwnd, IDC_CONTRIBUTE)) == BST_CHECKED;
                     break;
                 }
             }

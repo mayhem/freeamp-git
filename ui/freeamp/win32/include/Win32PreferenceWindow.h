@@ -96,6 +96,7 @@ typedef struct PrefsStruct
 
 	// page 8
 	bool updateCDAutomatically;
+	bool enableMB;
     string MBServerURL;
 
     // Browser page
@@ -149,7 +150,7 @@ typedef struct PrefsStruct
 
 			updateCDAutomatically == pref.updateCDAutomatically &&
             MBServerURL == pref.MBServerURL &&
-
+            enableMB == pref.enableMB &&
             true
         );
     }

@@ -310,10 +310,6 @@ SOURCE=..\src\win32thread.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\win32updatemanager.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\aps\wincomsocket.cpp
 # End Source File
 # Begin Source File
