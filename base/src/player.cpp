@@ -1397,11 +1397,17 @@ GenerateSigsWork(set<PlaylistItem *> *items)
 
         m_signatureSem->Wait();
 
+        string browserInfo = "Generating signature for " + url;
+        AcceptEvent(new BrowserMessageEvent(browserInfo.c_str()));
+
         m_sigspmo = pmo;
         pmo->Resume();
 
         while (m_sigspmo) 
             usleep(50);
+
+        browserInfo = " ";
+        AcceptEvent(new BrowserMessageEvent(browserInfo.c_str()));
 
         m_signatureSem->Signal();
     }

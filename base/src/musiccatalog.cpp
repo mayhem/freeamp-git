@@ -288,6 +288,70 @@ Error MusicCatalog::RemoveStream(const char *url)
     return kError_NoErr;
 }
 
+PlaylistItem *MusicCatalog::GetPlaylistItemFromURL(const char *url)
+{
+    assert(url);
+    PlaylistItem *retitem = NULL;
+
+    if (!m_database->Working())
+        return retitem;
+
+    MetaData *meta = ReadMetaDataFromDatabase(url);
+    if (!meta)
+        return retitem;
+
+    m_catMutex->Acquire();
+    if ((meta->Artist().size() == 0) || (meta->Artist() == " ")) {
+        vector<PlaylistItem *>::iterator i = m_unsorted->begin();
+        for (; i != m_unsorted->end(); i++)
+            if ((*i)->URL() == url)
+            {
+                retitem = *i;
+                break;
+            }
+    }
+    else 
+    {
+        vector<ArtistList *>::iterator    i;
+        vector<AlbumList *>              *alList;
+        vector<AlbumList *>::iterator     j;
+        vector<PlaylistItem *>           *trList;
+        vector<PlaylistItem *>::iterator  k;
+        bool                              found = false;
+
+        i = m_artistList->begin();
+        for (; i != m_artistList->end() && !found; i++)
+        {
+            if (CaseCompare(meta->Artist(),(*i)->name))
+            {
+                alList = (*i)->m_albumList;
+                j = alList->begin();
+                for (; j != alList->end() && !found; j++)
+                {
+                    if (CaseCompare(meta->Album(),(*j)->name))
+                    {
+                        trList = (*j)->m_trackList;
+                        k = trList->begin();
+                        for (; k != trList->end() && !found; k++)
+                            if (url == (*k)->URL())
+                            {
+                                retitem = *k;
+                                found = true;
+                                break;
+                            }
+
+                     } 
+                }
+            }
+        }
+    }
+ 
+    delete meta;
+
+    m_catMutex->Release();
+    return retitem;
+}
+
 Error MusicCatalog::RemoveSong(const char *url)
 {
     assert(url);
@@ -1234,11 +1298,17 @@ Error MusicCatalog::AcceptEvent(Event *e)
             m_context->aps->APSLookupSignature(sig, GUID);
 
             if (GUID != "") {
-                string url = string("file://") + asge->Url();
+                uint32 length = asge->Url().size() + 20;
+                char *curl = new char[length];
+                FilePathToURL(asge->Url().c_str(), curl, &length);
+
+                string url = curl;
+                delete [] curl;
+
                 MetaData *data = ReadMetaDataFromDatabase(url.c_str());
 
-                if (!data)
-                    break;
+                if (!data) 
+                    data = new MetaData;
 
                 if (data->GUID() != "") { 
                     if (strncmp(data->GUID().c_str(), GUID.c_str(), 16)) {
@@ -1260,6 +1330,14 @@ Error MusicCatalog::AcceptEvent(Event *e)
 
                 WriteMetaDataToDatabase(url.c_str(), (*data));
                 m_database->Sync();
+
+                PlaylistItem *plitem = GetPlaylistItemFromURL(url.c_str());
+                if (plitem) {
+                    plitem->SetMetaData(data);
+                    UpdateSong(plitem);
+                    m_plm->UpdateTrackMetaData(plitem, false);
+                }
+
                 delete data;
             }
             break; 

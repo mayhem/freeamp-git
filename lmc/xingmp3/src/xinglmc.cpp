@@ -104,7 +104,7 @@ const char *szCannotDecode = The_BRANDING" cannot play this file/stream. This fi
 XingLMC::XingLMC(FAContext *context) :
          LogicalMediaConverter(context)
 {
-   m_xingSem.Wait();
+   m_xingSem.Wait(3000);
 
    m_pContext = context;
 

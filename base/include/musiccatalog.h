@@ -101,6 +101,8 @@ class MusicCatalog : public EventQueue
     Error AddStream(const char *url);
     Error Add(const char *url);    
 
+    PlaylistItem *GetPlaylistItemFromURL(const char *url);
+
     Error UpdateSong(PlaylistItem *item);
 
     Error RePopulateFromDatabase();
