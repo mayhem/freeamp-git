@@ -104,6 +104,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
 void UpdateControls(HWND hwnd);
 void UpdateDisplay(HWND hwnd);
+bool NeedToScroll();
 
 
 #ifdef __cplusplus

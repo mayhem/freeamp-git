@@ -117,6 +117,27 @@ static HCURSOR dialCursor, arrowCursor, currentCursor;
 static HPALETTE palette = NULL;
 
 
+bool NeedToScroll()
+{
+    int32 length = 0;
+    int32 i;
+    RECT rect;
+    bool result = false;
+
+    GetRgnBox(g_displayRegion, &rect);
+
+    // first determine length
+    for(i = 0; g_displayInfo.path[i]; i++)
+    {
+        length += smallFontWidth[g_displayInfo.path[i] - 32];
+    }
+
+    // see if we need to scroll 
+    if(length > rect.right - rect.left)
+        result = true;
+
+    return result;
+}
 
 static void DrawPlayer(HDC hdc, ControlInfo* state)
 {
@@ -1421,7 +1442,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
 
             SetTimer(hwnd, 0x00, 100, NULL);
-            SetTimer(hwnd, 0x01, 200, NULL);
+            //SetTimer(hwnd, 0x01, 200, NULL);
 			break;
 		}
 
