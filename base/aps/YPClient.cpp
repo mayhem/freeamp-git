@@ -24,6 +24,7 @@ ____________________________________________________________________________*/
 #pragma warning(disable:4786)
 #endif
 
+#include "config.h"
 #include "YPClient.h"
 #include "comhttpsocket.h"
 

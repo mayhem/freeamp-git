@@ -35,6 +35,7 @@ ____________________________________________________________________________*/
 #ifndef AUTOMUTEX_H
 #define AUTOMUTEX_H
 
+#include "config.h"
 #include "mutex.h"
 
 /**Acquires its associated mutex on construction, and releases it on destruction. useful to automate mutex locking.
