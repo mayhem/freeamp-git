@@ -57,7 +57,6 @@ CLEAN :
 	-@erase "$(INTDIR)\pipeline.obj"
 	-@erase "$(INTDIR)\pmi.obj"
 	-@erase "$(INTDIR)\pullbuffer.obj"
-	-@erase "$(INTDIR)\streambuffer.obj"
 	-@erase "$(INTDIR)\tstream.obj"
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(OUTDIR)\httpinput.exp"
@@ -84,7 +83,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\pipeline.obj" \
 	"$(INTDIR)\pmi.obj" \
 	"$(INTDIR)\pullbuffer.obj" \
-	"$(INTDIR)\streambuffer.obj" \
 	"$(INTDIR)\tstream.obj" \
 	"$(INTDIR)\http.res" \
 	"..\..\..\..\base\win32\fabaselib.lib"
@@ -130,7 +128,6 @@ CLEAN :
 	-@erase "$(INTDIR)\pipeline.obj"
 	-@erase "$(INTDIR)\pmi.obj"
 	-@erase "$(INTDIR)\pullbuffer.obj"
-	-@erase "$(INTDIR)\streambuffer.obj"
 	-@erase "$(INTDIR)\tstream.obj"
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(INTDIR)\vc60.pdb"
@@ -160,7 +157,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\pipeline.obj" \
 	"$(INTDIR)\pmi.obj" \
 	"$(INTDIR)\pullbuffer.obj" \
-	"$(INTDIR)\streambuffer.obj" \
 	"$(INTDIR)\tstream.obj" \
 	"$(INTDIR)\http.res" \
 	"..\..\..\..\base\win32\fabaselib.lib"
@@ -206,7 +202,6 @@ CLEAN :
 	-@erase "$(INTDIR)\pipeline.obj"
 	-@erase "$(INTDIR)\pmi.obj"
 	-@erase "$(INTDIR)\pullbuffer.obj"
-	-@erase "$(INTDIR)\streambuffer.obj"
 	-@erase "$(INTDIR)\tstream.obj"
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(INTDIR)\vc60.pdb"
@@ -236,7 +231,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\pipeline.obj" \
 	"$(INTDIR)\pmi.obj" \
 	"$(INTDIR)\pullbuffer.obj" \
-	"$(INTDIR)\streambuffer.obj" \
 	"$(INTDIR)\tstream.obj" \
 	"$(INTDIR)\http.res" \
 	"..\..\..\..\base\win32\fabaselib.lib"
@@ -282,7 +276,6 @@ CLEAN :
 	-@erase "$(INTDIR)\pipeline.obj"
 	-@erase "$(INTDIR)\pmi.obj"
 	-@erase "$(INTDIR)\pullbuffer.obj"
-	-@erase "$(INTDIR)\streambuffer.obj"
 	-@erase "$(INTDIR)\tstream.obj"
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(OUTDIR)\httpinput.exp"
@@ -309,7 +302,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\pipeline.obj" \
 	"$(INTDIR)\pmi.obj" \
 	"$(INTDIR)\pullbuffer.obj" \
-	"$(INTDIR)\streambuffer.obj" \
 	"$(INTDIR)\tstream.obj" \
 	"$(INTDIR)\http.res" \
 	"..\..\..\..\base\win32\fabaselib.lib"
@@ -402,12 +394,6 @@ SOURCE=..\..\..\src\pullbuffer.cpp
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
-SOURCE=..\..\..\src\streambuffer.cpp
-
-"$(INTDIR)\streambuffer.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
 SOURCE=..\..\..\src\tstream.cpp
 
 "$(INTDIR)\tstream.obj" : $(SOURCE) "$(INTDIR)"
@@ -420,28 +406,28 @@ SOURCE=..\res\http.rc
 
 
 "$(INTDIR)\http.res" : $(SOURCE) "$(INTDIR)"
-	$(RSC) /l 0x409 /fo"$(INTDIR)\http.res" /i "\TEMP\freeamp_head\io\http\win32\res" /d "NDEBUG" $(SOURCE)
+	$(RSC) /l 0x409 /fo"$(INTDIR)\http.res" /i "\Local\src\freeamp\io\http\win32\res" /d "NDEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "httpinput - Win32 Debug"
 
 
 "$(INTDIR)\http.res" : $(SOURCE) "$(INTDIR)"
-	$(RSC) /l 0x409 /fo"$(INTDIR)\http.res" /i "\TEMP\freeamp_head\io\http\win32\res" /d "_DEBUG" $(SOURCE)
+	$(RSC) /l 0x409 /fo"$(INTDIR)\http.res" /i "\Local\src\freeamp\io\http\win32\res" /d "_DEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "httpinput - Win32 NASM Debug"
 
 
 "$(INTDIR)\http.res" : $(SOURCE) "$(INTDIR)"
-	$(RSC) /l 0x409 /fo"$(INTDIR)\http.res" /i "\TEMP\freeamp_head\io\http\win32\res" /d "_DEBUG" $(SOURCE)
+	$(RSC) /l 0x409 /fo"$(INTDIR)\http.res" /i "\Local\src\freeamp\io\http\win32\res" /d "_DEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "httpinput - Win32 NASM Release"
 
 
 "$(INTDIR)\http.res" : $(SOURCE) "$(INTDIR)"
-	$(RSC) /l 0x409 /fo"$(INTDIR)\http.res" /i "\TEMP\freeamp_head\io\http\win32\res" /d "NDEBUG" $(SOURCE)
+	$(RSC) /l 0x409 /fo"$(INTDIR)\http.res" /i "\Local\src\freeamp\io\http\win32\res" /d "NDEBUG" $(SOURCE)
 
 
 !ENDIF 
@@ -449,48 +435,48 @@ SOURCE=..\res\http.rc
 !IF  "$(CFG)" == "httpinput - Win32 Release"
 
 "fabaselib - Win32 Release" : 
-   cd "\TEMP\freeamp_head\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Release" 
    cd "..\..\..\io\http\win32\prj"
 
 "fabaselib - Win32 ReleaseCLEAN" : 
-   cd "\TEMP\freeamp_head\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Release" RECURSE=1 CLEAN 
    cd "..\..\..\io\http\win32\prj"
 
 !ELSEIF  "$(CFG)" == "httpinput - Win32 Debug"
 
 "fabaselib - Win32 Debug" : 
-   cd "\TEMP\freeamp_head\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Debug" 
    cd "..\..\..\io\http\win32\prj"
 
 "fabaselib - Win32 DebugCLEAN" : 
-   cd "\TEMP\freeamp_head\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Debug" RECURSE=1 CLEAN 
    cd "..\..\..\io\http\win32\prj"
 
 !ELSEIF  "$(CFG)" == "httpinput - Win32 NASM Debug"
 
 "fabaselib - Win32 NASM Debug" : 
-   cd "\TEMP\freeamp_head\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug" 
    cd "..\..\..\io\http\win32\prj"
 
 "fabaselib - Win32 NASM DebugCLEAN" : 
-   cd "\TEMP\freeamp_head\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug" RECURSE=1 CLEAN 
    cd "..\..\..\io\http\win32\prj"
 
 !ELSEIF  "$(CFG)" == "httpinput - Win32 NASM Release"
 
 "fabaselib - Win32 NASM Release" : 
-   cd "\TEMP\freeamp_head\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Release" 
    cd "..\..\..\io\http\win32\prj"
 
 "fabaselib - Win32 NASM ReleaseCLEAN" : 
-   cd "\TEMP\freeamp_head\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Release" RECURSE=1 CLEAN 
    cd "..\..\..\io\http\win32\prj"
 

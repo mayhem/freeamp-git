@@ -237,10 +237,6 @@ SOURCE=..\..\..\src\pullbuffer.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\src\streambuffer.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\..\src\tstream.cpp
 # End Source File
 # End Target
