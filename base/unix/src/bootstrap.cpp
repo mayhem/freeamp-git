@@ -115,7 +115,7 @@ int main(int argc, char **argv)
 #endif
 
     if (!allow_mult) {
-        iCmdSem = semget(tSemKey, 1, IPC_CREAT | 0666);
+        iCmdSem = semget(tSemKey, 1, IPC_CREAT | 0660);
         if (iCmdSem < 0)
         {
            printf("Cannot create/open a semaphore. Is SYS V IPC installed?\n");
@@ -129,7 +129,7 @@ int main(int argc, char **argv)
         {
             if (kill(iProcess, 0) >= 0)
             {
-                iCmdMem = shmget(tMemKey, iSharedMemSize, 0666);
+                iCmdMem = shmget(tMemKey, iSharedMemSize, 0660);
                 pCmdLine = (char *)shmat(iCmdMem, NULL, 0); 
                 for(i = 1, pPtr = pCmdLine; i < argc; i++)
                 {
@@ -166,7 +166,7 @@ int main(int argc, char **argv)
         semctl(iCmdSem, 0, SETVAL, unsem);
 
         // Create the shared memory segment
-        iCmdMem = shmget(tMemKey, iSharedMemSize, IPC_CREAT | 0666);
+        iCmdMem = shmget(tMemKey, iSharedMemSize, IPC_CREAT | 0660);
         if (iCmdMem != -1)
         {
             pCmdLine = (char *)shmat(iCmdMem, NULL, 0); 

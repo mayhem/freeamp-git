@@ -1730,6 +1730,7 @@ Error GTKMusicBrowser::AcceptEvent(Event *e)
             if (m_initialized && isVisible) {
                 gdk_threads_enter();
                 SetToolbarType();
+                UpdatePlaylistList();
                 gdk_threads_leave();
             }
             break; } 

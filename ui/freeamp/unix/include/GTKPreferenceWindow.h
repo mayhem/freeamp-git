@@ -261,6 +261,9 @@ class GTKPreferenceWindow : public PreferenceWindow
       vector<string> *m_PMOnames;
       set<uint32>     m_profileSelection;
 
+      GtkWidget *plAvailableList;
+      GtkWidget *plShownList;
+
   public:
       void SetPane(OptionsPane *pane);
       void SetPane(uint32 panenum);
@@ -318,7 +321,11 @@ class GTKPreferenceWindow : public PreferenceWindow
       void PollCDToggle(int active);
       void CDPathSet(char *newpath, bool set);
       void CDDBServerSet(char *newpath, bool set);
-      
+
+      void UpdatePLHeaders(void);     
+      void AddPLSelection(void);
+      void RemovePLSelection(void);
+
       FAContext *GetContext(void) { return m_pContext; }
 };
 

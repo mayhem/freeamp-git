@@ -432,6 +432,15 @@ void GTKPreferenceWindow::GetPrefsValues(Preferences* prefs,
     values->saveMusicDirectory = buffer;
     size = bufferSize;
 
+    if(kError_BufferTooSmall == prefs->GetPrefString(kPlaylistHeaderColumnsPref, buffer, &size))
+    {
+        bufferSize = size;
+        buffer = (char*)realloc(buffer, bufferSize);
+        prefs->GetPrefString(kPlaylistHeaderColumnsPref, buffer, &size);
+    }
+    values->playlistHeaders = buffer;
+    size = bufferSize;
+
     m_pThemeMan->GetCurrentTheme(values->currentTheme);
 
     prefs->GetPrefBoolean(kShowToolbarTextLabelsPref, &values->useTextLabels);
@@ -544,6 +553,8 @@ void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs,
     prefs->SetPrefBoolean(kUseProxyPref, values->useProxyServer);
     prefs->SetPrefString(kAlternateNICAddressPref, values->alternateIP.c_str());
     prefs->SetPrefBoolean(kUseAlternateNICPref, values->useAlternateIP);
+
+    prefs->SetPrefString(kPlaylistHeaderColumnsPref, values->playlistHeaders.c_str());
 
     prefs->SetPrefBoolean(kUseDebugLogPref, values->enableLogging);
     prefs->SetPrefBoolean(kLogMainPref, values->logMain);
@@ -1499,6 +1510,11 @@ static void freeamp_press(GtkWidget *w, GTKPreferenceWindow *p)
     LaunchBrowser("http://www.freeamp.org/");    
 }
 
+static void relatable_press(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    LaunchBrowser("http://www.relatable.com/");
+}
+
 static void emusic_press(GtkWidget *w, GTKPreferenceWindow *p)
 {
     LaunchBrowser("http://www.emusic.com/");
@@ -1555,6 +1571,12 @@ GtkWidget *GTKPreferenceWindow::CreateAbout(void)
     gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, FALSE, 5);
     gtk_signal_connect(GTK_OBJECT(button), "clicked", 
                        GTK_SIGNAL_FUNC(freeamp_press), this);
+    gtk_widget_show(button);
+
+    button = gtk_button_new_with_label(" Visit Relatable.com ");
+    gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, FALSE, 5);
+    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                       GTK_SIGNAL_FUNC(relatable_press), this);
     gtk_widget_show(button);
 
     button = gtk_button_new_with_label(" Visit EMusic.com ");
@@ -2374,11 +2396,174 @@ GtkWidget *GTKPreferenceWindow::CreateCD(void)
     return pane;
 }
 
+void GTKPreferenceWindow::UpdatePLHeaders(void)
+{
+    string newheader;
+    for (int row = 0; row < GTK_CLIST(plShownList)->rows; row++)
+    {
+        char *text[1];
+        gtk_clist_get_text(GTK_CLIST(plShownList), row, 0, text);
+        if (row != 0)
+            newheader += "|";
+        newheader += text[0];
+    }
+    proposedValues.playlistHeaders = newheader;
+}
+
+void GTKPreferenceWindow::AddPLSelection(void)
+{
+    if (!GTK_CLIST(plAvailableList)->selection)
+        return;
+
+    gint row = GPOINTER_TO_INT(GTK_CLIST(plAvailableList)->selection->data);
+
+    char *text[1];
+    gtk_clist_get_text(GTK_CLIST(plAvailableList), row, 0, text);
+    gtk_clist_append(GTK_CLIST(plShownList), text);
+
+    gtk_clist_remove(GTK_CLIST(plAvailableList), row);
+
+    UpdatePLHeaders();
+    gtk_widget_set_sensitive(applyButton, TRUE);
+}
+
+static void pl_add(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    p->AddPLSelection();
+}
+
+void GTKPreferenceWindow::RemovePLSelection(void)
+{
+    if (!GTK_CLIST(plShownList)->selection)
+        return;
+
+    gint row = GPOINTER_TO_INT(GTK_CLIST(plShownList)->selection->data);
+
+    char *text[1];
+    gtk_clist_get_text(GTK_CLIST(plShownList), row, 0, text);
+    gtk_clist_append(GTK_CLIST(plAvailableList), text);
+
+    gtk_clist_remove(GTK_CLIST(plShownList), row);
+    gtk_clist_sort(GTK_CLIST(plAvailableList));
+
+    UpdatePLHeaders();
+    gtk_widget_set_sensitive(applyButton, TRUE);
+}
+
+static void pl_remove(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    p->RemovePLSelection();
+}
+
+static void pl_row_move(GtkWidget *w, int source, int dest, 
+                        GTKPreferenceWindow *p)
+{
+    p->UpdatePLHeaders();
+}
+
 GtkWidget *GTKPreferenceWindow::CreatePlaylistHeaders(void)
 {
     GtkWidget *pane = gtk_vbox_new(FALSE, 5);
     gtk_container_set_border_width(GTK_CONTAINER(pane), 5);
     gtk_widget_show(pane);
+
+    GtkWidget *label = gtk_label_new("This will allow you to change what fields are shown in the Playlist editor");
+    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+    gtk_box_pack_start(GTK_BOX(pane), label, TRUE, TRUE, 0);
+    gtk_widget_show(label);
+ 
+    GtkWidget *hbox = gtk_hbox_new(FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(pane), hbox, TRUE, TRUE, 0);
+    gtk_widget_show(hbox);
+
+    GtkWidget *vbox = gtk_vbox_new(FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
+    gtk_widget_show(vbox);
+
+    label = gtk_label_new("Available:");
+    gtk_box_pack_start(GTK_BOX(vbox), label, TRUE, TRUE, 0);
+    gtk_widget_show(label);
+
+    GtkWidget *scrolledWindow = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledWindow),
+                                   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    gtk_box_pack_start(GTK_BOX(vbox), scrolledWindow, TRUE, FALSE, 0);
+    gtk_widget_set_usize(scrolledWindow, 50, 200);
+    gtk_widget_show(scrolledWindow);
+
+    plAvailableList = gtk_clist_new(1);
+    gtk_container_add(GTK_CONTAINER(scrolledWindow), plAvailableList);
+    gtk_widget_show(plAvailableList);
+
+    vbox = gtk_vbutton_box_new();
+    gtk_container_set_border_width(GTK_CONTAINER(vbox), 5);
+    gtk_box_pack_start(GTK_BOX(hbox), vbox, FALSE, FALSE, 0);
+    gtk_button_box_set_layout(GTK_BUTTON_BOX(vbox), GTK_BUTTONBOX_SPREAD);
+    gtk_button_box_set_spacing(GTK_BUTTON_BOX(vbox), 10);
+
+    gtk_widget_show(vbox);
+
+    GtkWidget *button =  gtk_button_new_with_label(" << ");
+    gtk_container_add(GTK_CONTAINER(vbox), button);
+    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                       GTK_SIGNAL_FUNC(pl_remove), this);
+    gtk_widget_show(button);
+
+    button =  gtk_button_new_with_label(" >> ");
+    gtk_container_add(GTK_CONTAINER(vbox), button);
+    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                       GTK_SIGNAL_FUNC(pl_add), this);
+    gtk_widget_show(button);
+
+    vbox = gtk_vbox_new(FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
+    gtk_widget_show(vbox);
+
+    label = gtk_label_new("Shown:");
+    gtk_box_pack_start(GTK_BOX(vbox), label, TRUE, TRUE, 0);
+    gtk_widget_show(label);
+
+    scrolledWindow = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledWindow),
+                                   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    gtk_box_pack_start(GTK_BOX(vbox), scrolledWindow, TRUE, FALSE, 0);
+    gtk_widget_set_usize(scrolledWindow, 50, 200);
+    gtk_widget_show(scrolledWindow);
+
+    plShownList = gtk_clist_new(1);
+    gtk_container_add(GTK_CONTAINER(scrolledWindow), plShownList);
+    gtk_clist_set_reorderable(GTK_CLIST(plShownList), TRUE);
+    gtk_signal_connect_after(GTK_OBJECT(plShownList), "row_move",
+                             GTK_SIGNAL_FUNC(pl_row_move), this);
+    gtk_widget_show(plShownList);
+
+    char *columns = new char[originalValues.playlistHeaders.size() + 1];
+    strcpy(columns, originalValues.playlistHeaders.c_str());
+
+    string used;
+    char *token = strtok(columns, "|");
+    char *text[1];
+    while (token != NULL)
+    {
+        text[0] = token;
+        gtk_clist_append(GTK_CLIST(plShownList), text);
+        used += token;
+        token = strtok(NULL, "|");
+    }
+
+    delete [] columns;
+ 
+    char *available[] = {"Artist", "Album", "Comment", "Genre", "Location",
+                         "Time", "Title", "Year"};
+    int nCols = sizeof(available) / sizeof(available[0]);
+    for (int i = 0; i < nCols; i++)
+    {
+        if (!strstr(used.c_str(), available[i]))
+        {
+            text[0] = available[i];
+            gtk_clist_append(GTK_CLIST(plAvailableList), text);
+        }
+    }
 
     return pane;
 }
