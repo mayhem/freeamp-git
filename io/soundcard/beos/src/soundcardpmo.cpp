@@ -72,7 +72,7 @@ SoundCardPMO::SoundCardPMO( FAContext* context )
 
 	m_eventBufferThread = Thread::CreateThread();
 	m_eventBufferThread->Create( _EventBufferThreadHook, this );
-    m_eventBufferThread->SetPriority( B_REAL_TIME_PRIORITY ); // FIXME: don't use beos native prio
+//    m_eventBufferThread->SetPriority( B_REAL_TIME_PRIORITY ); // FIXME: don't use beos native prio
 }
 
 SoundCardPMO::~SoundCardPMO()
@@ -84,7 +84,6 @@ SoundCardPMO::~SoundCardPMO()
 	m_bExit = true;
 	m_pSleepSem->Signal();
 	m_pPauseSem->Signal();
-//	m_pauseMutex.Release();
 	m_pauseLock.Unlock();
 
 	PRINT(( "SoundCardPMO::~SoundCardPMO\n" ));
@@ -141,7 +140,6 @@ SoundCardPMO::Pause( void )
 {
 	PRINT(( "SoundCardPMO::Pause\n" ));
 	PhysicalMediaOutput::Pause();
-//	m_pauseMutex.Acquire();
 	m_pauseLock.Lock();
 
 	if ( m_player )
@@ -161,7 +159,6 @@ SoundCardPMO::Resume( void )
 {
 	PRINT(( "SoundCardPMO::Resume\n" ));
 	PhysicalMediaOutput::Resume();
-//	m_pauseMutex.Release();
 	m_pauseLock.Unlock();
 
 	if ( m_player )
@@ -403,25 +400,27 @@ SoundCardPMO::EventBufferThread( void )
 		// events as requested by the Player method.
 		m_eventSem.Wait();
 		PRINT(( "SoundCardPMO::EventBufferThread:event is waiting to be dispatched\n" ));
-		Event*	event = eb->GetEvent();
-		if ( event != NULL )
+//		Event*	event = eb->GetEvent();
+		if ( m_event != NULL )
 		{
-			if ( event->Type() == PMO_Init )
+			if ( m_event->Type() == PMO_Init )
 			{
 				PRINT(( "SoundCardPMO::EventBufferThread:PMO_Init recv'd\n" ));
 			}
-			else if ( event->Type() == PMO_Reset )
+			else if ( m_event->Type() == PMO_Reset )
 			{
 				PRINT(( "SoundCardPMO::EventBufferThread:PMO_Reset recv'd\n" ));
 			}
-			else if ( event->Type() == PMO_Info )
+			else if ( m_event->Type() == PMO_Info )
 			{
 				PRINT(( "SoundCardPMO::EventBufferThread:PMO_Info recv'd\n" ));
+                HandleTimeInfoEvent( (PMOTimeInfoEvent*)m_event );
 			}
-			else if ( event->Type() == PMO_Quit )
+			else if ( m_event->Type() == PMO_Quit )
 			{
 				PRINT(( "SoundCardPMO::EventBufferThread:PMO_Quit recv'd\n" ));
-				delete event;
+				delete m_event;
+                m_event = NULL;
 				m_eventSem.Signal();
 				if ( WaitForDrain() )
 				{
@@ -429,9 +428,10 @@ SoundCardPMO::EventBufferThread( void )
 				}
 				return;
 			}
-			delete event;
+			delete m_event;
+            m_event = NULL;
 		}
-		m_eventSem.Signal();	// tell Player I'm done with the event.
+//		m_eventSem.Signal();	// tell Player I'm done with the event.
 	}
 	PRINT(( "SoundCardPMO::EventBufferThread:exiting\n" ));
 }
@@ -490,6 +490,7 @@ SoundCardPMO::_PlayerHook(
 	((SoundCardPMO*)cookie)->Player( buffer, size, format );
 }
 
+// this function is a mess. evil, i know.
 void
 SoundCardPMO::Player(
 				void*							bufferOut,
@@ -501,7 +502,6 @@ SoundCardPMO::Player(
 	size_t	bytesToCopy;
 	size_t	bytesCopied;
 	void*	bufferIn;
-//	bool	perfWarn = false;
 
 	if ( format.format != m_format.format )
 	{
@@ -516,7 +516,6 @@ SoundCardPMO::Player(
 		return;
 	}
 
-//	PRINT(( "SoundCardPMO::Player:trying to read %d bytes\n", bytesToCopy ));
 	EventBuffer*	eb = (EventBuffer*)m_pInputBuffer;
 	if ( !eb )
 	{
@@ -524,8 +523,6 @@ SoundCardPMO::Player(
 		return;
 	}
 
-//	err = eb->BeginRead( bufferIn, bytesToCopy );
-//	while ( err == kError_EventPending )
 	for ( int retry = 0; retry < 10; retry++ )
 	{
 		bytesToCopy = size;
@@ -537,6 +534,9 @@ SoundCardPMO::Player(
 
 		if ( err == kError_EventPending )
 		{
+            m_event = eb->GetEvent();
+            m_eventSem.Signal();
+#if 0
 			Event*	event = eb->PeekEvent();
 			switch ( event->Type() )
 			{
@@ -562,6 +562,7 @@ SoundCardPMO::Player(
 				m_eventSem.Wait();
 				break;
 			}
+#endif
 		}
 		else if ( err == kError_NoDataAvail )
 		{
@@ -569,8 +570,6 @@ SoundCardPMO::Player(
 			m_pLmc->Wake();
 			WasteTime();
 		}
-//		bytesToCopy = size;
-//		err = eb->BeginRead( bufferIn, bytesToCopy );
 	}
 
 	if ( IsError( err ) )
