@@ -209,6 +209,9 @@ private:
                                      // if the server is down ;)
     string m_profilePath;            // store the path to the profile
     bool m_bRelatableOn;             // is this thing on?
+
+    string m_strProxyAddr;           // store the proxy address
+    int    m_nProxyPort;             // store the proxy port
 };
 
 #endif
