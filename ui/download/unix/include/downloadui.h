@@ -94,6 +94,7 @@ class DownloadUI : public UserInterface {
     GtkWidget *m_PauseButton;
     GtkWidget *m_CancelButton;
     GtkWidget *m_ResumeButton;
+    GtkWidget *m_ResumeLabel;
     GtkWidget *m_CloseButton;
     GtkWidget *m_hwndProgress;
     GtkWidget *m_helpButton;

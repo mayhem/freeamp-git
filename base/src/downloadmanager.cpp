@@ -272,7 +272,7 @@ Error DownloadManager::QueueDownload(DownloadItem* item,
                                      bool          bDownloadNow)
 {
     Error result = kError_InvalidParam;
-    int   index;
+    unsigned int index;
 
     assert(item);
 
@@ -518,16 +518,15 @@ inline uint32 DownloadManager::CheckIndex(uint32 index)
 
 DownloadItem* DownloadManager::GetNextQueuedItem()
 {
-    DownloadItem* result = NULL;
     int           i, total = 0;
 
-	if (m_downloadIndex < 0 || m_downloadIndex >= m_itemList.size())
+    if (m_downloadIndex < 0 || m_downloadIndex >= (int)m_itemList.size())
         m_downloadIndex = 0;
 
-    for(i = m_downloadIndex, total = 0; i < m_itemList.size(); 
+    for(i = m_downloadIndex, total = 0; i < (int)m_itemList.size(); 
         i = (i + 1) % m_itemList.size(), total++)
     {
-        if (total >= m_itemList.size())
+        if (total >= (int)m_itemList.size())
             return NULL;
            
         if (m_itemList[i]->GetState() == kDownloadItemState_Queued)
@@ -1287,9 +1286,9 @@ void DownloadManager::SaveResumableDownloadItems()
                     ost << item->DestinationFile().size() << kDatabaseDelimiter;
                     ost << item->PlaylistName().size() << kDatabaseDelimiter;
 
-                    sprintf(num, "%ld", item->GetTotalBytes());
+                    sprintf(num, "%ld", (long int)item->GetTotalBytes());
                     ost << strlen(num) << kDatabaseDelimiter;
-                    sprintf(num, "%ld", item->GetBytesReceived());
+                    sprintf(num, "%ld", (long int)item->GetBytesReceived());
                     ost << strlen(num) << kDatabaseDelimiter;
 
                     // metadata lengths
@@ -1299,15 +1298,15 @@ void DownloadManager::SaveResumableDownloadItems()
                     ost << metadata.Comment().size() << kDatabaseDelimiter;
                     ost << metadata.Genre().size() << kDatabaseDelimiter;
 
-                    sprintf(num, "%ld", metadata.Year());
+                    sprintf(num, "%ld", (long int)metadata.Year());
                     ost << strlen(num) << kDatabaseDelimiter;
-                    sprintf(num, "%ld", metadata.Track());
+                    sprintf(num, "%ld", (long int)metadata.Track());
                     ost << strlen(num) << kDatabaseDelimiter;
-                    sprintf(num, "%ld", metadata.Time());
+                    sprintf(num, "%ld", (long int)metadata.Time());
                     ost << strlen(num) << kDatabaseDelimiter;
-                    sprintf(num, "%ld", metadata.Size());
+                    sprintf(num, "%ld", (long int)metadata.Size());
                     ost << strlen(num) << kDatabaseDelimiter;
-                    sprintf(num, "%ld", item->GetState());
+                    sprintf(num, "%ld", (long int)item->GetState());
                     ost << strlen(num) << kDatabaseDelimiter;
 
                     // now stuff all the data in there
@@ -1327,11 +1326,11 @@ void DownloadManager::SaveResumableDownloadItems()
                     ost << metadata.Time();
                     ost << metadata.Size();
                     
-                    sprintf(num, "%ld", item->GetState());
+                    sprintf(num, "%ld", (long int)item->GetState());
                     ost << num;
                     ost << '\0';     
                     
-                    sprintf(num, "%ld", index);
+                    sprintf(num, "%ld", (long int)index);
 #ifdef WIN32 
                     database.Insert(num, (char*)ost.str().c_str());  
 #else
@@ -1346,7 +1345,7 @@ void DownloadManager::SaveResumableDownloadItems()
 void DownloadManager::LoadResumableDownloadItems()
 {
     char   path[_MAX_PATH];
-    uint32 index = 0, length = sizeof(path);
+    uint32 length = sizeof(path);
 
     m_context->prefs->GetPrefString(kDatabaseDirPref, path, &length);
 
@@ -1361,7 +1360,7 @@ void DownloadManager::LoadResumableDownloadItems()
         {
             char *key = NULL;
             
-            while (key = database.NextKey(key))
+            while ((key = database.NextKey(key)))
             {
                 char* value = database.Value(key);
 
@@ -1371,17 +1370,19 @@ void DownloadManager::LoadResumableDownloadItems()
                 uint32 numFields = 0;
                 int offset = 0;
  
-                sscanf(value, "%lu%n", &numFields, &offset);
+                sscanf(value,"%lu%n", (long unsigned int *)&numFields, &offset);
                 uint32* fieldLength =  new uint32[numFields];
  
                 for(uint32 i = 0; i < numFields; i++)
                 {
                    int temp;
  
-                   sscanf(value + offset, " %lu %n", &fieldLength[i], &temp);
+                   sscanf(value + offset, " %lu %n", 
+		          (long unsigned int *)&fieldLength[i], &temp);
                    if (i == numFields - 1) {
                        char intholder[10];
-                       sprintf(intholder, "%lu", fieldLength[i]);
+                       sprintf(intholder, "%lu", 
+		               (long unsigned int)fieldLength[i]);
                        offset += strlen(intholder) + 1;
                    }
                    else
@@ -1466,7 +1467,7 @@ void DownloadManager::LoadResumableDownloadItems()
                 SendItemAddedMessage(item);
             }
             
-            while (key = database.NextKey(NULL))
+            while ((key = database.NextKey(NULL)))
             {
                 database.Remove(key);
                 delete key;

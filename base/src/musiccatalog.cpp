@@ -802,13 +802,13 @@ void MusicCatalog::WriteMetaDataToDatabase(const char *url,
     ost << metadata.Comment().size() << kDatabaseDelimiter;
     ost << metadata.Genre().size() << kDatabaseDelimiter;
 
-    sprintf(num, "%ld", metadata.Year());
+    sprintf(num, "%ld", (long int)metadata.Year());
     ost << strlen(num) << kDatabaseDelimiter;
-    sprintf(num, "%ld", metadata.Track());
+    sprintf(num, "%ld", (long int)metadata.Track());
     ost << strlen(num) << kDatabaseDelimiter;
-    sprintf(num, "%ld", metadata.Time());
+    sprintf(num, "%ld", (long int)metadata.Time());
     ost << strlen(num) << kDatabaseDelimiter;
-    sprintf(num, "%ld", metadata.Size());
+    sprintf(num, "%ld", (long int)metadata.Size());
     ost << strlen(num) << kDatabaseDelimiter;
 
     ost << metadata.Artist();
@@ -845,18 +845,19 @@ MetaData *MusicCatalog::ReadMetaDataFromDatabase(const char *url)
     uint32 numFields = 0;
     int offset = 0;
 
-    sscanf(value, "%lu%n", &numFields, &offset);
+    sscanf(value, "%lu%n", (long unsigned int *)&numFields, &offset);
     uint32* fieldLength =  new uint32[numFields];
 
     for(uint32 i = 0; i < numFields; i++)
     {
         int temp;
 
-        sscanf(value + offset, " %lu %n", &fieldLength[i], &temp);
+        sscanf(value + offset, " %lu %n", (long unsigned int *)&fieldLength[i],
+	                                  &temp);
 
         if (i == numFields - 1) {
             char intholder[10];
-            sprintf(intholder, "%lu", fieldLength[i]);
+            sprintf(intholder, "%lu", (long unsigned int)fieldLength[i]);
             offset += strlen(intholder) + 1;
         }
         else

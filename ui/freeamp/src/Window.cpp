@@ -165,7 +165,7 @@ Error Window::ControlEnable(const string &oTarget, bool bSet, bool &bEnable)
        return kError_InvalidParam;
        
     for(i = m_oControlMap.find(oTarget), j = 0; 
-        j != m_oControlMap.count(oTarget); j++, i++) 
+        j != (int)m_oControlMap.count(oTarget); j++, i++) 
     {
          (*i).second->Enable(bSet, bEnable);
     }        
@@ -186,7 +186,7 @@ Error Window::ControlShow(const string &oTarget, bool bSet, bool &bShow)
        return kError_InvalidParam;
        
     for(i = m_oControlMap.find(oTarget), j = 0; 
-        j != m_oControlMap.count(oTarget); j++, i++) 
+        j != (int)m_oControlMap.count(oTarget); j++, i++) 
     {
         pControl = (*i).second;
         
@@ -212,7 +212,7 @@ Error Window::ControlIntValue(const string &oTarget, bool bSet, int &iValue)
        return kError_InvalidParam;
        
     for(i = m_oControlMap.find(oTarget), j = 0; 
-        j != m_oControlMap.count(oTarget); j++, i++) 
+        j != (int)m_oControlMap.count(oTarget); j++, i++) 
     {
          (*i).second->IntValue(bSet, iValue);
     }        
@@ -229,7 +229,7 @@ Error Window::ControlStringValue(const string &oTarget, bool bSet, string &oValu
        return kError_InvalidParam;
        
     for(i = m_oControlMap.find(oTarget), j = 0; 
-        j != m_oControlMap.count(oTarget); j++, i++) 
+        j != (int)m_oControlMap.count(oTarget); j++, i++) 
     {
          (*i).second->StringValue(bSet, oValue);
     }        
@@ -246,7 +246,7 @@ Error Window::ControlGetDesc(const string &oTarget, string &oDesc)
        return kError_InvalidParam;
        
     for(i = m_oControlMap.find(oTarget), j = 0; 
-        j != m_oControlMap.count(oTarget); j++, i++) 
+        j != (int)m_oControlMap.count(oTarget); j++, i++) 
     {
          (*i).second->GetDesc(oDesc);
          return kError_NoErr;
@@ -264,7 +264,7 @@ Error Window::ControlGetTip(const string &oTarget, string &oTip)
        return kError_InvalidParam;
        
     for(i = m_oControlMap.find(oTarget), j = 0; 
-        j != m_oControlMap.count(oTarget); j++, i++) 
+        j != (int)m_oControlMap.count(oTarget); j++, i++) 
     {
          (*i).second->GetTip(oTip);
          return kError_NoErr;

@@ -43,6 +43,8 @@ portable C
 #ifdef ASM_X86
 extern void fdct32_asm(float*a, float*b);
 extern void fdct32_dual_asm(float*a, float*b);
+#elif defined(ASM_X86_OLD)
+extern void asm_fdct32(float *in, float *out);
 #endif /* ASM_X86 */
 
 float coef32[31];	/* 32 pt dct coefs */

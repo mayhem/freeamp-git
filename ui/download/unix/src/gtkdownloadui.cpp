@@ -429,10 +429,13 @@ void DownloadUI::CreateDownloadUI(void)
                        GTK_SIGNAL_FUNC(pause_internal), this);
     gtk_widget_show(m_PauseButton);
 
-    m_ResumeButton = gtk_button_new_with_label("  Resume  ");
+    m_ResumeButton = gtk_button_new();
+    m_ResumeLabel = gtk_label_new("  Resume  ");
+    gtk_container_add(GTK_CONTAINER(m_ResumeButton), m_ResumeLabel);
     gtk_box_pack_start(GTK_BOX(hbox), m_ResumeButton, FALSE, FALSE, 5);
     gtk_signal_connect(GTK_OBJECT(m_ResumeButton), "clicked", 
                        GTK_SIGNAL_FUNC(resume_internal), this);
+    gtk_widget_show(m_ResumeLabel);
     gtk_widget_show(m_ResumeButton);
 
     sep = gtk_vseparator_new();

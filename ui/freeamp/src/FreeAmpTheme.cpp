@@ -447,9 +447,9 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
          char szTemp[100];
          string oName("BufferInfo"), oText;
 
-		 sprintf(szTemp, "I: %3ld O: %3ld %c", 
-                 info->GetInputPercent(),
-                 info->GetOutputPercent(),
+	 sprintf(szTemp, "I: %3ld O: %3ld %c", 
+                 (long int)info->GetInputPercent(),
+                 (long int)info->GetOutputPercent(),
                  info->IsBufferingUp() ? '^' : ' ');
          oText = string(szTemp);
          m_pWindow->ControlStringValue(oName, true, oText);
@@ -488,12 +488,12 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
          m_fSecondsPerFrame = info->GetSecondsPerFrame();
          if (info->GetBitRate() == 0)
               sprintf(text, "VBR %ldkhz %s", 
-                   info->GetSampleRate() / 1000, 
+                   (long int)(info->GetSampleRate() / 1000), 
                    info->GetChannels() ? "Stereo" : "Mono");
          else
               sprintf(text, "%ldkbps %ldkhz %s", 
-                   info->GetBitRate() / 1000,
-                   info->GetSampleRate() / 1000, 
+                   (long int)(info->GetBitRate() / 1000),
+                   (long int)(info->GetSampleRate() / 1000), 
                    info->GetChannels() ? "Stereo" : "Mono");
 
          m_oStreamInfo = text;
