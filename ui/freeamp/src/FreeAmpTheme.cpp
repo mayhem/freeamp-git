@@ -990,6 +990,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
        int    iPos;
 
        m_pWindow->ControlIntValue(oControlName, false, iPos);
+       m_eq->ChangeValue(atoi(oControlName.c_str() + 2), iPos); 
        sprintf(szText, "%d db", ((iPos - 50) * 2) / 3);
        oDesc = string(szText);
        m_pWindow->ControlStringValue(oName, true, oDesc);
@@ -1036,6 +1037,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
        int    iPos;
 
        m_pWindow->ControlIntValue(oControlName, false, iPos);
+       m_eq->ChangePreamp(iPos); 
        sprintf(szText, "%d db", ((iPos - 50) * 10) / 25);
        oDesc = string(szText);
        m_pWindow->ControlStringValue(oName, true, oDesc);
