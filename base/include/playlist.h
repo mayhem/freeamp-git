@@ -261,6 +261,12 @@ public:
 };
 
 
+class ShuffleItem {
+ public:
+    int32 m_index;
+    int32 m_random;
+};
+
 class PlayListManager {
  public:
     PlayListManager(EventQueue *);
@@ -348,11 +354,17 @@ class PlayListManager {
     static BOOL progress_call_back( int pos, int count, void* cookie);
     BOOL ProgressCallBack( int pos, int count);
 
+    void CreateShuffleList();
+    void QuickSortShuffleList(int32 first, int32 last);
+    int32 PartitionShuffleList(int32 first, int32 last);
+
  private:
     
     EventQueue*			    m_target;
-    List<PlayListItem*>*    m_list;
+    List<PlayListItem*>*    m_playList;
+    List<ShuffleItem*>*     m_shuffleList;
     int32                   m_current;
+    int32                   m_shuffle;;
     int32                   m_skipNum;
 	Mutex*					m_mutex;
 

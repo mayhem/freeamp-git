@@ -45,8 +45,8 @@ PlayListManager(EventQueue * pPlayer)
 {
    m_mutex = new Mutex();
    m_target = pPlayer;
-   m_list = new List < PlayListItem * >();
- 
+   m_playList = new List < PlayListItem * >();
+   m_shuffleList = NULL; 
    m_current = -1;
    m_skipNum = 0;
    m_order = SHUFFLE_NOT_SHUFFLED;
@@ -58,11 +58,18 @@ PlayListManager(EventQueue * pPlayer)
 PlayListManager::
 ~PlayListManager()
 {
-   if(m_list)
+   if(m_playList)
    {
-      m_list->DeleteAll();
-      delete m_list;
-      m_list = NULL;
+      m_playList->DeleteAll();
+      delete m_playList;
+      m_playList = NULL;
+   }
+
+   if(m_shuffleList)
+   {
+      m_shuffleList->DeleteAll();
+      delete m_shuffleList;
+      m_shuffleList = NULL;
    }
    
    if(m_mutex)
@@ -79,9 +86,9 @@ GetCurrent()
     GetPLManipLock();
     PlayListItem *pli = NULL;
 
-    if ((m_current >= 0) && (m_current < m_list->CountItems()))
+    if ((m_current >= 0) && (m_current < m_playList->CountItems()))
     {
-        pli = m_list->ItemAt(m_current);
+        pli = m_playList->ItemAt(m_current);
     }
 
     ReleasePLManipLock();
@@ -93,7 +100,7 @@ PlayListManager::
 SetFirst()
 {
     GetPLManipLock();
-    int32 elems = m_list->CountItems();
+    int32 elems = m_playList->CountItems();
 
     if(elems)
     {
@@ -124,12 +131,12 @@ HasAnotherSong()
     {
         if(m_order == SHUFFLE_RANDOM)
         {
-            if(m_list->CountItems() != 1)
+            if(m_playList->CountItems() != 1)
                 result = true;
         }
         else
         {
-            if (m_current != m_list->CountItems() - 1)
+            if (m_current != m_playList->CountItems() - 1)
                 result = true;
         }
     }
@@ -143,7 +150,7 @@ PlayListManager::
 SetNext(bool bUserAction)
 {
     GetPLManipLock();
-    int32 count = m_list->CountItems();
+    int32 count = m_playList->CountItems();
 
     if(count)
     {
@@ -151,7 +158,20 @@ SetNext(bool bUserAction)
         {
             if(SHUFFLE_RANDOM == m_order)
             {
-                m_current = rand() % count;
+                m_current = 0;
+
+                if( m_shuffleList->CountItems() != m_playList->CountItems() ||
+                    m_shuffle >= count)
+                {
+                    CreateShuffleList();
+                }
+
+                ShuffleItem* item = m_shuffleList->ItemAt(m_shuffle++);
+
+                if(item)
+                {
+                    m_current = item->m_index;
+                }                
             }
             else
             {
@@ -180,7 +200,7 @@ PlayListManager::
 SetPrev(bool bUserAction)
 {
     GetPLManipLock();
-    int32 count = m_list->CountItems();
+    int32 count = m_playList->CountItems();
 
     if(count)
     {
@@ -279,6 +299,12 @@ SetShuffle(ShuffleMode oop)
     GetPLManipLock();
 
     m_order = oop;
+
+    if(m_order == SHUFFLE_RANDOM)
+    {
+        CreateShuffleList();
+    }
+
     SendShuffleModeToPlayer();
 
     ReleasePLManipLock();
@@ -292,6 +318,92 @@ SetRepeat(RepeatMode rp)
     m_repeat = rp;
     SendRepeatModeToPlayer();
     ReleasePLManipLock();
+}
+
+void
+PlayListManager::
+CreateShuffleList()
+{
+    if(m_shuffleList)
+    {
+        m_shuffleList->DeleteAll();
+        delete m_shuffleList;
+        m_shuffleList = NULL;
+    }
+
+    m_shuffle = 0;
+
+    int32 count = CountItems();
+    int32 i = 0;
+
+    m_shuffleList = new List < ShuffleItem * >(count);
+
+    srand( (unsigned)time( NULL ) );
+
+    for (i = 0;i < count;i++) 
+    {
+        ShuffleItem* item = new ShuffleItem;
+
+        item->m_index = i;
+        item->m_random = (int32) rand();
+
+	    m_shuffleList->AddItem(item);
+    }
+
+    QuickSortShuffleList(0, count - 1);
+
+    /*for (i = 0;i < count;i++) 
+    {
+        char temp[10];
+        sprintf(temp, "%d\r\n", m_shuffleList->ItemAt(i)->m_index);
+        OutputDebugString(temp);
+    }
+
+    OutputDebugString("\r\n");*/
+
+}
+
+void 
+PlayListManager::
+QuickSortShuffleList(int32 first, int32 last) 
+{
+    if (first < last) 
+    {
+	    int32 q = PartitionShuffleList(first, last);
+	    QuickSortShuffleList(first, q);
+	    QuickSortShuffleList(q + 1,last);
+    }
+}
+
+int32 
+PlayListManager::
+PartitionShuffleList(int32 first, int32 last) 
+{
+    int32 x = m_shuffleList->ItemAt(first)->m_random;
+    int32 i = first - 1;
+    int32 j = last + 1;
+
+    for(;;) 
+    {
+	    do 
+        {
+	        j--;
+	    } while (m_shuffleList->ItemAt(j)->m_random > x);
+
+	    do 
+        {
+	        i++;
+	    } while (m_shuffleList->ItemAt(i)->m_random < x);
+
+	    if (i < j) 
+        {
+	        m_shuffleList->Swap(i,j);
+	    } 
+        else 
+        {
+	        return j;
+	    }
+    }
 }
 
 void 
@@ -355,7 +467,7 @@ FirstItem()
 
     GetPLManipLock();
 
-    result = m_list->FirstItem();
+    result = m_playList->FirstItem();
 
     ReleasePLManipLock();
 
@@ -370,7 +482,7 @@ LastItem()
 
     GetPLManipLock();
 
-    result = m_list->LastItem();
+    result = m_playList->LastItem();
 
     ReleasePLManipLock();
 
@@ -385,7 +497,7 @@ HasItem(PlayListItem* item)
 
     GetPLManipLock();
 
-    result = m_list->HasItem(item);
+    result = m_playList->HasItem(item);
 
     ReleasePLManipLock();
 
@@ -400,7 +512,7 @@ CountItems()
 
     GetPLManipLock();
 
-    result = m_list->CountItems();
+    result = m_playList->CountItems();
 
     ReleasePLManipLock();
 
@@ -415,7 +527,7 @@ ItemAt(int32 index)
 
     GetPLManipLock();
 
-    result = m_list->ItemAt(index);
+    result = m_playList->ItemAt(index);
 
     ReleasePLManipLock();
 
@@ -430,7 +542,7 @@ IndexOf(PlayListItem* item)
 
     GetPLManipLock();
 
-    result = m_list->IndexOf(item);
+    result = m_playList->IndexOf(item);
 
     ReleasePLManipLock();
 
@@ -454,9 +566,9 @@ AddItem(char *url, int32 type)
             item->SetURL(url);
             item->SetType(type);
 
-            m_list->AddItem(item);
+            m_playList->AddItem(item);
 
-            if (m_list->CountItems() == 1)
+            if (m_playList->CountItems() == 1)
             {
                 m_current = 0; // set current to first
             }
@@ -497,9 +609,9 @@ AddItem(char *url,int32 type, int32 index)
                 item->SetURL(url);
                 item->SetType(type);
 
-                m_list->AddItem(item, index);
+                m_playList->AddItem(item, index);
 
-                if (m_list->CountItems() == 1)
+                if (m_playList->CountItems() == 1)
                 {
                     m_current = 0; // set current to first
                 }
@@ -529,9 +641,9 @@ AddItem(PlayListItem* item)
     
     if(item)
     {
-        m_list->AddItem(item);
+        m_playList->AddItem(item);
 
-        if(m_list->CountItems() == 1)
+        if(m_playList->CountItems() == 1)
         {
             m_current = 0;
         }
@@ -563,9 +675,9 @@ AddItem(PlayListItem* item, int32 index)
     {
         if(item)
         {
-            m_list->AddItem(item, index);
+            m_playList->AddItem(item, index);
 
-            if(m_list->CountItems() == 1)
+            if(m_playList->CountItems() == 1)
             {
                 m_current = 0;
             }
@@ -595,9 +707,9 @@ AddList(List<PlayListItem*>* items)
     
     if(items)
     {
-        m_list->AddList(*items, CountItems());
+        m_playList->AddList(*items, CountItems());
 
-        if(m_list->CountItems() == 1)
+        if(m_playList->CountItems() == 1)
         {
             m_current = 0;
         }
@@ -634,9 +746,9 @@ AddList(List<PlayListItem*>* items, int32 index)
     {
         if(items)
         {
-            m_list->AddList(*items, index);
+            m_playList->AddList(*items, index);
 
-            if(m_list->CountItems() == 1)
+            if(m_playList->CountItems() == 1)
             {
                 m_current = 0;
             }
@@ -684,7 +796,7 @@ RemoveItem(int32 index)
 
     if(index >= 0 )
     {
-        result = m_list->RemoveItem(index);
+        result = m_playList->RemoveItem(index);
     }
 
     if(m_current >= index)
@@ -714,7 +826,7 @@ RemoveItems(int32 index, int32 count)
 
         while(count--)
         {
-		    m_list->RemoveItem(count);
+		    m_playList->RemoveItem(count);
         }
 
         if(m_current >= index)
@@ -740,7 +852,7 @@ RemoveList(List<PlayListItem*>* items)
 
     if(items)
     {
-        m_list->RemoveList(*items);
+        m_playList->RemoveList(*items);
 
         result = kError_NoErr;
 
@@ -769,11 +881,11 @@ MoveList(List<PlayListItem*>* items, int32 index)
 
         if(index >= 0 )
         {
-            m_list->RemoveList(*items);
+            m_playList->RemoveList(*items);
 
-            m_list->AddList(*items, index);
+            m_playList->AddList(*items, index);
 
-            if(m_list->CountItems() == 1)
+            if(m_playList->CountItems() == 1)
             {
                 m_current = 0;
             }
@@ -795,7 +907,7 @@ MakeEmpty()
 {
     GetPLManipLock();
 
-    m_list->DeleteAll();
+    m_playList->DeleteAll();
 
     m_current = -1;
     m_skipNum = 0;
@@ -814,7 +926,7 @@ IsEmpty()
 
     GetPLManipLock();
 
-    result = m_list->IsEmpty();
+    result = m_playList->IsEmpty();
 
     ReleasePLManipLock();
 
@@ -831,7 +943,7 @@ DoForEach(bool (*func)(PlayListItem*))
 
 	for(int32 i = 0; i < count; i++)
     {
-		if((*func)((PlayListItem*) m_list->ItemAt(i)))
+		if((*func)((PlayListItem*) m_playList->ItemAt(i)))
         {
 			break;
         }
@@ -850,7 +962,7 @@ DoForEach(bool (*func)(PlayListItem*, void*), void* cookie)
 
 	for(int32 i = 0; i < count; i++)
     {
-		if((*func)((PlayListItem*) m_list->ItemAt(i), cookie))
+		if((*func)((PlayListItem*) m_playList->ItemAt(i), cookie))
         {
 			break;
         }
@@ -864,7 +976,7 @@ PlayListItem**
 PlayListManager::
 Items() const
 {
-    return (const PlayListItem**)(m_list->Items());
+    return (const PlayListItem**)(m_playList->Items());
 }
 
 
@@ -874,7 +986,7 @@ RemoveAll()
 {
    GetPLManipLock();
 
-   m_list->RemoveAll();
+   m_playList->RemoveAll();
    m_current = -1;
    m_skipNum = 0;
 
@@ -978,7 +1090,7 @@ ExportToM3U(const char* file)
         int32 i = 0;
         PlayListItem* item = NULL;
 
-        while((item = m_list->ItemAt(i++)))
+        while((item = m_playList->ItemAt(i++)))
         {
             fprintf(fp, "%s%s", item->URL(), LINE_END_MARKER_STR);
             result = kError_NoErr;
@@ -1087,7 +1199,7 @@ RioThreadFunction()
             int32 i = 0;
             PlayListItem* item = NULL;
 
-            while(item = m_list->ItemAt(i++))
+            while(item = m_playList->ItemAt(i++))
             {
                 // get file size
 		        int32 lSize = GetFileSize( item->URL() );
