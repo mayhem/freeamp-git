@@ -65,7 +65,9 @@ typedef ostrstream ostringstream;
 #include <errno.h>
 #include <iostream>
 #include <algorithm>
-//#include <iterators>
+#include <fstream>
+
+using namespace std;
 
 
 #include "facontext.h"
@@ -114,6 +116,15 @@ DownloadManager::DownloadManager(FAContext* context)
     }
 
     LoadResumableDownloadItems();
+
+    char path[MAX_PATH];
+    uint32 length = sizeof(path);
+
+    context->prefs->GetInstallDirectory(path, &length);
+    strcat(path, "\\DownloadLog.txt");
+
+    //m_debug = new ofstream(path);
+
 
     /*MetaData md;
 
@@ -180,6 +191,8 @@ DownloadManager::~DownloadManager()
     {
         delete m_downloadThread;
     }
+
+    //delete m_debug;
 }
 
 // Functions for adding items to Download Manager
@@ -277,7 +290,7 @@ Error DownloadManager::QueueDownload(DownloadItem* item)
 
     if(item)
     {
-        //cout << "Queue item: " << item->SourceURL() << endl;
+        //*m_debug << "Queue item: " << item->SourceURL() << endl;
 
         if(item->GetState() != kDownloadItemState_Downloading &&
            item->GetState() != kDownloadItemState_Done &&
@@ -592,6 +605,7 @@ Error DownloadManager::Download(DownloadItem* item)
 {
     Error result = kError_InvalidParam;
 
+    //*m_debug << "Downloading Item: " << item->SourceURL() << endl;
     assert(item);
 
     if(item)
@@ -666,6 +680,8 @@ Error DownloadManager::Download(DownloadItem* item)
         {
             struct hostent* hostByName;
             struct hostent  hostByIP;
+
+            //*m_debug << "gethostbyname: " << hostname << endl;
             hostByName = gethostbyname(hostname);
 
             // On some stacks a numeric IP address
@@ -706,6 +722,8 @@ Error DownloadManager::Download(DownloadItem* item)
             addr.sin_family= host.h_addrtype;
             addr.sin_port= htons(port); 
 
+            //*m_debug << "socket" << endl;
+
             s = socket(host.h_addrtype, SOCK_STREAM, 0);
 
             if(s < 0)
@@ -719,6 +737,8 @@ Error DownloadManager::Download(DownloadItem* item)
         // connect and send request
         if(IsntError(result))
         {
+            //*m_debug << "connect" << endl;
+
             if(connect(s,(const struct sockaddr*)&addr, sizeof(struct sockaddr)))
                 result = kError_CannotBind;
 
@@ -793,6 +813,8 @@ Error DownloadManager::Download(DownloadItem* item)
                 //cout << query << endl;
 
                 int count;
+
+                //*m_debug << "send:" << endl << query;
 
                 count = send(s, query, strlen(query), 0);
 
@@ -895,6 +917,8 @@ Error DownloadManager::Download(DownloadItem* item)
                             openFlags |= O_TRUNC;
                         }
 
+                        //*m_debug << "open file:" << destPath<< endl;
+
                         int fd = open(destPath, openFlags, S_IREAD | S_IWRITE);
 
                         if(fd >= 0)
@@ -945,10 +969,17 @@ Error DownloadManager::Download(DownloadItem* item)
 
                             }while(count > 0 && IsntError(result));
 
+                            if(IsError(result))
+                                //*m_debug << "Error: " << result << endl;
+
+                            //*m_debug << "file received: " << item->GetBytesReceived() << " bytes" << endl;
+
                             close(fd);                           
                         }
                         else
                         {
+                            //*m_debug << "error opening  file: " <<  endl;
+
                             switch(errno)
                             {
                                 case EEXIST:
@@ -999,6 +1030,8 @@ Error DownloadManager::Download(DownloadItem* item)
 
                             //cout << cp << endl;
 
+                            //*m_debug << "redirected: " << cp << endl;
+
                             if(305 == returnCode) // proxy
                             {
                                 char* proxy = new char[strlen(cp) + 
@@ -1025,6 +1058,8 @@ Error DownloadManager::Download(DownloadItem* item)
                     // be fulfilled
                     case '4':
                     {
+                        //*m_debug << "HTTP Error: " << returnCode << endl;
+
                         switch(returnCode)
                         {
                             case 400:

@@ -745,12 +745,24 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                 DeleteMenu(subMenu, ID_POPUP_ADDTRACK_PLAY, MF_BYCOMMAND);
             }
 
+            if( IsItemSelected(m_hCatalogItem) ||
+                IsItemSelected(m_hPlaylistItem) ||
+                IsItemSelected(m_hAllItem) ||
+                IsItemSelected(m_hUncatItem) ||
+                (IsItemSelected(m_hNewPlaylistItem) && !(playlistCount + trackCount)))
+            {
+                EnableMenuItem(subMenu,
+                               ID_POPUP_REMOVE,
+                               MF_BYCOMMAND|MF_GRAYED);
+            }
+
+
             if( playlistCount > 1 ||
                 IsItemSelected(m_hCatalogItem) ||
                 IsItemSelected(m_hPlaylistItem) ||
                 IsItemSelected(m_hAllItem) ||
                 IsItemSelected(m_hUncatItem) ||
-                IsItemSelected(m_hNewPlaylistItem))
+                (IsItemSelected(m_hNewPlaylistItem) && !(playlistCount + trackCount)))
             {
                 EnableMenuItem(subMenu,
                                ID_POPUP_EDITINFO,

@@ -29,6 +29,7 @@ ____________________________________________________________________________*/
 #include <vector>
 #include <deque>
 #include <functional>
+#include <fstream>
 
 using namespace std;
 
@@ -264,6 +265,7 @@ class DownloadManager {
     Mutex m_queueMutex;
     Mutex m_quitMutex;
 
+    //ofstream* m_debug;
 };
 
 #endif // INCLUDED_DOWNLOAD_MANAGER_H_

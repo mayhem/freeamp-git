@@ -211,8 +211,16 @@ void MusicBrowserUI::Init()
     m_playerState = PLAYERSTATE_STOPPED;
     m_initialCount = 0;
     m_itemsAddedBeforeWeWereCreated = 0;
-    m_hNewPlaylistItem = NULL;
+
+    m_hMusicCatalog = NULL;
     m_hPlaylistView = NULL;
+
+    m_hCatalogItem = NULL;
+    m_hAllItem = NULL;
+    m_hUncatItem = NULL; 
+    m_hPlaylistItem = NULL; 
+    m_hNewPlaylistItem = NULL;
+    
     m_hMusicCatalog = NULL;
     m_hPortableItem = NULL;
     m_hNewPortableItem = NULL;

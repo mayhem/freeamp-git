@@ -132,9 +132,52 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             indexRect.right = indexRect.left + ListView_GetColumnWidth(hwndList, 0) - 1;
 
             UINT left = indexRect.left + (ListView_GetColumnWidth(hwndList, 0)/2);
+
+            COLORREF scrollColor = GetSysColor(COLOR_SCROLLBAR);
+            COLORREF winColor = GetSysColor(COLOR_WINDOW);
+
+            if(scrollColor == winColor)
+            {
+                int r = GetRValue(scrollColor);
+                int g = GetGValue(scrollColor);
+                int b = GetBValue(scrollColor);
+
+                if(( r + g + b)/3 < 128)
+                {
+                    r -= 25;
+                    g -= 25;
+                    b -= 25;
+
+                    if(r < 0)
+                        r = 0;
+                    if(g < 0)
+                        g = 0;
+                    if(b < 0)
+                        b = 0;
+                }
+                else
+                {
+                    r += 25;
+                    g += 25;
+                    b += 25;
+
+                    if(r > 255)
+                        r = 255;
+                    if(g > 255)
+                        g = 255;
+                    if(b > 255)
+                        b = 255;
+                }
+
+                SetBkColor(dis->hDC, RGB(r, g, b));
+            }
+            else
+            {
+                SetBkColor(dis->hDC, GetSysColor(COLOR_SCROLLBAR)); //COLOR_INFOBK ));
+            }
             
-            SetTextColor(dis->hDC, GetSysColor(COLOR_INFOTEXT));
-            SetBkColor(dis->hDC, GetSysColor(COLOR_INFOBK ));
+            SetTextColor(dis->hDC, GetSysColor(COLOR_WINDOWTEXT)); //COLOR_INFOTEXT));
+            
 
             ExtTextOut( dis->hDC, 
                         left, indexRect.top + 1,
@@ -990,7 +1033,52 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
                 rectColumn.right = rectColumn.left + columnWidth - si.nPos - 1;
                 rectClient.left = rectColumn.right;
                 
-                FillRect(hdc, &rectColumn, (HBRUSH)(COLOR_INFOBK + 1));
+                COLORREF scrollColor = GetSysColor(COLOR_SCROLLBAR);
+                COLORREF winColor = GetSysColor(COLOR_WINDOW);
+
+                if(scrollColor == winColor)
+                {
+                    HBRUSH brush;
+                    int r = GetRValue(scrollColor);
+                    int g = GetGValue(scrollColor);
+                    int b = GetBValue(scrollColor);
+
+                    if(( r + g + b)/3 < 128)
+                    {
+                        r -= 25;
+                        g -= 25;
+                        b -= 25;
+
+                        if(r < 0)
+                            r = 0;
+                        if(g < 0)
+                            g = 0;
+                        if(b < 0)
+                            b = 0;
+                    }
+                    else
+                    {
+                        r += 25;
+                        g += 25;
+                        b += 25;
+
+                        if(r > 255)
+                            r = 255;
+                        if(g > 255)
+                            g = 255;
+                        if(b > 255)
+                            b = 255;
+                    }
+
+                    brush = CreateSolidBrush(RGB(r, g, b));
+
+                    FillRect(hdc, &rectColumn, brush);
+                    DeleteObject(brush);
+                }
+                else
+                {
+                    FillRect(hdc, &rectColumn, (HBRUSH)(COLOR_SCROLLBAR + 1)); //(COLOR_INFOBK + 1));
+                }
             }
 
             FillRect(hdc, &rectClient, (HBRUSH)GetClassLong(hwnd, GCL_HBRBACKGROUND));
