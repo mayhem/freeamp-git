@@ -332,8 +332,6 @@ bool ID3v2::ReadMetaData(const char* url, MetaData* metadata)
     pFrame = ID3Tag_FindFrameWithID(pTag, ID3FID_CONTENTTYPE);
     if (pFrame)
     {
-        char genre[255];
-        int  genreId, ret;
 
         pData[0] = 0;
         pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
@@ -541,17 +539,6 @@ bool ID3v2::WriteMetaData(const char* url, const MetaData& metadata)
     return err == ID3E_NoError;
 }
 
-void ID3v2::LookupGenre(int genreId, char* genre)
-{
-    if (genreId < 0 || genreId > genreMax)
-    {
-        genre[0] = 0;
-        return;
-    }
-
-    strcpy(genre, genreList[genreId]);
-}
-
 #else
 
 const int supportedVersion = 3;
@@ -588,14 +575,44 @@ void ID3v2::HandleFrame(char *tag, char *frameData, MetaData *metadata)
     if (strcmp(tagName, "TPE1") == 0)
         metadata->SetArtist(frameData);
 
+    if (strcmp(tagName, "TCOM") == 0)
+        metadata->SetComment(frameData);
+
     if (strcmp(tagName, "TLEN") == 0)
         metadata->SetTime(atoi(frameData) / 1000);
 
     if (strcmp(tagName, "TYER") == 0)
         metadata->SetYear(atoi(frameData));
 
+    if (strcmp(tagName, "TRCK") == 0)
+        metadata->SetTrack(atoi(frameData));
+
     if (strcmp(tagName, "TSIZ") == 0)
         metadata->SetSize(atoi(frameData));
+
+    if (strcmp(tagName, "TCON") == 0)
+    {
+        char genre[255];
+        int  genreId, ret;
+
+        genre[0] = 0;
+        ret = sscanf(frameData, "(%d)%[^\n]", &genreId, genre);
+        if (ret > 0)
+        {
+            if (ret == 2)
+                metadata->SetGenre(genre);
+            else
+            if (genreId != genreOther)
+            {
+                LookupGenre(genreId, genre);
+                metadata->SetGenre(genre);
+            }
+        }
+        else
+        {
+            metadata->SetGenre(frameData);
+        }
+    }
 }
 
 bool ID3v2::ReadMetaData(const char* url, MetaData* metadata)
@@ -702,3 +719,15 @@ bool ID3v2::WriteMetaData(const char* url, const MetaData& metadata)
 }
 
 #endif
+
+void ID3v2::LookupGenre(int genreId, char* genre)
+{
+    if (genreId < 0 || genreId > genreMax)
+    {
+        genre[0] = 0;
+        return;
+    }
+
+    strcpy(genre, genreList[genreId]);
+}
+

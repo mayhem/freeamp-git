@@ -37,7 +37,6 @@ ____________________________________________________________________________*/
 #include "metadata.h"
 
 #include "plm/metadata/id3v2/id3v2.h"
-#include "id3.h"
 #include "musicbrainz/mb_c.h"
 
 extern "C"
@@ -190,7 +189,7 @@ int main(int argc, char *argv[])
        {
            m.SetGUID(sig);
            printf("Signature: %s\n", sig);
-           //submit_metadata(&m);
+           submit_metadata(&m);
        }
        else
        {
