@@ -24,9 +24,14 @@ Windows:
 	such as Borland. 
 
 	Under MS VC++ you should only have to open the project file
-	and build it. The output will go to either the win32\prj\gui 
-	or win32\prj\console directory, depending on which project 
-	you are using. There are no special installation instructions.
+	and build it. The output will go to base\win32\prj. You can 
+	run freeamp from here or move it to another directory.
+	Just make sure the plugins directory is in the same 
+	location.
+
+	The InstallShield installer looks for the program files in the 
+	base\win32\prj directory so if you want to build an installer
+	do not remove the files.
 
 
 

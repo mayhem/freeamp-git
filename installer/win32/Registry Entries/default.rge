@@ -1,0 +1,79 @@
+[RainPlaySet]
+---Comment---=
+---FileGroup---=RainPlay UI
+HKCU0=Software\FreeAmp\FreeAmp v1.2
+
+[RainPlaySet:HKCU:Software\FreeAmp\FreeAmp v1.2]
+---Comment---=
+(Default)=S,
+UI=S,rainplay.ui
+InstallDirectory=S,<TARGETDIR>
+OpenSaveDirectory=S,<TARGETDIR>
+PMO=S,soundcard.pmo
+
+[DSoundSet:HKCU:Software\FreeAmp\FreeAmp v1.2]
+---Comment---=
+(Default)=S,
+PMO=S,dsoundcard.pmo
+
+[RegisterFileTypes:HKCR:freeAmpFile\shell\open\command]
+---Comment---=
+(Default)=S,<TARGETDIR>\freeamp.exe %1
+
+[RegisterFileTypes:HKCR:freeAmpFile]
+---Comment---=
+(Default)=S,FreeAmp File
+
+[FreeAmpSet]
+---Comment---=
+---FileGroup---=FreeAmp UI
+HKCU0=Software\FreeAmp\FreeAmp v1.2
+
+[Data]
+Set0=FreeAmpSet
+Set1=SimpleSet
+Set2=DSoundSet
+Set3=RegisterFileTypes
+Set4=RainPlaySet
+
+[SimpleSet]
+---Comment---=
+---FileGroup---=Simple UI
+HKCU0=Software\FreeAmp\FreeAmp v1.2
+
+[SimpleSet:HKCU:Software\FreeAmp\FreeAmp v1.2]
+(Default)=S,
+---Comment---=
+UI=S,simple.ui
+InstallDirectory=S,<TARGETDIR>
+OpenSaveDirectory=S,<TARGETDIR>
+PMO=S,soundcard.pmo
+
+[General]
+Type=REGISTRYDATA
+Version=1.00.000
+
+[DSoundSet]
+---Comment---=
+---FileGroup---=Direct Sound Output
+HKCU0=Software\FreeAmp\FreeAmp v1.2
+
+[RegisterFileTypes:HKCR:.mp3]
+---Comment---=
+(Default)=S,FreeAmpFile
+
+[FreeAmpSet:HKCU:Software\FreeAmp\FreeAmp v1.2]
+---Comment---=
+(Default)=S,
+UI=S,freeamp.ui
+InstallDirectory=S,<TARGETDIR>
+OpenSaveDirectory=S,<TARGETDIR>
+PMO=S,soundcard.pmo
+
+[RegisterFileTypes]
+---Comment---=
+---FileGroup---=Program Executable Files
+HKCR0=.mp3
+HKCR1=freeAmpFile
+HKCR2=freeAmpFile\shell\open\command
+

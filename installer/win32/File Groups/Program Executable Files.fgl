@@ -1,0 +1,8 @@
+[TopDir]
+file0=..\..\base\win32\prj\freeamp.exe
+file1=..\..\Readme
+
+[General]
+Type=FILELIST
+Version=1.00.000
+

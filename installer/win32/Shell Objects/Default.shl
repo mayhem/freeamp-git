@@ -1,0 +1,34 @@
+[Shortcut0]
+Target=<TARGETDIR>\FreeAmp.exe
+Parameters=
+ShortcutKey=
+SeparateMemorySpace=No
+Run=Normal Window
+IconIndex=0
+Replace=Yes
+FileGroup=
+StartIn=<TARGETDIR>
+IconFile=
+InternetShortcut=No
+DisplayText=FreeAmp
+Comments=
+
+[Folder4]
+Type=Common
+Comments=
+DisplayText=
+
+[Data]
+Folder3=<FOLDER_STARTUP>
+Shortcut0=Folder4\FreeAmp
+Folder4=Folder2\FreeAmp 1.2
+Group0=Main
+Group1=Startup
+Folder0=<FOLDER_DESKTOP>
+Folder1=<FOLDER_STARTMENU>
+Folder2=<FOLDER_PROGRAMS>
+
+[Info]
+Type=ShellObject
+Version=1.00.000
+
