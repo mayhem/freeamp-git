@@ -845,7 +845,7 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
 			break;
 		}
 
-        case WM_SIZE:
+        /*case WM_SIZE:
         {
             int32 oldWidth = 0;
 
@@ -855,7 +855,13 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
             oldWidth += ListView_GetColumnWidth(hwnd, 3);
             oldWidth += ListView_GetColumnWidth(hwnd, 4);
 
-            int32 headerResizeAmount = LOWORD(lParam) - oldWidth;
+            RECT clientRect;
+
+            GetClientRect(hwnd, &clientRect);
+
+            //int32 headerResizeAmount = LOWORD(lParam) - oldWidth;
+
+            int32 headerResizeAmount = (clientRect.right - clientRect.left) - oldWidth;
 
     
             int32 eachHeaderAmount = headerResizeAmount/3;
@@ -904,7 +910,7 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
             }
             
             break;
-        }
+        }*/
 
         case WM_SETFOCUS:
         case WM_KILLFOCUS:
@@ -1208,14 +1214,14 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
 
             if(hdn->hdr.code == HDN_BEGINTRACKW)
             {
-                if(hdn->iItem == 0 || hdn->iItem == 4)
+                if(hdn->iItem == 0 /*|| hdn->iItem == 4*/)
                     return TRUE; 
 
-                oldWidth = ListView_GetColumnWidth(hwnd, hdn->iItem);
+                //oldWidth = ListView_GetColumnWidth(hwnd, hdn->iItem);
 
-                itemTrack = hdn->iItem;
+                //itemTrack = hdn->iItem;
             }
-            else if(hdn->hdr.code == HDN_ITEMCHANGINGW)
+            /*else if(hdn->hdr.code == HDN_ITEMCHANGINGW)
             {
                 if(hdn->pitem->mask & HDI_WIDTH)                    
                 {
@@ -1254,7 +1260,7 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
             {
                 itemTrack = -1;   
                 oldWidth = 0;
-            }
+            }*/
             else if(hdn->hdr.code == HDN_DIVIDERDBLCLICKW)
             {
                 ResizeHeader(hwnd, hdn->iItem);

@@ -619,21 +619,6 @@ void MusicBrowserUI::SizeWindow(int iType, int iWidth, int iHeight)
                            controlHeight,
                            SWP_NOZORDER);
 
-    // Playlist View
-    GetClientRect(m_hPlaylistView, &oldListViewRect); 
-    GetWindowRect(m_hPlaylistView, &controlRect); 
-    MapWindowPoints(NULL, m_hWnd, (LPPOINT)&controlRect, 2);
-    controlHeight = controlRect.bottom - controlRect.top;
-    controlWidth = controlRect.right - controlRect.left;
-
-    hdwp = DeferWindowPos(hdwp, m_hPlaylistView, NULL,
-                           controlRect.left,
-                           controlRect.top,
-                           clientRect.right - controlRect.left,
-                           clientRect.bottom - controlRect.top - statusbarHeight,
-                           SWP_NOZORDER);
-
-
     // Music Catalog View
     GetWindowRect(m_hMusicView, &controlRect); 
     MapWindowPoints(NULL, m_hWnd, (LPPOINT)&controlRect, 2);
@@ -649,19 +634,159 @@ void MusicBrowserUI::SizeWindow(int iType, int iWidth, int iHeight)
 
 
     // Current Playlist Title
-    GetWindowRect(m_hPlaylistTitle, &controlRect); 
+    GetWindowRect(m_hPlaylistTitle, &controlRect);
     MapWindowPoints(NULL, m_hWnd, (LPPOINT)&controlRect, 2);
     controlHeight = controlRect.bottom - controlRect.top;
-    controlWidth = controlRect.right - controlRect.left;
+    controlWidth = clientRect.right - controlRect.left;
 
     hdwp = DeferWindowPos(hdwp, m_hPlaylistTitle, NULL,
                            controlRect.left,
                            controlRect.top,
-                           clientRect.right - controlRect.left,
+                           controlWidth,
                            controlHeight,
                            SWP_NOZORDER);
+
+    // Playlist View
+    GetClientRect(m_hPlaylistView, &oldListViewRect);
+    GetWindowRect(m_hPlaylistView, &controlRect);
+    MapWindowPoints(NULL, m_hWnd, (LPPOINT)&controlRect, 2);
+    controlHeight = clientRect.bottom - controlRect.top;
+    controlWidth = clientRect.right - controlRect.left;
+
+    hdwp = DeferWindowPos(hdwp, m_hPlaylistView, NULL,
+                           controlRect.left,
+                           controlRect.top,
+                           controlWidth,
+                           controlHeight - statusbarHeight,
+                           SWP_NOZORDER);
+
+    /*int delta = controlRect.right - controlRect.left - oldListViewRect.right - oldListViewRect.left;
+
+    controlWidth -= delta;
+
+    if(controlWidth < oldListViewRect.right - oldListViewRect.left)
+    {
+        int32 oldWidth = 0;
+        HWND hwnd = m_hPlaylistView;
+
+        oldWidth += ListView_GetColumnWidth(hwnd, 0);
+        oldWidth += ListView_GetColumnWidth(hwnd, 1);
+        oldWidth += ListView_GetColumnWidth(hwnd, 2);
+        oldWidth += ListView_GetColumnWidth(hwnd, 3);
+        oldWidth += ListView_GetColumnWidth(hwnd, 4);
+
+        int32 headerResizeAmount = controlWidth - oldWidth;
+
+        int32 eachHeaderAmount = headerResizeAmount/3;
+        int32 titleExtraAmount = headerResizeAmount%3;
+        int32 width;
+
+        if(eachHeaderAmount)
+        {
+            width = ListView_GetColumnWidth(m_hPlaylistView, 1);
+            width += eachHeaderAmount;    
+            ListView_SetColumnWidth(m_hPlaylistView, 1, width);
+
+            width = ListView_GetColumnWidth(m_hPlaylistView, 2);
+            width += eachHeaderAmount;
+            ListView_SetColumnWidth(m_hPlaylistView, 2, width);
+
+            width = ListView_GetColumnWidth(m_hPlaylistView, 3);
+            width += eachHeaderAmount;
+            ListView_SetColumnWidth(m_hPlaylistView, 3, width);
+        }
+
+        if(titleExtraAmount)
+        {
+            static uint32 lastColumn = 1;
+
+            while(titleExtraAmount)
+            {
+                width = ListView_GetColumnWidth(m_hPlaylistView, lastColumn);
+   
+                if(titleExtraAmount > 0)
+                {
+                    width += 1;
+                    titleExtraAmount--;
+                }
+                else
+                {
+                    width -= 1;
+                    titleExtraAmount++;
+                }
+
+                ListView_SetColumnWidth(m_hPlaylistView, lastColumn, width);
+
+                if(++lastColumn > 3)
+                    lastColumn = 1;
+            }
+        }        
+    }*/
                            
     EndDeferWindowPos(hdwp);
+
+    /*GetClientRect(m_hPlaylistView, &controlRect);
+
+    controlWidth = controlRect.right - controlRect.left;
+
+    if(controlWidth > oldListViewRect.right - oldListViewRect.left)
+    {
+        int32 oldWidth = 0;
+        HWND hwnd = m_hPlaylistView;
+
+        oldWidth += ListView_GetColumnWidth(hwnd, 0);
+        oldWidth += ListView_GetColumnWidth(hwnd, 1);
+        oldWidth += ListView_GetColumnWidth(hwnd, 2);
+        oldWidth += ListView_GetColumnWidth(hwnd, 3);
+        oldWidth += ListView_GetColumnWidth(hwnd, 4);
+
+        int32 headerResizeAmount = controlWidth - oldWidth;
+
+        int32 eachHeaderAmount = headerResizeAmount/3;
+        int32 titleExtraAmount = headerResizeAmount%3;
+        int32 width;
+
+        if(eachHeaderAmount)
+        {
+            width = ListView_GetColumnWidth(m_hPlaylistView, 1);
+            width += eachHeaderAmount;    
+            ListView_SetColumnWidth(m_hPlaylistView, 1, width);
+
+            width = ListView_GetColumnWidth(m_hPlaylistView, 2);
+            width += eachHeaderAmount;
+            ListView_SetColumnWidth(m_hPlaylistView, 2, width);
+
+            width = ListView_GetColumnWidth(m_hPlaylistView, 3);
+            width += eachHeaderAmount;
+            ListView_SetColumnWidth(m_hPlaylistView, 3, width);
+        }
+
+        if(titleExtraAmount)
+        {
+            static uint32 lastColumn = 1;
+
+            while(titleExtraAmount)
+            {
+                width = ListView_GetColumnWidth(m_hPlaylistView, lastColumn);
+   
+                if(titleExtraAmount > 0)
+                {
+                    width += 1;
+                    titleExtraAmount--;
+                }
+                else
+                {
+                    width -= 1;
+                    titleExtraAmount++;
+                }
+
+                ListView_SetColumnWidth(m_hPlaylistView, lastColumn, width);
+
+                if(++lastColumn > 3)
+                    lastColumn = 1;
+            }
+        }        
+    }*/
 }
 
 void MusicBrowserUI::GetMinMaxInfo(MINMAXINFO *pInfo)
