@@ -13,6 +13,7 @@
 #define IDI_ACTIVELIST                  109
 #define IDR_POPUP                       110
 #define IDD_OPENURL                     219
+#define IDB_PLAYING                     542
 #define IDC_MUSICTREE                   1000
 #define IDC_PLAYLISTBOX                 1002
 #define IDC_PLAYLISTCOMBO               1003

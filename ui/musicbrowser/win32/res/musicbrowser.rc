@@ -43,8 +43,8 @@ BEGIN
     PUSHBUTTON      "&Save List",IDC_SAVELIST,307,125,50,14
     PUSHBUTTON      "Clear List",IDC_CLEARLIST,307,151,50,14
     CONTROL         "List1",IDC_PLAYLISTBOX,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | WS_BORDER | WS_TABSTOP,138,19,166,149,
-                    WS_EX_CLIENTEDGE
+                    LVS_SINGLESEL | LVS_OWNERDRAWFIXED | WS_BORDER | 
+                    WS_TABSTOP,138,19,166,149,WS_EX_CLIENTEDGE
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,0,357,1
     LTEXT           "",IDC_PLAYLISTTITLE,140,7,217,8
 END
@@ -172,8 +172,6 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_ARROW               ICON    DISCARDABLE     "arrow.ico"
-IDI_BLANK               ICON    DISCARDABLE     "blank.ico"
 IDI_ACTIVELIST          ICON    DISCARDABLE     "active.ico"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -183,6 +181,13 @@ IDI_ACTIVELIST          ICON    DISCARDABLE     "active.ico"
 
 IDC_DRAG                CURSOR  DISCARDABLE     "drag.cur"
 IDC_NODROP              CURSOR  DISCARDABLE     "nodrop.cur"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_PLAYING             BITMAP  FIXED IMPURE    "playing.bmp"
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 

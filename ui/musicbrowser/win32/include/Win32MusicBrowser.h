@@ -110,6 +110,8 @@ class MusicBrowserUI : public UserInterface
     
     void  AddMusicBrowserWindow(MusicBrowserUI *pWindow);
     void  RemoveMusicBrowserWindow(MusicBrowserUI *pWindow);
+
+    BOOL  DrawItem(int32 controlId, DRAWITEMSTRUCT* dis);
  
  protected:
     FAContext *m_context;
@@ -155,6 +157,8 @@ class MusicBrowserUI : public UserInterface
     Error CloseMainDialog(void);
 
     void  BeginDrag(NM_TREEVIEW *pTreeView);
+
+    uint32 CalcStringEllipsis(HDC hdc, string& displayString, int32 columnWidth);
 
 
     EventQueue          *m_playerEQ;
