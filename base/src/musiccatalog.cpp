@@ -859,7 +859,7 @@ void MusicCatalog::DoSearchMusic(char *path, bool bSendMessages)
 
                 stat(dirtest.c_str(), &stdir);
                 if (stdir.st_mode & _S_IFDIR) {
-                    DoSearchMusic((char *)dirtest.c_str());
+                    DoSearchMusic((char *)dirtest.c_str(), bSendMessages);
                     continue;
                 }
 #endif           
