@@ -272,7 +272,7 @@ Error Http::Download(const string &url, bool fileDownload)
             static unsigned long ip;
             static char *addr_ptr[2] = {(char*)&ip, NULL};
 
-            if((int)(ip = inet_addr(hostname)) == INADDR_NONE) 
+            if((ip = inet_addr(hostname)) == INADDR_NONE) 
                 result =  kError_CantFindHost;
             else
             {
