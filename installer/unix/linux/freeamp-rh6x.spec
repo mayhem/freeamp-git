@@ -3,7 +3,7 @@
 # -------------------------------------------------------------------------
 %define name    freeamp
 %define cname   FreeAmp
-%define version 2.1.rc5
+%define version 2.1.rc6
 %define release 1
 %define prefix  /usr  
 
@@ -52,6 +52,30 @@ Requires:    alsa >= 0.5.0
 
 %description alsa
 %{cname} plugin for ALSA output
+
+# -------------------------------------------------------------------------
+# Arts Package defines
+# -------------------------------------------------------------------------
+%package     arts
+Summary:     %{cname} - %{cname} plugin for Arts output
+Group:       Applications/Multimedia
+Requires:    %{name} = %{version}
+Requires:    arts >= 2.1
+
+%description arts
+%{cname} plugin for Arts output plugin
+
+# -------------------------------------------------------------------------
+# Vorbis Package defines
+# -------------------------------------------------------------------------
+%package     vorbis
+Summary:     %{cname} - %{cname} plugin for Vorbis playback
+Group:       Applications/Multimedia
+Requires:    %{name} = %{version}
+Requires:    libogg >= 1.0beta4, libvorbis >= 1.0beta4
+
+%description vorbis
+%{cname} plugin for Vorbis playback
 
 # -------------------------------------------------------------------------
 # Extras Package defines
@@ -141,6 +165,15 @@ rm -rf $RPM_BUILD_ROOT
 %files alsa 
 %defattr(-,root,root)
 %{prefix}/lib/%{name}/plugins/alsa.pmo
+
+%files arts 
+%defattr(-,root,root)
+%{prefix}/lib/%{name}/plugins/arts.pmo
+
+%files vorbis 
+%defattr(-,root,root)
+%{prefix}/lib/%{name}/plugins/vorbis.lmc
+%{prefix}/lib/%{name}/plugins/vorbis.mdf
 
 %files extras 
 %defattr(-,root,root)

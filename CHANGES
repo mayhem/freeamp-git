@@ -1,6 +1,12 @@
-Changes for version 2.1.0 (rc6|final)
+Changes for version 2.1.0 rc6
 --------------------------------------------------------------------
 - Added support for mouse wheel volume adjustment in linux
+- Removed in the internal Vorbis code -- outside libraries are now needed
+  for using vorbis.
+- Added ID3lib code to the freeamp codebase. The id3 interfaces keep changing
+  so we'll just wait until that stablizes.
+- The user can now set which MusicBrainz server FreeAmp should use. 
+- Ray Lucke contributed the arts pmo
 
 Changes for version 2.1.0 rc5
 --------------------------------------------------------------------
