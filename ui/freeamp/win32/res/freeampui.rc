@@ -135,7 +135,7 @@ BEGIN
                     IDC_STATIC,3,123,227,25
     LTEXT           "William Bull, Alan Cutter, Gabor Fleischer, Jean-Michel HERVE, Hiromasa Kato, Michael Bruun Petersen, Sylvain Rebaud, The Snowblind Alliance, Tom Spindler, Valters Vingolds, Bill Yuan.",
                     IDC_STATIC,3,94,227,24
-    LTEXT           "version 2.0 beta 3",IDC_STATIC,88,14,58,8
+    LTEXT           "version 2.0 beta 4",IDC_STATIC,88,14,58,8
     LTEXT           "FreeAmp",IDC_STATIC,102,5,29,8
     PUSHBUTTON      "Visit FreeAmp.org",IDC_GOTOFREEAMP,30,156,67,14
     PUSHBUTTON      "Visit EMusic.com",IDC_GOTOEMUSIC,136,156,67,14
@@ -391,8 +391,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,0,0,3
- PRODUCTVERSION 2,0,0,3
+ FILEVERSION 2,0,0,4
+ PRODUCTVERSION 2,0,0,4
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -410,13 +410,13 @@ BEGIN
             VALUE "Comments", "For the latest version go to http://www.freeamp.org\0"
             VALUE "CompanyName", "FreeAmp Open Source Development Effort\0"
             VALUE "FileDescription", "The default user interface for FreeAmp. A user can change it's look through theme files which are similiar to, but more powerful than skins.\0"
-            VALUE "FileVersion", "2.0 beta 3\0"
+            VALUE "FileVersion", "2.0 beta 4\0"
             VALUE "InternalName", "FreeAmp\0"
             VALUE "LegalCopyright", "Copyright © EMusic.com 1999\0"
             VALUE "LegalTrademarks", "FreeAmp, EMusic\0"
             VALUE "OriginalFilename", "freeamp.ui\0"
             VALUE "ProductName", "FreeAmp User interface\0"
-            VALUE "ProductVersion", "2.0 beta 3\0"
+            VALUE "ProductVersion", "2.0 beta 4\0"
         END
     END
     BLOCK "VarFileInfo"

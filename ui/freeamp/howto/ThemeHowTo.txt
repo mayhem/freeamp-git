@@ -237,7 +237,7 @@ Window:
 -------
 
 FreeAmp supports different windows in the same theme. The theme
-that ships with beta 3 only has one window, but later themes will
+that ships with beta 4 only has one window, but later themes will
 have support for window shades and other cool layouts. 
 
 The default window that FreeAmp opens a theme in is called 'MainWindow'.
@@ -402,7 +402,7 @@ coordinates. In the example above, the button will be placed 202
 pixels to the right of the left edge of the control bitmap and
 122 pixels below the top edge of the control bitmap.
 
-In beta 3, the theme designer should also be able to specify a Pos
+In beta 4, the theme designer should also be able to specify a Pos
 instead of a Rect, and the size of the button will be determined
 from the information given in the ControlBitmap tag.
 
