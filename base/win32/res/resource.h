@@ -20,7 +20,9 @@
 #define IDI_MUSIC15                     216
 #define IDI_MUSIC16                     217
 #define IDI_MUSIC17                     218
+#define IDI_MUSIC12                     219
 #define IDD_RECLAIMFILETYPES            220
+#define IDI_MUSIC18                     220
 #define IDC_CHECK                       1007
 
 // Next default values for new objects
