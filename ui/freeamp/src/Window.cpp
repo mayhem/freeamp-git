@@ -595,6 +595,11 @@ void Window::HandleMouseLButtonDown(Pos &oScreenPos)
        return;
     }
 
+#ifdef __QNX__
+    DecUsageRef();
+    return;
+#endif
+
     m_bWindowMove = true;
 #ifndef HAVE_GTK
     CaptureMouse(true);
