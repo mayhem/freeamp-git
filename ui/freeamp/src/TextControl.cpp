@@ -31,6 +31,7 @@ ____________________________________________________________________________*/
 static TransitionInfo pTransitions[] =
 {  
     { CS_Normal,    CT_SetValue,         CS_Normal    },
+    { CS_Normal,    CT_Show,             CS_Normal    },
     { CS_Normal,    CT_Timer,            CS_Normal    },
     { CS_Normal,    CT_MouseEnter,       CS_MouseOver },
     { CS_MouseOver, CT_SetValue,         CS_MouseOver },
@@ -125,7 +126,9 @@ void TextControl::Transition(ControlTransitionEnum  eTrans,
         case CT_Timer:
             MarqueeText();
             break;
-
+        case CT_Show:
+            TextChanged();
+            break;
         default:
             break;
     }

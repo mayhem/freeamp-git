@@ -365,3 +365,10 @@ void Win32Canvas::SetPalette(HPALETTE hPal)
    m_hPal = hPal;
 }
 
+void Win32Canvas::InitBackgrounds(vector<Panel *> *pPanels)
+{
+	Canvas::InitBackgrounds(pPanels);
+
+	if (m_pBufferBitmap)
+ 	   m_pBufferBitmap->BlitRect(m_pBGBitmap, m_oBGRect, m_oBGRect);
+}

@@ -38,11 +38,13 @@ static TransitionInfo pTransitions[] =
     { CS_Normal,     CT_MouseEnter,       CS_MouseOver  }, 
     { CS_Normal,     CT_Disable,          CS_Disabled   }, 
     { CS_Normal,     CT_Hide,             CS_Hidden     },
+    { CS_Normal,     CT_Show,             CS_Normal     }, 
     { CS_MouseOver,  CT_MouseLeave,       CS_Normal     }, 
     { CS_MouseOver,  CT_MouseLButtonDown, CS_Dragging   }, 
     { CS_MouseOver,  CT_Disable,          CS_Disabled   }, 
     { CS_Dragging,   CT_MouseMove,        CS_Dragging   }, 
     { CS_Dragging,   CT_MouseLButtonUp,   CS_MouseOver  }, 
+    { CS_Disabled ,  CT_Show,             CS_Normal     },
     { CS_Disabled ,  CT_Enable,           CS_Normal     },
     { CS_Disabled ,  CT_MouseEnter,       CS_DisabledMO },
     { CS_DisabledMO, CT_MouseLeave,       CS_Disabled   },
@@ -249,6 +251,7 @@ void SliderControl::Transition(ControlTransitionEnum  eTrans,
     switch(m_eCurrentState)
     {
        case CS_Normal:
+		  Debug_v("Normal!");
           BlitFrame(CS_Normal, iThumbNumber, &oRect);
           break;
 

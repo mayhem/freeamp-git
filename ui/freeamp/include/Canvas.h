@@ -54,7 +54,7 @@ class Canvas
      void SetBackgroundBitmap(Bitmap *pBitmap);
      void SetMaskBitmap(Bitmap *pBitmap);
      Bitmap *GetBackgroundBitmap(void);
-     void InitBackgrounds(vector<Panel *> *pPanels);
+     virtual void InitBackgrounds(vector<Panel *> *pPanels);
 
      virtual void  Init(void) = 0;
      virtual void  Erase(Rect &oPaintRect) = 0;

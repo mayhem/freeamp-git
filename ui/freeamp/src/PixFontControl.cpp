@@ -30,6 +30,7 @@ ____________________________________________________________________________*/
 
 static TransitionInfo pTransitions[] =
 {  
+    { CS_Normal,    CT_Show,             CS_Normal    }, 
     { CS_Normal,    CT_SetValue,         CS_Normal    },
     { CS_Normal,    CT_Timer,            CS_Normal    },
     { CS_Normal,    CT_MouseEnter,       CS_MouseOver },
@@ -122,6 +123,7 @@ void PixFontControl::Transition(ControlTransitionEnum  eTrans,
         case CT_MouseLeave:
             m_pParent->SendControlMessage(this, CM_MouseLeave);
             break;
+        case CT_Show:
         case CT_SetValue:
             TextChanged();
             break;

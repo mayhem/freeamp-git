@@ -28,6 +28,7 @@ ____________________________________________________________________________*/
 
 static TransitionInfo pTransitions[] =
 {  
+    { CS_Normal,     CT_Show,             CS_Normal     }, 
     { CS_Normal,     CT_MouseEnter,       CS_MouseOver  }, 
     { CS_Normal,     CT_Disable,          CS_Disabled   }, 
     { CS_Normal,     CT_Hide,             CS_Hidden     },
@@ -83,6 +84,10 @@ void DialControl::Transition(ControlTransitionEnum  eTrans,
            m_iLastPos = pMousePos->y;
            m_oMutex.Release();
            break;
+
+	   case CT_Show:
+		   Init();
+		   break;
 
        default:
           break;

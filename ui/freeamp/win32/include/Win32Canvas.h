@@ -56,6 +56,7 @@ class Win32Canvas : public Canvas
      virtual void  Erase(Rect &oRect);
      virtual HRGN  GetMaskRgn(void);
 	 virtual void  SetPalette(HPALETTE hPal);
+     virtual void  InitBackgrounds(vector<Panel *> *pPanels);
      
     protected:
 

@@ -25,6 +25,8 @@ ____________________________________________________________________________*/
 #include "Window.h"
 #include "debug.h"
 
+#include "Win32Bitmap.h"
+
 Canvas::Canvas(void)
 {
     m_pBGBitmap = NULL;
@@ -102,5 +104,6 @@ void Canvas::InitBackgrounds(vector<Panel *> *pPanels)
             }
         }
     }
+    //((Win32Bitmap *)m_pBGBitmap)->BlitIt(0,0);
 }
 

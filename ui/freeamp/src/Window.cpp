@@ -225,12 +225,18 @@ void Window::AddPanel(Panel *pPanel)
 
 void Window::PanelStateChanged(void)
 {
-    Rect oRect;
+    ControlMapIterator  i;
+    Rect                oRect;
 
     IncUsageRef();
     m_pCanvas->InitBackgrounds(&m_oPanels);
+    for (i = m_oControlMap.begin(); i != m_oControlMap.end(); i++)
+    {
+         i->second->AcceptTransition(CT_Show);
+    }        
     m_pCanvas->GetBackgroundRect(oRect);
     m_pCanvas->Invalidate(oRect);
+
     DecUsageRef();
 }
 
