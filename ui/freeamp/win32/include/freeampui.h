@@ -37,6 +37,7 @@ ____________________________________________________________________________*/
 #include "queue.h"
 #include "playlist.h"
 #include "errors.h"
+#include "properties.h"
 
 enum { STATE_Stopped = 1, STATE_Playing, STATE_Paused };
 
@@ -50,6 +51,9 @@ class FreeAmpUI : public UserInterface {
     virtual int32 AcceptEvent(Event *);
     virtual void SetArgs(int32,char **);
 	virtual void SetPlayListManager(PlayListManager *);
+
+    virtual Error SetPropManager(Properties *p) { m_propManager = p; if (p) return kError_NoErr; else return kError_UnknownErr; }
+
 
     void CreateUI();
 
@@ -74,6 +78,7 @@ class FreeAmpUI : public UserInterface {
 
 
  private:
+	 Properties *   m_propManager;
     int32			m_totalSeconds;
     
     Thread*         m_uiThread;

@@ -24,6 +24,7 @@ ____________________________________________________________________________*/
 #ifndef _PROPERTIES_H_
 #define _PROPERTIES_H_
 
+#include <string.h>
 #include "config.h"
 #include "errors.h"
 

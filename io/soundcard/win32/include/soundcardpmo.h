@@ -34,6 +34,7 @@ ____________________________________________________________________________*/
 #include "config.h"
 #include "pmo.h"
 #include "mutex.h"
+#include "properties.h"
 
 #define BIT_SELECT  0x1f
 #define SLEEPTIME   256
@@ -52,12 +53,13 @@ public:
     virtual Error Write(int32&,void*,int32);
     virtual Error Pause();
     virtual Error Resume();
-    
+    virtual Error SetPropManager(Properties *p) { m_propManager = p; if (p) return kError_NoErr; else return kError_UnknownErr; }
     
  private:
 	WAVEHDR* NextHeader();
 
 private:
+	Properties *    m_propManager;
 	WAVEFORMATEX*	m_wfex;
 	LPWAVEHDR*		m_wavehdr_array;
 	HWAVEOUT		m_hwo;
