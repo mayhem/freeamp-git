@@ -95,18 +95,26 @@ while (<>) {
 	$label = "";
     }
 
-    if ($_ eq "" && $trailer =~ /^\s*;%% (\w+)$/) {
+    if ($_ eq "" && $trailer =~ /^\s*;%% (\w+)(\s+(.*))?$/) {
 	$_ = $1;
+	@args = split (/\s*,\s*/, $3);
 	tr/A-Z/a-z/;
 	$trailer = "\n";
 	if (/^proc$/) {
+	    &lerr ("Wrong # of args\n") if ($#args != -1);
 	    $proclabel = $label;
 	    $label = "";
 	    $proclabel =~ s/:.*//;
 	    $_ = "$proclabel proc near";
 	} elsif (/^endp$/) {
+	    &lerr ("Wrong # of args\n") if ($#args != -1);
 	    $_ = "$proclabel endp";
 	    $proclabel = "";
+	} elsif (/^extern$/) {
+	    &lerr ("Wrong # of args\n") if ($#args != 1);
+	    $sym = &translate_sym (@args[0]);
+	    $type = @args[1];
+	    $_ = "extern $sym:$type";
 	} else {
 	    &lerr ("Unrecognized special comment\n");
 	}
@@ -115,10 +123,6 @@ while (<>) {
 	my $sym = &translate_sym ($1);
 
 	$_ = "public $sym";
-    } elsif (/^\.extern\s+($re_sym)$/) {
-	my $sym = &translate_sym ($1);
-
-	$_ = "EXTERN $sym:dword";
     } elsif (/^\.align\s+([0-9]+)$/) {
 	$_ = "align $1";	# Don't know how to translate this
     } elsif (/^\.type\s+/) {
