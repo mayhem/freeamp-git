@@ -447,26 +447,39 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
         return 0;
     }
 
-	if (pHdr->code == TTN_NEEDTEXT)
+	if(pHdr->code == TTN_NEEDTEXT)
     {
         pToolTipText = (LPTOOLTIPTEXT)pHdr;
+
         switch(pToolTipText->hdr.idFrom)
         {
-           case ID_FILE_SEARCHFORMUSIC:
-              pToolTipText->lpszText = "Music Search";
-              return true;
-           case ID_FILE_NEWPLAYLIST:
-              pToolTipText->lpszText = "New Playlist";
-              return true;
-           case ID_FILE_IMPORT:
-              pToolTipText->lpszText = "Import Tracks";
-              return true;
-           case ID_EDIT_REMOVE:
-              pToolTipText->lpszText = "Remove Track/Playlist";
-              return true;
-           case ID_EDIT_EDIT:
-              pToolTipText->lpszText = "Edit Track/Playlist";
-              return true;
+            case ID_FILE_NEWPLAYLIST:
+                pToolTipText->lpszText = "Create a new playlist";
+                return true;
+            case ID_FILE_SAVEPLAYLIST:
+                pToolTipText->lpszText = "Save current playlist";
+                return true;
+            case ID_FILE_IMPORT:
+                pToolTipText->lpszText = "Import tracks from disk";
+                return true;
+            case ID_EDIT_REMOVE:
+                pToolTipText->lpszText = "Remove selected tracks or playlists";
+                return true;
+            case ID_EDIT_EDITINFO:
+                pToolTipText->lpszText = "Edit track or playlist info";
+                return true;
+            case ID_EDIT_ADDTRACK:
+                pToolTipText->lpszText = "Add selected tracks or playlists to playlist";
+                return true;
+            case ID_EDIT_ADDFILE:
+                pToolTipText->lpszText = "Add file from disk to playlist ";
+                return true;
+            case ID_EDIT_MOVEUP:
+                pToolTipText->lpszText = "Move selected playlist items up";
+                return true;
+            case ID_EDIT_MOVEDOWN:
+                pToolTipText->lpszText = "Move selected playlist items down";
+                return true;
         }      
     }
     
@@ -553,23 +566,56 @@ void MusicBrowserUI::AddTrackEvent(void)
     m_oPlm->AddItems(urls);
     
 }
-
-/*
+void MusicBrowserUI::AddFileEvent(void)
 {
-    vector<string>           oFileList;
-    vector<string>::iterator i;
-    Error                   eRet;
+    PlaylistFormatInfo format;
+    int32 i, iOffset = 0;
+    
+    char szFilter[1024] = "MPEG Audio Streams (.mp1;.mp2;.mp3;.mpp)\0"
+                          "*.mp1;*.mp2;*.mp3;*.mpp\0";
 
-    if (FileOpenDialog(m_hWnd, "Add playlist item",
-                       kAudioFileFilter, 
+    // we need a way to iterate LMCs...
+    iOffset += strlen(szFilter) + 1; 
+    iOffset += strlen(szFilter + iOffset) + 1;  
+        
+    for(i = 0; ; i++)
+    {
+       if (m_oPlm->GetSupportedPlaylistFormats(&format, i) != kError_NoErr)
+          break;
+    
+       sprintf(szFilter + iOffset, "%s (.%s)", 
+            format.GetDescription(),
+            format.GetExtension());
+       iOffset += strlen(szFilter + iOffset) + 1;     
+
+       sprintf(szFilter + iOffset, "*.%s", 
+            format.GetExtension());
+       iOffset += strlen(szFilter + iOffset) + 1;     
+    }
+    
+    strcpy(szFilter + iOffset, "All Files (*.*)\0");
+    iOffset += strlen(szFilter + iOffset) + 1;     
+    strcpy(szFilter + iOffset, "*.*\0");
+    iOffset += strlen(szFilter + iOffset) + 1;     
+    szFilter[iOffset] = 0;
+    
+    vector<string> oFileList;
+
+    if (FileOpenDialog(m_hWnd, "Add Tracks and Playlists",
+                       szFilter, 
                        &oFileList,
                        m_context->prefs))
     {
-        for(i = oFileList.begin(); i != oFileList.end(); i++)
-           eRet = m_oPlm->AddItem((*i).c_str());
-    }
+        // we know that we are gonna be adding a 
+        // bunch of items so let windows know.
+        // it will make the adds more efficient
+        uint32 newSize = ListView_GetItemCount(m_hPlaylistView);
+        newSize += oFileList.size();
+        ListView_SetItemCount(m_hPlaylistView, newSize);
+
+        m_oPlm->AddItems(oFileList); 
+    }  
 }
-*/
 
 void MusicBrowserUI::EmptyDBCheck(void)
 {

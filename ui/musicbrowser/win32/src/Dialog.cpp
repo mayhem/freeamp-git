@@ -43,13 +43,13 @@ TBBUTTON tbButtons[] = {
     { 2, ID_FILE_SAVEPLAYLIST, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
 	{ 0, 0, TBSTATE_ENABLED, TBSTYLE_SEP, 0L, 0},
     { 1, ID_FILE_IMPORT, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-	{ 12, IDC_DELETE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-	{ 5, ID_EDIT_EDIT, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+	{ 12,ID_EDIT_REMOVE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+	{ 5, ID_EDIT_EDITINFO, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
     { 0, 0, TBSTATE_ENABLED, TBSTYLE_SEP, 0L, 0},
     { 1, ID_EDIT_ADDTRACK, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-    { 1, ID_EDIT_ADDTRACK, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+    { 1, ID_EDIT_ADDFILE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
     { 9, ID_EDIT_MOVEUP, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-    { 10, ID_EDIT_MOVEDOWN, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},  
+    { 10,ID_EDIT_MOVEDOWN, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},  
 };
 
 static BOOL CALLBACK MainDlgProc(HWND hwnd, UINT msg, 
@@ -204,6 +204,10 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
 
                 case ID_EDIT_ADDTRACK:
                     AddTrackEvent();
+                    return 1;
+
+                case ID_EDIT_ADDFILE:
+                    AddFileEvent();
                     return 1;
 
                 case ID_EDIT_MOVEUP:
@@ -856,7 +860,7 @@ void MusicBrowserUI::CreateToolbar(void)
     tbButtons[3].iString = index;
     index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Remove Item");
     tbButtons[4].iString = index;
-    index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Edit Item");
+    index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Edit Info");
     tbButtons[5].iString = index;
     index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Add Item");
     tbButtons[7].iString = index;
@@ -1170,6 +1174,9 @@ void MusicBrowserUI::UpdateButtonMenuStates()
     EnableMenuItem(hMenu, ID_FILE_SAVEPLAYLIST, 
                    m_bListChanged ? MF_ENABLED : MF_GRAYED );
 
+    SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
+                    ID_FILE_SAVEPLAYLIST, MAKELPARAM(m_bListChanged, 0)); 
+
     int32        lParam;
     HTREEITEM    hDummy;
 
@@ -1179,10 +1186,22 @@ void MusicBrowserUI::UpdateButtonMenuStates()
                    m_oTreeIndex.IsPlaylist(lParam) ? 
                    MF_ENABLED : MF_GRAYED );
 
-
-    
     // Edit Menu
     hMenu = GetSubMenu(hMenuRoot, 1);
+
+
+    // start off disabled... might enable below
+    EnableMenuItem(hMenu, ID_EDIT_REMOVE, MF_GRAYED);
+    SendMessage(m_hToolbar, TB_ENABLEBUTTON, ID_EDIT_REMOVE, 0); 
+
+    sMenuItem.cbSize = sizeof(MENUITEMINFO);
+    sMenuItem.fMask =  MIIM_DATA|MIIM_TYPE;
+    sMenuItem.fType = MFT_STRING;
+    sMenuItem.dwTypeData = "&Remove Items...";
+    sMenuItem.cch = strlen(sMenuItem.dwTypeData);
+
+    SetMenuItemInfo(hMenu, ID_EDIT_REMOVE, false, &sMenuItem);
+
 
     // Can we move items up and down?
     uint32 index = ListView_GetItemCount(m_hPlaylistView) - 1;
@@ -1210,7 +1229,19 @@ void MusicBrowserUI::UpdateButtonMenuStates()
                        (state & LVIS_SELECTED) ? MF_GRAYED : MF_ENABLED );
 
         SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
-                    ID_EDIT_MOVEUP, MAKELPARAM(!(state & LVIS_SELECTED), 0));    
+                    ID_EDIT_MOVEUP, MAKELPARAM(!(state & LVIS_SELECTED), 0)); 
+        
+        EnableMenuItem(hMenu, ID_EDIT_REMOVE, MF_ENABLED);
+        SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
+                    ID_EDIT_REMOVE, MAKELPARAM(TRUE, 0)); 
+
+        sMenuItem.cbSize = sizeof(MENUITEMINFO);
+        sMenuItem.fMask = MIIM_DATA|MIIM_TYPE;
+        sMenuItem.fType = MFT_STRING;
+        sMenuItem.dwTypeData = "&Remove Tracks from Playlist";
+        sMenuItem.cch = strlen(sMenuItem.dwTypeData);
+
+        SetMenuItemInfo(hMenu, ID_EDIT_REMOVE, false, &sMenuItem);
     }
     else
     {    
@@ -1221,12 +1252,42 @@ void MusicBrowserUI::UpdateButtonMenuStates()
                     ID_EDIT_MOVEUP, 0);    
         SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
                     ID_EDIT_MOVEDOWN, 0); 
+
     }
 
+    // what about items which deal with the treeview?
+    HTREEITEM treeSelect = TreeView_GetSelection(m_hMusicCatalog);
+
+    if(treeSelect && m_hMusicCatalog == GetFocus())
+    {
+        EnableMenuItem(hMenu, ID_EDIT_ADDTRACK, MF_ENABLED );
+
+        if(treeSelect != m_hNewPlaylistItem && 
+           treeSelect != m_hCatalogItem)
+        {
+            EnableMenuItem(hMenu, ID_EDIT_REMOVE, MF_ENABLED);
+            SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
+                    ID_EDIT_REMOVE, MAKELPARAM(TRUE, 0)); 
+        }
+
+        sMenuItem.cbSize = sizeof(MENUITEMINFO);
+        sMenuItem.fMask =  MIIM_DATA|MIIM_TYPE;
+        sMenuItem.fType = MFT_STRING;
+        sMenuItem.dwTypeData = "&Remove Items from Catalog...";
+        sMenuItem.cch = strlen(sMenuItem.dwTypeData);
+
+        SetMenuItemInfo(hMenu, ID_EDIT_REMOVE, false, &sMenuItem);
+    }
+    else
+    {
+        EnableMenuItem(hMenu, ID_EDIT_ADDTRACK, MF_GRAYED );
+    }
+
+
    
- 
+
     sMenuItem.cbSize = sizeof(MENUITEMINFO);
-    sMenuItem.fMask =  MIIM_STATE;
+    sMenuItem.fMask =  MIIM_DATA;
     sMenuItem.fType = MFT_STRING;
     //sMenuItem.fState = (oType.length() == 0) ? MFS_GRAYED : MFS_ENABLED;
 

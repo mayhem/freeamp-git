@@ -172,8 +172,8 @@ BEGIN
     END
     POPUP "E&dit"
     BEGIN
-        MENUITEM "&Add Tracks and Playlists...", ID_EDIT_ADDTRACK
-        MENUITEM "Add &File...",                ID_EDIT_ADDFILE
+        MENUITEM "&Add Selected Tracks and Playlists", ID_EDIT_ADDTRACK
+        MENUITEM "Add &File From Disk...",      ID_EDIT_ADDFILE
         MENUITEM "&Remove Items",               ID_EDIT_REMOVE
         MENUITEM SEPARATOR
         MENUITEM "Move &Up",                    ID_EDIT_MOVEUP

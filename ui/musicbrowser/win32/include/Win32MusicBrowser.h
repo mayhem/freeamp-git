@@ -178,6 +178,7 @@ class MusicBrowserUI : public UserInterface
     void  MoveUpEvent(void);
     void  MoveDownEvent(void);
     void  AddTrackEvent(void);
+    void  AddFileEvent(void);
     void  EditPlaylistEvent(void);
     void  DeleteEvent(void);
     void  DeleteListEvent(void);
@@ -194,7 +195,6 @@ class MusicBrowserUI : public UserInterface
     void  ExportPlaylistEvent(void);
 
     // Functions in PlaylistView.cpp
-    
     void  AddPlaylistListItem(const PlaylistItem* item);
     void  UpdatePlaylistListItem(const PlaylistItem* item);
     void  PlaylistListItemMoved(const PlaylistItem* item, 
