@@ -28,9 +28,9 @@
 #define __ID3LIB_FRAME_H__
 
 #include "spec.h"
-#include "field.h"
 #include "header_frame.h"
 
+class ID3_Field;
 class ID3_Tag;
 
 /** The representative class of an id3v2 frame.
@@ -48,7 +48,6 @@ class ID3_Tag;
  **/
 class ID3_Frame : public ID3_Speccable
 {
-  friend ID3_Tag;
 public:
   /** Default constructor; accepts as a default parameter the type of frame
    ** to create.
@@ -61,18 +60,18 @@ public:
    ** @see SetID
    **/
   ID3_Frame(ID3_FrameID id = ID3FID_NOFRAME);
-  ID3_Frame(const ID3_FrameHeader &);
+  ID3_Frame(const ID3_FrameHeader&);
   ID3_Frame(const ID3_Frame&);
 
   /// Destructor.
-  ~ID3_Frame(void);
+  virtual ~ID3_Frame();
   
   /** Clears the frame of all data and resets the frame such that it can take
    ** on the form of any id3v2 frame that id3lib supports.
    ** 
    ** @see ID3_Tag::Clear
    **/
-  void        Clear(void);
+  void        Clear();
 
   /** Establishes the internal structure of an ID3_Frame object so
    ** that it represents the id3v2 frame indicated by the parameter
@@ -91,7 +90,7 @@ public:
    ** @param id The type of frame this frame should be set to
    ** @see ID3_FrameID
    **/
-  void        SetID(ID3_FrameID id);
+  bool        SetID(ID3_FrameID id);
 
   /** Returns the type of frame that the object represents.
    ** 
@@ -100,7 +99,7 @@ public:
    ** @returns The type, or id, of the frame
    ** @see ID3_Tag::Find
    **/
-  ID3_FrameID GetID(void) const;
+  ID3_FrameID GetID() const;
   
   /** Returns a reference to the frame's internal field indicated by the 
    ** parameter.
@@ -120,29 +119,42 @@ public:
    **/
   ID3_Field  &Field(ID3_FieldID name) const;
   
-  ID3_Frame  &operator=( const ID3_Frame &rFrame );
+  const char* GetDescription() const;
+  static const char* GetDescription(ID3_FrameID);
+
+  ID3_Frame  &operator=(const ID3_Frame &);
+  bool        HasChanged() const;
+  size_t      Parse(const uchar *buffer, luint size);
+  luint       Size();
+  luint       Render(uchar *buffer);
+  bool        Contains(ID3_FieldID fld)
+  { return BS_ISSET(__field_bitset, fld) > 0; }
+  bool        SetSpec(ID3_V2Spec);
+  ID3_V2Spec  GetSpec() const;
+
+  bool        SetCompression(bool b)  { return __hdr.SetCompression(b); }
+  bool        GetCompression() const  { return __hdr.GetCompression(); }
+  bool        BadParse() const { return __bad_parse; }
+  size_t      GetDataSize() const { return __hdr.GetDataSize(); }
 
 protected:
-  void        InitFields(const ID3_FrameDef *);
-  void        InitFieldBits(void);
-  bool        HasChanged(void) const;
-  void        Parse(uchar *buffer, luint size);
-  void        SetSpec(const ID3_V2Spec);
-  ID3_V2Spec  GetSpec() const;
-  void        UpdateStringTypes(void);
-  void        UpdateFieldDeps(void);
-  luint       Size(void);
-  luint       Render(uchar *buffer);
-  lsint       FindField(ID3_FieldID name) const;
+  bool        _SetID(ID3_FrameID);
+  bool        _ClearFields();
+  void        _InitFields();
+  void        _InitFieldBits();
+  void        _UpdateStringTypes();
+  void        _UpdateFieldDeps();
+  lsint       _FindField(ID3_FieldID name) const;
 
 private:
-  char        __sEncryptionID[256]; // encryption method used with this frame
-  char        __sGroupingID[256];   // the group to which this frame belongs
-  bool        __bHasChanged;        // frame changed since last parse/render?
-  bitset      __auiFieldBits;       // which fields are present?
-  luint       __ulNumFields;        // how many fields are in this frame?
-  ID3_Field **__apFields;           // an array of field object pointers
-  ID3_FrameHeader __FrmHdr;         // 
+  char        __encryption_id[256]; // encryption method used with this frame
+  char        __grouping_id[256];   // the group to which this frame belongs
+  bool        __changed;            // frame changed since last parse/render?
+  bitset      __field_bitset;       // which fields are present?
+  luint       __num_fields;         // how many fields are in this frame?
+  ID3_Field **__fields;             // an array of field object pointers
+  ID3_FrameHeader __hdr;            // 
+  bool        __bad_parse;          //
 }
 ;
 

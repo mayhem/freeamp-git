@@ -32,6 +32,7 @@
 #ifndef __ID3LIB_GLOBALS_H__
 #define __ID3LIB_GLOBALS_H__
 
+#include <stdlib.h>
 #include "sized_types.h"
 
 /* id3lib version.
@@ -45,11 +46,10 @@
 #  else /* !ID3LIB_COMPILATION */
 #    define ID3_C_EXPORT extern __declspec(dllimport)
 #  endif /* !ID3LIB_COMPILATION */
-#  define ID3_C_VAR extern
 #else /* !WIN32 */
-#  define ID3_C_VAR extern
 #  define ID3_C_EXPORT
 #endif /* !WIN32 */
+#define ID3_C_VAR extern
 
 #ifndef __cplusplus
 
@@ -99,8 +99,10 @@ const unicode_t NULL_UNICODE = (unicode_t) '\0';
  **/
 ID3_ENUM(ID3_TextEnc)
 {
+  ID3TE_NONE = -1,
   ID3TE_ASCII = 0,
-  ID3TE_UNICODE
+  ID3TE_UNICODE,
+  ID3TE_NUMENCODINGS  
 };
 
 /** Enumeration of the various id3 specifications
@@ -163,6 +165,8 @@ ID3_ENUM(ID3_FieldID)
   ID3FN_VOLCHGLEFT,     /**< Volume chage on the left channel */
   ID3FN_PEAKVOLRIGHT,   /**< Peak volume on the right channel */
   ID3FN_PEAKVOLLEFT,    /**< Peak volume on the left channel */
+  ID3FN_TIMESTAMPFORMAT,/**< SYLT Timestamp Format */
+  ID3FN_CONTENTTYPE,    /**< SYLT content type */
   ID3FN_LASTFIELDID     /**< Last field placeholder */
 };
 
@@ -246,7 +250,8 @@ ID3_ENUM(ID3_FrameID)
   /* WPAY */ ID3FID_WWWPAYMENT,        /**< Payment */
   /* WPUB */ ID3FID_WWWPUBLISHER,      /**< Official publisher webpage */
   /* WXXX */ ID3FID_WWWUSER,           /**< User defined URL link */
-  /*      */ ID3FID_METACRYPTO         /**< Encrypted meta frame (id3v2.2.x) */
+  /*      */ ID3FID_METACRYPTO,        /**< Encrypted meta frame (id3v2.2.x) */
+  /*      */ ID3FID_METACOMPRESSION    /**< Compressed meta frame (id3v2.2.1) */
 };
 
 ID3_ENUM(ID3_V1Lengths)
@@ -289,20 +294,20 @@ ID3_STRUCT(ID3V1_Tag)
 ID3_ENUM(ID3_FieldFlags)
 {
   ID3FF_NONE       =      0,
-  ID3FF_NULL       = 1 << 0,
-  ID3FF_NULLDIVIDE = 1 << 1,
-  ID3FF_ADJUSTENC  = 1 << 2,
-  ID3FF_ADJUSTEDBY = 1 << 3
+  ID3FF_CSTR       = 1 << 0,
+  ID3FF_LIST       = 1 << 1,
+  ID3FF_ENCODABLE  = 1 << 2,
+  ID3FF_TEXTLIST   = ID3FF_CSTR | ID3FF_LIST | ID3FF_ENCODABLE
 };
 
 /** Enumeration of the types of field types */
 ID3_ENUM(ID3_FieldType)
 {
+  ID3FTY_NONE           = -1,
   ID3FTY_INTEGER        = 0,
-  ID3FTY_BITFIELD,
   ID3FTY_BINARY,
-  ID3FTY_ASCIISTRING,
-  ID3FTY_UNICODESTRING
+  ID3FTY_TEXTSTRING,
+  ID3FTY_NUMTYPES
 };
 
 /**
@@ -327,10 +332,21 @@ ID3_ENUM(ID3_Err)
 
 };
 
-ID3_ENUM(ID3_VerCtl)
+ID3_ENUM(ID3_ContentType)
 {
-  ID3VC_HIGHER  = 0,
-  ID3VC_LOWER
+  ID3CT_OTHER = 0,
+  ID3CT_LYRICS,
+  ID3CT_TEXTTRANSCRIPTION,
+  ID3CT_MOVEMENT,
+  ID3CT_EVENTS,
+  ID3CT_CHORD,
+  ID3CT_TRIVIA
+};
+
+ID3_ENUM(ID3_TimeStampFormat)
+{
+  ID3TSF_FRAME  = 1,
+  ID3TSF_MS
 };
 
 #define BS_SIZE (sizeof(luint)*8)
@@ -351,7 +367,7 @@ ID3_ENUM(ID3_VerCtl)
 /*
  * The following is borrowed from glib.h (http://www.gtk.org)
  */
-#ifdef NATIVE_WIN32
+#ifdef WIN32
 
 /* On native Win32, directory separator is the backslash, and search path
  * separator is the semicolon.
@@ -361,7 +377,7 @@ ID3_ENUM(ID3_VerCtl)
 #  define ID3_SEARCHPATH_SEPARATOR ';'
 #  define ID3_SEARCHPATH_SEPARATOR_S ";"
 
-#else  /* !NATIVE_WIN32 */
+#else  /* !WIN32 */
 
 #  ifndef __EMX__
 /* Unix */
@@ -381,7 +397,7 @@ ID3_ENUM(ID3_VerCtl)
 
 #  endif
 
-#endif /* !NATIVE_WIN32 */
+#endif /* !WIN32 */
 
 #ifndef NULL
 #define NULL ((void*) 0)

@@ -1,6 +1,6 @@
 // $Id$
 
-// id3lib: a software library for creating and manipulating id3v1/v2 tags
+// id3lib: a C++ library for creating and manipulating id3v1/v2 tags
 // Copyright 1999, 2000  Scott Thomas Haug
 
 // This library is free software; you can redistribute it and/or modify it
@@ -24,34 +24,32 @@
 // id3lib.  These files are distributed with id3lib at
 // http://download.sourceforge.net/id3lib/
 
-#ifndef __ID3LIB_SPEC_H__
-#define __ID3LIB_SPEC_H__
+#ifndef __ID3LIB_FLAGS_H__
+#define __ID3LIB_FLAGS_H__
 
-#include "globals.h"
+#include "flags.h"
 
-ID3_V2Spec ID3_VerRevToV2Spec(uchar ver, uchar rev);
-uchar      ID3_V2SpecToVer(ID3_V2Spec spec);
-uchar      ID3_V2SpecToRev(ID3_V2Spec spec);
-
-class ID3_Speccable
+class ID3_Flags
 {
 public:
-  virtual bool       SetSpec(ID3_V2Spec) = 0;
-  virtual ID3_V2Spec GetSpec() const = 0;
+  typedef uint16 TYPE;
 
-  /* The following methods are deprecated */
-  virtual bool       SetVersion(uchar ver, uchar rev)
-  {
-    return this->SetSpec(ID3_VerRevToV2Spec(ver, rev));
-  }
-  virtual uchar      GetVersion() const
-  {
-    return ID3_V2SpecToVer(this->GetSpec());
-  }
-  virtual uchar      GetRevision() const
-  {
-    return ID3_V2SpecToRev(this->GetSpec());
-  }
+  ID3_Flags() : __f(0) { ; }
+  virtual ~ID3_Flags() { ; }
+
+  TYPE   get() const         { return __f; }
+  bool   test(TYPE f) const { return (this->get() & f) == f; }
+  bool   set(TYPE f)        { bool r = (__f != f); __f = f; return r; }
+  bool   add(TYPE f)        { return this->set(this->get() | f); }
+  bool   remove(TYPE f)     { return this->set(this->get() & ~f); }
+  bool   clear()             { return this->set(0); }
+  bool   set(TYPE f, bool b){ if (b) return this->add(f); return this->remove(f); }
+
+  ID3_Flags& operator=(const ID3_Flags& f)
+  { if (this != &f) { this->set(f.get()); } return *this; }
+
+private:
+  TYPE __f;
 };
 
-#endif /* __ID3LIB_SPEC_H__ */
+#endif /* __ID3LIB_FLAGS_H__ */

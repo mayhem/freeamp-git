@@ -28,37 +28,91 @@
 #define __ID3LIB_HEADER_FRAME_H__
 
 #include "header.h"
-#include "header_tag.h"
 #include "field.h"
-
-#define ID3FL_TAGALTER    (1 << 15)
-#define ID3FL_FILEALTER   (1 << 14)
-#define ID3FL_READONLY    (1 << 13)
-#define ID3FL_COMPRESSION (1 <<  7)
-#define ID3FL_ENCRYPTION  (1 <<  6)
-#define ID3FL_GROUPING    (1 <<  5)
 
 class ID3_FrameHeader : public ID3_Header
 {
 public:
-  ID3_FrameHeader();
-  virtual ~ID3_FrameHeader();
-  
-  virtual size_t Size(void);
-  virtual size_t Parse(uchar *buffer);
-  virtual size_t Render(uchar *buffer);
-  virtual void  SetFrameID(ID3_FrameID id);
-  virtual ID3_FrameID GetFrameID() const;
-  virtual const char *GetTextID(void) const;
-  virtual const ID3_FrameDef *GetFrameDef() const;
-  virtual void Clear();
-  ID3_FrameHeader& operator=(const ID3_FrameHeader&);
- 
-protected:
-  virtual void  SetUnknownFrame(const char*);
 
-  ID3_FrameDef *__pFrameDef;
-  bool __bDynFrameDef;
+  enum
+  {
+    TAGALTER    = 1 << 15,
+    FILEALTER   = 1 << 14,
+    READONLY    = 1 << 13,
+    COMPRESSION = 1 <<  7,
+    ENCRYPTION  = 1 <<  6,
+    GROUPING    = 1 <<  5
+  };
+
+  ID3_FrameHeader() : __frame_def(NULL), __dyn_frame_def(false) { ; }
+  virtual ~ID3_FrameHeader() { this->Clear(); }
+  
+  /* */ size_t        Size() const;
+  /* */ size_t        Parse(const uchar*, size_t);
+  /* */ size_t        Render(uchar*) const;
+  /* */ bool          SetFrameID(ID3_FrameID id);
+  /* */ ID3_FrameID   GetFrameID() const;
+  const char*         GetTextID() const;
+  const ID3_FrameDef* GetFrameDef() const;
+  /* */ bool          Clear();
+  ID3_FrameHeader&    operator=(const ID3_FrameHeader&);
+
+  size_t GetExtrasSize() const
+  {
+    return 
+      (__flags.test(COMPRESSION) ? sizeof(uint32) : 0) +
+      (__flags.test(ENCRYPTION)  ? sizeof(uchar)  : 0) +
+      (__flags.test(GROUPING)    ? sizeof(uchar)  : 0);
+  }
+  bool SetExpandedSize(size_t size)
+  {
+    bool changed = size != __expanded_size;
+    __expanded_size = size;
+    __changed = __changed || changed;
+    return changed;
+  }
+  size_t GetExpandedSize() const { return __expanded_size;  }
+  bool SetEncryptionID(uchar id)
+  {
+    bool changed = id != __encryption_id;
+    __encryption_id = id;
+    __changed = __changed || changed;
+    return changed;
+  }
+  uchar GetEncryptionID() const { return __encryption_id; }
+  bool SetGroupingID(uchar id)
+  {
+    bool changed = id != __grouping_id;
+    __grouping_id = id;
+    __changed = __changed || changed;
+    return changed;
+  }
+  uchar GetGroupingID() const { return __grouping_id; }
+ 
+  bool SetCompression(bool b) { return this->SetFlags(COMPRESSION, b); }
+  bool SetEncryption(bool b) { return this->SetFlags(ENCRYPTION, b); }
+  bool SetGrouping(bool b) { return this->SetFlags(GROUPING, b); }
+
+  bool GetCompression() const { return __flags.test(COMPRESSION); }
+  bool GetEncryption() const { return __flags.test(ENCRYPTION); }
+  bool GetGrouping() const { return __flags.test(GROUPING); }
+  bool GetReadOnly() const { return __flags.test(READONLY); }
+
+protected:
+  bool                SetFlags(uint16 f, bool b)
+  {
+    bool changed = __flags.set(f, b);
+    __changed = __changed || changed;
+    return changed;
+  }
+  void                SetUnknownFrame(const char*);
+
+private:
+  uchar               __encryption_id;
+  uchar               __grouping_id;
+  size_t              __expanded_size;
+  ID3_FrameDef*       __frame_def;
+  bool                __dyn_frame_def;
 }
 ;
 

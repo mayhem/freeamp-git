@@ -29,60 +29,59 @@
 
 #include "tag.h"
 
-uint32 ParseNumber(const uchar *buffer, size_t size = sizeof(uint32));
-void   RenderNumber(uchar *buffer, uint32 val, size_t size = sizeof(uint32));
+char*      ID3_GetString(const ID3_Frame *, ID3_FieldID, size_t nItems = 1);
 
 // defined in 'id3_misc_support.cpp'
 // these are 'convenience functions,' to make using the library easier for the 
 // most common of operations
-char  *ID3_GetArtist(ID3_Tag *tag);
-bool   ID3_AddArtist(ID3_Tag *tag, const char *text, bool bReplace = false);
-size_t ID3_RemoveArtists(ID3_Tag *tag);
+char*      ID3_GetArtist(const ID3_Tag*);
+ID3_Frame* ID3_AddArtist(ID3_Tag*, const char*, bool replace = false);
+size_t     ID3_RemoveArtists(ID3_Tag*);
 
-char  *ID3_GetAlbum(ID3_Tag *tag);
-bool   ID3_AddAlbum(ID3_Tag *tag, const char *text, bool bReplace = false);
-size_t ID3_RemoveAlbums(ID3_Tag *tag);
+char*      ID3_GetAlbum(const ID3_Tag*);
+ID3_Frame* ID3_AddAlbum(ID3_Tag*, const char*, bool replace = false);
+size_t     ID3_RemoveAlbums(ID3_Tag*);
 
-char  *ID3_GetTitle(ID3_Tag *tag);
-bool   ID3_AddTitle(ID3_Tag *tag, const char *text, bool bReplace = false);
-size_t ID3_RemoveTitles(ID3_Tag *tag);
+char*      ID3_GetTitle(const ID3_Tag*);
+ID3_Frame* ID3_AddTitle(ID3_Tag*, const char*, bool replace = false);
+size_t     ID3_RemoveTitles(ID3_Tag*);
 
-char  *ID3_GetYear(ID3_Tag *tag);
-bool   ID3_AddYear(ID3_Tag *tag, const char *text, bool bReplace = false);
-size_t ID3_RemoveYears(ID3_Tag *tag);
+char*      ID3_GetYear(const ID3_Tag*);
+ID3_Frame* ID3_AddYear(ID3_Tag*, const char*, bool replace = false);
+size_t     ID3_RemoveYears(ID3_Tag*);
 
-char  *ID3_GetComment(ID3_Tag *tag);
-bool   ID3_AddComment(ID3_Tag *tag, const char *text,
-                      const char *sDescription = "", bool bReplace = false);
-size_t ID3_RemoveComments(ID3_Tag *tag, const char *sDescription = NULL);
+char*      ID3_GetComment(const ID3_Tag*);
+ID3_Frame* ID3_AddComment(ID3_Tag *, const char*, 
+                          const char* desc = "", bool replace = false);
+size_t     ID3_RemoveComments(ID3_Tag*, const char * = NULL);
 
-char  *ID3_GetTrack(ID3_Tag *tag);
-luint  ID3_GetTrackNum(ID3_Tag *tag);
-bool   ID3_AddTrack(ID3_Tag *tag, uchar ucTrack, uchar ucTotal = 0,
-                    bool bReplace = false);
-bool   ID3_AddTrack(ID3_Tag *tag, uchar ucTrack, bool bReplace);
-size_t ID3_RemoveTracks(ID3_Tag *tag);
+char*      ID3_GetTrack(const ID3_Tag*);
+luint      ID3_GetTrackNum(const ID3_Tag*);
+ID3_Frame* ID3_AddTrack(ID3_Tag*, uchar ucTrack, uchar ucTotal = 0,
+                        bool replace = false);
+ID3_Frame* ID3_AddTrack(ID3_Tag*, uchar ucTrack, bool replace);
+size_t     ID3_RemoveTracks(ID3_Tag*);
 
-char  *ID3_GetGenre(ID3_Tag *tag);
-luint  ID3_GetGenreNum(ID3_Tag *tag);
-bool   ID3_AddGenre(ID3_Tag *tag, luint ucGenre, bool bReplace = false);
-size_t ID3_RemoveGenres(ID3_Tag *tag);
+char*      ID3_GetGenre(const ID3_Tag*);
+luint      ID3_GetGenreNum(const ID3_Tag*);
+ID3_Frame* ID3_AddGenre(ID3_Tag*, luint ucGenre, bool replace = false);
+size_t     ID3_RemoveGenres(ID3_Tag*);
 
-char  *ID3_GetLyrics(ID3_Tag *tag);
-bool   ID3_AddLyrics(ID3_Tag *tag, const char *text, bool bReplace = false);
-size_t ID3_RemoveLyrics(ID3_Tag *tag);
+char*      ID3_GetLyrics(const ID3_Tag*);
+ID3_Frame* ID3_AddLyrics(ID3_Tag*, const char *, bool replace = false);
+size_t     ID3_RemoveLyrics(ID3_Tag*);
 
-void   mbstoucs(unicode_t *unicode, const char *ascii, const luint len);
-void   ucstombs(char *ascii, const unicode_t *unicode, const luint len);
-size_t ucslen(const unicode_t *unicode);
-void   ucscpy(unicode_t *dest, const unicode_t *src);
-void   ucsncpy(unicode_t *dest, const unicode_t *src, size_t len);
-int    ucscmp(const unicode_t *s1, const unicode_t *s2);
-int    ucsncmp(const unicode_t *s1, const unicode_t *s2, size_t len);
+char*      ID3_GetLyricist(const ID3_Tag*);
+ID3_Frame* ID3_AddLyricist(ID3_Tag *, const char *, bool replace = false);
+size_t     ID3_RemoveLyricist(ID3_Tag*);
 
-char *ID3_GetString(const ID3_Frame *frame, const ID3_FieldID fldName,
-                    const size_t nItems = 1);
-// in 'id3_tag_parse_v1.cpp'
-void ID3_RemoveTrailingSpaces(char *buffer, luint length);
+ID3_Frame* ID3_AddSyncLyrics(ID3_Tag *tag, const char *lang, const char *desc,
+                             const uchar *text, luint textsize, 
+                             bool bReplace = false);
+ID3_Frame* ID3_GetSyncLyricsInfo(const ID3_Tag *tag, const char *lang, 
+                                 const char *desc, char &stampformat, 
+                                 char &type, luint &size);
+ID3_Frame* ID3_GetSyncLyrics(const ID3_Tag *tag, const char *lang, 
+                             const char *desc, char *pData, luint &size);
 
 #endif /* __ID3LIB_MISC_SUPPORT_H__ */

@@ -28,50 +28,75 @@
 #define __ID3LIB_HEADER_H__
 
 #include "spec.h"
-
-struct ID3_HeaderInfo
-{
-  ID3_V2Spec eSpec;
-  uchar      ucFrameIDBytes;
-  uchar      ucFrameSizeBytes;
-  uchar      ucFrameFlagsBytes;
-  bool       bHasExtHeader;
-  luint      ulExtHeaderBytes;
-  bool       bSetExpBit;
-};
-
-// extern ID3_HeaderInfo ID3_SpecInfo[];
+#include "flags.h"
 
 class ID3_Header : public ID3_Speccable
 {
 public:
-  ID3_Header(void);
-  
-  virtual void       SetSpec(const ID3_V2Spec);
-  virtual ID3_V2Spec GetSpec() const;
-  virtual void       SetDataSize(size_t newSize);
-  virtual size_t     GetDataSize() const;
-  virtual void       SetFlags(uint16 newFlags);
-  virtual void       AddFlags(uint16 newFlags);
-  virtual void       RemoveFlags(uint16 newFlags);
-  virtual uint16     GetFlags() const;
-  virtual void       Clear();
-  virtual size_t     Size(void) = 0;
-  virtual size_t     Render(uchar *buffer) = 0;
+  struct Info
+  {
+    uchar      frame_bytes_id;
+    uchar      frame_bytes_size;
+    uchar      frame_bytes_flags;
+    bool       is_extended;
+    luint      extended_bytes;
+    bool       is_experimental;
+  };
 
-  ID3_Header &operator=( const ID3_Header & );
+  ID3_Header() 
+  { 
+    this->Clear();
+    __changed = false;
+  }
+  virtual ~ID3_Header() { ; }
+  
+  virtual bool       SetSpec(ID3_V2Spec);
+  /*   */ ID3_V2Spec GetSpec() const { return __spec; }
+
+  /*   */ bool       SetDataSize(size_t size)
+  { 
+    bool changed = size != __data_size; 
+    __changed = __changed || changed;
+    __data_size = size;
+    return changed;
+  }
+  /*   */ size_t     GetDataSize() const { return __data_size; }
+  
+  virtual bool       Clear()
+  {
+    bool changed = this->SetDataSize(0);
+    if (this->GetSpec() == ID3V2_UNKNOWN)
+    {
+      this->SetSpec(ID3V2_LATEST);
+      changed = true;
+    }
+    changed = __flags.clear() || changed;
+    __changed = changed || __changed;
+    return changed;
+  }
+  virtual size_t     Size() const = 0;
+  
+  virtual size_t     Render(uchar* buffer) const = 0;
+  virtual size_t     Parse(const uchar*, size_t) = 0;
+
+  ID3_Header &operator=( const ID3_Header &rhs)
+  { 
+    if (this != &rhs)
+    { 
+      this->SetSpec(rhs.GetSpec());
+      this->SetDataSize(rhs.GetSpec());
+      this->__flags = rhs.__flags;
+    }
+    return *this;
+  }
 
 protected:
   ID3_V2Spec      __spec;             // which version of the spec 
-  size_t          __ulDataSize;       // how big is the data?
-  uint16          __ulFlags;          // header flags
-  ID3_HeaderInfo* __pInfo;            // the info about this version of the headers
+  size_t          __data_size;        // how big is the data?
+  ID3_Flags       __flags;            // header flags
+  const Info*     __info;             // header info w.r.t. id3v2 spec
+  bool            __changed;          // has the header changed since parsing
 }
 ;
-
-ID3_HeaderInfo* ID3_LookupHeaderInfo(ID3_V2Spec);
-
-/* Deprecated */
-ID3_HeaderInfo* ID3_LookupHeaderInfo(uchar ver, uchar rev);
 
 #endif /* __ID3LIB_HEADER_H */

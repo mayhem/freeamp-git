@@ -1,7 +1,5 @@
+// id3lib: a C++ library for creating and manipulating id3v1/v2 tags
 // $Id$
-
-// id3lib: a software library for creating and manipulating id3v1/v2 tags
-// Copyright 1999, 2000  Scott Thomas Haug
 
 // This library is free software; you can redistribute it and/or modify it
 // under the terms of the GNU Library General Public License as published by
@@ -24,34 +22,53 @@
 // id3lib.  These files are distributed with id3lib at
 // http://download.sourceforge.net/id3lib/
 
-#ifndef __ID3LIB_SPEC_H__
-#define __ID3LIB_SPEC_H__
+#ifndef __ID3LIB_UINT28_H__
+#define __ID3LIB_UINT28_H__
 
 #include "globals.h"
+#include <iostream.h>
 
-ID3_V2Spec ID3_VerRevToV2Spec(uchar ver, uchar rev);
-uchar      ID3_V2SpecToVer(ID3_V2Spec spec);
-uchar      ID3_V2SpecToRev(ID3_V2Spec spec);
-
-class ID3_Speccable
+class uint28
 {
+  uint32 __value;
 public:
-  virtual bool       SetSpec(ID3_V2Spec) = 0;
-  virtual ID3_V2Spec GetSpec() const = 0;
-
-  /* The following methods are deprecated */
-  virtual bool       SetVersion(uchar ver, uchar rev)
-  {
-    return this->SetSpec(ID3_VerRevToV2Spec(ver, rev));
+  uint28(uint32 val = 0) : __value(val) { ; }
+  uint28(const uchar* const data) { *this = data; }
+  uint28(const uint28& rhs) : __value(rhs.to_uint32()) { ; }
+  ~uint28() { ; }
+  
+  uint28&    operator=(const uchar* const);
+  
+  uint28&    operator=(uint32 val) 
+  { 
+    __value = val & MASK(28); 
+    return *this; 
   }
-  virtual uchar      GetVersion() const
-  {
-    return ID3_V2SpecToVer(this->GetSpec());
+  
+  uint28&    operator=(const uint28& rhs) 
+  { 
+    if (this != &rhs)
+    {
+      __value = rhs.to_uint32(); 
+    }
+    return *this; 
   }
-  virtual uchar      GetRevision() const
-  {
-    return ID3_V2SpecToRev(this->GetSpec());
+  
+  uint32    to_uint32() const 
+  { 
+    return __value; 
   }
+  
+  size_t    Parse(const uchar* const data) 
+  { 
+    *this = data;
+    return sizeof(uint32);
+  }
+  
+  void   Render(uchar*) const;
 };
 
-#endif /* __ID3LIB_SPEC_H__ */
+ostream& operator<<(ostream&, const uint28&);
+istream& operator>>(istream&, uint28&);
+
+#endif /* __ID3LIB_UINT28_H__ */

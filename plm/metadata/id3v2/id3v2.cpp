@@ -309,7 +309,7 @@ bool ID3v2::WriteMetaData(const char* url, const MetaData& metadata)
 
     err = ID3Tag_UpdateByTagType(pTag, whichTags);
 
-    delete pTag;
+    ID3Tag_Delete(pTag);
 
     return err == ID3E_NoError;
 }

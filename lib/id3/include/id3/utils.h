@@ -1,6 +1,6 @@
 // $Id$
 
-// id3lib: a software library for creating and manipulating id3v1/v2 tags
+// id3lib: a C++ library for creating and manipulating id3v1/v2 tags
 // Copyright 1999, 2000  Scott Thomas Haug
 
 // This library is free software; you can redistribute it and/or modify it
@@ -24,34 +24,29 @@
 // id3lib.  These files are distributed with id3lib at
 // http://download.sourceforge.net/id3lib/
 
-#ifndef __ID3LIB_SPEC_H__
-#define __ID3LIB_SPEC_H__
+#ifndef __ID3LIB_UTILS_H__
+#define __ID3LIB_UTILS_H__
 
 #include "globals.h"
 
-ID3_V2Spec ID3_VerRevToV2Spec(uchar ver, uchar rev);
-uchar      ID3_V2SpecToVer(ID3_V2Spec spec);
-uchar      ID3_V2SpecToRev(ID3_V2Spec spec);
-
-class ID3_Speccable
+#if defined ID3_UNDEFINED
+namespace id3
 {
-public:
-  virtual bool       SetSpec(ID3_V2Spec) = 0;
-  virtual ID3_V2Spec GetSpec() const = 0;
+#endif /* ID3_UNDEFINED */
+  uint32 ParseNumber(const uchar *buffer, size_t size = sizeof(uint32));
+  size_t RenderNumber(uchar *buffer, uint32 val, size_t size = sizeof(uint32));
+  
+  void   mbstoucs(unicode_t *unicode, const char *ascii, const luint len);
+  void   ucstombs(char *ascii, const unicode_t *unicode, const luint len);
+  size_t ucslen(const unicode_t *unicode);
+  void   ucscpy(unicode_t *dest, const unicode_t *src);
+  void   ucsncpy(unicode_t *dest, const unicode_t *src, size_t len);
+  int    ucscmp(const unicode_t *s1, const unicode_t *s2);
+  int    ucsncmp(const unicode_t *s1, const unicode_t *s2, size_t len);
 
-  /* The following methods are deprecated */
-  virtual bool       SetVersion(uchar ver, uchar rev)
-  {
-    return this->SetSpec(ID3_VerRevToV2Spec(ver, rev));
-  }
-  virtual uchar      GetVersion() const
-  {
-    return ID3_V2SpecToVer(this->GetSpec());
-  }
-  virtual uchar      GetRevision() const
-  {
-    return ID3_V2SpecToRev(this->GetSpec());
-  }
-};
-
-#endif /* __ID3LIB_SPEC_H__ */
+#if defined ID3_UNDEFINED
+}
+#endif  /* ID3_UNDEFINED */
+  
+  
+#endif /* __ID3LIB_UTILS_H__ */

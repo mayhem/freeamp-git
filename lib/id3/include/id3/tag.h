@@ -28,9 +28,8 @@
 #define __ID3LIB_TAG_H__
 
 #include <stdio.h>
-#include "frame.h"
-#include "header_frame.h"
 #include "header_tag.h"
+#include "frame.h"
 #include "spec.h"
 
 struct ID3_Elem
@@ -44,102 +43,53 @@ struct ID3_Elem
 /** String used for the description field of a comment tag converted from an
  ** id3v1 tag to an id3v2 tag
  **
- ** @see #ID3V1_Tag
+ ** \sa #ID3V1_Tag
  **/
-const char STR_V1_COMMENT_DESC[] = "ID3v1_Comment";
+//const char STR_V1_COMMENT_DESC[] = "ID3v1_Comment";
+const char STR_V1_COMMENT_DESC[] = "";
 
-/** The representative class of an id3 tag.
- ** 
- ** This is the 'container' class for everything else.  It is through an
- ** ID3_Tag that most of the productive stuff happens.  Let's look at what's
- ** required to start using ID3v2 tags.
- ** 
- ** \code
- **   #include <id3/tag.h>
- ** \endcode
- ** 
- ** This simple \c #include does it all.  In order to read an
- ** existing tag, do the following:
- **
- ** \code
- **   ID3_Tag myTag;
- **   myTag.Link("something.mp3");
- ** \endcode
- ** 
- ** That is all there is to it.  Now all you have to do is use the 
- ** <a href="#Find">Find</a> method to locate the frames you are interested in
- ** is the following:
- ** 
- ** \code
- **   ID3_Frame *myFrame;
- **   if (myTag.Find(ID3FID_TITLE) == myFrame)
- **   {
- **     char title[1024];
- **     myFrame->Field(ID3FN_TEXT).Get(title, 1024);
- **     cout << "Title: " << title << endl;
- **   }
- ** \endcode
- ** 
- ** This code snippet locates the TITLE frame and copies the contents of the
- ** text field into a buffer and displays the buffer.  Not difficult, eh?
- **
- ** When using the <a href="#Link">Link</a> method of an ID3_Tag object, you
- ** automatically gain access to any ID3v1/1.1, ID3v2, and Lyrics3 v2.0 tags
- ** present in the file.  The class will automaticaly parse and convert any of
- ** these foreign tag formats into ID3v2 tags.  Also, id3lib will correctly
- ** parse any correctly formatted 'CDM' frames from the unreleased 2.01 draft
- ** that id3lib 2.16 supports.
- **
- ** @author Dirk Mahoney
- ** @version $Id$
- ** @see ID3_Frame
- ** @see ID3_Field
- ** @see ID3_Err
- **/
 class ID3_Tag : public ID3_Speccable
 {
 public:
   ID3_Tag(char *name = NULL);
   ID3_Tag(const ID3_Tag &tag);
-  ~ID3_Tag(void);
+  virtual ~ID3_Tag();
   
-  void       Clear(void);
-  bool       HasChanged(void) const;
+  void       Clear();
+  bool       HasChanged() const;
   void       SetUnsync(bool bSync);
   void       SetExtendedHeader(bool bExt);
-  void       SetCompression(bool bComp);
   void       SetPadding(bool bPad);
   void       AddFrame(const ID3_Frame&);
   void       AddFrame(const ID3_Frame*);
   void       AttachFrame(ID3_Frame*);
-  void       AddFrames(const ID3_Frame *frames, luint num_frames);
-  void       RemoveFrame(ID3_Frame *pOldFrame);
-  luint      Render(uchar *buffer);
-  luint      RenderV1(char *buffer);
-  luint      Size(void) const;
-  void       Parse(uchar header[ID3_TAGHEADERSIZE], uchar *buffer);
-  luint      Link(char *fileInfo, const luint tt = (luint) ID3TT_ALL);
-  luint      Update(const luint tt = (luint) ID3TT_ID3V2);
-  luint      Strip(const luint tt = (luint) ID3TT_ALL);
+  void       RemoveFrame(const ID3_Frame *);
+  luint      Render(uchar*);
+  luint      RenderV1(uchar*);
+  luint      Size() const;
+  size_t     Parse(const uchar header[ID3_TAGHEADERSIZE], const uchar *buffer);
+  luint      Link(const char *fileInfo, luint tt = (luint) ID3TT_ALL);
+  luint      Update(luint tt = (luint) ID3TT_ID3V2);
+  luint      Strip(luint tt = (luint) ID3TT_ALL);
 
   //@{
   /// Finds frame with given frame id
-  ID3_Frame* Find(ID3_FrameID id);
+  ID3_Frame* Find(ID3_FrameID id) const;
 
   /// Finds frame with given frame id, fld id, and integer data
-  ID3_Frame* Find(ID3_FrameID id, ID3_FieldID fld, luint data);
+  ID3_Frame* Find(ID3_FrameID id, ID3_FieldID fld, luint data) const;
 
   /// Finds frame with given frame id, fld id, and ascii data
-  ID3_Frame* Find(ID3_FrameID id, ID3_FieldID fld, char *data);
+  ID3_Frame* Find(ID3_FrameID id, ID3_FieldID fld, const char *) const;
 
   /// Finds frame with given frame id, fld id, and unicode data
-  ID3_Frame* Find(ID3_FrameID id, ID3_FieldID fld, unicode_t *data);
+  ID3_Frame* Find(ID3_FrameID id, ID3_FieldID fld, const unicode_t *) const;
   //@}
 
-  luint      NumFrames(void) const;
-  ID3_Frame* GetFrameNum(luint nIndex) const;
-  ID3_Frame* operator[](luint nIndex) const;
-  ID3_Tag&   operator=( const ID3_Tag &rTag );
+  luint      NumFrames() const;
+  ID3_Frame* GetFrameNum(luint) const;
+  ID3_Frame* operator[](luint) const;
+  ID3_Tag&   operator=( const ID3_Tag & );
 
   /** Indicates whether the an V1 tag is present.
    **  
@@ -147,7 +97,7 @@ public:
    **
    ** @return Whether or not a V1 tag is present.
    **/
-  bool HasV1Tag() {return __bHasV1Tag;};
+  bool HasV1Tag() const {return __has_v1_tag;};
 
   /** Indicates whether the an V2 tag is present.
    **
@@ -155,7 +105,7 @@ public:
    **
    ** @return Whether or not a V2 tag is present.
    **/
-  bool HasV2Tag() {return (__ulOldTagSize > 0);};
+  bool HasV2Tag() const {return (__orig_tag_size > 0);};
      
   /** Indicates whether there are Lyrics present.
    **
@@ -163,60 +113,61 @@ public:
    **
    ** @return Whether or not Lyrics are present.
    **/
-  bool HasLyrics() {return __bHasV1Tag;};
+  bool HasLyrics() const {return __has_v1_tag;};
+
+  static size_t IsV2Tag(const uchar*);
 
   /* Deprecated! */
   void       AddNewFrame(ID3_Frame* f) { this->AttachFrame(f); }
-  luint      Link(char *fileInfo, bool parseID3v1, bool parseLyrics3);
+  luint      Link(const char *fileInfo, bool parseID3v1, bool parseLyrics3);
+  void       SetCompression(bool) { ; }
+  void       AddFrames(const ID3_Frame *, luint);
 
 protected:
-  void       AddFrame(ID3_Frame *pNewFrame, bool bFreeWhenDone);
-  void       AddFrames(ID3_Frame *newFrames, luint nFrames, bool freeWhenDone);
-  void       SetupTag(char *fileInfo);
-  void       SetSpec(const ID3_V2Spec);
+  size_t     ParseFrames(const uchar*, size_t);
+  void       AddFrame(ID3_Frame , bool);
+  void       AddFrames(ID3_Frame *, luint, bool);
+  void       SetupTag(char *);
+  bool       SetSpec(ID3_V2Spec);
   ID3_V2Spec GetSpec() const;
-  void       ClearList(ID3_Elem *list);
-  void       DeleteElem(ID3_Elem *cur);
-  void       AddBinary(uchar *buffer, luint size);
-  void       ExpandBinaries(uchar *buffer, luint size);
-  void       ProcessBinaries(ID3_FrameID whichFrame = ID3FID_NOFRAME, bool attach = true);  // this default means all frames
-  void       RemoveFromList(ID3_Elem *which, ID3_Elem **list);
-  ID3_Elem*  GetLastElem(ID3_Elem *list);
-  ID3_Elem*  Find(ID3_Frame *frame) const;
-  luint      PaddingSize(luint curSize) const;
-  void       RenderExtHeader(uchar *buffer);
-  ID3_Err    OpenFileForWriting(void);
-  ID3_Err    OpenFileForReading(void);
-  void       CreateFile(void);
-  bool       CloseFile(void);
-  void       RenderV1ToHandle(void);
-  void       RenderV2ToHandle(void);
-  luint      ParseFromHandle(void);
-  void       ParseID3v1(void);
-  void       ParseLyrics3(void);
-  luint      GetUnSyncSize(uchar *buffer, luint size);
-  void       UnSync(uchar *destData, luint destSize, uchar *sourceData, luint sourceSize);
-  luint      ReSync(uchar *binarySourceData, luint sourceSize);
+  void       ClearList(ID3_Elem *);
+  void       DeleteElem(ID3_Elem *);
+  void       RemoveFromList(ID3_Elem *, ID3_Elem **);
+  ID3_Elem*  Find(const ID3_Frame *) const;
+  luint      PaddingSize(luint) const;
+  void       RenderExtHeader(uchar *);
+  ID3_Err    OpenFileForWriting();
+  ID3_Err    OpenFileForReading();
+  void       CreateFile();
+  bool       CloseFile();
+  void       RenderV1ToHandle();
+  void       RenderV2ToHandle();
+  luint      ParseFromHandle();
+  void       ParseID3v1();
+  void       ParseLyrics3();
+  luint      GetUnSyncSize(uchar *, luint);
+  void       UnSync(uchar *, luint, uchar *, luint);
+  luint      ReSync(uchar *, luint);
 
 private:
   ID3_V2Spec __spec;            // what version of the spec are we using
-  ID3_Elem*  __pFrameList;      // the list of known frames currently attached to this tag
-  ID3_Elem*  __pBinaryList;     // the list of yet-to-be-parsed frames currently attached to this tag
-  ID3_Elem*  __pFindCursor;     // on which element in the frameList are we currently positioned?
-  bool       __bSyncOn;         // should we unsync this tag when rendering?
-  bool       __bCompression;    // should we compress frames when rendering?
-  bool       __bPadding;        // add padding to tags?
-  bool       __bExtendedHeader; // create an extended header when rendering?
-  bool       __bHasChanged;     // has the tag changed since the last parse or render?
-  bool       __bFileWritable;   // is the associated file (via Link) writable?
-  FILE*      __fFileHandle;     // a handle to the file we are linked to
-  luint      __ulFileSize;      // the size of the file (without any tag)
-  luint      __ulOldTagSize;    // the size of the old tag (if any)
-  luint      __ulExtraBytes;    // extra bytes to strip from end of file (ID3v1 and Lyrics3 tags)
-  bool       __bHasV1Tag;       // does the file have an ID3v1 tag attached?
-  luint      __ulTagsToParse;   // which tag types should be parsed
-  char*      __sFileName;       // name of the file we are linked to
-  static luint s_ulInstances;   // how many ID3_Tag objects are floating around in this app?
+  ID3_Elem*  __frames;          // the list of known frames currently attached to this tag
+  ID3_Elem*  __binaries;        // the list of yet-to-be-parsed frames currently attached to this tag
+  mutable ID3_Elem*  __cursor;  // on which element in the frameList are we currently positioned?
+  bool       __is_unsync;       // should we unsync this tag when rendering?
+  bool       __is_padded;       // add padding to tags?
+  bool       __is_extended;     // create an extended header when rendering?
+  bool       __changed;         // has the tag changed since the last parse or render?
+  bool       __is_file_writable;// is the associated file (via Link) writable?
+  FILE*      __file_handle;     // a handle to the file we are linked to
+  luint      __file_size;       // the size of the file (without any tag)
+  luint      __orig_tag_size;   // the size of the old tag (if any)
+  luint      __extra_bytes;     // extra bytes to strip from end of file (ID3v1 and Lyrics3 tags)
+  bool       __has_v1_tag;      // does the file have an ID3v1 tag attached?
+  luint      __tags_to_parse;   // which tag types should be parsed
+  char*      __file_name;       // name of the file we are linked to
+  ID3_TagHeader __hdr;
+  static luint __instances;     // how many ID3_Tag objects are floating around in this app?
 };
 
 //@{
@@ -226,4 +177,7 @@ ID3_Tag& operator<<(ID3_Tag&, const ID3_Frame &);
 ID3_Tag& operator<<(ID3_Tag&, const ID3_Frame *);
 //@}
 
-#endif
+// deprecated!
+lsint ID3_IsTagHeader(const uchar header[ID3_TAGHEADERSIZE]);
+
+#endif /* __ID3LIB_TAG_H__ */
