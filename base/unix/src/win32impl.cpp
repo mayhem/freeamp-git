@@ -4,6 +4,7 @@
 #include <iostream.h>
 #include <stdio.h>
 #include <sys/stat.h>
+#include <ctype.h>
 
 #include "win32impl.h"
 
@@ -141,7 +142,7 @@ bool Match(char *pattern,char *string) {
 		return false;
 		break; }
 	    default:
-		if (*ps1 != *ps2) return false;
+		if (tolower(*ps1) != tolower(*ps2)) return false;
 		ps1++;
 		ps2++;
 		break;

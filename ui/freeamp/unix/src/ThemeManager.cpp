@@ -89,7 +89,7 @@ Error ThemeManager::GetThemeList(map<string, string> &oThemeFileMap)
     oThemePath = oThemeBasePath + string("/*.fat");    
 
     handle = FindFirstFile((char *)oThemePath.c_str(), &find);
-    if(handle != INVALID_HANDLE_VALUE)
+    if(handle != INVALID_HANDLE_VALUE) {
         do {
    	    oThemeFile = oThemeBasePath + string("/") + string(find.cFileName);
     	    ptr = strrchr(find.cFileName, '.');
@@ -99,6 +99,8 @@ Error ThemeManager::GetThemeList(map<string, string> &oThemeFileMap)
             oThemeFileMap[find.cFileName] = oThemeFile;
         }
         while(FindNextFile(handle, &find));
+        FindClose(handle);
+    }
 
     oThemeBasePath = FreeampDir(NULL) + string("/themes");
 
@@ -107,7 +109,7 @@ Error ThemeManager::GetThemeList(map<string, string> &oThemeFileMap)
         mkdir(oThemeBasePath.c_str(), 0755);
     oThemePath = oThemeBasePath + string("/*.fat");
     handle = FindFirstFile((char *)oThemePath.c_str(), &find);
-    if(handle != INVALID_HANDLE_VALUE)
+    if (handle != INVALID_HANDLE_VALUE) {
         do {
             oThemeFile = oThemeBasePath + string("/") + string(find.cFileName);
             ptr = strrchr(find.cFileName, '.');
@@ -116,11 +118,13 @@ Error ThemeManager::GetThemeList(map<string, string> &oThemeFileMap)
             oThemeFileMap[find.cFileName] = oThemeFile;
         }
         while(FindNextFile(handle, &find));
+        FindClose(handle);
+    }
 
     oThemeBasePath = "./themes";
     oThemePath = oThemeBasePath + string("/*.fat");
     handle = FindFirstFile((char *)oThemePath.c_str(), &find);
-    if(handle != INVALID_HANDLE_VALUE)
+    if (handle != INVALID_HANDLE_VALUE) {
         do {
             oThemeFile = oThemeBasePath + string("/") + string(find.cFileName);
             ptr = strrchr(find.cFileName, '.');
@@ -129,6 +133,8 @@ Error ThemeManager::GetThemeList(map<string, string> &oThemeFileMap)
             oThemeFileMap[find.cFileName] = oThemeFile;
         }
         while(FindNextFile(handle, &find));
+        FindClose(handle);
+    }
 
     return kError_NoErr;
 }
@@ -169,10 +175,14 @@ Error ThemeManager::AddTheme(string &oThemeFile)
     else
         filename = fcopy;
     ext = strrchr(filename, '.');
-    if (ext)
+    if (ext) {
         *ext = '\0';
+        ext++;
+    }
     
-    oThemeDest += string(filename) + string(".") + string(ext);   
+    oThemeDest += string("/") + string(filename);
+    if (ext)
+        oThemeDest += string(".") + string(ext);   
 
     orig = fopen(oThemeFile.c_str(), "r");
     if (!orig)

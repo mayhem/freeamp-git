@@ -26,6 +26,9 @@ ____________________________________________________________________________*/
 #include "GTKUtility.h"
 #include "win32impl.h"
 #include "utility.h"
+#include <unistd.h>
+#include <sys/types.h>
+#include <dirent.h>
 
 GTKFont::GTKFont(FAContext *context, string &oName, string &oFace, 
                  string &oFile, string &oDefault) :
@@ -34,6 +37,20 @@ GTKFont::GTKFont(FAContext *context, string &oName, string &oFace,
     m_context = context;
 
     type = kFontTypeUnknown;
+ 
+#ifdef HAVE_FREETYPE
+    if (oFile.length() > 0) {
+        AddFont(oFile);
+        type = kFontTypeTTF;
+        gfont = NULL;
+        ttfont = NULL;
+        bold = false;
+        italic = false;
+        underline = false;
+        first = true;
+        return;
+    }
+#endif
 
     string finalName;    
     vector<string> Names;
@@ -65,7 +82,7 @@ GTKFont::GTKFont(FAContext *context, string &oName, string &oFace,
         mkdir(ttfbase.c_str(), 0755);
 
     handle = FindFirstFile((char *)ttfpath.c_str(), &find);
-    if (handle != INVALID_HANDLE_VALUE)
+    if (handle != INVALID_HANDLE_VALUE) {
         do { 
             i = Names.begin(); 
             for (; i != Names.end(); i++) {
@@ -78,6 +95,8 @@ GTKFont::GTKFont(FAContext *context, string &oName, string &oFace,
             if (ttffound == true)
                 break;
         } while (FindNextFile(handle, &find));
+        FindClose(handle);
+    }
 
     ttfbase = FreeampDir(NULL) + string("/fonts");
     if (-1 == stat(ttfbase.c_str(), &st))
@@ -85,7 +104,7 @@ GTKFont::GTKFont(FAContext *context, string &oName, string &oFace,
 
     ttfpath = ttfbase + string("/*.ttf");
     handle = FindFirstFile((char *)ttfpath.c_str(), &find);
-    if (handle != INVALID_HANDLE_VALUE)
+    if (handle != INVALID_HANDLE_VALUE) {
         do {
             i = Names.begin();
             for (; i != Names.end(); i++) {
@@ -98,11 +117,13 @@ GTKFont::GTKFont(FAContext *context, string &oName, string &oFace,
             if (ttffound == true)
                 break;
         } while (FindNextFile(handle, &find));
+        FindClose(handle);
+    }
 
     ttfbase = "./fonts";
     ttfpath = ttfbase + string("/*.ttf");
     handle = FindFirstFile((char *)ttfpath.c_str(), &find);
-    if (handle != INVALID_HANDLE_VALUE)
+    if (handle != INVALID_HANDLE_VALUE) {
         do {
             i = Names.begin();
             for (; i != Names.end(); i++) {
@@ -115,6 +136,8 @@ GTKFont::GTKFont(FAContext *context, string &oName, string &oFace,
             if (ttffound == true)
                 break;
         } while (FindNextFile(handle, &find));
+        FindClose(handle);
+    }
 #endif
 
     if (!ttffound) {
@@ -155,6 +178,46 @@ GTKFont::GTKFont(FAContext *context, string &oName, string &oFace,
     first = true;
 }
 
+Error GTKFont::AddFont(string &oFontFile)
+{
+    string oFontDest;
+    char fcopy[_MAX_PATH], *filename, *ext;
+    FILE *orig, *dest;
+
+    oFontDest = FreeampDir(NULL) + string ("/fonts");
+    strcpy(fcopy, oFontFile.c_str());
+    filename = strrchr(fcopy, '/');
+    if (filename) 
+        filename = filename + 1;
+    ext = strrchr(filename, '.');
+    if (ext) {
+        *ext = '\0';
+        ext++;
+    }
+ 
+    oFontDest += string("/") + string(filename);
+    if (ext)
+        oFontDest += string(".") + string(ext);
+
+    orig = fopen(oFontFile.c_str(), "r");
+    if (!orig) 
+        return kError_FileNotFound;
+    dest = fopen(oFontDest.c_str(), "w");
+    if (!dest) {
+        fclose(orig);
+        return kError_FileNotFound;
+    }
+    unsigned char buf[1];
+    while (fread(buf, 1, 1, orig))
+        fwrite(buf, 1, 1, dest);
+    fclose(orig);
+    fclose(dest);
+
+    m_oFace = oFontDest;
+
+    return kError_NoErr;
+}
+    
 Error GTKFont::Load(int iFontHeight, bool bBold, bool bItalic)
 {
     gdk_threads_enter();

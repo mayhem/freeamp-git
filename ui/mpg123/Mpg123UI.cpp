@@ -418,7 +418,7 @@ ProcessArgs()
       else
       {
          // ut << "Adding: " <<m_argv[i] << endl;
-         m_plm->AddItem(m_argv[i], 0);
+         //m_plm->AddItem(m_argv[i], 0);
          addedStuff++;
       }
    }

@@ -429,11 +429,8 @@ void ncursesUI::ProcessArgs() {
     for(int i=1;i<m_argc;i++) {
         //cout << "Adding arg " << i << ": " << argv[i] << endl;
         pc = m_argv[i];
-        if (pc[0] == '-') {
+        if (pc[0] == '-') 
             processSwitch(pc);
-        } else {
-            m_plm->AddItem(pc,0);
-        }
     }
     m_plm->SetCurrentIndex(0);
     Event *e = new Event(CMD_Play);

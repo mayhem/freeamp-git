@@ -73,6 +73,7 @@ class GTKFont : public Font
       Efont   *ttfont;
 #endif
       string   BuildFontString(bool bBold, bool bItalic, int iFontHeight);
+      Error    AddFont(string &oFontFile);
 
       bool bold;
       bool italic;

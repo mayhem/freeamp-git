@@ -128,21 +128,6 @@ GTKWindow::GTKWindow(Theme *pTheme, string &oName)
                           GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
                           GDK_KEY_PRESS_MASK);
     gtk_widget_realize(mainWindow);
-
-    if (oName == "Frunobulax") {
-        gtk_signal_connect(GTK_OBJECT(mainWindow), "motion_notify_event",
-                           GTK_SIGNAL_FUNC(mouse_move), this);
-        gtk_signal_connect(GTK_OBJECT(mainWindow), "button_press_event",
-                           GTK_SIGNAL_FUNC(button_down), this);
-        gtk_signal_connect(GTK_OBJECT(mainWindow), "button_release_event",
-                           GTK_SIGNAL_FUNC(button_up), this);
-        gtk_signal_connect(GTK_OBJECT(mainWindow), "key_press_event",
-                           GTK_SIGNAL_FUNC(key_press), this);
-        gtk_drag_dest_set(mainWindow, GTK_DEST_DEFAULT_ALL, main_drop, 2, 
-                          GDK_ACTION_COPY);
-        gtk_signal_connect(GTK_OBJECT(mainWindow), "drag_data_received", 
-                           GTK_SIGNAL_FUNC(drop_file), this);
-    }
     gdk_window_set_decorations(mainWindow->window, (GdkWMDecoration)0);
     gdk_threads_leave();
 
@@ -168,6 +153,20 @@ Error GTKWindow::Run(Pos &oPos)
     GetCanvas()->GetBackgroundRect(oRect);
 
     gdk_threads_enter();
+
+    gtk_signal_connect(GTK_OBJECT(mainWindow), "motion_notify_event",
+                       GTK_SIGNAL_FUNC(mouse_move), this);
+    gtk_signal_connect(GTK_OBJECT(mainWindow), "button_press_event",
+                       GTK_SIGNAL_FUNC(button_down), this);
+    gtk_signal_connect(GTK_OBJECT(mainWindow), "button_release_event",
+                       GTK_SIGNAL_FUNC(button_up), this);
+    gtk_signal_connect(GTK_OBJECT(mainWindow), "key_press_event",
+                       GTK_SIGNAL_FUNC(key_press), this);
+    gtk_drag_dest_set(mainWindow, GTK_DEST_DEFAULT_ALL, main_drop, 2,
+                      GDK_ACTION_COPY);
+    gtk_signal_connect(GTK_OBJECT(mainWindow), "drag_data_received",
+                       GTK_SIGNAL_FUNC(drop_file), this);
+
     iMaxX = gdk_screen_width();
     iMaxY = gdk_screen_height();
  
