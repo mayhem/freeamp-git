@@ -7,6 +7,8 @@ Changes for version 2.1.0 rc6
   so we'll just wait until that stablizes.
 - The user can now set which MusicBrainz server FreeAmp should use. 
 - Ray Lucke contributed the arts pmo
+- Decreased the startup time quite a bit.
+- Random stability bugs fixed.
 
 Changes for version 2.1.0 rc5
 --------------------------------------------------------------------
