@@ -30,7 +30,9 @@ ____________________________________________________________________________*/
 #include "pmi.h"
 #include "lmc.h"
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 
 void Initialize(LMCRef ref);
 
@@ -47,7 +49,9 @@ void Reset(LMCRef ref);
 bool ChangePosition(LMCRef ref, int32 pos);
 void Cleanup(LMCRef ref);
 
-} //extern "C"
+#ifdef __cplusplus
+// extern "C"
+#endif
 
 #endif /* _LMCLIB_H_ */
 

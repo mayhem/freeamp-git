@@ -26,41 +26,29 @@ ____________________________________________________________________________*/
 
 #include "event.h"
 
-class COO {
+
+class CommandInterface {
  public:
-    virtual int32 acceptCOOEvent(Event *) = 0;
-    virtual void setArgs(int, char **) = 0;
-    virtual ~COO() {}
+    virtual int32 AcceptEvent(Event *) = 0;
+    virtual void SetTarget(EventQueue* queue);
+    virtual ~CommandInterface() {}
 };
 
-class CIO {
- public:
-    virtual int32 acceptCIOEvent(Event *) = 0;
-    virtual void setArgs(int, char **) = 0;
-    virtual ~CIO() {}
-};
-
+#ifdef __cplusplus
 extern "C" {
+#endif
 
-typedef struct _COO{
+typedef struct CIO{
     void*   ref;
 
-    void    (*SetTarget)        (struct _COO*, EventQueue*);
-    int32   (*AcceptEvent)      (struct _COO*, Event *);
-    void    (*Cleanup)          (struct _COO*);
+    void    (*SetTarget)        (struct CIO*, EventQueue*);
+    int32   (*AcceptEvent)      (struct CIO*, Event *);
+    void    (*Cleanup)          (struct CIO*);
 
-}_COO, *COORef;
+}CIO, *CIORef;
 
-
-typedef struct UI{
-    void*   ref;
-
-    void    (*SetTarget)        (struct UI*, EventQueue*);
-    int32   (*AcceptEvent)      (struct UI*, Event *);
-    void    (*Cleanup)          (struct UI*);
-
-}UI, *UIRef;
-
-} //extern "C"
+#ifdef __cplusplus
+} // extern "C"
+#endif
 
 #endif // _CTRLOBJ_H_

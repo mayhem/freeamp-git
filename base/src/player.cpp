@@ -447,6 +447,11 @@ int32 Player::ServiceEvent(Event *pC) {
 		        ReleaseCOManipLock();
 		        //cout << "released lock" << endl;
 		        delete e;
+
+                e = new Event(CMD_QuitPlayer);
+	            Player::GetPlayer()->AcceptEvent(e);
+                delete e;
+
             }
             return 0;
 		    break; 

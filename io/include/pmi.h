@@ -57,7 +57,9 @@ public:
     virtual const char* Url(void) const = 0;
 };
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 
 typedef struct PMI {
     void*       ref;
@@ -71,6 +73,8 @@ typedef struct PMI {
 }PMI, *PMIRef;
 
 
-} // extern "C"
+#ifdef __cplusplus
+} //extern "C" 
+#endif
 
 #endif /* _PMI_H_ */

@@ -29,7 +29,9 @@ ____________________________________________________________________________*/
 #include "config.h"
 #include "pmo.h"
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 
 void Initialize(PMORef ref);
 
@@ -39,7 +41,9 @@ int32 Write(PMORef ref, void* buf, int32 len);
 void Clear(PMORef ref);
 void Cleanup(PMORef ref);
 
-} //extern "C"
+#ifdef __cplusplus
+// extern "C"
+#endif
 
 #endif /* _PMOLIB_H_ */
 

@@ -46,7 +46,9 @@ class LogicalMediaConverter {
     virtual void Init() = 0;
 };
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 
 typedef struct LMC{
     void*   ref;
@@ -67,6 +69,8 @@ typedef struct LMC{
 
 }LMC, *LMCRef;
 
-} //extern "C"
+#ifdef __cplusplus
+// extern "C"
+#endif
 
 #endif // _LMC_H_

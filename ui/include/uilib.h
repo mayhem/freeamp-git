@@ -28,15 +28,21 @@ ____________________________________________________________________________*/
 #include "event.h"
 #include "ctrlobj.h"
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 
-void Initialize(UIRef inputRef, UIRef outputRef);
+void Initialize(CIORef inputRef, CIORef outputRef);
 
-void SetTarget(UIRef ref, EventQueue* queue);
-int32 AcceptEvent(UIRef ref, Event* event);
-void Cleanup(LMCRef ref);
+void SetTarget(CIORef ref, EventQueue* queue);
+int32 AcceptEvent(CIORef ref, Event* event);
+void Cleanup(CIORef ref);
 
+#ifdef __cplusplus
 } //extern "C"
+#endif
+
+
 
 #endif /* _UILIB_H_ */
 

@@ -29,7 +29,9 @@ ____________________________________________________________________________*/
 #include "config.h"
 #include "pmi.h"
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 
 void Initialize(PMIRef ref);
 
@@ -40,7 +42,9 @@ bool Close(PMIRef ref);
 const char* Url(PMIRef ref);
 void Cleanup(PMIRef ref);
 
-} // extern "C"
+#ifdef __cplusplus
+// extern "C"
+#endif
 
 #endif /* _PMILIB_H_ */
 

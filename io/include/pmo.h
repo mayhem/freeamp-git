@@ -63,8 +63,9 @@ public:
 	virtual void Clear(){ }
 };
 
+#ifdef __cplusplus
 extern "C" {
-
+#endif
 typedef struct PMO{
     void*   ref;
     bool    (*Init)         (struct PMO*, OutputInfo*);
@@ -74,7 +75,9 @@ typedef struct PMO{
     void    (*Cleanup)      (struct PMO*);
 }PMO, *PMORef;
 
-} // extern "C"
+#ifdef __cplusplus
+// extern "C" 
+#endif
 
 #endif /* _PMO_H_ */
 
