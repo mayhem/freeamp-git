@@ -73,17 +73,18 @@ void PlayList::Shuffle(void) {
     srand((unsigned int) time(NULL));
     
     int32 first, second;
-    PlayListItem *temp = (PlayListItem *)new char[sizeof(PlayListItem)];
+//    PlayListItem *temp = (PlayListItem *)new char[sizeof(PlayListItem)];
     for (int32 i = 0; i < 3 * count; i++) {
 	first = (int32) ((count * rand()) / (RAND_MAX+1.0));
 	second = (int32) ((count * rand()) / (RAND_MAX+1.0));
-	if (first != second) {
-	    memcpy(temp, pMediaElems->elementAt(first), sizeof(PlayListItem));
-	    memcpy(pMediaElems->elementAt(first), pMediaElems->elementAt(second), sizeof(PlayListItem));
-	    memcpy(pMediaElems->elementAt(second), temp, sizeof(PlayListItem));
-	}
+	pMediaElems->Swap(first,second);
+//	if (first != second) {
+//	    memcpy(temp, pMediaElems->elementAt(first), sizeof(PlayListItem));
+//	    memcpy(pMediaElems->elementAt(first), pMediaElems->elementAt(second), sizeof(PlayListItem));
+//	    memcpy(pMediaElems->elementAt(second), temp, sizeof(PlayListItem));
+//	}
     }
-    delete (char *)temp;
+//    delete (char *)temp;
 }
 
  PlayListItem *PlayList::GetFirst() {

@@ -47,13 +47,32 @@ class Vector {
     int32 DeleteAll();
     T elementAt(int32);
     T removeElementAt(int32);
+    T RandomElement();
+    void Swap(int32,int32);
     int32 deleteElementAt(int32);
     int32 insert(T &);
     int32 numElements();
 };
 
 
+template<class T> T Vector<T>::RandomElement() {
+    srand((unsigned int) time (NULL));
+    int32 foo = (int32) (((double)insertionPoint * rand()) / (RAND_MAX+1.0));
+    return pObjs[foo];
+}
 
+template<class T> void Vector<T>::Swap(int32 s1, int32 s2) {
+    if ((s1 < 0) ||
+	(s2 < 0) ||
+	(s1 >= insertionPoint) ||
+	(s2 >= insertionPoint) ||
+	(s1 == s2)) {
+	return;
+    }
+    T tmp = pObjs[s1];
+    pObjs[s1] = pObjs[s2];
+    pObjs[s2] = tmp;
+}
 
 template<class T> Vector<T>::Vector(int32 th) {
     threshhold = th;
