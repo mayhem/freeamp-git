@@ -1402,6 +1402,26 @@ Error PlaylistManager::GetPortablePlaylist(DeviceInfo* device)
 
 
 // External playlist support
+bool PlaylistManager::IsSupportedPlaylistFormat(const char *extension)
+{
+    bool retvalue = false;
+
+    uint32 numFormats = m_playlistFormats.size();
+
+    for(uint32 index = 0; index < numFormats; index++)
+    {
+        PlaylistFormatInfo* format = m_playlistFormats[index];
+
+        if(!strcasecmp(extension, format->GetExtension()))
+        {
+            retvalue = true;
+            break;
+        }
+    }
+  
+    return retvalue;
+}
+
 Error PlaylistManager::GetSupportedPlaylistFormats(PlaylistFormatInfo* format, 
                                                    uint32 index)
 {

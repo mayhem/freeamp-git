@@ -53,21 +53,26 @@ class GTKWindow : public Window
      virtual Error GetWindowPosition(Rect &oWindowRect); 
      virtual Error Minimize(void);
      virtual Error Restore(void);
-     
+     virtual bool  LButtonDown(void);    
+ 
      GtkWidget *GetWindow(void) { return mainWindow; }
-    
+   
+     void MouseLeaveCheck(void); 
      void DropFiles(char *filename);
 
-    protected:
-      Pos m_oWindowPos;
+     Mutex *m_pMindMeldMutex;
+ 
+   protected:
+     Pos m_oWindowPos;
       
-    private:
-      void GTKEventService(void);
+   private:
+     void GTKEventService(void);
 
-      GtkWidget *mainWindow;
-      int gtkTimer;
-      bool quitLoop;
-      bool initialized;
+     GtkWidget *mainWindow;
+     int gtkTimer;
+     bool quitLoop;
+     bool initialized;
+     bool m_bMouseInWindow;
 };
 
 #endif

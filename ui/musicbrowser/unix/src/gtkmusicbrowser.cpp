@@ -698,7 +698,7 @@ void GTKMusicBrowser::AddFileCMD()
 
             DeleteListEvent();
 
-            if (!strncmp("M3U", ext, 3)) {
+            if (m_plm->IsSupportedPlaylistFormat(ext)) {
                 string tobeloaded = tempurl;
                 LoadPlaylist(tobeloaded);
             }
@@ -737,7 +737,7 @@ static void import_tool(GtkWidget *w, GTKMusicBrowser *p)
         char *tempurl = new char[length];
 
         if (IsntError(FilePathToURL(returnpath, tempurl, &length))) {
-            if (!strncmp("M3U", ext, 3))
+            if (m_context->plm->IsSupportedPlaylistFormat(ext))
                 p->ImportPlaylist(tempurl);
             else if (m_context->player->IsSupportedExtension(ext)) {
                 PlaylistItem *plist = new PlaylistItem(tempurl);

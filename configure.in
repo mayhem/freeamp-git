@@ -276,6 +276,9 @@ if test "$have_gtk" = "true"; then
 else
   GTK_CFLAGS=""
   GTK_LIBS=""
+  echo "WARNING: GTK+ was not found on this system.  This means you won't be"
+  echo "able to use any of the graphical user interfaces.  That's a bad thing,"
+  echo "so go get the latest version of GTK+ from http://www.gtk.org"
 fi
 
 AC_SUBST(GTK_CFLAGS)

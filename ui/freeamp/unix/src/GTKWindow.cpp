@@ -90,13 +90,17 @@ void drop_file(GtkWidget *w, GdkDragContext *context, gint x, gint y,
       
 gint do_timeout(GTKWindow *ui)
 {
+    ui->MouseLeaveCheck();
+    ui->m_pMindMeldMutex->Acquire();
     ui->TimerEvent();
+    ui->m_pMindMeldMutex->Release();
 }
 
 GTKWindow::GTKWindow(Theme *pTheme, string &oName)
           :Window(pTheme, oName)
 {
     m_pCanvas = new GTKCanvas(this);
+    m_pMindMeldMutex = new Mutex();
 
     gdk_threads_enter();
     mainWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -124,11 +128,13 @@ GTKWindow::GTKWindow(Theme *pTheme, string &oName)
     gdk_threads_leave();
 
     initialized = false;
+    m_bMouseInWindow = false;
 }
 
 GTKWindow::~GTKWindow(void)
 {
     delete m_pCanvas;
+    delete m_pMindMeldMutex;
     m_pCanvas = NULL;
 }
 
@@ -192,7 +198,11 @@ Error GTKWindow::VulcanMindMeld(Window *pOther)
     Error eRet;
     Rect  oRect;
 
+    m_pMindMeldMutex->Acquire();
+
     eRet = Window::VulcanMindMeld(pOther);
+    m_pMindMeldMutex->Release();
+
     if (IsError(eRet))
         return eRet;
 
@@ -349,4 +359,25 @@ void GTKWindow::DropFiles(char *filename)
         oFileList.push_back(string(filename));
         m_pTheme->DropFiles(&oFileList);
     }
-}   
+} 
+
+bool GTKWindow::LButtonDown(void)
+{
+    GdkModifierType mask;
+    gdk_window_get_pointer(mainWindow->window, NULL, NULL, &mask);
+    if (mask & GDK_BUTTON1_MASK)
+        return true;
+    return false;
+}
+
+void GTKWindow::MouseLeaveCheck(void)
+{
+    if (gdk_window_at_pointer(NULL, NULL) == mainWindow->window)
+        m_bMouseInWindow = true;
+    else {
+        if (m_bMouseInWindow)
+            MouseHasLeftWindow();
+        m_bMouseInWindow = false;
+    }
+}
+

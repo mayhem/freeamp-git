@@ -261,6 +261,8 @@ class PlaylistManager {
     Error GetPortablePlaylist(DeviceInfo* device);
 
     // External playlist support
+    bool  IsSupportedPlaylistFormat(const char *extension);
+
     Error GetSupportedPlaylistFormats(PlaylistFormatInfo* format, uint32 index);
     Error ReadPlaylist(const char* url, 
                        vector<PlaylistItem*>* items = NULL, 

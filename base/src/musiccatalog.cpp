@@ -557,7 +557,7 @@ void MusicBrowser::DoSearchMusic(char *path)
             }
             else if ((fileExt = m_context->player->GetExtension(find.cFileName)))
             {
-                if (!strncmp("M3U", fileExt, 3) && 
+                if (m_plm->IsSupportedPlaylistFormat(fileExt) && 
                     strcmp("currentlist.m3u", find.cFileName))
                 {
                     string file = path;

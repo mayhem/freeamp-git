@@ -48,6 +48,7 @@ PLUGINS += plugins/id3v2.mdf
 PLUGINS += plugins/misc.mdf
 
 PLUGINS += plugins/m3u.plf
+PLUGINS += plugins/pls.plf
 
 PLUGINS += plugins/rmp.dlf
 
@@ -240,6 +241,12 @@ M3UOBJ = plm/playlist/m3u/m3u.o
 plugins/m3u.plf: $(M3UOBJ)
 	$(LINKMOD) -o $@ $(M3UOBJ)
 
+
+#pls
+PLSOBJ = plm/playlist/pls/pls.o
+
+plugins/pls.plf: $(PLSOBJ)
+	$(LINKMOD) -o $@ $(PLSOBJ)
 
 # PPP section
 
