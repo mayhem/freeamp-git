@@ -46,6 +46,7 @@ ____________________________________________________________________________*/
 #define Preferences_Plugins 7
 #define Preferences_Advanced 8
 #define Preferences_About 9
+#define Preferences_Directory 12
 
 #define Edit_Info 11
 

@@ -668,9 +668,9 @@ bool Win32PreferenceWindow::MainProc(HWND hwnd,
             {
                 if(pnmtv->hdr.code == TVN_SELCHANGED)
                 {
-                    ShowPrefPage((PrefPage*)pnmtv->itemOld.lParam, false);
-
                     ShowPrefPage((PrefPage*)pnmtv->itemNew.lParam, true);
+
+                    ShowPrefPage((PrefPage*)pnmtv->itemOld.lParam, false);
                 }
             }
 
@@ -2371,7 +2371,7 @@ bool Win32PreferenceWindow::PrefDirectoryProc(HWND hwnd,
         case WM_HELP:
         case UWM_HELP:
         {
-            //LaunchHelp(hwnd, Preferences_Directory);
+            LaunchHelp(hwnd, Preferences_Directory);
             break;
         }
 
@@ -4539,11 +4539,7 @@ void Win32PreferenceWindow::ShowPrefPage(PrefPage* page, bool show)
     }
     else
     {
-        if(page->hwnd)
-        {
-            ShowWindow(page->hwnd, TRUE);
-        }
-        else
+        if(!page->hwnd)
         {
 
             HGLOBAL         hDlgResMem;
@@ -4577,15 +4573,21 @@ void Win32PreferenceWindow::ShowPrefPage(PrefPage* page, bool show)
                 lpDlgExRes->style &= ~WS_POPUP;
                 lpDlgExRes->style &= ~DS_MODALFRAME;
 
-                lpDlgExRes->style |= WS_CHILD | WS_OVERLAPPED | DS_CONTROL | WS_VISIBLE;
+                lpDlgExRes->style |= WS_CHILD | WS_OVERLAPPED | DS_CONTROL;
+
+                // this should help reduce flicker from moving it into position...
+                lpDlgExRes->style &= ~WS_VISIBLE;
             }
             else
             {
                 lpDlgRes->style &= ~WS_POPUP;
                 lpDlgRes->style &= ~DS_MODALFRAME;
 
-                lpDlgRes->style |= WS_CHILD | WS_OVERLAPPED | DS_CONTROL | WS_VISIBLE;
-            }
+                lpDlgRes->style |= WS_CHILD | WS_OVERLAPPED | DS_CONTROL;
+
+                // this should help reduce flicker from moving it into position...
+                lpDlgRes->style &= ~WS_VISIBLE;
+            }            
 
             // Create the Pref page
             page->hwnd = CreateDialogIndirect(
@@ -4598,11 +4600,12 @@ void Win32PreferenceWindow::ShowPrefPage(PrefPage* page, bool show)
             SetWindowPos(page->hwnd, NULL, pageRect.left, pageRect.top, 
                             0, 0, SWP_NOSIZE|SWP_NOZORDER);
 
-            
             // Free the resource
             UnlockResource(hDlgResMem);
             FreeResource(hDlgResMem);
         }
+
+        ShowWindow(page->hwnd, TRUE);
 
         m_currentPage = page;
 
