@@ -107,7 +107,8 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             lv_item.lParam = NULL;
 
             // is this the current index? if so make it bold ...
-            if(dis->itemID == m_oPlm->GetCurrentIndex())
+            // btw, we only do this if it is the primary browser
+            if(dis->itemID == m_oPlm->GetCurrentIndex() && !m_pParent)
             {
                 LOGFONT lf;
 
@@ -274,7 +275,7 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             rcClip.left += ListView_GetColumnWidth(hwndList, 4);
 
             // If we changed font undo it
-            if(dis->itemID == m_oPlm->GetCurrentIndex())
+            if(dis->itemID == m_oPlm->GetCurrentIndex() && !m_pParent)
             {
                 SelectObject(dis->hDC, oldFont);
                 DeleteObject(boldFont);

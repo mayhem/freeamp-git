@@ -332,9 +332,13 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
 
 	    if (pListView->hdr.code == NM_DBLCLK)
         {
-            m_playerEQ->AcceptEvent(new Event(CMD_Stop));
-            m_oPlm->SetCurrentIndex(pListView->iItem);
-            m_playerEQ->AcceptEvent(new Event(CMD_Play));
+            // only do this for the root browser
+            if(!m_pParent)
+            {
+                m_playerEQ->AcceptEvent(new Event(CMD_Stop));
+                m_oPlm->SetCurrentIndex(pListView->iItem);
+                m_playerEQ->AcceptEvent(new Event(CMD_Play));
+            }
         }   
         
         if (pListView->hdr.code == LVN_COLUMNCLICK)
