@@ -311,6 +311,10 @@ SOURCE=..\..\aps\sigxdr.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\aps\slclient.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\src\thread.cpp
 # End Source File
 # Begin Source File

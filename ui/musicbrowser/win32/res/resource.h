@@ -200,6 +200,12 @@
 #define ID_EDIT_GENERATEPLAYLIST        40085
 #define ID_EDIT_SUBMITPLAYLIST          40086
 #define ID_EDIT_STARTSIGNATURING        40087
+#define ID_SL_QUERY_500                 40088
+#define ID_SL_QUERY_1000                40089
+#define ID_SL_QUERY_5000                40090
+#define ID_SL_QUERY_10000               40091
+#define ID_SL_QUERY_20000               40092
+#define ID_SL_QUERY_NOMAX               40093
 #define IDS_URL                         65535
 #define IDC_TRACKTEXT                   65535
 #define IDC_TITLETEXT                   65535
@@ -209,7 +215,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        142
-#define _APS_NEXT_COMMAND_VALUE         40088
+#define _APS_NEXT_COMMAND_VALUE         40094
 #define _APS_NEXT_CONTROL_VALUE         1053
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

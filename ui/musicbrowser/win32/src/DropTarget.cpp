@@ -679,5 +679,6 @@ STDMETHODIMP DropTarget::Drop(LPDATAOBJECT pDataObj,
             return NOERROR;
         }
     }
+	MessageBox(NULL, "Drop failed.", "Drop failed", MB_OK);
 	return hr;      
 }

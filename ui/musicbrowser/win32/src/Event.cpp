@@ -84,7 +84,7 @@ void MusicBrowserUI::AskSignatureDialog(void)
                       string(numtracks) + string(" track(s).  Proceed?");
 
     int ret = MessageBox(m_hWnd, message.c_str(), caption.c_str(),
-                         MB_YESNO|MB_ICONQUESTION);
+                         MB_YESNO|MB_ICONQUESTION|MB_SETFOREGROUND);
 
     if (ret == IDYES)
         m_context->catalog->StartGeneratingSigs();
@@ -96,7 +96,7 @@ void MusicBrowserUI::AskOptIn(void)
     string message = "You didn't opt-in to use the Relatable features.  Would you like to go to the options dialog and create a profile?";
 
     int ret = MessageBox(m_hWnd, message.c_str(), caption.c_str(),
-                         MB_YESNO|MB_ICONSTOP);
+                         MB_YESNO|MB_ICONSTOP|MB_SETFOREGROUND);
 
     if (ret == IDYES)
         m_context->target->AcceptEvent(new ShowPreferencesEvent(7));
@@ -115,7 +115,7 @@ void MusicBrowserUI::StillNeedSignature(void)
     else
         message = "Before using any of the Relatable features, all tracks in your music collection need to be signatured.  Please click on 'Start Signaturing' in the Relatable menu.  NOTE: Signaturing will currently not take place while songs are being played.";
 
-    MessageBox(m_hWnd, message.c_str(), caption.c_str(), MB_OK|MB_ICONSTOP);
+    MessageBox(m_hWnd, message.c_str(), caption.c_str(), MB_OK|MB_ICONSTOP|MB_SETFOREGROUND);
 }
 
 void MusicBrowserUI::SubmitPlaylistEvent(void)
@@ -176,7 +176,121 @@ void MusicBrowserUI::SubmitPlaylistEvent(void)
       string caption = "Learn Playlist Error";
       string message = "In order to train the Relatable Engine, you need to have tracks selected in the My Music tree, have tracks selected in the playlist, or just have an active playlist.  You don't have any of this right now, so the Relatable Engine has nothing to learn.";
 
-      MessageBox(m_hWnd, message.c_str(), caption.c_str(), MB_OK|MB_ICONSTOP);
+      MessageBox(m_hWnd, message.c_str(), caption.c_str(), MB_OK|MB_ICONSTOP|MB_SETFOREGROUND);
+   }
+}
+
+
+void MusicBrowserUI::GenSLPlaylistEvent(float fMax)
+{
+    APSInterface *pInterface = m_context->aps;
+    if (!pInterface)
+        return;
+
+    if (!pInterface->IsTurnedOn()) {
+        AskOptIn();
+        return;
+    }
+
+    if (m_context->catalog->GetNumNeedingSigs() > 0) {
+        StillNeedSignature();
+        return;
+    }
+
+    vector<PlaylistItem*> items;
+    GetSelectedMusicTreeItems(&items);
+    if (items.empty())
+    {
+        GetSelectedPlaylistItems(&items);
+    }
+    GenSLPlaylistEvent(&items, fMax);
+}
+
+void MusicBrowserUI::GenSLPlaylistEvent(vector<PlaylistItem*>* pSeed, float fMax)
+{
+    APSInterface *pInterface = m_context->aps;
+    if (!pInterface)
+        return;
+
+    if (!pInterface->IsTurnedOn()) {
+        AskOptIn();
+        return;
+    }
+
+    if (m_context->catalog->GetNumNeedingSigs() > 0) {
+        StillNeedSignature();
+        return;
+    }
+
+    vector<string> seedList;
+	vector<string> returnList;
+    uint32 nResponse = 0;
+
+    if ((pSeed) && (!pSeed->empty())) {
+        APSPlaylist InputPlaylist;
+        vector<PlaylistItem *>::iterator i;
+
+        for (i = pSeed->begin(); i != pSeed->end(); i++)
+			seedList.push_back((*i)->GetMetaData().GUID());
+
+        nResponse = m_context->aps->APSGetSoundsLike(&seedList,
+                               m_context->catalog->m_guidList, &returnList, 10,
+							   fMax);
+    }
+    else {
+        nResponse = m_context->aps->APSGetSoundsLike(&seedList,
+                               m_context->catalog->m_guidList, &returnList, 10,
+							   fMax);
+    }
+
+	bool messageError = true;
+
+    if (nResponse == APS_NOERROR) {
+        if (returnList.size() > 0) {
+			messageError = false;
+            vector<string> newitems;
+            string strTemp;
+            string strFilename;
+            vector<string>::iterator j;
+
+            for (j = returnList.begin(); j != returnList.end(); j++) {
+                strFilename = m_context->catalog->GetFilename(*j);
+                if (strFilename != "")
+                    newitems.push_back(strFilename.c_str());
+            }
+
+            for (int z = m_plm->CountItems() - 1; z >= 0; z--) {
+                PlaylistItem *testitem = m_plm->ItemAt(z);
+                bool remove = true;
+
+                if ((pSeed) && (!pSeed->empty())) {
+                    vector<PlaylistItem *>::iterator i = pSeed->begin();
+                    for (; i != pSeed->end(); i++) {
+                        if ((*i)->GetMetaData().GUID() ==
+                             testitem->GetMetaData().GUID()) {
+                            remove = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (remove)
+                    m_plm->RemoveItem(z);
+            }
+            m_plm->AddItems(newitems);
+        }
+    }
+
+	if (messageError) {
+      string caption = "Generate SoundsLike Playlist Error";
+	  string message;
+
+	  if (nResponse != APS_NOERROR) 
+          message = "For some reason, the Relatable SoundsLike server returned an error.";
+      else 
+		  message = "The Relatable SoundsLike server didn't return any matches.";
+
+      MessageBox(m_hWnd, message.c_str(), caption.c_str(), MB_OK|MB_ICONSTOP|MB_SETFOREGROUND);
    }
 }
 
@@ -288,7 +402,7 @@ void MusicBrowserUI::GenPlaylistEvent(vector<PlaylistItem*>* pSeed)
       else 
 		  message = "The Relatable Engine didn't have any recommendations for you.  Listen to songs, use the 'Learn Playlist' menu item, and try this again later.";
 
-      MessageBox(m_hWnd, message.c_str(), caption.c_str(), MB_OK|MB_ICONSTOP);
+      MessageBox(m_hWnd, message.c_str(), caption.c_str(), MB_OK|MB_ICONSTOP|MB_SETFOREGROUND);
    }
 }
 

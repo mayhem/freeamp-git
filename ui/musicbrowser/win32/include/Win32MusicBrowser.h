@@ -232,6 +232,8 @@ class MusicBrowserUI : public UserInterface
     void  ClearPlaylistEvent();
     void  GenPlaylistEvent(vector<PlaylistItem *> *pSeed);
     void  GenPlaylistEvent(void);
+	void  GenSLPlaylistEvent(vector<PlaylistItem *> *pSeed, float fMax);
+	void  GenSLPlaylistEvent(float fMax);
     void  SubmitPlaylistEvent(void);
     void  SortEvent(int id);
     void  EmptyDBCheck();

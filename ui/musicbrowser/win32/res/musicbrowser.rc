@@ -468,6 +468,13 @@ BEGIN
         MENUITEM "&Recommend Playlist",         ID_EDIT_GENERATEPLAYLIST
         MENUITEM "&Learn Playlist",             ID_EDIT_SUBMITPLAYLIST
         MENUITEM SEPARATOR
+        MENUITEM "SoundsLike (500)",            ID_SL_QUERY_500
+        MENUITEM "SoundsLike (1000)",           ID_SL_QUERY_1000
+        MENUITEM "SoundsLike (5000)",           ID_SL_QUERY_5000
+        MENUITEM "SoundsLike (10000)",          ID_SL_QUERY_10000
+        MENUITEM "SoundsLike (20000)",          ID_SL_QUERY_20000
+        MENUITEM "SoundsLike (no max)",         ID_SL_QUERY_NOMAX
+        MENUITEM SEPARATOR
         MENUITEM "&Start Signaturing",          ID_EDIT_STARTSIGNATURING
     END
     POPUP "&Help"
