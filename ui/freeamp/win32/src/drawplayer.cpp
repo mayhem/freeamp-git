@@ -101,13 +101,15 @@ static HBITMAP repeatButtonBitmap;
 static HBITMAP shuffleButtonBitmap;
 static HBITMAP openButtonBitmap;
 static HBITMAP playerMask;
+static HBITMAP oldPlayerMaskBitmap;
 static HBITMAP smallFont, largeFont;
 static HBITMAP logoBitmap;
 
-static HRGN displayRegion;
+static HRGN g_displayRegion;
+static HRGN g_playerRegion;
 static HRGN* g_controlRegions = NULL;
 
-static HDC tempDC;
+static HDC playerMaskDC;
 static HCURSOR dialCursor, arrowCursor, currentCursor;
 static HPALETTE palette = NULL;
 
@@ -197,389 +199,6 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
     width += bmp.bmWidth; 
     height = bmp.bmHeight;
 
-
-    // Render Display
-#define LogoHeight  18
-#define FreeWidth   41
-#define AmpWidth    45
-
-    SelectClipRgn(bufferdc, displayRegion);
-
-    RECT displayRect;
-    GetRgnBox(displayRegion, &displayRect);
-
-    switch(g_displayInfo.state)
-    {
-        case Intro: // hard coded hack just to look good <grin>
-        {         
-            int32 xIntroPos = displayRect.left + 32;
-            int32 yIntroPos = displayRect.top + 6;
-
-            SelectObject(memdc, logoBitmap);
-
-
-            BitBlt( bufferdc, 
-                    xIntroPos - g_displayInfo.introOffset, 
-                    yIntroPos, 
-                    FreeWidth, 
-                    LogoHeight, 
-                    memdc, 
-                    0,
-                    0,
-                    SRCCOPY);
-
-            BitBlt( bufferdc, 
-                    xIntroPos + FreeWidth + g_displayInfo.introOffset, 
-                    yIntroPos, 
-                    AmpWidth, 
-                    LogoHeight, 
-                    memdc, 
-                    0,
-                    LogoHeight,
-                    SRCCOPY);
-
-            break;
-        }
-
-        /*
-        strcpy(g_displayInfo.path, "Alienated - Free Return.mp3");
-            g_displayInfo.frame = 0;
-            g_displayInfo.range = 1200;
-            g_displayInfo.hours = 0;
-            g_displayInfo.minutes = 1;
-            g_displayInfo.seconds = 26;
-            g_displayInfo.volume = 85;*/
-
-
-#define descriptionY    26
-#define valueY          25    
-#define descriptionX    
-
-        case Volume:
-        {
-            char volString[] = "volume";
-            char valueString[4];
-
-            int32 offset = displayRect.left + 50;
-    
-            SelectObject(memdc, smallFont);
-
-            for(i = 0; volString[i]; i++)
-            {
-                BitBlt( bufferdc, 
-                        offset, 
-                        descriptionY, 
-                        smallFontWidth[volString[i] - 32], 
-                        10,
-                        memdc, 
-                        0,
-                        (volString[i] - 32)*10,
-                        SRCCOPY);
-
-                offset += smallFontWidth[volString[i] - 32];
-
-            }
-
-            wsprintf(valueString, "%d%%", g_displayInfo.volume);
-
-            offset = displayRect.left + 3;
-
-            SelectObject(memdc, largeFont);
-
-            for(i = 0; valueString[i]; i++)
-            {
-                BitBlt( bufferdc, 
-                        offset, 
-                        valueY, 
-                        largeFontWidth[valueString[i] - 32], 
-                        12,
-                        memdc, 
-                        0,
-                        (valueString[i] - 32)*12,
-                        SRCCOPY);
-
-                offset += largeFontWidth[valueString[i] - 32];
-
-            }
-
-            break;
-        }
-
-        case CurrentTime:
-        {
-            char labelString[] = "current time";
-            char valueString[12];
-
-            int32 offset = displayRect.left + 1;
-    
-            SelectObject(memdc, smallFont);
-
-            for(i = 0; labelString[i]; i++)
-            {
-                BitBlt( bufferdc, 
-                        offset, 
-                        descriptionY, 
-                        smallFontWidth[labelString[i] - 32], 
-                        10,
-                        memdc, 
-                        0,
-                        (labelString[i] - 32)*10,
-                        SRCCOPY);
-
-                offset += smallFontWidth[labelString[i] - 32];
-
-            }
-
-            if(g_displayInfo.hours)
-            {
-                wsprintf(valueString, "%d:%.02d:%.02d", g_displayInfo.hours,
-                                                        g_displayInfo.minutes,
-                                                        g_displayInfo.seconds);
-                offset = displayRect.left + 73;
-            }
-            else
-            {
-                 wsprintf(valueString, "%.02d:%.02d",   g_displayInfo.minutes,
-                                                        g_displayInfo.seconds);
-
-                 offset = displayRect.left + 83;
-            }
-
-            SelectObject(memdc, largeFont);
-
-            for(i = 0; valueString[i]; i++)
-            {
-                BitBlt( bufferdc, 
-                        offset, 
-                        valueY, 
-                        largeFontWidth[valueString[i] - 32], 
-                        12,
-                        memdc, 
-                        0,
-                        (valueString[i] - 32)*12,
-                        SRCCOPY);
-
-                offset += largeFontWidth[valueString[i] - 32];
-
-            }
-            break;
-        }
-
-        case SeekTime:
-        {
-            char labelString[] = "seek time";
-            char valueString[12];
-
-            int32 offset = displayRect.left + 1;
-    
-            SelectObject(memdc, smallFont);
-
-            for(i = 0; labelString[i]; i++)
-            {
-                BitBlt( bufferdc, 
-                        offset, 
-                        descriptionY, 
-                        smallFontWidth[labelString[i] - 32], 
-                        10,
-                        memdc, 
-                        0,
-                        (labelString[i] - 32)*10,
-                        SRCCOPY);
-
-                offset += smallFontWidth[labelString[i] - 32];
-
-            }
-
-            if(g_displayInfo.hours)
-            {
-                wsprintf(valueString, "%d:%.02d:%.02d", g_displayInfo.seekhours,
-                                                        g_displayInfo.seekminutes,
-                                                        g_displayInfo.seekseconds);
-                offset = displayRect.left + 73;
-            }
-            else
-            {
-                 wsprintf(valueString, "%.02d:%.02d",   g_displayInfo.seekminutes,
-                                                        g_displayInfo.seekseconds);
-
-                 offset = displayRect.left + 83;
-            }
-
-            SelectObject(memdc, largeFont);
-
-            for(i = 0; valueString[i]; i++)
-            {
-                BitBlt( bufferdc, 
-                        offset, 
-                        valueY, 
-                        largeFontWidth[valueString[i] - 32], 
-                        12,
-                        memdc, 
-                        0,
-                        (valueString[i] - 32)*12,
-                        SRCCOPY);
-
-                offset += largeFontWidth[valueString[i] - 32];
-
-            }
-            break;
-        }
-
-        case RemainingTime:
-        {
-            char labelString[] = "remaining time";
-            char valueString[12];
-
-            int32 offset = displayRect.left + 1;
-    
-            SelectObject(memdc, smallFont);
-
-            for(i = 0; labelString[i]; i++)
-            {
-                BitBlt( bufferdc, 
-                        offset, 
-                        descriptionY, 
-                        smallFontWidth[labelString[i] - 32], 
-                        10,
-                        memdc, 
-                        0,
-                        (labelString[i] - 32)*10,
-                        SRCCOPY);
-
-                offset += smallFontWidth[labelString[i] - 32];
-
-            }
-			int32 totalSeconds = g_displayInfo.totalhours * 3600;
-			totalSeconds += g_displayInfo.totalminutes * 60;
-			totalSeconds += g_displayInfo.totalseconds;
-			int32 currSeconds = g_displayInfo.hours * 3600;
-			currSeconds += g_displayInfo.minutes * 60;
-			currSeconds += g_displayInfo.seconds;
-
-			int32 displaySeconds = totalSeconds - currSeconds;
-			int32 displayHours = displaySeconds / 3600;
-			int32 displayMinutes = (displaySeconds - (displayHours * 3600)) / 60;
-			displaySeconds = displaySeconds - (displayHours * 3600) - (displayMinutes * 60);
-
-            if(displayHours)
-            {
-                wsprintf(valueString, "%d:%.02d:%.02d", displayHours,displayMinutes,displaySeconds);
-                offset = displayRect.left + 73;
-            }
-            else
-            {
-                 wsprintf(valueString, "%.02d:%.02d", displayMinutes, displaySeconds);
-				//OutputDebugString(valueString);
-				//OutputDebugString("\n");
-                 offset = displayRect.left + 83;
-            }
-
-            SelectObject(memdc, largeFont);
-
-            for(i = 0; valueString[i]; i++)
-            {
-                BitBlt( bufferdc, 
-                        offset, 
-                        valueY, 
-                        largeFontWidth[valueString[i] - 32], 
-                        12,
-                        memdc, 
-                        0,
-                        (valueString[i] - 32)*12,
-                        SRCCOPY);
-
-                offset += largeFontWidth[valueString[i] - 32];
-
-            }
-            break;
-        }
-
-        case TotalTime:
-        {
-            char labelString[] = "total time";
-            char valueString[12];
-
-            int32 offset = displayRect.left + 1;
-    
-            SelectObject(memdc, smallFont);
-
-            for(i = 0; labelString[i]; i++)
-            {
-                BitBlt( bufferdc, 
-                        offset, 
-                        descriptionY, 
-                        smallFontWidth[labelString[i] - 32], 
-                        10,
-                        memdc, 
-                        0,
-                        (labelString[i] - 32)*10,
-                        SRCCOPY);
-
-                offset += smallFontWidth[labelString[i] - 32];
-
-            }
-
-            if(g_displayInfo.hours)
-            {
-                wsprintf(valueString, "%d:%.02d:%.02d", g_displayInfo.totalhours,
-                                                        g_displayInfo.totalminutes,
-                                                        g_displayInfo.totalseconds);
-                offset = displayRect.left + 73;
-            }
-            else
-            {
-                 wsprintf(valueString, "%.02d:%.02d",   g_displayInfo.totalminutes,
-                                                        g_displayInfo.totalseconds);
-
-                 offset = displayRect.left + 83;
-            }
-
-            SelectObject(memdc, largeFont);
-
-            for(i = 0; valueString[i]; i++)
-            {
-                BitBlt( bufferdc, 
-                        offset, 
-                        valueY, 
-                        largeFontWidth[valueString[i] - 32], 
-                        12,
-                        memdc, 
-                        0,
-                        (valueString[i] - 32)*12,
-                        SRCCOPY);
-
-                offset += largeFontWidth[valueString[i] - 32];
-
-            }
-            break;
-        }
-    }
-
-    if(g_displayInfo.state != Intro)
-    {
-        int32 offset = displayRect.left + 1;
-
-        SelectObject(memdc, smallFont);
-
-        for(i = 0; g_displayInfo.path[i]; i++)
-        {
-            BitBlt( bufferdc, 
-                    offset - g_displayInfo.scrollOffset, 
-                    10, 
-                    smallFontWidth[g_displayInfo.path[i] - 32], 
-                    10,
-                    memdc, 
-                    0,
-                    (g_displayInfo.path[i] - 32)*10,
-                    SRCCOPY);
-
-            offset += smallFontWidth[g_displayInfo.path[i] - 32];
-        }
-
-    }
-
-    SelectClipRgn(bufferdc, NULL);
-
     // Render Controls...
     for(i = 0; i < kNumControls; i++)
     {
@@ -587,7 +206,7 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
 
         GetRgnBox(g_buttonStateArray[i].region, &rect);
 
-        if(1)//g_buttonStateArray[i].dirty)
+        if(g_buttonStateArray[i].dirty)
         {
             switch(g_buttonStateArray[i].control_id)
             {
@@ -714,6 +333,8 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
         }
     } 
 
+    SelectClipRgn(hdc, g_playerRegion);
+
     BitBlt( hdc, 
             0, 
             0, 
@@ -723,6 +344,495 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
             0,
             0,
             SRCCOPY);
+
+    SelectClipRgn(hdc, NULL);
+
+    SelectObject(bufferdc, oldBufferBitmap); 
+    SelectObject(memdc, oldMemBitmap); 
+    DeleteDC(bufferdc);
+    DeleteDC(memdc);
+    DeleteObject(bufferBitmap);
+}
+
+void DrawDisplay(HDC hdc, DisplayInfo* state)
+{
+    HDC memdc, bufferdc;
+    HBITMAP oldMemBitmap, bufferBitmap, oldBufferBitmap;
+    int width, height;
+    BITMAP bmp;
+    int32 i;
+
+    if(palette)
+    {
+        SelectPalette (hdc, palette, FALSE);
+        RealizePalette (hdc);
+    }
+
+    bufferBitmap = CreateCompatibleBitmap(  hdc, 
+                                            PLAYER_WINDOW_WIDTH, 
+                                            PLAYER_WINDOW_HEIGHT);
+
+    memdc = CreateCompatibleDC(hdc);
+    bufferdc = CreateCompatibleDC(hdc);
+    oldMemBitmap = (HBITMAP)SelectObject(memdc, leftBitmap);
+    oldBufferBitmap = (HBITMAP)SelectObject(bufferdc, bufferBitmap);
+
+    GetObject(leftBitmap, sizeof(BITMAP), (LPSTR)&bmp);
+
+    BitBlt( bufferdc, 
+            0, 0, bmp.bmWidth, bmp.bmHeight,
+            memdc, 
+            0,0,
+            SRCCOPY);
+
+    width = bmp.bmWidth; 
+    height = bmp.bmHeight;
+
+    SelectObject(memdc, dialBitmap);
+
+    GetObject(dialBitmap, sizeof(BITMAP), (LPSTR)&bmp);
+
+    BitBlt( bufferdc, 
+            width, 0, DIAL_SECTION, bmp.bmHeight,
+            memdc, 
+            0,0,
+            SRCCOPY);
+
+    width += DIAL_SECTION; 
+    height = bmp.bmHeight;
+
+    SelectObject(memdc, middleBitmap);
+
+    GetObject(middleBitmap, sizeof(BITMAP), (LPSTR)&bmp);
+
+    BitBlt( bufferdc, 
+            width, 0, bmp.bmWidth, bmp.bmHeight,
+            memdc, 
+            0,0,
+            SRCCOPY);
+
+    width += bmp.bmWidth; 
+    height = bmp.bmHeight;
+
+    SelectObject(memdc, dialBitmap);
+
+    GetObject(dialBitmap, sizeof(BITMAP), (LPSTR)&bmp);
+
+    BitBlt( bufferdc, 
+            width, 0, DIAL_SECTION, bmp.bmHeight,
+            memdc, 
+            0,0,
+            SRCCOPY);
+
+    width += DIAL_SECTION; 
+    height = bmp.bmHeight;
+
+    SelectObject(memdc,rightBitmap);
+
+    GetObject(rightBitmap, sizeof(BITMAP), (LPSTR)&bmp);
+
+    BitBlt( bufferdc, 
+            width, 0, bmp.bmWidth, bmp.bmHeight,
+            memdc, 
+            0,0,
+            SRCCOPY);
+
+    width += bmp.bmWidth; 
+    height = bmp.bmHeight;
+
+
+    // Render Display
+#define LogoHeight  18
+#define FreeWidth   41
+#define AmpWidth    45
+
+
+    RECT displayRect;
+    GetRgnBox(g_displayRegion, &displayRect);
+
+    switch(state->state)
+    {
+        case Intro: // hard coded hack just to look good <grin>
+        {         
+            int32 xIntroPos = displayRect.left + 32;
+            int32 yIntroPos = displayRect.top + 6;
+
+            SelectObject(memdc, logoBitmap);
+
+
+            BitBlt( bufferdc, 
+                    xIntroPos - state->introOffset, 
+                    yIntroPos, 
+                    FreeWidth, 
+                    LogoHeight, 
+                    memdc, 
+                    0,
+                    0,
+                    SRCCOPY);
+
+            BitBlt( bufferdc, 
+                    xIntroPos + FreeWidth + state->introOffset, 
+                    yIntroPos, 
+                    AmpWidth, 
+                    LogoHeight, 
+                    memdc, 
+                    0,
+                    LogoHeight,
+                    SRCCOPY);
+
+            break;
+        }
+
+        /*
+        strcpy(g_displayInfo.path, "Alienated - Free Return.mp3");
+            g_displayInfo.frame = 0;
+            g_displayInfo.range = 1200;
+            g_displayInfo.hours = 0;
+            g_displayInfo.minutes = 1;
+            g_displayInfo.seconds = 26;
+            g_displayInfo.volume = 85;*/
+
+
+#define descriptionY    26
+#define valueY          25    
+#define descriptionX    
+
+        case Volume:
+        {
+            char volString[] = "volume";
+            char valueString[4];
+
+            int32 offset = displayRect.left + 50;
+    
+            SelectObject(memdc, smallFont);
+
+            for(i = 0; volString[i]; i++)
+            {
+                BitBlt( bufferdc, 
+                        offset, 
+                        descriptionY, 
+                        smallFontWidth[volString[i] - 32], 
+                        10,
+                        memdc, 
+                        0,
+                        (volString[i] - 32)*10,
+                        SRCCOPY);
+
+                offset += smallFontWidth[volString[i] - 32];
+
+            }
+
+            wsprintf(valueString, "%d%%", state->volume);
+
+            offset = displayRect.left + 3;
+
+            SelectObject(memdc, largeFont);
+
+            for(i = 0; valueString[i]; i++)
+            {
+                BitBlt( bufferdc, 
+                        offset, 
+                        valueY, 
+                        largeFontWidth[valueString[i] - 32], 
+                        12,
+                        memdc, 
+                        0,
+                        (valueString[i] - 32)*12,
+                        SRCCOPY);
+
+                offset += largeFontWidth[valueString[i] - 32];
+
+            }
+
+            break;
+        }
+
+        case CurrentTime:
+        {
+            char labelString[] = "current time";
+            char valueString[12];
+
+            int32 offset = displayRect.left + 1;
+    
+            SelectObject(memdc, smallFont);
+
+            for(i = 0; labelString[i]; i++)
+            {
+                BitBlt( bufferdc, 
+                        offset, 
+                        descriptionY, 
+                        smallFontWidth[labelString[i] - 32], 
+                        10,
+                        memdc, 
+                        0,
+                        (labelString[i] - 32)*10,
+                        SRCCOPY);
+
+                offset += smallFontWidth[labelString[i] - 32];
+
+            }
+
+            if(state->hours)
+            {
+                wsprintf(valueString, "%d:%.02d:%.02d", state->hours,
+                                                        state->minutes,
+                                                        state->seconds);
+                offset = displayRect.left + 73;
+            }
+            else
+            {
+                 wsprintf(valueString, "%.02d:%.02d",   state->minutes,
+                                                        state->seconds);
+
+                 offset = displayRect.left + 83;
+            }
+
+            SelectObject(memdc, largeFont);
+
+            for(i = 0; valueString[i]; i++)
+            {
+                BitBlt( bufferdc, 
+                        offset, 
+                        valueY, 
+                        largeFontWidth[valueString[i] - 32], 
+                        12,
+                        memdc, 
+                        0,
+                        (valueString[i] - 32)*12,
+                        SRCCOPY);
+
+                offset += largeFontWidth[valueString[i] - 32];
+
+            }
+            break;
+        }
+
+        case SeekTime:
+        {
+            char labelString[] = "seek time";
+            char valueString[12];
+
+            int32 offset = displayRect.left + 1;
+    
+            SelectObject(memdc, smallFont);
+
+            for(i = 0; labelString[i]; i++)
+            {
+                BitBlt( bufferdc, 
+                        offset, 
+                        descriptionY, 
+                        smallFontWidth[labelString[i] - 32], 
+                        10,
+                        memdc, 
+                        0,
+                        (labelString[i] - 32)*10,
+                        SRCCOPY);
+
+                offset += smallFontWidth[labelString[i] - 32];
+
+            }
+
+            if(state->hours)
+            {
+                wsprintf(valueString, "%d:%.02d:%.02d", state->seekhours,
+                                                        state->seekminutes,
+                                                        state->seekseconds);
+                offset = displayRect.left + 73;
+            }
+            else
+            {
+                 wsprintf(valueString, "%.02d:%.02d",   state->seekminutes,
+                                                        state->seekseconds);
+
+                 offset = displayRect.left + 83;
+            }
+
+            SelectObject(memdc, largeFont);
+
+            for(i = 0; valueString[i]; i++)
+            {
+                BitBlt( bufferdc, 
+                        offset, 
+                        valueY, 
+                        largeFontWidth[valueString[i] - 32], 
+                        12,
+                        memdc, 
+                        0,
+                        (valueString[i] - 32)*12,
+                        SRCCOPY);
+
+                offset += largeFontWidth[valueString[i] - 32];
+
+            }
+            break;
+        }
+
+        case RemainingTime:
+        {
+            char labelString[] = "remaining time";
+            char valueString[12];
+
+            int32 offset = displayRect.left + 1;
+    
+            SelectObject(memdc, smallFont);
+
+            for(i = 0; labelString[i]; i++)
+            {
+                BitBlt( bufferdc, 
+                        offset, 
+                        descriptionY, 
+                        smallFontWidth[labelString[i] - 32], 
+                        10,
+                        memdc, 
+                        0,
+                        (labelString[i] - 32)*10,
+                        SRCCOPY);
+
+                offset += smallFontWidth[labelString[i] - 32];
+
+            }
+			int32 totalSeconds = state->totalhours * 3600;
+			totalSeconds += state->totalminutes * 60;
+			totalSeconds += state->totalseconds;
+			int32 currSeconds = state->hours * 3600;
+			currSeconds += state->minutes * 60;
+			currSeconds += state->seconds;
+
+			int32 displaySeconds = totalSeconds - currSeconds;
+			int32 displayHours = displaySeconds / 3600;
+			int32 displayMinutes = (displaySeconds - (displayHours * 3600)) / 60;
+			displaySeconds = displaySeconds - (displayHours * 3600) - (displayMinutes * 60);
+
+            if(displayHours)
+            {
+                wsprintf(valueString, "%d:%.02d:%.02d", displayHours,displayMinutes,displaySeconds);
+                offset = displayRect.left + 73;
+            }
+            else
+            {
+                 wsprintf(valueString, "%.02d:%.02d", displayMinutes, displaySeconds);
+				//OutputDebugString(valueString);
+				//OutputDebugString("\n");
+                 offset = displayRect.left + 83;
+            }
+
+            SelectObject(memdc, largeFont);
+
+            for(i = 0; valueString[i]; i++)
+            {
+                BitBlt( bufferdc, 
+                        offset, 
+                        valueY, 
+                        largeFontWidth[valueString[i] - 32], 
+                        12,
+                        memdc, 
+                        0,
+                        (valueString[i] - 32)*12,
+                        SRCCOPY);
+
+                offset += largeFontWidth[valueString[i] - 32];
+
+            }
+            break;
+        }
+
+        case TotalTime:
+        {
+            char labelString[] = "total time";
+            char valueString[12];
+
+            int32 offset = displayRect.left + 1;
+    
+            SelectObject(memdc, smallFont);
+
+            for(i = 0; labelString[i]; i++)
+            {
+                BitBlt( bufferdc, 
+                        offset, 
+                        descriptionY, 
+                        smallFontWidth[labelString[i] - 32], 
+                        10,
+                        memdc, 
+                        0,
+                        (labelString[i] - 32)*10,
+                        SRCCOPY);
+
+                offset += smallFontWidth[labelString[i] - 32];
+
+            }
+
+            if(state->hours)
+            {
+                wsprintf(valueString, "%d:%.02d:%.02d", state->totalhours,
+                                                        state->totalminutes,
+                                                        state->totalseconds);
+                offset = displayRect.left + 73;
+            }
+            else
+            {
+                 wsprintf(valueString, "%.02d:%.02d",   state->totalminutes,
+                                                        state->totalseconds);
+
+                 offset = displayRect.left + 83;
+            }
+
+            SelectObject(memdc, largeFont);
+
+            for(i = 0; valueString[i]; i++)
+            {
+                BitBlt( bufferdc, 
+                        offset, 
+                        valueY, 
+                        largeFontWidth[valueString[i] - 32], 
+                        12,
+                        memdc, 
+                        0,
+                        (valueString[i] - 32)*12,
+                        SRCCOPY);
+
+                offset += largeFontWidth[valueString[i] - 32];
+
+            }
+            break;
+        }
+    }
+
+    if(state->state != Intro)
+    {
+        int32 offset = displayRect.left + 1;
+
+        SelectObject(memdc, smallFont);
+
+        for(i = 0; state->path[i]; i++)
+        {
+            BitBlt( bufferdc, 
+                    offset - state->scrollOffset, 
+                    10, 
+                    smallFontWidth[state->path[i] - 32], 
+                    10,
+                    memdc, 
+                    0,
+                    (state->path[i] - 32)*10,
+                    SRCCOPY);
+
+            offset += smallFontWidth[state->path[i] - 32];
+        }
+
+    }
+
+    SelectClipRgn(hdc, g_displayRegion);
+
+    BitBlt( hdc, 
+            0, 
+            0, 
+            PLAYER_WINDOW_WIDTH, 
+            PLAYER_WINDOW_HEIGHT,
+            bufferdc, 
+            0,
+            0,
+            SRCCOPY);
+
+    SelectClipRgn(hdc, NULL);
 
     SelectObject(bufferdc, oldBufferBitmap); 
     SelectObject(memdc, oldMemBitmap); 
@@ -994,6 +1104,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
     LRESULT result = FALSE;
     static POINT pressPt;
     static BOOL pressed = FALSE;
+    static int32 pressedIndex = 0;
     static int32 seekSpeed = 0;
     static HWND hwndTooltip = NULL;
     
@@ -1014,6 +1125,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
             // empty region to begin with...
             playerRegion = CreateRectRgn(0,0,0,0);
+            g_playerRegion = CreateRectRgn(0,0,0,0);
 
             capRegion = CreateEllipticRgn(  0,
                                             0,
@@ -1032,14 +1144,22 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                         bodyRegion,
                         RGN_OR);
 
+            CombineRgn( g_playerRegion,
+                        capRegion,
+                        bodyRegion,
+                        RGN_OR);
+
             OffsetRgn(capRegion, BODY_WIDTH, 0);
 
             CombineRgn( playerRegion,
                         playerRegion,
                         capRegion,
                         RGN_OR);
-
-
+            CombineRgn( g_playerRegion,
+                        g_playerRegion,
+                        capRegion,
+                        RGN_OR);
+            
             SetWindowRgn( hwnd, playerRegion, TRUE );
 
             dialCursor = LoadCursor(g_hInst, MAKEINTRESOURCE(IDC_DIAL));
@@ -1113,7 +1233,9 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                                                     g_buttonColorArray,
                                                     kFinalControl);
 
-            tempDC = CreateCompatibleDC(NULL);
+            playerMaskDC = CreateCompatibleDC(NULL);
+
+            oldPlayerMaskBitmap = (HBITMAP)SelectObject(playerMaskDC, playerMask);
 
             for(i = 0; i < kNumControls; i++)
             {
@@ -1158,7 +1280,16 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
             // display
             int32 displayOffset = LEFT_SECTION + DIAL_SECTION + 19;
 
-            displayRegion = g_controlRegions[kDisplayControl];
+            g_displayRegion = g_controlRegions[kDisplayControl];
+
+            // player
+            //Color black = {0,0,0,0};
+            //playerRegion = DetermineRegion(playerMask, &black);
+            
+            CombineRgn( g_playerRegion,
+                        g_playerRegion,
+                        g_displayRegion,
+                        RGN_DIFF);
              
             g_displayInfo.state = Intro;
             strcpy(g_displayInfo.path, "Welcome to FreeAmp");
@@ -1186,7 +1317,6 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                                         g_hInst, 
                                         NULL);
 
-            
             RECT toolRect;
             TOOLINFO ti;
 
@@ -1215,7 +1345,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
             }
 
             // don't forget display area!
-            GetRgnBox(displayRegion, &toolRect);
+            GetRgnBox(g_displayRegion, &toolRect);
             ti.cbSize = sizeof(TOOLINFO); 
             ti.uFlags =  TTF_SUBCLASS; 
             ti.hwnd = hwnd; 
@@ -1245,19 +1375,20 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
 
             SetTimer(hwnd, 0x00, 100, NULL);
-            SetTimer(hwnd, 0x01, 200, NULL);
+            //SetTimer(hwnd, 0x01, 200, NULL);
 			break;
 		}
 
         case WM_TIMER:
         {
-            HDC hdc = GetDC(hwnd);
+            
 
             switch (wParam)
             {
                 case 0:
                 {
                     static int32 count = 0;
+                    HDC hdc = GetDC(hwnd);
 
                     if(count == 15)
                     {
@@ -1272,6 +1403,11 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
                         multiplier += .55;
                     }
+
+                    DrawDisplay(hdc, &g_displayInfo);
+
+                    ReleaseDC(hwnd, hdc);
+
                     break;
                 }
 
@@ -1281,8 +1417,9 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                     int32 i;
                     RECT rect;
                     static int32 increment = 1;
+                    HDC hdc = GetDC(hwnd);
 
-                    GetRgnBox(displayRegion, &rect);
+                    GetRgnBox(g_displayRegion, &rect);
 
                     // first determine length
                     for(i = 0; g_displayInfo.path[i]; i++)
@@ -1313,12 +1450,17 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                         g_displayInfo.scrollOffset = 0;
                     }
 
+                    DrawDisplay(hdc, &g_displayInfo);
+
+                    ReleaseDC(hwnd, hdc);
+
                     break;
                 }
 
                 case 2:
                 {
-                    char foo[1024];
+                    //char foo[1024];
+                    HDC hdc = GetDC(hwnd);
 
                     g_displayInfo.seekframe += seekSpeed*20*abs(seekSpeed);
 
@@ -1329,28 +1471,27 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
                     int32 position = g_displayInfo.seekframe;
 
-                    sprintf(foo,"position: %d\r\n",position);
-				    OutputDebugString(foo);
+                    //sprintf(foo,"position: %d\r\n",position);
+				    //OutputDebugString(foo);
 
                     int32 seconds = (int32)ceil(g_ui->m_secondsPerFrame * position);
 					int32 hours = seconds / 3600;
 					int32 minutes = seconds / 60 - hours * 60;
 					seconds = seconds - minutes * 60 - hours * 3600;
 
-                    sprintf(foo,"seconds: %d\r\n",seconds);
+                    //sprintf(foo,"seconds: %d\r\n",seconds);
 
                     g_displayInfo.seekhours = hours;
                     g_displayInfo.seekminutes = minutes;
                     g_displayInfo.seekseconds = seconds;
 
+                    DrawDisplay(hdc, &g_displayInfo);
+
+                    ReleaseDC(hwnd, hdc);
 
                     break;
                 }
             } 
-
-            DrawPlayer(hdc, g_buttonStateArray);
-
-            ReleaseDC(hwnd, hdc);
 
             break;
         }
@@ -1363,6 +1504,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
             hdc = BeginPaint( hwnd, &ps );
 
             DrawPlayer(hdc, g_buttonStateArray);
+            DrawDisplay(hdc, &g_displayInfo);
             
             EndPaint( hwnd, &ps );          
             break;
@@ -1370,7 +1512,9 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
         case WM_DESTROY:
         {
-            DeleteDC(tempDC);
+            SelectObject(playerMaskDC, oldPlayerMaskBitmap); 
+
+            DeleteDC(playerMaskDC);
 
             DeleteObject(leftBitmap);
             DeleteObject(middleBitmap);
@@ -1392,7 +1536,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
             DeleteObject(largeFont);
             DeleteObject(logoBitmap);
 
-            DeleteObject(displayRegion);
+            DeleteObject(g_displayRegion);
 
             DeleteObject(palette);
 
@@ -1424,55 +1568,59 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
             if(pressed)
             {
-                for(i = 0; i < kNumControls; i++)
+                //for(i = 0; i < kNumControls; i++)
+                //{
+
+                i = pressedIndex;
+
+                if(i == kVolumeControl || i == kSeekControl )
                 {
-                    if(i == kVolumeControl || i == kSeekControl )
+
+                    if(PtInRegion(g_buttonStateArray[i].region, pressPt.x, pressPt.y))
                     {
+                        g_buttonStateArray[i].state = Deactivated;
+                        g_buttonStateArray[i].dirty = TRUE;
+                        g_buttonStateArray[i].position = 0;
+                        g_displayInfo.state = g_displayInfo.oldstate;
 
-                        if(PtInRegion(g_buttonStateArray[i].region, pressPt.x, pressPt.y))
+                        if(i == kSeekControl)
                         {
-                            g_buttonStateArray[i].state = Deactivated;
-                            g_buttonStateArray[i].dirty = TRUE;
-                            g_buttonStateArray[i].position = 0;
-                            g_displayInfo.state = g_displayInfo.oldstate;
+                            KillTimer(hwnd, 0x02);
 
-                            if(i == kSeekControl)
+                            if(g_ui->m_state == STATE_Playing)
                             {
-                                KillTimer(hwnd, 0x02);
-
-                                if(g_ui->m_state == STATE_Playing)
-                                {
-                                    g_ui->m_target->AcceptEvent(new ChangePositionEvent(g_displayInfo.seekframe));
-                                }
-                                else
-                                {
-                                    SendMessage(hwnd,WM_COMMAND,kPlayControl,0);
-                                    g_ui->m_target->AcceptEvent(new ChangePositionEvent(g_displayInfo.seekframe));
-                                }
+                                g_ui->m_target->AcceptEvent(new ChangePositionEvent(g_displayInfo.seekframe));
+                            }
+                            else
+                            {
+                                SendMessage(hwnd,WM_COMMAND,kPlayControl,0);
+                                g_ui->m_target->AcceptEvent(new ChangePositionEvent(g_displayInfo.seekframe));
                             }
                         }
                     }
-                    else
+                }
+                else
+                {
+                    if( PtInRegion(g_buttonStateArray[i].region, xPos, yPos) &&
+                        PtInRegion(g_buttonStateArray[i].region, pressPt.x, pressPt.y) &&
+                        g_buttonStateArray[i].state != Activated &&
+                        g_buttonStateArray[i].shown)
                     {
-                        if( PtInRegion(g_buttonStateArray[i].region, xPos, yPos) &&
-                            PtInRegion(g_buttonStateArray[i].region, pressPt.x, pressPt.y) &&
-                            g_buttonStateArray[i].state != Activated &&
-                            g_buttonStateArray[i].shown)
-                        {
-                            g_buttonStateArray[i].state = Selected;
-                            g_buttonStateArray[i].dirty = TRUE;
-							SendMessage(hwnd,WM_COMMAND,g_buttonStateArray[i].control_id,0);
-                        }
-                        else if(g_buttonStateArray[i].state != Activated)
-                        {
-                            g_buttonStateArray[i].state = Deactivated;
-                            g_buttonStateArray[i].dirty = TRUE;
-                        }
+                        g_buttonStateArray[i].state = Selected;
+                        g_buttonStateArray[i].dirty = TRUE;
+						SendMessage(hwnd,WM_COMMAND,g_buttonStateArray[i].control_id,0);
+                    }
+                    else if(g_buttonStateArray[i].state != Activated)
+                    {
+                        g_buttonStateArray[i].state = Deactivated;
+                        g_buttonStateArray[i].dirty = TRUE;
                     }
                 }
 
+                //}
+
                 // check on display area
-                if( PtInRegion(displayRegion, xPos, yPos) )
+                if( PtInRegion(g_displayRegion, xPos, yPos) )
                 {
                     if(g_displayInfo.state == TotalTime)
                         g_displayInfo.state = CurrentTime;
@@ -1487,22 +1635,13 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
             hdc = GetDC(hwnd);
 
             DrawPlayer(hdc, g_buttonStateArray);
+            DrawDisplay(hdc, &g_displayInfo);
 
             ReleaseDC(hwnd, hdc);
 
             pressed = FALSE;
             ReleaseCapture();
 
-            MSG relayMsg; 
- 
-            relayMsg.lParam = lParam; 
-            relayMsg.wParam = wParam; 
-            relayMsg.message = msg; 
-            relayMsg.hwnd = hwnd; 
-            /*SendMessage(hwndTooltip, 
-                        TTM_RELAYEVENT, 
-                        0, 
-                        (LPARAM) &relayMsg); */
             break;
         }
 
@@ -1525,6 +1664,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                 if( PtInRegion(g_buttonStateArray[i].region, pressPt.x, pressPt.y) )
                 {
                     pressed = TRUE;
+                    pressedIndex = i;
                     SetCapture(hwnd);
 
                     if(i == kVolumeControl)
@@ -1554,23 +1694,12 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
             } 
 
             // check on display area
-            if( PtInRegion(displayRegion, pressPt.x, pressPt.y) )
+            if( PtInRegion(g_displayRegion, pressPt.x, pressPt.y) )
             {
                 pressed = TRUE;
                 SetCapture(hwnd);
             }
 
-            MSG relayMsg; 
- 
-            relayMsg.lParam = lParam; 
-            relayMsg.wParam = wParam; 
-            relayMsg.message = msg; 
-            relayMsg.hwnd = hwnd; 
-            /*SendMessage(hwndTooltip, 
-                        TTM_RELAYEVENT, 
-                        0, 
-                        (LPARAM) &relayMsg); */
-                
             break;
         }
 
@@ -1583,9 +1712,10 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
             LPARAM yPos = HIWORD(lParam);  // vertical position of cursor 
             POINT pt;
             COLORREF color;
-            HBITMAP oldBitmap;
+            bool dirtyPlayer = false;
+            bool dirtyDisplay = false;
+            
             int32 i;
-            HDC hdc;
 
             pt.x = xPos;
             pt.y = yPos;
@@ -1595,11 +1725,10 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
             /*vErrorOut(bg_blue|fg_pink, "yPos = %d\r\n", pt.y);*/
 
-            oldBitmap = (HBITMAP)SelectObject(tempDC, playerMask);
-
-            color = GetPixel(tempDC, pt.x, pt.y);
+            color = GetPixel(playerMaskDC, pt.x, pt.y);
 
             if(color == RGB(0,0,0) && !pressed)
+            //if(PtInRegion(playerRegion, pt.x, pt.y))
             {
                 currentCursor = arrowCursor;
                 result = HTCAPTION;
@@ -1607,115 +1736,113 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
             else
             {
                 result = HTCLIENT;
-
-                MSG relayMsg; 
- 
-                relayMsg.lParam = MAKELPARAM(pt.x, pt.y); 
-                relayMsg.wParam = wParam; 
-                relayMsg.message = WM_MOUSEMOVE; 
-                relayMsg.hwnd = hwnd; 
-
-                /*SendMessage(hwndTooltip, 
-                        TTM_RELAYEVENT, 
-                        0, 
-                        (LPARAM) &relayMsg); */
-                
             }
+
             
-
-            for(i = 0; i < kNumControls; i++)
+            if(pressed)
             {
-                if(pressed)
+                i = pressedIndex;
+
+                if(i == kVolumeControl || i == kSeekControl )
                 {
-                    if(i == kVolumeControl || i == kSeekControl )
+                    short delta = (short)(pt.y - pressPt.y);
+
+                    delta = delta/-5;
+
+                    if(delta == 0)
                     {
-                        short delta = (short)(pt.y - pressPt.y);
-
-                        delta = delta/-5;
-
-                        if(delta == 0)
-                        {
-                            g_buttonStateArray[i].position = 0;
-                        }
-                        else if(delta > 0)
-                        {
-                            g_buttonStateArray[i].position = delta % 5;
-                        }
-                        else if(delta < 0)
-                        {
-                            g_buttonStateArray[i].position = ((delta % 5) + 5)  % 5;
-                        }
-
-                        if(i == kVolumeControl &&
-							PtInRegion(g_buttonStateArray[i].region, pressPt.x, pressPt.y))
-                        {
-                            static int32 lastDelta = 0;
-                            int32 change;
-
-                            if(lastDelta > delta)
-                                change = -1;
-                            else if(delta > lastDelta)
-                                change = 1;
-                            else
-                                change = 0;
-
-                            lastDelta = delta;
-
-                            char foo[1024];
-							sprintf(foo,"position: %d\n",delta);
-							OutputDebugString(foo);
-
-                            SendMessage(hwnd, WM_COMMAND, kVolumeControl, change);
-                        }
-                        else if(i == kSeekControl &&
-							PtInRegion(g_buttonStateArray[i].region, pressPt.x, pressPt.y))
-                        {
-                            SendMessage(hwnd, WM_COMMAND, kSeekControl, delta);
-                        }
-
-                        g_buttonStateArray[i].dirty = TRUE;
-
+                        g_buttonStateArray[i].position = 0;
                     }
-                    else
+                    else if(delta > 0)
                     {
-                        if( PtInRegion(g_buttonStateArray[i].region, pt.x, pt.y) &&
-                            PtInRegion(g_buttonStateArray[i].region, pressPt.x, pressPt.y) )
-                        {
-                            g_buttonStateArray[i].state = Pressed;
-                            g_buttonStateArray[i].dirty = TRUE;
-                        }
-                        else if( PtInRegion(g_buttonStateArray[i].region, pressPt.x, pressPt.y) )
-                        {
-                            g_buttonStateArray[i].state = g_buttonStateArray[i].oldstate;
-                            g_buttonStateArray[i].dirty = TRUE;
-                        }
+                        g_buttonStateArray[i].position = delta % 5;
                     }
+                    else if(delta < 0)
+                    {
+                        g_buttonStateArray[i].position = ((delta % 5) + 5)  % 5;
+                    }
+
+                    if(i == kVolumeControl &&
+						PtInRegion(g_buttonStateArray[i].region, pressPt.x, pressPt.y))
+                    {
+                        static int32 lastDelta = 0;
+                        int32 change;
+
+                        if(lastDelta > delta)
+                            change = -1;
+                        else if(delta > lastDelta)
+                            change = 1;
+                        else
+                            change = 0;
+
+                        lastDelta = delta;
+
+                        SendMessage(hwnd, WM_COMMAND, kVolumeControl, change);
+                    }
+                    else if(i == kSeekControl &&
+						PtInRegion(g_buttonStateArray[i].region, pressPt.x, pressPt.y))
+                    {
+                        SendMessage(hwnd, WM_COMMAND, kSeekControl, delta);
+                    }
+
+                    g_buttonStateArray[i].dirty = TRUE;
+                    dirtyPlayer = true;
+                    dirtyDisplay = true;
+
                 }
                 else
                 {
                     if( PtInRegion(g_buttonStateArray[i].region, pt.x, pt.y) &&
+                        PtInRegion(g_buttonStateArray[i].region, pressPt.x, pressPt.y) )
+                    {
+                        g_buttonStateArray[i].state = Pressed;
+                        g_buttonStateArray[i].dirty = TRUE;
+                        dirtyPlayer = true;
+                    }
+                    else if( PtInRegion(g_buttonStateArray[i].region, pressPt.x, pressPt.y) )
+                    {
+                        g_buttonStateArray[i].state = g_buttonStateArray[i].oldstate;
+                        g_buttonStateArray[i].dirty = TRUE;
+                        dirtyPlayer = true;
+                    }
+                }
+            }
+            else
+            {
+                for(i = 0; i < kNumControls; i++)
+                {
+                    if( PtInRegion(g_buttonStateArray[i].region, pt.x, pt.y) &&
                         g_buttonStateArray[i].state != Activated)
                     {
-                        g_buttonStateArray[i].state = Selected;
-                        g_buttonStateArray[i].dirty = TRUE;
-
+                        if(g_buttonStateArray[i].state != Selected )
+                        {
+                            g_buttonStateArray[i].state = Selected;
+                            g_buttonStateArray[i].dirty = TRUE;
+                            dirtyPlayer = true;
+                        }
                     }
-                    else if(g_buttonStateArray[i].state != Activated)
+                    else if(g_buttonStateArray[i].state == Selected )
                     {
                         g_buttonStateArray[i].state = Deactivated;
                         g_buttonStateArray[i].dirty = TRUE;
+                        dirtyPlayer = true;
                     }
                 }
-            } 
+            }
 
-            hdc = GetDC(hwnd);
+            if(dirtyPlayer || dirtyDisplay)
+            {
+                HDC hdc = GetDC(hwnd);
 
-            DrawPlayer(hdc, g_buttonStateArray);
+                if(dirtyDisplay)
+                    DrawDisplay(hdc, &g_displayInfo);
 
-            ReleaseDC(hwnd, hdc);
+                if(dirtyPlayer)
+                    DrawPlayer(hdc, g_buttonStateArray);
+
+                ReleaseDC(hwnd, hdc);
+            }
            
-            SelectObject(tempDC, oldBitmap); 
-
             break;
         }
 

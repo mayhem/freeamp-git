@@ -1,18 +1,9 @@
-#ifdef __cplusplus
-extern "C" {
-#endif
-LRESULT WINAPI MainWndProc( HWND hwnd, 
-                            UINT msg, 
-                            WPARAM wParam, 
-                            LPARAM lParam );
-#ifdef __cplusplus
-}
-#endif
+
 
 #define HEIGHT 51
 
 #define LEFT_SECTION    138 
-#define MID_SECTION     175
+#define MID_SECTION     190
 #define RIGHT_SECTION   83
 #define DIAL_SECTION    11
 
@@ -99,3 +90,19 @@ typedef struct ControlInfo{
 #define kFinalControl       15
 
 #define kNumControls        13
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+LRESULT WINAPI MainWndProc( HWND hwnd, 
+                            UINT msg, 
+                            WPARAM wParam, 
+                            LPARAM lParam );
+
+void DrawPlayer(HDC hdc, ControlInfo* state);
+void DrawDisplay(HDC hdc, DisplayInfo* state);
+
+
+#ifdef __cplusplus
+}
+#endif
