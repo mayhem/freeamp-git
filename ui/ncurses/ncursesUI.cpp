@@ -34,6 +34,9 @@ ____________________________________________________________________________*/
 
 /* ncurses / curses include */
 #include <curses.h>
+#ifndef NCURSES_VERSION
+#define color_set(a,b) ;
+#endif
 
 #include "config.h"
 #include "ncursesUI.h"
