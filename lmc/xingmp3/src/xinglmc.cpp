@@ -99,13 +99,11 @@ void XingLMC::Init() {
 
 	    char *pbitrate = new char[64];
 	    char *psamprate = new char[64];
-	    char *streamname = m_input->GetStreamName();
 	    sprintf(pbitrate,"%d kbits/s",bitrate/1000);
 	    int32 samprate = sr_table[4*head.id+head.sr_index];
 	    if ((head.sync & 1) == 0) samprate = samprate / 2;
 	    sprintf(psamprate,"%d Hz",samprate);
-	    MediaVitalInfo *mvi = new MediaVitalInfo(streamname,streamname,totalFrames,bytesPerFrame,bitrate,samprate,totalTime, tag_info);
-	    delete streamname;
+	    MediaVitalInfo *mvi = new MediaVitalInfo(m_input->Url(),m_input->Url(),totalFrames,bytesPerFrame,bitrate,samprate,totalTime, tag_info);
 	    Event *e = new Event(INFO_MediaVitalStats,mvi);
 	    SEND_EVENT(e);
 	}
@@ -136,7 +134,7 @@ void XingLMC::Init() {
 	    info.number_of_channels = decinfo.channels;
 	    info.samples_per_second = decinfo.samprate;
 	    info.max_buffer_size = (info.number_of_channels * 2 * 1152) << 5;
-	    m_output->Initialize(&info);
+	    m_output->Init(&info);
 	} else {
 	    cout << "Couldn't init decoder..." << endl;
 	    return;

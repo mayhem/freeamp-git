@@ -28,8 +28,6 @@ ____________________________________________________________________________*/
 /* system headers */
 #include <stdlib.h>
 
-#include <config.h>
-
 
 #if HAVE_UNISTD_H
 #include <unistd.h>
@@ -61,7 +59,6 @@ public:
 	virtual ~PhysicalMediaOutput() { }
 	virtual bool Init(OutputInfo* /*info*/){ return false; }
 	virtual bool Reset(bool /*user_stop*/){ return false; }
-	virtual void Append(uint32 /*channel*/, int16 /*value*/) { }
 	virtual int32 Write() { return -1; }
 	virtual int32 WriteThis(void * /* pBuffer */, int32 /* bufflength */) { return -1; }
 	virtual void Clear(){ }

@@ -45,7 +45,7 @@ public:
     SoundCardPMO();
     virtual ~SoundCardPMO();
     
-    virtual bool Initialize(OutputInfo* info);
+    virtual bool Init(OutputInfo* info);
     virtual bool Reset(bool user_stop);
     virtual void Append(uint32 channel, int16 value);
     virtual int32 Write();

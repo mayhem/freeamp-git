@@ -32,7 +32,7 @@ ____________________________________________________________________________*/
 
 class MediaTimePositionInfo {
  public:
-    MediaTimePositionInfo(int32 s,int32 f) {
+    MediaTimePositionInfo(float s,int32 f) {
 	    seconds = s; frame = f;
     }
     float seconds;

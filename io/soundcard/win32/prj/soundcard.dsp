@@ -125,6 +125,10 @@ SOURCE=.\soundcard.def
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\soundcardlib.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\soundcardpmo.cpp
 # End Source File
 # End Target

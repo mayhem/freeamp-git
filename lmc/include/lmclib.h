@@ -58,7 +58,7 @@ typedef struct LMCFunctionTable{
 
 }LMCFunctionTable;
 
-void Initialize(LMCRef ref, LMCFunctionTable*);
+void Initialize(LMCRef* ref, LMCFunctionTable*);
 
 
 void SetPMI(LMCRef ref, PhysicalMediaInput*);

@@ -28,11 +28,11 @@ ____________________________________________________________________________*/
 
 /* system headers */
 #include <stdlib.h>
+#include <windows.h>
 
 /* project headers */
-#include <config.h>
+#include "config.h"
 #include "pmo.h"
-#include "buffer.h"
 
 
 #define BIT_SELECT  0x1f
@@ -49,7 +49,6 @@ public:
     
     virtual bool Init(OutputInfo* info);
     virtual bool Reset(bool user_stop);
-    virtual void Append(uint32 channel, int16 value);
     virtual int32 Write();
     virtual int32 WriteThis(void *,int32);
     virtual void Clear();

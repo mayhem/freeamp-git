@@ -68,7 +68,7 @@ Mutex SoundCardPMO::refcountMutex;
 
 int SoundCardPMO::refCount = 0; 
 
-bool SoundCardPMO::Initialize(OutputInfo* info) {
+bool SoundCardPMO::Init(OutputInfo* info) {
     //cout << "initialize..." << endl;
 //    cout << "OI: bits_per_sample: " << info->bits_per_sample << endl;
 //    cout << "OI: number_of_channels: " << info->number_of_channels << endl;

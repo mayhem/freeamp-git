@@ -189,7 +189,7 @@ Init(OutputInfo* info)
 		if(!temp) 
 		{
 			result = false;
-			cerr << "error allocating WAVEHDR" << endl;
+			//cerr << "error allocating WAVEHDR" << endl;
 			break;
 		}
 
@@ -238,24 +238,12 @@ Reset(bool user_stop)
 	return result;
 }
 
-void 
-SoundCardPMO::
-Append(uint32 channel, int16 value)
-{
-	char* temp = m_wavehdr_array[2]->lpData;
-
-	temp[m_buffer[channel]]		= (char) (value & 0xff);
-	temp[m_buffer[channel] + 1] = (char) (value >> 8);
-
-    m_buffer[channel] += m_channels << 1;
-}
-
 int32 
 SoundCardPMO::
 WriteThis(void *pBuffer,int32 length) 
 {
 
-	cerr << "WriteThis: " << length << " bytes" << endl;
+	//cerr << "WriteThis: " << length << " bytes" << endl;
 	WaitForSingleObject(MCISemaphore, 10000);
 
 	WAVEHDR* wavhdr = NULL;
@@ -272,7 +260,7 @@ WriteThis(void *pBuffer,int32 length)
 	waveOutPrepareHeader(m_hwo, wavhdr, m_hdr_size);
 	waveOutWrite(m_hwo, wavhdr, m_hdr_size);
 	
-	cerr << "Wrote: " << length << " bytes" << endl;
+	//cerr << "Wrote: " << length << " bytes" << endl;
     return length;
 }
 
