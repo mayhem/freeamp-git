@@ -514,7 +514,7 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
             (PlaylistCurrentItemInfoEvent *)e;
  
          if (m_pContext->plm->GetCurrentIndex() != kInvalidIndex)
-             UpdateMetaData(pInfo->Item());
+             UpdateMetaData(m_pContext->plm->GetCurrentItem());
          break;
       }
 
