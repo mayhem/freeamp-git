@@ -49,7 +49,7 @@ public:
     int32		nFileSizeLow;
     int32		dwReserved0;
     int32		dwReserved1;
-    char		cFileName[ MAX_PATH ];
+    char		cFileName[ _MAX_PATH ];
     char		cAlternateFileName[ 14 ];
 };
 

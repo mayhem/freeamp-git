@@ -214,5 +214,5 @@ void
 beosThread::
 DumpThreadInfo( void ) const
 {
-	printf( "Thread ID = %d, %x\n", m_threadHandle, m_threadHandle );
+	//printf( "Thread ID = %d, %x\n", m_threadHandle, m_threadHandle );
 }

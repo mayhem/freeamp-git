@@ -21,10 +21,11 @@
 	$Id$
 ____________________________________________________________________________*/
 
-#include <iostream.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <iostream>
 
 #include <be/app/Application.h>
 
@@ -40,27 +41,6 @@ ____________________________________________________________________________*/
 #include "facontext.h"
 #include "beosprefs.h"
 
-#if MP3_PROF
-extern "C" {
-  Initialize();
-}
-#endif
-
-#if 0
-bool CompareName(const char *p1, const char *p2) {
-    //cout << "Comparing " << p1 << " to " << p2 << endl;
-    int32 i=0; int32 j=0;
-    if(!p1 ||!p2) return false;
-    while ((p1[i] == p2[j]) && p1[i] && p2[j]) {
-	i++; j++;
-    }
-    if (!p1[i] && (p2[j]=='-')) {
-	return true;
-    } else {
-	return false;
-    }
-}
-#endif
 int main(int argc, char **argv) {
 
 	// *** BeOS specific section begin ***
@@ -89,24 +69,14 @@ int main(int argc, char **argv) {
     Registry* ui;
     
     lmc = new Registry();
-#if MP3_PROF
-    {
-	RegistryItem* item = new RegistryItem;
-	item->SetPath("[builtin]");
-	item->SetName("xingmp3-linux.lmc");
-	item->SetDescription("xingmp3-linux.lmc");
-	item->SetInitFunction((InitializeFunction)Initialize);
-	lmc->Add(item);
-    }
-#else
+
 //    registrar->SetSubDir("lmc");
-    registrar->SetSubDir("plugins");
+    registrar->SetSubDir("");
     registrar->SetSearchString("*.lmc");
     registrar->InitializeRegistry(lmc,context->prefs);
-#endif
 
 //    registrar->SetSubDir("io");
-    registrar->SetSubDir("plugins");
+    registrar->SetSubDir("");
     registrar->SetSearchString("*.pmi");
     pmi = new Registry;
     registrar->InitializeRegistry(pmi,context->prefs);
@@ -117,13 +87,12 @@ int main(int argc, char **argv) {
 
 
 //    registrar->SetSubDir("ui");
-    registrar->SetSubDir("plugins");
+    registrar->SetSubDir("");
     registrar->SetSearchString("*.ui");
     ui = new Registry;
     registrar->InitializeRegistry(ui,context->prefs);
 
     delete registrar;
-
 
     Semaphore *termSemaphore;
     termSemaphore = new Semaphore();
@@ -134,17 +103,16 @@ int main(int argc, char **argv) {
     pP->RegisterPMOs(pmo);
     pP->RegisterUIs(ui);
 
-
-
-
     if (pP->SetArgs(argc,argv)) {
-	pP->SetTerminationSemaphore(termSemaphore);
-	pP->Run();
+		pP->SetTerminationSemaphore(termSemaphore);
+		pP->Run();
 	
-	termSemaphore->Wait();
+		termSemaphore->Wait();
     }
+    
     delete pP;
     delete context;
+    delete app;
     return 0;
 }
 
