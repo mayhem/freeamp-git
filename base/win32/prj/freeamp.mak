@@ -42,12 +42,12 @@ ALL : ".\themes\FreeAmpClassic.fat" ".\themes\FreeAmp.fat" ".\themes\EMusic.fat"
 
 !ELSE 
 
-ALL : "wavout - Win32 Release" "id3v2 - Win32 Release" "dde - Win32 Release" "cddb - Win32 Release" "cdoutput - Win32 Release" "cdlmc - Win32 Release" "winamp - Win32 Release" "pls - Win32 Release" "MakeTheme - Win32 Release" "misc - Win32 Release" "fabaselib - Win32 Release" "toolbar - Win32 Release" "musicbrowser - Win32 Release" "pmp300 - Win32 Release" "zlib - Win32 Release" "xing - Win32 Release" "update - Win32 Release" "soundcard - Win32 Release" "rmp - Win32 Release" "obsinput - Win32 Release" "m3u - Win32 Release" "id3v1 - Win32 Release" "httpinput - Win32 Release" "gdbm - Win32 Release" "freeampui - Win32 Release" "fileinput - Win32 Release" "dsoundcard - Win32 Release" "download - Win32 Release" ".\themes\FreeAmpClassic.fat" ".\themes\FreeAmp.fat" ".\themes\EMusic.fat" ".\themes\Aquatica.fat" ".\portio.sys" ".\id3lib.dll" "..\..\..\ReadMe.txt" "..\..\..\Copying.txt" "..\..\..\config\config.h" "..\..\..\Changes.txt" "..\..\..\Authors.txt" ".\freeamp.exe"
+ALL : "vorbis - Win32 Release" "signature - Win32 Release" "wavout - Win32 Release" "id3v2 - Win32 Release" "dde - Win32 Release" "cddb - Win32 Release" "cdoutput - Win32 Release" "cdlmc - Win32 Release" "winamp - Win32 Release" "pls - Win32 Release" "MakeTheme - Win32 Release" "misc - Win32 Release" "fabaselib - Win32 Release" "toolbar - Win32 Release" "musicbrowser - Win32 Release" "pmp300 - Win32 Release" "zlib - Win32 Release" "xing - Win32 Release" "update - Win32 Release" "soundcard - Win32 Release" "rmp - Win32 Release" "obsinput - Win32 Release" "m3u - Win32 Release" "id3v1 - Win32 Release" "httpinput - Win32 Release" "gdbm - Win32 Release" "freeampui - Win32 Release" "fileinput - Win32 Release" "dsoundcard - Win32 Release" "download - Win32 Release" ".\themes\FreeAmpClassic.fat" ".\themes\FreeAmp.fat" ".\themes\EMusic.fat" ".\themes\Aquatica.fat" ".\portio.sys" ".\id3lib.dll" "..\..\..\ReadMe.txt" "..\..\..\Copying.txt" "..\..\..\config\config.h" "..\..\..\Changes.txt" "..\..\..\Authors.txt" ".\freeamp.exe"
 
 !ENDIF 
 
 !IF "$(RECURSE)" == "1" 
-CLEAN :"download - Win32 ReleaseCLEAN" "dsoundcard - Win32 ReleaseCLEAN" "fileinput - Win32 ReleaseCLEAN" "freeampui - Win32 ReleaseCLEAN" "gdbm - Win32 ReleaseCLEAN" "httpinput - Win32 ReleaseCLEAN" "id3v1 - Win32 ReleaseCLEAN" "m3u - Win32 ReleaseCLEAN" "obsinput - Win32 ReleaseCLEAN" "rmp - Win32 ReleaseCLEAN" "soundcard - Win32 ReleaseCLEAN" "update - Win32 ReleaseCLEAN" "xing - Win32 ReleaseCLEAN" "zlib - Win32 ReleaseCLEAN" "pmp300 - Win32 ReleaseCLEAN" "musicbrowser - Win32 ReleaseCLEAN" "toolbar - Win32 ReleaseCLEAN" "fabaselib - Win32 ReleaseCLEAN" "misc - Win32 ReleaseCLEAN" "MakeTheme - Win32 ReleaseCLEAN" "pls - Win32 ReleaseCLEAN" "winamp - Win32 ReleaseCLEAN" "cdlmc - Win32 ReleaseCLEAN" "cdoutput - Win32 ReleaseCLEAN" "cddb - Win32 ReleaseCLEAN" "dde - Win32 ReleaseCLEAN" "id3v2 - Win32 ReleaseCLEAN" "wavout - Win32 ReleaseCLEAN" 
+CLEAN :"download - Win32 ReleaseCLEAN" "dsoundcard - Win32 ReleaseCLEAN" "fileinput - Win32 ReleaseCLEAN" "freeampui - Win32 ReleaseCLEAN" "gdbm - Win32 ReleaseCLEAN" "httpinput - Win32 ReleaseCLEAN" "id3v1 - Win32 ReleaseCLEAN" "m3u - Win32 ReleaseCLEAN" "obsinput - Win32 ReleaseCLEAN" "rmp - Win32 ReleaseCLEAN" "soundcard - Win32 ReleaseCLEAN" "update - Win32 ReleaseCLEAN" "xing - Win32 ReleaseCLEAN" "zlib - Win32 ReleaseCLEAN" "pmp300 - Win32 ReleaseCLEAN" "musicbrowser - Win32 ReleaseCLEAN" "toolbar - Win32 ReleaseCLEAN" "fabaselib - Win32 ReleaseCLEAN" "misc - Win32 ReleaseCLEAN" "MakeTheme - Win32 ReleaseCLEAN" "pls - Win32 ReleaseCLEAN" "winamp - Win32 ReleaseCLEAN" "cdlmc - Win32 ReleaseCLEAN" "cdoutput - Win32 ReleaseCLEAN" "cddb - Win32 ReleaseCLEAN" "dde - Win32 ReleaseCLEAN" "id3v2 - Win32 ReleaseCLEAN" "wavout - Win32 ReleaseCLEAN" "signature - Win32 ReleaseCLEAN" "vorbis - Win32 ReleaseCLEAN" 
 !ELSE 
 CLEAN :
 !ENDIF 
@@ -71,7 +71,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\..\..\lib\zlib\include" /I "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\freeamp.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\..\..\base\aps" /I "..\..\..\lib\zlib\include" /I "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /D "NDEBUG" /D "_WINDOWS" /D "WIN32" /D "NOMINMAX" /Fp"$(INTDIR)\freeamp.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32 
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\freeamp.res" /d "NDEBUG" 
 BSC32=bscmake.exe
@@ -109,7 +109,9 @@ LINK32_OBJS= \
 	"..\..\..\plm\metadata\cddb\prj\Release\cddb.lib" \
 	"..\..\..\ui\dde\win32\prj\Release\dde.lib" \
 	"..\..\..\plm\metadata\id3v2\prj\Release\id3v2.lib" \
-	"..\..\..\io\wavout\win32\prj\Release\wavout.lib"
+	"..\..\..\io\wavout\win32\prj\Release\wavout.lib" \
+	"..\..\..\io\signature\win32\prj\Release\signature.lib" \
+	"..\..\..\lmc\vorbis\win32\prj\Release\vorbis.lib"
 
 ".\freeamp.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -127,12 +129,12 @@ ALL : ".\themes\FreeAmpClassic.fat" ".\themes\FreeAmp.fat" ".\themes\EMusic.fat"
 
 !ELSE 
 
-ALL : "wavout - Win32 Debug" "id3v2 - Win32 Debug" "dde - Win32 Debug" "cddb - Win32 Debug" "cdoutput - Win32 Debug" "cdlmc - Win32 Debug" "winamp - Win32 Debug" "pls - Win32 Debug" "MakeTheme - Win32 Debug" "misc - Win32 Debug" "fabaselib - Win32 Debug" "toolbar - Win32 Debug" "musicbrowser - Win32 Debug" "pmp300 - Win32 Debug" "zlib - Win32 Debug" "xing - Win32 Debug" "update - Win32 Debug" "soundcard - Win32 Debug" "rmp - Win32 Debug" "obsinput - Win32 Debug" "m3u - Win32 Debug" "id3v1 - Win32 Debug" "httpinput - Win32 Debug" "gdbm - Win32 Debug" "freeampui - Win32 Debug" "fileinput - Win32 Debug" "dsoundcard - Win32 Debug" "download - Win32 Debug" ".\themes\FreeAmpClassic.fat" ".\themes\FreeAmp.fat" ".\themes\EMusic.fat" ".\themes\Aquatica.fat" ".\portio.sys" ".\id3lib.dll" "..\..\..\ReadMe.txt" "..\..\..\Copying.txt" "..\..\..\Changes.txt" "..\..\..\Authors.txt" ".\freeamp.exe"
+ALL : "vorbis - Win32 Debug" "signature - Win32 Debug" "wavout - Win32 Debug" "id3v2 - Win32 Debug" "dde - Win32 Debug" "cddb - Win32 Debug" "cdoutput - Win32 Debug" "cdlmc - Win32 Debug" "winamp - Win32 Debug" "pls - Win32 Debug" "MakeTheme - Win32 Debug" "misc - Win32 Debug" "fabaselib - Win32 Debug" "toolbar - Win32 Debug" "musicbrowser - Win32 Debug" "pmp300 - Win32 Debug" "zlib - Win32 Debug" "xing - Win32 Debug" "update - Win32 Debug" "soundcard - Win32 Debug" "rmp - Win32 Debug" "obsinput - Win32 Debug" "m3u - Win32 Debug" "id3v1 - Win32 Debug" "httpinput - Win32 Debug" "gdbm - Win32 Debug" "freeampui - Win32 Debug" "fileinput - Win32 Debug" "dsoundcard - Win32 Debug" "download - Win32 Debug" ".\themes\FreeAmpClassic.fat" ".\themes\FreeAmp.fat" ".\themes\EMusic.fat" ".\themes\Aquatica.fat" ".\portio.sys" ".\id3lib.dll" "..\..\..\ReadMe.txt" "..\..\..\Copying.txt" "..\..\..\Changes.txt" "..\..\..\Authors.txt" ".\freeamp.exe"
 
 !ENDIF 
 
 !IF "$(RECURSE)" == "1" 
-CLEAN :"download - Win32 DebugCLEAN" "dsoundcard - Win32 DebugCLEAN" "fileinput - Win32 DebugCLEAN" "freeampui - Win32 DebugCLEAN" "gdbm - Win32 DebugCLEAN" "httpinput - Win32 DebugCLEAN" "id3v1 - Win32 DebugCLEAN" "m3u - Win32 DebugCLEAN" "obsinput - Win32 DebugCLEAN" "rmp - Win32 DebugCLEAN" "soundcard - Win32 DebugCLEAN" "update - Win32 DebugCLEAN" "xing - Win32 DebugCLEAN" "zlib - Win32 DebugCLEAN" "pmp300 - Win32 DebugCLEAN" "musicbrowser - Win32 DebugCLEAN" "toolbar - Win32 DebugCLEAN" "fabaselib - Win32 DebugCLEAN" "misc - Win32 DebugCLEAN" "MakeTheme - Win32 DebugCLEAN" "pls - Win32 DebugCLEAN" "winamp - Win32 DebugCLEAN" "cdlmc - Win32 DebugCLEAN" "cdoutput - Win32 DebugCLEAN" "cddb - Win32 DebugCLEAN" "dde - Win32 DebugCLEAN" "id3v2 - Win32 DebugCLEAN" "wavout - Win32 DebugCLEAN" 
+CLEAN :"download - Win32 DebugCLEAN" "dsoundcard - Win32 DebugCLEAN" "fileinput - Win32 DebugCLEAN" "freeampui - Win32 DebugCLEAN" "gdbm - Win32 DebugCLEAN" "httpinput - Win32 DebugCLEAN" "id3v1 - Win32 DebugCLEAN" "m3u - Win32 DebugCLEAN" "obsinput - Win32 DebugCLEAN" "rmp - Win32 DebugCLEAN" "soundcard - Win32 DebugCLEAN" "update - Win32 DebugCLEAN" "xing - Win32 DebugCLEAN" "zlib - Win32 DebugCLEAN" "pmp300 - Win32 DebugCLEAN" "musicbrowser - Win32 DebugCLEAN" "toolbar - Win32 DebugCLEAN" "fabaselib - Win32 DebugCLEAN" "misc - Win32 DebugCLEAN" "MakeTheme - Win32 DebugCLEAN" "pls - Win32 DebugCLEAN" "winamp - Win32 DebugCLEAN" "cdlmc - Win32 DebugCLEAN" "cdoutput - Win32 DebugCLEAN" "cddb - Win32 DebugCLEAN" "dde - Win32 DebugCLEAN" "id3v2 - Win32 DebugCLEAN" "wavout - Win32 DebugCLEAN" "signature - Win32 DebugCLEAN" "vorbis - Win32 DebugCLEAN" 
 !ELSE 
 CLEAN :
 !ENDIF 
@@ -158,7 +160,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\..\..\lib\zlib\include" /I "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\freeamp.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\..\..\base\aps" /I "..\..\..\lib\zlib\include" /I "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /D "_DEBUG" /D "_WINDOWS" /D "WIN32" /D "NOMINMAX" /Fp"$(INTDIR)\freeamp.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32 
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\freeamp.res" /d "_DEBUG" 
 BSC32=bscmake.exe
@@ -196,7 +198,9 @@ LINK32_OBJS= \
 	"..\..\..\plm\metadata\cddb\prj\Debug\cddb.lib" \
 	"..\..\..\ui\dde\win32\prj\Debug\dde.lib" \
 	"..\..\..\plm\metadata\id3v2\prj\Debug\id3v2.lib" \
-	"..\..\..\io\wavout\win32\prj\Debug\wavout.lib"
+	"..\..\..\io\wavout\win32\prj\Debug\wavout.lib" \
+	"..\..\..\io\signature\win32\prj\Debug\signature.lib" \
+	"..\..\..\lmc\vorbis\win32\prj\Debug\vorbis.lib"
 
 ".\freeamp.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -214,12 +218,12 @@ ALL : ".\themes\FreeAmpClassic.fat" ".\themes\FreeAmp.fat" ".\themes\EMusic.fat"
 
 !ELSE 
 
-ALL : "wavout - Win32 NASM Release" "id3v2 - Win32 NASM Release" "dde - Win32 NASM Release" "cddb - Win32 NASM Release" "cdoutput - Win32 NASM Release" "cdlmc - Win32 NASM Release" "winamp - Win32 NASM Release" "pls - Win32 NASM Release" "MakeTheme - Win32 NASM Release" "misc - Win32 NASM Release" "fabaselib - Win32 NASM Release" "toolbar - Win32 NASM Release" "musicbrowser - Win32 NASM Release" "pmp300 - Win32 NASM Release" "zlib - Win32 NASM Release" "xing - Win32 NASM Release" "update - Win32 NASM Release" "soundcard - Win32 NASM Release" "rmp - Win32 NASM Release" "obsinput - Win32 NASM Release" "m3u - Win32 NASM Release" "id3v1 - Win32 NASM Release" "httpinput - Win32 NASM Release" "gdbm - Win32 NASM Release" "freeampui - Win32 NASM Release" "fileinput - Win32 NASM Release" "dsoundcard - Win32 NASM Release" "download - Win32 NASM Release" ".\themes\FreeAmpClassic.fat" ".\themes\FreeAmp.fat" ".\themes\EMusic.fat" ".\themes\Aquatica.fat" ".\portio.sys" ".\id3lib.dll" "..\..\..\ReadMe.txt" "..\..\..\Copying.txt" "..\..\..\config\config.h" "..\..\..\Changes.txt" "..\..\..\Authors.txt" ".\freeamp.exe"
+ALL : "vorbis - Win32 NASM Release" "signature - Win32 NASM Release" "wavout - Win32 NASM Release" "id3v2 - Win32 NASM Release" "dde - Win32 NASM Release" "cddb - Win32 NASM Release" "cdoutput - Win32 NASM Release" "cdlmc - Win32 NASM Release" "winamp - Win32 NASM Release" "pls - Win32 NASM Release" "MakeTheme - Win32 NASM Release" "misc - Win32 NASM Release" "fabaselib - Win32 NASM Release" "toolbar - Win32 NASM Release" "musicbrowser - Win32 NASM Release" "pmp300 - Win32 NASM Release" "zlib - Win32 NASM Release" "xing - Win32 NASM Release" "update - Win32 NASM Release" "soundcard - Win32 NASM Release" "rmp - Win32 NASM Release" "obsinput - Win32 NASM Release" "m3u - Win32 NASM Release" "id3v1 - Win32 NASM Release" "httpinput - Win32 NASM Release" "gdbm - Win32 NASM Release" "freeampui - Win32 NASM Release" "fileinput - Win32 NASM Release" "dsoundcard - Win32 NASM Release" "download - Win32 NASM Release" ".\themes\FreeAmpClassic.fat" ".\themes\FreeAmp.fat" ".\themes\EMusic.fat" ".\themes\Aquatica.fat" ".\portio.sys" ".\id3lib.dll" "..\..\..\ReadMe.txt" "..\..\..\Copying.txt" "..\..\..\config\config.h" "..\..\..\Changes.txt" "..\..\..\Authors.txt" ".\freeamp.exe"
 
 !ENDIF 
 
 !IF "$(RECURSE)" == "1" 
-CLEAN :"download - Win32 NASM ReleaseCLEAN" "dsoundcard - Win32 NASM ReleaseCLEAN" "fileinput - Win32 NASM ReleaseCLEAN" "freeampui - Win32 NASM ReleaseCLEAN" "gdbm - Win32 NASM ReleaseCLEAN" "httpinput - Win32 NASM ReleaseCLEAN" "id3v1 - Win32 NASM ReleaseCLEAN" "m3u - Win32 NASM ReleaseCLEAN" "obsinput - Win32 NASM ReleaseCLEAN" "rmp - Win32 NASM ReleaseCLEAN" "soundcard - Win32 NASM ReleaseCLEAN" "update - Win32 NASM ReleaseCLEAN" "xing - Win32 NASM ReleaseCLEAN" "zlib - Win32 NASM ReleaseCLEAN" "pmp300 - Win32 NASM ReleaseCLEAN" "musicbrowser - Win32 NASM ReleaseCLEAN" "toolbar - Win32 NASM ReleaseCLEAN" "fabaselib - Win32 NASM ReleaseCLEAN" "misc - Win32 NASM ReleaseCLEAN" "MakeTheme - Win32 NASM ReleaseCLEAN" "pls - Win32 NASM ReleaseCLEAN" "winamp - Win32 NASM ReleaseCLEAN" "cdlmc - Win32 NASM ReleaseCLEAN" "cdoutput - Win32 NASM ReleaseCLEAN" "cddb - Win32 NASM ReleaseCLEAN" "dde - Win32 NASM ReleaseCLEAN" "id3v2 - Win32 NASM ReleaseCLEAN" "wavout - Win32 NASM ReleaseCLEAN" 
+CLEAN :"download - Win32 NASM ReleaseCLEAN" "dsoundcard - Win32 NASM ReleaseCLEAN" "fileinput - Win32 NASM ReleaseCLEAN" "freeampui - Win32 NASM ReleaseCLEAN" "gdbm - Win32 NASM ReleaseCLEAN" "httpinput - Win32 NASM ReleaseCLEAN" "id3v1 - Win32 NASM ReleaseCLEAN" "m3u - Win32 NASM ReleaseCLEAN" "obsinput - Win32 NASM ReleaseCLEAN" "rmp - Win32 NASM ReleaseCLEAN" "soundcard - Win32 NASM ReleaseCLEAN" "update - Win32 NASM ReleaseCLEAN" "xing - Win32 NASM ReleaseCLEAN" "zlib - Win32 NASM ReleaseCLEAN" "pmp300 - Win32 NASM ReleaseCLEAN" "musicbrowser - Win32 NASM ReleaseCLEAN" "toolbar - Win32 NASM ReleaseCLEAN" "fabaselib - Win32 NASM ReleaseCLEAN" "misc - Win32 NASM ReleaseCLEAN" "MakeTheme - Win32 NASM ReleaseCLEAN" "pls - Win32 NASM ReleaseCLEAN" "winamp - Win32 NASM ReleaseCLEAN" "cdlmc - Win32 NASM ReleaseCLEAN" "cdoutput - Win32 NASM ReleaseCLEAN" "cddb - Win32 NASM ReleaseCLEAN" "dde - Win32 NASM ReleaseCLEAN" "id3v2 - Win32 NASM ReleaseCLEAN" "wavout - Win32 NASM ReleaseCLEAN" "signature - Win32 NASM ReleaseCLEAN" "vorbis - Win32 NASM ReleaseCLEAN" 
 !ELSE 
 CLEAN :
 !ENDIF 
@@ -243,7 +247,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\..\..\lib\zlib\include" /I "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\freeamp.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\..\..\base\aps" /I "..\..\..\lib\zlib\include" /I "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /D "NDEBUG" /D "_WINDOWS" /D "WIN32" /D "NOMINMAX" /Fp"$(INTDIR)\freeamp.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32 
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\freeamp.res" /d "NDEBUG" 
 BSC32=bscmake.exe
@@ -281,7 +285,9 @@ LINK32_OBJS= \
 	"..\..\..\plm\metadata\cddb\prj\Release\cddb.lib" \
 	"..\..\..\ui\dde\win32\prj\Release\dde.lib" \
 	"..\..\..\plm\metadata\id3v2\prj\Release\id3v2.lib" \
-	"..\..\..\io\wavout\win32\prj\Release\wavout.lib"
+	"..\..\..\io\wavout\win32\prj\Release\wavout.lib" \
+	"..\..\..\io\signature\win32\prj\Release\signature.lib" \
+	"..\..\..\lmc\vorbis\win32\prj\Release\vorbis.lib"
 
 ".\freeamp.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -295,16 +301,16 @@ INTDIR=.\Debug
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : ".\themes\FreeAmpClassic.fat" ".\themes\FreeAmp.fat" ".\themes\EMusic.fat" ".\themes\Aquatica.fat" ".\portio.sys" ".\id3lib.dll" "..\..\..\ReadMe.txt" "..\..\..\Copying.txt" "..\..\..\Changes.txt" "..\..\..\Authors.txt" ".\freeamp.exe"
+ALL : ".\themes\FreeAmpClassic.fat" ".\themes\FreeAmp.fat" ".\themes\EMusic.fat" ".\themes\Aquatica.fat" ".\portio.sys" ".\id3lib.dll" "..\..\..\ReadMe.txt" "..\..\..\Copying.txt" "..\..\..\config\config.h" "..\..\..\Changes.txt" "..\..\..\Authors.txt" ".\freeamp.exe"
 
 !ELSE 
 
-ALL : "wavout - Win32 NASM Debug" "id3v2 - Win32 NASM Debug" "dde - Win32 NASM Debug" "cddb - Win32 NASM Debug" "cdoutput - Win32 NASM Debug" "cdlmc - Win32 NASM Debug" "winamp - Win32 NASM Debug" "pls - Win32 NASM Debug" "MakeTheme - Win32 NASM Debug" "misc - Win32 NASM Debug" "fabaselib - Win32 NASM Debug" "toolbar - Win32 NASM Debug" "musicbrowser - Win32 NASM Debug" "pmp300 - Win32 NASM Debug" "zlib - Win32 NASM Debug" "xing - Win32 NASM Debug" "update - Win32 NASM Debug" "soundcard - Win32 NASM Debug" "rmp - Win32 NASM Debug" "obsinput - Win32 NASM Debug" "m3u - Win32 NASM Debug" "id3v1 - Win32 NASM Debug" "httpinput - Win32 NASM Debug" "gdbm - Win32 NASM Debug" "freeampui - Win32 NASM Debug" "fileinput - Win32 NASM Debug" "dsoundcard - Win32 NASM Debug" "download - Win32 NASM Debug" ".\themes\FreeAmpClassic.fat" ".\themes\FreeAmp.fat" ".\themes\EMusic.fat" ".\themes\Aquatica.fat" ".\portio.sys" ".\id3lib.dll" "..\..\..\ReadMe.txt" "..\..\..\Copying.txt" "..\..\..\Changes.txt" "..\..\..\Authors.txt" ".\freeamp.exe"
+ALL : "vorbis - Win32 NASM Debug" "signature - Win32 NASM Debug" "wavout - Win32 NASM Debug" "id3v2 - Win32 NASM Debug" "dde - Win32 NASM Debug" "cddb - Win32 NASM Debug" "cdoutput - Win32 NASM Debug" "cdlmc - Win32 NASM Debug" "winamp - Win32 NASM Debug" "pls - Win32 NASM Debug" "MakeTheme - Win32 NASM Debug" "misc - Win32 NASM Debug" "fabaselib - Win32 NASM Debug" "toolbar - Win32 NASM Debug" "musicbrowser - Win32 NASM Debug" "pmp300 - Win32 NASM Debug" "zlib - Win32 NASM Debug" "xing - Win32 NASM Debug" "update - Win32 NASM Debug" "soundcard - Win32 NASM Debug" "rmp - Win32 NASM Debug" "obsinput - Win32 NASM Debug" "m3u - Win32 NASM Debug" "id3v1 - Win32 NASM Debug" "httpinput - Win32 NASM Debug" "gdbm - Win32 NASM Debug" "freeampui - Win32 NASM Debug" "fileinput - Win32 NASM Debug" "dsoundcard - Win32 NASM Debug" "download - Win32 NASM Debug" ".\themes\FreeAmpClassic.fat" ".\themes\FreeAmp.fat" ".\themes\EMusic.fat" ".\themes\Aquatica.fat" ".\portio.sys" ".\id3lib.dll" "..\..\..\ReadMe.txt" "..\..\..\Copying.txt" "..\..\..\config\config.h" "..\..\..\Changes.txt" "..\..\..\Authors.txt" ".\freeamp.exe"
 
 !ENDIF 
 
 !IF "$(RECURSE)" == "1" 
-CLEAN :"download - Win32 NASM DebugCLEAN" "dsoundcard - Win32 NASM DebugCLEAN" "fileinput - Win32 NASM DebugCLEAN" "freeampui - Win32 NASM DebugCLEAN" "gdbm - Win32 NASM DebugCLEAN" "httpinput - Win32 NASM DebugCLEAN" "id3v1 - Win32 NASM DebugCLEAN" "m3u - Win32 NASM DebugCLEAN" "obsinput - Win32 NASM DebugCLEAN" "rmp - Win32 NASM DebugCLEAN" "soundcard - Win32 NASM DebugCLEAN" "update - Win32 NASM DebugCLEAN" "xing - Win32 NASM DebugCLEAN" "zlib - Win32 NASM DebugCLEAN" "pmp300 - Win32 NASM DebugCLEAN" "musicbrowser - Win32 NASM DebugCLEAN" "toolbar - Win32 NASM DebugCLEAN" "fabaselib - Win32 NASM DebugCLEAN" "misc - Win32 NASM DebugCLEAN" "MakeTheme - Win32 NASM DebugCLEAN" "pls - Win32 NASM DebugCLEAN" "winamp - Win32 NASM DebugCLEAN" "cdlmc - Win32 NASM DebugCLEAN" "cdoutput - Win32 NASM DebugCLEAN" "cddb - Win32 NASM DebugCLEAN" "dde - Win32 NASM DebugCLEAN" "id3v2 - Win32 NASM DebugCLEAN" "wavout - Win32 NASM DebugCLEAN" 
+CLEAN :"download - Win32 NASM DebugCLEAN" "dsoundcard - Win32 NASM DebugCLEAN" "fileinput - Win32 NASM DebugCLEAN" "freeampui - Win32 NASM DebugCLEAN" "gdbm - Win32 NASM DebugCLEAN" "httpinput - Win32 NASM DebugCLEAN" "id3v1 - Win32 NASM DebugCLEAN" "m3u - Win32 NASM DebugCLEAN" "obsinput - Win32 NASM DebugCLEAN" "rmp - Win32 NASM DebugCLEAN" "soundcard - Win32 NASM DebugCLEAN" "update - Win32 NASM DebugCLEAN" "xing - Win32 NASM DebugCLEAN" "zlib - Win32 NASM DebugCLEAN" "pmp300 - Win32 NASM DebugCLEAN" "musicbrowser - Win32 NASM DebugCLEAN" "toolbar - Win32 NASM DebugCLEAN" "fabaselib - Win32 NASM DebugCLEAN" "misc - Win32 NASM DebugCLEAN" "MakeTheme - Win32 NASM DebugCLEAN" "pls - Win32 NASM DebugCLEAN" "winamp - Win32 NASM DebugCLEAN" "cdlmc - Win32 NASM DebugCLEAN" "cdoutput - Win32 NASM DebugCLEAN" "cddb - Win32 NASM DebugCLEAN" "dde - Win32 NASM DebugCLEAN" "id3v2 - Win32 NASM DebugCLEAN" "wavout - Win32 NASM DebugCLEAN" "signature - Win32 NASM DebugCLEAN" "vorbis - Win32 NASM DebugCLEAN" 
 !ELSE 
 CLEAN :
 !ENDIF 
@@ -318,6 +324,7 @@ CLEAN :
 	-@erase ".\freeamp.ilk"
 	-@erase "..\..\..\Authors.txt"
 	-@erase "..\..\..\Changes.txt"
+	-@erase "..\..\..\config\config.h"
 	-@erase "..\..\..\Copying.txt"
 	-@erase "..\..\..\ReadMe.txt"
 	-@erase ".\id3lib.dll"
@@ -330,7 +337,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\..\..\lib\zlib\include" /I "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\freeamp.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\..\..\base\aps" /I "..\..\..\lib\zlib\include" /I "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /D "_DEBUG" /D "_WINDOWS" /D "WIN32" /D "NOMINMAX" /Fp"$(INTDIR)\freeamp.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32 
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\freeamp.res" /d "_DEBUG" 
 BSC32=bscmake.exe
@@ -368,7 +375,9 @@ LINK32_OBJS= \
 	"..\..\..\plm\metadata\cddb\prj\Debug\cddb.lib" \
 	"..\..\..\ui\dde\win32\prj\Debug\dde.lib" \
 	"..\..\..\plm\metadata\id3v2\prj\Debug\id3v2.lib" \
-	"..\..\..\io\wavout\win32\prj\Debug\wavout.lib"
+	"..\..\..\io\wavout\win32\prj\Debug\wavout.lib" \
+	"..\..\..\io\signature\win32\prj\Debug\signature.lib" \
+	"..\..\..\lmc\vorbis\win32\prj\Debug\vorbis.lib"
 
 ".\freeamp.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -696,7 +705,7 @@ SOURCE=..\res\freeamp.rc
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
 
 
-"$(INTDIR)\freeamp.res" : $(SOURCE) "$(INTDIR)" "..\..\..\config\config.h"
+"$(INTDIR)\freeamp.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\freeamp.res" /i "\Local\src\freeamp\base\win32\res" /d "_DEBUG" $(SOURCE)
 
 
@@ -2442,6 +2451,106 @@ InputName=id3lib
 "wavout - Win32 NASM DebugCLEAN" : 
    cd "\Local\src\freeamp\io\wavout\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\wavout.mak CFG="wavout - Win32 NASM Debug" RECURSE=1 CLEAN 
+   cd "..\..\..\..\base\win32\prj"
+
+!ENDIF 
+
+!IF  "$(CFG)" == "freeamp - Win32 Release"
+
+"signature - Win32 Release" : 
+   cd "\Local\src\freeamp\io\signature\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\signature.mak CFG="signature - Win32 Release" 
+   cd "..\..\..\..\base\win32\prj"
+
+"signature - Win32 ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\io\signature\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\signature.mak CFG="signature - Win32 Release" RECURSE=1 CLEAN 
+   cd "..\..\..\..\base\win32\prj"
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
+
+"signature - Win32 Debug" : 
+   cd "\Local\src\freeamp\io\signature\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\signature.mak CFG="signature - Win32 Debug" 
+   cd "..\..\..\..\base\win32\prj"
+
+"signature - Win32 DebugCLEAN" : 
+   cd "\Local\src\freeamp\io\signature\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\signature.mak CFG="signature - Win32 Debug" RECURSE=1 CLEAN 
+   cd "..\..\..\..\base\win32\prj"
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
+
+"signature - Win32 NASM Release" : 
+   cd "\Local\src\freeamp\io\signature\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\signature.mak CFG="signature - Win32 NASM Release" 
+   cd "..\..\..\..\base\win32\prj"
+
+"signature - Win32 NASM ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\io\signature\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\signature.mak CFG="signature - Win32 NASM Release" RECURSE=1 CLEAN 
+   cd "..\..\..\..\base\win32\prj"
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
+
+"signature - Win32 NASM Debug" : 
+   cd "\Local\src\freeamp\io\signature\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\signature.mak CFG="signature - Win32 NASM Debug" 
+   cd "..\..\..\..\base\win32\prj"
+
+"signature - Win32 NASM DebugCLEAN" : 
+   cd "\Local\src\freeamp\io\signature\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\signature.mak CFG="signature - Win32 NASM Debug" RECURSE=1 CLEAN 
+   cd "..\..\..\..\base\win32\prj"
+
+!ENDIF 
+
+!IF  "$(CFG)" == "freeamp - Win32 Release"
+
+"vorbis - Win32 Release" : 
+   cd "\Local\src\freeamp\lmc\vorbis\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\vorbis.mak CFG="vorbis - Win32 Release" 
+   cd "..\..\..\..\base\win32\prj"
+
+"vorbis - Win32 ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\lmc\vorbis\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\vorbis.mak CFG="vorbis - Win32 Release" RECURSE=1 CLEAN 
+   cd "..\..\..\..\base\win32\prj"
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
+
+"vorbis - Win32 Debug" : 
+   cd "\Local\src\freeamp\lmc\vorbis\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\vorbis.mak CFG="vorbis - Win32 Debug" 
+   cd "..\..\..\..\base\win32\prj"
+
+"vorbis - Win32 DebugCLEAN" : 
+   cd "\Local\src\freeamp\lmc\vorbis\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\vorbis.mak CFG="vorbis - Win32 Debug" RECURSE=1 CLEAN 
+   cd "..\..\..\..\base\win32\prj"
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
+
+"vorbis - Win32 NASM Release" : 
+   cd "\Local\src\freeamp\lmc\vorbis\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\vorbis.mak CFG="vorbis - Win32 NASM Release" 
+   cd "..\..\..\..\base\win32\prj"
+
+"vorbis - Win32 NASM ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\lmc\vorbis\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\vorbis.mak CFG="vorbis - Win32 NASM Release" RECURSE=1 CLEAN 
+   cd "..\..\..\..\base\win32\prj"
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
+
+"vorbis - Win32 NASM Debug" : 
+   cd "\Local\src\freeamp\lmc\vorbis\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\vorbis.mak CFG="vorbis - Win32 NASM Debug" 
+   cd "..\..\..\..\base\win32\prj"
+
+"vorbis - Win32 NASM DebugCLEAN" : 
+   cd "\Local\src\freeamp\lmc\vorbis\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\vorbis.mak CFG="vorbis - Win32 NASM Debug" RECURSE=1 CLEAN 
    cd "..\..\..\..\base\win32\prj"
 
 !ENDIF 
