@@ -24,6 +24,23 @@ ____________________________________________________________________________*/
 #include "lmclib.h"
 #include "xinglmc.h"
 
+#include "mem.h"
+
+void* operator new(size_t size)
+{
+    void* p;
+
+    p = __malloc(size);
+
+    return p;
+}
+
+void operator delete(void* p)
+{
+   __free(p);
+}
+
+
 void Initialize(LMCRef ref)
 {
     if(ref)
@@ -120,7 +137,7 @@ void Cleanup(LMCRef ref)
 {
     LogicalMediaConverter* lmc = (LogicalMediaConverter*)ref->ref;
 
-    delete ref;
+    delete ref->ref;
 }
 
 

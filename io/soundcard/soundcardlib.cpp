@@ -24,6 +24,23 @@ ____________________________________________________________________________*/
 #include "pmolib.h"
 #include "soundcardpmo.h"
 
+#include "mem.h"
+
+void* operator new(size_t size)
+{
+    void* p;
+
+    p = __malloc(size);
+
+    return p;
+}
+
+void operator delete(void* p)
+{
+   __free(p);
+}
+
+
 void Initialize(PMORef ref)
 {
     if(ref)

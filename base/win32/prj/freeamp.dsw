@@ -3,6 +3,21 @@ Microsoft Developer Studio Workspace File, Format Version 5.00
 
 ###############################################################################
 
+Project: "fileinput"=..\..\..\io\local\win32\prj\fileinput.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name mem
+    End Project Dependency
+}}}
+
+###############################################################################
+
 Project: "freeamp"=.\freeamp.dsp - Package Owner=<4>
 
 Package=<5>
@@ -11,6 +26,60 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name fileinput
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name mem
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name soundcard
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name xing
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "mem"=.\mem.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "soundcard"=..\..\..\io\soundcard\win32\prj\soundcard.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name mem
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "xing"=..\..\..\lmc\xingmp3\win32\prj\xing.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name mem
+    End Project Dependency
 }}}
 
 ###############################################################################
