@@ -411,8 +411,6 @@ void ncursesUI::ProcessArgs() {
         //    processSwitch(pc);
     //}
     m_plm->SetCurrentIndex(0);
-    Event *e = new Event(CMD_Play);
-    m_playerEQ->AcceptEvent(e);
 }
 
 void ncursesUI::processSwitch(char *pc) {
