@@ -477,7 +477,7 @@ lib/unzip/lib/libunzip.la: $(UNZIPOBJ)
 
 # libhttp section
 
-LIBHTTPOBJ = lib/http/src/Http.o
+LIBHTTPOBJ = lib/http/src/Http.lo
 
 lib/http/lib/libfahttp.la: $(LIBHTTPOBJ)
 	+test -d lib/http/lib || mkdir lib/http/lib

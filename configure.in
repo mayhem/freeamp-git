@@ -445,7 +445,7 @@ fi
 
 if test "$have_gtk" = "true"; then
   OSDEPPLUGINS="$OSDEPPLUGINS plugins/musicbrowser.ui"
-  OSDEPPLUGINS="$OSDEPPLUGINS plugins/freeamp.ui MakeTheme"
+  OSDEPPLUGINS="$OSDEPPLUGINS plugins/freeamp.ui" dnl #MakeTheme"
   OSDEPPLUGINS="$OSDEPPLUGINS plugins/download.ui"
   OSDEPPLUGINS="$OSDEPPLUGINS plugins/winamp.ftf"
   OSDEPPLUGINS="$OSDEPPLUGINS plugins/kjofol.ftf"
