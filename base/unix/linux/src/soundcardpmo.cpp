@@ -134,7 +134,7 @@ bool SoundCardPMO::Reset(bool user_stop) {
     int a;
     ioctl(audio_fd,SNDCTL_DSP_RESET,&a);
     if (user_stop) {
-	Initialize(NULL);
+	Init(NULL);
     }
 }
 

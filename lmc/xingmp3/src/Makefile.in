@@ -41,7 +41,7 @@ pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
 
-top_builddir = ../..
+top_builddir = ../../..
 
 ACLOCAL = @ACLOCAL@
 AUTOCONF = @AUTOCONF@
@@ -74,37 +74,45 @@ RANLIB = @RANLIB@
 VERSION = @VERSION@
 target_os = @target_os@
 
-@AM_HAVE_WIN32_TRUE@TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
 @AM_HAVE_WIN32_TRUE@FILES = 
+@AM_HAVE_WIN32_TRUE@MYLIBS = 
+@AM_HAVE_WIN32_TRUE@TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
+@AM_HAVE_WIN32_FALSE@FILES = cdct.c cupl3.c hwin.c iup.c l3init.c msis.c wavep.c csbt.c cwinm.c icdct.c mdct.c uph.c cup.c dec8.c isbt.c l3dq.c mhead.c \
+@AM_HAVE_WIN32_FALSE@        upsf.c iwinm.c xinglmc.cpp
+@AM_HAVE_WIN32_FALSE@MYLIBS = libfalmcxingmp3.a
 @AM_HAVE_WIN32_FALSE@TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
-@AM_HAVE_WIN32_FALSE@FILES = player.cpp bootstrap.cpp command.cpp buffer.cpp playlist.cpp hashtable.cpp thread.cpp
 
 @AM_HAVE_LINUXTHREADS_TRUE@REENT = -D_REENTRANT
 
-noinst_LIBRARIES = libfabase.a
-libfabase_a_SOURCES = $(FILES)
+noinst_LIBRARIES = $(MYLIBS)
+libfalmcxingmp3_a_SOURCES = $(FILES)
 
-INCLUDES = -I@top_srcdir@/base/include -I$(TRGT_SYS_HEADS) -I@top_srcdir@/io/include -I@top_srcdir@/ui/include -I@top_srcdir@/lmc/include -I@top_srcdir@/ui/dummy/include -I@top_srcdir@/io/local -I@top_srcdir@/lmc/xingmp3/include
-CXXFLAGS = -D__@target_os@__ $(REENT) $(EXTRA_CXXFLAGS)
+INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) -I@top_srcdir@/io/include -I@top_srcdir@/ui/include -I@top_srcdir@/lmc/include
+CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT) -D__@target_os@__
+CFLAGS = $(EXTRA_CFLAGS) $(REENT) -D__@target_os@__
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
-CONFIG_HEADER = ../../config/config.h
+CONFIG_HEADER = ../../../config/config.h
 CONFIG_CLEAN_FILES = 
 LIBRARIES =  $(noinst_LIBRARIES)
 
 
-DEFS = @DEFS@ -I. -I$(srcdir) -I../../config
+DEFS = @DEFS@ -I. -I$(srcdir) -I../../../config
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-libfabase_a_LIBADD = 
-@AM_HAVE_WIN32_TRUE@cond0libfabase_a_OBJECTS = 
-@AM_HAVE_WIN32_FALSE@cond1libfabase_a_OBJECTS =  player.o bootstrap.o \
-@AM_HAVE_WIN32_FALSE@command.o buffer.o playlist.o hashtable.o thread.o
-libfabase_a_OBJECTS =  $(cond0libfabase_a_OBJECTS) \
-$(cond1libfabase_a_OBJECTS)
+libfalmcxingmp3_a_LIBADD = 
+@AM_HAVE_WIN32_TRUE@cond0libfalmcxingmp3_a_OBJECTS = 
+@AM_HAVE_WIN32_FALSE@cond1libfalmcxingmp3_a_OBJECTS =  cdct.o cupl3.o \
+@AM_HAVE_WIN32_FALSE@hwin.o iup.o l3init.o msis.o wavep.o csbt.o \
+@AM_HAVE_WIN32_FALSE@cwinm.o icdct.o mdct.o uph.o cup.o dec8.o isbt.o \
+@AM_HAVE_WIN32_FALSE@l3dq.o mhead.o upsf.o iwinm.o xinglmc.o
+libfalmcxingmp3_a_OBJECTS =  $(cond0libfalmcxingmp3_a_OBJECTS) \
+$(cond1libfalmcxingmp3_a_OBJECTS)
 AR = ar
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 CXXLINK = $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@
+COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)
+LINK = $(CC) $(CFLAGS) $(LDFLAGS) -o $@
 DIST_COMMON =  Makefile.am Makefile.in
 
 
@@ -112,18 +120,21 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP = --best
-DEP_FILES =  .deps/bootstrap.P .deps/buffer.P .deps/command.P \
-.deps/hashtable.P .deps/player.P .deps/playlist.P .deps/thread.P
+DEP_FILES =  .deps/cdct.P .deps/csbt.P .deps/cup.P .deps/cupl3.P \
+.deps/cwinm.P .deps/dec8.P .deps/hwin.P .deps/icdct.P .deps/isbt.P \
+.deps/iup.P .deps/iwinm.P .deps/l3dq.P .deps/l3init.P .deps/mdct.P \
+.deps/mhead.P .deps/msis.P .deps/uph.P .deps/upsf.P .deps/wavep.P \
+.deps/xinglmc.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
-SOURCES = $(libfabase_a_SOURCES)
-OBJECTS = $(libfabase_a_OBJECTS)
+SOURCES = $(libfalmcxingmp3_a_SOURCES)
+OBJECTS = $(libfalmcxingmp3_a_OBJECTS)
 
 all: Makefile $(LIBRARIES)
 
 .SUFFIXES:
 .SUFFIXES: .S .c .cpp .o .s
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4)
-	cd $(top_srcdir) && $(AUTOMAKE) --gnu base/src/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu lmc/xingmp3/src/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
@@ -155,10 +166,10 @@ distclean-compile:
 
 maintainer-clean-compile:
 
-libfabase.a: $(libfabase_a_OBJECTS) $(libfabase_a_DEPENDENCIES)
-	-rm -f libfabase.a
-	$(AR) cru libfabase.a $(libfabase_a_OBJECTS) $(libfabase_a_LIBADD)
-	$(RANLIB) libfabase.a
+libfalmcxingmp3.a: $(libfalmcxingmp3_a_OBJECTS) $(libfalmcxingmp3_a_DEPENDENCIES)
+	-rm -f libfalmcxingmp3.a
+	$(AR) cru libfalmcxingmp3.a $(libfalmcxingmp3_a_OBJECTS) $(libfalmcxingmp3_a_LIBADD)
+	$(RANLIB) libfalmcxingmp3.a
 .cpp.o:
 	$(CXXCOMPILE) -c $<
 
@@ -189,14 +200,14 @@ maintainer-clean-tags:
 
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 
-subdir = base/src
+subdir = lmc/xingmp3/src
 
 distdir: $(DISTFILES)
 	here=`cd $(top_builddir) && pwd`; \
 	top_distdir=`cd $(top_distdir) && pwd`; \
 	distdir=`cd $(distdir) && pwd`; \
 	cd $(top_srcdir) \
-	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu base/src/Makefile
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu lmc/xingmp3/src/Makefile
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  test -f $(distdir)/$$file \

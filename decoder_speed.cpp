@@ -25,9 +25,9 @@ ____________________________________________________________________________*/
 
 #include <iostream.h>
 
-#include "lmc/include/xinglmc.h"
+#include "lmc/xingmp3/include/xinglmc.h"
 #include "base/unix/linux/include/soundcardpmo.h"
-#include "io/include/localfileinput.h"
+#include "io/local/localfileinput.h"
 
 
 

@@ -22,30 +22,9 @@
 ##
 ############################################################################
 
-include @top_srcdir@/config/Makefile.header
-
-if AM_HAVE_WIN32
-FILES = 
-MYLIBS = 
-TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
-else
-FILES = cdct.c cupl3.c hwin.c iup.c l3init.c msis.c wavep.c csbt.c cwinm.c icdct.c mdct.c uph.c cup.c dec8.c isbt.c l3dq.c mhead.c \
-        upsf.c iwinm.c xinglmc.cpp
-MYLIBS = libfalmcxingmp3.a
-TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
-endif
-
-if AM_HAVE_LINUXTHREADS
-REENT = -D_REENTRANT
-endif
+SUBDIRS = src
 
 
-noinst_LIBRARIES = $(MYLIBS)
-libfalmcxingmp3_a_SOURCES = $(FILES)
-
-INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) -I@top_srcdir@/io/include -I@top_srcdir@/ui/include
-CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT) -D__@target_os@__
-CFLAGS = $(EXTRA_CFLAGS) $(REENT) -D__@target_os@__
 
 
 
