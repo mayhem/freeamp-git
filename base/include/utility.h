@@ -72,5 +72,6 @@ bool ResolveLink(string& path);
 string FindFile(string oPath);
 
 bool ShowHelp(FAContext *context, const char *helptopic);
+bool GetProxySettings(FAContext *context, string &server, unsigned short &port);
 
 #endif /* INCLUDED_UTILITY_H */

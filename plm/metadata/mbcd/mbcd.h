@@ -60,6 +60,7 @@ class MusicBrainzCD : public MetaDataFormat {
 
     musicbrainz_t o;
     vector<int> m_trackLens;
+    int         m_nextTrack;
 };
 
 #endif

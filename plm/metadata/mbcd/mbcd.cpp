@@ -36,6 +36,8 @@ using namespace std;
 
 const int iDataLen = 256;
 
+#define DB printf("%d\n", __LINE__);
+
 extern "C"
 {
    MetaDataFormat *Initialize(FAContext* context)
@@ -48,6 +50,7 @@ MusicBrainzCD::MusicBrainzCD(FAContext* context)
               :MetaDataFormat(context)
 {
     o = NULL;
+    m_nextTrack = -1;
 }
 
 MusicBrainzCD::~MusicBrainzCD()
@@ -57,7 +60,7 @@ MusicBrainzCD::~MusicBrainzCD()
 bool MusicBrainzCD::ReadMetaData(const char* url, MetaData* metadata)
 {
     int  track, numTracks, i;
-    char data[iDataLen];
+    char data[iDataLen], *ptr;
 
     assert(url);
     assert(metadata);
@@ -72,8 +75,12 @@ bool MusicBrainzCD::ReadMetaData(const char* url, MetaData* metadata)
     if (strncasecmp(".CDA", ext, 4))
        return false;
 
-    track = atoi(url + 7);
-    if (track == 1)
+    ptr = strrchr(url, DIR_MARKER);
+    if (ptr == NULL)
+       return false;
+
+    track = atoi(ptr + 1);
+    if (track != m_nextTrack)
     {
         if (o)
           mb_Delete(o);
@@ -85,8 +92,9 @@ bool MusicBrainzCD::ReadMetaData(const char* url, MetaData* metadata)
            o = NULL; 
            return false;
         }
+        m_nextTrack = 1;
     }
-    if (track > 1 && o == NULL)
+    if (o == NULL)
        return false;
 
     mb_Select(o, MB_SelectFirstItem);  
@@ -128,7 +136,9 @@ bool MusicBrainzCD::ReadMetaData(const char* url, MetaData* metadata)
     {
        mb_Delete(o);
        o = NULL;
+       m_nextTrack = -1;
     }
+    m_nextTrack++;
 
     return true;
 }
@@ -138,18 +148,23 @@ bool MusicBrainzCD::LookupCD(void)
     char          error[iDataLen], trackLens[1024], *ptr, *result;
     char          diskId[64];
     int           ret;
+    unsigned short  proxyPort;
     char         *tempDir = new char[_MAX_PATH];
     uint32        length = _MAX_PATH;
     Database     *db;
-    string        rdf;
+    string        rdf, proxyServer;
 
     m_context->prefs->GetPrefString(kDatabaseDirPref, tempDir, &length);
 
     string database = string(tempDir) + string(DIR_MARKER_STR) +
                       string("mbcd");
 
+    m_context->prefs->GetPrefString(kCDDevicePathPref, tempDir, &length);
+    mb_SetDevice(o, tempDir);
 
     mb_SetServer(o, MUSICBRAINZ_SERVER, MUSICBRAINZ_PORT);
+    if (GetProxySettings(m_context, proxyServer, proxyPort))
+       mb_SetProxy(o, (char *)proxyServer.c_str(), proxyPort);
 
     ret = mb_Query(o, MB_GetCDTOC);
     if (!ret)
@@ -187,7 +202,7 @@ bool MusicBrainzCD::LookupCD(void)
     else
     {
         m_context->target->AcceptEvent(new 
-                 BrowserMessageEvent("Sending query to MusicBrainz..."));
+                 BrowserMessageEvent("Sending CD lookup query to MusicBrainz..."));
         ret = mb_Query(o, MB_GetCDInfo);
         if (!ret)
         {
@@ -213,10 +228,12 @@ bool MusicBrainzCD::LookupCD(void)
                   BrowserMessageEvent("Found CD."));
             WriteToCache(db, diskId, m_trackLens, result); 
         }
+        else
+        {
+            m_context->target->AcceptEvent(new 
+                  BrowserMessageEvent("Query failed."));
+        }
         delete result;
-
-        m_context->target->AcceptEvent(new 
-              BrowserMessageEvent("Query failed."));
     }
     delete db;
 

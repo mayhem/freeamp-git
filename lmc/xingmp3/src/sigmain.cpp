@@ -36,6 +36,7 @@ ____________________________________________________________________________*/
 
 #include "metadata.h"
 #include "config.h"
+#include "utility.h"
 
 #include "plm/metadata/id3v1/id3v1.h"
 #include "plm/metadata/id3v2/id3v2.h"
@@ -115,7 +116,8 @@ void submit_metadata(MetaData *pmetaData)
    int    ret;
    char   *args[11];
    char    temp[255];
-   int     i;
+   int     i, proxyPort;
+   string  proxyServer;
 
    if (pmetaData == NULL)
        return;

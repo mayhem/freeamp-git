@@ -887,3 +887,32 @@ bool ShowHelp(FAContext *m_context, const char *helpurl)
 
     return true;
 } 
+
+bool GetProxySettings(FAContext *context, string &server, unsigned short &port)
+{
+    bool   useProxy;
+    int32  numFields;
+    uint32 length;
+    char   proxyname[256], hostname[256];
+
+    context->prefs->GetPrefBoolean(kUseProxyPref, &useProxy);
+
+    length = sizeof(proxyname);
+    context->prefs->GetPrefString(kProxyHostPref, proxyname, &length);
+
+    if(useProxy)
+    {
+        numFields = sscanf(proxyname,
+                           "http://%[^:/]:%hu", hostname, &port);
+        if (numFields > 0)
+        {
+            server = string(hostname);
+            if (numFields == 1)
+               port = 80;
+
+            return true;
+        }
+    }
+
+    return false;
+}
