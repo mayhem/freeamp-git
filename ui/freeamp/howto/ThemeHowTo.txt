@@ -25,21 +25,11 @@ with your comments, or better yet head over to Bugzilla and enter a
 bug report <http://www.freeamp.org/bugzilla>.
 
 
-UPDATED FOR BETA 4 (November 19, 1999)
+UPDATED FOR BETA 5 (December 8, 1999)
 
-New features for beta 4:
+New features for beta 5:
 
-- There is now support for an optional TimeRemaining TextControl. This allows
-  a theme designer to give the TimeRemaining TextControl a different style/
-  color than the normal Time Text Control.
-- There is also support for the StreamInfo Text Control which shows
-  the bitrate, sample rate and Stereo/Mono about the current MP3.
-- There is a new ThemeInfo tag to give the theme designers credit.
-
-NEW FEATURES BEFORE RELEASE (December 10th, 1999)
-
-- TrueType font support in Linux
-
+- There now a VSliderControl for doing vertical sliders
 
 GETTING STARTED
 
@@ -271,8 +261,8 @@ Controls:
 
 This tag has no attributes. It is a container for all the controls
 that are to be placed on a window. Inside of the Controls tag you may
-include <MultiStateControl>, <ButtonControl>, <TextControl> and
-<SliderControl> tags.
+include <MultiStateControl>, <ButtonControl>, <TextControl>,
+<SliderControl> and <VSliderControl> tags.
 
 
 ButtonControl:
@@ -364,6 +354,23 @@ of the background bitmap. The thumb bitmap is specified by the
 
     Normal, MouseOver, and Disabled
 
+VSliderControl:
+--------------
+
+VSliderControls are used to control volume and seek position. A VSlider
+is arranged vertically, where a normal Slider is horizontal:
+
+    <VSliderControl Name="Volume">  
+
+The Name can either be Volume or Seek. The VSliderControl needs to 
+define the <Info>, <Position>, and <ControlBitmap> tags. The only
+bitmaps associated with a VSlidercontrol are the bitmaps for the
+thumb of the slider control. The actual frame of the control is part
+of the background bitmap. The thumb bitmap is specified by the
+<ControlBitmap> tag and has three states:
+
+    Normal, MouseOver, and Disabled
+
 Info:
 -----
 
@@ -439,10 +446,11 @@ Therefore the ControlBitmap needs to 65 * 4 = 260 pixels wide,
 and 16 pixels high. If the control bitmap starts at 0,203 then you
 arrive at: Rect="0,203,259,218"
 
-For a SliderControl thumb, you will need 3 frames. For a MultiStateControl
-you will need the ControlBitmap to be 4 frames wide and n frames high
-where n is the value defined by the NumStates attribute. State 0 will
-be in the first row of bitmaps, state 1 in the second row and so on.
+For a SliderControl and VSliderControl thumb, you will need 3 frames. 
+For a MultiStateControl you will need the ControlBitmap to be 4 frames 
+wide and n frames high where n is the value defined by the NumStates 
+attribute. State 0 will be in the first row of bitmaps, state 1 in 
+the second row and so on.
 
 Style:
 ------
@@ -558,6 +566,7 @@ QUICK REFERENCE
    <ButtonControl>
    <TextControl>
    <SliderControl>
+   <VSliderControl>
 
    
 <ButtonControl>
@@ -595,6 +604,21 @@ QUICK REFERENCE
 <SliderControl>
 
    -- specifies a slider control
+   
+   Attributes:
+   
+   Name -- the name of the control. See Appendix A for a list of
+           possible control names.
+
+   Subtags:
+
+   <Info> (required)
+   <Position> (required)
+   <ControlBitmap> (required) 
+
+<VSliderControl>
+
+   -- specifies a vertical slider control
    
    Attributes:
    
@@ -724,7 +748,7 @@ BufferInfo    -- The input and output buffer states (for streaming only)
 Time          -- The time display
 TimeRemaining -- The time display used when in TimeRemaining mode 
         
-SliderControls:        
+SliderControls,VSliderControls:        
         
 Volume        -- adjusts the volume
 Seek          -- seek in a track
