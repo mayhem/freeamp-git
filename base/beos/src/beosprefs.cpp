@@ -58,9 +58,9 @@ char *strdup_new(char *str)
 
 // default values
 const char*  kDefaultLibraryPath = ".:~/.freeamp:" UNIX_LIBDIR "/freeamp";
-const char*  kDefaultUI = "freeamp-" HOST_OS ".ui";
-const char*  kDefaultTextUI = "freeampcmd-" HOST_OS ".ui";
-const char*  kDefaultPMO = "soundcard-" HOST_OS ".pmo";
+const char*  kDefaultUI = "freeamp.ui";
+const char*  kDefaultTextUI = "freeampcmd.ui";
+const char*  kDefaultPMO = "soundcard.pmo";
 const char*  kDefaultALSADevice = "1:1";
 
 
