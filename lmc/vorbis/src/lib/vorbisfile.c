@@ -209,7 +209,7 @@ static int _fetch_headers(OggVorbis_File *vf,vorbis_info *vi,vorbis_comment *vc,
 
   ret=_get_next_page(vf,&og,CHUNKSIZE);
   if(ret==-1){
-    fprintf(stderr,"Did not find initial header for bitstream.\n");
+    //fprintf(stderr,"Did not find initial header for bitstream.\n");
     return -1;
   }
   

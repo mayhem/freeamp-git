@@ -98,7 +98,7 @@ const int iInitialFrameSize = iMaxFrameSize * iNumSanityCheckFrames;
 
 const char *szFailRead = "Cannot read MP3 data from input plugin.";
 const char *szFailWrite = "Cannot write audio data to output buffer.";
-const char *szCannotDecode = The_BRANDING" cannot play this file/stream. This file/stream may be corrupted.";
+const char *szCannotDecode = "Skipped corrupted file.";
 
 XingLMC::XingLMC(FAContext *context) :
          LogicalMediaConverter(context)
@@ -750,7 +750,10 @@ void XingLMC::DecodeWork()
    {
        m_pContext->log->Error("CanDecode returned false.\n");
        if (m_decodeInfo.sendInfo)
-           ReportError(szCannotDecode);
+       {
+           ReportStatus(szCannotDecode);
+           m_pTarget->AcceptEvent(new Event(INFO_DoneOutputtingDueToError));
+       }
        else
            ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(new PMOErrorEvent());
        return;
@@ -764,10 +767,12 @@ void XingLMC::DecodeWork()
    {
        m_pContext->log->Error("ExtractMediaInfo failed: %d\n", Err);
        if (m_decodeInfo.sendInfo)
-           ReportError(szCannotDecode);
-       else 
+       {
+           ReportStatus(szCannotDecode);
+           m_pTarget->AcceptEvent(new Event(INFO_DoneOutputtingDueToError));
+       }
+       else
            ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(new PMOErrorEvent());
-
        return;
    }
 
@@ -901,7 +906,7 @@ void XingLMC::DecodeWork()
              {
                  m_pContext->log->Error("LMC: Cannot advance to next frame: %d\n", Err);
                  if (m_decodeInfo.sendInfo)
-                     ReportError("Cannot advance to next frame. Possible media corruption?");
+                     ReportStatus("Skipping corrupt track.");
                  else
                      ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(new PMOErrorEvent());
                  return;
@@ -949,9 +954,9 @@ void XingLMC::DecodeWork()
          m_pContext->log->Error("LMC: Maximum number of retries reached"
                       " while trying to decode.\n");
          if (m_decodeInfo.sendInfo) 
-             ReportError("Cannot decode this MP3. Is the MP3 corrupted?");
-         else
-             ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(new PMOErrorEvent());
+             ReportStatus(szCannotDecode);
+
+         ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(new PMOErrorEvent());
          return;
       }
 
