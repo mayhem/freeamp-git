@@ -687,6 +687,9 @@ RemoveItem(int32 index)
         result = m_list->RemoveItem(index);
     }
 
+    if(m_current >= index)
+        m_current = CountItems() - 1;
+
     m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
 
     ReleasePLManipLock();
@@ -714,6 +717,9 @@ RemoveItems(int32 index, int32 count)
 		    m_list->RemoveItem(count);
         }
 
+        if(m_current >= index)
+            m_current = CountItems() - 1;
+
         m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
 
         result = kError_NoErr;
@@ -737,6 +743,9 @@ RemoveList(List<PlayListItem*>* items)
         m_list->RemoveList(*items);
 
         result = kError_NoErr;
+
+        if(m_current > CountItems() - 1)
+            m_current = CountItems() - 1;
 
         m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
     }
