@@ -449,7 +449,7 @@ void ReclaimFileTypes(const char* path, bool askBeforeReclaiming)
             if(result == ERROR_SUCCESS)
             {
                 //MessageBox(NULL, buf, "value", MB_OK);
-                if(strcmp(buf, kFileTypes[index][1]))
+                if(stricmp(buf, kFileTypes[index][1]))
                 {
                     if(!permission)
                     {
@@ -501,7 +501,7 @@ void ReclaimFileTypes(const char* path, bool askBeforeReclaiming)
             if(result == ERROR_SUCCESS)
             {
                 //MessageBox(NULL, buf, "value", MB_OK);
-                if(strcmp(buf, openString))
+                if(stricmp(buf, openString))
                 {
                     if(!permission)
                     {
@@ -560,7 +560,7 @@ void ReclaimFileTypes(const char* path, bool askBeforeReclaiming)
             if(result == ERROR_SUCCESS)
             {
                 //MessageBox(NULL, buf, "value", MB_OK);
-                if(strcmp(buf, path))
+                if(stricmp(buf, path))
                 {
                     if(!permission)
                     {

@@ -551,6 +551,10 @@ SOURCE=..\..\..\..\base\include\utility.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\include\VSliderControl.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\Win32Bitmap.h
 # End Source File
 # Begin Source File

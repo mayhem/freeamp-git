@@ -4,6 +4,21 @@ Parameters=
 ShortcutKey=
 SeparateMemorySpace=No
 Run=Normal Window
+IconIndex=0
+Replace=Yes
+FileGroup=
+StartIn=<TARGETDIR>
+IconFile=
+InternetShortcut=No
+DisplayText=FreeAmp
+Comments=
+
+[Shortcut1]
+Target=<TARGETDIR>\FreeAmp.exe
+Parameters=
+ShortcutKey=
+SeparateMemorySpace=No
+Run=Normal Window
 FileGroup=
 Replace=Yes
 IconIndex=0
@@ -15,12 +30,13 @@ DisplayText=FreeAmp
 
 [Folder4]
 Type=Personal
-DisplayText=
 Comments=
+DisplayText=
 
 [Data]
-Shortcut0=Folder4\FreeAmp
 Folder3=<FOLDER_STARTUP>
+Shortcut0=Folder4\FreeAmp
+Shortcut1=Folder0\FreeAmp
 Folder4=Folder2\FreeAmp 2.0
 Group0=Main
 Group1=Startup
