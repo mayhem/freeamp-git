@@ -102,9 +102,16 @@ KeyPressed(int32 keyCode)
     { 
         case VK_UP: 
         {
-            if(m_firstVisible > 0)
+            if(m_anchorIndex > 0)
+                m_anchorIndex--;
+
+            Select(m_anchorIndex, false);
+
+            if(m_anchorIndex >= 0 && m_firstVisible > m_anchorIndex)
             {
-                ScrollTo(--m_firstVisible);
+                m_firstVisible = m_anchorIndex;
+
+                ScrollTo(m_firstVisible);
 
                 if(m_scroller)
                     m_scroller->SetPosition(m_firstVisible);
@@ -115,7 +122,12 @@ KeyPressed(int32 keyCode)
 
         case VK_DOWN: 
         {
-            if(m_firstVisible < CountItems() - 8)
+            if(m_anchorIndex < CountItems() - 1) 
+                m_anchorIndex++;
+
+            Select(m_anchorIndex, false);
+
+            if(m_anchorIndex > m_firstVisible + 7)
             {
                 ScrollTo(++m_firstVisible); 
 
@@ -158,6 +170,23 @@ KeyPressed(int32 keyCode)
             DeleteSelection();
 
             break; 
+        }
+
+        case 'A':
+        {
+            short state = GetKeyState(VK_CONTROL);
+
+            /*char buffer[256];
+            wsprintf(buffer, "state: %hx\r\n", state);
+            OutputDebugString(buffer);*/
+
+            if(state>>4)
+            {
+                Select(0, CountItems() -1, false);
+            }
+
+
+            break;
         }
     } 
 }

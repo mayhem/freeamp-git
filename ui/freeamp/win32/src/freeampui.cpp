@@ -176,6 +176,7 @@ MainWndProc(HWND hwnd,
             ui->Timer(wParam);
             break;
 
+        case WM_KILLFOCUS:
         case WM_CANCELMODE:
             ui->CancelMode();
             break;
@@ -480,6 +481,7 @@ KeyDown(int32 keyCode)
         case VK_HOME: 
         case VK_END: 
         case VK_DELETE: 
+        case 'A':
             if(m_playlistView->Visible() && m_playlistView->Enabled())
                 m_playlistView->KeyPressed(keyCode);
             break;

@@ -169,6 +169,8 @@ MouseMove(int32 x, int32 y, int32 modifiers)
 
             m_target->ScrollTo(index);
 
+            //m_position = index;
+
             Invalidate();
         }
     }
@@ -183,9 +185,35 @@ LeftButtonDown(int32 x, int32 y, int32 modifiers)
 
     m_lastPoint = m_pressedPoint;
 
+
     if(PtInRect(&m_scrollRect, m_pressedPoint))
     {
         m_pressed = true;
+    }
+    else
+    {
+        if(y < m_scrollRect.top)
+        {
+            int32 index = Position() - Proportion();
+
+            if(index < m_min)
+                index = m_min;
+
+            m_target->ScrollTo(index);
+
+            SetPosition(index);
+        }
+        else if(y > m_scrollRect.bottom)
+        {
+            int32 index = Position() + Proportion();
+
+            if(index > m_max - Proportion())
+                index = m_max - Proportion();
+
+            m_target->ScrollTo(index);
+
+            SetPosition(index);
+        }
     }
 }
 
@@ -227,7 +255,12 @@ void
 ScrollView::
 SetPosition(int32 position)
 {
-    if( m_position != position && 
+    /*if(position < m_min)
+        position = m_min;
+    else if(position > m_max)
+        position = m_max;*/
+
+    if( m_position != position &&
         position >= m_min &&
         position <= m_max)
     {
@@ -333,11 +366,11 @@ SetRange(int32 min, int32 max)
 }
 
 
-void 
+int32 
 ScrollView::
-Proportion(int32* visible)
+Proportion() const
 {
-    *visible = m_visible;
+    return m_visible;
 }
 
 void 

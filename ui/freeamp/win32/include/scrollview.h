@@ -66,7 +66,7 @@ class ScrollView : public View {
             void Range(int32* min, int32* max);
             void SetRange(int32 min, int32 max);
 
-            void Proportion(int32* visible);
+            int32 Proportion() const;
             void SetProportion(int32 visible);
 
             int32 Orientation() const;
