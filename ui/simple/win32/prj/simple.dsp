@@ -134,6 +134,10 @@ SOURCE=..\..\src\simplelib.cpp
 
 SOURCE=..\..\src\simpleui.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=.\simpleui.def
+# End Source File
 # End Group
 # Begin Group "resources"
 
@@ -150,5 +154,9 @@ SOURCE=..\res\simple.rc
 
 # End Source File
 # End Group
+# Begin Source File
+
+SOURCE=..\res\about8.bmp
+# End Source File
 # End Target
 # End Project

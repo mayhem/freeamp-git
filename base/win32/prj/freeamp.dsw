@@ -54,6 +54,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "simple"=..\..\..\ui\simple\win32\prj\simple.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "soundcard"=..\..\..\io\soundcard\win32\prj\soundcard.dsp - Package Owner=<4>
 
 Package=<5>

@@ -98,7 +98,7 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
 	Player *player = Player::GetPlayer();
 
     // register items... we give up ownership here
-    player->RegisterCOO(dummy);
+    player->RegisterActiveUI(dummy);
     player->RegisterLMCs(lmc);
     player->RegisterPMIs(pmi);
     player->RegisterPMOs(pmo);

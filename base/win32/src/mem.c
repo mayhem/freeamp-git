@@ -1,7 +1,5 @@
 #include <windows.h>
 
-#include "conerror.h"
-
 HINSTANCE hInstance;
 
 #if defined(__BORLANDC__)
