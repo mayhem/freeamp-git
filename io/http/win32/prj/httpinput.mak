@@ -55,15 +55,17 @@ ALL : ".\httpinput.pmi"
 
 CLEAN :
 	-@erase "$(INTDIR)\http.res"
-	-@erase "$(INTDIR)\httpbuffer.obj"
 	-@erase "$(INTDIR)\httpinput.obj"
 	-@erase "$(INTDIR)\log.obj"
 	-@erase "$(INTDIR)\mutex.obj"
+	-@erase "$(INTDIR)\pipeline.obj"
+	-@erase "$(INTDIR)\pmi.obj"
 	-@erase "$(INTDIR)\preferences.obj"
 	-@erase "$(INTDIR)\pullbuffer.obj"
 	-@erase "$(INTDIR)\semaphore.obj"
 	-@erase "$(INTDIR)\streambuffer.obj"
 	-@erase "$(INTDIR)\thread.obj"
+	-@erase "$(INTDIR)\tstream.obj"
 	-@erase "$(INTDIR)\vc50.idb"
 	-@erase "$(INTDIR)\win32prefs.obj"
 	-@erase "$(INTDIR)\win32thread.obj"
@@ -97,15 +99,17 @@ DEF_FILE= \
 	".\httpinput.def"
 LINK32_OBJS= \
 	"$(INTDIR)\http.res" \
-	"$(INTDIR)\httpbuffer.obj" \
 	"$(INTDIR)\httpinput.obj" \
 	"$(INTDIR)\log.obj" \
 	"$(INTDIR)\mutex.obj" \
+	"$(INTDIR)\pipeline.obj" \
+	"$(INTDIR)\pmi.obj" \
 	"$(INTDIR)\preferences.obj" \
 	"$(INTDIR)\pullbuffer.obj" \
 	"$(INTDIR)\semaphore.obj" \
 	"$(INTDIR)\streambuffer.obj" \
 	"$(INTDIR)\thread.obj" \
+	"$(INTDIR)\tstream.obj" \
 	"$(INTDIR)\win32prefs.obj" \
 	"$(INTDIR)\win32thread.obj"
 
@@ -120,8 +124,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : ".\httpinput.pmi"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                    ..\..\..\..\base\win32\prj\plugins
-	copy httpinput.pmi               ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                       ..\..\..\..\base\win32\prj\plugins
+	copy httpinput.pmi                  ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "httpinput - Win32 Debug"
@@ -141,15 +145,17 @@ ALL : ".\httpinput.pmi"
 
 CLEAN :
 	-@erase "$(INTDIR)\http.res"
-	-@erase "$(INTDIR)\httpbuffer.obj"
 	-@erase "$(INTDIR)\httpinput.obj"
 	-@erase "$(INTDIR)\log.obj"
 	-@erase "$(INTDIR)\mutex.obj"
+	-@erase "$(INTDIR)\pipeline.obj"
+	-@erase "$(INTDIR)\pmi.obj"
 	-@erase "$(INTDIR)\preferences.obj"
 	-@erase "$(INTDIR)\pullbuffer.obj"
 	-@erase "$(INTDIR)\semaphore.obj"
 	-@erase "$(INTDIR)\streambuffer.obj"
 	-@erase "$(INTDIR)\thread.obj"
+	-@erase "$(INTDIR)\tstream.obj"
 	-@erase "$(INTDIR)\vc50.idb"
 	-@erase "$(INTDIR)\vc50.pdb"
 	-@erase "$(INTDIR)\win32prefs.obj"
@@ -186,15 +192,17 @@ DEF_FILE= \
 	".\httpinput.def"
 LINK32_OBJS= \
 	"$(INTDIR)\http.res" \
-	"$(INTDIR)\httpbuffer.obj" \
 	"$(INTDIR)\httpinput.obj" \
 	"$(INTDIR)\log.obj" \
 	"$(INTDIR)\mutex.obj" \
+	"$(INTDIR)\pipeline.obj" \
+	"$(INTDIR)\pmi.obj" \
 	"$(INTDIR)\preferences.obj" \
 	"$(INTDIR)\pullbuffer.obj" \
 	"$(INTDIR)\semaphore.obj" \
 	"$(INTDIR)\streambuffer.obj" \
 	"$(INTDIR)\thread.obj" \
+	"$(INTDIR)\tstream.obj" \
 	"$(INTDIR)\win32prefs.obj" \
 	"$(INTDIR)\win32thread.obj"
 
@@ -209,8 +217,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : ".\httpinput.pmi"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                    ..\..\..\..\base\win32\prj\plugins
-	copy httpinput.pmi               ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                       ..\..\..\..\base\win32\prj\plugins
+	copy httpinput.pmi                  ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "httpinput - Win32 NASM Debug"
@@ -230,15 +238,17 @@ ALL : ".\httpinput.pmi"
 
 CLEAN :
 	-@erase "$(INTDIR)\http.res"
-	-@erase "$(INTDIR)\httpbuffer.obj"
 	-@erase "$(INTDIR)\httpinput.obj"
 	-@erase "$(INTDIR)\log.obj"
 	-@erase "$(INTDIR)\mutex.obj"
+	-@erase "$(INTDIR)\pipeline.obj"
+	-@erase "$(INTDIR)\pmi.obj"
 	-@erase "$(INTDIR)\preferences.obj"
 	-@erase "$(INTDIR)\pullbuffer.obj"
 	-@erase "$(INTDIR)\semaphore.obj"
 	-@erase "$(INTDIR)\streambuffer.obj"
 	-@erase "$(INTDIR)\thread.obj"
+	-@erase "$(INTDIR)\tstream.obj"
 	-@erase "$(INTDIR)\vc50.idb"
 	-@erase "$(INTDIR)\vc50.pdb"
 	-@erase "$(INTDIR)\win32prefs.obj"
@@ -255,8 +265,9 @@ CLEAN :
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\..\\" /I "..\..\..\include" /I\
  "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I\
  "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I\
- "..\..\..\..\ui\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS"\
- /Fp"$(INTDIR)\httpinput.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+ "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /D "WIN32" /D "_DEBUG" /D\
+ "_WINDOWS" /Fp"$(INTDIR)\httpinput.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\"\
+ /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
@@ -275,15 +286,17 @@ DEF_FILE= \
 	".\httpinput.def"
 LINK32_OBJS= \
 	"$(INTDIR)\http.res" \
-	"$(INTDIR)\httpbuffer.obj" \
 	"$(INTDIR)\httpinput.obj" \
 	"$(INTDIR)\log.obj" \
 	"$(INTDIR)\mutex.obj" \
+	"$(INTDIR)\pipeline.obj" \
+	"$(INTDIR)\pmi.obj" \
 	"$(INTDIR)\preferences.obj" \
 	"$(INTDIR)\pullbuffer.obj" \
 	"$(INTDIR)\semaphore.obj" \
 	"$(INTDIR)\streambuffer.obj" \
 	"$(INTDIR)\thread.obj" \
+	"$(INTDIR)\tstream.obj" \
 	"$(INTDIR)\win32prefs.obj" \
 	"$(INTDIR)\win32thread.obj"
 
@@ -298,8 +311,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : ".\httpinput.pmi"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                    ..\..\..\..\base\win32\prj\plugins
-	copy httpinput.pmi               ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                       ..\..\..\..\base\win32\prj\plugins
+	copy httpinput.pmi                  ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "httpinput - Win32 NASM Release"
@@ -319,15 +332,17 @@ ALL : ".\httpinput.pmi"
 
 CLEAN :
 	-@erase "$(INTDIR)\http.res"
-	-@erase "$(INTDIR)\httpbuffer.obj"
 	-@erase "$(INTDIR)\httpinput.obj"
 	-@erase "$(INTDIR)\log.obj"
 	-@erase "$(INTDIR)\mutex.obj"
+	-@erase "$(INTDIR)\pipeline.obj"
+	-@erase "$(INTDIR)\pmi.obj"
 	-@erase "$(INTDIR)\preferences.obj"
 	-@erase "$(INTDIR)\pullbuffer.obj"
 	-@erase "$(INTDIR)\semaphore.obj"
 	-@erase "$(INTDIR)\streambuffer.obj"
 	-@erase "$(INTDIR)\thread.obj"
+	-@erase "$(INTDIR)\tstream.obj"
 	-@erase "$(INTDIR)\vc50.idb"
 	-@erase "$(INTDIR)\win32prefs.obj"
 	-@erase "$(INTDIR)\win32thread.obj"
@@ -361,15 +376,17 @@ DEF_FILE= \
 	".\httpinput.def"
 LINK32_OBJS= \
 	"$(INTDIR)\http.res" \
-	"$(INTDIR)\httpbuffer.obj" \
 	"$(INTDIR)\httpinput.obj" \
 	"$(INTDIR)\log.obj" \
 	"$(INTDIR)\mutex.obj" \
+	"$(INTDIR)\pipeline.obj" \
+	"$(INTDIR)\pmi.obj" \
 	"$(INTDIR)\preferences.obj" \
 	"$(INTDIR)\pullbuffer.obj" \
 	"$(INTDIR)\semaphore.obj" \
 	"$(INTDIR)\streambuffer.obj" \
 	"$(INTDIR)\thread.obj" \
+	"$(INTDIR)\tstream.obj" \
 	"$(INTDIR)\win32prefs.obj" \
 	"$(INTDIR)\win32thread.obj"
 
@@ -384,8 +401,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : ".\httpinput.pmi"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                    ..\..\..\..\base\win32\prj\plugins
-	copy httpinput.pmi               ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                       ..\..\..\..\base\win32\prj\plugins
+	copy httpinput.pmi                  ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 
@@ -462,150 +479,32 @@ SOURCE=..\res\http.rc
 
 
 "$(INTDIR)\http.res" : $(SOURCE) "$(INTDIR)"
-	$(RSC) /l 0x409 /fo"$(INTDIR)\http.res" /i "\TEMP\freeamp\io\http\win32\res"\
- /d "NDEBUG" $(SOURCE)
+	$(RSC) /l 0x409 /fo"$(INTDIR)\http.res" /i\
+ "\Local\src\freeamp\io\http\win32\res" /d "NDEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "httpinput - Win32 Debug"
 
 
 "$(INTDIR)\http.res" : $(SOURCE) "$(INTDIR)"
-	$(RSC) /l 0x409 /fo"$(INTDIR)\http.res" /i "\TEMP\freeamp\io\http\win32\res"\
- /d "_DEBUG" $(SOURCE)
+	$(RSC) /l 0x409 /fo"$(INTDIR)\http.res" /i\
+ "\Local\src\freeamp\io\http\win32\res" /d "_DEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "httpinput - Win32 NASM Debug"
 
 
 "$(INTDIR)\http.res" : $(SOURCE) "$(INTDIR)"
-	$(RSC) /l 0x409 /fo"$(INTDIR)\http.res" /i "\TEMP\freeamp\io\http\win32\res"\
- /d "_DEBUG" $(SOURCE)
+	$(RSC) /l 0x409 /fo"$(INTDIR)\http.res" /i\
+ "\Local\src\freeamp\io\http\win32\res" /d "_DEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "httpinput - Win32 NASM Release"
 
 
 "$(INTDIR)\http.res" : $(SOURCE) "$(INTDIR)"
-	$(RSC) /l 0x409 /fo"$(INTDIR)\http.res" /i "\TEMP\freeamp\io\http\win32\res"\
- /d "NDEBUG" $(SOURCE)
-
-
-!ENDIF 
-
-SOURCE=..\..\httpbuffer.cpp
-
-!IF  "$(CFG)" == "httpinput - Win32 Release"
-
-DEP_CPP_HTTPB=\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\base\include\event.h"\
-	"..\..\..\..\base\include\eventdata.h"\
-	"..\..\..\..\base\include\facontext.h"\
-	"..\..\..\..\base\include\id3v1.h"\
-	"..\..\..\..\base\include\list.h"\
-	"..\..\..\..\base\include\log.h"\
-	"..\..\..\..\base\include\preferences.h"\
-	"..\..\..\..\base\include\properties.h"\
-	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\mutex.h"\
-	"..\..\..\..\base\win32\include\semaphore.h"\
-	"..\..\..\..\config\config.h"\
-	"..\..\..\include\pmi.h"\
-	"..\..\..\include\pullbuffer.h"\
-	"..\..\..\include\streambuffer.h"\
-	"..\..\httpbuffer.h"\
-	"..\..\httpinput.h"\
-	
-
-"$(INTDIR)\httpbuffer.obj" : $(SOURCE) $(DEP_CPP_HTTPB) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "httpinput - Win32 Debug"
-
-DEP_CPP_HTTPB=\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\base\include\event.h"\
-	"..\..\..\..\base\include\eventdata.h"\
-	"..\..\..\..\base\include\facontext.h"\
-	"..\..\..\..\base\include\id3v1.h"\
-	"..\..\..\..\base\include\list.h"\
-	"..\..\..\..\base\include\log.h"\
-	"..\..\..\..\base\include\preferences.h"\
-	"..\..\..\..\base\include\properties.h"\
-	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\mutex.h"\
-	"..\..\..\..\base\win32\include\semaphore.h"\
-	"..\..\..\..\config\config.h"\
-	"..\..\..\include\pmi.h"\
-	"..\..\..\include\pullbuffer.h"\
-	"..\..\..\include\streambuffer.h"\
-	"..\..\httpbuffer.h"\
-	"..\..\httpinput.h"\
-	{$(INCLUDE)}"sys\types.h"\
-	
-
-"$(INTDIR)\httpbuffer.obj" : $(SOURCE) $(DEP_CPP_HTTPB) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "httpinput - Win32 NASM Debug"
-
-DEP_CPP_HTTPB=\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\base\include\event.h"\
-	"..\..\..\..\base\include\eventdata.h"\
-	"..\..\..\..\base\include\facontext.h"\
-	"..\..\..\..\base\include\id3v1.h"\
-	"..\..\..\..\base\include\list.h"\
-	"..\..\..\..\base\include\log.h"\
-	"..\..\..\..\base\include\preferences.h"\
-	"..\..\..\..\base\include\properties.h"\
-	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\mutex.h"\
-	"..\..\..\..\base\win32\include\semaphore.h"\
-	"..\..\..\..\config\config.h"\
-	"..\..\..\include\pmi.h"\
-	"..\..\..\include\pullbuffer.h"\
-	"..\..\..\include\streambuffer.h"\
-	"..\..\httpbuffer.h"\
-	"..\..\httpinput.h"\
-	{$(INCLUDE)}"sys\types.h"\
-	
-
-"$(INTDIR)\httpbuffer.obj" : $(SOURCE) $(DEP_CPP_HTTPB) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "httpinput - Win32 NASM Release"
-
-DEP_CPP_HTTPB=\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\base\include\event.h"\
-	"..\..\..\..\base\include\eventdata.h"\
-	"..\..\..\..\base\include\facontext.h"\
-	"..\..\..\..\base\include\id3v1.h"\
-	"..\..\..\..\base\include\list.h"\
-	"..\..\..\..\base\include\log.h"\
-	"..\..\..\..\base\include\preferences.h"\
-	"..\..\..\..\base\include\properties.h"\
-	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\mutex.h"\
-	"..\..\..\..\base\win32\include\semaphore.h"\
-	"..\..\..\..\config\config.h"\
-	"..\..\..\include\pmi.h"\
-	"..\..\..\include\pullbuffer.h"\
-	"..\..\..\include\streambuffer.h"\
-	"..\..\httpbuffer.h"\
-	"..\..\httpinput.h"\
-	
-
-"$(INTDIR)\httpbuffer.obj" : $(SOURCE) $(DEP_CPP_HTTPB) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
+	$(RSC) /l 0x409 /fo"$(INTDIR)\http.res" /i\
+ "\Local\src\freeamp\io\http\win32\res" /d "NDEBUG" $(SOURCE)
 
 
 !ENDIF 
@@ -618,17 +517,20 @@ DEP_CPP_HTTPI=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\facontext.h"\
 	"..\..\..\..\base\include\id3v1.h"\
 	"..\..\..\..\base\include\list.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
+	"..\..\..\include\pipeline.h"\
 	"..\..\..\include\pmi.h"\
 	"..\..\..\include\pullbuffer.h"\
-	"..\..\..\include\streambuffer.h"\
-	"..\..\httpbuffer.h"\
+	"..\..\..\include\tstream.h"\
 	"..\..\httpinput.h"\
 	
 
@@ -643,17 +545,20 @@ DEP_CPP_HTTPI=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\facontext.h"\
 	"..\..\..\..\base\include\id3v1.h"\
 	"..\..\..\..\base\include\list.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
+	"..\..\..\include\pipeline.h"\
 	"..\..\..\include\pmi.h"\
 	"..\..\..\include\pullbuffer.h"\
-	"..\..\..\include\streambuffer.h"\
-	"..\..\httpbuffer.h"\
+	"..\..\..\include\tstream.h"\
 	"..\..\httpinput.h"\
 	
 
@@ -668,17 +573,20 @@ DEP_CPP_HTTPI=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\facontext.h"\
 	"..\..\..\..\base\include\id3v1.h"\
 	"..\..\..\..\base\include\list.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
+	"..\..\..\include\pipeline.h"\
 	"..\..\..\include\pmi.h"\
 	"..\..\..\include\pullbuffer.h"\
-	"..\..\..\include\streambuffer.h"\
-	"..\..\httpbuffer.h"\
+	"..\..\..\include\tstream.h"\
 	"..\..\httpinput.h"\
 	
 
@@ -693,17 +601,20 @@ DEP_CPP_HTTPI=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\facontext.h"\
 	"..\..\..\..\base\include\id3v1.h"\
 	"..\..\..\..\base\include\list.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
+	"..\..\..\include\pipeline.h"\
 	"..\..\..\include\pmi.h"\
 	"..\..\..\include\pullbuffer.h"\
-	"..\..\..\include\streambuffer.h"\
-	"..\..\httpbuffer.h"\
+	"..\..\..\include\tstream.h"\
 	"..\..\httpinput.h"\
 	
 
@@ -731,6 +642,246 @@ DEP_CPP_MUTEX=\
 "$(INTDIR)\mutex.obj" : $(SOURCE) $(DEP_CPP_MUTEX) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+SOURCE=..\..\..\src\pipeline.cpp
+
+!IF  "$(CFG)" == "httpinput - Win32 Release"
+
+DEP_CPP_PIPEL=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\id3v1.h"\
+	"..\..\..\..\base\include\list.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\queue.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\include\eventbuffer.h"\
+	"..\..\..\include\pipeline.h"\
+	"..\..\..\include\pmi.h"\
+	"..\..\..\include\pmo.h"\
+	"..\..\..\include\pmoevent.h"\
+	"..\..\..\include\pullbuffer.h"\
+	
+NODEP_CPP_PIPEL=\
+	"..\..\..\include\lmc.h"\
+	
+
+"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "httpinput - Win32 Debug"
+
+DEP_CPP_PIPEL=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\id3v1.h"\
+	"..\..\..\..\base\include\list.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\queue.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\..\lmc\include\lmc.h"\
+	"..\..\..\include\eventbuffer.h"\
+	"..\..\..\include\pipeline.h"\
+	"..\..\..\include\pmi.h"\
+	"..\..\..\include\pmo.h"\
+	"..\..\..\include\pmoevent.h"\
+	"..\..\..\include\pullbuffer.h"\
+	
+
+"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "httpinput - Win32 NASM Debug"
+
+DEP_CPP_PIPEL=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\id3v1.h"\
+	"..\..\..\..\base\include\list.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\queue.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\..\lmc\include\lmc.h"\
+	"..\..\..\include\eventbuffer.h"\
+	"..\..\..\include\pipeline.h"\
+	"..\..\..\include\pmi.h"\
+	"..\..\..\include\pmo.h"\
+	"..\..\..\include\pmoevent.h"\
+	"..\..\..\include\pullbuffer.h"\
+	
+
+"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "httpinput - Win32 NASM Release"
+
+DEP_CPP_PIPEL=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\id3v1.h"\
+	"..\..\..\..\base\include\list.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\queue.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\include\eventbuffer.h"\
+	"..\..\..\include\pipeline.h"\
+	"..\..\..\include\pmi.h"\
+	"..\..\..\include\pmo.h"\
+	"..\..\..\include\pmoevent.h"\
+	"..\..\..\include\pullbuffer.h"\
+	
+NODEP_CPP_PIPEL=\
+	"..\..\..\include\lmc.h"\
+	
+
+"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
+SOURCE=..\..\..\src\pmi.cpp
+
+!IF  "$(CFG)" == "httpinput - Win32 Release"
+
+DEP_CPP_PMI_C=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\id3v1.h"\
+	"..\..\..\..\base\include\list.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\include\pipeline.h"\
+	"..\..\..\include\pmi.h"\
+	"..\..\..\include\pullbuffer.h"\
+	
+
+"$(INTDIR)\pmi.obj" : $(SOURCE) $(DEP_CPP_PMI_C) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "httpinput - Win32 Debug"
+
+DEP_CPP_PMI_C=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\id3v1.h"\
+	"..\..\..\..\base\include\list.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\include\pipeline.h"\
+	"..\..\..\include\pmi.h"\
+	"..\..\..\include\pullbuffer.h"\
+	
+
+"$(INTDIR)\pmi.obj" : $(SOURCE) $(DEP_CPP_PMI_C) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "httpinput - Win32 NASM Debug"
+
+DEP_CPP_PMI_C=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\id3v1.h"\
+	"..\..\..\..\base\include\list.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\include\pipeline.h"\
+	"..\..\..\include\pmi.h"\
+	"..\..\..\include\pullbuffer.h"\
+	
+
+"$(INTDIR)\pmi.obj" : $(SOURCE) $(DEP_CPP_PMI_C) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "httpinput - Win32 NASM Release"
+
+DEP_CPP_PMI_C=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\id3v1.h"\
+	"..\..\..\..\base\include\list.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\include\pipeline.h"\
+	"..\..\..\include\pmi.h"\
+	"..\..\..\include\pullbuffer.h"\
+	
+
+"$(INTDIR)\pmi.obj" : $(SOURCE) $(DEP_CPP_PMI_C) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\..\..\..\base\src\preferences.cpp
 
@@ -884,6 +1035,7 @@ DEP_CPP_STREA=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\include\pullbuffer.h"\
 	"..\..\..\include\streambuffer.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\streambuffer.obj" : $(SOURCE) $(DEP_CPP_STREA) "$(INTDIR)"\
@@ -900,7 +1052,6 @@ DEP_CPP_STREA=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\include\pullbuffer.h"\
 	"..\..\..\include\streambuffer.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\streambuffer.obj" : $(SOURCE) $(DEP_CPP_STREA) "$(INTDIR)"\
@@ -917,7 +1068,6 @@ DEP_CPP_STREA=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\include\pullbuffer.h"\
 	"..\..\..\include\streambuffer.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\streambuffer.obj" : $(SOURCE) $(DEP_CPP_STREA) "$(INTDIR)"\
@@ -934,6 +1084,7 @@ DEP_CPP_STREA=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\include\pullbuffer.h"\
 	"..\..\..\include\streambuffer.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\streambuffer.obj" : $(SOURCE) $(DEP_CPP_STREA) "$(INTDIR)"\
@@ -952,6 +1103,10 @@ DEP_CPP_THREA=\
 	"..\..\..\..\base\win32\include\win32thread.h"\
 	"..\..\..\..\config\config.h"\
 	
+NODEP_CPP_THREA=\
+	"..\..\..\..\base\src\linuxthread.h"\
+	"..\..\..\..\base\src\solaristhread.h"\
+	
 
 "$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"\
  "..\..\..\..\config\config.h"
@@ -964,10 +1119,6 @@ DEP_CPP_THREA=\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\win32thread.h"\
 	"..\..\..\..\config\config.h"\
-	
-NODEP_CPP_THREA=\
-	"..\..\..\..\base\src\linuxthread.h"\
-	"..\..\..\..\base\src\solaristhread.h"\
 	
 
 "$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"\
@@ -982,10 +1133,6 @@ DEP_CPP_THREA=\
 	"..\..\..\..\base\win32\include\win32thread.h"\
 	"..\..\..\..\config\config.h"\
 	
-NODEP_CPP_THREA=\
-	"..\..\..\..\base\src\linuxthread.h"\
-	"..\..\..\..\base\src\solaristhread.h"\
-	
 
 "$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"\
  "..\..\..\..\config\config.h"
@@ -999,8 +1146,100 @@ DEP_CPP_THREA=\
 	"..\..\..\..\base\win32\include\win32thread.h"\
 	"..\..\..\..\config\config.h"\
 	
+NODEP_CPP_THREA=\
+	"..\..\..\..\base\src\linuxthread.h"\
+	"..\..\..\..\base\src\solaristhread.h"\
+	
 
 "$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
+SOURCE=..\..\..\src\tstream.cpp
+
+!IF  "$(CFG)" == "httpinput - Win32 Release"
+
+DEP_CPP_TSTRE=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\id3v1.h"\
+	"..\..\..\..\base\include\list.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\include\tstream.h"\
+	
+
+"$(INTDIR)\tstream.obj" : $(SOURCE) $(DEP_CPP_TSTRE) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "httpinput - Win32 Debug"
+
+DEP_CPP_TSTRE=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\id3v1.h"\
+	"..\..\..\..\base\include\list.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\include\tstream.h"\
+	
+
+"$(INTDIR)\tstream.obj" : $(SOURCE) $(DEP_CPP_TSTRE) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "httpinput - Win32 NASM Debug"
+
+DEP_CPP_TSTRE=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\id3v1.h"\
+	"..\..\..\..\base\include\list.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\include\tstream.h"\
+	
+
+"$(INTDIR)\tstream.obj" : $(SOURCE) $(DEP_CPP_TSTRE) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "httpinput - Win32 NASM Release"
+
+DEP_CPP_TSTRE=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\id3v1.h"\
+	"..\..\..\..\base\include\list.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\include\tstream.h"\
+	
+
+"$(INTDIR)\tstream.obj" : $(SOURCE) $(DEP_CPP_TSTRE) "$(INTDIR)"\
  "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 

@@ -351,7 +351,7 @@ void ObsInput::WorkerThread(void)
 
       iStructSize = sizeof(struct sockaddr_in);
       iRead = recvfrom(m_hHandle, (char *)pTemp, iMAX_PACKET_SIZE, 0,
-                       (struct sockaddr *)m_pSin, (socklen_t *)&iStructSize);
+                       (struct sockaddr *)m_pSin, (int32 *)&iStructSize);
       if (iRead <= 0)
       {
          m_pOutputBuffer->SetEndOfStream(true);

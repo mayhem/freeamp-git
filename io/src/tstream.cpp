@@ -83,7 +83,7 @@ TitleStreamServer::~TitleStreamServer()
 Error TitleStreamServer::Init(int &iPort)
 {
    struct sockaddr_in sin;
-   socklen_t sinlen = sizeof(struct sockaddr_in);
+   uint32 sinlen = sizeof(struct sockaddr_in);
    int       port, startport = 10000;
    char      szSourceAddr[100];
    bool      bUseAltNIC;
@@ -261,7 +261,7 @@ void TitleStreamServer::WorkerThread(void)
       {
           iStructSize = sizeof(struct sockaddr_in);
           iRet = recvfrom(m_hHandle, buf, 255, 0, (struct sockaddr *)m_pSin, 
-                          (socklen_t *)&iStructSize);
+                          (int32 *)&iStructSize);
       }
       else
           iRet = recv(m_hHandle, buf, 255, 0);

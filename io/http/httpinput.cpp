@@ -297,7 +297,7 @@ Error GetHostByName(char *szHostName, struct hostent *pResult)
         if((IP_Adr = inet_addr(szHostName)) < 0) 
             return kError_NoDataAvail;
 
-        TempHostent.h_length = sizeof(uint32_t);
+        TempHostent.h_length = sizeof(uint32);
         TempHostent.h_addrtype = AF_INET;
         TempHostent.h_addr_list = (char **) &AdrPtrs;
         pTemp = &TempHostent;
