@@ -1,4 +1,7 @@
 #!/bin/sh -e
+#
+# $Id$
+#
 
 prefix=/usr/local
 
@@ -37,7 +40,7 @@ for file in plugins/*.*; do
 	    ;;
     esac
     if [ "$enable" = t ]; then
-        echo "install -c -o root -m 755 $file $plugdir"
-        install -c -o root -m 755 "$file" "$plugdir"
+        echo "install -c -o root -m 644 $file $plugdir"
+        install -c -o root -m 644 "$file" "$plugdir"
     fi
 done
