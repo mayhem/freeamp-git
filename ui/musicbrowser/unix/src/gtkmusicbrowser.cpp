@@ -689,12 +689,13 @@ void GTKMusicBrowser::UpdateCatalog(void)
 
     vector<PlaylistItem *>::const_iterator l = unsorted->begin();
     for (; l != unsorted->end(); l++) {
-        item_new2 = gtk_tree_item_new_with_label((char *)(*l)->URL().c_str());
+        MetaData mdata = (*l)->GetMetaData();
+        item_new2 = gtk_tree_item_new_with_label((char *)mdata.Title().c_str());
         gtk_object_set_user_data(GTK_OBJECT(item_new2), *l);
         gtk_object_set_data(GTK_OBJECT(item_new2), "type", (gpointer)4);
         gtk_tree_append(GTK_TREE(item_subtree2), item_new2);
         gtk_widget_show(item_new2);
-        item_new2 = gtk_tree_item_new_with_label((char *)(*l)->URL().c_str());
+        item_new2 = gtk_tree_item_new_with_label((char *)mdata.Title().c_str());
         gtk_object_set_user_data(GTK_OBJECT(item_new2), *l);
         gtk_object_set_data(GTK_OBJECT(item_new2), "type", (gpointer)4);
         gtk_tree_append(GTK_TREE(all_subtree), item_new2);

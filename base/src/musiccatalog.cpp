@@ -196,7 +196,7 @@ Error MusicCatalog::RemoveSong(const char *url)
 
     dbase->Remove(url);
 
-    if (meta->Artist().size() == 0) {
+    if ((meta->Artist().size() == 0) || (meta->Artist() == " ")) {
         vector<PlaylistItem *>::iterator i = m_unsorted->begin();
         for (; i != m_unsorted->end(); i++)
             if (url == (*i)->URL())
@@ -278,7 +278,7 @@ Error MusicCatalog::AddSong(const char *url)
     else
         newtrack = new PlaylistItem(url, meta);
 
-    if (meta->Artist().size() == 0) {
+    if ((meta->Artist().size() == 0) || (meta->Artist() == " ")) {
         m_unsorted->push_back(newtrack);
     }
     else {
@@ -661,6 +661,7 @@ void MusicBrowser::WriteMetaDataToDatabase(const char *url,
     ost << metadata.Track();
     ost << metadata.Time();
     ost << metadata.Size();
+    ost << '\0';
 
 #ifdef WIN32
     m_database->Insert(url, (char *)ost.str().c_str());
@@ -692,7 +693,14 @@ MetaData *MusicBrowser::ReadMetaDataFromDatabase(const char *url)
         uint32 temp;
 
         sscanf(value + offset, " %d %n", &fieldLength[i], &temp);
-        offset += temp;
+
+        if (i == numFields - 1) {
+            char intholder[10];
+            sprintf(intholder, "%d", fieldLength[i]);
+            offset += strlen(intholder) + 1;
+        }
+        else
+            offset += temp;
     }
 
     string data = value;
@@ -702,6 +710,9 @@ MetaData *MusicBrowser::ReadMetaDataFromDatabase(const char *url)
 
     for(uint32 j = 0; j < numFields; j++)
     {
+        if (fieldLength[j] == 0) 
+            continue;
+
         switch(j)
         {
             case 0:
