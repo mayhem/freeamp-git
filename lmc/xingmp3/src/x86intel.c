@@ -291,5 +291,3 @@ LastInRange:
   }
 }
 
-_TEXT	ends
-	end
