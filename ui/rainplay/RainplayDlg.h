@@ -10,6 +10,7 @@
 
 #include "Bmpsize.h"
 #include "PlayListDlg.h"
+#include "PreferencesDlg.h"
 #include "EQDlg.h"
 #include "AboutDlg.h"
 #include "VisualView.h"
@@ -51,6 +52,8 @@
 #define	WM_RP_MENU_SCOPEMODE	0				+WM_RAINPLAY_MENU_MESSAGE
 //WPARAM=0				LPARAM=fps(50,25,12)
 #define	WM_RP_MENU_FPS			1				+WM_RAINPLAY_MENU_MESSAGE
+//WPARAM=0				LPARAM=enum ANALYZERMODE
+#define	WM_RP_MENU_ANALYZERMODE	2				+WM_RAINPLAY_MENU_MESSAGE
 
 //Notify from UI to Dlg
 #define	WM_RAINPLAY_NOTIFY_MESSAGE			WM_USER + 200
@@ -79,13 +82,6 @@ public:
 		CFont *font3;			//Small
 	} UIFONT, *LPUIFONT;
 
-	typedef enum _tagVisMode {
-		flip,
-		oscilliscope,
-		spectrum,
-		disable
-	} VISMODE;
-
 	typedef struct _tagDispInfo {
 		CString szBitrate;
 		CString	szSamplerate;
@@ -99,13 +95,14 @@ public:
 		int currenttime;
 		unsigned int totalframe;
 		VISMODE visualmode;
+		ANALYZERMODE analyzer;
 		int fps;
 		SCOPEMODE scope;
 	} DISPINFO, *LPDISPINFO;
 	BOOL NotifyTotalTime(int seconds);
 	BOOL NotifyTime(int seconds);
 	BOOL NotifySongName(CString string);
-	BOOL NotifyMPEGInfo(int bitrate, float samplerate, unsigned int totalframe);
+	BOOL NotifyMPEGInfo(int bitrate, long samplerate, unsigned int totalframe);
 	BOOL NotifyNumSongs(int indexOfSong, int totalSongs);
 	BOOL NotifyVisDataReady(unsigned int length, unsigned char *buf);
 
@@ -167,6 +164,7 @@ protected:
 	afx_msg LRESULT	OnClickSeek(WPARAM, LPARAM);
 
 	afx_msg LRESULT	OnScopeMode(WPARAM, LPARAM);
+	afx_msg LRESULT OnChangeAnalyzerMode(WPARAM, LPARAM);
 	afx_msg LRESULT OnChangeFps(WPARAM, LPARAM);
 
 	afx_msg LRESULT OnNotifyTime(WPARAM, LPARAM);
@@ -181,6 +179,7 @@ protected:
 private:
 	CEQDlg * m_EQDlg;						//Equalizer dialog
 	CPlayListDlg * m_playlistDlg;			//Play list manager dialog
+	CPreferencesDlg * m_preferencesDlg;		//Options dialog
 	CAboutDlg * m_aboutDlg;					//About dialog
 	CVisualView * m_vis;					//Visual display
 

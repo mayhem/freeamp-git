@@ -74,7 +74,7 @@ CRainplayDlg::CRainplayDlg(CWnd* pParent /*=NULL*/)
 	m_i.szBitrate = "128";			//bitrate
 	m_i.szSamplerate = "44";		//sample rate
 	m_i.szSongname = "";			//song name string
-	m_i.szTime = "00:00:00";		//current time string
+	m_i.szTime = "00:00";		//current time string
 	m_i.indexOfSong = 0;			//index of the song which current playing
 	m_i.totalSongs = 0;				//total songs number
 	m_i.scrollOffset = 0;			//song name string scroll offset
@@ -83,6 +83,7 @@ CRainplayDlg::CRainplayDlg(CWnd* pParent /*=NULL*/)
 	m_i.totaltime = 32767;			//total time decimal in second
 	m_i.visualmode = oscilliscope;	//waveform display as default
 	m_i.fps = 25;					//25 fps visual display as default
+	m_i.analyzer = bars;			//lines spectrum;
 	m_i.scope = dot;				//dot scope default
 	ReleaseUILock();
 }
@@ -140,6 +141,7 @@ BEGIN_MESSAGE_MAP(CRainplayDlg, CDialog)
 	ON_MESSAGE( WM_RP_CONTROL_ABOUT,		OnClickAbout )
 	ON_MESSAGE( WM_RP_CONTROL_QUIT,			OnClickQuit )
 	ON_MESSAGE(	WM_RP_CONTROL_VISUALMODE,	OnClickVisualMode)
+	ON_MESSAGE( WM_RP_MENU_ANALYZERMODE,	OnChangeAnalyzerMode)
 	ON_MESSAGE(	WM_RP_CONTROL_SEEK,			OnClickSeek )
 
 	ON_MESSAGE( WM_RP_MENU_SCOPEMODE,		OnScopeMode )
@@ -173,9 +175,6 @@ BOOL CRainplayDlg::OnInitDialog()
 		m_pCMainUp->m_iWidth, m_pCMainUp->m_iHeight,
 		SWP_SHOWWINDOW);
 	CenterWindow(NULL);
-	m_pCMainUp->BmpBlt( FALSE, this, 0, 0, 
-		m_pCMainUp->m_iWidth,	m_pCMainUp->m_iHeight,
-		0,0);
 
 	CString szAppname;
 	szAppname.LoadString(IDS_APPNAME);
@@ -195,12 +194,13 @@ BOOL CRainplayDlg::OnInitDialog()
 	
 	//Init visual view control
 	ASSERT(this->m_hWnd!=NULL);
-	m_vis = new CVisualView(this,
+	m_vis = new CVisualView(this, 
+		m_i.fps, m_i.visualmode, m_i.analyzer, m_i.scope,
 		coordinatesMain[AREA_DISPLAYSPECTRUM].x,
 		coordinatesMain[AREA_DISPLAYSPECTRUM].y,
 		coordinatesMain[AREA_DISPLAYSPECTRUM].iWidth,
-		coordinatesMain[AREA_DISPLAYSPECTRUM].iHeight
-		);
+		coordinatesMain[AREA_DISPLAYSPECTRUM].iHeight,
+		m_pCMainUp);
 
 	//UI OK
 	m_bEQDlgActive = FALSE;
@@ -533,6 +533,10 @@ void CRainplayDlg::OnRButtonDown(UINT nFlags, CPoint point)
 		m_i.scope==line ? MF_CHECKED : MF_UNCHECKED);
 	cPopupMenu->CheckMenuItem(IDM_MAIN_VISMODE_SOLIDSCOPE,			//Solid scope
 		m_i.scope==solid ? MF_CHECKED : MF_UNCHECKED);
+	cPopupMenu->CheckMenuItem(IDM_MAIN_VISMODE_LINES,				//Lines spectrum
+		m_i.analyzer==lines ? MF_CHECKED : MF_UNCHECKED);
+	cPopupMenu->CheckMenuItem(IDM_MAIN_VISMODE_BARS,				//Bars spectrum
+		m_i.analyzer==bars ? MF_CHECKED : MF_UNCHECKED);
 	cPopupMenu->CheckMenuItem(IDM_MAIN_VISMODE_REFRESHRATE_50,		//50 fps
 		m_i.fps==50 ? MF_CHECKED : MF_UNCHECKED);
 	cPopupMenu->CheckMenuItem(IDM_MAIN_VISMODE_REFRESHRATE_25,		//25 fps
@@ -543,6 +547,11 @@ void CRainplayDlg::OnRButtonDown(UINT nFlags, CPoint point)
 						curPoint.x, curPoint.y,
 						this, NULL );
 	switch( bFlag )	{
+	case IDM_MAIN_PREFERENCES:		//Options dialog
+		m_preferencesDlg = new CPreferencesDlg();
+		m_preferencesDlg->DoModal();
+		delete m_preferencesDlg;
+		break;
 	case IDM_MAIN_OLDSKIN:			//Restore default skin
 		SelectOldSkin();
 		break;
@@ -610,6 +619,13 @@ void CRainplayDlg::OnRButtonDown(UINT nFlags, CPoint point)
 		break;
 	case IDM_MAIN_VISMODE_SOLIDSCOPE:
 		SendMessage(WM_RP_MENU_SCOPEMODE, 0, (LPARAM)solid);
+		break;
+
+	case IDM_MAIN_VISMODE_LINES:				//Analyzer mode
+		SendMessage(WM_RP_MENU_ANALYZERMODE, 0, (LPARAM)lines);
+		break;
+	case IDM_MAIN_VISMODE_BARS:
+		SendMessage(WM_RP_MENU_ANALYZERMODE, 0, (LPARAM)bars);
 		break;
 	default:
 		break;
@@ -710,15 +726,19 @@ BOOL CRainplayDlg::SelectSkin()
 
 			delete m_vis;
 			m_vis = new CVisualView(this,
+				m_i.fps, m_i.visualmode, m_i.analyzer, m_i.scope,
 				coordinatesMain[AREA_DISPLAYSPECTRUM].x,
 				coordinatesMain[AREA_DISPLAYSPECTRUM].y,
 				coordinatesMain[AREA_DISPLAYSPECTRUM].iWidth,
-				coordinatesMain[AREA_DISPLAYSPECTRUM].iHeight );
+				coordinatesMain[AREA_DISPLAYSPECTRUM].iHeight,
+				m_pCMainUp);
 			//Perpare UI fonts
 			if (PerpareUIFont())
 				m_uifont.bAvailable = TRUE;
 			else
 				m_uifont.bAvailable = FALSE;
+
+			NotifySongName(m_i.szSongname);
 		} else {
 			delete cTmpSkinUp;
 			delete cTmpSkinDown;
@@ -780,10 +800,12 @@ BOOL CRainplayDlg::SelectOldSkin()
 
 	delete m_vis;
 	m_vis = new CVisualView(this,
+		m_i.fps, m_i.visualmode, m_i.analyzer, m_i.scope,
 		coordinatesMain[AREA_DISPLAYSPECTRUM].x,
 		coordinatesMain[AREA_DISPLAYSPECTRUM].y,
 		coordinatesMain[AREA_DISPLAYSPECTRUM].iWidth,
-		coordinatesMain[AREA_DISPLAYSPECTRUM].iHeight );
+		coordinatesMain[AREA_DISPLAYSPECTRUM].iHeight,
+		m_pCMainUp);
 
 	//Perpare UI fonts
 	if (PerpareUIFont())
@@ -791,6 +813,7 @@ BOOL CRainplayDlg::SelectOldSkin()
 	else
 		m_uifont.bAvailable = FALSE;
 
+	NotifySongName(m_i.szSongname);
 	return TRUE;
 }
 
@@ -883,9 +906,8 @@ LRESULT CRainplayDlg::OnClickPrev(WPARAM wParam, LPARAM lParam)
 {
 	GetUILock();
 	if (m_i.szTime.Left(2)=="00" &&
-		m_i.szTime.Mid(3,2)=="00" &&
-		atoi(LPCTSTR(m_i.szTime.Right(2))) <=2) {
-		//已经播放<=2秒
+		atoi(LPCTSTR(m_i.szTime.Right(2))) <=5) {
+		//已经播放<=5秒
 		if (m_i.indexOfSong > 1) {
 			//不是song 1.
 			g_ui->m_target->AcceptEvent(new Event(CMD_PrevMediaPiece));
@@ -902,7 +924,7 @@ LRESULT CRainplayDlg::OnClickPrev(WPARAM wParam, LPARAM lParam)
 		g_ui->m_target->AcceptEvent(new Event(CMD_Play));
 	}
 
-	m_i.szTime = "00:00:00";
+	m_i.szTime = "00:00";
 	ReleaseUILock();
 
 	return TRUE;
@@ -914,10 +936,10 @@ LRESULT CRainplayDlg::OnClickNext(WPARAM wParam, LPARAM lParam)
 	GetUILock();
 	if ((m_i.indexOfSong != m_i.totalSongs)) {
 		g_ui->m_target->AcceptEvent(new Event(CMD_NextMediaPiece));
-		m_i.szTime = "00:00:00";
+		m_i.szTime = "00:00";
 	} else if (g_ui->m_plm->GetRepeat() !=REPEAT_NOT ) {
 		g_ui->m_target->AcceptEvent(new Event(CMD_NextMediaPiece));
-		m_i.szTime = "00:00:00";
+		m_i.szTime = "00:00";
 	}
 	ReleaseUILock();
 	return TRUE;
@@ -995,13 +1017,27 @@ LRESULT CRainplayDlg::OnClickVisualMode(WPARAM wParam, LPARAM lParam)
 		return TRUE;
 	switch((VISMODE)lParam) {
 	case flip:						//User click area spectrum to filp the display mode
-		m_vis->IsStart() ? m_vis->Stop() : m_vis->Start();
+		switch(m_i.visualmode) {
+		case disable:
+			m_i.visualmode = oscilliscope;
+			m_vis->Start();
+			break;
+		case oscilliscope:
+			m_i.visualmode = spectrum;
+			break;
+		case spectrum:
+			m_i.visualmode = disable;
+			m_vis->Stop();
+			InvalidateRect(AREA_RECT(AREA_DISPLAYSPECTRUM), FALSE);
+			break;
+		}
 		break;
 	case oscilliscope:				//Waveform display
 		m_vis->Start();
 		m_i.visualmode = oscilliscope;
 		break;
 	case spectrum:					//Spectrum display
+		m_vis->Start();
 		m_i.visualmode = spectrum;
 		break;
 	case disable:					//display visual display
@@ -1012,6 +1048,7 @@ LRESULT CRainplayDlg::OnClickVisualMode(WPARAM wParam, LPARAM lParam)
 	default:
 		break;
 	}
+	m_vis->SetVisualMode(m_i.visualmode);
 	return TRUE;
 }
 
@@ -1036,10 +1073,22 @@ LRESULT CRainplayDlg::OnScopeMode(WPARAM wParam, LPARAM lParam)
 }
 
 
+LRESULT CRainplayDlg::OnChangeAnalyzerMode(WPARAM wParam, LPARAM lParam)
+{
+	GetUILock();
+	m_i.analyzer = (ANALYZERMODE)lParam;
+	m_vis->SetAnalyzerMode(m_i.analyzer);
+	ReleaseUILock();
+	return TRUE;
+}
+
+
+
 LRESULT CRainplayDlg::OnChangeFps(WPARAM wParam, LPARAM lParam)
 {
 	GetUILock();
 	m_i.fps = (int)lParam;
+	m_vis->SetFps(m_i.fps);
 	ReleaseUILock();
 	return TRUE;
 }
@@ -1067,7 +1116,7 @@ LRESULT CRainplayDlg::OnNotifySongName(WPARAM wParam, LPARAM lParam)
 	TransParentDisplay(
 		coordinatesMain[AREA_DISPLAYBAR].x,
 		coordinatesMain[AREA_DISPLAYBAR].y,
-		coordinatesMain[AREA_DISPLAYBAR].iWidth - 10,
+		coordinatesMain[AREA_DISPLAYBAR].iWidth,
 		coordinatesMain[AREA_DISPLAYBAR].iHeight,
 		m_i.scrollOffset,
 		m_uifont.font1, m_i.szSongname, rgbDisplayColur );
@@ -1128,7 +1177,7 @@ void CRainplayDlg::OnTimer(UINT nIDEvent)
 	case TIMER_SONGNAME_SCROLL:
 		GetUILock();
 		if( increment > 0 &&
-			m_i.length - m_i.scrollOffset + 8< AREAWIDTH)
+			m_i.length - m_i.scrollOffset + 3< AREAWIDTH)
 		{
 			increment = -1;
 		}
@@ -1184,24 +1233,24 @@ BOOL CRainplayDlg::PerpareUIFont()
 	if (!EnumUIFont(&dc, &m_uifont.logfont, szFontName))
 		return FALSE;
 
-#define	DISPLAYAREAWIDTH	coordinatesMain[AREA_DISPLAYBAR].iWidth
-
 	//Large
-	m_uifont.logfont.lfHeight = (long)(DISPLAYAREAWIDTH / 25 * 1.5);
-	m_uifont.logfont.lfWidth =  (long)(DISPLAYAREAWIDTH / 25);
+	m_uifont.logfont.lfHeight = (long)(coordinatesMain[AREA_DISPLAYBAR].iHeight);
+	m_uifont.logfont.lfWidth =  0;
+	m_uifont.logfont.lfWeight = FW_BOLD;
 	m_uifont.font1->CreateFontIndirect(&m_uifont.logfont);
 
 	//Medium
-	m_uifont.logfont.lfHeight = (long)(DISPLAYAREAWIDTH / 30 * 1.5);
-	m_uifont.logfont.lfWidth = (long)(DISPLAYAREAWIDTH / 30);
+	m_uifont.logfont.lfHeight = (long)(coordinatesMain[AREA_DISPLAYTIME].iHeight);
+	m_uifont.logfont.lfWidth = 0;
+	m_uifont.logfont.lfWeight = FW_BOLD;
 	m_uifont.font2->CreateFontIndirect(&m_uifont.logfont);
 
 	//Small
-	m_uifont.logfont.lfHeight = (long)(DISPLAYAREAWIDTH / 35 * 1.5);
-	m_uifont.logfont.lfWidth = (long)(DISPLAYAREAWIDTH / 35);
+	m_uifont.logfont.lfHeight = (long)(coordinatesMain[AREA_DISPLAYBITRATE].iHeight);
+	m_uifont.logfont.lfWidth = 0;
+	m_uifont.logfont.lfWeight = FW_NORMAL;
 	m_uifont.font3->CreateFontIndirect(&m_uifont.logfont);
 
-#undef	DISPLAYAREAWIDTH
 	return TRUE;
 }
 
@@ -1273,18 +1322,13 @@ BOOL CRainplayDlg::SongNameNeedToScroll(void)
 {
 	CFont *oldfont;
 	CClientDC dc(this);
-	CRect rect(0, 0, 0, 0);
 #define	AREAWIDTH	(UINT)coordinatesMain[AREA_DISPLAYBAR].iWidth
 
 	if (m_uifont.bAvailable && !m_i.szSongname.IsEmpty()) {
 		oldfont = dc.SelectObject(m_uifont.font1);
-		dc.DrawText(m_i.szSongname, LPRECT(rect),
-						DT_LEFT |
-						DT_VCENTER |
-						DT_SINGLELINE |
-						DT_CALCRECT );
+		CSize size = dc.GetTextExtent(LPCTSTR(m_i.szSongname));
 		dc.SelectObject(oldfont);
-		m_i.length = rect.Width();
+		m_i.length = size.cx;
 		return m_i.length>(AREAWIDTH) ? TRUE : FALSE;
 	} else
 		return FALSE;
@@ -1307,21 +1351,21 @@ BOOL CRainplayDlg::NotifyTime(int seconds)
 	int iMin = (seconds-iHour*3600) / 60;
 	int iSec = seconds - iHour*3600 - iMin*60;
 
-	CString szTemp = "00:00:00";
-	szTemp.Format("%02d:%02d:%02d",iHour, iMin,iSec);
+	CString szTemp = "00:00";
+	szTemp.Format("%02d:%02d", iMin,iSec);
 	GetUILock();
 	if (szTemp!=m_i.szTime) {
 		m_i.szTime = szTemp;
 		m_i.currenttime = seconds;
+		ReleaseUILock();
+		if (m_bInitUIOk)
+			SendMessage(WM_RP_NOTIFY_TIME, 0,0);
+		return TRUE;
 	}
 	else {
 		ReleaseUILock();
 		return FALSE;
 	}
-	ReleaseUILock();
-	if (m_bInitUIOk)
-		SendMessage(WM_RP_NOTIFY_TIME, 0,0);
-	return TRUE;
 }
 
 
@@ -1367,18 +1411,20 @@ BOOL CRainplayDlg::NotifySongName(CString string)
 }
 
 
-BOOL CRainplayDlg::NotifyMPEGInfo(int bitrate, float samplerate, unsigned int totalframe)
+BOOL CRainplayDlg::NotifyMPEGInfo(int bitrate, long samplerate, unsigned int totalframe)
 {
 	CString szTemp = "128";
 	szTemp.Format("%03d",bitrate);
 	GetUILock();
 	m_i.totalframe = totalframe;
 	m_i.szBitrate = szTemp;
-	szTemp.Format("%02d",(int)samplerate);
+	szTemp.Format("%02d",samplerate/1000);
 	m_i.szSamplerate = szTemp;
 	ReleaseUILock();
-	if (m_bInitUIOk)
+	if (m_bInitUIOk) {
 		SendMessage(WM_RP_NOTIFY_MPEGINFO, 0,0);
+		m_vis->SetSampleRate(samplerate);
+	}
 	return TRUE;
 }
 

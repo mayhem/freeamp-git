@@ -43,11 +43,11 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /Yu"stdafx.h" /FD /c
-# ADD CPP /nologo /G6 /MT /W3 /GX /O2 /Op /Ob2 /I "..\..\config" /I "..\include" /I "..\..\base\include" /I "..\..\base\win32\include" /I "..\..\lmc\include" /I "..\..\io\include" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "_WINDLL" /YX /FD /c
+# ADD CPP /nologo /G6 /MT /W3 /GX /O2 /Op /Ob2 /I "." /I ".\Equalizer" /I ".\PlayList" /I ".\VisualView" /I ".\VisualView\Fft" /I ".\Preferences" /I "..\..\base\win32\include" /I "..\..\lmc\include" /I "..\..\io\include" /I "..\..\config" /I "..\include" /I "..\..\base\include" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "_WINDLL" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x804 /d "NDEBUG" /d "_AFXDLL"
-# ADD RSC /l 0x804 /d "NDEBUG"
+# ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -57,7 +57,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\base\win32\prj\plugins mkdir\
-                  ..\..\base\win32\prj\plugins	copy rainplay.ui     ..\..\base\win32\prj\plugins
+                   ..\..\base\win32\prj\plugins	copy rainplay.ui     ..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "Rainplay - Win32 Debug"
@@ -74,11 +74,11 @@ PostBuild_Cmds=IF NOT EXIST ..\..\base\win32\prj\plugins mkdir\
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MDd /W3 /GX /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /Yu"stdafx.h" /FD /ZI /GZ /c
-# ADD CPP /nologo /G6 /MDd /W3 /GX /Zi /Od /I "..\..\base\win32\include" /I "..\..\lmc\include" /I "..\..\io\include" /I "..\..\config" /I "..\include" /I "..\..\base\include" /D "_DEBUG" /D "_AFXDLL" /D "WIN32" /D "_WINDOWS" /D "_WINDLL" /D "_MBCS" /D "_USRDLL" /FD /ZI /c
+# ADD CPP /nologo /G6 /MDd /W3 /Gm /Gi /GR /GX /Zi /Od /I "." /I ".\Equalizer" /I ".\PlayList" /I ".\VisualView" /I ".\VisualView\Fft" /I ".\Preferences" /I "..\..\base\win32\include" /I "..\..\lmc\include" /I "..\..\io\include" /I "..\..\config" /I "..\include" /I "..\..\base\include" /D "_DEBUG" /D "_AFXDLL" /D "WIN32" /D "_WINDOWS" /D "_WINDLL" /D "_MBCS" /D "_USRDLL" /YX /FD /ZI /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x804 /d "_DEBUG" /d "_AFXDLL"
-# ADD RSC /l 0x804 /d "_DEBUG" /d "_AFXDLL"
+# ADD RSC /l 0x409 /d "_DEBUG" /d "_AFXDLL"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -88,7 +88,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\base\win32\prj\plugins mkdir\
-                  ..\..\base\win32\prj\plugins	copy rainplay.ui     ..\..\base\win32\prj\plugins
+                   ..\..\base\win32\prj\plugins	copy rainplay.ui     ..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
@@ -118,19 +118,11 @@ SOURCE=.\EnumFonts.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\EQDlg.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\base\win32\src\mutex.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\base\src\playlist.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\PlayListDlg.cpp
 # End Source File
 # Begin Source File
 
@@ -174,10 +166,6 @@ SOURCE=..\..\base\src\thread.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\VisualView.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\base\win32\src\win32thread.cpp
 # End Source File
 # End Group
@@ -202,15 +190,7 @@ SOURCE=.\cthread.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\EQDlg.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\MainFaceDescribe.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\PlayListDlg.h
 # End Source File
 # Begin Source File
 
@@ -231,10 +211,6 @@ SOURCE=.\Resource.h
 # Begin Source File
 
 SOURCE=.\StdAfx.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\VisualView.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"
@@ -263,6 +239,83 @@ SOURCE=.\res\Rainplay.ico
 # Begin Source File
 
 SOURCE=.\res\Rainplay.rc2
+# End Source File
+# End Group
+# Begin Group "Equalizer"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\Equalizer\EQDlg.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\Equalizer\EQDlg.h
+# End Source File
+# End Group
+# Begin Group "PlayList"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\PlayList\PlayListDlg.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\PlayList\PlayListDlg.h
+# End Source File
+# End Group
+# Begin Group "VisualView"
+
+# PROP Default_Filter ""
+# Begin Group "FFT"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\VisualView\Fft\Complex.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\VisualView\Fft\Fft.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\VisualView\Fft\Fft.h
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=.\VisualView\VisualView.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\VisualView\VisualView.h
+# End Source File
+# End Group
+# Begin Group "Preferences"
+
+# PROP Default_Filter ""
+# Begin Group "Setup"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\Preferences\optionsetupdlg.cpp
+# ADD CPP /I ".."
+# End Source File
+# Begin Source File
+
+SOURCE=.\Preferences\optionsetupdlg.h
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=.\Preferences\PreferencesDlg.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\Preferences\PreferencesDlg.h
 # End Source File
 # End Group
 # Begin Source File

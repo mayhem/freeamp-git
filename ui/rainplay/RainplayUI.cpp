@@ -10,6 +10,8 @@
 
 CRainplayUI *g_ui;
 
+extern BOOL ReadPlaylistFromFile(CString szFile, PlayListManager *plm);
+
 extern "C" CRainplayUI *Initialize()
 {
 	//AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -84,7 +86,7 @@ AcceptEvent(Event* event)
 				{
 					MpegInfoEvent *info = (MpegInfoEvent *)event;
 					int32 bitrate = info->GetBitRate()/1000;
-					float sample = (float)info->GetSampleRate()/1000;
+					unsigned short sample = (unsigned short)(info->GetSampleRate());
 					m_Dlg->NotifyMPEGInfo(bitrate,sample,info->GetTotalFrames());
 				}
 				break;
@@ -96,7 +98,7 @@ AcceptEvent(Event* event)
 					if (info->GetId3Tag().m_containsInfo) {
 						szTemp = info->GetId3Tag().m_artist;
 						szTemp.TrimRight();
-						szTemp += "-";
+						szTemp += " - ";
 						szTemp += info->GetId3Tag().m_songName;
 						szTemp.TrimRight();
 					} else
@@ -188,7 +190,12 @@ SetArgs(int32 argc, char** argv)
         }
         else 
         {
-            m_plm->Add(arg,0);
+			CString szTemp = arg;
+			if (szTemp.Right(3)=="M3U" ||
+				szTemp.Right(3)=="m3u" ) {
+				ReadPlaylistFromFile(szTemp, m_plm);
+			} else
+				m_plm->Add(arg,0);
             count++;
 	    }
     }

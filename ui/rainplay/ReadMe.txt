@@ -1,7 +1,25 @@
-Jan/17/1999
 elrod@gold.liquidmetal.com,jdw@freeamp.org
 freeamp-dev@freeamp.org
-Dear Elrod,Jason:
+Jan/29/1999
+Dear Elrod,Jason and other floks:
+Here I attached the lasted version of rainplay update.
+Please update this to freeamp-snap.*.
+Rainplay current supporting:
+[new]:
+1. spectrum display(512 points real-time FFT)
+2. freferences\options dialog
+3. register file type
+4. user can select startup freeamp's ui.
+5. eq enable(log method)
+6. user can select lines/dots/solid/bars visual display method
+[TODO]:
+1. user can select fps
+2. calibrate fft frequence
+3. log method spectrum levels
+4. fft based on MMX tech.
+
+Jan/17/1999
+Dear Elrod,Jason and other floks:
 Here I attached the lasted version of rainplay update.
 Please update this to freeamp-snap.*.
 
@@ -24,8 +42,8 @@ lmc\xingmp3\src\xinglmc.cpp
 [TODO]
 1.add volume change function
 2.spectrum
-3.CVisualView should has it's own buffer. That means
-once the PCM being copy into the CVisualView, the SendVisBufEvent
+3.CVisualView should has it's own buffer to keep the PCM data. That
+means once the PCM being copy into the CVisualView, the SendVisBufEvent
 should be delete at once(reduce the load of Event queue), then
 another thread render the waveform display sync with the xinglmc's
 work.

@@ -3,6 +3,7 @@
 // Used by Rainplay.rc
 //
 #define IDS_APPNAME                     1
+#define IDAPPLY                         3
 #define IDD_RAINPLAY                    102
 #define IDR_MAINFRAME                   128
 #define IDB_MAINUP                      129
@@ -13,11 +14,27 @@
 #define IDB_MAINABOUT                   140
 #define IDD_ABOUT                       141
 #define IDD_EQ                          142
+#define IDD_PREFERENCES                 144
+#define IDD_OPTION_SETUP                145
+#define IDD_OPTION_OPTIONS              146
+#define IDD_OPTION_VISUALIZATION        147
+#define IDD_OPTION_PLUGINS              148
 #define IDC_PLAYLIST                    1004
 #define IDC_SPIN1                       1005
 #define ID_ADD                          1006
 #define ID_REMOVE                       1007
 #define IDC_ENABLEEQ                    1008
+#define IDC_OPTIONS                     1010
+#define IDC_REGISTER_FILES              1012
+#define IDC_SEL_UI                      1013
+#define IDC_RADIO1                      1014
+#define IDC_RADIO2                      1015
+#define IDC_RADIO3                      1016
+#define IDC_SLIDER1                     1017
+#define IDC_SLIDER2                     1018
+#define IDC_SLIDER3                     1019
+#define IDC_CHECK2                      1020
+#define IDC_RADIO4                      1021
 #define IDC_EQ1                         1027
 #define IDC_EQ2                         1028
 #define IDC_EQ3                         1029
@@ -52,23 +69,24 @@
 #define IDM_MAIN_VISMODE_WAVEFORM       32798
 #define IDM_MAIN_VISMODE_SPEC           32799
 #define IDM_MAIN_VISMODE_DISABLE        32800
-#define IDM_MAIN_REFRESHRATE_50         32801
 #define IDM_MAIN_VISMODE_REFRESHRATE_50 32801
-#define IDM_MAIN_REFRESHRATE_25         32802
 #define IDM_MAIN_VISMODE_REFRESHRATE_25 32802
-#define IDM_MAIN_REFRESHRATE_12         32803
 #define IDM_MAIN_VISMODE_REFRESHRATE_12 32803
 #define IDM_MAIN_VISMODE_DOTSCOPE       32807
 #define IDM_MAIN_VISMODE_LINESCOPE      32809
 #define IDM_MAIN_VISMODE_SOLIDSCOPE     32810
+#define IDM_MAIN_VISMODE_LINES          32812
+#define IDM_MAIN_VISMODE_BARS           32813
+#define IDM_MAIN_VISMODE_PEAKS          32814
+#define IDM_MAIN_PREFERENCES            32815
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        143
-#define _APS_NEXT_COMMAND_VALUE         32811
-#define _APS_NEXT_CONTROL_VALUE         1010
+#define _APS_NEXT_RESOURCE_VALUE        146
+#define _APS_NEXT_COMMAND_VALUE         32816
+#define _APS_NEXT_CONTROL_VALUE         1024
 #define _APS_NEXT_SYMED_VALUE           103
 #endif
 #endif

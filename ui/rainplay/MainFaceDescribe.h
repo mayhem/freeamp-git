@@ -70,14 +70,14 @@ COORDINATES coordinatesMain[MAX_AREA] = {
 	TRUE,	"Playlist",			70, 38, 9, 9,			//Playlist
 	TRUE,	"Shuffle",			70, 16, 9, 9,			//Shuffle
 	TRUE,	"Repeat",			70, 27, 9, 9,			//Repeat
-	FALSE,	"DisplayBar",		81, 49, 159, 14,		//DisplayBar
+	FALSE,	"DisplayBar",		81, 49, 149, 14,		//DisplayBar
 	FALSE,	"DisplayTime",		240, 45, 50, 20,		//DisplayTime
 	FALSE,	"DisplayBitrate",	245, 10, 18, 12,		//DisplayBitrate
 	FALSE,	"DisplayKhz",		250, 21, 18, 12,		//DisplayKhz
 	FALSE,	"DisplayRepeat",	82, 23, 38, 13,			//DisplayRepeat
 	FALSE,	"DisplayShuffle",	82, 12, 38, 10,			//DisplayShuffle
 	FALSE,	"DisplayStereo",	0, 0, 0, 0,				//DisplayStereo
-	TRUE,	"DisplaySpectrum",	121, 12, 115, 22,		//DisplaySpectrum
+	TRUE,	"DisplaySpectrum",	120, 11, 120, 24,		//DisplaySpectrum
 	TRUE,	"SeekBar",			82, 36, 200, 8,			//SeekBar
 	TRUE,	"Equalizer",		8, 55, 12, 12			//Equalizer
 };
@@ -104,7 +104,7 @@ RECT	oldSkinCoord[MAX_AREA] = {
 	82, 23, 38, 13,			//DisplayRepeat
 	82, 12, 38, 10,			//DisplayShuffle
 	0, 0, 0, 0,				//DisplayStereo
-	121, 12, 115, 22,		//DisplaySpectrum
+	120, 11, 120, 24,		//DisplaySpectrum
 	82, 36, 200, 8,			//SeekBar
 	8, 55, 12, 12			//Equalizer
 };
