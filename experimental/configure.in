@@ -21,8 +21,6 @@ dnl Process this file with your mom to produce a configure script
 AC_INIT(base/src/player.cpp)
 AC_CONFIG_AUX_DIR(config)
 AC_CANONICAL_HOST
-#AM_INIT_AUTOMAKE(freeamp, 1.2.1)
-#AM_CONFIG_HEADER(config/config.h)
 
 AC_DEFINE_UNQUOTED(FREEAMP_VERSION, "1.2.1")
 
@@ -210,10 +208,8 @@ dnl probably Sun CC.
     
 esac  
 
-AC_DEFINE_UNQUOTED(AC_HOST_OS, "${host_os}")
-AC_DEFINE_UNQUOTED(AC_HOST_CPU, "${host_cpu}")
-dnl I am morally opposed to the previous two lines, because they screw up
-dnl the namespace.
+AC_DEFINE_UNQUOTED(HOST_OS, "${host_os}")
+AC_DEFINE_UNQUOTED(HOST_CPU, "${host_cpu}")
 
 
 dnl the following is to so that the right includes (and only the right
@@ -411,37 +407,16 @@ if expr "$host_cpu" : "i.86$" > /dev/null; then
   if test -n "$NASM"; then
     AC_MSG_RESULT([Using x86 optimizations])
     XINGASM="`echo lmc/xingmp3/src/{cdct,cwin,cwin8,mdct,msis}asm.o`"
-    XINGDEFS="$DEFS -DASM_X86"
+    AC_DEFINE(ASM_X86)
   else
     AC_MSG_RESULT([nasm not available, using older x86 optimizations])
     XINGASM=lmc/xingmp3/src/x86gas.o
-    XINGDEFS="$DEFS -DASM_FDCT32 -DASM_WINDOW_DUAL"
+    AC_DEFINE(ASM_X86_OLD)
   fi
 fi
 
-AC_SUBST(XINGDEFS)
 AC_SUBST(XINGASM)
 
-
-#AM_CONDITIONAL(AM_HAVE_ALSA, test "$have_alsa" = "true")
-#AM_CONDITIONAL(AM_MP3_PROF, test "$mp3prof" = "true")
-
-#AM_CONDITIONAL(AM_HAVE_WIN32, test "$host_os" = "windowsnt")
-#AM_CONDITIONAL(AM_HAVE_LINUX, test "$host_os" = "linux")
-#AM_CONDITIONAL(AM_HAVE_X86, expr "$host_cpu" : "i.86$" > /dev/null)
-#AC_OUTPUT(Makefile base/Makefile base/src/Makefile io/Makefile
-#          base/unix/Makefile ui/freeamp/Makefile ui/freeamp/unix/Makefile ui/freeamp/unix/src/Makefile
-#	  ui/Makefile base/unix/linux/Makefile base/unix/linux/src/Makefile
-#	  io/local/Makefile io/http/Makefile io/obs/Makefile
-#	  ui/cmdline/Makefile lmc/Makefile lmc/xingmp3/Makefile
-#	  lmc/xingmp3/src/Makefile lmc/src/Makefile io/src/Makefile ui/src/Makefile
-#	  io/soundcard/Makefile io/soundcard/unix/Makefile io/soundcard/unix/linux/Makefile
-#	  io/soundcard/unix/linux/src/Makefile base/unix/src/Makefile ui/mpg123/Makefile ui/gtk/Makefile
-#	  ui/lcd/Makefile ui/lcd/src/Makefile
-# 	  io/alsa/Makefile io/alsa/unix/Makefile io/alsa/unix/linux/Makefile
-# 	  io/alsa/unix/linux/src/Makefile
-#	  ui/irman/Makefile ui/irman/src/Makefile
-#)
 AC_CONFIG_HEADER(config/config.h)
 AC_OUTPUT(Makefile)
 

@@ -38,16 +38,14 @@ if AM_HAVE_X86
 
 if AM_HAVE_NASM
 ASM_FILES = cdctasm.s cwinasm.s cwin8asm.s mdctasm.s msisasm.s
-ASM_DEFS = -DASM_X86
-else # !AM_HAVE_NASM
+else
 ASM_FILES = x86gas.s
-ASM_DEFS = -DASM_FDCT32 -DASM_WINDOW_DUAL
-endif # !AM_HAVE_NASM
+endif
 
 else # !AM_HAVE_X86
 ASM_FILES =
-ASM_DEFS =
 endif # !AM_HAVE_X86
+
 MYLIBS = libfalmc.a
 TRGT_SYS_HEADS = @top_srcdir@/base/unix/@host_os@/include
 
@@ -86,4 +84,4 @@ INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include \
            -I@top_srcdir@/io/include -I@top_srcdir@/ui/include \
            -I@top_srcdir@/lmc/include -I@top_srcdir@/base/unix/include
 CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT)
-CFLAGS = $(MP3_PROF) $(EXTRA_CFLAGS) $(REENT) $(ASM_DEFS)
+CFLAGS = $(MP3_PROF) $(EXTRA_CFLAGS) $(REENT)

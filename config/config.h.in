@@ -44,8 +44,11 @@ ____________________________________________________________________________*/
 #define HAVE_LINUX_LIBC5 0
 #define HAVE_SOLARIS 0
 
-#define AC_HOST_OS "unknown"
-#define AC_HOST_CPU "unknown"
+#define HOST_OS "unknown"
+#define HOST_CPU "unknown"
+
+#undef ASM_X86
+#undef ASM_X86_OLD
 
 #define MP3_PROF 0
 

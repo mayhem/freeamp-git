@@ -365,7 +365,7 @@ CompareNames(const char *p1, const char *p2)
          // no plugin.ui match, try  plugin-arch.ui
          char      foo[512];
 
-         sprintf(foo, "%s-%s.ui", p2, AC_HOST_OS);
+         sprintf(foo, "%s-%s.ui", p2, HOST_OS);
          // cout << "Comparing: " << p1 << " to " << foo << endl;
          if (strcmp(p1, foo))
          {

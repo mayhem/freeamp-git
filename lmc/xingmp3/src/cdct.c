@@ -34,6 +34,7 @@ portable C
 
 ******************************************************************/
 
+#include "config.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <float.h>
@@ -116,7 +117,7 @@ void fdct32(float x[], float c[])
 
 #ifdef ASM_X86
    fdct32_asm(src, c);
-#elif defined(ASM_FDCT32)
+#elif defined(ASM_X86_OLD)
    asm_fdct32(src, c);
 #else
 /* special first stage */

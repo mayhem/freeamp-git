@@ -325,6 +325,7 @@ have_alsa="false"
 have_alsa="false"
 )
 
+
 AM_CONDITIONAL(AM_HAVE_ALSA, test "$have_alsa" = "true")
 AM_CONDITIONAL(AM_MP3_PROF, test "$mp3prof" = "true")
 
@@ -333,8 +334,16 @@ AM_CONDITIONAL(AM_HAVE_WIN32, test "$host_os" = "windowsnt")
 AM_CONDITIONAL(AM_HAVE_LINUX, test "$host_os" = "linux")
 AM_CONDITIONAL(AM_HAVE_X86, expr "$host_cpu" : "i.86$" > /dev/null)
 
-AC_DEFINE_UNQUOTED(AC_HOST_OS, "${host_os}")
-AC_DEFINE_UNQUOTED(AC_HOST_CPU, "${host_cpu}")
+if expr "$host_cpu" : "i.86$" > /dev/null; then
+  if test -n "$NASM"; then
+    AC_DEFINE(ASM_X86)
+  else
+    AC_DEFINE(ASM_X86_OLD)
+  fi
+fi
+
+AC_DEFINE_UNQUOTED(HOST_OS, "${host_os}")
+AC_DEFINE_UNQUOTED(HOST_CPU, "${host_cpu}")
 AC_DEFINE_UNQUOTED(FREEAMP_VERSION, "${VERSION}")
 
 AC_OUTPUT(Makefile base/Makefile base/src/Makefile io/Makefile

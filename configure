@@ -3181,6 +3181,7 @@ fi
 
 
 
+
 if test "$have_alsa" = "true"; then
   AM_HAVE_ALSA_TRUE=
   AM_HAVE_ALSA_FALSE='#'
@@ -3235,12 +3236,26 @@ else
   AM_HAVE_X86_FALSE=
 fi
 
+if expr "$host_cpu" : "i.86$" > /dev/null; then
+  if test -n "$NASM"; then
+    cat >> confdefs.h <<\EOF
+#define ASM_X86 1
+EOF
+
+  else
+    cat >> confdefs.h <<\EOF
+#define ASM_X86_OLD 1
+EOF
+
+  fi
+fi
+
 cat >> confdefs.h <<EOF
-#define AC_HOST_OS "${host_os}"
+#define HOST_OS "${host_os}"
 EOF
 
 cat >> confdefs.h <<EOF
-#define AC_HOST_CPU "${host_cpu}"
+#define HOST_CPU "${host_cpu}"
 EOF
 
 cat >> confdefs.h <<EOF

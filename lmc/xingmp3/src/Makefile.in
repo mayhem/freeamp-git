@@ -86,12 +86,10 @@ C_FILES = cdct.c cupl3.c hwin.c iup.c l3init.c msis.c wavep.c csbt.c \
           mhead.c upsf.c iwinm.c xinglmc.cpp
 
 @AM_HAVE_X86_TRUE@@AM_HAVE_NASM_TRUE@ASM_FILES = cdctasm.s cwinasm.s cwin8asm.s mdctasm.s msisasm.s
-@AM_HAVE_X86_TRUE@@AM_HAVE_NASM_TRUE@ASM_DEFS = -DASM_X86
 @AM_HAVE_X86_TRUE@@AM_HAVE_NASM_FALSE@ASM_FILES = x86gas.s
-@AM_HAVE_X86_TRUE@@AM_HAVE_NASM_FALSE@ASM_DEFS = -DASM_FDCT32 -DASM_WINDOW_DUAL
 
 @AM_HAVE_X86_FALSE@ASM_FILES =
-@AM_HAVE_X86_FALSE@ASM_DEFS =
+
 MYLIBS = libfalmc.a
 TRGT_SYS_HEADS = @top_srcdir@/base/unix/@host_os@/include
 
@@ -107,7 +105,7 @@ INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include \
            -I@top_srcdir@/io/include -I@top_srcdir@/ui/include \
            -I@top_srcdir@/lmc/include -I@top_srcdir@/base/unix/include
 CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT)
-CFLAGS = $(MP3_PROF) $(EXTRA_CFLAGS) $(REENT) $(ASM_DEFS)
+CFLAGS = $(MP3_PROF) $(EXTRA_CFLAGS) $(REENT)
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = ../../../config/config.h
 CONFIG_CLEAN_FILES = 
