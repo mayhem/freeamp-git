@@ -76,8 +76,8 @@ class PullBuffer
 
     protected:
 
-      int      GetWriteIndex();
-      int      GetReadIndex();
+      int32      GetWriteIndex();
+      int32      GetReadIndex();
 
       Semaphore *m_pWriteSem, *m_pReadSem;
       Mutex     *m_pMutex;
@@ -85,7 +85,7 @@ class PullBuffer
 
     private:
 
-      int            m_iReadIndex, m_iWriteIndex;
+      int32          m_iReadIndex, m_iWriteIndex;
       bool           m_bEOS, m_bReadOpPending, m_bWriteOpPending;
       unsigned char *m_pPullBuffer;
       size_t         m_iBytesInBuffer, m_iOverflowSize, m_iBufferSize;
