@@ -34,6 +34,7 @@ ____________________________________________________________________________*/
 /* project headers */
 #include <config.h>
 #include "soundcardpmo.h"
+#include "solarisvolume.h"
 #include "eventdata.h"
 #include "log.h"
 
@@ -132,33 +133,9 @@ Error SoundCardPMO::SetPropManager(Properties * p)
    return kError_NoErr;
 }
 
-int SoundCardPMO::GetVolume()
+VolumeManager *SoundCardPMO::GetVolumeManager()
 {
-   int mixFd = open("/dev/audioctl",O_RDWR);
-   struct audio_info audinf;
-
-   if (mixFd != -1) 
-   {
-      ioctl(mixFd, AUDIO_GETINFO, &audinf);
-      close(mixFd);
-   }
-   return audinf.play.gain;   
-}
-
-void SoundCardPMO::SetVolume(int32 iVolume)
-{
-   int mixFd;
-   struct audio_info audinf;
-
-   mixFd = open("/dev/audioctl",O_RDWR);
-   if (mixFd >= 0) 
-   {
-      ioctl(mixFd, AUDIO_GETINFO, &audinf);
-      /*iVolume |= (iVolume << 8);*/
-      audinf.play.gain=iVolume;
-      ioctl(mixFd, AUDIO_SETINFO, &audinf);
-      close(mixFd);
-   }    
+   return new SolarisVolumeManager();
 }
 
 int SoundCardPMO::GetBufferPercentage()
@@ -171,7 +148,7 @@ int SoundCardPMO::audio_fd = -1;
 Error SoundCardPMO::Pause()
 {
    //printf("Got pause\n");
-   m_pPauseMutex->Acquire();
+   // m_pPauseMutex->Acquire();
    //printf("Got pause mutex\n");
 
    if (m_properlyInitialized)
@@ -181,7 +158,7 @@ Error SoundCardPMO::Pause()
 
 Error SoundCardPMO::Resume()
 {
-   m_pPauseMutex->Release();
+  //   m_pPauseMutex->Release();
 
    return kError_NoErr;
 }
@@ -409,26 +386,26 @@ void SoundCardPMO::WorkerThread(void)
       iToCopy = iWriteToCard;
 
       //printf("before pause mutex acquire\n");
-      m_pPauseMutex->Acquire();
+      // m_pPauseMutex->Acquire();
       //printf("after pause mutex acquire\n");
 
       eErr = BeginRead(pBuffer, iToCopy);
       //printf("after begin read\n");
       if (eErr == kError_InputUnsuccessful || eErr == kError_NoDataAvail)
       {
-          m_pPauseMutex->Release();
+	//          m_pPauseMutex->Release();
           m_pReadSem->Wait();
           continue;
       }
       if (eErr == kError_Interrupt)
       {
-          m_pPauseMutex->Release();
+	//          m_pPauseMutex->Release();
           break;
       }
           
       if (eErr == kError_EventPending)
       {
-          m_pPauseMutex->Release();
+	//          m_pPauseMutex->Release();
 
           pEvent = GetEvent();
 
@@ -455,7 +432,7 @@ void SoundCardPMO::WorkerThread(void)
           
       if (IsError(eErr))
       {
-          m_pPauseMutex->Release();
+	//          m_pPauseMutex->Release();
 
           ReportError("Internal error occured.");
           m_context->log->Error("Cannot read from buffer in PMO worker thread: %d\n",
@@ -466,16 +443,25 @@ void SoundCardPMO::WorkerThread(void)
       iCopied = 0;
       do
       {
-          ioctl(audio_fd, AUDIO_GETINFO, &info);
-          if (info.play.buffer_size < iToCopy)
+	//	fprintf(stderr, "trying to write %d to audio\n", iToCopy);
+          iRet = write(audio_fd, pBuffer, iToCopy);
+          if (iRet > 0)
           {
+              pBuffer = ((char *)pBuffer + iRet);
+              iCopied += iRet;
+              m_iTotalBytesWritten += iRet;
+          }
+
+          if (iCopied < iToCopy) {
+	    fprintf(stderr, "short audio write: %d/%d\n", iRet, iToCopy);
+		    
               EndRead(0);
-              m_pPauseMutex->Release();
+	      //	      m_pPauseMutex->Release();
 
               usleep(10000);
 
               for(;!m_bExit;)
-                 if (m_pPauseMutex->Acquire(10000))
+		//                 if (m_pPauseMutex->Acquire(10000))
                      break;
               if (m_bExit)
                  iToCopy = 0;
@@ -486,13 +472,7 @@ void SoundCardPMO::WorkerThread(void)
 
               continue;
           }
-          iRet = write(audio_fd, pBuffer, iToCopy);
-          if (iRet > 0)
-          {
-              pBuffer = ((char *)pBuffer + iRet);
-              iCopied += iRet;
-              m_iTotalBytesWritten += iRet;
-          }
+
       }
       while (iCopied < iToCopy && (errno == EINTR || errno == 0));
 
@@ -500,14 +480,14 @@ void SoundCardPMO::WorkerThread(void)
       // start from the top
       if (iToCopy == 0)
       {
-         m_pPauseMutex->Release();
+	//         m_pPauseMutex->Release();
          continue;
       }
 
       if (iCopied < iToCopy)
       {
          EndRead(0);
-         m_pPauseMutex->Release();
+	 //         m_pPauseMutex->Release();
          ReportError("Could not write sound data to the soundcard.");
          m_context->log->Error("Failed to write to the soundcard: %s\n", strerror(errno))
 ;
@@ -515,7 +495,7 @@ void SoundCardPMO::WorkerThread(void)
       }
       EndRead(iCopied);
 
-      m_pPauseMutex->Release();
+      //      m_pPauseMutex->Release();
    }
    //printf("output buffer thread exit\n");
 }
