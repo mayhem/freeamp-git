@@ -12,10 +12,10 @@ Package=<5>
 Package=<4>
 {{{
     Begin Project Dependency
-    Project_Dep_Name gdbm
+    Project_Dep_Name fabaselib
     End Project Dependency
     Begin Project Dependency
-    Project_Dep_Name fabaselib
+    Project_Dep_Name gdbm
     End Project Dependency
 }}}
 

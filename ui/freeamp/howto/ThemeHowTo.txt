@@ -43,6 +43,8 @@ New features for beta 3:
   use the ButtonControls IPlay and IPause instead of the 
   MultiStateControl Play.
 
+- The .fat files are now simple tar gzipped files. You can either
+  create them using tar and gzip or you can continue to use MakeTheme.
 
 NEW FEATURES BEFORE RELEASE
 
@@ -94,7 +96,15 @@ the MakeTheme program bundled with FreeAmp. Simply do:
     MakeTheme mytheme.fat theme.xml *.bmp
     
 in your theme directory. You can then add the mytheme.fat in
-the options dialog to load your theme.
+the options dialog to load your theme. 
+
+Note: The .fat format is simple (no symlinks, no directories) 
+implementation of a tar'ed, gzipped file. If you prefer you can
+do:
+
+    tar -czf mytheme.fat theme.xml *.bmp
+    
+It will give you the same result.
 
 
 BITMAPS
