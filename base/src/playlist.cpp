@@ -1050,9 +1050,16 @@ ExpandM3U(char *szM3UFile, List<char *> &MP3List)
 		 if (fgets(szLine, iMaxFileNameLen - 1, fpFile) == NULL)
 			 break;
 
-       for (iIndex = strlen(szLine) -1; iIndex >=0; iIndex--)
-          if (szLine[iIndex] =='\\')
-              szLine[iIndex]='/';
+         // enable people with different platforms 
+        // to swap files by changing the path 
+        // separator as necessary
+        for (iIndex = strlen(szLine) - 1; iIndex >=0; iIndex--)
+        {
+            if(szLine[iIndex] == '\\' && DIR_MARKER == '/')
+                szLine[iIndex] = DIR_MARKER;
+            else if(szLine[iIndex] == '/' && DIR_MARKER == '\\')
+                szLine[iIndex] = DIR_MARKER;
+        }
 
 		 for(iIndex = strlen(szLine) -1; iIndex >= 0; iIndex--)
 			 if (szLine[iIndex] == '\n' || 
