@@ -2844,7 +2844,18 @@ SetArgs(int32 argc, char** argv)
         }
         else 
         {
-            m_plm->AddItem(arg,0);
+            HANDLE handle;
+            WIN32_FIND_DATA data;
+
+            handle = FindFirstFile( arg, &data);
+
+            if(handle != INVALID_HANDLE_VALUE)
+            {
+                m_plm->AddItem(data.cFileName,0);
+
+                FindClose(handle);
+            }
+
             count++;
 	    }
     }
@@ -2876,9 +2887,20 @@ FilesReceived(char* array, int32 count)
 
     for(int32 i = 0; i < count; i++)
     {
-        char* foo = new char[strlen(array) + 1];
+        char* foo = new char[MAX_PATH + 1];
 
         strcpy(foo, array);
+
+        HANDLE handle;
+        WIN32_FIND_DATA data;
+
+        handle = FindFirstFile( foo, &data);
+
+        if(handle != INVALID_HANDLE_VALUE)
+        {
+            strcpy(foo, data.cFileName);
+            FindClose(handle);
+        }
 
         fileList.AddItem(foo);
 
