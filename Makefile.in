@@ -85,7 +85,7 @@ DIRECTORIES += io/alsa/unix/linux io/alsa/unix/linux/src io/esound
 DIRECTORIES += io/esound/src io/http io/local io/obs io/src io/soundcard
 DIRECTORIES += io/soundcard/beos io/soundcard/unix io/soundcard/unix/linux
 DIRECTORIES += io/soundcard/beos/src io/soundcard/unix/linux/src 
-DIRECTORIES += io/wavout io/wavout/src io/wavout/include plm/metadata/cddb
+DIRECTORIES += io/wavout io/wavout/src io/wavout/include
 DIRECTORIES += io/soundcard/unix/solaris lib lib/xml lib/zlib lmc lmc/xingmp3
 DIRECTORIES += io/soundcard/unix/solaris/src lib/gdbm lib/xml/src lib/zlib/src
 DIRECTORIES += plm plm/metadata plm/playlist plm/portable plm/portable/pmp300
@@ -99,6 +99,7 @@ DIRECTORIES += ui/musicbrowser/unix ui/mpg123 plm/playlist/pls
 DIRECTORIES += ui/irman/src ui/lcd/src ui/musicbrowser/unix/src ui/ncurses
 DIRECTORIES += update update/unix lmc/cd lmc/cd/src io/cd io/cd/unix 
 DIRECTORIES += io/cd/unix/src lib/unzip lib/unzip/src ftc ftc/winamp
+DIRECTORIES += plm/metadata/cddb
 
 dirs:
 	for p in $(DIRECTORIES); do \
