@@ -275,14 +275,19 @@ Error ThemeZip::DecompressTheme(const string &oSrcFile, const string &oDestPath)
 {
     char *ext;
 
-    ext = strrchr(oSrcFile.c_str(), '.');
-    if (ext) {
-        ext++;
-        if (ext && *ext) {
-            if (!strcasecmp("zip", ext) || !strcasecmp("wsz", ext))
-                return DecompressZip(oSrcFile, oDestPath);
-        }
-    }
+    char buf[4];
+    FILE *f;
+    
+    f = fopen(oSrcFile.c_str(), "rb");
+    if (!f)
+        return kError_FileNotFound;
+
+    for (uint32 i = 0; i < 4; i++)
+        fread(&buf[i], 1, 1, f);
+    fclose(f);
+
+    if (!strncmp("PK\003\004", buf, 4))
+        return DecompressZip(oSrcFile, oDestPath);
     return DecompressGZ(oSrcFile, oDestPath);   
 }
 
