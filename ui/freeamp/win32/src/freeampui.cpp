@@ -130,6 +130,31 @@ MainWndProc(HWND hwnd,
             result = ui->Paint();
             break;
 
+        case WM_PALETTECHANGED:
+            if(hwnd == (HWND)wParam)
+                break;
+
+        case WM_QUERYNEWPALETTE:
+        {
+            if(ui->Palette())
+            {
+                HDC hdc = GetDC(hwnd);
+                int32 numEntries;
+
+                SelectPalette(hdc, ui->Palette(), FALSE);
+                numEntries = RealizePalette(hdc);
+
+                ReleaseDC(hwnd, hdc);
+
+                if(numEntries)
+                    InvalidateRect(hwnd, NULL, TRUE);
+
+                result = TRUE;
+            }
+
+            break;
+        }
+
         case WM_SETCURSOR:
             SetCursor(ui->Cursor());
             result = 1;
@@ -250,6 +275,7 @@ FreeAmpUI():
 UserInterface()
 {
     m_hwnd          = NULL;
+    m_palette       = NULL;
     m_windowRegion  = NULL;
     m_playerRegion  = NULL;
     m_viewList      = NULL;
@@ -474,7 +500,7 @@ DropFiles(HDROP dropHandle)
 						szFile,
 						sizeof(szFile));
 
-		m_plm->Add(szFile,0);
+		m_plm->AddItem(szFile,0);
 		//m_plm->SetFirst();
 	}
 
@@ -611,12 +637,14 @@ Command(int32 command,
 				strcat(file, "\\");
 
 				cp = filelist + ofn.nFileOffset;
-				m_plm->RemoveAll();
+
+				m_plm->MakeEmpty();
+
 				while(*cp)
 				{
 					strcpy(file + ofn.nFileOffset, cp);
 
-					m_plm->Add(file,0);
+					m_plm->AddItem(file,0);
 
 					cp += strlen(cp) + 1;
 				}
@@ -716,6 +744,9 @@ Command(int32 command,
 
             DIB* canvas = new DIB();
             canvas->Create(m_width, m_height, m_playerCanvas->BitsPerPixel());
+
+            canvas->SetPalette( m_bodyBitmap->Palette(), 
+                                m_bodyBitmap->NumberOfPaletteEntries() );
 
             delete m_playerCanvas;
 
@@ -994,8 +1025,11 @@ Paint()
     int32 width = m_width;
     int32 height = m_height;
 
-    //SetStretchBltMode(hdc, HALFTONE);
-    //SetBrushOrgEx(hdc, 0, 0, NULL);
+    if(m_palette)
+    {
+        SelectPalette(hdc, m_palette, FALSE);
+        RealizePalette(hdc);
+    }
 
 	StretchDIBits(	hdc,
 					x,y,width,height,
@@ -1137,7 +1171,7 @@ CreateControls()
     m_timeView = new TimeView(  m_hwnd, 
                                 m_backgroundView, 
                                 m_controlRegions[kSongInfoControl], 
-                                m_timeBackgroundBitmap,
+                                //m_timeBackgroundBitmap,
                                 m_largeFontBitmap,
                                 12,
                                 largeFontWidth,
@@ -1259,7 +1293,85 @@ LoadBitmaps()
 		
     if(numBits <= 8) 
     {
-        
+        m_playerCanvas = new DIB;
+        m_playerCanvas->Create(m_width, m_height, 8);
+
+        m_bodyBitmap = new DIB;
+        m_bodyBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_BODY_256));
+
+        m_playerCanvas->SetPalette( m_bodyBitmap->Palette(), 
+                                    m_bodyBitmap->NumberOfPaletteEntries() );
+
+        m_playlistBodyBitmap = new DIB;
+        m_playlistBodyBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_PLAYLIST_BODY_256));
+
+        m_playBitmap = new DIB;
+        m_playBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_PLAY_256));
+
+        m_stopBitmap = new DIB;
+        m_stopBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_STOP_256));
+
+        m_pauseBitmap = new DIB;
+        m_pauseBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_PAUSE_256));
+
+        m_nextBitmap = new DIB;
+        m_nextBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_NEXT_256));
+
+        m_lastBitmap = new DIB;
+        m_lastBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_LAST_256));
+
+        m_modeBitmap = new DIB;
+        m_modeBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_MODE_256));
+
+        m_minimizeBitmap = new DIB;
+        m_minimizeBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_MINIMIZE_256));
+
+        m_closeBitmap = new DIB;
+        m_closeBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_CLOSE_256));
+
+        assert(m_closeBitmap->NumberOfPaletteEntries() == m_bodyBitmap->NumberOfPaletteEntries());
+        assert(!memcmp(m_closeBitmap->Palette(), m_bodyBitmap->Palette(), m_closeBitmap->NumberOfPaletteEntries()));
+
+        m_repeatBitmap = new DIB;
+        m_repeatBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_REPEAT_256));
+
+        m_shuffleBitmap = new DIB;
+        m_shuffleBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_SHUFFLE_256));
+
+        m_openBitmap = new DIB;
+        m_openBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_OPEN_256));
+
+        m_dialBitmap = new DIB;
+        m_dialBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_DIALS_256));
+
+        m_shuffleIconBitmap = new DIB;
+        m_shuffleIconBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_SHUFFLED_ICON_256));
+
+        m_repeatIconBitmap = new DIB;
+        m_repeatIconBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_REPEAT_ICON_256));
+
+        m_repeatAllIconBitmap = new DIB;
+        m_repeatAllIconBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_REPEAT_ALL_ICON_256));
+
+        m_smallFontBitmap = new DIB;
+        m_smallFontBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_SMALL_FONT_256));
+
+        m_largeFontBitmap = new DIB;
+        m_largeFontBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_BIG_FONT_256));
+
+        m_timeBackgroundBitmap = new DIB;
+        m_timeBackgroundBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_TIME_BACK_256)); 
+
+        m_drawerBitmap = new DIB;
+        m_drawerBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_DRAWER_256)); 
+
+        m_panelBackingBitmap = new DIB;
+        m_panelBackingBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_PANEL_BACKING_256));
+
+        m_scrollbarBitmap = new DIB;
+        m_scrollbarBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_SCROLLBAR_256));
+
+        CreatePalette();
 	}
     else
     {
@@ -1329,18 +1441,18 @@ LoadBitmaps()
         m_drawerBitmap = new DIB;
         m_drawerBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_DRAWER)); 
 
-        m_drawerMaskBitmap = new DIB;
-        m_drawerMaskBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_DRAWER_MASK));
-
         m_panelBackingBitmap = new DIB;
         m_panelBackingBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_PANEL_BACKING));
-
-        m_panelBackingMaskBitmap = new DIB;
-        m_panelBackingMaskBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_PANEL_BACKING_MASK));
 
         m_scrollbarBitmap = new DIB;
         m_scrollbarBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_SCROLLBAR));
     }
+
+    m_drawerMaskBitmap = new DIB;
+    m_drawerMaskBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_DRAWER_MASK));
+
+    m_panelBackingMaskBitmap = new DIB;
+    m_panelBackingMaskBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_PANEL_BACKING_MASK));
 
     /*DIB test;
 
@@ -1358,6 +1470,34 @@ LoadBitmaps()
     DeleteDC(memdc);
 
     ReleaseDC(m_hwnd, hdc);
+}
+
+void 
+FreeAmpUI::
+CreatePalette()
+{
+    LOGPALETTE* logicalPalette;
+    RGBQUAD* rgbPalette;
+    int32 numEntries = m_playerCanvas->NumberOfPaletteEntries();
+
+    logicalPalette = (LOGPALETTE*)malloc(sizeof(LOGPALETTE) + sizeof(PALETTEENTRY)*numEntries);
+
+    logicalPalette->palVersion = 0x300;
+    logicalPalette->palNumEntries = numEntries;
+
+    rgbPalette = m_playerCanvas->Palette();
+
+    for(int32 i = 0; i < numEntries; i++, rgbPalette++)
+    {
+        logicalPalette->palPalEntry[i].peRed = rgbPalette->rgbRed;
+        logicalPalette->palPalEntry[i].peGreen = rgbPalette->rgbGreen;
+        logicalPalette->palPalEntry[i].peBlue = rgbPalette->rgbBlue;
+        logicalPalette->palPalEntry[i].peFlags = 0;
+    }
+
+    m_palette = ::CreatePalette(logicalPalette);
+
+    free(logicalPalette);
 }
 
 void 
@@ -1604,7 +1744,7 @@ SetArgs(int32 argc, char** argv)
         }
         else 
         {
-            m_plm->Add(arg,0);
+            m_plm->AddItem(arg,0);
             count++;
 	    }
     }
@@ -1612,7 +1752,7 @@ SetArgs(int32 argc, char** argv)
     m_plm->SetFirst();
 
     if(shuffle) 
-        m_plm->SetShuffle(SHUFFLE_SHUFFLED);
+        m_plm->SetShuffle(SHUFFLE_RANDOM);
     
     if(autoplay)
        m_target->AcceptEvent(new Event(CMD_Play));
@@ -1636,7 +1776,7 @@ UpdatePlayList()
 
     if(m_plm && m_playlistView)
     {
-        int32 playlistCount = m_plm->Total();
+        int32 playlistCount = m_plm->CountItems();
         int32 listviewCount = m_playlistView->CountItems();
 
         // for now, the only time it is updated without us having done it

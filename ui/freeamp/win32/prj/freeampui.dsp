@@ -58,8 +58,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                             ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
-            ..\..\..\..\base\win32\prj\plugins
+                               ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
+              ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
@@ -91,8 +91,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                             ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
-            ..\..\..\..\base\win32\prj\plugins
+                               ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
+              ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
@@ -162,13 +162,6 @@ SOURCE=..\src\fontwidth.cpp
 # Begin Source File
 
 SOURCE=..\res\freeamp.rc
-
-!IF  "$(CFG)" == "freeampui - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
@@ -312,6 +305,10 @@ SOURCE=..\res\drawer.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=..\res\drawer256.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=..\res\drawer_mask.bmp
 # End Source File
 # Begin Source File
@@ -388,6 +385,10 @@ SOURCE=..\res\panel_backing.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=..\res\panel_backing256.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=..\res\panel_backing_mask.bmp
 # End Source File
 # Begin Source File
@@ -420,6 +421,10 @@ SOURCE=..\res\playlist_back.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=..\res\playlist_back256.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=..\res\playlist_control_mask.bmp
 # End Source File
 # Begin Source File
@@ -449,6 +454,10 @@ SOURCE=..\res\rightside256.bmp
 # Begin Source File
 
 SOURCE=..\res\scrollbar.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\scrollbar256.bmp
 # End Source File
 # Begin Source File
 
@@ -485,6 +494,10 @@ SOURCE=..\res\stop_buttons256.bmp
 # Begin Source File
 
 SOURCE=..\res\time_background.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\time_background256.bmp
 # End Source File
 # Begin Source File
 

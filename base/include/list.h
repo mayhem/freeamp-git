@@ -62,6 +62,9 @@ class List {
     T RemoveItem(int32 index);
     bool DeleteItem(int32 index);
 
+    bool RemoveList(List<T> &list);
+    bool DeleteList(List<T> &list);
+
     bool RemoveAll();
     bool DeleteAll();
     
@@ -72,17 +75,17 @@ class List {
     void DoForEach(bool (*func)(T &));
     void DoForEach(bool (*func)(T &, void *), void *);
 
-    T *Items() const { return m_pObjs; }
+    T* Items() const { return m_list; }
 
     // cmp returns true if first arg is 'greater' than the second ; 
     // sorts list smallest to largest according to cmp
     void SortItems(int32 (*cmp)(const T &, const T &)); 
 
  private:
-    T *m_pObjs;  // indexer to array of objects
-    int32 m_threshhold;
-    int32 m_insertionPoint;
-    int32 m_currentLength;
+    T*      m_list;  // array of objects
+    int32   m_threshhold;
+    int32   m_insertionPoint;
+    int32   m_currentLength;
  
 };
 
@@ -91,10 +94,10 @@ List<T>::
 List(int32 threshold) 
 {
     m_threshhold = threshold;
-    m_pObjs = new T[m_threshhold];
+    m_list = new T[m_threshhold];
 
     for (int32 i=0;i<m_threshhold;i++) 
-        m_pObjs[i] = NULL;
+        m_list[i] = NULL;
 
     m_insertionPoint = 0;
     m_currentLength = m_threshhold;
@@ -104,7 +107,7 @@ template<class T>
 List<T>::
 ~List() 
 {
-    delete [] m_pObjs;
+    delete [] m_list;
 }
 
 
@@ -115,7 +118,7 @@ FirstItem()
 {
     if(m_insertionPoint > 0) 
     {
-	    return m_pObjs[0];
+	    return m_list[0];
     } 
     else 
     {
@@ -130,7 +133,7 @@ LastItem()
 {
     if(m_insertionPoint > 0) 
     {
-	    return m_pObjs[m_insertionPoint - 1];
+	    return m_list[m_insertionPoint - 1];
     } 
     else 
     {
@@ -148,7 +151,7 @@ ItemAt(int32 index)
 	    return NULL;
     }
 
-    return m_pObjs[index];
+    return m_list[index];
 }
 
 template<class T> 
@@ -160,7 +163,7 @@ IndexOf(T &mem)
 
     for(int32 i=0;i<m_insertionPoint;i++) 
     {
-	    if(m_pObjs[i] == mem) 
+	    if(m_list[i] == mem) 
         {
 	        result = i;
 	        break;
@@ -214,17 +217,17 @@ AddItem(T &item)
         {
 	        // add more and copy over
 	        T *pNewObjs = new T[m_currentLength+m_threshhold];
-	        memcpy(pNewObjs,m_pObjs,(sizeof (T))*m_currentLength);
+	        memcpy(pNewObjs,m_list,(sizeof (T))*m_currentLength);
 
-	        delete [] m_pObjs;
+	        delete [] m_list;
 
-	        m_pObjs = pNewObjs;
+	        m_list = pNewObjs;
 
-	        memset(&(m_pObjs[m_currentLength]),0,m_threshhold);
+	        memset(&(m_list[m_currentLength]),0,m_threshhold);
 	        m_currentLength = m_currentLength + m_threshhold;
 	    }
 
-	    m_pObjs[m_insertionPoint] = item;
+	    m_list[m_insertionPoint] = item;
 	    m_insertionPoint++;
 
 	    result = true;
@@ -248,24 +251,24 @@ AddItem(T &item, int32 index)
             {
 		        T *pNewObjs = new T[m_currentLength+m_threshhold];
 
-		        memcpy(pNewObjs,m_pObjs,(sizeof (T))*index);
+		        memcpy(pNewObjs,m_list,(sizeof (T))*index);
 		        pNewObjs[index] = item;
 
 		        if (index < m_insertionPoint) 
                 {
-		            memcpy(&(pNewObjs[index+1]), &(m_pObjs[index]),(sizeof (T))*(m_insertionPoint-index));
+		            memcpy(&(pNewObjs[index+1]), &(m_list[index]),(sizeof (T))*(m_insertionPoint-index));
 		        }
 
-		        delete [] m_pObjs;
+		        delete [] m_list;
 
-		        m_pObjs = pNewObjs;
-		        memset(&(m_pObjs[m_insertionPoint+1]),0,m_insertionPoint + m_threshhold - 2);
+		        m_list = pNewObjs;
+		        memset(&(m_list[m_insertionPoint+1]),0,m_insertionPoint + m_threshhold - 2);
 		        m_currentLength += m_threshhold;
 	        } 
             else 
             {
-		        memmove(&(m_pObjs[index+1]),&(m_pObjs[index]), (m_insertionPoint - index) * sizeof(T));
-		        m_pObjs[index] = item;
+		        memmove(&(m_list[index+1]),&(m_list[index]), (m_insertionPoint - index) * sizeof(T));
+		        m_list[index] = item;
 	        }
 
 	        m_insertionPoint++;
@@ -364,7 +367,7 @@ RemoveItems(int32 begin, int32 end)
         (begin < 0) || (end > begin)    || 
         (end >= m_insertionPoint))) 
     {
-	    memmove(&(m_pObjs[begin]),&(m_pObjs[end+1]),sizeof(T)*(m_insertionPoint-end-1));
+	    memmove(&(m_list[begin]),&(m_list[end+1]),sizeof(T)*(m_insertionPoint-end-1));
 	    m_insertionPoint -= end-begin+1;
 	    result = true;
     }
@@ -386,7 +389,7 @@ DeleteItems(int32 begin, int32 end)
     {
 	    for(int32 i = begin; i <= end; i++) 
         {
-	        delete m_pObjs[i];
+	        delete m_list[i];
 	    }
 
 	    result = RemoveItems(begin, end);
@@ -404,15 +407,15 @@ RemoveItem(int32 index)
 	    return NULL;
     }
 
-    T resultval = m_pObjs[index];
+    T resultval = m_list[index];
 
     if(index == m_insertionPoint - 1) // if it is the last one just NULL it
     {
-        m_pObjs[index] = 0x00;
+        m_list[index] = 0x00;
     }
     else // shift the other ones up 
     {
-        memmove(&(m_pObjs[index]),&(m_pObjs[index+1]),sizeof(T)*(m_insertionPoint-index-1));
+        memmove(&(m_list[index]),&(m_list[index+1]),sizeof(T)*(m_insertionPoint-index-1));
     }
    
     m_insertionPoint--;
@@ -441,10 +444,47 @@ DeleteItem(int32 index)
 template<class T> 
 bool 
 List<T>::
+RemoveList(List<T> &list)
+{
+    bool result = true;
+
+    for(int32 i = 0; i < list.CountItems(); i++) 
+    {
+	    if(!RemoveItem(list.ItemAt(i))) 
+        {
+	        result = false; // let them know some were not removed
+	    }
+    }
+
+    return result;
+}
+
+template<class T> 
+bool 
+List<T>::
+DeleteList(List<T> &list)
+{
+    bool result = true;
+
+    for(int32 i = 0; i < list.CountItems(); i++) 
+    {
+	    if(!DeleteItem(list.ItemAt(i))) 
+        {
+	        result = false; // let them know some were not deleted
+	    }
+    }
+
+    return result;
+}
+
+
+template<class T> 
+bool 
+List<T>::
 RemoveAll() 
 {
     for (int32 i = 0; i < m_insertionPoint; i++) 
-        m_pObjs[i] = NULL;
+        m_list[i] = NULL;
 
     m_insertionPoint = 0;
 
@@ -458,8 +498,8 @@ DeleteAll()
 {
     for(int32 i = 0; i < m_insertionPoint; i++) 
     {
-	    delete m_pObjs[i];
-	    m_pObjs[i] = NULL;
+	    delete m_list[i];
+	    m_list[i] = NULL;
     }
 
     m_insertionPoint = 0;
@@ -474,7 +514,7 @@ RandomItem()
 {
     srand((unsigned int) time (NULL));
     int32 foo = (int32) (((double)m_insertionPoint * rand()) / (RAND_MAX+1.0));
-    return m_pObjs[foo];
+    return m_list[foo];
 }
 
 template<class T> 
@@ -491,9 +531,9 @@ Swap(int32 s1, int32 s2)
 	    return;
     }
 
-    T tmp = m_pObjs[s1];
-    m_pObjs[s1] = m_pObjs[s2];
-    m_pObjs[s2] = tmp;
+    T tmp = m_list[s1];
+    m_list[s1] = m_list[s2];
+    m_list[s2] = tmp;
 }
 
 template<class T> 
@@ -503,7 +543,7 @@ DoForEach(bool (*func)(T &))
 {
     for(int i=0;i<m_insertionPoint;i++) 
     {
-	    *func(m_pObjs[i]);
+	    *func(m_list[i]);
     }
 }
 
@@ -514,7 +554,7 @@ DoForEach(bool (*func)(T &, void *), void *arg)
 {
     for(int i=0;i<m_insertionPoint;i++) 
     {
-	    *func(m_pObjs[i],arg);
+	    *func(m_list[i],arg);
     }
 }
 
@@ -528,7 +568,7 @@ SortItems(int (*cmp)(const T &, const T &))
     {
 	    for(int i=0;i<end;i++) 
         {
-	        if (*cmp(m_pObjs[i],m_pObjs[i+1])) 
+	        if (*cmp(m_list[i],m_list[i+1])) 
             {
 		        Swap(i,i+1);
 	        }

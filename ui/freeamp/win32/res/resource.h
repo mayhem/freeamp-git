@@ -51,6 +51,7 @@
 #define IDB_WINDOW_MASK_MID             159
 #define IDB_BODY                        160
 #define IDB_BODY256                     161
+#define IDB_BODY_256                    161
 #define IDB_TIME_BACK                   166
 #define IDB_DRAWER_MASK                 167
 #define IDB_DRAWER                      168
@@ -60,13 +61,18 @@
 #define IDB_PANEL_BACKING               172
 #define IDB_TITLE_BACK                  173
 #define IDB_SCROLLBAR                   174
+#define IDB_TIME_BACK_256               176
+#define IDB_SCROLLBAR_256               177
+#define IDB_PANEL_BACKING_256           178
+#define IDB_PLAYLIST_BODY_256           179
+#define IDB_DRAWER_256                  180
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        175
+#define _APS_NEXT_RESOURCE_VALUE        181
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1000
 #define _APS_NEXT_SYMED_VALUE           101

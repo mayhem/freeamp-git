@@ -60,7 +60,7 @@ public:
 
     BYTE* Bits() const { return m_bits; }
     BYTE* Bits(int32 x, int32 y);
-
+    
     int32 Height() const { return m_height; }
     int32 Width() const { return m_width; }
 
@@ -71,6 +71,12 @@ public:
     BITMAPINFO* BitmapInfo() { return m_bitmapInfo; }
 
     int32 NumberOfPaletteEntries() const;
+    RGBQUAD* Palette();
+    bool SetPalette(RGBQUAD* palette, int32 entries);
+
+    bool ColorForIndex(int32 index, Color* color);
+    int32 IndexForColor(Color* color);
+    int32 IndexForColor(int32 r, int32 g, int32 b);
 
 protected:
     BITMAPINFO* m_bitmapInfo;

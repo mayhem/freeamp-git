@@ -48,18 +48,18 @@ class ListItem {
 	void	SetWidth(int32 width) { m_width = width;}
 
     bool	IsSelected() const { return m_selected;}
-    void	Select(bool selected = true) { m_selected = selected;}
-    void	Deselect() { m_selected = false;}
+    virtual void Select(bool selected = true) { m_selected = selected;}
+    virtual void Deselect() { Select(false);}
 
     bool	IsEnabled() const { return m_enabled;}
-    void    Enable(bool enable = true) { m_enabled = enable;}
-    void    Disable() { m_enabled = false;}
+    virtual void Enable(bool enable = true) { m_enabled = enable;}
+    virtual void Disable() { Enable(false);}
 
     void*   UserValue() const { return m_userValue;}
     void    SetUserValue(void* value) { m_userValue = value;}
 
 		    
-    virtual	void    DrawItem(DIB* canvas, RECT* bounds) = 0;
+    virtual	void DrawItem(DIB* canvas, RECT* bounds) = 0;
 
 
  private:

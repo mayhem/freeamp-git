@@ -38,6 +38,9 @@ class StringItem : public ListItem {
 
     virtual ~StringItem();
 
+    virtual void Select(bool selected = true);
+    virtual void Deselect();
+
     virtual	void DrawItem(DIB* canvas, RECT* bounds);
 
  private:

@@ -461,7 +461,7 @@ LeftButtonUp(int32 x, int32 y, int32 modifiers)
                     PlayListItem* playlistItem;     
                     playlistItem = (PlayListItem*)item->UserValue();
 
-                    plm->AddAt(playlistItem, index + i);
+                    plm->AddItem(playlistItem, index + i);
                 }
 
 
@@ -775,6 +775,28 @@ RemoveItems(int32 index, int32 count)
         }
 
         result = true;
+    }
+
+    return result;
+}
+
+bool 
+ListView::
+RemoveAll()
+{
+    bool result = false;
+
+    if(CountItems())
+    {
+        result = m_list->RemoveAll();
+
+        m_firstVisible = 0;
+        m_firstSelected = -1;
+        m_lastSelected = -1;
+        m_anchorIndex = -1;
+
+        UpdateScrollBar();
+        Invalidate();
     }
 
     return result;

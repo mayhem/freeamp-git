@@ -77,6 +77,7 @@ class ListView : public View {
     virtual bool        RemoveItem(ListItem* item);
     virtual ListItem*   RemoveItem(int32 index);
     virtual bool        RemoveItems(int32 index, int32 count);
+    virtual bool        RemoveAll();
 
     virtual	void SetListType(list_view_type type);
 
@@ -85,14 +86,19 @@ class ListView : public View {
             ListItem*   ItemAt(int32 index) const;
             int32	    IndexOf(int32 x, int32 y) const;
 		    int32	    IndexOf(ListItem* item) const;
+
 		    ListItem*   FirstItem() const;
 		    ListItem*   LastItem() const;
+
 		    bool	    HasItem(ListItem* item) const;
 		    int32	    CountItems() const;
+
     virtual	void	    MakeEmpty();
 		    bool	    IsEmpty() const;
+
 		    void	    DoForEach(bool (*func)(ListItem*));
 		    void	    DoForEach(bool (*func)(ListItem*, void*), void*);
+
     const   ListItem**  Items() const;
 		    void        InvalidateItem(int32 index);
 

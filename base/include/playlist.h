@@ -132,11 +132,6 @@ class PlayListItem {
     int32 m_startFrame;
 };
 
-class OrderListItem {
- public:
-    int32 m_indexToRealList;
-    int32 m_random;
-};
 
 class PLMGetMediaInfoEvent : public Event {
  private:
@@ -185,17 +180,17 @@ class PLMSetMediaInfoEvent : public Event {
 };
 
 enum ShuffleMode {
-	SHUFFLE_NOT_SHUFFLED = 0,  // normal playlist playback
-	SHUFFLE_SHUFFLED,      // playlist is shuffled, with playback in order of shuffled list
-	SHUFFLE_INTERNAL_NUMBER, // swap this and SHUFFLE_RANDOM to enable random shuffling
-	SHUFFLE_RANDOM         // random song is played (and, GetCurrent() never returns NULL)
+	SHUFFLE_NOT_SHUFFLED = 0,
+	SHUFFLE_RANDOM,                             
+    SHUFFLE_LAST_ENUM
+
 };
     
 enum RepeatMode {
 	REPEAT_NOT = 0,
 	REPEAT_CURRENT,
 	REPEAT_ALL,
-	REPEAT_INTERNAL_NUMBER
+	REPEAT_LAST_ENUM
 };
 
 
@@ -225,8 +220,6 @@ class PlayListManager {
  public:
     PlayListManager(EventQueue *);
     ~PlayListManager();
-    void Add(char *,int);
-    Error RemoveAll();
     void SetSkip(int32 f) { m_skipNum = f; } // logical media units to skip at beginning
     int32 GetSkip() { return m_skipNum; }
 
@@ -240,7 +233,6 @@ class PlayListManager {
     void SetPrev(bool bUserAction = false);
 
     int32 Current() const {return m_current;}
-    int32 Total() const {return m_pOrderList->CountItems();}
 
     void SetShuffle(ShuffleMode oop);
     void SetRepeat(RepeatMode rp);
@@ -249,40 +241,64 @@ class PlayListManager {
     Error ToggleRepeat();
     Error ToggleShuffle();
 
-    Error AddAt(char *url, int32 type, int32 at);
-    Error AddAt(PlayListItem* item, int32 at);
+    PlayListItem* FirstItem() const;
+	PlayListItem* LastItem() const;
 
-    Error RemoveItem(int32 at);
-    Error RemoveItem(PlayListItem* item);
+	bool HasItem(PlayListItem* item) const;
+	int32 CountItems() const;
 
-    PlayListItem *ItemAt(int32);
-    int32 IndexOf(PlayListItem* item);
-    
+    PlayListItem*   ItemAt(int32 index) const;
+	int32	        IndexOf(PlayListItem* item) const;
 
- private:
-    
-    EventQueue *			m_target;
-    List<PlayListItem*>*    m_pMediaElems;
-    List<OrderListItem*>*   m_pOrderList;
-    int32                   m_current;
-    int32                   m_skipNum;
-	Mutex *					m_plMutex;
+    virtual	Error AddItem(char *url,int32 type);
+    virtual	Error AddItem(char *url,int32 type, int32 index);
 
-    
-    ShuffleMode m_order;
-    RepeatMode m_repeat;
+    virtual	Error AddItem(PlayListItem* item);
+    virtual Error AddItem(PlayListItem* item, int32 index);
+    virtual Error AddList(List<PlayListItem*>* items);
+    virtual Error AddList(List<PlayListItem*>* items, int32 index);
+
+    virtual Error           RemoveItem(PlayListItem* item);
+    virtual PlayListItem*   RemoveItem(int32 index);
+    virtual Error           RemoveItems(int32 index, int32 count);
+    virtual Error           RemoveAll();
+
+    virtual	void MakeEmpty();
+		    bool IsEmpty() const;
+
+    void DoForEach(bool (*func)(PlayListItem*));
+    void DoForEach(bool (*func)(PlayListItem*, void*), void*);
+
+    const PlayListItem** Items() const;
+
+ protected:
+    inline int32 CheckIndex(int32 index);
 
     void SendInfoToPlayer();
-	void SendShuffleModeToPlayer();
-	void SendRepeatModeToPlayer();
+    void SendShuffleModeToPlayer();
+    void SendRepeatModeToPlayer();
 
     void InitializeOrder();
     void ShuffleOrder();
     void QuickSortOrderList(int32 first, int32 last);
     int32 PartitionOrderList(int32 first, int32 last);
- 
-	void GetPLManipLock() { m_plMutex->Acquire(WAIT_FOREVER); }
-	void ReleasePLManipLock() { m_plMutex->Release(); }
+
+    inline void GetPLManipLock() { m_mutex->Acquire(WAIT_FOREVER); }
+    inline void ReleasePLManipLock() { m_mutex->Release(); }
+
+ private:
+    
+    EventQueue*			    m_target;
+    List<PlayListItem*>*    m_list;
+    int32                   m_current;
+    int32                   m_skipNum;
+	Mutex*					m_mutex;
+
+    
+    ShuffleMode             m_order;
+    RepeatMode              m_repeat;
+
+    
 };
 
 

@@ -108,30 +108,38 @@ Copy(   DIB* dest,      // destination bitmap
     assert(src_mask);
 
     assert(dest->BitsPerPixel() == src->BitsPerPixel());
-    assert(src->BitsPerPixel() == src_mask->BitsPerPixel());
+    assert(src_mask->BitsPerPixel() == 8);
 
     BYTE* pdest = dest->Bits(dest_x, dest_y);
     BYTE* psrc  = src->Bits(src_x, src_y);
     BYTE* psrc_mask  = src_mask->Bits(src_x, src_y);
     int32 bytesPerPixel = src->BytesPerPixel();
 
-    for(int32 y = 0; y < height; y++)
-	{
-        for ( int x = 0; x < width; x++ )
-		{
-			pdest[0]=(BYTE)(((psrc[0]-pdest[0])*psrc_mask[0]+(pdest[0]<<8))>>8);
-			pdest[1]=(BYTE)(((psrc[1]-pdest[1])*psrc_mask[1]+(pdest[1]<<8))>>8);
-			pdest[2]=(BYTE)(((psrc[2]-pdest[2])*psrc_mask[2]+(pdest[2]<<8))>>8);	
-			pdest += 3;
-			psrc += 3;
-            psrc_mask += 3;
-		}
+    //if(dest->BitsPerPixel() == 24)
+    {
+        for(int32 y = 0; y < height; y++)
+	    {
+            for ( int x = 0; x < width; x++ )
+		    {
+                if(*psrc_mask)
+                {
+                    memcpy(pdest, psrc, bytesPerPixel);
+                }
+                
+			    //pdest[0]=(BYTE)(((psrc[0]-pdest[0])*psrc_mask[0]+(pdest[0]<<8))>>8);
+			    //pdest[1]=(BYTE)(((psrc[1]-pdest[1])*psrc_mask[0]+(pdest[1]<<8))>>8);
+			    //pdest[2]=(BYTE)(((psrc[2]-pdest[2])*psrc_mask[0]+(pdest[2]<<8))>>8);	
+			    pdest += bytesPerPixel;
+			    psrc += bytesPerPixel;
+                psrc_mask++;
+		    }
 
-		pdest -= dest->BytesPerLine() + width * 3;
-		psrc -= src->BytesPerLine() + width * 3;
-        psrc_mask -= src_mask->BytesPerLine() + width * 3; 
-	}
-
+		    pdest -= dest->BytesPerLine() + width * bytesPerPixel;
+		    psrc -= src->BytesPerLine() + width * bytesPerPixel;
+            psrc_mask -= src_mask->BytesPerLine() + width; 
+	    }
+    }
+    
     return result;
 }
 
@@ -148,7 +156,7 @@ Copy(   DIB* dest,      // destination bitmap
     assert(src_mask);
 
     assert(dest->BitsPerPixel() == src->BitsPerPixel());
-    assert(src->BitsPerPixel() == src_mask->BitsPerPixel());
+    assert(src_mask->BitsPerPixel() == 8);
 
     BYTE* pdest = dest->Bits();
     BYTE* psrc  = src->Bits();
@@ -161,17 +169,22 @@ Copy(   DIB* dest,      // destination bitmap
 	{
         for ( int x = 0; x < width; x++ )
 		{
-			pdest[0]=(BYTE)(((psrc[0]-pdest[0])*psrc_mask[0]+(pdest[0]<<8))>>8);
-			pdest[1]=(BYTE)(((psrc[1]-pdest[1])*psrc_mask[1]+(pdest[1]<<8))>>8);
-			pdest[2]=(BYTE)(((psrc[2]-pdest[2])*psrc_mask[2]+(pdest[2]<<8))>>8);	
-			pdest += 3;
-			psrc += 3;
-            psrc_mask += 3;
+            if(*psrc_mask)
+            {
+                memcpy(pdest, psrc, bytesPerPixel);
+            }
+
+			//pdest[0]=(BYTE)(((psrc[0]-pdest[0])*psrc_mask[0]+(pdest[0]<<8))>>8);
+			//pdest[1]=(BYTE)(((psrc[1]-pdest[1])*psrc_mask[0]+(pdest[1]<<8))>>8);
+			//pdest[2]=(BYTE)(((psrc[2]-pdest[2])*psrc_mask[0]+(pdest[2]<<8))>>8);	
+			pdest += bytesPerPixel;
+			psrc += bytesPerPixel;
+            psrc_mask++;
 		}
 
-		pdest += dest->BytesPerLine() - width * 3;
-		psrc += src->BytesPerLine() - width * 3;
-        psrc_mask += src_mask->BytesPerLine() - width * 3;
+		pdest += dest->BytesPerLine() - width * bytesPerPixel;
+		psrc += src->BytesPerLine() - width * bytesPerPixel;
+        psrc_mask += src_mask->BytesPerLine() - width;
 	}
 
     return result;
@@ -274,6 +287,24 @@ Fill(   DIB* dest,      // destination bitmap
 		    pdest += dest->BytesPerLine() - width * 3;
 	    }
     }
+    else if(dest->BitsPerPixel() == 8)
+    {
+        int32 index = dest->IndexForColor(r, g, b);
+
+        if(index >= 0)
+        {
+            for(int32 y = 0; y < height; y++)
+	        {
+		        for(int x = 0; x < width; x++ )
+		        {
+			        *pdest = index;
+			        pdest++;
+		        }
+
+		        pdest += dest->BytesPerLine() - width;
+	        }
+        }
+    }
 
     return result;
 }
@@ -311,6 +342,24 @@ Fill(   DIB* dest,      // destination bitmap
 		    pdest -= dest->BytesPerLine() + width * 3;
 	    }
     }
+    else if(dest->BitsPerPixel() == 8)
+    {
+        int32 index = dest->IndexForColor(r, g, b);
+
+        if(index >= 0)
+        {
+            for(int32 y = 0; y < height; y++)
+	        {
+		        for(int x = 0; x < width; x++ )
+		        {
+			        *pdest = index;
+			        pdest++;
+		        }
+
+		        pdest -= dest->BytesPerLine() + width;
+	        }
+        }
+    }
 
     return result;
 }
@@ -347,6 +396,28 @@ Fill(   DIB* dest,      // destination bitmap
 		    }
 
 		    pdest -= dest->BytesPerLine() + width * 3;
+	    }
+    }
+    else if(dest->BitsPerPixel() == 8)
+    {
+        for(int32 y = 0; y < height; y++)
+	    {
+		    for ( int x = 0; x < width; x++ )
+		    {
+                Color destColor;
+
+                dest->ColorForIndex(pdest[0], &destColor);
+
+			    destColor.b = (BYTE)(((b-destColor.b)*a+(destColor.b<<8))>>8);
+			    destColor.g = (BYTE)(((g-destColor.g)*a+(destColor.g<<8))>>8);
+			    destColor.r = (BYTE)(((r-destColor.r)*a+(destColor.r<<8))>>8);
+
+                pdest[0] = dest->IndexForColor(&destColor);
+                
+			    pdest++;
+		    }
+
+		    pdest -= dest->BytesPerLine() + width;
 	    }
     }
 

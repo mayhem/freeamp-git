@@ -153,8 +153,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "xing - Win32 Release" "soundcard - Win32 Release"\
  "fileinput - Win32 Release" ".\freeamp.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                            ..\..\..\..\base\win32\prj\plugins
-	copy freeamp.ui           ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins
+	copy freeamp.ui              ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
@@ -282,8 +282,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "xing - Win32 Debug" "soundcard - Win32 Debug"\
  "fileinput - Win32 Debug" ".\freeamp.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                            ..\..\..\..\base\win32\prj\plugins
-	copy freeamp.ui           ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins
+	copy freeamp.ui              ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 
@@ -408,9 +408,6 @@ InputPath=..\..\..\..\config\config.win32
 !ENDIF 
 
 SOURCE=..\src\control.cpp
-
-!IF  "$(CFG)" == "freeampui - Win32 Release"
-
 DEP_CPP_CONTR=\
 	"..\..\..\..\config\config.h"\
 	"..\include\control.h"\
@@ -420,20 +417,6 @@ DEP_CPP_CONTR=\
  "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
-
-DEP_CPP_CONTR=\
-	"..\..\..\..\config\config.h"\
-	"..\include\control.h"\
-	
-
-"$(INTDIR)\control.obj" : $(SOURCE) $(DEP_CPP_CONTR) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 SOURCE=..\src\controlinfo.cpp
 
@@ -482,13 +465,10 @@ DEP_CPP_DIALV=\
 	"..\..\..\..\base\include\queue.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\include\vector.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\io\include\pmi.h"\
-	"..\..\..\..\io\include\pmo.h"\
-	"..\..\..\..\lmc\include\lmc.h"\
 	"..\..\..\include\ui.h"\
 	"..\include\bitmapview.h"\
 	"..\include\buttonview.h"\
@@ -529,13 +509,10 @@ DEP_CPP_DIALV=\
 	"..\..\..\..\base\include\queue.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\include\vector.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\io\include\pmi.h"\
-	"..\..\..\..\io\include\pmo.h"\
-	"..\..\..\..\lmc\include\lmc.h"\
 	"..\..\..\include\ui.h"\
 	"..\include\bitmapview.h"\
 	"..\include\buttonview.h"\
@@ -612,19 +589,15 @@ DEP_RSC_FREEA=\
 	"..\res\body256.bmp"\
 	"..\res\close_buttons.bmp"\
 	"..\res\close_buttons256.bmp"\
-	"..\res\colors.bmp"\
 	"..\res\control_mask_mid.bmp"\
 	"..\res\dials.bmp"\
 	"..\res\dials256.bmp"\
 	"..\res\drawer.bmp"\
+	"..\res\drawer256.bmp"\
 	"..\res\drawer_mask.bmp"\
 	"..\res\icon1.ico"\
 	"..\res\last_buttons.bmp"\
 	"..\res\last_buttons256.bmp"\
-	"..\res\lcd.bmp"\
-	"..\res\lcd256.bmp"\
-	"..\res\leftside.bmp"\
-	"..\res\leftside256.bmp"\
 	"..\res\logo.bmp"\
 	"..\res\logo256.bmp"\
 	"..\res\minimize_buttons.bmp"\
@@ -636,20 +609,21 @@ DEP_RSC_FREEA=\
 	"..\res\open_buttons.bmp"\
 	"..\res\open_buttons256.bmp"\
 	"..\res\panel_backing.bmp"\
+	"..\res\panel_backing256.bmp"\
 	"..\res\panel_backing_mask.bmp"\
 	"..\res\pause_buttons.bmp"\
 	"..\res\pause_buttons256.bmp"\
 	"..\res\play_buttons.bmp"\
 	"..\res\play_buttons256.bmp"\
 	"..\res\playlist_back.bmp"\
+	"..\res\playlist_back256.bmp"\
 	"..\res\playlist_control_mask.bmp"\
 	"..\res\repeat_buttons.bmp"\
 	"..\res\repeat_buttons256.bmp"\
 	"..\res\repeat_icon.bmp"\
 	"..\res\repeat_icon256.bmp"\
-	"..\res\rightside.bmp"\
-	"..\res\rightside256.bmp"\
 	"..\res\scrollbar.bmp"\
+	"..\res\scrollbar256.bmp"\
 	"..\res\shuffle_buttons.bmp"\
 	"..\res\shuffle_buttons256.bmp"\
 	"..\res\shuffled_icon.bmp"\
@@ -659,7 +633,7 @@ DEP_RSC_FREEA=\
 	"..\res\stop_buttons.bmp"\
 	"..\res\stop_buttons256.bmp"\
 	"..\res\time_background.bmp"\
-	"..\res\title_background.bmp"\
+	"..\res\time_background256.bmp"\
 	"..\res\window_mask_mid.bmp"\
 	
 
@@ -698,13 +672,10 @@ DEP_CPP_FREEAM=\
 	"..\..\..\..\base\include\queue.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\include\vector.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\io\include\pmi.h"\
-	"..\..\..\..\io\include\pmo.h"\
-	"..\..\..\..\lmc\include\lmc.h"\
 	"..\..\..\include\ui.h"\
 	"..\include\bitmapview.h"\
 	"..\include\buttonview.h"\
@@ -749,13 +720,10 @@ DEP_CPP_FREEAM=\
 	"..\..\..\..\base\include\queue.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\include\vector.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\io\include\pmi.h"\
-	"..\..\..\..\io\include\pmo.h"\
-	"..\..\..\..\lmc\include\lmc.h"\
 	"..\..\..\include\ui.h"\
 	"..\include\bitmapview.h"\
 	"..\include\buttonview.h"\
@@ -791,15 +759,40 @@ SOURCE=..\src\listview.cpp
 !IF  "$(CFG)" == "freeampui - Win32 Release"
 
 DEP_CPP_LISTV=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\id3v1.h"\
+	"..\..\..\..\base\include\linkedlist.h"\
 	"..\..\..\..\base\include\list.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\queue.h"\
+	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
+	"..\..\..\..\io\include\pmi.h"\
+	"..\..\..\include\ui.h"\
+	"..\include\bitmapview.h"\
+	"..\include\buttonview.h"\
+	"..\include\control.h"\
+	"..\include\controlinfo.h"\
+	"..\include\dialview.h"\
 	"..\include\dib.h"\
+	"..\include\freeampui.h"\
 	"..\include\listitem.h"\
 	"..\include\listview.h"\
 	"..\include\renderer.h"\
 	"..\include\scrollview.h"\
+	"..\include\statusview.h"\
+	"..\include\textview.h"\
+	"..\include\timeview.h"\
+	"..\include\utility.h"\
 	"..\include\view.h"\
+	"..\include\volumeview.h"\
 	
 
 "$(INTDIR)\listview.obj" : $(SOURCE) $(DEP_CPP_LISTV) "$(INTDIR)"\
@@ -810,15 +803,40 @@ DEP_CPP_LISTV=\
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
 
 DEP_CPP_LISTV=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\id3v1.h"\
+	"..\..\..\..\base\include\linkedlist.h"\
 	"..\..\..\..\base\include\list.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\queue.h"\
+	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
+	"..\..\..\..\io\include\pmi.h"\
+	"..\..\..\include\ui.h"\
+	"..\include\bitmapview.h"\
+	"..\include\buttonview.h"\
+	"..\include\control.h"\
+	"..\include\controlinfo.h"\
+	"..\include\dialview.h"\
 	"..\include\dib.h"\
+	"..\include\freeampui.h"\
 	"..\include\listitem.h"\
 	"..\include\listview.h"\
 	"..\include\renderer.h"\
 	"..\include\scrollview.h"\
+	"..\include\statusview.h"\
+	"..\include\textview.h"\
+	"..\include\timeview.h"\
+	"..\include\utility.h"\
 	"..\include\view.h"\
+	"..\include\volumeview.h"\
 	
 
 "$(INTDIR)\listview.obj" : $(SOURCE) $(DEP_CPP_LISTV) "$(INTDIR)"\
@@ -846,16 +864,14 @@ DEP_CPP_PLAYL=\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
 	"..\..\..\..\base\include\id3v1.h"\
+	"..\..\..\..\base\include\list.h"\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\playlist.h"\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\registry.h"\
-	"..\..\..\..\base\include\vector.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\io\include\pmi.h"\
-	"..\..\..\..\io\include\pmo.h"\
-	"..\..\..\..\lmc\include\lmc.h"\
 	
 
 "$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"\
@@ -870,16 +886,14 @@ DEP_CPP_PLAYL=\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
 	"..\..\..\..\base\include\id3v1.h"\
+	"..\..\..\..\base\include\list.h"\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\playlist.h"\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\registry.h"\
-	"..\..\..\..\base\include\vector.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\io\include\pmi.h"\
-	"..\..\..\..\io\include\pmo.h"\
-	"..\..\..\..\lmc\include\lmc.h"\
 	
 
 "$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"\
@@ -890,9 +904,6 @@ DEP_CPP_PLAYL=\
 !ENDIF 
 
 SOURCE=..\..\..\..\base\win32\src\preferences.cpp
-
-!IF  "$(CFG)" == "freeampui - Win32 Release"
-
 DEP_CPP_PREFE=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\win32\include\preferences.h"\
@@ -903,21 +914,6 @@ DEP_CPP_PREFE=\
  "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
-
-DEP_CPP_PREFE=\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\base\win32\include\preferences.h"\
-	"..\..\..\..\config\config.h"\
-	
-
-"$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 SOURCE=..\src\renderer.cpp
 
@@ -1294,6 +1290,9 @@ DEP_CPP_VOLUM=\
 !ENDIF 
 
 SOURCE=..\..\..\..\base\win32\src\win32thread.cpp
+
+!IF  "$(CFG)" == "freeampui - Win32 Release"
+
 DEP_CPP_WIN32=\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\win32thread.h"\
@@ -1304,6 +1303,21 @@ DEP_CPP_WIN32=\
  "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+!ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
+
+DEP_CPP_WIN32=\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\win32\include\win32thread.h"\
+	"..\..\..\..\config\config.h"\
+	
+
+"$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 !IF  "$(CFG)" == "freeampui - Win32 Release"
 

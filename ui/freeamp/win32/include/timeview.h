@@ -36,7 +36,7 @@ class TimeView : public View {
     TimeView(   HWND hwnd, 
                 View* parent, 
                 HRGN viewRegion, 
-                DIB* backgroundBitmap,
+                //DIB* backgroundBitmap,
                 DIB* timeFontBitmap,
                 int32 timeFontHeight,
                 int32* timeFontWidths,
@@ -49,7 +49,7 @@ class TimeView : public View {
     TimeView(   HWND hwnd, 
                 View* parent, 
                 RECT* viewRect, 
-                DIB* backgroundBitmap,
+                //DIB* backgroundBitmap,
                 DIB* timeFontBitmap,
                 int32 timeFontHeight,
                 int32* timeFontWidths,
@@ -97,8 +97,8 @@ class TimeView : public View {
  protected:
     
  private:
-    DIB*            m_backgroundBitmap;
-    DIB*            m_viewBitmap;
+    //DIB*            m_backgroundBitmap;
+    //DIB*            m_viewBitmap;
 
     DIB*            m_timeFontBitmap;
     int32*          m_timeFontWidths;

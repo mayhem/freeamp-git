@@ -38,7 +38,6 @@ TimeView::
 TimeView(   HWND hwnd,
             View* parent,
             HRGN viewRegion,
-            DIB* backgroundBitmap,
             DIB* timeFontBitmap,
             int32 timeFontHeight,
             int32* timeFontWidths,
@@ -49,9 +48,9 @@ TimeView(   HWND hwnd,
             int32 flags):
 View(hwnd, parent, viewRegion)
 {
-    assert(backgroundBitmap);
+    //assert(backgroundBitmap);
 
-    m_backgroundBitmap = backgroundBitmap;
+    //m_backgroundBitmap = backgroundBitmap;
     m_offset = 0;
     m_pressed = false;
     m_command = command;
@@ -67,10 +66,10 @@ View(hwnd, parent, viewRegion)
     m_labelFontWidths = labelFontWidths;
     m_labelFontHeight = labelFontHeight;
 
-    m_viewBitmap = new DIB;
+    /*m_viewBitmap = new DIB;
     m_viewBitmap->Create(   Width(),
                             Height(),
-                            backgroundBitmap->BitsPerPixel());
+                            backgroundBitmap->BitsPerPixel());*/
 
     SetTime(0,0,0);
 
@@ -84,7 +83,6 @@ TimeView::
 TimeView(   HWND hwnd,
             View* parent,
             RECT* viewRect,
-            DIB* backgroundBitmap,
             DIB* timeFontBitmap,
             int32 timeFontHeight,
             int32* timeFontWidths,
@@ -95,9 +93,9 @@ TimeView(   HWND hwnd,
             int32 flags):
 View(hwnd, parent, viewRect)
 {
-    assert(backgroundBitmap);
+    //assert(backgroundBitmap);
 
-    m_backgroundBitmap = backgroundBitmap;
+    //m_backgroundBitmap = backgroundBitmap;
     m_offset = 0;
     m_pressed = false;
     m_command = command;
@@ -113,10 +111,10 @@ View(hwnd, parent, viewRect)
     m_labelFontWidths = labelFontWidths;
     m_labelFontHeight = labelFontHeight;
 
-    m_viewBitmap = new DIB;
+    /*m_viewBitmap = new DIB;
     m_viewBitmap->Create(   Width(),
                             Height(),
-                            backgroundBitmap->BitsPerPixel());
+                            backgroundBitmap->BitsPerPixel());*/
 
     SetTime(0,0,0);
 
@@ -128,8 +126,8 @@ View(hwnd, parent, viewRect)
 TimeView::
 ~TimeView()
 {
-    delete m_viewBitmap;
-    m_viewBitmap = NULL;
+    //delete m_viewBitmap;
+    //m_viewBitmap = NULL;
 
     if(m_label)
         delete [] m_label;
@@ -269,7 +267,7 @@ Draw(DIB* canvas, RECT* invalidRect)
 
 
     // prepare the view bitmap
-    if(m_backgroundBitmap->Width() < Width() ||
+    /*if(m_backgroundBitmap->Width() < Width() ||
         m_backgroundBitmap->Height() < Height() )
     {
         Renderer::Tile( m_viewBitmap,
@@ -289,18 +287,18 @@ Draw(DIB* canvas, RECT* invalidRect)
                         m_backgroundBitmap,    
                         0,
                         0);
-    }
+    }*/
 
     int32 i = 0;
-    int32 offset = 1;
+    int32 offset = viewRect.left + 1;
 
     // copy the label
     for(i = 0; m_label[i]; i++)
     {
 
-        Renderer::Copy( m_viewBitmap,
+        Renderer::Copy( canvas,
                         offset, 
-                        3,     
+                        viewRect.top + 3,     
                         m_labelFontWidths[m_label[i] - 32],      
                         m_labelFontHeight, 
                         m_labelFontBitmap,    
@@ -310,13 +308,13 @@ Draw(DIB* canvas, RECT* invalidRect)
         offset += m_labelFontWidths[m_label[i] - 32];
     }
 
-    offset = Width() - m_timeLength - 1;
+    offset = viewRect.left + Width() - m_timeLength - 1;
 
     for(i = 0; m_time[i]; i++)
     {
-        Renderer::Copy( m_viewBitmap,
+        Renderer::Copy( canvas,
                         offset, 
-                        2,     
+                        viewRect.top + 2,     
                         m_timeFontWidths[m_time[i] - 32],      
                         m_timeFontHeight, 
                         m_timeFontBitmap,    
@@ -326,9 +324,8 @@ Draw(DIB* canvas, RECT* invalidRect)
         offset += m_timeFontWidths[m_time[i] - 32];
     }
 
-
     // make sure something weird did not happen above...
-    if(!IsRectEmpty(&drawRect))
+    /*if(!IsRectEmpty(&drawRect))
     {
         // render the draw rect to the canvas
 
@@ -354,5 +351,5 @@ Draw(DIB* canvas, RECT* invalidRect)
                         m_viewBitmap,    
                         src_x,
                         src_y + m_offset);
-    }
+    }*/
 }

@@ -79,9 +79,11 @@ Create( uint32 width,
     m_height = height;
     m_bitCount = bitsPerPixel;
 
-    m_bytesPerLine = (m_width * BytesPerPixel()) + (m_width%4);
+    int32 imageSize = ((((m_width * m_bitCount) + 31) & ~31) >> 3) * m_height;
 
-    m_bits = (BYTE*)malloc(m_bytesPerLine * m_height);
+    m_bytesPerLine = imageSize / m_height;
+
+    m_bits = (BYTE*)malloc(imageSize);
 
     m_bitmapInfo = (BITMAPINFO*)malloc( sizeof BITMAPINFO + 
                                         sizeof RGBQUAD *
@@ -175,9 +177,11 @@ Load(HANDLE module, LPCTSTR resource)
                 // so we can calculate this...
                 int32 numEntries = NumberOfPaletteEntries();
 
-                m_bytesPerLine = (m_width * BytesPerPixel()) + (m_width%4);
+                int32 imageSize = ((((m_width * m_bitCount) + 31) & ~31) >> 3) * m_height;
 
-                m_bits = (BYTE*)malloc(m_bytesPerLine * m_height);
+                m_bytesPerLine = imageSize / m_height;
+
+                m_bits = (BYTE*)malloc(imageSize);
 
                 m_bitmapInfo = (BITMAPINFO*)malloc( sizeof BITMAPINFO + 
                                                     sizeof RGBQUAD *
@@ -297,4 +301,96 @@ Pixel(int32 x, int32 y)
     Pixel(x, y, &color);
 
     return color.Pack();
+}
+
+RGBQUAD* 
+DIB::
+Palette()
+{
+    RGBQUAD* result = NULL;
+
+    if(BitsPerPixel() == 8)
+    {
+        BITMAPINFO* info = BitmapInfo();
+
+        result = info->bmiColors;
+    }
+
+    return result;
+}
+
+bool
+DIB::
+SetPalette(RGBQUAD* palette, int32 entries)
+{
+    bool result = false;
+
+    if(BitsPerPixel() == 8)
+    {
+        memcpy(Palette(), palette, entries*sizeof(RGBQUAD));
+
+        result = true;
+    }
+
+    return result;
+}
+
+
+bool 
+DIB::
+ColorForIndex(int32 index, Color* color)
+{
+    bool result = false;
+    
+    if( BitsPerPixel() == 8 &&
+        index >= 0 && index < 256)
+    {
+        RGBQUAD* palette = Palette();
+
+        color->r = palette[index].rgbRed;
+        color->g = palette[index].rgbGreen;
+        color->b = palette[index].rgbBlue;
+        color->a = palette[index].rgbReserved;
+
+        result = true;
+    }
+
+    return result;   
+}
+
+int32 
+DIB::
+IndexForColor(Color* color)
+{
+    return IndexForColor(color->r, color->g, color->b);
+}
+
+int32 
+DIB::
+IndexForColor(int32 r, int32 g, int32 b)
+{
+    int32 result = -1;
+    
+    if(BitsPerPixel() == 8)
+    {
+        uint32 p, d, bestCandidate = 0, leastDifference = 0xFFFFFFFF;
+        RGBQUAD* palette = Palette();
+
+        for(p = 0; p < 256; p++)
+        {
+            d =  abs(palette[p].rgbRed - r)^2;
+            d += abs(palette[p].rgbGreen - g)^2;
+            d += abs(palette[p].rgbBlue - b)^2;
+
+            if(d < leastDifference)
+            {
+                leastDifference = d;
+                bestCandidate = p;
+            }
+        }
+
+        result = bestCandidate;
+    }
+
+    return result;
 }
