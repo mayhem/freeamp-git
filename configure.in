@@ -295,22 +295,12 @@ dnl                   AC_MSG_ERROR(GTK+ distribution not found.)
 #AM_CONDITIONAL(AM_ENABLE_GTK, test "$gtk" = "true")
 
 
-esound="false"
-AC_ARG_WITH(esound,
-[  --with-esound           Enable esound pmo],
-[ case "${withval}" in
-  no)  ;;
-  yes) esound="true"
-       ;;
-  *)   esound="true"
-       EXTRALIBS="$EXTRALIBS -L$withval"
-       ;; 
-  esac])
+AC_CHECK_HEADER(esd.h, have_esound="true", have_esound="false")
 
-if test "$esound" = "true"; then
+if test "$have_esound" = "true"; then
   AC_PATH_PROG(ESD_CONFIG, esd-config, no)
   if test "$ESD_CONFIG" = "no" ; then
-     esound="false"
+     have_esound="false"
   else
      ESD_LIBS=`$ESD_CONFIG --libs`
      EXTRALIBS="$EXTRALIBS $ESD_LIBS"

@@ -59,11 +59,11 @@ EsounDPMO::EsounDPMO(FAContext *context) :
 
    m_pBufferThread = NULL;
 
-   m_iOutputBufferSize = 0;
    m_iTotalBytesWritten = 0;
    m_iBytesPerSample = 0;
    m_iLastFrame = -1;
    m_iDataSize = 0;
+   m_iVolume = 100;
    audio_fd = -1;
 
    if (!m_pBufferThread)
@@ -96,9 +96,21 @@ EsounDPMO::~EsounDPMO()
    }
 }
 
-VolumeManager *EsounDPMO::GetVolumeManager()
+int32 EsounDPMO::GetVolume()
 {
-   return new ESDVolumeManager(audio_fd);
+   return m_iVolume;
+}
+
+void EsounDPMO::SetVolume(int32 v)
+{
+   int esd = esd_open_sound(NULL);
+   if ((esd > 0) && (v != m_iVolume))
+   {
+      m_iVolume = v;
+      v = ESD_VOLUME_BASE * (v & 0xff) / 50;
+      esd_set_stream_pan(esd, audio_fd, v, v);
+      close(esd);
+   }
 }
 
 Error EsounDPMO::Init(OutputInfo * info)
@@ -115,8 +127,6 @@ Error EsounDPMO::Init(OutputInfo * info)
 
       m_iDataSize = info->max_buffer_size;
    }
-
-   channels = info->number_of_channels;
 
    // configure the device:
    int       esd_format = ESD_STREAM | ESD_PLAY | ESD_BITS16;
@@ -145,7 +155,6 @@ Error EsounDPMO::Init(OutputInfo * info)
    myInfo->max_buffer_size = info->max_buffer_size;
    m_properlyInitialized = true;
 
-   m_iOutputBufferSize = ESD_BUF_SIZE; 
    m_iBytesPerSample = info->number_of_channels * (info->bits_per_sample / 8);
 
    return kError_NoErr;

@@ -33,12 +33,6 @@ ____________________________________________________________________________*/
 #include "pmo.h"
 #include "pmoevent.h"
 #include "eventbuffer.h"
-#include "esdvolume.h"
-
-#define BIT_SELECT  0x1f
-#define SLEEPTIME   256
-
-static const uint32 OBUFFERSIZE = 2 * 1152;
 
 enum
 {
@@ -57,25 +51,25 @@ class EsounDPMO:public PhysicalMediaOutput
      virtual ~EsounDPMO();
 
      virtual Error Init(OutputInfo * info);
-     virtual VolumeManager *GetVolumeManager();
 
      static void   StartWorkerThread(void *);
-
+     int32         GetVolume(void);
+     void          SetVolume(int32);
+     
    private:
      void          WorkerThread(void);
      virtual Error Reset(bool user_stop);
      void          HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent);
 
      bool         m_properlyInitialized;
-     uint32       channels;
      int   audio_fd;
      OutputInfo  *myInfo;
      Thread      *m_pBufferThread;
-     Mutex       *m_pPauseMutex;
-     int          m_iOutputBufferSize, m_iBytesPerSample, m_iTotalFragments;
+     int          m_iBytesPerSample;
      long long    m_iTotalBytesWritten;
      int          m_iLastFrame;
-     unsigned     m_iDataSize;
+     unsigned int m_iDataSize;
+     int          m_iVolume;
 };
 
 #endif /* _ESOUNDPMO_H_ */ 
