@@ -1913,6 +1913,7 @@ void MusicBrowserUI::AddTrackAndPlayEvent(void)
 
     if(m_plm->CountItems())
     {
+		m_context->target->AcceptEvent(new Event(CMD_Stop));
         m_plm->SetCurrentIndex(count);
         m_context->target->AcceptEvent(new Event(CMD_Play));
     }
