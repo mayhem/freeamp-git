@@ -55,7 +55,7 @@ ____________________________________________________________________________*/
 #include <math.h>
 #include "utility.h"
 
-#include <musicbrainz/musicbrainz.h>
+#include <musicbrainz/mb_c.h>
 
 #include "slclient.h" // FIXME: remove before b9
 
@@ -150,57 +150,68 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
 
     m_pSema->Wait();
 
-    MusicBrainz o;
-    string  error, data;
+    musicbrainz_t o;
     bool    ret;
-    vector<string> args;
-    char    temp[10], guid[40];
+    char   *args[11];
+    char    temp[255], guid[40];
+    int     i;
 
-    o.SetServer(string("www.musicbrainz.org"), 80);
+    o = mb_New();
+    mb_SetServer(o, "www.musicbrainz.org", 80);
 
     uuid_ascii((unsigned char*)pmetaData->GUID().c_str(), guid);
 
-    args.push_back(pmetaData->Title());
-    args.push_back(string(guid));
-    args.push_back(pmetaData->Filename());
-    args.push_back(pmetaData->Artist());
-    args.push_back(pmetaData->Album());
+    args[0] = strdup(pmetaData->Title().c_str());
+    args[1] = strdup(guid);
+    args[2] = strdup(pmetaData->Filename().c_str());
+    args[3] = strdup(pmetaData->Artist().c_str());
+    args[4] = strdup(pmetaData->Album().c_str());
     sprintf(temp, "%d", pmetaData->Track());
-    args.push_back(string(temp));
+    args[5] = strdup(temp);
     sprintf(temp, "%d", pmetaData->Length());
-    args.push_back(string(temp));
+    args[6] = strdup(temp);
     sprintf(temp, "%d", pmetaData->Year());
-    args.push_back(string(temp));
-    args.push_back(pmetaData->Genre());
-    args.push_back(pmetaData->Comment());
+    args[7] = strdup(temp);
+    args[8] = strdup(pmetaData->Genre().c_str());
+    args[9] = strdup(pmetaData->Comment().c_str());
+    args[10] = NULL;
 
-    ret = o.Query(string(MB_ExchangeMetadata), &args);
+    ret = mb_QueryWithArgs(o, MB_ExchangeMetadata, args);
+    for(i = 0; i < 10; i++)
+       free(args[i]);
+
     if (!ret)
     {
-        o.GetQueryError(error);
-	m_pSema->Signal();
+        m_pSema->Signal();
         return APS_NETWORKERROR;
     }
 
     // This query should always return one item
-    if (o.GetNumItems() == 0)
+    if (mb_GetNumItems(o) == 0)
     {
-	m_pSema->Signal();
-	return APS_GENERALERROR;
+        m_pSema->Signal();
+        return APS_GENERALERROR;
     }
 
     // Now start the data extraction process.
     // Select the first item in the list of returned items
-    o.Select(MB_SelectExchangedData);
+    mb_Select(o, MB_SelectExchangedData);
 
-    pmetaData->SetArtist(o.Data(MB_GetArtistName).c_str());
-    pmetaData->SetTitle(o.Data(MB_GetTrackName).c_str());
-    pmetaData->SetAlbum(o.Data(MB_GetAlbumName).c_str());
-    pmetaData->SetGenre(o.Data(MB_GetGenre).c_str());
-    pmetaData->SetComment(o.Data(MB_GetDescription).c_str());
-    pmetaData->SetYear(o.DataInt(MB_GetYear));
-    pmetaData->SetTrack(o.DataInt(MB_GetTrackNum));
-    pmetaData->SetLength(o.DataInt(MB_GetDuration));
+    mb_GetResultData(o, MB_GetArtistName, temp, 255);
+    pmetaData->SetArtist(temp);
+    mb_GetResultData(o, MB_GetTrackName, temp, 255);
+    pmetaData->SetTitle(temp);
+    mb_GetResultData(o, MB_GetAlbumName, temp, 255);
+    pmetaData->SetAlbum(temp);
+    mb_GetResultData(o, MB_GetGenre, temp, 255);
+    pmetaData->SetGenre(temp);
+    mb_GetResultData(o, MB_GetDescription, temp, 255);
+    pmetaData->SetComment(temp);
+    pmetaData->SetYear(mb_GetResultInt(o, MB_GetYear));
+    pmetaData->SetTrack(mb_GetResultInt(o, MB_GetTrackNum));
+    pmetaData->SetLength(mb_GetResultInt(o, MB_GetDuration));
+
+    mb_Delete(o);
 
     m_pSema->Signal();
 

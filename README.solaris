@@ -1,4 +1,5 @@
-Solaris mostly works, although it has strange problems with lockups.
-Still trying to track them down.
+FreeAmp is currently not supported under Solaris. Sorry.
 
-$Id$
+If you'd like to finish porting FreeAmp to Solaris *AND* maintain
+that port, please mail info@freeamp.org
+
