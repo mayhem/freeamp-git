@@ -1,24 +1,24 @@
 /*____________________________________________________________________________
-	
-	FreeAmp - The Free MP3 Player
+    
+    FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 2000 EMusic.com
+    Portions Copyright (C) 2000 EMusic.com
 
-	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; either version 2 of the License, or
-	(at your option) any later version.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-	
-	$Id$
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    
+    $Id$
 ____________________________________________________________________________*/
 
 #include <assert.h>
@@ -79,7 +79,7 @@ bool MusicBrainzCD::ReadMetaData(const char* url, MetaData* metadata)
     if (ptr == NULL)
        return false;
 
-	m_mutex.Acquire();
+    m_mutex.Acquire();
 
     track = atoi(ptr + 1);
     if (track != m_nextTrack)
@@ -88,25 +88,26 @@ bool MusicBrainzCD::ReadMetaData(const char* url, MetaData* metadata)
           mb_Delete(o);
 
         o = mb_New();
+        mb_UseUTF8(o, 0);
         if (!LookupCD())
         {
            mb_Delete(o);
            o = NULL; 
-	       m_mutex.Release();
+           m_mutex.Release();
            return false;
         }
         m_nextTrack = 1;
     }
     if (o == NULL)
-	{
+    {
        m_mutex.Release();
        return false;
-	}
-
-    mb_Select(o, MB_SelectFirstItem);  
+    }
 
     mb_GetResultData(o, MB_GetNumTracks, data, iDataLen);
     numTracks = atoi(data);
+
+    mb_Select(o, MB_SelectAlbum);  
 
     mb_GetResultData(o, MB_GetAlbumName, data, iDataLen);
     metadata->SetAlbum(data);
@@ -146,7 +147,7 @@ bool MusicBrainzCD::ReadMetaData(const char* url, MetaData* metadata)
     }
     m_nextTrack++;
 
-	m_mutex.Release();
+    m_mutex.Release();
 
     return true;
 }
@@ -162,7 +163,7 @@ bool MusicBrainzCD::LookupCD(void)
     Database     *db;
     string        rdf, proxyServer;
 
-	error[0] = 0;
+    error[0] = 0;
     m_context->prefs->GetPrefString(kDatabaseDirPref, tempDir, &length);
 
     string database = string(tempDir) + string(DIR_MARKER_STR) +
@@ -171,7 +172,8 @@ bool MusicBrainzCD::LookupCD(void)
     m_context->prefs->GetPrefString(kCDDevicePathPref, tempDir, &length);
     mb_SetDevice(o, tempDir);
 
-    mb_SetServer(o, MUSICBRAINZ_SERVER, MUSICBRAINZ_PORT);
+    //mb_SetServer(o, MUSICBRAINZ_SERVER, MUSICBRAINZ_PORT);
+    mb_SetServer(o, "musicbrainz.eorbit.net", MUSICBRAINZ_PORT);
     if (GetProxySettings(m_context, proxyServer, proxyPort))
        mb_SetProxy(o, (char *)proxyServer.c_str(), proxyPort);
 
@@ -183,7 +185,7 @@ bool MusicBrainzCD::LookupCD(void)
        return false;
     }
 
-    if (!mb_Select(o, MB_SelectLocalQuery))
+    if (!mb_Select(o, MB_SelectTopLevel))
     {
        return false;
     }
