@@ -24,7 +24,7 @@ ____________________________________________________________________________*/
 
 /* system headers */
 #include <windows.h>
-#include <stdlib.h>
+#include <dsound.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
@@ -213,8 +213,8 @@ DSoundCardPMO::
     // delete the direct sound secondary buffer
     if (m_DSBufferManager.pDSSecondaryBuffer)
     {
-      IDirectSoundBuffer_Stop(m_DSBufferManager.pDSSecondaryBuffer);
-      IDirectSoundBuffer_Release(m_DSBufferManager.pDSSecondaryBuffer);
+      m_DSBufferManager.pDSSecondaryBuffer->Stop();
+      m_DSBufferManager.pDSSecondaryBuffer->Release();
     }
 
     // Do I need to release primary as well ?
@@ -301,9 +301,8 @@ Init(OutputInfo* info)
 
     // Should set cooperative level here to set primary buffer format
     // but we need a handle to a window ... need to talk to Mark about that
-    hResult = IDirectSound_SetCooperativeLevel( m_DSBufferManager.pDSDevice->pDSObject,
-                                                m_hMainWndHandle,
-                                                DSSCL_PRIORITY);
+    hResult = m_DSBufferManager.pDSDevice->pDSObject->SetCooperativeLevel( m_hMainWndHandle,
+																																						DSSCL_PRIORITY);
     if (FAILED(hResult))
     {
       g_Log->Log(LogOutput, "error cannot set DirectSound DSSCL_PRIORITY Cooperative Level...\n");
@@ -314,7 +313,7 @@ Init(OutputInfo* info)
     DSBufferInfo.dwSize   = sizeof(DSBUFFERDESC);
     DSBufferInfo.dwFlags  = DSBCAPS_PRIMARYBUFFER;
 
-    hResult = IDirectSound_CreateSoundBuffer( m_DSBufferManager.pDSDevice->pDSObject,
+    hResult = m_DSBufferManager.pDSDevice->pDSObject->CreateSoundBuffer(
                                               &DSBufferInfo,
                                               &m_DSBufferManager.pDSPrimaryBuffer,
                                               NULL);
@@ -337,7 +336,7 @@ Init(OutputInfo* info)
       format.nBlockAlign      = 2*2;
       format.cbSize           = 0;
 
-      hResult = IDirectSoundBuffer_SetFormat(m_DSBufferManager.pDSPrimaryBuffer, &format);
+      hResult = m_DSBufferManager.pDSPrimaryBuffer->SetFormat(&format);
       if (FAILED(hResult))
       {
         g_Log->Log(LogOutput, "Cannot Set DirectSound Primary Buffer Format...\n");
@@ -375,7 +374,7 @@ Init(OutputInfo* info)
   DSBufferInfo.lpwfxFormat        = m_wfex;
 
   // Create Secondary Buffer
-  hResult = IDirectSound_CreateSoundBuffer( m_DSBufferManager.pDSDevice->pDSObject,
+  hResult = m_DSBufferManager.pDSDevice->pDSObject->CreateSoundBuffer(
                                             &DSBufferInfo,
                                             &m_DSBufferManager.pDSSecondaryBuffer,
                                             NULL);
@@ -445,10 +444,9 @@ Resume()
   // otherwise, it's a seek or a stop (DSClear has been called)
   // and we let the Monitor decide to start playing when there are data
   if ((m_DSBufferManager.pDSSecondaryBuffer) && (m_bIsBufferEmptyNow == false))
-    IDirectSoundBuffer_Play(m_DSBufferManager.pDSSecondaryBuffer,
-                            0,
-                            0,
-                            DSBPLAY_LOOPING);
+    m_DSBufferManager.pDSSecondaryBuffer->Play( 0,
+																								0,
+																								DSBPLAY_LOOPING);
 
   return kError_NoErr;
 }
@@ -469,8 +467,7 @@ GetVolume(void)
   int32 volume = 0;
 
   if (m_DSBufferManager.pDSSecondaryBuffer)
-    IDirectSoundBuffer_GetVolume( m_DSBufferManager.pDSSecondaryBuffer,
-                                  (LPLONG) &volume);
+    m_DSBufferManager.pDSSecondaryBuffer->GetVolume((LPLONG) &volume);
   return volume;
 }
 
@@ -479,8 +476,7 @@ DSoundCardPMO::
 SetVolume(int32 v)
 {
   if (m_DSBufferManager.pDSSecondaryBuffer)
-    IDirectSoundBuffer_SetVolume( m_DSBufferManager.pDSSecondaryBuffer,
-                                  (LONG) v);
+    m_DSBufferManager.pDSSecondaryBuffer->SetVolume((LONG) v);
 }
 
 Error
@@ -630,17 +626,16 @@ DSWriteToSecBuffer(int32& wrote, void *pBuffer, int32 length)
   m_pDSWriteSem->Wait();
 
   // get a lock to a memory region to write to
-  hResult = IDirectSoundBuffer_Lock(  m_DSBufferManager.pDSSecondaryBuffer,
-                                      m_DSBufferManager.dwWritePtr,
-                                      length,
-                                      &ptr1,
-                                      &dwBytes1,
-                                      &ptr2,
-                                      &dwBytes2,
-                                      0);
+  hResult = m_DSBufferManager.pDSSecondaryBuffer->Lock(	m_DSBufferManager.dwWritePtr,
+																												length,
+																												&ptr1,
+																												&dwBytes1,
+																												&ptr2,
+																												&dwBytes2,
+																												0);
   if (hResult == DSERR_BUFFERLOST)
   {
-    hResult = IDirectSoundBuffer_Restore(m_DSBufferManager.pDSSecondaryBuffer);
+    hResult = m_DSBufferManager.pDSSecondaryBuffer->Restore();
     if (FAILED(hResult))
     {
       wrote = 0;
@@ -648,14 +643,13 @@ DSWriteToSecBuffer(int32& wrote, void *pBuffer, int32 length)
       g_Log->Log(LogOutput, "Exiting DSWriteToSecBuffer with DSound error\n");
       return result;
     }
-    hResult = IDirectSoundBuffer_Lock(  m_DSBufferManager.pDSSecondaryBuffer,
-                                        m_DSBufferManager.dwWritePtr,
-                                        length,
-                                        &ptr1,
-                                        &dwBytes1,
-                                        &ptr2,
-                                        &dwBytes2,
-                                        0);
+    hResult = m_DSBufferManager.pDSSecondaryBuffer->Lock(	m_DSBufferManager.dwWritePtr,
+																													length,
+																													&ptr1,
+																													&dwBytes1,
+																													&ptr2,
+																													&dwBytes2,
+																													0);
   }
 
   if (FAILED(hResult))
@@ -687,11 +681,10 @@ DSWriteToSecBuffer(int32& wrote, void *pBuffer, int32 length)
   }
 
   // unlock the memory region
-  IDirectSoundBuffer_Unlock(m_DSBufferManager.pDSSecondaryBuffer,
-                            ptr1,
-                            dwBytes1,
-                            ptr2,
-                            dwBytes2);
+  m_DSBufferManager.pDSSecondaryBuffer->Unlock(	ptr1,
+																								dwBytes1,
+																								ptr2,
+																								dwBytes2);
   if (FAILED(hResult))
   {
     wrote = 0;
@@ -728,9 +721,8 @@ DSMonitorBufferState()
 
   new_state = m_DSBufferManager.state;
 
-  IDirectSoundBuffer_GetCurrentPosition(m_DSBufferManager.pDSSecondaryBuffer,
-                                        &dwReadPos,
-                                        &dwWritePos);
+  m_DSBufferManager.pDSSecondaryBuffer->GetCurrentPosition( &dwReadPos,
+																														&dwWritePos);
   if (m_DSBufferManager.dwWritePtr >= dwReadPos)
   {
     dwBuffered = m_DSBufferManager.dwWritePtr - dwReadPos;
@@ -768,10 +760,9 @@ DSMonitorBufferState()
 
         // restart the buffer
         if (m_bLMCsaidToPlay && m_bIsBufferEmptyNow)
-        IDirectSoundBuffer_Play(m_DSBufferManager.pDSSecondaryBuffer,
-                    0,
-                    0,
-                    DSBPLAY_LOOPING);
+        m_DSBufferManager.pDSSecondaryBuffer->Play(	0,
+																										0,
+																										DSBPLAY_LOOPING);
 
         m_bIsBufferEmptyNow = false;
       }
@@ -832,7 +823,7 @@ DSReset()
 {
   if (m_DSBufferManager.pDSSecondaryBuffer)
   {
-    IDirectSoundBuffer_Stop(m_DSBufferManager.pDSSecondaryBuffer);
+    m_DSBufferManager.pDSSecondaryBuffer->Stop();
   }
 }
 
@@ -853,25 +844,23 @@ DSClear()
   m_DSBufferManager.state         = UNDERFLOW;
 
   // reset the play cursor
-  IDirectSoundBuffer_SetCurrentPosition(m_DSBufferManager.pDSSecondaryBuffer, 0);
+  m_DSBufferManager.pDSSecondaryBuffer->SetCurrentPosition(0);
 
   // write zeros into secondary buffer
-  hResult = IDirectSoundBuffer_Lock(m_DSBufferManager.pDSSecondaryBuffer,
-                                    0,
-                                    m_DSBufferManager.dwBufferSize,
-                                    &ptr,
-                                    &dwBytes,
-                                    NULL,
-                                    NULL,
-                                    0);
+  hResult = m_DSBufferManager.pDSSecondaryBuffer->Lock(	0,
+																												m_DSBufferManager.dwBufferSize,
+																												&ptr,
+																												&dwBytes,
+																												NULL,
+																												NULL,
+																												0);
   if (SUCCEEDED(hResult))
   {
     memset(ptr, 0, m_DSBufferManager.dwBufferSize);
-    IDirectSoundBuffer_Unlock(m_DSBufferManager.pDSSecondaryBuffer,
-                              ptr,
-                              dwBytes,
-                              NULL,
-                              0);
+    m_DSBufferManager.pDSSecondaryBuffer->Unlock(	ptr,
+																									dwBytes,
+																									NULL,
+																									0);
   }
   m_bIsBufferEmptyNow = true;
 

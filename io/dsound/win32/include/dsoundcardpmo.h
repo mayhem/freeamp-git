@@ -26,11 +26,6 @@ ____________________________________________________________________________*/
 #ifndef _DSOUNDCARDPMO_H_
 #define _DSOUNDCARDPMO_H_
 
-/* system headers */
-#include <windows.h>
-#include <dsound.h>
-#include <stdlib.h>
-
 /* project headers */
 #include "config.h"
 #include "pmo.h"
