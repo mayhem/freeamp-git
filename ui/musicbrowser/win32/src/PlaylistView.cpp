@@ -310,7 +310,7 @@ void MusicBrowserUI::InitList(void)
     lvc.cchTextMax = strlen(lvc.pszText);
     lvc.iSubItem = 0;
     lvc.cx = INDEX_COLUMN_WIDTH; // width of column in pixels
-    ListView_InsertColumn(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), 0, &lvc);
+    ListView_InsertColumn(m_hPlaylistView, 0, &lvc);
 
     int32 remainder = (sRect.right-sRect.left - FIXED_COLUMN_WIDTH)%3;
 
@@ -318,24 +318,40 @@ void MusicBrowserUI::InitList(void)
     lvc.cchTextMax = strlen(lvc.pszText);
     lvc.iSubItem = 1;
     lvc.cx = (sRect.right-sRect.left - FIXED_COLUMN_WIDTH)/3; // width of column in pixels
-    ListView_InsertColumn(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), 1, &lvc);
+    ListView_InsertColumn(m_hPlaylistView, 1, &lvc);
     
     lvc.pszText = "Artist";
     lvc.cchTextMax = strlen(lvc.pszText);
     lvc.iSubItem = 2;
-    ListView_InsertColumn(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), 2, &lvc);
+    ListView_InsertColumn(m_hPlaylistView, 2, &lvc);
 
     lvc.pszText = "Album";
     lvc.cchTextMax = strlen(lvc.pszText);
     lvc.iSubItem = 3;
-    ListView_InsertColumn(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), 3, &lvc);
+    ListView_InsertColumn(m_hPlaylistView, 3, &lvc);
 
     
     lvc.pszText = "Length";
     lvc.cx = LENGTH_COLUMN_WIDTH + remainder;//((sRect.right-sRect.left)/4) - 3; // width of column in pixels
     lvc.cchTextMax = strlen(lvc.pszText);
     lvc.iSubItem = 4;
-    ListView_InsertColumn(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), 4, &lvc);
+    ListView_InsertColumn(m_hPlaylistView, 4, &lvc);
+
+    if(m_itemsAddedBeforeWeWereCreated)
+    {
+        for(uint32 i = 0; i < m_itemsAddedBeforeWeWereCreated; i++)
+        {
+            LV_ITEM sItem;
+
+            sItem.mask = 0;
+            sItem.iSubItem = 0;
+            sItem.iItem = 0;
+
+            ListView_InsertItem(m_hPlaylistView, &sItem);
+        }
+
+        m_itemsAddedBeforeWeWereCreated = 0;
+    }
 }
 
 void MusicBrowserUI::PlaylistListItemMoved(const PlaylistItem* item, 
@@ -448,28 +464,35 @@ void MusicBrowserUI::PlaylistListItemAdded(const PlaylistItem* item)
 
     if(index != kInvalidIndex)
     {
-        sItem.mask = 0;
-        sItem.iSubItem = 0;
-        sItem.iItem = index;
+        if(hwnd)
+        {
+            sItem.mask = 0;
+            sItem.iSubItem = 0;
+            sItem.iItem = 0;
 
-        if(!ListView_GetItemCount(hwnd) && !m_pParent)
-            m_context->target->AcceptEvent(new Event(CMD_Play));
+            if(!ListView_GetItemCount(hwnd) && !m_pParent)
+                m_context->target->AcceptEvent(new Event(CMD_Play));
 
-        ListView_InsertItem(hwnd, &sItem);
+            ListView_InsertItem(hwnd, &sItem);
 
-        // this skips change notification
-        // for initial loading of list for
-        // editing. a hack pretty much but
-        // i can't think of a better way
-        if(m_initialCount)
-            m_initialCount--;
+            // this skips change notification
+            // for initial loading of list for
+            // editing. a hack pretty much but
+            // i can't think of a better way
+            if(m_initialCount)
+                m_initialCount--;
+            else
+            {
+                m_bListChanged = true;
+                UpdateButtonMenuStates();
+            }
+
+            UpdateTotalTime();
+        }
         else
         {
-            m_bListChanged = true;
-            UpdateButtonMenuStates();
+            m_itemsAddedBeforeWeWereCreated++;
         }
-
-        UpdateTotalTime();
     }
 }
 

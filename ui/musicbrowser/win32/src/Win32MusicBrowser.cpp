@@ -129,6 +129,7 @@ MusicBrowserUI::MusicBrowserUI(FAContext      *context,
 
     m_playerState = PLAYERSTATE_STOPPED;
     m_initialCount = 0;
+    m_itemsAddedBeforeWeWereCreated = 0;
     m_hNewPlaylistItem = NULL;
     m_hPlaylistView = NULL;
     m_hMusicCatalog = NULL;

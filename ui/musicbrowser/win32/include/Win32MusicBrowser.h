@@ -301,6 +301,7 @@ class MusicBrowserUI : public UserInterface
     vector<string>      m_searchPathList;
     HTREEITEM           m_hNewPlaylistItem;  
     uint32              m_initialCount;
+    uint32              m_itemsAddedBeforeWeWereCreated;
 
     MetaData            m_editTrackMetaData;
 };
