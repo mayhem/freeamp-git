@@ -401,7 +401,7 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
                     PlaylistItem *item;
             
                     item = new PlaylistItem(*treedata->m_pTrack);
-                    m_oPlm->AddItem(item, false);
+                    m_plm->AddItem(item, false);
                 } 
                 else if(treedata && treedata->IsPlaylist())
                 {
@@ -410,7 +410,7 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
                         ClearPlaylistEvent();  
                     }
 
-                    m_oPlm->ReadPlaylist(treedata->m_oPlaylistPath.c_str());
+                    m_plm->ReadPlaylist(treedata->m_oPlaylistPath.c_str());
                 }
                 else if(treedata && treedata->IsPortable())
                 {
@@ -426,7 +426,7 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
                     PlaylistItem *item;
             
                     item = new PlaylistItem(*treedata->m_pStream);
-                    m_oPlm->AddItem(item, false);
+                    m_plm->AddItem(item, false);
                 }
                 else if(tv_htinfo.hItem == m_hNewPlaylistItem)
                 {

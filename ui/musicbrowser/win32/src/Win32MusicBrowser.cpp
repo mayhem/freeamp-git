@@ -98,10 +98,10 @@ MusicBrowserUI::MusicBrowserUI(FAContext      *context,
     Init();
 
     if (m_pParent == NULL)
-        m_oPlm = m_context->plm;
+        m_plm = m_context->plm;
     else
     {
-        m_oPlm = new PlaylistManager(m_context);  
+        m_plm = new PlaylistManager(m_context);  
         m_portableDevice = pDevice;
 
         string displayString;
@@ -134,9 +134,9 @@ MusicBrowserUI::MusicBrowserUI(FAContext      *context,
 
     if (m_pParent == NULL)
     {
-       m_oPlm = m_context->plm;
+       m_plm = m_context->plm;
 
-       if(!m_oPlm->CountItems())
+       if(!m_plm->CountItems())
        {
             bool savePlaylist = true;
 
@@ -157,18 +157,18 @@ MusicBrowserUI::MusicBrowserUI(FAContext      *context,
 
                 vector<PlaylistItem*> items;
 
-                m_oPlm->ReadPlaylist(url, &items);
+                m_plm->ReadPlaylist(url, &items);
 
                 m_initialCount = items.size();
                 m_autoPlayHack = true;
 
-                m_oPlm->AddItems(&items);
+                m_plm->AddItems(&items);
             }           
        }
     }
     else
     {
-       m_oPlm = new PlaylistManager(m_context);   
+       m_plm = new PlaylistManager(m_context);   
        m_currentListName = oPlaylistName;
     }    
 }
@@ -190,7 +190,7 @@ void MusicBrowserUI::Init()
     m_overSplitter = false;
     m_trackSplitter = false;
 
-    m_oPlm = NULL;
+    m_plm = NULL;
     m_portableDevice = NULL;
 
     short pattern[8];
@@ -236,7 +236,7 @@ MusicBrowserUI::~MusicBrowserUI()
 
     if (m_pParent)
     {
-       delete m_oPlm;
+       delete m_plm;
     }
     else
     {
@@ -363,7 +363,7 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
                 length = sizeof(url);
                 FilePathToURL(path, url, &length);
 
-                m_oPlm->WritePlaylist(url);
+                m_plm->WritePlaylist(url);
             }
 
             CloseMainDialog();
@@ -481,7 +481,7 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
         {
             PlaylistItemsAddedEvent* pie = (PlaylistItemsAddedEvent*)event;
 
-            if(pie->Manager() == m_oPlm)
+            if(pie->Manager() == m_plm)
                 PlaylistListItemsAdded(pie->Items());
             else
             {
@@ -504,7 +504,7 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
         {
             PlaylistItemAddedEvent* pie = (PlaylistItemAddedEvent*)event;
 
-            if(pie->Manager() == m_oPlm)
+            if(pie->Manager() == m_plm)
                 PlaylistListItemAdded(pie->Item());
             else
             {
@@ -527,7 +527,7 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
         {
             PlaylistItemUpdatedEvent* pie = (PlaylistItemUpdatedEvent*)event;
 
-            if(pie->Manager() == m_oPlm)
+            if(pie->Manager() == m_plm)
                 PlaylistListItemUpdated(pie->Item());
             else
             {
@@ -550,7 +550,7 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
         {
             PlaylistItemMovedEvent* pie = (PlaylistItemMovedEvent*)event;
 
-            if(pie->Manager() == m_oPlm)
+            if(pie->Manager() == m_plm)
                 PlaylistListItemMoved(pie->Item(), pie->OldIndex(), pie->NewIndex());
             else
             {
@@ -573,7 +573,7 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
         {
             PlaylistItemRemovedEvent* pie = (PlaylistItemRemovedEvent*)event;
 
-            if(pie->Manager() == m_oPlm)
+            if(pie->Manager() == m_plm)
                 PlaylistListItemRemoved(pie->Item(), pie->Index());
             else
             {
@@ -596,7 +596,7 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
         {
             PlaylistSortedEvent* pie = (PlaylistSortedEvent*)event;
 
-            if(pie->Manager() == m_oPlm)
+            if(pie->Manager() == m_plm)
                 PlaylistListSorted();
             else
             {
@@ -621,7 +621,7 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
                                  m_currentplaying,
                                  m_currentplaying);
 
-            m_currentplaying = m_oPlm->GetCurrentIndex();
+            m_currentplaying = m_plm->GetCurrentIndex();
 
             ListView_RedrawItems(m_hPlaylistView, 
                                  m_currentplaying,

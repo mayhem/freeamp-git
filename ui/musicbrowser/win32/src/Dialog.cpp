@@ -222,11 +222,11 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                     return 1;
 
                 case ID_EDIT_UNDO_ACTION:
-                    m_oPlm->Undo();
+                    m_plm->Undo();
                     return 1;
 
                 case ID_EDIT_REDO_ACTION:
-                    m_oPlm->Redo();
+                    m_plm->Redo();
                     return 1;
 
                 case ID_POPUP_ADDTRACK:
@@ -983,24 +983,24 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
 //       string lastPlaylist = FreeampDir(m_context->prefs);
 //       lastPlaylist += "\\currentlist.m3u";
 //       LoadPlaylist(lastPlaylist);
-        m_oPlm->SetActivePlaylist(kPlaylistKey_MasterPlaylist);
+        m_plm->SetActivePlaylist(kPlaylistKey_MasterPlaylist);
     }   
     else if(m_portableDevice)
     {
-        m_oPlm->SetActivePlaylist(kPlaylistKey_PortablePlaylist);
-        if(m_oPlm->IsPortableAvailable(m_portableDevice))
+        m_plm->SetActivePlaylist(kPlaylistKey_PortablePlaylist);
+        if(m_plm->IsPortableAvailable(m_portableDevice))
         {
             vector<PlaylistItem*> items;
-            m_oPlm->ReadPortablePlaylist(m_portableDevice, &items);
+            m_plm->ReadPortablePlaylist(m_portableDevice, &items);
 
             m_initialCount = items.size();
 
-            m_oPlm->AddItems(&items);
+            m_plm->AddItems(&items);
         }
     }
     else
     {
-        m_oPlm->SetActivePlaylist(kPlaylistKey_ExternalPlaylist);
+        m_plm->SetActivePlaylist(kPlaylistKey_ExternalPlaylist);
         LoadPlaylist(m_currentListName.c_str());
     }       
 
@@ -1825,7 +1825,7 @@ void MusicBrowserUI::UpdateMenuStates()
 
     sMenuItem.fMask = MIIM_STATE;
 
-	switch(m_oPlm->GetRepeatMode()) 
+	switch(m_plm->GetRepeatMode()) 
     {
 		case kPlaylistMode_RepeatNone:
             sMenuItem.fState = MFS_CHECKED;
@@ -1855,10 +1855,10 @@ void MusicBrowserUI::UpdateMenuStates()
             break;
 	}
     
-    sMenuItem.fState = m_oPlm->GetShuffleMode() ? MFS_CHECKED:MFS_UNCHECKED;
+    sMenuItem.fState = m_plm->GetShuffleMode() ? MFS_CHECKED:MFS_UNCHECKED;
     SetMenuItemInfo(hMenu, ID_CONTROLS_SHUFFLE, false, &sMenuItem);
  
-    sMenuItem.fState = m_oPlm->GetShuffleMode() ? MFS_UNCHECKED: MFS_CHECKED;
+    sMenuItem.fState = m_plm->GetShuffleMode() ? MFS_UNCHECKED: MFS_CHECKED;
     SetMenuItemInfo(hMenu, ID_CONTROLS_NORMALORDER, false, &sMenuItem);
 
 }
@@ -1998,7 +1998,7 @@ FileOpenDialog(HWND hwnd,
 
         if(IsntError(FilePathToURL(installDir, urlPath, &urlPathSize)))
         {
-            m_oPlm->ReadPlaylist(urlPath, &url_list);
+            m_plm->ReadPlaylist(urlPath, &url_list);
         }
     }
 
@@ -2084,7 +2084,7 @@ FileOpenDialog(HWND hwnd,
                     }                    
                 }
 
-                m_oPlm->WritePlaylist(urlPath, &url_list);
+                m_plm->WritePlaylist(urlPath, &url_list);
             }
         }
         else // potential list of files

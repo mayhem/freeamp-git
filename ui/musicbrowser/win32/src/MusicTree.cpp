@@ -572,7 +572,7 @@ void MusicBrowserUI::FillPortables(void)
     uint32 i = 0;
     DeviceInfo device;
 
-    while(IsntError(m_oPlm->GetSupportedPortables(&device, i++)))
+    while(IsntError(m_plm->GetSupportedPortables(&device, i++)))
     {
 
         if( portablePlayers.end() != 

@@ -38,12 +38,12 @@ void MusicBrowserUI::LoadPlaylist(const string &oPlaylist)
 {
     vector<PlaylistItem*> items;
 
-    m_oPlm->RemoveAll();
-    m_oPlm->ReadPlaylist((char *)oPlaylist.c_str(), &items);
+    m_plm->RemoveAll();
+    m_plm->ReadPlaylist((char *)oPlaylist.c_str(), &items);
 
     m_initialCount = items.size();
 
-    m_oPlm->AddItems(&items);
+    m_plm->AddItems(&items);
 }
 
 void MusicBrowserUI::SavePlaylist(void)
@@ -64,7 +64,7 @@ void MusicBrowserUI::SavePlaylist(void)
     
     //FilePathToURL(m_currentListName.c_str(), url, &len);
 
-    if(IsError(m_oPlm->WritePlaylist(m_currentListName.c_str())))
+    if(IsError(m_plm->WritePlaylist(m_currentListName.c_str())))
     {
        MessageBox(m_hWnd, "Cannot save playlist to disk. Make sure there "
                           "is room on the drive or that the directory is "
@@ -213,7 +213,7 @@ bool MusicBrowserUI::SaveNewPlaylist(string &oName)
     {
         for(i = 0; ; i++)
         {
-           if (m_oPlm->GetSupportedPlaylistFormats(&format, i) != kError_NoErr)
+           if (m_plm->GetSupportedPlaylistFormats(&format, i) != kError_NoErr)
               break;
     
            sprintf(szFilter + iOffset, "%s (.%s)", 
@@ -307,7 +307,7 @@ bool MusicBrowserUI::SaveNewPlaylist(string &oName)
 
         oName = url;
         
-        if(IsError(m_oPlm->WritePlaylist(url)))
+        if(IsError(m_plm->WritePlaylist(url)))
         {
            MessageBox(m_hWnd, "Cannot save playlist to disk. Make sure there "
                               "is room on the drive or that the directory is "
@@ -345,7 +345,7 @@ void MusicBrowserUI::OpenPlaylist(void)
         
     for(i = 0; ; i++)
     {
-       if (m_oPlm->GetSupportedPlaylistFormats(&format, i) != kError_NoErr)
+       if (m_plm->GetSupportedPlaylistFormats(&format, i) != kError_NoErr)
           break;
     
        sprintf(szFilter + iOffset, "%s (.%s)", 
@@ -449,9 +449,9 @@ void MusicBrowserUI::EditPortablePlaylist(DeviceInfo* device)
 
 void MusicBrowserUI::SavePortablePlaylist()
 {
-    if(m_oPlm->IsPortableAvailable(m_portableDevice))
+    if(m_plm->IsPortableAvailable(m_portableDevice))
     {
-        m_oPlm->SyncPortablePlaylist(m_portableDevice);
+        m_plm->SyncPortablePlaylist(m_portableDevice);
     }
 }
 
@@ -469,7 +469,7 @@ void MusicBrowserUI::ImportTracksAndPlaylists(void)
         
     for(i = 0; ; i++)
     {
-       if (m_oPlm->GetSupportedPlaylistFormats(&format, i) != kError_NoErr)
+       if (m_plm->GetSupportedPlaylistFormats(&format, i) != kError_NoErr)
           break;
     
        sprintf(szFilter + iOffset, "%s (.%s)", 
@@ -507,7 +507,7 @@ void MusicBrowserUI::ImportTracksAndPlaylists(void)
 
             FilePathToURL((*i).c_str(), url, &size);
             
-            if(ext && m_oPlm->IsSupportedPlaylistFormat(++ext))
+            if(ext && m_plm->IsSupportedPlaylistFormat(++ext))
                 m_context->catalog->AddPlaylist(url);
             else
                 m_context->catalog->AddSong(url);
@@ -535,7 +535,7 @@ bool MusicBrowserUI::ExportPlaylist(string &oPlaylist)
 
     for(i = 0; ; i++)
     {
-       if (m_oPlm->GetSupportedPlaylistFormats(&format, i) != kError_NoErr)
+       if (m_plm->GetSupportedPlaylistFormats(&format, i) != kError_NoErr)
           break;
     
        sprintf(szFilter + iOffset, "%s (.%s)", 
@@ -598,14 +598,14 @@ bool MusicBrowserUI::ExportPlaylist(string &oPlaylist)
     {
         vector<PlaylistItem*> items;
 
-        m_oPlm->ReadPlaylist((char*)oPlaylist.c_str(), &items);
+        m_plm->ReadPlaylist((char*)oPlaylist.c_str(), &items);
 
         char   url[MAX_PATH + 7]; // make room for file://
         uint32 len = sizeof(url);
     
         FilePathToURL(sOpen.lpstrFile, url, &len);
         
-        if(IsError(m_oPlm->WritePlaylist(url, &items)))
+        if(IsError(m_plm->WritePlaylist(url, &items)))
         {
            MessageBox(m_hWnd, "Cannot save playlist to disk. Make sure there "
                               "is room on the drive or that the directory is "

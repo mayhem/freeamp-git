@@ -94,14 +94,14 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             ListView_GetItem(hwndList, &lv_item);
 
             //item = (PlaylistItem*) lv_item.lParam;
-            item = m_oPlm->ItemAt(dis->itemID);
+            item = m_plm->ItemAt(dis->itemID);
 
             if(item == NULL)
                 return FALSE;
 
             // is this the current index? if so make it bold ...
             // btw, we only do this if it is the primary browser
-            if(dis->itemID == m_oPlm->GetCurrentIndex() && !m_pParent)
+            if(dis->itemID == m_plm->GetCurrentIndex() && !m_pParent)
             {
                 LOGFONT lf;
 
@@ -305,7 +305,7 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             rcClip.left += ListView_GetColumnWidth(hwndList, 4);
 
             // If we changed font undo it
-            if(dis->itemID == m_oPlm->GetCurrentIndex() && !m_pParent)
+            if(dis->itemID == m_plm->GetCurrentIndex() && !m_pParent)
             {
                 SelectObject(dis->hDC, oldFont);
                 DeleteObject(boldFont);
@@ -399,8 +399,8 @@ void MusicBrowserUI::InitList(void)
 
     //HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
 
-    //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_oPlm->CanUndo() ? MF_ENABLED : MF_GRAYED));
-    //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_oPlm->CanRedo() ? MF_ENABLED : MF_GRAYED));
+    //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_plm->CanUndo() ? MF_ENABLED : MF_GRAYED));
+    //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_plm->CanRedo() ? MF_ENABLED : MF_GRAYED));
 }
 
 void MusicBrowserUI::PlaylistListItemMoved(const PlaylistItem* item, 
@@ -408,7 +408,7 @@ void MusicBrowserUI::PlaylistListItemMoved(const PlaylistItem* item,
                                            uint32 newIndex)
 {
     HWND    hwnd = GetDlgItem(m_hWnd, IDC_PLAYLISTBOX);
-    uint32  index = m_oPlm->IndexOf(item);
+    uint32  index = m_plm->IndexOf(item);
 
     if(index != kInvalidIndex)
     {
@@ -449,8 +449,8 @@ void MusicBrowserUI::PlaylistListItemMoved(const PlaylistItem* item,
 
         //HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
 
-        //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_oPlm->CanUndo() ? MF_ENABLED : MF_GRAYED));
-        //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_oPlm->CanRedo() ? MF_ENABLED : MF_GRAYED));
+        //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_plm->CanUndo() ? MF_ENABLED : MF_GRAYED));
+        //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_plm->CanRedo() ? MF_ENABLED : MF_GRAYED));
     }
 }
 
@@ -496,8 +496,8 @@ void MusicBrowserUI::PlaylistListItemRemoved(const PlaylistItem* item,
 
         //HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
 
-        //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_oPlm->CanUndo() ? MF_ENABLED : MF_GRAYED));
-        //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_oPlm->CanRedo() ? MF_ENABLED : MF_GRAYED));
+        //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_plm->CanUndo() ? MF_ENABLED : MF_GRAYED));
+        //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_plm->CanRedo() ? MF_ENABLED : MF_GRAYED));
     }
 }
 
@@ -509,13 +509,13 @@ void MusicBrowserUI::PlaylistListSorted(void)
 
     //HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
 
-    //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_oPlm->CanUndo() ? MF_ENABLED : MF_GRAYED));
-    //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_oPlm->CanRedo() ? MF_ENABLED : MF_GRAYED));
+    //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_plm->CanUndo() ? MF_ENABLED : MF_GRAYED));
+    //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_plm->CanRedo() ? MF_ENABLED : MF_GRAYED));
 }
 
 void MusicBrowserUI::PlaylistListItemUpdated(const PlaylistItem* item)
 {
-    uint32        index = m_oPlm->IndexOf(item);
+    uint32        index = m_plm->IndexOf(item);
     HWND          hwnd = GetDlgItem(m_hWnd, IDC_PLAYLISTBOX);
 
     if(index != kInvalidIndex)
@@ -524,15 +524,15 @@ void MusicBrowserUI::PlaylistListItemUpdated(const PlaylistItem* item)
 
         //HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
 
-        //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_oPlm->CanUndo() ? MF_ENABLED : MF_GRAYED));
-        //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_oPlm->CanRedo() ? MF_ENABLED : MF_GRAYED));
+        //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_plm->CanUndo() ? MF_ENABLED : MF_GRAYED));
+        //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_plm->CanRedo() ? MF_ENABLED : MF_GRAYED));
     }
 }
 
 void MusicBrowserUI::PlaylistListItemAdded(const PlaylistItem* item)
 {
     LV_ITEM       lv_item;
-    uint32        index = m_oPlm->IndexOf(item);
+    uint32        index = m_plm->IndexOf(item);
 
     if(index != kInvalidIndex)
     {
@@ -570,8 +570,8 @@ void MusicBrowserUI::PlaylistListItemAdded(const PlaylistItem* item)
 
         //HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
 
-        //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_oPlm->CanUndo() ? MF_ENABLED : MF_GRAYED));
-        //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_oPlm->CanRedo() ? MF_ENABLED : MF_GRAYED));
+        //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_plm->CanUndo() ? MF_ENABLED : MF_GRAYED));
+        //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_plm->CanRedo() ? MF_ENABLED : MF_GRAYED));
     }
 }
 
@@ -579,7 +579,7 @@ void MusicBrowserUI::PlaylistListItemsAdded(const vector<PlaylistItem*>* items)
 {
     uint32 count = ListView_GetItemCount(m_hPlaylistView);
 
-    if(m_oPlm->CountItems() != count)
+    if(m_plm->CountItems() != count)
     {
         uint32 newSize = count + items->size();
         ListView_SetItemCount(m_hPlaylistView, newSize);
@@ -646,7 +646,7 @@ void MusicBrowserUI::GetSelectedPlaylistItems(vector<PlaylistItem*>* items)
                                              LVIS_SELECTED);
         if(state & LVIS_SELECTED)
         {
-            PlaylistItem* item = m_oPlm->ItemAt(index);
+            PlaylistItem* item = m_plm->ItemAt(index);
 
             items->push_back(item);
             found++;
@@ -696,7 +696,7 @@ void MusicBrowserUI::LVBeginDrag(HWND hwnd, NM_LISTVIEW* nmlv)
 
         for(i = items.begin(); i != items.end(); i++)
         {
-            m_oPlm->RemoveItem(*i);         
+            m_plm->RemoveItem(*i);         
         }
     }
 
@@ -721,7 +721,7 @@ void MusicBrowserUI::LVBeginDrag(HWND hwnd, NM_LISTVIEW* nmlv)
 
         for(i = list.begin(); i != list.end(); i++)
         {
-            m_oPlm->RemoveItem(*i);         
+            m_plm->RemoveItem(*i);         
         }
     }*/
 
@@ -740,7 +740,7 @@ void MusicBrowserUI::UpdateTotalTime()
 
     for(index = 0; index < count; index++)
     {
-        PlaylistItem* item = m_oPlm->ItemAt(index);
+        PlaylistItem* item = m_plm->ItemAt(index);
 
         if(item)
         {
@@ -796,7 +796,7 @@ void MusicBrowserUI::ResizeHeader(HWND hwnd, uint32 column)
         string text;
         HDC hdc = GetDC(hwnd);
 
-        while(item = m_oPlm->ItemAt(i++))
+        while(item = m_plm->ItemAt(i++))
         {
             MetaData metadata = item->GetMetaData();
        
@@ -1025,7 +1025,7 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
                 }
             }
 
-            m_oPlm->MoveItems(&items, insertIndex);
+            m_plm->MoveItems(&items, insertIndex);
 
             break;
         }
@@ -1116,7 +1116,7 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
 
             if(index < 0)
             {
-                m_oPlm->AddItems(fileList);
+                m_plm->AddItems(fileList);
             }
             else
             {   
@@ -1129,7 +1129,7 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
                 if(hti.pt.y >= middle)
                     index++; 
 
-                m_oPlm->AddItems(fileList, index);
+                m_plm->AddItems(fileList, index);
             }
 
             SetFocus(hwnd);

@@ -46,7 +46,7 @@ void MusicBrowserUI::ClearPlaylistEvent(void)
 {
     m_context->target->AcceptEvent(new Event(CMD_Stop));
 
-    m_oPlm->RemoveAll();
+    m_plm->RemoveAll();
 }
 
 void MusicBrowserUI::RenameEvent(void)
@@ -145,6 +145,8 @@ void MusicBrowserUI::RemoveEvent(void)
         uint32 count = ListView_GetSelectedCount(m_hPlaylistView);
         uint32 found = 0;
         uint32 index = ListView_GetItemCount(m_hPlaylistView) - 1;
+        bool isCurrent = false;
+        vector<PlaylistItem*> items;
 
         while(found < count)
         {
@@ -154,19 +156,25 @@ void MusicBrowserUI::RemoveEvent(void)
             if(state & LVIS_SELECTED)
             {
                 found++;
-                bool isCurrent = (m_oPlm->GetCurrentIndex() == index);
 
-                if(isCurrent)
-                    m_context->target->AcceptEvent(new Event(CMD_Stop));
+                if(m_plm->GetCurrentIndex() == index)
+                    isCurrent = true;
 
-                m_oPlm->RemoveItem(index);
-
-                if(isCurrent)
-                    m_context->target->AcceptEvent(new Event(CMD_Play));
+                items.push_back(m_plm->ItemAt(index));
             }
 
             index--;
-        }        
+        }    
+
+        bool needToStopPlay = isCurrent && m_playerState == PLAYERSTATE_PLAYING;
+        
+        if(needToStopPlay)
+            m_context->target->AcceptEvent(new Event(CMD_Stop));
+
+        m_plm->RemoveItems(&items);
+
+        if(needToStopPlay)
+            m_context->target->AcceptEvent(new Event(CMD_Play));
     }
     else if(hwndFocus == m_hMusicView)
     {
@@ -240,7 +248,7 @@ void MusicBrowserUI::MoveUpEvent(void)
             if(index == 0)
                 break;
 
-            m_oPlm->MoveItem(index, index - 1);
+            m_plm->MoveItem(index, index - 1);
         }
 
         index++;
@@ -263,10 +271,10 @@ void MusicBrowserUI::MoveDownEvent(void)
         {
             found++;
 
-            if(index == m_oPlm->CountItems() - 1)
+            if(index == m_plm->CountItems() - 1)
                 break;
 
-            m_oPlm->MoveItem(index, index + 1);
+            m_plm->MoveItem(index, index + 1);
         }
 
         index--;
@@ -275,7 +283,7 @@ void MusicBrowserUI::MoveDownEvent(void)
 
 void MusicBrowserUI::MoveItemEvent(int source, int dest)
 {
-    m_oPlm->MoveItem(source, dest);
+    m_plm->MoveItem(source, dest);
 }
 
 void MusicBrowserUI::StartStopMusicSearch(bool useWizard)
@@ -480,7 +488,7 @@ void MusicBrowserUI::EditInfoEvent()
 
                 m_context->catalog->UpdateSong(*track);
 
-                m_oPlm->UpdateTrackMetaData(*track);
+                m_plm->UpdateTrackMetaData(*track);
             }
         } 
     }
@@ -674,11 +682,11 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                         PlaylistItem *item;
                 
                         item = new PlaylistItem(*treedata->m_pTrack);
-                        m_oPlm->AddItem(item, false);
+                        m_plm->AddItem(item, false);
                     } 
                     else if(treedata->IsPlaylist())
                     {
-                        m_oPlm->ReadPlaylist(treedata->m_oPlaylistPath.c_str());
+                        m_plm->ReadPlaylist(treedata->m_oPlaylistPath.c_str());
                     }
                     else if(treedata->IsPortable())
                     {
@@ -926,7 +934,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                 if(!m_pParent)
                 {
                     m_playerEQ->AcceptEvent(new Event(CMD_Stop));
-                    m_oPlm->SetCurrentIndex(pListView->iItem);
+                    m_plm->SetCurrentIndex(pListView->iItem);
                     m_playerEQ->AcceptEvent(new Event(CMD_Play));
                 }
                 break;
@@ -1035,7 +1043,7 @@ void MusicBrowserUI::SortEvent(int id)
     PlaylistSortKey oldKey, newKey;
     PlaylistSortType type;
     
-    if(!m_oPlm->CountItems())
+    if(!m_plm->CountItems())
         return;
 
     switch(id)
@@ -1072,14 +1080,14 @@ void MusicBrowserUI::SortEvent(int id)
              return;
     }
 
-    oldKey = m_oPlm->GetPlaylistSortKey();
+    oldKey = m_plm->GetPlaylistSortKey();
 
     type = (oldKey == newKey && 
-            m_oPlm->GetPlaylistSortType() == kPlaylistSortType_Ascending)
+            m_plm->GetPlaylistSortType() == kPlaylistSortType_Ascending)
             ? kPlaylistSortType_Descending : kPlaylistSortType_Ascending;
 
     ::SetCursor(LoadCursor(NULL, IDC_WAIT));
-    m_oPlm->Sort(newKey, type);
+    m_plm->Sort(newKey, type);
     ::SetCursor(LoadCursor(NULL, IDC_ARROW));
 }
 
@@ -1113,7 +1121,7 @@ void MusicBrowserUI::PlayNowEvent(void)
             {
                 // only do this for the root browser
                 m_playerEQ->AcceptEvent(new Event(CMD_Stop));
-                m_oPlm->SetCurrentIndex(index);
+                m_plm->SetCurrentIndex(index);
                 m_playerEQ->AcceptEvent(new Event(CMD_Play));
                 break;
             }
@@ -1145,19 +1153,19 @@ void MusicBrowserUI::AddTrackEvent(void)
     newSize += urls.size();
     ListView_SetItemCount(m_hPlaylistView, newSize);
 
-    m_oPlm->AddItems(urls);
+    m_plm->AddItems(urls);
     
 }
 
 void MusicBrowserUI::AddTrackAndPlayEvent(void)
 {
-    uint32 count = m_oPlm->CountItems();
+    uint32 count = m_plm->CountItems();
 
     AddTrackEvent();
 
-    if(m_oPlm->CountItems())
+    if(m_plm->CountItems())
     {
-        m_oPlm->SetCurrentIndex(count);
+        m_plm->SetCurrentIndex(count);
         m_context->target->AcceptEvent(new Event(CMD_Play));
     }
 }
@@ -1176,7 +1184,7 @@ void MusicBrowserUI::AddFileEvent(HWND hwndParent)
 
     for(i = 0; ; i++)
     {
-       if (m_oPlm->GetSupportedPlaylistFormats(&format, i) != kError_NoErr)
+       if (m_plm->GetSupportedPlaylistFormats(&format, i) != kError_NoErr)
           break;
     
        sprintf(szFilter + iOffset, "%s (.%s)", 
@@ -1210,7 +1218,7 @@ void MusicBrowserUI::AddFileEvent(HWND hwndParent)
         newSize += oFileList.size();
         ListView_SetItemCount(m_hPlaylistView, newSize);
 
-        m_oPlm->AddItems(oFileList);
+        m_plm->AddItems(oFileList);
     }
 }
 
@@ -1310,21 +1318,21 @@ void MusicBrowserUI::PlayerControlsEvent(int command)
             break;
 
         case ID_CONTROLS_NORMALORDER:
-            m_oPlm->SetShuffleMode(false);
+            m_plm->SetShuffleMode(false);
             break;
 
         case ID_CONTROLS_SHUFFLE:
-            m_oPlm->SetShuffleMode(true);
+            m_plm->SetShuffleMode(true);
             break;
 
         case ID_CONTROLS_REPEATNONE:
-            m_oPlm->SetRepeatMode(kPlaylistMode_RepeatNone);
+            m_plm->SetRepeatMode(kPlaylistMode_RepeatNone);
             break;
         case ID_CONTROLS_REPEATONE:
-            m_oPlm->SetRepeatMode(kPlaylistMode_RepeatOne);
+            m_plm->SetRepeatMode(kPlaylistMode_RepeatOne);
             break;
         case ID_CONTROLS_REPEATALL:
-            m_oPlm->SetRepeatMode(kPlaylistMode_RepeatAll);
+            m_plm->SetRepeatMode(kPlaylistMode_RepeatAll);
             break;
     }
 }

@@ -155,7 +155,7 @@ class MusicBrowserUI : public UserInterface
                     vector<string>* fileList,
                     bool allowURL);
     
-    const PlaylistManager* PLManager() const { return m_oPlm; }
+    const PlaylistManager* PLManager() const { return m_plm; }
  
  protected:
     FAContext *m_context;
@@ -319,7 +319,7 @@ class MusicBrowserUI : public UserInterface
   	HWND                m_hWnd, m_hStatus, m_hParent, m_hRebar;
     HWND                m_hMusicView, m_hPlaylistView;
     HWND                m_hPlaylistTitle, m_hMusicViewTitle;
-    PlaylistManager*    m_oPlm;
+    PlaylistManager*    m_plm;
     bool                m_initialized, isVisible, m_bListChanged, 
                         m_bSearchInProgress, m_bDragging;
     string              m_currentListName, m_activeListName;
