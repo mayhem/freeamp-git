@@ -61,9 +61,9 @@ Mpg123UI::Mpg123UI() {
 
 void mysigterm(int f) {
     Event *e = new Event(CMD_Stop);
-    Player::getPlayer()->acceptEvent(e);
+    Player::GetPlayer()->AcceptEvent(e);
     e = new Event(CMD_QuitPlayer);
-    Player::getPlayer()->acceptEvent(e);
+    Player::GetPlayer()->AcceptEvent(e);
 }
 
 void mysigint(int f) {
@@ -80,12 +80,12 @@ int32 Mpg123UI::acceptCIOEvent(Event *e) {
 	switch (e->getEvent()) {
 	    case INFO_PlayListDonePlay: {
 		Event *e = new Event(CMD_QuitPlayer);
-		Player::getPlayer()->acceptEvent(e);
+		Player::GetPlayer()->AcceptEvent(e);
 		break; }
 	    case CMD_Cleanup: {
 		Event *e = new Event(INFO_ReadyToDieCIO,this);
 		//cout << "I'm gonna ACTUALLY kill myself" << endl;
-		Player::getPlayer()->acceptEvent(e);
+		Player::GetPlayer()->AcceptEvent(e);
 		break; }
 	    default:
 		break;
@@ -167,7 +167,7 @@ int32 Mpg123UI::acceptCOOEvent(Event *e) {
 	    case CMD_Cleanup: {
 		Event *e = new Event(INFO_ReadyToDieCOO);
 		//cout << "i'm gonna NOT kill myself..." << endl;
-		Player::getPlayer()->acceptEvent(e);
+		Player::GetPlayer()->AcceptEvent(e);
 		break; }
 	    default:
 		break;
@@ -190,13 +190,13 @@ void Mpg123UI::setArgs(int argc, char **argv) {
 		    break;
 		case 'v': 
 		    verboseMode = true;
-		    cout << "verbose mode" << endl;
+		    //cout << "verbose mode" << endl;
 		    break;
 		case 'k': 
 		    i++;
 		    pc = argv[i];
 		    skipFirst = atoi(pc);
-		    cout << "skiping first " << skipFirst << " frames" << endl;
+		    //cout << "skiping first " << skipFirst << " frames" << endl;
 		    break;
 		case 'c':
 		    cout << "check range violations" << endl;
@@ -307,9 +307,9 @@ void Mpg123UI::setArgs(int argc, char **argv) {
     pl->setFirst();
     pl->setSkip(skipFirst);
     Event *e = new Event(CMD_SetPlaylist,pl);
-    Player::getPlayer()->acceptEvent(e);
+    Player::GetPlayer()->AcceptEvent(e);
     e = new Event(CMD_Play);
-    Player::getPlayer()->acceptEvent(e);
+    Player::GetPlayer()->AcceptEvent(e);
 }
 
 

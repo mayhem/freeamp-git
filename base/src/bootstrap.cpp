@@ -66,11 +66,11 @@ int main(int argc, char **argv) {
 
     Semaphore *termSemaphore;
     termSemaphore = new Semaphore();
-    Player *pP = Player::getPlayer();
+    Player *pP = Player::GetPlayer();
     //cout << "Got player..." << endl;
     DummyCOO *pDCOO = new DummyCOO(termSemaphore);
     //cout << "Created dcoo..." << endl;
-    pP->registerCOO(pDCOO);
+    pP->RegisterCOO(pDCOO);
     //cout << "Registered DummyCOO" << endl;
 
     CIO *pCIO = NULL;
@@ -81,10 +81,10 @@ int main(int argc, char **argv) {
     if (((int)(strstr(argv[0],DEFAULT_PROG_NAME)) + /*length of "freeamp" */ DEFAULT_PROG_NAME_LENGTH) == endOfArgv0) {
 	cout << "Using FreeAmp interface..." << endl;
 	pCIO = new DEFAULT_CIO;
-	pP->registerCIO(pCIO);
+	pP->RegisterCIO(pCIO);
 	//cout << "Registered CommandLine CIO" << endl;
 	pCOO = new DEFAULT_COO;
-	pP->registerCOO(pCOO) ;
+	pP->RegisterCOO(pCOO) ;
 	//cout << "Registered CommandLine COO" << endl;
     } 
 
@@ -94,15 +94,15 @@ int main(int argc, char **argv) {
 	Mpg123UI *pMpg = new Mpg123UI();
 	pCIO = (CIO *)pMpg;
 	pCOO = (COO *)pMpg;
-	pP->registerCIO(pCIO);
-	pP->registerCOO(pCOO) ;
+	pP->RegisterCIO(pCIO);
+	pP->RegisterCOO(pCOO) ;
     }
 #else
 	cout << "Using FreeAmp interface..." << endl;
 	pCIO = new DEFAULT_CIO;
-	pP->registerCIO(pCIO);
+	pP->RegisterCIO(pCIO);
 	pCOO = new DEFAULT_COO;
-	pP->registerCOO(pCOO) ;
+	pP->RegisterCOO(pCOO) ;
 #endif
 
     if (!pCIO || !pCOO) {
@@ -110,7 +110,7 @@ int main(int argc, char **argv) {
 	return 255;
     }
     pCIO->setArgs(argc,argv);
-    pCIO = NULL;  // is deleted by player now that it is registered.
+    pCIO = NULL;  // is deleted by player now that it is Registered.
     pCOO = NULL;
     //cout << "Set the args..." << endl;
     //pP->testQueue();
@@ -179,11 +179,11 @@ void testBuffer() {
     Buffer *pBuf = new Buffer();
     cout << "Created buffer" << endl;
     int32 hRead0 = pBuf->registerReader();
-    cout << "registered reader 0" << endl;
+    cout << "Registered reader 0" << endl;
     int32 hRead1 = pBuf->registerReader();
-    cout << "registered reader 1" << endl;
+    cout << "Registered reader 1" << endl;
     int32 hRead2 = pBuf->registerReader();
-    cout << "registered reader 2" << endl;
+    cout << "Registered reader 2" << endl;
 
 
     char *pStr1 = new char[1024];

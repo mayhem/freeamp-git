@@ -47,7 +47,7 @@ int wait_n_times;
 
 #define TEST_TIME 0
 
-#define SEND_EVENT(e) if (myEQ) myEQ->acceptEvent(e);
+#define SEND_EVENT(e) if (myEQ) myEQ->AcceptEvent(e);
 
 void XingLMC::SetInfoEventQueue(EventQueue *eq) {
     myEQ = eq;

@@ -48,7 +48,7 @@ class Event {
 
 class EventQueue {
  public:
-    virtual int32 acceptEvent(Event *) = 0;
+    virtual int32 AcceptEvent(Event *) = 0;
 };
 
 #define CMD_Stop                1  // stop current play  (no arg)

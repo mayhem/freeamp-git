@@ -71,7 +71,7 @@ int32 CommandLineCOO::acceptCOOEvent(Event *e) {
 		break; }
 	    case CMD_Cleanup: {
 		Event *e = new Event(INFO_ReadyToDieCOO,this);
-		Player::getPlayer()->acceptEvent(e);
+		Player::GetPlayer()->AcceptEvent(e);
 		break; }
 	    default:
 		break;

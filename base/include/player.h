@@ -52,12 +52,12 @@ class Player : public EventQueue {
 
  public:
     //Player();
-    static Player *getPlayer();
+    static Player *GetPlayer();
     ~Player();
 
-    virtual int32 acceptEvent(Event *);
-    int32 registerCOO(COO *);
-    int32 registerCIO(CIO *);
+    virtual int32 AcceptEvent(Event *);
+    int32 RegisterCOO(COO *);
+    int32 RegisterCIO(CIO *);
     void testQueue();
     static THREAD_RETURN THREAD_LINKAGE EventServiceThreadFunc(void *);
  private:
@@ -67,20 +67,20 @@ class Player : public EventQueue {
     Player();
     Queue<Event *> *event_queue;
     Thread *event_service_thread;
-    int32 serviceEvent(Event *);
+    int32 ServiceEvent(Event *);
     int32 quitWaitingFor;  // keeps track of how many CIO's and COO's haven't sent in their "Ready To Die" infos.
     int32 imQuitting;
     Vector<COO *> *coo_vector;
     Vector<CIO *> *cio_vector;
     Vector<COO *> *coo_death_vector;
     Vector<CIO *> *cio_death_vector;
-    void getCOManipLock();
-    void releaseCOManipLock();
+    void GetCOManipLock();
+    void ReleaseCOManipLock();
     Mutex *coManipLock;
     PlayList *myPlayList;
-    void sendToCIOCOO(Event *);
-    void sendToCOO(Event *);
-    bool setState(PlayerState);
+    void SendToCIOCOO(Event *);
+    void SendToCOO(Event *);
+    bool SetState(PlayerState);
     LMC *myLMC;
 };
 

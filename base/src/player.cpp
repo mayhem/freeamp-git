@@ -44,7 +44,7 @@ ____________________________________________________________________________*/
 
 Player *Player::thePlayer = NULL;
 
-Player *Player::getPlayer() {
+Player *Player::GetPlayer() {
     if (thePlayer == NULL) {
         thePlayer = new Player();
     }
@@ -147,7 +147,7 @@ THREAD_RETURN THREAD_LINKAGE Player::EventServiceThreadFunc(void *pPlayer) {
         pC = pP->event_queue->read();
         //cout << "Read queue..." << endl;
         if (pC) {
-	        rtnVal = pP->serviceEvent(pC);
+	        rtnVal = pP->ServiceEvent(pC);
 	        delete pC;
         }
         //if (pP->event_queue->isEmpty()) usleep(50000);
@@ -158,50 +158,50 @@ THREAD_RETURN THREAD_LINKAGE Player::EventServiceThreadFunc(void *pPlayer) {
 	return 0;
 }
 
-int32 Player::registerCOO(COO *ed) {
+int32 Player::RegisterCOO(COO *ed) {
     //cout << "Registering a COO..." << endl;
-    getCOManipLock();
+    GetCOManipLock();
 //    cout << "Got comaniplock" << endl;
     if (coo_vector && ed) {
         //cout << "about to insert..>" << endl;
         coo_vector->insert(ed);
         //cout <<"inserted" << endl;
-        releaseCOManipLock();
+        ReleaseCOManipLock();
         //cout <<"released" << endl;
         return 0;
     } else {
-        releaseCOManipLock();
+        ReleaseCOManipLock();
         return 255;
     }
 }
 
-int32 Player::registerCIO(CIO *ed) {
-    getCOManipLock();
+int32 Player::RegisterCIO(CIO *ed) {
+    GetCOManipLock();
     if (cio_vector) {
         cio_vector->insert(ed);
-        releaseCOManipLock();
+        ReleaseCOManipLock();
         return 0;
     } else {
-        releaseCOManipLock();
+        ReleaseCOManipLock();
         return 255;
     }
 }
 
-void Player::getCOManipLock() {
+void Player::GetCOManipLock() {
     coManipLock->Acquire(WAIT_FOREVER);
 }
 
-void Player::releaseCOManipLock() {
+void Player::ReleaseCOManipLock() {
     coManipLock->Release();
 }
 
-int32 Player::acceptEvent(Event *e) {
+int32 Player::AcceptEvent(Event *e) {
     event_queue->write(e);
     event_sem->Signal();
     return 0;
 }
 
-bool Player::setState(PlayerState ps) {
+bool Player::SetState(PlayerState ps) {
     //cout << "Changing from " << playerState << " to " << ps << endl;
     if (ps == playerState) 
         return false;
@@ -210,19 +210,19 @@ bool Player::setState(PlayerState ps) {
 }
 
 
-#define SEND_NORMAL_EVENT(e)  { Event *ev = new Event(e); getCOManipLock(); sendToCOO(ev); releaseCOManipLock(); delete ev; }
+#define SEND_NORMAL_EVENT(e)  { Event *ev = new Event(e); GetCOManipLock(); SendToCOO(ev); ReleaseCOManipLock(); delete ev;}
 
-int32 Player::serviceEvent(Event *pC) {
+int32 Player::ServiceEvent(Event *pC) {
     if (pC) {
 	//cout << "Player: serviceEvent: servicing Event: " << pC->getEvent() << endl;
 	switch (pC->getEvent()) {
 	    case INFO_DoneOutputting: {  // LMC or PMO sends this when its done outputting whatever.  Now, go on to next piece in playlist
-                if (setState(STATE_Stopped)) {
+                if (SetState(STATE_Stopped)) {
 		    SEND_NORMAL_EVENT(INFO_Stopped);
                 }
                 myPlayList->setNext();
                 Event *e = new Event(CMD_Play);
-                acceptEvent(e);
+                AcceptEvent(e);
                 return 0;
                 break; 
             }
@@ -233,7 +233,7 @@ int32 Player::serviceEvent(Event *pC) {
 		    delete myLMC;
 		    myLMC = NULL;
                 }
-                if (setState(STATE_Stopped)) {
+                if (SetState(STATE_Stopped)) {
 		    SEND_NORMAL_EVENT(INFO_Stopped);
                 }
                 return 0;
@@ -268,7 +268,7 @@ int32 Player::serviceEvent(Event *pC) {
 		    myLMC->SetPMI(pmi);
 		    myLMC->SetPMO(scPMO);
 		    myLMC->Init();
-		    if (setState(STATE_Playing)) {
+		    if (SetState(STATE_Playing)) {
 			SEND_NORMAL_EVENT(INFO_Playing);
 		    }
 		    myLMC->ChangePosition(myPlayList->getSkip());
@@ -282,17 +282,17 @@ int32 Player::serviceEvent(Event *pC) {
 			delete myLMC;
 			myLMC = NULL;
 		    }
-		    if (setState(STATE_Stopped)) {
+		    if (SetState(STATE_Stopped)) {
 			SEND_NORMAL_EVENT(INFO_Stopped);
 		    }
 		    //cout << "killed lmc" << endl;
-		    getCOManipLock();
+		    GetCOManipLock();
 		    //cout << "got lock" << endl;
 		    
 		    Event *e = new Event(INFO_PlayListDonePlay);
-		    sendToCIOCOO(e);
+		    SendToCIOCOO(e);
 		    //cout << "sent playlist done playing" << endl;
-		    releaseCOManipLock();
+		    ReleaseCOManipLock();
 		    //cout << "released lock" << endl;
 		    delete e;
                 }
@@ -313,7 +313,7 @@ int32 Player::serviceEvent(Event *pC) {
 	    case CMD_Pause: {
 		if (myLMC) {
 		    myLMC->Pause();
-		    if (setState(STATE_Paused)) {
+		    if (SetState(STATE_Paused)) {
 			SEND_NORMAL_EVENT(INFO_Paused);
 		    }
 		}
@@ -324,7 +324,7 @@ int32 Player::serviceEvent(Event *pC) {
 	    case CMD_UnPause: {
                 if (myLMC) {
 		    myLMC->Resume();
-		    if (setState(STATE_Playing)) {
+		    if (SetState(STATE_Playing)) {
 			SEND_NORMAL_EVENT(INFO_Playing);
 		    }
                 }
@@ -335,12 +335,12 @@ int32 Player::serviceEvent(Event *pC) {
                 if (myLMC) {
 		    if (playerState == STATE_Playing) {
                         myLMC->Pause();
-                        if (setState(STATE_Paused)) {
+                        if (SetState(STATE_Paused)) {
 			    SEND_NORMAL_EVENT(INFO_Paused);
                         }
 		    } else if (playerState == STATE_Paused) {
                         myLMC->Resume();
-                        if (setState(STATE_Playing)) {
+                        if (SetState(STATE_Playing)) {
 			    SEND_NORMAL_EVENT(INFO_Playing);
                         }
 		    }
@@ -357,20 +357,20 @@ int32 Player::serviceEvent(Event *pC) {
 		
 	    case CMD_QuitPlayer: {
 		Event *e = new Event(CMD_Stop);
-		acceptEvent(e);
+		AcceptEvent(e);
 		// 1) Set "I'm already quitting flag" (or exit if its already set)
 		imQuitting = 1;
 		// 2) Get CIO/COO manipulation lock
-		getCOManipLock();
+		GetCOManipLock();
 		// 3) Count CIO/COO, put into quitWaitingFor.
 		quitWaitingFor = cio_vector->numElements() + coo_vector->numElements();
 		// 4) Send CMD_Cleanup event to all CIO/COOs
 		
 		Event *pe = new Event(CMD_Cleanup);
-		sendToCIOCOO(pe);
+		SendToCIOCOO(pe);
 		delete pe;
 		// 5) Release CIO/COO manipulation lock
-		releaseCOManipLock();
+		ReleaseCOManipLock();
 		return 0;
 		break; 
             }
@@ -390,11 +390,11 @@ int32 Player::serviceEvent(Event *pC) {
 		if (quitWaitingFor) 
                     return 0;
 		
-                getCOManipLock();
+                GetCOManipLock();
                 //cout << "got comaniplock " << endl;
                 Event* pe = new Event(CMD_Terminate);
                 //cout << "sending to coo's" << endl;
-                sendToCOO(pe);
+                SendToCOO(pe);
                 //cout << "done sending to coo's" << endl;
                 delete pe;
                 //cout << "ending inforeadytodieCOO" << endl;
@@ -414,10 +414,10 @@ int32 Player::serviceEvent(Event *pC) {
 		if (quitWaitingFor) 
                     return 0;
 		
-		getCOManipLock();
+		GetCOManipLock();
 		//cout << "got COManipLock" << endl;
 		Event* pe = new Event(CMD_Terminate);
-		sendToCOO(pe);
+		SendToCOO(pe);
 		delete pe;
 		//cout << "ending InfoReadyToDie..." << endl;
 		return 1;
@@ -427,11 +427,11 @@ int32 Player::serviceEvent(Event *pC) {
 	    case INFO_MediaVitalStats: {
 		// decoder doesn't yet grab song title...
 		//cout << "Servicing media vital stats..." << endl;
-		getCOManipLock();
+		GetCOManipLock();
 		//cout << "got lock" << endl;
-		sendToCOO(pC);
+		SendToCOO(pC);
 		//cout << "sent to all" << endl;
-		releaseCOManipLock();
+		ReleaseCOManipLock();
 		//cout << "Released manip lock..." << endl;
 		delete ((MediaVitalInfo *)pC->getArgument());
 		//cout << "Done servicing mediavitalstats event" << endl;
@@ -440,9 +440,9 @@ int32 Player::serviceEvent(Event *pC) {
             }
 	    
 	    case INFO_MediaTimePosition: {
-		getCOManipLock();
-		sendToCOO(pC);
-		releaseCOManipLock();
+		GetCOManipLock();
+		SendToCOO(pC);
+		ReleaseCOManipLock();
 		delete ((MediaTimePositionInfo *)pC->getArgument());
 		return 0;
 		break; 
@@ -460,7 +460,7 @@ int32 Player::serviceEvent(Event *pC) {
 	return 255;
     }
 }
-void Player::sendToCIOCOO(Event *pe) {
+void Player::SendToCIOCOO(Event *pe) {
     int32 i;
     
     for (i = 0;i<cio_vector->numElements();i++) {
@@ -472,7 +472,7 @@ void Player::sendToCIOCOO(Event *pe) {
     }
 }
 
-void Player::sendToCOO(Event *pe) {
+void Player::SendToCOO(Event *pe) {
     //cout << "Sending a " << pe->getEvent() << endl;
     for (int32 i=0;i<coo_vector->numElements();i++) {
 	    //cout << "sending to " << i << endl;
@@ -493,11 +493,11 @@ void Player::testQueue() {
 
 
     pC = new Event(CMD_Play);
-    acceptEvent(pC);
+    AcceptEvent(pC);
     pC = new Event(CMD_Play);
-    acceptEvent(pC);
+    AcceptEvent(pC);
     pC = new Event(CMD_NextMediaPiece);
-    acceptEvent(pC);
+    AcceptEvent(pC);
 
     pC = event_queue->read();
     cout << "testQueue: " << pC->getEvent() << endl;

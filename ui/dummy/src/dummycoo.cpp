@@ -42,7 +42,7 @@ int32 DummyCOO::acceptCOOEvent(Event *pe) {
 
 	        case CMD_Cleanup: {
 	            Event *pE = new Event(INFO_ReadyToDieCOO,this);
-	            Player::getPlayer()->acceptEvent(pE);
+	            Player::GetPlayer()->AcceptEvent(pE);
 	            break; 
             }
 
