@@ -103,6 +103,7 @@ extern const char* kPlaylistHeaderColumnsPref;
 extern const char* kAdvancedRelatablePref;
 extern const char* kMetadataDisplayPref;
 extern const char* kEnableMusicBrainzBitziPref;
+extern const char* kLastFreeAmpVersionPref;
 
 extern const int32 kDefaultWatchThisDirTimeout;
 

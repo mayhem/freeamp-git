@@ -232,6 +232,19 @@ Player(FAContext *context) : EventQueue()
     }
 
     delete [] tempDir;
+
+    // Check to see if the version changed since the last time we ran.
+    // If so, show the introwizard again...
+    length = 20;
+    char ver[20];
+    m_context->prefs->GetPrefString(kLastFreeAmpVersionPref, ver, &length);
+    if (strcmp(ver, FREEAMP_VERSION))
+    {
+        m_context->prefs->SetPrefBoolean(kWelcomePref, true);
+        m_context->prefs->SetPrefString(kLastFreeAmpVersionPref, 
+                                        FREEAMP_VERSION);
+    }
+
     m_dlm = new DownloadManager(m_context);
     m_context->downloadManager = m_dlm;
 

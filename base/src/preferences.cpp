@@ -101,6 +101,7 @@ const char* kPlaylistHeaderColumnsPref = "PlaylistHeaderColumns";
 const char* kAdvancedRelatablePref = "UseAdvancedRelatableFeatures";
 const char* kMetadataDisplayPref = "DisplayMetadata";
 const char* kEnableMusicBrainzBitziPref = "ContributeMBBitzi";
+const char* kLastFreeAmpVersionPref = "LastFreeAmpVersion";
 
 //logging
 const char* kUseDebugLogPref = "UseDebugLog";
@@ -174,6 +175,7 @@ const char* kDefaultPlaylistHeaderColumns = "Title|Artist|Album|Time|Genre";
 const bool kDefaultAdvancedRelatable = false;
 const bool kDefaultMetadataDisplay = 1;
 const bool kDefaultEnableMusicBrainzBitzi = false;
+const char *kDefaultLastFreeAmpVersion = "0.0.0";
 
 Error
 Preferences::
@@ -417,6 +419,11 @@ SetDefaults()
         kError_NoPrefValue)
         SetPrefBoolean(kEnableMusicBrainzBitziPref, 
                        kDefaultEnableMusicBrainzBitzi);
+
+    dummyInt = 255;
+    if (GetPrefString(kLastFreeAmpVersionPref, dummyString,
+        (uint32 *)&dummyInt) == kError_NoPrefValue)
+        SetPrefString(kLastFreeAmpVersionPref, kDefaultLastFreeAmpVersion);
 
     return kError_NoErr;
 }

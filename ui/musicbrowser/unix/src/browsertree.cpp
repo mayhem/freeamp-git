@@ -655,14 +655,15 @@ static void tree_keypress(GtkWidget *w, GdkEventKey *event, GTKMusicBrowser *p)
 
 bool GTKMusicBrowser::CheckEmptyDatabase(void)
 {
-    if (m_context->catalog->GetPlaylists()->size() > 0 ||
-        m_context->catalog->GetMusicList()->size() > 0 ||
-        m_context->catalog->GetUnsortedMusic()->size() > 0)
-        return false;
-
     bool welcome = false;
 
     m_context->prefs->GetPrefBoolean(kWelcomePref, &welcome);
+
+    if ((m_context->catalog->GetPlaylists()->size() > 0 ||
+        m_context->catalog->GetMusicList()->size() > 0 ||
+        m_context->catalog->GetUnsortedMusic()->size() > 0) && 
+        welcome == false)
+        return false;
 
     if (welcome) {
         m_context->prefs->SetPrefBoolean(kWelcomePref, false);
