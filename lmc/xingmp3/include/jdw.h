@@ -2,10 +2,7 @@
 	
 	FreeAmp - The Free MP3 Player
 
-        MP3 Decoder originally Copyright (C) 1995-1997 Xing Technology
-        Corp.  http://www.xingtech.com
-
-	Portions Copyright (C) 1998 GoodNoise
+	Copyright (C) 1998 GoodNoise
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -24,36 +21,8 @@
 	$Id$
 ____________________________________________________________________________*/
 
-/****  cwinm.c  ***************************************************
+/* LOL */
 
-MPEG audio decoder, window master routine
-portable C
-
-
-******************************************************************/
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <float.h>
-#include <math.h>
-
-
-/* disable precision loss warning on type conversion */
-#ifdef _MSC_VER
-#pragma warning(disable:4244 4056)
+#ifndef min
+#define min(a,b) ((a>b)?b:a)
 #endif
-
-static float wincoef[264] =
-{				/* window coefs */
-#include "tableawd.h"
-};
-
-/*--------------------------------------------------------*/
-#ifdef QUICK_FLOAT
-#include "cwinq.c"
-#include "cwinbq.c"
-#else
-#include "cwin.c"
-#include "cwinb.c"
-#endif
-/*--------------------------------------------------------*/
