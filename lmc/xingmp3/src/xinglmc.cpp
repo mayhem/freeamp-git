@@ -318,7 +318,6 @@ vector<char *> *XingLMC::GetExtensions(void)
    extList->push_back("MP3");
    extList->push_back("MP2");
    extList->push_back("MP1");
-   extList->push_back("MPG");
 
    return extList;
 }
