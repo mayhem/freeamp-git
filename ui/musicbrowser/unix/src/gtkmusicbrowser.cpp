@@ -736,8 +736,9 @@ void GTKMusicBrowser::CreateExpanded(void)
     gtk_widget_show_all(masterBrowserBox);
 }
 
-void set_label_menu(GtkWidget *w, gchar *newtitle)
+void set_label_menu(GtkWidget *w, void *title)
 {
+    gchar *newtitle = (gchar*)title;
     if (GTK_IS_ACCEL_LABEL(GTK_OBJECT(w))) {
         gtk_label_set_text(&(GTK_ACCEL_LABEL(w)->label), newtitle);
     }
