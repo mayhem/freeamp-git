@@ -21,6 +21,9 @@
 	$Id$
 ____________________________________________________________________________*/
 
+
+#include "config.h"
+
 #include <pthread.h>
 #include <signal.h>
 #include <iostream.h>
