@@ -182,7 +182,7 @@ Error CDPMO::Init(OutputInfo *info)
 
    m_pTarget->AcceptEvent(cie);
 
-   delete cdindex;
+   delete [] cdindex;
 
    return kError_NoErr;
 }

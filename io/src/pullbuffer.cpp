@@ -67,11 +67,11 @@ PullBuffer::~PullBuffer(void)
    m_bExit = true;
 
    if (m_pPullBuffer)
-      delete m_pPullBuffer;
+      delete [] m_pPullBuffer;
 
    delete m_pMutex;
    if (m_pName)
-       delete m_pName;
+       delete [] m_pName;
 }
 
 void PullBuffer::SetName(char *name)
@@ -211,7 +211,7 @@ Error PullBuffer::Resize(size_t iNewSize,
    pNew = new unsigned char[iNewSize + iNewOverflowSize];
    memcpy(pNew, m_pPullBuffer, m_iBytesInBuffer);
 
-   delete m_pPullBuffer;
+   delete [] m_pPullBuffer;
    m_pPullBuffer = pNew;
    m_iBufferSize = iNewSize;
    m_iOverflowSize = iNewOverflowSize;

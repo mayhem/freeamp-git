@@ -190,7 +190,7 @@ HttpInput::~HttpInput()
    if (m_fpSave)
       fclose(m_fpSave);
 
-   delete    m_szError;
+   delete [] m_szError;
 }
 
 bool
@@ -707,13 +707,13 @@ HttpInput::Open(void)
    iRet = send(m_hHandle, szQuery, strlen(szQuery), 0);
    if (iRet != (int) strlen(szQuery))
    {
-      delete    szQuery;
+      delete [] szQuery;
 
       ReportError("Cannot send data to host: %s", szHostName);
       closesocket(m_hHandle);
       return (Error) httpError_SocketWrite;
    }
-   delete    szQuery;
+   delete [] szQuery;
 
    pInitialBuffer = new char[iInitialBufferSize + 1];
 
@@ -768,7 +768,7 @@ HttpInput::Open(void)
                  sprintf(url, "Redirected to: %s", m_path);
                  ReportStatus(url);
 
-                 delete    pInitialBuffer;
+                 delete [] pInitialBuffer;
                  closesocket(m_hHandle);
                  return Open(); 
              }
@@ -779,7 +779,7 @@ HttpInput::Open(void)
          ReportStatus("");
          ReportError("This stream is not available: %s\n", m_szError);
 
-         delete    pInitialBuffer;
+         delete [] pInitialBuffer;
 
          closesocket(m_hHandle);
          return (Error) httpError_CustomError;
@@ -801,7 +801,7 @@ HttpInput::Open(void)
 
             memset(pNew, 0, iCurHeaderSize + 1);
             memcpy(pNew, pHeaderData, iHeaderBytes);
-            delete    pHeaderData;
+            delete []  pHeaderData;
 
             pHeaderData = pNew;
          }
@@ -898,7 +898,7 @@ HttpInput::Open(void)
             e = new PlaylistItemsUpdatedEvent(&pl_items, m_pContext->plm);
             m_pTarget->AcceptEvent(e);
          }
-         delete    szStreamUrl;
+         delete [] szStreamUrl;
       }
 
       pPtr = strstr(pHeaderData, "x-audiocast-udpport:");
@@ -920,7 +920,7 @@ HttpInput::Open(void)
       }
    }
 
-   delete    pInitialBuffer;
+   delete [] pInitialBuffer;
 
    bool      bSave;
    uint32    size = 255;
@@ -974,15 +974,15 @@ HttpInput::Open(void)
 
          if (iRet != iRead)
          {
-            delete    pHeaderData;
+            delete [] pHeaderData;
 
             ReportError("Cannot save http stream to disk. Disk full? (1)");
             return kError_WriteFile;
          }
       }
    }
-   delete    pHeaderData;
-   delete    szStreamName;
+   delete [] pHeaderData;
+   delete [] szStreamName;
 
    return kError_NoErr;
 }
@@ -1062,7 +1062,7 @@ HttpInput::WorkerThread(void)
                      }
 
                   }
-                  delete    pMeta;
+                  delete [] pMeta;
                }
 
                iMaxReadBytes = iReadSize;

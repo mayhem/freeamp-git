@@ -102,7 +102,6 @@ LocalFileInput::~LocalFileInput()
        fclose(m_fpFile); 
        m_fpFile = NULL;
     }
-
 }
 
 Error LocalFileInput::Prepare(PullBuffer *&pBuffer)
@@ -164,7 +163,7 @@ Error LocalFileInput::SetTo(const char *url)
 
     if (m_path)
     {
-       delete m_path;
+       delete [] m_path;
        m_path = NULL;
     }
  
