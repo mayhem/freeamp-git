@@ -59,7 +59,7 @@ class     ObsInput:public PhysicalMediaInput
 	virtual bool  CachePMI() 
 	              { return true; };
 
-   virtual Error SetTo(char *url);
+   virtual Error SetTo(char *url, bool bStartThread = true);
    virtual Error Close(void);
    virtual const char *Url(void) const
    {

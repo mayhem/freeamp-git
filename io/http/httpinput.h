@@ -60,7 +60,7 @@ class HttpInput:public PhysicalMediaInput
    virtual bool  Resume();
    virtual void  Break();
 
-   virtual Error SetTo(char *url);
+   virtual Error SetTo(char *url, bool bStartThread = true);
    virtual Error Close(void);
    virtual const char *Url(void) const
    {

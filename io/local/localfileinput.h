@@ -53,7 +53,7 @@ class     LocalFileInput:public PhysicalMediaInput
    virtual Error SetBufferSize(size_t iNewSize)
                  { return kError_NoErr; };
 
-   virtual Error SetTo(char *url);
+   virtual Error SetTo(char *url, bool bStartThread = true);
    virtual Error Close(void);
    virtual const char *Url(void) const
    {

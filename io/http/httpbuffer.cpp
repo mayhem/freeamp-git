@@ -289,7 +289,12 @@ Error HttpBuffer::Open(void)
 
 		  if (iRet != iICY_OK)
 		  {
-            g_Log->Error("This stream is not available: %s\n", m_szError);
+            char szErr[255];
+
+            sprintf(szErr, "This stream is not available: %s\n", m_szError);
+            g_Log->Error(szErr);
+            m_pHttp->ReportError(szErr);
+
 		      delete pInitialBuffer;
 		      closesocket(m_hHandle);
 				return (Error)httpError_CustomError;

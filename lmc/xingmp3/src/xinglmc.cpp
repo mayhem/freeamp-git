@@ -956,7 +956,7 @@ Error XingLMC::BeginRead(void *&pBuffer, unsigned int iBytesNeeded,
        m_iBufferUpdate = iNow;
   	}
 
-   if (bBufferUp && iInPercent < 10 && iOutPercent < 10)
+   if (bBufferUp && iInPercent < 5 && iOutPercent < 5)
    {
        int iBufferUpBytes;
 

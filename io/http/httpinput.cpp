@@ -106,7 +106,7 @@ bool HttpInput::CanHandle(char *szUrl, char *szTitle)
    return bRet;
 }
 
-Error HttpInput::SetTo(char *url)
+Error HttpInput::SetTo(char *url, bool bStartThread)
 {
    Error     result = kError_NoErr;
 
@@ -143,7 +143,7 @@ Error HttpInput::SetTo(char *url)
          assert(m_pPullBuffer);
 
          result = m_pPullBuffer->Open();
-         if (result == kError_NoErr)
+         if (result == kError_NoErr && bStartThread)
              result = m_pPullBuffer->Run();
       }
    }

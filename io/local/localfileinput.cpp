@@ -104,7 +104,7 @@ bool LocalFileInput::CanHandle(char *szUrl, char *szTitle)
    return bRet;
 }
 
-Error     LocalFileInput::SetTo(char *url)
+Error     LocalFileInput::SetTo(char *url, bool bStartThread)
 {
    Error     result = kError_NoErr;
    
@@ -146,9 +146,12 @@ Error     LocalFileInput::SetTo(char *url)
          result = m_pPullBuffer->Open();
          if (!IsError(result))
          {
-             result = m_pPullBuffer->Run();
-             if (IsError(result))
-                 ReportError("Could run the input plugin.");
+             if (bStartThread)
+             {
+                result = m_pPullBuffer->Run();
+                if (IsError(result))
+                    ReportError("Could run the input plugin.");
+             }
          }
          else
              ReportError("Could not open the specified file.");

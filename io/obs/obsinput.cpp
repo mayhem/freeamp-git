@@ -106,7 +106,7 @@ bool ObsInput::CanHandle(char *szUrl, char *szTitle)
    return bRet;
 }
 
-Error ObsInput::SetTo(char *url)
+Error ObsInput::SetTo(char *url, bool bStartThread)
 {
    Error     result = kError_NoErr;
 
@@ -143,7 +143,7 @@ Error ObsInput::SetTo(char *url)
          assert(m_pPullBuffer);
 
          result = m_pPullBuffer->Open();
-         if (!IsError(result))
+         if (!IsError(result) && bStartThread)
             result = m_pPullBuffer->Run();
       }
    }

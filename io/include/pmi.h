@@ -88,7 +88,7 @@ public:
 
 	 virtual Error SetPropManager(Properties *) = 0;
 		 
-    virtual Error SetTo(char* url) = 0;
+    virtual Error SetTo(char* url, bool bStartThread = true) = 0;
     virtual Error SetTarget(EventQueue *target)
                   { m_target = target; return kError_NoErr; };
     virtual Error Close(void) = 0;

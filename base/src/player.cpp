@@ -991,7 +991,7 @@ void Player::GetMediaTitle(Event *pEventArg)
          pPmi = (PhysicalMediaInput *)pRegItem->InitFunction()(g_Log);
 
          pPmi->SetTarget((EventQueue *)this);
-         eRet = pPmi->SetTo(pItem->URL());
+         eRet = pPmi->SetTo(pItem->URL(), false);
          if (!IsError(eRet))
          {
             eRet = pPmi->GetID3v1Tag(szTagBuffer);
