@@ -74,7 +74,8 @@ depend:
 
 Makefile: Makefile.in Makefile-plugins.in
 	./config.status
-	make -$(MAKEFLAGS)
+	echo 'Makefile has been rebuilt; please run `make` again.'
+
 
 #Makefile: configure.in configure
 #	./config.status --recheck

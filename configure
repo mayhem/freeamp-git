@@ -2739,7 +2739,7 @@ fi
   else
      ESD_LIBS=`$ESD_CONFIG --libs`
      EXTRALIBS="$EXTRALIBS $ESD_LIBS"
-     ESOUNDPLUGIN=plugins/esound-${host_os}.pmo
+     ESOUNDPLUGIN=plugins/esound.pmo
      OSDEPPLUGINS="$OSDEPPLUGINS $ESOUNDPLUGIN"
      OSINC="$OSINC -Iio/esound/include"
   fi
@@ -2934,9 +2934,9 @@ fi
 
 #AM_CONDITIONAL(AM_ENABLE_X11, test "$x11" = "true")
 
-FAUIPLUGIN=plugins/freeamp-${host_os}.ui
+FAUIPLUGIN=plugins/freeamp.ui
 if test "$isunix" = "false" -o "$x11" = "false"; then
-  echo "configure: warning: not compiling freeamp-$host_os ui plugin" 1>&2
+  echo "configure: warning: not compiling freeamp.ui plugin" 1>&2
 else
   OSDEPPLUGINS="$OSDEPPLUGINS $FAUIPLUGIN";
   EXTRALIBS="$EXTRALIBS -lXpm"
@@ -3029,7 +3029,7 @@ fi
 
 
 if test "$curses" != ""; then
-	OSDEPPLUGINS="$OSDEPPLUGINS plugins/ncurses-${host_os}.ui";
+	OSDEPPLUGINS="$OSDEPPLUGINS plugins/ncurses.ui";
 	CURSES="$curses";
 	
 fi
@@ -3109,7 +3109,7 @@ have_alsa="false"
 fi
 
 
-ALSAPMOPLUGIN=plugins/alsa-${host_os}.pmo
+ALSAPMOPLUGIN=plugins/alsa.pmo
 if test "$have_alsa" = "true"; then
   OSDEPPLUGINS="$OSDEPPLUGINS $ALSAPMOPLUGIN";
   OSINC="$OSINC -Iio/alsa/$OSDEP/include"
