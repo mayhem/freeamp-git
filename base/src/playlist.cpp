@@ -300,6 +300,7 @@ PlaylistManager::~PlaylistManager()
     uint32 index = 0;
     uint32 size = 0;
     PlaylistItem* item = NULL;
+    vector<MetaDataFormat *>::iterator i;
     //uint32 count = 0;
 
     size = m_masterList.size();
@@ -386,6 +387,9 @@ PlaylistManager::~PlaylistManager()
         delete m_portablePlayers[index]->GetRef();
         delete m_portablePlayers[index];
     }
+
+    for(i = m_metadataFormats.begin(); i != m_metadataFormats.end(); i++)
+        delete (*i);
 
     m_context->prefs->SetPlaylistShuffle(m_shuffle);
     m_context->prefs->SetPlaylistRepeat(m_repeatMode);

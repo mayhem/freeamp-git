@@ -78,12 +78,16 @@ class DownloadItem {
             SetDestinationFile(dest);
 
         if(metadata)
+		{
             SetMetaData(metadata);
+			delete metadata;
+        }
 
         m_state = kDownloadItemState_Null;
         m_error = kError_NoErr;
         m_bytesTotal = 0;
         m_bytesReceived = 0;
+        m_normalDownload = false;
     }
 
     virtual ~DownloadItem() {}
@@ -133,6 +137,9 @@ class DownloadItem {
     void SetBytesReceived(uint32 bytes) { m_bytesReceived = bytes; }
     uint32 GetBytesReceived() const { return m_bytesReceived; }
 
+    void SetNormalDownload(void) { m_normalDownload = true; };
+	bool IsNormalDownload(void) { return m_normalDownload; };
+
  protected:
     Error SetBuffer(char* dest, const char* src, uint32* len)
     {
@@ -173,6 +180,7 @@ class DownloadItem {
     Error m_error;
     uint32 m_bytesReceived;
     uint32 m_bytesTotal;
+	bool   m_normalDownload;
 };
 
 class DownloadManager {
@@ -201,7 +209,7 @@ class DownloadManager {
     // This will indicate to the download thread that it should
     // attempt to retrieve this item. Has no effect if the item's
     // state is Done, or Downloading.
-    Error QueueDownload(DownloadItem* item, bool bQueueAtHead = false);
+    Error QueueDownload(DownloadItem* item, bool bDownloadNow = false);
     Error QueueDownload(uint32 index);
 
     // Changes item state to cancelled if it is queued or downloading.

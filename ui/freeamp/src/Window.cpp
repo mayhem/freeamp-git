@@ -61,9 +61,8 @@ Window::~Window(void)
     if (!m_bIsVulcanMindMeldHost)
     {
        delete m_pCanvas;
-    }   
-    else
        ClearControls();
+    }   
 }
 
 void Window::VulcanMindMeldHost(bool bHost)
@@ -79,6 +78,10 @@ void Window::VulcanMindMeldHost(bool bHost)
 
 Error Window::VulcanMindMeld(Window *pOther)
 {
+    vector<Control *>::iterator i;
+    ControlMapIterator          j;
+    string                      oName;
+    
     m_oName = pOther->m_oName;
     m_pTheme = pOther->m_pTheme;
 
@@ -89,9 +92,14 @@ Error Window::VulcanMindMeld(Window *pOther)
     m_pCaptureControl = NULL;
     m_pMouseDownControl = NULL;
 
-    m_oControls = pOther->m_oControls;
-    m_oControlMap = pOther->m_oControlMap;
+    m_oControls.clear();
+    for(i = pOther->m_oControls.begin(); i != pOther->m_oControls.end(); i++)
+        m_oControls.push_back(*i);
 
+    m_oControlMap.clear();
+    for(j = pOther->m_oControlMap.begin(); j != pOther->m_oControlMap.end(); j++)
+        m_oControlMap.insert(pair<string, Control *>((*j).first, (*j).second));
+        
     m_pCanvas = pOther->m_pCanvas;
     Init();   
    

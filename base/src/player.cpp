@@ -500,11 +500,6 @@ SetArgs(int32 argc, char **argv)
         }
     }
 
-    if(m_autoplay)
-    {
-        AcceptEvent(new Event(CMD_Play));
-    }    
-
     delete [] path;
     delete [] url;
 
@@ -688,10 +683,10 @@ Run()
                                                     toolbarName, &len)) ==
            kError_BufferTooSmall)
    {
-       delete[] downloadName;
+       delete[] toolbarName;
        len++;
      
-       downloadName = new char[len];
+       toolbarName = new char[len];
    }
 #endif
 
@@ -824,6 +819,7 @@ Run()
    delete[] name;
    delete[] musicBrowserName;
    delete[] downloadName;
+   delete[] toolbarName;
 }
 
 void 

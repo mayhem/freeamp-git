@@ -137,6 +137,9 @@ FreeAmpTheme::~FreeAmpTheme()
         delete m_pOptionsThread;
         m_pOptionsThread = NULL;
     }
+#if defined( WIN32 )
+    delete m_pUpdateMan;
+#endif // WIN32
 }
 
 Error FreeAmpTheme::Init(int32 startup_type)

@@ -225,6 +225,7 @@ Error DownloadManager::AddItem(const char* url, const char* filename)
 
         if(item)
         {
+            item->SetNormalDownload();
             result = AddItem(item);
         }
     }
@@ -286,7 +287,7 @@ Error DownloadManager::AddItems(vector<DownloadItem*>* list)
 // attempt to retrieve this item. Has no effect if the item's
 // state is Done, or Downloading.
 Error DownloadManager::QueueDownload(DownloadItem* item,
-                                     bool          bQueueAtHead)
+                                     bool          bDownloadNow)
 {
     Error result = kError_InvalidParam;
     int   index;
@@ -301,7 +302,7 @@ Error DownloadManager::QueueDownload(DownloadItem* item,
             item->SetState(kDownloadItemState_Queued);
             SendStateChangedMessage(item);
             
-            if (m_downloadsPaused)
+            if (m_downloadsPaused && bDownloadNow)
                for(index = 0; index < m_itemList.size(); index++)
                    if (m_itemList[index] == item)
                    {
@@ -965,14 +966,8 @@ Error DownloadManager::Download(DownloadItem* item)
                                    item->GetState() == kDownloadItemState_Paused)
                                     result = kError_UserCancel;
 
-                                //cout << "bytes recvd:" << count << endl;
-
-                            }while(count > 0 && IsntError(result));
-
-                            if(IsError(result))
-                                //*m_debug << "Error: " << result << endl;
-
-                            //*m_debug << "file received: " << item->GetBytesReceived() << " bytes" << endl;
+                            }while(count > 0 && IsntError(result) && m_runDownloadThread &&
+                                  item->GetTotalBytes() > item->GetBytesReceived());
 
                             close(fd);                           
                         }
@@ -1071,7 +1066,7 @@ Error DownloadManager::Download(DownloadItem* item)
                                 break;                           
 
                             case 403:
-                                result = kError_AccessForbidden;
+                                result = kError_DownloadDenied;
                                 break;
 
                             case 404:
@@ -1159,8 +1154,9 @@ Error DownloadManager::SubmitToDatabase(DownloadItem* item)
         
         if (IsntError(FilePathToURL(path, url, &urlLength)))
         {
-            m_context->catalog->WriteMetaDataToDatabase(url, 
-                                                        item->GetMetaData());
+            if (!item->IsNormalDownload())
+                m_context->catalog->WriteMetaDataToDatabase(url, 
+                                                            item->GetMetaData());
             m_context->catalog->AddSong(url);
         }
 
@@ -1416,6 +1412,8 @@ void DownloadManager::LoadResumableDownloadItems()
 
                 string data = value;
                 data.erase(0, offset);
+                delete value;
+                value = NULL;
 
                 DownloadItem* item = new DownloadItem();
                 MetaData metadata;
@@ -1495,7 +1493,10 @@ void DownloadManager::LoadResumableDownloadItems()
             }
             
             while (key = database.NextKey(NULL))
+            {
                 database.Remove(key);
+                delete key;
+            }
         }
     }
 }

@@ -875,7 +875,7 @@ void Win32Window::BringWindowToFront(void)
 
 void Win32Window::AddToSystemMenu(HWND hWnd)
 {
-    HMENU        hMenu, hPopup;
+    HMENU        hMenu, hPopup, hMain;
     MENUITEMINFO sInfo;
     BOOL         bRet;
     
@@ -883,8 +883,8 @@ void Win32Window::AddToSystemMenu(HWND hWnd)
        return;
        
     hMenu = GetSystemMenu(hWnd, false);
-    hPopup = LoadMenu(g_hinst, MAKEINTRESOURCE(IDM_TRAY));
-    hPopup = GetSubMenu(hPopup, 0);
+    hMain = LoadMenu(g_hinst, MAKEINTRESOURCE(IDM_TRAY));
+    hPopup = GetSubMenu(hMain, 0);
 
     sInfo.cbSize = sizeof(sInfo);
     sInfo.fMask = MIIM_SUBMENU | MIIM_TYPE;
@@ -901,6 +901,8 @@ void Win32Window::AddToSystemMenu(HWND hWnd)
     sInfo.fType = MFT_SEPARATOR;
     sInfo.fState = 0;
     bRet = InsertMenuItem(hMenu, 1, true, &sInfo);
+    
+    DestroyMenu(hMain);
 } 
 
 void Win32Window::ConvertTo256Color(vector<Bitmap *> *pList)

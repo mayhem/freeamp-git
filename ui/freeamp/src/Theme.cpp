@@ -613,6 +613,7 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
        else                                          
            m_pCurrentControl = new ButtonControl(m_pCurrentWindow, 
                                                  oAttrMap["Name"]);
+
        return kError_NoErr;
     }
 
@@ -1059,7 +1060,7 @@ Error Theme::EndElement(string &oElement)
     {
        if (!m_pParsedWindows)
            m_pParsedWindows = new vector<Window *>;
-           
+
        m_pParsedWindows->push_back(m_pCurrentWindow);
            
        m_pCurrentWindow = NULL;

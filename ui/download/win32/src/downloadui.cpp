@@ -214,6 +214,9 @@ int32 DownloadUI::AcceptEvent(Event* event)
                 // bring window into view
                 ShowWindow(m_hwnd, SW_SHOW);
                 SetForegroundWindow(m_hwnd);
+
+                if (m_dlm->IsPaused())
+                   m_dlm->ResumeDownloads();
                
 	            break; 
             }
@@ -588,6 +591,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             m_urlRect = rcClip;
 
             DeleteObject(font);
+            DeleteObject(pen);
             break;
         }
 
@@ -1473,12 +1477,6 @@ BOOL DownloadUI::Command(int32 command, HWND src)
                     memcpy(url, "http://", 7);
                     sp = url;
                 }
-
-                /*MessageBox(m_hwnd, 
-                           sp,
-                           "url",
-                           MB_OK|MB_ICONINFORMATION);*/
-
 
                 m_dlm->AddItem(sp);
             

@@ -94,6 +94,7 @@ const char* ErrorString[] = {
     "The requested file was not found", //          kError_HTTPFileNotFound  = 67,
     "Failed to initialize your CD-ROM", //          kError_CDInitFailed = 68;
     "Cannot play CD track",             //          kError_InvalidTrack = 69,
+    "Download denied", //                           kError_DownloadDenied = 70,  
 
     "kError_LastError", //            = 9999
 };
