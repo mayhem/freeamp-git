@@ -51,12 +51,11 @@ PERL = @PERL@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
 AC_HOST_OS = @host_os@
-CFLAGS = @CFLAGS@ -D_REENTRANT
+CFLAGS = -Wall @CFLAGS@ -D_REENTRANT
 OSDEP = @OSDEP@
 OSINC = @OSINC@
-OSLINK = @OSLINK@
 FPIC = @FPIC@
-LINKMOD = gcc -shared $(OSLINK)
+LINKMOD = gcc -shared $(OSLINK) $(LDFLAGS)
 
 OSDEPOBJ = @OSDEPOBJ@
 
@@ -97,9 +96,9 @@ all: freeamp plugins
 
 freeamp: $(FREEAMPOBJ) $(freeamp_DEPENDENCIES)
 	@rm -f freeamp
-	$(CXXLINK) $(FREEAMPOBJ) -ldl -lpthread -lm $(X_LIBS) $(X_EXTRA_LIBS)
+	$(CXXLINK) $(FREEAMPOBJ) $(LDFLAGS) -ldl -lpthread $(X_LIBS) $(X_EXTRA_LIBS)
 
-.SUFFIXES: .S .c .cpp .o .s .asm .asm1
+.SUFFIXES: .S .c .cpp .o .s
 
 
 .cpp.o:
@@ -107,12 +106,6 @@ freeamp: $(FREEAMPOBJ) $(freeamp_DEPENDENCIES)
 
 .c.o:
 	$(COMPILE) $(FPIC) -c $< -o $@
-
-.asm.asm1:
-	$(PERL) -pe 's/\b_//g' $< > $@
-
-.asm1.o:
-	$(NASM) -f elf -o $@ $<
 
 .s.o:
 	$(COMPILE) -c $< -o $@
