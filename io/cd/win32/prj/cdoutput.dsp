@@ -245,6 +245,10 @@ SOURCE=..\..\..\src\pmo.cpp
 
 SOURCE=..\..\..\src\pullbuffer.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\win32volume.cpp
+# End Source File
 # End Group
 # Begin Group "resources"
 
