@@ -191,7 +191,7 @@ BOOL MusicBrowserUI::EditTrackInfoDlgProc(HWND hwnd,
                 {
                     bool notJustWhiteSpace = false;
 
-                    for(uint32 index = 0; index < length; indexi++)
+                    for(uint32 index = 0; index < length; index++)
                     {
                         if(!isspace((*i)[index]))
                         {
