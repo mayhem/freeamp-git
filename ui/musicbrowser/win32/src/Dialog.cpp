@@ -491,7 +491,7 @@ void MusicBrowserUI::ExpandCollapseEvent(void)
     {                
        m_state = STATE_COLLAPSED;
        SetWindowText(m_hWnd, "Playlist - " BRANDING);
-       sItem.dwTypeData = "View &Music Browser";
+       sItem.dwTypeData = "View &My Music";
 
        ShowWindow(m_hMusicCatalog, SW_HIDE);
        ShowWindow(m_hMusicCatalogTitle, SW_HIDE);
