@@ -33,6 +33,7 @@ clean-plugins plugins-clean:
 
 PLUGINS =  lib/zlib/lib/libzlib.la
 PLUGINS += lib/unzip/lib/libunzip.la
+PLUGINS += lmc/vorbis/src/lib/libvorbis.la
 PLUGINS += plugins/localfileinput.pmi
 PLUGINS += plugins/httpinput.pmi
 PLUGINS += plugins/obsinput.pmi
@@ -53,6 +54,7 @@ PLUGINS += plugins/cd.lmc
 
 PLUGINS += plugins/id3v1.mdf
 PLUGINS += plugins/id3v2.mdf
+PLUGINS += plugins/vorbis.mdf
 PLUGINS += plugins/misc.mdf
 PLUGINS += plugins/cddb.mdf
 
@@ -319,34 +321,37 @@ XINGLMCOBJ = $(XINGLMCOBJC) $(XINGLMCOBJCXX)
 plugins/xingmp3.lmc: $(XINGLMCOBJ)
 	$(LINKMOD) -o $@ $(XINGLMCOBJ) $(STATICLD)
 
+# vorbis lib
+VORBISLIBOBJ = lmc/vorbis/src/lib/analysis.o
+VORBISLIBOBJ += lmc/vorbis/src/lib/barkmel.o
+VORBISLIBOBJ += lmc/vorbis/src/lib/bitwise.o
+VORBISLIBOBJ += lmc/vorbis/src/lib/block.o
+VORBISLIBOBJ += lmc/vorbis/src/lib/codebook.o
+VORBISLIBOBJ += lmc/vorbis/src/lib/envelope.o
+VORBISLIBOBJ += lmc/vorbis/src/lib/floor0.o
+VORBISLIBOBJ += lmc/vorbis/src/lib/framing.o
+VORBISLIBOBJ += lmc/vorbis/src/lib/iir.o
+VORBISLIBOBJ += lmc/vorbis/src/lib/info.o
+VORBISLIBOBJ += lmc/vorbis/src/lib/lpc.o
+VORBISLIBOBJ += lmc/vorbis/src/lib/lsp.o
+VORBISLIBOBJ += lmc/vorbis/src/lib/mapping0.o
+VORBISLIBOBJ += lmc/vorbis/src/lib/mdct.o
+VORBISLIBOBJ += lmc/vorbis/src/lib/psy.o
+VORBISLIBOBJ += lmc/vorbis/src/lib/registry.o
+VORBISLIBOBJ += lmc/vorbis/src/lib/res0.o
+VORBISLIBOBJ += lmc/vorbis/src/lib/sharedbook.o
+VORBISLIBOBJ += lmc/vorbis/src/lib/smallft.o
+VORBISLIBOBJ += lmc/vorbis/src/lib/synthesis.o
+VORBISLIBOBJ += lmc/vorbis/src/lib/time0.o
+VORBISLIBOBJ += lmc/vorbis/src/lib/vorbisfile.o
+VORBISLIBOBJ += lmc/vorbis/src/lib/window.o
+lmc/vorbis/src/lib/libvorbis.la: $(VORBISLIBOBJ)
+	$(LIBMOD) $@ $(VORBISLIBOBJ)
+
 # vorbis lmc
 VORBISOBJ = lmc/vorbis/src/vorbislmc.o
-VORBISOBJ += lmc/vorbis/src/lib/analysis.o
-VORBISOBJ += lmc/vorbis/src/lib/barkmel.o
-VORBISOBJ += lmc/vorbis/src/lib/bitwise.o
-VORBISOBJ += lmc/vorbis/src/lib/block.o
-VORBISOBJ += lmc/vorbis/src/lib/codebook.o
-VORBISOBJ += lmc/vorbis/src/lib/envelope.o
-VORBISOBJ += lmc/vorbis/src/lib/floor0.o
-VORBISOBJ += lmc/vorbis/src/lib/framing.o
-VORBISOBJ += lmc/vorbis/src/lib/iir.o
-VORBISOBJ += lmc/vorbis/src/lib/info.o
-VORBISOBJ += lmc/vorbis/src/lib/lpc.o
-VORBISOBJ += lmc/vorbis/src/lib/lsp.o
-VORBISOBJ += lmc/vorbis/src/lib/mapping0.o
-VORBISOBJ += lmc/vorbis/src/lib/mdct.o
-VORBISOBJ += lmc/vorbis/src/lib/psy.o
-VORBISOBJ += lmc/vorbis/src/lib/registry.o
-VORBISOBJ += lmc/vorbis/src/lib/res0.o
-VORBISOBJ += lmc/vorbis/src/lib/sharedbook.o
-VORBISOBJ += lmc/vorbis/src/lib/smallft.o
-VORBISOBJ += lmc/vorbis/src/lib/synthesis.o
-VORBISOBJ += lmc/vorbis/src/lib/time0.o
-VORBISOBJ += lmc/vorbis/src/lib/vorbisfile.o
-VORBISOBJ += lmc/vorbis/src/lib/window.o
-plugins/vorbis.lmc: $(VORBISOBJ)
-	$(LINKMOD) -o $@ $(VORBISOBJ) $(STATICLD)
-
+plugins/vorbis.lmc: $(VORBISOBJ) lmc/vorbis/src/lib/libvorbis.la
+	$(LINKMOD) -o $@ $(VORBISOBJ) lmc/vorbis/src/lib/libvorbis.la $(STATICLD)
 
 # MDF section 
 
@@ -361,6 +366,12 @@ ID3V2OBJ = plm/metadata/id3v2/id3v2.o
 
 plugins/id3v2.mdf: $(ID3V2OBJ)
 	$(LINKMOD) -o $@ $(ID3V2OBJ) $(STATICLD) @ID3LIB@
+
+#vorbis
+VORBISMDFOBJ = plm/metadata/vorbis/vorbis.o
+
+plugins/vorbis.mdf: $(VORBISMDFOBJ) lmc/vorbis/src/lib/libvorbis.la
+	$(LINKMOD) -o $@ $(VORBISMDFOBJ) lmc/vorbis/src/lib/libvorbis.la $(STATICLD)
 
 #misc
 MISCOBJ = plm/metadata/misc/misc.o 

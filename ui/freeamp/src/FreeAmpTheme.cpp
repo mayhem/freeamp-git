@@ -784,7 +784,7 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
       }
       case CMD_ShowPreferences:
       {
-         ShowPreferencesEvent* prefsEvent = (ShowPreferencesEvent*)e;
+          ShowPreferencesEvent* prefsEvent = (ShowPreferencesEvent*)e;
       	 ShowOptions(prefsEvent->GetDefaultPage());
       	 break;
       }
