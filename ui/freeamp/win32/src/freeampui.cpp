@@ -47,6 +47,8 @@ ____________________________________________________________________________*/
 #include "renderer.h"
 #include "fontwidth.h"
 #include "preferences.h"
+#include "prefdialog.h"
+
 #include "stringitem.h"
 
 #include "resource.h"
@@ -436,7 +438,7 @@ UserInterface()
 
     m_prevSongInfoText = NULL;
 
-    m_state = STATE_Stopped;
+    m_state = UIState_Stopped;
 
     for(int32 i = 0; i < kNumControls; i++)
     {
@@ -862,7 +864,7 @@ Command(int32 command,
 
                 m_plm->SetFirst();
 
-                if(m_state == STATE_Playing)
+                if(m_state == UIState_Playing)
                 {
                     m_target->AcceptEvent(new Event(CMD_Stop));
                     m_target->AcceptEvent(new Event(CMD_Play));
@@ -986,6 +988,12 @@ Command(int32 command,
             //OutputDebugString("StayOnTop\r\n");
             break;
         }
+
+        case kPrefControl:
+        {
+            DisplayPreferences(m_hwnd);
+            break;
+        }
     }
 }
 
@@ -1028,13 +1036,13 @@ Notify(int32 command, LPNMHDR notifyMsgHdr)
                     lpttt->lpszText = "Close"; 
                     break;
                 case kPlayControl:
-                    if(m_state == STATE_Stopped)
+                    if(m_state == UIState_Stopped)
                         lpttt->lpszText = "Play"; 
                     else
                         lpttt->lpszText = "Stop";
                     break;
                 case kPauseControl:
-                    if(m_state == STATE_Paused)
+                    if(m_state == UIState_Paused)
                         lpttt->lpszText = "Continue Playing"; 
                     else
                         lpttt->lpszText = "Pause"; 
@@ -1164,7 +1172,7 @@ Notify(int32 command, LPNMHDR notifyMsgHdr)
                         m_timeView->SetDisplay(m_lastTimeDisplay);
                         m_seekView->SetPosition(0);
 
-                        if(m_state == STATE_Playing)
+                        if(m_state == UIState_Playing)
                         {
                             m_target->AcceptEvent(new ChangePositionEvent(m_seekFrame));
                         }
@@ -2344,7 +2352,7 @@ AcceptEvent(Event* event)
 
             case INFO_Playing: 
             {   
-                m_state = STATE_Playing;
+                m_state = UIState_Playing;
                 m_stopView->Show();
                 m_playView->Hide();
                 m_pauseView->SetState(Unpressed);
@@ -2354,13 +2362,13 @@ AcceptEvent(Event* event)
             case INFO_Paused: 
             {
                 m_pauseView->SetState(Pressed);
-                m_state = STATE_Paused;
+                m_state = UIState_Paused;
 	            break; 
             }
 
             case INFO_Stopped: 
             {
-                m_state = STATE_Stopped;
+                m_state = UIState_Stopped;
                 m_playView->Show();
                 m_stopView->Hide();
                 m_pauseView->SetState(Unpressed);
@@ -2623,7 +2631,7 @@ FilesReceived(char* array, int32 count)
 	    array += strlen(array) + 1;
     }
             
-    if( m_state == STATE_Playing || m_state == STATE_Paused)
+    if( m_state == UIState_Playing || m_state == UIState_Paused)
         m_target->AcceptEvent(new Event(CMD_Stop));
 
     m_plm->MakeEmpty();

@@ -21,8 +21,8 @@
 	$Id$
 ____________________________________________________________________________*/
 
-#ifndef _LIST_VIEW_H_
-#define _LIST_VIEW_H_
+#ifndef PREF_DIALOG_H
+#define PREF_DIALOG_H
 
 #include "config.h"
 #include "view.h"
@@ -156,4 +156,4 @@ class ListView : public View {
     
 };
 
-#endif /* _LIST_VIEW_H_ */
+#endif /* PREF_DIALOG_H */

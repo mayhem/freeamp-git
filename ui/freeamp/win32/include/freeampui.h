@@ -60,9 +60,9 @@ ____________________________________________________________________________*/
 #include "scrollview.h"
 #include "resizeview.h"
 
-enum {	STATE_Stopped = 0, 
-		STATE_Playing, 
-		STATE_Paused };
+enum {	UIState_Stopped = 0, 
+		UIState_Playing, 
+		UIState_Paused };
 
 
 class FreeAmpUI : public UserInterface {

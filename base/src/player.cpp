@@ -50,7 +50,9 @@ const char *szPlaylistExt = ".M3U";
                              }
 
 
-Player *Player::GetPlayer()
+Player *
+Player::
+GetPlayer()
 {
    if (m_thePlayer == NULL)
    {
@@ -59,7 +61,8 @@ Player *Player::GetPlayer()
    return m_thePlayer;
 }
 
-Player::Player():
+Player::
+Player():
 EventQueue()
 {
    g_Log = new LogFile("freeamp.log");
@@ -81,7 +84,7 @@ EventQueue()
    m_imQuitting = 0;
    m_quitWaitingFor = 0;
    m_plm = new PlayListManager((EventQueue *) this);
-   m_playerState = STATE_Stopped;
+   m_playerState = PlayerState_Stopped;
 
    m_lmcRegistry = NULL;
    m_pmiRegistry = NULL;
@@ -106,7 +109,8 @@ EventQueue()
 
 #define TYPICAL_DELETE(x) /*printf("deleting...\n");*/ if (x) { delete x; x = NULL; }
 
-Player::~Player()
+Player::
+~Player()
 {
    TYPICAL_DELETE(m_pTermSem);
    TYPICAL_DELETE(m_argUIList);
@@ -153,7 +157,8 @@ Player::~Player()
    TYPICAL_DELETE(g_Log);
 }
 
-void      Player::
+void      
+Player::
 SetTerminationSemaphore(Semaphore * pSem)
 {
    m_pTermSem = pSem;
@@ -165,7 +170,8 @@ SetTerminationSemaphore(Semaphore * pSem)
 
 typedef char *pchar;
 
-bool      Player::
+bool      
+Player::
 SetArgs(int32 argc, char **argv)
 {
    List < char *>argList;
@@ -322,7 +328,8 @@ SetArgs(int32 argc, char **argv)
    return true;
 }
 
-void      Player::
+void      
+Player::
 Usage(const char *progname)
 {
    if (m_didUsage)
@@ -353,7 +360,8 @@ Usage(const char *progname)
 #define ARCH_NAME "unknown"
 #endif
 
-int32     Player::
+int32     
+Player::
 CompareNames(const char *p1, const char *p2)
 {
 // windows plugins and unix plugins are named differently...
@@ -397,13 +405,22 @@ CompareNames(const char *p1, const char *p2)
 #endif
 }
 
-void      Player::
+void      
+Player::
 SetPreferences(Preferences * pP)
 {
    m_prefs = pP;
 }
 
-void      Player::
+Preferences* 
+Player::
+GetPreferences() const
+{
+    return m_prefs;
+}
+
+void      
+Player::
 Run()
 {
    int32     uiListIndex = 0;
@@ -540,7 +557,9 @@ Run()
    delete[]name;
 }
 
-void Player::EventServiceThreadFunc(void *pPlayer)
+void 
+Player::
+EventServiceThreadFunc(void *pPlayer)
 {
    Player   *pP = (Player *) pPlayer;
    Event    *pC;
@@ -557,7 +576,8 @@ void Player::EventServiceThreadFunc(void *pPlayer)
    }
 }
 
-int32     Player::
+int32     
+Player::
 RegisterActiveUI(UserInterface * ui)
 {
    GetUIManipLock();
@@ -574,7 +594,8 @@ RegisterActiveUI(UserInterface * ui)
    }
 }
 
-int32     Player::
+int32     
+Player::
 RegisterLMCs(LMCRegistry * registry)
 {
    int32     result = 0;
@@ -594,7 +615,8 @@ RegisterLMCs(LMCRegistry * registry)
    return result;
 }
 
-int32     Player::
+int32     
+Player::
 RegisterPMIs(PMIRegistry * registry)
 {
    int32     result = 0;
@@ -614,7 +636,8 @@ RegisterPMIs(PMIRegistry * registry)
    return result;
 }
 
-int32     Player::
+int32     
+Player::
 RegisterPMOs(PMORegistry * registry)
 {
    int32     result = 0;
@@ -634,7 +657,8 @@ RegisterPMOs(PMORegistry * registry)
    return result;
 }
 
-int32     Player::
+int32     
+Player::
 RegisterUIs(UIRegistry * registry)
 {
    int32     result = 0;
@@ -654,36 +678,72 @@ RegisterUIs(UIRegistry * registry)
    return result;
 }
 
-void Player::GetUIManipLock()
+LMCRegistry* 
+Player::
+GetLMCRegistry() const
+{
+    return m_lmcRegistry;
+}
+
+PMIRegistry* 
+Player::
+GetPMIRegistry() const
+{
+    return m_pmiRegistry;
+}
+
+PMORegistry* 
+Player::
+GetPMORegistry() const
+{
+    return m_pmoRegistry;
+}
+
+UIRegistry*  
+Player::
+GetUIRegistry() const
+{
+    return m_uiRegistry;
+}
+
+void 
+Player::
+GetUIManipLock()
 {
    m_uiManipLock->Acquire(WAIT_FOREVER);
 }
 
-void Player::ReleaseUIManipLock()
+void 
+Player::
+ReleaseUIManipLock()
 {
    m_uiManipLock->Release();
 }
 
-int32 Player::AcceptEvent(Event * e)
+int32 
+Player::
+AcceptEvent(Event * e)
 {
    m_eventQueue->Write(e);
    m_eventSem->Signal();
    return 0;
 }
 
-bool Player::SetState(PlayerState ps)
+bool 
+Player::
+SetState(PlayerState ps)
 {
 #if 0
    printf("Player state: ");
    switch(ps)
    {
-       case STATE_Stopped:
+       case PlayerState_Stopped:
           printf("Stopped.\n");
           break;
-       case STATE_Paused:
+       case PlayerState_Paused:
           printf("Paused.\n");
           break;
-       case STATE_Playing:
+       case PlayerState_Playing:
           printf("Playing.\n");
           break;
        default:
@@ -697,7 +757,9 @@ bool Player::SetState(PlayerState ps)
    return true;
 }
 
-RegistryItem *Player::ChoosePMI(char *szUrl, char *szTitle)
+RegistryItem *
+Player::
+ChoosePMI(char *szUrl, char *szTitle)
 {
    PhysicalMediaInput *pmi;
    RegistryItem *pmi_item, *ret = NULL;
@@ -734,7 +796,9 @@ RegistryItem *Player::ChoosePMI(char *szUrl, char *szTitle)
    return ret;
 }
 
-void Player::CreateLMC(PlayListItem * pc, Event * pC)
+void 
+Player::
+CreateLMC(PlayListItem * pc, Event * pC)
 {
    Error     error = kError_NoErr;
    Event    *e;
@@ -756,7 +820,7 @@ void Player::CreateLMC(PlayListItem * pc, Event * pC)
 
          m_lmc = NULL;
       }
-      if (SetState(STATE_Stopped))
+      if (SetState(PlayerState_Stopped))
       {
          SEND_NORMAL_EVENT(INFO_Stopped);
       }
@@ -887,7 +951,9 @@ void Player::CreateLMC(PlayListItem * pc, Event * pC)
        delete lmc;
 }
 
-void Player::DoneOutputting(Event *pEvent)
+void 
+Player::
+DoneOutputting(Event *pEvent)
 {
    // LMC or PMO sends this when its done
    // outputting whatever.  Now, go on to next
@@ -899,7 +965,7 @@ void Player::DoneOutputting(Event *pEvent)
       m_lmc = NULL;
    }
 
-   if (SetState(STATE_Stopped))
+   if (SetState(PlayerState_Stopped))
    {
        SEND_NORMAL_EVENT(INFO_Stopped);
    }
@@ -910,7 +976,7 @@ void Player::DoneOutputting(Event *pEvent)
    {
       AcceptEvent(new Event(CMD_NextMediaPiece));
 
-      if (m_playerState == STATE_Paused)
+      if (m_playerState == PlayerState_Paused)
       {
          AcceptEvent(new Event(CMD_PlayPaused));
       }
@@ -929,7 +995,9 @@ void Player::DoneOutputting(Event *pEvent)
 }
 
 
-void Player::Stop(Event *pEvent)
+void 
+Player::
+Stop(Event *pEvent)
 {
     if (m_lmc)
     {
@@ -940,7 +1008,7 @@ void Player::Stop(Event *pEvent)
        m_lmc = NULL;
     }
 
-    if (SetState(STATE_Stopped))
+    if (SetState(PlayerState_Stopped))
     {
        SEND_NORMAL_EVENT(INFO_Stopped);
     }
@@ -948,7 +1016,9 @@ void Player::Stop(Event *pEvent)
     delete pEvent;
 }
 
-void Player::ChangePosition(Event *pEvent)
+void 
+Player::
+ChangePosition(Event *pEvent)
 {
     if (m_lmc)
        m_lmc->ChangePosition(((ChangePositionEvent *) pEvent)->GetPosition());
@@ -956,11 +1026,13 @@ void Player::ChangePosition(Event *pEvent)
     delete pEvent;
 }
 
-void Player::GetMediaInfo(Event *pEvent)
+void 
+Player::
+GetMediaInfo(Event *pEvent)
 {
      PlayListItem *pItem;
 
-     if (m_playerState == STATE_Stopped)
+     if (m_playerState == PlayerState_Stopped)
      {
          pItem = m_plm->GetCurrent();
          if (pItem)
@@ -969,7 +1041,9 @@ void Player::GetMediaInfo(Event *pEvent)
      delete pEvent;
 }
 
-void Player::GetMediaTitle(Event *pEventArg)
+void 
+Player::
+GetMediaTitle(Event *pEventArg)
 {
      PLMGetMediaTitleEvent *pEvent;
      PlayListItem          *pItem;
@@ -1022,16 +1096,18 @@ void Player::GetMediaTitle(Event *pEventArg)
      delete pEvent;
 }
 
-void Player::Play(Event *pEvent)
+void 
+Player::
+Play(Event *pEvent)
 {
     PlayListItem *pItem;
 
-    if (m_playerState == STATE_Playing)
+    if (m_playerState == PlayerState_Playing)
     {
        delete m_lmc;
        m_lmc = NULL;
 
-       if (SetState(STATE_Stopped))
+       if (SetState(PlayerState_Stopped))
        {
            SEND_NORMAL_EVENT(INFO_Stopped);
        }
@@ -1049,7 +1125,7 @@ void Player::Play(Event *pEvent)
 
     if (pEvent->Type() == CMD_PlayPaused)
     {
-        if (SetState(STATE_Paused))
+        if (SetState(PlayerState_Paused))
         {
            SEND_NORMAL_EVENT(INFO_Playing); 
            SEND_NORMAL_EVENT(INFO_Paused);
@@ -1058,7 +1134,7 @@ void Player::Play(Event *pEvent)
     else
     {
         m_lmc->Resume();
-        if (SetState(STATE_Playing))
+        if (SetState(PlayerState_Playing))
         {
            SEND_NORMAL_EVENT(INFO_Playing);
         }
@@ -1067,18 +1143,20 @@ void Player::Play(Event *pEvent)
     delete pEvent;
 }
 
-void Player::Next(Event *pEvent)
+void 
+Player::
+Next(Event *pEvent)
 {
-   if (m_playerState != STATE_Stopped)
+   if (m_playerState != PlayerState_Stopped)
    {
       AcceptEvent(new Event(CMD_Stop));
    }
 
    m_plm->SetNext(true);
 
-   if (m_playerState != STATE_Stopped)
+   if (m_playerState != PlayerState_Stopped)
    {
-       if (m_playerState == STATE_Paused)
+       if (m_playerState == PlayerState_Paused)
           AcceptEvent(new Event(CMD_PlayPaused));
        else
           AcceptEvent(new Event(CMD_Play));
@@ -1087,18 +1165,20 @@ void Player::Next(Event *pEvent)
    delete pEvent;
 }
 
-void Player::Previous(Event *pEvent)
+void 
+Player::
+Previous(Event *pEvent)
 {
-   if (m_playerState != STATE_Stopped)
+   if (m_playerState != PlayerState_Stopped)
    {
       AcceptEvent(new Event(CMD_Stop));
    }
 
    m_plm->SetPrev(true);
 
-   if (m_playerState != STATE_Stopped)
+   if (m_playerState != PlayerState_Stopped)
    {
-       if (m_playerState == STATE_Paused)
+       if (m_playerState == PlayerState_Paused)
           AcceptEvent(new Event(CMD_PlayPaused));
        else
           AcceptEvent(new Event(CMD_Play));
@@ -1107,43 +1187,51 @@ void Player::Previous(Event *pEvent)
    delete pEvent;
 }
 
-void Player::Pause(Event *pEvent)
+void 
+Player::
+Pause(Event *pEvent)
 {
    if (m_lmc)
    {
       m_lmc->Pause();
-      if (SetState(STATE_Paused))
+      if (SetState(PlayerState_Paused))
          SEND_NORMAL_EVENT(INFO_Paused);
    }
    delete pEvent;
 }
 
-void Player::UnPause(Event *pEvent)
+void 
+Player::
+UnPause(Event *pEvent)
 {
    if (m_lmc)
    {
       m_lmc->Resume();
-      if (SetState(STATE_Playing))
+      if (SetState(PlayerState_Playing))
          SEND_NORMAL_EVENT(INFO_Playing);
    }
    delete pEvent;
 }
 
-void Player::TogglePause(Event *pEvent)
+void 
+Player::
+TogglePause(Event *pEvent)
 {
     if (m_lmc)
     {
-       if (m_playerState == STATE_Playing)
+       if (m_playerState == PlayerState_Playing)
            Pause(NULL);
        else
-       if (m_playerState == STATE_Paused)
+       if (m_playerState == PlayerState_Paused)
            UnPause(NULL);
     }
 
     delete pEvent;
 }
 
-int Player::Quit(Event *pEvent)
+int 
+Player::
+Quit(Event *pEvent)
 {
    Event *pe;
 
@@ -1178,7 +1266,9 @@ int Player::Quit(Event *pEvent)
    }
 }
 
-int Player::ReadyToDieUI(Event *pEvent)
+int 
+Player::
+ReadyToDieUI(Event *pEvent)
 {
    delete pEvent;
 
@@ -1196,7 +1286,9 @@ int Player::ReadyToDieUI(Event *pEvent)
    return 1;
 }
 
-void Player::UserMessage(Event *pEvent)
+void 
+Player::
+UserMessage(Event *pEvent)
 {
    GetUIManipLock();
    SendToUI(pEvent);
@@ -1204,7 +1296,9 @@ void Player::UserMessage(Event *pEvent)
    delete pEvent;
 }
 
-void Player::HandleMediaInfo(Event *pEvent)
+void 
+Player::
+HandleMediaInfo(Event *pEvent)
 {
    MediaInfoEvent *pmvi;
    Event          *pe = NULL;
@@ -1234,9 +1328,11 @@ void Player::HandleMediaInfo(Event *pEvent)
    delete pEvent;
 }
 
-void Player::HandleMediaTimeInfo(Event *pEvent)
+void 
+Player::
+HandleMediaTimeInfo(Event *pEvent)
 {
-   if (m_playerState == STATE_Playing)
+   if (m_playerState == PlayerState_Playing)
    {
       GetUIManipLock();
       SendToUI(pEvent);
@@ -1246,7 +1342,9 @@ void Player::HandleMediaTimeInfo(Event *pEvent)
    delete pEvent;
 }
 
-void Player::SendEventToUI(Event *pEvent)
+void 
+Player::
+SendEventToUI(Event *pEvent)
 {
    GetUIManipLock();
    SendToUI(pEvent);
@@ -1256,7 +1354,9 @@ void Player::SendEventToUI(Event *pEvent)
 
 #define _EQUALIZER_ENABLE_
 #ifdef  _EQUALIZER_ENABLE_
-void Player::SetEQData(Event *pEvent)
+void 
+Player::
+SetEQData(Event *pEvent)
 {
    if (m_lmc)
    {
@@ -1272,9 +1372,11 @@ void Player::SetEQData(Event *pEvent)
 
 #define _VISUAL_ENABLE_
 #ifdef  _VISUAL_ENABLE_
-void Player::SendVisBuf(Event *pEvent)
+void 
+Player::
+SendVisBuf(Event *pEvent)
 {
-   if (m_playerState == STATE_Playing)
+   if (m_playerState == PlayerState_Playing)
    {
       GetUIManipLock();
       SendToUI(pEvent);
@@ -1285,7 +1387,9 @@ void Player::SendVisBuf(Event *pEvent)
 #endif // _VISUAL_ENABLE_
 #undef  _VISUAL_ENABLE_
 
-void Player::LMCError(Event *pEvent)
+void 
+Player::
+LMCError(Event *pEvent)
 {      
 #ifndef WIN32
    printf("Error: %s\n", ((LMCErrorEvent *) pEvent)->GetError()); 
@@ -1298,7 +1402,9 @@ void Player::LMCError(Event *pEvent)
       delete pEvent;
 }
 
-int32 Player::ServiceEvent(Event * pC)
+int32 
+Player::
+ServiceEvent(Event * pC)
 {
    if (!pC)
    {
@@ -1414,7 +1520,8 @@ int32 Player::ServiceEvent(Event * pC)
    return 0;
 }
 
-Error     Player::
+Error     
+Player::
 PropertyChange(const char *pProp, PropValue * ppv)
 {
    Error     rtn = kError_UnknownErr;
@@ -1434,7 +1541,8 @@ PropertyChange(const char *pProp, PropValue * ppv)
    return rtn;
 }
 
-void      Player::
+void      
+Player::
 SendToUI(Event * pe)
 {
    int32     i;
@@ -1445,25 +1553,29 @@ SendToUI(Event * pe)
    }
 }
 
-Error     Player::
+Error     
+Player::
 GetProperty(const char *pProp, PropValue ** ppVal)
 {
    return m_props.GetProperty(pProp, ppVal);
 }
 
-Error     Player::
+Error     
+Player::
 SetProperty(const char *pProp, PropValue * pVal)
 {
    return m_props.SetProperty(pProp, pVal);
 }
 
-Error     Player::
+Error     
+Player::
 RegisterPropertyWatcher(const char *pProp, PropertyWatcher * pPropWatch)
 {
    return m_props.RegisterPropertyWatcher(pProp, pPropWatch);
 }
 
-Error     Player::
+Error     
+Player::
 RemovePropertyWatcher(const char *pProp, PropertyWatcher * pPropWatch)
 {
    return m_props.RemovePropertyWatcher(pProp, pPropWatch);

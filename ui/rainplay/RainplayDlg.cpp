@@ -869,8 +869,8 @@ LRESULT CRainplayDlg::OnClickOpen(WPARAM wParam, LPARAM lParam)
 			m_i.szSongname = "";
 			ReleaseUILock();
 			SendMessage(WM_RP_NOTIFY_SONGNAME, 0,0);
-			if(g_ui->m_state == STATE_Playing ||
-				g_ui->m_state == STATE_Paused) {
+			if(g_ui->m_state == PlayerState_Playing ||
+				g_ui->m_state == PlayerState_Paused) {
 				g_ui->m_target->AcceptEvent(new Event(CMD_Stop));
 				g_ui->m_target->AcceptEvent(new Event(CMD_Play));
 			}
@@ -1013,7 +1013,7 @@ LRESULT CRainplayDlg::OnClickQuit(WPARAM wParam, LPARAM lParam)
 
 LRESULT CRainplayDlg::OnClickVisualMode(WPARAM wParam, LPARAM lParam)
 {
-	if(g_ui->m_state!=STATE_Playing)
+	if(g_ui->m_state!=PlayerState_Playing)
 		return TRUE;
 	switch((VISMODE)lParam) {
 	case flip:						//User click area spectrum to filp the display mode
@@ -1057,7 +1057,7 @@ LRESULT	CRainplayDlg::OnClickSeek(WPARAM wParam, LPARAM lParam)
 {
 	int pos = (int)lParam - coordinatesMain[AREA_SEEKBAR].x;
 	pos = (int)((float)m_i.totalframe*((float)pos/(float)coordinatesMain[AREA_SEEKBAR].iWidth));
-	if(g_ui->m_state == STATE_Playing)
+	if(g_ui->m_state == PlayerState_Playing)
 		g_ui->m_target->AcceptEvent(new ChangePositionEvent(pos));
 	return TRUE;
 }
@@ -1216,8 +1216,8 @@ void CRainplayDlg::OnDropFiles(HDROP hDropInfo)
 	m_i.szSongname = "";
 	ReleaseUILock();
 	SendMessage(WM_RP_NOTIFY_SONGNAME, 0,0);
-	if(g_ui->m_state == STATE_Playing ||
-		g_ui->m_state == STATE_Paused) {
+	if(g_ui->m_state == PlayerState_Playing ||
+		g_ui->m_state == PlayerState_Paused) {
 		g_ui->m_target->AcceptEvent(new Event(CMD_Stop));
 		g_ui->m_target->AcceptEvent(new Event(CMD_Play));
 	}

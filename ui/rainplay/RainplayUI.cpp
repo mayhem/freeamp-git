@@ -27,7 +27,7 @@ UserInterface()
 
 	g_ui = this;
 	m_plm = NULL;
-	m_state = STATE_Stopped;
+	m_state = PlayerState_Stopped;
 	m_uiThread = Thread::CreateThread();
 	m_uiThread->Create(UIThreadFunc,this);
 	m_uiSemaphore->Wait();
@@ -71,15 +71,15 @@ AcceptEvent(Event* event)
 
             case INFO_Playing:
 				//((Player *)(g_ui->m_target))->m_lmc->m_decoderThread->SetPriority(High);
-				m_state = STATE_Playing;
+				m_state = PlayerState_Playing;
 	            break; 
 
             case INFO_Paused:
-				m_state = STATE_Paused;
+				m_state = PlayerState_Paused;
 	            break; 
 
             case INFO_Stopped:
-				m_state = STATE_Stopped;
+				m_state = PlayerState_Stopped;
 	            break; 
 
 			case INFO_MPEGInfo:

@@ -45,13 +45,13 @@ ____________________________________________________________________________*/
 
 typedef enum
 {
-   STATE_Paused = 1,
-   STATE_Playing,
-   STATE_Stopped,
+   PlayerState_Paused = 1,
+   PlayerState_Playing,
+   PlayerState_Stopped,
 }
 PlayerState;
 
-class     Player:public EventQueue, Properties, PropertyWatcher
+class Player : public EventQueue, Properties, PropertyWatcher
 {
 
  public:
@@ -65,9 +65,15 @@ class     Player:public EventQueue, Properties, PropertyWatcher
    int32     RegisterPMOs(PMORegistry * registry);
    int32     RegisterUIs(UIRegistry * registry);
 
+   LMCRegistry* GetLMCRegistry() const;
+   PMIRegistry* GetPMIRegistry() const;
+   PMORegistry* GetPMORegistry() const;
+   UIRegistry*  GetUIRegistry() const;
+
    void      Run();
    bool      SetArgs(int32 argc, char **argv);
    void      SetPreferences(Preferences *);
+   Preferences* GetPreferences() const;
    void      SetTerminationSemaphore(Semaphore *);
    void      testQueue();
    static void EventServiceThreadFunc(void *);

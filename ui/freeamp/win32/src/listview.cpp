@@ -557,7 +557,7 @@ LeftButtonDoubleClick(int32 x, int32 y, int32 modifiers)
 
         plm->SetCurrent(index); 
 
-        if (ui->State() == STATE_Paused)
+        if (ui->State() == UIState_Paused)
             ui->Target()->AcceptEvent(new Event(CMD_PlayPaused));
         else
             ui->Target()->AcceptEvent(new Event(CMD_Play));

@@ -146,8 +146,8 @@ void CPlayListDlg::OnPlaylistLoad()
 	if (dialog->DoModal()==IDOK) {
 		CString szTemp = dialog->GetPathName();
 		ReadPlaylistFromFile(dialog->GetPathName(), g_ui->m_plm);
-		if(g_ui->m_state == STATE_Playing ||
-		g_ui->m_state == STATE_Paused) {
+		if(g_ui->m_state == PlayerState_Playing ||
+		g_ui->m_state == PlayerState_Paused) {
 			g_ui->m_target->AcceptEvent(new Event(CMD_Stop));
 			g_ui->m_target->AcceptEvent(new Event(CMD_Play));
 		}
