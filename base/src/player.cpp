@@ -1298,7 +1298,8 @@ GetExtension(const char *title)
       }
    }
 
-   if (!IsSupportedExtension(ext_return))
+   if (!IsSupportedExtension(ext_return) && 
+       !(m_plm->IsSupportedPlaylistFormat(ext_return)))
    {
        delete [] ext_return;
        ext_return = NULL;
