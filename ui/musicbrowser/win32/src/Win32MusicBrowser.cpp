@@ -145,8 +145,10 @@ MusicBrowserUI::MusicBrowserUI(FAContext      *context,
        if(!m_plm->CountItems())
        {
             bool savePlaylist = true;
+            uint32 index = 0;
 
             m_context->prefs->GetSaveCurrentPlaylistOnExit(&savePlaylist);
+            m_context->prefs->GetSavedPlaylistPosition(&index);
 
             if(savePlaylist)
             {
@@ -169,7 +171,10 @@ MusicBrowserUI::MusicBrowserUI(FAContext      *context,
                 m_autoPlayHack = true;
 
                 if(m_initialCount)
+                {
                     m_plm->AddItems(&items);
+                    m_plm->SetCurrentIndex(index);
+                }
             }           
        }
     }
@@ -352,6 +357,7 @@ void MusicBrowserUI::SaveCurrentPlaylist()
         FilePathToURL(path, url, &length);
 
         m_plm->WritePlaylist(url);
+        m_context->prefs->SetSavedPlaylistPosition(m_plm->GetCurrentIndex());
     }
 }
 
