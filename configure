@@ -1628,7 +1628,7 @@ else
 int main() {
 
 /* Ultrix mips cc rejects this.  */
-typedef int charset[2]; const charset x;
+typedef int charset[2]; const charset x = {0,0};
 /* SunOS 4.1.1 cc rejects this.  */
 char const *const *ccp;
 char **p;
@@ -2189,7 +2189,7 @@ else
 int main() {
 
 /* Ultrix mips cc rejects this.  */
-typedef int charset[2]; const charset x;
+typedef int charset[2]; const charset x = {0,0};
 /* SunOS 4.1.1 cc rejects this.  */
 char const *const *ccp;
 char **p;
@@ -3048,6 +3048,7 @@ if test "$have_gtk" = "true"; then
   OSDEPPLUGINS="$OSDEPPLUGINS plugins/musicbrowser.ui"
   OSDEPPLUGINS="$OSDEPPLUGINS plugins/freeamp.ui"
   OSDEPPLUGINS="$OSDEPPLUGINS plugins/download.ui"
+  OSDEPPLUGINS="$OSDEPPLUGINS plugins/winamp.ftf"
   OSINC="$OSINC -I$srcdir/ui/musicbrowser/unix/include"
   OSINC="$OSINC -I$srcdir/ui/freeamp/include -I$srcdir/ui/freeamp/unix/include"
   OSINC="$OSINC -I$srcdir/ui/download/unix/include"
@@ -3121,9 +3122,9 @@ elif test "$host_os" = "beos"; then
 else
 
   echo $ac_n "checking for MIT PThreads""... $ac_c" 1>&6
-echo "configure:3125: checking for MIT PThreads" >&5
+echo "configure:3126: checking for MIT PThreads" >&5
   cat > conftest.$ac_ext <<EOF
-#line 3127 "configure"
+#line 3128 "configure"
 #include "confdefs.h"
 #include <pthread.h>
 EOF
@@ -3144,9 +3145,9 @@ rm -f conftest*
 
   
   echo $ac_n "checking for Base LinuxThreads""... $ac_c" 1>&6
-echo "configure:3148: checking for Base LinuxThreads" >&5
+echo "configure:3149: checking for Base LinuxThreads" >&5
   cat > conftest.$ac_ext <<EOF
-#line 3150 "configure"
+#line 3151 "configure"
 #include "confdefs.h"
 #include <pthread.h>
 EOF
@@ -3169,9 +3170,9 @@ rm -f conftest*
 
   
   echo $ac_n "checking for LinuxThreads w/ErrorCheck Mutex""... $ac_c" 1>&6
-echo "configure:3173: checking for LinuxThreads w/ErrorCheck Mutex" >&5
+echo "configure:3174: checking for LinuxThreads w/ErrorCheck Mutex" >&5
   cat > conftest.$ac_ext <<EOF
-#line 3175 "configure"
+#line 3176 "configure"
 #include "confdefs.h"
 #include <pthread.h>
 EOF
@@ -3195,13 +3196,13 @@ rm -f conftest*
   if test "$mitpth" = "false"; then
       if test "$ltr" = "false"; then
   	echo $ac_n "checking for broken Slackware MIT PThreads header (Obj C stub) and implementation""... $ac_c" 1>&6
-echo "configure:3199: checking for broken Slackware MIT PThreads header (Obj C stub) and implementation" >&5
+echo "configure:3200: checking for broken Slackware MIT PThreads header (Obj C stub) and implementation" >&5
   	if test "$cross_compiling" = yes; then
   echo "$ac_t""assuming no" 1>&6
   	
 else
   cat > conftest.$ac_ext <<EOF
-#line 3205 "configure"
+#line 3206 "configure"
 #include "confdefs.h"
 
   	    #define _MIT_POSIX_THREADS 1
@@ -3213,7 +3214,7 @@ else
               }
   	    
 EOF
-if { (eval echo configure:3217: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:3218: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
 then
   cat >> confdefs.h <<\EOF
 #define HAVE_BROKENMITPTHREADS 1
@@ -3264,7 +3265,7 @@ fi
 
 
 echo $ac_n "checking for initscr in -lncurses""... $ac_c" 1>&6
-echo "configure:3268: checking for initscr in -lncurses" >&5
+echo "configure:3269: checking for initscr in -lncurses" >&5
 ac_lib_var=`echo ncurses'_'initscr | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -3272,7 +3273,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lncurses  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 3276 "configure"
+#line 3277 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -3283,7 +3284,7 @@ int main() {
 initscr()
 ; return 0; }
 EOF
-if { (eval echo configure:3287: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:3288: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -3303,7 +3304,7 @@ else
   echo "$ac_t""no" 1>&6
 
 	echo $ac_n "checking for initscr in -lcurses""... $ac_c" 1>&6
-echo "configure:3307: checking for initscr in -lcurses" >&5
+echo "configure:3308: checking for initscr in -lcurses" >&5
 ac_lib_var=`echo curses'_'initscr | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -3311,7 +3312,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lcurses  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 3315 "configure"
+#line 3316 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -3322,7 +3323,7 @@ int main() {
 initscr()
 ; return 0; }
 EOF
-if { (eval echo configure:3326: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:3327: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -3357,17 +3358,17 @@ fi
 	
 ac_safe=`echo "sys/asoundlib.h" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for sys/asoundlib.h""... $ac_c" 1>&6
-echo "configure:3361: checking for sys/asoundlib.h" >&5
+echo "configure:3362: checking for sys/asoundlib.h" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 3366 "configure"
+#line 3367 "configure"
 #include "confdefs.h"
 #include <sys/asoundlib.h>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:3371: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:3372: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -3384,7 +3385,7 @@ fi
 if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
   echo "$ac_t""yes" 1>&6
   echo $ac_n "checking for main in -lasound""... $ac_c" 1>&6
-echo "configure:3388: checking for main in -lasound" >&5
+echo "configure:3389: checking for main in -lasound" >&5
 ac_lib_var=`echo asound'_'main | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -3392,14 +3393,14 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lasound  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 3396 "configure"
+#line 3397 "configure"
 #include "confdefs.h"
 
 int main() {
 main()
 ; return 0; }
 EOF
-if { (eval echo configure:3403: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:3404: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -3445,7 +3446,7 @@ fi
 
 if test "$have_alsa" = "true"; then
   echo $ac_n "checking for libasound headers version >= 0.4.0""... $ac_c" 1>&6
-echo "configure:3449: checking for libasound headers version >= 0.4.0" >&5
+echo "configure:3450: checking for libasound headers version >= 0.4.0" >&5
   alsa_min_major_version=0
   alsa_min_minor_version=4
   alsa_min_micro_version=0
@@ -3466,7 +3467,7 @@ cross_compiling=$ac_cv_prog_cc_cross
 
 else
   cat > conftest.$ac_ext <<EOF
-#line 3470 "configure"
+#line 3471 "configure"
 #include "confdefs.h"
 
 #include <sys/asoundlib.h>
@@ -3506,7 +3507,7 @@ exit(0);
 }
 
 EOF
-if { (eval echo configure:3510: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:3511: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
 then
   :
 else

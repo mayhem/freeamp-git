@@ -425,6 +425,7 @@ if test "$have_gtk" = "true"; then
   OSDEPPLUGINS="$OSDEPPLUGINS plugins/musicbrowser.ui"
   OSDEPPLUGINS="$OSDEPPLUGINS plugins/freeamp.ui"
   OSDEPPLUGINS="$OSDEPPLUGINS plugins/download.ui"
+  OSDEPPLUGINS="$OSDEPPLUGINS plugins/winamp.ftf"
   OSINC="$OSINC -I$srcdir/ui/musicbrowser/unix/include"
   OSINC="$OSINC -I$srcdir/ui/freeamp/include -I$srcdir/ui/freeamp/unix/include"
   OSINC="$OSINC -I$srcdir/ui/download/unix/include"

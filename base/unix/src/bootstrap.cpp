@@ -63,6 +63,13 @@ static void PrintMutexDebugInfo(int sig)
 }
 #endif
 
+#ifndef semun
+union semun 
+{
+    int val;
+};
+#endif
+
 int main(int argc, char **argv) 
 {
     FAContext *context = new FAContext;
@@ -73,7 +80,7 @@ int main(int argc, char **argv)
     int        iProcess, i;
     char      *pCmdLine = NULL, *pPtr;
 
-    union { int val; } unsem;
+    union semun unsem;
     unsem.val = 0;
     
     context->prefs = unixPrefs;

@@ -59,8 +59,6 @@ PLUGINS += plugins/pls.plf
 
 PLUGINS += plugins/rmp.dlf
 
-PLUGINS += plugins/winamp.ftf
-
 plugins plugins-cc: $(PLUGINS) $(OSDEPPLUGINS)
 
 # ugly horrible static junk
