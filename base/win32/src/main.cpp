@@ -41,6 +41,17 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
 {
     // Initialize the preferences in case the user moved the app
    Preferences* prefs;
+   HANDLE runOnceMutex;
+
+   runOnceMutex = CreateMutex(	NULL,
+							    TRUE,
+							    "FreeAmp Should Only Run One Time!");
+
+   if(GetLastError() == ERROR_ALREADY_EXISTS)
+   {
+        return 0;
+   }
+
 
    prefs = new Preferences;
    prefs->Initialize();
