@@ -52,7 +52,6 @@ ____________________________________________________________________________*/
 #include "YPClient.h"
 #include "apsutility.h"
 #include "apsconvert.h"
-#include "sigclient.h"
 #include <math.h>
 #include "utility.h"
 
@@ -91,9 +90,6 @@ APSInterface::APSInterface(char *profilePath, const char* pIP,
     m_pYpClient->SetAddress(m_strIP.c_str(), nAPSYPPort);
     m_nMetaFailures = 0;
 
-    m_pSigClient = new SigClient; 
-    m_pSigClient->SetAddress(m_sigIP.c_str(), nAPSSigPort);
-
     m_pSLClient = new SoundsLikeClient;
     m_pSLClient->SetAddress(m_sigIP.c_str(), nAPSSigPort);
 
@@ -113,11 +109,6 @@ APSInterface::~APSInterface()
     {
         delete m_pYpClient;
         m_pYpClient = NULL;
-    }
-    if (m_pSigClient != NULL)
-    {
-        delete m_pSigClient;
-        m_pSigClient = NULL;
     }
     if (m_pMutex != NULL) 
     {
@@ -209,30 +200,6 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
     m_pSema->Signal();
 
     return APS_NOERROR;
-}
-
-int APSInterface::APSLookupSignature(AudioSig *sig, string &strGUID, 
-                                     bool bUseCollection)
-{
-    if (sig == NULL)
-        return APS_PARAMERROR;
-
-    m_pMutex->Acquire();
-
-    string strCollectionID = "EMPTY_COLLECTION";
-    if (bUseCollection && m_bRelatableOn && !m_strCollectionID.empty())
-        strCollectionID = m_strCollectionID;
-
-    int nRes = m_pSigClient->GetSignature(sig, strGUID, strCollectionID);
-
-    fstream fout("sigs.txt", ios_base::out | ios_base::app);
-    fout << "GetSignature returned: " << nRes << " and filled in " <<
-            strGUID.size() << " : " << strGUID << endl;
-    fout.close();
-
-    m_pMutex->Release();
-
-    return nRes;
 }
 
 int APSInterface::APSGetSoundsLike(vector<string> *seedGUIDs,

@@ -49,7 +49,6 @@ using namespace std;
 #include "utility.h"
 #include "pmo.h"
 #include "debug.h"
-#include "audiosig.h"
 
 #define METADATABASE_VERSION 1
 

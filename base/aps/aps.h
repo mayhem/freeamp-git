@@ -54,7 +54,6 @@ class APSMetaData;
 class Mutex;
 class Semaphore;
 class YPClient;
-class SigClient;
 class AudioSig;
 class SoundsLikeClient;
 
@@ -87,13 +86,6 @@ public:
                  const char* pSigIP = "209.249.187.199");
     virtual ~APSInterface(); // to be or not to be virtual....
        
-    /** Submit an AudioSig structure to the Signature server, and get the
-        corresponding GUID. Option bUseCollection associates item to a
-        music collection, for narrowing recommendations by what is 
-        available on a given machine. */
-    int APSLookupSignature(AudioSig *sig, string &strGUID, 
-                           bool bUseCollection = true);
-
     /** Attempts to finish filling in the metadata Record, 
         by comparing the record/filenames against a master music 
         database. */ 
@@ -214,8 +206,6 @@ private:
                                      // metadata lookups
     YPClient* m_pYpClient;           // Wraps the connection logic for talking
                                      // to the YourPlay Servers
-    SigClient* m_pSigClient;         // Wraps the connection logic for talking
-                                     // to the audio signature server
     int m_nMetaFailures;             // track metadata timeouts to stop lookups
                                      // if the server is down ;)
     string m_profilePath;            // store the path to the profile

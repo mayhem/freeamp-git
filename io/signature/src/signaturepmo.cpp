@@ -130,7 +130,6 @@ Resume()
    PhysicalMediaOutput::Resume();
 
    m_url = m_pPmi->Url();
-cout << "m_url " << m_url << endl;
 }
 
 Error
@@ -222,7 +221,6 @@ WorkerThread(void)
                 break;
        
             if (bDone || bGotPMOQuit) {
-cout << "fa done sig\n";
                 AudioSignatureGeneratedEvent *asge = 
                              new AudioSignatureGeneratedEvent(m_url, m_strGUID,
                                                               this);
