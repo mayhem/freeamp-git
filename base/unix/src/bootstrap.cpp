@@ -63,7 +63,8 @@ static void PrintMutexDebugInfo(int sig)
 }
 #endif
 
-#if defined(__GNU_LIBRARY__) && !defined(_SEM_SEMUN_UNDEFINED)
+#if ( (defined(__GNU_LIBRARY__) && !defined(_SEM_SEMUN_UNDEFINED)) \
+    || (defined(__FreeBSD__)) )
 #else
 union semun 
 {

@@ -49,6 +49,11 @@ ____________________________________________________________________________*/
 #define SHUT_RDWR 2
 #endif
 
+/* FreeBSD uses IPPROTO_TCP */
+#ifndef SOL_TCP
+#define SOL_TCP IPPROTO_TCP
+#endif
+
 COMSocket::COMSocket(int nSocket, int nSockType)
 {
 	m_nSocket = nSocket;
@@ -337,6 +342,9 @@ int COMSocket::NBConnect(const char* pIP, int nPort, int nType, int nTimeout)
 /** Sets multicast packets to only go through the NIC labeled pNIC */
 int COMSocket::SetMCastInterface(const char* pNIC)
 {
+#ifdef __FreeBSD__
+#warning WARNING COMSocket::SetMCastInterface is NOT IMPLEMENTED
+#else
 	struct ip_mreqn mReq;
 	memset(&mReq, 0, sizeof(ip_mreq));
 	int nErr = -1;
@@ -348,4 +356,5 @@ int COMSocket::SetMCastInterface(const char* pNIC)
 		if (nErr == -1) cout << "failed IP_MULTICAST_IF " << endl;
 	}
 	return ((nErr != -1) - 1);
+#endif
 }

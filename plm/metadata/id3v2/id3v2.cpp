@@ -29,6 +29,7 @@ ____________________________________________________________________________*/
 #ifdef WIN32
 #include <winsock.h>
 #else
+#include <sys/types.h>
 #include <netinet/in.h>
 #endif
 

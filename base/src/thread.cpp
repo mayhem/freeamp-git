@@ -24,7 +24,7 @@ ____________________________________________________________________________*/
 #include "config.h"
 #include "thread.h"
 
-#if defined(__LINUX__) || defined(solaris)
+#if defined(__LINUX__) || defined(solaris) || defined(__FreeBSD__)
     #include "pthreadthread.h"
 #elif WIN32
     #include "win32thread.h"
@@ -34,15 +34,12 @@ ____________________________________________________________________________*/
     #error thread class needs to be defined for this platform
 #endif
 
-
-
-
 Thread* Thread::CreateThread()
 {
     Thread* thread = NULL;
-#if defined(__linux__) || defined(solaris)
+#if defined(__LINUX__) || defined(solaris) || defined(__FreeBSD__)
     thread = new pthreadThread();
-#elif defined(WIN32)
+#elif WIN32
     thread = new win32Thread();
 #elif defined(__BEOS__)
     thread = new beosThread();

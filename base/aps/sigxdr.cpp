@@ -28,6 +28,7 @@ ____________________________________________________________________________*/
 #include <winsock.h>
 #else
 #undef socklen_t
+#include <sys/types.h>
 #include <netinet/in.h>
 #endif
 

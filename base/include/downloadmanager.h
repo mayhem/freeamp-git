@@ -35,6 +35,8 @@ ____________________________________________________________________________*/
 #include <io.h>
 #else
 #undef socklen_t
+#include <sys/types.h>
+#include <netinet/in.h>
 #include <sys/socket.h>
 #include <netdb.h>
 #include <unistd.h>

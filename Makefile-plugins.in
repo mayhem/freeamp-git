@@ -101,7 +101,7 @@ plugins/obsinput.pmi: $(OBSPMI)
 SCPMObeosOBJ=io/soundcard/beos/src/soundutils.o
 SCPMObeosLIB=-lmedia -lbe -lroot
 
-SCPMOOBJ  = io/soundcard/$(OSDEP)/src/soundcardpmo.o io/src/pmo.o
+SCPMOOBJ  = io/soundcard/unix/$(UNIX_AUDIO_API)/src/soundcardpmo.o io/src/pmo.o
 SCPMOOBJ += io/src/pipeline.lo $(SCPMO$(HOST_OS)OBJ)
 
 plugins/soundcard.pmo: $(SCPMOOBJ)

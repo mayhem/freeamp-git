@@ -80,6 +80,7 @@ dnl Check for some more stuff
 
 cmdline="true"
 isunix="true"
+UNIX_AUDIO_API="linux"
 OSLINK=""
 FPIC="-fPIC"
 LINKMOD="$CXX -shared"
@@ -104,6 +105,7 @@ case "$host_os" in
     ;;
   freebsd*)
     host_os="freebsd"
+    CFLAGS="$CFLAGS -D_THREAD_SAFE -pthread"
     LDFLAGS="$LDFLAGS -Wl,-export-dynamic"
     ;;
   irix*)
@@ -131,6 +133,7 @@ case "$host_os" in
           echo "adding -fpermissive to CFLAGS for openwin headers"
         fi
       fi
+      UNIX_AUDIO_API="solaris"
     fi	
     ;;
   *)
@@ -221,6 +224,7 @@ AC_SUBST(FPIC)
 AC_SUBST(LINKMOD)
 AC_SUBST(LIBMOD)
 AC_SUBST(build_cpu)
+AC_SUBST(UNIX_AUDIO_API)
 
 AC_CHECK_HEADER(esd.h, have_esound="true", have_esound="false")
 
