@@ -1041,6 +1041,7 @@ void Player::Play(Event *pEvent)
     {
         if (SetState(STATE_Paused))
         {
+           SEND_NORMAL_EVENT(INFO_Playing); 
            SEND_NORMAL_EVENT(INFO_Paused);
         }
     }
