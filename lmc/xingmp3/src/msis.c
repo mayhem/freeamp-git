@@ -232,6 +232,8 @@ void is_process_MPEG2(float x[][1152],	/* intensity stereo */
    ARRAY2 *lr;
    int cb0, cb1;
 
+   memset(il, 0, sizeof(il));
+
    lr = lr2[is_sf_info->intensity_scale][ms_mode];
 
    if (cb_info[1].cbtype)
