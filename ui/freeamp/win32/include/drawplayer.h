@@ -49,6 +49,7 @@ typedef struct DisplayInfo{
     BOOL            dirty;
     char            path[MAX_PATH];
     int32           frame;
+    int32           seekframe;
     int32           range;
     int32           hours;
     int32           minutes;
@@ -61,6 +62,7 @@ typedef struct DisplayInfo{
     int32           totalseconds;
     int32           volume;
     int32           scrollOffset;
+    int32           introOffset;
 
 }DisplayInfo;
 
@@ -91,5 +93,3 @@ typedef struct ControlInfo{
 
 
 #define kNumControls        10
-
-#define INTRO_COUNT         12

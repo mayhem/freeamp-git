@@ -102,6 +102,12 @@ UserInterface()
 
 	g_ui = this;
 	m_state = STATE_Stopped;
+
+    g_displayInfo.hours = 0;
+	g_displayInfo.minutes = 0;
+	g_displayInfo.seconds = 0;
+	g_displayInfo.frame = 0;
+    m_secondsPerFrame = 0;
 }
 
 FreeAmpUI::
@@ -138,6 +144,7 @@ AcceptEvent(Event* event)
 				EnableWindow(m_hwndPause, TRUE);
 				EnableWindow(m_hwndSlider, TRUE);
 				m_state = STATE_Playing;
+                g_buttonStateArray[kPlayControl].state = Activated;
 	            break; 
             }
 
@@ -151,64 +158,75 @@ AcceptEvent(Event* event)
 				EnableWindow(m_hwndPause, FALSE);
 				EnableWindow(m_hwndSlider, TRUE);
 				m_state = STATE_Paused;
+                g_buttonStateArray[kPlayControl].state = Selected;
 	            break; 
             }
 
             case INFO_Stopped: 
             {
-                EnableWindow(m_hwndPlay, TRUE);
-				EnableWindow(m_hwndNext, TRUE);
-				EnableWindow(m_hwndLast, TRUE);
+                //EnableWindow(m_hwndPlay, TRUE);
+				//EnableWindow(m_hwndNext, TRUE);
+				//EnableWindow(m_hwndLast, TRUE);
 
-				EnableWindow(m_hwndStop, FALSE);
-				EnableWindow(m_hwndPause, FALSE);
+				//EnableWindow(m_hwndStop, FALSE);
+				//EnableWindow(m_hwndPause, FALSE);
 				
-                /*SendMessage(m_hwndSlider,
-						    TBM_SETPOS,
-						    (WPARAM)TRUE,
-						    (LPARAM)0);*/
+           
+                //EnableWindow(m_hwndSlider, FALSE);
 
-                EnableWindow(m_hwndSlider, FALSE);
+                //char timeString[256] = "00:00:00";
 
-                char timeString[256] = "00:00:00";
+                //SetWindowText(m_hwndCurrent, timeString);
 
-                SetWindowText(m_hwndCurrent, timeString);
+                g_displayInfo.hours = 0;
+				g_displayInfo.minutes = 0;
+				g_displayInfo.seconds = 0;
+				g_displayInfo.frame = 0;
+
+                g_displayInfo.state = TotalTime;
+
 				m_state = STATE_Stopped;
+                g_buttonStateArray[kPlayControl].state = Deactivated;
 	            break; 
             }
+
 			case INFO_PlayList: 
 				{
 					PlayListEvent *info = (PlayListEvent *)event;
 					m_playList = info->GetPlayList();
 					break;
 				}
-			case INFO_MPEGInfo: 
-				{
-					MpegInfoEvent *info = (MpegInfoEvent *)event;
 
-					g_displayInfo.range = info->GetTotalFrames();
+			case INFO_MPEGInfo: 
+			{
+				MpegInfoEvent *info = (MpegInfoEvent *)event;
+
+				g_displayInfo.range = info->GetTotalFrames();
+
+                m_secondsPerFrame = info->GetSecondsPerFrame();
 
 #if 0
-					char szTemp[256];
-					m_secondsPerFrame = info->GetSecondsPerFrame();
-					sprintf(szTemp, "%d kbps",  info->GetBitRate()/1000);
-					SendMessage(m_hwndStatus, 
-								SB_SETTEXT, 
-								0, 
-								(LPARAM)szTemp);
+				char szTemp[256];
+				
+				sprintf(szTemp, "%d kbps",  info->GetBitRate()/1000);
+				SendMessage(m_hwndStatus, 
+							SB_SETTEXT, 
+							0, 
+							(LPARAM)szTemp);
 
-					sprintf(szTemp, "%.1f kHz",  ((float)info->GetSampleRate())/1000);
-					SendMessage(m_hwndStatus, 
-								SB_SETTEXT, 
-								1, 
-								(LPARAM) szTemp);
-					SendMessage(m_hwndSlider,
-								TBM_SETRANGE,
-								(WPARAM)TRUE,
-								MAKELPARAM(0, info->GetTotalFrames()));
+				sprintf(szTemp, "%.1f kHz",  ((float)info->GetSampleRate())/1000);
+				SendMessage(m_hwndStatus, 
+							SB_SETTEXT, 
+							1, 
+							(LPARAM) szTemp);
+				SendMessage(m_hwndSlider,
+							TBM_SETRANGE,
+							(WPARAM)TRUE,
+							MAKELPARAM(0, info->GetTotalFrames()));
 #endif					
-					break;
-				}
+				break;
+			}
+
             case INFO_MediaInfo: 
             {
                 MediaInfoEvent *info = (MediaInfoEvent*)event;
@@ -237,35 +255,7 @@ AcceptEvent(Event* event)
 				g_displayInfo.minutes = minutes;
 				g_displayInfo.seconds = seconds;
 				g_displayInfo.frame = info->m_frame;
-#if 0				
-				char timeString[256] = "00:00:00";
-                static int32 lastSeconds = 0, lastMinutes = 0, lastHours = 0;
-	            
-                if(lastSeconds != info->m_seconds ||
-                    lastMinutes != info->m_minutes ||
-                    lastHours != info->m_hours)
-                {
-                    lastSeconds = info->m_seconds;
-                    lastMinutes = info->m_minutes;
-                    lastHours = info->m_hours;
 
-                    sprintf(timeString,"%02d:%02d:%02d",info->m_hours,
-				                                    info->m_minutes,
-				                                    info->m_seconds);
-
-			        SetWindowText(m_hwndCurrent, timeString);
-                }
-
-                if(!m_scrolling)
-                {
-
-                    SendMessage(m_hwndSlider,
-						        TBM_SETPOS,
-						        (WPARAM)TRUE,
-						        (LPARAM)info->m_frame);
-
-                }
-#endif
 	            break; 
             }
 
@@ -277,30 +267,10 @@ AcceptEvent(Event* event)
 
             case INFO_PlayListDonePlay:
             {
-                char timeString[256] = "00:00:00";
-                char szTemp[256] = {0x00};
-
-                SetWindowText(m_hwndCurrent, timeString);
-			    SetWindowText(m_hwndTotal, timeString);
-
-
-                SendMessage(m_hwndStatus, 
-						    SB_SETTEXT, 
-						    0, 
-						    (LPARAM)szTemp);
-
-			    SendMessage(m_hwndStatus, 
-						    SB_SETTEXT, 
-						    1, 
-						    (LPARAM) szTemp);
-
-			    SendMessage(m_hwndStatus, 
-						    SB_SETTEXT, 
-						    2, 
-						    (LPARAM) szTemp);
-
-             
-                SetWindowText(m_hwnd, "FreeAmp");
+                g_displayInfo.hours = 0;
+				g_displayInfo.minutes = 0;
+				g_displayInfo.seconds = 0;
+				g_displayInfo.frame = 0;
                 break;
             }
 

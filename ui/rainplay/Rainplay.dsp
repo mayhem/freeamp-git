@@ -1,5 +1,5 @@
 # Microsoft Developer Studio Project File - Name="Rainplay" - Package Owner=<4>
-# Microsoft Developer Studio Generated Build File, Format Version 6.00
+# Microsoft Developer Studio Generated Build File, Format Version 5.00
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Dynamic-Link Library" 0x0102
@@ -17,12 +17,12 @@ CFG=Rainplay - Win32 Debug
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "Rainplay - Win32 Release" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "Rainplay - Win32 Release" (based on\
+ "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "Rainplay - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE 
 
 # Begin Project
-# PROP AllowPerConfigDependencies 0
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
 CPP=cl.exe
@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /Yu"stdafx.h" /FD /c
-# ADD CPP /nologo /G5 /MT /W3 /GX /O2 /I "..\..\config" /I "..\include" /I "..\..\base\include" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_WINDLL" /D "_MBCS" /D "_USRDLL" /D "__FREEAMP_UI__" /Yu"stdafx.h" /FD /c
+# ADD CPP /nologo /G5 /MT /W3 /GX /O2 /I "..\..\config" /I "..\include" /I "..\..\base\include" /I "..\..\base\win32\include" /I "..\..\lmc\include" /I "..\..\io\include" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_WINDLL" /D "_MBCS" /D "_USRDLL" /D "__FREEAMP_UI__" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x804 /d "NDEBUG" /d "_AFXDLL"
@@ -55,8 +55,10 @@ LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:windows /dll /machine:I386
 # ADD LINK32 /nologo /subsystem:windows /dll /machine:I386 /out:"Rainplay.ui"
 # Begin Special Build Tool
-SOURCE="$(InputPath)"
-PostBuild_Cmds=IF NOT EXIST ..\..\base\win32\prj\plugins mkdir            ..\..\base\win32\prj\plugins	copy plugins\rainplay.ui ..\..\base\win32\prj\plugins
+SOURCE=$(InputPath)
+PostBuild_Cmds=IF NOT EXIST ..\..\base\win32\prj\plugins mkdir\
+            ..\..\base\win32\prj\plugins	copy plugins\rainplay.ui\
+ ..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "Rainplay - Win32 Debug"
@@ -72,8 +74,9 @@ PostBuild_Cmds=IF NOT EXIST ..\..\base\win32\prj\plugins mkdir            ..\..\
 # PROP Intermediate_Dir "Debug"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /Yu"stdafx.h" /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\..\config" /I "..\include" /I "..\..\base\include" /I "..\..\base\win32\include" /I "..\..\lmc\include" /I "..\..\io\include" /D "_DEBUG" /D "_AFXDLL" /D "WIN32" /D "_WINDOWS" /D "_WINDLL" /D "_MBCS" /D "_USRDLL" /D "__FREEAMP_UI__" /YX /FD /GZ /c
+# ADD BASE CPP /nologo /MDd /W3 /GX /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /Yu"stdafx.h" /FD /ZI /GZ /c
+# ADD CPP /nologo /MDd /W3 /GX /Od /I "..\..\base\win32\include" /I "..\..\lmc\include" /I "..\..\io\include" /I "..\..\config" /I "..\include" /I "..\..\base\include" /D "_DEBUG" /D "_AFXDLL" /D "WIN32" /D "_WINDOWS" /D "_WINDLL" /D "_MBCS" /D "_USRDLL" /D "__FREEAMP_UI__" /FD /ZI /GZ /c
+# SUBTRACT CPP /YX
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x804 /d "_DEBUG" /d "_AFXDLL"
@@ -85,8 +88,10 @@ LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:windows /dll /debug /machine:I386 /pdbtype:sept
 # ADD LINK32 /nologo /subsystem:windows /dll /debug /machine:I386 /out:"plugins\rainplay.ui" /pdbtype:sept
 # Begin Special Build Tool
-SOURCE="$(InputPath)"
-PostBuild_Cmds=IF NOT EXIST ..\..\base\win32\prj\plugins mkdir            ..\..\base\win32\prj\plugins	copy plugins\rainplay.ui ..\..\base\win32\prj\plugins
+SOURCE=$(InputPath)
+PostBuild_Cmds=IF NOT EXIST ..\..\base\win32\prj\plugins mkdir\
+            ..\..\base\win32\prj\plugins	copy plugins\rainplay.ui\
+ ..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 

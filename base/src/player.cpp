@@ -475,7 +475,8 @@ int32 Player::ServiceEvent(Event *pC) {
 	    }
 	    
 	    case CMD_ChangePosition: {
-		m_lmc->ChangePosition(((ChangePositionEvent *)pC)->GetPosition());        
+        if(m_lmc)
+		    m_lmc->ChangePosition(((ChangePositionEvent *)pC)->GetPosition());        
 		return 0;
 		break;
 	    }

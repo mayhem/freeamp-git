@@ -44,6 +44,7 @@ ____________________________________________________________________________*/
 #include "playlist.h"
 #include "eventdata.h"
 
+#define INTRO_COUNT         13
 
 extern FreeAmpUI *g_ui;
 
@@ -54,7 +55,6 @@ extern "C" {
 
 
 LRESULT WINAPI MainWndProc( HWND, UINT, WPARAM, LPARAM );
-void ImmediateProcessMessage(HWND hWnd,UINT Msg, WPARAM wParam,LPARAM lParam);
 
 extern HINSTANCE g_hInst;		//  Program instance handle
 
@@ -170,17 +170,12 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
     {
         case Intro: // hard coded hack just to look good <grin>
         {
-            static int32 count = 0;
-            static double multiplier = 0;
-
-            int32 offset = (int32)(multiplier * count++);
-
-            multiplier += .55;
+                              
             SelectObject(memdc, logoBitmap);
-            
-                                
+
+
             BitBlt( bufferdc, 
-                    xIntroPos - offset, 
+                    xIntroPos - g_displayInfo.introOffset, 
                     yIntroPos, 
                     FreeWidth, 
                     LogoHeight, 
@@ -190,7 +185,7 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
                     SRCCOPY);
 
             BitBlt( bufferdc, 
-                    xIntroPos + FreeWidth + offset, 
+                    xIntroPos + FreeWidth + g_displayInfo.introOffset, 
                     yIntroPos, 
                     AmpWidth, 
                     LogoHeight, 
@@ -675,8 +670,6 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
         }
     } 
 
-
-
     BitBlt( hdc, 
             0, 
             0, 
@@ -686,9 +679,6 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
             0,
             0,
             SRCCOPY);
-
-    
-
 
     SelectObject(bufferdc, oldBufferBitmap); 
     SelectObject(memdc, oldMemBitmap); 
@@ -707,6 +697,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
     LRESULT result = FALSE;
     static POINT pressPt;
     static BOOL pressed = FALSE;
+    static int32 seekSpeed = 0;
     
 
     switch( msg )
@@ -719,8 +710,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
             int32 i;
             int32 xPos, yPos;
    
-            //  Create the region and apply it to the window
-
+            // Create the region and apply it to the window
             capRegion = CreateEllipticRgn(  0,
                                             0,
                                             CAP_CIRCUMFERENCE + 1,
@@ -860,17 +850,26 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
         case WM_TIMER:
         {
-            static int32 count = 0;
             HDC hdc = GetDC(hwnd);
 
             switch (wParam)
             {
                 case 0:
                 {
-                    if(count++ == INTRO_COUNT)
+                    static int32 count = 0;
+
+                    if(count == 15)
                     {
                         KillTimer(hwnd, 0x00);
                         g_displayInfo.state = TotalTime;
+                    }
+                    else
+                    {
+                        static double multiplier = 0;
+
+                        g_displayInfo.introOffset = (int32)(multiplier * count++);
+
+                        multiplier += .55;
                     }
                     break;
                 }
@@ -915,7 +914,38 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
                     break;
                 }
-            }
+
+                case 2:
+                {
+                    char foo[1024];
+
+                    g_displayInfo.seekframe += seekSpeed*20*abs(seekSpeed);
+
+                    if(g_displayInfo.seekframe < 0)
+                        g_displayInfo.seekframe = 0;
+                    else if(g_displayInfo.seekframe > g_displayInfo.range)
+                        g_displayInfo.seekframe = g_displayInfo.range;
+
+                    int32 position = g_displayInfo.seekframe;
+
+                    sprintf(foo,"position: %d\r\n",position);
+				    OutputDebugString(foo);
+
+                    int32 seconds = (int32)ceil(g_ui->m_secondsPerFrame * position);
+					int32 hours = seconds / 3600;
+					int32 minutes = seconds / 60 - hours * 60;
+					seconds = seconds - minutes * 60 - hours * 3600;
+
+                    sprintf(foo,"seconds: %d\r\n",seconds);
+
+                    g_displayInfo.seekhours = hours;
+                    g_displayInfo.seekminutes = minutes;
+                    g_displayInfo.seekseconds = seconds;
+
+
+                    break;
+                }
+            } 
 
             DrawPlayer(hdc, g_buttonStateArray);
 
@@ -974,6 +1004,22 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                             g_buttonStateArray[i].dirty = TRUE;
                             g_buttonStateArray[i].position = 0;
                             g_displayInfo.state = g_displayInfo.oldstate;
+
+                            if(i == kSeekControl)
+                            {
+                                KillTimer(hwnd, 0x02);
+
+                                if(g_ui->m_state == STATE_Playing)
+                                {
+                                    g_ui->m_target->AcceptEvent(new ChangePositionEvent(g_displayInfo.seekframe));
+                                }
+                                else
+                                {
+                                    SendMessage(hwnd,WM_COMMAND,kPlayControl,0);
+                                    g_ui->m_target->AcceptEvent(new ChangePositionEvent(g_displayInfo.seekframe));
+                                }
+                                //seekframe
+                            }
                         }
                     }
                     else
@@ -983,7 +1029,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                         {
                             g_buttonStateArray[i].state = Selected;
                             g_buttonStateArray[i].dirty = TRUE;
-							ImmediateProcessMessage(hwnd,WM_COMMAND,g_buttonStateArray[i].control_id,0);
+							SendMessage(hwnd,WM_COMMAND,g_buttonStateArray[i].control_id,0);
                             //PostMessage(hwnd, WM_COMMAND, g_buttonStateArray[i].control_id, 0);
                         }
                         else if(g_buttonStateArray[i].state != Activated)
@@ -1050,6 +1096,8 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                     {
                         g_displayInfo.oldstate = g_displayInfo.state;
                         g_displayInfo.state = SeekTime;
+                        g_displayInfo.seekframe = g_displayInfo.frame;
+                        SetTimer(hwnd, 0x02, 100, NULL);
                     }
 
                     g_buttonStateArray[i].oldstate = g_buttonStateArray[i].state;
@@ -1083,6 +1131,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
       
             break;
         }*/
+
 		case WM_DROPFILES:
 		{
 			HDROP hDrop = (HDROP) wParam;
@@ -1102,19 +1151,26 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 								szFile,
 								sizeof(szFile));
 
-				if (!g_ui->m_playList) {
+				if (!g_ui->m_playList) 
+                {
 					g_ui->m_playList = new PlayList();
 					g_ui->m_playList->Add(szFile,0);
 					g_ui->m_playList->SetFirst();
 					g_ui->m_target->AcceptEvent(new SetPlayListEvent(g_ui->m_playList));
 					g_ui->m_target->AcceptEvent(new Event(CMD_Play));
-				} else {
-					if (g_ui->m_playList->GetCurrent() == NULL) {
+				} 
+                else 
+                {
+					if (g_ui->m_playList->GetCurrent() == NULL) 
+                    {
 						g_ui->m_playList->Add(szFile,0);
 						g_ui->m_target->AcceptEvent(new SetPlayListEvent(g_ui->m_playList));
 						// first in playlist...
-						g_ui->m_target->AcceptEvent(new Event(CMD_Play));
-					} else {
+						//g_ui->m_target->AcceptEvent(new Event(CMD_Play));
+                        SendMessage(hwnd, WM_COMMAND, kPlayControl,0);
+					} 
+                    else 
+                    {
 						g_ui->m_playList->Add(szFile,0);
 						g_ui->m_target->AcceptEvent(new SetPlayListEvent(g_ui->m_playList));
 					}
@@ -1186,8 +1242,6 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                             static int32 lastDelta = 0;
                             int32 change;
 
-                            //vErrorOut(fg_pink, "delta = %d\r\n", lParam);
-
                             if(lastDelta > delta)
                                 change = -1;
                             else if(delta > lastDelta)
@@ -1197,14 +1251,15 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
                             lastDelta = delta;
 
-                           SendMessage(hwnd, WM_COMMAND, kVolumeControl, change);
+                            char foo[1024];
+							sprintf(foo,"position: %d\n",delta);
+							OutputDebugString(foo);
+
+                            SendMessage(hwnd, WM_COMMAND, kVolumeControl, change);
                         }
                         else if(i == kSeekControl &&
 							PtInRegion(g_buttonStateArray[i].region, pressPt.x, pressPt.y))
                         {
-							char foo[1024];
-							sprintf(foo,"position: %d\n",pt.y);
-							OutputDebugString(foo);
                             SendMessage(hwnd, WM_COMMAND, kSeekControl, delta);
                         }
 
@@ -1248,14 +1303,108 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
             ReleaseDC(hwnd, hdc);
            
-            SelectObject(tempDC, oldBitmap);
+            SelectObject(tempDC, oldBitmap); 
 
             break;
         }
 
 		case WM_COMMAND:
 		{
-			ImmediateProcessMessage(hwnd,WM_COMMAND,wParam,lParam);
+			switch(wParam)
+	        {
+		        case kModeControl:
+		        {
+			        break;        
+		        }
+
+		        case kMinimizeControl:
+		        {
+			        break;        
+		        }
+
+		        case kCloseControl:
+		        {
+			        DestroyWindow( hwnd );
+			        break;        
+		        }
+
+		        case kPlayControl:
+		        {
+			        OutputDebugString("play clicked\n");
+			        if (g_ui->m_state == STATE_Stopped) {
+				        g_ui->m_target->AcceptEvent(new Event(CMD_Play));
+                        if(g_displayInfo.state == TotalTime)
+                            g_displayInfo.state = CurrentTime;
+                        
+			        } else if (g_ui->m_state == STATE_Paused) {
+				        g_ui->m_target->AcceptEvent(new Event(CMD_TogglePause));
+                        
+			        } else if (g_ui->m_state == STATE_Playing) {
+				        g_ui->m_target->AcceptEvent(new Event(CMD_TogglePause));
+                        
+			        }
+			        break;        
+		        }
+		        case kStopControl:
+		        {
+			        OutputDebugString("stop clicked\n");
+			        g_ui->m_target->AcceptEvent(new Event(CMD_Stop));
+			        break;        
+		        }
+
+		        case kNextControl:
+		        {
+			        OutputDebugString("next clicked\n");
+			        g_ui->m_target->AcceptEvent(new Event(CMD_NextMediaPiece));
+			        break;        
+		        }
+
+		        case kLastControl:
+		        {
+			        OutputDebugString("prev clicked\n");
+			        g_ui->m_target->AcceptEvent(new Event(CMD_PrevMediaPiece));
+			        break;        
+		        }
+    
+		        case kPlaylistControl:
+		        {
+			        break;        
+		        }
+
+		        case kDisplayControl:
+		        {
+			        break;        
+		        }
+
+		        case kVolumeControl:
+		        {
+		           //vErrorOut(fg_pink, "delta = %d\r\n", lParam);
+			        float percent;
+			        g_displayInfo.volume+=lParam;
+
+			        if(g_displayInfo.volume > 100)
+				        g_displayInfo.volume = 100;
+			        else if(g_displayInfo.volume < 0)
+				        g_displayInfo.volume = 0;
+        
+			        percent = (float)g_displayInfo.volume/(float)100;
+
+			        waveOutSetVolume( (HWAVEOUT)WAVE_MAPPER , MAKELPARAM(0xFFFF*percent, 0xFFFF*percent));
+
+			        break;        
+		        }
+
+		        case kSeekControl:
+		        {
+                    if(lParam > 5)
+                        lParam = 5;
+                    else if(lParam < -5)
+                        lParam = -5;
+
+                    seekSpeed = lParam;
+			        break;
+		        }
+	        }
 
 			break;
 		}
@@ -1269,93 +1418,6 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
 	return result;
 }                                                        
-
-void ImmediateProcessMessage(HWND hwnd,UINT Msg, WPARAM wParam,LPARAM lParam) {
-	switch(wParam)
-	{
-		case kModeControl:
-		{
-			break;        
-		}
-
-		case kMinimizeControl:
-		{
-			break;        
-		}
-
-		case kCloseControl:
-		{
-			DestroyWindow( hwnd );
-			break;        
-		}
-
-		case kPlayControl:
-		{
-			OutputDebugString("play clicked\n");
-			if (g_ui->m_state == STATE_Stopped) {
-				g_ui->m_target->AcceptEvent(new Event(CMD_Play));
-			} else if (g_ui->m_state == STATE_Paused) {
-				g_ui->m_target->AcceptEvent(new Event(CMD_TogglePause));
-			} else if (g_ui->m_state == STATE_Playing) {
-				g_ui->m_target->AcceptEvent(new Event(CMD_TogglePause));
-			}
-			break;        
-		}
-		case kStopControl:
-		{
-			OutputDebugString("stop clicked\n");
-			g_ui->m_target->AcceptEvent(new Event(CMD_Stop));
-			break;        
-		}
-
-		case kNextControl:
-		{
-			OutputDebugString("next clicked\n");
-			g_ui->m_target->AcceptEvent(new Event(CMD_NextMediaPiece));
-			break;        
-		}
-
-		case kLastControl:
-		{
-			OutputDebugString("prev clicked\n");
-			g_ui->m_target->AcceptEvent(new Event(CMD_PrevMediaPiece));
-			break;        
-		}
-    
-		case kPlaylistControl:
-		{
-			break;        
-		}
-
-		case kDisplayControl:
-		{
-			break;        
-		}
-
-		case kVolumeControl:
-		{
-		   //vErrorOut(fg_pink, "delta = %d\r\n", lParam);
-			float percent;
-			g_displayInfo.volume+=lParam;
-
-			if(g_displayInfo.volume > 100)
-				g_displayInfo.volume = 100;
-			else if(g_displayInfo.volume < 0)
-				g_displayInfo.volume = 0;
-        
-			percent = (float)g_displayInfo.volume/(float)100;
-
-			waveOutSetVolume( (HWAVEOUT)WAVE_MAPPER , MAKELPARAM(0xFFFF*percent, 0xFFFF*percent));
-
-			break;        
-		}
-
-		case kSeekControl:
-		{
-			break;
-		}
-	}
-}
 
 
 #ifdef __cplusplus
