@@ -30,6 +30,8 @@ using namespace std;
 #include "infoeditor.h"
 #include "metadata.h"
 #include "musiccatalog.h"
+#include "uuid.h"
+#include "gtkmessagedialog.h"
 
 infoeditorUI::infoeditorUI(FAContext *context, PlaylistManager *plm,
                            vector<PlaylistItem *> *itemlist)
@@ -153,6 +155,43 @@ void text_changed_event(GtkWidget *widget, infoeditorUI *p)
    p->CheckWidget(widget);
 }
 
+void infoeditorUI::MBClick(void)
+{
+   MetaData firstdata = (*(m_itemlist->begin()))->GetMetaData();
+
+   if (firstdata.GUID() == "") {
+       string caption = "No Signature Found";
+       string message = "This track does not have a Relatable Signature "
+                        "associated with it.  To look up this track on the "
+                        "MusicBrainz server, you need to enable a Relatable "
+                        "Profile and signature your music collection.";
+
+       GTKMessageDialog *dialog = new GTKMessageDialog();
+       dialog->Show(message.c_str(), caption.c_str(), kMessageOk);
+
+       delete dialog;
+   }
+   else {
+       string url = "http://www.musicbrainz.org/showguid.html?guid=";
+   
+       char ascii_uuid[37];
+       uuid_t1 uu;
+
+       memset(uu, '\0', 17 * sizeof(unsigned char));
+       strncpy((char *)uu, firstdata.GUID().c_str(), 16);
+       uuid_ascii(uu, ascii_uuid);
+
+       url += ascii_uuid;
+
+       LaunchBrowser((char *)url.c_str());
+    }
+}
+       
+void mb_button_click(GtkWidget *w, infoeditorUI *p)
+{
+   p->MBClick();
+}
+
 void infoeditorUI::CheckWidget(GtkWidget *widget)
 {
    if (widget == m_titleEntry)
@@ -226,6 +265,14 @@ void infoeditorUI::DisplayInfo(void)
    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 5);
    gtk_widget_show(label);
+
+   if (m_listsize == 1) {
+       GtkWidget *mb_button = gtk_button_new_with_label("Look up track on MusicBrainz");
+       gtk_box_pack_start(GTK_BOX(vbox), mb_button, FALSE, FALSE, 5);
+       gtk_signal_connect(GTK_OBJECT(mb_button), "clicked",
+                          GTK_SIGNAL_FUNC(mb_button_click), this);
+       gtk_widget_show(mb_button);
+   }
 
    table = gtk_table_new(6, 5, FALSE);
    gtk_box_pack_start(GTK_BOX(vbox), table, FALSE, FALSE, 5);

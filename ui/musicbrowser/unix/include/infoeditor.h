@@ -44,6 +44,7 @@ class infoeditorUI {
   
     void DoApplyInfoEdit();
     void CheckWidget(GtkWidget *widget);
+    void MBClick(void);
 
     bool changed;
  protected:
