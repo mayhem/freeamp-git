@@ -40,10 +40,6 @@ ____________________________________________________________________________*/
 #include "windowhash.h"
 #include "graphics.h"
 
-void FreeAmpUI::SetArgs(int argc, char **argv) {
-    m_argc = argc;
-    m_argv = argv;
-}
 extern "C" {
 
 UserInterface *Initialize() {
@@ -54,6 +50,7 @@ UserInterface *Initialize() {
 
 FreeAmpUI::FreeAmpUI() {
     m_windowHash = new WindowHash();
+    m_done = false;
 }
 FreeAmpUI::~FreeAmpUI() {
     if (m_windowHash) {
@@ -64,16 +61,7 @@ FreeAmpUI::~FreeAmpUI() {
     XCloseDisplay(m_display);
 
 }
-int32 FreeAmpUI::AcceptEvent(Event *e) {
-    switch (e->Type()) {
-	case CMD_Cleanup:
-	    m_playerEQ->AcceptEvent(new Event(INFO_ReadyToDieUI));
-	    break;
-	default:
-	    break;
-    }
-    return 0;
-}
+
 void FreeAmpUI::SetPlayListManager(PlayListManager *plm) {
     m_plm = plm;
 }
@@ -124,9 +112,13 @@ void FreeAmpUI::Init()
     m_gc = XCreateGC(m_display, m_mainWindow->GetWindow(), valuemask, &values);
 
     m_mainWindow->SetGC(m_gc);
+    m_mainWindow->SetTarget(m_playerEQ);
 
     m_playButton = new FATriStateWindow(m_display,m_screenNum,m_gc,m_mainWindow->GetWindow(),PLAY_BUTTON_X,PLAY_BUTTON_Y,PLAY_BUTTON_WIDTH,PLAY_BUTTON_HEIGHT*3);
     m_playButton->SetPartialHeight(PLAY_BUTTON_HEIGHT);
+
+    m_stopButton = new FATriStateWindow(m_display,m_screenNum,m_gc,m_mainWindow->GetWindow(),STOP_BUTTON_X,STOP_BUTTON_Y,STOP_BUTTON_WIDTH,STOP_BUTTON_HEIGHT*3);
+    m_stopButton->SetPartialHeight(STOP_BUTTON_HEIGHT);
     
     m_pauseButton = new FATriStateWindow(m_display,m_screenNum,m_gc,m_mainWindow->GetWindow(),PAUSE_BUTTON_X,PAUSE_BUTTON_Y,PAUSE_BUTTON_WIDTH,PAUSE_BUTTON_HEIGHT*3);
     m_pauseButton->SetPartialHeight(PAUSE_BUTTON_HEIGHT);
@@ -142,6 +134,21 @@ void FreeAmpUI::Init()
     m_switchModeButton = new FATriStateWindow(m_display,m_screenNum,m_gc,m_mainWindow->GetWindow(),SWITCH_MODE_BUTTON_X,SWITCH_MODE_BUTTON_Y,SWITCH_MODE_BUTTON_WIDTH,SWITCH_MODE_BUTTON_HEIGHT*3);
     m_switchModeButton->SetPartialHeight(SWITCH_MODE_BUTTON_HEIGHT);
 
+    m_minimizeButton = new FATriStateWindow(m_display,m_screenNum,m_gc,m_mainWindow->GetWindow(),MINIMIZE_BUTTON_X,MINIMIZE_BUTTON_Y,MINIMIZE_BUTTON_WIDTH,MINIMIZE_BUTTON_HEIGHT * 3);
+    m_minimizeButton->SetPartialHeight(MINIMIZE_BUTTON_HEIGHT);
+
+    m_closeButton = new FATriStateWindow(m_display,m_screenNum,m_gc,m_mainWindow->GetWindow(),CLOSE_BUTTON_X,CLOSE_BUTTON_Y,CLOSE_BUTTON_WIDTH,CLOSE_BUTTON_HEIGHT * 3);
+    m_closeButton->SetPartialHeight(CLOSE_BUTTON_HEIGHT);
+
+    m_repeatButton = new FATriStateWindow(m_display,m_screenNum,m_gc,m_mainWindow->GetWindow(),REPEAT_BUTTON_X,REPEAT_BUTTON_Y,REPEAT_BUTTON_WIDTH,REPEAT_BUTTON_HEIGHT * 3);
+    m_repeatButton->SetPartialHeight(REPEAT_BUTTON_HEIGHT);
+
+    m_shuffleButton = new FATriStateWindow(m_display,m_screenNum,m_gc,m_mainWindow->GetWindow(),SHUFFLE_BUTTON_X,SHUFFLE_BUTTON_Y,SHUFFLE_BUTTON_WIDTH,SHUFFLE_BUTTON_HEIGHT * 3);
+    m_shuffleButton->SetPartialHeight(SHUFFLE_BUTTON_HEIGHT);
+
+    m_openButton = new FATriStateWindow(m_display,m_screenNum,m_gc,m_mainWindow->GetWindow(),OPEN_BUTTON_X,OPEN_BUTTON_Y,OPEN_BUTTON_WIDTH,OPEN_BUTTON_HEIGHT * 3);
+    m_openButton->SetPartialHeight(OPEN_BUTTON_HEIGHT);
+
     switch (display_depth) {
 	case 16:
 	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),logo,&m_iconPixmap,NULL,NULL);	    
@@ -156,11 +163,17 @@ void FreeAmpUI::Init()
 	    major_button_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow->GetWindow(),(char *)major_button_mask_bits,MAJOR_BUTTON_MASK_WIDTH,MAJOR_BUTTON_MASK_HEIGHT);
 	    minor_button_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow->GetWindow(),(char *)minor_button_mask_bits,MINOR_BUTTON_MASK_WIDTH,MINOR_BUTTON_MASK_HEIGHT);
 	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),play_buttons,&play_buttons_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),stop_buttons,&stop_buttons_pixmap,NULL,NULL);
 	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),pause_buttons,&pause_buttons_pixmap,NULL,NULL);
 	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),last_buttons,&prev_buttons_pixmap,NULL,NULL);
 	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),next_buttons,&next_buttons_pixmap,NULL,NULL);
 
 	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),mode_buttons,&mode_buttons_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),minimize_buttons,&minimize_buttons_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),close_buttons,&close_buttons_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),repeat_buttons,&repeat_buttons_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),shuffle_buttons,&shuffle_buttons_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),open_buttons,&open_buttons_pixmap,NULL,NULL);
 	    break;
 	case 8:
 	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),logo256,&m_iconPixmap,NULL,NULL);
@@ -175,11 +188,17 @@ void FreeAmpUI::Init()
 	    major_button_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow->GetWindow(),(char *)major_button_mask_bits,MAJOR_BUTTON_MASK_WIDTH,MAJOR_BUTTON_MASK_HEIGHT);
 	    minor_button_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow->GetWindow(),(char *)minor_button_mask_bits,MINOR_BUTTON_MASK_WIDTH,MINOR_BUTTON_MASK_HEIGHT);
 	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),play_buttons256,&play_buttons_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),stop_buttons256,&stop_buttons_pixmap,NULL,NULL);
 	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),pause_buttons256,&pause_buttons_pixmap,NULL,NULL);
 	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),last_buttons256,&prev_buttons_pixmap,NULL,NULL);
 	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),next_buttons256,&next_buttons_pixmap,NULL,NULL);
 
 	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),mode_buttons256,&mode_buttons_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),minimize_buttons256,&minimize_buttons_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),close_buttons256,&close_buttons_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),repeat_buttons256,&repeat_buttons_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),shuffle_buttons256,&shuffle_buttons_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),open_buttons256,&open_buttons_pixmap,NULL,NULL);
 	    break;
 	default:
 	    cerr << "Only know how to deal with bit depths of 8 or 16 (256 or 65535 colors)!!!" << endl;
@@ -201,10 +220,16 @@ void FreeAmpUI::Init()
     m_mainWindow->SetPixmap(m_doubleBufferPixmap);
 
     m_playButton->SetPixmap(play_buttons_pixmap);
+    m_stopButton->SetPixmap(stop_buttons_pixmap);
     m_pauseButton->SetPixmap(pause_buttons_pixmap);
     m_prevButton->SetPixmap(prev_buttons_pixmap);
     m_nextButton->SetPixmap(next_buttons_pixmap);
     m_switchModeButton->SetPixmap(mode_buttons_pixmap);
+    m_minimizeButton->SetPixmap(minimize_buttons_pixmap);
+    m_closeButton->SetPixmap(close_buttons_pixmap);
+    m_repeatButton->SetPixmap(repeat_buttons_pixmap);
+    m_shuffleButton->SetPixmap(shuffle_buttons_pixmap);
+    m_openButton->SetPixmap(open_buttons_pixmap);
 
     size_hints->flags = PPosition | PSize | PMinSize;
     size_hints->min_width = TOTAL_WIDTH;
@@ -243,35 +268,40 @@ void FreeAmpUI::Init()
 		     class_hints);
     
     /* Select event types wanted */
+    int32 tmpMask = ExposureMask | ButtonReleaseMask |
+		 ButtonPressMask | StructureNotifyMask | EnterWindowMask | LeaveWindowMask | SubstructureNotifyMask;
+
     m_mainWindow->SelectInput(ExposureMask | KeyPressMask | ButtonReleaseMask | KeyReleaseMask | PointerMotionMask |
 		 ButtonPressMask | StructureNotifyMask | EnterWindowMask | LeaveWindowMask | SubstructureNotifyMask);
     
-    m_playButton->SelectInput(ExposureMask | ButtonReleaseMask |
-		 ButtonPressMask | StructureNotifyMask | EnterWindowMask | LeaveWindowMask | SubstructureNotifyMask);
+    m_playButton->SelectInput(tmpMask);
+    m_stopButton->SelectInput(tmpMask);
+    m_pauseButton->SelectInput(tmpMask);
+    m_prevButton->SelectInput(tmpMask);
+    m_nextButton->SelectInput(tmpMask);
+    m_switchModeButton->SelectInput(tmpMask);
+    m_minimizeButton->SelectInput(tmpMask);
+    m_closeButton->SelectInput(tmpMask);
+    m_repeatButton->SelectInput(tmpMask);
+    m_shuffleButton->SelectInput(tmpMask);
+    m_openButton->SelectInput(tmpMask);
 
-    m_pauseButton->SelectInput(ExposureMask | ButtonReleaseMask |
-		 ButtonPressMask | StructureNotifyMask | EnterWindowMask | LeaveWindowMask | SubstructureNotifyMask);
-
-    m_prevButton->SelectInput(ExposureMask | ButtonReleaseMask |
-		 ButtonPressMask | StructureNotifyMask | EnterWindowMask | LeaveWindowMask | SubstructureNotifyMask);
-
-    m_nextButton->SelectInput(ExposureMask | ButtonReleaseMask |
-		 ButtonPressMask | StructureNotifyMask | EnterWindowMask | LeaveWindowMask | SubstructureNotifyMask);
-
-    m_switchModeButton->SelectInput(ExposureMask | ButtonReleaseMask |
-		 ButtonPressMask | StructureNotifyMask | EnterWindowMask | LeaveWindowMask | SubstructureNotifyMask);
-
-    
     // set up shape
     XSetForeground(m_display,m_gc,BlackPixel(m_display,m_screenNum));
     XFillRectangle(m_display,m_mainWindow->GetWindow(),m_gc,0,0,TOTAL_WIDTH,TOTAL_HEIGHT);
     m_mainWindow->SetMask(player_full_mask_pixmap);
 
     m_playButton->SetMask(major_button_mask_pixmap);
+    m_stopButton->SetMask(major_button_mask_pixmap);
     m_pauseButton->SetMask(major_button_mask_pixmap);
     m_prevButton->SetMask(major_button_mask_pixmap);
     m_nextButton->SetMask(major_button_mask_pixmap);
     m_switchModeButton->SetMask(minor_button_mask_pixmap);
+    m_minimizeButton->SetMask(minor_button_mask_pixmap);
+    m_closeButton->SetMask(minor_button_mask_pixmap);
+    m_repeatButton->SetMask(minor_button_mask_pixmap);
+    m_shuffleButton->SetMask(minor_button_mask_pixmap);
+    m_openButton->SetMask(minor_button_mask_pixmap);
 
     gtkListenThread = Thread::CreateThread();
     gtkListenThread->Create(FreeAmpUI::x11ServiceFunction,this);
@@ -288,12 +318,30 @@ void FreeAmpUI::X11EventService() {
     int32 button_click_spot_y = 0;
     XEvent report;
 
+    m_playButton->SetClickAction(playFunction,this);
+    m_stopButton->SetClickAction(stopFunction,this);
+    m_pauseButton->SetClickAction(pauseFunction,this);
+    m_prevButton->SetClickAction(prevFunction,this);
+    m_nextButton->SetClickAction(nextFunction,this);
+    m_switchModeButton->SetClickAction(switchModeFunction,this);
+    m_minimizeButton->SetClickAction(minimizeFunction,this);
+    m_closeButton->SetClickAction(closeFunction,this);
+    m_repeatButton->SetClickAction(repeatFunction,this);
+    m_shuffleButton->SetClickAction(shuffleFunction,this);
+    m_openButton->SetClickAction(openFunction,this);
+
     m_windowHash->Insert(m_mainWindow->GetWindow(),(FAWindow *)m_mainWindow);
     m_windowHash->Insert(m_playButton->GetWindow(),(FAWindow *)m_playButton);
+    m_windowHash->Insert(m_stopButton->GetWindow(),(FAWindow *)m_stopButton);
     m_windowHash->Insert(m_pauseButton->GetWindow(),(FAWindow *)m_pauseButton);
     m_windowHash->Insert(m_prevButton->GetWindow(),(FAWindow *)m_prevButton);
     m_windowHash->Insert(m_nextButton->GetWindow(),(FAWindow *)m_nextButton);
     m_windowHash->Insert(m_switchModeButton->GetWindow(),(FAWindow *)m_switchModeButton);
+    m_windowHash->Insert(m_minimizeButton->GetWindow(),(FAWindow *)m_minimizeButton);
+    m_windowHash->Insert(m_closeButton->GetWindow(),(FAWindow *)m_closeButton);
+    m_windowHash->Insert(m_repeatButton->GetWindow(),(FAWindow *)m_repeatButton);
+    m_windowHash->Insert(m_shuffleButton->GetWindow(),(FAWindow *)m_shuffleButton);
+    m_windowHash->Insert(m_openButton->GetWindow(),(FAWindow *)m_openButton);
 
     /* Display window */
     m_mainWindow->MapWindow();
@@ -302,16 +350,21 @@ void FreeAmpUI::X11EventService() {
     m_nextButton->MapWindow();
     m_prevButton->MapWindow();
     m_switchModeButton->MapWindow();
-    
+    m_minimizeButton->MapWindow();
+    m_closeButton->MapWindow();
+    m_repeatButton->MapWindow();
+    m_shuffleButton->MapWindow();
+    m_openButton->MapWindow();
+
     fprintf(stderr,"Main window ID: %x\n",m_mainWindow->GetWindow());
     fprintf(stderr,"Play Button ID: %x\n",m_playButton->GetWindow());
     fprintf(stderr,"PauseButton ID: %x\n",m_pauseButton->GetWindow());
     fprintf(stderr,"Prev Button ID: %x\n",m_prevButton->GetWindow());
     fprintf(stderr,"Next Button ID: %x\n",m_nextButton->GetWindow());
-
+    fprintf(stderr,"MinimizeButtonID: %x\n",m_minimizeButton->GetWindow());
 
     /* get events, use first to display text and graphics */
-    while (1)  {
+    while (!m_done)  {
 	XNextEvent(m_display, &report);
 
 	//fprintf(stderr, "window ID: %x\n", report.xany.window);
@@ -323,3 +376,137 @@ void FreeAmpUI::X11EventService() {
 	}
     } /* end while */
 }
+
+int32 FreeAmpUI::AcceptEvent(Event *e) {
+    switch (e->Type()) {
+	case CMD_Cleanup: {
+	    m_done = true;
+	    XEvent ev;
+	    ev.xclient.format = 32;
+	    XSendEvent(m_display,InputFocus,true,0,&ev);
+	    gtkListenThread->Join();
+	    m_playerEQ->AcceptEvent(new Event(INFO_ReadyToDieUI));
+	    break; }
+	case INFO_Playing:
+	    m_stopButton->MapWindow();
+	    m_playButton->UnMapWindow();
+	    m_pauseButton->ClearActivated();
+	    break;
+	case INFO_Paused:
+	    m_pauseButton->SetActivated();
+	    break;
+	case INFO_Stopped:
+	    m_pauseButton->ClearActivated();
+	    m_playButton->MapWindow();
+	    m_stopButton->UnMapWindow();
+	    break;
+	default:
+	    break;
+    }
+    return 0;
+}
+
+void FreeAmpUI::SetArgs(int argc, char **argv) {
+    m_argc = argc;
+    m_argv = argv;
+
+    char *arg = NULL;
+    bool shuffle = false;
+    bool autoplay = false;
+    int32 count = 0;
+
+    for(int32 i = 1;i < m_argc; i++) {
+	arg = m_argv[i];
+	
+	if (arg[0] == '-') {
+	    switch (arg[1]) {
+		case 's':
+                    shuffle = true;
+		    break;
+                case 'p':
+                    autoplay = true;
+		    break;
+            }
+        } else {
+            m_plm->Add(arg,0);
+            count++;
+	}
+    }
+
+    m_plm->SetFirst();
+    
+    if(shuffle) 
+        m_plm->SetShuffle(SHUFFLE_SHUFFLED);
+    
+    if(autoplay)
+       m_playerEQ->AcceptEvent(new Event(CMD_Play));
+}
+
+
+
+void FreeAmpUI::playFunction(void *p) {
+    cerr << "play" << endl;
+    //((FreeAmpUI *)p)->m_stopButton->MapWindow();
+    //((FreeAmpUI *)p)->m_playButton->UnMapWindow();
+    ((FreeAmpUI *)p)->m_playerEQ->AcceptEvent(new Event(CMD_Play));
+}
+
+void FreeAmpUI::stopFunction(void *p) {
+    cerr << "stop" << endl;
+    //((FreeAmpUI *)p)->m_playButton->MapWindow();
+    //((FreeAmpUI *)p)->m_stopButton->UnMapWindow();
+    ((FreeAmpUI *)p)->m_playerEQ->AcceptEvent(new Event(CMD_Stop));
+}
+
+void FreeAmpUI::pauseFunction(void *p) {
+    cerr << "pause" << endl;
+    ((FreeAmpUI *)p)->m_playerEQ->AcceptEvent(new Event(CMD_TogglePause));
+}
+
+void FreeAmpUI::prevFunction(void *p) {
+    cerr << "prev" << endl;
+    ((FreeAmpUI *)p)->m_playerEQ->AcceptEvent(new Event(CMD_PrevMediaPiece));
+}
+
+void FreeAmpUI::nextFunction(void *p) {
+    cerr << "next" << endl;
+    ((FreeAmpUI *)p)->m_playerEQ->AcceptEvent(new Event(CMD_NextMediaPiece));
+}
+
+void FreeAmpUI::switchModeFunction(void *p) {
+    cerr << "switch mode" << endl;
+}
+
+void FreeAmpUI::minimizeFunction(void *p) {
+    cerr << "minimize" << endl;
+    XIconifyWindow(((FreeAmpUI *)p)->m_display,
+		   ((FreeAmpUI *)p)->m_mainWindow->GetWindow(),
+		   ((FreeAmpUI *)p)->m_screenNum);
+}
+
+void FreeAmpUI::closeFunction(void *p) {
+    cerr << "close" << endl;
+    ((FreeAmpUI *)p)->m_playerEQ->AcceptEvent(new Event(CMD_QuitPlayer));
+}
+
+void FreeAmpUI::repeatFunction(void *p) {
+    cerr << "repeat" << endl;
+    ((FreeAmpUI *)p)->m_plm->ToggleRepeat();
+}
+
+void FreeAmpUI::shuffleFunction(void *p) {
+    cerr << "shuffle" << endl;
+    ((FreeAmpUI *)p)->m_plm->ToggleShuffle();
+}
+
+void FreeAmpUI::openFunction(void *p) {
+    cerr << "open" << endl;
+}
+
+
+
+
+
+
+
+

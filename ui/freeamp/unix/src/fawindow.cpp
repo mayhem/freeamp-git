@@ -52,7 +52,9 @@ void FAWindow::SetMask(Pixmap mask) { XShapeCombineMask(m_display,m_me,ShapeBoun
 
 void FAWindow::SelectInput(int32 mask) { XSelectInput(m_display,m_me,mask); }
 
-void FAWindow::MapWindow() {  XMapWindow(m_display,m_me); }
+void FAWindow::MapWindow() { XMapWindow(m_display,m_me); }
+
+void FAWindow::UnMapWindow() { XUnmapWindow(m_display,m_me); }
 
 FAMainWindow::FAMainWindow(Display *display, int32 screen_num,GC gc, Window parent,int32 x,int32 y,int32 w, int32 h) {
     m_display = display;
@@ -64,7 +66,7 @@ FAMainWindow::FAMainWindow(Display *display, int32 screen_num,GC gc, Window pare
     m_width = w;
     m_height = h;
     m_me = XCreateSimpleWindow(m_display,m_parent,m_xParent,m_yParent,m_width,m_height,0,BlackPixel(m_display,m_screenNum),WhitePixel(m_display,m_screenNum));
-    fprintf(stderr,"created main win\n");
+    //fprintf(stderr,"created main win\n");
 }
 
 FAMainWindow::~FAMainWindow() { }
@@ -86,11 +88,12 @@ void FAMainWindow::DoEvent(XEvent e) {
 	    break;
 	case KeyRelease: {
 	    char foo[32];
-	    fprintf(stderr,"key released\n");
-	    XLookupString((XKeyEvent *)&e,foo,sizeof(foo),NULL,NULL);
+	    //fprintf(stderr,"key released\n");
+	    XLookupString(&(e.xkey),foo,sizeof(foo),NULL,NULL);
 	    if (foo[0] == 'q') {
 		m_playerEQ->AcceptEvent(new Event(CMD_QuitPlayer));
 	    }
+	    //fprintf(stderr,"done key release\n");
 	    break;
 	}
     }
@@ -98,6 +101,7 @@ void FAMainWindow::DoEvent(XEvent e) {
 
 void FAMainWindow::Draw() {
     XCopyArea(m_display,m_pixmap,m_me,m_gc,0,0,m_width,m_height,0,0);
+    XFlush(m_display);
 }
 
 FATriStateWindow::FATriStateWindow(Display *display, int32 screen_num,GC gc, Window parent,int32 x,int32 y,int32 w, int32 h) {
@@ -113,7 +117,7 @@ FATriStateWindow::FATriStateWindow(Display *display, int32 screen_num,GC gc, Win
     m_activated = false;
     m_pressed = false;
     m_insideButton = false;
-    fprintf(stderr,"Created tristate window\n");
+    //fprintf(stderr,"Created tristate window\n");
 }
 
 FATriStateWindow::~FATriStateWindow() { }
@@ -123,20 +127,29 @@ void FATriStateWindow::SetPartialHeight(int32 ph) {
 }
 
 void FATriStateWindow::SetActivated() {
+    //cerr << "SetActivated" << endl;
     m_activated = true;
-    XEvent x;
-    XSendEvent(m_display,m_me,false,ExposureMask,&x);
+    Draw();
+//    XEvent x;
+//    x.xexpose.count = 0;
+//    XSendEvent(m_display,m_me,false,ExposureMask,&x);
+//    XFlush(m_display);
 }
 
 void FATriStateWindow::ClearActivated() {
+    //cerr << "ClearActivated" << endl;
     m_activated = false;
-    XEvent x;
-    XSendEvent(m_display,m_me,false,ExposureMask,&x);
+    Draw();
+//    XEvent x;
+//    x.xexpose.count = 0;
+//    XSendEvent(m_display,m_me,false,ExposureMask,&x);
+//    XFlush(m_display);
 }
 
 void FATriStateWindow::DoEvent(XEvent e) {
     switch (e.type) {
 	case Expose:
+	    //cerr << "got exposure" << endl;
 	    if (e.xexpose.count != 0)
 		return;
 	    Draw();
@@ -146,8 +159,14 @@ void FATriStateWindow::DoEvent(XEvent e) {
 	    Draw();
 	    break;
 	case ButtonRelease:
+	    //cerr << "button release" << endl;
 	    m_pressed = false;
+	    if (m_insideButton) {
+		m_clickFunction(m_cookie);
+	    }
+	    //cerr << "about to draw" << endl;
 	    Draw();
+	    //cerr << "done drawing" << endl;
 	    break;
 	case EnterNotify:
 	    m_insideButton = true;
@@ -162,6 +181,7 @@ void FATriStateWindow::DoEvent(XEvent e) {
 }
 
 void FATriStateWindow::Draw() {
+    //cerr << "Drawing..." << endl;
     int32 theInt;
     if (m_activated) {
 	theInt = 2;
@@ -188,10 +208,13 @@ void FATriStateWindow::Draw() {
 	      m_partialHeight, //height
 	      0,  //dest_x
 	      0); // dest_y
-
+    XFlush(m_display);
 }
 
-
+void FATriStateWindow::SetClickAction(action_function f, void *p) {
+    m_cookie = p;
+    m_clickFunction = f;
+}
 
 
 

@@ -81,6 +81,14 @@ Pixmap player_full_mask_pixmap;
 #include "play_buttons256.xpm"
 Pixmap play_buttons_pixmap;
 
+#define STOP_BUTTON_X 29
+#define STOP_BUTTON_Y 15
+#define STOP_BUTTON_WIDTH 20
+#define STOP_BUTTON_HEIGHT 20
+#include "stop_buttons.xpm"
+#include "stop_buttons256.xpm"
+Pixmap stop_buttons_pixmap;
+
 #define PAUSE_BUTTON_X (DISTANCE_BETWEEN_MAJORS + PLAY_BUTTON_X)
 #define PAUSE_BUTTON_Y 15
 #define PAUSE_BUTTON_WIDTH 20
@@ -125,6 +133,44 @@ Pixmap minor_button_mask_pixmap;
 #include "mode_buttons256.xpm"
 Pixmap mode_buttons_pixmap;
 
+#define MINIMIZE_BUTTON_X (SWITCH_MODE_BUTTON_X + 16)
+#define MINIMIZE_BUTTON_Y 9
+#define MINIMIZE_BUTTON_WIDTH 13
+#define MINIMIZE_BUTTON_HEIGHT 13
+#include "minimize_buttons.xpm"
+#include "minimize_buttons256.xpm"
+Pixmap minimize_buttons_pixmap;
 
+#define CLOSE_BUTTON_X (MINIMIZE_BUTTON_X + 16)
+#define CLOSE_BUTTON_Y 9
+#define CLOSE_BUTTON_WIDTH 13
+#define CLOSE_BUTTON_HEIGHT 13
+#include "close_buttons.xpm"
+#include "close_buttons256.xpm"
+Pixmap close_buttons_pixmap;
+
+#define REPEAT_BUTTON_X 360
+#define REPEAT_BUTTON_Y 30
+#define REPEAT_BUTTON_WIDTH 13
+#define REPEAT_BUTTON_HEIGHT 13
+#include "repeat_buttons.xpm"
+#include "repeat_buttons256.xpm"
+Pixmap repeat_buttons_pixmap;
+
+#define SHUFFLE_BUTTON_X (REPEAT_BUTTON_X + 16)
+#define SHUFFLE_BUTTON_Y 30
+#define SHUFFLE_BUTTON_WIDTH 13
+#define SHUFFLE_BUTTON_HEIGHT 13
+#include "shuffle_buttons.xpm"
+#include "shuffle_buttons256.xpm"
+Pixmap shuffle_buttons_pixmap;
+
+#define OPEN_BUTTON_X (SHUFFLE_BUTTON_X + 16)
+#define OPEN_BUTTON_Y 30
+#define OPEN_BUTTON_WIDTH 13
+#define OPEN_BUTTON_HEIGHT 13
+#include "open_buttons.xpm"
+#include "open_buttons256.xpm"
+Pixmap open_buttons_pixmap;
 
 #endif // _GRAPHICS_H_
