@@ -44,7 +44,8 @@ class Font
 {
     public:
 
-               Font(string &oName, string &oFace, string &oDefault);
+               Font(string &oName, string &oFace, 
+			        string &m_oFile, string &oDefault);
       virtual ~Font(void);
       
       virtual Error GetName(string &oName);
@@ -52,7 +53,7 @@ class Font
 
 	protected:
     
-      string   m_oName, m_oFace, m_oDefault;
+      string   m_oName, m_oFace, m_oFile, m_oDefault;
 };
 
 #endif

@@ -94,10 +94,7 @@ void SliderControl::Transition(ControlTransitionEnum  eTrans,
 
 
            if (m_iValue < 0 || m_iValue > 100)
-           {
-              Debug_v("--- Illegal seek pos: %d", m_iValue);
               return;
-           }   
 
            iNewPos = (m_iValue * m_iRange) / 100;
            if (iNewPos == m_iCurrentPos)

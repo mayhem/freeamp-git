@@ -34,12 +34,16 @@ int CALLBACK IHateMicrosoft(ENUMLOGFONTEX *lpelfe,
    return pFont->Callback((unsigned char *)lpelfe->elfFullName);
 }                               
 
-Win32Font::Win32Font(string &oName, string &oFace, string &oDefault) :
-                Font(oName, oFace, oDefault)
+Win32Font::Win32Font(string &oName, string &oFace, 
+                     string &oFile, string &oDefault) :
+                Font(oName, oFace, oFile, oDefault)
 {
    HDC     hRootDC, hMemDC;
    LOGFONT sFont;
    char   *szDup, *szToken;
+
+   if (oFile.length() > 0)
+      AddFontResource(oFile.c_str());
    
    hRootDC = GetDC(NULL);
    hMemDC = CreateCompatibleDC(hRootDC);
@@ -74,7 +78,8 @@ Win32Font::Win32Font(string &oName, string &oFace, string &oDefault) :
 
 Win32Font::~Win32Font(void)
 {
-
+   if (m_oFile.length() > 0)
+      RemoveFontResource(m_oFile.c_str());
 }
 
 Win32Font::Callback(unsigned char *szFontFace)

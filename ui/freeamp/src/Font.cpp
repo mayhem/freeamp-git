@@ -23,10 +23,11 @@ ____________________________________________________________________________*/
 
 #include "Font.h"
 
-Font::Font(string &oName, string &oFace, string &oDefault)
+Font::Font(string &oName, string &oFace, string &oFile, string &oDefault)
 {
    m_oName = oName;
    m_oFace = oFace;
+   m_oFile = oFile;
    m_oDefault = oDefault;
 }
 

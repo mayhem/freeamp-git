@@ -42,7 +42,8 @@ class Win32Font : public Font
 {
     public:
 
-               Win32Font(string &oName, string &oFace, string &oDefault);
+               Win32Font(string &oName, string &oFace, 
+			             string &oFile, string &oDefault);
       virtual ~Win32Font(void);
       
       int      Callback(unsigned char *szFontFace);
