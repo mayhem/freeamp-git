@@ -183,7 +183,10 @@ void PixSliderControl::Transition(ControlTransitionEnum  eTrans,
 
     if (m_eCurrentState == CS_MouseOver &&
         eTrans == CT_MouseLButtonUp) {
-        m_iValue = (int)((float)(m_iState * 100) / 255); 
+        if (!m_bActivationReveal)
+            m_iValue = (int)((float)(m_iState * 100) / m_iNumStates);
+        else
+            m_iValue = (int)((float)(m_iState * 100) / 255); 
         m_pParent->SendControlMessage(this, CM_ValueChanged);
     }
 
@@ -258,6 +261,11 @@ void PixSliderControl::DrawReveal(int reveal)
 
    if (reveal == m_iOldRevealPos)
        return;
+
+   if (reveal == 0) {
+       m_iOldRevealPos = 0;
+       return;
+   }
 
    m_pActivationBitmap->GetTransColor(trans);
    pCanvas = m_pParent->GetCanvas();

@@ -89,6 +89,9 @@ bool KJofol::IsSupportedFormat(string &oDir)
 
 Error KJofol::ConvertToNative(string &oDir)
 {
+    m_bmpvolume = false;
+    m_understandvolume = false;
+
     Error eErr = kError_NoErr;
 
     string outpath = oDir + string(DIR_MARKER_STR) + string("theme.xml");
@@ -236,29 +239,44 @@ Error KJofol::ConvertToNative(string &oDir)
             Seek(right);
         }
         else if (!strcasecmp(left, "VolumeControlType")) {
-            if (!strcasecmp(right, "BMP")) {
+            if (!strncasecmp(right, "BMP", 3)) {
                 m_bmpvolume = true; 
                 m_understandvolume = true;
+                m_bmpvolfields = 1;
+            }
+            else {
+                cout << "don't understand BAR yet\n";
             }
         }
         else if (!strcasecmp(left, "VolumeControlImage")) {
             info["VolumeBMPImage"] = right;
+            m_bmpvolfields++;
         }
         else if (!strcasecmp(left, "VolumeControlImagePosition")) {
             info["VolumeBMPPos"] = right;
+            m_bmpvolfields++;
         }
         else if (!strcasecmp(left, "VolumeControlImageXSize")) {
             m_volxsize = atoi(right);
+            m_bmpvolfields++;
         }
         else if (!strcasecmp(left, "VolumeControlImageNb")) {
             m_volnum = atoi(right);
+            m_bmpvolfields++;
         }
         else if (!strcasecmp(left, "VolumeControlButton")) {
-            if (m_understandvolume && m_bmpvolume)
-                VolumeBMP(right);
+            info["VolumeBMPControl"] = right;
+            m_bmpvolfields++;
+        }
+        else if (!strncasecmp(left, "Playlist", 8)) {
         }
         else
             cout << "don't understand: " << line << endl;
+
+        if (m_bmpvolume && m_bmpvolfields == 6) {
+            VolumeBMP();
+            m_bmpvolume = false;
+        }
     }
 
     Write("</Controls>\n", 1);
@@ -561,14 +579,15 @@ void KJofol::Seek(char *desc)
     Write(outline, 2);
 }
 
-void KJofol::VolumeBMP(char *desc)
+void KJofol::VolumeBMP(void)
 {
     char outline[_MAX_PATH];
     char rect[256];
     Rect volrect;
     string pixname = info["VolumeBMPImage"];
 
-    sscanf(desc, "%i %i %i %i %s", &volrect.x1, &volrect.y1, &volrect.x2,
+    sscanf(info["VolumeBMPControl"].c_str(), 
+           "%i %i %i %i %s", &volrect.x1, &volrect.y1, &volrect.x2,
            &volrect.y2, rect);
     
     sprintf(rect, "%d, %d, %d, %d", volrect.x1, volrect.y1, volrect.x2,

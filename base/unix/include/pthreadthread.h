@@ -59,7 +59,6 @@ private:
 	thread_function m_function;
 	void           *m_arg;
 	Semaphore       m_semaphore;
-        Semaphore       m_exitSem;
 };
 
 #endif /* _LINUX_THREAD_H */

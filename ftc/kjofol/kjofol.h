@@ -87,7 +87,7 @@ class KJofol : public ThemeFormat
 
         void Seek(char *desc);
         void Button(char *desc, string name, string inf, string tip);
-        void VolumeBMP(char *desc);
+        void VolumeBMP(void);
 
         FAContext *m_context;
 
@@ -100,6 +100,7 @@ class KJofol : public ThemeFormat
         Rect m_seekrect;
 
         bool m_bmpvolume;
+        int m_bmpvolfields;
         bool m_understandvolume;
         int m_volxsize;
         int m_volnum;
