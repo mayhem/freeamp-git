@@ -14,9 +14,14 @@ From the source:
 
 From binaries:
 
-  Move freeamp to /usr/local/bin (or, somewhere else in your path)
-  Move the plugins directory (complete with contents) to
-    /usr/local/lib/freeamp  (see first note under the Linux section below)
+  Run "./install-freeamp" from this directory
+
+  Or alternatively, if you prefer to install the files manually:
+    - Move freeamp to /usr/local/bin (or, somewhere else in your path)
+    - Move the plugins directory (complete with contents) to
+        /usr/local/lib/freeamp  (see first note under the Linux section below)
+    - If you do not have ALSA installed, remove alsa-linux.pmo from the
+        /usr/local/lib/freeamp/plugins directory.
 
 
 USING FREEAMP:

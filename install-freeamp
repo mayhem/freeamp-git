@@ -1,0 +1,36 @@
+#!/bin/sh -e
+
+prefix=/usr/local
+bindir="$prefix/bin"
+libdir="$prefix/lib"
+fadir="$libdir/freeamp"
+plugdir="$fadir/plugins"
+
+# Yes, we could use mkdir -p, but not all unix systems' mkdir's support -p
+for dir in "$bindir" "$libdir" "$fadir" "$plugdir"; do
+    if [ \! -d "$dir" ]; then
+	echo "mkdir $dir && chown root.root $dir && chmod 755 $dir"
+	mkdir "$dir" && chown root.root "$dir" && chmod 755 "$dir"
+    fi
+done
+
+install -c -m 755 freeamp "$bindir"
+for file in plugins/*.*; do
+    enable=f
+    case "$file" in
+    	*/alsa-*.pmo)
+	    if ldconfig -p | grep 'libasound\.so' > /dev/null; then
+	    	enable=t
+	    else
+	    	enable=f
+	    fi
+	    ;;
+	*)
+	    enable=t
+	    ;;
+    esac
+    if [ "$enable" = "t" ]; then
+        echo install -c -m 755 "$file" "$prefix/lib/freeamp/plugins"
+        install -c -m 755 "$file" "$prefix/lib/freeamp/plugins"
+    fi
+done
