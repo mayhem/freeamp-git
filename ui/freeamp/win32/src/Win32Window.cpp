@@ -410,7 +410,7 @@ Error Win32Window::VulcanMindMeld(Window *pOther)
     sRect.top = oRect.y1;
     sRect.right = oRect.y2;
 
-    InvalidateRect(NULL, &sRect, true);
+    ShowWindow(m_hWnd, SW_HIDE);
     
     eRet = Window::VulcanMindMeld(pOther);
     m_pMindMeldMutex->Release();
@@ -437,7 +437,7 @@ Error Win32Window::VulcanMindMeld(Window *pOther)
 
         CreateTooltips();
 
-	    InvalidateRect(m_hWnd, NULL, false);
+        ShowWindow(m_hWnd, SW_SHOW);
         UpdateWindow(m_hWnd);
     }    
 

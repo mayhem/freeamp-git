@@ -117,7 +117,7 @@ void Window::AddControl(Control *pControl)
     string oName;
 
     pControl->GetName(oName);
-    m_oControlMap[oName] = pControl;
+    m_oControlMap.insert(pair<string, Control *>(oName, pControl));
     m_oControls.push_back(pControl);
 }
 
@@ -128,6 +128,7 @@ void Window::ClearControls(void)
         delete m_oControls[0];
         m_oControls.erase(m_oControls.begin());
     }
+    m_oControlMap.clear();
 }
 
 Canvas *Window::GetCanvas(void)
@@ -142,84 +143,101 @@ void Window::GetName(string &oName)
 
 Error Window::ControlEnable(const string &oTarget, bool bSet, bool &bEnable)
 {
-    Control *pControl;
+    ControlMapIterator i;
+    int                j;
 
-    pControl = m_oControlMap[oTarget];
-    if (pControl == NULL)
-       return kError_InvalidParam;
+    for(i = m_oControlMap.find(oTarget), j = 0; 
+        j != m_oControlMap.count(oTarget); j++, i++) 
+    {
+         (*i).second->Enable(bSet, bEnable);
+    }        
 
-    return pControl->Enable(bSet, bEnable);
+    return (j == 0) ? kError_InvalidParam : kError_NoErr;
 }
 
 Error Window::ControlShow(const string &oTarget, bool bSet, bool &bShow)
 {
-    Control *pControl;
-    Pos      oPos;
-    Rect     oRect;
-    Error    eRet;
+    Pos                 oPos;
+    Rect                oRect;
+    Error               eRet;
+    Control            *pControl;
+    ControlMapIterator  i;
+    int                 j;
 
-    pControl = m_oControlMap[oTarget];
-    if (pControl == NULL)
-       return kError_InvalidParam;
+    for(i = m_oControlMap.find(oTarget), j = 0; 
+        j != m_oControlMap.count(oTarget); j++, i++) 
+    {
+        pControl = (*i).second;
+        
+        eRet = pControl->Show(bSet, bShow);
 
-    eRet = pControl->Show(bSet, bShow);
+        GetMousePos(oPos);
+        GetWindowPosition(oRect);
+        oPos.x -= oRect.x1;
+        oPos.y -= oRect.y1;
+        if (bSet && bShow && pControl->PosInControl(oPos))
+    	    pControl->AcceptTransition(CT_MouseEnter);
+    }        
 
-    GetMousePos(oPos);
-    GetWindowPosition(oRect);
-    oPos.x -= oRect.x1;
-    oPos.y -= oRect.y1;
-    if (bSet && bShow && pControl->PosInControl(oPos))
-    	pControl->AcceptTransition(CT_MouseEnter);
-
-    return eRet;
+    return (j == 0) ? kError_InvalidParam : kError_NoErr;
 }
 
 Error Window::ControlIntValue(const string &oTarget, bool bSet, int &iValue)
 {
-    Control *pControl;
+    ControlMapIterator  i;
+    int                 j;
 
-    pControl = m_oControlMap[oTarget];
-    if (pControl == NULL)
-       return kError_InvalidParam;
+    for(i = m_oControlMap.find(oTarget), j = 0; 
+        j != m_oControlMap.count(oTarget); j++, i++) 
+    {
+         (*i).second->IntValue(bSet, iValue);
+    }        
 
-    return pControl->IntValue(bSet, iValue);
+    return (j == 0) ? kError_InvalidParam : kError_NoErr;
 }
 
 Error Window::ControlStringValue(const string &oTarget, bool bSet, string &oValue)
 {
-    Control *pControl;
+    ControlMapIterator  i;
+    int                 j;
 
-    pControl = m_oControlMap[oTarget];
-    if (pControl == NULL)
-       return kError_InvalidParam;
+    for(i = m_oControlMap.find(oTarget), j = 0; 
+        j != m_oControlMap.count(oTarget); j++, i++) 
+    {
+         (*i).second->StringValue(bSet, oValue);
+    }        
 
-    return pControl->StringValue(bSet, oValue);
+    return (j == 0) ? kError_InvalidParam : kError_NoErr;
 }
 
 Error Window::ControlGetDesc(const string &oTarget, string &oDesc)
 {
-    Control *pControl;
+    ControlMapIterator  i;
+    int                 j;
 
-    pControl = m_oControlMap[oTarget];
-    if (pControl == NULL)
-       return kError_InvalidParam;
+    for(i = m_oControlMap.find(oTarget), j = 0; 
+        j != m_oControlMap.count(oTarget); j++, i++) 
+    {
+         (*i).second->GetDesc(oDesc);
+         return kError_NoErr;
+    }        
 
-    pControl->GetDesc(oDesc);
-    
-    return kError_NoErr;
+    return kError_InvalidParam;
 }
 
 Error Window::ControlGetTip(const string &oTarget, string &oTip)
 {
-    Control *pControl;
+    ControlMapIterator  i;
+    int                 j;
 
-    pControl = m_oControlMap[oTarget];
-    if (pControl == NULL)
-       return kError_InvalidParam;
+    for(i = m_oControlMap.find(oTarget), j = 0; 
+        j != m_oControlMap.count(oTarget); j++, i++) 
+    {
+         (*i).second->GetTip(oTip);
+         return kError_NoErr;
+    }        
 
-    pControl->GetTip(oTip);
-    
-    return kError_NoErr;
+    return kError_InvalidParam;
 }
 
 Error Window::SendControlMessage(Control *pControl, 

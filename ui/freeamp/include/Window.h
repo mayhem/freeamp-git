@@ -44,8 +44,8 @@ using namespace std;
 #include "semaphore.h"
 #include "mutex.h"
 
-typedef map<string, Control *> ControlMap;
-typedef map<string, Control *>::iterator ControlMapIterator;
+typedef multimap<string, Control *> ControlMap;
+typedef multimap<string, Control *>::iterator ControlMapIterator;
 
 class Theme;
 
