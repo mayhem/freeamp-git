@@ -116,7 +116,7 @@ void submit_metadata(MetaData *pmetaData)
    int    ret;
    char   *args[11];
    char    temp[255];
-   int     i, proxyPort;
+   int     i;
    string  proxyServer;
 
    if (pmetaData == NULL)

@@ -129,11 +129,12 @@ const char *kDefaultWindowMode = "MainWindow";
 #ifdef WIN32
 const char *kDefaultThemeDefaultFont = "Arial";
 const char *kDefaultCDDevicePath = "cdaudio";
+const bool  kDefaultCheckCDAutomatically = true;
 #else
 const char *kDefaultThemeDefaultFont = "Helvetica";
 const char *kDefaultCDDevicePath = "/dev/cdrom";
-#endif
 const bool  kDefaultCheckCDAutomatically = false;
+#endif
 const char *kDefaultDownloadManagerUI = "download.ui";
 const char *kDefaultMusicBrowserUI = "musicbrowser.ui";
 const char *kDefaultToolbarUI = "toolbar.ui";

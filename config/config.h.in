@@ -71,7 +71,7 @@ ____________________________________________________________________________*/
 #undef HAVE_FREETYPE_H
 #undef HAVE_FREETYPE
 #undef HAVE_LIBVORBIS 
-#undef HAVE_ID3V2
+#undef HAVE_ZLIB
 
 #undef USING_GDKPIXBUF
 

@@ -632,18 +632,6 @@ if test "$curses" != ""; then
 	AC_SUBST(CURSES)
 fi
 
-AC_CHECK_LIB(id3, ID3Tag_HasTagType, 
-   [ AC_DEFINE(HAVE_ID3V2) 
-     ID3LIB="-lid3" 
-     AC_SUBST(ID3LIB)
-   ],
-   [ echo ""
-     echo "id3lib not found. id3 support will be read-only."
-     echo "For full ID3v2 support download and install the id3lib from"
-     echo "    http://id3lib.sourceforge.net/"
-     echo ""
-   ])
-
 dnl ****
 dnl Check for alsa
 dnl ****
@@ -738,6 +726,14 @@ dnl  OSDEPPLUGINS="$OSDEPPLUGINS plugins/vorbis.lmc";
 dnl  OSINC="$OSINC -I$srcdir/lmc/vorbis/include"
 dnl  AC_MSG_RESULT([compiling vorbis codec plugin])
 dnl )
+
+ID3_LIBS=""
+AC_CHECK_LIB(z, uncompress,
+  ID3_LIBS=-lz
+  AC_MSG_RESULT([compiling id3lib with zlib])
+  AC_DEFINE(HAVE_ZLIB)
+)
+AC_SUBST(ID3_LIBS)
 
 ARTS_LIBS=""
 AC_CHECK_LIB(artsc, arts_init, 

@@ -37,16 +37,12 @@ ____________________________________________________________________________*/
 #include <strings.h>
 #endif
 
-#include "config.h"
+#include "id3config.h"
 #include "errors.h"
 #include "utility.h"
 #include "debug.h"
 
-
-#ifdef HAVE_ID3V2
-#include <id3.h>
-#endif
-
+#include "id3.h"
 #include "id3v2.h"
 
 const int iDataFieldLen = 1024;
