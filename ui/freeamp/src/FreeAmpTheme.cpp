@@ -1202,13 +1202,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
    if (oControlName == string("BitziLookup") && eMesg == CM_Pressed)
    {
        if (m_oFileName.length() == 0)
-       {
-          MessageDialog oBox(m_pContext);
-  
-          oBox.Show("A song must be loaded in order to look it up.", 
-                     string(BRANDING), kMessageOk);
           return kError_NoErr;
-       }
            
        m_pContext->target->AcceptEvent(new 
                    BitziLookupEvent(m_oFileName));
