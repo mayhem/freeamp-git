@@ -845,7 +845,7 @@ void FreeAmpUI::SeekDialFunction(void *p, int32 c,int32 x,int32 y) {
 	    pMe->m_lcdWindow->SetCurrentTime(h,m,s);
 	    pMe->m_lcdWindow->SetDisplayState( pMe->m_oldLcdState);
 	    pMe->m_playerEQ->AcceptEvent(new ChangePositionEvent( pMe->m_seekSeconds / pMe->m_secondsPerFrame ));
-	    cout << "Changed position to" << pMe->m_seekSeconds / pMe->m_secondsPerFrame << endl;
+	    //cout << "Changed position to" << pMe->m_seekSeconds / pMe->m_secondsPerFrame << endl;
 	    break; }
 	case 1: {
 	    pMe->m_seekDelta = 0;
