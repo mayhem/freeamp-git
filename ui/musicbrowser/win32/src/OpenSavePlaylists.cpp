@@ -59,12 +59,12 @@ void MusicBrowserUI::SavePlaylist(void)
         return;
     }
   
-    char   url[MAX_PATH];
-    uint32 len = MAX_PATH;
+    //char   url[MAX_PATH];
+    //uint32 len = MAX_PATH;
     
-    FilePathToURL(m_currentListName.c_str(), url, &len);
+    //FilePathToURL(m_currentListName.c_str(), url, &len);
 
-    if(IsError(m_oPlm->WritePlaylist(url)))
+    if(IsError(m_oPlm->WritePlaylist(m_currentListName.c_str())))
     {
        MessageBox(m_hWnd, "Cannot save playlist to disk. Make sure there "
                           "is room on the drive or that the directory is "

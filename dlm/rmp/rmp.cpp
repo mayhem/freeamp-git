@@ -204,6 +204,11 @@ Error RMP::PCData(string &oData)
     	m_pMetaData->SetYear(atoi(oData.c_str()));
         return kError_NoErr;
     }
+    if (m_oPath == string("/PACKAGE/TRACKLIST/TRACK/DURATION"))
+    {
+    	m_pMetaData->SetTime(atoi(oData.c_str()));
+        return kError_NoErr;
+    }
         
 	return kError_NoErr;
 }
