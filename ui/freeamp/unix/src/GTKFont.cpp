@@ -243,7 +243,7 @@ Error GTKFont::Load(int iFontHeight, bool bBold, bool bItalic)
                 if (!gfont) {
                     gfont = gdk_font_load("variable");  
                     if (!gfont) {
-                        gfont = gdk_font_load("default");
+                        gfont = gdk_font_load("fixed");
                         if (!gfont) {
                             gdk_threads_leave();
                             cout << "oops, couldn't load _any_ fonts...\n";
