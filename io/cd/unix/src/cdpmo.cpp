@@ -83,33 +83,32 @@ CDPMO::~CDPMO()
    cd_finish(m_cdDesc);
 }
 
-void CDPMO::SetVolume(int32 v)
+void CDPMO::SetVolume(int32 left, int32 right)
 {
     if (m_cdDesc != -1)
     {
-        v = (int32)(((double)v / (double)100) * (double)255);
+        left = (int32)(((double)left / (double)100) * (double)255);
+        right = (int32)(((double)right / (double)100) * (double)255);
         struct disc_volume vol;
 
-        vol.vol_front.left = vol.vol_front.right = v;
-        vol.vol_back.left = vol.vol_back.right = v;
+        vol.vol_front.left = left;
+        vol.vol_back.right = right;
 
         cd_set_volume(m_cdDesc, vol);
     }
 }
 
-int32 CDPMO::GetVolume()
+void CDPMO::GetVolume(int32 &left, int32 &right)
 {
-    int32 volume = 0;
+    left = right = -1;
     if (m_cdDesc != -1)
     {
         struct disc_volume vol;
       
         cd_get_volume(m_cdDesc, &vol);
-        volume = (vol.vol_front.left + vol.vol_front.right) / 2; 
-
-        volume = (int32)(((double)volume / (double)255) * 100);
+        left = (int32)(((double)vol.vol_front.left / (double)255) * 100);
+        right = (int32)(((double)vol.vol_front.right / (double)255) * 100);
     }
-    return volume;
 } 
 
 Error CDPMO::SetTo(const char *url)
