@@ -170,20 +170,16 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
 
     o = mb_New();
 
-printf("%s:%d\n", __FILE__, __LINE__);
-
     // Calculate the bitzi bitprint for this file.
     len = MAX_PATH;
     URLToFilePath((char *)pmetaData->Filename().c_str(), file, &len);
     mb_CalculateBitprint(o, file, &info);
-printf("%s:%d\n", __FILE__, __LINE__);
 
     mb_UseUTF8(o, 0);
     mb_SetServer(o, hostname, port);
     if (m_strProxyAddr.size() > 7)
         mb_SetProxy(o, (char *)m_strProxyAddr.c_str(), m_nProxyPort);
 
-printf("%s:%d\n", __FILE__, __LINE__);
     uuid_ascii((unsigned char*)pmetaData->GUID().c_str(), guid);
 
     string guidMapping = m_profilePath + string(DIR_MARKER_STR) +
@@ -194,7 +190,6 @@ printf("%s:%d\n", __FILE__, __LINE__);
                                      guid);
     fclose(guidLogfile);
 
-printf("%s:%d\n", __FILE__, __LINE__);
     args[0] = strdup(pmetaData->Title().c_str());
     args[1] = strdup(guid);
     args[2] = strdup(pmetaData->Filename().c_str());
@@ -212,26 +207,32 @@ printf("%s:%d\n", __FILE__, __LINE__);
     // These are the bitzi bitpint metadata
     args[10] = strdup(info.bitprint);
     args[11] = strdup(info.first20);
-    args[12] = strdup(info.audioSha1);
     sprintf(temp, "%d", info.length);
-    args[13] = strdup(temp);
-    sprintf(temp, "%d", info.duration);
-    args[14] = strdup(temp);
-    sprintf(temp, "%d", info.samplerate);
-    args[15] = strdup(temp);
-    sprintf(temp, "%d", info.bitrate);
-    args[16] = strdup(temp);
-    sprintf(temp, "%d", info.stereo);
-    args[17] = strdup(temp);
-    sprintf(temp, "%d", info.vbr);
-    args[18] = strdup(temp);
-    args[19] = NULL;
+    args[12] = strdup(temp);
 
-printf("%s:%d\n", __FILE__, __LINE__);
+    if (info.audioSha1)
+    {
+        args[13] = strdup(info.audioSha1);
+        sprintf(temp, "%d", info.duration);
+        args[14] = strdup(temp);
+        sprintf(temp, "%d", info.samplerate);
+        args[15] = strdup(temp);
+        sprintf(temp, "%d", info.bitrate);
+        args[16] = strdup(temp);
+        sprintf(temp, "%d", info.stereo);
+        args[17] = strdup(temp);
+        sprintf(temp, "%d", info.vbr);
+        args[18] = strdup(temp);
+        args[19] = NULL;
+    }
+    else
+    {
+        args[13] = NULL;
+    }
+
     ret = mb_QueryWithArgs(o, MB_ExchangeMetadata, args);
-    for(i = 0; i < 10; i++)
+    for(i = 0; i < 11; i++)
        free(args[i]);
-printf("%s:%d\n", __FILE__, __LINE__);
 
     if (!ret)
     {
