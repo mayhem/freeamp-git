@@ -311,9 +311,7 @@ __asm {
 	push ebp
 	sub esp,L_locals
 
-;	lea ecx,coef32-128	; coef = coef32 - (32 * 4)
-	lea ecx,coef32
-	sub ecx,128		; coef = coef32 - (32 * 4)
+	lea ecx,coef32-128	; coef = coef32 - (32 * 4)
 	mov DWORD PTR [esp+4],1		; m = 1
 	mov ebp,16		; n = 32 / 2
 

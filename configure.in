@@ -342,11 +342,3 @@ AC_OUTPUT(Makefile base/Makefile base/src/Makefile io/Makefile
 	  ui/irman/Makefile ui/irman/src/Makefile
 )
 
-
-
-
-
-
-
-
-

@@ -77,6 +77,8 @@ PLUGIN_DIR = @top_srcdir@/plugins/
 PLUGIN_NAME = xingmp3-@host_os@.lmc
 PLUGIN_FULL_NAME = $(PLUGIN_DIR)$(PLUGIN_NAME)
 
+GAS2INTEL = @top_srcdir@/util/gas2intel
+
 @AM_HAVE_WIN32_TRUE@C_FILES =
 @AM_HAVE_WIN32_TRUE@ASM_FILES =
 @AM_HAVE_WIN32_TRUE@ASM_DEFS =
@@ -353,6 +355,12 @@ include @top_srcdir@/config/Makefile.header
 @AM_HAVE_WIN32_FALSE@	@mkdir -p @top_srcdir@/plugins
 @AM_HAVE_WIN32_FALSE@	gcc -shared -Wl,-soname,$(PLUGIN_NAME) -o $(PLUGIN_FULL_NAME) $(libfalmc_a_OBJECTS)
 @AM_HAVE_WIN32_FALSE@	@chmod 644 $(PLUGIN_FULL_NAME)
+
+@AM_HAVE_WIN32_FALSE@x86intel.asm: x86gas.s $(GAS2INTEL)
+@AM_HAVE_WIN32_FALSE@	$(GAS2INTEL) $< > $@
+
+@AM_HAVE_WIN32_FALSE@x86intel.c: x86gas.s $(GAS2INTEL)
+@AM_HAVE_WIN32_FALSE@	$(GAS2INTEL) -i $< > $@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -25,23 +25,45 @@
 
 #%% extern wincoef,dword
 #%% extern coef32,dword
+#%% ! extern float wincoef[264];
+#%% ! extern float coef32[31];
+
+.equ L_tmp,	0
+#%!.equ L_pcm,	4
+#%% if-not-inline
+.equ L_vbuf,	24
+.equ L_vb_ptr,	28
+.equ L_pcm,	32
 
 .globl window_dual
 	.align 16
+#%% end-not-inline
+#%% ! void window_dual(float *vbuf, int vb_ptr, short *pcm)
+#%% ! {
 window_dual:	#%% proc
+#%% if-not-inline
 	pushl %ebp
 	pushl %edi
 	pushl %esi
 	pushl %ebx
 	subl $4,%esp
 
-	movl 28(%esp),%esi
-	movl $wincoef,%ecx	# coef = wincoef
-	addl $16,%esi		# si = vb_ptr + 16
+	movl L_vb_ptr(%esp),%esi
+	movl L_vbuf(%esp),%edi
+#%% end-not-inline
+
+#%!	movl vb_ptr,%esi
+#%!	movl vbuf,%edi
+#%!	movl pcm,%ecx
+#%!	pushl %ebp
+#%!	subl $8,%esp
+#%!	movl %ecx,L_pcm(%esp)
+
 	movl $511,%ebp		# ebp = 511
+	leal wincoef,%ecx	# coef = wincoef
+	addl $16,%esi		# si = vb_ptr + 16
 	movl %esi,%ebx
 	addl $32,%ebx
-	movl 24(%esp),%edi	# Load vbuf
 	andl %ebp,%ebx		# bx = (si + 32) & 511
 
 # First 16
@@ -71,9 +93,9 @@ window_dual:	#%% proc
 	decb %dl		# --j
 	jg .FirstInner		# Jump back if j > 0
 
-	fistpl (%esp)		# tmp = (long) round (sum)
+	fistpl L_tmp(%esp)	# tmp = (long) round (sum)
 	incl %esi		# si++
-	movl (%esp),%eax
+	movl L_tmp(%esp),%eax
 	decl %ebx		# bx--
 	movl %eax,%ebp
 	sarl $15,%eax
@@ -85,11 +107,11 @@ window_dual:	#%% proc
 	movl $32767,%ebp
 	xorl %eax,%ebp
 .FirstInRange:
-	movl 32(%esp),%eax
+	movl L_pcm(%esp),%eax
 	movw %bp,(%eax)		# Store sample in *pcm
 	addl $4,%eax		# Increment pcm
 	movl $511,%ebp		# Reload ebp with 511
-	movl %eax,32(%esp)
+	movl %eax,L_pcm(%esp)
 
 	decb %dh		# --i
 	jg .FirstOuter		# Jump back if i > 0
@@ -112,9 +134,9 @@ window_dual:	#%% proc
 	decb %dl		# --j
 	jg .SpecialInner	# Jump back if j > 0
 
-	fistpl (%esp)		# tmp = (long) round (sum)
+	fistpl L_tmp(%esp)	# tmp = (long) round (sum)
 	decl %esi		# si--
-	movl (%esp),%eax
+	movl L_tmp(%esp),%eax
 	incl %ebx		# bx++
 	movl %eax,%ebp
 	sarl $15,%eax
@@ -126,12 +148,12 @@ window_dual:	#%% proc
 	movl $32767,%ebp
 	xorl %eax,%ebp
 .SpecialInRange:
-	movl 32(%esp),%eax
+	movl L_pcm(%esp),%eax
 	subl $36,%ecx		# Readjust coef pointer for last round
 	movw %bp,(%eax)		# Store sample in *pcm
 	addl $4,%eax		# Increment pcm
 	movl $511,%ebp		# Reload ebp with 511
-	movl %eax,32(%esp)
+	movl %eax,L_pcm(%esp)
 
 
 # Last 15
@@ -161,9 +183,9 @@ window_dual:	#%% proc
 	decb %dl		# --j
 	jg .LastInner		# Jump back if j > 0
 
-	fistpl (%esp)		# tmp = (long) round (sum)
+	fistpl L_tmp(%esp)	# tmp = (long) round (sum)
 	decl %esi		# si--
-	movl (%esp),%eax
+	movl L_tmp(%esp),%eax
 	incl %ebx		# bx++
 	movl %eax,%ebp
 	sarl $15,%eax
@@ -175,15 +197,19 @@ window_dual:	#%% proc
 	movl $32767,%ebp
 	xorl %eax,%ebp
 .LastInRange:
-	movl 32(%esp),%eax
+	movl L_pcm(%esp),%eax
 	movw %bp,(%eax)		# Store sample in *pcm
 	addl $4,%eax		# Increment pcm
 	movl $511,%ebp		# Reload ebp with 511
-	movl %eax,32(%esp)
+	movl %eax,L_pcm(%esp)
 
 	decb %dh		# --i
 	jg .LastOuter		# Jump back if i > 0
 
+#%!	addl $8,%esp
+#%!	popl %ebp
+
+#%% if-not-inline
 # Restore regs and return
 	addl $4,%esp	
 	popl %ebx
@@ -191,38 +217,67 @@ window_dual:	#%% proc
 	popl %edi
 	popl %ebp
 	ret
+#%% end-not-inline
 #%% endp
+#%% ! }
+
+#---------------------------------------------------------------------------
+
+.equ L_mi,	0
+.equ L_m,	4
+.equ L_dummy,	8
+#%!.equ L_in,	12
+#%!.equ L_out,	16
+#%!.equ L_buf,	20	# Temporary buffer
+#%!.equ L_locals, 148	# Bytes used for locals
+#%% if-not-inline
+.equ L_buf,	12	# Temporary buffer
+.equ L_in,	160
+.equ L_out,	164
+.equ L_locals,	140	# Bytes used for locals
 
 .globl fdct32
 	.align 16
+#%% end-not-inline
+#%% ! void fdct32(float in[], float out[])
+#%% ! {
 fdct32:		#%% proc
+#%% if-not-inline
 	pushl %ebp
 	pushl %edi
 	pushl %esi
 	pushl %ebx
-	subl $140,%esp
-	movl $coef32-128,%ecx	# coef = coef32 - (32 * 4)
+	subl $L_locals,%esp
+
+	movl L_in(%esp),%edi	# edi = x
+	movl L_out(%esp),%esi	# esi = f
+#%% end-not-inline
+
+#%!	movl in,%edi		# edi = x
+#%!	movl out,%esi		# esi = f
+#%!	pushl %ebp
+#%!	subl $L_locals,%esp
+
+	leal coef32-128,%ecx	# coef = coef32 - (32 * 4)
 	movl $1,4(%esp)		# m = 1
 	movl $16,%ebp		# n = 32 / 2
 	
-	movl 160(%esp),%edi	# edi = x
-	movl 164(%esp),%esi	# esi = f
-	leal 12(%esp),%ebx
-	movl %ebx,164(%esp)	# From now on, use temp buf instead of orig x
+	leal L_buf(%esp),%ebx
+	movl %ebx,L_out(%esp)	# From now on, use temp buf instead of orig x
 	jmp .ForwardLoopStart
 
 	.align 4
 .ForwardOuterLoop:
-	movl 160(%esp),%edi	# edi = x
-	movl 164(%esp),%esi	# esi = f
-	movl %edi,164(%esp)	# Exchange mem versions of f/x for next iter
+	movl L_in(%esp),%edi	# edi = x
+	movl L_out(%esp),%esi	# esi = f
+	movl %edi,L_out(%esp)	# Exchange mem versions of f/x for next iter
 .ForwardLoopStart:
-	movl %esi,160(%esp)
-	movl 4(%esp),%ebx	# ebx = m (temporarily)
-	movl %ebx,0(%esp)	# mi = m
+	movl %esi,L_in(%esp)
+	movl L_m(%esp),%ebx	# ebx = m (temporarily)
+	movl %ebx,L_mi(%esp)	# mi = m
 	sall $1,%ebx		# Double m for next iter
 	leal (%ecx,%ebp,8),%ecx	# coef += n * 8
-	movl %ebx,4(%esp)	# Store doubled m
+	movl %ebx,L_m(%esp)	# Store doubled m
 	leal (%esi,%ebp,4),%ebx	# ebx = f2 = f + n * 4
 	sall $3,%ebp		# n *= 8
 
@@ -266,7 +321,7 @@ fdct32:		#%% proc
 	addl %ebp,%esi		# f += n
 	addl %ebp,%ebx		# f2 += n
 	addl %ebp,%edi		# x += n
-	decl 0(%esp)		# mi--
+	decl L_mi(%esp)		# mi--
 	jg .ForwardMiddleLoop	# Jump back if mi > 0
 
 	sarl $4,%ebp		# n /= 16
@@ -279,13 +334,13 @@ fdct32:		#%% proc
 
 	.align 4
 .BackOuterLoop:
-	movl 164(%esp),%esi	# esi = f
-	movl %ebx,0(%esp)	# mi = m
-	movl 160(%esp),%edi	# edi = x
-	movl %ebx,4(%esp)	# Store m
-	movl %esi,160(%esp)	# Exchange mem versions of f/x for next iter
+	movl L_out(%esp),%esi	# esi = f
+	movl %ebx,L_mi(%esp)	# mi = m
+	movl L_in(%esp),%edi	# edi = x
+	movl %ebx,L_m(%esp)	# Store m
+	movl %esi,L_in(%esp)	# Exchange mem versions of f/x for next iter
 	movl %edi,%ebx
-	movl %edi,164(%esp)
+	movl %edi,L_out(%esp)
 	subl %ebp,%ebx		# ebx = x2 = x - n
 	sall $1,%ebp		# n *= 2
 
@@ -303,30 +358,36 @@ fdct32:		#%% proc
 	movl (%ebx,%eax),%ecx
 	movl %ecx,(%esi,%edx)	# f[p] = x2[q]
 	flds (%edi,%eax)	# push x[q]
-	fadd
+	fadd %st,%st(1)
 	fxch
 	fstps 4(%esi,%edx)	# f[p + 4] = x[q] + x[q + 4]
 	subl $4,%eax		# q -= 4
 	subl $8,%edx		# p -= 8
 	jge .BackInnerLoop	# Jump back if p >= 0
 
-	fstps 8(%esp)		# Pop (XXX is there a better way to do this?)
+	fstps L_dummy(%esp)	# Pop (XXX is there a better way to do this?)
 	addl %ebp,%esi		# f += n
 	addl %ebp,%ebx		# x2 += n
 	addl %ebp,%edi		# x += n
-	decl 0(%esp)		# mi--
+	decl L_mi(%esp)		# mi--
 	jg .BackMiddleLoop	# Jump back if mi > 0
 
-	movl 4(%esp),%ebx	# ebx = m (temporarily)
+	movl L_m(%esp),%ebx	# ebx = m (temporarily)
 	sarl $1,%ebx		# Halve m for next iter
 	jg .BackOuterLoop	# Jump back if m > 0
 
+#%!	addl $L_locals,%esp
+#%!	popl %ebp
 
-	addl $140,%esp
+#%% if-not-inline
+# Restore regs and return
+	addl $L_locals,%esp
 	popl %ebx
 	popl %esi
 	popl %edi
 	popl %ebp
 	ret
+#%% end-not-inline
 #%% endp
+#%% ! }
 

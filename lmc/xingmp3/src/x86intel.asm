@@ -330,9 +330,7 @@ _fdct32 proc near
 	mov esi,DWORD PTR [esp+L_out]	; esi = f
 
 
-;	lea ecx,_coef32-128	; coef = coef32 - (32 * 4)
-	lea ecx,_coef32
-	sub ecx,128		; coef = coef32 - (32 * 4)
+	lea ecx,_coef32-128	; coef = coef32 - (32 * 4)
 	mov DWORD PTR [esp+4],1		; m = 1
 	mov ebp,16		; n = 32 / 2
 

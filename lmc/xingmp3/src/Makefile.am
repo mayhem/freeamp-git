@@ -28,6 +28,8 @@ PLUGIN_DIR = @top_srcdir@/plugins/
 PLUGIN_NAME = xingmp3-@host_os@.lmc
 PLUGIN_FULL_NAME = $(PLUGIN_DIR)$(PLUGIN_NAME)
 
+GAS2INTEL = @top_srcdir@/util/gas2intel
+
 if AM_HAVE_WIN32
 C_FILES =
 ASM_FILES =
@@ -58,6 +60,12 @@ $(PLUGIN_FULL_NAME) : $(libfalmc_a_OBJECTS)
 	@mkdir -p @top_srcdir@/plugins
 	gcc -shared -Wl,-soname,$(PLUGIN_NAME) -o $(PLUGIN_FULL_NAME) $(libfalmc_a_OBJECTS)
 	@chmod 644 $(PLUGIN_FULL_NAME)
+
+x86intel.asm: x86gas.s $(GAS2INTEL)
+	$(GAS2INTEL) $< > $@
+
+x86intel.c: x86gas.s $(GAS2INTEL)
+	$(GAS2INTEL) -i $< > $@
 
 endif
 
