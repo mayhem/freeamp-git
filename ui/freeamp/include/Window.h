@@ -84,7 +84,7 @@ class Window
       virtual void  HandleMouseMove(Pos &oPos);
       virtual void  HandleMouseLButtonDown(Pos &oPos);
       virtual void  HandleMouseLButtonUp(Pos &oPos);
-	   virtual void  MouseHasLeftWindow(void);
+	  virtual void  MouseHasLeftWindow(void);
 
       virtual Error StartMouseCapture(Control *);
       virtual Error EndMouseCapture(void);
@@ -113,6 +113,7 @@ class Window
       virtual Error Restore(void) = 0;
 	  virtual bool  LButtonDown(void) = 0;
 	  virtual Error GetDesktopSize(int32 &iX, int32 &iY) = 0;
+      virtual void  BringWindowToFront(void) = 0;
       
       // Mouse position is in screen coordinates
       virtual Error SetMousePos(Pos &oMousePos) = 0;

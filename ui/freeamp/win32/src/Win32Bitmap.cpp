@@ -21,13 +21,15 @@
    $Id$
 ____________________________________________________________________________*/ 
 
+#include <assert.h>
 #include "string"
 #include "Win32Bitmap.h"
 #include "debug.h"
 
+#define DB Debug_v("%s:%d\n", __FILE__, __LINE__);
 
 Win32Bitmap::Win32Bitmap(const string &oName)
-          :Bitmap(oName)
+            :Bitmap(oName)
 {
    m_oBitmapName = oName;
    m_hBitmap = NULL;
@@ -39,25 +41,31 @@ Win32Bitmap::Win32Bitmap(int iWidth, int iHeight, const string &oName)
            :Bitmap(oName)
 {
    HDC hDc;
-   BITMAPINFO sInfo;
+
+   m_iHeight = iHeight;
+   m_iWidth = iWidth;
    
-   sInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER); 
-   sInfo.bmiHeader.biWidth = iWidth; 
-   sInfo.bmiHeader.biHeight = iHeight; 
-   sInfo.bmiHeader.biPlanes = 1; 
-   sInfo.bmiHeader.biBitCount = 24;
-   sInfo.bmiHeader.biCompression = BI_RGB; 
-   sInfo.bmiHeader.biSizeImage = 0; 
-   sInfo.bmiHeader.biXPelsPerMeter = 0; 
-   sInfo.bmiHeader.biYPelsPerMeter = 0; 
-   sInfo.bmiHeader.biClrUsed = 0; 
-   sInfo.bmiHeader.biClrImportant = 0; 
+   m_sBitmapInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER); 
+   m_sBitmapInfo.bmiHeader.biWidth = iWidth; 
+   m_sBitmapInfo.bmiHeader.biHeight = iHeight; 
+   m_sBitmapInfo.bmiHeader.biPlanes = 1; 
+   m_sBitmapInfo.bmiHeader.biBitCount = 24;
+   m_sBitmapInfo.bmiHeader.biCompression = BI_RGB; 
+   m_sBitmapInfo.bmiHeader.biSizeImage = 0; 
+   m_sBitmapInfo.bmiHeader.biXPelsPerMeter = 0; 
+   m_sBitmapInfo.bmiHeader.biYPelsPerMeter = 0; 
+   m_sBitmapInfo.bmiHeader.biClrUsed = 0; 
+   m_sBitmapInfo.bmiHeader.biClrImportant = 0; 
    
    hDc = GetDC(NULL);
-   m_hBitmap = CreateDIBSection(hDc, &sInfo, DIB_RGB_COLORS, 
+   m_hBitmap = CreateDIBSection(hDc, &m_sBitmapInfo, DIB_RGB_COLORS, 
                                 &m_pBitmapData, NULL, NULL);
    ReleaseDC(NULL, hDc);
    m_hMaskBitmap = NULL;
+   
+   m_iBytesPerLine = iWidth * 3;
+   if (m_iBytesPerLine % 4)
+      m_iBytesPerLine += 4 - (m_iBytesPerLine % 4);
 }
 
 Win32Bitmap::~Win32Bitmap(void)
@@ -76,16 +84,85 @@ Win32Bitmap::~Win32Bitmap(void)
 
 Error Win32Bitmap::LoadBitmapFromDisk(string &oFile)
 {
+   DIBSECTION sSection;
+   
    m_hBitmap = (HBITMAP)LoadImage(NULL, oFile.c_str(), IMAGE_BITMAP,
                                   0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
    if (m_hBitmap == NULL)
-   	   return kError_LoadBitmapFailed;
+           return kError_LoadBitmapFailed;
+
+   GetObject(m_hBitmap, sizeof(DIBSECTION), (LPSTR)&sSection);
+   memcpy(&m_sBitmapInfo, &sSection.dsBmih, sizeof(BITMAPINFOHEADER));
+   
+   assert(m_sBitmapInfo.bmiHeader.biBitCount == 24);
+   m_iBytesPerLine = m_sBitmapInfo.bmiHeader.biWidth * 3;
+   m_iHeight = m_sBitmapInfo.bmiHeader.biHeight;
+   m_iWidth = m_sBitmapInfo.bmiHeader.biWidth;
+   m_pBitmapData = sSection.dsBm.bmBits;
+
+   if (m_iBytesPerLine % 4)
+      m_iBytesPerLine += 4 - (m_iBytesPerLine % 4);
 
    if (m_bHasTransColor)
       CreateMaskBitmap();
 
    return kError_NoErr;
 }
+
+#if 0
+Error Win32Bitmap::LoadBitmapFromDisk(string &oFile)
+{
+   BITMAPFILEHEADER sFile;
+   FILE             *fp;
+   int32            iSize;
+
+   fp = fopen(oFile.c_str(), "rb");
+   if (fp == NULL)
+   	   return kError_FileNotFound;
+       
+   if (fread(&sFile, 1, sizeof(BITMAPFILEHEADER), fp) != 
+       sizeof(BITMAPFILEHEADER))
+   {
+       fclose(fp);
+   	   return kError_LoadBitmapFailed;
+   }    
+    
+   if (fread(&m_sBitmapInfo, 1, sizeof(BITMAPINFO), fp) != 
+       sizeof(BITMAPINFO))
+   {
+       fclose(fp);
+   	   return kError_LoadBitmapFailed;
+   }    
+
+   assert(m_sBitmapInfo.bmiHeader.biBitCount == 24);
+   m_iBytesPerLine = m_sBitmapInfo.bmiHeader.biWidth * 3;
+   m_iHeight = m_sBitmapInfo.bmiHeader.biHeight;
+   m_iWidth = m_sBitmapInfo.bmiHeader.biWidth;
+
+   if (m_iBytesPerLine % 4)
+      m_iBytesPerLine += 4 - (m_iBytesPerLine % 4);
+   iSize = m_iBytesPerLine * m_iHeight;
+
+   m_hBitmap = CreateDIBSection(NULL, &m_sBitmapInfo, DIB_RGB_COLORS, 
+                                &m_pBitmapData, NULL, NULL);
+   
+   fseek(fp, sFile.bfOffBits, SEEK_SET);
+   if (fread(m_pBitmapData, 1, iSize, fp) != iSize)
+   {
+       fclose(fp);
+       DeleteObject(m_hBitmap);
+       m_hBitmap = NULL;
+   	   return kError_LoadBitmapFailed;
+   }    
+   
+   fclose(fp);
+
+   if (m_bHasTransColor)
+      CreateMaskBitmap();
+
+   return kError_NoErr;
+}
+#endif
 
 HBITMAP Win32Bitmap::GetBitmapHandle(void)
 {
@@ -218,7 +295,7 @@ Error Win32Bitmap::BlitRect(Bitmap *pOther, Rect &oSrcRect,
  
    if (pSrcBitmap->m_hBitmap == NULL)
       return kError_UnknownErr;
-   
+
    hRootDC = GetDC(NULL);
    hSrcDC = CreateCompatibleDC(hRootDC);
    hDestDC = CreateCompatibleDC(hRootDC);

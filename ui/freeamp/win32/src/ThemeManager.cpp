@@ -155,12 +155,13 @@ Error ThemeManager::UseTheme(string &oThemeFile)
        return kError_NoErr;
     }   
 
+
     m_pContext->prefs->SetThemePath((char *)oThemeFile.c_str());
     if (oThemeFile == m_oDevelTheme)
         m_oCurrentTheme = THEME_IN_DEVEL;
     else    
         m_oCurrentTheme = string(dir);
-    
+
     return kError_NoErr;
 }
 

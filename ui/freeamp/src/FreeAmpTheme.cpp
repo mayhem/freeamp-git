@@ -71,6 +71,12 @@ const char *szCantFindHelpError = "Cannot find the help files. Please make "
 const char *szKeepThemeMessage = "Would you like to keep this theme?";
 const int iVolumeChangeIncrement = 10;
 
+struct OptionsArgs
+{
+   FreeAmpTheme *pThis;
+   uint32        uDefaultPage;
+}; 
+
 extern    "C"
 {
    UserInterface *Initialize(FAContext * context)
@@ -97,6 +103,8 @@ FreeAmpTheme::FreeAmpTheme(FAContext * context)
    m_oStreamInfo = string("");
    m_pUpdateMan = NULL;
    m_pUpdateThread = NULL;
+   m_pOptionsThread = NULL;
+   m_bInOptions = false;
 
 #if defined( WIN32 )
     m_pUpdateMan = new Win32UpdateManager(m_pContext);
@@ -115,6 +123,11 @@ FreeAmpTheme::FreeAmpTheme(FAContext * context)
 
 FreeAmpTheme::~FreeAmpTheme()
 {
+    if (m_pOptionsThread)
+    {  
+        delete m_pOptionsThread;
+        m_pOptionsThread = NULL;
+    }
 }
 
 Error FreeAmpTheme::Init(int32 startup_type)
@@ -480,7 +493,7 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
       case INFO_PrefsChanged:
       {
          bool bValue;
-         
+
          ReloadTheme();
 
          m_pContext->prefs->GetStayOnTop(&bValue);
@@ -545,6 +558,12 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
 Error FreeAmpTheme::HandleControlMessage(string &oControlName, 
                                          ControlMessageEnum eMesg)
 {
+   if (m_bInOptions)
+   {
+       m_pWindow->BringWindowToFront();
+       return kError_NoErr;
+   }    
+
    if (eMesg == CM_MouseEnter)
    {
        string oName("Info"), oDesc("");
@@ -1011,23 +1030,6 @@ void FreeAmpTheme::HandleKeystroke(unsigned char cKey)
     }
 }
 
-void FreeAmpTheme::ShowOptions(uint32 defaultPage)
-{
-    PreferenceWindow *pWindow;
-       
-#ifdef WIN32
-    pWindow = new Win32PreferenceWindow(m_pContext, m_pThemeMan, m_pUpdateMan, defaultPage);
-#elif defined(__BEOS__)
-    pWindow = new BeOSPreferenceWindow(m_pContext, m_pThemeMan);
-#else
-    pWindow = new GTKPreferenceWindow(m_pContext, m_pThemeMan, defaultPage); 
-#endif
-
-    pWindow->Show(m_pWindow);
-
-    delete pWindow;
-}
-
 void FreeAmpTheme::UpdateTimeDisplay(int iCurrentSeconds)
 {
     string oText;
@@ -1276,4 +1278,52 @@ void FreeAmpTheme::UpdateThread()
 #endif
 
     delete m_pUpdateThread;
+}
+
+void FreeAmpTheme::ShowOptions(uint32 defaultPage)
+{
+    OptionsArgs oArgs;
+    
+    if (m_bInOptions)
+       return;
+       
+    if (m_pOptionsThread)
+    {  
+        delete m_pOptionsThread;
+        m_pOptionsThread = NULL;
+    }
+
+    oArgs.pThis = this;
+    oArgs.uDefaultPage = defaultPage;
+
+    m_pOptionsThread = Thread::CreateThread();
+    m_pOptionsThread->Create(options_thread, &oArgs);
+}
+
+void FreeAmpTheme::options_thread(void* arg)
+{
+    OptionsArgs *pArgs = (OptionsArgs *)arg;
+    
+    pArgs->pThis->OptionsThread(pArgs->uDefaultPage);
+}
+
+void FreeAmpTheme::OptionsThread(uint32 defaultPage)
+{
+    PreferenceWindow *pWindow;
+
+    m_bInOptions = true;
+       
+#ifdef WIN32
+    pWindow = new Win32PreferenceWindow(m_pContext, m_pThemeMan, m_pUpdateMan, defaultPage);
+#elif defined(__BEOS__)
+    pWindow = new BeOSPreferenceWindow(m_pContext, m_pThemeMan);
+#else
+    pWindow = new GTKPreferenceWindow(m_pContext, m_pThemeMan, defaultPage); 
+#endif
+
+    pWindow->Show(m_pWindow);
+
+    delete pWindow;
+    
+    m_bInOptions = false;
 }

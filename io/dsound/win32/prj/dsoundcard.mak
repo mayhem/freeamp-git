@@ -650,6 +650,7 @@ DEP_CPP_DSOUN=\
 	"..\..\..\..\base\include\queue.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\undomanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
@@ -761,6 +762,7 @@ DEP_CPP_DSOUN=\
 	"..\..\..\..\base\include\queue.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\undomanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
@@ -802,6 +804,7 @@ DEP_CPP_EVENT=\
 	"..\..\..\..\base\include\queue.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\undomanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
@@ -911,6 +914,7 @@ DEP_CPP_EVENT=\
 	"..\..\..\..\base\include\queue.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\undomanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
@@ -937,6 +941,7 @@ SOURCE=..\..\..\src\pipeline.cpp
 !IF  "$(CFG)" == "dsoundcard - Win32 Release"
 
 DEP_CPP_PIPEL=\
+	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
@@ -952,6 +957,7 @@ DEP_CPP_PIPEL=\
 	"..\..\..\..\base\include\queue.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\undomanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
@@ -973,6 +979,7 @@ DEP_CPP_PIPEL=\
 !ELSEIF  "$(CFG)" == "dsoundcard - Win32 Debug"
 
 DEP_CPP_PIPEL=\
+	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
@@ -1009,6 +1016,7 @@ DEP_CPP_PIPEL=\
 !ELSEIF  "$(CFG)" == "dsoundcard - Win32 NASM Debug"
 
 DEP_CPP_PIPEL=\
+	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
@@ -1045,6 +1053,7 @@ DEP_CPP_PIPEL=\
 !ELSEIF  "$(CFG)" == "dsoundcard - Win32 NASM Release"
 
 DEP_CPP_PIPEL=\
+	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
@@ -1060,6 +1069,7 @@ DEP_CPP_PIPEL=\
 	"..\..\..\..\base\include\queue.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\undomanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
@@ -1101,6 +1111,7 @@ DEP_CPP_PMO_C=\
 	"..\..\..\..\base\include\queue.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\undomanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
@@ -1212,6 +1223,7 @@ DEP_CPP_PMO_C=\
 	"..\..\..\..\base\include\queue.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\undomanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\

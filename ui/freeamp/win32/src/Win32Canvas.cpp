@@ -243,7 +243,7 @@ Error Win32Canvas::MaskBlitRect(Bitmap *pSrcBitmap, Rect &oSrcRect, Rect &oDestR
    return m_pBufferBitmap->MaskBlitRect(pSrcBitmap, oSrcRect, oDestRect);
 }
 
-static int iPaintCount = 0;
+//static int iPaintCount = 0;
 
 void Win32Canvas::Paint(HDC hDC, Rect &oRect)
 {
@@ -269,7 +269,7 @@ void Win32Canvas::Paint(HDC hDC, Rect &oRect)
 //   if (iPaintCount++ == 0)
 //      m_pBufferBitmap->SaveBitmap("c:\\temp\\out.bmp");
 
-   DeleteDC(hMemDC);       
+   DeleteDC(hMemDC);  
 }
 
 void Win32Canvas::Erase(Rect &oRect)

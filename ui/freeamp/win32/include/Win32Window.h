@@ -62,6 +62,7 @@ class Win32Window : public Window
      virtual Error Restore(void);
      virtual bool  LButtonDown(void);
      virtual Error GetDesktopSize(int32 &iX, int32 &iY);
+     virtual void  BringWindowToFront(void);
 
 	 virtual HWND  GetWindowHandle(void);
      LRESULT       WindowProc(HWND hwnd, UINT msg, 

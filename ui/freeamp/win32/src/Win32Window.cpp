@@ -786,3 +786,9 @@ Error Win32Window::GetDesktopSize(int32 &iX, int32 &iY)
 
     return kError_NoErr;
 }
+
+void Win32Window::BringWindowToFront(void)
+{
+    ShowWindow(m_hWnd, SW_RESTORE);
+    SetForegroundWindow(m_hWnd);
+}

@@ -45,6 +45,7 @@ enum TimeDisplayState
     kTimeRemaining
 };
 
+
 class FreeAmpTheme : public UserInterface, public Theme
 {
     public:
@@ -69,6 +70,7 @@ class FreeAmpTheme : public UserInterface, public Theme
         void  WorkerThread(void);
 
         static void update_thread(void*);
+        static void options_thread(void*);
 
     protected:
 
@@ -78,18 +80,19 @@ class FreeAmpTheme : public UserInterface, public Theme
         void             UpdateMetaData(const PlaylistItem *pItem);
         void             ShowHelp(void);
         void             UpdateThread();
+        void             OptionsThread(uint32 defaultPage);
 
         FAContext       *m_pContext;
         int              m_iCurrentSeconds, m_iTotalSeconds, m_iSeekSeconds;
         float			 m_fSecondsPerFrame;
         int              m_iStartupType, m_iVolume, m_iSeekPos;
-        Thread          *m_uiThread;
+        Thread          *m_uiThread, *m_pUpdateThread;
+        Thread          *m_pOptionsThread;
         Pos              m_oWindowPos;
-        bool             m_bSeekInProgress, m_bPlayShown;
+        bool             m_bSeekInProgress, m_bPlayShown, m_bInOptions;
         string           m_oCurrentWindow, m_oTitle, m_oStreamInfo;
         TimeDisplayState m_eTimeDisplayState;
         UpdateManager   *m_pUpdateMan;
-        Thread          *m_pUpdateThread;
 
 };
 

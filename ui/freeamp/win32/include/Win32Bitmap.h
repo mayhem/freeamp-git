@@ -47,16 +47,22 @@ class Win32Bitmap : public Bitmap
      virtual bool  IsPosVisible(Pos &oPos);
 
      HBITMAP       GetBitmapHandle(void);
+     BITMAPINFO   *GetBitmapInfo(void) { return &m_sBitmapInfo; };
+     void         *GetBitmapBits(void) { return m_pBitmapData; };
      HBITMAP       GetMaskBitmapHandle(void);
+     BYTE         *Bits(int32 x, int32 y);
      void          SaveBitmap(char *szFile);
 
     protected:
 
      void          CreateMaskBitmap(void);
+	 int32         BytesPerLine(void);
     
-     HBITMAP  m_hBitmap;
-     HBITMAP  m_hMaskBitmap;
-	 void    *m_pBitmapData;
+     HBITMAP     m_hBitmap;
+     HBITMAP     m_hMaskBitmap;
+	 BITMAPINFO  m_sBitmapInfo;
+	 void       *m_pBitmapData;
+	 int32       m_iBytesPerLine, m_iHeight, m_iWidth;
 };
 
 #endif
