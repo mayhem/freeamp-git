@@ -23,7 +23,7 @@ ____________________________________________________________________________*/
 
 #include "config.h"
 
-#include <iostream.h>
+#include <iostream>
 #include <stdio.h>
 #include <unistd.h>
 

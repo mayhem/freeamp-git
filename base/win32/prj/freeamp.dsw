@@ -227,6 +227,9 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name wavout
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name signature
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -425,6 +428,18 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name fabaselib
     End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "signature"=..\..\..\io\signature\win32\prj\signature.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
 }}}
 
 ###############################################################################

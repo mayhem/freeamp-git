@@ -32,7 +32,13 @@ using namespace std;
 #include "errors.h"
 #include "eventdata.h"
 
-
+typedef struct DecodeInfo
+{
+  uint32 downsample; /* 0 = full, 1 = half, 2 = quarter */
+  bool   mono;       /* true for mixing to mono output */
+  bool   eightbit;   /* true to force it to 8 bit unsigned output */
+  bool   sendInfo;   /* false to skip sending [Media/MPEG]InfoEvents */
+} _DecodeInfo;
 
 class MediaInfoEvent;
 class PullBuffer;
@@ -46,7 +52,13 @@ class LogicalMediaConverter : public PipelineUnit
 {
  public:
             LogicalMediaConverter(FAContext *context) :
-                      PipelineUnit(context) { };
+                      PipelineUnit(context) 
+                      {
+                        m_decodeInfo.downsample = 0;
+                        m_decodeInfo.mono = false;
+                        m_decodeInfo.eightbit = false;
+                      };
+
     virtual ~LogicalMediaConverter() {}
 
     virtual Error Prepare(PullBuffer *pInput, PullBuffer *&pOutput) = 0;
@@ -59,6 +71,8 @@ class LogicalMediaConverter : public PipelineUnit
 
     virtual Error SetEQData(float *) = 0;
     virtual Error SetEQData(bool) = 0;
+
+    virtual Error SetDecodeInfo(DecodeInfo &info) = 0;
     
     virtual vector<const char *> *GetExtensions(void) = 0;
 
@@ -71,6 +85,7 @@ class LogicalMediaConverter : public PipelineUnit
      
       PhysicalMediaInput    *m_pmi;
       PhysicalMediaOutput   *m_pmo;
+      DecodeInfo             m_decodeInfo;
 };
 
 #endif // _LMC_H_

@@ -45,6 +45,7 @@ using namespace std;
 #include "downloadmanager.h"
 #include "timer.h"
 #include "lmc.h"
+#include "aps.h"
 
 typedef enum
 {
@@ -87,7 +88,7 @@ class Player : public EventQueue, Properties, PropertyWatcher
 
     bool    IsSupportedExtension(const char *ext);
     char *GetExtension(const char *title);
-  
+ 
     // Properties
     virtual Error GetProperty(const char *, PropValue **);
     virtual Error SetProperty(const char *, PropValue *);
@@ -95,6 +96,8 @@ class Player : public EventQueue, Properties, PropertyWatcher
     virtual Error RemovePropertyWatcher(const char *, PropertyWatcher *);
 
     virtual Error PropertyChange(const char *, PropValue *);
+
+    PlayerState  State() const { return m_playerState; }
 
  protected:
               Player(FAContext *context);
@@ -105,13 +108,15 @@ class Player : public EventQueue, Properties, PropertyWatcher
     void      Usage(const char *);
 
     bool         SetState(PlayerState);
-    PlayerState  State() const { return m_playerState; }
 
     int32     ServiceEvent(Event *);
     void      CreatePMO(const PlaylistItem * pc, Event * pC);
 
     static void cd_timer(void* arg);
     void        CDTimer();
+
+    static void generate_sigs_function(void *arg);
+    void        GenerateSigsWork(set<PlaylistItem *> *items);
 
     FAContext *m_context;
 
@@ -138,6 +143,8 @@ class Player : public EventQueue, Properties, PropertyWatcher
     void ToggleUI(Event *pEvent);
     void HandleQueryState();
     void SendEventToCatalog(Event *pEvent);   
+    void GenerateSignature(Event *pEvent);
+    void HandleAudioSigGenerated(Event *pEvent);
  
     #define _EQUALIZER_ENABLE_
     #ifdef  _EQUALIZER_ENABLE_
@@ -172,8 +179,13 @@ class Player : public EventQueue, Properties, PropertyWatcher
     Mutex    *m_pmiMutex;
     Mutex    *m_pmoMutex;
     Mutex    *m_uiMutex;
+
+    Semaphore *m_signatureSem;
+
     PlaylistManager *m_plm;
 
+    PhysicalMediaOutput *m_sigspmo;
+ 
     PhysicalMediaOutput *m_pmo;
     LogicalMediaConverter *m_lmc;
     UserInterface *m_ui;
@@ -193,8 +205,9 @@ class Player : public EventQueue, Properties, PropertyWatcher
     MusicCatalog *m_musicCatalog;
     UserInterface *m_browserUI;
 
-    DownloadManager* m_dlm;
+    DownloadManager *m_dlm;
     UserInterface *m_downloadUI;
+    APSInterface *m_APSInterface;
 
     TimerRef m_cdTimer;
     float    m_eqValues[32];

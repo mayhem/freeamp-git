@@ -28,6 +28,8 @@ ____________________________________________________________________________*/
 #pragma warning(disable:4786) 
 #endif
 
+#include "config.h"
+
 #include <sys/stat.h>
 
 #ifdef WIN32
@@ -42,11 +44,12 @@ ____________________________________________________________________________*/
 
 using namespace std;
 
-#include "config.h"
 #include "musiccatalog.h"
 #include "player.h"
 #include "utility.h"
+#include "pmo.h"
 #include "debug.h"
+#include "audiosig.h"
 
 #define METADATABASE_VERSION 1
 
@@ -64,6 +67,8 @@ MusicCatalog::MusicCatalog(FAContext *context, char *databasepath)
     m_unsorted = new vector<PlaylistItem *>;
     m_playlists = new vector<string>;
     m_streams = new vector<PlaylistItem *>;
+    m_sigs = new set<PlaylistItem *>;
+    m_guidTable = new multimap<string, string, less<string> >;
     m_watchTimer = NULL;
    
     m_timeout = 0;
@@ -105,6 +110,20 @@ MusicCatalog::~MusicCatalog()
     delete m_mutex;
     delete m_catMutex;
     delete m_timerMutex;
+    delete m_guidTable;
+}
+
+string MusicCatalog::GetFilename(const string &strGUID)
+{
+    if ((!m_guidTable) || (m_guidTable->size() == 0))
+        return "";
+    
+    multimap<string, string, less<string> >::iterator i;
+    i = m_guidTable->find(strGUID);
+
+    if (i != m_guidTable->end())
+        return (*i).second;
+    return "";
 }
 
 class comp_catalog {
@@ -237,6 +256,8 @@ Error MusicCatalog::RemoveStream(const char *url)
     if (!meta)
         return kError_ItemNotFound;
 
+    string strGUID = meta->GUID();
+
     m_database->Remove(url);
 
     m_catMutex->Acquire();
@@ -248,6 +269,18 @@ Error MusicCatalog::RemoveStream(const char *url)
              m_streams->erase(i);
              break;
          }
+
+    if ((strGUID.size() != 0) && (m_guidTable->size() != 0)) {
+        multimap<string, string, less<string> >::iterator i;
+        i = m_guidTable->find(strGUID);
+        while ((i != m_guidTable->end()) && ((*i).first == strGUID)) {
+            if ((*i).second == url) {
+                m_guidTable->erase(i);
+                break;
+            }
+            i++;
+        }
+    }
 
     m_catMutex->Release();
 
@@ -265,6 +298,8 @@ Error MusicCatalog::RemoveSong(const char *url)
     MetaData *meta = ReadMetaDataFromDatabase(url);
     if (!meta)
         return kError_ItemNotFound;
+
+    string strGUID = meta->GUID();
 
     m_database->Remove(url);
 
@@ -323,6 +358,18 @@ Error MusicCatalog::RemoveSong(const char *url)
 
     delete meta;
 
+    if ((strGUID.size() != 0) && (m_guidTable->size() != 0)) {
+        multimap<string, string, less<string> >::iterator i;
+        i = m_guidTable->find(strGUID);
+        while ((i != m_guidTable->end()) && ((*i).first == strGUID)) {
+            if ((*i).second == url) {
+        // FIXME???    m_guidTable->erase(i);
+                break;
+            }
+            i++;
+        }
+    }
+
     m_catMutex->Release();
     return kError_NoErr;
 }
@@ -344,6 +391,10 @@ Error MusicCatalog::AddStream(const char *url)
     newstream = new PlaylistItem(url, meta);
 
     m_catMutex->Acquire();
+
+    if (meta->GUID().size() > 0)
+        m_guidTable->insert(multimap<string, string, less<string> >
+                            ::value_type(meta->GUID(), url));
 
     vector<PlaylistItem *>::iterator i = m_streams->begin();
     for (; i != m_streams->end(); i++) 
@@ -370,9 +421,15 @@ bool MusicCatalog::CaseCompare(string s1, string s2)
     return false;
 }
 
+void MusicCatalog::GenerateSignature(PlaylistItem *track)
+{
+    m_sigs->insert(track);
+}
+
 Error MusicCatalog::AddSong(const char *url)
 {
     assert(url);
+    bool generated = false;
 
     if (!m_database->Working())
         return kError_DatabaseNotWorking;
@@ -396,8 +453,17 @@ Error MusicCatalog::AddSong(const char *url)
     newtrack = new PlaylistItem(url, meta);
 
     m_catMutex->Acquire();
+
+    if (meta->GUID().size() > 0)
+        m_guidTable->insert(multimap<string, string, less<string> >
+                            ::value_type(meta->GUID(), url));
+    else
+        GenerateSignature(newtrack);
+
     if ((meta->Artist().size() == 0) || (meta->Artist() == " ")) {
         vector<PlaylistItem *>::iterator i = m_unsorted->begin();
+        if (!generated)
+            GenerateSignature(newtrack);
         for (; i != m_unsorted->end(); i++)
              if ((*i)->URL() == url) {
                  m_catMutex->Release();
@@ -579,10 +645,15 @@ void MusicCatalog::ClearCatalog()
        delete (*p);
     delete m_streams;
 
+    delete m_sigs;
+    delete m_guidTable;
+
     m_artistList = new vector<ArtistList *>;
     m_unsorted = new vector<PlaylistItem *>;
     m_playlists = new vector<string>;
     m_streams = new vector<PlaylistItem *>;
+    m_sigs = new set<PlaylistItem *>;
+    m_guidTable = new multimap<string, string, less<string> >;
     m_catMutex->Release();
 }
 
@@ -610,6 +681,9 @@ Error MusicCatalog::RePopulateFromDatabase()
         key = m_database->NextKey(key);
     }
     m_catMutex->Release();
+    set<PlaylistItem *> *newset = new set<PlaylistItem *>(*m_sigs);
+    m_context->target->AcceptEvent(new GenerateSignatureEvent(newset));
+    m_sigs->erase(m_sigs->begin(), m_sigs->end());
     return kError_NoErr;
 }
 
@@ -928,7 +1002,7 @@ void MusicCatalog::WriteMetaDataToDatabase(const char *url,
     else
         ost.append("M");
     ost.append(kDatabaseDelimiter);
-    ost.append("9");
+    ost.append("11");
     ost.append(kDatabaseDelimiter);
 
     sprintf(num, "%ld%s", (long int)metadata.Artist().size(), kDatabaseDelimiter);
@@ -953,6 +1027,11 @@ void MusicCatalog::WriteMetaDataToDatabase(const char *url,
     sprintf(temp, "%ld", (long int)metadata.Size());
     sprintf(num, "%ld%s", (long int)strlen(temp), kDatabaseDelimiter);
     ost.append(num);
+    sprintf(temp, "%ld", (long int)metadata.PlayCount());
+    sprintf(num, "%ld%s", (long int)strlen(temp), kDatabaseDelimiter);
+    ost.append(num);
+    sprintf(num, "%ld%s", (long int)metadata.GUID().size(), kDatabaseDelimiter);
+    ost.append(num);
 
     ost.append(metadata.Artist());
     ost.append(metadata.Album());
@@ -967,8 +1046,16 @@ void MusicCatalog::WriteMetaDataToDatabase(const char *url,
     ost.append(temp);
     sprintf(temp, "%ld", (long int)metadata.Size());
     ost.append(temp);
+    sprintf(temp, "%ld", (long int)metadata.PlayCount());
+    ost.append(temp);
+    ost.append(metadata.GUID());
     ost.append("\0");
 
+    if (metadata.GUID().size() > 0)
+        if (GetFilename(metadata.GUID()).size() == 0) 
+            m_guidTable->insert(multimap<string, string, less<string> >
+                                ::value_type(metadata.GUID().c_str(), url));
+         
     m_database->Insert(url, (char *)ost.c_str());
 
     delete [] num;
@@ -1049,6 +1136,12 @@ MetaData *MusicCatalog::ReadMetaDataFromDatabase(const char *url)
             case 8:
                 metadata->SetSize(atoi(data.substr(count, fieldLength[j]).c_str()));
                 break;
+            case 9:
+                metadata->SetPlayCount(atoi(data.substr(count, fieldLength[j]).c_str()));
+                break;
+            case 10: 
+                metadata->SetGUID(data.substr(count, fieldLength[j]).c_str());
+                break;
             default:
                 break;
 
@@ -1059,6 +1152,11 @@ MetaData *MusicCatalog::ReadMetaDataFromDatabase(const char *url)
 
     delete [] fieldLength;
     delete [] dbasedata;
+
+    if (metadata->GUID().size() > 0)
+        if (GetFilename(metadata->GUID()).size() == 0)
+            m_guidTable->insert(multimap<string, string, less<string> >
+                                ::value_type(metadata->GUID().c_str(), url));
 
     return metadata;
 }
@@ -1120,6 +1218,42 @@ Error MusicCatalog::AcceptEvent(Event *e)
                     m_context->timerManager->StopTimer(m_watchTimer);
             }
             break;
+        }
+        case INFO_AudioSignatureGenerated: {
+            AudioSignatureGeneratedEvent *asge = 
+                                     (AudioSignatureGeneratedEvent *)e;
+
+            //cout << "got audio sig for: " << asge->Url() << endl;
+            AudioSig *sig = new AudioSig(asge->Energy(), asge->ZXing(),
+                                         asge->Length(), 
+                                         (int *)asge->Spectrum());
+            string GUID = "";
+            m_context->aps->APSLookupSignature(sig, GUID);
+
+            if (GUID != "") {
+                string url = string("file://") + asge->Url();
+                MetaData *data = ReadMetaDataFromDatabase(url.c_str());
+
+                if (!data)
+                    break;
+
+                if (data->GUID() != "") { 
+                    if (strncmp(data->GUID().c_str(), GUID.c_str(), 16)) {
+                        cout << "ERROR! " << url << " has 2 GUIDs!\n";
+                        cout << data->GUID() << ". " << GUID << ".\n";
+                        cout << asge->Energy() << " " << asge->ZXing() <<
+                                " " << asge->Length() << endl;
+                        for (int i = 0; i < 32; i++)
+                            cout << asge->Spectrum()[i] << " " ;
+                        cout << endl;
+                    }
+                }
+                data->SetGUID(GUID.c_str());
+                WriteMetaDataToDatabase(url.c_str(), (*data));
+                m_database->Sync();
+                delete data;
+            }
+            break; 
         }
     }
     return kError_NoErr; 

@@ -39,6 +39,8 @@
 #define IDB_BUSY                        135
 #define IDB_STREAMS                     136
 #define IDB_CD                          137
+#define IDD_INTROWIZARD_RELATABLE       138
+#define IDB_RELATABLE                   141
 #define IDI_WARN                        207
 #define IDD_OPENURL                     219
 #define IDD_DELETETRACKS                220
@@ -101,6 +103,11 @@
 #define IDC_EDIT2                       1045
 #define IDC_MISSINGTRACK                1045
 #define IDC_BUTTON2                     1046
+#define IDC_PLAYCOUNT                   1047
+#define IDC_RELATABLE_CAPTION1          1049
+#define IDC_RELATABLE_TEXT1             1050
+#define IDC_RELATABLE_CAPTION2          1051
+#define IDC_RELATABLE_EDIT1             1052
 #define IDC_BROWSE                      1110
 #define IDC_DRIVES                      1231
 #define IDC_ALBUM                       1462
@@ -184,6 +191,8 @@
 #define ID_POPUP_REMOVEFAVORITE         40082
 #define ID_VIEW_LOCATECURRENTITEM       40083
 #define ID_POPUP_ADDTOFAVORITES         40084
+#define ID_EDIT_GENERATEPLAYLIST        40085
+#define ID_EDIT_SUBMITPLAYLIST          40086
 #define IDS_URL                         65535
 #define IDC_TRACKTEXT                   65535
 #define IDC_TITLETEXT                   65535
@@ -192,9 +201,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        138
-#define _APS_NEXT_COMMAND_VALUE         40085
-#define _APS_NEXT_CONTROL_VALUE         1042
+#define _APS_NEXT_RESOURCE_VALUE        142
+#define _APS_NEXT_COMMAND_VALUE         40087
+#define _APS_NEXT_CONTROL_VALUE         1053
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -145,6 +145,8 @@ BEGIN
     PUSHBUTTON      "Help",9,200,137,50,14
     LTEXT           "Location:",IDC_LOCATIONTEXT,7,120,30,8
     EDITTEXT        IDC_LOCATION,47,116,203,14,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_PLAYCOUNT,200,63,50,11,ES_AUTOHSCROLL
+    LTEXT           "Playcount:",IDC_TRACKTEXT,164,65,34,8
 END
 
 IDD_INTROWIZARD_HELLO DIALOG DISCARDABLE  0, 0, 316, 164
@@ -152,14 +154,15 @@ STYLE WS_CHILD | WS_DISABLED | WS_CAPTION
 CAPTION "Welcome!"
 FONT 8, "MS Sans Serif"
 BEGIN
+    CONTROL         "Text",IDC_TEXT2,"Button",BS_OWNERDRAW | BS_FLAT |
+                    WS_TABSTOP,92,38,216,123
+    CONTROL         135,IDC_STATIC,"Static",SS_BITMAP,0,0,81,161
     CONTROL         "Caption 1",IDC_CAPTION1,"Button",BS_OWNERDRAW | BS_LEFT | 
                     BS_FLAT | WS_TABSTOP,92,0,216,10
-    CONTROL         "Text",IDC_TEXT2,"Button",BS_OWNERDRAW | BS_FLAT | 
-                    WS_TABSTOP,92,47,216,116
     CONTROL         "Text",IDC_TEXT1,"Button",BS_OWNERDRAW | BS_CENTER | 
-                    BS_FLAT | WS_TABSTOP,92,12,216,18
+                    BS_FLAT | WS_TABSTOP,92,10,216,18
     CONTROL         "Caption 2",IDC_CAPTION2,"Button",BS_OWNERDRAW | BS_LEFT | 
-                    BS_FLAT | WS_TABSTOP,92,33,216,10
+                    BS_FLAT | WS_TABSTOP,92,28,216,10
     CONTROL         130,IDC_STATIC,"Static",SS_BITMAP,0,0,81,161
 END
 
@@ -183,6 +186,19 @@ BEGIN
     LTEXT           "Limit search to:",IDC_LIMITTEXT,92,148,48,8
     EDITTEXT        IDC_DIRECTORY,145,146,94,13,ES_AUTOHSCROLL | ES_READONLY
     CONTROL         130,IDC_STATIC,"Static",SS_BITMAP,0,0,81,161
+END
+
+IDD_INTROWIZARD_RELATABLE DIALOG DISCARDABLE  0, 0, 316, 182
+STYLE WS_CHILD | WS_DISABLED | WS_CAPTION
+CAPTION "Relatable"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Caption 1",IDC_RELATABLE_CAPTION1,"Button",BS_OWNERDRAW | 
+                    BS_LEFT | BS_FLAT | WS_TABSTOP,94,169,44,12
+    CONTROL         "Text 1",IDC_RELATABLE_TEXT1,"Button",BS_OWNERDRAW | 
+                    BS_LEFT | BS_TOP | BS_FLAT | WS_TABSTOP,94,1,212,163
+    EDITTEXT        IDC_RELATABLE_EDIT1,140,166,86,12,ES_AUTOHSCROLL
+    CONTROL         141,IDC_STATIC,"Static",SS_BITMAP,2,2,81,161
 END
 
 IDD_MISSINGTRACK DIALOG DISCARDABLE  0, 0, 257, 145
@@ -285,14 +301,20 @@ BEGIN
 
     IDD_INTROWIZARD_HELLO, DIALOG
     BEGIN
-        RIGHTMARGIN, 313
-        BOTTOMMARGIN, 163
+        RIGHTMARGIN, 308
+        BOTTOMMARGIN, 161
     END
 
     IDD_INTROWIZARD_SEARCH, DIALOG
     BEGIN
         RIGHTMARGIN, 305
         BOTTOMMARGIN, 163
+    END
+
+    IDD_INTROWIZARD_RELATABLE, DIALOG
+    BEGIN
+        RIGHTMARGIN, 313
+        BOTTOMMARGIN, 181
     END
 
     IDD_MISSINGTRACK, DIALOG
@@ -427,6 +449,11 @@ BEGIN
         MENUITEM "&EMusic.com Web Site",        ID_HELP_EMUSICCOMWEBSITE
         MENUITEM SEPARATOR
         MENUITEM "&About...",                   ID_HELP_ABOUT
+    END
+    POPUP "&Relatable"
+    BEGIN
+        MENUITEM "&Recommend Playlist",         ID_EDIT_GENERATEPLAYLIST
+        MENUITEM "&Learn Playlist",             ID_EDIT_SUBMITPLAYLIST
     END
 END
 
@@ -611,6 +638,7 @@ IDB_BUSY                BITMAP  DISCARDABLE     "busy.bmp"
 IDB_STREAMS             BITMAP  DISCARDABLE     "streams.bmp"
 IDB_CD                  BITMAP  DISCARDABLE     "cd.bmp"
 IDB_FAVORITES           BITMAP  DISCARDABLE     "favorites.bmp"
+IDB_RELATABLE           BITMAP  DISCARDABLE     "relatable.bmp"
 
 #ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////

@@ -44,6 +44,7 @@ infoeditorUI::infoeditorUI(FAContext *context, PlaylistManager *plm,
     year_change = false;
     comment_change = false;
     track_change = false;
+    count_change = false;
     gartistlist = NULL;
     galbumlist = NULL;
     ggenrelist = NULL;
@@ -105,9 +106,14 @@ void infoeditorUI::DoApplyInfoEdit(void)
             text = gtk_entry_get_text(GTK_ENTRY(m_trackEntry));
             newmeta.SetTrack(atoi(text));
         }
+        if (count_change) {
+            text = gtk_entry_get_text(GTK_ENTRY(m_countEntry));
+            newmeta.SetPlayCount(atoi(text));
+        }
 
         newmeta.SetTime(oldmeta.Time());
         newmeta.SetSize(oldmeta.Size());
+        newmeta.SetGUID(oldmeta.GUID().c_str());
 
         if (newmeta != oldmeta) {
             (*i)->SetMetaData(&newmeta);
@@ -163,6 +169,8 @@ void infoeditorUI::CheckWidget(GtkWidget *widget)
        track_change = true;
    else if (widget == m_commentEntry)
        comment_change = true;
+   else if (widget == m_countEntry)
+       count_change = true;
 }
 
 void infoeditorUI::DisplayInfo(void)
@@ -184,6 +192,7 @@ void infoeditorUI::DisplayInfo(void)
    m_albums = true;
    m_years = true;
    m_genres = true;
+   m_counts = true;
 
    MetaData firstdata = (*(m_itemlist->begin()))->GetMetaData();
    vector<PlaylistItem *>::iterator i = m_itemlist->begin();
@@ -198,6 +207,8 @@ void infoeditorUI::DisplayInfo(void)
            m_years = false;
        if (firstdata.Genre() != compare.Genre())
            m_genres = false;
+       if (firstdata.PlayCount() != compare.PlayCount())
+           m_counts = false;
    }
 
    m_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -396,6 +407,31 @@ void infoeditorUI::DisplayInfo(void)
  
    gtk_widget_set_sensitive(time_entry, FALSE);  
  
+   /* playcount */
+   label = gtk_label_new("Playcount:");
+   gtk_misc_set_alignment(GTK_MISC(label), (gfloat)1.0, (gfloat)0.5);
+   gtk_table_attach(GTK_TABLE(table), label, 3, 4, 3, 4, GTK_FILL, GTK_FILL,
+                    10, 5);
+   gtk_widget_show(label);
+
+   m_countEntry = gtk_entry_new();
+   if (!m_counts)
+       gtk_entry_set_text(GTK_ENTRY(m_countEntry), "<Multiple>");
+   else if (firstdata.PlayCount() != 0) {
+       char tempstr[10];
+       sprintf(tempstr, "%d", firstdata.PlayCount());
+       gtk_entry_set_text(GTK_ENTRY(m_countEntry), tempstr);
+   }
+   gtk_signal_connect(GTK_OBJECT(m_countEntry), "changed",
+                      GTK_SIGNAL_FUNC(text_changed_event), this);
+   gtk_table_attach_defaults(GTK_TABLE(table), m_countEntry, 4, 5, 3, 4);
+   gtk_widget_show(m_countEntry);
+
+   if (m_listsize > 1) {
+       gtk_widget_set_sensitive(m_countEntry, FALSE);
+       gtk_widget_set_sensitive(label, FALSE);
+   }
+
    /* location */
    label = gtk_label_new("Location:");
    gtk_misc_set_alignment(GTK_MISC(label), (gfloat)1.0, (gfloat)0.5);

@@ -213,6 +213,8 @@ class PlaylistManager {
     virtual ~PlaylistManager();
 
     // Playlist actions
+    Error GeneratePlaylist();
+
     Error SetCurrentItem(PlaylistItem* item);
     PlaylistItem* GetCurrentItem();
     

@@ -72,7 +72,7 @@ void Panel::AddControl(Control *pControl)
     string oName;
 
     pControl->GetName(oName);
-    m_oControlMap.insert(pair<string, Control *>(oName, pControl));
+    m_oControlMap.insert(ControlMap::value_type(oName, pControl));
     m_oControls.push_back(pControl);
 }
 
@@ -142,7 +142,7 @@ Error Panel::ControlEnable(const string &oTarget, bool bSet, bool &bEnable)
 
     for (i = keyRange.first; i != keyRange.second; i++)
     {
-        i->second->Enable(bSet, bEnable);
+        (*i).second->Enable(bSet, bEnable);
     }
 
     return kError_NoErr;
@@ -161,7 +161,7 @@ Error Panel::ControlShow(const string &oTarget, bool bSet, bool &bShow)
 
     for (i = keyRange.first; i != keyRange.second; i++)
     {
-        pControl = i->second;
+        pControl = (*i).second;
         
         eRet = pControl->Show(bSet, bShow);
 
@@ -185,7 +185,7 @@ Error Panel::ControlIntValue(const string &oTarget, bool bSet, int &iValue)
 
     for (i = keyRange.first; i != keyRange.second; i++)
     {
-         i->second->IntValue(bSet, iValue);
+         (*i).second->IntValue(bSet, iValue);
     }        
 
     return kError_NoErr;
@@ -200,7 +200,7 @@ Error Panel::ControlStringValue(const string &oTarget, bool bSet, string &oValue
 
     for (i = keyRange.first; i != keyRange.second; i++)
     {
-        i->second->StringValue(bSet, oValue);
+        (*i).second->StringValue(bSet, oValue);
     }        
 
     return kError_NoErr;
@@ -215,7 +215,7 @@ Error Panel::ControlGetDesc(const string &oTarget, string &oDesc)
 
     for (i = keyRange.first; i != keyRange.second; i++)
     {
-         i->second->GetDesc(oDesc);
+         (*i).second->GetDesc(oDesc);
          return kError_NoErr;
     }        
 
@@ -231,7 +231,7 @@ Error Panel::ControlGetTip(const string &oTarget, string &oTip)
 
     for (i = keyRange.first; i != keyRange.second; i++)
     {
-         i->second->GetTip(oTip);
+         (*i).second->GetTip(oTip);
          return kError_NoErr;
     }        
 

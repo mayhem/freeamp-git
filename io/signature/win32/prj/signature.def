@@ -1,0 +1,7 @@
+;diskout.def : Declares the module parameters for the DLL.
+
+LIBRARY      "signature"
+DESCRIPTION  'Signature Output Library'
+
+EXPORTS
+	Initialize

@@ -36,6 +36,7 @@ ____________________________________________________________________________*/
 #include "musicbrowserui.h"
 
 #include "../res/wizard.xpm"
+//#include "../res/relatable.xpm"
 
 void IntroWizardUI::DeleteEvent(void)
 {
@@ -54,6 +55,8 @@ static void start_search_button_event(GtkWidget *widget, IntroWizardUI *p)
 {
     if (p->page == 1)
         p->GoToPage2();
+    else if (p->page == 2)
+        p->GoToPage3();
     else if (p->searchDone) 
         gtk_widget_destroy(p->m_window);
     else if (p->searchInProgress)
@@ -71,7 +74,10 @@ static void search_cancel_button_event(GtkWidget *widget, IntroWizardUI *p)
 
 static void search_back_event(GtkWidget *widget, IntroWizardUI *p)
 {
-    p->GoToPage1();
+    if (p->page == 3)
+        p->GoToPage2();
+    else if (p->page == 2)
+        p->GoToPage1();
 }
 
 void IntroWizardUI::UpdateEntry(void)
@@ -150,13 +156,26 @@ IntroWizardUI::IntroWizardUI(FAContext *context, MusicBrowserUI *parent)
     m_parent = parent;
 }
 
+void IntroWizardUI::GoToPage3(void)
+{
+   gtk_widget_hide(page2);
+   gtk_widget_hide(page1);
+   gtk_widget_show(page3);
+
+   gtk_widget_set_sensitive(m_backButton, TRUE); 
+   gtk_label_set_text(GTK_LABEL(buttonLabel), "  Start Search >  ");
+
+   page = 3;
+}
+
 void IntroWizardUI::GoToPage2(void)
 {
    gtk_widget_hide(page1);
+   gtk_widget_hide(page3);
    gtk_widget_show(page2);
 
    gtk_widget_set_sensitive(m_backButton, TRUE);
-   gtk_label_set_text(GTK_LABEL(buttonLabel), "  Start Search >  ");
+   gtk_label_set_text(GTK_LABEL(buttonLabel), "  Next >  ");
 
    page = 2;
 }
@@ -164,6 +183,7 @@ void IntroWizardUI::GoToPage2(void)
 void IntroWizardUI::GoToPage1(void)
 {
    gtk_widget_hide(page2);
+   gtk_widget_hide(page3);
    gtk_widget_show(page1);
 
    gtk_widget_set_sensitive(m_backButton, FALSE);
@@ -207,13 +227,45 @@ GtkWidget *IntroWizardUI::IntroPage(void)
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
    gtk_widget_show(label);
 
-   label = gtk_label_new("Currently Listening To displays a list of the songs you have\nchosen to play. In order to listen to music, all you have to\ndo is add items to the list by dragging them from the My\nMusic Collection pane on the left to the Currently Listening\nTo pane on the right.");
+   label = gtk_label_new("Currently Listening To displays a list of the songs you have \nchosen to play. In order to listen to music, all you have to\ndo is add items to the list by dragging them from the My\nMusic Collection pane on the left to the Currently Listening\nTo pane on the right.");
    gtk_label_set_line_wrap(GTK_LABEL(label), FALSE);
    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
    gtk_widget_show(label);
 	       
    label = gtk_label_new("For a more detailed explanation of how to use the My Music\nwindow, you should access the application's help system\nthrough the Help menu.");
+   gtk_label_set_line_wrap(GTK_LABEL(label), FALSE);
+   gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+   gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
+   gtk_widget_show(label);
+
+   return vbox;
+}
+
+GtkWidget *IntroWizardUI::RelatablePage(void)
+{
+   GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
+   gtk_widget_show(vbox);
+
+   GtkWidget *label = gtk_label_new("Thanks for using the Relatable-enabled "BRANDING".  Our\nmusic player features the Relatable Plug-in, designed\nto automatically generate personal playlists that are\nbased on the files located on your computer and the music\nyou listen to on the Web.  The more you use our player,\nthe better it works!");
+   gtk_label_set_line_wrap(GTK_LABEL(label), FALSE);
+   gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+   gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
+   gtk_widget_show(label);
+
+   label = gtk_label_new("To experience the power of Relatable:\nSelect the \"Profiles\" section of the Options dialog, create  \nand save your profile and then start listening to music.\nAfter you have listened to just a few tunes, hit the button\non the far right of the main player window to view and\nlisten to a recommended list of songs.");
+   gtk_label_set_line_wrap(GTK_LABEL(label), FALSE);
+   gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+   gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
+   gtk_widget_show(label);
+
+   label = gtk_label_new("Please note that your anonymous music profile is stored    \non Relatable's secure servers.  At Relatable, privacy is\nparamount: Your profile will NEVER be shared with third\nparties.  The Relatable Plug-in is an \"opt-in\" solution; if\nyou don't want to use it, don't create a profile.  Either\nway, you enjoy the player!");
+   gtk_label_set_line_wrap(GTK_LABEL(label), FALSE);
+   gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+   gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
+   gtk_widget_show(label);
+
+   label = gtk_label_new("For more information, please review our \"Read-me\" file or \nsend questions to: freeamptest@relatable.com");
    gtk_label_set_line_wrap(GTK_LABEL(label), FALSE);
    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
@@ -351,17 +403,21 @@ void IntroWizardUI::Show(bool runMain)
    pixmap = gdk_pixmap_create_from_xpm_d(m_window->window, &mask, 
                                          &style->bg[GTK_STATE_NORMAL],
 					 wizard);
+//                                         relatable);
    GtkWidget *g_pixmap = gtk_pixmap_new(pixmap, mask);
    gtk_box_pack_start(GTK_BOX(temphbox), g_pixmap, TRUE, TRUE, 0);
    gtk_widget_show(g_pixmap);
   
    page1 = IntroPage();
-   page2 = SearchPage();
+   page2 = RelatablePage();
+   page3 = SearchPage();
   
    page = 1;
+   gtk_widget_hide(page3);
    gtk_widget_hide(page2);
    gtk_widget_hide(page1);
 
+   gtk_box_pack_end(GTK_BOX(temphbox), page3, FALSE, FALSE, 0);
    gtk_box_pack_end(GTK_BOX(temphbox), page2, FALSE, FALSE, 0);
    gtk_box_pack_end(GTK_BOX(temphbox), page1, FALSE, FALSE, 0);
    

@@ -120,6 +120,7 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
             break; }
         case CMD_AddFiles:
         case CMD_EditCurrentPlaylistItemInfo:
+        case CMD_GeneratePlaylist:
         case INFO_MusicCatalogRegenerating:
         case INFO_MusicCatalogDoneRegenerating:
         case INFO_PlaylistCurrentItemInfo:

@@ -128,7 +128,8 @@ BOOL EditTrackInfoDialog::DialogProc(HWND hwnd,
             HWND hwndLocation = GetDlgItem(hwnd, IDC_LOCATION);
             HWND hwndTitleText =  FindWindowEx(hwnd, NULL, NULL, "Title:");
             HWND hwndTrackText =  FindWindowEx(hwnd, NULL, NULL, "Track #:");
-            
+            HWND hwndPlayCount = GetDlgItem(hwnd, IDC_PLAYCOUNT);           
+ 
             SYSTEMTIME sysTime;
 
             GetSystemTime(&sysTime);
@@ -166,6 +167,17 @@ BOOL EditTrackInfoDialog::DialogProc(HWND hwnd,
             {
                 sprintf(number, "%d", m_editMetaData->Year());
                 Edit_SetText(hwndYear, number);
+            }
+
+            // playcount
+            if(m_editMetaData->PlayCount() == -1)
+            {
+                Edit_SetText(hwndPlayCount, "<Multiple>");
+            }
+            else
+            {
+                sprintf(number, "%d", m_editMetaData->PlayCount());
+                Edit_SetText(hwndPlayCount, number);
             }
 
             // track comment
@@ -283,6 +295,7 @@ BOOL EditTrackInfoDialog::DialogProc(HWND hwnd,
                     HWND hwndTrack = GetDlgItem(hwnd, IDC_TRACK);
                     HWND hwndYear = GetDlgItem(hwnd, IDC_YEAR);
                     HWND hwndComment = GetDlgItem(hwnd, IDC_COMMENT);
+                    HWND hwndPlayCount = GetDlgItem(hwnd, IDC_PLAYCOUNT);
                     uint32 length;
                     char* data;
                     char number[64];
@@ -334,6 +347,16 @@ BOOL EditTrackInfoDialog::DialogProc(HWND hwnd,
                         strcpy(number, "-1");
 
                     m_editMetaData->SetYear(atoi(number));
+
+                    // deal with playcount attribute
+                    Edit_GetText(hwndPlayCount, number, sizeof(number));
+
+                    if(!strcmp(number, "Unknown"))
+                        strcpy(number, "0");
+                    else if(!strcmp(number, "<Multiple>"))
+                        strcpy(number, "-1");
+
+                    m_editMetaData->SetPlayCount(atoi(number));
                     
                     EndDialog(hwnd, TRUE);
                     break;

@@ -39,6 +39,11 @@ using namespace std;
 #include "eventdata.h"
 #include "debug.h"
 #include "FavoriteDialog.h"
+#include "player.h"
+
+#include "aps.h"
+#include "apsplaylist.h"
+#include "FAMetaUnit.h"
 
 const char* kAudioFileFilter =
             "MPEG Audio Streams (.mpg, .mp1, .mp2, .mp3, .mpp)\0"
@@ -53,12 +58,164 @@ void MusicBrowserUI::ClearPlaylistEvent(void)
     m_plm->RemoveAll();
 }
 
+void MusicBrowserUI::SubmitPlaylistEvent(void)
+{
+    vector<PlaylistItem*> items;
+
+    GetSelectedMusicTreeItems(&items);
+
+    PlaylistItem* pPlaylistItem = NULL;
+       
+   if (items.empty())
+   {
+       // fill the vector with the current playlist;
+       int nCount = m_plm->CountItems();
+       for (int i = 0; i < nCount; i++)
+       {
+           pPlaylistItem = m_plm->ItemAt(i);
+           if (pPlaylistItem != NULL)
+           {
+               items.push_back(pPlaylistItem);
+           }
+       }
+   }
+
+   vector<PlaylistItem*>::iterator i;
+
+   if (!items.empty())
+   {
+       APSPlaylist InputPlaylist;
+
+       // Assumes that GUID's are set properly in meta structures
+       for (i = items.begin(); i != items.end(); i++)
+       {
+           InputPlaylist.Insert((*i)->GetMetaData().GUID().c_str(), (*i)->URL().c_str());
+       }
+
+       uint32 nResponse = 0;
+
+       APSInterface* pInterface = m_context->aps;
+       if (pInterface == NULL) 
+           return;
+
+        nResponse = pInterface->APSSubmitPlaylist(&InputPlaylist); 
+        // call the GetPlaylist function to generate a playlist
+    }
+}
+
+void MusicBrowserUI::GenPlaylistEvent()
+{
+    vector<PlaylistItem*> items;
+    GetSelectedMusicTreeItems(&items);
+    if (items.empty())
+    {
+        GetSelectedPlaylistItems(&items);
+    }
+    GenPlaylistEvent(&items);
+}
+
+void MusicBrowserUI::GenPlaylistEvent(vector<PlaylistItem*>* pSeed)
+{
+    vector<PlaylistItem*>::iterator i;
+
+    // Branch here, based on number of selected elements.
+    // If nothing is selected, use a profile based query.
+    // If tracks are selected, use track based query.
+
+   if ((pSeed != NULL) && (!pSeed->empty())) 
+       // tracks selected, use track based query
+   {
+       APSPlaylist InputPlaylist;
+       APSPlaylist ResultList;
+
+       // Assumes that GUID's are set properly in meta structures
+       for (i = pSeed->begin(); i != pSeed->end(); i++)
+       {
+           InputPlaylist.Insert((*i)->GetMetaData().GUID().c_str(), 
+                                (*i)->URL().c_str());
+       }
+
+       uint32 nResponse = 0;
+
+       APSInterface* pInterface = NULL;
+       pInterface = m_context->aps;
+       if (pInterface == NULL)
+       {
+           //m_context->catalog->ConnectAPSInterface("172.16.0.10");
+           //pInterface = m_context->catalog->GetAPSInterface();
+           if (pInterface == NULL) 
+               return; // errored twice: abort;
+       }
+
+       nResponse = pInterface->APSGetPlaylist(&InputPlaylist, &ResultList); 
+       // call the GetPlaylist function to generate a playlist
+
+       if (nResponse == APS_NOERROR)
+       {
+           if (ResultList.Size() > 0)
+           {
+               vector<string> newitems;
+               string strTemp;
+               string strFilename;
+               APSPlaylist::iterator j;
+               for (j = ResultList.begin(); j.isvalid(); j.next())
+               {
+                   strFilename = m_context->catalog->GetFilename(j.first());
+                   if (strFilename != "") 
+                       newitems.push_back(strFilename.c_str());
+               }
+               ClearPlaylistEvent();      // start by clearing the current 
+                                          // playlist
+
+               m_plm->AddItems(newitems); // add the filenames to the current 
+                                          // playlist and let freeamp take over
+
+           }
+      }
+   } 
+   else
+   {
+       APSInterface* pInterface = m_context->aps;
+       if (pInterface == NULL)
+       {
+           // deal with error
+           return;
+       }
+
+       int nRes = 0;
+       APSPlaylist ResultList;
+
+       nRes = pInterface->APSGetPlaylist(NULL, &ResultList);
+       if (nRes == APS_NOERROR)
+       {
+           if (ResultList.Size() > 0)
+           {
+               vector<string> newitems;
+               string strTemp;
+               string strFilename;
+               APSPlaylist::iterator j;
+
+               for (j = ResultList.begin(); j.isvalid(); j.next())
+               {
+                    strFilename = m_context->catalog->GetFilename(j.first());
+                    if (strFilename != "") 
+                        newitems.push_back(strFilename.c_str());
+               }
+
+               ClearPlaylistEvent();
+
+               m_plm->AddItems(newitems);
+           }
+       }
+   }
+}
+
 void MusicBrowserUI::RenameEvent(void)
 {
     HWND hwnd = m_hMusicView;
 
     HTREEITEM item;
-    //TV_HITTESTINFO hti;
+    //tv_hitTESTINFO hti;
 
     //GetCursorPos(&hti.pt);
     //ScreenToClient(hwnd, &hti.pt);
@@ -306,7 +463,7 @@ void MusicBrowserUI::StartStopMusicSearch(bool useWizard)
     m_searchPathList.clear();
 
     if(useWizard)
-        doSearch = IntroductionWizard(&m_searchPathList);
+        doSearch = IntroductionWizard(&m_searchPathList, m_context->aps);
     else
         doSearch = (0 < DialogBoxParam(g_hinst, 
                           MAKEINTRESOURCE(IDD_MUSICSEARCH),
@@ -410,6 +567,7 @@ void MusicBrowserUI::EditInfo(vector<PlaylistItem*>& items, HWND hwnd)
     bool sameAlbum = true;
     bool sameGenre = true;
     bool sameYear = true;
+    bool samePlayCount = true;
     vector<PlaylistItem*>::iterator track;
 
     for(track = items.begin(); track != items.end(); track++)
@@ -427,6 +585,9 @@ void MusicBrowserUI::EditInfo(vector<PlaylistItem*>& items, HWND hwnd)
 
         if(metadata.Year() != metadataCheck.Year())
             sameYear = false;
+
+        if(metadata.PlayCount() != metadataCheck.PlayCount())
+            samePlayCount = false;
     }
 
     if(!sameArtist)
@@ -440,6 +601,9 @@ void MusicBrowserUI::EditInfo(vector<PlaylistItem*>& items, HWND hwnd)
 
     if(!sameGenre)
         metadata.SetGenre(kMultipleGenres);
+
+    if(!samePlayCount)
+        metadata.SetPlayCount(-1);
 
     char location[MAX_PATH];
 
@@ -492,6 +656,9 @@ void MusicBrowserUI::EditInfo(vector<PlaylistItem*>& items, HWND hwnd)
 
             if(metadata.Track() != -1)
                 newMetaData.SetTrack(metadata.Track());
+
+            if(metadata.PlayCount() != -1)
+                newMetaData.SetPlayCount(metadata.PlayCount());
 
             if(newMetaData != oldMetaData)
             {

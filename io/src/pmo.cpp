@@ -23,7 +23,7 @@ ____________________________________________________________________________*/
 
 /* system headers */
 #include <stdlib.h>
-#include <iostream.h>
+#include <iostream>
 #include <fcntl.h>
 //#include <sys/soundcard.h>
 #include <errno.h>

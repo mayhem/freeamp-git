@@ -75,9 +75,8 @@ void ForeignTheme::TryToConvert(string &oDir)
     string testfile = oDir + string(DIR_MARKER_STR) + string("theme.xml");
     struct stat st;
  
-// FIXME: remember to uncomment this eventually
-//    if (stat(testfile.c_str(), &st) != -1)
-//        return;
+    if (stat(testfile.c_str(), &st) != -1)
+        return;
 
     for (uint32 i = 0; i < numFormats; i++) {
         ftf = m_formats[i];

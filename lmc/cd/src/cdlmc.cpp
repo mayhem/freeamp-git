@@ -99,9 +99,6 @@ Error CDLMC::ChangePosition(int32 position)
    return kError_NoErr;
 }
 
-#define _EQUALIZER_ENABLE_
-#ifdef  _EQUALIZER_ENABLE_
-
 Error CDLMC::SetEQData(float *arrayEQ) 
 {
     return kError_NoErr;
@@ -111,6 +108,10 @@ Error CDLMC::SetEQData(bool enable)
 {    
     return kError_NoErr;
 }
-#endif  //_EQUALIZER_ENABLE_
-#undef  _EQUALIZER_ENABLE_
+
+Error CDLMC::SetDecodeInfo(DecodeInfo &info)
+{
+    m_decodeInfo = info;
+    return kError_NoErr;
+}
 

@@ -82,6 +82,7 @@
 #define IDD_PREF1                       193
 #define IDD_PREF_GENERAL                193
 #define IDD_MAIN_PREF_DIALOG            195
+#define IDD_PREF_PROFILE                199
 #define IDB_FOLDER                      200
 #define IDD_OPENURL                     219
 #define IDD_SAVERIO                     220
@@ -177,6 +178,10 @@
 #define IDC_ADD                         1065
 #define IDC_ADDDIR                      1065
 #define IDC_REMOVEDIR                   1066
+#define IDC_PROFILE_LIST                1067
+#define IDC_NEW_PROFILE                 1068
+#define IDC_ADDPROFILE                  1069
+#define IDC_DELETEPROFILE               1070
 #define IDMC_MYMUSIC                    6900
 #define IDMC_PLAY                       6901
 #define IDMC_STOP                       6902
@@ -194,7 +199,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        201
 #define _APS_NEXT_COMMAND_VALUE         40013
-#define _APS_NEXT_CONTROL_VALUE         1067
+#define _APS_NEXT_CONTROL_VALUE         1071
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

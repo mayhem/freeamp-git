@@ -31,7 +31,7 @@ ____________________________________________________________________________*/
 
 #include <stdio.h>
 #include <string.h>
-#include <iostream.h>
+#include <iostream>
 
 /* Project Includes */
 #include "config.h"

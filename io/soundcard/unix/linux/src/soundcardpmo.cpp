@@ -194,7 +194,7 @@ Error SoundCardPMO::Init(OutputInfo * info)
    }
 
    // configure the device:
-   int       play_precision = 16;
+   int       play_precision = info->bits_per_sample;
    int       play_stereo = channels - 1;
    int       play_sample_rate = info->samples_per_second;
 

@@ -139,7 +139,8 @@ class MusicBrowserUI : public UserInterface
     void   SetMinMaxInfo();
     void   EditItemLabel(HWND hwnd, HTREEITEM item);
 
-    bool   IntroductionWizard(vector<string>* searchPaths);
+    bool   IntroductionWizard(vector<string>* searchPaths, 
+                              APSInterface *pInterface);
 
     BOOL   DialogProc(HWND hwnd, UINT msg, 
                       WPARAM wParam, LPARAM lParam);
@@ -229,6 +230,9 @@ class MusicBrowserUI : public UserInterface
     void  AddFileEvent(HWND hwndParent, bool playNow = false);
     void  EditPlaylistEvent();
     void  ClearPlaylistEvent();
+    void  GenPlaylistEvent(vector<PlaylistItem *> *pSeed);
+    void  GenPlaylistEvent(void);
+    void  SubmitPlaylistEvent(void);
     void  SortEvent(int id);
     void  EmptyDBCheck();
     void  RemoveEvent();

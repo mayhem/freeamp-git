@@ -64,6 +64,7 @@ void GTKPreferenceWindow::ApplyInfo(void)
 {
     if (proposedValues != currentValues) 
         SavePrefsValues(m_pContext->prefs, &proposedValues);
+    ApplyProfiles();
 }
 
 static void pref_ok_click(GtkWidget *w, GTKPreferenceWindow *p)
@@ -282,8 +283,12 @@ bool GTKPreferenceWindow::Show(Window *pWindow)
     opane = new OptionsPane("Advanced", " Advanced Preferences", 5, pane);
     AddPane(opane);
 
+    pane = CreateProfiles();
+    opane = new OptionsPane("Profiles", " Relatable Profiles", 6, pane);
+    AddPane(opane);
+
     pane = CreateAbout();
-    opane = new OptionsPane("About", " About "The_BRANDING, 6, pane);
+    opane = new OptionsPane("About", " About "The_BRANDING, 7, pane);
     AddPane(opane);
 
     GtkWidget *separator = gtk_hseparator_new();
@@ -1230,7 +1235,8 @@ GtkWidget *GTKPreferenceWindow::CreatePlugins(void)
     uint32 outputIndex = 0;
 
     while (pmo && (item = pmo->GetItem(i++))) {
-        if (!strncmp("cd.pmo", item->Name(), 7))
+        if (!strncmp("cd.pmo", item->Name(), 7) ||
+            !strncmp("signature.pmo", item->Name(), 13))
             continue;
 
         menuitem = gtk_radio_menu_item_new_with_label(group, item->Name());
@@ -1749,6 +1755,196 @@ GtkWidget *GTKPreferenceWindow::CreateThemes(void)
     gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 5);
     gtk_signal_connect(GTK_OBJECT(button), "clicked",
                        GTK_SIGNAL_FUNC(choose_font_press), this);
+    gtk_widget_show(button);
+
+    return pane;
+}
+
+void GTKPreferenceWindow::SelectProfile(int row, bool select)
+{
+    if (select) 
+        m_profileSelection.insert(row);
+    else
+        m_profileSelection.erase(row);
+}
+
+static void profile_select(GtkWidget *w, int row, int column,
+                           GdkEventButton *button, GTKPreferenceWindow *p)
+{
+    p->SelectProfile(row, true);
+}
+
+static void profile_unselect(GtkWidget *w, int row, int column,
+                             GdkEventButton *button, GTKPreferenceWindow *p)
+{
+    p->SelectProfile(row, false);
+}
+
+
+void GTKPreferenceWindow::AddProfileEvent(void)
+{
+    APSInterface *aps = m_pContext->aps;
+    if (!aps)
+        return;
+
+    char *name = gtk_entry_get_text(GTK_ENTRY(profileEntry));
+    if (name) {
+        if (aps->CreateProfile(name) != APS_NOERROR)
+            return;
+
+        char *iText[1];
+        iText[0] = name;
+        gtk_clist_append(GTK_CLIST(profileList), iText);
+    }
+    UpdateProfileList();
+}
+
+static void add_profile_press(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    p->AddProfileEvent();
+}
+
+void GTKPreferenceWindow::DeleteProfileEvent(void)
+{
+    APSInterface *aps = m_pContext->aps;
+    if (!aps)
+        return;
+
+    vector<string> *profiles = aps->GetKnownProfiles();
+    if (!profiles)
+        return;
+
+    set<uint32>::reverse_iterator i = m_profileSelection.rbegin();
+    for (; i != m_profileSelection.rend(); i++) {
+        if ((*i) <= profiles->size() - 1) {
+            string deleted = (*profiles)[*i];
+            aps->DeleteProfile(deleted.c_str());
+        }
+        gtk_clist_remove(GTK_CLIST(profileList), *i);
+    }
+    delete profiles;
+}
+
+static void delete_profile_press(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    p->DeleteProfileEvent();
+}
+
+void GTKPreferenceWindow::UpdateProfileList(void)
+{
+    gtk_clist_freeze(GTK_CLIST(profileList));
+    gtk_clist_clear(GTK_CLIST(profileList));
+
+    APSInterface *aps = m_pContext->aps;
+    if (aps) {
+        vector<string>::iterator i;
+        vector<string> *profiles = aps->GetKnownProfiles();
+
+        if (profiles) {
+            for (i = profiles->begin(); i != profiles->end(); i++) {
+                if ((*i) != "") {
+                    char *iText[1];
+                    iText[0] = (char *)(*i).c_str();
+                    int j = gtk_clist_append(GTK_CLIST(profileList), iText);
+                    if ((*i) == aps->GetCurrentProfileName())
+                        gtk_clist_select_row(GTK_CLIST(profileList), j, 0);
+                }
+            }
+            delete profiles;
+        }
+    }
+    gtk_clist_thaw(GTK_CLIST(profileList));        
+}
+
+void GTKPreferenceWindow::ApplyProfiles(void)
+{
+    APSInterface *aps = m_pContext->aps;
+    if (!aps)
+        return;
+
+    if (m_profileSelection.size() < 1)
+        return;
+
+    vector<string> *profiles = aps->GetKnownProfiles();
+    if (!profiles) 
+        return;
+
+    bool first = true;
+    set<uint32>::iterator i = m_profileSelection.begin();
+    for (; i != m_profileSelection.end(); i++) {
+        if (first) {
+            first = false;
+            aps->ChangeProfile((*profiles)[*i].c_str());
+        }
+        else 
+            aps->CombineProfile((*profiles)[*i].c_str());
+    }
+    delete profiles;
+}
+
+GtkWidget *GTKPreferenceWindow::CreateProfiles(void)
+{
+    GtkWidget *pane = gtk_vbox_new(FALSE, 5);
+    gtk_container_set_border_width(GTK_CONTAINER(pane), 5);
+    gtk_widget_show(pane);
+
+    GtkWidget *frame = gtk_frame_new("Profile Selection");
+    gtk_container_set_border_width(GTK_CONTAINER(frame), 5);
+    gtk_container_add(GTK_CONTAINER(pane), frame);
+    gtk_widget_show(frame);
+
+    GtkWidget *listwindow = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(listwindow),
+                                   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    gtk_container_add(GTK_CONTAINER(frame), listwindow);
+    gtk_widget_set_usize(listwindow, 200, 200);
+    gtk_widget_show(listwindow);
+
+    profileList = gtk_clist_new(1);
+    gtk_signal_connect(GTK_OBJECT(profileList), "select_row",
+                       GTK_SIGNAL_FUNC(profile_select), this);
+    gtk_signal_connect(GTK_OBJECT(profileList), "unselect_row",
+                       GTK_SIGNAL_FUNC(profile_unselect), this);
+    gtk_clist_set_selection_mode(GTK_CLIST(profileList),
+                                 GTK_SELECTION_EXTENDED);
+    gtk_container_add(GTK_CONTAINER(listwindow), profileList);
+    gtk_widget_show(profileList);
+
+    UpdateProfileList();
+
+    frame = gtk_frame_new("New Profile");
+    gtk_container_set_border_width(GTK_CONTAINER(frame), 5);
+    gtk_container_add(GTK_CONTAINER(pane), frame);
+    gtk_widget_show(frame);
+
+    GtkWidget *vbox = gtk_vbox_new(FALSE, 5);
+    gtk_container_add(GTK_CONTAINER(frame), vbox);
+    gtk_widget_show(vbox);
+
+    GtkWidget *textlabel = gtk_label_new("To create a new profile, simply name it in the box below and click\n'Add Profile.'  To use an existing profile, select it from the list above.");
+    gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_LEFT);
+    gtk_box_pack_start(GTK_BOX(vbox), textlabel, TRUE, TRUE, 5);
+    gtk_widget_show(textlabel);
+
+    GtkWidget *hbox = gtk_hbox_new(FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 5);
+    gtk_widget_show(hbox);
+
+    profileEntry = gtk_entry_new();
+    gtk_entry_set_max_length(GTK_ENTRY(profileEntry), 64);
+    gtk_box_pack_start(GTK_BOX(hbox), profileEntry, TRUE, TRUE, 5);
+    gtk_widget_show(profileEntry);
+
+    GtkWidget *button = gtk_button_new_with_label("Add Profile");
+    gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 5);
+    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                       GTK_SIGNAL_FUNC(add_profile_press), this);
+    gtk_widget_show(button);
+
+    button = gtk_button_new_with_label("Delete Profile");
+    gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 5);
+    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                       GTK_SIGNAL_FUNC(delete_profile_press), this);
     gtk_widget_show(button);
 
     return pane;

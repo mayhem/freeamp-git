@@ -58,6 +58,7 @@ class infoeditorUI {
      GtkWidget *m_commentEntry;
      GtkWidget *m_genreEntry;
      GtkWidget *m_trackEntry;
+     GtkWidget *m_countEntry;
 
      vector<PlaylistItem *> *m_itemlist;
 
@@ -65,6 +66,7 @@ class infoeditorUI {
      bool   m_albums;
      bool   m_years;
      bool   m_genres;
+     bool   m_counts;
      uint32 m_listsize;
 
      bool title_change;
@@ -74,6 +76,7 @@ class infoeditorUI {
      bool year_change;
      bool comment_change;
      bool track_change;
+     bool count_change;
 
      PlaylistManager *m_plm;
 

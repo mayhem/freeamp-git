@@ -32,7 +32,7 @@ ____________________________________________________________________________*/
 /* system headers */
 #include <stdlib.h>
 #include <stdio.h>
-#include <iostream.h>
+#include <iostream>
 #include <assert.h>
 #include <string.h>
 
@@ -122,6 +122,10 @@ XingLMC::XingLMC(FAContext *context) :
    m_pLocalReadBuffer = NULL;
    m_pXingHeader = NULL;
    m_iTotalFrames = -1;
+   m_decodeInfo.downsample = 0;
+   m_decodeInfo.mono = false;
+   m_decodeInfo.eightbit = false;
+   m_decodeInfo.sendInfo = true;
 }
 
 XingLMC::~XingLMC()
@@ -387,8 +391,10 @@ Error XingLMC::ExtractMediaInfo()
        return kError_OutOfMemory;
    }
 
-   if (m_pTarget)
+   if (m_pTarget && m_decodeInfo.sendInfo)
       m_pTarget->AcceptEvent(pMIE);
+   else 
+      delete pMIE;
 
    return kError_NoErr;
 }
@@ -601,14 +607,25 @@ Error XingLMC::InitDecoder()
 		    return Err;
    }
 
-   // select decoder
    m_audioMethods = audio_table[0][0];       // not integer, non 8 bit mode
+
+   uint32 iRedCode = 0;
+//   if (m_decodeInfo.downsample == 1)
+//       iRedCode = 1;
+//   else if (m_decodeInfo.downsample == 2)
+//       iRedCode = 2;
+
+   uint32 iConvCode = 0;
+//   if (m_decodeInfo.mono)
+//       iConvCode = 1;
+//   if (m_decodeInfo.eightbit)
+//       iConvCode += 8;
 
    if (m_audioMethods.decode_init(&m_sMpegHead,
                                   m_frameBytes,
-                                  0 /* reduction code */ ,
+                                  iRedCode /* reduction code */ ,
                                   0 /* transform code (ignored) */ ,
-                                  0 /* convert code */ ,
+                                  iConvCode /* convert code */ ,
                                   24000 /* freq limit */ ))
    {
          DEC_INFO      decinfo;
@@ -629,18 +646,23 @@ Error XingLMC::InitDecoder()
          info->number_of_channels = decinfo.channels;
          info->samples_per_second = decinfo.samprate;
 
-		   if (m_sMpegHead.id)
+	   if (m_sMpegHead.id)
            {
              m_iMaxWriteSize = (info->number_of_channels * 
 	    		               (decinfo.bits / 8) * 1152);
              info->samples_per_frame = 1152;
            }                    
-		   else
+	   else
            {
              m_iMaxWriteSize = (info->number_of_channels * 
 	    		               (decinfo.bits / 8) * 576);
              info->samples_per_frame = 576;
            }                    
+
+//         if (m_decodeInfo.downsample == 1)
+//             m_iMaxWriteSize *= 2;
+//         else if (m_decodeInfo.downsample == 2)
+//             m_iMaxWriteSize *= 4;
 
          info->max_buffer_size = m_iMaxWriteSize;
 
@@ -983,6 +1005,12 @@ Error XingLMC::SetEQData(bool enable) {
     Error error = kError_NoErr;
         enableEQ = enable;
         return error;
+}
+
+Error XingLMC::SetDecodeInfo(DecodeInfo &info) 
+{
+    m_decodeInfo = info;
+    return kError_NoErr;
 }
 
 Error XingLMC::ChangePosition(int32 position)

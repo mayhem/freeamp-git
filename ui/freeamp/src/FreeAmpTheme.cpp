@@ -1027,7 +1027,16 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
            m_pContext->target->AcceptEvent(new Event(CMD_Stop));
        return kError_NoErr;
    }
-   
+  
+   if (oControlName == string("Relatable Playlist") && eMesg == CM_Pressed)
+   {
+       GeneratePlaylistEvent *gpe;
+       gpe = new GeneratePlaylistEvent(m_pContext->plm->GetCurrentItem(),
+                                       m_pContext->plm);
+       m_pContext->target->AcceptEvent((Event *)gpe);
+       return kError_NoErr;
+   }
+
    if (oControlName == string("Play") && eMesg == CM_Pressed)
    {
        if (m_pContext->plm->CountItems() == 0)

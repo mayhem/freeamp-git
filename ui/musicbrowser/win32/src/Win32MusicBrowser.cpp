@@ -907,6 +907,25 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
             break;
         }
 
+        case CMD_GeneratePlaylist:
+        {
+            GeneratePlaylistEvent *gpe = (GeneratePlaylistEvent *)event;
+
+            vector<PlaylistItem *> SeedList;
+            if (gpe->Item() != NULL)
+            {
+                PlaylistItem plTemp(gpe->Item()->URL().c_str(),
+                                    &(gpe->Item()->GetMetaData()));
+                SeedList.push_back(&plTemp);
+                GenPlaylistEvent(&SeedList);
+            }
+            else
+            {
+                GenPlaylistEvent(NULL);
+            }
+            break;
+        }
+
         default:
             break;
     }

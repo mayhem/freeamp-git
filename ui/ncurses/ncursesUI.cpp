@@ -24,7 +24,7 @@ ncurses user interface by stephan auerhahn (palpatine@midi.net)
 this is a hacked up version of cmdlineUI.cpp
 ____________________________________________________________________________*/
 
-#include <iostream.h>
+#include <iostream>
 #include <stdio.h>
 #include <unistd.h>
 

@@ -2,7 +2,7 @@
         
         FreeAmp - The Free MP3 Player
 
-        Portions Copyright (C) 1998-1999 EMusic.com
+        Portions Copyright (C) 1998-2000 EMusic.com
 
         This program is free software; you can redistribute it and/or modify
         it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ ____________________________________________________________________________*/
 #pragma warning(disable:4786)
 #endif
 
-#include <iostream.h>
+#include <iostream>
 #include <stdlib.h>
 #include <assert.h>
 #include <ctype.h>
@@ -89,6 +89,9 @@ EventQueue()
 {
     m_context = context;
     m_context->player = this;
+    m_APSInterface = new APSInterface();
+    m_context->aps = m_APSInterface;
+
     // cout << "Creating player..." << endl;
     m_eventSem = new Semaphore();
     m_eventQueue = new Queue < Event * >();
@@ -102,6 +105,7 @@ EventQueue()
     m_pmiMutex = new Mutex();
     m_pmoMutex = new Mutex();
     m_uiMutex = new Mutex();
+    m_signatureSem = new Semaphore(2);
     // cout << "Created mutex" << endl;
     m_imQuitting = 0;
     m_quitWaitingFor = 0;
@@ -118,6 +122,7 @@ EventQueue()
     m_browserUI = NULL;
     m_downloadUI = NULL;
 
+    m_sigspmo = NULL;
     m_pmo = NULL;
     m_lmc = NULL;
     m_ui = NULL;
@@ -198,6 +203,7 @@ Player::
     TYPICAL_DELETE(m_dlm);
 
     TYPICAL_DELETE(m_pTermSem);
+    TYPICAL_DELETE(m_APSInterface);
 
     if(m_argUIList)
     {
@@ -248,6 +254,7 @@ Player::
     TYPICAL_DELETE(m_pmiMutex);
     TYPICAL_DELETE(m_pmoMutex);
     TYPICAL_DELETE(m_uiMutex);
+    TYPICAL_DELETE(m_signatureSem);
     TYPICAL_DELETE(m_lmcRegistry);
     TYPICAL_DELETE(m_pmiRegistry);
     TYPICAL_DELETE(m_pmoRegistry);
@@ -1243,6 +1250,149 @@ ChoosePMI(const char *szUrl, char *szTitle)
    return ret;
 }
 
+typedef struct GenerateSigsStruct {
+    Player *player;
+    Thread *thread;
+    set<PlaylistItem *> *tracks;
+} GenerateSigsStruct;
+
+void 
+Player::
+GenerateSignature(Event *pEvent)
+{
+    GenerateSignatureEvent *gse = (GenerateSignatureEvent *)pEvent;
+    set<PlaylistItem *> *tracks = gse->Tracks();
+
+    Thread *thread = Thread::CreateThread();
+    if (thread) {
+        GenerateSigsStruct *gss = new GenerateSigsStruct;
+        gss->player = this;
+        gss->thread = thread;
+        gss->tracks = tracks;
+
+        thread->Create(generate_sigs_function, gss, true);
+    }
+}
+
+void
+Player::
+generate_sigs_function(void *arg)
+{
+    GenerateSigsStruct *gss = (GenerateSigsStruct *)arg;
+    gss->player->GenerateSigsWork(gss->tracks);
+
+    delete gss->thread;
+    delete gss;
+}
+
+void 
+Player::
+GenerateSigsWork(set<PlaylistItem *> *items)
+{
+    set<PlaylistItem *>::iterator i = items->begin();
+    for (; i != items->end(); i++) 
+    {
+        Error  error = kError_NoErr;
+        PhysicalMediaOutput *pmo = NULL;
+        PhysicalMediaInput *pmi = NULL;
+        LogicalMediaConverter *lmc = NULL;
+        RegistryItem *pmi_item = NULL;
+        RegistryItem *lmc_item = NULL;
+        RegistryItem *item = NULL;
+
+        PlaylistItem *pc = *i;
+        if (!pc)
+            continue;
+
+        string url = pc->URL();
+        //string url = string("file:///music/Various Artists/Sounds_of_Wood_&_Steel_2/09_Opportunity_(T.J._Baden).mp3");
+
+        pmi_item = ChoosePMI(url.c_str());
+        if (!pmi_item)
+        {
+           char szErr[1024];
+ 
+           sprintf(szErr, "Cannot determine what pmi to use for %s\n", url.c_str());
+           m_context->log->Error(szErr);
+           AcceptEvent(new ErrorMessageEvent(szErr));
+
+           continue;
+        }
+
+        lmc_item = ChooseLMC(url.c_str());
+        if (!lmc_item)
+        // FIXME: Should probably have a user definable default LMC
+           lmc_item = m_lmcRegistry->GetItem(0);
+   
+        pmi = (PhysicalMediaInput *) pmi_item->InitFunction()(m_context);
+        pmi->SetPropManager((Properties *) this);
+
+        int32 i = 0;
+
+        while (NULL != (item = m_pmoRegistry->GetItem(i++)))
+            if (!strcmp("signature.pmo", item->Name()))
+                break;
+
+        if (!item) {
+            delete pmi;
+            return;
+        }
+
+        pmo = (PhysicalMediaOutput *) item->InitFunction()(m_context);
+        pmo->SetPropManager((Properties *) this);
+
+        error = kError_NoErr;
+        lmc = (LogicalMediaConverter *) lmc_item->InitFunction()(m_context);
+        lmc->SetPropManager((Properties *) this);
+
+        lmc->SetPMI(pmi);
+        lmc->SetPMO(pmo);
+
+        pmo->SetPMI(pmi);
+        pmo->SetLMC(lmc);
+
+        DecodeInfo decInfo;
+//        decInfo.downsample = 2;
+//        decInfo.mono = decInfo.eightbit = true;
+        decInfo.sendInfo = false;
+
+        lmc->SetDecodeInfo(decInfo);
+        lmc->SetEQData(m_eqValues);
+        lmc->SetEQData(m_eqEnabled);
+
+        error = pmo->SetTo(url.c_str());
+        if (error == kError_FileNotFound) {
+            delete pmo;
+            delete lmc;
+            delete pmi;
+            continue;
+        }
+
+        if (IsError(error))
+        {
+            char szErr[1024];
+
+            sprintf(szErr, "Cannot setup the audio decode process: %d\n", error);
+            m_context->log->Error(szErr);
+            delete pmo;
+            delete lmc;
+            delete pmi;
+            continue;
+        }
+
+        m_signatureSem->Wait();
+
+        m_sigspmo = pmo;
+        pmo->Resume();
+
+        while (m_sigspmo) 
+            usleep(50);
+
+        m_signatureSem->Signal();
+    }
+    delete items;
+}
+
 void 
 Player::
 CreatePMO(const PlaylistItem * pc, Event * pC)
@@ -1262,6 +1412,7 @@ CreatePMO(const PlaylistItem * pc, Event * pC)
       if (m_pmo)
       {
          m_pmo->Pause();
+         m_signatureSem->Signal();
          delete m_pmo;
 
          m_pmo = NULL;
@@ -1284,6 +1435,7 @@ CreatePMO(const PlaylistItem * pc, Event * pC)
    if (m_pmo)
    {
       m_pmo->Pause();
+      m_signatureSem->Signal();
       delete    m_pmo;
 
       m_pmo = NULL;
@@ -1432,6 +1584,7 @@ DoneOutputting(Event *pEvent)
 
    if (m_pmo)
    {
+      m_signatureSem->Signal();
       delete m_pmo;
       m_pmo = NULL;
       m_lmc = NULL;
@@ -1441,6 +1594,14 @@ DoneOutputting(Event *pEvent)
    {
        SEND_NORMAL_EVENT(INFO_Stopped);
    }
+
+   PlaylistItem *item = m_plm->GetCurrentItem();
+   MetaData mdata = (MetaData)item->GetMetaData();
+   mdata.AddPlayCount();
+   item->SetMetaData(&mdata);
+   m_plm->UpdateTrackMetaData(item);
+   m_musicCatalog->UpdateSong(item);
+   m_APSInterface->WriteToLog(mdata.GUID());   
 
    SEND_NORMAL_EVENT(INFO_DoneOutputting);
 
@@ -1486,6 +1647,7 @@ Stop(Event *pEvent)
     if (m_pmo)
     {
        m_pmo->Pause();
+       m_signatureSem->Signal();
        delete    m_pmo;
  
        m_pmo = NULL;
@@ -1562,6 +1724,7 @@ Play(Event *pEvent)
     if (m_playerState == PlayerState_Playing)
     {
        delete m_pmo;
+       m_signatureSem->Signal();
        m_pmo = NULL;
        m_lmc = NULL;
 
@@ -1576,7 +1739,7 @@ Play(Event *pEvent)
        pItem = m_plm->GetCurrentItem();
        if (pItem)
        {
-          CreatePMO(pItem, pEvent);
+            CreatePMO(pItem, pEvent);
        }   
 
        if (!m_pmo) 
@@ -1593,6 +1756,13 @@ Play(Event *pEvent)
     }
     else
     {
+        if (m_playerState != PlayerState_Paused) {
+            while (!m_signatureSem->Wait(1)) {
+                if (m_sigspmo)
+                    delete m_sigspmo;
+                m_sigspmo = NULL;
+            }
+        }
         m_pmo->Resume();
         if (SetState(PlayerState_Playing))
         {
@@ -1872,6 +2042,19 @@ ToggleUI(Event *pEvent)
    delete pEvent;
 } 
 
+void 
+Player::
+HandleAudioSigGenerated(Event *pEvent)
+{
+    AudioSignatureGeneratedEvent *asge = (AudioSignatureGeneratedEvent *)pEvent;
+    if (m_sigspmo)
+        delete asge->PMO();
+    m_musicCatalog->AcceptEvent(pEvent);
+    m_sigspmo = NULL;
+
+    delete pEvent;
+}
+
 int32 
 Player::
 ServiceEvent(Event * pC)
@@ -1958,6 +2141,10 @@ ServiceEvent(Event * pC)
             delete pC;
             break;
 
+        case INFO_AudioSignatureGenerated:
+            HandleAudioSigGenerated(pC);
+            break;
+
         case INFO_UserMessage:
         case INFO_StatusMessage:
         case INFO_BrowserMessage:
@@ -1995,6 +2182,7 @@ ServiceEvent(Event * pC)
         case CMD_LoadTheme:
         case CMD_ShowPreferences:
         case CMD_EditCurrentPlaylistItemInfo:
+        case CMD_GeneratePlaylist:
             SendEventToUI(pC);
             delete pC;
             break;
@@ -2007,6 +2195,11 @@ ServiceEvent(Event * pC)
 
         case CMD_SetEQData:
             SetEQData(pC);
+            break;
+
+        case CMD_GenerateSignature:
+            GenerateSignature(pC);
+            delete pC;
             break;
 
 #define _VISUAL_ENABLE_

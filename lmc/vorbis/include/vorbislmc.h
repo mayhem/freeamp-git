@@ -66,7 +66,9 @@ class VorbisLMC : public LogicalMediaConverter
 
    virtual Error SetEQData(float *f) { return kError_YouScrewedUp; };
    virtual Error SetEQData(bool b) { return kError_YouScrewedUp; };
-   
+  
+   virtual Error SetDecodeInfo(DecodeInfo &info);
+ 
  private:
 
    static int    SeekWrapper(void *stream, int64_t offset, int whence);

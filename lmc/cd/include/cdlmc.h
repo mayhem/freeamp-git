@@ -53,6 +53,8 @@ class  CDLMC:public LogicalMediaConverter
    virtual Error SetEQData(float *);
    virtual Error SetEQData(bool);
 
+   virtual Error SetDecodeInfo(DecodeInfo &info);
+
    virtual vector<const char *> *GetExtensions(void);
 };
 

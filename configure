@@ -2943,7 +2943,7 @@ else
   echo "WARNING: You don't have FreeType installed.  This means that FreeAmp"
   echo "will fall back on X fonts.  To make FreeAmp's GUI interface all pretty,"
   echo "you need FreeType.  Get the latest stable version at: "
-  echo "http://www.freetype.org/download.htm"
+  echo "http://www.freetype.org/download.html"
 fi
  
 

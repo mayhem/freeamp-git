@@ -149,5 +149,8 @@ class EventQueue {
 #define INFO_VorbisInfo             82 // Used to send vorbis stream info
 #define INFO_FileNotFound           83 // Used to send file not found info
 #define CMD_EditCurrentPlaylistItemInfo  84 // Used to instruct the info editor to edit the current metadata item
+#define CMD_GenerateSignature        85 // sent by the MC to tell the player to generate a signature
+#define INFO_AudioSignatureGenerated 86 // sent by the signature.pmo generation algo.
+#define CMD_GeneratePlaylist         87 // sent to the MC to generate an APL playlist
 #endif // _EVENT_H_
 

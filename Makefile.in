@@ -57,6 +57,11 @@ FREEAMPbeosOBJ += base/beos/src/mutex.o base/beos/src/semaphore.o
 FREEAMPbeosOBJ += base/beos/src/utility.o base/beos/src/freeampapp.o
 FREEAMPbeosOBJ += base/beos/src/win32impl.o
 
+APSOBJ  = base/aps/FAMetaUnit.o base/aps/apsinterface.o base/aps/sigclient.o
+APSOBJ += base/aps/apsplaylist.o base/aps/gencrc.o base/aps/hosttonet.o 
+APSOBJ += base/aps/nettohost.o base/aps/comsocket.o base/aps/apsconvert.o
+APSOBJ += base/aps/YPClient.o base/aps/sigxdr.o 
+
 FREEAMPOBJ =  base/src/log.o base/src/player.o base/src/musiccatalog.o
 FREEAMPOBJ += base/src/playlist.o base/src/propimpl.o base/src/registrar.o
 FREEAMPOBJ += base/src/registry.o base/src/thread.o io/src/eventbuffer.o
@@ -66,7 +71,7 @@ FREEAMPOBJ += base/src/downloadmanager.o base/src/errors.o
 FREEAMPOBJ += io/src/pullbuffer.o io/src/tstream.o
 FREEAMPOBJ += base/src/undomanager.o #base/src/updatemanager.o
 FREEAMPOBJ += base/src/timer.o base/src/missingfile.o io/src/pipeline.o
-FREEAMPOBJ += $(FREEAMP$(HOST_OS)OBJ)
+FREEAMPOBJ += $(FREEAMP$(HOST_OS)OBJ) $(APSOBJ)
 FREEAMPOBJ += lib/gdbm/lib/libfagdbm.a lib/xml/lib/libfaxml.a 
 FREEAMPOBJ += lib/zlib/lib/libzlib.a lib/http/lib/libfahttp.a
 
@@ -85,8 +90,9 @@ DIRECTORIES += io/esound/src io/http io/local io/obs io/src io/soundcard
 DIRECTORIES += io/soundcard/beos io/soundcard/unix io/soundcard/unix/linux
 DIRECTORIES += io/soundcard/beos/src io/soundcard/unix/linux/src 
 DIRECTORIES += io/wavout io/wavout/src io/wavout/include
-DIRECTORIES += io/soundcard/unix/solaris lib lib/xml lib/zlib lmc lmc/xingmp3
-DIRECTORIES += io/soundcard/unix/solaris/src lib/gdbm lib/xml/src lib/zlib/src
+DIRECTORIES += io/soundcard/unix/solaris io/soundcard/unix/solaris/src 
+DIRECTORIES += lib lib/xml lib/xml/src lib/http lib/http/src lib/zlib lmc
+DIRECTORIES += lmc/xingmp3 lmc/xingmp3/src lib/gdbm lib/zlib/src lmc/vorbis 
 DIRECTORIES += plm plm/metadata plm/playlist plm/portable plm/portable/pmp300
 DIRECTORIES += lmc/xingmp3/src plm/metadata/id3v1 plm/metadata/id3v2 
 DIRECTORIES += plm/metadata/misc plm/playlist/m3u plm/portable/pmp300/sba ui
@@ -94,11 +100,11 @@ DIRECTORIES += ui/download ui/download/unix ui/freeamp ui/freeamp/beos
 DIRECTORIES += ui/cmdline ui/download/unix/src ui/freeamp/beos/src 
 DIRECTORIES += ui/freeamp/tools ui/freeamp/unix ui/irman ui/lcd ui/musicbrowser
 DIRECTORIES += ui/freeamp/src ui/freeamp/tools/src ui/freeamp/unix/src
-DIRECTORIES += ui/musicbrowser/unix ui/mpg123 plm/playlist/pls
+DIRECTORIES += ui/musicbrowser/src ui/musicbrowser/unix ui/mpg123 plm/playlist/pls
 DIRECTORIES += ui/irman/src ui/lcd/src ui/musicbrowser/unix/src ui/ncurses
 DIRECTORIES += update update/unix lmc/cd lmc/cd/src io/cd io/cd/unix 
-DIRECTORIES += io/cd/unix/src lib/unzip lib/unzip/src ftc ftc/winamp
-DIRECTORIES += plm/metadata/cddb
+DIRECTORIES += io/cd/unix/src lib/unzip lib/unzip/src ftc ftc/kjofol ftc/winamp
+DIRECTORIES += plm/metadata/cddb base/aps lmc/vorbis/src
 
 dirs:
 	for p in $(DIRECTORIES); do \

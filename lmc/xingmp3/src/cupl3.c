@@ -1195,6 +1195,7 @@ int L3audio_decode_init(MPEG_HEAD * h, int framebytes_arg,
    decinfo.channels = out_chans;
    decinfo.outvalues = outvalues;
    decinfo.samprate = samprate >> reduction_code;
+
    if (bit_code)
       decinfo.bits = 8;
    else

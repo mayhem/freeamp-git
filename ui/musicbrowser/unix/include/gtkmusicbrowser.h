@@ -302,6 +302,9 @@ class GTKMusicBrowser {
     void SaveCurrentPlaylist(char *path = NULL);
     void LoadPlaylist(string &oPlaylist);
     void ImportPlaylist(char *path);
+    void GenPlaylist(vector<PlaylistItem *> *seed);
+    void GenPlaylist(void);
+    void SubmitPlaylist(void);
 
     void CreateNewEditor(char *playlisturl, bool cd_mode = false);
 

@@ -45,6 +45,7 @@ class MetaData {
         m_track = 0;
         m_time = 0;
         m_size = 0;
+        m_playcount = 0;
     }
 
     virtual ~MetaData(){}
@@ -85,6 +86,14 @@ class MetaData {
     Error SetSize(uint32 bytes){ m_size = bytes; return kError_NoErr;}
     uint32 Size() const { return m_size; }
 
+    Error SetGUID(const char *guid) { m_guid = guid; return kError_NoErr; }
+    Error GetGUID(char *buf, uint32 *len) { return SetBuffer(buf, m_guid.c_str(), len); }
+    const string& GUID() const { return m_guid; }
+
+    Error SetPlayCount(uint32 playcount) { m_playcount = playcount; return kError_NoErr; }
+    uint32 PlayCount() const { return m_playcount; }
+    void AddPlayCount() { m_playcount++; }
+
     bool operator==(const MetaData& data) const
     {
         bool result = false;
@@ -98,7 +107,7 @@ class MetaData {
                    m_track == data.m_track &&
                    m_time == data.m_time &&
                    m_size == data.m_size &&
-				   m_extension == data.m_extension);
+		   m_extension == data.m_extension);
 
         return result;
     }
@@ -144,12 +153,13 @@ class MetaData {
     string m_title;
     string m_genre;
     string m_comment;
-	string m_extension;
+    string m_extension;
+    string m_guid;
     uint32 m_year;
     uint32 m_track;
     uint32 m_time;
     uint32 m_size;
-
+    uint32 m_playcount;
 };
 
 typedef enum MetaDataOrder {

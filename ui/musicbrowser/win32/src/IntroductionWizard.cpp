@@ -289,7 +289,10 @@ static BOOL CALLBACK IntroWizardSearch( HWND hwnd,
             HWND hwndDrives = GetDlgItem(hwnd, IDC_DRIVES);
             HWND hwndDirectory = GetDlgItem(hwnd, IDC_DIRECTORY);
             DWORD  dwDrives;
-            char   szDrive[3] = "X:";
+            //char   szDrive[3] = "X:";
+            char *szDrive = new char[4];
+            memset(szDrive, 0, 4);
+            szDrive[1] = ':';
             int32  i, ret;
 
             i = ComboBox_AddString(hwndDrives, "All Drives");
@@ -314,6 +317,7 @@ static BOOL CALLBACK IntroWizardSearch( HWND hwnd,
             PROPSHEETPAGE* psp = (PROPSHEETPAGE*)lParam;
             searchPaths = (vector<string>*)psp->lParam;
 
+            delete [] szDrive;
             break;
         }
 
@@ -632,9 +636,165 @@ static BOOL CALLBACK IntroWizardSearch( HWND hwnd,
 	return result;
 }   
 
-bool MusicBrowserUI::IntroductionWizard(vector<string>* searchPaths)
+static BOOL CALLBACK IntroWizardRelatable(HWND hwnd,
+                                          UINT msg,
+                                          WPARAM wParam,
+                                          LPARAM lParam)
 {
-    PROPSHEETPAGE psp[2];
+    BOOL result = FALSE;
+    static APSInterface *pInterface;
+  
+    switch(msg)
+    {
+        case WM_INITDIALOG:
+        {
+            PROPSHEETPAGE *psp = (PROPSHEETPAGE*)lParam;
+            pInterface = (APSInterface *)psp->lParam;
+            break;
+        }
+        case WM_DRAWITEM:
+        {
+            DRAWITEMSTRUCT* dis = (DRAWITEMSTRUCT*)lParam;
+            UINT ctrlId = wParam;
+            const char* kMsg1 = "Thanks for using the Relatable-enabled FreeAmp player.\n"
+                                "Our music player features the Relatable Plug-in, designed to\n"
+                                "automatically generate personal playlists that are based on the files\n"
+                                "located on your computer and the music you listen to on the Web.\n"
+                                "The more you use our player, the better it works!\n\n"
+                                "To experience the power of Relatable...\n"
+                                "Select the \"Options\" tab, create and save your profile and then\n"
+                                "start listening to music.  After you have listened to just a few\n"
+                                "tunes, hit the button on the far right to view and listen to a\n"
+                                "recommended list of songs.\n\n"
+                                "Please note that your anonymous music profile is stored on\n"
+                                "Relatable's secure servers.  At Relatable, privacy is paramount:\n"
+                                "Your profile will NEVER be shared with third parties.  The\n"
+                                "Relatable Plug-in is an \"opt-in\" solution; if you don't want\n"
+                                "to use it don't create a profile.  Either way, enjoy the player!\n\n"
+                                "For more information, please review our 'Read-me' file or send\n"
+                                "questions to: freeamptest@relatable.com\n";
+            const char* kCaption1 = "Profile Name: ";
+            switch(ctrlId)
+            {
+                case IDC_RELATABLE_TEXT1:
+                {
+                    HFONT font, oldFont;
+
+                    font = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
+
+                    oldFont = (HFONT)SelectObject(dis->hDC, font);
+
+                    RECT clientRect;
+                    GetClientRect(dis->hwndItem, &clientRect);
+
+                    DrawText(dis->hDC,
+                             kMsg1,
+                             strlen(kMsg1),
+                             &clientRect,
+                             DT_LEFT|DT_WORDBREAK);
+
+                    SelectObject(dis->hDC, oldFont);
+
+                    DeleteObject(font);
+                    break;
+                }
+                case IDC_RELATABLE_CAPTION1:
+                {
+                    HFONT font, oldFont;
+
+                    font = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
+
+                    oldFont = (HFONT)SelectObject(dis->hDC, font);
+
+                    RECT clientRect;
+                    GetClientRect(dis->hwndItem, &clientRect);
+
+                    RECT halfHeightRect = clientRect;
+                    int halfHeight = DrawText(
+                                         dis->hDC,
+                                         kCaption1,
+                                         strlen(kCaption1),
+                                         &halfHeightRect,
+                                         DT_LEFT|DT_SINGLELINE|DT_CALCRECT)/2;
+                    int height;
+
+                    height = DrawText(
+                             dis->hDC,
+                             kCaption1,
+                             strlen(kCaption1),
+                             &clientRect,
+                             DT_LEFT|DT_WORDBREAK);
+
+                    clientRect.top += height + halfHeight;
+
+                    SelectObject(dis->hDC, oldFont);
+
+                    DeleteObject(font);
+                    break;
+                }
+                               
+                case IDC_RELATABLE_EDIT1:
+                {
+                    break;
+                }
+            }
+
+            break;
+        }
+        case WM_NOTIFY:
+        {
+            switch(((NMHDR*)lParam)->code)
+            {
+                case PSN_KILLACTIVE:
+                {
+                    SetWindowLong(hwnd,        DWL_MSGRESULT, FALSE);
+                    result = TRUE;
+                    break;
+                }
+                case PSN_RESET:
+                {
+                    SetWindowLong(hwnd,        DWL_MSGRESULT, FALSE);
+                    break;
+                }
+
+                case PSN_SETACTIVE:
+                {
+                    PropSheet_SetWizButtons(GetParent(hwnd), PSWIZB_BACK | PSWIZB_NEXT);
+                    break;
+                }
+                case PSN_WIZNEXT:
+                {
+                    HWND hwndProfileEdit = GetDlgItem(hwnd, IDC_RELATABLE_EDIT1);
+                    char temp[MAX_PATH];
+
+                    Edit_GetText( hwndProfileEdit,
+                                  temp,
+                                  MAX_PATH);
+                                       
+                    //MessageBox(NULL, temp, "Value", MB_OK | MB_SYSTEMMODAL);
+                    if (!string(temp).empty())
+                    {
+                        pInterface->CreateProfile(temp);
+                    }
+                    break;
+                }
+
+                case PSN_WIZBACK:
+                {
+                    break;
+                }
+            }
+            break;
+        }
+    }
+
+    return result;
+}
+
+bool MusicBrowserUI::IntroductionWizard(vector<string>* searchPaths,
+                                        APSInterface *pInterface)
+{
+    PROPSHEETPAGE psp[3];
     PROPSHEETHEADER psh;
 
     HINSTANCE hinst = (HINSTANCE)GetWindowLong(m_hWnd, GWL_HINSTANCE);
@@ -651,11 +811,20 @@ bool MusicBrowserUI::IntroductionWizard(vector<string>* searchPaths)
     psp[1].dwSize = sizeof(PROPSHEETPAGE);
     psp[1].dwFlags = 0;
     psp[1].hInstance = hinst;
-    psp[1].pszTemplate = MAKEINTRESOURCE(IDD_INTROWIZARD_SEARCH);
+    psp[1].pszTemplate = MAKEINTRESOURCE(IDD_INTROWIZARD_RELATABLE);
     psp[1].pszIcon = NULL;
-    psp[1].pfnDlgProc = IntroWizardSearch;
+    psp[1].pfnDlgProc = IntroWizardRelatable;
     psp[1].pszTitle = NULL;
-    psp[1].lParam = (LPARAM)searchPaths;
+    psp[1].lParam = (LPARAM) pInterface;
+
+    psp[2].dwSize = sizeof(PROPSHEETPAGE);
+    psp[2].dwFlags = 0;
+    psp[2].hInstance = hinst;
+    psp[2].pszTemplate = MAKEINTRESOURCE(IDD_INTROWIZARD_SEARCH);
+    psp[2].pszIcon = NULL;
+    psp[2].pfnDlgProc = IntroWizardSearch;
+    psp[2].pszTitle = NULL;
+    psp[2].lParam = (LPARAM)searchPaths;
 
     psh.dwSize = sizeof(PROPSHEETHEADER);
     psh.dwFlags = PSH_PROPSHEETPAGE | PSH_WIZARD | PSH_NOAPPLYNOW;

@@ -30,6 +30,7 @@ ____________________________________________________________________________*/
 #include <iostream>
 #include <algorithm>
 #include <vector>
+#include <set>
 using namespace std;
 
 #include "event.h"
@@ -37,6 +38,7 @@ using namespace std;
 #include "utility.h"
 
 class     LogicalMediaConverter;
+class     PhysicalMediaOutput;
 
 class     UserMessageEvent:public Event
 {
@@ -759,6 +761,58 @@ public:
     virtual ~MusicCatalogPlaylistRemovedEvent() {}
 
     const string Item() const { return m_item; }
+};
+
+class GenerateSignatureEvent : public Event {
+private:
+    set<PlaylistItem *> *m_items;
+public:
+    GenerateSignatureEvent(set<PlaylistItem *> *items)
+    { m_type = CMD_GenerateSignature; m_items = items; }
+    virtual ~GenerateSignatureEvent() {}
+
+    set<PlaylistItem *> *Tracks() { return m_items; }
+};
+
+class AudioSignatureGeneratedEvent : public Event {
+private:
+    string m_url;
+    float  m_energy;
+    float  m_zxing;
+    float  m_length;
+    int    m_spectrum[32];
+    PhysicalMediaOutput *m_pmo;
+
+public:
+    AudioSignatureGeneratedEvent(string &url, float energy, float zxing,
+                                 float length, int spectrum[32],
+                                 PhysicalMediaOutput *pmo)
+    { m_type = INFO_AudioSignatureGenerated; m_url = url; m_energy = energy;
+      m_zxing = zxing; m_length = length;
+      for (int i = 0; i < 32; i++) m_spectrum[i] = spectrum[i];
+      m_pmo = pmo;
+    }
+    virtual ~AudioSignatureGeneratedEvent() {}
+     
+    const string Url() const { return m_url; }
+    const float  Energy() const { return m_energy; }
+    const float  ZXing() const { return m_zxing; }
+    const float  Length() const { return m_length; }
+    const int   *Spectrum() const { return m_spectrum; }
+    PhysicalMediaOutput *PMO() { return m_pmo; }
+};
+
+class GeneratePlaylistEvent : public Event {
+private:
+    const PlaylistItem *m_item;
+    const PlaylistManager *m_plm;
+public:
+    GeneratePlaylistEvent(const PlaylistItem *item, const PlaylistManager *plm)
+    { m_type = CMD_GeneratePlaylist; m_item = item; m_plm = plm; }
+    virtual ~GeneratePlaylistEvent() {}
+
+    const PlaylistItem *Item() const { return m_item; }
+    const PlaylistManager *Manager() const { return m_plm; }
 };
 
 class PlaylistItemAddedEvent : public Event {

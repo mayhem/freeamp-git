@@ -124,7 +124,7 @@ bool Misc::ReadMetaData(const char* url, MetaData* metadata)
                 LogicalMediaConverter *lmc;
                 uint32                 length = 0;
 
-                lmcItem = iter->second; 
+                lmcItem = (*iter).second; 
 
                 lmc = (LogicalMediaConverter*)lmcItem->InitFunction()(m_context);
                 length = lmc->CalculateSongLength(url);

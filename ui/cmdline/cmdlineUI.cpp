@@ -22,7 +22,7 @@
         $Id$
 ____________________________________________________________________________*/
 
-#include <iostream.h>
+#include <iostream>
 #include <stdio.h>
 #include <unistd.h>
 

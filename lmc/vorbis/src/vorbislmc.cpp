@@ -494,3 +494,10 @@ size_t VorbisLMC::Read(void *buf, size_t size, size_t num)
 
    return bytes / size;   
 }
+
+Error VorbisLMC::SetDecodeInfo(DecodeInfo &info)
+{
+    m_decodeInfo = info;
+    return kError_NoErr;
+}
+

@@ -44,6 +44,7 @@ class DownloadManager;
 class UpdateManager;
 class Player;
 class TimerManager;
+class APSInterface;
 
 class FAContext
 {
@@ -58,6 +59,7 @@ class FAContext
           target(0),
 	  catalog(0),
           downloadManager(0),
+          aps(0),
           //updateManager(0),
           player(0),
 #ifdef HAVE_GTK
@@ -86,6 +88,7 @@ class FAContext
     EventQueue *target;
     MusicCatalog *catalog;
     DownloadManager *downloadManager;
+    APSInterface *aps;
     //UpdateManager *updateManager;
     TimerManager *timerManager;
     Player *player;

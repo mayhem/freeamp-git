@@ -50,6 +50,8 @@ using namespace std;
 #include "Win32Window.h"
 #include "help.h"
 #include "Debug.h"
+#include "player.h"
+#include "aps.h"
 
 #define DB Debug_v("%s:%d\n", __FILE__, __LINE__);
 
@@ -154,6 +156,15 @@ PrefDebugCallback(HWND hwnd,
 	return g_pCurrentPrefWindow->PrefDebugProc(hwnd, msg, wParam, lParam);
 }            
 
+static BOOL CALLBACK
+PrefProfileCallback(HWND hwnd,
+                    UINT msg,
+                    WPARAM wParam,
+                    LPARAM lParam)
+{
+       return g_pCurrentPrefWindow->PrefProfileProc(hwnd, msg, wParam, lParam);
+}
+
 Win32PreferenceWindow::Win32PreferenceWindow(FAContext *context,
                                              ThemeManager *pThemeMan,
                                              UpdateManager *pUpdateMan,
@@ -236,11 +247,14 @@ bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent)
     page.pfnDlgProc = PrefAdvancedCallback;
     m_pages.push_back(page);
 
+    page.pszTemplate = MAKEINTRESOURCE(IDD_PREF_PROFILE);
+    page.pfnDlgProc = PrefProfileCallback;
+    m_pages.push_back(page);
+
     page.pszTemplate = MAKEINTRESOURCE(IDD_PREF_ABOUT);
     page.pfnDlgProc = PrefAboutCallback;
     m_pages.push_back(page);
-    
-    
+        
     GetPrefsValues(&m_originalValues);
 
     m_proposedValues = m_currentValues = m_originalValues;
@@ -1787,6 +1801,232 @@ bool Win32PreferenceWindow::PrefDebugProc(HWND hwnd,
 
     return result;
 }
+
+bool Win32PreferenceWindow::PrefProfileProc(HWND hwnd,
+                                            UINT msg,
+                                            WPARAM wParam,
+                                            LPARAM lParam)
+{
+    bool result = false;
+    static HWND hwndProfileList = NULL;
+    static HWND hwndAddProfile = NULL;
+
+    switch(msg)
+    {
+        case WM_INITDIALOG:
+        {
+            hwndProfileList = GetDlgItem(hwnd, IDC_PROFILE_LIST); 
+            hwndAddProfile = GetDlgItem(hwnd, IDC_NEW_PROFILE);
+
+            APSInterface *pTemp = m_pContext->aps;
+            SetFocus(GetDlgItem(hwnd, IDC_PROFILE_LIST));
+
+            if (pTemp != NULL)  
+            {
+                vector<string>::iterator i;
+                vector<string> *pProfiles = pTemp->GetKnownProfiles();
+ 
+                if (pProfiles) 
+                {
+                    for (i =pProfiles->begin(); i != pProfiles->end() ; i++)
+                    {
+                        SendDlgItemMessage(hwnd, IDC_PROFILE_LIST,
+                                           LB_ADDSTRING, NULL,
+                                           (LPARAM)(LPCTSTR)(*i).c_str());
+                    }
+                    SetFocus(GetDlgItem(hwnd, IDC_PROFILE_LIST));
+                }
+            }
+            break;
+        }
+        case WM_DRAWITEM:
+        {
+            SendDlgItemMessage(hwnd, IDC_PROFILE_LIST, WM_SETREDRAW, true, 0L);
+            InvalidateRect(hwndProfileList, NULL, true);
+            break;
+        }
+        case WM_COMMAND:
+        {
+            switch(LOWORD(wParam))
+            {
+                case IDC_PROFILE_LIST:
+                {
+                    switch(HIWORD(wParam))
+                    {
+                        case LBN_SELCHANGE:
+                        {
+                          /*
+                            int iIndex;
+                            int nNumSelected;
+                            char szCurSel[256];
+ 
+                            iIndex = SendDlgItemMessage(hwnd, IDC_PROFILE_LIST,
+                                                        LB_GETCARETINDEX, 0, 0);
+                            nNumSelected = SendDlgItemMessage(hwnd, 
+                                                              IDC_PROFILE_LIST,
+                                                              LB_GETSELCOUNT,
+                                                              0, 0);
+                            if (iIndex >= 0)
+                            {
+                                SendDlgItemMessage(hwnd, IDC_PROFILE_LIST,
+                                                   LB_GETTEXT, iIndex,
+                                                   (LPARAM)szCurSel);
+                                m_pContext->aps->ChangeProfile(szCurSel);
+                            }
+                          */
+                            break;
+                        }
+                    }
+                    break;
+                }
+                case IDC_ADDPROFILE:
+                {
+                    char szCurSel[256];
+                    memset(szCurSel, 0, sizeof(szCurSel));
+                    Edit_GetText(hwndAddProfile, szCurSel, sizeof(szCurSel));
+                    
+                    if (strlen(szCurSel) != 0)
+                    {
+                        APSInterface *pAPS = m_pContext->aps;
+                        if (pAPS)
+                        {
+                            int nRes = pAPS->CreateProfile(szCurSel);
+                            SendDlgItemMessage(hwnd, IDC_PROFILE_LIST,
+                                               LB_ADDSTRING, NULL, 
+                                               (LPARAM)(LPCTSTR)szCurSel);
+                            SendDlgItemMessage(hwnd, IDC_PROFILE_LIST,
+                                               LB_SELECTSTRING, -1,
+                                               (LPARAM)(LPCTSTR)szCurSel);
+                        }
+                    }
+                    break;
+                }
+                case IDC_DELETEPROFILE:
+                {
+                    char szCurSel[256];
+                    memset(szCurSel, 0, sizeof(szCurSel));
+                    int nNumSelected = 0;
+                    int iIndex = 0;
+                    nNumSelected = SendDlgItemMessage(hwnd, IDC_PROFILE_LIST,
+                                                      LB_GETSELCOUNT, 0, 0);
+                    APSInterface *pAPS = m_pContext->aps;
+
+                    if (nNumSelected >= 1 && pAPS)
+                    {
+                        int *pnSelected = new int[nNumSelected];
+                        SendDlgItemMessage(hwnd, IDC_PROFILE_LIST,
+                                           LB_GETSELITEMS, nNumSelected,
+                                           (LPARAM)(LPCTSTR)pnSelected);
+                        // delete item(s) from aps->m_ProfileMap.
+                        char szCurSel[256];
+                        memset(szCurSel, 0, sizeof(szCurSel));
+                       
+                        for (int i = 0; i < nNumSelected; i++) 
+                        {
+                            SendDlgItemMessage(hwnd, IDC_PROFILE_LIST, 
+                                               LB_GETTEXT, pnSelected[i],
+                                               (LPARAM)szCurSel);
+                            int nRes = pAPS->DeleteProfile(szCurSel);
+                        }
+                        
+                        if (nNumSelected > 1)
+                        {
+                            // delete multiple items from list box.
+                            int nCnt = 0;
+                            for (int i = 0; i < nNumSelected; i++, nCnt++)
+                            {
+                                SendDlgItemMessage(hwnd, IDC_PROFILE_LIST,
+                                                   LB_DELETESTRING, 
+                                                   pnSelected[i] - nCnt, 0);
+                            }
+                        }
+                        else
+                        {
+                            // delete single item from list box.
+                            SendDlgItemMessage(hwnd, IDC_PROFILE_LIST,
+                                               LB_DELETESTRING, pnSelected[0], 
+                                               0);
+                        }
+                        delete [] pnSelected;
+                        pnSelected = NULL;
+                    }
+                    break;
+                }
+            }
+            break;
+        }
+        case WM_NOTIFY:
+        {
+            NMHDR *notify = (NMHDR*)lParam;
+
+            switch(notify->code)
+            {
+                case PSN_HELP:
+                {
+                    ShowHelp(m_pContext, Preferences_About);
+                    break;
+                }
+                case PSN_SETACTIVE:
+                {
+                    break;
+                }
+                case PSN_APPLY:
+                {
+                    int  iIndex;
+                    int  nNumSelected;
+                    int *pnSelected;
+                    char szCurSel[256];
+
+                    iIndex = SendDlgItemMessage(hwnd, IDC_PROFILE_LIST,
+                                                LB_GETCARETINDEX, 0, 0);
+                    nNumSelected = SendDlgItemMessage(hwnd, IDC_PROFILE_LIST,
+                                                      LB_GETSELCOUNT, 0, 0);
+                    if (nNumSelected >= 1) 
+                    {
+                        APSInterface *pAPS = m_pContext->aps;
+                        pAPS->ClearActiveProfiles();
+                        SendDlgItemMessage(hwnd, IDC_PROFILE_LIST, 
+                                           LB_GETTEXT, iIndex, (LPARAM)szCurSel);
+                        pAPS->ChangeProfile(szCurSel);
+
+                        // if multiple profiles are selected, combine them.
+                        if (nNumSelected > 1)
+                        {
+                            pnSelected = new int[nNumSelected];
+                            SendDlgItemMessage(hwnd, IDC_PROFILE_LIST,
+                                               LB_GETSELITEMS, nNumSelected,
+                                               (LPARAM)(LPCTSTR)pnSelected);
+                            // Loop through the selected profiles to combine
+                            for (int i = 0; i < nNumSelected; i++)
+                            {
+                                SendDlgItemMessage(hwnd, IDC_PROFILE_LIST,
+                                                   LB_GETTEXT, pnSelected[i],
+                                                   (LPARAM)szCurSel);
+                                pAPS->CombineProfile(szCurSel);
+                            }
+                            delete [] pnSelected;
+                            pnSelected = NULL;
+                        }
+                    }
+                    SavePrefsValues(&m_proposedValues);
+                    break;
+                }
+                case PSN_KILLACTIVE:
+                {
+                    break;
+                }
+
+                {
+                    SavePrefsValues(&m_originalValues);
+                    break;
+                }
+            }
+            break;
+        }
+    }
+         
+    return result;
+}   
 
 bool Win32PreferenceWindow::PrefAboutProc(HWND hwnd, 
                                           UINT msg, 

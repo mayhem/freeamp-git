@@ -101,7 +101,7 @@ typedef enum Error
     kError_DownloadDenied       = 70,
     kError_NoDiscInDrive        = 71,
     kError_LastError            = 9999
-};
+} _Errors;
 
 
 #define IsError( err )		( (err) != kError_NoErr )

@@ -50,6 +50,7 @@ class IntroWizardUI {
     void EndSearch();
     void GoToPage1();
     void GoToPage2();
+    void GoToPage3();
     void DeleteEvent();
     void Close();
     
@@ -76,10 +77,12 @@ class IntroWizardUI {
 
     GtkWidget *page1;
     GtkWidget *page2;
+    GtkWidget *page3;
     
     string searchPath;
 
     GtkWidget *IntroPage(void);
+    GtkWidget *RelatablePage(void);
     GtkWidget *SearchPage(void);
 
     MusicBrowserUI *m_parent;
