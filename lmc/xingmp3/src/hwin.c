@@ -36,8 +36,13 @@ hybrid window/filter
 #include <float.h>
 #include <math.h>
 
-
+#ifdef ASM_X86
 extern int band_limit_nsb;
+extern int hybrid_asm(float xin[], float xprev[], float y[18][32],
+	   int btype, int nlong, int ntot, int nprev);
+extern void FreqInvert_asm(float y[18][32], int n);
+#endif /* ASM_X86 */
+
 
 typedef float ARRAY36[36];
 
@@ -54,6 +59,13 @@ ARRAY36 *hwin_init_addr()
 {
    return win;
 }
+
+#ifdef ASM_X86
+#ifdef _MSC_VER
+#pragma warning(disable: 4035)
+#endif /* _MSC_VER */ 
+#endif /* ASM_X86 */
+
 /*====================================================================*/
 int hybrid(float xin[], float xprev[], float y[18][32],
 	   int btype, int nlong, int ntot, int nprev)
@@ -158,6 +170,13 @@ int hybrid(float xin[], float xprev[], float y[18][32],
    return nout;
 #endif
 }
+
+#ifdef ASM_X86
+#ifdef _MSC_VER
+#pragma warning(default: 4035)
+#endif /* _MSC_VER */ 
+#endif /* ASM_X86 */
+
 /*--------------------------------------------------------------------*/
 /*--------------------------------------------------------------------*/
 /*-- convert to mono, add curr result to y,

@@ -68,6 +68,10 @@ typedef float ARRAY2_64_2[2][64][2];
 typedef float ARRAY64_2[64][2];
 static float lr2[2][2][64][2];
 
+#ifdef ASM_X86
+extern void antialias_asm(float x[], int n);
+#endif /* ASM_X86 */
+
 
 /*===============================================================*/
 ARRAY2 *alias_init_addr()

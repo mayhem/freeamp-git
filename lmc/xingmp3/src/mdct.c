@@ -43,6 +43,10 @@ inplace ok.
 #include <float.h>
 #include <math.h>
 
+#ifdef ASM_X86
+extern void imdct18_asm(float f[18]);
+extern void imdct6_3_asm(float f[]);
+#endif /* ASM_X86 */
 
 /*------ 18 point xform -------*/
 float mdct18w[18];
