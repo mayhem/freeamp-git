@@ -1,7 +1,0 @@
-; cddb.def : Declares the module parameters for the DLL.
-
-LIBRARY      "cddb"
-DESCRIPTION  'CDDB MetaData Library'
-
-EXPORTS
-	Initialize
