@@ -43,6 +43,7 @@ class Mpg123UI : public CIO,public COO {
     float totalTime;
     int32 skipFirst;
     char fileName[512];
+    float lastSeconds;
 };
 
 

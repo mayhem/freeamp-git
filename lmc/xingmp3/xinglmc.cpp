@@ -6,6 +6,7 @@
         Corp.  http://www.xingtech.com
 
 	Portions Copyright (C) 1998 GoodNoise
+	Portions Copyright (C) 1998 "Michael Bruun Petersen" <mbp@image.dk>
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -83,11 +84,12 @@ XingLMC(PhysicalMediaInput* input, PhysicalMediaOutput* output)
 //	    cout << "Back here: " << backhere << endl;
 	    int32 end = m_input->Seek(0,SEEK_FROM_END);
 	    m_input->Seek(-128,SEEK_FROM_CURRENT);
-	    char buf[5];
-	    m_input->Read(buf,4); // account for id3v1 / id3v1.1 tag
-	    if ((buf[0] == 'T') &&
-		(buf[1] == 'A') &&
-		(buf[2] == 'G')) {
+	    // look for id3 tag
+	    char buf[128];
+	    memset(buf,0,sizeof(buf));
+	    m_input->Read(buf,128);
+	    Id3TagInfo tag_info(buf);
+	    if (tag_info.contains_info) {
 		end -= 128;
 	    }
 //	    cout << "now here: " << m_input->Seek(backhere,SEEK_FROM_START) << endl;
@@ -104,7 +106,7 @@ XingLMC(PhysicalMediaInput* input, PhysicalMediaOutput* output)
 	    int32 samprate = sr_table[4*head.id+head.sr_index];
 	    if ((head.sync & 1) == 0) samprate = samprate / 2;
 	    sprintf(psamprate,"%d Hz",samprate);
-	    MediaVitalInfo *mvi = new MediaVitalInfo(streamname,streamname,totalFrames,bytesPerFrame,bitrate,samprate,totalTime);
+	    MediaVitalInfo *mvi = new MediaVitalInfo(streamname,streamname,totalFrames,bytesPerFrame,bitrate,samprate,totalTime, tag_info);
 	    delete streamname;
 	    Event *e = new Event(INFO_MediaVitalStats,mvi);
 	    Player::getPlayer()->acceptEvent(*e);

@@ -46,13 +46,14 @@ void PlayList::add(char *pc, int type) {
 	//int len = strlen(pc) + 1;
 	//char *pNewC = new char[len];
 	PlayListItem* item = new PlayListItem;
-
-	if(item->url = new char[strlen(pc) + 1]) {
-	  strcpy(item->url,pc);
-	}
-	else {
-	  //XXX FIXME Uhhh...what if we run out of memory?
-	  cerr << "Out of memory!\n";
+	int len = strlen(pc) + 1;
+	if(item->url = new char[len]) {
+	    //strcpy(item->url,pc);
+	    memcpy(item->url,pc,len);
+	} else {
+	    //XXX FIXME Uhhh...what if we run out of memory?
+	    // --jdw:  then we're screwwwwwwwed
+	    cerr << "Out of memory!\n";
 	}
 	item->type = type;
 

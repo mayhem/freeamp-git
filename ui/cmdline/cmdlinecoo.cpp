@@ -3,6 +3,7 @@
 	FreeAmp - The Free MP3 Player
 
 	Portions Copyright (C) 1998 GoodNoise
+	Portions Copyright (C) 1998 "Michael Bruun Petersen" <mbp@image.dk>
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -47,6 +48,13 @@ int32 CommandLineCOO::acceptCOOEvent(Event *e) {
 		MediaVitalInfo *pmvi = (MediaVitalInfo *)e->getArgument();
 		if (pmvi) {
 		    cout << "Playing: " << pmvi->songTitle << endl;
+		    if (pmvi->tagInfo.contains_info) {
+			cout << "Title  : " << pmvi->tagInfo.songname << endl;
+			cout << "Artist : " << pmvi->tagInfo.artist << endl;
+			cout << "Album  : " << pmvi->tagInfo.album << endl;
+			cout << "Year   : " << pmvi->tagInfo.year << endl;
+			cout << "Comment: " << pmvi->tagInfo.comment << endl;
+		    }
 #if 0
 		    //cout << "CMDLineCOO: got pmvi" << endl;
 		    char foo[64];

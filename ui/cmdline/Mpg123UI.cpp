@@ -48,7 +48,7 @@ Mpg123UI::Mpg123UI() {
     cerr << "High Performance MPEG 1.0 Audio Player for Layer 2, 3" << endl;
     cerr << "Version 0.05 (1998/Oct/06).  Written by Jason Woodward, Mark Elrod, others." << endl;
     cerr << "Copyrights GoodNoise, XingTech. See 'README' for more!" << endl;
-    cerr << "This software is distributed under the GNU GPL." << endl << endl;
+    cerr << "This software is distributed under the GNU GPL." << endl;
 
     verboseMode = false;
     totalFrames = 0;
@@ -119,6 +119,13 @@ int32 Mpg123UI::acceptCOOEvent(Event *e) {
 		    }
 		    strncpy(fileName,fname,511);
 		    fileName[511] = '\0';
+		    if (pmvi->tagInfo.contains_info) {
+			fprintf(stderr,"Title  : %30s  Artist: %s\n",pmvi->tagInfo.songname,pmvi->tagInfo.artist);
+			fprintf(stderr,"Album  : %30s  Year: %4s, Genre: %d\n",pmvi->tagInfo.album,pmvi->tagInfo.year,(int)pmvi->tagInfo.genre);
+			fprintf(stderr,"Comment: %30s \n",pmvi->tagInfo.comment);
+		    }
+		    cerr << endl;
+
 		    if (verboseMode == false) {
 			// NORMAL MODE
 			if (dir) {
@@ -128,6 +135,12 @@ int32 Mpg123UI::acceptCOOEvent(Event *e) {
 			cerr << "MPEG 1.0 layer III, " << pmvi->bps/1000 << " KBit/s" << ", " << pmvi->freq << " Hz" << " joint-stereo" << endl;
 		    } else {
 			// VERBOSE MODE
+			if (pmvi->tagInfo.contains_info) {
+			    fprintf(stderr,"Title  : %30s  Artist: %s\n",pmvi->tagInfo.songname,pmvi->tagInfo.artist);
+			    fprintf(stderr,"Album  : %30s  Year: %4s, Genre: %d\n",pmvi->tagInfo.album,pmvi->tagInfo.year,(int)pmvi->tagInfo.genre);
+			    fprintf(stderr,"Comment: %30s \n",pmvi->tagInfo.comment);
+			}
+
 			if (dir) {
 			    cerr << "Directory: " << dir << "/" << endl;
 			}
@@ -137,18 +150,6 @@ int32 Mpg123UI::acceptCOOEvent(Event *e) {
 			cerr << "Bitrate: " << pmvi->bps/1000 << " KBits/s, Extension value: 0" << endl;
 			cerr << "Audio: 1:1 conversion, rate: " << pmvi->freq << ", encoding: signed 16 bit, channels: 2" << endl;
 		    }
-#if 0
-		    //cerr << "CMDLineCOO: got pmvi" << endl;
-		    char foo[64];
-		    sprintf(foo,"%.2d:%.2d:%.2d.%.2d",pmvi->hours,pmvi->minutes,pmvi->seconds,pmvi->milliseconds);
-		    cerr << "Track Title: " << pmvi->title << endl;
-		    //cerr << "Track Length: " << pmvi->hours << ":" << pmvi->minutes << ":" << pmvi->seconds << "." << pmvi->milliseconds << endl;
-		    cerr << "Track Length: " << foo << endl;
-		    cerr << "Track Range: " << pmvi->range << endl;
-		    cerr << "Track bps: " << pmvi->bps << endl;
-		    cerr << "Track frequency: " << pmvi->frequency << endl;
-		    cerr << endl;
-#endif
 		}
 		break; }
 	    case INFO_MediaTimePosition: {
@@ -158,11 +159,12 @@ int32 Mpg123UI::acceptCOOEvent(Event *e) {
 		    fprintf(stderr,"\rFrame# %5d [%5d], ",pmtp->frame,totalFrames-pmtp->frame);
 		    fprintf(stderr,"Time: %3.2f [%3.2f], ",pmtp->seconds,totalTime-pmtp->seconds);
 		}
+		lastSeconds = pmtp->seconds;
 		break;}
 	    case INFO_Stopped: {
-		if (verboseMode == true) {
-		    cerr << endl << "[0:00] Decoding of " << fileName << " finished." << endl;
-		}
+		int m = (int)lastSeconds / 60;
+		int s = (int)lastSeconds % 60;
+		fprintf(stderr,"\n[%d:%02d] Decoding of %s finished.\n",m,s,fileName);
 		break;
 	    }
 	    case CMD_Cleanup: {
