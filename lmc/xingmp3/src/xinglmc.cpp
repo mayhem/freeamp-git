@@ -844,18 +844,28 @@ Reset()
 #define _EQUALIZER_ENABLE_
 #ifdef  _EQUALIZER_ENABLE_
 
+extern "C" {
+float equalizer[32] = {
+    1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+    1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+    1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+    1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+};
+int enableEQ = false;
+	   }
+
 Error XingLMC::SetEQData(float *arrayEQ) {
     ENSURE_INITIALIZED;
     Error error = kError_NoErr;
         for(int i=0; i<32; i++)
-                m_equalizer[i] = arrayEQ[i];
+                equalizer[i] = arrayEQ[i];
         return error;
 }
 
 Error XingLMC::SetEQData(bool enable) {
     ENSURE_INITIALIZED;
     Error error = kError_NoErr;
-        m_enableEQ = enable;
+        enableEQ = enable;
         return error;
 }
 #endif  //_EQUALIZER_ENABLE_

@@ -146,9 +146,6 @@ class     XingLMC:public LogicalMediaConverter
    int32     m_frameCounter;
 	time_t    m_iBufferUpdate;
 
-    bool m_enableEQ;
-    float m_equalizer[32];
-
 };
 
 #endif /* _XINGLMC_H */
