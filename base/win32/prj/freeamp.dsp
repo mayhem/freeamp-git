@@ -97,6 +97,10 @@ SOURCE=..\..\src\command.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\src\hashtable.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\main.cpp
 # End Source File
 # Begin Source File
@@ -185,14 +189,6 @@ SOURCE=..\..\src\registry.cpp
 # Begin Source File
 
 SOURCE=..\..\..\ui\src\uiregistry.cpp
-# End Source File
-# End Group
-# Begin Group "dummy"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\..\..\ui\dummy\src\dummyui.cpp
 # End Source File
 # End Group
 # End Target

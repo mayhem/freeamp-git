@@ -32,7 +32,6 @@ ____________________________________________________________________________*/
 #include "player.h"
 #include "event.h"
 #include "registrar.h"
-#include "dummyui.h"
 #include "preferences.h"
  
 int APIENTRY WinMain(	HINSTANCE hInstance, 
@@ -55,12 +54,11 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
 
     registrar = new Registrar;
 
-    registrar->SetSubDir("lmc");
+    registrar->SetSubDir("plugins");
     registrar->SetSearchString("*.lmc");
     lmc = new LMCRegistry;
     registrar->InitializeRegistry(lmc, prefs);
 
-    registrar->SetSubDir("io");
     registrar->SetSearchString("*.pmi");
     pmi = new PMIRegistry;
     registrar->InitializeRegistry(pmi, prefs);
@@ -69,8 +67,6 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
     pmo = new PMORegistry;
     registrar->InitializeRegistry(pmo, prefs);
 
-
-    registrar->SetSubDir("ui");
     registrar->SetSearchString("*.ui");
     ui = new UIRegistry;
     registrar->InitializeRegistry(ui, prefs);
@@ -83,21 +79,9 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
 
     // need a way to signal main thread to quit...
     Semaphore *termination = new Semaphore();
-
-    EventQueueRef eq = new EventQueue;
-    eq->ref = player;
-    eq->AcceptEvent = Player::AcceptEventStub;
-
-    DummyUI *dummy = new DummyUI(termination);
-    dummy->SetTarget(eq);
-
-    UIRef dummyRef = new UI;
-    dummyRef->ref = dummy;
-    dummyRef->AcceptEvent = dummy->AcceptEventStub;
-    dummyRef->Cleanup = dummy->Cleanup;
-
+    
     // register items... we give up ownership here
-    player->RegisterActiveUI(dummyRef);
+    player->SetTerminationSemaphore(termination);
     player->RegisterLMCs(lmc);
     player->RegisterPMIs(pmi);
     player->RegisterPMOs(pmo);
@@ -116,8 +100,6 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
 
     // clean up our act
     delete player;
-
-    delete termination;
 
 	return 0;
 }

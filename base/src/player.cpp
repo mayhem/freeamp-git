@@ -85,9 +85,10 @@ Player::Player() {
 }
 
 Player::~Player() {
+
     if (m_pTermSem) {
-	delete m_pTermSem;
-	m_pTermSem = NULL;
+	    delete m_pTermSem;
+	    m_pTermSem = NULL;
     }
     //cout << "waiting for service thread to end..." << endl;
     m_eventServiceThread->Join();

@@ -55,8 +55,9 @@ LINK32=link.exe
 # ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386 /out:"xing.lmc"
 # Begin Special Build Tool
 SOURCE=$(InputPath)
-PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\lmc mkdir\
-        ..\..\..\..\base\win32\prj\lmc	copy xing.lmc ..\..\..\..\base\win32\prj\lmc
+PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
+         ..\..\..\..\base\win32\prj\plugins	copy xing.lmc\
+ ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "xing - Win32 Debug"
@@ -87,8 +88,9 @@ LINK32=link.exe
 # SUBTRACT LINK32 /nodefaultlib
 # Begin Special Build Tool
 SOURCE=$(InputPath)
-PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\lmc mkdir\
-        ..\..\..\..\base\win32\prj\lmc	copy xing.lmc ..\..\..\..\base\win32\prj\lmc
+PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
+         ..\..\..\..\base\win32\prj\plugins	copy xing.lmc\
+ ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 

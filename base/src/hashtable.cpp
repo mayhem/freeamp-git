@@ -25,12 +25,13 @@ ____________________________________________________________________________*/
 #include <stdlib.h>
 #include <memory.h>
 #include <iostream.h>
+#include <string.h>
 
 #include "hashtable.h"
 
 HashTable::HashTable(int32 slots) {
     if (slots < 5) slots = 5;
-    hashSlots = new (HashElem *)[slots];
+    hashSlots = new HashElem*[slots];
     memset(hashSlots,'\0',slots*sizeof(HashElem *));
     numSlots = slots;
 }
