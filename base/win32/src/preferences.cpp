@@ -65,7 +65,7 @@ const bool   kDefaultLiveInTray = false;
 const int32  kDefaultInputBufferSize = 64;
 const int32  kDefaultOutputBufferSize = 512;
 const int32  kDefaultStreamBufferInterval = 3;
-const int32  kDefaultDecoderThreadPriority = 1;
+const int32  kDefaultDecoderThreadPriority = 4;
 const bool   kDefaultLogging = false;
 const int32  kDefaultWindowPosition = 0;
 
@@ -288,10 +288,10 @@ Initialize()
         {
             // set install directory value
             SetPrefString(kInstallDirPref, cwd);
-            
+    
             // set default ui value
             SetPrefString(kUIPref, kDefaultUI);
-            
+    
             // set default pmo value
             SetPrefString(kPMOPref, kDefaultPMO);
 
@@ -648,6 +648,8 @@ GetPrefString(const char* pref, char* buf, uint32* len)
             error = kError_NoErr;
         else if(result == ERROR_MORE_DATA)
             error = kError_BufferTooSmall;    
+        else if(result == ERROR_FILE_NOT_FOUND)
+            error = kError_NoPrefValue;
 	    
     }
     else
@@ -683,6 +685,8 @@ SetPrefString(const char* pref, const char* buf)
 
         if(result == ERROR_SUCCESS)
             error = kError_NoErr;
+        else if(result == ERROR_FILE_NOT_FOUND)
+            error = kError_NoPrefValue;
     }
     else
     {
@@ -724,7 +728,9 @@ GetPrefBoolean(const char* pref, bool* value)
             *value = (buf == 0 ? false : true);
         }
         else if(result == ERROR_MORE_DATA)
-            error = kError_BufferTooSmall;    
+            error = kError_BufferTooSmall;  
+        else if(result == ERROR_FILE_NOT_FOUND)
+            error = kError_NoPrefValue;
     }
     else
     {
@@ -761,6 +767,8 @@ SetPrefBoolean(const char* pref, bool value)
 
         if(result == ERROR_SUCCESS)
             error = kError_NoErr;
+        else if(result == ERROR_FILE_NOT_FOUND)
+            error = kError_NoPrefValue;
     }
     else
     {
@@ -802,7 +810,9 @@ GetPrefInt32(const char* pref, int32* value)
             *value = (int32)buf;
         }
         else if(result == ERROR_MORE_DATA)
-            error = kError_BufferTooSmall;    
+            error = kError_BufferTooSmall;  
+        else if(result == ERROR_FILE_NOT_FOUND)
+            error = kError_NoPrefValue;
     }
     else
     {
@@ -826,7 +836,6 @@ SetPrefInt32(const char* pref, int32 value)
         return error;
     }
 
-
 	if(m_prefsKey)
 	{
 		// set install directory value
@@ -839,6 +848,8 @@ SetPrefInt32(const char* pref, int32 value)
 
         if(result == ERROR_SUCCESS)
             error = kError_NoErr;
+        else if(result == ERROR_FILE_NOT_FOUND)
+            error = kError_NoPrefValue;
     }
     else
     {

@@ -47,7 +47,7 @@ BEGIN
                     IDC_STATIC,4,3,211,24
 END
 
-IDD_PREF1 DIALOG DISCARDABLE  0, 0, 233, 167
+IDD_PREF1 DIALOG DISCARDABLE  0, 0, 233, 175
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "General"
 FONT 8, "MS Sans Serif"
@@ -59,60 +59,63 @@ BEGIN
                     WS_VSCROLL | WS_TABSTOP
     LTEXT           "Output:",IDC_STATIC,50,32,25,8
     GROUPBOX        "Plug-Ins",IDC_STATIC,3,2,227,48
-    GROUPBOX        "Decoder Priority",IDC_STATIC,3,54,227,43
+    GROUPBOX        "Decoder Priority",IDC_STATIC,3,54,227,52
     CONTROL         "Slider1",IDC_PRIORITY,"msctls_trackbar32",TBS_AUTOTICKS | 
-                    WS_TABSTOP,41,65,150,15
-    GROUPBOX        "Buffer Sizes",IDC_STATIC,3,102,136,62
-    EDITTEXT        IDC_INPUT,73,114,25,12,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "Input Buffer Size:",IDC_STATIC,13,116,57,8
-    EDITTEXT        IDC_OUTPUT,73,130,25,12,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "Output Buffer Size:",IDC_STATIC,8,132,60,8
-    LTEXT           "Kilobytes",IDC_STATIC,103,116,29,8
-    LTEXT           "Kilobytes",IDC_STATIC,103,132,29,8
-    LTEXT           "Low",IDC_STATIC,42,83,14,8
-    LTEXT           "Normal",IDC_STATIC,84,83,23,8
-    LTEXT           "High",IDC_STATIC,132,83,16,8
-    LTEXT           "Realtime",IDC_STATIC,169,83,28,8
-    EDITTEXT        IDC_STREAM_INTERVAL,73,146,25,12,ES_AUTOHSCROLL | 
+                    WS_TABSTOP,9,66,214,15
+    GROUPBOX        "Buffer Sizes",IDC_STATIC,3,110,136,62
+    EDITTEXT        IDC_INPUT,73,122,25,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Input Buffer Size:",IDC_STATIC,13,124,57,8
+    EDITTEXT        IDC_OUTPUT,73,138,25,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Output Buffer Size:",IDC_STATIC,8,140,60,8
+    LTEXT           "Kilobytes",IDC_STATIC,103,124,29,8
+    LTEXT           "Kilobytes",IDC_STATIC,103,140,29,8
+    LTEXT           "Low",IDC_STATIC,41,84,14,8
+    LTEXT           "Normal",IDC_STATIC,104,84,23,8
+    LTEXT           "High",IDC_STATIC,175,84,16,8
+    LTEXT           "Realtime",IDC_STATIC,199,84,28,8
+    EDITTEXT        IDC_STREAM_INTERVAL,73,154,25,12,ES_AUTOHSCROLL | 
                     ES_NUMBER
-    LTEXT           "Buffer Streams For",IDC_STATIC,8,148,59,8
-    LTEXT           "Seconds",IDC_STATIC,103,148,29,8
+    LTEXT           "Buffer Streams For",IDC_STATIC,8,156,59,8
+    LTEXT           "Seconds",IDC_STATIC,103,156,29,8
     CONTROL         "Manifest in Tray instead of Taskbar",IDC_TRAY,"Button",
-                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,153,133,75,
+                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,153,141,75,
                     17
     CONTROL         "Stay on top",IDC_STAYONTOP,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,153,119,52,10
-    GROUPBOX        "Misc",IDC_STATIC,145,102,85,62
+                    WS_TABSTOP,153,127,52,10
+    GROUPBOX        "Misc",IDC_STATIC,145,110,85,62
+    LTEXT           "Idle",IDC_STATIC,10,84,12,8
+    CTEXT           "Below Normal",IDC_STATIC,69,84,29,15
+    CTEXT           "Above Normal",IDC_STATIC,135,84,27,16
 END
 
-IDD_PREF2 DIALOG DISCARDABLE  0, 0, 233, 167
+IDD_PREF2 DIALOG DISCARDABLE  0, 0, 233, 175
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Debug"
 FONT 8, "MS Sans Serif"
 BEGIN
-    GROUPBOX        "",IDC_STATIC,3,84,227,79
-    LTEXT           " ",IDC_STATIC,9,83,8,8
+    GROUPBOX        "",IDC_STATIC,3,87,227,84
+    LTEXT           " ",IDC_STATIC,9,87,8,8
     CONTROL         "Enable Logging",IDC_LOG,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,11,83,63,10
+                    WS_TABSTOP,11,87,63,10
     LTEXT           "If you are experiencing a problem with FreeAmp it is possible to log what the program is doing in order to help us track down the cause. When you enable logging a file is created in the program's install directory ",
-                    IDC_STATIC,3,3,227,24
+                    IDC_STATIC,3,4,227,24
     LTEXT           "called freeamp.log. You should send us the log file when you report a bug.",
-                    IDC_STATIC,3,27,227,17
+                    IDC_STATIC,3,28,227,17
     CONTROL         "Log input from PMIs (e.g. File, HTTP, ShoutCAST)",
                     IDC_LOGINPUT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,
-                    110,174,10
+                    115,174,10
     CONTROL         "Log output from PMOs (e.g. Wave, DirectSound)",
                     IDC_LOGOUTPUT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,
-                    123,169,10
+                    129,169,10
     CONTROL         "Log decoding process (e.g. MP3, CDDA)",IDC_LOGDECODER,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,136,145,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,143,145,10
     LTEXT           "You have the ability to narrow the logging to a particular portion of FreeAmp by selecting the various logging options. If you are not sure in which portion of the program the problem is occuring you can simply enable all the logging options.",
-                    IDC_STATIC,3,46,227,32
+                    IDC_STATIC,3,48,227,32
     CONTROL         "Log performance issues (e.g. Timings, Buffer Under/Overflows)",
                     IDC_LOGPERFORMANCE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    13,149,213,10
+                    13,157,213,10
     CONTROL         "Log general player errors (e.g. Loading plugins)",
-                    IDC_LOGMAIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,97,
+                    IDC_LOGMAIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,101,
                     163,10
 END
 
@@ -264,8 +267,6 @@ IDM_MAIN MENU DISCARDABLE
 BEGIN
     POPUP "popup"
     BEGIN
-        MENUITEM "FreeAmp...",                  IDC_ABOUT
-        MENUITEM SEPARATOR
         MENUITEM "Open...",                     IDC_OPEN
         MENUITEM "Save...",                     IDC_SAVE
         MENUITEM SEPARATOR
@@ -309,7 +310,7 @@ BEGIN
         LEFTMARGIN, 3
         RIGHTMARGIN, 230
         TOPMARGIN, 3
-        BOTTOMMARGIN, 164
+        BOTTOMMARGIN, 172
     END
 
     IDD_PREF2, DIALOG
@@ -317,7 +318,7 @@ BEGIN
         LEFTMARGIN, 3
         RIGHTMARGIN, 230
         TOPMARGIN, 3
-        BOTTOMMARGIN, 163
+        BOTTOMMARGIN, 171
     END
 
     IDD_PREF1_OLD, DIALOG

@@ -517,7 +517,7 @@ void SoundCardPMO::WorkerThread(void)
    pPref->GetDecoderThreadPriority(&iValue);
    delete pPref;
 
-   m_pBufferThread->SetPriority((Priority) iValue);
+   m_pBufferThread->SetPriority(iValue);
 
 
    m_bPause = false;

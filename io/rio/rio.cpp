@@ -801,7 +801,7 @@ BOOL CRio::RemoveAllFiles()
 	CDirEntry* pDirEntry = m_cDirBlock.m_acDirEntry;
     int iCountEntry = m_cDirBlock.m_cDirHeader.m_usCountEntry;
 
-	for( int iA=0; iA<iCountEntry; ++iA, ++pDirEntry )
+	for(int count=0; count<iCountEntry; ++count)
 	{
 	    // free FAT and blocks used
 	    USHORT usPos32KBlock = pDirEntry->m_usPos32KBlock;

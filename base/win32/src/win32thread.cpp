@@ -25,12 +25,22 @@ ____________________________________________________________________________*/
 
 #include "win32thread.h"
 
+int32 priority_values[] = {
+    -15,
+    -2,
+    -1,
+    0,
+    1,
+    2,
+    15
+};
+
+const uint32 kNumPriorities = sizeof(priority_values)/sizeof(int32);
 
 win32Thread::
 win32Thread():
 Thread()
 {
-	m_priority		= Normal;
 	m_threadHandle	= NULL;	
 	m_threadId		= 0;
     m_function      = NULL;
@@ -117,20 +127,40 @@ Join()
 	WaitForSingleObject(m_threadHandle, INFINITE);
 }
 
-Priority 
+uint32 
 win32Thread::
 GetPriority() const
 {
-	return (Priority) GetThreadPriority(m_threadHandle);
+    int32 priority = GetThreadPriority(m_threadHandle);
+
+    for(int32 i=0; i < kNumPriorities; i++)
+    {
+        if(priority_values[i] == priority)
+        {
+            priority = i;
+            break;
+        }
+    }
+
+	return priority;
 }
 
-Priority 
+uint32 
 win32Thread::
-SetPriority(Priority priority)
+SetPriority(uint32 priority)
 {
-	Priority old = (Priority) GetThreadPriority(m_threadHandle);
+	int32 old = GetThreadPriority(m_threadHandle);
 
-	SetThreadPriority(m_threadHandle, priority);
+	SetThreadPriority(m_threadHandle, priority_values[priority]);
+
+    for(int32 i=0; i < kNumPriorities; i++)
+    {
+        if(priority_values[i] == old)
+        {
+            old = i;
+            break;
+        }
+    }
 
 	return old;
 }

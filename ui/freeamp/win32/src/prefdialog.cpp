@@ -183,7 +183,7 @@ PrefPage1Proc(  HWND hwnd,
             SendMessage(hwndPriority, 
                         TBM_SETRANGE, 
                         (WPARAM) TRUE,                   
-                        (LPARAM) MAKELONG(0, 3));
+                        (LPARAM) MAKELONG(0, 6));
 
             SendMessage(hwndPriority, 
                         TBM_SETPOS, 
@@ -422,6 +422,27 @@ PrefPage1Proc(  HWND hwnd,
 											    TBM_GETPOS, 
 											    0, 
 											    0);
+
+                        // translate position into 
+                        // actual thread priority
+                        // since we have don't have 
+                        // them all shown
+                        /*switch(position)
+                        {
+                            case 0:
+                                position = 1;
+
+                            case 1:
+                                position = 3;
+
+                            case 2:
+                                position = 5;
+
+                            case 3: 
+                                position = 6;
+                        
+                        }*/
+                        
 
                         currentValues.decoderThreadPriority = position;
 

@@ -212,5 +212,59 @@ SOURCE=..\res\freeamp.rc
 
 SOURCE=..\res\icon1.ico
 # End Source File
+# Begin Source File
+
+SOURCE=..\..\..\io\rio\win32\i386\free\portio.sys
+
+!IF  "$(CFG)" == "freeamp - Win32 Release"
+
+# Begin Custom Build
+InputPath=..\..\..\io\rio\win32\i386\free\portio.sys
+
+".\portio.sys" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\io\rio\win32\i386\free\portio.sys .\portio.sys
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
+
+# Begin Custom Build
+InputPath=..\..\..\io\rio\win32\i386\free\portio.sys
+
+".\portio.sys" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\io\rio\win32\i386\free\portio.sys .\portio.sys
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\README
+
+!IF  "$(CFG)" == "freeamp - Win32 Release"
+
+# Begin Custom Build
+InputPath=..\..\..\README
+
+"..\..\..\ReadMe.txt" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\README ..\..\..\ReadMe.txt
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
+
+# Begin Custom Build
+InputPath=..\..\..\README
+
+"..\..\..\ReadMe.txt" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\README ..\..\..\ReadMe.txt
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
 # End Target
 # End Project

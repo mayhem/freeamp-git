@@ -10,7 +10,7 @@ INSTALLATION:
 
 From the source:
 
-  See the document INSTALL
+  See the document install/INSTALL
 
 From binaries:
 
@@ -22,7 +22,37 @@ From binaries:
 USING FREEAMP:
 ----------------------------------------------------------------------
 
-FreeAmp version 1.20 -- Usage:
+FreeAmp 1.2 for Win32:
+
+  freeamp [options] [file 1] [file 2]...
+
+  * right-clicking on the player brings up a menu that allows
+    you to access player functionality and preferences.
+  * dragging a file (or files) onto the Player sets the playlist.
+    If the player is currently playing, it will stop.
+  * move between files in the playlist using the |< and >| buttons
+  * pause/play again by pressing the > button
+  * stop by pressing the [] buton
+  * adjust the volume by clicking-and-dragging on the dial to the left of the display
+  * seek in the current file by clicking-and-dragging on the dial to the right of the
+    display.  This is a 'jog' mechanism in that the dial adjusts the rate of change of
+    the seeking (move it a little bit vertically, and the position of the song increments 
+    slowly.  move it a lot vertically, and the position of the song increments quickly.)
+    let up the mouse button to move to the selected point in the song.
+  * clicking on the display cycles through total time, current time and time remaining.
+  * Of the six buttons to the right of the display, the upper left is
+    disabled (in the future will switch between modes)
+  * the upper middle minimizes the player
+  * the upper right quits the player
+  * the lower left cycles through Repeat Mode in the following order:
+    Repeat Current Song, Repeat Playlist, Repeat off.
+  * the lower middle toggles 'Shuffle' mode.
+  * the lower right presents the 'Open File' dialog.  The files
+    selected here will replace the playlist in the same fashion as drag-n-drop
+  * just under the display is the playlist drawer, click it to access playlist functions
+
+
+FreeAmp version 1.20 for Linux:
 
 freeamp [-ui <UI plugin name>] [-prop <PropertyName>=<PropertyValue>]
         <MP3 file/stream> [MP3 file/stream] ...
@@ -89,33 +119,6 @@ The Six buttons on the right:
   * Lower middle toggles Shuffle Mode between On and Off
   * Lower right is currently not functional (in the future it will
     open the file-open drawer)
-
-
-FreeAmp Win32 1.0.0 (11-9-98) Usage:
-
-  freeamp [options] [file 1] [file 2]...
-
-  * dragging a file (or files) onto the Player sets the playlist.
-    If the player is currently playing, it will stop.
-  * move between files in the playlist using the |< and >| buttons
-  * pause/play again by pressing the > button
-  * stop by pressing the [] buton
-  * adjust the volume by clicking-and-dragging on the dial to the left of the display
-  * seek in the current file by clicking-and-dragging on the dial to the right of the
-    display.  This is a 'jog' mechanism in that the dial adjusts the rate of change of
-    the seeking (move it a little bit vertically, and the position of the song increments 
-    slowly.  move it a lot vertically, and the position of the song increments quickly.)
-    let up the mouse button to move to the selected point in the song.
-  * clicking on the display cycles through total time, current time and time remaining.
-  * Of the six buttons to the right of the display, the upper left is
-    disabled (in the future will switch between modes)
-  * the upper middle minimizes the player
-  * the upper right quits the player
-  * the lower left cycles through Repeat Mode in the following order:
-    Repeat Current Song, Repeat Playlist, Repeat off.
-  * the lower middle toggles 'Shuffle' mode.
-  * the lower right presents the 'Open File' dialog.  The files
-    selected here will replace the playlist in the same fashion as drag-n-drop
 
 
 

@@ -30,7 +30,6 @@ ____________________________________________________________________________*/
 #include "thread.h"
 
 
-
 class win32Thread : public Thread {
 
 public:
@@ -44,18 +43,16 @@ public:
 	virtual void Resume();
 	virtual void Join();
 
-	virtual Priority GetPriority() const;
-	virtual Priority SetPriority(Priority priority);
+	virtual uint32 GetPriority() const;
+	virtual uint32 SetPriority(uint32 priority);
 
     static unsigned long __stdcall internalThreadFunction(void* arg);
 
     uint32 InternalThreadFunction(); 
 
 private:
-	Priority	    m_priority;
 	HANDLE		    m_threadHandle;	
-	unsigned long	    m_threadId;
-
+	unsigned long	m_threadId;
     thread_function m_function;
     void*           m_arg;
 

@@ -37,14 +37,15 @@ INTDIR=.\Release
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : ".\freeamp.exe"
+ALL : ".\portio.sys" "..\..\..\ReadMe.txt" ".\freeamp.exe"
 
 !ELSE 
 
 ALL : "dsoundcard - Win32 Release" "Rainplay - Win32 Release"\
  "simple - Win32 Release" "obsinput - Win32 Release" "httpinput - Win32 Release"\
  "freeampui - Win32 Release" "xing - Win32 Release" "soundcard - Win32 Release"\
- "fileinput - Win32 Release" ".\freeamp.exe"
+ "fileinput - Win32 Release" ".\portio.sys" "..\..\..\ReadMe.txt"\
+ ".\freeamp.exe"
 
 !ENDIF 
 
@@ -79,6 +80,8 @@ CLEAN :
 	-@erase "$(INTDIR)\volume.obj"
 	-@erase "$(INTDIR)\win32thread.obj"
 	-@erase ".\freeamp.exe"
+	-@erase "..\..\..\ReadMe.txt"
+	-@erase ".\portio.sys"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -145,14 +148,14 @@ INTDIR=.\Debug
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : ".\freeamp.exe"
+ALL : ".\portio.sys" "..\..\..\ReadMe.txt" ".\freeamp.exe"
 
 !ELSE 
 
 ALL : "dsoundcard - Win32 Debug" "Rainplay - Win32 Debug"\
  "simple - Win32 Debug" "obsinput - Win32 Debug" "httpinput - Win32 Debug"\
  "freeampui - Win32 Debug" "xing - Win32 Debug" "soundcard - Win32 Debug"\
- "fileinput - Win32 Debug" ".\freeamp.exe"
+ "fileinput - Win32 Debug" ".\portio.sys" "..\..\..\ReadMe.txt" ".\freeamp.exe"
 
 !ENDIF 
 
@@ -190,6 +193,8 @@ CLEAN :
 	-@erase "$(OUTDIR)\freeamp.pdb"
 	-@erase ".\freeamp.exe"
 	-@erase ".\freeamp.ilk"
+	-@erase "..\..\..\ReadMe.txt"
+	-@erase ".\portio.sys"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -287,26 +292,9 @@ LINK32_OBJS= \
  "freeamp - Win32 Debug"
 SOURCE=..\..\src\hashtable.cpp
 
-!IF  "$(CFG)" == "freeamp - Win32 Release"
-
-DEP_CPP_HASHT=\
-	"..\..\..\config\config.h"\
-	"..\..\include\hashtable.h"\
-	
-
-"$(INTDIR)\hashtable.obj" : $(SOURCE) $(DEP_CPP_HASHT) "$(INTDIR)"\
- "..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
-
-
 "$(INTDIR)\hashtable.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ENDIF 
 
 SOURCE=..\..\src\log.cpp
 DEP_CPP_LOG_C=\
@@ -349,9 +337,6 @@ DEP_CPP_MAIN_=\
 	"..\include\mutex.h"\
 	"..\include\preferences.h"\
 	"..\include\semaphore.h"\
-	
-NODEP_CPP_MAIN_=\
-	"..\..\include\win32impl.h"\
 	
 
 "$(INTDIR)\main.obj" : $(SOURCE) $(DEP_CPP_MAIN_) "$(INTDIR)"\
@@ -433,9 +418,6 @@ DEP_CPP_PLAYE=\
 	"..\include\preferences.h"\
 	"..\include\semaphore.h"\
 	
-NODEP_CPP_PLAYE=\
-	"..\..\include\win32impl.h"\
-	
 
 "$(INTDIR)\player.obj" : $(SOURCE) $(DEP_CPP_PLAYE) "$(INTDIR)"\
  "..\..\..\config\config.h"
@@ -504,8 +486,6 @@ DEP_CPP_PLAYL=\
 	"..\..\include\thread.h"\
 	"..\include\mutex.h"\
 	"..\include\win32thread.h"\
-	{$(INCLUDE)}"sys\stat.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"\
@@ -593,9 +573,6 @@ DEP_CPP_REGIS=\
 	"..\..\include\registry.h"\
 	"..\include\preferences.h"\
 	
-NODEP_CPP_REGIS=\
-	"..\..\include\win32impl.h"\
-	
 
 "$(INTDIR)\registrar.obj" : $(SOURCE) $(DEP_CPP_REGIS) "$(INTDIR)"\
  "..\..\..\config\config.h"
@@ -629,10 +606,7 @@ SOURCE=..\..\..\io\rio\rio.cpp
 DEP_CPP_RIO_C=\
 	"..\..\..\io\include\binary.h"\
 	"..\..\..\io\include\rio.h"\
-	"..\..\..\io\include\rioioctl.h"\
 	"..\..\..\io\include\std.h"\
-	{$(INCLUDE)}"sys\stat.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\rio.obj" : $(SOURCE) $(DEP_CPP_RIO_C) "$(INTDIR)"
@@ -654,25 +628,6 @@ DEP_CPP_RIO_C=\
 !ENDIF 
 
 SOURCE=..\..\src\thread.cpp
-
-!IF  "$(CFG)" == "freeamp - Win32 Release"
-
-DEP_CPP_THREA=\
-	"..\..\..\config\config.h"\
-	"..\..\include\thread.h"\
-	"..\include\win32thread.h"\
-	
-NODEP_CPP_THREA=\
-	"..\..\src\linuxthread.h"\
-	
-
-"$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"\
- "..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
-
 DEP_CPP_THREA=\
 	"..\..\..\config\config.h"\
 	"..\..\include\thread.h"\
@@ -683,8 +638,6 @@ DEP_CPP_THREA=\
  "..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ENDIF 
 
 SOURCE=..\src\volume.cpp
 DEP_CPP_VOLUM=\
@@ -1239,6 +1192,42 @@ DEP_RSC_FREEA=\
 	$(RSC) /l 0x409 /fo"$(INTDIR)\freeamp.res" /i\
  "\Local\src\freeamp\base\win32\res" /d "_DEBUG" $(SOURCE)
 
+
+!ENDIF 
+
+SOURCE=..\..\..\io\rio\win32\i386\free\portio.sys
+
+!IF  "$(CFG)" == "freeamp - Win32 Release"
+
+InputPath=..\..\..\io\rio\win32\i386\free\portio.sys
+
+".\portio.sys" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\io\rio\win32\i386\free\portio.sys .\portio.sys
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
+
+InputPath=..\..\..\io\rio\win32\i386\free\portio.sys
+
+".\portio.sys" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\io\rio\win32\i386\free\portio.sys .\portio.sys
+
+!ENDIF 
+
+SOURCE=..\..\..\README
+
+!IF  "$(CFG)" == "freeamp - Win32 Release"
+
+InputPath=..\..\..\README
+
+"..\..\..\ReadMe.txt" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\README ..\..\..\ReadMe.txt
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
+
+InputPath=..\..\..\README
+
+"..\..\..\ReadMe.txt" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\README ..\..\..\ReadMe.txt
 
 !ENDIF 
 

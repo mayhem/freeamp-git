@@ -538,11 +538,35 @@ InstallDriver(  SC_HANDLE  scManager,
                             NULL,                   // no dependencies
                             NULL,                   // LocalSystem account
                             NULL);                  // no password
+
+
                                 
-    if(service)
+    if(service || ERROR_SERVICE_EXISTS == GetLastError())
     {
         result = true;
     }
+    /*else
+    {
+        LPVOID lpMessageBuffer;
+        int32 error = GetLastError();
+
+		FormatMessage(
+		  FORMAT_MESSAGE_ALLOCATE_BUFFER |
+		  FORMAT_MESSAGE_FROM_SYSTEM,
+		  NULL,
+		  error,
+		  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		  (LPTSTR) &lpMessageBuffer,
+		  0,
+		  NULL );
+
+		// now display this string
+ 		MessageBox(NULL, (char*)lpMessageBuffer, 0, MB_OK);
+
+		// Free the buffer allocated by the system
+		LocalFree( lpMessageBuffer );
+
+    }*/
     
     CloseServiceHandle(service);
 

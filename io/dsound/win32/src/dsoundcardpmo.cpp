@@ -33,6 +33,7 @@ ____________________________________________________________________________*/
 #include "config.h"
 #include "dsoundcardpmo.h"
 #include "eventdata.h"
+#include "preferences.h"
 #include "log.h"
 
 LogFile  *g_Log;
@@ -722,7 +723,7 @@ DSMonitorBufferState()
   new_state = m_DSBufferManager.state;
 
   m_DSBufferManager.pDSSecondaryBuffer->GetCurrentPosition( &dwReadPos,
-																														&dwWritePos);
+															&dwWritePos);
   if (m_DSBufferManager.dwWritePtr >= dwReadPos)
   {
     dwBuffered = m_DSBufferManager.dwWritePtr - dwReadPos;
@@ -761,8 +762,8 @@ DSMonitorBufferState()
         // restart the buffer
         if (m_bLMCsaidToPlay && m_bIsBufferEmptyNow)
         m_DSBufferManager.pDSSecondaryBuffer->Play(	0,
-																										0,
-																										DSBPLAY_LOOPING);
+													0,
+													DSBPLAY_LOOPING);
 
         m_bIsBufferEmptyNow = false;
       }
@@ -848,19 +849,19 @@ DSClear()
 
   // write zeros into secondary buffer
   hResult = m_DSBufferManager.pDSSecondaryBuffer->Lock(	0,
-																												m_DSBufferManager.dwBufferSize,
-																												&ptr,
-																												&dwBytes,
-																												NULL,
-																												NULL,
-																												0);
+														m_DSBufferManager.dwBufferSize,
+														&ptr,
+														&dwBytes,
+														NULL,
+														NULL,
+														0);
   if (SUCCEEDED(hResult))
   {
     memset(ptr, 0, m_DSBufferManager.dwBufferSize);
     m_DSBufferManager.pDSSecondaryBuffer->Unlock(	ptr,
-																									dwBytes,
-																									NULL,
-																									0);
+													dwBytes,
+													NULL,
+													0);
   }
   m_bIsBufferEmptyNow = true;
 
@@ -883,12 +884,14 @@ WorkerThread(void)
   Error   eErr;
   Event*  pEvent;
   Preferences *pPref;
+  int32 iValue;
+
 
   pPref = new Preferences();
   pPref->GetDecoderThreadPriority(&iValue);
   delete pPref;
 
-  m_pBufferThread->SetPriority((Priority) iValue);
+  m_pBufferThread->SetPriority(iValue);
 
   for(; !m_bExit;)
   {

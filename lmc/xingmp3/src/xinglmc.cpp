@@ -729,7 +729,7 @@ void XingLMC::DecodeWork()
    pPref->GetDecoderThreadPriority(&iValue);
    delete pPref;
 
-   m_decoderThread->SetPriority((Priority) iValue);
+   m_decoderThread->SetPriority(iValue);
 
 
    for (m_frameCounter = 0; !m_bExit;)

@@ -42,14 +42,13 @@ public:
 	virtual void Suspend();
 	virtual void Resume();
 	virtual void Join();
-	virtual Priority GetPriority() const;
-	virtual Priority SetPriority(Priority priority);
+	virtual uint32 GetPriority() const;
+	virtual uint32 SetPriority(uint32 priority);
 
 	static void *internalThreadFunction(void *);
 	void *InternalThreadFunction();
 
 private:
-	Priority	m_priority;
 	pthread_t   m_threadHandle;
 	unsigned	m_threadId;
 	bool        m_suspended;

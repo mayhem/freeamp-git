@@ -126,7 +126,7 @@ class Preferences {
                             int32 height);
 
  protected:
-    
+
 
  private:
      HKEY   m_prefsKey;
