@@ -713,7 +713,7 @@ function DialogSdRegisterUser()
 begin
 
     szTitle = "User Info";
-    szMsg   = "Please enter your first and last name below. " + @PRODUCT_NAME +
+    szMsg   = "Please enter your first and last name below. " + @THE_PRODUCT_NAME_UC +
     		  " will only use this information to customize its interface for" +
     		  " you. Under no circumstance will this information be distributed.";
     		
@@ -738,7 +738,7 @@ function DialogAskForMusicFolder()
 begin
 
     szTitle = "Default Music Folder";
-    szMsg   = @PRODUCT_NAME + " features the ability to download music " +
+    szMsg   = @THE_PRODUCT_NAME_UC + " features the ability to download music " +
     		  "directly from within the player. Where would you like to save " +
     		  "your downloaded music files?";
     		
@@ -887,14 +887,14 @@ begin
     endif;
 
 	szTitle = "File Types";
-    szMsg  	= "Setup can register " + @PRODUCT_NAME + " to be your default MP3 player. " +
+    szMsg  	= "Setup can register " + @THE_PRODUCT_NAME_LC + " to be your default MP3 player. " +
     		  "Sometimes other applications register themselves to handle file types without " +
-    		  "asking for your permission. Do you want " + @PRODUCT_NAME + " to reclaim supported " +
+    		  "asking for your permission. Do you want " + @THE_PRODUCT_NAME_LC + " to reclaim supported " +
     		  "file types if they are registered by another application?\r\n\r\n" +
      		  "Select the file type options you wish for setup to use. ";
     		
-	szOpt1 	= "Make " + @PRODUCT_NAME + " my default MP3 player.";
-	szOpt2  = "Allow " + @PRODUCT_NAME + " to reclaim stolen filetypes.";    		
+	szOpt1 	= "Make " + @THE_PRODUCT_NAME_LC + " my default MP3 player.";
+	szOpt2  = "Allow " + @THE_PRODUCT_NAME_LC + " to reclaim stolen filetypes.";    		
     bOpt1	= TRUE;
     bOpt2	= FALSE;
     	
@@ -925,8 +925,8 @@ begin
 	
     	szTitle = "Restart Netscape?";
     	szMsg  	= "Setup has detected that Netscape is installed on your computer. "  +
-    			  "In order to complete the installation of " + @PRODUCT_NAME + " we need " +
-    		 	  "to restart Netscape if it is running. After shutting down " +
+    			  "In order to complete the installation of " + @THE_PRODUCT_NAME_LC +
+    			  " we need to restart Netscape if it is running. After shutting down " +
     			  "Netscape we will attempt to restart the application and " +
    		 		  "return you to any web pages you are currently viewing.";
 		szOpt1 	= "Yes, please restart Netscape for me. Thank you for asking!";
@@ -969,7 +969,7 @@ begin
         szMsg1 = "";
         szMsg2 = "";
         szOption1 = "Read the README file";
-        szOption2 = "Launch " + @PRODUCT_NAME;
+        szOption2 = "Launch " + @THE_PRODUCT_NAME_LC;
         nResult = SdFinish( szTitle, szMsg1, szMsg2, szOption1, szOption2, bOpt1, bOpt2 );
 
 		if (bOpt1) then
@@ -1000,6 +1000,7 @@ end;
 // --- include script file section ---
 
 #include "sddialog.rul"
+
 
 
 

@@ -1,21 +1,23 @@
 [Data]
-COMPANY_NAME=EMusic.com
-ERROR_COMPONENT=Component:
+THE_PRODUCT_NAME_UC=The EMusic Player
 VERSION_STRING_SPECIAL=
-PRODUCT_VERSION=2.0
-ERROR_MOVEDATA=An error occurred during the move data process: %d
+ERROR_COMPONENT=Component:
+COMPANY_NAME=EMusic
 ERROR_FILEGROUP=File Group:
-UNINST_KEY=FreeAmp
-MAIN_REGISTRY_KEY=Software\FreeAmp\FreeAmp v2.0\Main
+ERROR_MOVEDATA=An error occurred during the move data process: %d
+PRODUCT_VERSION=2.0
+MAIN_REGISTRY_KEY=Software\EMusic\EMusic Player v2.0\Main
+UNINST_KEY=EMusic Player
 TITLE_CAPTIONBAR=EMusic Player Setup
-ERROR_VGARESOLUTION=This program requires VGA or better resolution.
+THE_PRODUCT_NAME_LC=the EMusic Player
+DEFAULT_THEME=EMusic.fat
+FOLDER_NAME=EMusic Player
 ERROR_FILE=File:
-FOLDER_NAME=FreeAmp
-DEFAULT_THEME=FreeAmp.fat
-UNINST_DISPLAY_NAME=FreeAmp
+ERROR_VGARESOLUTION=This program requires VGA or better resolution.
 PRODUCT_KEY=freeamp.exe
-PRODUCT_NAME=EMusic Player
+UNINST_DISPLAY_NAME=EMusic Player
 ERROR_UNINSTSETUP=unInstaller setup failed to initialize.  You may not be able to uninstall this product.
+PRODUCT_NAME=EMusic Player
 
 [General]
 Language=0009
