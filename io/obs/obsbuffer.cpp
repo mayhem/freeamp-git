@@ -60,13 +60,13 @@ static char *g_ErrorArray[5] =
 };
 
 ObsBuffer::ObsBuffer(size_t iBufferSize, size_t iOverFlowSize, 
-                     size_t iWriteTriggerSize, char *szFile, ObsInput *m_pObs) :
+                     size_t iWriteTriggerSize, char *szFile, ObsInput *pObs) :
         StreamBuffer(iBufferSize, iOverFlowSize, iWriteTriggerSize)
 {
     m_hHandle = -1;
     m_pBufferThread = NULL;
     m_pID3Tag = NULL;
-    m_pObs = m_pObs;
+    m_pObs = pObs;
 
     strcpy(m_szUrl, szFile);
 }

@@ -102,7 +102,14 @@ class PlayListItem {
     int32 StartFrame() const { return m_startFrame; }
     void SetStartFrame(int32 frame) { m_startFrame = frame; }
 
-    char* _DisplayString() const { return strrchr(m_url, '\\') + 1;}
+    char* _DisplayString() const 
+	{ 
+		char *pPtr;
+
+		pPtr = strrchr(m_url, '\\');
+
+		return pPtr ? pPtr + 1 : "";
+	}
 
 
     RegistryItem *GetPMIRegistryItem() { return m_pmiRegItem; }

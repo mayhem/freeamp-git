@@ -23,6 +23,7 @@ ____________________________________________________________________________*/
 /* System Includes */
 #define STRICT
 #include <windows.h>
+#include <winsock.h>
 #include <commctrl.h>
 #include <stdio.h>
 #include <string.h>
@@ -53,6 +54,8 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
         return 0;
    }
 
+   WSADATA sGawdIHateMicrosoft;
+   WSAStartup(0x0002,  &sGawdIHateMicrosoft);
 
    prefs = new Preferences;
    prefs->Initialize();
@@ -116,6 +119,8 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
     delete player;
 
     CloseHandle(runOnceMutex);
+
+	WSACleanup();
 
 	return 0;
 }

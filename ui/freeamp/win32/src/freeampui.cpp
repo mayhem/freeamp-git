@@ -1644,7 +1644,7 @@ UpdatePlayList()
             //char buffer[256];
             //sprintf(buffer, "This is StringItem #%d", i);
 
-            m_playlistView->AddItem(new StringItem(item->DisplayString(),
+            m_playlistView->AddItem(new StringItem(item->_DisplayString(),
                                     m_smallFontBitmap,
                                     10,
                                     smallFontWidth));
