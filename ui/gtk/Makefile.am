@@ -33,8 +33,8 @@ GTK_LINK_TAIL = `gtk-config --cflags` `gtk-config --libs`
 all-local: cmdline-local
 
 cmdline-local: freeamp-gtk.o
-	gcc -shared -Wl,-soname,freeampgui-@target_os@.ui -o freeampgui-@target_os@.ui freeamp-gtk.o $(GTK_LINK_TAIL)
-	cp freeampgui-@target_os@.ui @top_srcdir@/plugins
+	gcc -shared -Wl,-soname,freeampgtk-@target_os@.ui -o freeampgtk-@target_os@.ui freeamp-gtk.o $(GTK_LINK_TAIL)
+	cp freeampgtk-@target_os@.ui @top_srcdir@/plugins
 else 
 FILES = 
 MYLIBS = 

@@ -151,10 +151,22 @@ AC_ARG_ENABLE(gtk,
 	      esac])
 AM_CONDITIONAL(AM_ENABLE_GTK, test "$gtk" = "true")
 
+x11="false"
+
+AC_ARG_ENABLE(x11,
+		[  --enable-x11   Build the FreeAmp X11 GUI],
+		[case "${enableval}" in
+		  yes) x11="true" ;;
+		  no) x11="false" ;;
+		  *) AC_MSG_ERROR(bad value ${enableval} for --enable-x11) ;;
+		esac])
+AM_CONDITIONAL(AM_ENABLE_X11, test "$x11" = "true")
+
+
 AM_CONDITIONAL(AM_HAVE_WIN32, test "$target_os" = "windowsnt")
 AM_CONDITIONAL(AM_HAVE_LINUX, test "$target_os" = "linux")
 AC_OUTPUT(Makefile base/Makefile base/src/Makefile io/Makefile
-          base/unix/Makefile 
+          base/unix/Makefile ui/freeamp/Makefile ui/freeamp/unix/Makefile ui/freeamp/unix/src/Makefile
 	  ui/Makefile base/unix/linux/Makefile base/unix/linux/src/Makefile
 	  io/local/Makefile ui/cmdline/Makefile lmc/Makefile lmc/xingmp3/Makefile
 	  lmc/xingmp3/src/Makefile lmc/src/Makefile io/src/Makefile ui/src/Makefile

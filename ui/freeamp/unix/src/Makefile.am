@@ -22,5 +22,35 @@
 ##
 ############################################################################
 
-SUBDIRS = gtk cmdline src mpg123 freeamp
+include @top_srcdir@/config/Makefile.header
+
+if AM_ENABLE_X11
+FILES = freeamp.cpp
+MYLIBS = libfauicmdline.a
+TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
+
+all-local: cmdline-local
+else
+
+FILES = 
+MYLIBS = 
+TRGT_SYS_HEADS =
+all-local:
+	@true
+endif
+
+cmdline-local: freeamp.o
+	gcc -shared -Wl,-soname,freeampgui-@target_os@.ui -o freeampgui-@target_os@.ui freeamp.o -L/usr/X11R6/lib -lX11 -lXext -lXpm
+	cp freeampgui-@target_os@.ui @top_srcdir@/plugins
+
+if AM_HAVE_LINUXTHREADS
+REENT = -D_REENTRANT
+endif
+
+noinst_LIBRARIES = $(MYLIBS)
+libfauicmdline_a_SOURCES = $(FILES)
+
+INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) -I@top_srcdir@/lmc/include -I@top_srcdir@/io/include -I@srcdir@/../res
+CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT)
+
 
