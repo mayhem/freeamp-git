@@ -362,14 +362,14 @@ void LocalFileInput::WorkerThread(void)
 
    for(; !m_bExit;)
    {
-      if (m_pOutputBuffer->IsEndOfStream())
-      {
-          m_pSleepSem->Wait();
-          continue;
-      }
       if (m_bPause)
       {
           m_pPauseSem->Wait();
+          continue;
+      }
+      if (m_pOutputBuffer->IsEndOfStream())
+      {
+          m_pSleepSem->Wait();
           continue;
       }
           
@@ -381,6 +381,7 @@ void LocalFileInput::WorkerThread(void)
       {
           iRead = fread((unsigned char *)pBuffer, 1, iReadBlock, m_fpFile);
           eError = m_pOutputBuffer->EndWrite(iRead);
+
           if (IsError(eError))
           {
               m_pContext->log->Error("local: EndWrite returned: %d\n", eError);
@@ -388,7 +389,9 @@ void LocalFileInput::WorkerThread(void)
           }
 
           if (iRead < iReadBlock)
+          {
              m_pOutputBuffer->SetEndOfStream(true);
+          }   
       }
 
       if (eError == kError_BufferTooSmall)
