@@ -66,11 +66,13 @@ class Win32Window : public Window
              void  DropFiles(HDROP dropHandle);
              void  Notify(int32 command, LPNMHDR notifyMsgHdr);
              void  CreateTooltips(void);
+             void  Paint(void);
              
     protected:
     
      HWND     m_hWnd;
      Pos      m_oWindowPos;
+     Mutex   *m_pMindMeldMutex;
 };
 
 #endif

@@ -110,22 +110,8 @@ static LRESULT WINAPI MainWndProc(HWND hwnd, UINT msg,
             break;
 
         case WM_PAINT:
-        {
-            PAINTSTRUCT ps;
-            HDC         hDc;
-            Rect        oRect;
-            
-        	hDc = BeginPaint(hwnd, &ps);
-            oRect.x1 = ps.rcPaint.left;
-            oRect.y1 = ps.rcPaint.top;
-            oRect.x2 = ps.rcPaint.right;
-            oRect.y2 = ps.rcPaint.bottom;
-            
-            ((Win32Canvas *)(ui->GetCanvas()))->Paint(hDc, oRect);
-            EndPaint(hwnd, &ps);
-            
+            ui->Paint();
             break;
-        }    
 
         case WM_MOUSEMOVE:
         {
@@ -218,10 +204,12 @@ Win32Window::Win32Window(Theme *pTheme, string &oName)
 {
     m_pCanvas = new Win32Canvas(this);
 	m_hWnd = NULL;
+    m_pMindMeldMutex = new Mutex();
 }
 
 Win32Window::~Win32Window(void)
 {
+    delete m_pMindMeldMutex;
 }
 
 Error Win32Window::Run(Pos &oPos)
@@ -330,6 +318,8 @@ Error Win32Window::VulcanMindMeld(Window *pOther)
     Rect     oRect;
     RECT     sRect;
 
+    m_pMindMeldMutex->Acquire();
+
 	oRect.x1 = oRect.x2 = oRect.y1 = oRect.y2 = 0;
 	GetWindowPosition(oRect);
     sRect.left = oRect.x1;
@@ -342,6 +332,8 @@ Error Win32Window::VulcanMindMeld(Window *pOther)
        InvalidateRect(NULL, &sRect, true);
     
     eRet = Window::VulcanMindMeld(pOther);
+    m_pMindMeldMutex->Release();
+
     if (IsError(eRet))
        return eRet;
 
@@ -363,6 +355,26 @@ Error Win32Window::VulcanMindMeld(Window *pOther)
 
     return kError_NoErr;
 }
+
+void Win32Window::Paint(void)
+{
+    PAINTSTRUCT ps;
+    HDC         hDc;
+    Rect        oRect;
+
+    m_pMindMeldMutex->Acquire();
+    
+	hDc = BeginPaint(m_hWnd, &ps);
+    oRect.x1 = ps.rcPaint.left;
+    oRect.y1 = ps.rcPaint.top;
+    oRect.x2 = ps.rcPaint.right;
+    oRect.y2 = ps.rcPaint.bottom;
+    
+    ((Win32Canvas *)(GetCanvas()))->Paint(hDc, oRect);
+    EndPaint(m_hWnd, &ps);
+
+    m_pMindMeldMutex->Release();
+}    
 
 void Win32Window::SaveWindowPos(Pos &oPos)
 {
