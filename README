@@ -1,13 +1,31 @@
 This documents how to get you up, running and using FreeAmp.  It also
 explains a bit about where we are coming from.
 
+Send feedback/questions to info@freeamp.org
+
 INSTALLATION:
+
+From the source:
 
   See the document INSTALL
 
-FreeAmp Linux 1.1.0 (12-2-98) Usage:
+From binaries:
+
+  Move freeamp to /usr/local/bin (or, somewhere else in your path)
+  Move the plugins directory (complete with contents) to
+    /usr/local/lib/freeamp  (see first note under the Linux section below)
+
+
+FreeAmp Linux 1.1.0 (12-12-98) Usage:
 
   freeamp [-ui <ui plugin name>] <song1.mp3> [song2.mp3]...
+
+  * FreeAmp looks for the plugin directory in:
+   - the current directory, then
+   - ~/.freeamp, then
+   - /usr/local/lib/freeamp
+   _or_
+   in the path specified by the environment variable FREEAMP_PATH
   
   * at the moment, the only way to modify the playlist is via the
     command line when FreeAmp is started (playlist modification will
