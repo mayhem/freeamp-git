@@ -24,6 +24,10 @@ ____________________________________________________________________________*/
 #include <string.h>
 #include <assert.h>
 
+#ifdef WIN32
+#include <errno.h>
+#endif
+
 #include "filebuffer.h"
 
 #define DB //printf("%s:%d\n", __FILE__, __LINE__);

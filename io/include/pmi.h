@@ -59,7 +59,7 @@ public:
 	               {return kError_GotDefaultMethod;}
     virtual Error GetLength(size_t &iSize)
 	               {return kError_GotDefaultMethod;}
-	 virtual bool  GetID3v1Tag(unsigned char *pTag)
+	 virtual Error  GetID3v1Tag(unsigned char *pTag)
 	               {return kError_GotDefaultMethod;}
 		 
     virtual Error SetTo(char* url) = 0;

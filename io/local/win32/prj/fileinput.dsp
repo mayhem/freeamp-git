@@ -58,8 +58,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-          ..\..\..\..\base\win32\prj\plugins	copy fileinput.pmi\
-     ..\..\..\..\base\win32\prj\plugins
+           ..\..\..\..\base\win32\prj\plugins	copy fileinput.pmi\
+      ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "fileinput - Win32 Debug"
@@ -90,8 +90,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-          ..\..\..\..\base\win32\prj\plugins	copy fileinput.pmi\
-     ..\..\..\..\base\win32\prj\plugins
+           ..\..\..\..\base\win32\prj\plugins	copy fileinput.pmi\
+      ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
@@ -129,11 +129,35 @@ InputPath=..\..\..\..\config\config.win32
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\filebuffer.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\fileinput.def
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\localfileinput.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\win32\src\mutex.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\pullbuffer.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\win32\src\semaphore.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\src\thread.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\win32\src\win32thread.cpp
 # End Source File
 # End Target
 # End Project

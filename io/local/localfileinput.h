@@ -45,7 +45,7 @@ class     LocalFileInput:public PhysicalMediaInput
 
    virtual Error Seek(int32 & rtn, int32 offset, int32 origin);
    virtual Error GetLength(size_t &iSize); // filesize - ID3tag if any
-   virtual bool  GetID3v1Tag(unsigned char *pTag);
+   virtual Error  GetID3v1Tag(unsigned char *pTag);
 
    virtual Error SetTo(char *url);
    virtual Error Close(void);

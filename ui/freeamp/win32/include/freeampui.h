@@ -45,7 +45,7 @@ class FreeAmpUI : public UserInterface {
     FreeAmpUI();
     ~FreeAmpUI();
 
-    virtual Error Init() { return kError_NoErr; }
+    virtual Error Init(int32 startup_type) { return kError_NoErr; }
     virtual void SetTarget(EventQueue*);
     virtual int32 AcceptEvent(Event *);
     virtual void SetArgs(int32,char **);
