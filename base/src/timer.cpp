@@ -21,8 +21,15 @@
 	$Id$
 ____________________________________________________________________________*/
 
+// The debugger can't handle symbols more than 255 characters long.
+// STL often creates symbols longer than that.
+// When symbols are longer than 255 characters, the warning is disabled.
+#ifdef WIN32
+#pragma warning(disable:4786)
+#endif
+
 #include "config.h"
-#include "timer.h"
+#include "Timer.h"
 
 #if defined(__linux__) || defined(solaris)
 #include <unistd.h>
@@ -38,78 +45,126 @@ ____________________________________________________________________________*/
 #endif
 
 
-Timer::Timer(uint32 milliseconds):
-m_ticks(milliseconds), m_thread(NULL), m_alive(true), m_sleepFirst(false)
+TimerManager::TimerManager(): m_alive(true)
 {
-     
+	m_thread = Thread::CreateThread();
+	m_thread->Create(TimerManager::thread_function, this);
 }
 
-Timer::~Timer()
+TimerManager::~TimerManager()
 {
     m_alive = false;
 
     if(m_thread)
-    {
-        m_thread->Resume();
         m_semaphore.Wait();
-        m_thread->Join();
-    }
-}
 
-void Timer::SleepFirst(void)
-{
-    m_sleepFirst = true;
-}
+    delete m_thread;
 
-void Timer::Set(uint32 milliseconds)
-{
-    m_ticks = milliseconds;
-}
+    vector<TimerRef>::iterator i = m_list.begin();
 
-void Timer::Start()
-{
-    if(m_thread)
-        m_thread->Resume();
-    else
+    for(; i != m_list.end(); i++)
     {
-        m_thread = Thread::CreateThread();
-        m_thread->Create(Timer::thread_function, this);
+        delete (*i);
     }
 }
 
-void Timer::Stop()
+void TimerManager::StartTimer(TimerRef* timerRef,
+							  TimerFunction function,
+							  uint32 seconds, 
+							  void* userValue)
 {
-#ifdef unix
-    if (m_thread) {
-        m_alive = false;
-        m_semaphore.Wait();
-        m_thread = NULL;
+    if(function)
+    {
+        Timer* t = new Timer;
+
+        t->ticks = 0;
+        t->duration = seconds;
+        t->function = function;
+        t->userValue = userValue;
+
+        *timerRef = t;
+        
+        m_list.push_back(t);
     }
-#else
-    if(m_thread)
-        m_thread->Suspend();
-#endif
 }
 
-void Timer::ThreadFunction()
+void TimerManager::StopTimer(TimerRef timer)
 {
-    if (m_sleepFirst)
-        GoToSleep(m_ticks);
+    timer->ticks = 0;
+    timer->duration = 0;
 
+    vector<TimerRef>::iterator i = m_list.begin();
+
+    for(; i != m_list.end(); i++)
+    {
+        if(*i == timer)
+        {
+            m_mutex.Acquire();
+            m_list.erase(i);
+            delete timer;
+            m_mutex.Release();
+            break;
+        }
+    }
+}
+
+void TimerManager::SetTimer(TimerRef timer, uint32 seconds)
+{
+    vector<TimerRef>::iterator i = m_list.begin();
+
+    for(; i != m_list.end(); i++)
+    {
+        if(*i == timer)
+        {
+            timer->duration = seconds;
+            break;
+        }
+    }
+    
+}
+
+void TimerManager::ThreadFunction()
+{
     do
     {
-        Tick();
+        GoToSleep(1000);
 
-        GoToSleep(m_ticks);
+        m_mutex.Acquire();
+
+        vector<TimerRef>::iterator i = m_list.begin();
+
+		for(; i != m_list.end(); i++)
+		{
+			(*i)->ticks++;
+
+			if((*i)->duration && (*i)->ticks >= (*i)->duration)
+			{
+                Timer* t = new Timer(*(*i));
+                t->thread = Thread::CreateThread();
+	            t->thread->Create(TimerManager::timer_function, t);
+			}
+		}
+
+        m_mutex.Release();
 
     } while(m_alive);  
 
     m_semaphore.Signal();
 }
 
-void Timer::thread_function(void* arg)
+void TimerManager::thread_function(void* arg)
 {
-    Timer* _this = (Timer*)arg;
+    TimerManager* _this = (TimerManager*)arg;
 
     _this->ThreadFunction();
+}
+
+void TimerManager::timer_function(void* arg)
+{
+    Timer* t = (Timer*)arg;
+
+    t->function(t->userValue);
+
+    delete t->thread;
+    delete t;
 }

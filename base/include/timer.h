@@ -23,31 +23,52 @@ ____________________________________________________________________________*/
 #ifndef INCLUDED_TIMER_H_
 #define INCLUDED_TIMER_H_
 
+#include <vector>
+
+using namespace std;
+
+#include "config.h"
 #include "thread.h"
 #include "semaphore.h"
+#include "mutex.h"
+
+
+typedef void (*TimerFunction)(void* arg);
 
 class Timer {
  public:
-    Timer(uint32 milliseconds);
-    virtual ~Timer();
+     uint32 ticks;
+     uint32 duration;
+     TimerFunction function;
+     void* userValue;
+     Thread* thread;
+};
 
-    void Set(uint32 milliseconds);
-    void Start();
-    void Stop();
+typedef Timer* TimerRef;
 
-    void SleepFirst(void);
+class TimerManager {
+ public:
+    TimerManager();
+    virtual ~TimerManager();
 
-    virtual void Tick() = 0;
+    void StartTimer(TimerRef* timerRef, TimerFunction function,
+					uint32 seconds, void* userValue);
+
+    void StopTimer(TimerRef timerRef);
+
+    void SetTimer(TimerRef timerRef, uint32 seconds);
 
     static void thread_function(void* arg);
     void ThreadFunction();
 
+    static void timer_function(void* arg);
+
  private:
-    uint32 m_ticks;
     Thread* m_thread;
     bool m_alive;
     Semaphore m_semaphore;
-    bool m_sleepFirst;
+    Mutex m_mutex;
+    vector<TimerRef> m_list;
 };
 
 #endif // INCLUDED_TIMER_H_

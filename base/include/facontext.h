@@ -43,6 +43,7 @@ class MusicCatalog;
 class DownloadManager;
 class UpdateManager;
 class Player;
+class TimerManager;
 
 class FAContext
 {
@@ -86,6 +87,7 @@ class FAContext
     MusicCatalog *catalog;
     DownloadManager *downloadManager;
     //UpdateManager *updateManager;
+    TimerManager *timerManager;
     Player *player;
 #ifdef HAVE_GTK
     Mutex gtkLock;
