@@ -348,12 +348,12 @@ Error XingLMC::ExtractMediaInfo()
       return kError_OutOfMemory;
 
    /*LEAK*/MpegInfoEvent *mie = new MpegInfoEvent(totalFrames,
-                       (float)(fMsPerFrame / 1000), m_frameBytes,
-                       m_iBitRate, samprate, layer,
-                       (m_sMpegHead.sync == 2) ? 3 : (m_sMpegHead.id) ? 1 : 2,
-                       (m_sMpegHead.mode == 0x3 ? 1 : 2), 
+                  (float)(fMsPerFrame / 1000), m_frameBytes,
+                  (m_pXingHeader) ? 0 : m_iBitRate, samprate, layer,
+                  (m_sMpegHead.sync == 2) ? 3 : (m_sMpegHead.id) ? 1 : 2,
+                  (m_sMpegHead.mode == 0x3 ? 1 : 2), 
 					   m_sMpegHead.original, m_sMpegHead.prot,
-                       m_sMpegHead.emphasis, m_sMpegHead.mode, 
+                  m_sMpegHead.emphasis, m_sMpegHead.mode, 
 					   m_sMpegHead.mode_ext);
 
    if (mie)

@@ -380,10 +380,15 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
          char           text[100];
 
          m_fSecondsPerFrame = info->GetSecondsPerFrame();
-         sprintf(text, "%dkbps %dkhz %s", 
-               info->GetBitRate() / 1000,
-               info->GetSampleRate() / 1000, 
-               info->GetChannels() ? "Stereo" : "Mono");
+         if (info->GetBitRate() == 0)
+              sprintf(text, "VBR %dkhz %s", 
+                   info->GetSampleRate() / 1000, 
+                   info->GetChannels() ? "Stereo" : "Mono");
+         else
+              sprintf(text, "%dkbps %dkhz %s", 
+                   info->GetBitRate() / 1000,
+                   info->GetSampleRate() / 1000, 
+                   info->GetChannels() ? "Stereo" : "Mono");
 
          m_oStreamInfo = text;
          m_pWindow->ControlStringValue("StreamInfo", true, m_oStreamInfo);
