@@ -93,18 +93,13 @@ TreeData *GTKMusicBrowser::NewTreeData(TreeNodeType type, MusicCatalog *cat,
 
 vector<PlaylistItem *> *GTKMusicBrowser::GetTreeSelection(void)
 {
-    GtkCTree *tree = musicBrowserTree;
-
     vector<PlaylistItem *> *newlist = new vector<PlaylistItem *>;
 
-    GtkCList *clist = GTK_CLIST(tree);
-    GList *selection = clist->selection;
+    vector<TreeData *>::iterator iter = mbSelections->begin();
+    for (; iter != mbSelections->end(); iter++) {
+      TreeData *data = *iter;
 
-    while (selection) {
-      GtkCTreeNode *node = (GtkCTreeNode *)selection->data;
-      TreeData *data = (TreeData *)gtk_ctree_node_get_row_data(tree, node);
-
-      if (!data)
+      if (!data) 
           return newlist;
 
       switch (data->type) {
@@ -185,8 +180,6 @@ vector<PlaylistItem *> *GTKMusicBrowser::GetTreeSelection(void)
         default:
             break;
       }
-
-      selection = selection->next;
     }
     return newlist;
 }
@@ -1153,7 +1146,7 @@ void GTKMusicBrowser::StreamTimer(void)
     }
 
     eRet = o.ParseStreamXML(page, list);
-    
+   
     if (eRet != kError_NoErr) {
         cout << "Stream .xml parse error: " << ErrorString[eRet] << "\n";
         return;
