@@ -62,7 +62,7 @@ static int find_sync(unsigned char *buf, int n);
 static int sync_scan(unsigned char *buf, int n, int i0);
 static int sync_test(unsigned char *buf, int n, int isync, int padbytes);
 
-// jdw
+/* jdw */
 extern unsigned int g_jdw_additional;
 
 /*--------------------------------------------------------------*/
@@ -77,23 +77,23 @@ int head_info(unsigned char *buf, unsigned int n, MPEG_HEAD * h)
 
 
    h->sync = 0;
-   //if ((buf[0] == 0xFF) && ((buf[1] & 0xF0) == 0xF0))
+   /*if ((buf[0] == 0xFF) && ((buf[1] & 0xF0) == 0xF0)) */
    if ((buf[0] == 0xFF) && ((buf[0+1] & 0xF0) == 0xF0))
    {
-      mpeg25_flag = 0;		// mpeg 1 & 2
+      mpeg25_flag = 0;		/* mpeg 1 & 2 */
 
    }
    else if ((buf[0] == 0xFF) && ((buf[0+1] & 0xF0) == 0xE0))
    {
-      mpeg25_flag = 1;		// mpeg 2.5
+      mpeg25_flag = 1;		/* mpeg 2.5 */
 
    }
    else
-      return 0;			// sync fail
+      return 0;			/* sync fail */
 
    h->sync = 1;
    if (mpeg25_flag)
-      h->sync = 2;		//low bit clear signals mpeg25 (as in 0xFFE)
+      h->sync = 2;		/*low bit clear signals mpeg25 (as in 0xFFE)*/
 
    h->id = (buf[0+1] & 0x08) >> 3;
    h->option = (buf[0+1] & 0x06) >> 1;
@@ -110,9 +110,9 @@ int head_info(unsigned char *buf, unsigned int n, MPEG_HEAD * h)
    h->emphasis = (buf[0+3] & 0x03);
 
 
-// if( mpeg25_flag ) {
- //    if( h->sr_index == 2 ) return 0;   // fail 8khz
- //}
+/* if( mpeg25_flag ) {
+     if( h->sr_index == 2 ) return 0;   // fail 8khz
+   } */
 
 
 /* compute framebytes for Layer I, II, III */
@@ -141,17 +141,17 @@ int head_info(unsigned char *buf, unsigned int n, MPEG_HEAD * h)
       else if (h->option == 1)
       {				/* layer III */
 	 if (h->id)
-	 {			// mpeg1
+	 {			/* mpeg1 */
 
 	    framebytes =
 	       2880 * mp_br_tableL3[h->id][h->br_index]
 	       / mp_sr20_table[h->id][h->sr_index];
 	 }
 	 else
-	 {			// mpeg2
+	 {			/* mpeg2 */
 
 	    if (mpeg25_flag)
-	    {			// mpeg2.2
+	    {			/* mpeg2.2 */
 
 	       framebytes =
 		  2880 * mp_br_tableL3[h->id][h->br_index]
@@ -174,7 +174,7 @@ int head_info(unsigned char *buf, unsigned int n, MPEG_HEAD * h)
 
 int head_info3(unsigned char *buf, unsigned int n, MPEG_HEAD *h, int *br, unsigned int *searchForward) {
 	unsigned int pBuf = 0;
-	// jdw insertion...
+	/* jdw insertion... */
    while ((pBuf < n) && !((buf[pBuf] == 0xFF) && 
           ((buf[pBuf+1] & 0xF0) == 0xF0 || (buf[pBuf+1] & 0xF0) == 0xE0))) 
    {
@@ -208,13 +208,13 @@ int head_info2(unsigned char *buf, unsigned int n, MPEG_HEAD * h, int *br)
 	 *br = 1000 * mp_br_tableL3[h->id][h->br_index];
       else
       {
-	 if (h->id)		// mpeg1
+	 if (h->id)		/* mpeg1 */
 
 	    *br = 1000 * framebytes * mp_sr20_table[h->id][h->sr_index] / (144 * 20);
 	 else
-	 {			// mpeg2
+	 {			/* mpeg2 */
 
-	    if ((h->sync & 1) == 0)	//  flags mpeg25
+	    if ((h->sync & 1) == 0)	/*  flags mpeg25 */
 
 	       *br = 500 * framebytes * mp_sr20_table[h->id][h->sr_index] / (72 * 20);
 	    else

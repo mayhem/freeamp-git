@@ -21,8 +21,6 @@
 	$Id$
 ____________________________________________________________________________*/
 
-// debug.h
-
 #ifndef INCLUDED_DEBUG_H_
 #define INCLUDED_DEBUG_H_
 
@@ -31,4 +29,4 @@ void debug_string(char*);
 void DebugInit_v(void);
 void Debug_v(const char * format, ...);
 
-#endif // _DEBUG_H_
+#endif /* _DEBUG_H_ */

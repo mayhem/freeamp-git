@@ -95,15 +95,15 @@ void imdct18(float f[18])	/* 18 point */
    {
       g1 = mdct18w[p] * f[p];
       g2 = mdct18w[17 - p] * f[17 - p];
-      ap = g1 + g2;		// a[p]
+      ap = g1 + g2;		/* a[p] */
 
-      bp = mdct18w2[p] * (g1 - g2);	// b[p]
+      bp = mdct18w2[p] * (g1 - g2);	/* b[p] */
 
       g1 = mdct18w[8 - p] * f[8 - p];
       g2 = mdct18w[9 + p] * f[9 + p];
-      a8p = g1 + g2;		// a[8-p]
+      a8p = g1 + g2;		/* a[8-p] */
 
-      b8p = mdct18w2[8 - p] * (g1 - g2);	// b[8-p]
+      b8p = mdct18w2[8 - p] * (g1 - g2);	/* b[8-p] */
 
       a[p] = ap + a8p;
       a[5 + p] = ap - a8p;
@@ -185,7 +185,7 @@ void imdct6_3(float f[])	/* 6 point */
 #else
    int w;
    float buf[18];
-   float *a, *c;		// b[i] = a[3+i]
+   float *a, *c;		/* b[i] = a[3+i] */
 
    float g1, g2;
    float a02, b02;

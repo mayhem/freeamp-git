@@ -278,7 +278,7 @@ int audio_decode8_init(MPEG_HEAD * h, int framebytes_arg,
    }
 
    if ((h->sync & 1) == 0)
-      return 0;			// fail mpeg 2.5
+      return 0;			/* fail mpeg 2.5 */
 
    output_code = convert_code >> 2;
    if (output_code < 1)

@@ -170,7 +170,6 @@ void TimerManager::timer_function(void* arg)
 
     t->function(t->userValue);
 
-    //t->thread->Join();
     delete t->thread;
     delete t;
 }

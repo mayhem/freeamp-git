@@ -131,7 +131,7 @@ int L3table_init(void)
    }
 
 /*-------------------------*/
-// quant_init_sf_band(sr_index);   replaced by code in sup.c
+/* quant_init_sf_band(sr_index);   replaced by code in sup.c */
 
 
 /*================ antialias ===============================*/

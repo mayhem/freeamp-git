@@ -84,7 +84,9 @@ void MusicCatalog::StartTimer(void)
 MusicCatalog::~MusicCatalog()
 {
     ClearCatalog();
+    StopSearchMusic();
 
+    m_mutex->Acquire();
     m_catMutex->Acquire();
 
     if(m_watchTimer)

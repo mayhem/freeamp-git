@@ -71,7 +71,7 @@ unsigned int cvt_to_wave(unsigned char *pcm, unsigned int bytes_in)
    short tmp;
    unsigned short *w;
 
-// printf("\n wave convert");
+/* printf("\n wave convert"); */
 
    if (cvt_flag == 0)
       return bytes_in;

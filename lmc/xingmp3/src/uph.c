@@ -278,7 +278,7 @@ void unpack_huff(int xy[][2], int n, int ntable)
 	    xy[i][0] = x;
 	    xy[i][1] = y;
 	    if (bitdat.bs_ptr > bitdat.bs_ptr_end)
-	       break;		// bad data protect
+	       break;		/* bad data protect */
 
 	 }
 	 return;
@@ -309,7 +309,7 @@ void unpack_huff(int xy[][2], int n, int ntable)
 	    xy[i][0] = x;
 	    xy[i][1] = y;
 	    if (bitdat.bs_ptr > bitdat.bs_ptr_end)
-	       break;		// bad data protect
+	       break;		/* bad data protect */
 
 	 }
 	 return;
@@ -343,7 +343,7 @@ void unpack_huff(int xy[][2], int n, int ntable)
 	    xy[i][0] = x;
 	    xy[i][1] = y;
 	    if (bitdat.bs_ptr > bitdat.bs_ptr_end)
-	       break;		// bad data protect
+	       break;		/* bad data protect */
 
 	 }
 	 return;
@@ -416,7 +416,7 @@ int unpack_huff_quad(int vwxy[][4], int n, int nbits, int ntable)
       vwxy[i][2] = x;
       vwxy[i][3] = y;
       if (bitdat.bs_ptr > bitdat.bs_ptr_end)
-	 break;			// bad data protect
+	 break;			/* bad data protect */
 
    }
    if (nbits < 0)
@@ -482,7 +482,7 @@ int unpack_huff_quad(int vwxy[][4], int n, int nbits, int ntable)
       vwxy[i][2] = x;
       vwxy[i][3] = y;
       if (bitdat.bs_ptr > bitdat.bs_ptr_end)
-	 break;			// bad data protect
+	 break;			/* bad data protect */
 
    }
    if (nbits < 0)

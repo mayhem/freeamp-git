@@ -67,9 +67,10 @@ void *
 pthreadThread::
 InternalThreadFunction()
 {
+    m_semaphore.Wait();
+
     if (m_function) 
         m_function(m_arg);
-
     return NULL;
 }
 
@@ -85,8 +86,11 @@ Create(thread_function function, void* arg, bool detach)
     {
 	result = false;
     }
-    if (detach) 
+    if (detach && result) {
         pthread_detach(m_threadHandle);
+    }
+
+    m_semaphore.Signal();
 
     return result;
 }

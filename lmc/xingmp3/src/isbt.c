@@ -95,8 +95,8 @@ static float wincoef[264] =
 /* extern windows because of asm */
 static signed int vb_ptr;
 
-// static WININT vbuf[512];
-//static WININT vbuf2[512];
+/* static WININT vbuf[512];
+   static WININT vbuf2[512]; */
 extern WININT vbuf[512];
 extern WININT vbuf2[512];
 

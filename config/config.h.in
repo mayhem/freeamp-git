@@ -27,20 +27,20 @@ ____________________________________________________________________________*/
 #include <limits.h>
 
 
-// name of company
+/* name of company */
 #define BRANDING_COMPANY "FreeAmp"
 
-// name of player
+/* name of player */
 #define BRANDING "FreeAmp"
 
-// name of player + "The" and "the" if it is needed for your player name. for 
-// example, Welcome to FreeAmp does not need the "the" but Welcome to the 
-// EMusic Player does in order to read well.
+/* name of player + "The" and "the" if it is needed for your player name. for 
+   example, Welcome to FreeAmp does not need the "the" but Welcome to the 
+   EMusic Player does in order to read well. */
 #define The_BRANDING "FreeAmp"
 #define the_BRANDING "FreeAmp"
 
-// uncomment this line if branding version != FreeAmp version
-//#define BRANDING_VERSION "2.0.7"
+/* uncomment this line if branding version != FreeAmp version */
+/* #define BRANDING_VERSION "2.0.7" */
 
 #define BRANDING_URL "http://www.freeamp.org"
 #define BRANDING_UPDATE_SERVER "fatman.freeamp.org"
@@ -162,7 +162,7 @@ ____________________________________________________________________________*/
 #endif
 
 /* define our datatypes */
-// real number
+/* real number */
 typedef double real;
 
 #if HAVE_BEOS
@@ -215,8 +215,8 @@ typedef short			int32;
 
 #endif
 
-// What character marks the end of a directory entry? For DOS and
-// Windows, it is "\"; in UNIX it is "/".
+/* What character marks the end of a directory entry? For DOS and
+   Windows, it is "\"; in UNIX it is "/". */
 #if defined(WIN32) || defined(OS2) || defined(__DOS__)
 #define DIR_MARKER '\\'
 #define DIR_MARKER_STR "\\"
@@ -225,8 +225,8 @@ typedef short			int32;
 #define DIR_MARKER_STR "/"
 #endif /* WIN32 */
 
-// What character(s) marks the end of a line in a text file? 
-// For DOS and Windows, it is "\r\n"; in UNIX it is "\r".
+/* What character(s) marks the end of a line in a text file? 
+   For DOS and Windows, it is "\r\n"; in UNIX it is "\r". */
 #if defined(WIN32) || defined(OS2) || defined(__DOS__)
 #define LINE_END_MARKER_STR "\r\n"
 #else
@@ -257,7 +257,7 @@ typedef short			int32;
 #undef socklen_t
 #endif
 
-// kludges for beos
+/* kludges for beos */
 #if HAVE_BEOS
 # include <be/kernel/OS.h>
 # define usleep(a)	snooze(a)

@@ -23,12 +23,13 @@ ____________________________________________________________________________*/
 
 #ifndef INCLUDED_PTHREAD_THREAD_H
 #define INCLUDED_PTHREAD_THREAD_H
+#include "config.h"
 
 #include <pthread.h>
 #include "thread.h"
 
 #include "mutex.h"
-
+#include "semaphore.h"
 
 class pthreadThread : public Thread{
 
@@ -57,6 +58,7 @@ private:
 	Mutex          *m_suspendMutex;
 	thread_function m_function;
 	void           *m_arg;
+	Semaphore       m_semaphore;
 };
 
 #endif /* _LINUX_THREAD_H */

@@ -2090,7 +2090,7 @@ void Player::CDTimer()
     if(IsError(pmo->Init(NULL))) 
     {
         CDInfoEvent *cie = new CDInfoEvent(0, 0, "");
-        m_context->player->AcceptEvent(cie);
+        AcceptEvent(cie);
     }
 
     delete pmo;

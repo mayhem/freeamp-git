@@ -156,7 +156,7 @@ calc_size(Efont * f, int *width, int *height, char *text)
 }
 
 static void
-render_text(TT_Raster_Map * rmap, TT_Raster_Map * rchr, Efont * f, char *text,
+render_text(TT_Raster_Map *rmap, TT_Raster_Map *rchr, Efont *f, char *text,
 	    int *xor, int *yor)
 {
    TT_Glyph_Metrics    metrics;

@@ -66,11 +66,11 @@ static signed char lookqt[4][3][16] =
  {{1, -1, -1, -1, 2, -1, 2, 0, 0, 0, 1, 1, 1, 1, 1, -1},	/*  44ks dual chan */
   {0, -1, -1, -1, 2, -1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -1},	/*  48ks */
   {1, -1, -1, -1, 3, -1, 3, 0, 0, 0, 1, 1, 1, 1, 1, -1}},	/*  32ks */
-// mono extended beyond legal br index
-//  1,2,2,0,0,0,1,1,1,1,1,1,1,1,1,-1,          /*  44ks single chan */
-//  0,2,2,0,0,0,0,0,0,0,0,0,0,0,0,-1,          /*  48ks */
-//  1,3,3,0,0,0,1,1,1,1,1,1,1,1,1,-1,          /*  32ks */
-// legal mono
+/* mono extended beyond legal br index */
+/*  1,2,2,0,0,0,1,1,1,1,1,1,1,1,1,-1, */         /*  44ks single chan */
+/*  0,2,2,0,0,0,0,0,0,0,0,0,0,0,0,-1, */         /*  48ks */
+/*  1,3,3,0,0,0,1,1,1,1,1,1,1,1,1,-1, */         /*  32ks */
+/* legal mono */
  {{1, 2, 2, 0, 0, 0, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1},	/*  44ks single chan */
   {0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1, -1, -1},	/*  48ks */
   {1, 3, 3, 0, 0, 0, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1}},	/*  32ks */
@@ -314,7 +314,7 @@ int audio_decode_init(MPEG_HEAD * h, int framebytes_arg,
       abcd_index = 4;		/* mpeg 2 */
 
    if (abcd_index < 0)
-      return 0;			// fail invalid Layer II bit rate index
+      return 0;			/* fail invalid Layer II bit rate index */
 
    for (i = 0; i < 4; i++)
       for (j = 0; j < 16; j++)

@@ -79,15 +79,16 @@ static int getch()
 #endif
 
 
-// JDW //
-//#ifdef LITTLE_SHORT16
-//#define cvt_to_wave_init(a)
-//#define cvt_to_wave(a, b)  b
-//#else
-//void cvt_to_wave_init(int bits);
-//unsigned int cvt_to_wave(void *a, unsigned int b);
-//
-//#endif
+/* JDW 
+#ifdef LITTLE_SHORT16
+#define cvt_to_wave_init(a)
+#define cvt_to_wave(a, b)  b
+#else
+void cvt_to_wave_init(int bits);
+unsigned int cvt_to_wave(void *a, unsigned int b);
+
+#endif
+*/
 #ifdef LITTLE_SHORT16
 #define cvt_to_wave_init(a)
 #define cvt_to_wave(a, b) b

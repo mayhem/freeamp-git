@@ -84,9 +84,9 @@ int iframe;
 
 /*-------*/
 static int band_limit = (576);
-static int band_limit21 = (576);	// limit for sf band 21
+static int band_limit21 = (576);	/* limit for sf band 21 */
 
-static int band_limit12 = (576);	// limit for sf band 12 short
+static int band_limit12 = (576);	/* limit for sf band 12 short */
 
 int band_limit_nsb = 32;	/* global for hybrid */
 static int nsb_limit = 32;
@@ -544,7 +544,7 @@ static int unpack_side_MPEG2(int igr)
       {
 	 framebytes =
 	    2880 * mp_br_tableL3[id][br_index] / mp_sr20_table[id][sr_index];
-       //if( sr_index == 2 ) return 0;  // fail mpeg25 8khz
+       /*if( sr_index == 2 ) return 0; */ /* fail mpeg25 8khz */
       }
    }
    side_info.main_data_begin = bitget(8);
@@ -672,7 +672,7 @@ static void unpack_main(unsigned char *pcm, int igr)
 			     side_info.gr[igr][ch].count1table_select);
       n4 = n3 + nn4;
       nsamp[igr][ch] = n4;
-    //limit n4 or allow deqaunt to sf band 22
+    /*/limit n4 or allow deqaunt to sf band 22*/
       if (side_info.gr[igr][ch].block_type == 2)
 	 n4 = min(n4, band_limit12);
       else
@@ -680,7 +680,7 @@ static void unpack_main(unsigned char *pcm, int igr)
       if (n4 < 576)
 	 memset(sample[ch][igr] + n4, 0, sizeof(SAMPLE) * (576 - n4));
       if (bitdat.bs_ptr > bitdat.bs_ptr_end)
-      {				// bad data overrun
+      {				/* bad data overrun */
 
 	 memset(sample[ch][igr], 0, sizeof(SAMPLE) * (576));
       }
@@ -805,7 +805,7 @@ w---------------------------------------------*/
    }
    nbytes = padframebytes - side_bytes - crcbytes;
 
-   // RAK: This is no bueno. :-(
+   /* RAK: This is no bueno. :-( */
 	if (nbytes < 0 || nbytes > NBUF)
 	{
 	    in_out.in_bytes = 0;
@@ -818,7 +818,7 @@ w---------------------------------------------*/
 
    if (buf_ptr0 >= 0)
    {
-// dump_frame(buf+buf_ptr0, 64);
+/* dump_frame(buf+buf_ptr0, 64); */
       main_pos_bit = buf_ptr0 << 3;
       unpack_main(pcm, 0);
       unpack_main(pcm + half_outbytes, 1);
@@ -852,7 +852,7 @@ IN_OUT L3audio_decode_MPEG2(unsigned char *bs, unsigned char *pcm)
    in_out.out_bytes = 0;
    sync = bitget(12);
 
-// if( sync != 0xFFF ) return in_out;       /* sync fail */
+/* if( sync != 0xFFF ) return in_out; */   /* sync fail */
 
    mpeg25_flag = 0;
    if (sync != 0xFFF)
@@ -877,7 +877,7 @@ IN_OUT L3audio_decode_MPEG2(unsigned char *bs, unsigned char *pcm)
       buf_ptr1 = side_info.main_data_begin;
    }
    nbytes = padframebytes - side_bytes - crcbytes;
-   // RAK: This is no bueno. :-(
+   /* RAK: This is no bueno. :-( */
 	if (nbytes < 0 || nbytes > NBUF)
 	{
 	    in_out.in_bytes = 0;
@@ -897,7 +897,7 @@ IN_OUT L3audio_decode_MPEG2(unsigned char *bs, unsigned char *pcm)
    {
       memset(pcm, zero_level_pcm, outbytes);	/* fill out skipped frames */
       in_out.out_bytes = outbytes;
-// iframe--;  in_out.out_bytes = 0; return in_out;// test test */
+/* iframe--;  in_out.out_bytes = 0; return in_out; */ /* test test */
    }
 
 
@@ -1009,7 +1009,7 @@ sfBandIndexTable[3][3] =
 	 }
       }
       ,
-// this 8khz table, and only 8khz, from mpeg123)
+/* this 8khz table, and only 8khz, from mpeg123) */
       {
 	 {
 	    0, 12, 24, 36, 48, 60, 72, 88, 108, 132, 160, 192, 232, 280, 336, 400, 476, 566, 568, 570, 572, 574, 576
@@ -1086,7 +1086,7 @@ int L3audio_decode_init(MPEG_HEAD * h, int framebytes_arg,
 			int freq_limit)
 {
    int i, j, k;
-   // static int first_pass = 1;
+   /* static int first_pass = 1; */
    int samprate;
    int limit;
    int bit_code;
@@ -1121,7 +1121,7 @@ int L3audio_decode_init(MPEG_HEAD * h, int framebytes_arg,
 
    samprate = sr_table[4 * h->id + h->sr_index];
    if ((h->sync & 1) == 0)
-      samprate = samprate / 2;	// mpeg 2.5 
+      samprate = samprate / 2;	/* mpeg 2.5 */
 /*----- compute nsb_limit --------*/
    nsb_limit = (freq_limit * 64L + samprate / 2) / samprate;
 /*- caller limit -*/
@@ -1134,7 +1134,7 @@ int L3audio_decode_init(MPEG_HEAD * h, int framebytes_arg,
 
    k = h->id;
    if ((h->sync & 1) == 0)
-      k = 2;			// mpeg 2.5 
+      k = 2;			/* mpeg 2.5 */
 
    if (k == 1)
    {
@@ -1211,7 +1211,7 @@ int L3audio_decode_init(MPEG_HEAD * h, int framebytes_arg,
 
    k = h->id;
    if ((h->sync & 1) == 0)
-      k = 2;			// mpeg 2.5 
+      k = 2;			/* mpeg 2.5 */
 
    for (i = 0; i < 22; i++)
       sfBandIndex[0][i] = sfBandIndexTable[k][h->sr_index].l[i + 1];

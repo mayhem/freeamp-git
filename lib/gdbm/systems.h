@@ -149,8 +149,8 @@
 #define STDERR_FILENO 2
 #endif
 
-       //      Added by "Dave Roth" rothd@roth.net 970829
-       //      Modifications made by "Sergei Romanenko" <roman@spp.Keldysh.ru> 980602
+/*    Added by "Dave Roth" rothd@roth.net 970829
+      Modifications made by "Sergei Romanenko" <roman@spp.Keldysh.ru> 980602 */
 #ifdef WIN32
 #include <io.h>
 int    lock_val;

@@ -192,7 +192,7 @@ void dequant(SAMPLE Sample[], int *nsamp,
    }
 
    cb_info->cbmax = cbmax[0];
-   cb_info->cbtype = 0;		// type = long
+   cb_info->cbtype = 0;		/* type = long */
 
    if (cbs0 >= 12)
       return;

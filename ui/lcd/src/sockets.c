@@ -24,7 +24,7 @@
 **************************************************/
 
 
-// Length of longest transmission allowed at once...
+/* Length of longest transmission allowed at once... */
 #define MAXMSG 8192
 
 
@@ -51,7 +51,7 @@ static int sock_init_sockaddr (sockaddr_in *name,
   
 }
 
- // Client functions...
+ /* Client functions... */
 int sock_connect(const char *host, unsigned short int port)
 {
   struct sockaddr_in servername;
@@ -59,14 +59,14 @@ int sock_connect(const char *host, unsigned short int port)
   int err=0;
   
   
-  // jdw debug("sock_connect: Creating socket\n");
+  /* jdw debug("sock_connect: Creating socket\n"); */
   sock = socket(PF_INET, SOCK_STREAM, 0);
   if(sock < 0)
     {
       fprintf(stderr,"sock_connect: Error creating socket\n");
       return sock;
     }
-  // jdw debug("sock_connect: Created socket (%i)\n", sock);
+  /* jdw debug("sock_connect: Created socket (%i)\n", sock); */
   
   sock_init_sockaddr(&servername, host, port);
   
@@ -77,7 +77,7 @@ int sock_connect(const char *host, unsigned short int port)
     {
       fprintf (stderr,"sock_connect: connect failed\n");
       shutdown(sock, 2);
-      return 0;  // Normal exit if server doesn't exist...
+      return 0;  /* Normal exit if server doesn't exist... */
     }
   
   fcntl(sock, F_SETFL, O_NONBLOCK);
@@ -95,7 +95,7 @@ int sock_close(int fd)
    return err;
 }
 
-// Send/receive lines of text
+/* Send/receive lines of text */
 int sock_send_string(int fd, const char *string)
 {
    int err;
@@ -106,28 +106,28 @@ int sock_send_string(int fd, const char *string)
    if (err < 0)
    {
       fprintf (stderr,"sock_send_string: socket write error\n");
-      //shutdown(fd, 2);
+      /* shutdown(fd, 2); */
       return err;
    }
 
-   //printf("sock_send_string: %i bytes\n", err);
+   /*printf("sock_send_string: %i bytes\n", err);*/
    
    return err;
 }
 
-// Recv gives only one line per call...
+/* Recv gives only one line per call... */
 int sock_recv_string(int fd, char *dest, size_t maxlen)
 {
    char * err;
    int i;
 
-   // TODO:  Get this function to work right somehow...
+   /* TODO:  Get this function to work right somehow... */
    return -1;
    
    if(!dest) return -1;
    if(maxlen <= 0) return 0;
 
-   // Read in characters until the end of the line...
+   /* Read in characters until the end of the line... */
    for(i=0;
        i<maxlen && (read(fd, dest+i, 1) > 0);
        i++)
@@ -136,7 +136,7 @@ int sock_recv_string(int fd, char *dest, size_t maxlen)
    if (err == NULL)
    {
       fprintf (stderr,"sock_recv_string: socket read error\n");
-      //shutdown(fd, 2);
+      /*shutdown(fd, 2);*/
       return -1;
    }
    printf("sock_recv_string: Got message \"%s\"\n", dest);
@@ -144,7 +144,7 @@ int sock_recv_string(int fd, char *dest, size_t maxlen)
    return strlen(dest);
 }
 
-// Send/receive raw data
+/* Send/receive raw data */
 int sock_send(int fd, void *src, size_t size)
 {
    int err;
@@ -155,7 +155,7 @@ int sock_send(int fd, void *src, size_t size)
    if (err < 0)
     {
       fprintf (stderr,"sock_send: socket write error\n");
-      //shutdown(fd, 2);
+      /*shutdown(fd, 2);*/
       return err;
     }
 
@@ -172,11 +172,11 @@ int sock_recv(int fd, void *dest, size_t maxlen)
    err = read (fd, dest, maxlen);
    if (err < 0)
    {
-      //fprintf (stderr,"sock_recv: socket read error\n");
-      //shutdown(fd, 2);
+      /*fprintf (stderr,"sock_recv: socket read error\n");
+        shutdown(fd, 2);*/
       return err;
    }
-   //debug("sock_recv: Got message \"%s\"\n", (char *)dest);
+   /*debug("sock_recv: Got message \"%s\"\n", (char *)dest);*/
    
    return err;
 }

@@ -17,19 +17,19 @@
  */
 
 
-// Client functions...
+/* Client functions... */
 int sock_connect(const char *host, unsigned short int port);
 int sock_close(int fd);
-// Send/receive lines of text
+/* Send/receive lines of text */
 int sock_send_string(int fd, const char *string);
-// Recv gives only one line per call...
+/* Recv gives only one line per call... */
 int sock_recv_string(int fd, char *dest, size_t maxlen);
-// Send/receive raw data
+/* Send/receive raw data */
 int sock_send(int fd, void *src, size_t size);
 int sock_recv(int fd, void *dest, size_t maxlen);
 
 
-// Er, ignore the rest of this file.  I'll clean it up sometime...
+/* Er, ignore the rest of this file.  I'll clean it up sometime... */
 
 /*****************************************************************
   LCDproc command line interface?:  (while running)
