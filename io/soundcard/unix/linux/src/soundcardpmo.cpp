@@ -261,7 +261,7 @@ bool SoundCardPMO::WaitForDrain(void)
    for(; !m_bExit && !m_bPause; )
    {
        ioctl(audio_fd, SNDCTL_DSP_GETOSPACE, &info);
-       if (info.fragments == m_iTotalFragments - 1)
+       if (info.fragments >= m_iTotalFragments - 1)
        {
            return true;
        }
