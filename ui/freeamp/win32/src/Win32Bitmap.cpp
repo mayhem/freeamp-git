@@ -94,7 +94,6 @@ Error Win32Bitmap::LoadBitmapFromDisk(string &oFile)
    GetObject(m_hBitmap, sizeof(DIBSECTION), (LPSTR)&sSection);
    memcpy(&m_sBitmapInfo, &sSection.dsBmih, sizeof(BITMAPINFOHEADER));
    
-   assert(m_sBitmapInfo.bmiHeader.biBitCount == 24);
    m_iBytesPerLine = m_sBitmapInfo.bmiHeader.biWidth * 3;
    m_iHeight = m_sBitmapInfo.bmiHeader.biHeight;
    m_iWidth = m_sBitmapInfo.bmiHeader.biWidth;
