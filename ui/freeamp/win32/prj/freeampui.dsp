@@ -236,6 +236,10 @@ SOURCE=..\..\src\DialControl.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\src\Equalizer.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\src\Font.cpp
 # End Source File
 # Begin Source File

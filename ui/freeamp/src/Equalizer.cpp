@@ -45,7 +45,7 @@ Equalizer::Equalizer(FAContext *context)
 
 	for(int i=0; i<32; i++)
 		m_equalizer[i] = 1.0;
-	for(int i=0; i<10; i++)
+	for(i=0; i<10; i++)
 		m_sliders[i] = 0;
 }
 

@@ -28,7 +28,7 @@ ____________________________________________________________________________*/
 // STL often creates symbols longer than that.
 // When symbols are longer than 255 characters, the warning is disabled.
 #ifdef WIN32
-#pragma warning(disable:4786)
+#pragma warning(disable:4786 4800)
 #endif
 
 #include "facontext.h"
