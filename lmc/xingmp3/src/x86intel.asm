@@ -29,13 +29,13 @@
 ;	$Id$
 ;
 
-extern _wincoef:dword
-extern _coef32:dword
-
 .386
 ;FLAT	group _TEXT
 ;	assume cs:FLAT, ds:FLAT, ss:FLAT
 _TEXT	segment para public use32 'CODE'
+
+extern _wincoef:dword
+extern _coef32:dword
 
 public _window_dual
 	align 16
