@@ -137,9 +137,7 @@ GTKWindow::GTKWindow(Theme *pTheme, string &oName)
 
 GTKWindow::~GTKWindow(void)
 {
-    delete m_pCanvas;
     delete m_pMindMeldMutex;
-    m_pCanvas = NULL;
 }
 
 Error GTKWindow::Run(Pos &oPos)
