@@ -35,6 +35,8 @@ ____________________________________________________________________________*/
 
 #include "config.h"
 
+#include "freeamp-x11.h"
+
 #define BITMAPDEPTH 1
 #define TOO_SMALL 0
 #define BIG_ENOUGH 1
@@ -79,30 +81,49 @@ static char *progname; /* name this program was invoked by */
 
 void draw_graphics(Window win, GC gc, uint32 window_width, uint32 window_height);
 
-void main(int argc, char **argv)
-{
-    int foo,bar,baz,biz;
-    Window win;
-    unsigned int width, height;	/* window size */
-    int x, y; 	/* window position */
-    unsigned int border_width = 4;	/* four pixels */
-    unsigned int display_width, display_height;
-    unsigned int icon_width, icon_height;
-    char *window_name = "FreeAmp v1.0.0";
-    char *icon_name = "FreeAmp";
-    Pixmap icon_pixmap;
+void FreeAmpUI::SetArgs(int argc, char **argv) {
+    m_argc = argc;
+    m_argv = argv;
+}
+extern "C" {
 
-    XSizeHints *size_hints;
-    XIconSize *size_list;
-    XWMHints *wm_hints;
-    XClassHint *class_hints;
-    XTextProperty windowName, iconName;
-    int count;
-    XEvent report;
-    GC gc;
-    XFontStruct *font_info;
-    char *display_name = (char *)NULL;
-    int window_size = BIG_ENOUGH;	/* or TOO_SMALL to display contents */
+UserInterface *Initialize() {
+    return new FreeAmpUI();
+}
+
+	   }
+
+FreeAmpUI::FreeAmpUI() {}
+FreeAmpUI::~FreeAmpUI() {}
+int32 FreeAmpUI::AcceptEvent(Event *e) {
+    return 0;
+}
+void FreeAmpUI::SetPlayListManager(PlayListManager *plm) {
+    m_plm = plm;
+}
+
+int foo,bar,baz,biz;
+Window win;
+unsigned int width, height;	/* window size */
+int x, y; 	/* window position */
+unsigned int border_width = 4;	/* four pixels */
+unsigned int display_width, display_height;
+unsigned int icon_width, icon_height;
+char *window_name = "FreeAmp v1.0.0";
+char *icon_name = "FreeAmp";
+Pixmap icon_pixmap;
+GC gc;
+int count;
+XSizeHints *size_hints;
+XIconSize *size_list;
+XWMHints *wm_hints;
+XClassHint *class_hints;
+XTextProperty windowName, iconName;
+char *display_name = (char *)NULL;
+int window_size = BIG_ENOUGH;	/* or TOO_SMALL to display contents */
+
+void FreeAmpUI::Init()
+{
     
     if (!(size_hints = XAllocSizeHints())) {
 	fprintf(stderr, "%s: failure allocating memory\n", progname);
@@ -117,7 +138,7 @@ void main(int argc, char **argv)
         exit(0);
     }
     
-    progname = argv[0];
+    progname = m_argv[0];
     
     /* connect to X server */
     if ( (display=XOpenDisplay(display_name)) == NULL )
@@ -230,7 +251,7 @@ void main(int argc, char **argv)
     class_hints->res_class = "Basicwin";
     
     XSetWMProperties(display, win, &windowName, &iconName, 
-		     argv, argc, size_hints, wm_hints, 
+		     m_argv, m_argc, size_hints, wm_hints, 
 		     class_hints);
     
     /* Select event types wanted */
@@ -251,7 +272,16 @@ void main(int argc, char **argv)
     XFillRectangle(display,win,gc,0,0,TOTAL_WIDTH,TOTAL_HEIGHT);
     XShapeCombineMask(display,win,ShapeBounding,0,0,player_full_mask_pixmap,ShapeSet);
 
+    gtkListenThread = Thread::CreateThread();
+    gtkListenThread->Create(FreeAmpUI::x11ServiceFunction,this);
     
+
+}
+
+void FreeAmpUI::x11ServiceFunction(void *p) {
+    XEvent report;
+    FreeAmpUI *pMe = (FreeAmpUI*)p;
+
     /* Display window */
     XMapWindow(display, win);
     
