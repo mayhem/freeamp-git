@@ -202,7 +202,7 @@ void emusic_web(GTKMusicBrowser *p, guint action, GtkWidget *w)
 
 void show_about(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
-    p->ShowOptions(4);
+    p->ShowOptions(5);
 }
 
 void stop_menu(GTKMusicBrowser *p, guint action, GtkWidget *w)

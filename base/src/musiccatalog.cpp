@@ -608,6 +608,9 @@ void MusicCatalog::DoSearchMusic(char *path)
        search.append(DIR_MARKER_STR);
 
     search.append("*");
+#ifdef WIN32
+    search.append(".*");
+#endif
 
     handle = FindFirstFile((char *)search.c_str(), &find);
 

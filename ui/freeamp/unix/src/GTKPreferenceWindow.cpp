@@ -297,6 +297,7 @@ void GTKPreferenceWindow::GetPrefsValues(Preferences* prefs,
         prefs->GetSaveMusicDirectory(buffer, &size);
     }
     values->saveMusicDirectory = buffer;
+    size = bufferSize;
 
     m_pThemeMan->GetCurrentTheme(values->currentTheme);
 
@@ -313,6 +314,17 @@ void GTKPreferenceWindow::GetPrefsValues(Preferences* prefs,
     }
 
     values->saveMusicDirectory = buffer;
+    size = bufferSize;
+
+    if(kError_BufferTooSmall == prefs->GetPrefString(kALSADevicePref, 
+                                                     buffer, &size)) {
+        size++;
+        bufferSize = size;
+        buffer = (char*)realloc(buffer, bufferSize);
+        prefs->GetPrefString(kALSADevicePref, buffer, &size);
+    }
+ 
+    values->alsaOutput = buffer;
     size = bufferSize;
 
     if(kError_BufferTooSmall == prefs->GetUsersPortablePlayers(buffer, &size)) {
@@ -364,6 +376,8 @@ void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs,
     prefs->SetLogPerformance(values->logPerformance);
 
     prefs->SetThemeDefaultFont(values->defaultFont.c_str());
+
+    prefs->SetPrefString(kALSADevicePref, values->alsaOutput.c_str());
 
     map<string, string>::iterator i;
     int32 iLoop = 0;
@@ -988,6 +1002,20 @@ void pmo_select(GtkWidget *item, GTKPreferenceWindow *p)
     p->SetPMO(p->numPMOs - i);
 }
 
+void GTKPreferenceWindow::AlsaSet(void)
+{
+    char *one = gtk_entry_get_text(GTK_ENTRY(alsaOneBox));
+    char *two = gtk_entry_get_text(GTK_ENTRY(alsaTwoBox));
+
+    proposedValues.alsaOutput = string(one) + string(":") + string(two);
+    gtk_widget_set_sensitive(applyButton, TRUE);
+}
+
+void alsa_change(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    p->AlsaSet();
+}
+
 GtkWidget *GTKPreferenceWindow::CreatePage3(void)
 {
     GtkWidget *pane = gtk_vbox_new(FALSE, 5);
@@ -1040,6 +1068,52 @@ GtkWidget *GTKPreferenceWindow::CreatePage3(void)
                                 proposedValues.outputIndex);
     gtk_widget_show(pmoOptionMenu);
 
+    frame = gtk_frame_new("ALSA Setup");
+    gtk_box_pack_start(GTK_BOX(pane), frame, FALSE, FALSE, 0);
+    gtk_container_set_border_width(GTK_CONTAINER(frame), 1);
+    gtk_widget_show(frame);
+
+    GtkWidget *hbox = gtk_hbox_new(FALSE, 0);
+    gtk_container_set_border_width(GTK_CONTAINER(hbox), 10);
+    gtk_container_add(GTK_CONTAINER(frame), hbox);
+    gtk_widget_show(hbox);
+
+    label = gtk_label_new("Default ALSA Output Device: ");
+    gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 10);
+    gtk_widget_show(label);
+
+    char tempstr[256];
+    char *port = NULL;
+    strncpy(tempstr, originalValues.alsaOutput.c_str(), 256);
+    port = strrchr(tempstr, ':');
+    if (port) {
+        *port = '\0';
+        port++;
+    }
+
+    alsaOneBox = gtk_entry_new();
+    gtk_entry_set_text(GTK_ENTRY(alsaOneBox), tempstr);
+    gtk_entry_set_max_length(GTK_ENTRY(alsaOneBox), 3);
+    gtk_widget_set_usize(alsaOneBox, 32, 0);
+    gtk_signal_connect(GTK_OBJECT(alsaOneBox), "changed",
+                       GTK_SIGNAL_FUNC(alsa_change), this);
+    gtk_box_pack_start(GTK_BOX(hbox), alsaOneBox, FALSE, FALSE, 0);
+    gtk_widget_show(alsaOneBox);
+
+    label = gtk_label_new(":");
+    gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
+    gtk_widget_show(label);
+
+    alsaTwoBox = gtk_entry_new();
+    if (port)
+        gtk_entry_set_text(GTK_ENTRY(alsaTwoBox), port);
+    gtk_entry_set_max_length(GTK_ENTRY(alsaTwoBox), 3);
+    gtk_widget_set_usize(alsaTwoBox, 32, 0);
+    gtk_signal_connect(GTK_OBJECT(alsaTwoBox), "changed",
+                       GTK_SIGNAL_FUNC(alsa_change), this);
+    gtk_box_pack_start(GTK_BOX(hbox), alsaTwoBox, FALSE, FALSE, 0);
+    gtk_widget_show(alsaTwoBox);
+
     frame = gtk_frame_new("Portable Devices");
     gtk_box_pack_start(GTK_BOX(pane), frame, FALSE, FALSE, 0);
     gtk_container_set_border_width(GTK_CONTAINER(frame), 1);
@@ -1055,6 +1129,10 @@ GtkWidget *GTKPreferenceWindow::CreatePage3(void)
                                    GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_box_pack_start(GTK_BOX(vbox), listwindow, TRUE, TRUE, 5);
     gtk_widget_show(listwindow);
+
+    GtkWidget *list = gtk_clist_new(1);
+    gtk_container_add(GTK_CONTAINER(listwindow), list);
+    gtk_widget_show(list);
 
     GtkWidget *textlabel = gtk_label_new(NULL);
     gtk_label_set_line_wrap(GTK_LABEL(textlabel), TRUE);

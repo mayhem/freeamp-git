@@ -79,6 +79,8 @@ typedef struct PrefsStruct
     string saveMusicDirectory;
     PortableSet portablePlayers;
 
+    string alsaOutput;
+
     bool operator == (const struct PrefsStruct& pref)
     {
         return (
@@ -108,6 +110,7 @@ typedef struct PrefsStruct
             portablePlayers == pref.portablePlayers &&
             listboxIndex == pref.listboxIndex &&
             outputIndex == pref.outputIndex && 
+            alsaOutput == pref.alsaOutput &&
             true
         );
     }
@@ -178,6 +181,8 @@ class GTKPreferenceWindow : public PreferenceWindow
       GtkWidget *ipFourBox;
 
       GtkWidget *pmoMenu;
+      GtkWidget *alsaOneBox;
+      GtkWidget *alsaTwoBox;
 
       GtkWidget *themeList;
 
@@ -216,6 +221,7 @@ class GTKPreferenceWindow : public PreferenceWindow
       void SelectTheme(int number);
 
       void SetPMO(int newsel);
+      void AlsaSet(void);
 
       void ShowHelp(void);
 
