@@ -27,6 +27,7 @@ ____________________________________________________________________________*/
 #include <pwd.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <set>
 #endif // WIN32
 
 #include <stdio.h>
@@ -36,9 +37,10 @@ ____________________________________________________________________________*/
 /* Project Includes */
 #include "config.h"
 #include "registrar.h"
-#include "hashtable.h"
 #include "errors.h"
 #include "debug.h"
+
+using namespace std;
 
 Error 
 Registrar::
@@ -48,7 +50,7 @@ InitializeRegistry(Registry* registry, Preferences* prefs)
     char dir[_MAX_PATH];
 
 #ifndef WIN32
-    HashTable<int32 *> *pHT = new HashTable<int32 *>;
+    set<string> *pHT = new set<string>;
 #endif
 
     if(registry == NULL)
@@ -130,7 +132,7 @@ InitializeRegistry(Registry* registry, Preferences* prefs)
             {
 #ifndef WIN32
 		if (pHT) {
-		    if (pHT->Value(find.cFileName)) {
+		    if (pHT->find(find.cFileName) != pHT->end()) {
 			// only put things with same Name into registry once.
 			continue;
 		    }
@@ -171,11 +173,9 @@ InitializeRegistry(Registry* registry, Preferences* prefs)
 #ifdef WIN32
                         GetPluginDescription(file, item);
 #endif
-			            totalFilesFound++;
+		        totalFilesFound++;
 #ifndef WIN32
-			            int32 *pInt = new int32;
-			            *pInt = 1;
-			            pHT->Insert(find.cFileName,pInt);
+                        pHT->insert(find.cFileName);
 #endif
                     }
                 }
@@ -214,7 +214,12 @@ Registrar::
 CleanupRegistry(Registry* registry)
 {
     Error           error   = kError_NoErr;
-    
+    int count = registry->CountItems();
+    for (int i = 0; i < count; i++) {
+        FreeLibrary(registry->GetItem(i)->Module());
+        delete (registry->GetItem(i));
+    }
+ 
     return error;
 }
 

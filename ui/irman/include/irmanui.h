@@ -28,7 +28,9 @@ ____________________________________________________________________________*/
 #include "event.h"
 #include "thread.h"
 #include "playlist.h"
-#include "hashtable.h"
+
+#include <map>
+using namespace std;
 
 #define DEFAULT_DEVICE "/dev/irman"
 
@@ -46,7 +48,7 @@ class IRManUI : public UserInterface {
     FAContext *m_context;
 
  private:
-    HashTable<int32 *> m_commands;
+    map<string, int32>  m_commands;
     bool m_quitIRListen;
     Properties *m_propManager;
     int32 m_startupType;

@@ -43,6 +43,9 @@ ____________________________________________________________________________*/
 #include "thread.h"
 #include "eventdata.h"
 
+#include <map>
+using namespace std;
+
 extern "C" {
 #include "ir.h"
 	   }
@@ -56,7 +59,7 @@ UserInterface *Initialize(FAContext *context) {
 	   }
 
 
-#define ASSOCIATE(x,y) pInt = new int32; *pInt = y; m_commands.Insert(x,pInt);
+#define ASSOCIATE(x,y) m_commands[x] = y;
 
 #define IR_VolumeUp 9998
 #define IR_VolumeDown 9999
@@ -70,7 +73,6 @@ IRManUI::IRManUI(FAContext *context) {
 
     irListenThread = NULL;
 
-    int32 *pInt = NULL;
     ASSOCIATE("4297ac000000",CMD_Play);
     ASSOCIATE("4017fc000000",CMD_Stop);
     ASSOCIATE("46173c000000",CMD_NextMediaPiece);
@@ -146,22 +148,22 @@ void IRManUI::irServiceFunction(void *pclcio) {
 	    text = ir_code_to_text(code);
 	    //cout << "rx " << text << endl;
 	    
-	    int32 *cmd = pMe->m_commands.Value(text);
-	    if (cmd) {
+	    if (pMe->m_commands.find(text) != pMe->m_commands.end()) {
+                int32 cmd = pMe->m_commands[text];
 		//cout << "command: " << *cmd << endl;
-		if ((*cmd != lastCmd) ||
+		if ((cmd != lastCmd) ||
 
-		    ((*cmd == lastCmd) && ((tv.tv_sec - lastTimeSec) > 2)) ||
+		    ((cmd == lastCmd) && ((tv.tv_sec - lastTimeSec) > 2)) ||
 		    
-		    ((*cmd == lastCmd) && ((tv.tv_sec - lastTimeSec) == 1) && (tv.tv_usec > lastTimeMill)) ||
+		    ((cmd == lastCmd) && ((tv.tv_sec - lastTimeSec) == 1) && (tv.tv_usec > lastTimeMill)) ||
 
-		    ((*cmd == lastCmd) && ( ((tv.tv_usec > lastTimeMill) && ((tv.tv_usec - lastTimeMill) > bounceTime)) ||
+		    ((cmd == lastCmd) && ( ((tv.tv_usec > lastTimeMill) && ((tv.tv_usec - lastTimeMill) > bounceTime)) ||
 					    ((tv.tv_usec < lastTimeMill) && ((tv.tv_usec + 1000000 - lastTimeMill) > bounceTime)) ) ) ) {
 
-		    lastCmd = *cmd;
+		    lastCmd = cmd;
 		    lastTimeMill = tv.tv_usec;
 		    lastTimeSec = tv.tv_sec;
-		    switch (*cmd) {
+		    switch (cmd) {
 			case IR_VolumeUp: {
 			    bounceTime = 100000;
 			    
@@ -192,7 +194,7 @@ void IRManUI::irServiceFunction(void *pclcio) {
 			    break; }
 			default:
 			    bounceTime = 300000;
-			    Event *e = new Event(*cmd);
+			    Event *e = new Event(cmd);
 			    pMe->m_playerEQ->AcceptEvent(e);
 		    }
 		} else {

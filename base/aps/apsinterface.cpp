@@ -776,6 +776,8 @@ int APSInterface::SyncLog()
     if (!IsTurnedOn())
         return APS_PARAMERROR;
 
+    int nRes = -1;
+
     EventRecord TempRecord;
     EventLog TheLog;
     m_pMutex->Acquire();
@@ -791,31 +793,34 @@ int APSInterface::SyncLog()
                          m_strCurrentProfile;
 
     fstream fIn(logfilename.c_str(), ios_base::in);
-       
-    TempRecord.strGUID = "blah";
-    // Does this deal with the spaces between fields or the binary bits in the 
-    // GUID?
-    while (!fIn.eof() && !TempRecord.strGUID.empty())
-    {
-        TempRecord.strGUID.erase(TempRecord.strGUID.begin(), 
-                                 TempRecord.strGUID.end());
-        fIn >> TempRecord.lTimeStamp >> TempRecord.strGUID 
-            >> TempRecord.nEventType;
-        if (!TempRecord.strGUID.empty())
+    if (fIn.is_open()) {  
+ 
+        TempRecord.strGUID = "blah";
+        // Does this deal with the spaces between fields or the binary bits 
+        // in the GUID?
+        while (!fIn.eof() && !TempRecord.strGUID.empty())
         {
-            TheLog.push_back(TempRecord);
+            TempRecord.strGUID.erase(TempRecord.strGUID.begin(), 
+                                     TempRecord.strGUID.end());
+            fIn >> TempRecord.lTimeStamp >> TempRecord.strGUID 
+                >> TempRecord.nEventType;
+            if (!TempRecord.strGUID.empty())
+            {
+                TheLog.push_back(TempRecord);
+            }
         }
-    }
        
-    fIn.close();
-    int nRes = m_pYpClient->SyncLog(TheLog, 
+        fIn.close();
+        nRes = m_pYpClient->SyncLog(TheLog, 
                                     (*m_pProfileMap)[m_strCurrentProfile]);
        
-    if (nRes == 0)
-    {
-       // empty the log file
-       fIn.open(logfilename.c_str(), ios_base::out | ios_base::trunc);
-       fIn.close();
+        if (nRes == 0)
+        {
+           // empty the log file
+           fIn.open(logfilename.c_str(), ios_base::out | ios_base::trunc);
+           if (fIn.is_open())
+              fIn.close();
+        }
     }
                       
     m_pMutex->Release();

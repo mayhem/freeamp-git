@@ -279,10 +279,16 @@ Player::
     TYPICAL_DELETE(m_pmoMutex);
     TYPICAL_DELETE(m_uiMutex);
     TYPICAL_DELETE(m_signatureSem);
+
     TYPICAL_DELETE(m_lmcRegistry);
     TYPICAL_DELETE(m_pmiRegistry);
     TYPICAL_DELETE(m_pmoRegistry);
     TYPICAL_DELETE(m_uiRegistry);
+
+    map<string, RegistryItem *>::iterator i = m_lmcExtensions->begin();
+    for (; i != m_lmcExtensions->end(); i++)
+        delete (*i).second;
+
     TYPICAL_DELETE(m_lmcExtensions);
     TYPICAL_DELETE(m_context->timerManager);
     TYPICAL_DELETE(m_sigStopMutex);
@@ -1000,14 +1006,18 @@ RegisterLMCs(Registry * registry)
 
    if (m_lmcRegistry)
    {
-    Registrar::CleanupRegistry(m_lmcRegistry);
+      Registrar::CleanupRegistry(m_lmcRegistry);
       delete    m_lmcRegistry;
    }
 
-   if (m_lmcExtensions)
+   if (m_lmcExtensions) {
+      map<string, RegistryItem *>::iterator iter = m_lmcExtensions->begin();
+      for (; iter != m_lmcExtensions->end(); iter++)
+          delete (*iter).second;
       delete m_lmcExtensions;
+   }
 
-   m_lmcExtensions = new HashTable<RegistryItem *>;
+   m_lmcExtensions = new map<string, RegistryItem *>;
 
    m_lmcRegistry = registry;
 
@@ -1026,7 +1036,7 @@ RegisterLMCs(Registry * registry)
       for (i = extList->begin(); i != extList->end(); i++)
       {
           lmc_item = new RegistryItem(*temp);
-          m_lmcExtensions->Insert(*i, lmc_item);
+          (*m_lmcExtensions)[(*i)] = lmc_item;
       }
 
       delete extList;
@@ -1217,9 +1227,7 @@ bool
 Player::
 IsSupportedExtension(const char *ext)
 {
-   RegistryItem *lmc_item = m_lmcExtensions->Value(ext);
-
-   if (lmc_item)
+   if (m_lmcExtensions->find(ext) != m_lmcExtensions->end())
        return true;
    return false;
 }
@@ -1233,9 +1241,10 @@ ChooseLMC(const char *szUrl)
 
    iExt = GetExtension(szUrl);
    if (!iExt)
-      return lmc_item;
+      return NULL;
 
-   lmc_item = m_lmcExtensions->Value(iExt);
+   if (m_lmcExtensions->find(iExt) != m_lmcExtensions->end()) 
+       lmc_item = (*m_lmcExtensions)[iExt];
 
    delete iExt;
 

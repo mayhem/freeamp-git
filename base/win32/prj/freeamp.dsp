@@ -817,10 +817,6 @@ SOURCE=..\..\..\lib\gdbm\gdbm_fa.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\include\hashtable.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\..\lmc\include\lmc.h
 # End Source File
 # Begin Source File

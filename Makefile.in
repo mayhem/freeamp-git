@@ -76,11 +76,12 @@ FREEAMPOBJ += base/src/timer.o base/src/missingfile.o io/src/pipeline.o
 FREEAMPOBJ += $(FREEAMP$(HOST_OS)OBJ) $(APSOBJ)
 FREEAMPOBJ += lib/gdbm/lib/libfagdbm.a lib/xml/lib/libfaxml.a 
 FREEAMPOBJ += lib/zlib/lib/libzlib.a lib/http/lib/libfahttp.a
+#FREEAMPOBJ += dmallocc.o
 
 FREEAMPlinuxLIBS = -ldl -lpthread 
 FREEAMPsolarisLIBS = -ldl -lpthread
 FREEAMPfreebsdLIBS = -pthread
-UNIXFREEAMPLIBS = $(FREEAMP$(HOST_OS)LIBS) -lmusicbrainz $(EXTRALIBS)
+UNIXFREEAMPLIBS = $(FREEAMP$(HOST_OS)LIBS) -lmusicbrainz $(EXTRALIBS) #-ldmallocthcxx
 
 BEOSFREEAMPLIBS = -lbe -lroot
 BEOSFREEAMPPOSTLINK = util/beos/buildresources.pl -o freeamp -s "application/x-vnd.freeamp.freeamp" base/beos/res/freeamp_app.rsrc

@@ -21,9 +21,16 @@
 	$Id$
 ____________________________________________________________________________*/
 
+#ifdef WIN32
+#include <windows.h>
+#else
+#include "win32impl.h"
+#endif
+
 #include <iostream>
 #include "registry.h"
 
+using namespace std;
 
 Registry::Registry()
 {
@@ -32,10 +39,14 @@ Registry::Registry()
 
 Registry::~Registry()
 {
+#ifndef WIN32
     uint32 count = m_elements.size();
 
-    for(uint32 i = 0; i < count; i++)
+    for(uint32 i = 0; i < count; i++) {
+        FreeLibrary(m_elements[i]->Module());
         delete m_elements[i];
+    }
+#endif
 }
 
 void Registry::AddItem(RegistryItem* item)

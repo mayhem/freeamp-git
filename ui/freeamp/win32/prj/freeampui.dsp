@@ -456,10 +456,6 @@ SOURCE=..\..\..\..\lib\gdbm\gdbm_fa.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\..\base\include\hashtable.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\include\Headlines.h
 # End Source File
 # Begin Source File

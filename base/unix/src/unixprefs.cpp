@@ -270,77 +270,31 @@ AppendToString(char **destPtr, const char *src, int32 length)
     {
         strncpy(newStr, oldStr, oldLen);
         delete[] oldStr;
+        *destPtr = NULL;
     }
     strncpy(newStr + oldLen, src, length);
     newStr[newLen] = '\0';
     *destPtr = newStr;
 }
 
-#if 0
-static
-void
-Test(UnixPrefs *prefs)
+UnixPrefEntry::
+UnixPrefEntry()
 {
-    const char *delim = "#";
-    static const char *tests[] = {
-        "# \nfoo\tbar\r\017blah\371\321woz\\top\"dog",
-        "FooBar",
-        "Foo Bar",
-        " Foo Bar",
-        "\"Foo",
-        "Foo\"",
-        "Fo\"o",
-        "Fo\\o",
-        "#Foo",
-        "Fo#o",
-        ":Foo",
-        "Fo:o",
-        "Fo\no",
-        "Fo\to",
-        "Fo\ro",
-        "Fo\017o",
-        "Fo\371o",
-        "Fo\123o",
-        "Foo",
-        0
-    };
-
-    prefs->SetPrefString(tests[0], tests[0]);
-
-    int i;
-    char quotedStr[256], recoveredStr[256];
-    bool needQuotes;
-    int len1, len2;
-    const char *end;
-
-    for (i = 0; tests[i]; i++)
-    {
-        needQuotes = false;
-        PrepareQuotableString(tests[i], &needQuotes, 0, &len1, delim);
-        PrepareQuotableString(tests[i], &needQuotes, quotedStr,
-                              &len2, delim);
-        if (len1 != len2 || len1 != strlen(quotedStr))
-            printf("ERROR: len1: %d, len2: %d, len: %d\n", len1, len2,
-                   strlen(quotedStr));
-        puts(quotedStr);
-
-        ScanQuotableString(quotedStr, &end, recoveredStr, &len2, delim);
-        if (len2 != strlen(recoveredStr) || strcmp(tests[i], recoveredStr))
-            printf("ERROR: len2: %d, len: %d\n", len2,
-                   strlen(recoveredStr));
-    }
+    prefix = NULL;
+    key = NULL;
+    separator = NULL;
+    value = NULL;
+    suffix = NULL;
 }
-#endif
-
 
 UnixPrefEntry::
 ~UnixPrefEntry()
 {
-    if (prefix)    delete[] prefix;
-    if (key)       delete[] key;
-    if (separator) delete[] separator;
-    if (value)     delete[] value;
-    if (suffix)    delete[] suffix;
+    if (prefix)    delete [] prefix;
+    if (key)       delete [] key;
+    if (separator) delete [] separator;
+    if (value)     delete [] value;
+    if (suffix)    delete [] suffix;
 }
 
 static bool file_exists(char *s)
@@ -430,8 +384,8 @@ UnixPrefs()
                 entry->key = ReadQuotableString(p, (const char **)&end, ":#");
                 if (entry->key && entry->key[0] == '/')
                     continue;
-                else if (entry->key && !m_ht.Value(entry->key))
-                    m_ht.Insert(entry->key, entry);
+                else if (entry->key && (m_ht.find(entry->key) == m_ht.end()))
+                    m_ht[entry->key] = entry;
                 else if (!m_errorLineNumber)
                     m_errorLineNumber = lineNumber;
                 p = end;
@@ -486,6 +440,10 @@ UnixPrefs::
 {
     Save();
 
+    while (m_entries.size() > 0) {
+        delete m_entries[0];
+        m_entries.erase(m_entries.begin());
+    }
     if (m_libDirs)
         delete [] m_libDirs;
     delete[] m_prefsFilePath;
@@ -670,7 +628,14 @@ GetPrefString(const char* pref, char* buf, uint32* len)
     m_mutex.Acquire();
 
     buf[0] = '\0';
-    entry = m_ht.Value(pref);
+    if (m_ht.find(pref) == m_ht.end())
+    {
+        *len = 0;
+        m_mutex.Release();
+        return kError_NoPrefValue;
+    }
+
+    entry = m_ht[pref];
     if (!entry || !entry->value)
     {
         *len = 0;
@@ -702,21 +667,33 @@ SetPrefString(const char* pref, const char* buf)
 
     m_mutex.Acquire();
 
-    entry = m_ht.Value(pref);
-    if (entry)
-    {
-        delete[] entry->value;
-        entry->value = 0;
-    }
-    else
+    if (m_ht.find(pref) == m_ht.end())
     {
         entry = new UnixPrefEntry;
         AppendToString(&entry->key, pref, strlen(pref));
         AppendToString(&entry->separator, ": ", 2);
         AppendToString(&entry->suffix, "\n", 1);
         m_entries.push_back(entry);
-        m_ht.Insert(pref, entry);
+        m_ht[pref] = entry;
     }
+    else {
+        entry = m_ht[pref];
+        if (entry) 
+        {
+            delete [] entry->value;
+            entry->value = NULL;
+        }
+        else 
+        {
+            entry = new UnixPrefEntry;
+            AppendToString(&entry->key, pref, strlen(pref));
+            AppendToString(&entry->separator, ": ", 2);
+            AppendToString(&entry->suffix, "\n", 1);
+            m_entries.push_back(entry);
+            m_ht[pref] = entry;
+        }
+    }
+
     AppendToString(&entry->value, buf, strlen(buf));
 
     m_changed = true;

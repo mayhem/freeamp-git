@@ -25,7 +25,7 @@ ____________________________________________________________________________*/
 #define INCLUDED_PLAYER_H_
 
 #include <vector>
-
+#include <map>
 using namespace std;
 
 #include "config.h"
@@ -212,7 +212,7 @@ class Player : public EventQueue, Properties, PropertyWatcher
     int32     m_argc;
     char    **m_argv;
 
-    HashTable<RegistryItem *> *m_lmcExtensions;
+    map<string, RegistryItem *> *m_lmcExtensions;
 
     MusicCatalog *m_musicCatalog;
     UserInterface *m_browserUI;

@@ -38,7 +38,6 @@ ____________________________________________________________________________*/
 #include "event.h"
 #include "ui.h"
 #include "list.h"
-#include "hashtable.h"
 #include "semaphore.h"
 #include "registrar.h"
 #include "facontext.h"
