@@ -135,3 +135,6 @@ Michael Rich <istan@alltel.net>
 
 "Michael Jennings" <mej@valinux.com>
 * compile fixes for the linux build
+
+"Alexander Haväng" <eel@musiknet.se>
+* icecast title streaming fixes

@@ -56,6 +56,8 @@ ____________________________________________________________________________*/
 
 #define DB printf("%s:%d\n", __FILE__, __LINE__); 
 
+static char *splitc (char *first, char *rest, const char divider);
+
 TitleStreamServer::TitleStreamServer(FAContext *context,
                                      EventQueue *target)
 {
@@ -246,65 +248,106 @@ void TitleStreamServer::StartWorkerThread(void *pVoidBuffer)
 
 void TitleStreamServer::WorkerThread(void)
 {
-   char            buf[256];
-   char           *ptr, *szTitle = NULL, *szURL = NULL;
+   char            buf[1024], line[1024];
+   char            *szTitle = NULL, *szURL = NULL, *lasturl = NULL, *valptr = NULL;
    fd_set          sSet; 
    struct timeval  sTv; 
-   int             iRet;
+   int             iRet, go_on = 1;
    socklen_t       iStructSize;
 
    for(; !m_bExit; ) 
    {
-      sTv.tv_sec = 0; sTv.tv_usec = 0;
-      FD_ZERO(&sSet); FD_SET(m_hHandle, &sSet);
+      sTv.tv_sec = 0; 
+      sTv.tv_usec = 0;
+      FD_ZERO(&sSet); 
+      FD_SET(m_hHandle, &sSet);
+      
       iRet = select(m_hHandle + 1, &sSet, NULL, NULL, &sTv);
+      
       if (!iRet)
       {
-         usleep(10000);
+         usleep(10000); /* Hope you know usleep is not threadsafe...*/
          continue;
       } 
-
+      
       if (m_bUseMulticast)
       {
-          iStructSize = sizeof(struct sockaddr_in);
-          iRet = recvfrom(m_hHandle, buf, 255, 0, (struct sockaddr *)m_pSin, 
-                          &iStructSize);
+	      iStructSize = sizeof(struct sockaddr_in);
+	      iRet = recvfrom(m_hHandle, buf, 1024, 0, (struct sockaddr *)m_pSin, 
+			      &iStructSize);
       }
       else
-          iRet = recv(m_hHandle, buf, 255, 0);
+	      iRet = recv(m_hHandle, buf, 1024, 0);
+
+
       if (iRet > 0)
       {
-         buf[iRet] = 0;
-         if (strstr(buf, "x-audiocast-streamtitle") != NULL)
-         {
-            ptr = strchr(buf, ':');
-            if (!ptr)
-               continue;
+	/* Data received, line by line parsing */
+	while (go_on)
+	{
+		if (splitc (line, buf, '\n') == NULL)
+		{
+			go_on = 0;
+			strcpy (line, buf);
+		}
+		
+		valptr = strchr (line, ':');
+		
+		if (!valptr)
+			continue;
+		else
+			valptr++;
+		
+		while (valptr && valptr[0] && valptr[0] == ' ')
+			valptr++;
+		
+		if (valptr[strlen (valptr) - 1] == '\r')
+			valptr[strlen (valptr) - 1] = '\0';
+		
+		if (strstr (line, "x-audiocast-streamtitle") != NULL) {
+			if (valptr)
+				szTitle = strdup (valptr);
+		}
+		
+		else if (strstr (line, "x-audiocast-streammsg") != NULL) {
+			if (valptr)
+				szTitle = strdup (valptr);
+			
+		}
+		
+		else if (strstr (line, "x-audiocast-streamurl") != NULL) {
+			if (lasturl && strcmp (valptr, lasturl)) {
+				if (lasturl)
+					free (lasturl);
+				lasturl = strdup (valptr);
+				szURL = strdup (valptr);
+			} else {
+				lasturl = strdup (valptr);
+				szURL = strdup (valptr);
+			}
+		}
+		
+		else if (strstr (line, "x-audiocast-udpseqnr:") != NULL)
+		{
+			char obuf[1024];
+			snprintf (obuf, 1024, "x-audiocast-ack: %ld\r\n", atol (valptr));
+			if (send (m_hHandle, obuf, strlen (obuf), 0) == -1)
+				fprintf (stderr, "Could not send ack to server\n");
+		}
+	}
+	
+	if (szURL && szTitle)
+	{
 
-            szTitle = strdup(ptr + 2);
-            szTitle[strlen(szTitle) - 1] = 0;
-         }
-         if (strstr(buf, "x-audiocast-streamurl") != NULL)
-         {
-            ptr = strchr(buf, ':');
-            if (!ptr)
-               continue;
-
-            szURL = strdup(ptr + 2);
-            szURL[strlen(szURL) - 1] = 0;
-         }
-
-         if (szURL && szTitle)
-         {
-             m_pTarget->AcceptEvent(new StreamInfoEvent(szTitle, szURL));
-             free(szTitle);
-             free(szURL);
-             szTitle = NULL;
-             szURL = NULL;
-         }
+		m_pTarget->AcceptEvent(new StreamInfoEvent(szTitle, szURL));
+		free(szTitle);
+		free(szURL);
+		szTitle = NULL;
+		szURL = NULL;
+	}
       }
    }
-
+   
    free(szTitle);
    free(szURL);
 
@@ -313,4 +356,21 @@ void TitleStreamServer::WorkerThread(void)
    m_hHandle = -1; 
 }
 
+static char *splitc (char *first, char *rest, const char divider)
+{
+	char *p;
+	
+	p = strchr(rest, divider);
+	if (p == NULL) {
+		if ((first != rest) && (first != NULL))
+			first[0] = 0;
 
+		return NULL;
+	}
+
+	*p = 0;
+	if (first != NULL) strcpy(first, rest);
+	if (first != rest) strcpy(rest, p + 1);
+
+	return rest;
+}
