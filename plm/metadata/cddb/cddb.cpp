@@ -86,12 +86,13 @@ bool CDDB::ReadMetaData(const char* url, MetaData* metadata)
         if (!pmo_item)
             return retvalue;
 
-        PhysicalMediaOutput *pmo;
-        pmo = (PhysicalMediaOutput *)pmo_item->InitFunction()(m_context);
-        pmo->SetPropManager((Properties *)(m_context->player));
+        CDPMO* pmo;
+
+        pmo = (CDPMO*)pmo_item->InitFunction()(m_context);
+        pmo->SetPropManager(m_context->props);
         pmo->Init(NULL);
 
-        m_discinfo = ((CDPMO*)pmo)->GetDiscInfo();
+        m_discinfo = (pmo)->GetDiscInfo();
 
         if (!m_discinfo.disc_present) {
             delete pmo;

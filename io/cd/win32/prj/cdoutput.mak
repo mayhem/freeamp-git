@@ -40,9 +40,12 @@ ALL : "..\..\..\..\config\config.h" ".\cd.pmo"
 
 
 CLEAN :
+	-@erase "$(INTDIR)\cdaudio.obj"
 	-@erase "$(INTDIR)\cdoutput.res"
+	-@erase "$(INTDIR)\cdpmo.obj"
+	-@erase "$(INTDIR)\discids.obj"
 	-@erase "$(INTDIR)\pipeline.obj"
-	-@erase "$(INTDIR)\pmi.obj"
+	-@erase "$(INTDIR)\pmo.obj"
 	-@erase "$(INTDIR)\pullbuffer.obj"
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(OUTDIR)\cd.exp"
@@ -53,7 +56,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\..\\" /I "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\cdoutput.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\..\\" /I "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\include" /I "..\..\..\..\lmc\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\cdoutput.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32 
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\cdoutput.res" /d "NDEBUG" 
 BSC32=bscmake.exe
@@ -61,12 +64,13 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\cdoutput.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib /nologo /base:"0x11900000" /subsystem:windows /dll /incremental:no /pdb:"$(OUTDIR)\cd.pdb" /machine:I386 /def:".\cdoutput.def" /out:"cd.pmo" /implib:"$(OUTDIR)\cd.lib" /libpath:"..\..\..\..\base\win32" 
-DEF_FILE= \
-	".\cdoutput.def"
+LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib winmm.lib /nologo /base:"0x11900000" /subsystem:windows /dll /incremental:no /pdb:"$(OUTDIR)\cd.pdb" /machine:I386 /def:".\cdoutput.def" /out:"cd.pmo" /implib:"$(OUTDIR)\cd.lib" /libpath:"..\..\..\..\base\win32" 
 LINK32_OBJS= \
+	"$(INTDIR)\cdaudio.obj" \
+	"$(INTDIR)\cdpmo.obj" \
+	"$(INTDIR)\discids.obj" \
 	"$(INTDIR)\pipeline.obj" \
-	"$(INTDIR)\pmi.obj" \
+	"$(INTDIR)\pmo.obj" \
 	"$(INTDIR)\pullbuffer.obj" \
 	"$(INTDIR)\cdoutput.res"
 
@@ -94,9 +98,12 @@ ALL : ".\cd.pmo"
 
 
 CLEAN :
+	-@erase "$(INTDIR)\cdaudio.obj"
 	-@erase "$(INTDIR)\cdoutput.res"
+	-@erase "$(INTDIR)\cdpmo.obj"
+	-@erase "$(INTDIR)\discids.obj"
 	-@erase "$(INTDIR)\pipeline.obj"
-	-@erase "$(INTDIR)\pmi.obj"
+	-@erase "$(INTDIR)\pmo.obj"
 	-@erase "$(INTDIR)\pullbuffer.obj"
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(INTDIR)\vc60.pdb"
@@ -109,7 +116,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\..\\" /I "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\cdoutput.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\..\\" /I "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\include" /I "..\..\..\..\lmc\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\cdoutput.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32 
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\cdoutput.res" /d "_DEBUG" 
 BSC32=bscmake.exe
@@ -117,12 +124,13 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\cdoutput.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=fabaselib.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x11900000" /subsystem:windows /dll /incremental:yes /pdb:"$(OUTDIR)\cd.pdb" /debug /machine:I386 /def:".\cdoutput.def" /out:"cd.pmo" /implib:"$(OUTDIR)\cd.lib" /pdbtype:sept /libpath:"..\..\..\..\base\win32" 
-DEF_FILE= \
-	".\cdoutput.def"
+LINK32_FLAGS=fabaselib.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib winmm.lib /nologo /base:"0x11900000" /subsystem:windows /dll /incremental:yes /pdb:"$(OUTDIR)\cd.pdb" /debug /machine:I386 /def:".\cdoutput.def" /out:"cd.pmo" /implib:"$(OUTDIR)\cd.lib" /pdbtype:sept /libpath:"..\..\..\..\base\win32" 
 LINK32_OBJS= \
+	"$(INTDIR)\cdaudio.obj" \
+	"$(INTDIR)\cdpmo.obj" \
+	"$(INTDIR)\discids.obj" \
 	"$(INTDIR)\pipeline.obj" \
-	"$(INTDIR)\pmi.obj" \
+	"$(INTDIR)\pmo.obj" \
 	"$(INTDIR)\pullbuffer.obj" \
 	"$(INTDIR)\cdoutput.res"
 
@@ -150,9 +158,12 @@ ALL : ".\cd.pmo"
 
 
 CLEAN :
+	-@erase "$(INTDIR)\cdaudio.obj"
 	-@erase "$(INTDIR)\cdoutput.res"
+	-@erase "$(INTDIR)\cdpmo.obj"
+	-@erase "$(INTDIR)\discids.obj"
 	-@erase "$(INTDIR)\pipeline.obj"
-	-@erase "$(INTDIR)\pmi.obj"
+	-@erase "$(INTDIR)\pmo.obj"
 	-@erase "$(INTDIR)\pullbuffer.obj"
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(INTDIR)\vc60.pdb"
@@ -165,7 +176,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\..\\" /I "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\cdoutput.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\..\\" /I "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\include" /I "..\..\..\..\lmc\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\cdoutput.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32 
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\cdoutput.res" /d "_DEBUG" 
 BSC32=bscmake.exe
@@ -173,12 +184,13 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\cdoutput.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=fabaselib.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x11900000" /subsystem:windows /dll /incremental:yes /pdb:"$(OUTDIR)\cd.pdb" /debug /machine:I386 /def:".\cdoutput.def" /out:"cd.pmo" /implib:"$(OUTDIR)\cd.lib" /pdbtype:sept /libpath:"..\..\..\..\base\win32" 
-DEF_FILE= \
-	".\cdoutput.def"
+LINK32_FLAGS=fabaselib.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib winmm.lib /nologo /base:"0x11900000" /subsystem:windows /dll /incremental:yes /pdb:"$(OUTDIR)\cd.pdb" /debug /machine:I386 /def:".\cdoutput.def" /out:"cd.pmo" /implib:"$(OUTDIR)\cd.lib" /pdbtype:sept /libpath:"..\..\..\..\base\win32" 
 LINK32_OBJS= \
+	"$(INTDIR)\cdaudio.obj" \
+	"$(INTDIR)\cdpmo.obj" \
+	"$(INTDIR)\discids.obj" \
 	"$(INTDIR)\pipeline.obj" \
-	"$(INTDIR)\pmi.obj" \
+	"$(INTDIR)\pmo.obj" \
 	"$(INTDIR)\pullbuffer.obj" \
 	"$(INTDIR)\cdoutput.res"
 
@@ -206,9 +218,12 @@ ALL : "..\..\..\..\config\config.h" ".\cd.pmo"
 
 
 CLEAN :
+	-@erase "$(INTDIR)\cdaudio.obj"
 	-@erase "$(INTDIR)\cdoutput.res"
+	-@erase "$(INTDIR)\cdpmo.obj"
+	-@erase "$(INTDIR)\discids.obj"
 	-@erase "$(INTDIR)\pipeline.obj"
-	-@erase "$(INTDIR)\pmi.obj"
+	-@erase "$(INTDIR)\pmo.obj"
 	-@erase "$(INTDIR)\pullbuffer.obj"
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(OUTDIR)\cd.exp"
@@ -219,7 +234,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\..\\" /I "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\cdoutput.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\..\\" /I "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\include" /I "..\..\..\..\lmc\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fp"$(INTDIR)\cdoutput.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32 
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\cdoutput.res" /d "NDEBUG" 
 BSC32=bscmake.exe
@@ -227,12 +242,13 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\cdoutput.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=fabaselib.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x11900000" /subsystem:windows /dll /incremental:no /pdb:"$(OUTDIR)\cd.pdb" /machine:I386 /def:".\cdoutput.def" /out:"cd.pmo" /implib:"$(OUTDIR)\cd.lib" /libpath:"..\..\..\..\base\win32" 
-DEF_FILE= \
-	".\cdoutput.def"
+LINK32_FLAGS=fabaselib.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib winmm.lib /nologo /base:"0x11900000" /subsystem:windows /dll /incremental:no /pdb:"$(OUTDIR)\cd.pdb" /machine:I386 /def:".\cdoutput.def" /out:"cd.pmo" /implib:"$(OUTDIR)\cd.lib" /libpath:"..\..\..\..\base\win32" 
 LINK32_OBJS= \
+	"$(INTDIR)\cdaudio.obj" \
+	"$(INTDIR)\cdpmo.obj" \
+	"$(INTDIR)\discids.obj" \
 	"$(INTDIR)\pipeline.obj" \
-	"$(INTDIR)\pmi.obj" \
+	"$(INTDIR)\pmo.obj" \
 	"$(INTDIR)\pullbuffer.obj" \
 	"$(INTDIR)\cdoutput.res"
 
@@ -294,37 +310,17 @@ $(DS_POSTBUILD_DEP) : "..\..\..\..\config\config.h" ".\cd.pmo"
 
 
 !IF "$(CFG)" == "cdoutput - Win32 Release" || "$(CFG)" == "cdoutput - Win32 Debug" || "$(CFG)" == "cdoutput - Win32 NASM Debug" || "$(CFG)" == "cdoutput - Win32 NASM Release"
-SOURCE=..\res\cdoutput.rc
+SOURCE=..\src\cdaudio.cpp
 
-!IF  "$(CFG)" == "cdoutput - Win32 Release"
-
-
-"$(INTDIR)\cdoutput.res" : $(SOURCE) "$(INTDIR)"
-	$(RSC) /l 0x409 /fo"$(INTDIR)\cdoutput.res" /i "\Local\src\freeamp\io\cd\win32\res" /d "NDEBUG" $(SOURCE)
+"$(INTDIR)\cdaudio.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
-!ELSEIF  "$(CFG)" == "cdoutput - Win32 Debug"
+SOURCE=..\src\cdpmo.cpp
 
+"$(INTDIR)\cdpmo.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-"$(INTDIR)\cdoutput.res" : $(SOURCE) "$(INTDIR)"
-	$(RSC) /l 0x409 /fo"$(INTDIR)\cdoutput.res" /i "\Local\src\freeamp\io\cd\win32\res" /d "_DEBUG" $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "cdoutput - Win32 NASM Debug"
-
-
-"$(INTDIR)\cdoutput.res" : $(SOURCE) "$(INTDIR)"
-	$(RSC) /l 0x409 /fo"$(INTDIR)\cdoutput.res" /i "\Local\src\freeamp\io\cd\win32\res" /d "_DEBUG" $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "cdoutput - Win32 NASM Release"
-
-
-"$(INTDIR)\cdoutput.res" : $(SOURCE) "$(INTDIR)"
-	$(RSC) /l 0x409 /fo"$(INTDIR)\cdoutput.res" /i "\Local\src\freeamp\io\cd\win32\res" /d "NDEBUG" $(SOURCE)
-
-
-!ENDIF 
 
 SOURCE=..\..\..\..\config\config.win32
 
@@ -374,15 +370,21 @@ InputPath=..\..\..\..\config\config.win32
 
 !ENDIF 
 
+SOURCE=..\src\discids.cpp
+
+"$(INTDIR)\discids.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
 SOURCE=..\..\..\src\pipeline.cpp
 
 "$(INTDIR)\pipeline.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
-SOURCE=..\..\..\src\pmi.cpp
+SOURCE=..\..\..\src\pmo.cpp
 
-"$(INTDIR)\pmi.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\pmo.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -391,6 +393,38 @@ SOURCE=..\..\..\src\pullbuffer.cpp
 "$(INTDIR)\pullbuffer.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+SOURCE=..\res\cdoutput.rc
+
+!IF  "$(CFG)" == "cdoutput - Win32 Release"
+
+
+"$(INTDIR)\cdoutput.res" : $(SOURCE) "$(INTDIR)"
+	$(RSC) /l 0x409 /fo"$(INTDIR)\cdoutput.res" /i "\Local\src\freeamp\io\cd\win32\res" /d "NDEBUG" $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "cdoutput - Win32 Debug"
+
+
+"$(INTDIR)\cdoutput.res" : $(SOURCE) "$(INTDIR)"
+	$(RSC) /l 0x409 /fo"$(INTDIR)\cdoutput.res" /i "\Local\src\freeamp\io\cd\win32\res" /d "_DEBUG" $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "cdoutput - Win32 NASM Debug"
+
+
+"$(INTDIR)\cdoutput.res" : $(SOURCE) "$(INTDIR)"
+	$(RSC) /l 0x409 /fo"$(INTDIR)\cdoutput.res" /i "\Local\src\freeamp\io\cd\win32\res" /d "_DEBUG" $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "cdoutput - Win32 NASM Release"
+
+
+"$(INTDIR)\cdoutput.res" : $(SOURCE) "$(INTDIR)"
+	$(RSC) /l 0x409 /fo"$(INTDIR)\cdoutput.res" /i "\Local\src\freeamp\io\cd\win32\res" /d "NDEBUG" $(SOURCE)
+
+
+!ENDIF 
 
 
 !ENDIF 

@@ -63,9 +63,9 @@ LINK32_FLAGS=fabaselib.lib gdbm.lib version.lib wsock32.lib kernel32.lib user32.
 DEF_FILE= \
 	".\cddb.def"
 LINK32_OBJS= \
-	"$(INTDIR)\cddb.res" \
+	"$(INTDIR)\cddb.obj" \
 	"$(INTDIR)\cddb_proto.obj" \
-	"$(INTDIR)\cddb.obj"
+	"$(INTDIR)\cddb.res"
 
 ".\cddb.mdf" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -117,9 +117,9 @@ LINK32_FLAGS=fabaselib.lib gdbm.lib version.lib wsock32.lib kernel32.lib user32.
 DEF_FILE= \
 	".\cddb.def"
 LINK32_OBJS= \
-	"$(INTDIR)\cddb.res" \
+	"$(INTDIR)\cddb.obj" \
 	"$(INTDIR)\cddb_proto.obj" \
-	"$(INTDIR)\cddb.obj"
+	"$(INTDIR)\cddb.res"
 
 ".\cddb.mdf" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -168,9 +168,9 @@ LINK32_FLAGS=fabaselib.lib gdbm.lib version.lib wsock32.lib kernel32.lib user32.
 DEF_FILE= \
 	".\cddb.def"
 LINK32_OBJS= \
-	"$(INTDIR)\cddb.res" \
+	"$(INTDIR)\cddb.obj" \
 	"$(INTDIR)\cddb_proto.obj" \
-	"$(INTDIR)\cddb.obj"
+	"$(INTDIR)\cddb.res"
 
 ".\cddb.mdf" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -222,9 +222,9 @@ LINK32_FLAGS=fabaselib.lib gdbm.lib version.lib wsock32.lib kernel32.lib user32.
 DEF_FILE= \
 	".\cddb.def"
 LINK32_OBJS= \
-	"$(INTDIR)\cddb.res" \
+	"$(INTDIR)\cddb.obj" \
 	"$(INTDIR)\cddb_proto.obj" \
-	"$(INTDIR)\cddb.obj"
+	"$(INTDIR)\cddb.res"
 
 ".\cddb.mdf" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<

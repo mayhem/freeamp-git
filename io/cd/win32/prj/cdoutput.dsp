@@ -259,11 +259,115 @@ SOURCE=..\res\cdoutput.rc
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE="..\..\..\..\..\..\..\Program Files\Microsoft Visual Studio\VC98\Include\BASETSD.H"
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\cdaudio.h
 # End Source File
 # Begin Source File
 
 SOURCE=..\include\cdpmo.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\config\config.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\debug.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\event.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\eventbuffer.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\eventdata.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\facontext.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lmc\include\lmc.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\log.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\metadata.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\win32\include\mutex.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\pipeline.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\playlistformat.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\plmevent.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\pmi.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\pmo.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\pmoevent.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\portabledevice.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\preferences.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\properties.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\pullbuffer.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\registry.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\win32\include\semaphore.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\thread.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\undomanager.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\utility.h
 # End Source File
 # End Group
 # End Target

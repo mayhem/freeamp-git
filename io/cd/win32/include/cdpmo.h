@@ -64,9 +64,9 @@ class CDPMO:public PhysicalMediaOutput
    virtual Error ChangePosition(int32);
    virtual Error SetTo(const char *url); 
 
-   struct disc_info GetDiscInfo();
-   uint32  GetCDDBDiscID();
-   char   *GetcdindexDiscID();
+   virtual struct disc_info GetDiscInfo();
+   virtual uint32  GetCDDBDiscID();
+   virtual char   *GetcdindexDiscID();
 
  private:
    void          WorkerThread(void); 
