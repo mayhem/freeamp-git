@@ -21,6 +21,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "cddb"=..\..\..\plm\metadata\cddb\prj\cddb.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "cdlmc"=..\..\..\lmc\cd\win32\prj\cdlmc.dsp - Package Owner=<4>
 
 Package=<5>

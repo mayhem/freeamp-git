@@ -28,17 +28,22 @@ ____________________________________________________________________________*/
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <errno.h>
+#include <time.h>
+
+#ifndef WIN32
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <string.h>
 #include <pwd.h>
-#include <errno.h>
 #include <unistd.h>
-#include <time.h>
+#else
+#include <winsock.h>
+#endif // WIN32
+
 
 #ifndef INADDR_NONE
 #define INADDR_NONE 0xFFFFFFFF
@@ -47,6 +52,7 @@ ____________________________________________________________________________*/
 #include "database.h"
 #include "cddb.h"
 #include "cddb_proto.h"
+
 
 #ifndef HAVE_SNPRINTF
 int snprintf(char *dest, int size, const char *format, ...)
@@ -144,7 +150,7 @@ int CDDB::cddb_query(int sock, int mode, struct cddb_query_t *query, ...)
    delete outtemp;
    va_end(arglist);
 
-   if(write(sock, outbuffer, strlen(outbuffer)) < 0) {
+   if(send(sock, outbuffer, strlen(outbuffer), 0) < 0) {
       delete outbuffer;
       return -1;
    }
@@ -488,7 +494,7 @@ int CDDB::cddb_connect_server(struct cddb_host host, struct cddb_server *proxy,
 
        snprintf(outbuffer, 256, "cddb hello anonymous anonymous %s %s\n", hello.hello_program, hello.hello_version);
 
-       if (write(sock, outbuffer, strlen(outbuffer)) < 0) {
+       if (send(sock, outbuffer, strlen(outbuffer), 0) < 0) {
            delete outbuffer;
            va_end(arglist);
            return -1;
@@ -507,7 +513,7 @@ int CDDB::cddb_connect_server(struct cddb_host host, struct cddb_server *proxy,
        }
 
        snprintf(outbuffer, 256, "proto %d\n", CDDB_PROTOCOL_LEVEL);
-       if (write(sock, outbuffer, strlen(outbuffer)) < 0) {
+       if (send(sock, outbuffer, strlen(outbuffer), 0) < 0) {
            delete outbuffer;
            va_end(arglist);
            return -1;
@@ -555,7 +561,7 @@ int CDDB::cddb_skip_http_header(int sock)
    do {
       len = 0;
       do {
-         if (read(sock, &inchar, 1) < 1) {
+         if (recv(sock, &inchar, 1, 0) < 1) {
             if (use_cddb_message)
                 strncpy(cddb_message, "Unexpected socket closure", 256);
             return -1;
@@ -600,7 +606,7 @@ int CDDB::cddb_read_line(int sock, char *inbuffer, int len)
     char inchar;
 
     for (index = 0; index < len; index++) {
-        read(sock, &inchar, 1);
+        recv(sock, &inchar, 1, 0);
         if (inchar == '\n') {
             inbuffer[index] = '\0';
             if (inbuffer[0] == '.')
@@ -642,7 +648,7 @@ int CDDB::cddb_vread(int sock, int mode, struct cddb_entry *entry,
       snprintf(outbuffer, 512, "cddb read %s %08lx\n", 
                cddb_genre(entry->entry_genre), entry->entry_id);
 
-   write(sock, outbuffer, strlen(outbuffer));
+   send(sock, outbuffer, strlen(outbuffer), 0);
 
    delete [] outbuffer;
 
@@ -684,10 +690,10 @@ int CDDB::cddb_quit(int sock)
     char outbuffer[8];
 
     strcpy(outbuffer, "quit\n");
-    write(sock, outbuffer, strlen(outbuffer));
+    send(sock, outbuffer, strlen(outbuffer), 0);
  
     shutdown(sock, 2);
-    close(sock);
+    closesocket(sock);
  
     return 0;
 }
@@ -768,7 +774,7 @@ int CDDB::cddb_read_data(struct disc_data *data)
               return -1;
            }
            shutdown(sock, 2);
-           close(sock);
+           closesocket(sock);
 
            if ((sock = cddb_connect_server(list.list_host[index], proxy_ptr, 
                                            hello, http_string, 512)) < 0) {
@@ -806,7 +812,7 @@ int CDDB::cddb_read_data(struct disc_data *data)
            }
 
            shutdown(sock, 2);
-           close(sock);
+           closesocket(sock);
            break; }
    }
 
