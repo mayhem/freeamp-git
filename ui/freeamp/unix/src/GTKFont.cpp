@@ -58,7 +58,9 @@ GTKFont::GTKFont(string &oName, string &oFace, string &oDefault) :
 //    free(dup);
 
     gfont = NULL;
+#ifdef HAVE_FREETYPE
     ttfont = NULL;
+#endif
     bold = false;
     italic = false;
     underline = false;
