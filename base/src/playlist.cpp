@@ -3,6 +3,7 @@
 	FreeAmp - The Free MP3 Player
 
 	Portions Copyright (C) 1998 GoodNoise
+	Portions Copyright (C) 1998 "Michael Bruun Petersen" <mbp@image.dk>
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -21,6 +22,10 @@
 	$Id$
 ____________________________________________________________________________*/
 
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
 #include "playlist.h"
 #include "vector.h"
 
@@ -38,49 +43,71 @@ PlayList::~PlayList() {
     }
 }
 
-void PlayList::add(char *pc, int type) {
+void PlayList::Add(char *pc, int type) {
     if (pc) {
-	    //int len = strlen(pc) + 1;
-	    //char *pNewC = new char[len];
-	    PlayListItem* item = new PlayListItem;
-	    int len = strlen(pc) + 1;
-	    if(item->url = new char[len]) {
-	        //strcpy(item->url,pc);
-	        memcpy(item->url,pc,len);
-	    } else {
-	        //XXX FIXME Uhhh...what if we run out of memory?
-	        // --jdw:  then we're screwwwwwwwed
-	        cerr << "Out of memory!\n";
-	    }
-
-	    item->type = type;
-
-	    pMediaElems->insert(item);
+	//int len = strlen(pc) + 1;
+	//char *pNewC = new char[len];
+	PlayListItem* item = new PlayListItem;
+	int len = strlen(pc) + 1;
+	if(item->url = new char[len]) {
+	    //strcpy(item->url,pc);
+	    memcpy(item->url,pc,len);
+	} else {
+	    //XXX FIXME Uhhh...what if we run out of memory?
+	    // --jdw:  then we're screwwwwwwwed
+	    cerr << "Out of memory!\n";
+	}
+	
+	item->type = type;
+	
+	pMediaElems->insert(item);
     }
 }
 
- PlayListItem *PlayList::getFirst() {
-    setFirst();
-    return getCurrent();
+void PlayList::Shuffle(void) {
+    double count= (double) pMediaElems->numElements() - 1;
+    if (count < 2) {
+	return;
+    }
+    
+    srand((unsigned int) time(NULL));
+    
+    int32 first, second;
+    PlayListItem *temp = (PlayListItem *)new char[sizeof(PlayListItem)];
+    for (int32 i = 0; i < 3 * count; i++) {
+	first = (int32) ((count * rand()) / (RAND_MAX+1.0));
+	second = (int32) ((count * rand()) / (RAND_MAX+1.0));
+	if (first != second) {
+	    memcpy(temp, pMediaElems->elementAt(first), sizeof(PlayListItem));
+	    memcpy(pMediaElems->elementAt(first), pMediaElems->elementAt(second), sizeof(PlayListItem));
+	    memcpy(pMediaElems->elementAt(second), temp, sizeof(PlayListItem));
+	}
+    }
+    delete (char *)temp;
 }
 
- PlayListItem *PlayList::getNext() {
-    setNext();
-    return getCurrent();
+ PlayListItem *PlayList::GetFirst() {
+    SetFirst();
+    return GetCurrent();
 }
 
- PlayListItem *PlayList::getPrev() {
-    setPrev();
-    return getCurrent();
+ PlayListItem *PlayList::GetNext() {
+    SetNext();
+    return GetCurrent();
 }
 
- PlayListItem *PlayList::getCurrent() {
+ PlayListItem *PlayList::GetPrev() {
+    SetPrev();
+    return GetCurrent();
+}
+
+ PlayListItem *PlayList::GetCurrent() {
     return pMediaElems->elementAt(current);
 }
 
- void PlayList::setFirst() { current = 0; }
- void PlayList::setNext() { current++; }
- void PlayList::setPrev() { current--; }
+ void PlayList::SetFirst() { current = 0; }
+ void PlayList::SetNext() { current++; }
+ void PlayList::SetPrev() { current--; }
 
 PlayListItem::PlayListItem() {
     url = NULL;

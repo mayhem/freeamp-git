@@ -7,8 +7,10 @@ Brett Thomas
 
 FreeAmp's MP3 decoder is based upon work done by Xing Technology Corp.
 
-Look here in the future for the names of other contributors.
+Other major contributors and their contributions:
+"Michael Bruun Petersen" <mbp@image.dk>
+* ID3v1 tag parsing
+* PlayList Shuffle method
 
-jdw 10-8-98
 
 

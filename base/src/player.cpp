@@ -211,13 +211,13 @@ bool Player::SetState(PlayerState ps) {
 
 int32 Player::ServiceEvent(Event *pC) {
     if (pC) {
-	//cout << "Player: serviceEvent: servicing Event: " << pC->getEvent() << endl;
+	//cout << "Player: serviceEvent: servicing Event: " << pC->GetEvent() << endl;
 	switch (pC->getEvent()) {
 	    case INFO_DoneOutputting: {  // LMC or PMO sends this when its done outputting whatever.  Now, go on to next piece in playlist
                 if (SetState(STATE_Stopped)) {
 		    SEND_NORMAL_EVENT(INFO_Stopped);
                 }
-                myPlayList->setNext();
+                myPlayList->SetNext();
                 Event *e = new Event(CMD_Play);
                 AcceptEvent(e);
                 return 0;
@@ -238,7 +238,7 @@ int32 Player::ServiceEvent(Event *pC) {
 	    }
 	    
 	    case CMD_Play: {
-                PlayListItem *pc = myPlayList->getCurrent();
+                PlayListItem *pc = myPlayList->GetCurrent();
                 if (pc) {
 		    // MP3 from disk to soundcard proof of concept steps:
 		    // 1) Create a LocalFileInput with pc
@@ -270,7 +270,7 @@ int32 Player::ServiceEvent(Event *pC) {
 		    if (SetState(STATE_Playing)) {
 			SEND_NORMAL_EVENT(INFO_Playing);
 		    }
-		    myLMC->ChangePosition(myPlayList->getSkip());
+		    myLMC->ChangePosition(myPlayList->GetSkip());
 		    myLMC->Decode();
 		    //cout << "Kicked off decoder..." << endl;
 		    
@@ -300,12 +300,12 @@ int32 Player::ServiceEvent(Event *pC) {
             }
 	    
 	    case CMD_NextMediaPiece:
-                myPlayList->setNext();
+                myPlayList->SetNext();
                 return 0;
                 break;
 		
             case CMD_PrevMediaPiece:
-                myPlayList->setPrev();
+                myPlayList->SetPrev();
                 return 0;
                 break;
 		
@@ -350,14 +350,14 @@ int32 Player::ServiceEvent(Event *pC) {
 	    
 	    case CMD_SetPlaylist:
 		myPlayList = (PlayList *)pC->getArgument();
-		//myPlayList->setFirst();  // Should be done by object creating the playlist
+		//myPlayList->SetFirst();  // Should be done by object creating the playlist
 		return 0;
 		break;
 		
 	    case CMD_QuitPlayer: {
 		Event *e = new Event(CMD_Stop);
 		AcceptEvent(e);
-		// 1) Set "I'm already quitting flag" (or exit if its already set)
+		// 1) Set "I'm already quitting flag" (or exit if its already Set)
 		imQuitting = 1;
 		// 2) Get CIO/COO manipulation lock
 		GetCOManipLock();

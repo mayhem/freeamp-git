@@ -29,6 +29,7 @@ ____________________________________________________________________________*/
 #include "ctrlobj.h"
 #include "event.h"
 #include "thread.h"
+#include "playlist.h"
 
 class CommandLineCIO : public CIO {
  public:
@@ -40,7 +41,7 @@ class CommandLineCIO : public CIO {
  private:
     void processSwitch(char *);
     Thread *keyboardListenThread;
-
+    PlayList *mypl;
 };
 
 
