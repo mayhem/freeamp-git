@@ -282,7 +282,7 @@ static void add_track(GTKMusicBrowser *p, guint action, GtkWidget *w)
     delete filesel;
 }
 
-bool GTKMusicBrowser::AskToDelete(string url)
+bool GTKMusicBrowser::AskToDelete(string &url)
 {
     bool retvalue = false;
 

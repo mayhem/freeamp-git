@@ -634,8 +634,8 @@ void GTKMusicBrowser::AddNewStream(void)
     PlaylistItem *newitem = new PlaylistItem;
     MetaData metadata;
 
-    newitem->SetURL(url.c_str());
-    metadata.SetTitle(title.c_str());
+    newitem->SetURL(url);
+    metadata.SetTitle(title);
     newitem->SetMetaData(&metadata);
 
     m_context->catalog->WriteMetaDataToDatabase(newitem->URL().c_str(),
@@ -1996,7 +1996,7 @@ Error GTKMusicBrowser::AcceptEvent(Event *e)
                               (MusicCatalogPlaylistAddedEvent *)e;
             if (m_initialized && !m_bIgnoringMusicCatalogMessages) {
                 gdk_threads_enter();
-                AddCatPlaylist((string)mcp->Item());
+                AddCatPlaylist(mcp->Item());
                 gdk_threads_leave();
             }
             break; }
@@ -2005,7 +2005,7 @@ Error GTKMusicBrowser::AcceptEvent(Event *e)
                               (MusicCatalogPlaylistRemovedEvent *)e;
             if (m_initialized) {
                 gdk_threads_enter();
-                RemoveCatPlaylist((string)mcp->Item());
+                RemoveCatPlaylist(mcp->Item());
                 gdk_threads_leave();
             }
             break; }

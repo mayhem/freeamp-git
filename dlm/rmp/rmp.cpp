@@ -187,22 +187,22 @@ Error RMP::PCData(string &oData)
 
     if (m_oPath == string("/PACKAGE/TRACKLIST/TRACK/TITLE"))
     {
-    	m_pMetaData->SetTitle(oData.c_str());
+    	m_pMetaData->SetTitle(oData);
         return kError_NoErr;
     }
     if (m_oPath == string("/PACKAGE/TRACKLIST/TRACK/ALBUM"))
     {
-    	m_pMetaData->SetAlbum(oData.c_str());
+    	m_pMetaData->SetAlbum(oData);
         return kError_NoErr;
     }
     if (m_oPath == string("/PACKAGE/TRACKLIST/TRACK/ARTIST"))
     {
-    	m_pMetaData->SetArtist(oData.c_str());
+    	m_pMetaData->SetArtist(oData);
         return kError_NoErr;
     }
     if (m_oPath == string("/PACKAGE/TRACKLIST/TRACK/GENRE"))
     {
-    	m_pMetaData->SetGenre(oData.c_str());
+    	m_pMetaData->SetGenre(oData);
         return kError_NoErr;
     }
     if (m_oPath == string("/PACKAGE/TRACKLIST/TRACK/SIZE"))
@@ -272,9 +272,9 @@ Error RMP::EndElement(string &oElement)
         pItem = new DownloadItem(oFinal.c_str(), 
                                  m_oFileName.c_str(),
                                  m_pMetaData);
-        pItem->SetPlaylistName(m_oPlaylist.c_str());
+        pItem->SetPlaylistName(m_oPlaylist);
         pItem->SetTotalBytes(m_pMetaData->Size());
-        pItem->SetSourceCookie(m_oCookie.c_str());
+        pItem->SetSourceCookie(m_oCookie);
 
 		m_pList->push_back(pItem);
         delete m_pMetaData;

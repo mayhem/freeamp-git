@@ -98,14 +98,14 @@ bool Vorbis::ReadMetaData(const char *url, MetaData * metadata)
         {
             string iso;
             iso = ConvertToISO(temp);
-            metadata->SetTitle(iso.c_str());
+            metadata->SetTitle(iso);
         }
         temp = vorbis_comment_query(comment, "artist", 0);
         if (temp)
         {
             string iso;
             iso = ConvertToISO(temp);
-            metadata->SetArtist(iso.c_str());
+            metadata->SetArtist(iso);
         }
 
         temp = vorbis_comment_query(comment, "album", 0);
@@ -113,7 +113,7 @@ bool Vorbis::ReadMetaData(const char *url, MetaData * metadata)
         {
             string iso;
             iso = ConvertToISO(temp);
-            metadata->SetAlbum(iso.c_str());
+            metadata->SetAlbum(iso);
         }
 
         temp = vorbis_comment_query(comment, "tracknumber", 0);

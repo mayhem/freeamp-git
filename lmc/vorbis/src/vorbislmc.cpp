@@ -445,7 +445,7 @@ void VorbisLMC::DecodeWork()
               {
                   string iso;
                   iso = ConvertToISO(temp);
-                  mdata.SetTitle(iso.c_str());
+                  mdata.SetTitle(iso);
               }
 
               temp = vorbis_comment_query(comment, "artist", 0);
@@ -453,7 +453,7 @@ void VorbisLMC::DecodeWork()
               {
                   string iso;
                   iso = ConvertToISO(temp);
-                  mdata.SetArtist(iso.c_str());
+                  mdata.SetArtist(iso);
               }
 
               temp = vorbis_comment_query(comment, "album", 0);
@@ -461,7 +461,7 @@ void VorbisLMC::DecodeWork()
               {
                   string iso;
                   iso = ConvertToISO(temp);
-                  mdata.SetAlbum(iso.c_str());
+                  mdata.SetAlbum(iso);
               }
 
               temp = vorbis_comment_query(comment, "tracknumber", 0);

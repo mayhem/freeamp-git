@@ -167,6 +167,7 @@ bool MusicBrainzCD::LookupCD(void)
     char          url[MAX_PATH], hostname[MAX_PATH];
     int           i, port;
     uint32        len = MAX_PATH;
+    string        message;
 
     error[0] = 0;
     m_context->prefs->GetPrefString(kDatabaseDirPref, tempDir, &length);
@@ -195,7 +196,8 @@ bool MusicBrainzCD::LookupCD(void)
     if (!ret)
     {
        mb_GetQueryError(o, error, iDataLen);
-       m_context->target->AcceptEvent(new BrowserMessageEvent(error));
+       message = error;
+       m_context->target->AcceptEvent(new BrowserMessageEvent(message));
        return false;
     }
 
@@ -231,18 +233,19 @@ bool MusicBrainzCD::LookupCD(void)
     if (ReadFromCache(db, diskId, m_trackLens, rdf) &&
         mb_SetResultRDF(o, (char *)rdf.c_str()))
     { 
-        m_context->target->AcceptEvent(new 
-              BrowserMessageEvent("Retrieved CD from local cache."));
+        message = "Retrieved CD from local cache.";
+        m_context->target->AcceptEvent(new  BrowserMessageEvent(message));
     }
     else
     {
-        m_context->target->AcceptEvent(new 
-                 BrowserMessageEvent("Sending CD lookup query to MusicBrainz..."));
+        message = "Sending CD lookup query to MusicBrainz...";
+        m_context->target->AcceptEvent(new BrowserMessageEvent(message));
         ret = mb_Query(o, MB_GetCDInfo);
         if (!ret)
         {
            mb_GetQueryError(o, error, iDataLen);
-           m_context->target->AcceptEvent(new BrowserMessageEvent(error));
+           message = error;
+           m_context->target->AcceptEvent(new BrowserMessageEvent(message));
            delete db;
            return false;
         }
@@ -264,10 +267,9 @@ bool MusicBrainzCD::LookupCD(void)
 		   m_notFoundDiskIdExpire += 60;
 
            mb_GetWebSubmitURL(o, url, MAX_PATH);
-           m_context->target->AcceptEvent(new 
-                     BrowserMessageEvent("CD not found."));
-           m_context->target->AcceptEvent(new 
-                     CDNotFoundEvent(string(url)));
+           message = "CD not found.";
+           m_context->target->AcceptEvent(new BrowserMessageEvent(message));
+           m_context->target->AcceptEvent(new CDNotFoundEvent(url));
            delete db;
            return false;
         }  
@@ -276,14 +278,14 @@ bool MusicBrainzCD::LookupCD(void)
         result = new char[ret];
         if (mb_GetResultRDF(o, result, ret))
         {
-            m_context->target->AcceptEvent(new 
-                  BrowserMessageEvent("Found CD."));
+            message = "Found CD.";
+            m_context->target->AcceptEvent(new BrowserMessageEvent(message));
             WriteToCache(db, diskId, m_trackLens, result); 
         }
         else
         {
-            m_context->target->AcceptEvent(new 
-                  BrowserMessageEvent("Query failed."));
+            message = "Query failed.";
+            m_context->target->AcceptEvent(new BrowserMessageEvent(message));
         }
         delete result;
     }

@@ -229,7 +229,7 @@ bool Misc::ReadMetaData(const char* url, MetaData* metadata)
             }
         }
 
-        metadata->SetTitle(temp.c_str());
+        metadata->SetTitle(temp);
 
         pos = 0;
         temp = metadata->Artist();

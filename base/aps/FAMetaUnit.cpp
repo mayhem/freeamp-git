@@ -63,13 +63,13 @@ uint32 FAMetaUnit::FillData(MetaData* pMetaData, const char* pczURL )
     if ((pMetaData == NULL) || ( pczURL == NULL)) 
         return APS_PARAMERROR;
 
-    SetAlbum(pMetaData->Album().c_str());
-    SetArtist(pMetaData->Artist().c_str());
-    SetTitle(pMetaData->Title().c_str());
-    SetGenre(pMetaData->Genre().c_str());
-    SetComment(pMetaData->Comment().c_str());
+    SetAlbum(pMetaData->Album());
+    SetArtist(pMetaData->Artist());
+    SetTitle(pMetaData->Title());
+    SetGenre(pMetaData->Genre());
+    SetComment(pMetaData->Comment());
     SetFilename(pczURL);
-    SetGUID(pMetaData->GUID().c_str());
+    SetGUID(pMetaData->GUID());
     SetLength(pMetaData->Time());
     SetPlayCount(pMetaData->PlayCount());
     SetTrack(pMetaData->Track());
@@ -86,13 +86,13 @@ uint32 FAMetaUnit::FillData(PlaylistItem* pPlayItem)
 
     MetaData mdTemp = pPlayItem->GetMetaData();
 
-    SetAlbum(mdTemp.Album().c_str());
-    SetArtist(mdTemp.Artist().c_str());
-    SetTitle(mdTemp.Title().c_str());
-    SetGenre(mdTemp.Genre().c_str());
-    SetComment(mdTemp.Comment().c_str());
-    SetFilename(pPlayItem->URL().c_str());
-    SetGUID(mdTemp.GUID().c_str());
+    SetAlbum(mdTemp.Album());
+    SetArtist(mdTemp.Artist());
+    SetTitle(mdTemp.Title());
+    SetGenre(mdTemp.Genre());
+    SetComment(mdTemp.Comment());
+    SetFilename(pPlayItem->URL());
+    SetGUID(mdTemp.GUID());
     SetLength(mdTemp.Time());
     SetPlayCount(mdTemp.PlayCount());
     SetTrack(mdTemp.Track());
@@ -107,13 +107,13 @@ uint32 FAMetaUnit::GetMetaData(MetaData *pMetaData)
     if (pMetaData == NULL) 
         return APS_PARAMERROR;
 
-    pMetaData->SetAlbum(Album().c_str());
-    pMetaData->SetArtist(Artist().c_str());
-    pMetaData->SetTitle(Title().c_str());
-    pMetaData->SetGenre(Genre().c_str());
-    pMetaData->SetComment(Comment().c_str());
-    pMetaData->SetGenre(Genre().c_str());
-    pMetaData->SetGUID(GUID().c_str());
+    pMetaData->SetAlbum(Album());
+    pMetaData->SetArtist(Artist());
+    pMetaData->SetTitle(Title());
+    pMetaData->SetGenre(Genre());
+    pMetaData->SetComment(Comment());
+    pMetaData->SetGenre(Genre());
+    pMetaData->SetGUID(GUID());
     pMetaData->SetPlayCount(PlayCount());
     pMetaData->SetTime(Length());
     pMetaData->SetTrack(Track());

@@ -105,7 +105,7 @@ typedef struct {
 class GTKMusicBrowser {
  public:
     GTKMusicBrowser(FAContext *, MusicBrowserUI *masterUI, 
-                    string playlistURL = string(""),
+                    string playlistURL = "",
                     bool cdCreationMode = false);
     virtual ~GTKMusicBrowser();
 
@@ -151,7 +151,7 @@ class GTKMusicBrowser {
 
     bool     stream_timer_started; 
     TimerRef stream_timer;
-    GtkCTreeNode *StreamGetParentNode(string treePath);
+    GtkCTreeNode *StreamGetParentNode(string &treePath);
 
     uint32 CD_DiscID;
     uint32 CD_numtracks;
@@ -288,7 +288,7 @@ class GTKMusicBrowser {
                            AlbumList *album, PlaylistItem *item,
                            GtkCTreeNode *searchFrom = NULL);
     GtkCTreeNode *FindStreamNode(PlaylistItem *item);
-    GtkCTreeNode *FindPlaylistNode(string playlist);
+    GtkCTreeNode *FindPlaylistNode(const string &playlist);
 
     void CreateMainTreeItems(void);
 
@@ -299,8 +299,8 @@ class GTKMusicBrowser {
                         PlaylistItem *item);
     void AddCatStream(PlaylistItem *item);
     void RemoveCatStream(PlaylistItem *item);
-    void AddCatPlaylist(string playlist);
-    void RemoveCatPlaylist(string playlist);
+    void AddCatPlaylist(const string &playlist);
+    void RemoveCatPlaylist(const string &playlist);
     void SetRepeatType(RepeatMode mode);
     void SetShuffleType(bool shuffled);
     bool CheckEmptyDatabase(void);
@@ -329,7 +329,7 @@ class GTKMusicBrowser {
     void AddFileCMD();
     void DeleteListEvent();
     void DeleteEvent();
-    bool AskToDelete(string url);
+    bool AskToDelete(string &url);
     void DeletePlaylistItem(uint32 loc);
     void HandleKeypress(char key);
     void MoveUpEvent();

@@ -144,7 +144,7 @@ class     BrowserMessageEvent:public Event
       m_type = INFO_BrowserMessage;
       m_info = "";
    }
-   BrowserMessageEvent(string info)
+   BrowserMessageEvent(const string &info)
    {
       m_type = INFO_BrowserMessage;
       m_info = info;

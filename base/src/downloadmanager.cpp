@@ -1482,16 +1482,16 @@ void DownloadManager::LoadResumableDownloadItems()
                     switch(j)
                     {
                         case 0:
-                            item->SetSourceURL(data.substr(count, fieldLength[j]).c_str());
+                            item->SetSourceURL(data.substr(count, fieldLength[j]));
                             break;
                         case 1:
-                            item->SetSourceCookie(data.substr(count, fieldLength[j]).c_str());
+                            item->SetSourceCookie(data.substr(count, fieldLength[j]));
                             break;
                         case 2:
-                            item->SetDestinationFile(data.substr(count, fieldLength[j]).c_str());
+                            item->SetDestinationFile(data.substr(count, fieldLength[j]));
                             break;
                         case 3:
-                            item->SetPlaylistName(data.substr(count, fieldLength[j]).c_str());
+                            item->SetPlaylistName(data.substr(count, fieldLength[j]));
                             break;
                         case 4:
                             item->SetTotalBytes(atoi(data.substr(count, fieldLength[j]).c_str()));
@@ -1513,19 +1513,19 @@ void DownloadManager::LoadResumableDownloadItems()
                             break;
                         }    
                         case 6:
-                            metadata.SetArtist(data.substr(count, fieldLength[j]).c_str());
+                            metadata.SetArtist(data.substr(count, fieldLength[j]));
                             break;
                         case 7:
-                            metadata.SetAlbum(data.substr(count, fieldLength[j]).c_str());
+                            metadata.SetAlbum(data.substr(count, fieldLength[j]));
                             break;
                         case 8:
-                            metadata.SetTitle(data.substr(count, fieldLength[j]).c_str());
+                            metadata.SetTitle(data.substr(count, fieldLength[j]));
                             break;
                         case 9:
-                            metadata.SetComment(data.substr(count, fieldLength[j]).c_str());
+                            metadata.SetComment(data.substr(count, fieldLength[j]));
                             break;
                         case 10:
-                            metadata.SetGenre(data.substr(count, fieldLength[j]).c_str());
+                            metadata.SetGenre(data.substr(count, fieldLength[j]));
                             break;
                         case 11:
                             metadata.SetYear(atoi(data.substr(count, fieldLength[j]).c_str()));

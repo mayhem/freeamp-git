@@ -128,11 +128,11 @@ class PlaylistItem {
 
     const MetaData& GetMetaData() const { return m_metadata; }
 
-    Error SetURL(const char* url) { m_url = string(url); return kError_NoErr;}
+    Error SetURL(const string &url) { m_url = url; return kError_NoErr;}
     Error GetURL(char* buf, uint32* len) { return SetBuffer(buf, m_url.c_str(), len); }
     const string& URL() const { return m_url; }
 
-    Error SetWebURL(const char* webUrl) { m_webUrl = string(webUrl); return kError_NoErr;}
+    Error SetWebURL(const string &webUrl) { m_webUrl = webUrl; return kError_NoErr;}
     Error GetWebURL(char* buf, uint32* len) { return SetBuffer(buf, m_webUrl.c_str(), len); }
     const string& WebURL() const { return m_webUrl; }
 

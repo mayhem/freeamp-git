@@ -76,25 +76,25 @@ class APSMetaData
     virtual ~APSMetaData() {}
 
     const string &Artist() const { return m_strArtist; }
-    void SetArtist(const char *pczNewArtist) { m_strArtist = pczNewArtist; }
+    void SetArtist(const string &pczNewArtist) { m_strArtist = pczNewArtist; }
 
     const string &Title() const { return m_strTitle; }
-    void SetTitle(const char *pczNewTitle) { m_strTitle = pczNewTitle; }
+    void SetTitle(const string &pczNewTitle) { m_strTitle = pczNewTitle; }
 
     const string &Album() const { return m_strAlbum; }
-    void SetAlbum(const char *pczNewAlbum) { m_strAlbum = pczNewAlbum; }
+    void SetAlbum(const string &pczNewAlbum) { m_strAlbum = pczNewAlbum; }
 
     const string &Genre() const { return m_strGenre; }
-    void SetGenre(const char *pczNewGenre) { m_strGenre = pczNewGenre; }
+    void SetGenre(const string &pczNewGenre) { m_strGenre = pczNewGenre; }
 
     const string &Comment() const { return m_strComment; }
-    void SetComment(const char *pczNewComment) { m_strComment = pczNewComment; }
+    void SetComment(const string &pczNewComment) { m_strComment = pczNewComment; }
 
     const string &GUID() const { return m_strGUID; }
-    void SetGUID(const char *pczNewGUID) { m_strGUID = pczNewGUID; }
+    void SetGUID(const string &pczNewGUID) { m_strGUID = pczNewGUID; }
 
     const string &Filename() const { return m_strFilename; }
-    void SetFilename(const char *pczNewFilename) { m_strFilename = pczNewFilename; }
+    void SetFilename(const string &pczNewFilename) { m_strFilename = pczNewFilename; }
 
     int Year() const { return m_nYear; }
     void SetYear(int nNewYear) { m_nYear = nNewYear; }
@@ -178,7 +178,7 @@ class APSMetaData
 	SetTrack(atoi(strTemp.substr(nIndex[11] - nIndex[9], nIndex[9]).c_str()));
 	nIndex[11] -= nIndex[9];
 
-	SetTitle(strTemp.substr(nIndex[11] - nIndex[8], nIndex[8]).c_str());
+	SetTitle(strTemp.substr(nIndex[11] - nIndex[8], nIndex[8]));
 	nIndex[11] -= nIndex[8];
 
 	SetPlayCount(atoi(strTemp.substr(nIndex[11] - nIndex[7], nIndex[7]).c_str()));
@@ -187,22 +187,22 @@ class APSMetaData
 	SetLength(atoi(strTemp.substr(nIndex[11] - nIndex[6], nIndex[6]).c_str()));
 	nIndex[11] -= nIndex[6];
 
-	SetGUID(strTemp.substr(nIndex[11] - nIndex[5], nIndex[5]).c_str());
+	SetGUID(strTemp.substr(nIndex[11] - nIndex[5], nIndex[5]));
 	nIndex[11] -= nIndex[5];
 
-	SetGenre(strTemp.substr(nIndex[11] - nIndex[4], nIndex[4]).c_str());
+	SetGenre(strTemp.substr(nIndex[11] - nIndex[4], nIndex[4]));
 	nIndex[11] -= nIndex[4];
 
-	SetFilename(strTemp.substr(nIndex[11] - nIndex[3], nIndex[3]).c_str());
+	SetFilename(strTemp.substr(nIndex[11] - nIndex[3], nIndex[3]));
 	nIndex[11] -= nIndex[3];
 
-	SetComment(strTemp.substr(nIndex[11] - nIndex[2], nIndex[2]).c_str());
+	SetComment(strTemp.substr(nIndex[11] - nIndex[2], nIndex[2]));
 	nIndex[11] -= nIndex[2];
 
-	SetArtist(strTemp.substr(nIndex[11] - nIndex[1], nIndex[1]).c_str());
+	SetArtist(strTemp.substr(nIndex[11] - nIndex[1], nIndex[1]));
 	nIndex[11] -= nIndex[1];
 
-	SetAlbum(strTemp.substr(nIndex[11] - nIndex[0], nIndex[0]).c_str());
+	SetAlbum(strTemp.substr(nIndex[11] - nIndex[0], nIndex[0]));
 	nIndex[11] -= nIndex[0];
 
 	delete[]pBuffer;

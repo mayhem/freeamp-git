@@ -465,7 +465,7 @@ void GTKMusicBrowser::RemoveCatStream(PlaylistItem *item)
         gtk_ctree_remove_node(musicBrowserTree, toRemove);
 }
 
-GtkCTreeNode *GTKMusicBrowser::FindPlaylistNode(string playlist)
+GtkCTreeNode *GTKMusicBrowser::FindPlaylistNode(const string &playlist)
 {
     GtkCTreeNode *retnode;
     TreeData *data = NewTreeData(kTreePlaylist, NULL, NULL, NULL, NULL,
@@ -479,7 +479,7 @@ GtkCTreeNode *GTKMusicBrowser::FindPlaylistNode(string playlist)
     return retnode;
 }
 
-void GTKMusicBrowser::AddCatPlaylist(string playlist)
+void GTKMusicBrowser::AddCatPlaylist(const string &playlist)
 {
     char *fullname = new char[playlist.length() + 1];
     strcpy(fullname, playlist.c_str());
@@ -507,7 +507,7 @@ void GTKMusicBrowser::AddCatPlaylist(string playlist)
     delete [] fullname;
 }
 
-void GTKMusicBrowser::RemoveCatPlaylist(string playlist)
+void GTKMusicBrowser::RemoveCatPlaylist(const string &playlist)
 {
     GtkCTreeNode *toRemove;
 
@@ -1266,11 +1266,11 @@ void GTKMusicBrowser::HandleStreamList(vector<FreeAmpStreamInfo> &list)
         PlaylistItem *newitem = new PlaylistItem;
         MetaData metadata;
 
-        newitem->SetURL(i->m_streamUrl.c_str());
-        newitem->SetWebURL(i->m_webUrl.c_str());
-        metadata.SetTitle(i->m_name.c_str());
-        metadata.SetArtist(i->m_webUrl.c_str());
-        metadata.SetComment(i->m_desc.c_str());
+        newitem->SetURL(i->m_streamUrl);
+        newitem->SetWebURL(i->m_webUrl);
+        metadata.SetTitle(i->m_name);
+        metadata.SetArtist(i->m_webUrl);
+        metadata.SetComment(i->m_desc);
         newitem->SetMetaData(&metadata);
 
         char *tempname = new char[i->m_name.size() + 128];
@@ -1303,7 +1303,7 @@ void GTKMusicBrowser::HandleStreamList(vector<FreeAmpStreamInfo> &list)
     gdk_threads_leave();
 }
 
-GtkCTreeNode *GTKMusicBrowser::StreamGetParentNode(string treePath)
+GtkCTreeNode *GTKMusicBrowser::StreamGetParentNode(string &treePath)
 {
     GtkCTreeNode *parent = streamTree;
     char      *fullpath = strdup_new(treePath.c_str());
@@ -1432,8 +1432,8 @@ void GTKMusicBrowser::FillRelatable(bool force)
         PlaylistItem *newitem = new PlaylistItem;
         MetaData metadata;
 
-        newitem->SetURL((*i).second.c_str());
-        metadata.SetTitle((*i).first.c_str());
+        newitem->SetURL((*i).second);
+        metadata.SetTitle((*i).first);
         newitem->SetMetaData(&metadata);
 
         name[0] = (char *)((*i).first.c_str());

@@ -50,27 +50,27 @@ class MetaData {
 
     virtual ~MetaData(){}
 
-    Error SetArtist(const char* artist){ m_artist = string(artist); return kError_NoErr;}
+    Error SetArtist(const string &artist){ m_artist = artist; return kError_NoErr;}
     Error GetArtist(char* buf, uint32* len) { return SetBuffer(buf, m_artist.c_str(), len); }
     const string& Artist() const { return m_artist; }
 
-    Error SetAlbum(const char* album) { m_album = string(album); return kError_NoErr; }
+    Error SetAlbum(const string &album) { m_album = album; return kError_NoErr; }
     Error GetAlbum(char* buf, uint32* len) { return SetBuffer(buf, m_album.c_str(), len); }
     const string& Album() const { return m_album; }
 
-    Error SetTitle(const char* title){ m_title = string(title); return kError_NoErr; }
+    Error SetTitle(const string &title){ m_title = title; return kError_NoErr; }
     Error GetTitle(char* buf, uint32* len) { return SetBuffer(buf, m_title.c_str(), len); }
     const string& Title() const { return m_title; }
 
-    Error SetComment(const char* comment){ m_comment = string(comment); return kError_NoErr; }
+    Error SetComment(const string &comment){ m_comment = comment; return kError_NoErr; }
     Error GetComment(char* buf, uint32* len) { return SetBuffer(buf, m_comment.c_str(), len); }
     const string& Comment() const { return m_comment; }
 
-    Error SetGenre(const char* genre) { m_genre = string(genre); return kError_NoErr; }
+    Error SetGenre(const string &genre) { m_genre = genre; return kError_NoErr; }
     Error GetGenre(char* buf, uint32* len) { return SetBuffer(buf, m_genre.c_str(), len); }
     const string& Genre() const { return m_genre; }
 
-	Error SetFormatExtension(const char* extension){ m_extension = string(extension); return kError_NoErr; }
+	Error SetFormatExtension(const string &extension){ m_extension = extension; return kError_NoErr; }
     Error GetFormatExtension(char* buf, uint32* len) { return SetBuffer(buf, m_extension.c_str(), len); }
     const string& FormatExtension() const { return m_extension; }
 
@@ -86,7 +86,7 @@ class MetaData {
     Error SetSize(uint32 bytes){ m_size = bytes; return kError_NoErr;}
     uint32 Size() const { return m_size; }
 
-    Error SetGUID(const char *guid) { m_guid = guid; return kError_NoErr; }
+    Error SetGUID(const string &guid) { m_guid = guid; return kError_NoErr; }
     Error GetGUID(char *buf, uint32 *len) { return SetBuffer(buf, m_guid.c_str(), len); }
     const string& GUID() const { return m_guid; }
 

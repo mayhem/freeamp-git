@@ -576,12 +576,12 @@ Error MusicCatalog::AddSong(const char *url)
         bool changed = false;
         if (meta->Album() == " " || meta->Album().size() == 0) {
             string unknownstr = string("Unknown");
-            meta->SetAlbum(unknownstr.c_str());
+            meta->SetAlbum(unknownstr);
             changed = true;
         }
         if (meta->Title() == " " || meta->Title().size() == 0) {
             string unknownstr = string("Unknown");
-            meta->SetTitle(unknownstr.c_str());
+            meta->SetTitle(unknownstr);
             changed = true;
         }
   
@@ -687,11 +687,11 @@ Error MusicCatalog::Remove(const char *url)
 
     Error retvalue = kError_YouScrewedUp;
 
-    if (!strncmp("P", data, 1))
-        retvalue = RemovePlaylist(url);
-    else if (!strncmp("M", data, 1)) 
+    if (*data == 'M')
         retvalue = RemoveSong(url);
-    else if (!strncmp("S", data, 1))
+    else if (*data == 'P')
+        retvalue = RemovePlaylist(url);
+    else if (*data == 'S')
         retvalue = RemoveStream(url);
 
     delete [] data;
@@ -712,11 +712,11 @@ Error MusicCatalog::Add(const char *url)
 
     Error retvalue = kError_YouScrewedUp;
 
-    if (!strncmp("P", data, 1))
-        retvalue = AddPlaylist(url);
-    else if (!strncmp("M", data, 1)) 
+    if (*data == 'M')
         retvalue = AddSong(url);
-    else if (!strncmp("S", data, 1))
+    else if (*data == 'P')
+        retvalue = AddPlaylist(url);
+    else if (*data == 'S')
         retvalue = AddStream(url);
 
     delete [] data;
@@ -1113,7 +1113,7 @@ void MusicCatalog::DoSearchMusic(char *path, bool bSendMessages)
                     if (!tempdata || !m_addImmediately) {
                         MetaData newmdata = (MetaData)plist->GetMetaData();
                         if (tempdata)
-                            newmdata.SetGUID(tempdata->GUID().c_str());
+                            newmdata.SetGUID(tempdata->GUID());
 
                         WriteMetaDataToDatabase(tempurl, newmdata);
                     }
@@ -1230,10 +1230,10 @@ MetaData *MusicCatalog::ReadMetaDataFromDatabase(const char *url)
     sscanf(value, "%lu%n", (long unsigned int *)&numFields, &offset);
     uint32* fieldLength =  new uint32[numFields];
 
+    int temp;
+
     for(uint32 i = 0; i < numFields; i++)
     {
-        int temp;
-
         sscanf(value + offset, " %lu %n", (long unsigned int *)&fieldLength[i],
 	                                  &temp);
 
@@ -1250,46 +1250,49 @@ MetaData *MusicCatalog::ReadMetaDataFromDatabase(const char *url)
     data.erase(0, offset);
 
     uint32 count = 0;
+    string substring;
 
     for(uint32 j = 0; j < numFields; j++)
     {
         if (fieldLength[j] == 0) 
             continue;
 
+        substring = data.substr(count, fieldLength[j]);
+
         switch(j)
         {
             case 0:
-                metadata->SetArtist(data.substr(count, fieldLength[j]).c_str());
+                metadata->SetArtist(substring);
                 break;
             case 1:
-                metadata->SetAlbum(data.substr(count, fieldLength[j]).c_str());
+                metadata->SetAlbum(substring);
                 break;
             case 2:
-                metadata->SetTitle(data.substr(count, fieldLength[j]).c_str());
+                metadata->SetTitle(substring);
                 break;
             case 3:
-                metadata->SetComment(data.substr(count, fieldLength[j]).c_str());
+                metadata->SetComment(substring);
                 break;
             case 4:
-                metadata->SetGenre(data.substr(count, fieldLength[j]).c_str());
+                metadata->SetGenre(substring);
                 break;
             case 5:
-                metadata->SetYear(atoi(data.substr(count, fieldLength[j]).c_str()));
+                metadata->SetYear(atoi(substring.c_str()));
                 break;
             case 6:
-                metadata->SetTrack(atoi(data.substr(count, fieldLength[j]).c_str()));
+                metadata->SetTrack(atoi(substring.c_str()));
                 break;
             case 7:
-                metadata->SetTime(atoi(data.substr(count, fieldLength[j]).c_str()));
+                metadata->SetTime(atoi(substring.c_str()));
                 break;
             case 8:
-                metadata->SetSize(atoi(data.substr(count, fieldLength[j]).c_str()));
+                metadata->SetSize(atoi(substring.c_str()));
                 break;
             case 9:
-                metadata->SetPlayCount(atoi(data.substr(count, fieldLength[j]).c_str()));
+                metadata->SetPlayCount(atoi(substring.c_str()));
                 break;
             case 10: 
-                metadata->SetGUID(data.substr(count, fieldLength[j]).c_str());
+                metadata->SetGUID(substring);
                 break;
             default:
                 break;
@@ -1487,7 +1490,10 @@ void MusicCatalog::MBLookupThread(void)
     }
 
     if (m_pendingMBLookups == 0 && m_sigs->size() == 0)
-        m_context->target->AcceptEvent(new BrowserMessageEvent("Signaturing Has Completed."));
+    {
+        string message = "Signaturing Has Completed.";
+        m_context->target->AcceptEvent(new BrowserMessageEvent(message));
+    }
 
     m_MBLookupThreadActive = false;
 }
@@ -1504,7 +1510,7 @@ void MusicCatalog::DoMBLookup(const string &url, const string &GUID)
             if (strncmp(data->GUID().c_str(), GUID.c_str(), 16))
                 cout << "ERROR! " << url << " has 2 GUIDs!\n";
         }
-        data->SetGUID(GUID.c_str());
+        data->SetGUID(GUID);
 
         FAMetaUnit faTemp(data, url.c_str());
         int nRes = m_context->aps->APSFillMetaData(&faTemp);
