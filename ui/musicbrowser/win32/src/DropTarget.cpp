@@ -247,6 +247,23 @@ STDMETHODIMP DropTarget::DragEnter(LPDATAOBJECT pDataObj,
         return NOERROR;
     }
 
+    /*IEnumFORMATETC* ief;
+
+    if(S_OK == pDataObj->EnumFormatEtc(DATADIR_GET, &ief))
+    {
+        FORMATETC e;
+        ULONG i;
+
+        while (S_OK == ief->Next(1, &e, &i))
+        {
+
+            ief->Skip(1);
+        }
+
+
+
+    }*/
+
     // Does the drag source provide our private format?     
     fmtetc.cfFormat = RegisterClipboardFormat(CFSTR_FREEAMP_CATALOGITEM);
     fmtetc.ptd      = NULL;

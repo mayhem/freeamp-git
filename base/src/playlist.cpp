@@ -319,6 +319,8 @@ PlaylistManager::~PlaylistManager()
     vector<MetaDataFormat *>::iterator i;
     //uint32 count = 0;
 
+    m_mutex.Acquire();
+
     size = m_masterList.size();
 
     for(index = 0; index < size; index++)
@@ -406,6 +408,8 @@ PlaylistManager::~PlaylistManager()
 
     for(i = m_metadataFormats.begin(); i != m_metadataFormats.end(); i++)
         delete (*i);
+
+    m_mutex.Release();
 
     m_context->prefs->SetPlaylistShuffle(m_shuffle);
     m_context->prefs->SetPlaylistRepeat(m_repeatMode);
@@ -1795,6 +1799,8 @@ bool PlaylistManager::IsSupportedPlaylistFormat(const char *extension)
 {
     bool retvalue = false;
 
+    m_mutex.Acquire();
+
     if (!extension)
         return false;
 
@@ -1810,6 +1816,8 @@ bool PlaylistManager::IsSupportedPlaylistFormat(const char *extension)
             break;
         }
     }
+
+    m_mutex.Acquire();
   
     return retvalue;
 }

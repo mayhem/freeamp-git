@@ -64,7 +64,6 @@ typedef struct PrefsStruct
     bool convertUnderscores;
 
     // page 2
-    int32 streamInterval;
     bool saveStreams;
     string saveStreamsDirectory;
     bool useProxyServer;
@@ -108,7 +107,6 @@ typedef struct PrefsStruct
             decoderThreadPriority == pref.decoderThreadPriority &&
             stayOnTop == pref.stayOnTop &&
             liveInTray == pref.liveInTray &&
-            streamInterval == pref.streamInterval &&
             saveStreams == pref.saveStreams &&
             saveStreamsDirectory == pref.saveStreamsDirectory &&
             useProxyServer == pref.useProxyServer &&

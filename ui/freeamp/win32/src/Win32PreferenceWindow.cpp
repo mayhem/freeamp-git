@@ -426,7 +426,6 @@ void Win32PreferenceWindow::GetPrefsValues(PrefsStruct* values)
     m_prefs->GetPrebufferLength(&values->preBufferLength);
     m_prefs->GetStayOnTop(&values->stayOnTop);
     m_prefs->GetLiveInTray(&values->liveInTray);
-    m_prefs->GetStreamBufferInterval(&values->streamInterval);
     m_prefs->GetSaveStreams(&values->saveStreams);
     m_prefs->GetUseProxyServer(&values->useProxyServer);
     m_prefs->GetUseAlternateNIC(&values->useAlternateIP);
@@ -459,7 +458,6 @@ void Win32PreferenceWindow::SavePrefsValues(PrefsStruct* values)
     m_prefs->SetStayOnTop(values->stayOnTop);
     m_prefs->SetLiveInTray(values->liveInTray);
 
-    m_prefs->SetStreamBufferInterval(values->streamInterval);
     m_prefs->SetSaveStreams(values->saveStreams);
     m_prefs->SetSaveStreamsDirectory(values->saveStreamsDirectory.c_str());
     m_prefs->SetProxyServerAddress(values->proxyServer.c_str());
@@ -1063,7 +1061,6 @@ bool Win32PreferenceWindow::PrefStreamingProc(HWND hwnd,
                                               LPARAM lParam)      
 {
     bool result = false;
-    static HWND hwndStreamInterval = NULL;
     static HWND hwndSaveStreams = NULL;
     static HWND hwndSaveStreamsDirectory = NULL;
     static HWND hwndBrowse = NULL;
@@ -1090,7 +1087,6 @@ bool Win32PreferenceWindow::PrefStreamingProc(HWND hwnd,
         case WM_INITDIALOG:
         {
             // get the handles to all our controls
-            hwndStreamInterval = GetDlgItem(hwnd, IDC_STREAM_INTERVAL);
 
             hwndSaveStreams = GetDlgItem(hwnd, IDC_SAVESTREAMS);
             hwndSaveStreamsDirectory = GetDlgItem(hwnd, IDC_STREAMSAVEDIR);
@@ -1116,13 +1112,7 @@ bool Win32PreferenceWindow::PrefStreamingProc(HWND hwnd,
    
 
             // initialize our controls
-            int32 value;
             char temp[256];
-
-            value = m_originalValues.streamInterval;
-            sprintf(temp, "%d", value);
-            Edit_LimitText(hwndStreamInterval, 2);
-            Edit_SetText(hwndStreamInterval, temp);
             
             Button_SetCheck(hwndSaveStreams, m_originalValues.saveStreams);
 
@@ -1233,29 +1223,6 @@ bool Win32PreferenceWindow::PrefStreamingProc(HWND hwnd,
         {
             switch(LOWORD(wParam))
             {
-                case IDC_STREAM_INTERVAL:
-                {
-                    if(HIWORD(wParam) == EN_CHANGE)
-                    {
-                        char text[128];
-
-                        Edit_GetText(hwndStreamInterval, text, sizeof(text));
-
-                        m_proposedValues.streamInterval = atoi(text);
-
-                        if(m_proposedValues != m_currentValues)
-                        {
-                            PropSheet_Changed(GetParent(hwnd), hwnd);
-                        }
-                        else
-                        {
-                            PropSheet_UnChanged(GetParent(hwnd), hwnd);
-                        }
-                    }
-
-                    break;
-                }
-
                 case IDC_SAVESTREAMS:
                 {
                     BOOL enabled;

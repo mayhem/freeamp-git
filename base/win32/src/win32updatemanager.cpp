@@ -39,7 +39,7 @@ ____________________________________________________________________________*/
 #include <iostream>
 #include <algorithm>
 #include <sstream>
-
+#include <iomanip>
 
 using namespace std;
 
@@ -326,7 +326,9 @@ Error Win32UpdateManager::GetFileVersions(const char* path)
 
                             ostringstream ost;
 
-                            ost << sysTime.wYear << "-" << sysTime.wMonth << "-" << sysTime.wDay;
+                            ost << sysTime.wYear << "-" <<
+                                setw(2) << setfill('0') << sysTime.wMonth << "-" <<
+                                setw(2) << setfill('0') << sysTime.wDay;
 
                             item->SetLocalFileTime(ost.str());
 

@@ -348,7 +348,7 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                     return 1;
 
                 case ID_HELP_ABOUT:
-                    m_context->target->AcceptEvent(new ShowPreferencesEvent(6));
+                    m_context->target->AcceptEvent(new ShowPreferencesEvent(7));
                     return 1;
             }    
         }     
