@@ -75,6 +75,7 @@ IDI_MUSIC16             ICON    DISCARDABLE     "music16.ico"
 IDI_MUSIC17             ICON    DISCARDABLE     "music17.ico"
 IDI_MUSIC12             ICON    DISCARDABLE     "music12.ico"
 IDI_MUSIC18             ICON    DISCARDABLE     "music18.ico"
+IDI_MUSIC19             ICON    DISCARDABLE     "music19.ico"
 
 #ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
