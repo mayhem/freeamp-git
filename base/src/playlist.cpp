@@ -326,6 +326,7 @@ PlaylistManager::~PlaylistManager()
     uint32 size = 0;
     PlaylistItem* item = NULL;
     vector<MetaDataFormat *>::iterator i;
+    vector<PlaylistFormatInfo *>::iterator j;
     //uint32 count = 0;
 
     m_mutex.Acquire();
@@ -399,13 +400,8 @@ PlaylistManager::~PlaylistManager()
         }
     }
 
-    size = m_playlistFormats.size();
-
-    for(index = 0; index < size; index++)
-    {
-        delete m_playlistFormats[index]->GetRef();
-        delete m_playlistFormats[index];
-    }
+    for(j = m_playlistFormats.begin(); j != m_playlistFormats.end(); j++)
+        delete (*j);
 
     size = m_portablePlayers.size();
 
@@ -1600,7 +1596,7 @@ Error PlaylistManager::UpdateTrackMetaData(PlaylistItem* updatedTrack, bool writ
         wtd->metadataFormats = m_metadataFormats;
 
         wtd->thread = Thread::CreateThread();
-        wtd->thread->Create(write_to_disk, wtd);
+        wtd->thread->Create(write_to_disk, wtd, true);
     }
 
     //m_mutex.Release();

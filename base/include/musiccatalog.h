@@ -142,6 +142,7 @@ class MusicCatalog : public EventQueue
     bool CaseCompare(string s1, string s2);
 
     Mutex *m_catMutex;
+    Mutex *m_timerMutex;
 
     vector<ArtistList *> *m_artistList;
     vector<PlaylistItem *> *m_unsorted;

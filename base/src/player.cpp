@@ -239,7 +239,6 @@ Player::
     }
 
     TYPICAL_DELETE(m_musicCatalog);
-    TYPICAL_DELETE(m_plm);
     TYPICAL_DELETE(m_uiManipLock);
     TYPICAL_DELETE(m_lmcMutex);
     TYPICAL_DELETE(m_pmiMutex);
@@ -251,6 +250,7 @@ Player::
     TYPICAL_DELETE(m_uiRegistry);
     TYPICAL_DELETE(m_lmcExtensions);
     TYPICAL_DELETE(m_context->timerManager);
+    TYPICAL_DELETE(m_plm);
 }
 
 void      

@@ -48,6 +48,8 @@ Thread()
 pthreadThread::
 ~pthreadThread()
 {
+    m_exitSem.Wait();
+
     if (m_suspendMutex) {
 	delete m_suspendMutex;
 	m_suspendMutex = NULL;
@@ -71,6 +73,7 @@ InternalThreadFunction()
 
     if (m_function) 
         m_function(m_arg);
+    m_exitSem.Signal();
     return NULL;
 }
 
