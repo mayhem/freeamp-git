@@ -215,7 +215,7 @@ void MusicBrowserUI::Init()
     m_hMusicView = NULL;
     m_hPlaylistView = NULL;
 
-    m_hCatalogItem = NULL;
+    m_hMyMusicItem = NULL;
     m_hAllItem = NULL;
     m_hUncatItem = NULL; 
     m_hPlaylistItem = NULL; 
@@ -308,7 +308,7 @@ void MusicBrowserUI::MusicSearchDone()
                 
     //InitTree();
     TreeView_Expand(m_hMusicView,m_hPlaylistItem, TVE_EXPAND);
-    TreeView_Expand(m_hMusicView,m_hCatalogItem, TVE_EXPAND);
+    TreeView_Expand(m_hMusicView,m_hMyMusicItem, TVE_EXPAND);
 }
 
 void MusicBrowserUI::DisplayBrowserMessage(const char* msg)
@@ -371,6 +371,20 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
             
             m_playerEQ->AcceptEvent(new Event(INFO_ReadyToDieUI));
             break; 
+        }
+
+        case INFO_MusicCatalogCleared:
+        {
+            vector<MusicBrowserUI *>::iterator i;
+
+            for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
+            {
+                (*i)->MusicCatalogCleared();
+            }
+
+            MusicCatalogCleared();
+
+            break;
         }
 
         case INFO_MusicCatalogTrackChanged:

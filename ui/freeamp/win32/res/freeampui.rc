@@ -43,9 +43,9 @@ BEGIN
     EDITTEXT        IDC_SAVEMUSICDIR,11,16,160,14,ES_AUTOHSCROLL
     PUSHBUTTON      "Browse...",IDC_BROWSE,175,16,50,14
     GROUPBOX        "File Associations",IDC_STATIC,3,44,227,38
-    CONTROL         "Reclaim stolen music file associations when application starts.",
+    CONTROL         "Reclaim music file associations when application starts.",
                     IDC_RECLAIMFILETYPES,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,12,56,209,10
+                    WS_TABSTOP,12,56,189,10
     CONTROL         "Ask before reclaiming music file associations.",
                     IDC_ASKRECLAIM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,
                     68,157,10

@@ -1350,25 +1350,18 @@ void MusicBrowserUI::UpdateButtonMenuStates()
     SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
                     ID_FILE_SAVEPLAYLIST, MAKELPARAM(m_bListChanged, 0)); 
 
-    int32        lParam;
-    HTREEITEM    hDummy;
-
-    lParam = GetMusicTreeSelection(&hDummy);
-
-    EnableMenuItem(hMenu, ID_FILE_EXPORTPLAYLIST, 
-                   m_oTreeIndex.IsPlaylist(lParam) ? 
-                   MF_ENABLED : MF_GRAYED );
+    // start off disabled... might enable below
+    EnableMenuItem(hMenu, ID_FILE_EXPORTPLAYLIST, MF_GRAYED);
 
     // Edit Menu
     hMenu = GetSubMenu(hMenuRoot, 1);
 
-
     // start off disabled... might enable below
     EnableMenuItem(hMenu, ID_EDIT_REMOVE, MF_GRAYED);
     SendMessage(m_hToolbar, TB_ENABLEBUTTON, ID_EDIT_REMOVE, 0); 
+
     EnableMenuItem(hMenu, ID_EDIT_EDITINFO, MF_GRAYED);
-    SendMessage(m_hToolbar, TB_ENABLEBUTTON, ID_EDIT_EDITINFO, 0); 
-    
+    SendMessage(m_hToolbar, TB_ENABLEBUTTON, ID_EDIT_EDITINFO, 0);    
 
     sMenuItem.cbSize = sizeof(MENUITEMINFO);
     sMenuItem.fMask =  MIIM_DATA|MIIM_TYPE;
@@ -1484,10 +1477,10 @@ void MusicBrowserUI::UpdateButtonMenuStates()
         }
 
         /*if(!IsItemSelected(m_hNewPlaylistItem) && !IsItemSelected(m_hAllItem) &&
-           !IsItemSelected(m_hCatalogItem) && !IsItemSelected(m_hUncatItem) &&
+           !IsItemSelected(m_hMyMusicItem) && !IsItemSelected(m_hUncatItem) &&
            !IsItemSelected(m_hPlaylistItem) && !IsItemSelected(m_hPortableItem) &&
            (playlistCount && !trackCount) &&
-           !IsItemSelected(m_hCatalogItem) &&
+           !IsItemSelected(m_hMyMusicItem) &&
            !IsItemSelected(m_hUncatItem) &&
            !IsItemSelected(m_hAllItem))
         {
@@ -1533,7 +1526,7 @@ void MusicBrowserUI::UpdateButtonMenuStates()
                         break;
                     }
             
-                }while(result && 
+                }while(result &&
                        (tv_item.hItem = TreeView_GetNextSibling(m_hMusicView, 
                                                                 tv_item.hItem)));
             }
@@ -1541,6 +1534,9 @@ void MusicBrowserUI::UpdateButtonMenuStates()
 
         EnableMenuItem(hMenu, ID_EDIT_EDITPLAYLIST, 
                         enableEditPlaylist ? MF_ENABLED : MF_GRAYED);
+
+        EnableMenuItem(GetSubMenu(hMenuRoot, 0), ID_FILE_EXPORTPLAYLIST, 
+                       enableEditPlaylist ? MF_ENABLED : MF_GRAYED);
     }
     else
     {

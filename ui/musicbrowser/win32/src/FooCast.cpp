@@ -47,7 +47,7 @@ FooCast::FooCast(HWND hwndTree, HTREEITEM parentItem):
     insert.item.iImage = 11;
     insert.item.iSelectedImage = 11;
     insert.item.cChildren= 0;
-    insert.item.lParam = -1;
+    insert.item.lParam = NULL;
     insert.hInsertAfter = TVI_LAST;
     insert.hParent = m_parentItem;
     m_busyItem = TreeView_InsertItem(m_hwndTree, &insert);

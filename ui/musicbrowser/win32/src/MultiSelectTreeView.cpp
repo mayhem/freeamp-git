@@ -166,13 +166,20 @@ void MusicBrowserUI::EditItemLabel(HWND hwnd, HTREEITEM item)
 
         TreeView_GetItem(hwnd, &tv_item);
 
+        TreeData* treedata = (TreeData*)tv_item.lParam;
+
+        if(treedata)
+        {
+            isPlaylist = treedata->IsPlaylist();
+        }
+
         SetProp(hwndEdit, 
                 "oldproc",
                 (HANDLE)GetWindowLong(hwndEdit, GWL_WNDPROC));
 
         SetProp(hwndEdit, 
                 "playlist",
-                (HANDLE)m_oTreeIndex.IsPlaylist(tv_item.lParam));
+                (HANDLE)isPlaylist);
 
 	    // Subclass the window so we can handle multi-select
 	    SetWindowLong(hwndEdit, 
@@ -361,7 +368,7 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
 
         case WM_LBUTTONDBLCLK:
         {
-            TV_ITEM sItem;
+            TV_ITEM tv_item;
             TV_HITTESTINFO tv_htinfo;
 
             //GetCursorPos(&tv_htinfo.pt);
@@ -372,30 +379,32 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
 
             if(TreeView_HitTest(m_hMusicView, &tv_htinfo))
             {
-                sItem.hItem = TreeView_GetSelection(m_hMusicView); 
-                sItem.mask = TVIF_PARAM | TVIF_HANDLE;
-                TreeView_GetItem(m_hMusicView, &sItem);
+                tv_item.hItem = TreeView_GetSelection(m_hMusicView); 
+                tv_item.mask = TVIF_PARAM | TVIF_HANDLE;
+                TreeView_GetItem(m_hMusicView, &tv_item);
 
-                if(m_oTreeIndex.IsTrack(sItem.lParam))
+                TreeData* treedata = (TreeData*)tv_item.lParam;
+
+                if(treedata && treedata->IsTrack())
                 {
                     PlaylistItem *item;
-                
-                    item = new PlaylistItem(*m_oTreeIndex.Data(sItem.lParam).m_pTrack);
+            
+                    item = new PlaylistItem(*treedata->m_pTrack);
                     m_oPlm->AddItem(item, false);
                 } 
-                else if(m_oTreeIndex.IsPlaylist(sItem.lParam))
+                else if(treedata && treedata->IsPlaylist())
                 {
-                    m_oPlm->ReadPlaylist(m_oTreeIndex.Data(sItem.lParam).m_oPlaylistPath.c_str());
+                    m_oPlm->ReadPlaylist(treedata->m_oPlaylistPath.c_str());
                 }
-                else if(m_oTreeIndex.IsPortable(sItem.lParam))
+                else if(treedata && treedata->IsPortable())
                 {
-                    EditPortablePlaylist(m_oTreeIndex.Data(sItem.lParam).m_pPortable);
+                    EditPortablePlaylist(treedata->m_pPortable);
                 }
-                else if(m_oTreeIndex.IsStream(sItem.lParam))
+                else if(treedata && treedata->IsStream())
                 {
                     PlaylistItem *item;
-                
-                    item = new PlaylistItem(*m_oTreeIndex.Data(sItem.lParam).m_pStream);
+            
+                    item = new PlaylistItem(*treedata->m_pStream);
                     m_oPlm->AddItem(item, false);
                 }
                 else if(tv_htinfo.hItem == m_hNewPlaylistItem)
@@ -406,7 +415,6 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
                 {
                     m_context->target->AcceptEvent(new ShowPreferencesEvent(3));
                 }
-                
             }
             break;
         }
@@ -722,7 +730,7 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
                         if(g_editItem != item)
                         {
                             // i should do this in the notify but it is ignoring me
-                            if(item != m_hCatalogItem &&
+                            if(item != m_hMyMusicItem &&
                                item != m_hPlaylistItem &&
                                item != m_hAllItem &&
                                item != m_hUncatItem &&

@@ -264,7 +264,6 @@ class MusicBrowserUI : public UserInterface
     void    FillWiredPlanet();
     void    FillIceCast();
     int32   GetCurrentItemFromMousePos();
-    int32   GetMusicTreeSelection(HTREEITEM* hItem);
     void    GetSelectedMusicTreeItems(vector<PlaylistItem*>* items);
     BOOL    FindSelectedItems(HTREEITEM root, vector<PlaylistItem*>* items);
     void    AddTrackItems(TV_ITEM* tv_item, vector<PlaylistItem*>* items);
@@ -287,6 +286,7 @@ class MusicBrowserUI : public UserInterface
                                      const AlbumList* album,
                                      const PlaylistItem* item);
     void    MusicCatalogPlaylistRemoved(string item);
+    void    MusicCatalogCleared();
 
     HTREEITEM FindArtist(const ArtistList* artist);
     HTREEITEM FindAlbum(HTREEITEM artistItem, const AlbumList* album);
@@ -324,9 +324,8 @@ class MusicBrowserUI : public UserInterface
     string              m_currentListName, m_activeListName;
     Thread*             m_uiThread;
     POINT               m_sMinSize;
-    HTREEITEM	        m_hPlaylistItem, m_hCatalogItem, m_hPortableItem;
+    HTREEITEM	        m_hPlaylistItem, m_hMyMusicItem, m_hPortableItem;
     HTREEITEM           m_hAllItem, m_hUncatItem;
-    TreeDataIndex       m_oTreeIndex;
     int                 m_iCollapseMoveAmount;
     HCURSOR             m_hSavedCursor, m_hDragCursor, m_hNoDropCursor;
     HCURSOR             m_hSplitterCursor, m_hPointerCursor, m_hCurrentCursor;

@@ -61,7 +61,7 @@ void MusicBrowserUI::RenameEvent(void)
     item = TreeView_GetSelection(hwnd);
 
     if(item /*&& (hti.flags & TVHT_ONITEM)*/ &&
-       item != m_hCatalogItem &&
+       item != m_hMyMusicItem &&
        item != m_hPlaylistItem &&
        item != m_hAllItem &&
        item != m_hUncatItem &&
@@ -348,9 +348,14 @@ void MusicBrowserUI::ExportPlaylistEvent()
             {
                 string playlistPath;
 
-                playlistPath = m_oTreeIndex.Data(tv_item.lParam).m_oPlaylistPath;
+                TreeData* treedata = (TreeData*)tv_item.lParam;
 
-                ExportPlaylist(playlistPath);  
+                if(treedata)
+                {
+                    playlistPath = treedata->m_oPlaylistPath;
+
+                    ExportPlaylist(playlistPath);
+                }
                 break;
             }
             
@@ -482,6 +487,16 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
 
         switch(pTreeView->hdr.code)
         {
+            case TVN_DELETEITEM:
+            {
+                TreeData* treedata = (TreeData*)pTreeView->itemOld.lParam;
+
+                if(treedata)
+                    delete treedata; 
+
+                break;
+            }
+
             case TVN_BEGINDRAG:
             {
                 TVBeginDrag(m_hMusicView, pTreeView);
@@ -503,7 +518,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                 TV_DISPINFO* info = (TV_DISPINFO*)pHdr;
                 HTREEITEM item = info->item.hItem;
 
-                if(item == m_hCatalogItem ||
+                if(item == m_hMyMusicItem ||
                    item == m_hPlaylistItem ||
                    item == m_hAllItem ||
                    item == m_hUncatItem ||
@@ -520,41 +535,46 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
             case TVN_ENDLABELEDIT:
             {
                 TV_DISPINFO* info = (TV_DISPINFO*)pHdr;
-                TV_ITEM item = info->item;
+                TV_ITEM tv_item = info->item;
 
                 // was the operation cancelled?
-                if(item.pszText)
+                if(tv_item.pszText)
                 {
-                    if(m_oTreeIndex.IsTrack(item.lParam))
+                    TreeData* treedata = (TreeData*)tv_item.lParam;
+
+                    if(treedata)
                     {
-                        // just change the title for this song
-                        UpdateTrackName(m_oTreeIndex.Data(item.lParam).m_pTrack, 
-                                        item.pszText);
-                    } 
-                    else if(m_oTreeIndex.IsPlaylist(item.lParam))
-                    {
-                        // just change the title for this playlist
-                        UpdatePlaylistName(m_oTreeIndex.Data(item.lParam).m_oPlaylistPath, 
-                                           item.pszText);
-                    }
-                    else if(m_oTreeIndex.IsAlbum(item.lParam))
-                    {
-                        // need to change the album for all tracks in album
-                        UpdateAlbumName(m_oTreeIndex.Data(item.lParam).m_pAlbum, 
-                                        item.pszText);
-                    }
-                    else if(m_oTreeIndex.IsArtist(item.lParam))
-                    {
-                        // need to change the artist for all albums
-                        // and tracks by this artist
-                        UpdateArtistName(m_oTreeIndex.Data(item.lParam).m_pArtist, 
-                                         item.pszText);
-                    }
-                    else if(m_oTreeIndex.IsUncatagorized(item.lParam))
-                    {
-                        // just change the title for this song
-                        UpdateUncatagorizedTrackName(m_oTreeIndex.Data(item.lParam).m_pTrack, 
-                                        item.pszText);
+                        if(treedata->IsTrack())
+                        {
+                            // just change the title for this song
+                            UpdateTrackName(treedata->m_pTrack, 
+                                            tv_item.pszText);
+                        } 
+                        else if(treedata->IsPlaylist())
+                        {
+                            // just change the title for this playlist
+                            UpdatePlaylistName(treedata->m_oPlaylistPath, 
+                                               tv_item.pszText);
+                        }
+                        else if(treedata->IsAlbum())
+                        {
+                            // need to change the album for all tracks in album
+                            UpdateAlbumName(treedata->m_pAlbum, 
+                                            tv_item.pszText);
+                        }
+                        else if(treedata->IsArtist())
+                        {
+                            // need to change the artist for all albums
+                            // and tracks by this artist
+                            UpdateArtistName(treedata->m_pArtist, 
+                                             tv_item.pszText);
+                        }
+                        else if(treedata->IsUncatagorized())
+                        {
+                            // just change the title for this song
+                            UpdateUncatagorizedTrackName(treedata->m_pTrack, 
+                                            tv_item.pszText);
+                        }
                     }
 
                     result = TRUE;
@@ -568,7 +588,9 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                 if(!TreeView_GetChild(m_hMusicView, 
                                       pTreeView->itemNew.hItem))
                 {
-                    if(pTreeView->itemNew.hItem == m_hCatalogItem)
+                    TreeData* treedata = (TreeData*)pTreeView->itemNew.lParam;
+
+                    if(pTreeView->itemNew.hItem == m_hMyMusicItem)
                     {
                         FillArtists();
                     }
@@ -580,11 +602,11 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                     {
                         FillUncatTracks();
                     }
-                    else if(m_oTreeIndex.GetLevel(pTreeView->itemNew.lParam) == 1)
+                    else if(treedata && treedata->GetLevel() == 1)
                     {
                         FillAlbums(&pTreeView->itemNew);
                     }
-                    else if(m_oTreeIndex.GetLevel(pTreeView->itemNew.lParam) == 2)
+                    else if(treedata && treedata->GetLevel() == 2)
                     {
                         FillTracks(&pTreeView->itemNew);
                     }
@@ -620,7 +642,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                 /*int32 lParam;
                 lParam = GetCurrentItemFromMousePos();
 
-                TV_ITEM sItem;
+                TV_ITEM tv_item;
                 TV_HITTESTINFO tv_htinfo;
 
 
@@ -629,24 +651,26 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
 
                 if(TreeView_HitTest(m_hMusicView, &tv_htinfo))
                 {
-                    sItem.hItem = TreeView_GetSelection(m_hMusicView); 
-                    sItem.mask = TVIF_PARAM | TVIF_HANDLE;
-                    TreeView_GetItem(m_hMusicView, &sItem);
+                    tv_item.hItem = TreeView_GetSelection(m_hMusicView); 
+                    tv_item.mask = TVIF_PARAM | TVIF_HANDLE;
+                    TreeView_GetItem(m_hMusicView, &tv_item);
 
-                    if(m_oTreeIndex.IsTrack(sItem.lParam))
+                    TreeData* treedata = (TreeData*)tv_item.lParam;
+
+                    if(treedata->IsTrack())
                     {
                         PlaylistItem *item;
                 
-                        item = new PlaylistItem(*m_oTreeIndex.Data(sItem.lParam).m_pTrack);
+                        item = new PlaylistItem(*treedata->m_pTrack);
                         m_oPlm->AddItem(item, false);
                     } 
-                    else if(m_oTreeIndex.IsPlaylist(sItem.lParam))
+                    else if(treedata->IsPlaylist())
                     {
-                        m_oPlm->ReadPlaylist(m_oTreeIndex.Data(sItem.lParam).m_oPlaylistPath.c_str());
+                        m_oPlm->ReadPlaylist(treedata->m_oPlaylistPath.c_str());
                     }
-                    else if(m_oTreeIndex.IsPortable(sItem.lParam))
+                    else if(treedata->IsPortable())
                     {
-                        EditPortablePlaylist(m_oTreeIndex.Data(sItem.lParam).m_pPortable);
+                        EditPortablePlaylist(treedata->m_pPortable);
                     }
                     else if(tv_htinfo.hItem == m_hNewPlaylistItem)
                     {
@@ -681,7 +705,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                     DeleteMenu(subMenu, ID_POPUP_ADDTRACK_PLAY, MF_BYCOMMAND);
                 }
 
-                if( IsItemSelected(m_hCatalogItem) ||
+                if( IsItemSelected(m_hMyMusicItem) ||
                     IsItemSelected(m_hPlaylistItem) ||
                     IsItemSelected(m_hAllItem) ||
                     IsItemSelected(m_hUncatItem) ||
@@ -694,7 +718,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
 
 
                 if( playlistCount > 1 ||
-                    IsItemSelected(m_hCatalogItem) ||
+                    IsItemSelected(m_hMyMusicItem) ||
                     IsItemSelected(m_hPlaylistItem) ||
                     IsItemSelected(m_hAllItem) ||
                     IsItemSelected(m_hUncatItem) ||
@@ -708,7 +732,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
 
                 if( trackCount > 1 ||
                     playlistCount > 1 ||
-                    IsItemSelected(m_hCatalogItem) ||
+                    IsItemSelected(m_hMyMusicItem) ||
                     IsItemSelected(m_hPlaylistItem) ||
                     IsItemSelected(m_hAllItem) ||
                     IsItemSelected(m_hUncatItem) ||
@@ -782,7 +806,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                    SendMessage(m_hStatus, SB_SETTEXT, 0, 
                                (LPARAM)"This tree item contains all of your playlists.");
                 else               
-                if (hItem == m_hCatalogItem)
+                if (hItem == m_hMyMusicItem)
                    SendMessage(m_hStatus, SB_SETTEXT, 0, 
                                (LPARAM)"This tree item contains all of your music.");
                 else               
@@ -1231,9 +1255,14 @@ void MusicBrowserUI::EditPlaylistEvent(void)
             {
                 string playlistPath;
 
-                playlistPath = m_oTreeIndex.Data(tv_item.lParam).m_oPlaylistPath;
+                TreeData* treedata = (TreeData*)tv_item.lParam;
 
-                EditPlaylist(playlistPath);
+                if(treedata)
+                {
+                    playlistPath = treedata->m_oPlaylistPath;
+
+                    EditPlaylist(playlistPath);
+                }
             }
             
         }while(result && 

@@ -35,138 +35,114 @@ ____________________________________________________________________________*/
 #include "debug.h"
 
 
-TreeDataIndex::TreeDataIndex(void)
+TreeData::TreeData()
 {
+    m_iLevel = -1;
+    m_pArtist = NULL;
+    m_pAlbum = NULL;
+    m_pTrack = NULL;
+    m_pPortable = NULL;
+    m_pStream = NULL;
 }
 
-TreeDataIndex::~TreeDataIndex(void)
+TreeData::TreeData(const TreeData &oOther)
 {
+    m_iLevel = oOther.m_iLevel; 
+    m_pArtist= oOther.m_pArtist;
+    m_pAlbum = oOther.m_pAlbum; 
+    m_pTrack = oOther.m_pTrack; 
+    m_oPlaylistName = oOther.m_oPlaylistName;
+    m_oPlaylistPath = oOther.m_oPlaylistPath;
+    m_pStream = oOther.m_pStream;
+
+    if(oOther.m_pPortable)
+        m_pPortable = new DeviceInfo(*oOther.m_pPortable);
+    else
+        m_pPortable = NULL;
+};
+
+TreeData::~TreeData()
+{
+    if(m_pPortable) 
+        delete m_pPortable; 
+        
+    m_pPortable = NULL;
 }
 
-bool TreeDataIndex::IsValidParam(int32 lParam)
-{
-    return lParam >= 0 && lParam < m_oTreeData.size();
+
+bool TreeData::IsPlaylist()
+{    
+    return m_oPlaylistName.length() > 0;
 }
 
-bool TreeDataIndex::IsPlaylist(int32 lParam)
-{
-    if (!IsValidParam(lParam))
-       return false;
-    
-    return m_oTreeData[lParam].m_oPlaylistName.length() > 0;
-}
-
-bool TreeDataIndex::IsArtist(int32 lParam)
+bool TreeData::IsArtist()
 {
     bool result = false;
 
-    if (!IsValidParam(lParam))
-       return false;
-
-    result = m_oTreeData[lParam].m_pArtist != NULL &&
-             m_oTreeData[lParam].m_pAlbum == NULL &&
-             m_oTreeData[lParam].m_pTrack == NULL;
+    result = m_pArtist != NULL &&
+             m_pAlbum == NULL &&
+             m_pTrack == NULL;
    
     return result;
 }
 
-bool TreeDataIndex::IsAlbum(int32 lParam)
+bool TreeData::IsAlbum()
 {
     bool result = false;
 
-    if (!IsValidParam(lParam))
-       return false;
-
-    result = m_oTreeData[lParam].m_pAlbum != NULL &&
-             m_oTreeData[lParam].m_pArtist != NULL &&
-             m_oTreeData[lParam].m_pTrack == NULL;
+    result = m_pAlbum != NULL &&
+             m_pArtist != NULL &&
+             m_pTrack == NULL;
 
     return result;
 }
 
-bool TreeDataIndex::IsTrack(int32 lParam)
+bool TreeData::IsTrack()
 {
    bool result = false;
 
-    if (!IsValidParam(lParam))
-       return false;
-
-    result = m_oTreeData[lParam].m_pAlbum != NULL &&
-             m_oTreeData[lParam].m_pArtist != NULL &&
-             m_oTreeData[lParam].m_pTrack != NULL;
+    result = m_pAlbum != NULL &&
+             m_pArtist != NULL &&
+             m_pTrack != NULL;
     
     return result;
 }
 
-bool TreeDataIndex::IsUncatagorized(int32 lParam)
+bool TreeData::IsUncatagorized()
 {
    bool result = false;
 
-    if (!IsValidParam(lParam))
-       return false;
-
-    result = m_oTreeData[lParam].m_pAlbum == NULL &&
-             m_oTreeData[lParam].m_pArtist == NULL &&
-             m_oTreeData[lParam].m_pTrack != NULL;
+    result = m_pAlbum == NULL &&
+             m_pArtist == NULL &&
+             m_pTrack != NULL;
 
     return result;
 }
 
-bool TreeDataIndex::IsPortable(int32 lParam)
+bool TreeData::IsPortable()
 {
    bool result = false;
 
-    if (!IsValidParam(lParam))
-       return false;
-
-    result = m_oTreeData[lParam].m_pPortable != NULL;
+    result = m_pPortable != NULL;
 
     return result;
 }
 
-bool TreeDataIndex::IsStream(int32 lParam)
+bool TreeData::IsStream()
 {
    bool result = false;
 
-    if (!IsValidParam(lParam))
-       return false;
-
-    result = m_oTreeData[lParam].m_pStream != NULL;
+    result = m_pStream != NULL;
     
     return result;
 }
 
-bool TreeDataIndex::IsLeaf(int32 lParam)
+bool TreeData::IsLeaf()
 {
-    if (!IsValidParam(lParam))
-       return false;
-    
-    return ( IsTrack(lParam) || IsPlaylist(lParam) || IsUncatagorized(lParam));
+    return ( IsTrack() || IsPlaylist() || IsUncatagorized());
 }
 
-int32 TreeDataIndex::GetLevel(int32 lParam)
+int32 TreeData::GetLevel()
 {
-    if (!IsValidParam(lParam))
-       return -1;
-       
-    return m_oTreeData[lParam].m_iLevel;
+    return m_iLevel;
 }
-
-const TreeData &TreeDataIndex::Data(int32 lParam)
-{
-    assert(IsValidParam(lParam));
-
-    return m_oTreeData[lParam];
-}
-
-int32 TreeDataIndex::Add(TreeData &oData)
-{
-    m_oTreeData.push_back(oData);  
-    return m_oTreeData.size() - 1;
-}
-
-void TreeDataIndex::Clear(void)
-{
-    m_oTreeData.clear();
-}
-
