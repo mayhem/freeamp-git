@@ -132,6 +132,7 @@
 #define IDC_CONTRIBUTE_NO               1532
 #define IDC_CONTRIBUTE_YES              1533
 #define IDD_INTROWIZARD_MUSICBRAINZ     1534
+#define IDD_INTROWIZARD_BITZI           1545
 #define ID_FILE_NEWPLAYLIST             40001
 #define ID_FILE_OPENPLAYLIST            40002
 #define ID_FILE_SAVEPLAYLIST            40004

@@ -5162,6 +5162,10 @@ bool Win32PreferenceWindow::PrefCDAudioProc(HWND hwnd,
             SetWindowText(GetDlgItem(hwnd, IDC_MB_URL), m_originalValues.MBServerURL.c_str());
             Button_SetCheck(GetDlgItem(hwnd, IDC_UPDATE_AUDIO), m_originalValues.updateCDAutomatically);
             Button_SetCheck(GetDlgItem(hwnd, IDC_CONTRIBUTE), m_originalValues.enableMB);
+            if (!m_originalValues.enableMB)
+				Button_Enable(GetDlgItem(hwnd, IDC_CONTRIBUTE_BITZI), false);
+
+			Button_SetCheck(GetDlgItem(hwnd, IDC_CONTRIBUTE_BITZI), m_originalValues.enableBitzi);
             break;
         }
 
@@ -5187,6 +5191,13 @@ bool Win32PreferenceWindow::PrefCDAudioProc(HWND hwnd,
                 {
 					m_proposedValues.enableMB = 
                        Button_GetCheck(GetDlgItem(hwnd, IDC_CONTRIBUTE)) == BST_CHECKED;
+					Button_Enable(GetDlgItem(hwnd, IDC_CONTRIBUTE_BITZI), m_proposedValues.enableMB);
+                    break;
+                }
+                case IDC_CONTRIBUTE_BITZI:
+                {
+					m_proposedValues.enableBitzi = 
+                       Button_GetCheck(GetDlgItem(hwnd, IDC_CONTRIBUTE_BITZI)) == BST_CHECKED;
                     break;
                 }
             }

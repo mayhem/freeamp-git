@@ -195,6 +195,7 @@
 #define IDC_UPDATE_AUDIO                1078
 #define IDC_MB_URL                      1079
 #define IDC_CONTRIBUTE                  1080
+#define IDC_CONTRIBUTE_BITZI            1081
 #define IDMC_MYMUSIC                    6900
 #define IDMC_PLAY                       6901
 #define IDMC_STOP                       6902

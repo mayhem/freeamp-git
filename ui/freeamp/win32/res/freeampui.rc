@@ -163,12 +163,13 @@ BEGIN
     CONTROL         "Automatically update Audio CD item in MyMusic",
                     IDC_UPDATE_AUDIO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,
                     8,221,10
-    EDITTEXT        IDC_MB_URL,6,49,221,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_MB_URL,6,59,221,14,ES_AUTOHSCROLL
     LTEXT           "MusicBrainz server URL for Audio CD/Metadata lookups:",
-                    IDC_STATIC,7,36,217,8
-    CONTROL         "Contribute metadata to MusicBrainz and Bitzi",
-                    IDC_CONTRIBUTE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,
-                    20,218,10
+                    IDC_STATIC,7,46,217,8
+    CONTROL         "Contribute metadata to MusicBrainz",IDC_CONTRIBUTE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,20,218,10
+    CONTROL         "Contribute metadata to Bitzi",IDC_CONTRIBUTE_BITZI,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,33,218,10
 END
 
 IDD_PREF_THEME DIALOG DISCARDABLE  0, 0, 233, 174
