@@ -44,7 +44,9 @@ GTKPreferenceWindow::GTKPreferenceWindow(FAContext *context,
 {    
     startPage = defaultPage;
     done = false;
+    visiblePane = NULL;
     m_PMOnames = new vector<string>;
+    paneList = new vector<OptionsPane *>;
 }
 
 GTKPreferenceWindow::~GTKPreferenceWindow(void)
@@ -64,14 +66,14 @@ void GTKPreferenceWindow::ApplyInfo(void)
         SavePrefsValues(m_pContext->prefs, &proposedValues);
 }
 
-void pref_ok_click(GtkWidget *w, GTKPreferenceWindow *p)
+static void pref_ok_click(GtkWidget *w, GTKPreferenceWindow *p)
 {
     p->ApplyInfo();
     gtk_widget_destroy(p->mainWindow);
     p->done = true;
 }
 
-void pref_apply_click(GtkWidget *w, GTKPreferenceWindow *p)
+static void pref_apply_click(GtkWidget *w, GTKPreferenceWindow *p)
 {
     p->ApplyInfo();
 }
@@ -82,15 +84,9 @@ void GTKPreferenceWindow::CancelInfo(void)
         SavePrefsValues(m_pContext->prefs, &originalValues);
 }
 
-void pref_cancel_click(GtkWidget *w, GTKPreferenceWindow *p)
+static void pref_cancel_click(GtkWidget *w, GTKPreferenceWindow *p)
 {
     p->CancelInfo();
-    gtk_widget_destroy(p->mainWindow);
-    p->done = true;
-}
-
-void pref_close_click(GtkWidget *w, GTKPreferenceWindow *p)
-{
     gtk_widget_destroy(p->mainWindow);
     p->done = true;
 }
@@ -116,9 +112,84 @@ void GTKPreferenceWindow::ShowHelp(void)
     }
 }
 
-void help_click(GtkWidget *w, GTKPreferenceWindow *p)
+static void help_click(GtkWidget *w, GTKPreferenceWindow *p)
 {
     p->ShowHelp();
+}
+
+void GTKPreferenceWindow::SetPane(OptionsPane *pane)
+{
+    if (visiblePane == pane->m_pane)
+        return;
+
+    if (visiblePane)
+        gtk_widget_hide(visiblePane);
+
+    gtk_widget_show(pane->m_pane);
+    visiblePane = pane->m_pane;
+
+    gtk_label_set_text(GTK_LABEL(paneLabel), pane->m_description.c_str());
+}
+
+void GTKPreferenceWindow::SetPane(uint32 panenum)
+{
+    if (paneList->size() < panenum)
+        return;
+
+    SetPane((*paneList)[panenum]);
+}
+
+static void pref_tree_clicked(GtkWidget *widget, GdkEventButton *event,
+                              GTKPreferenceWindow *p)
+{
+    if (!event)
+        return;
+
+    g_return_if_fail(widget != NULL);
+    g_return_if_fail(GTK_IS_CTREE(widget));
+    g_return_if_fail(event != NULL);
+
+    GtkCTree *ctree = GTK_CTREE(widget);
+    GtkCList *clist = GTK_CLIST(widget);
+
+    if (event->window != clist->clist_window)
+        return;
+
+    int row, column;
+    if (!gtk_clist_get_selection_info(clist, (int)event->x, (int)event->y, 
+                                      &row, &column))
+        return;
+
+    GtkCTreeNode *node = GTK_CTREE_NODE(g_list_nth(clist->row_list, row));
+    
+    OptionsPane *opane = (OptionsPane *)gtk_ctree_node_get_row_data(ctree, 
+                                                                    node);
+
+    p->SetPane(opane);
+}
+
+static void kill_optionspane(OptionsPane *die)
+{
+    gtk_widget_hide(die->m_pane);
+    gtk_widget_destroy(die->m_pane);
+    delete die;
+}
+
+void GTKPreferenceWindow::AddPane(OptionsPane *pane)
+{
+    GtkCTreeNode *node;
+
+    char *name[1];
+    name[0] = (char *)pane->m_label.c_str();
+    node = gtk_ctree_insert_node(prefTree, NULL, NULL, name, 5, NULL, NULL,
+                                 NULL, NULL, true, false);
+    gtk_ctree_node_set_row_data_full(prefTree, node, pane, 
+                                     (GtkDestroyNotify)kill_optionspane);
+
+    gtk_widget_hide(pane->m_pane);
+    gtk_box_pack_start(GTK_BOX(paneVbox), pane->m_pane, FALSE, FALSE, 5);
+
+    paneList->push_back(pane);
 }
 
 bool GTKPreferenceWindow::Show(Window *pWindow)
@@ -141,46 +212,89 @@ bool GTKPreferenceWindow::Show(Window *pWindow)
     gtk_container_add(GTK_CONTAINER(mainWindow), vbox);
     gtk_widget_show(vbox);
 
-    GtkWidget *notebook = gtk_notebook_new();
-    gtk_notebook_set_tab_pos(GTK_NOTEBOOK(notebook), GTK_POS_TOP);
-    gtk_box_pack_start(GTK_BOX(vbox), notebook, TRUE, TRUE, 0);
-    gtk_container_set_border_width(GTK_CONTAINER(notebook), 5);
-    gtk_widget_realize(notebook);
-   
+    GtkWidget *mainHbox = gtk_hbox_new(FALSE, 0);
+    gtk_container_set_border_width(GTK_CONTAINER(mainHbox), 5);
+    gtk_container_add(GTK_CONTAINER(vbox), mainHbox);
+    gtk_widget_show(mainHbox);
+
+    GtkWidget *scrolledWindow = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledWindow),
+                                   GTK_POLICY_NEVER, GTK_POLICY_NEVER);
+    gtk_box_pack_start(GTK_BOX(mainHbox), scrolledWindow, TRUE, TRUE, 0);
+    gtk_widget_set_usize(scrolledWindow, 100, 300);
+    gtk_widget_show(scrolledWindow);
+
+    char *name[1];
+    name[0] = "Category";
+
+    prefTree = GTK_CTREE(gtk_ctree_new_with_titles(1, 0, name));
+    gtk_container_add(GTK_CONTAINER(scrolledWindow), GTK_WIDGET(prefTree));
+    gtk_signal_connect(GTK_OBJECT(prefTree), "button_press_event",
+                       GTK_SIGNAL_FUNC(pref_tree_clicked), this);
+    gtk_clist_set_row_height(GTK_CLIST(prefTree), 16);
+    gtk_widget_show(GTK_WIDGET(prefTree));
+
+    paneVbox = gtk_vbox_new(FALSE, 0);
+    gtk_container_set_border_width(GTK_CONTAINER(paneVbox), 5);
+    gtk_box_pack_start(GTK_BOX(mainHbox), paneVbox, FALSE, FALSE, 0);
+    gtk_widget_show(paneVbox);
+
+    paneStyle = gtk_style_copy(gtk_widget_get_style(mainWindow));
+    GdkColor temp = paneStyle->bg[GTK_STATE_NORMAL];
+    paneStyle->bg[GTK_STATE_NORMAL] = paneStyle->fg[GTK_STATE_NORMAL];
+    paneStyle->fg[GTK_STATE_NORMAL] = temp;
+    GdkFont *font = 
+            gdk_font_load("-adobe-helvetica-bold-r-normal--*-180-*-*-*-*-*-*");
+    if (font) {
+        gdk_font_unref(paneStyle->font);
+        paneStyle->font = font;
+    }
+
+    GtkWidget *stupid_gtk = gtk_event_box_new();
+    gtk_container_set_border_width(GTK_CONTAINER(stupid_gtk), 0);
+    gtk_box_pack_start(GTK_BOX(paneVbox), stupid_gtk, FALSE, FALSE, 0);
+    gtk_widget_set_style(stupid_gtk, paneStyle);
+    gtk_widget_show(stupid_gtk);
+
+    paneLabel = gtk_label_new(NULL); 
+    gtk_container_add(GTK_CONTAINER(stupid_gtk), paneLabel);
+    gtk_widget_set_style(paneLabel, paneStyle);
+    gtk_label_set_justify(GTK_LABEL(paneLabel), GTK_JUSTIFY_LEFT);
+    gtk_misc_set_alignment(GTK_MISC(paneLabel), 0.0, 0.5);
+    gtk_widget_realize(paneLabel);
+
+    gtk_widget_show(paneLabel);
+    
     GtkWidget *pane;
-    GtkWidget *label;
+    OptionsPane *opane;
 
-    label = gtk_label_new("General");
-    gtk_widget_show(label);
     pane = CreatePage1();
-    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), pane, label);
+    opane = new OptionsPane("General", " General Preferences", 0, pane);
+    AddPane(opane);
 
-    label = gtk_label_new("Themes");
-    gtk_widget_show(label);
     pane = CreatePage5();
-    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), pane, label);
+    opane = new OptionsPane("Themes", " Theme Preferences", 1, pane);
+    AddPane(opane);
 
-    label = gtk_label_new("Streaming");
-    gtk_widget_show(label);
     pane = CreatePage2();
-    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), pane, label);
+    opane = new OptionsPane("Streaming", " Stream Preferences", 2, pane);
+    AddPane(opane);
 
-    label = gtk_label_new("Plugins");
-    gtk_widget_show(label);
     pane = CreatePage3();
-    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), pane, label);
+    opane = new OptionsPane("Plugins", " Plugin Preferences", 3, pane);
+    AddPane(opane);
 
-    label = gtk_label_new("Advanced");
-    gtk_widget_show(label);
     pane = CreatePage6();
-    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), pane, label);
+    opane = new OptionsPane("Advanced", " Advanced Preferences", 4, pane);
+    AddPane(opane);
 
-    label = gtk_label_new("About");
-    gtk_widget_show(label);
     pane = CreateAbout();
-    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), pane, label);
+    opane = new OptionsPane("About", " About "The_BRANDING, 5, pane);
+    AddPane(opane);
 
-    gtk_widget_show(notebook);
+    GtkWidget *separator = gtk_hseparator_new();
+    gtk_container_add(GTK_CONTAINER(vbox), separator);
+    gtk_widget_show(separator);
 
     GtkWidget *hbox = gtk_hbox_new(FALSE, 5);
     gtk_container_set_border_width(GTK_CONTAINER(hbox), 5);
@@ -214,7 +328,7 @@ bool GTKPreferenceWindow::Show(Window *pWindow)
     gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 0);
     gtk_widget_show(button);
 
-    gtk_notebook_set_page(GTK_NOTEBOOK(notebook), startPage);
+    SetPane(startPage);
 
     gtk_widget_show(mainWindow);
 
@@ -422,13 +536,13 @@ void GTKPreferenceWindow::SaveMusicSet(char *newpath, bool set)
         gtk_entry_set_text(GTK_ENTRY(saveMusicBox), newpath);
 }
 
-void save_music_change(GtkWidget *w, GTKPreferenceWindow *p)
+static void save_music_change(GtkWidget *w, GTKPreferenceWindow *p)
 {
     char *text = gtk_entry_get_text(GTK_ENTRY(w));
     p->SaveMusicSet(text, false);
 }
 
-void save_music_browse(GtkWidget *w, GTKPreferenceWindow *p)
+static void save_music_browse(GtkWidget *w, GTKPreferenceWindow *p)
 {
     GTKFileSelector *filesel = new GTKFileSelector("Select a New Directory");
     if (filesel->Run(true)) {
@@ -457,19 +571,19 @@ void GTKPreferenceWindow::SetToolbar(bool text, bool pics)
         gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
-void text_selected(GtkWidget *w, GTKPreferenceWindow *p)
+static void text_selected(GtkWidget *w, GTKPreferenceWindow *p)
 {
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w)))
         p->SetToolbar(true, false);
 }
 
-void images_selected(GtkWidget *w, GTKPreferenceWindow *p)
+static void images_selected(GtkWidget *w, GTKPreferenceWindow *p)
 {
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w)))
         p->SetToolbar(false, true);
 }
 
-void both_selected(GtkWidget *w, GTKPreferenceWindow *p)
+static void both_selected(GtkWidget *w, GTKPreferenceWindow *p)
 {
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w)))
         p->SetToolbar(true, true);
@@ -482,7 +596,7 @@ void GTKPreferenceWindow::SaveOnExitToggle(int active)
         gtk_widget_set_sensitive(applyButton, TRUE);
 }
     
-void save_onexit_toggle(GtkWidget *w, GTKPreferenceWindow *p)
+static void save_onexit_toggle(GtkWidget *w, GTKPreferenceWindow *p)
 {
     int i = GTK_TOGGLE_BUTTON(w)->active;
     p->SaveOnExitToggle(i);
@@ -495,7 +609,7 @@ void GTKPreferenceWindow::PlayImmediatelyToggle(int active)
         gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
-void play_now_toggle(GtkWidget *w, GTKPreferenceWindow *p)
+static void play_now_toggle(GtkWidget *w, GTKPreferenceWindow *p)
 {
     int i = GTK_TOGGLE_BUTTON(w)->active;
     p->PlayImmediatelyToggle(i);
@@ -622,7 +736,7 @@ void GTKPreferenceWindow::SetStreamInterval(int newvalue)
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
-void stream_interval_change(GtkWidget *w, GTKPreferenceWindow *p)
+static void stream_interval_change(GtkWidget *w, GTKPreferenceWindow *p)
 {
     char *text = gtk_entry_get_text(GTK_ENTRY(w));
     int newdata = atoi(text);
@@ -639,7 +753,7 @@ void GTKPreferenceWindow::SaveLocalToggle(int active)
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
-void save_local_toggle(GtkWidget *w, GTKPreferenceWindow *p)
+static void save_local_toggle(GtkWidget *w, GTKPreferenceWindow *p)
 {
     int i = GTK_TOGGLE_BUTTON(w)->active;
     p->SaveLocalToggle(i);
@@ -656,7 +770,7 @@ void GTKPreferenceWindow::ProxyToggle(int active)
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
-void proxy_toggle(GtkWidget *w, GTKPreferenceWindow *p)
+static void proxy_toggle(GtkWidget *w, GTKPreferenceWindow *p)
 {
     int i = GTK_TOGGLE_BUTTON(w)->active;
     p->ProxyToggle(i);
@@ -676,7 +790,7 @@ void GTKPreferenceWindow::AltIPToggle(int active)
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
-void alt_ip_toggle(GtkWidget *w, GTKPreferenceWindow *p)
+static void alt_ip_toggle(GtkWidget *w, GTKPreferenceWindow *p)
 {
     int i = GTK_TOGGLE_BUTTON(w)->active;
     p->AltIPToggle(i);
@@ -690,13 +804,13 @@ void GTKPreferenceWindow::SaveLocalSet(char *newpath, bool set)
         gtk_entry_set_text(GTK_ENTRY(saveStreamBox), newpath);
 }
 
-void save_stream_change(GtkWidget *w, GTKPreferenceWindow *p)
+static void save_stream_change(GtkWidget *w, GTKPreferenceWindow *p)
 {
     char *text = gtk_entry_get_text(GTK_ENTRY(w));
     p->SaveLocalSet(text, false);
 }
 
-void save_stream_browse(GtkWidget *w, GTKPreferenceWindow *p)
+static void save_stream_browse(GtkWidget *w, GTKPreferenceWindow *p)
 {
     GTKFileSelector *filesel = new GTKFileSelector("Select a New Directory");
     if (filesel->Run(true)) {
@@ -729,7 +843,7 @@ void GTKPreferenceWindow::ProxyAddySet()
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
-void proxy_change(GtkWidget *w, GTKPreferenceWindow *p)
+static void proxy_change(GtkWidget *w, GTKPreferenceWindow *p)
 {
     p->ProxyAddySet();
 }
@@ -762,7 +876,7 @@ void GTKPreferenceWindow::AltIPSet()
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
-void ip_change(GtkWidget *w, GTKPreferenceWindow *p)
+static void ip_change(GtkWidget *w, GTKPreferenceWindow *p)
 {
     p->AltIPSet();
 }
@@ -1036,7 +1150,7 @@ void GTKPreferenceWindow::SetPMO(int newsel)
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
-void pmo_select(GtkWidget *item, GTKPreferenceWindow *p)
+static void pmo_select(GtkWidget *item, GTKPreferenceWindow *p)
 {
     int i = 0;
 
@@ -1062,7 +1176,7 @@ void GTKPreferenceWindow::AlsaSet(void)
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
-void alsa_change(GtkWidget *w, GTKPreferenceWindow *p)
+static void alsa_change(GtkWidget *w, GTKPreferenceWindow *p)
 {
     p->AlsaSet();
 }
@@ -1205,7 +1319,7 @@ void GTKPreferenceWindow::SetInputBufferSize(int newvalue)
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
-void input_buffer_change(GtkWidget *w, GTKPreferenceWindow *p)
+static void input_buffer_change(GtkWidget *w, GTKPreferenceWindow *p)
 {
     char *text = gtk_entry_get_text(GTK_ENTRY(w));
     int newdata = atoi(text);
@@ -1218,7 +1332,7 @@ void GTKPreferenceWindow::SetOutputBufferSize(int newvalue)
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
-void output_buffer_change(GtkWidget *w, GTKPreferenceWindow *p)
+static void output_buffer_change(GtkWidget *w, GTKPreferenceWindow *p)
 {
     char *text = gtk_entry_get_text(GTK_ENTRY(w));
     int newdata = atoi(text);
@@ -1231,7 +1345,7 @@ void GTKPreferenceWindow::SetPreBufferLength(int newvalue)
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
-void prestream_buffer_change(GtkWidget *w, GTKPreferenceWindow *p)
+static void prestream_buffer_change(GtkWidget *w, GTKPreferenceWindow *p)
 {
     char *text = gtk_entry_get_text(GTK_ENTRY(w));
     int newdata = atoi(text);
@@ -1309,12 +1423,12 @@ GtkWidget *GTKPreferenceWindow::CreatePage6(void)
     return pane;
 }
 
-void freeamp_press(GtkWidget *w, GTKPreferenceWindow *p)
+static void freeamp_press(GtkWidget *w, GTKPreferenceWindow *p)
 {
     LaunchBrowser("http://www.freeamp.org/");    
 }
 
-void emusic_press(GtkWidget *w, GTKPreferenceWindow *p)
+static void emusic_press(GtkWidget *w, GTKPreferenceWindow *p)
 {
     LaunchBrowser("http://www.emusic.com/");
 }
@@ -1389,8 +1503,8 @@ void GTKPreferenceWindow::SelectTheme(int row)
 }
 
 
-void theme_click(GtkWidget *w, int row, int column, GdkEventButton *button,
-                 GTKPreferenceWindow *p)
+static void theme_click(GtkWidget *w, int row, int column, 
+                        GdkEventButton *button, GTKPreferenceWindow *p)
 {
     p->SelectTheme(row);
 }
@@ -1413,7 +1527,7 @@ void GTKPreferenceWindow::AddThemeEvent(const char *newpath)
         UpdateThemeList();
 }
 
-void add_theme_press(GtkWidget *w, GTKPreferenceWindow *p)
+static void add_theme_press(GtkWidget *w, GTKPreferenceWindow *p)
 {
     GTKFileSelector *filesel = new GTKFileSelector("Select a Theme to Add");
     if (filesel->Run(true)) {
@@ -1449,7 +1563,7 @@ void GTKPreferenceWindow::DeleteThemeEvent(void)
         UpdateThemeList();
 }
 
-void delete_theme_press(GtkWidget *w, GTKPreferenceWindow *p)
+static void delete_theme_press(GtkWidget *w, GTKPreferenceWindow *p)
 {
     p->DeleteThemeEvent();
 }
@@ -1516,7 +1630,7 @@ void GTKPreferenceWindow::SetFont()
     gtk_widget_destroy(fontDialog);
 }
 
-void font_ok(GtkWidget *w, GTKPreferenceWindow *p)
+static void font_ok(GtkWidget *w, GTKPreferenceWindow *p)
 {
     p->SetFont();
 }
@@ -1538,7 +1652,7 @@ void GTKPreferenceWindow::ChooseFont(void)
     gtk_widget_show(fontDialog);
 }
 
-void choose_font_press(GtkWidget *w, GTKPreferenceWindow *p)
+static void choose_font_press(GtkWidget *w, GTKPreferenceWindow *p)
 {
     p->ChooseFont();
 }
