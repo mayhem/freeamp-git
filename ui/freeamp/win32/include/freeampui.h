@@ -107,6 +107,7 @@ class FreeAmpUI : public UserInterface {
     void Timer(int32 timerID);
     void InitMenuPopup(HMENU menuHandle, uint32 position, bool systemMenu);
     void MinMaxInfo(MINMAXINFO* info);
+    void ExitSizeMove();
     void TrayNotify(int32 notifyMessage);
 
     void FilesReceived(char* array, int32 count);

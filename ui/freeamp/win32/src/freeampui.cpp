@@ -326,6 +326,12 @@ MainWndProc(HWND hwnd,
             break;
         }
 
+        case WM_EXITSIZEMOVE:
+        {
+            ui->ExitSizeMove();
+            break;
+        }
+
         case UWM_TRAY:
         {
             ui->TrayNotify(lParam);
@@ -640,7 +646,14 @@ Destroy()
         }
     }
 
+    // Tell windows msg loop we wanna die
+    PostQuitMessage(0);
+}
 
+void
+FreeAmpUI::
+ExitSizeMove()
+{
     // save window position
     RECT windowRect;
 
@@ -650,9 +663,6 @@ Destroy()
                                 windowRect.top,
                                 windowRect.right - windowRect.left, 
                                 windowRect.bottom - windowRect.top);
-
-    // Tell windows msg loop we wanna die
-    PostQuitMessage(0);
 }
 
 void 

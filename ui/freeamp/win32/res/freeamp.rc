@@ -280,8 +280,6 @@ IDM_TRAY MENU DISCARDABLE
 BEGIN
     POPUP "popup"
     BEGIN
-        MENUITEM "FreeAmp...",                  IDC_ABOUT
-        MENUITEM SEPARATOR
         MENUITEM "Open...",                     IDC_OPEN
         MENUITEM "Save...",                     IDC_SAVE
         MENUITEM SEPARATOR
