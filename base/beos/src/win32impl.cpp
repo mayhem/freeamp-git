@@ -3,6 +3,7 @@
 #include <dirent.h>
 #include <string.h>
 #include <iostream.h>
+#include <ctype.h>
 
 #include "win32impl.h"
 
@@ -123,6 +124,8 @@ Match(char *pattern,char *string)
 		case '*': {
 			// find existance of next block
 			ps1++;
+            if (*ps1 == '\0')
+                return true;
 			char *pS = strchr(ps1,'*');
 			char *pQ = strchr(ps1,'?');
 			if (pS) {*pS = '\0';}  if (pQ) {*pQ = '\0';}
@@ -135,7 +138,7 @@ Match(char *pattern,char *string)
 			return false;
 			break; }
 		default:
-			if (*ps1 != *ps2) return false;
+			if (tolower(*ps1) != tolower(*ps2)) return false;
 			ps1++;
 			ps2++;
 			break;
