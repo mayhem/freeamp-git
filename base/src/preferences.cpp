@@ -70,6 +70,7 @@ const char* kShowToolbarTextLabelsPref = "ShowToolbarTextLabels";
 const char* kShowToolbarImagesPref = "ShowToolbarImages";
 const char* kSaveCurrentPlaylistOnExitPref = "SaveCurrentPlaylistOnExit";
 const char* kViewMusicBrowserPref = "ViewMusicBrowser";
+const char* kWelcomePref = "Welcome";
 
 //logging
 const char* kUseDebugLogPref = "UseDebugLog";
@@ -116,6 +117,7 @@ const bool kDefaultShowToolbarTextLabels = true;
 const bool kDefaultShowToolbarImages = true;
 const bool kDefaultSaveCurrentPlaylistOnExit = false;
 const bool kDefaultViewMusicBrowser = true;
+const bool kDefaultWelcome = true;
 
 Error
 Preferences::
@@ -260,6 +262,9 @@ SetDefaults()
 
     if (GetPrefBoolean(kViewMusicBrowserPref, &dummyBool) == kError_NoPrefValue)
         SetPrefBoolean(kViewMusicBrowserPref, kDefaultViewMusicBrowser);
+
+    if (GetPrefBoolean(kWelcomePref, &dummyBool) == kError_NoPrefValue)
+        SetPrefBoolean(kWelcomePref, kDefaultWelcome);
 
 
     return kError_NoErr;

@@ -77,6 +77,7 @@ extern const char* kShowToolbarTextLabelsPref;
 extern const char* kShowToolbarImagesPref;
 extern const char* kSaveCurrentPlaylistOnExitPref;
 extern const char* kViewMusicBrowserPref;
+extern const char* kWelcomePref;
 
 class LibDirFindHandle;
 

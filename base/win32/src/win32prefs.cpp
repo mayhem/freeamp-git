@@ -201,6 +201,15 @@ Initialize()
 											REG_SZ, 
 											(LPBYTE)cwd, 
 											strlen(cwd) + 1);
+
+                    strcat(cwd, "\\db");
+
+                    result = RegSetValueEx( m_prefsKey,
+											kDatabaseDirPref, 
+											NULL, 
+											REG_SZ, 
+											(LPBYTE)cwd, 
+											strlen(cwd) + 1);
 				}
 			}
 

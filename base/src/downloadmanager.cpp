@@ -536,7 +536,7 @@ DownloadItem* DownloadManager::GetNextQueuedItem()
 
         m_queueList.pop_front();
 
-        cout << "Queue count: " << m_queueList.size() << endl;
+        //cout << "Queue count: " << m_queueList.size() << endl;
     }
 
     m_queueMutex.Release();
@@ -864,7 +864,7 @@ Error DownloadManager::Download(DownloadItem* item)
                 buffer[total] = 0x00;
                 //cout << buffer << endl;
 
-                cout << returnCode << endl;
+                //cout << returnCode << endl;
 
                 switch(buffer[9])
                 {
@@ -885,7 +885,7 @@ Error DownloadManager::Download(DownloadItem* item)
                         if(fileSize > 0)
                             item->SetTotalBytes(fileSize);
 
-                        cout << destPath << endl;
+                        //cout << destPath << endl;
 
                         int openFlags = O_BINARY|O_CREAT|O_RDWR|O_APPEND;
 
@@ -1086,7 +1086,7 @@ Error DownloadManager::Download(DownloadItem* item)
 
 void DownloadManager::CleanUpDownload(DownloadItem* item)
 {
-    cout << "Cleaning item: " << item->SourceURL() << endl;
+    //cout << "Cleaning item: " << item->SourceURL() << endl;
 
     char path[_MAX_PATH];
     uint32 length = sizeof(path);
@@ -1109,7 +1109,7 @@ Error DownloadManager::SubmitToDatabase(DownloadItem* item)
 
     if(item)
     {
-        cout << "Submitting item: " << item->SourceURL() << endl;
+        //cout << "Submitting item: " << item->SourceURL() << endl;
 
         char path[_MAX_PATH];
         uint32 length = sizeof(path);

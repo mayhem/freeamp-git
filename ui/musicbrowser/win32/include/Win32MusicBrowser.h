@@ -134,10 +134,10 @@ class MusicBrowserUI : public UserInterface
 						 
     static void UIThreadFunc(void* arg);
     void   InitDialog(HWND hwnd);
-    void   SetMinMaxInfo(void);
+    void   SetMinMaxInfo();
     void   EditItemLabel(HWND hwnd, HTREEITEM item);
 
-    bool   IntroductionWizard();
+    bool   IntroductionWizard(vector<string>* searchPaths);
 
     BOOL   DialogProc(HWND hwnd, UINT msg, 
                       WPARAM wParam, LPARAM lParam);
@@ -173,13 +173,13 @@ class MusicBrowserUI : public UserInterface
 
  private:
 
-    void   Init(void);
+    void   Init();
 
     // Functions in Dialog.cpp
     void   ShowBrowser(bool bShowExpanded);
-    void   HideBrowser(void);
-    void   Close(void);
-	void   ExpandCollapseEvent(void);
+    void   HideBrowser();
+    void   Close();
+	void   ExpandCollapseEvent();
     void   GetMinMaxInfo(MINMAXINFO *pInfo);
     void   SizeWindow(int type, int iWidth, int iHeight);
     BOOL   SetCursor(int hitTest, int mouseMsg);
@@ -189,57 +189,57 @@ class MusicBrowserUI : public UserInterface
     void   MouseButtonUp(int keys, int x, int y);
     BOOL   DrawItem(int32 controlId, DRAWITEMSTRUCT* dis);
     void   SetStatusText(const char *text);
-    void   CreateToolbar(void);
+    void   CreateToolbar();
     void   AddToolbarButtons(bool textLabels, bool images);
-    void   ToggleVisEvent(void);
-    void   SetTitles(void);
-    void   UpdateButtonMenuStates(void);
+    void   ToggleVisEvent();
+    void   SetTitles();
+    void   UpdateButtonMenuStates();
     void   MoveControls(int iPixelsToMove);
-    bool   CreateMainDialog(void);
-    Error  CloseMainDialog(void);
+    bool   CreateMainDialog();
+    Error  CloseMainDialog();
     uint32 CalcStringEllipsis(HDC hdc, string& displayString, 
                                  int32 columnWidth);
     void   ShowHelp(uint32 topic);
 
 
     // Functions in OpenSavePlaylist.cpp
-    void OpenPlaylist(void);
-    void NewPlaylist(void);
-    void SavePlaylist(void);
-    void SavePlaylistAs(void);
-    void ImportTracksAndPlaylists(void);
+    void OpenPlaylist();
+    void NewPlaylist();
+    void SavePlaylist();
+    void SavePlaylistAs();
+    void ImportTracksAndPlaylists();
     void AddPlaylist(const string &oName);
     void LoadPlaylist(const string &oPlaylist);
     bool SaveNewPlaylist(string &oName);
     void EditPlaylist(const string &oList);
     bool ExportPlaylist(string &oName);
     void EditPortablePlaylist(DeviceInfo* device);
-    void SavePortablePlaylist(void);
+    void SavePortablePlaylist();
 
     // Functions in Event.cpp
     int   Notify(WPARAM wParam, NMHDR *pNMHDR);
-    void  StartStopMusicSearch(void);
-    void  MoveUpEvent(void);
-    void  MoveDownEvent(void);
-    void  AddTrackEvent(void);
-    void  AddTrackAndPlayEvent(void);
+    void  StartStopMusicSearch(bool useWizard = false);
+    void  MoveUpEvent();
+    void  MoveDownEvent();
+    void  AddTrackEvent();
+    void  AddTrackAndPlayEvent();
     void  AddFileEvent(HWND hwndParent);
-    void  EditPlaylistEvent(void);
-    void  ClearPlaylistEvent(void);
+    void  EditPlaylistEvent();
+    void  ClearPlaylistEvent();
     void  SortEvent(int id);
-    void  EmptyDBCheck(void);
-    void  RemoveEvent(void);
-    void  RemoveFromDiskEvent(void);
-    void  ImportEvent(void);
+    void  EmptyDBCheck();
+    void  RemoveEvent();
+    void  RemoveFromDiskEvent();
+    void  ImportEvent();
     void  MoveItemEvent(int source, int dest);
     void  PlayerControlsEvent(int command);
     void  ChangeShuffleMode(bool shuffled);
     void  ChangePlayerState(int32 event);
     void  ChangeRepeatMode(RepeatMode mode);
-    void  ExportPlaylistEvent(void);
-    void  EditInfoEvent(void);
-    void  RenameEvent(void);
-    void  PlayNowEvent(void);
+    void  ExportPlaylistEvent();
+    void  EditInfoEvent();
+    void  RenameEvent();
+    void  PlayNowEvent();
     bool  DeleteFromDrive(const char* url);
     
 
@@ -249,10 +249,10 @@ class MusicBrowserUI : public UserInterface
     void  PlaylistListItemMoved(const PlaylistItem* item, 
                                 uint32 oldIndex, uint32 newIndex);
     void  PlaylistListItemRemoved(const PlaylistItem* item, uint32 oldIndex);
-    void  PlaylistListSorted(void);
-    void  InitList(void);
+    void  PlaylistListSorted();
+    void  InitList();
     void  LVBeginDrag(HWND hwnd, NM_LISTVIEW* nmlv);
-    void  UpdateTotalTime(void);
+    void  UpdateTotalTime();
     void  GetSelectedPlaylistItems(vector<PlaylistItem*>* items);
 
     // Functions in Win32MusicBrowser.cpp
@@ -262,15 +262,15 @@ class MusicBrowserUI : public UserInterface
     void  DisplayBrowserMessage(const char* msg);
 
     // Functions is MusicTree.cpp
-    void    InitTree(void);
-    void    FillArtists(void);
+    void    InitTree();
+    void    FillArtists();
     void    FillAlbums(TV_ITEM *pItem);
-    void    FillPlaylists(void);
+    void    FillPlaylists();
     void    FillTracks(TV_ITEM *pItem);
-    void    FillAllTracks(void);
-    void    FillUncatTracks(void);
-    void    FillPortables(void);
-    int32   GetCurrentItemFromMousePos(void);
+    void    FillAllTracks();
+    void    FillUncatTracks();
+    void    FillPortables();
+    int32   GetCurrentItemFromMousePos();
     int32   GetMusicTreeSelection(HTREEITEM* hItem);
     void    GetSelectedMusicTreeItems(vector<PlaylistItem*>* items);
     BOOL    FindSelectedItems(HTREEITEM root, vector<PlaylistItem*>* items);
@@ -305,8 +305,8 @@ class MusicBrowserUI : public UserInterface
     void UpdateArtistName(ArtistList* artist, const char* name);
     void UpdateUncatagorizedTrackName(PlaylistItem* track, const char* name);
 
-    uint32 GetSelectedTrackCount(void);
-    uint32 GetSelectedPlaylistCount(void);
+    uint32 GetSelectedTrackCount();
+    uint32 GetSelectedPlaylistCount();
     uint32 CountSelectedItems(HTREEITEM root);
     bool IsItemSelected(HTREEITEM item);
 

@@ -466,10 +466,10 @@ Error MusicBrowserUI::CloseMainDialog(void)
 
 void MusicBrowserUI::ShowBrowser(bool bShowExpanded)
 {
-    PostMessage(m_hWnd, WM_EMPTYDBCHECK, 0, 0);
     ShowWindow(m_hWnd, SW_RESTORE);
 	ShowWindow(m_hWnd, SW_SHOW);
     SetForegroundWindow(m_hWnd);
+    PostMessage(m_hWnd, WM_EMPTYDBCHECK, 0, 0);
 }
 
 void MusicBrowserUI::HideBrowser(void)

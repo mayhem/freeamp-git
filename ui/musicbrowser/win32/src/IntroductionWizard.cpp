@@ -251,17 +251,63 @@ static BOOL CALLBACK IntroWizardHello(HWND hwnd,
 	return result;
 }   
 
-static BOOL CALLBACK IntroWizardSearch(HWND hwnd,
+static int CALLBACK BrowseCallbackProc(HWND hwnd, 
+                                       UINT uMsg, 
+                                       LPARAM lParam,
+                                       LPARAM lpData)
+{
+        // Called just after the dialog is initialized
+        // Select the dir passed in BROWSEINFO.lParam
+        // TAKE CARE THAT IF THE DIR STRING ENDS WITH \ IT WILL NOT WORK ???
+        if (uMsg == BFFM_INITIALIZED)
+                ::SendMessage(hwnd, BFFM_SETSELECTION, FALSE, lpData);
+
+        return 0;
+}
+
+//const char* kAllDrives = "All Drives";
+//const char* kAllFolders = "All Folders";
+
+static BOOL CALLBACK IntroWizardSearch( HWND hwnd,
                                         UINT msg, 
                                         WPARAM wParam, 
                                         LPARAM lParam)
 {
 	BOOL result = FALSE;
+    static vector<string>* searchPaths;
 
     switch(msg)
     {
         case WM_INITDIALOG:
         {
+            HWND hwndDrives = GetDlgItem(hwnd, IDC_DRIVES);
+            HWND hwndDirectory = GetDlgItem(hwnd, IDC_DIRECTORY);
+            DWORD  dwDrives;
+            char   *szDrive = "X:";
+            int32  i, ret;
+
+            i = ComboBox_AddString(hwndDrives, "All Drives");
+            ComboBox_SetCurSel(hwndDrives, i);
+
+            dwDrives = GetLogicalDrives();
+            for(i = 0; i < sizeof(DWORD) * 8; i++)
+            {
+               if (dwDrives & (1 << i))
+               {
+                  szDrive[0] = 'A' + i;
+                  ret = GetDriveType(szDrive);
+                  if (ret != DRIVE_CDROM && ret != DRIVE_REMOVABLE)
+                  {
+                      ComboBox_AddString(hwndDrives, szDrive);
+                  }
+               }   
+            }
+
+            Edit_SetText(hwndDirectory, "All Folders");
+
+            PROPSHEETPAGE* psp = (PROPSHEETPAGE*)lParam;
+            searchPaths = (vector<string>*)psp->lParam;
+
             break;
         }
 
@@ -359,6 +405,142 @@ static BOOL CALLBACK IntroWizardSearch(HWND hwnd,
             break;
         }
 
+        case WM_COMMAND:
+        {
+            switch(LOWORD(wParam))
+            {
+                case IDC_DRIVES:
+                {
+                    if(HIWORD(wParam) == CBN_CLOSEUP)
+                    {
+                        HWND hwndCombo = (HWND) lParam;
+                        char temp[MAX_PATH];
+                        int32 sel = ComboBox_GetCurSel(hwndCombo);
+
+                        ComboBox_GetText( hwndCombo, 
+                                          temp, 
+                                          MAX_PATH);
+
+                        HWND hwndDirectory = GetDlgItem(hwnd, IDC_DIRECTORY);
+                        HWND hwndBrowse = GetDlgItem(hwnd, IDC_BROWSE);
+                        
+                        BOOL enable = strcmp(temp, "All Drives");
+
+                        if(!enable)
+                            strcpy(temp, "All Folders");
+                        else
+                            sprintf(temp, "%s\\", temp);
+                            
+                        Edit_SetText(hwndDirectory, temp);
+
+                        //EnableWindow(hwndText, enable);
+                        //EnableWindow(hwndDirectory, enable);
+                        EnableWindow(hwndBrowse, enable);
+                    }
+
+                    break;
+                }          
+
+                case IDC_DIRECTORY:
+                {
+                    /*if(HIWORD(wParam) == EN_CHANGE)
+                    {
+                        char temp[MAX_PATH];
+                        HWND hwndEdit = (HWND) lParam;
+
+                        Edit_GetText( hwndEdit, 
+                                      temp,
+                                      MAX_PATH);
+                    }*/
+
+                    break;
+                }
+
+
+
+                case IDC_BROWSE:
+                {
+                    LPMALLOC pMalloc;
+
+                    if(SUCCEEDED(SHGetMalloc(&pMalloc)))
+                    {
+                        HWND hwndDrives = GetDlgItem(hwnd, IDC_DRIVES);
+                        HWND hwndDirectory = GetDlgItem(hwnd, IDC_DIRECTORY);
+                        char temp[MAX_PATH];
+
+                        LPITEMIDLIST pidlDrive;
+
+                        // get the PIDL for this dir and set the root
+                        LPSHELLFOLDER desktop;
+
+                        if(SUCCEEDED(SHGetDesktopFolder(&desktop)))
+                        {
+                            OLECHAR drive[MAX_PATH];
+                            OLECHAR path[MAX_PATH];
+                            ULONG eaten;
+                            LPITEMIDLIST pidlPath;
+
+                            ComboBox_GetText(hwndDrives, 
+                                             temp, 
+                                             MAX_PATH);
+
+                            strcat(temp, "\\");
+
+                            MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, temp,
+                                                -1, drive, sizeof(drive));
+
+                            desktop->ParseDisplayName(hwnd, NULL, drive, &eaten, &pidlDrive, NULL);                            
+
+                            Edit_GetText(hwndDirectory, 
+                                         temp,
+                                         MAX_PATH);
+
+                            MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, temp, 
+                                                -1, path, sizeof(path));
+
+                            desktop->ParseDisplayName(hwnd, NULL, path, &eaten, &pidlPath, NULL);
+
+                            BROWSEINFO bi; 
+                            LPITEMIDLIST browseId;
+                            char displayName[MAX_PATH + 1];
+
+                            bi.hwndOwner = hwnd;
+                            bi.pidlRoot = pidlDrive;
+                            bi.pszDisplayName = displayName;
+                            bi.lpszTitle = "Please select the folder in which you want to search.";
+                            bi.ulFlags = BIF_RETURNONLYFSDIRS;
+                            bi.lpfn = BrowseCallbackProc;
+                            bi.lParam = (LPARAM)pidlPath;
+
+                            browseId = SHBrowseForFolder(&bi);
+        
+                            if(browseId)
+                            {
+                                SHGetPathFromIDList(browseId, temp);
+                        
+                                Edit_SetText(hwndDirectory, temp);
+
+                                pMalloc->Free(browseId);
+                            }
+
+                            // clean up
+                            if(pidlPath)
+                                pMalloc->Free(pidlPath);
+
+                            if(pidlDrive)
+                                pMalloc->Free(pidlDrive);
+
+                            desktop->Release();
+                        }                        
+                    }
+
+                    break;
+                }
+            }
+
+            break;
+        }
+                 
         case WM_NOTIFY:
         {
             switch(((NMHDR*)lParam)->code)
@@ -387,8 +569,46 @@ static BOOL CALLBACK IntroWizardSearch(HWND hwnd,
                     break;
                 }
 
-                case PSN_WIZNEXT:
+                case PSN_WIZFINISH:
                 {
+                    HWND hwndDrives = GetDlgItem(hwnd, IDC_DRIVES);
+                    HWND hwndDirectory = GetDlgItem(hwnd, IDC_DIRECTORY);
+                    char temp[MAX_PATH];
+
+                    ComboBox_GetText(hwndDrives, 
+                                     temp, 
+                                     MAX_PATH);
+
+                    BOOL allDrives = !strcmp(temp, "All Drives");
+
+                    if(allDrives)
+                    {
+                        DWORD  dwDrives;
+                        char   *szDrive = "X:\\";
+                        int32  i, ret;
+
+                        dwDrives = GetLogicalDrives();
+                        for(i = 0; i < sizeof(DWORD) * 8; i++)
+                        {
+                           if (dwDrives & (1 << i))
+                           {
+                              szDrive[0] = 'A' + i;
+                              ret = GetDriveType(szDrive);
+                              if (ret != DRIVE_CDROM && ret != DRIVE_REMOVABLE)
+                              {
+                                  searchPaths->push_back(szDrive);
+                              }
+                           }   
+                        }
+                    }
+                    else
+                    {
+                        Edit_GetText(hwndDirectory, 
+                                     temp,
+                                     MAX_PATH);
+
+                        searchPaths->push_back(temp);
+                    }
                     break;
                 }
 
@@ -406,7 +626,7 @@ static BOOL CALLBACK IntroWizardSearch(HWND hwnd,
 	return result;
 }   
 
-bool MusicBrowserUI::IntroductionWizard()
+bool MusicBrowserUI::IntroductionWizard(vector<string>* searchPaths)
 {
     PROPSHEETPAGE psp[2];
     PROPSHEETHEADER psh;
@@ -429,7 +649,7 @@ bool MusicBrowserUI::IntroductionWizard()
     psp[1].pszIcon = NULL;
     psp[1].pfnDlgProc = IntroWizardSearch;
     psp[1].pszTitle = NULL;
-    psp[1].lParam = (LPARAM)0;
+    psp[1].lParam = (LPARAM)searchPaths;
 
     psh.dwSize = sizeof(PROPSHEETHEADER);
     psh.dwFlags = PSH_PROPSHEETPAGE | PSH_WIZARD | PSH_NOAPPLYNOW;

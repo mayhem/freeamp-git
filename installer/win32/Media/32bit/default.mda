@@ -7,8 +7,8 @@ count=2
 LANGUAGEDEFAULT=0009
 
 [GeneralInfo]
-MEDIATYPE=CDROM
-DATAASFILES=Yes
+MEDIATYPE=144M
+DATAASFILES=No
 BUILDTYPE=Full
 BuildLocation=C:\Local\src\freeamp\installer\win32\Media\32bit
 BREAKBYTOPCOMPONENT=No

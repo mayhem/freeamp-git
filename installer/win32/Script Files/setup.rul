@@ -364,6 +364,8 @@ begin
     // Call registry functions and/or create keys from
     // the InstallShield IDE's Resources pane.
 
+	bRegisterForRMPs = TRUE;	
+		
 	// First set up the default registry entries
 	nResult = CreateRegistrySet("MainSet");
     nResult = CreateRegistrySet("SimpleSet");
@@ -374,6 +376,11 @@ begin
 	
 	if(bRegisterFileTypes = TRUE) then
 		nResult = CreateRegistrySet("RegisterFileTypes");
+		
+		// RMP support
+		if(bRegisterForRMPs = TRUE) then
+			nResult = CreateRegistrySet("RegisterRMPFileType");
+		endif;		
 	endif;
 	
 	// We want to look under HKEY_CURRENT_USER
@@ -410,7 +417,7 @@ begin
 			
 	if(bInLocalMachine = TRUE && bInCurrentUser = TRUE) then
 		bNetscapeDetected = TRUE;
-		bRegisterForRMPs = TRUE;		
+		
 		
 		// RMP support
 		if(bRegisterForRMPs = TRUE) then
@@ -992,6 +999,7 @@ end;
 // --- include script file section ---
 
 #include "sddialog.rul"
+
 
 
 

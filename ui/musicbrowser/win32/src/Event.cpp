@@ -267,10 +267,11 @@ void MusicBrowserUI::MoveItemEvent(int source, int dest)
     m_oPlm->MoveItem(source, dest);
 }
 
-void MusicBrowserUI::StartStopMusicSearch(void)
+void MusicBrowserUI::StartStopMusicSearch(bool useWizard)
 {  
     HMENU           hMenu;
     MENUITEMINFO    sItem;
+    bool            doSearch = false;
 
     if (m_bSearchInProgress)
     {
@@ -281,11 +282,16 @@ void MusicBrowserUI::StartStopMusicSearch(void)
 
     m_searchPathList.clear();
 
-    if(0 < DialogBoxParam(g_hinst, 
+    if(useWizard)
+        doSearch = IntroductionWizard(&m_searchPathList);
+    else
+        doSearch = (0 < DialogBoxParam(g_hinst, 
                           MAKEINTRESOURCE(IDD_MUSICSEARCH),
                           m_hWnd, 
                           ::MusicSearchDlgProc, 
-                          (LPARAM )this))
+                          (LPARAM )this));
+
+    if(doSearch)
     {
         
         m_context->catalog->SearchMusic(m_searchPathList);
@@ -1158,22 +1164,30 @@ void MusicBrowserUI::AddFileEvent(HWND hwndParent)
 void MusicBrowserUI::EmptyDBCheck(void)
 {
     int iRet;
-
-    IntroductionWizard();
     
     if (m_context->catalog->GetPlaylists()->size() > 0 ||
         m_context->catalog->GetMusicList()->size() > 0 ||
         m_context->catalog->GetUnsortedMusic()->size() > 0)
         return;
-        
-    /*iRet = MessageBox(m_hWnd, "Your music database does not contain any items.\r\n"
-                              "Would you like to start a search to find music\r\n"
-                              "and playlists on your machine?",
-                       "Populate My Music", MB_YESNO);
-    if (iRet == IDYES)
-        StartStopMusicSearch();*/
 
-    
+    bool welcome = false;
+
+    m_context->prefs->GetPrefBoolean(kWelcomePref, &welcome);
+
+    if(welcome)
+    {
+        m_context->prefs->SetPrefBoolean(kWelcomePref, false);
+        StartStopMusicSearch(true); 
+    }
+    else
+    {
+        iRet = MessageBox(m_hWnd, "Your music database does not contain any items.\r\n"
+                                  "Would you like to start a search to find music\r\n"
+                                  "and playlists on your machine?",
+                                  "Search For Music", MB_YESNO|MB_SETFOREGROUND);
+        if (iRet == IDYES)
+            StartStopMusicSearch();   
+    }
 }
 
 void MusicBrowserUI::EditPlaylistEvent(void)
