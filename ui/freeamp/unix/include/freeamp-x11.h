@@ -20,17 +20,40 @@
 	
 	$Id$
 ____________________________________________________________________________*/
-// CommandLineCIO.h
+// FreeAmpUI.h
 
 
-#ifndef _COMMANDLINECIO_H_
-#define _COMMANDLINECIO_H_
+#ifndef _FreeAmpUI_H_
+#define _FreeAmpUI_H_
+
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/Xos.h>
+#include <X11/Xatom.h>
+
+#include <X11/xpm.h>
+
+#include <X11/extensions/shape.h>
 
 #include "ui.h"
 #include "event.h"
 #include "thread.h"
 #include "playlist.h"
 
+enum {
+    kPlayButton = 0,
+    kUpperBound
+
+};
+enum {
+    kPressed = 0,
+    kLit,
+    kNotLit
+};
+class ButtonState {
+ public:
+    int32 m_state;
+};
 class FreeAmpUI : public UserInterface {
  public:
     FreeAmpUI();
@@ -44,6 +67,16 @@ class FreeAmpUI : public UserInterface {
 
     EventQueue *m_playerEQ;
  private:
+    ButtonState *m_buttonStates;
+    Display *m_display;
+    int32 m_screenNum;
+    Pixmap m_doubleBufferPixmap;
+    Window m_mainWindow;
+    Pixmap m_iconPixmap;
+    GC m_gc;
+    void draw_graphics(Window win, GC gc);
+    void X11EventService();
+
     int32 m_argc;
     char **m_argv;
     void processSwitch(char *);
@@ -52,4 +85,6 @@ class FreeAmpUI : public UserInterface {
 };
 
 
-#endif // _COMMANDLINECIO_H_
+#endif // _FreeAmpUI_H_
+
+

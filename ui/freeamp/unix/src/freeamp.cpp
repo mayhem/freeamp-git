@@ -18,10 +18,8 @@
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 	
-	$$
+	$Id$
 ____________________________________________________________________________*/
-
-extern "C" {
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -34,20 +32,11 @@ extern "C" {
 
 
 #include <stdio.h>
-	   }
 
 #include "config.h"
 #include "event.h"
-
 #include "freeamp-x11.h"
 
-#define BITMAPDEPTH 1
-#define TOO_SMALL 0
-#define BIG_ENOUGH 1
-
-Display *display;
-int screen_num;
-Pixmap double_buffer_pixmap;
 
 #include "logo.xpm"
 #include "logo256.xpm"
@@ -106,9 +95,6 @@ Pixmap major_button_mask_pixmap;
 #include "minor_button_mask.xbm"
 Pixmap minor_button_mask_pixmap;
 
-static char *progname; /* name this program was invoked by */
-
-void draw_graphics(Window win, GC gc, uint32 window_width, uint32 window_height);
 
 void FreeAmpUI::SetArgs(int argc, char **argv) {
     m_argc = argc;
@@ -122,8 +108,18 @@ UserInterface *Initialize() {
 
 	   }
 
-FreeAmpUI::FreeAmpUI() {}
-FreeAmpUI::~FreeAmpUI() {}
+FreeAmpUI::FreeAmpUI() {
+    m_buttonStates = new ButtonState[kUpperBound];
+    for (int i=0;i<kUpperBound;i++) {
+	m_buttonStates[i].m_state = kNotLit;
+    }
+}
+FreeAmpUI::~FreeAmpUI() {
+    if (m_buttonStates) {
+	delete m_buttonStates;
+	m_buttonStates = NULL;
+    }
+}
 int32 FreeAmpUI::AcceptEvent(Event *e) {
     switch (e->Type()) {
 	case CMD_Cleanup:
@@ -138,111 +134,80 @@ void FreeAmpUI::SetPlayListManager(PlayListManager *plm) {
     m_plm = plm;
 }
 
-int foo,bar,baz,biz;
-Window win;
-unsigned int width, height;	/* window size */
-int x, y; 	/* window position */
-unsigned int display_width, display_height;
-unsigned int icon_width, icon_height;
-char *window_name = "FreeAmp v1.0.0";
-char *icon_name = "FreeAmp";
-Pixmap icon_pixmap;
-GC gc;
-int count;
-XSizeHints *size_hints;
-XIconSize *size_list;
-XWMHints *wm_hints;
-XClassHint *class_hints;
-XTextProperty windowName, iconName;
-char *display_name = (char *)NULL;
-int window_size = BIG_ENOUGH;	/* or TOO_SMALL to display contents */
-int32 display_depth;
-
 void FreeAmpUI::Init()
 {
+    XSizeHints *size_hints;
+    XIconSize *size_list;
+    XWMHints *wm_hints;
+    XClassHint *class_hints;
+    int32 display_depth;
 
     if (!(size_hints = XAllocSizeHints())) {
-	fprintf(stderr, "%s: failure allocating memory\n", progname);
-        exit(0);
+	fprintf(stderr, "%s: failure allocating memory\n", m_argv[0]);
     }
     if (!(wm_hints = XAllocWMHints())) {
-	fprintf(stderr, "%s: failure allocating memory\n", progname);
-        exit(0);
+	fprintf(stderr, "%s: failure allocating memory\n", m_argv[0]);
     }
     if (!(class_hints = XAllocClassHint())) {
-	fprintf(stderr, "%s: failure allocating memory\n", progname);
-        exit(0);
+	fprintf(stderr, "%s: failure allocating memory\n", m_argv[0]);
     }
     
-    progname = m_argv[0];
-    
     /* connect to X server */
-    if ( (display=XOpenDisplay(display_name)) == NULL )
+    if ( (m_display=XOpenDisplay(NULL/*display_name*/)) == NULL )
     {
 	(void) fprintf( stderr, "%s: cannot connect to X server %s\n", 
-			progname, XDisplayName(display_name));
+			m_argv[0], XDisplayName(NULL/*display_name*/));
 	exit( -1 );
     }
     
-
-    if (!XShapeQueryExtension(display,&foo,&bar)) {
-	fprintf( stderr, "%s: No Shape Extension on server %s\n",progname, XDisplayName(display_name));
+    int foo,bar;
+    if (!XShapeQueryExtension(m_display,&foo,&bar)) {
+	fprintf( stderr, "%s: No Shape Extension on server %s\n",m_argv[0], XDisplayName(NULL/*display_name*/));
     }
 
     /* get screen size from display structure macro */
-    screen_num = DefaultScreen(display);
-    display_width = DisplayWidth(display, screen_num);
-    display_height = DisplayHeight(display, screen_num);
-    display_depth = DefaultDepth(display,screen_num);
+    m_screenNum = DefaultScreen(m_display);
+    display_depth = DefaultDepth(m_display,m_screenNum);
     cerr << endl<<endl<<"Screen Depth: " << display_depth << endl;
     
-    win = XCreateSimpleWindow(display, RootWindow(display,screen_num), 
+    m_mainWindow = XCreateSimpleWindow(m_display, RootWindow(m_display,m_screenNum), 
 			      0, 0, TOTAL_WIDTH, TOTAL_HEIGHT, 0,
-			      BlackPixel(display,screen_num), WhitePixel(display,screen_num));
+			      BlackPixel(m_display,m_screenNum), WhitePixel(m_display,m_screenNum));
 
-    play_button_window = XCreateSimpleWindow(display,win,PLAY_BUTTON_X,PLAY_BUTTON_Y,
-					     PLAY_BUTTON_WIDTH,PLAY_BUTTON_HEIGHT,0,BlackPixel(display,screen_num),
-					     WhitePixel(display,screen_num));
+    play_button_window = XCreateSimpleWindow(m_display,m_mainWindow,PLAY_BUTTON_X,PLAY_BUTTON_Y,
+					     PLAY_BUTTON_WIDTH,PLAY_BUTTON_HEIGHT,0,BlackPixel(m_display,m_screenNum),
+					     WhitePixel(m_display,m_screenNum));
 
-    double_buffer_pixmap = XCreatePixmap(display,win,TOTAL_WIDTH,TOTAL_HEIGHT,display_depth);
+    m_doubleBufferPixmap = XCreatePixmap(m_display,m_mainWindow,TOTAL_WIDTH,TOTAL_HEIGHT,display_depth);
 
-    /* Get available icon sizes from Window manager */
-    
-//    if (XGetIconSizes(display, RootWindow(display,screen_num), 
-//		      &size_list, &count) == 0) {
-//	;
-//    } else {
-//	;
-//    }
-    
     switch (display_depth) {
 	case 16:
-	    XpmCreatePixmapFromData(display,win,logo,&icon_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(display,win,leftside,&left_side_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(display,win,dials,&dials_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(display,win,lcd,&lcd_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow,logo,&m_iconPixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow,leftside,&left_side_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow,dials,&dials_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow,lcd,&lcd_pixmap,NULL,NULL);
 	    
-	    player_full_mask_pixmap =XCreateBitmapFromData(display,win,(char *)player_full_mask_bits,PLAYER_FULL_MASK_WIDTH,PLAYER_FULL_MASK_HEIGHT);
+	    player_full_mask_pixmap =XCreateBitmapFromData(m_display,m_mainWindow,(char *)player_full_mask_bits,PLAYER_FULL_MASK_WIDTH,PLAYER_FULL_MASK_HEIGHT);
 
-	    XpmCreatePixmapFromData(display,win,rightside,&right_side_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow,rightside,&right_side_pixmap,NULL,NULL);
 
-	    major_button_mask_pixmap = XCreateBitmapFromData(display,win,(char *)major_button_mask_bits,MAJOR_BUTTON_MASK_WIDTH,MAJOR_BUTTON_MASK_HEIGHT);
-	    minor_button_mask_pixmap = XCreateBitmapFromData(display,win,(char *)minor_button_mask_bits,MINOR_BUTTON_MASK_WIDTH,MINOR_BUTTON_MASK_HEIGHT);
-	    XpmCreatePixmapFromData(display,win,play_buttons,&play_buttons_pixmap,NULL,NULL);
+	    major_button_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow,(char *)major_button_mask_bits,MAJOR_BUTTON_MASK_WIDTH,MAJOR_BUTTON_MASK_HEIGHT);
+	    minor_button_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow,(char *)minor_button_mask_bits,MINOR_BUTTON_MASK_WIDTH,MINOR_BUTTON_MASK_HEIGHT);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow,play_buttons,&play_buttons_pixmap,NULL,NULL);
 	    break;
 	case 8:
-	    XpmCreatePixmapFromData(display,win,logo256,&icon_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(display,win,leftside256,&left_side_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(display,win,dials256,&dials_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(display,win,lcd256,&lcd_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow,logo256,&m_iconPixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow,leftside256,&left_side_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow,dials256,&dials_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow,lcd256,&lcd_pixmap,NULL,NULL);
 	    
-	    player_full_mask_pixmap =XCreateBitmapFromData(display,win,(char *)player_full_mask_bits,PLAYER_FULL_MASK_WIDTH,PLAYER_FULL_MASK_HEIGHT);
+	    player_full_mask_pixmap =XCreateBitmapFromData(m_display,m_mainWindow,(char *)player_full_mask_bits,PLAYER_FULL_MASK_WIDTH,PLAYER_FULL_MASK_HEIGHT);
 
-	    XpmCreatePixmapFromData(display,win,rightside256,&right_side_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow,rightside256,&right_side_pixmap,NULL,NULL);
 
-	    major_button_mask_pixmap = XCreateBitmapFromData(display,win,(char *)major_button_mask_bits,MAJOR_BUTTON_MASK_WIDTH,MAJOR_BUTTON_MASK_HEIGHT);
-	    minor_button_mask_pixmap = XCreateBitmapFromData(display,win,(char *)minor_button_mask_bits,MINOR_BUTTON_MASK_WIDTH,MINOR_BUTTON_MASK_HEIGHT);
-	    XpmCreatePixmapFromData(display,win,play_buttons256,&play_buttons_pixmap,NULL,NULL);
+	    major_button_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow,(char *)major_button_mask_bits,MAJOR_BUTTON_MASK_WIDTH,MAJOR_BUTTON_MASK_HEIGHT);
+	    minor_button_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow,(char *)minor_button_mask_bits,MINOR_BUTTON_MASK_WIDTH,MINOR_BUTTON_MASK_HEIGHT);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow,play_buttons256,&play_buttons_pixmap,NULL,NULL);
 	    break;
 	default:
 	    cerr << "Only know how to deal with bit depths of 8 or 16 (256 or 65535 colors)!!!" << endl;
@@ -250,41 +215,46 @@ void FreeAmpUI::Init()
     }
 
     size_hints->flags = PPosition | PSize | PMinSize;
-    size_hints->min_width = width;
-    size_hints->min_height = height;
+    size_hints->min_width = TOTAL_WIDTH;
+    size_hints->min_height = TOTAL_HEIGHT;
     
     /* These calls store window_name and icon_name into
      * XTextProperty structures and set their other 
      * fields properly. */
+
+    char *window_name = "FreeAmp v1.0.0";
+    char *icon_name = "FreeAmp";
+    XTextProperty windowName, iconName;
+
     if (XStringListToTextProperty(&window_name, 1, &windowName) == 0) {
 	(void) fprintf( stderr, "%s: structure allocation for windowName failed.\n", 
-			progname);
+			m_argv[0]);
 	exit(-1);
     }
     
     if (XStringListToTextProperty(&icon_name, 1, &iconName) == 0) {
 	(void) fprintf( stderr, "%s: structure allocation for iconName failed.\n", 
-			progname);
+			m_argv[0]);
 	exit(-1);
     }
     
     wm_hints->initial_state = NormalState;
     wm_hints->input = True;
-    wm_hints->icon_pixmap = icon_pixmap;
+    wm_hints->icon_pixmap = m_iconPixmap;
     wm_hints->flags = StateHint | IconPixmapHint | InputHint;
     
-    class_hints->res_name = progname;
+    class_hints->res_name = m_argv[0];
     class_hints->res_class = "Basicwin";
     
-    XSetWMProperties(display, win, &windowName, &iconName, 
+    XSetWMProperties(m_display, m_mainWindow, &windowName, &iconName, 
 		     m_argv, m_argc, size_hints, wm_hints, 
 		     class_hints);
     
     /* Select event types wanted */
-    XSelectInput(display, win, ExposureMask | KeyPressMask | ButtonReleaseMask | KeyReleaseMask | PointerMotionMask |
+    XSelectInput(m_display, m_mainWindow, ExposureMask | KeyPressMask | ButtonReleaseMask | KeyReleaseMask | PointerMotionMask |
 		 ButtonPressMask | StructureNotifyMask | EnterWindowMask | LeaveWindowMask | SubstructureNotifyMask);
     
-    XSelectInput(display, play_button_window, ExposureMask | ButtonReleaseMask |
+    XSelectInput(m_display, play_button_window, ExposureMask | ButtonReleaseMask |
 		 ButtonPressMask | StructureNotifyMask | EnterWindowMask | LeaveWindowMask | SubstructureNotifyMask);
     
     
@@ -292,16 +262,16 @@ void FreeAmpUI::Init()
     {
 	XGCValues values;
 	int valuemask = 0;
-	gc = XCreateGC(display, win, valuemask, &values);
+	m_gc = XCreateGC(m_display, m_mainWindow, valuemask, &values);
 
     }
 
     // set up shape
-    XSetForeground(display,gc,BlackPixel(display,screen_num));
-    XFillRectangle(display,win,gc,0,0,TOTAL_WIDTH,TOTAL_HEIGHT);
-    XShapeCombineMask(display,win,ShapeBounding,0,0,player_full_mask_pixmap,ShapeSet);
+    XSetForeground(m_display,m_gc,BlackPixel(m_display,m_screenNum));
+    XFillRectangle(m_display,m_mainWindow,m_gc,0,0,TOTAL_WIDTH,TOTAL_HEIGHT);
+    XShapeCombineMask(m_display,m_mainWindow,ShapeBounding,0,0,player_full_mask_pixmap,ShapeSet);
 
-    XShapeCombineMask(display,play_button_window,ShapeBounding,0,0,major_button_mask_pixmap,ShapeSet);
+    XShapeCombineMask(m_display,play_button_window,ShapeBounding,0,0,major_button_mask_pixmap,ShapeSet);
 
     gtkListenThread = Thread::CreateThread();
     gtkListenThread->Create(FreeAmpUI::x11ServiceFunction,this);
@@ -310,84 +280,88 @@ void FreeAmpUI::Init()
 }
 
 void FreeAmpUI::x11ServiceFunction(void *p) {
+    ((FreeAmpUI *)p)->X11EventService();
+}
+
+void FreeAmpUI::X11EventService() {
     int32 button_click_spot_x = 0;
     int32 button_click_spot_y = 0;
     XEvent report;
-    FreeAmpUI *pMe = (FreeAmpUI*)p;
 
     /* Display window */
-    XMapWindow(display, win);
-    XMapWindow(display,play_button_window);
+    XMapWindow(m_display, m_mainWindow);
+    XMapWindow(m_display,play_button_window);
     
-    fprintf(stderr,"Main window ID: %x\n",win);
+    fprintf(stderr,"Main window ID: %x\n",m_mainWindow);
     fprintf(stderr,"Play Button ID: %x\n",play_button_window);
 
     /* get events, use first to display text and graphics */
     while (1)  {
-	XNextEvent(display, &report);
+	XNextEvent(m_display, &report);
 
 	//fprintf(stderr, "window ID: %x\n", report.xany.window);
 	switch  (report.type) {
 	    case MotionNotify:
-		//fprintf(stderr, "%s: motion: %d  %d\n",progname, report.xmotion.x_root,report.xmotion.y_root);
+		//fprintf(stderr, "%s: motion: %d  %d\n",m_argv[0], report.xmotion.x_root,report.xmotion.y_root);
 		if (report.xmotion.state & Button1Mask) {
-		    //fprintf(stderr, "%s: trying %d  %d\n",progname,report.xmotion.x_root-report.xmotion.x,report.xmotion.y_root-report.xmotion.y);
-		    //fprintf(stderr, "%s: from   %d  %d  and %d  %d\n",progname,report.xmotion.x_root,report.xmotion.y_root,report.xmotion.x,report.xmotion.y);
+		    //fprintf(stderr, "%s: trying %d  %d\n",m_argv[0],report.xmotion.x_root-report.xmotion.x,report.xmotion.y_root-report.xmotion.y);
+		    //fprintf(stderr, "%s: from   %d  %d  and %d  %d\n",m_argv[0],report.xmotion.x_root,report.xmotion.y_root,report.xmotion.x,report.xmotion.y);
 		    //XMoveWindow(display,win,report.xmotion.x_root-report.xmotion.x,report.xmotion.y_root-report.xmotion.y);
-		    XMoveWindow(display,win,report.xmotion.x_root-button_click_spot_x,report.xmotion.y_root-button_click_spot_y);
-//		    XMoveWindow(display,win,report.xmotion.x_root,report.xmotion.y_root);
+		    XMoveWindow(m_display,m_mainWindow,report.xmotion.x_root-button_click_spot_x,report.xmotion.y_root-button_click_spot_y);
+//		    XMoveWindow(m_display,m_mainWindow,report.xmotion.x_root,report.xmotion.y_root);
 		}
 		break;
 	    case Expose:
-		//fprintf(stderr, "%s: expose\n",progname);
+		//fprintf(stderr, "%s: expose\n",m_argv[0]);
 		/* unless this is the last contiguous expose,
 		 * don't draw the window */
 		if (report.xexpose.count != 0)
 		    break;
 				/* place graphics in window, */
-		draw_graphics(report.xexpose.window, gc, width, height);
+		draw_graphics(report.xexpose.window, m_gc);
 		break;
 	    case ConfigureNotify:
 		/* window has been resized, change width and
 		 * height to send to draw_text and draw_graphics
 		 * in next Expose */
-		//fprintf(stderr,"%s: ConfigureNotify %d %d\n",progname,report.xconfigure.x,report.xconfigure.y);
-		width = report.xconfigure.width;
-		height = report.xconfigure.height;
-		if ((width < size_hints->min_width) || 
-		    (height < size_hints->min_height))
-		    window_size = TOO_SMALL;
-		else
-		    window_size = BIG_ENOUGH;
+		//fprintf(stderr,"%s: ConfigureNotify %d %d\n",m_argv[0],report.xconfigure.x,report.xconfigure.y);
 		break;
 	    case ButtonPress:
-		//fprintf(stderr, "%s: button press\n",progname);
+		//fprintf(stderr, "%s: button press\n",m_argv[0]);
 		button_click_spot_x = report.xbutton.x;
 		button_click_spot_y = report.xbutton.y;
 		if (report.xbutton.window == play_button_window) {
-		    XCopyArea(display,play_buttons_pixmap,play_button_window,gc,0,2*PLAY_BUTTON_HEIGHT,PLAY_BUTTON_WIDTH,PLAY_BUTTON_HEIGHT,0,0);
+		    m_buttonStates[kPlayButton].m_state = kPressed;
+		    draw_graphics(report.xany.window,m_gc);
 		}
 		break;
 	    case ButtonRelease:
-		//fprintf(stderr, "%s: button release\n",progname);
+		//fprintf(stderr, "%s: button release\n",m_argv[0]);
 		if (report.xbutton.window == play_button_window) {
-		    XCopyArea(display,play_buttons_pixmap,play_button_window,gc,0,0,PLAY_BUTTON_WIDTH,PLAY_BUTTON_HEIGHT,0,0);
-		    pMe->m_plm->RemoveAll();
-		    pMe->m_plm->Add("/home/jdw/mp3s/old/incomplete-Aqua - Happy Boys and Girls.mp3",0);
-		    pMe->m_plm->SetFirst();
-		    pMe->m_playerEQ->AcceptEvent(new Event(CMD_Play));
+		    m_buttonStates[kPlayButton].m_state = kLit;
+		    m_plm->RemoveAll();
+		    m_plm->Add("/home/jdw/mp3s/old/incomplete-Aqua - Happy Boys and Girls.mp3",0);
+		    m_plm->SetFirst();
+		    m_playerEQ->AcceptEvent(new Event(CMD_Play));
+		    draw_graphics(report.xany.window,m_gc);
 		}
 		break;
 	    case EnterNotify:
-		//fprintf(stderr, "%s: entered window\n",progname);
+		//fprintf(stderr, "%s: entered window\n",m_argv[0]);
 		if (report.xcrossing.window == play_button_window) {
-		    XCopyArea(display,play_buttons_pixmap,play_button_window,gc,0,PLAY_BUTTON_HEIGHT,PLAY_BUTTON_WIDTH,PLAY_BUTTON_HEIGHT,0,0);
+		    if (m_buttonStates[kPlayButton].m_state != kLit) {
+			m_buttonStates[kPlayButton].m_state = kPressed;
+			draw_graphics(report.xany.window,m_gc);
+		    }
 		}
 		break;
 	    case LeaveNotify:
-		//fprintf(stderr,"%s: left window\n",progname);
+		//fprintf(stderr,"%s: left window\n",m_argv[0]);
 		if (report.xcrossing.window == play_button_window) {
-		    XCopyArea(display,play_buttons_pixmap,play_button_window,gc,0,0,PLAY_BUTTON_WIDTH,PLAY_BUTTON_HEIGHT,0,0);
+		    if (m_buttonStates[kPlayButton].m_state != kLit) {
+			m_buttonStates[kPlayButton].m_state = kNotLit;
+			draw_graphics(report.xany.window,m_gc);
+		    }
 		}
 		break;
 	    case KeyPress: {
@@ -395,21 +369,21 @@ void FreeAmpUI::x11ServiceFunction(void *p) {
 	    }
 	    case KeyRelease: {
 		char foo[32];
-		fprintf(stderr,"%s: key released\n",progname);
+		fprintf(stderr,"%s: key released\n",m_argv[0]);
 		XLookupString((XKeyEvent *)&report,foo,sizeof(foo),NULL,NULL);
-		//fprintf(stderr, "%s: keypress %s\n",progname,foo);
+		//fprintf(stderr, "%s: keypress %s\n",m_argv[0],foo);
 		if (foo[0] == 'q') {
-		    pMe->m_playerEQ->AcceptEvent(new Event(CMD_QuitPlayer));
-		    XFreeGC(display, gc);
-		    XCloseDisplay(display);
+		    m_playerEQ->AcceptEvent(new Event(CMD_QuitPlayer));
+		    XFreeGC(m_display, m_gc);
+		    XCloseDisplay(m_display);
 		    return;
 		}
 		break; }
 	    case DestroyNotify:
-		fprintf(stderr, "%s: destroy notify\n",progname);
-		pMe->m_playerEQ->AcceptEvent(new Event(CMD_QuitPlayer));
-		XFreeGC(display, gc);
-		XCloseDisplay(display);
+		fprintf(stderr, "%s: destroy notify\n",m_argv[0]);
+		m_playerEQ->AcceptEvent(new Event(CMD_QuitPlayer));
+		XFreeGC(m_display, m_gc);
+		XCloseDisplay(m_display);
 		return;
 	    default:
 		/* all events selected by StructureNotifyMask
@@ -418,26 +392,36 @@ void FreeAmpUI::x11ServiceFunction(void *p) {
 		break;
 	} /* end switch */
     } /* end while */
-    fprintf(stderr, "%s: done!\n",progname);
+    fprintf(stderr, "%s: done!\n",m_argv[0]);
 }
 
-void draw_graphics(Window win, GC gc, uint32 window_width, uint32 window_height)
+void FreeAmpUI::draw_graphics(Window win, GC gc)
 {
     int x = 0;
-    if (win == ::win) {
-	XCopyArea(display,left_side_pixmap,double_buffer_pixmap,gc,0,0,LEFT_SIDE_WIDTH,LEFT_SIDE_HEIGHT,x,0);
+    if (win == m_mainWindow) {
+	XCopyArea(m_display,left_side_pixmap,m_doubleBufferPixmap,gc,0,0,LEFT_SIDE_WIDTH,LEFT_SIDE_HEIGHT,x,0);
 	x+=LEFT_SIDE_WIDTH;
-	XCopyArea(display,dials_pixmap,double_buffer_pixmap,gc,0,0,SINGLE_DIAL_WIDTH,DIALS_HEIGHT,x,0);
+	XCopyArea(m_display,dials_pixmap,m_doubleBufferPixmap,gc,0,0,SINGLE_DIAL_WIDTH,DIALS_HEIGHT,x,0);
 	x+=SINGLE_DIAL_WIDTH;
-	XCopyArea(display,lcd_pixmap,double_buffer_pixmap,gc,0,0,LCD_WIDTH,LCD_HEIGHT,x,0);
+	XCopyArea(m_display,lcd_pixmap,m_doubleBufferPixmap,gc,0,0,LCD_WIDTH,LCD_HEIGHT,x,0);
 	x+=LCD_WIDTH;
-	XCopyArea(display,dials_pixmap,double_buffer_pixmap,gc,0,0,SINGLE_DIAL_WIDTH,DIALS_HEIGHT,x,0);
+	XCopyArea(m_display,dials_pixmap,m_doubleBufferPixmap,gc,0,0,SINGLE_DIAL_WIDTH,DIALS_HEIGHT,x,0);
 	x+=SINGLE_DIAL_WIDTH;
-	XCopyArea(display,right_side_pixmap,double_buffer_pixmap,gc,0,0,RIGHT_SIDE_WIDTH,RIGHT_SIDE_HEIGHT,x,0);
+	XCopyArea(m_display,right_side_pixmap,m_doubleBufferPixmap,gc,0,0,RIGHT_SIDE_WIDTH,RIGHT_SIDE_HEIGHT,x,0);
 	x+=RIGHT_SIDE_WIDTH;
-	XCopyArea(display,double_buffer_pixmap,win,gc,0,0,TOTAL_WIDTH,TOTAL_HEIGHT,0,0);
+	XCopyArea(m_display,m_doubleBufferPixmap,win,gc,0,0,TOTAL_WIDTH,TOTAL_HEIGHT,0,0);
     } else if (win == play_button_window) {
-	XCopyArea(display,play_buttons_pixmap,play_button_window,gc,0,0,PLAY_BUTTON_WIDTH,PLAY_BUTTON_HEIGHT,0,0);
+	switch (m_buttonStates[kPlayButton].m_state) {
+	    case kPressed: 
+		XCopyArea(m_display,play_buttons_pixmap,play_button_window,gc,0,PLAY_BUTTON_HEIGHT,PLAY_BUTTON_WIDTH,PLAY_BUTTON_HEIGHT,0,0);
+		break;
+	    case kLit:
+		XCopyArea(m_display,play_buttons_pixmap,play_button_window,gc,0,2*PLAY_BUTTON_HEIGHT,PLAY_BUTTON_WIDTH,PLAY_BUTTON_HEIGHT,0,0);
+		break;
+	    case kNotLit:
+		XCopyArea(m_display,play_buttons_pixmap,play_button_window,gc,0,0,PLAY_BUTTON_WIDTH,PLAY_BUTTON_HEIGHT,0,0);
+		break;
+	}
     }
 }
 
