@@ -163,10 +163,9 @@ BEGIN
     LTEXT           " ",IDC_STATIC,9,84,8,8
     CONTROL         "Enable Logging",IDC_LOG,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,11,83,63,10
-    LTEXT           "If you are experiencing a problem with FreeAmp it is possible to log what the program is doing in order to help us track down the cause. When you enable logging a file is created in the program's install directory ",
-                    IDC_STATIC,3,3,227,24
-    LTEXT           "called freeamp.log. You should send us the log file when you report a bug.",
-                    IDC_STATIC,3,27,227,17
+    CONTROL         "Log general player errors (e.g. Loading plugins)",
+                    IDC_LOGMAIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,98,
+                    163,10
     CONTROL         "Log input from PMIs (e.g. File, HTTP, ShoutCAST)",
                     IDC_LOGINPUT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,
                     112,174,10
@@ -175,54 +174,15 @@ BEGIN
                     126,169,10
     CONTROL         "Log decoding process (e.g. MP3, CDDA)",IDC_LOGDECODER,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,140,145,10
-    LTEXT           "You have the ability to narrow the logging to a particular portion of FreeAmp by selecting the various logging options. If you are not sure in which portion of the program the problem is occuring you can simply enable all the logging options.",
-                    IDC_STATIC,3,46,227,32
     CONTROL         "Log performance issues (e.g. Timings, Buffer Under/Overflows)",
                     IDC_LOGPERFORMANCE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     13,154,213,10
-    CONTROL         "Log general player errors (e.g. Loading plugins)",
-                    IDC_LOGMAIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,98,
-                    163,10
-END
-
-IDD_PREF1 DIALOG DISCARDABLE  0, 0, 233, 174
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "General"
-FONT 8, "MS Sans Serif"
-BEGIN
-    COMBOBOX        IDC_UI,81,13,125,50,CBS_DROPDOWNLIST | CBS_SORT | 
-                    WS_VSCROLL | WS_TABSTOP
-    LTEXT           "User Interface:",IDC_STATIC,27,15,48,8
-    COMBOBOX        IDC_PMO,81,31,125,54,CBS_DROPDOWNLIST | CBS_SORT | 
-                    WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Output:",IDC_STATIC,50,32,25,8
-    GROUPBOX        "Plug-Ins",IDC_STATIC,3,2,227,48
-    GROUPBOX        "Decoder Priority",IDC_STATIC,3,54,227,52
-    CONTROL         "Slider1",IDC_PRIORITY,"msctls_trackbar32",TBS_AUTOTICKS | 
-                    WS_TABSTOP,9,66,214,15
-    GROUPBOX        "Buffer Sizes",IDC_STATIC,3,110,136,60
-    EDITTEXT        IDC_INPUT,73,122,25,12,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "Input Buffer Size:",IDC_STATIC,13,124,57,8
-    EDITTEXT        IDC_OUTPUT,73,138,25,12,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "Output Buffer Size:",IDC_STATIC,8,140,60,8
-    LTEXT           "Kilobytes",IDC_STATIC,103,124,29,8
-    LTEXT           "Kilobytes",IDC_STATIC,103,140,29,8
-    LTEXT           "Low",IDC_STATIC,41,84,14,8
-    LTEXT           "Normal",IDC_STATIC,104,84,23,8
-    LTEXT           "High",IDC_STATIC,175,84,16,8
-    LTEXT           "Realtime",IDC_STATIC,199,84,28,8
-    CONTROL         "Manifest in Tray instead of Taskbar",IDC_TRAY,"Button",
-                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,153,145,75,
-                    17
-    CONTROL         "Stay on top",IDC_STAYONTOP,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,153,126,52,10
-    GROUPBOX        "Misc",IDC_STATIC,145,110,85,60
-    LTEXT           "Idle",IDC_STATIC,10,84,12,8
-    CTEXT           "Below Normal",IDC_STATIC,69,84,29,15
-    CTEXT           "Above Normal",IDC_STATIC,135,84,27,16
-    EDITTEXT        IDC_PREBUFFER,73,154,25,12,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "Prebuffer Streams:",IDC_STATIC,9,156,59,8
-    LTEXT           "Seconds",IDC_STATIC,103,156,29,8
+    LTEXT           "If you are experiencing a problem with FreeAmp it is possible to log what the program is doing in order to help us track down the cause. When you enable logging a file is created in the program's install directory ",
+                    IDC_STATIC,3,3,227,24
+    LTEXT           "called freeamp.log. You should send us the log file when you report a bug.",
+                    IDC_STATIC,3,27,227,17
+    LTEXT           "You have the ability to narrow the logging to a particular portion of FreeAmp by selecting the various logging options. If you are not sure in which portion of the program the problem is occuring you can simply enable all the logging options.",
+                    IDC_STATIC,3,46,227,32
 END
 
 IDD_PREF2 DIALOG DISCARDABLE  0, 0, 233, 174
@@ -265,6 +225,46 @@ BEGIN
     GROUPBOX        "Buffer Sizes",IDC_STATIC,3,3,227,30
 END
 
+IDD_PREF1 DIALOG DISCARDABLE  0, 0, 233, 174
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "General"
+FONT 8, "MS Sans Serif"
+BEGIN
+    COMBOBOX        IDC_UI,81,13,125,50,CBS_DROPDOWNLIST | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_PMO,81,31,125,54,CBS_DROPDOWNLIST | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Slider1",IDC_PRIORITY,"msctls_trackbar32",TBS_AUTOTICKS | 
+                    WS_TABSTOP,9,66,214,15
+    EDITTEXT        IDC_INPUT,73,122,25,12,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_OUTPUT,73,138,25,12,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        1026,73,154,25,12,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Stay on top",IDC_STAYONTOP,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,153,126,52,10
+    CONTROL         "Manifest in Tray instead of Taskbar",IDC_TRAY,"Button",
+                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,153,145,75,
+                    17
+    LTEXT           "User Interface:",IDC_STATIC,27,15,48,8
+    LTEXT           "Output:",IDC_STATIC,50,32,25,8
+    GROUPBOX        "Plug-Ins",IDC_STATIC,3,2,227,48
+    GROUPBOX        "Decoder Priority",IDC_STATIC,3,54,227,52
+    GROUPBOX        "Buffer Sizes",IDC_STATIC,3,110,136,60
+    LTEXT           "Input Buffer Size:",IDC_STATIC,13,124,57,8
+    LTEXT           "Output Buffer Size:",IDC_STATIC,8,140,60,8
+    LTEXT           "Kilobytes",IDC_STATIC,103,124,29,8
+    LTEXT           "Kilobytes",IDC_STATIC,103,140,29,8
+    LTEXT           "Low",IDC_STATIC,41,84,14,8
+    LTEXT           "Normal",IDC_STATIC,104,84,23,8
+    LTEXT           "High",IDC_STATIC,175,84,16,8
+    LTEXT           "Realtime",IDC_STATIC,199,84,28,8
+    GROUPBOX        "Misc",IDC_STATIC,145,110,85,60
+    LTEXT           "Idle",IDC_STATIC,10,84,12,8
+    CTEXT           "Below Normal",IDC_STATIC,69,84,29,15
+    CTEXT           "Above Normal",IDC_STATIC,135,84,27,16
+    LTEXT           "Prebuffer Streams:",IDC_STATIC,9,156,59,8
+    LTEXT           "Seconds",IDC_STATIC,103,156,29,8
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -303,20 +303,20 @@ BEGIN
         BOTTOMMARGIN, 170
     END
 
-    IDD_PREF1, DIALOG
-    BEGIN
-        LEFTMARGIN, 3
-        RIGHTMARGIN, 230
-        TOPMARGIN, 3
-        BOTTOMMARGIN, 171
-    END
-
     IDD_PREF2, DIALOG
     BEGIN
         LEFTMARGIN, 3
         RIGHTMARGIN, 230
         TOPMARGIN, 3
         BOTTOMMARGIN, 169
+    END
+
+    IDD_PREF1, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 230
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 171
     END
 END
 #endif    // APSTUDIO_INVOKED
