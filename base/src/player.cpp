@@ -91,7 +91,7 @@ Player(FAContext *context) : EventQueue()
 
     char *m_faDir = FreeampDir(m_context->prefs);
 
-    m_APSInterface = new APSInterface(m_faDir); 
+    m_APSInterface = new APSInterface(m_faDir);
     m_context->aps = m_APSInterface;
 
     delete [] m_faDir;
