@@ -1,0 +1,13 @@
+#!/bin/sh
+
+echo "Removing emusic, freeamp, relatable rpms..."
+rpm -e freeamp emusic icast relatable
+echo "Removing binaries, libs, share..."
+rm -f /usr/bin/freeamp /usr/bin/emusic /usr/bin/relatable 
+rm -f /usr/local/bin/freeamp /usr/local/bin/emusic /usr/local/bin/relatable
+rm -rf /usr/lib/freeamp /usr/lib/emusic /usr/lib/relatable
+rm -rf /usr/local/lib/freeamp /usr/local/lib/emusic /usr/local/lib/relatable
+rm -rf /usr/share/freeamp /usr/share/emusic /usr/share/relatable
+rm -rf /usr/local/share/freeamp /usr/local/share/emusic /usr/local/share/relatable
+echo "Removing ~/.freeamp, ~/.emusic and ~/.relatable"
+rm -rf ~/.freeamp ~/.emusic ~/.relatable
