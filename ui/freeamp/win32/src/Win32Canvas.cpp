@@ -117,7 +117,7 @@ int Win32Canvas::RenderText(int iFontHeight, Rect &oClipRect,
 
    GetTextMetrics(hMemDC, &sTm);
    sClip.top -= sTm.tmInternalLeading;
-   sClip.bottom -= (sTm.tmInternalLeading - 2);
+   sClip.bottom -= sTm.tmExternalLeading - sTm.tmInternalLeading;
 
    SetBkMode(hMemDC, TRANSPARENT);
    SetTextColor(hMemDC, RGB(oColor.red, oColor.green, oColor.blue));
@@ -191,7 +191,7 @@ int Win32Canvas::RenderOffsetText(int iFontHeight, Rect &oClipRect,
 
    GetTextMetrics(hMemDC, &sTm);
    sClip.top -= sTm.tmInternalLeading;
-   sClip.bottom -= (sTm.tmInternalLeading - 2);
+   sClip.bottom -= sTm.tmExternalLeading - sTm.tmInternalLeading;
 
    // The size of this text is artificially inflated to insert some
    // spaces between occurances of this string. Otherwise, the end of
