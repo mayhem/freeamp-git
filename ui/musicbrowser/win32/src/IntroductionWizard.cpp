@@ -276,6 +276,7 @@ static int CALLBACK BrowseCallbackProc(HWND hwnd,
 //const char* kAllDrives = "All Drives";
 //const char* kAllFolders = "All Folders";
 
+
 static BOOL CALLBACK IntroWizardSearch( HWND hwnd,
                                         UINT msg, 
                                         WPARAM wParam, 
@@ -314,6 +315,7 @@ static BOOL CALLBACK IntroWizardSearch( HWND hwnd,
                }   
             }
 
+            ComboBox_AddString(hwndDrives, "Other...");
             Edit_SetText(hwndDirectory, "All Folders");
 
             PROPSHEETPAGE* psp = (PROPSHEETPAGE*)lParam;
@@ -440,8 +442,12 @@ static BOOL CALLBACK IntroWizardSearch( HWND hwnd,
 
                         if(!enable)
                             strcpy(temp, "All Folders");
+                        else 
+                        if (!strcmp(temp, "Other..."))
+                            strcpy(temp, "Select a location...");
                         else
                             sprintf(temp, "%s\\", temp);
+
                             
                         Edit_SetText(hwndDirectory, temp);
 
@@ -622,7 +628,17 @@ static BOOL CALLBACK IntroWizardSearch( HWND hwnd,
                                      temp,
                                      MAX_PATH);
 
-                        searchPaths->push_back(temp);
+                        if (strcmp(temp, "Select a location...")) 
+                        {
+                            searchPaths->push_back(temp);
+                        } 
+                        else 
+                        {
+                            MessageBox(hwnd, "You must select a directory to search.",
+                                       BRANDING, MB_OK);
+                            SetWindowLong(hwnd, DWL_MSGRESULT, IDD_INTROWIZARD_SEARCH);
+                            result = TRUE;
+                        }
                     }
                     break;
                 }

@@ -80,7 +80,7 @@ static int CALLBACK BrowseCallbackProc(HWND hwnd,
 
 const char* kAllDrives = "All Drives";
 const char* kAllFolders = "All Folders";
-const char* kOtherFolders = "Other...";
+const char* kOtherFolder = "Other...";
 const char* kSelectOtherText = "Select a location...";
 
 BOOL MusicBrowserUI::MusicSearchDlgProc(HWND hwnd, 
@@ -200,10 +200,8 @@ BOOL MusicBrowserUI::MusicSearchDlgProc(HWND hwnd,
                         }
                     }
 
-                    EndDialog(hwnd, TRUE);
                     if (endDialog) 
                         EndDialog(hwnd, TRUE);
-
 
                     break;
                 }
