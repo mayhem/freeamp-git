@@ -1394,8 +1394,13 @@ void FreeAmpTheme::InitControls(void)
        m_pWindow->ControlIntValue(string("Balance"), true, m_iBalance);
     }
     else 
+    {
+       int iTemp = 50;
+
+       m_pWindow->ControlIntValue(string("Balance"), true, iTemp);
        bSet = false;   
-       
+    }   
+
     m_pWindow->ControlEnable(string("Volume"), true, bSet);
     m_pWindow->ControlEnable(string("Balance"), true, bSet);
 
