@@ -46,6 +46,7 @@ namespace YP
     static const char GetStreams       = 'D';
     static const char DeleteProfile    = 'E';
     static const char SyncLog          = 'F'; 
+    static const char SoundsLike       = 'G';
     static const char StatusSuccess    = 'X';
     static const char StatusFailure    = 'Y';
     static const char Disconnect       = 'Z';
@@ -288,7 +289,8 @@ int YPClient::GetGUID(string& strGUID, int nSeed)
     return nRes;
 }
 
-int YPClient::GetStreams(StreamList& ResultList, string& strUID)
+int YPClient::GetStreams(StreamList& ResultList, string& strUID, string&
+strCollectionID)
 {
     AutoMutex AM(m_pMutex);
     int nConRes = this->Connect(m_strIP, m_nPort);
@@ -299,6 +301,8 @@ int YPClient::GetStreams(StreamList& ResultList, string& strUID)
     nBufLen = sizeof(char) + sizeof(int);
     nOffset = nBufLen;
     nBufLen += strUID.size() + sizeof(char);
+    nBufLen += strCollectionID.size() + sizeof(char);
+
 
     char* pBuffer = new char[nBufLen];
     memset(pBuffer, 0x00, nBufLen);
@@ -309,6 +313,11 @@ int YPClient::GetStreams(StreamList& ResultList, string& strUID)
 
     nTemp = strUID.size();
     memcpy(&pBuffer[nOffset], strUID.c_str(), nTemp);
+    nOffset += nTemp;
+    pBuffer[nOffset] = '\0';
+    nOffset += sizeof(char);
+    nTemp = strCollectionID.size();
+    memcpy(&pBuffer[nOffset], strCollectionID.c_str(), nTemp);
     nOffset += nTemp;
     pBuffer[nOffset] = '\0';
     nOffset += sizeof(char);
@@ -435,3 +444,67 @@ int YPClient::SyncLog(EventLog& TheLog, string& strUID)
     this->Disconnect();
     return nRes;
 }
+
+int YPClient::SoundsLike(APSPlaylist& ResultList, APSPlaylist& SeedList,
+string& strCollectionID)
+{
+        AutoMutex AM(m_pMutex);
+        int nConRes = this->Connect(m_strIP, m_nPort);
+        if (nConRes != 0) return -1;
+
+        int nBufLen, nOffset, nBytes, nTemp, nRes;
+        nBufLen = sizeof(char) + sizeof(int);
+        nOffset = nBufLen;
+        nBufLen += BufSize(SeedList);
+        nBufLen += strCollectionID.size() + sizeof(char);
+
+        char* pBuffer = new char[nBufLen];
+        memset(pBuffer, 0x00, nBufLen);
+        pBuffer[0] = YP::SoundsLike;
+        nBufLen -= nOffset;
+        memcpy(&pBuffer[1], &nBufLen, sizeof(int));
+        nBufLen += nOffset;
+
+        ToBuffer(SeedList, &pBuffer[nOffset], nTemp);
+        nOffset += nTemp;
+        nTemp = strCollectionID.size();
+        memcpy(&pBuffer[nOffset], strCollectionID.c_str(), nTemp);
+        nOffset += nTemp;
+        pBuffer[nOffset] = '\0';
+        nOffset += sizeof(char);
+
+        nBytes = 0;
+        nRes = m_pSocket->Write(pBuffer, nBufLen, &nBytes);
+        nBufLen = 0;
+
+        nRes = m_pSocket->NBRead(pBuffer, sizeof(char) + sizeof(int), &nBytes, YP::nTimeout);
+        if ((nRes != -1) && (nBytes == (sizeof(char) + sizeof(int))) && (pBuffer[0] == YP::StatusSuccess))
+        {
+                memcpy(&nBufLen, &pBuffer[sizeof(char)], sizeof(int));
+                if (nBufLen != 0)
+                {
+                        delete [] pBuffer;
+                        pBuffer = new char[nBufLen+1];
+                        pBuffer[nBufLen] = '\0';
+                        nOffset = 0;
+                        while ((nOffset < nBufLen) && (nRes != -1))
+                        {
+                                nRes = m_pSocket->Read(&pBuffer[nOffset], nBufLen - nOffset, &nBytes);
+                                nOffset += nBytes;
+                        }
+                        nBytes = nOffset;
+
+        FromBuffer(ResultList, &pBuffer[nOffset], nTemp);
+        nOffset += nTemp;
+                        nRes = 0;
+                }
+        }
+        else
+        {
+                nRes = -1;
+        }
+        if (pBuffer != NULL) delete [] pBuffer;
+        this->Disconnect();
+        return nRes;
+}
+
