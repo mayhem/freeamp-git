@@ -341,7 +341,7 @@ static void DrawPlayer(HDC hdc, ControlInfo* state)
                         BitBlt( bufferdc, 
                                 rect.left, 
                                 rect.top, 
-                                rect.right - rect.left, 
+                                11, 
                                 rect.bottom - rect.top, 
                                 memdc, 
                                 srcOffset,
