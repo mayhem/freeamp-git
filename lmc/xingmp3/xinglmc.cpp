@@ -40,9 +40,9 @@ ____________________________________________________________________________*/
 extern "C" {
 #include "mhead.h"
 #include "port.h"
-	   }
 
 int wait_n_times;
+	   }
 
 #define TEST_TIME 0
 
