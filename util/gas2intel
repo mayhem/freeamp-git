@@ -80,7 +80,7 @@ while (<>) {
 	$leader = "";
     }
 
-    if (!$header_done && $_ ne "") {
+    if (!$header_done && ($_ ne "" || $trailer =~ /^\s*;%% \w+/)) {
     	$leader = ".386\n" .
 		  ";FLAT\tgroup _TEXT\n" .
 		  ";\tassume cs:FLAT, ds:FLAT, ss:FLAT\n" .
