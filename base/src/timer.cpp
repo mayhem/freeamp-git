@@ -136,6 +136,9 @@ void TimerManager::ThreadFunction()
 
 	for(; i != m_list.end(); i++)
 	{
+                if (!(*i)->function)
+                    continue;
+
 		(*i)->ticks++;
 
 		if((*i)->duration && (*i)->ticks >= (*i)->duration)

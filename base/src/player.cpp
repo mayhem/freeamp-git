@@ -1104,6 +1104,9 @@ Error
 Player::
 AcceptEvent(Event * e)
 {
+   if (!m_eventQueue)
+       return kError_YouScrewedUp;
+
    m_eventQueue->Write(e);
    m_eventSem->Signal();
    return kError_NoErr;
@@ -2059,6 +2062,9 @@ void Player::CDTimer()
     Registry *pmoRegistry = m_context->player->GetPMORegistry();
     RegistryItem *pmo_item = NULL;
     int32 i = 0;
+
+    if (!pmoRegistry)
+        return;
 
     while(NULL != (pmo_item = pmoRegistry->GetItem(i++))) 
     {
