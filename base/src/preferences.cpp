@@ -67,7 +67,7 @@ const bool  kDefaultLogging = false;
 const bool  kDefaultSaveStreams = false;
 const char* kDefaultSaveStreamsDir = ".";
 const int32 kDefaultPreBuffer = 0;
-const char *kDefaultProxyHost = "proxy.yourdomain.com";
+const char *kDefaultProxyHost = "http://proxy.yourdomain.com:8080";
 const bool  kDefaultUseProxy = false;
 
 Error

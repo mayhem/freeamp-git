@@ -303,11 +303,14 @@ void SoundCardPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
    iTotalTime = (m_iTotalBytesWritten - iDataInBuffer) /
                 (m_iBytesPerSample * myInfo->samples_per_second);
 
+
+   iTotalTime %= 86400;
+
    hours = iTotalTime / 3600;
    minutes = (iTotalTime / 60) % 60;
    seconds = iTotalTime % 60;
 
-   if (hours < 0 || hours > 23 ||
+   if (hours < 0 ||
        minutes < 0 || minutes > 59 || 
        seconds < 0 || seconds > 59)
       return;

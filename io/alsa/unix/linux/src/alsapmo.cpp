@@ -317,11 +317,13 @@ void AlsaPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
              ((long long)ainfo.stime.tv_usec / 10000);
    iTotalTime = ((llEnd - llStart) / 100) + m_iBaseTime;
 
+   iTotalTime %= 86400;
+
    hours = iTotalTime / 3600;
    minutes = (iTotalTime / 60) % 60;
    seconds = iTotalTime % 60;
 
-   if (hours < 0 || hours > 23 ||
+   if (hours < 0  ||
        minutes < 0 || minutes > 59 || 
        seconds < 0 || seconds > 59)
       return;

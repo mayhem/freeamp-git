@@ -2,8 +2,16 @@
 #include <dirent.h>
 #include <string.h>
 #include <iostream.h>
+#include <stdio.h>
 
 #include "win32impl.h"
+
+const char *SpecialLibraries[] = 
+{
+    "alsa",
+    "esound",
+    "\0"
+};
 
 class FindData {
  public:
@@ -175,7 +183,34 @@ bool FindClose(HANDLE hFindFile) {
 
 HINSTANCE LoadLibrary(char *lpLibFileName) {
     HINSTANCE hInst = dlopen(lpLibFileName, RTLD_NOW);
-    if (!hInst) cout << dlerror() << endl;
+    if (!hInst) 
+    {
+        int i;
+        char *ptr;
+
+        ptr = strrchr(lpLibFileName, '/');
+        if (ptr == NULL)
+           ptr = lpLibFileName;
+        else
+           ptr++;
+
+        for(i = 0; SpecialLibraries[i][0]; i++)
+        {
+            if (strncmp(ptr, SpecialLibraries[i], 
+                        strlen(SpecialLibraries[i])) == 0)
+            {
+               printf("%s\n\nThis is *not* a fatal error. The plugin ", 
+                      dlerror());
+               printf("'%s' in FreeAmp's plugin \ndirectory could not ", ptr);
+               printf("be loaded. FreeAmp will use the default PMO.\n");
+               printf("To get rid of this warning either fix the problem, ");
+               printf("or delete the\n'%s' file from FreeAmp's plugin ", ptr);
+               printf("directory.\n");
+               return hInst;
+            }
+        }
+        cout << dlerror() << endl;
+    }
     return hInst;
 }
 

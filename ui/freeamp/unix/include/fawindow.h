@@ -151,6 +151,7 @@ class FALcdWindow : public FAWindow {
 
     bool BlitText(Drawable d, GC gc, int32 x, int32 y, const char *text, int32 font);
     void SetState(int32);
+    void UpdateTimeDisplay(int, int, int);
     void DrawIntroState(int32);
     void DrawVolumeState(int32);
     void DrawCurrentTimeState(int32);
