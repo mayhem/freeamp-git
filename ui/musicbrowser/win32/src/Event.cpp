@@ -280,26 +280,38 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
         {
             TV_DISPINFO* info = (TV_DISPINFO*)pHdr;
             TV_ITEM item = info->item;
+
+            // was the operation cancelled?
+            if(!item.pszText)
+                return FALSE;
            
             if(m_oTreeIndex.IsTrack(item.lParam))
             {
                 // just change the title for this song
+                UpdateTrackName(m_oTreeIndex.Data(item.lParam).m_pTrack, 
+                                item.pszText);
             } 
             else if(m_oTreeIndex.IsPlaylist(item.lParam))
             {
                 // just change the title for this playlist
+                UpdatePlaylistName(m_oTreeIndex.Data(item.lParam).m_oPlaylistPath, 
+                                   item.pszText);
             }
             else if(m_oTreeIndex.IsAlbum(item.lParam))
             {
                 // need to change the album for all tracks in album
+                UpdateAlbumName(m_oTreeIndex.Data(item.lParam).m_pAlbum, 
+                                item.pszText);
             }
             else if(m_oTreeIndex.IsArtist(item.lParam))
             {
                 // need to change the artist for all albums
                 // and tracks by this artist
+                UpdateArtistName(m_oTreeIndex.Data(item.lParam).m_pArtist, 
+                                 item.pszText);
             }
 
-            return FALSE;
+            return TRUE;
         }    
  
 	    if (pTreeView->hdr.code == TVN_ITEMEXPANDING && 

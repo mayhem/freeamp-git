@@ -252,6 +252,11 @@ class MusicBrowserUI : public UserInterface
     HTREEITEM FindTrack(HTREEITEM albumItem, const PlaylistItem* track);
     HTREEITEM FindPlaylist(const string playlist);
 
+    void UpdateTrackName(PlaylistItem* track, const char* name);
+    void UpdatePlaylistName(string playlist, const char* name);
+    void UpdateAlbumName(AlbumList* album, const char* name);
+    void UpdateArtistName(ArtistList* artist, const char* name);
+
 
     // Data members
     EventQueue          *m_playerEQ;
