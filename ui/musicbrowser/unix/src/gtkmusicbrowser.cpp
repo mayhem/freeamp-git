@@ -385,6 +385,8 @@ void GTKMusicBrowser::UpdatePlayPause(void)
 
 void GTKMusicBrowser::ExpandCollapseEvent(void)
 {
+    string title = string(BRANDING);
+
     if (m_state == kStateCollapsed) {
         CreateExpanded();
         m_state = kStateExpanded;
@@ -392,7 +394,7 @@ void GTKMusicBrowser::ExpandCollapseEvent(void)
             gtk_paned_set_position(GTK_PANED(masterBox), lastPanedPosition);
             gtk_paned_set_handle_size(GTK_PANED(masterBox), lastPanedHandle);
         }
-        gtk_window_set_title(GTK_WINDOW(musicBrowser), BRANDING" - My Music");
+        title += string(" - My Music: ");
         GtkWidget *w = gtk_item_factory_get_widget(menuFactory,
                                                    "/View/View Playlist Only");
         gtk_container_foreach(GTK_CONTAINER(w), set_label_menu, (gpointer)"View Playlist Only");
@@ -404,11 +406,24 @@ void GTKMusicBrowser::ExpandCollapseEvent(void)
         lastPanedHandle = ((GtkPaned *)masterBox)->handle_size;
         gtk_paned_set_position(GTK_PANED(masterBox), 0);
         gtk_paned_set_handle_size(GTK_PANED(masterBox), 0);
-        gtk_window_set_title(GTK_WINDOW(musicBrowser), BRANDING" - Playlist Editor");
+        title += string(" - Playlist Editor: ");
         GtkWidget *w = gtk_item_factory_get_widget(menuFactory,
                                                    "/View/View Playlist Only");
         gtk_container_foreach(GTK_CONTAINER(w), set_label_menu, (gpointer)"View My Music");
     }
+
+    if (master)
+        title += string("Current listening list");
+    else {
+        if (m_bCDMode)
+            title += string("New Audio CD");
+        else if (m_currentListName.length() == 0)
+            title += string("New Playlist");
+        else
+            title += string("Editing playlist ") + m_currentListName;
+    }
+
+    gtk_window_set_title(GTK_WINDOW(musicBrowser), title.c_str());
 }
 
 void GTKMusicBrowser::ToggleVisEvent(void)
@@ -435,7 +450,7 @@ void GTKMusicBrowser::SetStatusText(const char *text)
     gtk_statusbar_push(GTK_STATUSBAR(statusBar), 1, text);
 }
 
-void GTKMusicBrowser::CreateNewEditor(char *playlisturl)
+void GTKMusicBrowser::CreateNewEditor(char *playlisturl, bool cd_mode)
 {
     string newURL;
     if (playlisturl) {
@@ -446,7 +461,7 @@ void GTKMusicBrowser::CreateNewEditor(char *playlisturl)
     }
     else
         newURL = "";
-    parentUI->CreateNewEditor(newURL);
+    parentUI->CreateNewEditor(newURL, cd_mode);
 }
 
 GtkWidget *GTKMusicBrowser::NewPixmap(char **data)
@@ -473,7 +488,9 @@ void GTKMusicBrowser::CreatePlaylist(void)
     if (master)
         titlestr += string("Current listening list");
     else {
-        if (m_currentListName.length() == 0)
+        if (m_bCDMode)
+            titlestr += string("New Audio CD");
+        else if (m_currentListName.length() == 0)
             titlestr += string("New Playlist");
         else
             titlestr += string("Editing playlist ") + m_currentListName;
@@ -519,12 +536,17 @@ void GTKMusicBrowser::CreatePlaylist(void)
     if (master)
         playlistLabel = gtk_label_new("Currently listening to:");
     else {
-        string labelstr = string("Editing playlist: ");
-        if (m_currentListName.length() == 0) 
-            labelstr += string("New Playlist");
-        else
-            labelstr += m_currentListName;
-        playlistLabel = gtk_label_new(labelstr.c_str());
+        if (m_bCDMode) {
+            playlistLabel = gtk_label_new("New Audio CD:");
+        }
+        else {
+            string labelstr = string("Editing playlist: ");
+            if (m_currentListName.length() == 0) 
+                labelstr += string("New Playlist");
+            else
+                labelstr += m_currentListName;
+            playlistLabel = gtk_label_new(labelstr.c_str());
+        }
     }
     gtk_box_pack_start(GTK_BOX(hbox), playlistLabel, FALSE, FALSE, 5);
     gtk_widget_show(playlistLabel);
@@ -547,8 +569,24 @@ void GTKMusicBrowser::CreatePlaylist(void)
     GdkFont *font =
             gdk_font_load("-adobe-helvetica-bold-r-normal--*-120-*-*-*-*-*-*");     if (!font)
         font = gdk_font_load("fixed");
+    gdk_font_unref(boldStyle->font);
     boldStyle->font = font;
     gdk_font_ref(boldStyle->font);
+
+    GdkColor red;
+    GdkColor green;
+
+    red.red     = 56000;
+    red.green   = 0;
+    red.blue    = 0;
+    green.red   = 0;
+    green.green = 56000;
+    green.blue  = 000;
+
+    greenStyle = gtk_style_copy(normStyle);
+    greenStyle->fg[GTK_STATE_NORMAL] = green;
+    redStyle = gtk_style_copy(normStyle);
+    redStyle->fg[GTK_STATE_NORMAL] = red;
 
     CreatePlaylistList(playlistwindow);
 
@@ -560,15 +598,23 @@ void GTKMusicBrowser::CreatePlaylist(void)
 
 void GTKMusicBrowser::DeleteListEvent(void)
 {
+    if (m_currentindex == kInvalidIndex)
+        return;
+
     m_plm->RemoveAll();
-    m_context->target->AcceptEvent(new Event(CMD_Stop));
+    if (master)
+        m_context->target->AcceptEvent(new Event(CMD_Stop));
     m_currentindex = kInvalidIndex;
 }
 
 void GTKMusicBrowser::SetClickState(ClickState newState)
 {
-    gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
-                             "/File/Create New Audio CD"), FALSE);
+    if (m_bCDMode) {
+        GtkWidget *w = gtk_item_factory_get_widget(menuFactory,
+                                        "/File/Create New Audio CD");
+        gtk_container_foreach(GTK_CONTAINER(w), set_label_menu,
+                              (gpointer)"Burn Audio CD");
+    }
 
     m_clickState = newState;
     if (m_clickState == kContextPlaylist) {
@@ -745,10 +791,11 @@ void GTKMusicBrowser::DeleteEvent(void)
         }
         else if (m_playingindex > m_currentindex)
             m_playingindex--;
-    }
-    if (master && stopped && (m_plm->CountItems() - 1 > deleteindex)) {
-        m_plm->SetCurrentIndex(m_currentindex + 1);
-        m_context->target->AcceptEvent(new Event(CMD_Play));
+
+        if (stopped && (m_plm->CountItems() - 1 > deleteindex)) {
+            m_plm->SetCurrentIndex(m_currentindex + 1);
+            m_context->target->AcceptEvent(new Event(CMD_Play));
+        }
     }
     m_plm->RemoveItem(deleteindex);
 }
@@ -976,7 +1023,7 @@ void GTKMusicBrowser::ReadPlaylist(char *path, vector<PlaylistItem *> *plist)
 }
 
 GTKMusicBrowser::GTKMusicBrowser(FAContext *context, MusicBrowserUI *masterUI,
-                                 string playlistURL)
+                                 string playlistURL, bool cdCreationMode)
 {
     m_context = context;
     m_initialized = false;
@@ -998,8 +1045,10 @@ GTKMusicBrowser::GTKMusicBrowser(FAContext *context, MusicBrowserUI *masterUI,
     iSetShuffleMode = false;
     CD_DiscID = 0;
     CD_numtracks = 0;
+    scheduleCDredraw = false;
     CDTracks = new vector<PlaylistItem *>;
     m_bIgnoringMusicCatalogMessages = false;
+    m_bCDMode = cdCreationMode;
 
     parentUI = masterUI;
  
@@ -1020,7 +1069,7 @@ GTKMusicBrowser::GTKMusicBrowser(FAContext *context, MusicBrowserUI *masterUI,
         if (saveOnExit)
             LoadPlaylist(playlistURL);
     }
-    else   
+    else if (playlistURL != "")
         LoadPlaylist(playlistURL);
 }
 
@@ -1236,7 +1285,8 @@ Error GTKMusicBrowser::AcceptEvent(Event *e)
         case INFO_MusicCatalogStreamAdded: {
             MusicCatalogStreamAddedEvent *mcsae = 
                               (MusicCatalogStreamAddedEvent *)e;
-            if (m_initialized && !m_bIgnoringMusicCatalogMessages) {
+            if (m_initialized && !m_bIgnoringMusicCatalogMessages &&
+                !m_bCDMode) {
                 gdk_threads_enter();
                 AddCatStream((PlaylistItem *)mcsae->Item());
                 gdk_threads_leave();
@@ -1245,7 +1295,7 @@ Error GTKMusicBrowser::AcceptEvent(Event *e)
         case INFO_MusicCatalogStreamRemoved: {
             MusicCatalogStreamRemovedEvent *mcsre =
                               (MusicCatalogStreamRemovedEvent *)e;
-            if (m_initialized) {
+            if (m_initialized && !m_bCDMode) {
                 gdk_threads_enter();
                 RemoveCatStream((PlaylistItem *)mcsre->Item());
                 gdk_threads_leave();
@@ -1298,14 +1348,15 @@ Error GTKMusicBrowser::AcceptEvent(Event *e)
             if (m_initialized) {
                 gdk_threads_enter();
                 ClearTree();
-                RegenerateCDTree();
+                if (!m_bCDMode)
+                    RegenerateCDTree();
                 gdk_threads_leave();
             }
             break; }
         case INFO_CDDiscStatus: {
             CDInfoEvent *cie = (CDInfoEvent *)e;
 
-            if (cie->GetCDDB() != CD_DiscID) {
+            if (cie->GetCDDB() != CD_DiscID && !m_bCDMode) {
                 CD_DiscID = cie->GetCDDB();
                 CD_numtracks = cie->GetNumTracks();
                 if (isVisible) {
@@ -1359,13 +1410,27 @@ Error GTKMusicBrowser::AcceptEvent(Event *e)
             if (ext)
                 ext++;
             if (ext && *ext) {
-                if (!strncasecmp("CDA", ext, 3) && isVisible)
+                if (!strncasecmp("CDA", ext, 3) && isVisible && !m_bCDMode)
                     UpdateCDTree(item);
             }
 
             if (piue->Manager() == m_plm && isVisible) {
                 gdk_threads_enter();
                 UpdatePlaylistItem(item);
+                gdk_threads_leave();
+            }
+            break; }
+        case INFO_PlaylistItemMoved: {
+            PlaylistItemMovedEvent *pime = (PlaylistItemMovedEvent *)e;
+            
+            if (pime->Manager() == m_plm && isVisible) {
+                gdk_threads_enter();
+
+                uint32 start = pime->OldIndex();
+                if (pime->NewIndex() < start)
+                    start = pime->NewIndex();
+
+                RenumberPlaylistList(start);
                 gdk_threads_leave();
             }
             break; }

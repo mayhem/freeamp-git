@@ -213,6 +213,7 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
         case INFO_MusicCatalogDoneRegenerating:
         case INFO_PlaylistCurrentItemInfo:
         case INFO_PlaylistItemUpdated:
+        case INFO_PlaylistItemMoved:
         case INFO_CDDiscStatus: 
         case INFO_PrefsChanged: {
             mainBrowser->AcceptEvent(event);
@@ -250,9 +251,10 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
     return kError_NoErr;
 }
 
-void MusicBrowserUI::CreateNewEditor(string & newPlaylist)
+void MusicBrowserUI::CreateNewEditor(string &newPlaylist, bool cd_mode)
 {
-    GTKMusicBrowser *newUI = new GTKMusicBrowser(m_context, this, newPlaylist);
+    GTKMusicBrowser *newUI = new GTKMusicBrowser(m_context, this, newPlaylist,
+                                                 cd_mode);
     gdk_threads_leave();
     newUI->ShowMusicBrowser();
     gdk_threads_enter();

@@ -47,7 +47,7 @@ class MusicBrowserUI : public UserInterface {
  
     EventQueue *m_playerEQ;
 
-    void CreateNewEditor(string & newPlaylist);
+    void CreateNewEditor(string &newPlaylist, bool cd_mode = false);
     void WindowClose(GTKMusicBrowser *oldUI);
 
     void StartSearch(bool runMain = true, bool intro = false);

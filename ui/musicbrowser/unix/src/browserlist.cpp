@@ -41,6 +41,11 @@ class comp_pi_pos {
     }
 };
 
+void int_destroy(int *oldint)
+{
+    delete oldint;
+}
+
 void GTKMusicBrowser::RenumberPlaylistList(int starting)
 {
     if (starting > GTK_CLIST(playlistList)->rows)
@@ -48,11 +53,36 @@ void GTKMusicBrowser::RenumberPlaylistList(int starting)
 
     gtk_clist_freeze(GTK_CLIST(playlistList));
 
+    int totaltime = 0;
+    int32 maxCDtime = 0;
+
+    if (m_bCDMode) {
+        if (starting >= 1)
+            totaltime = *(int *)(gtk_clist_get_row_data(GTK_CLIST(playlistList),
+                                                        starting - 1));
+        m_context->prefs->GetAudioCDLength(&maxCDtime);
+    }
+
     for (int i = starting; i < GTK_CLIST(playlistList)->rows; i++) {
         char location[50];
 
         sprintf(location, "%d", i + 1);
         gtk_clist_set_text(GTK_CLIST(playlistList), i, 0, location);
+
+        if (m_bCDMode) {
+            PlaylistItem *item = m_plm->ItemAt(i);
+            totaltime += item->GetMetaData().Time();
+
+            if (totaltime > maxCDtime)
+                gtk_clist_set_row_style(GTK_CLIST(playlistList), i, redStyle);
+            else
+                gtk_clist_set_row_style(GTK_CLIST(playlistList), i,
+                                        greenStyle);
+
+            int *totTime = (int *)gtk_clist_get_row_data(
+                                                    GTK_CLIST(playlistList), i);
+            *totTime = totaltime;
+        }
     }
     
     gtk_clist_thaw(GTK_CLIST(playlistList));
@@ -97,6 +127,9 @@ void GTKMusicBrowser::UpdatePlaylistItem(PlaylistItem *item)
 
     for (uint32 count = 0; count < 4; count++)
          gtk_clist_set_text(GTK_CLIST(playlistList), pos, count, iText[count]);
+
+    if (m_bCDMode)
+        RenumberPlaylistList(pos);
 }
 
 void GTKMusicBrowser::AddPlaylistItems(vector<PlaylistItem *> *items)
@@ -151,11 +184,17 @@ void GTKMusicBrowser::AddPlaylistItems(vector<PlaylistItem *> *items)
 
         gtk_clist_insert(GTK_CLIST(playlistList), pos, iText);
 
+        int *totTime = new int;
+        *totTime = 0;
+
+        gtk_clist_set_row_data_full(GTK_CLIST(playlistList), pos, totTime,
+                                    (GtkDestroyNotify)int_destroy);
+
         if (pos < minpos)
             minpos = pos;
     }
 
-    RenumberPlaylistList(minpos + 1);
+    RenumberPlaylistList(minpos);
 
     gtk_clist_columns_autosize(GTK_CLIST(playlistList));
     gtk_clist_select_row(GTK_CLIST(playlistList), m_currentindex, 0);
@@ -198,6 +237,12 @@ void GTKMusicBrowser::UpdatePlaylistList(void)
 
     uint32 iLoop = m_plm->CountItems();
 
+    int32 totaltime = 0;
+    int32 maxCDtime = 0;
+    m_context->prefs->GetAudioCDLength(&maxCDtime);
+
+    int row = 0;
+
     for (uint32 i = 0; i < iLoop; i++) {
         PlaylistItem *item = m_plm->ItemAt(i);
 
@@ -231,7 +276,23 @@ void GTKMusicBrowser::UpdatePlaylistList(void)
         iText[2] = artist;
         iText[3] = length;
 
-        gtk_clist_append(GTK_CLIST(playlistList), iText);
+        totaltime = totaltime + mdata.Time();
+
+        row = gtk_clist_append(GTK_CLIST(playlistList), iText);
+
+        if (m_bCDMode) {
+            if (totaltime > (int)maxCDtime)
+                gtk_clist_set_row_style(GTK_CLIST(playlistList), row, redStyle);
+            else
+                gtk_clist_set_row_style(GTK_CLIST(playlistList), row, 
+                                        greenStyle);
+        }
+        
+        int *totTime = new int;
+        *totTime = totaltime;
+
+        gtk_clist_set_row_data_full(GTK_CLIST(playlistList), row, totTime,
+                                    (GtkDestroyNotify)int_destroy);
     }
 
     if (iLoop == 0) {

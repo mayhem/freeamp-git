@@ -85,6 +85,7 @@ extern const char* kCDDevicePathPref;
 extern const char* kCDDBServerPref;
 extern const char* kConvertUnderscoresToSpacesPref;
 extern const char* kAllowMultipleInstancesPref;
+extern const char* kAudioCDLengthPref;
 
 class LibDirFindHandle;
 
@@ -268,6 +269,9 @@ class Preferences {
 
     Error GetWAVOutDirectory(char* path, uint32* len);
     Error SetWAVOutDirectory(const char* path);
+
+    Error GetAudioCDLength(int32* value);
+    Error SetAudioCDLength(int32  value);
 };
 
 #endif /* _PREFERENCES_H */

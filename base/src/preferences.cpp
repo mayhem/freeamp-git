@@ -79,6 +79,7 @@ const char* kCDDBServerPref = "CDDBServer";
 const char* kConvertUnderscoresToSpacesPref = "ConvertUnderscoresToSpaces";
 const char* kAllowMultipleInstancesPref = "AllowMultipleInstances";
 const char* kWAVOutputPathPref = "WAVOutputPath";
+const char* kAudioCDLengthPref = "AudioCDLength";
 
 //logging
 const char* kUseDebugLogPref = "UseDebugLog";
@@ -135,6 +136,7 @@ const char* kDefaultCDDBServer = "http://www2.freedb.org/cgi-bin/cddb.cgi";
 const bool kDefaultConvertUnderscoresToSpaces = true;
 const bool kDefaultAllowMultipleInstances = false;
 const char* kDefaultWAVOutPath = ".";
+const int32 kDefaultAudioCDLength = 4440; // 74 minutes
 
 Error
 Preferences::
@@ -314,6 +316,9 @@ SetDefaults()
     if (GetPrefString(kWAVOutputPathPref, dummyString, 
         (uint32 *)&dummyInt) == kError_NoPrefValue)
         SetPrefString(kWAVOutputPathPref, kDefaultWAVOutPath);
+
+    if (GetPrefInt32(kAudioCDLengthPref, &dummyInt) == kError_NoPrefValue)
+        SetPrefInt32(kAudioCDLengthPref, kDefaultAudioCDLength);
 
     return kError_NoErr;
 }
@@ -1062,6 +1067,20 @@ Preferences::
 SetWAVOutDirectory(const char* path)
 {
     return SetPrefString(kWAVOutputPathPref, path);
+}
+
+Error
+Preferences::
+GetAudioCDLength(int32* value)
+{
+    return GetPrefInt32(kAudioCDLengthPref, value);
+}
+
+Error
+Preferences::
+SetAudioCDLength(int32 value)
+{
+    return SetPrefInt32(kAudioCDLengthPref, value);
 }
 
 LibDirFindHandle *
