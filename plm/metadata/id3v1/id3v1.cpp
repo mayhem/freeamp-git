@@ -243,9 +243,17 @@ bool ID3v1::ReadMetaData(const char* url, MetaData* metadata)
     bool result = false;
     Error error;
     id3v1 id3;
+    char *ptr;
 
     assert(url);
     assert(metadata);
+
+    ptr = strrchr(url, '.');
+    if (ptr == NULL)
+        return false;
+
+    if (strcasecmp(ptr, ".mp3"))
+        return false;  
 
     if(url && metadata)
     {

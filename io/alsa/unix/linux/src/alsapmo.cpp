@@ -97,9 +97,6 @@ AlsaPMO::AlsaPMO(FAContext *context) :
 
    ai = new struct audio_info_struct;
    ai->handle = NULL;
-   ai->alsa_format.format = (unsigned)-1;
-   ai->alsa_format.rate = (unsigned)-1;
-   ai->alsa_format.channels = (unsigned)-1;
    ai->device = NULL;
    ai->format = -1;
    ai->channels = -1;
@@ -190,7 +187,7 @@ AlsaPMO::~AlsaPMO()
 }
 
 
-void AlsaPMO::SetVolume(int32 iVolume)
+void AlsaPMO::SetVolume(int32 left, int32 right)
 {
    int   err;
    snd_mixer_t *pMixer;
@@ -205,19 +202,28 @@ void AlsaPMO::SetVolume(int32 iVolume)
       if (err < 0)
          return;
 
-      int actualVolume = (int)((double)(m_group.max - m_group.min) * 
-                          (double)iVolume * 0.01) + m_group.min;
+      left = (int)((double)(m_group.max - m_group.min) * 
+               (double)left * 0.01) + m_group.min;
+      right = (int)((double)(m_group.max - m_group.min) * 
+               (double)right * 0.01) + m_group.min;
       for (int chn = 0; chn <= SND_MIXER_CHN_LAST; chn++) {
           if (!(m_group.channels & (1<<chn)))
               continue;
-          m_group.volume.values[chn] = actualVolume;
+
+          if (chn == 0)
+              m_group.volume.values[chn] = left;
+          else
+          if (chn == 1)
+              m_group.volume.values[chn] = right;
+          else
+              m_group.volume.values[chn] = (left + right) / 2;
       }
       snd_mixer_group_write(pMixer, &m_group);
    }
    snd_mixer_close(pMixer);
 } 
 
-int32 AlsaPMO::GetVolume()
+void AlsaPMO::GetVolume(int32 &left, int32 &right)
 {
    int   err;
    snd_mixer_t *pMixer = NULL;
@@ -225,48 +231,50 @@ int32 AlsaPMO::GetVolume()
    err = snd_mixer_open(&pMixer, m_iCard, 0);
    if (err != 0)
    {
-      return 0;
+      return;
    }
 
    if (m_iChannel >= 0)
    {
       err = snd_mixer_group_read(pMixer, &m_group);
       if (err < 0)
-         return 0;
+         return;
    }
    else
-      return 0;
+      return;
 
    snd_mixer_close(pMixer);
-   int actualVolume = (int)((double)(m_group.max - m_group.min) *
-                       (double)m_group.volume.values[0] * 0.01) + 
-                      m_group.min;
-   return actualVolume;
+   left = (int)(((float)((m_group.volume.values[0] - m_group.min) * 100) /
+                        (float)(m_group.max - m_group.min)) + 0.5);
+   right = (int)(((float)((m_group.volume.values[1] - m_group.min) * 100) /
+                        (float)(m_group.max - m_group.min)) + 0.5);
 } 
 
-Error AlsaPMO::Init(OutputInfo* info) {
-    int err;
+Error AlsaPMO::Init(OutputInfo* info) 
+{
+    int                      err;
+    snd_pcm_channel_params_t params;
 
     m_properlyInitialized = false;
-    if (!info) {
+    if (!info) 
+    {
         info = myInfo;
-    } else {
+    } 
+    else 
+    {
         // got info, so this is the beginning...
         m_iDataSize = info->max_buffer_size;
 
-        if((err=snd_pcm_open(&ai->handle, m_iCard, m_iDevice, SND_PCM_OPEN_PLAYBACK)) < 0 )
+        err=snd_pcm_open(&ai->handle, m_iCard, m_iDevice, 
+                         SND_PCM_OPEN_PLAYBACK);
+        if (err < 0)
         {
             ReportError("Audio device is busy. Please make sure that "
                         "another program is not using the device.");
             return (Error)pmoError_DeviceOpenFailed;
         }
-#define SND_PCM_BLOCK_MODE_NON_BLOCKING         (0)
-#define SND_PCM_BLOCK_MODE_BLOCKING             (1)
-        snd_pcm_block_mode(ai->handle,SND_PCM_BLOCK_MODE_NON_BLOCKING);
-        if ((err=snd_pcm_playback_time(ai->handle,1))!=0) {
-                ReportError("Can't enable playback time.");
-            return (Error)pmoError_DeviceOpenFailed;
-        }
+
+        snd_pcm_nonblock_mode(ai->handle, 1);
     }
 
     channels = info->number_of_channels;
@@ -276,17 +284,38 @@ Error AlsaPMO::Init(OutputInfo* info) {
     ai->channels=channels;
     ai->rate=info->samples_per_second;
 
-    audio_set_all(ai);
+    memset(&params, 0, sizeof(params)); 
+    params.format.format = SND_PCM_SFMT_S16_LE;
+    params.format.interleave = 1;
+    params.format.voices = channels;
+    params.format.rate = info->samples_per_second;
+    params.channel = SND_PCM_CHANNEL_PLAYBACK;
+    params.mode = SND_PCM_MODE_BLOCK;
+    params.start_mode = SND_PCM_START_DATA;
+    params.stop_mode = SND_PCM_STOP_STOP;
+    params.buf.block.frag_size = m_iDataSize;
+    params.buf.block.frags_max = 32;
+    params.buf.block.frags_min = 1;
+
+    err = snd_pcm_channel_params(ai->handle, &params);
+    if (err < 0)
+    {
+        ReportError("Cannot initialized audio device.");
+        return (Error)pmoError_DeviceOpenFailed;
+    }
 
     memcpy(myInfo, info, sizeof(OutputInfo));
-    if (snd_pcm_playback_time(ai->handle, true))
-        ReportError("Cannot set soundcard time playback mode.");
 
-    snd_pcm_playback_status_t aInfo;
-    snd_pcm_playback_status(ai->handle,&aInfo);
-    m_iOutputBufferSize = aInfo.fragment_size * aInfo.fragments;
-    m_iTotalFragments = aInfo.fragments;
+    snd_pcm_channel_setup_t aInfo;
+    aInfo.mode = SND_PCM_MODE_BLOCK;
+    aInfo.channel = SND_PCM_CHANNEL_PLAYBACK;
+    snd_pcm_channel_setup(ai->handle,&aInfo);
+    m_iOutputBufferSize = aInfo.buf.block.frag_size * aInfo.buf.block.frags;
+    m_iTotalFragments = aInfo.buf.block.frags;
     m_iBytesPerSample = info->number_of_channels * (info->bits_per_sample / 8);
+
+    snd_pcm_channel_prepare(ai->handle, SND_PCM_CHANNEL_PLAYBACK);
+    snd_pcm_channel_go(ai->handle, SND_PCM_CHANNEL_PLAYBACK);
 
     m_properlyInitialized = true;
     return kError_NoErr;
@@ -295,9 +324,11 @@ Error AlsaPMO::Init(OutputInfo* info) {
 Error AlsaPMO::Reset(bool user_stop) {
 
     if (user_stop) 
-        snd_pcm_drain_playback(ai->handle);
+        snd_pcm_playback_drain(ai->handle);
     else
-        snd_pcm_flush_playback(ai->handle);
+        snd_pcm_playback_flush(ai->handle);
+
+    snd_pcm_playback_prepare(ai->handle);
 
     return kError_NoErr;
 }
@@ -311,18 +342,21 @@ void AlsaPMO::Pause(void)
 
 bool AlsaPMO::WaitForDrain(void)
 {
-   snd_pcm_playback_status_t ainfo;
+   snd_pcm_channel_status_t ainfo;
 
-   snd_pcm_playback_status(ai->handle,&ainfo);
    for(; !m_bExit && !m_bPause; )
    {
-       snd_pcm_playback_status(ai->handle,&ainfo);
-       if (ainfo.underrun || ainfo.queue  < ainfo.fragment_size)
+       ainfo.channel = SND_PCM_CHANNEL_PLAYBACK;
+       ainfo.mode = SND_PCM_MODE_BLOCK;
+       snd_pcm_channel_status(ai->handle,&ainfo);
+
+       if (ainfo.underrun || ainfo.status == SND_PCM_STATUS_UNDERRUN)
        {
            return true;
        }
        WasteTime();
    }
+
    return false;
 } 
 
@@ -331,8 +365,7 @@ void AlsaPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
    MediaTimeInfoEvent *pmtpi;
    int32               hours, minutes, seconds;
    int                 iTotalTime = 0;
-   snd_pcm_playback_status_t ainfo;
-   long long           llStart, llEnd;
+   snd_pcm_channel_status_t ainfo;
 
    if (m_iBaseTime < 0)
    {
@@ -341,14 +374,13 @@ void AlsaPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
                       myInfo->samples_per_second;
    }
 
-   snd_pcm_playback_status(ai->handle,&ainfo);
-   llEnd = ((long long)ainfo.time.tv_sec * 100) + 
-           ((long long)ainfo.time.tv_usec / 10000);
-   llStart = ((long long)ainfo.stime.tv_sec * 100) + 
-             ((long long)ainfo.stime.tv_usec / 10000);
-   iTotalTime = ((llEnd - llStart) / 100) + m_iBaseTime;
+   ainfo.channel = SND_PCM_CHANNEL_PLAYBACK;
+   ainfo.mode = SND_PCM_MODE_BLOCK;
+   snd_pcm_channel_status(ai->handle,&ainfo);
 
-   iTotalTime %= 86400;
+   iTotalTime = ainfo.scount / (m_iBytesPerSample * myInfo->samples_per_second);
+   //printf("total: %d base: %d\n", iTotalTime, m_iBaseTime);
+   iTotalTime = (iTotalTime + m_iBaseTime) % 86400;
 
    hours = iTotalTime / 3600;
    minutes = (iTotalTime / 60) % 60;
@@ -373,9 +405,9 @@ void AlsaPMO::WorkerThread(void)
 {
    void                      *pBuffer;
    Error                      eErr;
-   size_t                     iRet;
+   int                        iRet;
    Event                     *pEvent;
-   snd_pcm_playback_status_t  ainfo;
+   snd_pcm_channel_status_t  ainfo;
 
    // Don't do anything until resume is called.
    m_pPauseSem->Wait();
@@ -504,8 +536,15 @@ void AlsaPMO::WorkerThread(void)
           if (m_bExit || m_bPause)
               break;
 
-          iRet = snd_pcm_playback_status(ai->handle,&ainfo);
-          if (ainfo.count < m_iDataSize)      
+          iRet = snd_pcm_channel_status(ai->handle,&ainfo);
+          if (iRet < 0)
+          {
+              printf("ALSA: %s\n", snd_strerror(iRet));
+              m_bExit = true;
+              break;
+          }
+
+          if (ainfo.free < m_iDataSize)      
           {
               WasteTime();
               continue;
@@ -521,6 +560,7 @@ void AlsaPMO::WorkerThread(void)
       iRet = snd_pcm_write(ai->handle,pBuffer,m_iDataSize);
       if (iRet < 0)
       {
+         printf("ALSA: %s\n", snd_strerror(iRet));
          m_pInputBuffer->EndRead(0);
          ReportError("Could not write sound data to the soundcard.");
          m_pContext->log->Error("Failed to write to the soundcard: %s\n", 
@@ -533,89 +573,3 @@ void AlsaPMO::WorkerThread(void)
       UpdateBufferStatus();
    }
 }
-
-int AlsaPMO::audio_set_all(struct audio_info_struct *ai)
-{
-        int err;
-
-        if(ai->format == -1) {
-#ifdef DEBUG
-cout<<"AlsaPMO::audio_set_all:ai->format error"<<endl;
-#endif
-                return 0;
-        }
-        if(!ai || ai->rate < 0) {
-#ifdef DEBUG
-cout<<"AlsaPMO::audio_set_all:ai->rate error"<<endl;
-#endif
-                return -1;
-        }
-        if(ai->alsa_format.channels < 0) {
-#ifdef DEBUG
-cout<<"AlsaPMO::audio_set_all:ai->channels error"<<endl;
-#endif
-                return 0;
-        }
-#ifdef DEBUG
-cout<<"AlsaPMO::audio_set_all: format="<<ai->format<<",rate="<<ai->rate<<",channels="<<ai->channels<<endl;
-#endif
-
-        switch(ai->format)
-        {
-                case AUDIO_FORMAT_SIGNED_16:
-                default:
-                        ai->alsa_format.format=SND_PCM_SFMT_S16_LE;
-                        break;
-                case AUDIO_FORMAT_UNSIGNED_8:
-                        ai->alsa_format.format=SND_PCM_SFMT_U8;
-                        break;
-                case AUDIO_FORMAT_SIGNED_8:
-                        ai->alsa_format.format=SND_PCM_SFMT_S8;
-                        break;
-                case AUDIO_FORMAT_ULAW_8:
-                        ai->alsa_format.format=SND_PCM_SFMT_MU_LAW;
-                        break;
-                case AUDIO_FORMAT_ALAW_8:
-                        ai->alsa_format.format=SND_PCM_SFMT_A_LAW;
-                        break;
-                case AUDIO_FORMAT_UNSIGNED_16:
-                        ai->alsa_format.format=SND_PCM_SFMT_U16_LE;
-                        break;
-        }
-//      ai->alsa_format.format=SND_PCM_SFMT_S16_LE;
-        ai->alsa_format.rate=ai->rate;
-        ai->alsa_format.channels = ai->channels;
-
-        if((err=snd_pcm_playback_format(ai->handle, &ai->alsa_format)) < 0 ) {
-//          ReportError("Cannot reset the soundcard.");
-            ReportError("Cannot get audio format.");
-            return (Error)pmoError_IOCTL_SNDCTL_DSP_RESET;
-        }
-//      audio_set_playback_params2(ai);
-//      int err;
-        snd_pcm_playback_info_t pi;
-        snd_pcm_playback_params_t pp;
-
-        if((err=snd_pcm_playback_info(ai->handle, &pi)) < 0 )
-        {
-                ReportError("Cannot get audio info.");
-                return (Error)pmoError_ALSA_Playback_Info;
-        }
-
-        bzero(&pp, sizeof(pp));
-        pp.fragment_size = pi.buffer_size/4;
-        if ((unsigned)pp.fragment_size > pi.max_fragment_size) 
-            pp.fragment_size = pi.max_fragment_size;
-        if ((unsigned)pp.fragment_size < pi.min_fragment_size) 
-            pp.fragment_size = pi.min_fragment_size;
-        pp.fragments_max = -1;
-        pp.fragments_room = 1;
-
-        if((err=snd_pcm_playback_params(ai->handle, &pp)) < 0 )
-        {
-                ReportError("Cannot set audio params.");
-                return (Error)pmoError_ALSA_Playback_Params;
-        }
-        return 0;
-}
-

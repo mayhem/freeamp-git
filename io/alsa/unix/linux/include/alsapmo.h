@@ -49,7 +49,6 @@ ____________________________________________________________________________*/
 struct audio_info_struct
 {
     snd_pcm_t *handle;
-    snd_pcm_format_t alsa_format;
 
     char *device;
     int format;
@@ -92,8 +91,8 @@ public:
     virtual Error Init(OutputInfo* info);
     static void   StartWorkerThread(void *);
     virtual void  Pause(void);
-            void  SetVolume(int32);
-            int32 GetVolume(void);
+            void  SetVolume(int32 left, int32 right);
+            void  GetVolume(int32 &left, int32 &right);
 
  private:
 
@@ -117,9 +116,7 @@ public:
     int		 m_iChannel;
     snd_mixer_gid_t m_gid;
     snd_mixer_group_t m_group;
- 
     struct audio_info_struct *ai;
-    int audio_set_all(struct audio_info_struct *);
 };
 
 #endif /* _ALSAPMO_H_ */

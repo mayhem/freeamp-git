@@ -71,10 +71,18 @@ bool ID3v2::ReadMetaData(const char* url, MetaData* metadata)
     ID3Frame *pFrame;
     luint     ret;
     char     *pData;
+    char     *ptr;
     ID3Field *pField;
 
     assert(url);
     assert(metadata);
+
+    ptr = strrchr(url, '.');
+    if (ptr == NULL)
+        return false;
+
+    if (strcasecmp(ptr, ".mp3"))
+        return false;  
 
     char path[_MAX_PATH];
     uint32 length = sizeof(path);
@@ -170,6 +178,14 @@ bool ID3v2::WriteMetaData(const char* url, const MetaData& metadata)
     char      dummy[20];
     bool      bWriteID3v1, bWriteID3v2;
     luint     whichTags;
+    char     *ptr;
+
+    ptr = strrchr(url, '.');
+    if (ptr == NULL)
+        return false;
+
+    if (strcasecmp(ptr, ".mp3"))
+        return false;  
 
     m_context->prefs->GetWriteID3v1(&bWriteID3v1);
     m_context->prefs->GetWriteID3v2(&bWriteID3v2);
@@ -354,9 +370,17 @@ bool ID3v2::ReadMetaData(const char* url, MetaData* metadata)
     int         ret;
     int         size;
     Error       error;
+    char       *ptr;
 
     assert(url);
     assert(metadata);
+
+    ptr = strrchr(url, '.');
+    if (ptr == NULL)
+        return false;
+
+    if (strcasecmp(ptr, ".mp3"))
+        return false;  
 
     char path[_MAX_PATH];
     uint32 length = sizeof(path);
