@@ -159,7 +159,12 @@ Error FreeAmpTheme::Close(void)
 {
     Theme::Close();
     
+    if (!m_uiThread)
+       return kError_NoErr;
+    
     m_uiThread->Join();
+    delete m_uiThread;
+    m_uiThread = NULL;
 
     return kError_NoErr;
 }
@@ -218,6 +223,15 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
          bEnable = false;
          m_pWindow->ControlEnable(string("IPause"), true, bEnable);
          m_bPlayShown = false;
+         
+         if (e->Type() == INFO_Stopped)
+         {
+            m_iSeekPos = 0;
+            m_iTotalSeconds = -1;
+            m_pWindow->ControlIntValue(string("Seek"), true, m_iSeekPos);
+            UpdateTimeDisplay();
+         }
+         
          break;
       }   
       case INFO_DoneOutputting:
@@ -386,12 +400,14 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
 
       case INFO_PrefsChanged:
       {
-         bool bStayFidoStay;
+         bool bValue;
          
          ReloadTheme();
 
-         m_pContext->prefs->GetStayOnTop(&bStayFidoStay);
-         m_pWindow->SetStayOnTop(bStayFidoStay);
+         m_pContext->prefs->GetStayOnTop(&bValue);
+         m_pWindow->SetStayOnTop(bValue);
+         m_pContext->prefs->GetLiveInTray(&bValue);
+         m_pWindow->SetLiveInToolbar(bValue);
          
       	 break;
       }
@@ -624,6 +640,9 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
    {
        string oName("Info"), oDesc;
        
+       if (m_iTotalSeconds < 0)
+           return kError_NoErr;       
+          
        if (m_eTimeDisplayState == kNormal)
        {
            m_eTimeDisplayState = kTimeRemaining;
@@ -663,28 +682,8 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
    }
    if (oControlName == string("Help") && eMesg == CM_Pressed)
    {
-       string            oHelpFile;
-       char              dir[MAX_PATH];
-       uint32            len = sizeof(dir);
+       ShowHelp();
        
-       m_pContext->prefs->GetInstallDirectory(dir, &len);
-       oHelpFile = string(dir);
-       oHelpFile += string("\\");    
-       oHelpFile += string(HELP_FILE);    
-       
-#ifdef WIN32   
-       Int32PropValue *pProp;
-       HWND            hWnd;
-       if (IsError(m_pContext->props->GetProperty("MainWindow", 
-                   (PropValue **)&pProp)))
-          hWnd = NULL;
-       else
-          hWnd = (HWND)pProp->GetInt32();
-       
-       Debug_v("Help: %x", hWnd);
-             
-       WinHelp(hWnd, oHelpFile.c_str(), HELP_FINDER, FreeAmp_Main_Window);
-#endif
    }
    
    return kError_NoErr;
@@ -725,11 +724,34 @@ void FreeAmpTheme::InitControls(void)
     bEnable = !m_bPlayShown;
     m_pWindow->ControlEnable(string("IPause"), true, bEnable);
     
-    
+
+    // Set the title text field to the current meta data, or if no
+    // is available, show the welcome message
     if (m_oTitle.length() == 0)
         m_pWindow->ControlStringValue(string("Title"), true, oWelcome);
     else    
         m_pWindow->ControlStringValue(string("Title"), true, m_oTitle);
+
+    // Ask the playlist manager what the current repeat mode is
+    // and set the controls appropriately.    
+    switch (m_pContext->plm->GetRepeatMode())
+    {
+        case kPlaylistMode_RepeatNone:
+           iState = 0;
+           break;
+        case kPlaylistMode_RepeatOne:
+           iState = 1;
+           break;
+        case kPlaylistMode_RepeatAll:
+           iState = 2;
+           break;
+        default:
+           break;
+    }
+    m_pWindow->ControlIntValue(string("Repeat"), true, iState);
+
+    iState = m_pContext->plm->GetShuffleMode() ? 1 : 0;
+    m_pWindow->ControlIntValue(string("Shuffle"), true, iState);
 }
 
 // This function gets called after the window object is created,
@@ -791,11 +813,6 @@ void FreeAmpTheme::HandleKeystroke(unsigned char cKey)
 {
     switch(cKey)
     {
-     case 'O':
-     case 'o':
-        m_pContext->target->AcceptEvent(new Event(CMD_TogglePlaylistUI));
-        break;
-        
      case 'p':
      case 'P':
         m_pContext->target->AcceptEvent(new Event(CMD_Play));
@@ -811,8 +828,8 @@ void FreeAmpTheme::HandleKeystroke(unsigned char cKey)
         m_pContext->target->AcceptEvent(new Event(CMD_Pause));
         break;
 
-     case 'b':
-     case 'B':
+     case 'M':
+     case 'm':
         m_pContext->target->AcceptEvent(new Event(CMD_ToggleMusicBrowserUI));
         break;
 
@@ -831,9 +848,19 @@ void FreeAmpTheme::HandleKeystroke(unsigned char cKey)
         m_pContext->target->AcceptEvent(new Event(CMD_ToggleDownloadUI));
         break;
         
-     case 'e':
-     case 'E':
+     case 'o':
+     case 'O':
      	ShowOptions();
+        break;
+ 
+     case 't':
+     case 'T':
+        ReloadTheme();
+        break;
+       
+     case 'h':
+     case 'H':
+     	ShowHelp();
         break;
     }
 }
@@ -1007,5 +1034,29 @@ void FreeAmpTheme::PostWindowCreate(void)
     
     pProp = new Int32PropValue((int)((Win32Window *)m_pWindow)->GetWindowHandle());
     m_pContext->props->SetProperty("MainWindow", pProp);
+#endif
+}
+
+void FreeAmpTheme::ShowHelp(void)
+{
+    string            oHelpFile;
+    char              dir[MAX_PATH];
+    uint32            len = sizeof(dir);
+    
+    m_pContext->prefs->GetInstallDirectory(dir, &len);
+    oHelpFile = string(dir);
+    oHelpFile += string("\\");    
+    oHelpFile += string(HELP_FILE);    
+    
+#ifdef WIN32   
+    Int32PropValue *pProp;
+    HWND            hWnd;
+    if (IsError(m_pContext->props->GetProperty("MainWindow", 
+                (PropValue **)&pProp)))
+       hWnd = NULL;
+    else
+       hWnd = (HWND)pProp->GetInt32();
+    
+    WinHelp(hWnd, oHelpFile.c_str(), HELP_FINDER, FreeAmp_Main_Window);
 #endif
 }

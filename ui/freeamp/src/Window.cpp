@@ -46,16 +46,23 @@ Window::Window(Theme *pTheme, string &oName)
 
 Window::~Window(void)
 {
-    if (m_bIsVulcanMindMeldHost)
+    if (!m_bIsVulcanMindMeldHost)
     {
-       ClearControls();
        delete m_pCanvas;
     }   
+    else
+       ClearControls();
 }
 
 void Window::VulcanMindMeldHost(bool bHost)
 {
     m_bIsVulcanMindMeldHost = bHost;
+    
+    if (bHost)
+    {
+       delete m_pCanvas;
+       m_pCanvas = NULL;
+    }
 }
 
 Error Window::VulcanMindMeld(Window *pOther)

@@ -130,12 +130,7 @@ UserInterface()
 ToolbarUI::
 ~ToolbarUI()
 {
-    RemoveTrayIcon();
-
-    if(m_trayIcon)
-        DeleteObject(m_trayIcon);
-        
-    delete m_uiThread;    
+   delete m_uiThread;    
 }
 
 Error ToolbarUI::Init(int32 startup_type)
@@ -154,7 +149,6 @@ ui_thread_function(void* arg)
 {
     ToolbarUI* ui = (ToolbarUI*)arg;
 
-    Debug_v("ui thread starting");
     ui->UIThreadFunction();
 }
 
@@ -201,6 +195,9 @@ UIThreadFunction()
                 DispatchMessage( &msg );
             }
         }
+        RemoveTrayIcon();
+        DestroyWindow(m_hWnd);
+        m_hWnd = NULL;
     }    
 }
 
@@ -266,7 +263,8 @@ AcceptEvent(Event* event)
 
 	        case CMD_Cleanup: 
             {
-                PostMessage(m_hWnd, WM_QUIT, 0, 0);
+                if (m_hWnd)
+                   PostMessage(m_hWnd, WM_QUIT, 0, 0);
                 m_uiThread->Join();
 	            m_context->target->AcceptEvent(new Event(INFO_ReadyToDieUI));
 	            break; 

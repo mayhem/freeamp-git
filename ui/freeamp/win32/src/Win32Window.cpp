@@ -86,7 +86,25 @@ static LRESULT WINAPI MainWndProc(HWND hwnd, UINT msg,
             
             break;
         }
+        case WM_NCCREATE:  
+        case WM_NCDESTROY: 
+        case WM_NCCALCSIZE:
+            return 1;    
+        
+        default:
+            return ui->WindowProc(hwnd, msg, wParam, lParam);
+    }
+    return result;
+}        
+        
+LRESULT Win32Window::WindowProc(HWND hwnd, UINT msg, 
+                                 WPARAM wParam, LPARAM lParam)
+{
+    LRESULT result = 0;
 
+    m_pMindMeldMutex->Acquire();
+    switch (msg)
+    {
 		case WM_CLOSE:
         {
             Rect oRect;
@@ -94,23 +112,23 @@ static LRESULT WINAPI MainWndProc(HWND hwnd, UINT msg,
 
             KillTimer(hwnd, 0);
  
-            ui->GetWindowPosition(oRect);
+            GetWindowPosition(oRect);
             oPos.x = oRect.x1;
             oPos.y = oRect.y1;
-            ui->SaveWindowPos(oPos);
+            SaveWindowPos(oPos);
             PostQuitMessage(0);
             break;
         }    
 
 		case WM_TIMER:
-            ui->TimerEvent();
+            TimerEvent();
             break;
 
         case WM_DESTROY:
             break;
 
         case WM_PAINT:
-            ui->Paint();
+            Paint();
             break;
 
         case WM_MOUSEMOVE:
@@ -125,7 +143,7 @@ static LRESULT WINAPI MainWndProc(HWND hwnd, UINT msg,
             oPos.x = pt.x;
             oPos.y = pt.y;
             
-            ui->HandleMouseMove(oPos);
+            HandleMouseMove(oPos);
             break;
         }
 
@@ -135,7 +153,7 @@ static LRESULT WINAPI MainWndProc(HWND hwnd, UINT msg,
             
         	oPos.x = (int16)LOWORD(lParam);
             oPos.y = (int16)HIWORD(lParam);  
-            ui->HandleMouseMove(oPos);
+            HandleMouseMove(oPos);
 
             break;
         }		
@@ -152,7 +170,7 @@ static LRESULT WINAPI MainWndProc(HWND hwnd, UINT msg,
             oPos.x = pt.x;
             oPos.y = pt.y;
             
-            ui->HandleMouseLButtonDown(oPos);
+            HandleMouseLButtonDown(oPos);
             
             break;
         }
@@ -169,23 +187,26 @@ static LRESULT WINAPI MainWndProc(HWND hwnd, UINT msg,
             oPos.x = pt.x;
             oPos.y = pt.y;
             
-            ui->HandleMouseLButtonUp(oPos);
+            HandleMouseLButtonUp(oPos);
             
             break;
         }
 
         case WM_KEYDOWN:
         {
-            ui->Keystroke((unsigned char)wParam);
+            if (wParam == VK_F1)
+               wParam = 'h';
+               
+            Keystroke((unsigned char)wParam);
             break;
         }
         
         case WM_NOTIFY:
-            ui->Notify(wParam, (LPNMHDR)lParam);
+            Notify(wParam, (LPNMHDR)lParam);
             break;
             
         case WM_DROPFILES:
-            ui->DropFiles((HDROP) wParam);
+            DropFiles((HDROP) wParam);
             break;
 
         default:
@@ -193,6 +214,7 @@ static LRESULT WINAPI MainWndProc(HWND hwnd, UINT msg,
             break;
 
     }
+    m_pMindMeldMutex->Release();
 
     return result;
 }
@@ -330,7 +352,7 @@ Error Win32Window::VulcanMindMeld(Window *pOther)
 
 	// Invalidate the complete old window to ensure a redraw
     if (oRect.Width() > 0 && oRect.Height() > 0)
-       InvalidateRect(NULL, &sRect, true);
+       InvalidateRect(m_hWnd, NULL, true);
     
     eRet = Window::VulcanMindMeld(pOther);
     m_pMindMeldMutex->Release();
@@ -363,7 +385,6 @@ void Win32Window::Paint(void)
     HDC         hDc;
     Rect        oRect;
 
-    m_pMindMeldMutex->Acquire();
     
 	hDc = BeginPaint(m_hWnd, &ps);
     oRect.x1 = ps.rcPaint.left;
@@ -373,17 +394,11 @@ void Win32Window::Paint(void)
     
     ((Win32Canvas *)(GetCanvas()))->Paint(hDc, oRect);
     EndPaint(m_hWnd, &ps);
-
-    m_pMindMeldMutex->Release();
 }    
 
 void Win32Window::TimerEvent(void)
 {
-    m_pMindMeldMutex->Acquire();
-
     Window::TimerEvent();
-
-    m_pMindMeldMutex->Release();
 }
 
 void Win32Window::SaveWindowPos(Pos &oPos)
@@ -665,9 +680,35 @@ void Win32Window::SetStayOnTop(bool bStay)
 {
     Window::SetStayOnTop(bStay);
 
+    if (m_hWnd == NULL)
+       return;
+
     if (m_bStayOnTop)
        SetWindowPos(m_hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
     else   
        SetWindowPos(m_hWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
 }    
 
+void Win32Window::SetLiveInToolbar(bool bLive)
+{
+    int iExtStyle, iStyle;
+    
+    Window::SetLiveInToolbar(bLive);
+
+    if (m_hWnd == NULL)
+       return;
+
+    ShowWindow(m_hWnd, FALSE);
+
+    iStyle = GetWindowLong(m_hWnd, GWL_STYLE);
+    iExtStyle = GetWindowLong(m_hWnd, GWL_EXSTYLE);
+    if (m_bLiveInToolbar)
+        iExtStyle |= WS_EX_TOOLWINDOW;
+    else
+        iExtStyle &= ~WS_EX_TOOLWINDOW;
+
+    SetWindowLong(m_hWnd, GWL_STYLE, WS_VISIBLE);
+    SetWindowLong(m_hWnd, GWL_STYLE, iStyle);
+    SetWindowLong(m_hWnd, GWL_EXSTYLE, iExtStyle);
+    ShowWindow(m_hWnd, TRUE);
+}

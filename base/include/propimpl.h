@@ -42,7 +42,7 @@ using namespace std;
 #include "config.h"
 #include "mutex.h"
 #include "properties.h"
-#include "hashtable.h"
+#include "debug.h"
 
 class PropElem 
 {
@@ -50,7 +50,13 @@ class PropElem
        PropElem() 
          { m_val = NULL; }
       ~PropElem() 
-         { if (m_val) delete m_val; }
+         {  
+            if (m_val) 
+            {
+               Debug_v("Propelem: delete %p", m_val);
+               delete m_val; 
+            }   
+         }
          
       vector<PropertyWatcher *> m_propWatchers;
       PropValue *m_val;

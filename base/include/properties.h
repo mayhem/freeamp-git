@@ -63,7 +63,7 @@ class Int32PropValue : public PropValue {
     Int32PropValue(int32 i) {
 	m_int = i;
     }
-    virtual ~Int32PropValue() { }
+    virtual ~Int32PropValue() {}
     int32 GetInt32() { return m_int; }
  private:
     int32 m_int;

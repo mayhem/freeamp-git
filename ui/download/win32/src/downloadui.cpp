@@ -128,6 +128,7 @@ DownloadUI::~DownloadUI()
 {
     DeleteObject(m_progressBitmap);
     delete m_uiSemaphore;
+    delete m_uiThread;
 }
 
 int32 DownloadUI::AcceptEvent(Event* event)
@@ -141,27 +142,32 @@ int32 DownloadUI::AcceptEvent(Event* event)
 	        case CMD_Cleanup: 
             {
                 LV_ITEM item;
-                uint32 itemCount = ListView_GetItemCount(m_hwndList);
-
-                for(uint32 i = 0; i < itemCount; i++)
+                
+                if (m_hwndList)
                 {
-                    item.mask = LVIF_PARAM;
-                    item.iItem = i;
-                    item.lParam = 0;
-
-                    if(ListView_GetItem(m_hwndList, &item))
+                    uint32 itemCount = ListView_GetItemCount(m_hwndList);
+                    for(uint32 i = 0; i < itemCount; i++)
                     {
-                        DownloadItem* dli = (DownloadItem*)item.lParam;
+                        item.mask = LVIF_PARAM;
+                        item.iItem = i;
+                        item.lParam = 0;
 
-                        if(dli->GetState() == kDownloadItemState_Queued ||
-                           dli->GetState() == kDownloadItemState_Downloading)
+                        if(ListView_GetItem(m_hwndList, &item))
                         {
-                            m_dlm->CancelDownload(dli, false);  
+                            DownloadItem* dli = (DownloadItem*)item.lParam;
+
+                            if(dli->GetState() == kDownloadItemState_Queued ||
+                               dli->GetState() == kDownloadItemState_Downloading)
+                            {
+                                m_dlm->CancelDownload(dli, false);  
+                            }
                         }
                     }
                 }
 
-                DestroyWindow(m_hwnd);
+                PostMessage(m_hwnd, WM_QUIT, 0, 0);
+                m_uiThread->Join();
+                
 	            m_target->AcceptEvent(new Event(INFO_ReadyToDieUI));
 	            break; 
             }
@@ -353,6 +359,10 @@ void DownloadUI::CreateUI()
             IsDialogMessage(hwnd, &msg);
         }
     }
+    ImageList_Destroy(m_noteImage);
+    DestroyWindow(hwnd);
+    m_hwnd = NULL;
+    m_hwndList = NULL;
 
     m_target->AcceptEvent(new Event(CMD_QuitPlayer));
 }

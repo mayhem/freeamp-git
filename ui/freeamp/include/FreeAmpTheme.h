@@ -63,11 +63,11 @@ class FreeAmpTheme : public UserInterface, public Theme
 
     protected:
 
-        void             ParseArgs();
         void             ReloadTheme(void);
         void             SetVolume(int iVolume);
         void             UpdateTimeDisplay(void);
         void             UpdateMetaData(const PlaylistItem *pItem);
+        void             ShowHelp(void);
 
         FAContext       *m_pContext;
         int              m_iCurrentSeconds, m_iTotalSeconds, m_iSeekSeconds;

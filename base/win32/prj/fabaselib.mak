@@ -31,6 +31,8 @@ NULL=
 NULL=nul
 !ENDIF 
 
+CPP=cl.exe
+
 !IF  "$(CFG)" == "fabaselib - Win32 Release"
 
 OUTDIR=.\Release
@@ -73,7 +75,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\..\..\lib\zlib\include" /I\
  "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I\
  "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I\
@@ -82,37 +83,6 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\..\..\lib\zlib\include" /I\
  /Fp"$(INTDIR)\fabaselib.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\fabaselib.bsc" 
 BSC32_SBRS= \
@@ -188,7 +158,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MDd /W3 /GX /Z7 /Od /I "..\..\..\lib\zlib\include" /I\
  "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I\
  "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I\
@@ -197,37 +166,6 @@ CPP_PROJ=/nologo /MDd /W3 /GX /Z7 /Od /I "..\..\..\lib\zlib\include" /I\
  /Fp"$(INTDIR)\fabaselib.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\fabaselib.bsc" 
 BSC32_SBRS= \
@@ -303,7 +241,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MDd /W3 /GX /Z7 /Od /I "..\..\..\lib\zlib\include" /I\
  "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I\
  "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I\
@@ -312,37 +249,6 @@ CPP_PROJ=/nologo /MDd /W3 /GX /Z7 /Od /I "..\..\..\lib\zlib\include" /I\
  /Fp"$(INTDIR)\fabaselib.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\fabaselib.bsc" 
 BSC32_SBRS= \
@@ -418,7 +324,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\..\..\lib\zlib\include" /I\
  "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I\
  "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I\
@@ -427,37 +332,6 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\..\..\lib\zlib\include" /I\
  /Fp"$(INTDIR)\fabaselib.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\fabaselib.bsc" 
 BSC32_SBRS= \
@@ -492,6 +366,36 @@ LIB32_OBJS= \
 <<
 
 !ENDIF 
+
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
 
 
 !IF "$(CFG)" == "fabaselib - Win32 Release" || "$(CFG)" ==\

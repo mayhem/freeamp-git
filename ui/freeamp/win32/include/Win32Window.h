@@ -62,15 +62,19 @@ class Win32Window : public Window
      virtual Error Restore(void);
 
 	 virtual HWND  GetWindowHandle(void);
-             void  SaveWindowPos(Pos &oPos);
-             void  DropFiles(HDROP dropHandle);
-             void  Notify(int32 command, LPNMHDR notifyMsgHdr);
-             void  CreateTooltips(void);
-             void  Paint(void);
-             void  TimerEvent(void);
-             void  SetStayOnTop(bool bStay);
-             
+     LRESULT       WindowProc(HWND hwnd, UINT msg, 
+                               WPARAM wParam, LPARAM lParam);
+
     protected:
+     
+     void  SaveWindowPos(Pos &oPos);
+     void  DropFiles(HDROP dropHandle);
+     void  Notify(int32 command, LPNMHDR notifyMsgHdr);
+     void  CreateTooltips(void);
+     void  Paint(void);
+     void  TimerEvent(void);
+     void  SetStayOnTop(bool bStay);
+     void  SetLiveInToolbar(bool bLive);
     
      HWND     m_hWnd;
      Pos      m_oWindowPos;
