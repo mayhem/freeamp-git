@@ -246,7 +246,7 @@ Error XingLMC::GetHeadInfo()
        for(iFrame = 0, iOffset = 0; iFrame < iNumSanityCheckFrames; iFrame++)
        {
            m_frameBytes = head_info3(((unsigned char *)pBuffer) + iOffset,
-			                            iMaxFrameSize, &m_sMpegHead, 
+			                         iInitialFrameSize - iOffset, &m_sMpegHead, 
                                      (int*)&m_iBitRate, &iForward);
 
            iOffset += m_frameBytes + iForward + m_sMpegHead.pad;
