@@ -46,14 +46,21 @@ BeOSWindow::BeOSWindow( Theme* pTheme, string& oName )
 BeOSWindow::~BeOSWindow()
 {
     CHECK_POINT_MSG( "~BeOSWindow" );
-    delete m_pCanvas;
-    m_pCanvas = NULL;
+
+    if ( false && m_bIsVulcanMindMeldHost )
+    {
+        delete m_pCanvas;
+        m_pCanvas = NULL;
+    }
 }
 
 Error
 BeOSWindow::VulcanMindMeld( Window* other )
 {
     Rect rect;
+    bool windowAlreadyRunning = false;
+
+    CHECK_POINT_MSG( "VulcanMindMeld" );
 
     Error err = Window::VulcanMindMeld( other );
     if ( IsError( err ) )
@@ -62,7 +69,17 @@ BeOSWindow::VulcanMindMeld( Window* other )
         return err;
     }
 
-    m_mainWindow = new MainWindow( BRect(0,0,0,0), m_oName.c_str() );
+    // by now, canvas is set to new one.
+
+    if ( !m_mainWindow )
+    {
+        m_mainWindow = new MainWindow( BRect(0,0,0,0), m_oName.c_str() );
+    }
+    else
+    {
+        windowAlreadyRunning = true;
+        m_mainWindow->RemoveChild( m_mainWindow->ChildAt( 0 ) );
+    }
 
     // make myself parent of the canvas
     ((BeOSCanvas*)GetCanvas())->SetParent( this );
@@ -76,7 +93,10 @@ BeOSWindow::VulcanMindMeld( Window* other )
     other->GetWindowPosition( rect );
     SetWindowPosition( rect );
 
-    m_mainWindow->Run();
+    if ( !windowAlreadyRunning )
+    {
+        m_mainWindow->Run();
+    }
 
     return kError_NoErr;
 }
