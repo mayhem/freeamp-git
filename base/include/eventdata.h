@@ -962,12 +962,12 @@ class ShowPreferencesEvent:public Event
 class MissingFileEvent:public Event
 {
  private:
-   string m_url;
+   PlaylistItem *m_item;
  public:
-   MissingFileEvent(const string &url)
-   { m_type = INFO_FileNotFound; m_url = url; }
+   MissingFileEvent(PlaylistItem *item)
+   { m_type = INFO_FileNotFound; m_item = item; }
    virtual ~ MissingFileEvent(){ }
-   const string &URL() const{ return m_url; }
+   PlaylistItem *Item() const{ return m_item; }
 };
 
 #endif /* _EVENTDATA_H_ */

@@ -1365,6 +1365,8 @@ CreatePMO(const PlaylistItem * pc, Event * pC)
    // that will notify the user
    if (error == kError_FileNotFound)
    {
+      AcceptEvent(new MissingFileEvent((PlaylistItem *)
+                                       m_plm->GetCurrentItem()));
       m_plm->GotoNextItem();
       AcceptEvent(new Event(CMD_Play));
       goto epilogue;

@@ -37,8 +37,10 @@ class MissingFile
     MissingFile(FAContext *context);
     virtual ~MissingFile();
 
-    Error FindMissingFile(const string &url, const string &searchPath, 
+    Error FindMissingFile(PlaylistItem *item, const string &searchPath, 
                           string &newUrl);
+    Error AcceptLocation(PlaylistItem *item,
+                         const string &newUrl);
 
  protected:
 

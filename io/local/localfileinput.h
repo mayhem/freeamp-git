@@ -73,7 +73,6 @@ class LocalFileInput:public PhysicalMediaInput
    bool            m_bLoop;
    size_t          m_iFileSize;
    Thread        *m_pBufferThread; 
-   string          m_url;
 };
 
 #endif /* _LOCALFILEINPUT_H_ */
