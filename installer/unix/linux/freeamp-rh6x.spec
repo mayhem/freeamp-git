@@ -97,7 +97,7 @@ Group:       Applications/Multimedia
 Requires:    %{name} = %{version}
 Requires:    ORBit >= 0.5.0
 
-%description extras
+%description corba
 Corba remote control interface plugin
 
 # -------------------------------------------------------------------------
@@ -120,7 +120,7 @@ mkdir -p $RPM_BUILD_ROOT%{prefix}{/bin,/lib,/share}
 mkdir -p $RPM_BUILD_ROOT%{prefix}/lib/%{name}/plugins
 mkdir -p $RPM_BUILD_ROOT%{prefix}/share/%{name}/{help,themes}
 
-install -s {MakeTheme,%{name}} $RPM_BUILD_ROOT%{prefix}/bin
+install -s %{name} $RPM_BUILD_ROOT%{prefix}/bin
 install themes/* $RPM_BUILD_ROOT%{prefix}/share/%{name}/themes
 install -s plugins/* $RPM_BUILD_ROOT%{prefix}/lib/%{name}/plugins
 (cd $RPM_BUILD_ROOT%{prefix}/share/%{name}/ ;
