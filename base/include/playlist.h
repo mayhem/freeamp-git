@@ -26,6 +26,8 @@ ____________________________________________________________________________*/
 #define _PLAYLIST_H_
 
 #include "vector.h"
+#include "errors.h"
+#include "event.h"
 
 class PlayListItem {
  public:
@@ -59,9 +61,10 @@ public:
     };
 
  public:
-    PlayListManager();
+    PlayListManager(EventQueue *);
     ~PlayListManager();
     void Add(char *,int);
+	Error RemoveAll();
     void SetSkip(int32 f) { m_skipNum = f; } // logical media units to skip at beginning
     int32 GetSkip() { return m_skipNum; }
     PlayListItem *GetFirst();
@@ -81,6 +84,7 @@ public:
     RepeatPlay GetRepeat() {return m_repeat;}
 
  private:
+	 EventQueue *			m_target;
     Vector<PlayListItem *>* m_pMediaElems;
     int32                   m_current;
     int32                   m_skipNum;

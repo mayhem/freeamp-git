@@ -1456,28 +1456,13 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 								szFile,
 								sizeof(szFile));
 
-				if (!g_ui->m_plm) 
-                {
-					g_ui->m_plm->Add(szFile,0);
-					g_ui->m_plm->SetFirst();
-					g_ui->m_target->AcceptEvent(new Event(CMD_Play));
-				} 
-                else 
-                {
-					if (g_ui->m_plm->GetCurrent() == NULL) 
-                    {
-						g_ui->m_plm->Add(szFile,0);
-						// first in playlist...
-						//g_ui->m_target->AcceptEvent(new Event(CMD_Play));
-                        SendMessage(hwnd, WM_COMMAND, kPlayControl,0);
-					} 
-                    else 
-                    {
-						g_ui->m_plm->Add(szFile,0);
-					}
-				}
+				g_ui->m_plm->Add(szFile,0);
+				g_ui->m_plm->SetFirst();
 			}
-
+			if (count) {
+				g_ui->m_target->AcceptEvent(new Event(CMD_Play));
+                SendMessage(hwnd, WM_COMMAND, kPlayControl,0);
+			}
 			break;
 		}
 

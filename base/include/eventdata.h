@@ -35,28 +35,22 @@ ____________________________________________________________________________*/
 
 class MediaInfoEvent : public Event {
  public:
+	 bool m_filled;
     float m_totalSeconds;
     int32 m_indexOfSong;
     int32 m_totalSongs;
-    char m_songTitle[512];
     char m_filename[512];
     virtual ~MediaInfoEvent() {}
-    MediaInfoEvent() { m_type = INFO_MediaInfo; m_songTitle[0] = '\0'; m_filename[0] = '\0'; }
+    MediaInfoEvent() { m_type = INFO_MediaInfo; m_filled = false; m_filename[0] = '\0'; }
     MediaInfoEvent( const char *t,
                     const char *fn, 
                     float ts)
     {
+		m_filled = true;
 		m_type = INFO_MediaInfo;
         m_totalSeconds = ts;
         m_indexOfSong = 0;
         m_totalSongs = 0;
-
-        if (t) {
-	        strncpy(m_songTitle,t,511);
-	        m_songTitle[511] = '\0';
-        } else {
-	        m_songTitle[0] = '\0';
-        }
 
         if (fn) {
 	        strncpy(m_filename,fn,511);

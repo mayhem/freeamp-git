@@ -28,8 +28,11 @@ ____________________________________________________________________________*/
 
 #include "playlist.h"
 #include "vector.h"
+#include "event.h"
+#include "eventdata.h"
 
-PlayListManager::PlayListManager() {
+PlayListManager::PlayListManager(EventQueue *pPlayer) {
+	m_target = pPlayer;
     m_pMediaElems = new Vector<PlayListItem *>();
     m_pOrderList = new Vector<OrderListItem *>();
     if (!m_pMediaElems || !m_pOrderList) {
@@ -54,6 +57,16 @@ PlayListManager::~PlayListManager() {
 	delete m_pOrderList;
 	m_pOrderList = NULL;
     }
+}
+
+Error PlayListManager::RemoveAll() {
+	m_pMediaElems->DeleteAll();
+	m_pOrderList->DeleteAll();
+	m_current = -1;
+	m_skipNum = 0;
+
+	m_target->AcceptEvent(new MediaInfoEvent());
+	return kError_NoErr;
 }
 
 void PlayListManager::Add(char *pc, int type) {
