@@ -401,6 +401,8 @@ begin
 		bRegisterForRMPs = bRegisterFileTypes;		
 		
 		if(bRegisterForRMPs = TRUE) then
+			szKey = "Software\\Netscape\\Netscape Navigator\\Suffixes";
+			RegDBSetKeyValueEx(szKey, "application/vnd.rn-rn_music_package", REGDB_STRING, "rmp", -1);
 			szKey = "Software\\Netscape\\Netscape Navigator\\Viewers";
 			RegDBSetKeyValueEx(szKey, "application/vnd.rn-rn_music_package", REGDB_STRING, szAppPath, -1);
 			szKey = "Software\\Netscape\\Netscape Navigator\\User Trusted External Applications";
@@ -915,6 +917,7 @@ end;
 // --- include script file section ---
 
 #include "sddialog.rul"
+
 
 
 
