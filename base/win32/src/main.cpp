@@ -287,6 +287,8 @@ bool SendCommandLineToRealJukebox()
                                     MessageBox(NULL, The_BRANDING" does not support the formats "
                                                      "contained in this Music Package.  The download "
                                                      "will be aborted.", "Unsupported Formats", MB_OK);
+
+                                    DeleteFile(__argv[1]);
                                 }
 							}
 						}
