@@ -113,7 +113,7 @@ pBase = 0;
    else
       m_hWnd = (HWND)pProp->GetInt32();
    
-   m_volume = new Win32Volume(Win32Volume::eWaveOut, hWnd);
+   m_volume = new Win32Volume(Win32Volume::eWaveOut, m_hWnd);
 } 
 
 SoundCardPMO::~SoundCardPMO()

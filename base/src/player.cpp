@@ -1596,35 +1596,41 @@ CreatePMO(const PlaylistItem * pc, Event * pC)
                 break;
             }
        }
+
+	   // if the default isn't around then just use first one 
+	   // is there a better way?
+	   if(!item)
+		  item = m_pmoRegistry->GetItem(0);
+
+	   if (item)
+	   {
+		  pmo = (PhysicalMediaOutput *) item->InitFunction()(m_context);
+		  pmo->SetPropManager((Properties *) this);
+	   }
+
+	   error = kError_NoErr;
+	   if (lmc_item)
+	   {
+		  lmc = (LogicalMediaConverter *) lmc_item->InitFunction()(m_context);
+
+		  lmc->SetPropManager((Properties *) this);
+	   }
+
+	   lmc->SetPMI(pmi);
+	   lmc->SetPMO(pmo);
+
+	   pmo->SetPMI(pmi);
+	   pmo->SetLMC(lmc);
+
+	   lmc->SetEQData(m_eqValues, m_eqPreamp);
+	   lmc->SetEQData(m_eqEnabled);
    }
-
-   // if the default isn't around then just use first one 
-   // is there a better way?
-   if(!item)
-      item = m_pmoRegistry->GetItem(0);
-
-   if (item)
+   else
    {
-      pmo = (PhysicalMediaOutput *) item->InitFunction()(m_context);
-      pmo->SetPropManager((Properties *) this);
+	   // We're using the CD PMO, do no need to set up an LMC or PMI
+	   pmo = (PhysicalMediaOutput *) item->InitFunction()(m_context);
+	   pmo->SetPropManager((Properties *) this);
    }
-
-   error = kError_NoErr;
-   if (lmc_item)
-   {
-      lmc = (LogicalMediaConverter *) lmc_item->InitFunction()(m_context);
-
-      lmc->SetPropManager((Properties *) this);
-   }
-
-   lmc->SetPMI(pmi);
-   lmc->SetPMO(pmo);
-
-   pmo->SetPMI(pmi);
-   pmo->SetLMC(lmc);
-
-   lmc->SetEQData(m_eqValues, m_eqPreamp);
-   lmc->SetEQData(m_eqEnabled);
 
    pmi = NULL;
    m_lmc = lmc;

@@ -34,6 +34,7 @@ ____________________________________________________________________________*/
 #include "eventdata.h"
 #include "facontext.h"
 #include "log.h"
+#include "debug.h"
 
 #include <windows.h>
 
@@ -62,15 +63,15 @@ CDPMO::CDPMO(FAContext *context) :
    trackDone = false;
    Int32PropValue *pProp;
 
-    m_hWnd = 0;
+   m_hWnd = 0;
 
-    if (IsError(m_pContext->props->GetProperty("MainWindow", 
-              (PropValue **)&pProp)))
-        return;        
-    else
-        m_hWnd = (HWND)pProp->GetInt32();
+   if (IsError(m_pContext->props->GetProperty("MainWindow", 
+             (PropValue **)&pProp)))
+       return;        
+   else
+       m_hWnd = (HWND)pProp->GetInt32();
 
-   m_volume = Win32Volume::GetInstance( Win32Volume::eCDOut, m_hWnd );
+   m_volume = new Win32Volume( Win32Volume::eCDOut, m_hWnd );
 }
 
 CDPMO::~CDPMO()
@@ -88,6 +89,8 @@ CDPMO::~CDPMO()
        Reset(true);
 
    cd_finish(m_cdDesc);
+
+   delete m_volume;
 }
 
 void CDPMO::SetVolume(int32 left, int32 right)

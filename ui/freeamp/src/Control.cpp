@@ -231,7 +231,10 @@ void Control::SetStateBitmap(Bitmap *pBitmap, Rect &oBitmapRect,
     m_pBitmap = pBitmap;
 
     if (m_oStateBitmapRect.size() < (unsigned int)(iState + 1)) 
+		// IJR: Boundschecker complains that this line leaks memory.
+		//      Is this our problem or something with the STL?
         m_oStateBitmapRect.resize(iState + 1);
+
     m_oStateBitmapRect[iState][eClickState] = oBitmapRect;
 
     if (m_oStateBitmaps.size() < (unsigned int)(iState + 1))

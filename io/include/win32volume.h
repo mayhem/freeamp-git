@@ -7,6 +7,7 @@
 class Win32Volume
 {
 	public:
+        enum eDeviceType { eWaveOut = 0, eCDOut };
 
 		         Win32Volume( eDeviceType, HWND );
 		virtual ~Win32Volume(void);
@@ -14,7 +15,6 @@ class Win32Volume
 		void GetVolume(int32 &left, int32 &right);
 		void SetVolume(int32 left, int32 right);
 
-        enum eDeviceType { eWaveOut = 0, eCDOut };
 
 	protected:
 
