@@ -223,6 +223,7 @@ class MusicBrowserUI : public UserInterface
     void    AddTrackURLs(TV_ITEM* tv_item, vector<string>* urls);
     void    AddAllTrackURLs(vector<string>* urls);
     void    AddUncatagorizedTrackURLs(vector<string>* urls);
+    void    AddSelectedPlaylistItems(vector<string>* urls);
 
     // Data members
     EventQueue          *m_playerEQ;

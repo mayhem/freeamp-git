@@ -929,19 +929,21 @@ void MusicBrowserUI::SetTitles(void)
 
 void MusicBrowserUI::BeginDrag(HWND hwnd, NM_TREEVIEW* nmtv)
 {
-    vector<string>* urls = new vector<string>;
+    if(m_hNewPlaylistItem != nmtv->itemNew.hItem)
+    {
+        vector<string>* urls = new vector<string>;
 
-    GetSelectedMusicTreeItems(urls); 
+        GetSelectedMusicTreeItems(urls); 
 
-    DataObject* data = new DataObject(urls);
-    DropSource* src = new DropSource(hwnd, nmtv);
-    DWORD dwEffect = 0;
+        DataObject* data = new DataObject(urls);
+        DropSource* src = new DropSource(hwnd, nmtv);
+        DWORD dwEffect = 0;
 
-    DoDragDrop(data, src, DROPEFFECT_COPY|DROPEFFECT_SCROLL, &dwEffect); 
+        DoDragDrop(data, src, DROPEFFECT_COPY|DROPEFFECT_SCROLL, &dwEffect); 
 
-    data->Release();
-    src->Release();
-
+        data->Release();
+        src->Release();
+    }
 }
 
 void MusicBrowserUI::DropFiles(HDROP dropHandle, bool filesAreURLs)

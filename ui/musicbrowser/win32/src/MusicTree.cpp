@@ -539,6 +539,96 @@ BOOL MusicBrowserUI::FindSelectedItems(HWND hwnd, HTREEITEM root, vector<string>
     return result;
 }
 
+void MusicBrowserUI::AddSelectedPlaylistItems(vector<string>* urls)
+{
+    TV_ITEM tv_root;
+
+    tv_root.hItem = m_hPlaylistItem;
+    tv_root.mask = TVIF_STATE;
+    tv_root.stateMask = TVIS_SELECTED;
+    tv_root.state = 0;
+
+    TreeView_GetItem(m_hMusicCatalog, &tv_root);
+
+    // if selected then we add all the playlists
+    if(tv_root.state & TVIS_SELECTED)
+    {
+        TV_ITEM tv_item;
+
+        // get the first playlist item
+        tv_item.hItem = TreeView_GetChild(m_hMusicCatalog, m_hPlaylistItem);
+        tv_item.mask = TVIF_STATE|TVIF_PARAM;
+        tv_item.stateMask = TVIS_SELECTED;
+        tv_item.state = 0;
+
+        // skip the "Create New Playlist..." item
+        tv_item.hItem = TreeView_GetNextSibling(m_hMusicCatalog, tv_item.hItem);
+
+        if(tv_item.hItem)
+        {
+            BOOL result = FALSE;
+
+            do
+            {
+                result = TreeView_GetItem(m_hMusicCatalog, &tv_item);
+
+                if(result)
+                {
+                    string playlist;
+
+                    playlist = m_oTreeIndex.Data(tv_item.lParam).m_oPlaylistPath;
+
+                    urls->push_back(playlist);
+                }
+        
+            }while(result && 
+                   (tv_item.hItem = TreeView_GetNextSibling(m_hMusicCatalog, 
+                                                            tv_item.hItem)));
+        }    
+       
+    }
+    else // iterate the playlists and add selected ones
+    {
+        TV_ITEM tv_item;
+
+        // get the first playlist item
+        tv_item.hItem = TreeView_GetChild(m_hMusicCatalog, m_hPlaylistItem);
+        tv_item.mask = TVIF_STATE|TVIF_PARAM;
+        tv_item.stateMask = TVIS_SELECTED;
+        tv_item.state = 0;
+
+        // skip the "Create New Playlist..." item
+        tv_item.hItem = TreeView_GetNextSibling(m_hMusicCatalog, tv_item.hItem);
+
+        if(tv_item.hItem)
+        {
+            BOOL result = FALSE;
+
+            // iterate the items and see if any are selected.
+            // for now we only grab the first one on an export
+            // but i need to figure out a good way to allow a
+            // user to export multiple items since we allow
+            // multi-select in the treeview.
+            do
+            {
+                result = TreeView_GetItem(m_hMusicCatalog, &tv_item);
+
+                if(result && (tv_item.state & TVIS_SELECTED))
+                {
+                    string playlist;
+
+                    playlist = m_oTreeIndex.Data(tv_item.lParam).m_oPlaylistPath;
+
+                    urls->push_back(playlist);
+                }
+        
+            }while(result && 
+                   (tv_item.hItem = TreeView_GetNextSibling(m_hMusicCatalog, 
+                                                            tv_item.hItem)));
+        }
+    }
+}
+
 // get all the selected items... there are some special
 // cases:
 //
@@ -618,6 +708,9 @@ void MusicBrowserUI::GetSelectedMusicTreeItems(vector<string>* urls)
                     FindSelectedItems(m_hMusicCatalog, firstSearchItem, urls);
             }
         }
+
+        // iterate playlists
+        AddSelectedPlaylistItems(urls);
     }
 }
 

@@ -181,6 +181,10 @@ void MusicBrowserUI::ExportPlaylistEvent()
     tv_item.stateMask = TVIS_SELECTED;
     tv_item.state = 0;
 
+    // skip the "Create New Playlist..." item
+    tv_item.hItem = TreeView_GetNextSibling(m_hMusicCatalog, tv_item.hItem);
+
+
     if(tv_item.hItem)
     {
         BOOL result = FALSE;
