@@ -35,7 +35,8 @@ enum
     PMO_Init,
     PMO_Info,
     PMO_Reset,
-    PMO_Quit
+    PMO_Quit,
+    PMO_Error
 };
 
 class PMOInitEvent : public Event
@@ -106,6 +107,15 @@ class PMOQuitEvent : public Event
                   m_type = PMO_Quit;
                };
       virtual ~PMOQuitEvent(void) { ; };
+
+    protected:
+};
+
+class PMOErrorEvent : public Event
+{
+    public:
+	      PMOErrorEvent(void) { m_type = PMO_Error; }
+     virtual ~PMOErrorEvent(void) { ; }
 
     protected:
 };

@@ -151,10 +151,11 @@ class EventQueue {
 #define CMD_EditCurrentPlaylistItemInfo  84 // Used to instruct the info editor to edit the current metadata item
 #define CMD_GenerateSignature        85 // sent by the MC to tell the player to generate a signature
 #define INFO_AudioSignatureGenerated 86 // sent by the signature.pmo generation algo.
-#define CMD_GeneratePlaylist         87 // sent to the MC to generate an APL playlist
-#define INFO_UnsignaturedTracksExist 88 // sent by MC to UIs to prompt user to generate signatures
-#define INFO_SignaturingStarted      89 // sent by player to inform UIs of signaturing status
-#define INFO_SignaturingStopped      90 // sent by player to inform UIs of signaturing status
-#define CMD_KillSigThread            91 // sent by MC to player to kill signaturing thread
+#define INFO_AudioSignatureFailed    87 // sent by the signature.pmo to indicate a failed signature.
+#define CMD_GeneratePlaylist         88 // sent to the MC to generate an APL playlist
+#define INFO_UnsignaturedTracksExist 89 // sent by MC to UIs to prompt user to generate signatures
+#define INFO_SignaturingStarted      90 // sent by player to inform UIs of signaturing status
+#define INFO_SignaturingStopped      91 // sent by player to inform UIs of signaturing status
+#define CMD_KillSigThread            92 // sent by MC to player to kill signaturing thread
 #endif // _EVENT_H_
 

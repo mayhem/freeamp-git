@@ -802,6 +802,20 @@ public:
     PhysicalMediaOutput *PMO() { return m_pmo; }
 };
 
+class AudioSignatureFailedEvent : public Event {
+  private:
+    string m_url;
+    PhysicalMediaOutput *m_pmo;
+    
+  public:
+    AudioSignatureFailedEvent(string &url, PhysicalMediaOutput *pmo)
+    { m_type = INFO_AudioSignatureFailed; m_url = url; m_pmo = pmo; } 
+    virtual ~AudioSignatureFailedEvent() {}
+
+    const string Url() const { return m_url; }
+    PhysicalMediaOutput *PMO() { return m_pmo; }
+};
+
 class GeneratePlaylistEvent : public Event {
 private:
     const PlaylistItem *m_item;

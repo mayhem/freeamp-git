@@ -230,6 +230,14 @@ WorkerThread(void)
                     break;
                 }
             }
+            if (pEvent->Type() == PMO_Error)
+            {
+                AudioSignatureFailedEvent *asfe;
+                asfe = new AudioSignatureFailedEvent(m_url, this);
+                m_pTarget->AcceptEvent(asfe);
+                delete pEvent;
+                return;
+            }
             delete pEvent;
 
             continue;
@@ -285,6 +293,14 @@ WorkerThread(void)
                 if (pEvent->Type() == PMO_Quit) {
                     bGotPMOQuit = true;
                     continue;
+                }
+                if (pEvent->Type() == PMO_Error)
+                {
+                    AudioSignatureFailedEvent *asfe;
+                    asfe = new AudioSignatureFailedEvent(m_url, this);
+                    m_pTarget->AcceptEvent(asfe);
+                    delete pEvent;
+                    return;
                 }
 
                 delete pEvent;

@@ -1718,6 +1718,14 @@ Error Theme::EndElement(string &oElement)
            }    
        }
 
+       // fix lameass broken CocaCola themes... someone didn't read the theme
+       // HOWTO
+       if (m_pCurrentPanel == NULL) 
+       {
+           m_pCurrentPanel = new Panel("DummyPanel");
+           m_pCurrentPanel->SetParentWindow(m_pCurrentWindow);
+       }
+
        m_pCurrentPanel->AddControl(m_pCurrentControl);
        m_pCurrentControl = NULL;
        m_eCurrentControl = eUndefinedControl;

@@ -71,7 +71,7 @@ void GTKMusicBrowser::AskSignatureDialog(void)
                      "selecting 'Stop Signaturing' from the Relatable menu in "
                      "'My Music'. " +
                      string("You need to signature ") + string(numtracks) + 
-                     string(" tracks.  Do it?");
+                     string(" track(s).  Do it?");
 
     if (dialog->Show(message.c_str(), caption.c_str(), kMessageYesNo) ==
         kMessageReturnYes) 

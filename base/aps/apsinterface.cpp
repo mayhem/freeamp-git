@@ -323,6 +323,11 @@ int APSInterface::ChangeProfile(const char *pczUserName)
                              string(pczUserName);
         m_pLogFile = new fstream(logfilename.c_str(), 
                                  ios_base::out | ios_base::app);
+
+        string savedProfiles = m_profilePath + string(DIR_MARKER_STR) +
+                               string("profiles.txt");
+        WriteProfileMap(savedProfiles.c_str());
+
         return APS_NOERROR;
     }
     else
@@ -421,6 +426,10 @@ int APSInterface::DeleteProfile(const char *pczNewName, bool bServerToo)
             m_pLogFile = NULL;
         }
     }
+
+    string savedProfiles = m_profilePath + string(DIR_MARKER_STR) +
+                           string("profiles.txt");
+    WriteProfileMap(savedProfiles.c_str());
 
     return APS_NOERROR;
 }

@@ -1279,6 +1279,9 @@ KillSigThread(Event *pEvent)
             m_sigspmo = NULL;
         }
         m_signatureThread->Join();
+
+        delete m_signatureThread;
+        m_signatureThread = NULL;
     }
     m_signatureThread = NULL;
 }
@@ -1297,8 +1300,19 @@ GenerateSignature(Event *pEvent)
     set<string> *tracks = gse->Tracks();
 
     if (m_signatureThread) {
+cout << "killing sig thread\n";
         m_bKillSignature = true;
+        if (m_sigspmo) {
+cout << "need to delete sigspmo\n";
+            delete m_sigspmo;
+            m_sigspmo = NULL;
+        }
+cout << "joining thread\n";
         m_signatureThread->Join();
+
+        delete m_signatureThread;
+        m_signatureThread = NULL;
+cout << "done killing thread\n";
     }
         
     m_signatureThread = Thread::CreateThread();
@@ -1308,7 +1322,7 @@ GenerateSignature(Event *pEvent)
         gss->thread = m_signatureThread;
         gss->tracks = tracks;
 
-        m_signatureThread->Create(generate_sigs_function, gss, true);
+        m_signatureThread->Create(generate_sigs_function, gss, false);
     }
 }
 
@@ -1319,7 +1333,6 @@ generate_sigs_function(void *arg)
     GenerateSigsStruct *gss = (GenerateSigsStruct *)arg;
     gss->player->GenerateSigsWork(gss->tracks);
 
-    delete gss->thread;
     delete gss;
 }
 
@@ -1391,8 +1404,6 @@ GenerateSigsWork(set<string> *items)
         pmo->SetLMC(lmc);
 
         DecodeInfo decInfo;
-//        decInfo.downsample = 2;
-//        decInfo.mono = decInfo.eightbit = true;
         decInfo.sendInfo = false;
 
         lmc->SetDecodeInfo(decInfo);
@@ -1406,13 +1417,12 @@ GenerateSigsWork(set<string> *items)
             break; 
         }
  
-        m_sigspmo = pmo; 
-
         error = pmo->SetTo(url.c_str());
         if (error == kError_FileNotFound) {
             delete pmo;
             delete lmc;
             delete pmi;
+            m_sigspmo = NULL;
             m_signatureSem->Signal();
             continue;
         }
@@ -1426,12 +1436,15 @@ GenerateSigsWork(set<string> *items)
             delete pmo;
             delete lmc;
             delete pmi;
+            m_sigspmo = NULL;
             m_signatureSem->Signal();
             continue;
         }
 
         string browserInfo = "Generating signature for " + url;
         AcceptEvent(new BrowserMessageEvent(browserInfo.c_str()));
+
+        m_sigspmo = pmo;
 
         pmo->Resume();
 
@@ -1447,7 +1460,6 @@ GenerateSigsWork(set<string> *items)
     AcceptEvent(new Event(INFO_SignaturingStopped));
 
     delete items;
-    m_signatureThread = NULL;
     m_bKillSignature = false;
 }
 
@@ -1668,11 +1680,13 @@ DoneOutputting(Event *pEvent)
    if (item)
    {
       MetaData mdata = (MetaData)item->GetMetaData();
-      mdata.AddPlayCount();
-      item->SetMetaData(&mdata);
-      m_plm->UpdateTrackMetaData(item);
-      m_musicCatalog->UpdateSong(item);
-      m_APSInterface->WriteToLog(mdata.GUID());   
+      if (mdata.GUID().size() == 16) {
+          mdata.AddPlayCount();
+          item->SetMetaData(&mdata);
+          m_plm->UpdateTrackMetaData(item);
+          m_musicCatalog->UpdateSong(item);
+          m_APSInterface->WriteToLog(mdata.GUID());   
+      }
    }
 
    SEND_NORMAL_EVENT(INFO_DoneOutputting);
@@ -2143,6 +2157,19 @@ HandleAudioSigGenerated(Event *pEvent)
     delete pEvent;
 }
 
+void 
+Player::
+HandleAudioSigFailed(Event *pEvent)
+{
+    AudioSignatureFailedEvent *asfe = (AudioSignatureFailedEvent *)pEvent;
+    if (m_sigspmo)
+        delete asfe->PMO();
+    m_sigspmo = NULL;
+    m_musicCatalog->AcceptEvent(pEvent);
+
+    delete pEvent;
+}
+
 int32 
 Player::
 ServiceEvent(Event * pC)
@@ -2231,6 +2258,10 @@ ServiceEvent(Event * pC)
 
         case INFO_AudioSignatureGenerated:
             HandleAudioSigGenerated(pC);
+            break;
+
+        case INFO_AudioSignatureFailed:
+            HandleAudioSigFailed(pC);
             break;
 
         case INFO_UserMessage:

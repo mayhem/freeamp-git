@@ -148,6 +148,7 @@ class Player : public EventQueue, Properties, PropertyWatcher
     void SendEventToCatalog(Event *pEvent);   
     void GenerateSignature(Event *pEvent);
     void HandleAudioSigGenerated(Event *pEvent);
+    void HandleAudioSigFailed(Event *pEvent);
     void KillSigThread(Event *pEvent);
     
     #define _EQUALIZER_ENABLE_

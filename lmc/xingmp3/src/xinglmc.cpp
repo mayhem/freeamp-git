@@ -197,7 +197,10 @@ Error XingLMC::AdvanceBufferToNextFrame()
 
    if (Err != kError_NoErr)
    {
-      ReportError(szFailRead);
+      if (m_decodeInfo.sendInfo) 
+          ReportError(szFailRead);
+      else
+          ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(new PMOErrorEvent());
       return Err;
    }
 
@@ -226,8 +229,11 @@ Error XingLMC::AdvanceBufferToNextFrame()
 
        if (Err != kError_NoErr)
        {
-           ReportError(szFailRead);
-	       return Err;
+           if (m_decodeInfo.sendInfo) 
+               ReportError(szFailRead);
+           else
+               ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(new PMOErrorEvent());
+	   return Err;
        }
    }
 
@@ -250,7 +256,10 @@ Error XingLMC::GetHeadInfo()
        {
           if (Err != kError_EndOfStream && Err != kError_Interrupt)
           {
-              ReportError(szFailRead);
+              if (m_decodeInfo.sendInfo) 
+                  ReportError(szFailRead);
+              else
+                  ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(new PMOErrorEvent());
           }
           return Err;
        }
@@ -744,7 +753,10 @@ void XingLMC::DecodeWork()
    if (Err != kError_NoErr)
    {
        m_pContext->log->Error("CanDecode returned false.\n");
-       ReportError(szCannotDecode);
+       if (m_decodeInfo.sendInfo)
+           ReportError(szCannotDecode);
+       else
+           ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(new PMOErrorEvent());
        return;
    }
 
@@ -755,7 +767,10 @@ void XingLMC::DecodeWork()
    if (IsError(Err))
    {
        m_pContext->log->Error("ExtractMediaInfo failed: %d\n", Err);
-       ReportError(szCannotDecode);
+       if (m_decodeInfo.sendInfo)
+           ReportError(szCannotDecode);
+       else 
+           ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(new PMOErrorEvent());
 
        return;
    }
@@ -767,8 +782,10 @@ void XingLMC::DecodeWork()
    if (IsError(Err))
    {
        m_pContext->log->Error("Initializing the decoder failed: %d\n", Err);
-       ReportError("Initializing the decoder failed.");
-
+       if (m_decodeInfo.sendInfo)
+           ReportError("Initializing the decoder failed.");
+       else
+           ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(new PMOErrorEvent());
        return;
    }
 
@@ -805,7 +822,10 @@ void XingLMC::DecodeWork()
           }
           if (Err != kError_NoErr)
           {
-              ReportError(szFailWrite);
+              if (m_decodeInfo.sendInfo)
+                  ReportError(szFailWrite);
+              else
+                  ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(new PMOErrorEvent());
               m_pContext->log->Error("LMC: Cannot write to eventbuffer: %s (%d)\n", 
                         m_szError, Err); 
               return;
@@ -884,7 +904,10 @@ void XingLMC::DecodeWork()
              if (Err != kError_NoErr)
              {
                  m_pContext->log->Error("LMC: Cannot advance to next frame: %d\n", Err);
-                 ReportError("Cannot advance to next frame. Possible media corruption?");
+                 if (m_decodeInfo.sendInfo)
+                     ReportError("Cannot advance to next frame. Possible media corruption?");
+                 else
+                     ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(new PMOErrorEvent());
                  return;
              }
 			 m_audioMethods.decode_init(&m_sMpegHead, m_frameBytes, 0, 0, 0, 24000);
@@ -917,7 +940,10 @@ void XingLMC::DecodeWork()
          if (IsError(Err))
          {
              m_pContext->log->Error("lmc: EndWrite returned %d\n", Err);
-             ReportError(szFailWrite);
+             if (m_decodeInfo.sendInfo)
+                 ReportError(szFailWrite);
+             else
+                 ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(new PMOErrorEvent());
              return;
          }
       }
@@ -926,7 +952,10 @@ void XingLMC::DecodeWork()
       {
          m_pContext->log->Error("LMC: Maximum number of retries reached"
                       " while trying to decode.\n");
-         ReportError("Cannot decode this MP3. Is the MP3 corrupted?");
+         if (m_decodeInfo.sendInfo) 
+             ReportError("Cannot decode this MP3. Is the MP3 corrupted?");
+         else
+             ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(new PMOErrorEvent());
          return;
       }
 

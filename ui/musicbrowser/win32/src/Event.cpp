@@ -83,7 +83,7 @@ void MusicBrowserUI::AskSignatureDialog(void)
                      "selecting 'Stop Signaturing' from the Relatable menu in "
                      "'My Music'. " +
                      string("You need to signature ") + string(numtracks) +
-                     string(" tracks.  Do it?");
+                     string(" track(s).  Do it?");
 
     int ret = MessageBox(m_hWnd, message.c_str(), caption.c_str(),
                          MB_YESNO|MB_ICONQUESTION);

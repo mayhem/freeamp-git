@@ -1300,6 +1300,36 @@ Error MusicCatalog::AcceptEvent(Event *e)
             }
             break;
         }
+        case INFO_AudioSignatureFailed: {
+            AudioSignatureFailedEvent *asfe = (AudioSignatureFailedEvent *)e;
+            m_sigs->erase(asfe->Url());
+
+            uint32 length = asfe->Url().size() + 20;
+            char *curl = new char[length];
+            FilePathToURL(asfe->Url().c_str(), curl, &length);
+
+            string url = curl;
+            delete [] curl;
+       
+            MetaData *data = ReadMetaDataFromDatabase(url.c_str());
+            if (!data)
+                data = new MetaData;
+
+            data->SetGUID("BAD_MP3         ");
+
+            WriteMetaDataToDatabase(url.c_str(), (*data));
+            m_database->Sync();
+
+            PlaylistItem *plitem = GetPlaylistItemFromURL(url.c_str());
+            if (plitem) {
+                plitem->SetMetaData(data);
+                UpdateSong(plitem);
+                m_plm->UpdateTrackMetaData(plitem, false);
+            }
+
+            delete data;
+            break;
+        }   
         case INFO_AudioSignatureGenerated: {
             AudioSignatureGeneratedEvent *asge = 
                                      (AudioSignatureGeneratedEvent *)e;
