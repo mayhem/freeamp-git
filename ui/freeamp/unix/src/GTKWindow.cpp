@@ -473,9 +473,11 @@ void GTKWindow::SetMouseIn(void)
 
 void GTKWindow::SetMouseOut(void)
 {
-    if (m_bMouseInWindow)
-        MouseHasLeftWindow();
-    m_bMouseInWindow = false;
+    if (!m_bWindowMove) {
+        if (m_bMouseInWindow)
+            MouseHasLeftWindow();
+        m_bMouseInWindow = false;
+    }
 }
 
 Error GTKWindow::GetDesktopSize(int32 &iX, int32 &iY)
