@@ -20,7 +20,9 @@ From binaries:
     - Move freeamp to /usr/local/bin (or, somewhere else in your path)
     - Move the plugins directory (complete with contents) to
         /usr/local/lib/freeamp  (see first note under the Linux section below)
-    - If you do not have ALSA installed, remove alsa-linux.pmo from the
+    - If you do not have ALSA installed, remove alsa.pmo from the
+        /usr/local/lib/freeamp/plugins directory.
+    - If you do not have EsounD installed, remove esound.pmo from the
         /usr/local/lib/freeamp/plugins directory.
 
 
@@ -82,9 +84,9 @@ Notes:
 
          InstallDirectory: /usr/local/lib
          LibraryPath: .:~/.freeamp:/usr/local/lib/freeamp
-         UI: freeamp-linux.ui
-         TextUI: freeampcmd-linux.ui
-         PMO: soundcard-linux.pmo
+         UI: freeamp.ui
+         TextUI: freeampcmd.ui
+         PMO: soundcard.pmo
          ALSADevice: 1:1
          InputBufferSize: 64
          OutputBufferSize: 512
@@ -152,13 +154,13 @@ Notes:
   * Click on the display to cycle through 'total time', 'current time'
     and 'remaining time'.
 The Six buttons on the right:
-  * Upper right is currently not functional (in the future it will
+  * Upper left is currently not functional (in the future it will
     switch between player modes)
   * Upper middle iconifies FreeAmp
   * Upper right closes FreeAmp
   * Lower left toggles Repeat Mode between None, Current and All
   * Lower middle toggles Shuffle Mode between On and Off
-  * Lower left is currently not functional (in the future it will
+  * Lower right is currently not functional (in the future it will
     open the file-open drawer)
 
 
