@@ -79,7 +79,7 @@ class ColumnInfo
      {
          for( int i = 0; i < m_columnData.size(); i++ )
          {
-             ColumnHolder *ch = m_columnData.at( i );
+             ColumnHolder *ch = m_columnData[i];
              if ( index == ch->GetIndex() )
                  return( ch->GetText() );
          }
@@ -93,7 +93,7 @@ class ColumnInfo
      {
          for( int i = 0; i < m_columnData.size(); i++ )
          {
-             ColumnHolder *ch = m_columnData.at( i );
+             ColumnHolder *ch = m_columnData[i];
              if ( stricmp( ch->GetText(), text ) == 0 )
                  return( ch->GetIndex() );
          }

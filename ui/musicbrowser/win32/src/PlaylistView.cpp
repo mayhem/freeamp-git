@@ -341,11 +341,11 @@ void MusicBrowserUI::InitList(void)
     }
 
     int columnN = 1;
-    char *token = strtok(buffer, '|');
+    char *token = strtok(buffer, "|");
     while (token != NULL)
     {
         InsertColumn(token, columnN);
-        token = strtok(NULL, '|');
+        token = strtok(NULL, "|");
         columnN++;
     }
 
@@ -394,7 +394,7 @@ void  MusicBrowserUI::InsertColumn( const char *title, int position )
     if (0 == position)
     {
         lvc.cx = INDEX_COLUMN_WIDTH;
-        lcx.mask |= LVCF_WIDTH;
+        lvc.mask |= LVCF_WIDTH;
     }
 
     // Add to our list.
@@ -413,7 +413,7 @@ void MusicBrowserUI::ResizeColumns()
     // Disable repaints.
     //
 
-    SendMessage(m_hlaylistView, WM_SETREDRAW, FALSE, 0);
+    SendMessage(m_hPlaylistView, WM_SETREDRAW, FALSE, 0);
     ShowWindow(m_hPlaylistView, SW_HIDE);
 
     HWND hwndList = GetDlgItem(m_hWnd, IDC_PLAYLISTBOX);

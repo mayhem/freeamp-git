@@ -399,7 +399,7 @@ void CDPMO::WorkerThread(void)
 
               return;
           }
-          WasteTime();
+          usleep(10000);
       }
    }
 }

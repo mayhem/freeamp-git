@@ -383,7 +383,7 @@ void Win32PreferenceWindow::GetPrefsValues(PrefsStruct* values)
     {
         bufferSize = size;
         buffer = (char*)realloc(buffer, bufferSize);
-        m_prefs->GetPrefString(PlaylistHeaderColumnsPref, buffer, &size);
+        m_prefs->GetPrefString(kPlaylistHeaderColumnsPref, buffer, &size);
     }
 
     values->playlistHeaderColumns = buffer;
@@ -3887,7 +3887,7 @@ bool Win32PreferenceWindow::PrefBrowserProc(HWND hwnd,
         }
         case WM_HELP:
         {
-            LaunchHelp(hwnd, Preferences_General);
+            //LaunchHelp(hwnd, Preferences_General);
             break;
         }
 
