@@ -121,10 +121,7 @@ class     XingLMC:public LogicalMediaConverter
 
    static void          DecodeWorkerThreadFunc(void *);
    void                 DecodeWork();
-   Error                BeginRead(void *&pBuffer, unsigned int iBytesNeeded,
-                                  bool bBufferUp = true);
-   Error                BlockingBeginRead(void *&pBuffer, 
-                                          unsigned int iBytesNeeded);
+   Error                BeginRead(void *&pBuffer, unsigned int iBytesNeeded);
    Error                EndRead(size_t iBytesUsed);
    Error                AdvanceBufferToNextFrame();
    Error                GetHeadInfo();

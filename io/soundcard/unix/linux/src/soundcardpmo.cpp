@@ -336,6 +336,8 @@ void SoundCardPMO::WorkerThread(void)
    // Don't do anything until resume is called.
    m_pPauseSem->Wait();
 
+   //CheckForBufferUp();
+
    // Wait a specified prebuffer time...
    PreBuffer();
 
@@ -394,6 +396,7 @@ void SoundCardPMO::WorkerThread(void)
           if (eErr == kError_NoDataAvail)
           {
               m_pLmc->Wake();
+              CheckForBufferUp();
 
               if (!bPerfWarn)
               {

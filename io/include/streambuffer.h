@@ -29,8 +29,6 @@ ____________________________________________________________________________*/
 
 #include "pullbuffer.h"
 
-const int iReceiveTimeout = 1;
-
 class StreamBuffer : public PullBuffer
 {
     public:
@@ -40,19 +38,10 @@ class StreamBuffer : public PullBuffer
                             FAContext *context);
       virtual ~StreamBuffer(void);
 
-      virtual  Error    BeginWrite (void *&pBuffer, size_t iBytesNeeded);
-
-      virtual  bool     IsBufferingUp(int32 iBytesNeeded);
-		virtual  void     Pause()
-		                  { m_bPause = true; };     
-		virtual  void     Resume()
-		                  { m_bPause = false; };     
-      virtual  bool     DidDiscardBytes();
+      virtual  Error    BeginRead (void *&pBuffer, size_t iBytesNeeded);
+      virtual  Error    EndRead   (size_t iBytesUsed);
 
     protected:
-
-	   bool      m_bBufferingUp, m_bPause, m_bDiscardedBytes;
-		Mutex    *m_pStreamMutex;
 };
 
 #endif

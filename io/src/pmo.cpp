@@ -135,6 +135,8 @@ void PhysicalMediaOutput::Resume(void)
 
 void PhysicalMediaOutput::PreBuffer(void)
 {
+    m_pLmc->Wake();
+    CheckForBufferUp();
     usleep(m_iPreBuffer * 1000);
 }
 
@@ -199,5 +201,28 @@ void PhysicalMediaOutput::UpdateBufferStatus(void)
                          m_pPmiBuffer->GetBufferPercentage(), 
                          m_pInputBuffer->GetBufferPercentage()));
        m_iBufferUpdate = iNow;
+   }
+}
+
+void PhysicalMediaOutput::CheckForBufferUp(void)
+{
+   int iInPercent, iOutPercent;
+
+   if (!m_pPmi->IsStreaming())
+      return;
+
+   iInPercent = m_pPmiBuffer->GetBufferPercentage(); 
+   iOutPercent = m_pInputBuffer->GetBufferPercentage();
+
+   if (iOutPercent < 2 && iInPercent < 2)
+   {
+       for(; !m_bExit && iInPercent < 50;)
+       {
+           usleep(500000);
+           iInPercent = m_pPmiBuffer->GetBufferPercentage(); 
+           iOutPercent = m_pInputBuffer->GetBufferPercentage(); 
+           m_pTarget->AcceptEvent(new StreamBufferEvent(true, 
+                                  iInPercent, iOutPercent)); 
+       }
    }
 }

@@ -648,6 +648,7 @@ void SoundCardPMO::WorkerThread(void)
           if (eErr == kError_NoDataAvail)
           {
               m_pLmc->Wake();
+              CheckForBufferUp();
 
               // Calling NextHeader with a true arguments just  
               // cleans up the pending headers so the bytes in use

@@ -91,6 +91,7 @@ protected:
     virtual bool  WasteTime();
     virtual void  PreBuffer();
     virtual void  UpdateBufferStatus(void);
+    virtual void  CheckForBufferUp(void);
 
     PhysicalMediaInput    *m_pPmi;
     LogicalMediaConverter *m_pLmc;

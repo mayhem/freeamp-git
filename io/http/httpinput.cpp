@@ -672,8 +672,6 @@ Error HttpInput::Open(void)
     delete pHeaderData;
     delete szStreamName;
 
-    ReportStatus("");
-
     return kError_NoErr;
 }
 

@@ -316,7 +316,6 @@ void ObsInput::WorkerThread(void)
    Error           eError;
    fd_set          sSet;
    struct timeval  sTv;
-   bool            bFirstPacket = true;
 
    eError = Open();
    if (IsError(eError) || m_bExit)
@@ -360,12 +359,6 @@ void ObsInput::WorkerThread(void)
       {
          m_pOutputBuffer->SetEndOfStream(true);
          break;
-      }
-
-      if (bFirstPacket)
-      {
-          ReportStatus("Playing RTP stream...");
-          bFirstPacket = false;
       }
 
       for(;;)

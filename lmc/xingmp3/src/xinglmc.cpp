@@ -237,7 +237,7 @@ Error XingLMC::GetHeadInfo()
 
    for(iLoop = 0; iLoop < iMaxDecodeRetries; iLoop++)
    {
-       Err = BeginRead(pBuffer, iInitialFrameSize, false);
+       Err = BeginRead(pBuffer, iInitialFrameSize);
        if (IsError(Err))
        {
           if (Err != kError_EndOfStream && Err != kError_Interrupt)
@@ -910,12 +910,12 @@ void XingLMC::DecodeWork()
    return;
 }
 
-// This function encapsulates all the buffering event management
-Error XingLMC::BeginRead(void *&pBuffer, unsigned int iBytesNeeded,
-                         bool bBufferUp)
+// These two functions are here just to support the CalculcateSongLength()
+// function which opens a local file and then reads from it, rather than
+// reading from the pipeline.
+Error XingLMC::BeginRead(void *&pBuffer, unsigned int iBytesNeeded)
 {
-   int32  iInPercent, iOutPercent;
-   unsigned int iBufferUpBytes;
+   Error eRet;
 
    if (m_fpFile)
    {
@@ -931,67 +931,7 @@ Error XingLMC::BeginRead(void *&pBuffer, unsigned int iBytesNeeded,
        return kError_NoErr;
    }
 
-   if (m_pPmi && m_pInputBuffer && (!m_pPmi->IsStreaming() || m_iBitRate <= 0))
-   {
-	   return BlockingBeginRead(pBuffer, iBytesNeeded);
-   }
-
-   iInPercent = m_pInputBuffer->GetBufferPercentage();
-   iOutPercent = m_pOutputBuffer->GetBufferPercentage();
-
-   // If the input buffer is getting too full, discard some bytes.
-   // This could be caused by a soundcard with slow playback or 
-   // a host that is sending data too quicky. Clock-drift-a-moo!
-   if (iOutPercent > 90 && iInPercent > 90 && m_pPmi->UseBufferReduction())
-   {
-       m_pInputBuffer->DiscardBytes();
-   }
-
-   iBufferUpBytes = (m_iBitRate * m_iBufferUpInterval * 1000) / 8192;
-   if (iBufferUpBytes > (unsigned)m_iBufferSize)
-       iBufferUpBytes = m_iBufferSize / 2;
-
-   if (bBufferUp && iOutPercent < 1 &&
-       m_pInputBuffer->GetNumBytesInBuffer() < iBufferUpBytes / 2)
-   {
-       assert(m_iBufferSize > 0);
-       assert(m_iBufferUpInterval > 0);
-       assert(m_iBitRate > 0);
-
-       ReportStatus("Buffering up...");
-       m_pTarget->AcceptEvent(new StreamBufferEvent(true, iInPercent, 
-                                                    iOutPercent));
-       for(; !m_bExit;)
-       {
-           usleep(1000000);
-           iInPercent = m_pInputBuffer->GetBufferPercentage();
-           iOutPercent = m_pOutputBuffer->GetBufferPercentage();
-
-           m_pTarget->AcceptEvent(new StreamBufferEvent(true, iInPercent, 
-                                                    iOutPercent));
-
-           if (m_pInputBuffer->GetNumBytesInBuffer() >= iBufferUpBytes)
-           {
-               break;
-           }    
-           if (m_pInputBuffer->GetBufferPercentage() > 90)
-           {
-               break;
-           }
-       }
-       m_pTarget->AcceptEvent(new StreamBufferEvent(false, iInPercent, 
-                                                    iOutPercent));
-       ReportStatus("Playing stream...");
-   }
-
-	return BlockingBeginRead(pBuffer, iBytesNeeded);
-}
-
-Error XingLMC::BlockingBeginRead(void *&pBuffer, unsigned int iBytesNeeded)
-{
-   Error eRet;
-
-   for(;;)
+   for(; !m_bExit;)
    {
        eRet = m_pInputBuffer->BeginRead(pBuffer, iBytesNeeded);
        if (eRet == kError_NoDataAvail)
@@ -1003,6 +943,8 @@ Error XingLMC::BlockingBeginRead(void *&pBuffer, unsigned int iBytesNeeded)
        }
        break;
    }
+   if (m_bExit)
+      return kError_Interrupt;
 
    return eRet;
 }

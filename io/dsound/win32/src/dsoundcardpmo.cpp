@@ -959,6 +959,7 @@ WorkerThread(void)
           if (eErr == kError_NoDataAvail)
           {
               m_pLmc->Wake();
+              CheckForBufferUp();
     
               WasteTime();
               continue;

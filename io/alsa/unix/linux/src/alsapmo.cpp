@@ -470,6 +470,7 @@ void AlsaPMO::WorkerThread(void)
           if (eErr == kError_NoDataAvail)
           {
               m_pLmc->Wake();
+              CheckForBufferUp();
 
               WasteTime();
               continue;
@@ -539,7 +540,6 @@ void AlsaPMO::WorkerThread(void)
           iRet = snd_pcm_channel_status(ai->handle,&ainfo);
           if (iRet < 0)
           {
-              printf("ALSA: %s\n", snd_strerror(iRet));
               m_bExit = true;
               break;
           }
