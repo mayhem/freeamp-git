@@ -40,17 +40,17 @@ ____________________________________________________________________________*/
  
 
 TBBUTTON tbButtons[] = {
-    { 0, ID_FILE_NEWPLAYLIST, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-    { 1, ID_FILE_SAVEPLAYLIST, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 1},
+    { 0, ID_FILE_NEWPLAYLIST, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, -1},
+    { 1, ID_FILE_SAVEPLAYLIST, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, -1},
 	{ 0, 0, TBSTATE_ENABLED, TBSTYLE_SEP, 0L, -1},
-    { 2, ID_FILE_IMPORT, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 2},
-	{ 3, ID_EDIT_REMOVE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 3},
-	{ 4, ID_EDIT_EDITINFO, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 4},
+    { 2, ID_FILE_IMPORT, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, -1},
+	{ 3, ID_EDIT_REMOVE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, -1},
+	{ 4, ID_EDIT_EDITINFO, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, -1},
     { 0, 0, TBSTATE_ENABLED, TBSTYLE_SEP, 0L, -1},
-    { 5, ID_EDIT_ADDTRACK, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 5},
-    { 6, ID_EDIT_ADDFILE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 6},
-    { 7, ID_EDIT_MOVEUP, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 7},
-    { 8, ID_EDIT_MOVEDOWN, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 8} 
+    { 5, ID_EDIT_ADDTRACK, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, -1},
+    { 6, ID_EDIT_ADDFILE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, -1},
+    { 7, ID_EDIT_MOVEUP, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, -1},
+    { 8, ID_EDIT_MOVEDOWN, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, -1} 
 };
 
 static BOOL CALLBACK MainDlgProc(HWND hwnd, UINT msg, 
@@ -850,66 +850,9 @@ void MusicBrowserUI::AddToolbarButtons(bool textLabels, bool images)
 
     SendMessage(m_hRebar, RB_DELETEBAND, 0, 0);
 
-    for(uint32 i = 0; i < 11; i++)
-    {
-        SendMessage(m_hImageToolbar, TB_DELETEBUTTON, 0, 0);
-    }
-
-    if(textLabels)
-    {
-        tbButtons[0].iString = 0;
-        tbButtons[1].iString = 1;
-        tbButtons[3].iString = 2;
-        tbButtons[4].iString = 3;
-        tbButtons[5].iString = 4;
-        tbButtons[7].iString = 5;
-        tbButtons[8].iString = 6;
-        tbButtons[9].iString = 7;
-        tbButtons[10].iString = 8;
-
-        // this hack insures that the text labels are added.
-        // if buttons are small then they won't be added...
-        SendMessage(m_hImageToolbar, TB_SETBUTTONSIZE, 0, 
-                    MAKELPARAM(100, 50));
-    }
-    else
-    {
-        tbButtons[0].iString = -1;
-        tbButtons[1].iString = -1;
-        tbButtons[3].iString = -1;
-        tbButtons[4].iString = -1;
-        tbButtons[5].iString = -1;
-        tbButtons[7].iString = -1;
-        tbButtons[8].iString = -1;
-        tbButtons[9].iString = -1;
-        tbButtons[10].iString = -1;
-    }
-
-    if(images)
-    {
-        tbButtons[0].iBitmap = 0;
-        tbButtons[1].iBitmap = 1;
-        tbButtons[3].iBitmap = 2;
-        tbButtons[4].iBitmap = 3;
-        tbButtons[5].iBitmap = 4;
-        tbButtons[7].iBitmap = 5;
-        tbButtons[8].iBitmap = 6;
-        tbButtons[9].iBitmap = 7;
-        tbButtons[10].iBitmap = 8;
-
-        // this hack insures that the text labels are added.
-        // if buttons are small then they won't be added...
-        if(images && !textLabels)
-        {
-            SendMessage(m_hImageToolbar, TB_SETBUTTONSIZE, 0, 
-                        MAKELPARAM(24, 20));
-        }
-    }
-
-    SendMessage(m_hImageToolbar, TB_ADDBUTTONS, (WPARAM) 11, (LPARAM) &tbButtons);
-    SendMessage(m_hImageToolbar, TB_AUTOSIZE, (WPARAM) 0, (LPARAM) 0);
-
-    if(!images && textLabels)
+    if(images && textLabels)
+        m_hToolbar = m_hBothToolbar;
+    else if(!images)
         m_hToolbar = m_hTextToolbar;
     else
         m_hToolbar = m_hImageToolbar;
@@ -1049,15 +992,23 @@ void MusicBrowserUI::CreateToolbar(void)
                      WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT |
                      TBSTYLE_TOOLTIPS | WS_CLIPCHILDREN | 
                      WS_CLIPSIBLINGS | CCS_NODIVIDER | CCS_NORESIZE, 
-                     0, 0, 0, 0, m_hRebar, (HMENU) ID_TOOLBAR, g_hinst, NULL);
+                     0, 0, 0, 0, m_hRebar, (HMENU) ID_TOOLBAR + 1, g_hinst, NULL);
+
+    m_hBothToolbar = CreateWindowEx(0, TOOLBARCLASSNAME, (LPSTR) NULL,
+                     WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT |
+                     TBSTYLE_TOOLTIPS | WS_CLIPCHILDREN | 
+                     WS_CLIPSIBLINGS | CCS_NODIVIDER | CCS_NORESIZE, 
+                     0, 0, 0, 0, m_hRebar, (HMENU) ID_TOOLBAR + 2, g_hinst, NULL);
 
     // Send the TB_BUTTONSTRUCTSIZE message, which is required for 
     // backward compatibility. 
     SendMessage(m_hImageToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM) sizeof(TBBUTTON), 0);
     SendMessage(m_hTextToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM) sizeof(TBBUTTON), 0);
+    SendMessage(m_hBothToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM) sizeof(TBBUTTON), 0);
 
     SendMessage(m_hImageToolbar, TB_SETBITMAPSIZE, 0, MAKELPARAM(22, 18)); 
     SendMessage(m_hTextToolbar, TB_SETBITMAPSIZE, 0, MAKELPARAM(0, 0)); 
+    SendMessage(m_hBothToolbar, TB_SETBITMAPSIZE, 0, MAKELPARAM(22, 18)); 
 
     TBADDBITMAP tbab; 
 
@@ -1065,47 +1016,35 @@ void MusicBrowserUI::CreateToolbar(void)
     tbab.hInst = g_hinst; 
     tbab.nID   = IDB_TOOLBAR; 
     SendMessage(m_hImageToolbar, TB_ADDBITMAP, (WPARAM) 10, (WPARAM) &tbab);
+    SendMessage(m_hBothToolbar, TB_ADDBITMAP, (WPARAM) 10, (WPARAM) &tbab);
 
-    SendMessage(m_hImageToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"New Playlist");
-    SendMessage(m_hTextToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"New Playlist");
+    SendMessage(m_hImageToolbar, TB_ADDBUTTONS, (WPARAM) 11, (LPARAM) &tbButtons);
+    SendMessage(m_hImageToolbar, TB_AUTOSIZE, (WPARAM) 0, (LPARAM) 0);
 
-    SendMessage(m_hImageToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Save Playlist");
-    SendMessage(m_hTextToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Save Playlist");
+    tbButtons[0].iString = SendMessage(m_hBothToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"New Playlist");
+    tbButtons[1].iString = SendMessage(m_hBothToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Save Playlist");
+    tbButtons[3].iString = SendMessage(m_hBothToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Import Items");
+    tbButtons[4].iString = SendMessage(m_hBothToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Remove Items");
+    tbButtons[5].iString = SendMessage(m_hBothToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Edit Info");
+    tbButtons[7].iString = SendMessage(m_hBothToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Add Items");
+    tbButtons[8].iString = SendMessage(m_hBothToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Add Files");
+    tbButtons[9].iString = SendMessage(m_hBothToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Move Up");
+    tbButtons[10].iString = SendMessage(m_hBothToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Move Down");
+    SendMessage(m_hBothToolbar, TB_ADDBUTTONS, (WPARAM) 11, (LPARAM) &tbButtons);
+    SendMessage(m_hBothToolbar, TB_AUTOSIZE, (WPARAM) 0, (LPARAM) 0);
 
-    SendMessage(m_hImageToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Import Items");
-    SendMessage(m_hTextToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Import Items");
-
-    SendMessage(m_hImageToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Remove Items");
-    SendMessage(m_hTextToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Remove Items");
-
-    SendMessage(m_hImageToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Edit Info");
-    SendMessage(m_hTextToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Edit Info");
-
-    SendMessage(m_hImageToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Add Items");
-    SendMessage(m_hTextToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Add Items");
-
-    SendMessage(m_hImageToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Add Files");
-    SendMessage(m_hTextToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Add Files");
-
-    SendMessage(m_hImageToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Move Up");
-    SendMessage(m_hTextToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Move Up");
-
-    SendMessage(m_hImageToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Move Down");
-    SendMessage(m_hTextToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Move Down");
-
-    tbButtons[0].iString = 0;
-    tbButtons[1].iString = 1;
-    tbButtons[3].iString = 2;
-    tbButtons[4].iString = 3;
-    tbButtons[5].iString = 4;
-    tbButtons[7].iString = 5;
-    tbButtons[8].iString = 6;
-    tbButtons[9].iString = 7;
-    tbButtons[10].iString = 8;
-
+    tbButtons[0].iString = SendMessage(m_hTextToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"New Playlist");
+    tbButtons[1].iString = SendMessage(m_hTextToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Save Playlist");
+    tbButtons[3].iString = SendMessage(m_hTextToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Import Items");
+    tbButtons[4].iString = SendMessage(m_hTextToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Remove Items");
+    tbButtons[5].iString = SendMessage(m_hTextToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Edit Info");
+    tbButtons[7].iString = SendMessage(m_hTextToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Add Items");
+    tbButtons[8].iString = SendMessage(m_hTextToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Add Files");
+    tbButtons[9].iString = SendMessage(m_hTextToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Move Up");
+    tbButtons[10].iString = SendMessage(m_hTextToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Move Down");
     SendMessage(m_hTextToolbar, TB_ADDBUTTONS, (WPARAM) 11, (LPARAM) &tbButtons);
     SendMessage(m_hTextToolbar, TB_AUTOSIZE, (WPARAM) 0, (LPARAM) 0);
-
+   
     RECT buttonRect;
     SIZE sizeString;
     char temp[] = "HowBigAmI?";
@@ -1118,7 +1057,7 @@ void MusicBrowserUI::CreateToolbar(void)
     ReleaseDC(m_hTextToolbar, hdc);
 
     SendMessage(m_hTextToolbar, TB_SETBUTTONSIZE , 0, 
-        MAKELPARAM(buttonRect.right - buttonRect.left, sizeString.cy + 4));
+        MAKELPARAM(buttonRect.right - buttonRect.left, sizeString.cy + 6));
 
     bool useTextLabels, useImages;
     m_context->prefs->GetShowToolbarTextLabels(&useTextLabels);

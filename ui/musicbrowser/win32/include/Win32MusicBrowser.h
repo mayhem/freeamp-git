@@ -330,7 +330,7 @@ class MusicBrowserUI : public UserInterface
     HBRUSH              m_splitterBrush;
 
     HWND                m_hPlaylistHeader;
-    HWND                m_hToolbar, m_hTextToolbar, m_hImageToolbar;
+    HWND                m_hToolbar, m_hTextToolbar, m_hImageToolbar, m_hBothToolbar;
     DropTarget*         m_playlistDropTarget;
     vector<string>      m_searchPathList;
     HTREEITEM           m_hNewPlaylistItem, m_hNewPortableItem;  
