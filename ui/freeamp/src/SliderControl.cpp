@@ -58,7 +58,8 @@ SliderControl::SliderControl(Window *pWindow, string &oName, int iThumbs,
                Control(pWindow, oName, pTransitions)
 {
      m_iRange = -1;
-     m_iCurrentPos = 0;
+     m_iCurrentPos = -1;
+     m_iValue = -1;
      m_oOrigin.x = -1;
      m_iNumThumbStates = iThumbs;
      m_iNumFrames = iNumFrames;
