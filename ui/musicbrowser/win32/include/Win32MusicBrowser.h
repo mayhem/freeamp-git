@@ -67,7 +67,9 @@ class MusicBrowserUI : public UserInterface
 {
  public:
 
-             MusicBrowserUI(FAContext *);
+             MusicBrowserUI(FAContext *, 
+                            MusicBrowserUI *parent,
+                            const string &oPlaylistName);
     virtual ~MusicBrowserUI();
 
     virtual int32 AcceptEvent(Event *);
@@ -120,9 +122,8 @@ class MusicBrowserUI : public UserInterface
     void ToggleVisEvent(void);
 
     void InitList(void);
-    void LoadPlaylist(string &oPlaylist);
-    void ActivePlaylistCleared(void);
-    void SetActivePlaylist(void);
+    void AddPlaylist(const string &oName);
+    void LoadPlaylist(const string &oPlaylist);
     void SetActivePlaylistIcon(int iImage);
 
     void InitTree(void);
@@ -130,7 +131,8 @@ class MusicBrowserUI : public UserInterface
     void FillAlbums(TV_ITEM *pItem);
     void FillPlaylists(void);
     void FillTracks(TV_ITEM *pItem);
-//    void FillPlaylistCombo(void);
+    void FillAllTracks(void);
+    void FillUncatTracks(void);
 
     void  UpdateButtonStates(void);
     void  MoveControls(int iPixelsToMove);
@@ -144,17 +146,19 @@ class MusicBrowserUI : public UserInterface
     int32                m_state, m_startupType;
     int32                m_currentindex, m_currentplaying;
   	HWND                 m_hWnd, m_hStatus;		
-    PlaylistManager     *m_plm;
+    PlaylistManager     *m_oPlm;
     bool                 m_initialized, isVisible, m_bListChanged, 
                          m_bSearchInProgress, m_bDragging;
     string               m_currentListName, m_activeListName;
     Thread              *m_uiThread;
     POINT                m_sMinSize;
     HTREEITEM	         m_hPlaylistItem, m_hCatalogItem, m_hDropTarget;
+    HTREEITEM            m_hAllItem, m_hUncatItem;
     TV_ITEM              m_hTreeDragItem;
     vector<TreeCrossRef> m_oMusicCrossRefs;
     int                  m_iCollapseMoveAmount;
     HCURSOR              m_hSavedCursor, m_hDragCursor, m_hNoDropCursor;
+    MusicBrowserUI      *m_pParent;
 };
 
 #endif

@@ -35,8 +35,7 @@ BEGIN
     CONTROL         "Tree1",IDC_MUSICTREE,"SysTreeView32",TVS_HASBUTTONS | 
                     TVS_HASLINES | WS_BORDER | WS_TABSTOP,2,19,134,149,
                     WS_EX_CLIENTEDGE
-    LTEXT           "My Music Catalog:",IDC_MUSICCATALOGTEXT,4,6,59,8
-    LTEXT           "Currently listening to:",IDC_PLAYLISTTEXT,142,6,66,8
+    LTEXT           "My Music Catalog:",IDC_MUSICCATALOGTEXT,4,7,59,8
     PUSHBUTTON      "&Up",IDC_UP,307,21,50,14
     PUSHBUTTON      "D&elete",IDC_DELETE,307,99,50,14
     PUSHBUTTON      "&Add",IDC_ADD,307,73,50,14
@@ -47,6 +46,7 @@ BEGIN
                     LVS_SINGLESEL | WS_BORDER | WS_TABSTOP,138,19,166,149,
                     WS_EX_CLIENTEDGE
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,0,357,1
+    LTEXT           "",IDC_PLAYLISTTITLE,140,7,217,8
 END
 
 IDD_OPENURL DIALOG FIXED IMPURE  0, 0, 280, 21
