@@ -163,7 +163,7 @@ Read(int32 &rtn, void* buf, size_t numbytes)
     if (rtn >= 0) {
 	return kError_NoErr;
     } else {
-	return kError_Unsuccessful;
+	return kError_InputUnsuccessful;
     }
 }
 
@@ -174,7 +174,7 @@ Seek(int32 &rtn, int32 offset, int32 origin)
     if (rtn >= 0) {
 	return kError_NoErr;
     } else {
-	return kError_Unsuccessful;
+	return kError_InputUnsuccessful;
     }
 }
 

@@ -37,6 +37,17 @@ ____________________________________________________________________________*/
 
 static const uint32 OBUFFERSIZE = 2 * 1152;
 
+enum {
+    pmoError_MinimumError = 0x00010000,
+    pmoError_DeviceOpenFailed,
+    pmoError_IOCTL_F_GETFL,
+    pmoError_IOCTL_F_SETFL,
+    pmoError_IOCTL_SNDCTL_DSP_RESET,
+    pmoError_IOCTL_SNDCTL_DSP_SAMPLESIZE,
+    pmoError_IOCTL_SNDCTL_DSP_STEREO,
+    pmoError_IOCTL_SNDCTL_DSP_SPEED,
+    pmoError_MaximumError
+};
 
 class SoundCardPMO : public PhysicalMediaOutput{
 
@@ -44,13 +55,14 @@ public:
     SoundCardPMO();
     virtual ~SoundCardPMO();
     
-    virtual bool Init(OutputInfo* info);
-    virtual bool Reset(bool user_stop);
-    virtual int32 Write(void *,int32);
-    virtual void Pause();
-    virtual void Resume();
-    
+    virtual Error Init(OutputInfo* info);
+    virtual Error Reset(bool user_stop);
+    virtual Error Write(int32 &,void *,int32);
+    virtual Error Pause();
+    virtual Error Resume();
+    virtual const char *GetErrorString(int32);
  private:
+    bool m_properlyInitialized;
     int16 buffer[OBUFFERSIZE];
     int16 *bufferp[MAXCHANNELS];
     uint32 channels;

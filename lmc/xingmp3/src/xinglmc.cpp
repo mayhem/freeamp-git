@@ -62,7 +62,7 @@ static AUDIO audio_table[2][2] = {
     }
 };
 
-static char * g_ErrorArray[8] = {
+static char * g_ErrorArray[9] = {
     "Invalid Error Code",
     "head_info2 return 0 bytes/frame",
     "audio.decode_init failed",
@@ -70,7 +70,8 @@ static char * g_ErrorArray[8] = {
     "creation of decoder thread failed",
     "output didn't return the same number of bytes we wrote",
     "decoder method didn't return anything",
-    "seeking and reading ID3v1(.1) tag failed"
+    "seeking and reading ID3v1(.1) tag failed",
+    "output initialization failed"
 
 };
 
@@ -111,6 +112,7 @@ Error XingLMC::InitDecoder() {
     if (!m_target || !m_input || !m_output) {
 	return kError_NullValueInvalid;
     }
+    m_properlyInitialized = false;
     if (bs_fill() > 0) {
 	MPEG_HEAD head;
 	int32 bitrate;
@@ -201,7 +203,11 @@ Error XingLMC::InitDecoder() {
 	    info.samples_per_second = decinfo.samprate;
 //	    info.max_buffer_size = (info.number_of_channels * 2 * 1152) << 5;
 	    info.max_buffer_size = PCM_BUFBYTES;
-	    m_output->Init(&info);
+	    Error error = m_output->Init(&info);
+	    if (error != kError_NoErr) {
+		cout << "output init failed: " << m_output->GetErrorString(error) << endl;
+		return (Error)lmcError_OutputInitializeFailed;
+	    }
 
 	    m_pcmBuffer = new unsigned char[info.max_buffer_size];
 	    if (!m_pcmBuffer) 
@@ -380,9 +386,9 @@ void XingLMC::DecodeWork() {
 	    m_pcmBufBytes = cvt_to_wave(m_pcmBuffer,m_pcmBufBytes);
             #endif
 	    if (actually_decode) {
-		nwrite = m_output->Write(m_pcmBuffer,m_pcmBufBytes);
+		Error error = m_output->Write(nwrite,m_pcmBuffer,m_pcmBufBytes);
 		
-		if (nwrite != (int32)m_pcmBufBytes) {
+		if (error != kError_NoErr) {
 		    if (m_target) m_target->AcceptEvent(new LMCErrorEvent(this,(Error)lmcError_OutputWriteFailed));
 		    return;
 		}
@@ -397,8 +403,8 @@ void XingLMC::DecodeWork() {
         #if __BYTE_ORDER != __LITTLE_ENDIAN
 	m_pcmBufBytes = cvt_to_wave(m_pcmBuffer,m_pcmBufBytes);
         #endif
-	nwrite = m_output->Write(m_pcmBuffer,m_pcmBufBytes);
-	if (nwrite != (int32)m_pcmBufBytes) {
+	Error error = m_output->Write(nwrite,m_pcmBuffer,m_pcmBufBytes);
+	if (error != kError_NoErr) {
 	    if (m_target) m_target->AcceptEvent(new LMCErrorEvent(this,(Error)lmcError_OutputWriteFailed));
 	    return;
 	}

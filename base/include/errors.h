@@ -47,8 +47,9 @@ typedef enum Error
     kError_InvalidError     = 16,
     kError_PluginNotInitialized = 17,
     kError_GotDefaultMethod = 18,
-    kError_Unsuccessful = 19,
-    kError_FileSeekNotSupported = 20
+    kError_InputUnsuccessful = 19,
+    kError_FileSeekNotSupported = 20,
+    kError_OutputUnsuccessful = 21
 }Error;
 
 

@@ -71,6 +71,7 @@ enum {
     lmcError_OutputWriteFailed,
     lmcError_DecodeDidntDecode,
     lmcError_ID3ReadFailed,
+    lmcError_OutputInitializeFailed,
     lmcError_MaximumError
 };
 

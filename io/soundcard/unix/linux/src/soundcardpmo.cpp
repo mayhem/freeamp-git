@@ -45,18 +45,28 @@ PhysicalMediaOutput *Initialize() {
 }
 	   }
 
+static char * g_ErrorArray[8] = {
+    "Invalid Error Code",
+    "dsp device open failed",
+    "fcntl F_GETFL on /dev/dsp failed",
+    "fcntl F_SETFL on /dev/dsp failed"
+    "ioctl reset failed",
+    "config of samplesize failed",
+    "config of stereo failed",
+    "config of speed failed"
+};
+
+const char *SoundCardPMO::GetErrorString(int32 error) {
+    if ((error <= pmoError_MinimumError) || (error >= pmoError_MaximumError)) {
+	return g_ErrorArray[0];
+    }
+    return g_ErrorArray[error - pmoError_MinimumError];
+}
+
 SoundCardPMO::SoundCardPMO() {
     //cout << "Creating scpmo" << endl;
+    m_properlyInitialized = false;
     myInfo = new OutputInfo();
-    if ((audio_fd = open("/dev/dsp", O_WRONLY | O_SYNC, 0)) < 0) {
-	if (errno == EBUSY) {
-	    cerr << "Audio device busy!" << endl;
-	    exit(1);
-	} else {
-	    cout << "Can't open /dev/dsp for writing" << endl;
-	    exit(1);
-	}
-    }
     //cout << "Done creation of the SoundCardPMO..." << endl;
 }
 
@@ -74,22 +84,36 @@ SoundCardPMO::~SoundCardPMO() {
 int SoundCardPMO::audio_fd = -1;
 
 
-void SoundCardPMO::Pause() {
-    Reset(true);
+Error SoundCardPMO::Pause() {
+    return Reset(true);
 }
 
-void SoundCardPMO::Resume() {
-
+Error SoundCardPMO::Resume() {
+    return kError_NoErr;
 }
 
-bool SoundCardPMO::Init(OutputInfo* info) {
+Error SoundCardPMO::Init(OutputInfo* info) {
     //cout << "initialize..." << endl;
 //    cout << "OI: bits_per_sample: " << info->bits_per_sample << endl;
 //    cout << "OI: number_of_channels: " << info->number_of_channels << endl;
 //    cout << "OI: samples_per_second: " << info->samples_per_second << endl;
 //    cout << "OI: max_buffer_size: " << info->max_buffer_size << endl;
+
+
+    m_properlyInitialized = false;
     if (!info) {
 	info = myInfo;
+    } else {
+	// got info, so this is the beginning...
+	if ((audio_fd = open("/dev/dsp", O_WRONLY | O_SYNC, 0)) < 0) {
+	    if (errno == EBUSY) {
+		//cerr << "Audio device busy!" << endl;
+		return (Error)pmoError_DeviceOpenFailed;
+	    } else {
+		//cout << "Can't open /dev/dsp for writing" << endl;
+		return (Error)pmoError_DeviceOpenFailed;
+	    }
+	}
     }
     
     
@@ -97,15 +121,13 @@ bool SoundCardPMO::Init(OutputInfo* info) {
     int fd = audio_fd;
     int flags;
     if ((flags = fcntl(fd,F_GETFL,0)) < 0) {
-	cerr << "fcntl F_GETFL on /dev/dsp failed" << endl;
-	exit(1);
+	return (Error)pmoError_IOCTL_F_GETFL;
     }
 
     flags &= O_NDELAY; //SYNC;
     
     if (fcntl(fd, F_SETFL, flags) < 0) {
-	cerr << "fcntl F_SETFL on /dev/dsp failed" << endl;
-	exit(1);
+	return (Error)pmoError_IOCTL_F_SETFL;
     }
 
     audio_fd = fd;
@@ -122,41 +144,40 @@ bool SoundCardPMO::Init(OutputInfo* info) {
 
     int junkvar = 0;
     if (ioctl(audio_fd, SNDCTL_DSP_RESET, &junkvar) == -1) {
-	cerr << "hosed during ioctl reset" << endl;
-	exit(1);
+	return (Error)pmoError_IOCTL_SNDCTL_DSP_RESET;
     } 
     
     if(ioctl(audio_fd, SNDCTL_DSP_SAMPLESIZE, &play_precision) == -1) {
-	cerr << "config of samplesize failed" << endl;
-	exit(1);
+	return (Error)pmoError_IOCTL_SNDCTL_DSP_SAMPLESIZE;
     }
 
     if(ioctl(audio_fd, SNDCTL_DSP_STEREO, &play_stereo) == -1) {
-	cerr << "config of stereo failed" << endl;
-	exit(1);
+	return (Error)pmoError_IOCTL_SNDCTL_DSP_STEREO;
     }
     if (ioctl(audio_fd, SNDCTL_DSP_SPEED, &play_sample_rate) == -1) {
-	cerr << "config of speed failed" << endl;
-	exit(1);
+	return (Error)pmoError_IOCTL_SNDCTL_DSP_SPEED;
     }
     myInfo->bits_per_sample = info->bits_per_sample;
     myInfo->number_of_channels = info->number_of_channels;
     myInfo->samples_per_second = info->samples_per_second;
     myInfo->max_buffer_size = info->max_buffer_size;
-    return true;
+    m_properlyInitialized = true;
+    return kError_NoErr;
 }
 
-bool SoundCardPMO::Reset(bool user_stop) {
+Error SoundCardPMO::Reset(bool user_stop) {
     //cout << "Reset..." << endl;
     int a;
-    ioctl(audio_fd,SNDCTL_DSP_RESET,&a);
+    if (ioctl(audio_fd,SNDCTL_DSP_RESET,&a) == -1) {
+	return (Error)pmoError_IOCTL_SNDCTL_DSP_RESET;
+    }
     if (user_stop) {
 	Init(NULL);
     }
+    return kError_NoErr;
 }
 
-int32 SoundCardPMO::Write(void *pBuffer,int32 length) {
-    int32 actual = 0;
+Error SoundCardPMO::Write(int32&rtn,void *pBuffer,int32 length) {
     int32 actualThisTime = 0;
     int32 writeBlockLength = length / PIECES;
     //cout << "length: " << length << endl;
@@ -164,14 +185,16 @@ int32 SoundCardPMO::Write(void *pBuffer,int32 length) {
     void *pv = NULL;
     int32 gp = 0;
     do {
-	actual = write(audio_fd,pBuffer,length);
-    } while ((actual != length) && (errno == EINTR));
-    if(actual != length) {
-	cerr << "Wrote " << length << ", and got " << actual << " back" << endl;
-	cerr << "errno: " << errno << endl << "str: " << strerror(errno) << endl;
-	actual = -1;
+	rtn = write(audio_fd,pBuffer,length);
+    } while ((rtn != length) && (errno == EINTR));
+    if(rtn != length) {
+
+//	cerr << "Wrote " << length << ", and got " << rtn << " back" << endl;
+//	cerr << "errno: " << errno << endl << "str: " << strerror(errno) << endl;
+	rtn = -1;
+	return kError_OutputUnsuccessful;
     }
-    return actual;
+    return kError_NoErr;
 }
 
 
