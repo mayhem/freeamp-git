@@ -248,8 +248,6 @@ void PLS::AddItem(vector<PlaylistItem*>* list, char *entry,
     char          path[_MAX_PATH];
     PlaylistItem *item;
 
-    Debug_v("AddItem: %s", entry);
-    
     // if this is not a URL then let's
     // enable people with different platforms 
     // to swap files by changing the path 
