@@ -129,7 +129,7 @@ int main(int argc, char **argv)
         // Check to see if the process that created that semaphore still
         // exists
         iProcess = semctl(iCmdSem, 0, GETVAL, unsem);
-        if (iProcess > 0 && !allow_mult && iCmdSem > 0)
+        if (iProcess > 0 && !allow_mult && iCmdSem >= 0)
         {
             if (kill(iProcess, 0) >= 0)
             {
@@ -165,11 +165,11 @@ int main(int argc, char **argv)
             }
         }
 
-        if (iCmdSem > 0) 
+        if (iCmdSem >= 0) 
         {
             // Set the current pid into the semaphore
             unsem.val = getpid();
-            semctl(iCmdSem, 0, SETVAL, unsem);
+            int ret = semctl(iCmdSem, 0, SETVAL, unsem);
 
             // Create the shared memory segment
             iCmdMem = shmget(tMemKey, iSharedMemSize, IPC_CREAT | 0660);
