@@ -36,24 +36,7 @@ ____________________________________________________________________________*/
 #include "debug.h"
 
 #define WM_EMPTYDBCHECK WM_USER + 69
-
-static int pControls[] =
-{
-   IDOK,
-   IDC_PLAYLISTTEXT,
-   IDC_MUSICCATALOGTEXT,
-   IDC_MUSICTREE,
-   IDC_PLAYLISTBOX,
-   IDC_PLAYLISTCOMBO,
-   IDC_SEARCH,        
-   IDC_UP,            
-   IDC_DELETE,        
-   IDC_ADD,           
-   IDC_DOWN,          
-   IDC_NEWLIST,       
-   IDC_CLEARLIST,
-   -1     
-};   
+ 
 
 TBBUTTON tbButtons[] = {
     { 0, ID_FILE_NEWPLAYLIST, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
@@ -66,10 +49,7 @@ TBBUTTON tbButtons[] = {
     { 1, ID_EDIT_ADDTRACK, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
     { 1, ID_EDIT_ADDTRACK, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
     { 9, ID_EDIT_MOVEUP, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-    { 10, ID_EDIT_MOVEDOWN, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-    { 11, ID_EDIT_CLEARPLAYLIST, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0}
-	
-    
+    { 10, ID_EDIT_MOVEDOWN, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},  
 };
 
 static BOOL CALLBACK MainDlgProc(HWND hwnd, UINT msg, 
@@ -188,45 +168,79 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                         StartStopMusicSearch();  
                     }
                     return 1;
-                case ID_FILE_SEARCHFORMUSIC:
-                case IDC_SEARCH:
-                    StartStopMusicSearch();
-                    return 1;
-                case ID_EDIT_MOVEUP:
-                case IDC_UP:
-                    MoveUpEvent();
-                    return 1;
-                case ID_EDIT_MOVEDOWN:
-                case IDC_DOWN:
-                    MoveDownEvent();
-                    return 1;
-                case ID_EDIT_ADDTRACK:
-                case IDC_ADD:
-                    AddEvent();
-                    return 1;
-                case ID_EDIT_CLEARPLAYLIST:
-                case IDC_CLEARLIST:
-                    DeleteListEvent();
-                    return 1;
-                case ID_VIEW_MUSICCATALOG:
-                    ExpandCollapseEvent();
-                    return 1;
-                case ID_FILE_OPENPLAYLIST:
-                    OpenPlaylist();
-                    return 1;
-                case ID_FILE_EXIT:
-                    Close();
-                    return 1;
-                case ID_FILE_SAVEPLAYLIST:
-                    WritePlaylist();
-                    return 1;
-                case ID_FILE_SAVEASPLAYLIST:
-                    SaveAsPlaylist();
-                    return 1;
-                case IDC_NEWLIST:
+
                 case ID_FILE_NEWPLAYLIST:
                     NewPlaylist();
                     return 1;
+
+                case ID_FILE_OPENPLAYLIST:
+                    OpenPlaylist();
+                    return 1;
+
+                case ID_FILE_SAVEPLAYLIST:
+                    SavePlaylist();
+                    return 1;
+
+                case ID_FILE_SAVEASPLAYLIST:
+                    SavePlaylistAs();
+                    return 1;
+                
+                case ID_FILE_SEARCHFORMUSIC:
+                    StartStopMusicSearch();
+                    return 1;
+                
+                case ID_FILE_CLOSEPLAYLIST:
+                    Close();
+                    return 1;
+
+
+                case ID_EDIT_ADDTRACK:
+                    AddEvent();
+                    return 1;
+
+                case ID_EDIT_MOVEUP:
+                    MoveUpEvent();
+                    return 1;
+                case ID_EDIT_MOVEDOWN:
+                    MoveDownEvent();
+                    return 1;
+
+                case ID_EDIT_EDITPLAYLIST:
+                    EditEvent();
+                    return 1;
+
+                case ID_EDIT_EDITINFO:
+
+                    return 1;
+                
+                case ID_EDIT_REMOVE:
+                    RemoveEvent();
+                    return 1;
+                
+                case ID_FILE_IMPORT:
+                    ImportEvent();
+                    return 1;
+                
+                case ID_EDIT_CLEARPLAYLIST:
+                    DeleteListEvent();
+                    return 1;
+
+
+                case ID_VIEW_MUSICCATALOG:
+                    ExpandCollapseEvent();
+                    return 1;
+
+
+                case ID_CONTROLS_PLAYPAUSE:
+                case ID_CONTROLS_STOP:
+                case ID_CONTROLS_PREVIOUSSONG:
+                case ID_CONTROLS_NEXTSONG:
+                case ID_CONTROLS_SHUFFLE:
+                case ID_CONTROLS_REPEATNONE:
+                case ID_CONTROLS_REPEATONE:
+                case ID_CONTROLS_REPEATALL:
+                    PlayerControlsEvent(LOWORD(wParam));
+                
                 case ID_SORT_ARTIST:
                 case ID_SORT_ALBUM:
                 case ID_SORT_TITLE:
@@ -238,21 +252,6 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                 case ID_SORT_RANDOMIZE:
                 case IDC_RANDOMIZE:
                     SortEvent(LOWORD(wParam));
-                    return 1;
-                case ID_EDIT_EDIT:
-                    EditEvent();
-                    return 1;
-                case IDC_DELETE:
-                    DeleteEvent();
-                    return 1;
-                case ID_EDIT_REMOVE:
-                    RemoveEvent();
-                    return 1;
-                case ID_EDIT_REMOVEFROMDISK:
-                    RemoveFromDiskEvent();
-                    return 1;
-                case ID_FILE_IMPORT:
-                    ImportEvent();
                     return 1;
             }    
         }     
@@ -370,20 +369,17 @@ void MusicBrowserUI::UIThreadFunc(void* arg)
 
 Error MusicBrowserUI::CloseMainDialog(void)
 { 
-    if (m_pParent)
+    if(m_pParent)
     {
-       if (m_bListChanged)
+       if(m_bListChanged)
        {
            ShowWindow(m_hWnd, SW_RESTORE);
            SetForegroundWindow(m_hWnd);
            if (MessageBox(m_hWnd, "Would you like to save this playlist?",
                           BRANDING, MB_YESNO) == IDYES)
-              WritePlaylist();
+              SavePlaylist();
        }    
     }
-    else      
-       if (m_bListChanged)
-           WritePlaylist();
 
     m_bListChanged = false;   
     PostMessage(m_hWnd, WM_QUIT, 0, 0);
@@ -488,24 +484,6 @@ void MusicBrowserUI::ExpandCollapseEvent(void)
     SendMessage(m_hStatus, SB_SETTEXT, 0, (LPARAM)"");
     InvalidateRect(m_hWnd, NULL, true);
     UpdateWindow(m_hWnd);
-}
-
-void MusicBrowserUI::MoveControls(int iPixelsToMove)
-{
-	RECT  sLoc;
-    POINT sCorner;
-    int  *iIndex;
-    
-    for(iIndex = pControls; *iIndex >= 0; iIndex++)
-    {
-	    GetWindowRect(GetDlgItem(m_hWnd, *iIndex), &sLoc);
-        sCorner.x = sLoc.left;
-        sCorner.y = sLoc.top;
-        ScreenToClient(m_hWnd, &sCorner);
-    	SetWindowPos(GetDlgItem(m_hWnd, *iIndex), NULL,
-                     sCorner.x + iPixelsToMove,
-                     sCorner.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
-    }                 
 }
 
 void MusicBrowserUI::SizeWindow(int iType, int iWidth, int iHeight)
@@ -718,22 +696,6 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
  
     ListView_SetImageList(m_hPlaylistView, hList, LVSIL_SMALL); 
 
-    if (m_pParent == NULL)
-    {
-//       string lastPlaylist = FreeampDir(m_context->prefs);
-//       lastPlaylist += "\\currentlist.m3u";
-//       LoadPlaylist(lastPlaylist);
-        m_oPlm->SetActivePlaylist(kPlaylistKey_MasterPlaylist);
-    }   
-    else   
-    {
-        char   url[MAX_PATH];
-        uint32 len = MAX_PATH;
-        FilePathToURL(m_currentListName.c_str(), url, &len);
-        m_oPlm->SetActivePlaylist(kPlaylistKey_ExternalPlaylist);
-        LoadPlaylist(url);
-    }   
-
     InitTree();                      
     InitList();
     SetTitles();
@@ -765,11 +727,6 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
         hd_item.fmt = HDF_OWNERDRAW;
 
         Header_SetItem(m_hPlaylistHeader, 0, &hd_item);
-
-        //hd_item.fmt = HDF_CENTER;
-        //Header_SetItem(m_hPlaylistHeader, 1, &hd_item);
-        //Header_SetItem(m_hPlaylistHeader, 2, &hd_item);
-        //Header_SetItem(m_hPlaylistHeader, 3, &hd_item);
     }
 
     // Subclass the treeview
@@ -784,7 +741,7 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
             "this",
             (HANDLE)this);
 	
-	// Subclass the window so we can draw it
+	// Subclass the window so we can handle multi-select
 	SetWindowLong(m_hMusicCatalog, 
 			      GWL_WNDPROC, 
                   (DWORD)::TreeViewWndProc );  
@@ -802,11 +759,28 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
                                   "", m_hWnd, IDC_STATUS);
 
     SendMessage(m_hStatus, SB_SETPARTS, kNumPanes, (LPARAM) panes);
-    m_currentindex = -1;
-    UpdateButtonStates();
+
+    UpdateButtonMenuStates();
+    m_context->target->AcceptEvent(new Event(CMD_QueryPlayerState));
 
     m_sMinSize.x = 500;
     m_sMinSize.y = 300;
+
+    if (m_pParent == NULL)
+    {
+//       string lastPlaylist = FreeampDir(m_context->prefs);
+//       lastPlaylist += "\\currentlist.m3u";
+//       LoadPlaylist(lastPlaylist);
+        m_oPlm->SetActivePlaylist(kPlaylistKey_MasterPlaylist);
+    }   
+    else   
+    {
+        char   url[MAX_PATH];
+        uint32 len = MAX_PATH;
+        FilePathToURL(m_currentListName.c_str(), url, &len);
+        m_oPlm->SetActivePlaylist(kPlaylistKey_ExternalPlaylist);
+        LoadPlaylist(url);
+    }   
     
     if (m_pParent)
         ShowWindow(m_hWnd, SW_SHOW);
@@ -848,14 +822,6 @@ void MusicBrowserUI::CreateToolbar(void)
 				g_hinst,
 				NULL );
 
-    /*m_hToolbar = CreateToolbarEx(m_hWnd, 
-                     WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT |
-                     TBSTYLE_TOOLTIPS | TBSTYLE_LIST | WS_CLIPCHILDREN | 
-                     WS_CLIPSIBLINGS | CCS_NODIVIDER | CCS_NORESIZE,
-                     0, 8, g_hinst, IDB_TOOLBAR,
-		             (LPCTBBUTTON)&tbButtons,
-		             6, 44, 44, 16, 16, sizeof(TBBUTTON));*/
-
     m_hToolbar = CreateWindowEx(0, TOOLBARCLASSNAME, (LPSTR) NULL, 
                      WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT |
                      TBSTYLE_TOOLTIPS |  WS_CLIPCHILDREN | 
@@ -894,10 +860,8 @@ void MusicBrowserUI::CreateToolbar(void)
     tbButtons[9].iString = index;
     index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Move Down");
     tbButtons[10].iString = index;
-    index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Clear Playlist");
-    tbButtons[11].iString = index;
     
-    SendMessage(m_hToolbar, TB_ADDBUTTONS, (WPARAM) 12, (LPARAM) &tbButtons);
+    SendMessage(m_hToolbar, TB_ADDBUTTONS, (WPARAM) 11, (LPARAM) &tbButtons);
     SendMessage(m_hToolbar, TB_AUTOSIZE, (WPARAM) 0, (LPARAM) 0);
 
     //GetClientRect(m_hRebar, &dummyRect);
@@ -907,7 +871,7 @@ void MusicBrowserUI::CreateToolbar(void)
 
     // Initialize REBARBANDINFO for all rebar bands
 	rbb.cbSize = sizeof(REBARBANDINFO);
-	rbb.fMask = RBBIM_COLORS |	//  clrFore and clrBack are valid
+	rbb.fMask = RBBIM_COLORS |	    //  clrFore and clrBack are valid
 		RBBIM_CHILD |				// hwndChild is valid
 		RBBIM_CHILDSIZE |			// cxMinChild and cyMinChild are valid
 		RBBIM_STYLE |				// fStyle is valid
@@ -957,70 +921,11 @@ void MusicBrowserUI::SetTitles(void)
     }   
 }
 
-/*void MusicBrowserUI::BeginDrag(NM_TREEVIEW *pTreeView)
-{
-    POINT      sPoint;
-    
-    m_hTreeDragItem = pTreeView->itemNew;
-    sPoint = pTreeView->ptDrag;
-
-    m_hDragCursor = LoadCursor(g_hinst, MAKEINTRESOURCE(IDC_DRAG));
-    m_hNoDropCursor = LoadCursor(g_hinst, MAKEINTRESOURCE(IDC_NODROP));
-    m_hSavedCursor = ::SetCursor(m_hDragCursor);
-    
-    SetCapture(m_hWnd);
-    m_bDragging = true;
-}*/
-
 void MusicBrowserUI::BeginDrag(HWND hwnd, NM_TREEVIEW* nmtv)
 {
-    /*HIMAGELIST himl;    // handle of image list 
-    RECT rcItem;        // bounding rectangle of item 
-    //DWORD dwLevel;      // heading level of item 
-    DWORD dwIndent;     // amount that child items are indented 
- 
-    // Tell the tree-view control to create an image to use 
-    // for dragging. 
-    himl = TreeView_CreateDragImage(hwnd, nmtv->itemNew.hItem);
- 
-    // Get the bounding rectangle of the item being dragged. 
-    TreeView_GetItemRect(hwnd, nmtv->itemNew.hItem, &rcItem, TRUE); 
- 
-    // Get the heading level and the amount that the child items are 
-    // indented. 
-    //dwLevel = nmtv->itemNew.lParam; 
-    dwIndent = (DWORD) SendMessage(hwnd, TVM_GETINDENT, 0, 0);
- 
-    //MapWindowPoints(hwnd, GetParent(hwnd), &nmtv->ptDrag, 1);
-
-    // Start the drag operation. 
-    //ImageList_DragEnter(GetParent(hwnd), nmtv->ptDrag.x, nmtv->ptDrag.y);
-    ImageList_BeginDrag(himl, 
-                        0, 
-                        nmtv->ptDrag.x - rcItem.left, 
-                        nmtv->ptDrag.y - rcItem.top);
- 
-    POINT pt = nmtv->ptDrag;
-    //ClientToScreen(hwnd, &pt);
-    //MapWindowPoints(hwnd, GetParent(hwnd), &pt, 1);
-    
-    ClientToScreen(hwnd, &pt);
-
-    //ImageList_DragEnter(NULL, pt.x, pt.y);
-    ImageList_DragEnter(NULL, pt.x, pt.y);
- 
-    // Hide the mouse cursor, and direct mouse input to the 
-    // parent window. 
-    ShowCursor(FALSE); 
-    SetCapture(GetParent(hwnd)); 
-    m_bDragging = true; */
-    
     vector<string>* urls = new vector<string>;
 
-    GetSelectedMusicTreeItems(urls);
-    //urls->push_back("file://c|/local/mpegs/311 - Beautiful Disaster.mp3");
-    //urls->push_back("file://c|/local/mpegs/Age of Aquarius.mp3");
-    //urls->push_back("file://c|/local/mpegs/B-52s - Loveshack.mp3");
+    GetSelectedMusicTreeItems(urls); 
 
     DataObject* data = new DataObject(urls);
     DropSource* src = new DropSource(hwnd, nmtv);
@@ -1068,46 +973,7 @@ BOOL MusicBrowserUI::SetCursor(int hitTest, int mouseMsg)
 
 void MusicBrowserUI::MouseMove(uint32 uFlags, POINT &sPoint)
 {
-    if(m_bDragging)
-    {
-        // Drag the item to the current position of the mouse cursor. 
-
-        //ClientToScreen(m_hWnd, &sPoint);
-
-        GetCursorPos(&sPoint);
-        
-        ImageList_DragMove(sPoint.x, sPoint.y); 
-    }
-
-    /*if(m_bDragging)
-    {
-        TV_HITTESTINFO sHit;
-        
-        sHit.flags = TVHT_ONITEM;
-        
-        ClientToWindow(m_hWnd, &sPoint); 
-        sHit.pt = sPoint;
-        m_hDropTarget = TreeView_HitTest(m_hMusicCatalog,
-                                         &sHit);
-        if (m_hDropTarget != NULL)
-        {
-            TV_ITEM sItem;
-            
-            sItem.hItem = m_hDropTarget;
-            sItem.mask = TVIF_PARAM;
-            TreeView_GetItem(m_hMusicCatalog, &sItem);
-            if (sItem.lParam < 0)
-                ::SetCursor(m_hDragCursor);
-            else    
-            {
-                ::SetCursor(m_hNoDropCursor);
-               m_hDropTarget = NULL;
-            }
-        }       
-        else    
-            ::SetCursor(m_hNoDropCursor);
-    }*/
-    else if(m_trackSplitter)
+    if(m_trackSplitter)
     {
         HDC hdc = GetDC(NULL);
         POINT pt = sPoint;
@@ -1279,119 +1145,141 @@ void MusicBrowserUI::MouseButtonUp(int keys, int x, int y)
 
 
     }
-    else if(m_bDragging) 
-    { 
-        ImageList_EndDrag(); 
-        ReleaseCapture(); 
-        ShowCursor(TRUE); 
-        m_bDragging = false; 
-    } 
-    /*
-    else if(m_bDragging)
-    {
-        int i;
-
-        ReleaseCapture();
-        ::SetCursor(m_hSavedCursor);
-        m_bDragging = false; 
-        
-        if (m_hDropTarget)
-        {
-            TV_ITEM sItem;
-            PlaylistItem *item;
-            
-            sItem.hItem = m_hDropTarget;
-            sItem.mask = TVIF_PARAM;
-            TreeView_GetItem(m_hMusicCatalog, &sItem);
-
-            assert(sItem.lParam < 0);
-            
-            i = -sItem.lParam;
-                 
-            if (i != 1)
-            {
-                const vector<string> *p;
-                
-                p = m_context->browser->m_catalog->GetPlaylists();
-                LoadPlaylist((*p)[(-sItem.lParam) - 1]);
-            }
-            else
-                LoadPlaylist(string(""));
-
-            item = new PlaylistItem(*m_oTreeIndex.Data(m_hTreeDragItem.lParam).m_pTrack);
-            
-            m_oPlm->AddItem(item, false);
-            UpdatePlaylistList();
-            m_bListChanged = true;
-                     
-            SetFocus(m_hPlaylistView);
-        }    
-    }    */
 }
 
-void MusicBrowserUI::UpdateButtonStates()
+void MusicBrowserUI::UpdateButtonMenuStates()
 {
-    HMENU hMenu;
-    
-    hMenu = GetMenu(m_hWnd);
-    hMenu = GetSubMenu(hMenu, 1);
-    
-    EnableWindow(GetDlgItem(m_hWnd, IDC_DELETE), m_currentindex != -1);
-
-    EnableWindow(GetDlgItem(m_hWnd, IDC_UP), m_currentindex > 0);
-    EnableMenuItem(hMenu, ID_EDIT_MOVEUP, 
-                   (m_currentindex > 0) ? MF_ENABLED : MF_GRAYED);
-    
-    EnableWindow(GetDlgItem(m_hWnd, IDC_DOWN), 
-                 m_currentindex < m_oPlm->CountItems() - 1);
-    EnableMenuItem(hMenu, ID_EDIT_MOVEDOWN, 
-                 (m_currentindex < m_oPlm->CountItems() - 1) ? 
-                 MF_ENABLED : MF_GRAYED);
-
-}
-
-void MusicBrowserUI::UpdateMenuItems(void)
-{
-    HMENU        hMenu;
+    HMENU        hMenuRoot, hMenu;
     MENUITEMINFO sMenuItem;
-    string       oType(""), oText;
+
+    hMenuRoot = GetMenu(m_hWnd);
+
+
+    // File Menu
+    hMenu = GetSubMenu(hMenuRoot, 0); 
+
+
+    EnableMenuItem(hMenu, ID_FILE_SAVEPLAYLIST, 
+                   m_bListChanged ? MF_ENABLED : MF_GRAYED );
+
     int32        lParam;
     HTREEITEM    hDummy;
 
     lParam = GetMusicTreeSelection(hDummy);
-    if (m_oTreeIndex.IsTrack(lParam))
-       oType = " Track";
-       
-    if (m_oTreeIndex.IsPlaylist(lParam))
-       oType = " Playlist";
 
-    hMenu = GetMenu(m_hWnd);
-    hMenu = GetSubMenu(hMenu, 1);
+    EnableMenuItem(hMenu, ID_FILE_EXPORTPLAYLIST, 
+                   m_oTreeIndex.IsPlaylist(lParam) ? 
+                   MF_ENABLED : MF_GRAYED );
+
+
+    
+    // Edit Menu
+    hMenu = GetSubMenu(hMenuRoot, 1);
+
+    // Can we move items up and down?
+    uint32 index = ListView_GetItemCount(m_hPlaylistView) - 1;
+    uint32 count = ListView_GetSelectedCount(m_hPlaylistView);
+
+    if(count && m_hPlaylistView == GetFocus())
+    {
+        uint32 state;
+
+        state = ListView_GetItemState(m_hPlaylistView, 
+                                      index, 
+                                      LVIS_SELECTED);
+
+        EnableMenuItem(hMenu, ID_EDIT_MOVEDOWN, 
+                       (state & LVIS_SELECTED) ? MF_GRAYED : MF_ENABLED );
+
+        SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
+                    ID_EDIT_MOVEDOWN, MAKELPARAM(!(state & LVIS_SELECTED), 0)); 
+
+        state = ListView_GetItemState(m_hPlaylistView, 
+                                      0, 
+                                      LVIS_SELECTED);
+
+        EnableMenuItem(hMenu, ID_EDIT_MOVEUP, 
+                       (state & LVIS_SELECTED) ? MF_GRAYED : MF_ENABLED );
+
+        SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
+                    ID_EDIT_MOVEUP, MAKELPARAM(!(state & LVIS_SELECTED), 0));    
+    }
+    else
+    {    
+        EnableMenuItem(hMenu, ID_EDIT_MOVEUP, MF_GRAYED);
+        EnableMenuItem(hMenu, ID_EDIT_MOVEDOWN, MF_GRAYED);
+
+        SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
+                    ID_EDIT_MOVEUP, 0);    
+        SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
+                    ID_EDIT_MOVEDOWN, 0); 
+    }
+
+   
  
     sMenuItem.cbSize = sizeof(MENUITEMINFO);
-    sMenuItem.fMask = MIIM_TYPE | MIIM_STATE;
+    sMenuItem.fMask =  MIIM_STATE;
     sMenuItem.fType = MFT_STRING;
-    sMenuItem.fState = (oType.length() == 0) ? MFS_GRAYED : MFS_ENABLED;
+    //sMenuItem.fState = (oType.length() == 0) ? MFS_GRAYED : MFS_ENABLED;
 
-    oText = string("&Edit") + oType + string("...");
-    sMenuItem.dwTypeData = (char *)oText.c_str();
-    sMenuItem.cch = strlen(sMenuItem.dwTypeData);
-    SetMenuItemInfo(hMenu, ID_EDIT_EDIT, false, &sMenuItem);
+    //oText = string("&Edit") + oType + string("...");
+    //sMenuItem.dwTypeData = (char *)oText.c_str();
+    //sMenuItem.cch = strlen(sMenuItem.dwTypeData);
+    //SetMenuItemInfo(hMenu, ID_EDIT_EDIT, false, &sMenuItem);
 
-    oText = string("&Remove") + oType + string(" from Catalog...");
-    sMenuItem.dwTypeData = (char *)oText.c_str();
-    sMenuItem.cch = strlen(sMenuItem.dwTypeData);
-    SetMenuItemInfo(hMenu, ID_EDIT_REMOVE, false, &sMenuItem);
+    //oText = string("&Remove") + oType + string(" from Catalog...");
+    //sMenuItem.dwTypeData = (char *)oText.c_str();
+    //sMenuItem.cch = strlen(sMenuItem.dwTypeData);
+    //SetMenuItemInfo(hMenu, ID_EDIT_REMOVE, false, &sMenuItem);
     
-    oText = string("Remove") + oType + string(" from &Disk...");
-    sMenuItem.dwTypeData = (char *)oText.c_str();
-    sMenuItem.cch = strlen(sMenuItem.dwTypeData);
-    SetMenuItemInfo(hMenu, ID_EDIT_REMOVEFROMDISK, false, &sMenuItem);
+    //oText = string("Remove") + oType + string(" from &Disk...");
+    //sMenuItem.dwTypeData = (char *)oText.c_str();
+    //sMenuItem.cch = strlen(sMenuItem.dwTypeData);
+    //SetMenuItemInfo(hMenu, ID_EDIT_REMOVEFROMDISK, false, &sMenuItem);
     
-    SendMessage(m_hToolbar, TB_ENABLEBUTTON, ID_EDIT_EDIT, 
-                MAKELONG(oType.length() != 0, 0));    
-    SendMessage(m_hToolbar, TB_ENABLEBUTTON, ID_EDIT_REMOVE, 
-                MAKELONG(oType.length() != 0, 0));    
+    //SendMessage(m_hToolbar, TB_ENABLEBUTTON, ID_EDIT_EDIT, 
+    //            MAKELONG(oType.length() != 0, 0));    
+    //SendMessage(m_hToolbar, TB_ENABLEBUTTON, ID_EDIT_REMOVE, 
+    ///            MAKELONG(oType.length() != 0, 0)); 
+    
+    hMenu = GetSubMenu(hMenuRoot, 3);
+
+
+    sMenuItem.fMask = MIIM_STATE;
+
+	switch(m_oPlm->GetRepeatMode()) 
+    {
+		case kPlaylistMode_RepeatNone:
+            sMenuItem.fState = MFS_CHECKED;
+            SetMenuItemInfo(hMenu, ID_CONTROLS_REPEATNONE, false, &sMenuItem);
+            sMenuItem.fState = MFS_UNCHECKED;
+            SetMenuItemInfo(hMenu, ID_CONTROLS_REPEATONE, false, &sMenuItem);
+            sMenuItem.fState = MFS_UNCHECKED;
+            SetMenuItemInfo(hMenu, ID_CONTROLS_REPEATALL, false, &sMenuItem);
+			break;
+
+		case kPlaylistMode_RepeatOne:
+            sMenuItem.fState = MFS_UNCHECKED;
+            SetMenuItemInfo(hMenu, ID_CONTROLS_REPEATNONE, false, &sMenuItem);
+            sMenuItem.fState = MFS_CHECKED;
+            SetMenuItemInfo(hMenu, ID_CONTROLS_REPEATONE, false, &sMenuItem);
+            sMenuItem.fState = MFS_UNCHECKED;
+            SetMenuItemInfo(hMenu, ID_CONTROLS_REPEATALL, false, &sMenuItem);
+			break;
+
+		case kPlaylistMode_RepeatAll:
+            sMenuItem.fState = MFS_UNCHECKED;
+            SetMenuItemInfo(hMenu, ID_CONTROLS_REPEATNONE, false, &sMenuItem);
+            sMenuItem.fState = MFS_UNCHECKED;
+            SetMenuItemInfo(hMenu, ID_CONTROLS_REPEATONE, false, &sMenuItem);
+            sMenuItem.fState = MFS_CHECKED;
+            SetMenuItemInfo(hMenu, ID_CONTROLS_REPEATALL, false, &sMenuItem);
+            break;
+	}
+    
+    sMenuItem.fState = m_oPlm->GetShuffleMode() ? MFS_CHECKED:MFS_UNCHECKED;
+    SetMenuItemInfo(hMenu, ID_CONTROLS_SHUFFLE, false, &sMenuItem);
+
 }
 
 

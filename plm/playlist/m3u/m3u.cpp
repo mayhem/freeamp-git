@@ -259,6 +259,29 @@ Error M3U::WritePlaylist(const char* url, PlaylistFormatInfo* format,
 
                 result = kError_NoErr;
             }
+            else
+            {
+                int err = errno;
+
+                switch(err)
+                {
+                    case EACCES:
+                        result = kError_FileNoAccess;
+                        break;
+
+                    case EEXIST:
+                        result = kError_FileNoAccess;
+                        break;
+
+                    case EINVAL:
+                        result = kError_FileNoAccess;
+                        break;
+
+                    case ENOENT:
+                        result = kError_FileNoAccess;
+                        break;
+                }
+            }
         }
     }
 

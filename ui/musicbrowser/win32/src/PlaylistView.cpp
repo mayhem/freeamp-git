@@ -33,43 +33,6 @@ ____________________________________________________________________________*/
 #include "Win32MusicBrowser.h"
 #include "debug.h"
 
-void MusicBrowserUI::NewPlaylist(void)
-{
-    MusicBrowserUI *pNew;
-    
-    if (m_pParent)
-    {
-       pNew = new MusicBrowserUI(m_context, m_pParent, m_hWnd, string(""));
-       m_pParent->AddMusicBrowserWindow(pNew);
-    }   
-    else   
-    {
-       pNew = new MusicBrowserUI(m_context, this, m_hWnd, string(""));
-       AddMusicBrowserWindow(pNew);
-    }   
-       
-    pNew->Init(SECONDARY_UI_STARTUP);
-}
-
-void MusicBrowserUI::EditPlaylist(const string &oList)
-{
-    MusicBrowserUI *pNew;
-    
-    if (m_pParent)
-    {
-       pNew = new MusicBrowserUI(m_context, m_pParent, m_hWnd, oList);
-       m_pParent->AddMusicBrowserWindow(pNew);
-    }   
-    else   
-    {
-       pNew = new MusicBrowserUI(m_context, this, m_hWnd, oList);
-       AddMusicBrowserWindow(pNew);
-    }   
-       
-    pNew->Init(SECONDARY_UI_STARTUP);
-}
-
-
 #define kPrePadding 5
 
 BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
@@ -406,6 +369,9 @@ void MusicBrowserUI::PlaylistListItemRemoved(const PlaylistItem* item,
 
         ListView_SetItemState(m_hPlaylistView, oldIndex, LVIS_SELECTED, LVIS_SELECTED);
         ListView_RedrawItems(m_hPlaylistView, oldIndex, ListView_GetItemCount(m_hPlaylistView) - 1);
+
+        m_bListChanged = true;
+        UpdateButtonMenuStates();
     }
 }
 
@@ -435,6 +401,9 @@ void MusicBrowserUI::PlaylistListSorted(void)
     // again lets try to use the sort feature of the 
     // list and sort on index;
     ListView_SortItems(m_hPlaylistView, LVCompareFunc, (LPARAM)m_oPlm);
+
+    m_bListChanged = true;
+    UpdateButtonMenuStates();
 }
 
 void MusicBrowserUI::UpdatePlaylistListItem(const PlaylistItem* item)
@@ -463,40 +432,20 @@ void MusicBrowserUI::AddPlaylistListItem(const PlaylistItem* item)
         sItem.iImage = 0;
 
         ListView_InsertItem(hwnd, &sItem);
+
+        // this skips change notification
+        // for initial loading of list for
+        // editing. a hack pretty much but
+        // i can't think of a better way
+        if(m_initialCount)
+            m_initialCount--;
+        else
+        {
+            m_bListChanged = true;
+            UpdateButtonMenuStates();
+        }
     }
 }
-
-void MusicBrowserUI::UpdatePlaylistList(void)
-{
-    LV_ITEM       sItem;
-    int           i;
-    PlaylistItem *pItem;
-
-    ListView_DeleteAllItems(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX));
-    sItem.state = sItem.stateMask = 0;
-    for(i = 0; pItem = m_oPlm->ItemAt(i); i++)
-    {
-        sItem.mask = LVIF_IMAGE | LVIF_PARAM;
-        sItem.iSubItem = 0;
-        sItem.iItem = i;
-        sItem.lParam = (LPARAM)pItem;
-        sItem.iImage = 0;
-
-        ListView_InsertItem(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), &sItem);
-    }
-
-    if (m_currentindex >= i)
-       m_currentindex = i - 1;
-        
-    ListView_SetItemState(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), 
-                    m_currentindex, 
-                    LVIS_FOCUSED|LVIS_SELECTED,
-                    LVIS_FOCUSED|LVIS_SELECTED);
-    SetFocus(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX));
-    UpdateButtonStates();
-}
-
-
 
 LRESULT WINAPI 
 ListViewWndProc(HWND hwnd, 
@@ -531,6 +480,11 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
 
 			break;
 		}
+
+        case WM_SETFOCUS:
+        case WM_KILLFOCUS:
+            UpdateButtonMenuStates();
+            break;
         
         case WM_DROPURLS:
             filesAreURLs = true;
@@ -583,7 +537,6 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
 
             MessageBox(NULL, buf, "pt", MB_OK);*/
 
-            m_bListChanged = true;
             break;
         }
 

@@ -1055,6 +1055,7 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
         case WM_SETFOCUS:
         case WM_KILLFOCUS:
         {
+            UpdateButtonMenuStates();
             InvalidateRect(hwnd, NULL, TRUE);
             break;
         }

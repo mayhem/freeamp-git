@@ -45,6 +45,10 @@ class FAContext;
 #define STATE_COLLAPSED 0
 #define STATE_EXPANDED  1
 
+#define PLAYERSTATE_STOPPED 0
+#define PLAYERSTATE_PLAYING 1
+#define PLAYERSTATE_PAUSED 2
+
 bool operator<(const TreeData &A, const TreeData &b);
 bool operator==(const TreeData &A, const TreeData &b);
 void ClientToWindow(HWND hWnd, POINT *Pt); 
@@ -73,6 +77,12 @@ MusicSearchDlgProc(HWND hwnd,
                    UINT msg, 
                    WPARAM wParam, 
                    LPARAM lParam);
+
+BOOL CALLBACK 
+SavePlaylistDlgProc(HWND hwnd, 
+                    UINT msg, 
+                    WPARAM wParam, 
+                    LPARAM lParam);
 
 class MusicBrowserUI : public UserInterface 
 {
@@ -110,6 +120,13 @@ class MusicBrowserUI : public UserInterface
                             WPARAM wParam, 
                             LPARAM lParam);
 
+    BOOL SavePlaylistDlgProc(HWND hwnd, 
+                             UINT msg, 
+                             WPARAM wParam, 
+                             LPARAM lParam);
+
+    
+
     const PlaylistManager* PLManager() const { return m_oPlm; }
  
  protected:
@@ -134,8 +151,8 @@ class MusicBrowserUI : public UserInterface
     void   CreateToolbar(void);
     void   ToggleVisEvent(void);
     void   SetTitles(void);
-    void   UpdateButtonStates(void);
-    void   UpdateMenuItems(void);
+    void   UpdateButtonMenuStates(void);
+    //void   UpdateMenuItems(void);
     void   MoveControls(int iPixelsToMove);
     bool   CreateMainDialog(void);
     Error  CloseMainDialog(void);
@@ -157,12 +174,16 @@ class MusicBrowserUI : public UserInterface
     void  RemoveFromDiskEvent(void);
     void  ImportEvent(void);
     void  MoveItemEvent(int source, int dest);
+    void  PlayerControlsEvent(int command);
+    void  ChangeShuffleMode(bool shuffled);
+    void  ChangePlayerState(int32 event);
+    void  ChangeRepeatMode(RepeatMode mode);
 
     // Functions in PlaylistView.cpp
     void  OpenPlaylist(void);
     void  NewPlaylist(void);
-    void  WritePlaylist(void);
-    void  SaveAsPlaylist(void);
+    void  SavePlaylist(void);
+    void  SavePlaylistAs(void);
     void  UpdatePlaylistList(void);
     void  AddPlaylistListItem(const PlaylistItem* item);
     void  UpdatePlaylistListItem(const PlaylistItem* item);
@@ -198,8 +219,8 @@ class MusicBrowserUI : public UserInterface
 
     // Data members
     EventQueue          *m_playerEQ;
-    int32                m_state, m_startupType;
-    int32                m_currentindex, m_currentplaying;
+    int32                m_state, m_startupType, m_playerState;
+    int32                m_currentplaying;
   	HWND                 m_hWnd, m_hStatus, m_hParent, m_hToolbar, m_hRebar;
     HWND                 m_hMusicCatalog, m_hPlaylistView;
     HWND                 m_hPlaylistTitle, m_hMusicCatalogTitle;
@@ -227,6 +248,7 @@ class MusicBrowserUI : public UserInterface
     DropTarget*          m_playlistDropTarget;
     vector<string>       m_searchPathList;
     HTREEITEM            m_hNewPlaylistItem;  
+    uint32               m_initialCount;
 };
 
 #endif

@@ -43,7 +43,7 @@ void MusicBrowserUI::DeleteListEvent(void)
 {
     m_bListChanged = true;
     m_oPlm->RemoveAll();
-    UpdatePlaylistList();
+    UpdateButtonMenuStates();
 }
 
 void MusicBrowserUI::DeleteEvent(void)
@@ -134,47 +134,7 @@ void MusicBrowserUI::MoveDownEvent(void)
 void MusicBrowserUI::MoveItemEvent(int source, int dest)
 {
     m_oPlm->MoveItem(source, dest);
-    UpdatePlaylistList();
 }
-
-#if 0
-void MusicBrowserUI::AddTrackPlaylistEvent(char *path)
-{
-    char *tempurl = new char[_MAX_PATH];
-    uint32 length = _MAX_PATH;
-
-    FilePathToURL(path, tempurl, &length);
-    if (m_currentindex == kInvalidIndex) 
-        m_currentindex = 0;
-    m_oPlm->AddItem(tempurl, m_currentindex);
-   
-    delete [] tempurl;
-
-    UpdatePlaylistList();
-}
-
-void MusicBrowserUI::AddTrackPlaylistEvent(PlaylistItem *newitem)
-{
-    if (m_currentindex == kInvalidIndex)
-        m_currentindex = 0;
-    m_oPlm->AddItem(newitem, m_currentindex, false);
-    UpdatePlaylistList();
-}
-
-void MusicBrowserUI::AddTracksPlaylistEvent(vector<PlaylistItem *> *newlist)
-{
-    if (m_currentindex == kInvalidIndex)
-        m_currentindex = 0;
-    m_oPlm->AddItems(newlist, m_currentindex, false);
-    UpdatePlaylistList();
-}
-
-void MusicBrowserUI::PlayEvent(void)
-{
-    m_oPlm->SetCurrentIndex(m_currentindex);
-    m_playerEQ->AcceptEvent(new Event(CMD_Play));
-}
-#endif
 
 void MusicBrowserUI::StartStopMusicSearch(void)
 {  
@@ -296,7 +256,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
         
 	    if (pTreeView->hdr.code == TVN_SELCHANGED)
         {
-            UpdateMenuItems();
+            UpdateButtonMenuStates();
             return 0;
         }
 	    if (pTreeView->hdr.code == NM_DBLCLK)
@@ -323,7 +283,6 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                 
                     item = new PlaylistItem(*m_oTreeIndex.Data(sItem.lParam).m_pTrack);
                     m_oPlm->AddItem(item, false);
-                    m_bListChanged = true;
                 } 
                 else if(m_oTreeIndex.IsPlaylist(sItem.lParam))
                 {
@@ -396,8 +355,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
     {
 	    if(pListView->hdr.code == LVN_ITEMCHANGED)
         {
-            m_currentindex = pListView->lParam;
-            UpdateButtonStates();
+            UpdateButtonMenuStates();
         }
 	    else if(pListView->hdr.code == NM_DBLCLK)
         {
@@ -446,7 +404,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
         return 0;
     }
 
-	if (pTreeView->hdr.code == TTN_NEEDTEXT)
+	if (pHdr->code == TTN_NEEDTEXT)
     {
         pToolTipText = (LPTOOLTIPTEXT)pHdr;
         switch(pToolTipText->hdr.idFrom)
@@ -549,8 +507,6 @@ void MusicBrowserUI::AddEvent(void)
     {
         for(i = oFileList.begin(); i != oFileList.end(); i++)
            eRet = m_oPlm->AddItem(*i);
-        m_bListChanged = true;
-        //UpdatePlaylistList();
     }
 }
 
@@ -672,3 +628,142 @@ void MusicBrowserUI::ImportEvent(void)
     }
 }
 
+void MusicBrowserUI::PlayerControlsEvent(int command)
+{
+    switch(command)
+    {
+        case ID_CONTROLS_PLAYPAUSE:
+
+            if(m_playerState == PLAYERSTATE_PLAYING)
+                m_context->target->AcceptEvent(new Event(CMD_Pause));
+            else
+                m_context->target->AcceptEvent(new Event(CMD_Play));
+
+            break;
+
+        case ID_CONTROLS_STOP:
+            m_context->target->AcceptEvent(new Event(CMD_Stop));
+            break;
+
+        case ID_CONTROLS_PREVIOUSSONG:
+            m_context->target->AcceptEvent(new Event(CMD_PrevMediaPiece));
+            break;
+
+        case ID_CONTROLS_NEXTSONG:
+            m_context->target->AcceptEvent(new Event(CMD_NextMediaPiece));
+            break;
+
+        case ID_CONTROLS_SHUFFLE:
+            m_oPlm->ToggleShuffleMode();
+            break;
+
+        case ID_CONTROLS_REPEATNONE:
+            m_oPlm->SetRepeatMode(kPlaylistMode_RepeatNone);
+            break;
+        case ID_CONTROLS_REPEATONE:
+            m_oPlm->SetRepeatMode(kPlaylistMode_RepeatOne);
+            break;
+        case ID_CONTROLS_REPEATALL:
+            m_oPlm->SetRepeatMode(kPlaylistMode_RepeatAll);
+            break;
+
+
+    }
+}
+
+void MusicBrowserUI::ChangePlayerState(int32 event)
+{
+    HMENU           menu;
+    MENUITEMINFO    item;
+
+    menu = GetMenu(m_hWnd);
+    menu = GetSubMenu(menu, 3);
+    item.cbSize = sizeof(MENUITEMINFO);
+    item.fMask = MIIM_TYPE;
+    item.fType = MFT_STRING;
+
+    switch(event) 
+    {
+        case INFO_Playing: 
+        {   
+            m_playerState = PLAYERSTATE_PLAYING;
+            
+            item.dwTypeData = "Pause";
+            item.cch = strlen(item.dwTypeData);
+            SetMenuItemInfo(menu, ID_CONTROLS_PLAYPAUSE, false, &item);
+                   
+	        break; 
+        }
+
+        case INFO_Paused: 
+        case INFO_Stopped: 
+        {
+            if(event == INFO_Paused)
+                m_playerState = PLAYERSTATE_PAUSED;
+            else
+                m_playerState = PLAYERSTATE_STOPPED;
+
+            item.dwTypeData = "Play";
+            item.cch = strlen(item.dwTypeData);
+            SetMenuItemInfo(menu, ID_CONTROLS_PLAYPAUSE, false, &item);
+
+	        break; 
+        }
+    }
+}
+
+void MusicBrowserUI::ChangeShuffleMode(bool shuffled)
+{
+    HMENU           menu;
+    MENUITEMINFO    item;
+
+    menu = GetMenu(m_hWnd);
+    menu = GetSubMenu(menu, 3);
+    item.cbSize = sizeof(MENUITEMINFO);
+    item.fMask = MIIM_STATE;
+    item.fState = shuffled ? MFS_CHECKED:MFS_UNCHECKED;
+    SetMenuItemInfo(menu, ID_CONTROLS_SHUFFLE, false, &item);
+}
+
+void MusicBrowserUI::ChangeRepeatMode(RepeatMode mode)
+{
+    HMENU           menu;
+    MENUITEMINFO    item;
+
+    menu = GetMenu(m_hWnd);
+    menu = GetSubMenu(menu, 3);
+    item.fMask = MIIM_STATE;
+
+    item.cbSize = sizeof(MENUITEMINFO);
+
+	switch(mode) 
+    {
+		case kPlaylistMode_RepeatNone:
+            item.fState = MFS_CHECKED;
+            SetMenuItemInfo(menu, ID_CONTROLS_REPEATNONE, false, &item);
+            item.fState = MFS_UNCHECKED;
+            SetMenuItemInfo(menu, ID_CONTROLS_REPEATONE, false, &item);
+            item.fState = MFS_UNCHECKED;
+            SetMenuItemInfo(menu, ID_CONTROLS_REPEATALL, false, &item);
+			break;
+
+		case kPlaylistMode_RepeatOne:
+            item.fState = MFS_UNCHECKED;
+            SetMenuItemInfo(menu, ID_CONTROLS_REPEATNONE, false, &item);
+            item.fState = MFS_CHECKED;
+            SetMenuItemInfo(menu, ID_CONTROLS_REPEATONE, false, &item);
+            item.fState = MFS_UNCHECKED;
+            SetMenuItemInfo(menu, ID_CONTROLS_REPEATALL, false, &item);
+			break;
+
+		case kPlaylistMode_RepeatAll:
+            item.fState = MFS_UNCHECKED;
+            SetMenuItemInfo(menu, ID_CONTROLS_REPEATNONE, false, &item);
+            item.fState = MFS_UNCHECKED;
+            SetMenuItemInfo(menu, ID_CONTROLS_REPEATONE, false, &item);
+            item.fState = MFS_CHECKED;
+            SetMenuItemInfo(menu, ID_CONTROLS_REPEATALL, false, &item);
+            break;
+	}
+
+}

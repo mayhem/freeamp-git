@@ -31,7 +31,7 @@ STYLE DS_CENTER | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP |
     WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "FreeAmp - My Music"
 MENU IDR_MENU1
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     CONTROL         "Tree1",IDC_MUSICTREE,"SysTreeView32",TVS_HASBUTTONS | 
                     TVS_HASLINES | TVS_LINESATROOT | TVS_SHOWSELALWAYS | 
@@ -55,26 +55,39 @@ BEGIN
     PUSHBUTTON      "Open URL",IDC_OPEN_URL,222,3,50,13
 END
 
-IDD_MUSICSEARCH DIALOG DISCARDABLE  0, 0, 212, 126
+IDD_MUSICSEARCH DIALOG DISCARDABLE  0, 0, 209, 127
 STYLE DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
     WS_SYSMENU
 CAPTION "Search Computer for Music"
 FONT 8, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "Begin Search",IDOK,91,105,54,14
-    PUSHBUTTON      "Cancel",IDCANCEL,151,105,54,14
-    LTEXT           "&Look for music on:",IDC_STATIC,10,64,60,8
-    COMBOBOX        IDC_DRIVES,73,62,48,48,CBS_DROPDOWNLIST | WS_VSCROLL | 
+    DEFPUSHBUTTON   "Begin Search",IDOK,91,106,54,14
+    PUSHBUTTON      "Cancel",IDCANCEL,148,106,54,14
+    LTEXT           "&Look for music on:",IDC_STATIC,7,64,60,8
+    COMBOBOX        IDC_DRIVES,71,62,48,48,CBS_DROPDOWNLIST | WS_VSCROLL | 
                     WS_TABSTOP
     PUSHBUTTON      "&Browse...",IDC_BROWSE,152,81,50,14,WS_DISABLED
-    LTEXT           "Limit search to:",IDC_LIMITTEXT,10,83,48,8
-    EDITTEXT        IDC_DIRECTORY,63,81,84,13,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Limit search to:",IDC_LIMITTEXT,7,83,48,8
+    EDITTEXT        IDC_DIRECTORY,61,81,84,13,ES_AUTOHSCROLL | ES_READONLY
     LTEXT           "We will search your computer for supported music files. The files will not be moved or modified during this process. Their location will be remembered in order to provide you with an",
-                    IDC_STATIC,7,7,198,25
+                    IDC_STATIC,7,7,195,25
     LTEXT           "organized view of your music collection. ",IDC_STATIC,7,
-                    31,198,8
+                    31,195,8
     LTEXT           "Where would you like to look for music?",IDC_STATIC,7,
-                    43,198,8
+                    43,195,8
+END
+
+IDD_SAVEPLAYLIST DIALOG DISCARDABLE  0, 0, 198, 63
+STYLE DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Save Playlist As"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,87,42,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,141,42,50,14
+    EDITTEXT        IDC_NAME,7,21,184,14,ES_AUTOHSCROLL
+    LTEXT           "What would you like to call this compilation of songs?",
+                    IDC_STATIC,7,7,184,9
 END
 
 
@@ -94,9 +107,17 @@ BEGIN
     IDD_MUSICSEARCH, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 205
+        RIGHTMARGIN, 202
         TOPMARGIN, 7
-        BOTTOMMARGIN, 119
+        BOTTOMMARGIN, 120
+    END
+
+    IDD_SAVEPLAYLIST, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 191
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 56
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -142,27 +163,43 @@ BEGIN
         MENUITEM "Save Playlist",               ID_FILE_SAVEPLAYLIST
         MENUITEM "Save Playlist &As ...",       ID_FILE_SAVEASPLAYLIST
         MENUITEM SEPARATOR
-        MENUITEM "&Import...",                  ID_FILE_IMPORT
+        MENUITEM "&Import Tracks and Playlists...", ID_FILE_IMPORT
+        MENUITEM "&Export Playlist...",         ID_FILE_EXPORTPLAYLIST
+        MENUITEM SEPARATOR
         MENUITEM "Search for &Music...",        ID_FILE_SEARCHFORMUSIC
         MENUITEM SEPARATOR
-        MENUITEM "&Close",                      ID_FILE_EXIT
+        MENUITEM "&Close",                      ID_FILE_CLOSEPLAYLIST
     END
     POPUP "E&dit"
     BEGIN
-        MENUITEM "&Add Track...",               ID_EDIT_ADDTRACK
-        MENUITEM "&Edit...",                    ID_EDIT_EDIT
-        MENUITEM "&Remove from Catalog",        ID_EDIT_REMOVE
-        MENUITEM "Remove from &Disk",           ID_EDIT_REMOVEFROMDISK
+        MENUITEM "&Add Tracks and Playlists...", ID_EDIT_ADDTRACK
+        MENUITEM "Add &File...",                ID_EDIT_ADDFILE
+        MENUITEM "&Remove Items",               ID_EDIT_REMOVE
         MENUITEM SEPARATOR
         MENUITEM "Move &Up",                    ID_EDIT_MOVEUP
         MENUITEM "Move &Down",                  ID_EDIT_MOVEDOWN
         MENUITEM SEPARATOR
-        MENUITEM "&Clear Playlist",             ID_EDIT_CLEARPLAYLIST
-        MENUITEM "Ra&ndomize Playlist",         IDC_RANDOMIZE
+        MENUITEM "&Edit Playlist...",           ID_EDIT_EDITPLAYLIST
+        MENUITEM "Edit Track and Playlist Info...", ID_EDIT_EDITINFO
     END
     POPUP "&View"
     BEGIN
         MENUITEM "View &playlist only",         ID_VIEW_MUSICCATALOG
+        MENUITEM "Options...",                  ID_VIEW_OPTIONS
+    END
+    POPUP "&Controls"
+    BEGIN
+        MENUITEM "Play",                        ID_CONTROLS_PLAYPAUSE
+        MENUITEM "Stop",                        ID_CONTROLS_STOP
+        MENUITEM SEPARATOR
+        MENUITEM "Next Song",                   ID_CONTROLS_NEXTSONG
+        MENUITEM "Previous Song",               ID_CONTROLS_PREVIOUSSONG
+        MENUITEM SEPARATOR
+        MENUITEM "Shuffle",                     ID_CONTROLS_SHUFFLE
+        MENUITEM SEPARATOR
+        MENUITEM "Repeat None",                 ID_CONTROLS_REPEATNONE
+        MENUITEM "Repeat One",                  ID_CONTROLS_REPEATONE
+        MENUITEM "Repeat All",                  ID_CONTROLS_REPEATALL
     END
     POPUP "&Sort Playlist"
     BEGIN
@@ -175,6 +212,26 @@ BEGIN
         MENUITEM "by &Length",                  ID_SORT_LENGTH
         MENUITEM "by L&ocation",                ID_SORT_LOCATION
         MENUITEM "&Randomly",                   ID_SORT_RANDOMIZE
+    END
+    POPUP "&Window"
+    BEGIN
+        MENUITEM "&Next",                       ID_WINDOW_NEXT
+        MENUITEM "&Previous",                   ID_WINDOW_PREVIOUS
+        MENUITEM SEPARATOR
+        MENUITEM "&Cascade",                    ID_WINDOW_CASCADE
+        MENUITEM "Tile &Horizontally",          ID_WINDOW_TILEHORIZONTALLY
+        MENUITEM "Tile &Vertically",            ID_WINDOW_TILEVERTICALLY
+        MENUITEM SEPARATOR
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&Contents",                   ID_HELP_CONTENTS
+        MENUITEM "&Search...",                  ID_HELP_SEARCH
+        MENUITEM SEPARATOR
+        MENUITEM "&FreeAmp Website",            ID_HELP_FREEAMPWEBSITE
+        MENUITEM "&EMusic.com Website",         ID_HELP_EMUSICCOMWEBSITE
+        MENUITEM SEPARATOR
+        MENUITEM "About...",                    ID_HELP_ABOUT
     END
 END
 
@@ -206,8 +263,7 @@ IDI_ACTIVELIST          ICON    DISCARDABLE     "active.ico"
 
 IDC_DRAG                CURSOR  DISCARDABLE     "drag.cur"
 IDC_NODROP              CURSOR  DISCARDABLE     "nodrop.cur"
-IDC_SPLITTER            CURSOR  FIXED IMPURE    "splitter.cur"
-
+IDC_SPLITTER            CURSOR  DISCARDABLE     "splitter.cur"
 
 /////////////////////////////////////////////////////////////////////////////
 //

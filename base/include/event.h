@@ -128,5 +128,7 @@ class EventQueue {
 #define CMD_ShowPreferences         64 // send by some module to have the theme ui show the prefences dialog
 #define CMD_AddFiles                65 // sent by the theme ui to have the music browser show an add tracks dialog for quickly adding/playing tracks
 
+#define CMD_QueryPlayerState      64 // asks the player object to resend out its state
+
 #endif // _EVENT_H_
 

@@ -90,7 +90,6 @@ MusicBrowserUI::MusicBrowserUI(FAContext      *context,
     m_context = context;
     m_initialized = false;
     isVisible = false;
-    m_currentindex = 0;
     m_currentListName = "";
     m_state = STATE_EXPANDED;
     m_hWnd = NULL;    
@@ -127,6 +126,9 @@ MusicBrowserUI::MusicBrowserUI(FAContext      *context,
     m_hSplitterCursor = LoadCursor(g_hinst, MAKEINTRESOURCE(IDC_SPLITTER));
     m_hPointerCursor = LoadCursor(NULL, IDC_ARROW);
     m_hCurrentCursor = m_hPointerCursor;
+
+    m_playerState = PLAYERSTATE_STOPPED;
+    m_initialCount = 0;
 }
 
 MusicBrowserUI::~MusicBrowserUI()
@@ -418,6 +420,54 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
             if (m_state == STATE_COLLAPSED)
                 ExpandCollapseEvent();
             break; 
+        }
+
+
+        case INFO_PlaylistRepeat:
+		{
+            PlaylistRepeatEvent* plre = (PlaylistRepeatEvent*)event;
+
+            vector<MusicBrowserUI *>::iterator i;
+
+            for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
+            {
+                (*i)->ChangeRepeatMode(plre->GetRepeatMode());
+            }
+
+            ChangeRepeatMode(plre->GetRepeatMode());
+			break;
+		}
+
+		case INFO_PlaylistShuffle:
+		{
+            PlaylistShuffleEvent* plse = (PlaylistShuffleEvent*)event;            
+
+            vector<MusicBrowserUI *>::iterator i;
+
+            for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
+            {
+                (*i)->ChangeShuffleMode(plse->GetShuffleMode());
+            }
+
+            ChangeShuffleMode(plse->GetShuffleMode());
+            
+			break;
+		}
+
+        case INFO_Playing: 
+        case INFO_Paused: 
+        case INFO_Stopped: 
+        {   
+            vector<MusicBrowserUI *>::iterator i;
+
+            for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
+            {
+                (*i)->ChangePlayerState(event->Type());
+            }
+
+            ChangePlayerState(event->Type());
+                        
+	        break; 
         }
 
         default:

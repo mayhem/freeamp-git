@@ -52,112 +52,88 @@ void MusicBrowserUI::AddPlaylist(const string &oName)
         m_oPlm->AddItem(new PlaylistItem(*(*j)), true);
 
     m_bListChanged = true;
-
-    //UpdatePlaylistList();
 }
 
 void MusicBrowserUI::LoadPlaylist(const string &oPlaylist)
 {
+    vector<PlaylistItem*> items;
+
     m_oPlm->RemoveAll();
-    m_oPlm->ReadPlaylist((char *)oPlaylist.c_str());
-       
-    m_currentindex = 0;
-    //UpdatePlaylistList();
+    m_oPlm->ReadPlaylist((char *)oPlaylist.c_str(), &items);
+
+    m_initialCount = items.size();
+
+    m_oPlm->AddItems(&items);
 }
 
-void MusicBrowserUI::WritePlaylist(void)
+void MusicBrowserUI::SavePlaylist(void)
 {
-    PlaylistFormatInfo     oInfo;              
-    char                   ext[MAX_PATH];
-    Error                  eRet = kError_NoErr;
-    vector<PlaylistItem *> oTempList;
-    int                    i;
-    bool                   bNewList = false;
-
-    if (!m_bListChanged)
+    if(!m_bListChanged)
         return;
 
-    if (!m_pParent)
+    // if this is the root window or this list has no
+    // name then treat this as a SaveAs command.
+    if(!m_pParent || m_currentListName.length() == 0)
     {
-//        string lastPlaylist = FreeampDir(m_context->prefs);
-//        lastPlaylist += "\\currentlist.m3u";
-    
-//        SaveCurrentPlaylist((char *)lastPlaylist.c_str());  
-
-        m_bListChanged = false;
+        SavePlaylistAs();
         return;
     }
   
-    Debug_v("items: %d", m_oPlm->CountItems());
-    if (m_currentListName.length() == 0)
-    {
-        if (SaveNewPlaylist(m_currentListName))
-           bNewList = true;
-        else
-        {
-           return;
-        }   
-        Debug_v("items: %d", m_oPlm->CountItems());
-        SetTitles();
-        Debug_v("items: %d", m_oPlm->CountItems());
-    }
+    char   url[MAX_PATH];
+    uint32 len = MAX_PATH;
+    
+    FilePathToURL(m_currentListName.c_str(), url, &len);
 
-    Debug_v("items: %d", m_oPlm->CountItems());
-    _splitpath(m_currentListName.c_str(), NULL, NULL, NULL, ext);
-    for(i = 0; ; i++)
+    if(IsError(m_oPlm->WritePlaylist(url)))
     {
-        eRet = m_oPlm->GetSupportedPlaylistFormats(&oInfo, i);
-        if (IsError(eRet))
-           break;
-
-        if (strcasecmp(oInfo.GetExtension(), ext + 1) == 0)
-           break;   
+       MessageBox(m_hWnd, "Cannot save playlist to disk. Make sure there "
+                          "is room on the drive or that the directory is "
+                          "not read-only?", BRANDING, MB_OK);                              
     }
-    Debug_v("items: %d", m_oPlm->CountItems());
-    if (!IsError(eRet))
+    else
     {
-        char   url[MAX_PATH];
-        uint32 len = MAX_PATH;
-        
-        FilePathToURL(m_currentListName.c_str(), url, &len);
-        Debug_v("items: %d", m_oPlm->CountItems());
-        Debug_v("Writing playlist to: %s", url);
-        eRet = m_oPlm->WritePlaylist(url, &oInfo);   
-        if (IsError(eRet))
-        {
-           MessageBox(m_hWnd, "Cannot save playlist to disk. Out of disk space?", BRANDING, MB_OK);                              
-           return;
-        }
+        m_bListChanged = false;
+        UpdateButtonMenuStates();
     }
-    if (bNewList)
-    {
-        m_context->browser->m_catalog->AddPlaylist(m_currentListName.c_str());
-    }
-
-    m_bListChanged = false;
 }
 
-void MusicBrowserUI::SaveAsPlaylist(void)
+void MusicBrowserUI::SavePlaylistAs(void)
 {
-    string oName;
+    string oName = m_currentListName;
     
-    if (SaveNewPlaylist(oName))
+    if(SaveNewPlaylist(oName))
     {
-       m_currentListName = oName;
-       SetTitles();
-       WritePlaylist();
+        if(m_pParent)
+        {
+            m_currentListName = oName;
+            SetTitles();
+        }
     }   
 }
 
 bool MusicBrowserUI::SaveNewPlaylist(string &oName)
 {
-    int32              i, iOffset = 0;
-    uint32             size;
-    PlaylistFormatInfo format;
-    char               szFilter[512];
-    OPENFILENAME       sOpen;
-    char               szFile[MAX_PATH], szInitialDir[MAX_PATH];
-        
+    bool                result = false;
+    int32               i, iOffset = 0;
+    uint32              size;
+    PlaylistFormatInfo  format;
+    char                szFilter[512];
+    OPENFILENAME        sOpen;
+    char                szPlaylistDir[MAX_PATH];
+    char                szFile[MAX_PATH] = {0x00};
+    char                szInitialDir[MAX_PATH] = {0x00};
+    char                szExt[MAX_PATH] = {0x00};
+    bool                addToDB = false;
+    
+    size = MAX_PATH;
+    m_context->prefs->GetInstallDirectory(szPlaylistDir, &size);
+
+    strcat(szPlaylistDir, "\\Playlists");
+
+    struct _stat buf;
+    if (_stat(szPlaylistDir, &buf) != 0)
+       _mkdir(szPlaylistDir);
+
     for(i = 0; ; i++)
     {
        if (m_oPlm->GetSupportedPlaylistFormats(&format, i) != kError_NoErr)
@@ -179,42 +155,103 @@ bool MusicBrowserUI::SaveNewPlaylist(string &oName)
     iOffset += strlen(szFilter + iOffset) + 1;     
     szFilter[iOffset] = 0;
 
-    size = MAX_PATH;
-    if (!IsError(m_context->prefs->GetInstallDirectory(szInitialDir, &size)))
+    if(oName.length())
     {
-        struct _stat buf;
-        
-        strcat(szInitialDir, "\\Playlists");
-        if (_stat(szInitialDir, &buf) != 0)
-           _mkdir(szInitialDir);
-           
-        sOpen.lpstrInitialDir = szInitialDir;
+        strcpy(szInitialDir, oName.c_str());
+
+        char* cp = NULL;
+
+        if(cp = strrchr(szInitialDir, '\\'))
+        {
+            *cp = 0x00;
+            strcpy(szFile, cp + 1);
+        }
     }
     else
-        sOpen.lpstrInitialDir = NULL;
-    
-    szFile[0] = 0;
-    sOpen.lStructSize = sizeof(OPENFILENAME);
-    sOpen.hwndOwner = m_hWnd;
-    sOpen.hInstance = NULL;
-    sOpen.lpstrFilter = szFilter;
-    sOpen.lpstrCustomFilter = NULL;
-    sOpen.nMaxCustFilter = 0;
-    sOpen.nFilterIndex = 1;
-    sOpen.lpstrFile = szFile;
-    sOpen.nMaxFile = MAX_PATH;
-    sOpen.lpstrFileTitle = NULL;
-    sOpen.lpstrTitle = "Save Playlist as";
-    sOpen.Flags = OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY |
-                  OFN_PATHMUSTEXIST;
-    sOpen.lpstrDefExt = "m3u";
-      
-    if (GetSaveFileName(&sOpen))
     {
-        oName = sOpen.lpstrFile;
-        return true;
+        strcpy(szInitialDir, szPlaylistDir);
+        strcpy(szFile, "My Greatest Hits");
     }
-    return false;
+
+    // is this playlist saved in our default location?
+    // if so we are gonna just ask for the name, if not
+    // they are editing a file elsewhere and we bring
+    // up a file selector 
+    if(strstr(szInitialDir, szPlaylistDir))
+    {
+        if(0 < DialogBoxParam(g_hinst, 
+                          MAKEINTRESOURCE(IDD_SAVEPLAYLIST),
+                          m_hWnd, 
+                          (int (__stdcall *)(void))::SavePlaylistDlgProc, 
+                          (LPARAM )szFile))
+        {        
+            oName = szInitialDir;
+            oName += "\\";
+            oName += szFile;
+            oName += ".m3u";
+
+            addToDB = true;
+            result = true;
+        }
+    }
+    else
+    {
+        sOpen.lStructSize = sizeof(OPENFILENAME);
+        sOpen.hwndOwner = m_hWnd;
+        sOpen.hInstance = NULL;
+        sOpen.lpstrFilter = szFilter;
+        sOpen.lpstrCustomFilter = NULL;
+        sOpen.nMaxCustFilter = 0;
+        sOpen.nFilterIndex = 1;
+        sOpen.lpstrInitialDir = szInitialDir;
+        sOpen.lpstrFile = szFile;
+        sOpen.nMaxFile = MAX_PATH;
+        sOpen.lpstrFileTitle = NULL;
+        sOpen.lpstrTitle = "Save Playlist As";
+        sOpen.Flags = OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY |
+                      OFN_PATHMUSTEXIST;
+        sOpen.lpstrDefExt = "m3u";
+      
+        if(GetSaveFileName(&sOpen))
+        {
+            oName = sOpen.lpstrFile;
+            result =  true;
+        }
+    }
+
+    if(result)
+    {
+        char   url[MAX_PATH + 7]; // make room for file://
+        uint32 len = sizeof(url);
+    
+        FilePathToURL(oName.c_str(), url, &len);
+        
+        if(IsError(m_oPlm->WritePlaylist(url)))
+        {
+           MessageBox(m_hWnd, "Cannot save playlist to disk. Make sure there "
+                              "is room on the drive or that the directory is "
+                              "not read-only?", BRANDING, MB_OK);                              
+           result = false;
+        }
+        else
+        {
+            if(addToDB)
+            {
+                m_context->browser->m_catalog->AddPlaylist(oName.c_str());        
+            }
+
+            if(m_pParent)
+            {
+                m_currentListName = oName;
+                SetTitles();
+            }
+
+            m_bListChanged = false;
+            UpdateButtonMenuStates();
+        }
+    }
+
+    return result;
 }
 
 void MusicBrowserUI::OpenPlaylist(void)
@@ -269,6 +306,42 @@ void MusicBrowserUI::OpenPlaylist(void)
         //m_context->browser->m_catalog->AddPlaylist(sOpen.lpstrFile);
         //InitTree();
         //FillPlaylistCombo();
-        LoadPlaylist(playlist);
+        EditPlaylist(playlist);
     }
+}
+
+void MusicBrowserUI::NewPlaylist(void)
+{
+    MusicBrowserUI *pNew;
+    
+    if(m_pParent)
+    {
+       pNew = new MusicBrowserUI(m_context, m_pParent, m_hWnd, string(""));
+       m_pParent->AddMusicBrowserWindow(pNew);
+    }   
+    else   
+    {
+       pNew = new MusicBrowserUI(m_context, this, m_hWnd, string(""));
+       AddMusicBrowserWindow(pNew);
+    }   
+       
+    pNew->Init(SECONDARY_UI_STARTUP);
+}
+
+void MusicBrowserUI::EditPlaylist(const string &oList)
+{
+    MusicBrowserUI *pNew;
+    
+    if(m_pParent)
+    {
+       pNew = new MusicBrowserUI(m_context, m_pParent, m_hWnd, oList);
+       m_pParent->AddMusicBrowserWindow(pNew);
+    }   
+    else   
+    {
+       pNew = new MusicBrowserUI(m_context, this, m_hWnd, oList);
+       AddMusicBrowserWindow(pNew);
+    }   
+       
+    pNew->Init(SECONDARY_UI_STARTUP);
 }
