@@ -678,8 +678,8 @@ IDB_RELATABLE           BITMAP  DISCARDABLE     "relatable.bmp"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,1,0,9
- PRODUCTVERSION 2,1,0,9
+ FILEVERSION 2,1,1,0
+ PRODUCTVERSION 2,1,1,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -697,7 +697,7 @@ BEGIN
             VALUE "Comments", "For the latest version go to http://www.freeamp.org\0"
             VALUE "CompanyName", "FreeAmp Open Source Development Effort\0"
             VALUE "FileDescription", "The Music Browser user interface enables you to organize your music collection and select music to listen to.\0"
-            VALUE "FileVersion", "2.1.0.9\0"
+            VALUE "FileVersion", "2.1.1.0\0"
             VALUE "InternalName", "MusicBrowser\0"
             VALUE "LegalCopyright", "Copyright © EMusic.com 1999-2000 (http://www.gnu.org/copyleft/gpl.html)\0"
             VALUE "LegalTrademarks", "FreeAmp, EMusic\0"

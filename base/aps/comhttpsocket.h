@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include <string>
 
+using namespace std;
+
 class COMSocket;
 /**Wraps the OS specifics of an http based proxiable client socket.
   *@author Sean Ward

@@ -26,7 +26,10 @@ COMHTTPSocket::COMHTTPSocket()
 {
 	m_pSock = new COMSocket;
 	m_pTempBuf = NULL;
-	m_nBufLen = 0;	
+	m_nBufLen = 0;
+	memset(m_hostname, 0x00, 65);
+	memset(m_proxyname, 0x00, 1025);
+	m_pFile = NULL;
 }
 COMHTTPSocket::~COMHTTPSocket()
 {
@@ -47,7 +50,8 @@ int COMHTTPSocket::Connect(const char* pURL)
 		m_nBufLen = 0;
 	}
 	// if its not an http:// based url, this can't deal with it
-	if (strncasecmp(pURL, "http://", 7)) return -1;
+//	if (strncasecmp(pURL, "http://", 7)) return -1;
+	if (strncmp(pURL, "http://", 7)) return -1;
 	m_strURL = pURL;
 
 	int nRes = 0;

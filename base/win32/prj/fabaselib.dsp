@@ -28,7 +28,7 @@ CFG=fabaselib - Win32 NASM Debug MS STL
 # PROP AllowPerConfigDependencies 0
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
-CPP=cl.exe
+CPP=xicl6.exe
 RSC=rc.exe
 
 !IF  "$(CFG)" == "fabaselib - Win32 Release"
@@ -50,7 +50,7 @@ RSC=rc.exe
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
-LIB32=link.exe -lib
+LIB32=xilink6.exe -lib
 # ADD BASE LIB32 /nologo
 # ADD LIB32 /nologo /out:"..\fabaselib.lib"
 
@@ -73,7 +73,7 @@ LIB32=link.exe -lib
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
-LIB32=link.exe -lib
+LIB32=xilink6.exe -lib
 # ADD BASE LIB32 /nologo
 # ADD LIB32 /nologo /out:"..\fabaselib.lib"
 
@@ -96,7 +96,7 @@ LIB32=link.exe -lib
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
-LIB32=link.exe -lib
+LIB32=xilink6.exe -lib
 # ADD BASE LIB32 /nologo /out:"fabaselib.lib"
 # ADD LIB32 /nologo /out:"..\fabaselib.lib"
 
@@ -119,7 +119,7 @@ LIB32=link.exe -lib
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
-LIB32=link.exe -lib
+LIB32=xilink6.exe -lib
 # ADD BASE LIB32 /nologo /out:"fabaselib.lib"
 # ADD LIB32 /nologo /out:"..\fabaselib.lib"
 
@@ -142,7 +142,7 @@ LIB32=link.exe -lib
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
-LIB32=link.exe -lib
+LIB32=xilink6.exe -lib
 # ADD BASE LIB32 /nologo /out:"..\fabaselib.lib"
 # ADD LIB32 /nologo /out:"..\fabaselib.lib"
 
@@ -166,6 +166,14 @@ SOURCE=..\..\aps\apsinterface.cpp
 # Begin Source File
 
 SOURCE=..\..\aps\apsplaylist.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\aps\comhttpsocket.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\aps\comhttpsocket.h
 # End Source File
 # Begin Source File
 

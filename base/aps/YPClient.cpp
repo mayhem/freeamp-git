@@ -57,12 +57,15 @@ YPClient::YPClient()
 
 YPClient::~YPClient()
 {
-    if (m_pSocket->IsConnected()) 
-        this->Disconnect();
-    if (m_pSocket != NULL) 
-        delete m_pSocket;
-    if (m_pMutex != NULL)
+     if (m_pSocket != NULL)
+	 {
+		delete m_pSocket;
+	 }
+    
+	if (m_pMutex != NULL)
+	{
         delete m_pMutex;
+	}
 }
 
 int YPClient::Connect(string& strIP, int nPort)
