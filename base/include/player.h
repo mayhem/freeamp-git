@@ -59,7 +59,7 @@ class Player : public EventQueue {
     int32 RegisterCOO(COO *);
     int32 RegisterCIO(CIO *);
     void testQueue();
-    static THREAD_RETURN THREAD_LINKAGE EventServiceThreadFunc(void *);
+    static void EventServiceThreadFunc(void *);
  private:
     Semaphore *event_sem;
     PlayerState playerState;

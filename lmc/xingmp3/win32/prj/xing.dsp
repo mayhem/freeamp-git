@@ -91,6 +91,10 @@ LINK32=link.exe
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=..\..\..\..\base\src\command.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\config\config.win32
 
 !IF  "$(CFG)" == "xing - Win32 Release"
@@ -122,7 +126,7 @@ SOURCE=..\..\..\..\base\win32\src\mutex.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\..\base\win32\src\thread.cpp
+SOURCE=..\..\..\..\base\src\thread.cpp
 # End Source File
 # Begin Source File
 
@@ -179,6 +183,10 @@ SOURCE=..\..\iwinm.c
 # Begin Source File
 
 SOURCE=..\..\l3dq.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\l3init.c
 # End Source File
 # Begin Source File
 

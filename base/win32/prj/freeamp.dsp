@@ -53,7 +53,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
-# ADD LINK32 winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
+# ADD LINK32 winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /out:"freeamp.exe"
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
 
@@ -69,7 +69,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /I "..\..\..\ui\dummy\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
 # SUBTRACT CPP /X
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /o NUL /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /o NUL /win32
@@ -80,7 +80,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
+# ADD LINK32 winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /out:"freeamp.exe" /pdbtype:sept
 
 !ENDIF 
 
@@ -88,16 +88,16 @@ LINK32=link.exe
 
 # Name "freeamp - Win32 Release"
 # Name "freeamp - Win32 Debug"
-# Begin Group "base"
+# Begin Group "source"
 
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\..\src\buffer.cpp
+SOURCE=..\..\src\command.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\src\command.cpp
+SOURCE=..\src\main.cpp
 # End Source File
 # Begin Source File
 
@@ -107,112 +107,21 @@ SOURCE=..\..\src\player.cpp
 
 SOURCE=..\..\src\playlist.cpp
 # End Source File
-# End Group
-# Begin Group "io"
-
-# PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\..\..\io\local\localfileinput.cpp
-# End Source File
-# End Group
-# Begin Group "lmc"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\..\..\lmc\xingmp3\cdct.c
+SOURCE=..\src\registrar.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\lmc\xingmp3\csbt.c
+SOURCE=..\..\src\registry.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\lmc\xingmp3\cup.c
+SOURCE=..\..\src\thread.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\lmc\xingmp3\cupl3.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\lmc\xingmp3\cwinm.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\lmc\xingmp3\dec8.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\lmc\xingmp3\hwin.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\lmc\xingmp3\icdct.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\lmc\xingmp3\isbt.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\lmc\xingmp3\iup.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\lmc\xingmp3\iwinm.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\lmc\xingmp3\l3dq.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\lmc\xingmp3\l3init.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\lmc\xingmp3\mdct.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\lmc\xingmp3\mhead.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\lmc\xingmp3\msis.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\lmc\xingmp3\uph.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\lmc\xingmp3\upsf.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\lmc\xingmp3\wavep.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\lmc\xingmp3\xinglmc.cpp
-# End Source File
-# End Group
-# Begin Group "ui"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\..\..\ui\win32Test\res\freeamp.rc
-
-!IF  "$(CFG)" == "freeamp - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
-
-!ENDIF 
-
+SOURCE=..\src\utility.cpp
 # End Source File
 # End Group
 # Begin Group "system"
@@ -227,8 +136,8 @@ SOURCE=..\..\..\config\config.win32
 # Begin Custom Build
 InputPath=..\..\..\config\config.win32
 
-"..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\config\config.win32 ..\..\config\config.h
+"..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\config\config.win32 ..\..\..\config\config.h
 
 # End Custom Build
 
@@ -255,11 +164,35 @@ SOURCE=..\src\semaphore.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\soundcardpmo.cpp
+SOURCE=..\src\win32thread.cpp
+# End Source File
+# End Group
+# Begin Group "Registries"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\..\lmc\src\lmcregistry.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\thread.cpp
+SOURCE=..\..\..\io\src\pmiregistry.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\io\src\pmoregistry.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\ui\src\uiregistry.cpp
+# End Source File
+# End Group
+# Begin Group "dummy"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\..\ui\dummy\src\dummycoo.cpp
 # End Source File
 # End Group
 # End Target

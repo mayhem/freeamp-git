@@ -67,21 +67,20 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
     DummyCOO *dummy = new DummyCOO(termination);
 
 	// create the player
-	Player *player = Player::getPlayer();
+	Player *player = Player::GetPlayer();
 
-    player->registerCOO(dummy);
+    player->RegisterCOO(dummy);
 
     //CIO* defaultCIO;
     //COO* defaultCOO;
 
     //CreateDefaultUI(UIRegistry, &defaultCIO, &defaultCOO);
 
-    //player->registerCOO(defaultCOO);
-    //player->registerCIO(defaultCIO);
+    //player->RegisterCOO(defaultCOO);
+    //player->RegisterCIO(defaultCIO);
 
     Event *e = new Event(CMD_QuitPlayer);
-	Player::getPlayer()->acceptEvent(*e);
-    delete e;
+	Player::GetPlayer()->AcceptEvent(e);
 
     // sit around and twiddle our thumbs
     termination->Wait();

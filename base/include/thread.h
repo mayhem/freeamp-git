@@ -21,7 +21,6 @@
 	$Id$
 ____________________________________________________________________________*/
 
-
 #ifndef THREAD_H
 #define THREAD_H
 
@@ -55,7 +54,7 @@ public:
 
 	virtual Priority GetPriority() const = 0;
 	virtual Priority SetPriority(Priority priority) = 0;
-    
+
     static Thread* CreateThread();
 };
 

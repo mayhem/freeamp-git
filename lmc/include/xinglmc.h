@@ -72,7 +72,7 @@ public:
 
     void DecodeWork();
 private:
-    static THREAD_RETURN THREAD_LINKAGE DecodeWorkerThreadFunc(void *);
+    static void DecodeWorkerThreadFunc(void *);
 
     int32 bs_fill();
     void bs_clear();

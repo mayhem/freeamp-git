@@ -35,7 +35,6 @@ ____________________________________________________________________________*/
 #include "xinglmc.h"
 #include "event.h"
 #include "eventdata.h"
-#include "player.h"
 #include "mutex.h"
 
 extern "C" {
@@ -43,7 +42,7 @@ extern "C" {
 #include "port.h"
 
 int wait_n_times;
-	   }
+}
 
 #define TEST_TIME 0
 
@@ -211,20 +210,18 @@ void XingLMC::Stop() {
 bool XingLMC::Decode() {
     // kick off thread w/ DecodeWorkerThreadFunc(void *);
     if (!decoderThread) {
-	decoderThread = new Thread();
+        decoderThread = Thread::CreateThread();
 	decoderThread->Create(XingLMC::DecodeWorkerThreadFunc,this);
     }
 
 	return true;
 }
 
-THREAD_RETURN THREAD_LINKAGE XingLMC::DecodeWorkerThreadFunc(void *pxlmc) {
+void XingLMC::DecodeWorkerThreadFunc(void *pxlmc) {
     if (pxlmc) {
 	XingLMC *xlmc = (XingLMC *)pxlmc;
 	xlmc->DecodeWork();
     }
-
-	return 0;
 }
 
 

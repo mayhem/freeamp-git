@@ -70,6 +70,9 @@ Create(thread_function function, void* arg)
 {
 	bool result = false;
 
+    m_function      = function;
+    m_arg           = arg;
+
 	m_threadHandle = (HANDLE) _beginthreadex(
 									NULL,
 									0,
