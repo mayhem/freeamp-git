@@ -37,7 +37,7 @@ class FAContext;
 class IRManUI : public UserInterface {
  public:
     IRManUI(FAContext *context);
-    virtual int32 AcceptEvent(Event *);
+    virtual Error AcceptEvent(Event *);
     virtual Error Init(int32);
     static void irServiceFunction(void *);
     virtual ~IRManUI();

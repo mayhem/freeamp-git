@@ -36,7 +36,7 @@ class Mpg123UI : public UserInterface {
  public:
     Mpg123UI(FAContext *context);
 
-    virtual int32 AcceptEvent(Event *);
+    virtual Error AcceptEvent(Event *);
     virtual Error Init(int32);
     
     ~Mpg123UI();

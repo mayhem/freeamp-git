@@ -45,7 +45,7 @@ class FAContext;
 class ncursesUI : public UserInterface {
  public:
     ncursesUI(FAContext *context);
-    virtual int32 AcceptEvent(Event *);
+    virtual Error AcceptEvent(Event *);
     virtual Error Init(int32);
     static void keyboardServiceFunction(void *);
     virtual ~ncursesUI();

@@ -143,9 +143,9 @@ DownloadUI::~DownloadUI()
 
 }
 
-int32 DownloadUI::AcceptEvent(Event* event)
+Error DownloadUI::AcceptEvent(Event* event)
 {
-    int32 result = 255;
+    Error result = kError_UnknownErr;
 
     if(event) 
     {
@@ -333,7 +333,7 @@ int32 DownloadUI::AcceptEvent(Event* event)
 	            break;
 	    }
 
-	    result = 0;
+	    result = kError_NoErr;
 
     } 
 

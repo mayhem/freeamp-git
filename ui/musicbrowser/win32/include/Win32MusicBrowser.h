@@ -120,7 +120,7 @@ class MusicBrowserUI : public UserInterface
 
     virtual ~MusicBrowserUI();
 
-    virtual int32 AcceptEvent(Event *);
+    virtual Error AcceptEvent(Event *);
     virtual Error Init(int32);
 						 
     static void UIThreadFunc(void* arg);

@@ -39,7 +39,7 @@ class IntroWizardUI {
   
     void Show(bool runMain = true);
 
-    int32 AcceptEvent(Event *);
+    Error AcceptEvent(Event *);
  
     void SetSearchPath(string &newpath) { searchPath = newpath; }
     void SetSearchPath(char *newpath) { searchPath = newpath; }

@@ -316,7 +316,7 @@ void MusicBrowserUI::DisplayBrowserMessage(const char* msg)
     SendMessage(m_hStatus, SB_SETTEXT, 0, (LPARAM)msg);
 }
 
-int32 MusicBrowserUI::AcceptEvent(Event *event)
+Error MusicBrowserUI::AcceptEvent(Event *event)
 {
     switch (event->Type()) 
     {
@@ -780,7 +780,7 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
         default:
             break;
     }
-    return 0;
+    return kError_NoErr;
 }
 
 

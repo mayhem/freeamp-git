@@ -114,7 +114,7 @@ class MusicCatalog : public EventQueue
     void  GetCatalogLock(void) { m_catMutex->Acquire(); }
     void  ReleaseCatalogLock(void) { m_catMutex->Release(); }
 
-    virtual int32 AcceptEvent(Event *e);
+    virtual Error AcceptEvent(Event *e);
 
  protected:
     static void musicsearch_thread_function(void *arg);

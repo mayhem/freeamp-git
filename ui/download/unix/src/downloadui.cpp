@@ -109,7 +109,7 @@ void DownloadUI::GTKEventService(void)
     }
 }
 
-int32 DownloadUI::AcceptEvent(Event *event)
+Error DownloadUI::AcceptEvent(Event *event)
 {
     
     switch (event->Type()) {
@@ -192,7 +192,7 @@ int32 DownloadUI::AcceptEvent(Event *event)
         default:
             break;
     }
-    return 0;
+    return kError_NoErr;
 }
 
 void DownloadUI::UpdateOverallProgress(void)

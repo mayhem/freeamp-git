@@ -948,7 +948,7 @@ MetaData *MusicCatalog::ReadMetaDataFromDatabase(const char *url)
     return metadata;
 }
 
-int32 MusicCatalog::AcceptEvent(Event *e)
+Error MusicCatalog::AcceptEvent(Event *e)
 {
     switch (e->Type()) {
         case INFO_MusicCatalogTrackRemoved: {
@@ -1003,5 +1003,5 @@ int32 MusicCatalog::AcceptEvent(Event *e)
             break;
         } 
     }
-    return 0; 
+    return kError_NoErr; 
 }

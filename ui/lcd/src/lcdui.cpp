@@ -271,7 +271,7 @@ void LcdUI::keyboardServiceFunction(void *pclcio) {
     }
 }
 
-int32 LcdUI::AcceptEvent(Event *e) {
+Error LcdUI::AcceptEvent(Event *e) {
     if (e) {
 	//cout << "LcdUI: processing event " << e->Type() << endl;
 	switch (e->Type()) {
@@ -410,7 +410,7 @@ int32 LcdUI::AcceptEvent(Event *e) {
 		break;
 	}
     }
-    return 0;
+    return kError_NoErr;
 }
 
 void LcdUI::BlitTimeLine() {

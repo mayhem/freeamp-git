@@ -262,7 +262,7 @@ Error FreeAmpTheme::Close(void)
     return kError_NoErr;
 }
 
-int32 FreeAmpTheme::AcceptEvent(Event * e)
+Error FreeAmpTheme::AcceptEvent(Event * e)
 {
    switch (e->Type())
    {
@@ -619,7 +619,7 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
       default:
          break;
    }
-   return 0;
+   return kError_NoErr;
 }
 
 Error FreeAmpTheme::HandleControlMessage(string &oControlName, 

@@ -86,7 +86,7 @@ class GTKMusicBrowser {
     void Close(bool inMain = true);
  
     bool Visible(void) { return isVisible; }
-    int32 AcceptEvent(Event *e);
+    Error AcceptEvent(Event *e);
 
     uint32 m_currentindex;
     

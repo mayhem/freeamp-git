@@ -207,7 +207,7 @@ void IRManUI::irServiceFunction(void *pclcio) {
     ir_finish();
 }
 
-int32 IRManUI::AcceptEvent(Event *e) {
+Error IRManUI::AcceptEvent(Event *e) {
     if (e) {
 	//cout << "IRManUI: processing event " << e->Type() << endl;
 	switch (e->Type()) {
@@ -226,7 +226,7 @@ int32 IRManUI::AcceptEvent(Event *e) {
 		break;
 	}
     }
-    return 0;
+    return kError_NoErr;
 }
 
 void IRManUI::ProcessArgs() {

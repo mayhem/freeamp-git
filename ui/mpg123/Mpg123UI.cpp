@@ -118,7 +118,7 @@ Mpg123UI::~Mpg123UI()
    }
 }
 
-int32     Mpg123UI::
+Error     Mpg123UI::
 AcceptEvent(Event * e)
 {
    if (e)
@@ -203,7 +203,7 @@ AcceptEvent(Event * e)
       }
    }
 //cerr << "Done cmdlinecoo: accpet event" << endl;
-   return 0;
+   return kError_NoErr;
 }
 
 void      Mpg123UI::

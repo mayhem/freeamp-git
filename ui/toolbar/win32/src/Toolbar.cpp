@@ -317,15 +317,15 @@ TrayNotify(int32 notifyMessage)
     }
 }
 
-int32 
+Error 
 ToolbarUI::
 AcceptEvent(Event* event)
 {
-    int32 result = 255;
+    Error result = kError_UnknownErr;
 
     if (event) 
     {
-        result = 0;
+        result = kError_NoErr;
 
         switch (event->Type()) 
         {

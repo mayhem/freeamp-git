@@ -40,7 +40,7 @@ class FAContext;
 class MusicBrowserUI : public UserInterface {
  public:
     MusicBrowserUI(FAContext *);
-    virtual int32 AcceptEvent(Event *);
+    virtual Error AcceptEvent(Event *);
     virtual Error Init(int32);
     static void gtkServiceFunction(void *);
     virtual ~MusicBrowserUI();

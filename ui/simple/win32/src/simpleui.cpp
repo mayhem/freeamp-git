@@ -124,11 +124,11 @@ SetHwnd(HWND hwnd)
 	m_hwndStatus	= GetDlgItem(m_hwnd, IDC_STATUS);
 }
 
-int32 
+Error 
 SimpleUI::
 AcceptEvent(Event* event)
 {
-    int32 result = 255;
+    Error result = kError_UnknownErr;
 
     if (event) 
     {
@@ -371,7 +371,7 @@ AcceptEvent(Event* event)
 	            break;
 	    }
 
-	    result = 0;
+	    result = kError_NoErr;
 
     } 
 

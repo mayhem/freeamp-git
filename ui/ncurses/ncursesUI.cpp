@@ -213,7 +213,7 @@ void ncursesUI::keyboardServiceFunction(void *pclcio) {
 
 }
 
-int32 ncursesUI::AcceptEvent(Event *e) {
+Error ncursesUI::AcceptEvent(Event *e) {
     if (e) {
         switch (e->Type()) {
             case INFO_PlaylistDonePlay: {
@@ -399,7 +399,7 @@ int32 ncursesUI::AcceptEvent(Event *e) {
                 break;
         }
     }
-    return 0;
+    return kError_NoErr;
 }
 
 void ncursesUI::ProcessArgs() {

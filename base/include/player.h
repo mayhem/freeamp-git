@@ -79,7 +79,7 @@ class Player : public EventQueue, Properties, PropertyWatcher
     void      SetTerminationSemaphore(Semaphore *);
     void      testQueue();
     static void EventServiceThreadFunc(void *);
-    virtual int32 AcceptEvent(Event *);
+    virtual Error AcceptEvent(Event *);
     virtual RegistryItem *ChooseLMC(const char *szUrl, char *szTitle = NULL);
     virtual RegistryItem *ChoosePMI(const char *szUrl, char *szTitle = NULL);
 

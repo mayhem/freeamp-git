@@ -1015,13 +1015,13 @@ ReleaseUIManipLock()
    m_uiManipLock->Release();
 }
 
-int32 
+Error 
 Player::
 AcceptEvent(Event * e)
 {
    m_eventQueue->Write(e);
    m_eventSem->Signal();
-   return 0;
+   return kError_NoErr;
 }
 
 bool 

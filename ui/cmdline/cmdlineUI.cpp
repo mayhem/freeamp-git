@@ -242,7 +242,7 @@ keyboardServiceFunction(void *pclcio)
 
 }
 
-int32     cmdlineUI::
+Error     cmdlineUI::
 AcceptEvent(Event * e)
 {
    if (e)
@@ -321,7 +321,7 @@ AcceptEvent(Event * e)
          break;
       }
    }
-   return 0;
+   return kError_NoErr;
 }
 
 void      cmdlineUI::

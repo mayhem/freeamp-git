@@ -2582,7 +2582,7 @@ void GTKMusicBrowser::Close(bool inMain)
     gdk_threads_leave();
 }
 
-int32 GTKMusicBrowser::AcceptEvent(Event *e)
+Error GTKMusicBrowser::AcceptEvent(Event *e)
 {
     switch (e->Type()) {
         case INFO_PrefsChanged: {
@@ -2731,7 +2731,7 @@ int32 GTKMusicBrowser::AcceptEvent(Event *e)
         default:
             break;
     }
-    return 0;
+    return kError_NoErr;
 }
 
 void GTKMusicBrowser::CreateNewEditor(char *playlisturl)

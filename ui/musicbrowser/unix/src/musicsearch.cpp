@@ -319,7 +319,7 @@ void musicsearchUI::EndSearch(void)
     searchInProgress = false;    
 }
 
-int32 musicsearchUI::AcceptEvent(Event *e)
+Error musicsearchUI::AcceptEvent(Event *e)
 {
     switch (e->Type()) {
         case INFO_SearchMusicDone: {
@@ -340,4 +340,6 @@ int32 musicsearchUI::AcceptEvent(Event *e)
             break;
         }
     }
+
+    return kError_NoErr;
 }

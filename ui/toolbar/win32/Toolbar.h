@@ -59,7 +59,7 @@ class ToolbarUI : public UserInterface
     ~ToolbarUI();
 
     virtual Error Init(int32 startup_type);
-    virtual int32 AcceptEvent(Event*);
+    virtual Error AcceptEvent(Event*);
 
     void TrayNotify(int32 notifyMessage);
 

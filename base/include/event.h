@@ -25,6 +25,7 @@ ____________________________________________________________________________*/
 #define INCLUDED_EVENT_H_
 
 #include "config.h"
+#include "errors.h"
 
 class Event {
 
@@ -42,7 +43,7 @@ class Event {
 
 class EventQueue {
  public:
-    virtual int32 AcceptEvent(Event *) = 0;
+    virtual Error AcceptEvent(Event *) = 0;
 };
 
 

@@ -536,12 +536,8 @@ void CreateHiddenWindow(void* arg)
 
     memset(&wc, 0x00, sizeof(WNDCLASS));
 
-    wc.style = CS_OWNDC|CS_DBLCLKS;
     wc.lpfnWndProc = HiddenWndProc;
     wc.hInstance = g_hinst;
-    wc.hCursor = NULL;
-    wc.hIcon = NULL;
-    wc.hbrBackground = NULL;
     wc.lpszClassName = kHiddenWindow;
 
     RegisterClass(&wc);

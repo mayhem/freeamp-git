@@ -52,7 +52,7 @@ class ToolbarUI : public UserInterface
     ~ToolbarUI();
 
     virtual Error Init(int32 startup_type) { return kError_NoErr;}
-    virtual int32 AcceptEvent(Event*);
+    virtual Error AcceptEvent(Event*);
 
     void InitMenuPopup(HMENU menuHandle, uint32 position, bool systemMenu);
     void TrayNotify(int32 notifyMessage);

@@ -38,7 +38,7 @@ enum {
 
 class UserInterface : public EventQueue {
  public:
-    virtual int32 AcceptEvent(Event *) = 0;
+    virtual Error AcceptEvent(Event *) = 0;
     virtual Error Init(int32) = 0;
     virtual ~UserInterface() {}
 };

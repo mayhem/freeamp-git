@@ -112,7 +112,7 @@ void MusicBrowserUI::GTKEventService(void)
     }
 }
 
-int32 MusicBrowserUI::AcceptEvent(Event *event)
+Error MusicBrowserUI::AcceptEvent(Event *event)
 {
     switch (event->Type()) {
         case CMD_Cleanup: {
@@ -196,7 +196,7 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
         default:
             break;
     }
-    return 0;
+    return kError_NoErr;
 }
 
 void MusicBrowserUI::CreateNewEditor(string & newPlaylist)

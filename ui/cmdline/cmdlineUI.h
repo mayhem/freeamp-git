@@ -37,7 +37,7 @@ class     cmdlineUI:public UserInterface
 {
    public:
    cmdlineUI(FAContext * context);
-   virtual int32 AcceptEvent(Event *);
+   virtual Error AcceptEvent(Event *);
    virtual Error Init(int32);
    static void keyboardServiceFunction(void *);
              virtual ~ cmdlineUI();

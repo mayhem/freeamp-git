@@ -433,7 +433,7 @@ void IntroWizardUI::EndSearch(void)
     searchInProgress = false;    
 }
 
-int32 IntroWizardUI::AcceptEvent(Event *e)
+Error IntroWizardUI::AcceptEvent(Event *e)
 {
     switch (e->Type()) {
         case INFO_SearchMusicDone: {
@@ -454,4 +454,6 @@ int32 IntroWizardUI::AcceptEvent(Event *e)
             break;
         }
     }
+
+    return kError_NoErr;
 }
