@@ -51,12 +51,30 @@ gboolean wiz_destroy(GtkWidget *widget, IntroWizardUI *p)
     return FALSE;
 }
 
+void IntroWizardUI::CheckCreateProfile(void)
+{
+    char *text = gtk_entry_get_text(GTK_ENTRY(profileEntry));
+    if (text && strlen(text) > 0) {
+        m_context->aps->CreateProfile(text);
+
+        m_context->target->AcceptEvent(new Event(INFO_UnsignaturedTracksExist));
+    }
+}
+
 static void start_search_button_event(GtkWidget *widget, IntroWizardUI *p)
 {
     if (p->page == 1)
         p->GoToPage2();
-    else if (p->page == 2)
-        p->GoToPage3();
+    else if (p->page == 2) {
+        if (p->skipRelatableTwo)
+            p->GoToPage4();
+        else
+            p->GoToPage3();
+    }
+    else if (p->page == 3) {
+        p->CheckCreateProfile();
+        p->GoToPage4();
+    }
     else if (p->searchDone) 
         gtk_widget_destroy(p->m_window);
     else if (p->searchInProgress)
@@ -74,6 +92,12 @@ static void search_cancel_button_event(GtkWidget *widget, IntroWizardUI *p)
 
 static void search_back_event(GtkWidget *widget, IntroWizardUI *p)
 {
+    if (p->page == 4) {
+        if (p->skipRelatableTwo)
+            p->GoToPage2();
+        else 
+            p->GoToPage3();
+    }
     if (p->page == 3)
         p->GoToPage2();
     else if (p->page == 2)
@@ -156,20 +180,35 @@ IntroWizardUI::IntroWizardUI(FAContext *context, MusicBrowserUI *parent)
     m_parent = parent;
 }
 
+void IntroWizardUI::GoToPage4(void)
+{
+   gtk_widget_hide(page1);
+   gtk_widget_hide(page2);
+   gtk_widget_hide(page3);
+   gtk_widget_show(page4);
+
+   gtk_widget_set_sensitive(m_backButton, TRUE);
+   gtk_label_set_text(GTK_LABEL(buttonLabel), "  Start Search >  ");
+
+   page = 4;
+}
+
 void IntroWizardUI::GoToPage3(void)
 {
+   gtk_widget_hide(page4);
    gtk_widget_hide(page2);
    gtk_widget_hide(page1);
    gtk_widget_show(page3);
 
    gtk_widget_set_sensitive(m_backButton, TRUE); 
-   gtk_label_set_text(GTK_LABEL(buttonLabel), "  Start Search >  ");
+   gtk_label_set_text(GTK_LABEL(buttonLabel), "  Next >  ");
 
    page = 3;
 }
 
 void IntroWizardUI::GoToPage2(void)
 {
+   gtk_widget_hide(page4);
    gtk_widget_hide(page1);
    gtk_widget_hide(page3);
    gtk_widget_show(page2);
@@ -182,6 +221,7 @@ void IntroWizardUI::GoToPage2(void)
 
 void IntroWizardUI::GoToPage1(void)
 {
+   gtk_widget_hide(page4);
    gtk_widget_hide(page2);
    gtk_widget_hide(page3);
    gtk_widget_show(page1);
@@ -242,34 +282,115 @@ GtkWidget *IntroWizardUI::IntroPage(void)
    return vbox;
 }
 
+static void opt_in_selected(GtkWidget *w, IntroWizardUI *p)
+{
+    p->skipRelatableTwo = false;
+}
+
+static void opt_out_selected(GtkWidget *w, IntroWizardUI *p)
+{
+    p->skipRelatableTwo = true;
+}
+
 GtkWidget *IntroWizardUI::RelatablePage(void)
 {
    GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
    gtk_widget_show(vbox);
 
-   GtkWidget *label = gtk_label_new("Thanks for using the Relatable-enabled "BRANDING".  Our\nmusic player features the Relatable Plug-in, designed\nto automatically generate personal playlists that are\nbased on the files located on your computer and the music\nyou listen to on the Web.  The more you use our player,\nthe better it works!");
+   GtkWidget *label = gtk_label_new("Check out Relatable's new recommendation features");
    gtk_label_set_line_wrap(GTK_LABEL(label), FALSE);
    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
    gtk_widget_show(label);
 
-   label = gtk_label_new("To experience the power of Relatable:\nSelect the \"Profiles\" section of the Options dialog, create  \nand save your profile and then start listening to music.\nAfter you have listened to just a few tunes, hit the button\non the far right of the main player window to view and\nlisten to a recommended list of songs.");
+   label = gtk_label_new("This version of FreeAmp offers Relatable features that automatically recommend music playlists and streams. It's our first public test of an exciting new approach to discovering music. Relatable's system 'learns' listener preferences through FreeAmp and compares them with the preferences of like-minded listeners. Like virtual 'word of mouth', Relatable introduces you to music that people like you have enjoyed.");
+   gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+   gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+   gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
+   gtk_widget_show(label);
+
+   label = gtk_label_new("Private by Design");
    gtk_label_set_line_wrap(GTK_LABEL(label), FALSE);
    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
    gtk_widget_show(label);
 
-   label = gtk_label_new("Please note that your anonymous music profile is stored    \non Relatable's secure servers.  At Relatable, privacy is\nparamount: Your profile will NEVER be shared with third\nparties.  The Relatable Plug-in is an \"opt-in\" solution; if\nyou don't want to use it, don't create a profile.  Either\nway, you enjoy the player!");
-   gtk_label_set_line_wrap(GTK_LABEL(label), FALSE);
+   label = gtk_label_new("Please note that Relatable profiles are totally anonymous and individual profiles are never shared with third parties. We don't collect any personally identifiable information. Feel free to check our code on that. Each anonymous music profile is stored on Relatable's secure servers, and we're continually adding safeguards to protect our users. To enjoy these features and help us test the system, just opt in. You will never be contacted by Relatable or anyone else (unless you ask, of course!). That's Relatable's privacy promise. Please feel free to ask any questions at info@relatable.com.");
+   gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+   gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+   gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
+   gtk_widget_show(label);
+
+   GtkWidget *button = gtk_radio_button_new_with_label(NULL, "Enjoy Relatable Features");
+   gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 2);
+   gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                      GTK_SIGNAL_FUNC(opt_in_selected), this);
+   gtk_widget_show(button);
+
+   button = gtk_radio_button_new_with_label(gtk_radio_button_group(
+                                            GTK_RADIO_BUTTON(button)),
+                                            "Cool! But I'll pass");
+   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
+   skipRelatableTwo = true;
+   gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 2);
+   gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                      GTK_SIGNAL_FUNC(opt_out_selected), this);
+   gtk_widget_show(button);
+
+   return vbox;
+}
+
+static void relatable_web(GtkWidget *w, IntroWizardUI *p)
+{
+    LaunchBrowser("http://beta.relatable.com/");
+}
+
+GtkWidget *IntroWizardUI::RelatableTwoPage(void)
+{
+   GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
+   gtk_widget_show(vbox);
+
+   GtkWidget *label = gtk_label_new("Here's how to enjoy Relatable Features");
+   gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+   gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+   gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
+   gtk_widget_show(label);
+
+   label = gtk_label_new("Relatable automaticallly generates personalized playlists that are based on the files located on your computer and the music you listen to on the Web. The more you use the player, the better it works!");
+   gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+   gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+   gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
+   gtk_widget_show(label);
+
+   label = gtk_label_new("You can create a profile below. Or you can select the \"Profiles\" tab under \"Options\" and create and save multiple profiles. Then just start listening to music. After you have listened for a while, hit the \"Suggest\" button to view and listen to a recommended list of songs. You can also check out \"Recommended Streams\" on the music browser window. Learn more about Relatable features in the help menu.");
+   gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
    gtk_widget_show(label);
 
    label = gtk_label_new("For more information, please review our \"Read-me\" file or \nsend questions to: freeamptest@relatable.com");
-   gtk_label_set_line_wrap(GTK_LABEL(label), FALSE);
+   gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
    gtk_widget_show(label);
+
+   GtkWidget *hbox = gtk_hbox_new(FALSE, 5);
+   gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, FALSE, 5);
+   gtk_widget_show(hbox);
+
+   label = gtk_label_new("Profile Name: ");
+   gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
+   gtk_widget_show(label);
+
+   profileEntry = gtk_entry_new();
+   gtk_box_pack_start(GTK_BOX(hbox), profileEntry, FALSE, FALSE, 0);
+   gtk_widget_show(profileEntry);
+
+   GtkWidget *button = gtk_button_new_with_label(" To the Web Page!");
+   gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                      GTK_SIGNAL_FUNC(relatable_web), this);
+   gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 0);
+   gtk_widget_show(button);
 
    return vbox;
 }
@@ -410,13 +531,16 @@ void IntroWizardUI::Show(bool runMain)
   
    page1 = IntroPage();
    page2 = RelatablePage();
-   page3 = SearchPage();
-  
+   page3 = RelatableTwoPage();
+   page4 = SearchPage();
+
    page = 1;
+   gtk_widget_hide(page4);
    gtk_widget_hide(page3);
    gtk_widget_hide(page2);
    gtk_widget_hide(page1);
 
+   gtk_box_pack_end(GTK_BOX(temphbox), page4, FALSE, FALSE, 0);
    gtk_box_pack_end(GTK_BOX(temphbox), page3, FALSE, FALSE, 0);
    gtk_box_pack_end(GTK_BOX(temphbox), page2, FALSE, FALSE, 0);
    gtk_box_pack_end(GTK_BOX(temphbox), page1, FALSE, FALSE, 0);

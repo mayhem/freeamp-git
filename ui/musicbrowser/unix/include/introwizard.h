@@ -51,15 +51,20 @@ class IntroWizardUI {
     void GoToPage1();
     void GoToPage2();
     void GoToPage3();
+    void GoToPage4();
     void DeleteEvent();
     void Close();
-    
+   
+    void CheckCreateProfile();
+
     unsigned int page;
     
     bool custom;
     bool searchInProgress;
     bool searchDone;
     bool done;
+
+    bool skipRelatableTwo;
 
     GtkWidget *m_window;
     
@@ -75,14 +80,18 @@ class IntroWizardUI {
     GtkWidget *browseButton;
     GtkWidget *buttonLabel;
 
+    GtkWidget *profileEntry;
+    
     GtkWidget *page1;
     GtkWidget *page2;
     GtkWidget *page3;
-    
+    GtkWidget *page4;
+   
     string searchPath;
 
     GtkWidget *IntroPage(void);
     GtkWidget *RelatablePage(void);
+    GtkWidget *RelatableTwoPage(void);
     GtkWidget *SearchPage(void);
 
     MusicBrowserUI *m_parent;
