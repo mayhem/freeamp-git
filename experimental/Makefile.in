@@ -71,7 +71,7 @@ DEFS = -I. -I$(srcdir) -I./config -DUNIX_LIBDIR=\"$(libdir)\" -D$(HOST_OS)
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 X_CFLAGS = @X_CFLAGS@
-X_LIBS = @X_LIBS@ -lX11 -lXext -lXpm
+X_LIBS = @X_LIBS@ -lX11 -lXext @XPMLIB@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
 X_PRE_LIBS = @X_PRE_LIBS@
 

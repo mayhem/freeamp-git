@@ -390,11 +390,14 @@ AC_ARG_ENABLE(x11,
 #AM_CONDITIONAL(AM_ENABLE_X11, test "$x11" = "true")
 
 FAUIPLUGIN=plugins/freeamp-${host_os}.ui
-if test "$isunix" = "false" -o "x11 = false"; then
-  OSDEPPLUGINS="$OSDEPPLUGINS $FAUIPLUGIN";
-else
+if test "$isunix" = "false" -o "$x11" = "false"; then
   AC_MSG_WARN([not compiling freeamp-$host_os ui plugin])
+else
+  OSDEPPLUGINS="$OSDEPPLUGINS $FAUIPLUGIN";
+  XPMLIB="-lXpm"
 fi
+
+AC_SUBST(XPMLIB)
 
 dnl ****
 dnl Check for alsa
@@ -410,7 +413,7 @@ AC_CHECK_HEADER(sys/asoundlib.h,
 )
 
 ALSAPMOPLUGIN=plugins/almasoundcard-${host_os}.pmo
-if test "$isunix" = "false" -a "x11 = true"; then
+if test "$isunix" = "false" -a "$x11" = "true"; then
   OSDEPPLUGINS="$OSDEPPLUGINS $ALSAPMOPLUGIN";
   OSINC="$OSINC -Iio/soundcard/unix/linux/include"
   AC_MSG_RESULT([compiling alsa soundcard plugin])
