@@ -186,7 +186,8 @@ BeOSMusicBrowser::InitViews( void )
     rect.left += 2;
     rect.right -= B_V_SCROLL_BAR_WIDTH;
     rect.bottom -= B_H_SCROLL_BAR_HEIGHT;
-    m_playlistView = new PlaylistView( rect, "PlaylistView", B_FOLLOW_ALL );
+    m_playlistView =
+        new PlaylistView( this, rect, "PlaylistView", B_FOLLOW_ALL );
     m_playlistView->
         SetInvocationMessage( new BMessage( MBMSG_PLAYLIST_VIEW_INVOKED ) );
     right = new BScrollView( "scroll", m_playlistView, B_FOLLOW_ALL,
@@ -783,7 +784,6 @@ BeOSMusicBrowser::CatalogItemInvoked( CatalogItem* item )
 uint32
 BeOSMusicBrowser::GetURLsUnder( CollectionItem* item, vector<string>* urls )
 {
-    // currently not used.
     int32 count = m_musicTreeView->CountItemsUnder( item, false );
 
     for ( int32 i = 0; i < count; i++ )
@@ -911,7 +911,8 @@ BeOSMusicBrowser::BuildMenu( BMenuBar* menuBar )
     item = new BMenuItem( "Move Down", new BMessage( MBMSG_MOVE_DOWN ) );
     menu->AddItem( item );
     menu->AddSeparatorItem();
-    item = new BMenuItem( "Clear Playlist", NULL );
+    item = new BMenuItem( "Clear Playlist",
+                          new BMessage( MBMSG_CLEAR_PLAYLIST ) );
     menu->AddItem( item );
     item = new BMenuItem( "Edit Info", new BMessage( MBMSG_EDIT_INFO ) );
     menu->AddItem( item );

@@ -66,6 +66,7 @@ enum {
     MBMSG_WIZARD_GONE = 'wzgn',
     MBMSG_STOP_SEARCH = 'stps',
     MBMSG_EDIT_CATALOG_ITEM = 'edci',
+    MBMSG_CLEAR_PLAYLIST = 'clpl',
     MBMSG_SELECTION_CHANGED = 'slnc',
 
     // For debug.
@@ -99,18 +100,20 @@ public:
     virtual void        Quit( void );
     virtual bool        QuitRequested( void );
 
+    PlaylistManager*    PLM( void ) const { return m_plm; }
+
     void                LoadPlaylist( const string& playlist );
     void                SaveCurrentPlaylist( const char* path );
     void                UpdateCatalogView( void );
     void                UpdateCatalogPlaylistGroup( void );
     void                UpdatePlaylistView( void );
     void                MovePlaylistItem( uint32 oldIndex, uint32 newIndex );
+    uint32              GetURLsUnder( CollectionItem* item,
+                                      vector<string>* urls );
 
 protected:
     void                ClearPlaylistView( void );
     void                CatalogItemInvoked( CatalogItem* item );
-    uint32              GetURLsUnder( CollectionItem* item,
-                                      vector<string>* urls );
     void                SaveCurrentPlaylistPanel( BMessage* message,
                                                   bool reply );
     void                EditCatalogItem( CatalogItem* item );
