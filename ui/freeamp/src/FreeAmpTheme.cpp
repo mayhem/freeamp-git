@@ -1418,9 +1418,9 @@ void FreeAmpTheme::ReloadTheme(void)
 
     szTemp = new char[iLen];
 
-    eRet = m_pContext->prefs->GetPrefString(kThemePathPref, szTemp, &iLen);
-
-    if (_stat(szTemp, &buf) < 0 && strlen(szTemp) > 0)
+    m_pContext->prefs->GetPrefString(kThemePathPref, szTemp, &iLen);
+    
+    if (_stat(szTemp, &buf) < 0 && strlen(szTemp) < 1)
     {
        // If the theme doesn't exist, let's try to prepend the install/theme dir
        char   *dir;
