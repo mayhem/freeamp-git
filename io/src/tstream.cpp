@@ -50,7 +50,7 @@ ____________________________________________________________________________*/
 #include "log.h" 
 #include "eventdata.h" 
 
-#ifndef WIN32
+#if !defined(WIN32) && !defined(__BEOS__)
 #define closesocket(s) close(s)
 #endif  
 
