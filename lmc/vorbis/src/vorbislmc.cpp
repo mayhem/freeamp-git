@@ -550,7 +550,7 @@ size_t VorbisLMC::Read(void *buf, size_t size, size_t num)
        {
            bytes = m_pInputBuffer->GetNumBytesInBuffer();
            if (bytes == 0)
-              return (size_t)-1;
+              return (size_t)0;
            continue;
        }
        break;
