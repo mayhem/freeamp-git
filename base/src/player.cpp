@@ -515,6 +515,7 @@ int32 Player::ServiceEvent(Event *pC) {
 		    }
 		    
 		    m_lmc->InitDecoder();
+
 		    if (SetState(STATE_Playing)) {
 			    SEND_NORMAL_EVENT(INFO_Playing);
 		    }

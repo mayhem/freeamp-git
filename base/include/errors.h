@@ -42,7 +42,9 @@ typedef enum Error
     kError_FileInvalidArg   = 11,
     kError_FileNotFound     = 12,
     kError_FileNoHandles    = 13,
-    kError_NoMoreLibDirs    = 14
+    kError_NoMoreLibDirs    = 14,
+    kError_NullValueInvalid = 15,
+    kError_InvalidError     = 16
 }Error;
 
 

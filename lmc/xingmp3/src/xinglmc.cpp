@@ -32,6 +32,7 @@ ____________________________________________________________________________*/
 
 /* project headers */
 #include "config.h"
+#include "errors.h"
 #include "xinglmc.h"
 #include "event.h"
 #include "eventdata.h"
@@ -61,20 +62,51 @@ static AUDIO audio_table[2][2] = {
     }
 };
 
+static char * g_ErrorArray[4] = {
+    "shouldn't get this one...",
+    "head_info2 return 0 bytes/frame",
+    "audio.decode_init failed",
+    "bs_fill() failed"
 
-void XingLMC::SetTarget(EventQueue *eq) {
-    m_target = eq;
+};
+
+Error XingLMC::SetTarget(EventQueue *eq) {
+    if (m_target = eq) {
+	return kError_NoErr;
+    } else {
+	return kError_NullValueInvalid;
+    }
 }
 
-void XingLMC::SetPMI(PhysicalMediaInput *i) {
-    m_input = i;
+Error XingLMC::SetPMI(PhysicalMediaInput *i) {
+    if (m_input = i) {
+	return kError_NoErr;
+    } else {
+	return kError_NullValueInvalid;
+    }
 }
 
-void XingLMC::SetPMO(PhysicalMediaOutput *o) {
-    m_output = o;
+Error XingLMC::SetPMO(PhysicalMediaOutput *o) {
+    if (m_output = o) {
+	return kError_NoErr;
+    } else {
+	return kError_NullValueInvalid;
+    }
 }
 
-void XingLMC::InitDecoder() {
+Error XingLMC::GetErrorString(int32 error, char *pBuf, int32 length) {
+    if (!pBuf || !length) return kError_NullValueInvalid;
+    if ((error <= lmcError_MinimumError) || (error >= lmcError_MaximumError)) {
+	cout << "Sorry... " << error << " " << lmcError_MinimumError << " " << lmcError_MaximumError << endl;
+	*pBuf = '\0';
+	return kError_InvalidError;
+    }
+    cout << "Copying from error " << error-lmcError_MinimumError << endl;
+    strncpy(pBuf,g_ErrorArray[error-lmcError_MinimumError],length);
+    return kError_NoErr;
+}
+
+Error XingLMC::InitDecoder() {
     if (bs_fill()) {
 	MPEG_HEAD head;
 	int32 bitrate;
@@ -82,8 +114,8 @@ void XingLMC::InitDecoder() {
 	m_frameBytes = head_info2(m_bsBuffer, m_bsBufBytes, &head, &bitrate);
 	if (m_frameBytes == 0) {
 	    // BAD OR UNSUPPORTED MPEG FILE!!!
-	    cout << "XingLMC::XingLMC: head_info2 return 0 bytes/frame" << endl;
-	    return;
+	    //cout << "XingLMC::XingLMC: head_info2 return 0 bytes/frame" << endl;
+	    return (Error)lmcError_HeadInfoReturnedZero;
 	}
 
 	// select decoder
@@ -161,13 +193,14 @@ void XingLMC::InitDecoder() {
 	    m_pcmBufBytes = 0;
 
 	} else {
-	    cout << "Couldn't init decoder..." << endl;
-	    return;
+	    //cout << "Couldn't init decoder..." << endl;
+	    return (Error)lmcError_AudioDecodeInitFailed;
 	}
     } else {
-	cout << "Couldn't fill the manure pile..." << endl;
-	return;
+	//cout << "Couldn't fill the manure pile..." << endl;
+	return (Error)lmcError_BSFillFailed;
     }
+    return (Error)kError_NoErr;
 }
 
 XingLMC::
@@ -225,7 +258,7 @@ XingLMC::~XingLMC() {
 }
 
 
-void XingLMC::Stop() {
+Error XingLMC::Stop() {
     //cout << "stopping..." << endl;
     if (m_decoderThread) {
 	XingCommand *xc = new XingCommand[1];
@@ -238,16 +271,17 @@ void XingLMC::Stop() {
 	m_output->Reset(true);
 	//cout << "XingLMC deleted decoder thread.." << endl;
     }
+    return kError_NoErr;
 }
 
-bool XingLMC::Decode() {
+Error XingLMC::Decode() {
     // kick off thread w/ DecodeWorkerThreadFunc(void *);
     if (!m_decoderThread) {
         m_decoderThread = Thread::CreateThread();
 	m_decoderThread->Create(XingLMC::DecodeWorkerThreadFunc,this);
     }
     
-    return true;
+    return kError_NoErr;
 }
 
 void XingLMC::DecodeWorkerThreadFunc(void *pxlmc) {
@@ -346,22 +380,24 @@ void XingLMC::DecodeWork() {
     
     return;
 }
-void XingLMC::Pause() {
+Error XingLMC::Pause() {
     XingCommand *xc = new XingCommand[1];
     xc[0] = XING_Pause;
     m_xcqueue->Write(xc);
+    return kError_NoErr;
 }
 
-void XingLMC::Resume() {
+Error XingLMC::Resume() {
     m_output->Resume();
     m_pauseSemaphore->Signal();
+    return kError_NoErr;
 }
 
-void XingLMC::Reset() {
-
+Error XingLMC::Reset() {
+    return kError_NoErr;
 }
 
-bool XingLMC::ChangePosition(int32 position) {
+Error XingLMC::ChangePosition(int32 position) {
     m_seekMutex->Acquire(WAIT_FOREVER);
     //cout << "Seeking to ..." << position << endl;
 #if 1
@@ -386,7 +422,7 @@ bool XingLMC::ChangePosition(int32 position) {
 #endif
     m_seekMutex->Release();
 
-    return true;
+    return kError_NoErr;
 }
 
 void XingLMC::bs_clear() {

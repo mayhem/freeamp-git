@@ -62,6 +62,13 @@ typedef struct {
     IN_OUT(*decode) (unsigned char *bs, short *pcm);
 } AUDIO;
 
+enum {
+    lmcError_MinimumError = 0x00010000,
+    lmcError_HeadInfoReturnedZero,
+    lmcError_AudioDecodeInitFailed,
+    lmcError_BSFillFailed,
+    lmcError_MaximumError
+};
 
 class XingLMC : public LogicalMediaConverter {
 
@@ -71,18 +78,18 @@ public:
     
     virtual ~XingLMC();
     
-    virtual bool Decode();
-    virtual void Stop();
-    virtual void Pause();
-    virtual void Resume();
-    virtual void Reset();
-    virtual bool ChangePosition(int32 position);
+    virtual Error Decode();
+    virtual Error Stop();
+    virtual Error Pause();
+    virtual Error Resume();
+    virtual Error Reset();
+    virtual Error ChangePosition(int32 position);
 
-    virtual void SetPMI(PhysicalMediaInput *);
-    virtual void SetPMO(PhysicalMediaOutput *);
-    virtual void SetTarget(EventQueue *);
-    virtual void InitDecoder();
-//	bool SetCallback(EventCallback callback, void* cookie);
+    virtual Error SetPMI(PhysicalMediaInput *);
+    virtual Error SetPMO(PhysicalMediaOutput *);
+    virtual Error SetTarget(EventQueue *);
+    virtual Error InitDecoder();
+    virtual Error GetErrorString(int32, char *,int32);
 
     void DecodeWork();
 private:
