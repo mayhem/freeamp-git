@@ -55,6 +55,7 @@ Mpg123UI::Mpg123UI(FAContext * context)
 
    verboseMode = false;
    totalFrames = 0;
+   lastSeconds = 0;
 
    m_plm = NULL;
 
@@ -124,11 +125,19 @@ AcceptEvent(Event * e)
       // cerr << "Mpg123COO: processing event " << e->Type() << endl;
       switch (e->Type())
       {
+      case INFO_ErrorMessage:
+         {
+           ErrorMessageEvent *eme = (ErrorMessageEvent *)e;
+           string ErrMessage(eme->GetErrorMessage());
+ 
+           cout << ErrMessage << endl;
+           break;
+         }
       case INFO_PlaylistDonePlay:
          {
-            Event    *e = new Event(CMD_QuitPlayer);
+            Event    *ev = new Event(CMD_QuitPlayer);
 
-            m_playerEQ->AcceptEvent(e);
+            m_playerEQ->AcceptEvent(ev);
             break;
          }
       case INFO_MPEGInfo:

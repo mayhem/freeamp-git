@@ -250,6 +250,14 @@ AcceptEvent(Event * e)
       // cout << "cmdlineUI: processing event " << e->getEvent() << endl;
       switch (e->Type())
       {
+      case INFO_ErrorMessage:
+         {
+           ErrorMessageEvent *eme = (ErrorMessageEvent *)e;
+           string ErrMessage(eme->GetErrorMessage());
+
+           cout << ErrMessage << endl;
+           break;
+         }
       case INFO_PlaylistDonePlay:
          {
             Event    *e = new Event(CMD_QuitPlayer);

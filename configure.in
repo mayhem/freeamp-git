@@ -138,7 +138,9 @@ dnl not needed.
 esac  
 
 if test "$isunix" = "true" ; then
-    AC_MSG_CHECKING(for GCC >= 2.91)
+    AC_LANG_SAVE
+    AC_LANG_CPLUSPLUS
+    AC_MSG_CHECKING(for G++ >= 2.91)
     AC_TRY_RUN([
 #include <stdlib.h>
 int main() {
@@ -166,6 +168,7 @@ int main() {
         echo "Re-run this configure script after you have a newer version."
         exit 1
     fi
+    AC_LANG_RESTORE
 fi
  
 AC_SUBST(OSTYPE)

@@ -418,7 +418,7 @@ SetArgs(int32 argc, char **argv)
 
                             AcceptEvent(new LoadThemeEvent(url, szSavedTheme));
                         }
-                        else
+                        else 
                             m_plm->AddItem(url); 
 
                     }while(FindNextFile(handle, &data));
@@ -446,6 +446,7 @@ SetArgs(int32 argc, char **argv)
                 char* extension = NULL;
 
                 extension = strrchr(url, '.');
+
                 if(extension)
                 {
                     DownloadFormatInfo dlfi;
@@ -465,10 +466,9 @@ SetArgs(int32 argc, char **argv)
                         giveToTheme = true; 
                 }
 
-                if(giveToDLM)
+                if (giveToDLM) 
                     m_dlm->ReadDownloadFile(url);
-                else
-                if(giveToTheme)
+                else if (giveToTheme)
                 {
                     char szSavedTheme[MAX_PATH], szNewTheme[MAX_PATH];
                     uint32 iLen = MAX_PATH;   
@@ -481,15 +481,15 @@ SetArgs(int32 argc, char **argv)
 
                     AcceptEvent(new LoadThemeEvent(url, szSavedTheme));
                 }
-                else
-                    m_plm->AddItem(url);
+                else 
+                    m_plm->AddItem(url); 
 #endif
             }
         }
     }
 
     if(m_autoplay)
-    { 
+    {
         AcceptEvent(new Event(CMD_Play));
     }    
 
@@ -1420,7 +1420,7 @@ Play(Event *pEvent)
           CreatePMO(pItem, pEvent);
        }   
 
-       if (!m_pmo)
+       if (!m_pmo) 
           return;
     }
 

@@ -88,3 +88,6 @@ Other major contributors and their contributions:
 
 "Jean Tourrilhes" <jeant@rockfort.hpl.hp.com>
 * Unicast RTP support in obsinput.pmi
+
+"Jimen Ching" <jching@flex.com>
+* patch to configure to change the gcc check to a g++ check
