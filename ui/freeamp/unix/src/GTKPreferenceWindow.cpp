@@ -528,7 +528,8 @@ void GTKPreferenceWindow::GetPrefsValues(Preferences* prefs,
     prefs->GetPrefBoolean(kReclaimFiletypesPref, &values->reclaimFiletypes);
     prefs->GetPrefInt32(kWatchThisDirTimeoutPref, &values->watchThisDirTimeout);
     prefs->GetPrefBoolean(kCheckCDAutomaticallyPref, &values->pollCD);
-    prefs->GetPrefBoolean(kEnableMusicBrainzBitziPref, &values->enableMB);
+    prefs->GetPrefBoolean(kEnableMusicBrainzPref, &values->enableMB);
+    prefs->GetPrefBoolean(kEnableBitziPref, &values->enableBitzi);
 }
 
 void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs, 
@@ -593,7 +594,8 @@ void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs,
     prefs->SetPrefString(kUsersPortablePlayersPref, portableList.c_str());
 
     prefs->SetPrefString(kPMOPref, values->defaultPMO.c_str());
-    prefs->SetPrefBoolean(kEnableMusicBrainzBitziPref, values->enableMB);
+    prefs->SetPrefBoolean(kEnableMusicBrainzPref, values->enableMB);
+    prefs->SetPrefBoolean(kEnableBitziPref, values->enableBitzi);
     
     if (*values != currentValues) {
         m_pContext->target->AcceptEvent(new Event(INFO_PrefsChanged));
@@ -2368,6 +2370,19 @@ static void enable_mb_toggle(GtkWidget *w, GTKPreferenceWindow *p)
     p->EnableMBToggle(i);
 }
 
+void GTKPreferenceWindow::EnableBitziToggle(int active)
+{
+    if (!firsttime)
+        gtk_widget_set_sensitive(applyButton, TRUE);
+    proposedValues.enableBitzi = (bool)active;
+}
+
+static void enable_bitzi_toggle(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    int i = GTK_TOGGLE_BUTTON(w)->active;
+    p->EnableBitziToggle(i);
+}
+
 GtkWidget *GTKPreferenceWindow::CreateCD(void)
 {
     GtkWidget *pane = gtk_vbox_new(FALSE, 5);
@@ -2423,7 +2438,7 @@ GtkWidget *GTKPreferenceWindow::CreateCD(void)
     gtk_widget_show(mbServer);
 
     enableMB = gtk_check_button_new_with_label("Contribute metadata to "
-           "MusicBrainz and Bitzi");
+           "MusicBrainz");
     gtk_container_add(GTK_CONTAINER(pane), enableMB);
     gtk_signal_connect(GTK_OBJECT(enableMB), "toggled",
                        GTK_SIGNAL_FUNC(enable_mb_toggle), this);
@@ -2431,6 +2446,14 @@ GtkWidget *GTKPreferenceWindow::CreateCD(void)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(enableMB),
                                      TRUE);
     gtk_widget_show(enableMB);
+
+    enableBitzi = gtk_check_button_new_with_label("Contribute metadata to Bitzi");
+    gtk_container_add(GTK_CONTAINER(pane), enableBitzi);
+    gtk_signal_connect(GTK_OBJECT(enableBitzi), "toggled",
+                       GTK_SIGNAL_FUNC(enable_bitzi_toggle), this);
+    if (originalValues.enableBitzi)
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(enableBitzi), TRUE);
+    gtk_widget_show(enableBitzi);
 
     return pane;
 }

@@ -89,6 +89,7 @@ typedef struct PrefsStruct
 
     bool pollCD;
     bool enableMB;
+    bool enableBitzi;
     string CDDevicePath;
     string MBServer;
 
@@ -134,6 +135,7 @@ typedef struct PrefsStruct
             reclaimFiletypes == pref.reclaimFiletypes &&
             askReclaimFiletypes == pref.askReclaimFiletypes &&
             enableMB == pref.enableMB &&
+            enableBitzi == pref.enableBitzi &&
             true
         );
     }
@@ -254,6 +256,7 @@ class GTKPreferenceWindow : public PreferenceWindow
       GtkWidget *cdPath;
       GtkWidget *mbServer;
       GtkWidget *enableMB;
+      GtkWidget *enableBitzi;
       
       vector<OptionsPane *> *paneList;
       void AddPane(OptionsPane *pane);      
@@ -325,6 +328,7 @@ class GTKPreferenceWindow : public PreferenceWindow
       void CDPathSet(char *newpath, bool set);
       void MBServerSet(char *newpath, bool set);
       void EnableMBToggle(int active);
+      void EnableBitziToggle(int active);
 
       void UpdatePLHeaders(void);     
       void AddPLSelection(void);

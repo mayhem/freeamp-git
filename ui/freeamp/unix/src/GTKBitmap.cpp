@@ -664,6 +664,13 @@ Error GTKBitmap::MakeTransparent(Rect &oRect)
 
 void GTKBitmap::GetColor(Pos oPos, Color &oColor)
 {
+    if (oPos.x > m_width || oPos.y > m_height ||
+        oPos.x < 0 || oPos.y < 0)
+    {
+        oColor.red = oColor.green = oColor.blue = 0;
+        return;
+    }
+
     gdk_threads_enter();
 
     if (!m_cache) {

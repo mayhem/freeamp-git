@@ -157,7 +157,8 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
     int     i, port;
     uint32  len = MAX_PATH;
     BitprintInfo  info;
-    bool    submitMeta = false;
+    bool    submitMusicBrainz = false;
+    bool    submitBitzi = false;
 
     memset(args, 0, sizeof(args));
 
@@ -174,6 +175,7 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
     o = mb_New();
 
     mb_UseUTF8(o, 0);
+    mb_SetDebug(o, 1);
     mb_SetServer(o, hostname, port);
     if (m_strProxyAddr.size() > 7)
         mb_SetProxy(o, (char *)m_strProxyAddr.c_str(), m_nProxyPort);
@@ -188,14 +190,12 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
                                      guid);
     fclose(guidLogfile);
 
-    m_context->prefs->GetPrefBoolean(kEnableMusicBrainzBitziPref, &submitMeta);
-    if (submitMeta)
+    m_context->prefs->GetPrefBoolean(kEnableMusicBrainzPref, 
+                                     &submitMusicBrainz);
+    m_context->prefs->GetPrefBoolean(kEnableBitziPref, 
+                                     &submitBitzi);
+    if (submitMusicBrainz)
     {
-        // Calculate the bitzi bitprint for this file.
-        len = MAX_PATH;
-        URLToFilePath((char *)pmetaData->Filename().c_str(), file, &len);
-        mb_CalculateBitprint(o, file, &info);
-    
         args[0] = strdup(pmetaData->Artist().c_str());
         args[1] = strdup(pmetaData->Album().c_str());
         args[2] = strdup(pmetaData->Title().c_str());
@@ -207,33 +207,54 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
         args[6] = strdup(temp);
         args[7] = strdup(pmetaData->Genre().c_str());
         args[8] = strdup(pmetaData->Comment().c_str());
-    
-        // These are the bitzi bitpint metadata items
-        args[9] = strdup(info.bitprint);
-        args[10] = strdup(info.first20);
-        sprintf(temp, "%d", info.length);
-        args[11] = strdup(temp);
-    
-        if (info.audioSha1)
+   
+        len = MAX_PATH;
+        URLToFilePath((char *)pmetaData->Filename().c_str(), file, &len);
+        if (submitBitzi)
         {
-            args[12] = strdup(info.audioSha1);
-            sprintf(temp, "%d", info.duration);
-            args[13] = strdup(temp);
-            sprintf(temp, "%d", info.samplerate);
-            args[14] = strdup(temp);
-            sprintf(temp, "%d", info.bitrate);
-            args[15] = strdup(temp);
-            sprintf(temp, "%d", info.stereo ? 2 : 1);
-            args[16] = strdup(temp);
-            sprintf(temp, "%d", info.vbr);
-            args[17] = strdup(temp);
-            args[18] = NULL;
+            // Calculate the bitzi bitprint for this file.
+            mb_CalculateBitprint(o, file, &info);
+
+            // These are the bitzi bitpint metadata items
+            args[9] = strdup(info.bitprint);
+            args[10] = strdup(info.first20);
+            sprintf(temp, "%d", info.length);
+            args[11] = strdup(temp);
+    
+            if (info.audioSha1)
+            {
+                args[12] = strdup(info.audioSha1);
+                sprintf(temp, "%d", info.duration);
+                args[13] = strdup(temp);
+                sprintf(temp, "%d", info.samplerate);
+                args[14] = strdup(temp);
+                sprintf(temp, "%d", info.bitrate);
+                args[15] = strdup(temp);
+                sprintf(temp, "%d", info.stereo ? 2 : 1);
+                args[16] = strdup(temp);
+                sprintf(temp, "%d", info.vbr);
+                args[17] = strdup(temp);
+                args[18] = NULL;
+            }
+            else
+            {
+                args[12] = NULL;
+            }
+
+            ret = mb_QueryWithArgs(o, MBQ_ExchangeMetadata, args);
         }
         else
         {
-            args[12] = NULL;
+            char sha1[41];
+
+            mb_CalculateSha1(o, file, sha1);
+            args[9] = strdup(sha1);
+            sprintf(temp, "%d", pmetaData->Length() * 1000);
+            args[10] = strdup(temp);
+            args[11] = NULL;
+
+            ret = mb_QueryWithArgs(o, MBQ_ExchangeMetadataLite, args);
         }
-        ret = mb_QueryWithArgs(o, MBQ_ExchangeMetadata, args);
         for(i = 0; i < 11; i++)
            if (args[i])
                free(args[i]);
@@ -273,7 +294,10 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
         pmetaData->SetGenre("Unknown");
 
     if (mb_GetResultData(o, MBE_MEGetDescription, temp, 255))
+    {
+        printf("Comment: %s\n", temp);
         pmetaData->SetComment(temp);
+    }
     else
         pmetaData->SetComment("Unknown");
 

@@ -100,7 +100,8 @@ const char* kPerformDBCheckPref = "PerformDBCheck";
 const char* kPlaylistHeaderColumnsPref = "PlaylistHeaderColumns";
 const char* kAdvancedRelatablePref = "UseAdvancedRelatableFeatures";
 const char* kMetadataDisplayPref = "DisplayMetadata";
-const char* kEnableMusicBrainzBitziPref = "ContributeMBBitzi";
+const char* kEnableMusicBrainzPref = "ContributeMB";
+const char* kEnableBitziPref = "ContributeBitzi";
 const char* kLastFreeAmpVersionPref = "LastFreeAmpVersion";
 
 //logging
@@ -174,7 +175,8 @@ const bool kDefaultPerformDBCheck = true;
 const char* kDefaultPlaylistHeaderColumns = "Title|Artist|Album|Time|Genre";
 const bool kDefaultAdvancedRelatable = false;
 const bool kDefaultMetadataDisplay = 1;
-const bool kDefaultEnableMusicBrainzBitzi = false;
+const bool kDefaultEnableMusicBrainz = false;
+const bool kDefaultEnableBitzi = false;
 const char *kDefaultLastFreeAmpVersion = "0.0.0";
 
 Error
@@ -415,10 +417,12 @@ SetDefaults()
     if (GetPrefInt32(kMetadataDisplayPref, &dummyInt) == kError_NoPrefValue)
         SetPrefInt32(kMetadataDisplayPref, kDefaultMetadataDisplay);
 
-    if (GetPrefBoolean(kEnableMusicBrainzBitziPref, &dummyBool) == 
+    if (GetPrefBoolean(kEnableMusicBrainzPref, &dummyBool) == 
         kError_NoPrefValue)
-        SetPrefBoolean(kEnableMusicBrainzBitziPref, 
-                       kDefaultEnableMusicBrainzBitzi);
+        SetPrefBoolean(kEnableMusicBrainzPref, kDefaultEnableMusicBrainz);
+
+    if (GetPrefBoolean(kEnableBitziPref, &dummyBool) == kError_NoPrefValue)
+        SetPrefBoolean(kEnableBitziPref, kDefaultEnableBitzi);
 
     dummyInt = 255;
     if (GetPrefString(kLastFreeAmpVersionPref, dummyString,

@@ -64,8 +64,12 @@ void IntroWizardUI::CheckCreateProfile(void)
 
 void IntroWizardUI::SetMBPref(void)
 {
-    m_context->prefs->SetPrefBoolean(kEnableMusicBrainzBitziPref, 
-                                     mbBitziEnabled);
+    m_context->prefs->SetPrefBoolean(kEnableMusicBrainzPref, mbEnabled);
+}
+
+void IntroWizardUI::SetBitziPref(void)
+{
+    m_context->prefs->SetPrefBoolean(kEnableBitziPref, bitziEnabled);
 }
 
 static void start_search_button_event(GtkWidget *widget, IntroWizardUI *p)
@@ -76,7 +80,7 @@ static void start_search_button_event(GtkWidget *widget, IntroWizardUI *p)
     if (p->page == 2) 
     {
         if (p->skipRelatableTwo)
-            p->GoToPage5();
+            p->GoToPage6();
         else
             p->GoToPage3();
     }
@@ -86,7 +90,14 @@ static void start_search_button_event(GtkWidget *widget, IntroWizardUI *p)
     }
     else if (p->page == 4) {
         p->SetMBPref();
-        p->GoToPage5();
+        if (p->mbEnabled)
+            p->GoToPage5();
+        else
+            p->GoToPage6();
+    }
+    else if (p->page == 5) {
+        p->SetBitziPref();
+        p->GoToPage6();
     }
     else if (p->searchDone) 
         gtk_widget_destroy(p->m_window);
@@ -105,13 +116,19 @@ static void search_cancel_button_event(GtkWidget *widget, IntroWizardUI *p)
 
 static void search_back_event(GtkWidget *widget, IntroWizardUI *p)
 {
-    if (p->page == 5) 
+    if (p->page == 6) 
     {
         if (p->skipRelatableTwo)
             p->GoToPage2();
         else 
+        if (p->mbEnabled)
+            p->GoToPage5();
+        else
             p->GoToPage4();
     }
+    else
+    if (p->page == 5)
+        p->GoToPage4();
     else
     if (p->page == 4)
         p->GoToPage3();
@@ -199,22 +216,39 @@ IntroWizardUI::IntroWizardUI(FAContext *context, MusicBrowserUI *parent)
     m_parent = parent;
 }
 
-void IntroWizardUI::GoToPage5(void)
+void IntroWizardUI::GoToPage6(void)
 {
    gtk_widget_hide(page1);
    gtk_widget_hide(page2);
    gtk_widget_hide(page3);
    gtk_widget_hide(page4);
-   gtk_widget_show(page5);
+   gtk_widget_hide(page5);
+   gtk_widget_show(page6);
 
    gtk_widget_set_sensitive(m_backButton, TRUE);
    gtk_label_set_text(GTK_LABEL(buttonLabel), "  Start Search >  ");
+
+   page = 6;
+}
+
+void IntroWizardUI::GoToPage5(void)
+{
+   gtk_widget_hide(page6);
+   gtk_widget_hide(page4);
+   gtk_widget_hide(page3);
+   gtk_widget_hide(page2);
+   gtk_widget_hide(page1);
+   gtk_widget_show(page5);
+
+   gtk_widget_set_sensitive(m_backButton, TRUE); 
+   gtk_label_set_text(GTK_LABEL(buttonLabel), "  Next >  ");
 
    page = 5;
 }
 
 void IntroWizardUI::GoToPage4(void)
 {
+   gtk_widget_hide(page6);
    gtk_widget_hide(page5);
    gtk_widget_hide(page3);
    gtk_widget_hide(page2);
@@ -229,6 +263,7 @@ void IntroWizardUI::GoToPage4(void)
 
 void IntroWizardUI::GoToPage3(void)
 {
+   gtk_widget_hide(page6);
    gtk_widget_hide(page5);
    gtk_widget_hide(page4);
    gtk_widget_hide(page2);
@@ -243,6 +278,7 @@ void IntroWizardUI::GoToPage3(void)
 
 void IntroWizardUI::GoToPage2(void)
 {
+   gtk_widget_hide(page6);
    gtk_widget_hide(page5);
    gtk_widget_hide(page4);
    gtk_widget_hide(page1);
@@ -257,6 +293,7 @@ void IntroWizardUI::GoToPage2(void)
 
 void IntroWizardUI::GoToPage1(void)
 {
+   gtk_widget_hide(page6);
    gtk_widget_hide(page5);
    gtk_widget_hide(page4);
    gtk_widget_hide(page2);
@@ -331,12 +368,22 @@ static void opt_out_selected(GtkWidget *w, IntroWizardUI *p)
 
 static void mb_opt_in_selected(GtkWidget *w, IntroWizardUI *p)
 {
-    p->mbBitziEnabled = true;
+    p->mbEnabled = true;
 }
 
 static void mb_opt_out_selected(GtkWidget *w, IntroWizardUI *p)
 {
-    p->mbBitziEnabled = false;
+    p->mbEnabled = false;
+}
+
+static void bitzi_opt_in_selected(GtkWidget *w, IntroWizardUI *p)
+{
+    p->bitziEnabled = true;
+}
+
+static void bitzi_opt_out_selected(GtkWidget *w, IntroWizardUI *p)
+{
+    p->bitziEnabled = false;
 }
 
 GtkWidget *IntroWizardUI::RelatablePage(void)
@@ -372,7 +419,8 @@ GtkWidget *IntroWizardUI::RelatablePage(void)
 
    GtkWidget *button = gtk_radio_button_new_with_label(NULL, "Enjoy Relatable Features");
    skipRelatableTwo = false;
-   mbBitziEnabled = true;
+   mbEnabled = true;
+   bitziEnabled = true;
    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
    gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 2);
    gtk_signal_connect(GTK_OBJECT(button), "clicked",
@@ -455,30 +503,30 @@ static void bitzi_web(GtkWidget *w, IntroWizardUI *p)
     LaunchBrowser("http://www.bitzi.com/welcome/freeamp/");
 }
 
-GtkWidget *IntroWizardUI::MusicBrainzBitziPage(void)
+GtkWidget *IntroWizardUI::MusicBrainzPage(void)
 {
    GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
    gtk_widget_show(vbox);
 
-   GtkWidget *label = gtk_label_new("MusicBrainz and Bitzi Community Metadata");
+   GtkWidget *label = gtk_label_new("MusicBrainz Community Metadata");
    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
    gtk_widget_show(label);
 
-   label = gtk_label_new("FreeAmp also supports contributing metadata from your MP3 and Vorbis files to the MusicBrainz and Bitzi community metadata projects. ");
+   label = gtk_label_new("FreeAmp also supports contributing metadata from your MP3 and Vorbis files to the MusicBrainz community metadata projects. ");
    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
    gtk_widget_show(label);
 
-   label = gtk_label_new("When you signature your music collection using the Relatable features, FreeAmp can send the metadata from your music files (artist, title, filesize, etc.) to MusicBrainz and Bitzi. Contributing your metadata will increase the usefulness of these services.");
+   label = gtk_label_new("When you signature your music collection using the Relatable features, FreeAmp can send the metadata from your music files (artist, title, filesize, etc.) to MusicBrainz. Contributing your metadata will increase the usefulness of these services.");
    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
    gtk_widget_show(label);
 
-   label = gtk_label_new("When you contribute to MusicBrainz and Bitzi, all of your contributions will be made publicly available using the OpenContent and OpenBits licenses, respectively. No personal information will ever be sent to MusicBrainz or Bitzi. Please visit the project websites for more details.");
+   label = gtk_label_new("When you contribute to MusicBrainz, all of your contributions will be made publicly available using the OpenContent licenses, respectively. No personal information will ever be sent to MusicBrainz. Please visit the MusicBrainz website for more details.");
    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
@@ -494,14 +542,8 @@ GtkWidget *IntroWizardUI::MusicBrainzBitziPage(void)
    gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 0);
    gtk_widget_show(button);
 
-   button = gtk_button_new_with_label(" Bitzi Web Page ");
-   gtk_signal_connect(GTK_OBJECT(button), "clicked",
-                      GTK_SIGNAL_FUNC(bitzi_web), this);
-   gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 0);
-   gtk_widget_show(button);
-
    button = gtk_radio_button_new_with_label(NULL, 
-                     "Contribute to MusicBrainz/Bitzi");
+                     "Contribute to MusicBrainz");
    skipRelatableTwo = false;
    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
    gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 2);
@@ -520,6 +562,64 @@ GtkWidget *IntroWizardUI::MusicBrainzBitziPage(void)
    return vbox;
 }
 
+GtkWidget *IntroWizardUI::BitziPage(void)
+{
+   GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
+   gtk_widget_show(vbox);
+
+   GtkWidget *label = gtk_label_new("Bitzi Community Metadata");
+   gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+   gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+   gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
+   gtk_widget_show(label);
+
+   label = gtk_label_new("FreeAmp also supports contributing metadata from your MP3 and Vorbis files to the Bitzi community metadata projects. ");
+   gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+   gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+   gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
+   gtk_widget_show(label);
+
+   label = gtk_label_new("When you signature your music collection using the Relatable features, FreeAmp can send the metadata from your music files (artist, title, filesize, etc.) to Bitzi. Contributing your metadata will increase the usefulness of these services.");
+   gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+   gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+   gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
+   gtk_widget_show(label);
+
+   label = gtk_label_new("When you contribute to Bitzi, all of your contributions will be made publicly available using the OpenBits licenses. No personal information will ever be sent to Bitzi. Please visit the Bitzi website for more details.");
+   gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+   gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+   gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
+   gtk_widget_show(label);
+		  
+   GtkWidget *hbox = gtk_hbox_new(FALSE, 5);
+   gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, FALSE, 5);
+   gtk_widget_show(hbox);
+
+   GtkWidget *button = gtk_button_new_with_label(" Bitzi Web Page ");
+   gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                      GTK_SIGNAL_FUNC(bitzi_web), this);
+   gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 0);
+   gtk_widget_show(button);
+
+   button = gtk_radio_button_new_with_label(NULL, 
+                     "Contribute to Bitzi");
+   skipRelatableTwo = false;
+   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
+   gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 2);
+   gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                      GTK_SIGNAL_FUNC(bitzi_opt_in_selected), this);
+   gtk_widget_show(button);
+
+   button = gtk_radio_button_new_with_label(gtk_radio_button_group(
+                                            GTK_RADIO_BUTTON(button)),
+                                            "Cool! But I'll pass");
+   gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 2);
+   gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                      GTK_SIGNAL_FUNC(bitzi_opt_out_selected), this);
+   gtk_widget_show(button);
+
+   return vbox;
+}
 
 GtkWidget *IntroWizardUI::SearchPage(void)
 {
@@ -658,16 +758,19 @@ void IntroWizardUI::Show(bool runMain)
    page1 = IntroPage();
    page2 = RelatablePage();
    page3 = RelatableTwoPage();
-   page4 = MusicBrainzBitziPage();
-   page5 = SearchPage();
+   page4 = MusicBrainzPage();
+   page5 = BitziPage();
+   page6 = SearchPage();
 
    page = 1;
+   gtk_widget_hide(page6);
    gtk_widget_hide(page5);
    gtk_widget_hide(page4);
    gtk_widget_hide(page3);
    gtk_widget_hide(page2);
    gtk_widget_hide(page1);
 
+   gtk_box_pack_end(GTK_BOX(temphbox), page6, FALSE, FALSE, 0);
    gtk_box_pack_end(GTK_BOX(temphbox), page5, FALSE, FALSE, 0);
    gtk_box_pack_end(GTK_BOX(temphbox), page4, FALSE, FALSE, 0);
    gtk_box_pack_end(GTK_BOX(temphbox), page3, FALSE, FALSE, 0);
