@@ -794,10 +794,11 @@ UnixPrefs::
 GetLibDirClose(LibDirFindHandle *hLibDirFind)
 {
     if (hLibDirFind) {
-        vector <char *>::iterator i = hLibDirFind->m_pLibDirs->begin();
-
-        for (; i != hLibDirFind->m_pLibDirs->end(); i++)
-             delete *i;
+        while (hLibDirFind->m_pLibDirs->size() > 0)
+        {
+            delete (*(hLibDirFind->m_pLibDirs))[0];
+            hLibDirFind->m_pLibDirs->erase(hLibDirFind->m_pLibDirs->begin());
+        }
         delete hLibDirFind->m_pLibDirs;
         delete hLibDirFind;
     }

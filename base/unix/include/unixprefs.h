@@ -65,7 +65,7 @@ class UnixPrefs : public Preferences
 
     virtual LibDirFindHandle *GetFirstLibDir(char *path, uint32 *len);
     virtual Error GetNextLibDir(LibDirFindHandle *hLibDirFind,
-				char *path, uint32 *len);
+                   		char *path, uint32 *len);
     virtual Error GetLibDirClose(LibDirFindHandle *hLibDirFind);
 
     virtual const char *GetLibDirs();

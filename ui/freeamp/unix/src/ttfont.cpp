@@ -47,7 +47,12 @@
 #ifdef HAVE_FREETYPE
 
 #include <stdlib.h>
+#include <string.h>
 #include "ttfont.h"
+#include "mutex.h"
+
+
+Mutex ttfLock;
 
 #define TT_VALID(handle) ((handle).z != NULL)
 
@@ -61,7 +66,7 @@ create_font_raster(int width, int height)
 {
    TT_Raster_Map      *rmap;
 
-   rmap = malloc(sizeof(TT_Raster_Map));
+   rmap = (TT_Raster_Map *)malloc(sizeof(TT_Raster_Map));
    rmap->width = (width + 3) & -4;
    rmap->rows = height;
    rmap->flow = TT_Flow_Down;
@@ -82,7 +87,7 @@ duplicate_raster(TT_Raster_Map * rmap)
 {
    TT_Raster_Map      *new_rmap;
 
-   new_rmap = malloc(sizeof(TT_Raster_Map));
+   new_rmap = (TT_Raster_Map *)malloc(sizeof(TT_Raster_Map));
    *new_rmap = *rmap;
    if (new_rmap->size > 0)
      {
@@ -442,6 +447,8 @@ EFont_draw_string(GdkPixmap *win, GdkGC *gc, int x, int y, char *text,
    inx = 0;
    iny = 0;
 
+   ttfLock.Acquire();
+
    rtmp = calc_size(font, &w, &h, text);
    rmap = create_font_raster(w, h);
 
@@ -484,6 +491,7 @@ EFont_draw_string(GdkPixmap *win, GdkGC *gc, int x, int y, char *text,
      {
 	destroy_font_raster(rmap);
 	destroy_font_raster(rtmp);
+        ttfLock.Release();
 	return;
      }
 
@@ -508,6 +516,8 @@ EFont_draw_string(GdkPixmap *win, GdkGC *gc, int x, int y, char *text,
    destroy_font_raster(rmap);
    destroy_font_raster(rtmp);
    gdk_image_destroy(xim);
+
+   ttfLock.Release();
 }
 
 void
@@ -517,9 +527,11 @@ Efont_free(Efont * f)
 
    if (!f)
       return;
+   ttfLock.Acquire();
+
    TT_Done_Instance(f->instance);
    TT_Close_Face(f->face);
-   for (i = 0; i < 256; i++)
+   for (i = 0; i < f->num_glyph; i++)
      {
 	if (f->glyphs_cached[i])
 	   destroy_font_raster(f->glyphs_cached[i]);
@@ -531,6 +543,8 @@ Efont_free(Efont * f)
    if (f->glyphs_cached)
       free(f->glyphs_cached);
    free(f);
+
+   ttfLock.Release();
 }
 
 Efont              *
@@ -547,20 +561,25 @@ Efont_load(char *file, int size)
    unsigned short      num_glyphs = 0, no_cmap = 0;
    unsigned short      platform, encoding;
 
+   ttfLock.Acquire();
+
    if (!have_engine)
      {
 	error = TT_Init_FreeType(&engine);
-	if (error)
+	if (error) {
+           ttfLock.Release();
 	   return NULL;
+        }
 	have_engine = 1;
      }
-   f = malloc(sizeof(Efont));
+   f = (Efont *)malloc(sizeof(Efont));
    f->engine = engine;
    error = TT_Open_Face(f->engine, file, &f->face);
    if (error)
      {
 	free(f);
 /*      fprintf(stderr, "Unable to open font\n"); */
+        ttfLock.Release();
 	return NULL;
      }
    error = TT_Get_Face_Properties(f->face, &f->properties);
@@ -568,6 +587,7 @@ Efont_load(char *file, int size)
      {
 	TT_Close_Face(f->face);
 	free(f);
+        ttfLock.Release();
 /*      fprintf(stderr, "Unable to get face properties\n"); */
 	return NULL;
      }
@@ -576,6 +596,7 @@ Efont_load(char *file, int size)
      {
 	TT_Close_Face(f->face);
 	free(f);
+        ttfLock.Release();
 /*      fprintf(stderr, "Unable to create instance\n"); */
 	return NULL;
      }
@@ -601,21 +622,23 @@ Efont_load(char *file, int size)
 	TT_Done_Instance(f->instance);
 	TT_Close_Face(f->face);
 	free(f);
+        ttfLock.Release();
 /*      fprintf(stderr, "Sorry, but this font doesn't contain any Unicode mapping table\n"); */
 	return NULL;
      }
-   f->num_glyph = 256;
-   f->glyphs = (TT_Glyph *) malloc(256 * sizeof(TT_Glyph));
-   memset(f->glyphs, 0, 256 * sizeof(TT_Glyph));
-   f->glyphs_cached = (TT_Raster_Map **) malloc(256 * sizeof(TT_Raster_Map *));
-   memset(f->glyphs_cached, 0, 256 * sizeof(TT_Raster_Map *));
+   f->num_glyph = 128;
+   f->glyphs = (TT_Glyph *) malloc(f->num_glyph * sizeof(TT_Glyph));
+   memset(f->glyphs, 0, f->num_glyph * sizeof(TT_Glyph));
+   f->glyphs_cached = 
+              (TT_Raster_Map **) malloc(f->num_glyph * sizeof(TT_Raster_Map *));
+   memset(f->glyphs_cached, 0, f->num_glyph * sizeof(TT_Raster_Map *));
 
    load_flags = TTLOAD_SCALE_GLYPH | TTLOAD_HINT_GLYPH;
 
    f->max_descent = 0;
    f->max_ascent = 0;
 
-   for (i = 0; i < 256; ++i)
+   for (i = 0; i < f->num_glyph; ++i)
      {
 	if (TT_VALID(f->glyphs[i]))
 	   continue;
@@ -638,6 +661,9 @@ Efont_load(char *file, int size)
 	if (((metrics.bbox.yMax + 63) & -64) > f->max_ascent)
 	   f->max_ascent = ((metrics.bbox.yMax + 63) & -64);
      }
+
+   ttfLock.Release();
+
    return f;
 }
 
@@ -654,6 +680,7 @@ Efont_extents(Efont * f, char *text, int *font_ascent_return,
    if (!f)
       return;
 
+   ttfLock.Acquire();
    TT_Get_Instance_Metrics(f->instance, &imetrics);
    upm = f->properties.header->Units_Per_EM;
    ascent = (f->properties.horizontal->Ascender * imetrics.y_ppem) / upm;
@@ -693,6 +720,8 @@ Efont_extents(Efont * f, char *text, int *font_ascent_return,
       *max_ascent_return = f->max_ascent;
    if (max_descent_return)
       *max_descent_return = f->max_descent;
+
+   ttfLock.Release();
 }
 
 #endif

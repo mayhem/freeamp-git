@@ -36,9 +36,7 @@ using namespace std;
 #include "Font.h"
 
 #ifdef HAVE_FREETYPE
-extern "C" {
 #include "ttfont.h"
-}
 #endif
 
 enum FontTypeEnum 

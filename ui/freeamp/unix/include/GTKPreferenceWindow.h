@@ -135,8 +135,9 @@ class GTKPreferenceWindow : public PreferenceWindow
 
                void SavePrefsValues(Preferences* prefs, 
                                     PrefsStruct* values);
+
   protected:
-    
+
       PrefsStruct  currentValues;
       PrefsStruct  originalValues;
       PrefsStruct  proposedValues;

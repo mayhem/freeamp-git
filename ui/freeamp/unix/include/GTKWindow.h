@@ -59,6 +59,10 @@ class GTKWindow : public Window
      GtkWidget *GetWindow(void) { return mainWindow; }
    
      void MouseLeaveCheck(void); 
+     void SetMouseIn(void) { m_bMouseInWindow = true; }
+     void SetMouseOut(void) { m_bMouseInWindow = false; }
+     void ModifyTimer(bool stop);
+
      void DropFiles(char *filename);
 
      Mutex *m_pMindMeldMutex;

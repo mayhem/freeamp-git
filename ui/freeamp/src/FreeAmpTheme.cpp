@@ -491,7 +491,7 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
       }
       case CMD_ShowPreferences:
       {
-          ShowPreferencesEvent* prefsEvent = (ShowPreferencesEvent*)e;
+         ShowPreferencesEvent* prefsEvent = (ShowPreferencesEvent*)e;
       	 ShowOptions(prefsEvent->GetDefaultPage(), false);
       	 break;
       }
@@ -1022,9 +1022,10 @@ void FreeAmpTheme::ShowOptions(uint32 defaultPage, bool inEventLoop)
 #else
     pWindow = new GTKPreferenceWindow(m_pContext, m_pThemeMan, defaultPage, 
                                       inEventLoop);
-#endif       
+#endif
+
     pWindow->Show(m_pWindow);
-          
+
     delete pWindow;
 }
 

@@ -68,7 +68,7 @@ Error ThemeManager::GetDefaultTheme(string &oThemePath)
     map<string, string> oThemeList;
 
     GetThemeList(oThemeList);
-    oThemePath = oThemeList["freeamp"];
+    oThemePath = oThemeList["FreeAmp"];
 
     return kError_NoErr;
 }

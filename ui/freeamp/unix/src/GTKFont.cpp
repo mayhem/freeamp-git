@@ -69,8 +69,8 @@ GTKFont::GTKFont(FAContext *context, string &oName, string &oFace,
         do { 
             i = Names.begin(); 
             for (; i != Names.end(); i++) {
-                if (!strcasecmp(find.cFileName, (*i).c_str())) {
-                    finalName = (*i);
+                if (!strncasecmp(find.cFileName, (*i).c_str(), (*i).length())) {
+                    finalName = ttfbase + string("/") + string(find.cFileName);
                     ttffound = true;
                     break;
                 }
@@ -89,8 +89,8 @@ GTKFont::GTKFont(FAContext *context, string &oName, string &oFace,
         do {
             i = Names.begin();
             for (; i != Names.end(); i++) {
-                if (!strcasecmp(find.cFileName, (*i).c_str())) {
-                    finalName = *i;
+                if (!strncasecmp(find.cFileName, (*i).c_str(), (*i).length())) {
+                    finalName = ttfbase + string("/") + string(find.cFileName);
                     ttffound = true;
                     break;
                 }
@@ -106,8 +106,8 @@ GTKFont::GTKFont(FAContext *context, string &oName, string &oFace,
         do {
             i = Names.begin();
             for (; i != Names.end(); i++) {
-                if (!strcasecmp(find.cFileName, (*i).c_str())) {
-                    finalName = *i;
+                if (!strncasecmp(find.cFileName, (*i).c_str(), (*i).length())) {
+                    finalName = ttfbase + string("/") + string(find.cFileName);
                     ttffound = true;
                     break;
                 }
@@ -172,6 +172,7 @@ Error GTKFont::Load(int iFontHeight, bool bBold, bool bItalic)
                 fontname = BuildFontString(bold, italic, size - 1);
                 gfont = gdk_font_load(fontname.c_str());
                 if (!gfont) {
+//    cout << "fallback.. size is " << size << endl;
                     gfont = gdk_font_load("variable");  
                     if (!gfont) {
                         gfont = gdk_font_load("default");
@@ -188,12 +189,15 @@ Error GTKFont::Load(int iFontHeight, bool bBold, bool bItalic)
     }
 #ifdef HAVE_FREETYPE
     else {
-        if (ttfont)
-            Efont_free(ttfont);
-        ttfont = Efont_load("/tmp/asimov.ttf", iFontHeight - 3);
-        if (!ttfont) {
-            cout << "ERROR loading ttfn";
-            return kError_YouScrewedUp;
+        if (!ttfont || iFontHeight != size) {
+            size = iFontHeight;
+            if (ttfont)
+                Efont_free(ttfont);
+            ttfont = Efont_load((char *)m_oFace.c_str(), iFontHeight - 3);
+            if (!ttfont) {
+                cout << "ERROR loading ttf\n";
+                return kError_YouScrewedUp;
+            }
         }
     }
 #endif
@@ -243,6 +247,7 @@ void GTKFont::Render(Rect &oClipRect, string &oText, int iOffset,
 {
     if (!bitmap->GetBitmap())
         return;
+
     gdk_threads_enter();
     GdkGC *gc = gdk_gc_new((GdkWindow *)bitmap->GetBitmap());
     gdk_rgb_gc_set_foreground(gc, (oColor.red << 16) | (oColor.green << 8) |

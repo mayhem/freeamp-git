@@ -48,6 +48,7 @@ GTKPreferenceWindow::GTKPreferenceWindow(FAContext *context,
 
 GTKPreferenceWindow::~GTKPreferenceWindow(void)
 {
+    done = true;
 } 
 
 static gboolean pref_destroy(GtkWidget *widget, gpointer p)
@@ -130,6 +131,8 @@ bool GTKPreferenceWindow::Show(Window *pWindow)
     currentValues = proposedValues = originalValues;
 
     gdk_threads_enter();
+    ((GTKWindow *)pWindow)->ModifyTimer(true);
+
     mainWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_modal(GTK_WINDOW(mainWindow), TRUE);
     gtk_signal_connect(GTK_OBJECT(mainWindow), "destroy",
@@ -217,16 +220,24 @@ bool GTKPreferenceWindow::Show(Window *pWindow)
 
     gtk_widget_show(mainWindow);
 
-    gdk_threads_leave();
+    firsttime = false;
 
-    if (eventLoop)
+    if (eventLoop) {
         gtk_main();
+        gdk_threads_leave();
+    }
     else {
-        while (!done)
+        while (!done) {
+            gdk_threads_leave();
             usleep(20);
+        }
     }
 
+    gdk_threads_enter();
+    ((GTKWindow *)pWindow)->ModifyTimer(false);
     gdk_threads_leave();
+
+    return true;
 }
 
 void GTKPreferenceWindow::GetPrefsValues(Preferences* prefs, 
@@ -448,8 +459,6 @@ void GTKPreferenceWindow::SetToolbar(bool text, bool pics)
     proposedValues.useImages = pics;
     if (!firsttime) 
         gtk_widget_set_sensitive(applyButton, TRUE);
-    else
-        firsttime = false;
 }
 
 void text_selected(GtkWidget *w, GTKPreferenceWindow *p)
@@ -514,9 +523,13 @@ GtkWidget *GTKPreferenceWindow::CreatePage1(void)
     gtk_container_add(GTK_CONTAINER(frame), temphbox);
     gtk_widget_show(temphbox);
 
+    bool setSomething = false;
+
     button = gtk_radio_button_new_with_label(NULL, "Text Only");
-    if (originalValues.useTextLabels && !originalValues.useImages)
+    if (originalValues.useTextLabels && !originalValues.useImages) {
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
+        setSomething = true;
+    }
     gtk_box_pack_start(GTK_BOX(temphbox), button, FALSE, FALSE, 0);
     gtk_signal_connect(GTK_OBJECT(button), "clicked",
                        GTK_SIGNAL_FUNC(text_selected), this);
@@ -525,8 +538,10 @@ GtkWidget *GTKPreferenceWindow::CreatePage1(void)
     button = gtk_radio_button_new_with_label(
                              gtk_radio_button_group(GTK_RADIO_BUTTON(button)),
                              "Images Only");
-    if (!originalValues.useTextLabels && originalValues.useImages)
+    if (!originalValues.useTextLabels && originalValues.useImages) {
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
+        setSomething = true;
+    }
     gtk_box_pack_start(GTK_BOX(temphbox), button, FALSE, FALSE, 0);
     gtk_signal_connect(GTK_OBJECT(button), "clicked",
                        GTK_SIGNAL_FUNC(images_selected), this);
@@ -536,12 +551,17 @@ GtkWidget *GTKPreferenceWindow::CreatePage1(void)
     button = gtk_radio_button_new_with_label(
                              gtk_radio_button_group(GTK_RADIO_BUTTON(button)),
                              "Text and Images");
-    if (originalValues.useTextLabels && originalValues.useImages)
+    if (originalValues.useTextLabels && originalValues.useImages) {
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
+        setSomething  = true;
+    }
     gtk_box_pack_start(GTK_BOX(temphbox), button, FALSE, FALSE, 0);
     gtk_signal_connect(GTK_OBJECT(button), "clicked",
                        GTK_SIGNAL_FUNC(both_selected), this);
     gtk_widget_show(button);
+
+    if (!setSomething)
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
 
     return pane;
 }
@@ -1229,7 +1249,8 @@ GtkWidget *GTKPreferenceWindow::CreateAbout(void)
 void GTKPreferenceWindow::SelectTheme(int row)
 {
     proposedValues.listboxIndex = row;
-    gtk_widget_set_sensitive(applyButton, TRUE);
+    if (!firsttime)
+        gtk_widget_set_sensitive(applyButton, TRUE);
 }
 
 
@@ -1311,12 +1332,12 @@ void GTKPreferenceWindow::UpdateThemeList(void)
     for (i = m_oThemeList.begin(); i != m_oThemeList.end(); i++, iLoop++) {
          char *Text[1];
          Text[0] = (char *)((*i).first.c_str());
-         gtk_clist_append(GTK_CLIST(themeList), Text);
-         if ((*i).first == originalValues.currentTheme)
+         gtk_clist_append(GTK_CLIST(themeList), Text); 
+         if ((*i).second == originalValues.currentTheme) 
              proposedValues.listboxIndex = currentValues.listboxIndex = iLoop;
     }
 
-    gtk_clist_select_row(GTK_CLIST(themeList), proposedValues.listboxIndex, 1);
+    gtk_clist_select_row(GTK_CLIST(themeList), proposedValues.listboxIndex, 0);
 }
 
 void GTKPreferenceWindow::SetFont()

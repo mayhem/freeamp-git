@@ -43,7 +43,10 @@ void mouse_move(GtkWidget *w, GdkEvent *e, GTKWindow *ui)
     oPos.x = (int)e->motion.x_root;
     oPos.y = (int)e->motion.y_root;
     gdk_threads_leave();
+    ui->SetMouseIn();
+    ui->m_pMindMeldMutex->Acquire();
     ui->HandleMouseMove(oPos);
+    ui->m_pMindMeldMutex->Release();
     gdk_threads_enter();
 }
 
@@ -54,8 +57,11 @@ void button_down(GtkWidget *w, GdkEvent *e, GTKWindow *ui)
     oPos.x = (int)e->button.x_root;
     oPos.y = (int)e->button.y_root;
     gdk_threads_leave();
+    ui->SetMouseIn();
+    ui->m_pMindMeldMutex->Acquire();
     if (e->button.button == 1) 
         ui->HandleMouseLButtonDown(oPos);
+    ui->m_pMindMeldMutex->Release();
     gdk_threads_enter();
 }
 
@@ -65,8 +71,11 @@ void button_up(GtkWidget *w, GdkEvent *e, GTKWindow *ui)
     oPos.x = (int)e->button.x_root;
     oPos.y = (int)e->button.y_root;
     gdk_threads_leave();
+    ui->SetMouseOut();
+    ui->m_pMindMeldMutex->Acquire();
     if (e->button.button == 1)
         ui->HandleMouseLButtonUp(oPos);
+    ui->m_pMindMeldMutex->Release();
     gdk_threads_enter();
 }
 
@@ -74,7 +83,10 @@ void key_press(GtkWidget *w, GdkEvent *e, GTKWindow *ui)
 {
     char *str = e->key.string;
     gdk_threads_leave();
+    ui->SetMouseIn();
+    ui->m_pMindMeldMutex->Acquire();
     ui->Keystroke(str[0]);
+    ui->m_pMindMeldMutex->Release();
     gdk_threads_enter();
 }
 
@@ -83,16 +95,17 @@ void drop_file(GtkWidget *w, GdkDragContext *context, gint x, gint y,
                GTKWindow *ui)
 {
     gdk_threads_leave();
+    ui->SetMouseIn();
     if (data->data) {
         ui->DropFiles((char *)data->data);
     }
     gdk_threads_enter();
 }
       
-gint do_timeout(GTKWindow *ui)
+static gint do_timeout(GTKWindow *ui)
 {
-    ui->MouseLeaveCheck();
     ui->m_pMindMeldMutex->Acquire();
+//    ui->MouseLeaveCheck();
     ui->TimerEvent();
     ui->m_pMindMeldMutex->Release();
     
@@ -207,10 +220,11 @@ Error GTKWindow::VulcanMindMeld(Window *pOther)
     m_pMindMeldMutex->Acquire();
 
     eRet = Window::VulcanMindMeld(pOther);
-    m_pMindMeldMutex->Release();
 
-    if (IsError(eRet))
+    if (IsError(eRet)) {
+        m_pMindMeldMutex->Release();
         return eRet;
+    }
 
     m_pCanvas->GetBackgroundRect(oRect);
     GdkBitmap *mask = ((GTKCanvas *)m_pCanvas)->GetMask();
@@ -223,6 +237,9 @@ Error GTKWindow::VulcanMindMeld(Window *pOther)
 
     ((GTKCanvas *)m_pCanvas)->SetParent(this);
     m_pCanvas->Update();
+ 
+    m_pMindMeldMutex->Release();
+
     return kError_NoErr;
 }
 
@@ -385,12 +402,14 @@ bool GTKWindow::LButtonDown(void)
 
 void GTKWindow::MouseLeaveCheck(void)
 {
-    if (gdk_window_at_pointer(NULL, NULL) == mainWindow->window)
-        m_bMouseInWindow = true;
-    else {
-        if (m_bMouseInWindow)
+    if (m_bMouseInWindow) {
+cout << "in window?\n";
+        if (gdk_window_at_pointer(NULL, NULL) != mainWindow->window) {
+            m_bMouseInWindow = false;
             MouseHasLeftWindow();
-        m_bMouseInWindow = false;
+        }
+        else 
+            m_bMouseInWindow = true;
     }
 }
 
@@ -400,4 +419,12 @@ Error GTKWindow::GetDesktopSize(int32 &iX, int32 &iY)
     iY = gdk_screen_height();
 
     return kError_NoErr;
+}
+
+void GTKWindow::ModifyTimer(bool stop)
+{
+    if (stop)
+        gtk_timeout_remove(gtkTimer);
+    else
+        gtkTimer = gtk_timeout_add(250, do_timeout, this);
 }
