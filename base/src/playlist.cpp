@@ -1758,6 +1758,9 @@ bool PlaylistManager::IsSupportedPlaylistFormat(const char *extension)
 {
     bool retvalue = false;
 
+    if (!extension)
+        return false;
+
     uint32 numFormats = m_playlistFormats.size();
 
     for(uint32 index = 0; index < numFormats; index++)

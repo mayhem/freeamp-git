@@ -1265,9 +1265,9 @@ static void import_tool(GtkWidget *w, GTKMusicBrowser *p)
         char *tempurl = new char[length];
 
         if (IsntError(FilePathToURL(returnpath, tempurl, &length))) {
-            if (m_context->plm->IsSupportedPlaylistFormat(ext))
+            if (ext && m_context->plm->IsSupportedPlaylistFormat(ext))
                 p->ImportPlaylist(tempurl);
-            else if (m_context->player->IsSupportedExtension(ext)) {
+            else if (ext && m_context->player->IsSupportedExtension(ext)) {
                 PlaylistItem *plist = new PlaylistItem(tempurl);
                 m_context->plm->RetrieveMetaData(plist);
 
@@ -1448,7 +1448,7 @@ static void add_tool(GtkWidget *widget, GTKMusicBrowser *p)
         uint32 length = strlen(returnpath) + 10;
         char *tempurl = new char[length];
         if (IsntError(FilePathToURL(returnpath, tempurl, &length))) {
-            if (p->GetContext()->plm->IsSupportedPlaylistFormat(ext)) {
+            if (ext && p->GetContext()->plm->IsSupportedPlaylistFormat(ext)) {
                 string tobeloaded = tempurl;
                 p->LoadPlaylist(tobeloaded);
             }
@@ -1459,10 +1459,17 @@ static void add_tool(GtkWidget *widget, GTKMusicBrowser *p)
                     char *first= strtok(filereturn, "\n");
 
                     while ((temp = strtok(NULL, "\n"))) {
-                        p->AddTrackPlaylistEvent(temp);
-                        p->m_currentindex++;
+                        ext = p->GetContext()->player->GetExtension(temp);
+                        if (ext && 
+                           p->GetContext()->player->IsSupportedExtension(ext)) {
+                            p->AddTrackPlaylistEvent(temp);
+                            p->m_currentindex++;
+                        }
                     }
-                    p->AddTrackPlaylistEvent(first);
+                    ext = p->GetContext()->player->GetExtension(first);
+                    if (ext && 
+                        p->GetContext()->player->IsSupportedExtension(ext))
+                        p->AddTrackPlaylistEvent(first);
                 }
                 delete [] filereturn;
             }
