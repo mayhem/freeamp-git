@@ -1750,11 +1750,16 @@ void FreeAmpTheme::HandleMouseWheelChange(int iSteps)
 {
 	string oControlName("Volume");
 	int    iVol;
+	bool   bEnabled;
 
-    m_pWindow->ControlIntValue(oControlName, false, iVol);
-	iVol += iSteps * 5;
-	iVol = max(min(iVol, 100), 0);
-    SetVolume(iVol, m_iBalance);
+    m_pWindow->ControlEnable(oControlName, false, bEnabled);
+	if (bEnabled)
+	{
+       m_pWindow->ControlIntValue(oControlName, false, iVol);
+       iVol += iSteps * 5;
+	   iVol = max(min(iVol, 100), 0);
+       SetVolume(iVol, m_iBalance);
+	}
 }
 
 void FreeAmpTheme::HandleMouseWheelClick(void)

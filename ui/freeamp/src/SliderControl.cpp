@@ -48,6 +48,7 @@ static TransitionInfo pTransitions[] =
     { CS_Disabled ,  CT_Enable,           CS_Normal     },
     { CS_Disabled ,  CT_MouseEnter,       CS_DisabledMO },
     { CS_DisabledMO, CT_MouseLeave,       CS_Disabled   },
+    { CS_DisabledMO, CT_Enable,           CS_MouseOver  },
     { CS_Hidden,     CT_Show,             CS_Normal     },
     { CS_Any,        CT_SetValue,         CS_Same       },
     { CS_LastState,  CT_LastTransition,   CS_LastState  }
@@ -68,7 +69,7 @@ SliderControl::SliderControl(Window *pWindow, string &oName, int iThumbs,
      m_bHasTroughBitmap = false;
      m_bTroughMiddle = false;
      m_iCurrentTroughFrame = -1;
-     m_iLastThumbPos = -1; 
+     m_iLastThumbPos = 0; 
 };
 
 SliderControl::~SliderControl(void)
@@ -373,15 +374,7 @@ void SliderControl::MoveThumb(int iNewPos)
     Rect    oEraseRect, oRect;
 
     pCanvas = m_pParent->GetCanvas();
-    if (m_iLastThumbPos >= 0)
-    {
-        oEraseRect.x1 = m_oRect.x1 + m_iLastThumbPos;
-        oEraseRect.x2 = oEraseRect.x1 + m_iThumbWidth + 1;
-        oEraseRect.y1 = m_oRect.y1;
-        oEraseRect.y2 = m_oRect.y2 + 1;
-        
-        pCanvas->Erase(oEraseRect);
-    }
+    pCanvas->Erase(m_oRect);
 
     oRect.x1 = m_oRect.x1 + iNewPos;
     oRect.x2 = oRect.x1 + m_iThumbWidth;
@@ -410,6 +403,7 @@ void SliderControl::MoveThumb(int iNewPos)
           break;
 
        case CS_Disabled:
+       case CS_DisabledMO:
           BlitFrame(CS_Disabled, iThumbNumber, &oRect, false);
           break;
 
@@ -417,8 +411,7 @@ void SliderControl::MoveThumb(int iNewPos)
           break;
     }
     
-    oEraseRect.Union(oRect);
-    pCanvas->Invalidate(oEraseRect);
+    pCanvas->Invalidate(m_oRect);
 
     m_iLastThumbPos = iNewPos;
 } 

@@ -84,7 +84,7 @@ public:
 
     Thread         *m_pBufferThread;
     int             m_iOutputBufferSize, m_iBaseTime, m_iBytesPerSample;
-    int             m_iHead, m_iTail, m_iOffset;
+    int             m_iHead, m_iTail, m_iOffset, m_iLastTime;
     
     string          m_oDstLineName, m_oVolumeControlName;
     DWORD           m_dwMinimum, m_dwMaximum, m_dwVolumeControlID;

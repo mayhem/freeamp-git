@@ -93,6 +93,7 @@ SoundCardPMO::SoundCardPMO(FAContext *context) :
    m_iBaseTime = MAXINT32;
    m_iBytesPerSample = 0;
    m_num_headers = 0;
+   m_iLastTime = 0;
 
    //   lillian
    m_volume = NULL;
@@ -176,6 +177,7 @@ Error SoundCardPMO::Init(OutputInfo * info)
    MMRESULT        mmresult = 0;
    Int32PropValue *pProp = NULL;
 
+
    m_channels = info->number_of_channels;
    m_samples_per_second = info->samples_per_second;
    m_samples_per_frame = info->samples_per_frame;
@@ -224,6 +226,7 @@ Error SoundCardPMO::Init(OutputInfo * info)
 
    m_initialized = true;
 
+
    return result;
 }
 
@@ -247,6 +250,7 @@ void SoundCardPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
            return;
    
        m_iBaseTime -= (sTime.u.cb / (m_samples_per_second * m_iBytesPerSample));
+	   m_iLastTime = 0;
    }
 
    if (m_samples_per_second <= 0)
@@ -258,6 +262,19 @@ void SoundCardPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
    
    iTotalTime = (sTime.u.cb / (m_samples_per_second * m_iBytesPerSample)) +
                 m_iBaseTime;
+
+   // Time needs to be greater or equal to the last time for each pass,
+   // otherwise we have a break in playback, in which case we need to
+   // reset the base time. After a break in playback the waveOutGetPosition()
+   // function will reset back to 0. 
+   // Alternatively, if m_iBaseTime gets messed up (i.e. its more than 24 hours!)
+   // force a reset as well.
+   if (iTotalTime < m_iLastTime || (m_iBaseTime > 86400 && m_iBaseTime < MAXINT32))
+   {
+	   Debug_v("Reset: %d %d %d", iTotalTime, m_iLastTime, m_iBaseTime);
+	   m_iBaseTime = MAXINT32;
+	   return;
+   }
       
    hours = iTotalTime / 3600;
    minutes = (iTotalTime - 
@@ -266,12 +283,19 @@ void SoundCardPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
                 (hours * 3600) - 
                 (minutes * 60);
 
-   if (minutes < 0 || minutes > 59 || seconds < 0 || seconds > 59)
+   // If something became wonky, reset.
+   if (minutes < 0 || minutes > 59 || 
+	   seconds < 0 || seconds > 59 || 
+	   hours < 0 || hours > 24)
+   {
+	  m_iBaseTime = MAXINT32;
       return;
+   }
 
    pmtpi = new MediaTimeInfoEvent(hours, minutes, seconds, 0,
                                   (float)iTotalTime, 0);
    m_pTarget->AcceptEvent(pmtpi);
+   m_iLastTime = iTotalTime;
 }
 
 bool SoundCardPMO::WaitForDrain(void)
