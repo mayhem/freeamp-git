@@ -212,7 +212,15 @@ dnl not needed.
       dnl probably Sun CC.
       FPIC="-Kpic"
       LINKMOD="$CC -G"	
-    fi
+    else
+      z=`gcc -v 2>&1`;
+      if expr "$z" : ".*gcc version 2.95" >/dev/null; then
+        if expr "$x_includes" : "/usr/openwin/include" >/dev/null; then
+          CFLAGS="$CFLAGS -fpermissive"
+          echo "adding -fpermissive to CFLAGS for openwin headers"
+        fi
+      fi
+    fi	
     dnl thank you, oh autoconf, for the oh-so-accurately named
     dnl AC_EGREP_HEADER, which only uses egrep after it PUTS THE
     dnl THING THROUGH CPP, MAKING #defineS NOT SHOW UP!
@@ -482,4 +490,4 @@ AC_SUBST(XINGASM)
 
 AC_CONFIG_HEADER(config/config.h)
 AC_OUTPUT(Makefile Makefile-plugins config/Makefile.header)
-
+touch .config.check
