@@ -65,7 +65,7 @@ char* kWiredPlanet = "Wired Planet";
 char* kShoutCast = "ShoutCast";
 char* kIceCast = "IceCast";
 
-void MusicBrowserUI::InitTree(void)
+void MusicBrowserUI::InitTree()
 {
     if(m_hMyMusicItem)
         TreeView_DeleteItem(m_hMusicView, m_hMyMusicItem);
@@ -164,7 +164,7 @@ void MusicBrowserUI::InitTree(void)
     m_hPortableItem = TreeView_InsertItem(m_hMusicView, &insert);
 }
 
-void MusicBrowserUI::FillArtists(void)
+void MusicBrowserUI::FillArtists()
 {
     TV_INSERTSTRUCT                     insert;
     const vector<ArtistList*>*          artistList;
@@ -308,11 +308,10 @@ void MusicBrowserUI::FillTracks(TV_ITEM *pItem)
 
 void MusicBrowserUI::RefreshCDList(vector<PlaylistItem*>* trackList)
 {
-    TV_INSERTSTRUCT                     insert;
-    TreeData                            data;
-    MetaData                            metadata;
-
-    HTREEITEM treeItem;
+    TV_INSERTSTRUCT insert;
+    TreeData        data;
+    MetaData        metadata;
+    HTREEITEM       treeItem;
 
     while(treeItem = TreeView_GetChild(m_hMusicView, m_hCDItem))
     {
@@ -332,6 +331,9 @@ void MusicBrowserUI::RefreshCDList(vector<PlaylistItem*>* trackList)
         track != trackList->end();
         track++)
     {
+        ostringstream ost;
+        string trackString;
+
         data.m_pArtist = NULL;
         data.m_pAlbum = NULL;
         data.m_pTrack = (*track);
@@ -342,11 +344,11 @@ void MusicBrowserUI::RefreshCDList(vector<PlaylistItem*>* trackList)
             insert.item.pszText = (char*)(metadata.Title().c_str());
         else
         {
-            ostringstream ost;
-
             ost << "CD Audio Track " << trackNumber;
 
-            insert.item.pszText = (char*)(ost.str().c_str());
+            trackString = ost.str();
+
+            insert.item.pszText = (char*)(trackString.c_str());
         }        
             
         insert.item.cchTextMax = strlen(insert.item.pszText);
@@ -385,13 +387,25 @@ void MusicBrowserUI::RefreshCDList(vector<PlaylistItem*>* trackList)
     TreeView_SetItem(m_hMusicView, &tv_item);
 }
 
-void MusicBrowserUI::FillAllTracks(void)
+unsigned long __stdcall 
+MusicBrowserUI::
+fill_all_tracks(void* arg)
+{
+    MusicBrowserUI* ui = (MusicBrowserUI*) arg;
+
+	ui->FillAllTracks();
+
+    return 0;
+}
+
+void MusicBrowserUI::FillAllTracks()
 {
     TV_INSERTSTRUCT                     insert;
     const vector<ArtistList*>*          artistList;
     vector<ArtistList*>::const_iterator artist;        
     TreeData                            data;
     MetaData                            metadata;
+	bool								gotOne = false;
 
     insert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
                  TVIF_SELECTEDIMAGE | TVIF_PARAM; 
@@ -435,6 +449,13 @@ void MusicBrowserUI::FillAllTracks(void)
                 insert.hInsertAfter = TVI_LAST;
                 insert.hParent = m_hAllItem;
                 TreeView_InsertItem(m_hMusicView, &insert);
+
+				if(!gotOne)
+				{
+					gotOne = true;
+					TreeView_Expand(m_hMusicView, m_hAllItem, TVE_EXPAND);
+				}
+
             }
         }
     }       
@@ -475,7 +496,7 @@ void MusicBrowserUI::FillAllTracks(void)
     TreeView_SortChildren(m_hMusicView, m_hAllItem, 0);
 }
 
-void MusicBrowserUI::FillUncatTracks(void)
+void MusicBrowserUI::FillUncatTracks()
 {
     TV_INSERTSTRUCT                         insert;
     const vector<PlaylistItem*>*            trackList;
@@ -518,7 +539,7 @@ void MusicBrowserUI::FillUncatTracks(void)
     TreeView_SortChildren(m_hMusicView, m_hUncatItem, 0);
 }
 
-void MusicBrowserUI::FillPlaylists(void)
+void MusicBrowserUI::FillPlaylists()
 {
     TV_INSERTSTRUCT                 insert;
     vector<string>::const_iterator  url;
@@ -651,7 +672,7 @@ void MusicBrowserUI::FillIceCast()
     FooCast* fooCast = new FooCast(m_hMusicView, m_hIceCastItem);
 }
 
-void MusicBrowserUI::FillPortables(void)
+void MusicBrowserUI::FillPortables()
 {
     TV_INSERTSTRUCT         insert;
     char*                   buffer = NULL;  

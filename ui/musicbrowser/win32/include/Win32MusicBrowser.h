@@ -263,6 +263,7 @@ class MusicBrowserUI : public UserInterface
     void    FillAlbums(TV_ITEM *pItem);
     void    FillPlaylists();
     void    FillTracks(TV_ITEM *pItem);
+	static unsigned long __stdcall fill_all_tracks(void* arg);
     void    FillAllTracks();
     void    FillUncatTracks();
     void    FillPortables();

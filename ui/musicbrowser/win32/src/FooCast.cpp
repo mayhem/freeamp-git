@@ -41,7 +41,8 @@ using namespace std;
 char* kBusy = "Searching for Stations...";
 
 FooCast::FooCast(HWND hwndTree, HTREEITEM parentItem):
-    m_hwndTree(hwndTree), m_parentItem(parentItem)
+    m_hwndTree(hwndTree), m_parentItem(parentItem),
+    m_refreshThread(NULL)
 {
     TV_INSERTSTRUCT insert;
 
@@ -57,9 +58,27 @@ FooCast::FooCast(HWND hwndTree, HTREEITEM parentItem):
     insert.hInsertAfter = TVI_LAST;
     insert.hParent = m_parentItem;
     m_busyItem = TreeView_InsertItem(m_hwndTree, &insert);
+
+    m_refreshThread = Thread::CreateThread();
+    m_refreshThread->Create(FooCast::refresh_stations, this);
+
 }
 
 FooCast::~FooCast()
 {
+
+    delete m_refreshThread;
+}
+
+void FooCast::refresh_stations(void* arg)
+{
+    FooCast* _this = (FooCast*)arg;
+
+    _this->RefreshStations();
+}
+
+void FooCast::RefreshStations()
+{
+
 
 }

@@ -27,15 +27,21 @@ ____________________________________________________________________________*/
 #include <windows.h>
 #include <commctrl.h>
 
+#include "thread.h"
 
 class FooCast {
  public:
     FooCast(HWND hwndTree, HTREEITEM parentItem);
     ~FooCast();
 
+    static void refresh_stations(void* arg);
+    void RefreshStations();
+
  private:
     HWND m_hwndTree;
     HTREEITEM m_parentItem, m_busyItem;
+
+    Thread* m_refreshThread;
 
 };
 
