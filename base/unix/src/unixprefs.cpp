@@ -644,6 +644,19 @@ GetPrefString(const char* pref, char* buf, uint32* len)
     memcpy(buf, value, value_len);
     *len = value_len;
     m_mutex.Release();
+   
+    // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
+    if (strcmp(pref, "UI") == 0 ||
+        strcmp(pref, "TextUI") == 0 ||
+        strcmp(pref, "PMO") == 0)
+    {
+        char base[512], ext[512];
+
+        if (sscanf(buf, "%[^-.]-linux.%s", base, ext) == 2)
+           sprintf(buf, "%s.%s", base, ext);
+    }
+    // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
+
     return kError_NoErr;
 }
 
