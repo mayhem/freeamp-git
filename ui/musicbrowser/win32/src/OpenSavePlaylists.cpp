@@ -255,6 +255,49 @@ bool MusicBrowserUI::SaveNewPlaylist(string &oName)
         }
     }
 
+    
+    if(result)
+    {
+        HANDLE findFileHandle = NULL;
+        WIN32_FIND_DATA findData;
+
+        findFileHandle = FindFirstFile(oName.c_str(), &findData);
+
+        if(findFileHandle != INVALID_HANDLE_VALUE)
+        {
+            int yes_no;
+            const char* kFileExist = "%s\r\n\r\n"
+                                     "A playlist with the name already exists. "
+                                     "Would you like to replace\r\n
+                                     "the existing playlist with this one?";
+
+            const char* cp = NULL;
+
+            cp = strrchr(oName.c_str(), '\\');
+
+            if(!cp)
+                cp = oName.c_str();
+            else
+                cp++;
+
+            char* msg = new char[strlen(kFileExist) + strlen(cp) + 1];
+
+            wsprintf(msg, kFileExist, cp);
+
+            yes_no = MessageBox(m_hWnd, 
+                       msg, 
+                       "Replace Playlist?", 
+                       MB_YESNO|MB_ICONWARNING);
+
+            if(yes_no == IDNO)
+                result = false;
+
+            delete [] msg;
+
+            FindClose(findFileHandle);
+        }        
+    }
+
     if(result)
     {
         char   url[MAX_PATH + 7]; // make room for file://
