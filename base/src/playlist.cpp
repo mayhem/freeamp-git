@@ -1064,7 +1064,13 @@ Error PlaylistManager::SwapItems(uint32 index1, uint32 index2)
         temp = (*m_activeList)[index1];
         (*m_activeList)[index1] = (*m_activeList)[index2];
         (*m_activeList)[index2] = temp;
+/*
+        m_context->target->AcceptEvent(
+                new PlaylistItemMovedEvent(index1, index2, (*m_activeList)[index2]));
 
+        m_context->target->AcceptEvent(
+                new PlaylistItemMovedEvent(index2, index1, (*m_activeList)[index1]));
+*/
         result = kError_NoErr;
     }
 
@@ -1095,6 +1101,20 @@ Error PlaylistManager::MoveItem(uint32 oldIndex, uint32 newIndex)
             newIndex = m_activeList->size();
 
         m_activeList->insert(&(*m_activeList)[newIndex],item);
+
+        if(oldIndex == m_current)
+            InternalSetCurrentIndex(newIndex);
+        else if(newIndex == m_current)
+        {
+            if(oldIndex > m_current)
+                InternalSetCurrentIndex(m_current + 1);
+            else
+                InternalSetCurrentIndex(m_current - 1);
+        }
+
+        m_context->target->AcceptEvent(
+                new PlaylistItemMovedEvent(oldIndex, newIndex, item));
+
         result = kError_NoErr;
     }
 

@@ -164,6 +164,8 @@ class MusicBrowserUI : public UserInterface
     void  UpdatePlaylistList(void);
     void  AddPlaylistListItem(const PlaylistItem* item);
     void  UpdatePlaylistListItem(const PlaylistItem* item);
+    void  PlaylistListItemMoved(const PlaylistItem* item, 
+                                uint32 oldIndex, uint32 newIndex);
     void  InitList(void);
     void  AddPlaylist(const string &oName);
     void  LoadPlaylist(const string &oPlaylist);

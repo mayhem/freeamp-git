@@ -559,6 +559,23 @@ public:
 	const PlaylistItem* Item() { return m_item; }
 };
 
+class PlaylistItemMovedEvent : public Event {
+private:
+	const PlaylistItem* m_item;
+    uint32 m_oldIndex, m_newIndex;
+public:
+	PlaylistItemMovedEvent(uint32 oldIndex, 
+                           uint32 newIndex, 
+                           const PlaylistItem* item) 
+    { m_type = INFO_PlaylistItemMoved; m_item = item; 
+      m_oldIndex = oldIndex; m_newIndex = newIndex;}
+	virtual ~PlaylistItemMovedEvent() {}
+
+	const PlaylistItem* Item() { return m_item; }
+    uint32 OldIndex() { return m_oldIndex; }
+    uint32 NewIndex() { return m_newIndex; }
+};
+
 class PlaylistItemRemovedEvent : public Event {
 private:
 	const PlaylistItem* m_item;

@@ -469,6 +469,78 @@ void MusicBrowserUI::SaveAsPlaylist(void)
     }   
 }
 
+void MusicBrowserUI::PlaylistListItemMoved(const PlaylistItem* item, 
+                                           uint32 oldIndex, 
+                                           uint32 newIndex)
+{
+    HWND    hwnd = GetDlgItem(m_hWnd, IDC_PLAYLISTBOX);
+    uint32  index = m_oPlm->IndexOf(item);
+
+    if(index != kInvalidIndex)
+    {
+        LV_ITEM sItem;
+        char    szText[256];
+
+        uint32 state = ListView_GetItemState(m_hPlaylistView, 
+                                             oldIndex, 
+                                             LVIS_SELECTED|LVIS_FOCUSED);
+
+        sItem.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM | LVIF_STATE;
+        sItem.pszText = szText;
+        sItem.cchTextMax = strlen(szText);
+        sItem.iSubItem = 0;
+        sItem.iItem = index;
+        sItem.lParam = index;
+        sItem.iImage = 0;
+        sItem.stateMask = LVIS_FOCUSED|LVIS_SELECTED;
+        sItem.state = state;
+
+        ListView_DeleteItem(hwnd, oldIndex);
+
+        ListView_InsertItem(hwnd, &sItem);
+
+        sItem.mask = LVIF_TEXT;
+
+        // Update Title
+        sItem.pszText = (char*)item->GetMetaData().Title().c_str();
+        sItem.cchTextMax = item->GetMetaData().Title().length();
+        sItem.iSubItem = 1;
+        ListView_SetItem(hwnd, &sItem);
+
+        // Update Artist
+        sItem.pszText = (char*)item->GetMetaData().Artist().c_str();
+        sItem.cchTextMax = item->GetMetaData().Artist().length();
+        sItem.iSubItem = 2;
+        ListView_SetItem(hwnd, &sItem);
+
+        // Update Album
+        sItem.pszText = (char*)item->GetMetaData().Album().c_str();
+        sItem.cchTextMax = item->GetMetaData().Album().length();
+        sItem.iSubItem = 3;
+        ListView_SetItem(hwnd, &sItem);
+
+        // Update Time
+        if (item->GetMetaData().Time() != 0)
+        {
+            int32 seconds = item->GetMetaData().Time();
+            int32 hours = seconds / 3600;
+		    int32 minutes = seconds / 60 - hours * 60;
+            seconds = seconds - minutes * 60 - hours * 3600;
+
+            if(hours)
+                sprintf(szText, "%d:%02d:%02d", hours, minutes, seconds);
+            else
+                sprintf(szText, "%d:%02d", minutes, seconds);
+        }
+        else    
+            strcpy(szText, "Unknown");
+        sItem.pszText = szText;
+        sItem.cchTextMax = strlen(szText);
+        sItem.iSubItem = 4;
+        ListView_SetItem(hwnd, &sItem);
+    }
+}
+
 void MusicBrowserUI::UpdatePlaylistListItem(const PlaylistItem* item)
 {
     LV_ITEM       sItem;

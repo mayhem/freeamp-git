@@ -581,6 +581,29 @@ void MusicBrowserUI::SizeWindow(int iType, int iWidth, int iHeight)
     EndDeferWindowPos(hdwp);
 
     // Resize the listview headers
+
+#if 0
+
+#define LENGTH_COLUMN_WIDTH 60
+#define INDEX_COLUMN_WIDTH 25
+#define FIXED_COLUMN_WIDTH (LENGTH_COLUMN_WIDTH + INDEX_COLUMN_WIDTH)
+
+    RECT sRect;
+
+    GetClientRect(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), &sRect);
+
+    int32 remainder = (sRect.right-sRect.left - FIXED_COLUMN_WIDTH)%3;
+    
+    int32 width = (sRect.right-sRect.left - FIXED_COLUMN_WIDTH)/3;
+    ListView_SetColumnWidth(m_hPlaylistView, 1, width);
+    ListView_SetColumnWidth(m_hPlaylistView, 2, width);
+    ListView_SetColumnWidth(m_hPlaylistView, 3, width);
+    
+    width = LENGTH_COLUMN_WIDTH + remainder;
+    ListView_SetColumnWidth(m_hPlaylistView, 4, width);
+
+#endif
+
     GetClientRect(m_hPlaylistView, &newListViewRect);
     
     headerResizeAmount = (newListViewRect.right - newListViewRect.left) - 

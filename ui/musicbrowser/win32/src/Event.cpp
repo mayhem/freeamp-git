@@ -48,32 +48,76 @@ void MusicBrowserUI::DeleteListEvent(void)
 
 void MusicBrowserUI::DeleteEvent(void)
 {
-    m_oPlm->RemoveItem(m_currentindex);
-    m_bListChanged = true;
-    m_currentplaying = m_oPlm->GetCurrentIndex();
-    UpdatePlaylistList();
+    uint32 count = ListView_GetSelectedCount(m_hPlaylistView);
+    uint32 found = 0;
+    uint32 index = ListView_GetItemCount(m_hPlaylistView) - 1;
+
+    while(found < count)
+    {
+        uint32 state = ListView_GetItemState(m_hPlaylistView, 
+                                             index, 
+                                             LVIS_SELECTED);
+
+        if(state & LVIS_SELECTED)
+        {
+            found++;
+            m_oPlm->RemoveItem(index);
+        }
+
+        index--;
+    }
 }
 
 void MusicBrowserUI::MoveUpEvent(void)
 {
-    if (m_currentindex == 0)
-        return;
+    uint32 count = ListView_GetSelectedCount(m_hPlaylistView);
+    uint32 found = 0;
+    uint32 index = 0;
 
-    m_bListChanged = true;
-    m_oPlm->SwapItems(m_currentindex, m_currentindex - 1);
-    m_currentindex--;
-    UpdatePlaylistList();
+    while(found < count)
+    {
+        uint32 state = ListView_GetItemState(m_hPlaylistView, 
+                                             index, 
+                                             LVIS_SELECTED);
+
+        if(state & LVIS_SELECTED)
+        {
+            found++;
+
+            if(index == 0)
+                break;
+
+            m_oPlm->MoveItem(index, index - 1);
+        }
+
+        index++;
+    }    
 }
 
 void MusicBrowserUI::MoveDownEvent(void)
 {
-    if (m_currentindex == m_oPlm->CountItems() - 1)
-        return;
+    uint32 count = ListView_GetSelectedCount(m_hPlaylistView);
+    uint32 found = 0;
+    uint32 index = ListView_GetItemCount(m_hPlaylistView) - 1;;
 
-    m_bListChanged = true;
-    m_oPlm->SwapItems(m_currentindex, m_currentindex + 1);
-    m_currentindex++;
-    UpdatePlaylistList();
+    while(found < count)
+    {
+        uint32 state = ListView_GetItemState(m_hPlaylistView, 
+                                             index, 
+                                             LVIS_SELECTED);
+
+        if(state & LVIS_SELECTED)
+        {
+            found++;
+
+            if(index == m_oPlm->CountItems() - 1)
+                break;
+
+            m_oPlm->MoveItem(index, index + 1);
+        }
+
+        index--;
+    }    
 }
 
 void MusicBrowserUI::MoveItemEvent(int source, int dest)

@@ -222,6 +222,18 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
             break; 
         }
 
+        case INFO_PlaylistItemMoved:
+        {
+            PlaylistItemMovedEvent* pime = (PlaylistItemMovedEvent*)event;
+            vector<MusicBrowserUI *>::iterator i;
+            
+            for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
+               (*i)->PlaylistListItemMoved(pime->Item(), pime->OldIndex(), pime->NewIndex());
+               
+            PlaylistListItemMoved(pime->Item(), pime->OldIndex(), pime->NewIndex());
+            break; 
+        }
+
         case INFO_PlaylistCurrentItemInfo:
         {
             ListView_RedrawItems(m_hPlaylistView, 
