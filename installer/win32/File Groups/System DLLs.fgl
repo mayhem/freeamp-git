@@ -1,4 +1,5 @@
 [TopDir]
+file0=c:\winnt\system32\msvcp50.dll
 
 [General]
 Type=FILELIST
