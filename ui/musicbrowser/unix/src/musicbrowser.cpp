@@ -21,6 +21,7 @@
     $Id$
 ____________________________________________________________________________*/
 
+#include <musicbrainz/bitzi/bitcollider.h>
 #include "musicbrowserui.h"
 #include "gtkmusicbrowser.h" 
 #include "gtkmessagedialog.h" 
@@ -182,6 +183,11 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
             delete dialog;
 
             break; }
+        case CMD_BitziLookup: {
+            BitziLookupEvent *ev = (BitziLookupEvent *)event;
+            BitziLookup(ev->URL());
+            break;
+        }
         default:
             break;
     }
@@ -240,4 +246,60 @@ void MusicBrowserUI::WizardClose(void)
 
     delete wiz;
     wiz = NULL;
+}
+
+void MusicBrowserUI::BitziLookup(const string &URL)
+{
+    Bitcollider           *bc;
+    BitcolliderSubmission *submission = NULL;
+    BrowserEnum            browser = eBrowserNetscape;
+    char                   error[255];
+    int                    ret;
+  
+    error[0] = 0;
+    bc = bitcollider_init(false);
+    if (!bc)
+        strcpy(error, "Cannot create bitcollider. ");
+    else
+    {
+        submission = create_submission(bc);
+        set_auto_submit(submission, true);
+        if (!submission)
+            strcpy(error, "Cannot create submission. ");
+        {
+            char path[_MAX_PATH];
+            uint32 length = sizeof(path);
+
+            URLToFilePath(URL.c_str(), path, &length);
+            ret = analyze_file(submission, path, false);
+            if (!ret)
+                strcpy(error, "Cannot analyze file. ");
+            else
+            {
+                if (!submit_submission(submission, NULL, browser))
+                    strcpy(error, "Submission failed. ");
+            }
+        }
+    }
+    
+    if (submission)
+       delete_submission(submission);
+
+    if (bc)
+       bitcollider_shutdown(bc);
+  
+    if (error[0] != 0)
+    {
+         GTKMessageDialog *dialog = new GTKMessageDialog();
+         string message = string(error);
+         char   *ptr;
+  
+         ptr = get_error(bc);
+         if (ptr)
+             message += string(ptr);
+  
+         gdk_threads_enter();
+         dialog->Show(message.c_str(), "Bitzi Lookup Error", kMessageOk); 
+         gdk_threads_leave();
+    }
 }

@@ -45,6 +45,7 @@ class infoeditorUI {
     void DoApplyInfoEdit();
     void CheckWidget(GtkWidget *widget);
     void MBClick(void);
+    void BitziLookupClick(void);
 
     bool changed;
  protected:

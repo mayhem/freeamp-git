@@ -222,6 +222,7 @@ class GTKMusicBrowser {
     GtkItemFactory *favPopup;
     GtkItemFactory *cdPopup;
     GtkItemFactory *trackPopup;
+    GtkItemFactory *artistalbumPopup;
     GtkItemFactory *playlistCatPopup;
     GtkItemFactory *otherPopup;
     GtkItemFactory *relatablePopup;
@@ -379,6 +380,7 @@ class GTKMusicBrowser {
     void HandleSignature(void);
 
     void TipArtist(PlaylistItem *tipee = NULL);
+    void BitziLookup(PlaylistItem *tipee = NULL);
 };
 
 #endif

@@ -1049,4 +1049,15 @@ class CDNotFoundEvent:public Event
    const string &URL() const{ return m_submitUrl; }
 };
 
+class BitziLookupEvent:public Event
+{
+ private:
+   string m_lookupURL;
+ public:
+   BitziLookupEvent(const string &url)
+   { m_type = CMD_BitziLookup; m_lookupURL = url; }
+   virtual ~ BitziLookupEvent(){ }
+   const string &URL() const{ return m_lookupURL; }
+};
+
 #endif /* _EVENTDATA_H_ */

@@ -1027,6 +1027,11 @@ static void tip_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
     p->TipArtist();
 }
 
+static void bitzi_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+    p->BitziLookup();
+}
+
 void GTKMusicBrowser::PlaylistRightClick(int x, int y, uint32 time)
 {
     if (m_lastindex == kInvalidIndex)
@@ -1084,6 +1089,7 @@ void GTKMusicBrowser::CreatePlaylistList(GtkWidget *box)
      {"/sep2",         NULL,      0,                        0, "<Separator>" },
      {"/Edit Info",    NULL,      (GtkItemFactoryCallback)edit_pop,      0, 0 },
      {"/sep3",         NULL,      0,                        0, "<Separator>" },
+     {"/Lookup at Bitzi", NULL,   (GtkItemFactoryCallback)bitzi_pop,       0, 0 },
      {"/Tip This Artist", NULL,   (GtkItemFactoryCallback)tip_pop,       0, 0 }
     };
  

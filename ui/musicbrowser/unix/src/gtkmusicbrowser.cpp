@@ -1501,6 +1501,37 @@ void GTKMusicBrowser::TipArtist(PlaylistItem *tipee)
    LaunchBrowser(url.c_str());
 }
 
+void GTKMusicBrowser::BitziLookup(PlaylistItem *lookupArg)
+{
+    PlaylistItem *lookup = NULL;
+    if (lookupArg)
+    {
+        m_context->target->AcceptEvent(new BitziLookupEvent(lookupArg->URL()));
+        return;
+    }
+
+    if (GetClickState() == kContextPlaylist) 
+    {
+        if (m_lastindex == kInvalidIndex)
+            return;
+   
+        lookup = m_plm->ItemAt(*(m_plSelected.begin()));
+    }
+    else if (GetClickState() == kContextBrowser) 
+    {
+        vector<TreeData *>::iterator i = mbSelections->begin();
+        switch ((*i)->type) {
+            case kTreeTrack: {
+                lookup = (*i)->track;
+                break; }
+            default:
+                break;
+        }
+    }
+    if (lookup)
+        m_context->target->AcceptEvent(new BitziLookupEvent(lookup->URL()));
+}
+
 void GTKMusicBrowser::PopUpInfoEditor(PlaylistItem *editee)
 {
     if (editee) {

@@ -1517,9 +1517,11 @@ void GTKMusicBrowser::TreeRightClick(int x, int y, uint32 time)
             itemfact = favPopup;
             break;
         case kTreeTrack:
-	case kTreeArtist:
-	case kTreeAlbum:
             itemfact = trackPopup;
+            break;
+        case kTreeArtist:
+        case kTreeAlbum:
+            itemfact = artistalbumPopup;
             break;
         case kTreePlaylist:
             itemfact = playlistCatPopup;
@@ -1599,11 +1601,17 @@ static void edit_info_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
     p->PopUpInfoEditor();
 }
 
+static void bitzi_lookup_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+    p->BitziLookup();
+}
+
 static void update_cd_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
     p->UpdateCD();
 }
 
+#define DB printf("%s:%d\n", __FILE__, __LINE__);
 void GTKMusicBrowser::CreateTreePopups(void)
 {
     GtkItemFactoryEntry relatable_items[] = {
@@ -1686,7 +1694,8 @@ void GTKMusicBrowser::CreateTreePopups(void)
      {"/sep1",         NULL,    0,                        0, "<Separator>" },
      {"/Remove",       NULL,    (GtkItemFactoryCallback)remove_pop,     0, 0 },
      {"/sep2",         NULL,    0,                        0, "<Separator>" },
-     {"/Edit Info", NULL,       (GtkItemFactoryCallback)edit_info_pop,0, 0 }
+     {"/Edit Info", NULL,       (GtkItemFactoryCallback)edit_info_pop,0, 0 },
+     {"/Lookup at Bitzi", NULL, (GtkItemFactoryCallback)bitzi_lookup_pop,0, 0 }
     };
     int ntrack_items = sizeof(track_items) / sizeof(track_items[0]);
 
@@ -1694,6 +1703,23 @@ void GTKMusicBrowser::CreateTreePopups(void)
                                             NULL);
     gtk_item_factory_create_items(trackPopup, ntrack_items, track_items, 
                                   (void*)this);
+
+    GtkItemFactoryEntry artistalbum_items[] = {
+     {"/Add to Playlist",NULL,  (GtkItemFactoryCallback)add_pop,  0, 0 },
+     {"/Add and Play Now",NULL, (GtkItemFactoryCallback)add_play_pop,   0, 0 },
+     {"/sep1",         NULL,    0,                        0, "<Separator>" },
+     {"/Remove",       NULL,    (GtkItemFactoryCallback)remove_pop,     0, 0 },
+     {"/sep2",         NULL,    0,                        0, "<Separator>" },
+     {"/Edit Info", NULL,       (GtkItemFactoryCallback)edit_info_pop,0, 0 }
+    };
+    int nartistalbum_items = sizeof(artistalbum_items) / 
+                             sizeof(artistalbum_items[0]);
+
+    artistalbumPopup = gtk_item_factory_new(GTK_TYPE_MENU, 
+                                            "<artistalbum_popup>", 
+                                            NULL);
+    gtk_item_factory_create_items(artistalbumPopup, nartistalbum_items, 
+                                  artistalbum_items, (void*)this);
 
     GtkItemFactoryEntry other_items[] = {
      {"/Add to Playlist",NULL,  (GtkItemFactoryCallback)add_pop,  0, 0 },

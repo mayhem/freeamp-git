@@ -525,6 +525,11 @@ static void relatable_web(GTKMusicBrowser *p, guint action, GtkWidget *w)
     LaunchBrowser("http://www.relatable.com/");
 }
 
+static void bitzi_web(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+    LaunchBrowser("http://bitzi.com/");
+}
+
 static void show_about(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
     p->ShowOptions(9);
@@ -573,6 +578,11 @@ static void genslplaylistnomax(GTKMusicBrowser *p, guint action, GtkWidget *w)
 static void profile_edit(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
     p->ShowOptions(7);
+}
+
+static void bitzi_lookup(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+    p->BitziLookup();
 }
 
 void GTKMusicBrowser::CreateMenu(GtkWidget *topbox)
@@ -645,12 +655,16 @@ void GTKMusicBrowser::CreateMenu(GtkWidget *topbox)
      {"/_Relatable/sep2",      NULL,            0,          0, "<Separator>" }, 
      {"/_Relatable/_Edit Profile", NULL,     (GtkItemFactoryCallback)profile_edit, 0, 0 },
 
+     {"/_Bitzi",           NULL,            0,          0, "<Branch>" },
+     {"/_Bitzi/_Lookup track at Bitzi", NULL,      (GtkItemFactoryCallback)bitzi_lookup, 0, 0 },
+
      {"/_Help",                 NULL,           0,          0, "<Branch>" },
      {"/_Help/_Contents",        NULL,           (GtkItemFactoryCallback)show_help,  0, 0 },
      {"/_Help/sep9",            NULL,           0,          0, "<Separator>" },
      {"/_Help/_FreeAmp Web Site", NULL,         (GtkItemFactoryCallback)freeamp_web, 0, 0 },
      {"/_Help/_EMusic.com Web Site", NULL,       (GtkItemFactoryCallback)emusic_web, 0, 0 },
      {"/_Help/_Relatable Web Site", NULL,        (GtkItemFactoryCallback)relatable_web, 0, 0 },
+     {"/_Help/_Bitzi Web Site", NULL,        (GtkItemFactoryCallback)bitzi_web, 0, 0 },
      {"/_Help/sep10",           NULL,           0,          0, "<Separator>" },
      {"/_Help/_About",           NULL,           (GtkItemFactoryCallback)show_about, 0, 0 }
     };

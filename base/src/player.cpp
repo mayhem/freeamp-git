@@ -2512,6 +2512,7 @@ ServiceEvent(Event * pC)
         case CMD_GeneratePlaylist:
         case INFO_CDNotFound:
         case INFO_DatabaseUpgraded:
+        case CMD_BitziLookup:
             SendEventToUI(pC);
             delete pC;
             break;

@@ -26,6 +26,7 @@ ____________________________________________________________________________*/
 #include <set>
 using namespace std;
 
+#include "eventdata.h"
 #include "utility.h"
 #include "infoeditor.h"
 #include "metadata.h"
@@ -186,10 +187,21 @@ void infoeditorUI::MBClick(void)
        LaunchBrowser((char *)url.c_str());
     }
 }
+
+void infoeditorUI::BitziLookupClick(void)
+{
+   m_context->target->AcceptEvent(new 
+                 BitziLookupEvent((*(m_itemlist->begin()))->URL()));
+}
        
 void mb_button_click(GtkWidget *w, infoeditorUI *p)
 {
    p->MBClick();
+}
+
+void bitzi_button_click(GtkWidget *w, infoeditorUI *p)
+{
+   p->BitziLookupClick();
 }
 
 void infoeditorUI::CheckWidget(GtkWidget *widget)
@@ -267,11 +279,24 @@ void infoeditorUI::DisplayInfo(void)
    gtk_widget_show(label);
 
    if (m_listsize == 1) {
-       GtkWidget *mb_button = gtk_button_new_with_label("Look up track on MusicBrainz");
-       gtk_box_pack_start(GTK_BOX(vbox), mb_button, FALSE, FALSE, 5);
+       GtkWidget *box;
+
+       box = gtk_hbox_new(FALSE, 10);
+       gtk_container_set_border_width(GTK_CONTAINER(box), 5);
+       gtk_container_add(GTK_CONTAINER(vbox), box);
+       gtk_widget_show(box);
+
+       GtkWidget *mb_button = gtk_button_new_with_label("Look up track at MusicBrainz");
+       gtk_box_pack_start(GTK_BOX(box), mb_button, TRUE, TRUE, 5);
        gtk_signal_connect(GTK_OBJECT(mb_button), "clicked",
                           GTK_SIGNAL_FUNC(mb_button_click), this);
        gtk_widget_show(mb_button);
+
+       GtkWidget *bitzi_button = gtk_button_new_with_label("Look up track at Bitzi");
+       gtk_box_pack_end(GTK_BOX(box), bitzi_button, TRUE, TRUE, 15);
+       gtk_signal_connect(GTK_OBJECT(bitzi_button), "clicked",
+                          GTK_SIGNAL_FUNC(bitzi_button_click), this);
+       gtk_widget_show(bitzi_button);
    }
 
    table = gtk_table_new(6, 5, FALSE);

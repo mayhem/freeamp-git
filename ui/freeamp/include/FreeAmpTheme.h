@@ -125,7 +125,8 @@ class FreeAmpTheme : public UserInterface, public Theme
         bool             m_bShowBuffers, m_bBufferingUp;
         string           m_oCurrentWindow, m_oTitle, m_oStreamInfo;
         string           m_oHeadlineUrl, m_oArtist, m_oAlbum, m_oTrackNo;
-	string           m_oYear, m_oTrackName, m_oGenre, m_oComment;
+        string           m_oYear, m_oTrackName, m_oGenre, m_oComment;
+        string           m_oFileName;
         TimeDisplayState      m_eTimeDisplayState;
         TitleDisplayState     m_eTitleDisplayState;
         string                m_themeCache;

@@ -159,5 +159,6 @@ class EventQueue {
 #define CMD_KillSigThread            92 // sent by MC to player to kill signaturing thread
 #define INFO_CDNotFound              93 // sent by mbcd plugin to musicbrowser 
 #define INFO_DatabaseUpgraded        94 // sent by the MB to UIs when it wipes the database.
+#define CMD_BitziLookup              95 // sent by various UIs to get the mb to do a bitzi lookup on a file
 #endif // _EVENT_H_
 

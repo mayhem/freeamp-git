@@ -493,9 +493,6 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
          m_pWindow->ControlEnable(oName, true, bSet);
 
          m_pContext->target->AcceptEvent(new Event(CMD_GetVolume));
-
-         bSet = true;
-
          break;
       }
  
@@ -1197,7 +1194,21 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
    }
    if (oControlName == string("Download") && eMesg == CM_Pressed)
    {
-       m_pContext->target->AcceptEvent(new Event(CMD_ToggleDownloadUI));
+       if (m_oFileName.length() == 0)
+          return kError_NoErr;
+
+       //m_pContext->target->AcceptEvent(new Event(CMD_ToggleDownloadUI));
+       m_pContext->target->AcceptEvent(new 
+                   BitziLookupEvent(m_oFileName));
+       return kError_NoErr;
+   }
+   if (oControlName == string("BitziLookup") && eMesg == CM_Pressed)
+   {
+       if (m_oFileName.length() == 0)
+          return kError_NoErr;
+           
+       m_pContext->target->AcceptEvent(new 
+                   BitziLookupEvent(m_oFileName));
        return kError_NoErr;
    }
    if (oControlName == string("Options") && eMesg == CM_Pressed)
@@ -1550,6 +1561,9 @@ void FreeAmpTheme::InitControls(void)
        iState = 1;
 
 	 m_pWindow->ControlIntValue(string("SigIndicator"), true, iState);
+
+    bEnable = m_oFileName.length() > 0;
+    m_pWindow->ControlEnable(string("BitziLookup"), true, bEnable);
 
     m_eq->InitControls(m_pWindow);
 }
@@ -1921,6 +1935,8 @@ void FreeAmpTheme::UpdateTimeDisplay(int iCurrentSeconds)
 
 void FreeAmpTheme::UpdateMetaData(const PlaylistItem *pItem)
 {
+    bool bEnable;
+
     if (pItem->GetMetaData().Title().length() > 0 || 
         pItem->GetMetaData().Artist().length() > 0 ||
         pItem->GetMetaData().Album().length() > 0)
@@ -1931,12 +1947,12 @@ void FreeAmpTheme::UpdateMetaData(const PlaylistItem *pItem)
         if (pItem->GetMetaData().Artist().length() > 0 && 
             (m_eTitleDisplayState == kNameArtist ||
              m_eTitleDisplayState == kNameArtistAlbum))
-           m_oTitle += string(" ~ ") + pItem->GetMetaData().Artist();
+           m_oTitle += string(" - ") + pItem->GetMetaData().Artist();
 
         if (pItem->GetMetaData().Album().length() > 0 && 
              m_eTitleDisplayState == kNameArtistAlbum)
-           m_oTitle += string(" ~ ") + pItem->GetMetaData().Album() + 
-                       string(" ~ ");;
+           m_oTitle += string(" - ") + pItem->GetMetaData().Album() + 
+                       string(" - ");;
 
         oText = string(BRANDING": ") + m_oTitle;
         m_pWindow->SetTitle(oText);
@@ -1997,7 +2013,20 @@ void FreeAmpTheme::UpdateMetaData(const PlaylistItem *pItem)
     else
         m_oComment = "";
 
-    
+    if (strncmp(pItem->URL().c_str(), "http://", 7) == 0 ||
+        strncmp(pItem->URL().c_str(), "rtp://", 7) == 0)
+    {
+        bEnable = false;
+        m_oFileName.erase();
+    }
+    else
+    {
+        bEnable = true;
+        m_oFileName = pItem->URL();
+    }
+    //m_pWindow->ControlEnable(string("BitziLookup"), true, bEnable);
+    m_pWindow->ControlEnable(string("Download"), true, bEnable);
+
     m_pWindow->ControlStringValue(string("Title"), true, m_oTitle);
     m_pWindow->ControlStringValue(string("TrackName"), true, m_oTrackName);
     m_pWindow->ControlStringValue(string("TrackNo"), true, m_oTrackNo);

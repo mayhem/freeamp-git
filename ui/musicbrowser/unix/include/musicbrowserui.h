@@ -53,6 +53,7 @@ class MusicBrowserUI : public UserInterface {
   
     void SearchClose(void);
     void WizardClose(void);
+    void BitziLookup(const string &URL);
 
  protected:
     FAContext *m_context;
