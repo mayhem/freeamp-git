@@ -26,7 +26,7 @@ ____________________________________________________________________________*/
 #include <iostream.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
-#include <sys/soundcard.h>
+//#include <sys/soundcard.h>
 #include <errno.h>
 #include <string.h>
 #include <time.h>

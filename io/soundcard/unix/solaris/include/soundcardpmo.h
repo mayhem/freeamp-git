@@ -33,8 +33,7 @@ ____________________________________________________________________________*/
 #include "pmo.h"
 #include "pmoevent.h"
 #include "eventbuffer.h"
-#include "facontext.h"
-#include "preferences.h"
+#include "solarisvolume.h"
 
 #define BIT_SELECT  0x1f
 #define SLEEPTIME   256
@@ -51,43 +50,29 @@ enum
    pmoError_IOCTL_SNDCTL_DSP_SAMPLESIZE,
    pmoError_IOCTL_SNDCTL_DSP_STEREO,
    pmoError_IOCTL_SNDCTL_DSP_SPEED,
-   pmoError_IOCTL_AUDIO_GETINFO,
-   pmoError_IOCTL_AUDIO_SETINFO,
-   pmoError_IOCTL_AUDIO_DRAIN,
    pmoError_MaximumError
 };
 
-class SoundCardPMO:public PhysicalMediaOutput, public EventBuffer
+class FAContext;
+
+class SoundCardPMO:public PhysicalMediaOutput
 {
-   public:
+ public:
 
             SoundCardPMO(FAContext *context);
    virtual ~SoundCardPMO();
 
    virtual Error Init(OutputInfo * info);
-   virtual Error Pause();
-   virtual Error Resume();
-   virtual Error Break();
-   virtual void  WaitToQuit();
-   virtual Error Clear();
-   virtual Error SetPropManager(Properties * p);
    virtual VolumeManager *GetVolumeManager();
 
    static void   StartWorkerThread(void *);
-   virtual Error BeginWrite(void *&pBuffer, size_t &iBytesToWrite);
-   virtual Error EndWrite  (size_t iNumBytesWritten);
-   virtual Error AcceptEvent(Event *);
-   virtual int   GetBufferPercentage();
 
-   private:
-
+ private:
    void          WorkerThread(void); 
    virtual Error Reset(bool user_stop);
    void          HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent);
+   bool          WaitForDrain(void);
 
-   FAContext    *m_context;
-   Preferences  *m_prefs;
-   Properties  *m_propManager;
    bool         m_properlyInitialized;
    int16        buffer[OBUFFERSIZE];
    int16       *bufferp[MAXCHANNELS];
@@ -96,9 +81,10 @@ class SoundCardPMO:public PhysicalMediaOutput, public EventBuffer
    OutputInfo  *myInfo;
    int32        getprocessed(void);
    Thread      *m_pBufferThread;
-   Mutex       *m_pPauseMutex;
-   int          m_iOutputBufferSize, m_iTotalBytesWritten, m_iBytesPerSample;
-   int          m_iLastFrame, m_iDataSize;
+   int          m_iOutputBufferSize, m_iBytesPerSample, m_iTotalFragments;
+   long long    m_iTotalBytesWritten;
+   int          m_iLastFrame;
+   unsigned     m_iDataSize;
 };
 
 #endif /* _SOUNDCARDPMO_H_ */
