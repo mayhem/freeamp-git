@@ -1401,6 +1401,9 @@ void GTKMusicBrowser::AddTracksPlaylistEvent(vector<PlaylistItem *> *newlist,
                                              bool end, bool forcePlay, 
                                              bool forceNoPlay)
 {
+    if (!newlist || newlist->size() == 0)
+        return;
+
     bool play = false;
     int playPos = 0;
 
