@@ -382,8 +382,9 @@ GTKFont::~GTKFont(void)
     }
 #ifdef HAVE_FREETYPE
     else {
-        if (ttfont)
+        if (ttfont) {
             Efont_free(ttfont);
+         }
     }
 #endif
     gdk_threads_leave();

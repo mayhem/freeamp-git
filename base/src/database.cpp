@@ -26,6 +26,7 @@ ____________________________________________________________________________*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <string.h>
 
 #include "gdbm_fa.h"
 #include "errors.h"

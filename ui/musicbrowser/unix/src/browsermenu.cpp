@@ -109,30 +109,39 @@ static void import_tool(GtkWidget *w, GTKMusicBrowser *p)
     if (filesel->Run()) {
         FAContext *m_context = p->GetContext();
         char *returnpath = filesel->GetReturnPath();
-        char *ext = m_context->player->GetExtension(returnpath);
-        uint32 length = strlen(returnpath) + 10;
-        char *tempurl = new char[length];
+        char *filereturn = strdup_new(returnpath);
+        if (filereturn)
+        {
+            char *first = strtok(filereturn, "\n");
+            while (first) {
+                char *ext = m_context->player->GetExtension(first);
+                uint32 length = strlen(first) + 10;
+                char *tempurl = new char[length];
 
-        if (IsntError(FilePathToURL(returnpath, tempurl, &length))) {
-            if (ext && m_context->plm->IsSupportedPlaylistFormat(ext))
-                p->ImportPlaylist(tempurl);
-            else if (ext && m_context->player->IsSupportedExtension(ext)) {
-                PlaylistItem *plist = new PlaylistItem(tempurl);
-                m_context->plm->RetrieveMetaData(plist);
+                if (IsntError(FilePathToURL(first, tempurl, &length))) 
+                {
+                    if (ext && m_context->plm->IsSupportedPlaylistFormat(ext))
+                        p->ImportPlaylist(tempurl);
+                    else if (ext && 
+                             m_context->player->IsSupportedExtension(ext)) 
+                    {
+                        PlaylistItem *plist = new PlaylistItem(tempurl);
+                        m_context->plm->RetrieveMetaDataNow(plist);
 
-                while (plist->GetState() != kPlaylistItemState_Normal)
-                    usleep(5);
-
-                m_context->catalog->WriteMetaDataToDatabase(tempurl,
+                        m_context->catalog->WriteMetaDataToDatabase(tempurl,
                                                           plist->GetMetaData());
+                        m_context->catalog->AddSong(tempurl);
 
-                m_context->catalog->AddSong(tempurl);
+                        delete plist;
+                    }
+                }
+                delete [] tempurl;
+                delete ext;
 
-                delete plist;
+                first = strtok(NULL, "\n");
             }
+            delete [] filereturn;
         }
-        delete [] tempurl;
-        delete ext;
     }
     delete filesel;
 }
@@ -570,81 +579,81 @@ void GTKMusicBrowser::CreateMenu(GtkWidget *topbox)
 {
     GtkItemFactoryEntry menu_items[] = {
      {"/_File",                 NULL,           0,         0, "<Branch>" },
-     {"/File/_New Playlist",    "<control>N",   (void(*)(...))new_plist, 0, 0 },
-     {"/File/_Open Playlist",   "<control>O",   (void(*)(...))open_list, 0, 0 },
-     {"/File/_Save Playlist",   "<control>S",   (void(*)(...))save_list, 0, 0 },
-     {"/File/Save Playlist _As","<control>A",   (void(*)(...))saveas_list,0, 0 },
+     {"/File/_New Playlist",    "<control>N",   (GtkItemFactoryCallback)new_plist, 0, 0 },
+     {"/File/_Open Playlist",   "<control>O",   (GtkItemFactoryCallback)open_list, 0, 0 },
+     {"/File/_Save Playlist",   "<control>S",   (GtkItemFactoryCallback)save_list, 0, 0 },
+     {"/File/Save Playlist _As","<control>A",   (GtkItemFactoryCallback)saveas_list,0, 0 },
      {"/File/sep1",             NULL,           0,         0, "<Separator>" },
-     {"/File/_Import Tracks and Playlists","<control>I", (void(*)(...))import_list, 0, 0 },
-     {"/File/_Export Playlist", NULL,           (void(*)(...))export_list, 0, 0 },
+     {"/File/_Import Tracks and Playlists","<control>I", (GtkItemFactoryCallback)import_list, 0, 0 },
+     {"/File/_Export Playlist", NULL,           (GtkItemFactoryCallback)export_list, 0, 0 },
      {"/File/sep0",             NULL,           0,         0, "<Separator>" },
-     {"/File/Create New Audio CD", NULL,        (void(*)(...))create_cd, 0, 0 },
-     {"/File/Search Computer for Music", NULL, (void(*)(...))music_search, 0, 0 },
+     {"/File/Create New Audio CD", NULL,        (GtkItemFactoryCallback)create_cd, 0, 0 },
+     {"/File/Search Computer for Music", NULL, (GtkItemFactoryCallback)music_search, 0, 0 },
      {"/File/sep2",             NULL,           0,         0, "<Separator>" },
-     {"/File/_Close",           "<control>Q",   (void(*)(...))quit_menu, 0, 0 },
+     {"/File/_Close",           "<control>Q",   (GtkItemFactoryCallback)quit_menu, 0, 0 },
 
      {"/_Edit",                 NULL,           0,         0, "<Branch>" },
-     {"/_Edit/_Add Items to Playlist", NULL,   (void(*)(...))add_track_mb, 0, 0 },
-     {"/_Edit/Add _Tracks or Playlists from Disk", NULL,  (void(*)(...))add_track, 0, 0 },
-     {"/_Edit/_Remove Items from My Music", NULL,(void(*)(...))delete_sel,0, 0 },
-     {"/_Edit/Add Stream to Favorites", NULL,   (void(*)(...))add_stream, 0, 0 },
+     {"/_Edit/_Add Items to Playlist", NULL,   (GtkItemFactoryCallback)add_track_mb, 0, 0 },
+     {"/_Edit/Add _Tracks or Playlists from Disk", NULL,  (GtkItemFactoryCallback)add_track, 0, 0 },
+     {"/_Edit/_Remove Items from My Music", NULL,(GtkItemFactoryCallback)delete_sel,0, 0 },
+     {"/_Edit/Add Stream to Favorites", NULL,   (GtkItemFactoryCallback)add_stream, 0, 0 },
      {"/_Edit/sep3",            NULL,           0,         0, "<Separator>" },
-     {"/_Edit/Move _Up",         NULL,           (void(*)(...))move_up,   0, 0 },
-     {"/_Edit/Move _Down",       NULL,           (void(*)(...))move_down, 0, 0 },
+     {"/_Edit/Move _Up",         NULL,           (GtkItemFactoryCallback)move_up,   0, 0 },
+     {"/_Edit/Move _Down",       NULL,           (GtkItemFactoryCallback)move_down, 0, 0 },
      {"/_Edit/sep4",            NULL,           0,         0, "<Separator>" },
-     {"/_Edit/_Clear Playlist",  NULL,           (void(*)(...))clear_list, 0, 0 },
-     {"/_Edit/Edit _Info",       NULL,           (void(*)(...))infoedit,  0, 0 },
+     {"/_Edit/_Clear Playlist",  NULL,           (GtkItemFactoryCallback)clear_list, 0, 0 },
+     {"/_Edit/Edit _Info",       NULL,           (GtkItemFactoryCallback)infoedit,  0, 0 },
 
      {"/_View",                 NULL,           0,         0, "<Branch>" },
-     {"/_View/View _Playlist Only",NULL,        (void(*)(...))catalog_tog, 0, 0 },
-     {"/_View/_Options",         NULL,         (void(*)(...))options_show, 0, 0 },
+     {"/_View/View _Playlist Only",NULL,        (GtkItemFactoryCallback)catalog_tog, 0, 0 },
+     {"/_View/_Options",         NULL,         (GtkItemFactoryCallback)options_show, 0, 0 },
 
      {"/_Controls",             NULL,           0,         0, "<Branch>" },
-     {"/_Controls/_Play",        NULL,           (void(*)(...))play_menu,0, 0 },
-     {"/_Controls/_Stop",        NULL,           (void(*)(...))stop_menu, 0, 0 },
+     {"/_Controls/_Play",        NULL,           (GtkItemFactoryCallback)play_menu,0, 0 },
+     {"/_Controls/_Stop",        NULL,           (GtkItemFactoryCallback)stop_menu, 0, 0 },
      {"/_Controls/sep6",        NULL,           0,         0, "<Separator>" },
-     {"/_Controls/_Eject CD",    NULL,           (void(*)(...))eject_cd, 0, 0 },
+     {"/_Controls/_Eject CD",    NULL,           (GtkItemFactoryCallback)eject_cd, 0, 0 },
      {"/_Controls/sep65",       NULL,           0,         0, "<Separator>" },
-     {"/_Controls/_Next Track",   NULL,          (void(*)(...))next_menu, 0, 0 },
-     {"/_Controls/Pre_vious Track", NULL,        (void(*)(...))prev_menu, 0, 0 },
+     {"/_Controls/_Next Track",   NULL,          (GtkItemFactoryCallback)next_menu, 0, 0 },
+     {"/_Controls/Pre_vious Track", NULL,        (GtkItemFactoryCallback)prev_menu, 0, 0 },
      {"/_Controls/sep7",        NULL,           0,         0, "<Separator>" },
-     {"/_Controls/Play Tracks in Nor_mal Order", NULL, (void(*)(...))sort_normal, 0, "<RadioItem>" },
-     {"/_Controls/Play Tracks in _Random Order", NULL, (void(*)(...))sort_random2, 0, "/Controls/Play Tracks in Normal Order" },
+     {"/_Controls/Play Tracks in Nor_mal Order", NULL, (GtkItemFactoryCallback)sort_normal, 0, "<RadioItem>" },
+     {"/_Controls/Play Tracks in _Random Order", NULL, (GtkItemFactoryCallback)sort_random2, 0, "/Controls/Play Tracks in Normal Order" },
      {"/_Controls/sep8",        NULL,           0,         0, "<Separator>" },
-     {"/_Controls/Repeat N_o Tracks", NULL,      (void(*)(...))repeat_none, 0, "<RadioItem>" },
-     {"/_Controls/Repeat _Current Track",  NULL, (void(*)(...))repeat_one, 0, "/Controls/Repeat No Tracks" },
-     {"/_Controls/Repeat _All Tracks",  NULL,    (void(*)(...))repeat_all, 0, "/Controls/Repeat No Tracks" },
+     {"/_Controls/Repeat N_o Tracks", NULL,      (GtkItemFactoryCallback)repeat_none, 0, "<RadioItem>" },
+     {"/_Controls/Repeat _Current Track",  NULL, (GtkItemFactoryCallback)repeat_one, 0, "/Controls/Repeat No Tracks" },
+     {"/_Controls/Repeat _All Tracks",  NULL,    (GtkItemFactoryCallback)repeat_all, 0, "/Controls/Repeat No Tracks" },
 
      {"/_Sort Playlist",        NULL,           0,         0, "<Branch>" },
-     {"/_Sort Playlist/by _Artist",  NULL,      (void(*)(...))sort_artist, 0, 0 },
-     {"/_Sort Playlist/by A_lbum", NULL,         (void(*)(...))sort_album, 0, 0 },
-     {"/_Sort Playlist/by _Title", NULL,         (void(*)(...))sort_title, 0, 0 },
-     {"/_Sort Playlist/by _Year", NULL,          (void(*)(...))sort_year,  0, 0 },
-     {"/_Sort Playlist/by Trac_k Number", NULL,  (void(*)(...))sort_track, 0, 0 },
-     {"/_Sort Playlist/by _Genre", NULL,         (void(*)(...))sort_genre, 0, 0 },
-     {"/_Sort Playlist/by _Length", NULL,        (void(*)(...))sort_time,  0, 0 },
-     {"/_Sort Playlist/by L_ocation", NULL,   (void(*)(...))sort_location, 0, 0 },
-     {"/_Sort Playlist/by _Filename", NULL,   (void(*)(...))sort_filename, 0, 0 },
-     {"/_Sort Playlist/by _Comment", NULL,    (void(*)(...))sort_comment, 0, 0},
-     {"/_Sort Playlist/_Randomly", NULL,        (void(*)(...))sort_random, 0, 0 },
+     {"/_Sort Playlist/by _Artist",  NULL,      (GtkItemFactoryCallback)sort_artist, 0, 0 },
+     {"/_Sort Playlist/by A_lbum", NULL,         (GtkItemFactoryCallback)sort_album, 0, 0 },
+     {"/_Sort Playlist/by _Title", NULL,         (GtkItemFactoryCallback)sort_title, 0, 0 },
+     {"/_Sort Playlist/by _Year", NULL,          (GtkItemFactoryCallback)sort_year,  0, 0 },
+     {"/_Sort Playlist/by Trac_k Number", NULL,  (GtkItemFactoryCallback)sort_track, 0, 0 },
+     {"/_Sort Playlist/by _Genre", NULL,         (GtkItemFactoryCallback)sort_genre, 0, 0 },
+     {"/_Sort Playlist/by _Length", NULL,        (GtkItemFactoryCallback)sort_time,  0, 0 },
+     {"/_Sort Playlist/by L_ocation", NULL,   (GtkItemFactoryCallback)sort_location, 0, 0 },
+     {"/_Sort Playlist/by _Filename", NULL,   (GtkItemFactoryCallback)sort_filename, 0, 0 },
+     {"/_Sort Playlist/by _Comment", NULL,    (GtkItemFactoryCallback)sort_comment, 0, 0},
+     {"/_Sort Playlist/_Randomly", NULL,        (GtkItemFactoryCallback)sort_random, 0, 0 },
 
      {"/_Relatable",           NULL,            0,          0, "<Branch>" },
-     {"/_Relatable/_Recommend Playlist", NULL,  (void(*)(...))genplaylist, 0, 0 },
-     {"/_Relatable/SoundsLike Recommendation", NULL, (void(*)(...))genslplaylistnomax, 0, 0 },
-     {"/_Relatable/_Learn Playlist",  NULL,  (void(*)(...))submitplaylist, 0, 0 },
+     {"/_Relatable/_Recommend Playlist", NULL,  (GtkItemFactoryCallback)genplaylist, 0, 0 },
+     {"/_Relatable/SoundsLike Recommendation", NULL, (GtkItemFactoryCallback)genslplaylistnomax, 0, 0 },
+     {"/_Relatable/_Learn Playlist",  NULL,  (GtkItemFactoryCallback)submitplaylist, 0, 0 },
      {"/_Relatable/sep",       NULL,            0,          0, "<Separator>" },
-     {"/_Relatable/_Start Signaturing", NULL, (void(*)(...))signature_func, 0, 0 },
+     {"/_Relatable/_Start Signaturing", NULL, (GtkItemFactoryCallback)signature_func, 0, 0 },
      {"/_Relatable/sep2",      NULL,            0,          0, "<Separator>" }, 
-     {"/_Relatable/_Edit Profile", NULL,     (void(*)(...))profile_edit, 0, 0 },
+     {"/_Relatable/_Edit Profile", NULL,     (GtkItemFactoryCallback)profile_edit, 0, 0 },
 
      {"/_Help",                 NULL,           0,          0, "<Branch>" },
-     {"/_Help/_Contents",        NULL,           (void(*)(...))show_help,  0, 0 },
+     {"/_Help/_Contents",        NULL,           (GtkItemFactoryCallback)show_help,  0, 0 },
      {"/_Help/sep9",            NULL,           0,          0, "<Separator>" },
-     {"/_Help/_FreeAmp Web Site", NULL,         (void(*)(...))freeamp_web, 0, 0 },
-     {"/_Help/_EMusic.com Web Site", NULL,       (void(*)(...))emusic_web, 0, 0 },
-     {"/_Help/_Relatable Web Site", NULL,        (void(*)(...))relatable_web, 0, 0 },
+     {"/_Help/_FreeAmp Web Site", NULL,         (GtkItemFactoryCallback)freeamp_web, 0, 0 },
+     {"/_Help/_EMusic.com Web Site", NULL,       (GtkItemFactoryCallback)emusic_web, 0, 0 },
+     {"/_Help/_Relatable Web Site", NULL,        (GtkItemFactoryCallback)relatable_web, 0, 0 },
      {"/_Help/sep10",           NULL,           0,          0, "<Separator>" },
-     {"/_Help/_About",           NULL,           (void(*)(...))show_about, 0, 0 }
+     {"/_Help/_About",           NULL,           (GtkItemFactoryCallback)show_about, 0, 0 }
     };
 
     int nmenu_items = sizeof(menu_items) / sizeof(menu_items[0]);
