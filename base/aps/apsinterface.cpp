@@ -439,36 +439,145 @@ int APSInterface::LoadProfileMap(const char *pczFile)
     if (pczFile == NULL) 
         return APS_PARAMERROR;
 
+	FILE* pfIn = fopen(pczFile, "r");
+	if (pfIn == NULL) return APS_PARAMERROR;
+
     int nNumProfiles = 0;
-    fstream fTemp(pczFile, ios_base::in);
-    string strCurrentUser;
+    string strCurrentProfileName;
     string strCollectionID;
-    string strUserName;
-    string strFilename;
+	bool bIsOn = false;
+	int nBufLen = 2048;
+	int nStrLen = 0;
+	char* pBuffer = new char[nBufLen];
+	memset(pBuffer, 0x00, nBufLen);
+	
+	int nRes = fread(&nNumProfiles, sizeof(int), 1, pfIn);	// Number of profiles
+	if (nRes == 0)
+	{
+		delete [] pBuffer;
+		fclose(pfIn);
+		return APS_PARAMERROR;
+	}
+	
+	nRes = fread(&bIsOn, sizeof(bool), 1, pfIn); // is on flag
+	if (nRes == 0)
+	{
+		delete [] pBuffer;
+		fclose(pfIn);
+		return APS_PARAMERROR;
+	}
+	
+	nRes = fread(&nStrLen, sizeof(int), 1, pfIn); // len of current profile
+	if ((nRes == 0) && (nStrLen < nBufLen))
+	{
+		delete [] pBuffer;
+		fclose(pfIn);
+		return APS_PARAMERROR;
+	}
+	
+	nRes = fread(pBuffer, nStrLen, 1, pfIn); // current profile
+	if (nRes == 0)
+	{
+		delete [] pBuffer;
+		fclose(pfIn);
+		return APS_PARAMERROR;
+	}
+	
+	strCurrentProfileName = pBuffer;
+	memset(pBuffer, 0x00, nStrLen);
 
-    fTemp >> nNumProfiles >> strCurrentUser;
-    if (strCurrentUser == "1" || strCurrentUser == "0") {
-        m_bRelatableOn = atoi(strCurrentUser.c_str());
-        fTemp >> strCurrentUser;
-    }
+	nRes = fread(&nStrLen, sizeof(int), 1, pfIn); // len of collection ID
+	if ((nRes == 0) && (nStrLen < nBufLen))
+	{
+		delete [] pBuffer;
+		fclose(pfIn);
+		return APS_PARAMERROR;
+	}
+	
+	nRes = fread(pBuffer, nStrLen, 1, pfIn);  // collection id
+	if (nRes == 0)
+	{
+		delete [] pBuffer;
+		fclose(pfIn);
+		return APS_PARAMERROR;
+	}
 
-    fTemp >> strCollectionID;
+	strCollectionID = pBuffer;
+	memset(pBuffer, 0x00, nStrLen);
+
+	string* pProfNames = new string[nNumProfiles];
+	string* pProfGUID = new string[nNumProfiles];
+	
+	int i = 0;
+	for (i = 0; i < nNumProfiles; i++)
+	{
+		nRes = fread(&nStrLen, sizeof(int), 1, pfIn); // profile name len
+		if ((nRes == 0) && (nStrLen < nBufLen))
+		{
+			delete [] pProfNames;
+			delete [] pProfGUID;
+			delete [] pBuffer;
+			fclose(pfIn);
+			return APS_PARAMERROR;
+		}
+		
+		nRes = fread(pBuffer, nStrLen, 1, pfIn); // profile name
+		if (nRes == 0)
+		{
+			delete [] pProfNames;
+			delete [] pProfGUID;
+			delete [] pBuffer;
+			fclose(pfIn);
+			return APS_PARAMERROR;
+		}
+		
+		pProfNames[i] = pBuffer;
+		memset(pBuffer, 0x00, nStrLen);
+
+		nRes = fread(&nStrLen, sizeof(int), 1, pfIn); // GUID len
+		if ((nRes == 0) && (nStrLen < nBufLen))
+		{
+			delete [] pProfNames;
+			delete [] pProfGUID;
+			delete [] pBuffer;
+			fclose(pfIn);
+			return APS_PARAMERROR;
+		}
+		
+		nRes = fread(pBuffer, nStrLen, 1, pfIn); // GUID
+		if (nRes == 0)
+		{
+			delete [] pProfNames;
+			delete [] pProfGUID;
+			delete [] pBuffer;
+			fclose(pfIn);
+			return APS_PARAMERROR;
+		}
+		
+		pProfGUID[i] = pBuffer;
+		memset(pBuffer, 0x00, nStrLen);
+	}
+	
+	// having successfully read in the entire profile log file, apply it
 
     if (strCollectionID == "NULL")
         m_strCollectionID = "";
     else
         m_strCollectionID = strCollectionID;
 
-    for ( int i = 0; ((i < nNumProfiles) && !(fTemp.eof())); i++)
+	m_bRelatableOn = bIsOn;
+    for (i = 0; i < nNumProfiles; i++)
     {
-        fTemp >> strUserName;
-        fTemp >> strFilename;
-        if ((!strUserName.empty()) && (!strFilename.empty()))
-            (*m_pProfileMap)[strUserName] = strFilename;
+        if ((!pProfNames[i].empty()) && (!pProfGUID[i].empty()))
+            (*m_pProfileMap)[pProfNames[i]] = pProfGUID[i];
     }
+	
+	delete [] pProfNames;
+	delete [] pProfGUID;
+	delete [] pBuffer;
 
-    if (!strCurrentUser.empty())
-        return ChangeProfile(strCurrentUser.c_str());
+    if (!strCurrentProfileName.empty())
+        return ChangeProfile(strCurrentProfileName.c_str());
     else
         return -1;  // no active profile
 }
@@ -477,9 +586,13 @@ int APSInterface::WriteProfileMap(const char *pczFile)
 {
     if (pczFile == NULL) 
         return APS_PARAMERROR;
-    int nNumProfiles = m_pProfileMap->size();
 
-    fstream fTemp(pczFile, ios_base::out | ios_base::trunc);
+    int nNumProfiles = m_pProfileMap->size();
+	int nStrLen = 0;
+	FILE* pfOut = fopen(pczFile, "w+b");
+	
+	if (pfOut == NULL)
+		return APS_PARAMERROR;
 
     map<string, string>::iterator i;
     string strCurrentProfile = m_strCurrentProfile;
@@ -489,15 +602,85 @@ int APSInterface::WriteProfileMap(const char *pczFile)
     string strCollectionID = m_strCollectionID;
     if (strCollectionID.empty())
         strCollectionID = "NULL";
+	
+	// file format is : numprofiles, isenabled flag, current profile name len, current profile name, 
+	//	current collection id len, current collection id, 
+	// for each profile entry, name len, name, guid len, guid
+	int nRes = fwrite(&nNumProfiles, sizeof(int), 1, pfOut);
+	if (nRes == 0) 
+	{
+		fclose(pfOut);
+		return APS_PARAMERROR;
+	}
+	
+	nRes = fwrite(&m_bRelatableOn, sizeof(bool), 1, pfOut);
+	if (nRes == 0) 
+	{
+		fclose(pfOut);
+		return APS_PARAMERROR;
+	}
 
-    fTemp << nNumProfiles << " " << m_bRelatableOn << endl;
-    fTemp << strCurrentProfile << endl; // to store current profile name
-    fTemp << m_strCollectionID << endl; // to store music collection id
+	nStrLen = strCurrentProfile.size();
+	nRes = fwrite(&nStrLen, sizeof(int), 1, pfOut);
+	if (nRes == 0) 
+	{
+		fclose(pfOut);
+		return APS_PARAMERROR;
+	}
+	
+	nRes = fwrite(strCurrentProfile.c_str(), nStrLen, 1, pfOut);
+	if (nRes == 0) 
+	{
+		fclose(pfOut);
+		return APS_PARAMERROR;
+	}
+	
+	nStrLen = strCollectionID.size();
+	nRes = fwrite(&nStrLen, sizeof(int), 1, pfOut);
+	if (nRes == 0) 
+	{
+		fclose(pfOut);
+		return APS_PARAMERROR;
+	}
 
+	nRes = fwrite(strCollectionID.c_str(), nStrLen, 1, pfOut);
+	if (nRes == 0) 
+	{
+		fclose(pfOut);
+		return APS_PARAMERROR;
+	}
+	
     for (i = m_pProfileMap->begin(); i != m_pProfileMap->end(); i++)
     {
-        fTemp << (*i).first << " ";   // store the list of known profiles
-        fTemp << (*i).second << endl; // and their GUIDs
+		nStrLen = (*i).first.size();
+		nRes = fwrite(&nStrLen, sizeof(int), 1, pfOut);
+		if (nRes == 0) 
+		{
+			fclose(pfOut);
+			return APS_PARAMERROR;
+		}
+
+		nRes = fwrite((*i).first.c_str(), nStrLen, 1, pfOut);
+		if (nRes == 0) 
+		{
+			fclose(pfOut);
+			return APS_PARAMERROR;
+		}
+		
+		nStrLen = (*i).second.size();
+		nRes = fwrite(&nStrLen, sizeof(int), 1, pfOut);
+		if (nRes == 0) 
+		{
+			fclose(pfOut);
+			return APS_PARAMERROR;
+		}
+		
+		nRes = fwrite((*i).second.c_str(), nStrLen, 1, pfOut);
+		if (nRes == 0) 
+		{
+			fclose(pfOut);
+			return APS_PARAMERROR;
+		}
     }
 
     return APS_NOERROR;
