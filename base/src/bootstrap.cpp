@@ -32,25 +32,14 @@ ____________________________________________________________________________*/
 #include "hashtable.h"
 #include "semaphore.h"
 #include "dummycoo.h"
+#include "registrar.h"
 
-#ifdef WIN32
-#include "consoleCIO.h"
-#include "consoleCOO.h"
-#define DEFAULT_PROG_NAME "freeamp_console.exe"
-#define DEFAULT_PROG_NAME_LENGTH 19
-#define DEFAULT_CIO ConsoleCIO()
-#define DEFAULT_COO ConsoleCOO()
 
-#else
-
-#include "CommandLineCIO.h"
-#include "CommandLineCOO.h"
 #include "Mpg123UI.h"
 #define DEFAULT_PROG_NAME "freeamp"
 #define DEFAULT_PROG_NAME_LENGTH 7
 #define DEFAULT_CIO CommandLineCIO()
 #define DEFAULT_COO CommandLineCOO()
-#endif
 
 void testVector();
 void testBuffer();
@@ -61,20 +50,46 @@ int main(int argc, char **argv) {
     //testBuffer();
     //testHashTable();
 
+    Registrar *registrar= new Registrar();
+    LMCRegistry *lmc;
+    PMIRegistry *pmi;
+    PMORegistry *pmo;
+    UIRegistry* ui;
+    
+    registrar->SetSubDir("lmc");
+    registrar->SetSearchString("*.lmc");
+    lmc = new LMCRegistry();
+    registrar->InitializeRegistry(lmc);
+
+    registrar->SetSubDir("io");
+    registrar->SetSearchString("*.pmi");
+    pmi = new PMIRegistry;
+    registrar->InitializeRegistry(pmi);
+
+    registrar->SetSearchString("*.pmo");
+    pmo = new PMORegistry;
+    registrar->InitializeRegistry(pmo);
+
+
+    registrar->SetSubDir("ui");
+    registrar->SetSearchString("*.ui");
+    ui = new UIRegistry;
+    registrar->InitializeRegistry(ui);
+
+    delete registrar;
+
+
     Semaphore *termSemaphore;
     termSemaphore = new Semaphore();
     Player *pP = Player::GetPlayer();
     //cout << "Got player..." << endl;
     DummyCOO *pDCOO = new DummyCOO(termSemaphore);
     //cout << "Created dcoo..." << endl;
-    pP->RegisterCOO(pDCOO);
+    pP->RegisterActiveUI(pDCOO);
     //cout << "Registered DummyCOO" << endl;
     //Event *pe = new Event(CMD_QuitPlayer);
     //Player::GetPlayer()->AcceptEvent(pe);
-#if 1
-    CIO *pCIO = NULL;
-    COO *pCOO = NULL;
-#ifdef __linux__
+#if 0
     int foo = strlen(argv[0]);
     int endOfArgv0 = ((int)(argv[0])) + foo;
     if (((int)(strstr(argv[0],DEFAULT_PROG_NAME)) + /*length of "freeamp" */ DEFAULT_PROG_NAME_LENGTH) == endOfArgv0) {
@@ -96,7 +111,6 @@ int main(int argc, char **argv) {
 	pP->RegisterCIO(pCIO);
 	pP->RegisterCOO(pCOO) ;
     }
-#else
 	cout << "Using FreeAmp interface..." << endl;
 	pCIO = new DEFAULT_CIO;
 	pP->RegisterCIO(pCIO);
@@ -104,13 +118,27 @@ int main(int argc, char **argv) {
 	pP->RegisterCOO(pCOO) ;
 #endif
 
-    if (!pCIO || !pCOO) {
-	cout << "Error initializing UI." << endl;
-	return 255;
+    pP->RegisterLMCs(lmc);
+    pP->RegisterPMIs(pmi);
+    pP->RegisterPMOs(pmo);
+    pP->RegisterUIs(ui);
+
+
+    RegistryItem *item = ui->GetItem(0);
+    if (item) {
+	UI *myui = new UI;
+	item->InitFunction()(myui);
+	myui->SetArgs(myui,argc,argv);
     }
-    pCIO->setArgs(argc,argv);
-    pCIO = NULL;  // is deleted by player now that it is Registered.
-    pCOO = NULL;
+
+
+//    if (!pCIO || !pCOO) {
+//	cout << "Error initializing UI." << endl;
+//	return 255;
+    //   }
+//    pCIO->setArgs(argc,argv);
+//    pCIO = NULL;  // is deleted by player now that it is Registered.
+//    pCOO = NULL;
     //cout << "Set the args..." << endl;
     //pP->testQueue();
 
@@ -124,8 +152,6 @@ int main(int argc, char **argv) {
 //    pP->acceptEvent(*pC);
 //    delete pC;
 //    cout << "main: stopping..." << endl;
-
-#endif
 
     termSemaphore->Wait();
 

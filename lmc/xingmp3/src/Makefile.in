@@ -78,7 +78,7 @@ target_os = @target_os@
 @AM_HAVE_WIN32_TRUE@MYLIBS = 
 @AM_HAVE_WIN32_TRUE@TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
 @AM_HAVE_WIN32_FALSE@FILES = cdct.c cupl3.c hwin.c iup.c l3init.c msis.c wavep.c csbt.c cwinm.c icdct.c mdct.c uph.c cup.c dec8.c isbt.c l3dq.c mhead.c \
-@AM_HAVE_WIN32_FALSE@        upsf.c iwinm.c xinglmc.cpp
+@AM_HAVE_WIN32_FALSE@        upsf.c iwinm.c xinglmc.cpp xinglib.cpp
 @AM_HAVE_WIN32_FALSE@MYLIBS = libfalmcxingmp3.a
 @AM_HAVE_WIN32_FALSE@TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
 
@@ -88,8 +88,8 @@ noinst_LIBRARIES = $(MYLIBS)
 libfalmcxingmp3_a_SOURCES = $(FILES)
 
 INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) -I@top_srcdir@/io/include -I@top_srcdir@/ui/include -I@top_srcdir@/lmc/include
-CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT) -D__@target_os@__
-CFLAGS = $(EXTRA_CFLAGS) $(REENT) -D__@target_os@__
+CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT) -D__@target_os@__ -fPIC
+CFLAGS = $(EXTRA_CFLAGS) $(REENT) -D__@target_os@__ -fPIC
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = ../../../config/config.h
 CONFIG_CLEAN_FILES = 
@@ -105,7 +105,7 @@ libfalmcxingmp3_a_LIBADD =
 @AM_HAVE_WIN32_FALSE@cond1libfalmcxingmp3_a_OBJECTS =  cdct.o cupl3.o \
 @AM_HAVE_WIN32_FALSE@hwin.o iup.o l3init.o msis.o wavep.o csbt.o \
 @AM_HAVE_WIN32_FALSE@cwinm.o icdct.o mdct.o uph.o cup.o dec8.o isbt.o \
-@AM_HAVE_WIN32_FALSE@l3dq.o mhead.o upsf.o iwinm.o xinglmc.o
+@AM_HAVE_WIN32_FALSE@l3dq.o mhead.o upsf.o iwinm.o xinglmc.o xinglib.o
 libfalmcxingmp3_a_OBJECTS =  $(cond0libfalmcxingmp3_a_OBJECTS) \
 $(cond1libfalmcxingmp3_a_OBJECTS)
 AR = ar
@@ -124,12 +124,12 @@ DEP_FILES =  .deps/cdct.P .deps/csbt.P .deps/cup.P .deps/cupl3.P \
 .deps/cwinm.P .deps/dec8.P .deps/hwin.P .deps/icdct.P .deps/isbt.P \
 .deps/iup.P .deps/iwinm.P .deps/l3dq.P .deps/l3init.P .deps/mdct.P \
 .deps/mhead.P .deps/msis.P .deps/uph.P .deps/upsf.P .deps/wavep.P \
-.deps/xinglmc.P
+.deps/xinglib.P .deps/xinglmc.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 SOURCES = $(libfalmcxingmp3_a_SOURCES)
 OBJECTS = $(libfalmcxingmp3_a_OBJECTS)
 
-all: Makefile $(LIBRARIES)
+all: Makefile $(LIBRARIES) all-local
 
 .SUFFIXES:
 .SUFFIXES: .S .c .cpp .o .s
@@ -313,6 +313,10 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
 include @top_srcdir@/config/Makefile.header
+
+all-local: $(MYLIBS)
+	gcc -shared -Wl,-soname,libxingmp3.lmc -o libxingmp3.lmc *.o
+	cp libxingmp3.lmc @top_srcdir@/lmc
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -81,8 +81,10 @@ SUBDIRS = base io ui lmc
 @AM_HAVE_WIN32_FALSE@ALLLDADD = @top_srcdir@/base/unix/@target_os@/src/*.o \
 @AM_HAVE_WIN32_FALSE@	  @top_srcdir@/io/local/*.o \
 @AM_HAVE_WIN32_FALSE@	  @top_srcdir@/ui/cmdline/*.o \
-@AM_HAVE_WIN32_FALSE@	  @top_srcdir@/lmc/xingmp3/src/*.o \
 @AM_HAVE_WIN32_FALSE@	  @top_srcdir@/ui/dummy/src/*.o \
+@AM_HAVE_WIN32_FALSE@	  @top_srcdir@/lmc/src/*.o \
+@AM_HAVE_WIN32_FALSE@	  @top_srcdir@/io/src/*.o \
+@AM_HAVE_WIN32_FALSE@	  @top_srcdir@/ui/src/*.o \
 @AM_HAVE_WIN32_FALSE@	  -lpthread -lm -ldl
 @AM_HAVE_WIN32_FALSE@FALDADD = @top_srcdir@/base/src/*.o $(ALLLDADD)
 @AM_HAVE_WIN32_FALSE@DSLDADD = @top_srcdir@/base/src/player.o @top_srcdir@/base/src/playlist.o @top_srcdir@/base/src/command.o @top_srcdir@/base/src/thread.o $(ALLLDADD)
@@ -91,7 +93,10 @@ SUBDIRS = base io ui lmc
 @AM_HAVE_WIN32_FALSE@         @top_srcdir@/io/local/libfaiolocal.a \
 @AM_HAVE_WIN32_FALSE@         @top_srcdir@/ui/cmdline/libfauicmdline.a \
 @AM_HAVE_WIN32_FALSE@         @top_srcdir@/lmc/xingmp3/src/libfalmcxingmp3.a \
-@AM_HAVE_WIN32_FALSE@	 @top_srcdir@/ui/dummy/src/libfauidummy.a
+@AM_HAVE_WIN32_FALSE@	 @top_srcdir@/ui/dummy/src/libfauidummy.a \
+@AM_HAVE_WIN32_FALSE@	 @top_srcdir@/lmc/src/libfalmcsrc.a \
+@AM_HAVE_WIN32_FALSE@	 @top_srcdir@/io/src/libfaiosrc.a \
+@AM_HAVE_WIN32_FALSE@	 @top_srcdir@/ui/src/libfauisrc.a
 @AM_HAVE_WIN32_FALSE@TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
 
 bin_PROGRAMS = $(PRG)
@@ -100,7 +105,7 @@ freeamp_LDADD = $(FALDADD)
 freeamp_DEPENDENCIES = $(MYDEPS)
 
 INCLUDES = -I@top_srcdir@/base/include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) -I@top_srcdir@/io/include -I@top_srcdir@/ui/include -I@top_srcdir@/lmc/include
-CXXFLAGS = $(EXTRA_CXXFLAGS) -D__@target_os@__
+CXXFLAGS = $(EXTRA_CXXFLAGS) -D__@target_os@__ -Wl,-export-dynamic
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = ./config/config.h

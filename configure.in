@@ -85,7 +85,7 @@ AC_OUTPUT(Makefile base/Makefile base/src/Makefile io/Makefile
           base/unix/Makefile ui/dummy/Makefile ui/dummy/src/Makefile
 	  ui/Makefile base/unix/linux/Makefile base/unix/linux/src/Makefile
 	  io/local/Makefile ui/cmdline/Makefile lmc/Makefile lmc/xingmp3/Makefile
-	  lmc/xingmp3/src/Makefile
+	  lmc/xingmp3/src/Makefile lmc/src/Makefile io/src/Makefile ui/src/Makefile
 )
 
 

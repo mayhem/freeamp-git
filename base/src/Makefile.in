@@ -77,7 +77,7 @@ target_os = @target_os@
 @AM_HAVE_WIN32_TRUE@TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
 @AM_HAVE_WIN32_TRUE@FILES = 
 @AM_HAVE_WIN32_FALSE@TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
-@AM_HAVE_WIN32_FALSE@FILES = player.cpp bootstrap.cpp command.cpp buffer.cpp playlist.cpp hashtable.cpp thread.cpp registrar.cpp utility.cpp win32impl.cpp registry.cpp
+@AM_HAVE_WIN32_FALSE@FILES = player.cpp bootstrap.cpp command.cpp buffer.cpp playlist.cpp hashtable.cpp thread.cpp registrar.cpp win32impl.cpp registry.cpp
 
 @AM_HAVE_LINUXTHREADS_TRUE@REENT = -D_REENTRANT
 
@@ -100,7 +100,7 @@ libfabase_a_LIBADD =
 @AM_HAVE_WIN32_TRUE@cond0libfabase_a_OBJECTS = 
 @AM_HAVE_WIN32_FALSE@cond1libfabase_a_OBJECTS =  player.o bootstrap.o \
 @AM_HAVE_WIN32_FALSE@command.o buffer.o playlist.o hashtable.o thread.o \
-@AM_HAVE_WIN32_FALSE@registrar.o utility.o win32impl.o registry.o
+@AM_HAVE_WIN32_FALSE@registrar.o win32impl.o registry.o
 libfabase_a_OBJECTS =  $(cond0libfabase_a_OBJECTS) \
 $(cond1libfabase_a_OBJECTS)
 AR = ar
@@ -115,7 +115,7 @@ TAR = tar
 GZIP = --best
 DEP_FILES =  .deps/bootstrap.P .deps/buffer.P .deps/command.P \
 .deps/hashtable.P .deps/player.P .deps/playlist.P .deps/registrar.P \
-.deps/registry.P .deps/thread.P .deps/utility.P .deps/win32impl.P
+.deps/registry.P .deps/thread.P .deps/win32impl.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 SOURCES = $(libfabase_a_SOURCES)
 OBJECTS = $(libfabase_a_OBJECTS)

@@ -80,8 +80,11 @@ InitializeRegistry(Registry* registry)
             do
             {
                 char file[MAX_PATH];
-
+#ifdef WIN32
                 sprintf(file, "%s\\%s", dir, find.cFileName);
+#else
+		sprintf(file, "%s/%s",dir, find.cFileName);
+#endif
 
                 RegistryItem* item = new RegistryItem;
 

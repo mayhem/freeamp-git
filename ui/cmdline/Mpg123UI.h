@@ -30,11 +30,11 @@ ____________________________________________________________________________*/
 #include "ctrlobj.h"
 #include "event.h"
 
-class Mpg123UI : public CIO,public COO {
+class Mpg123UI : public UserInterface {
  public:
     Mpg123UI();
-    virtual int32 acceptCIOEvent(Event *);
-    virtual int32 acceptCOOEvent(Event *);
+
+    virtual int32 AcceptEvent(Event *);
     virtual void setArgs(int argc, char **argv);
     ~Mpg123UI();
  private:

@@ -29,7 +29,7 @@ FILES =
 MYLIBS = 
 TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
 else
-FILES = CommandLineCIO.cpp cmdlinecoo.cpp Mpg123UI.cpp
+FILES = Mpg123UI.cpp
 MYLIBS = libfauicmdline.a
 TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
 endif

@@ -55,8 +55,7 @@ class Player : public EventQueue {
     ~Player();
 
     virtual int32 AcceptEvent(Event *);
-    int32 RegisterCOO(EventQueue* queue);
-    int32 RegisterCIO(EventQueue* queue);
+    int32 RegisterActiveUI(EventQueue* queue);
     int32 RegisterLMCs(LMCRegistry* registry);
     int32 RegisterPMIs(PMIRegistry* registry);
     int32 RegisterPMOs(PMORegistry* registry);
@@ -67,11 +66,10 @@ class Player : public EventQueue {
 
  protected:
     Player();
-    void GetCOManipLock();
-    void ReleaseCOManipLock();
+    void GetUIManipLock();
+    void ReleaseUIManipLock();
 
-    void SendToCIOCOO(Event *);
-    void SendToCOO(Event *);
+    void SendToUI(Event *);
 
     bool SetState(PlayerState);
     int32 ServiceEvent(Event *);
@@ -86,12 +84,10 @@ class Player : public EventQueue {
                                              // and COO's haven't sent in 
                                              // their "Ready To Die" infos.
     int32                   imQuitting;
-    Vector<EventQueue *>    *coo_vector;
-    Vector<EventQueue *>    *cio_vector;
-    Vector<EventQueue *>    *coo_death_vector;
-    Vector<EventQueue *>    *cio_death_vector;
+    Vector<EventQueue *>    *ui_vector;
+    Vector<EventQueue *>    *ui_death_vector;
     
-    Mutex                   *coManipLock;
+    Mutex                   *uiManipLock;
     Mutex                   *m_lmcMutex;
     Mutex                   *m_pmiMutex;
     Mutex                   *m_pmoMutex;

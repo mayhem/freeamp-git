@@ -74,32 +74,16 @@ Mpg123UI::~Mpg123UI() {
 }
 
 
-int32 Mpg123UI::acceptCIOEvent(Event *e) {
+int32 Mpg123UI::AcceptEvent(Event *e) {
     if (e) {
-	//cerr << "Mpg123UI: processing event " << e->getEvent() << endl;
-	switch (e->getEvent()) {
+	//cerr << "Mpg123COO: processing event " << e->getEvent() << endl;
+	switch (e->GetEvent()) {
 	    case INFO_PlayListDonePlay: {
 		Event *e = new Event(CMD_QuitPlayer);
 		Player::GetPlayer()->AcceptEvent(e);
 		break; }
-	    case CMD_Cleanup: {
-		Event *e = new Event(INFO_ReadyToDieCIO,this);
-		//cout << "I'm gonna ACTUALLY kill myself" << endl;
-		Player::GetPlayer()->AcceptEvent(e);
-		break; }
-	    default:
-		break;
-	}
-    }
-    return 0;
-}
-
-int32 Mpg123UI::acceptCOOEvent(Event *e) {
-    if (e) {
-	//cerr << "Mpg123COO: processing event " << e->getEvent() << endl;
-	switch (e->getEvent()) {
 	    case INFO_MediaVitalStats: {
-		MediaVitalInfo *pmvi = (MediaVitalInfo *)e->getArgument();
+		MediaVitalInfo *pmvi = (MediaVitalInfo *)e->GetArgument();
 		if (pmvi) {
 		    totalFrames = pmvi->totalFrames;
 		    totalTime = pmvi->totalTime;
@@ -150,7 +134,7 @@ int32 Mpg123UI::acceptCOOEvent(Event *e) {
 		}
 		break; }
 	    case INFO_MediaTimePosition: {
-		MediaTimePositionInfo *pmtp = (MediaTimePositionInfo *)(e->getArgument());
+		MediaTimePositionInfo *pmtp = (MediaTimePositionInfo *)(e->GetArgument());
 		if (verboseMode == true) {
 //		    cout << "foo: " << pmtp->frame << "  " << pmtp->seconds << endl;
 		    fprintf(stderr,"\rFrame# %5d [%5d], ",pmtp->frame,totalFrames-pmtp->frame);
@@ -165,8 +149,8 @@ int32 Mpg123UI::acceptCOOEvent(Event *e) {
 		break;
 	    }
 	    case CMD_Cleanup: {
-		Event *e = new Event(INFO_ReadyToDieCOO);
-		//cout << "i'm gonna NOT kill myself..." << endl;
+		Event *e = new Event(INFO_ReadyToDieUI,this);
+		//cout << "I'm gonna ACTUALLY kill myself" << endl;
 		Player::GetPlayer()->AcceptEvent(e);
 		break; }
 	    default:

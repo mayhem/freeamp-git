@@ -30,6 +30,7 @@ ____________________________________________________________________________*/
 class UserInterface : public EventQueue {
  public:
     virtual int32 AcceptEvent(Event *) = 0;
+    virtual int32 SetArgs(int32,char **) = 0;
     virtual ~UserInterface() {}
 };
 
@@ -40,9 +41,9 @@ extern "C" {
 typedef struct UI{
     void*   ref;
 
-    EventQueue* (*Target)   (struct UI*);
+    EventQueue* (*Target)   (struct UI);
     void        (*Cleanup)  (struct UI*);
-
+    int32       (*SetArgs)  (struct UI*,int32 /*argc*/,char ** /*argv*/);
 }UI, *UIRef;
 
 #ifdef __cplusplus

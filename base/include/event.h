@@ -60,7 +60,7 @@ class EventQueue {
 #define CMD_QuitPlayer          7  // tells player to quit (no arg)
 #define CMD_Cleanup             8  // player tells modules to cleanup and get ready for termination (no arg)
 #define CMD_Terminate           9  // is sent by player to COOs, and the DummyCOO makes the main thread delete player and exit (no arg)
-#define INFO_ReadyToDieCIO      10 // sent by CIO to player notifying it that their cleanup has completed. (if arg !null, it is a ptr to this module, it wants to be deleted)
+#define INFO_ReadyToDieUI      10 // sent by CIO to player notifying it that their cleanup has completed. (if arg !null, it is a ptr to this module, it wants to be deleted)
 #define INFO_PlayListDonePlay   11 // sent by player when the playlist has been exhausted (no arg)
 #define INFO_DoneOutputting     12 // sent by PMO (or LMC controlling PMO) to Player when its done outputing (i.e. playing is done)
 #define CMD_KillEventThread     13 // sent by player to various modules so they kill their event threads before deletion (no arg)
@@ -74,7 +74,6 @@ class EventQueue {
 #define INFO_Paused             21 // sent by player to COOs when it pauses playing the current song (no arg)
 #define CMD_UnPause             22 // sent by CIO to player to tell it to unpause current song.  Note: a play causes the current song to be played from beginning (no arg)
 #define CMD_TogglePause         24 // sent by CIO to player to change the boolean state Paused (no arg)
-#define INFO_ReadyToDieCOO      25 // similar to INFO_ReadyToDieCIO
 #define INFO_Playing            26 // sent by player to COO to say that it is beginning to play a song
 #endif // _EVENT_H_
 

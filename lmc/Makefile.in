@@ -74,7 +74,7 @@ RANLIB = @RANLIB@
 VERSION = @VERSION@
 target_os = @target_os@
 
-SUBDIRS = xingmp3
+SUBDIRS = xingmp3 src
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = ../config/config.h
 CONFIG_CLEAN_FILES = 
