@@ -493,7 +493,7 @@ void MusicBrowserUI::PlaylistListItemRemoved(const PlaylistItem* item,
         UpdateTotalTime();
         UpdateButtonMenuStates();
 
-        HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
+        //HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
 
         //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_oPlm->CanUndo() ? MF_ENABLED : MF_GRAYED));
         //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_oPlm->CanRedo() ? MF_ENABLED : MF_GRAYED));

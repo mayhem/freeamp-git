@@ -387,8 +387,17 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
 
                 TreeData* treedata = (TreeData*)tv_item.lParam;
 
+                bool playNow;
+
+                m_context->prefs->GetPlayImmediately(&playNow);
+
                 if(treedata && treedata->IsTrack())
                 {
+                    if(playNow && !m_pParent)
+                    {
+                        ClearPlaylistEvent();  
+                    }
+
                     PlaylistItem *item;
             
                     item = new PlaylistItem(*treedata->m_pTrack);
@@ -396,6 +405,11 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
                 } 
                 else if(treedata && treedata->IsPlaylist())
                 {
+                    if(playNow && !m_pParent)
+                    {
+                        ClearPlaylistEvent();  
+                    }
+
                     m_oPlm->ReadPlaylist(treedata->m_oPlaylistPath.c_str());
                 }
                 else if(treedata && treedata->IsPortable())
@@ -404,6 +418,11 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
                 }
                 else if(treedata && treedata->IsStream())
                 {
+                    if(playNow && !m_pParent)
+                    {
+                        ClearPlaylistEvent();  
+                    }
+
                     PlaylistItem *item;
             
                     item = new PlaylistItem(*treedata->m_pStream);

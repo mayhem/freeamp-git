@@ -229,6 +229,7 @@ static LRESULT WINAPI HiddenWndProc(HWND hwnd,
 {
     LRESULT result = 0;
     FAContext* context = (FAContext*)GetWindowLong(hwnd, GWL_USERDATA);
+    static bool replaceCurrentQueue = true;
 
     switch (msg)
     {
@@ -243,6 +244,13 @@ static LRESULT WINAPI HiddenWndProc(HWND hwnd,
             break;
         }
 
+        case WM_TIMER:
+        {
+            KillTimer(hwnd, 1);
+            replaceCurrentQueue = true;
+            break;
+        }
+
         case WM_COPYDATA:
         {
             COPYDATASTRUCT* pcds = (COPYDATASTRUCT*)lParam;
@@ -253,6 +261,22 @@ static LRESULT WINAPI HiddenWndProc(HWND hwnd,
             uint32 length = sizeof(url);
             int offset = 0;
 
+            KillTimer(hwnd, 1);
+
+            bool playNow = false;
+
+            context->prefs->GetPlayImmediately(&playNow);
+
+            if(playNow)
+            {
+                if(replaceCurrentQueue)
+                {
+                    context->target->AcceptEvent(new Event(CMD_Stop));
+                    context->plm->RemoveAll();
+
+                    replaceCurrentQueue = false;
+                }
+            }
 
             for(int32 i = 0; i < count; i++)
             {
@@ -264,6 +288,12 @@ static LRESULT WINAPI HiddenWndProc(HWND hwnd,
                     !strncasecmp(path, "rtp://", 6))
                 {
                     context->plm->AddItem(path);
+
+                    if(playNow)
+                    {
+                        SetTimer(hwnd, 1, 1000, NULL);
+                    }
+
                     continue;
                 }
 
@@ -321,6 +351,11 @@ static LRESULT WINAPI HiddenWndProc(HWND hwnd,
                     context->target->AcceptEvent(new LoadThemeEvent(url, ""));
                 else
                     plm->AddItem(url);
+
+                if(playNow)
+                {
+                    SetTimer(hwnd, 1, 1000, NULL);
+                }
             }
             
             break;

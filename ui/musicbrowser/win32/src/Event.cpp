@@ -44,6 +44,8 @@ const char* kAudioFileFilter =
 
 void MusicBrowserUI::ClearPlaylistEvent(void)
 {
+    m_context->target->AcceptEvent(new Event(CMD_Stop));
+
     m_oPlm->RemoveAll();
 }
 
