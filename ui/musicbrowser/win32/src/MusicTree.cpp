@@ -777,8 +777,8 @@ void MusicBrowserUI::MusicCatalogPlaylistAdded(string item)
 
         sInsert.item.pszText = szBase;
         sInsert.item.cchTextMax = strlen(szBase);
-        sInsert.item.iImage = 0;
-        sInsert.item.iSelectedImage = 0;
+        sInsert.item.iImage = 1;
+        sInsert.item.iSelectedImage = 1;
         sInsert.item.cChildren= 0;
         sInsert.item.lParam = m_oTreeIndex.Add(oCrossRef);
         sInsert.hInsertAfter = TVI_SORT;
@@ -788,8 +788,8 @@ void MusicBrowserUI::MusicCatalogPlaylistAdded(string item)
         TreeView_DeleteItem(m_hMusicCatalog, m_hNewPlaylistItem);
         sInsert.item.pszText = kNewPlaylist;
         sInsert.item.cchTextMax = strlen(kNewPlaylist);
-        sInsert.item.iImage = 0;
-        sInsert.item.iSelectedImage = 0;
+        sInsert.item.iImage = 1;
+        sInsert.item.iSelectedImage = 1;
         sInsert.item.cChildren= 0;
         sInsert.item.lParam = -1;
         sInsert.hInsertAfter = TVI_FIRST;
