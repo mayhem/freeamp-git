@@ -1,3 +1,13 @@
+Changes for Linux and Windows version 2.0.1
+--------------------------------------------------------------------
+
+- Help files for both Linux and Win32 have been updated further.
+- Bug fixes galore. 
+- Resolved several resource issues.
+- Win32 Music Browser no longer shows duplicates when you search 
+  for music again.
+- Added some more icons.
+
 Changes for Linux and Windows version 2.0
 --------------------------------------------------------------------
 
