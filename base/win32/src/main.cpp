@@ -264,9 +264,34 @@ static LRESULT WINAPI HiddenWndProc(HWND hwnd,
 
                 FilePathToURL(path, url, &length);
 
-                context->plm->AddItem(url);
+                // who needs to get this, plm or dlm?
+                bool giveToDLM = false;
+                char* extension = NULL;
+                PlaylistManager* plm = context->plm;
+                DownloadManager* dlm = context->downloadManager;
 
-                array += strlen(array) + 1;
+                extension = strrchr(url, '.');
+                if(extension)
+                {
+                    DownloadFormatInfo dlfi;
+                    uint32 i = 0;
+
+                    extension++;
+
+                    while(IsntError(dlm->GetSupportedDownloadFormats(&dlfi, i++)))
+                    {
+                        if(!strcasecmp(extension, dlfi.GetExtension()))
+                        {
+                            giveToDLM = true;
+                            break;
+                        }
+                    }
+                }
+
+                if(giveToDLM)
+                    dlm->ReadDownloadFile(url);
+                else
+                    plm->AddItem(url);
             }
             
             break;
