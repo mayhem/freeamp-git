@@ -30,9 +30,11 @@ ____________________________________________________________________________*/
 
 #include "facontext.h"
 
+class MusicBrowserUI;
+
 class musicsearchUI {
  public:
-    musicsearchUI(FAContext *);
+    musicsearchUI(FAContext *, MusicBrowserUI *parent);
    ~musicsearchUI();
   
     void Show(bool runMain = true);
@@ -46,11 +48,12 @@ class musicsearchUI {
 
     void StartSearch();
     void EndSearch();
+    void DeleteEvent();
+    void Close();
 
     bool custom;
     bool searchInProgress;
     bool searchDone;
-    bool m_main;
     bool done;
 
     GtkWidget *m_window;
@@ -64,6 +67,9 @@ class musicsearchUI {
     GtkWidget *buttonLabel;
 
     string searchPath;
+
+    bool m_main;
+    MusicBrowserUI *m_parent;
 };
    
 

@@ -52,6 +52,9 @@ class MusicBrowserUI : public UserInterface {
 
     void StartSearch(bool runMain = true, bool intro = false);
     void SetRunning(void);
+  
+    void SearchClose(void);
+    void WizardClose(void);
 
     bool doQuitNow;
 

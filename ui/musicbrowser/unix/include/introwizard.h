@@ -30,9 +30,11 @@ ____________________________________________________________________________*/
 
 #include "facontext.h"
 
+class MusicBrowserUI;
+
 class IntroWizardUI {
  public:
-    IntroWizardUI(FAContext *);
+    IntroWizardUI(FAContext *, MusicBrowserUI *parent);
    ~IntroWizardUI();
   
     void Show(bool runMain = true);
@@ -48,13 +50,14 @@ class IntroWizardUI {
     void EndSearch();
     void GoToPage1();
     void GoToPage2();
+    void DeleteEvent();
+    void Close();
     
     unsigned int page;
     
     bool custom;
     bool searchInProgress;
     bool searchDone;
-    bool m_main;
     bool done;
 
     GtkWidget *m_window;
@@ -63,6 +66,8 @@ class IntroWizardUI {
     FAContext *m_context;
 
  private:
+    bool m_main;
+ 
     GtkWidget *m_backButton;
     GtkWidget *m_searchButton;
     GtkWidget *textEntry;
@@ -76,6 +81,8 @@ class IntroWizardUI {
 
     GtkWidget *IntroPage(void);
     GtkWidget *SearchPage(void);
+
+    MusicBrowserUI *m_parent;
 };
    
 #endif

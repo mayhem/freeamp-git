@@ -32,14 +32,20 @@ ____________________________________________________________________________*/
 #include "fileselector.h"
 #include "musiccatalog.h"
 #include "musicsearchui.h"
+#include "musicbrowserui.h"
 
 #include "../res/wizard_small.xpm"
 
-gboolean search_destroy(GtkWidget *widget, gpointer p)
+void musicsearchUI::DeleteEvent(void)
 {
-    bool quitmain = (bool)p;
-    if (quitmain)
+    if (m_main)
         gtk_main_quit();
+    m_parent->SearchClose();
+}
+
+gboolean search_destroy(GtkWidget *widget, musicsearchUI *p)
+{
+    p->DeleteEvent();
     return FALSE;
 }
 
@@ -130,9 +136,10 @@ static void search_browse(GtkWidget *w, musicsearchUI *p)
     delete filesel;
 }
 
-musicsearchUI::musicsearchUI(FAContext *context)
+musicsearchUI::musicsearchUI(FAContext *context, MusicBrowserUI *parent)
 {
     m_context = context;
+    m_parent = parent;
 }
 
 void musicsearchUI::Show(bool runMain)
@@ -152,7 +159,7 @@ void musicsearchUI::Show(bool runMain)
    m_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
    gtk_window_set_title(GTK_WINDOW(m_window), BRANDING" - Search For Music");
    gtk_signal_connect(GTK_OBJECT(m_window), "destroy",
-                      GTK_SIGNAL_FUNC(search_destroy), (void *)runMain);
+                      GTK_SIGNAL_FUNC(search_destroy), this);
    gtk_container_set_border_width(GTK_CONTAINER(m_window), 5);
    gtk_widget_realize(m_window);
 
@@ -285,11 +292,15 @@ void musicsearchUI::Show(bool runMain)
        gtk_main();
 }
 
-musicsearchUI::~musicsearchUI()
+void musicsearchUI::Close(void)
 {
     if (searchInProgress)
         EndSearch();
     gtk_widget_destroy(m_window);
+}
+
+musicsearchUI::~musicsearchUI()
+{
 }
 
 void musicsearchUI::StartSearch(void)

@@ -33,14 +33,20 @@ ____________________________________________________________________________*/
 #include "musiccatalog.h"
 #include "introwizard.h"
 #include "musicsearchui.h"
+#include "musicbrowserui.h"
 
 #include "../res/wizard.xpm"
 
-gboolean wiz_destroy(GtkWidget *widget, gpointer p)
+void IntroWizardUI::DeleteEvent(void)
 {
-    bool quitmain = (bool)p;
-    if (quitmain)
+    if (m_main)
         gtk_main_quit();
+    m_parent->WizardClose();
+}
+
+gboolean wiz_destroy(GtkWidget *widget, IntroWizardUI *p)
+{
+    p->DeleteEvent();
     return FALSE;
 }
 
@@ -138,9 +144,10 @@ static void search_browse(GtkWidget *w, IntroWizardUI *p)
     delete filesel;
 }
 
-IntroWizardUI::IntroWizardUI(FAContext *context)
+IntroWizardUI::IntroWizardUI(FAContext *context, MusicBrowserUI *parent)
 {
     m_context = context;
+    m_parent = parent;
 }
 
 void IntroWizardUI::GoToPage2(void)
@@ -176,8 +183,8 @@ GtkWidget *IntroWizardUI::IntroPage(void)
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
    gtk_widget_show(label);
 
-   label = gtk_label_new("This wizard will help you begin organizing your music collection and get you started playing your music.");
-   gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+   label = gtk_label_new("This wizard will help you begin organizing your music         \ncollection and get you started playing your music.");
+   gtk_label_set_line_wrap(GTK_LABEL(label), FALSE);
    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
    gtk_widget_show(label);
@@ -188,26 +195,26 @@ GtkWidget *IntroWizardUI::IntroPage(void)
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
    gtk_widget_show(label);
 
-   label = gtk_label_new("My Music helps you organize the music you have on your computer. The My Music window is divided into two panes: My Music Collection and Currently Listening To.");
-   gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+   label = gtk_label_new("My Music helps you organize the music you have on your\ncomputer. The My Music window is divided into two panes: \nMy Music Collection and Currently Listening To.");
+   gtk_label_set_line_wrap(GTK_LABEL(label), FALSE);
    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
    gtk_widget_show(label);
 
-   label = gtk_label_new("My Music Collection provides a convenient, organized view of the music you have on your computer. It might help to think of this pane as a CD rack for your computer.");
-   gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+   label = gtk_label_new("My Music Collection provides a convenient, organized\nview of the music you have on your computer. It might help \nto think of this pane as a CD rack for your computer.");
+   gtk_label_set_line_wrap(GTK_LABEL(label), FALSE);
    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
    gtk_widget_show(label);
 
-   label = gtk_label_new("Currently Listening To displays a list of the songs you have chosen to play. In order to listen to music, all you have to do is add items to the list by dragging them from the My Music Collection pane on the left to the Currently Listening To pane on the right.");
-   gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+   label = gtk_label_new("Currently Listening To displays a list of the songs you have\nchosen to play. In order to listen to music, all you have to\ndo is add items to the list by dragging them from the My\nMusic Collection pane on the left to the Currently Listening\nTo pane on the right.");
+   gtk_label_set_line_wrap(GTK_LABEL(label), FALSE);
    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
    gtk_widget_show(label);
 	       
-   label = gtk_label_new("For a more detailed explanation of how to use the My Music window, you should access the application's help system through the Help menu.");
-   gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+   label = gtk_label_new("For a more detailed explanation of how to use the My Music\nwindow, you should access the application's help system\nthrough the Help menu.");
+   gtk_label_set_line_wrap(GTK_LABEL(label), FALSE);
    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
    gtk_widget_show(label);
@@ -226,8 +233,8 @@ GtkWidget *IntroWizardUI::SearchPage(void)
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
    gtk_widget_show(label);
 
-   label = gtk_label_new("In order to populate the My Music Collection pane "the_BRANDING" will search your computer for supported music files. The files will not be moved or modified during this process. Their location will be remembered in order to provide you with an organized view of your music collection.");
-   gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+   label = gtk_label_new("In order to populate the My Music Collection pane\n"the_BRANDING" will search your computer for supported music\nfiles. The files will not be moved or modified during this        \nprocess. Their location will be remembered in order to\nprovide you with an organized view of your music    \ncollection.");
+   gtk_label_set_line_wrap(GTK_LABEL(label), FALSE);
    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
    gtk_widget_show(label);
@@ -238,14 +245,14 @@ GtkWidget *IntroWizardUI::SearchPage(void)
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
    gtk_widget_show(label);
 
-   label = gtk_label_new("By default "the_BRANDING" will search all the disk drives on your computer for music. If you would like to limit the scope of the search you may do so by selecting a directory for us to search. If you wish, you may also just restrict the search to your home directory.");
-   gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+   label = gtk_label_new("By default "the_BRANDING" will search all the disk drives\non your computer for music. If you would like to limit the\nscope of the search you may do so by selecting a\ndirectory for us to search. If you wish, you may also just     \nrestrict the search to your home directory.");
+   gtk_label_set_line_wrap(GTK_LABEL(label), FALSE);
    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
    gtk_widget_show(label);
 	       
    GtkWidget *hbox = gtk_hbox_new(FALSE, 5);
-   gtk_container_add(GTK_CONTAINER(vbox), hbox);
+   gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, FALSE, 5);
    gtk_widget_show(hbox);
 
    label = gtk_label_new("Look for music in: ");
@@ -285,7 +292,7 @@ GtkWidget *IntroWizardUI::SearchPage(void)
    gtk_option_menu_set_history(GTK_OPTION_MENU(optionmenu), 0);
 
    hbox = gtk_hbox_new(FALSE, 5);
-   gtk_container_add(GTK_CONTAINER(vbox), hbox);
+   gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, FALSE, 5);
    gtk_widget_show(hbox);
 
    label = gtk_label_new("Searching in: ");
@@ -326,7 +333,7 @@ void IntroWizardUI::Show(bool runMain)
    m_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
    gtk_window_set_title(GTK_WINDOW(m_window), BRANDING" - Introduction");
    gtk_signal_connect(GTK_OBJECT(m_window), "destroy",
-                      GTK_SIGNAL_FUNC(wiz_destroy), (void *)runMain);
+                      GTK_SIGNAL_FUNC(wiz_destroy), this);
    gtk_container_set_border_width(GTK_CONTAINER(m_window), 5);
    gtk_widget_realize(m_window);
 
@@ -399,11 +406,15 @@ void IntroWizardUI::Show(bool runMain)
        gtk_main();
 }
 
-IntroWizardUI::~IntroWizardUI()
+void IntroWizardUI::Close()
 {
     if (searchInProgress)
         EndSearch();
     gtk_widget_destroy(m_window);
+}
+
+IntroWizardUI::~IntroWizardUI()
+{
 }
 
 void IntroWizardUI::StartSearch(void)
