@@ -1042,9 +1042,23 @@ void MusicCatalog::DoSearchMusic(char *path, bool bSendMessages)
 
                     if (IsError(FilePathToURL(file.c_str(), tempurl, &length)))
                     {
+                        delete [] tempurl;
+                        delete [] fileExt;
+
                         continue;
                     }
-                    
+                   
+                    if (!bSendMessages) {
+                        MetaData *tdata = ReadMetaDataFromDatabase(tempurl);
+                        if (tdata) {
+                            delete tdata;
+                            delete [] tempurl;
+                            delete [] fileExt;
+
+                            continue;
+                        }
+                    }
+
                     PlaylistItem *plist = new PlaylistItem(tempurl);
                     m_plm->RetrieveMetaDataNow(plist);
 
@@ -1060,7 +1074,7 @@ void MusicCatalog::DoSearchMusic(char *path, bool bSendMessages)
                     delete plist;
                     delete [] tempurl;
                 }
-                delete fileExt;
+                delete [] fileExt;
             }
         }
         while (FindNextFile(handle, &find) && !m_exit);
