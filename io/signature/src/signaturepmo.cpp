@@ -56,7 +56,7 @@ SignaturePMO(FAContext *context):
 {
     m_pBufferThread       = NULL;
 
-    m_MB = new MusicBrainz;
+    m_MB = mb_New();
 
     if (!m_pBufferThread)
     {
@@ -108,8 +108,9 @@ Init(OutputInfo* info)
 {
    m_data_size = info->max_buffer_size;
 
-   m_MB->SetPCMDataInfo(info->samples_per_second, info->number_of_channels,
-                        info->bits_per_sample);
+   mb_SetPCMDataInfo(m_MB, info->samples_per_second, 
+	                 info->number_of_channels,
+                     info->bits_per_sample);
 
    m_strGUID = "";
    m_initialized = true;
@@ -251,10 +252,14 @@ WorkerThread(void)
                 if (pEvent->Type() == PMO_Init)
                     Init(((PMOInitEvent *)pEvent)->GetInfo());
    
-                if (pEvent->Type() == PMO_Quit) {
+                if (pEvent->Type() == PMO_Quit) 
+				{
+					char *guid;
                     bGotPMOQuit = true;
 
-                    m_MB->GenerateSignatureNow(m_strGUID, m_collID);
+                    mb_GenerateSignatureNow(m_MB, &guid, (char *)m_collID.c_str());
+                    m_strGUID = string(guid);
+					free(guid);
                     continue;
                 }
                 if (pEvent->Type() == PMO_Error)
@@ -287,9 +292,15 @@ WorkerThread(void)
             continue;
         }
 
-        if (m_MB->GenerateSignature((char *)pBuffer, m_data_size, m_strGUID, 
-                                    m_collID)) 
+        char *guid;
+        if (mb_GenerateSignature(m_MB, (char *)pBuffer, 
+			                     m_data_size, &guid, (char *)m_collID.c_str())) 
+		{
+            m_strGUID = string(guid);
+			free(guid);
+
             bDone = true;
+		}
 
         m_pInputBuffer->EndRead(m_data_size);
      

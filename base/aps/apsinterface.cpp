@@ -53,10 +53,8 @@ ____________________________________________________________________________*/
 #include "apsutility.h"
 #include "apsconvert.h"
 #include <math.h>
-#include "utility.h"
-
 #include <musicbrainz/mb_c.h>
-
+#include "utility.h"
 #include "slclient.h" // FIXME: remove before b9
 
 #ifndef WIN32

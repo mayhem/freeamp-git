@@ -144,9 +144,6 @@ Package=<4>
     Project_Dep_Name download
     End Project Dependency
     Begin Project Dependency
-    Project_Dep_Name dsoundcard
-    End Project Dependency
-    Begin Project Dependency
     Project_Dep_Name fileinput
     End Project Dependency
     Begin Project Dependency

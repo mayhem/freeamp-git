@@ -40,7 +40,7 @@ ____________________________________________________________________________*/
 #include "facontext.h"
 #include "preferences.h"
 
-#include <musicbrainz/musicbrainz.h>
+#include "musicbrainz/mb_c.h"
 
 class SignaturePMO : public PhysicalMediaOutput
 {
@@ -74,7 +74,7 @@ public:
   Thread*         m_pBufferThread;
   bool            m_initialized;
 
-  MusicBrainz    *m_MB;
+  musicbrainz_t   m_MB;
   string          m_strGUID;
   string          m_collID;
 };
