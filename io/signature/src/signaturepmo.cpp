@@ -84,7 +84,7 @@ SignaturePMO::
   }
   if (m_MB)
   {
-     delete m_MB;
+     mb_Delete(m_MB);
      m_MB = NULL;
   }
 }
