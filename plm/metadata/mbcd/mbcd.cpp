@@ -222,7 +222,7 @@ bool MusicBrainzCD::LookupCD(void)
            return false;
         }
     
-        if (mb_GetResultInt(o, MBE_AlbumGetNumAlbums) == 0)
+        if (mb_GetResultInt(o, MBE_GetNumAlbums) == 0)
         {
            char url[MAX_PATH];
 
