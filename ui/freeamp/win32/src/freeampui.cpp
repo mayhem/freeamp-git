@@ -496,6 +496,7 @@ FreeAmpUI::
 DropFiles(HDROP dropHandle)
 {
 	int32 count;
+    int32 originalCount = m_plm->CountItems();
 	char file[MAX_PATH + 1];
 
 	count = DragQueryFile(	dropHandle,
@@ -546,10 +547,9 @@ DropFiles(HDROP dropHandle)
         }
 	}
 
-	if(count) 
+	if(!originalCount) 
     {
-		//m_target->AcceptEvent(new Event(CMD_Play));
-        //SendMessage(m_hwnd, WM_COMMAND, kPlayControl,0);
+		m_target->AcceptEvent(new Event(CMD_Play));
 	}
 }
 
