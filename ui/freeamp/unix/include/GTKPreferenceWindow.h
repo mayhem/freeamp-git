@@ -138,6 +138,7 @@ class GTKPreferenceWindow : public PreferenceWindow
       GtkWidget *CreatePage3(void);
       GtkWidget *CreateAbout(void);
       GtkWidget *CreatePage5(void);
+      GtkWidget *CreatePage6(void);
 
       GtkWidget *applyButton;
 
@@ -160,16 +161,11 @@ class GTKPreferenceWindow : public PreferenceWindow
       GtkWidget *ipPeriod3;
       GtkWidget *ipFourBox;
 
-      GtkWidget *logGeneral;
-      GtkWidget *logPMI;
-      GtkWidget *logPMO;
-      GtkWidget *logLMC;
-      GtkWidget *logPerf;
-
   public:
       GtkWidget *mainWindow;
 
       void ApplyInfo(void);
+      void CancelInfo(void);
       
       void SetInputBufferSize(int newvalue);
       void SetOutputBufferSize(int newvalue);
@@ -182,13 +178,6 @@ class GTKPreferenceWindow : public PreferenceWindow
       void ProxyToggle(int active);
       void AltIPSet(void);
       void AltIPToggle(int active);
-
-      void LogToggle(int active);
-      void GeneralToggle(int active);
-      void PMIToggle(int active);
-      void PMOToggle(int active);
-      void LMCToggle(int active);
-      void PerfToggle(int active);
 
       void SelectTheme(int number);
 };

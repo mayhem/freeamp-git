@@ -49,8 +49,8 @@ static gboolean pref_destroy(GtkWidget *widget)
 
 void GTKPreferenceWindow::ApplyInfo(void)
 {
-    SavePrefsValues(m_pContext->prefs, &currentValues);
-    m_pContext->target->AcceptEvent(new Event(INFO_PrefsChanged));
+    if (proposedValues != currentValues) 
+        SavePrefsValues(m_pContext->prefs, &proposedValues);
 }
 
 void pref_ok_click(GtkWidget *w, GTKPreferenceWindow *p)
@@ -64,7 +64,19 @@ void pref_apply_click(GtkWidget *w, GTKPreferenceWindow *p)
     p->ApplyInfo();
 }
 
+void GTKPreferenceWindow::CancelInfo(void)
+{
+    if (currentValues != originalValues)
+        SavePrefsValues(m_pContext->prefs, &proposedValues);
+}
+
 void pref_cancel_click(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    p->CancelInfo();
+    gtk_widget_destroy(p->mainWindow);
+}
+
+void pref_close_click(GtkWidget *w, GTKPreferenceWindow *p)
 {
     gtk_widget_destroy(p->mainWindow);
 }
@@ -100,24 +112,29 @@ bool GTKPreferenceWindow::Show(Window *pWindow)
     pane = CreatePage1();
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), pane, label);
 
+    label = gtk_label_new("Themes");
+    gtk_widget_show(label);
+    pane = CreatePage5();
+    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), pane, label);
+
     label = gtk_label_new("Streaming");
     gtk_widget_show(label);
     pane = CreatePage2();
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), pane, label);
 
-    label = gtk_label_new("Debug");
+    label = gtk_label_new("Plugins");
     gtk_widget_show(label);
     pane = CreatePage3();
+    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), pane, label);
+
+    label = gtk_label_new("Advanced");
+    gtk_widget_show(label);
+    pane = CreatePage6();
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), pane, label);
 
     label = gtk_label_new("About");
     gtk_widget_show(label);
     pane = CreateAbout();
-    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), pane, label);
-
-    label = gtk_label_new("Themes");
-    gtk_widget_show(label);
-    pane = CreatePage5();
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), pane, label);
 
     gtk_widget_show(notebook);
@@ -129,9 +146,7 @@ bool GTKPreferenceWindow::Show(Window *pWindow)
 
     GtkWidget *button;
 
-    button = gtk_button_new_with_label("  OK  ");
-    gtk_signal_connect(GTK_OBJECT(button), "clicked",
-                       GTK_SIGNAL_FUNC(pref_ok_click), this);
+    button = gtk_button_new_with_label("  Help  ");
     gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 0);
     gtk_widget_show(button);
 
@@ -145,6 +160,12 @@ bool GTKPreferenceWindow::Show(Window *pWindow)
     button = gtk_button_new_with_label("  Cancel  ");
     gtk_signal_connect(GTK_OBJECT(button), "clicked",
                        GTK_SIGNAL_FUNC(pref_cancel_click), this);
+    gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 0);
+    gtk_widget_show(button);
+
+    button = gtk_button_new_with_label("  OK  ");
+    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                       GTK_SIGNAL_FUNC(pref_ok_click), this);
     gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 0);
     gtk_widget_show(button);
 
@@ -314,158 +335,11 @@ void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs,
     }
 }
 
-void pmo_select(GtkWidget *item, GTKPreferenceWindow *p)
-{
-}
-
-void GTKPreferenceWindow::SetInputBufferSize(int newvalue)
-{
-    proposedValues.inputBufferSize = newvalue;
-    gtk_widget_set_sensitive(applyButton, TRUE);
-}
-
-void input_buffer_change(GtkWidget *w, GTKPreferenceWindow *p)
-{
-    char *text = gtk_entry_get_text(GTK_ENTRY(w));
-    int newdata = atoi(text);
-
-    p->SetInputBufferSize(newdata);
-}
-
-void GTKPreferenceWindow::SetOutputBufferSize(int newvalue)
-{
-    proposedValues.outputBufferSize = newvalue;
-    gtk_widget_set_sensitive(applyButton, TRUE);
-}
-
-void output_buffer_change(GtkWidget *w, GTKPreferenceWindow *p)
-{
-    char *text = gtk_entry_get_text(GTK_ENTRY(w));
-    int newdata = atoi(text);
-
-    p->SetOutputBufferSize(newdata);
-}
-
-void GTKPreferenceWindow::SetPreBufferLength(int newvalue)
-{
-    proposedValues.preBufferLength = newvalue;
-    gtk_widget_set_sensitive(applyButton, TRUE);
-}
-
-void prestream_buffer_change(GtkWidget *w, GTKPreferenceWindow *p)
-{
-    char *text = gtk_entry_get_text(GTK_ENTRY(w));
-    int newdata = atoi(text);
-
-    p->SetPreBufferLength(newdata);
-}
-
 GtkWidget *GTKPreferenceWindow::CreatePage1(void)
 {
     GtkWidget *pane = gtk_vbox_new(FALSE, 5);
     gtk_container_set_border_width(GTK_CONTAINER(pane), 5);
     gtk_widget_show(pane);
-
-    GtkWidget *frame = gtk_frame_new("Plug-In");
-    gtk_container_add(GTK_CONTAINER(pane), frame);
-    gtk_widget_show(frame);
-
-    GtkWidget *table = gtk_table_new(2, 2, FALSE);
-    gtk_container_add(GTK_CONTAINER(frame), table); 
-    gtk_widget_show(table);
-
-    Registry *pmo = m_pContext->player->GetPMORegistry();
-
-    int32 i = 0;
-    int32 pos = 0;
-    RegistryItem *item;
-
-    GtkWidget *label = gtk_label_new("Output");
-    gtk_misc_set_alignment(GTK_MISC(label), (gfloat)1.0, (gfloat)0.5);
-    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 1, 2, GTK_FILL, GTK_FILL,
-                     5, 0);
-    gtk_widget_show(label);
-
-    GtkWidget *optionmenu = gtk_option_menu_new();
-    GtkWidget *menu = gtk_menu_new();
-
-    while (pmo && (item = pmo->GetItem(i++))) {
-        GtkWidget *menuitem = gtk_menu_item_new_with_label(item->Name());
-        gtk_signal_connect(GTK_OBJECT(menuitem), "activate", 
-                           GTK_SIGNAL_FUNC(pmo_select), this);
-        gtk_widget_show(menuitem);
-
-        gtk_menu_append(GTK_MENU(menu), menuitem);
-        if (originalValues.defaultPMO == item->Name())
-            pos = i;
-    }
-    gtk_option_menu_set_menu(GTK_OPTION_MENU(optionmenu), menu);
-    gtk_table_attach(GTK_TABLE(table), optionmenu, 1, 2, 1, 2, GTK_FILL, 
-                     GTK_FILL, 5, 5);
-    gtk_widget_show(optionmenu);
-    gtk_option_menu_set_history(GTK_OPTION_MENU(optionmenu), pos - 1);
-
-    frame = gtk_frame_new("Buffer Sizes");
-    gtk_container_add(GTK_CONTAINER(pane), frame);
-    gtk_widget_show(frame);
-
-    table = gtk_table_new(3, 2, FALSE);
-    gtk_container_add(GTK_CONTAINER(frame), table);
-    gtk_widget_show(table);
-
-    int32 value;
-    char tempstr[256];
-
-    label = gtk_label_new("Input Buffer Size (Kilobytes)");
-    gtk_misc_set_alignment(GTK_MISC(label), (gfloat)1.0, (gfloat)0.5);
-    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 0, 1, GTK_FILL, GTK_FILL,
-                     10, 1);
-    gtk_widget_show(label);
-
-    GtkWidget *entry = gtk_entry_new();
-    value = originalValues.inputBufferSize;
-    sprintf(tempstr, "%d", value);
-    gtk_entry_set_text(GTK_ENTRY(entry), tempstr);
-    gtk_entry_set_max_length(GTK_ENTRY(entry), 4);
-    gtk_signal_connect(GTK_OBJECT(entry), "changed",
-                       GTK_SIGNAL_FUNC(input_buffer_change), this);
-    gtk_table_attach(GTK_TABLE(table), entry, 1, 2, 0, 1, GTK_FILL, GTK_FILL, 
-                     10, 3);
-    gtk_widget_show(entry);
-
-    label = gtk_label_new("Output Buffer Size (Kilobytes)");
-    gtk_misc_set_alignment(GTK_MISC(label), (gfloat)1.0, (gfloat)0.5);
-    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 1, 2, GTK_FILL, GTK_FILL,
-                     10, 1);
-    gtk_widget_show(label);
-
-    entry = gtk_entry_new();
-    value = originalValues.outputBufferSize;
-    sprintf(tempstr, "%d", value);
-    gtk_entry_set_text(GTK_ENTRY(entry), tempstr);
-    gtk_entry_set_max_length(GTK_ENTRY(entry), 4);
-    gtk_signal_connect(GTK_OBJECT(entry), "changed",
-                       GTK_SIGNAL_FUNC(output_buffer_change), this);
-    gtk_table_attach(GTK_TABLE(table), entry, 1, 2, 1, 2, GTK_FILL, GTK_FILL,
-                     10, 3);
-    gtk_widget_show(entry);
-
-    label = gtk_label_new("Prebuffer Streams (Seconds)");
-    gtk_misc_set_alignment(GTK_MISC(label), (gfloat)1.0, (gfloat)0.5);
-    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 2, 3, GTK_FILL, GTK_FILL,
-                     10, 1);
-    gtk_widget_show(label);
-
-    entry = gtk_entry_new();
-    value = originalValues.preBufferLength;
-    sprintf(tempstr, "%d", value);
-    gtk_entry_set_text(GTK_ENTRY(entry), tempstr);
-    gtk_entry_set_max_length(GTK_ENTRY(entry), 2);
-    gtk_signal_connect(GTK_OBJECT(entry), "changed",
-                       GTK_SIGNAL_FUNC(prestream_buffer_change), this);
-    gtk_table_attach(GTK_TABLE(table), entry, 1, 2, 2, 3, GTK_FILL, GTK_FILL, 
-                     10, 3);
-    gtk_widget_show(entry);
 
     return pane;
 }
@@ -731,7 +605,8 @@ GtkWidget *GTKPreferenceWindow::CreatePage2(void)
     gtk_widget_show(proxyColon);
 
     proxyPortBox = gtk_entry_new();
-    gtk_entry_set_text(GTK_ENTRY(proxyPortBox), port);
+    if (port)
+        gtk_entry_set_text(GTK_ENTRY(proxyPortBox), port);
     gtk_entry_set_max_length(GTK_ENTRY(proxyPortBox), 5);
     gtk_widget_set_usize(proxyPortBox, 60, 0);
     gtk_signal_connect(GTK_OBJECT(proxyPortBox), "changed",
@@ -772,15 +647,20 @@ GtkWidget *GTKPreferenceWindow::CreatePage2(void)
     char *ip[4];
     int32 i = 1;
 
-    strncpy(tempstr, originalValues.alternateIP.c_str(), 256);
-    ip[0] = tempstr;
-    dot = tempstr;
+    if (originalValues.alternateIP.length() == 0) {
+        ip[0] = ip[1] = ip[2] = ip[3] = "0";
+    }
+    else {
+        strncpy(tempstr, originalValues.alternateIP.c_str(), 256);
+        ip[0] = tempstr;
+        dot = tempstr;
 
-    while ((dot = strchr(dot, '.'))) {
-        *dot = 0x00;
-        ip[i++] = ++dot;
-        if (i == 4)
-            break;
+        while ((dot = strchr(dot, '.'))) {
+            *dot = 0x00;
+            ip[i++] = ++dot;
+            if (i == 4)
+                break;
+        }
     }
 
     ipOneBox = gtk_entry_new();
@@ -845,80 +725,8 @@ GtkWidget *GTKPreferenceWindow::CreatePage2(void)
     return pane;
 }
 
-void GTKPreferenceWindow::LogToggle(int active)
+void pmo_select(GtkWidget *item, GTKPreferenceWindow *p)
 {
-    gtk_widget_set_sensitive(logGeneral, active);
-    gtk_widget_set_sensitive(logPMI, active);
-    gtk_widget_set_sensitive(logPMO, active);
-    gtk_widget_set_sensitive(logLMC, active);
-    gtk_widget_set_sensitive(logPerf, active);
-    proposedValues.enableLogging = active;
-    gtk_widget_set_sensitive(applyButton, TRUE);
-}
-
-void log_toggle(GtkWidget *w, GTKPreferenceWindow *p)
-{
-    int i = GTK_TOGGLE_BUTTON(w)->active;
-    p->LogToggle(i);
-}
-
-void GTKPreferenceWindow::GeneralToggle(int active)
-{
-    proposedValues.logMain = active;
-    gtk_widget_set_sensitive(applyButton, TRUE);
-}
-
-void general_toggle(GtkWidget *w, GTKPreferenceWindow *p)
-{
-    int i = GTK_TOGGLE_BUTTON(w)->active;
-    p->GeneralToggle(i);
-}
-void GTKPreferenceWindow::PMIToggle(int active)
-{
-    proposedValues.logInput = active;
-    gtk_widget_set_sensitive(applyButton, TRUE);
-}
-
-void pmi_toggle(GtkWidget *w, GTKPreferenceWindow *p)
-{
-    int i = GTK_TOGGLE_BUTTON(w)->active;
-    p->PMIToggle(i);
-}
-
-void GTKPreferenceWindow::PMOToggle(int active)
-{
-    proposedValues.logOutput = active;
-    gtk_widget_set_sensitive(applyButton, TRUE);
-}
-
-void pmo_toggle(GtkWidget *w, GTKPreferenceWindow *p)
-{
-    int i = GTK_TOGGLE_BUTTON(w)->active;
-    p->PMOToggle(i);
-}
-
-void GTKPreferenceWindow::LMCToggle(int active)
-{
-    proposedValues.logDecoder = active;
-    gtk_widget_set_sensitive(applyButton, TRUE);
-}
-
-void lmc_toggle(GtkWidget *w, GTKPreferenceWindow *p)
-{
-    int i = GTK_TOGGLE_BUTTON(w)->active;
-    p->LMCToggle(i);
-}
-
-void GTKPreferenceWindow::PerfToggle(int active)
-{
-    proposedValues.logPerformance = active;
-    gtk_widget_set_sensitive(applyButton, TRUE);
-}
-
-void perf_toggle(GtkWidget *w, GTKPreferenceWindow *p)
-{
-    int i = GTK_TOGGLE_BUTTON(w)->active;
-    p->PerfToggle(i);
 }
 
 GtkWidget *GTKPreferenceWindow::CreatePage3(void)
@@ -927,105 +735,235 @@ GtkWidget *GTKPreferenceWindow::CreatePage3(void)
     gtk_container_set_border_width(GTK_CONTAINER(pane), 5);
     gtk_widget_show(pane);
 
-    GtkWidget *textlabel = gtk_label_new(NULL);
-    gtk_label_set_line_wrap(GTK_LABEL(textlabel), TRUE);
-    gtk_misc_set_alignment(GTK_MISC(textlabel), (gfloat)0.0, (gfloat)0.5);
-    gtk_label_set_text(GTK_LABEL(textlabel), "If you are experiencing a problem with "BRANDING" it is possible to log what the program is doing in order to help us track down the cause.  When you enable logging a file is created in your home directory called freeamp.log.  You should send us the log file when you report a bug.");
-    gtk_container_add(GTK_CONTAINER(pane), textlabel);
-    gtk_widget_show(textlabel);
-
-    textlabel = gtk_label_new(NULL);
-    gtk_label_set_line_wrap(GTK_LABEL(textlabel), TRUE);
-    gtk_misc_set_alignment(GTK_MISC(textlabel), (gfloat)0.0, (gfloat)0.5);
-    gtk_label_set_text(GTK_LABEL(textlabel), "You have the ability to narrow the logging to a particular portion of "BRANDING" by selecting the various logging options.  If you are not sure in which portion of the program the problem is occuring you can simply enable all the logging options.");
-    gtk_container_add(GTK_CONTAINER(pane), textlabel);
-    gtk_widget_show(textlabel);
-
-    GtkWidget *check = gtk_check_button_new_with_label("Enable Logging");
-    gtk_container_add(GTK_CONTAINER(pane), check);
-    gtk_signal_connect(GTK_OBJECT(check), "toggled",
-                       GTK_SIGNAL_FUNC(log_toggle), this);
-    if (originalValues.enableLogging)
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), TRUE);
-    gtk_widget_show(check);
-
-    GtkWidget *frame = gtk_frame_new(NULL);
-    gtk_container_add(GTK_CONTAINER(pane), frame);
+    GtkWidget *frame = gtk_frame_new("Audio");
+    gtk_box_pack_start(GTK_BOX(pane), frame, TRUE, FALSE, 0);
     gtk_widget_show(frame);
 
-    GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
-    gtk_container_set_border_width(GTK_CONTAINER(vbox), 0);
-    gtk_container_add(GTK_CONTAINER(frame), vbox);
-    gtk_widget_show(vbox);
+    GtkWidget *table = gtk_table_new(2, 2, FALSE);
+    gtk_container_add(GTK_CONTAINER(frame), table);
+    gtk_widget_show(table);
 
-    logGeneral = gtk_check_button_new_with_label(
-                      "Log general player errors (e.g. Loading plugins)");
-    gtk_container_add(GTK_CONTAINER(vbox), logGeneral);
-    gtk_signal_connect(GTK_OBJECT(logGeneral), "toggled",
-                       GTK_SIGNAL_FUNC(general_toggle), this);
-    if (originalValues.logMain)
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(logGeneral), TRUE);
-    gtk_widget_show(logGeneral);
+    Registry *pmo = m_pContext->player->GetPMORegistry();
+    int32 i = 0;
+    int32 pos = 0;
+    RegistryItem *item;
 
-    logPMI = gtk_check_button_new_with_label(
-                   "Log input from PMIs (e.g. File, HTTP, ShoutCAST)");
-    gtk_container_add(GTK_CONTAINER(vbox), logPMI);
-    gtk_signal_connect(GTK_OBJECT(logPMI), "toggled",
-                       GTK_SIGNAL_FUNC(pmi_toggle), this);
-    if (originalValues.logInput)
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(logPMI), TRUE);
-    gtk_widget_show(logPMI);
+    GtkWidget *label = gtk_label_new("Audio Output");
+    gtk_misc_set_alignment(GTK_MISC(label), (gfloat)1.0, (gfloat)0.5);
+    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 1, 2, GTK_FILL, GTK_FILL,
+                     5, 0);
+    gtk_widget_show(label);
 
-    logPMO = gtk_check_button_new_with_label(
-                   "Log output from PMOs (e.g. Soundcard, EsounD, ALSA)");
-    gtk_container_add(GTK_CONTAINER(vbox), logPMO);
-    gtk_signal_connect(GTK_OBJECT(logPMO), "toggled",
-                       GTK_SIGNAL_FUNC(pmo_toggle), this);
-    if (originalValues.logOutput)
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(logPMO), TRUE);
-    gtk_widget_show(logPMO);
+    GtkWidget *optionmenu = gtk_option_menu_new();
+    GtkWidget *menu = gtk_menu_new();
 
-    logLMC = gtk_check_button_new_with_label(
-                   "Log decoding process (e.g. MP3, CDDA)");
-    gtk_container_add(GTK_CONTAINER(vbox), logLMC);
-    gtk_signal_connect(GTK_OBJECT(logLMC), "toggled",
-                       GTK_SIGNAL_FUNC(lmc_toggle), this);
-    if (originalValues.logDecoder)
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(logLMC), TRUE);
-    gtk_widget_show(logLMC);
+    while (pmo && (item = pmo->GetItem(i++))) {
+        GtkWidget *menuitem = gtk_menu_item_new_with_label(item->Name());
+        gtk_signal_connect(GTK_OBJECT(menuitem), "activate",
+                           GTK_SIGNAL_FUNC(pmo_select), this);
+        gtk_widget_show(menuitem);
+        gtk_menu_append(GTK_MENU(menu), menuitem);
+        if (originalValues.defaultPMO == item->Name())
+            pos = i;
+    }
 
-    logPerf = gtk_check_button_new_with_label(
-               "Log performance issues (e.g. Timing, Buffer Under/Overflows)");
-    gtk_container_add(GTK_CONTAINER(vbox), logPerf);
-    gtk_signal_connect(GTK_OBJECT(logPerf), "toggled",
-                       GTK_SIGNAL_FUNC(perf_toggle), this);
-    if (originalValues.logPerformance)
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(logPerf), TRUE);
-    gtk_widget_show(logPerf);
+    gtk_option_menu_set_menu(GTK_OPTION_MENU(optionmenu), menu);
+    gtk_table_attach(GTK_TABLE(table), optionmenu, 1, 2, 1, 2, GTK_FILL,
+                     GTK_FILL, 5, 5);
+    gtk_widget_show(optionmenu);
+    gtk_option_menu_set_history(GTK_OPTION_MENU(optionmenu), pos - 1);
+
 
     return pane;
+}
+
+void GTKPreferenceWindow::SetInputBufferSize(int newvalue)
+{
+    proposedValues.inputBufferSize = newvalue;
+    gtk_widget_set_sensitive(applyButton, TRUE);
+}
+
+void input_buffer_change(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    char *text = gtk_entry_get_text(GTK_ENTRY(w));
+    int newdata = atoi(text);
+    p->SetInputBufferSize(newdata);
+}
+
+void GTKPreferenceWindow::SetOutputBufferSize(int newvalue)
+{
+    proposedValues.outputBufferSize = newvalue;
+    gtk_widget_set_sensitive(applyButton, TRUE);
+}
+
+void output_buffer_change(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    char *text = gtk_entry_get_text(GTK_ENTRY(w));
+    int newdata = atoi(text);
+    p->SetOutputBufferSize(newdata);
+}
+
+void GTKPreferenceWindow::SetPreBufferLength(int newvalue)
+{
+    proposedValues.preBufferLength = newvalue;
+    gtk_widget_set_sensitive(applyButton, TRUE);
+}
+
+void prestream_buffer_change(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    char *text = gtk_entry_get_text(GTK_ENTRY(w));
+    int newdata = atoi(text);
+    p->SetPreBufferLength(newdata);
+}
+
+GtkWidget *GTKPreferenceWindow::CreatePage6(void)
+{
+    GtkWidget *pane = gtk_vbox_new(FALSE, 5);
+    gtk_container_set_border_width(GTK_CONTAINER(pane), 5);
+    gtk_widget_show(pane);
+
+    GtkWidget *frame = gtk_frame_new("Buffer Sizes");
+    gtk_box_pack_start(GTK_BOX(pane), frame, TRUE, FALSE, 0);
+    gtk_widget_show(frame);
+
+    GtkWidget *table = gtk_table_new(3, 2, FALSE);
+    gtk_container_add(GTK_CONTAINER(frame), table);
+    gtk_widget_show(table);
+
+    int32 value;
+    char tempstr[256];
+
+    GtkWidget *label = gtk_label_new("Input Buffer Size (Kilobytes)");
+    gtk_misc_set_alignment(GTK_MISC(label), (gfloat)1.0, (gfloat)0.5);
+    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 0, 1, GTK_FILL, GTK_FILL,
+                     10, 1);
+    gtk_widget_show(label);
+
+    GtkWidget *entry = gtk_entry_new();
+    value = originalValues.inputBufferSize;
+    sprintf(tempstr, "%d", value);
+    gtk_entry_set_text(GTK_ENTRY(entry), tempstr);
+    gtk_entry_set_max_length(GTK_ENTRY(entry), 4);
+    gtk_signal_connect(GTK_OBJECT(entry), "changed",
+                       GTK_SIGNAL_FUNC(input_buffer_change), this);
+    gtk_table_attach(GTK_TABLE(table), entry, 1, 2, 0, 1, GTK_FILL, GTK_FILL,
+                     10, 3);
+    gtk_widget_show(entry);
+
+    label = gtk_label_new("Output Buffer Size (Kilobytes)");
+    gtk_misc_set_alignment(GTK_MISC(label), (gfloat)1.0, (gfloat)0.5);
+    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 1, 2, GTK_FILL, GTK_FILL,
+                     10, 1);
+    gtk_widget_show(label);
+
+    entry = gtk_entry_new();
+    value = originalValues.outputBufferSize;
+    sprintf(tempstr, "%d", value);
+    gtk_entry_set_text(GTK_ENTRY(entry), tempstr);
+    gtk_entry_set_max_length(GTK_ENTRY(entry), 4);
+    gtk_signal_connect(GTK_OBJECT(entry), "changed",
+                       GTK_SIGNAL_FUNC(output_buffer_change), this);
+    gtk_table_attach(GTK_TABLE(table), entry, 1, 2, 1, 2, GTK_FILL, GTK_FILL,
+                     10, 3);
+    gtk_widget_show(entry);
+
+    label = gtk_label_new("Prebuffer Streams (Seconds)");
+    gtk_misc_set_alignment(GTK_MISC(label), (gfloat)1.0, (gfloat)0.5);
+    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 2, 3, GTK_FILL, GTK_FILL,
+                     10, 1);
+    gtk_widget_show(label);
+
+    entry = gtk_entry_new();
+    value = originalValues.preBufferLength;
+    sprintf(tempstr, "%d", value);
+    gtk_entry_set_text(GTK_ENTRY(entry), tempstr);
+    gtk_entry_set_max_length(GTK_ENTRY(entry), 2);
+    gtk_signal_connect(GTK_OBJECT(entry), "changed",
+                       GTK_SIGNAL_FUNC(prestream_buffer_change), this);
+    gtk_table_attach(GTK_TABLE(table), entry, 1, 2, 2, 3, GTK_FILL, GTK_FILL,
+                     10, 3);
+    gtk_widget_show(entry);
+
+    return pane;
+}
+
+void freeamp_press(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    LaunchBrowser("http://www.freeamp.org/");    
+}
+
+void emusic_press(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    LaunchBrowser("http://www.emusic.com/");
 }
 
 GtkWidget *GTKPreferenceWindow::CreateAbout(void)
 {
     GtkWidget *pane = gtk_vbox_new(FALSE, 5);
-    gtk_container_set_border_width(GTK_CONTAINER(pane), 5);
+    gtk_container_set_border_width(GTK_CONTAINER(pane), 0);
     gtk_widget_show(pane);
 
     GtkWidget *textlabel = gtk_label_new(NULL);
     gtk_label_set_line_wrap(GTK_LABEL(textlabel), TRUE);
     gtk_label_set_text(GTK_LABEL(textlabel), BRANDING);
     gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_CENTER);
-    gtk_container_add(GTK_CONTAINER(pane), textlabel);
+    gtk_box_pack_start(GTK_BOX(pane), textlabel, FALSE, FALSE, 0);
     gtk_widget_show(textlabel);
 
     textlabel = gtk_label_new(NULL);
     gtk_label_set_line_wrap(GTK_LABEL(textlabel), TRUE);
     gtk_label_set_text(GTK_LABEL(textlabel), "version "FREEAMP_VERSION);
     gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_CENTER);
-    gtk_container_add(GTK_CONTAINER(pane), textlabel);
+    gtk_box_pack_start(GTK_BOX(pane), textlabel, FALSE, FALSE, 0);
     gtk_widget_show(textlabel);
 
+    textlabel = gtk_label_new(NULL);
+    gtk_label_set_line_wrap(GTK_LABEL(textlabel), TRUE);
+    gtk_label_set_text(GTK_LABEL(textlabel), "FreeAmp is an Open Source effort to build the best digital audio player available.  In the interest of supporting the free software community, while at the same time fostering the growth of the online delivery of music, EMusic.com, THE Source for Downloadable Music, is funding both the FreeAmp.org domain and the efforts of the FreeAmp team.  The FreeAmp team consists of: Mark B. Elrod, Robert Kaye, Isaac Richards, Brett Thomas, and Jason Woodward.");
+    gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_LEFT);
+    gtk_box_pack_start(GTK_BOX(pane), textlabel, FALSE, FALSE, 0);
+    gtk_widget_show(textlabel);
+
+    textlabel = gtk_label_new(NULL);
+    gtk_label_set_line_wrap(GTK_LABEL(textlabel), TRUE);
+    gtk_label_set_text(GTK_LABEL(textlabel), "Other people have also contributed to FreeAmp:");
+    gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_LEFT);
+    gtk_box_pack_start(GTK_BOX(pane), textlabel, FALSE, FALSE, 0);
+    gtk_widget_show(textlabel);
+
+    textlabel = gtk_label_new(NULL);
+    gtk_label_set_line_wrap(GTK_LABEL(textlabel), TRUE);
+    gtk_label_set_text(GTK_LABEL(textlabel), "William Bull, Alan Cutter, Gabor Fleischer, Jean-Michel HERVE, Hiromasa Kato, Michael Bruun Petersen, Sylvain Rebaud, The Snowblind Alliance, Tom Spindler, Valters Vingolds, Bill Yuan.");
+    gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_LEFT);
+    gtk_box_pack_start(GTK_BOX(pane), textlabel, FALSE, FALSE, 0);
+    gtk_widget_show(textlabel);
+
+    textlabel = gtk_label_new(NULL);
+    gtk_label_set_line_wrap(GTK_LABEL(textlabel), TRUE);
+    gtk_label_set_text(GTK_LABEL(textlabel), "FreeAmp is being released under the terms of the GPL.  As is provided by the GPL, all of EMusic.com's and your efforts toward FreeAmp will be released back to the community at large.");
+    gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_LEFT);
+    gtk_box_pack_start(GTK_BOX(pane), textlabel, FALSE, FALSE, 0);
+    gtk_widget_show(textlabel);
+
+    GtkWidget *hbox = gtk_hbox_new(FALSE, 5);
+    gtk_container_set_border_width(GTK_CONTAINER(hbox), 5);
+    gtk_container_add(GTK_CONTAINER(pane), hbox);
+    gtk_widget_show(hbox);
+
+    GtkWidget *button;
+
+    button = gtk_button_new_with_label(" Visit FreeAmp.org ");
+    gtk_container_add(GTK_CONTAINER(hbox), button);
+    gtk_signal_connect(GTK_OBJECT(button), "clicked", 
+                       GTK_SIGNAL_FUNC(freeamp_press), this);
+    gtk_widget_show(button);
+
+    button = gtk_button_new_with_label(" Visit EMusic.com ");
+    gtk_container_add(GTK_CONTAINER(hbox), button);
+    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                       GTK_SIGNAL_FUNC(emusic_press), this);
+    gtk_widget_show(button);
+   
     return pane;
 }
 
