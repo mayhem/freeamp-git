@@ -20,30 +20,29 @@
 	
 	$Id$
 ____________________________________________________________________________*/
-
 // CommandLineCIO.h
 
 
-#ifndef _CONSOLE_CIO_H_
-#define _CONSOLE_CIO_H_
+#ifndef _COMMANDLINECIO_H_
+#define _COMMANDLINECIO_H_
 
 #include "ctrlobj.h"
 #include "event.h"
 #include "thread.h"
+#include "playlist.h"
 
-class ConsoleCIO : public CIO {
+class CommandLineCIO : public CIO {
  public:
-    ConsoleCIO();
+    CommandLineCIO();
     virtual int32 acceptCIOEvent(Event *);
     virtual void setArgs(int argc, char **argv);
-    ~ConsoleCIO();
-
-	static void keyboardServiceFunction(void *);
+    static void keyboardServiceFunction(void *);
+    ~CommandLineCIO();
  private:
     void processSwitch(char *);
     Thread *keyboardListenThread;
-
+    PlayList *mypl;
 };
 
 
-#endif // _CONSOLE_CIO_H_
+#endif // _COMMANDLINECIO_H_

@@ -21,29 +21,30 @@
 	$Id$
 ____________________________________________________________________________*/
 
-// CommandLineCIO.h
+// Mpg123UI.h
 
 
-#ifndef _CONSOLE_CIO_H_
-#define _CONSOLE_CIO_H_
+#ifndef _Mpg123UI_H_
+#define _Mpg123UI_H_
 
 #include "ctrlobj.h"
 #include "event.h"
-#include "thread.h"
 
-class ConsoleCIO : public CIO {
+class Mpg123UI : public CIO,public COO {
  public:
-    ConsoleCIO();
+    Mpg123UI();
     virtual int32 acceptCIOEvent(Event *);
+    virtual int32 acceptCOOEvent(Event *);
     virtual void setArgs(int argc, char **argv);
-    ~ConsoleCIO();
-
-	static void keyboardServiceFunction(void *);
+    ~Mpg123UI();
  private:
-    void processSwitch(char *);
-    Thread *keyboardListenThread;
-
+    bool verboseMode;
+    int32 totalFrames;
+    float totalTime;
+    int32 skipFirst;
+    char fileName[512];
+    float lastSeconds;
 };
 
 
-#endif // _CONSOLE_CIO_H_
+#endif // _Mpg123UI_H_

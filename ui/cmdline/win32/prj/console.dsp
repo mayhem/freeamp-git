@@ -83,7 +83,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\ui mkdir\
-  ..\..\..\..\base\win32\prj\ui	copy console.ui ..\..\..\..\base\win32\prj\ui
+   ..\..\..\..\base\win32\prj\ui	copy console.ui ..\..\..\..\base\win32\prj\ui
 # End Special Build Tool
 
 !ENDIF 
@@ -110,6 +110,14 @@ InputPath=..\..\..\..\config\config.win32
 
 !ENDIF 
 
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\consoleCIO.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\consoleCOO.cpp
 # End Source File
 # End Target
 # End Project

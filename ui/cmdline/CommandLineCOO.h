@@ -21,29 +21,24 @@
 	$Id$
 ____________________________________________________________________________*/
 
-// CommandLineCIO.h
+// CommandLineCOO.h
 
 
-#ifndef _CONSOLE_CIO_H_
-#define _CONSOLE_CIO_H_
+#ifndef _COMMANDLINECOO_H_
+#define _COMMANDLINECOO_H_
 
 #include "ctrlobj.h"
 #include "event.h"
-#include "thread.h"
 
-class ConsoleCIO : public CIO {
+class CommandLineCOO : public COO {
  public:
-    ConsoleCIO();
-    virtual int32 acceptCIOEvent(Event *);
-    virtual void setArgs(int argc, char **argv);
-    ~ConsoleCIO();
-
-	static void keyboardServiceFunction(void *);
+    CommandLineCOO();
+    virtual int32 acceptCOOEvent(Event *);
+    virtual void setArgs(int, char **);
+    ~CommandLineCOO();
  private:
-    void processSwitch(char *);
-    Thread *keyboardListenThread;
 
 };
 
 
-#endif // _CONSOLE_CIO_H_
+#endif // _COMMANDLINECOO_H_

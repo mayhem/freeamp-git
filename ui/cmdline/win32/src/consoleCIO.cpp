@@ -27,8 +27,6 @@ ____________________________________________________________________________*/
 
 #include "ConsoleCIO.h"
 #include "event.h"
-#include "player.h"
-#include "playlist.h"
 #include "thread.h"
 
 #define stdinfd 0
@@ -56,7 +54,7 @@ ConsoleCIO::~ConsoleCIO()
     }
 }
 
-THREAD_RETURN THREAD_LINKAGE ConsoleCIO::keyboardServiceFunction(void *pclcio) {
+void ConsoleCIO::keyboardServiceFunction(void *pclcio) {
     ConsoleCIO *pMe = (ConsoleCIO *)pclcio;
     char *pkey = new char[1];
     char chr;
