@@ -80,6 +80,8 @@ SoundCardPMO()
 	m_data_size			= 0;
 	m_user_stop			= false;
 	m_initialized		= false;
+
+	m_pauseMutex = new Mutex();
 }
 
 SoundCardPMO::
@@ -99,8 +101,12 @@ SoundCardPMO::
 
         delete [] buf;
 
-        while(waveOutClose(m_hwo) == WAVERR_STILLPLAYING)
-		{
+        //while(waveOutClose(m_hwo) == WAVERR_STILLPLAYING)
+		//{
+		//	Sleep(SLEEPTIME);
+		//}
+		MMRESULT foo = waveOutReset(m_hwo);
+		while ((foo = waveOutClose(m_hwo)) == WAVERR_STILLPLAYING) {
 			Sleep(SLEEPTIME);
 		}
 
@@ -116,6 +122,11 @@ SoundCardPMO::
 		delete [] m_wavehdr_array;
 		delete m_wfex;
 	}
+	if (m_pauseMutex) {
+		delete m_pauseMutex;
+		m_pauseMutex = NULL;
+	}
+
 }
 
 
@@ -242,7 +253,9 @@ Write(int32& wrote, void *pBuffer,int32 length)
 
 	// Prepare & write newest header
 	waveOutPrepareHeader(m_hwo, wavhdr, m_hdr_size);
+	m_pauseMutex->Acquire(WAIT_FOREVER);
 	waveOutWrite(m_hwo, wavhdr, m_hdr_size);
+	m_pauseMutex->Release();
 	//cerr << "Wrote: " << length << " bytes" << endl;
     wrote = length;
     return result;
@@ -277,7 +290,8 @@ Error
 SoundCardPMO::
 Pause()
 {
-	waveOutPause(m_hwo);
+	//waveOutPause(m_hwo);
+	m_pauseMutex->Acquire(WAIT_FOREVER);
      return kError_NoErr;
 }
 
@@ -285,6 +299,7 @@ Error
 SoundCardPMO::
 Resume()
 {
-    waveOutRestart(m_hwo);
+    //waveOutRestart(m_hwo);
+	m_pauseMutex->Release();
     return kError_NoErr;
 }

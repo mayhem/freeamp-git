@@ -37,6 +37,8 @@ ____________________________________________________________________________*/
 #include "queue.h"
 
 
+enum { STATE_Stopped = 1, STATE_Playing, STATE_Paused };
+
 class FreeAmpUI : public UserInterface {
  public:
     FreeAmpUI();
@@ -61,6 +63,8 @@ class FreeAmpUI : public UserInterface {
 
     bool            m_scrolling;
 
+    EventQueue*     m_target;
+	int32			m_state;
 
  protected:
       static void UIThreadFunc(void *);
@@ -70,7 +74,6 @@ class FreeAmpUI : public UserInterface {
     int32			m_totalSeconds;
     float			m_secondsPerFrame;
     Thread*         m_uiThread;
-    EventQueue*     m_target;
 
     HWND            m_hwnd;
     HWND            m_hwndPlay;

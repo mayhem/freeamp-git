@@ -46,7 +46,7 @@ win32Thread::
     }
 }
 
-uint32 __stdcall 
+unsigned long __stdcall 
 win32Thread::
 internalThreadFunction(void* arg)
 {
@@ -73,7 +73,8 @@ Create(thread_function function, void* arg)
     m_function      = function;
     m_arg           = arg;
 
-	m_threadHandle = (HANDLE) _beginthreadex(
+	//m_threadHandle = (HANDLE) _beginthreadex(
+	m_threadHandle = ::CreateThread(
 									NULL,
 									0,
 									internalThreadFunction,

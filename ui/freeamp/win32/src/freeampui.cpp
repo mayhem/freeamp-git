@@ -49,6 +49,8 @@ extern "C"
 #include "drawplayer.h"
 
 HINSTANCE g_hInst;		//  Program instance handle
+extern ControlInfo g_buttonStateArray[kNumControls];
+extern DisplayInfo g_displayInfo;
 
 }
 
@@ -83,6 +85,8 @@ INT WINAPI DllMain (HINSTANCE hInst,
     return 1;                 
 }
 
+FreeAmpUI *g_ui;
+
 FreeAmpUI::
 FreeAmpUI():
 UserInterface()
@@ -95,6 +99,9 @@ UserInterface()
     m_uiThread->Create(UIThreadFunc,this);
 
     m_uiSemaphore->Wait();
+
+	g_ui = this;
+	m_state = STATE_Stopped;
 }
 
 FreeAmpUI::
@@ -130,7 +137,7 @@ AcceptEvent(Event* event)
 				EnableWindow(m_hwndStop, TRUE);
 				EnableWindow(m_hwndPause, TRUE);
 				EnableWindow(m_hwndSlider, TRUE);
-
+				m_state = STATE_Playing;
 	            break; 
             }
 
@@ -143,6 +150,7 @@ AcceptEvent(Event* event)
 				EnableWindow(m_hwndStop, TRUE);
 				EnableWindow(m_hwndPause, FALSE);
 				EnableWindow(m_hwndSlider, TRUE);
+				m_state = STATE_Paused;
 	            break; 
             }
 
@@ -165,113 +173,66 @@ AcceptEvent(Event* event)
                 char timeString[256] = "00:00:00";
 
                 SetWindowText(m_hwndCurrent, timeString);
-
+				m_state = STATE_Stopped;
 	            break; 
             }
 			case INFO_MPEGInfo: 
 				{
 					MpegInfoEvent *info = (MpegInfoEvent *)event;
+
+					g_displayInfo.range = info->GetTotalFrames();
+
+#if 0
 					char szTemp[256];
 					m_secondsPerFrame = info->GetSecondsPerFrame();
-                sprintf(szTemp, "%d kbps",  info->GetBitRate()/1000);
-                SendMessage(m_hwndStatus, 
-						    SB_SETTEXT, 
-						    0, 
-						    (LPARAM)szTemp);
+					sprintf(szTemp, "%d kbps",  info->GetBitRate()/1000);
+					SendMessage(m_hwndStatus, 
+								SB_SETTEXT, 
+								0, 
+								(LPARAM)szTemp);
 
-                sprintf(szTemp, "%.1f kHz",  ((float)info->GetSampleRate())/1000);
-			    SendMessage(m_hwndStatus, 
-						    SB_SETTEXT, 
-						    1, 
-						    (LPARAM) szTemp);
-                SendMessage(m_hwndSlider,
-						    TBM_SETRANGE,
-						    (WPARAM)TRUE,
-						    MAKELPARAM(0, info->GetTotalFrames()));
-				
-				break;
+					sprintf(szTemp, "%.1f kHz",  ((float)info->GetSampleRate())/1000);
+					SendMessage(m_hwndStatus, 
+								SB_SETTEXT, 
+								1, 
+								(LPARAM) szTemp);
+					SendMessage(m_hwndSlider,
+								TBM_SETRANGE,
+								(WPARAM)TRUE,
+								MAKELPARAM(0, info->GetTotalFrames()));
+#endif					
+					break;
 				}
             case INFO_MediaInfo: 
             {
                 MediaInfoEvent *info = (MediaInfoEvent*)event;
+				int32 seconds = (int32)ceil(info->m_totalSeconds);
+				int32 hours = seconds / 3600;
+				int32 minutes = (seconds - (hours * 3600)) / 60;
+				seconds = seconds - (hours * 3600) - (minutes * 60);
 
-                
-                char timeString[256] = "00:00:00";
-			    char szTemp[256];
-
-                SetWindowText(m_hwndCurrent, timeString);
-
-
-                int32 seconds = (int32)ceil(info->m_totalSeconds);
-				m_totalSeconds = seconds;
-			    int32 hours = seconds / 3600;
-			    int32 minutes = seconds / 60 - hours * 60;
-			    seconds = seconds - minutes * 60 - hours * 3600;
-
-				
-                sprintf(timeString,"%02d:%02d:%02d",hours,
-				                                    minutes,
-				                                    seconds);
-
-			    SetWindowText(m_hwndTotal, timeString);
-
-
-
-                sprintf(szTemp, "%d of %d", info->m_indexOfSong,info->m_totalSongs);
-			    SendMessage(m_hwndStatus, 
-						    SB_SETTEXT, 
-						    2, 
-						    (LPARAM) szTemp);
-
-		
-			    SendMessage(m_hwndSlider,
-						    TBM_SETPOS,
-						    (WPARAM)TRUE,
-						    (LPARAM)0);
-
-                SetWindowText(m_hwnd, info->m_filename);
-
-
-		        /*totalFrames = info->totalFrames;
-		        totalTime = info->totalTime;
-		        char *path = info->filename;
-		        char *pLastSlash = strrchr(path,'/');
-		        char *dir = NULL;
-		        char *fname = NULL;
-		        if (pLastSlash) {
-			    *pLastSlash = '\0';
-			    fname = (char *)((int)pLastSlash + 1);
-			    dir = path;
-		        } else {
-			    fname = path;
-		        }
-		        strncpy(fileName,fname,511);
-
-		        fileName[511] = '\0';
-
-		        if (info->tagInfo.contains_info) 
-                {
-			        fprintf(stderr,"Title  : %30s  Artist: %s\n",info->tagInfo.songname,info->tagInfo.artist);
-			        fprintf(stderr,"Album  : %30s  Year: %4s, Genre: %d\n",info->tagInfo.album,info->tagInfo.year,(int)info->tagInfo.genre);
-			        fprintf(stderr,"Comment: %30s \n",info->tagInfo.comment);
-		        }
-
-		        if (verboseMode == false) 
-                {
-                cerr << "Playing MPEG stream from " << fileName << " ..." << endl;
-			    cerr << "MPEG 1.0, Layer: III, Freq: " << info->freq << ", mode: Joint-Stereo, modext: 3, BPF : " << info->bytesPerFrame  << endl;
-			    cerr << "Channels: 2, copyright: No, original: Yes, CRC: No, emphasis: 0." << endl;
-			    cerr << "Bitrate: " << info->bps/1000 << " KBits/s, Extension value: 0" << endl;
-			    cerr << "Audio: 1:1 conversion, rate: " << info->freq << ", encoding: signed 16 bit, channels: 2" << endl;
-		        }*/
-
+                strcpy(g_displayInfo.path,info->m_filename);
+				g_displayInfo.totalhours = hours;
+				g_displayInfo.totalminutes = minutes;
+				g_displayInfo.totalseconds = seconds;
 	            break; 
             }
 
             case INFO_MediaTimeInfo: 
             {
                 MediaTimeInfoEvent* info = (MediaTimeInfoEvent*)event;
-                char timeString[256] = "00:00:00";
+ 
+				int32 seconds = (int32)ceil(info->m_totalSeconds);
+				int32 hours = seconds / 3600;
+				int32 minutes = (seconds - (hours * 3600)) / 60;
+				seconds = seconds - (hours * 3600) - (minutes * 60);
+				
+				g_displayInfo.hours = hours;
+				g_displayInfo.minutes = minutes;
+				g_displayInfo.seconds = seconds;
+				g_displayInfo.frame = info->m_frame;
+#if 0				
+				char timeString[256] = "00:00:00";
                 static int32 lastSeconds = 0, lastMinutes = 0, lastHours = 0;
 	            
                 if(lastSeconds != info->m_seconds ||
@@ -298,7 +259,7 @@ AcceptEvent(Event* event)
 						        (LPARAM)info->m_frame);
 
                 }
-
+#endif
 	            break; 
             }
 

@@ -1,4 +1,17 @@
-int smallFontWidth[] = {    
+#ifndef FONT_WIDTH_H
+#define FONT_WIDTH_H
+
+#ifdef DEFINE_FONT_WIDTHS
+#define EXTERN
+#else
+#define EXTERN extern
+#endif
+
+EXTERN int smallFontWidth[] 
+#ifndef DEFINE_FONT_WIDTHS
+;
+#else
+= {    
 4,
 3,
 4,
@@ -96,9 +109,13 @@ int smallFontWidth[] = {
 7
 
 };
+#endif
 
-int largeFontWidth[] = {    
-
+EXTERN int largeFontWidth[] 
+#ifndef DEFINE_FONT_WIDTHS
+;
+#else
+= {    
 0,
 0,
 4,
@@ -141,3 +158,7 @@ int largeFontWidth[] = {
 12
 
 };
+
+#endif
+
+#endif

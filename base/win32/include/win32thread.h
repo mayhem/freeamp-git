@@ -48,14 +48,14 @@ public:
 	virtual Priority GetPriority() const;
 	virtual Priority SetPriority(Priority priority);
 
-    static uint32 __stdcall internalThreadFunction(void* arg);
+    static unsigned long __stdcall internalThreadFunction(void* arg);
 
     uint32 InternalThreadFunction(); 
 
 private:
 	Priority	    m_priority;
 	HANDLE		    m_threadHandle;	
-	unsigned	    m_threadId;
+	unsigned long	    m_threadId;
 
     thread_function m_function;
     void*           m_arg;

@@ -390,6 +390,7 @@ void XingLMC::DecodeWork() {
 		case XING_Pause:
 		    m_output->Pause();
 		    m_pauseSemaphore->Wait();
+			//m_output->Resume();
 		    break;
 		default: break;
 	    }
@@ -465,8 +466,8 @@ Error XingLMC::Pause() {
 
 Error XingLMC::Resume() {
     ENSURE_INITIALIZED;
-    m_output->Resume();
     m_pauseSemaphore->Signal();
+	m_output->Resume();
     return kError_NoErr;
 }
 

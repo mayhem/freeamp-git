@@ -1,9 +1,13 @@
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 LRESULT WINAPI MainWndProc( HWND hwnd, 
                             UINT msg, 
                             WPARAM wParam, 
                             LPARAM lParam );
-
+#ifdef __cplusplus
+}
+#endif
 
 #define HEIGHT 51
 

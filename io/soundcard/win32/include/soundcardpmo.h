@@ -33,7 +33,7 @@ ____________________________________________________________________________*/
 /* project headers */
 #include "config.h"
 #include "pmo.h"
-
+#include "mutex.h"
 
 #define BIT_SELECT  0x1f
 #define SLEEPTIME   256
@@ -73,7 +73,7 @@ private:
 	bool			m_user_stop;
 	bool			m_initialized;
 
-
+	Mutex*			m_pauseMutex;
     
 };
 
