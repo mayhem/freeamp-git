@@ -55,7 +55,11 @@ ListItem()
     // that will hold the pre-rendered string
     for(i = 0; m_text[i]; i++)
     {
-        textLength += m_fontWidths[m_text[i] - 32];
+        if(m_text[i] < 127 && m_text[i] > 31)
+            textLength += m_fontWidths[m_text[i] - 32];
+        else
+            textLength += m_fontWidths[63 - 32];
+
     }
 
     // create text bitmap
@@ -67,16 +71,30 @@ ListItem()
     // render the string
     for(i = 0; m_text[i]; i++)
     {
+        int32 y;
+        int32 width;
+
+        if(m_text[i] < 127 && m_text[i] > 31)
+        {
+            y = (m_text[i] - 32)*m_fontHeight;
+            width = m_fontWidths[m_text[i] - 32];
+        }
+        else
+        {
+            y = (63 - 32)*m_fontHeight;
+            width = m_fontWidths[63 - 32];
+        }
+
         Renderer::Copy( m_textBitmap,
                         offset, 
                         0,     
-                        m_fontWidths[m_text[i] - 32],   
+                        width,   
                         m_fontHeight,
                         m_fontBitmap,    
                         0,
-                        (m_text[i] - 32)*m_fontHeight);
+                        y);
 
-        offset += m_fontWidths[m_text[i] - 32];
+        offset += width;
     }
 
     SetHeight(fontHeight);

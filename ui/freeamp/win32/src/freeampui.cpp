@@ -1641,11 +1641,10 @@ UpdatePlayList()
         {
             MediaInfoEvent* info = item->GetMediaInfo();
 
-            char buffer[256];
+            //char buffer[256];
+            //sprintf(buffer, "This is StringItem #%d", i);
 
-            sprintf(buffer, "This is StringItem #%d", i);
-
-            m_playlistView->AddItem(new StringItem(buffer,
+            m_playlistView->AddItem(new StringItem(item->DisplayString(),
                                     m_smallFontBitmap,
                                     10,
                                     smallFontWidth));
