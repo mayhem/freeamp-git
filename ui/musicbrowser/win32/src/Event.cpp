@@ -538,23 +538,58 @@ void MusicBrowserUI::NewFavoriteEvent()
 
 void MusicBrowserUI::AddFavoriteEvent()
 {
-    vector<PlaylistItem*> items;
+    HWND hwndFocus = GetFocus();
 
-    GetSelectedStreamItems(&items);
-
-    if(items.size())
+    if(hwndFocus == m_hMusicView)
     {
-        vector<PlaylistItem*>::iterator i = items.begin();
-        
-        for(; i != items.end(); i++)
-        {
-            m_context->catalog->WriteMetaDataToDatabase((*i)->URL().c_str(),
-                                                        (*i)->GetMetaData(),
-                                                        kTypeStream);
+        vector<PlaylistItem*> items;
 
-            m_context->catalog->AddStream((*i)->URL().c_str());
+        GetSelectedStreamItems(&items);
+
+        if(items.size())
+        {
+            vector<PlaylistItem*>::iterator i = items.begin();
+        
+            for(; i != items.end(); i++)
+            {
+                m_context->catalog->WriteMetaDataToDatabase((*i)->URL().c_str(),
+                                                            (*i)->GetMetaData(),
+                                                            kTypeStream);
+
+                m_context->catalog->AddStream((*i)->URL().c_str());
+            }
         }
-    }  
+    }
+    else if(hwndFocus == m_hPlaylistView)
+    {
+        uint32 count = ListView_GetItemCount(m_hPlaylistView);
+        uint32 selected = ListView_GetSelectedCount(m_hPlaylistView);
+
+        uint32 index = 0;
+        uint32 found = 0;
+
+        for(index = 0; index < count, found < selected; index++)
+        {
+            uint32 state = ListView_GetItemState(m_hPlaylistView, 
+                                                 index, 
+                                                 LVIS_SELECTED);
+            if(state & LVIS_SELECTED)
+            {
+                found++;
+
+                PlaylistItem* item = m_plm->ItemAt(index);
+
+                if(!item->URL().compare(0, 4, "http"))
+                {
+                    m_context->catalog->WriteMetaDataToDatabase(item->URL().c_str(),
+                                                                item->GetMetaData(),
+                                                                kTypeStream);
+
+                    m_context->catalog->AddStream(item->URL().c_str()); 
+                }
+            }
+        }
+    }
 }
 
 void MusicBrowserUI::RemoveFavoriteEvent()
@@ -1049,11 +1084,6 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                 HMENU menu;
                 HMENU subMenu;
                 POINT sPoint;
-                uint32 trackCount = 0;
-                uint32 playlistCount = 0;
-
-                trackCount = GetSelectedTrackCount();
-                playlistCount = GetSelectedPlaylistCount();
             
                 GetCursorPos(&sPoint);
 
@@ -1089,6 +1119,39 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
 
                     EnableMenuItem(subMenu, ID_POPUP_MOVEUP, MF_BYCOMMAND|
                                    (state & LVIS_SELECTED) ? MF_GRAYED : MF_ENABLED );
+
+                    uint32 index = 0;
+                    uint32 found = 0;
+
+
+                    for(index = 0; index < count, found < selected; index++)
+                    {
+                        uint32 state = ListView_GetItemState(m_hPlaylistView, 
+                                                             index, 
+                                                             LVIS_SELECTED);
+                        if(state & LVIS_SELECTED)
+                        {
+                            found++;
+
+                            PlaylistItem* item = m_plm->ItemAt(index);
+
+                            if(!item->URL().compare(0, 4, "http"))
+                            {
+                                MENUITEMINFO mii;
+
+                                mii.cbSize = sizeof(MENUITEMINFO);
+                                mii.fMask = MIIM_ID | MIIM_TYPE;
+                                mii.wID = ID_POPUP_FAVORITE;
+                                mii.fType = MFT_STRING;
+                                mii.dwTypeData = "Add to Favorites";
+                                mii.cch = strlen(mii.dwTypeData);
+
+                                InsertMenuItem(subMenu, ID_POPUP_EDITINFO, FALSE, &mii);
+                                
+                                break;
+                            }
+                        }
+                    }
                 }
                 else
                 {
