@@ -779,6 +779,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
     static POINT pressPt;
     static BOOL pressed = FALSE;
     static int32 seekSpeed = 0;
+    static HWND hwndTooltip = NULL;
     
 
     switch( msg )
@@ -786,6 +787,8 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 		case WM_CREATE:
 		{
 			DragAcceptFiles(hwnd, TRUE);
+
+            InitCommonControls();
 
 			HRGN bodyRegion, capRegion, playerRegion, tempRegion;
             int32 i;
@@ -882,12 +885,6 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
             tempDC = CreateCompatibleDC(NULL);
 
-            /*HRGN          region;
-            ControlState    state;
-            BOOL            enabled;
-            BOOL            dirty;
-            HBITMAP         bitmap;*/
-
             for(i = 0; i < 5; i++)
             {
                 g_buttonStateArray[i].control_id = i;
@@ -982,6 +979,48 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                                         dialOffset + DIAL_SECTION,
                                         50);
             g_buttonStateArray[9].region = tempRegion;
+
+            hwndTooltip = CreateWindow( TOOLTIPS_CLASS, 
+                                        NULL, 
+                                        0, 
+                                        CW_USEDEFAULT, 
+                                        CW_USEDEFAULT, 
+                                        CW_USEDEFAULT, 
+                                        CW_USEDEFAULT, 
+                                        NULL, 
+                                        (HMENU) NULL, 
+                                        g_hInst, 
+                                        NULL);
+            RECT toolRect;
+            TOOLINFO ti;
+
+            for(i = 0; i < kNumControls; i++)
+            {
+                GetRgnBox(g_buttonStateArray[i].region, &toolRect);
+
+                ti.cbSize = sizeof(TOOLINFO); 
+                ti.uFlags = 0; 
+                ti.hwnd = hwnd; 
+                ti.hinst = g_hInst; 
+                ti.uId = (UINT) i; 
+                ti.lpszText = (LPSTR) LPSTR_TEXTCALLBACK; 
+                ti.rect.left = toolRect.left; 
+                ti.rect.top = toolRect.top; 
+                ti.rect.right = toolRect.right; 
+                ti.rect.bottom = toolRect.bottom; 
+
+                if(i != kStopControl)
+                {
+                    SendMessage(hwndTooltip, 
+                            TTM_ADDTOOL, 
+                            0, 
+                            (LPARAM) &ti);
+                }
+            }
+
+
+            
+
 
             // display
             int32 displayOffset = LEFT_SECTION + DIAL_SECTION + 19;
@@ -1247,7 +1286,16 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
             pressed = FALSE;
             ReleaseCapture();
 
-           
+            MSG relayMsg; 
+ 
+            relayMsg.lParam = lParam; 
+            relayMsg.wParam = wParam; 
+            relayMsg.message = msg; 
+            relayMsg.hwnd = hwnd; 
+            SendMessage(hwndTooltip, 
+                        TTM_RELAYEVENT, 
+                        0, 
+                        (LPARAM) &relayMsg); 
             break;
         }
 
@@ -1304,6 +1352,17 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                 pressed = TRUE;
                 SetCapture(hwnd);
             }
+
+            MSG relayMsg; 
+ 
+            relayMsg.lParam = lParam; 
+            relayMsg.wParam = wParam; 
+            relayMsg.message = msg; 
+            relayMsg.hwnd = hwnd; 
+            SendMessage(hwndTooltip, 
+                        TTM_RELAYEVENT, 
+                        0, 
+                        (LPARAM) &relayMsg); 
                 
             break;
         }
@@ -1339,7 +1398,23 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                 result = HTCAPTION;
             }
             else
-                result = HTCLIENT;            
+            {
+                result = HTCLIENT;
+
+                MSG relayMsg; 
+ 
+                relayMsg.lParam = MAKELPARAM(pt.x, pt.y); 
+                relayMsg.wParam = wParam; 
+                relayMsg.message = WM_MOUSEMOVE; 
+                relayMsg.hwnd = hwnd; 
+
+                SendMessage(hwndTooltip, 
+                            TTM_RELAYEVENT, 
+                            0, 
+                            (LPARAM) &relayMsg); 
+                
+            }
+            
 
             for(i = 0; i < kNumControls; i++)
             {
@@ -1433,6 +1508,60 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
             ReleaseDC(hwnd, hdc);
            
             SelectObject(tempDC, oldBitmap); 
+
+            break;
+        }
+
+        case WM_NOTIFY:
+        {
+            LPTOOLTIPTEXT lpttt; 
+            int32 idCtrl; 
+
+            if((((LPNMHDR) lParam)->code) == TTN_NEEDTEXT)
+            {
+                idCtrl = ((LPNMHDR) lParam)->idFrom;
+                lpttt = (LPTOOLTIPTEXT) lParam; 
+
+                switch (idCtrl) 
+                { 
+                    case kModeControl:
+                        lpttt->lpszText = "Change Player Mode (disabled)"; 
+                        break;
+                    case kMinimizeControl:
+                        lpttt->lpszText = "Minimize."; 
+                        break;
+                    case kCloseControl:
+                        lpttt->lpszText = "Close"; 
+                        break;
+                    case kPlayControl:
+                        if(g_ui->m_state != STATE_Playing)
+                            lpttt->lpszText = "Play"; 
+                        else
+                            lpttt->lpszText = "Stop";
+                        break;
+                    case kPauseControl:
+                        lpttt->lpszText = "Pause"; 
+                        break;
+                    case kNextControl:
+                        lpttt->lpszText = "Next Song"; 
+                        break;
+                    case kLastControl:
+                        lpttt->lpszText = "Previous Song."; 
+                        break;
+                    case kPlaylistControl:
+                        lpttt->lpszText = "Display Playlist (disabled)"; 
+                        break;
+                    case kDisplayControl:
+                        lpttt->lpszText = "Change Display Mode"; 
+                        break;
+                    case kVolumeControl:
+                        lpttt->lpszText = "Volume"; 
+                        break;
+                    case kSeekControl:
+                        lpttt->lpszText = "Seek"; 
+                        break;
+                }
+            }
 
             break;
         }
