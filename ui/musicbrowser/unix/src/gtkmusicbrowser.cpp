@@ -73,7 +73,9 @@ void move_up(GTKMusicBrowser *p, guint action, GtkWidget *w);
 void move_down(GTKMusicBrowser *p, guint action, GtkWidget *w);
 void clear_list(GTKMusicBrowser *p, guint action, GtkWidget *w);
 void catalog_tog(GTKMusicBrowser *p, guint action, GtkWidget *w);
+void sort_normal(GTKMusicBrowser *p, guint action, GtkWidget *w);
 void sort_random(GTKMusicBrowser *p, guint action, GtkWidget *w);
+void sort_random2(GTKMusicBrowser *p, guint action, GtkWidget *w);
 void sort_location(GTKMusicBrowser *p, guint action, GtkWidget *w);
 void sort_time(GTKMusicBrowser *p, guint action, GtkWidget *w);
 void sort_genre(GTKMusicBrowser *p, guint action, GtkWidget *w);
@@ -115,6 +117,7 @@ void repeat_all(GTKMusicBrowser *p, guint action, GtkWidget *w)
 
 void GTKMusicBrowser::SetRepeat(int numrepeat)
 {
+   iSetRepeatMode = true;
    switch(numrepeat) {
        case 0: {
            m_plm->SetRepeatMode(kPlaylistMode_RepeatNone);
@@ -126,6 +129,44 @@ void GTKMusicBrowser::SetRepeat(int numrepeat)
            m_plm->SetRepeatMode(kPlaylistMode_RepeatAll);
            break; }
    }
+}
+
+void set_active(GtkWidget *w, gpointer data)
+{
+    if (GTK_IS_CHECK_MENU_ITEM(GTK_OBJECT(w))) {
+        gtk_check_menu_item_set_show_toggle(GTK_CHECK_MENU_ITEM(w), TRUE);
+    }
+}
+
+void GTKMusicBrowser::SetRepeatType(RepeatMode mode)
+{
+    GtkWidget *w;
+
+    if (mode == kPlaylistMode_RepeatNone)
+        w = gtk_item_factory_get_widget(menuFactory,
+                                        "/Controls/Repeat No Tracks");
+    else if (mode == kPlaylistMode_RepeatOne)
+        w = gtk_item_factory_get_widget(menuFactory,
+                                        "/Controls/Repeat One Track");
+    else
+        w = gtk_item_factory_get_widget(menuFactory, 
+                                        "/Controls/Repeat All Tracks");
+    if (GTK_IS_CHECK_MENU_ITEM(GTK_OBJECT(w))) 
+        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(w), TRUE);
+}
+
+void GTKMusicBrowser::SetShuffleType(bool shuffled)
+{
+    iSetShuffleMode = false;
+    GtkWidget *w;
+    if (shuffled)
+        w = gtk_item_factory_get_widget(menuFactory, 
+                                       "/Controls/Play Tracks in Random Order");
+    else
+        w = gtk_item_factory_get_widget(menuFactory, 
+                                       "/Controls/Play Tracks in Normal Order");
+    if (GTK_IS_CHECK_MENU_ITEM(GTK_OBJECT(w)))
+        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(w), TRUE);
 }
 
 void show_help(GTKMusicBrowser *p, guint action, GtkWidget *w)
@@ -1501,6 +1542,18 @@ static void sort_location(GTKMusicBrowser *p, guint action, GtkWidget *w)
     p->SortPlaylistEvent(kPlaylistSortKey_Location, PlaylistSortType_Ascending);
 }
 
+static void sort_normal(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+    p->iSetShuffleMode = true;
+    p->SortPlaylistEvent(kPlaylistSortKey_Random, PlaylistSortType_Descending);
+}
+
+static void sort_random2(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+    p->iSetShuffleMode = true;
+    p->SortPlaylistEvent(kPlaylistSortKey_Random, PlaylistSortType_Ascending);
+}
+
 static void sort_random(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
     p->SortPlaylistEvent(kPlaylistSortKey_Random, PlaylistSortType_Ascending);
@@ -2217,8 +2270,12 @@ void GTKMusicBrowser::StartMusicSearch(bool runMain)
 void GTKMusicBrowser::SortPlaylistEvent(PlaylistSortKey order, PlaylistSortType
                                         type)
 {
-    if (order == kPlaylistSortKey_Random)
-        m_plm->SetShuffleMode(true);
+    if (order == kPlaylistSortKey_Random) {
+        if (type == PlaylistSortType_Ascending)
+            m_plm->SetShuffleMode(true);
+        else
+            m_plm->SetShuffleMode(false);
+    }
     else
         m_plm->Sort(order, type);
     UpdatePlaylistList();
@@ -2318,6 +2375,8 @@ GTKMusicBrowser::GTKMusicBrowser(FAContext *context, MusicBrowserUI *masterUI,
     stopState = 1;
     musicBrowserTree = NULL;
     m_playingindex = kInvalidIndex;
+    iSetRepeatMode = false;
+    iSetShuffleMode = false;
 
     parentUI = masterUI;
  
@@ -2453,13 +2512,14 @@ int32 GTKMusicBrowser::AcceptEvent(Event *e)
                 AddFileCMD();
             break; }
         case INFO_Playing: {
-            pauseState = 0;
+            pauseState = 1;
             stopState = 0;
             if (master) {
                 gdk_threads_enter();
                 UpdatePlayPause();
                 gdk_threads_leave();
             }
+            pauseState = 0;
             break; }
         case INFO_Stopped: {
             stopState = 1;
@@ -2469,16 +2529,43 @@ int32 GTKMusicBrowser::AcceptEvent(Event *e)
                 UpdatePlayPause();
                 gdk_threads_leave();
             }
+            pauseState = 1;
             break; }
         case INFO_Paused: {
-            pauseState = 1;
+            pauseState = 0;
             stopState = 0;
             if (master) {
                 gdk_threads_enter();
                 UpdatePlayPause();
                 gdk_threads_leave();
             }
+            pauseState = 1;
             break; }  
+        case INFO_PlaylistRepeat: {
+            PlaylistRepeatEvent *pre = (PlaylistRepeatEvent *)e;
+            if (!iSetRepeatMode) {
+                gdk_threads_enter();
+                SetRepeatType(pre->GetRepeatMode());
+                gdk_threads_leave();
+            }
+            else
+                iSetRepeatMode = false;
+            break; }
+        case INFO_PlaylistShuffle: {
+            PlaylistShuffleEvent *pse = (PlaylistShuffleEvent *)e;
+            if (!iSetShuffleMode) {
+                gdk_threads_enter();
+                SetShuffleType(pse->GetShuffleMode());
+                gdk_threads_leave();
+            }
+            else
+                iSetShuffleMode = false;
+            if (master) {
+                gdk_threads_enter();
+                UpdatePlaylistList();
+                gdk_threads_leave();
+            }
+            break; }
         case INFO_MusicCatalogTrackAdded: {
             MusicCatalogTrackAddedEvent *mct = (MusicCatalogTrackAddedEvent *)e;
             if (m_initialized) {

@@ -155,6 +155,8 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
             for (; i != browserWindows.end(); i++)
                     (*i)->AcceptEvent(event);
             break; }
+        case INFO_PlaylistRepeat:
+        case INFO_PlaylistShuffle:
         case INFO_Paused:
         case INFO_Stopped:
         case INFO_Playing:

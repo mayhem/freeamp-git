@@ -41,7 +41,9 @@ extern void move_up();
 extern void move_down();
 extern void clear_list();
 extern void catalog_tog();
+extern void sort_normal();
 extern void sort_random();
+extern void sort_random2();
 extern void sort_location();
 extern void sort_time();
 extern void sort_genre();
@@ -101,8 +103,8 @@ void CreateMenuItems(GtkItemFactory *item_factory, void *p)
      {"/_Controls/Next Track",   NULL,           next_menu, 0, 0 },
      {"/_Controls/Previous Track", NULL,         prev_menu, 0, 0 },
      {"/_Controls/sep7",        NULL,           0,         0, "<Separator>" },
-//     {"/_Controls/Play Tracks in Normal Order", NULL, sort_random, 0, "<RadioItem>" },
-//     {"/_Controls/Play Tracks in Random Order", NULL, sort_random, 0, "/Controls/Play Tracks in Normal Order" },
+     {"/_Controls/Play Tracks in Normal Order", NULL, sort_normal, 0, "<RadioItem>" },
+     {"/_Controls/Play Tracks in Random Order", NULL, sort_random2, 0, "/Controls/Play Tracks in Normal Order" },
      {"/_Controls/sep8",        NULL,           0,         0, "<Separator>" },
      {"/_Controls/Repeat No Tracks", NULL,           repeat_none, 0, "<RadioItem>" },
      {"/_Controls/Repeat One Track",  NULL,  repeat_one, 0, "/Controls/Repeat No Tracks" },

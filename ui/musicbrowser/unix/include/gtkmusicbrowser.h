@@ -118,6 +118,8 @@ class GTKMusicBrowser {
 
     bool master;
 
+    bool iSetRepeatMode;
+
     uint32 m_playingindex;
 
     PlaylistManager *m_plm;
@@ -187,8 +189,12 @@ class GTKMusicBrowser {
                         PlaylistItem *item);
     void AddCatPlaylist(string playlist);
     void RemoveCatPlaylist(string playlist);
+    void SetRepeatType(RepeatMode mode);
+    void SetShuffleType(bool shuffled);
 
   public:
+    bool iSetShuffleMode;
+
     ClickState GetClickState() { return m_clickState; }
     void SetClickState(ClickState newState);
 
