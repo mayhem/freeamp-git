@@ -1116,6 +1116,10 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
                   titleRect.bottom - titleRect.top,
                   TRUE);
 
+        m_splitterRect.top = playlistRect.top;
+        m_splitterRect.bottom = playlistRect.bottom;
+        m_splitterRect.left = catalogRect.right + 1;
+        m_splitterRect.right = playlistRect.left - 1;
 
         // resize headers... only wanna do this if we resized the window
         int32 a,b,c,d;
@@ -1475,7 +1479,7 @@ void MusicBrowserUI::MouseMove(uint32 uFlags, POINT &sPoint)
     }
     else
     {
-        RECT catalogRect,playlistRect;
+        /*RECT catalogRect,playlistRect;
         
         GetWindowRect(m_hMusicView, &catalogRect);
         GetWindowRect(m_hPlaylistView, &playlistRect);
@@ -1485,7 +1489,7 @@ void MusicBrowserUI::MouseMove(uint32 uFlags, POINT &sPoint)
         m_splitterRect.top = playlistRect.top;
         m_splitterRect.bottom = playlistRect.bottom;
         m_splitterRect.left = catalogRect.right + 1;
-        m_splitterRect.right = playlistRect.left - 1;
+        m_splitterRect.right = playlistRect.left - 1;*/
 
         if(PtInRect(&m_splitterRect, sPoint))
         {
