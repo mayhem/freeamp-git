@@ -1321,7 +1321,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
 
             SetTimer(hwnd, 0x00, 100, NULL);
-            //SetTimer(hwnd, 0x01, 200, NULL);
+            SetTimer(hwnd, 0x01, 200, NULL);
 			break;
 		}
 
