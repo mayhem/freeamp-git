@@ -36,7 +36,7 @@ ____________________________________________________________________________*/
 #include <sys/audioio.h>
 #endif
 
-#include <sys/ioctl.h>
+//#include <sys/ioctl.h>
 
 #include <stdio.h>
 #include <unistd.h>
@@ -48,6 +48,7 @@ ____________________________________________________________________________*/
 #include "windowhash.h"
 #include "graphics.h"
 #include "queue.h"
+#include "volume.h"
 
 #define DEFINE_FONT_WIDTHS
 #include "font_width.h"
@@ -808,6 +809,8 @@ void FreeAmpUI::VolumeDialFunction(void *p, int32 c,int32 x, int32 y) {
 	case 1:
 	    ((FreeAmpUI *)p)->m_oldLcdState = ((FreeAmpUI *)p)->m_lcdWindow->GetDisplayState();
 
+       ((FreeAmpUI *)p)->m_volume = VolumeManager::GetVolume();
+#if 0
 #ifdef linux
 	    ((FreeAmpUI *)p)->m_mixerFd = open("/dev/mixer",O_RDWR);
 	    ioctl( ((FreeAmpUI *)p)->m_mixerFd, SOUND_MIXER_READ_VOLUME, &( ((FreeAmpUI *)p)->m_volume ));
@@ -817,6 +820,7 @@ void FreeAmpUI::VolumeDialFunction(void *p, int32 c,int32 x, int32 y) {
 	    ioctl(((FreeAmpUI *)p)->m_mixerFd, AUDIO_GETINFO, &ainfo);
 	    /* bork */
             ((FreeAmpUI *)p)->m_volume = ainfo.play.gain;
+#endif
 #endif
 	    ((FreeAmpUI *)p)->m_volume &= 0xFF;
 	    ((FreeAmpUI *)p)->m_lcdWindow->SetVolume( ((FreeAmpUI *)p)->m_volume );
@@ -833,7 +837,9 @@ void FreeAmpUI::VolumeDialFunction(void *p, int32 c,int32 x, int32 y) {
 	    ((FreeAmpUI *)p)->m_lcdWindow->SetVolume( (foo*100)/VOL_MAX );
 	    ((FreeAmpUI *)p)->m_lcdWindow->Draw(FALcdWindow::TimeOnly);
 	    ((FreeAmpUI *)p)->m_volume = foo;
-	    
+
+       VolumeManager::SetVolume(foo);
+#if 0	    
 #ifdef linux
 	    foo |= (foo << 8);
 	    ioctl( ((FreeAmpUI *)p)->m_mixerFd, SOUND_MIXER_WRITE_VOLUME, &foo);
@@ -841,6 +847,7 @@ void FreeAmpUI::VolumeDialFunction(void *p, int32 c,int32 x, int32 y) {
 	    ioctl(((FreeAmpUI *)p)->m_mixerFd, AUDIO_GETINFO, &ainfo);
             ainfo.play.gain = foo;
 	    ioctl(((FreeAmpUI *)p)->m_mixerFd, AUDIO_SETINFO, &ainfo);
+#endif
 #endif
 
 	    break; }
@@ -854,6 +861,8 @@ void FreeAmpUI::VolumeDialFunction(void *p, int32 c,int32 x, int32 y) {
 	    ((FreeAmpUI *)p)->m_lcdWindow->Draw(FALcdWindow::TimeOnly);
 	    ((FreeAmpUI *)p)->m_volume = foo;
 
+       VolumeManager::SetVolume(foo);
+#if 0
 #ifdef linux
 	    foo |= (foo << 8);
 
@@ -862,6 +871,7 @@ void FreeAmpUI::VolumeDialFunction(void *p, int32 c,int32 x, int32 y) {
 	    ioctl(((FreeAmpUI *)p)->m_mixerFd, AUDIO_GETINFO, &ainfo);
             ainfo.play.gain = foo;
 	    ioctl(((FreeAmpUI *)p)->m_mixerFd, AUDIO_SETINFO, &ainfo);
+#endif
 #endif
 	    
 	    break; }

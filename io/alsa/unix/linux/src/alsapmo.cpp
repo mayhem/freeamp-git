@@ -38,7 +38,6 @@ ____________________________________________________________________________*/
 #include <ctype.h>
 #include <errno.h>
 #include <string.h>
-#include <timebits.h>
 
 /* project headers */
 #include <config.h>

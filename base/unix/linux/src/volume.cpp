@@ -36,7 +36,7 @@ void VolumeManager::SetVolume(int32 v) {
     int mixFd = open("/dev/mixer",O_RDWR);
     if (mixFd != -1) {
 	v |= (v << 8);
-	ioctl(mixFd, SOUND_MIXER_WRITE_VOLUME, &v);
+	ioctl(mixFd, SOUND_MIXER_WRITE_PCM, &v);
 	close(mixFd);
     }
 }
@@ -45,7 +45,7 @@ int32 VolumeManager::GetVolume() {
     int mixFd = open("/dev/mixer",O_RDWR);
     int volume = 0;
     if (mixFd != -1) {
-	ioctl(mixFd, SOUND_MIXER_READ_VOLUME, &volume);
+	ioctl(mixFd, SOUND_MIXER_READ_PCM, &volume);
 	volume &= 0xFF;
 	close(mixFd);
     }
