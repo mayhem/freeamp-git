@@ -20,36 +20,25 @@
 	$Id$
 ____________________________________________________________________________*/
 
-#ifndef _LMCLIB_H_
-#define _LMCLIB_H_
+#ifndef _UILIB_H_
+#define _UILIB_H_
 
 /* project headers */
 #include "config.h"
 #include "event.h"
-#include "pmo.h"
-#include "pmi.h"
-#include "lmc.h"
+#include "ctrlobj.h"
 
 extern "C" {
 
-void Initialize(LMCRef ref);
+void Initialize(UIRef inputRef, UIRef outputRef);
 
-void Init(LMCRef ref);
-void SetPMI(LMCRef ref, PMIRef);
-void SetPMO(LMCRef ref, PMORef);
-void SetInfoEventQueue(LMCRef ref, EventQueue*);
-
-bool Decode(LMCRef ref);
-void Stop(LMCRef ref);
-void Pause(LMCRef ref);
-void Resume(LMCRef ref);
-void Reset(LMCRef ref);
-bool ChangePosition(LMCRef ref, int32 pos);
+void SetTarget(UIRef ref, EventQueue* queue);
+int32 AcceptEvent(UIRef ref, Event* event);
 void Cleanup(LMCRef ref);
 
 } //extern "C"
 
-#endif /* _LMCLIB_H_ */
+#endif /* _UILIB_H_ */
 
 
 

@@ -43,4 +43,27 @@ class CIO {
     virtual ~CIO() {}
 };
 
+extern "C" {
+
+typedef struct _COO{
+    void*   ref;
+
+    void    (*SetTarget)        (struct _COO*, EventQueue*);
+    int32   (*AcceptEvent)      (struct _COO*, Event *);
+    void    (*Cleanup)          (struct _COO*);
+
+}_COO, *COORef;
+
+
+typedef struct UI{
+    void*   ref;
+
+    void    (*SetTarget)        (struct UI*, EventQueue*);
+    int32   (*AcceptEvent)      (struct UI*, Event *);
+    void    (*Cleanup)          (struct UI*);
+
+}UI, *UIRef;
+
+} //extern "C"
+
 #endif // _CTRLOBJ_H_
