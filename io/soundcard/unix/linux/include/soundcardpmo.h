@@ -48,7 +48,8 @@ public:
     virtual bool Reset(bool user_stop);
     virtual int32 Write(void *,int32);
     virtual void Clear();
-    
+    virtual void Pause();
+    virtual void Resume();
     
  private:
     int16 buffer[OBUFFERSIZE];

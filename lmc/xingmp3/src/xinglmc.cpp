@@ -286,7 +286,7 @@ void XingLMC::DecodeWork() {
 	    switch (*xc) {
 		case XING_Stop: return;
 		case XING_Pause:
-		    m_output->Reset(true);
+		    m_output->Pause();
 		    m_pauseSemaphore->Wait();
 		    break;
 		default: break;
@@ -347,7 +347,6 @@ void XingLMC::DecodeWork() {
     return;
 }
 void XingLMC::Pause() {
-    m_output->Pause();
     XingCommand *xc = new XingCommand[1];
     xc[0] = XING_Pause;
     m_xcqueue->Write(xc);

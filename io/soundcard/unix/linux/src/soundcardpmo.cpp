@@ -74,6 +74,14 @@ SoundCardPMO::~SoundCardPMO() {
 int SoundCardPMO::audio_fd = -1;
 
 
+void SoundCardPMO::Pause() {
+    Reset(true);
+}
+
+void SoundCardPMO::Resume() {
+
+}
+
 bool SoundCardPMO::Init(OutputInfo* info) {
     //cout << "initialize..." << endl;
 //    cout << "OI: bits_per_sample: " << info->bits_per_sample << endl;
