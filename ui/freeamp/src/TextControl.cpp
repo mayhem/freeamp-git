@@ -25,6 +25,7 @@ ____________________________________________________________________________*/
 #include "TextControl.h"
 #include "Window.h"
 #include "debug.h"
+#include "sys/types.h"
 
 #ifdef __QNX__
 #include <strings.h>

@@ -292,6 +292,7 @@ WorkerThread(void)
 
       if (iRet > 0)
       {
+         buf[iRet] = 0;
          go_on = 1;
          /* Data received, line by line parsing */
          while (go_on)

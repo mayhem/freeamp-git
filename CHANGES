@@ -3,6 +3,9 @@ Changes for version 2.1.0 rc2
 - Quite a few bug fixes, including the intermittant deadlock when
   switching streams.
 - Very prelimininary Fairtunes tipping integration.
+- FreeAmp will no longer pop up annoying boxes when it comes across
+  a corrupt track. 
+- Fixed segfault on exit problem in Linux
 
 Changes for Linux and Windows version 2.1.0 rc1
 --------------------------------------------------------------------

@@ -761,6 +761,7 @@ Error HttpInput::Open(void)
             pPtr += strlen("icy-name:");
             szStreamName = new char[strlen(pPtr) + 1];
             sscanf(pPtr, " %[^\r\n]", szStreamName);
+            printf("'%s'\n", szStreamName);
         }
 
         pPtr = strstr(pHeaderData, "icy-url");

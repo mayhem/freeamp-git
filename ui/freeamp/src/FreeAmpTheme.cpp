@@ -484,6 +484,7 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
          {
              pFoo = (pFoo ? ++pFoo : info->m_filename);
              m_oTitle = string(pFoo);
+             printf("%s\n", pFoo);
              m_pWindow->ControlStringValue(oName, true, m_oTitle);
              oText = string(BRANDING": ") + string(pFoo);
              m_pWindow->SetTitle(oText);

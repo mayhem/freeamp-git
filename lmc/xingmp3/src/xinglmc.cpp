@@ -906,7 +906,10 @@ void XingLMC::DecodeWork()
              {
                  m_pContext->log->Error("LMC: Cannot advance to next frame: %d\n", Err);
                  if (m_decodeInfo.sendInfo)
+                 {
                      ReportStatus("Skipping corrupt track.");
+                     m_pTarget->AcceptEvent(new Event(INFO_DoneOutputtingDueToError));
+                 }
                  else
                      ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(new PMOErrorEvent());
                  return;
