@@ -24,6 +24,7 @@ ____________________________________________________________________________*/
 // system header files
 #include <windows.h>
 #include <commctrl.h>
+#include <stdio.h>
 
 // project header files
 #include "DropSource.h"
@@ -118,8 +119,11 @@ DropSource::DropSource(HWND hwndTree, NM_TREEVIEW* nmtv)
     //ImageList_DragEnter(GetParent(hwndTree), nmtv->ptDrag.x, nmtv->ptDrag.y);
     ImageList_BeginDrag(himl, 
                         0, 
-                        nmtv->ptDrag.x - rcItem.left, 
-                        nmtv->ptDrag.y - rcItem.top);
+                        0,
+                        (rcItem.bottom - rcItem.top)/2);// + (rcItem.bottom - rcItem.top)/2);
+
+                        //nmtv->ptDrag.x - rcItem.left, 
+                        //nmtv->ptDrag.y - rcItem.top);
 
     ImageList_Destroy(himl);
  

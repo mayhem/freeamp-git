@@ -379,7 +379,7 @@ void MusicBrowserUI::PlaylistListSorted(void)
     UpdateButtonMenuStates();
 }
 
-void MusicBrowserUI::UpdatePlaylistListItem(const PlaylistItem* item)
+void MusicBrowserUI::PlaylistListItemUpdated(const PlaylistItem* item)
 {
     uint32        index = m_oPlm->IndexOf(item);
     HWND          hwnd = GetDlgItem(m_hWnd, IDC_PLAYLISTBOX);
@@ -390,7 +390,7 @@ void MusicBrowserUI::UpdatePlaylistListItem(const PlaylistItem* item)
     }
 }
 
-void MusicBrowserUI::AddPlaylistListItem(const PlaylistItem* item)
+void MusicBrowserUI::PlaylistListItemAdded(const PlaylistItem* item)
 {
     LV_ITEM       sItem;
     uint32        index = m_oPlm->IndexOf(item);
@@ -498,16 +498,40 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
             newSize += fileList.size();
             ListView_SetItemCount(hwnd, newSize);
 
-            m_oPlm->AddItems(fileList);
+            LV_HITTESTINFO hti;
+            RECT itemRect;
 
-            /*POINT pt;
-            DragQueryPoint(dropHandle, &pt);
+            DragQueryPoint(dropHandle, &hti.pt);
+            int32 index = ListView_HitTest(hwnd, &hti);
 
-            char buf[256];
-            sprintf(buf, "x: %d   y: %d", pt.x, pt.y);
+            if(index < 0)
+            {
+                m_oPlm->AddItems(fileList);
+            }
+            else
+            {   
+                int32 middle;
 
-            MessageBox(NULL, buf, "pt", MB_OK);*/
+                ListView_GetItemRect(hwnd, hti.iItem, &itemRect, LVIR_BOUNDS);
 
+                middle = itemRect.top + (itemRect.bottom - itemRect.top)/2;
+
+                if(hti.pt.y < middle)
+                {
+                    //index 
+                }
+                else
+                {
+                    index++; 
+                }
+
+                m_oPlm->AddItems(fileList, index);
+            }
+
+            //char buf[256];
+            //sprintf(buf, "x: %d   y: %d\r\n", pt.x, pt.y);
+            //OutputDebugString(buf);
+   
             break;
         }
 
@@ -541,7 +565,6 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
         case WM_ERASEBKGND:
         {
             HDC hdc = (HDC) wParam;
-
 
             SCROLLINFO si;
             uint32 columnWidth = ListView_GetColumnWidth(hwnd, 0);

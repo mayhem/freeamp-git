@@ -1044,7 +1044,7 @@ void MusicBrowserUI::MouseMove(uint32 uFlags, POINT &sPoint)
 
         SelectObject(hdc, oldBrush);
 
-        ReleaseDC(m_hWnd, hdc);
+        ReleaseDC(NULL, hdc);
     }
     else
     {
@@ -1115,7 +1115,7 @@ void MusicBrowserUI::MouseButtonDown(int keys, int x, int y)
 
         SelectObject(hdc, oldBrush);
 
-        ReleaseDC(m_hWnd, hdc);
+        ReleaseDC(NULL, hdc);
     }
 }
 
@@ -1146,7 +1146,7 @@ void MusicBrowserUI::MouseButtonUp(int keys, int x, int y)
 
         SelectObject(hdc, oldBrush);
 
-        ReleaseDC(m_hWnd, hdc);
+        ReleaseDC(NULL, hdc);
 
 
         RECT catalogRect, playlistRect, titleRect;

@@ -196,8 +196,8 @@ class MusicBrowserUI : public UserInterface
     void  ExportPlaylistEvent(void);
 
     // Functions in PlaylistView.cpp
-    void  AddPlaylistListItem(const PlaylistItem* item);
-    void  UpdatePlaylistListItem(const PlaylistItem* item);
+    void  PlaylistListItemAdded(const PlaylistItem* item);
+    void  PlaylistListItemUpdated(const PlaylistItem* item);
     void  PlaylistListItemMoved(const PlaylistItem* item, 
                                 uint32 oldIndex, uint32 newIndex);
     void  PlaylistListItemRemoved(const PlaylistItem* item, uint32 oldIndex);

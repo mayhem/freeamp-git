@@ -24,6 +24,10 @@ ____________________________________________________________________________*/
 #ifndef INCLUDED_UTILITY_H
 #define INCLUDED_UTILITY_H
 
+#include <string>
+
+using namespace std;
+
 #include "config.h"
 #include "errors.h"
 #include "preferences.h"
@@ -40,6 +44,10 @@ void ToLower(char *s);
 
 #ifndef WIN32
 void LaunchBrowser(char* url);
+#endif
+
+#ifdef WIN32
+bool ResolveLink(string& path);
 #endif
 
 #endif /* INCLUDED_UTILITY_H */

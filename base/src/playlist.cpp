@@ -718,6 +718,10 @@ Error PlaylistManager::AddItem(PlaylistItem* item, uint32 index, bool queryForMe
 
             if(m_current == kInvalidIndex && m_activeList->size())
                 InternalSetCurrentIndex(0);
+            else if(index <= m_current)
+            {
+                InternalSetCurrentIndex(m_current + 1);
+            }
         }
 
         if(queryForMetaData)
@@ -802,6 +806,10 @@ Error PlaylistManager::AddItems(vector<PlaylistItem*>* list, uint32 index, bool 
 
             if(m_current == kInvalidIndex && m_activeList->size())
                 InternalSetCurrentIndex(0);
+            else if(index <= m_current)
+            {
+                InternalSetCurrentIndex(m_current + list->size());
+            }
         }
 
         // we need our own vector so user can delete theirs

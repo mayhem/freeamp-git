@@ -38,8 +38,8 @@ BEGIN
                     WS_BORDER | WS_TABSTOP,0,40,136,198,WS_EX_CLIENTEDGE
     LTEXT           "My Music Collection",IDC_MUSICCATALOGTEXT,4,29,64,8
     CONTROL         "List1",IDC_PLAYLISTBOX,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | LVS_OWNERDRAWFIXED | WS_BORDER | 
-                    WS_TABSTOP,140,40,340,198,WS_EX_CLIENTEDGE
+                    LVS_OWNERDRAWFIXED | WS_BORDER | WS_TABSTOP,140,40,340,
+                    198,WS_EX_CLIENTEDGE
     LTEXT           "",IDC_PLAYLISTTITLE,142,29,337,8
     PUSHBUTTON      "DUMMY",IDC_DUMMYCONTROL,0,0,479,27,BS_FLAT | NOT 
                     WS_VISIBLE | NOT WS_TABSTOP
@@ -61,8 +61,8 @@ STYLE DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION |
 CAPTION "Search Computer for Music"
 FONT 8, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "Begin Search",IDOK,91,106,54,14
-    PUSHBUTTON      "Cancel",IDCANCEL,148,106,54,14
+    DEFPUSHBUTTON   "Begin Search",IDOK,35,109,54,14
+    PUSHBUTTON      "Cancel",IDCANCEL,93,109,54,14
     LTEXT           "&Look for music on:",IDC_STATIC,7,64,60,8
     COMBOBOX        IDC_DRIVES,71,62,48,48,CBS_DROPDOWNLIST | WS_VSCROLL | 
                     WS_TABSTOP
@@ -75,6 +75,8 @@ BEGIN
                     31,195,8
     LTEXT           "Where would you like to look for music?",IDC_STATIC,7,
                     43,195,8
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,103,209,1
+    PUSHBUTTON      "Help",9,151,109,54,14
 END
 
 IDD_SAVEPLAYLIST DIALOG DISCARDABLE  0, 0, 198, 63
@@ -106,10 +108,7 @@ BEGIN
 
     IDD_MUSICSEARCH, DIALOG
     BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 202
         TOPMARGIN, 7
-        BOTTOMMARGIN, 120
     END
 
     IDD_SAVEPLAYLIST, DIALOG

@@ -207,7 +207,7 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
             PlaylistItemAddedEvent* pie = (PlaylistItemAddedEvent*)event;
 
             if(pie->Manager() == m_oPlm)
-                AddPlaylistListItem(pie->Item());
+                PlaylistListItemAdded(pie->Item());
             else
             {
                 vector<MusicBrowserUI *>::iterator i;
@@ -216,7 +216,7 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
                 {
                     if((*i)->PLManager() == pie->Manager())
                     {
-                        (*i)->AddPlaylistListItem(pie->Item());
+                        (*i)->PlaylistListItemAdded(pie->Item());
                         break;
                     }
                 }
@@ -230,7 +230,7 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
             PlaylistItemUpdatedEvent* pie = (PlaylistItemUpdatedEvent*)event;
 
             if(pie->Manager() == m_oPlm)
-                UpdatePlaylistListItem(pie->Item());
+                PlaylistListItemUpdated(pie->Item());
             else
             {
                 vector<MusicBrowserUI *>::iterator i;
@@ -239,7 +239,7 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
                 {
                     if((*i)->PLManager() == pie->Manager())
                     {
-                        (*i)->UpdatePlaylistListItem(pie->Item());
+                        (*i)->PlaylistListItemUpdated(pie->Item());
                         break;
                     }
                 }

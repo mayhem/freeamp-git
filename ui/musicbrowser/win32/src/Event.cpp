@@ -66,18 +66,6 @@ void MusicBrowserUI::DeleteEvent(void)
             if(state & LVIS_SELECTED)
             {
                 found++;
-                /*ListView_DeleteItem(m_hPlaylistView, index);
-
-                uint32 oldIndex = index;
-
-                if(oldIndex >= ListView_GetItemCount(m_hPlaylistView))
-                    oldIndex = ListView_GetItemCount(m_hPlaylistView) - 1;
-
-                ListView_SetItemState(m_hPlaylistView, oldIndex, LVIS_SELECTED, LVIS_SELECTED);
-                ListView_RedrawItems(m_hPlaylistView, oldIndex, ListView_GetItemCount(m_hPlaylistView) - 1);
-
-                m_bListChanged = true;*/
-                
                 m_oPlm->RemoveItem(index);
             }
 
@@ -452,7 +440,10 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
 
             if(pnkd->wVKey == VK_DELETE)
             {
-                DeleteEvent();    
+                DeleteEvent();  
+                //ListView_Scroll(pnkd->hdr.hwndFrom, 0, 1);
+                //SendMessage(pnkd->hdr.hwndFrom, WM_VSCROLL, 
+                //    MAKELONG(SB_LINEDOWN, 0), NULL);
             }
 
         }

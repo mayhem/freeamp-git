@@ -22,13 +22,18 @@
 ____________________________________________________________________________*/
 
 #include <assert.h>
-#include <string.h>
 #include <time.h>
 #include <ctype.h>
 #include <stdio.h>
 
+#include <string>
+
+using namespace std;
+
 #ifdef WIN32
+#include <windows.h>
 #include <direct.h>
+#include <shlobj.h>
 #define MKDIR(z) mkdir(z)
 #else
 #include <sys/types.h>
@@ -483,4 +488,83 @@ void LaunchBrowser(char* url)
         delete [] command;
     }
 }
+#endif
+
+#ifdef WIN32
+
+bool ResolveLink(string& path)
+{
+    bool result = false;
+    HRESULT hres = NULL;
+
+    hres = CoInitialize(NULL);
+
+    if(SUCCEEDED(hres))
+    {
+        IShellLink* psl = NULL;
+
+        // Get a pointer to the IShellLink interface
+        hres = CoCreateInstance(CLSID_ShellLink, 
+                                NULL, 
+                                CLSCTX_INPROC_SERVER, 
+                                IID_IShellLink, 
+                                (void**)&psl);
+
+        if(SUCCEEDED(hres))
+        {
+            IPersistFile* ppf;
+
+            // Get a pointer to the IPersistFile interface
+            hres = psl->QueryInterface(IID_IPersistFile, (void**)&ppf);
+
+            if(SUCCEEDED(hres))
+            {
+                WORD wsz[MAX_PATH];
+
+                // Ensure string is UNICODE
+                MultiByteToWideChar(CP_ACP, 
+                                    0, 
+                                    path.c_str(), 
+                                    -1, 
+                                    wsz, 
+                                    MAX_PATH);
+
+                // Load Shortcut
+                hres = ppf->Load(wsz, STGM_READ);
+
+                if(SUCCEEDED(hres))
+                {
+                    // Resolve the link
+                    hres = psl->Resolve(NULL, SLR_ANY_MATCH|SLR_NO_UI);
+            
+                    if(SUCCEEDED(hres))
+                    {
+                        WIN32_FIND_DATA wfd;
+                        char buf[MAX_PATH];
+
+                        // Resolve the link
+                        hres = psl->GetPath(buf,sizeof(buf),&wfd, 0);
+
+                        if(SUCCEEDED(hres))
+                        {
+                            path = buf;
+                            result = true;
+                        }
+                    }
+                }
+
+                // Release the IPersist Interface
+                ppf->Release();
+            }
+    
+            // Release the IShellLink Interface
+            psl->Release();
+        }
+
+        CoUninitialize(); 
+    }
+
+    return result;
+}
+
 #endif
