@@ -71,7 +71,7 @@ done
 for file in plugins/*.*; do
     enable=f
     case "$file" in
-    	*/alsa-*.pmo)
+    	*/alsa*.pmo)
 	      if ldconfig -p | grep 'libasound\.so' > /dev/null; then
 	      	enable=t
 	      else
@@ -79,7 +79,7 @@ for file in plugins/*.*; do
 		      rm -f "$fadir/$file"
 	      fi
 	   ;;
-    	*/esound-*.pmo)
+    	*/esound*.pmo)
 	      if ldconfig -p | grep 'libesd\.so' > /dev/null; then
 	      	enable=t
 	      else
@@ -87,7 +87,7 @@ for file in plugins/*.*; do
 		      rm -f "$fadir/$file"
 	      fi
 	   ;;
-    	*/ncurses-*.ui)
+    	*/ncurses*.ui)
 	      if ldconfig -p | grep 'libncurses\.so' > /dev/null; then
 	      	enable=t
 	      else
