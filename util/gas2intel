@@ -38,6 +38,7 @@ sub translate_sym {
     local $sym = $_[0];
 
     $sym =~ s/^([A-Za-z_])/_$1/;
+    $sym =~ s/^\.//;
     return $sym;
 }
 
@@ -81,8 +82,8 @@ while (<>) {
 
     if (!$header_done && $_ ne "") {
     	$leader = ".386\n" .
-		  "FLAT\tgroup _TEXT\n" .
-		  "\tassume cs:FLAT, ds:FLAT, ss:FLAT\n" .
+		  ";FLAT\tgroup _TEXT\n" .
+		  ";\tassume cs:FLAT, ds:FLAT, ss:FLAT\n" .
 		  "_TEXT\tsegment para public use32 'CODE'\n\n" .
 		  $leader;
     	$header_done = 1;
@@ -117,8 +118,7 @@ while (<>) {
     } elsif (/^\.extern\s+($re_sym)$/) {
 	my $sym = &translate_sym ($1);
 
-	# $_ = "EXTERN $sym";
-	$_ = "";		# For now, ignore .extern directives
+	$_ = "EXTERN $sym:dword";
     } elsif (/^\.align\s+([0-9]+)$/) {
 	$_ = "align $1";	# Don't know how to translate this
     } elsif (/^\.type\s+/) {
@@ -141,9 +141,10 @@ while (<>) {
 	$_ = "; END REPEAT";
     } elsif (/^\./) {
 	&fatal ("Unrecognized directive: $_\n");
-    } elsif (/^([A-Za-z]+)\s+(.*)$/) {
+    } elsif (/^([A-Za-z]+)(\s+(.*))?$/) {
     	$op = $1;
-	$_ = "," . $2;
+	$_ = $2;
+	$_ = "," . $_ if $_ ne "";
 	@args = ();
 
 	# XXX: Too simplistic for char consts
@@ -156,7 +157,7 @@ while (<>) {
 	tr/A-Z/a-z/;	# Convert opcode to all lowercase
 
 	$size = "";
-	if (/^(ret|pushad|popad,fld[z1])$/) {
+	if (/^(ret|pushad|popad|fld[z1])$/) {
 	    # zero-arity instructions
 	    &lerr ("Wrong # of args\n") if ($#args != -1);
 	    $op = $1;
@@ -188,7 +189,7 @@ while (<>) {
 	    $op = $1;
 	    $size = $2;
 	    $size =~ tr/sl/lq/;
-	} elsif (/^(faddp?|fsubr?p?|fmulp?|fdivr?p?)([sl]?)$/) {
+	} elsif (/^(faddp?|fsubr?p?|fmulp?|fdivr?p?|fxch)([sl]?)$/) {
 	    # float instructions with variable arity
 	    &lerr ("Wrong # of args\n") if ($#args > 1);
 	    $op = $1;
@@ -223,8 +224,7 @@ while (<>) {
 	    }
 
 	    foreach (@args) {
-		if (s/^%st(\(([0-9])\))?$/st$2/) {	# Float register
-		} elsif (s/^%//) {			# Int register
+		if (s/^%//) {				# Register
 		} elsif (s/^\$//) {			# Immediate constant
 		    $_ = &translate_sym ($_) if /^$re_sym/;
 		} elsif (/^(.*)\((.*)\)$/) {	# Memory operand
@@ -254,6 +254,8 @@ while (<>) {
 
 	    $_ = $op . " " . join (",", @args);
 	}
+    } else {
+	&lerr ("Unrecognized pattern: $_\n");
     }
     &append_line;
 }
