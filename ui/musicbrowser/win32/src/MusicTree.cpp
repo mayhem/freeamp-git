@@ -919,36 +919,39 @@ void MusicBrowserUI::MusicCatalogTrackAdded(const ArtistList* artist,
     // can we catagorize this track?
     if(!artist) 
     {
-        // nope, stick in uncatagorized
-        TV_INSERTSTRUCT sInsert;
-        TreeData        oCrossRef;
-        MetaData        oData;
+        if(m_hUncatItem)
+        {
+            // nope, stick in uncatagorized
+            TV_INSERTSTRUCT sInsert;
+            TreeData        oCrossRef;
+            MetaData        oData;
 
-        sInsert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
-                            TVIF_SELECTEDIMAGE | TVIF_PARAM; 
+            sInsert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
+                                TVIF_SELECTEDIMAGE | TVIF_PARAM; 
 
-        oCrossRef.m_iLevel = 3;
-        oCrossRef.m_pArtist = NULL;
-        oCrossRef.m_pAlbum = NULL;
+            oCrossRef.m_iLevel = 3;
+            oCrossRef.m_pArtist = NULL;
+            oCrossRef.m_pAlbum = NULL;
     
         
-        oCrossRef.m_pTrack = (PlaylistItem*)item;
-        oData = item->GetMetaData();
+            oCrossRef.m_pTrack = (PlaylistItem*)item;
+            oData = item->GetMetaData();
 
-        if (oData.Title() == string(" ") || 
-            oData.Title().length() == 0)
-            sInsert.item.pszText = "Unknown";
-        else    
-            sInsert.item.pszText = (char *)(oData.Title().c_str());
+            if (oData.Title() == string(" ") || 
+                oData.Title().length() == 0)
+                sInsert.item.pszText = "Unknown";
+            else    
+                sInsert.item.pszText = (char *)(oData.Title().c_str());
         
-        sInsert.item.cchTextMax = oData.Title().length();
-        sInsert.item.iImage = 4;
-        sInsert.item.iSelectedImage = 4;
-        sInsert.item.cChildren= 0;
-        sInsert.item.lParam = m_oTreeIndex.Add(oCrossRef);
-        sInsert.hInsertAfter = TVI_SORT;
-        sInsert.hParent = m_hUncatItem;
-        newItem = TreeView_InsertItem(m_hMusicCatalog, &sInsert);
+            sInsert.item.cchTextMax = oData.Title().length();
+            sInsert.item.iImage = 4;
+            sInsert.item.iSelectedImage = 4;
+            sInsert.item.cChildren= 0;
+            sInsert.item.lParam = m_oTreeIndex.Add(oCrossRef);
+            sInsert.hInsertAfter = TVI_SORT;
+            sInsert.hParent = m_hUncatItem;
+            newItem = TreeView_InsertItem(m_hMusicCatalog, &sInsert);
+        }
     }
     else 
     {
@@ -1135,34 +1138,37 @@ void MusicBrowserUI::MusicCatalogTrackAdded(const ArtistList* artist,
     // put it under "All Tracks"
     if(TreeView_GetChild(m_hMusicCatalog, m_hAllItem))
     {
-        TV_INSERTSTRUCT sInsert;
-        TreeData        oCrossRef;
-        MetaData        oData;
+        if(m_hAllItem)
+        {
+            TV_INSERTSTRUCT sInsert;
+            TreeData        oCrossRef;
+            MetaData        oData;
 
-        sInsert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
-                            TVIF_SELECTEDIMAGE | TVIF_PARAM;
+            sInsert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
+                                TVIF_SELECTEDIMAGE | TVIF_PARAM;
 
-        oCrossRef.m_iLevel = 3;
-        oCrossRef.m_pArtist = (ArtistList*)artist;
-        oCrossRef.m_pAlbum = (AlbumList*)album;
+            oCrossRef.m_iLevel = 3;
+            oCrossRef.m_pArtist = (ArtistList*)artist;
+            oCrossRef.m_pAlbum = (AlbumList*)album;
 
-        oCrossRef.m_pTrack = (PlaylistItem*)item;
-        oData = item->GetMetaData();
+            oCrossRef.m_pTrack = (PlaylistItem*)item;
+            oData = item->GetMetaData();
 
-        if (oData.Title() == string(" ") || 
-            oData.Title().length() == 0)
-            sInsert.item.pszText = "Unknown";
-        else    
-            sInsert.item.pszText = (char *)(oData.Title().c_str());
+            if (oData.Title() == string(" ") || 
+                oData.Title().length() == 0)
+                sInsert.item.pszText = "Unknown";
+            else    
+                sInsert.item.pszText = (char *)(oData.Title().c_str());
 
-        sInsert.item.cchTextMax = oData.Title().length();
-        sInsert.item.iImage = 4;
-        sInsert.item.iSelectedImage = 4;
-        sInsert.item.cChildren= 0;
-        sInsert.item.lParam = m_oTreeIndex.Add(oCrossRef);
-        sInsert.hInsertAfter = TVI_SORT;
-        sInsert.hParent = m_hAllItem;
-        TreeView_InsertItem(m_hMusicCatalog, &sInsert);
+            sInsert.item.cchTextMax = oData.Title().length();
+            sInsert.item.iImage = 4;
+            sInsert.item.iSelectedImage = 4;
+            sInsert.item.cChildren= 0;
+            sInsert.item.lParam = m_oTreeIndex.Add(oCrossRef);
+            sInsert.hInsertAfter = TVI_SORT;
+            sInsert.hParent = m_hAllItem;
+            TreeView_InsertItem(m_hMusicCatalog, &sInsert);
+        }
     }
 }
 
