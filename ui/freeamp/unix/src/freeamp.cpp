@@ -18,8 +18,10 @@
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 	
-	$ $
+	$$
 ____________________________________________________________________________*/
+
+extern "C" {
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -33,7 +35,11 @@ ____________________________________________________________________________*/
 
 #include <stdio.h>
 
+
+	   }
 #include "config.h"
+
+#include "event.h"
 
 #include "freeamp-x11.h"
 
@@ -77,6 +83,20 @@ Pixmap dials_pixmap;
 #define PLAYER_FULL_MASK_HEIGHT player_full_mask_height
 Pixmap player_full_mask_pixmap;
 
+
+#define PLAY_BUTTON_X 29
+#define PLAY_BUTTON_Y 15
+#define PLAY_BUTTON_WIDTH 20
+#define PLAY_BUTTON_HEIGHT 20
+#include "play_buttons.xpm"
+Pixmap play_buttons_pixmap;
+Window play_button_window;
+
+#define MAJOR_BUTTON_MASK_WIDTH 20
+#define MAJOR_BUTTON_MASK_HEIGHT 20
+#include "major_button_mask.xbm"
+Pixmap major_button_mask_pixmap;
+
 static char *progname; /* name this program was invoked by */
 
 void draw_graphics(Window win, GC gc, uint32 window_width, uint32 window_height);
@@ -96,6 +116,13 @@ UserInterface *Initialize() {
 FreeAmpUI::FreeAmpUI() {}
 FreeAmpUI::~FreeAmpUI() {}
 int32 FreeAmpUI::AcceptEvent(Event *e) {
+    switch (e->Type()) {
+	case CMD_Cleanup:
+	    m_playerEQ->AcceptEvent(new Event(INFO_ReadyToDieUI));
+	    break;
+	default:
+	    break;
+    }
     return 0;
 }
 void FreeAmpUI::SetPlayListManager(PlayListManager *plm) {
@@ -172,6 +199,10 @@ void FreeAmpUI::Init()
 			      x, y, width, height, border_width, 
 			      BlackPixel(display,screen_num), WhitePixel(display,screen_num));
 
+    play_button_window = XCreateSimpleWindow(display,win,PLAY_BUTTON_X,PLAY_BUTTON_Y,
+					     PLAY_BUTTON_WIDTH,PLAY_BUTTON_HEIGHT,0,BlackPixel(display,screen_num),
+					     WhitePixel(display,screen_num));
+
     double_buffer_pixmap = XCreatePixmap(display,win,width,height,16);
 
     /* Get available icon sizes from Window manager */
@@ -203,9 +234,13 @@ void FreeAmpUI::Init()
     //XpmReadFileToPixmap(display,win,"lcd.xpm",&lcd_pixmap,NULL,NULL);
 
     //XReadBitmapFile(display,win,"player_full_mask.xbm",&foo,&bar,&player_full_mask_pixmap,&baz,&biz);
-    player_full_mask_pixmap =XCreateBitmapFromData(display,win,player_full_mask_bits,PLAYER_FULL_MASK_WIDTH,PLAYER_FULL_MASK_HEIGHT);
+    player_full_mask_pixmap =XCreateBitmapFromData(display,win,(char *)player_full_mask_bits,PLAYER_FULL_MASK_WIDTH,PLAYER_FULL_MASK_HEIGHT);
 
     XpmCreatePixmapFromData(display,win,rightside,&right_side_pixmap,NULL,NULL);
+
+    major_button_mask_pixmap = XCreateBitmapFromData(display,win,(char *)major_button_mask_bits,MAJOR_BUTTON_MASK_WIDTH,MAJOR_BUTTON_MASK_HEIGHT);
+
+    XpmCreatePixmapFromData(display,win,play_buttons,&play_buttons_pixmap,NULL,NULL);
 
 //    if (XpmReadFileToPixmap(display,win,"rightside.xpm",&right_side_pixmap,NULL,NULL)) {
 //	fprintf( stderr, "%s: Couldn't read colorful xpm from disk\n",progname);
@@ -258,6 +293,9 @@ void FreeAmpUI::Init()
     XSelectInput(display, win, ExposureMask | KeyPressMask | ButtonReleaseMask | KeyReleaseMask |
 		 ButtonPressMask | StructureNotifyMask | EnterWindowMask | LeaveWindowMask | SubstructureNotifyMask);
     
+    XSelectInput(display, play_button_window, ExposureMask | KeyPressMask | ButtonReleaseMask | KeyReleaseMask |
+		 ButtonPressMask | StructureNotifyMask | EnterWindowMask | LeaveWindowMask | SubstructureNotifyMask);
+    
     
     /* create GC for text and drawing */
     {
@@ -272,6 +310,8 @@ void FreeAmpUI::Init()
     XFillRectangle(display,win,gc,0,0,TOTAL_WIDTH,TOTAL_HEIGHT);
     XShapeCombineMask(display,win,ShapeBounding,0,0,player_full_mask_pixmap,ShapeSet);
 
+    XShapeCombineMask(display,play_button_window,ShapeBounding,0,0,major_button_mask_pixmap,ShapeSet);
+
     gtkListenThread = Thread::CreateThread();
     gtkListenThread->Create(FreeAmpUI::x11ServiceFunction,this);
     
@@ -284,10 +324,15 @@ void FreeAmpUI::x11ServiceFunction(void *p) {
 
     /* Display window */
     XMapWindow(display, win);
+    XMapWindow(display,play_button_window);
     
+    fprintf(stderr,"Main window ID: %x\n",win);
+    fprintf(stderr,"Play Button ID: %x\n",play_button_window);
+
     /* get events, use first to display text and graphics */
     while (1)  {
 	XNextEvent(display, &report);
+	fprintf(stderr, "window ID: %x\n", report.xany.window);
 	switch  (report.type) {
 	    case Expose:
 		fprintf(stderr, "%s: expose\n",progname);
@@ -297,7 +342,7 @@ void FreeAmpUI::x11ServiceFunction(void *p) {
 		    break;
 		
 				/* place graphics in window, */
-		draw_graphics(win, gc, width, height);
+		draw_graphics(report.xexpose.window, gc, width, height);
 		break;
 	    case ConfigureNotify:
 		/* window has been resized, change width and
@@ -314,25 +359,41 @@ void FreeAmpUI::x11ServiceFunction(void *p) {
 		break;
 	    case ButtonPress:
 		fprintf(stderr, "%s: button press\n",progname);
+		if (report.xbutton.window == play_button_window) {
+		    XCopyArea(display,play_buttons_pixmap,play_button_window,gc,0,2*PLAY_BUTTON_HEIGHT,PLAY_BUTTON_WIDTH,PLAY_BUTTON_HEIGHT,0,0);
+		}
 		break;
 	    case ButtonRelease:
 		fprintf(stderr, "%s: button release\n",progname);
-		
+		if (report.xbutton.window == play_button_window) {
+		    XCopyArea(display,play_buttons_pixmap,play_button_window,gc,0,0,PLAY_BUTTON_WIDTH,PLAY_BUTTON_HEIGHT,0,0);
+		    pMe->m_plm->RemoveAll();
+		    pMe->m_plm->Add("/home/jdw/mp3s/old/incomplete-Aqua - Happy Boys and Girls.mp3",0);
+		    pMe->m_plm->SetFirst();
+		    pMe->m_playerEQ->AcceptEvent(new Event(CMD_Play));
+		}
 		break;
 	    case EnterNotify:
 		fprintf(stderr, "%s: entered window\n",progname);
+		if (report.xcrossing.window == play_button_window) {
+		    XCopyArea(display,play_buttons_pixmap,play_button_window,gc,0,PLAY_BUTTON_HEIGHT,PLAY_BUTTON_WIDTH,PLAY_BUTTON_HEIGHT,0,0);
+		}
 		break;
 	    case LeaveNotify:
 		fprintf(stderr,"%s: left window\n",progname);
+		if (report.xcrossing.window == play_button_window) {
+		    XCopyArea(display,play_buttons_pixmap,play_button_window,gc,0,0,PLAY_BUTTON_WIDTH,PLAY_BUTTON_HEIGHT,0,0);
+		}
 		break;
 	    case KeyPress: {
 		char foo[32];
 		XLookupString((XKeyEvent *)&report,foo,sizeof(foo),NULL,NULL);
 		fprintf(stderr, "%s: keypress %s\n",progname,foo);
 		if (foo[0] == 'q') {
+		    pMe->m_playerEQ->AcceptEvent(new Event(CMD_QuitPlayer));
 		    XFreeGC(display, gc);
 		    XCloseDisplay(display);
-		    exit(1);
+		    return;
 		}
 		break;
 	    }
@@ -341,9 +402,10 @@ void FreeAmpUI::x11ServiceFunction(void *p) {
 		break;
 	    case DestroyNotify:
 		fprintf(stderr, "%s: destroy notify\n",progname);
+		pMe->m_playerEQ->AcceptEvent(new Event(CMD_QuitPlayer));
 		XFreeGC(display, gc);
 		XCloseDisplay(display);
-		exit(1);
+		return;
 	    default:
 		/* all events selected by StructureNotifyMask
 		 * except ConfigureNotify are thrown away here,
@@ -357,18 +419,21 @@ void FreeAmpUI::x11ServiceFunction(void *p) {
 void draw_graphics(Window win, GC gc, uint32 window_width, uint32 window_height)
 {
     int x = 0;
-    
-    XCopyArea(display,left_side_pixmap,double_buffer_pixmap,gc,0,0,LEFT_SIDE_WIDTH,LEFT_SIDE_HEIGHT,x,0);
-    x+=LEFT_SIDE_WIDTH;
-    XCopyArea(display,dials_pixmap,double_buffer_pixmap,gc,0,0,SINGLE_DIAL_WIDTH,DIALS_HEIGHT,x,0);
-    x+=SINGLE_DIAL_WIDTH;
-    XCopyArea(display,lcd_pixmap,double_buffer_pixmap,gc,0,0,LCD_WIDTH,LCD_HEIGHT,x,0);
-    x+=LCD_WIDTH;
-    XCopyArea(display,dials_pixmap,double_buffer_pixmap,gc,0,0,SINGLE_DIAL_WIDTH,DIALS_HEIGHT,x,0);
-    x+=SINGLE_DIAL_WIDTH;
-    XCopyArea(display,right_side_pixmap,double_buffer_pixmap,gc,0,0,RIGHT_SIDE_WIDTH,RIGHT_SIDE_HEIGHT,x,0);
-    x+=RIGHT_SIDE_WIDTH;
-    XCopyArea(display,double_buffer_pixmap,win,gc,0,0,TOTAL_WIDTH,TOTAL_HEIGHT,0,0);
+    if (win == ::win) {
+	XCopyArea(display,left_side_pixmap,double_buffer_pixmap,gc,0,0,LEFT_SIDE_WIDTH,LEFT_SIDE_HEIGHT,x,0);
+	x+=LEFT_SIDE_WIDTH;
+	XCopyArea(display,dials_pixmap,double_buffer_pixmap,gc,0,0,SINGLE_DIAL_WIDTH,DIALS_HEIGHT,x,0);
+	x+=SINGLE_DIAL_WIDTH;
+	XCopyArea(display,lcd_pixmap,double_buffer_pixmap,gc,0,0,LCD_WIDTH,LCD_HEIGHT,x,0);
+	x+=LCD_WIDTH;
+	XCopyArea(display,dials_pixmap,double_buffer_pixmap,gc,0,0,SINGLE_DIAL_WIDTH,DIALS_HEIGHT,x,0);
+	x+=SINGLE_DIAL_WIDTH;
+	XCopyArea(display,right_side_pixmap,double_buffer_pixmap,gc,0,0,RIGHT_SIDE_WIDTH,RIGHT_SIDE_HEIGHT,x,0);
+	x+=RIGHT_SIDE_WIDTH;
+	XCopyArea(display,double_buffer_pixmap,win,gc,0,0,TOTAL_WIDTH,TOTAL_HEIGHT,0,0);
+    } else if (win == play_button_window) {
+	XCopyArea(display,play_buttons_pixmap,play_button_window,gc,0,0,PLAY_BUTTON_WIDTH,PLAY_BUTTON_HEIGHT,0,0);
+    }
 }
 
 
