@@ -110,6 +110,11 @@ APSInterface::~APSInterface()
         delete m_pYpClient;
         m_pYpClient = NULL;
     }
+    if (m_pSLClient != NULL)
+    {
+        delete m_pSLClient;
+        m_pSLClient = NULL;
+    }
     if (m_pMutex != NULL) 
     {
         delete m_pMutex;

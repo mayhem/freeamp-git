@@ -77,7 +77,7 @@ FREEAMPOBJ += $(FREEAMP$(HOST_OS)OBJ) $(APSOBJ)
 FREEAMPOBJ += lib/gdbm/lib/libfagdbm.a lib/xml/lib/libfaxml.a 
 FREEAMPOBJ += lib/zlib/lib/libzlib.a lib/http/lib/libfahttp.a
 
-FREEAMPlinuxLIBS = -ldl -lpthread
+FREEAMPlinuxLIBS = -ldl -lpthread 
 FREEAMPsolarisLIBS = -ldl -lpthread
 FREEAMPfreebsdLIBS = -pthread
 UNIXFREEAMPLIBS = $(FREEAMP$(HOST_OS)LIBS) -lmusicbrainz $(EXTRALIBS)

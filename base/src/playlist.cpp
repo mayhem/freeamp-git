@@ -1953,7 +1953,6 @@ Error PlaylistManager::WritePlaylist(const char* url,
         {
             items = m_activeList;
         }
-
         result = format->GetRef()->WritePlaylist(url, 
                                                  format, 
                                                  items, 

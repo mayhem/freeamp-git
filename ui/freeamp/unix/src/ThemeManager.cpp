@@ -119,7 +119,9 @@ Error ThemeManager::GetThemeList(map<string, string> &oThemeFileMap)
         FindClose(handle);
     }
 
-    oThemeBasePath = FreeampDir(NULL) + string("/themes");
+    char *fadir = FreeampDir(NULL);
+    oThemeBasePath = string(fadir) + string("/themes");
+    delete [] fadir;
 
     struct stat st;
     if (-1 == stat(oThemeBasePath.c_str(), &st))
@@ -196,7 +198,10 @@ Error ThemeManager::AddTheme(string &oThemeFile, bool bRename)
     bool   bRenameFailed = false;
     char fcopy[_MAX_PATH], *filename = NULL, *ext = NULL;
 
-    oThemeDest = FreeampDir(NULL) + string("/themes");
+    char *fadir = FreeampDir(NULL);
+    oThemeDest = string(fadir) + string("/themes");
+    delete [] fadir;
+
     if (bRename)
     {
         ThemeZip oZip;

@@ -91,23 +91,16 @@ HANDLE FindFirstFile(char *lpFileName, WIN32_FIND_DATA *lpFindFileData) {
 	if (pFD->pDir) {
 	    struct dirent *pdirent = readdir(pFD->pDir);
 	    while (pdirent) {
-		//cout << "FindFirstFile: matching " << pFD->rest << " to " << pdirent->d_name << endl;
 		if (Match(pFD->rest,pdirent->d_name)) {
 		    FillWin32FindData(pFD->dir, pdirent->d_name,lpFindFileData);
 		    return (HANDLE)pFD;
 		}
 		pdirent = readdir(pFD->pDir);
 	    }
-	    // no matching directory entries...
-	    return INVALID_HANDLE_VALUE;
-	} else {
-	    // dir open failed, so no matches
-	    return INVALID_HANDLE_VALUE;
-	}
-    } else {
-	// no directory, just see if file exists...
+        }
     }
 
+    FindClose(pFD);
     return INVALID_HANDLE_VALUE;
 }
 

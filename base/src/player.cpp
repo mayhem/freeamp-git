@@ -1778,7 +1778,9 @@ GetVolume(Event *pEvent)
     if (m_pmo) 
     {
        m_pmo->GetVolume(left, right);
-       SendToUI(new VolumeEvent(INFO_VolumeInfo,left, right));
+       Event *e = new VolumeEvent(INFO_VolumeInfo, left, right);
+       SendToUI(e);
+       delete e;
     }   
 }
 
@@ -1855,8 +1857,10 @@ Play(Event *pEvent)
             CreatePMO(pItem, pEvent);
        }   
 
-       if (!m_pmo) 
+       if (!m_pmo)  {
+          delete pEvent;
           return;
+       }
     }
 
     if (pEvent->Type() == CMD_PlayPaused)

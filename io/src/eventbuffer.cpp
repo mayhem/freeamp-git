@@ -75,7 +75,7 @@ Error EventBuffer::BeginRead(void *&pBuffer, size_t iBytesWanted)
    if (iBytesWanted >= iMaxBytes)
       return kError_EventPending;
    else
-	  return PullBuffer::BeginRead(pBuffer, iBytesWanted);
+      return PullBuffer::BeginRead(pBuffer, iBytesWanted);
 
 }
 
@@ -93,7 +93,7 @@ Error EventBuffer::AcceptEvent(Event *pPMOEvent)
 
    m_pQueue->Write(pEvent);
 
-	return kError_NoErr;
+   return kError_NoErr;
 }
 
 Event *EventBuffer::GetEvent()
@@ -124,6 +124,10 @@ Event *EventBuffer::PeekEvent()
 
 Error EventBuffer::Clear()
 {
+   Event *e; 
+   while ((e = GetEvent()) != NULL) {
+       delete e;
+   }
    m_pQueue->Clear();
 
    return PullBuffer::Clear();

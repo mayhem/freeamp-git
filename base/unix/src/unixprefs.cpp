@@ -486,6 +486,8 @@ UnixPrefs::
 {
     Save();
 
+    if (m_libDirs)
+        delete [] m_libDirs;
     delete[] m_prefsFilePath;
 }
 
@@ -533,9 +535,11 @@ SetDefaults()
 
     size = sizeof(buf);
     if (GetPrefString(kDatabaseDirPref, buf, &size) == kError_NoPrefValue) {
-        string tempdir = FreeampDir(NULL);
+        char *fadir = FreeampDir(NULL);
+        string tempdir = fadir;
         tempdir += "/db/";
         SetPrefString(kDatabaseDirPref, tempdir.c_str());
+        delete [] fadir;
     }
 
     size = sizeof(buf);
@@ -721,7 +725,7 @@ SetPrefString(const char* pref, const char* buf)
     return kError_NoErr;
 }
 
-char *UnixPrefs::m_libDirs = 0;
+char *UnixPrefs::m_libDirs = NULL;
 
 const char *
 UnixPrefs::

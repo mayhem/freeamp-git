@@ -69,6 +69,13 @@ PhysicalMediaOutput::~PhysicalMediaOutput()
     m_pPauseSem->Signal();
     m_pSleepSem->Signal();
 
+   //Debug_v("Clear PMO");
+   Clear();
+   //Debug_v("Clear LMC");
+   m_pLmc->Clear();
+   //Debug_v("Clear PMI");
+   m_pPmi->Clear();
+
     delete m_pLmc;
     delete m_pPmi;
 }

@@ -90,7 +90,7 @@ void MusicCatalog::StartTimer(void)
 
 MusicCatalog::~MusicCatalog()
 {
-//    ClearCatalog();
+    ClearCatalog();
     StopSearchMusic();
 
     m_mutex->Acquire();
@@ -100,9 +100,11 @@ MusicCatalog::~MusicCatalog()
     if(m_watchTimer)
         m_context->timerManager->StopTimer(m_watchTimer);
 
-//    delete m_artistList;
-//    delete m_unsorted;
-//    delete m_streams;
+    delete m_artistList;
+    delete m_unsorted;
+    delete m_streams;
+
+    delete m_sigs;
 
     if (m_database)
         delete m_database;
@@ -112,6 +114,7 @@ MusicCatalog::~MusicCatalog()
     delete m_catMutex;
     delete m_timerMutex;
     delete m_guidTable;
+    delete m_guidList;
 }
 
 string MusicCatalog::GetFilename(const string &strGUID)
@@ -267,6 +270,7 @@ Error MusicCatalog::RemoveStream(const char *url)
     for (; i != m_streams->end(); i++)
          if ((*i)->URL() == url) {
              m_context->target->AcceptEvent(new MusicCatalogStreamRemovedEvent(*i));
+             delete (*i);
              m_streams->erase(i);
              break;
          }
@@ -374,7 +378,7 @@ Error MusicCatalog::RemoveSong(const char *url)
         for (; i != m_unsorted->end(); i++)
             if ((*i)->URL() == url)
             {
-                AcceptEvent(new MusicCatalogTrackRemovedEvent(*i, NULL, NULL));     
+                AcceptEvent(new MusicCatalogTrackRemovedEvent(*i, NULL, NULL));
                 m_unsorted->erase(i);
                 break;
             }
@@ -410,13 +414,15 @@ Error MusicCatalog::RemoveSong(const char *url)
                                 break;
                             }    
 
-                        if (trList->size() == 0)
+                        if (trList->size() == 0) {
                             alList->erase(j);
+                        }
                      }
                 }
 
-                if (alList->size() == 0)
+                if (alList->size() == 0) {
                     m_artistList->erase(i);
+                }
             }
         }
     }
@@ -536,6 +542,7 @@ Error MusicCatalog::AddSong(const char *url)
              if ((*i)->URL() == url) {
                  m_catMutex->Release();
                  delete meta;
+                 delete newtrack;
                  return kError_DuplicateItem;
              }
 
@@ -621,8 +628,8 @@ Error MusicCatalog::UpdateSong(PlaylistItem *item)
 
     m_inUpdateSong = true;
 
-    Error err = RemoveSong(item->URL().c_str());
-    
+    Error err = RemoveSong(item->URL().c_str());    
+
     if (IsError(err))
         return err;
    

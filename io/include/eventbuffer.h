@@ -60,7 +60,7 @@ class EventBuffer : public PullBuffer
     protected:
      
       Queue <BufferEvent *> *m_pQueue;
-	  uint32                 m_iBytesInUse;
+      uint32                 m_iBytesInUse;
 };
 
 #endif

@@ -135,15 +135,13 @@ class ErrorMessageEvent:public Event
 class     BrowserMessageEvent:public Event
 {
    private:
-   char     *m_info;
+   char *m_info;
 
    public:
    virtual ~ BrowserMessageEvent()
    {
-      if (m_info)
-      {
-         delete [] m_info;
-      }
+       if (m_info)
+           delete [] m_info;
    }
    BrowserMessageEvent()
    {

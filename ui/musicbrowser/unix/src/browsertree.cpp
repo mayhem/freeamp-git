@@ -1006,7 +1006,9 @@ static void tree_status_clear(GtkWidget *w, GdkEventCrossing *event,
                               GTKMusicBrowser *p)
 {
     gdk_threads_leave();
-    p->AcceptEvent(new BrowserMessageEvent(" "));
+    Event *e = new BrowserMessageEvent(" ");
+    p->AcceptEvent(e);
+    delete e;
     gdk_threads_enter();
 }
 
@@ -1022,7 +1024,9 @@ static void tree_status(GtkWidget *w, GdkEventMotion *event,
 
     if (!gtk_clist_get_selection_info(clist, x, y, &row, &column)) {
         gdk_threads_leave();
-        p->AcceptEvent(new BrowserMessageEvent(" "));
+        Event *e = new BrowserMessageEvent(" ");
+        p->AcceptEvent(e);
+        delete e;
         gdk_threads_enter();
         return;
     }
@@ -1030,6 +1034,7 @@ static void tree_status(GtkWidget *w, GdkEventMotion *event,
     GtkCTreeNode *node = GTK_CTREE_NODE(g_list_nth(clist->row_list, row));
     TreeData *data = (TreeData *)gtk_ctree_node_get_row_data(ctree, node);
 
+    Event *e;
     if (data) {
         gdk_threads_leave();
         switch (data->type) {
@@ -1041,12 +1046,14 @@ static void tree_status(GtkWidget *w, GdkEventMotion *event,
             case kTreeCDHead:
             case kTreeStreamsHead:
             case kTreeFavoriteStreamsHead:
-                p->AcceptEvent(new BrowserMessageEvent(data->message.c_str()));
+                e = new BrowserMessageEvent(data->message.c_str());
                 break;
             default:
-                p->AcceptEvent(new BrowserMessageEvent(" "));
+                e = new BrowserMessageEvent(" ");
                 break;
         }
+        p->AcceptEvent(e);
+        delete e;
         gdk_threads_enter();
     }
 }

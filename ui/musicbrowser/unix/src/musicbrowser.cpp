@@ -62,8 +62,10 @@ Error MusicBrowserUI::Init(int32 startup_level)
 
     m_playerEQ = m_context->target;
 
-    string URL = string("file://") + FreeampDir(NULL) +
+    char *fadir = FreeampDir(NULL);
+    string URL = string("file://") + string(fadir) +
                  string("/currentlist.m3u");
+    delete [] fadir;
     mainBrowser = new GTKMusicBrowser(m_context, this, URL);
 
     return kError_NoErr;

@@ -398,7 +398,6 @@ void SoundCardPMO::WorkerThread(void)
               }
           }
           delete pEvent;
-
           continue;
       }
 
@@ -459,7 +458,7 @@ void SoundCardPMO::WorkerThread(void)
     
               if (pEvent->Type() == PMO_Info) 
                   HandleTimeInfoEvent((PMOTimeInfoEvent *)pEvent);
-    
+
               if (pEvent->Type() == PMO_Quit) 
               {
                   delete pEvent;

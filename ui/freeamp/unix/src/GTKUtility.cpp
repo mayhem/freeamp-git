@@ -170,6 +170,7 @@ void InitializeGTK(FAContext *context)
 
     if (gtkThread)
         return;
+
     context->gtkLock.Acquire();
     if (!context->gtkInitialized) {
         context->gtkInitialized = true;
@@ -212,6 +213,7 @@ void ShutdownGTK(void)
         weAreGTK = false;
         doQuitNow = true;
         gtkThread->Join();
+        delete gtkThread;
         gtkThread = NULL;
     }
 }

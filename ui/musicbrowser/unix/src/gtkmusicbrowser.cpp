@@ -1640,6 +1640,8 @@ GTKMusicBrowser::~GTKMusicBrowser(void)
         if (stream_timer)
             m_context->timerManager->StopTimer(stream_timer);
     }
+    delete mbSelections;
+    delete CDTracks;
 }
 
 void GTKMusicBrowser::ShowMusicBrowser(void)
@@ -2010,6 +2012,7 @@ Error GTKMusicBrowser::AcceptEvent(Event *e)
             GeneratePlaylistEvent *gpe = (GeneratePlaylistEvent *)e;
 
             vector<PlaylistItem *> seed;
+            gdk_threads_enter();
             if (gpe->Item()) {
                 PlaylistItem plTemp(gpe->Item()->URL().c_str(),
                                     &(gpe->Item()->GetMetaData()));
@@ -2017,7 +2020,8 @@ Error GTKMusicBrowser::AcceptEvent(Event *e)
                 GenPlaylist(&seed);
             }
             else
-                GenPlaylist(NULL);
+                GenPlaylist(&seed);
+            gdk_threads_leave();
             break; }
         case INFO_UnsignaturedTracksExist: {
             if (m_context->catalog->GetNumNeedingSigs() > 0) {

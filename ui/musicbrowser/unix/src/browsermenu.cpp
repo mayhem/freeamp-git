@@ -191,9 +191,12 @@ static void saveas_list(GTKMusicBrowser *p, guint action, GtkWidget *w)
             if (temp[i] == '/')
                 temp[i] = '_';
 
-        string name = FreeampDir(NULL) + string("/") + string(temp) +
+        char *fadir = FreeampDir(NULL);
+        string name = string(fadir) + string("/") + string(temp) +
                       string(".m3u");
         p->m_currentListName = string(name);
+
+        delete [] fadir;
 
         p->SaveCurrentPlaylist();
     }

@@ -291,11 +291,11 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
        // Is this a reload, as opposed to a new load?
        if (m_pWindows)
        {
-          vector<Window *> oWindows;
-          vector<Bitmap *> oBitmaps;
-          vector<Font *>   oFonts;
+          vector<Window *> *oWindows;
+          vector<Bitmap *> *oBitmaps;
+          vector<Font *>   *oFonts;
           
-          oWindows = *m_pWindows;
+          oWindows = m_pWindows;
 
           // Adopt the new window vector
           m_pWindows = m_pParsedWindows;
@@ -319,8 +319,8 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
           
           // Save the old bitmaps and fonts
           if (m_pFonts)
-              oFonts = *m_pFonts;
-          oBitmaps = *m_pBitmaps;
+              oFonts = m_pFonts;
+          oBitmaps = m_pBitmaps;
 
           // Accept the new bitmaps and font.
           m_pBitmaps = m_pParsedBitmaps;
@@ -343,21 +343,24 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
           // everything *should* be fine.
 
           // Now delete the old crap
-          while(oFonts.size() > 0)
+          while(oFonts->size() > 0)
           {
-             delete oFonts[0];
-             oFonts.erase(oFonts.begin());
+             delete (*oFonts)[0];
+             oFonts->erase(oFonts->begin());
           }
-          while(oBitmaps.size() > 0)
+          delete oFonts;
+          while(oBitmaps->size() > 0)
           {
-             delete oBitmaps[0];
-             oBitmaps.erase(oBitmaps.begin());
+             delete (*oBitmaps)[0];
+             oBitmaps->erase(oBitmaps->begin());
           }
-          while(oWindows.size() > 0)
+          delete oBitmaps;
+          while(oWindows->size() > 0)
           {
-             delete oWindows[0];
-             oWindows.erase(oWindows.begin());
+             delete (*oWindows)[0];
+             oWindows->erase(oWindows->begin());
           }
+          delete oWindows;
        }
        else
        {

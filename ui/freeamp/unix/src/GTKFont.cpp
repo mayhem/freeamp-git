@@ -98,7 +98,10 @@ GTKFont::GTKFont(FAContext *context, string &oName, string &oFace,
         FindClose(handle);
     }
 
-    ttfbase = FreeampDir(NULL) + string("/fonts");
+    char *fadir = FreeampDir(NULL);
+    ttfbase = string(fadir) + string("/fonts");
+    delete [] fadir;
+
     if (-1 == stat(ttfbase.c_str(), &st))
         mkdir(ttfbase.c_str(), 0755);
 
@@ -185,7 +188,9 @@ Error GTKFont::AddFont(string &oFontFile)
     struct stat st;
     string tempfile;
 
-    oFontDest = FreeampDir(NULL) + string ("/fonts");
+    char *fadir = FreeampDir(NULL);
+    oFontDest = string(fadir) + string ("/fonts");
+    delete [] fadir;
 
     if (-1 == stat(oFontDest.c_str(), &st))
         mkdir(oFontDest.c_str(), 0755);

@@ -507,6 +507,8 @@ static void list_drag_rec_internal(GtkWidget *widget, GdkDragContext *context,
 
                 g_dataset_remove_data(context, "gtk-clist-drag-dest"); 
                 gtk_drag_finish(context, TRUE, FALSE, time);
+
+                delete newlist;
             }
         }
     }
