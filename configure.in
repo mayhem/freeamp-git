@@ -174,8 +174,8 @@ case "$host_os" in
     ;;
   freebsd*)
     host_os="freebsd"
-    CFLAGS="$CFLAGS -D_THREAD_SAFE -pthread"
-    LDFLAGS="$LDFLAGS -Wl,-export-dynamic"
+    CFLAGS="$CFLAGS -D_THREAD_SAFE -pthread -I/usr/local/include"
+    LDFLAGS="$LDFLAGS -Wl,-export-dynamic -L/usr/local/lib"
     ;;
   netbsd*)
     host_os="freebsd"
@@ -502,7 +502,7 @@ fi
 
 if test "$have_gtk" = "true"; then
   OSDEPPLUGINS="$OSDEPPLUGINS plugins/musicbrowser.ui"
-  OSDEPPLUGINS="$OSDEPPLUGINS plugins/freeamp.ui" dnl #MakeTheme"
+  OSDEPPLUGINS="$OSDEPPLUGINS plugins/freeamp.ui"
   OSDEPPLUGINS="$OSDEPPLUGINS plugins/download.ui"
   OSDEPPLUGINS="$OSDEPPLUGINS plugins/winamp.ftf"
   OSDEPPLUGINS="$OSDEPPLUGINS plugins/kjofol.ftf"

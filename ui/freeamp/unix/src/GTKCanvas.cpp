@@ -168,6 +168,6 @@ void GTKCanvas::InitBackgrounds(vector<Panel *> *pPanels)
 {
    Canvas::InitBackgrounds(pPanels);
 
-   if (m_pBufferBitmap)
-      m_pBufferBitmap->MaskBlitRect(m_pBGBitmap, m_oBGRect, m_oBGRect);
+   //if (m_pBufferBitmap)
+   //   m_pBufferBitmap->MaskBlitRect(m_pBGBitmap, m_oBGRect, m_oBGRect);
 }  

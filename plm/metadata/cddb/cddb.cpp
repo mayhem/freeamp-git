@@ -106,9 +106,11 @@ bool CDDB::ReadMetaData(const char* url, MetaData* metadata)
 
         m_total_tracks = m_discinfo->disc_total_tracks;
 
-        struct disc_data data;
-        if (cddb_read_disc_data(&data) < 0)
+        struct disc_data *p_data = new struct disc_data;
+        if (cddb_read_disc_data(p_data) < 0) {
+            delete p_data;
             return retvalue;
+        }
 
         char *tracknumber = strrchr(url, DIR_MARKER);
         if (!tracknumber)
@@ -123,19 +125,21 @@ bool CDDB::ReadMetaData(const char* url, MetaData* metadata)
 
         int m_track = atoi(tracknumber);
 
-        if (m_track < 1)
+        if (m_track < 1) {
+            delete p_data;
             return retvalue;
+        }
 
         m_track--;
-        metadata->SetAlbum(data.data_title);
-        if (strlen(data.data_track[m_track].track_artist) > 0) 
-            metadata->SetArtist(data.data_track[m_track].track_artist);
+        metadata->SetAlbum(p_data->data_title);
+        if (strlen(p_data->data_track[m_track].track_artist) > 0) 
+            metadata->SetArtist(p_data->data_track[m_track].track_artist);
         else
-            metadata->SetArtist(data.data_artist);
-        metadata->SetTitle(data.data_track[m_track].track_name);
-        metadata->SetComment(data.data_track[m_track].track_extended);
+            metadata->SetArtist(p_data->data_artist);
+        metadata->SetTitle(p_data->data_track[m_track].track_name);
+        metadata->SetComment(p_data->data_track[m_track].track_extended);
         metadata->SetTrack(m_track + 1);
-        metadata->SetGenre(cddb_genre(data.data_genre));
+        metadata->SetGenre(cddb_genre(p_data->data_genre));
         metadata->SetTime(m_discinfo->disc_track[m_track].track_length.minutes *
                           60 +  
                           m_discinfo->disc_track[m_track].track_length.seconds);
@@ -143,6 +147,7 @@ bool CDDB::ReadMetaData(const char* url, MetaData* metadata)
         retvalue = true;
 
 	delete pmo;
+        delete p_data;
     }
     return retvalue;
 }
