@@ -60,7 +60,7 @@ MusicBrainzCD::~MusicBrainzCD()
 
 bool MusicBrainzCD::ReadMetaData(const char* url, MetaData* metadata)
 {
-    int  track, numTracks, i;
+    int  track, numTracks;
     char data[iDataLen], *ptr;
 
     assert(url);
@@ -106,39 +106,16 @@ bool MusicBrainzCD::ReadMetaData(const char* url, MetaData* metadata)
        return false;
     }
 
-    mb_GetResultData(o, MB_GetNumTracks, data, iDataLen);
-    numTracks = atoi(data);
+    mb_Select1(o, MBS_SelectAlbum, 1);  
 
-    mb_Select(o, MB_SelectAlbum);  
-
-    mb_GetResultData(o, MB_GetAlbumName, data, iDataLen);
+    numTracks = mb_GetResultInt(o, MBE_AlbumGetNumTracks);
+    mb_GetResultData(o, MBE_AlbumGetAlbumName, data, iDataLen);
     metadata->SetAlbum(data);
-
-    if (mb_DoesResultExist(o, MB_GetArtistName))
-    {
-        mb_GetResultData(o, MB_GetArtistName, data, iDataLen);
-        metadata->SetArtist(data);
-
-        mb_Select(o, MB_SelectFirstTrack);
-        for(i = 0; i < track - 1; i++)
-            mb_Select(o, MB_SelectNextTrack);
-
-        mb_GetResultData(o, MB_GetTrackName, data, iDataLen);
-        metadata->SetTitle(data);
-    }
-    else
-    {
-        mb_Select(o, MB_SelectFirstTrack);
-        for(i = 0; i < track - 1; i++)
-            mb_Select(o, MB_SelectNextTrack);
-
-        mb_GetResultData(o, MB_GetArtistName, data, iDataLen);
-        metadata->SetArtist(data);
-        mb_GetResultData(o, MB_GetTrackName, data, iDataLen);
-        metadata->SetTitle(data);
-    }
-
-    metadata->SetTrack(track);
+    mb_GetResultData1(o, MBE_AlbumGetArtistName, data, 256, track + 1);
+    metadata->SetArtist(data);
+    mb_GetResultData1(o, MBE_AlbumGetTrackName, data, 256, track + 1);
+    metadata->SetTitle(string(data));
+    metadata->SetTrack(track + 1);
     metadata->SetTime(m_trackLens[track - 1]);
 
     if (track == numTracks)
@@ -156,7 +133,7 @@ bool MusicBrainzCD::ReadMetaData(const char* url, MetaData* metadata)
 
 bool MusicBrainzCD::LookupCD(void)
 {
-    char          error[iDataLen], trackLens[1024], *ptr, *result;
+    char          error[iDataLen], *result;
     char          diskId[64];
     int           ret;
     unsigned short  proxyPort;
@@ -165,7 +142,7 @@ bool MusicBrainzCD::LookupCD(void)
     Database     *db;
     string        rdf, proxyServer;
     char          url[MAX_PATH], hostname[MAX_PATH];
-    int           i, port;
+    int           i, port, numSectors, numTracks;
     uint32        len = MAX_PATH;
     string        message;
 
@@ -192,7 +169,7 @@ bool MusicBrainzCD::LookupCD(void)
     if (GetProxySettings(m_context, proxyServer, proxyPort))
        mb_SetProxy(o, (char *)proxyServer.c_str(), proxyPort);
 
-    ret = mb_Query(o, MB_GetCDTOC);
+    ret = mb_Query(o, MBQ_GetCDTOC);
     if (!ret)
     {
        mb_GetQueryError(o, error, iDataLen);
@@ -201,22 +178,17 @@ bool MusicBrainzCD::LookupCD(void)
        return false;
     }
 
-    if (!mb_Select(o, MB_SelectTopLevel))
-    {
-       return false;
-    }
-    if (!mb_GetResultData(o, MB_LocalGetTrackLengths, trackLens, 1024))
-    {
-       mb_GetQueryError(o, error, iDataLen);
-       return false;
-    }
-
     m_trackLens.clear();
-    for(ptr = strtok(trackLens, " "); ptr; ptr = strtok(NULL, " "))
-       m_trackLens.push_back(atoi(ptr));
-    mb_GetResultData(o, MB_LocalGetId, diskId, 64);
+    numTracks = mb_GetResultInt(o, MBE_TOCGetLastTrack);
+    for(i = 2; i <= numTracks + 1; i++)
+    {
+       numSectors = mb_GetResultInt1(o, MBE_TOCGetTrackNumSectors, i) / 75;
+       m_trackLens.push_back(numSectors);
+    }
 
-	if (strcmp(diskId, m_notFoundDiskId) == 0)
+    mb_GetResultData(o, MBE_TOCGetCDIndexId, diskId, 64);
+
+ 	 if (strcmp(diskId, m_notFoundDiskId) == 0)
     {
 	   time_t t;
 
@@ -240,7 +212,7 @@ bool MusicBrainzCD::LookupCD(void)
     {
         message = "Sending CD lookup query to MusicBrainz...";
         m_context->target->AcceptEvent(new BrowserMessageEvent(message));
-        ret = mb_Query(o, MB_GetCDInfo);
+        ret = mb_Query(o, MBQ_GetCDInfo);
         if (!ret)
         {
            mb_GetQueryError(o, error, iDataLen);
@@ -250,21 +222,21 @@ bool MusicBrainzCD::LookupCD(void)
            return false;
         }
     
-        if (mb_GetNumItems(o) == 0)
+        if (mb_GetResultInt(o, MBE_AlbumGetNumAlbums) == 0)
         {
            char url[MAX_PATH];
 
-		   // Due to a shortcoming in the design of the metadata stuff, the
-		   // player will continue to ask for more tracks even after a CD has
-		   // not been found. In order to avoid hitting the server for each track
-		   // we'll keep the diskid around and if subsequently we're asked for a
-		   // query on the same CD, we will just skip the query. A timeout value
-		   // is associated with the not found cd id, so that if the cd info 
-		   // is entered into MB, and the user updates the cd we force the query
-		   // to the server after the timeout (suggested: 60 seconds)
-		   strcpy(m_notFoundDiskId, diskId);
-		   time(&m_notFoundDiskIdExpire);
-		   m_notFoundDiskIdExpire += 60;
+           // Due to a shortcoming in the design of the metadata stuff, the
+           // player will continue to ask for more tracks even after a CD has
+           // not been found. In order to avoid hitting the server for each track
+           // we'll keep the diskid around and if subsequently we're asked for a
+           // query on the same CD, we will just skip the query. A timeout value
+           // is associated with the not found cd id, so that if the cd info 
+           // is entered into MB, and the user updates the cd we force the query
+           // to the server after the timeout (suggested: 60 seconds)
+           strcpy(m_notFoundDiskId, diskId);
+           time(&m_notFoundDiskIdExpire);
+           m_notFoundDiskIdExpire += 60;
 
            mb_GetWebSubmitURL(o, url, MAX_PATH);
            message = "CD not found.";

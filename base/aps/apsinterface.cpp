@@ -230,7 +230,7 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
         args[12] = NULL;
     }
 
-    ret = mb_QueryWithArgs(o, MB_ExchangeMetadata, args);
+    ret = mb_QueryWithArgs(o, MBQ_ExchangeMetadata, args);
     for(i = 0; i < 11; i++)
        if (args[i])
            free(args[i]);
@@ -241,33 +241,20 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
         return APS_NETWORKERROR;
     }
 
-    // This query should always return one item
-    if (mb_GetNumItems(o) == 0)
-    {
-        m_pSema->Signal();
-        return APS_GENERALERROR;
-    }
-
     // Now start the data extraction process.
-    // Select the album context of the exchanged data
-    mb_Select(o, MB_SelectExchangedAlbum);
-    if (mb_GetResultData(o, MB_GetAlbumName, temp, 255))
+    if (mb_GetResultData(o, MBE_MEGetAlbumName, temp, 255))
         pmetaData->SetAlbum(temp);
-
-    // Select the main context of the exchanged data
-    mb_Select(o, MB_SelectExchangedData);
-
-    if (mb_GetResultData(o, MB_GetArtistName, temp, 255))
+    if (mb_GetResultData(o, MBE_MEGetArtistName, temp, 255))
         pmetaData->SetArtist(temp);
-    if (mb_GetResultData(o, MB_GetTrackName, temp, 255))
+    if (mb_GetResultData(o, MBE_MEGetTrackName, temp, 255))
         pmetaData->SetTitle(temp);
-    if (mb_GetResultData(o, MB_GetGenre, temp, 255))
+    if (mb_GetResultData(o, MBE_MEGetGenre, temp, 255))
         pmetaData->SetGenre(temp);
-    if (mb_GetResultData(o, MB_GetDescription, temp, 255))
+    if (mb_GetResultData(o, MBE_MEGetDescription, temp, 255))
         pmetaData->SetComment(temp);
-    pmetaData->SetYear(mb_GetResultInt(o, MB_GetYear));
-    pmetaData->SetTrack(mb_GetResultInt(o, MB_GetTrackNum));
-    pmetaData->SetLength(mb_GetResultInt(o, MB_GetDuration));
+    pmetaData->SetYear(mb_GetResultInt(o, MBE_MEGetYear));
+    pmetaData->SetTrack(mb_GetResultInt(o, MBE_MEGetTrackNum));
+    pmetaData->SetLength(mb_GetResultInt(o, MBE_MEGetDuration));
 
     mb_Delete(o);
 

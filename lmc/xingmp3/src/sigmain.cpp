@@ -160,7 +160,8 @@ void submit_metadata(MetaData *pmetaData)
    }
 
    o = mb_New();
-   mb_SetServer(o, MUSICBRAINZ_SERVER, MUSICBRAINZ_PORT);
+   //mb_SetServer(o, MUSICBRAINZ_SERVER, MUSICBRAINZ_PORT);
+   mb_SetServer(o, "musicbrainz.eorbit.net", MUSICBRAINZ_PORT);
 
    args[0] = strdup(pmetaData->Title().c_str());
    args[1] = strdup(pmetaData->GUID().c_str());
@@ -195,6 +196,51 @@ void submit_metadata(MetaData *pmetaData)
 
    mb_Delete(o);  
 }
+
+
+void lookup_metadata(MetaData *pmetaData)
+{
+   musicbrainz_t o;
+   int    ret;
+   char   *args[11];
+   char    temp[255];
+   int     i;
+   string  proxyServer;
+
+   if (pmetaData == NULL)
+       return;
+
+   o = mb_New();
+   //mb_SetServer(o, MUSICBRAINZ_SERVER, MUSICBRAINZ_PORT);
+   mb_SetServer(o, "musicbrainz.eorbit.net", MUSICBRAINZ_PORT);
+
+   args[0] = strdup(pmetaData->GUID().c_str());
+   args[1] = NULL;
+
+   ret = mb_QueryWithArgs(o, MB_GetTrackByGUID, args);
+   free(args[0]);
+
+   if (!ret)
+   {
+       char err[255];
+       mb_GetQueryError(o, err, 255);
+       if (!quiet)
+          printf("Data submit error: %s\n\n", err);
+   }
+   else
+   {
+       if (!quiet)
+       {
+          char rdf[2048];
+          printf("Lookup query returned:\n\n");
+          if (mb_GetResultRDF(o, rdf, 2048))
+              printf("%s\n", rdf);
+       }
+   }
+
+   mb_Delete(o);  
+}
+
 
 /*------------------------------------------*/
 
@@ -244,33 +290,30 @@ int main(int argc, char *argv[])
        hasmeta = true;
    }
    
-   if (hasmeta || nosubmit)
+   if (ff_decode(argv[index], sig, 0, 0, 0, 24000, 0))
    {
-       if (ff_decode(argv[index], sig, 0, 0, 0, 24000, 0))
-       {
-           m.SetGUID(sig);
-           if (!quiet)
-               printf("Signature: ");
-           printf("%s\n", sig);
-           if (!nosubmit)
-               submit_metadata(&m);
+       m.SetGUID(sig);
+       if (!quiet)
+           printf("Signature: ");
 
+       printf("%s\n", sig);
+       if (!nosubmit)
+       {
+           if (hasmeta)
+              submit_metadata(&m);
+           else
+              lookup_metadata(&m);
+       }
 #ifdef SIG_DEBUG
-           FILE *logfile = fopen("guid_mapping.txt", "a+");
-           fprintf(logfile,"%s\t%s\n", argv[index], sig);
-           fclose(logfile);
+       FILE *logfile = fopen("guid_mapping.txt", "a+");
+       fprintf(logfile,"%s\t%s\n", argv[index], sig);
+       fclose(logfile);
 #endif
-
-       }
-       else
-       {
-           if (!quiet)
-              printf("Error calculating signature.\n");
-       }
    }
    else
    {
-       printf("Error getting metadata.\n");
+       if (!quiet)
+          printf("Error calculating signature.\n");
    }
 
    return 0;
