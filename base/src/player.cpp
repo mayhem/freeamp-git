@@ -331,9 +331,7 @@ Player::
 
     TYPICAL_DELETE(m_context->timerManager);
     TYPICAL_DELETE(m_sigStopMutex);
-#ifndef WIN32
     TYPICAL_DELETE(m_plm);
-#endif
 }
 
 void      
