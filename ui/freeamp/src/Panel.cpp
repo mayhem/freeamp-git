@@ -283,15 +283,6 @@ void Panel::MoveControls(Pos &oPos)
     }
 }
 
-bool Panel::operator<(const Panel *&a)
-{
-    if (a->m_iZOrder == m_iZOrder)
-       return 0;
-    if (a->m_iZOrder < m_iZOrder)
-       return -1;
-    return 1;
-}
-
 void Panel::TogglePanelPos(void)
 {
     Pos oTemp;

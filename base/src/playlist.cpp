@@ -1531,6 +1531,37 @@ Error PlaylistManager::MoveItems(vector<uint32>* items, uint32 index)
     return result;
 }
 
+typedef struct WriteToDiskStruct {
+    PlaylistItem item;
+    vector<MetaDataFormat*> metadataFormats;
+    Thread* thread;
+}WriteToDiskStruct;
+
+static void write_to_disk(void* arg)
+{
+    WriteToDiskStruct* wtd = (WriteToDiskStruct*)arg;
+
+    MetaData metadata = wtd->item.GetMetaData();
+
+    MetaDataFormat* mdf = NULL;
+    uint32 numFormats;
+
+    numFormats = wtd->metadataFormats.size();
+
+    for(uint32 i = 0; i < numFormats; i++)
+    {
+        mdf = wtd->metadataFormats[i];
+
+        if(mdf)
+        {
+            mdf->WriteMetaData(wtd->item.URL().c_str(), metadata);
+        }
+    }
+
+    delete wtd->thread;
+    delete wtd;
+}
+
 // Functions for updating
 // This function searches the items in the playlist
 // and updates the metadata if the tracks are the
@@ -1538,7 +1569,7 @@ Error PlaylistManager::MoveItems(vector<uint32>* items, uint32 index)
 Error PlaylistManager::UpdateTrackMetaData(PlaylistItem* updatedTrack, bool writeToDisk)
 {
     Error result = kError_InvalidParam;
-    m_mutex.Acquire();
+    //m_mutex.Acquire();
 
     vector<PlaylistItem*>::iterator i = m_activeList->begin();
 
@@ -1563,24 +1594,16 @@ Error PlaylistManager::UpdateTrackMetaData(PlaylistItem* updatedTrack, bool writ
 
     if(writeToDisk)
     {
-        MetaData metadata = updatedTrack->GetMetaData();
-        MetaDataFormat* mdf = NULL;
-        uint32 numFormats;
+        WriteToDiskStruct* wtd = new WriteToDiskStruct;
 
-        numFormats = m_metadataFormats.size();
+        wtd->item = *updatedTrack;
+        wtd->metadataFormats = m_metadataFormats;
 
-        for(uint32 i = 0; i < numFormats; i++)
-        {
-            mdf = m_metadataFormats[i];
-
-            if(mdf)
-            {
-                mdf->WriteMetaData(updatedTrack->URL().c_str(), metadata);
-            }
-        }
+        wtd->thread = Thread::CreateThread();
+        wtd->thread->Create(write_to_disk, wtd);
     }
 
-    m_mutex.Release();
+    //m_mutex.Release();
     return result;
 }
 

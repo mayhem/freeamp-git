@@ -2276,6 +2276,8 @@ void MusicBrowserUI::UpdateUncatagorizedTrackName(PlaylistItem* track,
     track->SetMetaData(&metadata);
 
     m_context->catalog->UpdateSong(track);
+
+    m_plm->UpdateTrackMetaData(track, true);
 }
 
 
@@ -2289,6 +2291,8 @@ void MusicBrowserUI::UpdateTrackName(PlaylistItem* track,
     track->SetMetaData(&metadata);
 
     m_context->catalog->UpdateSong(track);
+
+    m_plm->UpdateTrackMetaData(track, true);
 }
 
 const char* kFileExists = "There is already a playlist with that name.";
@@ -2365,6 +2369,8 @@ void MusicBrowserUI::UpdateAlbumName(AlbumList* album,
         (*track)->SetMetaData(&metadata);
 
         m_context->catalog->UpdateSong(*track);
+
+        m_plm->UpdateTrackMetaData(*track, true);
     }
 }
 
@@ -2390,6 +2396,8 @@ void MusicBrowserUI::UpdateArtistName(ArtistList* artist,
             (*track)->SetMetaData(&metadata);
 
             m_context->catalog->UpdateSong(*track);
+
+            m_plm->UpdateTrackMetaData(*track, true);
         }
 
     }

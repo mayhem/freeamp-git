@@ -689,7 +689,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                             // just change the title for this song
                             UpdateUncatagorizedTrackName(treedata->m_pTrack, 
                                             tv_item.pszText);
-                        }
+                        }                        
                     }
 
                     if(treedata->IsTrack())
