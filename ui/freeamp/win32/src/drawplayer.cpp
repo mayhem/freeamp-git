@@ -104,6 +104,9 @@ static HBITMAP playerMask;
 static HBITMAP oldPlayerMaskBitmap;
 static HBITMAP smallFont, largeFont;
 static HBITMAP logoBitmap;
+static HBITMAP shuffledIconBitmap;
+static HBITMAP repeatIconBitmap;
+static HBITMAP allIconBitmap;
 
 static HRGN g_displayRegion;
 static HRGN g_playerRegion;
@@ -242,7 +245,7 @@ static void DrawPlayer(HDC hdc, ControlInfo* state)
                             srcOffset,
                             SRCCOPY);
 
-                    currentCursor = arrowCursor;
+                    //currentCursor = arrowCursor;
                     break;        
                 }
 
@@ -282,7 +285,7 @@ static void DrawPlayer(HDC hdc, ControlInfo* state)
                             SRCCOPY);
                     }
 
-                    currentCursor = arrowCursor;
+                    //currentCursor = arrowCursor;
                     break;        
                 }
 
@@ -290,7 +293,7 @@ static void DrawPlayer(HDC hdc, ControlInfo* state)
                 case kPlaylistControl:
                 case kDisplayControl:
                 {
-                    currentCursor = arrowCursor;
+                    //currentCursor = arrowCursor;
                     break;
                 }
 
@@ -299,7 +302,7 @@ static void DrawPlayer(HDC hdc, ControlInfo* state)
                 {
                     if( g_buttonStateArray[i].state == Selected )
                     {
-                        currentCursor = dialCursor;
+                        //currentCursor = dialCursor;
                     }
                     else if( g_buttonStateArray[i].state == Pressed )
                     {
@@ -334,6 +337,63 @@ static void DrawPlayer(HDC hdc, ControlInfo* state)
             g_buttonStateArray[i].dirty = FALSE;
         }
     } 
+
+    // this should not be here but deadline is approaching...
+    RECT displayRect;
+    GetRgnBox(g_displayRegion, &displayRect);
+
+    if(g_displayInfo.shuffled)
+    {
+        int32 offset = displayRect.right + 3;
+
+        SelectObject(memdc, shuffledIconBitmap);
+   
+        BitBlt( bufferdc, 
+                offset, 
+                12, 
+                11, 
+                6,
+                memdc, 
+                0,
+                0,
+                SRCCOPY);
+    }
+
+    
+
+    if(g_displayInfo.repeat)
+    {
+        int32 offset = displayRect.right + 2;
+
+        SelectObject(memdc, repeatIconBitmap);
+   
+        BitBlt( bufferdc, 
+                offset, 
+                22, 
+                12, 
+                7,
+                memdc, 
+                0,
+                0,
+                SRCCOPY);
+
+        if(g_displayInfo.repeatAll)
+        {
+            offset = displayRect.right + 3;
+
+            SelectObject(memdc, allIconBitmap);
+   
+            BitBlt( bufferdc, 
+                    offset, 
+                    29, 
+                    11, 
+                    8,
+                    memdc, 
+                    0,
+                    0,
+                    SRCCOPY);
+        }
+    }
 
     SelectClipRgn(hdc, g_playerRegion);
 
@@ -1134,7 +1194,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
             dialCursor = LoadCursor(g_hInst, MAKEINTRESOURCE(IDC_DIAL));
             arrowCursor = LoadCursor(NULL, IDC_ARROW);
-            currentCursor = arrowCursor;
+            //currentCursor = arrowCursor;
 
             HDC hdc = GetDC(hwnd);
             int32 numBits = 0;
@@ -1170,7 +1230,10 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                 repeatButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_REPEAT_256), &palette);
                 shuffleButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_SHUFFLE_256), &palette);
                 openButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_OPEN_256), &palette);
-
+                
+                shuffledIconBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_SHUFFLED_ICON_256), &palette);
+                repeatIconBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_REPEAT_ICON_256), &palette);
+                allIconBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_REPEAT_ALL_ICON_256), &palette);
 			}
             else
             {
@@ -1195,6 +1258,11 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                 repeatButtonBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_REPEAT));
                 shuffleButtonBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_SHUFFLE));
                 openButtonBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_OPEN));
+
+                shuffledIconBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_SHUFFLED_ICON));
+                repeatIconBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_REPEAT_ICON));
+                allIconBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_REPEAT_ALL_ICON));
+
             }
             
             playerMask = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_PLAYER_MASK));
@@ -1272,6 +1340,10 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
             g_displayInfo.hours = 0;
             g_displayInfo.minutes = 0;
             g_displayInfo.seconds = 0;
+            g_displayInfo.shuffled = false;
+            g_displayInfo.repeat = false;
+            g_displayInfo.repeatAll = false;
+
 
             waveOutGetVolume((HWAVEOUT)WAVE_MAPPER, (DWORD*)&g_displayInfo.volume);
 
@@ -1704,7 +1776,6 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
             if(color == RGB(0,0,0) && !pressed)
             //if(PtInRegion(playerRegion, pt.x, pt.y))
             {
-                currentCursor = arrowCursor;
                 result = HTCAPTION;
             }
             else
@@ -1712,13 +1783,16 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                 result = HTCLIENT;
             }
 
-            
+            currentCursor = arrowCursor;
+
             if(pressed)
             {
                 i = pressedIndex;
 
                 if(i == kVolumeControl || i == kSeekControl )
                 {
+                    currentCursor = dialCursor;
+
                     short delta = (short)(pt.y - pressPt.y);
 
                     delta = delta/-5;
@@ -1786,8 +1860,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                 for(i = 0; i < kNumControls; i++)
                 {
                     if( PtInRegion(g_buttonStateArray[i].region, pt.x, pt.y) &&
-                        g_buttonStateArray[i].state != Activated &&
-                        g_buttonStateArray[i].shown)
+                        g_buttonStateArray[i].state != Activated)
                     {
                         if(g_buttonStateArray[i].state != Selected )
                         {
@@ -1795,9 +1868,11 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                             g_buttonStateArray[i].dirty = TRUE;
                             dirtyPlayer = true;
                         }
+
+                        if(i == kVolumeControl || i == kSeekControl )
+                            currentCursor = dialCursor;
                     }
-                    else if(g_buttonStateArray[i].state == Selected &&
-                            g_buttonStateArray[i].shown)
+                    else if(g_buttonStateArray[i].state == Selected)
                     {
                         g_buttonStateArray[i].state = Deactivated;
                         g_buttonStateArray[i].dirty = TRUE;
@@ -1895,7 +1970,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 			char szFile[MAX_PATH + 1];
 
 			count = DragQueryFile(	hDrop,
-									-1L,
+							 		-1L,
 									szFile,
 									sizeof(szFile));
 
@@ -1923,11 +1998,26 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 	        {
                 case kRepeatControl:
                 {
+                    if(g_displayInfo.repeatAll)
+                    {
+                        g_displayInfo.repeat = false;
+                        g_displayInfo.repeatAll = false;
+                    }
+                    else if(g_displayInfo.repeat)
+                    {
+                        g_displayInfo.repeatAll = true;
+                    }
+                    else
+                    {
+                        g_displayInfo.repeat = true;
+                    }
+
 			        break;        
 		        }
 
                 case kShuffleControl:
                 {
+                    g_displayInfo.shuffled = !g_displayInfo.shuffled;
 			        break;        
 		        }
 

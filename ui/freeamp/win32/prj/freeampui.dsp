@@ -321,6 +321,14 @@ SOURCE=..\res\stop_buttons256.bmp
 # End Group
 # Begin Source File
 
+SOURCE=..\res\all_icon.bmp.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\all_icon256.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=..\res\colors.bmp
 # End Source File
 # Begin Source File
@@ -341,11 +349,27 @@ SOURCE=..\res\repeat_buttons256.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=..\res\repeat_icon.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\repeat_icon256.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=..\res\shuffle_buttons.bmp
 # End Source File
 # Begin Source File
 
 SOURCE=..\res\shuffle_buttons256.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\shuffled_icon.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\shuffled_icon256.bmp
 # End Source File
 # End Target
 # End Project

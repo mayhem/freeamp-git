@@ -56,6 +56,9 @@ typedef struct DisplayInfo{
     int32           introOffset;
 	int32			totalSongs;
 	int32			indexOfSong;
+    bool            shuffled;
+    bool            repeat;
+    bool            repeatAll;
 
 }DisplayInfo;
 
