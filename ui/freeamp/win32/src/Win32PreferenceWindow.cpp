@@ -408,6 +408,9 @@ void Win32PreferenceWindow::GetPrefsValues(Preferences* prefs,
     prefs->GetCheckForUpdates(&values->checkForUpdates);
     prefs->GetAskToReclaimFiletypes(&values->askReclaimFiletypes);
     prefs->GetReclaimFiletypes(&values->reclaimFiletypes);
+    prefs->GetShowToolbarTextLabels(&values->useTextLabels);
+    prefs->GetShowToolbarImages(&values->useImages);
+    prefs->GetSaveCurrentPlaylistOnExit(&values->savePlaylistOnExit);
 
     free(buffer);
 }
@@ -457,6 +460,10 @@ void Win32PreferenceWindow::SavePrefsValues(Preferences* prefs,
     }
 
     prefs->SetUsersPortablePlayers(portableList.c_str());
+    prefs->SetShowToolbarTextLabels(values->useTextLabels);
+    prefs->SetShowToolbarImages(values->useImages);
+
+    prefs->SetSaveCurrentPlaylistOnExit(values->savePlaylistOnExit);
 
     // this gets called by each page unfortunately
     // so save some effort by only doing it once
@@ -494,6 +501,9 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
     static HWND hwndSaveMusicDir = NULL;
     static HWND hwndStayOnTop = NULL;
     static HWND hwndLiveInTray = NULL;
+    static HWND hwndTextOnly = NULL;
+    static HWND hwndImagesOnly = NULL;
+    static HWND hwndTextAndImages = NULL;
     
 
     switch(msg)
@@ -505,12 +515,14 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
             prefs = (Preferences*)psp->lParam;
 
             // get the handles to all our controls
-            
             hwndStayOnTop = GetDlgItem(hwnd, IDC_STAYONTOP);
             hwndLiveInTray = GetDlgItem(hwnd, IDC_TRAY);
             hwndAskReclaimFiletypes = GetDlgItem(hwnd, IDC_ASKRECLAIM);
             hwndReclaimFiletypes = GetDlgItem(hwnd, IDC_RECLAIMFILETYPES);
             hwndSaveMusicDir = GetDlgItem(hwnd, IDC_SAVEMUSICDIR);
+            hwndTextOnly = GetDlgItem(hwnd, IDC_TEXTONLY);
+            hwndImagesOnly = GetDlgItem(hwnd, IDC_IMAGESONLY);
+            hwndTextAndImages = GetDlgItem(hwnd, IDC_TEXTANDIMAGES);
 
 
             Button_SetCheck(hwndStayOnTop, m_originalValues.stayOnTop);
@@ -518,11 +530,16 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
 
             Button_SetCheck(hwndReclaimFiletypes, m_originalValues.reclaimFiletypes);
             Button_SetCheck(hwndAskReclaimFiletypes, m_originalValues.askReclaimFiletypes);
-           
+
+            Button_SetCheck(hwndTextOnly, 
+                m_originalValues.useTextLabels && !m_originalValues.useImages);
+            Button_SetCheck(hwndImagesOnly,
+                !m_originalValues.useTextLabels && m_originalValues.useImages);
+            Button_SetCheck(hwndTextAndImages, 
+                m_originalValues.useTextLabels && m_originalValues.useImages);
 
             Edit_SetText(hwndSaveMusicDir, 
                          m_originalValues.saveMusicDirectory.c_str());
-
 
             LONG style = GetWindowLong(GetParent(hwnd), GWL_EXSTYLE);
 
@@ -543,6 +560,66 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
         {
             switch(LOWORD(wParam))
             {
+                case IDC_TEXTONLY:
+                {
+                    if(Button_GetCheck(hwndTextOnly) == BST_CHECKED)
+                    {
+                        m_proposedValues.useTextLabels = true;
+                        m_proposedValues.useImages = false;
+                    }
+
+                    if(m_proposedValues != m_currentValues)
+                    {
+                        PropSheet_Changed(GetParent(hwnd), hwnd);
+                    }
+                    else
+                    {
+                        PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                    }
+
+                    break;
+                }
+
+                case IDC_IMAGESONLY:
+                {
+                    if(Button_GetCheck(hwndImagesOnly) == BST_CHECKED)
+                    {
+                        m_proposedValues.useTextLabels = false;
+                        m_proposedValues.useImages = true;
+                    }
+
+                    if(m_proposedValues != m_currentValues)
+                    {
+                        PropSheet_Changed(GetParent(hwnd), hwnd);
+                    }
+                    else
+                    {
+                        PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                    }
+
+                    break;
+                }
+
+                case IDC_TEXTANDIMAGES:
+                {
+                    if(Button_GetCheck(hwndTextAndImages) == BST_CHECKED)
+                    {
+                        m_proposedValues.useTextLabels = true;
+                        m_proposedValues.useImages = true;
+                    }
+
+                    if(m_proposedValues != m_currentValues)
+                    {
+                        PropSheet_Changed(GetParent(hwnd), hwnd);
+                    }
+                    else
+                    {
+                        PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                    }
+
+                    break;
+                }
+
                 case IDC_STAYONTOP:
                 {
                     if(Button_GetCheck(hwndStayOnTop) == BST_CHECKED)

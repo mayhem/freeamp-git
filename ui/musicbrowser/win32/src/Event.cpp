@@ -68,6 +68,66 @@ void MusicBrowserUI::RenameEvent(void)
     }
 }
 
+const char kErrorMsg[] = "Cannot delete %s: Access is denied.\r\n\r\n"
+                        "Make sure the file is not currently in use.";
+
+bool MusicBrowserUI::DeleteFromDrive(const char* url)
+{
+    bool result = true;
+    char path[MAX_PATH];
+    uint32 length = sizeof(path);
+    BOOL success = FALSE;
+
+    URLToFilePath(url, path, &length);
+
+    do
+    {
+        success = DeleteFile(path);
+
+        if(!success)
+        {
+            int ret;
+            char msg[MAX_PATH + sizeof(kErrorMsg) + 1];
+            char* cp;
+
+            cp = strrchr(path, '\\');
+
+            if(cp)
+                cp++;
+            else
+                cp = path;
+
+            sprintf(msg, kErrorMsg, cp);
+
+            ret = MessageBox(m_hWnd, 
+                              msg,
+                              "Unable To Delete File",
+                              MB_ABORTRETRYIGNORE|MB_ICONSTOP);
+
+            switch(ret)
+            {
+                case IDABORT:
+                    result = false;
+                    success = TRUE;
+                    break;
+
+                case IDRETRY:
+                    result = true;
+                    success = FALSE;
+                    break;
+
+                case IDIGNORE:
+                    result = true;
+                    success = TRUE;
+                    break;
+            }
+        }
+
+    }while(!success);
+
+    return result;
+}
+
 void MusicBrowserUI::RemoveEvent(void)
 {
     // first figure out which control has focus
@@ -84,7 +144,6 @@ void MusicBrowserUI::RemoveEvent(void)
             uint32 state = ListView_GetItemState(m_hPlaylistView, 
                                                  index, 
                                                  LVIS_SELECTED);
-
             if(state & LVIS_SELECTED)
             {
                 found++;
@@ -106,22 +165,42 @@ void MusicBrowserUI::RemoveEvent(void)
         {       
             vector<PlaylistItem*> items;
             GetSelectedMusicTreeItems(&items); 
+            bool keepGoing = true;
 
             vector<PlaylistItem*>::iterator i;
 
             for(i = items.begin(); i != items.end(); i++)
             {
                 m_context->browser->m_catalog->RemoveSong((*i)->URL().c_str());
+
+                if(deleteFromDrive)
+                {
+                    keepGoing = DeleteFromDrive((*i)->URL().c_str());
+
+                    if(!keepGoing)
+                        break;
+                }
             }
 
-            vector<string> urls;            
-            GetSelectedPlaylistItems(&urls);
-
-            vector<string>::iterator j;
-
-            for(j = urls.begin(); j != urls.end(); j++)
+            if(!keepGoing)
             {
-                m_context->browser->m_catalog->RemovePlaylist((*j).c_str());
+                vector<string> urls;            
+                GetSelectedPlaylistItems(&urls);
+
+                vector<string>::iterator j;
+            
+                for(j = urls.begin(); j != urls.end(); j++)
+                {
+                    m_context->browser->m_catalog->RemovePlaylist((*j).c_str());
+
+                    if(deleteFromDrive)
+                    {
+                        keepGoing = DeleteFromDrive((*j).c_str());
+
+                        if(!keepGoing)
+                            break;
+                    }
+                }
             }
         }
     }
@@ -272,7 +351,10 @@ void MusicBrowserUI::EditInfoEvent()
 {
     vector<PlaylistItem*> items;
 
-    GetSelectedMusicTreeItems(&items); 
+    if(m_hPlaylistView == GetFocus())
+        GetSelectedPlaylistItems(&items); 
+    else if(m_hMusicCatalog == GetFocus())
+        GetSelectedMusicTreeItems(&items); 
 
     m_editTrackMetaData = items[0]->GetMetaData();
 
@@ -355,11 +437,7 @@ void MusicBrowserUI::EditInfoEvent()
 
                 m_context->browser->m_catalog->UpdateSong(*track);
             }
-        }
-
-        
-        
-        
+        } 
     }
 }
 
@@ -372,14 +450,22 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
     pTreeView = (NM_TREEVIEW *)pHdr;
     if (pTreeView->hdr.idFrom == IDC_MUSICTREE)
     {
-	    if (pTreeView->hdr.code == TVN_BEGINDRAG )//&&
-            //m_oTreeData.GetLevel(pTreeView->itemNew.lParam) == 3)
+	    if (pTreeView->hdr.code == TVN_BEGINDRAG )
         {
             TVBeginDrag(GetDlgItem(m_hWnd, IDC_MUSICTREE), 
                       (NM_TREEVIEW*)pHdr);
             return 0;
         }    
 
+        if(pTreeView->hdr.code == TVN_KEYDOWN)
+        {
+            TV_KEYDOWN* pnkd = (TV_KEYDOWN*)pHdr; 
+
+            if(pnkd->wVKey == VK_DELETE)
+            {
+                RemoveEvent();  
+            }
+        }
 
         if (pTreeView->hdr.code == TVN_BEGINLABELEDIT)
         {
@@ -592,8 +678,13 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
             
             GetCursorPos(&sPoint);
 
-            menu = LoadMenu(g_hinst, MAKEINTRESOURCE(IDR_POPUP));
+            menu = LoadMenu(g_hinst, MAKEINTRESOURCE(IDR_TVPOPUP));
             subMenu = GetSubMenu(menu, 0);
+
+            if(m_pParent)
+            {
+                DeleteMenu(subMenu, ID_POPUP_ADDTRACK_PLAY, MF_BYCOMMAND);
+            }
 
             if( trackCount > 1 ||
                 playlistCount > 1 ||
@@ -649,15 +740,75 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
     }    
 
     pListView = (NM_LISTVIEW *)pHdr;
-    if (pListView->hdr.idFrom == IDC_PLAYLISTBOX)
+    if(pListView->hdr.idFrom == IDC_PLAYLISTBOX)
     {
-        if (pListView->hdr.code == LVN_BEGINDRAG )
+        if(pListView->hdr.code == LVN_BEGINDRAG )
         {
             LVBeginDrag(m_hPlaylistView, (NM_LISTVIEW*)pHdr);
             return 0;
-        }    
+        }  
+        else if(pListView->hdr.code == NM_RCLICK)
+        {
+            HMENU menu;
+            HMENU subMenu;
+            POINT sPoint;
+            uint32 trackCount = 0;
+            uint32 playlistCount = 0;
 
-	    if(pListView->hdr.code == LVN_ITEMCHANGED)
+            trackCount = GetSelectedTrackCount();
+            playlistCount = GetSelectedPlaylistCount();
+            
+            GetCursorPos(&sPoint);
+
+            menu = LoadMenu(g_hinst, MAKEINTRESOURCE(IDR_LVPOPUP));
+            subMenu = GetSubMenu(menu, 0);
+
+            if(m_pParent)
+            {
+                DeleteMenu(subMenu, ID_POPUP_PLAY, MF_BYCOMMAND);
+            }
+
+            // Can we move items up and down?
+            uint32 count = ListView_GetItemCount(m_hPlaylistView);
+            uint32 selected = ListView_GetSelectedCount(m_hPlaylistView);
+
+            if(count)
+            {
+                uint32 state;
+
+                EnableMenuItem(subMenu, ID_POPUP_PLAY, MF_BYCOMMAND|
+                               (selected > 1) ? MF_GRAYED : MF_ENABLED );
+
+                state = ListView_GetItemState(m_hPlaylistView,
+                                              count - 1, 
+                                              LVIS_SELECTED);
+
+                EnableMenuItem(subMenu, ID_POPUP_MOVEDOWN, MF_BYCOMMAND|
+                               (state & LVIS_SELECTED) ? MF_GRAYED : MF_ENABLED );
+
+                state = ListView_GetItemState(m_hPlaylistView, 
+                                              0, 
+                                              LVIS_SELECTED);
+
+                EnableMenuItem(subMenu, ID_POPUP_MOVEUP, MF_BYCOMMAND|
+                               (state & LVIS_SELECTED) ? MF_GRAYED : MF_ENABLED );
+            }
+            else
+            {
+                EnableMenuItem(subMenu, ID_POPUP_PLAY, MF_BYCOMMAND|MF_GRAYED);
+                EnableMenuItem(subMenu, ID_POPUP_MOVEUP, MF_BYCOMMAND|MF_GRAYED);
+                EnableMenuItem(subMenu, ID_POPUP_MOVEDOWN, MF_BYCOMMAND|MF_GRAYED);
+                EnableMenuItem(subMenu, ID_POPUP_REMOVE, MF_BYCOMMAND|MF_GRAYED);
+                EnableMenuItem(subMenu, ID_POPUP_EDITINFO, MF_BYCOMMAND|MF_GRAYED);
+            }
+
+            TrackPopupMenu(subMenu, 
+                           TPM_LEFTALIGN, sPoint.x, sPoint.y, 
+                           0, m_hWnd, NULL);
+
+            DestroyMenu(menu);
+        }
+	    else if(pListView->hdr.code == LVN_ITEMCHANGED)
         {
             UpdateButtonMenuStates();
         }
@@ -822,6 +973,29 @@ void MusicBrowserUI::ToggleVisEvent(void)
     delete e;
 }
 
+void MusicBrowserUI::PlayNowEvent(void)
+{
+    if(!m_pParent)
+    {
+        uint32 count = ListView_GetItemCount(m_hPlaylistView);
+        uint32 index = 0;
+
+        for(index = 0; index < count; index++)
+        {
+            uint32 state = ListView_GetItemState(m_hPlaylistView, 
+                                                 index, 
+                                                 LVIS_SELECTED);
+            if(state & LVIS_SELECTED)
+            {
+                // only do this for the root browser
+                m_playerEQ->AcceptEvent(new Event(CMD_Stop));
+                m_oPlm->SetCurrentIndex(index);
+                m_playerEQ->AcceptEvent(new Event(CMD_Play));
+                break;
+            }
+        }
+    }
+}
 
 void MusicBrowserUI::AddTrackEvent(void)
 {

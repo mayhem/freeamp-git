@@ -56,6 +56,9 @@ typedef struct PrefsStruct
     int32 decoderThreadPriority;
     bool stayOnTop;
     bool liveInTray;
+    bool useTextLabels;
+    bool useImages;
+    bool savePlaylistOnExit;
 
     // page 2
     int32 streamInterval;
@@ -112,7 +115,7 @@ typedef struct PrefsStruct
             logOutput == pref.logOutput &&
             logDecoder == pref.logDecoder &&
             logPerformance == pref.logPerformance &&
-
+            
             defaultFont == pref.defaultFont &&
             currentTheme == pref.currentTheme &&
 
@@ -123,6 +126,11 @@ typedef struct PrefsStruct
             saveMusicDirectory == pref.saveMusicDirectory &&
 
             portablePlayers == pref.portablePlayers &&
+
+            useTextLabels == pref.useTextLabels &&
+            useImages == pref.useImages &&
+
+            savePlaylistOnExit == pref.savePlaylistOnExit &&
 
             true
         );

@@ -16,12 +16,14 @@
 #define IDI_BLANK                       107
 #define IDI_ACTIVELIST                  109
 #define IDR_POPUP                       110
+#define IDR_TVPOPUP                     110
 #define IDB_PLAYLIST                    113
 #define IDB_BITMAP1                     116
 #define IDR_TRACKPOPUP                  119
 #define IDD_MUSICSEARCH                 120
 #define IDR_MENU2                       120
 #define IDD_SAVEPLAYLIST                121
+#define IDR_LVPOPUP                     121
 #define IDB_ALL                         124
 #define IDB_UNCATAGORIZED               125
 #define IDI_MYMUSIC                     126
@@ -130,6 +132,9 @@
 #define ID_POPUP_RENAME                 40065
 #define ID_POPUP_REMOVE                 40066
 #define ID_POPUP_EDITINFO               40067
+#define ID_POPUP_MOVEUP                 40068
+#define ID_POPUP_MOVEDOWN               40069
+#define ID_POPUP_PLAY                   40070
 #define IDS_URL                         65535
 #define IDC_TRACKTEXT                   65535
 #define IDC_TITLETEXT                   65535
@@ -139,7 +144,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        127
-#define _APS_NEXT_COMMAND_VALUE         40068
+#define _APS_NEXT_COMMAND_VALUE         40071
 #define _APS_NEXT_CONTROL_VALUE         1030
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

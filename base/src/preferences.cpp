@@ -66,6 +66,9 @@ const char* kUserNamePref = "UserName";
 const char* kReclaimFiletypesPref = "ReclaimFiletypes";
 const char* kAskToReclaimFiletypesPref = "AskToReclaimFiletypes";
 const char* kUsersPortablePlayersPref = "UsersPortablePlayers";
+const char* kShowToolbarTextLabelsPref = "ShowToolbarTextLabels";
+const char* kShowToolbarImagesPref = "ShowToolbarImages";
+const char* kSaveCurrentPlaylistOnExitPref = "SaveCurrentPlaylistOnExit";
 
 //logging
 const char* kUseDebugLogPref = "UseDebugLog";
@@ -108,6 +111,9 @@ const char* kDefaultUserName = "";
 const bool kDefaultReclaimFiletypes = true;
 const bool kDefaultAskToReclaimFiletypesPref = true;
 const char* kDefaultUsersPortablePlayers = "";
+const bool kDefaultShowToolbarTextLabels = true;
+const bool kDefaultShowToolbarImages = true;
+const bool kDefaultSaveCurrentPlaylistOnExit = true;
 
 Error
 Preferences::
@@ -240,6 +246,15 @@ SetDefaults()
     if (GetPrefString(kUsersPortablePlayersPref, dummyString, 
         (uint32 *)&dummyInt) == kError_NoPrefValue)
         SetPrefString(kUsersPortablePlayersPref, kDefaultUsersPortablePlayers);
+
+    if (GetPrefBoolean(kShowToolbarTextLabelsPref, &dummyBool) == kError_NoPrefValue)
+        SetPrefBoolean(kShowToolbarTextLabelsPref, kDefaultShowToolbarTextLabels);
+
+    if (GetPrefBoolean(kShowToolbarImagesPref, &dummyBool) == kError_NoPrefValue)
+        SetPrefBoolean(kShowToolbarImagesPref, kDefaultShowToolbarImages);
+
+    if (GetPrefBoolean(kSaveCurrentPlaylistOnExitPref, &dummyBool) == kError_NoPrefValue)
+        SetPrefBoolean(kSaveCurrentPlaylistOnExitPref, kDefaultSaveCurrentPlaylistOnExit);
 
     return kError_NoErr;
 }
@@ -833,6 +848,48 @@ Preferences::
 SetUsersPortablePlayers(const char* list)
 {
     return SetPrefString(kUsersPortablePlayersPref, list);
+}
+
+Error
+Preferences::
+GetShowToolbarTextLabels(bool* value)
+{
+    return GetPrefBoolean(kShowToolbarTextLabelsPref, value);
+}
+
+Error
+Preferences::
+SetShowToolbarTextLabels(bool value)
+{
+    return SetPrefBoolean(kShowToolbarTextLabelsPref, value);
+}
+
+Error
+Preferences::
+GetShowToolbarImages(bool* value)
+{
+    return GetPrefBoolean(kShowToolbarImagesPref, value);
+}
+
+Error
+Preferences::
+SetShowToolbarImages(bool value)
+{
+    return SetPrefBoolean(kShowToolbarImagesPref, value);
+}
+
+Error
+Preferences::
+GetSaveCurrentPlaylistOnExit(bool* value)
+{
+    return GetPrefBoolean(kSaveCurrentPlaylistOnExitPref, value);
+}
+
+Error
+Preferences::
+SetSaveCurrentPlaylistOnExit(bool value)
+{
+    return SetPrefBoolean(kSaveCurrentPlaylistOnExitPref, value);
 }
 
 LibDirFindHandle *

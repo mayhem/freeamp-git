@@ -848,7 +848,6 @@ void MusicBrowserUI::TVBeginDrag(HWND hwnd, NM_TREEVIEW* nmtv)
 
         GetSelectedPlaylistItems(urls);
 
-
         HIMAGELIST himl;
         RECT rcItem;
         POINT hotspot;

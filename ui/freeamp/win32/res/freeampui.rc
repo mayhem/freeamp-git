@@ -33,20 +33,27 @@ CAPTION "General"
 FONT 8, "MS Sans Serif"
 BEGIN
     CONTROL         "Remain on top of all other windows.",IDC_STAYONTOP,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,131,128,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,145,128,10
     CONTROL         "Show FreeAmp icon in the system tray instead of the taskbar.",
-                    IDC_TRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,145,
+                    IDC_TRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,157,
                     207,10
-    GROUPBOX        "Miscellaneous",IDC_STATIC,3,117,227,44
-    GROUPBOX        "Save Music Folder",IDC_STATIC,3,3,227,44
-    EDITTEXT        IDC_SAVEMUSICDIR,11,22,160,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "Browse...",IDC_BROWSE,175,22,50,14
-    GROUPBOX        "File Associations",IDC_STATIC,3,60,227,44
+    GROUPBOX        "Miscellaneous",IDC_STATIC,3,133,227,38
+    GROUPBOX        "Save Music Folder",IDC_STATIC,3,3,227,39
+    EDITTEXT        IDC_SAVEMUSICDIR,11,19,160,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Browse...",IDC_BROWSE,175,19,50,14
+    GROUPBOX        "File Associations",IDC_STATIC,3,49,227,38
     CONTROL         "Reclaim stolen filetypes when application starts.",
                     IDC_RECLAIMFILETYPES,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,18,74,163,10
+                    WS_TABSTOP,18,61,163,10
     CONTROL         "Ask before reclaiming filetypes.",IDC_ASKRECLAIM,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,18,88,113,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,18,73,113,10
+    GROUPBOX        "Show Toolbars As",IDC_STATIC,3,94,227,32
+    CONTROL         "Text only",IDC_TEXTONLY,"Button",BS_AUTORADIOBUTTON,178,
+                    108,43,10
+    CONTROL         "Images only",IDC_IMAGESONLY,"Button",BS_AUTORADIOBUTTON,
+                    101,108,53,10
+    CONTROL         "Text and images",IDC_TEXTANDIMAGES,"Button",
+                    BS_AUTORADIOBUTTON,11,108,66,10
 END
 
 IDD_PREF_DEBUG DIALOG DISCARDABLE  0, 0, 233, 174
@@ -231,15 +238,15 @@ FONT 8, "MS Sans Serif"
 BEGIN
     CONTROL         "Slider1",IDC_PRIORITY,"msctls_trackbar32",TBS_AUTOTICKS | 
                     WS_TABSTOP,9,20,214,15
-    EDITTEXT        IDC_INPUT,119,79,25,12,ES_AUTOHSCROLL | ES_NUMBER
-    EDITTEXT        IDC_OUTPUT,119,95,25,12,ES_AUTOHSCROLL | ES_NUMBER
-    EDITTEXT        IDC_PREBUFFER,119,111,25,12,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_INPUT,119,77,25,12,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_OUTPUT,119,93,25,12,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_PREBUFFER,119,109,25,12,ES_AUTOHSCROLL | ES_NUMBER
     GROUPBOX        "Decoder Priority",IDC_STATIC,3,3,227,59
-    GROUPBOX        "Buffer Sizes",IDC_STATIC,3,66,227,64
-    LTEXT           "Input Buffer Size:",IDC_STATIC,59,81,57,8
-    LTEXT           "Output Buffer Size:",IDC_STATIC,54,97,60,8
-    LTEXT           "Kilobytes",IDC_STATIC,149,81,29,8
-    LTEXT           "Kilobytes",IDC_STATIC,149,97,29,8
+    GROUPBOX        "Buffer Sizes",IDC_STATIC,3,66,227,62
+    LTEXT           "Input Buffer Size:",IDC_STATIC,59,79,57,8
+    LTEXT           "Output Buffer Size:",IDC_STATIC,54,95,60,8
+    LTEXT           "Kilobytes",IDC_STATIC,149,79,29,8
+    LTEXT           "Kilobytes",IDC_STATIC,149,95,29,8
     LTEXT           "Low",IDC_STATIC,41,38,14,8
     LTEXT           "Normal",IDC_STATIC,104,38,23,8
     LTEXT           "High",IDC_STATIC,175,38,16,8
@@ -247,11 +254,11 @@ BEGIN
     LTEXT           "Idle",IDC_STATIC,10,38,12,8
     CTEXT           "Below Normal",IDC_STATIC,69,38,29,15
     CTEXT           "Above Normal",IDC_STATIC,135,38,27,16
-    LTEXT           "Prebuffer Streams:",IDC_STATIC,55,113,59,8
-    LTEXT           "Seconds",IDC_STATIC,149,113,29,8
+    LTEXT           "Prebuffer Streams:",IDC_STATIC,55,111,59,8
+    LTEXT           "Seconds",IDC_STATIC,149,111,29,8
     GROUPBOX        "Default Values",IDC_STATIC,3,132,227,38
     PUSHBUTTON      "Use &Defaults",IDC_USEDEFAULTS,170,146,50,14
-    LTEXT           "To reset this tab to use the recommended the default values, click on Use Defaults.",
+    LTEXT           "To reset this tab to use the recommended default values, click on ""Use Defaults.""",
                     IDC_STATIC,9,146,153,20
 END
 

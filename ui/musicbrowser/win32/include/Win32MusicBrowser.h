@@ -170,6 +170,7 @@ class MusicBrowserUI : public UserInterface
     BOOL   DrawItem(int32 controlId, DRAWITEMSTRUCT* dis);
     void   SetStatusText(const char *text);
     void   CreateToolbar(void);
+    void   AddToolbarButtons(bool textLabels, bool images);
     void   ToggleVisEvent(void);
     void   SetTitles(void);
     void   UpdateButtonMenuStates(void);
@@ -216,6 +217,8 @@ class MusicBrowserUI : public UserInterface
     void  ExportPlaylistEvent(void);
     void  EditInfoEvent(void);
     void  RenameEvent(void);
+    void  PlayNowEvent(void);
+    bool  DeleteFromDrive(const char* url);
 
     // Functions in PlaylistView.cpp
     void  PlaylistListItemAdded(const PlaylistItem* item);
@@ -227,7 +230,7 @@ class MusicBrowserUI : public UserInterface
     void  InitList(void);
     void  LVBeginDrag(HWND hwnd, NM_LISTVIEW* nmlv);
     void  UpdateTotalTime(void);
-    
+    void  GetSelectedPlaylistItems(vector<PlaylistItem*>* items);
 
     // Functions in Win32MusicBrowser.cpp
     void  AddMusicBrowserWindow(MusicBrowserUI *pWindow);
@@ -284,7 +287,7 @@ class MusicBrowserUI : public UserInterface
     EventQueue*         m_playerEQ;
     int32               m_state, m_startupType, m_playerState;
     int32               m_currentplaying;
-  	HWND                m_hWnd, m_hStatus, m_hParent, m_hToolbar, m_hRebar;
+  	HWND                m_hWnd, m_hStatus, m_hParent, m_hRebar;
     HWND                m_hMusicCatalog, m_hPlaylistView;
     HWND                m_hPlaylistTitle, m_hMusicCatalogTitle;
     PlaylistManager*    m_oPlm;
@@ -307,6 +310,7 @@ class MusicBrowserUI : public UserInterface
     HBRUSH              m_splitterBrush;
 
     HWND                m_hPlaylistHeader;
+    HWND                m_hToolbar, m_hTextToolbar, m_hImageToolbar;
     DropTarget*         m_playlistDropTarget;
     vector<string>      m_searchPathList;
     HTREEITEM           m_hNewPlaylistItem;  

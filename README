@@ -37,12 +37,13 @@ FreeAmp 2.0 for Win32 and Linux:
   new interface with easily labelled buttons.
 
   * My Music - Opens a music browser which will hopefully allow you
-    to more easily manage your music. The "My Music" dialog allows
-    you to edit the current play queue as well as persistant 
-    playlists.
+      to more easily manage your music. The "My Music" dialog allows
+      you to edit the current play queue as well as persistant 
+      playlists.
   * Options - Opens the preferences dialog, enabling you to control
-    many features in FreeAmp.
-  * Playlist - Opens the "My Music" dialog in a compressed form
+      many features in FreeAmp.
+  * Files - Allows you to immediately open files located on your
+      file system.
   * Download - Opens the download manager.
 
   Above the button bar are the volume slider on the left and the seek
@@ -67,13 +68,14 @@ player available.  In the interest of supporting the free software
 community, while at the same time fostering the growth of the online 
 delivery of music, EMusic.com, THE Source for Downloadable Music, is 
 funding both the FreeAmp.org domain and the efforts of the FreeAmp 
-team. The FreeAmp team consists of: Mark B. Elrod, Robert Kaye, Brett 
-Thomas, Jason Woodward, and Isaac Richards. 
+team. The FreeAmp team consists of: Mark B. Elrod, Robert Kaye, Isaac
+Richards, Brett Thomas, and Jason Woodward. 
 
 Other people have also contributed to FreeAmp. Bill Yuan in China has
 contributed the RainPlay user interface and Gabor Fleischer in Hungary 
-has contributed Linux ALSA support. If you feel like contributing to 
-the project, please check out our developer pages. 
+has contributed Linux ALSA support. For a complete list of contributors
+and their contributions check out the AUTHORS file. If you feel like 
+contributing to the project, please check out our developer pages. 
 
 FreeAmp is being released under the GPL.  As is provided by the GPL, 
 all of EMusic's and your efforts toward FreeAmp will be released back 

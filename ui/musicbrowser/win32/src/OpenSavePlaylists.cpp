@@ -138,6 +138,11 @@ bool MusicBrowserUI::SaveNewPlaylist(string &oName)
 
         m_context->prefs->GetUsersName(szName, &length);
 
+        while(*szName && isspace(*szName))
+        {
+            strcpy(szName, szName + 1);
+        }
+
         if(strlen(szName))
         {
             char* cp = NULL;

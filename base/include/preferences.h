@@ -73,6 +73,9 @@ extern const char* kUserNamePref;
 extern const char* kReclaimFiletypesPref;
 extern const char* kAskToReclaimFiletypesPref;
 extern const char* kUsersPortablePlayersPref;
+extern const char* kShowToolbarTextLabelsPref;
+extern const char* kShowToolbarImagesPref;
+extern const char* kSaveCurrentPlaylistOnExitPref;
 
 class LibDirFindHandle;
 
@@ -224,6 +227,15 @@ class Preferences {
 
     Error GetUsersPortablePlayers(char* list, uint32* len);
     Error SetUsersPortablePlayers(const char* list);
+
+    Error GetShowToolbarTextLabels(bool* value);
+    Error SetShowToolbarTextLabels(bool value);
+
+    Error GetShowToolbarImages(bool* value);
+    Error SetShowToolbarImages(bool value);
+
+    Error GetSaveCurrentPlaylistOnExit(bool* value);
+    Error SetSaveCurrentPlaylistOnExit(bool value);
 
 };
 

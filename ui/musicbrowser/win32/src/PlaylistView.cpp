@@ -496,33 +496,42 @@ void MusicBrowserUI::PlaylistListItemAdded(const PlaylistItem* item)
     }
 }
 
-void MusicBrowserUI::LVBeginDrag(HWND hwnd, NM_LISTVIEW* nmlv)
+void MusicBrowserUI::GetSelectedPlaylistItems(vector<PlaylistItem*>* items)
 {
-    vector<string>* urls = new vector<string>;
-    vector<PlaylistItem*> list;
-
-    m_playlistDropTarget->TargetIsSource(true);
-
-    uint32 selected = ListView_GetSelectedCount(hwnd);
-    uint32 count = ListView_GetItemCount(hwnd);
+    uint32 selected = ListView_GetSelectedCount(m_hPlaylistView);
+    uint32 count = ListView_GetItemCount(m_hPlaylistView);
     uint32 index = 0;
     uint32 found = 0;
 
     for(index = 0, found = 0; found < selected && index < count; index++)
     {
-        uint32 state = ListView_GetItemState(hwnd, 
+        uint32 state = ListView_GetItemState(m_hPlaylistView, 
                                              index, 
                                              LVIS_SELECTED);
         if(state & LVIS_SELECTED)
         {
             PlaylistItem* item = m_oPlm->ItemAt(index);
 
-            urls->push_back(item->URL());
-
-            //ListView_SetItemState(hwnd, index, LVIS_CUT, LVIS_CUT);
-            list.push_back(item);
+            items->push_back(item);
             found++;
         }
+    }
+}
+
+void MusicBrowserUI::LVBeginDrag(HWND hwnd, NM_LISTVIEW* nmlv)
+{
+    vector<string>* urls = new vector<string>;
+    vector<PlaylistItem*> items;
+
+    m_playlistDropTarget->TargetIsSource(true);
+
+    GetSelectedPlaylistItems(&items);
+
+    vector<PlaylistItem*>::iterator i;
+
+    for(i = items.begin(); i != items.end(); i++)
+    {
+        urls->push_back((*i)->URL().c_str());
     }
 
     HIMAGELIST himl;
@@ -549,7 +558,7 @@ void MusicBrowserUI::LVBeginDrag(HWND hwnd, NM_LISTVIEW* nmlv)
     {
         vector<PlaylistItem*>::iterator i;
 
-        for(i = list.begin(); i != list.end(); i++)
+        for(i = items.begin(); i != items.end(); i++)
         {
             m_oPlm->RemoveItem(*i);         
         }
@@ -662,6 +671,67 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
 
 			break;
 		}
+
+        case WM_SIZE:
+        {
+            int32 oldWidth = 0;
+
+            oldWidth += ListView_GetColumnWidth(hwnd, 0);
+            oldWidth += ListView_GetColumnWidth(hwnd, 1);
+            oldWidth += ListView_GetColumnWidth(hwnd, 2);
+            oldWidth += ListView_GetColumnWidth(hwnd, 3);
+            oldWidth += ListView_GetColumnWidth(hwnd, 4);
+
+            int32 headerResizeAmount = LOWORD(lParam) - oldWidth;
+
+    
+            int32 eachHeaderAmount = headerResizeAmount/3;
+            int32 titleExtraAmount = headerResizeAmount%3;
+            int32 width;
+
+            if(eachHeaderAmount)
+            {
+                width = ListView_GetColumnWidth(m_hPlaylistView, 1);
+                width += eachHeaderAmount;    
+                ListView_SetColumnWidth(m_hPlaylistView, 1, width);
+
+                width = ListView_GetColumnWidth(m_hPlaylistView, 2);
+                width += eachHeaderAmount;
+                ListView_SetColumnWidth(m_hPlaylistView, 2, width);
+
+                width = ListView_GetColumnWidth(m_hPlaylistView, 3);
+                width += eachHeaderAmount;
+                ListView_SetColumnWidth(m_hPlaylistView, 3, width);
+            }
+    
+            if(titleExtraAmount)
+            {
+                static uint32 lastColumn = 1;
+
+                while(titleExtraAmount)
+                {
+                    width = ListView_GetColumnWidth(m_hPlaylistView, lastColumn);
+       
+                    if(titleExtraAmount > 0)
+                    {
+                        width += 1;
+                        titleExtraAmount--;
+                    }
+                    else
+                    {
+                        width -= 1;
+                        titleExtraAmount++;
+                    }
+
+                    ListView_SetColumnWidth(m_hPlaylistView, lastColumn, width);
+
+                    if(++lastColumn > 3)
+                        lastColumn = 1;
+                }
+            }
+            
+            break;
+        }
 
         case WM_SETFOCUS:
         case WM_KILLFOCUS:

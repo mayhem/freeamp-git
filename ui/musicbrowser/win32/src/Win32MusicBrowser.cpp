@@ -194,8 +194,39 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
 {
     switch (event->Type()) 
     {
+        case INFO_PrefsChanged:
+        {
+            bool useTextLabels, useImages;
+            m_context->prefs->GetShowToolbarTextLabels(&useTextLabels);
+            m_context->prefs->GetShowToolbarImages(&useImages);
+
+            AddToolbarButtons(useTextLabels, useImages);
+            UpdateButtonMenuStates();
+            break;
+        }
+
         case CMD_Cleanup: 
         {
+            bool savePlaylist = true;
+
+            m_context->prefs->GetSaveCurrentPlaylistOnExit(&savePlaylist);
+
+            if(savePlaylist)
+            {
+                char path[MAX_PATH];
+                char url[MAX_PATH + 7];
+                uint32 length = sizeof(path);
+
+                m_context->prefs->GetInstallDirectory(path, &length);
+
+                strcat(path, "\\freeamp.m3u");
+
+                length = sizeof(url);
+                FilePathToURL(path, url, &length);
+
+                m_oPlm->WritePlaylist(url);
+            }
+
             CloseMainDialog();
             m_uiThread->Join();
             
