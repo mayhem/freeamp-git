@@ -27,8 +27,11 @@ ____________________________________________________________________________*/
 #include "PlaylistListItem.h"
 #include "BeOSMusicBrowser.h"
 #include "playlist.h"
+#include "utility.h"
 #define DEBUG 1
 #include <be/support/Debug.h>
+#include <be/storage/Entry.h>
+#include <be/storage/Path.h>
 #include <vector>
 using namespace std;
 
@@ -65,22 +68,19 @@ bool
 PlaylistView::InitiateDrag( BPoint point, int32 index, bool wasSelected )
 {
     CatalogItem* item = dynamic_cast<CatalogItem*>( ItemAt( index ) );
-    if ( item )
+    if ( item && wasSelected )
     {
         PRINT(( "Drag begin\n" ));
-        BMessage msg( B_SIMPLE_DATA );
+        BMessage msg( MBMSG_DRAGGED );
         msg.AddPointer( "CatalogItem", item );
+        msg.AddPointer( "source", this );
+        msg.AddInt32( "index", index );
         BRect dragRect( ItemFrame( index ) );
         DragMessage( &msg, dragRect, NULL );
-        if ( wasSelected )
-        {
-            BMessage sm( *SelectionMessage() );
-            sm.AddPointer( "source", this );
-            Messenger().SendMessage( &sm );
-        }
         return true;
     }
-    return false;
+
+    return BListView::InitiateDrag( point, index, wasSelected );
 }
 
 void
@@ -88,7 +88,7 @@ PlaylistView::MessageReceived( BMessage* message )
 {
     switch ( message->what )
     {
-        case B_SIMPLE_DATA:
+        case MBMSG_DRAGGED:
         {
             PRINT(( "inserter = %d\n", m_inserter ));
             int32 index = m_inserter + 1;
@@ -98,7 +98,18 @@ PlaylistView::MessageReceived( BMessage* message )
                 if ( cti->Type() == CatalogItem::ITEM_TRACK )
                 {
                     TrackItem* ti = dynamic_cast<TrackItem*>( cti );
-                    m_plm->AddItem( ti->URL(), index );
+                    PlaylistView* src;
+                    if ( message->FindPointer( "source", (void**)&src ) == B_OK
+                         && src == this )
+                    {
+                        m_plm->MoveItem( message->FindInt32( "index" ),
+                                         m_inserter );
+                        Select( m_inserter );
+                    }
+                    else
+                    {
+                        m_plm->AddItem( ti->URL(), index );
+                    }
                 }
                 else if ( cti->Type() == CatalogItem::ITEM_COLLECTION )
                 {
@@ -115,6 +126,31 @@ PlaylistView::MessageReceived( BMessage* message )
                 }
             }
             SetInserter( -1 );
+            break;
+        }
+        case B_SIMPLE_DATA:
+        {
+            int32 index = m_inserter + 1;
+            entry_ref ref;
+            int32 count = 0;
+            while ( message->FindRef( "refs", count++, &ref ) == B_OK )
+            {
+                BPath path( &ref );
+                if ( path.InitCheck() < B_OK )
+                    continue;
+                size_t urlLen = strlen( path.Path() ) + 10;
+                char* url = new char[ urlLen ];
+                if ( FilePathToURL( path.Path(), url, &urlLen )
+                     == kError_BufferTooSmall )
+                {
+                    delete[] url;
+                    url = new char[ urlLen ];
+                    FilePathToURL( path.Path(), url, &urlLen );
+                }
+                PRINT(( "dropped: %s\n", url ));
+                m_plm->AddItem( url, index );
+                delete[] url;
+            }
             break;
         }
         default:
@@ -175,6 +211,7 @@ PlaylistView::SetInserter( int32 index )
     InvalidateItem( m_inserter );
     m_inserter = index;
     InvalidateItem( m_inserter );
+    PRINT(( "PlaylistView::SetInserter: inserter = %d\n", m_inserter ));
 }
 
 // vi: set ts=4:

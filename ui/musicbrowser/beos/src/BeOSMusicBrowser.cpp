@@ -310,6 +310,16 @@ BeOSMusicBrowser::MessageReceived( BMessage* message )
             m_playlistView->SetCurrentlyPlaying(
                                 message->FindInt32( "index" ) );
             break;
+        case MBMSG_PLAYLIST_ITEM_REMOVED:
+        {
+            PlaylistItemRemovedEvent* pire;
+            if ( message->FindPointer( "event", (void**)&pire ) == B_OK &&
+                 pire->Manager() == m_plm )
+            {
+                UpdatePlaylistView();
+            }
+            break;
+        }
         case MBMSG_PLAYLIST_ITEMS_UPDATED:
         {
             PlaylistItemsUpdatedEvent* piue;
@@ -356,6 +366,8 @@ BeOSMusicBrowser::MessageReceived( BMessage* message )
         case MBMSG_SAVE_CURRENT_PLAYLIST_REPLY:
             SaveCurrentPlaylistPanel( message, true );
             break;
+        case MBMSG_IMPORT_ITEMS:
+            break;
         case MBMSG_MUSIC_TREE_INVOKED:
         {
             PRINT(( "invoked" ));
@@ -394,15 +406,24 @@ BeOSMusicBrowser::MessageReceived( BMessage* message )
             }
             break;
         }
+        case MBMSG_REMOVE_ITEMS:
+        {
+            int32 index = m_playlistView->CurrentSelection();
+            if ( index >= 0 )
+            {
+                m_plm->RemoveItem( index );
+            }
+            break;
+        }
         case MBMSG_MOVE_UP:
         {
-            uint32 index = m_playlistView->CurrentSelection();
+            int32 index = m_playlistView->CurrentSelection();
             MovePlaylistItem( index, index - 1 );
             break;
         }
         case MBMSG_MOVE_DOWN:
         {
-            uint32 index = m_playlistView->CurrentSelection();
+            int32 index = m_playlistView->CurrentSelection();
             MovePlaylistItem( index, index + 1 );
             break;
         }
@@ -447,6 +468,8 @@ BeOSMusicBrowser::MessageReceived( BMessage* message )
             break;
         case MBMSG_DEBUG_3:
             UpdateCatalogView();
+            break;
+        case MBMSG_DEBUG_4:
             break;
 #endif
         default:
@@ -722,6 +745,14 @@ BeOSMusicBrowser::UpdatePlaylistView( void )
         }
     }
 
+    // If there's anything left in the playlist view, it should be removed.
+    int32 removeBegin = m_plm->CountItems();
+    int32 removeEnd = m_playlistView->CountItems();
+    if ( removeBegin < removeEnd )
+    {
+        m_playlistView->RemoveItems( removeBegin, removeEnd - removeBegin );
+    }
+
     // Set the currently playing item.
     m_playlistView->SetCurrentlyPlaying( m_plm->GetCurrentIndex() );
 
@@ -903,7 +934,8 @@ BeOSMusicBrowser::BuildMenu( BMenuBar* menuBar )
     menu->AddItem( item );
     item = new BMenuItem( "Add Tracks or Playlists from Disk", NULL );
     menu->AddItem( item );
-    item = new BMenuItem( "Remove Items from My Music", NULL );
+    item = new BMenuItem( "Remove Items from My Music",
+                           new BMessage( MBMSG_REMOVE_ITEMS ) );
     menu->AddItem( item );
     menu->AddSeparatorItem();
     item = new BMenuItem( "Move Up", new BMessage( MBMSG_MOVE_UP ) );

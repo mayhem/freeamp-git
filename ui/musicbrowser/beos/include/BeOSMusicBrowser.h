@@ -36,6 +36,7 @@ enum {
     // These are simply BMessage wrappers for the similarly named
     // FreeAmp events (those dispatched to/from AcceptEvent())
     MBMSG_PLAYLIST_CURRENT_ITEM_INFO = 'plci',
+    MBMSG_PLAYLIST_ITEM_REMOVED = 'pirm',
     MBMSG_PLAYLIST_ITEMS_UPDATED = 'piud',
     MBMSG_PLAYLIST_SORTED = 'plsd',
     MBMSG_PLAYLIST_UPDATED = 'plud',
@@ -68,11 +69,13 @@ enum {
     MBMSG_EDIT_CATALOG_ITEM = 'edci',
     MBMSG_CLEAR_PLAYLIST = 'clpl',
     MBMSG_SELECTION_CHANGED = 'slnc',
+    MBMSG_DRAGGED = 'drgd',
 
     // For debug.
     MBMSG_DEBUG_1 = 'dbg1',
     MBMSG_DEBUG_2 = 'dbg2',
     MBMSG_DEBUG_3 = 'dbg3',
+    MBMSG_DEBUG_4 = 'dbg4',
 };
 
 class FAContext;

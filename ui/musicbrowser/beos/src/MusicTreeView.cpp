@@ -76,7 +76,7 @@ MusicTreeView::InitiateDrag( BPoint point, int32 index, bool wasSelected )
     if ( item )
     {
         PRINT(( "Drag begin\n" ));
-        BMessage msg( B_SIMPLE_DATA );
+        BMessage msg( MBMSG_DRAGGED );
         msg.AddPointer( "CatalogItem", item );
         BRect dragRect( ItemFrame( index ) );
         DragMessage( &msg, dragRect, NULL );

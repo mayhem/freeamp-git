@@ -117,7 +117,7 @@ MusicBrowserUI::AcceptEvent( Event* event )
             }
             break;
         case INFO_PlaylistItemsUpdated:
-            PRINT(( "INFO_PlaylistItemUpdated\n" ));
+            PRINT(( "INFO_PlaylistItemsUpdated\n" ));
             BroadcastToAllBrowsers( MBMSG_PLAYLIST_ITEMS_UPDATED, event );
             break;
         case INFO_PlaylistUpdated: // not used?
@@ -126,6 +126,11 @@ MusicBrowserUI::AcceptEvent( Event* event )
             break;
         case INFO_PlaylistItemsAdded:
             PRINT(( "INFO_PlaylistItemsAdded\n" ));
+            break;
+        case INFO_PlaylistItemRemoved:
+            PRINT(( "INFO_PlaylistItemRemoved\n" ));
+            BroadcastToAllBrowsers( MBMSG_PLAYLIST_ITEM_REMOVED, event );
+            break;
             break;
         case INFO_PlaylistItemMoved:
             PRINT(( "INFO_PlaylistItemMoved\n" ));
