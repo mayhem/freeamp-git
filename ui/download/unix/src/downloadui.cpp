@@ -73,8 +73,14 @@ void DownloadUI::UIThreadFunc(void *p)
     ((DownloadUI *)p)->GTKEventService();
 }
 
+void DownloadUI::SetRunning(void)
+{
+    m_context->gtkRunning = true;
+}
+
 static int download_timeout(DownloadUI *p)
 {
+    p->SetRunning();
     if (p->doQuitNow)
         gtk_main_quit();
 }

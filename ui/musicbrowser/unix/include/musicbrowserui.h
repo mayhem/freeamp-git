@@ -50,6 +50,7 @@ class MusicBrowserUI : public UserInterface {
     void WindowClose(GTKMusicBrowser *oldUI);
 
     void StartSearch(bool runMain = true);
+    void SetRunning(void);
 
     bool doQuitNow;
 

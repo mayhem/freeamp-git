@@ -59,8 +59,9 @@ class FAContext
           downloadManager(0),
           //updateManager(0),
           player(0),
-#ifndef WIN32	  
+#ifdef HAVE_GTK
 	  gtkInitialized(false),
+          gtkRunning(false),
 #endif	  
 	  argc(0),
           argv(0),	  
@@ -86,9 +87,10 @@ class FAContext
     DownloadManager *downloadManager;
     //UpdateManager *updateManager;
     Player *player;
-#ifndef WIN32
+#ifdef HAVE_GTK
     Mutex gtkLock;
     bool gtkInitialized;
+    bool gtkRunning;
 #endif    
     int32 argc;
     char** argv;

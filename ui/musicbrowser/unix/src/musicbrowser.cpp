@@ -77,8 +77,14 @@ void MusicBrowserUI::gtkServiceFunction(void *p)
     ((MusicBrowserUI *)p)->GTKEventService();
 }
 
+void MusicBrowserUI::SetRunning(void)
+{
+    m_context->gtkRunning = true;
+}
+
 static int musicbrowser_timeout(MusicBrowserUI *p)
 {
+    p->SetRunning();
     if (p->doQuitNow)
         gtk_main_quit();
 }
