@@ -7,28 +7,31 @@
 
 2) Download and install NASM (http://www.web-sites.co.uk/nasm/).
 
-3) Run Developer Studio and open the FreeAmp workspace located at:
+3) Download and install the Win32 port of the SGI stl from:
+   http://www.sirius.com/~ouchida/
+
+4) Run Developer Studio and open the FreeAmp workspace located at:
    freeamp\base\win32\prj\freeamp.dsw
 
-4) Put NASM in your path. Choose "Tools | Options" in DevStudio and
+5) Put NASM in your path. Choose "Tools | Options" in DevStudio and
    go to the "Directories" tab.  Choose "Show Directories For" and
    select "Executable Files". Then add the directory where you have
    NASM.
 
-5) The workspace is set up so that DevStudio automatically calculates
+6) The workspace is set up so that DevStudio automatically calculates
    dependencies between projects. This means that building the top
    level project (called simply "freeamp") will automatically build
    all the other projects you need to run the product. Set freeamp
    as your active project.
 
-6) Build the freeamp project, and then run freeamp.exe. If you
+7) Build the freeamp project, and then run freeamp.exe. If you
    installed a shipping version of FreeAmp somewhere else, the first
    time you run the development version of FreeAmp, it will ask
    you whether you want to associate .MP3 files with the development
    version. It's up to you, I find it's nice to associate them with
    the development version.
 
-7) If you get some errors compiling the dsoundcardpmo.cpp file, you likely
+8) If you get some errors compiling the dsoundcardpmo.cpp file, you likely
    have an old version (or rather, the stock DirectX headers that ship
    with MSVC 5.0) of DirectX installed. You can either update the DirectX
    SDK (which is a *very* large download) or you can grab the needed 

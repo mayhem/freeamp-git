@@ -1,3 +1,12 @@
+Changes for Linux and Windows version 2.1.0 beta 8
+--------------------------------------------------------------------
+
+- Relatable profiles now get saved properly.
+- Much more tolerant of bad frames w/i MP3s
+- preliminary FreeBSD support, courtesy of Roger Hardiman
+- linux: Don't poll the CD for changes by default
+- Fix the streaming bug introduced in beta 7
+
 Changes for Linux and Windows version 2.1.0 beta 7
 --------------------------------------------------------------------
 
