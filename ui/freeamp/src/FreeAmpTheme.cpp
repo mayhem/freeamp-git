@@ -1339,7 +1339,7 @@ void FreeAmpTheme::UpdateThread()
 
 void FreeAmpTheme::ShowOptions(uint32 defaultPage)
 {
-    OptionsArgs oArgs;
+    OptionsArgs *oArgs = new OptionsArgs;
     
     if (m_bInOptions)
        return;
@@ -1350,18 +1350,20 @@ void FreeAmpTheme::ShowOptions(uint32 defaultPage)
         m_pOptionsThread = NULL;
     }
 
-    oArgs.pThis = this;
-    oArgs.uDefaultPage = defaultPage;
+    oArgs->pThis = this;
+    oArgs->uDefaultPage = defaultPage;
 
     m_pOptionsThread = Thread::CreateThread();
-    m_pOptionsThread->Create(options_thread, &oArgs);
+    m_pOptionsThread->Create(options_thread, oArgs);
 }
 
 void FreeAmpTheme::options_thread(void* arg)
 {
     OptionsArgs *pArgs = (OptionsArgs *)arg;
-    
+  
     pArgs->pThis->OptionsThread(pArgs->uDefaultPage);
+
+    delete pArgs;
 }
 
 void FreeAmpTheme::OptionsThread(uint32 defaultPage)
@@ -1369,7 +1371,7 @@ void FreeAmpTheme::OptionsThread(uint32 defaultPage)
     PreferenceWindow *pWindow;
 
     m_bInOptions = true;
-       
+
 #ifdef WIN32
     pWindow = new Win32PreferenceWindow(m_pContext, m_pThemeMan, m_pUpdateMan, defaultPage);
 #elif defined(__BEOS__)

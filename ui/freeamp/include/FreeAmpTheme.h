@@ -94,7 +94,6 @@ class FreeAmpTheme : public UserInterface, public Theme
         string           m_oCurrentWindow, m_oTitle, m_oStreamInfo;
         TimeDisplayState m_eTimeDisplayState;
         UpdateManager   *m_pUpdateMan;
-
 };
 
 #endif
