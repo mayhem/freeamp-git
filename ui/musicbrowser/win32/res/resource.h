@@ -2,6 +2,7 @@
 // Microsoft Developer Studio generated include file.
 // Used by musicbrowser.rc
 //
+#define IDB_TOOLBAR                     100
 #define IDD_MUSICBROWSER                101
 #define IDC_URL                         101
 #define IDR_MENU1                       102
@@ -68,7 +69,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        111
+#define _APS_NEXT_RESOURCE_VALUE        113
 #define _APS_NEXT_COMMAND_VALUE         40035
 #define _APS_NEXT_CONTROL_VALUE         1018
 #define _APS_NEXT_SYMED_VALUE           101

@@ -477,7 +477,7 @@ DEP_CPP_M3U_C=\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
 	"..\m3u.h"\
 	
@@ -501,7 +501,7 @@ DEP_CPP_M3U_C=\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
 	"..\m3u.h"\
 	
@@ -525,7 +525,7 @@ DEP_CPP_M3U_C=\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
 	"..\m3u.h"\
 	
@@ -549,7 +549,7 @@ DEP_CPP_M3U_C=\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
 	"..\m3u.h"\
 	

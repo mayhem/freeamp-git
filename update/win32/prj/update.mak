@@ -469,7 +469,7 @@ DEP_CPP_MAIN_=\
 	"..\..\..\base\include\preferences.h"\
 	"..\..\..\base\include\thread.h"\
 	"..\..\..\base\include\updatemanager.h"\
-	"..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\base\win32\include\win32prefs.h"\
 	"..\..\..\config\config.h"\
@@ -489,7 +489,7 @@ DEP_CPP_MAIN_=\
 	"..\..\..\base\include\preferences.h"\
 	"..\..\..\base\include\thread.h"\
 	"..\..\..\base\include\updatemanager.h"\
-	"..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\base\win32\include\win32prefs.h"\
 	"..\..\..\config\config.h"\
@@ -509,7 +509,7 @@ DEP_CPP_MAIN_=\
 	"..\..\..\base\include\preferences.h"\
 	"..\..\..\base\include\thread.h"\
 	"..\..\..\base\include\updatemanager.h"\
-	"..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\base\win32\include\win32prefs.h"\
 	"..\..\..\config\config.h"\
@@ -530,7 +530,7 @@ DEP_CPP_MAIN_=\
 	"..\..\..\base\include\preferences.h"\
 	"..\..\..\base\include\thread.h"\
 	"..\..\..\base\include\updatemanager.h"\
-	"..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\base\win32\include\win32prefs.h"\
 	"..\..\..\config\config.h"\

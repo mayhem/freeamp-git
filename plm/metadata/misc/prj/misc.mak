@@ -475,14 +475,32 @@ SOURCE=..\misc.cpp
 
 DEP_CPP_MISC_=\
 	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
 	"..\..\..\..\base\include\facontext.h"\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
 	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registrar.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
+	"..\..\..\..\io\include\pipeline.h"\
+	"..\..\..\..\io\include\pmi.h"\
+	"..\..\..\..\io\include\pullbuffer.h"\
+	"..\..\..\..\lmc\include\lmc.h"\
 	"..\misc.h"\
+	
+NODEP_CPP_MISC_=\
+	"..\..\..\..\base\include\win32impl.h"\
 	
 
 "$(INTDIR)\misc.obj" : $(SOURCE) $(DEP_CPP_MISC_) "$(INTDIR)"
@@ -493,13 +511,28 @@ DEP_CPP_MISC_=\
 
 DEP_CPP_MISC_=\
 	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
 	"..\..\..\..\base\include\facontext.h"\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
 	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registrar.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
+	"..\..\..\..\io\include\pipeline.h"\
+	"..\..\..\..\io\include\pmi.h"\
+	"..\..\..\..\io\include\pullbuffer.h"\
+	"..\..\..\..\lmc\include\lmc.h"\
 	"..\misc.h"\
 	
 
@@ -511,14 +544,32 @@ DEP_CPP_MISC_=\
 
 DEP_CPP_MISC_=\
 	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
 	"..\..\..\..\base\include\facontext.h"\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
 	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registrar.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
+	"..\..\..\..\io\include\pipeline.h"\
+	"..\..\..\..\io\include\pmi.h"\
+	"..\..\..\..\io\include\pullbuffer.h"\
+	"..\..\..\..\lmc\include\lmc.h"\
 	"..\misc.h"\
+	
+NODEP_CPP_MISC_=\
+	"..\..\..\..\base\include\win32impl.h"\
 	
 
 "$(INTDIR)\misc.obj" : $(SOURCE) $(DEP_CPP_MISC_) "$(INTDIR)"
@@ -529,13 +580,28 @@ DEP_CPP_MISC_=\
 
 DEP_CPP_MISC_=\
 	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
 	"..\..\..\..\base\include\facontext.h"\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
 	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registrar.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
+	"..\..\..\..\io\include\pipeline.h"\
+	"..\..\..\..\io\include\pmi.h"\
+	"..\..\..\..\io\include\pullbuffer.h"\
+	"..\..\..\..\lmc\include\lmc.h"\
 	"..\misc.h"\
 	
 

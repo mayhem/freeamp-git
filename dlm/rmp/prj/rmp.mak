@@ -543,7 +543,7 @@ DEP_CPP_RMP_C=\
 	"..\..\..\base\include\registry.h"\
 	"..\..\..\base\include\thread.h"\
 	"..\..\..\base\include\utility.h"\
-	"..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\config\config.h"\
 	"..\..\..\lib\xml\include\Parse.h"\
@@ -568,7 +568,7 @@ DEP_CPP_RMP_C=\
 	"..\..\..\base\include\registry.h"\
 	"..\..\..\base\include\thread.h"\
 	"..\..\..\base\include\utility.h"\
-	"..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\config\config.h"\
 	"..\..\..\lib\xml\include\Parse.h"\
@@ -593,7 +593,7 @@ DEP_CPP_RMP_C=\
 	"..\..\..\base\include\registry.h"\
 	"..\..\..\base\include\thread.h"\
 	"..\..\..\base\include\utility.h"\
-	"..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\config\config.h"\
 	"..\..\..\lib\xml\include\Parse.h"\
@@ -618,7 +618,7 @@ DEP_CPP_RMP_C=\
 	"..\..\..\base\include\registry.h"\
 	"..\..\..\base\include\thread.h"\
 	"..\..\..\base\include\utility.h"\
-	"..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\config\config.h"\
 	"..\..\..\lib\xml\include\Parse.h"\

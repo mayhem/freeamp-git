@@ -30,7 +30,7 @@ IDD_MUSICBROWSER DIALOGEX 0, 0, 359, 180
 STYLE DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "FreeAmp - My Music"
 MENU IDR_MENU1
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     CONTROL         "Tree1",IDC_MUSICTREE,"SysTreeView32",TVS_HASBUTTONS | 
                     TVS_HASLINES | WS_BORDER | WS_TABSTOP,2,19,134,149,
@@ -153,17 +153,17 @@ BEGIN
     END
 END
 
-IDR_POPUP MENU DISCARDABLE 
+IDR_TRACKPOPUP MENU DISCARDABLE 
 BEGIN
     POPUP "Sheep?"
     BEGIN
         MENUITEM "&Play",                       ID_PLAY
         MENUITEM "&Add to playlist",            ID_ADD
-        MENUITEM "&Edit",                       ID_EDIT
-        MENUITEM "&Rename",                     ID_RENAME
+        MENUITEM "&Edit",                       ID_EDIT_EDIT
+//        MENUITEM "&Rename",                     ID_EDIT_RENAME
+        MENUITEM "&Remove",                     ID_EDIT_REMOVE
     END
 END
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -188,6 +188,7 @@ IDC_NODROP              CURSOR  DISCARDABLE     "nodrop.cur"
 //
 
 IDB_PLAYING             BITMAP  FIXED IMPURE    "playing.bmp"
+IDB_TOOLBAR             BITMAP  DISCARDABLE     "TOOLBAR.BMP"
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 

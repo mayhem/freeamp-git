@@ -492,7 +492,7 @@ DEP_CPP_TOOLB=\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\include\ui.h"\
 	"..\Toolbar.h"\
@@ -520,7 +520,7 @@ DEP_CPP_TOOLB=\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\include\ui.h"\
 	"..\Toolbar.h"\
@@ -548,7 +548,7 @@ DEP_CPP_TOOLB=\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\include\ui.h"\
 	"..\Toolbar.h"\
@@ -576,7 +576,7 @@ DEP_CPP_TOOLB=\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\include\ui.h"\
 	"..\Toolbar.h"\
