@@ -136,5 +136,8 @@ Michael Rich <istan@alltel.net>
 "Michael Jennings" <mej@valinux.com>
 * compile fixes for the linux build
 
+"Mo DeJong" <mdejong@cygnus.com>
+* Makefile patch for when srcdir != builddir
+
 "Alexander Haväng" <eel@musiknet.se>
 * icecast title streaming fixes

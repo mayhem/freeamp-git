@@ -108,7 +108,7 @@ DIRECTORIES += io/alsa/unix/linux io/alsa/unix/linux/src io/esound
 DIRECTORIES += io/esound/src io/http io/local io/obs io/src io/soundcard
 DIRECTORIES += io/soundcard/beos io/soundcard/unix io/soundcard/unix/linux
 DIRECTORIES += io/soundcard/beos/src io/soundcard/unix/linux/src 
-DIRECTORIES += io/wavout io/wavout/src io/wavout/include
+DIRECTORIES += io/wavout io/wavout/src io/wavout/include io/signature/src
 DIRECTORIES += io/soundcard/unix/solaris io/soundcard/unix/solaris/src 
 DIRECTORIES += lib lib/xml lib/xml/src lib/http lib/http/src lib/zlib lmc
 DIRECTORIES += lmc/xingmp3 lmc/xingmp3/src lib/gdbm lib/zlib/src lmc/vorbis 
@@ -124,10 +124,12 @@ DIRECTORIES += ui/irman/src ui/lcd/src ui/musicbrowser/unix/src ui/ncurses
 DIRECTORIES += update update/unix lmc/cd lmc/cd/src io/cd io/cd/unix 
 DIRECTORIES += io/cd/unix/src lib/unzip lib/unzip/src ftc ftc/kjofol ftc/winamp
 DIRECTORIES += plm/metadata/cddb base/aps lmc/vorbis/src
+DIRECTORIES += lib/musicbrainz/expat/xmlparse lib/musicbrainz/expat/xmltok
+DIRECTORIES += lib/musicbrainz/osdep lib/musicbrainz/lib
 
 dirs:
 	for p in $(DIRECTORIES); do \
-	  test -d $$p || mkdir $$p; \
+	  test -d $$p || mkdir -p $$p; \
         done
           
 freeamp: $(FREEAMPOBJ) $(freeamp_DEPENDENCIES)
