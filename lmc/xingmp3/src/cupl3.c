@@ -879,6 +879,12 @@ IN_OUT L3audio_decode_MPEG2(unsigned char *bs, unsigned char *pcm)
       buf_ptr1 = side_info.main_data_begin;
    }
    nbytes = padframebytes - side_bytes - crcbytes;
+   // RAK: This is no bueno. :-(
+	if (nbytes < 0 || nbytes > NBUF)
+	{
+	    in_out.in_bytes = 0;
+		 return in_out;
+   }
    memmove(buf + buf_ptr1, bs + side_bytes + crcbytes, nbytes);
    buf_ptr1 += nbytes;
 /*-----------------------*/

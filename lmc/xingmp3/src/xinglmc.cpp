@@ -409,9 +409,9 @@ Error XingLMC::GetHeadInfo()
               int       iFrameBytes, iBitRate;
             
               iFrameBytes = head_info3(((unsigned char *)pBuffer) + 
-                                       m_frameBytes + iForward,
-                                       iNumBytes - (m_frameBytes + iForward), 
-                                       &sHead, &iBitRate, &iForward);
+                                    m_frameBytes + iForward + m_sMpegHead.pad,
+                                    iNumBytes - (m_frameBytes + iForward), 
+                                    &sHead, &iBitRate, &iForward);
               if (m_input)
                  m_input->EndRead(0);
 
@@ -959,6 +959,10 @@ Error XingLMC::BeginRead(void *&pBuffer, unsigned int iBytesNeeded,
    if (bBufferUp && iInPercent < 10 && iOutPercent < 10)
    {
        int iBufferUpBytes;
+
+       assert(m_iBufferSize > 0);
+       assert(m_iBufferUpInterval > 0);
+       assert(m_iBitRate > 0);
 
        iBufferUpBytes = (m_iBitRate * m_iBufferUpInterval * 1000) / 8192;
        if (iBufferUpBytes > m_iBufferSize)
