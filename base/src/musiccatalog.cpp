@@ -454,10 +454,12 @@ Error MusicCatalog::AddSong(const char *url)
 
     m_catMutex->Acquire();
 
-    if (meta->GUID().size() > 0)
+    if (meta->GUID().size() > 0) {
+        generated = true;
         m_guidTable->insert(multimap<string, string, less<string> >
                             ::value_type(meta->GUID(), url));
-    else
+    }
+    else 
         GenerateSignature(newtrack);
 
     if ((meta->Artist().size() == 0) || (meta->Artist() == " ")) {
