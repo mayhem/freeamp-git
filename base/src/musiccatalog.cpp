@@ -69,21 +69,20 @@ MusicCatalog::MusicCatalog(FAContext *context, char *databasepath)
 
     m_timeout = 0;
     context->prefs->GetWatchThisDirTimeout(&m_timeout);
-    if (m_timeout) 
-        m_watchTimer = new WatchDirectoryTimer(context, m_timeout);
-    else 
-        m_watchTimer = new WatchDirectoryTimer(context, 300000);
 }
 
 void MusicCatalog::StartTimer(void)
 {
     if (m_timeout > 0)
-        m_watchTimer->Start();
+        m_context->timerManager->StartTimer(&m_watchTimer, watch_timer,
+                                            m_timeout, this);
 }
 
 MusicCatalog::~MusicCatalog()
 {
     ClearCatalog();
+
+    m_context->timerManager->StopTimer(m_watchTimer);
 
     if (m_database)
         delete m_database;
@@ -1095,13 +1094,10 @@ Error MusicCatalog::AcceptEvent(Event *e)
             m_context->prefs->GetWatchThisDirTimeout(&watchtimeout);
             if (m_timeout != watchtimeout) {
                 m_timeout = watchtimeout;
-                if (m_timeout != 0) {
-                    m_watchTimer->Stop();
-                    m_watchTimer->Set(m_timeout);
-                    m_watchTimer->Start();
-                }
+                if (m_timeout != 0) 
+                    m_context->timerManager->SetTimer(m_watchTimer, m_timeout);
                 else 
-                    m_watchTimer->Stop();
+                    m_context->timerManager->StopTimer(m_watchTimer);
             }
             break;
         }
@@ -1109,26 +1105,26 @@ Error MusicCatalog::AcceptEvent(Event *e)
     return kError_NoErr; 
 }
 
-WatchDirectoryTimer::WatchDirectoryTimer(FAContext *context, int32 timeout) 
-      : Timer(timeout)
+void MusicCatalog::watch_timer(void *arg) 
 {
-   m_context = context;
+    MusicCatalog *cat = (MusicCatalog*)arg;
+    cat->WatchTimer();
 }
 
-void WatchDirectoryTimer::Tick(void)
+void MusicCatalog::WatchTimer(void)
 {
-   char *watchDir = new char[_MAX_PATH];
-   uint32 length = _MAX_PATH;
+    char *watchDir = new char[_MAX_PATH];
+    uint32 length = _MAX_PATH;
 
-   m_context->prefs->GetWatchThisDirectory(watchDir, &length);
+    m_context->prefs->GetWatchThisDirectory(watchDir, &length);
 
-   string watchPath = watchDir;
+    string watchPath = watchDir;
 
-   vector<string> searchPaths;
-   searchPaths.push_back(watchPath);
+    vector<string> searchPaths;
+    searchPaths.push_back(watchPath);
 
-   m_context->catalog->PruneDirectory(watchPath);
-   m_context->catalog->SearchMusic(searchPaths, false);
+    PruneDirectory(watchPath);
+    SearchMusic(searchPaths, false);
 
-   delete [] watchDir;
+    delete [] watchDir;
 }

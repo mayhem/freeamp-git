@@ -1226,14 +1226,13 @@ void GTKMusicBrowser::FillWiredPlanet(void)
     gtk_clist_thaw(GTK_CLIST(musicBrowserTree));
 }
 
-IceCastTimer::IceCastTimer(FAContext *context, GTKMusicBrowser *ui, 
-                           int32 timeout) : Timer(timeout)
+void GTKMusicBrowser::icecast_timer(void *arg)
 {
-    m_context = context;
-    m_ui = ui;
+    GTKMusicBrowser *ui = (GTKMusicBrowser*)arg;
+    ui->IcecastTimer();
 }
 
-void IceCastTimer::Tick(void)
+void GTKMusicBrowser::IcecastTimer(void)
 {
     Error  eRet;
     Http   iceDownload(m_context);
@@ -1241,6 +1240,7 @@ void IceCastTimer::Tick(void)
     vector<IcecastStreamInfo> list;
     IcecastStreams            o;
 
+cout << "ice tick\n";
     eRet = iceDownload.DownloadToString(icecastURL, page);
     if (eRet != kError_NoErr) {
         cout << "Icecast download failed: " << ErrorString[eRet] << "\n";
@@ -1250,7 +1250,7 @@ void IceCastTimer::Tick(void)
     o.ParseStreamXML(page, list);
 
     if (list.size() > 0) {
-        m_ui->HandleIceCastList(list);
+        HandleIceCastList(list);
     }
     else
        cout << "no streams.\n";
@@ -1314,10 +1314,10 @@ void GTKMusicBrowser::FillIceCast(void)
     if (icecastExpanded)
         return;
 
-    if (!ice_timer)
-        ice_timer = new IceCastTimer(m_context, this, 30000);
-
-    ice_timer->Start();    
+    if (!ice_timer_started)
+        m_context->timerManager->StartTimer(&ice_timer, icecast_timer, 30, 
+                                            this);
+    ice_timer_started = true;
     icecastExpanded = true;
 }
 
@@ -1326,7 +1326,6 @@ void GTKMusicBrowser::CloseIceCast(void)
     if (!icecastExpanded)
         return;
 
-    //ice_timer->Stop();
     icecastExpanded = false;
 }
 

@@ -36,21 +36,8 @@ ____________________________________________________________________________*/
 #include "timer.h"
 #include "Icecast.h"
 
-class GTKMusicBrowser;
 class FAContext;
 class MusicBrowserUI;
-
-class IceCastTimer : public Timer {
-  public:
-    IceCastTimer(FAContext *context, GTKMusicBrowser *ui, int32 timeout);
-    virtual ~IceCastTimer() {}
-
-    virtual void Tick();
-
-  private:
-    FAContext *m_context;
-    GTKMusicBrowser *m_ui;
-};
 
 typedef enum {
     kStateCollapsed,
@@ -135,10 +122,14 @@ class GTKMusicBrowser {
  protected:
     FAContext *m_context;
 
+    static void icecast_timer(void *arg);
+    void IcecastTimer(void);
+
  private:
     MusicBrowserUI *parentUI;
- 
-    IceCastTimer *ice_timer;
+
+    bool     ice_timer_started; 
+    TimerRef ice_timer;
 
     uint32 CD_DiscID;
     uint32 CD_numtracks;
