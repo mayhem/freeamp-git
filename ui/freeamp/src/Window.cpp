@@ -55,9 +55,9 @@ Window::Window(Theme *pTheme, string &oName)
     m_bIsVulcanMindMeldHost = false;
     m_bMindMeldInProgress = false;
     
-	m_pUsageMutex = new Mutex();
-	m_pUsageSem = new Semaphore();
-	m_iUsageCount = 0;
+    m_pUsageMutex = new Mutex();
+    m_pUsageSem = new Semaphore();
+    m_iUsageCount = 0;
 }
 
 Window::~Window(void)
@@ -68,8 +68,8 @@ Window::~Window(void)
        ClearControls();
     }   
 
-	delete m_pUsageMutex;
-	delete m_pUsageSem;
+    delete m_pUsageMutex;
+    delete m_pUsageSem;
 }
 
 void Window::IncUsageRef(void)
@@ -141,6 +141,7 @@ void Window::VulcanMindMeldHost(bool bHost)
 Error Window::VulcanMindMeld(Window *pOther)
 {
     vector<Control *>::iterator i;
+    vector<Panel *>::iterator   k;
     ControlMapIterator          j;
     string                      oName;
 
@@ -160,6 +161,11 @@ Error Window::VulcanMindMeld(Window *pOther)
     for(i = pOther->m_oControls.begin(); i != pOther->m_oControls.end(); i++)
     {
         m_oControls.push_back(*i);
+    }    
+    m_oPanels.clear();
+    for(k = pOther->m_oPanels.begin(); k != pOther->m_oPanels.end(); k++)
+    {
+        m_oPanels.push_back(*k);
     }    
 
     m_oControlMap.clear();
@@ -181,6 +187,7 @@ void Window::Init(void)
 
     IncUsageRef();
 
+    m_pCanvas->InitBackgrounds(&m_oPanels);
     m_pCanvas->Init();
 
     for(i = m_oControls.begin(); i != m_oControls.end(); i++)
@@ -204,6 +211,26 @@ void Window::AddControl(Control *pControl)
     m_oControlMap.insert(pair<string, Control *>(oName, pControl));
     m_oControls.push_back(pControl);
 
+    DecUsageRef();
+}
+
+void Window::AddPanel(Panel *pPanel)
+{
+    string oName;
+
+    IncUsageRef();
+    m_oPanels.push_back(pPanel);
+    DecUsageRef();
+}
+
+void Window::PanelStateChanged(void)
+{
+    Rect oRect;
+
+    IncUsageRef();
+    m_pCanvas->InitBackgrounds(&m_oPanels);
+    m_pCanvas->GetBackgroundRect(oRect);
+    m_pCanvas->Invalidate(oRect);
     DecUsageRef();
 }
 
@@ -274,7 +301,7 @@ Error Window::ControlShow(const string &oTarget, bool bSet, bool &bShow)
         oPos.x -= oRect.x1;
         oPos.y -= oRect.y1;
         if (bSet && bShow && pControl->PosInControl(oPos))
-    	    pControl->AcceptTransition(CT_MouseEnter);
+            pControl->AcceptTransition(CT_MouseEnter);
     }        
 
     DecUsageRef();
@@ -817,3 +844,4 @@ void Window::GetReloadWindowPos(Rect &oOldRect, int iNewWidth, int iNewHeight,
     }
 }
 
+    

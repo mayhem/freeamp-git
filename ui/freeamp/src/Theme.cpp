@@ -94,6 +94,7 @@ Theme::Theme(FAContext *context)
     m_pContext = context;
     m_pCurrentWindow = NULL;
     m_pCurrentControl = NULL;
+    m_pCurrentPanel = NULL;
     m_pParsedWindows = m_pWindows = NULL;
     m_pParsedBitmaps = m_pBitmaps = NULL;
     m_pParsedFonts = m_pFonts = NULL;
@@ -106,7 +107,7 @@ Theme::Theme(FAContext *context)
     m_pForeignThemes = new ForeignTheme(m_pContext);
     m_bThemeLoaded = false;
     m_bCreditsShown = false;
-	m_pHeadlineGrabber = NULL;
+    m_pHeadlineGrabber = NULL;
     
     string funkyName = "Frunobulax"; 
 #ifdef WIN32
@@ -124,6 +125,7 @@ Theme::~Theme(void)
 {
     delete m_pCurrentWindow;
     delete m_pCurrentControl;
+    delete m_pCurrentPanel;
     delete m_pThemeMan;
     delete m_pWindow;
     delete m_pForeignThemes;   
@@ -143,7 +145,7 @@ Theme::~Theme(void)
 
 void Theme::ClearWindows(void)
 {
-	if (m_pWindows)
+    if (m_pWindows)
     {
        while(m_pWindows->size() > 0)
        {
@@ -157,7 +159,7 @@ void Theme::ClearWindows(void)
 
 void Theme::ClearBitmaps(void)
 {  
-  	if (m_pBitmaps)
+    if (m_pBitmaps)
     {
        while(m_pBitmaps->size() > 0)
        {
@@ -171,7 +173,7 @@ void Theme::ClearBitmaps(void)
 
 void Theme::ClearFonts(void)
 {  
-  	if (m_pFonts)
+    if (m_pFonts)
     {
        while(m_pFonts->size() > 0)
        {
@@ -185,7 +187,7 @@ void Theme::ClearFonts(void)
 
 void Theme::SetThemePath(string &oThemePath)
 {
-	m_oThemePath = oThemePath + string(DIR_MARKER_STR);
+    m_oThemePath = oThemePath + string(DIR_MARKER_STR);
 }
 
 Error Theme::LoadTheme(string &oFile, string &oWindowName)
@@ -270,7 +272,7 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
         ConvertForeignFormat(oTempPath);
 
         oCompleteFile = oTempPath + string(DIR_MARKER_STR) 
-	                + string("theme.xml");
+                    + string("theme.xml");
         eRet = Parse::ParseFile(oCompleteFile);
         pZip->CleanupThemeZip(oTempPath);
         rmdir(oTempPath.c_str());
@@ -302,14 +304,14 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
               (*i)->GetName(oTemp);
               if (oTemp == oWindowName)
               {
-              	  pNewWindow = *i;
+                  pNewWindow = *i;
                   break;
               }    
               if (oTemp == string("MainWindow"))
-              	  pMainWindow = *i;
+                  pMainWindow = *i;
           }
 
-	      // If we can't find the proper mode, switch to mainwindow
+          // If we can't find the proper mode, switch to mainwindow
           if (!pNewWindow)
              pNewWindow = pMainWindow;
           
@@ -334,7 +336,6 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
           // Now the window lists have been properly adjusted, so
           // adopt all the info from the new window into the existing
           // window via the VulcanMindLink 
-          printf("VMM::Window %p\n", m_pWindow);
           m_pWindow->VulcanMindMeld(pNewWindow);
           // And if god doesn't stike me down right now,
           // everything *should* be fine.
@@ -373,11 +374,11 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
               (*i)->GetName(oTemp);
               if (oTemp == oWindowName)
               {
-              	  pNewWindow = *i;
+                  pNewWindow = *i;
                   break;
               }    
               if (oTemp == string("MainWindow"))
-              	  pMainWindow = *i;
+                  pMainWindow = *i;
           }
           if (!pNewWindow)
              pNewWindow = pMainWindow;
@@ -399,7 +400,7 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
 
 Error Theme::SwitchWindow(const string &oWindowName)
 {
-	string                      oTemp;
+    string                      oTemp;
     vector<Window *>::iterator  i;
     Window                     *pMainWindow, *pNewWindow = NULL; 
     
@@ -412,7 +413,7 @@ Error Theme::SwitchWindow(const string &oWindowName)
             break;
         }    
         if (oTemp == string("MainWindow"))
-        	  pMainWindow = *i;
+              pMainWindow = *i;
     }
     if (!pNewWindow)
        pNewWindow = pMainWindow;
@@ -504,6 +505,7 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
        {
            string oBitmapErr;
 
+DB
            pBitmap->GetErrorString(oBitmapErr);
            m_oLastError = string("Cannot load bitmap ") +
                           oAttrMap["File"] + string(": ") + oBitmapErr;
@@ -521,19 +523,19 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
     {
        Font *pFont;
 
-	   if (oAttrMap.find("Name") == oAttrMap.end())
+       if (oAttrMap.find("Name") == oAttrMap.end())
        {
            m_oLastError = string("the <Font> tag needs a Name attribute");
            return kError_ParseError;
        }        
-	   if (oAttrMap.find("Face") == oAttrMap.end() &&
-	       oAttrMap.find("File") == oAttrMap.end())
+       if (oAttrMap.find("Face") == oAttrMap.end() &&
+           oAttrMap.find("File") == oAttrMap.end())
        {
            m_oLastError = string("the <Font> tag needs a Face or File attribute");
            return kError_ParseError;
        }        
 
-	   if (oAttrMap.find("File") != oAttrMap.end())
+       if (oAttrMap.find("File") != oAttrMap.end())
            oCompleteFile = m_oThemePath + oAttrMap["File"];
        else
            oCompleteFile = "";    
@@ -562,7 +564,7 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
            m_oLastError = string("<Window> tags cannot be nested");
            return kError_InvalidParam;
        }
-	   if (oAttrMap.find("Name") == oAttrMap.end())
+       if (oAttrMap.find("Name") == oAttrMap.end())
        {
            m_oLastError = string("the <Window> tag needs a Name attribute");
            return kError_ParseError;
@@ -591,7 +593,7 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
            return kError_InvalidParam;
        }
 
-	   if (oAttrMap.find("Name") == oAttrMap.end())
+       if (oAttrMap.find("Name") == oAttrMap.end())
        {
            m_oLastError = string("the <BackgroundBitmap> tag needs a Name attribute");
            return kError_ParseError;
@@ -623,6 +625,116 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
        pCanvas->SetBackgroundBitmap(pBitmap);
        pCanvas->SetBackgroundRect(oRect);
 
+       return kError_NoErr;
+    }
+    
+    if (oElement == string("Panel"))
+    {
+       if (m_pCurrentWindow == NULL)
+       {
+           m_oLastError = string("<Panel> must occur inside "
+                                 "of a <Window> tag");
+           return kError_InvalidParam;
+       }
+
+       if (oAttrMap.find("Name") == oAttrMap.end())
+       {
+           m_oLastError = string("the <Panel> tag needs a Name attribute");
+           return kError_ParseError;
+       }        
+
+       m_pCurrentPanel = new Panel;
+       m_pCurrentPanel->m_oName = oAttrMap["Name"];
+       return kError_NoErr;
+    }
+
+    if (oElement == string("Open"))
+    {
+       Bitmap *pBitmap;
+       Rect    oRect;
+
+       if (m_pCurrentPanel == NULL)
+       {
+           m_oLastError = string("<Open> must occur inside "
+                                 "of a <Panel> tag");
+           return kError_InvalidParam;
+       }
+       if (oAttrMap.find("Name") == oAttrMap.end())
+       {
+           m_oLastError = string("the <Open> tag needs a Name attribute");
+           return kError_ParseError;
+       }        
+       if (oAttrMap.find("Rect") == oAttrMap.end())
+       {
+           m_oLastError = string("the <Open> tag needs a Rect attribute");
+           return kError_ParseError;
+       }        
+       eRet = ParseRect(oAttrMap["Rect"], oRect);
+       if (eRet != kError_NoErr)
+       {
+           m_oLastError = string("Improperly formatted Rect coordinates: ") +
+                          oAttrMap["Rect"];
+           return kError_InvalidParam;
+       }
+       pBitmap = FindBitmap(oAttrMap["Name"]);
+       if (pBitmap == NULL)
+       {
+           m_oLastError = string("Undefined bitmap ") +
+                          oAttrMap["Name"] +
+                          string(" in tag <Open>");
+           return kError_InvalidParam;
+       }
+       m_pCurrentPanel->m_oOpenRect = oRect;
+       m_pCurrentPanel->m_pOpenBitmap = pBitmap;
+       return kError_NoErr;
+    }
+    if (oElement == string("Closed"))
+    {
+       Bitmap *pBitmap;
+       Rect    oRect;
+       Pos     oPos;
+
+       if (m_pCurrentPanel == NULL)
+       {
+           m_oLastError = string("<Closed> must occur inside "
+                                 "of a <Panel> tag");
+           return kError_InvalidParam;
+       }
+       if (oAttrMap.find("Name") == oAttrMap.end())
+       {
+           m_oLastError = string("the <Closed> tag needs a Name attribute");
+           return kError_ParseError;
+       }        
+       if (oAttrMap.find("Rect") == oAttrMap.end())
+       {
+           m_oLastError = string("the <Closed> tag needs a Rect attribute");
+           return kError_ParseError;
+       }        
+       eRet = ParseRect(oAttrMap["Rect"], oRect);
+       if (eRet != kError_NoErr)
+       {
+           m_oLastError = string("Improperly formatted Rect coordinates: ") +
+                          oAttrMap["Rect"];
+           return kError_InvalidParam;
+       }
+       eRet = ParsePos(oAttrMap["Pos"], oPos);
+       if (eRet != kError_NoErr)
+       {
+           m_oLastError = string("Improperly formatted Pos coordinates: ") +
+                          oAttrMap["Pos"];
+           return kError_InvalidParam;
+       }
+       pBitmap = FindBitmap(oAttrMap["Name"]);
+       if (pBitmap == NULL)
+       {
+           m_oLastError = string("Undefined bitmap ") +
+                          oAttrMap["Name"] +
+                          string(" in tag <Opened>");
+           return kError_InvalidParam;
+       }
+       m_pCurrentPanel->m_oClosedRect = oRect;
+       m_pCurrentPanel->m_oOffset = oPos;
+       m_pCurrentPanel->m_pClosedBitmap = pBitmap;
        return kError_NoErr;
     }
 
@@ -965,19 +1077,19 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
        {
            eRet = ParseColor(oAttrMap["Color"], oColor);
            if (eRet != kError_NoErr)
-    	   {
-    	       m_oLastError = string("Improperly formatted color info: ") +
-    	                      oAttrMap["Color"];
-    	       return kError_InvalidParam;
-    	   }
+           {
+               m_oLastError = string("Improperly formatted color info: ") +
+                              oAttrMap["Color"];
+               return kError_InvalidParam;
+           }
        }
 
        if (oAttrMap.find("Bold") != oAttrMap.end())
-       	  bBold = strcasecmp(oAttrMap["Bold"].c_str(), "yes") == 0;
+          bBold = strcasecmp(oAttrMap["Bold"].c_str(), "yes") == 0;
        if (oAttrMap.find("Italic") != oAttrMap.end())
-       	  bItalic = strcasecmp(oAttrMap["Italic"].c_str(), "yes") == 0;
+          bItalic = strcasecmp(oAttrMap["Italic"].c_str(), "yes") == 0;
        if (oAttrMap.find("Underline") != oAttrMap.end())
-       	  bUnderline = strcasecmp(oAttrMap["Underline"].c_str(), "yes") == 0;
+          bUnderline = strcasecmp(oAttrMap["Underline"].c_str(), "yes") == 0;
 
        if (oAttrMap.find("Align") != oAttrMap.end()) 
           oAlign = oAttrMap["Align"]; 
@@ -992,7 +1104,7 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
     {
        if (m_pCurrentControl == NULL || m_eCurrentControl != eButtonControl)
        {
-           m_oLastError = string("The <Style> tag must be inside of a "
+           m_oLastError = string("The <ChangeWindow> tag must be inside of a "
                                  "<ButtonControl> tag");
            return kError_InvalidParam;
        }
@@ -1006,7 +1118,36 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
        ((ButtonControl *)m_pCurrentControl)->SetTargetWindow(oAttrMap["Window"]);
        
        return kError_NoErr;
-	}
+    }
+    if (oElement == string("TogglePanel"))
+    {
+       Panel *pPanel;
+
+       if (m_pCurrentControl == NULL || m_eCurrentControl != eButtonControl)
+       {
+           m_oLastError = string("The <TogglePanel> tag must be inside of a "
+                                 "<ButtonControl> tag");
+           return kError_InvalidParam;
+       }
+       if (oAttrMap.find("Panel") == oAttrMap.end())
+       {
+           m_oLastError = string("the <ChangeWindow> tag needs a Panel attribute");
+           return kError_ParseError;
+       }        
+
+       pPanel = FindPanel(oAttrMap["Panel"]);
+       if (pPanel == NULL)
+       {
+           m_oLastError = string("Undefined Panel ") +
+                          oAttrMap["Panel"] +
+                          string(" in tag <TogglePanel>");
+           return kError_InvalidParam;
+       }
+
+       ((ButtonControl *)m_pCurrentControl)->SetPanelToggle(pPanel);
+       
+       return kError_NoErr;
+    }
 
 
     if (oElement == string("Position"))
@@ -1285,9 +1426,9 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
           return kError_InvalidParam;
        }
 
-	   if (oAttrMap.find("Desc") != oAttrMap.end())
+       if (oAttrMap.find("Desc") != oAttrMap.end())
            m_pCurrentControl->SetDesc(oAttrMap["Desc"]);
-	   if (oAttrMap.find("Tip") != oAttrMap.end())
+       if (oAttrMap.find("Tip") != oAttrMap.end())
            m_pCurrentControl->SetTip(oAttrMap["Tip"]);
        
        m_bInfoDefined = true;
@@ -1344,7 +1485,7 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
            m_oLastError = string("the <Headlines> tag needs a XMLPath attribute");
            return kError_ParseError;
        }        
-	   if (oAttrMap.find("XMLURLPath") != oAttrMap.end())
+       if (oAttrMap.find("XMLURLPath") != oAttrMap.end())
            oURLPath = oAttrMap["XMLURLPath"];
 
        if (oAttrMap.find("DownloadInterval") == oAttrMap.end())
@@ -1376,6 +1517,9 @@ Error Theme::EndElement(string &oElement)
 {
     if (oElement == string("Bitmap") ||
         oElement == string("BackgroundBitmap") ||
+        oElement == string("TogglePanel") ||
+        oElement == string("Open") ||
+        oElement == string("Closed") ||
         oElement == string("Font") ||
         oElement == string("ChangeWindow") ||
         oElement == string("ThemeInfo") ||
@@ -1440,7 +1584,7 @@ Error Theme::EndElement(string &oElement)
        }
        if (m_eCurrentControl == eTextControl)
        {
-       	   if (!((TextControl *)m_pCurrentControl)->StyleHasBeenSet())
+           if (!((TextControl *)m_pCurrentControl)->StyleHasBeenSet())
            {
                m_oLastError = "A <TextControl> needs to define a <Style> tag";
                return kError_InvalidParam;
@@ -1462,6 +1606,15 @@ Error Theme::EndElement(string &oElement)
        m_pParsedWindows->push_back(m_pCurrentWindow);
            
        m_pCurrentWindow = NULL;
+
+       return kError_NoErr;
+    }
+
+    if (oElement == string("Panel"))
+    {
+       m_oPanels.push_back(m_pCurrentPanel);
+       m_pCurrentWindow->AddPanel(m_pCurrentPanel);
+       m_pCurrentPanel = NULL;
 
        return kError_NoErr;
     }
@@ -1492,8 +1645,8 @@ Bitmap *Theme::FindBitmap(string &oName)
     vector<Bitmap *>::iterator i;
     string                     oTemp;
 
-	if (!m_pParsedBitmaps)
-		return NULL;
+    if (!m_pParsedBitmaps)
+        return NULL;
         
     for(i = m_pParsedBitmaps->begin(); i != m_pParsedBitmaps->end(); i++)
     {
@@ -1505,13 +1658,27 @@ Bitmap *Theme::FindBitmap(string &oName)
     return NULL;
 }
 
+Panel *Theme::FindPanel(string &oName)
+{
+    vector<Panel *>::iterator i;
+    string                     oTemp;
+
+    for(i = m_oPanels.begin(); i != m_oPanels.end(); i++)
+    {
+       if ((*i)->m_oName == oName)
+          return *i;
+    }
+
+    return NULL;
+}
+
 Font *Theme::FindFont(string &oName)
 {
     vector<Font *>::iterator i;
     string                   oTemp;
 
-	if (!m_pParsedFonts)
-		return NULL;
+    if (!m_pParsedFonts)
+        return NULL;
         
     for(i = m_pParsedFonts->begin(); i != m_pParsedFonts->end(); i++)
     {
@@ -1569,7 +1736,7 @@ Error Theme::ParseColor(string &oColorstring, Color &oColor)
 
     if (iRet == 3)
     {
-    	oColor.red = iRed;
+        oColor.red = iRed;
         oColor.green = iGreen;
         oColor.blue = iBlue;
         return kError_NoErr;
@@ -1583,14 +1750,14 @@ Error Theme::ParsePos(string &oPosstring, Pos &oPos)
     int iRet;
 
     iRet = sscanf(oPosstring.c_str(), " %d , %d",
-    		&oPos.x, &oPos.y);
+            &oPos.x, &oPos.y);
 
     return (iRet == 2) ? kError_NoErr : kError_InvalidParam;
 }
 
 void Theme::SetDefaultFont(const string &oFont)
 { 
-	m_oDefaultFont = oFont;
+    m_oDefaultFont = oFont;
 }
 
 void Theme::PostWindowCreate(void)

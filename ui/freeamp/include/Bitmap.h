@@ -45,15 +45,20 @@ class Bitmap
               Bitmap(const string &oName);
      virtual ~Bitmap(void);
 
-     virtual void  GetName(string &oName);
-     virtual void  GetErrorString(string &oName);
-     virtual void  SetTransColor(Color &oColor);
-     virtual bool  IsPosVisible(Pos &oPos) = 0;
-     virtual Error LoadBitmapFromDisk(string &oFile) = 0;
-     virtual Error BlitRect(Bitmap *pSrcBitmap, Rect &oSrcRect, 
-                            Rect &oDestRect) = 0;
-     virtual Error MaskBlitRect(Bitmap *pSrcBitmap, Rect &oSrcRect, 
-                                Rect &oDestRect) = 0;
+     virtual void    GetName(string &oName);
+     virtual void    GetErrorString(string &oName);
+     virtual void    SetTransColor(Color &oColor);
+     virtual bool    GetTransColor(Color &oColor);
+     virtual bool    IsPosVisible(Pos &oPos) = 0;
+     virtual Error   LoadBitmapFromDisk(string &oFile) = 0;
+     virtual Error   BlitRect(Bitmap *pSrcBitmap, Rect &oSrcRect, 
+                              Rect &oDestRect) = 0;
+     virtual Error   MaskBlitRect(Bitmap *pSrcBitmap, Rect &oSrcRect, 
+                                  Rect &oDestRect) = 0;
+     virtual Error   BlitRectMaskBitmap(Bitmap *pSrcBitmap, Rect &oSrcRect, 
+                                        Rect &oDestRect) = 0;
+     virtual Bitmap *Clone(void) = 0;
+     virtual Error   MakeTransparent(Rect &oRect) = 0; 
 
     protected:
 

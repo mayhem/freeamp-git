@@ -103,6 +103,7 @@ class Theme : public Parse
 
       Bitmap *FindBitmap(string &oName);
       Font   *FindFont(string &oName);
+      Panel  *FindPanel(string &oName);
       Error   ParseState(string &oStateString, ControlStateEnum &eState);
       Error   ParseRect(string &oRectString, Rect &oRect);
       Error   ParseColor(string &oColorString, Color &oColor);
@@ -110,16 +111,19 @@ class Theme : public Parse
       void    ClearWindows(void);
       void    ClearBitmaps(void);
       void    ClearFonts(void);
+      void    ClearPanels(void);
 
       void    ConvertForeignFormat(string &oDir);
       ForeignTheme    *m_pForeignThemes;
 
       Window          *m_pCurrentWindow;
       Control         *m_pCurrentControl;
+      Panel           *m_pCurrentPanel;
 
       vector<Window *> *m_pWindows, *m_pParsedWindows;
       vector<Bitmap *> *m_pBitmaps, *m_pParsedBitmaps;
       vector<Font *>   *m_pFonts, *m_pParsedFonts;
+      vector<Panel *>   m_oPanels;
       bool              m_bReloadTheme, m_bReloadWindow, m_bThemeLoaded;
       bool              m_bPosDefined, m_bBitmapDefined;
       bool              m_bInfoDefined;

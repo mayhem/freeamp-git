@@ -39,7 +39,7 @@ class Win32Bitmap : public Bitmap
     public:
 
               Win32Bitmap(const string &oName);
-			  Win32Bitmap(int iWidth, int iHeight, const string &oName);
+              Win32Bitmap(int iWidth, int iHeight, const string &oName);
      virtual ~Win32Bitmap(void);
 
      virtual Error LoadBitmapFromDisk(string &oFile);
@@ -48,6 +48,10 @@ class Win32Bitmap : public Bitmap
      virtual Error MaskBlitRect(Bitmap *pSrcBitmap, Rect &oSrcRect, 
                                 Rect &oDestRect);
      virtual bool  IsPosVisible(Pos &oPos);
+     virtual Error BlitRectMaskBitmap(Bitmap *pSrcBitmap, Rect &oSrcRect, 
+                                      Rect &oDestRect);
+     virtual Error   MakeTransparent(Rect &oRect); 
+     virtual Bitmap *Clone(void);
 
      HBITMAP       GetBitmapHandle(void);
      HBITMAP       GetMaskBitmapHandle(void);
@@ -56,18 +60,18 @@ class Win32Bitmap : public Bitmap
                                      RGBQUAD         *pColorTable);
      void          SaveBitmap(char    *szFile, 
                               RGBQUAD *pColorTable);
-	 virtual void  SetPalette(HPALETTE hPal);
-	 
+     virtual void  SetPalette(HPALETTE hPal);
+     
     protected:
 
      void          CreateMaskBitmap(void);
-	 int32         BytesPerLine(void);
+     int32         BytesPerLine(void);
     
      HBITMAP     m_hBitmap;
      HBITMAP     m_hMaskBitmap;
-	 int32       m_iHeight, m_iWidth;
-     void       *m_pBitmapData;
-	 HPALETTE    m_hPal;
+     int32       m_iHeight, m_iWidth;
+     void       *m_pBitmapData, *m_pMaskBitmapData;
+     HPALETTE    m_hPal;
 };
 
 #endif

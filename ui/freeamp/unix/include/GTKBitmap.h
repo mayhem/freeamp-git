@@ -50,8 +50,12 @@ class GTKBitmap : public Bitmap
      virtual bool  IsPosVisible(Pos &oPos);
      virtual Error BlitRect(Bitmap *pSrcBitmap, Rect &oSrcRect, 
                             Rect &oDestRect);
+     virtual Error BlitRectMaskBitmap(Bitmap *pSrcBitmap, Rect &oSrcRect, 
+                                      Rect &oDestRect);
      virtual Error MaskBlitRect(Bitmap *pSrcBitmap, Rect &oSrcRect,
 		                Rect &oDestRect);
+     virtual Bitmap *Clone(void);
+     virtual Error MakeTransparent(Rect &oRect);
 
      GdkPixmap *GetBitmap() { return m_Bitmap; }
      GdkPixmap *GetMask() { return m_MaskBitmap; }
@@ -66,6 +70,7 @@ class GTKBitmap : public Bitmap
 
      GdkGC *m_GC;
      bool shape_set;
+     int  m_width, m_height;
 };
 
 #endif

@@ -59,21 +59,21 @@ INT WINAPI DllMain (HINSTANCE hInstance,
                     ULONG ul_reason_being_called,
                     LPVOID lpReserved)
 {
-	switch (ul_reason_being_called)
-	{
-		case DLL_PROCESS_ATTACH:
-			g_hinst = hInstance;
-	    	break;
+    switch (ul_reason_being_called)
+    {
+        case DLL_PROCESS_ATTACH:
+            g_hinst = hInstance;
+            break;
 
-		case DLL_THREAD_ATTACH:
-		    break;
+        case DLL_THREAD_ATTACH:
+            break;
 
-		case DLL_THREAD_DETACH:
-		    break;
+        case DLL_THREAD_DETACH:
+            break;
 
-		case DLL_PROCESS_DETACH:
-		    break;
-	}
+        case DLL_PROCESS_DETACH:
+            break;
+    }
 
     return 1;                 
 }
@@ -107,7 +107,7 @@ static LRESULT WINAPI MainWndProc(HWND hwnd, UINT msg,
         }
         
         default:
-			if (!ui) 
+            if (!ui) 
                 return DefWindowProc( hwnd, msg, wParam, lParam );
             
             return ui->WindowProc(hwnd, msg, wParam, lParam);
@@ -125,7 +125,7 @@ LRESULT Win32Window::WindowProc(HWND hwnd, UINT msg,
 
     switch (msg)
     {
-		case WM_CLOSE:
+        case WM_CLOSE:
         {
             Rect oRect;
             Pos  oPos;
@@ -143,7 +143,7 @@ LRESULT Win32Window::WindowProc(HWND hwnd, UINT msg,
             break;
         }   
         
-		case WM_TIMER:
+        case WM_TIMER:
             MouseLeaveCheck();
             m_pMindMeldMutex->Acquire();
             TimerEvent();
@@ -162,7 +162,7 @@ LRESULT Win32Window::WindowProc(HWND hwnd, UINT msg,
         case WM_MOUSEMOVE:
         {
             POINT pt;
-        	Pos oPos;
+            Pos oPos;
 
             pt.x = (int16)LOWORD(lParam);
             pt.y = (int16)HIWORD(lParam);
@@ -179,21 +179,21 @@ LRESULT Win32Window::WindowProc(HWND hwnd, UINT msg,
 
         case WM_NCMOUSEMOVE:
         {
-        	Pos oPos;
+            Pos oPos;
             
-        	oPos.x = (int16)LOWORD(lParam);
+            oPos.x = (int16)LOWORD(lParam);
             oPos.y = (int16)HIWORD(lParam);  
             m_pMindMeldMutex->Acquire();
             HandleMouseMove(oPos);
             m_pMindMeldMutex->Release();
 
             break;
-        }		
+        }       
 
         case WM_LBUTTONDOWN:
         {
             POINT pt;
-        	Pos oPos;
+            Pos oPos;
 
             pt.x = (int16)LOWORD(lParam);
             pt.y = (int16)HIWORD(lParam);
@@ -212,7 +212,7 @@ LRESULT Win32Window::WindowProc(HWND hwnd, UINT msg,
         case WM_LBUTTONUP:
         {
             POINT pt;
-        	Pos oPos;
+            Pos oPos;
 
             pt.x = (int16)LOWORD(lParam);
             pt.y = (int16)HIWORD(lParam);
@@ -294,7 +294,7 @@ Win32Window::Win32Window(Theme *pTheme, string &oName)
             :Window(pTheme, oName)
 {
     m_pCanvas = new Win32Canvas(this);
-	m_hWnd = NULL;
+    m_hWnd = NULL;
     m_pMindMeldMutex = new Mutex();
     m_bMouseInWindow = false;
     m_hPal = NULL;
@@ -316,9 +316,9 @@ Error Win32Window::Run(Pos &oPos)
     HRGN     hRgn;
     HDC      hDc;
     int      iMaxX, iMaxY;
-	Canvas  *pCanvas;
+    Canvas  *pCanvas;
 
-	m_oWindowPos = oPos;
+    m_oWindowPos = oPos;
 
     memset(&wc, 0x00, sizeof(WNDCLASS));
 
@@ -333,15 +333,15 @@ Error Win32Window::Run(Pos &oPos)
     RegisterClass(&wc);
          
     hDc = GetDC(NULL);
-	iMaxX = GetDeviceCaps(hDc, HORZRES);
-	iMaxY = GetDeviceCaps(hDc, VERTRES);
+    iMaxX = GetDeviceCaps(hDc, HORZRES);
+    iMaxY = GetDeviceCaps(hDc, VERTRES);
     ReleaseDC(NULL, hDc);
     
-	
+    
     pCanvas = GetCanvas();
-	if (pCanvas)
+    if (pCanvas)
     {
-		pCanvas->GetBackgroundRect(oRect);
+        pCanvas->GetBackgroundRect(oRect);
     
         if (m_oWindowPos.x > iMaxX || m_oWindowPos.x + oRect.Width() < 0)
             m_oWindowPos.x = 0;
@@ -349,7 +349,7 @@ Error Win32Window::Run(Pos &oPos)
             m_oWindowPos.y = 0;
 
         if(m_oWindowPos.x < 0 || m_oWindowPos.y < 0)
-		{    
+        {    
             m_oWindowPos.x = (iMaxX - oRect.Width())/2;
             m_oWindowPos.y = (iMaxY - oRect.Height())/2;
         }
@@ -407,10 +407,10 @@ Error Win32Window::Run(Pos &oPos)
     }
     m_hWnd = NULL;
 
-	oPos = m_oWindowPos;
+    oPos = m_oWindowPos;
 
     return kError_NoErr;
-}			
+}           
 
 void Win32Window::ProcessWaitingMessages(void)
 {
@@ -428,7 +428,7 @@ void Win32Window::ProcessWaitingMessages(void)
 
 void Win32Window::Init(void)
 {
-	Window::Init();
+    Window::Init();
     ((Win32Canvas *)m_pCanvas)->SetParent(this);
 }
 
@@ -444,8 +444,8 @@ Error Win32Window::VulcanMindMeld(Window *pOther)
 
     KillTimer(m_hWnd, 0);
 
-	oRect.x1 = oRect.x2 = oRect.y1 = oRect.y2 = 0;
-	GetWindowPosition(oRect);
+    oRect.x1 = oRect.x2 = oRect.y1 = oRect.y2 = 0;
+    GetWindowPosition(oRect);
     sRect.left = oRect.x1;
     sRect.right = oRect.x2;
     sRect.top = oRect.y1;
@@ -502,7 +502,7 @@ void Win32Window::Paint(void)
     if (m_bMindMeldInProgress)
        return;
     
-	hDc = BeginPaint(m_hWnd, &ps);
+    hDc = BeginPaint(m_hWnd, &ps);
     oRect.x1 = ps.rcPaint.left;
     oRect.y1 = ps.rcPaint.top;
     oRect.x2 = ps.rcPaint.right;
@@ -526,61 +526,61 @@ void Win32Window::TimerEvent(void)
 void Win32Window::SaveWindowPos(Pos &oPos)
 {
     m_oWindowPos = oPos;
-}									
+}                                   
 
 Error Win32Window::Close(void)
 {
-	if (!m_hWnd || m_bMindMeldInProgress)
+    if (!m_hWnd || m_bMindMeldInProgress)
        return kError_YouScrewedUp;
        
-	SendMessage(m_hWnd, WM_CLOSE, 0, 0);
+    SendMessage(m_hWnd, WM_CLOSE, 0, 0);
 
     return kError_NoErr;
 }
 
 Error Win32Window::Enable(void)
 {
-	if (!m_hWnd || m_bMindMeldInProgress)
+    if (!m_hWnd || m_bMindMeldInProgress)
        return kError_YouScrewedUp;
        
-	return EnableWindow(m_hWnd, false) ? kError_NoErr : kError_InvalidParam;
+    return EnableWindow(m_hWnd, false) ? kError_NoErr : kError_InvalidParam;
 }
 
 Error Win32Window::Disable(void)
 {
-	if (!m_hWnd || m_bMindMeldInProgress)
+    if (!m_hWnd || m_bMindMeldInProgress)
        return kError_YouScrewedUp;
-	return EnableWindow(m_hWnd, true) ? kError_NoErr : kError_InvalidParam;
+    return EnableWindow(m_hWnd, true) ? kError_NoErr : kError_InvalidParam;
 }
 
 Error Win32Window::Show(void)
 {
-	if (!m_hWnd || m_bMindMeldInProgress)
+    if (!m_hWnd || m_bMindMeldInProgress)
        return kError_YouScrewedUp;
-	return ShowWindow(m_hWnd, SW_SHOWNORMAL) ? kError_NoErr : kError_InvalidParam;
+    return ShowWindow(m_hWnd, SW_SHOWNORMAL) ? kError_NoErr : kError_InvalidParam;
 }
 
 Error Win32Window::Hide(void)
 {
-	if (!m_hWnd || m_bMindMeldInProgress)
+    if (!m_hWnd || m_bMindMeldInProgress)
        return kError_YouScrewedUp;
-	return ShowWindow(m_hWnd, SW_HIDE) ? kError_NoErr : kError_InvalidParam;
+    return ShowWindow(m_hWnd, SW_HIDE) ? kError_NoErr : kError_InvalidParam;
 }
 
 Error Win32Window::SetTitle(string &oTitle)
 {
-	if (!m_hWnd || m_bMindMeldInProgress)
+    if (!m_hWnd || m_bMindMeldInProgress)
        return kError_YouScrewedUp;
        
-	return SetWindowText(m_hWnd, oTitle.c_str()) ? kError_NoErr : kError_InvalidParam;
+    return SetWindowText(m_hWnd, oTitle.c_str()) ? kError_NoErr : kError_InvalidParam;
 }
 
 Error Win32Window::CaptureMouse(bool bCapture)
 {
-	if (!m_hWnd || m_bMindMeldInProgress)
+    if (!m_hWnd || m_bMindMeldInProgress)
        return kError_YouScrewedUp;
        
-	if (bCapture)
+    if (bCapture)
     {
         SetCapture(m_hWnd);
         return kError_NoErr;
@@ -591,34 +591,34 @@ Error Win32Window::CaptureMouse(bool bCapture)
 
 Error Win32Window::HideMouse(bool bHide)
 {
-	return ShowCursor(!bHide) ? kError_NoErr : kError_InvalidParam;
+    return ShowCursor(!bHide) ? kError_NoErr : kError_InvalidParam;
 }
 
 Error Win32Window::SetMousePos(Pos &oPos)
 {
-	return SetCursorPos(oPos.x, oPos.y) ? kError_NoErr : kError_InvalidParam;
+    return SetCursorPos(oPos.x, oPos.y) ? kError_NoErr : kError_InvalidParam;
 }
 
 Error Win32Window::GetMousePos(Pos &oPos)
 {
-	POINT oPoint;
+    POINT oPoint;
     BOOL  bRet;
     
     bRet = GetCursorPos(&oPoint);
     oPos.x = oPoint.x;
     oPos.y = oPoint.y;
     
-	return bRet ? kError_NoErr : kError_InvalidParam;
+    return bRet ? kError_NoErr : kError_InvalidParam;
 }
 
 HWND Win32Window::GetWindowHandle(void)
 {
-	return m_hWnd;
+    return m_hWnd;
 }
 
 Error Win32Window::SetWindowPosition(Rect &oWindowRect)
 {
-	if (!m_hWnd)
+    if (!m_hWnd)
        return kError_YouScrewedUp;
        
     MoveWindow(m_hWnd, oWindowRect.x1, oWindowRect.y1,
@@ -629,9 +629,9 @@ Error Win32Window::SetWindowPosition(Rect &oWindowRect)
 
 Error Win32Window::GetWindowPosition(Rect &oWindowRect)
 {
-	RECT sRect;
+    RECT sRect;
     
-	if (!m_hWnd)
+    if (!m_hWnd)
        return kError_YouScrewedUp;
        
     GetWindowRect(m_hWnd, &sRect);
@@ -645,19 +645,19 @@ Error Win32Window::GetWindowPosition(Rect &oWindowRect)
 
 Error Win32Window::Minimize(void)
 {
-	if (!m_hWnd || m_bMindMeldInProgress)
+    if (!m_hWnd || m_bMindMeldInProgress)
        return kError_YouScrewedUp;
 
     ShowWindow(m_hWnd, SW_MINIMIZE);
     if (m_bLiveInToolbar)
-	   ShowWindow(m_hWnd, SW_HIDE);
+       ShowWindow(m_hWnd, SW_HIDE);
 
     return kError_NoErr;
 }
 
 Error Win32Window::Restore(void)
 {
-	if (!m_hWnd || m_bMindMeldInProgress)
+    if (!m_hWnd || m_bMindMeldInProgress)
        return kError_YouScrewedUp;
        
     ShowWindow(m_hWnd, SW_RESTORE);
@@ -726,16 +726,16 @@ Notify(int32 command, LPNMHDR notifyMsgHdr)
 
         m_oControls[idCtrl]->GetTip(strTip);
         if(strTip.length())
-		{
-			if(strTip.length()>79)
-			{
+        {
+            if(strTip.length()>79)
+            {
                 // to avoid buffer overruns
                 lpttt->szText[79]=0;
                 strncpy(lpttt->szText,strTip.c_str(),78);
-			}
-			else
-			    strcpy(lpttt->szText,strTip.c_str()); // if tip is there
-		}
+            }
+            else
+                strcpy(lpttt->szText,strTip.c_str()); // if tip is there
+        }
     }
 }
 

@@ -30,6 +30,8 @@ ____________________________________________________________________________*/
 #include "GTKCanvas.h"
 #include "GTKUtility.h" 
 
+#define DB printf("%s:%d\n", __FILE__, __LINE__);
+
 static GtkTargetEntry main_drop[] =
 {
     { "text/plain", 0, 1 },
@@ -274,6 +276,24 @@ Error GTKWindow::VulcanMindMeld(Window *pOther)
     m_pMindMeldMutex->Release();
 
     return kError_NoErr;
+}
+
+void GTKWindow::PanelStateChanged(void)
+{
+    Rect       oRect;
+    GdkBitmap *mask;
+
+    Window::PanelStateChanged();
+
+    GetCanvas()->GetBackgroundRect(oRect);
+    mask = ((GTKCanvas *)m_pCanvas)->GetMask();
+
+    gdk_threads_enter();
+    if (mask)
+        gdk_window_shape_combine_mask(mainWindow->window, mask, 0, 0);
+    gdk_threads_leave();
+
+    ((GTKCanvas *)GetCanvas())->Paint(oRect);
 }
 
 void GTKWindow::SaveWindowPos(Pos &oPos)

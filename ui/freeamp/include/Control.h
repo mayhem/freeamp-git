@@ -56,6 +56,7 @@ enum ControlMessageEnum
     CM_ChangeWindow,
     CM_WindowEnter,
     CM_WindowLeave,
+    CM_TogglePanel,
 
     CM_LastValue
 };

@@ -60,19 +60,23 @@ GTKBitmap::GTKBitmap(string &oName)
     gdk_threads_enter();
     m_GC = gdk_gc_new(gdk_window_foreign_new(GDK_ROOT_WINDOW()));
     gdk_threads_leave();
+    m_width = 0;
+    m_height = 0;
 }
 
 GTKBitmap::GTKBitmap(int iWidth, int iHeight, string &oName) 
           :Bitmap(oName)
 {
     m_oBitmapName = oName;
-    m_MaskBitmap = NULL;
     shape_set = false;
     gdk_threads_enter();
     m_Bitmap = gdk_pixmap_new(NULL, iWidth, iHeight, 
                               gdk_visual_get_best_depth());
+    m_MaskBitmap = gdk_pixmap_new(NULL, iWidth, iHeight, 1); 
     m_GC = gdk_gc_new(gdk_window_foreign_new(GDK_ROOT_WINDOW()));
     gdk_threads_leave();
+    m_width = iWidth;
+    m_height = iHeight;
 }
 
 GTKBitmap::~GTKBitmap(void)
@@ -515,6 +519,9 @@ Error GTKBitmap::LoadBitmapFromDisk(string &oFile)
     g_free(data);
     g_free(buffer);
 
+    m_width = w;
+    m_height = h;
+
     return kError_NoErr;
 }
 
@@ -556,5 +563,59 @@ Error GTKBitmap::MaskBlitRect(Bitmap *pSrcBitmap, Rect &oSrcRect,
     gdk_draw_pixmap(dest, m_GC, src->GetBitmap(), oSrcRect.x1, oSrcRect.y1, 
                     oDestRect.x1, oDestRect.y1, w, h);
     gdk_threads_leave();    
+    return kError_NoErr;
+}
+
+Error GTKBitmap::BlitRectMaskBitmap(Bitmap *pSrcBitmap, Rect &oSrcRect, 
+                                    Rect &oDestRect)
+{
+    GdkWindow *src = (GdkWindow *)(((GTKBitmap *)pSrcBitmap)->m_MaskBitmap);
+    GdkWindow *dest = (GdkWindow *)m_MaskBitmap;
+
+    gdk_threads_enter();
+    GdkGC *tempgc = gdk_gc_new(dest);
+    gdk_window_copy_area(dest, tempgc, oDestRect.x1, oDestRect.y1, src,
+                         oSrcRect.x1, oSrcRect.y1, oDestRect.Width(),
+                         oDestRect.Height());
+    gdk_gc_unref(tempgc);
+    gdk_threads_leave();
+
+    return kError_NoErr;
+}
+
+Bitmap *GTKBitmap::Clone(void)
+{
+   GTKBitmap *pTemp;
+   Rect       oRect;
+
+   pTemp = new GTKBitmap(m_width, m_height, m_oBitmapName);
+   pTemp->m_oTransColor = m_oTransColor;
+   pTemp->m_bHasTransColor = m_bHasTransColor;
+   pTemp->shape_set = false;
+   oRect.x1 = oRect.y1 = 0;
+   oRect.x2 = m_width;
+   oRect.y2 = m_height;
+   pTemp->BlitRect(this, oRect, oRect);
+   pTemp->BlitRectMaskBitmap(this, oRect, oRect);
+
+   return pTemp;
+} 
+
+Error GTKBitmap::MakeTransparent(Rect &oRect)
+{
+    GdkColor   oGdkColor;
+    GdkWindow *dest = (GdkWindow *)m_MaskBitmap;
+
+    oGdkColor.pixel = 1;
+
+    gdk_threads_enter();
+
+    gdk_gc_set_foreground(m_GC, &oGdkColor);
+    GdkGC *tempgc = gdk_gc_new(dest);
+    gdk_draw_rectangle(dest, tempgc, 1, oRect.x1, oRect.y1, 
+                       oRect.Width(), oRect.Height());
+    gdk_gc_unref(tempgc);
+    gdk_threads_leave();    
+
     return kError_NoErr;
 }

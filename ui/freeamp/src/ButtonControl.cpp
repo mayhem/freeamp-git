@@ -56,12 +56,14 @@ static TransitionInfo pTransitions[] =
 ButtonControl::ButtonControl(Window *pWindow, string &oName) :
                Control(pWindow, oName, pTransitions)
 {
+   m_pPanelToToggle = NULL;
 }
 
 ButtonControl::ButtonControl(Window *pWindow, string &oName, string &oUrl) :
                Control(pWindow, oName, pTransitions)
 {
    m_oValue = oUrl;
+   m_pPanelToToggle = NULL;
 }
 
 ButtonControl::~ButtonControl(void)
@@ -139,11 +141,11 @@ void ButtonControl::Transition(ControlTransitionEnum  eTrans,
           break;
        case CT_Hide:
        {
-       	  Rect oRect = m_oRect;
+          Rect oRect = m_oRect;
           pCanvas = m_pParent->GetCanvas();
           pCanvas->Erase(oRect);
           pCanvas->Invalidate(oRect);
-       	  break;
+          break;
        }   
 
        default:
@@ -153,16 +155,7 @@ void ButtonControl::Transition(ControlTransitionEnum  eTrans,
     if (m_eCurrentState == CS_MouseOver && 
         eTrans == CT_MouseLButtonUp)
     {    
-       if (m_oTargetWindow.length() == 0)
-       {
-           if (m_oName == "ReloadTheme")
-           {
-              m_pParent->SendControlMessage(this, CM_Pressed);
-              return;
-           }   
-           m_pParent->SendControlMessage(this, CM_Pressed);
-       }    
-       else 
+       if (m_oTargetWindow.length() > 0)
        {   
            m_oMutex.Acquire();
            m_oValue = m_oTargetWindow;
@@ -171,6 +164,18 @@ void ButtonControl::Transition(ControlTransitionEnum  eTrans,
            m_pParent->SendControlMessage(this, CM_ChangeWindow);
            return;
        }
+       if (m_pPanelToToggle)
+       {
+           m_pPanelToToggle->m_bIsOpen = !m_pPanelToToggle->m_bIsOpen;
+           m_pParent->SendControlMessage(this, CM_TogglePanel);
+           return;
+       }
+       if (m_oName == "ReloadTheme")
+       {
+          m_pParent->SendControlMessage(this, CM_Pressed);
+          return;
+       }   
+       m_pParent->SendControlMessage(this, CM_Pressed);
     }       
 
     BlitFrame(m_eCurrentState);
@@ -185,7 +190,7 @@ bool ButtonControl::PosInControl(Pos &oPos)
     bRet = m_oRect.IsPosInRect(oPos);
     if (bRet && m_pBitmap)
     {
-    	Pos oLocalPos;
+        Pos oLocalPos;
         
         oLocalPos.x = (oPos.x - m_oRect.x1) + 
                       m_oStateBitmapRect[0][m_eCurrentState].x1;
@@ -205,6 +210,13 @@ void ButtonControl::SetTargetWindow(string &oWindow)
 {
     m_oMutex.Acquire();
     m_oTargetWindow = oWindow;
+    m_oMutex.Release();
+}
+
+void ButtonControl::SetPanelToggle(Panel *pPanel)
+{
+    m_oMutex.Acquire();
+    m_pPanelToToggle = pPanel;
     m_oMutex.Release();
 }
 

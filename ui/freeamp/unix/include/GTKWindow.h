@@ -56,6 +56,7 @@ class GTKWindow : public Window
      virtual bool  LButtonDown(void);    
      virtual Error GetDesktopSize(int32 &iX, int32 &iY);
      virtual void  BringWindowToFront(void);
+     virtual void  PanelStateChanged(void);
 
      GtkWidget *GetWindow(void) { return mainWindow; }
 

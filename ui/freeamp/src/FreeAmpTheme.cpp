@@ -871,6 +871,11 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
                                 
        return kError_NoErr;
    }
+   if (eMesg == CM_TogglePanel)
+   {
+       m_pWindow->PanelStateChanged();
+       return kError_NoErr;
+   }
    if (oControlName == string("Minimize") && eMesg == CM_Pressed)
    {
        m_pWindow->Minimize();
@@ -1912,19 +1917,3 @@ void FreeAmpTheme::OptionsThread(uint32 defaultPage)
    
     m_bInOptions = false;
 }
-
-const char *pThemes[] = 
-{
-    "/home/robert/FreeAmp/freeamp/themes/Aquatica.fat",
-    "/home/robert/FreeAmp/freeamp/themes/EMusic.fat",
-    "/home/robert/FreeAmp/freeamp/themes/FreeAmp.fat",
-    "/home/robert/FreeAmp/freeamp/themes/FreeAmpClassic.fat",
-    "/home/robert/FreeAmp/freeamp/themes/Minimalist.fat",
-    "/home/robert/FreeAmp/freeamp/themes/Visions.fat",
-    "/home/robert/FreeAmp/freeamp/themes/cchiphop.fat",
-    "/home/robert/FreeAmp/freeamp/themes/ccpolarbear.fat",
-    "/home/robert/FreeAmp/freeamp/themes/ccstompola.fat",
-    "/home/robert/FreeAmp/freeamp/themes/glass.fat",
-    "\0"
-};
-

@@ -50,3 +50,9 @@ void Bitmap::SetTransColor(Color &oColor)
     m_bHasTransColor = true;
     m_oTransColor = oColor;
 }
+
+bool Bitmap::GetTransColor(Color &oColor)
+{
+    oColor = m_oTransColor;
+    return m_bHasTransColor;
+}

@@ -37,6 +37,7 @@ using namespace std;
 
 #include "Control.h"
 
+struct Panel;
 class ButtonControl : public Control
 {
     public:
@@ -46,6 +47,7 @@ class ButtonControl : public Control
       virtual ~ButtonControl(void);
 
       virtual void SetTargetWindow(string &oWindow);
+      virtual void SetPanelToggle(Panel *pPanel);
 
       void Transition(ControlTransitionEnum eTrans, Pos *pMousePos);
       virtual void Init(void);
@@ -54,7 +56,8 @@ class ButtonControl : public Control
       
     private:
 
-	  string m_oTargetWindow;
+	  string  m_oTargetWindow;
+     Panel  *m_pPanelToToggle;
 };
 
 #endif
