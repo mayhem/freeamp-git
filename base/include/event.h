@@ -148,5 +148,6 @@ class EventQueue {
 #define INFO_MusicCatalogDoneRegenerating 81 // sent by the MC to tell the UIs to regenerate their database
 #define INFO_VorbisInfo             82 // Used to send vorbis stream info
 #define INFO_FileNotFound           83 // Used to send file not found info
+#define CMD_EditCurrentPlaylistItemInfo  84 // Used to instruct the info editor to edit the current metadata item
 #endif // _EVENT_H_
 
