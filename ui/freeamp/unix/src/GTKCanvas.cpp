@@ -117,6 +117,9 @@ Error GTKCanvas::Invalidate(Rect &oRect)
 
 Error GTKCanvas::Update(void)
 {
+   if (m_bNoScreenUpdate)
+       return kError_NoErr;
+   
    Rect foo;  
    Paint(foo);
 

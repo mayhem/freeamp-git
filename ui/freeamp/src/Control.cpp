@@ -55,6 +55,7 @@ Control::Control(Window *pWindow, string &oName, TransitionInfo *pInfo)
     m_oValue = string("");
     m_pBitmap = NULL;
     m_bWantsTimingMessages = false;
+    m_oOrigRect.x1 = m_oOrigRect.y1 = m_oOrigRect.x2 = m_oOrigRect.y2 = -1;
     
     for(iLoop = 0; ; iLoop++, pInfo++)
     {
@@ -191,7 +192,7 @@ void Control::SetParent(Window *pParent)
 void Control::SetRect(Rect &oRect)
 {
     m_oMutex.Acquire();
-    m_oRect = oRect;
+    m_oOrigRect = m_oRect = oRect;
     m_oMutex.Release();
 }
 
@@ -209,6 +210,7 @@ void Control::SetPos(Pos &oPos)
     m_oRect.y1 = oPos.y;
     m_oRect.x2 = -1;
     m_oRect.y2 = -1;
+    m_oOrigRect = m_oRect;
     m_oMutex.Release();
 }
 
@@ -258,6 +260,9 @@ void Control::BlitFrame(ControlStateEnum eFrame, int iState, Rect *pRect,
     Canvas *pCanvas;
     Rect    oFrameRect, oDestRect;
 
+    if (m_pPanel->IsHidden())
+       return;
+
     if (pRect == NULL)
         oDestRect = m_oRect;
     else
@@ -267,10 +272,17 @@ void Control::BlitFrame(ControlStateEnum eFrame, int iState, Rect *pRect,
         iState = 0;
 
     if (m_oStateBitmapRect[iState].find(eFrame) == 
-        m_oStateBitmapRect[iState].end()) 
-        m_oStateBitmapRect[iState][eFrame] = 
+        m_oStateBitmapRect[iState].end()) {
+        if (eFrame == CS_DisabledMO && 
+           m_oStateBitmapRect[iState].find(CS_Disabled) != 
+           m_oStateBitmapRect[iState].end())
+            m_oStateBitmapRect[iState][eFrame] = 
+                                    m_oStateBitmapRect[iState][CS_Disabled]; 
+        else
+            m_oStateBitmapRect[iState][eFrame] = 
                                     m_oStateBitmapRect[iState][CS_Normal];
-
+    }
+ 
     oFrameRect = m_oStateBitmapRect[iState][eFrame];
 
     oFrameRect.x2++;
@@ -295,6 +307,9 @@ void Control::BlitFrame(ControlStateEnum eFrame, int iState, Rect *pRect,
 void Control::BlitFrame(int iFrame, int iNumFramesInBitmap, Rect *pRect,
                         bool bUpdate)
 {
+   if (m_pPanel->IsHidden())
+       return;
+
 	if (m_bHorizontalBitmap)
 		BlitFrameHoriz(iFrame,iNumFramesInBitmap,pRect, bUpdate);
 	else
@@ -404,4 +419,20 @@ void Control::GetTip(string &oTip)
 bool Control::WantsTimingMessages(void)
 {
     return m_bWantsTimingMessages;
+}
+
+void Control::Move(Pos &oPos)
+{
+    m_oRect.x1 = m_oOrigRect.x1 + oPos.x;
+    m_oRect.y1 = m_oOrigRect.y1 + oPos.y;
+    if (m_oOrigRect.x2 != -1 && m_oOrigRect.y2 != -1)
+    {
+        m_oRect.x2 = m_oOrigRect.x2 + oPos.x;
+        m_oRect.y2 = m_oOrigRect.y2 + oPos.y;
+    }
+    else
+    {
+        m_oRect.x2 = m_oOrigRect.x2;
+        m_oRect.y2 = m_oOrigRect.y2;
+    }
 }

@@ -21,22 +21,44 @@
    $Id$
 ____________________________________________________________________________*/ 
 
+// The debugger can't handle symbols more than 255 characters long.
+// STL often creates symbols longer than that.
+// When symbols are longer than 255 characters, the warning is disabled.
+#ifdef WIN32
+#pragma warning(disable:4786)
+#define STRICT
+#endif
+
+
+#include <algorithm>
 #include "Canvas.h"
 #include "Window.h"
+
+#ifdef WIN32
+#include "Win32Bitmap.h"
+#elif defined(HAVE_GTK)
+#include "GTKBitmap.h"
+#elif defined(__BEOS__)
+#include "BeOSBitmap.h"
+#endif  
+
 #include "debug.h"
+
+#define DB Debug_v("%s:%d\n", __FILE__, __LINE__);
 
 Canvas::Canvas(void)
 {
     m_pBGBitmap = NULL;
-    m_pCompleteBGBitmap = NULL;
     m_pMaskBitmap = NULL;
+    m_bDeleteBitmap = false;
+    m_bNoScreenUpdate = false;
 }
 
 Canvas::~Canvas(void)
 {
 	// The bitmap that was loaded by the theme will be destroyed by the theme
 	// However, if we created any clones, we need to kill those...
-	if (m_pCompleteBGBitmap)
+	if (m_bDeleteBitmap)
 		delete m_pBGBitmap;
 }
 
@@ -48,9 +70,7 @@ void Canvas::SetBackgroundRect(Rect &oRect)
 void Canvas::SetBackgroundBitmap(Bitmap *pBitmap)
 {
     delete m_pBGBitmap;
-    delete m_pCompleteBGBitmap;
-    m_pCompleteBGBitmap = pBitmap;
-    m_pBGBitmap = NULL;
+    m_pBGBitmap = pBitmap;
 }
 
 void Canvas::SetMaskBitmap(Bitmap *pBitmap)
@@ -69,44 +89,114 @@ Bitmap *Canvas::GetBackgroundBitmap(void)
     return m_pBGBitmap;
 }
 
+class PanelCompare
+{
+    public:
+
+      bool operator()(Panel *a, Panel *b)
+      {
+          if (a->GetZOrder() > b->GetZOrder())
+             return true;
+          return false;
+      }
+}; 
+
 void Canvas::InitBackgrounds(vector<Panel *> *pPanels)
 {
     vector<Panel *>::iterator i;
-    Rect                      oDestRect;
+    Rect                      oDestRect, oSrcRect, oUnion, oTemp;
+    Pos                       oOffset, oBitmapPos, oTempPos;
+    int                       iLoop;
+    Color                     oColor;
 
-    if (m_pCompleteBGBitmap == NULL)
+    // If the bitmap we have came from the theme parser and we're
+    // not supposed to delete it, we've got a normal, non-panel theme
+    // and we should not execute this function
+    if (m_bDeleteBitmap == false && m_pBGBitmap)
        return;
 
-    if (pPanels->size() == 0)
-    {
-        m_pBGBitmap = m_pCompleteBGBitmap;
-        m_pCompleteBGBitmap = NULL;
-        return;
-    }
-
-	if (m_pBGBitmap)
+	 if (m_pBGBitmap)
 	   delete m_pBGBitmap;
 
-    m_pBGBitmap = m_pCompleteBGBitmap->Clone();
-    for(i = pPanels->begin(); i != pPanels->end(); i++)
+    // Calculate the bounding rectangle of all the panels
+    for(i = pPanels->begin(), iLoop = 0; i != pPanels->end(); i++, iLoop++)
     {
-        if (!(*i)->m_bIsOpen)
+        if ((*i)->IsHidden())
         {
-            m_pBGBitmap->MakeTransparent((*i)->m_oOpenRect);
-            if ((*i)->m_pClosedBitmap)
-            {
-                oDestRect.x1 = (*i)->m_oOffset.x;
-                oDestRect.y1 = (*i)->m_oOffset.y;
-                oDestRect.x2 = oDestRect.x1 + (*i)->m_oClosedRect.Width();
-                oDestRect.y2 = oDestRect.y1 + (*i)->m_oClosedRect.Height();
-                m_pBGBitmap->BlitRect((*i)->m_pClosedBitmap, 
-                                      (*i)->m_oClosedRect,
-                                      oDestRect);
-                m_pBGBitmap->BlitRectMaskBitmap((*i)->m_pClosedBitmap, 
-                                                (*i)->m_oClosedRect,
-                                                oDestRect);
-            }
+            iLoop--;
+            continue;
         }
+
+        string j;
+        (*i)->GetName(j);
+
+        (*i)->GetRect(oTemp);
+        (*i)->GetPos(oOffset);
+        oTemp.x2 = oOffset.x + oTemp.Width();
+        oTemp.y2 = oOffset.y + oTemp.Height();
+        oTemp.x1 = oOffset.x;
+        oTemp.y1 = oOffset.y;
+
+        if (iLoop == 0)
+           oUnion = oTemp;
+        else
+           oUnion.Union(oTemp);
+
+    }
+     
+    oOffset.x = oUnion.x1;
+    oOffset.y = oUnion.y1;
+
+    // If the bounding rectangle does not start at the origin, move 
+    // all controls relative to the origin
+    if (oOffset.x != 0 && oOffset.y != 0)
+    {
+        oUnion.x1 -= oOffset.x;
+        oUnion.y1 -= oOffset.y;
+        oUnion.x2 -= oOffset.x;
+        oUnion.y2 -= oOffset.y;
+    }
+    m_bDeleteBitmap = true;
+
+#ifdef WIN32
+    m_pBGBitmap = new Win32Bitmap(oUnion.Width(), oUnion.Height(), 
+                              string("Background"));
+#elif defined(HAVE_GTK)
+    m_pBGBitmap = new GTKBitmap(oUnion.Width(), oUnion.Height(), 
+                            string("Background"));
+#elif defined(__BEOS__)
+    m_pBGBitmap = new BeOSBitmap(oUnion.Width(), oUnion.Height(), 
+                             string("Background"));
+#endif 
+    (*(pPanels->begin()))->GetPanelBitmap()->GetTransColor(oColor);
+    m_pBGBitmap->SetTransColor(oColor);
+    m_pBGBitmap->MakeTransparent(oUnion);
+    SetBackgroundRect(oUnion);
+
+    // Sort the panels in ascending Zorder
+    sort(pPanels->begin(), pPanels->end(), PanelCompare());
+
+    // And now blit the panel bitmaps to the background bitmap
+    for(i = pPanels->end() - 1; i >= pPanels->begin(); i--)
+    {
+        if ((*i)->IsHidden())
+        {
+            continue;
+        }
+
+        (*i)->GetRect(oSrcRect);
+        (*i)->GetPos(oBitmapPos);
+
+        oTempPos.x = oOffset.x + oBitmapPos.x;
+        oTempPos.y = oOffset.y + oBitmapPos.y;
+        (*i)->MoveControls(oTempPos);
+
+        oDestRect.x1 = oBitmapPos.x - oOffset.x; 
+        oDestRect.y1 = oBitmapPos.y - oOffset.y; 
+        oDestRect.x2 = oDestRect.x1 + oSrcRect.Width();
+        oDestRect.y2 = oDestRect.y1 + oSrcRect.Height();
+        m_pBGBitmap->BlitRect((*i)->GetPanelBitmap(), oSrcRect, oDestRect);
+        m_pBGBitmap->BlitRectMaskBitmap((*i)->GetPanelBitmap(), 
+                                        oSrcRect, oDestRect);
     }
 }
-

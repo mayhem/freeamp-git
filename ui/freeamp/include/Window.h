@@ -40,34 +40,14 @@ ____________________________________________________________________________*/
 using namespace std;
 
 #include "Bitmap.h"
+#include "Panel.h"
 #include "Control.h"
 #include "Canvas.h"
 #include "thread.h"
 #include "semaphore.h"
 #include "mutex.h"
 
-typedef multimap<string, Control *> ControlMap;
-typedef multimap<string, Control *>::iterator ControlMapIterator;
-
 class Theme;
-
-struct Panel
-{
-    Panel() 
-    { 
-        memset(&m_oOpenRect, 0, sizeof(Rect));
-        memset(&m_oClosedRect, 0, sizeof(Rect));
-        memset(&m_oOffset, 0, sizeof(Pos));
-        m_pOpenBitmap = m_pClosedBitmap = NULL;
-        m_bIsOpen = false;
-    };
-    string  m_oName;
-    Rect    m_oOpenRect, m_oClosedRect;
-    Pos     m_oOffset;
-    Bitmap *m_pOpenBitmap, *m_pClosedBitmap;
-    bool    m_bIsOpen;
-};
-
 class Window
 {
     public:
@@ -77,7 +57,6 @@ class Window
 
       void    GetName(string &oName);
       Canvas *GetCanvas(void);
-      void    AddControl(Control *pControl);
       void    ClearControls(void);
       void    Keystroke(unsigned char cKey);
       bool    MenuCommand(uint32 uCommand);
@@ -103,6 +82,7 @@ class Window
       Error   ControlGetTip(const string &oName, string &oTip);
       Error   ControlGetDesc(const string &oName, string &oDesc);
       bool    DoesControlExist(const string &oName);
+      void    GetControlToolTips(vector<pair<Rect, string> > &oList);
 
       // These functions should be called from the OS dependent event
       // loop to handle mouse messages
@@ -163,7 +143,6 @@ class Window
       void     GetReloadWindowPos(Rect &oOldRect, 
                                   int iNewWidth, int iNewHeight, 
                                   Rect &oNewRect);
-      void     GetWindowVisibleArea(Rect &oRect);
 
       // For locking the window in preparatiom for a VMM
       virtual void  LockUsageRef(void);
@@ -171,8 +150,6 @@ class Window
      
       string                    m_oName;
       vector<Panel *>           m_oPanels;
-      vector<Control *>         m_oControls;
-      ControlMap                m_oControlMap;
       Canvas                   *m_pCanvas;
       bool                      m_bExit, m_bWindowMove, m_bLButtonDown;
       Theme                    *m_pTheme;

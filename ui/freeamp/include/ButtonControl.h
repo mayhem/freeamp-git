@@ -37,7 +37,7 @@ using namespace std;
 
 #include "Control.h"
 
-struct Panel;
+class Panel;
 class ButtonControl : public Control
 {
     public:
@@ -58,6 +58,7 @@ class ButtonControl : public Control
 
 	  string  m_oTargetWindow;
      Panel  *m_pPanelToToggle;
+     Pos     m_oPos;
 };
 
 #endif

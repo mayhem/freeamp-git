@@ -272,6 +272,10 @@ SOURCE=..\..\src\MultiStateControl.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\src\Panel.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\lib\xml\src\Parse.cpp
 # End Source File
 # Begin Source File

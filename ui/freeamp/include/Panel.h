@@ -36,6 +36,7 @@ ____________________________________________________________________________*/
 #include <string> 
 #include <vector>
 #include <map>
+#include <utility>
 
 using namespace std;
 
@@ -53,23 +54,39 @@ class Panel
 {
     public:
     
-              Panel(string &oName, Bitmap *pPanelBitmap, int iZOrder,
-                    Rect &oRect, Pos &oPos, Window *pWindow);
-              Panel(Window *pWindow);
+              Panel(const string &oName);
      virtual ~Panel();
 
       bool    IsOpen(void) { return m_bIsOpen; };
       void    OpenPanel(bool bOpen) { m_bIsOpen = bOpen; };
+      bool    IsHidden(void) { return m_bIsHidden; };
+      void    Hide(bool bHidden) { m_bIsHidden = bHidden; };
       void    AddControl(Control *pControl);
       void    ClearControls(void);
       void    Init(void);
+      void    ShowAllControls(void);
       void    GetRect(Rect &oRect) { oRect = m_oRect; };
+      void    SetRect(Rect &oRect) { m_oRect = oRect; };
       void    GetName(string &oName);
       void    GetPos(Pos &oPos) { oPos = m_oPos; };
+      void    SetPos(Pos &oPos) { m_oPos = oPos; };
+      void    GetTogglePos(Pos &oPos) { oPos = m_oTogglePos; };
+      void    SetTogglePos(Pos &oPos) { m_oTogglePos = oPos; };
       int     GetZOrder(void) { return m_iZOrder; };
+      void    SetZOrder(int i) { m_iZOrder = i; };
+      void    SetPanelBitmap(Bitmap *pBitmap) { m_pPanelBitmap = pBitmap; };
       Bitmap *GetPanelBitmap(void) { return m_pPanelBitmap; };
+      void    TogglePanelPos(void);
+      void    SetParentWindow(Window *pWin) { m_pWindow = pWin; };
+      Window *GetParentWindow(void) { return m_pWindow; };
+
+      void    SetOnOpenHide(Panel *pPanel);
+      void    SetOnOpenShow(Panel *pPanel);
+      void    SetOnCloseHide(Panel *pPanel);
+      void    SetOnCloseShow(Panel *pPanel);
 
       Control *ControlFromPos(Pos &oPos);
+      void    GetControlToolTips(vector<pair<Rect, string> > &oList);
  
       Error   ControlEnable(const string &oControlName, bool bSet, bool &bEnable);
       Error   ControlShow(const string &oControlName, bool bSet, bool &bShow);
@@ -88,14 +105,16 @@ class Panel
     protected:
 
       string              m_oName;
-      Pos                 m_oPos;
+      Pos                 m_oPos, m_oTogglePos;
       Rect                m_oRect;
       Bitmap             *m_pPanelBitmap;
-      bool                m_bIsOpen;
+      bool                m_bIsOpen, m_bIsHidden;
       vector<Control *>   m_oControls;
       ControlMap          m_oControlMap;
       Window             *m_pWindow;
       int                 m_iZOrder;
+
+      Panel *m_pOnOpenHide, *m_pOnOpenShow, *m_pOnCloseHide, *m_pOnCloseShow;
 };
 
 #endif

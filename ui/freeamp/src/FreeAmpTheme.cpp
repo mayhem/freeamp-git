@@ -942,7 +942,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
        return kError_NoErr;
    }
    
-   if (strncmp(oControlName.c_str(), "Eq", 2) == 0 && eMesg == CM_SliderUpdate)
+   if (eMesg == CM_SliderUpdate && strncmp(oControlName.c_str(), "Eq", 2) == 0)
    {
        string oName("Info"), oDesc;
        char   szText[20];
@@ -1268,22 +1268,18 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
    if (oControlName == string("EqEnable") && eMesg == CM_Pressed)
    {
        int iState;
-       string oName("Info"), oText;
 
        m_pWindow->ControlIntValue(oControlName, false, iState);
        if (iState == 1)
        {
            m_eq->Enable(true);
            iState = 0;
-           oText = string("The equalizer is on.");
        }
        else
        {
            m_eq->Enable(false);
            iState = 1;
-           oText = string("The equalizer is off.");
        }
-       m_pWindow->ControlStringValue(oName, true, oText);
        m_pWindow->ControlIntValue(oControlName, true, iState);
        return kError_NoErr;
    }
@@ -1581,7 +1577,7 @@ void FreeAmpTheme::HandleKeystroke(unsigned char cKey)
 
      case '@':
      {
-        string oText("23:59:59");
+        string oText("-23:59:59");
         m_pWindow->ControlStringValue("Time", true, oText);
         break;
      }    

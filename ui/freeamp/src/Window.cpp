@@ -146,9 +146,7 @@ void Window::VulcanMindMeldHost(bool bHost)
 
 Error Window::VulcanMindMeld(Window *pOther)
 {
-    vector<Control *>::iterator i;
     vector<Panel *>::iterator   k;
-    ControlMapIterator          j;
     string                      oName;
 
     LockUsageRef();
@@ -163,21 +161,12 @@ Error Window::VulcanMindMeld(Window *pOther)
     m_pCaptureControl = NULL;
     m_pMouseDownControl = NULL;
 
-    m_oControls.clear();
-    for(i = pOther->m_oControls.begin(); i != pOther->m_oControls.end(); i++)
-    {
-        m_oControls.push_back(*i);
-    }    
     m_oPanels.clear();
     for(k = pOther->m_oPanels.begin(); k != pOther->m_oPanels.end(); k++)
     {
         m_oPanels.push_back(*k);
     }    
 
-    m_oControlMap.clear();
-    for(j = pOther->m_oControlMap.begin(); j != pOther->m_oControlMap.end(); j++)
-        m_oControlMap.insert(pair<string, Control *>((*j).first, (*j).second));
-        
     m_pCanvas = pOther->m_pCanvas;
 
     UnlockUsageRef();
@@ -189,34 +178,18 @@ Error Window::VulcanMindMeld(Window *pOther)
 
 void Window::Init(void)
 {
-    vector<Control *>::iterator i;
+    vector<Panel *>::iterator i;
 
     IncUsageRef();
 
     m_pCanvas->InitBackgrounds(&m_oPanels);
     m_pCanvas->Init();
 
-    for(i = m_oControls.begin(); i != m_oControls.end(); i++)
-    {
-        (*i)->SetParent(this);
+    for(i = m_oPanels.begin(); i != m_oPanels.end(); i++)
         (*i)->Init();
-    }    
         
     m_pTheme->InitControls();    
     
-    DecUsageRef();
-}
-
-void Window::AddControl(Control *pControl)
-{
-    string oName;
-
-    IncUsageRef();
-
-    pControl->GetName(oName);
-    m_oControlMap.insert(pair<string, Control *>(oName, pControl));
-    m_oControls.push_back(pControl);
-
     DecUsageRef();
 }
 
@@ -231,16 +204,21 @@ void Window::AddPanel(Panel *pPanel)
 
 void Window::PanelStateChanged(void)
 {
-    ControlMapIterator  i;
-    Rect                oRect;
+    vector<Panel *>::iterator i;
+    Rect oRect, oWindowRect;
 
     IncUsageRef();
     m_pCanvas->InitBackgrounds(&m_oPanels);
-    for (i = m_oControlMap.begin(); i != m_oControlMap.end(); i++)
-    {
-         i->second->AcceptTransition(CT_Show);
-    }        
+    m_pCanvas->Init();
+    for(i = m_oPanels.begin(); i != m_oPanels.end(); i++)
+        (*i)->ShowAllControls();
+
+    GetWindowPosition(oWindowRect);
     m_pCanvas->GetBackgroundRect(oRect);
+    oWindowRect.x2 = oWindowRect.x1 + oRect.Width();
+    oWindowRect.y2 = oWindowRect.y1 + oRect.Height();
+    SetWindowPosition(oWindowRect);
+
     m_pCanvas->Invalidate(oRect);
 
     DecUsageRef();
@@ -248,14 +226,12 @@ void Window::PanelStateChanged(void)
 
 void Window::ClearControls(void)
 {
+    vector<Panel *>::iterator i;
+
     IncUsageRef();
        
-    while(m_oControls.size() > 0)
-    {
-        delete m_oControls[0];
-        m_oControls.erase(m_oControls.begin());
-    }
-    m_oControlMap.clear();
+    for(i = m_oPanels.begin(); i != m_oPanels.end(); i++)
+        (*i)->ClearControls();
 
     DecUsageRef();
 }
@@ -272,17 +248,12 @@ void Window::GetName(string &oName)
 
 Error Window::ControlEnable(const string &oTarget, bool bSet, bool &bEnable)
 {
-    ControlMapIterator i;
+    vector<Panel *>::iterator i;
 
     IncUsageRef();
        
-    pair<ControlMapIterator, ControlMapIterator> keyRange
-        = m_oControlMap.equal_range(oTarget);
-
-    for (i = keyRange.first; i != keyRange.second; i++)
-    {
-        i->second->Enable(bSet, bEnable);
-    }
+    for(i = m_oPanels.begin(); i != m_oPanels.end(); i++)
+        (*i)->ControlEnable(oTarget, bSet, bEnable);
 
     DecUsageRef();
 
@@ -291,30 +262,12 @@ Error Window::ControlEnable(const string &oTarget, bool bSet, bool &bEnable)
 
 Error Window::ControlShow(const string &oTarget, bool bSet, bool &bShow)
 {
-    Pos                 oPos;
-    Rect                oRect;
-    Error               eRet;
-    Control            *pControl;
-    ControlMapIterator  i;
+    vector<Panel *>::iterator i;
 
     IncUsageRef();
 
-    pair<ControlMapIterator, ControlMapIterator> keyRange
-        = m_oControlMap.equal_range(oTarget);
-
-    for (i = keyRange.first; i != keyRange.second; i++)
-    {
-        pControl = i->second;
-        
-        eRet = pControl->Show(bSet, bShow);
-
-        GetMousePos(oPos);
-        GetWindowPosition(oRect);
-        oPos.x -= oRect.x1;
-        oPos.y -= oRect.y1;
-        if (bSet && bShow && pControl->PosInControl(oPos))
-            pControl->AcceptTransition(CT_MouseEnter);
-    }        
+    for(i = m_oPanels.begin(); i != m_oPanels.end(); i++)
+        (*i)->ControlShow(oTarget, bSet, bShow);
 
     DecUsageRef();
 
@@ -323,18 +276,13 @@ Error Window::ControlShow(const string &oTarget, bool bSet, bool &bShow)
 
 Error Window::ControlIntValue(const string &oTarget, bool bSet, int &iValue)
 {
-    ControlMapIterator  i;
+    vector<Panel *>::iterator i;
 
     IncUsageRef();
+
+    for(i = m_oPanels.begin(); i != m_oPanels.end(); i++)
+        (*i)->ControlIntValue(oTarget, bSet, iValue);
        
-    pair<ControlMapIterator, ControlMapIterator> keyRange
-        = m_oControlMap.equal_range(oTarget);
-
-    for (i = keyRange.first; i != keyRange.second; i++)
-    {
-         i->second->IntValue(bSet, iValue);
-    }        
-
     DecUsageRef();
 
     return kError_NoErr;
@@ -342,17 +290,12 @@ Error Window::ControlIntValue(const string &oTarget, bool bSet, int &iValue)
 
 Error Window::ControlStringValue(const string &oTarget, bool bSet, string &oValue)
 {
-    ControlMapIterator  i;
+    vector<Panel *>::iterator i;
 
     IncUsageRef();
        
-    pair<ControlMapIterator, ControlMapIterator> keyRange
-        = m_oControlMap.equal_range(oTarget);
-
-    for (i = keyRange.first; i != keyRange.second; i++)
-    {
-        i->second->StringValue(bSet, oValue);
-    }        
+    for(i = m_oPanels.begin(); i != m_oPanels.end(); i++)
+        (*i)->ControlStringValue(oTarget, bSet, oValue);
 
     DecUsageRef();
 
@@ -361,19 +304,12 @@ Error Window::ControlStringValue(const string &oTarget, bool bSet, string &oValu
 
 Error Window::ControlGetDesc(const string &oTarget, string &oDesc)
 {
-    ControlMapIterator  i;
+    vector<Panel *>::iterator i;
 
     IncUsageRef();
        
-    pair<ControlMapIterator, ControlMapIterator> keyRange
-        = m_oControlMap.equal_range(oTarget);
-
-    for (i = keyRange.first; i != keyRange.second; i++)
-    {
-         i->second->GetDesc(oDesc);
-         DecUsageRef();
-         return kError_NoErr;
-    }        
+    for(i = m_oPanels.begin(); i != m_oPanels.end(); i++)
+        (*i)->ControlGetDesc(oTarget, oDesc);
 
     DecUsageRef();
 
@@ -382,19 +318,12 @@ Error Window::ControlGetDesc(const string &oTarget, string &oDesc)
 
 Error Window::ControlGetTip(const string &oTarget, string &oTip)
 {
-    ControlMapIterator  i;
+    vector<Panel *>::iterator i;
 
     IncUsageRef();
        
-    pair<ControlMapIterator, ControlMapIterator> keyRange
-        = m_oControlMap.equal_range(oTarget);
-
-    for (i = keyRange.first; i != keyRange.second; i++)
-    {
-         i->second->GetTip(oTip);
-         DecUsageRef();
-         return kError_NoErr;
-    }        
+    for(i = m_oPanels.begin(); i != m_oPanels.end(); i++)
+        (*i)->ControlGetTip(oTarget, oTip);
 
     DecUsageRef();
 
@@ -419,10 +348,14 @@ Error Window::SendControlMessage(Control *pControl,
 
 bool Window::DoesControlExist(const string &oName)
 {
-    bool bRet;
+    bool bRet = false;
+    vector<Panel *>::iterator i;
 
     IncUsageRef();
-    bRet = m_oControlMap.find(oName) != m_oControlMap.end();
+    for(i = m_oPanels.begin(); i != m_oPanels.end() && !bRet; i++)
+    {
+        bRet = (*i)->DoesControlExist(oName);
+    }
     DecUsageRef();
     
     return bRet;
@@ -430,28 +363,32 @@ bool Window::DoesControlExist(const string &oName)
 
 Control *Window::ControlFromPos(Pos &oPos)
 {
-    vector<Control *>::iterator i;
-    bool                        bShown;
-    Control                    *pControl;
+    vector<Panel *>::iterator   i;
+    Control                    *pControl = NULL;
 
     IncUsageRef();
     
-    for(i = m_oControls.begin(); i != m_oControls.end(); i++)
+    for(i = m_oPanels.begin(); i != m_oPanels.end() && !pControl; i++)
     {
-        (*i)->Show(false, bShown);
-        if ((*i)->PosInControl(oPos) && bShown) 
-        {
-            pControl = (*i);
-            DecUsageRef();
-        
-            return pControl;
-        }    
-    }        
-
+        pControl = (*i)->ControlFromPos(oPos);
+    }
     DecUsageRef();
 
-    return NULL;
+    return pControl;
 }
+
+void Window::GetControlToolTips(vector<pair<Rect, string> > &oList)
+{
+    vector<Panel *>::iterator   i;
+
+    IncUsageRef();
+	oList.clear();
+    for(i = m_oPanels.begin(); i != m_oPanels.end(); i++)
+    {
+        (*i)->GetControlToolTips(oList);
+    }
+    DecUsageRef();
+}	 
 
 Error Window::StartMouseCapture(Control *pControl)
 {
@@ -649,10 +586,8 @@ void Window::HandleMouseLButtonDown(Pos &oScreenPos)
        
     GetWindowPosition(m_oMoveStart);
     m_pCanvas->GetBackgroundRect(oRect);
-	m_oMoveStart.x2 = m_oMoveStart.x1 + oRect.Width();
-	m_oMoveStart.y2 = m_oMoveStart.y1 + oRect.Height();
-    GetWindowVisibleArea(m_oMoveStart);
-
+    m_oMoveStart.x2 = m_oMoveStart.x1 + oRect.Width();
+    m_oMoveStart.y2 = m_oMoveStart.y1 + oRect.Height();
     m_oMovePos = oScreenPos;
 
     if (IsError(GetDesktopSize(m_iDesktopWidth, m_iDesktopHeight)))
@@ -767,48 +702,37 @@ void Window::MouseHasLeftWindow(void)
 
 void Window::TimerEvent(void)
 {
-    vector<Control *>::iterator i;
+    vector<Panel *>::iterator i;
 
     if (!m_bTimerEnabled)
        return;
 
     IncUsageRef();
 
-    for(i = m_oControls.begin(); i != m_oControls.end(); i++)
-    {
-        if ((*i)->WantsTimingMessages())
-            (*i)->AcceptTransition(CT_Timer);
-    }  
+    for(i = m_oPanels.begin(); i != m_oPanels.end(); i++)
+        (*i)->TimerEvent();
     
     DecUsageRef();
 }
 
 void Window::EnableTimer(bool bEnable)
 {
-    IncUsageRef();
     m_bTimerEnabled = bEnable;
-    DecUsageRef();
 }  
 
 void Window::SetStayOnTop(bool bStay)
 {
-    IncUsageRef();
     m_bStayOnTop = bStay;
-    DecUsageRef();
 }
 
 void Window::SetLiveInToolbar(bool bLive)
 {
-    IncUsageRef();
     m_bLiveInToolbar = bLive;
-    DecUsageRef();
 }
 
 void Window::Keystroke(unsigned char cKey)
 {
-//    IncUsageRef();
     m_pTheme->HandleKeystroke(cKey);
-//    DecUsageRef();
 }
 
 bool Window::MenuCommand(uint32 uCommand)
@@ -880,25 +804,4 @@ void Window::GetReloadWindowPos(Rect &oOldRect, int iNewWidth, int iNewHeight,
        oNewRect.y1 = 0;
        oNewRect.y2 = iNewHeight;
     }
-}
-
-    
-void Window::GetWindowVisibleArea(Rect &m_oTotalWindowRect)
-{
-    vector<Panel *>::iterator i;
-    Rect                      oRect;
-
-    // This function needs to be genericized -- right now it will
-    // only cover the specific case for the freeamp theme
-    m_pCanvas->GetBackgroundRect(oRect);
-    for(i = m_oPanels.begin(); i != m_oPanels.end(); i++)
-    {
-        if ((*i)->m_bIsOpen)
-           continue;
-
-        oRect.y2 = (*i)->m_oOpenRect.y2;
-        m_oTotalWindowRect.y2 = m_oTotalWindowRect.y1 + oRect.Height();
-        break;
-    }
-
 }

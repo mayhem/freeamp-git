@@ -125,6 +125,8 @@ class Control
       virtual ~Control(void);
  
       virtual void  SetParent(Window *pParent);
+      virtual void  SetPanel(Panel *pPanel) { m_pPanel = pPanel; };
+      virtual Panel *GetPanel(void) { return m_pPanel; };
       virtual void  SetRect(Rect &oRect);
       virtual void  GetRect(Rect &oRect);
       virtual void  SetPos(Pos &oPos);
@@ -149,6 +151,7 @@ class Control
       virtual bool WantsTimingMessages(void);
       virtual bool UseToDragWindow(void) { return false; };
       virtual void Init(void) = 0;
+      virtual void Move(Pos &oPos);
       virtual void AcceptTransition(ControlTransitionEnum eTrans,
                                     Pos *pMousePos = NULL);
 
@@ -175,11 +178,12 @@ class Control
                                  bool bUpdate = true);
 
       string                 m_oName, m_oDesc, m_oToolTip;
-      Rect                   m_oRect, m_oBitmapRect;
+      Rect                   m_oRect, m_oBitmapRect, m_oOrigRect;
       Bitmap                *m_pBitmap;
       ControlStateEnum       m_eCurrentState, m_eLastState;
       vector<TransitionInfo> m_oTransitions;
       Window                *m_pParent;
+      Panel                 *m_pPanel;
       bool                   m_bShow, m_bEnable, m_bWantsTimingMessages;
       bool                   m_bHorizontalBitmap;
       int                    m_iValue;

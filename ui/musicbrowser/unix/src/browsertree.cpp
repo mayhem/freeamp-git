@@ -1147,10 +1147,13 @@ void GTKMusicBrowser::StreamTimer(void)
         return;
     }
 
+    printf("xml: '%s'\n", page.c_str());
     eRet = o.ParseStreamXML(page, list);
    
     if (eRet != kError_NoErr) {
-        cout << "Stream .xml parse error: " << ErrorString[eRet] << "\n";
+        string err;
+        o.GetErrorString(err);
+        cout << "Stream .xml parse error: " << err << "\n";
         return;
     }
 

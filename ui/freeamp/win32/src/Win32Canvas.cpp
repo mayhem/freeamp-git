@@ -249,6 +249,9 @@ Error Win32Canvas::Invalidate(Rect &oRect)
 Error Win32Canvas::Update(void)
 {
    HWND hWnd;
+
+   if (m_bNoScreenUpdate)
+       return kError_NoErr;
    
    hWnd = m_pParent->GetWindowHandle();
    if (hWnd == NULL)

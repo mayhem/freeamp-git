@@ -193,7 +193,7 @@ void MultiStateControl::Init(void)
                      m_oStateBitmapRect[0][CS_Normal].x1; 
         m_oRect.y2 = m_oRect.y1 + m_oStateBitmapRect[0][CS_Normal].y2 -
                      m_oStateBitmapRect[0][CS_Normal].y1; 
-
+        //m_oOrigRect = m_oRect;
     }    
     m_oMutex.Release();
     

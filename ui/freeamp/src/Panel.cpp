@@ -36,28 +36,21 @@ ____________________________________________________________________________*/
 
 #define DB Debug_v("%s:%d\n", __FILE__, __LINE__);
 
-Panel::Panel(string &oName, Bitmap *pPanelBitmap, int iZOrder,
-             Rect &oRect, Pos &oPos, Window *pWindow)
+Panel::Panel(const string &oName)
 {
     m_oName = oName;
-    m_pWindow = pWindow;
-    m_pPanelBitmap = pPanelBitmap;
-    m_oRect = oRect;
-    m_oPos = oPos;
-    m_iZOrder = iZOrder;
+    m_pWindow = NULL;
+    m_pPanelBitmap = NULL;
+    m_iZOrder = -1;
+    m_oPos.x = m_oPos.y = -1;
+    m_oTogglePos.x = m_oTogglePos.y = -1;
+    m_pOnOpenHide = m_pOnOpenShow = m_pOnCloseHide = m_pOnCloseShow = NULL;
     m_bIsOpen = false;
+    m_bIsHidden = false;
 }
-
-Panel::Panel(Window *pWindow)
-{
-    m_pWindow = pWindow;
-}
-
 
 Panel::~Panel(void)
 {
-
-
 }
 
 void Panel::Init(void)
@@ -66,8 +59,11 @@ void Panel::Init(void)
 
     for(i = m_oControls.begin(); i != m_oControls.end(); i++)
     {
+        (*i)->SetPanel(this);
         (*i)->SetParent(m_pWindow);
         (*i)->Init();
+        if (!m_bIsHidden)
+            (*i)->AcceptTransition(CT_Show);
     }    
 }
 
@@ -90,10 +86,52 @@ void Panel::ClearControls(void)
     m_oControlMap.clear();
 }
 
+void Panel::GetControlToolTips(vector<pair<Rect, string> > &oList)
+{
+    vector<Control *>::iterator i;
+	Rect                        oRect;
+	string                      oTip;
+	pair<Rect, string>          oTemp;
+
+	if (m_bIsHidden)
+	    return;
+
+    for(i = m_oControls.begin(); i != m_oControls.end(); i++)
+    {
+        (*i)->GetTip(oTip);
+        (*i)->GetRect(oRect);
+		oTemp.first = oRect;
+		oTemp.second = oTip;
+		oList.push_back(oTemp);
+    }
+}
+
 void Panel::GetName(string &oName)
 {
     oName = m_oName;
 }
+
+void Panel::SetOnOpenHide(Panel *pPanel) 
+{ 
+    m_pOnOpenHide = pPanel; 
+}
+
+void Panel::SetOnOpenShow(Panel *pPanel) 
+{ 
+    m_pOnOpenShow = pPanel; 
+}
+
+void Panel::SetOnCloseHide(Panel *pPanel)
+{ 
+    m_pOnCloseHide = pPanel; 
+    m_pOnCloseHide->Hide(true);
+}
+
+void Panel::SetOnCloseShow(Panel *pPanel) 
+{ 
+    m_pOnCloseShow = pPanel; 
+    m_pOnCloseShow->Hide(false);
+} 
 
 Error Panel::ControlEnable(const string &oTarget, bool bSet, bool &bEnable)
 {
@@ -211,9 +249,6 @@ Control *Panel::ControlFromPos(Pos &oPos)
     bool                        bShown;
     Control                    *pControl;
 
-    if (!m_bIsOpen)
-       return NULL;
-
     for(i = m_oControls.begin(); i != m_oControls.end(); i++)
     {
         (*i)->Show(false, bShown);
@@ -255,4 +290,40 @@ bool Panel::operator<(const Panel *&a)
     if (a->m_iZOrder < m_iZOrder)
        return -1;
     return 1;
+}
+
+void Panel::TogglePanelPos(void)
+{
+    Pos oTemp;
+
+    if (m_bIsOpen)
+    {
+        if (m_pOnCloseShow)
+            m_pOnCloseShow->Hide(false);
+        if (m_pOnCloseHide)
+            m_pOnCloseHide->Hide(true);
+    } 
+    else
+    {
+        if (m_pOnOpenShow)
+            m_pOnOpenShow->Hide(false);
+        if (m_pOnOpenHide)
+            m_pOnOpenHide->Hide(true);
+    } 
+
+    m_bIsOpen = !m_bIsOpen;
+    oTemp = m_oPos;
+    m_oPos = m_oTogglePos;
+    m_oTogglePos = oTemp;
+}
+
+void Panel::ShowAllControls(void)
+{
+    ControlMapIterator i;
+
+    for (i = m_oControlMap.begin(); i != m_oControlMap.end(); i++)
+    {
+         i->second->Init();
+         i->second->AcceptTransition(m_bIsHidden ? CT_Hide : CT_Show);
+    }        
 }

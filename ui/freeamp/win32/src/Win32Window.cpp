@@ -410,13 +410,13 @@ Error Win32Window::Run(Pos &oPos)
         if (m_bStayOnTop)
             SetWindowPos(m_hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
         
-        CreateTooltips();
         UpdateWindow( m_hWnd );
 
         m_pTheme->PostWindowCreate();
 
         SetForegroundWindow(m_hWnd);
         AddToSystemMenu(m_hWnd);
+        CreateTooltips();
 
         while( GetMessage( &msg, NULL, 0, 0 ) )
         {
@@ -729,6 +729,8 @@ void
 Win32Window::
 Notify(int32 command, LPNMHDR notifyMsgHdr)
 {
+    vector<pair<Rect, string> > oList;
+
     if (m_bMindMeldInProgress)
        return;
        
@@ -743,7 +745,8 @@ Notify(int32 command, LPNMHDR notifyMsgHdr)
         // and feed it's tip
         //
 
-        m_oControls[idCtrl]->GetTip(strTip);
+        GetControlToolTips(oList);
+        strTip = oList[idCtrl].second;
         if(strTip.length())
         {
             if(strTip.length()>79)
@@ -762,13 +765,14 @@ void
 Win32Window::
 CreateTooltips()
 {
+    vector<pair<Rect, string> > oList;
+
     // tooltip support
     static HWND hwndTooltip = NULL;
         static uint32 uTooltipCount = 0;
     HINSTANCE hinst = (HINSTANCE)GetWindowLong( m_hWnd, 
                                                 GWL_HINSTANCE);
     TOOLINFO ti;
-    vector<Control *>::iterator i;
     uint32 uCtr;
 
     //
@@ -814,14 +818,16 @@ CreateTooltips()
     //
     // now go adding tooltip regions
     //
-    uCtr=0;
-    for(i = m_oControls.begin(); i != m_oControls.end(); i++)
+    GetControlToolTips(oList);
+    for(uCtr = 0; uCtr < oList.size(); uCtr++)
     {
         Rect rect;
         string strTip;
 
-        (*i)->GetTip(strTip);
-        (*i)->GetRect(rect);
+        strTip = oList[uCtr].second;
+        rect = oList[uCtr].first;
+        if (strTip.length() == 0)
+            continue;
 
         // add a tool tip
 
@@ -837,11 +843,9 @@ CreateTooltips()
         ti.rect.bottom = rect.y2; 
 
         SendMessage(hwndTooltip, 
-            TTM_ADDTOOL, 
+            TTM_ADDTOOL,          
             0, 
             (LPARAM) &ti);
-
-        uCtr++;
     }
         
     uTooltipCount = uCtr; // save value for next mindmeld
@@ -1062,9 +1066,11 @@ void Win32Window::Create256ColorPalette(BYTE pColorMap[236][3],
 
 void Win32Window::PanelStateChanged(void)
 {
-    Rect   oRect;
+    Rect   oRect, oWindowRect;
     RECT   sRect;
-	HRGN   hRgn;
+    HRGN   hRgn;
+
+    GetCanvas()->SetNoScreenUpdate(true);
  
     Window::PanelStateChanged();
 
@@ -1073,12 +1079,19 @@ void Win32Window::PanelStateChanged(void)
     if (hRgn)
         SetWindowRgn(m_hWnd, hRgn, true);
 
+    GetWindowPosition(oWindowRect);
+    m_pCanvas->GetBackgroundRect(oRect);
+    oWindowRect.x2 = oWindowRect.x1 + oRect.Width();
+    oWindowRect.y2 = oWindowRect.y1 + oRect.Height();
+    SetWindowPosition(oWindowRect);
 
     sRect.left = oRect.x1;
     sRect.right = oRect.x2;
     sRect.top = oRect.y1;
     sRect.bottom = oRect.y2;
 
-	InvalidateRect(m_hWnd, &sRect, true);
-	UpdateWindow(m_hWnd);
+    InvalidateRect(m_hWnd, &sRect, true);
+    GetCanvas()->SetNoScreenUpdate(false);
+    UpdateWindow(m_hWnd);
+    CreateTooltips();
 }

@@ -41,7 +41,7 @@ enum AlignEnum
 
 // This class must keep an internal bitmap of the current display image
 // and then paint from that image in response to paint events.
-struct Panel;
+class Panel;
 class Canvas
 {
     public:
@@ -55,6 +55,8 @@ class Canvas
      void SetMaskBitmap(Bitmap *pBitmap);
      Bitmap *GetBackgroundBitmap(void);
      virtual void InitBackgrounds(vector<Panel *> *pPanels);
+     void SetNoScreenUpdate(bool bUpdate) { m_bNoScreenUpdate = bUpdate; };
+     bool GetNoScreenUpdate(void) { return m_bNoScreenUpdate; };
 
      virtual void  Init(void) = 0;
      virtual void  Erase(Rect &oPaintRect) = 0;
@@ -73,9 +75,10 @@ class Canvas
 
     protected:
 
-     Bitmap *m_pBGBitmap, *m_pMaskBitmap, *m_pCompleteBGBitmap;
+     Bitmap *m_pBGBitmap, *m_pMaskBitmap;
      Rect    m_oBGRect;
      string  m_oDefaultFont;
+     bool    m_bDeleteBitmap, m_bNoScreenUpdate;
 };
 
 #endif

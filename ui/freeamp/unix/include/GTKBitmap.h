@@ -43,7 +43,7 @@ class GTKBitmap : public Bitmap
     public:
 
               GTKBitmap(string &oName);
-	      GTKBitmap(int iWidth, int iHeight, string &oName);
+	      GTKBitmap(int iWidth, int iHeight, const string &oName);
      virtual ~GTKBitmap(void);
 
      virtual Error LoadBitmapFromDisk(string &oFile);
@@ -60,6 +60,8 @@ class GTKBitmap : public Bitmap
      GdkPixmap *GetBitmap() { return m_Bitmap; }
      GdkPixmap *GetMask() { return m_MaskBitmap; }
      void       SetMask(GdkPixmap *mask) { m_MaskBitmap = mask; }
+
+void BlitIt(int x, int y);
 
     protected:
      Error ReadleShort(FILE *file, gushort *ret);
