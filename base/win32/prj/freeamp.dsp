@@ -757,6 +757,61 @@ InputName=FreeAmp
 !ENDIF 
 
 # End Source File
+# Begin Source File
+
+SOURCE=..\..\..\themes\FreeAmpClassic.fat
+
+!IF  "$(CFG)" == "freeamp - Win32 Release"
+
+# Begin Custom Build
+InputPath=..\..\..\themes\FreeAmpClassic.fat
+InputName=FreeAmpClassic
+
+".\themes\$(InputName).fat" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST themes mkdir themes 
+	copy $(InputPath) themes 
+	
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
+
+# Begin Custom Build
+InputPath=..\..\..\themes\FreeAmpClassic.fat
+InputName=FreeAmpClassic
+
+".\themes\$(InputName).fat" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST themes mkdir themes 
+	copy $(InputPath) themes 
+	
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
+
+# Begin Custom Build
+InputPath=..\..\..\themes\FreeAmpClassic.fat
+InputName=FreeAmpClassic
+
+".\themes\$(InputName).fat" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST themes mkdir themes 
+	copy $(InputPath) themes 
+	
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
+
+# Begin Custom Build
+InputPath=..\..\..\themes\FreeAmpClassic.fat
+InputName=FreeAmpClassic
+
+".\themes\$(InputName).fat" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST themes mkdir themes 
+	copy $(InputPath) themes 
+	
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
 # End Group
 # Begin Group "includes"
 
