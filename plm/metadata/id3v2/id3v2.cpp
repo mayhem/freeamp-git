@@ -230,6 +230,7 @@ bool ID3v2::ReadMetaData(const char* url, MetaData* metadata)
     pTag = ID3Tag_New();
     ID3Tag_Link(pTag, path);
 
+ /*
     if (!ID3Tag_HasTagType(pTag, ID3TT_ID3V1) &&
         !ID3Tag_HasTagType(pTag, ID3TT_ID3V2) &&
         !ID3Tag_HasTagType(pTag, ID3TT_MUSICMATCH))
@@ -237,6 +238,7 @@ bool ID3v2::ReadMetaData(const char* url, MetaData* metadata)
         ID3Tag_Delete(pTag);
         return false;
     }
+*/
 
     pData = new char[iDataFieldLen];
 
