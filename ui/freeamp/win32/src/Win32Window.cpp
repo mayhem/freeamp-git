@@ -343,6 +343,8 @@ Error Win32Window::Run(Pos &oPos)
 
         m_pTheme->PostWindowCreate();
 
+        SetForegroundWindow(m_hWnd);
+
         while( GetMessage( &msg, NULL, 0, 0 ) )
         {
             TranslateMessage( &msg );
