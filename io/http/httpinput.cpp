@@ -532,22 +532,25 @@ Error HttpInput::Open(void)
 
 #ifndef WIN32
         int error = errno;
-#else
-		int error = WSAGetLastError();
 
-		if (error != WSAEINPROGRESS)
+	if (error != EINPROGRESS)
+#else
+	int error = WSAGetLastError();
+
+	if (error != WSAEINPROGRESS)
 #endif
-		{
-	        ReportError("Cannot connect to host: %s", szHostName);
-	        closesocket(m_hHandle);
-	        return (Error)httpError_CannotConnect;
-		}
+	{
+	    ReportError("Cannot connect to host: %s", szHostName);
+	    closesocket(m_hHandle);
+	    return (Error)httpError_CannotConnect;
+	}	
 
         int conattempt = 0;
         for(; iConnect && !m_bExit;)
         {
 	    if (conattempt > 50)
 	    {
+	    cout << "timed out\n";
 	       ReportError("Host not answering: %s", szHostName);
 	       closesocket(m_hHandle);
 	       return (Error)httpError_CannotConnect;
