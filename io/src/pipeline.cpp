@@ -112,7 +112,7 @@ void PipelineUnit::ReportError(const char * format, ...)
     va_end(argptr);
 
     m_pTarget->AcceptEvent(new ErrorMessageEvent(szBuffer));
-    m_pTarget->AcceptEvent(new Event(INFO_DoneOutputting));
+    m_pTarget->AcceptEvent(new Event(INFO_DoneOutputtingDueToError));
 }   
 
 void PipelineUnit::ReportStatus(const char * format, ...)

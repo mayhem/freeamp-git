@@ -58,7 +58,7 @@ public:
 	void          WorkerThread(void); 
     virtual Error Reset(bool user_stop);
     void          HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent);
-    WAVEHDR      *NextHeader();
+    WAVEHDR      *NextHeader(bool bFreeHeadersOnly = false);
     Error         FreeHeader();
     Error         AllocHeader(void *&pBuffer);
     Error         Write(void *pBuffer);

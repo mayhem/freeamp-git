@@ -303,7 +303,7 @@ Error HttpInput::Open(void)
         if (iRet < 1)
         {
            ReportError("Bad Proxy URL format. URL format: http:"
-                       "<host name>:[port]. Please check your proxy settings "
+                       "//<host name>:[port]. Please check your proxy settings "
                        "in the Options.");
            return (Error)httpError_BadUrl;
         }

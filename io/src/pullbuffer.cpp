@@ -326,8 +326,7 @@ Error PullBuffer::BeginRead(void *&pBuffer, size_t iBytesNeeded)
 {
    assert(m_pPullBuffer != NULL);
    assert(m_iBytesToRead == 0);
-   assert(iBytesNeeded <= m_iBufferSize);
-
+   
    Error  eError = kError_UnknownErr;
    int    iOverflow;
    size_t iAvail = 0;

@@ -1327,7 +1327,19 @@ DoneOutputting(Event *pEvent)
 
    SEND_NORMAL_EVENT(INFO_DoneOutputting);
 
-   if (m_plm->HasAnotherItem())
+   if (pEvent->Type() == INFO_DoneOutputtingDueToError &&
+       (m_plm->GetRepeatMode() == kPlaylistMode_RepeatOne || 
+        (m_plm->GetRepeatMode() == kPlaylistMode_RepeatAll && 
+         m_plm->CountItems() == 1))) 
+   {
+      m_plm->SetCurrentIndex(0);
+      SEND_NORMAL_EVENT(INFO_PlaylistDonePlay);
+      delete pEvent;
+      
+      return;
+   }
+
+   if (m_plm->HasAnotherItem()) 
    {
       //AcceptEvent(new Event(CMD_NextMediaPiece));
       m_plm->GotoNextItem(false);
@@ -1346,7 +1358,6 @@ DoneOutputting(Event *pEvent)
       m_plm->SetCurrentIndex(0);
       SEND_NORMAL_EVENT(INFO_PlaylistDonePlay);
    }
-   
    delete pEvent;
 }
 
@@ -1752,6 +1763,7 @@ ServiceEvent(Event * pC)
     //printf("Got event %d\n", pC->Type());
     switch (pC->Type())
     {
+        case INFO_DoneOutputtingDueToError:
         case INFO_DoneOutputting:
             DoneOutputting(pC);
             break;

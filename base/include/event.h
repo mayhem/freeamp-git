@@ -140,5 +140,6 @@ class EventQueue {
 #define INFO_MusicCatalogStreamRemoved 75 // sent by the MC when a stream is removed
 
 #define INFO_PlaylistItemsAdded 76 // sent by PLM to player to inform of a playlistitem update
+#define INFO_DoneOutputtingDueToError 77 // sent by PMO (or LMC controlling PMO) to Player when its done outputing but an error occurred
 #endif // _EVENT_H_
 

@@ -400,7 +400,7 @@ Error SoundCardPMO::FreeHeader()
     return kError_NoErr;
 }
 
-WAVEHDR *SoundCardPMO::NextHeader()
+WAVEHDR *SoundCardPMO::NextHeader(bool bFreeHeadersOnly)
 {
    WAVEHDR  *result = NULL;
    unsigned  iLoop;
@@ -428,7 +428,7 @@ WAVEHDR *SoundCardPMO::NextHeader()
               m_wavehdr_array[iLoop]->dwUser = 0;
               m_iTail++;
           }
-          if (!m_wavehdr_array[iLoop]->dwUser)
+          if (!bFreeHeadersOnly && !m_wavehdr_array[iLoop]->dwUser)
           {
              result = m_wavehdr_array[iLoop];
              result->dwUser = ++m_iHead;
@@ -439,6 +439,9 @@ WAVEHDR *SoundCardPMO::NextHeader()
           }
        }
        g_pHeaderMutex->Release();
+
+       if (bFreeHeadersOnly)
+           return NULL;
 
        usleep(10000);
    }
@@ -515,6 +518,11 @@ void SoundCardPMO::WorkerThread(void)
           if (eErr == kError_NoDataAvail)
           {
               m_pLmc->Wake();
+
+              // Calling NextHeader with a true arguments just  
+              // cleans up the pending headers so the bytes in use
+              // value is correct.
+              NextHeader(true);
     
               WasteTime();
               continue;
