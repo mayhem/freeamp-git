@@ -333,6 +333,7 @@ class GTKMusicBrowser {
 
     void CreateTreePopups(void);
     void EjectCD(void);
+    void UpdateCD(void);
 
     void AddStreamToFavs(void);
     void AddPLStreamToFavs(void);

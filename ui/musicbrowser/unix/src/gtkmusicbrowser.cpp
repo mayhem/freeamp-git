@@ -433,6 +433,11 @@ void GTKMusicBrowser::AddNewStream(void)
     m_context->catalog->AddStream(newitem->URL().c_str());
 }
 
+void GTKMusicBrowser::UpdateCD(void)
+{
+    m_context->player->UpdateCDNow();
+}
+
 void GTKMusicBrowser::EjectCD(void)
 {
     Registry *pmoRegistry = m_context->player->GetPMORegistry();

@@ -1541,6 +1541,11 @@ static void edit_info_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
     p->PopUpInfoEditor();
 }
 
+static void update_cd_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+    p->UpdateCD();
+}
+
 void GTKMusicBrowser::CreateTreePopups(void)
 {
     GtkItemFactoryEntry relatable_items[] = {
@@ -1591,7 +1596,9 @@ void GTKMusicBrowser::CreateTreePopups(void)
      {"/Add to Playlist",NULL,  (void(*)(...))add_pop,  0, 0 },
      {"/Add and Play Now",NULL, (void(*)(...))add_play_pop,   0, 0 },
      {"/sep1",         NULL,    0,                        0, "<Separator>" },
-     {"/Eject CD",     NULL,    (void(*)(...))eject_cd_pop,0, 0 }
+     {"/Eject CD",     NULL,    (void(*)(...))eject_cd_pop,0, 0 },
+     {"/sep2",         NULL,    0,                        0, "<Separator>" },
+     {"/Update CD Info", NULL,  (void(*)(...))update_cd_pop, 0, 0 }
     };
     int ncd_items = sizeof(cd_items) / sizeof(cd_items[0]);
 

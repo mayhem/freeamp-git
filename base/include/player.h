@@ -99,6 +99,8 @@ class Player : public EventQueue, Properties, PropertyWatcher
 
     PlayerState  State() const { return m_playerState; }
 
+    void UpdateCDNow();
+    
  protected:
               Player(FAContext *context);
     void      GetUIManipLock();
@@ -150,6 +152,7 @@ class Player : public EventQueue, Properties, PropertyWatcher
     void HandleAudioSigGenerated(Event *pEvent);
     void HandleAudioSigFailed(Event *pEvent);
     void KillSigThread(Event *pEvent);
+    void HandlePrefsChanged(Event *pEvent);
     
     #define _EQUALIZER_ENABLE_
     #ifdef  _EQUALIZER_ENABLE_
@@ -219,6 +222,7 @@ class Player : public EventQueue, Properties, PropertyWatcher
     APSInterface *m_APSInterface;
 
     TimerRef m_cdTimer;
+    bool     m_cdTimerActive;
     TimerRef m_syncTimer;
     float    m_eqValues[32], m_eqPreamp;
     bool     m_eqEnabled;
