@@ -62,8 +62,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                     ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
-                    ..\..\..\..\base\win32\prj\plugins
+                                      ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
+                     ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
@@ -95,8 +95,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                     ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
-                    ..\..\..\..\base\win32\prj\plugins
+                                      ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
+                     ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Debug"
@@ -130,8 +130,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                     ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
-                    ..\..\..\..\base\win32\prj\plugins
+                                      ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
+                     ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Release"
@@ -163,8 +163,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                     ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
-                    ..\..\..\..\base\win32\prj\plugins
+                                      ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
+                     ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
@@ -283,6 +283,10 @@ SOURCE=..\src\prefdialog.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\..\base\src\preferences.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\base\src\registrar.cpp
 # End Source File
 # Begin Source File
@@ -340,6 +344,10 @@ SOURCE=..\src\view.cpp
 # Begin Source File
 
 SOURCE=..\src\volumeview.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\win32\src\win32prefs.cpp
 # End Source File
 # Begin Source File
 
@@ -646,13 +654,5 @@ SOURCE=..\res\title_background.bmp
 SOURCE=..\res\window_mask_mid.bmp
 # End Source File
 # End Group
-# Begin Source File
-
-SOURCE=..\..\..\..\base\src\preferences.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\base\win32\src\win32prefs.cpp
-# End Source File
 # End Target
 # End Project
