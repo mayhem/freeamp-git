@@ -429,7 +429,6 @@ Run()
    uint32    len = 256;
    Error     error = kError_NoErr;
    int32     uisActivated = 0;
-   PropValue *pProp; 
    bool      bValue;
 
    prefs = new Preferences;
@@ -450,7 +449,7 @@ Run()
    if (bValue)
       g_Log->AddLogLevel(LogDecode);
    
-   prefs->GetLogPerf(&bValue);
+   prefs->GetLogPerformance(&bValue);
    if (bValue)
       g_Log->AddLogLevel(LogPerf);
    
