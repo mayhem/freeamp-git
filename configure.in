@@ -75,25 +75,48 @@ dnl *****
 
 AC_MSG_CHECKING(for MIT PThreads)
 AC_EGREP_HEADER(PTHREAD_MUTEXTYPE_FAST,
-pthread.h,AC_DEFINE(HAVE_MITPTHREADS) AC_MSG_RESULT(yes), 
+pthread.h,AC_DEFINE(HAVE_MITPTHREADS) AC_MSG_RESULT(yes)
+mitpth="true", 
 AC_MSG_RESULT(no)
-mitpth="true"
 )
 
 AC_MSG_CHECKING(for Base LinuxThreads)
 AC_EGREP_HEADER(PTHREAD_MUTEX_FAST_NP,pthread.h, AC_DEFINE(HAVE_BASELINUXTHREADS) 
-hblt=true
+hblt="true"
+ltr="true"
 AC_MSG_RESULT(yes), 
 AC_MSG_RESULT(no)
-ltr="true"
 )
 
 AC_MSG_CHECKING(for LinuxThreads w/ErrorCheck Mutex)
 AC_EGREP_HEADER(PTHREAD_MUTEX_ERRORCHECK_NP,pthread.h,AC_DEFINE(HAVE_ENHLINUXTHREADS)
+ltr="true"
 AC_MSG_RESULT(yes), 
 AC_MSG_RESULT(no)
-ltr="true"
 )
+
+if test "$mitpth" = "false"; then
+    if test "$ltr" = "false"; then
+	AC_MSG_CHECKING(for broken Slackware MIT PThreads header (Obj C stub) and implementation)
+	AC_TRY_RUN([
+	    #define _MIT_POSIX_THREADS
+	    #include <pthread.h>
+	    int main(int argc,char**argv) {
+		int foo;
+                foo = 5 + PTHREAD_MUTEXTYPE_DEBUG;
+		return 0;
+            }
+	    ],
+	    AC_DEFINE(HAVE_BROKENMITPTHREADS)
+	    AC_DEFINE(HAVE_MITPTHREADS)
+	    mitpth="true"
+	    AC_MSG_RESULT(yes),
+	    AC_MSG_RESULT(no),
+	    AC_MSG_RESULT(assuming no)
+	)
+    fi
+fi
+
 
 if test "$mitpth" = "false"; then
    if test "$ltr" = "false"; then

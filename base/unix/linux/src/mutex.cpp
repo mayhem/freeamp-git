@@ -21,13 +21,11 @@
 	
 	$Id$
 ____________________________________________________________________________*/
-
+#include "config.h"
 
 #include <string.h>
 #include <pthread.h>
 #include <iostream.h>
-
-#include "config.h"
 
 #if HAVE_BASELINUXTHREADS
 #if HAVE_ENHLINUXTHREADS

@@ -1756,10 +1756,10 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 #define HAVE_MITPTHREADS 1
 EOF
  echo "$ac_t""yes" 1>&6
+mitpth="true"
 else
   rm -rf conftest*
   echo "$ac_t""no" 1>&6
-mitpth="true"
 
 fi
 rm -f conftest*
@@ -1779,12 +1779,12 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 #define HAVE_BASELINUXTHREADS 1
 EOF
  
-hblt=true
+hblt="true"
+ltr="true"
 echo "$ac_t""yes" 1>&6
 else
   rm -rf conftest*
   echo "$ac_t""no" 1>&6
-ltr="true"
 
 fi
 rm -f conftest*
@@ -1804,14 +1804,60 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 #define HAVE_ENHLINUXTHREADS 1
 EOF
 
+ltr="true"
 echo "$ac_t""yes" 1>&6
 else
   rm -rf conftest*
   echo "$ac_t""no" 1>&6
-ltr="true"
 
 fi
 rm -f conftest*
+
+
+if test "$mitpth" = "false"; then
+    if test "$ltr" = "false"; then
+	echo $ac_n "checking for broken Slackware MIT PThreads header (Obj C stub) and implementation""... $ac_c" 1>&6
+echo "configure:1821: checking for broken Slackware MIT PThreads header (Obj C stub) and implementation" >&5
+	if test "$cross_compiling" = yes; then
+  echo "$ac_t""assuming no" 1>&6
+	
+else
+  cat > conftest.$ac_ext <<EOF
+#line 1827 "configure"
+#include "confdefs.h"
+
+	    #define _MIT_POSIX_THREADS
+	    #include <pthread.h>
+	    int main(int argc,char**argv) {
+		int foo;
+                foo = 5 + PTHREAD_MUTEXTYPE_DEBUG;
+		return 0;
+            }
+	    
+EOF
+if { (eval echo configure:1839: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest && (./conftest; exit) 2>/dev/null
+then
+  cat >> confdefs.h <<\EOF
+#define HAVE_BROKENMITPTHREADS 1
+EOF
+
+	    cat >> confdefs.h <<\EOF
+#define HAVE_MITPTHREADS 1
+EOF
+
+	    mitpth="true"
+	    echo "$ac_t""yes" 1>&6
+else
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
+  rm -fr conftest*
+  echo "$ac_t""no" 1>&6
+fi
+rm -fr conftest*
+fi
+
+    fi
+fi
 
 
 if test "$mitpth" = "false"; then
