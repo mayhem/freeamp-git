@@ -61,7 +61,7 @@ gtk="true"
 dnl ****
 dnl Check for GTK+
 dnl ****
-AM_PATH_GTK(1.1.2	, echo "             GTK+ compilation enabled", 
+AM_PATH_GTK(1.0.6	, echo "             GTK+ compilation enabled", 
 dnl                   AC_MSG_ERROR(GTK+ distribution not found.)
 gtk="false"
 echo GTK+ compilation disabled

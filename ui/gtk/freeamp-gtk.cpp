@@ -223,17 +223,17 @@ int32 GtkUI::AcceptEvent(Event *e) {
 		    gtk_label_set(GTK_LABEL(p_titleField), pmvi->m_songTitle);
 		    //cout << "set label..." << endl;
 		    //g_print("set label...\n");
-		    //while (gtk_events_pending())
-		    //gtk_main_iteration(); // redraw
+		    while (gtk_events_pending())
+			gtk_main_iteration(); // redraw
 		    //cout << "tried to redraw" << endl;
 		    //g_print("tried to redraw\n");
-		    if (pmvi->m_tagInfo.m_containsInfo) {
-			cout << "Title  : " << pmvi->m_tagInfo.m_songName << endl;
-			cout << "Artist : " << pmvi->m_tagInfo.m_artist << endl;
-			cout << "Album  : " << pmvi->m_tagInfo.m_album << endl;
-			cout << "Year   : " << pmvi->m_tagInfo.m_year << endl;
-			cout << "Comment: " << pmvi->m_tagInfo.m_comment << endl;
-		    }
+		    //if (pmvi->m_tagInfo.m_containsInfo) {
+		    //cout << "Title  : " << pmvi->m_tagInfo.m_songName << endl;
+		    //cout << "Artist : " << pmvi->m_tagInfo.m_artist << endl;
+		    //cout << "Album  : " << pmvi->m_tagInfo.m_album << endl;
+		    //cout << "Year   : " << pmvi->m_tagInfo.m_year << endl;
+		    //cout << "Comment: " << pmvi->m_tagInfo.m_comment << endl;
+		    //}
 		}
 		break; }
 	    default:
