@@ -1753,7 +1753,7 @@ CreatePMO(const PlaylistItem * pc, Event * pC)
    {
       AcceptEvent(new MissingFileEvent((PlaylistItem *)
                                        m_plm->GetCurrentItem()));
-      m_plm->GotoNextItem();
+      //m_plm->GotoNextItem();
       AcceptEvent(new Event(CMD_Play));
       goto epilogue;
    }
@@ -1775,6 +1775,7 @@ CreatePMO(const PlaylistItem * pc, Event * pC)
 
    if (pmo)
    {
+       m_pmo = NULL;
        delete pmo;
    }
 
@@ -1785,6 +1786,7 @@ CreatePMO(const PlaylistItem * pc, Event * pC)
 
    if (lmc)
    {
+       m_lmc = NULL;
        delete lmc;
    }
 }
@@ -2246,7 +2248,7 @@ SetEQData(Event *pEvent)
    else
        m_eqEnabled = ((SetEqualizerDataEvent *) pEvent)->GetEnableState();
 
-   if (m_lmc)
+   if (m_lmc && m_pmo)
    {
        if (((SetEqualizerDataEvent *) pEvent)->IsEQData())
        {

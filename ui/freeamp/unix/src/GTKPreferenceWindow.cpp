@@ -1874,7 +1874,15 @@ void GTKPreferenceWindow::AddProfileEvent(void)
             delete profiles;
 
         if (aps->CreateProfile(name) != APS_NOERROR) 
+        {
+            MessageDialog oBox(GetContext());
+            oBox.Show("For some reason, the Relatable server could not be "
+                      "contacted to create a new profile.  Perhaps you need "
+                      "to set up a Proxy Server on the 'Streaming' pane?",
+                      "Create Profile Error", kMessageOk, true);
+
             return;
+        }
     }
     UpdateProfileList();
 

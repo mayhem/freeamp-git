@@ -3012,7 +3012,7 @@ EOF
 EOF
 
     LDFLAGS="$LDFLAGS -Wl,-export-dynamic"
-    CFLAGS="-fno-exceptions -fno-rtti"
+    CFLAGS="$CFLAGS -O0 -g3"
     ;;
   *qnx*)
     host_os="qnx"
@@ -4160,9 +4160,9 @@ if test "$curses" != ""; then
 	
 fi
 
-echo $ac_n "checking for ID3Tag_Link in -lid3""... $ac_c" 1>&6
-echo "configure:4165: checking for ID3Tag_Link in -lid3" >&5
-ac_lib_var=`echo id3'_'ID3Tag_Link | sed 'y%./+-%__p_%'`
+echo $ac_n "checking for ID3Tag_HasTagType in -lid3""... $ac_c" 1>&6
+echo "configure:4165: checking for ID3Tag_HasTagType in -lid3" >&5
+ac_lib_var=`echo id3'_'ID3Tag_HasTagType | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -4174,10 +4174,10 @@ cat > conftest.$ac_ext <<EOF
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
     builtin and then its argument prototype would still apply.  */
-char ID3Tag_Link();
+char ID3Tag_HasTagType();
 
 int main() {
-ID3Tag_Link()
+ID3Tag_HasTagType()
 ; return 0; }
 EOF
 if { (eval echo configure:4184: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
@@ -4205,7 +4205,7 @@ EOF
 else
   echo "$ac_t""no" 1>&6
  echo ""
-	  echo "id3lib not found. id3 support will be read-only."
+     echo "id3lib not found. id3 support will be read-only."
      echo "For full ID3v2 support download and install the id3lib from"
      echo "    http://id3lib.sourceforge.net/"
      echo ""

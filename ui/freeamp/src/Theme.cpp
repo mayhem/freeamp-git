@@ -519,7 +519,6 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
        {
            string oBitmapErr;
 
-DB
            pBitmap->GetErrorString(oBitmapErr);
            m_oLastError = string("Cannot load bitmap ") +
                           oAttrMap["File"] + string(": ") + oBitmapErr;

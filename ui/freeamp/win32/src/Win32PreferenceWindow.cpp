@@ -1965,21 +1965,28 @@ bool Win32PreferenceWindow::PrefProfileProc(HWND hwnd,
                         APSInterface *pAPS = m_pContext->aps;
                         if (pAPS)
                         {
-							vector<string> *profiles = pAPS->GetKnownProfiles();
+                            vector<string> *profiles = pAPS->GetKnownProfiles();
 
                             int nRes = pAPS->CreateProfile(szCurSel);
-                            SendDlgItemMessage(hwnd, IDC_PROFILE_LIST,
-                                               LB_ADDSTRING, NULL, 
-                                               (LPARAM)(LPCTSTR)szCurSel);
-                            SendDlgItemMessage(hwnd, IDC_PROFILE_LIST,
-                                               LB_SELECTSTRING, -1,
-                                               (LPARAM)(LPCTSTR)szCurSel);
+                            if (nRes != APS_NOERROR)
+                            {
+                                SendDlgItemMessage(hwnd, IDC_PROFILE_LIST,
+                                                   LB_ADDSTRING, NULL, 
+                                                   (LPARAM)(LPCTSTR)szCurSel);
+                                SendDlgItemMessage(hwnd, IDC_PROFILE_LIST,
+                                                   LB_SELECTSTRING, -1,
+                                                   (LPARAM)(LPCTSTR)szCurSel);
 
-							if (!profiles || profiles->size() == 0)
-								m_pContext->target->AcceptEvent(new Event(INFO_UnsignaturedTracksExist));
+  			       if (!profiles || profiles->size() == 0)
+                                   m_pContext->target->AcceptEvent(new Event(INFO_UnsignaturedTracksExist));
+                            }
+                            else 
+                            {
+                                MessageBox(hwnd, "For some reason, the Relatable server could not be contacted to create a new profile.  Perhaps you need to set up a Proxy Server on the 'Streaming' pane?", "Create Profile Error", MB_OK|MB_SETFOREGROUND);
+                            }
 
-							if (profiles)
-								delete profiles;
+                            if (profiles)
+                                delete profiles;
                         }
                     }
                     break;

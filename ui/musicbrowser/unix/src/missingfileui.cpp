@@ -135,7 +135,7 @@ void MissingFileUI::Run(void)
 
     m_entryText = "";
     GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_modal(GTK_WINDOW(window), TRUE);
+    //gtk_window_set_modal(GTK_WINDOW(window), TRUE);
     gtk_signal_connect(GTK_OBJECT(window), "destroy",
                        GTK_SIGNAL_FUNC(missing_destroy), NULL);
     gtk_signal_connect(GTK_OBJECT(window), "delete_event",
@@ -277,6 +277,9 @@ void MissingFileUI::Run(void)
               
             delete mf;
             break; }
-        default: m_context->plm->RemoveItem(m_missing);
+        default: {
+            m_context->plm->RemoveItem(m_missing);
+            break;
+        }
     }
 }

@@ -210,6 +210,7 @@ class GTKMusicBrowser {
     GtkWidget *toolUp;
     GtkWidget *toolDown;
     GtkWidget *toolbar;
+    GtkWidget *playlistLabel;
 
     GtkItemFactory *menuFactory;
     GtkItemFactory *playlistPopup;
