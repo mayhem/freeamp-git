@@ -672,7 +672,7 @@ void MusicBrowserUI::SizeWindow(int iType, int iWidth, int iHeight)
 
 #endif
 
-    GetClientRect(m_hPlaylistView, &newListViewRect);
+    /*GetClientRect(m_hPlaylistView, &newListViewRect);
     
     headerResizeAmount = (newListViewRect.right - newListViewRect.left) - 
                          (oldListViewRect.right - oldListViewRect.left);
@@ -699,6 +699,10 @@ void MusicBrowserUI::SizeWindow(int iType, int iWidth, int iHeight)
     
     if(titleExtraAmount)
     {
+        char buf[256];
+        wsprintf(buf, "%d ",titleExtraAmount);
+        OutputDebugString(buf);
+
         static uint32 lastColumn = 1;
 
         while(titleExtraAmount)
@@ -721,7 +725,7 @@ void MusicBrowserUI::SizeWindow(int iType, int iWidth, int iHeight)
             if(++lastColumn > 3)
                 lastColumn = 1;
         }
-    }
+    }*/
 }
 
 void MusicBrowserUI::GetMinMaxInfo(MINMAXINFO *pInfo)
