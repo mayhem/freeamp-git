@@ -347,6 +347,7 @@ class MusicBrowserUI : public UserInterface
 
     void AskSignatureDialog();
     void AskOptIn();
+    void StillNeedSignature();
     void HandleSignature();
 
     // Functions in EditTrackInfoDialog.cpp

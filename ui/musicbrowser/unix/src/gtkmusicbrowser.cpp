@@ -97,6 +97,25 @@ void GTKMusicBrowser::AskOptIn(bool inMain)
     delete dialog;
 }
 
+void GTKMusicBrowser::StillNeedSignature(bool inMain)
+{
+    GTKMessageDialog *dialog = new GTKMessageDialog();
+    string caption = "Relatable Not Enabled";
+    string message;
+
+    char numtracks[10];
+    sprintf(numtracks, "%d", m_context->catalog->GetNumNeedingSigs());
+
+    if (!m_sigsStart)
+        message = string("Before using any of the Relatable features, all tracks in your music collection need to be signatured.  "The_BRANDING" is currently in the process of generating the signatures, but there are still ") + string(numtracks) + string(" left to go.  NOTE: Signaturing will currently not take place while songs are being played.");
+    else
+        message = "Before using any of the Relatable features, all tracks in your music collection need to be signatured.  Please click on 'Start Signaturing' in the Relatable menu.  NOTE: Signaturing will currently not take place while songs are being played.";
+
+    dialog->Show(message.c_str(), caption.c_str(), kMessageOk, inMain);
+
+    delete dialog;
+}
+
 void GTKMusicBrowser::SubmitPlaylist(void)
 {
     APSInterface *pInterface = m_context->aps;
@@ -105,6 +124,11 @@ void GTKMusicBrowser::SubmitPlaylist(void)
  
     if (!pInterface->IsTurnedOn()) {
         AskOptIn();
+        return;
+    }
+
+    if (m_context->catalog->GetNumNeedingSigs() > 0) {
+        StillNeedSignature();
         return;
     }
 
@@ -151,6 +175,11 @@ void GTKMusicBrowser::GenPlaylist(void)
         return;
     }
 
+    if (m_context->catalog->GetNumNeedingSigs() > 0) {
+        StillNeedSignature();
+        return;
+    }
+
     vector<PlaylistItem *> *items;  
 
     if (GetClickState() == kContextPlaylist) {
@@ -183,11 +212,13 @@ void GTKMusicBrowser::GenPlaylist(vector<PlaylistItem *> *seed)
         return;
     }
 
+    if (m_context->catalog->GetNumNeedingSigs() > 0) {
+        StillNeedSignature(false);
+        return;
+    }
+
     APSPlaylist ResultPlaylist;
     uint32 nResponse = 0;
-
-    if (!m_context->aps)
-        return;
 
     if ((seed) && (!seed->empty())) {
         APSPlaylist InputPlaylist;

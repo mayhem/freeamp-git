@@ -275,7 +275,8 @@ class GTKMusicBrowser {
   
     void AskSignatureDialog(void);  
     void AskOptIn(bool inMain = true);
-
+    void StillNeedSignature(bool inMain = true);
+    
   public:
 
     vector<PlaylistItem *> *GetTreeSelection(void);

@@ -104,6 +104,22 @@ void MusicBrowserUI::AskOptIn(void)
         m_context->target->AcceptEvent(new ShowPreferencesEvent(6));
 }
 
+void MusicBrowserUI::StillNeedSignature(void)
+{
+    string caption = "Relatable Not Enabled";
+    string message;
+
+    char numtracks[10];
+    sprintf(numtracks, "%d", m_context->catalog->GetNumNeedingSigs());
+
+    if (!m_sigsStart)
+        message = string("Before using any of the Relatable features, all tracks in your music collection need to be signatured.  "The_BRANDING" is currently in the process of generating the signatures, but there are still ") + string(numtracks) + string(" left to go.  NOTE: Signaturing will currently not take place while songs are being played.");
+    else
+        message = "Before using any of the Relatable features, all tracks in your music collection need to be signatured.  Please click on 'Start Signaturing' in the Relatable menu.  NOTE: Signaturing will currently not take place while songs are being played.";
+
+    MessageBox(m_hWnd, message.c_str(), caption.c_str(), MB_OK|MB_ICONSTOP);
+}
+
 void MusicBrowserUI::SubmitPlaylistEvent(void)
 {
     APSInterface *pInterface = m_context->aps;
@@ -112,6 +128,11 @@ void MusicBrowserUI::SubmitPlaylistEvent(void)
 
     if (!pInterface->IsTurnedOn()) {
         AskOptIn();
+        return;
+    }
+
+    if (m_context->catalog->GetNumNeedingSigs() > 0) {
+        StillNeedSignature();
         return;
     }
 
@@ -165,6 +186,11 @@ void MusicBrowserUI::GenPlaylistEvent()
         return;
     }
 
+    if (m_context->catalog->GetNumNeedingSigs() > 0) {
+        StillNeedSignature();
+        return;
+    }
+
     vector<PlaylistItem*> items;
     GetSelectedMusicTreeItems(&items);
     if (items.empty())
@@ -182,6 +208,11 @@ void MusicBrowserUI::GenPlaylistEvent(vector<PlaylistItem*>* pSeed)
 
     if (!pInterface->IsTurnedOn()) {
         AskOptIn();
+        return;
+    }
+
+    if (m_context->catalog->GetNumNeedingSigs() > 0) {
+        StillNeedSignature();
         return;
     }
 

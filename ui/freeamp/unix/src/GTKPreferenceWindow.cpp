@@ -1796,6 +1796,9 @@ void GTKPreferenceWindow::AddProfileEvent(void)
         if (!profiles || profiles->size() == 0) 
             firstProfile = true;
 
+        if (profiles)
+            delete profiles;
+
         if (aps->CreateProfile(name) != APS_NOERROR) 
             return;
     }
