@@ -107,7 +107,7 @@ void ResolvePath(char** path)
         char* fullPath = new char[strlen(cwd) + strlen(*path) + 2];
         
         strcpy(fullPath, cwd);
-        strcat(fullPath, "\\");
+        strcat(fullPath, DIR_MARKER_STR);
         strcat(fullPath, *path);
 
         delete [] *path;

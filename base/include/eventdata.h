@@ -707,6 +707,25 @@ private:
     DownloadItem* m_item;
 };
 
+class LoadThemeEvent : public Event {
+public:
+    LoadThemeEvent(const char *url, const char *saved) 
+         { m_type = CMD_LoadTheme; 
+           m_url = strdup(url); 
+           m_saved = strdup(saved);
+         }
+	virtual ~LoadThemeEvent() 
+         { free((void *)m_url); }
+
+   const char *URL(void) { return m_url; };
+   const char *SavedTheme(void) { return m_saved; };
+
+private:
+
+   const char *m_url;
+   const char *m_saved;
+};
+
 class ShowPreferencesEvent:public Event
 {
  private:

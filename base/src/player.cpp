@@ -58,6 +58,7 @@ ____________________________________________________________________________*/
 Player   *Player::m_thePlayer = NULL;
 
 const char *szPlaylistExt = ".M3U";
+const char *themeExtension = "fat";
 
 #define SEND_NORMAL_EVENT(e) { Event *ev = new Event(e); GetUIManipLock();    \
                                SendToUI(ev); ReleaseUIManipLock(); delete ev; \
@@ -366,6 +367,7 @@ SetArgs(int32 argc, char **argv)
 
                         strcpy(cp, data.cFileName);
 
+
                         // make sure we have an absolute path
                         ResolvePath(&path);
 
@@ -375,6 +377,7 @@ SetArgs(int32 argc, char **argv)
 
                         // who needs to get this, plm or dlm?
                         bool giveToDLM = false;
+                        bool giveToTheme = false;
                         char* extension = NULL;
 
                         extension = strrchr(url, '.');
@@ -393,10 +396,28 @@ SetArgs(int32 argc, char **argv)
                                     break;
                                 }
                             }
+                            if (strcasecmp(extension, themeExtension) == 0)
+                                giveToTheme = true; 
                         }
+
 
                         if(giveToDLM)
                             m_dlm->ReadDownloadFile(url);
+                        else
+                        if(giveToTheme)
+                        {
+                            char szSavedTheme[MAX_PATH], szNewTheme[MAX_PATH];
+                            uint32 iLen = MAX_PATH;   
+
+                            m_context->prefs->GetPrefString(kThemePathPref, 
+                                 szSavedTheme, &iLen);
+                            iLen = MAX_PATH;   
+                            URLToFilePath(url, szNewTheme, &iLen); 
+                            m_context->prefs->setPrefString(kThemePathPref, 
+                               szNewTheme);
+
+                            AcceptEvent(new LoadThemeEvent(url, szSavedTheme));
+                        }
                         else
                             m_plm->AddItem(url); 
 
@@ -421,6 +442,7 @@ SetArgs(int32 argc, char **argv)
 
                 // who needs to get this, plm or dlm?
                 bool giveToDLM = false;
+                bool giveToTheme = false;
                 char* extension = NULL;
 
                 extension = strrchr(url, '.');
@@ -439,10 +461,26 @@ SetArgs(int32 argc, char **argv)
                             break;
                         }
                     }
+                    if (strcasecmp(extension, themeExtension) == 0)
+                        giveToTheme = true; 
                 }
 
                 if(giveToDLM)
                     m_dlm->ReadDownloadFile(url);
+                else
+                if(giveToTheme)
+                {
+                    char szSavedTheme[MAX_PATH], szNewTheme[MAX_PATH];
+                    uint32 iLen = MAX_PATH;   
+
+                    m_context->prefs->GetPrefString(kThemePathPref, 
+                                                    szSavedTheme, &iLen);
+                    iLen = MAX_PATH;   
+                    URLToFilePath(url, szNewTheme, &iLen); 
+                    m_context->prefs->SetPrefString(kThemePathPref, szNewTheme);
+
+                    AcceptEvent(new LoadThemeEvent(url, szSavedTheme));
+                }
                 else
                     m_plm->AddItem(url);
 #endif
@@ -1740,6 +1778,7 @@ ServiceEvent(Event * pC)
         case INFO_DownloadItemNewState:
         case INFO_DownloadItemProgress:
         case CMD_AddFiles:
+        case CMD_LoadTheme:
         case CMD_ShowPreferences:
             SendEventToUI(pC);
             break;

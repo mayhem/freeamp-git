@@ -64,6 +64,7 @@ const char *szCantFindHelpError = "Cannot find the help files. Please make "
                                   "sure that the help files are properly "
                                   "installed, and you are not running "
                                   BRANDING" from the build directory.";
+const char *szKeepThemeMessage = "Would you like to keep this theme?";
 const int iVolumeChangeIncrement = 10;
 
 extern    "C"
@@ -429,13 +430,49 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
          m_pContext->prefs->GetLiveInTray(&bValue);
          m_pWindow->SetLiveInToolbar(bValue);
          
-      	 break;
+      	break;
       }
       case CMD_ShowPreferences:
       {
-         ShowPreferencesEvent* prefsEvent = (ShowPreferencesEvent*)e;
-
+          ShowPreferencesEvent* prefsEvent = (ShowPreferencesEvent*)e;
       	 ShowOptions(prefsEvent->GetDefaultPage());
+      	 break;
+      }
+
+      case CMD_LoadTheme:
+      {
+          char          szSavedTheme[MAX_PATH], szNewTheme[MAX_PATH];
+          uint32        iLen = MAX_PATH;
+          string        oThemePath, oThemeFile("theme.xml");
+          MessageDialog oBox;
+	       string        oMessage(szKeepThemeMessage);
+
+          LoadThemeEvent *pInfo = (LoadThemeEvent *)e;
+          URLToFilePath(pInfo->URL(), szNewTheme, &iLen);
+
+          iLen = MAX_PATH;
+          m_pContext->prefs->GetPrefString(kThemePathPref, szSavedTheme, &iLen);
+
+          if (strcmp(szSavedTheme, szNewTheme))
+          {
+              m_pContext->prefs->SetPrefString(kThemePathPref, szNewTheme);
+              ReloadTheme();
+          }
+          else
+              strcpy(szSavedTheme, pInfo->SavedTheme());
+  
+          if (oBox.Show(oMessage.c_str(), string(BRANDING), kMessageYesNo) == 
+              kMessageReturnYes)
+          {
+              // Save the theme to the proper place and set the pref to
+              // point to the right place
+              printf("Accept %s\n", szNewTheme);
+          }
+          else
+          {
+              m_pContext->prefs->SetPrefString(kThemePathPref, szSavedTheme);
+              ReloadTheme();
+          }
       	 break;
       }
       
@@ -809,7 +846,7 @@ void FreeAmpTheme::ReloadTheme(void)
     if (IsError(eRet))					   
     {
         MessageDialog oBox;
-	    string        oErr, oMessage(szParseError);
+	     string        oErr, oMessage(szParseError);
   
         GetErrorString(oErr);
         oMessage += oErr;
