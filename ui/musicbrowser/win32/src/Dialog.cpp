@@ -288,7 +288,7 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
 					return 1;
 
 				case ID_RELATABLE_EDITPROFILE:
-                    m_context->target->AcceptEvent(new ShowPreferencesEvent(7));
+                    m_context->target->AcceptEvent(new ShowPreferencesEvent(8));
                     return 1;
 
                 case ID_EDIT_STARTSIGNATURING:
