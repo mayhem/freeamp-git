@@ -253,7 +253,7 @@ bool SoundCardPMO::WaitForDrain(void)
    for(; !m_bExit && !m_bPause; )
    {
        ioctl(audio_fd, AUDIO_GETINFO, &info);
-       if (info.play.error == 1)
+       if (info.play.error)
        {
            return true;
        }
@@ -459,6 +459,7 @@ void SoundCardPMO::WorkerThread(void)
       }
 
       iRet = write(audio_fd, pBuffer, m_iDataSize);
+      // write(audio_fd, pBuffer, 0); // for WaitForDrain(), maybe?
       if (iRet < 0)
       {
          m_pInputBuffer->EndRead(0);
