@@ -446,6 +446,14 @@ void MusicBrowserUI::EditInfoEvent()
 
                 m_oPlm->UpdateTrackMetaData(*track);
             }
+
+            /*m_editTrackMetaData.SetArtist("");
+            m_editTrackMetaData.SetAlbum("");
+            m_editTrackMetaData.SetTitle("");
+            m_editTrackMetaData.SetGenre("");
+            m_editTrackMetaData.SetComment("");
+            m_editTrackMetaData.SetYear(0);
+            m_editTrackMetaData.SetTrack(0);*/
         } 
     }
 }

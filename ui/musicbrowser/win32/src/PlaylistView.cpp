@@ -148,7 +148,7 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
 
             
             // Move over to the next column
-            rcClip.left += ListView_GetColumnWidth(hwndList, 0);
+            rcClip.left = indexRect.right; //ListView_GetColumnWidth(hwndList, 0);
 
             // Check to see if this item is selected
             if(dis->itemState & ODS_SELECTED && GetFocus() == hwndList)
