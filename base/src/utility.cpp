@@ -485,15 +485,20 @@ void LaunchBrowser(char* url)
             execlp("netscape", "netscape", url, NULL);
         }
         perror("Could not launch netscape");
+	_exit(0);
     }
     else
     {
+        if (fork() > 0)
+	    return;
+	    
         char *command = new char[strlen(browser) + strlen(url) + 10];
         sprintf(command, "%s \"%s\"", browser, url);
 
         system(command);
 
         delete [] command;
+	_exit(0);
     }
 }
 #endif

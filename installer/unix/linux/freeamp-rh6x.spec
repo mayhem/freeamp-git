@@ -16,7 +16,7 @@
 # 
 Summary: MP3 audio player with theme user interface and streaming support
 Name: freeamp
-Version: 2.0.0
+Version: 2.0.1
 Release: 1
 Copyright: GPL
 Group: Applications/Multimedia
