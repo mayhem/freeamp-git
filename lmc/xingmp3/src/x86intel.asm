@@ -29,13 +29,13 @@
 ;	$Id$
 ;
 
+extern _wincoef:dword
+extern _coef32:dword
+
 .386
 ;FLAT	group _TEXT
 ;	assume cs:FLAT, ds:FLAT, ss:FLAT
 _TEXT	segment para public use32 'CODE'
-
-EXTERN _wincoef:dword
-EXTERN _coef32:dword
 
 public _window_dual
 
@@ -50,11 +50,11 @@ _window_dual proc near
 	mov esi,DWORD PTR [esp+28]
 	mov ecx,_wincoef	; coef = wincoef
 	add esi,16		; si = vb_ptr + 16
-	mov edi,511		; edi = 511
+	mov ebp,511		; ebp = 511
 	mov ebx,esi
 	add ebx,32
-	mov ebp,DWORD PTR [esp+24]	; Load vbuf
-	and ebx,edi		; bx = (si + 32) & 511
+	mov edi,DWORD PTR [esp+24]	; Load vbuf
+	and ebx,ebp		; bx = (si + 32) & 511
 
 ; First 16
 	mov dh,16		; i = 16
@@ -66,59 +66,59 @@ FirstOuter:
 FirstInner:
 ; REPEAT 4		; Unrolled loop
 	fld DWORD PTR [ecx]		; Push *coef
-	fmul DWORD PTR [ebp+esi*4]	; Multiply by vbuf[si]
+	fmul DWORD PTR [edi+esi*4]	; Multiply by vbuf[si]
 	add esi,64		; si += 64
 	add ecx,4		; Advance coef pointer
-	and esi,edi		; si &= 511
+	and esi,ebp		; si &= 511
 	faddp st(1),st	; Add to sum
 
 	fld DWORD PTR [ecx]		; Push *coef
-	fmul DWORD PTR [ebp+ebx*4]	; Multiply by vbuf[bx]
+	fmul DWORD PTR [edi+ebx*4]	; Multiply by vbuf[bx]
 	add ebx,64		; bx += 64
 	add ecx,4		; Advance coef pointer
-	and ebx,edi		; bx &= 511
+	and ebx,ebp		; bx &= 511
 	fsubrp st(1),st	; Subtract from sum
 ;--
 	fld DWORD PTR [ecx]		; Push *coef
-	fmul DWORD PTR [ebp+esi*4]	; Multiply by vbuf[si]
+	fmul DWORD PTR [edi+esi*4]	; Multiply by vbuf[si]
 	add esi,64		; si += 64
 	add ecx,4		; Advance coef pointer
-	and esi,edi		; si &= 511
+	and esi,ebp		; si &= 511
 	faddp st(1),st	; Add to sum
 
 	fld DWORD PTR [ecx]		; Push *coef
-	fmul DWORD PTR [ebp+ebx*4]	; Multiply by vbuf[bx]
+	fmul DWORD PTR [edi+ebx*4]	; Multiply by vbuf[bx]
 	add ebx,64		; bx += 64
 	add ecx,4		; Advance coef pointer
-	and ebx,edi		; bx &= 511
+	and ebx,ebp		; bx &= 511
 	fsubrp st(1),st	; Subtract from sum
 ;--
 	fld DWORD PTR [ecx]		; Push *coef
-	fmul DWORD PTR [ebp+esi*4]	; Multiply by vbuf[si]
+	fmul DWORD PTR [edi+esi*4]	; Multiply by vbuf[si]
 	add esi,64		; si += 64
 	add ecx,4		; Advance coef pointer
-	and esi,edi		; si &= 511
+	and esi,ebp		; si &= 511
 	faddp st(1),st	; Add to sum
 
 	fld DWORD PTR [ecx]		; Push *coef
-	fmul DWORD PTR [ebp+ebx*4]	; Multiply by vbuf[bx]
+	fmul DWORD PTR [edi+ebx*4]	; Multiply by vbuf[bx]
 	add ebx,64		; bx += 64
 	add ecx,4		; Advance coef pointer
-	and ebx,edi		; bx &= 511
+	and ebx,ebp		; bx &= 511
 	fsubrp st(1),st	; Subtract from sum
 ;--
 	fld DWORD PTR [ecx]		; Push *coef
-	fmul DWORD PTR [ebp+esi*4]	; Multiply by vbuf[si]
+	fmul DWORD PTR [edi+esi*4]	; Multiply by vbuf[si]
 	add esi,64		; si += 64
 	add ecx,4		; Advance coef pointer
-	and esi,edi		; si &= 511
+	and esi,ebp		; si &= 511
 	faddp st(1),st	; Add to sum
 
 	fld DWORD PTR [ecx]		; Push *coef
-	fmul DWORD PTR [ebp+ebx*4]	; Multiply by vbuf[bx]
+	fmul DWORD PTR [edi+ebx*4]	; Multiply by vbuf[bx]
 	add ebx,64		; bx += 64
 	add ecx,4		; Advance coef pointer
-	and ebx,edi		; bx &= 511
+	and ebx,ebp		; bx &= 511
 	fsubrp st(1),st	; Subtract from sum
 ;--
 ; END REPEAT
@@ -130,20 +130,20 @@ FirstInner:
 	inc esi		; si++
 	mov eax,DWORD PTR [esp]
 	dec ebx		; bx--
-	mov edi,eax
+	mov ebp,eax
 	sar eax,15
 	inc eax
 	sar eax,1
 	jz FirstInRange	; Jump if in range
 
 	sar eax,16		; Out of range
-	mov edi,32767
-	xor edi,eax
+	mov ebp,32767
+	xor ebp,eax
 FirstInRange:
 	mov eax,DWORD PTR [esp+32]
-	mov WORD PTR [eax],di		; Store sample in *pcm
+	mov WORD PTR [eax],bp		; Store sample in *pcm
 	add eax,4		; Increment pcm
-	mov edi,511		; Reload edi with 511
+	mov ebp,511		; Reload ebp with 511
 	mov DWORD PTR [esp+32],eax
 
 	dec dh		; --i
@@ -157,17 +157,17 @@ FirstInRange:
 SpecialInner:
 ; REPEAT 2		; Unrolled loop
 	fld DWORD PTR [ecx]		; Push *coef
-	fmul DWORD PTR [ebp+ebx*4]	; Multiply by vbuf[bx]
+	fmul DWORD PTR [edi+ebx*4]	; Multiply by vbuf[bx]
 	add ebx,64		; bx += 64
 	add ecx,4		; Increment coef pointer
-	and ebx,edi		; bx &= 511
+	and ebx,ebp		; bx &= 511
 	faddp st(1),st	; Add to sum
 ;--
 	fld DWORD PTR [ecx]		; Push *coef
-	fmul DWORD PTR [ebp+ebx*4]	; Multiply by vbuf[bx]
+	fmul DWORD PTR [edi+ebx*4]	; Multiply by vbuf[bx]
 	add ebx,64		; bx += 64
 	add ecx,4		; Increment coef pointer
-	and ebx,edi		; bx &= 511
+	and ebx,ebp		; bx &= 511
 	faddp st(1),st	; Add to sum
 ;--
 ; END REPEAT
@@ -179,21 +179,21 @@ SpecialInner:
 	dec esi		; si--
 	mov eax,DWORD PTR [esp]
 	inc ebx		; bx++
-	mov edi,eax
+	mov ebp,eax
 	sar eax,15
 	inc eax
 	sar eax,1
 	jz SpecialInRange	; Jump if within range
 
 	sar eax,16		; Out of range
-	mov edi,32767
-	xor edi,eax
+	mov ebp,32767
+	xor ebp,eax
 SpecialInRange:
 	mov eax,DWORD PTR [esp+32]
 	sub ecx,36		; Readjust coef pointer for last round
-	mov WORD PTR [eax],di		; Store sample in *pcm
+	mov WORD PTR [eax],bp		; Store sample in *pcm
 	add eax,4		; Increment pcm
-	mov edi,511		; Reload edi with 511
+	mov ebp,511		; Reload ebp with 511
 	mov DWORD PTR [esp+32],eax
 
 
@@ -207,59 +207,59 @@ LastOuter:
 LastInner:
 ; REPEAT 4		; Unrolled loop
 	fld DWORD PTR [ecx]		; Push *coef
-	fmul DWORD PTR [ebp+esi*4]	; Multiply by vbuf[si]
+	fmul DWORD PTR [edi+esi*4]	; Multiply by vbuf[si]
 	add esi,64		; si += 64
 	sub ecx,4		; Back up coef pointer
-	and esi,edi		; si &= 511
+	and esi,ebp		; si &= 511
 	faddp st(1),st	; Add to sum
 
 	fld DWORD PTR [ecx]		; Push *coef
-	fmul DWORD PTR [ebp+ebx*4]	; Multiply by vbuf[bx]
+	fmul DWORD PTR [edi+ebx*4]	; Multiply by vbuf[bx]
 	add ebx,64		; bx += 64
 	sub ecx,4		; Back up coef pointer
-	and ebx,edi		; bx &= 511
+	and ebx,ebp		; bx &= 511
 	faddp st(1),st	; Add to sum
 ;--
 	fld DWORD PTR [ecx]		; Push *coef
-	fmul DWORD PTR [ebp+esi*4]	; Multiply by vbuf[si]
+	fmul DWORD PTR [edi+esi*4]	; Multiply by vbuf[si]
 	add esi,64		; si += 64
 	sub ecx,4		; Back up coef pointer
-	and esi,edi		; si &= 511
+	and esi,ebp		; si &= 511
 	faddp st(1),st	; Add to sum
 
 	fld DWORD PTR [ecx]		; Push *coef
-	fmul DWORD PTR [ebp+ebx*4]	; Multiply by vbuf[bx]
+	fmul DWORD PTR [edi+ebx*4]	; Multiply by vbuf[bx]
 	add ebx,64		; bx += 64
 	sub ecx,4		; Back up coef pointer
-	and ebx,edi		; bx &= 511
+	and ebx,ebp		; bx &= 511
 	faddp st(1),st	; Add to sum
 ;--
 	fld DWORD PTR [ecx]		; Push *coef
-	fmul DWORD PTR [ebp+esi*4]	; Multiply by vbuf[si]
+	fmul DWORD PTR [edi+esi*4]	; Multiply by vbuf[si]
 	add esi,64		; si += 64
 	sub ecx,4		; Back up coef pointer
-	and esi,edi		; si &= 511
+	and esi,ebp		; si &= 511
 	faddp st(1),st	; Add to sum
 
 	fld DWORD PTR [ecx]		; Push *coef
-	fmul DWORD PTR [ebp+ebx*4]	; Multiply by vbuf[bx]
+	fmul DWORD PTR [edi+ebx*4]	; Multiply by vbuf[bx]
 	add ebx,64		; bx += 64
 	sub ecx,4		; Back up coef pointer
-	and ebx,edi		; bx &= 511
+	and ebx,ebp		; bx &= 511
 	faddp st(1),st	; Add to sum
 ;--
 	fld DWORD PTR [ecx]		; Push *coef
-	fmul DWORD PTR [ebp+esi*4]	; Multiply by vbuf[si]
+	fmul DWORD PTR [edi+esi*4]	; Multiply by vbuf[si]
 	add esi,64		; si += 64
 	sub ecx,4		; Back up coef pointer
-	and esi,edi		; si &= 511
+	and esi,ebp		; si &= 511
 	faddp st(1),st	; Add to sum
 
 	fld DWORD PTR [ecx]		; Push *coef
-	fmul DWORD PTR [ebp+ebx*4]	; Multiply by vbuf[bx]
+	fmul DWORD PTR [edi+ebx*4]	; Multiply by vbuf[bx]
 	add ebx,64		; bx += 64
 	sub ecx,4		; Back up coef pointer
-	and ebx,edi		; bx &= 511
+	and ebx,ebp		; bx &= 511
 	faddp st(1),st	; Add to sum
 ;--
 ; END REPEAT
@@ -271,20 +271,20 @@ LastInner:
 	dec esi		; si--
 	mov eax,DWORD PTR [esp]
 	inc ebx		; bx++
-	mov edi,eax
+	mov ebp,eax
 	sar eax,15
 	inc eax
 	sar eax,1
 	jz LastInRange		; Jump if in range
 
 	sar eax,16		; Out of range
-	mov edi,32767
-	xor edi,eax
+	mov ebp,32767
+	xor ebp,eax
 LastInRange:
 	mov eax,DWORD PTR [esp+32]
-	mov WORD PTR [eax],di		; Store sample in *pcm
+	mov WORD PTR [eax],bp		; Store sample in *pcm
 	add eax,4		; Increment pcm
-	mov edi,511		; Reload edi with 511
+	mov ebp,511		; Reload ebp with 511
 	mov DWORD PTR [esp+32],eax
 
 	dec dh		; --i
@@ -308,9 +308,9 @@ _fdct32 proc near
 	push esi
 	push ebx
 	sub esp,8
-	mov ebp,_coef32-128	; coef = coef32 - (32 * 4)
+	mov ecx,_coef32-128	; coef = coef32 - (32 * 4)
 	mov DWORD PTR [esp+4],1		; m = 1
-	mov ecx,16		; n = 32 / 2
+	mov ebp,16		; n = 32 / 2
 
 	align 4
 ForwardOuterLoop:
@@ -319,16 +319,16 @@ ForwardOuterLoop:
 	mov DWORD PTR [esp+0],ebx	; mi = m
 	mov edi,DWORD PTR [esp+28]	; edi = x
 	sal ebx,1		; Double m for next iter
-	lea ebp,DWORD PTR [ebp+ecx*8]	; coef += n * 8
+	lea ecx,DWORD PTR [ecx+ebp*8]	; coef += n * 8
 	mov DWORD PTR [esp+4],ebx	; Store doubled m
 	mov DWORD PTR [esp+28],esi	; Exchange mem versions of f/x for next iter
 	mov DWORD PTR [esp+32],edi
-	lea ebx,DWORD PTR [esi+ecx*4]	; ebx = f2 = f + n * 4
-	sal ecx,3		; n *= 8
+	lea ebx,DWORD PTR [esi+ebp*4]	; ebx = f2 = f + n * 4
+	sal ebp,3		; n *= 8
 
 	align 4
 ForwardMiddleLoop:
-	mov eax,ecx		; q = n
+	mov eax,ebp		; q = n
 	xor edx,edx		; p = 0
 	test eax,8
 	jnz ForwardInnerLoop1
@@ -343,7 +343,7 @@ ForwardInnerLoop:
 	faddp st(1),st
 	fstp DWORD PTR [esi+edx]	; f[p] = x[p] + x[q]
 	fsubp st(1),st
-	fmul DWORD PTR [ebp+edx]
+	fmul DWORD PTR [ecx+edx]
 	fstp DWORD PTR [ebx+edx]	; f2[p] = coef[p] * (x[p] - x[q])
 	add edx,4		; p += 4
 
@@ -356,26 +356,26 @@ ForwardInnerLoop1:
 	faddp st(1),st
 	fstp DWORD PTR [esi+edx]	; f[p] = x[p] + x[q]
 	fsubp st(1),st
-	fmul DWORD PTR [ebp+edx]
+	fmul DWORD PTR [ecx+edx]
 	fstp DWORD PTR [ebx+edx]	; f2[p] = coef[p] * (x[p] - x[q])
 	add edx,4		; p += 4
 
 	cmp edx,eax
 	jb ForwardInnerLoop	; Jump back if (p < q)
 
-	add esi,ecx		; f += n
-	add ebx,ecx		; f2 += n
-	add edi,ecx		; x += n
+	add esi,ebp		; f += n
+	add ebx,ebp		; f2 += n
+	add edi,ebp		; x += n
 	dec DWORD PTR [esp+0]		; mi--
 	jg ForwardMiddleLoop	; Jump back if mi > 0
 
-	sar ecx,4		; n /= 16
+	sar ebp,4		; n /= 16
 	jg ForwardOuterLoop	; Jump back if n > 0
 
 
 ; Setup back loop
 	mov ebx,8		; ebx = m = 8 (temporarily)
-	mov ecx,ebx		; n = 4 * 2
+	mov ebp,ebx		; n = 4 * 2
 
 	align 4
 BackOuterLoop:
@@ -386,22 +386,22 @@ BackOuterLoop:
 	mov DWORD PTR [esp+28],esi	; Exchange mem versions of f/x for next iter
 	mov ebx,edi
 	mov DWORD PTR [esp+32],edi
-	sub ebx,ecx		; ebx = x2 = x - n
-	sal ecx,1		; n *= 2
+	sub ebx,ebp		; ebx = x2 = x - n
+	sal ebp,1		; n *= 2
 
 	align 4
 BackMiddleLoop:
-	mov ebp,DWORD PTR [ebx+ecx-4]
-	mov DWORD PTR [esi+ecx-8],ebp	; f[n - 8] = x2[n - 4]
-	fld DWORD PTR [edi+ecx-4]	; push x[n - 4]
-	fst DWORD PTR [esi+ecx-4]	; f[n - 4] = x[n - 4], without popping
-	lea eax,DWORD PTR [ecx-8]	; q = n - 8
-	lea edx,DWORD PTR [ecx-16]	; p = n - 16
+	mov ecx,DWORD PTR [ebx+ebp-4]
+	mov DWORD PTR [esi+ebp-8],ecx	; f[n - 8] = x2[n - 4]
+	fld DWORD PTR [edi+ebp-4]	; push x[n - 4]
+	fst DWORD PTR [esi+ebp-4]	; f[n - 4] = x[n - 4], without popping
+	lea eax,DWORD PTR [ebp-8]	; q = n - 8
+	lea edx,DWORD PTR [ebp-16]	; p = n - 16
 
 	align 4
 BackInnerLoop:
-	mov ebp,DWORD PTR [ebx+eax]
-	mov DWORD PTR [esi+edx],ebp	; f[p] = x2[q]
+	mov ecx,DWORD PTR [ebx+eax]
+	mov DWORD PTR [esi+edx],ecx	; f[p] = x2[q]
 	fld DWORD PTR [edi+eax]	; push x[q]
 	fadd 
 	fxch 
@@ -411,9 +411,9 @@ BackInnerLoop:
 	jge BackInnerLoop	; Jump back if p >= 0
 
 	fstp DWORD PTR [esp-4]		; Pop (XXX is there a better way to do this?)
-	add esi,ecx		; f += n
-	add ebx,ecx		; x2 += n
-	add edi,ecx		; x += n
+	add esi,ebp		; f += n
+	add ebx,ebp		; x2 += n
+	add edi,ebp		; x += n
 	dec DWORD PTR [esp+0]		; mi--
 	jg BackMiddleLoop	; Jump back if mi > 0
 
