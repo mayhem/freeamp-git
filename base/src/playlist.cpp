@@ -297,8 +297,6 @@ AcceptEvent(Event * e)
                     // make sure pItem still exists
                     pItem->SetPMIRegistryItem(smi->GetPMIRegistryItem());
                     pItem->SetLMCRegistryItem(smi->GetLMCRegistryItem());
-                    //RAK
-                    //pItem->SetPMI(smi->GetPMI());
                     pItem->SetMediaInfo(smi->GetMediaInfo());
                     // if pItem is the current item, send out the info posthaste
                     if(pItem == GetCurrent())
@@ -865,4 +863,44 @@ CheckIndex(int32 index)
     }
 
 	return index;
+}
+
+// Note: This function does not clear the list ahead of time!
+Error PlayListManager::
+ExpandM3U(char *szM3UFile, List<char *> &MP3List)
+{
+	FILE  *fpFile;
+	char  *szLine, *szMP3 = NULL;
+	int    iIndex;
+
+	fpFile = fopen(szM3UFile, "r");
+	if (fpFile == NULL)
+        return kError_FileNotFound;
+
+	szLine = new char[iMaxFileNameLen];
+	for(;;)
+    {
+		 if (fgets(szLine, iMaxFileNameLen - 1, fpFile) == NULL)
+			 break;
+
+		 for(iIndex = strlen(szLine) -1; iIndex >= 0; iIndex--)
+			 if (szLine[iIndex] == '\n' || 
+				 szLine[iIndex] == '\r' ||
+				 szLine[iIndex] == ' ')
+				szLine[iIndex] = 0;
+			 else
+				break;
+
+		 if (strlen(szLine))
+		 {
+			 szMP3 = new char[strlen(szLine) + 1];
+			 strcpy(szMP3, szLine);
+			 MP3List.AddItem(szMP3);
+			 szMP3 = NULL;
+		 }
+    }
+	delete szLine;
+	fclose(fpFile);
+
+	return kError_NoErr;
 }

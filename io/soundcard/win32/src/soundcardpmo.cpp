@@ -562,5 +562,6 @@ void SoundCardPMO::WorkerThread(void)
 
       Write(pBuffer);
    }
+   g_Log->Log(LogDecode, "PMO: Soundcard thread exiting\n");
 }    
 

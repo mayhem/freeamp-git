@@ -208,6 +208,7 @@ Stop()
       m_input->Break();
 
       m_decoderThread->Join();  // wait for thread to exit
+      g_Log->Log(LogDecode, "LMC: Decoder thread exited.\n");
 
       delete m_input;
       m_input = NULL;

@@ -36,6 +36,8 @@ ____________________________________________________________________________*/
 #include "mutex.h"
 #include "pmi.h"
 
+const int iMaxFileNameLen = 1024;
+
 class PlayListItem {
 
  public:
@@ -277,6 +279,9 @@ class PlayListManager {
     void DoForEach(bool (*func)(PlayListItem*, void*), void*);
 
     const PlayListItem** Items() const;
+
+    Error ExpandM3U(char *szM3UFile, List<char *> &MP3List);
+
 
  protected:
     inline int32 CheckIndex(int32 index);

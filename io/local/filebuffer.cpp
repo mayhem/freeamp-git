@@ -221,4 +221,5 @@ void FileBuffer::WorkerThread(void)
           m_pWriteSem->Wait();
       }
    }
+   g_Log->Log(LogInput, "PMI: filebuffer thread exit\n");
 }
