@@ -37,11 +37,13 @@ public:
        ~pthreadThread();
 
 
-	virtual bool Create(thread_function function, void* arg);
+	virtual bool Create(thread_function function, void* arg,
+                            bool detach = false);
 	virtual void Destroy();
 	virtual void Suspend();
 	virtual void Resume();
 	virtual void Join();
+     
 	virtual uint32 GetPriority() const;
 	virtual uint32 SetPriority(uint32 priority);
 

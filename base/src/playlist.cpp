@@ -2542,7 +2542,7 @@ void PlaylistManager::RetrieveMetaData(vector<PlaylistItem*>* list)
             mts->items = list;
             mts->thread = thread;
 
-            thread->Create(metadata_thread_function, mts);
+            thread->Create(metadata_thread_function, mts, true);
         }
     }
 }

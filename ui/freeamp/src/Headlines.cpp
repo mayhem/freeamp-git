@@ -89,7 +89,7 @@ Headlines::Headlines(FAContext * context)
     m_iIndex = 0;
 
     m_pThread = Thread::CreateThread();
-    m_pThread->Create(worker_thread, this);
+    m_pThread->Create(worker_thread, this, true);
 }
 
 Headlines::~Headlines()

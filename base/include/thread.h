@@ -36,14 +36,15 @@ public:
     virtual ~Thread(){}
 
 
-	virtual bool Create(thread_function function, void* arg) = 0;
-	virtual void Destroy() = 0;
-	virtual void Suspend() = 0;
-	virtual void Resume() = 0;
-	virtual void Join() = 0;
+    virtual bool Create(thread_function function, void* arg, 
+                        bool detach = false) = 0;
+    virtual void Destroy() = 0;
+    virtual void Suspend() = 0;
+    virtual void Resume() = 0;
+    virtual void Join() = 0;
 
-	virtual uint32 GetPriority() const = 0;
-	virtual uint32 SetPriority(uint32 priority) = 0;
+    virtual uint32 GetPriority() const = 0;
+    virtual uint32 SetPriority(uint32 priority) = 0;
 
     static Thread* CreateThread();
 };

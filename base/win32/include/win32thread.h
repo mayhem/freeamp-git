@@ -37,7 +37,8 @@ public:
 	~win32Thread();
 
 
-	virtual bool Create(thread_function function, void* arg);
+	virtual bool Create(thread_function function, void* arg,
+                            bool detach = false);
 	virtual void Destroy();
 	virtual void Suspend();
 	virtual void Resume();

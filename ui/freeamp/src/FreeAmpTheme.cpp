@@ -1910,7 +1910,7 @@ void FreeAmpTheme::ShowOptions(uint32 defaultPage)
     oArgs->uDefaultPage = defaultPage;
 
     m_pOptionsThread = Thread::CreateThread();
-    m_pOptionsThread->Create(options_thread, oArgs);
+    m_pOptionsThread->Create(options_thread, oArgs, true);
 }
 
 void FreeAmpTheme::options_thread(void* arg)

@@ -640,7 +640,7 @@ void MusicCatalog::PruneDatabase(bool sendmessages, bool spawn)
             pts->sendmessages = sendmessages;
             pts->thread = thread;
 
-            thread->Create(prune_thread_function, pts);
+            thread->Create(prune_thread_function, pts, true);
         }
     }
     else {
@@ -737,7 +737,7 @@ void MusicCatalog::SearchMusic(vector<string> &pathList, bool bBrowserMessages)
         mst->thread = thread;
         mst->bSendMessages = bBrowserMessages;
 
-        thread->Create(musicsearch_thread_function, mst);
+        thread->Create(musicsearch_thread_function, mst, true);
     }
 }
 

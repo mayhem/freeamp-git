@@ -143,10 +143,10 @@ void TimerManager::ThreadFunction()
 
 		if((*i)->duration && (*i)->ticks >= (*i)->duration)
 		{
-                	Timer* t = new Timer(*(*i));
-                	t->thread = Thread::CreateThread();
-	            	t->thread->Create(TimerManager::timer_function, t);
-                        (*i)->ticks = 0;
+                    Timer* t = new Timer(*(*i));
+                    t->thread = Thread::CreateThread();
+	            t->thread->Create(TimerManager::timer_function, t, true);
+                    (*i)->ticks = 0;
 		}
 	}
 

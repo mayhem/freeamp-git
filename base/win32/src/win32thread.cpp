@@ -76,7 +76,7 @@ InternalThreadFunction()
 
 bool 
 win32Thread::
-Create(thread_function function, void* arg)
+Create(thread_function function, void* arg, bool detach)
 {
 	bool result = false;
 

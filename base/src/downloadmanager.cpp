@@ -124,7 +124,7 @@ DownloadManager::DownloadManager(FAContext* context)
 
     if(m_downloadThread)
     {
-        m_downloadThread->Create(download_thread_function, this);
+        m_downloadThread->Create(download_thread_function, this, true);
     }
 }
 

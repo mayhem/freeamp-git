@@ -48,7 +48,6 @@ Thread()
 pthreadThread::
 ~pthreadThread()
 {
-    //pthread_cancel(m_threadHandle);
     if (m_suspendMutex) {
 	delete m_suspendMutex;
 	m_suspendMutex = NULL;
@@ -76,18 +75,21 @@ InternalThreadFunction()
 
 bool 
 pthreadThread::
-Create(thread_function function, void* arg)
+Create(thread_function function, void* arg, bool detach)
 {
-//    cout << "Thread: Create" << endl;
     bool result = true;
     m_function = function;
     m_arg = arg;
-    if(pthread_create(&m_threadHandle, NULL,pthreadThread::internalThreadFunction, this))
+    if (pthread_create(&m_threadHandle, NULL,
+        pthreadThread::internalThreadFunction, this))
     {
-//	cout << "Create failed!!" << endl;
 	result = false;
     }
-//    cout << "Thread: Create: done" << endl;
+    if (detach) {
+        cout << "detaching\n";
+        pthread_detach(m_threadHandle);
+    }
+
     return result;
 }
 
@@ -121,7 +123,6 @@ Resume()
     }
     m_suspendMutex->Release();
 }
-
 
 uint32 
 pthreadThread::
