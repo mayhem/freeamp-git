@@ -182,8 +182,8 @@ class PlayListManager {
 
     PlayListItem *GetCurrent();
     void SetFirst();
-    void SetNext();
-    void SetPrev();
+    void SetNext(bool bUserAction = false);
+    void SetPrev(bool bUserAction = false);
 
     int32 Current() const {return m_current;}
     int32 Total() const {return m_pOrderList->NumElements();}

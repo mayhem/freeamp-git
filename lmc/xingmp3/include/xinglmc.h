@@ -91,7 +91,7 @@ class     XingLMC:public LogicalMediaConverter
 
    virtual ~ XingLMC();
 
-   virtual Error Decode();
+   virtual Error Decode(int iSkipNumFrames = 0);
    virtual Error Stop();
    virtual Error Pause();
    virtual Error Resume();
@@ -100,7 +100,7 @@ class     XingLMC:public LogicalMediaConverter
 
    virtual bool  CanDecode();
    virtual bool  IsStreaming();
-   virtual Error ExtractMediaInfo(MediaInfoEvent **);
+   virtual Error ExtractMediaInfo();
 
    virtual Error SetPMI(PhysicalMediaInput *);
    virtual Error SetPMO(PhysicalMediaOutput *);

@@ -110,7 +110,7 @@ ObsInput::
 bool ObsInput::
 CanHandle(char *szUrl)
 {
-   return strncmp(szUrl, "obs://", 6) == 0;
+   return strncmp(szUrl, "rtp://", 6) == 0;
 }
 
 Error     ObsInput::

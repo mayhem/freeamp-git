@@ -36,7 +36,7 @@ ____________________________________________________________________________*/
 #include <iostream.h>
 #include <assert.h>
 
-/* project headers */
+
 #include "config.h"
 #include "errors.h"
 #include "xinglmc.h"
@@ -46,6 +46,8 @@ ____________________________________________________________________________*/
 #include "semaphore.h"
 #include "lmc.h"
 #include "log.h"
+
+#define DB printf("%08x: %s:%d\n", pthread_self(), __FILE__, __LINE__);
 
 extern    "C"
 {
@@ -96,381 +98,12 @@ static int sample_rate_table[8] =
 
 const int ID3_TAG_SIZE = 128;
 const int iMaxDecodeRetries = 15;
-const int iInitialBufferSize = 1100; // just larger than the largest frame size
 const int iStreamingBufferSize = 3;  // in seconds
+const int iMaxFrameSize = 1046;
 
 #define ENSURE_INITIALIZED if (!m_properlyInitialized) return kError_PluginNotInitialized;
 
-Error     XingLMC::
-SetTarget(EventQueue * eq)
-{
-   if (m_target = eq)
-   {
-      return kError_NoErr;
-   }
-   else
-   {
-      return kError_NullValueInvalid;
-   }
-}
-
-Error     XingLMC::
-SetPMI(PhysicalMediaInput * i)
-{
-   if (m_input = i)
-   {
-      return kError_NoErr;
-   }
-   else
-   {
-      return kError_NullValueInvalid;
-   }
-}
-
-Error     XingLMC::
-SetPMO(PhysicalMediaOutput * o)
-{
-   if (m_output = o)
-   {
-      return kError_NoErr;
-   }
-   else
-   {
-      return kError_NullValueInvalid;
-   }
-}
-
-bool XingLMC::
-IsStreaming()
-{
-   if (!m_input)
-	   return false;
-
-   return m_input->IsStreaming();
-}
-
-const char *XingLMC::
-GetErrorString(int32 error)
-{
-   if ((error <= lmcError_MinimumError) || (error >= lmcError_MaximumError))
-   {
-      return g_ErrorArray[0];
-   }
-   return g_ErrorArray[error - lmcError_MinimumError];
-}
-
-Error XingLMC::AdvanceBufferToNextFrame()
-{
-   int            iNumBytes;
-	void          *pBufferBase;
-	unsigned char *pBuffer;
-   int32          iCount;
-	Error          Err;
-
-   iNumBytes = iInitialBufferSize;
-   Err = BeginRead(pBufferBase, iNumBytes);
-   if (Err != kError_NoErr)
-   {
-	    return Err;
-   }
-
-   for(;;)
-   {
-		 pBuffer = ((unsigned char *)pBufferBase) + 1;
-	    
-       for(iCount = 0; iCount < iNumBytes - 1 &&
-           !(*pBuffer == 0xFF && (*(pBuffer+1) & 0xF0) == 0xF0); 
-           pBuffer++, iCount++)
-               ; // <=== Empty body!
-  
-
-       g_Log->Log(LogDecode, "Skipped %d bytes in advance frame.\n", iCount + 1);
-       if (m_input)
-           m_input->EndRead(iCount + 1);
-
-       if (iCount != 0 && iCount < iNumBytes - 1)
-       {
-          break;
-       }
-
-       iNumBytes = iInitialBufferSize;
-       BeginRead(pBufferBase, iNumBytes);
-       if (Err != kError_NoErr)
-       {
-	        return Err;
-       }
-   }
-
-	return kError_NoErr;
-}
-
-Error XingLMC::GetHeadInfo()
-{
-   int          iNumBytes, iLoop;
-	unsigned int iForward;
-	bool         bRet;
-	void        *pBuffer;
-	Error        Err;
-
-   for(iLoop = 0; iLoop < iMaxDecodeRetries; iLoop++)
-   {
-       iNumBytes = iInitialBufferSize;
-       Err = BeginRead(pBuffer, iNumBytes);
-       if (Err == kError_NoErr)
-       {
-           m_frameBytes = head_info3((unsigned char *)pBuffer,
-			                            iNumBytes, &m_sMpegHead, 
-                                     &m_iBitRate, &iForward);
-           if (m_frameBytes > 0 && m_frameBytes < 1050)
-           {
-              MPEG_HEAD sHead;
-              int       iFrameBytes, iBitRate;
-            
-              iFrameBytes = head_info3(((unsigned char *)pBuffer) + 
-                                       m_frameBytes + iForward,
-                                       iNumBytes - (m_frameBytes + iForward), 
-                                       &sHead, &iBitRate, &iForward);
-              if (m_input)
-                 m_input->EndRead(0);
-
-              if (iFrameBytes > 0 && iFrameBytes < 1050)
-                 return kError_NoErr;
-           }
-           else
-              if (m_input)
-                  m_input->EndRead(0);
-
-           AdvanceBufferToNextFrame();
-       }
-		 else
-		 {
-		     return Err;
-       }
-   }
-
-   return (Error)lmcError_HeadInfoReturnedZero;
-}
-
-bool      XingLMC::
-CanDecode()
-{
-   Error  Err;
-   int32  dummy, iLoop;
-   void  *pBuffer;
-   bool   bRet = false;
-   size_t iNumBytes;
-
-   if (!m_input)
-      return false;
-
-   if (!m_input->IsStreaming())
-       m_input->Seek(dummy, 0, SEEK_FROM_START);
-
-   Err = GetHeadInfo();
-   if (Err != kError_NoErr)
-   {
-       g_Log->Log(LogDecode, "GetHeadInfo() in CanDecode() could not find the sync marker.\n");
-       return false;
-   }
-
-   if (m_input->CachePMI())
-       m_input->SetBufferSize((m_iBitRate * iStreamingBufferSize * 1000) / 8192);
-
-   return true;
-}
-
-Error     XingLMC::
-ExtractMediaInfo(MediaInfoEvent ** pMIE)
-{
-   size_t         iNumBytes;
-   int32          totalFrames = 0;
-   int32          bytesPerFrame;
-   size_t         end;
-   unsigned char *pID3Tag; 
-   Error          Err;
-   float          totalSeconds;
-
-   if (!m_input)
-      return kError_NullValueInvalid;
- 
-   if (m_frameBytes < 0)
-   {
-       Err = GetHeadInfo();
-		 if (Err != kError_NoErr)
-		    return Err;
-   }
-
-   if (m_input->GetLength(end) == kError_FileSeekNotSupported)
-      end = 0;
-
-   pID3Tag = new unsigned char[ID3_TAG_SIZE];
-   if (m_input->GetID3v1Tag(pID3Tag) != kError_NoErr)
-   {
-      memset(pID3Tag, 0, ID3_TAG_SIZE);
-   }
-
-   Id3TagInfo tag_info((char *)pID3Tag);
-
-   int32     sampRateIndex = 4 * m_sMpegHead.id + m_sMpegHead.sr_index;
-   int32     samprate = sample_rate_table[sampRateIndex];
-
-   if ((m_sMpegHead.sync & 1) == 0)
-        samprate = samprate / 2;    // mpeg25
-
-   double    milliseconds_per_frame = 0;
-   static int32 l[4] = {25, 3, 2, 1};
-
-   int32     layer = l[m_sMpegHead.option];
-   static double ms_p_f_table[3][3] =
-   {
-      {8.707483f, 8.0f, 12.0f},
-      {26.12245f, 24.0f, 36.0f},
-      {26.12245f, 24.0f, 36.0f}
-   };
-
-   milliseconds_per_frame = ms_p_f_table[layer - 1][m_sMpegHead.sr_index];
-
-   if (end > 0)
-   {
-       bytesPerFrame = m_frameBytes;
-       totalFrames = end / bytesPerFrame;
-       totalSeconds = (float) ((double) totalFrames * 
-                      (double) milliseconds_per_frame / 1000);
-   }
-   else
-   {
-       totalFrames = -1;
-       totalSeconds = -1;
-   }
-
-   *pMIE = new MediaInfoEvent(m_input->Url(), totalSeconds);
-
-   if (!(*pMIE))
-      return kError_OutOfMemory;
-
-   if (tag_info.m_containsInfo)
-   {
-
-       ID3TagEvent *ite = new ID3TagEvent(tag_info);
-
-       if (ite)
-       {
-           (*pMIE)->AddChildEvent((Event *) ite);
-           ite = NULL;
-       }
-       else
-       {
-           return kError_OutOfMemory;
-       }
-   }
-
-   delete pID3Tag;
-
-   MpegInfoEvent *mie = new MpegInfoEvent(totalFrames,
-                       milliseconds_per_frame / 1000, m_frameBytes,
-                       m_iBitRate, samprate, layer,
-                       (m_sMpegHead.sync == 2) ? 3 : (m_sMpegHead.id) ? 1 : 2,
-                       (m_sMpegHead.mode == 0x3 ? 1 : 2), 
-							  m_sMpegHead.original, m_sMpegHead.prot,
-                       m_sMpegHead.emphasis, m_sMpegHead.mode, 
-							  (float) m_sMpegHead.mode_ext);
-
-   if (mie)
-   {
-       (*pMIE)->AddChildEvent((Event *) mie);
-       mie = NULL;
-   }
-   else
-   {
-       return kError_OutOfMemory;
-   }
-
-   return kError_NoErr;
-}
-
-Error     XingLMC::
-InitDecoder()
-{
-   void          *pBuffer;
-   int32          bitrate;
-   unsigned int   dummy;
-   size_t         iNumBytes;
-   Error          Err;
-
-   if (!m_target || !m_input || !m_output)
-   {
-      return kError_NullValueInvalid;
-   }
-   m_properlyInitialized = false;
-
-   if (m_frameBytes < 0)
-   {
-       Err = GetHeadInfo();
-		 if (Err != kError_NoErr)
-		    return Err;
-   }
-
-   if (!m_input->CachePMI())
-       m_input->SetBufferSize((m_iBitRate * iStreamingBufferSize * 1000) / 8192);
-
-   // select decoder
-   m_audioMethods = audio_table[0][0];       // not integer, non 8 bit mode
-
-   if (m_audioMethods.decode_init(&m_sMpegHead,
-                                  m_frameBytes,
-                                  0 /* reduction code */ ,
-                                  0 /* transform code (ignored) */ ,
-                                  0 /* convert code */ ,
-                                  24000 /* freq limit */ ))
-   {
-         DEC_INFO  decinfo;
-
-         m_audioMethods.decode_info(&decinfo);
-
-#if __BYTE_ORDER != __LITTLE_ENDIAN
-         cvt_to_wave_init(decinfo.bits);
-#endif
-
-         OutputInfo info;
-
-         info.bits_per_sample = decinfo.bits;
-         info.number_of_channels = decinfo.channels;
-         info.samples_per_second = decinfo.samprate;
-         info.max_buffer_size = (info.number_of_channels * 2 * 1152) << 2;
-         Error     error = m_output->Init(&info);
-
-         if (error != kError_NoErr)
-         {
-            return (Error) lmcError_OutputInitializeFailed;
-         }
-
-         m_pcmBuffer = new unsigned char[info.max_buffer_size];
-
-         if (!m_pcmBuffer)
-            return kError_OutOfMemory;
-         m_pcmTrigger = info.max_buffer_size - 2500 * sizeof(short);
-#define _VISUAL_ENABLE_
-#ifdef  _VISUAL_ENABLE_
-                m_pcmTrigger = info.max_buffer_size - 
-					           (3250 * info.number_of_channels * sizeof(short)); 
-
-#endif  //_VISUAL_ENABLE_
-#undef  _VISUAL_ENABLE_
-
-         m_pcmBufBytes = 0;
-   }
-   else
-   {
-      g_Log->Log(LogDecode, "Audio decode init failed.\n");
-      return (Error) lmcError_AudioDecodeInitFailed;
-   }
-
-   m_properlyInitialized = true;
-   return (Error) kError_NoErr;
-}
-
-XingLMC::
-XingLMC()
+XingLMC::XingLMC()
 {
    m_input = NULL;
    m_output = NULL;
@@ -549,12 +182,10 @@ Stop()
       m_xcqueue->Write(xc);
       m_pauseSemaphore->Signal();
 
-      // This will cause the input plug-in to shut down and exit out of any blocked
-      // functions that the pmi might be in.
+      m_decoderThread->Join();  // wait for thread to exit
+
       delete m_input;
       m_input = NULL;
-
-      m_decoderThread->Join();  // wait for thread to exit
 
       delete    m_decoderThread;
 
@@ -564,26 +195,419 @@ Stop()
    return kError_NoErr;
 }
 
-Error     XingLMC::
-Decode()
+Error XingLMC::Pause()
+{
+   XingCommand *xc = new XingCommand[1];
+
+   xc[0] = XING_Pause;
+   m_xcqueue->Write(xc);
+
+   return kError_NoErr;
+}
+
+Error XingLMC::Resume()
+{
+   XingCommand *xc = new XingCommand[1];
+
+   xc[0] = XING_Resume;
+   m_xcqueue->Write(xc);
+   m_pauseSemaphore->Signal();
+
+   return kError_NoErr;
+}
+
+Error XingLMC::Reset()
 {
    ENSURE_INITIALIZED;
+   return kError_NoErr;
+}
+
+
+Error XingLMC::SetTarget(EventQueue * eq)
+{
+   if (m_target = eq)
+   {
+      return kError_NoErr;
+   }
+   else
+   {
+      return kError_NullValueInvalid;
+   }
+}
+
+Error XingLMC::SetPMI(PhysicalMediaInput * i)
+{
+   if (m_input = i)
+   {
+      return kError_NoErr;
+   }
+   else
+   {
+      return kError_NullValueInvalid;
+   }
+}
+
+Error XingLMC::SetPMO(PhysicalMediaOutput * o)
+{
+   if (m_output = o)
+   {
+      return kError_NoErr;
+   }
+   else
+   {
+      return kError_NullValueInvalid;
+   }
+}
+
+bool XingLMC::IsStreaming()
+{
+   if (!m_input)
+	   return false;
+
+   return m_input->IsStreaming();
+}
+
+const char *XingLMC::GetErrorString(int32 error)
+{
+   if ((error <= lmcError_MinimumError) || (error >= lmcError_MaximumError))
+   {
+      return g_ErrorArray[0];
+   }
+   return g_ErrorArray[error - lmcError_MinimumError];
+}
+
+Error XingLMC::AdvanceBufferToNextFrame()
+{
+   int            iNumBytes;
+	void          *pBufferBase;
+	unsigned char *pBuffer;
+   int32          iCount;
+	Error          Err;
+
+   iNumBytes = iMaxFrameSize;
+   Err = BeginRead(pBufferBase, iNumBytes);
+   if (Err != kError_NoErr)
+   {
+	    return Err;
+   }
+
+   for(;;)
+   {
+		 pBuffer = ((unsigned char *)pBufferBase) + 1;
+	    
+       for(iCount = 0; iCount < iNumBytes - 1 &&
+           !(*pBuffer == 0xFF && (*(pBuffer+1) & 0xF0) == 0xF0); 
+           pBuffer++, iCount++)
+               ; // <=== Empty body!
+  
+
+       g_Log->Log(LogDecode, "Skipped %d bytes in advance frame.\n", iCount + 1);
+       if (m_input)
+           m_input->EndRead(iCount + 1);
+
+       if (iCount != 0 && iCount < iNumBytes - 1)
+       {
+          break;
+       }
+
+       iNumBytes = iMaxFrameSize;
+       BeginRead(pBufferBase, iNumBytes);
+       if (Err != kError_NoErr)
+       {
+	        return Err;
+       }
+   }
+
+	return kError_NoErr;
+}
+
+Error XingLMC::GetHeadInfo()
+{
+   int          iNumBytes, iLoop;
+	unsigned int iForward;
+	bool         bRet;
+	void        *pBuffer;
+	Error        Err;
+
+   for(iLoop = 0; iLoop < iMaxDecodeRetries; iLoop++)
+   {
+       iNumBytes = iMaxFrameSize;
+       Err = BeginRead(pBuffer, iNumBytes);
+       if (Err == kError_NoErr)
+       {
+           m_frameBytes = head_info3((unsigned char *)pBuffer,
+			                            iNumBytes, &m_sMpegHead, 
+                                     &m_iBitRate, &iForward);
+           if (m_frameBytes > 0 && m_frameBytes < 1050)
+           {
+              MPEG_HEAD sHead;
+              int       iFrameBytes, iBitRate;
+            
+              iFrameBytes = head_info3(((unsigned char *)pBuffer) + 
+                                       m_frameBytes + iForward,
+                                       iNumBytes - (m_frameBytes + iForward), 
+                                       &sHead, &iBitRate, &iForward);
+              if (m_input)
+                 m_input->EndRead(0);
+
+              if (iFrameBytes > 0 && iFrameBytes < 1050)
+                 return kError_NoErr;
+           }
+           else
+              if (m_input)
+                  m_input->EndRead(0);
+
+           AdvanceBufferToNextFrame();
+       }
+		 else
+		 {
+		     return Err;
+       }
+   }
+
+   return (Error)lmcError_HeadInfoReturnedZero;
+}
+
+bool XingLMC::CanDecode()
+{
+   Error  Err;
+   int32  dummy, iLoop;
+   void  *pBuffer;
+   bool   bRet = false;
+   size_t iNumBytes;
+
+   if (!m_input)
+   {
+      g_Log->Error("CanDecode() called, with no PMI set.\n");
+      return false;
+   }
+
+   if (!m_input->IsStreaming())
+       m_input->Seek(dummy, 0, SEEK_FROM_START);
+
+   Err = GetHeadInfo();
+   if (Err != kError_NoErr)
+   {
+       g_Log->Log(LogDecode, "GetHeadInfo() in CanDecode() could not find the sync marker.\n");
+       return false;
+   }
+
+   if (m_input->CachePMI())
+       m_input->SetBufferSize((m_iBitRate * iStreamingBufferSize * 1000) / 8192);
+
+   return true;
+}
+
+Error XingLMC::ExtractMediaInfo()
+{
+   size_t          iNumBytes;
+   int32           totalFrames = 0;
+   int32           bytesPerFrame;
+   size_t          end;
+   unsigned char  *pID3Tag; 
+   Error           Err;
+   float           totalSeconds;
+   MediaInfoEvent *pMIE;
+
+   if (!m_input)
+      return kError_NullValueInvalid;
+ 
+   if (m_frameBytes < 0)
+   {
+       Err = GetHeadInfo();
+		 if (Err != kError_NoErr)
+		    return Err;
+   }
+
+   if (m_input->GetLength(end) == kError_FileSeekNotSupported)
+      end = 0;
+
+   pID3Tag = new unsigned char[ID3_TAG_SIZE];
+   if (m_input->GetID3v1Tag(pID3Tag) != kError_NoErr)
+   {
+      memset(pID3Tag, 0, ID3_TAG_SIZE);
+   }
+
+   Id3TagInfo tag_info((char *)pID3Tag);
+
+   int32     sampRateIndex = 4 * m_sMpegHead.id + m_sMpegHead.sr_index;
+   int32     samprate = sample_rate_table[sampRateIndex];
+
+   if ((m_sMpegHead.sync & 1) == 0)
+        samprate = samprate / 2;    // mpeg25
+
+   double    milliseconds_per_frame = 0;
+   static int32 l[4] = {25, 3, 2, 1};
+
+   int32     layer = l[m_sMpegHead.option];
+   static double ms_p_f_table[3][3] =
+   {
+      {8.707483f, 8.0f, 12.0f},
+      {26.12245f, 24.0f, 36.0f},
+      {26.12245f, 24.0f, 36.0f}
+   };
+
+   milliseconds_per_frame = ms_p_f_table[layer - 1][m_sMpegHead.sr_index];
+
+   if (end > 0)
+   {
+       bytesPerFrame = m_frameBytes;
+       totalFrames = end / bytesPerFrame;
+       totalSeconds = (float) ((double) totalFrames * 
+                      (double) milliseconds_per_frame / 1000);
+   }
+   else
+   {
+       totalFrames = -1;
+       totalSeconds = -1;
+   }
+
+   pMIE = new MediaInfoEvent(m_input->Url(), totalSeconds);
+   if (!pMIE)
+      return kError_OutOfMemory;
+
+   if (tag_info.m_containsInfo)
+   {
+
+       ID3TagEvent *ite = new ID3TagEvent(tag_info);
+
+       if (ite)
+       {
+           pMIE->AddChildEvent((Event *) ite);
+           ite = NULL;
+       }
+       else
+       {
+           return kError_OutOfMemory;
+       }
+   }
+
+   delete pID3Tag;
+
+   MpegInfoEvent *mie = new MpegInfoEvent(totalFrames,
+                       milliseconds_per_frame / 1000, m_frameBytes,
+                       m_iBitRate, samprate, layer,
+                       (m_sMpegHead.sync == 2) ? 3 : (m_sMpegHead.id) ? 1 : 2,
+                       (m_sMpegHead.mode == 0x3 ? 1 : 2), 
+							  m_sMpegHead.original, m_sMpegHead.prot,
+                       m_sMpegHead.emphasis, m_sMpegHead.mode, 
+							  (float) m_sMpegHead.mode_ext);
+
+   if (mie)
+   {
+       pMIE->AddChildEvent((Event *) mie);
+       mie = NULL;
+   }
+   else
+   {
+       return kError_OutOfMemory;
+   }
+
+   if (m_target)
+      m_target->AcceptEvent(pMIE);
+
+   return kError_NoErr;
+}
+
+Error XingLMC::InitDecoder()
+{
+   void          *pBuffer;
+   int32          bitrate;
+   unsigned int   dummy;
+   size_t         iNumBytes;
+   Error          Err;
+
+   if (!m_target || !m_input || !m_output)
+   {
+      return kError_NullValueInvalid;
+   }
+   m_properlyInitialized = false;
+
+   if (m_frameBytes < 0)
+   {
+       Err = GetHeadInfo();
+		 if (Err != kError_NoErr)
+		    return Err;
+   }
+
+   if (!m_input->CachePMI())
+       m_input->SetBufferSize((m_iBitRate * iStreamingBufferSize * 1000) / 8192);
+
+   // select decoder
+   m_audioMethods = audio_table[0][0];       // not integer, non 8 bit mode
+
+   if (m_audioMethods.decode_init(&m_sMpegHead,
+                                  m_frameBytes,
+                                  0 /* reduction code */ ,
+                                  0 /* transform code (ignored) */ ,
+                                  0 /* convert code */ ,
+                                  24000 /* freq limit */ ))
+   {
+         DEC_INFO  decinfo;
+
+         m_audioMethods.decode_info(&decinfo);
+
+#if __BYTE_ORDER != __LITTLE_ENDIAN
+         cvt_to_wave_init(decinfo.bits);
+#endif
+
+         OutputInfo info;
+
+         info.bits_per_sample = decinfo.bits;
+         info.number_of_channels = decinfo.channels;
+         info.samples_per_second = decinfo.samprate;
+         info.max_buffer_size = (info.number_of_channels * 2 * 1152) << 2;
+
+         Error     error = m_output->Init(&info);
+         if (error != kError_NoErr)
+         {
+            g_Log->Error("PMO->Init() returned an error: %s\n", m_output->GetErrorString(error));
+            return (Error) lmcError_OutputInitializeFailed;
+         }
+
+         m_pcmBuffer = new unsigned char[info.max_buffer_size];
+
+         if (!m_pcmBuffer)
+            return kError_OutOfMemory;
+         m_pcmTrigger = info.max_buffer_size - 2500 * sizeof(short);
+#define _VISUAL_ENABLE_
+#ifdef  _VISUAL_ENABLE_
+                m_pcmTrigger = info.max_buffer_size - 
+					           (3250 * info.number_of_channels * sizeof(short)); 
+
+#endif  //_VISUAL_ENABLE_
+#undef  _VISUAL_ENABLE_
+
+         m_pcmBufBytes = 0;
+   }
+   else
+   {
+      g_Log->Log(LogDecode, "Audio decode init failed.\n");
+      return (Error) lmcError_AudioDecodeInitFailed;
+   }
+
+   m_properlyInitialized = true;
+   return (Error) kError_NoErr;
+}
+
+Error XingLMC::Decode(int32 iSkipNumFrames)
+{   
+   m_frameWaitTill = iSkipNumFrames;
 
    if (!m_decoderThread)
    {
-    m_decoderThread = Thread::CreateThread();
+      m_decoderThread = Thread::CreateThread();
       if (!m_decoderThread)
       {
          return (Error) lmcError_DecoderThreadFailed;
       }
-    m_decoderThread->Create(XingLMC::DecodeWorkerThreadFunc, this);
+      m_decoderThread->Create(XingLMC::DecodeWorkerThreadFunc, this);
    }
 
    return kError_NoErr;
 }
 
-void      XingLMC::
-DecodeWorkerThreadFunc(void *pxlmc)
+void XingLMC::DecodeWorkerThreadFunc(void *pxlmc)
 {
    if (pxlmc)
    {
@@ -593,10 +617,9 @@ DecodeWorkerThreadFunc(void *pxlmc)
    }
 }
 
-void      XingLMC::
-DecodeWork()
+void XingLMC::DecodeWork()
 {
-   bool           result = true;
+   bool           result = true, bRet;
    int32          in_bytes, out_bytes;
    int32          nwrite;
    size_t         iBytesNeeded;
@@ -607,10 +630,37 @@ DecodeWork()
 
    in_bytes = out_bytes = 0;
 
-   if (!m_input)
+   if (!m_input || !m_target)
       return;
 
-	m_input->Resume();
+   bRet = CanDecode();
+   if (!bRet)
+   {
+       g_Log->Error("CanDecode returned false. This LMC cannot decode this media\n");
+       m_target->AcceptEvent(new LMCErrorEvent(this,Err));
+
+       return;
+   }
+
+   Err = ExtractMediaInfo();
+   if (IsError(Err))
+   {
+       g_Log->Error("ExtractMediaInfo failed: %d\n", Err);
+       m_target->AcceptEvent(new LMCErrorEvent(this,Err));
+
+       return;
+   }
+
+   Err = InitDecoder();
+   if (IsError(Err))
+   {
+       g_Log->Error("Initializing the decoder failed: %d\n", Err);
+       m_target->AcceptEvent(new LMCErrorEvent(this,Err));
+
+       return;
+   }
+
+	//m_input->Resume();
    for (m_frameCounter = 0;;)
    {
       if (m_frameCounter >= m_frameWaitTill)
@@ -627,10 +677,7 @@ DecodeWork()
          MediaTimeInfoEvent *pmtpi = new MediaTimeInfoEvent(hours, 
                        minutes, seconds, 0, totalTime, m_frameCounter);
 
-         if (m_target)
-         {
-            m_target->AcceptEvent(pmtpi);
-         }
+         m_target->AcceptEvent(pmtpi);
       }
 
       while (!m_xcqueue->IsEmpty())
@@ -641,15 +688,24 @@ DecodeWork()
          {
          case XING_Stop:
             return;
+
          case XING_Pause:
             if (m_output)
                m_output->Pause();
             if (m_input)
                m_input->Pause();
+
             m_pauseSemaphore->Wait();
+
+            break;
+
+         case XING_Resume:
+            if (m_output)
+               m_output->Resume();
             if (m_input)
                m_input->Resume();
             break;
+
          default:
             break;
          }
@@ -659,18 +715,17 @@ DecodeWork()
 
       for(iLoop = 0; iLoop < iMaxDecodeRetries; iLoop++)
 		{
-          iBytesNeeded = m_frameBytes + 1;
+          x.in_bytes = 0;
+          iBytesNeeded = iMaxFrameSize;
           Err = BeginRead(pBuffer, iBytesNeeded);
-          if (Err == kError_Interrupt)
+          if (Err == kError_Interrupt || Err == kError_InputUnsuccessful)
              break;
 
           if (Err != kError_NoErr)
           {
               m_seekMutex->Release();
-              if (m_target)
-                 m_target->AcceptEvent(new LMCErrorEvent(this,Err));
-
-              g_Log->Error("LMC: Cannot read from pullbuffer.\n"); 
+              g_Log->Error("LMC: Cannot read from pullbuffer: %d\n", Err); 
+              m_target->AcceptEvent(new LMCErrorEvent(this,Err));
 
               return;
           }
@@ -693,8 +748,7 @@ DecodeWork()
              {
                  m_seekMutex->Release();
                  g_Log->Error("LMC: Cannot advance to next frame.\n");
-                 if (m_target)
-                     m_target->AcceptEvent(new LMCErrorEvent(this,Err));
+                 m_target->AcceptEvent(new LMCErrorEvent(this,Err));
 
                  return;
              }
@@ -706,18 +760,19 @@ DecodeWork()
       }
       if (m_input)
          m_input->EndRead(x.in_bytes);
-      else
-         break;
 
       if (iLoop == iMaxDecodeRetries)
       {
          m_seekMutex->Release();
          g_Log->Error("LMC: Maximum number of retries reached while trying to decode.\n");
-         if (m_target)
-            m_target->AcceptEvent(new LMCErrorEvent(this, (Error) 
-                        lmcError_DecodeDidntDecode));
+         m_target->AcceptEvent(new LMCErrorEvent(this, (Error) lmcError_DecodeDidntDecode));
+
          return;
       }
+
+      // EOF?
+      if (x.in_bytes == 0)
+         break;
 
       m_pcmBufBytes += x.out_bytes;
       m_frameCounter++;
@@ -737,9 +792,7 @@ DecodeWork()
             if (error != kError_NoErr)
             {
                m_seekMutex->Release();
-               if (m_target)
-                  m_target->AcceptEvent(new LMCErrorEvent(this, 
-                           (Error) lmcError_OutputWriteFailed));
+               m_target->AcceptEvent(new LMCErrorEvent(this, (Error) lmcError_OutputWriteFailed));
                g_Log->Error("LMC: Cannot write to output plugin.\n");
                return;
             }
@@ -769,16 +822,13 @@ DecodeWork()
 
       if (error != kError_NoErr)
       {
-         if (m_target)
-            m_target->AcceptEvent(new LMCErrorEvent(this, (Error) 
-                         lmcError_OutputWriteFailed));
+         m_target->AcceptEvent(new LMCErrorEvent(this, (Error) lmcError_OutputWriteFailed));
          g_Log->Error("LMC: Cannot write to output plugin.\n");
          return;
       }
 #define _VISUAL_ENABLE_
 #ifdef  _VISUAL_ENABLE_
-                if (m_target)
-                        m_target->AcceptEvent(new SendVisBufEvent(nwrite,m_pcmBuffer,m_pcmBufBytes));
+      m_target->AcceptEvent(new SendVisBufEvent(nwrite,m_pcmBuffer,m_pcmBufBytes));
 #endif  //_VISUAL_ENABLE_
 #undef  _VISUAL_ENABLE_
       out_bytes += m_pcmBufBytes;
@@ -787,22 +837,20 @@ DecodeWork()
 
    m_output->Reset(false);
 
-   if (m_target)
-      m_target->AcceptEvent(new Event(INFO_DoneOutputting));
+   m_target->AcceptEvent(new Event(INFO_DoneOutputting));
 
    return;
 }
 
 // This function encapsulates all the buffering event management
-Error XingLMC::
-BeginRead(void *&pBuffer, unsigned int iBytesNeeded)
+Error XingLMC::BeginRead(void *&pBuffer, unsigned int iBytesNeeded)
 {
    time_t iNow;
 	Error  Err;
 	bool   bBuffering = false;
 	int32  iPercent;
 
-   if (!m_input->IsStreaming())
+   if (m_input && !m_input->IsStreaming())
 	    return m_input->BeginRead(pBuffer, iBytesNeeded);
 
    for(;;)
@@ -854,33 +902,6 @@ BeginRead(void *&pBuffer, unsigned int iBytesNeeded)
 	}
 
 	return Err;
-}
-
-Error     XingLMC::
-Pause()
-{
-   ENSURE_INITIALIZED;
-   XingCommand *xc = new XingCommand[1];
-
-   xc[0] = XING_Pause;
-   m_xcqueue->Write(xc);
-   return kError_NoErr;
-}
-
-Error     XingLMC::
-Resume()
-{
-   ENSURE_INITIALIZED;
-   m_pauseSemaphore->Signal();
-   m_output->Resume();
-   return kError_NoErr;
-}
-
-Error     XingLMC::
-Reset()
-{
-   ENSURE_INITIALIZED;
-   return kError_NoErr;
 }
 
 #define _EQUALIZER_ENABLE_

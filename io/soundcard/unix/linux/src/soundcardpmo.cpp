@@ -1,27 +1,25 @@
-
 /*____________________________________________________________________________
-	
-	FreeAmp - The Free MP3 Player
+        
+        FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1998 GoodNoise
+        Portions Copyright (C) 1998 GoodNoise
 
-	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; either version 2 of the License, or
-	(at your option) any later version.
+        This program is free software; you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation; either version 2 of the License, or
+        (at your option) any later version.
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+        This program is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-	
-	$Id$
+        You should have received a copy of the GNU General Public License
+        along with this program; if not, write to the Free Software
+        Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+        
+        $Id$
 ____________________________________________________________________________*/
-
 
 /* system headers */
 #include <stdlib.h>
@@ -32,193 +30,212 @@ ____________________________________________________________________________*/
 #include <errno.h>
 #include <string.h>
 
-
 /* project headers */
 #include <config.h>
 #include "soundcardpmo.h"
+#include "log.h"
 
 #define PIECES 50
 
-extern "C" {
-PhysicalMediaOutput *Initialize() {
-    return new SoundCardPMO();
+extern    "C"
+{
+   PhysicalMediaOutput *Initialize()
+   {
+      return new SoundCardPMO();
+   }
 }
-	   }
 
-static char * g_ErrorArray[8] = {
-    "Invalid Error Code",
-    "dsp device open failed",
-    "fcntl F_GETFL on /dev/dsp failed",
-    "fcntl F_SETFL on /dev/dsp failed"
-    "ioctl reset failed",
-    "config of samplesize failed",
-    "config of stereo failed",
-    "config of speed failed"
+static char *g_ErrorArray[8] =
+{
+   "Invalid Error Code",
+   "dsp device open failed",
+   "fcntl F_GETFL on /dev/dsp failed",
+   "fcntl F_SETFL on /dev/dsp failed"
+   "ioctl reset failed",
+   "config of samplesize failed",
+   "config of stereo failed",
+   "config of speed failed"
 };
 
-const char *SoundCardPMO::GetErrorString(int32 error) {
-    if ((error <= pmoError_MinimumError) || (error >= pmoError_MaximumError)) {
-	return g_ErrorArray[0];
-    }
-    return g_ErrorArray[error - pmoError_MinimumError];
+const char *SoundCardPMO::
+GetErrorString(int32 error)
+{
+   if ((error <= pmoError_MinimumError) || (error >= pmoError_MaximumError))
+   {
+      return g_ErrorArray[0];
+   }
+   return g_ErrorArray[error - pmoError_MinimumError];
 }
 
-SoundCardPMO::SoundCardPMO() {
-    //cout << "Creating scpmo" << endl;
-    m_properlyInitialized = false;
-    myInfo = new OutputInfo();
-    //cout << "Done creation of the SoundCardPMO..." << endl;
+SoundCardPMO::SoundCardPMO()
+{
+   // cout << "Creating scpmo" << endl;
+   m_properlyInitialized = false;
+   myInfo = new OutputInfo();
+   // cout << "Done creation of the SoundCardPMO..." << endl;
 }
 
-SoundCardPMO::~SoundCardPMO() {
+SoundCardPMO::~SoundCardPMO()
+{
+   // RAK: I took out the reset here. According to the docs
+   // (http://www.se.opensound.com/pguide/audio.html) close() does
+   // a reset automagically.
+   // Reset(false);
 
-    //RAK: I took out the reset here. According to the docs
-	 // (http://www.se.opensound.com/pguide/audio.html) close() does
-	 // a reset automagically.
-    //Reset(false);
+   // cout << "Deleting scpmo... " << endl;
+   close(audio_fd);
+   if (myInfo)
+   {
+      delete    myInfo;
 
-    //cout << "Deleting scpmo... " << endl;
-    close(audio_fd);
-    if (myInfo) {
-	delete myInfo;
-	myInfo = NULL;
-    }
-    //cout << "Done deleting scpmo" << endl;
+      myInfo = NULL;
+   }
+   // cout << "Done deleting scpmo" << endl;
 }
 
-int SoundCardPMO::audio_fd = -1;
+int       SoundCardPMO::audio_fd = -1;
 
-
-Error SoundCardPMO::Pause() {
-    return Reset(true);
+Error     SoundCardPMO::
+Pause()
+{
+   return Reset(true);
 }
 
-Error SoundCardPMO::Resume() {
-    return kError_NoErr;
+Error     SoundCardPMO::
+Resume()
+{
+   return kError_NoErr;
 }
 
-Error SoundCardPMO::Init(OutputInfo* info) {
-    //cout << "initialize..." << endl;
-//    cout << "OI: bits_per_sample: " << info->bits_per_sample << endl;
-//    cout << "OI: number_of_channels: " << info->number_of_channels << endl;
-//    cout << "OI: samples_per_second: " << info->samples_per_second << endl;
-//    cout << "OI: max_buffer_size: " << info->max_buffer_size << endl;
-
-
-    m_properlyInitialized = false;
-    if (!info) {
-	info = myInfo;
-    } else {
-	// got info, so this is the beginning...
-	if ((audio_fd = open("/dev/dsp", O_WRONLY | O_SYNC, 0)) < 0) {
-	    if (errno == EBUSY) {
-		//cerr << "Audio device busy!" << endl;
-		return (Error)pmoError_DeviceOpenFailed;
-	    } else {
-		//cout << "Can't open /dev/dsp for writing" << endl;
-		return (Error)pmoError_DeviceOpenFailed;
-	    }
-	}
-    }
-    
-    
-
-    int fd = audio_fd;
-    int flags;
-    if ((flags = fcntl(fd,F_GETFL,0)) < 0) {
-	return (Error)pmoError_IOCTL_F_GETFL;
-    }
-
-    flags &= O_NDELAY; //SYNC;
-    
-    if (fcntl(fd, F_SETFL, flags) < 0) {
-	return (Error)pmoError_IOCTL_F_SETFL;
-    }
-
-    audio_fd = fd;
-    
-    channels = info->number_of_channels;
-    
-    for (int i = 0; i < info->number_of_channels; ++i)
-	bufferp[i] = buffer + i;
-    
-    // configure the device:
-    int play_precision = 16;
-    int play_stereo = channels-1;
-    int play_sample_rate = info->samples_per_second;
-
-    int junkvar = 0;
-    if (ioctl(audio_fd, SNDCTL_DSP_RESET, &junkvar) == -1) {
-	return (Error)pmoError_IOCTL_SNDCTL_DSP_RESET;
-    } 
-    
-    if(ioctl(audio_fd, SNDCTL_DSP_SAMPLESIZE, &play_precision) == -1) {
-	return (Error)pmoError_IOCTL_SNDCTL_DSP_SAMPLESIZE;
-    }
-
-    if(ioctl(audio_fd, SNDCTL_DSP_STEREO, &play_stereo) == -1) {
-	return (Error)pmoError_IOCTL_SNDCTL_DSP_STEREO;
-    }
-    if (ioctl(audio_fd, SNDCTL_DSP_SPEED, &play_sample_rate) == -1) {
-	return (Error)pmoError_IOCTL_SNDCTL_DSP_SPEED;
-    }
-    myInfo->bits_per_sample = info->bits_per_sample;
-    myInfo->number_of_channels = info->number_of_channels;
-    myInfo->samples_per_second = info->samples_per_second;
-    myInfo->max_buffer_size = info->max_buffer_size;
-    m_properlyInitialized = true;
-    return kError_NoErr;
-}
-
-Error SoundCardPMO::Reset(bool user_stop) {
-    //cout << "Reset..." << endl;
-    int a;
-
-	 if (user_stop)
-	 {
-         if (ioctl(audio_fd,SNDCTL_DSP_RESET,&a) == -1) 
-			{
-	          return (Error)pmoError_IOCTL_SNDCTL_DSP_RESET;
+Error     SoundCardPMO::
+Init(OutputInfo * info)
+{
+   m_properlyInitialized = false;
+   if (!info)
+   {
+      info = myInfo;
+   }
+   else
+   {
+      // got info, so this is the beginning...
+      if ((audio_fd = open("/dev/dsp", O_WRONLY | O_SYNC, 0)) < 0)
+      {
+         if (errno == EBUSY)
+         {
+            g_Log->Error("Audio device busy!\n");
+            return (Error) pmoError_DeviceOpenFailed;
          }
-	      Init(NULL);
-    }
-	 else
-	 {
-         if (ioctl(audio_fd,SNDCTL_DSP_SYNC,&a) == -1) 
-			{
-	          return (Error)pmoError_IOCTL_SNDCTL_DSP_RESET;
+         else
+         {
+            g_Log->Error("Cannot open audio device!\n");
+            return (Error) pmoError_DeviceOpenFailed;
          }
-	 }
-    return kError_NoErr;
+      }
+   }
+
+   int       fd = audio_fd;
+   int       flags;
+
+   if ((flags = fcntl(fd, F_GETFL, 0)) < 0)
+   {
+      return (Error) pmoError_IOCTL_F_GETFL;
+   }
+
+   flags &= O_NDELAY;           // SYNC;
+
+   if (fcntl(fd, F_SETFL, flags) < 0)
+   {
+      return (Error) pmoError_IOCTL_F_SETFL;
+   }
+
+   audio_fd = fd;
+
+   channels = info->number_of_channels;
+
+   for (int i = 0; i < info->number_of_channels; ++i)
+      bufferp[i] = buffer + i;
+
+   // configure the device:
+   int       play_precision = 16;
+   int       play_stereo = channels - 1;
+   int       play_sample_rate = info->samples_per_second;
+
+   int       junkvar = 0;
+
+   if (ioctl(audio_fd, SNDCTL_DSP_RESET, &junkvar) == -1)
+   {
+      return (Error) pmoError_IOCTL_SNDCTL_DSP_RESET;
+   }
+
+   if (ioctl(audio_fd, SNDCTL_DSP_SAMPLESIZE, &play_precision) == -1)
+   {
+      return (Error) pmoError_IOCTL_SNDCTL_DSP_SAMPLESIZE;
+   }
+
+   if (ioctl(audio_fd, SNDCTL_DSP_STEREO, &play_stereo) == -1)
+   {
+      return (Error) pmoError_IOCTL_SNDCTL_DSP_STEREO;
+   }
+   if (ioctl(audio_fd, SNDCTL_DSP_SPEED, &play_sample_rate) == -1)
+   {
+      return (Error) pmoError_IOCTL_SNDCTL_DSP_SPEED;
+   }
+   myInfo->bits_per_sample = info->bits_per_sample;
+   myInfo->number_of_channels = info->number_of_channels;
+   myInfo->samples_per_second = info->samples_per_second;
+   myInfo->max_buffer_size = info->max_buffer_size;
+   m_properlyInitialized = true;
+   return kError_NoErr;
 }
 
-Error SoundCardPMO::Write(int32&rtn,void *pBuffer,int32 length) {
-    int32 actualThisTime = 0;
-    int32 writeBlockLength = length / PIECES;
-    //cout << "length: " << length << endl;
-    //cout << "writeBl" << endl;
-    void *pv = NULL;
-    int32 gp = 0;
-    do {
-	rtn = write(audio_fd,pBuffer,length);
-    } while ((rtn != length) && (errno == EINTR));
-    if(rtn != length) {
+Error     SoundCardPMO::
+Reset(bool user_stop)
+{
+   // cout << "Reset..." << endl;
+   int       a;
 
-//	cerr << "Wrote " << length << ", and got " << rtn << " back" << endl;
-//	cerr << "errno: " << errno << endl << "str: " << strerror(errno) << endl;
-	rtn = -1;
-	return kError_OutputUnsuccessful;
-    }
-    return kError_NoErr;
+   if (user_stop)
+   {
+      if (ioctl(audio_fd, SNDCTL_DSP_RESET, &a) == -1)
+      {
+         return (Error) pmoError_IOCTL_SNDCTL_DSP_RESET;
+      }
+      Init(NULL);
+   }
+   else
+   {
+      if (ioctl(audio_fd, SNDCTL_DSP_SYNC, &a) == -1)
+      {
+         return (Error) pmoError_IOCTL_SNDCTL_DSP_RESET;
+      }
+   }
+   return kError_NoErr;
 }
 
+Error     SoundCardPMO::
+Write(int32 & rtn, void *pBuffer, int32 length)
+{
+   int32     actualThisTime = 0;
+   int32     writeBlockLength = length / PIECES;
 
+   // cout << "length: " << length << endl;
+   // cout << "writeBl" << endl;
+   void     *pv = NULL;
+   int32     gp = 0;
 
+   do
+   {
+      rtn = write(audio_fd, pBuffer, length);
+   }
+   while ((rtn != length) && (errno == EINTR));
+   if (rtn != length)
+   {
 
-
-
-
-
-
-
-
+//      cerr << "Wrote " << length << ", and got " << rtn << " back" << endl;
+      // cerr << "errno: " << errno << endl << "str: " << strerror(errno) <<
+      // endl;
+      rtn = -1;
+      return kError_OutputUnsuccessful;
+   }
+   return kError_NoErr;
+}

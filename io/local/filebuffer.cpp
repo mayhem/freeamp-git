@@ -86,7 +86,13 @@ void FileBuffer::Clear(void)
 
 Error FileBuffer::Open(void)
 {
-    m_fpFile = fopen(m_szFile, "rb");
+    if (strcmp(m_szFile, "-") == 0)
+    {
+       m_fpFile = stdin;
+    }
+    else
+       m_fpFile = fopen(m_szFile, "rb");
+
     if (m_fpFile == NULL)
     {
         switch (errno)

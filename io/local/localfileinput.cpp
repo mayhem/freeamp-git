@@ -100,7 +100,7 @@ LocalFileInput::
       delete[]m_path;
       m_path = NULL;
    }
-   if (m_pPullBuffer >= 0)
+   if (m_pPullBuffer)
    {
       delete m_pPullBuffer;
       m_pPullBuffer = NULL;
@@ -117,7 +117,7 @@ Error     LocalFileInput::
 SetTo(char *url)
 {
    Error     result = kError_NoErr;
-
+   
    if (m_pPullBuffer)
    {
       delete m_pPullBuffer;
@@ -150,7 +150,7 @@ SetTo(char *url)
       if (IsntError(result))
       {
          m_pPullBuffer = new FileBuffer(iBufferSize, iOverflowSize, 
-                                         iTriggerSize, url);
+                                         iTriggerSize, m_path);
          assert(m_pPullBuffer);
 
          result = m_pPullBuffer->Open();
