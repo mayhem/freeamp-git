@@ -37,17 +37,17 @@ void infoeditorUI::DoApplyInfoEdit(void)
     gtk_widget_set_sensitive(m_okButton, FALSE);
     gtk_widget_set_sensitive(m_applyButton, FALSE);
     text = gtk_entry_get_text(GTK_ENTRY(m_titleEntry));
-    newmeta.SetTitle(strdup_new(text));
+    newmeta.SetTitle(text);
     text = gtk_entry_get_text(GTK_ENTRY(m_artistEntry));
-    newmeta.SetArtist(strdup_new(text));
+    newmeta.SetArtist(text);
     text = gtk_entry_get_text(GTK_ENTRY(m_albumEntry));
-    newmeta.SetAlbum(strdup_new(text));
+    newmeta.SetAlbum(text);
     text = gtk_entry_get_text(GTK_ENTRY(m_yearEntry));
     newmeta.SetYear(atoi(text));
     text = gtk_entry_get_text(GTK_ENTRY(m_commentEntry));
-    newmeta.SetComment(strdup_new(text));
+    newmeta.SetComment(text);
     text = gtk_entry_get_text(GTK_ENTRY(m_genreEntry));
-    newmeta.SetGenre(strdup_new(text));
+    newmeta.SetGenre(text);
     text = gtk_entry_get_text(GTK_ENTRY(m_trackEntry));
     newmeta.SetTrack(atoi(text));
 

@@ -49,9 +49,134 @@ void GTKMusicBrowser::AddStreamToFavs(void)
     m_context->catalog->AddStream(stream->URL().c_str());
 }
 
+static gboolean add_new_destroy(GtkWidget *w, gpointer p)
+{
+    gtk_main_quit();
+    return FALSE;
+}
+
+static gint add_new_kill(GtkWidget *w, GdkEvent *e, int *ret)
+{
+    *ret = 2;
+    return FALSE;
+}
+
+static void add_new_ok(GtkWidget *w, int *ret)
+{
+    *ret = 1;
+}
+
+static void add_new_cancel(GtkWidget *w, int *ret)
+{
+    *ret = 2;
+}
+
+static void add_new_title(GtkWidget *w, string *title)
+{
+    *title = gtk_entry_get_text(GTK_ENTRY(w));
+}
+
+static void add_new_url(GtkWidget *w, string *url)
+{
+    *url = gtk_entry_get_text(GTK_ENTRY(w));
+}
+
 void GTKMusicBrowser::AddNewStream(void)
 {
+    int iRet = 0;
 
+    string url, title;
+
+    GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_modal(GTK_WINDOW(window), TRUE);
+    gtk_signal_connect(GTK_OBJECT(window), "destroy",
+                       GTK_SIGNAL_FUNC(add_new_destroy), NULL);
+    gtk_signal_connect(GTK_OBJECT(window), "delete_event",
+                       GTK_SIGNAL_FUNC(add_new_kill), &iRet);
+    gtk_window_set_title(GTK_WINDOW(window), "Add a New Stream");
+    gtk_container_set_border_width(GTK_CONTAINER(window), 5);
+    gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
+
+    GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(window), vbox);
+    gtk_widget_show(vbox);
+
+    GtkWidget *table = gtk_table_new(8, 2, FALSE);
+    gtk_box_pack_start(GTK_BOX(vbox), table, FALSE, FALSE, 0);
+    gtk_widget_show(table);
+
+    GtkWidget *label = gtk_label_new("Title:");
+    gtk_misc_set_alignment(GTK_MISC(label), (gfloat)1.0, (gfloat)0.5);
+    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 0, 1, GTK_FILL, GTK_FILL,
+                     10, 1);
+    gtk_widget_show(label);
+
+    GtkWidget *titleEntry = gtk_entry_new();
+    gtk_table_attach_defaults(GTK_TABLE(table), titleEntry, 1, 2, 0, 1);
+    gtk_signal_connect(GTK_OBJECT(titleEntry), "changed",
+                       GTK_SIGNAL_FUNC(add_new_title), &title);
+    gtk_widget_show(titleEntry);
+
+    label = gtk_label_new("URL:");
+    gtk_misc_set_alignment(GTK_MISC(label), (gfloat)1.0, (gfloat)0.5);
+    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 1, 2, GTK_FILL, GTK_FILL,
+                     10, 1);
+    gtk_widget_show(label);
+
+    GtkWidget *urlEntry = gtk_entry_new();
+    gtk_table_attach_defaults(GTK_TABLE(table), urlEntry, 1, 2, 1, 2);
+    gtk_signal_connect(GTK_OBJECT(urlEntry), "changed",
+                       GTK_SIGNAL_FUNC(add_new_url), &url);
+    gtk_widget_show(urlEntry);
+
+    GtkWidget *separator = gtk_hseparator_new();
+    gtk_container_add(GTK_CONTAINER(vbox), separator);
+    gtk_widget_show(separator);
+
+    GtkWidget *hbox = gtk_hbox_new(FALSE, 10);
+    gtk_container_set_border_width(GTK_CONTAINER(hbox), 5);
+    gtk_container_add(GTK_CONTAINER(vbox), hbox);
+    gtk_widget_show(hbox);
+
+    GtkWidget *button = gtk_button_new_with_label("OK");
+    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                       GTK_SIGNAL_FUNC(add_new_ok), &iRet);
+    gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
+                              GTK_SIGNAL_FUNC(gtk_widget_destroy),
+                              GTK_OBJECT(window));
+    gtk_container_add(GTK_CONTAINER(hbox), button);
+    gtk_widget_show(button);
+
+    button = gtk_button_new_with_label("Cancel");
+    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                       GTK_SIGNAL_FUNC(add_new_cancel), &iRet);
+    gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
+                              GTK_SIGNAL_FUNC(gtk_widget_destroy),
+                              GTK_OBJECT(window));
+    gtk_container_add(GTK_CONTAINER(hbox), button);
+    gtk_widget_show(button);
+
+    gtk_widget_show(window);
+
+    gtk_main();
+
+    if (iRet != 1)
+        return;
+
+    if (!url.size() || !title.size())
+        return;
+
+    PlaylistItem *newitem = new PlaylistItem;
+    MetaData metadata;
+
+    newitem->SetURL(url.c_str());
+    metadata.SetTitle(title.c_str());
+    newitem->SetMetaData(&metadata);
+
+    m_context->catalog->WriteMetaDataToDatabase(newitem->URL().c_str(),
+                                                newitem->GetMetaData(),
+                                                kTypeStream);
+    m_context->catalog->AddStream(newitem->URL().c_str());
 }
 
 void GTKMusicBrowser::EjectCD(void)
