@@ -22,8 +22,6 @@
 	$Id$
 ____________________________________________________________________________*/
 
-// player.cpp
-
 #include <iostream.h>
 
 #include "event.h"
@@ -35,10 +33,9 @@ ____________________________________________________________________________*/
 #include "queue.h"
 
 
-#include "localfileinput.h"
-//#include "eofinput.h"
-#include "soundcardpmo.h"
-#include "xinglmc.h"
+//#include "localfileinput.h"
+//#include "soundcardpmo.h"
+//#include "xinglmc.h"
 #include "semaphore.h"
 
 #include "eventdata.h"
@@ -49,7 +46,7 @@ Player *Player::thePlayer = NULL;
 
 Player *Player::getPlayer() {
     if (thePlayer == NULL) {
-	thePlayer = new Player();
+        thePlayer = new Player();
     }
     return thePlayer;
 }
@@ -71,8 +68,6 @@ Player::Player() {
     imQuitting = 0;
     quitWaitingFor = 0;
     myPlayList = NULL;
-    //maPlayLMC = NULL;
-    //xingLMC = NULL;
     myLMC = NULL;
     playerState = STATE_Stopped;
 }
@@ -82,62 +77,62 @@ Player::~Player() {
     event_service_thread->Join();
     //cout << "serivce thread done.." << endl;
     if (myLMC) {
-	myLMC->Stop();
-	delete myLMC;
-	myLMC = NULL;
+        myLMC->Stop();
+        delete myLMC;
+        myLMC = NULL;
     }
     //cout << "done deleting myLMC" << endl;
     if (event_sem) {
-	delete event_sem;
-	event_sem = NULL;
+        delete event_sem;
+        event_sem = NULL;
     }
     //cout << "Player: deleting event service thread" << endl;
     if (event_service_thread) {
-	delete event_service_thread;
-	event_service_thread = NULL;
+        delete event_service_thread;
+        event_service_thread = NULL;
     }
     //cout << "Player: deleting event queue" << endl;
     if (event_queue) {
-	delete event_queue;
-	event_queue = NULL;
+        delete event_queue;
+        event_queue = NULL;
     }
     // Delete PlayList
     //cout << "Player: deleting PlayList" << endl;
     if (myPlayList) {
-	delete myPlayList;
-	myPlayList = NULL;
+        delete myPlayList;
+        myPlayList = NULL;
     }
 
     // Delete CIOs
     //cout << "Player: deleting CIOs" << endl;
     if (cio_vector) {
-//	cio_vector->DeleteAll();
-	delete cio_vector;
-	cio_vector = NULL;
+        //cio_vector->DeleteAll();
+        delete cio_vector;
+        cio_vector = NULL;
     }
     // Delete COOs
     //cout << "Player: deleting COOs" << endl;
     if (coo_vector) {
-//	coo_vector->DeleteAll();
-	delete coo_vector;
-	coo_vector = NULL;
+        //coo_vector->DeleteAll();
+        delete coo_vector;
+        coo_vector = NULL;
     }
     //cout << "Actaully deleting registered deletions" << endl;
     if (cio_death_vector) {
-	cio_death_vector->DeleteAll();
-	delete cio_death_vector;
-	cio_death_vector = NULL;
+        cio_death_vector->DeleteAll();
+        delete cio_death_vector;
+        cio_death_vector = NULL;
     }
     //cout << "Actually deleting registered deletions" << endl;
     if (coo_death_vector) {
-	coo_death_vector->DeleteAll();
-	delete coo_death_vector;
-	coo_death_vector = NULL;
+        coo_death_vector->DeleteAll();
+        delete coo_death_vector;
+        coo_death_vector = NULL;
     }
     //cout << "Player: deleting CIO/COO manipulation lock" << endl;
     if (coManipLock) {
-	delete coManipLock;
-	coManipLock = NULL;
+        delete coManipLock;
+        coManipLock = NULL;
     }
 }
 
@@ -147,15 +142,15 @@ THREAD_RETURN THREAD_LINKAGE Player::EventServiceThreadFunc(void *pPlayer) {
     Event *pC;
     int32 rtnVal = 0x0;
     while (rtnVal == 0) {   // serviceEvent will return 1 if error or time to quit.
-	//cout << "About to read queue..." << endl;
-	pP->event_sem->Wait();
-	pC = pP->event_queue->read();
-	//cout << "Read queue..." << endl;
-	if (pC) {
-	    rtnVal = pP->serviceEvent(pC);
-	    delete pC;
-	}
-	//if (pP->event_queue->isEmpty()) usleep(50000);
+        //cout << "About to read queue..." << endl;
+        pP->event_sem->Wait();
+        pC = pP->event_queue->read();
+        //cout << "Read queue..." << endl;
+        if (pC) {
+	        rtnVal = pP->serviceEvent(pC);
+	        delete pC;
+        }
+        //if (pP->event_queue->isEmpty()) usleep(50000);
     }
 //    cout << "EventServiceThreadFunc: quitting on " << rtnVal << endl;
     // Time to quit!!!
@@ -168,27 +163,27 @@ int32 Player::registerCOO(COO *ed) {
     getCOManipLock();
 //    cout << "Got comaniplock" << endl;
     if (coo_vector && ed) {
-//	cout << "about to insert..>" << endl;
-	coo_vector->insert(ed);
-//	cout <<"inserted" << endl;
-	releaseCOManipLock();
-//	cout <<"released" << endl;
-	return 0;
+        //cout << "about to insert..>" << endl;
+        coo_vector->insert(ed);
+        //cout <<"inserted" << endl;
+        releaseCOManipLock();
+        //cout <<"released" << endl;
+        return 0;
     } else {
-	releaseCOManipLock();
-	return 255;
+        releaseCOManipLock();
+        return 255;
     }
 }
 
 int32 Player::registerCIO(CIO *ed) {
     getCOManipLock();
     if (cio_vector) {
-	cio_vector->insert(ed);
-	releaseCOManipLock();
-	return 0;
+        cio_vector->insert(ed);
+        releaseCOManipLock();
+        return 0;
     } else {
-	releaseCOManipLock();
-	return 255;
+        releaseCOManipLock();
+        return 255;
     }
 }
 
@@ -209,7 +204,8 @@ int32 Player::acceptEvent(Event c) {
 
 bool Player::setState(PlayerState ps) {
     //cout << "Changing from " << playerState << " to " << ps << endl;
-    if (ps == playerState) return false;
+    if (ps == playerState) 
+        return false;
     playerState = ps;
     return true;
 }
@@ -222,127 +218,134 @@ int32 Player::serviceEvent(Event *pC) {
 	//cout << "Player: serviceEvent: servicing Event: " << pC->getEvent() << endl;
 	switch (pC->getEvent()) {
 	    case INFO_DoneOutputting: {  // LMC or PMO sends this when its done outputting whatever.  Now, go on to next piece in playlist
-		if (setState(STATE_Stopped)) {
-		    SEND_NORMAL_EVENT(INFO_Stopped);
-		}
-		myPlayList->setNext();
-		Event *e = new Event(CMD_Play);
-		acceptEvent(*e);
-		delete e;
-		return 0;
-		break; }
+            if (setState(STATE_Stopped)) {
+	            SEND_NORMAL_EVENT(INFO_Stopped);
+            }
+            myPlayList->setNext();
+            Event *e = new Event(CMD_Play);
+            acceptEvent(*e);
+            delete e;
+            return 0;
+            break; 
+        }
+
 	    case CMD_Stop: {
-		if (myLMC) {
-		    myLMC->Stop();
-		    delete myLMC;
-		    myLMC = NULL;
-		}
-		if (setState(STATE_Stopped)) {
-		    SEND_NORMAL_EVENT(INFO_Stopped);
-		}
-		return 0;
+            if (myLMC) {
+	            myLMC->Stop();
+	            delete myLMC;
+	            myLMC = NULL;
+            }
+            if (setState(STATE_Stopped)) {
+	            SEND_NORMAL_EVENT(INFO_Stopped);
+            }
+            return 0;
 		break;
 	    }
+
 	    case CMD_Play: {
-		PlayListItem *pc = myPlayList->getCurrent();
-		if (pc) {
-		    // MP3 from disk to soundcard proof of concept steps:
-		    // 1) Create a LocalFileInput with pc
-		    // 2) Create a SoundCardOutput
-		    // 3) Create a XingLMC(LocalFilePMI,SoundCardPMO)
-		    // 4) go nuts
-		    if (myLMC) {
-			myLMC->Stop();
-			delete myLMC;
-			myLMC = NULL;
-		    }
-		   PhysicalMediaInput* pmi = NULL;
-		    //cout << "Done deleting myLMC" << endl;
-			if(pc->type == 0)
-				pmi = new LocalFileInput(pc->url);
-			else if(pc->type == 1) 
-//				pmi = new EOFInput(pc->url, 0x69e00);
-			    ;
-		    //cout << "New PMI..." << endl;
-		    SoundCardPMO *scPMO = new SoundCardPMO();
-		    //cout << "New scPMO..." << endl;
-		    //myLMC = new MAPlayLMC(lfPMI,scPMO);
-		    myLMC = new XingLMC(pmi,scPMO);
-		    //cout << "Created xing..." << endl;
-		    if (setState(STATE_Playing)) {
-			SEND_NORMAL_EVENT(INFO_Playing);
-		    }
-		    myLMC->ChangePosition(myPlayList->getSkip());
-		    myLMC->Decode();
-		    //cout << "Kicked off decoder..." << endl;
-		    
-		} else {
-		    //cout << "no more in playlist..." << endl;
-		    if (myLMC) {
-			myLMC->Stop();
-			delete myLMC;
-			myLMC = NULL;
-		    }
-		    if (setState(STATE_Stopped)) {
-			SEND_NORMAL_EVENT(INFO_Stopped);
-		    }
-		    //cout << "killed lmc" << endl;
-		    getCOManipLock();
-		    //cout << "got lock" << endl;
-		    
-		    Event *e = new Event(INFO_PlayListDonePlay);
-		    sendToCIOCOO(e);
-		    //cout << "sent playlist done playing" << endl;
-		    releaseCOManipLock();
-		    //cout << "released lock" << endl;
-		    delete e;
-		}
-		return 0;
-		break; }
+            PlayListItem *pc = myPlayList->getCurrent();
+            if (pc) {
+	            // MP3 from disk to soundcard proof of concept steps:
+	            // 1) Create a LocalFileInput with pc
+	            // 2) Create a SoundCardOutput
+	            // 3) Create a XingLMC(LocalFilePMI,SoundCardPMO)
+	            // 4) go nuts
+                if (myLMC) {
+                    myLMC->Stop();
+	                delete myLMC;
+	                myLMC = NULL;
+	            }
+
+	            PhysicalMediaInput* pmi = NULL;
+	            //cout << "Done deleting myLMC" << endl;
+	            //if(pc->type == 0)
+	            //	pmi = new LocalFileInput(pc->url);
+
+	            //cout << "New PMI..." << endl;
+	            //SoundCardPMO *scPMO = new SoundCardPMO();
+	            //cout << "New scPMO..." << endl;
+	            //myLMC = new MAPlayLMC(lfPMI,scPMO);
+	            //myLMC = new XingLMC(pmi,scPMO);
+	            //cout << "Created xing..." << endl;
+	            if (setState(STATE_Playing)) {
+	                SEND_NORMAL_EVENT(INFO_Playing);
+	            }
+	            myLMC->ChangePosition(myPlayList->getSkip());
+	            myLMC->Decode();
+	            //cout << "Kicked off decoder..." << endl;
+	            
+            } else {
+	            //cout << "no more in playlist..." << endl;
+	            if (myLMC) {
+	                myLMC->Stop();
+	                delete myLMC;
+	                myLMC = NULL;
+	            }
+	            if (setState(STATE_Stopped)) {
+	                SEND_NORMAL_EVENT(INFO_Stopped);
+	            }
+	            //cout << "killed lmc" << endl;
+	            getCOManipLock();
+	            //cout << "got lock" << endl;
+	            
+	            Event *e = new Event(INFO_PlayListDonePlay);
+	            sendToCIOCOO(e);
+	            //cout << "sent playlist done playing" << endl;
+	            releaseCOManipLock();
+	            //cout << "released lock" << endl;
+	            delete e;
+            }
+            return 0;
+		    break; 
+        }
+
 	    case CMD_NextMediaPiece:
-		myPlayList->setNext();
-		return 0;
-		break;
-	    case CMD_PrevMediaPiece:
-		myPlayList->setPrev();
-		return 0;
-		break;
+            myPlayList->setNext();
+            return 0;
+            break;
+
+        case CMD_PrevMediaPiece:
+            myPlayList->setPrev();
+            return 0;
+            break;
+
 	    case CMD_Pause: {
-		if (myLMC) {
-		    myLMC->Pause();
-		    if (setState(STATE_Paused)) {
-			SEND_NORMAL_EVENT(INFO_Paused);
+		    if (myLMC) {
+		        myLMC->Pause();
+		        if (setState(STATE_Paused)) {
+			    SEND_NORMAL_EVENT(INFO_Paused);
+		        }
 		    }
-		}
-		return 0;
-		break;
+		    return 0;
+		    break;
 	    }
+
 	    case CMD_UnPause: {
-		if (myLMC) {
-		    myLMC->Resume();
-		    if (setState(STATE_Playing)) {
-			SEND_NORMAL_EVENT(INFO_Playing);
-		    }
-		}
-		return 0;
-		break;
+            if (myLMC) {
+	            myLMC->Resume();
+	            if (setState(STATE_Playing)) {
+	                SEND_NORMAL_EVENT(INFO_Playing);
+	            }
+            }
+            return 0;
+            break;
 	    }
 	    case CMD_TogglePause: {
-		if (myLMC) {
-		    if (playerState == STATE_Playing) {
-			myLMC->Pause();
-			if (setState(STATE_Paused)) {
-			    SEND_NORMAL_EVENT(INFO_Paused);
-			}
-		    } else if (playerState == STATE_Paused) {
-			myLMC->Resume();
-			if (setState(STATE_Playing)) {
-			    SEND_NORMAL_EVENT(INFO_Playing);
-			}
-		    }
-		}
-		return 0;
-		break;
+            if (myLMC) {
+	            if (playerState == STATE_Playing) {
+                    myLMC->Pause();
+                    if (setState(STATE_Paused)) {
+	                    SEND_NORMAL_EVENT(INFO_Paused);
+                    }
+	            } else if (playerState == STATE_Paused) {
+                    myLMC->Resume();
+                    if (setState(STATE_Playing)) {
+	                    SEND_NORMAL_EVENT(INFO_Playing);
+                    }
+	            }
+            }
+            return 0;
+            break;
 	    }
 	    case CMD_SetPlaylist:
 		myPlayList = (PlayList *)pC->getArgument();

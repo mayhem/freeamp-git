@@ -1,4 +1,3 @@
-
 /*____________________________________________________________________________
 	
 	FreeAmp - The Free MP3 Player
@@ -22,40 +21,23 @@
 	$Id$
 ____________________________________________________________________________*/
 
-#ifndef _PLAYLIST_H_
-#define _PLAYLIST_H_
+#ifndef _PMI_REGISTRY_H_
+#define _PMI_REGISTRY_H_
 
-#include "vector.h"
+#include "config.h"
+#include "registry.h"
 
-class PlayListItem {
+class PMIInfo : public RegistryInfo {
  public:
-    char *url;
-    int32 type;
-    int32 startFrame;
-
-    PlayListItem();
-    ~PlayListItem();
+    PMIInfo(){}
+    ~PMIInfo(){}
 };
 
-class PlayList {
- private:
-    Vector<PlayListItem *> *pMediaElems;
-    int32 current;
-    int32 skipNum;
+class PMIRegistry : public Registry{
  public:
-    PlayList();
-    ~PlayList();
-    void add(char *,int);
-    void setSkip(int32 f) { skipNum = f; } // logical media units to skip at beginning
-    int32 getSkip() { return skipNum; }
-    PlayListItem *getFirst();
-    PlayListItem *getNext();
-    PlayListItem *getPrev();
-    PlayListItem *getCurrent();
-    void setFirst();
-    void setNext();
-    void setPrev();
+    PMIRegistry();
+    ~PMIRegistry();
 };
 
 
-#endif // _PLAYLIST_H_
+#endif // _PMI_REGISTRY_H_

@@ -1,4 +1,3 @@
-
 /*____________________________________________________________________________
 	
 	FreeAmp - The Free MP3 Player
@@ -22,40 +21,42 @@
 	$Id$
 ____________________________________________________________________________*/
 
-#ifndef _PLAYLIST_H_
-#define _PLAYLIST_H_
+#ifndef _REGISTRY_H_
+#define _REGISTRY_H_
 
+#include "config.h"
 #include "vector.h"
 
-class PlayListItem {
+class RegistryInfo {
  public:
-    char *url;
-    int32 type;
-    int32 startFrame;
+    RegistryInfo();
+    virtual ~RegistryInfo();
 
-    PlayListItem();
-    ~PlayListItem();
-};
+    virtual void SetPath(char* path);
+    virtual const char* Path() const {return m_path;}
 
-class PlayList {
+    virtual void SetDescription(char* description);
+    virtual const char* Description() const { return m_description;}
+
+
  private:
-    Vector<PlayListItem *> *pMediaElems;
-    int32 current;
-    int32 skipNum;
+    char* m_path;
+    char* m_description;
+
+};
+
+class Registry {
+ private:
+    Vector<RegistryInfo*> *m_elements;
+    int32 m_count;
+    
  public:
-    PlayList();
-    ~PlayList();
-    void add(char *,int);
-    void setSkip(int32 f) { skipNum = f; } // logical media units to skip at beginning
-    int32 getSkip() { return skipNum; }
-    PlayListItem *getFirst();
-    PlayListItem *getNext();
-    PlayListItem *getPrev();
-    PlayListItem *getCurrent();
-    void setFirst();
-    void setNext();
-    void setPrev();
+    Registry();
+    virtual ~Registry();
+
+    virtual void Add(RegistryInfo*);
+    virtual RegistryInfo* GetInfo(int32 index);
 };
 
 
-#endif // _PLAYLIST_H_
+#endif // _REGISTRY_H_

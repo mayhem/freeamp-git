@@ -61,7 +61,7 @@ class Id3TagInfo {
     }
 
  private:
-    nullinit() {
+    void nullinit() {
 	*songname = '\0';
 	*artist = '\0';
 	*album = '\0';

@@ -1,4 +1,3 @@
-
 /*____________________________________________________________________________
 	
 	FreeAmp - The Free MP3 Player
@@ -22,40 +21,23 @@
 	$Id$
 ____________________________________________________________________________*/
 
-#ifndef _PLAYLIST_H_
-#define _PLAYLIST_H_
+#ifndef _LMC_REGISTRY_H_
+#define _LMC_REGISTRY_H_
 
-#include "vector.h"
+#include "config.h"
+#include "registry.h"
 
-class PlayListItem {
+class LMCInfo : public RegistryInfo {
  public:
-    char *url;
-    int32 type;
-    int32 startFrame;
-
-    PlayListItem();
-    ~PlayListItem();
+    LMCInfo(){}
+    ~LMCInfo(){}
 };
 
-class PlayList {
- private:
-    Vector<PlayListItem *> *pMediaElems;
-    int32 current;
-    int32 skipNum;
+class LMCRegistry : public Registry{
  public:
-    PlayList();
-    ~PlayList();
-    void add(char *,int);
-    void setSkip(int32 f) { skipNum = f; } // logical media units to skip at beginning
-    int32 getSkip() { return skipNum; }
-    PlayListItem *getFirst();
-    PlayListItem *getNext();
-    PlayListItem *getPrev();
-    PlayListItem *getCurrent();
-    void setFirst();
-    void setNext();
-    void setPrev();
+    LMCRegistry();
+    ~LMCRegistry();
 };
 
 
-#endif // _PLAYLIST_H_
+#endif // _LMC_REGISTRY_H_

@@ -1,4 +1,3 @@
-
 /*____________________________________________________________________________
 	
 	FreeAmp - The Free MP3 Player
@@ -22,8 +21,6 @@
 	$Id$
 ____________________________________________________________________________*/
 
-
-
 #include "playlist.h"
 #include "vector.h"
 
@@ -35,29 +32,30 @@ PlayList::PlayList() {
 
 PlayList::~PlayList() {
     if (pMediaElems) {
-	pMediaElems->DeleteAll();
-	delete pMediaElems;
-	pMediaElems = NULL;
+        pMediaElems->DeleteAll();
+	    delete pMediaElems;
+	    pMediaElems = NULL;
     }
 }
 
 void PlayList::add(char *pc, int type) {
     if (pc) {
-	//int len = strlen(pc) + 1;
-	//char *pNewC = new char[len];
-	PlayListItem* item = new PlayListItem;
-	int len = strlen(pc) + 1;
-	if(item->url = new char[len]) {
-	    //strcpy(item->url,pc);
-	    memcpy(item->url,pc,len);
-	} else {
-	    //XXX FIXME Uhhh...what if we run out of memory?
-	    // --jdw:  then we're screwwwwwwwed
-	    cerr << "Out of memory!\n";
-	}
-	item->type = type;
+	    //int len = strlen(pc) + 1;
+	    //char *pNewC = new char[len];
+	    PlayListItem* item = new PlayListItem;
+	    int len = strlen(pc) + 1;
+	    if(item->url = new char[len]) {
+	        //strcpy(item->url,pc);
+	        memcpy(item->url,pc,len);
+	    } else {
+	        //XXX FIXME Uhhh...what if we run out of memory?
+	        // --jdw:  then we're screwwwwwwwed
+	        cerr << "Out of memory!\n";
+	    }
 
-	pMediaElems->insert(item);
+	    item->type = type;
+
+	    pMediaElems->insert(item);
     }
 }
 
@@ -85,10 +83,10 @@ void PlayList::add(char *pc, int type) {
  void PlayList::setPrev() { current--; }
 
 PlayListItem::PlayListItem() {
-  url = NULL;
+    url = NULL;
 }
     
 PlayListItem::~PlayListItem() {
-  if(url)
-    delete url;
+    if(url)
+        delete url;
 }
