@@ -210,6 +210,7 @@ plugins/obsinput-$(HOST_OS).pmi: $(OBSPMI)
 
 # soundcardpmo is os-dependent, so have to fool with $(OSDEP)
 SCPMOOBJ = io/soundcard/$(OSDEP)/src/soundcardpmo.o
+SCPMOOBJ +=io/soundcard/$(OSDEP)/src/volume.o
 
 plugins/soundcard-$(HOST_OS).pmo: $(SCPMOOBJ)
 	$(LINKMOD) -o $@ $(SCPMOOBJ)
