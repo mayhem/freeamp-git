@@ -142,6 +142,7 @@ MUSICBROWSEROBJ += ui/musicbrowser/unix/src/fileselector.o
 MUSICBROWSEROBJ += ui/musicbrowser/unix/src/browsermenu.o 
 MUSICBROWSEROBJ += ui/musicbrowser/unix/src/musicsearch.o 
 MUSICBROWSEROBJ += ui/musicbrowser/unix/src/gtkmessagedialog.o 
+MUSICBROWSEROBJ += ui/musicbrowser/unix/src/introwizard.o
 
 plugins/musicbrowser.ui: $(MUSICBROWSEROBJ)
 	$(LINKMOD) -o $@ $(MUSICBROWSEROBJ) $(GTK_LIBS)

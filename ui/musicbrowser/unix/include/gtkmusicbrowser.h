@@ -193,7 +193,8 @@ class GTKMusicBrowser {
     void RemoveCatPlaylist(string playlist);
     void SetRepeatType(RepeatMode mode);
     void SetShuffleType(bool shuffled);
-
+    bool CheckEmptyDatabase(void);
+    
   public:
     bool iSetShuffleMode;
 
@@ -221,7 +222,7 @@ class GTKMusicBrowser {
     void AddTracksPlaylistEvent(vector<PlaylistItem *> *newlist, 
                                 bool end = false);
     void PlayEvent();
-    void StartMusicSearch(bool runMain = true);
+    void StartMusicSearch(bool runMain = true, bool intro = false);
     void SortPlaylistEvent(PlaylistSortKey order, PlaylistSortType type);
     void PopUpInfoEditor(PlaylistItem *editee = NULL);
     void SaveCurrentPlaylist(char *path = NULL);

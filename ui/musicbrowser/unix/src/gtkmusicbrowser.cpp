@@ -1037,13 +1037,37 @@ void GTKMusicBrowser::CreateMainTreeItems(void)
 
     gtk_clist_thaw(GTK_CLIST(musicBrowserTree));
 }
-    
+   
+bool GTKMusicBrowser::CheckEmptyDatabase(void)
+{
+    if (m_context->catalog->GetPlaylists()->size() > 0 ||
+        m_context->catalog->GetMusicList()->size() > 0 ||
+	m_context->catalog->GetUnsortedMusic()->size() > 0)
+	return false;
+
+    bool welcome = false;
+
+    m_context->prefs->GetPrefBoolean(kWelcomePref, &welcome);
+
+    if (welcome) {
+        m_context->prefs->SetPrefBoolean(kWelcomePref, false);
+	StartMusicSearch(false, true);
+    }
+    else {
+        GTKMessageDialog oBox;
+        string oMessage = string("Your music database does not contain any items.  Would you like to start a music search to find music and playlists on your machine?");
+
+        if (oBox.Show(oMessage.c_str(), "MusicBrowser", kMessageYesNo)
+            == kMessageReturnYes)
+           StartMusicSearch(false);
+    }
+    return true;
+}
+
 void GTKMusicBrowser::UpdateCatalog(void)
 
 {
     m_musicCatalog = m_context->catalog;
-    static bool triedUpdate = false;
-
     m_musicCatalog->GetCatalogLock();
 
     vector<ArtistList *> *artistList = 
@@ -1053,15 +1077,7 @@ void GTKMusicBrowser::UpdateCatalog(void)
     vector<string> *playlists = 
                                (vector<string> *)m_musicCatalog->GetPlaylists();
 
-    if ((artistList->size() == 0) && (unsorted->size() == 0) && 
-        (playlists->size() == 0) && (triedUpdate == false)) {
-        GTKMessageDialog oBox;
-        string oMessage = string("Your music database does not contain any items.  Would you like to start a music search to find music and playlists on your machine?"); 
-       
-        triedUpdate = true;
-        if (oBox.Show(oMessage.c_str(), "MusicBrowser", kMessageYesNo)
-            == kMessageReturnYes)
-            StartMusicSearch(false);
+    if (CheckEmptyDatabase()) {
         m_musicCatalog->ReleaseCatalogLock();
         return;
     }
@@ -2317,9 +2333,9 @@ void GTKMusicBrowser::PlayEvent(void)
     m_context->target->AcceptEvent(new Event(CMD_Play));
 }
 
-void GTKMusicBrowser::StartMusicSearch(bool runMain)
+void GTKMusicBrowser::StartMusicSearch(bool runMain, bool intro)
 {
-    parentUI->StartSearch(runMain);
+    parentUI->StartSearch(runMain, intro);
 }
 
 void GTKMusicBrowser::SortPlaylistEvent(PlaylistSortKey order, PlaylistSortType

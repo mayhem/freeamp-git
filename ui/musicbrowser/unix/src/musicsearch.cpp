@@ -33,6 +33,8 @@ ____________________________________________________________________________*/
 #include "musiccatalog.h"
 #include "musicsearchui.h"
 
+#include "../res/wizard_small.xpm"
+
 gboolean search_destroy(GtkWidget *widget, gpointer p)
 {
     bool quitmain = (bool)p;
@@ -41,7 +43,7 @@ gboolean search_destroy(GtkWidget *widget, gpointer p)
     return FALSE;
 }
 
-void start_search_button_event(GtkWidget *widget, musicsearchUI *p)
+static void start_search_button_event(GtkWidget *widget, musicsearchUI *p)
 {
     if (p->searchDone) 
         gtk_widget_destroy(p->m_window);
@@ -51,7 +53,7 @@ void start_search_button_event(GtkWidget *widget, musicsearchUI *p)
         p->StartSearch();
 }
 
-void search_cancel_button_event(GtkWidget *widget, musicsearchUI *p)
+static void search_cancel_button_event(GtkWidget *widget, musicsearchUI *p)
 {
     if (p->searchInProgress)
         p->EndSearch();
@@ -65,14 +67,14 @@ void musicsearchUI::UpdateEntry(void)
     gtk_entry_set_text(GTK_ENTRY(textEntry), searchPath.c_str());
 }
 
-void search_select_entire(GtkWidget *widget, musicsearchUI *p)
+static void search_select_entire(GtkWidget *widget, musicsearchUI *p)
 {
     p->SetSearchPath("/");
     p->custom = false;
     p->UpdateEntry();
 }
 
-void search_select_home(GtkWidget *widget, musicsearchUI *p)
+static void search_select_home(GtkWidget *widget, musicsearchUI *p)
 {
     char *homeDir = getenv("HOME");
     if (!homeDir)
@@ -83,14 +85,14 @@ void search_select_home(GtkWidget *widget, musicsearchUI *p)
     p->UpdateEntry();
 }
 
-void search_select_share(GtkWidget *widget, musicsearchUI *p)
+static void search_select_share(GtkWidget *widget, musicsearchUI *p)
 {
     p->SetSearchPath("/usr/share");
     p->custom = false;
     p->UpdateEntry();
 }
 
-void search_select_custom(GtkWidget *widget, musicsearchUI *p)
+static void search_select_custom(GtkWidget *widget, musicsearchUI *p)
 {
     if (!p->custom)
         p->SetSearchPath("/");
@@ -98,13 +100,13 @@ void search_select_custom(GtkWidget *widget, musicsearchUI *p)
     p->UpdateEntry();
 }
 
-void search_entry_change(GtkWidget *w, musicsearchUI *p)
+static void search_entry_change(GtkWidget *w, musicsearchUI *p)
 {
     char *text = gtk_entry_get_text(GTK_ENTRY(w));
     p->SetSearchPath(text);
 }
 
-void search_browse(GtkWidget *w, musicsearchUI *p)
+static void search_browse(GtkWidget *w, musicsearchUI *p)
 {
     FileSelector *filesel = new FileSelector("Select a Directory to begin searching in..");
     
@@ -152,16 +154,47 @@ void musicsearchUI::Show(bool runMain)
    gtk_signal_connect(GTK_OBJECT(m_window), "destroy",
                       GTK_SIGNAL_FUNC(search_destroy), (void *)runMain);
    gtk_container_set_border_width(GTK_CONTAINER(m_window), 5);
+   gtk_widget_realize(m_window);
 
+   GtkWidget *tempvbox = gtk_vbox_new(FALSE, 5);
+   gtk_container_add(GTK_CONTAINER(m_window), tempvbox);
+   gtk_widget_show(tempvbox);
+   
+   GtkWidget *temphbox = gtk_hbox_new(FALSE, 5);
+   gtk_box_pack_start(GTK_BOX(tempvbox), temphbox, TRUE, FALSE, 0);
+   gtk_widget_show(temphbox);
+  
+   GdkPixmap *pixmap;
+   GdkBitmap *mask;
+   GtkStyle *style = gtk_widget_get_style(m_window);
+   pixmap = gdk_pixmap_create_from_xpm_d(m_window->window, &mask, 
+                                         &style->bg[GTK_STATE_NORMAL],
+					 wizard_small);
+   GtkWidget *g_pixmap = gtk_pixmap_new(pixmap, mask);
+   gtk_box_pack_start(GTK_BOX(temphbox), g_pixmap, TRUE, TRUE, 0);
+   gtk_widget_show(g_pixmap);
+   
    vbox = gtk_vbox_new(FALSE, 5);
-   gtk_container_add(GTK_CONTAINER(m_window), vbox);
+   gtk_box_pack_end(GTK_BOX(temphbox), vbox, FALSE, FALSE, 0);
    gtk_widget_show(vbox);
 
+   GtkWidget *label = gtk_label_new("We will search your computer for supported music files. Their location will be remembered in order to provide you with an organized view of your music collection.");
+   gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+   gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+   gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
+   gtk_widget_show(label);
+   
+   label = gtk_label_new("Where would you like to look for music?");
+   gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+   gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+   gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 2);
+   gtk_widget_show(label);
+   
    hbox = gtk_hbox_new(FALSE, 5);
    gtk_container_add(GTK_CONTAINER(vbox), hbox);
    gtk_widget_show(hbox);
 
-   GtkWidget *label = gtk_label_new("Look for music in: ");
+   label = gtk_label_new("Look for music in: ");
    gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
    gtk_widget_show(label);
 
@@ -222,12 +255,12 @@ void musicsearchUI::Show(bool runMain)
 
    /* Control buttons at the bottom */
    separator = gtk_hseparator_new();
-   gtk_container_add(GTK_CONTAINER(vbox), separator);
+   gtk_box_pack_start(GTK_BOX(tempvbox), separator, FALSE, FALSE, 0);
    gtk_widget_show(separator);
 
    hbox = gtk_hbox_new(FALSE, 10);
    gtk_container_set_border_width(GTK_CONTAINER(hbox), 5);
-   gtk_container_add(GTK_CONTAINER(vbox), hbox);
+   gtk_box_pack_start(GTK_BOX(tempvbox), hbox, FALSE, FALSE, 0);
    gtk_widget_show(hbox);
 
    GtkWidget *button = gtk_button_new_with_label("Quit");

@@ -33,6 +33,7 @@ ____________________________________________________________________________*/
 #include "musiccatalog.h"
 #include "gtkmusicbrowser.h"
 #include "musicsearchui.h"
+#include "introwizard.h"
 
 class FAContext;
 
@@ -49,7 +50,7 @@ class MusicBrowserUI : public UserInterface {
     void CreateNewEditor(string & newPlaylist);
     void WindowClose(GTKMusicBrowser *oldUI);
 
-    void StartSearch(bool runMain = true);
+    void StartSearch(bool runMain = true, bool intro = false);
     void SetRunning(void);
 
     bool doQuitNow;
@@ -76,6 +77,7 @@ class MusicBrowserUI : public UserInterface {
     GTKMusicBrowser *mainBrowser;
     vector<GTKMusicBrowser *> browserWindows;
 
+    IntroWizardUI *wiz;
     musicsearchUI *searching;
 };
 

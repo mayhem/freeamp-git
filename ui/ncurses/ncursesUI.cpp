@@ -48,8 +48,10 @@ UserInterface *Initialize(FAContext *context) {
 }
 
            }
+	   
 static struct termios normalTTY;
 static struct termios rawTTY;
+
 int getKey() {
     fd_set rdfs;
 
@@ -268,13 +270,13 @@ int32 ncursesUI::AcceptEvent(Event *e) {
                     move(2, 0);
                     addstr("Title  : ");
                     if (md.Title().c_str()[0] != '\0')
-		        addstr(md.Title().c_str());
+		        addstr((char *)md.Title().c_str());
 		    else
                         addstr(pmvi->m_filename);
                     addstr("\nArtist : ");
-                    addstr(md.Artist().c_str());
+                    addstr((char *)md.Artist().c_str());
                     addstr("\nAlbum  : ");
-                    addstr(md.Album().c_str());
+                    addstr((char *)md.Album().c_str());
                     addstr("\nYear   : ");
                     if (md.Year() != 0)
 		    {
@@ -282,7 +284,7 @@ int32 ncursesUI::AcceptEvent(Event *e) {
 		    	addstr(buf);
                     }
                     addstr("\nGenre  : ");
-                    addstr(md.Genre().c_str());
+                    addstr((char *)md.Genre().c_str());
                     addstr("\nTrack  : ");
                     if (md.Track() != 0)
                     {
@@ -290,7 +292,7 @@ int32 ncursesUI::AcceptEvent(Event *e) {
                         addstr(buf);
                     }
                     addstr("\nComment: ");
-                    addstr(md.Comment().c_str());
+                    addstr((char *)md.Comment().c_str());
                     addstr("\n");
                     refresh();
 
@@ -393,31 +395,7 @@ int32 ncursesUI::AcceptEvent(Event *e) {
                 refresh();
                 lastSeconds = pmtp->m_totalSeconds;
                 break;}
-
-/*            case INFO_ID3TagInfo: {
-                ID3TagEvent *ite = (ID3TagEvent *)e;
-                if (ite) {
-                    Id3TagInfo ti = ite->GetId3Tag();
-                    if (ti.m_containsInfo && !m_id3InfoPrinted) {
-                        m_id3InfoPrinted = true;
-                        move(2, 0);
-                        addstr("Title  : ");
-                        addstr(ti.m_songName);
-                        addstr("\nArtist : ");
-                        addstr(ti.m_artist);
-                        addstr("\nAlbum  : ");
-                        addstr(ti.m_album);
-                        addstr("\nYear   : ");
-                        addstr(ti.m_year);
-                        addstr("\nComment: ");
-                        addstr(ti.m_comment);
-                        addstr("\n\n");
-                        refresh();
-                    }
-                }
-                break;
-            }
-*/            default:
+              default:
                 break;
         }
     }

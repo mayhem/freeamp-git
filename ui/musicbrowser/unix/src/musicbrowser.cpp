@@ -126,8 +126,10 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
             if (weAreGTK) 
                 doQuitNow = true;
 
-            if (searching)
-                delete searching;
+            //if (searching)
+            //    delete searching;
+            //if (wiz)
+            //    delete wiz;
 
             gtkThread->Join();
             m_playerEQ->AcceptEvent(new Event(INFO_ReadyToDieUI));
@@ -140,9 +142,17 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
                 (*i)->AcceptEvent(event);
             if (searching)
                 searching->AcceptEvent(event);
+            if (wiz)
+	        wiz->AcceptEvent(event);
             if (event->Type() == INFO_SearchMusicDone) {
-                delete searching;
-                searching = NULL;
+	        if (searching) {
+                    delete searching;
+                    searching = NULL;
+		}
+		if (wiz) {
+		    delete wiz;
+		    wiz = NULL;
+		}
             }
             break; }
         case CMD_TogglePlaylistUI: {
@@ -207,12 +217,17 @@ void MusicBrowserUI::WindowClose(GTKMusicBrowser *oldUI)
         browserWindows.erase(loc);
 }
 
-void MusicBrowserUI::StartSearch(bool runMain)
+void MusicBrowserUI::StartSearch(bool runMain, bool intro)
 {
-    if (searching)
+    if (wiz || searching)
         return;
 
-    searching = new musicsearchUI(m_context);
-
-    searching->Show(runMain);
+    if (intro) {
+        wiz = new IntroWizardUI(m_context);
+	wiz->Show(runMain);
+    }
+    else {
+        searching = new musicsearchUI(m_context);
+        searching->Show(runMain);
+    }    
 }
