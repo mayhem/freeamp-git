@@ -72,7 +72,7 @@ class FreeAmpTheme : public UserInterface, public Theme
 
         void             ReloadTheme(void);
         void             SetVolume(int iVolume);
-        void             UpdateTimeDisplay(void);
+        void             UpdateTimeDisplay(int iCurrentTime);
         void             UpdateMetaData(const PlaylistItem *pItem);
         void             ShowHelp(void);
 

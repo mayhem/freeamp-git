@@ -58,6 +58,7 @@ void WorkerThreadStart(void* arg);
 
 #define DB Debug_v("%s:%d\n", __FILE__, __LINE__);
 
+const char *szWelcomeMsg = "Welcome to the "BRANDING" player!";
 const char *szParseError = "Parsing the Theme description failed. Cause: ";
 const int iVolumeChangeIncrement = 10;
 
@@ -230,7 +231,15 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
             m_iSeekPos = 0;
             m_iTotalSeconds = -1;
             m_pWindow->ControlIntValue(string("Seek"), true, m_iSeekPos);
-            UpdateTimeDisplay();
+            UpdateTimeDisplay(m_iCurrentSeconds);
+            
+            if ((int32)m_pContext->plm->GetCurrentIndex() < 0)
+            {
+                m_oTitle = szWelcomeMsg;
+                
+                m_pWindow->ControlStringValue("Title", true, m_oTitle);
+                m_pWindow->SetTitle(string(BRANDING));
+            }    
          }
          
          break;
@@ -240,7 +249,7 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
          m_iSeekPos = 0;
          m_iTotalSeconds = -1;
          m_pWindow->ControlIntValue(string("Seek"), true, m_iSeekPos);
-         UpdateTimeDisplay();
+         UpdateTimeDisplay(m_iCurrentSeconds);
          
          break;
       }   
@@ -342,7 +351,7 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
              break;
              
          m_iCurrentSeconds = iSeconds;            
-         UpdateTimeDisplay();
+         UpdateTimeDisplay(m_iCurrentSeconds);
 
          if (m_iTotalSeconds > 0)
          {
@@ -422,7 +431,7 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
 Error FreeAmpTheme::HandleControlMessage(string &oControlName, 
                                          ControlMessageEnum eMesg)
 {
-   char szTemp[255];
+//   char szTemp[255];
 
    if (eMesg == CM_MouseEnter)
    {
@@ -500,12 +509,8 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
        
        m_pWindow->ControlIntValue(oControlName, false, iValue);
        iTime = (iValue * m_iTotalSeconds) / 100;
-       sprintf(szTemp, "%d:%02d:%02d", iTime / 3600,
-               (iTime % 3600) / 60, iTime % 60);
-       oText = string(szTemp);        
+       UpdateTimeDisplay(iTime);
        m_bSeekInProgress = true;
-       
-       m_pWindow->ControlStringValue(oName, true, oText);
               
        return kError_NoErr;
    }    
@@ -656,7 +661,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
        }    
        
        m_pWindow->ControlStringValue("Info", true, oDesc);
-       UpdateTimeDisplay();                      
+       UpdateTimeDisplay(m_iCurrentSeconds);                      
    }
    if (oControlName == string("Logo") && eMesg == CM_Pressed)
    {
@@ -694,7 +699,7 @@ void FreeAmpTheme::InitControls(void)
 {
 	bool   bSet, bEnable;
     int    iState;
-    string oWelcome("Welcome to the "BRANDING" player!");
+    string oWelcome(szWelcomeMsg);
     
     assert(m_pWindow);
     
@@ -882,39 +887,41 @@ void FreeAmpTheme::ShowOptions(void)
     delete pWindow;
 }
 
-void FreeAmpTheme::UpdateTimeDisplay(void)
+void FreeAmpTheme::UpdateTimeDisplay(int iCurrentSeconds)
 {
     string oText;
     char   szText[20];
     int    iSeconds;
     
-    if (m_eTimeDisplayState == kTimeRemaining &&
-        m_iTotalSeconds > 0)
+    if (m_eTimeDisplayState == kTimeRemaining)
     {    
-        iSeconds = m_iTotalSeconds - m_iCurrentSeconds;
+        iSeconds = m_iTotalSeconds - iCurrentSeconds;
         if (iSeconds > 3600)
             sprintf(szText, "-%d:%02d:%02d", 
                     iSeconds / 3600,
                     (iSeconds % 3600) / 60,
                     iSeconds % 60);
         else                
-            sprintf(szText, "-%02d:%02d", 
+            sprintf(szText, "-%d:%02d", 
                     (iSeconds % 3600) / 60,
                     iSeconds % 60);
                 
     }    
     else    
+    if (m_iTotalSeconds >= 0)
     {
-        if (m_iCurrentSeconds > 3600)
+        if (iCurrentSeconds > 3600)
            sprintf(szText, "%d:%02d:%02d", 
-                   m_iCurrentSeconds / 3600,
-                   (m_iCurrentSeconds % 3600) / 60,
-                   m_iCurrentSeconds % 60);
+                   iCurrentSeconds / 3600,
+                   (iCurrentSeconds % 3600) / 60,
+                   iCurrentSeconds % 60);
         else           
-           sprintf(szText, "%02d:%02d", 
-                   (m_iCurrentSeconds % 3600) / 60,
-                   m_iCurrentSeconds % 60);
+           sprintf(szText, "%d:%02d", 
+                   (iCurrentSeconds % 3600) / 60,
+                   iCurrentSeconds % 60);
     }
+    else    
+        sprintf(szText, "0:00");
             
     oText = string(szText);
     m_pWindow->ControlStringValue("Time", true, oText);
@@ -931,12 +938,13 @@ void FreeAmpTheme::UpdateMetaData(const PlaylistItem *pItem)
         if (pItem->GetMetaData().Artist().length() > 0)
            m_oTitle += string(" -- ") + pItem->GetMetaData().Artist();
 
-        m_pWindow->ControlStringValue(string("Title"), true, m_oTitle);
         oText = string(BRANDING": ") + m_oTitle;
         m_pWindow->SetTitle(oText);
     }    
     else
         m_oTitle = "";
+        
+    m_pWindow->ControlStringValue(string("Title"), true, m_oTitle);
 }
 
 void FreeAmpTheme::DropFiles(vector<string> *pFileList)
