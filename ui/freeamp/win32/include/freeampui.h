@@ -96,7 +96,7 @@ class FreeAmpUI : public UserInterface {
     void Notify(int32 command, LPNMHDR notifyMsgHdr);
     void KeyDown(int32 keyCode);
     void DropFiles(HDROP dropHandle);
-
+    void CancelMode();
 
  protected:
     static void ui_thread_function(void*);
@@ -179,6 +179,7 @@ class FreeAmpUI : public UserInterface {
 	int32			    m_height;
 
     View*               m_captureView;
+    View*               m_mouseView;
 
     BitmapView*         m_backgroundView;
     BitmapView*         m_playlistBackView;

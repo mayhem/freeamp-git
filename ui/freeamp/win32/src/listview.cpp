@@ -427,6 +427,7 @@ LeftButtonUp(int32 x, int32 y, int32 modifiers)
 
                 // remove selected items from list
                 List<ListItem*>* selectList = new List<ListItem*>();
+                List<PlayListItem*>* playlistList = new List<PlayListItem*>();
 
 	            i = m_lastSelected;
 
@@ -438,14 +439,13 @@ LeftButtonUp(int32 x, int32 y, int32 modifiers)
 		            if(item->IsSelected())
                     {
                         RemoveItem(item);
+                        //item->Select(); // remove deselects
 
                         PlayListItem* playlistItem;     
                         playlistItem = (PlayListItem*)item->UserValue();
 
-                        plm->RemoveItem(playlistItem);
-
-                        //item->Select(); // remove deselects
                         selectList->AddItem(item, 0);
+                        playlistList->AddItem(playlistItem, 0);
                     }
 	            }
 
@@ -454,19 +454,10 @@ LeftButtonUp(int32 x, int32 y, int32 modifiers)
 
                 AddList(selectList, index);
 
-                i = 0;
-
-                while(item = selectList->ItemAt(i++))
-                {
-                    PlayListItem* playlistItem;     
-                    playlistItem = (PlayListItem*)item->UserValue();
-
-                    plm->AddItem(playlistItem, index + i);
-                }
-
-
+                plm->MoveList(playlistList, index);
 
                 delete selectList;
+                delete playlistList;
             }
         }
 

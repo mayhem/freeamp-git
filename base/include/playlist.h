@@ -199,7 +199,8 @@ class PlayListRepeatEvent : public Event {
 private:
 	RepeatMode m_rm;
 public:
-	PlayListRepeatEvent(RepeatMode rm) { m_type = INFO_PlayListRepeat; m_rm = rm; }
+	PlayListRepeatEvent(RepeatMode rm) 
+    { m_type = INFO_PlayListRepeat; m_rm = rm; }
 	virtual ~PlayListRepeatEvent() {}
 
 	RepeatMode GetRepeatMode() { return m_rm; }
@@ -209,7 +210,8 @@ class PlayListShuffleEvent : public Event {
 private:
 	ShuffleMode m_sm;
 public:
-	PlayListShuffleEvent(ShuffleMode sm) { m_type = INFO_PlayListShuffle; m_sm = sm; }
+	PlayListShuffleEvent(ShuffleMode sm) 
+    { m_type = INFO_PlayListShuffle; m_sm = sm; }
 	virtual ~PlayListShuffleEvent() {}
 
 	ShuffleMode GetShuffleMode() { return m_sm; }
@@ -220,7 +222,9 @@ class PlayListManager {
  public:
     PlayListManager(EventQueue *);
     ~PlayListManager();
-    void SetSkip(int32 f) { m_skipNum = f; } // logical media units to skip at beginning
+    // logical media units to skip at beginning
+    // helps us get past id3v2 tags
+    void SetSkip(int32 f) { m_skipNum = f; } 
     int32 GetSkip() { return m_skipNum; }
 
     void AcceptEvent(Event *);
@@ -261,7 +265,10 @@ class PlayListManager {
     virtual Error           RemoveItem(PlayListItem* item);
     virtual PlayListItem*   RemoveItem(int32 index);
     virtual Error           RemoveItems(int32 index, int32 count);
+    virtual Error           RemoveList(List<PlayListItem*>* items);
     virtual Error           RemoveAll();
+
+    virtual Error           MoveList(List<PlayListItem*>* items, int32 index);
 
     virtual	void MakeEmpty();
 		    bool IsEmpty();

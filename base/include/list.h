@@ -450,7 +450,9 @@ RemoveList(List<T> &list)
 
     for(int32 i = 0; i < list.CountItems(); i++) 
     {
-	    if(!RemoveItem(list.ItemAt(i))) 
+        T foo = list.ItemAt(i);
+
+	    if(!RemoveItem(foo)) 
         {
 	        result = false; // let them know some were not removed
 	    }
@@ -468,7 +470,9 @@ DeleteList(List<T> &list)
 
     for(int32 i = 0; i < list.CountItems(); i++) 
     {
-	    if(!DeleteItem(list.ItemAt(i))) 
+        T foo = list.ItemAt(i);
+
+	    if(!DeleteItem(foo)) 
         {
 	        result = false; // let them know some were not deleted
 	    }

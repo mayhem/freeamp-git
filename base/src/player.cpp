@@ -1103,7 +1103,7 @@ void Player::HandleMediaInfo(Event *pEvent)
 
    pmvi = (MediaInfoEvent *)pEvent;
    pmvi->m_indexOfSong = m_plm->Current() + 1;         // zero based
-   pmvi->m_totalSongs = m_plm->Total();
+   pmvi->m_totalSongs = m_plm->CountItems();
 
    SendToUI(pEvent);
 

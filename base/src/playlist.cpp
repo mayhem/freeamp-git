@@ -678,14 +678,77 @@ RemoveItems(int32 index, int32 count)
 
     GetPLManipLock();
 
+    index = CheckIndex(index);
+
     if(index >= 0 )
     {
+        if(count > (CountItems() - index))
+            count = CountItems() - index;
+
         while(count--)
         {
-		    RemoveItem(index);
+		    m_list->RemoveItem(count);
         }
 
+        m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
+
         result = kError_NoErr;
+    }
+
+    ReleasePLManipLock();
+
+    return result;
+}
+
+Error           
+PlayListManager::
+RemoveList(List<PlayListItem*>* items)
+{
+    Error result = kError_UnknownErr;
+
+    GetPLManipLock();
+
+    if(items)
+    {
+        m_list->RemoveList(*items);
+
+        result = kError_NoErr;
+
+        m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
+    }
+
+    ReleasePLManipLock();
+
+    return result;
+}
+
+Error           
+PlayListManager::
+MoveList(List<PlayListItem*>* items, int32 index)
+{
+    Error result = kError_UnknownErr;
+
+    GetPLManipLock();
+
+    if(items)
+    {
+        index = CheckIndex(index);
+
+        if(index >= 0 )
+        {
+            m_list->RemoveList(*items);
+
+            m_list->AddList(*items, index);
+
+            if(m_list->CountItems() == 1)
+            {
+                m_current = 0;
+            }
+
+            m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
+
+            result = kError_NoErr;
+        }
     }
 
     ReleasePLManipLock();
@@ -704,7 +767,8 @@ MakeEmpty()
     m_current = -1;
     m_skipNum = 0;
 
-    m_target->AcceptEvent(new MediaInfoEvent());
+    //m_target->AcceptEvent(new MediaInfoEvent());
+    m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
 
     ReleasePLManipLock();
 }
@@ -781,7 +845,8 @@ RemoveAll()
    m_current = -1;
    m_skipNum = 0;
 
-   m_target->AcceptEvent(new MediaInfoEvent());
+   //m_target->AcceptEvent(new MediaInfoEvent());
+   m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
 
    ReleasePLManipLock();
 

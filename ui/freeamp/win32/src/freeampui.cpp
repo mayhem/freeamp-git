@@ -201,6 +201,12 @@ MainWndProc(HWND hwnd,
             break;
         }
 
+        case WM_CANCELMODE:
+        {
+            ui->CancelMode();
+            break;
+        }
+
         case WM_NCHITTEST:
         {
             POINT pt;
@@ -314,6 +320,7 @@ UserInterface()
     m_scrollbarBitmap   = NULL;
 
     m_captureView   = NULL;
+    m_mouseView     = NULL;
 
     m_backgroundView = NULL;
 
@@ -500,7 +507,7 @@ DropFiles(HDROP dropHandle)
 						szFile,
 						sizeof(szFile));
 
-		m_plm->AddItem(szFile,0);
+		m_plm->AddItem(szFile, 0);
 		//m_plm->SetFirst();
 	}
 
@@ -856,6 +863,33 @@ Notify(int32 command, LPNMHDR notifyMsgHdr)
     }
 }
 
+void
+FreeAmpUI::
+CancelMode()
+{
+    if(m_captureView)
+    {
+        m_captureView = NULL;
+        ReleaseCapture();
+    }
+    
+    if(m_mouseView)
+    {
+        POINT pt;
+
+        GetCursorPos(&pt);
+
+        ScreenToClient(m_hwnd, &pt);
+
+        if(!m_mouseView->PointInView(pt.x, pt.y))
+        {
+            m_mouseView->MouseLeft();
+            m_mouseView = NULL;
+        }
+    }
+
+}
+
 bool
 FreeAmpUI::
 MouseMove(int32 xPos, 
@@ -863,7 +897,6 @@ MouseMove(int32 xPos,
           int32 modifiers)
 {
     bool result = false;
-    static View* mouseView = NULL;
 
     Item<View*>* viewItem = m_viewList->LastItem();
 
@@ -885,10 +918,10 @@ MouseMove(int32 xPos,
     }
     else if(!PtInRect(&rect, pt))
     {
-        if(mouseView)
-            mouseView->MouseLeft();
+        if(m_mouseView)
+            m_mouseView->MouseLeft();
 
-        mouseView = NULL;
+        m_mouseView = NULL;
     }
     else
     {
@@ -898,14 +931,14 @@ MouseMove(int32 xPos,
                 viewItem->Member()->Visible() &&
                 viewItem->Member()->Enabled())
             {
-                if(mouseView != viewItem->Member())
+                if(m_mouseView != viewItem->Member())
                 {
-                    if(mouseView)
-                        mouseView->MouseLeft();
+                    if(m_mouseView)
+                        m_mouseView->MouseLeft();
 
-                    mouseView = viewItem->Member();
+                    m_mouseView = viewItem->Member();
 
-                    mouseView->MouseEntered();
+                    m_mouseView->MouseEntered();
                 }
 
                 viewItem->Member()->MouseMove(xPos, yPos, modifiers);
@@ -1779,13 +1812,13 @@ UpdatePlayList()
         int32 playlistCount = m_plm->CountItems();
         int32 listviewCount = m_playlistView->CountItems();
 
-        // for now, the only time it is updated without us having done it
-        // is when a file is added, thus the lists should be different sizes
         if(playlistCount != listviewCount)      
         {
-            int32 i = listviewCount;
+            int32 i = 0;
             PlayListItem* playlistItem;
 
+            m_playlistView->MakeEmpty();
+            
             while(playlistItem = m_plm->ItemAt(i++))
             {
                 MediaInfoEvent* info = playlistItem->GetMediaInfo();
@@ -1802,6 +1835,50 @@ UpdatePlayList()
                 m_playlistView->AddItem(item);
             }
         }       
+        else
+        {
+            bool different = false;
+            int32 i = 0;
+
+            PlayListItem* playlistItem;
+
+            while(playlistItem = m_plm->ItemAt(i))
+            {
+                if(playlistItem != (PlayListItem*) m_playlistView->ItemAt(i++)->UserValue())
+                {
+                    different = true;
+                    break;
+                }
+            }
+
+
+
+            if(different)
+            {
+                PlayListItem* playlistItem;
+
+                m_playlistView->MakeEmpty();
+            
+                i = 0;
+
+                while(playlistItem = m_plm->ItemAt(i++))
+                {
+                    MediaInfoEvent* info = playlistItem->GetMediaInfo();
+
+                    //char buffer[256];
+                    //sprintf(buffer, "This is StringItem #%d", i);
+
+                    StringItem* item = new StringItem(  playlistItem->StringForPlayerToDisplay(),
+                                                        m_smallFontBitmap,
+                                                        10,
+                                                        smallFontWidth);
+                    item->SetUserValue(playlistItem);
+
+                    m_playlistView->AddItem(item);
+                }
+            }
+
+        }
     }
 }
 
