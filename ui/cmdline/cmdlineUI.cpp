@@ -125,7 +125,7 @@ void cmdlineUI::keyboardServiceFunction(void *pclcio) {
 	    case 's':
 	    case 'S': {
 		if (pMe->mypl) {
-		    pMe->mypl->Shuffle();
+		    pMe->mypl->SetOrder(PlayList::ORDER_SHUFFLED);
 		    pMe->mypl->SetFirst();
 		}
 		Event *e = new Event(CMD_Stop);

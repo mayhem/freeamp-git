@@ -167,7 +167,7 @@ int32 Mpg123UI::AcceptEvent(Event *e) {
 void Mpg123UI::SetArgs(int argc, char **argv) {
     PlayList *pl = new PlayList();
     char *pc = NULL;
-    bool do_shuffle = false;
+
     for(int i=1;i<argc;i++) {
 	pc = argv[i];
 	if (pc[0] == '-') {
@@ -276,11 +276,12 @@ void Mpg123UI::SetArgs(int argc, char **argv) {
 		    cout << "use HTTP proxy " << pc << endl;
 		    break;
 		case 'z':
-		    do_shuffle = true;
+		    pl->SetOrder(PlayList::ORDER_SHUFFLED);
 		    //cout << "shuffle play (with wildcards) " << endl;
 		    break;
 		case 'Z':
-		    cout << "Random Play" << endl;
+		    pl->SetOrder(PlayList::ORDER_RANDOM);
+		    //cout << "Random Play" << endl;
 		    break;
 		default:
 		    cout << "Unknown option:  " << pc << endl;
@@ -295,9 +296,6 @@ void Mpg123UI::SetArgs(int argc, char **argv) {
 
     pl->SetFirst();
     pl->SetSkip(skipFirst);
-    if (do_shuffle) {
-	pl->Shuffle();
-    }
     Event *e = new Event(CMD_SetPlaylist,pl);
     m_playerEQ->AcceptEvent(m_playerEQ,e);
     e = new Event(CMD_Play);
