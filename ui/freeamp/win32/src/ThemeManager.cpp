@@ -174,19 +174,21 @@ Error ThemeManager::AddTheme(string &oThemeFile)
     char            dir[MAX_PATH], ext[MAX_PATH];
     uint32          len = sizeof(dir);
     string          oThemeDest;
+    Error           eErr;
 
     m_pContext->prefs->GetInstallDirectory(dir, &len);
     oThemeDest = string(dir);
     
     _splitpath(oThemeFile.c_str(), NULL, NULL, dir, ext);
-    if (strcmp(dir, m_oCurrentTheme.c_str()) == 0)
-    {
-       return kError_NoErr;
-    }   
-
     oThemeDest += string("\\themes\\") + string(dir) + string(ext);
-    return CopyFile(oThemeFile.c_str(), oThemeDest.c_str(), false) ? 
+    eErr = CopyFile(oThemeFile.c_str(), oThemeDest.c_str(), false) ? 
            kError_NoErr : kError_CopyFailed;
+
+    if (!IsError(eErr))
+       // So the caller knows where the theme ended up
+       oThemeFile = oThemeDest;
+              
+    return eErr;       
 }
 
 Error ThemeManager::DeleteTheme(string &oThemeFile)

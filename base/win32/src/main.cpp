@@ -45,6 +45,7 @@ void SendCommandLineToHiddenWindow();
 
 const char* kHiddenWindow = "FreeAmp Hidden Window";
 HINSTANCE g_hinst = NULL;
+static const char *themeExtension = "fat";
 
 int APIENTRY WinMain(HINSTANCE hInstance, 
 					 HINSTANCE hPrevInstance,
@@ -238,10 +239,21 @@ static LRESULT WINAPI HiddenWndProc(HWND hwnd,
             char path[MAX_PATH];
             char url[MAX_PATH + 7];
             uint32 length = sizeof(url);
+            int offset = 0;
+
 
             for(int32 i = 0; i < count; i++)
             {
-                strcpy(path, array);
+                strcpy(path, array + offset);
+                offset += strlen(path) + 1;
+
+                // is this a URL we know how to handle
+                if( !strncasecmp(path, "http://", 7) ||
+                    !strncasecmp(path, "rtp://", 6))
+                {
+                    context->plm->AddItem(path);
+                    continue;
+                }
 
                 HANDLE handle;
                 WIN32_FIND_DATA data;
@@ -266,6 +278,7 @@ static LRESULT WINAPI HiddenWndProc(HWND hwnd,
 
                 // who needs to get this, plm or dlm?
                 bool giveToDLM = false;
+                bool giveToTheme = false;
                 char* extension = NULL;
                 PlaylistManager* plm = context->plm;
                 DownloadManager* dlm = context->downloadManager;
@@ -286,12 +299,19 @@ static LRESULT WINAPI HiddenWndProc(HWND hwnd,
                             break;
                         }
                     }
+                    if (strcasecmp(extension, themeExtension) == 0)
+                        giveToTheme = true; 
                 }
 
                 if(giveToDLM)
                     dlm->ReadDownloadFile(url);
                 else
+                if(giveToTheme)
+                    context->target->AcceptEvent(new LoadThemeEvent(url, ""));
+                else
+                {
                     plm->AddItem(url);
+                }    
             }
             
             break;

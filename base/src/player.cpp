@@ -413,7 +413,7 @@ SetArgs(int32 argc, char **argv)
                                  szSavedTheme, &iLen);
                             iLen = MAX_PATH;   
                             URLToFilePath(url, szNewTheme, &iLen); 
-                            m_context->prefs->setPrefString(kThemePathPref, 
+                            m_context->prefs->SetPrefString(kThemePathPref, 
                                szNewTheme);
 
                             AcceptEvent(new LoadThemeEvent(url, szSavedTheme));
