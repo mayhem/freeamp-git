@@ -1,6 +1,6 @@
 Summary: MP3 audio player with theme user interface and streaming support
 Name: freeamp
-Version: 2.0.5
+Version: 2.1.beta2
 Release: 1
 Copyright: GPL
 Group: Applications/Multimedia
@@ -9,10 +9,10 @@ Prefix: /usr
 BuildRoot: /var/tmp/%{name}-%{version}-root
 ExcludeArch: sparc
 AutoReqProv: No 
-Requires: ld-linux.so.2 libc.so.6 libdl.so.2 libm.so.6 libnsl.so.1 libpthread.so.0 libstdc++-libc6.1-1.so.2 libX11.so.6 libXext.so.6 libgdk-1.2.so.0 libglib-1.2.so.0 libgmodule-1.2.so.0 libgthread-1.2.so.0 libgtk-1.2.so.0 libttf.so.2 libc.so.6(GLIBC_2.0) libm.so.6(GLIBC_2.1) libpthread.so.0(GLIBC_2.1) libpthread.so.0(GLIBC_2.0) libc.so.6(GLIBC_2.1) libdl.so.2(GLIBC_2.1) libdl.so.2(GLIBC_2.0)
+Requires: id3lib >= 3.7.8 ld-linux.so.2 libc.so.6 libdl.so.2 libm.so.6 libnsl.so.1 libpthread.so.0 libstdc++-libc6.1-1.so.2 libX11.so.6 libXext.so.6 libgdk-1.2.so.0 libglib-1.2.so.0 libgmodule-1.2.so.0 libgthread-1.2.so.0 libgtk-1.2.so.0 libttf.so.2 libc.so.6(GLIBC_2.0) libm.so.6(GLIBC_2.1) libpthread.so.0(GLIBC_2.1) libpthread.so.0(GLIBC_2.0) libc.so.6(GLIBC_2.1) libdl.so.2(GLIBC_2.1) libdl.so.2(GLIBC_2.0)
 
 %description
-FreeAmp is an extensible, cross-platform audio player. It features an
+FreeAmp is an extensible, cross-platform mp3/audio cd player. It features an
 optimized version of the GPLed Xing MPEG decoder which makes it one of the
 fastest and best sounding players available. FreeAmp provides a number of the
 most common features users have come to expect in a clean, easy to use
@@ -32,6 +32,8 @@ mkdir -p $RPM_BUILD_ROOT%{prefix}{/bin,/lib,/share}
 mkdir -p $RPM_BUILD_ROOT%{prefix}/lib/freeamp/plugins
 mkdir -p $RPM_BUILD_ROOT%{prefix}/share/freeamp/{help,themes}
 
+strip MakeTheme
+strip freeamp
 install -s {MakeTheme,freeamp} $RPM_BUILD_ROOT%{prefix}/bin
 install themes/* $RPM_BUILD_ROOT%{prefix}/share/freeamp/themes
 #install -s plugins/* $RPM_BUILD_ROOT%{prefix}/lib/freeamp/plugins
@@ -39,24 +41,24 @@ for file in plugins/*.*; do
     enable=f
     case "$file" in
       */alsa*.pmo)
-         if ldconfig -p | grep 'libasound\.so' > /dev/null; then
-            enable=t
-         else
+         if ldd $file | grep 'not found' > /dev/null; then
             enable=f
+         else
+            enable=t
          fi
       ;;
       */esound*.pmo)
-         if ldconfig -p | grep 'libesd\.so' > /dev/null; then
-            enable=t
-         else
+         if ldd $file | grep 'not found' > /dev/null; then
             enable=f
+         else
+            enable=t
          fi
       ;;
       */ncurses*.ui)
-         if ldconfig -p | grep 'libncurses\.so' > /dev/null; then
-            enable=t
-         else
+         if ldd $file | grep 'not found' > /dev/null; then
             enable=f
+         else
+            enable=t
          fi
       ;;
       *)
@@ -64,6 +66,7 @@ for file in plugins/*.*; do
       ;;
     esac
     if [ "$enable" = t ]; then
+        strip $file
         install -s $file $RPM_BUILD_ROOT%{prefix}/lib/freeamp/plugins
     fi
 done  
