@@ -258,7 +258,6 @@ Error Window::ControlShow(const string &oTarget, bool bSet, bool &bShow)
     Error               eRet;
     Control            *pControl;
     ControlMapIterator  i;
-    int                 j;
 
     IncUsageRef();
 
@@ -281,13 +280,12 @@ Error Window::ControlShow(const string &oTarget, bool bSet, bool &bShow)
 
     DecUsageRef();
 
-    return (j == 0) ? kError_InvalidParam : kError_NoErr;
+    return kError_NoErr;
 }
 
 Error Window::ControlIntValue(const string &oTarget, bool bSet, int &iValue)
 {
     ControlMapIterator  i;
-    int                 j;
 
     IncUsageRef();
        
@@ -301,7 +299,7 @@ Error Window::ControlIntValue(const string &oTarget, bool bSet, int &iValue)
 
     DecUsageRef();
 
-    return (j == 0) ? kError_InvalidParam : kError_NoErr;
+    return kError_NoErr;
 }
 
 Error Window::ControlStringValue(const string &oTarget, bool bSet, string &oValue)

@@ -416,7 +416,7 @@ void Win32Window::ProcessWaitingMessages(void)
     
     while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE)) 
     {
-        if (msg.message == WM_QUIT)
+        if (!GetMessage(&msg, NULL, 0, 0))
            return;
            
         TranslateMessage(&msg);

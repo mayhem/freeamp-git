@@ -1218,30 +1218,6 @@ void FreeAmpTheme::HandleKeystroke(unsigned char cKey)
         m_bShowBuffers = !m_bShowBuffers;
         break;
      }    
-     
-     case '#':
-     {
-        int i, j;
-        string oTheme;
-
-        for(j = 0; j < 10; j++)
-        {
-           Debug_v("j: %d", j);   
-           for(i = 0; ; i++)
-           {
-              if (strlen(aThemes[i]) == 0)
-                 break;
-
-              Debug_v("i: %d", i);   
-                 
-              oTheme = aThemes[i];
-              m_pThemeMan->UseTheme(oTheme);
-              AcceptEvent(new Event(INFO_PrefsChanged));
-              m_pWindow->ProcessWaitingMessages();
-           }   
-        }   
-        break;
-     }    
    }
 }
 
