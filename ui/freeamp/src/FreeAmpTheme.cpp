@@ -312,26 +312,11 @@ Error FreeAmpTheme::Close(void)
 
 Error FreeAmpTheme::AcceptEvent(Event * e)
 {
+   if (m_pWindow && m_pWindow->DisallowOutsideMessages())
+      return kError_NoErr;
+
    switch (e->Type())
    {
-#if 0
-      case INFO_FileNotFound:
-      {
-         MissingFileEvent *pEvent = (MissingFileEvent *)e;
-         MissingFile o(m_pContext);
-         string      url;
-
-         if (o.FindMissingFile(pEvent->Item(), string("/home/robert"), url)
-             == kError_NoErr)
-         {
-              printf("Found file: '%s'\n", url.c_str());
-              o.AcceptLocation(pEvent->Item(), url);
-         }
-         else
-              printf("Could not find file.\n");
-         break;
-      }
-#endif
       case INFO_ErrorMessage:
       {
          MessageDialog      oBox(m_pContext);

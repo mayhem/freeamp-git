@@ -55,6 +55,7 @@ Window::Window(Theme *pTheme, string &oName)
     m_pMouseDownControl = NULL;
     m_bIsVulcanMindMeldHost = false;
     m_bMindMeldInProgress = false;    
+    m_bNoOutsideMessages = false;
 
     m_pUsageMutex = new Mutex();
     m_pUsageSem = new Semaphore();
@@ -151,6 +152,7 @@ Error Window::VulcanMindMeld(Window *pOther)
     string                      oName;
 
     LockUsageRef();
+    m_bNoOutsideMessages = true;
 
     m_oName = pOther->m_oName;
     m_pTheme = pOther->m_pTheme;
@@ -174,9 +176,11 @@ Error Window::VulcanMindMeld(Window *pOther)
     m_pCanvas = pOther->m_pCanvas;
 
     UnlockUsageRef();
-    
+
     Init();   
-   
+
+    m_bNoOutsideMessages = false;
+
     return kError_NoErr;
 }
 

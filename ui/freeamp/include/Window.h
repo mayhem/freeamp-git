@@ -140,6 +140,8 @@ class Window
       // For deadlock avaoidance
       virtual void  IncUsageRef(void);
       virtual void  DecUsageRef(void);
+      virtual bool  DisallowOutsideMessages(void) 
+                       { return m_bNoOutsideMessages; } 
 
     protected:
 
@@ -161,7 +163,7 @@ class Window
       Control                  *m_pCaptureControl;
       Pos                       m_oMovePos;
       bool                      m_bStayOnTop, m_bLiveInToolbar;
-      bool                      m_bIsVulcanMindMeldHost;
+      bool                      m_bIsVulcanMindMeldHost, m_bNoOutsideMessages;
       Rect                      m_oMoveStart;
       int32                     m_iDesktopWidth, m_iDesktopHeight;
       bool                      m_bMindMeldInProgress, m_bTimerEnabled;
