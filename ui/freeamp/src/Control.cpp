@@ -267,10 +267,17 @@ void Control::BlitFrame(ControlStateEnum eFrame, int iState, Rect *pRect,
         iState = 0;
 
     if (m_oStateBitmapRect[iState].find(eFrame) == 
-        m_oStateBitmapRect[iState].end()) 
-        m_oStateBitmapRect[iState][eFrame] = 
+        m_oStateBitmapRect[iState].end()) {
+        if (eFrame == CS_DisabledMO && 
+           m_oStateBitmapRect[iState].find(CS_Disabled) != 
+           m_oStateBitmapRect[iState].end())
+            m_oStateBitmapRect[iState][eFrame] = 
+                                    m_oStateBitmapRect[iState][CS_Disabled]; 
+        else
+            m_oStateBitmapRect[iState][eFrame] = 
                                     m_oStateBitmapRect[iState][CS_Normal];
-
+    }
+ 
     oFrameRect = m_oStateBitmapRect[iState][eFrame];
 
     oFrameRect.x2++;
