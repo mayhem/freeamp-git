@@ -426,6 +426,8 @@ class MusicBrowserUI : public UserInterface
     bool                m_sigsStart;
 
     ColumnInfo          m_columnInfo;
+    // cached.
+    string              m_columnCache;
 };
 
 #endif

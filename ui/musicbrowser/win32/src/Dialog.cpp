@@ -545,6 +545,7 @@ void MusicBrowserUI::ShowBrowser(bool bShowExpanded)
 	ShowWindow(m_hWnd, SW_SHOW);
     SetForegroundWindow(m_hWnd);
     PostMessage(m_hWnd, UWM_EMPTYDBCHECK, 0, 0);
+	isVisible = true;
 }
 
 void MusicBrowserUI::HideBrowser()
