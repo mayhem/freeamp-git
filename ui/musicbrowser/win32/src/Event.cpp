@@ -326,12 +326,37 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
             m_currentindex = pListView->lParam;
             UpdateButtonStates();
         }
+
 	    if (pListView->hdr.code == NM_DBLCLK)
         {
             m_playerEQ->AcceptEvent(new Event(CMD_Stop));
             m_oPlm->SetCurrentIndex(pListView->iItem);
             m_playerEQ->AcceptEvent(new Event(CMD_Play));
-        }    
+        }   
+        
+        if (pListView->hdr.code == LVN_COLUMNCLICK)
+        {
+            int column = pListView->iSubItem;
+
+            switch(column)
+            {
+                case 1:
+                    SendMessage(m_hWnd, WM_COMMAND, ID_SORT_TITLE, 0);
+                    break;
+
+                case 2:
+                    SendMessage(m_hWnd, WM_COMMAND, ID_SORT_ARTIST, 0);
+                    break;
+
+                case 3:
+                    SendMessage(m_hWnd, WM_COMMAND, ID_SORT_ALBUM, 0);
+                    break;
+
+                case 4:
+                    SendMessage(m_hWnd, WM_COMMAND, ID_SORT_LENGTH, 0);
+                    break;
+            }
+        }   
             
         return 0;
     }
