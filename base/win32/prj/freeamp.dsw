@@ -63,18 +63,6 @@ Package=<4>
 
 ###############################################################################
 
-Project: "freeampdev"=..\..\..\ui\freeampdev\win32\prj\freeampdev.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
 Project: "freeampui"=..\..\..\ui\freeamp\win32\prj\freeampui.dsp - Package Owner=<4>
 
 Package=<5>
