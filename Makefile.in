@@ -167,8 +167,8 @@ install-themes:
 	$(mkinstalldirs) $(DESTDIR)$(datadir)/freeamp/themes
 	@list=`ls $(srcdir)/themes/*.*`; for p in $$list; do \
 	  if test -f $$p; then \
-	    echo "  $(INSTALL_PROGRAM) $$p $(DESTRIR)$(datadir)/freeamp/themes/`basename $$p`"; \
-	    $(INSTALL_PROGRAM) $$p $(DESTDIR)$(datadir)/freeamp/themes/`basename $$p`; \
+	    echo "  $(INSTALL_DATA) $$p $(DESTDIR)$(datadir)/freeamp/themes/`basename $$p`"; \
+	    $(INSTALL_DATA) $$p $(DESTDIR)$(datadir)/freeamp/themes/`basename $$p`; \
 	  else :; fi; \
 	done
 
