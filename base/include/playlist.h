@@ -114,6 +114,7 @@ class PlayListItem {
 	{ 
 		return m_DisplayString ? m_DisplayString : "";
 	}
+
     void SetDisplayString(char *pDisplayString)
     {
         if (m_DisplayString)

@@ -28,7 +28,6 @@ ____________________________________________________________________________*/
 #include <sys/types.h>
 
 #include "eventbuffer.h"
-#include "debug.hpp"
 
 #define DB Debug_v("%s:%d\n", __FILE__, __LINE__);
 

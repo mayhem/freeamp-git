@@ -31,7 +31,6 @@ ____________________________________________________________________________*/
 #include "SoundCardPMO.h"
 #include "eventdata.h"
 #include "log.h"
-//#include "debug.hpp"
 
 LogFile  *g_Log;
 

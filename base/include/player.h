@@ -68,7 +68,7 @@ struct ID3Tag
 class     Player:public EventQueue, Properties, PropertyWatcher
 {
 
-   public:
+ public:
    // Player();
    static Player *GetPlayer();
             ~Player();
@@ -95,7 +95,7 @@ class     Player:public EventQueue, Properties, PropertyWatcher
    virtual Error RemovePropertyWatcher(const char *, PropertyWatcher *);
 
    virtual Error PropertyChange(const char *, PropValue *);
-             protected:
+ protected:
              Player();
    void      GetUIManipLock();
    void      ReleaseUIManipLock();
@@ -106,7 +106,7 @@ class     Player:public EventQueue, Properties, PropertyWatcher
    int32     ServiceEvent(Event *);
    void      CreateLMC(PlayListItem * pc, Event * pC);
 
-   private:
+ private:
 
    // These are event loop handling functions
    void DoneOutputting(Event *pEvent) ;

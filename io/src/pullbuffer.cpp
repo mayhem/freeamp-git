@@ -28,7 +28,6 @@ ____________________________________________________________________________*/
 
 #include "pullbuffer.h"
 #include "log.h"
-#include "debug.hpp"
 
 extern LogFile *g_Log;
 

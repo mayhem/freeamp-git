@@ -46,7 +46,7 @@ StreamBuffer::~StreamBuffer(void)
 
 bool StreamBuffer::IsBufferingUp(int32 iBytesNeeded)
 {
-   return GetNumBytesInBuffer() < iBytesNeeded;
+   return GetNumBytesInBuffer() < (uint32)iBytesNeeded;
 }
 
 bool StreamBuffer::DidDiscardBytes()
