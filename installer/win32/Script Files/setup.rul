@@ -962,13 +962,14 @@ begin
 
 		if (bOpt1) then
 //			MessageBox(TARGETDIR^'\\Readme',INFORMATION);
-			LaunchApp(WINDIR^'Notepad.exe',TARGETDIR^'\\Readme.txt');
+			LaunchApp(WINDIR^'Notepad.exe',TARGETDIR^'Readme.txt');
 			
 		
 		endif;
 		if (bOpt2) then
 //			MessageBox(TARGETDIR^'\\freeamp.exe',INFORMATION);
-			LaunchApp(TARGETDIR^@PRODUCT_KEY,'');
+			ChangeDirectory(TARGETDIR);
+			LaunchApp(@PRODUCT_KEY,'');
 			//nResult = CreateRegistrySet("RegisterFileTypes");
 		endif;
 
@@ -987,6 +988,7 @@ end;
 // --- include script file section ---
 
 #include "sddialog.rul"
+
 
 
 
