@@ -1806,14 +1806,19 @@ TrayNotify(int32 notifyMessage)
                                 &mii);
             }
 
+            SetForegroundWindow(m_hwnd);
+
             // display the popup
             command = TrackPopupMenu(   popupHandle,			
-					                    TPM_RETURNCMD | TPM_RIGHTBUTTON,
+					                    TPM_RETURNCMD | TPM_RIGHTBUTTON |
+                                        TPM_NONOTIFY,
 					                    pt.x, 
                                         pt.y,       
 					                    0,  
 					                    m_hwnd,
 					                    NULL);
+
+            SetForegroundWindow(m_hwnd);
 
             switch(command)
             {
