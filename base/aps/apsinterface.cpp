@@ -154,7 +154,7 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData, bool bUseCollection)
 
     o.SetServer(string("www.musicbrainz.org"), 80);
 
-    uuid_ascii((uuid_t)pmetaData->GUID().c_str(), guid);
+    uuid_ascii((unsigned char*)pmetaData->GUID().c_str(), guid);
 
     args.push_back(pmetaData->Title());
     args.push_back(string(guid));
