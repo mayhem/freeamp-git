@@ -750,13 +750,16 @@ void Win32Window::MouseLeaveCheck(void)
     Rect  oRect;
     POINT sPos;
     Pos   oPos;
+    HDC   hDc;
     
     GetWindowPosition(oRect);
     GetCursorPos(&sPos);
     oPos.x = sPos.x;
     oPos.y = sPos.y;
+    ScreenToClient(m_hWnd, &sPos);
     
-    if (!oRect.IsPosInRect(oPos))
+    hDc = GetDC(m_hWnd);
+    if (!oRect.IsPosInRect(oPos) || !PtVisible(hDc, sPos.x, sPos.y))
     {
         if (m_bMouseInWindow)
             MouseHasLeftWindow();
@@ -764,4 +767,6 @@ void Win32Window::MouseLeaveCheck(void)
     }
     else
         m_bMouseInWindow = true;
+        
+    ReleaseDC(m_hWnd, hDc);
 }
