@@ -176,8 +176,8 @@ Error GTKWindow::Run(Pos &oPos)
        m_oWindowPos.y = 0;
 
     if (m_oWindowPos.x == -1 && m_oWindowPos.y == -1) {
-        m_oWindowPos.x = iMaxX - (oRect.Width()) / 2;
-        m_oWindowPos.y = iMaxY - (oRect.Height()) / 2;
+        m_oWindowPos.x = (iMaxX - oRect.Width()) / 2;
+        m_oWindowPos.y = (iMaxY - oRect.Height()) / 2;
     }
 
     gtk_widget_set_uposition(mainWindow, m_oWindowPos.x, m_oWindowPos.y);
@@ -225,14 +225,32 @@ Error GTKWindow::VulcanMindMeld(Window *pOther)
         return eRet;
     }
 
-    m_pCanvas->GetBackgroundRect(oRect);
+    gdk_threads_enter();
+    gdk_flush();
+    gdk_threads_leave();
+
+    Rect oNewRect, oSize;
+    
+    oRect.x1 = oRect.x2 = oRect.y1 = oRect.y2 = 0;
+    GetWindowPosition(oRect);
+
+    m_pCanvas->GetBackgroundRect(oSize);
     GdkBitmap *mask = ((GTKCanvas *)m_pCanvas)->GetMask();
 
+    GetReloadWindowPos(oRect, oSize.Width(), oSize.Height(), oNewRect);
+
     gdk_threads_enter();
-    gtk_widget_set_usize(mainWindow, oRect.Width(), oRect.Height());
+    gtk_widget_set_uposition(mainWindow, oNewRect.x1, oNewRect.y1);
+    gtk_widget_set_usize(mainWindow, oNewRect.Width(), oNewRect.Height());
     if (mask)
         gdk_window_shape_combine_mask(mainWindow->window, mask, 0, 0);
     gdk_threads_leave();
+
+    Pos NewPos;
+    NewPos.x = oNewRect.x1;
+    NewPos.y = oNewRect.y1;
+
+    SaveWindowPos(NewPos);
 
     ((GTKCanvas *)m_pCanvas)->SetParent(this);
     m_pCanvas->Update();
@@ -415,8 +433,8 @@ void GTKWindow::MouseLeaveCheck(void)
 
 Error GTKWindow::GetDesktopSize(int32 &iX, int32 &iY)
 {
-    iX = gdk_screen_width() / 2;
-    iY = gdk_screen_height() / 2;
+    iX = gdk_screen_width();
+    iY = gdk_screen_height();
 
     return kError_NoErr;
 }

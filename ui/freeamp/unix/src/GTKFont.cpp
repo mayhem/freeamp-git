@@ -183,8 +183,13 @@ Error GTKFont::AddFont(string &oFontFile)
     string oFontDest;
     char fcopy[_MAX_PATH], *filename, *ext;
     FILE *orig, *dest;
+    struct stat st;
 
     oFontDest = FreeampDir(NULL) + string ("/fonts");
+
+    if (-1 == stat(oFontDest.c_str(), &st))
+        mkdir(oFontDest.c_str(), 0755);
+
     strcpy(fcopy, oFontFile.c_str());
     filename = strrchr(fcopy, '/');
     if (filename) 

@@ -550,7 +550,7 @@ void Window::GetReloadWindowPos(Rect &oOldRect, int iNewWidth, int iNewHeight,
        oNewRect.y2 -= oNewRect.y1;
        oNewRect.y1 = 0;
     }   
-    
+   
     if (oOldRect.x2 == iSizeX)
     {
        oNewRect.x2 = iSizeX;
