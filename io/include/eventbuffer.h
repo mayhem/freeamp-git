@@ -53,6 +53,7 @@ class EventBuffer : public PullBuffer
       virtual  Event     *PeekEvent(void);
       virtual  Error      BeginRead(void *&pBuffer, size_t iNumBytes);
 
+      virtual  uint32     GetBytesInUse(void);
       virtual  void       SetBytesInUse(uint32 iBytesInUse);
       virtual  int32      GetBufferPercentage(void);
 

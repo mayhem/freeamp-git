@@ -447,6 +447,22 @@ void AlsaPMO::WorkerThread(void)
           // before we play this block of samples?
           if (eErr == kError_EventPending)
           {
+              pEvent = ((EventBuffer *)m_pInputBuffer)->PeekEvent();
+			  if (pEvent == NULL)
+				  continue;
+                  
+              if (pEvent->Type() == PMO_Quit && 
+                  ((EventBuffer *)m_pInputBuffer)->GetNumBytesInBuffer() > 0) 
+              {
+                  if (WaitForDrain())
+				  {
+                     Reset(true);
+                     m_pTarget->AcceptEvent(new Event(INFO_DoneOutputting));
+                     return;
+				  }
+                  continue;
+              }
+              
               pEvent = ((EventBuffer *)m_pInputBuffer)->GetEvent();
 
               if (pEvent->Type() == PMO_Init)
@@ -461,11 +477,7 @@ void AlsaPMO::WorkerThread(void)
               if (pEvent->Type() == PMO_Quit) 
               {
                   delete pEvent;
-                  if (WaitForDrain())
-                  {
-                     Reset(true);
-                     m_pTarget->AcceptEvent(new Event(INFO_DoneOutputting));
-                  }
+                  m_pTarget->AcceptEvent(new Event(INFO_DoneOutputting));
                   return;
               }
  
