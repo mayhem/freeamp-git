@@ -46,7 +46,14 @@ void PlayList::add(char *pc, int type) {
 	//int len = strlen(pc) + 1;
 	//char *pNewC = new char[len];
 	PlayListItem* item = new PlayListItem;
-	strcpy(item->url,pc);
+
+	if(item->url = new char[strlen(pc) + 1]) {
+	  strcpy(item->url,pc);
+	}
+	else {
+	  //XXX FIXME Uhhh...what if we run out of memory?
+	  cerr << "Out of memory!\n";
+	}
 	item->type = type;
 
 	pMediaElems->insert(item);
@@ -76,6 +83,11 @@ void PlayList::add(char *pc, int type) {
  void PlayList::setNext() { current++; }
  void PlayList::setPrev() { current--; }
 
-
-
-
+PlayListItem::PlayListItem() {
+  url = NULL;
+}
+    
+PlayListItem::~PlayListItem() {
+  if(url)
+    delete url;
+}

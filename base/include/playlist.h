@@ -31,9 +31,12 @@ ____________________________________________________________________________*/
 
 class PlayListItem {
  public:
-    char url[512];
+    char *url;
     int32 type;
     int32 startFrame;
+
+    PlayListItem();
+    ~PlayListItem();
 };
 
 class PlayList {
