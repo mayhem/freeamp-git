@@ -39,15 +39,17 @@ class FAContext;
 #define STATE_COLLAPSED 0
 #define STATE_EXPANDED  1
 
-class MusicBrowserUI : public UserInterface {
+class GTKMusicBrowser {
  public:
-    MusicBrowserUI(FAContext *);
-    virtual int32 AcceptEvent(Event *);
-    virtual Error Init(int32);
-    static void gtkServiceFunction(void *);
-    virtual ~MusicBrowserUI();
+    GTKMusicBrowser(FAContext *, string playlistURL = string(""));
+    virtual ~GTKMusicBrowser();
+
+    void ShowPlaylist(void);
+    void ShowMusicBrowser(void);
+    void Close(void);
  
-    EventQueue *m_playerEQ;
+    bool Visible(void) { return isVisible; }
+    int32 AcceptEvent(Event *e);
 
     uint32 m_currentindex;
     
@@ -60,24 +62,13 @@ class MusicBrowserUI : public UserInterface {
 
  private:
     bool isVisible;
-    bool weAreGTK;
     void UpdatePlaylistList(void);
     void UpdateCatalog(void);
-    void UpdateCombo(void);
-    void SetComboSelection(string &oName);
 
     Properties *m_propManager;
-    int32 m_startupType;
 
     bool m_initialized;
     bool m_browserCreated;
-
-    void GTKEventService(void);
-
-    int32 m_argc;
-    char **m_argv;
-
-    Thread *gtkThread;
 
     PlaylistManager *m_plm;
     MusicCatalog *m_musicCatalog;

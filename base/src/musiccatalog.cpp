@@ -37,6 +37,9 @@ ____________________________________________________________________________*/
 #endif
 
 #include <string>
+#include <algorithm>
+
+using namespace std;
 
 #include "config.h"
 #include "musicbrowser.h"
@@ -59,6 +62,47 @@ MusicCatalog::~MusicCatalog()
     delete m_artistList;
     delete m_unsorted;
     delete m_playlists;
+}
+
+class comp_catalog {
+  public:
+      bool operator()(PlaylistItem *a, PlaylistItem *b)
+      {
+          if (a->GetMetaData().Track() == b->GetMetaData().Track())
+             // sort alphabetically...
+             return (a->GetMetaData().Title() < b->GetMetaData().Title());
+          return (a->GetMetaData().Track() < b->GetMetaData().Track());
+      }
+      bool operator()(AlbumList *a, AlbumList *b)
+      {
+          return (a->name < b->name);
+      }
+      bool operator()(ArtistList *a, ArtistList *b)
+      {
+          return (a->name < b->name);
+      }
+};
+          
+void MusicCatalog::Sort(void)
+{
+    // Sort the playlists...
+    sort(m_playlists->begin(), m_playlists->end());
+
+    // Sort the uncategorized tracks
+    sort(m_unsorted->begin(), m_unsorted->end(), comp_catalog());
+
+    // sort the rest o the junk
+    vector<ArtistList *>::iterator i = m_artistList->begin();
+    for (; i != m_artistList->end(); i++) {
+        vector<AlbumList *>::iterator j = (*i)->m_albumList->begin();
+        for (; j != (*i)->m_albumList->end(); j++) {
+            sort((*j)->m_trackList->begin(), (*j)->m_trackList->end(), 
+                 comp_catalog());
+        }
+        sort((*i)->m_albumList->begin(), (*i)->m_albumList->end(), 
+             comp_catalog());
+    }
+    sort(m_artistList->begin(), m_artistList->end(), comp_catalog());
 }
 
 Error MusicCatalog::RemovePlaylist(const char *url)
@@ -637,6 +681,9 @@ int32 MusicBrowser::AcceptEvent(Event *e)
             info = "Regenerating the Music Catalog Database...";
             m_context->target->AcceptEvent(new BrowserMessageEvent(info.c_str()));
             m_catalog->RePopulateFromDatabase();
+            info = "Sorting the Music Catalog Database...";
+            m_context->target->AcceptEvent(new BrowserMessageEvent(info.c_str()));
+            m_catalog->Sort();
             m_context->target->AcceptEvent(new Event(INFO_SearchMusicDone));
             break;
         } 

@@ -29,8 +29,10 @@ ____________________________________________________________________________*/
 
 #include "utility.h"
 #include "gtkmusicbrowser.h"
+#include "infoeditor.h"
 #include "fileselector.h"
 #include "browsermenu.h"
+#include "eventdata.h"
 
 extern "C" {
 void new_plist();
@@ -55,14 +57,14 @@ void about();
 }
 
 /* evil, yes */
-MusicBrowserUI *localui = NULL;
+GTKMusicBrowser *localui = NULL;
 
 struct {
     void *data;
     int type;
 } TreeData;
 
-vector<PlaylistItem *> *getTreeSelection(GtkWidget *item)
+static vector<PlaylistItem *> *getTreeSelection(GtkWidget *item)
 {
     int type = (int)gtk_object_get_data(GTK_OBJECT(item), "type");
     vector<PlaylistItem *> *newlist = new vector<PlaylistItem *>;
@@ -107,8 +109,10 @@ vector<PlaylistItem *> *getTreeSelection(GtkWidget *item)
     return newlist;
 }
 
-gboolean list_drag_drop_internal(GtkWidget *widget, GdkDragContext *context,
-                                 gint x, gint y, guint time, MusicBrowserUI *p)
+static gboolean list_drag_drop_internal(GtkWidget *widget, 
+                                        GdkDragContext *context,
+                                        gint x, gint y, guint time, 
+                                        GTKMusicBrowser *p)
 {
     if (widget == gtk_drag_get_source_widget(context))
         return FALSE;
@@ -122,7 +126,7 @@ gboolean list_drag_drop_internal(GtkWidget *widget, GdkDragContext *context,
     return FALSE;
 }
 
-void drag_dest_info_destroy(gpointer data)
+static void drag_dest_info_destroy(gpointer data)
 {
     GtkCListDestInfo *info = (GtkCListDestInfo *)data;
     g_free(info);
@@ -199,9 +203,9 @@ static void drag_dest_cell (GtkCList *clist, gint x, gint y,
     }
 }
 
-void list_drag_rec_internal(GtkWidget *widget, GdkDragContext *context,
-                            gint x, gint y, GtkSelectionData *data,
-                            guint info, guint time, MusicBrowserUI *p)
+static void list_drag_rec_internal(GtkWidget *widget, GdkDragContext *context,
+                                   gint x, gint y, GtkSelectionData *data,
+                                   guint info, guint time, GTKMusicBrowser *p)
 {
     if (widget == gtk_drag_get_source_widget(context))
         return;
@@ -222,8 +226,8 @@ void list_drag_rec_internal(GtkWidget *widget, GdkDragContext *context,
     }
 }
 
-void list_drag_leave_internal(GtkWidget *widget, GdkDragContext *context,
-                              guint time, MusicBrowserUI *p)
+static void list_drag_leave_internal(GtkWidget *widget, GdkDragContext *context,
+                                     guint time, GTKMusicBrowser *p)
 {
     if (widget == gtk_drag_get_source_widget(context))
         return;
@@ -251,8 +255,10 @@ void list_drag_leave_internal(GtkWidget *widget, GdkDragContext *context,
     }
 }
 
-gint list_drag_motion_internal(GtkWidget *widget, GdkDragContext *context,
-                               gint x, gint y, guint time, MusicBrowserUI *p)
+static gint list_drag_motion_internal(GtkWidget *widget, 
+                                      GdkDragContext *context,
+                                      gint x, gint y, guint time, 
+                                      GTKMusicBrowser *p)
 {
     if (widget == gtk_drag_get_source_widget(context))
         return FALSE;
@@ -316,7 +322,8 @@ gint list_drag_motion_internal(GtkWidget *widget, GdkDragContext *context,
     return TRUE;
 }
 
-void tree_clicked(GtkWidget *widget, GdkEventButton *event, MusicBrowserUI *p)
+static void tree_clicked(GtkWidget *widget, GdkEventButton *event, 
+                         GTKMusicBrowser *p)
 {
     GtkWidget *item;
 
@@ -344,7 +351,7 @@ static void tree_source_destroy(gpointer data)
 {
 }
 
-void tree_drag_begin(GtkWidget *w, GdkDragContext *context)
+static void tree_drag_begin(GtkWidget *w, GdkDragContext *context)
 {
     GList *selected = GTK_TREE_SELECTION(GTK_TREE(w));
 
@@ -366,9 +373,9 @@ void tree_drag_begin(GtkWidget *w, GdkDragContext *context)
                                 tree_source_destroy);
 }
 
-void tree_drag_data_get(GtkWidget *w, GdkDragContext *context,
-                        GtkSelectionData *selection_data, guint info,
-                        guint time, GtkWidget *widget)
+static void tree_drag_data_get(GtkWidget *w, GdkDragContext *context,
+                               GtkSelectionData *selection_data, guint info,
+                               guint time, GtkWidget *widget)
 {
     if (selection_data->target == gdk_atom_intern("tree-drag", FALSE)) {
         vector<PlaylistItem *> *newlist = 
@@ -379,7 +386,7 @@ void tree_drag_data_get(GtkWidget *w, GdkDragContext *context,
     }
 }
         
-void MusicBrowserUI::UpdateCatalog(void)
+void GTKMusicBrowser::UpdateCatalog(void)
 {
     m_musicCatalog = m_context->browser->m_catalog;
     GtkTargetEntry tree_target_table = {"tree-drag", 0, 1};
@@ -529,12 +536,12 @@ void MusicBrowserUI::UpdateCatalog(void)
     }
 }
 
-void music_search()
+static void music_search()
 {
     localui->StartMusicSearch();
 }
 
-void MusicBrowserUI::CreateExpanded(void)
+void GTKMusicBrowser::CreateExpanded(void)
 {
     GtkWidget *browserlabel;
     GtkWidget *browservbox;
@@ -575,7 +582,7 @@ void MusicBrowserUI::CreateExpanded(void)
     gtk_widget_show(musicBrowserTree);
 }
 
-void MusicBrowserUI::ExpandCollapseEvent(void)
+void GTKMusicBrowser::ExpandCollapseEvent(void)
 {
     if (m_state == STATE_COLLAPSED) {
         CreateExpanded();
@@ -592,12 +599,7 @@ void MusicBrowserUI::ExpandCollapseEvent(void)
     }
 }
 
-void expand_collapse_internal(GtkWidget *widget, MusicBrowserUI *p)
-{
-    p->ExpandCollapseEvent();
-}
-
-void MusicBrowserUI::ToggleVisEvent(void)
+void GTKMusicBrowser::ToggleVisEvent(void)
 {
     Event *e;
     if (m_state == STATE_COLLAPSED)
@@ -610,29 +612,29 @@ void MusicBrowserUI::ToggleVisEvent(void)
     delete e;
 }
 
-void MusicBrowserUI::ToggleVisEventDestroyed(void)
+void GTKMusicBrowser::ToggleVisEventDestroyed(void)
 {
     ToggleVisEvent();
     m_initialized = false;
 }
 
-gboolean toggle_vis_destroy(GtkWidget *w, MusicBrowserUI *p)
+static gboolean toggle_vis_destroy(GtkWidget *w, GTKMusicBrowser *p)
 {
     p->ToggleVisEventDestroyed();
     return FALSE;
 }
 
-void delete_list_internal(GtkWidget *widget, MusicBrowserUI *p)
+static void delete_list_internal(GtkWidget *widget, GTKMusicBrowser *p)
 {
     p->DeleteListEvent();
 }
 
-void delete_internal(GtkWidget *widget, MusicBrowserUI *p)
+static void delete_internal(GtkWidget *widget, GTKMusicBrowser *p)
 {
     p->DeleteEvent();
 }
 
-void add_track_plist_internal(GtkWidget *widget, MusicBrowserUI *p)
+static void add_track_plist_internal(GtkWidget *widget, GTKMusicBrowser *p)
 {
     FileSelector *filesel = new FileSelector("Add a Track");
     filesel->SetExtended();
@@ -655,35 +657,39 @@ void add_track_plist_internal(GtkWidget *widget, MusicBrowserUI *p)
     delete filesel;
 }
 
-void move_up_internal(GtkWidget *widget, MusicBrowserUI *p)
+static void move_up_internal(GtkWidget *widget, GTKMusicBrowser *p)
 {
     p->MoveUpEvent();
 }
 
-void move_down_internal(GtkWidget *widget, MusicBrowserUI *p)
+static void move_down_internal(GtkWidget *widget, GTKMusicBrowser *p)
 {
     p->MoveDownEvent();
 }
 
-void playlist_row_move_internal(GtkWidget *widget, int source, int dest, MusicBrowserUI *p)
+static void playlist_row_move_internal(GtkWidget *widget, int source, int dest, 
+                                       GTKMusicBrowser *p)
 {
     p->MoveItemEvent(source, dest);
 }
 
-void set_current_index_internal(GtkWidget *widget, int row, int column, 
-                                GdkEventButton *button, MusicBrowserUI *p)
+static void set_current_index_internal(GtkWidget *widget, int row, int column, 
+                                       GdkEventButton *button, 
+                                       GTKMusicBrowser *p)
 {
     p->m_currentindex = row;
     if (button && button->type == GDK_2BUTTON_PRESS)
         p->PlayEvent();
 }
 
-void quit_menu()
+static void quit_menu()
 {
     localui->ToggleVisEvent();
 }
 
-void sort_playlist_internal(int column, MusicBrowserUI *p, PlaylistSortType type                            = PlaylistSortType_Ascending)
+static void sort_playlist_internal(int column, GTKMusicBrowser *p, 
+                                   PlaylistSortType type = 
+                                                    PlaylistSortType_Ascending)
 {
     PlaylistSortKey key;
 
@@ -703,62 +709,62 @@ void sort_playlist_internal(int column, MusicBrowserUI *p, PlaylistSortType type
     p->SortPlaylistEvent(key, type);
 }
 
-void sort_artist()
+static void sort_artist()
 {
     sort_playlist_internal(1, localui);
 }
 
-void sort_album()
+static void sort_album()
 {
     sort_playlist_internal(3, localui);
 }
 
-void sort_title()
+static void sort_title()
 {
     sort_playlist_internal(0, localui);
 }
 
-void sort_year()
+static void sort_year()
 {
     sort_playlist_internal(4, localui);
 }
 
-void sort_track()
+static void sort_track()
 {
     sort_playlist_internal(5, localui);
 }
 
-void sort_genre()
+static void sort_genre()
 {
     sort_playlist_internal(6, localui);
 }
 
-void sort_time()
+static void sort_time()
 {
     sort_playlist_internal(3, localui);
 }
 
-void sort_location()
+static void sort_location()
 {
     sort_playlist_internal(7, localui);
 }
 
-void sort_random()
+static void sort_random()
 {
     sort_playlist_internal(8, localui);
 }
 
-void catalog_tog()
+static void catalog_tog()
 {
     localui->ExpandCollapseEvent();
 }
 
-void infoedit()
+static void infoedit()
 {
     localui->PopUpInfoEditor();
 }
 
-void new_list_internal(GtkWidget *widget, MusicBrowserUI *p)
+static void new_list_internal(GtkWidget *widget, GTKMusicBrowser *p)
 {
     p->SaveCurrentPlaylist();
     p->DeleteListEvent();
@@ -770,12 +776,12 @@ void new_list_internal(GtkWidget *widget, MusicBrowserUI *p)
     delete filesel;
 }
 
-void new_plist(void)
+static void new_plist(void)
 {
     new_list_internal(NULL, localui);
 }
 
-void open_list()
+static void open_list()
 {
     localui->SaveCurrentPlaylist();
 
@@ -785,7 +791,7 @@ void open_list()
     delete filesel;
 }
 
-void save_list()
+static void save_list()
 {
     FileSelector *filesel = new FileSelector("Save This Playlist to Disk");
     if (filesel->Run())
@@ -793,11 +799,11 @@ void save_list()
     delete filesel;
 }
 
-void about()
+static void about()
 {
 }
 
-void MusicBrowserUI::CreateMenu(GtkWidget *topbox)
+void GTKMusicBrowser::CreateMenu(GtkWidget *topbox)
 {
     GtkItemFactory *item_factory;
     GtkAccelGroup *accel_group;
@@ -818,7 +824,7 @@ void MusicBrowserUI::CreateMenu(GtkWidget *topbox)
     gtk_widget_show(separator);
 }
 
-void MusicBrowserUI::UpdatePlaylistList(void)
+void GTKMusicBrowser::UpdatePlaylistList(void)
 {
     if (!playlistList || !m_plm)
         return;
@@ -883,7 +889,8 @@ void MusicBrowserUI::UpdatePlaylistList(void)
     gtk_clist_thaw(GTK_CLIST(playlistList));
 }
 
-void playlist_column_click_internal(GtkCList *clist, gint column, MusicBrowserUI                                    *p)
+static void playlist_column_click_internal(GtkCList *clist, gint column, 
+                                           GTKMusicBrowser *p)
 {
     if (column == p->m_playlistLastSort) {
         if (p->m_playlistColumnSort == PlaylistSortType_Ascending)
@@ -898,7 +905,7 @@ void playlist_column_click_internal(GtkCList *clist, gint column, MusicBrowserUI
     sort_playlist_internal(column, p, p->m_playlistColumnSort);
 }
     
-void MusicBrowserUI::CreatePlaylistList(GtkWidget *box)
+void GTKMusicBrowser::CreatePlaylistList(GtkWidget *box)
 {
     static char *titles[] =
     {
@@ -939,7 +946,7 @@ void MusicBrowserUI::CreatePlaylistList(GtkWidget *box)
     UpdatePlaylistList();
 }
 
-void MusicBrowserUI::SetStatusText(const char *text)
+void GTKMusicBrowser::SetStatusText(const char *text)
 {
     if (statusContext > 0) 
         gtk_statusbar_pop(GTK_STATUSBAR(statusBar), statusContext);
@@ -949,7 +956,7 @@ void MusicBrowserUI::SetStatusText(const char *text)
     gtk_statusbar_push(GTK_STATUSBAR(statusBar), 1, text);
 }
 
-void MusicBrowserUI::LoadPlaylist(string &oPlaylist)
+void GTKMusicBrowser::LoadPlaylist(string &oPlaylist)
 {
     if (oPlaylist == m_currentListName)
         return;
@@ -971,7 +978,7 @@ void MusicBrowserUI::LoadPlaylist(string &oPlaylist)
     delete [] PlaylistURL;
 }
 
-void MusicBrowserUI::CreatePlaylist(void)
+void GTKMusicBrowser::CreatePlaylist(void)
 {
     GtkWidget *vbox;
     GtkWidget *buttonvbox;
@@ -1073,31 +1080,245 @@ void MusicBrowserUI::CreatePlaylist(void)
     m_state = STATE_COLLAPSED;
 }
 
-void MusicBrowserUI::gtkServiceFunction(void *p)
+void GTKMusicBrowser::DeleteListEvent(void)
 {
-    assert(p);
-    ((MusicBrowserUI *)p)->GTKEventService();
+    m_plm->RemoveAll();
+    UpdatePlaylistList();
+    m_currentindex = kInvalidIndex;
 }
 
-void MusicBrowserUI::GTKEventService(void)
+void GTKMusicBrowser::DeleteEvent(void)
 {
-    string lastPlaylist = FreeampDir(m_context->prefs);
-    lastPlaylist += "/currentlist.m3u";
-    LoadPlaylist(lastPlaylist);
+    m_plm->RemoveItem(m_currentindex);
+    m_currentindex = m_plm->GetCurrentIndex();
+    UpdatePlaylistList();
+}
 
-    weAreGTK = false;
-    m_context->gtkLock.Acquire();
-    if (!m_context->gtkInitialized) {
-        m_context->gtkInitialized = true;
-        g_thread_init(NULL);
-        gtk_init(&m_argc, &m_argv);
-        gdk_rgb_init();
-        weAreGTK = true;
-    }
-    m_context->gtkLock.Release();
+void GTKMusicBrowser::MoveUpEvent(void)
+{
+    if (m_currentindex == 0)
+        return;
+    m_plm->SwapItems(m_currentindex, m_currentindex - 1);
+    m_currentindex--;
+    UpdatePlaylistList();
+}
 
-    if (weAreGTK) {
-        gtk_main();
-        gdk_threads_leave();
+void GTKMusicBrowser::MoveDownEvent(void)
+{
+    if (m_currentindex == m_plm->CountItems() - 1)
+        return;
+    m_plm->SwapItems(m_currentindex, m_currentindex + 1);
+    m_currentindex++;
+    UpdatePlaylistList();
+}
+
+void GTKMusicBrowser::MoveItemEvent(int source, int dest)
+{
+    m_plm->MoveItem(source, dest);
+    UpdatePlaylistList();
+}
+
+void GTKMusicBrowser::AddTrackPlaylistEvent(char *path)
+{
+    char *tempurl = new char[_MAX_PATH];
+    uint32 length = _MAX_PATH;
+    if (m_currentindex == kInvalidIndex)
+        m_currentindex = 0;
+    if (IsntError(FilePathToURL(path, tempurl, &length))) {
+        m_plm->AddItem(tempurl, m_currentindex);
+        UpdatePlaylistList();
     }
+    delete [] tempurl;
+}
+
+void GTKMusicBrowser::AddTrackPlaylistEvent(PlaylistItem *newitem)
+{
+    if (m_currentindex == kInvalidIndex)
+        m_currentindex = 0;
+    m_plm->AddItem(newitem, m_currentindex, false);
+    UpdatePlaylistList();
+}
+
+void GTKMusicBrowser::AddTracksPlaylistEvent(vector<PlaylistItem *> *newlist)
+{
+    if (m_currentindex == kInvalidIndex)
+        m_currentindex = 0;
+    m_plm->AddItems(newlist, m_currentindex, false);
+    UpdatePlaylistList();
+}
+
+void GTKMusicBrowser::PlayEvent(void)
+{
+    m_plm->SetCurrentIndex(m_currentindex);
+    m_context->target->AcceptEvent(new Event(CMD_Play));
+}
+
+void GTKMusicBrowser::StartMusicSearch(void)
+{
+    vector<string> oPathList;
+    oPathList.push_back(string(ROOT_DIR));
+    m_context->browser->SearchMusic(oPathList);
+}
+
+void GTKMusicBrowser::SortPlaylistEvent(PlaylistSortKey order, PlaylistSortType
+                                        type)
+{
+    if (order == kPlaylistSortKey_Random)
+        m_plm->SetShuffleMode(true);
+    else
+        m_plm->Sort(order, type);
+    UpdatePlaylistList();
+}
+
+void GTKMusicBrowser::PopUpInfoEditor(void)
+{
+    if (m_currentindex == kInvalidIndex)
+        return;
+    infoeditorUI *infoedit = new infoeditorUI(m_context,
+                                              m_plm->ItemAt(m_currentindex));
+    infoedit->DisplayInfo();
+}
+
+void GTKMusicBrowser::SaveCurrentPlaylist(char *path)
+{
+    if (path)
+        m_currentListName = path;
+    if (m_currentListName.length() == 0)
+        return;
+    char *ext = strrchr(m_currentListName.c_str(), '.');
+    if (ext)
+        ext = ext + 1;
+    Error result = kError_NoErr;
+    int i = 0;
+    bool found = false;
+    PlaylistFormatInfo format;
+    while (ext && result == kError_NoErr) {
+        result = m_plm->GetSupportedPlaylistFormats(&format, i);
+        if (!strcmp(ext, format.GetExtension())) {
+            found = true;
+            break;
+        }
+        i++;
+    }
+    if (!found) {
+        m_plm->GetSupportedPlaylistFormats(&format, 0);
+        m_currentListName += "." ;
+        m_currentListName += format.GetExtension();
+    }
+    uint32 urlLength = m_currentListName.length() + 20;
+    char *writeURL = new char[urlLength];
+    Error err = FilePathToURL(m_currentListName.c_str(), writeURL, &urlLength);
+    if (IsntError(err))
+        m_plm->WritePlaylist(writeURL, &format);
+    delete [] writeURL;
+}
+
+void GTKMusicBrowser::ImportPlaylist(char *path)
+{
+    if (!path)
+        return;
+    uint32 length = strlen(path) + 10;
+    char *url = new char[length];
+    if (IsntError(FilePathToURL(path, url, &length)))
+        m_context->browser->m_catalog->AddPlaylist(path);
+    delete [] url;
+    UpdateCatalog();
+}
+
+void GTKMusicBrowser::ReadPlaylist(char *path, vector<PlaylistItem *> *plist)
+{
+    m_plm->ReadPlaylist(path, plist);
+}
+
+GTKMusicBrowser::GTKMusicBrowser(FAContext *context, string playlistURL)
+{
+    m_context = context;
+    m_initialized = false;
+    isVisible = false;
+    m_currentindex = 0;
+    m_currentListName = "";
+    m_state = STATE_COLLAPSED;
+    statusContext = 0;
+    playlistList = NULL;
+    m_musicCatalog = NULL;
+    m_browserCreated = false;
+
+    if (playlistURL.length() == 0) {
+        playlistURL = string("file://") + FreeampDir(NULL) + 
+                      string("/currentlist.m3u");
+
+        m_plm = context->plm;
+    }
+   
+    LoadPlaylist(playlistURL);
+}
+
+GTKMusicBrowser::~GTKMusicBrowser(void)
+{
+}
+
+void GTKMusicBrowser::ShowPlaylist(void)
+{
+    gdk_threads_enter();
+    isVisible = true;
+    if (m_initialized) 
+        gtk_widget_show(musicBrowser);
+    else {
+        CreatePlaylist();
+        m_initialized = true;
+    }
+
+    if (m_state == STATE_EXPANDED)
+        ExpandCollapseEvent();
+    gdk_threads_leave();
+}
+
+void GTKMusicBrowser::ShowMusicBrowser(void)
+{
+    gdk_threads_enter();
+    isVisible = true;
+    if (m_initialized)
+        gtk_widget_show(musicBrowser);
+    else {
+        CreatePlaylist();
+        m_initialized = true;
+    }
+    if (m_state == STATE_COLLAPSED)
+        ExpandCollapseEvent();
+    gdk_threads_leave();
+}
+
+void GTKMusicBrowser::Close(void)
+{
+    gdk_threads_enter();
+    isVisible = false;
+    if (m_initialized)
+        gtk_widget_hide(musicBrowser);
+    gdk_threads_leave();
+
+    SaveCurrentPlaylist(NULL);
+}
+
+int32 GTKMusicBrowser::AcceptEvent(Event *e)
+{
+    switch (e->Type()) {
+        case INFO_SearchMusicDone: {
+            if (m_initialized) {
+                gdk_threads_enter();
+                UpdateCatalog();
+                SetStatusText("");
+                gdk_threads_leave();
+            }
+            break; }
+        case INFO_BrowserMessage: {
+            if (m_initialized) {
+                gdk_threads_enter();
+                SetStatusText(((BrowserMessageEvent *)e)->GetBrowserMessage());
+                gdk_threads_leave();
+            }
+            break; }
+        default:
+            break;
+    }
+    return 0;
 }

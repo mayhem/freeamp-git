@@ -82,6 +82,8 @@ class MusicCatalog
 
     void  ClearCatalog(void);
 
+    void  Sort(void);
+
     const vector<ArtistList *> *GetMusicList(void) { return m_artistList; }
     const vector<PlaylistItem *> *GetUnsortedMusic(void) { return m_unsorted; }
     const vector<string> *GetPlaylists(void) { return m_playlists; }
