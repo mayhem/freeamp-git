@@ -68,6 +68,12 @@ TreeViewWndProc(HWND hwnd,
                 WPARAM wParam, 
                 LPARAM lParam);
 
+BOOL CALLBACK 
+MusicSearchDlgProc(HWND hwnd, 
+                   UINT msg, 
+                   WPARAM wParam, 
+                   LPARAM lParam);
+
 class MusicBrowserUI : public UserInterface 
 {
  public:
@@ -95,6 +101,11 @@ class MusicBrowserUI : public UserInterface
                             LPARAM lParam);
 
     LRESULT ListViewWndProc(HWND hwnd, 
+                            UINT msg, 
+                            WPARAM wParam, 
+                            LPARAM lParam);
+
+    BOOL MusicSearchDlgProc(HWND hwnd, 
                             UINT msg, 
                             WPARAM wParam, 
                             LPARAM lParam);
@@ -208,6 +219,7 @@ class MusicBrowserUI : public UserInterface
 
     HWND                 m_hPlaylistHeader;
     DropTarget*          m_playlistDropTarget;
+    vector<string>       m_searchPathList;
 };
 
 #endif

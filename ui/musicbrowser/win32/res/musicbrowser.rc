@@ -55,6 +55,28 @@ BEGIN
     PUSHBUTTON      "Open URL",IDC_OPEN_URL,222,3,50,13
 END
 
+IDD_MUSICSEARCH DIALOG DISCARDABLE  0, 0, 212, 126
+STYLE DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Search Computer for Music"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "Begin Search",IDOK,91,105,54,14
+    PUSHBUTTON      "Cancel",IDCANCEL,151,105,54,14
+    LTEXT           "&Look for music on:",IDC_STATIC,10,64,60,8
+    COMBOBOX        IDC_DRIVES,73,62,48,48,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    PUSHBUTTON      "&Browse...",IDC_BROWSE,152,81,50,14,WS_DISABLED
+    LTEXT           "Limit search to:",IDC_LIMITTEXT,10,83,48,8
+    EDITTEXT        IDC_DIRECTORY,63,81,84,13,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "We will search your computer for supported music files. The files will not be moved or modified during this process. Their location will be remembered in order to provide you with an",
+                    IDC_STATIC,7,7,198,25
+    LTEXT           "organized view of your music collection. ",IDC_STATIC,7,
+                    31,198,8
+    LTEXT           "Where would you like to look for music?",IDC_STATIC,7,
+                    43,198,8
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -67,6 +89,14 @@ BEGIN
     IDD_MUSICBROWSER, DIALOG
     BEGIN
         BOTTOMMARGIN, 239
+    END
+
+    IDD_MUSICSEARCH, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 205
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 119
     END
 END
 #endif    // APSTUDIO_INVOKED

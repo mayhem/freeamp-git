@@ -17,6 +17,8 @@
 #define IDR_POPUP                       110
 #define IDB_PLAYLIST                    113
 #define IDB_BITMAP1                     116
+#define IDR_TRACKPOPUP                  119
+#define IDD_MUSICSEARCH                 120
 #define IDD_OPENURL                     219
 #define IDB_PLAYING                     542
 #define IDB_CATALOG                     543
@@ -42,7 +44,11 @@
 #define IDC_PLAYLISTNAME                1016
 #define IDC_PLAYLISTTITLE               1017
 #define IDC_DUMMYCONTROL                1018
+#define IDC_LIMITTEXT                   1019
 #define IDC_OPEN_URL                    1029
+#define IDC_BROWSE                      1110
+#define IDC_DRIVES                      1231
+#define IDC_DIRECTORY                   1531
 #define ID_FILE_NEWPLAYLIST             40001
 #define ID_FILE_OPENPLAYLIST            40002
 #define ID_FILE_SAVEPLAYLIST            40004
@@ -78,9 +84,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        119
+#define _APS_NEXT_RESOURCE_VALUE        121
 #define _APS_NEXT_COMMAND_VALUE         40035
-#define _APS_NEXT_CONTROL_VALUE         1019
+#define _APS_NEXT_CONTROL_VALUE         1020
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

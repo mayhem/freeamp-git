@@ -801,6 +801,7 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
             HDROP dropHandle = (HDROP)wParam;
             uint32 count;
             char url[1024];
+            char path[MAX_PATH];
             vector<string> fileList;
 
             count = DragQueryFile(  dropHandle,
@@ -814,6 +815,13 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
                                 i,
                                 url,
                                 sizeof(url));
+
+                if(!filesAreURLs)
+                {
+                    uint32 length = sizeof(url);
+                    strcpy(path, url);
+                    FilePathToURL(path, url, &length);
+                }
 
                 fileList.push_back(url);
 

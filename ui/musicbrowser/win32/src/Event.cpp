@@ -122,11 +122,7 @@ void MusicBrowserUI::PlayEvent(void)
 #endif
 
 void MusicBrowserUI::StartStopMusicSearch(void)
-{
-    DWORD           dwDrives;
-    char           *szPath = "X:\\";
-    int32           i, ret;
-    vector<string>  oPathList;
+{  
     HMENU           hMenu;
     MENUITEMINFO    sItem;
 
@@ -136,29 +132,28 @@ void MusicBrowserUI::StartStopMusicSearch(void)
         m_context->browser->StopSearchMusic();
         return;
     }
-        
-    dwDrives = GetLogicalDrives();
-    for(i = 0; i < sizeof(DWORD) * 8; i++)
-    {
-       if (dwDrives & (1 << i))
-       {
-          szPath[0] = 'A' + i;
-          ret = GetDriveType(szPath);
-          if (ret != DRIVE_CDROM && ret != DRIVE_REMOVABLE)
-              oPathList.push_back(string(szPath));
-       }   
-    }
-    m_context->browser->SearchMusic(oPathList);
 
-    m_bSearchInProgress = true;
-    hMenu = GetMenu(m_hWnd);
-    hMenu = GetSubMenu(hMenu, 0);
-    sItem.cbSize = sizeof(MENUITEMINFO);
-    sItem.fMask = MIIM_TYPE;
-    sItem.fType = MFT_STRING;
-    sItem.dwTypeData = "Stop &Music Search";
-    sItem.cch = strlen(sItem.dwTypeData);
-    SetMenuItemInfo(hMenu, ID_FILE_SEARCHFORMUSIC, false, &sItem);
+    m_searchPathList.clear();
+
+    if(0 < DialogBoxParam(g_hinst, 
+                          MAKEINTRESOURCE(IDD_MUSICSEARCH),
+                          m_hWnd, 
+                          (int (__stdcall *)(void))::MusicSearchDlgProc, 
+                          (LPARAM )this))
+    {
+        
+        m_context->browser->SearchMusic(m_searchPathList);
+
+        m_bSearchInProgress = true;
+        hMenu = GetMenu(m_hWnd);
+        hMenu = GetSubMenu(hMenu, 0);
+        sItem.cbSize = sizeof(MENUITEMINFO);
+        sItem.fMask = MIIM_TYPE;
+        sItem.fType = MFT_STRING;
+        sItem.dwTypeData = "Stop &Music Search";
+        sItem.cch = strlen(sItem.dwTypeData);
+        SetMenuItemInfo(hMenu, ID_FILE_SEARCHFORMUSIC, false, &sItem);
+    }
 }
 
 int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
