@@ -131,7 +131,7 @@ class MusicBrowserUI : public UserInterface
 
     // Functions in Event.cpp
     int   Notify(WPARAM wParam, NMHDR *pNMHDR);
-    void  StartMusicSearch(void);
+    void  StartStopMusicSearch(void);
     void  MoveUpEvent(void);
     void  MoveDownEvent(void);
     void  AddEvent(void);

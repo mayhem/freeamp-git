@@ -121,7 +121,7 @@ void MusicBrowserUI::PlayEvent(void)
 }
 #endif
 
-void MusicBrowserUI::StartMusicSearch(void)
+void MusicBrowserUI::StartStopMusicSearch(void)
 {
     DWORD           dwDrives;
     char           *szPath = "X:\\";
@@ -483,7 +483,7 @@ void MusicBrowserUI::EmptyDBCheck(void)
                        "music and playlists on your machine?",
                        "MusicBrowser", MB_YESNO);
     if (iRet == IDYES)
-        StartMusicSearch();
+        StartStopMusicSearch();
 }
 
 void MusicBrowserUI::EditEvent(void)

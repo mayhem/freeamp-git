@@ -270,13 +270,23 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
         }
         case INFO_BrowserMessage: 
         {
-            SendMessage(m_hStatus, SB_SETTEXT, 0, (LPARAM)
-                          ((BrowserMessageEvent *)event)->GetBrowserMessage());
+            const char* cancelMsg = "(Press ESC to Cancel)  ";
+            string message;
+
+            if(m_bSearchInProgress)
+            {
+                message = cancelMsg;
+            }
+
+            message += ((BrowserMessageEvent *)event)->GetBrowserMessage();
+
+            SendMessage(m_hStatus, SB_SETTEXT, 0, (LPARAM)message.c_str());
+
             break; 
         }
         case CMD_TogglePlaylistUI: 
         {
-            if (m_initialized && isVisible) 
+            if (m_initialized && isVisible)
             {
                 isVisible = false;
             }

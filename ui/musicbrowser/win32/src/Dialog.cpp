@@ -118,7 +118,6 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
             filesAreURLs = true;
         case WM_DROPFILES:
         {
-
             DropFiles((HDROP)wParam, filesAreURLs);
             return 0;
         }
@@ -164,47 +163,53 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
         {
         	switch(LOWORD(wParam))
             {
+                case 2: // what is this? we get it when we press ESC.
+                    if(m_bSearchInProgress)
+                    {
+                        StartStopMusicSearch();  
+                    }
+                    return 1;
                 case ID_FILE_SEARCHFORMUSIC:
                 case IDC_SEARCH:
-                   StartMusicSearch();
+                    StartStopMusicSearch();
                 return 1;
                 case ID_EDIT_MOVEUP:
                 case IDC_UP:
-                   MoveUpEvent();
+                    MoveUpEvent();
                 return 1;
                 case ID_EDIT_MOVEDOWN:
                 case IDC_DOWN:
-                   MoveDownEvent();
+                    MoveDownEvent();
                 return 1;
                 case IDC_DELETE:
-                   DeleteEvent();
+                    DeleteEvent();
                 return 1;
                 case ID_EDIT_ADDTRACK:
                 case IDC_ADD:
-                   AddEvent();
+                    AddEvent();
                 return 1;
                 case ID_EDIT_CLEARPLAYLIST:
                 case IDC_CLEARLIST:
-                   DeleteListEvent();
+                    DeleteListEvent();
                 return 1;
                 case ID_VIEW_MUSICCATALOG:
-                   ExpandCollapseEvent();
+                    ExpandCollapseEvent();
                 return 1;
                 case ID_FILE_OPENPLAYLIST:
-                   OpenPlaylist();
+                    OpenPlaylist();
                 return 1;
                 case ID_FILE_EXIT:
-                   Close();
+                    Close();
                 return 1;
                 case ID_FILE_SAVEPLAYLIST:
-                   WritePlaylist();
+                    WritePlaylist();
                 return 1;
                 case ID_FILE_SAVEASPLAYLIST:
-                   SaveAsPlaylist();
+                    SaveAsPlaylist();
                 return 1;
                 case IDC_NEWLIST:
                 case ID_FILE_NEWPLAYLIST:
-                   NewPlaylist();
+                    NewPlaylist();
                 return 1;
                 case ID_SORT_ARTIST:
                 case ID_SORT_ALBUM:
@@ -216,19 +221,19 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                 case ID_SORT_LOCATION:
                 case ID_SORT_RANDOMIZE:
                 case IDC_RANDOMIZE:
-                   SortEvent(LOWORD(wParam));
+                    SortEvent(LOWORD(wParam));
                 return 1;
                 case ID_EDIT_EDIT:
-                   EditEvent();
+                    EditEvent();
                 return 1;
                 case ID_EDIT_REMOVE:
-                   RemoveEvent();
+                    RemoveEvent();
                 return 1;
                 case ID_EDIT_REMOVEFROMDISK:
-                   RemoveFromDiskEvent();
+                    RemoveFromDiskEvent();
                 return 1;
                 case ID_FILE_IMPORT:
-                   ImportEvent();
+                    ImportEvent();
                 return 1;
             }    
         }     
