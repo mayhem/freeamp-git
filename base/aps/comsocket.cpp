@@ -44,6 +44,11 @@ ____________________________________________________________________________*/
 #include <net/if.h>
 #include <sys/ioctl.h>
 #endif
+
+#ifndef SHUT_RDWR
+#define SHUT_RDWR 2
+#endif
+
 COMSocket::COMSocket(int nSocket, int nSockType)
 {
 	m_nSocket = nSocket;
