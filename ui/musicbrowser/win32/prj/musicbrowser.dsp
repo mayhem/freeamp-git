@@ -450,6 +450,10 @@ SOURCE=..\res\portable.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=..\res\relatable.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=..\res\shoutcast.bmp
 # End Source File
 # Begin Source File
@@ -494,7 +498,27 @@ SOURCE=..\res\wizard_small.bmp
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=..\..\..\..\..\..\include\algobase.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\aps\aps.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\aps\apsmetadata.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\aps\apsplaylist.h
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\..\..\..\..\..\Program Files\Microsoft Visual Studio\VC98\Include\BASETSD.H"
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\ColumnInfo.h
 # End Source File
 # Begin Source File
 
@@ -511,6 +535,14 @@ SOURCE=..\include\DataIndex.h
 # Begin Source File
 
 SOURCE=..\..\..\..\base\include\debug.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\downloadformat.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\downloadmanager.h
 # End Source File
 # Begin Source File
 
@@ -550,11 +582,31 @@ SOURCE=..\..\..\..\base\include\facontext.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\..\base\aps\FAMetaUnit.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\FavoriteDialog.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\include\FreeAmpStreams.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\lib\gdbm\gdbm_fa.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\..\..\include\hashtable.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\..\..\include\heap.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\help.h
 # End Source File
 # Begin Source File
 
@@ -567,6 +619,10 @@ SOURCE=..\..\..\..\lib\http\include\Http.h
 # Begin Source File
 
 SOURCE=..\..\include\Icecast.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lmc\include\lmc.h
 # End Source File
 # Begin Source File
 
@@ -598,6 +654,14 @@ SOURCE=..\..\..\..\lib\xml\include\Parse.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\..\io\include\pipeline.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\player.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\base\include\playlist.h
 # End Source File
 # Begin Source File
@@ -607,6 +671,14 @@ SOURCE=..\..\..\..\base\include\playlistformat.h
 # Begin Source File
 
 SOURCE=..\..\..\..\base\include\plmevent.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\io\include\pmi.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\io\include\pmo.h
 # End Source File
 # Begin Source File
 
@@ -622,6 +694,14 @@ SOURCE=..\..\..\..\base\include\properties.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\..\base\include\propimpl.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\io\include\pullbuffer.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\base\include\registrar.h
 # End Source File
 # Begin Source File
@@ -634,11 +714,27 @@ SOURCE=..\..\..\..\base\win32\include\semaphore.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\..\..\..\include\stl_config.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\..\..\include\tempbuf.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\base\include\thread.h
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\..\..\base\include\timer.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\..\..\include\tree.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\..\..\include\type_traits.h
 # End Source File
 # Begin Source File
 
@@ -654,12 +750,12 @@ SOURCE=..\..\..\..\base\include\utility.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\..\base\aps\uuid.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\Win32MusicBrowser.h
 # End Source File
 # End Group
-# Begin Source File
-
-SOURCE=..\res\relatable.bmp
-# End Source File
 # End Target
 # End Project

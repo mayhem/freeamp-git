@@ -61,6 +61,7 @@ CDPMO::CDPMO(FAContext *context) :
    sentData = false;
    trackDone = false;
    Int32PropValue *pProp;
+   m_volume = NULL;
 
    m_hWnd = 0;
 
