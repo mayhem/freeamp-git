@@ -39,6 +39,7 @@ UserInterface *Initialize(FAContext *context) {
 MusicBrowserUI::MusicBrowserUI(FAContext *context)
 {
     m_context = context;
+    searching = NULL;
 }
 
 MusicBrowserUI::~MusicBrowserUI()
@@ -108,6 +109,8 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
                 gtk_main_quit();
                 gdk_threads_leave();
             }
+            if (searching)
+                delete searching;
             gtkThread->Join();
             m_playerEQ->AcceptEvent(new Event(INFO_ReadyToDieUI));
             break; }
@@ -117,6 +120,8 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
             vector<GTKMusicBrowser *>::iterator i = browserWindows.begin();
             for (; i != browserWindows.end(); i++)
                 (*i)->AcceptEvent(event);
+            if (searching)
+                searching->AcceptEvent(event);
             break; }
         case CMD_TogglePlaylistUI: {
             if (mainBrowser->Visible())
@@ -152,4 +157,16 @@ void MusicBrowserUI::WindowClose(GTKMusicBrowser *oldUI)
 
     if (loc != browserWindows.end())
         browserWindows.erase(loc);
+}
+
+void MusicBrowserUI::StartSearch(void)
+{
+    if (searching)
+        return;
+
+    searching = new musicsearchUI(m_context);
+
+    searching->Show();
+
+    searching = NULL;
 }

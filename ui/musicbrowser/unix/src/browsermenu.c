@@ -67,7 +67,7 @@ void CreateMenuItems(GtkItemFactory *item_factory, void *p)
 
      {"/_Edit",                 NULL,           0,         0, "<Branch>" },
      {"/_Edit/Add Track",       NULL,           add_track, 0, 0 },
-     {"/_Edit/Edit Track\\Playlist info", NULL,  infoedit,  0, 0 },
+     {"/_Edit/Edit Track Information\\Playlist", NULL,  infoedit,  0, 0 },
      {"/_Edit/Remove Track\\Playlist", NULL,     delete_sel,0, 0 },
      {"/_Edit/Remove Track\\Playlist From Disk", NULL, realdelete_sel, 0, 0},
      {"/_Edit/sep3",            NULL,           0,         0, "<Separator>" },

@@ -45,6 +45,7 @@ PLUGINS += plugins/xingmp3.lmc
 
 PLUGINS += plugins/id3v1.mdf
 PLUGINS += plugins/id3v2.mdf
+PLUGINS += plugins/misc.mdf
 
 PLUGINS += plugins/m3u.plf
 
@@ -121,6 +122,8 @@ MUSICBROWSEROBJ = ui/musicbrowser/unix/src/gtkmusicbrowser.o \
                   ui/musicbrowser/unix/src/infoeditor.o \
                   ui/musicbrowser/unix/src/fileselector.o \
                   ui/musicbrowser/unix/src/browsermenu.o \
+                  ui/musicbrowser/unix/src/musicsearch.o \
+                  ui/freeamp/unix/src/GTKMessageDialog.o \
                   base/src/utility.o
 
 plugins/musicbrowser.ui: $(MUSICBROWSEROBJ)
@@ -225,6 +228,12 @@ ID3V2OBJ = plm/metadata/id3v2/id3v2.o
 
 plugins/id3v2.mdf: $(ID3V2OBJ)
 	$(LINKMOD) -o $@ $(ID3V2OBJ)
+
+#misc
+MISCOBJ = plm/metadata/misc/misc.o
+
+plugins/misc.mdf: $(MISCOBJ)
+	$(LINKMOD) -o $@ $(MISCOBJ)
 
 # PLF section
 

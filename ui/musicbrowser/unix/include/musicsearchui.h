@@ -21,59 +21,48 @@
         $Id$
 ____________________________________________________________________________*/
 
-#ifndef INCLUDED_MUSICBROWSERUI_H_
-#define INCLUDED_MUSICBROWSERUI_H_
+#ifndef INCLUDED_MUSICSEARCHUI_H_
+#define INCLUDED_MUSICSEARCHUI_H_
 
 #include "config.h"
 
-#include "ui.h"
-#include "event.h"
-#include "thread.h"
-#include "playlist.h"
-#include "musicbrowser.h"
-#include "gtkmusicbrowser.h"
-#include "musicsearchui.h"
+#include <gtk/gtk.h>
 
-class FAContext;
+#include "facontext.h"
 
-class MusicBrowserUI : public UserInterface {
+class musicsearchUI {
  public:
-    MusicBrowserUI(FAContext *);
-    virtual int32 AcceptEvent(Event *);
-    virtual Error Init(int32);
-    static void gtkServiceFunction(void *);
-    virtual ~MusicBrowserUI();
+    musicsearchUI(FAContext *);
+   ~musicsearchUI();
+  
+    void Show();
+
+    int32 AcceptEvent(Event *);
  
-    EventQueue *m_playerEQ;
+    void SetSearchPath(string &newpath) { searchPath = newpath; }
+    void SetSearchPath(char *newpath) { searchPath = newpath; }
 
-    void CreateNewEditor(string & newPlaylist);
-    void WindowClose(GTKMusicBrowser *oldUI);
+    void UpdateEntry(void);
 
-    void StartSearch(void);
+    void StartSearch();
+    void EndSearch();
+
+    bool custom;
+    bool searchInProgress;
+    bool searchDone;
 
  protected:
     FAContext *m_context;
 
  private:
-    bool isVisible;
-    bool weAreGTK;
+    GtkWidget *m_window;
+    GtkWidget *m_searchButton;
+    GtkWidget *textEntry;
+    GtkWidget *browseButton;
+    GtkWidget *buttonLabel;
 
-    Properties *m_propManager;
-    int32 m_startupType;
-
-    bool m_initialized;
-
-    void GTKEventService(void);
-
-    int32 m_argc;
-    char **m_argv;
-
-    Thread *gtkThread;
-
-    GTKMusicBrowser *mainBrowser;
-    vector<GTKMusicBrowser *> browserWindows;
-
-    musicsearchUI *searching;
+    string searchPath;
 };
+   
 
 #endif
