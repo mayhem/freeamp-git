@@ -70,6 +70,9 @@ cmdlineUI::cmdlineUI(FAContext *context) {
     m_playerEQ = NULL;
     m_lastIndexPlayed = -1;
     m_id3InfoPrinted = false;
+    m_currSeconds=0;
+    m_totalFrames=1;
+    m_secondsPerFrame=1;
 
     keyboardListenThread = NULL;
 }
@@ -95,6 +98,8 @@ Error cmdlineUI::Init(int32 startup_level) {
 	cout << " * -    Prev Song" << endl;
 	cout << " * p    Pause / UnPause" << endl;
 	cout << " * s    Shuffle" << endl << endl;
+ 	cout << " * f    Fast forward 10 seconds" << endl << endl;
+ 	cout << " * b    Skip backwards 10 seconds" << endl << endl;
 
         m_argc = m_context->argc;
         m_argv = m_context->argv;
@@ -116,6 +121,8 @@ cmdlineUI::~cmdlineUI() {
     }
 }
 
+#define STEP_SIZE 10
+
 void cmdlineUI::keyboardServiceFunction(void *pclcio) {
     cmdlineUI *pMe = (cmdlineUI *)pclcio;
     //char *pkey = new char[1];
@@ -135,6 +142,25 @@ void cmdlineUI::keyboardServiceFunction(void *pclcio) {
 	    case '-': {
 		Event *e = new Event(CMD_PrevMediaPiece);
 		pMe->m_playerEQ->AcceptEvent(e);
+		break;
+	    }
+	    case 'f':{
+	        int32 cf=int32((pMe->m_currSeconds+STEP_SIZE)/pMe->m_secondsPerFrame);
+		if (cf>pMe->m_totalFrames)
+		  cf=pMe->m_totalFrames;
+		Event *e = new ChangePositionEvent(cf);
+		pMe->m_currSeconds+=STEP_SIZE;
+		pMe->m_playerEQ->AcceptEvent(e);
+		break;
+	    }
+	    case 'b':{
+	        int32 nsec=pMe->m_currSeconds-STEP_SIZE;
+		if (nsec<0)
+		    nsec=0;
+		if (pMe->m_currSeconds>0) {
+		  Event *e = new ChangePositionEvent(nsec/pMe->m_secondsPerFrame);
+		  pMe->m_playerEQ->AcceptEvent(e);
+		}
 		break;
 	    }
 	    case '=':
@@ -179,6 +205,9 @@ int32 cmdlineUI::AcceptEvent(Event *e) {
 		Event *e = new Event(CMD_QuitPlayer);
 		m_playerEQ->AcceptEvent(e);
 		break; }
+  	    case INFO_Stopped:
+	        if (m_currSeconds==0)
+		    break;
 	    case CMD_Cleanup: {
 		Event *e = new Event(INFO_ReadyToDieUI);
 		m_playerEQ->AcceptEvent(e);
@@ -191,6 +220,16 @@ int32 cmdlineUI::AcceptEvent(Event *e) {
 		    cout << "Playing: " << pmvi->m_filename << endl;
 		}
 		break; }
+	    case INFO_MediaTimeInfo: {
+	        MediaTimeInfoEvent *info = (MediaTimeInfoEvent *)e;
+	        m_currSeconds = (info->m_hours * 3600) + (info->m_minutes * 60) + info->m_seconds;
+	    }
+	    case INFO_MPEGInfo: {
+	        MpegInfoEvent *info = (MpegInfoEvent *)e;
+		m_secondsPerFrame = info->GetSecondsPerFrame();
+		m_totalFrames = info->GetTotalFrames();
+		break;
+	    }
 /*	    case INFO_ID3TagInfo: {
 		ID3TagEvent *ite = (ID3TagEvent *)e;
 		if (ite) {
