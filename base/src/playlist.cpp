@@ -151,7 +151,7 @@ SetNext(bool bUserAction)
         {
             if(SHUFFLE_RANDOM == m_order)
             {
-                m_current = (int32) (((double) count * rand()) / (RAND_MAX + 1.0));
+                m_current = rand() % count;
             }
             else
             {
@@ -188,7 +188,7 @@ SetPrev(bool bUserAction)
         {
             if(m_order == SHUFFLE_RANDOM)
             {
-                m_current = (int32) (((double) count * rand()) / (RAND_MAX + 1.0));
+                m_current = rand() % count;
             }
             else
             {
