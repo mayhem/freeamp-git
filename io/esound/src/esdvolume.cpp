@@ -24,7 +24,6 @@ ____________________________________________________________________________*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <linux/soundcard.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <esd.h>
