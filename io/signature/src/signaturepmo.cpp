@@ -109,7 +109,7 @@ Init(OutputInfo* info)
    m_data_size = info->max_buffer_size;
 
    mb_SetPCMDataInfo(m_MB, info->samples_per_second, 
-	                 info->number_of_channels,
+                    info->number_of_channels,
                      info->bits_per_sample);
 
    m_strGUID = "";
@@ -169,6 +169,7 @@ WorkerThread(void)
     Event*  pEvent;
     bool    bDone = false;
     bool    bGotPMOQuit = false;
+    char    guid[17];
 
     // Don't do anything until resume is called.
     m_pPauseSem->Wait();
@@ -253,13 +254,12 @@ WorkerThread(void)
                     Init(((PMOInitEvent *)pEvent)->GetInfo());
    
                 if (pEvent->Type() == PMO_Quit) 
-				{
-					char *guid;
+                {
                     bGotPMOQuit = true;
 
-                    mb_GenerateSignatureNow(m_MB, &guid, (char *)m_collID.c_str());
+                    mb_GenerateSignatureNow(m_MB, guid, 
+                    (char *)m_collID.c_str());
                     m_strGUID = string(guid);
-					free(guid);
                     continue;
                 }
                 if (pEvent->Type() == PMO_Error)
@@ -292,15 +292,12 @@ WorkerThread(void)
             continue;
         }
 
-        char *guid;
         if (mb_GenerateSignature(m_MB, (char *)pBuffer, 
-			                     m_data_size, &guid, (char *)m_collID.c_str())) 
-		{
+                              m_data_size, guid, (char *)m_collID.c_str())) 
+        {
             m_strGUID = string(guid);
-			free(guid);
-
             bDone = true;
-		}
+        }
 
         m_pInputBuffer->EndRead(m_data_size);
      
