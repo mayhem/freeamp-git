@@ -86,6 +86,9 @@ ____________________________________________________________________________*/
 #include "compat.h"
 
 
+#include <iostream>
+using namespace std;
+
 #ifndef IRIX_CDAUDIO
 /*
 Because of Irix's different interface, most of this program is
@@ -143,6 +146,7 @@ cd_init_device(char *device_name)
 
    if(fclose(mounts) != 0)
       return -1;
+
 #elif defined(HAVE_GETMNTENT)
    if((mounts = setmntent(MOUNTED, "r")) == NULL)
       return -1;
@@ -156,6 +160,7 @@ cd_init_device(char *device_name)
    }
    endmntent(mounts);
 #endif
+
 #ifdef HAVE_GETMNTINFO
    for ( (mounts = getmntinfo(&mnt, 0)); mounts > 0;)
    {
@@ -169,11 +174,13 @@ cd_init_device(char *device_name)
 #endif   
 
 #ifdef NON_BLOCKING
-   if((cd_desc = open(device_name, O_RDONLY | O_NONBLOCK)) < 0)
+   if((cd_desc = open(device_name, O_RDONLY | O_NONBLOCK)) < 0) {
 #else
-   if((cd_desc = open(device_name, O_RDONLY)) < 0)
+   if((cd_desc = open(device_name, O_RDONLY)) < 0) {
 #endif
+     perror("Error opening cdrom");
      return -1;
+   }
 	
    return cd_desc;
 }

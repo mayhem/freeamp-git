@@ -87,9 +87,16 @@ typedef struct PrefsStruct
     string watchThisDirectory;
     int32  watchThisDirTimeout;
 
+    bool pollCD;
+    string CDDevicePath;
+    string CDDBServer;
+
     bool operator == (const struct PrefsStruct& pref)
     {
         return (
+            CDDevicePath == pref.CDDevicePath &&
+            CDDBServer == pref.CDDBServer &&
+            pollCD == pref.pollCD &&
             watchThisDirTimeout == pref.watchThisDirTimeout &&
             watchThisDirectory == pref.watchThisDirectory &&
             convertUnderscores == pref.convertUnderscores &&
@@ -236,6 +243,10 @@ class GTKPreferenceWindow : public PreferenceWindow
       GtkWidget *profileDelete;
       
       bool enableProfiles;
+     
+      GtkWidget *pollCD;
+      GtkWidget *cdPath;
+      GtkWidget *cddbServer;
       
       vector<OptionsPane *> *paneList;
       void AddPane(OptionsPane *pane);      
@@ -300,6 +311,10 @@ class GTKPreferenceWindow : public PreferenceWindow
       void WatchDirSet(char *newpath, bool set);
       void SetWatchTimeout(int32 timeout);
 
+      void PollCDToggle(int active);
+      void CDPathSet(char *newpath, bool set);
+      void CDDBServerSet(char *newpath, bool set);
+      
       FAContext *GetContext(void) { return m_pContext; }
 };
 

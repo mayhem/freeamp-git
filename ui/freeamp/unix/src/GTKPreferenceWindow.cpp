@@ -188,10 +188,10 @@ void GTKPreferenceWindow::AddPane(OptionsPane *pane)
 bool GTKPreferenceWindow::Show(Window *pWindow)
 {
     GetPrefsValues(m_pContext->prefs, &originalValues);
-     
-    fontDialog = NULL;
+    GetPrefsValues(m_pContext->prefs, &proposedValues);
+    GetPrefsValues(m_pContext->prefs, &currentValues);     
 
-    currentValues = proposedValues = originalValues;
+    fontDialog = NULL;
 
     gdk_threads_enter();
 
@@ -465,6 +465,28 @@ void GTKPreferenceWindow::GetPrefsValues(Preferences* prefs,
     values->watchThisDirectory = buffer;
     size = bufferSize;
 
+    if(kError_BufferTooSmall == prefs->GetPrefString(kCDDevicePathPref,
+                                                     buffer, &size)) {
+        size++;
+        bufferSize = size;
+        buffer = (char*)realloc(buffer, bufferSize);
+        prefs->GetPrefString(kCDDevicePathPref, buffer, &size);
+    }
+
+    values->CDDevicePath = buffer;
+    size = bufferSize;
+
+    if(kError_BufferTooSmall == prefs->GetPrefString(kCDDBServerPref,
+                                                     buffer, &size)) {
+        size++;
+        bufferSize = size;
+        buffer = (char*)realloc(buffer, bufferSize);
+        prefs->GetPrefString(kCDDBServerPref, buffer, &size);
+    }
+
+    values->CDDBServer = buffer;
+    size = bufferSize;
+
     if(kError_BufferTooSmall == prefs->GetPrefString(kUsersPortablePlayersPref, buffer, &size)) {
         buffer = (char*)realloc(buffer, size);
         prefs->GetPrefString(kUsersPortablePlayersPref, buffer, &size);
@@ -488,11 +510,13 @@ void GTKPreferenceWindow::GetPrefsValues(Preferences* prefs,
     prefs->GetPrefBoolean(kAskToReclaimFiletypesPref, &values->askReclaimFiletypes);
     prefs->GetPrefBoolean(kReclaimFiletypesPref, &values->reclaimFiletypes);
     prefs->GetPrefInt32(kWatchThisDirTimeoutPref, &values->watchThisDirTimeout);
+    prefs->GetPrefBoolean(kCheckCDAutomaticallyPref, &values->pollCD);
 }
 
 void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs, 
                                           PrefsStruct* values)
 {
+    prefs->SetPrefBoolean(kCheckCDAutomaticallyPref, values->pollCD);
     prefs->SetPrefBoolean(kShowToolbarTextLabelsPref, values->useTextLabels);
     prefs->SetPrefBoolean(kShowToolbarImagesPref, values->useImages);
     prefs->SetPrefBoolean(kSaveCurrentPlaylistOnExitPref, values->savePlaylistOnExit);
@@ -523,6 +547,8 @@ void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs,
     prefs->SetPrefString(kThemeDefaultFontPref, values->defaultFont.c_str());
 
     prefs->SetPrefString(kALSADevicePref, values->alsaOutput.c_str());
+    prefs->SetPrefString(kCDDevicePathPref, values->CDDevicePath.c_str());
+    prefs->SetPrefString(kCDDBServerPref, values->CDDBServer.c_str());
 
     map<string, string>::iterator i;
     int32 iLoop = 0;
@@ -2242,13 +2268,97 @@ GtkWidget *GTKPreferenceWindow::CreateDirectories(void)
     return pane;
 }
 
+void GTKPreferenceWindow::PollCDToggle(int active)
+{
+    if (!firsttime)
+        gtk_widget_set_sensitive(applyButton, TRUE);
+    proposedValues.pollCD = (bool)active;
+}
+
+static void pollcd_toggle(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    int i = GTK_TOGGLE_BUTTON(w)->active;
+    p->PollCDToggle(i);
+}
+
+void GTKPreferenceWindow::CDPathSet(char *newpath, bool set)
+{
+    proposedValues.CDDevicePath = newpath;
+    gtk_widget_set_sensitive(applyButton, TRUE);
+    if (set)
+        gtk_entry_set_text(GTK_ENTRY(cdPath), newpath);
+}
+
+static void cd_path_change(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    char *text = gtk_entry_get_text(GTK_ENTRY(w));
+    p->CDPathSet(text, false);
+}
+
+void GTKPreferenceWindow::CDDBServerSet(char *newpath, bool set)
+{
+    proposedValues.CDDBServer = newpath;
+    gtk_widget_set_sensitive(applyButton, TRUE);
+    if (set)
+        gtk_entry_set_text(GTK_ENTRY(cddbServer), newpath);
+}
+
+static void cddb_server_change(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    char *text = gtk_entry_get_text(GTK_ENTRY(w));
+    p->CDDBServerSet(text, false);
+}
+
 GtkWidget *GTKPreferenceWindow::CreateCD(void)
 {
     GtkWidget *pane = gtk_vbox_new(FALSE, 5);
     gtk_container_set_border_width(GTK_CONTAINER(pane), 5);
     gtk_widget_show(pane);
 
-    
-    
+    pollCD = gtk_check_button_new_with_label("Automatically update the CD Audio"
+                                             " item in My Music");
+    gtk_container_add(GTK_CONTAINER(pane), pollCD);
+    gtk_signal_connect(GTK_OBJECT(pollCD), "toggled",
+                       GTK_SIGNAL_FUNC(pollcd_toggle), this);
+    gtk_widget_show(pollCD);
+
+    GtkWidget *temphbox = gtk_hbox_new(FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(pane), temphbox, FALSE, FALSE, 5);
+    gtk_widget_show(temphbox);
+
+    GtkWidget *label = gtk_label_new("CD-ROM path: ");
+    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+    gtk_box_pack_start(GTK_BOX(temphbox), label, FALSE, FALSE, 5);
+    gtk_widget_show(label);
+
+    char copys[256];
+   
+    strncpy(copys, originalValues.CDDevicePath.c_str(), 256);
+    cdPath = gtk_entry_new();
+    gtk_entry_set_text(GTK_ENTRY(cdPath), copys);
+    gtk_entry_set_max_length(GTK_ENTRY(cdPath), 64);
+    gtk_signal_connect(GTK_OBJECT(cdPath), "changed",
+                       GTK_SIGNAL_FUNC(cd_path_change), this);
+    gtk_box_pack_start(GTK_BOX(temphbox), cdPath, TRUE, TRUE, 0);
+    gtk_widget_show(cdPath);
+
+    temphbox = gtk_hbox_new(FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(pane), temphbox, FALSE, FALSE, 5);
+    gtk_widget_show(temphbox);
+
+    label = gtk_label_new("CDDB URL: ");
+    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+    gtk_box_pack_start(GTK_BOX(temphbox), label, FALSE, FALSE, 5);
+    gtk_widget_show(label);
+
+    strncpy(copys, originalValues.CDDBServer.c_str(), 256);
+    cddbServer = gtk_entry_new();
+    gtk_entry_set_text(GTK_ENTRY(cddbServer), copys);
+    gtk_entry_set_max_length(GTK_ENTRY(cddbServer), 64);
+    gtk_signal_connect(GTK_OBJECT(cddbServer), "changed",
+                       GTK_SIGNAL_FUNC(cddb_server_change), this);
+    gtk_box_pack_start(GTK_BOX(temphbox), cddbServer, TRUE, TRUE, 0);
+    gtk_widget_show(cddbServer);
+
     return pane;
 }
