@@ -1547,31 +1547,28 @@ bool Win32PreferenceWindow::PrefAboutProc(HWND hwnd,
 
 void Win32PreferenceWindow::LoadThemeListBox(HWND hwnd)
 {
-	int                           iLoop;
     map<string, string>::iterator i;
 
-	m_proposedValues.listboxIndex = -1;
-	m_pThemeMan->GetCurrentTheme(m_proposedValues.currentTheme);
+	//m_pThemeMan->GetCurrentTheme(m_proposedValues.currentTheme);
 
     m_oThemeList.clear();    
+
     SendDlgItemMessage(hwnd, IDC_THEMELISTBOX, LB_RESETCONTENT, 0, 0);
 
     m_pThemeMan->GetThemeList(m_oThemeList);
-    for(iLoop = 0, i = m_oThemeList.begin(); 
-        i != m_oThemeList.end(); i++, iLoop++)
+
+    for(i = m_oThemeList.begin(); i != m_oThemeList.end(); i++)
     {
-    	SendDlgItemMessage(hwnd, IDC_THEMELISTBOX, LB_ADDSTRING,
+        int index;
+
+    	index = SendDlgItemMessage(hwnd, IDC_THEMELISTBOX, LB_ADDSTRING,
                            0, (LPARAM)(*i).first.c_str());
+
         if ((*i).first == m_proposedValues.currentTheme)
-            m_proposedValues.listboxIndex = iLoop;
+            SendDlgItemMessage(hwnd, IDC_THEMELISTBOX, LB_SETCURSEL, index, 0);
     }                      
-    
-    if (m_proposedValues.listboxIndex >= 0)
-    	SendDlgItemMessage(hwnd, IDC_THEMELISTBOX, LB_SETCURSEL, 
-                           m_proposedValues.listboxIndex, 0);
      
     EnableWindow(GetDlgItem(hwnd, IDC_DELETETHEME), 0);
-    m_proposedValues.fontChanged = false;
 }
 
 bool Win32PreferenceWindow::PrefThemeProc(HWND hwnd, 
@@ -1592,6 +1589,9 @@ bool Win32PreferenceWindow::PrefThemeProc(HWND hwnd,
             prefs = (Preferences*)psp->lParam;
 
             LoadThemeListBox(hwnd);
+
+            SetFocus(GetDlgItem(hwnd, IDC_THEMELISTBOX));
+            result = false;
             break;
         }
 
@@ -1601,26 +1601,41 @@ bool Win32PreferenceWindow::PrefThemeProc(HWND hwnd,
             {
 				case IDC_THEMELISTBOX:
                 {
-                	int    iIndex;
-                    char   szCurSel[256];
+                    switch (HIWORD(wParam)) 
+                    { 
+                        case LBN_SELCHANGE: 
+                        {
+                	        int    iIndex;
+                            char   szCurSel[256];
                     
-                    iIndex = SendDlgItemMessage(hwnd, IDC_THEMELISTBOX, LB_GETCURSEL, 0, 0);
-                    if (iIndex >= 0)
-                    {
-                        SendDlgItemMessage(hwnd, IDC_THEMELISTBOX, 
-                                           LB_GETTEXT, iIndex, 
-                                           (LPARAM)szCurSel);
-                        if (strcasecmp(szCurSel, "freeamp"))                   
-                           EnableWindow(GetDlgItem(hwnd, IDC_DELETETHEME), 1);
-                        else   
-                           EnableWindow(GetDlgItem(hwnd, IDC_DELETETHEME), 0);
-                    }    
-                    m_proposedValues.currentTheme = string(szCurSel);
-                    if (iIndex != m_proposedValues.listboxIndex || 
-                        m_proposedValues.fontChanged)
-                        PropSheet_Changed(GetParent(hwnd), hwnd);
-                    else
-                        PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                            iIndex = SendDlgItemMessage(hwnd, IDC_THEMELISTBOX, 
+                                                            LB_GETCURSEL, 0, 0);
+
+                            if(iIndex >= 0)
+                            {
+                                SendDlgItemMessage(hwnd, IDC_THEMELISTBOX, 
+                                                   LB_GETTEXT, iIndex, 
+                                                   (LPARAM)szCurSel);
+                                if (strcasecmp(szCurSel, "freeamp"))                   
+                                   EnableWindow(GetDlgItem(hwnd, IDC_DELETETHEME), 1);
+                                else   
+                                   EnableWindow(GetDlgItem(hwnd, IDC_DELETETHEME), 0);
+
+                                m_proposedValues.currentTheme = string(szCurSel);
+
+                                if(m_proposedValues != m_currentValues)
+                                {
+                                    PropSheet_Changed(GetParent(hwnd), hwnd);
+                                }
+                                else
+                                {
+                                    PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                                }
+                            }  
+                            
+                            break;
+                        }
+                    }
                 
                 	break;
                 }
@@ -1712,8 +1727,15 @@ bool Win32PreferenceWindow::PrefThemeProc(HWND hwnd,
                     if(ChooseFont(&sFont))
                     {
                     	m_proposedValues.defaultFont= sLogFont.lfFaceName;
-                        m_proposedValues.fontChanged = true;
-                        PropSheet_Changed(GetParent(hwnd), hwnd);
+
+                        if(m_proposedValues != m_currentValues)
+                        {
+                            PropSheet_Changed(GetParent(hwnd), hwnd);
+                        }
+                        else
+                        {
+                            PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                        }
                     }    
                     
                     break;
@@ -3186,7 +3208,6 @@ bool Win32PreferenceWindow::PrefPluginsProc(HWND hwnd,
                 {
                     case PSN_SETACTIVE:
                     {
-                        // initialize temporary sets
                         break;
                     }
 
@@ -3198,7 +3219,6 @@ bool Win32PreferenceWindow::PrefPluginsProc(HWND hwnd,
 
                     case PSN_KILLACTIVE:
                     {
-                        // write out sets
                         break;
                     }
 

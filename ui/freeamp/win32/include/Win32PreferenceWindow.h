@@ -75,10 +75,8 @@ typedef struct PrefsStruct
     bool logPerformance;
 
 	// page 5
-    string   defaultFont;
-    bool   fontChanged;
+    string defaultFont;
     string currentTheme;
-    int    listboxIndex;
 
     // page 6
     bool checkForUpdates;
@@ -116,9 +114,7 @@ typedef struct PrefsStruct
             logPerformance == pref.logPerformance &&
 
             defaultFont == pref.defaultFont &&
-            fontChanged == pref.fontChanged &&
             currentTheme == pref.currentTheme &&
-            listboxIndex == pref.listboxIndex &&
 
             checkForUpdates == pref.checkForUpdates &&
 
