@@ -328,7 +328,7 @@ char *FreeampDir(Preferences *pref)
 char *FreeampDir(Preferences *prefs)
 {
     char *homeDir = getenv("HOME");
-    const char *fadir = "/.freeamp";
+    const char *fadir = "/."BRANDING_APP_NAME;
     char *s;
 
     if (!homeDir) {

@@ -46,7 +46,7 @@ ____________________________________________________________________________*/
 // WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
 
 // default values
-const char*  kDefaultLibraryPath = ".:~/.freeamp:" UNIX_LIBDIR "/freeamp";
+const char*  kDefaultLibraryPath = ".:~/."BRANDING_APP_NAME":"UNIX_LIBDIR"/"BRANDING_APP_NAME;
 const char*  kDefaultUI = "freeamp.ui";
 const char*  kDefaultTextUI = "freeampcmd.ui";
 const char*  kDefaultPMO = "soundcard.pmo";
@@ -360,7 +360,7 @@ UnixPrefs()
 {
     const char *old_suffix = "/.freeamp_prefs";
     char *old_prefsFilePath;
-    const char *fadir = "/.freeamp";
+    const char *fadir = "/."BRANDING_APP_NAME;
     const char *suffix = "/preferences";
     char *homeDir = getenv("HOME"); 
 

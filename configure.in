@@ -76,17 +76,6 @@ else
   AC_CHECK_TYPE(socklen_t, unsigned int)
 fi
 
-dnl ******************
-dnl Check for dynamic loading library
-dnl ******************
-if test "$host_os" = "beos"; then
-  AC_MSG_WARN([skipping libdl check, using BeOS add-on mechanism])
-else
-  AC_CHECK_LIB(dl, dlopen, foo="bar",
-    AC_MSG_ERROR([FreeAmp requires the ability to load libraries dynamically (-ldl must work)])
-  )
-fi
-
 dnl Check for some more stuff
 
 cmdline="true"
@@ -113,15 +102,17 @@ case "$host_os" in
     LINKMOD='g++ -nostart -Xlinker -soname=${@F} freeamp'
     isunix="false"
     ;;
+  freebsd*)
+    host_os="freebsd"
+    LDFLAGS="$LDFLAGS -Wl,-export-dynamic"
+    ;;
   irix*)
     AC_DEFINE(IRIX_CDAUDIO)
     ;;
   linux*)
     host_os="linux"
     AC_DEFINE(HAVE_LINUX)
-dnl  OSLINK='-Wl,soname,${*F}'
     LDFLAGS="$LDFLAGS -Wl,-export-dynamic"
-dnl not needed.
     ;;
   solaris*)
     AC_DEFINE(SOLARIS_GETMNTENT)
@@ -147,6 +138,22 @@ dnl not needed.
     ;;
     
 esac  
+
+dnl *********************************
+dnl Check for dynamic loading library
+dnl *********************************
+
+if test "$host_os" = "beos"; then
+  AC_MSG_WARN([skipping libdl check, using BeOS add-on mechanism])
+elif test "$host_os" = "freebsd"; then
+  AC_CHECK_LIB(c, dlopen, foo="bar",
+    AC_MSG_ERROR([FreeAmp requires the ability to load libraries dynamically (using dlopen)])
+  )
+else
+  AC_CHECK_LIB(dl, dlopen, foo="bar", 
+    AC_MSG_ERROR([FreeAmp requires the ability to load libraries dynamically (using dlopen)])
+  )
+fi
 
 if test "$isunix" = "true" ; then
     AC_LANG_SAVE
@@ -472,6 +479,9 @@ dnl *****
 
 if test "$host_os" = "beos"; then
   AC_MSG_RESULT([This is BeOS; using BeOS threads.])
+elif test "$host_os" = "freebsd"; then
+  AC_CHECK_HEADER(pthread.h, ,
+    AC_MSG_ERROR([FreeAmp requires pthreads]))
 else
   AC_CHECK_LIB(pthread, pthread_create, foo="bar",
     AC_MSG_ERROR([FreeAmp requires pthreads (-lpthread must work)]))
