@@ -160,7 +160,7 @@ void FreeAmpTheme::LoadFreeAmpTheme(void)
    eRet = LoadTheme(oThemePath, m_oCurrentWindow);
    if (IsError(eRet))					   
    {
-       MessageDialog oBox;
+       MessageDialog oBox(m_pContext);
        string        oErr, oMessage(szParseError);
 
        GetErrorString(oErr);
@@ -190,7 +190,7 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
    {
       case INFO_ErrorMessage:
       {
-         MessageDialog      oBox;
+         MessageDialog      oBox(m_pContext);
          ErrorMessageEvent *pEvent = (ErrorMessageEvent *)e;
          
          string oDesc(pEvent->GetErrorMessage());
@@ -468,8 +468,8 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
           char          szSavedTheme[MAX_PATH], szNewTheme[MAX_PATH];
           uint32        iLen = MAX_PATH;
           string        oThemePath;
-          MessageDialog oBox;
-	       string        oMessage(szKeepThemeMessage);
+          MessageDialog oBox(m_pContext);
+	      string        oMessage(szKeepThemeMessage);
 
           LoadThemeEvent *pInfo = (LoadThemeEvent *)e;
           URLToFilePath(pInfo->URL(), szNewTheme, &iLen);
@@ -885,8 +885,8 @@ void FreeAmpTheme::ReloadTheme(void)
     eRet = LoadTheme(oThemePath, m_oCurrentWindow);
     if (IsError(eRet))					   
     {
-        MessageDialog oBox;
-	     string        oErr, oMessage(szParseError);
+        MessageDialog oBox(m_pContext);
+	    string        oErr, oMessage(szParseError);
   
         GetErrorString(oErr);
         oMessage += oErr;
@@ -1191,7 +1191,7 @@ void FreeAmpTheme::ShowHelp(void)
         LaunchBrowser((char *)oHelpFile.c_str());
     else
     {
-//        MessageDialog oBox;
+//          MessageDialog oBox(m_pContext);
 //        string        oMessage(szCantFindHelpError);
 
 //        oBox.Show(oMessage.c_str(), string(BRANDING), kMessageOk);

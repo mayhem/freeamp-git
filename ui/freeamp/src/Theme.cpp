@@ -195,7 +195,7 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
         free(pTemp);
         if (MKDIR(oTempPath.c_str()))
         {
-            MessageDialog oBox;
+            MessageDialog oBox(m_pContext);
             string        oErr, oMessage(szCannotCreateTempDirError);
 
             oBox.Show(oMessage.c_str(), string(BRANDING), kMessageOk);
@@ -210,7 +210,7 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
         
             if (oFile.length() > 0)
             {
-                MessageDialog oBox;
+                MessageDialog oBox(m_pContext);
        
                 string        oErr, oMessage(szThemeNotFoundError);
 
@@ -228,7 +228,7 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
         }
         if (IsError(eRet))
         {
-            MessageDialog oBox;
+            MessageDialog oBox(m_pContext);
             string        oErr, oMessage(szThemeUnzipError);
 
             oBox.Show(oMessage.c_str(), string(BRANDING), kMessageOk);

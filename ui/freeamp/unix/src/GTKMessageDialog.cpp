@@ -27,7 +27,7 @@ ____________________________________________________________________________*/
 #include "MessageDialog.h"
 
 
-MessageDialog::MessageDialog(void)
+MessageDialog::MessageDialog(FAContext *context);
 {
 }
 

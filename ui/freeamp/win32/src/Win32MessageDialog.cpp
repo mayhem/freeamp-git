@@ -23,10 +23,11 @@ ____________________________________________________________________________*/
 
 #include <windows.h>
 #include "MessageDialog.h"
+#include "properties.h"
 
-
-MessageDialog::MessageDialog(void)
+MessageDialog::MessageDialog(FAContext *context)
 {
+   m_context = context;
 }
 
 MessageDialog::~MessageDialog(void)
@@ -49,7 +50,9 @@ MessageDialogReturnEnum MessageDialog::
                              const string      &oTitle, 
                              MessageDialogEnum  eType)
 {
-	int                     iRet, iType;
+	int             iRet, iType;
+    Int32PropValue *pProp;
+    HWND            hWnd;
     
     switch(eType)
     {
@@ -66,8 +69,14 @@ MessageDialogReturnEnum MessageDialog::
            iType = MB_RETRYCANCEL;
            break;
     }
-    
-    iRet = MessageBox(NULL, oMessage.c_str(), oTitle.c_str(), iType);
+
+    if (IsError(m_context->props->GetProperty("MainWindow", 
+                (PropValue **)&pProp)))
+       hWnd = NULL;
+    else
+       hWnd = (HWND)pProp->GetInt32();
+
+    iRet = MessageBox(hWnd, oMessage.c_str(), oTitle.c_str(), iType);
     switch(iRet)
     {
     	case IDOK:

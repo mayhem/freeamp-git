@@ -35,6 +35,7 @@ ____________________________________________________________________________*/
 
 using namespace std;
 
+#include "facontext.h"
 
 enum MessageDialogEnum
 {
@@ -58,7 +59,7 @@ class MessageDialog
 {
   public:
     
-                MessageDialog(void);
+                MessageDialog(FAContext *context);
        virtual ~MessageDialog(void);                  
 
        MessageDialogReturnEnum Show(const char *szMessage, 
@@ -68,6 +69,9 @@ class MessageDialog
                                     const string &oTitle, 
                                     MessageDialogEnum eType);
 
+  private:
+  
+       FAContext *m_context;
 };
 
 #endif
