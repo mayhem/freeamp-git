@@ -34,6 +34,7 @@ ____________________________________________________________________________*/
 #include "buffer.h"
 #include "hashtable.h"
 #include "semaphore.h"
+#include "dummycoo.h"
 
 #ifdef WIN32
 #include "consoleCIO.h"
@@ -54,62 +55,20 @@ ____________________________________________________________________________*/
 #define DEFAULT_COO CommandLineCOO()
 #endif
 
-Semaphore *termSemaphore;
-
 void testVector();
 void testBuffer();
 void testHashTable();
-class DummyCOO : public COO {
- public:
-    virtual int32 acceptCOOEvent(Event *);
-    virtual void setArgs(int a, char**b) {}
-    Player *pPlayer;
-    DummyCOO(Player *);
-    virtual ~DummyCOO();
-};
-
-DummyCOO::DummyCOO(Player *p) {
-    pPlayer = p;
-    //printf("Dummy this: %x\n",this);
-}
-
-DummyCOO::~DummyCOO() {
-    //cout << "DummyCOO: being deleted..." << endl;
-}
-
-int32 DummyCOO::acceptCOOEvent(Event *pe) {
-    if (pe) {
-  	//cout << "DummyCOO::acceptEvent: processing " << pe->getEvent() << "..." << endl;
-	switch (pe->getEvent()) {
-	    case CMD_Terminate:
-		::termSemaphore->Signal();
-		break;
-	    case CMD_Cleanup: {
-		Event *pE = new Event(INFO_ReadyToDieCOO,this);
-		//pPlayer->acceptEvent(*pE);
-		Player::getPlayer()->acceptEvent(*pE);
-		delete pE;
-		break; }
-	    default:
-		break;
-	}
-	return 0;
-    } else {
-	return 255;
-    }
-}
-
 
 int main(int argc, char **argv) {
     //testVector();
     //testBuffer();
     //testHashTable();
 
-
+    Semaphore *termSemaphore;
     termSemaphore = new Semaphore();
     Player *pP = Player::getPlayer();
     //cout << "Got player..." << endl;
-    DummyCOO *pDCOO = new DummyCOO(pP);
+    DummyCOO *pDCOO = new DummyCOO(termSemaphore);
     //cout << "Created dcoo..." << endl;
     pP->registerCOO(pDCOO);
     //cout << "Registered DummyCOO" << endl;

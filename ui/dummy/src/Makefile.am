@@ -24,39 +24,23 @@
 
 include @top_srcdir@/config/Makefile.header
 
-SUBDIRS = base io ui lmc
-
 if AM_HAVE_WIN32
-PRG =
+FILES = 
+MYLIBS = 
+TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
 else
-PRG = freeamp decspeed
-ALLLDADD = @top_srcdir@/base/unix/@target_os@/src/*.o \
-	  @top_srcdir@/io/local/*.o \
-	  @top_srcdir@/ui/cmdline/*.o \
-	  @top_srcdir@/lmc/xingmp3/*.o \
-	  @top_srcdir@/ui/dummy/src/*.o \
-	  -lpthread -lm
-FALDADD = @top_srcdir@/base/src/*.o $(ALLLDADD)
-DSLDADD = @top_srcdir@/base/src/player.o @top_srcdir@/base/src/playlist.o @top_srcdir@/base/src/command.o $(ALLLDADD)
-MYDEPS = @top_srcdir@/base/unix/@target_os@/src/libfasys.a \
-         @top_srcdir@/base/src/libfabase.a \
-         @top_srcdir@/io/local/libfaiolocal.a \
-         @top_srcdir@/ui/cmdline/libfauicmdline.a \
-         @top_srcdir@/lmc/xingmp3/libfalmcxingmp3.a \
-	 @top_srcdir@/ui/dummy/src/libfauidummy.a
+FILES = dummycoo.cpp
+MYLIBS = libfauidummy.a
 TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
 endif
 
+noinst_LIBRARIES = $(MYLIBS)
+libfauidummy_a_SOURCES = $(FILES)
 
-bin_PROGRAMS = $(PRG)
-freeamp_SOURCES = freeamp.cpp
-freeamp_LDADD = $(FALDADD)
-freeamp_DEPENDENCIES = $(MYDEPS)
-
-decspeed_SOURCES = decoder_speed.cpp
-decspeed_LDADD = $(DSLDADD)
-decspeed_DEPENDENCIES = $(MYDEPS)
-
-INCLUDES = -I@top_srcdir@/base/include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) -I@top_srcdir@/io/include -I@top_srcdir@/ui/include -I@top_srcdir@/lmc/include
+INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) -I@top_srcdir@/lmc/include -I@top_srcdir@/io/include -I@top_srcdir@/ui/include
 CXXFLAGS = $(EXTRA_CXXFLAGS) -D__@target_os@__
+
+
+
+
 

@@ -264,7 +264,6 @@ int32 Player::serviceEvent(Event *pC) {
 	                //cout << "New PMI..." << endl;
 	                SoundCardPMO *scPMO = new SoundCardPMO();
 	                //cout << "New scPMO..." << endl;
-	                myLMC = new MAPlayLMC(lfPMI,scPMO);
 	                myLMC = new XingLMC(pmi,scPMO);
 	                //cout << "Created xing..." << endl;
 	                if (setState(STATE_Playing)) {

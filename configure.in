@@ -79,7 +79,7 @@ AM_CONDITIONAL(AM_ENABLE_CMDLINE, test "$cmdline" = "true")
 AM_CONDITIONAL(AM_HAVE_WIN32, test "$target_os" = "windowsnt")
 AM_CONDITIONAL(AM_HAVE_LINUX, test "$target_os" = "linux")
 AC_OUTPUT(Makefile base/Makefile base/src/Makefile io/Makefile
-          base/unix/Makefile
+          base/unix/Makefile ui/dummy/Makefile ui/dummy/src/Makefile
 	  ui/Makefile base/unix/linux/Makefile base/unix/linux/src/Makefile
 	  io/local/Makefile ui/cmdline/Makefile lmc/Makefile lmc/xingmp3/Makefile
 )
