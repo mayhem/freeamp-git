@@ -76,7 +76,9 @@ void Clear(PMORef ref)
 
 void Cleanup(PMORef ref)
 {
-    delete ref->ref;
+    PhysicalMediaOutput *pmo = (PhysicalMediaOutput*)ref->ref;
+
+    delete pmo;
 }
 
 #ifdef __cplusplus

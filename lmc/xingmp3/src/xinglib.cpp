@@ -21,6 +21,8 @@
 ____________________________________________________________________________*/
 
 /* project headers */
+#include <iostream.h>
+
 #include "lmclib.h"
 #include "xinglmc.h"
 
@@ -140,7 +142,7 @@ void Cleanup(LMCRef ref)
 {
     LogicalMediaConverter* lmc = (LogicalMediaConverter*)ref->ref;
 
-    delete ref->ref;
+    delete lmc;
 }
 
 
