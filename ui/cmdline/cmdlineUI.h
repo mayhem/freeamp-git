@@ -38,13 +38,14 @@ class cmdlineUI : public UserInterface {
     virtual void SetArgs(int argc, char **argv);
     virtual void SetTarget(EventQueue *eqr) { m_playerEQ = eqr; }
     virtual void Init() {}
+    virtual void SetPlayListManager(PlayListManager *);
     static void keyboardServiceFunction(void *);
     virtual ~cmdlineUI();
  private:
     EventQueue *m_playerEQ;
     void processSwitch(char *);
     Thread *keyboardListenThread;
-    PlayList *mypl;
+    PlayListManager *m_plm;
 };
 
 

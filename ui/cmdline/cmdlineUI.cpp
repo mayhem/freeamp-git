@@ -59,9 +59,14 @@ int getKey() {
     }
     return 0;
 }
+
+void cmdlineUI::SetPlayListManager(PlayListManager *plm) {
+    m_plm = plm;
+}
+
 cmdlineUI::cmdlineUI() {
 
-    mypl = NULL;
+    m_plm = NULL;
     m_playerEQ = NULL;
     tcgetattr(stdinfd, &::normalTTY);
     ::rawTTY = ::normalTTY;
@@ -127,9 +132,9 @@ void cmdlineUI::keyboardServiceFunction(void *pclcio) {
 		break; }
 	    case 's':
 	    case 'S': {
-		if (pMe->mypl) {
-		    pMe->mypl->SetOrder(PlayList::ORDER_SHUFFLED);
-		    pMe->mypl->SetFirst();
+		if (pMe->m_plm) {
+		    pMe->m_plm->SetOrder(PlayListManager::ORDER_SHUFFLED);
+		    pMe->m_plm->SetFirst();
 		}
 		Event *e = new Event(CMD_Stop);
 		pMe->m_playerEQ->AcceptEvent(e);
@@ -162,7 +167,7 @@ int32 cmdlineUI::AcceptEvent(Event *e) {
 	    case INFO_MediaInfo: {
 		MediaInfoEvent *pmvi = (MediaInfoEvent *)e;
 		if (pmvi) {
-		    cout << "Playing: " << pmvi->m_songTitle << endl;
+		    cout << "Playing: " << pmvi->m_filename << endl;
 		}
 		break; }
 	    case INFO_ID3TagInfo: {
@@ -187,7 +192,6 @@ int32 cmdlineUI::AcceptEvent(Event *e) {
 }
 
 void cmdlineUI::SetArgs(int argc, char **argv) {
-    mypl = new PlayList();
     char *pc = NULL;
     for(int i=1;i<argc;i++) {
 	//cout << "Adding arg " << i << ": " << argv[i] << endl;
@@ -195,65 +199,17 @@ void cmdlineUI::SetArgs(int argc, char **argv) {
 	if (pc[0] == '-') {
 	    processSwitch(&(pc[0]));
 	} else {
-	    mypl->Add(pc,0);
+	    m_plm->Add(pc,0);
 	}
     }
-    mypl->SetFirst();
-    Event *e = new SetPlayListEvent(mypl);
-    m_playerEQ->AcceptEvent(e);
-    e = new Event(CMD_Play);
+    m_plm->SetFirst();
+    Event *e = new Event(CMD_Play);
     m_playerEQ->AcceptEvent(e);
 }
 
 void cmdlineUI::processSwitch(char *pc) {
     return;
 }
-
-#if 0
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
-    void SetArgs(UI *ref, int32 c, char **v) {
-	UserInterface *ui = (UserInterface *)ref->ref;
-	ui->SetArgs(c,v);
-    }
-    
-    int32 AcceptEvent(UI *ref,Event *e) {
-	UserInterface *ui = (UserInterface *)ref->ref;
-	return ui->AcceptEvent(e);
-    }
-    
-    void SetTarget(UI *ref, EventQueue *eq) {
-	UserInterface *ui = (UserInterface *)ref->ref;
-	ui->SetTarget(eq);
-    }
-	
-    void Cleanup(UI *ref) {
-	UserInterface *ui = (UserInterface *)ref->ref;
-	delete ui;
-    }
-
-void Initialize(UI *ref)
-{
-    if(ref)
-    {
-        UserInterface *ui = new cmdlineUI();
-        ref->ref = ui;
-
-	ref->SetArgs = SetArgs;
-	ref->AcceptEvent = AcceptEvent;
-	ref->SetTarget = SetTarget;
-	ref->Cleanup = Cleanup;
-    }
-}
-
-#ifdef __cplusplus
-	   }
-#endif
-
-#endif
 
 
 

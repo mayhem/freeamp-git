@@ -58,6 +58,8 @@ Mpg123UI::Mpg123UI() {
     verboseMode = false;
     totalFrames = 0;
 
+    m_plm = NULL;
+
     signal(SIGTERM,mysigterm);
     signal(SIGINT,mysigint);
     
@@ -200,7 +202,6 @@ void Mpg123UI::DisplayStuff() {
 
 
 void Mpg123UI::SetArgs(int argc, char **argv) {
-    PlayList *pl = new PlayList();
     char *pc = NULL;
     int addedStuff = 0;
     for(int i=1;i<argc;i++) {
@@ -311,11 +312,11 @@ void Mpg123UI::SetArgs(int argc, char **argv) {
 		    cout << "use HTTP proxy " << pc << endl;
 		    break;
 		case 'z':
-		    pl->SetOrder(PlayList::ORDER_SHUFFLED);
+		    m_plm->SetOrder(PlayListManager::ORDER_SHUFFLED);
 		    //cout << "shuffle play (with wildcards) " << endl;
 		    break;
 		case 'Z':
-		    pl->SetOrder(PlayList::ORDER_RANDOM);
+		    m_plm->SetOrder(PlayListManager::ORDER_RANDOM);
 		    //cout << "Random Play" << endl;
 		    break;
 		case 'u':
@@ -329,22 +330,24 @@ void Mpg123UI::SetArgs(int argc, char **argv) {
 	    }
 	} else {
 	    //ut << "Adding: " <<argv[i] << endl;
-	    pl->Add(argv[i],0);
+	    m_plm->Add(argv[i],0);
 	    addedStuff++;
 	}
     }
 
     if (addedStuff) {
 
-	pl->SetFirst();
-	pl->SetSkip(skipFirst);
-	Event *e = new SetPlayListEvent(pl);
-	m_playerEQ->AcceptEvent(e);
-	e = new Event(CMD_Play);
+	m_plm->SetFirst();
+	m_plm->SetSkip(skipFirst);
+	Event *e = new Event(CMD_Play);
 	m_playerEQ->AcceptEvent(e);
     } else {
 	m_playerEQ->AcceptEvent(new Event(CMD_QuitPlayer));
     }
+}
+
+void Mpg123UI::SetPlayListManager(PlayListManager *plm) {
+    m_plm = plm;
 }
 
 void Mpg123UI::SetTarget(EventQueue *eq) {

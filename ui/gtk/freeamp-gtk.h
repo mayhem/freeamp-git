@@ -38,6 +38,7 @@ class GtkUI : public UserInterface {
     virtual void SetArgs(int argc, char **argv);
     virtual void SetTarget(EventQueue *eqr) { m_playerEQ = eqr; }
     virtual void Init();
+    virtual void SetPlayListManager(PlayListManager *);
     static void gtkServiceFunction(void *);
     virtual ~GtkUI();
 
@@ -45,7 +46,7 @@ class GtkUI : public UserInterface {
  private:
     void processSwitch(char *);
     Thread *gtkListenThread;
-    PlayList *mypl;
+    PlayListManager *m_plm;
 };
 
 

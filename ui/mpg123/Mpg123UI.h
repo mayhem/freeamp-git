@@ -30,6 +30,7 @@ ____________________________________________________________________________*/
 #include "ui.h"
 #include "event.h"
 #include "eventdata.h"
+#include "playlist.h"
 
 class Mpg123UI : public UserInterface {
  public:
@@ -39,10 +40,13 @@ class Mpg123UI : public UserInterface {
     virtual void SetArgs(int argc, char **argv);
     virtual void SetTarget(EventQueue *);
     virtual void Init() {}
+    virtual void SetPlayListManager(PlayListManager *);
+    
     ~Mpg123UI();
 
     static EventQueue *m_playerEQ;
  private:
+    PlayListManager *m_plm;
     void DisplayStuff();
     MediaInfoEvent m_mediaInfo;
     bool m_mediaInfo_set;
