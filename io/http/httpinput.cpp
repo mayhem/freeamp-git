@@ -36,6 +36,7 @@ ____________________________________________________________________________*/
 #include <sys/time.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h> 
 #include <netdb.h>
 #include <fcntl.h>
 #endif 
@@ -54,6 +55,7 @@ ____________________________________________________________________________*/
 #include "httpinput.h"
 #include "facontext.h"
 #include "log.h"
+#include "tstream.h"
 
 const int iBufferSize = 8192;
 const int iOverflowSize = 1536;
@@ -110,6 +112,7 @@ HttpInput::HttpInput(FAContext *context):
     m_pBufferThread = NULL;
     m_fpSave = NULL;
     m_szError = new char[iMaxErrorLen];
+    m_pTitleStream = NULL;
 
     m_pContext->prefs->GetPrefBoolean(kUseProxyPref, &m_bUseProxy);
     if (m_bUseProxy)
@@ -126,6 +129,9 @@ HttpInput::~HttpInput()
     m_bExit = true;
     m_pSleepSem->Signal();
     m_pPauseSem->Signal();
+
+    if (m_pTitleStream)
+       delete m_pTitleStream;
 
     if (m_pBufferThread)
     {
@@ -278,10 +284,24 @@ void HttpInput::LogError(char *szErrorMsg)
 Error GetHostByName(char *szHostName, struct hostent *pResult)
 {
     struct hostent *pTemp;
+    struct hostent TempHostent;
+    static unsigned long IP_Adr;
+    static char *AdrPtrs[2] = {(char *) &IP_Adr, NULL };
 
     pTemp = gethostbyname(szHostName);
-    if (pTemp == NULL)
-        return kError_NoDataAvail;
+    if (pTemp == NULL) 
+    {
+        // That didn't work.  On some stacks a numeric IP address
+        // will not parse with gethostbyname.  Try to convert it as a
+        // numeric address before giving up.
+        if((IP_Adr = inet_addr(szHostName)) == INADDR_NONE) 
+            return kError_NoDataAvail;
+
+        TempHostent.h_length = sizeof(uint32_t);
+        TempHostent.h_addrtype = AF_INET;
+        TempHostent.h_addr_list = (char **) &AdrPtrs;
+        pTemp = &TempHostent;
+    }
 
     memcpy(pResult, pTemp, sizeof(struct hostent));
 
@@ -292,7 +312,7 @@ Error HttpInput::Open(void)
 {
     char                szHostName[iMaxHostNameLen+1], *szFile, *szQuery;
     char                szLocalName[iMaxHostNameLen+1];
-    char               *pInitialBuffer, szStreamName[255];
+    char               *pInitialBuffer, szStreamName[255], szSourceAddr[100];
     unsigned            iPort;
     int                 iRet, iRead = 0, iConnect;
     struct sockaddr_in  sAddr;
@@ -301,9 +321,9 @@ Error HttpInput::Open(void)
     void               *pPtr;
     fd_set              sSet; 
     struct timeval      sTv;
+    bool                bUseTitleStreaming;
 
     szStreamName[0] = 0;
-
     if (!m_bUseProxy)
     {
         iRet = sscanf(m_path, "http://%[^:/]:%d", szHostName, &iPort);
@@ -388,10 +408,33 @@ Error HttpInput::Open(void)
     szQuery = new char[iMaxUrlLen];
 
     if (szFile)
-        sprintf(szQuery, "GET %s HTTP/1.0\n\n", szFile);
+        sprintf(szQuery, "GET %s HTTP/1.0\n", szFile);
     else
-        sprintf(szQuery, "GET / HTTP/1.0\nHost %s\nAccept: */*\n\n", 
+        sprintf(szQuery, "GET / HTTP/1.0\nHost %s\nAccept: */*\n", 
                 szLocalName);
+
+    m_pContext->prefs->GetPrefBoolean(kUseTitleStreaming, &bUseTitleStreaming);
+    if (bUseTitleStreaming)
+    {
+        int   iPort;
+        Error eRet;
+
+        m_pTitleStream = new TitleStreamServer(m_pContext, m_pTarget);
+
+        eRet = m_pTitleStream->Init(iPort);
+        if (IsntError(eRet))
+        {
+            sprintf(szQuery + strlen(szQuery), "x-audiocast-udpport: %d\n", 
+                    iPort); 
+        }
+        else
+        {
+            delete m_pTitleStream;
+            m_pTitleStream = NULL;
+        }
+    }
+
+    strcat(szQuery, "\n");
 
     iRet = send(m_hHandle, szQuery, strlen(szQuery), 0);
     if (iRet != (int)strlen(szQuery))
@@ -404,7 +447,6 @@ Error HttpInput::Open(void)
 	 delete szQuery;
 
     pInitialBuffer = new char[iInitialBufferSize + 1];
-
     for(;!m_bExit;)
     {
         sTv.tv_sec = 0; sTv.tv_usec = 0;
@@ -512,6 +554,14 @@ Error HttpInput::Open(void)
             pPtr += strlen("icy-url:");
             sscanf(pPtr, "%30[^\r\n]", m_pID3Tag->m_artist);
         }
+
+        pPtr = strstr(pHeaderData, "x-audiocast-udpport:");
+        if (pPtr)
+        {
+             if (m_pTitleStream)
+                m_pTitleStream->Run(sAddr.sin_addr, atoi(pPtr + 20));
+        }
+
         delete pHeaderData;
 
         // Don't bother saving the beginning of the frame -- the

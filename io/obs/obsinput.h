@@ -30,6 +30,7 @@ ____________________________________________________________________________*/
 /* project headers */
 #include "config.h"
 #include "pmi.h"
+#include "tstream.h"
 
 const int iMaxUrlLen = 1024;
 const int iMaxErrorLen = 1024;
@@ -102,6 +103,7 @@ class ObsInput :public PhysicalMediaInput
    Thread             *m_pBufferThread;
    bool                m_bLoop, m_bDiscarded;
    struct sockaddr_in *m_pSin;
+   TitleStreamServer *m_pTitleStream; 
 };
 
 #endif /* _OBSFILEINPUT_H_ */

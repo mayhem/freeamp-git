@@ -83,6 +83,7 @@ ObsInput::ObsInput(FAContext *context):
     m_pBufferThread = NULL;
     m_bLoop = true;
     m_bDiscarded = false;
+    m_pTitleStream = NULL;  
 
     // Let's make up a ficticous ID3 tag.
     m_pID3Tag = new Id3TagInfo();
@@ -97,6 +98,9 @@ ObsInput::~ObsInput()
     m_bExit = true;
     m_pSleepSem->Signal();
     m_pPauseSem->Signal();
+
+    if (m_pTitleStream)
+           delete m_pTitleStream;  
 
     if (m_pBufferThread)
     {
@@ -181,7 +185,8 @@ Error ObsInput::Open(void)
     int    iRet, iPort;
     struct ip_mreq sMreq;
     int    iReuse=0;
-    char   szAddr[100];
+    char   szAddr[100], szSourceAddr[100];
+    bool   bUseTitleStreaming;
 
     iRet = sscanf(m_path, "rtp://%[^:]:%d", szAddr, &iPort);
     if (iRet < 2)
@@ -237,6 +242,23 @@ Error ObsInput::Open(void)
        return (Error)obsError_CannotSetSocketOpts;
     }
 
+    m_pContext->prefs->GetPrefBoolean(kUseTitleStreaming, &bUseTitleStreaming);
+    if (bUseTitleStreaming)
+    {
+        Error eRet;
+
+        m_pTitleStream = new TitleStreamServer(m_pContext, m_pTarget);
+
+        eRet = m_pTitleStream->MulticastInit(szAddr, iPort + 1);
+        if (IsError(eRet))
+        {
+            delete m_pTitleStream;
+            m_pTitleStream = NULL;
+        }
+        else
+            m_pTitleStream->Run();
+    } 
+
     return kError_NoErr;
 }
 
@@ -278,7 +300,7 @@ void ObsInput::StartWorkerThread(void *pVoidBuffer)
 void ObsInput::WorkerThread(void)
 {
    int             iRead, iPacketNum = -1, iCurrNum, iRet, iHeaderSize;
-   int           iStructSize;
+   unsigned        iStructSize;
    RTPHeader      *pHeader;
    void           *pBuffer;
    unsigned        char *pTemp;
@@ -315,7 +337,7 @@ void ObsInput::WorkerThread(void)
 
       iStructSize = sizeof(struct sockaddr_in);
       iRead = recvfrom(m_hHandle, (char *)pTemp, iMAX_PACKET_SIZE, 0,
-                       (struct sockaddr *)m_pSin, &iStructSize);
+                       (struct sockaddr *)m_pSin, (socklen_t *)&iStructSize);
       if (iRead <= 0)
       {
          m_pOutputBuffer->SetEndOfStream(true);

@@ -105,6 +105,8 @@ class EventQueue {
 #define INFO_StatusMessage      46 // sent to UIs so they can display status info
 
 #define INFO_VolumeInfo         47
+#define INFO_StreamInfo         48
+
 #endif // _EVENT_H_
 
 

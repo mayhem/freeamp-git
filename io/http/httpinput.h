@@ -32,7 +32,8 @@ ____________________________________________________________________________*/
 #include "pmi.h"
 #include "thread.h"
 #include "semaphore.h"
-#include "streambuffer.h"  
+#include "pullbuffer.h"  
+#include "tstream.h"  
 
 const int iMaxUrlLen = 1024;
 const int iMaxErrorLen = 1024;   
@@ -78,9 +79,10 @@ class HttpInput:public PhysicalMediaInput
 
 protected:
 
-   virtual Error     Open(void);
-   static  void      StartWorkerThread(void *);
-   void              LogError(char *);
+   virtual Error      Open(void);
+   static  void       StartWorkerThread(void *);
+   void               LogError(char *);
+   TitleStreamServer *m_pTitleStream;
 
 private:
 

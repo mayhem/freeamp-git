@@ -609,6 +609,22 @@ int32 FreeAmpUI::AcceptEvent(Event *e) {
 	    XUnlockDisplay(m_display);
 	    break;
 	}
+   case INFO_StreamInfo:
+   { 
+       char szTitle[100], szURL[100];
+
+       StreamInfoEvent *pInfo = (StreamInfoEvent *)e;
+
+	    pInfo->GetTitle(szTitle, 100);
+	    m_lcdWindow->SetMainText(szTitle);
+	    m_needsWiggling = true;
+
+	    XLockDisplay(m_display);
+	    m_lcdWindow->Draw(FALcdWindow::FullRedraw);
+	    XUnlockDisplay(m_display);
+
+	    break;
+   }
 	case INFO_MediaTimeInfo: {
 	    MediaTimeInfoEvent *info = (MediaTimeInfoEvent *)e;
 	    m_lcdWindow->SetCurrentTime(info->m_hours,info->m_minutes,info->m_seconds);
@@ -932,7 +948,7 @@ void FreeAmpUI::TimerEventFunction(void *p) {
 	    pMe->SeekJogAction();
 	}
 	pMe->m_seekSlice = ++(pMe->m_seekSlice) % SEEK_SLICE;
-	usleep(170000);
+	usleep(370000);
     }
 }
 

@@ -61,7 +61,14 @@ typedef enum Error
     kError_YouScrewedUp         = 30,
     kError_NoPrefValue          = 31,
     kError_SyntaxError          = 32,
-    kError_EndOfStream          = 33
+    kError_EndOfStream          = 33,
+    kError_ConnectFailed        = 34,
+    kError_CantCreateSocket     = 35,
+    kError_CannotSetSocketOpts  = 36,
+    kError_CannotBind           = 37,
+
+
+    kError_LastError            = 9999
 }Error;
 
 

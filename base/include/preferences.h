@@ -56,6 +56,9 @@ extern const char* kSaveStreamsDirPref;
 extern const char* kUseProxyPref;
 extern const char* kProxyHostPref;
 extern const char* kPreBufferPref;
+extern const char* kUseNIC;
+extern const char* kNICAddress;
+extern const char* kUseTitleStreaming;  
 
 class LibDirFindHandle;
 

@@ -70,3 +70,6 @@ Other major contributors and their contributions:
 
 "Isaac Richards" <ijr@po.cwru.edu>
 * EsounD plug-in and warning clean-up
+
+"Skip Hansen" <shansen@earthlink.net>
+* HTTP numeric IP patch for Win93 OSR2 and Win NT

@@ -1549,6 +1549,7 @@ ServiceEvent(Event * pC)
            HandleMediaTimeInfo(pC);
            break;
 
+      case INFO_StreamInfo:
       case INFO_PlayListShuffle:
       case INFO_PlayListRepeat:
       case INFO_PlayListUpdated:

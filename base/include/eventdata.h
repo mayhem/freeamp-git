@@ -337,6 +337,38 @@ public:
 		  };
 };
 
+class StreamInfoEvent : public Event
+{
+private:
+        char *m_szStreamURL;
+        char *m_szStreamTitle;
+
+public:
+
+        StreamInfoEvent(char *szTitle, char *szURL)
+		  {
+            m_type = INFO_StreamInfo;
+            m_szStreamURL = strdup(szURL);
+            m_szStreamTitle = strdup(szTitle);
+		  };
+		  virtual ~StreamInfoEvent() 
+        {
+            free(m_szStreamURL);
+            free(m_szStreamTitle);
+        };
+
+        void GetURL(char *szUrl, int iSize)
+        {
+            strncpy(szUrl, m_szStreamURL, iSize - 1);
+            szUrl[iSize - 1] = 0;
+        }
+        void GetTitle(char *szTitle, int iSize)
+        {
+            strncpy(szTitle, m_szStreamTitle, iSize - 1);
+            szTitle[iSize - 1] = 0;
+        }
+};
+
 #endif /* _EVENTDATA_H_ */
 
 

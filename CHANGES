@@ -1,3 +1,14 @@
+Changes for Linux and Windows version 1.3.0:
+--------------------------------------------------------------------
+
+- Fixed support for MPEG-1,2 layer 2 files
+- Fixed 'LMC cannot decode, corrupt media?' bug
+- Added PreBuffer support
+- Added HTTP proxy support (thanks to Alan Cutter for the patch)
+- Improved audio pipeline with much clearer model and common base classes
+- Added support for selecting network card for streaming plugins
+- Added Enlightened Sound Daemon support. Thanks for Isaac Richards (Linux)
+
 Changes for Linux and Windows version 1.2.3:
 --------------------------------------------------------------------
 - Fixed support for MPEG 2.5 streams and files

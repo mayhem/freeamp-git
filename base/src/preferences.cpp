@@ -49,6 +49,9 @@ const char* kSaveStreamsDirPref = "SaveStreamsDirectory";
 const char* kUseProxyPref = "UseProxy";
 const char* kProxyHostPref = "ProxyHost";  
 const char* kPreBufferPref = "PreBuffer";  
+const char* kUseNIC = "UseAlternateNIC";  
+const char* kNICAddress = "AlternateNIC";  
+const char* kUseTitleStreaming = "UseTitleStreaming";  
 
 //logging
 const char* kUseDebugLogPref = "UseDebugLog";
@@ -69,6 +72,9 @@ const char* kDefaultSaveStreamsDir = ".";
 const int32 kDefaultPreBuffer = 0;
 const char *kDefaultProxyHost = "http://proxy.yourdomain.com:8080";
 const bool  kDefaultUseProxy = false;
+const bool  kDefaultUseNIC = false;
+const char *kDefaultNICAddress = "192.168.1.1";
+const bool  kDefaultUseTitleStreaming = true;
 
 Error
 Preferences::
@@ -122,12 +128,24 @@ SetDefaults()
     if (GetPrefInt32(kPreBufferPref, &dummyInt) == kError_NoPrefValue)
         SetPrefInt32(kPreBufferPref, kDefaultPreBuffer);
 
-	if (GetPrefBoolean(kUseProxyPref, &dummyBool) == kError_NoPrefValue)
+    if (GetPrefBoolean(kUseProxyPref, &dummyBool) == kError_NoPrefValue)
         SetPrefBoolean(kUseProxyPref, kDefaultUseProxy);
 
-	dummyInt = 255;
-    if (GetPrefString(kProxyHostPref, dummyString, (unsigned int *)&dummyInt) == kError_NoPrefValue)
-		SetPrefString(kProxyHostPref, kDefaultProxyHost);
+    dummyInt = 255;
+    if (GetPrefString(kProxyHostPref, dummyString, 
+        (unsigned int *)&dummyInt) == kError_NoPrefValue)
+        SetPrefString(kProxyHostPref, kDefaultProxyHost);
+
+    if (GetPrefBoolean(kUseNIC, &dummyBool) == kError_NoPrefValue)
+        SetPrefBoolean(kUseNIC, kDefaultUseNIC);
+
+    dummyInt = 255;
+    if (GetPrefString(kNICAddress, dummyString, 
+        (unsigned int *)&dummyInt) == kError_NoPrefValue)
+        SetPrefString(kNICAddress, kDefaultNICAddress);
+
+    if (GetPrefBoolean(kUseTitleStreaming, &dummyBool) == kError_NoPrefValue)
+        SetPrefBoolean(kUseTitleStreaming, kDefaultUseTitleStreaming);
 
     return kError_NoErr;
 }

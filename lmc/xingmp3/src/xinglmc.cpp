@@ -743,7 +743,7 @@ Error XingLMC::BeginRead(void *&pBuffer, unsigned int iBytesNeeded,
        m_pInputBuffer->DiscardBytes();
    }
 
-   if (bBufferUp && iInPercent < 5 && iOutPercent < 5)
+   if (bBufferUp && iInPercent < 50 && iOutPercent < 5)
    {
        unsigned iBufferUpBytes;
 
