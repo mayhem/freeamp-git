@@ -107,7 +107,7 @@ const char *kDefaultMainWindowPos = "-1,-1";
 const char *kDefaultWindowMode = "MainWindow";
 #ifdef WIN32
 const char *kDefaultThemeDefaultFont = "Arial";
-const char *kDefaultCDDevicePath = "";
+const char *kDefaultCDDevicePath = "cdaudio";
 #else
 const char *kDefaultThemeDefaultFont = "Helvetica";
 const char *kDefaultCDDevicePath = "/dev/cdrom";

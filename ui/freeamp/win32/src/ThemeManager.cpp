@@ -112,7 +112,7 @@ Error ThemeManager::GetThemeList(map<string, string> &oThemeFileMap)
 
     m_pContext->prefs->GetInstallDirectory(dir, &len);
     oThemeBasePath = string(dir) + "\\themes";
-    oThemePath = oThemeBasePath + string("\\*.fat");    
+    oThemePath = oThemeBasePath + string("\\*.*");    
 
     handle = FindFirstFile(oThemePath.c_str(), &find);
     if(handle == INVALID_HANDLE_VALUE)
@@ -133,12 +133,19 @@ Error ThemeManager::GetThemeList(map<string, string> &oThemeFileMap)
         {
             // fine... use the filename instead.
             ptr = strrchr(find.cFileName, '.');
-            if (ptr)
+            if (ptr) {
                *ptr = 0;
-            oThemeFileMap[find.cFileName] = oThemeFile;
+               ptr++;
+			}
+            if (ptr && *ptr) {
+                if (!strcasecmp("fat", ptr) || !strcasecmp("zip", ptr) ||
+                    !strcasecmp("wsz", ptr))
+                    oThemeFileMap[find.cFileName] = oThemeFile;
+            }
         }
     }
     while(FindNextFile(handle, &find));
+    FindClose(handle);
 
     return kError_NoErr;
 }

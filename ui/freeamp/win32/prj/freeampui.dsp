@@ -272,6 +272,10 @@ SOURCE=..\..\src\PixFontControl.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\src\PixTimeControl.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\src\SliderControl.cpp
 # End Source File
 # Begin Source File
@@ -469,6 +473,10 @@ SOURCE=..\..\..\..\lib\xml\include\Parse.h
 # Begin Source File
 
 SOURCE=..\..\..\..\io\include\pipeline.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\PixTimeControl.h
 # End Source File
 # Begin Source File
 
