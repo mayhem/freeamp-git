@@ -28,7 +28,7 @@ ____________________________________________________________________________*/
 #include <be/support/Debug.h>
 #include <be/interface/Bitmap.h>
 #include <be/interface/Region.h>
-
+#include <assert.h>
 #include <string>
 
 #define CHECK_POINT CHECK_POINT_MSG("")
@@ -107,6 +107,7 @@ BeOSCanvas::RenderText( int iFontHeight, Rect& oClipRect,
     if ( !v ) return 0;
 
     BBitmap* bitmap = m_pBufferBitmap->GetBBitmap();
+    assert( bitmap );
 
     BFont font;
     font_height fontHeight;
@@ -134,11 +135,15 @@ BeOSCanvas::RenderText( int iFontHeight, Rect& oClipRect,
     float width = v->StringWidth(oText.c_str(), oText.size());
     
     if(eAlign == eCenter)
-        v->MovePenTo( float(oClipRect.x1) + (float(oClipRect.x2 - oClipRect.x1) - width)/2, float(oClipRect.y2-fontHeight.descent) );	
+        v->MovePenTo( float(oClipRect.x1) +
+                      (float(oClipRect.x2 - oClipRect.x1) - width)/2,
+                      float(oClipRect.y2-fontHeight.descent) );	
     else if (eAlign == eRight)
-        v->MovePenTo( float(oClipRect.x2) - width, float(oClipRect.y2-fontHeight.descent) );
+        v->MovePenTo( float(oClipRect.x2) - width,
+                      float(oClipRect.y2-fontHeight.descent) );
     else
-        v->MovePenTo( float(oClipRect.x1), float(oClipRect.y2-fontHeight.descent) );
+        v->MovePenTo( float(oClipRect.x1),
+                      float(oClipRect.y2-fontHeight.descent) );
 
     v->DrawString( oText.c_str() );
     v->Sync();

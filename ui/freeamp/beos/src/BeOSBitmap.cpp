@@ -202,3 +202,5 @@ BeOSBitmap::MaskBlitRect( Bitmap* pSrcBitmap, Rect& oSrcRect, Rect& oDestRect )
 
     return kError_NoErr;
 }
+
+// vi: set ts=4:
