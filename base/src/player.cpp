@@ -192,21 +192,21 @@ bool Player::SetArgs(int32 argc, char** argv){
 		    }
 		    break;
 		case 'u':
-        case 'U':
-        {
-             if( arg[2] == 'i' ||
-                 arg[2] == 'I')
-               {
-                   i++;
-					if (i >= argc) {
-				    Usage(argv[0]);
-				    AcceptEvent(new Event(CMD_QuitPlayer));
-				    return false;
-				}
+		case 'U':
+		{
+		    if( arg[2] == 'i' ||
+			arg[2] == 'I')
+		    {
+			i++;
+			if (i >= argc) {
+			    Usage(argv[0]);
+			    AcceptEvent(new Event(CMD_QuitPlayer));
+			    return false;
+			}
 			arg = argv[i];
 			//if (m_argUI) delete m_argUI;
-            argUI = new char[strlen(arg) + 1];
-            strcpy(argUI, arg);
+			argUI = new char[strlen(arg) + 1];
+			strcpy(argUI, arg);
 			if (justGotArgvZero) {
 			    m_argUIvector->DeleteAll();
 			    justGotArgvZero = false;
@@ -219,6 +219,32 @@ bool Player::SetArgs(int32 argc, char** argv){
 		case 'H':
 		    Usage(argv[0]);
 		    argVector.Insert(argv[i]);
+		    break;
+		case 'p':
+		    if (!strcmp(&(arg[2]),"rop")) {
+			// add in a Property=Value property
+			i++;
+			if (i >= argc) {
+			    Usage(argv[0]);
+			    AcceptEvent(new Event(CMD_QuitPlayer));
+			    return false;
+			}
+			char *pProp = argv[i];
+			if (pProp) {
+			    char *pVal = strchr(pProp,'=');
+			    if (pVal) {
+				*pVal = '\0';
+				pVal++;
+				StringPropValue *spv = new StringPropValue(pVal);
+				m_props.SetProperty(pProp,(PropValue *)spv);
+			    } else {
+				cerr << "Property string '" << pProp << "' is not valid.  Needs to be of the form Property=Value." << endl;
+				break;
+			    }
+			}
+		    } else {
+			argVector.Insert(argv[i]);
+		    }
 		    break;
 		default:
 		    argVector.Insert(argv[i]);
@@ -955,12 +981,12 @@ void Player::SendToUI(Event *pe) {
     }
 }
 
-Error Player::GetProperty(const char *pProp, void **ppVal) {
+Error Player::GetProperty(const char *pProp, PropValue **ppVal) {
     return m_props.GetProperty(pProp,ppVal);
 }
 
-Error Player::SetProperty(const char *pProp, void *pVal, bool deleteWhenDone) {
-    return m_props.SetProperty(pProp,pVal,deleteWhenDone);
+Error Player::SetProperty(const char *pProp, PropValue *pVal) {
+    return m_props.SetProperty(pProp,pVal);
 }
 
 Error Player::RegisterPropertyWatcher(const char *pProp, PropertyWatcher *pPropWatch) {

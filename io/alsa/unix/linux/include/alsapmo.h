@@ -27,7 +27,7 @@ ____________________________________________________________________________*/
 #define _ALSAPMO_H_
 
 #define ALSA
-//#define DEBUG
+#define DEBUG
 
 /* ALSA_DEVICE=1:0 is normal /dev/dsp          */
 /* ALSA_DEVICE=1:1 is alsa's advanced device   */
