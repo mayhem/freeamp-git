@@ -273,8 +273,6 @@ Win32Prefs::
 SetDefaults()
 {
     char cwd[MAX_PATH]= {0x00};
-    int32 dummyInt;
-    bool dummyBool;
     char buf[1024];
     uint32 size;
 
