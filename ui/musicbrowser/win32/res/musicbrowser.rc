@@ -231,7 +231,7 @@ CAPTION "Relatable"
 FONT 8, "MS Sans Serif"
 BEGIN
     CONTROL         130,IDC_STATIC,"Static",SS_BITMAP,2,2,81,161
-    CONTROL         "Contribute to MuiscBrainz",IDC_CONTRIBUTE_YES,"Button",
+    CONTROL         "Contribute to MusicBrainz",IDC_CONTRIBUTE_YES,"Button",
                     BS_AUTORADIOBUTTON,99,144,173,8
     CONTROL         "Cool! But I'll pass",IDC_CONTRIBUTE_NO,"Button",
                     BS_AUTORADIOBUTTON,99,156,140,9
