@@ -1,3 +1,21 @@
+Changes for Linux and Windows version 2.0.2
+--------------------------------------------------------------------
+
+- Improved speed for adding and removing items in My Music window.
+- Fixes issues with Windows 2000 compatability.
+- Importing Tracks works again.
+- FreeAmp now associates itself with .fat files under Windows.
+- Fixed buffer bug in windows output plugin.
+- Fixed slider issues.
+- Themes now support a miscellaneous comment field that will be 
+  displayed in the credits for the theme.
+- FreeAmp is now bound to processor 0 under Windows NT.
+- Fix for "Not saving theme" bug under Linux.
+- Better recreation of file/mimetypes under Windows.
+- Fixed theme reload bug.
+- Track info dialog now displays track location.
+- Fonts are now antialiased under Windows.
+
 Changes for Linux and Windows version 2.0.1
 --------------------------------------------------------------------
 
