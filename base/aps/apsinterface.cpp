@@ -222,9 +222,8 @@ int APSInterface::APSGetSoundsLike(APSPlaylist *pSeedList,
     if (strUID.empty())
         strUID = "NOT_OPTED_IN1111"; // 16 char aggregate query id
 
-    vector<pair<string, float> > *blah;
-    int nRes = m_pYpClient->GetSoundsLike(*pReturnList, *pSeedList, nMaxItems,
-                                       strUID, m_strCollectionID);
+    int nRes = m_pYpClient->SoundsLike(*pReturnList, *pSeedList, 
+                                       m_strCollectionID);
 
     m_pMutex->Release();
 
@@ -350,7 +349,7 @@ int APSInterface::APSGetStreams(vector<pair<string, string> >* pResultList)
     if (strUID.empty()) 
         strUID = "NOT_OPTED_IN1111";        // 16 char aggregate query id
        
-    int nRes = m_pYpClient->GetStreams(*pResultList, strUID);
+    int nRes = m_pYpClient->GetStreams(*pResultList, strUID, m_strCollectionID);
        
     fstream fout("test.txt", ios_base::in | ios_base::out | ios_base::app);
     fout << "GetStream returned: " << nRes << " and filled in " <<
