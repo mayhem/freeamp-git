@@ -932,8 +932,20 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
        m_pWindow->ControlIntValue(oControlName, true, iState);
        return kError_NoErr;
    }
-  
    
+   if (strncmp(oControlName.c_str(), "Eq", 2) == 0 && eMesg == CM_SliderUpdate)
+   {
+       string oName("Info"), oDesc;
+       char   szText[20];
+       int    iPos;
+
+       m_pWindow->ControlIntValue(oControlName, false, iPos);
+       sprintf(szText, "%d db", ((iPos - 50) * 10) / 25);
+       oDesc = string(szText);
+       m_pWindow->ControlStringValue(oName, true, oDesc);
+                                
+       return kError_NoErr;
+   }    
    if (oControlName == string("Seek") && eMesg == CM_ValueChanged)
    {
        string oName("Info"), oEmpty("");

@@ -159,8 +159,10 @@ class Window
     protected:
 
       Control *ControlFromPos(Pos &oPos);
-      void     GetReloadWindowPos(Rect &oOldRect, int iNewWidth, int iNewHeight, 
+      void     GetReloadWindowPos(Rect &oOldRect, 
+                                  int iNewWidth, int iNewHeight, 
                                   Rect &oNewRect);
+      void     GetWindowVisibleArea(Rect &oRect);
 
       // For locking the window in preparatiom for a VMM
       virtual void  LockUsageRef(void);

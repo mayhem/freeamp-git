@@ -26,37 +26,6 @@ From binaries:
         /usr/local/lib/freeamp/plugins directory.
 
 
-SETTING UP FREEAMP: (Unix only -- done automatically in Windows)
-----------------------------------------------------------------------
-
-To properly setup FreeAmp, you need to set the mime-type associations
-in your Web Browser. To do this in Netscape, open up the Edit menu and
-select 'Preferences'. On the left pane, select 'Navigator', then 
-'Applications' to get to the configuration pane where you can setup
-Helper Application. Then all that needsjust click on the 'New...' button
-to start adding new associations.  For all the following mime-types, fill
-in the Application field to be: freeamp %s
-
-The mimetypes and their extension that FreeAmp can handle are: 
-     
-     mimetype                             extension
-     ----------------------------------------------
-     audio/x-mpeg                         mp3
-     audio/x-mp3                          mp3
-     audio/mpeg                           mp3
-     audio/mp3                            mp3
-     audio/mpegurl                        m3u 
-     audio/x-mpegurl                      m3u
-     audio/scpls                          pls
-     audio/x-scpls                        pls
-     application/vnd.rn-rn_music_package  rmp
-     application/x-freeamp-theme          fat
-
-Just set up seperate associations for each of these mimetypes, and 
-FreeAmp will be launched whenever you click on a relavent URL in your
-browser.
-
-
 USING FREEAMP:
 ----------------------------------------------------------------------
 

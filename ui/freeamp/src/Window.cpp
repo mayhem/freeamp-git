@@ -648,6 +648,7 @@ void Window::HandleMouseLButtonDown(Pos &oScreenPos)
 #endif
        
     GetWindowPosition(m_oMoveStart);
+    GetWindowVisibleArea(m_oMoveStart);
     m_oMovePos = oScreenPos;
 
     if (IsError(GetDesktopSize(m_iDesktopWidth, m_iDesktopHeight)))
@@ -857,3 +858,22 @@ void Window::GetReloadWindowPos(Rect &oOldRect, int iNewWidth, int iNewHeight,
 }
 
     
+void Window::GetWindowVisibleArea(Rect &m_oTotalWindowRect)
+{
+    vector<Panel *>::iterator i;
+    Rect                      oRect;
+
+    // This function needs to be genericized -- right now it will
+    // only cover the specific case for the freeamp theme
+    m_pCanvas->GetBackgroundRect(oRect);
+    for(i = m_oPanels.begin(); i != m_oPanels.end(); i++)
+    {
+        if ((*i)->m_bIsOpen)
+           continue;
+
+        oRect.y2 = (*i)->m_oOpenRect.y1;
+        m_oTotalWindowRect.y2 = m_oTotalWindowRect.y1 + oRect.Height();
+        break;
+    }
+
+}

@@ -52,12 +52,12 @@ struct Rect
     {
          return y2 - y1;
     }
-	void Union(Rect &oOther)
-	{
-	     x1 = (oOther.x1 < x1) ? oOther.x1 : x1;
-	     y1 = (oOther.y1 < y1) ? oOther.y1 : y1;
-	     x2 = (oOther.x2 > x2) ? oOther.x2 : x2;
-	     y2 = (oOther.y2 > y2) ? oOther.y2 : y2;
+    void Union(Rect &oOther)
+    {
+         x1 = (oOther.x1 < x1) ? oOther.x1 : x1;
+         y1 = (oOther.y1 < y1) ? oOther.y1 : y1;
+         x2 = (oOther.x2 > x2) ? oOther.x2 : x2;
+         y2 = (oOther.y2 > y2) ? oOther.y2 : y2;
     }
     bool IsPosInRect(Pos &oPos)
     {
@@ -71,11 +71,11 @@ struct Rect
 
 struct Color
 {
-	Color(void)
+    Color(void)
     {
         red = blue = green = 0;
     };
-	Color(unsigned char red, unsigned char green, unsigned char blue)
+    Color(unsigned char red, unsigned char green, unsigned char blue)
     { 
         this->red = red;
         this->green = green;

@@ -1,3 +1,19 @@
+Changes for Linux and Windows version 2.1.0 beta 1
+--------------------------------------------------------------------
+
+This is the first beta release ofthe 2.1 series. For changes for 
+the 2.1 series, please refer to the specification:
+
+    http://www.freeamp.org/~robert/FreeAmp_2.1_Spec.doc
+
+The following items from the spec are not included in the first 2.1 
+release:
+
+    - CD Burning support
+    - Playlist view in theme
+    - Icecast stream listing (waiting on the server side xml changes)
+
+
 Changes for Linux and Windows version 2.0.7
 --------------------------------------------------------------------
 
