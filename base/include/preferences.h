@@ -35,6 +35,7 @@ extern const char* kTextUIPref;
 extern const char* kMusicBrowserUIPref;
 extern const char* kDownloadManagerUIPref;
 extern const char* kToolbarUIPref;
+extern const char* kSecondaryUIPref;
 extern const char* kPMOPref;
 extern const char* kALSADevicePref;
 extern const char* kESOUNDHostPref;
@@ -129,6 +130,9 @@ class Preferences {
 
     Error GetDefaultTextUI(char* name, uint32* len);
     Error SetDefaultTextUI(const char* name);
+
+    Error GetSecondaryUI(char* name, uint32* len);
+    Error SetSecondaryUI(const char* name);
 
     Error GetDefaultPMO(char* name, uint32* len);
     Error SetDefaultPMO(const char* name);

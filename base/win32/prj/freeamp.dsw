@@ -57,6 +57,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "dde"=..\..\..\ui\dde\win32\prj\dde.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "download"=..\..\..\ui\download\win32\prj\download.dsp - Package Owner=<4>
 
 Package=<5>
@@ -208,6 +220,9 @@ Package=<4>
     End Project Dependency
     Begin Project Dependency
     Project_Dep_Name cddb
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name dde
     End Project Dependency
 }}}
 

@@ -375,6 +375,7 @@ int CDDB::cddb_read_serverlist(struct cddb_conf *conf,
                                struct cddb_server *proxy)
 {
     conf->conf_access = CDDB_ACCESS_REMOTE;    
+    list->list_len = 0;
 
     char *host = new char[1024];
     uint32 length = 1024;

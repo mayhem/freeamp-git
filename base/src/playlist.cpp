@@ -199,6 +199,7 @@ bool MetaDataSort::operator() (MetaDataFormat* item1,
     return result;
 }
 
+
 // return an integral random number in the range 0 - (n - 1)
 static int my_rand(int n)
 {
@@ -581,9 +582,9 @@ Error PlaylistManager::SetShuffleMode(bool shuffle)
 
     if(shuffle)
     {
-        pointer_to_unary_function<int, int> lRand =
-                       pointer_to_unary_function<int, int>(my_rand);
-        random_shuffle(m_shuffleList.begin(), m_shuffleList.end(), lRand);
+        /*pointer_to_unary_function<int, int> lRand =
+                       pointer_to_unary_function<int, int>(my_rand);*/
+        random_shuffle(m_shuffleList.begin(), m_shuffleList.end());
 
         if(currentItem)
             m_current = InternalIndexOf(&m_shuffleList, currentItem);
@@ -1551,9 +1552,9 @@ Error PlaylistManager::Sort(PlaylistSortKey key, PlaylistSortType type)
     }
     else if(key == kPlaylistSortKey_Random)
     {
-        pointer_to_unary_function<int, int> lRand = 
-                       pointer_to_unary_function<int, int>(my_rand);
-        random_shuffle(m_activeList->begin(), m_activeList->end(), lRand);
+        /*pointer_to_unary_function<int, int> lRand = 
+                       pointer_to_unary_function<int, int>(my_rand);*/
+        random_shuffle(m_activeList->begin(), m_activeList->end());
         
         m_sortKey = key;
         m_sortType = type;
