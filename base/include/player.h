@@ -99,7 +99,7 @@ class Player : public EventQueue {
     Mutex*                  m_pmiMutex;
     Mutex*                  m_pmoMutex;
     Mutex*                  m_uiMutex;
-    PlayList*               m_myPlayList;
+    PlayListManager*               m_plm;
     
     LogicalMediaConverter * m_lmc;
     UserInterface *         m_ui;

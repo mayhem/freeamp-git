@@ -43,7 +43,8 @@ class OrderListItem {
     int32 m_random;
 };
 
-class PlayList {
+
+class PlayListManager {
 public:
     enum OrderOfPlay {
 	ORDER_STRAIGHT = 1,
@@ -58,8 +59,8 @@ public:
     };
 
  public:
-    PlayList();
-    ~PlayList();
+    PlayListManager();
+    ~PlayListManager();
     void Add(char *,int);
     void SetSkip(int32 f) { m_skipNum = f; } // logical media units to skip at beginning
     int32 GetSkip() { return m_skipNum; }

@@ -34,6 +34,11 @@ CRainplayUI::
 
 void 
 CRainplayUI::
+SetPlayListManager(PlayListManager *plm) {
+	m_plm = plm;
+}
+void 
+CRainplayUI::
 SetTarget(EventQueue* eq)
 {
     m_target = eq;

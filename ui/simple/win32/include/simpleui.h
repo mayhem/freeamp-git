@@ -46,7 +46,7 @@ class SimpleUI : public UserInterface {
     virtual void SetTarget(EventQueue*);
     virtual int32 AcceptEvent(Event *);
     virtual void SetArgs(int32,char **);
-
+	virtual void SetPlayListManager(PlayListManager *);
 
     void CreateUI();
 
@@ -67,6 +67,7 @@ class SimpleUI : public UserInterface {
 
 
  private:
+	 PlayListManager *m_plm;
 	 int32			m_totalSeconds;
 	 float			m_secondsPerFrame;
     Thread*         m_uiThread;

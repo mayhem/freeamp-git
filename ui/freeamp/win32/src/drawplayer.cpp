@@ -1456,28 +1456,24 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 								szFile,
 								sizeof(szFile));
 
-				if (!g_ui->m_playList) 
+				if (!g_ui->m_plm) 
                 {
-					g_ui->m_playList = new PlayList();
-					g_ui->m_playList->Add(szFile,0);
-					g_ui->m_playList->SetFirst();
-					g_ui->m_target->AcceptEvent(new SetPlayListEvent(g_ui->m_playList));
+					g_ui->m_plm->Add(szFile,0);
+					g_ui->m_plm->SetFirst();
 					g_ui->m_target->AcceptEvent(new Event(CMD_Play));
 				} 
                 else 
                 {
-					if (g_ui->m_playList->GetCurrent() == NULL) 
+					if (g_ui->m_plm->GetCurrent() == NULL) 
                     {
-						g_ui->m_playList->Add(szFile,0);
-						g_ui->m_target->AcceptEvent(new SetPlayListEvent(g_ui->m_playList));
+						g_ui->m_plm->Add(szFile,0);
 						// first in playlist...
 						//g_ui->m_target->AcceptEvent(new Event(CMD_Play));
                         SendMessage(hwnd, WM_COMMAND, kPlayControl,0);
 					} 
                     else 
                     {
-						g_ui->m_playList->Add(szFile,0);
-						g_ui->m_target->AcceptEvent(new SetPlayListEvent(g_ui->m_playList));
+						g_ui->m_plm->Add(szFile,0);
 					}
 				}
 			}
@@ -1537,8 +1533,6 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 						char file[MAX_PATH + 1];
 						char* cp = NULL;
 
-						g_ui->m_playList = new PlayList();
-
 						strcpy(file, filelist);
 						strcat(file, "\\");
 
@@ -1548,7 +1542,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 						{
 							strcpy(file + ofn.nFileOffset, cp);
 
-					        g_ui->m_playList->Add(file,0);
+					        g_ui->m_plm->Add(file,0);
 
 					        cp += strlen(cp) + 1;
 						}
@@ -1556,17 +1550,16 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                         if(g_ui->m_state == STATE_Playing)
                         {
                             g_ui->m_target->AcceptEvent(new Event(CMD_Stop));
-						    g_ui->m_target->AcceptEvent(new SetPlayListEvent(g_ui->m_playList));
                             g_ui->m_target->AcceptEvent(new Event(CMD_Play));
                         }
                         else
                         {
-                            g_ui->m_target->AcceptEvent(new SetPlayListEvent(g_ui->m_playList));
+							;
                         }
                         //EnableWindow(m_ui->m_hwndPlay, TRUE);
 					}
 
-                    g_ui->m_playList->SetFirst();
+                    g_ui->m_plm->SetFirst();
 
 					delete [] filelist;
 

@@ -48,7 +48,7 @@ class FreeAmpUI : public UserInterface {
     virtual void SetTarget(EventQueue*);
     virtual int32 AcceptEvent(Event *);
     virtual void SetArgs(int32,char **);
-
+	virtual void SetPlayListManager(PlayListManager *);
 
     void CreateUI();
 
@@ -65,7 +65,7 @@ class FreeAmpUI : public UserInterface {
 
     EventQueue*     m_target;
 	int32			m_state;
-	PlayList *		m_playList;
+	PlayListManager *m_plm;
     float			m_secondsPerFrame;
 
  protected:

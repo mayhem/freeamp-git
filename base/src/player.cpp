@@ -66,7 +66,7 @@ EventQueue() {
     //cout << "Created mutex" << endl;
     m_imQuitting = 0;
     m_quitWaitingFor = 0;
-    m_myPlayList = NULL;
+    m_plm = NULL;
     m_playerState = STATE_Stopped;
 
     m_lmcRegistry = NULL;
@@ -87,14 +87,15 @@ EventQueue() {
     //m_autoplay = false;
 }
 
+#define TYPICAL_DELETE(x) if (x) { delete x; x = NULL; }
+
 Player::~Player() {
 
-    if (m_pTermSem) {
-	    delete m_pTermSem;
-	    m_pTermSem = NULL;
-    }
+	TYPICAL_DELETE(m_pTermSem);
+
     //cout << "waiting for service thread to end..." << endl;
     m_eventServiceThread->Join();
+
     //cout << "serivce thread done.." << endl;
     if (m_lmc) {
         m_lmc->Stop();
@@ -103,95 +104,48 @@ Player::~Player() {
     }
 
     //cout << "done deleting myLMC" << endl;
-    if (m_eventSem) {
-        delete m_eventSem;
-        m_eventSem = NULL;
-    }
+	TYPICAL_DELETE(m_eventSem);
+
     //cout << "Player: deleting event service thread" << endl;
-    if (m_eventServiceThread) {
-        delete m_eventServiceThread;
-        m_eventServiceThread = NULL;
-    }
+	TYPICAL_DELETE(m_eventServiceThread);
+
     //cout << "Player: deleting event queue" << endl;
-    if (m_eventQueue) {
-        delete m_eventQueue;
-        m_eventQueue = NULL;
-    }
-    // Delete PlayList
-    //cout << "Player: deleting PlayList" << endl;
-    if (m_myPlayList) {
-        delete m_myPlayList;
-        m_myPlayList = NULL;
-    }
+	TYPICAL_DELETE(m_eventQueue);
+
 
     // Delete CIOs
     //cout << "Player: deleting CIOs" << endl;
     if (m_uiVector) {
-//	for(int i=0;i<m_uiVector->NumElements();i++) {
-//	    m_uiVector->ElementAt(i)->Cleanup(m_uiVector->ElementAt(i));
-//	}
         m_uiVector->DeleteAll();
         delete m_uiVector;
         m_uiVector = NULL;
     }
 
+    //cout << "Player: deleting PlayList" << endl;
+	TYPICAL_DELETE(m_plm);
 
     //cout << "Player: deleting CIO/COO manipulation lock" << endl;
-    if (m_uiManipLock) {
-        delete m_uiManipLock;
-        m_uiManipLock = NULL;
-    }
+	TYPICAL_DELETE(m_uiManipLock);
 
-    if (m_lmcMutex) {
-        delete m_lmcMutex;
-        m_lmcMutex = NULL;
-    }
+	TYPICAL_DELETE(m_lmcMutex);
 
-    if (m_pmiMutex) {
-        delete m_pmiMutex;
-        m_pmiMutex = NULL;
-    }
+	TYPICAL_DELETE(m_pmiMutex);
 
-    if (m_pmoMutex) {
-        delete m_pmoMutex;
-        m_pmoMutex = NULL;
-    }
+	TYPICAL_DELETE(m_pmoMutex);
 
-    if (m_uiMutex) {
-        delete m_uiMutex;
-        m_uiMutex = NULL;
-    }
+	TYPICAL_DELETE(m_uiMutex);
 
-    if(m_lmcRegistry){
-        delete m_lmcRegistry;
-        m_lmcRegistry = NULL;
-    }
+	TYPICAL_DELETE(m_lmcRegistry);
 
-    if(m_pmiRegistry){
-        delete m_pmiRegistry;
-        m_pmiRegistry = NULL;
-    }
+	TYPICAL_DELETE(m_pmiRegistry);
 
-    if(m_pmoRegistry){
-        delete m_pmoRegistry;
-        m_pmoRegistry = NULL;
-    }
+	TYPICAL_DELETE(m_pmoRegistry);
 
-    if(m_uiRegistry){
-        delete m_uiRegistry;
-        m_uiRegistry = NULL;
-    }
+	TYPICAL_DELETE(m_uiRegistry);
 
-    if (m_prefs) {
-	delete m_prefs;
-	m_prefs = NULL;
-    }
+	TYPICAL_DELETE(m_prefs);
 
-    if(m_argUI)
-    {
-        delete [] m_argUI;
-        m_argUI = NULL;
-    }
+	TYPICAL_DELETE(m_argUI);
 }
 
 void Player::SetTerminationSemaphore(Semaphore *pSem) {
@@ -313,7 +267,7 @@ void Player::Run(){
 		m_ui = (UserInterface *)item->InitFunction()();
 		
 		m_ui->SetTarget((EventQueue *)this);
-		
+		m_ui->SetPlayListManager(m_plm);
                 m_ui->SetArgs(m_argc, m_argv);
 		m_ui->Init();
                 RegisterActiveUI(m_ui);
@@ -326,7 +280,9 @@ void Player::Run(){
 #ifdef WIN32
 	    char foo[1024];
 	    char bar[MAX_PATH];
-	    sprintf(foo,"No UI plugin matched 'plugins\\%s' or 'plugins\\%s.ui' in '%s'.  FreeAmp will quit.",name,name,m_prefs->GetInstallDirectory(bar,MAX_PATH-1));
+		uint32 size = MAX_PATH - 1;
+		m_prefs->GetInstallDirectory(bar,&size);
+	    sprintf(foo,"No UI plugin matched 'plugins\\%s' or 'plugins\\%s.ui' in '%s'.  FreeAmp will quit.",name,name,bar	);
 	    MessageBox(NULL,foo,"FreeAmp Error",MB_OK);
 #else
 	    const char *thePath = getenv(FREEAMP_PATH_ENV);
@@ -482,7 +438,7 @@ int32 Player::ServiceEvent(Event *pC) {
                 if (SetState(STATE_Stopped)) {
 		    SEND_NORMAL_EVENT(INFO_Stopped);
                 }
-                m_myPlayList->SetNext();
+                m_plm->SetNext();
                 Event *e = new Event(CMD_Play);
                 AcceptEvent(e);
                 return 0;
@@ -510,7 +466,7 @@ int32 Player::ServiceEvent(Event *pC) {
 	    }
 	    
 	    case CMD_Play: {
-		PlayListItem *pc = m_myPlayList->GetCurrent();
+		PlayListItem *pc = m_plm->GetCurrent();
 		Error error = kError_NoErr;
 
 		if (pc) {
@@ -571,7 +527,7 @@ int32 Player::ServiceEvent(Event *pC) {
 		    if (SetState(STATE_Playing)) {
 			    SEND_NORMAL_EVENT(INFO_Playing);
 		    }
-		    if ((error = m_lmc->ChangePosition(m_myPlayList->GetSkip())) != kError_NoErr) {
+		    if ((error = m_lmc->ChangePosition(m_plm->GetSkip())) != kError_NoErr) {
 			DISPLAY_ERROR(m_lmc,error);
 			return 0;
 		    }
@@ -580,7 +536,7 @@ int32 Player::ServiceEvent(Event *pC) {
 			return 0;
 		    }
 		} else {
-		    m_myPlayList->SetFirst();
+		    m_plm->SetFirst();
 		    //cout << "no more in playlist..." << endl;
 		    if (m_lmc) {
 			m_lmc->Stop();
@@ -611,14 +567,14 @@ int32 Player::ServiceEvent(Event *pC) {
 	    }
 	    
 	    case CMD_NextMediaPiece:
-		    m_myPlayList->SetNext();
+		    m_plm->SetNext();
 		    AcceptEvent(new Event(CMD_Stop));
 		    AcceptEvent(new Event(CMD_Play));
 		    return 0;
 	    break;
 	    
 	    case CMD_PrevMediaPiece:
-		m_myPlayList->SetPrev();
+		m_plm->SetPrev();
 		AcceptEvent(new Event(CMD_Stop));
 		AcceptEvent(new Event(CMD_Play));
 		return 0;
@@ -663,24 +619,6 @@ int32 Player::ServiceEvent(Event *pC) {
                 break;
 	    }
 	    
-		case CMD_SetPlaylist: {
-			
-			PlayList *localPL = ((SetPlayListEvent *)pC)->GetPlayList();
-			if (m_myPlayList && (m_myPlayList != localPL)) {
-				delete m_myPlayList;
-				m_myPlayList = NULL;
-			}
-			
-			m_myPlayList = localPL;
-
-			GetUIManipLock();
-			Event *pe = new PlayListEvent(m_myPlayList);
-			SendToUI(pe);
-			delete pe;
-			ReleaseUIManipLock();
-			return 0;
-	    	break;
-							  }
 	    case CMD_QuitPlayer: {
 		AcceptEvent(new Event(CMD_Stop));
 		// 1) Set "I'm already quitting flag" (or exit if its already Set)
@@ -721,8 +659,8 @@ int32 Player::ServiceEvent(Event *pC) {
 		    GetUIManipLock();
 		    
 		    MediaInfoEvent *pmvi = (MediaInfoEvent *)pC;
-		    pmvi->m_indexOfSong = m_myPlayList->Current() + 1; // zero based
-		    pmvi->m_totalSongs = m_myPlayList->Total();
+		    pmvi->m_indexOfSong = m_plm->Current() + 1; // zero based
+		    pmvi->m_totalSongs = m_plm->Total();
 		    
 		    SendToUI(pC);
 		    

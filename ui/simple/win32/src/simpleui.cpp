@@ -77,6 +77,11 @@ INT WINAPI DllMain (HINSTANCE hInst,
     return 1;                 
 }
 
+void
+SimpleUI::
+SetPlayListManager(PlayListManager *plm) {
+	m_plm = plm;
+}
 
 SimpleUI::
 SimpleUI():
@@ -370,7 +375,7 @@ void
 SimpleUI::
 SetArgs(int32 argc, char** argv)
 {
-    PlayList* playlist = new PlayList;
+    PlayListManager* playlist = m_plm;
     char *arg = NULL;
     bool shuffle = false;
     bool autoplay = false;
@@ -407,11 +412,8 @@ SetArgs(int32 argc, char** argv)
     playlist->SetFirst();
 
     if(shuffle) 
-        playlist->SetOrder(PlayList::ORDER_SHUFFLED);
+        playlist->SetOrder(PlayListManager::ORDER_SHUFFLED);
     
-    m_target->AcceptEvent(new SetPlayListEvent(playlist));
-
-
     if(count)
     {
         EnableWindow(m_hwndPlay, TRUE);
@@ -419,8 +421,6 @@ SetArgs(int32 argc, char** argv)
         if(count > 1)
 			EnableWindow(m_hwndNext, TRUE);
     }
-    //if(autoplay)
-       //m_target->AcceptEvent(m_target, new Event(CMD_Play));
 }
 
 void
@@ -589,9 +589,8 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 					{
 						char file[MAX_PATH + 1];
 						char* cp = NULL;
-						PlayList* playlist;
+						PlayListManager* playlist = m_ui->m_plm;
 
-						playlist = new PlayList;
 
 						strcpy(file, filelist);
 						strcat(file, "\\");
@@ -607,7 +606,6 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 							cp += strlen(cp) + 1;
 						}
 
-						m_ui->m_target->AcceptEvent(new SetPlayListEvent(playlist));
                         EnableWindow(m_ui->m_hwndPlay, TRUE);
 					}
 
@@ -671,14 +669,11 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 			HDROP hDrop = (HDROP) wParam;
 			int32 count;
 			char szFile[MAX_PATH + 1];
-			PlayList* playlist;
 
 			count = DragQueryFile(	hDrop,
 									-1L,
 									szFile,
 									sizeof(szFile));
-
-			playlist = new PlayList;
 
 			for(int32 i = 0; i < count; i++)
 			{
@@ -687,10 +682,9 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 								szFile,
 								sizeof(szFile));
 
-				playlist->Add(szFile,0);
+				m_ui->m_plm->Add(szFile,0);
 			}
 
-			m_ui->m_target->AcceptEvent(new SetPlayListEvent(playlist));
             EnableWindow(m_ui->m_hwndPlay, TRUE);
 
 			break;

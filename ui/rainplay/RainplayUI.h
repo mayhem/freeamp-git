@@ -9,6 +9,7 @@
 #include "event.h"
 #include "semaphore.h"
 #include "queue.h"
+#include "playlist.h"
 #include "RainplayDlg.h"
 
 class CRainplayUI: public UserInterface
@@ -21,6 +22,7 @@ public:
     virtual void SetTarget(EventQueue*);
     virtual int32 AcceptEvent(Event *);
     virtual void SetArgs(int32,char **);
+	virtual void SetPlayListManager(PlayListManager *);
 
     void CreateUI();
     
@@ -30,6 +32,7 @@ protected:
       static void UIThreadFunc(void *);
 
 private:
+	PlayListManager *m_plm;
 	CRainplayDlg*	m_Dlg;
 	Thread*         m_uiThread;
     EventQueue*     m_target;

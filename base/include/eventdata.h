@@ -33,24 +33,6 @@ ____________________________________________________________________________*/
 #include "event.h"
 #include "id3v1.h"
 
-class PlayListEvent : public Event {
-public:
-	PlayListEvent(PlayList *pl) { m_type = INFO_PlayList; m_arg = pl; }
-	PlayList *GetPlayList() { return m_arg; }
-	virtual ~PlayListEvent() {}
-private:
-	PlayList *m_arg;
-};
-
-class SetPlayListEvent : public Event {
- public:
-    SetPlayListEvent(PlayList *pl) { m_type = CMD_SetPlaylist; m_arg = pl; }
-    PlayList *GetPlayList() { return m_arg; }
-    virtual ~SetPlayListEvent() {};
- private:
-    PlayList *m_arg;
-};
-
 class MediaInfoEvent : public Event {
  public:
     float m_totalSeconds;

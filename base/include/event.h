@@ -54,7 +54,6 @@ class EventQueue {
 #define CMD_NextMediaPiece      3  // set pointer in playlist to next mediapiece (no arg)
 #define CMD_PrevMediaPiece      4  // set pointer in playlist to prev mediapiece (no arg)
 #define CMD_Pause               5  // pause current play (no arg)
-#define CMD_SetPlaylist         6  // sets current playlist.  (arg is *PlayList)
 #define CMD_QuitPlayer          7  // tells player to quit (no arg)
 #define CMD_Cleanup             8  // player tells modules to cleanup and get ready for termination (no arg)
 //#define CMD_Terminate           9  // is sent by player to COOs, and the DummyCOO makes the main thread delete player and exit (no arg)
@@ -77,7 +76,6 @@ class EventQueue {
 #define INFO_LMCError           28 // sent by LMC to player to signal an error condition in the decoder
 #define INFO_MPEGInfo			29 // info about MPEG stuff (layer, samprate, etc.)
 #define INFO_ID3TagInfo			30 // info about ID3 tag
-#define INFO_PlayList			31 // sent by player to UIs notifying of new playlist
 #endif // _EVENT_H_
 
 

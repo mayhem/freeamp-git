@@ -29,7 +29,7 @@ ____________________________________________________________________________*/
 #include "playlist.h"
 #include "vector.h"
 
-PlayList::PlayList() {
+PlayListManager::PlayListManager() {
     m_pMediaElems = new Vector<PlayListItem *>();
     m_pOrderList = new Vector<OrderListItem *>();
     if (!m_pMediaElems || !m_pOrderList) {
@@ -43,7 +43,7 @@ PlayList::PlayList() {
     srand((unsigned int) time(NULL));
 }
 
-PlayList::~PlayList() {
+PlayListManager::~PlayListManager() {
     if (m_pMediaElems) {
         m_pMediaElems->DeleteAll();
 	    delete m_pMediaElems;
@@ -56,7 +56,7 @@ PlayList::~PlayList() {
     }
 }
 
-void PlayList::Add(char *pc, int type) {
+void PlayListManager::Add(char *pc, int type) {
     if (pc) {
 	//int len = strlen(pc) + 1;
 	//char *pNewC = new char[len];
@@ -104,22 +104,22 @@ void PlayList::Add(char *pc, int type) {
     }
 }
 
-PlayListItem *PlayList::GetFirst() {
+PlayListItem *PlayListManager::GetFirst() {
     SetFirst();
     return GetCurrent();
 }
 
-PlayListItem *PlayList::GetNext() {
+PlayListItem *PlayListManager::GetNext() {
     SetNext();
     return GetCurrent();
 }
 
-PlayListItem *PlayList::GetPrev() {
+PlayListItem *PlayListManager::GetPrev() {
     SetPrev();
     return GetCurrent();
 }
 
-PlayListItem *PlayList::GetCurrent() {
+PlayListItem *PlayListManager::GetCurrent() {
     OrderListItem *order_item = m_pOrderList->ElementAt(m_current);
     if (order_item) {
 	return m_pMediaElems->ElementAt(order_item->m_index);
@@ -128,7 +128,7 @@ PlayListItem *PlayList::GetCurrent() {
     }
 }
 
-void PlayList::SetFirst() { 
+void PlayListManager::SetFirst() { 
     if (m_order == ORDER_RANDOM) {
 	SetNext();
     } else {
@@ -136,7 +136,7 @@ void PlayList::SetFirst() {
     }
 }
 
-void PlayList::SetNext() { 
+void PlayListManager::SetNext() { 
     if (m_repeat == REPEAT_CURRENT) {
 	return;
     }
@@ -154,7 +154,7 @@ void PlayList::SetNext() {
     }
 }
 
-void PlayList::SetPrev() {
+void PlayListManager::SetPrev() {
     if (m_repeat == REPEAT_CURRENT) {
 	return;
     }
@@ -169,7 +169,7 @@ void PlayList::SetPrev() {
     }
 }
 
-void PlayList::SetOrder(OrderOfPlay oop) {
+void PlayListManager::SetOrder(OrderOfPlay oop) {
     if (oop == m_order) return;
     if (oop == ORDER_SHUFFLED) {
 	ShuffleOrder();
@@ -179,11 +179,11 @@ void PlayList::SetOrder(OrderOfPlay oop) {
     m_order = oop;
 }
 
-void PlayList::SetRepeat(RepeatPlay rp) {
+void PlayListManager::SetRepeat(RepeatPlay rp) {
     m_repeat = rp;
 }
 
-void PlayList::InitializeOrder() {
+void PlayListManager::InitializeOrder() {
     int32 element_count = m_pOrderList->NumElements();
     if (element_count < 1) {
 	return;
@@ -206,7 +206,7 @@ void PlayList::InitializeOrder() {
     }
 }
 
-void PlayList::ShuffleOrder() {
+void PlayListManager::ShuffleOrder() {
     int32 element_count = m_pOrderList->NumElements();
     if (element_count < 1) {
 	return;
@@ -240,7 +240,7 @@ void PlayList::ShuffleOrder() {
     }
 }
 
-void PlayList::QuickSortOrderList(int32 first, int32 last) {
+void PlayListManager::QuickSortOrderList(int32 first, int32 last) {
     if (first < last) {
 	int32 q = PartitionOrderList(first, last);
 	QuickSortOrderList(first, q);
@@ -248,7 +248,7 @@ void PlayList::QuickSortOrderList(int32 first, int32 last) {
     }
 }
 
-int32 PlayList::PartitionOrderList(int32 first, int32 last) {
+int32 PlayListManager::PartitionOrderList(int32 first, int32 last) {
     int32 x = m_pOrderList->ElementAt(first)->m_random;
     int32 i = first - 1;
     int32 j = last + 1;

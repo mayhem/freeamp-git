@@ -107,6 +107,7 @@ UserInterface()
 	g_displayInfo.seconds = 0;
 	g_displayInfo.frame = 0;
     m_secondsPerFrame = 0;
+	m_plm = NULL;
 }
 
 FreeAmpUI::
@@ -197,12 +198,6 @@ AcceptEvent(Event* event)
 	            break; 
             }
 
-			case INFO_PlayList: 
-			{
-				PlayListEvent *info = (PlayListEvent *)event;
-				m_playList = info->GetPlayList();
-				break;
-			}
 
 			case INFO_MPEGInfo: 
 			{
@@ -302,7 +297,6 @@ void
 FreeAmpUI::
 SetArgs(int32 argc, char** argv)
 {
-    PlayList* playlist = new PlayList;
     char *arg = NULL;
     bool shuffle = false;
     bool autoplay = false;
@@ -331,18 +325,16 @@ SetArgs(int32 argc, char** argv)
         }
         else 
         {
-            playlist->Add(arg,0);
+            m_plm->Add(arg,0);
             count++;
 	    }
     }
 
-    playlist->SetFirst();
+    m_plm->SetFirst();
 
     if(shuffle) 
-        playlist->SetOrder(PlayList::ORDER_SHUFFLED);
+        m_plm->SetOrder(PlayListManager::ORDER_SHUFFLED);
     
-    m_target->AcceptEvent(new SetPlayListEvent(playlist));
-
 
     if(count)
     {
@@ -353,6 +345,12 @@ SetArgs(int32 argc, char** argv)
     }
     //if(autoplay)
        //m_target->AcceptEvent(m_target, new Event(CMD_Play));
+}
+
+void
+FreeAmpUI::
+SetPlayListManager(PlayListManager *plm) {
+	m_plm = plm;
 }
 
 void
