@@ -113,7 +113,7 @@ pBase = 0;
    else
       m_hWnd = (HWND)pProp->GetInt32();
    
-   SetupVolumeControl( m_hWnd );
+   m_volume = new Win32Volume(Win32Volume::eWaveOut, hWnd);
 } 
 
 SoundCardPMO::~SoundCardPMO()
@@ -153,23 +153,11 @@ SoundCardPMO::~SoundCardPMO()
       g_pHeaderMutex = NULL;
    }
 
-/* GetInstance() returns only one pointer, so any deletion will cause segfaults
-   TODO: Add destruction/management of m_volume, perhaps to Win32Volume
-
    if ( m_volume )
    {
         delete m_volume;
         m_volume = NULL;
    }
-*/
-}
-
-bool SoundCardPMO::SetupVolumeControl( HWND hWnd)
-{
-
-    m_volume = Win32Volume::GetInstance( Win32Volume::eWaveOut, hWnd );
-
-    return !!m_volume;
 }
 
 void SoundCardPMO::GetVolume(int32 &left, int32 &right) 

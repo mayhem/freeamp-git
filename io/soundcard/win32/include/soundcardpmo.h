@@ -56,7 +56,6 @@ public:
  
  private:
 
-    bool          SetupVolumeControl( HWND );
     void          WorkerThread(void); 
     virtual Error Reset(bool user_stop);
     void          HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent);
