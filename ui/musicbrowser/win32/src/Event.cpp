@@ -423,6 +423,9 @@ void MusicBrowserUI::EditInfoEvent()
             if(m_editTrackMetaData.Album() != kMultipleAlbums)
                 newMetaData.SetAlbum(m_editTrackMetaData.Album().c_str());
 
+            if(m_editTrackMetaData.Title() != kMultipleTracks)
+                newMetaData.SetTitle(m_editTrackMetaData.Title().c_str());
+
             if(m_editTrackMetaData.Genre() != kMultipleGenres)
                 newMetaData.SetGenre(m_editTrackMetaData.Genre().c_str());
 
