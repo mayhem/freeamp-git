@@ -25,7 +25,7 @@
 include @top_srcdir@/config/Makefile.header
 
 PLUGIN_DIR = @top_srcdir@/plugins/
-PLUGIN_NAME = localfileinput-@target_os@.pmi
+PLUGIN_NAME = localfileinput-@host_os@.pmi
 PLUGIN_FULL_NAME = $(PLUGIN_DIR)$(PLUGIN_NAME)
 
 
@@ -36,7 +36,7 @@ TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
 else
 FILES = localfileinput.cpp filebuffer.cpp
 MYLIBS = libfaio.a
-TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
+TRGT_SYS_HEADS = @top_srcdir@/base/unix/@host_os@/include
 
 all-local : $(PLUGIN_FULL_NAME)
 

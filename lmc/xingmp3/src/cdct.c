@@ -39,7 +39,7 @@ portable C
 #include <float.h>
 #include <math.h>
 
-static float coef32[31];	/* 32 pt dct coefs */
+float coef32[31];	/* 32 pt dct coefs */
 
 /*------------------------------------------------------------*/
 float *dct_coef_addr()
@@ -95,6 +95,7 @@ extern int enableEQ;
 #endif
 #undef _EQUALIZER_ENABLE_
 
+#ifndef ASM_FDCT32
 void fdct32(float x[], float c[])
 {
    float a[32];			/* ping pong buffers */
@@ -108,7 +109,7 @@ void fdct32(float x[], float c[])
            for(i=0; i<32; i++)
                    x[i] *= equalizer[i];
    }
-#endif  //_EQUALIZER_ENABLE_
+#endif  /* _EQUALIZER_ENABLE_ */
 #undef  _EQUALIZER_ENABLE_
 
 /* special first stage */
@@ -126,6 +127,7 @@ void fdct32(float x[], float c[])
    back_bf(2, 16, a, b);
    back_bf(1, 32, b, c);
 }
+#endif	/* ndef ASM_FDCT32 */
 /*------------------------------------------------------------*/
 void fdct32_dual(float x[], float c[])
 {

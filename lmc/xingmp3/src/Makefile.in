@@ -60,12 +60,8 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_alias = @build_alias@
-build_triplet = @build@
 host_alias = @host_alias@
 host_triplet = @host@
-target_alias = @target_alias@
-target_triplet = @target@
 CC = @CC@
 CXX = @CXX@
 GTK_CFLAGS = @GTK_CFLAGS@
@@ -75,28 +71,44 @@ MAKEINFO = @MAKEINFO@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
-target_os = @target_os@
+host_os = @host_os@
 
 PLUGIN_DIR = @top_srcdir@/plugins/
-PLUGIN_NAME = xingmp3-@target_os@.lmc
+PLUGIN_NAME = xingmp3-@host_os@.lmc
 PLUGIN_FULL_NAME = $(PLUGIN_DIR)$(PLUGIN_NAME)
 
-@AM_HAVE_WIN32_TRUE@FILES = 
-@AM_HAVE_WIN32_TRUE@MYLIBS = 
+@AM_HAVE_WIN32_TRUE@C_FILES =
+@AM_HAVE_WIN32_TRUE@ASM_FILES =
+@AM_HAVE_WIN32_TRUE@ASM_DEFS =
+@AM_HAVE_WIN32_TRUE@MYLIBS =
 @AM_HAVE_WIN32_TRUE@TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
-@AM_HAVE_WIN32_FALSE@FILES = cdct.c cupl3.c hwin.c iup.c l3init.c msis.c wavep.c csbt.c cwinm.c icdct.c mdct.c uph.c cup.c dec8.c isbt.c l3dq.c mhead.c \
-@AM_HAVE_WIN32_FALSE@        upsf.c iwinm.c xinglmc.cpp
+@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_TRUE@C_FILES = cdct.c cupl3.c hwin.c iup.c l3init.c msis.c wavep.c csbt.c \
+@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_TRUE@          cwinm.c icdct.c mdct.c uph.c cup.c dec8.c isbt.c l3dq.c \
+@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_TRUE@          mhead.c upsf.c iwinm.c xinglmc.cpp
+@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_TRUE@ASM_FILES = x86gas.s
+@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_TRUE@ASM_DEFS = -DASM_FDCT32 -DASM_WINDOW_DUAL
+# A bug in automake forces us to redundantly declare C_FILES
+@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_FALSE@C_FILES = cdct.c cupl3.c hwin.c iup.c l3init.c msis.c wavep.c csbt.c \
+@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_FALSE@          cwinm.c icdct.c mdct.c uph.c cup.c dec8.c isbt.c l3dq.c \
+@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_FALSE@          mhead.c upsf.c iwinm.c xinglmc.cpp
+@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_FALSE@ASM_FILES =
+@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_FALSE@ASM_DEFS =
 @AM_HAVE_WIN32_FALSE@MYLIBS = libfalmc.a
-@AM_HAVE_WIN32_FALSE@TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
+@AM_HAVE_WIN32_FALSE@TRGT_SYS_HEADS = @top_srcdir@/base/unix/@host_os@/include
 
 @AM_HAVE_LINUXTHREADS_TRUE@REENT = -D_REENTRANT
 
-noinst_LIBRARIES = $(MYLIBS)
-libfalmc_a_SOURCES = $(FILES)
+@AM_MP3_PROF_TRUE@MP3_PROF = -pg
 
-INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) -I@top_srcdir@/io/include -I@top_srcdir@/ui/include -I@top_srcdir@/lmc/include
+noinst_LIBRARIES = $(MYLIBS)
+libfalmc_a_SOURCES = $(C_FILES) $(ASM_FILES)
+
+INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include \
+           -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) \
+           -I@top_srcdir@/io/include -I@top_srcdir@/ui/include \
+           -I@top_srcdir@/lmc/include
 CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT)
-CFLAGS = $(EXTRA_CFLAGS) $(REENT)
+CFLAGS = $(MP3_PROF) $(EXTRA_CFLAGS) $(REENT) $(ASM_DEFS)
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = ../../../config/config.h
 CONFIG_CLEAN_FILES = 
@@ -112,13 +124,23 @@ X_LIBS = @X_LIBS@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
 X_PRE_LIBS = @X_PRE_LIBS@
 libfalmc_a_LIBADD = 
-@AM_HAVE_WIN32_TRUE@cond0libfalmc_a_OBJECTS = 
-@AM_HAVE_WIN32_FALSE@cond1libfalmc_a_OBJECTS =  cdct.o cupl3.o hwin.o \
-@AM_HAVE_WIN32_FALSE@iup.o l3init.o msis.o wavep.o csbt.o cwinm.o \
-@AM_HAVE_WIN32_FALSE@icdct.o mdct.o uph.o cup.o dec8.o isbt.o l3dq.o \
-@AM_HAVE_WIN32_FALSE@mhead.o upsf.o iwinm.o xinglmc.o
+@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_TRUE@cond0libfalmc_a_OBJECTS =  cdct.o \
+@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_TRUE@cupl3.o hwin.o iup.o l3init.o \
+@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_TRUE@msis.o wavep.o csbt.o cwinm.o \
+@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_TRUE@icdct.o mdct.o uph.o cup.o \
+@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_TRUE@dec8.o isbt.o l3dq.o mhead.o \
+@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_TRUE@upsf.o iwinm.o xinglmc.o \
+@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_TRUE@x86gas.o
+@AM_HAVE_WIN32_TRUE@cond1libfalmc_a_OBJECTS = 
+@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_FALSE@cond2libfalmc_a_OBJECTS =  \
+@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_FALSE@cdct.o cupl3.o hwin.o iup.o \
+@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_FALSE@l3init.o msis.o wavep.o csbt.o \
+@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_FALSE@cwinm.o icdct.o mdct.o uph.o \
+@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_FALSE@cup.o dec8.o isbt.o l3dq.o \
+@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_FALSE@mhead.o upsf.o iwinm.o \
+@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_FALSE@xinglmc.o
 libfalmc_a_OBJECTS =  $(cond0libfalmc_a_OBJECTS) \
-$(cond1libfalmc_a_OBJECTS)
+$(cond1libfalmc_a_OBJECTS) $(cond2libfalmc_a_OBJECTS)
 AR = ar
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 CXXLINK = $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@
@@ -135,7 +157,7 @@ DEP_FILES =  .deps/cdct.P .deps/csbt.P .deps/cup.P .deps/cupl3.P \
 .deps/cwinm.P .deps/dec8.P .deps/hwin.P .deps/icdct.P .deps/isbt.P \
 .deps/iup.P .deps/iwinm.P .deps/l3dq.P .deps/l3init.P .deps/mdct.P \
 .deps/mhead.P .deps/msis.P .deps/uph.P .deps/upsf.P .deps/wavep.P \
-.deps/xinglmc.P
+.deps/x86gas.P .deps/xinglmc.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 SOURCES = $(libfalmc_a_SOURCES)
 OBJECTS = $(libfalmc_a_OBJECTS)

@@ -39,6 +39,8 @@
 #define HAVE_LINUX 0
 #define HAVE_SOLARIS 0
 
+#define MP3_PROF 0
+
 #if HAVE_BROKENMITPTHREADS
 #define _MIT_POSIX_THREADS
 #endif

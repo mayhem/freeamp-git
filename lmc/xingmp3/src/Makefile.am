@@ -25,18 +25,32 @@
 include @top_srcdir@/config/Makefile.header
 
 PLUGIN_DIR = @top_srcdir@/plugins/
-PLUGIN_NAME = xingmp3-@target_os@.lmc
+PLUGIN_NAME = xingmp3-@host_os@.lmc
 PLUGIN_FULL_NAME = $(PLUGIN_DIR)$(PLUGIN_NAME)
 
 if AM_HAVE_WIN32
-FILES = 
-MYLIBS = 
+C_FILES =
+ASM_FILES =
+ASM_DEFS =
+MYLIBS =
 TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
 else
-FILES = cdct.c cupl3.c hwin.c iup.c l3init.c msis.c wavep.c csbt.c cwinm.c icdct.c mdct.c uph.c cup.c dec8.c isbt.c l3dq.c mhead.c \
-        upsf.c iwinm.c xinglmc.cpp
+if AM_HAVE_X86
+C_FILES = cdct.c cupl3.c hwin.c iup.c l3init.c msis.c wavep.c csbt.c \
+          cwinm.c icdct.c mdct.c uph.c cup.c dec8.c isbt.c l3dq.c \
+          mhead.c upsf.c iwinm.c xinglmc.cpp
+ASM_FILES = x86gas.s
+ASM_DEFS = -DASM_FDCT32 -DASM_WINDOW_DUAL
+else
+# A bug in automake forces us to redundantly declare C_FILES
+C_FILES = cdct.c cupl3.c hwin.c iup.c l3init.c msis.c wavep.c csbt.c \
+          cwinm.c icdct.c mdct.c uph.c cup.c dec8.c isbt.c l3dq.c \
+          mhead.c upsf.c iwinm.c xinglmc.cpp
+ASM_FILES =
+ASM_DEFS =
+endif
 MYLIBS = libfalmc.a
-TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
+TRGT_SYS_HEADS = @top_srcdir@/base/unix/@host_os@/include
 
 all-local : $(PLUGIN_FULL_NAME)
 
@@ -51,12 +65,16 @@ if AM_HAVE_LINUXTHREADS
 REENT = -D_REENTRANT
 endif
 
+if AM_MP3_PROF
+MP3_PROF = -pg
+endif
 
 noinst_LIBRARIES = $(MYLIBS)
-libfalmc_a_SOURCES = $(FILES)
+libfalmc_a_SOURCES = $(C_FILES) $(ASM_FILES)
 
-INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) -I@top_srcdir@/io/include -I@top_srcdir@/ui/include -I@top_srcdir@/lmc/include
+INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include \
+           -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) \
+           -I@top_srcdir@/io/include -I@top_srcdir@/ui/include \
+           -I@top_srcdir@/lmc/include
 CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT)
-CFLAGS = $(EXTRA_CFLAGS) $(REENT)
-
-
+CFLAGS = $(MP3_PROF) $(EXTRA_CFLAGS) $(REENT) $(ASM_DEFS)

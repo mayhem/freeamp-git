@@ -31,7 +31,7 @@ TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
 else
 FILES = lmcregistry.cpp
 MYLIBS = libfalmcsrc.a
-TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
+TRGT_SYS_HEADS = @top_srcdir@/base/unix/@host_os@/include
 endif
 
 if AM_HAVE_LINUXTHREADS

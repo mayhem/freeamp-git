@@ -19,8 +19,8 @@ dnl
 dnl Process this file with your mom to produce a configure script
 AC_INIT(base/src/player.cpp)
 AC_CONFIG_AUX_DIR(config)
-AC_CANONICAL_SYSTEM
-AM_INIT_AUTOMAKE(freeamp, 0.2)
+AC_CANONICAL_HOST
+AM_INIT_AUTOMAKE(freeamp, 1.1.0)
 AM_CONFIG_HEADER(config/config.h)
 
 AC_PROG_MAKE_SET
@@ -40,12 +40,12 @@ AC_HAVE_HEADERS(unistd.h io.h pthread.h)
 x11="true"
 
 AC_ARG_ENABLE(x11,
-		[  --enable-x11   Build the FreeAmp X11 GUI],
-		[case "${enableval}" in
-		  yes) x11="true" ;;
-		  no) x11="false" ;;
-		  *) AC_MSG_ERROR(bad value ${enableval} for --enable-x11) ;;
-		esac])
+	[  --enable-x11            Build the FreeAmp X11 GUI],
+	[case "${enableval}" in
+	  yes) x11="true" ;;
+	  no) x11="false" ;;
+	  *) AC_MSG_ERROR(bad value ${enableval} for --enable-x11) ;;
+	esac])
 
 dnl ******************
 dnl Checks for X stuff
@@ -169,24 +169,25 @@ AC_CHECK_LIB(dl, dlopen, foo="bar",
 
 dnl Check for some more stuff
 
-AC_SUBST(target_os)
+AC_SUBST(host_os)
 
-if test "$target_os" = "linux"; then
+if test "$host_os" = "linux"; then
    AC_DEFINE(HAVE_LINUX)
-elif test "$target_os" = "solaris2.6"; then
+elif test "$host_os" = "solaris2.6"; then
    AC_DEFINE(HAVE_SOLARIS)
 fi
 
-if test "$target_os" = "windowsnt"; then
+if test "$host_os" = "windowsnt"; then
    cmdline="false"
 else
    cmdline="true"
 fi
 
+
 gtk="false"
 
 AC_ARG_ENABLE(gtk,
-	      [  --enable-gtk     Build GTK+ version of FreeAmp],
+	      [  --enable-gtk            Build GTK+ version of FreeAmp],
               [case "${enableval}" in
 		yes) gtk="true" ;;
 		no)  gtk="false" ;;
@@ -205,6 +206,22 @@ echo GTK+ compilation disabled
 fi
 
 AM_CONDITIONAL(AM_ENABLE_GTK, test "$gtk" = "true")
+
+
+mp3prof="false"
+
+AC_ARG_ENABLE(mp3prof,
+	[  --enable-mp3prof        Enable profiling of the MP3 decoder (linux only!)],
+	[case "${enableval}" in
+	  yes) mp3prof="true" ;;
+	  no) mp3prof="false" ;;
+	  *) AC_MSG_ERROR(bad value ${enableval} for --enable-mp3prof) ;;
+	esac])
+
+if test "$mp3prof" = "true"; then
+   AC_DEFINE(MP3_PROF)
+fi
+
 
 dnl *****
 dnl Check for LinuxThreads or MIT pthreads
@@ -274,7 +291,7 @@ dnl AC_CHECK_LIB(asound, main)
 AM_CONDITIONAL(AM_HAVE_LINUXTHREADS, test "$hblt" = "true")
 
 AC_ARG_ENABLE(cmdline,
-	      [  --enable-cmdline     Build command line freeamp],
+	      [  --enable-cmdline        Build command line freeamp],
 	      [case "${enableval}" in
 	        yes) cmdline="true" ;;
 		no)  cmdline="false" ;;
@@ -284,7 +301,7 @@ AM_CONDITIONAL(AM_ENABLE_CMDLINE, test "$cmdline" = "true")
 
 
 AC_ARG_ENABLE(x11,
-		[  --enable-x11   Build the FreeAmp X11 GUI],
+		[  --enable-x11            Build the FreeAmp X11 GUI],
 		[case "${enableval}" in
 		  yes) x11="true" ;;
 		  no) x11="false" ;;
@@ -306,9 +323,11 @@ have_alsa="false"
 )
 
 AM_CONDITIONAL(AM_HAVE_ALSA, test "$have_alsa" = "true")
+AM_CONDITIONAL(AM_MP3_PROF, test "$mp3prof" = "true")
 
-AM_CONDITIONAL(AM_HAVE_WIN32, test "$target_os" = "windowsnt")
-AM_CONDITIONAL(AM_HAVE_LINUX, test "$target_os" = "linux")
+AM_CONDITIONAL(AM_HAVE_WIN32, test "$host_os" = "windowsnt")
+AM_CONDITIONAL(AM_HAVE_LINUX, test "$host_os" = "linux")
+AM_CONDITIONAL(AM_HAVE_X86, expr "$host_cpu" : "i.86$" > /dev/null)
 AC_OUTPUT(Makefile base/Makefile base/src/Makefile io/Makefile
           base/unix/Makefile ui/freeamp/Makefile ui/freeamp/unix/Makefile ui/freeamp/unix/src/Makefile
 	  ui/Makefile base/unix/linux/Makefile base/unix/linux/src/Makefile

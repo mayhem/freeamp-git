@@ -25,7 +25,7 @@
 include @top_srcdir@/config/Makefile.header
 
 PLUGIN_DIR = @top_srcdir@/plugins/
-PLUGIN_NAME = alsa-@target_os@.pmo
+PLUGIN_NAME = alsa-@host_os@.pmo
 PLUGIN_FULL_NAME = $(PLUGIN_DIR)$(PLUGIN_NAME)
 
 if AM_HAVE_ALSA
@@ -55,7 +55,7 @@ endif
 noinst_LIBRARIES = $(MYLIBS)
 libfaio_a_SOURCES = $(FILES)
 
-INCLUDES = -I@top_srcdir@/base/include -I@top_srcdir@/base/unix/@target_os@/include  -I@srcdir@/../include -I@top_srcdir@/config -I@top_srcdir@/io/include -I@top_srcdir@/ui/include
+INCLUDES = -I@top_srcdir@/base/include -I@top_srcdir@/base/unix/@host_os@/include  -I@srcdir@/../include -I@top_srcdir@/config -I@top_srcdir@/io/include -I@top_srcdir@/ui/include
 CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT)
 
 

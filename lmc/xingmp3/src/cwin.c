@@ -104,6 +104,7 @@ void window(float *vbuf, int vb_ptr, short *pcm)
 
 
 /*------------------------------------------------------------*/
+#ifndef ASM_WINDOW_DUAL
 void window_dual(float *vbuf, int vb_ptr, short *pcm)
 {
    int i, j;			/* dual window interleaves output */
@@ -174,6 +175,7 @@ void window_dual(float *vbuf, int vb_ptr, short *pcm)
       pcm += 2;
    }
 }
+#endif	/* ndef ASM_WINDOW_DUAL */
 /*------------------------------------------------------------*/
 /*------------------- 16 pt window ------------------------------*/
 void window16(float *vbuf, int vb_ptr, short *pcm)

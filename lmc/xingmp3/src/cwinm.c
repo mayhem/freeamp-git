@@ -43,7 +43,7 @@ portable C
 #pragma warning(disable:4244 4056)
 #endif
 
-static float wincoef[264] =
+float wincoef[264] =
 {				/* window coefs */
 #include "tableawd.h"
 };

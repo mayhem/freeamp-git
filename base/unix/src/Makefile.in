@@ -60,12 +60,8 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_alias = @build_alias@
-build_triplet = @build@
 host_alias = @host_alias@
 host_triplet = @host@
-target_alias = @target_alias@
-target_triplet = @target@
 CC = @CC@
 CXX = @CXX@
 GTK_CFLAGS = @GTK_CFLAGS@
@@ -75,7 +71,7 @@ MAKEINFO = @MAKEINFO@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
-target_os = @target_os@
+host_os = @host_os@
 
 @AM_HAVE_WIN32_TRUE@FILES = 
 @AM_HAVE_WIN32_TRUE@MYLIBS = 
@@ -87,7 +83,7 @@ target_os = @target_os@
 noinst_LIBRARIES = $(MYLIBS)
 libfaunix_a_SOURCES = $(FILES)
 
-INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I@top_srcdir@/io/include -I@top_srcdir@/ui/include -I@top_srcdir@/base/unix/@target_os@/include -I@top_srcdir@/ui/dummy/include -I@top_srcdir@/lmc/include
+INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I@top_srcdir@/io/include -I@top_srcdir@/ui/include -I@top_srcdir@/base/unix/@host_os@/include -I@top_srcdir@/ui/dummy/include -I@top_srcdir@/lmc/include
 CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT) -DUNIX_LIBDIR="\"@libdir@\""
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = ../../../config/config.h

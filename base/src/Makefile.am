@@ -32,7 +32,7 @@ TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
 FILES = 
 INCLS = 
 else
-TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
+TRGT_SYS_HEADS = @top_srcdir@/base/unix/@host_os@/include
 FILES = player.cpp playlist.cpp hashtable.cpp thread.cpp registrar.cpp \
         registry.cpp propimpl.cpp log.cpp
 INCLS = -I@top_srcdir@/base/unix/include

@@ -60,12 +60,8 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_alias = @build_alias@
-build_triplet = @build@
 host_alias = @host_alias@
 host_triplet = @host@
-target_alias = @target_alias@
-target_triplet = @target@
 CC = @CC@
 CXX = @CXX@
 GTK_CFLAGS = @GTK_CFLAGS@
@@ -75,10 +71,10 @@ MAKEINFO = @MAKEINFO@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
-target_os = @target_os@
+host_os = @host_os@
 
 PLUGIN_DIR = @top_srcdir@/plugins/
-PLUGIN_NAME = httpinput-@target_os@.pmi
+PLUGIN_NAME = httpinput-@host_os@.pmi
 PLUGIN_FULL_NAME = $(PLUGIN_DIR)$(PLUGIN_NAME)
 
 @AM_HAVE_WIN32_TRUE@FILES = 
@@ -86,7 +82,7 @@ PLUGIN_FULL_NAME = $(PLUGIN_DIR)$(PLUGIN_NAME)
 @AM_HAVE_WIN32_TRUE@TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
 @AM_HAVE_WIN32_FALSE@FILES = httpinput.cpp httpbuffer.cpp
 @AM_HAVE_WIN32_FALSE@MYLIBS = libfaio.a
-@AM_HAVE_WIN32_FALSE@TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
+@AM_HAVE_WIN32_FALSE@TRGT_SYS_HEADS = @top_srcdir@/base/unix/@host_os@/include
 
 @AM_HAVE_LINUXTHREADS_TRUE@REENT = -D_REENTRANT
 
@@ -94,7 +90,7 @@ noinst_LIBRARIES = $(MYLIBS)
 libfaio_a_SOURCES = $(FILES)
 
 INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS)
-CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT) -D__@target_os@__
+CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT) -D__@host_os@__
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = ../../config/config.h
 CONFIG_CLEAN_FILES = 

@@ -60,12 +60,8 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_alias = @build_alias@
-build_triplet = @build@
 host_alias = @host_alias@
 host_triplet = @host@
-target_alias = @target_alias@
-target_triplet = @target@
 CC = @CC@
 CXX = @CXX@
 GTK_CFLAGS = @GTK_CFLAGS@
@@ -75,15 +71,15 @@ MAKEINFO = @MAKEINFO@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
-target_os = @target_os@
+host_os = @host_os@
 
 PLUGIN_DIR = @top_srcdir@/plugins/
-PLUGIN_NAME = freeamp-@target_os@.ui
+PLUGIN_NAME = freeamp-@host_os@.ui
 PLUGIN_FULL_NAME = $(PLUGIN_DIR)$(PLUGIN_NAME)
 
 @AM_ENABLE_X11_TRUE@FILES = freeamp.cpp windowhash.cpp fawindow.cpp res.cpp
 @AM_ENABLE_X11_TRUE@MYLIBS = libfaui.a
-@AM_ENABLE_X11_TRUE@TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
+@AM_ENABLE_X11_TRUE@TRGT_SYS_HEADS = @top_srcdir@/base/unix/@host_os@/include
 
 @AM_ENABLE_X11_FALSE@FILES = 
 @AM_ENABLE_X11_FALSE@MYLIBS = 

@@ -25,7 +25,7 @@
 include @top_srcdir@/config/Makefile.header
 
 PLUGIN_DIR = @top_srcdir@/plugins/
-PLUGIN_NAME = httpinput-@target_os@.pmi
+PLUGIN_NAME = httpinput-@host_os@.pmi
 PLUGIN_FULL_NAME = $(PLUGIN_DIR)$(PLUGIN_NAME)
 
 
@@ -36,7 +36,7 @@ TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
 else
 FILES = httpinput.cpp httpbuffer.cpp
 MYLIBS = libfaio.a
-TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
+TRGT_SYS_HEADS = @top_srcdir@/base/unix/@host_os@/include
 
 all-local : $(PLUGIN_FULL_NAME)
 
@@ -55,7 +55,7 @@ noinst_LIBRARIES = $(MYLIBS)
 libfaio_a_SOURCES = $(FILES)
 
 INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS)
-CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT) -D__@target_os@__
+CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT) -D__@host_os@__
 
 
 

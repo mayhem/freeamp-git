@@ -607,13 +607,30 @@ Error XingLMC::Decode(int32 iSkipNumFrames)
    return kError_NoErr;
 }
 
+#if MP3_PROF
+extern "C"
+{
+   etext();
+   monstartup();
+   _mcleanup();
+}
+#endif
+
 void XingLMC::DecodeWorkerThreadFunc(void *pxlmc)
 {
    if (pxlmc)
    {
       XingLMC  *xlmc = (XingLMC *) pxlmc;
 
+#if MP3_PROF
+      monstartup(0x08040000, etext);
+#endif
+
       xlmc->DecodeWork();
+
+#if MP3_PROF
+      _mcleanup();
+#endif
    }
 }
 

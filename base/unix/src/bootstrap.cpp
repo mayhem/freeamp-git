@@ -24,6 +24,7 @@ ____________________________________________________________________________*/
 #include <iostream.h>
 #include <stdio.h>
 
+#include "config.h"
 #include "player.h"
 #include "event.h"
 #include "ui.h"
@@ -32,6 +33,11 @@ ____________________________________________________________________________*/
 #include "semaphore.h"
 #include "registrar.h"
 
+#if MP3_PROF
+extern "C" {
+  Initialize();
+}
+#endif
 
 void testVector();
 void testHashTable();
@@ -64,11 +70,23 @@ int main(int argc, char **argv) {
     PMORegistry *pmo;
     UIRegistry* ui;
     
+    lmc = new LMCRegistry();
+#if MP3_PROF
+    {
+	RegistryItem* item = new RegistryItem;
+	item->SetPath("[builtin]");
+	item->SetName("xingmp3-linux.lmc");
+	item->SetDescription("xingmp3-linux.lmc");
+	item->SetInitFunction((InitializeFunction)Initialize);
+	lmc->Add(item);
+    }
+#else
 //    registrar->SetSubDir("lmc");
     registrar->SetSubDir("plugins");
     registrar->SetSearchString("*.lmc");
-    lmc = new LMCRegistry();
     registrar->InitializeRegistry(lmc,prefs);
+#endif
+
 
 //    registrar->SetSubDir("io");
     registrar->SetSubDir("plugins");

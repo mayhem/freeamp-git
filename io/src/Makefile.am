@@ -31,7 +31,7 @@ TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
 else
 FILES = pmiregistry.cpp pmoregistry.cpp pullbuffer.cpp streambuffer.cpp
 MYLIBS = libfaiosrc.a
-TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
+TRGT_SYS_HEADS = @top_srcdir@/base/unix/@host_os@/include
 endif
 
 if AM_HAVE_LINUXTHREADS
@@ -43,8 +43,8 @@ noinst_LIBRARIES = $(MYLIBS)
 libfaiosrc_a_SOURCES = $(FILES)
 
 INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) -I@top_srcdir@/io/include -I@top_srcdir@/ui/include -I@top_srcdir@/lmc/include
-CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT) -D__@target_os@__
-CFLAGS = $(EXTRA_CFLAGS) $(REENT) -D__@target_os@__
+CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT) -D__@host_os@__
+CFLAGS = $(EXTRA_CFLAGS) $(REENT) -D__@host_os@__
 
 
 

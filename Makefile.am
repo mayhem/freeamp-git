@@ -30,21 +30,29 @@ if AM_HAVE_WIN32
 PRG =
 else
 PRG = freeamp
-ALLLDADD = @top_srcdir@/base/unix/@target_os@/src/*.o \
-          @top_srcdir@/base/unix/src/*.o \
-	  @top_srcdir@/lmc/src/*.o \
-	  @top_srcdir@/io/src/*.o \
-	  @top_srcdir@/ui/src/*.o \
-	  -lpthread -lm -ldl
-FALDADD = @top_srcdir@/base/src/*.o $(ALLLDADD)
+if AM_MP3_PROF
+PROF_LD_ADD = @top_srcdir@/lmc/xingmp3/src/*.o
+PROF_DEPS = @top_srcdir@/lmc/xingmp3/src/libfalmc.a
+else
+PROF_LD_ADD =
+PROF_DEPS =
+endif
+ALLLDADD = @top_srcdir@/base/unix/@host_os@/src/*.o \
+           @top_srcdir@/base/unix/src/*.o \
+           @top_srcdir@/lmc/src/*.o \
+           @top_srcdir@/io/src/*.o \
+           @top_srcdir@/ui/src/*.o \
+           -lpthread -lm -ldl
+FALDADD = @top_srcdir@/base/src/*.o $(ALLLDADD) $(PROF_LD_ADD)
 DSLDADD = @top_srcdir@/base/src/player.o @top_srcdir@/base/src/playlist.o @top_srcdir@/base/src/command.o @top_srcdir@/base/src/thread.o $(ALLLDADD)
-MYDEPS = @top_srcdir@/base/unix/@target_os@/src/libfasys.a \
+MYDEPS = @top_srcdir@/base/unix/@host_os@/src/libfasys.a \
          @top_srcdir@/base/src/libfabase.a \
-	 @top_srcdir@/base/unix/src/libfaunix.a \
-	 @top_srcdir@/lmc/src/libfalmcsrc.a \
-	 @top_srcdir@/io/src/libfaiosrc.a \
-	 @top_srcdir@/ui/src/libfauisrc.a
-TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
+         @top_srcdir@/base/unix/src/libfaunix.a \
+         @top_srcdir@/lmc/src/libfalmcsrc.a \
+         @top_srcdir@/io/src/libfaiosrc.a \
+         @top_srcdir@/ui/src/libfauisrc.a \
+         $(PROF_DEPS)
+TRGT_SYS_HEADS = @top_srcdir@/base/unix/@host_os@/include
 endif
 
 
@@ -58,7 +66,7 @@ freeamp_DEPENDENCIES = $(MYDEPS)
 ## decspeed_DEPENDENCIES = $(MYDEPS)
 
 INCLUDES = -I@top_srcdir@/base/include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) -I@top_srcdir@/io/include -I@top_srcdir@/ui/include -I@top_srcdir@/lmc/include
-CXXFLAGS = $(EXTRA_CXXFLAGS) -D__@target_os@__ -Wl,-export-dynamic
+CXXFLAGS = $(EXTRA_CXXFLAGS) -D__@host_os@__ -Wl,-export-dynamic
 
 install-exec-local: install_plugins
 

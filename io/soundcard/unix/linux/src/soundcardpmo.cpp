@@ -226,14 +226,14 @@ Write(int32 & rtn, void *pBuffer, int32 length)
    do
    {
       rtn = write(audio_fd, pBuffer, length);
+      if (rtn > 0) {
+         pBuffer = (void *) ((char *) pBuffer + rtn);
+	 length -= rtn;
+      }
    }
-   while ((rtn != length) && (errno == EINTR));
-   if (rtn != length)
+   while (length != 0 && (errno == 0 || errno == EINTR));
+   if (length != 0)
    {
-
-//      cerr << "Wrote " << length << ", and got " << rtn << " back" << endl;
-      // cerr << "errno: " << errno << endl << "str: " << strerror(errno) <<
-      // endl;
       rtn = -1;
       return kError_OutputUnsuccessful;
    }
