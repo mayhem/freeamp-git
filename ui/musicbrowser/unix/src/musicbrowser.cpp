@@ -73,7 +73,9 @@ void MusicBrowserUI::GTKEventService(void)
 {
     weAreGTK = false;
 
-    mainBrowser = new GTKMusicBrowser(m_context, this);
+    string URL = string("file://") + FreeampDir(NULL) + 
+                 string("/currentlist.m3u");
+    mainBrowser = new GTKMusicBrowser(m_context, this, URL);
 
     m_context->gtkLock.Acquire();
     if (!m_context->gtkInitialized) {

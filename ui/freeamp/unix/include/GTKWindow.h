@@ -55,7 +55,9 @@ class GTKWindow : public Window
      virtual Error Restore(void);
      
      GtkWidget *GetWindow(void) { return mainWindow; }
-     
+    
+     void DropFiles(char *filename);
+
     protected:
       Pos m_oWindowPos;
       

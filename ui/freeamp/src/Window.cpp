@@ -323,7 +323,9 @@ void Window::HandleMouseLButtonDown(Pos &oScreenPos)
     }
 
     m_bMouseButtonDown = true;
+#ifndef HAVE_GTK
     CaptureMouse(true);
+#endif
        
     GetWindowPosition(m_oMoveStart);
     m_oMovePos = oScreenPos;
@@ -344,8 +346,10 @@ void Window::HandleMouseLButtonUp(Pos &oScreenPos)
     if (m_bMouseButtonDown)
     {
        m_bMouseButtonDown = false;
+#ifndef HAVE_GTK
        CaptureMouse(false);
-          
+#endif        
+  
        return; 
     }
     

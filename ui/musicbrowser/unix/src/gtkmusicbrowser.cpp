@@ -932,11 +932,13 @@ static void new_plist(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
     p->SaveCurrentPlaylist();
 
-    FileSelector *filesel = new FileSelector("Choose Name for the New Playlist");
-    if (filesel->Run())
-        p->CreateNewEditor(filesel->GetReturnPath());
-    delete filesel;
+    p->CreateNewEditor(NULL);
 }
+
+static void new_plist_tool(GtkWidget *w, GTKMusicBrowser *p)
+{
+    new_plist(p, 1, w);  
+} 
 
 static void open_list(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
@@ -950,6 +952,12 @@ static void open_list(GTKMusicBrowser *p, guint action, GtkWidget *w)
 
 static void save_list(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
+    if (p->m_currentListName.length() == 0) {
+        FileSelector *filesel = new FileSelector("Save This Playlist to Disk");
+        if (filesel->Run())
+            p->m_currentListName = filesel->GetReturnPath();
+    }
+
     p->SaveCurrentPlaylist();
 }
 
@@ -1091,30 +1099,13 @@ void GTKMusicBrowser::UpdatePlaylistList(void)
            usleep(10);
 
         MetaData mdata = item->GetMetaData();
-        char *iText[3];
+        char *iText[4];
+        char position[10];
         char *title;
         char *artist;
         char length[50];
 
-        if (mdata.Title() == "" || mdata.Title() == " ") {
-            char *urlname = new char[_MAX_PATH];
-            char *tempdir = strrchr(item->URL().c_str(), '/');
-            if (tempdir)
-                strcpy(urlname, tempdir + 1);
-            else 
-                strcpy(urlname, item->URL().c_str());
-            tempdir = strrchr(urlname, '.');
-            if (tempdir)
-                *tempdir = '\0';
-            
-            uint32 filelength = strlen(urlname) + 1;
-            char *filename = new char[filelength];
-
-            if (IsntError(URLToFilePath(urlname, filename, &filelength)))
-                mdata.SetTitle(filename);
-            else
-                mdata.SetTitle(urlname);
-        }
+        sprintf(position, "%d", i + 1);
         title = (char *)mdata.Title().c_str();
         artist = (char *)mdata.Artist().c_str();
 
@@ -1123,9 +1114,10 @@ void GTKMusicBrowser::UpdatePlaylistList(void)
         else
             sprintf(length, "%d", mdata.Time());
 
-        iText[0] = title;
-        iText[1] = artist;
-        iText[2] = length;
+        iText[0] = position;
+        iText[1] = title;
+        iText[2] = artist;
+        iText[3] = length;
 
         gtk_clist_append(GTK_CLIST(playlistList), iText);
     }
@@ -1149,17 +1141,17 @@ static void playlist_column_click_internal(GtkCList *clist, gint column,
         p->m_playlistColumnSort = PlaylistSortType_Ascending;
     p->m_playlistLastSort = column;
 
-    sort_playlist_internal(column, p, p->m_playlistColumnSort);
+    sort_playlist_internal(column - 1, p, p->m_playlistColumnSort);
 }
     
 void GTKMusicBrowser::CreatePlaylistList(GtkWidget *box)
 {
     static char *titles[] =
     {
-      "Title", "Artist", "Length"
+      "# ", "Title", "Artist", "Length"
     };
 
-    playlistList = gtk_clist_new_with_titles(3, titles);
+    playlistList = gtk_clist_new_with_titles(4, titles);
     gtk_container_add(GTK_CONTAINER(box), playlistList);
     gtk_signal_connect(GTK_OBJECT(playlistList), "row_move",
                        GTK_SIGNAL_FUNC(playlist_row_move_internal), this);   
@@ -1257,8 +1249,12 @@ void GTKMusicBrowser::CreatePlaylist(void)
     string titlestr = string(BRANDING) + string(" - Music Browser: ");
     if (master)
         titlestr += string("Current listening list");
-    else
-        titlestr += string("Editing playlist ") + m_currentListName;
+    else {
+        if (m_currentListName.length() == 0)
+            titlestr += string("New Playlist");
+        else
+            titlestr += string("Editing playlist ") + m_currentListName;
+    }
     gtk_window_set_title(GTK_WINDOW(musicBrowser), titlestr.c_str());
     gtk_window_set_policy(GTK_WINDOW(musicBrowser), TRUE, TRUE, TRUE);
     gtk_signal_connect(GTK_OBJECT(musicBrowser), "destroy",
@@ -1285,7 +1281,14 @@ void GTKMusicBrowser::CreatePlaylist(void)
                             "Toolbar/MusicSearch", new_pixmap(musicBrowser),
                             GTK_SIGNAL_FUNC(music_search_tool), this);
 
-    gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Import",
+    gtk_toolbar_append_space(GTK_TOOLBAR(toolbar));
+
+    gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "New Playlist",
+                            "Start Editing a new Playlist",
+                            "Toolbar/New", new_pixmap(musicBrowser),
+                            GTK_SIGNAL_FUNC(new_plist_tool), this);
+
+    gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Import Tracks",
                             "Import a Playlist/Track into the Music Catalog",
                             "Toolbar/Import", new_pixmap(musicBrowser),
                             GTK_SIGNAL_FUNC(import_tool), this);
@@ -1324,7 +1327,11 @@ void GTKMusicBrowser::CreatePlaylist(void)
     if (master)
         playlistLabel = gtk_label_new("Currently listening to:");
     else {
-        string labelstr = string("Editing playlist: ") + m_currentListName;
+        string labelstr = string("Editing playlist: ");
+        if (m_currentListName.length() == 0) 
+            labelstr += string("New Playlist");
+        else
+            labelstr += m_currentListName;
         playlistLabel = gtk_label_new(labelstr.c_str());
     }
     gtk_box_pack_start(GTK_BOX(hbox), playlistLabel, FALSE, FALSE, 5);
@@ -1453,7 +1460,7 @@ void GTKMusicBrowser::AddTrackPlaylistEvent(char *path)
         tempurl = new char[_MAX_PATH];
         uint32 length = _MAX_PATH; 
         if (IsntError(FilePathToURL(path, tempurl, &length))) {
-            additReally = false;
+            additReally = true;
             needToDelete = true;
         }
     }
@@ -1595,10 +1602,7 @@ GTKMusicBrowser::GTKMusicBrowser(FAContext *context, MusicBrowserUI *masterUI,
  
     clickState = CONTEXT_PLAYLIST;
 
-    if (playlistURL.length() == 0) {
-        playlistURL = string("file://") + FreeampDir(NULL) + 
-                      string("/currentlist.m3u");
-
+    if (playlistURL.find("currentlist.m3u") <= playlistURL.length()) {
         m_plm = context->plm;
         master = true;
     }
@@ -1606,7 +1610,7 @@ GTKMusicBrowser::GTKMusicBrowser(FAContext *context, MusicBrowserUI *masterUI,
         m_plm = new PlaylistManager(context);
         master = false;
     }
-   
+  
     LoadPlaylist(playlistURL);
 }
 
@@ -1654,8 +1658,15 @@ void GTKMusicBrowser::Close(void)
         if (!master)
             parentUI->WindowClose(this); 
     }
-    gdk_threads_leave();
 
+    if (m_currentListName.length() == 0) {
+        FileSelector *filesel = new FileSelector("Save This Playlist to Disk");
+        if (filesel->Run())
+            m_currentListName = filesel->GetReturnPath();
+    }
+
+    gdk_threads_leave();
+ 
     SaveCurrentPlaylist(NULL);
 }
 
@@ -1686,10 +1697,14 @@ int32 GTKMusicBrowser::AcceptEvent(Event *e)
 void GTKMusicBrowser::CreateNewEditor(char *playlisturl)
 {
     string newURL;
-    if (!strncmp("file://", playlisturl, 7))
-        newURL = playlisturl;
+    if (playlisturl) {
+        if (!strncmp("file://", playlisturl, 7))
+            newURL = playlisturl;
+        else
+            newURL = string("file://") + string(playlisturl);
+    }
     else
-        newURL = string("file://") + string(playlisturl);
+        newURL = "";
     parentUI->CreateNewEditor(newURL);
 }
 

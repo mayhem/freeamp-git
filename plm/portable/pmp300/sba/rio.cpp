@@ -63,11 +63,7 @@
 #elif defined(__linux__)
 	// linux g++
 	#include	<unistd.h>
-	#if defined(__alpha)
-		#include	<sys/io.h>
-	#else
-		#include	<sys/perm.h>
-	#endif
+	#include	<sys/io.h>
 	#include	<asm/io.h>
 	#define		OUTPORT(p,v)			outb( v, p )
 	#define		INPORT(p)				inb( p )
