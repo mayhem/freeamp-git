@@ -1993,7 +1993,7 @@ ac_given_srcdir=$srcdir
 ac_given_INSTALL="$INSTALL"
 
 trap 'rm -fr `echo "Makefile base/Makefile base/src/Makefile io/Makefile
-          base/unix/Makefile lmc/mpg123/Makefile
+          base/unix/Makefile 
 	  ui/Makefile base/unix/linux/Makefile base/unix/linux/src/Makefile
 	  io/local/Makefile ui/cmdline/Makefile lmc/Makefile lmc/xingmp3/Makefile
 	  lmc/xingmp3/src/Makefile lmc/src/Makefile io/src/Makefile ui/src/Makefile
@@ -2114,7 +2114,7 @@ EOF
 cat >> $CONFIG_STATUS <<EOF
 
 CONFIG_FILES=\${CONFIG_FILES-"Makefile base/Makefile base/src/Makefile io/Makefile
-          base/unix/Makefile lmc/mpg123/Makefile
+          base/unix/Makefile 
 	  ui/Makefile base/unix/linux/Makefile base/unix/linux/src/Makefile
 	  io/local/Makefile ui/cmdline/Makefile lmc/Makefile lmc/xingmp3/Makefile
 	  lmc/xingmp3/src/Makefile lmc/src/Makefile io/src/Makefile ui/src/Makefile
