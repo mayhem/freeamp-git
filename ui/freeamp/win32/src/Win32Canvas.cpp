@@ -74,11 +74,12 @@ int Win32Canvas::RenderText(int iFontHeight, Rect &oClipRect,
                             Font *pFont, const Color &oColor,
                             bool bBold, bool bItalic, bool bUnderline)
 {
-   HDC   hRootDC, hMemDC;
-   HFONT hFont;
-   RECT  sClip;
-   SIZE  sSize;
-   string oFontFace;
+   HDC        hRootDC, hMemDC;
+   HFONT      hFont;
+   RECT       sClip;
+   SIZE       sSize;
+   string     oFontFace;
+   TEXTMETRIC sTm;
 
    ((Win32Font *)pFont)->GetFace(oFontFace);
    
@@ -100,6 +101,12 @@ int Win32Canvas::RenderText(int iFontHeight, Rect &oClipRect,
  					  OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
                       DEFAULT_PITCH, oFontFace.c_str()); 
    
+   // For debugging -- draw a red border around the text field
+   //HPEN hPen = CreatePen(PS_SOLID, 1, RGB(254, 0, 0));
+   //HPEN hOld = (HPEN)SelectObject(hMemDC, hPen);
+   //Rectangle(hMemDC, sClip.left, sClip.top, sClip.right, sClip.bottom);
+   //DeleteObject(SelectObject(hMemDC, hOld)); 
+
    // There is a bug in Windows 95/98 that when you DrawText into a bitmap
    // the anti aliasing does not work unless you select the font into the
    // main window and the select it into your bitmap DC. Whatever...
@@ -107,6 +114,10 @@ int Win32Canvas::RenderText(int iFontHeight, Rect &oClipRect,
    SelectObject(hExtra, SelectObject(hExtra, hFont));
    SelectObject(hMemDC, hFont);
    ReleaseDC(m_pParent->GetWindowHandle(), hExtra);
+
+   GetTextMetrics(hMemDC, &sTm);
+   sClip.top -= sTm.tmInternalLeading;
+   sClip.bottom -= (sTm.tmInternalLeading - 2);
 
    SetBkMode(hMemDC, TRANSPARENT);
    SetTextColor(hMemDC, RGB(oColor.red, oColor.green, oColor.blue));
@@ -140,6 +151,7 @@ int Win32Canvas::RenderOffsetText(int iFontHeight, Rect &oClipRect,
    SIZE   sSize;
    int    iRet;
    string oFontFace;
+   TEXTMETRIC sTm;
 
    ((Win32Font *)pFont)->GetFace(oFontFace);
    
@@ -160,7 +172,13 @@ int Win32Canvas::RenderOffsetText(int iFontHeight, Rect &oClipRect,
                       bItalic, bUnderline, 0, DEFAULT_CHARSET,
  					  OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
                       DEFAULT_PITCH, oFontFace.c_str()); 
-                      
+
+   // For debugging -- draw a red border around the text field
+   //HPEN hPen = CreatePen(PS_SOLID, 1, RGB(254, 0, 0));
+   //HPEN hOld = (HPEN)SelectObject(hMemDC, hPen);
+   //Rectangle(hMemDC, sClip.left, sClip.top, sClip.right, sClip.bottom);
+   //DeleteObject(SelectObject(hMemDC, hOld)); 
+
    // There is a bug in Windows 95/98 that when you DrawText into a bitmap
    // the anti aliasing does not work unless you select the font into the
    // main window and the select it into your bitmap DC. Whatever...
@@ -170,6 +188,10 @@ int Win32Canvas::RenderOffsetText(int iFontHeight, Rect &oClipRect,
    ReleaseDC(m_pParent->GetWindowHandle(), hExtra);
 
    GetTextExtentPoint32(hMemDC, oText.c_str(), oText.length(), &sSize);
+
+   GetTextMetrics(hMemDC, &sTm);
+   sClip.top -= sTm.tmInternalLeading;
+   sClip.bottom -= (sTm.tmInternalLeading - 2);
 
    // The size of this text is artificially inflated to insert some
    // spaces between occurances of this string. Otherwise, the end of
@@ -184,7 +206,7 @@ int Win32Canvas::RenderOffsetText(int iFontHeight, Rect &oClipRect,
 
    SetBkMode(hMemDC, TRANSPARENT);
    SetTextColor(hMemDC, RGB(oColor.red, oColor.green, oColor.blue));
-   ExtTextOut(hMemDC, oClipRect.x1 - iOffset, oClipRect.y1, ETO_CLIPPED,
+   ExtTextOut(hMemDC, oClipRect.x1 - iOffset, sClip.top, ETO_CLIPPED,
               &sClip, oText.c_str(), oText.length(), NULL);
 
    // If some space was left in the clipping rectangle, textout
@@ -194,7 +216,7 @@ int Win32Canvas::RenderOffsetText(int iFontHeight, Rect &oClipRect,
    iRet = sSize.cx - iOffset - oClipRect.Width();
    if (iRet < 0)
        ExtTextOut(hMemDC, oClipRect.x1 + (sSize.cx - iOffset), 
-                  oClipRect.y1, ETO_CLIPPED,
+                  sClip.top, ETO_CLIPPED,
                   &sClip, oText.c_str(), oText.length(), NULL);
           
    DeleteDC(hMemDC);
