@@ -104,6 +104,7 @@ class TreeDataIndex
       vector<TreeData> m_oTreeData;  
 };
 
-
+bool operator<(const TreeData &A, const TreeData &b);
+bool operator==(const TreeData &A, const TreeData &b);
 
 #endif

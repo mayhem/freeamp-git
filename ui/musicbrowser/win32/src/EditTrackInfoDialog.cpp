@@ -37,6 +37,7 @@ ____________________________________________________________________________*/
 #include "EditTrackInfoDialog.h"
 #include "help.h"
 
+
 EditTrackInfoDialog::EditTrackInfoDialog(FAContext* context,
                                          HWND hwnd, 
                                          const vector<ArtistList*>* artistList,

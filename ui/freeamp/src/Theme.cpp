@@ -295,6 +295,10 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
           m_pParsedBitmaps = NULL;
           m_pParsedFonts = NULL;
          
+#ifdef WIN32         
+          ((Win32Window *)m_pWindow)->ConvertTo256Color(m_pBitmaps);
+#endif          
+          
           // Now the window lists have been properly adjusted, so
           // adopt all the info from the new window into the existing
           // window via the VulcanMindLink 
@@ -325,6 +329,11 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
           }
           if (!pNewWindow)
              pNewWindow = pMainWindow;
+             
+#ifdef WIN32         
+          ((Win32Window *)m_pWindow)->ConvertTo256Color(m_pBitmaps);
+#endif       
+   
           m_pWindow->VulcanMindMeld(pNewWindow);
        }   
        m_bThemeLoaded = true;
@@ -576,6 +585,8 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
 
     if (oElement == string("ButtonControl"))
     {
+	   m_bPosDefined = m_bBitmapDefined = m_bInfoDefined = false;
+       
        if (m_pCurrentControl)
        {
            m_oLastError = string("Controls cannot be nested");
@@ -607,6 +618,8 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
 
     if (oElement == string("DialControl"))
     {
+	   m_bPosDefined = m_bBitmapDefined = m_bInfoDefined = false;
+       
        if (m_pCurrentControl)
        {
            m_oLastError = string("Controls cannot be nested");
@@ -641,6 +654,8 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
 
     if (oElement == string("MultiStateControl"))
     {
+	   m_bPosDefined = m_bBitmapDefined = m_bInfoDefined = false;
+       
        if (m_pCurrentControl)
        {
            m_oLastError = string("Controls cannot be nested");
@@ -668,6 +683,8 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
 
     if (oElement == string("SliderControl"))
     {
+	   m_bPosDefined = m_bBitmapDefined = m_bInfoDefined = false;
+    
        if (m_pCurrentControl)
        {
            m_oLastError = string("Controls cannot be nested");
@@ -687,6 +704,8 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
 
     if (oElement == string("VSliderControl"))
     {
+	   m_bPosDefined = m_bBitmapDefined = m_bInfoDefined = false;
+       
        if (m_pCurrentControl)
        {
            m_oLastError = string("Controls cannot be nested");
@@ -706,6 +725,8 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
 
     if (oElement == string("TextControl"))
     {
+	   m_bPosDefined = m_bBitmapDefined = m_bInfoDefined = false;
+       
        if (m_pCurrentControl)
        {
            m_oLastError = string("Controls cannot be nested");
@@ -856,6 +877,8 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
            m_pCurrentControl->SetPos(oPos);
        }    
 
+       m_bPosDefined = true;
+
        return kError_NoErr;
     }
 
@@ -907,6 +930,9 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
        }
 
        m_pCurrentControl->SetBitmap(pBitmap, oRect, bHoriz);
+       
+       m_bBitmapDefined = true;
+       
        return kError_NoErr;
     }
 
@@ -923,6 +949,8 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
            m_pCurrentControl->SetDesc(oAttrMap["Desc"]);
 	   if (oAttrMap.find("Tip") != oAttrMap.end())
            m_pCurrentControl->SetTip(oAttrMap["Tip"]);
+       
+       m_bInfoDefined = true;
        
        return kError_NoErr;
     }
@@ -993,16 +1021,24 @@ Error Theme::EndElement(string &oElement)
         oElement == string("DialControl") ||
         oElement == string("SliderControl") ||
         oElement == string("VSliderControl") ||
-        oElement == string("MultiStateControl"))
+        oElement == string("MultiStateControl") ||
+        oElement == string("TextControl")) 
     {
-       m_pCurrentWindow->AddControl(m_pCurrentControl);
-       m_pCurrentControl = NULL;
-       m_eCurrentControl = eUndefinedControl;
-
-       return kError_NoErr;
-    }
-    if (oElement == string("TextControl")) 
-    {
+       if (!m_bPosDefined)
+       {
+           m_oLastError = string("The Control is missing the <Position> tag");
+           return kError_InvalidParam;
+       }
+       if (!m_bBitmapDefined && m_eCurrentControl != eTextControl)
+       {
+           m_oLastError = string("The Control is missing the <ControlBitmap> tag");
+           return kError_InvalidParam;
+       }
+       if (!m_bInfoDefined && m_eCurrentControl != eTextControl)
+       {
+           m_oLastError = string("The Control is missing the <Info> tag");
+           return kError_InvalidParam;
+       }
        if (m_eCurrentControl == eTextControl)
        {
        	   if (!((TextControl *)m_pCurrentControl)->StyleHasBeenSet())
@@ -1011,6 +1047,7 @@ Error Theme::EndElement(string &oElement)
                return kError_InvalidParam;
            }    
        }
+
        m_pCurrentWindow->AddControl(m_pCurrentControl);
        m_pCurrentControl = NULL;
        m_eCurrentControl = eUndefinedControl;

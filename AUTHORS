@@ -98,3 +98,7 @@ Other major contributors and their contributions:
 
 "Reece Hart" <reece@in-machina.com>
 * make uninstall target
+
+"Anton Kruger" <unknown>
+* Median-cut color quantization algorithm as published in 
+  Dr. Dobbs Journal September 1994

@@ -36,6 +36,7 @@ ____________________________________________________________________________*/
 
 using namespace std;
 
+class Bitmap;
 class Win32Window : public Window
 {
     public:
@@ -68,6 +69,10 @@ class Win32Window : public Window
      LRESULT       WindowProc(HWND hwnd, UINT msg, 
                                WPARAM wParam, LPARAM lParam);
 
+             void  ConvertTo256Color(vector<Bitmap *> *pList);
+             void  Create256ColorPalette(BYTE pColorMap[236][3], 
+                                         RGBQUAD *pWinColorMap);
+
     protected:
      
      void  SaveWindowPos(Pos &oPos);
@@ -82,6 +87,7 @@ class Win32Window : public Window
      void  AddToSystemMenu(HWND hWnd);
     
      HWND     m_hWnd;
+	 HPALETTE m_hPal;
      Pos      m_oWindowPos;
      Mutex   *m_pMindMeldMutex;
 	 bool     m_bMouseInWindow;

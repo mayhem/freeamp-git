@@ -39,8 +39,6 @@ Win32Canvas::Win32Canvas(Win32Window *pParent)
 Win32Canvas::~Win32Canvas(void)
 {
    delete m_pBufferBitmap;
-   if (m_hPal)
-      DeleteObject(m_hPal);
 }
 
 void Win32Canvas::SetParent(Win32Window *pParent)
@@ -243,8 +241,6 @@ Error Win32Canvas::MaskBlitRect(Bitmap *pSrcBitmap, Rect &oSrcRect, Rect &oDestR
    return m_pBufferBitmap->MaskBlitRect(pSrcBitmap, oSrcRect, oDestRect);
 }
 
-//static int iPaintCount = 0;
-
 void Win32Canvas::Paint(HDC hDC, Rect &oRect)
 {
    HDC   hMemDC;
@@ -255,19 +251,11 @@ void Win32Canvas::Paint(HDC hDC, Rect &oRect)
    
    if (GetDeviceCaps(hDC, RASTERCAPS) & RC_PALETTE)
    {
-      SetStretchBltMode(hDC, HALFTONE);
-      if (!m_hPal)
-      {
-         m_hPal = CreateHalftonePalette(hDC);
-      }   
-      SelectPalette(hDC, m_hPal, true);
+      SelectPalette(hDC, m_hPal, false);
       RealizePalette(hDC);
    }
-   StretchBlt(hDC, oRect.x1, oRect.y1, oRect.Width(), oRect.Height(),
-              hMemDC, oRect.x1, oRect.y1, oRect.Width(), oRect.Height(), SRCCOPY);
-
-//   if (iPaintCount++ == 0)
-//      m_pBufferBitmap->SaveBitmap("c:\\temp\\out.bmp");
+   BitBlt(hDC, oRect.x1, oRect.y1, oRect.Width(), oRect.Height(),
+          hMemDC, oRect.x1, oRect.y1, SRCCOPY);
 
    DeleteDC(hMemDC);  
 }
@@ -355,3 +343,12 @@ HRGN Win32Canvas::GetMaskRgn(void)
 
    return hMask;
 }
+
+void Win32Canvas::SetPalette(HPALETTE hPal)
+{
+   if (m_hPal)
+       DeleteObject(m_hPal);
+       
+   m_hPal = hPal;
+}
+

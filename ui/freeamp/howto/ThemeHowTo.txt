@@ -25,24 +25,6 @@ with your comments, or better yet head over to Bugzilla and enter a
 bug report <http://www.freeamp.org/bugzilla>.
 
 
-UPDATED FOR FINAL RELEASE (December 17th, 1999)
-
-New features for final release:
-
-- Fonts can now be embedded. We found a way to legally protect ourselves
-  even if people upload Themes with copyrighted (without a free license
-  to distribute) font embedded in them.
-- There is now a PlayStop button as well as a PlayPause button. Works
-  just like the PlayPause button, but with stop instead of Pause.
-- There is now a MPause button, which is 2 state MultiStateControl. The
-  first state is the normal state of the pause button and the second
-  state is the button when the player is paused. This gives the player
-  a way to indicate to the user that the player is paused.
-- To give your theme a descriptive title in the options dialog, simply
-  include a file called title.txt in your theme. The first line of that
-  file will be used as the name of the theme when the theme is shown in
-  the options dialog.
-
 GETTING STARTED
 
 To get started working on FreeAmp themes, I recommend that you 
@@ -457,13 +439,14 @@ Style:
 
 The Style tag is used to define the style of a TextControl:
 
-   <Style Align="Left" Font="Serif" Bold="Yes"/>
+   <Style Align="Left" Font="Serif" Bold="Yes" Color="#FF00FF"/>
 
 The Style tag must define the Font attribute which identifies 
 the font (defined by the <Font> tag) to use. The Style tag may
 also have an Align (Left, Center, Right), a Bold (Yes, No),
-a Italic (Yes, No), and an Underline (Yes, No) attribute. 
-Only the Font attribute is required, the others are optional.
+a Italic (Yes, No), an Underline (Yes, No) attribute, and a Color
+tag that uses #RRGGBB colors in hex just like HTML does. Only the 
+Font attribute is required, the others are optional.
 
 
 ChangeWindow:
@@ -684,6 +667,7 @@ QUICK REFERENCE
    Bold -- Show text in boldface (Yes, No) [optional]
    Italic -- Show text in italics (Yes, No) [optional]
    Underline -- Show text underlined (Yes, No) [optional]
+   Color -- Show the text in the given color (#RRGGBB) [optional]
 
 <ThemeInfo>
 

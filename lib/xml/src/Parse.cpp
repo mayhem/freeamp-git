@@ -260,7 +260,7 @@ void Parse::GetErrorString(string &oError)
     
     szError = new char[m_oLastError.length() + 100];
     sprintf(szError, "%s on line %d.", 
-            m_oLastError.c_str(), m_iErrorLine);
+            m_oLastError.c_str(), m_iErrorLine - 1);
     oError = string(szError);
     delete szError;
 }

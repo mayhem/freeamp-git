@@ -55,7 +55,8 @@ class Win32Canvas : public Canvas
      virtual void  Paint(HDC hDC, Rect &oRect);
      virtual void  Erase(Rect &oRect);
      virtual HRGN  GetMaskRgn(void);
-
+	 virtual void  SetPalette(HPALETTE hPal);
+     
     protected:
 
 	 Win32Bitmap *m_pBufferBitmap;

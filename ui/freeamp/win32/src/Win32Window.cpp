@@ -29,14 +29,22 @@ ____________________________________________________________________________*/
 #pragma warning(disable:4786)
 #endif
 
+#include <map>
+
 #include <stdio.h>
 #include "Theme.h"
 #include "Win32Window.h"
 #include "Win32Canvas.h"
+#include "Win32Bitmap.h"
+#include "Median.h"
 #include "resource.h"
 #include "debug.h"
 
 #define DB Debug_v("%s:%d\n", __FILE__, __LINE__);
+
+const int iNumColorsInHist = 32768;
+const int iNumColorsInPalette = 236;
+const int iNumColorsTotal = 256;
 
 const static char szAppName[] = BRANDING;
 HINSTANCE g_hinst = NULL;
@@ -239,7 +247,16 @@ LRESULT Win32Window::WindowProc(HWND hwnd, UINT msg,
                 
             break;
         }    
-
+        case WM_QUERYNEWPALETTE:
+        {
+            HDC hDc;
+            
+            hDc = GetDC(m_hWnd);
+            SelectPalette(hDc, m_hPal, false);
+            RealizePalette(hDc);
+            break;
+        }
+        
         default:
             result = DefWindowProc( hwnd, msg, wParam, lParam );
             break;
@@ -257,10 +274,13 @@ Win32Window::Win32Window(Theme *pTheme, string &oName)
 	m_hWnd = NULL;
     m_pMindMeldMutex = new Mutex();
     m_bMouseInWindow = false;
+    m_hPal = NULL;
 }
 
 Win32Window::~Win32Window(void)
 {
+    if (m_hPal)
+        DeleteObject(m_hPal);
     delete m_pMindMeldMutex;
 }
 
@@ -394,6 +414,9 @@ Error Win32Window::VulcanMindMeld(Window *pOther)
     
     eRet = Window::VulcanMindMeld(pOther);
     m_pMindMeldMutex->Release();
+
+    if (m_hPal)
+       ((Win32Canvas *)m_pCanvas)->SetPalette(m_hPal);
 
     if (IsError(eRet))
        return eRet;
@@ -837,3 +860,86 @@ void Win32Window::AddToSystemMenu(HWND hWnd)
     sInfo.fState = 0;
     bRet = InsertMenuItem(hMenu, 1, true, &sInfo);
 } 
+
+void Win32Window::ConvertTo256Color(vector<Bitmap *> *pList)
+{
+   vector<Bitmap *>::iterator  i;
+   Win32Bitmap                *pBitmap;
+   WORD                       *pHist;
+   BYTE                        pColorMap[iNumColorsInPalette][3];
+   RGBQUAD                     pWinColorMap[iNumColorsTotal];
+   HDC                         hDC;
+   
+   hDC = GetDC(NULL);
+   if (!(GetDeviceCaps(hDC, RASTERCAPS) & RC_PALETTE))
+   {
+       ReleaseDC(NULL, hDC);
+       return;
+   }
+   
+   ReleaseDC(NULL, hDC);
+
+   pHist = new WORD[iNumColorsInHist];
+   memset(pHist, 0, sizeof(WORD) * iNumColorsInHist);
+   
+   memset(pColorMap, 0, sizeof(BYTE) * 3 * iNumColorsInPalette);
+
+   for(i = pList->begin(); i != pList->end(); i++)
+   {
+      pBitmap = (Win32Bitmap *)(*i);
+      pBitmap->UpdateHistogram(pHist);
+      
+   }
+   
+   MedianCut(pHist, pColorMap, iNumColorsInPalette);
+   Create256ColorPalette(pColorMap, pWinColorMap);
+
+   for(i = pList->begin(); i != pList->end(); i++)
+   {
+      pBitmap = (Win32Bitmap *)(*i);
+      pBitmap->SetPalette(m_hPal);
+      pBitmap->ConvertTo256Color(pHist, pWinColorMap);
+   }
+
+   delete pHist;
+}
+
+void Win32Window::Create256ColorPalette(BYTE pColorMap[236][3], 
+                                        RGBQUAD pWinColorMap[256])
+{
+   HDC           hRootDC;
+   LOGPALETTE   *pLog;
+   int           i;
+
+   pLog = (LOGPALETTE *)new unsigned char[sizeof(LOGPALETTE) + 
+                                          sizeof(PALETTEENTRY) * 256]; 
+   pLog->palVersion = 0x300;
+   pLog->palNumEntries = 256;
+   
+   hRootDC = GetDC(NULL);
+   GetSystemPaletteEntries(hRootDC, 0, 10, pLog->palPalEntry);
+   GetSystemPaletteEntries(hRootDC, 245, 10, &pLog->palPalEntry[245]);
+   ReleaseDC(NULL, hRootDC);
+   
+   for(i = 0; i < 236; i++)
+   {
+      pLog->palPalEntry[i + 10].peRed = pColorMap[i][0];
+      pLog->palPalEntry[i + 10].peGreen = pColorMap[i][1];
+      pLog->palPalEntry[i + 10].peBlue = pColorMap[i][2];
+      pLog->palPalEntry[i + 10].peFlags = PC_NOCOLLAPSE; 
+   }
+
+   if (m_hPal)
+      DeleteObject(m_hPal);
+      
+   m_hPal = CreatePalette(pLog);
+   
+   for(i = 0; i < 256; i++, pWinColorMap++)
+   {
+       pWinColorMap->rgbRed = pLog->palPalEntry[i].peRed;
+       pWinColorMap->rgbGreen = pLog->palPalEntry[i].peGreen;
+       pWinColorMap->rgbBlue = pLog->palPalEntry[i].peBlue;
+   }    
+                           
+   delete pLog;
+}

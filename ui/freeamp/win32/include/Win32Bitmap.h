@@ -25,6 +25,9 @@ ____________________________________________________________________________*/
 #define INCLUDED_WIN32BITMAP_H__
 
 #include <string>
+#include <map>
+
+using namespace std;
 
 #include <windows.h>
 #include "Bitmap.h"
@@ -47,12 +50,14 @@ class Win32Bitmap : public Bitmap
      virtual bool  IsPosVisible(Pos &oPos);
 
      HBITMAP       GetBitmapHandle(void);
-     BITMAPINFO   *GetBitmapInfo(void) { return &m_sBitmapInfo; };
-     void         *GetBitmapBits(void) { return m_pBitmapData; };
      HBITMAP       GetMaskBitmapHandle(void);
-     BYTE         *Bits(int32 x, int32 y);
-     void          SaveBitmap(char *szFile);
-
+     void          UpdateHistogram(WORD *pHist);
+     void          ConvertTo256Color(WORD            *pHist,
+                                     RGBQUAD         *pColorTable);
+     void          SaveBitmap(char    *szFile, 
+                              RGBQUAD *pColorTable);
+	 virtual void  SetPalette(HPALETTE hPal);
+	 
     protected:
 
      void          CreateMaskBitmap(void);
@@ -60,9 +65,9 @@ class Win32Bitmap : public Bitmap
     
      HBITMAP     m_hBitmap;
      HBITMAP     m_hMaskBitmap;
-	 BITMAPINFO  m_sBitmapInfo;
-	 void       *m_pBitmapData;
-	 int32       m_iBytesPerLine, m_iHeight, m_iWidth;
+	 int32       m_iHeight, m_iWidth;
+     void       *m_pBitmapData;
+	 HPALETTE    m_hPal;
 };
 
 #endif
