@@ -35,7 +35,6 @@ ____________________________________________________________________________*/
 #include <config.h>
 #include "soundcardpmo.h"
 #include "eventdata.h"
-#include "facontext.h"
 #include "log.h"
 
 #define PIECES 50
@@ -55,12 +54,15 @@ extern    "C"
    }
 }
 
-SoundCardPMO::SoundCardPMO(context) :
+SoundCardPMO::SoundCardPMO(FAContext *context) :
               EventBuffer(iInitialBufferSize, iOverflowSize,
 			  iWriteTriggerSize, context)
 {
    //printf("PMO ctor\n");
    m_properlyInitialized = false;
+
+   m_context = context;
+   m_prefs = context->prefs;
 
    myInfo = new OutputInfo();
    memset(myInfo, 0, sizeof(OutputInfo));
