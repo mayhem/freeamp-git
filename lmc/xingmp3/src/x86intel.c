@@ -30,6 +30,8 @@
 /*	Generated from Id: x86gas.s,v 1.7 1999/03/04 07:28:16 mhw Exp $ */
 
 
+extern float wincoef[264];
+extern float coef32[31];
 
 #define L_tmp 0
 #define L_pcm 4
