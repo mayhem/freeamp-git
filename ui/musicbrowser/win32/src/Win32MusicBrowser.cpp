@@ -109,10 +109,26 @@ MusicBrowserUI::MusicBrowserUI(FAContext      *context,
        m_oPlm = new PlaylistManager(context);   
        m_currentListName = oPlaylistName;
     }   
+
+    m_overSplitter = false;
+    m_trackSplitter = false;
+
+    short pattern[8];
+    HBITMAP bmp;
+
+	for (int32 i = 0; i < 8; i++)
+		pattern[i] = (WORD)(0x5555 << (i & 1));
+
+	bmp = CreateBitmap(8, 8, 1, 1, &pattern);
+
+    m_splitterBrush = CreatePatternBrush(bmp);
+    DeleteObject(bmp);
 }
 
 MusicBrowserUI::~MusicBrowserUI()
 {
+    DeleteObject(m_splitterBrush);
+
     if (m_pParent)
     {
        delete m_oPlm;

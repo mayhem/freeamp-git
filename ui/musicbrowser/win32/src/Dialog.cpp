@@ -106,6 +106,10 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
             GetMinMaxInfo((MINMAXINFO *)lParam);
             break;
 
+        case WM_SETCURSOR:
+            return SetCursor(LOWORD(lParam), HIWORD(lParam));
+            break;
+
         case WM_MOUSEMOVE:
         {
             POINT sPoint;   
@@ -114,8 +118,13 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
             MouseMove((uint32)wParam, sPoint);
             return 1;
         }
+
+        case WM_LBUTTONDOWN:
+            MouseButtonDown(wParam, LOWORD(lParam), HIWORD(lParam));
+            return 1;
+
         case WM_LBUTTONUP:
-            MouseButtonUp();
+            MouseButtonUp(wParam, LOWORD(lParam), HIWORD(lParam));
             return 1;
             
         case WM_EMPTYDBCHECK:
@@ -566,6 +575,8 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
     m_hPlaylistTitle = GetDlgItem(m_hWnd, IDC_PLAYLISTTITLE);
     m_hMusicCatalogTitle = GetDlgItem(m_hWnd, IDC_MUSICCATALOGTEXT);
 
+    m_hSplitterCursor = LoadCursor(g_hinst, MAKEINTRESOURCE(IDC_SPLITTER));
+
     hShell = GetModuleHandle("SHELL32.DLL");
     
     hList = ImageList_Create(16, 16, ILC_COLOR24|ILC_MASK, 4, 0);
@@ -764,15 +775,27 @@ void MusicBrowserUI::BeginDrag(NM_TREEVIEW *pTreeView)
 
     m_hDragCursor = LoadCursor(g_hinst, MAKEINTRESOURCE(IDC_DRAG));
     m_hNoDropCursor = LoadCursor(g_hinst, MAKEINTRESOURCE(IDC_NODROP));
-    m_hSavedCursor = SetCursor(m_hDragCursor);
+    m_hSavedCursor = ::SetCursor(m_hDragCursor);
     
     SetCapture(m_hWnd);
     m_bDragging = true;
 }
 
+BOOL MusicBrowserUI::SetCursor(int hitTest, int mouseMsg)
+{
+    BOOL result = FALSE;
+
+    if(m_overSplitter || m_trackSplitter)
+    {
+        ::SetCursor(m_hSplitterCursor);
+        result = TRUE;
+    }
+    return result;
+}
+
 void MusicBrowserUI::MouseMove(uint32 uFlags, POINT &sPoint)
 {
-    if (m_bDragging)
+    if(m_bDragging)
     {
         TV_HITTESTINFO sHit;
         
@@ -790,26 +813,193 @@ void MusicBrowserUI::MouseMove(uint32 uFlags, POINT &sPoint)
             sItem.mask = TVIF_PARAM;
             TreeView_GetItem(m_hMusicCatalog, &sItem);
             if (sItem.lParam < 0)
-               SetCursor(m_hDragCursor);
+                ::SetCursor(m_hDragCursor);
             else    
             {
-               SetCursor(m_hNoDropCursor);
+                ::SetCursor(m_hNoDropCursor);
                m_hDropTarget = NULL;
             }
         }       
         else    
-            SetCursor(m_hNoDropCursor);
+            ::SetCursor(m_hNoDropCursor);
+    }
+    else if(m_trackSplitter)
+    {
+        HDC hdc = GetDC(NULL);
+        POINT pt = sPoint;
+
+        MapWindowPoints(m_hWnd, NULL, (LPPOINT)&pt, 1);
+
+        HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, m_splitterBrush);
+
+        PatBlt(hdc,
+               m_splitterRect.left, 
+               m_splitterRect.top, 
+               m_splitterRect.right - m_splitterRect.left, 
+               m_splitterRect.bottom - m_splitterRect.top, 
+               PATINVERT);
+
+        OffsetRect(&m_splitterRect, (pt.x - m_splitterRect.left), 0);
+
+        PatBlt(hdc,
+               m_splitterRect.left, 
+               m_splitterRect.top, 
+               m_splitterRect.right - m_splitterRect.left, 
+               m_splitterRect.bottom - m_splitterRect.top, 
+               PATINVERT);
+
+        SelectObject(hdc, oldBrush);
+
+        ReleaseDC(m_hWnd, hdc);
+    }
+    else
+    {
+        RECT catalogRect,playlistRect;
+        
+        GetWindowRect(m_hMusicCatalog, &catalogRect);
+        GetWindowRect(m_hPlaylistView, &playlistRect);
+        MapWindowPoints(NULL, m_hWnd, (LPPOINT)&catalogRect, 2);
+        MapWindowPoints(NULL, m_hWnd, (LPPOINT)&playlistRect, 2);
+
+        m_splitterRect.top = playlistRect.top;
+        m_splitterRect.bottom = playlistRect.bottom;
+        m_splitterRect.left = catalogRect.right + 1;
+        m_splitterRect.right = playlistRect.left - 1;
+
+        if(PtInRect(&m_splitterRect, sPoint))
+        {
+            m_overSplitter = true;
+        }
+        else
+        {
+            m_overSplitter = false;
+        }
+   
     }
 } 
 
-void MusicBrowserUI::MouseButtonUp(void)
+void MusicBrowserUI::MouseButtonDown(int keys, int x, int y)
+{
+    RECT catalogRect,playlistRect;
+    RECT clientRect;
+    POINT pt;
+
+    pt.x = x;
+    pt.y = y;
+
+    GetClientRect(m_hWnd, &clientRect);
+    //InflateRect(&clientRect, -150, 0);
+    clientRect.left += 125;
+    clientRect.right -= 175;
+    GetWindowRect(m_hMusicCatalog, &catalogRect);
+    GetWindowRect(m_hPlaylistView, &playlistRect);
+    MapWindowPoints(m_hWnd, NULL, (LPPOINT)&pt, 1);
+    MapWindowPoints(m_hWnd, NULL, (LPPOINT)&clientRect, 2);
+
+    m_splitterRect.top = playlistRect.top;
+    m_splitterRect.bottom = playlistRect.bottom;
+    m_splitterRect.left = catalogRect.right + 1;
+    m_splitterRect.right = playlistRect.left - 1;
+
+    if(PtInRect(&m_splitterRect, pt))
+    {
+        m_trackSplitter = true;
+        SetCapture(m_hWnd);
+        ClipCursor(&clientRect);
+        m_hSavedCursor = ::SetCursor(m_hSplitterCursor);
+
+        HDC hdc = GetDC(NULL);
+
+        HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, m_splitterBrush);
+
+        PatBlt(hdc,
+               m_splitterRect.left, 
+               m_splitterRect.top, 
+               m_splitterRect.right - m_splitterRect.left, 
+               m_splitterRect.bottom - m_splitterRect.top, 
+               PATINVERT);
+
+        SelectObject(hdc, oldBrush);
+
+        ReleaseDC(m_hWnd, hdc);
+    }
+}
+
+void MusicBrowserUI::MouseButtonUp(int keys, int x, int y)
 {
     int i;
-    
-    if (m_bDragging)
+    POINT pt;
+
+    pt.x = x;
+    pt.y = y;
+
+    if(m_trackSplitter)
+    {
+        m_trackSplitter = false;
+        ReleaseCapture();
+        ClipCursor(NULL);
+        ::SetCursor(m_hSavedCursor);
+
+        HDC hdc = GetDC(NULL);
+
+        HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, m_splitterBrush);
+
+        PatBlt(hdc,
+               m_splitterRect.left, 
+               m_splitterRect.top, 
+               m_splitterRect.right - m_splitterRect.left, 
+               m_splitterRect.bottom - m_splitterRect.top, 
+               PATINVERT);
+
+        SelectObject(hdc, oldBrush);
+
+        ReleaseDC(m_hWnd, hdc);
+
+
+        RECT catalogRect, playlistRect, titleRect;
+        int32 delta;
+
+        GetWindowRect(m_hMusicCatalog, &catalogRect);
+        GetWindowRect(m_hPlaylistView, &playlistRect);
+        GetWindowRect(m_hPlaylistTitle, &titleRect);
+
+        delta = (m_splitterRect.right + 1) - playlistRect.left;
+        catalogRect.right = m_splitterRect.left - 1;
+        playlistRect.left = m_splitterRect.right + 1;
+        titleRect.left += delta;
+
+        MapWindowPoints(NULL, m_hWnd, (LPPOINT)&catalogRect, 2);
+        MapWindowPoints(NULL, m_hWnd, (LPPOINT)&playlistRect, 2);
+        MapWindowPoints(NULL, m_hWnd, (LPPOINT)&titleRect, 2);
+
+        
+        MoveWindow(m_hMusicCatalog, 
+                  catalogRect.left, 
+                  catalogRect.top, 
+        	      (catalogRect.right - catalogRect.left),
+                  catalogRect.bottom - catalogRect.top,
+                  TRUE);
+
+        MoveWindow(m_hPlaylistView, 
+                  playlistRect.left,
+                  playlistRect.top, 
+        	      (playlistRect.right - playlistRect.left),
+                  playlistRect.bottom - playlistRect.top,
+                  TRUE);
+
+        MoveWindow(m_hPlaylistTitle, 
+                  titleRect.left,
+                  titleRect.top, 
+        	      (titleRect.right - titleRect.left),
+                  titleRect.bottom - titleRect.top,
+                  TRUE);
+
+
+    }
+    else if(m_bDragging)
     {
         ReleaseCapture();
-        SetCursor(m_hSavedCursor);
+        ::SetCursor(m_hSavedCursor);
         m_bDragging = false; 
         
         if (m_hDropTarget)

@@ -176,6 +176,8 @@ IDI_ACTIVELIST          ICON    DISCARDABLE     "active.ico"
 
 IDC_DRAG                CURSOR  DISCARDABLE     "drag.cur"
 IDC_NODROP              CURSOR  DISCARDABLE     "nodrop.cur"
+IDC_SPLITTER            CURSOR  FIXED IMPURE    "splitter.cur"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

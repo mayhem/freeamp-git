@@ -6,6 +6,7 @@
 #define IDB_TOOLBAR                     100
 #define IDD_MUSICBROWSER                101
 #define IDC_URL                         101
+#define IDC_SPLITTER                    101
 #define IDR_MENU1                       102
 #define IDI_CLOSED                      104
 #define IDC_DRAG                        104
