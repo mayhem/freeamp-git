@@ -28,7 +28,6 @@ ____________________________________________________________________________*/
 #include <sys/stat.h>
 
 #include "gdbm_fa.h"
-#include "mutex.h"
 #include "errors.h"
 #include "database.h"
 

@@ -54,6 +54,8 @@ ____________________________________________________________________________*/
 #define BRANDING_VERSION FREEAMP_VERSION
 #endif
 
+#undef DEBUG_MUTEXES
+
 #undef HAVE_GTK
 #undef HAVE_FREETYPE_FREETYPE_H
 #undef HAVE_FREETYPE_H

@@ -49,7 +49,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "ttfont.h"
-#include "mutex.h"
 
 
 Mutex ttfLock;

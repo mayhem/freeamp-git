@@ -133,7 +133,7 @@ Error LcdUI::Init(int32 startupType) {
     lcd.contrast(STOCK_CONTRAST);
 #endif
     cout << "startup..." << endl;
-    m_lcdLock->Acquire(WAIT_FOREVER);
+    m_lcdLock->Acquire();
 #if LCDPROC_4
     m_sock = sock_connect("localhost",LCDPORT);
     cout << "connecting" << endl;
@@ -335,7 +335,7 @@ Error LcdUI::AcceptEvent(Event *e) {
 		    m_totalMinutes = ((int32)pmvi->m_totalSeconds - m_totalHours*3600) / 60;
 		    m_totalSeconds = ((int32)pmvi->m_totalSeconds - m_totalHours*3600 - m_totalMinutes*60);
 		    //cout << "total hours " << m_totalHours << " " << m_totalMinutes << " " << m_totalSeconds << endl;
-		    m_lcdLock->Acquire(WAIT_FOREVER);
+		    m_lcdLock->Acquire();
 #if !LCDPROC_4
 		    lcd.clear();
 #endif
@@ -378,7 +378,7 @@ Error LcdUI::AcceptEvent(Event *e) {
 		if (ite) {
 		    Id3TagInfo ti = ite->GetId3Tag();
 		    if (ti.m_containsInfo) {
-			m_lcdLock->Acquire(WAIT_FOREVER);
+			m_lcdLock->Acquire();
 #if !LCDPROC_4
 			lcd.clear();
 #endif

@@ -107,7 +107,7 @@ void
 linuxThread::
 Suspend()
 {
-    m_suspendMutex->Acquire(WAIT_FOREVER);
+    m_suspendMutex->Acquire();
     if (!m_suspended) {
 	pthread_kill(m_threadHandle, SIGSTOP);
 	m_suspended = true;
@@ -119,7 +119,7 @@ void
 linuxThread::
 Resume()
 {
-    m_suspendMutex->Acquire(WAIT_FOREVER);
+    m_suspendMutex->Acquire();
     if (m_suspended) {
 	pthread_kill(m_threadHandle, SIGCONT);
 	m_suspended = false;

@@ -24,6 +24,9 @@ ____________________________________________________________________________*/
 #ifndef INCLUDED_TTFONT__H_
 #define INCLUDED_TTFONT__H_
 
+#include "config.h"
+#include "mutex.h"
+
 #include <gdk/gdk.h>
 #ifdef HAVE_FREETYPE_FREETYPE_H
 #include <freetype/freetype.h>

@@ -24,6 +24,8 @@ ____________________________________________________________________________*/
 #ifndef INCLUDED_CONTROL_H__
 #define INCLUDED_CONTROL_H__
 
+#include "config.h"
+
 // The debugger can't handle symbols more than 255 characters long.
 // STL often creates symbols longer than that.
 // When symbols are longer than 255 characters, the warning is disabled.

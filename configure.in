@@ -666,8 +666,10 @@ if test "x$enable_x86" = "xyes"; then
   fi
 fi
 
-
 AC_SUBST(XINGASM)
+
+AC_ARG_ENABLE(mutex-debug, [  --enable-mutex-debug    Enable verbose mutex debugging output], AC_DEFINE(DEBUG_MUTEXES), )
+
 
 AC_CONFIG_HEADER(config/config.h)
 AC_OUTPUT(Makefile Makefile-plugins Makefile.header)

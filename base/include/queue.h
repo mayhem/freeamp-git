@@ -168,7 +168,7 @@ template<class T> bool Queue<T>::IsEmpty() {
 
 template<class T> void Queue<T>::GetLock() {
     assert(m_myLock);
-    m_myLock->Acquire(WAIT_FOREVER);
+    m_myLock->Acquire();
     return;
 }
 

@@ -1010,7 +1010,7 @@ void
 Player::
 GetUIManipLock()
 {
-   m_uiManipLock->Acquire(WAIT_FOREVER);
+   m_uiManipLock->Acquire();
 }
 
 void 

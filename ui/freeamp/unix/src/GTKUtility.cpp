@@ -90,6 +90,7 @@ void InitializeGTK(FAContext *context)
         context->gtkLock.Acquire();
         running = context->gtkRunning;
         context->gtkLock.Release();
+        usleep(50);
     }
 }
 
