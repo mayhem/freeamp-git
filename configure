@@ -1628,7 +1628,7 @@ else
 int main() {
 
 /* Ultrix mips cc rejects this.  */
-typedef int charset[2]; const charset x = {0,0};
+typedef int charset[2]; const charset x;
 /* SunOS 4.1.1 cc rejects this.  */
 char const *const *ccp;
 char **p;
@@ -2189,7 +2189,7 @@ else
 int main() {
 
 /* Ultrix mips cc rejects this.  */
-typedef int charset[2]; const charset x = {0,0};
+typedef int charset[2]; const charset x;
 /* SunOS 4.1.1 cc rejects this.  */
 char const *const *ccp;
 char **p;
@@ -3062,7 +3062,7 @@ elif test "$host_os" = "beos"; then
   OSINC="$OSINC -Iui/musicbrowser/beos/include"
   # freeampui's Font.h and friends conflict with Be API, thus the junk below.
   OSINC="-Iui/freeamp/include -I- -Iui/freeamp/beos/include $OSINC"
-  OSINC="$OSINC -Iconfig -Iio/local -Iio/http -Iui/cmdline -Ilmc/xingmp3/src -Iplm/metadata/id3v1 -Iplm/metadata/id3v2 -Iplm/metadata/misc -Iplm/playlist/m3u -Iplm/playlist/pls -Idlm/rmp/"
+  OSINC="$OSINC -Iconfig -Iio/local -Iio/http -Iui/cmdline -Iui/mpg123 -Ilmc/xingmp3/src -Iplm/metadata/cddb -Iplm/metadata/id3v1 -Iplm/metadata/id3v2 -Iplm/metadata/misc -Iplm/playlist/m3u -Iplm/playlist/pls -Idlm/rmp/"
 else
   GTK_CFLAGS=""
   GTK_LIBS=""
