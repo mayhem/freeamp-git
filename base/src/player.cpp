@@ -15,7 +15,7 @@
 	GNU General Public License for more details.
 
 	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
+	along with this program; if not, Write to the Free Software
 	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 	
 	$Id$
@@ -172,15 +172,15 @@ void Player::EventServiceThreadFunc(void *pPlayer) {
     Event *pC;
     int32 rtnVal = 0x0;
     while (rtnVal == 0) {   // serviceEvent will return 1 if error or time to quit.
-        //cout << "About to read queue..." << endl;
+        //cout << "About to Read queue..." << endl;
         pP->m_eventSem->Wait();
-        pC = pP->m_eventQueue->read();
+        pC = pP->m_eventQueue->Read();
         //cout << "Read queue..." << endl;
         if (pC) {
 	        rtnVal = pP->ServiceEvent(pC);
 	        delete pC;
         }
-        //if (pP->m_eventQueue->isEmpty()) usleep(50000);
+        //if (pP->m_eventQueue->IsEmpty()) usleep(50000);
     }
 //    cout << "EventServiceThreadFunc: quitting on " << rtnVal << endl;
     // Time to quit!!!
@@ -269,7 +269,7 @@ void Player::ReleaseUIManipLock() {
 }
 
 int32 Player::AcceptEvent(Event *e) {
-    m_eventQueue->write(e);
+    m_eventQueue->Write(e);
     m_eventSem->Signal();
     return 0;
 }
@@ -539,13 +539,13 @@ void Player::SendToUI(Event *pe) {
 void Player::testQueue() {
     Event *pC;
     
-    pC = m_eventQueue->read();
+    pC = m_eventQueue->Read();
     if (pC) {
 	    cout << "testQueue: First failed!!" << endl;
     } else {
 	    cout << "testQueue: First succeded!!" << endl;
     }
-    cout << "testQueue: isEmpty(): " << m_eventQueue->isEmpty() << endl;
+    cout << "testQueue: IsEmpty(): " << m_eventQueue->IsEmpty() << endl;
 
 
     pC = new Event(CMD_Play);
@@ -555,21 +555,21 @@ void Player::testQueue() {
     pC = new Event(CMD_NextMediaPiece);
     AcceptEvent(pC);
 
-    pC = m_eventQueue->read();
+    pC = m_eventQueue->Read();
     cout << "testQueue: " << pC->GetEvent() << endl;
     delete pC;
-    pC = m_eventQueue->read();
+    pC = m_eventQueue->Read();
     cout << "testQueue: " << pC->GetEvent() << endl;
     delete pC;
-    cout << "testQueue: isEmpty(): " << m_eventQueue->isEmpty() << endl;
-    pC = m_eventQueue->read();
+    cout << "testQueue: IsEmpty(): " << m_eventQueue->IsEmpty() << endl;
+    pC = m_eventQueue->Read();
     cout << "testQueue: " << pC->GetEvent() << endl;
     delete pC;
-    pC = m_eventQueue->read();
+    pC = m_eventQueue->Read();
     if (pC) {
 	    cout << "testQueue: Failed!!!" << endl;
     } else {
 	    cout << "testQueue: Final Succeeded!!" << endl;
     }
-    cout << "testQueue: isEmpty(): " << m_eventQueue->isEmpty() << endl;
+    cout << "testQueue: IsEmpty(): " << m_eventQueue->IsEmpty() << endl;
 }

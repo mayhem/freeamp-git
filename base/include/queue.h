@@ -37,9 +37,9 @@ class Queue {
     Queue(bool dwd = true);
     ~Queue();
     
-    T read();
-    int32 write(T &);
-    bool isEmpty();
+    T Read();
+    int32 Write(T &);
+    bool IsEmpty();
 
  private:
     class QueueMember {
@@ -47,12 +47,13 @@ class Queue {
 	    QueueMember *m_behindMe;
 	    T m_myMember;
     };
+
+    void GetLock();
+    void ReleaseLock();
+
     QueueMember *m_head;
     QueueMember *m_tail;
-    
     bool m_deleteWhenDone;
-    void getLock();
-    void releaseLock();
     Mutex *m_myLock;
  
 };
@@ -66,12 +67,12 @@ template<class T> Queue<T>::Queue(bool dwd) {
 }
 
 template<class T> Queue<T>::~Queue() {
-    getLock();
+    GetLock();
     QueueMember *pQM = m_head;
     QueueMember *next = NULL;
     m_head = NULL;
     m_tail = NULL;
-    releaseLock();
+    ReleaseLock();
     while (pQM != NULL) {
 	next = pQM->m_behindMe;
 	if (m_deleteWhenDone) {
@@ -87,8 +88,8 @@ template<class T> Queue<T>::~Queue() {
     }
 }
 
-template<class T> T Queue<T>::read() {
-    getLock();
+template<class T> T Queue<T>::Read() {
+    GetLock();
     //cout << "queue:: read" << endl;
     T rtnVal = NULL;
     if (m_head) {
@@ -103,12 +104,12 @@ template<class T> T Queue<T>::read() {
 	m_tail = NULL;
     }
     //cout << "queue:: read ending" << endl;
-    releaseLock();
+    ReleaseLock();
     return rtnVal;
 }
 
-template<class T> int32 Queue<T>::write(T &c) {
-    getLock();
+template<class T> int32 Queue<T>::Write(T &c) {
+    GetLock();
     QueueMember *pQM = new QueueMember();
     pQM->m_myMember = c;
     pQM->m_behindMe = NULL;
@@ -120,20 +121,20 @@ template<class T> int32 Queue<T>::write(T &c) {
 	// no m_head, this T we just pushed on is now the m_head
 	m_head = pQM;
     }
-    releaseLock();
+    ReleaseLock();
     return 0;
 }
 
-template<class T> bool Queue<T>::isEmpty() {
+template<class T> bool Queue<T>::IsEmpty() {
     return (m_head ? false : true);
 }
 
-template<class T> void Queue<T>::getLock() {
+template<class T> void Queue<T>::GetLock() {
     m_myLock->Acquire(WAIT_FOREVER);
     return;
 }
 
-template<class T> void Queue<T>::releaseLock() {
+template<class T> void Queue<T>::ReleaseLock() {
     m_myLock->Release();
     return;
 }

@@ -19,7 +19,7 @@
 	GNU General Public License for more details.
 
 	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
+	along with this program; if not, Write to the Free Software
 	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 	
 	$Id$
@@ -213,7 +213,7 @@ void XingLMC::Stop() {
     if (decoderThread) {
 	XingCommand *xc = new XingCommand[1];
 	xc[0] = XING_Stop;
-	xcqueue->write(xc);
+	xcqueue->Write(xc);
 	decoderThread->Join(); // wait for thread to exit
 	delete decoderThread;
 	decoderThread = NULL;
@@ -241,8 +241,8 @@ void XingLMC::DecodeWorkerThreadFunc(void *pxlmc) {
 
 #define PIECES 20
 #if 1
-#define CHECK_COMMAND   { while (!xcqueue->isEmpty()) { \
-	XingCommand *xc = xcqueue->read(); \
+#define CHECK_COMMAND   { while (!xcqueue->IsEmpty()) { \
+	XingCommand *xc = xcqueue->Read(); \
 	switch (*xc) { \
 	    case XING_Stop: \
 		return; \
@@ -251,8 +251,8 @@ void XingLMC::DecodeWorkerThreadFunc(void *pxlmc) {
 		m_output->Reset(m_output, true); \
 		isPaused = true; \
 		while (isPaused) { \
-		    if (!xcqueue->isEmpty()) { \
-			xc = xcqueue->read(); \
+		    if (!xcqueue->IsEmpty()) { \
+			xc = xcqueue->Read(); \
 			switch (*xc) { \
 			    case XING_Stop: \
 				return; \
@@ -335,7 +335,7 @@ void XingLMC::DecodeWork() {
             #endif
 	    
 
-#if 0 // 0 = mini block write, 1 = total block write
+#if 0 // 0 = mini block Write, 1 = total block Write
 	    nwrite = m_output->Write(m_output, pcm_buffer,pcm_bufbytes);
 #else
 	    int32 writeBlockLength = pcm_bufbytes / PIECES;
@@ -393,7 +393,7 @@ void XingLMC::DecodeWork() {
 	in_bytes += x.in_bytes;
 	seek_mutex->Release();
     }
-    if (pcm_bufbytes > 0) {  // write out last bit
+    if (pcm_bufbytes > 0) {  // Write out last bit
         #if __BYTE_ORDER != __LITTLE_ENDIAN
 	pcm_bufbytes = cvt_to_wave(pcm_buffer,pcm_bufbytes);
         #endif
@@ -414,13 +414,13 @@ void XingLMC::DecodeWork() {
 void XingLMC::Pause() {
     XingCommand *xc = new XingCommand[1];
     xc[0] = XING_Pause;
-    xcqueue->write(xc);
+    xcqueue->Write(xc);
 }
 
 void XingLMC::Resume() {
     XingCommand *xc = new XingCommand[1];
     xc[0] = XING_Resume;
-    xcqueue->write(xc);
+    xcqueue->Write(xc);
 }
 
 void XingLMC::Reset() {
@@ -451,7 +451,7 @@ int XingLMC::bs_fill() {
       memmove(bs_buffer, bs_bufptr, bs_bufbytes);
       //cout << "Reading from " << m_input->Seek(m_input, 0,SEEK_FROM_CURRENT) << " to at most " << BS_BUFBYTES-bs_bufbytes << endl;
       nread = m_input->Read(m_input, bs_buffer + bs_bufbytes, BS_BUFBYTES - bs_bufbytes);
-      //nread = read(handle, bs_buffer + bs_bufbytes, BS_BUFBYTES - bs_bufbytes);
+      //nread = Read(handle, bs_buffer + bs_bufbytes, BS_BUFBYTES - bs_bufbytes);
       if ((nread + 1) == 0) {
          /*-- test for -1 = error --*/
 	 bs_trigger = 0;
