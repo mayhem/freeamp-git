@@ -58,7 +58,7 @@ ObsBuffer::ObsBuffer(size_t iBufferSize, size_t iOverFlowSize,
     m_bExit = false;
     m_pBufferThread = NULL;
     m_pID3Tag = NULL;
-	 m_szError = new char[iMaxErrorLen];
+    m_szError = new char[iMaxErrorLen];
 
     strcpy(m_szUrl, szFile);
 }
@@ -107,7 +107,7 @@ Error ObsBuffer::Open(void)
     m_pSin->sin_addr.s_addr = htonl(INADDR_ANY);
 
     iRet = setsockopt(m_hHandle, SOL_SOCKET, SO_REUSEADDR, 
-	                   &cReuse, sizeof(char));
+                      &cReuse, sizeof(char));
     if (iRet < 0)
     {
        close(m_hHandle);
@@ -116,7 +116,7 @@ Error ObsBuffer::Open(void)
     }
 
     iRet = bind(m_hHandle, (struct sockaddr *)m_pSin, 
-	             sizeof(struct sockaddr_in));
+                sizeof(struct sockaddr_in));
     if (iRet < 0)
     {
        close(m_hHandle);
@@ -186,7 +186,7 @@ void ObsBuffer::WorkerThread(void)
 {
    size_t  iToCopy, iRead, iStructSize, iActual; 
    void   *pBuffer;
-	unsigned char *pTemp, *pCopy;
+   unsigned char *pTemp, *pCopy;
    Error   eError;
 
    pTemp = new unsigned char[iMAX_PACKET_SIZE];
@@ -198,48 +198,51 @@ void ObsBuffer::WorkerThread(void)
           continue;
       }
 
-      eError = BeginWrite(pBuffer, iToCopy);
-      if (eError == kError_NoErr)
+      iStructSize = sizeof(struct sockaddr_in);
+      iRead = recvfrom(m_hHandle, pTemp, iMAX_PACKET_SIZE, 0,
+                       (struct sockaddr *)m_pSin, &iStructSize);
+      if (iRead <= 0)
       {
-		    iStructSize = sizeof(struct sockaddr_in);
-			 iRead = recvfrom(m_hHandle, pTemp, iMAX_PACKET_SIZE, 0,
-                           (struct sockaddr *)m_pSin, &iStructSize);
-          if (iRead <= 0)
+         SetEndOfStream(true);
+         break;
+      }
+
+      for(;;)
+      {
+          eError = BeginWrite(pBuffer, iToCopy);
+          if (eError == kError_BufferTooSmall)
           {
-             SetEndOfStream(true);
-             EndWrite(0);
-             break;
+              m_pWriteSem->Wait();
+              continue;
           }
-
-			 iRead -= sizeof(RTPHeader);
-			 for(pCopy = pTemp + sizeof(RTPHeader); iRead > 0;)
-			 {
-			     iActual = min(iToCopy, iRead);
-			     memcpy(pBuffer, pCopy, iActual);
-              EndWrite(iActual);
-
-				  pCopy += iActual;
-				  iRead -= iActual;
-
-				  if (iRead != 0)
-				  {
-				      for(; !m_bExit;)
-						{
-			             eError = BeginWrite(pBuffer, iToCopy);	     
-							 if (eError == kError_BufferTooSmall)
-							     m_pWriteSem->Wait();
-							 else
-							     break;
-                  }
-				  }
-          }
-
+          break;
       }
-		else
-      if (eError == kError_BufferTooSmall)
+      if (eError != kError_NoErr)
+         break; 
+
+      iRead -= sizeof(RTPHeader);
+      for(pCopy = pTemp + sizeof(RTPHeader); iRead > 0;)
       {
-          m_pWriteSem->Wait();
+          iActual = min(iToCopy, iRead);
+          memcpy(pBuffer, pCopy, iActual);
+          EndWrite(iActual);
+
+          pCopy += iActual;
+          iRead -= iActual;
+
+          if (iRead != 0)
+          {
+              for(; !m_bExit;)
+              {   
+                  eError = BeginWrite(pBuffer, iToCopy);      
+                  if (eError == kError_BufferTooSmall)
+                     m_pWriteSem->Wait();
+                  else
+                     break;
+              }
+          }
       }
+
    }
 
    delete pTemp;
