@@ -118,6 +118,7 @@ Error XingLMC::InitDecoder() {
 	int32 bitrate;
 	// parse MPEG header
 	m_frameBytes = head_info3(m_bsBuffer, m_bsBufBytes, &head, &bitrate,&m_searchAhead);
+	m_originalSearchAhead = m_searchAhead;
 	if (m_frameBytes == 0) {
 	    return (Error)lmcError_HeadInfoReturnedZero;
 	}
@@ -457,17 +458,39 @@ Error XingLMC::ChangePosition(int32 position) {
     m_frameCounter = 0;
     m_frameWaitTill = position;
     actually_decode = 0;
+	m_searchAhead = m_originalSearchAhead;
 #else
-    m_input->Seek((417*position)-50,SEEK_FROM_START);
+	int32 dummy;
+
+	//char foo[512];
+	//sprintf(foo,"seeking to %d",position);
+	//MessageBox(NULL,foo,NULL,MB_OK);
+
+    m_input->Seek(dummy,(m_frameBytes*position),SEEK_FROM_START);
     m_bsBufBytes = 0;
     m_bsBufPtr = m_bsBuffer;
     bs_fill();
+	MPEG_HEAD head;
+	int32 bitrate;
+	m_frameBytes = head_info3(m_bsBuffer, m_bsBufBytes, &head, &bitrate,&m_searchAhead);
 
-    unsigned char buf[1024];
-    int pBuf = 0;
-    while ((m_bsBufPtr[pBuf] != 0xFF) && ((m_bsBufPtr[pBuf+1] & 0xF0) != 0xF0)) pBuf++;
-    cout << "pBuf = " << pBuf << endl;
-    m_bsBufPtr = &(m_bsBufPtr[pBuf]);
+//	char count = 0;
+//	int32 pBuf = 0;
+//	while (count < 1) {
+//		while (!((m_bsBufPtr[pBuf] == 0xFF) && ((m_bsBufPtr[pBuf+1] & 0xE0) == 0xE0))) {
+//			pBuf++;
+//		}
+//		count++;
+//	}
+//	m_bsBufPtr = &(m_bsBufPtr[pBuf]);
+	m_frameCounter = position;
+	m_pcmBufBytes = 0;
+
+//    unsigned char buf[1024];
+//    int pBuf = 0;
+//    while ((m_bsBufPtr[pBuf] != 0xFF) && ((m_bsBufPtr[pBuf+1] & 0xF0) != 0xF0)) pBuf++;
+//    cout << "pBuf = " << pBuf << endl;
+//    m_bsBufPtr = &(m_bsBufPtr[pBuf]);
 
 #endif
     m_seekMutex->Release();

@@ -103,7 +103,8 @@ private:
     int32 bs_fill();
     void bs_clear();
 private:
-	uint32					m_searchAhead;
+	uint32					m_originalSearchAhead; // holds orignal bytes skipped for use when doing a ChangePosition in the poor manner
+	uint32					m_searchAhead;  // holds bytes to skip in bsbuffer when calling audio.decode
     bool                    m_properlyInitialized;
     int32                   m_frameWaitTill;
     Semaphore *             m_pauseSemaphore;

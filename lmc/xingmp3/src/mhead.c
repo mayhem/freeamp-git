@@ -201,7 +201,7 @@ int head_info2(unsigned char *buf, unsigned int n, MPEG_HEAD * h, int *br)
    framebytes = head_info(buf, n, h);
 
    if (framebytes == 0)
-      return 0;
+      return 0; 
 
    if (h->option == 1)
    {				/* layer III */
