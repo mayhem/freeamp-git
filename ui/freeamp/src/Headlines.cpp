@@ -136,8 +136,8 @@ void Headlines::WorkerThread(void)
         time(&t);
         if (m_lLastDownload + m_oInfo.m_iDownloadInterval < t || m_oHeadlines.size() == 0)
         {
-            if (IsntError(Download()))
-                m_lLastDownload = t;
+            Download();
+            m_lLastDownload = t;
         }
 
         if (m_oHeadlines.size())
@@ -159,6 +159,7 @@ Error Headlines::Download(void)
     string oPage;
     Error  eRet;
     Http   oDownload(m_pContext);
+    vector<string>::iterator i;
 
     m_pContext->target->AcceptEvent(new StatusMessageEvent("Downloading headlines..."));
     eRet = oDownload.DownloadToString(m_oInfo.m_oUrl, oPage);
@@ -171,12 +172,16 @@ Error Headlines::Download(void)
     m_pContext->target->AcceptEvent(new StatusMessageEvent(""));
     m_oHeadlines.clear(); 
 
-    printf("Page: '%s'\n", oPage.c_str());
     eRet = ParseString(oPage);
     if (IsntError(eRet))
     {
         if (m_oHeadlines.size() != m_oHeadlineURLs.size())
             m_oHeadlineURLs.clear();
+    }
+    else
+    {
+        m_pContext->target->AcceptEvent(
+                    new StatusMessageEvent (m_oLastError.c_str()));
     }
     
     return eRet;
@@ -185,6 +190,7 @@ Error Headlines::Download(void)
 Error Headlines::BeginElement(string &oElement, AttrMap &oAttrMap)
 {
     m_oPath += string("/") + oElement;
+
 
     return kError_NoErr;
 }
