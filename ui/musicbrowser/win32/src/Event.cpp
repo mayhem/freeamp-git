@@ -26,6 +26,7 @@ ____________________________________________________________________________*/
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <direct.h>
+#include <math.h>
 
 #include <sstream>
 
@@ -163,7 +164,7 @@ void MusicBrowserUI::SubmitPlaylistEvent(void)
     int totaltracks = m_context->catalog->GetTotalNumTracks();
     int needingsigs = m_context->catalog->GetNumNeedingSigs();
 
-    if ((needingsigs * 100) / totaltracks > 25) {
+    if (ceil((needingsigs * 100) / totaltracks) > 26) {
         StillNeedSignature();
         return;
     }
@@ -240,7 +241,7 @@ void MusicBrowserUI::GenSLPlaylistEvent(float fMax)
     int totaltracks = m_context->catalog->GetTotalNumTracks();
     int needingsigs = m_context->catalog->GetNumNeedingSigs();
 
-    if ((needingsigs * 100) / totaltracks > 25) {
+    if (ceil((needingsigs * 100) / totaltracks) > 26) {
         StillNeedSignature();
         return;
     }
@@ -253,8 +254,8 @@ void MusicBrowserUI::GenSLPlaylistEvent(float fMax)
     }
 
     bool allgood = true;
-    vector<PlaylistItem *>::iterator j = items->begin();
-    for (; j != items->end(); j++) {
+    vector<PlaylistItem *>::iterator j = items.begin();
+    for (; j != items.end(); j++) {
         if ((*j)->GetMetaData().GUID().size() != 16) {
             allgood = false;
             break;
@@ -282,7 +283,10 @@ void MusicBrowserUI::GenSLPlaylistEvent(vector<PlaylistItem*>* pSeed, float fMax
         return;
     }
 
-    if (m_context->catalog->GetNumNeedingSigs() > 0) {
+    int totaltracks = m_context->catalog->GetTotalNumTracks();
+    int needingsigs = m_context->catalog->GetNumNeedingSigs();
+
+    if (ceil((needingsigs * 100) / totaltracks) > 26) {
         StillNeedSignature();
         return;
     }
@@ -367,7 +371,7 @@ void MusicBrowserUI::GenPlaylistEvent()
     int totaltracks = m_context->catalog->GetTotalNumTracks();
     int needingsigs = m_context->catalog->GetNumNeedingSigs();
 
-    if ((needingsigs * 100) / totaltracks > 25) {
+    if (ceil((needingsigs * 100) / totaltracks) > 26) {
         StillNeedSignature();
         return;
     }
@@ -395,7 +399,7 @@ void MusicBrowserUI::GenPlaylistEvent(vector<PlaylistItem*>* pSeed)
     int totaltracks = m_context->catalog->GetTotalNumTracks();
     int needingsigs = m_context->catalog->GetNumNeedingSigs();
 
-    if ((needingsigs * 100) / totaltracks > 25) {
+    if (ceil((needingsigs * 100) / totaltracks) > 26) {
         StillNeedSignature();
         return;
     }
