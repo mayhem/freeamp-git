@@ -47,8 +47,8 @@ class Vorbis : public MetaDataFormat {
 
  private:
 
+    const string ConvertToISO(const char *utf8);
 };
-
 
 #endif // INCLUDED_VORBIS_H
 
