@@ -1237,7 +1237,7 @@ void FreeAmpTheme::HandleKeystroke(unsigned char cKey)
               oTheme = aThemes[i];
               m_pThemeMan->UseTheme(oTheme);
               AcceptEvent(new Event(INFO_PrefsChanged));
-              Sleep(3000);
+              m_pWindow->ProcessWaitingMessages();
            }   
         }   
         break;

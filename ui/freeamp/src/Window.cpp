@@ -158,7 +158,9 @@ Error Window::VulcanMindMeld(Window *pOther)
 
     m_oControls.clear();
     for(i = pOther->m_oControls.begin(); i != pOther->m_oControls.end(); i++)
+    {
         m_oControls.push_back(*i);
+    }    
 
     m_oControlMap.clear();
     for(j = pOther->m_oControlMap.begin(); j != pOther->m_oControlMap.end(); j++)
@@ -236,11 +238,13 @@ Error Window::ControlEnable(const string &oTarget, bool bSet, bool &bEnable)
 
     IncUsageRef();
        
-    for(i = m_oControlMap.find(oTarget), j = 0; 
-        j != (int)m_oControlMap.count(oTarget); j++, i++) 
+    pair<ControlMapIterator, ControlMapIterator> keyRange
+        = m_oControlMap.equal_range(oTarget);
+
+    for (i = keyRange.first; i != keyRange.second; i++)
     {
-         (*i).second->Enable(bSet, bEnable);
-    }        
+        i->second->Enable(bSet, bEnable);
+    }
 
     DecUsageRef();
 
@@ -257,11 +261,13 @@ Error Window::ControlShow(const string &oTarget, bool bSet, bool &bShow)
     int                 j;
 
     IncUsageRef();
-       
-    for(i = m_oControlMap.find(oTarget), j = 0; 
-        j != (int)m_oControlMap.count(oTarget); j++, i++) 
+
+    pair<ControlMapIterator, ControlMapIterator> keyRange
+        = m_oControlMap.equal_range(oTarget);
+
+    for (i = keyRange.first; i != keyRange.second; i++)
     {
-        pControl = (*i).second;
+        pControl = i->second;
         
         eRet = pControl->Show(bSet, bShow);
 
@@ -285,10 +291,12 @@ Error Window::ControlIntValue(const string &oTarget, bool bSet, int &iValue)
 
     IncUsageRef();
        
-    for(i = m_oControlMap.find(oTarget), j = 0; 
-        j != (int)m_oControlMap.count(oTarget); j++, i++) 
+    pair<ControlMapIterator, ControlMapIterator> keyRange
+        = m_oControlMap.equal_range(oTarget);
+
+    for (i = keyRange.first; i != keyRange.second; i++)
     {
-         (*i).second->IntValue(bSet, iValue);
+         i->second->IntValue(bSet, iValue);
     }        
 
     DecUsageRef();
@@ -299,32 +307,34 @@ Error Window::ControlIntValue(const string &oTarget, bool bSet, int &iValue)
 Error Window::ControlStringValue(const string &oTarget, bool bSet, string &oValue)
 {
     ControlMapIterator  i;
-    int                 j;
 
     IncUsageRef();
        
-    for(i = m_oControlMap.find(oTarget), j = 0; 
-        j != (int)m_oControlMap.count(oTarget); j++, i++) 
+    pair<ControlMapIterator, ControlMapIterator> keyRange
+        = m_oControlMap.equal_range(oTarget);
+
+    for (i = keyRange.first; i != keyRange.second; i++)
     {
-         (*i).second->StringValue(bSet, oValue);
+        i->second->StringValue(bSet, oValue);
     }        
 
     DecUsageRef();
 
-    return (j == 0) ? kError_InvalidParam : kError_NoErr;
+    return kError_NoErr;
 }
 
 Error Window::ControlGetDesc(const string &oTarget, string &oDesc)
 {
     ControlMapIterator  i;
-    int                 j;
 
     IncUsageRef();
        
-    for(i = m_oControlMap.find(oTarget), j = 0; 
-        j != (int)m_oControlMap.count(oTarget); j++, i++) 
+    pair<ControlMapIterator, ControlMapIterator> keyRange
+        = m_oControlMap.equal_range(oTarget);
+
+    for (i = keyRange.first; i != keyRange.second; i++)
     {
-         (*i).second->GetDesc(oDesc);
+         i->second->GetDesc(oDesc);
          DecUsageRef();
          return kError_NoErr;
     }        
@@ -337,14 +347,15 @@ Error Window::ControlGetDesc(const string &oTarget, string &oDesc)
 Error Window::ControlGetTip(const string &oTarget, string &oTip)
 {
     ControlMapIterator  i;
-    int                 j;
 
     IncUsageRef();
        
-    for(i = m_oControlMap.find(oTarget), j = 0; 
-        j != (int)m_oControlMap.count(oTarget); j++, i++) 
+    pair<ControlMapIterator, ControlMapIterator> keyRange
+        = m_oControlMap.equal_range(oTarget);
+
+    for (i = keyRange.first; i != keyRange.second; i++)
     {
-         (*i).second->GetTip(oTip);
+         i->second->GetTip(oTip);
          DecUsageRef();
          return kError_NoErr;
     }        

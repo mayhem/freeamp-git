@@ -277,8 +277,11 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
        // Is this a reload, as opposed to a new load?
        if (m_pWindows)
        {
-          // Clear the current window list
-          ClearWindows();
+          vector<Window *> oWindows;
+          vector<Bitmap *> oBitmaps;
+          vector<Font *>   oFonts;
+          
+          oWindows = *m_pWindows;
 
           // Adopt the new window vector
           m_pWindows = m_pParsedWindows;
@@ -300,9 +303,9 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
           if (!pNewWindow)
              pNewWindow = pMainWindow;
           
-          // Clear out all the old bitmaps and fonts
-          ClearBitmaps();
-          ClearFonts();
+          // Save the old bitmaps and fonts
+          oFonts = *m_pFonts;
+          oBitmaps = *m_pBitmaps;
 
           // Accept the new bitmaps and font.
           m_pBitmaps = m_pParsedBitmaps;
@@ -323,6 +326,23 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
           m_pWindow->VulcanMindMeld(pNewWindow);
           // And if god doesn't stike me down right now,
           // everything *should* be fine.
+
+          // Now delete the old crap
+          while(oFonts.size() > 0)
+          {
+             delete oFonts[0];
+             oFonts.erase(oFonts.begin());
+          }
+          while(oBitmaps.size() > 0)
+          {
+             delete oBitmaps[0];
+             oBitmaps.erase(oBitmaps.begin());
+          }
+          while(oWindows.size() > 0)
+          {
+             delete oWindows[0];
+             oWindows.erase(oWindows.begin());
+          }
        }
        else
        {
