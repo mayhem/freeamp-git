@@ -48,14 +48,14 @@ typedef enum {
     STATE_Stopped,
 } PlayerState;
 
-class Player {
+class Player : public EventQueue {
 
  public:
     //Player();
     static Player *getPlayer();
     ~Player();
 
-    int32 acceptEvent(Event c);
+    virtual int32 acceptEvent(Event *);
     int32 registerCOO(COO *);
     int32 registerCIO(CIO *);
     void testQueue();

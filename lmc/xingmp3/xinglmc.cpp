@@ -47,22 +47,21 @@ int wait_n_times;
 
 #define TEST_TIME 0
 
-XingLMC::
-//XingLMC(Input* input, Output* output, EventCallback callback, void* cookie)
-XingLMC(PhysicalMediaInput* input, PhysicalMediaOutput* output)
-{
-    //cout << "XingLMC::XingLMC: Creating XingLMC..." << endl;
-    wait_n_times = 0;
-    decoderThread = NULL;
-    xcqueue = new Queue<XingCommand *>(false); 
-    seek_mutex = new Mutex();
-    m_input				= input;
-    m_output			= output;
-    bs_bufbytes = 0;
-    bs_trigger = 2500;
-    bs_buffer = NULL;
-    bs_bufptr = bs_buffer;
-    bs_buffer = new unsigned char[BS_BUFBYTES];
+#define SEND_EVENT(e) if (myEQ) myEQ->acceptEvent(e);
+
+void XingLMC::SetInfoEventQueue(EventQueue *eq) {
+    myEQ = eq;
+}
+
+void XingLMC::SetPMI(PhysicalMediaInput *i) {
+    m_input = i;
+}
+
+void XingLMC::SetPMO(PhysicalMediaOutput *o) {
+    m_output = o;
+}
+
+void XingLMC::Init() {
     if (bs_fill()) {
 	MPEG_HEAD head;
 	int32 bitrate;
@@ -109,8 +108,7 @@ XingLMC(PhysicalMediaInput* input, PhysicalMediaOutput* output)
 	    MediaVitalInfo *mvi = new MediaVitalInfo(streamname,streamname,totalFrames,bytesPerFrame,bitrate,samprate,totalTime, tag_info);
 	    delete streamname;
 	    Event *e = new Event(INFO_MediaVitalStats,mvi);
-	    Player::getPlayer()->acceptEvent(*e);
-	    delete e;
+	    SEND_EVENT(e);
 	}
 	
 	pcm_buffer = new unsigned char[PCM_BUFBYTES];
@@ -128,7 +126,7 @@ XingLMC(PhysicalMediaInput* input, PhysicalMediaOutput* output)
 //		    sprintf(psamprate,"%6ld KHz",decinfo.samprate);
 //		    MediaVitalInfo *mvi = new MediaVitalInfo(NULL,hours,minutes,seconds,milliseconds,frames,pbitrate,psamprate);
 //		    Event *e = new Event(INFO_MediaVitalStats,mvi);
-//		    Player::getPlayer()->acceptEvent(*e);
+//		    SEND_EVENT(e);
 //		    delete e;
 	    }
 #if __BYTE_ORDER != __LITTLE_ENDIAN
@@ -149,6 +147,23 @@ XingLMC(PhysicalMediaInput* input, PhysicalMediaOutput* output)
 	return;
     }
     //cout << "XingLMC::XingLMC: constructor succeeded" << endl;
+}
+
+XingLMC::
+//XingLMC(Input* input, Output* output, EventCallback callback, void* cookie)
+XingLMC()
+{
+    //cout << "XingLMC::XingLMC: Creating XingLMC..." << endl;
+    myEQ = NULL;
+    wait_n_times = 0;
+    decoderThread = NULL;
+    xcqueue = new Queue<XingCommand *>(false); 
+    seek_mutex = new Mutex();
+    bs_bufbytes = 0;
+    bs_trigger = 2500;
+    bs_buffer = NULL;
+    bs_bufptr = bs_buffer;
+    bs_buffer = new unsigned char[BS_BUFBYTES];
 }
 
 XingLMC::~XingLMC() {
@@ -277,8 +292,7 @@ void XingLMC::DecodeWork() {
 	    float totalTime = (float)((double)u * (double)tpf);
 	    MediaTimePositionInfo *pmtpi = new MediaTimePositionInfo(totalTime,u);
 	    Event *e = new Event(INFO_MediaTimePosition,pmtpi);
-	    Player::getPlayer()->acceptEvent(*e);
-	    delete e;
+	    SEND_EVENT(e);
 	}
 	//cout << "Paused: " << isPaused << endl;
 	CHECK_COMMAND;
@@ -382,8 +396,7 @@ void XingLMC::DecodeWork() {
 	pcm_bufbytes = 0;
     }
     Event *e = new Event(INFO_DoneOutputting);
-    Player::getPlayer()->acceptEvent(*e);
-    delete e;
+    SEND_EVENT(e);
     
     return;
 }

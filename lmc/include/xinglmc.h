@@ -53,7 +53,7 @@ class XingLMC : public LMC {
 
 public:
 //	XingLMC(PhysicalMediaInput* input, PhysicalMediaOutput* output,EventCallback callback, void* cookie);
-    XingLMC(PhysicalMediaInput* input, PhysicalMediaOutput* output);
+    XingLMC();
     
     virtual ~XingLMC();
     
@@ -63,6 +63,11 @@ public:
     virtual void Resume();
     virtual void Reset();
     virtual bool ChangePosition(int32 position);
+
+    virtual void SetPMI(PhysicalMediaInput *);
+    virtual void SetPMO(PhysicalMediaOutput *);
+    virtual void SetInfoEventQueue(EventQueue *);
+    virtual void Init();
 //	bool SetCallback(EventCallback callback, void* cookie);
 
     void DecodeWork();
@@ -72,6 +77,7 @@ private:
     int32 bs_fill();
     void bs_clear();
 private:
+    EventQueue *myEQ;
     Mutex *seek_mutex;
     Queue<XingCommand *> *xcqueue;
     PhysicalMediaInput*				m_input;

@@ -36,7 +36,10 @@ int main(int argc, char **argv) {
     cout << "Playing " << argv[1] << " for testing..." << endl;
     LocalFileInput *pLFI = new LocalFileInput(argv[1]);
     SoundCardPMO *pSCO = new SoundCardPMO();
-    XingLMC *myLMC = new XingLMC(pLFI,pSCO);
+    XingLMC *myLMC = new XingLMC();
+    myLMC->SetPMI(pLFI);
+    myLMC->SetPMO(pSCO);
+    myLMC->Init();
     myLMC->DecodeWork();
     delete myLMC;
     return 0;

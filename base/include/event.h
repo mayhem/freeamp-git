@@ -46,6 +46,10 @@ class Event {
     
 };
 
+class EventQueue {
+ public:
+    virtual int32 acceptEvent(Event *) = 0;
+};
 
 #define CMD_Stop                1  // stop current play  (no arg)
 #define CMD_Play                2  // Play current media piece from beginning (no arg)

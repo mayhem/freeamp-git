@@ -28,6 +28,9 @@ ____________________________________________________________________________*/
 #define _LMC_H_
 
 
+#include "event.h"
+#include "pmo.h"
+#include "pmi.h"
 
 class LMC {
  public:
@@ -38,7 +41,11 @@ class LMC {
     virtual void Resume() = 0;
     virtual void Reset() = 0;
     virtual bool ChangePosition(int32) = 0;
-    
+
+    virtual void SetPMI(PhysicalMediaInput *) = 0;
+    virtual void SetPMO(PhysicalMediaOutput *) = 0;
+    virtual void SetInfoEventQueue(EventQueue *) = 0;
+    virtual void Init() = 0;
 };
 
 #endif // _LMC_H_
