@@ -457,7 +457,7 @@ static int unpack_side_MPEG1(void)
 	 side_info.gr[igr][ch].big_values = bitget(9);
 
          if (side_info.gr[igr][ch].big_values > 288)
-             return 0;
+             return -1;
 	 
 	 side_info.gr[igr][ch].global_gain = bitget(8) + gain_adjust;
 	 if (ms_mode)
@@ -577,7 +577,7 @@ static int unpack_side_MPEG2(int igr)
       side_info.gr[igr][ch].big_values = bitget(9);
 	  
       if (side_info.gr[igr][ch].big_values > 288)
-	  return 0; // to catch corrupt sideband data
+	  return -1; // to catch corrupt sideband data
       
       side_info.gr[igr][ch].global_gain = bitget(8) + gain_adjust;
       if (ms_mode)
@@ -809,6 +809,11 @@ IN_OUT L3audio_decode_MPEG1(unsigned char *bs, unsigned char *pcm)
 
 /*-- unpack side info --*/
    side_bytes = unpack_side_MPEG1();
+   if (side_bytes < 0)
+	{
+	    in_out.in_bytes = 0;
+		 return in_out;
+   }
    padframebytes = framebytes + pad;
    in_out.in_bytes = padframebytes;
 
@@ -887,6 +892,11 @@ IN_OUT L3audio_decode_MPEG2(unsigned char *bs, unsigned char *pcm)
 
 /*-- unpack side info --*/
    side_bytes = unpack_side_MPEG2(igr);
+   if (side_bytes < 0)
+	{
+	    in_out.in_bytes = 0;
+		 return in_out;
+   }
    padframebytes = framebytes + pad;
    in_out.in_bytes = padframebytes;
 

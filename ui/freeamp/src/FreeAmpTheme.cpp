@@ -990,7 +990,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
        int    iPos;
 
        m_pWindow->ControlIntValue(oControlName, false, iPos);
-       sprintf(szText, "%d db", ((iPos - 50) * 10) / 25);
+       sprintf(szText, "%d db", ((iPos - 50) * 2) / 3);
        oDesc = string(szText);
        m_pWindow->ControlStringValue(oName, true, oDesc);
                                 
