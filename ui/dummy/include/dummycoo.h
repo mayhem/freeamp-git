@@ -31,7 +31,7 @@ ____________________________________________________________________________*/
 class DummyCOO : public UserInterface {
  public:
     virtual int32 AcceptEvent(Event *);
-    virtual int32 SetArgs(int32 i, char **c) { return 0; }
+    virtual void  SetArgs(int32 i, char **c) { return; }
     DummyCOO(Semaphore*);
     virtual ~DummyCOO();
 

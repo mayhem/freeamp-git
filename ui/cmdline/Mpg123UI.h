@@ -35,7 +35,7 @@ class Mpg123UI : public UserInterface {
     Mpg123UI();
 
     virtual int32 AcceptEvent(Event *);
-    virtual void setArgs(int argc, char **argv);
+    virtual void SetArgs(int argc, char **argv);
     ~Mpg123UI();
  private:
     bool verboseMode;

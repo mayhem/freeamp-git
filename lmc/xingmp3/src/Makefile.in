@@ -315,8 +315,8 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 include @top_srcdir@/config/Makefile.header
 
 all-local: $(MYLIBS)
-	gcc -shared -Wl,-soname,libxingmp3.lmc -o libxingmp3.lmc *.o
-	cp libxingmp3.lmc @top_srcdir@/lmc
+	gcc -shared -Wl,-soname,xingmp3-@target_os@.lmc -o xingmp3-@target_os@.lmc *.o
+	cp xingmp3-@target_os@.lmc @top_srcdir@/lmc
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

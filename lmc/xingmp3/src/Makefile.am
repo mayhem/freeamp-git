@@ -48,6 +48,6 @@ CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT) -D__@target_os@__ -fPIC
 CFLAGS = $(EXTRA_CFLAGS) $(REENT) -D__@target_os@__ -fPIC
 
 all-local: $(MYLIBS)
-	gcc -shared -Wl,-soname,libxingmp3.lmc -o libxingmp3.lmc *.o
-	cp libxingmp3.lmc @top_srcdir@/lmc
+	gcc -shared -Wl,-soname,xingmp3-@target_os@.lmc -o xingmp3-@target_os@.lmc *.o
+	cp xingmp3-@target_os@.lmc @top_srcdir@/lmc
 

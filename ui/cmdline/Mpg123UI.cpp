@@ -76,7 +76,7 @@ Mpg123UI::~Mpg123UI() {
 
 int32 Mpg123UI::AcceptEvent(Event *e) {
     if (e) {
-	//cerr << "Mpg123COO: processing event " << e->getEvent() << endl;
+	cerr << "Mpg123COO: processing event " << e->GetEvent() << endl;
 	switch (e->GetEvent()) {
 	    case INFO_PlayListDonePlay: {
 		Event *e = new Event(CMD_QuitPlayer);
@@ -162,7 +162,7 @@ int32 Mpg123UI::AcceptEvent(Event *e) {
 }
 
 
-void Mpg123UI::setArgs(int argc, char **argv) {
+void Mpg123UI::SetArgs(int argc, char **argv) {
     PlayList *pl = new PlayList();
     char *pc = NULL;
     bool do_shuffle = false;
@@ -301,9 +301,32 @@ void Mpg123UI::setArgs(int argc, char **argv) {
     Player::GetPlayer()->AcceptEvent(e);
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+void SetArgs(UIRef ref, int32 c, char **v) {
+    UserInterface *ui = (UserInterface *)ref->ref;
+    ui->SetArgs(c,v);
+}
 
+int32 AcceptEvent(UIRef ref,Event *e) {
+    UserInterface *ui = (UserInterface *)ref->ref;
+    return ui->AcceptEvent(e);
+}
 
+void Initialize(UIRef ref)
+{
+    if(ref)
+    {
+        UserInterface *ui = new Mpg123UI();
+        ref->ref = ui;
 
+	ref->SetArgs = SetArgs;
+	ref->AcceptEvent = AcceptEvent;
+    }
+}
 
-
+#ifdef __cplusplus
+	   }
+#endif

@@ -30,11 +30,6 @@ ____________________________________________________________________________*/
 #include "vector.h"
 #include "ctrlobj.h"
 #include "queue.h"
-#ifdef __linux__
-#include "localfileinput.h"
-#include "soundcardpmo.h"
-#include "xinglmc.h"
-#endif
 #include "semaphore.h"
 #include "eventdata.h"
 #include "registrar.h"
@@ -51,7 +46,7 @@ Player *Player::GetPlayer() {
 }
 
 Player::Player() {
-    cout << "Creating player..." << endl;
+    //cout << "Creating player..." << endl;
     event_sem = new Semaphore();
     event_queue = new Queue<Event *>();
     //cout << "Created queue" << endl;
@@ -292,7 +287,7 @@ bool Player::SetState(PlayerState ps) {
 
 int32 Player::ServiceEvent(Event *pC) {
     if (pC) {
-	//cout << "Player: serviceEvent: servicing Event: " << pC->GetEvent() << endl;
+	cout << "Player: serviceEvent: servicing Event: " << pC->GetEvent() << endl;
 	switch (pC->GetEvent()) {
 	    case INFO_DoneOutputting: {  // LMC or PMO sends this when its done outputting whatever.  Now, go on to next piece in playlist
                 if (SetState(STATE_Stopped)) {

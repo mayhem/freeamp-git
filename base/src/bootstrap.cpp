@@ -124,8 +124,10 @@ int main(int argc, char **argv) {
     pP->RegisterUIs(ui);
 
 
+    cout << "Looking to start up a UI..." << endl;
     RegistryItem *item = ui->GetItem(0);
     if (item) {
+	cout << "Got an item..." << endl;
 	UI *myui = new UI;
 	item->InitFunction()(myui);
 	myui->SetArgs(myui,argc,argv);
