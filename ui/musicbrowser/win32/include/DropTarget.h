@@ -26,8 +26,8 @@ ____________________________________________________________________________*/
 
 #include <ole2.h>
 
-#define UWM_DROPURLS    WM_USER + 92173 
-#define UWM_MOVEITEMS   WM_USER + 120742
+#define UWM_DROPURLS    WM_USER + 42 
+#define UWM_MOVEITEMS   WM_USER + 43
 
 class FAR DropTarget : public IDropTarget
 {
