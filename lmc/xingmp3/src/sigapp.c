@@ -96,10 +96,9 @@ int ff_decode(char *filename, char ascii_sig[37],
    DEC_INFO  decinfo;
    int       bitrate, ret = 0;
    char      sig[17];
-   musicbrainz_t mb = 0;
+   trm_t     trm = 0;
    unsigned  int skip;
-
-
+   
 /*------------------------------------------*/
 /*   typedef struct
    {
@@ -195,8 +194,8 @@ int ff_decode(char *filename, char ascii_sig[37],
 /*---- get info -------*/
    audio_decode_info(&m, &decinfo);
 
-   mb = mb_New();
-   mb_SetPCMDataInfo(mb, decinfo.samprate, decinfo.channels, decinfo.bits);
+   trm = trm_New();
+   trm_SetPCMDataInfo(trm, decinfo.samprate, decinfo.channels, decinfo.bits);
    cvt_to_wave_init(decinfo.bits);
 
    for (u = 0;;)
@@ -218,12 +217,12 @@ int ff_decode(char *filename, char ascii_sig[37],
       if (pcm_bufbytes > pcm_trigger)
       {
          pcm_bufbytes = cvt_to_wave(pcm_buffer, pcm_bufbytes);
-         ret = mb_GenerateSignature(mb, pcm_buffer, pcm_bufbytes, sig, NULL);
+         ret = trm_GenerateSignature(trm, pcm_buffer, pcm_bufbytes, sig, NULL);
          if (ret)
          {
-            pcm_bufbytes = 0;
-            break;
-         }
+             pcm_bufbytes = 0;
+             break;
+	 }
 
          out_bytes += pcm_bufbytes;
          pcm_bufbytes = 0;
@@ -235,15 +234,15 @@ int ff_decode(char *filename, char ascii_sig[37],
    {
       pcm_bufbytes = cvt_to_wave(pcm_buffer, pcm_bufbytes);
 
-      ret = mb_GenerateSignature(mb, pcm_buffer, pcm_bufbytes, sig, NULL);
+      ret = trm_GenerateSignature(trm, pcm_buffer, pcm_bufbytes, sig, NULL);
       if (!ret)
-          mb_GenerateSignatureNow(mb, sig, NULL);
+          trm_GenerateSignatureNow(trm, sig, NULL);
 
       out_bytes += pcm_bufbytes;
       pcm_bufbytes = 0;
    }
 
-   mb_ConvertSigToASCII(mb, sig, ascii_sig); 
+   trm_ConvertSigToASCII(trm, sig, ascii_sig); 
 
    ret = 1;
 
@@ -251,7 +250,7 @@ int ff_decode(char *filename, char ascii_sig[37],
    close(handle);
    free(bs_buffer);
    free(pcm_buffer);
-   mb_Delete(mb);
+   trm_Delete(trm);
    return ret;
 }
 /*-------------------------------------------------------------*/

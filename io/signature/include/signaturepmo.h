@@ -74,7 +74,7 @@ public:
   Thread*         m_pBufferThread;
   bool            m_initialized;
 
-  musicbrainz_t   m_MB;
+  trm_t           m_TRM;
   string          m_strGUID;
   string          m_collID;
 };

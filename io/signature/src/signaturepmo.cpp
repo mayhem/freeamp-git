@@ -56,7 +56,7 @@ SignaturePMO(FAContext *context):
 {
     m_pBufferThread       = NULL;
 
-    m_MB = mb_New();
+    m_TRM = trm_New();
 
     if (!m_pBufferThread)
     {
@@ -82,10 +82,10 @@ SignaturePMO::
      delete m_pBufferThread;
      m_pBufferThread = NULL;
   }
-  if (m_MB)
+  if (m_TRM)
   {
-     mb_Delete(m_MB);
-     m_MB = NULL;
+     trm_Delete(m_TRM);
+     m_TRM = NULL;
   }
 }
 
@@ -134,12 +134,12 @@ Init(OutputInfo* info)
            nPort = atoi(port);
 
        free(buffer);
-       mb_SetProxy(m_MB, (char *)proxyAddr.c_str(), nPort);
+       trm_SetProxy(m_TRM, (char *)proxyAddr.c_str(), nPort);
    }
 
-   mb_SetPCMDataInfo(m_MB, info->samples_per_second, 
-                    info->number_of_channels,
-                     info->bits_per_sample);
+   trm_SetPCMDataInfo(m_TRM, info->samples_per_second, 
+                      info->number_of_channels,
+                      info->bits_per_sample);
 
    m_strGUID = "";
    m_initialized = true;
@@ -286,8 +286,8 @@ WorkerThread(void)
                 {
                     bGotPMOQuit = true;
 
-                    mb_GenerateSignatureNow(m_MB, guid, 
-                    (char *)m_collID.c_str());
+                    trm_GenerateSignatureNow(m_TRM, guid, 
+                                             (char *)m_collID.c_str());
                     m_strGUID = string(guid);
                     continue;
                 }
@@ -321,8 +321,8 @@ WorkerThread(void)
             continue;
         }
 
-        if (mb_GenerateSignature(m_MB, (char *)pBuffer, 
-                              m_data_size, guid, (char *)m_collID.c_str())) 
+        if (trm_GenerateSignature(m_TRM, (char *)pBuffer, 
+                                  m_data_size, guid, (char *)m_collID.c_str())) 
         {
             m_strGUID = string(guid);
             bDone = true;

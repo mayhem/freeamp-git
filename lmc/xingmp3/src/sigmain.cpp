@@ -178,10 +178,13 @@ int main(int argc, char *argv[])
    MetaData    m;
    struct stat s;
    int         index = 1;
+   bool        hasmeta = false;
 
    if (argc < 2)
    {
-       printf("Usage: sigapp [-q] [-n] <mp3 file>\n");
+       printf("Usage: sigapp [-q] [-n] [-s secs] <mp3 file>\n");
+       printf("  -q => quiet mode\n");
+       printf("  -n => don't submit data to musicbrainz\n");
        exit(0);
    }
 
@@ -194,6 +197,13 @@ int main(int argc, char *argv[])
    if (strcmp(argv[index], "-n") == 0)
    {
        nosubmit = 1;
+       index++;
+   }
+
+   if (strcmp(argv[index], "-s") == 0)
+   {
+       index++;
+       secs = atoi(argv[index]);
        index++;
    }
 
@@ -212,7 +222,11 @@ int main(int argc, char *argv[])
           printf("     Time: %d\n", m.Time());
           printf("     Size: %d\n", m.Size());
        }
-
+       hasmeta = true;
+   }
+    
+   if (hasmeta || nosubmit)
+   {
        if (ff_decode(argv[index], sig, 0, 0, 0, 24000, 0))
        {
            m.SetGUID(sig);
