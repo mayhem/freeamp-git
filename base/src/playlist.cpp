@@ -933,7 +933,9 @@ ExpandM3U(char *szM3UFile, List<char *> &MP3List)
 		 {
              if( !strncmp(szLine, "..", 2) ||
                  (strncmp(szLine + 1, ":\\", 2) &&
-                 strncmp(szLine, "\\", 1)))
+                  strncmp(szLine, "\\", 1)) &&
+                 (strncmp(szLine, "http://", 7) &&
+                  strncmp(szLine, "rtp://", 6)) )
              {
                 char* cp;
 
