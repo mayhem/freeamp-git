@@ -38,6 +38,12 @@ ____________________________________________________________________________*/
 
 #include <string>
 #include <algorithm>
+#ifdef unix
+#include <strstream>
+typedef ostrstream ostringstream;
+#else
+#include <sstream>
+#endif
 
 using namespace std;
 
@@ -190,7 +196,7 @@ Error MusicCatalog::RemoveSong(const char *url)
 
     dbase->Remove(url);
 
-    if (meta->Artist() == " ") {
+    if (meta->Artist().size() == 0) {
         vector<PlaylistItem *>::iterator i = m_unsorted->begin();
         for (; i != m_unsorted->end(); i++)
             if (url == (*i)->URL())
@@ -272,7 +278,7 @@ Error MusicCatalog::AddSong(const char *url)
     else
         newtrack = new PlaylistItem(url, meta);
 
-    if (meta->Artist() == " ") {
+    if (meta->Artist().size() == 0) {
         m_unsorted->push_back(newtrack);
     }
     else {
@@ -334,14 +340,16 @@ Error MusicCatalog::Remove(const char *url)
     if (!data)
         return kError_ItemNotFound;
 
+    Error retvalue = kError_YouScrewedUp;
+
     if (!strncmp("P", data, 1))
-        return RemovePlaylist(url);
+        retvalue = RemovePlaylist(url);
     else if (!strncmp("M", data, 1))
-        return RemoveSong(url);
+        retvalue = RemoveSong(url);
 
     delete [] data;
 
-    return kError_YouScrewedUp;
+    return retvalue;
 }
 
 Error MusicCatalog::Add(const char *url)
@@ -357,13 +365,16 @@ Error MusicCatalog::Add(const char *url)
     if (!data)
         return kError_ItemNotFound;
 
+    Error retvalue = kError_YouScrewedUp;
+
     if (!strncmp("P", data, 1))
-        return AddPlaylist(url);
+        retvalue = AddPlaylist(url);
     else if (!strncmp("M", data, 1)) 
-        return AddSong(url);
+        retvalue = AddSong(url);
 
     delete [] data;
-    return kError_YouScrewedUp;
+
+    return retvalue;
 }
 
 void MusicCatalog::ClearCatalog()
@@ -613,54 +624,49 @@ void MusicBrowser::DoSearchMusic(char *path)
 }
 
 void MusicBrowser::WriteMetaDataToDatabase(const char *url, 
-                                           const MetaData information)
+                                           const MetaData metadata)
 {
     if (!m_database->Working())
         return;
 
-    string data;
-    char tempstr[11];
+    ostringstream ost;
+    char num[256];
+    const char *kDatabaseDelimiter = " ";
 
-    data = "M";
-    if (information.Artist() != "")
-        data += information.Artist();
-    else
-        data += " ";
-    data += DBASEDELIM;
-    if (information.Album() != "")
-        data += information.Album();
-    else
-        data += " ";
-    data += DBASEDELIM;
-    if (information.Title() != "")
-        data += information.Title();
-    else
-        data += " ";
-    data += DBASEDELIM;
-    if (information.Comment() != "")
-        data += information.Comment();
-    else
-        data += " ";
-    data += DBASEDELIM;
-    if (information.Genre() != "")
-        data += information.Genre();
-    else
-        data += " ";
-    data += DBASEDELIM;
+    ost << "M" << kDatabaseDelimiter;
 
-    sprintf(tempstr, "%u", information.Year());
-    data += tempstr;
-    data += DBASEDELIM;
-    sprintf(tempstr, "%u", information.Track());
-    data += tempstr;
-    data += DBASEDELIM;
-    sprintf(tempstr, "%u", information.Time());
-    data += tempstr;
-    data += DBASEDELIM;
-    sprintf(tempstr, "%u", information.Size());
-    data += tempstr;
+    ost << 9 << kDatabaseDelimiter;
 
-    m_database->Insert(url, (char *)data.c_str());
+    ost << metadata.Artist().size() << kDatabaseDelimiter;
+    ost << metadata.Album().size() << kDatabaseDelimiter;
+    ost << metadata.Title().size() << kDatabaseDelimiter;
+    ost << metadata.Comment().size() << kDatabaseDelimiter;
+    ost << metadata.Genre().size() << kDatabaseDelimiter;
+
+    sprintf(num, "%d", metadata.Year());
+    ost << strlen(num) << kDatabaseDelimiter;
+    sprintf(num, "%d", metadata.Track());
+    ost << strlen(num) << kDatabaseDelimiter;
+    sprintf(num, "%d", metadata.Time());
+    ost << strlen(num) << kDatabaseDelimiter;
+    sprintf(num, "%d", metadata.Size());
+    ost << strlen(num) << kDatabaseDelimiter;
+
+    ost << metadata.Artist();
+    ost << metadata.Album();
+    ost << metadata.Title();
+    ost << metadata.Comment();
+    ost << metadata.Genre();
+    ost << metadata.Year();
+    ost << metadata.Track();
+    ost << metadata.Time();
+    ost << metadata.Size();
+
+#ifdef WIN32
+    m_database->Insert(url, (char *)ost.str().c_str());
+#else
+    m_database->Insert(url, (char *)ost.str());
+#endif
 }
 
 MetaData *MusicBrowser::ReadMetaDataFromDatabase(const char *url)
@@ -668,37 +674,76 @@ MetaData *MusicBrowser::ReadMetaDataFromDatabase(const char *url)
     if (!m_database->Working())
         return NULL;
 
-    char *data = m_database->Value(url);
+    char *dbasedata = m_database->Value(url);
 
-    if (!data)
+    if (!dbasedata)
         return NULL;
 
-    MetaData *new_metadata = new MetaData();
-    char *temp = data + 1;
-    char *info; 
+    MetaData *metadata = new MetaData();
+    char *value = dbasedata + 2;
 
-    info = strtok(temp, DBASEDELIM);
-    new_metadata->SetArtist(info);
-    info = strtok(NULL, DBASEDELIM);
-    new_metadata->SetAlbum(info);
-    info = strtok(NULL, DBASEDELIM);
-    new_metadata->SetTitle(info);
-    info = strtok(NULL, DBASEDELIM);
-    new_metadata->SetComment(info);
-    info = strtok(NULL, DBASEDELIM);
-    new_metadata->SetGenre(info);
-    info = strtok(NULL, DBASEDELIM);
-    new_metadata->SetYear(atoi(info));
-    info = strtok(NULL, DBASEDELIM);
-    new_metadata->SetTrack(atoi(info));
-    info = strtok(NULL, DBASEDELIM);
-    new_metadata->SetTime(atoi(info));
-    info = strtok(NULL, DBASEDELIM);
-    new_metadata->SetSize(atoi(info));
+    uint32 numFields, offset = 0;
 
-    delete [] data;
+    sscanf(value, "%d%n", &numFields, &offset);
+    uint32* fieldLength =  new uint32[numFields];
 
-    return new_metadata;
+    for(uint32 i = 0; i < numFields; i++)
+    {
+        uint32 temp;
+
+        sscanf(value + offset, " %d %n", &fieldLength[i], &temp);
+        offset += temp;
+    }
+
+    string data = value;
+    data.erase(0, offset);
+
+    uint32 count = 0;
+
+    for(uint32 j = 0; j < numFields; j++)
+    {
+        switch(j)
+        {
+            case 0:
+                metadata->SetArtist(data.substr(count, fieldLength[j]).c_str());
+                break;
+            case 1:
+                metadata->SetAlbum(data.substr(count, fieldLength[j]).c_str());
+                break;
+            case 2:
+                metadata->SetTitle(data.substr(count, fieldLength[j]).c_str());
+                break;
+            case 3:
+                metadata->SetComment(data.substr(count, fieldLength[j]).c_str());
+                break;
+            case 4:
+                metadata->SetGenre(data.substr(count, fieldLength[j]).c_str());
+                break;
+            case 5:
+                metadata->SetYear(atoi(data.substr(count, fieldLength[j]).c_str()));
+                break;
+            case 6:
+                metadata->SetTrack(atoi(data.substr(count, fieldLength[j]).c_str()));
+                break;
+            case 7:
+                metadata->SetTime(atoi(data.substr(count, fieldLength[j]).c_str()));
+                break;
+            case 8:
+                metadata->SetSize(atoi(data.substr(count, fieldLength[j]).c_str()));
+                break;
+            default:
+                break;
+
+        }
+
+        count += fieldLength[j];
+    }
+
+    delete [] fieldLength;
+
+    delete [] dbasedata;
+
+    return metadata;
 }
 
 int32 MusicBrowser::AcceptEvent(Event *e)

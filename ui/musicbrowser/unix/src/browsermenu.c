@@ -54,7 +54,6 @@ void CreateMenuItems(GtkItemFactory *item_factory, void *p)
 {
     GtkItemFactoryEntry menu_items[] = {
      {"/_File",                 NULL,           0,         0, "<Branch>" },
-     {"/File/tearoff1",         NULL,           0,         0, "<Tearoff>" },
      {"/File/_New Playlist...",    "<control>N",new_plist, 0, 0 },
      {"/File/_Open Playlist...",   "<control>O",open_list, 0, 0 },
      {"/File/_Save Playlist",   "<control>S",   save_list, 0, 0 },

@@ -101,6 +101,9 @@ class GTKMusicBrowser {
     ClickState m_clickState;
     TreeClickState m_mbState;
 
+    int32 lastPanedPosition;
+    int32 lastPanedHandle;
+
     /* Widget creation */
     void CreateExpanded(void);
     void CreateMenu(GtkWidget *);
@@ -116,7 +119,12 @@ class GTKMusicBrowser {
     GtkWidget *playlistList;
     GtkWidget *playlistOMenu;
     GtkWidget *playlistMenu;
+    GtkWidget *addFile;
+    GtkWidget *toolUp;
+    GtkWidget *toolDown;
     GtkItemFactory *menuFactory;
+
+    GtkWidget *NewPixmap(char **data);
 
     void SetStatusText(const char *text);
     GtkWidget *statusBar;

@@ -106,7 +106,7 @@ class MusicBrowser : public EventQueue
     void SearchMusic(vector<string> &pathList);
     void StopSearchMusic(void);
     
-    void WriteMetaDataToDatabase(const char *url, const MetaData information);
+    void WriteMetaDataToDatabase(const char *url, const MetaData metadata);
     MetaData *ReadMetaDataFromDatabase(const char *url);
 
     virtual int32 AcceptEvent(Event *e);

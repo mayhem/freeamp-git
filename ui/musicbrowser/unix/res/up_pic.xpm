@@ -1,0 +1,31 @@
+/* XPM */
+static char *up_pic[] = {
+/* width height num_colors chars_per_pixel */
+"    16    16        8            1",
+/* colors */
+". c #000000",
+"# c #808000",
+"a c #000080",
+"b c #808080",
+"c c #c0c0c0",
+"d c #ff0000",
+"e c #ffff00",
+"f c #ffffff",
+/* pixels */
+"cccccccccccccccc",
+"cccccccccccccccc",
+"ccccccc.cccccccc",
+"cccccc.e.ccccccc",
+"ccccc.eee.cccccc",
+"cccc.eeeee.ccccc",
+"ccc.eeeeeee.cccc",
+"cc.eeeeeeeee.ccc",
+"c.eeeeeeeeeee.cc",
+"......eee......c",
+"ccccc.eee.cccccc",
+"ccccc.eee.cccccc",
+"ccccc.eee.cccccc",
+"ccccc.....cccccc",
+"cccccccccccccccc",
+"cccccccccccccccc"
+};

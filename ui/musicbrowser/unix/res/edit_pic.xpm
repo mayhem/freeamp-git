@@ -1,0 +1,31 @@
+/* XPM */
+static char *edit_pic[] = {
+/* width height num_colors chars_per_pixel */
+"    16    16        8            1",
+/* colors */
+". c #000000",
+"# c #808000",
+"a c #000080",
+"b c #808080",
+"c c #c0c0c0",
+"d c #ff0000",
+"e c #ffff00",
+"f c #ffffff",
+/* pixels */
+"cccccc....cccccc",
+"cc.....ee.....cc",
+"c.b#b.e..e.#b#.c",
+"c.#b.cccccc.#b.c",
+"c.b#........b#.c",
+"c.#b#b#b#b#b#b.c",
+"c.b#b#baaaaaaa.c",
+"c.#b#b#afffffaac",
+"c.b#b#bafffffafa",
+"c.#b#b#afaaafaaa",
+"c.b#b#bafffffffa",
+"c.#b#b#afaaaaafa",
+"cc.....afffffffa",
+"cccccccaaaaaaaaa",
+"cccccccccccccccc",
+"cccccccccccccccc"
+};
