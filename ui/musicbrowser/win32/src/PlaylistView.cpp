@@ -602,27 +602,28 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
         {
             HDC hdc = (HDC) wParam;
 
-            //HWND hwndHeader = FindWindowEx(hwnd, NULL, WC_HEADER, NULL);
 
-            //if(hwndHeader /* && !ListView_GetItemCount(hwnd) */)
+            SCROLLINFO si;
+            uint32 columnWidth = ListView_GetColumnWidth(hwnd, 0);
+
+            si.cbSize = sizeof(SCROLLINFO);
+            si.fMask = SIF_ALL;
+
+            GetScrollInfo(hwnd, SB_HORZ, &si);
+            
+            RECT rectClient, rectColumn;
+
+            GetClientRect(hwnd, &rectClient);
+
+            if(si.nPos < columnWidth)
             {
-                //RECT headerRect;
-                
-                //GetWindowRect(hwndHeader, &headerRect);
-
-                RECT rectClient, rectColumn;
-
-                GetClientRect(hwnd, &rectClient);
                 rectColumn = rectClient;
-
-                //rectColumn.top += (headerRect.bottom - headerRect.top);
-                rectColumn.right = rectColumn.left + ListView_GetColumnWidth(hwnd, 0);
+                rectColumn.right = rectColumn.left + columnWidth - si.nPos - 1;
                 rectClient.left = rectColumn.right;
-
-                FillRect(hdc, &rectClient, (HBRUSH)GetClassLong(hwnd, GCL_HBRBACKGROUND));
-
                 FillRect(hdc, &rectColumn, (HBRUSH)(COLOR_INFOBK + 1));
             }
+
+            FillRect(hdc, &rectClient, (HBRUSH)GetClassLong(hwnd, GCL_HBRBACKGROUND));
 
             return TRUE;
             break;
