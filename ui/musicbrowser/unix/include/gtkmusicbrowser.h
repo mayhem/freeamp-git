@@ -53,6 +53,27 @@ typedef enum {
     kClickTrack
 } TreeClickState;
 
+typedef enum {
+   kTreeMyMusic,
+   kTreeAll,
+   kTreeUncat,
+   kTreeArtist,
+   kTreeAlbum,
+   kTreeTrack,
+   kTreePlaylistHead,
+   kTreePlaylist
+} TreeNodeType;
+
+typedef struct {
+    int type;
+    MusicCatalog *catalog;
+    ArtistList   *artist;
+    AlbumList    *album;
+    PlaylistItem *track;
+    string        playlistname;
+    string        message;
+} TreeData;
+
 class GTKMusicBrowser {
  public:
     GTKMusicBrowser(FAContext *, MusicBrowserUI *masterUI,
@@ -72,9 +93,8 @@ class GTKMusicBrowser {
     int m_playlistLastSort;
     string m_currentListName;
 
-    char *mbSelName;
-    PlaylistItem *mbSel;
-    GtkWidget *mbSelWidget;
+    TreeData *mbSelection;
+    GtkCTree *musicBrowserTree;
  
     FAContext *GetContext(void) { return m_context; }
     void UpdateCatalog(void);
@@ -119,10 +139,10 @@ class GTKMusicBrowser {
     GtkWidget *masterBrowserBox;
     GtkWidget *masterPlaylistBox;
     GtkWidget *musicBrowserWindow;
-    GtkWidget *musicBrowserTree;
     GtkWidget *playlistList;
     GtkWidget *playlistOMenu;
     GtkWidget *playlistMenu;
+    GtkWidget *addTrack;
     GtkWidget *addFile;
     GtkWidget *toolUp;
     GtkWidget *toolDown;
@@ -138,6 +158,11 @@ class GTKMusicBrowser {
     GtkWidget *playlistSubTree;
   
     void UpdatePlayPause();
+    TreeData *NewTreeData(int type, MusicCatalog *cat = NULL, 
+                          ArtistList *art = NULL, AlbumList *alb = NULL, 
+                          PlaylistItem *tr = NULL, char *pname = NULL,
+                          char *message = NULL);
+
   public:
     ClickState GetClickState() { return m_clickState; }
     void SetClickState(ClickState newState);

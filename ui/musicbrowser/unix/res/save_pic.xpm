@@ -38,7 +38,7 @@ static char *save_pic[] = {
 "E c #b4bec9",
 "F c #b5bdc5",
 "G c #b5bec6",
-"H c #c0c0c0",
+"H c None",
 "I c #c0c2ca",
 "J c #c1cae7",
 "K c #ced7eb",

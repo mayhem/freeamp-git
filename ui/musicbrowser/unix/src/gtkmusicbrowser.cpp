@@ -42,10 +42,17 @@ ____________________________________________________________________________*/
 #include "../res/new_pic.xpm"
 #include "../res/import_pic.xpm"
 #include "../res/add_file.xpm"
+#include "../res/add_track.xpm"
 #include "../res/save_pic.xpm"
 #include "../res/trash_pic.xpm"
 #include "../res/up_pic.xpm"
-
+#include "../res/album_pix.xpm"
+#include "../res/all_pix.xpm"
+#include "../res/artist_pix.xpm"
+#include "../res/catalog_pix.xpm"
+#include "../res/playlist_pix.xpm"
+#include "../res/track_pix.xpm"
+#include "../res/uncatagorized_pix.xpm"
 
 extern "C" {
 void new_plist(GTKMusicBrowser *p, guint action, GtkWidget *w);
@@ -190,18 +197,45 @@ void GTKMusicBrowser::ShowOptions()
     m_context->target->AcceptEvent(new ShowPreferencesEvent());
 }
 
-struct {
-    void *data;
-    int type;
-} TreeData;
-
-static vector<PlaylistItem *> *getTreeSelection(GtkWidget *item)
+TreeData *GTKMusicBrowser::NewTreeData(int type, MusicCatalog *cat, 
+                                       ArtistList *art, AlbumList *alb, 
+                                       PlaylistItem *tr, char *pname,
+                                       char *message)
 {
-    int type = (int)gtk_object_get_data(GTK_OBJECT(item), "type");
+    TreeData *data = new TreeData;
+    data->type = type;
+    data->catalog = cat;
+    data->artist = art;
+    data->album = alb;
+    data->track = tr;
+    if (pname)
+        data->playlistname = pname;
+    else
+        data->playlistname = ""; 
+    if (message)
+        data->message = message;
+    else 
+        data->message = "";
+    return data;
+}
+
+static vector<PlaylistItem *> *getTreeSelection(GtkCTree *tree) 
+{
     vector<PlaylistItem *> *newlist = new vector<PlaylistItem *>;
-    switch (type) {
-        case 0: {
-            MusicCatalog *cat = (MusicCatalog *)gtk_object_get_user_data(GTK_OBJECT(item));
+
+    GtkCList *clist = GTK_CLIST(tree);
+    GList *selection = clist->selection;
+
+    while (selection) {
+      GtkCTreeNode *node = (GtkCTreeNode *)selection->data;
+      TreeData *data = (TreeData *)gtk_ctree_node_get_row_data(tree, node);
+
+      if (!data)
+          return newlist;
+
+      switch (data->type) {
+        case kTreeAll: {
+            MusicCatalog *cat = data->catalog;
             if (!cat)
                 return newlist;
             const vector<ArtistList *> *artistList = cat->GetMusicList();
@@ -223,8 +257,8 @@ static vector<PlaylistItem *> *getTreeSelection(GtkWidget *item)
                 newlist->push_back(item);
             }
             break; }
-        case 1: {
-            ArtistList *list = (ArtistList *)gtk_object_get_user_data(GTK_OBJECT(item));
+        case kTreeArtist: {
+            ArtistList *list = data->artist;
             vector<AlbumList *>::iterator i = list->m_albumList->begin();
             for (; i != list->m_albumList->end(); i++) {
                 vector<PlaylistItem *>::iterator j = (*i)->m_trackList->begin();
@@ -234,40 +268,36 @@ static vector<PlaylistItem *> *getTreeSelection(GtkWidget *item)
                 }
             }
             break; }
-        case 2: {
-            AlbumList *list = (AlbumList *)gtk_object_get_user_data(GTK_OBJECT(item));
+        case kTreeAlbum: {
+            AlbumList *list = data->album;
             vector<PlaylistItem *>::iterator j = list->m_trackList->begin();
             for (; j != list->m_trackList->end(); j++) {
                 PlaylistItem *item = new PlaylistItem(*(PlaylistItem *)*j);
                 newlist->push_back(item);
             }
             break; }
-        case 3: {
-            PlaylistItem *i = new PlaylistItem(*(PlaylistItem *)gtk_object_get_user_data(GTK_OBJECT(item)));
+        case kTreeTrack: {
+            PlaylistItem *i = new PlaylistItem(*(data->track));
             newlist->push_back(i);
             break; }
-        case 4: {
-            PlaylistItem *i = new PlaylistItem(*(PlaylistItem *)gtk_object_get_user_data(GTK_OBJECT(item)));
-            newlist->push_back(i);
-            break; }
-        case 5: {
-            char *fname = (char *)gtk_object_get_user_data(GTK_OBJECT(item));
+        case kTreePlaylist: {
+            char *fname = (char *)data->playlistname.c_str();
             BADContext->plm->ReadPlaylist(fname, newlist);
             break; }
-        case 8: {
-            vector<PlaylistItem *> *unsorted = (vector<PlaylistItem *> *)
-                                    gtk_object_get_user_data(GTK_OBJECT(item));
-            vector<PlaylistItem *>::iterator k = unsorted->begin();
+        case kTreeUncat: {
+            MusicCatalog *cat = data->catalog;
+            const vector<PlaylistItem *> *unsorted = cat->GetUnsortedMusic();
+            vector<PlaylistItem *>::const_iterator k = unsorted->begin();
             for (; k != unsorted->end(); k++) {
                 PlaylistItem *item = new PlaylistItem(*(PlaylistItem *)*k);
                 newlist->push_back(item);
             }
             break; }
-        case 9: {
-//            cout << "Danger, Wil Robinson, Danger!  To be implemented soon\n";
-            break; }
         default:
             break;
+      }
+
+      selection = selection->next;
     }
     return newlist;
 }
@@ -490,46 +520,44 @@ static gint list_drag_motion_internal(GtkWidget *widget,
 static void tree_clicked(GtkWidget *widget, GdkEventButton *event, 
                          GTKMusicBrowser *p)
 {
-    GtkWidget *item;
-
     if (!event)
         return;
 
     g_return_if_fail(widget != NULL);
-    g_return_if_fail(GTK_IS_TREE(widget));
+    g_return_if_fail(GTK_IS_CTREE(widget));
     g_return_if_fail(event != NULL);
 
-    item = gtk_get_event_widget((GdkEvent *)event);
+    GtkCTree *ctree = GTK_CTREE(widget);
+    GtkCList *clist = GTK_CLIST(widget);
 
-    while (item && !GTK_IS_TREE_ITEM(item))
-        item = item->parent;
- 
-    if (!item  || (item->parent != widget))
+    if (event->window != clist->clist_window)
         return;
 
     if (event->type == GDK_2BUTTON_PRESS) {
-        vector<PlaylistItem *> *newlist = getTreeSelection(item);
+        vector<PlaylistItem *> *newlist = getTreeSelection(ctree);
         p->AddTracksPlaylistEvent(newlist, true);
     }
     else {
-        int type = (int)gtk_object_get_data(GTK_OBJECT(item), "type");
+        int x, y, row, column;
 
-        p->mbSelWidget = item;
+        x = (int)event->x;
+        y = (int)event->y;
+ 
+        if (!gtk_clist_get_selection_info(clist, x, y, &row, &column)) 
+            return;
 
-        if (type == 5) {
+        GtkCTreeNode *node = GTK_CTREE_NODE(g_list_nth(clist->row_list, row));
+        p->mbSelection = (TreeData *)gtk_ctree_node_get_row_data(ctree, node);
+
+        if (p->mbSelection->type == kTreePlaylist) 
             p->SetTreeClick(kClickPlaylist);
-            p->mbSelName = (char *)gtk_object_get_user_data(GTK_OBJECT(item));
-        }
-        else if (type == 3 || type == 4) {
+        else if (p->mbSelection->type == kTreeTrack) 
             p->SetTreeClick(kClickTrack);
-            p->mbSel = (PlaylistItem *)gtk_object_get_user_data(GTK_OBJECT(item));
-            p->mbSelName = (char *)(p->mbSel->URL().c_str());
-        }
         else
             p->SetTreeClick(kClickNone);
     }
 
-    p->SetClickState(kContextBrowser);
+    p->SetClickState(kContextBrowser); 
 }
 
 static void tree_source_destroy(gpointer data)
@@ -538,17 +566,30 @@ static void tree_source_destroy(gpointer data)
 
 static void tree_drag_begin(GtkWidget *w, GdkDragContext *context)
 {
-    GList *selected = GTK_TREE_SELECTION(GTK_TREE(w));
+    GtkCTree *ctree;
+    GtkCList *clist;
+ 
+    g_return_if_fail(w != NULL);
+    g_return_if_fail(GTK_IS_CTREE(w));
+    g_return_if_fail(context != NULL);
 
-    if (selected == NULL)
-        return;
+    ctree = GTK_CTREE(w);
+    clist = GTK_CLIST(w);
 
-    GtkWidget *item = GTK_WIDGET(selected->data);
+    vector<PlaylistItem *> *newlist = getTreeSelection(ctree);
 
-    if (!item && !GTK_IS_TREE_ITEM(item))
-        return;
+    if (newlist->size() == 0) {
+        delete newlist;
 
-    vector<PlaylistItem *> *newlist = getTreeSelection(item);
+        GtkCTreeNode *node = GTK_CTREE_NODE(g_list_nth(clist->row_list,
+                                                       clist->click_cell.row));
+        gtk_ctree_select(ctree, node);
+
+        newlist = getTreeSelection(ctree);
+
+        if (newlist->size() == 0)
+            return;
+    }
 
     vector<PlaylistItem *> *test = 
          (vector<PlaylistItem *> *)g_dataset_get_data(context, 
@@ -571,18 +612,94 @@ static void tree_drag_data_get(GtkWidget *w, GdkDragContext *context,
     }
 }
 
-static void tree_status(GtkWidget *w, GdkEventCrossing *event, char *message)
+static void tree_status(GtkWidget *w, GdkEventMotion *event, 
+                        GTKMusicBrowser *p)
 {
-    BADContext->target->AcceptEvent(new BrowserMessageEvent(message));
+    int x, y, row, column;
+    GtkCTree *ctree = GTK_CTREE(w);
+    GtkCList *clist = GTK_CLIST(w);
+
+    x = (int)event->x;
+    y = (int)event->y;
+
+    if (!gtk_clist_get_selection_info(clist, x, y, &row, &column)) {
+        gdk_threads_leave();
+        p->AcceptEvent(new BrowserMessageEvent(" "));
+        gdk_threads_enter();
+        return;
+    }
+
+    GtkCTreeNode *node = GTK_CTREE_NODE(g_list_nth(clist->row_list, row));
+    TreeData *data = (TreeData *)gtk_ctree_node_get_row_data(ctree, node);
+
+    gdk_threads_leave();
+    switch (data->type) {
+        case kTreeMyMusic:
+        case kTreeAll:
+        case kTreeUncat:
+        case kTreePlaylistHead:
+        case kTreePlaylist:
+            p->AcceptEvent(new BrowserMessageEvent(data->message.c_str()));
+            break;
+        default:
+            p->AcceptEvent(new BrowserMessageEvent(" "));
+            break;
+    }
+    gdk_threads_enter();
+}
+
+static void tree_status_clear(GtkWidget *w, GdkEventCrossing *event, 
+                              GTKMusicBrowser *p)
+{
+    gdk_threads_leave();
+    p->AcceptEvent(new BrowserMessageEvent(" "));
+    gdk_threads_enter();
+}
+
+static gint nocase_compare(GtkCList *clist, gconstpointer ptr1, 
+                           gconstpointer ptr2)
+{
+    char *text1 = NULL;
+    char *text2 = NULL;
+
+    GtkCListRow *row1 = (GtkCListRow *) ptr1;
+    GtkCListRow *row2 = (GtkCListRow *) ptr2;
+
+    switch (row1->cell[clist->sort_column].type) {
+        case GTK_CELL_TEXT:
+            text1 = GTK_CELL_TEXT (row1->cell[clist->sort_column])->text;
+            break;
+        case GTK_CELL_PIXTEXT:
+            text1 = GTK_CELL_PIXTEXT (row1->cell[clist->sort_column])->text;
+            break;
+        default:
+            break;
+    }
+
+    switch (row2->cell[clist->sort_column].type) {
+        case GTK_CELL_TEXT:
+            text2 = GTK_CELL_TEXT (row2->cell[clist->sort_column])->text;
+            break;
+        case GTK_CELL_PIXTEXT:
+            text2 = GTK_CELL_PIXTEXT (row2->cell[clist->sort_column])->text;
+            break;
+        default:
+            break;
+    }
+
+    if (!text2)
+        return (text1 != NULL);
+
+    if (!text1)
+        return -1;
+
+    return strcasecmp (text1, text2);
 }
 
 void GTKMusicBrowser::UpdateCatalog(void)
 {
     m_musicCatalog = m_context->browser->m_catalog;
-    GtkTargetEntry tree_target_table = {"tree-drag", 0, 1};
-
     static bool triedUpdate = false;
-
     const vector<ArtistList *> *artistList = m_musicCatalog->GetMusicList();
     const vector<PlaylistItem *> *unsorted = m_musicCatalog->GetUnsortedMusic();
     const vector<string> *playlists = m_musicCatalog->GetPlaylists();
@@ -603,187 +720,135 @@ void GTKMusicBrowser::UpdateCatalog(void)
         (playlists->size() == 0)) 
        return;
 
-    if (musicBrowserTree) {
-        gtk_widget_destroy(musicBrowserTree);
-        musicBrowserTree = gtk_tree_new();
-        gtk_signal_connect(GTK_OBJECT(musicBrowserTree), "button_press_event",
-                           GTK_SIGNAL_FUNC(tree_clicked), this);
-        gtk_tree_set_selection_mode(GTK_TREE(musicBrowserTree), 
-                                    GTK_SELECTION_BROWSE);
-        gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(musicBrowserWindow),
-                                              musicBrowserTree);
-        gtk_widget_show(musicBrowserTree);
-    }
+    gtk_clist_freeze(GTK_CLIST(musicBrowserTree));
+    if (musicBrowserTree) 
+        gtk_clist_clear(GTK_CLIST(musicBrowserTree));
 
-    GtkWidget *item_subtree1, *item_subtree2, *item_subtree3;
-    GtkWidget *item_new1, *item_new2, *item_new3;
-    GtkWidget *all_subtree, *all_new;
+    GtkCTreeNode *mainTree, *allTree, *allItem, *uncatTree, *uncatItem;
+    TreeData *data;
+    char *name[1];
 
-    artistSubTree = gtk_tree_item_new_with_label("My Music");
-    gtk_tree_append(GTK_TREE(musicBrowserTree), artistSubTree);
-    gtk_signal_connect(GTK_OBJECT(artistSubTree), "enter_notify_event",
-                       GTK_SIGNAL_FUNC(tree_status),
-                       (gpointer)"This tree item contains all of your music");
-    gtk_signal_connect(GTK_OBJECT(artistSubTree), "leave_notify_event",
-                       GTK_SIGNAL_FUNC(tree_status), (gpointer)" ");
-    gtk_widget_show(artistSubTree);
+    GdkPixmap *pixmap;
+    GdkBitmap *mask;
+    GtkStyle  *style = gtk_widget_get_style(musicBrowserWindow);
 
-    item_subtree1 = gtk_tree_new();
-    gtk_tree_set_selection_mode(GTK_TREE(item_subtree1), GTK_SELECTION_BROWSE);
-    gtk_signal_connect(GTK_OBJECT(item_subtree1), "button_press_event",
-                       GTK_SIGNAL_FUNC(tree_clicked), this);
-    gtk_drag_source_set(item_subtree1, GDK_BUTTON1_MASK, &tree_target_table, 1,
-                        GDK_ACTION_MOVE);
-    gtk_signal_connect(GTK_OBJECT(item_subtree1), "drag_data_get",
-                       GTK_SIGNAL_FUNC(tree_drag_data_get), this);
-    gtk_signal_connect(GTK_OBJECT(item_subtree1), "drag_begin",
-                       GTK_SIGNAL_FUNC(tree_drag_begin), this);
-    gtk_tree_item_set_subtree(GTK_TREE_ITEM(artistSubTree), item_subtree1);
-    
-    all_new = gtk_tree_item_new_with_label("All Tracks");
-    gtk_object_set_user_data(GTK_OBJECT(all_new), m_musicCatalog);
-    gtk_object_set_data(GTK_OBJECT(all_new), "type", (gpointer)0);
-    gtk_signal_connect(GTK_OBJECT(all_new), "enter_notify_event",
-                       GTK_SIGNAL_FUNC(tree_status),
-                       (gpointer)"This tree item lists all of your music "
+    pixmap = gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, &mask,
+                                          &style->bg[GTK_STATE_NORMAL], 
+                                          catalog_pix);
+    name[0] = "My Music";
+    mainTree = gtk_ctree_insert_node(musicBrowserTree, NULL, NULL, name, 5, 
+                                     pixmap, mask, pixmap, mask, false, false);
+    data = NewTreeData(kTreeMyMusic, NULL, NULL, NULL, NULL, NULL,
+                       "This tree item contains all of your music");
+    gtk_ctree_node_set_row_data(musicBrowserTree, mainTree, data);
+
+    pixmap = gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, &mask,
+                                          &style->bg[GTK_STATE_NORMAL],
+                                          all_pix);
+    name[0] = "All Tracks";
+    allTree = gtk_ctree_insert_node(musicBrowserTree, mainTree, NULL, name, 5, 
+                                    pixmap, mask, pixmap, mask, false, false);
+    data = NewTreeData(kTreeAll, m_musicCatalog, NULL, NULL, NULL, NULL,
+                       "This tree item lists all of your music tracks");
+    gtk_ctree_node_set_row_data(musicBrowserTree, allTree, data);
+
+    pixmap = gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, &mask,
+                                          &style->bg[GTK_STATE_NORMAL],
+                                          uncatagorized_pix);
+    name[0] = "Uncategorized Tracks";
+    uncatTree = gtk_ctree_insert_node(musicBrowserTree, mainTree, NULL,
+                                      name, 5, pixmap, mask, pixmap, mask, 
+                                      false, false);
+    data = NewTreeData(kTreeUncat, m_musicCatalog, NULL, NULL, NULL, NULL,
+                       "This tree item lists all of your uncategorized music "
                        "tracks");
-    gtk_signal_connect(GTK_OBJECT(all_new), "leave_notify_event",
-                       GTK_SIGNAL_FUNC(tree_status), (gpointer)" ");
-    gtk_tree_append(GTK_TREE(item_subtree1), all_new);
+    gtk_ctree_node_set_row_data(musicBrowserTree, uncatTree, data);
 
-    all_subtree = gtk_tree_new();
-    gtk_tree_set_selection_mode(GTK_TREE(all_subtree), GTK_SELECTION_BROWSE);
-    gtk_tree_item_set_subtree(GTK_TREE_ITEM(all_new), all_subtree);
-    gtk_signal_connect(GTK_OBJECT(all_subtree), "button_press_event",
-                       GTK_SIGNAL_FUNC(tree_clicked), this);
-    gtk_drag_source_set(all_subtree, GDK_BUTTON1_MASK, &tree_target_table, 1,
-                        GDK_ACTION_MOVE);
-    gtk_signal_connect(GTK_OBJECT(all_subtree), "drag_data_get",
-                       GTK_SIGNAL_FUNC(tree_drag_data_get), this);
-    gtk_signal_connect(GTK_OBJECT(all_subtree), "drag_begin",
-                       GTK_SIGNAL_FUNC(tree_drag_begin), this);
-
-    item_new1 = gtk_tree_item_new_with_label("Uncategorized Tracks");
-    gtk_object_set_user_data(GTK_OBJECT(item_new1), (void *)unsorted);
-    gtk_object_set_data(GTK_OBJECT(item_new1), "type", (gpointer)8);
-    gtk_signal_connect(GTK_OBJECT(item_new1), "enter_notify_event",
-                       GTK_SIGNAL_FUNC(tree_status),
-                       (gpointer)"This tree item lists all of your "
-                       "uncategorized music tracks");
-    gtk_signal_connect(GTK_OBJECT(item_new1), "leave_notify_event",
-                       GTK_SIGNAL_FUNC(tree_status), (gpointer)" ");
-    gtk_tree_append(GTK_TREE(item_subtree1), item_new1);
-
-    item_subtree2 = gtk_tree_new();
-    gtk_tree_set_selection_mode(GTK_TREE(item_subtree2), GTK_SELECTION_BROWSE);
-    gtk_tree_item_set_subtree(GTK_TREE_ITEM(item_new1), item_subtree2);
-    gtk_signal_connect(GTK_OBJECT(item_subtree2), "button_press_event",
-                       GTK_SIGNAL_FUNC(tree_clicked), this);
-    gtk_drag_source_set(item_subtree2, GDK_BUTTON1_MASK, &tree_target_table, 1,
-                        GDK_ACTION_MOVE);
-    gtk_signal_connect(GTK_OBJECT(item_subtree2), "drag_data_get",
-                       GTK_SIGNAL_FUNC(tree_drag_data_get), this);
-    gtk_signal_connect(GTK_OBJECT(item_subtree2), "drag_begin",
-                       GTK_SIGNAL_FUNC(tree_drag_begin), this);
-
+    uncatItem = NULL;
+    allItem = NULL;
     vector<PlaylistItem *>::const_iterator l = unsorted->begin();
     for (; l != unsorted->end(); l++) {
         MetaData mdata = (*l)->GetMetaData();
-        item_new2 = gtk_tree_item_new_with_label((char *)mdata.Title().c_str());
-        gtk_object_set_user_data(GTK_OBJECT(item_new2), *l);
-        gtk_object_set_data(GTK_OBJECT(item_new2), "type", (gpointer)4);
-        gtk_tree_append(GTK_TREE(item_subtree2), item_new2);
-        gtk_widget_show(item_new2);
-        item_new2 = gtk_tree_item_new_with_label((char *)mdata.Title().c_str());
-        gtk_object_set_user_data(GTK_OBJECT(item_new2), *l);
-        gtk_object_set_data(GTK_OBJECT(item_new2), "type", (gpointer)4);
-        gtk_tree_append(GTK_TREE(all_subtree), item_new2);
-        gtk_widget_show(item_new2);
+        name[0] = (char *)mdata.Title().c_str();
+        pixmap = gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, &mask,
+                                          &style->bg[GTK_STATE_NORMAL],
+                                          track_pix);
+        uncatItem = gtk_ctree_insert_node(musicBrowserTree, uncatTree, 
+                                          NULL, name, 5, 
+                                          pixmap, mask, pixmap, mask, true, 
+                                          false);
+        data = NewTreeData(kTreeTrack, NULL, NULL, NULL, *l);
+        gtk_ctree_node_set_row_data(musicBrowserTree, uncatItem, data);
+
+        allItem = gtk_ctree_insert_node(musicBrowserTree, allTree,
+                                        NULL, name, 5, pixmap, mask, pixmap, 
+                                        mask, true, false);
+        data = NewTreeData(kTreeTrack, NULL, NULL, NULL, *l);
+        gtk_ctree_node_set_row_data(musicBrowserTree, allItem, data);
     }
-    gtk_widget_show(item_new1);
 
     vector<ArtistList *>::const_iterator i = artistList->begin();
     for (; i != artistList->end(); i++) {
-        item_new1 = gtk_tree_item_new_with_label((char *)(*i)->name.c_str());
-        gtk_object_set_user_data(GTK_OBJECT(item_new1), *i);
-        gtk_object_set_data(GTK_OBJECT(item_new1), "type", (gpointer)1);
-        gtk_tree_append(GTK_TREE(item_subtree1), item_new1);
+        GtkCTreeNode *artTree, *artItem = NULL;
+
+        name[0] = (char *)(*i)->name.c_str();
+        pixmap = gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, &mask,
+                                          &style->bg[GTK_STATE_NORMAL],
+                                          artist_pix);
+        artTree = gtk_ctree_insert_node(musicBrowserTree, mainTree,
+                                        NULL, name, 5, pixmap, mask, 
+                                        pixmap, mask, false, false);
+        data = NewTreeData(kTreeArtist, NULL, (*i));
+        gtk_ctree_node_set_row_data(musicBrowserTree, artTree, data);
 
         vector<AlbumList *>::iterator j = (*i)->m_albumList->begin();
-        item_subtree2 = gtk_tree_new();
-        gtk_tree_set_selection_mode(GTK_TREE(item_subtree2), 
-                                    GTK_SELECTION_BROWSE);
-        gtk_tree_item_set_subtree(GTK_TREE_ITEM(item_new1), item_subtree2);
-        gtk_signal_connect(GTK_OBJECT(item_subtree2), "button_press_event",
-                           GTK_SIGNAL_FUNC(tree_clicked), this);
-        gtk_drag_source_set(item_subtree2, GDK_BUTTON1_MASK, &tree_target_table,
-                            1, GDK_ACTION_MOVE);
-        gtk_signal_connect(GTK_OBJECT(item_subtree2), "drag_data_get",
-                           GTK_SIGNAL_FUNC(tree_drag_data_get), this);
-        gtk_signal_connect(GTK_OBJECT(item_subtree2), "drag_begin",
-                           GTK_SIGNAL_FUNC(tree_drag_begin), this);
-
         for (; j != (*i)->m_albumList->end(); j++) {
-            item_new2 = gtk_tree_item_new_with_label((char *)(*j)->name.c_str());
-            gtk_object_set_user_data(GTK_OBJECT(item_new2), *j);
-            gtk_object_set_data(GTK_OBJECT(item_new2), "type", (gpointer)2);
-            gtk_tree_append(GTK_TREE(item_subtree2), item_new2);
+            GtkCTreeNode *trackItem = NULL;
+
+            name[0] = (char *)(*j)->name.c_str();
+            pixmap = gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, 
+                                          &mask, &style->bg[GTK_STATE_NORMAL],
+                                          album_pix);
+            artItem = gtk_ctree_insert_node(musicBrowserTree, artTree,
+                                            NULL, name, 5, pixmap, mask, 
+                                            pixmap, mask, false, false);
+            data = NewTreeData(kTreeAlbum, NULL, (*i), (*j));
+            gtk_ctree_node_set_row_data(musicBrowserTree, artItem, data);
 
             vector<PlaylistItem *>::iterator k = (*j)->m_trackList->begin();
-            item_subtree3 = gtk_tree_new();
-            gtk_tree_set_selection_mode(GTK_TREE(item_subtree3), 
-                                        GTK_SELECTION_BROWSE);
-            gtk_tree_item_set_subtree(GTK_TREE_ITEM(item_new2), item_subtree3);
-            gtk_signal_connect(GTK_OBJECT(item_subtree3), "button_press_event",
-                               GTK_SIGNAL_FUNC(tree_clicked), this);
-            gtk_drag_source_set(item_subtree3, GDK_BUTTON1_MASK, 
-                                &tree_target_table, 1, GDK_ACTION_MOVE);
-            gtk_signal_connect(GTK_OBJECT(item_subtree3), "drag_data_get",
-                               GTK_SIGNAL_FUNC(tree_drag_data_get), this);
-            gtk_signal_connect(GTK_OBJECT(item_subtree3), "drag_begin",
-                               GTK_SIGNAL_FUNC(tree_drag_begin), this);
-
             for (;k != (*j)->m_trackList->end(); k++) {
-                item_new3 = gtk_tree_item_new_with_label((char *)(*k)->GetMetaData().Title().c_str());
-                gtk_object_set_user_data(GTK_OBJECT(item_new3), *k);
-                gtk_object_set_data(GTK_OBJECT(item_new3), "type", (gpointer)3);
-                gtk_tree_append(GTK_TREE(item_subtree3), item_new3);
-                gtk_widget_show(item_new3);
-                item_new3 = gtk_tree_item_new_with_label((char *)(*k)->GetMetaData().Title().c_str());
-                gtk_object_set_user_data(GTK_OBJECT(item_new3), *k);
-                gtk_object_set_data(GTK_OBJECT(item_new3), "type", (gpointer)3);
-                gtk_tree_append(GTK_TREE(all_subtree), item_new3);
-                gtk_widget_show(item_new3);
+                name[0] = (char *)(*k)->GetMetaData().Title().c_str();
+                pixmap =gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, 
+                                          &mask, &style->bg[GTK_STATE_NORMAL],
+                                          track_pix);
+                trackItem = gtk_ctree_insert_node(musicBrowserTree, artItem,
+                                                  NULL, name,  
+                                                  5, pixmap, mask, pixmap, mask,
+                                                  true, false);
+                data = NewTreeData(kTreeTrack, NULL, NULL, NULL, (*k));
+                gtk_ctree_node_set_row_data(musicBrowserTree, trackItem, data);
+
+
+                allItem = gtk_ctree_insert_node(musicBrowserTree, allTree,
+                                                NULL, name,
+                                                5, pixmap, mask, pixmap, mask,
+                                                true, false);
+                data = NewTreeData(kTreeTrack, NULL, NULL, NULL, (*k));
+                gtk_ctree_node_set_row_data(musicBrowserTree, allItem, data);
             }
-            gtk_widget_show(item_new2);
         }
-        gtk_widget_show(item_new1);
     }
 
-    gtk_widget_show(all_new);
-
-    playlistSubTree = gtk_tree_item_new_with_label("My Playlists");
-    gtk_tree_append(GTK_TREE(musicBrowserTree), playlistSubTree);
-    gtk_signal_connect(GTK_OBJECT(playlistSubTree), "enter_notify_event",
-                       GTK_SIGNAL_FUNC(tree_status),
-                       (gpointer)"This tree item contains all of your "
-                       "playlists");
-    gtk_signal_connect(GTK_OBJECT(playlistSubTree), "leave_notify_event",
-                       GTK_SIGNAL_FUNC(tree_status), (gpointer)" ");
-    gtk_widget_show(playlistSubTree);
-    
-    item_subtree1 = gtk_tree_new();
-    gtk_tree_set_selection_mode(GTK_TREE(item_subtree1), GTK_SELECTION_BROWSE);
-    gtk_signal_connect(GTK_OBJECT(item_subtree1), "button_press_event",
-                       GTK_SIGNAL_FUNC(tree_clicked), this);
-    gtk_drag_source_set(item_subtree1, GDK_BUTTON1_MASK, &tree_target_table, 1,
-                        GDK_ACTION_MOVE);
-    gtk_signal_connect(GTK_OBJECT(item_subtree1), "drag_data_get",
-                       GTK_SIGNAL_FUNC(tree_drag_data_get), this);
-    gtk_signal_connect(GTK_OBJECT(item_subtree1), "drag_begin",
-                       GTK_SIGNAL_FUNC(tree_drag_begin), this);
-
-    gtk_tree_item_set_subtree(GTK_TREE_ITEM(playlistSubTree), item_subtree1);
+    gtk_ctree_sort_recursive(musicBrowserTree, allTree);
+    pixmap = gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, &mask,
+                                          &style->bg[GTK_STATE_NORMAL],
+                                          playlist_pix);
+    name[0] = "My Playlists";
+    mainTree = gtk_ctree_insert_node(musicBrowserTree, NULL, NULL, name, 5,
+                                     pixmap, mask, pixmap, mask, false, false);
+    data = NewTreeData(kTreePlaylistHead, NULL, NULL, NULL, NULL, NULL,
+                       "This tree item contains all of your playlists");
+    gtk_ctree_node_set_row_data(musicBrowserTree, mainTree, data);
 
     vector<string>::const_iterator m = playlists->begin();
     for (; m != playlists->end(); m++) {
@@ -796,20 +861,22 @@ void GTKMusicBrowser::UpdateCatalog(void)
         temp = strrchr(fullname, '/');
         if (temp)
             listname = temp + 1;
-        item_new1 = gtk_tree_item_new_with_label(listname);
+
+        name[0] = listname;
+        allItem = NULL;
+        pixmap = gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, &mask,
+                                          &style->bg[GTK_STATE_NORMAL],
+                                          playlist_pix);
+        allItem = gtk_ctree_insert_node(musicBrowserTree, mainTree, NULL, 
+                                        name, 5, pixmap, mask, pixmap, mask, 
+                                        true, false);
+        data = NewTreeData(kTreePlaylist, NULL, NULL, NULL, NULL,
+                           (char *)(*m).c_str(), (char *)(*m).c_str());
+        gtk_ctree_node_set_row_data(musicBrowserTree, allItem, data);
+
         delete [] fullname;
-        gtk_object_set_user_data(GTK_OBJECT(item_new1), 
-                                 (char *)(*m).c_str());
-        gtk_object_set_data(GTK_OBJECT(item_new1), "type", (gpointer)5);
-        gtk_signal_connect(GTK_OBJECT(item_new1), "enter_notify_event",
-                           GTK_SIGNAL_FUNC(tree_status),
-                           (gpointer)((*m).c_str()));
-        gtk_signal_connect(GTK_OBJECT(item_new1), "leave_notify_event",
-                           GTK_SIGNAL_FUNC(tree_status), (gpointer)" ");
-        gtk_widget_show(playlistSubTree);
-        gtk_tree_append(GTK_TREE(item_subtree1), item_new1);
-        gtk_widget_show(item_new1);
-    }
+    } 
+    gtk_clist_thaw(GTK_CLIST(musicBrowserTree));
 }
 
 static void music_search(GTKMusicBrowser *p, guint action, GtkWidget *w)
@@ -898,10 +965,10 @@ static void remove_tool(GtkWidget *w, GTKMusicBrowser *p)
     }
     else if (p->GetClickState() == kContextBrowser) {
         if (p->GetTreeClick() == kClickPlaylist) {
-            p->GetContext()->browser->m_catalog->RemovePlaylist(p->mbSelName);
+            p->GetContext()->browser->m_catalog->RemovePlaylist(p->mbSelection->playlistname.c_str());
         }
         else if (p->GetTreeClick() == kClickTrack) {
-            p->GetContext()->browser->m_catalog->RemoveSong(p->mbSelName);
+            p->GetContext()->browser->m_catalog->RemoveSong(p->mbSelection->track->URL().c_str());
         }
     }
 }
@@ -913,16 +980,18 @@ static void edit_tool(GtkWidget *w, GTKMusicBrowser *p)
     }
     else if (p->GetClickState() == kContextBrowser) {
         if (p->GetTreeClick() == kClickPlaylist) {
-            p->CreateNewEditor(p->mbSelName);
+            p->CreateNewEditor((char *)p->mbSelection->playlistname.c_str());
         }
         else if (p->GetTreeClick() == kClickTrack) {
-            p->PopUpInfoEditor(p->mbSel);
+            p->PopUpInfoEditor(p->mbSelection->track);
         }
     }
 }
     
 void GTKMusicBrowser::CreateExpanded(void)
 {
+    GtkTargetEntry tree_target_table = {"tree-drag", 0, 1};
+
     GtkWidget *browserlabel;
     GtkWidget *browservbox;
     GtkWidget *hbox;
@@ -934,36 +1003,43 @@ void GTKMusicBrowser::CreateExpanded(void)
 
     masterBrowserBox = gtk_vbox_new(FALSE, 0);
     gtk_paned_pack1(GTK_PANED(masterBox), masterBrowserBox, TRUE, TRUE);
-    gtk_widget_show(masterBrowserBox);
 
     hbox = gtk_hbox_new(FALSE, 0);
     gtk_box_pack_start(GTK_BOX(masterBrowserBox), hbox, FALSE, FALSE, 5);
-    gtk_widget_show(hbox);
 
     browserlabel = gtk_label_new("My Music:");
     gtk_box_pack_start(GTK_BOX(hbox), browserlabel, FALSE, FALSE, 5);
-    gtk_widget_show(browserlabel);
 
     browservbox = gtk_vbox_new(FALSE, 0);
     gtk_container_add(GTK_CONTAINER(masterBrowserBox), browservbox);
     gtk_container_set_border_width(GTK_CONTAINER(browservbox), 5);
-    gtk_widget_show(browservbox);
 
     musicBrowserWindow = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(musicBrowserWindow),
-                                   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+                                   GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
     gtk_box_pack_start(GTK_BOX(browservbox), musicBrowserWindow, TRUE, TRUE, 0);
     gtk_widget_set_usize(musicBrowserWindow, 200, 200);
-    gtk_widget_show(musicBrowserWindow);
 
-    musicBrowserTree = gtk_tree_new();
-    gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(musicBrowserWindow),
-                                          musicBrowserTree);
-    gtk_signal_connect(GTK_OBJECT(musicBrowserTree), "button_press_event",
-                       GTK_SIGNAL_FUNC(tree_clicked), this);
-    gtk_widget_show(musicBrowserTree);
+    musicBrowserTree = GTK_CTREE(gtk_ctree_new(1, 0));
+    gtk_widget_add_events(GTK_WIDGET(musicBrowserTree), 
+                          GDK_POINTER_MOTION_MASK | GDK_LEAVE_NOTIFY_MASK);
+    gtk_container_add(GTK_CONTAINER(musicBrowserWindow),
+                      GTK_WIDGET(musicBrowserTree));
+    gtk_signal_connect_after(GTK_OBJECT(musicBrowserTree), "button_press_event",
+                             GTK_SIGNAL_FUNC(tree_clicked), this);
+    gtk_signal_connect(GTK_OBJECT(musicBrowserTree),"motion_notify_event",
+                       GTK_SIGNAL_FUNC(tree_status), this);
+    gtk_signal_connect(GTK_OBJECT(musicBrowserTree), "leave_notify_event",
+                       GTK_SIGNAL_FUNC(tree_status_clear), this);
+    gtk_drag_source_set(GTK_WIDGET(musicBrowserTree), GDK_BUTTON1_MASK, 
+                        &tree_target_table, 1, GDK_ACTION_MOVE);
+    gtk_signal_connect(GTK_OBJECT(musicBrowserTree), "drag_data_get",
+                             GTK_SIGNAL_FUNC(tree_drag_data_get), this);
+    gtk_signal_connect(GTK_OBJECT(musicBrowserTree), "drag_begin",
+                       GTK_SIGNAL_FUNC(tree_drag_begin), this);
+    gtk_clist_set_compare_func(GTK_CLIST(musicBrowserTree), nocase_compare);
 
-    gtk_widget_show(masterBrowserBox);
+    gtk_widget_show_all(masterBrowserBox);
 }
 
 void set_label_menu(GtkWidget *w, gchar *newtitle)
@@ -1028,7 +1104,6 @@ void GTKMusicBrowser::ToggleVisEventDestroyed(void)
     m_initialized = false;
     musicBrowserTree = NULL;
     m_browserCreated = false; 
-    mbSelWidget = NULL;
 }
 
 static gboolean toggle_vis_destroy(GtkWidget *w, GTKMusicBrowser *p)
@@ -1238,10 +1313,15 @@ static void import_list(GTKMusicBrowser *p, guint action, GtkWidget *w)
 
 static void add_track_mb(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
-    if (p->mbSelWidget) {
-        vector<PlaylistItem *> *newlist = getTreeSelection(p->mbSelWidget);
+    if (p->GetClickState() == kContextBrowser) {
+        vector<PlaylistItem *> *newlist = getTreeSelection(p->musicBrowserTree);
         p->AddTracksPlaylistEvent(newlist, true);
     }
+}
+
+static void add_track_tool(GtkWidget *w, GTKMusicBrowser *p)
+{
+    add_track_mb(p, 0, w);
 }
 
 static void add_track(GTKMusicBrowser *p, guint action, GtkWidget *w)
@@ -1271,8 +1351,14 @@ static void delete_sel(GTKMusicBrowser *p, guint action, GtkWidget *w)
 
     if (p->GetClickState() == kContextPlaylist)
         urlToDel = p->GetContext()->plm->ItemAt(p->m_currentindex)->URL();
-    else if (p->GetClickState() == kContextBrowser)
-        urlToDel = p->mbSelName;
+    else if (p->GetClickState() == kContextBrowser) {
+        if (p->GetTreeClick() == kClickPlaylist) 
+            urlToDel = p->mbSelection->playlistname;
+        else if (p->GetTreeClick() == kClickTrack)
+            urlToDel = p->mbSelection->track->URL();
+        else
+            return;
+    }
 
     uint32 length = urlToDel.length();
     char *filename = new char[length];
@@ -1294,10 +1380,10 @@ static void delete_sel(GTKMusicBrowser *p, guint action, GtkWidget *w)
             }
             else if (p->GetClickState() == kContextBrowser) {
                 if (p->GetTreeClick() == kClickPlaylist) {
-                    p->GetContext()->browser->m_catalog->RemovePlaylist(p->mbSelName);
+                    p->GetContext()->browser->m_catalog->RemovePlaylist(p->mbSelection->playlistname.c_str());
                 }
                 else if (p->GetTreeClick() == kClickTrack) {
-                    p->GetContext()->browser->m_catalog->RemoveSong(p->mbSelName);
+                    p->GetContext()->browser->m_catalog->RemoveSong(p->mbSelection->track->URL().c_str());
                 }
             }
         }
@@ -1484,12 +1570,10 @@ GtkWidget *GTKMusicBrowser::NewPixmap(char **data)
     GtkWidget *wpixmap;
     GdkPixmap *pixmap;
     GdkBitmap *mask;
-    GdkColor   color;
-
-    gdk_color_parse("grey", &color);
+    GtkStyle  *style = gtk_widget_get_style(musicBrowser);
 
     pixmap = gdk_pixmap_create_from_xpm_d(musicBrowser->window, &mask, 
-                                          NULL, data);
+                                          &style->bg[GTK_STATE_NORMAL], data);
 
     wpixmap = gtk_pixmap_new(pixmap, mask);
     return wpixmap;
@@ -1560,6 +1644,11 @@ void GTKMusicBrowser::CreatePlaylist(void)
                             GTK_SIGNAL_FUNC(edit_tool), this);
 
     gtk_toolbar_append_space(GTK_TOOLBAR(toolbar));
+
+    addTrack = gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Add Items",
+                            "Add Music from My Music to the Playlist",
+                            "Toolbar/AddItem", NewPixmap(add_track_pic),
+                            GTK_SIGNAL_FUNC(add_track_tool), this);
 
     addFile = gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Add File",
                             "Add a File to the Playlist",
@@ -1651,9 +1740,8 @@ void GTKMusicBrowser::SetClickState(ClickState newState)
         gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
                                  "/Edit/Move Down"), TRUE);
 
-        if (mbSelWidget)
-            gtk_tree_item_deselect(GTK_TREE_ITEM(mbSelWidget));
-        mbSelWidget = NULL;
+        if (musicBrowserTree)
+            gtk_clist_unselect_all(GTK_CLIST(musicBrowserTree));
  
         GtkWidget *w = gtk_item_factory_get_widget(menuFactory,
                                                  "/Edit/Edit Info");
@@ -1928,7 +2016,6 @@ GTKMusicBrowser::GTKMusicBrowser(FAContext *context, MusicBrowserUI *masterUI,
     pauseState = 0;
     stopState = 1;
     musicBrowserTree = NULL;
-    mbSelWidget = NULL;
 
     parentUI = masterUI;
  

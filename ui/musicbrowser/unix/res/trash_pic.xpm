@@ -108,7 +108,7 @@ static char *trash_pic[] = {
 "#K c #bababa",
 "#L c #bbbbbb",
 "#M c #bebebe",
-"#N c #c0c0c0",
+"#N c None",
 "#O c #c2c2c2",
 "#P c #c3c3c3",
 "#Q c #c6c6c6",

@@ -32,7 +32,7 @@ static char *import_pic[] = {
 "y c #b3b3b3",
 "z c #b9b9b9",
 "A c #bbfc27",
-"B c #c0c0c0",
+"B c None",
 "C c #cccccc",
 "D c #cecece",
 "E c #e6e6e6",

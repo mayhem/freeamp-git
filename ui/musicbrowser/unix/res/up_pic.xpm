@@ -34,7 +34,7 @@ static char *up_pic[] = {
 "A c #bdaee5",
 "B c #bfaee5",
 "C c #c0b4d6",
-"D c #c0c0c0",
+"D c None",
 "E c #c1b2e5",
 "F c #c1b3e8",
 "G c #c3b4e7",
