@@ -385,7 +385,7 @@ void GTKWindow::MouseLeaveCheck(void)
     }
 }
 
-Error Win32Window::GetDesktopSize(int32 &iX, int32 &iY)
+Error GTKWindow::GetDesktopSize(int32 &iX, int32 &iY)
 {
     return kError_InvalidParam;
 }
