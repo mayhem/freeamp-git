@@ -1239,7 +1239,8 @@ GTKMusicBrowser::GTKMusicBrowser(FAContext *context, MusicBrowserUI *masterUI,
         if (saveOnExit) {
             LoadPlaylist(playlistURL);
             uint32 pos = 0; 
-            m_context->prefs->GetPrefInt32(kSavedPlaylistPositionPref, &pos);
+            m_context->prefs->GetPrefInt32(kSavedPlaylistPositionPref, 
+                                           (int32 *)&pos);
 
             m_plm->SetCurrentIndex(pos);   
         }
