@@ -865,7 +865,13 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
    if (eMesg == CM_ChangeWindow)
    {
        m_pWindow->ControlStringValue(oControlName, false, m_oCurrentWindow);
+
+       // This is cheating, but I don't know how else to do it. :-(
+       m_pWindow->DecUsageRef();
+       m_pWindow->DecUsageRef();
        SwitchWindow(m_oCurrentWindow);
+       m_pWindow->IncUsageRef();
+       m_pWindow->IncUsageRef();
    
        return kError_NoErr;
    }

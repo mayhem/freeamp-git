@@ -130,6 +130,10 @@ class Window
 	  // that might cause a deadlock
       virtual void  ProcessWaitingMessages(void) { ; };
 
+      // For deadlock avaoidance
+      virtual void  IncUsageRef(void);
+      virtual void  DecUsageRef(void);
+
     protected:
 
       Control *ControlFromPos(Pos &oPos);
@@ -137,8 +141,6 @@ class Window
                                   Rect &oNewRect);
 
       // For locking the window in preparatiom for a VMM
-      virtual void  IncUsageRef(void);
-      virtual void  DecUsageRef(void);
       virtual void  LockUsageRef(void);
       virtual void  UnlockUsageRef(void);
      
