@@ -713,10 +713,10 @@ void MusicCatalog::DoSearchMusic(char *path)
         {
             char *fileExt;
 #ifndef WIN32
-            if (find.dwFileAttributes == FILE_ATTRIBUTE_SYMLINK)
+            if (find.dwFileAttributes & FILE_ATTRIBUTE_SYMLINK)
                 continue;
 #endif
-            if (find.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)
+            if (find.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
             {
                 if (!(!strcmp("." , find.cFileName) || !strcmp("..", find.cFileName)))
                 {
@@ -728,9 +728,24 @@ void MusicCatalog::DoSearchMusic(char *path)
                     DoSearchMusic((char *)newDir.c_str());
                 }
             }
-            else if ((fileExt = m_context->player->GetExtension(find.cFileName)))
+            else 
             {
-                if (m_plm->IsSupportedPlaylistFormat(fileExt) && 
+#ifdef WIN32
+                string dirtest = path;
+                if (path[strlen(path) - 1] != DIR_MARKER)
+                    dirtest.append(DIR_MARKER_STR);
+                dirtest.append(find.cFileName);
+
+                struct stat stdir;
+
+                stat(dirtest.c_str(), &stdir);
+                if (stdir.st_mode & _S_IFDIR) {
+                    DoSearchMusic((char *)dirtest.c_str());
+                    continue;
+                }
+#endif           
+                fileExt = m_context->player->GetExtension(find.cFileName);
+                if (fileExt && m_plm->IsSupportedPlaylistFormat(fileExt) && 
                     strcmp("currentlist.m3u", find.cFileName))
                 {
                     string file = path;
@@ -745,7 +760,8 @@ void MusicCatalog::DoSearchMusic(char *path)
 
                     delete [] url;
                 }
-                else if (m_context->player->IsSupportedExtension(fileExt))
+                else if (fileExt && 
+                         m_context->player->IsSupportedExtension(fileExt))
                 {
                     string file = path;
                     file.append(DIR_MARKER_STR);
