@@ -75,6 +75,27 @@ static vector<PlaylistItem *> *getTreeSelection(GtkWidget *item)
     int type = (int)gtk_object_get_data(GTK_OBJECT(item), "type");
     vector<PlaylistItem *> *newlist = new vector<PlaylistItem *>;
     switch (type) {
+        case 0: {
+            MusicCatalog *cat = (MusicCatalog *)gtk_object_get_user_data(GTK_OBJECT(item));
+            const vector<ArtistList *> *artistList = cat->GetMusicList();
+            const vector<PlaylistItem *> *unsorted = cat->GetUnsortedMusic();
+            vector<ArtistList *>::const_iterator h = artistList->begin();
+            for (; h != artistList->end(); h++) {
+                vector<AlbumList *>::iterator i = (*h)->m_albumList->begin();
+                for (; i != (*h)->m_albumList->end(); i++) {
+                    vector<PlaylistItem *>::iterator j = (*i)->m_trackList->begin();
+                    for (; j != (*i)->m_trackList->end(); j++) {
+                        PlaylistItem *item = new PlaylistItem(*(PlaylistItem *)*j);
+                        newlist->push_back(item);
+                    }
+                }
+            }
+            vector<PlaylistItem *>::const_iterator k = unsorted->begin();
+            for (; k != unsorted->end(); k++) {
+                PlaylistItem *item = new PlaylistItem(*(PlaylistItem *)*k);
+                newlist->push_back(item);
+            }
+            break; }
         case 1: {
             ArtistList *list = (ArtistList *)gtk_object_get_user_data(GTK_OBJECT(item));
             vector<AlbumList *>::iterator i = list->m_albumList->begin();
@@ -105,6 +126,15 @@ static vector<PlaylistItem *> *getTreeSelection(GtkWidget *item)
         case 5: {
             char *fname = (char *)gtk_object_get_user_data(GTK_OBJECT(item));
 //            localui->ReadPlaylist(fname, newlist);
+            break; }
+        case 8: {
+            vector<PlaylistItem *> *unsorted = (vector<PlaylistItem *> *)
+                                    gtk_object_get_user_data(GTK_OBJECT(item));
+            vector<PlaylistItem *>::iterator k = unsorted->begin();
+            for (; k != unsorted->end(); k++) {
+                PlaylistItem *item = new PlaylistItem(*(PlaylistItem *)*k);
+                newlist->push_back(item);
+            }
             break; }
         case 9: {
             cout << "Danger, Wil Robinson, Danger!  To be implemented soon\n";
@@ -434,6 +464,7 @@ void GTKMusicBrowser::UpdateCatalog(void)
 
     GtkWidget *item_subtree1, *item_subtree2, *item_subtree3;
     GtkWidget *item_new1, *item_new2, *item_new3;
+    GtkWidget *all_subtree, *all_new;
 
     artistSubTree = gtk_tree_item_new_with_label("Music Catalog");
     gtk_tree_append(GTK_TREE(musicBrowserTree), artistSubTree);
@@ -448,8 +479,51 @@ void GTKMusicBrowser::UpdateCatalog(void)
                        GTK_SIGNAL_FUNC(tree_drag_data_get), this);
     gtk_signal_connect(GTK_OBJECT(item_subtree1), "drag_begin",
                        GTK_SIGNAL_FUNC(tree_drag_begin), this);
-
     gtk_tree_item_set_subtree(GTK_TREE_ITEM(artistSubTree), item_subtree1);
+    
+    all_new = gtk_tree_item_new_with_label("All");
+    gtk_object_set_user_data(GTK_OBJECT(all_new), m_musicCatalog);
+    gtk_object_set_data(GTK_OBJECT(all_new), "type", (gpointer)0);
+    gtk_tree_append(GTK_TREE(item_subtree1), all_new);
+    all_subtree = gtk_tree_new();
+    gtk_tree_item_set_subtree(GTK_TREE_ITEM(all_new), all_subtree);
+    gtk_signal_connect(GTK_OBJECT(all_subtree), "button_press_event",
+                       GTK_SIGNAL_FUNC(tree_clicked), this);
+    gtk_drag_source_set(all_subtree, GDK_BUTTON1_MASK, &tree_target_table, 1,
+                        GDK_ACTION_MOVE);
+    gtk_signal_connect(GTK_OBJECT(all_subtree), "drag_data_get",
+                       GTK_SIGNAL_FUNC(tree_drag_data_get), this);
+    gtk_signal_connect(GTK_OBJECT(all_subtree), "drag_begin",
+                       GTK_SIGNAL_FUNC(tree_drag_begin), this);
+
+    item_new1 = gtk_tree_item_new_with_label("Uncategorized Songs");
+    gtk_object_set_user_data(GTK_OBJECT(item_new1), (void *)unsorted);
+    gtk_object_set_data(GTK_OBJECT(item_new1), "type", (gpointer)8);
+    gtk_tree_append(GTK_TREE(item_subtree1), item_new1);
+    item_subtree2 = gtk_tree_new();
+    gtk_tree_item_set_subtree(GTK_TREE_ITEM(item_new1), item_subtree2);
+    gtk_signal_connect(GTK_OBJECT(item_subtree2), "button_press_event",
+                       GTK_SIGNAL_FUNC(tree_clicked), this);
+    gtk_drag_source_set(item_subtree2, GDK_BUTTON1_MASK, &tree_target_table, 1,
+                        GDK_ACTION_MOVE);
+    gtk_signal_connect(GTK_OBJECT(item_subtree2), "drag_data_get",
+                       GTK_SIGNAL_FUNC(tree_drag_data_get), this);
+    gtk_signal_connect(GTK_OBJECT(item_subtree2), "drag_begin",
+                       GTK_SIGNAL_FUNC(tree_drag_begin), this);
+    vector<PlaylistItem *>::const_iterator l = unsorted->begin();
+    for (; l != unsorted->end(); l++) {
+        item_new2 = gtk_tree_item_new_with_label((char *)(*l)->URL().c_str());
+        gtk_object_set_user_data(GTK_OBJECT(item_new2), *l);
+        gtk_object_set_data(GTK_OBJECT(item_new2), "type", (gpointer)4);
+        gtk_tree_append(GTK_TREE(item_subtree2), item_new2);
+        gtk_widget_show(item_new2);
+        item_new2 = gtk_tree_item_new_with_label((char *)(*l)->URL().c_str());
+        gtk_object_set_user_data(GTK_OBJECT(item_new2), *l);
+        gtk_object_set_data(GTK_OBJECT(item_new2), "type", (gpointer)4);
+        gtk_tree_append(GTK_TREE(all_subtree), item_new2);
+        gtk_widget_show(item_new2);
+    }
+    gtk_widget_show(item_new1);
 
     vector<ArtistList *>::const_iterator i = artistList->begin();
     for (; i != artistList->end(); i++) {
@@ -494,34 +568,18 @@ void GTKMusicBrowser::UpdateCatalog(void)
                 gtk_object_set_data(GTK_OBJECT(item_new3), "type", (gpointer)3);
                 gtk_tree_append(GTK_TREE(item_subtree3), item_new3);
                 gtk_widget_show(item_new3);
+                item_new3 = gtk_tree_item_new_with_label((char *)(*k)->GetMetaData().Title().c_str());
+                gtk_object_set_user_data(GTK_OBJECT(item_new3), *k);
+                gtk_object_set_data(GTK_OBJECT(item_new3), "type", (gpointer)3);
+                gtk_tree_append(GTK_TREE(all_subtree), item_new3);
+                gtk_widget_show(item_new3);
             }
             gtk_widget_show(item_new2);
         }
         gtk_widget_show(item_new1);
     }
 
-    item_new1 = gtk_tree_item_new_with_label("Unsorted Songs");
-    gtk_tree_append(GTK_TREE(item_subtree1), item_new1);
-    item_subtree2 = gtk_tree_new();
-    gtk_tree_item_set_subtree(GTK_TREE_ITEM(item_new1), item_subtree2);
-    gtk_signal_connect(GTK_OBJECT(item_subtree2), "button_press_event",
-                       GTK_SIGNAL_FUNC(tree_clicked), this);
-    gtk_drag_source_set(item_subtree2, GDK_BUTTON1_MASK, &tree_target_table, 1,
-                        GDK_ACTION_MOVE);
-    gtk_signal_connect(GTK_OBJECT(item_subtree2), "drag_data_get",
-                       GTK_SIGNAL_FUNC(tree_drag_data_get), this);
-    gtk_signal_connect(GTK_OBJECT(item_subtree2), "drag_begin",
-                       GTK_SIGNAL_FUNC(tree_drag_begin), this);
-
-    vector<PlaylistItem *>::const_iterator l = unsorted->begin();
-    for (; l != unsorted->end(); l++) {
-        item_new2 = gtk_tree_item_new_with_label((char *)(*l)->URL().c_str());
-        gtk_object_set_user_data(GTK_OBJECT(item_new2), *l);
-        gtk_object_set_data(GTK_OBJECT(item_new2), "type", (gpointer)4);
-        gtk_tree_append(GTK_TREE(item_subtree2), item_new2);
-        gtk_widget_show(item_new2);
-    }
-    gtk_widget_show(item_new1);
+    gtk_widget_show(all_new);
 
     playlistSubTree = gtk_tree_item_new_with_label("Playlists");
     gtk_tree_append(GTK_TREE(musicBrowserTree), playlistSubTree);
