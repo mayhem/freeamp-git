@@ -47,6 +47,7 @@ ____________________________________________________________________________*/
 #include "semaphore.h"
 #include "lmc.h"
 #include "log.h"
+#include "debug.hpp"
 
 #if MP3_PROF
 extern LogFile *g_Log;
@@ -132,10 +133,10 @@ XingLMC::XingLMC()
    m_xcqueue = new Queue < XingCommand * >(false);
    m_seekMutex = new Mutex();
    m_pauseSemaphore = new Semaphore();
-	m_bBufferingUp = false;
-	m_iBufferUpdate = 0;
-	m_iBitRate = 0;
-	m_frameBytes = -1;
+   m_bBufferingUp = false;
+   m_iBufferUpdate = 0;
+   m_iBitRate = 0;
+   m_frameBytes = -1;
    m_szUrl = NULL;
    m_szError = NULL;
    m_iMaxWriteSize = 0;
@@ -149,6 +150,7 @@ XingLMC::XingLMC()
 
 XingLMC::~XingLMC()
 {
+   Debug_v("LMC dtor");
    Stop();
    if (m_xcqueue)
    {
@@ -164,6 +166,7 @@ XingLMC::~XingLMC()
    }
    if (m_input)
    {
+      Debug_v("LMC delete pmi");
       delete    m_input;
 
       m_input = NULL;
@@ -190,8 +193,6 @@ XingLMC::~XingLMC()
 Error     XingLMC::
 Stop()
 {
-   ENSURE_INITIALIZED;
-
    if (m_decoderThread)
    {
       XingCommand *xc = new XingCommand[1];
@@ -205,14 +206,10 @@ Stop()
       m_bExit = true;
       m_pauseSemaphore->Signal();
 
-      //printf("PMO break\n");
       m_output->Break();
-      //printf("PMO pause\n");
       m_output->Pause();
-      //printf("PMI break\n");
       m_input->Break();
 
-      //printf("decoder join\n");
       m_decoderThread->Join();  // wait for thread to exit
 
       delete m_input;

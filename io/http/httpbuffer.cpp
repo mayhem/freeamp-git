@@ -168,12 +168,11 @@ Error HttpBuffer::Open(void)
     char                szHostName[iMaxHostNameLen+1], *szFile, *szQuery;
     char               *pInitialBuffer;
     unsigned            iPort;
-    int                 iRet, iErrno, iDummy, iRead, iLoop, iConnect;
+    int                 iRet, iRead, iLoop, iConnect;
     struct sockaddr_in  sAddr;
-    struct hostent      sHost, *pRes;
+    struct hostent      sHost;
     Error               eRet;
     void               *pPtr;
-    size_t              iSize;
     fd_set              sSet; 
     struct timeval      sTv;
 
@@ -215,17 +214,18 @@ Error HttpBuffer::Open(void)
 #ifndef WIN32
     fcntl(m_hHandle, F_SETFL, fcntl(m_hHandle, F_GETFL) | O_NONBLOCK);
 #else
-
+	unsigned long lMicrosoftSucksBalls = 1;
+	ioctlsocket(m_hHandle, FIONBIO, &lMicrosoftSucksBalls);
 #endif
     iConnect = connect(m_hHandle,(const sockaddr *)&sAddr,sizeof sAddr);
     for(; iConnect && !m_bExit;)
     {
-        sTv.tv_sec = iTransmitTimeout;
-        sTv.tv_usec = 0;
+        sTv.tv_sec = 0; sTv.tv_usec = 0;
         FD_ZERO(&sSet); FD_SET(m_hHandle, &sSet);
         iRet = select(m_hHandle + 1, NULL, &sSet, NULL, &sTv);
         if (!iRet)
         {
+		   usleep(100000);
            continue;
         }
         if (iRet < 0)
@@ -262,12 +262,12 @@ Error HttpBuffer::Open(void)
 
     for(;!m_bExit;)
     {
-        sTv.tv_sec = iTransmitTimeout;
-        sTv.tv_usec = 0;
+        sTv.tv_sec = 0; sTv.tv_usec = 0;
         FD_ZERO(&sSet); FD_SET(m_hHandle, &sSet);
         iRet = select(m_hHandle + 1, &sSet, NULL, NULL, &sTv);
         if (!iRet)
         {
+		   usleep(10000);
            continue;
         }
         iRead = recv(m_hHandle, pInitialBuffer, iInitialBufferSize, 0);
@@ -329,12 +329,12 @@ Error HttpBuffer::Open(void)
                
             for(;!m_bExit;)
             {
-                sTv.tv_sec = iTransmitTimeout;
-                sTv.tv_usec = 0;
+                sTv.tv_sec = 0; sTv.tv_usec = 0;
                 FD_ZERO(&sSet); FD_SET(m_hHandle, &sSet);
                 iRet = select(m_hHandle + 1, &sSet, NULL, NULL, &sTv);
                 if (!iRet)
                 {
+				   usleep(10000);
                    continue;
                 }
                 iRead = recv(m_hHandle, pInitialBuffer, iInitialBufferSize, 0);
@@ -418,8 +418,6 @@ Error HttpBuffer::GetID3v1Tag(unsigned char *pTag)
 
 Error HttpBuffer::Run(void)
 {
-    int iRet;
-
     if (!m_pBufferThread)
     {
        m_pBufferThread = Thread::CreateThread();
@@ -457,12 +455,12 @@ void HttpBuffer::WorkerThread(void)
           continue;
       }
 
-      sTv.tv_sec = 0;
-      sTv.tv_usec = 100000;  // .1 second
-      FD_SET(m_hHandle, &sSet);
+      sTv.tv_sec = 0; sTv.tv_usec = 0;
+      FD_ZERO(&sSet); FD_SET(m_hHandle, &sSet);
       iRet = select(m_hHandle + 1, &sSet, NULL, NULL, &sTv);
       if (!iRet)
       {
+		 usleep(10000);
          continue;
       }
         
