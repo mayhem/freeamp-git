@@ -67,6 +67,7 @@ class Win32Window : public Window
              void  Notify(int32 command, LPNMHDR notifyMsgHdr);
              void  CreateTooltips(void);
              void  Paint(void);
+             void  TimerEvent(void);
              
     protected:
     

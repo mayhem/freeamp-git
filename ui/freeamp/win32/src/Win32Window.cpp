@@ -129,7 +129,6 @@ static LRESULT WINAPI MainWndProc(HWND hwnd, UINT msg,
             break;
         }
 
-
         case WM_NCMOUSEMOVE:
         {
         	Pos oPos;
@@ -375,6 +374,15 @@ void Win32Window::Paint(void)
 
     m_pMindMeldMutex->Release();
 }    
+
+void Win32Window::TimerEvent(void)
+{
+    m_pMindMeldMutex->Acquire();
+
+    Window::TimerEvent();
+
+    m_pMindMeldMutex->Release();
+}
 
 void Win32Window::SaveWindowPos(Pos &oPos)
 {
