@@ -1713,7 +1713,7 @@ TrayNotify(int32 notifyMessage)
                 mii.wID = IDC_STOP;
 
                 SetMenuItemInfo(popupHandle, 
-                                7,
+                                5,
                                 TRUE,
                                 &mii);
             }
@@ -1729,7 +1729,7 @@ TrayNotify(int32 notifyMessage)
                 mii.fState = MFS_CHECKED;
 
                 SetMenuItemInfo(popupHandle, 
-                                8,
+                                6,
                                 TRUE,
                                 &mii);
             }

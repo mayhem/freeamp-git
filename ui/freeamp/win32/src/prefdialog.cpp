@@ -531,15 +531,8 @@ PrefPage2Proc(  HWND hwnd,
                                         originalValues.saveStreamsDirectory, 
                                         &size);
 
-            if(!strcmp(originalValues.saveStreamsDirectory, "."))
-            {
-                Edit_SetText(hwndSaveStreamsDirectory, "(Current Directory)");
-            }
-            else
-            {
-                Edit_SetText(   hwndSaveStreamsDirectory, 
-                                originalValues.saveStreamsDirectory);
-            }
+            Edit_SetText(   hwndSaveStreamsDirectory, 
+                            originalValues.saveStreamsDirectory);
 
             Button_Enable(  hwndSaveStreamsDirectory, 
                             originalValues.saveStreams);
@@ -1042,7 +1035,9 @@ bool DisplayPreferences(HWND hwndParent, Preferences* prefs)
     psh.pszIcon = NULL;
     psh.pszCaption = "FreeAmp Preferences";
     psh.nPages = sizeof(psp)/sizeof(PROPSHEETPAGE);
+    psh.nStartPage = 0;
     psh.ppsp = psp;
+    psh.pfnCallback = NULL;
 
     result = (PropertySheet(&psh) > 0);
 
