@@ -82,3 +82,9 @@ Other major contributors and their contributions:
 
 "Mark Weaver" <mhw@netris.org>
 * Unix prefs
+
+"Henrik Johnson" <hpj@globecom.net>
+* Fast forward and fast backward in command line UI
+
+"Jean Tourrilhes" <jeant@rockfort.hpl.hp.com>
+* Unicast RTP support in obsinput.pmi
