@@ -39,13 +39,18 @@ class Mpg123UI : public UserInterface {
     virtual int32 AcceptEvent(Event *);
     virtual void SetArgs(int argc, char **argv);
     virtual void SetTarget(EventQueue *);
-    virtual Error Init() { return kError_NoErr; }
+    virtual Error Init(int32);
     virtual void SetPlayListManager(PlayListManager *);
     
     ~Mpg123UI();
 
     static EventQueue *m_playerEQ;
  private:
+    int32 m_argc;
+    char **m_argv;
+    int32 m_startupType;
+    void ProcessArgs();
+
     PlayListManager *m_plm;
     void DisplayStuff();
     MediaInfoEvent m_mediaInfo;

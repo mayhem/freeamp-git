@@ -48,7 +48,7 @@ class FreeAmpUI : public UserInterface {
     virtual int32 AcceptEvent(Event *);
     virtual void SetArgs(int argc, char **argv);
     virtual void SetTarget(EventQueue *eqr) { m_playerEQ = eqr; }
-    virtual Error Init();
+    virtual Error Init(int32);
     virtual void SetPlayListManager(PlayListManager *);
     static void x11ServiceFunction(void *);
     static void TimerEventFunction(void *);
@@ -56,6 +56,7 @@ class FreeAmpUI : public UserInterface {
 
     EventQueue *m_playerEQ;
  private:
+    int32 m_startupType;
     void Usage();
     bool m_noStartUp;
 

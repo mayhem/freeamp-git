@@ -49,22 +49,27 @@ EventQueue *Mpg123UI::m_playerEQ = NULL;
 Mpg123UI::Mpg123UI() {
     m_mediaInfo_set = false;
     m_mpegInfo_set = false;
-    //cout << endl << "mpg123 0.59k command line compatability mode" << endl << endl;
-    cerr << "High Performance MPEG 1.0/2.0/2.5 Audio Player for Layer 1, 2 and 3" << endl;
-    cerr << "Version 0.05 (1998/Oct/06).  Written by Jason Woodward, Mark Elrod, others." << endl;
-    cerr << "Copyrights GoodNoise, XingTech. See 'README' for more!" << endl;
-    cerr << "This software is distributed under the GNU GPL." << endl;
 
     verboseMode = false;
     totalFrames = 0;
 
     m_plm = NULL;
 
-    signal(SIGTERM,mysigterm);
-    signal(SIGINT,mysigint);
-    
 }
 
+Error Mpg123UI::Init(int32 startup_level) {
+    if ((m_startupType = startup_level) == PRIMARY_UI) {
+	ProcessArgs();
+	//cout << endl << "mpg123 0.59k command line compatability mode" << endl << endl;
+	cerr << "High Performance MPEG 1.0/2.0/2.5 Audio Player for Layer 1, 2 and 3" << endl;
+	cerr << "Version 0.05 (1998/Oct/06).  Written by Jason Woodward, Mark Elrod, others." << endl;
+	cerr << "Copyrights GoodNoise, XingTech. See 'README' for more!" << endl;
+	cerr << "This software is distributed under the GNU GPL." << endl;
+	signal(SIGTERM,mysigterm);
+	signal(SIGINT,mysigint);
+ 
+    }
+}
 
 void mysigterm(int f) {
     Event *e = new Event(CMD_Stop);
@@ -202,10 +207,13 @@ void Mpg123UI::DisplayStuff() {
 
 
 void Mpg123UI::SetArgs(int argc, char **argv) {
+    m_argc = argc; m_argv = argv;
+}
+void Mpg123UI::ProcessArgs() {
     char *pc = NULL;
     int addedStuff = 0;
-    for(int i=1;i<argc;i++) {
-	pc = argv[i];
+    for(int i=1;i<m_argc;i++) {
+	pc = m_argv[i];
 	if (pc[0] == '-') {
 	    switch (pc[1]) {
 		case 't': 
@@ -217,7 +225,7 @@ void Mpg123UI::SetArgs(int argc, char **argv) {
 		    break;
 		case 'k': 
 		    i++;
-		    pc = argv[i];
+		    pc = m_argv[i];
 		    skipFirst = atoi(pc);
 		    //cout << "skiping first " << skipFirst << " frames" << endl;
 		    break;
@@ -226,12 +234,12 @@ void Mpg123UI::SetArgs(int argc, char **argv) {
 		    break;
 		case 'b':
 		    i++;
-		    pc = argv[i];
+		    pc = m_argv[i];
 		    cout << "output buffer: " << pc << "Kbytes" << endl;
 		    break;
 		case 'r':
 		    i++;
-		    pc = argv[i];
+		    pc = m_argv[i];
 		    cout << "override samplerate: " << pc << endl;
 		    break;
 		case 'o': {
@@ -252,7 +260,7 @@ void Mpg123UI::SetArgs(int argc, char **argv) {
 		    break;
 		case 'd':
 		    i++;
-		    pc = argv[i];
+		    pc = m_argv[i];
 		    cout << "play only every nth frame" << endl;
 		    break;
 		case '0':
@@ -263,7 +271,7 @@ void Mpg123UI::SetArgs(int argc, char **argv) {
 		    break;
 		case '@':
 		    i++;
-		    pc = argv[i];
+		    pc = m_argv[i];
 		    cout << "read filenames/URLs from " << pc << endl;
 		    break;
 		case 'q':
@@ -274,7 +282,7 @@ void Mpg123UI::SetArgs(int argc, char **argv) {
 		    break;
 		case 'n':
 		    i++;
-		    pc = argv[i];
+		    pc = m_argv[i];
 		    cout << "decode only " << pc << " frames" << endl;
 		    break;
 		case 'y':
@@ -282,17 +290,17 @@ void Mpg123UI::SetArgs(int argc, char **argv) {
 		    break;
 		case 'f':
 		    i++;
-		    pc = argv[i];
+		    pc = m_argv[i];
 		    cout << "change scalefactor to " << pc << endl;
 		    break;
 		case 'g':
 		    i++;
-		    pc = argv[i];
+		    pc = m_argv[i];
 		    cout << "set audio output hardware gain to " << pc << endl;
 		    break;
 		case 'a':
 		    i++;
-		    pc = argv[i];
+		    pc = m_argv[i];
 		    cout << "set audio device " << pc << endl;
 		    break;
 		case '4':
@@ -300,7 +308,7 @@ void Mpg123UI::SetArgs(int argc, char **argv) {
 		    break;
 		case 'h':
 		    i++;
-		    pc = argv[i];
+		    pc = m_argv[i];
 		    cout << " play every frame " << pc << " times" << endl;
 		    break;
 		case '1':
@@ -308,7 +316,7 @@ void Mpg123UI::SetArgs(int argc, char **argv) {
 		    break;
 		case 'p':
 		    i++;
-		    pc = argv[i];
+		    pc = m_argv[i];
 		    cout << "use HTTP proxy " << pc << endl;
 		    break;
 		case 'z':
@@ -330,8 +338,8 @@ void Mpg123UI::SetArgs(int argc, char **argv) {
 		    break;
 	    }
 	} else {
-	    //ut << "Adding: " <<argv[i] << endl;
-	    m_plm->Add(argv[i],0);
+	    //ut << "Adding: " <<m_argv[i] << endl;
+	    m_plm->Add(m_argv[i],0);
 	    addedStuff++;
 	}
     }

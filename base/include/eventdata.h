@@ -34,6 +34,29 @@ ____________________________________________________________________________*/
 #include "id3v1.h"
 #include "vector.h"
 
+class UserMessageEvent : public Event {
+ private:
+    char *m_info;
+ public:
+    virtual ~UserMessageEvent() { 
+	if (m_info) {
+	    delete m_info;
+	    m_info = NULL;
+	}
+    }
+    UserMessageEvent() {
+	m_type = INFO_UserMessage;
+	m_info = NULL;
+    }
+    UserMessageEvent(const char *info) {
+	m_type = INFO_UserMessage;
+	m_info = strdup(info);
+    }
+    const char *GetInfo() {
+	return m_info;
+    }
+};
+
 class MediaInfoEvent : public Event {
  public:
     Vector<Event *> *m_childEvents;

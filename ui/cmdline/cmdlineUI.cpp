@@ -68,27 +68,37 @@ cmdlineUI::cmdlineUI() {
 
     m_plm = NULL;
     m_playerEQ = NULL;
-    tcgetattr(stdinfd, &::normalTTY);
-    ::rawTTY = ::normalTTY;
-    ::rawTTY.c_lflag &= ~ICANON;
-    ::rawTTY.c_lflag &= ~ECHO;
-    tcsetattr(stdinfd, TCSANOW, &rawTTY);
 
-
-    keyboardListenThread = Thread::CreateThread();
-    keyboardListenThread->Create(cmdlineUI::keyboardServiceFunction,this);
-    
-    cout << endl << "Command Line Interface" << endl << endl;
-    cout << " * q    Quit" << endl;
-    cout << " * +/=  Next Song" << endl;
-    cout << " * -    Prev Song" << endl;
-    cout << " * p    Pause / UnPause" << endl;
-    cout << " * s    Shuffle" << endl << endl;
+    keyboardListenThread = NULL;
 }
 
+Error cmdlineUI::Init(int32 startup_level) {
+    if ((m_startupLevel = startup_level) == PRIMARY_UI) {
+	tcgetattr(stdinfd, &::normalTTY);
+	::rawTTY = ::normalTTY;
+	::rawTTY.c_lflag &= ~ICANON;
+	::rawTTY.c_lflag &= ~ECHO;
+	tcsetattr(stdinfd, TCSANOW, &rawTTY);
+	
+	
+	keyboardListenThread = Thread::CreateThread();
+	keyboardListenThread->Create(cmdlineUI::keyboardServiceFunction,this);
+	
+	cout << endl << "Command Line Interface" << endl << endl;
+	cout << " * q    Quit" << endl;
+	cout << " * +/=  Next Song" << endl;
+	cout << " * -    Prev Song" << endl;
+	cout << " * p    Pause / UnPause" << endl;
+	cout << " * s    Shuffle" << endl << endl;
+	ProcessArgs();
+    }
+    return kError_NoErr;
+}
 
 cmdlineUI::~cmdlineUI() {
-    tcsetattr(stdinfd, TCSANOW, &normalTTY);
+    if (m_startupLevel == PRIMARY_UI) {
+	tcsetattr(stdinfd, TCSANOW, &normalTTY);
+    }
     //cout << "cmdlineUI: begin deleted..." << endl;
     if (keyboardListenThread) {
 	keyboardListenThread->Destroy();
@@ -192,10 +202,13 @@ int32 cmdlineUI::AcceptEvent(Event *e) {
 }
 
 void cmdlineUI::SetArgs(int argc, char **argv) {
+    m_argc = argc; m_argv = argv;
+}
+void cmdlineUI::ProcessArgs() {
     char *pc = NULL;
-    for(int i=1;i<argc;i++) {
+    for(int i=1;i<m_argc;i++) {
 	//cout << "Adding arg " << i << ": " << argv[i] << endl;
-	pc = argv[i];
+	pc = m_argv[i];
 	if (pc[0] == '-') {
 	    processSwitch(&(pc[0]));
 	} else {
@@ -210,6 +223,8 @@ void cmdlineUI::SetArgs(int argc, char **argv) {
 void cmdlineUI::processSwitch(char *pc) {
     return;
 }
+
+
 
 
 

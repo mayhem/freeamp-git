@@ -82,6 +82,7 @@ class EventQueue {
 #define INFO_PlayListRepeat     33 // sent by PLM to player to inform of a setting of repeat mode
 #define INFO_PlayListShuffle    34 // sent by PLM to player to inform of a setting of shuffle mode
 #define INFO_PlayListUpdated	35 // sent by PLM to player to inform of a playlist update
+#define INFO_UserMessage        36 // sent by UI to Player, diseminated by Player to each UI
 #endif // _EVENT_H_
 
 

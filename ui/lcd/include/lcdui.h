@@ -44,11 +44,15 @@ class LcdUI : public UserInterface {
     virtual int32 AcceptEvent(Event *);
     virtual void SetArgs(int argc, char **argv);
     virtual void SetTarget(EventQueue *eqr) { m_playerEQ = eqr; }
-    virtual Error Init();
+    virtual Error Init(int32);
     virtual void SetPlayListManager(PlayListManager *);
     static void keyboardServiceFunction(void *);
     virtual ~LcdUI();
  private:
+    int32 m_startupType;
+    int32 m_argc;
+    char **m_argv;
+    void ProcessArgs();
     void BlitTimeLine();
     int32 m_timeType;
     int32 m_currHours, m_currMinutes, m_currSeconds;

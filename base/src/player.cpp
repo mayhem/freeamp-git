@@ -76,7 +76,7 @@ EventQueue() {
     m_lmc = NULL;
     m_ui = NULL;
 
-    m_argUI = NULL;
+    m_argUIvector = new Vector<char *>();
 
     m_argc  = 0;
     m_argv  = NULL;
@@ -92,7 +92,8 @@ EventQueue() {
 Player::~Player() {
 
     TYPICAL_DELETE(m_pTermSem);
-    
+    TYPICAL_DELETE(m_argUIvector);
+
     //cout << "waiting for service thread to end..." << endl;
     if (m_eventServiceThread) {
 	m_eventServiceThread->Join();
@@ -146,7 +147,6 @@ Player::~Player() {
 
 	TYPICAL_DELETE(m_prefs);
 
-	TYPICAL_DELETE(m_argUI);
 }
 
 void Player::SetTerminationSemaphore(Semaphore *pSem) {
@@ -163,14 +163,16 @@ bool Player::SetArgs(int32 argc, char** argv){
     char *arg = NULL;
 #ifndef WIN32
     // grab the UI name from how we are invoked.
-    m_argUI = new char[strlen(argv[0]) + 1 + 3];
+    char *argUI = new char[strlen(argv[0]) + 1 + 3];
     char *pBegin = strrchr(argv[0],'/');
     if (pBegin) {
 	pBegin++;
     } else {
 	pBegin = argv[0];
     }
-    sprintf(m_argUI,"%s",pBegin);
+    //sprintf(m_argUI,"%s",pBegin);
+    strcpy(argUI,pBegin);
+    m_argUIvector->Insert(argUI);
 #endif
     argVector.Insert(argv[0]);
     for(int32 i = 1;i < argc; i++) 
@@ -200,9 +202,10 @@ bool Player::SetArgs(int32 argc, char** argv){
 			    return false;
 			}
 			arg = argv[i];
-			if (m_argUI) delete m_argUI;
-                        m_argUI = new char[strlen(arg) + 1];
-                        strcpy(m_argUI, arg);
+			//if (m_argUI) delete m_argUI;
+                        argUI = new char[strlen(arg) + 1];
+                        strcpy(argUI, arg);
+			m_argUIvector->Insert(argUI);
                     }
 		    break;
 		}
@@ -279,16 +282,17 @@ void Player::SetPreferences(Preferences * pP) {
 }
 
 void Player::Run(){
+    int32 uiVectorIndex = 0;
     Preferences* prefs;
     char* name = NULL;
     uint32 len = 256;
     Error error = kError_NoErr;
-
+    int32 uisActivated = 0;
     m_eventServiceThread = Thread::CreateThread();
     m_eventServiceThread->Create(Player::EventServiceThreadFunc,this);
 
     // which ui should we instantiate first??
-    if(m_argUI == NULL)
+    if(m_argUIvector->NumElements() == 0)
     {
         name = new char[len];
         prefs = new Preferences;
@@ -306,38 +310,44 @@ void Player::Run(){
     }
     else
     {
-        name = new char[strlen(m_argUI) + 1]; 
-        strcpy(name, m_argUI);
+        name = new char[1024]; 
+        strcpy(name, m_argUIvector->ElementAt(uiVectorIndex));
     }
 
     if(IsntError(error))
     {
-        RegistryItem* item = NULL;
-	UserInterface *ui = NULL;
-        int32 i = 0;
-	    int32 uisActivated = 0;
-	
-        while(item = m_uiRegistry->GetItem(i++))
-        {
-            if(!CompareNames(item->Name(),name))
-            {
-		        m_ui = (UserInterface *)item->InitFunction()();
-		
-		        m_ui->SetTarget((EventQueue *)this);
- 		        m_ui->SetPlayListManager(m_plm);
-			m_ui->SetArgs(m_argc, m_argv);
-		        Error er = m_ui->Init();
-			if (er == kError_NoErr) {
-			    RegisterActiveUI(m_ui);
-			} else {
-			    delete m_ui;
-			    m_ui = NULL;
-			}
-			uisActivated++;
-                break;
-            }
-        }
-	
+	while (*name) {
+	    RegistryItem* item = NULL;
+	    UserInterface *ui = NULL;
+	    int32 i = 0;
+	    
+	    while(item = m_uiRegistry->GetItem(i++))
+	    {
+		if(!CompareNames(item->Name(),name))
+		{
+		    m_ui = (UserInterface *)item->InitFunction()();
+		    
+		    m_ui->SetTarget((EventQueue *)this);
+		    m_ui->SetPlayListManager(m_plm);
+		    m_ui->SetArgs(m_argc, m_argv);
+		    Error er = m_ui->Init((uiVectorIndex == 0) ? PRIMARY_UI : SECONDARY_UI_STARTUP); // call it the primary if we're looking at the first ui
+		    if (er == kError_NoErr) {
+			RegisterActiveUI(m_ui);
+		    } else {
+			delete m_ui;
+			m_ui = NULL;
+		    }
+		    uisActivated++;
+		    break;
+		}
+	    }
+	    char *p = m_argUIvector->ElementAt(++uiVectorIndex);
+	    if (p) {
+		strcpy(name,p);
+	    } else {
+		*name = '\0';
+	    }
+	}
 	if (!uisActivated) {
 #ifdef WIN32
 	    char foo[1024];
@@ -843,6 +853,14 @@ int32 Player::ServiceEvent(Event *pC) {
 		break; 
 	    }
 	    
+	    case INFO_UserMessage: {
+		GetUIManipLock();
+		SendToUI(pC);
+		ReleaseUIManipLock();
+		delete pC;
+		break;
+	    }
+
 	    case INFO_MediaInfo: {
 		    GetUIManipLock();
 		    

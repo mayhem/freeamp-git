@@ -78,15 +78,8 @@ LcdUI::LcdUI() {
     m_plm = NULL;
     m_playerEQ = NULL;
     m_lcdLock = new Mutex();
-    tcgetattr(stdinfd, &::normalTTY);
-    ::rawTTY = ::normalTTY;
-    ::rawTTY.c_lflag &= ~ICANON;
-    ::rawTTY.c_lflag &= ~ECHO;
-    tcsetattr(stdinfd, TCSANOW, &rawTTY);
 
-
-    keyboardListenThread = Thread::CreateThread();
-    keyboardListenThread->Create(LcdUI::keyboardServiceFunction,this);
+    keyboardListenThread = NULL;
 
     m_currHours = m_currMinutes = m_currSeconds = m_totalHours = m_totalMinutes = m_totalSeconds = 0;
 
@@ -100,7 +93,9 @@ LcdUI::LcdUI() {
 
 
 LcdUI::~LcdUI() {
-    tcsetattr(stdinfd, TCSANOW, &normalTTY);
+    if (m_startupType == PRIMARY_UI) {
+	tcsetattr(stdinfd, TCSANOW, &normalTTY);
+    }
     //cout << "LcdUI: begin deleted..." << endl;
     
     m_lcdLock->Acquire();
@@ -123,20 +118,27 @@ LcdUI::~LcdUI() {
 
 #define STOCK_CONTRAST 140
 
-Error LcdUI::Init() {
+Error LcdUI::Init(int32 startupType) {
     lcd_init("/dev/lcd","MtxOrb");
     lcd.contrast(STOCK_CONTRAST);
 
     m_lcdLock->Acquire(WAIT_FOREVER);
-    lcd.string(1,1,"spifman");
+    lcd.string(1,1," Welcome To FreeAmp");
     lcd.flush();
-    //sleep(1);
-    lcd.string(1,2,"jason");
-    lcd.flush();
-    //sleep(1);
-    lcd.string(3,1,"jason");
-    //lcd.flush();
     m_lcdLock->Release();
+
+    if ((m_startupType = startupType) == PRIMARY_UI) {
+	ProcessArgs();
+	tcgetattr(stdinfd, &::normalTTY);
+	::rawTTY = ::normalTTY;
+	::rawTTY.c_lflag &= ~ICANON;
+	::rawTTY.c_lflag &= ~ECHO;
+	tcsetattr(stdinfd, TCSANOW, &rawTTY);
+	
+	
+	keyboardListenThread = Thread::CreateThread();
+	keyboardListenThread->Create(LcdUI::keyboardServiceFunction,this);
+    }
 
     return kError_NoErr;
 }
@@ -216,14 +218,46 @@ int32 LcdUI::AcceptEvent(Event *e) {
 		Event *e = new Event(INFO_ReadyToDieUI);
 		m_playerEQ->AcceptEvent(e);
 		break; }
+	    case INFO_Stopped: {
+		m_currHours = m_currMinutes = m_currSeconds = 0;
+		m_lcdLock->Acquire();
+		BlitTimeLine();
+		lcd.flush();
+		m_lcdLock->Release();
+	    }
+	    case INFO_UserMessage: {
+		if (!strcmp("time_curr_mode",((UserMessageEvent *)e)->GetInfo())) {
+		    m_timeType = TIME_CURR;
+		    m_lcdLock->Acquire();
+		    BlitTimeLine();
+		    lcd.flush();
+		    m_lcdLock->Release();
+		} else if (!strcmp("time_remain_mode",((UserMessageEvent *)e)->GetInfo())) {
+		    m_timeType = TIME_REMAIN;
+		    m_lcdLock->Acquire();
+		    BlitTimeLine();
+		    lcd.flush();
+		    m_lcdLock->Release();
+
+		}else if (!strcmp("time_total_mode",((UserMessageEvent *)e)->GetInfo())) {
+		    m_timeType = TIME_TOTAL;
+		    m_lcdLock->Acquire();
+		    BlitTimeLine();
+		    lcd.flush();
+		    m_lcdLock->Release();
+
+		}
+		break;
+	    }
 	    case INFO_MediaInfo: {
 		MediaInfoEvent *pmvi = (MediaInfoEvent *)e;
 		if (pmvi) {
-		    //cout << "writing lcd" << endl;
+		    cout << "writing lcd" << endl;
 		    //cout << "total seconds" << pmvi->m_totalSeconds << endl;
 		    m_totalHours = (int32)pmvi->m_totalSeconds / 3600;
 		    m_totalMinutes = ((int32)pmvi->m_totalSeconds - m_totalHours*3600) / 60;
 		    m_totalSeconds = ((int32)pmvi->m_totalSeconds - m_totalHours*3600 - m_totalMinutes*60);
+		    cout << "total hours " << m_totalHours << " " << m_totalMinutes << " " << m_totalSeconds << endl;
 		    m_lcdLock->Acquire(WAIT_FOREVER);
 		    lcd.clear();
 		    char *foo = strrchr(pmvi->m_filename,'/');
@@ -301,10 +335,13 @@ void LcdUI::BlitTimeLine() {
 }
 
 void LcdUI::SetArgs(int argc, char **argv) {
+    m_argc = argc; m_argv = argv;
+}
+void LcdUI::ProcessArgs() {
     char *pc = NULL;
-    for(int i=1;i<argc;i++) {
+    for(int i=1;i<m_argc;i++) {
 	//cout << "Adding arg " << i << ": " << argv[i] << endl;
-	pc = argv[i];
+	pc = m_argv[i];
 	if (pc[0] == '-') {
 	    processSwitch(&(pc[0]));
 	} else {

@@ -110,7 +110,7 @@ class Player : public EventQueue {
     PMORegistry*            m_pmoRegistry;
     UIRegistry*             m_uiRegistry;
 
-    char*                   m_argUI;
+    Vector<char *>*                   m_argUIvector;
 
     int32                   m_argc;          
     char**                  m_argv;
