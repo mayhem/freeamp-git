@@ -186,7 +186,6 @@ BOOL MusicBrowserUI::MusicSearchDlgProc(HWND hwnd,
                                      temp,
                                      MAX_PATH);
 
-                        m_searchPathList.push_back(temp);
                         if (strcmp(temp, kSelectOtherText)) 
                         {
                             m_searchPathList.push_back(temp);
