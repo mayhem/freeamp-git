@@ -2173,6 +2173,7 @@ static void check_function(void* arg)
     EnableWindow(hwndPrefCancel, TRUE);
 
     delete ts->thread;
+    delete ts;
 }
 
 static void update_function(void* arg)
@@ -2208,55 +2209,55 @@ static void update_function(void* arg)
         {
             SetWindowText(hwndStatus, " Status: An update is already in progress."); 
         }
-
-        return;
     }
-
-    // Add items
-    LV_ITEM lv_item;
-    UpdateItem* item = NULL;
-    uint32 i = 0;
-    uint32 count = ListView_GetItemCount(ts->hwndList);
-
-    while(item = ts->um->ItemAt(i++))
+    else
     {
-        bool newItem = true;
+        // Add items
+        LV_ITEM lv_item;
+        UpdateItem* item = NULL;
+        uint32 i = 0;
+        uint32 count = ListView_GetItemCount(ts->hwndList);
 
-        for(uint32 j = 0; j < count; j++)
+        while(item = ts->um->ItemAt(i++))
         {
-            lv_item.mask = LVIF_PARAM;
-            lv_item.iItem = j;
+            bool newItem = true;
 
-            if(ListView_GetItem(ts->hwndList, &lv_item))
+            for(uint32 j = 0; j < count; j++)
             {
-                if((UpdateItem*)lv_item.lParam == item)
+                lv_item.mask = LVIF_PARAM;
+                lv_item.iItem = j;
+
+                if(ListView_GetItem(ts->hwndList, &lv_item))
                 {
-                    newItem = false;
-                    break;
+                    if((UpdateItem*)lv_item.lParam == item)
+                    {
+                        newItem = false;
+                        break;
+                    }
                 }
+            }
+
+            if(newItem)
+            {
+                lv_item.mask = LVIF_PARAM | LVIF_STATE;
+                lv_item.state = 0;
+                lv_item.stateMask = 0;
+                lv_item.iItem = ListView_GetItemCount(ts->hwndList);
+                lv_item.iSubItem = 0;
+                lv_item.lParam = (LPARAM)item;
+
+                ListView_InsertItem(ts->hwndList, &lv_item);
             }
         }
 
-        if(newItem)
+        ListView_RedrawItems(ts->hwndList, 0, ListView_GetItemCount(ts->hwndList) - 1);
+
+        result = ts->um->UpdateComponents(callback_function, ts);
+
+        if(result == kError_UserCancel)
         {
-            lv_item.mask = LVIF_PARAM | LVIF_STATE;
-            lv_item.state = 0;
-            lv_item.stateMask = 0;
-            lv_item.iItem = ListView_GetItemCount(ts->hwndList);
-            lv_item.iSubItem = 0;
-            lv_item.lParam = (LPARAM)item;
-
-            ListView_InsertItem(ts->hwndList, &lv_item);
+            SetWindowText(hwndStatus, " Status: Update cancelled by user.");
         }
-    }
-
-    ListView_RedrawItems(ts->hwndList, 0, ListView_GetItemCount(ts->hwndList) - 1);
-
-    result = ts->um->UpdateComponents(callback_function, ts);
-
-    if(result == kError_UserCancel)
-    {
-        SetWindowText(hwndStatus, " Status: Update cancelled by user."); 
     }
 
     EnableWindow(hwndCheck, TRUE);
@@ -2267,6 +2268,7 @@ static void update_function(void* arg)
     EnableWindow(hwndPrefOK, TRUE);
     EnableWindow(hwndPrefCancel, TRUE);
     delete ts->thread;
+    delete ts;
 }
 
 bool Win32PreferenceWindow::PrefUpdateProc(HWND hwnd, 
@@ -2283,7 +2285,7 @@ bool Win32PreferenceWindow::PrefUpdateProc(HWND hwnd,
     static HWND hwndUpdate = NULL;
     static HWND hwndCheck = NULL;
     static HWND hwndAutoCheck = NULL;
-    static ThreadStruct ts;
+    static ThreadStruct* ts = NULL;
     const char* kNoSelection = "No component is selected.";
 
     
@@ -2302,6 +2304,7 @@ bool Win32PreferenceWindow::PrefUpdateProc(HWND hwnd,
             hwndUpdate = GetDlgItem(hwnd, IDC_UPDATE);
             hwndCheck = GetDlgItem(hwnd, IDC_CHECK);
             hwndAutoCheck = GetDlgItem(hwnd, IDC_AUTOCHECK);
+            
 
             // Init our controls
 
@@ -2366,34 +2369,38 @@ bool Win32PreferenceWindow::PrefUpdateProc(HWND hwnd,
             {
                 case IDC_UPDATE:
                 {
+                    ts = new ThreadStruct;
+
                     Thread* thread = Thread::CreateThread();
 
                     if(thread)
                     {
-                        ts.thread = thread;
-                        ts.um = um;
-                        ts.hwndList = hwndList;
-                        ts.context = m_pContext;
-                        ts.cancel = false;
+                        ts->thread = thread;
+                        ts->um = um;
+                        ts->hwndList = hwndList;
+                        ts->context = m_pContext;
+                        ts->cancel = false;
 
-                        thread->Create(update_function, &ts);
+                        thread->Create(update_function, ts);
                     }
                 	break;
                 }
 
                 case IDC_CHECK:
                 {
+                    ts = new ThreadStruct;
+
                     Thread* thread = Thread::CreateThread();
 
                     if(thread)
                     {
-                        ts.thread = thread;
-                        ts.um = um;
-                        ts.hwndList = hwndList;
-                        ts.context = m_pContext;
-                        ts.cancel = false;
+                        ts->thread = thread;
+                        ts->um = um;
+                        ts->hwndList = hwndList;
+                        ts->context = m_pContext;
+                        ts->cancel = false;
 
-                        thread->Create(check_function, &ts);
+                        thread->Create(check_function, ts);
                     }
                     break;
                 }         
@@ -2401,7 +2408,33 @@ bool Win32PreferenceWindow::PrefUpdateProc(HWND hwnd,
                 case IDC_CANCELCHECK:
                 case IDC_CANCELUPDATE:
                 {
-                    ts.cancel = true;
+                    if(ts)
+                    {
+                        ts->cancel = true;
+                        ts = NULL;
+
+                        HWND hwndCancelUpdate = GetDlgItem(hwnd, IDC_CANCELUPDATE);
+                        HWND hwndCancelCheck = GetDlgItem(hwnd, IDC_CANCELCHECK);
+                        HWND hwndStatus = GetDlgItem(hwnd, IDC_STATUS);
+                        HWND hwndPref = GetParent(hwnd);
+                        HWND hwndPrefOK = GetDlgItem(hwndPref, IDOK);
+                        HWND hwndPrefCancel = GetDlgItem(hwndPref, IDCANCEL);
+
+                        SetWindowText(hwndStatus, " Status: Update cancelled by user.");
+
+                        EnableWindow(hwndCheck, TRUE);
+                        EnableWindow(hwndCancelCheck, FALSE);
+                        ShowWindow(hwndCheck, SW_SHOW);
+                        ShowWindow(hwndCancelCheck, SW_HIDE);
+
+                        EnableWindow(hwndUpdate, TRUE);
+                        EnableWindow(hwndCancelUpdate, FALSE);
+                        ShowWindow(hwndUpdate, SW_SHOW);
+                        ShowWindow(hwndCancelUpdate, SW_HIDE);
+
+                        EnableWindow(hwndPrefOK, TRUE);
+                        EnableWindow(hwndPrefCancel, TRUE);
+                    }
                     break;
                 }
 

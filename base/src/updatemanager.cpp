@@ -73,6 +73,8 @@ typedef ostrstream ostringstream;
 #include "event.h"
 #include "eventdata.h"
 #include "zlib.h"
+#include "mutex.h"
+#include "semaphore.h"
 
 
 const char* kUpdateServer = BRANDING_UPDATE_SERVER;
@@ -83,6 +85,7 @@ const char* kUpdateRequest = "GET %s HTTP/1.0\n"
                              "User-Agent: FreeAmp/%s\n" // we do not want to change this for branding
                              "\n";
 const uint8 kUpdatePort = 80;
+
 
 UpdateManager::UpdateManager(FAContext* context)
 {
@@ -918,7 +921,7 @@ Error UpdateManager::DownloadItem(UpdateItem* item,
                 const char* kHTTPQuery = "GET %s HTTP/1.0\n"
                                          "Host: %s\n"
                                          "Accept: */*\n" 
-                                         "User-Agent: "BRANDING"/%s\n"
+                                         "User-Agent: FreeAmp/%s\n"
                                          "\n";
                                              
                 char* query = new char[ strlen(kHTTPQuery) + 

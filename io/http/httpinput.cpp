@@ -407,13 +407,13 @@ Error HttpInput::Open(void)
         sprintf(szQuery, "GET %s HTTP/1.0\n"
                          "Host: %s\n"
                          "Accept: */*\n" 
-                         "User-Agent: "BRANDING"/%s\n", 
+                         "User-Agent: FreeAmp/%s\n", 
                          szFile, szLocalName, FREEAMP_VERSION);
     else
         sprintf(szQuery, "GET / HTTP/1.0\n"
                          "Host: %s\n"
                          "Accept: */*\n" 
-                         "User-Agent: "BRANDING"/%s\n", 
+                         "User-Agent: FreeAmp/%s\n", 
                          szLocalName, FREEAMP_VERSION);
 
     m_pContext->prefs->GetPrefBoolean(kUseTitleStreamingPref, &bUseTitleStreaming);

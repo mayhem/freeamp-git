@@ -733,7 +733,7 @@ Error DownloadManager::Download(DownloadItem* item)
                 const char* kHTTPQuery = "GET %s HTTP/1.1\n"
                                          "Host: %s\n"
                                          "Accept: */*\n" 
-                                         "User-Agent: "BRANDING"/%s\n";
+                                         "User-Agent: FreeAmp/%s\n";
 
                 const char* kRange = "Range: %lu-\n"
                                      "If-Range: %s\n";
