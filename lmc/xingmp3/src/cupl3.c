@@ -455,6 +455,10 @@ static int unpack_side_MPEG1(void)
       {
 	 side_info.gr[igr][ch].part2_3_length = bitget(12);
 	 side_info.gr[igr][ch].big_values = bitget(9);
+
+         if (side_info.gr[igr][ch].big_values > 288)
+             return 0;
+	 
 	 side_info.gr[igr][ch].global_gain = bitget(8) + gain_adjust;
 	 if (ms_mode)
 	    side_info.gr[igr][ch].global_gain -= 2;
@@ -572,9 +576,10 @@ static int unpack_side_MPEG2(int igr)
       side_info.gr[igr][ch].part2_3_length = bitget(12);
       side_info.gr[igr][ch].big_values = bitget(9);
 	  
-	  assert(side_info.gr[igr][ch].big_values < 288); // to catch corrupt sideband data
+      if (side_info.gr[igr][ch].big_values > 288)
+	  return 0; // to catch corrupt sideband data
       
-	  side_info.gr[igr][ch].global_gain = bitget(8) + gain_adjust;
+      side_info.gr[igr][ch].global_gain = bitget(8) + gain_adjust;
       if (ms_mode)
 	 side_info.gr[igr][ch].global_gain -= 2;
       side_info.gr[igr][ch].scalefac_compress = bitget(9);
