@@ -109,6 +109,7 @@ bool ID3v2::ReadMetaData(const char* url, MetaData* metadata)
     FrameHeader sFrame;
     int         ret;
     int         size;
+    Error       error;
 
     assert(url);
     assert(metadata);
@@ -116,71 +117,74 @@ bool ID3v2::ReadMetaData(const char* url, MetaData* metadata)
     char path[_MAX_PATH];
     uint32 length = sizeof(path);
 
-    URLToFilePath(url, path, &length);
+    error = URLToFilePath(url, path, &length);
 
-    inFile = fopen(path, "rb");
-    if (inFile == NULL)
-        return result;
-
-    ret = fread(&sHead, 1, sizeof(ID3Header), inFile);
-    if (ret != sizeof(ID3Header))
+    if(IsntError(error))
     {
+        inFile = fopen(path, "rb");
+        if (inFile == NULL)
+            return result;
+
+        ret = fread(&sHead, 1, sizeof(ID3Header), inFile);
+        if (ret != sizeof(ID3Header))
+        {
+            fclose(inFile);
+            return result;
+        }
+
+        if (strncmp(sHead.tag, "ID3", 3))
+        {
+            fclose(inFile);
+            return result;
+        }
+
+        if (sHead.versionMajor != supportedVersion)
+        {
+            fclose(inFile);
+            return result;
+        }
+        size = ( sHead.size[3] & 0x7F       ) |
+               ((sHead.size[2] & 0x7F) << 7 ) |
+               ((sHead.size[1] & 0x7F) << 14) |
+               ((sHead.size[0] & 0x7F) << 21);
+        if (sHead.flags & (1 << 6))
+        {
+            unsigned extHeaderSize;
+
+            if (fread(&extHeaderSize, 1, sizeof(int), inFile) != sizeof(int))
+            {
+                fclose(inFile);
+                return result;
+            }
+            if (fread(buffer, 1, extHeaderSize, inFile) != extHeaderSize)
+            {
+                fclose(inFile);
+                return result;
+            }
+        }
+        for(; size > 0;)
+        {
+            if (fread(&sFrame, 1, frameHeaderSize, inFile) != frameHeaderSize)
+            {
+                fclose(inFile);
+                return result;
+            }
+            sFrame.size = ntohl(sFrame.size);
+            frameData = new char[sFrame.size + 1];
+            if (fread(frameData, 1, sFrame.size, inFile) != sFrame.size)
+            {
+                fclose(inFile);
+                return result;
+            }
+            frameData[sFrame.size] = 0;
+            HandleFrame(sFrame.tag, &frameData[1], metadata);
+
+            delete frameData;
+            size -= sizeof(FrameHeader) + sFrame.size;
+        }
+
         fclose(inFile);
-        return result;
     }
-
-    if (strncmp(sHead.tag, "ID3", 3))
-    {
-        fclose(inFile);
-        return result;
-    }
-
-    if (sHead.versionMajor != supportedVersion)
-    {
-        fclose(inFile);
-        return result;
-    }
-    size = ( sHead.size[3] & 0x7F       ) |
-           ((sHead.size[2] & 0x7F) << 7 ) |
-           ((sHead.size[1] & 0x7F) << 14) |
-           ((sHead.size[0] & 0x7F) << 21);
-    if (sHead.flags & (1 << 6))
-    {
-        unsigned extHeaderSize;
-
-        if (fread(&extHeaderSize, 1, sizeof(int), inFile) != sizeof(int))
-        {
-            fclose(inFile);
-            return result;
-        }
-        if (fread(buffer, 1, extHeaderSize, inFile) != extHeaderSize)
-        {
-            fclose(inFile);
-            return result;
-        }
-    }
-    for(; size > 0;)
-    {
-        if (fread(&sFrame, 1, frameHeaderSize, inFile) != frameHeaderSize)
-        {
-            fclose(inFile);
-            return result;
-        }
-        sFrame.size = ntohl(sFrame.size);
-        frameData = new char[sFrame.size + 1];
-        if (fread(frameData, 1, sFrame.size, inFile) != sFrame.size)
-        {
-            fclose(inFile);
-            return result;
-        }
-        frameData[sFrame.size] = 0;
-        HandleFrame(sFrame.tag, &frameData[1], metadata);
-
-        delete frameData;
-        size -= sizeof(FrameHeader) + sFrame.size;
-    }
-
-    fclose(inFile);
     return true;
 }
 

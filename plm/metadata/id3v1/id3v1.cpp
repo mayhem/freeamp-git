@@ -241,6 +241,7 @@ ID3v1::~ID3v1()
 bool ID3v1::ReadMetaData(const char* url, MetaData* metadata)
 {
     bool result = false;
+    Error error;
     id3v1 id3;
 
     assert(url);
@@ -252,88 +253,92 @@ bool ID3v1::ReadMetaData(const char* url, MetaData* metadata)
         char path[_MAX_PATH];
         uint32 length = sizeof(path);
 
-        URLToFilePath(url, path, &length);
+        error = URLToFilePath(url, path, &length);
 
-        fp = fopen(path, "rb");
-
-        if(fp)
+        if(IsntError(error))
         {
-            if(!fseek(fp, -128, SEEK_END))
+
+            fp = fopen(path, "rb");
+
+            if(fp)
             {
-                if(fread(&id3, 128, 1, fp))
+                if(!fseek(fp, -128, SEEK_END))
                 {
-                    if(!strncmp(id3.v1_0.id, "TAG", 3))
+                    if(fread(&id3, 128, 1, fp))
                     {
-                        char buffer[31];
+                        if(!strncmp(id3.v1_0.id, "TAG", 3))
+                        {
+                            char buffer[31];
          
-                        strncpy(buffer, id3.v1_0.artist, 30);
-                        buffer[30] = 0;
-                        KillTrailingSpaces(buffer);
-                        // simple test to see if we have "more" data
-                        // would be nice if we can test for "better" data
-                        if(strlen(buffer) > metadata->Artist().size())
-                            metadata->SetArtist(buffer);
-
-                        strncpy(buffer, id3.v1_0.album, 30);
-                        buffer[30] = 0;
-                        KillTrailingSpaces(buffer);
-                        // simple test to see if we have "more" data
-                        // would be nice if we can test for "better" data
-                        if(strlen(buffer) > metadata->Album().size())
-                            metadata->SetAlbum(buffer);
-
-                        strncpy(buffer, id3.v1_0.title, 30);
-                        buffer[30] = 0;
-                        KillTrailingSpaces(buffer);
-                        // simple test to see if we have "more" data
-                        // would be nice if we can test for "better" data
-                        if(strlen(buffer) > metadata->Title().size())
-                            metadata->SetTitle(buffer);
-
-                        strncpy(buffer, id3.v1_0.year,4);
-                        buffer[4] = 0;
-                        KillTrailingSpaces(buffer);
-                        metadata->SetYear(atoi(buffer));
-
-                        strncpy(buffer, id3.v1_0.comment, 
-                            (id3.v1_1.zero ? 30 : 28));
-                        buffer[(id3.v1_1.zero ? 30 : 28)] = 0;
-                        KillTrailingSpaces(buffer);
-                        // simple test to see if we have "more" data
-                        // would be nice if we can test for "better" data
-                        if(strlen(buffer) > metadata->Comment().size())
-                            metadata->SetComment(buffer);
-
-                        if( id3.v1_1.zero == 0x00 &&
-                            id3.v1_1.track != 0x00)
-                        {
-                            uint32 track = id3.v1_1.track;
-
-                            metadata->SetTrack(track);
-                        }
-
-                        if(id3.v1_0.genre >= 0 && (uint32)id3.v1_0.genre < kNumGenres)
-                        {
+                            strncpy(buffer, id3.v1_0.artist, 30);
+                            buffer[30] = 0;
+                            KillTrailingSpaces(buffer);
                             // simple test to see if we have "more" data
                             // would be nice if we can test for "better" data
-                            if(strlen(buffer) > metadata->Genre().size())
-                                metadata->SetGenre(genre_strings[id3.v1_0.genre]);
-                        }
-                        else
-                        {
+                            if(strlen(buffer) > metadata->Artist().size())
+                                metadata->SetArtist(buffer);
+
+                            strncpy(buffer, id3.v1_0.album, 30);
+                            buffer[30] = 0;
+                            KillTrailingSpaces(buffer);
                             // simple test to see if we have "more" data
                             // would be nice if we can test for "better" data
-                            if(!metadata->Genre().size())
-                                metadata->SetGenre("{unknown}");
+                            if(strlen(buffer) > metadata->Album().size())
+                                metadata->SetAlbum(buffer);
 
+                            strncpy(buffer, id3.v1_0.title, 30);
+                            buffer[30] = 0;
+                            KillTrailingSpaces(buffer);
+                            // simple test to see if we have "more" data
+                            // would be nice if we can test for "better" data
+                            if(strlen(buffer) > metadata->Title().size())
+                                metadata->SetTitle(buffer);
+
+                            strncpy(buffer, id3.v1_0.year,4);
+                            buffer[4] = 0;
+                            KillTrailingSpaces(buffer);
+                            metadata->SetYear(atoi(buffer));
+
+                            strncpy(buffer, id3.v1_0.comment, 
+                                (id3.v1_1.zero ? 30 : 28));
+                            buffer[(id3.v1_1.zero ? 30 : 28)] = 0;
+                            KillTrailingSpaces(buffer);
+                            // simple test to see if we have "more" data
+                            // would be nice if we can test for "better" data
+                            if(strlen(buffer) > metadata->Comment().size())
+                                metadata->SetComment(buffer);
+
+                            if( id3.v1_1.zero == 0x00 &&
+                                id3.v1_1.track != 0x00)
+                            {
+                                uint32 track = id3.v1_1.track;
+
+                                metadata->SetTrack(track);
+                            }
+
+                            if(id3.v1_0.genre >= 0 && (uint32)id3.v1_0.genre < kNumGenres)
+                            {
+                                // simple test to see if we have "more" data
+                                // would be nice if we can test for "better" data
+                                if(strlen(buffer) > metadata->Genre().size())
+                                    metadata->SetGenre(genre_strings[id3.v1_0.genre]);
+                            }
+                            else
+                            {
+                                // simple test to see if we have "more" data
+                                // would be nice if we can test for "better" data
+                                if(!metadata->Genre().size())
+                                    metadata->SetGenre("{unknown}");
+
+                            }
+
+                            result = true;
                         }
-
-                        result = true;
                     }
                 }
-            }
 
-            fclose(fp);
+                fclose(fp);
+            }
         }
     }
 

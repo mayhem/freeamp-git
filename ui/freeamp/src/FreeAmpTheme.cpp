@@ -844,6 +844,8 @@ void FreeAmpTheme::UpdateMetaData(const PlaylistItem *pItem)
 void FreeAmpTheme::DropFiles(vector<string> *pFileList)
 {
     char                     ext[MAX_PATH];
+    char                     url[MAX_PATH + 7];
+    uint32                   length;
     vector<string>::iterator i;
     
     for(i = pFileList->begin(); i != pFileList->end(); i++)
@@ -858,10 +860,13 @@ void FreeAmpTheme::DropFiles(vector<string> *pFileList)
             HANDLE          findFileHandle = NULL;
             WIN32_FIND_DATA findData;
             char            findPath[MAX_PATH + 1];
+            char*           file;
 
             strcpy(findPath, (*i).c_str());
             strcat(findPath, DIR_MARKER_STR);
             strcat(findPath, "*.*");
+
+            file = strrchr(findPath, DIR_MARKER) + 1;
 
             findFileHandle = FindFirstFile(findPath, &findData);
             if(findFileHandle != INVALID_HANDLE_VALUE)
@@ -876,10 +881,15 @@ void FreeAmpTheme::DropFiles(vector<string> *pFileList)
                     ToUpper(ext);   
                     if (m_pContext->player->IsSupportedExtension(ext))
                     {   
-                       strcpy(findPath, (*i).c_str());
-                       strcat(findPath, DIR_MARKER_STR);
-                       strcat(findPath, findData.cFileName);
-                       m_pContext->plm->AddItem(findPath);
+                       //strcpy(findPath, (*i).c_str());
+                       //strcat(findPath, DIR_MARKER_STR);
+                       //strcat(findPath, findData.cFileName);
+                        strcpy(file, findData.cFileName);
+                        
+                        length = sizeof(url);
+                        FilePathToURL(file, url, &length);
+                        
+                        m_pContext->plm->AddItem(url);
                     }   
 
                 }while(FindNextFile(findFileHandle, &findData));
@@ -911,17 +921,24 @@ void FreeAmpTheme::DropFiles(vector<string> *pFileList)
             }
             if (!IsError(eRet))
             {
-               m_pContext->plm->ReadPlaylist((*i).c_str());
+                length = sizeof(url);
+                FilePathToURL((*i).c_str(), url, &length);
+                
+                m_pContext->plm->ReadPlaylist(url);
             }   
             else   
-               if (m_pContext->player->IsSupportedExtension(ext))
-               {
-                   string url;
-                   
-                   url = string("file://") + (*i);
-                   m_pContext->plm->AddItem(url.c_str(),
-                        m_pContext->plm->CountItems());
-               }    
+                if (m_pContext->player->IsSupportedExtension(ext))
+                {
+                    //string url;
+
+                    //url = string("file://") + (*i);
+                    //m_pContext->plm->AddItem(url.c_str(),
+                    //     m_pContext->plm->CountItems());
+                    length = sizeof(url);
+                    FilePathToURL((*i).c_str(), url, &length);
+                
+                    m_pContext->plm->AddItem(url);
+                }    
         }
     }
 }
