@@ -29,7 +29,7 @@
 .globl window_dual
 
 	.align 16
-window_dual:
+window_dual:	#%% proc
 	pushl %ebp
 	pushl %edi
 	pushl %esi
@@ -192,12 +192,12 @@ window_dual:
 	popl %edi
 	popl %ebp
 	ret
-
+#%% endp
 
 .globl fdct32
 
 	.align 16
-fdct32:
+fdct32:		#%% proc
 	pushl %ebp
 	pushl %edi
 	pushl %esi
@@ -323,3 +323,5 @@ fdct32:
 	popl %edi
 	popl %ebp
 	ret
+#%% endp
+
