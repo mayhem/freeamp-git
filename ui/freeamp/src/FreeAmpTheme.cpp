@@ -109,6 +109,7 @@ FreeAmpTheme::FreeAmpTheme(FAContext * context)
    m_pOptionsThread = NULL;
    m_bInOptions = false;
    m_bPaused = false;
+   m_pSlashdot = NULL;
 
 #if defined( WIN32 )
     m_pUpdateMan = new Win32UpdateManager(m_pContext);
@@ -129,6 +130,7 @@ FreeAmpTheme::FreeAmpTheme(FAContext * context)
       m_oCurrentWindow = string("MainWindow");
 
    LoadFreeAmpTheme();
+
 }
 
 FreeAmpTheme::~FreeAmpTheme()
@@ -141,6 +143,7 @@ FreeAmpTheme::~FreeAmpTheme()
 #if defined( WIN32 )
     delete m_pUpdateMan;
 #endif // WIN32
+    delete m_pSlashdot;
 }
 
 Error FreeAmpTheme::Init(int32 startup_type)
@@ -439,6 +442,17 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
          m_pWindow->ControlStringValue(oName, true, m_oTitle);
          oText = string(BRANDING": ") + string(szTitle);
          m_pWindow->SetTitle(oText);
+
+         break;
+      }
+      case INFO_HeadlineText:
+      {
+         string oName("HeadlineInfo"), oText;
+
+         HeadlineMessageEvent *pInfo = (HeadlineMessageEvent *) e;
+
+         oText = string(pInfo->GetHeadlineMessage());
+         m_pWindow->ControlStringValue(oName, true, oText);
 
          break;
       }
@@ -1003,6 +1017,23 @@ void FreeAmpTheme::InitControls(void)
     m_pWindow->ControlIntValue(string("Shuffle"), true, iState);
 
     m_pWindow->ControlStringValue("StreamInfo", true, m_oStreamInfo);
+
+    if (m_pWindow->DoesControlExist("HeadlineInfo"))
+    {
+        if (m_pSlashdot == NULL)
+        {
+            m_pSlashdot = new Slashdot(m_pContext);
+        }
+        else
+        {
+            m_pSlashdot->Resume();
+        }
+    }
+    else
+    {
+        if (m_pSlashdot)
+           m_pSlashdot->Pause();
+    }
 }
 
 // This function gets called after the window object is created,
@@ -1348,6 +1379,7 @@ void FreeAmpTheme::PostWindowCreate(void)
 #endif
     string winTitle = string(BRANDING);
     m_pWindow->SetTitle(winTitle);
+
 }
 
 void FreeAmpTheme::ShowHelp(void)

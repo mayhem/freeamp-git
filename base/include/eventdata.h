@@ -159,6 +159,36 @@ class     BrowserMessageEvent:public Event
    }
 };
 
+class     HeadlineMessageEvent:public Event
+{
+   private:
+   char     *m_info;
+
+   public:
+   virtual ~ HeadlineMessageEvent()
+   {
+      if (m_info)
+      {
+         delete    m_info;
+      }
+   }
+   HeadlineMessageEvent()
+   {
+      m_type = INFO_HeadlineText;
+      m_info = "";
+   }
+   HeadlineMessageEvent(const char *info)
+   {
+      m_type = INFO_HeadlineText;
+      m_info = strdup_new(info);
+   }
+   const char *GetHeadlineMessage()
+   {
+      return m_info;
+   }
+};
+
+
 class     MediaInfoEvent:public Event
 {
    public:

@@ -1851,6 +1851,7 @@ ServiceEvent(Event * pC)
         case INFO_PlaylistSorted:
         case INFO_PlaylistCurrentItemInfo:
         case INFO_BufferStatus:
+        case INFO_HeadlineText:
         case INFO_SearchMusicDone:
         case INFO_DownloadItemAdded:
         case INFO_DownloadItemRemoved:

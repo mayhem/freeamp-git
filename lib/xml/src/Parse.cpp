@@ -123,7 +123,7 @@ Error Parse::DoParse(void)
     char     szDummy[10];
     string   oElementName, oAttr, oValue, oData;
     int      iRet, iOffset, iTemp;
-    bool     bError = false, bEmptyTag = false;
+    bool     bError = false, bEmptyTag = false, bFirst = true;
     Error    eRet;
     AttrMap  oAttrMap; 
 
@@ -132,7 +132,8 @@ Error Parse::DoParse(void)
     szAttr = new char[iMaxAttrLength];
     szValue = new char[iMaxValueLength];
     szData = new char[iMaxPCDataLength];
-    for(szElement[0] = 0; !bError;)
+
+    for(szElement[0] = 0; !bError; bFirst = false)
     {
     	m_iErrorLine += CountNewlines(szElement);
         
@@ -160,12 +161,16 @@ Error Parse::DoParse(void)
             continue; 
         }
 
+        if (bFirst && szElement[0] == '?' && 
+                      szElement[strlen(szElement) - 1] == '?')
+           continue;
+
         iRet = Scanf("%[\n\t \r]", szElementName);
         if (iRet > 0)
     	    m_iErrorLine += CountNewlines(szElementName);
 
         iTemp = 0;
-        sscanf(szElement, " /%254[A-Za-z0-9_]%n", szElementName, &iTemp);
+        sscanf(szElement, " /%254[A-Za-z0-9:_]%n", szElementName, &iTemp);
         if (iTemp > 0)
         {
             oElementName = szElementName;
@@ -182,7 +187,7 @@ Error Parse::DoParse(void)
         }
         
 		  iOffset = 0;
-        int iRet = sscanf(szElement, " %254[A-Za-z0-9_] %n", szElementName, &iOffset);
+        int iRet = sscanf(szElement, " %254[A-Za-z0-9:_] %n", szElementName, &iOffset);
         oElementName = szElementName;
         if (iOffset == 0)
             iOffset = strlen(szElementName);
@@ -206,13 +211,13 @@ Error Parse::DoParse(void)
                 break;
 
             iRet = sscanf(szElement + iOffset, 
-                          " %254[A-Za-z0-9] = \"%254[^\"] \" %n", 
+                          " %254[A-Za-z0-9:] = \"%254[^\"] \" %n", 
                           szAttr, szValue, &iTemp);
             if (iRet < 2 || iTemp == 0)
             {
                iTemp = 0;
                iRet = sscanf(szElement + iOffset, 
-                             " %254[A-Za-z0-9] = \" \" %n", 
+                             " %254[A-Za-z0-9:] = \" \" %n", 
                              szAttr, &iTemp);
                if (iRet < 1 || iTemp == 0)
                {
