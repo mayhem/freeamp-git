@@ -906,7 +906,7 @@ PlayListManager::
 ExpandM3U(char *szM3UFile, List<char *> &MP3List)
 {
 	FILE  *fpFile;
-	char  *szLine, *szMP3 = NULL;
+	char  *szLine, *szTemp, *szMP3 = NULL;
 	int32 iIndex;
 
 	fpFile = fopen(szM3UFile, "r");
@@ -914,6 +914,8 @@ ExpandM3U(char *szM3UFile, List<char *> &MP3List)
         return kError_FileNotFound;
 
 	szLine = new char[iMaxFileNameLen];
+    szTemp = new char[iMaxFileNameLen];
+
 	for(;;)
     {
 		 if (fgets(szLine, iMaxFileNameLen - 1, fpFile) == NULL)
@@ -929,13 +931,35 @@ ExpandM3U(char *szM3UFile, List<char *> &MP3List)
 
 		 if (strlen(szLine))
 		 {
+             if( !strncmp(szLine, "..", 2) ||
+                 (strncmp(szLine + 1, ":\\", 2) &&
+                 strncmp(szLine, "\\", 1)))
+             {
+                char* cp;
+
+                strcpy(szTemp, szM3UFile);
+
+                cp = strrchr(szTemp, '\\');
+
+                if(cp)
+                {
+                    strcpy(cp + 1, szLine);
+                    strcpy(szLine, szTemp);
+                }
+             }
+
+             OutputDebugString(szLine);             
+             OutputDebugString("\r\n");
+
 			 szMP3 = new char[strlen(szLine) + 1];
 			 strcpy(szMP3, szLine);
 			 MP3List.AddItem(szMP3);
 			 szMP3 = NULL;
 		 }
     }
-	delete szLine;
+
+	delete [] szLine;
+    delete [] szTemp;
 	fclose(fpFile);
 
 	return kError_NoErr;
