@@ -101,7 +101,7 @@ CXXLINK = $(CXXLD) $(CXXFLAGS) $(LDFLAGS) $(RELOC) -o $@
 .asm.asm1:
 	$(PERL) -pe 's/\b_//g' $< > $@
 
-.asm1.:
+.asm1.o:
 	$(NASM) -f elf -o $@ $<
 
 .s.o:
