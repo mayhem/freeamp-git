@@ -42,7 +42,7 @@ class StreamBuffer : public PullBuffer
 
       virtual  Error    BeginWrite (void *&pBuffer, size_t iBytesNeeded);
 
-      virtual  bool     IsBufferingUp(int iBytesNeeded);
+      virtual  bool     IsBufferingUp(int32 iBytesNeeded);
 		virtual  void     Pause()
 		                  { m_bPause = true; };     
 		virtual  void     Resume()

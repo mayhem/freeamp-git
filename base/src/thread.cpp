@@ -30,6 +30,8 @@ ____________________________________________________________________________*/
     #include "win32thread.h"
 #elif defined(solaris)
     #include "solaristhread.h"
+#elif defined(__BEOS__)
+    #include "beosthread.h"
 #else
     #error thread class needs to be defined for this platform
 #endif
@@ -46,6 +48,8 @@ Thread* Thread::CreateThread()
     thread = new win32Thread();
 #elif defined(solaris)
     thread = new solarisThread();
+#elif defined(__BEOS__)
+    thread = new beosThread();
 #else
     #error thread class needs to be defined for this platform
 #endif

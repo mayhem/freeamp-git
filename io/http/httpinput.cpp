@@ -36,7 +36,9 @@ ____________________________________________________________________________*/
 #include <sys/time.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#ifndef __BEOS__
 #include <arpa/inet.h> 
+#endif
 #include <netdb.h>
 #include <fcntl.h>
 #endif 
@@ -62,7 +64,7 @@ const int iOverflowSize = 1536;
 const int iTriggerSize = 1024;
 const char *szDefaultStreamTitle = "SHOUTcast Stream";
 
-#ifndef WIN32
+#if !defined(WIN32) && !defined(__BEOS__)
 #define closesocket(s) close(s)
 #endif
 
@@ -102,7 +104,7 @@ extern    "C"
 HttpInput::HttpInput(FAContext *context):
            PhysicalMediaInput(context)
 {
-    unsigned int len;
+    uint32 len;
 
     m_path = NULL;
     m_hHandle = -1;
@@ -181,7 +183,7 @@ Error HttpInput::GetID3v1Tag(Id3TagInfo &sTag)
 
 Error HttpInput::Prepare(PullBuffer *&pBuffer, bool bStartThread)
 {
-    int iBufferSize = iDefaultBufferSize;
+    int32 iBufferSize = iDefaultBufferSize;
     Error result;
 
     if (m_pOutputBuffer)
@@ -400,11 +402,14 @@ Error HttpInput::Open(void)
          }  
      }   
 
-#ifndef WIN32
-    fcntl(m_hHandle, F_SETFL, fcntl(m_hHandle, F_GETFL) | O_NONBLOCK);
-#else
+#if defined(WIN32)
 	unsigned long lMicrosoftSucksBalls = 1;
 	ioctlsocket(m_hHandle, FIONBIO, &lMicrosoftSucksBalls);
+#elif defined(__BEOS__)
+//	int on = 1;
+//	setsockopt( m_hHandle, SOL_SOCKET, SO_NONBLOCK, &on, sizeof( on ) );
+#else
+    fcntl(m_hHandle, F_SETFL, fcntl(m_hHandle, F_GETFL) | O_NONBLOCK);
 #endif
     iConnect = connect(m_hHandle,(const sockaddr *)&sAddr,sizeof(sAddr));
     for(; iConnect && !m_bExit;)
@@ -651,7 +656,7 @@ Error HttpInput::Open(void)
     delete pInitialBuffer;
 
     bool bSave;
-    unsigned  size = 255;
+    uint32  size = 255;
     m_pContext->prefs->GetPrefBoolean(kSaveStreamsPref, &bSave);
     if (bSave || (m_pContext->argFlags & FAC_ARGFLAGS_SAVE_STREAMS))
     {

@@ -97,7 +97,7 @@ Error PullBuffer::Clear(void)
    return kError_NoErr;
 }
 
-int PullBuffer::GetReadIndex(void)
+int32 PullBuffer::GetReadIndex(void)
 {
    int iRet;
 
@@ -124,7 +124,7 @@ int PullBuffer::GetReadIndex(void)
    return iRet;
 }
 
-int PullBuffer::GetWriteIndex(void)
+int32 PullBuffer::GetWriteIndex(void)
 {
    int iRet;
 

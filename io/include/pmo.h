@@ -93,7 +93,7 @@ protected:
 
     PhysicalMediaInput    *m_pPmi;
     LogicalMediaConverter *m_pLmc;
-    int                    m_iPreBuffer;
+    int32                  m_iPreBuffer;
 };
 
 #endif /* _PMO_H_ */

@@ -166,7 +166,7 @@ SoundCardPMO::Resume( void )
 bool
 SoundCardPMO::WaitForDrain( void )
 {
-	PRINT(( "SoundCardPMO::WaitForDrain:**************************************\n" ));
+	PRINT(( "SoundCardPMO::WaitForDrain\n" ));
 #if 0
 	if ( m_eventBufferThread )
 	{
@@ -177,11 +177,14 @@ SoundCardPMO::WaitForDrain( void )
 	PRINT(( "SoundCardPMO::WaitForDrain:event buffer terminated\n" ));
 #endif
 
-	if ( m_player )
+	if ( !m_player )
 	{
-		m_player->SetHasData( false );
-		m_player->Stop();
+		PRINT(( "SoundCardPMO::WaitForDrain:no BSoundPlayer exists?!\n" ));
+		return false;
 	}
+
+	m_player->SetHasData( false );
+	m_player->Stop();
 	PRINT(( "SoundCardPMO::WaitForDrain:sound player terminated\n" ));
 
 	return true;
@@ -310,6 +313,10 @@ SoundCardPMO::EventBufferThread( void )
 
 	// Don't do anything until resume is called.
 	m_pPauseSem->Wait();
+
+	// Prebuffer wait
+	PRINT(( "SoundCardPMO::EventBufferThread: prebuffering...\n" ));
+	PreBuffer();
 
 	PRINT(( "SoundCardPMO::EventBufferThread: okay now ready to spin!\n" ));
 

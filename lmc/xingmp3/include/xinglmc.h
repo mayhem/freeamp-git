@@ -108,7 +108,7 @@ class     XingLMC:public LogicalMediaConverter
    PhysicalMediaOutput *m_pPmo;
 
    int                  m_iMaxWriteSize;
-   int                  m_frameBytes, m_iBufferUpInterval, m_iBufferSize;
+   int32                m_frameBytes, m_iBufferUpInterval, m_iBufferSize;
 	MPEG_HEAD            m_sMpegHead;
 	int32                m_iBitRate;
    bool                 m_bBufferingUp;

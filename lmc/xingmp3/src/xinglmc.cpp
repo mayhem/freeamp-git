@@ -227,7 +227,7 @@ Error XingLMC::GetHeadInfo()
        {
            m_frameBytes = head_info3((unsigned char *)pBuffer,
 			                            iMaxFrameSize, &m_sMpegHead, 
-                                     &m_iBitRate, &iForward);
+                                     (int*)&m_iBitRate, &iForward);
            if (m_frameBytes > 0 && m_frameBytes < iMaxFrameSize && 
                (m_sMpegHead.option == 1 || m_sMpegHead.option == 2))
            {
@@ -434,7 +434,7 @@ Error XingLMC::InitDecoder()
                                   24000 /* freq limit */ ))
    {
          DEC_INFO      decinfo;
-         int           iNewSize;
+         int32         iNewSize;
          Error         result;
 
          m_audioMethods.decode_info(&decinfo);
@@ -515,7 +515,7 @@ void XingLMC::DecodeWork()
 {
    void          *pBuffer, *pOutBuffer;
    Error          Err;
-   int            iLoop = 0, iValue;
+   int32          iLoop = 0, iValue;
    IN_OUT         x = {0, 0};
 
    assert(m_pPmi);

@@ -36,7 +36,9 @@ ____________________________________________________________________________*/
 #include <sys/time.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#ifndef __BEOS__
 #include <arpa/inet.h>
+#endif
 #include <netdb.h>
 #include <fcntl.h>
 #endif  
@@ -132,6 +134,9 @@ Error TitleStreamServer::Init(int &iPort)
 
 Error TitleStreamServer::MulticastInit(char *szAddr, int iPort)
 {
+#ifdef __BEOS__
+    return kError_CantCreateSocket;
+#else
     int    iRet;
     struct ip_mreq sMreq;
     int    iReuse=0;
@@ -198,6 +203,7 @@ Error TitleStreamServer::MulticastInit(char *szAddr, int iPort)
     }
 
     return kError_NoErr;
+#endif
 }
 
 Error TitleStreamServer::Run(in_addr &sAddr, int iPort)
@@ -261,7 +267,7 @@ void TitleStreamServer::WorkerThread(void)
       {
           iStructSize = sizeof(struct sockaddr_in);
           iRet = recvfrom(m_hHandle, buf, 255, 0, (struct sockaddr *)m_pSin, 
-                          (socklen_t *)&iStructSize);
+                          &iStructSize);
       }
       else
           iRet = recv(m_hHandle, buf, 255, 0);

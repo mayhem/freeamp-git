@@ -37,7 +37,7 @@ class cmdlineUI : public UserInterface {
  public:
     cmdlineUI(FAContext *context);
     virtual int32 AcceptEvent(Event *);
-    virtual void SetArgs(int argc, char **argv);
+    virtual void SetArgs(int32 argc, char **argv);
     virtual void SetTarget(EventQueue *eqr) { m_playerEQ = eqr; }
     virtual Error Init(int32);
     virtual void SetPlayListManager(PlayListManager *);

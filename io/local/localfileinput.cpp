@@ -89,7 +89,7 @@ LocalFileInput::~LocalFileInput()
 
 Error LocalFileInput::Prepare(PullBuffer *&pBuffer, bool bStartThread)
 {
-    int iBufferSize = iDefaultBufferSize;
+    int32 iBufferSize = iDefaultBufferSize;
     Error result;
 
     if (m_pOutputBuffer)
