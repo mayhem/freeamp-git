@@ -14,17 +14,17 @@
 #        script below will handle them correctly. Finally,
 #        Turn AutoReqProv back on and then build the rpm.
 # 
-Summary: MP3 audio player with streaming support
+Summary: MP3 audio player with theme user interface and streaming support
 Name: freeamp
-Version: 2.0
+Version: 2.0.0
 Release: 1
 Copyright: GPL
 Group: Applications/Multimedia
-Source: www.freeamp.org:/pub/freeamp/freeamp-1.3.1-linux-x86-glibc2.tar.gz
+Source: www.freeamp.org:/pub/freeamp/freeamp-2.0.0-linux-x86-glibc2.1.tar.gz
 
 # Please read note above  
 AutoReqProv: No
-Requires: ld-linux.so.2 libc.so.6 libdl.so.2 libm.so.6 libnsl.so.1 libpthread.so.0 libstdc++-libc6.1-1.so.2 libX11.so.6 libXext.so.6 libXpm.so.4 libc.so.6(GLIBC_2.0) libm.so.6(GLIBC_2.1) libc.so.6(GLIBC_2.1) libdl.so.2(GLIBC_2.1) libdl.so.2(GLIBC_2.0) libpthread.so.0(GLIBC_2.1) libpthread.so.0(GLIBC_2.0)
+Requires: ld-linux.so.2 libc.so.6 libdl.so.2 libm.so.6 libnsl.so.1 libpthread.so.0 libstdc++-libc6.1-1.so.2 libX11.so.6 libXext.so.6 libgdk-1.2.so.0 libglib-1.2.so.0 libgmodule-1.2.so.0 libgthread-1.2.so.0 libgtk-1.2.so.0 libncurses.so.4 libttf.so.2 libc.so.6(GLIBC_2.0) libm.so.6(GLIBC_2.1) libpthread.so.0(GLIBC_2.1) libpthread.so.0(GLIBC_2.0) libc.so.6(GLIBC_2.1) libdl.so.2(GLIBC_2.1) libdl.so.2(GLIBC_2.0)
 
 %description
 This program plays MP3 (MPEG-1 audio layer 3) files and streams. The
@@ -42,11 +42,11 @@ libdir="$prefix/lib"
 fadir="$libdir/freeamp"
 plugdir="$fadir/plugins"
 sharedir="$prefix/share"
-fathemedir="$sharedir/freeamp"
-themedir="$fathemedir/themes"
+fasharedir="$sharedir/freeamp"
+themedir="$fasharedir/themes"
 
 # We could use mkdir -p, but not all unix systems' mkdir's support -p
-for dir in "$bindir" "$libdir" "$fadir" "$plugdir" "$sharedir" "$fathemedir" "$themedir"; do
+for dir in "$bindir" "$libdir" "$fadir" "$plugdir" "$sharedir" "$fasharedir" "$themedir"; do
     if [ \! -d "$dir" ]; then
 	echo "mkdir $dir"
 	mkdir "$dir"
@@ -66,7 +66,7 @@ fi
 for file in themes/*.*; do
     echo "install -c -o root -m 644 $file $themedir"
     install -c -o root -m 644 "$file" "$themedir"
-    echo "$themedir/$file" >> installed.files
+    echo "$fasharedir/$file" >> installed.files
 done
 for file in plugins/*.*; do
     enable=f
@@ -104,11 +104,16 @@ for file in plugins/*.*; do
         echo $fadir/$file >> installed.files
     fi
 done
+gzip -d -c < help/freeamphelp.tar.gz | (cd $fasharedir; rm -rf help; tar -xmf -)
+for file in `ls $fasharedir/help`; do
+    echo $fasharedir/help/$file >> installed.files
+done
 
 %files -f installed.files
 %dir /usr/lib/freeamp 
 %dir /usr/lib/freeamp/plugins
 %dir /usr/share/freeamp
-%dir /usr/share/freeamp/plugins
-%doc AUTHORS CHANGES COPYING ChangeLog INSTALL NEWS README
+%dir /usr/share/freeamp/themes
+%dir /usr/share/freeamp/help
+%doc AUTHORS CHANGES COPYING INSTALL NEWS README README.linux
 

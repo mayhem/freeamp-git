@@ -1,11 +1,13 @@
 #!/bin/sh
 
-version=$1
+mixedname=$1
+version=$2
 osname=`uname | tr A-Z a-z`
+name=`echo $mixedname | tr A-Z a-z`
 
 if test $# -eq 0
 then
-   echo "Usage: make-binary-dist <freeamp version number> [extra info]"
+   echo "Usage: make-binary-dist <playername> <version number> [extra info]"
    exit
 fi
 
@@ -16,26 +18,31 @@ then
       extra="x86-glibc2"
    fi
 else
-   extra=$2
+   extra=$3
 fi
 
-echo Creating freeamp-$version-$osname-$extra.tar.gz 
+echo Creating $name-$version-$osname-$extra.tar.gz 
 
-if test ! -f freeamp
+if test ! -f $name
 then
-   echo "This script should be run in the FreeAmp main directory."
+   echo "This script should be run in the $name main directory."
 else
    if test ! -d plugins
    then
-       echo "This script should be run in the FreeAmp main directory."
+       echo "This script should be run in the $name main directory."
    else
-       mkdir freeamp-$version
-       mkdir freeamp-$version/plugins
-       cp freeamp freeamp-$version
-       cp plugins/*.pmo plugins/*.pmi plugins/*.lmc plugins/*.ui freeamp-$version/plugins
-       cp AUTHORS CHANGES COPYING ChangeLog INSTALL NEWS README install-freeamp freeamp-$version
-       tar -czf freeamp-$version-$osname-$extra.tar.gz freeamp-$version
-       rm -rf freeamp-$version
+       mkdir $name-$version
+       mkdir $name-$version/plugins
+       mkdir $name-$version/themes
+       mkdir $name-$version/help
+       cp $name $name-$version
+       cp plugins/*.* $name-$version/plugins
+       cp AUTHORS CHANGES COPYING CHANGES INSTALL NEWS README README.linux \
+          install-$name $name-$version
+       cp themes/$mixedname.fat $name-$version/themes 
+       cp "help/unix/"$name"help.tar.gz" $name-$version/help
+       tar -czf $name-$version-$osname-$extra.tar.gz $name-$version
+       rm -rf $name-$version
    fi
 fi
 
