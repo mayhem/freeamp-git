@@ -20,6 +20,7 @@
       
   $Id$
 ____________________________________________________________________________*/
+#include "config.h"
 
 /* system headers */
 #include <stdlib.h>
@@ -39,7 +40,6 @@ ____________________________________________________________________________*/
 #include <unistd.h>
 
 /* project headers */
-#include <config.h>
 #include "artspmo.h"
 #include "lmc.h"
 #include "eventdata.h"
