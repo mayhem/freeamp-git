@@ -170,6 +170,10 @@ SOURCE=.\cdinput.def
 # End Source File
 # Begin Source File
 
+SOURCE=..\res\cdinput.rc
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\config\config.win32
 
 !IF  "$(CFG)" == "cdinput - Win32 Release"
@@ -214,10 +218,6 @@ InputPath=..\..\..\..\config\config.win32
 
 !ENDIF 
 
-# End Source File
-# Begin Source File
-
-SOURCE=..\res\local.rc
 # End Source File
 # Begin Source File
 
