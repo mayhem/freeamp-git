@@ -883,6 +883,7 @@ void MusicCatalog::DoSearchMusic(char *path, bool bSendMessages)
                     if (m_addImmediately)
                         AddSong(tempurl);
 
+                    delete plist;
                     delete [] tempurl;
                 }
                 delete fileExt;

@@ -79,8 +79,7 @@ FREEAMPPOSTLINK = $($(OSTYPE)FREEAMPPOSTLINK)
 
 # hack hack hack
 DIRECTORIES  = base base/beos base/beos/src base/src base/unix base/unix/src 
-DIRECTORIES += base/unix/linux base/unix/linux/src base/unix/solaris
-DIRECTORIES += base/unix/solaris/src dlm dlm/rmp io io/alsa io/alsa/unix
+DIRECTORIES += dlm dlm/rmp io io/alsa io/alsa/unix
 DIRECTORIES += io/alsa/unix/linux io/alsa/unix/linux/src io/esound
 DIRECTORIES += io/esound/src io/http io/local io/obs io/src io/soundcard
 DIRECTORIES += io/soundcard/beos io/soundcard/unix io/soundcard/unix/linux
