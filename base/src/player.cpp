@@ -523,8 +523,10 @@ int32 Player::ServiceEvent(Event *pC) {
 	    }
 	    
 	    case CMD_ChangePosition: {
-		if(m_lmc)
+		if(m_lmc) {
 		    m_lmc->ChangePosition(((ChangePositionEvent *)pC)->GetPosition());        
+		    cout << "player: changed position to " << ((ChangePositionEvent *)pC)->GetPosition() << endl;
+		}
 		delete pC;
 		return 0;
 		break;

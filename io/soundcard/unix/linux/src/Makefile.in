@@ -77,15 +77,20 @@ RANLIB = @RANLIB@
 VERSION = @VERSION@
 target_os = @target_os@
 
+PLUGIN_DIR = @top_srcdir@/plugins/
+PLUGIN_NAME = soundcard-@target_os@.pmo
+PLUGIN_FULL_NAME = $(PLUGIN_DIR)$(PLUGIN_NAME)
+
 @AM_HAVE_LINUX_TRUE@FILES = soundcardpmo.cpp 
-@AM_HAVE_LINUX_TRUE@MYLIBS = libfasndcard.a
+@AM_HAVE_LINUX_TRUE@MYLIBS = libfaio.a
+
 @AM_HAVE_LINUX_FALSE@FILES = 
 @AM_HAVE_LINUX_FALSE@MYLIBS = 
 
 @AM_HAVE_LINUXTHREADS_TRUE@REENT = -D_REENTRANT
 
 noinst_LIBRARIES = $(MYLIBS)
-libfasndcard_a_SOURCES = $(FILES)
+libfaio_a_SOURCES = $(FILES)
 
 INCLUDES = -I@top_srcdir@/base/include -I@top_srcdir@/base/unix/@target_os@/include  -I@srcdir@/../include -I@top_srcdir@/config -I@top_srcdir@/io/include -I@top_srcdir@/ui/include
 CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT)
@@ -103,11 +108,10 @@ X_CFLAGS = @X_CFLAGS@
 X_LIBS = @X_LIBS@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
 X_PRE_LIBS = @X_PRE_LIBS@
-libfasndcard_a_LIBADD = 
-@AM_HAVE_LINUX_FALSE@cond0libfasndcard_a_OBJECTS = 
-@AM_HAVE_LINUX_TRUE@cond1libfasndcard_a_OBJECTS =  soundcardpmo.o
-libfasndcard_a_OBJECTS =  $(cond0libfasndcard_a_OBJECTS) \
-$(cond1libfasndcard_a_OBJECTS)
+libfaio_a_LIBADD = 
+@AM_HAVE_LINUX_FALSE@cond0libfaio_a_OBJECTS = 
+@AM_HAVE_LINUX_TRUE@cond1libfaio_a_OBJECTS =  soundcardpmo.o
+libfaio_a_OBJECTS =  $(cond0libfaio_a_OBJECTS) $(cond1libfaio_a_OBJECTS)
 AR = ar
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 CXXLINK = $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@
@@ -120,8 +124,8 @@ TAR = tar
 GZIP = --best
 DEP_FILES =  .deps/soundcardpmo.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
-SOURCES = $(libfasndcard_a_SOURCES)
-OBJECTS = $(libfasndcard_a_OBJECTS)
+SOURCES = $(libfaio_a_SOURCES)
+OBJECTS = $(libfaio_a_OBJECTS)
 
 all: Makefile $(LIBRARIES) all-local
 
@@ -160,10 +164,10 @@ distclean-compile:
 
 maintainer-clean-compile:
 
-libfasndcard.a: $(libfasndcard_a_OBJECTS) $(libfasndcard_a_DEPENDENCIES)
-	-rm -f libfasndcard.a
-	$(AR) cru libfasndcard.a $(libfasndcard_a_OBJECTS) $(libfasndcard_a_LIBADD)
-	$(RANLIB) libfasndcard.a
+libfaio.a: $(libfaio_a_OBJECTS) $(libfaio_a_DEPENDENCIES)
+	-rm -f libfaio.a
+	$(AR) cru libfaio.a $(libfaio_a_OBJECTS) $(libfaio_a_LIBADD)
+	$(RANLIB) libfaio.a
 .cpp.o:
 	$(CXXCOMPILE) -c $<
 
@@ -308,12 +312,12 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 include @top_srcdir@/config/Makefile.header
 
-all-local: sndcard-local
+@AM_HAVE_LINUX_TRUE@all-local : $(PLUGIN_FULL_NAME)
 
-sndcard-local: soundcardpmo.o 
-	gcc -shared -Wl,-soname,soundcard-@target_os@.pmo -o soundcard-@target_os@.pmo soundcardpmo.o 
-	mkdir -p @top_srcdir@/plugins
-	cp soundcard-@target_os@.pmo @top_srcdir@/plugins
+@AM_HAVE_LINUX_TRUE@$(PLUGIN_FULL_NAME) : $(libfaio_a_OBJECTS)
+@AM_HAVE_LINUX_TRUE@	@mkdir -p @top_srcdir@/plugins
+@AM_HAVE_LINUX_TRUE@	gcc -shared -Wl,-soname,$(PLUGIN_NAME) -o $(PLUGIN_FULL_NAME) $(libfaio_a_OBJECTS)
+@AM_HAVE_LINUX_TRUE@	@chmod 644 $(PLUGIN_FULL_NAME)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

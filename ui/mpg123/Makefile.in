@@ -77,6 +77,10 @@ RANLIB = @RANLIB@
 VERSION = @VERSION@
 target_os = @target_os@
 
+PLUGIN_DIR = @top_srcdir@/plugins/
+PLUGIN_NAME = mpg123-@target_os@.ui
+PLUGIN_FULL_NAME = $(PLUGIN_DIR)$(PLUGIN_NAME)
+
 @AM_HAVE_WIN32_TRUE@FILES = 
 @AM_HAVE_WIN32_TRUE@MYLIBS = 
 @AM_HAVE_WIN32_TRUE@TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
@@ -310,12 +314,12 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 include @top_srcdir@/config/Makefile.header
 
-all-local: mpg123-local
+@AM_HAVE_WIN32_FALSE@all-local : $(PLUGIN_FULL_NAME)
 
-mpg123-local: Mpg123UI.o
-	gcc -shared -Wl,-soname,mpg123-@target_os@.ui -o mpg123-@target_os@.ui Mpg123UI.o
-	mkdir -p @top_srcdir@/plugins
-	cp mpg123-@target_os@.ui @top_srcdir@/plugins
+@AM_HAVE_WIN32_FALSE@$(PLUGIN_FULL_NAME) : $(libfaui_a_OBJECTS)
+@AM_HAVE_WIN32_FALSE@	@mkdir -p @top_srcdir@/plugins
+@AM_HAVE_WIN32_FALSE@	gcc -shared -Wl,-soname,$(PLUGIN_NAME) -o $(PLUGIN_FULL_NAME) $(libfaui_a_OBJECTS)
+@AM_HAVE_WIN32_FALSE@	@chmod 644 $(PLUGIN_FULL_NAME)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -77,10 +77,15 @@ RANLIB = @RANLIB@
 VERSION = @VERSION@
 target_os = @target_os@
 
+PLUGIN_DIR = @top_srcdir@/plugins/
+PLUGIN_NAME = freeampgtk-@target_os@.ui
+PLUGIN_FULL_NAME = $(PLUGIN_DIR)$(PLUGIN_NAME)
+
 @AM_ENABLE_GTK_TRUE@FILES = freeamp-gtk.cpp
-@AM_ENABLE_GTK_TRUE@MYLIBS = libfauicmdline.a
+@AM_ENABLE_GTK_TRUE@MYLIBS = libfaui.a
 @AM_ENABLE_GTK_TRUE@TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
 @AM_ENABLE_GTK_TRUE@GTK_LINK_TAIL = `gtk-config --cflags` `gtk-config --libs`
+
 @AM_ENABLE_GTK_FALSE@FILES = 
 @AM_ENABLE_GTK_FALSE@MYLIBS = 
 @AM_ENABLE_GTK_FALSE@TRGT_SYS_HEADS =
@@ -88,7 +93,7 @@ target_os = @target_os@
 @AM_HAVE_LINUXTHREADS_TRUE@REENT = -D_REENTRANT
 
 noinst_LIBRARIES = $(MYLIBS)
-libfauicmdline_a_SOURCES = $(FILES)
+libfaui_a_SOURCES = $(FILES)
 
 INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) -I@top_srcdir@/lmc/include -I@top_srcdir@/io/include `gtk-config --cflags`
 CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT)
@@ -106,11 +111,10 @@ X_CFLAGS = @X_CFLAGS@
 X_LIBS = @X_LIBS@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
 X_PRE_LIBS = @X_PRE_LIBS@
-libfauicmdline_a_LIBADD = 
-@AM_ENABLE_GTK_TRUE@cond0libfauicmdline_a_OBJECTS =  freeamp-gtk.o
-@AM_ENABLE_GTK_FALSE@cond1libfauicmdline_a_OBJECTS = 
-libfauicmdline_a_OBJECTS =  $(cond0libfauicmdline_a_OBJECTS) \
-$(cond1libfauicmdline_a_OBJECTS)
+libfaui_a_LIBADD = 
+@AM_ENABLE_GTK_TRUE@cond0libfaui_a_OBJECTS =  freeamp-gtk.o
+@AM_ENABLE_GTK_FALSE@cond1libfaui_a_OBJECTS = 
+libfaui_a_OBJECTS =  $(cond0libfaui_a_OBJECTS) $(cond1libfaui_a_OBJECTS)
 AR = ar
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 CXXLINK = $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@
@@ -123,8 +127,8 @@ TAR = tar
 GZIP = --best
 DEP_FILES =  .deps/freeamp-gtk.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
-SOURCES = $(libfauicmdline_a_SOURCES)
-OBJECTS = $(libfauicmdline_a_OBJECTS)
+SOURCES = $(libfaui_a_SOURCES)
+OBJECTS = $(libfaui_a_OBJECTS)
 
 all: Makefile $(LIBRARIES) all-local
 
@@ -163,10 +167,10 @@ distclean-compile:
 
 maintainer-clean-compile:
 
-libfauicmdline.a: $(libfauicmdline_a_OBJECTS) $(libfauicmdline_a_DEPENDENCIES)
-	-rm -f libfauicmdline.a
-	$(AR) cru libfauicmdline.a $(libfauicmdline_a_OBJECTS) $(libfauicmdline_a_LIBADD)
-	$(RANLIB) libfauicmdline.a
+libfaui.a: $(libfaui_a_OBJECTS) $(libfaui_a_DEPENDENCIES)
+	-rm -f libfaui.a
+	$(AR) cru libfaui.a $(libfaui_a_OBJECTS) $(libfaui_a_LIBADD)
+	$(RANLIB) libfaui.a
 .cpp.o:
 	$(CXXCOMPILE) -c $<
 
@@ -311,12 +315,12 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 include @top_srcdir@/config/Makefile.header
 
-@AM_ENABLE_GTK_TRUE@all-local: cmdline-local
+@AM_ENABLE_GTK_TRUE@all-local : $(PLUGIN_FULL_NAME)
 
-@AM_ENABLE_GTK_TRUE@cmdline-local: freeamp-gtk.o
-@AM_ENABLE_GTK_TRUE@	gcc -shared -Wl,-soname,freeampgtk-@target_os@.ui -o freeampgtk-@target_os@.ui freeamp-gtk.o $(GTK_LINK_TAIL)
-@AM_ENABLE_GTK_TRUE@	mkdir -p @top_srcdir@/plugins
-@AM_ENABLE_GTK_TRUE@	cp freeampgtk-@target_os@.ui @top_srcdir@/plugins
+@AM_ENABLE_GTK_TRUE@$(PLUGIN_FULL_NAME) : $(libfaui_a_OBJECTS)
+@AM_ENABLE_GTK_TRUE@	@mkdir -p @top_srcdir@/plugins
+@AM_ENABLE_GTK_TRUE@	gcc -shared -Wl,-soname,$(PLUGIN_NAME) -o $(PLUGIN_FULL_NAME) $(libfaui_a_OBJECTS) $(GTK_LINK_TAIL)
+@AM_ENABLE_GTK_TRUE@	@chmod 644 $(PLUGIN_FULL_NAME)
 @AM_ENABLE_GTK_FALSE@all-local:
 @AM_ENABLE_GTK_FALSE@	@true
 

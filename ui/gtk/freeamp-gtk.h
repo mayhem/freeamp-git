@@ -37,7 +37,7 @@ class GtkUI : public UserInterface {
     virtual int32 AcceptEvent(Event *);
     virtual void SetArgs(int argc, char **argv);
     virtual void SetTarget(EventQueue *eqr) { m_playerEQ = eqr; }
-    virtual void Init();
+    virtual Error Init();
     virtual void SetPlayListManager(PlayListManager *);
     static void gtkServiceFunction(void *);
     virtual ~GtkUI();

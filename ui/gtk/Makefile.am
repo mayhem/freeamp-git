@@ -24,18 +24,23 @@
 
 include @top_srcdir@/config/Makefile.header
 
+PLUGIN_DIR = @top_srcdir@/plugins/
+PLUGIN_NAME = freeampgtk-@target_os@.ui
+PLUGIN_FULL_NAME = $(PLUGIN_DIR)$(PLUGIN_NAME)
+
 if AM_ENABLE_GTK
 FILES = freeamp-gtk.cpp
-MYLIBS = libfauicmdline.a
+MYLIBS = libfaui.a
 TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
 GTK_LINK_TAIL = `gtk-config --cflags` `gtk-config --libs`
 
-all-local: cmdline-local
+all-local : $(PLUGIN_FULL_NAME)
 
-cmdline-local: freeamp-gtk.o
-	gcc -shared -Wl,-soname,freeampgtk-@target_os@.ui -o freeampgtk-@target_os@.ui freeamp-gtk.o $(GTK_LINK_TAIL)
-	mkdir -p @top_srcdir@/plugins
-	cp freeampgtk-@target_os@.ui @top_srcdir@/plugins
+$(PLUGIN_FULL_NAME) : $(libfaui_a_OBJECTS)
+	@mkdir -p @top_srcdir@/plugins
+	gcc -shared -Wl,-soname,$(PLUGIN_NAME) -o $(PLUGIN_FULL_NAME) $(libfaui_a_OBJECTS) $(GTK_LINK_TAIL)
+	@chmod 644 $(PLUGIN_FULL_NAME)
+
 else 
 FILES = 
 MYLIBS = 
@@ -50,7 +55,7 @@ endif
 
 
 noinst_LIBRARIES = $(MYLIBS)
-libfauicmdline_a_SOURCES = $(FILES)
+libfaui_a_SOURCES = $(FILES)
 
 INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) -I@top_srcdir@/lmc/include -I@top_srcdir@/io/include `gtk-config --cflags`
 CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT)

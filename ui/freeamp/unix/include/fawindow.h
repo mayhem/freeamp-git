@@ -49,6 +49,7 @@ class FAWindow {
     int32 m_xParent,m_yParent;
     int32 m_width,m_height;
     Pixmap m_pixmap;
+    Pixmap m_maskPixmap;
     FAWindow();
     EventQueue *m_playerEQ;
  public:

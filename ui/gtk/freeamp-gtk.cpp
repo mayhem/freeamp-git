@@ -113,7 +113,7 @@ void destroy (GtkWidget *widget, gpointer data) {
     gtk_main_quit ();
 }
 
-void GtkUI::Init() {
+Error GtkUI::Init() {
     GtkWidget *theButtonBox;
     GtkWidget *outerBox;
 
@@ -190,6 +190,8 @@ void GtkUI::Init() {
     gtkListenThread = Thread::CreateThread();
     gtkListenThread->Create(GtkUI::gtkServiceFunction,this);
     
+
+    return kError_NoErr;
 }
 
 

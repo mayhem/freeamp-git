@@ -77,17 +77,21 @@ RANLIB = @RANLIB@
 VERSION = @VERSION@
 target_os = @target_os@
 
+PLUGIN_DIR = @top_srcdir@/plugins/
+PLUGIN_NAME = freeampcmd-@target_os@.ui
+PLUGIN_FULL_NAME = $(PLUGIN_DIR)$(PLUGIN_NAME)
+
 @AM_HAVE_WIN32_TRUE@FILES = 
 @AM_HAVE_WIN32_TRUE@MYLIBS = 
 @AM_HAVE_WIN32_TRUE@TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
 @AM_HAVE_WIN32_FALSE@FILES = cmdlineUI.cpp
-@AM_HAVE_WIN32_FALSE@MYLIBS = libfauicmdline.a
+@AM_HAVE_WIN32_FALSE@MYLIBS = libfaui.a
 @AM_HAVE_WIN32_FALSE@TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
 
 @AM_HAVE_LINUXTHREADS_TRUE@REENT = -D_REENTRANT
 
 noinst_LIBRARIES = $(MYLIBS)
-libfauicmdline_a_SOURCES = $(FILES)
+libfaui_a_SOURCES = $(FILES)
 
 INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) -I@top_srcdir@/lmc/include -I@top_srcdir@/io/include
 CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT)
@@ -105,11 +109,10 @@ X_CFLAGS = @X_CFLAGS@
 X_LIBS = @X_LIBS@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
 X_PRE_LIBS = @X_PRE_LIBS@
-libfauicmdline_a_LIBADD = 
-@AM_HAVE_WIN32_TRUE@cond0libfauicmdline_a_OBJECTS = 
-@AM_HAVE_WIN32_FALSE@cond1libfauicmdline_a_OBJECTS =  cmdlineUI.o
-libfauicmdline_a_OBJECTS =  $(cond0libfauicmdline_a_OBJECTS) \
-$(cond1libfauicmdline_a_OBJECTS)
+libfaui_a_LIBADD = 
+@AM_HAVE_WIN32_TRUE@cond0libfaui_a_OBJECTS = 
+@AM_HAVE_WIN32_FALSE@cond1libfaui_a_OBJECTS =  cmdlineUI.o
+libfaui_a_OBJECTS =  $(cond0libfaui_a_OBJECTS) $(cond1libfaui_a_OBJECTS)
 AR = ar
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 CXXLINK = $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@
@@ -122,8 +125,8 @@ TAR = tar
 GZIP = --best
 DEP_FILES =  .deps/cmdlineUI.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
-SOURCES = $(libfauicmdline_a_SOURCES)
-OBJECTS = $(libfauicmdline_a_OBJECTS)
+SOURCES = $(libfaui_a_SOURCES)
+OBJECTS = $(libfaui_a_OBJECTS)
 
 all: Makefile $(LIBRARIES) all-local
 
@@ -162,10 +165,10 @@ distclean-compile:
 
 maintainer-clean-compile:
 
-libfauicmdline.a: $(libfauicmdline_a_OBJECTS) $(libfauicmdline_a_DEPENDENCIES)
-	-rm -f libfauicmdline.a
-	$(AR) cru libfauicmdline.a $(libfauicmdline_a_OBJECTS) $(libfauicmdline_a_LIBADD)
-	$(RANLIB) libfauicmdline.a
+libfaui.a: $(libfaui_a_OBJECTS) $(libfaui_a_DEPENDENCIES)
+	-rm -f libfaui.a
+	$(AR) cru libfaui.a $(libfaui_a_OBJECTS) $(libfaui_a_LIBADD)
+	$(RANLIB) libfaui.a
 .cpp.o:
 	$(CXXCOMPILE) -c $<
 
@@ -310,12 +313,12 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 include @top_srcdir@/config/Makefile.header
 
-all-local: cmdline-local
+@AM_HAVE_WIN32_FALSE@all-local : $(PLUGIN_FULL_NAME)
 
-cmdline-local: cmdlineUI.o
-	gcc -shared -Wl,-soname,freeampcmd-@target_os@.ui -o freeampcmd-@target_os@.ui cmdlineUI.o
-	mkdir -p @top_srcdir@/plugins
-	cp freeampcmd-@target_os@.ui @top_srcdir@/plugins
+@AM_HAVE_WIN32_FALSE@$(PLUGIN_FULL_NAME) : $(libfaui_a_OBJECTS)
+@AM_HAVE_WIN32_FALSE@	@mkdir -p @top_srcdir@/plugins
+@AM_HAVE_WIN32_FALSE@	gcc -shared -Wl,-soname,$(PLUGIN_NAME) -o $(PLUGIN_FULL_NAME) $(libfaui_a_OBJECTS)
+@AM_HAVE_WIN32_FALSE@	@chmod 644 $(PLUGIN_FULL_NAME)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

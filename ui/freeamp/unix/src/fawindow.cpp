@@ -52,7 +52,7 @@ void FAWindow::SetGC(GC gc) { m_gc = gc; }
 
 void FAWindow::SetPixmap(Pixmap pm) { m_pixmap = pm; }
 
-void FAWindow::SetMask(Pixmap mask) { XShapeCombineMask(m_display,m_me,ShapeBounding,0,0,mask,ShapeSet); }
+void FAWindow::SetMask(Pixmap mask) { XShapeCombineMask(m_display,m_me,ShapeBounding,0,0,mask,ShapeSet); m_maskPixmap = mask; }
 
 void FAWindow::SelectInput(int32 mask) { XSelectInput(m_display,m_me,mask); }
 

@@ -77,8 +77,12 @@ RANLIB = @RANLIB@
 VERSION = @VERSION@
 target_os = @target_os@
 
+PLUGIN_DIR = @top_srcdir@/plugins/
+PLUGIN_NAME = freeamp-@target_os@.ui
+PLUGIN_FULL_NAME = $(PLUGIN_DIR)$(PLUGIN_NAME)
+
 @AM_ENABLE_X11_TRUE@FILES = freeamp.cpp windowhash.cpp fawindow.cpp res.cpp
-@AM_ENABLE_X11_TRUE@MYLIBS = libfauicmdline.a
+@AM_ENABLE_X11_TRUE@MYLIBS = libfaui.a
 @AM_ENABLE_X11_TRUE@TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
 
 @AM_ENABLE_X11_FALSE@FILES = 
@@ -88,7 +92,7 @@ target_os = @target_os@
 @AM_HAVE_LINUXTHREADS_TRUE@REENT = -D_REENTRANT
 
 noinst_LIBRARIES = $(MYLIBS)
-libfauicmdline_a_SOURCES = $(FILES)
+libfaui_a_SOURCES = $(FILES)
 
 INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) -I@top_srcdir@/lmc/include -I@top_srcdir@/io/include -I@top_srcdir@/ui/include -I@srcdir@/../res
 CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT)
@@ -106,12 +110,11 @@ X_CFLAGS = @X_CFLAGS@
 X_LIBS = @X_LIBS@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
 X_PRE_LIBS = @X_PRE_LIBS@
-libfauicmdline_a_LIBADD = 
-@AM_ENABLE_X11_TRUE@cond0libfauicmdline_a_OBJECTS =  freeamp.o \
-@AM_ENABLE_X11_TRUE@windowhash.o fawindow.o res.o
-@AM_ENABLE_X11_FALSE@cond1libfauicmdline_a_OBJECTS = 
-libfauicmdline_a_OBJECTS =  $(cond0libfauicmdline_a_OBJECTS) \
-$(cond1libfauicmdline_a_OBJECTS)
+libfaui_a_LIBADD = 
+@AM_ENABLE_X11_TRUE@cond0libfaui_a_OBJECTS =  freeamp.o windowhash.o \
+@AM_ENABLE_X11_TRUE@fawindow.o res.o
+@AM_ENABLE_X11_FALSE@cond1libfaui_a_OBJECTS = 
+libfaui_a_OBJECTS =  $(cond0libfaui_a_OBJECTS) $(cond1libfaui_a_OBJECTS)
 AR = ar
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 CXXLINK = $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@
@@ -125,8 +128,8 @@ GZIP = --best
 DEP_FILES =  .deps/fawindow.P .deps/freeamp.P .deps/res.P \
 .deps/windowhash.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
-SOURCES = $(libfauicmdline_a_SOURCES)
-OBJECTS = $(libfauicmdline_a_OBJECTS)
+SOURCES = $(libfaui_a_SOURCES)
+OBJECTS = $(libfaui_a_OBJECTS)
 
 all: Makefile $(LIBRARIES) all-local
 
@@ -165,10 +168,10 @@ distclean-compile:
 
 maintainer-clean-compile:
 
-libfauicmdline.a: $(libfauicmdline_a_OBJECTS) $(libfauicmdline_a_DEPENDENCIES)
-	-rm -f libfauicmdline.a
-	$(AR) cru libfauicmdline.a $(libfauicmdline_a_OBJECTS) $(libfauicmdline_a_LIBADD)
-	$(RANLIB) libfauicmdline.a
+libfaui.a: $(libfaui_a_OBJECTS) $(libfaui_a_DEPENDENCIES)
+	-rm -f libfaui.a
+	$(AR) cru libfaui.a $(libfaui_a_OBJECTS) $(libfaui_a_LIBADD)
+	$(RANLIB) libfaui.a
 .cpp.o:
 	$(CXXCOMPILE) -c $<
 
@@ -313,13 +316,14 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 include @top_srcdir@/config/Makefile.header
 
-@AM_ENABLE_X11_TRUE@all-local: cmdline-local
+@AM_ENABLE_X11_TRUE@all-local : $(PLUGIN_FULL_NAME)
+
+@AM_ENABLE_X11_TRUE@$(PLUGIN_FULL_NAME) : $(libfaui_a_OBJECTS)
+@AM_ENABLE_X11_TRUE@	@mkdir -p @top_srcdir@/plugins
+@AM_ENABLE_X11_TRUE@	gcc -shared -Wl,-soname,$(PLUGIN_NAME) -o $(PLUGIN_FULL_NAME) $(libfaui_a_OBJECTS) -L/usr/X11R6/lib -lX11 -lXext -lXpm
+@AM_ENABLE_X11_TRUE@	@chmod 644 $(PLUGIN_FULL_NAME)
 @AM_ENABLE_X11_FALSE@all-local:
 @AM_ENABLE_X11_FALSE@	@true
-
-cmdline-local: freeamp.o
-	gcc -shared -Wl,-soname,freeamp-@target_os@.ui -o freeamp-@target_os@.ui freeamp.o windowhash.o fawindow.o res.o -L/usr/X11R6/lib -lX11 -lXext -lXpm
-	cp freeamp-@target_os@.ui @top_srcdir@/plugins
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

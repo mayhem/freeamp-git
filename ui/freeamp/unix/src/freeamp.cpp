@@ -134,6 +134,7 @@ Error FreeAmpUI::Init()
     m_screenNum = DefaultScreen(m_display);
     display_depth = DefaultDepth(m_display,m_screenNum);
 
+
 //    cerr << endl<<endl<<"Screen Depth: " << display_depth << endl;
     
 //    m_mainWindow = XCreateSimpleWindow(m_display, RootWindow(m_display,m_screenNum), 
@@ -194,7 +195,6 @@ Error FreeAmpUI::Init()
     m_seekWindow = new FADialWindow(m_display,m_screenNum,m_gc,m_mainWindow->GetWindow(), SEEK_DIAL_X,SEEK_DIAL_Y,SINGLE_DIAL_WIDTH,DIALS_HEIGHT);
     m_seekWindow->SetMotionFunction(SeekDialFunction,this);
 
-    //display_depth = 8;
 
     XpmAttributes xpma;
     xpma.closeness = 0xFFFF;
@@ -845,7 +845,7 @@ void FreeAmpUI::SeekDialFunction(void *p, int32 c,int32 x,int32 y) {
 	    pMe->m_lcdWindow->SetCurrentTime(h,m,s);
 	    pMe->m_lcdWindow->SetDisplayState( pMe->m_oldLcdState);
 	    pMe->m_playerEQ->AcceptEvent(new ChangePositionEvent( pMe->m_seekSeconds / pMe->m_secondsPerFrame ));
-
+	    cout << "Changed position to" << pMe->m_seekSeconds / pMe->m_secondsPerFrame << endl;
 	    break; }
 	case 1: {
 	    pMe->m_seekDelta = 0;
