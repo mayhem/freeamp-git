@@ -148,8 +148,8 @@ void PixFontControl::BlitLetter(char letter, Rect oDestRect)
 
     srcRect.x1 = m_lettermap[letter].col * m_LetterWidth; 
     srcRect.y1 = m_lettermap[letter].row * m_LetterHeight;
-    srcRect.x2 = srcRect.x1 + m_LetterWidth;
-    srcRect.y2 = srcRect.y2 + m_LetterHeight;
+    srcRect.x2 = srcRect.x1 + m_LetterWidth + 1;
+    srcRect.y2 = srcRect.y1 + m_LetterHeight + 1;
 
     oDestRect.x2++;
     oDestRect.y2++;
@@ -159,9 +159,12 @@ void PixFontControl::BlitLetter(char letter, Rect oDestRect)
 
 int PixFontControl::BlitString(string &oText, int iOffset)
 {
-    char *text = (char *)oText.c_str();
+    char *text = new char[strlen(oText.c_str()) + 2];
+    strcpy(text, oText.c_str());
+    strcat(text, " ");
+
     uint32 length = strlen(text);
-    int width = length * m_LetterWidth;
+    int width = (length - 1) * m_LetterWidth;
     uint32 i;
 
     Rect dest;
@@ -169,8 +172,10 @@ int PixFontControl::BlitString(string &oText, int iOffset)
 
     if (iOffset != 0) {
         width += 20;
-        if (iOffset > width)
+        if (iOffset > width) {
+            delete [] text;
             return width - iOffset;
+        }
     }
 
     for (i = 0; i < length; i++) {
@@ -205,6 +210,8 @@ int PixFontControl::BlitString(string &oText, int iOffset)
     Canvas *pCanvas = m_pParent->GetCanvas();
     pCanvas->Invalidate(m_oRect);
     pCanvas->Update();
+
+    delete [] text;
 
     if (currentOffset > 0)
         return currentOffset;

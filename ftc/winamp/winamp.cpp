@@ -78,9 +78,8 @@ bool Winamp::IsSupportedFormat(string &oDir)
 
 Error Winamp::ConvertToNative(string &oDir)
 {
-    string sourcePath;
-    string destPath;
-
+    string sourcePath, destPath;
+    struct stat st;
     char *dir = new char[_MAX_PATH];
     uint32 len = _MAX_PATH;
 
@@ -97,6 +96,19 @@ Error Winamp::ConvertToNative(string &oDir)
 
     eErr = CopyFile(sourcePath.c_str(), destPath.c_str(), false) ?
            kError_NoErr : kError_CopyFailed;
+
+    sourcePath = oDir + string(DIR_MARKER_STR) + string("nums_ex.bmp");
+    if (stat(sourcePath.c_str(), &st) == 0) {
+        destPath = oDir + string(DIR_MARKER_STR) + string("numbers.bmp");
+        CopyFile(sourcePath.c_str(), destPath.c_str(), false);
+    }
+
+    sourcePath = oDir + string(DIR_MARKER_STR) + string("volbar.bmp");
+    if (stat(sourcePath.c_str(), &st) == 0) {
+        destPath = oDir + string(DIR_MARKER_STR) + string("volume.bmp");
+        if (stat(destPath.c_str(), &st) == 0) 
+            CopyFile(sourcePath.c_str(), destPath.c_str(), false);
+    } 
 
     return eErr;
 }
