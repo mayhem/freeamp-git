@@ -642,7 +642,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                 ostringstream ost;
                 float total = m_totalBytes;
                 float recvd = m_doneBytes;
-                uint32 percent;
+                uint32 percent = 0;
                 RECT clientRect;
                 HDC hDc;
                 HBITMAP hBitmap, hSavedBitmap;
@@ -668,7 +668,8 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                 ost.precision(2);
                 ost.flags(ios_base::fixed);
 
-                percent = (uint32)recvd/total*100;
+                if(total)
+                    percent = (uint32)recvd/total*100;
 
                 ost << percent << "%, " << m_doneItems << " of " << m_totalItems << " items (";
 
