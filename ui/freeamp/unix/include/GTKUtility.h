@@ -32,5 +32,7 @@ void WarpPointer(GdkWindow *win, int x, int y);
 void InitializeGTK(FAContext *context);
 void ShutdownGTK(void);
 
-bool ListFonts(char *);
+bool ListFonts(char *mask);
+
+void ReclaimFileTypes(FAContext *context, bool askBeforeReclaiming);
 #endif

@@ -36,10 +36,21 @@ RSC=rc.exe
 OUTDIR=.\Release
 INTDIR=.\Release
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : ".\httpinput.pmi"
 
+!ELSE 
 
+ALL : "fabaselib - Win32 Release" ".\httpinput.pmi"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fabaselib - Win32 ReleaseCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\debug.obj"
 	-@erase "$(INTDIR)\http.res"
 	-@erase "$(INTDIR)\httpinput.obj"
@@ -64,7 +75,7 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\httpinput.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=fabaselib.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x10400000" /subsystem:windows /dll /incremental:no /pdb:"$(OUTDIR)\httpinput.pdb" /machine:I386 /def:".\httpinput.def" /out:"httpinput.pmi" /implib:"$(OUTDIR)\httpinput.lib" /libpath:"..\..\..\..\base\win32" 
+LINK32_FLAGS=fabaselib.lib gdbm.lib version.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x10400000" /subsystem:windows /dll /incremental:no /pdb:"$(OUTDIR)\httpinput.pdb" /machine:I386 /def:".\httpinput.def" /out:"httpinput.pmi" /implib:"$(OUTDIR)\httpinput.lib" /libpath:"..\..\..\..\base\win32" /libpath:"..\..\..\..\lib\gdbm" 
 DEF_FILE= \
 	".\httpinput.def"
 LINK32_OBJS= \
@@ -75,7 +86,8 @@ LINK32_OBJS= \
 	"$(INTDIR)\pullbuffer.obj" \
 	"$(INTDIR)\streambuffer.obj" \
 	"$(INTDIR)\tstream.obj" \
-	"$(INTDIR)\http.res"
+	"$(INTDIR)\http.res" \
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\httpinput.pmi" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -87,7 +99,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\httpinput.pmi"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 Release" ".\httpinput.pmi"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins
 	copy httpinput.pmi                          ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -97,10 +109,21 @@ $(DS_POSTBUILD_DEP) : ".\httpinput.pmi"
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : ".\httpinput.pmi"
 
+!ELSE 
 
+ALL : "fabaselib - Win32 Debug" ".\httpinput.pmi"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fabaselib - Win32 DebugCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\debug.obj"
 	-@erase "$(INTDIR)\http.res"
 	-@erase "$(INTDIR)\httpinput.obj"
@@ -128,7 +151,7 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\httpinput.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=fabaselib.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x10400000" /subsystem:windows /dll /incremental:yes /pdb:"$(OUTDIR)\httpinput.pdb" /debug /machine:I386 /def:".\httpinput.def" /out:"httpinput.pmi" /implib:"$(OUTDIR)\httpinput.lib" /pdbtype:sept /libpath:"..\..\..\..\base\win32" 
+LINK32_FLAGS=fabaselib.lib gdbm.lib version.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x10400000" /subsystem:windows /dll /incremental:yes /pdb:"$(OUTDIR)\httpinput.pdb" /debug /machine:I386 /def:".\httpinput.def" /out:"httpinput.pmi" /implib:"$(OUTDIR)\httpinput.lib" /pdbtype:sept /libpath:"..\..\..\..\base\win32" /libpath:"..\..\..\..\lib\gdbm" 
 DEF_FILE= \
 	".\httpinput.def"
 LINK32_OBJS= \
@@ -139,7 +162,8 @@ LINK32_OBJS= \
 	"$(INTDIR)\pullbuffer.obj" \
 	"$(INTDIR)\streambuffer.obj" \
 	"$(INTDIR)\tstream.obj" \
-	"$(INTDIR)\http.res"
+	"$(INTDIR)\http.res" \
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\httpinput.pmi" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -151,7 +175,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\httpinput.pmi"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 Debug" ".\httpinput.pmi"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins
 	copy httpinput.pmi                          ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -161,10 +185,21 @@ $(DS_POSTBUILD_DEP) : ".\httpinput.pmi"
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : ".\httpinput.pmi"
 
+!ELSE 
 
+ALL : "fabaselib - Win32 NASM Debug" ".\httpinput.pmi"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fabaselib - Win32 NASM DebugCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\debug.obj"
 	-@erase "$(INTDIR)\http.res"
 	-@erase "$(INTDIR)\httpinput.obj"
@@ -192,7 +227,7 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\httpinput.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=fabaselib.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x10400000" /subsystem:windows /dll /incremental:yes /pdb:"$(OUTDIR)\httpinput.pdb" /debug /machine:I386 /def:".\httpinput.def" /out:"httpinput.pmi" /implib:"$(OUTDIR)\httpinput.lib" /pdbtype:sept /libpath:"..\..\..\..\base\win32" 
+LINK32_FLAGS=fabaselib.lib gdbm.lib version.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x10400000" /subsystem:windows /dll /incremental:yes /pdb:"$(OUTDIR)\httpinput.pdb" /debug /machine:I386 /def:".\httpinput.def" /out:"httpinput.pmi" /implib:"$(OUTDIR)\httpinput.lib" /pdbtype:sept /libpath:"..\..\..\..\base\win32" /libpath:"..\..\..\..\lib\gdbm" 
 DEF_FILE= \
 	".\httpinput.def"
 LINK32_OBJS= \
@@ -203,7 +238,8 @@ LINK32_OBJS= \
 	"$(INTDIR)\pullbuffer.obj" \
 	"$(INTDIR)\streambuffer.obj" \
 	"$(INTDIR)\tstream.obj" \
-	"$(INTDIR)\http.res"
+	"$(INTDIR)\http.res" \
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\httpinput.pmi" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -215,7 +251,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\httpinput.pmi"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Debug" ".\httpinput.pmi"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins
 	copy httpinput.pmi                          ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -225,10 +261,21 @@ $(DS_POSTBUILD_DEP) : ".\httpinput.pmi"
 OUTDIR=.\Release
 INTDIR=.\Release
 
+!IF "$(RECURSE)" == "0" 
+
 ALL : ".\httpinput.pmi"
 
+!ELSE 
 
+ALL : "fabaselib - Win32 NASM Release" ".\httpinput.pmi"
+
+!ENDIF 
+
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fabaselib - Win32 NASM ReleaseCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\debug.obj"
 	-@erase "$(INTDIR)\http.res"
 	-@erase "$(INTDIR)\httpinput.obj"
@@ -253,7 +300,7 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\httpinput.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=fabaselib.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x10400000" /subsystem:windows /dll /incremental:no /pdb:"$(OUTDIR)\httpinput.pdb" /machine:I386 /def:".\httpinput.def" /out:"httpinput.pmi" /implib:"$(OUTDIR)\httpinput.lib" /libpath:"..\..\..\..\base\win32" 
+LINK32_FLAGS=fabaselib.lib gdbm.lib version.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x10400000" /subsystem:windows /dll /incremental:no /pdb:"$(OUTDIR)\httpinput.pdb" /machine:I386 /def:".\httpinput.def" /out:"httpinput.pmi" /implib:"$(OUTDIR)\httpinput.lib" /libpath:"..\..\..\..\base\win32" /libpath:"..\..\..\..\lib\gdbm" 
 DEF_FILE= \
 	".\httpinput.def"
 LINK32_OBJS= \
@@ -264,7 +311,8 @@ LINK32_OBJS= \
 	"$(INTDIR)\pullbuffer.obj" \
 	"$(INTDIR)\streambuffer.obj" \
 	"$(INTDIR)\tstream.obj" \
-	"$(INTDIR)\http.res"
+	"$(INTDIR)\http.res" \
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\httpinput.pmi" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -276,7 +324,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : ".\httpinput.pmi"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Release" ".\httpinput.pmi"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins
 	copy httpinput.pmi                          ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -372,29 +420,79 @@ SOURCE=..\res\http.rc
 
 
 "$(INTDIR)\http.res" : $(SOURCE) "$(INTDIR)"
-	$(RSC) /l 0x409 /fo"$(INTDIR)\http.res" /i "\Local\src\freeamp\io\http\win32\res" /d "NDEBUG" $(SOURCE)
+	$(RSC) /l 0x409 /fo"$(INTDIR)\http.res" /i "\TEMP\freeamp_head\io\http\win32\res" /d "NDEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "httpinput - Win32 Debug"
 
 
 "$(INTDIR)\http.res" : $(SOURCE) "$(INTDIR)"
-	$(RSC) /l 0x409 /fo"$(INTDIR)\http.res" /i "\Local\src\freeamp\io\http\win32\res" /d "_DEBUG" $(SOURCE)
+	$(RSC) /l 0x409 /fo"$(INTDIR)\http.res" /i "\TEMP\freeamp_head\io\http\win32\res" /d "_DEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "httpinput - Win32 NASM Debug"
 
 
 "$(INTDIR)\http.res" : $(SOURCE) "$(INTDIR)"
-	$(RSC) /l 0x409 /fo"$(INTDIR)\http.res" /i "\Local\src\freeamp\io\http\win32\res" /d "_DEBUG" $(SOURCE)
+	$(RSC) /l 0x409 /fo"$(INTDIR)\http.res" /i "\TEMP\freeamp_head\io\http\win32\res" /d "_DEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "httpinput - Win32 NASM Release"
 
 
 "$(INTDIR)\http.res" : $(SOURCE) "$(INTDIR)"
-	$(RSC) /l 0x409 /fo"$(INTDIR)\http.res" /i "\Local\src\freeamp\io\http\win32\res" /d "NDEBUG" $(SOURCE)
+	$(RSC) /l 0x409 /fo"$(INTDIR)\http.res" /i "\TEMP\freeamp_head\io\http\win32\res" /d "NDEBUG" $(SOURCE)
 
+
+!ENDIF 
+
+!IF  "$(CFG)" == "httpinput - Win32 Release"
+
+"fabaselib - Win32 Release" : 
+   cd "\TEMP\freeamp_head\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Release" 
+   cd "..\..\..\io\http\win32\prj"
+
+"fabaselib - Win32 ReleaseCLEAN" : 
+   cd "\TEMP\freeamp_head\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Release" RECURSE=1 CLEAN 
+   cd "..\..\..\io\http\win32\prj"
+
+!ELSEIF  "$(CFG)" == "httpinput - Win32 Debug"
+
+"fabaselib - Win32 Debug" : 
+   cd "\TEMP\freeamp_head\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Debug" 
+   cd "..\..\..\io\http\win32\prj"
+
+"fabaselib - Win32 DebugCLEAN" : 
+   cd "\TEMP\freeamp_head\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Debug" RECURSE=1 CLEAN 
+   cd "..\..\..\io\http\win32\prj"
+
+!ELSEIF  "$(CFG)" == "httpinput - Win32 NASM Debug"
+
+"fabaselib - Win32 NASM Debug" : 
+   cd "\TEMP\freeamp_head\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug" 
+   cd "..\..\..\io\http\win32\prj"
+
+"fabaselib - Win32 NASM DebugCLEAN" : 
+   cd "\TEMP\freeamp_head\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug" RECURSE=1 CLEAN 
+   cd "..\..\..\io\http\win32\prj"
+
+!ELSEIF  "$(CFG)" == "httpinput - Win32 NASM Release"
+
+"fabaselib - Win32 NASM Release" : 
+   cd "\TEMP\freeamp_head\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Release" 
+   cd "..\..\..\io\http\win32\prj"
+
+"fabaselib - Win32 NASM ReleaseCLEAN" : 
+   cd "\TEMP\freeamp_head\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Release" RECURSE=1 CLEAN 
+   cd "..\..\..\io\http\win32\prj"
 
 !ENDIF 
 

@@ -33,7 +33,8 @@ ____________________________________________________________________________*/
 #include <commctrl.h>
 #include <stdio.h>
 #include <string.h>
-#include <iostream>
+#include <sys/stat.h>
+#include <direct.h>
 
 /* Project Includes */
 #include "player.h"
@@ -56,6 +57,10 @@ bool IsMultiProcessor(void);
 const char* kHiddenWindow = "FreeAmp Hidden Window";
 HINSTANCE g_hinst = NULL;
 static const char *themeExtension = "fat";
+const char* kReboot = The_BRANDING" needs for you to restart your computer "
+                      "in order to complete the update process.\r\nPlease "
+                      "restart your computer before attempting to use "
+                      the_BRANDING".";
 
 int APIENTRY WinMain(HINSTANCE hInstance, 
 					 HINSTANCE hPrevInstance,
@@ -65,6 +70,19 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     HANDLE runOnceMutex;
 
     g_hinst = hInstance;
+
+    // should we allow FreeAmp to run?
+    struct stat st;
+    char path[MAX_PATH];
+
+    getcwd(path, sizeof(path));
+    strcat(path, "\\NeedToRebootForUpdate");
+    if(!stat(path, &st))
+    {
+        MessageBox(NULL, kReboot, "You Need To Reboot...", 
+                            MB_OK|MB_ICONINFORMATION|MB_SETFOREGROUND);
+        return 0;
+    }
 
 	if(SendCommandLineToRealJukebox())
 	{
@@ -126,7 +144,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     delete registrar;
 
     bool reclaimFileTypes, askBeforeReclaiming;
-    char path[MAX_PATH];
     uint32 length = sizeof(path);
     context->prefs->GetReclaimFiletypes(&reclaimFileTypes);
     context->prefs->GetAskToReclaimFiletypes(&askBeforeReclaiming);

@@ -59,6 +59,7 @@ class Win32UpdateManager : public UpdateManager {
  protected:
   
     Error GetFileVersions(const char* path);
+    Error GetSystemFileVersions();
 
  private:
 

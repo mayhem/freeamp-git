@@ -18,7 +18,7 @@
         along with this program; if not, write to the Free Software
         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-        $Id$
+   $Id$
 ____________________________________________________________________________*/
 
 #ifndef INCLUDED_GTKMUSICBROWSER_H_
@@ -145,7 +145,7 @@ class GTKMusicBrowser {
     bool iSetRepeatMode;
 
     uint32 m_playingindex;
- 
+
     bool m_bIgnoringMusicCatalogMessages;
 
     PlaylistManager *m_plm;

@@ -401,7 +401,6 @@ Error DownloadManager::ReadDownloadFile(char* url,
 
                     result = format->GetRef()->ReadDownloadFile(url, 
                                                                 items);
-
                     if(addToInternalList)
                     {
                         AddItems(items);
@@ -620,6 +619,7 @@ Error DownloadManager::Download(DownloadItem* item)
         char* file = NULL;
         char* destPath = NULL;
         bool useProxy;
+        struct stat st;
 
         destPath = new char[_MAX_PATH];
         uint32 length = _MAX_PATH;
@@ -628,6 +628,16 @@ Error DownloadManager::Download(DownloadItem* item)
 
         strcat(destPath, DIR_MARKER_STR);
         strcat(destPath, item->DestinationFile().c_str());
+        
+        if(-1 != stat(destPath, &st))
+        {
+            if (st.st_size >= item->GetTotalBytes())
+            {
+               if(destPath)
+                   delete [] destPath;
+               return kError_NoErr;    
+            }
+        }
 
         result = kError_ProtocolNotSupported;
 
@@ -776,8 +786,6 @@ Error DownloadManager::Download(DownloadItem* item)
                 // do we need to request a range?
                 if(item->GetBytesReceived())
                 { 
-                    struct stat st;
-
                     if(-1 != stat(destPath, &st))
                     {
                         char* range = new char[strlen(kRange) + 256 + 1];
@@ -1172,9 +1180,19 @@ Error DownloadManager::SubmitToDatabase(DownloadItem* item)
         
         if (IsntError(FilePathToURL(path, url, &urlLength)))
         {
-            if (!item->IsNormalDownload())
-                m_context->catalog->WriteMetaDataToDatabase(url, 
-                                                            item->GetMetaData());
+            PlaylistItem *newtrack;
+            
+            if (item->IsNormalDownload())
+               newtrack = new PlaylistItem(url);
+            else   
+               newtrack = new PlaylistItem(url, &(item->GetMetaData()));
+               
+            m_context->plm->RetrieveMetaData(newtrack);
+            while (newtrack->GetState() != kPlaylistItemState_Normal)
+                usleep(100);
+
+            MetaData tempdata = (MetaData)(newtrack->GetMetaData());
+            m_context->catalog->WriteMetaDataToDatabase(url, tempdata);
             m_context->catalog->AddSong(url);
         }
 
@@ -1440,7 +1458,7 @@ void DownloadManager::LoadResumableDownloadItems()
                        offset += temp;
                 }
 
-                string data = value;
+                string data = string(value);
                 data.erase(0, offset);
                 delete value;
                 value = NULL;

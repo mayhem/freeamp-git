@@ -96,6 +96,7 @@ public:
   void            HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent);
   Error           GetData(void *&pBuffer);
   Error           Write(void *pBuffer);
+  bool            SetupVolumeControl(void);
 
   void            Clear(void);
   void            DSClear();
@@ -119,6 +120,10 @@ public:
   Semaphore*      m_pDSWriteSem;  // Semaphore to access Sec Buffer for writing purpose
   bool            m_bDSEnumFailed;
   int             m_nCurrentDevice;
+  
+  HMIXER          m_hmixer;
+  string          m_oDstLineName, m_oVolumeControlName;
+  DWORD           m_dwMinimum, m_dwMaximum, m_dwVolumeControlID;
 };
 
 #endif /* _DSOUNDCARDPMO_H_ */

@@ -155,11 +155,12 @@ void ButtonControl::Transition(ControlTransitionEnum  eTrans,
     {    
        if (m_oTargetWindow.length() == 0)
        {
-           m_pParent->SendControlMessage(this, CM_Pressed);
            if (m_oName == "ReloadTheme")
            {
+              m_pParent->SendControlMessage(this, CM_Pressed);
               return;
            }   
+           m_pParent->SendControlMessage(this, CM_Pressed);
        }    
        else 
        {   

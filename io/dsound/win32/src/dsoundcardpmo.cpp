@@ -145,6 +145,9 @@ DSoundCardPMO(FAContext *context):
      PhysicalMediaOutput(context)
 {
   HRESULT hResult;
+  MMRESULT mmresult = 0;
+  Int32PropValue *pProp;
+  HWND hWnd;
 
   m_samples_per_second  = 0;
   m_data_size           = 0;
@@ -162,10 +165,8 @@ DSoundCardPMO(FAContext *context):
   m_pDSWriteSem         = new Semaphore(1);
   m_pDSBufferSem        = new Semaphore(0);
   m_DSBufferManager.pDSSecondaryBuffer  = NULL;
-  m_iLastVolume         = 0;
   m_bIsBufferEmptyNow   = true;
   m_bLMCsaidToPlay      = false;
-
 
   // Get a list of windows handle
   BOOL breturn = EnumWindows((WNDENUMPROC) EnumThreadWndProc, (LPARAM) this);
@@ -183,6 +184,21 @@ DSoundCardPMO(FAContext *context):
     assert(m_pBufferThread);
     m_pBufferThread->Create(DSoundCardPMO::StartWorkerThread, this);
   }
+  
+  if (IsError(m_pContext->props->GetProperty("MainWindow", 
+             (PropValue **)&pProp)))
+     return;        
+  else
+     hWnd = (HWND)pProp->GetInt32();
+  
+  mmresult = mixerOpen(&m_hmixer, 0, (DWORD)hWnd, NULL, 
+                        MIXER_OBJECTF_MIXER | CALLBACK_WINDOW);
+  if (mmresult != MMSYSERR_NOERROR)
+  {
+      m_hmixer = NULL;
+      m_pContext->log->Error("Cannot open Mixer device.");
+  }    
+  SetupVolumeControl();
 }
 
 DSoundCardPMO::
@@ -195,6 +211,8 @@ DSoundCardPMO::
   m_pPauseSem->Signal();
   m_pDSBufferSem->Signal();
   m_pDSWriteSem->Signal();
+
+  mixerClose(m_hmixer);
 
   if (m_pBufferThread)
   {
@@ -248,37 +266,101 @@ DSoundCardPMO::
   }
 }
 
+bool DSoundCardPMO::SetupVolumeControl(void)
+{
+	MIXERLINE mxl;
+	MIXERCONTROL mxc;
+	MIXERLINECONTROLS mxlc;
+    
+	m_oDstLineName = "";
+	m_oVolumeControlName = "";
+
+	if (m_hmixer == NULL)
+		return FALSE;
+
+	mxl.cbStruct = sizeof(MIXERLINE);
+	mxl.dwComponentType = MIXERLINE_COMPONENTTYPE_SRC_WAVEOUT;
+	if (mixerGetLineInfo((HMIXEROBJ)m_hmixer,
+                         &mxl,
+                         MIXER_OBJECTF_HMIXER |
+                         MIXER_GETLINEINFOF_COMPONENTTYPE)
+		!= MMSYSERR_NOERROR)
+		return false;
+
+	mxlc.cbStruct = sizeof(MIXERLINECONTROLS);
+	mxlc.dwLineID = mxl.dwLineID;
+	mxlc.dwControlType = MIXERCONTROL_CONTROLTYPE_VOLUME;
+	mxlc.cControls = 1;
+	mxlc.cbmxctrl = sizeof(MIXERCONTROL);
+	mxlc.pamxctrl = &mxc;
+
+	if (mixerGetLineControls((HMIXEROBJ)m_hmixer,
+		     				 &mxlc,
+							 MIXER_OBJECTF_HMIXER |
+							 MIXER_GETLINECONTROLSF_ONEBYTYPE)
+		!= MMSYSERR_NOERROR)
+		return false;
+
+	// record dwControlID
+	m_oDstLineName = mxl.szName;
+	m_oVolumeControlName = mxc.szName;
+	m_dwMinimum = mxc.Bounds.dwMinimum;
+	m_dwMaximum = mxc.Bounds.dwMaximum;
+	m_dwVolumeControlID = mxc.dwControlID;
+
+	return TRUE;
+}
+
+
 int32
 DSoundCardPMO::
 GetVolume(void)
 {
-    int32 volume = 0;
+	MIXERCONTROLDETAILS_UNSIGNED mxcdVolume;
+	MIXERCONTROLDETAILS mxcd;
+    int                 ret;
+    
+	mxcd.cbStruct = sizeof(MIXERCONTROLDETAILS);
+	mxcd.dwControlID = m_dwVolumeControlID;
+	mxcd.cChannels = 1;
+	mxcd.cMultipleItems = 0;
+	mxcd.cbDetails = sizeof(MIXERCONTROLDETAILS_UNSIGNED);
+	mxcd.paDetails = &mxcdVolume;
+	ret = mixerGetControlDetails((HMIXEROBJ)m_hmixer,
+								 &mxcd,
+								 MIXER_OBJECTF_HMIXER |
+								 MIXER_GETCONTROLDETAILSF_VALUE);
+	if (ret != MMSYSERR_NOERROR)
+		return false;
 
-    if (m_DSBufferManager.pDSSecondaryBuffer)
-	{
-       m_DSBufferManager.pDSSecondaryBuffer->GetVolume((LPLONG) &volume);
-	   volume = 100 - ((100 * volume) / (DSBVOLUME_MIN-DSBVOLUME_MAX));
-       
-    }
-	else
-	{
-	   waveOutGetVolume((HWAVEOUT)WAVE_MAPPER, (DWORD*)&volume);
-       volume = (int32)(100 * ((float)LOWORD(volume)/(float)0xffff));
-	}
-
-    return volume;
+    return  (int)(((float)((mxcdVolume.dwValue - m_dwMinimum) * 100) /  
+                  (float)(m_dwMaximum - m_dwMinimum)) + 0.5); 
 }
 
 void
 DSoundCardPMO::
-SetVolume(int32 v)
+SetVolume(int32 volume)
 {
-    if (m_DSBufferManager.pDSSecondaryBuffer)
-	{
-        m_DSBufferManager.pDSSecondaryBuffer->SetVolume(((100 - v) * (DSBVOLUME_MIN-DSBVOLUME_MAX)) / 100);
-	}
+    DWORD dwVal;
+    
+    dwVal = (volume * (m_dwMaximum - m_dwMinimum) / 100);
 
-    m_iLastVolume = v;
+	MIXERCONTROLDETAILS_UNSIGNED mxcdVolume[2];
+	MIXERCONTROLDETAILS mxcd;
+    
+    memcpy(&mxcdVolume[0], &dwVal, sizeof(MIXERCONTROLDETAILS_UNSIGNED));
+    memcpy(&mxcdVolume[1], &dwVal, sizeof(MIXERCONTROLDETAILS_UNSIGNED));
+    
+	mxcd.cbStruct = sizeof(MIXERCONTROLDETAILS);
+	mxcd.dwControlID = m_dwVolumeControlID;
+	mxcd.cChannels = 2;
+	mxcd.cMultipleItems = 0;
+	mxcd.cbDetails = sizeof(MIXERCONTROLDETAILS_UNSIGNED);
+	mxcd.paDetails = &mxcdVolume;
+    
+	mixerSetControlDetails((HMIXEROBJ)m_hmixer, &mxcd, 
+                           MIXER_OBJECTF_HMIXER | 
+                           MIXER_SETCONTROLDETAILSF_VALUE);
 }
 
 Error
@@ -403,8 +485,6 @@ Init(OutputInfo* info)
     m_DSBufferManager.pDSSecondaryBuffer = NULL;
     return result;
   }
-
-  SetVolume(m_iLastVolume);
 
   m_initialized = true;
 

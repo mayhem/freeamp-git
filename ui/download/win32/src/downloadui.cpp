@@ -721,7 +721,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                     ost << m_doneBytes << " of " << m_totalBytes << " Bytes)";
                 }
 
-                displayString = "Overall Progress:";
+                displayString = string("Overall Progress:");
 
                 SIZE stringSize;
                 RECT rcClip = clientRect;
@@ -1100,7 +1100,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                 }
 
                 case kDownloadItemState_Done:
-                    displayString = "Download Complete";
+                    displayString = string("Download Complete");
                     break;
 
                 default:
@@ -1160,7 +1160,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             SetBkColor(dis->hDC, GetSysColor(COLOR_WINDOW));
             string displayString;
 
-            string longestString = "File Name :";
+            string longestString = string("File Name :");
 
             SIZE stringSize;
                     
@@ -1217,7 +1217,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             {
                 case 0:
                 {
-                    displayString = "Artist :";
+                    displayString = string("Artist :");
                     ExtTextOut( dis->hDC, 
                         rcClip.left, rcClip.top + 1, 
                         ETO_CLIPPED | ETO_OPAQUE,
@@ -1228,7 +1228,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
 
                     rcClip.left = dis->rcItem.left + dataOffset;
 
-                    displayString = "";
+                    displayString = string("");
 
                     if(dli)
                         displayString = dli->GetMetaData().Artist();
@@ -1248,7 +1248,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
 
                 case 1:
                 {
-                    displayString = "Album :";
+                    displayString = string("Album :");
                     ExtTextOut( dis->hDC, 
                         rcClip.left, rcClip.top + 1, 
                         ETO_CLIPPED | ETO_OPAQUE,
@@ -1259,7 +1259,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
 
                     rcClip.left = dis->rcItem.left + dataOffset;
 
-                    displayString = "";
+                    displayString = string("");
 
                     if(dli)
                         displayString = dli->GetMetaData().Album();
@@ -1278,7 +1278,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
 
                 case 2:
                 {
-                    displayString = "Title :";
+                    displayString = string("Title :");
                     ExtTextOut( dis->hDC, 
                         rcClip.left, rcClip.top + 1, 
                         ETO_CLIPPED | ETO_OPAQUE,
@@ -1289,7 +1289,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
 
                     rcClip.left = dis->rcItem.left + dataOffset;
 
-                    displayString = "";
+                    displayString = string("");
 
                     if(dli)
                         displayString = dli->GetMetaData().Title();
@@ -1308,7 +1308,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
 
                 case 3:
                 {
-                    displayString = "Genre :";
+                    displayString = string("Genre :");
                     ExtTextOut( dis->hDC, 
                         rcClip.left, rcClip.top + 1, 
                         ETO_CLIPPED | ETO_OPAQUE,
@@ -1319,7 +1319,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
 
                     rcClip.left = dis->rcItem.left + dataOffset;
 
-                    displayString = "";
+                    displayString = string("");
 
                     if(dli)
                         displayString = dli->GetMetaData().Genre();
@@ -1339,7 +1339,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
 
                 case 4:
                 {
-                    displayString = "Playlist :";
+                    displayString = string("Playlist :");
                     ExtTextOut( dis->hDC, 
                         rcClip.left, rcClip.top + 1, 
                         ETO_CLIPPED | ETO_OPAQUE,
@@ -1350,8 +1350,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
 
                     rcClip.left = dis->rcItem.left + dataOffset;
 
-                    displayString = "";
-
+                    displayString = string("");
                     if(dli)
                         displayString = dli->PlaylistName();
 
@@ -1369,7 +1368,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
 
                 case 5:
                 {
-                    displayString = "File Name :";
+                    displayString = string("File Name :");
                     ExtTextOut( dis->hDC, 
                         rcClip.left, rcClip.top + 1, 
                         ETO_CLIPPED | ETO_OPAQUE,
@@ -1380,8 +1379,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
 
                     rcClip.left = dis->rcItem.left + dataOffset;
 
-                    displayString = "";
-
+                    displayString = string("");
                     if(dli)
                         displayString = dli->DestinationFile();
 
@@ -1399,7 +1397,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
 
                 case 6:
                 {
-                    displayString = "File Size :";
+                    displayString = string("File Size :");
                     ExtTextOut( dis->hDC, 
                         rcClip.left, rcClip.top + 1, 
                         ETO_CLIPPED | ETO_OPAQUE,
@@ -1416,8 +1414,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                     ost.precision(2);
                     ost.flags(ios_base::fixed);
 
-                    displayString = "";
-
+                    displayString = string("");
                     if(dli)
                     {
                         total = dli->GetTotalBytes();

@@ -88,7 +88,7 @@ protected:
 
 private:
 
-   int             m_hHandle;
+   int             m_hHandle, m_iMetaDataInterval;
    Thread         *m_pBufferThread;
    bool            m_bLoop, m_bDiscarded;
    FILE           *m_fpSave;
@@ -96,6 +96,7 @@ private:
    bool            m_bUseProxy, m_bIsStreaming;
    char            m_szProxyHost[iMaxUrlLen];
    bool            m_bUseBufferReduction;
+   int             m_uBytesReceived;
 };
 
 #endif /* _HTTPFILEINPUT_H_ */

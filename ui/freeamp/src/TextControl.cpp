@@ -88,7 +88,8 @@ bool TextControl::UseToDragWindow(void)
 {
     return m_oName != string("Time") && 
            m_oName != string("TimeRemaining") &&
-           m_oName != string("HeadlineInfo");
+           m_oName != string("HeadlineInfo") &&
+           m_oName != string("HeadlineStreamInfo");
 }
 
 TextControl::~TextControl(void)

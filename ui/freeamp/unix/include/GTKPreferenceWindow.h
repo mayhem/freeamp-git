@@ -48,6 +48,8 @@ typedef struct PrefsStruct
     int32 inputBufferSize;
     int32 outputBufferSize;
     int32 preBufferLength;
+    bool  reclaimFiletypes;
+    bool  askReclaimFiletypes;
 
     // page 2
     int32 streamInterval;
@@ -115,6 +117,8 @@ typedef struct PrefsStruct
             portablePlayers == pref.portablePlayers &&
             listboxIndex == pref.listboxIndex &&
             alsaOutput == pref.alsaOutput &&
+            reclaimFiletypes == pref.reclaimFiletypes &&
+            askReclaimFiletypes == pref.askReclaimFiletypes &&
             true
         );
     }
@@ -267,6 +271,8 @@ class GTKPreferenceWindow : public PreferenceWindow
       void PlayImmediatelyToggle(int active);
       void AllowMultipleToggle(int active);
       void ConvertUnderscoresToggle(int active);
+      void ReclaimTypesToggle(int active);
+      void AskReclaimToggle(int active);
 
       FAContext *GetContext(void) { return m_pContext; }
 };

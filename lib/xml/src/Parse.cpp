@@ -42,7 +42,21 @@ const int iMaxAttrLength = 255;
 const int iMaxValueLength = 1024;
 const int iMaxPCDataLength = 4096;
 
-//AttrMap  oAttrMap; 
+struct EntityDefs
+{
+    char *szEntity;
+    char *szReplacement;
+};
+
+EntityDefs pEntities[] =
+{
+    { "&amp;", "&"},
+    { "&lt;",  "<"},   
+    { "&gt;",  ">"},   
+    { "&apos;",  "'"},   
+    { "&quot;",  "\""},   
+    { "\0", "\0"}
+};
 
 Parse::Parse(void)
 {
@@ -152,6 +166,7 @@ Error Parse::DoParse(void)
             }
             m_iErrorLine += CountNewlines(szData);
             oData = string(szData);
+            UnXMLize(oData);
             eRet = PCData(oData);
             if (IsError(eRet))
             {
@@ -286,4 +301,22 @@ int Parse::CountNewlines(char *szElement)
 int Parse::GetErrorLine(void)
 {
     return m_iErrorLine;
+}
+
+void Parse::UnXMLize(string &oData)
+{
+    string::size_type  pos;
+    EntityDefs        *pEntity;
+    
+    for(pEntity = pEntities; *pEntity->szEntity; pEntity++)
+    {
+        for(;;)
+        {
+            pos = oData.find(string(pEntity->szEntity), 0);
+            if (pos == string::npos)
+               break;
+        
+            oData.replace(pos, strlen(pEntity->szEntity), pEntity->szReplacement);
+        }    
+    }    
 }

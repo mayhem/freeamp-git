@@ -95,7 +95,13 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
         {
 			Close();
             return 1;
-        }    
+        }
+
+        case WM_ENDSESSION:
+        {
+            SaveCurrentPlaylist();
+            break;
+        }
 
         case UWM_DROPURLS:
             filesAreURLs = true;
@@ -1878,7 +1884,7 @@ void MusicBrowserUI::ShowHelp(uint32 topic)
 
     m_context->prefs->GetInstallDirectory(dir, &len);
     oHelpFile = string(dir);
-    oHelpFile += string("\\freeamp.hlp");    
+    oHelpFile += string("\\"BRANDING_HELP_FILE);    
 
     WinHelp(m_hWnd, oHelpFile.c_str(), HELP_CONTEXT, topic);
 }        

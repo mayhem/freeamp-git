@@ -18,7 +18,7 @@
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 	
-	$Id$
+   $Id$
 ____________________________________________________________________________*/
 
 // The debugger can't handle symbols more than 255 characters long.
@@ -35,6 +35,7 @@ ____________________________________________________________________________*/
 #include <commctrl.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <time.h>
 
 #include <sstream>
 #include <set>
@@ -2323,17 +2324,24 @@ static void check_function(void* arg)
         {
             bool newItem = true;
 
-            for(uint32 j = 0; j < count; j++)
+            if(strstr(item->GetCurrentFileLocation().c_str(), "_system_"))
             {
-                lv_item.mask = LVIF_PARAM;
-                lv_item.iItem = j;
-
-                if(ListView_GetItem(ts->hwndList, &lv_item))
+                //newItem = false;
+            }
+            else
+            {
+                for(uint32 j = 0; j < count; j++)
                 {
-                    if((UpdateItem*)lv_item.lParam == item)
+                    lv_item.mask = LVIF_PARAM;
+                    lv_item.iItem = j;
+
+                    if(ListView_GetItem(ts->hwndList, &lv_item))
                     {
-                        newItem = false;
-                        break;
+                        if((UpdateItem*)lv_item.lParam == item)
+                        {
+                            newItem = false;
+                            break;
+                        }
                     }
                 }
             }
@@ -2420,17 +2428,24 @@ static void update_function(void* arg)
         {
             bool newItem = true;
 
-            for(uint32 j = 0; j < count; j++)
+            if(strstr(item->GetCurrentFileLocation().c_str(), "_system_"))
             {
-                lv_item.mask = LVIF_PARAM;
-                lv_item.iItem = j;
-
-                if(ListView_GetItem(ts->hwndList, &lv_item))
+                newItem = false;
+            }
+            else
+            {
+                for(uint32 j = 0; j < count; j++)
                 {
-                    if((UpdateItem*)lv_item.lParam == item)
+                    lv_item.mask = LVIF_PARAM;
+                    lv_item.iItem = j;
+
+                    if(ListView_GetItem(ts->hwndList, &lv_item))
                     {
-                        newItem = false;
-                        break;
+                        if((UpdateItem*)lv_item.lParam == item)
+                        {
+                            newItem = false;
+                            break;
+                        }
                     }
                 }
             }
@@ -2543,14 +2558,17 @@ bool Win32PreferenceWindow::PrefUpdateProc(HWND hwnd,
 
             while(item = um->ItemAt(i++))
             {
-                lv_item.mask = LVIF_PARAM | LVIF_STATE;
-                lv_item.state = 0;
-                lv_item.stateMask = 0;
-                lv_item.iItem = ListView_GetItemCount(hwndList);
-                lv_item.iSubItem = 0;
-                lv_item.lParam = (LPARAM)item;
+                if(!strstr(item->GetCurrentFileLocation().c_str(), "_system_"))
+                {
+                    lv_item.mask = LVIF_PARAM | LVIF_STATE;
+                    lv_item.state = 0;
+                    lv_item.stateMask = 0;
+                    lv_item.iItem = ListView_GetItemCount(hwndList);
+                    lv_item.iSubItem = 0;
+                    lv_item.lParam = (LPARAM)item;
 
-                ListView_InsertItem(hwndList, &lv_item);
+                    ListView_InsertItem(hwndList, &lv_item);
+                }
             }
 
             // Don't want this to be blank on startup
@@ -2674,58 +2692,104 @@ bool Win32PreferenceWindow::PrefUpdateProc(HWND hwnd,
             uint32 localMinorVersion, currentMinorVersion;
             uint32 localRevisionVersion, currentRevisionVersion;
             uint32 localFileVersion, currentFileVersion; 
+            time_t localFileTime, currentFileTime;
             int32 numFields;
             bool currentVersionMoreRecent = false;
             
-            numFields = sscanf(item->GetLocalFileVersion().c_str(),
-                   "%lu.%lu.%lu.%lu",
-                   &localMajorVersion,&localMinorVersion,
-                   &localRevisionVersion,&localFileVersion);
-
-            if(numFields < 4)
-                localFileVersion = 0;
-
-            if(numFields < 3)
-                localRevisionVersion = 0;
-
-            if(numFields < 2)
-                localMinorVersion = 0;
-
-            if(numFields < 1)
-                localMajorVersion = 0;
-            
-            numFields = sscanf(item->GetCurrentFileVersion().c_str(),
-                   "%lu.%lu.%lu.%lu",
-                   &currentMajorVersion,&currentMinorVersion,
-                   &currentRevisionVersion,&currentFileVersion);
-
-            if(numFields < 4)
-                currentFileVersion = 0;
-
-            if(numFields < 3)
-                currentRevisionVersion = 0;
-
-            if(numFields < 2)
-                currentMinorVersion = 0;
-
-            if(numFields < 1)
-                currentMajorVersion = 0;
-
-            // is the version on the server more recent?
-            if( (currentMajorVersion > localMajorVersion) ||
-                (currentMajorVersion == localMajorVersion && 
-                 currentMinorVersion > localMinorVersion) ||
-                (currentMajorVersion == localMajorVersion && 
-                 currentMinorVersion == localMinorVersion &&
-                 currentRevisionVersion > localRevisionVersion) ||
-                (currentMajorVersion == localMajorVersion && 
-                 currentMinorVersion == localMinorVersion &&
-                 currentRevisionVersion == localRevisionVersion &&
-                 currentFileVersion > localFileVersion))
+            if(item->GetLocalFileTime().size())
             {
-                currentVersionMoreRecent = true;
-            }
+                uint32 month, day, year;
+                
+                numFields = sscanf(item->GetLocalFileTime().c_str(),
+                       "%lu/%lu/%lu",&month,&day,&year);
 
+                struct tm fileTime;
+
+                memset(&fileTime, 0x00, sizeof(struct tm));
+
+                fileTime.tm_mon = month;
+                fileTime.tm_mday = day;
+                fileTime.tm_year = year - 1900;
+
+                localFileTime = mktime(&fileTime);
+            }
+            else
+            {
+                numFields = sscanf(item->GetLocalFileVersion().c_str(),
+                       "%lu.%lu.%lu.%lu",
+                       &localMajorVersion,&localMinorVersion,
+                       &localRevisionVersion,&localFileVersion);
+
+                if(numFields < 4)
+                    localFileVersion = 0;
+
+                if(numFields < 3)
+                    localRevisionVersion = 0;
+
+                if(numFields < 2)
+                    localMinorVersion = 0;
+
+                if(numFields < 1)
+                    localMajorVersion = 0;
+            }            
+
+            if(item->GetCurrentFileTime().size())
+            {
+                uint32 month, day, year;
+                
+                numFields = sscanf(item->GetCurrentFileTime().c_str(),
+                       "%lu/%lu/%lu",&month,&day,&year);
+
+                struct tm fileTime;
+
+                memset(&fileTime, 0x00, sizeof(struct tm));
+
+                fileTime.tm_mon = month;
+                fileTime.tm_mday = day;
+                fileTime.tm_year = year - 1900;
+
+                currentFileTime = mktime(&fileTime);
+
+                // is the version on the server more recent?
+                if(currentFileTime > localFileTime)
+                {
+                    currentVersionMoreRecent = true;
+                }
+            }
+            else
+            {
+                numFields = sscanf(item->GetCurrentFileVersion().c_str(),
+                       "%lu.%lu.%lu.%lu",
+                       &currentMajorVersion,&currentMinorVersion,
+                       &currentRevisionVersion,&currentFileVersion);
+
+                if(numFields < 4)
+                    currentFileVersion = 0;
+
+                if(numFields < 3)
+                    currentRevisionVersion = 0;
+
+                if(numFields < 2)
+                    currentMinorVersion = 0;
+
+                if(numFields < 1)
+                    currentMajorVersion = 0;
+
+                // is the version on the server more recent?
+                if( (currentMajorVersion > localMajorVersion) ||
+                    (currentMajorVersion == localMajorVersion && 
+                     currentMinorVersion > localMinorVersion) ||
+                    (currentMajorVersion == localMajorVersion && 
+                     currentMinorVersion == localMinorVersion &&
+                     currentRevisionVersion > localRevisionVersion) ||
+                    (currentMajorVersion == localMajorVersion && 
+                     currentMinorVersion == localMinorVersion &&
+                     currentRevisionVersion == localRevisionVersion &&
+                     currentFileVersion > localFileVersion))
+                {
+                    currentVersionMoreRecent = true;
+                }
+            }            
 
             uint32 uiFlags = ILD_TRANSPARENT;
             RECT rcClip;
@@ -2767,7 +2831,8 @@ bool Win32PreferenceWindow::PrefUpdateProc(HWND hwnd,
 
             rcClip.left += ListView_GetColumnWidth(hwndList, 0);
 
-            displayString = item->GetLocalFileVersion();
+            displayString = (item->GetLocalFileVersion().size() ? 
+                                item->GetLocalFileVersion() : item->GetLocalFileTime());
 
             CalcStringEllipsis(dis->hDC, 
                                displayString, 
@@ -2788,7 +2853,8 @@ bool Win32PreferenceWindow::PrefUpdateProc(HWND hwnd,
         
             rcClip.left += ListView_GetColumnWidth(hwndList, 1);
 
-            displayString = item->GetCurrentFileVersion();
+            displayString = (item->GetCurrentFileVersion().size() ? 
+                                item->GetCurrentFileVersion() : item->GetCurrentFileTime());
 
             CalcStringEllipsis(dis->hDC, 
                                displayString, 

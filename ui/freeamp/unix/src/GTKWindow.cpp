@@ -445,12 +445,20 @@ bool GTKWindow::LButtonDown(void)
 
 void GTKWindow::MouseLeaveCheck(void)
 {
+<<<<<<< GTKWindow.cpp
 /*
     if (gdk_window_at_pointer(NULL, NULL) != mainWindow->window) {
         if (m_bMouseInWindow) 
+=======
+/*
+    if (m_bMouseInWindow) {
+        if (gdk_window_at_pointer(NULL, NULL) != mainWindow->window) {
+            m_bMouseInWindow = false;
+>>>>>>> 1.23.8.1
             MouseHasLeftWindow();
         m_bMouseInWindow = false;
     }
+<<<<<<< GTKWindow.cpp
     else {
         if (!m_bMouseInWindow) 
             MouseHasEnteredWindow();
@@ -473,6 +481,23 @@ void GTKWindow::SetMouseOut(void)
             MouseHasLeftWindow();
         m_bMouseInWindow = false;
     }
+=======
+*/
+}
+
+void GTKWindow::SetMouseIn(void)
+{
+    m_bMouseInWindow = true;
+}
+
+void GTKWindow::SetMouseOut(void)
+{
+    if (!m_bWindowMove) {
+        if (m_bMouseInWindow)
+            MouseHasLeftWindow();
+        m_bMouseInWindow = false;
+    }
+>>>>>>> 1.23.8.1
 }
 
 Error GTKWindow::GetDesktopSize(int32 &iX, int32 &iY)

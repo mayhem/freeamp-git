@@ -255,6 +255,7 @@ class MusicBrowserUI : public UserInterface
     void  RemoveMusicBrowserWindow(MusicBrowserUI *pWindow);
     void  MusicSearchDone();
     void  DisplayBrowserMessage(const char* msg);
+    void  SaveCurrentPlaylist();
 
     // Functions is MusicTree.cpp
     void    InitTree();

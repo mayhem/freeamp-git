@@ -516,6 +516,8 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
          oText = string(pInfo->GetHeadlineMessage());
          m_oHeadlineUrl = string(pInfo->GetHeadlineURL());
          m_pWindow->ControlStringValue(oName, true, oText);
+         oName = string("HeadlineStreamInfo");
+         m_pWindow->ControlStringValue(oName, true, oText);
 
          break;
       }
@@ -958,7 +960,11 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
    }
    if (oControlName == string("ReloadTheme") && eMesg == CM_Pressed)
    {
+       m_pWindow->DecUsageRef();
+       m_pWindow->DecUsageRef();
        ReloadTheme();
+       m_pWindow->IncUsageRef();
+       m_pWindow->IncUsageRef();
        return kError_NoErr;
    }
    if (oControlName == string("Shuffle") && eMesg == CM_Pressed)
@@ -1074,6 +1080,27 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
 #endif
        return kError_NoErr;
    }
+   if (oControlName == string("HeadlineStreamInfo") && eMesg == CM_Pressed)
+   {
+       bool bPlay;
+
+       if (m_oHeadlineUrl.length() == 0)
+          return kError_NoErr;
+
+       m_pContext->prefs->GetPlayImmediately(&bPlay);
+       if (bPlay)
+       {
+           m_pContext->target->AcceptEvent(new Event(CMD_Stop));
+           m_pContext->plm->RemoveAll();
+           m_pContext->plm->AddItem(m_oHeadlineUrl);
+           m_pContext->target->AcceptEvent(new Event(CMD_Play));
+       }
+       else
+           m_pContext->plm->AddItem(m_oHeadlineUrl);
+
+       return kError_NoErr;
+   }
+
    if (oControlName == string("Help") && eMesg == CM_Pressed)
    {
        ShowHelp();
@@ -1158,7 +1185,8 @@ void FreeAmpTheme::InitControls(void)
 
     m_pWindow->ControlStringValue("StreamInfo", true, m_oStreamInfo);
 
-    if (m_pWindow->DoesControlExist("HeadlineInfo") && m_pHeadlines)
+    if ((m_pWindow->DoesControlExist("HeadlineInfo") ||
+         m_pWindow->DoesControlExist("HeadlineStreamInfo")) && m_pHeadlines)
     {
         if (m_pHeadlineGrabber)
         {

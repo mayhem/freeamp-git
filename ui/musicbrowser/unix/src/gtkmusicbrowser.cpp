@@ -1066,8 +1066,10 @@ GTKMusicBrowser::GTKMusicBrowser(FAContext *context, MusicBrowserUI *masterUI,
         bool saveOnExit;
         m_context->prefs->GetSaveCurrentPlaylistOnExit(&saveOnExit);
 
-        if (saveOnExit)
+        if (saveOnExit) 
             LoadPlaylist(playlistURL);
+        else
+            m_currentListName = playlistURL;
     }
     else if (playlistURL != "")
         LoadPlaylist(playlistURL);
@@ -1444,6 +1446,7 @@ Error GTKMusicBrowser::AcceptEvent(Event *e)
                 gdk_threads_leave();
             }
             m_playingindex = temp;
+<<<<<<< gtkmusicbrowser.cpp
             break; } 
         case INFO_MusicCatalogRegenerating: {
             m_bIgnoringMusicCatalogMessages = true;
@@ -1456,6 +1459,20 @@ Error GTKMusicBrowser::AcceptEvent(Event *e)
                 gdk_threads_leave();
             }
             break; }
+=======
+           break; }
+        case INFO_MusicCatalogRegenerating: {
+            m_bIgnoringMusicCatalogMessages = true;
+            break; }
+        case INFO_MusicCatalogDoneRegenerating: {
+            m_bIgnoringMusicCatalogMessages = false;
+            if (isVisible) {
+                gdk_threads_enter();
+                UpdateCatalog();
+                gdk_threads_leave();
+            }
+            break; } 
+>>>>>>> 1.59.2.1.2.4.2.1
         default:
             break;
     }

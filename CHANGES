@@ -1,3 +1,11 @@
+Changes for Linux and Windows version 2.0.6
+--------------------------------------------------------------------
+
+- The update process will now allow us to update system files and
+  files that do not have version info, such as the help files.
+- We squashed the huge memory leak some people were seeing.
+- ShoutCast title streaming is now supported.
+
 Changes for Linux and Windows version 2.0.5
 --------------------------------------------------------------------
 

@@ -62,6 +62,7 @@ class Parse
       virtual Error EndElement(string &oElement) = 0;
       virtual Error PCData(string &oData) = 0;
               int   CountNewlines(char *szElement);
+              void  UnXMLize(string &oData);
 
       string        m_oLastError;
       int           m_iErrorLine; 

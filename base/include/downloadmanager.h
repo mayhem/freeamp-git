@@ -78,6 +78,7 @@ class DownloadItem {
         m_error = kError_NoErr;
         m_bytesTotal = 0;
         m_bytesReceived = 0;
+		m_normalDownload = false;
     }
 
     DownloadItem(const char* src, const char* dest = NULL, const MetaData* metadata = NULL)

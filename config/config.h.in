@@ -47,6 +47,7 @@ ____________________________________________________________________________*/
 #define BRANDING_UPDATE_PATH "/update/freeamp/"
 #define BRANDING_DEFAULT_THEME "FreeAmp.fat"
 #define BRANDING_SHARE_PATH "/../share/freeamp"
+#define BRANDING_APP_NAME "freeamp"
 
 #define FREEAMP_PATH_ENV "FREEAMP_PATH"
 #define FREEAMP_VERSION "2.0.5"

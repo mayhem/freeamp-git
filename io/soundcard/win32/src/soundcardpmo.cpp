@@ -232,12 +232,15 @@ void SoundCardPMO::SetVolume(int32 volume)
     
     dwVal = (volume * (m_dwMaximum - m_dwMinimum) / 100);
 
-	MIXERCONTROLDETAILS_UNSIGNED mxcdVolume = { dwVal };
+	MIXERCONTROLDETAILS_UNSIGNED mxcdVolume[2];
 	MIXERCONTROLDETAILS mxcd;
+    
+    memcpy(&mxcdVolume[0], &dwVal, sizeof(MIXERCONTROLDETAILS_UNSIGNED));
+    memcpy(&mxcdVolume[1], &dwVal, sizeof(MIXERCONTROLDETAILS_UNSIGNED));
     
 	mxcd.cbStruct = sizeof(MIXERCONTROLDETAILS);
 	mxcd.dwControlID = m_dwVolumeControlID;
-	mxcd.cChannels = 1;
+	mxcd.cChannels = 2;
 	mxcd.cMultipleItems = 0;
 	mxcd.cbDetails = sizeof(MIXERCONTROLDETAILS_UNSIGNED);
 	mxcd.paDetails = &mxcdVolume;

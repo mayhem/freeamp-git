@@ -226,93 +226,43 @@ bool UpdateManager::IsUpdateAvailable()
             int32 numFields;
 
             item = *i;
-            
-            numFields = sscanf(item->GetLocalFileVersion().c_str(),
-                   "%lu.%lu.%lu.%lu", 
-                   &localMajorVersion,&localMinorVersion,
-                   &localRevisionVersion, &localFileVersion);
 
-            if(numFields < 4)
-                localFileVersion = 0;
-
-            if(numFields < 3)
-                localRevisionVersion = 0;
-
-            if(numFields < 2)
-                localMinorVersion = 0;
-
-            if(numFields < 1)
-                localMajorVersion = 0;
-            
-            numFields = sscanf(item->GetCurrentFileVersion().c_str(),
-                   "%lu.%lu.%lu.%lu", 
-                   &currentMajorVersion,&currentMinorVersion,
-                   &currentRevisionVersion, &currentFileVersion);
-
-            if(numFields < 4)
-                currentFileVersion = 0;
-
-            if(numFields < 3)
-                currentRevisionVersion = 0;
-
-            if(numFields < 2)
-                currentMinorVersion = 0;
-
-            if(numFields < 1)
-                currentMajorVersion = 0;
-
-            // is the version on the server more recent?
-            if( (currentMajorVersion > localMajorVersion) ||
-                (currentMajorVersion == localMajorVersion && 
-                 currentMinorVersion > localMinorVersion) ||
-                (currentMajorVersion == localMajorVersion && 
-                 currentMinorVersion == localMinorVersion &&
-                 currentRevisionVersion > localRevisionVersion) ||
-                (currentMajorVersion == localMajorVersion && 
-                 currentMinorVersion == localMinorVersion &&
-                 currentRevisionVersion == localRevisionVersion &&
-                 currentFileVersion > localFileVersion))
+            if(item->GetLocalFileTime().size())
             {
-                result = true;
-                break;
+                time_t localFileTime, currentFileTime;
+                uint32 month, day, year;
+                
+                numFields = sscanf(item->GetLocalFileTime().c_str(),
+                       "%lu/%lu/%lu",&month,&day,&year);
+
+                struct tm fileTime;
+
+                memset(&fileTime, 0x00, sizeof(struct tm));
+
+                fileTime.tm_mon = month;
+                fileTime.tm_mday = day;
+                fileTime.tm_year = year - 1900;
+
+                localFileTime = mktime(&fileTime);
+
+                numFields = sscanf(item->GetCurrentFileTime().c_str(),
+                       "%lu/%lu/%lu",&month,&day,&year);
+
+                fileTime.tm_mon = month;
+                fileTime.tm_mday = day;
+                fileTime.tm_year = year - 1900;
+
+                currentFileTime = mktime(&fileTime);
+
+                // is the version on the server more recent?
+                if(currentFileTime > localFileTime)
+                {
+                    result = true;
+                    break;
+                }
             }
-        }
-    }
-
-    return result;
-}
-
-Error UpdateManager::UpdateComponents(UMCallBackFunction function,
-                                      void* cookie)
-{
-    Error result = kError_AlreadyUpdating;
-    
-    if(m_mutex.Acquire(0))
-    {
-        uint32 downloadCount = 0;
-
-        // make sure we have latest info
-        //result = InternalRetrieveLatestVersionInfo(function, cookie);
-        result = kError_NoErr;
-
-        if(IsntError(result))
-        {
-            UpdateItem* item;
-
-            vector<UpdateItem*>::iterator i = m_itemList.begin();
-
-            // go thru list of components and see if 
-            // there are newer versions
-            for (; i != m_itemList.end(); i++)
+            else
             {
-                uint32 localMajorVersion, currentMajorVersion;
-                uint32 localMinorVersion, currentMinorVersion;
-                uint32 localRevisionVersion, currentRevisionVersion;
-                uint32 localFileVersion, currentFileVersion; 
-                int32 numFields;
-
-                item = *i;
-            
                 numFields = sscanf(item->GetLocalFileVersion().c_str(),
                        "%lu.%lu.%lu.%lu", 
                        &localMajorVersion,&localMinorVersion,
@@ -358,6 +308,136 @@ Error UpdateManager::UpdateComponents(UMCallBackFunction function,
                      currentMinorVersion == localMinorVersion &&
                      currentRevisionVersion == localRevisionVersion &&
                      currentFileVersion > localFileVersion))
+                {
+                    result = true;
+                    break;
+                }
+            }            
+        }
+    }
+
+    return result;
+}
+
+Error UpdateManager::UpdateComponents(UMCallBackFunction function,
+                                      void* cookie)
+{
+    Error result = kError_AlreadyUpdating;
+    
+    if(m_mutex.Acquire(0))
+    {
+        uint32 downloadCount = 0;
+
+        // make sure we have latest info
+        //result = InternalRetrieveLatestVersionInfo(function, cookie);
+        result = kError_NoErr;
+
+        if(IsntError(result))
+        {
+            UpdateItem* item;
+
+            vector<UpdateItem*>::iterator i = m_itemList.begin();
+
+            // go thru list of components and see if 
+            // there are newer versions
+            for (; i != m_itemList.end(); i++)
+            {
+                bool currentVersionMoreRecent = false;
+                uint32 localMajorVersion, currentMajorVersion;
+                uint32 localMinorVersion, currentMinorVersion;
+                uint32 localRevisionVersion, currentRevisionVersion;
+                uint32 localFileVersion, currentFileVersion; 
+                int32 numFields;
+
+                item = *i;
+
+                if(item->GetLocalFileTime().size())
+                {
+                    time_t localFileTime, currentFileTime;
+                    uint32 month, day, year;
+                
+                    numFields = sscanf(item->GetLocalFileTime().c_str(),
+                           "%lu/%lu/%lu",&month,&day,&year);
+
+                    struct tm fileTime;
+
+                    memset(&fileTime, 0x00, sizeof(struct tm));
+
+                    fileTime.tm_mon = month;
+                    fileTime.tm_mday = day;
+                    fileTime.tm_year = year - 1900;
+
+                    localFileTime = mktime(&fileTime);
+
+                    numFields = sscanf(item->GetCurrentFileTime().c_str(),
+                           "%lu/%lu/%lu",&month,&day,&year);
+
+                    fileTime.tm_mon = month;
+                    fileTime.tm_mday = day;
+                    fileTime.tm_year = year - 1900;
+
+                    currentFileTime = mktime(&fileTime);
+
+                    // is the version on the server more recent?
+                    if(currentFileTime > localFileTime)
+                    {
+                        currentVersionMoreRecent = true;
+                    }
+                }
+                else
+                {
+                    numFields = sscanf(item->GetLocalFileVersion().c_str(),
+                           "%lu.%lu.%lu.%lu", 
+                           &localMajorVersion,&localMinorVersion,
+                           &localRevisionVersion, &localFileVersion);
+
+                    if(numFields < 4)
+                        localFileVersion = 0;
+
+                    if(numFields < 3)
+                        localRevisionVersion = 0;
+
+                    if(numFields < 2)
+                        localMinorVersion = 0;
+
+                    if(numFields < 1)
+                        localMajorVersion = 0;
+            
+                    numFields = sscanf(item->GetCurrentFileVersion().c_str(),
+                           "%lu.%lu.%lu.%lu", 
+                           &currentMajorVersion,&currentMinorVersion,
+                           &currentRevisionVersion, &currentFileVersion);
+
+                    if(numFields < 4)
+                        currentFileVersion = 0;
+
+                    if(numFields < 3)
+                        currentRevisionVersion = 0;
+
+                    if(numFields < 2)
+                        currentMinorVersion = 0;
+
+                    if(numFields < 1)
+                        currentMajorVersion = 0;
+
+                    // is the version on the server more recent?
+                    if( (currentMajorVersion > localMajorVersion) ||
+                        (currentMajorVersion == localMajorVersion && 
+                         currentMinorVersion > localMinorVersion) ||
+                        (currentMajorVersion == localMajorVersion && 
+                         currentMinorVersion == localMinorVersion &&
+                         currentRevisionVersion > localRevisionVersion) ||
+                        (currentMajorVersion == localMajorVersion && 
+                         currentMinorVersion == localMinorVersion &&
+                         currentRevisionVersion == localRevisionVersion &&
+                         currentFileVersion > localFileVersion))
+                    {
+                        currentVersionMoreRecent = true;
+                    }
+                }
+                
+
+                if(currentVersionMoreRecent)
                 {
                     result = DownloadItem(item, function, cookie);
 
@@ -1431,8 +1511,9 @@ Error UpdateManager::BeginElement(string &element, AttrMap &attrMap)
 
         item->SetCurrentFileVersion(attrMap["VERSION"]);
         item->SetFileDescription(attrMap["DESCRIPTION"]);
+        item->SetCurrentFileTime(attrMap["DATE"]);
 
-        if(attrMap.find("NAME") != attrMap.end())
+        /*if(attrMap.find("NAME") != attrMap.end())
             cout << "Name: " << attrMap["NAME"] << endl;
 
         if(attrMap.find("DESCRIPTION") != attrMap.end())
@@ -1442,7 +1523,7 @@ Error UpdateManager::BeginElement(string &element, AttrMap &attrMap)
             cout << "Version: " << attrMap["VERSION"] << endl;
 
         if(attrMap.find("LOCATION") != attrMap.end())
-            cout << "Location: " << attrMap["LOCATION"] << endl;
+            cout << "Location: " << attrMap["LOCATION"] << endl;*/
     }
 
     return kError_NoErr;

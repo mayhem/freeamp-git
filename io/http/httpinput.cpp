@@ -117,6 +117,8 @@ HttpInput::HttpInput(FAContext *context):
     m_szError = new char[iMaxErrorLen];
     m_pTitleStream = NULL;
     m_bUseBufferReduction = true;
+    m_iMetaDataInterval = 0;
+    m_uBytesReceived = 0;
 
     m_pContext->prefs->GetPrefBoolean(kUseProxyPref, &m_bUseProxy);
     if (m_bUseProxy)
@@ -403,12 +405,14 @@ Error HttpInput::Open(void)
         sprintf(szQuery, "GET %s HTTP/1.0\n"
                          "Host: %s\n"
                          "Accept: */*\n" 
+                         "icy-metadata:1\n" 
                          "User-Agent: FreeAmp/%s\n", 
                          szFile, szLocalName, FREEAMP_VERSION);
     else
         sprintf(szQuery, "GET / HTTP/1.0\n"
                          "Host: %s\n"
                          "Accept: */*\n" 
+                         "icy-metadata:1\n" 
                          "User-Agent: FreeAmp/%s\n", 
                          szLocalName, FREEAMP_VERSION);
 
@@ -556,6 +560,13 @@ Error HttpInput::Open(void)
             szStreamUrl = new char[strlen(pPtr) + 1];
             sscanf(pPtr, " %[^\r\n]", szStreamUrl);
         }
+
+        pPtr = strstr(pHeaderData, "icy-metaint");
+        if (pPtr)
+        {
+            pPtr += strlen("icy-metaint:");
+            m_iMetaDataInterval = atoi(pPtr);
+        }
         
         // If this is a stream from a web server and not a shout/ice
         // server we don't want to use buffer reduction when the
@@ -566,17 +577,28 @@ Error HttpInput::Open(void)
         
         if (szStreamName && strlen(szStreamName))
         {
-           StreamInfoEvent *e;
+           PlaylistItemUpdatedEvent *e;
+           PlaylistItem *pItem;
+         
+           pItem = m_pContext->plm->ItemAt(m_pContext->plm->GetCurrentIndex());
+           if (pItem && szStreamName)
+           {
+               MetaData oData;
+               
+               oData = pItem->GetMetaData();
+               oData.SetTitle(szStreamName);
+               pItem->SetMetaData(&oData);
            
-           e = new StreamInfoEvent(szStreamName ? szStreamName : (char *)"", 
-                                   szStreamUrl ? szStreamUrl : (char *)"");
-           m_pTarget->AcceptEvent(e);
+               e = new PlaylistItemUpdatedEvent(pItem, m_pContext->plm);
+               m_pTarget->AcceptEvent(e);
+           }
            delete szStreamUrl;
         }   
 
         pPtr = strstr(pHeaderData, "x-audiocast-udpport:");
         if (pPtr)
         {
+             //Debug_v("x-audiocast-udpport: %s", atoi(pPtr));
              if (m_pTitleStream)
                 m_pTitleStream->Run(sAddr.sin_addr, atoi(pPtr + 20));
         }
@@ -588,6 +610,7 @@ Error HttpInput::Open(void)
             m_pOutputBuffer->BeginWrite(pData, iRead);
             memcpy(pData, (char *)pHeaderData + strlen(pHeaderData) + 1, iRead);
             m_pOutputBuffer->EndWrite(iRead);
+            m_uBytesReceived = iRead;
         }    
     }
 
@@ -661,11 +684,12 @@ void HttpInput::StartWorkerThread(void *pVoidBuffer)
 
 void HttpInput::WorkerThread(void)
 {
-   int             iRead, iRet, iReadSize = 1024;
+   int             iRead, iRet, iReadSize = 1024, iMaxReadBytes;
    void           *pBuffer;
    Error           eError;
    fd_set          sSet;
    struct timeval  sTv;
+   char            cNumBlocks;
 
    static int      iSize = 0;
 
@@ -690,14 +714,50 @@ void HttpInput::WorkerThread(void)
       iRet = select(m_hHandle + 1, &sSet, NULL, NULL, &sTv);
       if (!iRet)
       {
-		   usleep(10000);
-         continue;
+          usleep(10000);
+          continue;
       }
         
       eError = m_pOutputBuffer->BeginWrite(pBuffer, iReadSize);
       if (eError == kError_NoErr)
       {
-          iRead = recv(m_hHandle, (char *)pBuffer, iReadSize, 0);
+          if (m_iMetaDataInterval > 0)
+          {
+              iMaxReadBytes = min(iReadSize, m_iMetaDataInterval-m_uBytesReceived);
+              if (iMaxReadBytes == 0)
+              {
+                  iRead = recv(m_hHandle, &cNumBlocks, 1, 0);
+                  if (cNumBlocks > 0)
+                  {
+                     char *pMeta, *pPtr, *pNull;
+
+                     pMeta = new char[cNumBlocks * 16 + 1];
+                     recv(m_hHandle, pMeta, cNumBlocks * 16, 0); 
+                     pMeta[cNumBlocks * 16] = 0;
+
+                     pPtr = strstr(pMeta, "StreamTitle=");
+                     if (pPtr)
+                     {
+                         pPtr += strlen("StreamTitle='");
+                         pNull = strchr(pPtr, '\'');
+                         if (pNull)
+                         {
+                             *pNull = 0;
+                             m_pTarget->AcceptEvent(new StreamInfoEvent(pPtr, ""));
+                         }
+
+                     }
+                     delete pMeta;
+                  }
+
+                  iMaxReadBytes = iReadSize;
+                  m_uBytesReceived = 0;
+              }
+          }
+          else
+              iMaxReadBytes = iReadSize;
+              
+          iRead = recv(m_hHandle, (char *)pBuffer, iMaxReadBytes, 0);
           if (iRead <= 0)
           {
              m_pOutputBuffer->SetEndOfStream(true);
@@ -705,6 +765,7 @@ void HttpInput::WorkerThread(void)
              break;
           }
           iSize += iRead;
+          m_uBytesReceived += iRead;
 
           if (m_fpSave)
           {
