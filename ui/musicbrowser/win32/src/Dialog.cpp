@@ -779,7 +779,7 @@ BOOL MusicBrowserUI::SetCursor(int hitTest, int mouseMsg)
 {
     BOOL result = FALSE;
 
-    if(m_overSplitter || m_trackSplitter && hitTest == HTCLIENT)
+    if((m_overSplitter || m_trackSplitter) && hitTest == HTCLIENT)
     {
         ::SetCursor(m_hSplitterCursor);
         result = TRUE;

@@ -123,13 +123,39 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             lv_item.cchTextMax = 2;
             lv_item.lParam = NULL;
 
+            /*
             // Item index
+            ListView_GetItemText(hwndList, dis->itemID, 0, buf, 1024);
+            displayString = buf;
+
+            
+            CalcStringEllipsis(dis->hDC, 
+                               displayString, 
+                               ListView_GetColumnWidth(hwndList, 0) - (cxImage + 1));
+
+            ExtTextOut( dis->hDC, 
+                        rcClip.left + cxImage + 2, rcClip.top + 1, 
+                        ETO_CLIPPED | ETO_OPAQUE,
+                        &rcClip, 
+                        displayString.c_str(),
+                        displayString.size(),
+                        NULL);
+            
+
+            
+
+            // Move over to the next column
+            rcClip.left += ListView_GetColumnWidth(hwndList, 0);
+
+            */
+
+            // Title
             ListView_GetItemText(hwndList, dis->itemID, 0, buf, 1024);
             displayString = buf;
 
             CalcStringEllipsis(dis->hDC, 
                                displayString, 
-                               ListView_GetColumnWidth(hwndList, 0) - (cxImage + 1));
+                               ListView_GetColumnWidth(hwndList, 0) - kPrePadding);
 
             ExtTextOut( dis->hDC, 
                         rcClip.left + cxImage + 2, rcClip.top + 1, 
@@ -152,7 +178,7 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             // Move over to the next column
             rcClip.left += ListView_GetColumnWidth(hwndList, 0);
 
-            // Title
+            // Artist
             ListView_GetItemText(hwndList, dis->itemID, 1, buf, 1024);
             displayString = buf;
 
@@ -171,8 +197,9 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             // Move over to the next column
             rcClip.left += ListView_GetColumnWidth(hwndList, 1);
 
-            // Artist
+            // Album
             ListView_GetItemText(hwndList, dis->itemID, 2, buf, 1024);
+
             displayString = buf;
 
             CalcStringEllipsis(dis->hDC, 
@@ -190,7 +217,7 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             // Move over to the next column
             rcClip.left += ListView_GetColumnWidth(hwndList, 2);
 
-            // Album
+            // Length
             ListView_GetItemText(hwndList, dis->itemID, 3, buf, 1024);
 
             displayString = buf;
@@ -209,26 +236,6 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
 
             // Move over to the next column
             rcClip.left += ListView_GetColumnWidth(hwndList, 3);
-
-            // Length
-            ListView_GetItemText(hwndList, dis->itemID, 4, buf, 1024);
-
-            displayString = buf;
-
-            CalcStringEllipsis(dis->hDC, 
-                               displayString, 
-                               ListView_GetColumnWidth(hwndList, 4) - kPrePadding);
-
-            ExtTextOut( dis->hDC, 
-                        rcClip.left + kPrePadding, rcClip.top + 1, 
-                        ETO_CLIPPED | ETO_OPAQUE,
-                        &rcClip, 
-                        displayString.c_str(),
-                        displayString.size(),
-                        NULL);
-
-            // Move over to the next column
-            rcClip.left += ListView_GetColumnWidth(hwndList, 4);
 
 
             // If we changed the colors for the selected item, undo it
@@ -261,39 +268,44 @@ void MusicBrowserUI::InitList(void)
     RECT      sRect;
     
     ListView_DeleteAllItems(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX));
-    GetWindowRect(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), &sRect);
+    GetClientRect(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), &sRect);
 
     lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT;
     lvc.fmt = LVCFMT_RIGHT; // right align column
 
+    /*
     lvc.pszText = "#";
     lvc.cchTextMax = strlen(lvc.pszText);
     lvc.iSubItem = 0;
     lvc.cx = (sRect.right-sRect.left)/8; // width of column in pixels
     ListView_InsertColumn(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), 0, &lvc);
+    */
 
     lvc.fmt = LVCFMT_LEFT; // left align column
 
+    int32 remainder = (sRect.right-sRect.left - 55)%3;
+
     lvc.pszText = "Title";
     lvc.cchTextMax = strlen(lvc.pszText);
-    lvc.iSubItem = 1;
-    lvc.cx = (sRect.right-sRect.left)*3/8; // width of column in pixels
+    lvc.iSubItem = 0;
+    lvc.cx = (sRect.right-sRect.left - 55)/3; // width of column in pixels
     ListView_InsertColumn(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), 1, &lvc);
     
     lvc.pszText = "Artist";
     lvc.cchTextMax = strlen(lvc.pszText);
-    lvc.iSubItem = 2;
+    lvc.iSubItem = 1;
     ListView_InsertColumn(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), 2, &lvc);
 
     lvc.pszText = "Album";
     lvc.cchTextMax = strlen(lvc.pszText);
-    lvc.iSubItem = 3;
+    lvc.iSubItem = 2;
     ListView_InsertColumn(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), 3, &lvc);
 
+    
     lvc.pszText = "Length";
-    lvc.cx = ((sRect.right-sRect.left)/4) - 3; // width of column in pixels
+    lvc.cx = 55 + remainder;//((sRect.right-sRect.left)/4) - 3; // width of column in pixels
     lvc.cchTextMax = strlen(lvc.pszText);
-    lvc.iSubItem = 4;
+    lvc.iSubItem = 3;
     ListView_InsertColumn(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), 4, &lvc);
 }
 
@@ -425,10 +437,11 @@ void MusicBrowserUI::UpdatePlaylistList(void)
     sItem.state = sItem.stateMask = 0;
     for(i = 0; pItem = m_oPlm->ItemAt(i); i++)
     {
-        sprintf(szText, "%d", i + 1);
+        //sprintf(szText, "%d", i + 1);
+
         sItem.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM;
-        sItem.pszText = szText;
-        sItem.cchTextMax = strlen(szText);
+        sItem.pszText = (char *)pItem->GetMetaData().Title().c_str();
+        sItem.cchTextMax = pItem->GetMetaData().Title().length();
         sItem.iSubItem = 0;
         sItem.iItem = i;
         sItem.lParam = i;
@@ -437,21 +450,15 @@ void MusicBrowserUI::UpdatePlaylistList(void)
         ListView_InsertItem(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), &sItem);
 
         sItem.mask = LVIF_TEXT;
-        sItem.pszText = (char *)pItem->GetMetaData().Title().c_str();
-        sItem.cchTextMax = pItem->GetMetaData().Title().length();
-        sItem.iSubItem = 1;
-        ListView_SetItem(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), &sItem);
-
-        sItem.mask = LVIF_TEXT;
         sItem.pszText = (char *)pItem->GetMetaData().Artist().c_str();
         sItem.cchTextMax = pItem->GetMetaData().Artist().length();
-        sItem.iSubItem = 2;
+        sItem.iSubItem = 1;
         ListView_SetItem(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), &sItem);
 
         sItem.mask = LVIF_TEXT;
         sItem.pszText = (char *)pItem->GetMetaData().Album().c_str();
         sItem.cchTextMax = pItem->GetMetaData().Album().length();
-        sItem.iSubItem = 3;
+        sItem.iSubItem = 2;
         ListView_SetItem(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), &sItem);
 
         if (pItem->GetMetaData().Time() != 0)
@@ -460,7 +467,7 @@ void MusicBrowserUI::UpdatePlaylistList(void)
             strcpy(szText, "Unknown");
         sItem.pszText = szText;
         sItem.cchTextMax = strlen(szText);
-        sItem.iSubItem = 4;
+        sItem.iSubItem = 3;
         ListView_SetItem(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), &sItem);
     }
 
