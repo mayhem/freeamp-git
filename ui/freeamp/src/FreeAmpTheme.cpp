@@ -997,7 +997,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
 
        m_pWindow->ControlIntValue(oControlName, false, iPos);
        m_eq->ChangeValue(atoi(oControlName.c_str() + 2), iPos); 
-       sprintf(szText, "%d db", ((iPos - 50) * 2) / 3);
+       sprintf(szText, "%d db", ((iPos - 50) * 2) / 5);
        oDesc = string(szText);
        m_pWindow->ControlStringValue(oName, true, oDesc);
                                 
