@@ -423,8 +423,8 @@ bool MusicCatalog::CaseCompare(string s1, string s2)
 
 void MusicCatalog::GenerateSignature(PlaylistItem *track)
 {
-	// RAK: This line causes a crash every time!
-    //m_sigs->insert(track);
+    if (m_context->aps->GetCurrentProfileName() != "")
+        m_sigs->insert(track);
 }
 
 Error MusicCatalog::AddSong(const char *url)
@@ -1252,6 +1252,12 @@ Error MusicCatalog::AcceptEvent(Event *e)
                     }
                 }
                 data->SetGUID(GUID.c_str());
+
+                FAMetaUnit faTemp(data, url.c_str());
+                int nRes = m_context->aps->APSFillMetaData(&faTemp);
+                if (nRes == 0) 
+                    faTemp.GetMetaData(data);
+
                 WriteMetaDataToDatabase(url.c_str(), (*data));
                 m_database->Sync();
                 delete data;

@@ -1293,6 +1293,7 @@ void
 Player::
 GenerateSigsWork(set<PlaylistItem *> *items)
 {
+    cout << "Generating signatures for " << items->size() << " tracks.\n";
     set<PlaylistItem *>::iterator i = items->begin();
     for (; i != items->end(); i++) 
     {
@@ -2325,5 +2326,6 @@ void Player::synclog_timer(void* arg)
 
 void Player::SyncLog()
 {
+cout << "sync!\n";
     m_context->aps->SyncLog();
 }
