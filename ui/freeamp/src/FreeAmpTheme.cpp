@@ -164,8 +164,6 @@ void FreeAmpTheme::WorkerThread(void)
     Error  eRet;
     int32  iValue;
 
-    Debug_v("UI Theme: %d", GetCurrentThreadId());
-
     m_pContext->prefs->GetTimeDisplay(&iValue);
     if (iValue)
        m_eTimeDisplayState = kTimeRemaining;

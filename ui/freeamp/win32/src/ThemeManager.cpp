@@ -150,12 +150,6 @@ Error ThemeManager::UseTheme(string &oThemeFile)
     string oThemePath;
 
     _splitpath(oThemeFile.c_str(), NULL, NULL, dir, NULL);
-//    if (strcmp(dir, m_oCurrentTheme.c_str()) == 0)
-//    {
-//       Debug_v("Use same theme");
-//       return kError_NoErr;
-//    }   
-
     m_pContext->prefs->SetThemePath((char *)oThemeFile.c_str());
     if (oThemeFile == m_oDevelTheme)
         m_oCurrentTheme = THEME_IN_DEVEL;
