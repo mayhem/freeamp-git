@@ -1815,8 +1815,14 @@ Player::
 Play(Event *pEvent)
 {
     const PlaylistItem               *pItem;
-
-    if (m_playerState == PlayerState_Playing)
+	
+	if ((m_playerState == PlayerState_Playing) && (pEvent->Type() == PlayerState_Playing)) 
+	{	// ignore double Playing event
+		delete pEvent;
+		return;
+	}
+    
+	if (m_playerState == PlayerState_Playing)
     {
        delete m_pmo;
        m_pmo = NULL;
