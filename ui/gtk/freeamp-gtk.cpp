@@ -67,25 +67,31 @@ GtkWidget *window;
 GtkWidget *p_button_play;
 GtkWidget *p_button_pause;
 GtkWidget *p_button_quit;
+GtkWidget *p_button_stop;
+GtkWidget *p_button_next;
+GtkWidget *p_button_prev;
 
 bool playing = false;
 
 void button_general (GtkWidget *widget, gpointer data) {
     switch ((int32)data) {
 	case 1:
-	    if (!playing) {
-		g_pGtkUI->m_playerEQ->AcceptEvent(new Event(CMD_Play));
-		playing = true;
-	    } else {
-		g_pGtkUI->m_playerEQ->AcceptEvent(new Event(CMD_Stop));
-		playing = false;
-	    }
+	    g_pGtkUI->m_playerEQ->AcceptEvent(new Event(CMD_Play));
 	    break;
 	case 2:
 	    g_pGtkUI->m_playerEQ->AcceptEvent(new Event(CMD_TogglePause));
 	    break;
 	case 3:
 	    gtk_main_quit(); // causes gtkServiceThread to exit, causing a quitplayer event to be sent to player
+	    break;
+	case 4:
+	    g_pGtkUI->m_playerEQ->AcceptEvent(new Event(CMD_Stop));
+	    break;
+	case 5:
+	    g_pGtkUI->m_playerEQ->AcceptEvent(new Event(CMD_NextMediaPiece));
+	    break;
+	case 6:
+	    g_pGtkUI->m_playerEQ->AcceptEvent(new Event(CMD_PrevMediaPiece));
 	    break;
 	default:
 	    g_print("don't know what to do with %d\n",(int32) data);
@@ -119,6 +125,9 @@ void GtkUI::Init() {
     p_button_play = gtk_button_new_with_label ("Play");
     p_button_pause = gtk_button_new_with_label ("Pause");
     p_button_quit = gtk_button_new_with_label ("Quit");
+    p_button_stop = gtk_button_new_with_label ("Stop");
+    p_button_next = gtk_button_new_with_label ("Next");
+    p_button_prev = gtk_button_new_with_label ("Prev");
 
     gtk_signal_connect (GTK_OBJECT (p_button_play), "clicked",
 			GTK_SIGNAL_FUNC (button_general), (gpointer)1);
@@ -129,6 +138,15 @@ void GtkUI::Init() {
     gtk_signal_connect (GTK_OBJECT (p_button_quit), "clicked",
 			GTK_SIGNAL_FUNC (button_general), (gpointer)3);
 
+    gtk_signal_connect (GTK_OBJECT (p_button_stop), "clicked",
+			GTK_SIGNAL_FUNC (button_general), (gpointer)4);
+
+    gtk_signal_connect (GTK_OBJECT (p_button_next), "clicked",
+			GTK_SIGNAL_FUNC (button_general), (gpointer)5);
+
+    gtk_signal_connect (GTK_OBJECT (p_button_prev), "clicked",
+			GTK_SIGNAL_FUNC (button_general), (gpointer)6);
+
     theBox = gtk_hbox_new(FALSE,0);
     gtk_container_add(GTK_CONTAINER (window), theBox);
     
@@ -136,11 +154,17 @@ void GtkUI::Init() {
 
     gtk_box_pack_start(GTK_BOX(theBox),p_button_play, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(theBox),p_button_pause, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(theBox),p_button_stop, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(theBox),p_button_prev, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(theBox),p_button_next, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(theBox),p_button_quit, TRUE, TRUE, 0);
 
     /* and the window */
     gtk_widget_show (p_button_play);
     gtk_widget_show (p_button_pause);
+    gtk_widget_show (p_button_stop);
+    gtk_widget_show (p_button_prev);
+    gtk_widget_show (p_button_next);
     gtk_widget_show (p_button_quit);
     
     gtk_widget_show (theBox);
@@ -180,17 +204,17 @@ int32 GtkUI::AcceptEvent(Event *e) {
 		m_playerEQ->AcceptEvent(e);
 		break; }
 	    case INFO_MediaInfo: {
-		//MediaInfoEvent *pmvi = (MediaInfoEvent *)e;
-		//if (pmvi) {
-		//    cout << "Playing: " << pmvi->m_songTitle << endl;
-		//    if (pmvi->m_tagInfo.m_containsInfo) {
-		//	cout << "Title  : " << pmvi->m_tagInfo.m_songName << endl;
-		//	cout << "Artist : " << pmvi->m_tagInfo.m_artist << endl;
-		//	cout << "Album  : " << pmvi->m_tagInfo.m_album << endl;
-		//	cout << "Year   : " << pmvi->m_tagInfo.m_year << endl;
-		//	cout << "Comment: " << pmvi->m_tagInfo.m_comment << endl;
-		//    }
-		//}
+		MediaInfoEvent *pmvi = (MediaInfoEvent *)e;
+		if (pmvi) {
+		    cout << "Playing: " << pmvi->m_songTitle << endl;
+		    if (pmvi->m_tagInfo.m_containsInfo) {
+			cout << "Title  : " << pmvi->m_tagInfo.m_songName << endl;
+			cout << "Artist : " << pmvi->m_tagInfo.m_artist << endl;
+			cout << "Album  : " << pmvi->m_tagInfo.m_album << endl;
+			cout << "Year   : " << pmvi->m_tagInfo.m_year << endl;
+			cout << "Comment: " << pmvi->m_tagInfo.m_comment << endl;
+		    }
+		}
 		break; }
 	    default:
 		break;
