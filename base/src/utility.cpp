@@ -332,7 +332,8 @@ Error FilePathToURL(const char* path, char* url, uint32* length)
         int32 extra = 0;
 
 #ifdef WIN32
-         if(path[0] == '\\')
+         // is this relative or network path
+         if(path[0] == '\\' && path[1] != '\\') 
          {
              extra = 2;
          }

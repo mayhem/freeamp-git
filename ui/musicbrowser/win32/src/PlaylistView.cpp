@@ -753,8 +753,8 @@ void MusicBrowserUI::OpenPlaylist(void)
     {
         string playlist = sOpen.lpstrFile;
         
-        m_context->browser->m_catalog->AddPlaylist(sOpen.lpstrFile);
-        InitTree();
+        //m_context->browser->m_catalog->AddPlaylist(sOpen.lpstrFile);
+        //InitTree();
         //FillPlaylistCombo();
         LoadPlaylist(playlist);
     }
