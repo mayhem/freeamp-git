@@ -101,7 +101,7 @@ void MusicBrowserUI::AskOptIn(void)
                          MB_YESNO|MB_ICONSTOP);
 
     if (ret == IDYES)
-        m_context->target->AcceptEvent(new ShowPreferencesEvent(6));
+        m_context->target->AcceptEvent(new ShowPreferencesEvent(7));
 }
 
 void MusicBrowserUI::StillNeedSignature(void)
@@ -140,21 +140,23 @@ void MusicBrowserUI::SubmitPlaylistEvent(void)
 
     GetSelectedMusicTreeItems(&items);
 
-    PlaylistItem* pPlaylistItem = NULL;
-       
-   if (items.empty())
-   {
-       // fill the vector with the current playlist;
-       int nCount = m_plm->CountItems();
-       for (int i = 0; i < nCount; i++)
-       {
-           pPlaylistItem = m_plm->ItemAt(i);
-           if (pPlaylistItem != NULL)
-           {
-               items.push_back(pPlaylistItem);
-           }
-       }
-   }
+	if (items.empty())
+	    GetSelectedPlaylistItems(&items);
+
+    PlaylistItem* pPlaylistItem = NULL;   
+    if (items.empty())
+    {
+        // fill the vector with the current playlist;
+        int nCount = m_plm->CountItems();
+        for (int i = 0; i < nCount; i++)
+        {
+            pPlaylistItem = m_plm->ItemAt(i);
+            if (pPlaylistItem != NULL)
+            {
+                items.push_back(pPlaylistItem);
+            }
+		} 
+    }
 
    vector<PlaylistItem*>::iterator i;
 
@@ -171,7 +173,12 @@ void MusicBrowserUI::SubmitPlaylistEvent(void)
        uint32 nResponse = 0;
 
        nResponse = pInterface->APSSubmitPlaylist(&InputPlaylist); 
-        // call the GetPlaylist function to generate a playlist
+   }
+   else {
+      string caption = "Learn Playlist Error";
+      string message = "In order to train the Relatable Engine, you need to have tracks selected in the My Music tree, have tracks selected in the playlist, or just have an active playlist.  You don't have any of this right now, so the Relatable Engine has nothing to learn.";
+
+      MessageBox(m_hWnd, message.c_str(), caption.c_str(), MB_OK|MB_ICONSTOP);
    }
 }
 
@@ -236,8 +243,11 @@ void MusicBrowserUI::GenPlaylistEvent(vector<PlaylistItem*>* pSeed)
                                                    &ResultPlaylist);
     }
 
+	bool messageError = true;
+
     if (nResponse == APS_NOERROR) {
         if (ResultPlaylist.Size() > 0) {
+			messageError = false;
             vector<string> newitems;
             string strTemp;
             string strFilename;
@@ -270,6 +280,18 @@ void MusicBrowserUI::GenPlaylistEvent(vector<PlaylistItem*>* pSeed)
             m_plm->AddItems(newitems);
         }
     }
+
+	if (messageError) {
+      string caption = "Generate Playlist Error";
+	  string message;
+
+	  if (nResponse != APS_NOERROR) 
+          message = "For some reason, the Relatable server returned an error.";
+      else 
+		  message = "The Relatable Engine didn't have any recommendations for you.  Listen to songs, use the 'Learn Playlist' menu item, and try this again later.";
+
+      MessageBox(m_hWnd, message.c_str(), caption.c_str(), MB_OK|MB_ICONSTOP);
+   }
 }
 
 void MusicBrowserUI::RenameEvent(void)
