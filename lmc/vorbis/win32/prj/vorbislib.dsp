@@ -20,13 +20,14 @@ CFG=vorbislib - Win32 NASM Debug MS STL
 !MESSAGE "vorbislib - Win32 Release" (based on "Win32 (x86) Static Library")
 !MESSAGE "vorbislib - Win32 Debug" (based on "Win32 (x86) Static Library")
 !MESSAGE "vorbislib - Win32 NASM Debug MS STL" (based on "Win32 (x86) Static Library")
+!MESSAGE "vorbislib - Win32 NASM Release" (based on "Win32 (x86) Static Library")
 !MESSAGE 
 
 # Begin Project
 # PROP AllowPerConfigDependencies 0
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
-CPP=cl.exe
+CPP=xicl6.exe
 RSC=rc.exe
 
 !IF  "$(CFG)" == "vorbislib - Win32 Release"
@@ -48,7 +49,7 @@ RSC=rc.exe
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
-LIB32=link.exe -lib
+LIB32=xilink6.exe -lib
 # ADD BASE LIB32 /nologo
 # ADD LIB32 /nologo /out:"..\vorbislib.lib"
 
@@ -71,7 +72,7 @@ LIB32=link.exe -lib
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
-LIB32=link.exe -lib
+LIB32=xilink6.exe -lib
 # ADD BASE LIB32 /nologo
 # ADD LIB32 /nologo /out:"..\vorbislib.lib"
 
@@ -94,7 +95,30 @@ LIB32=link.exe -lib
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
-LIB32=link.exe -lib
+LIB32=xilink6.exe -lib
+# ADD BASE LIB32 /nologo /out:"..\vorbislib.lib"
+# ADD LIB32 /nologo /out:"..\vorbislib.lib"
+
+!ELSEIF  "$(CFG)" == "vorbislib - Win32 NASM Release"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 0
+# PROP BASE Output_Dir "vorbislib___Win32_NASM_Release"
+# PROP BASE Intermediate_Dir "vorbislib___Win32_NASM_Release"
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 0
+# PROP Output_Dir "vorbislib___Win32_NASM_Release"
+# PROP Intermediate_Dir "vorbislib___Win32_NASM_Release"
+# PROP Target_Dir ""
+# ADD BASE CPP /nologo /MD /W3 /GX /O2 /I "..\..\\" /I "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\..\vorbis\include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /I "..\..\\" /I "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\..\vorbis\include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /YX /FD /c
+# ADD BASE RSC /l 0x409 /d "NDEBUG"
+# ADD RSC /l 0x409 /d "NDEBUG"
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LIB32=xilink6.exe -lib
 # ADD BASE LIB32 /nologo /out:"..\vorbislib.lib"
 # ADD LIB32 /nologo /out:"..\vorbislib.lib"
 
@@ -105,6 +129,7 @@ LIB32=link.exe -lib
 # Name "vorbislib - Win32 Release"
 # Name "vorbislib - Win32 Debug"
 # Name "vorbislib - Win32 NASM Debug MS STL"
+# Name "vorbislib - Win32 NASM Release"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
