@@ -173,43 +173,56 @@ Error ThemeManager::AddTheme(string &oThemeFile, bool bRename)
     string          oThemeDest;
     Error           eErr;
 
-    m_pContext->prefs->GetInstallDirectory(dir, &len);
-    oThemeDest = string(dir);
-    
-    if (bRename)
+    struct _stat buf;
+
+    if (_stat(oThemeFile.c_str(), &buf) == 0 && (buf.st_mode & _S_IFDIR))
     {
-        ThemeZip oZip;
-        string   oName;
+       m_bDevelTheme = true;
+       m_oDevelTheme = oThemeFile;
+       //m_oCurrentTheme = string(THEME_IN_DEVEL);
 
-        if (IsntError(oZip.GetDescriptiveName(oThemeFile, oName)) && 
-            oName.length() > 0)
+       eErr = kError_NoErr;
+    }
+    else
+    {
+        m_pContext->prefs->GetInstallDirectory(dir, &len);
+        oThemeDest = string(dir);
+    
+        if (bRename)
         {
-            int i;
+            ThemeZip oZip;
+            string   oName;
 
-            for(i = oName.length() - 1; i >= 0; i--)
-                if (!isalnum(oName[i]) && oName[i] != ' ')
-                    oName.erase(i, 1);
+            if (IsntError(oZip.GetDescriptiveName(oThemeFile, oName)) && 
+                oName.length() > 0)
+            {
+                int i;
+
+                for(i = oName.length() - 1; i >= 0; i--)
+                    if (!isalnum(oName[i]) && oName[i] != ' ')
+                        oName.erase(i, 1);
                 
-            oThemeDest += string("\\themes\\") + oName + string(".fat");
+                oThemeDest += string("\\themes\\") + oName + string(".fat");
+            }
+            else
+            {
+                _splitpath(oThemeFile.c_str(), NULL, NULL, dir, ext);
+                oThemeDest += string("\\themes\\") + string(dir) + string(".fat");
+            }
         }
         else
         {
             _splitpath(oThemeFile.c_str(), NULL, NULL, dir, ext);
-            oThemeDest += string("\\themes\\") + string(dir) + string(".fat");
-        }
-    }
-    else
-    {
-        _splitpath(oThemeFile.c_str(), NULL, NULL, dir, ext);
-        oThemeDest += string("\\themes\\") + string(dir) + string(ext);
-    }              
+            oThemeDest += string("\\themes\\") + string(dir) + string(ext);
+        }              
     
-    eErr = CopyFile(oThemeFile.c_str(), oThemeDest.c_str(), false) ? 
-           kError_NoErr : kError_CopyFailed;
+        eErr = CopyFile(oThemeFile.c_str(), oThemeDest.c_str(), false) ? 
+               kError_NoErr : kError_CopyFailed;
 
-    if (!IsError(eErr))
-       // So the caller knows where the theme ended up
-       oThemeFile = oThemeDest;
+        if (!IsError(eErr))
+           // So the caller knows where the theme ended up
+           oThemeFile = oThemeDest;
+    }
               
     return eErr;       
 }

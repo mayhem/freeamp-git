@@ -2508,35 +2508,76 @@ bool Win32PreferenceWindow::PrefThemeProc(HWND hwnd,
                 }
                 case IDC_ADDTHEME:
                 {
-                	OPENFILENAME sOpen;
-                    char szFile[256];
-                    
-                    szFile[0] = 0;
-                    sOpen.lStructSize = sizeof(OPENFILENAME);
-                    sOpen.hwndOwner = hwnd;
-                    sOpen.hInstance = NULL;
-                    sOpen.lpstrFilter = kThemeFileFilter;
-                    sOpen.lpstrCustomFilter = NULL;
-                    sOpen.nMaxCustFilter = 0;
-                    sOpen.nFilterIndex = 1;
-                    sOpen.lpstrFile = szFile;
-                    sOpen.nMaxFile = 256;
-                    sOpen.lpstrFileTitle = NULL;
-                    sOpen.lpstrInitialDir = NULL;
-                    sOpen.lpstrTitle = "Open Theme";
-                    sOpen.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-                    sOpen.lpstrDefExt = "fat";
-                      
-                	if (GetOpenFileName(&sOpen))
+                    if(GetKeyState(VK_CONTROL) < 0)
                     {
-                        string       oThemeName(sOpen.lpstrFile);
-                        Error        eRet;
+                        LPMALLOC pMalloc;
+
+                        if(SUCCEEDED(SHGetMalloc(&pMalloc)))
+                        {
+                            BROWSEINFO bi; 
+                            LPITEMIDLIST browseId;
+                            char displayName[MAX_PATH + 1];
+
+                            bi.hwndOwner = hwnd;
+                            bi.pidlRoot = NULL;
+                            bi.pszDisplayName = displayName;
+                            bi.lpszTitle = "Please select the folder which contains your theme.";
+                            bi.ulFlags = BIF_RETURNONLYFSDIRS;
+                            bi.lpfn = NULL;
+
+                            browseId = SHBrowseForFolder(&bi);
+            
+                            if(browseId)
+                            {
+                                char temp[MAX_PATH];
+
+                                SHGetPathFromIDList(browseId, temp);
+
+                                string oThemeName(temp);
+                                Error  eRet;
                         
-                        eRet = m_pThemeMan->AddTheme(oThemeName);
-                        if (IsError(eRet))
-                            MessageBox(hwnd, "Could not add theme.", "Add Theme", MB_OK);
-                        else    
-                            LoadThemeListBox(hwnd);
+                                eRet = m_pThemeMan->AddTheme(oThemeName);
+                                if(IsError(eRet))
+                                    MessageBox(hwnd, "Could not add theme.", "Add Theme", MB_OK);
+                                else    
+                                    LoadThemeListBox(hwnd);
+                            
+                                pMalloc->Free(browseId);
+                            }
+                        }
+                    }
+                    else
+                    {
+                	    OPENFILENAME sOpen;
+                        char szFile[256];
+                    
+                        szFile[0] = 0;
+                        sOpen.lStructSize = sizeof(OPENFILENAME);
+                        sOpen.hwndOwner = hwnd;
+                        sOpen.hInstance = NULL;
+                        sOpen.lpstrFilter = kThemeFileFilter;
+                        sOpen.lpstrCustomFilter = NULL;
+                        sOpen.nMaxCustFilter = 0;
+                        sOpen.nFilterIndex = 1;
+                        sOpen.lpstrFile = szFile;
+                        sOpen.nMaxFile = 256;
+                        sOpen.lpstrFileTitle = NULL;
+                        sOpen.lpstrInitialDir = NULL;
+                        sOpen.lpstrTitle = "Open Theme";
+                        sOpen.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+                        sOpen.lpstrDefExt = "fat";
+                      
+                	    if (GetOpenFileName(&sOpen))
+                        {
+                            string       oThemeName(sOpen.lpstrFile);
+                            Error        eRet;
+                        
+                            eRet = m_pThemeMan->AddTheme(oThemeName);
+                            if (IsError(eRet))
+                                MessageBox(hwnd, "Could not add theme.", "Add Theme", MB_OK);
+                            else    
+                                LoadThemeListBox(hwnd);
+                        }
                     }
                     
                     break;
