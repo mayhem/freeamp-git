@@ -607,11 +607,6 @@ fi
 
 dnl *****
 
-AC_LANG_SAVE
-AC_LANG_CPLUSPLUS
-AC_CHECK_LIB(musicbrainz, mb_New, ,
-  AC_MSG_ERROR([FreeAmp requires that the MusicBrainz client library be installed.]))
-AC_LANG_RESTORE
 
 #AM_CONDITIONAL(AM_HAVE_LINUXTHREADS, test "$hblt" = "true")
 
@@ -915,6 +910,12 @@ rm -f conf.gdk_pixbuftest
 
 CFLAGS="$CFLAGS $GDK_PIXBUF_CFLAGS"
 AC_SUBST(CFLAGS)
+
+AC_LANG_SAVE
+AC_LANG_CPLUSPLUS
+AC_CHECK_LIB(musicbrainz, mb_New, ,
+  AC_MSG_ERROR([FreeAmp requires that the MusicBrainz client library be installed.]))
+AC_LANG_RESTORE
 
 AC_CONFIG_HEADER(config/config.h)
 AC_OUTPUT(Makefile Makefile-plugins Makefile.header Makefile.towav)
