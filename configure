@@ -2369,13 +2369,14 @@ fi
 if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
   echo "$ac_t""yes" 1>&6
   x11="true"
+else
   echo "$ac_t""no" 1>&6
  echo "Hmmm. X11/xpm.h not showing up in your include path."
   echo "Looking for $x_includes/X11/xpm.h directly..."
   z=0;
   if test -f "${x_includes}/X11/xpm.h"; then
     z=1
-    echo "Found $i/X11/xpm.h."
+    echo "Found $x_includes/X11/xpm.h."
   fi
   if test $z = 0; then	
          x11="false"
