@@ -2038,16 +2038,17 @@ void MusicBrowserUI::AddFileEvent(HWND hwndParent, bool playNow)
 
 void MusicBrowserUI::EmptyDBCheck(void)
 {    
-    if (m_context->catalog->GetPlaylists()->size() > 0 ||
-        m_context->catalog->GetMusicList()->size() > 0 ||
-        m_context->catalog->GetUnsortedMusic()->size() > 0)
-        return;
-
     bool welcome = false;
     bool checkDB = true;
 
     m_context->prefs->GetPrefBoolean(kWelcomePref, &welcome);
     m_context->prefs->GetPrefBoolean(kPerformDBCheckPref, &checkDB);
+
+    if ((m_context->catalog->GetPlaylists()->size() > 0 ||
+        m_context->catalog->GetMusicList()->size() > 0 ||
+        m_context->catalog->GetUnsortedMusic()->size() > 0) && 
+        welcome == false)
+        return;
 
     if(welcome)
     {
