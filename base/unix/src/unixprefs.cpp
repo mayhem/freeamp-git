@@ -50,7 +50,7 @@ const char*  kDefaultLibraryPath = ".:~/.freeamp:" UNIX_LIBDIR "/freeamp";
 const char*  kDefaultUI = "freeamp.ui";
 const char*  kDefaultTextUI = "freeampcmd.ui";
 const char*  kDefaultPMO = "soundcard.pmo";
-const char*  kDefaultALSADevice = "1:1";
+const char*  kDefaultALSADevice = "0:0";
 const char*  kDefaultESOUNDHost = "localhost";
 
 
