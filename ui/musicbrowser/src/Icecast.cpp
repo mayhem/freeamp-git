@@ -131,7 +131,7 @@ Error IcecastStreams::EndElement(string &oElement)
     return kError_NoErr;
 }
 
-#if 1
+#if 0
 
 const char *test = "<directory>"
                    "  <resource href=\"http://icecast.server.com:8000/stream\">"
