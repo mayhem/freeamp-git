@@ -39,7 +39,9 @@ ____________________________________________________________________________*/
 #include "registrar.h"
 #include "resource.h"
 
-typedef struct PrefValues {
+typedef struct PrefsStruct {
+    Preferences* prefs;
+
     // page 1
     char defaultUI[256];
     char defaultPMO[256];
@@ -62,23 +64,52 @@ typedef struct PrefValues {
     bool logDecoder;
     bool logPerformance;
 
-    PrefValues()
+    PrefsStruct()
     {
         memset(defaultUI, 0x00, sizeof(defaultUI));
         memset(defaultPMO, 0x00, sizeof(defaultPMO));
         memset(saveStreamsDirectory, 0x00, sizeof(saveStreamsDirectory));
     }
 
-}PrefValues;
+}PrefsStruct;
 
-static PrefValues originalValues;
-static PrefValues currentValues;
+static PrefsStruct originalValues;
+static PrefsStruct currentValues;
 
 
 static 
 void 
-SavePrefValues( Preferences* prefs, 
-                PrefValues* values)
+GetPrefsValues(Preferences* prefs, 
+               PrefsStruct* values)
+{
+    uint32 size = 256;
+
+    prefs->GetDefaultPMO(values->defaultPMO, &size);
+    prefs->GetDefaultUI(values->defaultUI, &size);
+    prefs->GetDecoderThreadPriority(&values->decoderThreadPriority);
+    prefs->GetInputBufferSize(&values->inputBufferSize);
+    prefs->GetOutputBufferSize(&values->outputBufferSize);
+    prefs->GetStayOnTop(&values->stayOnTop);
+    prefs->GetLiveInTray(&values->liveInTray);
+
+    prefs->GetStreamBufferInterval(&values->streamInterval);
+    prefs->GetSaveStreams(&values->saveStreams);
+    size = MAX_PATH;
+    prefs->GetSaveStreamsDirectory(values->saveStreamsDirectory, &size);
+
+    prefs->GetUseDebugLog(&values->enableLogging);
+    prefs->GetLogMain(&values->logMain);
+    prefs->GetLogDecode(&values->logDecoder);
+    prefs->GetLogInput(&values->logInput);
+    prefs->GetLogOutput(&values->logOutput);
+    prefs->GetLogPerformance(&values->logPerformance);
+
+}
+
+static 
+void 
+SavePrefsValues( Preferences* prefs, 
+                PrefsStruct* values)
 {
     prefs->SetDefaultPMO(values->defaultPMO);
     prefs->SetDefaultUI(values->defaultUI);
@@ -155,40 +186,27 @@ PrefPage1Proc(  HWND hwnd,
             int32 i = 0;
             RegistryItem *item;
 
-            char temp[256];
-            uint32 size = sizeof(temp);
-
-            prefs->GetDefaultPMO(temp, &size);
-            strcpy(originalValues.defaultPMO, temp);
-
             while(item = pmo.GetItem(i++))
             {
                 ComboBox_AddString(hwndPMO, item->Name());
 
-                if(!strcmp(temp, item->Name()))
+                if(!strcmp(originalValues.defaultPMO, item->Name()))
                 {
                     ComboBox_SetCurSel(hwndPMO, i-1);
                 }
             }
             
             i = 0;
-            prefs->GetDefaultUI(temp, &size);
-            strcpy(originalValues.defaultUI, temp);
 
             while(item = ui.GetItem(i++))
             {
                 ComboBox_AddString(hwndUI, item->Name());
 
-                if(!strcmp(temp, item->Name()))
+                if(!strcmp(originalValues.defaultUI, item->Name()))
                 {
                     ComboBox_SetCurSel(hwndUI, i-1);
                 }
             }
-
-            int32 priority;
-
-            prefs->GetDecoderThreadPriority(&priority);
-            originalValues.decoderThreadPriority = priority;
 
             SendMessage(hwndPriority, 
                         TBM_SETRANGE, 
@@ -198,29 +216,24 @@ PrefPage1Proc(  HWND hwnd,
             SendMessage(hwndPriority, 
                         TBM_SETPOS, 
                         (WPARAM) TRUE,                   
-                        (LPARAM) priority);
+                        (LPARAM) originalValues.decoderThreadPriority);
 
             int32 value;
+            char temp[256];
 
-            prefs->GetInputBufferSize(&value);
+            value = originalValues.inputBufferSize;
             sprintf(temp, "%d", value);
             Edit_LimitText(hwndInput, 4);
             Edit_SetText(hwndInput, temp);
-            originalValues.inputBufferSize = value;
 
-            prefs->GetOutputBufferSize(&value);
+            value = originalValues.outputBufferSize;
             sprintf(temp, "%d", value);
             Edit_LimitText(hwndOutput, 4);
             Edit_SetText(hwndOutput, temp);
-            originalValues.outputBufferSize = value;
 
-            prefs->GetStayOnTop(&originalValues.stayOnTop);
             Button_SetCheck(hwndStayOnTop, originalValues.stayOnTop);
 
-            prefs->GetLiveInTray(&originalValues.liveInTray);
             Button_SetCheck(hwndLiveInTray, originalValues.liveInTray);
-
-            currentValues = originalValues;
             
             break;
         }
@@ -240,7 +253,7 @@ PrefPage1Proc(  HWND hwnd,
 
                         if(memcmp(  &originalValues, 
                                     &currentValues, 
-                                    sizeof(PrefValues)))
+                                    sizeof(PrefsStruct)))
                         {
                             PropSheet_Changed(GetParent(hwnd), hwnd);
                         }
@@ -264,7 +277,7 @@ PrefPage1Proc(  HWND hwnd,
 
                         if(memcmp(  &originalValues, 
                                     &currentValues, 
-                                    sizeof(PrefValues)))
+                                    sizeof(PrefsStruct)))
                         {
                             PropSheet_Changed(GetParent(hwnd), hwnd);
                         }
@@ -289,7 +302,7 @@ PrefPage1Proc(  HWND hwnd,
 
                         if(memcmp(  &originalValues, 
                                     &currentValues, 
-                                    sizeof(PrefValues)))
+                                    sizeof(PrefsStruct)))
                         {
                             PropSheet_Changed(GetParent(hwnd), hwnd);
                         }
@@ -314,7 +327,7 @@ PrefPage1Proc(  HWND hwnd,
 
                         if(memcmp(  &originalValues, 
                                     &currentValues, 
-                                    sizeof(PrefValues)))
+                                    sizeof(PrefsStruct)))
                         {
                             PropSheet_Changed(GetParent(hwnd), hwnd);
                         }
@@ -340,7 +353,7 @@ PrefPage1Proc(  HWND hwnd,
 
                     if(memcmp(  &originalValues, 
                                 &currentValues, 
-                                sizeof(PrefValues)))
+                                sizeof(PrefsStruct)))
                     {
                         PropSheet_Changed(GetParent(hwnd), hwnd);
                     }
@@ -365,7 +378,7 @@ PrefPage1Proc(  HWND hwnd,
 
                     if(memcmp(  &originalValues, 
                                 &currentValues, 
-                                sizeof(PrefValues)))
+                                sizeof(PrefsStruct)))
                     {
                         PropSheet_Changed(GetParent(hwnd), hwnd);
                     }
@@ -402,32 +415,11 @@ PrefPage1Proc(  HWND hwnd,
 											    0, 
 											    0);
 
-                        // translate position into 
-                        // actual thread priority
-                        // since we have don't have 
-                        // them all shown
-                        /*switch(position)
-                        {
-                            case 0:
-                                position = 1;
-
-                            case 1:
-                                position = 3;
-
-                            case 2:
-                                position = 5;
-
-                            case 3: 
-                                position = 6;
-                        
-                        }*/
-                        
-
                         currentValues.decoderThreadPriority = position;
 
                         if(memcmp(  &originalValues, 
                                     &currentValues, 
-                                    sizeof(PrefValues)))
+                                    sizeof(PrefsStruct)))
                         {
                             PropSheet_Changed(GetParent(hwnd), hwnd);
                         }
@@ -456,7 +448,7 @@ PrefPage1Proc(  HWND hwnd,
 
                 case PSN_APPLY:
                 {
-                    SavePrefValues(prefs, &currentValues);
+                    SavePrefsValues(prefs, &currentValues);
                     break;
                 }
 
@@ -468,7 +460,7 @@ PrefPage1Proc(  HWND hwnd,
 
                 case PSN_RESET:
                 {
-                    SavePrefValues(prefs, &originalValues);
+                    SavePrefsValues(prefs, &originalValues);
                     break;
                 }
             }
@@ -515,31 +507,17 @@ PrefPage2Proc(  HWND hwnd,
             // initialize our controls
             int32 value;
             char temp[256];
-            uint32 size = sizeof(temp);
 
-            prefs->GetStreamBufferInterval(&value);
+            value = originalValues.streamInterval;
             sprintf(temp, "%d", value);
             Edit_LimitText(hwndStreamInterval, 2);
             Edit_SetText(hwndStreamInterval, temp);
-            originalValues.streamInterval = value;
-
-            prefs->GetSaveStreams(&originalValues.saveStreams);
+            
             Button_SetCheck(hwndSaveStreams, originalValues.saveStreams);
 
-            size = MAX_PATH;
-            prefs->GetSaveStreamsDirectory( 
-                                        originalValues.saveStreamsDirectory, 
-                                        &size);
 
-            if(!strcmp(originalValues.saveStreamsDirectory, "."))
-            {
-                Edit_SetText(hwndSaveStreamsDirectory, "(Current Directory)");
-            }
-            else
-            {
-                Edit_SetText(   hwndSaveStreamsDirectory, 
-                                originalValues.saveStreamsDirectory);
-            }
+            Edit_SetText(   hwndSaveStreamsDirectory, 
+                            originalValues.saveStreamsDirectory);
 
             Button_Enable(  hwndSaveStreamsDirectory, 
                             originalValues.saveStreams);
@@ -549,8 +527,6 @@ PrefPage2Proc(  HWND hwnd,
 
             Button_Enable(  hwndSaveLocationText,
                             originalValues.saveStreams);
-
-            currentValues = originalValues;
             
             break;
         }
@@ -571,7 +547,7 @@ PrefPage2Proc(  HWND hwnd,
 
                         if(memcmp(  &originalValues, 
                                     &currentValues, 
-                                    sizeof(PrefValues)))
+                                    sizeof(PrefsStruct)))
                         {
                             PropSheet_Changed(GetParent(hwnd), hwnd);
                         }
@@ -606,7 +582,7 @@ PrefPage2Proc(  HWND hwnd,
 
                     if(memcmp(  &originalValues, 
                                 &currentValues, 
-                                sizeof(PrefValues)))
+                                sizeof(PrefsStruct)))
                     {
                         PropSheet_Changed(GetParent(hwnd), hwnd);
                     }
@@ -629,7 +605,7 @@ PrefPage2Proc(  HWND hwnd,
 
                         if(memcmp(  &originalValues, 
                                     &currentValues, 
-                                    sizeof(PrefValues)))
+                                    sizeof(PrefsStruct)))
                         {
                             PropSheet_Changed(GetParent(hwnd), hwnd);
                         }
@@ -699,7 +675,7 @@ PrefPage2Proc(  HWND hwnd,
 
                 case PSN_APPLY:
                 {
-                    SavePrefValues(prefs, &currentValues);
+                    SavePrefsValues(prefs, &currentValues);
                     break;
                 }
 
@@ -711,7 +687,7 @@ PrefPage2Proc(  HWND hwnd,
 
                 case PSN_RESET:
                 {
-                    SavePrefValues(prefs, &originalValues);
+                    SavePrefsValues(prefs, &originalValues);
                     break;
                 }
             }
@@ -760,8 +736,8 @@ PrefPage3Proc(  HWND hwnd,
             // initialize our controls
             bool value;
 
-            prefs->GetUseDebugLog(&value);
-            originalValues.enableLogging = value;
+            value = originalValues.enableLogging;
+
             Button_SetCheck(hwndLog, value); 
             Button_Enable(hwndLogDecoder, value); 
             Button_Enable(hwndLogInput, value);
@@ -769,28 +745,12 @@ PrefPage3Proc(  HWND hwnd,
             Button_Enable(hwndLogMain, value);
             Button_Enable(hwndLogPerformance, value);
 
-            prefs->GetLogMain(&value);
-            originalValues.logMain = value;
-            Button_SetCheck(hwndLogMain, value); 
-
-            prefs->GetLogDecode(&value);
-            originalValues.logDecoder = value;
-            Button_SetCheck(hwndLogDecoder, value); 
-
-            prefs->GetLogInput(&value);
-            originalValues.logInput = value;
-            Button_SetCheck(hwndLogInput, value); 
-
-            prefs->GetLogOutput(&value);
-            originalValues.logOutput = value;
-            Button_SetCheck(hwndLogOutput, value); 
-
-            prefs->GetLogPerformance(&value);
-            originalValues.logPerformance = value;
-            Button_SetCheck(hwndLogPerformance, value); 
-           
-            currentValues = originalValues;
-            
+            Button_SetCheck(hwndLogMain, originalValues.logMain); 
+            Button_SetCheck(hwndLogDecoder, originalValues.logDecoder); 
+            Button_SetCheck(hwndLogInput, originalValues.logInput); 
+            Button_SetCheck(hwndLogOutput, originalValues.logOutput); 
+            Button_SetCheck(hwndLogPerformance, originalValues.logPerformance); 
+                     
             break;
         }
 
@@ -822,7 +782,7 @@ PrefPage3Proc(  HWND hwnd,
 
                     if(memcmp(  &originalValues, 
                                 &currentValues, 
-                                sizeof(PrefValues)))
+                                sizeof(PrefsStruct)))
                     {
                         PropSheet_Changed(GetParent(hwnd), hwnd);
                     }
@@ -847,7 +807,7 @@ PrefPage3Proc(  HWND hwnd,
 
                     if(memcmp(  &originalValues, 
                                 &currentValues, 
-                                sizeof(PrefValues)))
+                                sizeof(PrefsStruct)))
                     {
                         PropSheet_Changed(GetParent(hwnd), hwnd);
                     }
@@ -872,7 +832,7 @@ PrefPage3Proc(  HWND hwnd,
 
                     if(memcmp(  &originalValues, 
                                 &currentValues, 
-                                sizeof(PrefValues)))
+                                sizeof(PrefsStruct)))
                     {
                         PropSheet_Changed(GetParent(hwnd), hwnd);
                     }
@@ -897,7 +857,7 @@ PrefPage3Proc(  HWND hwnd,
 
                     if(memcmp(  &originalValues, 
                                 &currentValues, 
-                                sizeof(PrefValues)))
+                                sizeof(PrefsStruct)))
                     {
                         PropSheet_Changed(GetParent(hwnd), hwnd);
                     }
@@ -922,7 +882,7 @@ PrefPage3Proc(  HWND hwnd,
 
                     if(memcmp(  &originalValues, 
                                 &currentValues, 
-                                sizeof(PrefValues)))
+                                sizeof(PrefsStruct)))
                     {
                         PropSheet_Changed(GetParent(hwnd), hwnd);
                     }
@@ -947,7 +907,7 @@ PrefPage3Proc(  HWND hwnd,
 
                     if(memcmp(  &originalValues, 
                                 &currentValues, 
-                                sizeof(PrefValues)))
+                                sizeof(PrefsStruct)))
                     {
                         PropSheet_Changed(GetParent(hwnd), hwnd);
                     }
@@ -977,7 +937,7 @@ PrefPage3Proc(  HWND hwnd,
 
                 case PSN_APPLY:
                 {
-                    SavePrefValues(prefs, &currentValues);
+                    SavePrefsValues(prefs, &currentValues);
                     break;
                 }
 
@@ -989,7 +949,68 @@ PrefPage3Proc(  HWND hwnd,
 
                 case PSN_RESET:
                 {
-                    SavePrefValues(prefs, &originalValues);
+                    SavePrefsValues(prefs, &originalValues);
+                    break;
+                }
+            }
+
+            break;
+        }
+    }
+
+    return result;
+}
+
+static
+BOOL 
+CALLBACK 
+PrefPage4Proc(  HWND hwnd, 
+                UINT msg, 
+                WPARAM wParam, 
+                LPARAM lParam)
+{
+    UINT result = 0;
+    static PROPSHEETPAGE* psp = NULL;
+    static Preferences* prefs = NULL;
+    
+    switch(msg)
+    {
+        case WM_INITDIALOG:
+        {
+            // remember these for later...
+            psp = (PROPSHEETPAGE*)lParam;
+            prefs = (Preferences*)psp->lParam;
+            
+            break;
+        }
+
+        case WM_NOTIFY:
+        {
+            NMHDR* notify = (NMHDR*)lParam;
+
+            switch(notify->code)
+            {
+                case PSN_SETACTIVE:
+                {
+                    
+                    break;
+                }
+
+                case PSN_APPLY:
+                {
+                    SavePrefsValues(prefs, &currentValues);
+                    break;
+                }
+
+                case PSN_KILLACTIVE:
+                {
+                    
+                    break;
+                }
+
+                case PSN_RESET:
+                {
+                    SavePrefsValues(prefs, &originalValues);
                     break;
                 }
             }
@@ -1004,7 +1025,7 @@ PrefPage3Proc(  HWND hwnd,
 bool DisplayPreferences(HWND hwndParent, Preferences* prefs)
 {
     bool result = false;
-    PROPSHEETPAGE psp[3];
+    PROPSHEETPAGE psp[4];
     PROPSHEETHEADER psh;
     HINSTANCE hinst = (HINSTANCE)GetWindowLong(hwndParent, GWL_HINSTANCE);
 
@@ -1035,6 +1056,15 @@ bool DisplayPreferences(HWND hwndParent, Preferences* prefs)
     psp[2].pszTitle = NULL;
     psp[2].lParam = (LPARAM)prefs;
 
+    psp[3].dwSize = sizeof(PROPSHEETPAGE);
+    psp[3].dwFlags = 0;
+    psp[3].hInstance = hinst;
+    psp[3].pszTemplate = MAKEINTRESOURCE(IDD_PREF4);
+    psp[3].pszIcon = NULL;
+    psp[3].pfnDlgProc = PrefPage4Proc;
+    psp[3].pszTitle = NULL;
+    psp[3].lParam = (LPARAM)prefs;
+
     psh.dwSize = sizeof(PROPSHEETHEADER);
     psh.dwFlags = PSH_PROPSHEETPAGE;
     psh.hwndParent = hwndParent;
@@ -1042,7 +1072,13 @@ bool DisplayPreferences(HWND hwndParent, Preferences* prefs)
     psh.pszIcon = NULL;
     psh.pszCaption = "FreeAmp Preferences";
     psh.nPages = sizeof(psp)/sizeof(PROPSHEETPAGE);
+    psh.nStartPage = 0;
     psh.ppsp = psp;
+    psh.pfnCallback = NULL;
+
+    GetPrefsValues(prefs, &originalValues);
+
+    currentValues = originalValues;
 
     result = (PropertySheet(&psh) > 0);
 

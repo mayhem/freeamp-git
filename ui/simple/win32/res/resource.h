@@ -17,6 +17,7 @@
 #define IDD_PREF1                       193
 #define IDD_PREF3                       221
 #define IDD_PREF2                       223
+#define IDD_PREF4                       224
 #define IDC_PLAY                        1000
 #define IDC_STOP                        1001
 #define IDC_NEXTSONG                    1002

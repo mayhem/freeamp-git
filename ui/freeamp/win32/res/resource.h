@@ -83,6 +83,7 @@
 #define IDD_SAVERIO                     220
 #define IDD_PREF3                       221
 #define IDD_PREF2                       223
+#define IDD_PREF4                       224
 #define IDC_SAVE_RIO                    1002
 #define IDC_UI                          1005
 #define IDC_PMO                         1006

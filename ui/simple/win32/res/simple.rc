@@ -113,7 +113,7 @@ STYLE DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_VISIBLE |
 EXSTYLE WS_EX_ACCEPTFILES
 CAPTION "FreeAmp"
 MENU IDM_PLAYER
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     PUSHBUTTON      "Play",IDC_PLAY,32,4,29,13
     PUSHBUTTON      "Stop",IDC_STOP,91,4,29,13
@@ -222,6 +222,25 @@ BEGIN
     CTEXT           "Above Normal",IDC_STATIC,135,84,27,16
 END
 
+IDD_PREF4 DIALOG DISCARDABLE  0, 0, 233, 159
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "FreeAmp is an Open Source effort to build the best digital audio player available.  In the interest of supporting the free software community, while at the same time fostering the growth of the online delivery of music, EMusic",
+                    IDC_STATIC,3,27,227,25
+    LTEXT           "THE Source for Downloadable Music, is funding both the FreeAmp.org \ndomain and the efforts of the FreeAmp team. The FreeAmp team consists of: Mark B. Elrod, Robert Kaye, Brett Thomas, Jason Woodward, and Mark H. Weaver.",
+                    IDC_STATIC,3,51,227,33
+    LTEXT           "Other people have also contributed to FreeAmp:",
+                    IDC_STATIC,3,89,227,9
+    LTEXT           "FreeAmp is being released under the terms of the GPL. As is provided by the GPL, all of EMusic's and your efforts toward FreeAmp will be released back to the community at large.",
+                    IDC_STATIC,3,130,227,25
+    LTEXT           "Alan Cutter, Gabor Fleischer, Jean-Michel HERVE, Hiromasa Kato, Michael Bruun Petersen, Sylvain Rebaud, The Snowblind Alliance, Tom Spindler, Valters Vingolds, and Bill Yuan.",
+                    IDC_STATIC,3,100,227,30
+    LTEXT           "version 1.2.3",IDC_STATIC,97,14,38,8
+    LTEXT           "FreeAmp",IDC_STATIC,102,5,29,8
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -266,6 +285,14 @@ BEGIN
         RIGHTMARGIN, 230
         TOPMARGIN, 3
         BOTTOMMARGIN, 156
+    END
+
+    IDD_PREF4, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 230
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 155
     END
 END
 #endif    // APSTUDIO_INVOKED
