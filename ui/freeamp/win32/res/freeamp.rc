@@ -124,10 +124,10 @@ BEGIN
     LTEXT           " ",IDC_STATIC,9,42,8,8
     CONTROL         "Save Streams Locally",IDC_SAVESTREAMS,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,11,42,82,10
-    EDITTEXT        IDC_STREAM_INTERVAL,119,15,25,12,ES_AUTOHSCROLL | 
+    EDITTEXT        IDC_STREAM_INTERVAL,117,15,25,12,ES_AUTOHSCROLL | 
                     ES_NUMBER
-    LTEXT           "Buffer Streams For",IDC_STATIC,54,17,59,8
-    LTEXT           "Seconds",IDC_STATIC,149,17,29,8
+    LTEXT           "Buffer Streams For",IDC_STATIC,57,17,59,8
+    LTEXT           "Seconds",IDC_STATIC,146,17,29,8
     EDITTEXT        IDC_STREAMSAVEDIR,11,71,210,14,ES_AUTOHSCROLL
     PUSHBUTTON      "Browse...",IDC_BROWSE,171,91,50,14
     LTEXT           "Save Location:",IDC_SAVELOCATION_TEXT,11,57,49,8
