@@ -83,6 +83,9 @@ Error Window::VulcanMindMeld(Window *pOther)
 
     m_bWindowMove = pOther->m_bWindowMove;
     m_bStayOnTop = pOther->m_bLiveInToolbar;
+
+    if (m_pMouseInControl)
+       m_pMouseInControl->AcceptTransition(CT_MouseLeave);
     
     m_pMouseInControl = NULL;
     m_pCaptureControl = NULL;
@@ -475,8 +478,18 @@ void Window::MouseHasLeftWindow(void)
     if (m_pMouseInControl)
     {
        m_pMouseInControl->AcceptTransition(CT_MouseLeave);
+       m_pMouseInControl = NULL;
        return;
     }
+    if (!m_pMouseInControl)
+    { 
+       Pos oPos;
+
+       GetMousePos(oPos);
+       m_pMouseInControl = ControlFromPos(oPos);
+       if (m_pMouseInControl)
+          m_pMouseInControl->AcceptTransition(CT_MouseEnter);
+    }      
 }
 
 void Window::TimerEvent(void)
@@ -504,3 +517,57 @@ void Window::Keystroke(unsigned char cKey)
 {
     m_pTheme->HandleKeystroke(cKey);
 }
+
+void Window::GetReloadWindowPos(Rect &oOldRect, int iNewWidth, int iNewHeight, 
+                                Rect &oNewRect)
+{
+    int  iSizeX, iSizeY;
+ 
+    oNewRect = oOldRect;
+    oNewRect.x2 = oNewRect.x1 + iNewWidth;
+    oNewRect.y2 = oNewRect.y1 + iNewHeight;
+
+    GetDesktopSize(iSizeX, iSizeY);
+    if (oNewRect.x2 > iSizeX)
+    {
+       oNewRect.x1 -= oNewRect.x2 - iSizeX;
+       oNewRect.x2 -= oNewRect.x2 - iSizeX;
+    }   
+    if (oNewRect.y2 > iSizeY)
+    {
+       oNewRect.y1 -= oNewRect.y2 - iSizeY;
+       oNewRect.y2 -= oNewRect.y2 - iSizeY;
+    }
+    if (oNewRect.x1 < 0)
+    {
+       oNewRect.x2 -= oNewRect.x1;
+       oNewRect.x1 = 0;
+    }   
+    if (oNewRect.y1 < 0)
+    {
+       oNewRect.y2 -= oNewRect.y1;
+       oNewRect.y1 = 0;
+    }   
+    
+    if (oOldRect.x2 == iSizeX)
+    {
+       oNewRect.x2 = iSizeX;
+       oNewRect.x1 = iSizeX - iNewWidth;
+    }
+    if (oOldRect.y2 == iSizeY)
+    {
+       oNewRect.y2 = iSizeY;
+       oNewRect.y1 = iSizeY - iNewHeight;
+    }
+    if (oOldRect.x1 == 0)
+    {
+       oNewRect.x1 = 0;
+       oNewRect.x2 = iNewWidth;
+    }
+    if (oOldRect.y2 == 0)
+    {
+       oNewRect.y1 = 0;
+       oNewRect.y2 = iNewHeight;
+    }
+}
+

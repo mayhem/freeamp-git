@@ -124,6 +124,8 @@ class Window
     protected:
 
       Control *ControlFromPos(Pos &oPos);
+      void     GetReloadWindowPos(Rect &oOldRect, int iNewWidth, int iNewHeight, 
+                                  Rect &oNewRect);
      
       string                    m_oName;
       vector<Control *>         m_oControls;

@@ -390,9 +390,13 @@ Error Win32Window::VulcanMindMeld(Window *pOther)
 
     if (m_hWnd)
     {   
-        m_pCanvas->GetBackgroundRect(oRect);   
-        SetWindowPos(m_hWnd, NULL, 0, 0, oRect.Width(), oRect.Height(),
-                     SWP_NOZORDER|SWP_NOMOVE);
+        Rect oNewRect, oSize;
+ 
+        m_pCanvas->GetBackgroundRect(oSize);   
+        GetReloadWindowPos(oRect, oSize.Width(), oSize.Height(), oNewRect);
+        SetWindowPos(m_hWnd, NULL, oNewRect.x1, oNewRect.y1, 
+                     oNewRect.Width(), oNewRect.Height(),
+                     SWP_NOZORDER);
     
         hRgn = ((Win32Canvas *)m_pCanvas)->GetMaskRgn(); 
         if (hRgn)
