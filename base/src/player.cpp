@@ -159,7 +159,7 @@ typedef char *pchar;
 
 bool Player::SetArgs(int32 argc, char** argv){
     Vector<char *> argVector;
-
+    bool justGotArgvZero = false;
     char *arg = NULL;
 #ifndef WIN32
     // grab the UI name from how we are invoked.
@@ -173,6 +173,7 @@ bool Player::SetArgs(int32 argc, char** argv){
     //sprintf(m_argUI,"%s",pBegin);
     strcpy(argUI,pBegin);
     m_argUIvector->Insert(argUI);
+    justGotArgvZero = true;
 #endif
     argVector.Insert(argv[0]);
     for(int32 i = 1;i < argc; i++) 
@@ -205,6 +206,10 @@ bool Player::SetArgs(int32 argc, char** argv){
 			//if (m_argUI) delete m_argUI;
                         argUI = new char[strlen(arg) + 1];
                         strcpy(argUI, arg);
+			if (justGotArgvZero) {
+			    m_argUIvector->DeleteAll();
+			    justGotArgvZero = false;
+			}
 			m_argUIvector->Insert(argUI);
                     }
 		    break;
