@@ -27,7 +27,7 @@ ____________________________________________________________________________*/
 Registry::
 Registry()
 {
-    m_elements = new Vector<RegistryItem*>();
+    m_elements = new List<RegistryItem*>();
     m_count = 0;
 }
 

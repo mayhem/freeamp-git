@@ -29,7 +29,7 @@ ____________________________________________________________________________*/
 #include "player.h"
 #include "thread.h"
 #include "debug.h"
-#include "vector.h"
+#include "list.h"
 #include "ui.h"
 #include "queue.h"
 #include "semaphore.h"
@@ -74,8 +74,8 @@ EventQueue()
    // cout << "Created queue" << endl;
    m_eventServiceThread = NULL;
    // cout << "Started event thread" << endl;
-   m_uiVector = new Vector < UserInterface * >();
-   // cout << "Created vectors" << endl;
+   m_uiList = new List < UserInterface * >();
+   // cout << "Created Lists" << endl;
    m_uiManipLock = new Mutex();
    m_lmcMutex = new Mutex();
    m_pmiMutex = new Mutex();
@@ -95,7 +95,7 @@ EventQueue()
    m_lmc = NULL;
    m_ui = NULL;
 
-   m_argUIvector = new Vector < char *>();
+   m_argUIList = new List < char *>();
 
    m_argc = 0;
    m_argv = NULL;
@@ -119,7 +119,7 @@ Player::~Player()
 {
 
    TYPICAL_DELETE(m_pTermSem);
-   TYPICAL_DELETE(m_argUIvector);
+   TYPICAL_DELETE(m_argUIList);
 
    if (m_eventServiceThread)
    {
@@ -141,12 +141,12 @@ Player::~Player()
    TYPICAL_DELETE(m_eventQueue);
 
    // Delete CIOs
-   if (m_uiVector)
+   if (m_uiList)
    {
-      m_uiVector->DeleteAll();
-      delete    m_uiVector;
+      m_uiList->DeleteAll();
+      delete    m_uiList;
 
-      m_uiVector = NULL;
+      m_uiList = NULL;
    }
 
    TYPICAL_DELETE(m_plm);
@@ -178,7 +178,7 @@ typedef char *pchar;
 bool      Player::
 SetArgs(int32 argc, char **argv)
 {
-   Vector < char *>argVector;
+   List < char *>argList;
    bool      justGotArgvZero = false;
    char     *arg = NULL;
    char     *argUI = NULL;
@@ -198,10 +198,10 @@ SetArgs(int32 argc, char **argv)
    }
    // sprintf(m_argUI,"%s",pBegin);
    strcpy(argUI, pBegin);
-   m_argUIvector->Insert(argUI);
+   m_argUIList->Insert(argUI);
    justGotArgvZero = true;
 #endif
-   argVector.Insert(argv[0]);
+   argList.Insert(argv[0]);
    for (int32 i = 1; i < argc; i++)
    {
       arg = argv[i];
@@ -214,7 +214,7 @@ SetArgs(int32 argc, char **argv)
             if (!strcmp(&(arg[2]), "help"))
             {
                Usage(argv[0]);
-               argVector.Insert(argv[i]);
+               argList.Insert(argv[i]);
             }
             break;
          case 'u':
@@ -237,17 +237,17 @@ SetArgs(int32 argc, char **argv)
                   strcpy(argUI, arg);
                   if (justGotArgvZero)
                   {
-                     m_argUIvector->DeleteAll();
+                     m_argUIList->DeleteAll();
                      justGotArgvZero = false;
                   }
-                  m_argUIvector->Insert(argUI);
+                  m_argUIList->Insert(argUI);
                }
                break;
             }
          case 'h':
          case 'H':
             Usage(argv[0]);
-            argVector.Insert(argv[i]);
+            argList.Insert(argv[i]);
             break;
          case 'p':
             if (!strcmp(&(arg[2]), "rop"))
@@ -283,25 +283,25 @@ SetArgs(int32 argc, char **argv)
             }
             else
             {
-               argVector.Insert(argv[i]);
+               argList.Insert(argv[i]);
             }
             break;
          default:
-            argVector.Insert(argv[i]);
+            argList.Insert(argv[i]);
          }
       }
       else
       {
-         argVector.Insert(argv[i]);
+         argList.Insert(argv[i]);
       }
    }
-   m_argc = argVector.NumElements();
+   m_argc = argList.NumElements();
    if (m_argc)
    {
       m_argv = new pchar[m_argc];
       for (int f = 0; f < m_argc; f++)
       {
-         m_argv[f] = argVector.ElementAt(f);
+         m_argv[f] = argList.ElementAt(f);
          // cerr << "Adding argument (" << f << "): " << m_argv[f] << endl;
       }
    }
@@ -378,7 +378,7 @@ SetPreferences(Preferences * pP)
 void      Player::
 Run()
 {
-   int32     uiVectorIndex = 0;
+   int32     uiListIndex = 0;
    Preferences *prefs;
    char     *name = NULL;
    uint32    len = 256;
@@ -386,7 +386,7 @@ Run()
    int32     uisActivated = 0;
 
    // which ui should we instantiate first??
-   if (m_argUIvector->NumElements() == 0)
+   if (m_argUIList->NumElements() == 0)
    {
       name = new char[len];
 
@@ -407,7 +407,7 @@ Run()
    {
       name = new char[1024];
 
-      strcpy(name, m_argUIvector->ElementAt(uiVectorIndex));
+      strcpy(name, m_argUIList->ElementAt(uiListIndex));
    }
 
    if (IsntError(error))
@@ -428,7 +428,7 @@ Run()
                m_ui->SetPropManager((Properties *) this);
                m_ui->SetPlayListManager(m_plm);
                m_ui->SetArgs(m_argc, m_argv);
-               Error     er = m_ui->Init((uiVectorIndex == 0) ? PRIMARY_UI : SECONDARY_UI_STARTUP);  
+               Error     er = m_ui->Init((uiListIndex == 0) ? PRIMARY_UI : SECONDARY_UI_STARTUP);  
                if (er == kError_NoErr)
                {
                   RegisterActiveUI(m_ui);
@@ -443,7 +443,7 @@ Run()
                break;
             }
          }
-         char     *p = m_argUIvector->ElementAt(++uiVectorIndex);
+         char     *p = m_argUIList->ElementAt(++uiListIndex);
 
          if (p)
          {
@@ -506,9 +506,9 @@ int32     Player::
 RegisterActiveUI(UserInterface * ui)
 {
    GetUIManipLock();
-   if (m_uiVector && ui)
+   if (m_uiList && ui)
    {
-      m_uiVector->Insert(ui);
+      m_uiList->Insert(ui);
       ReleaseUIManipLock();
       return 0;
    }
@@ -1008,7 +1008,7 @@ int Player::Quit(Event *pEvent)
    // 2) Get CIO/COO manipulation lock
    GetUIManipLock();
    // 3) Count CIO/COO, put into m_quitWaitingFor.
-   m_quitWaitingFor = m_uiVector->NumElements();
+   m_quitWaitingFor = m_uiList->NumElements();
    // 4) Send CMD_Cleanup event to all CIO/COOs
 
    pe = new Event(CMD_Cleanup);
@@ -1276,9 +1276,9 @@ SendToUI(Event * pe)
 {
    int32     i;
 
-   for (i = 0; i < m_uiVector->NumElements(); i++)
+   for (i = 0; i < m_uiList->NumElements(); i++)
    {
-      m_uiVector->ElementAt(i)->AcceptEvent(pe);
+      m_uiList->ElementAt(i)->AcceptEvent(pe);
    }
 }
 

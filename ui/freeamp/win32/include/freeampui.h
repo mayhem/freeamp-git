@@ -81,6 +81,8 @@ class FreeAmpUI : public UserInterface {
 
     HCURSOR Cursor(void) const { return m_cursor;}
 
+    PlayListManager* GetPlayListManager() const { return m_plm; }
+
     /* handle window messages */
     void Create();
     void Destroy();
@@ -109,16 +111,15 @@ class FreeAmpUI : public UserInterface {
     void UpdatePlayList();
 
  public:
-    Semaphore*          m_uiSemaphore;
-
-    bool                m_scrolling;
-
-    EventQueue*         m_target;
-	int32			    m_state;
+    
 	
-    float			    m_secondsPerFrame;
-
  private:
+    Semaphore*          m_uiSemaphore;
+    float			    m_secondsPerFrame;
+    int32			    m_state;
+    EventQueue*         m_target;
+
+
     PlayListManager*    m_plm;
     Properties*         m_propManager;
     Thread*             m_uiThread;

@@ -1183,17 +1183,7 @@ CreateControls()
                                     m_controlRegions[kPlaylistDisplayControl],
                                     MULTIPLE_SELECTION_LIST);
 
-    /*for(int32 count = 0; count < 9; count++)
-    {
-        char buffer[256];
-
-        sprintf(buffer, "This is StringItem #%d", count);
-
-        m_playlistView->AddItem(new StringItem(buffer,
-                                m_smallFontBitmap,
-                                10,
-                                smallFontWidth));
-    }*/
+   
 
     /*m_playlistView->AddItem(new TestItem);
     m_playlistView->AddItem(new TestItem);
@@ -1212,6 +1202,18 @@ CreateControls()
     m_scrollbarView->Hide();
 
     m_scrollbarView->SetTarget(m_playlistView);
+
+    /*for(int32 count = 0; count < 9; count++)
+    {
+        char buffer[256];
+
+        sprintf(buffer, "This is StringItem #%d", count);
+
+        m_playlistView->AddItem(new StringItem(buffer,
+                                m_smallFontBitmap,
+                                10,
+                                smallFontWidth));
+    }*/
 
     m_viewList->Append(m_backgroundView);
     m_viewList->Append(m_playlistBackView);
@@ -1618,7 +1620,7 @@ SetArgs(int32 argc, char** argv)
 
 void
 FreeAmpUI::
-SetPlayListManager(PlayListManager *plm) 
+SetPlayListManager(PlayListManager *plm)
 {
 	m_plm = plm;
 
@@ -1634,21 +1636,32 @@ UpdatePlayList()
 
     if(m_plm && m_playlistView)
     {
-        int32 i = 0;
-        PlayListItem* item;
+        int32 playlistCount = m_plm->Total();
+        int32 listviewCount = m_playlistView->CountItems();
 
-        while(item = m_plm->ItemAt(i++))
+        // for now, the only time it is updated without us having done it
+        // is when a file is added, thus the lists should be different sizes
+        if(playlistCount != listviewCount)      
         {
-            MediaInfoEvent* info = item->GetMediaInfo();
+            int32 i = listviewCount;
+            PlayListItem* playlistItem;
 
-            //char buffer[256];
-            //sprintf(buffer, "This is StringItem #%d", i);
+            while(playlistItem = m_plm->ItemAt(i++))
+            {
+                MediaInfoEvent* info = playlistItem->GetMediaInfo();
 
-            m_playlistView->AddItem(new StringItem(item->_DisplayString(),
-                                    m_smallFontBitmap,
-                                    10,
-                                    smallFontWidth));
-        }
+                //char buffer[256];
+                //sprintf(buffer, "This is StringItem #%d", i);
+
+                StringItem* item = new StringItem(  playlistItem->StringForPlayerToDisplay(),
+                                                    m_smallFontBitmap,
+                                                    10,
+                                                    smallFontWidth);
+                item->SetUserValue(playlistItem);
+
+                m_playlistView->AddItem(item);
+            }
+        }       
     }
 }
 

@@ -28,12 +28,12 @@ ____________________________________________________________________________*/
 
 #include "config.h"
 #include "errors.h"
-#include "vector.h"
+#include "list.h"
 #include "win32impl.h"
 
 class LibDirFindHandle {
  public:
-    Vector <char *> *m_pLibDirs;
+    List <char *> *m_pLibDirs;
     int32 m_current;
 };
 

@@ -28,7 +28,7 @@ ____________________________________________________________________________*/
 #include "player.h"
 #include "event.h"
 #include "ui.h"
-#include "vector.h"
+#include "list.h"
 #include "hashtable.h"
 #include "semaphore.h"
 #include "registrar.h"
@@ -39,7 +39,7 @@ extern "C" {
 }
 #endif
 
-void testVector();
+void testList();
 void testHashTable();
 
 #if 0
@@ -58,7 +58,7 @@ bool CompareName(const char *p1, const char *p2) {
 }
 #endif
 int main(int argc, char **argv) {
-    //testVector();
+    //testList();
     //testBuffer();
     //testHashTable();
     //exit(1);
@@ -132,9 +132,9 @@ int main(int argc, char **argv) {
 }
 
 #if 0
-void testVector() {
-    cout << "Beginning testVector..." << endl;
-    Vector<char *> *pVect = new Vector<char *>(2);
+void testList() {
+    cout << "Beginning testList..." << endl;
+    List<char *> *pVect = new List<char *>(2);
     char *p1 = "Hey man!";
     char *p2 = "Yo dude!";
     char *p3 = "And, the fourth.";
@@ -160,7 +160,7 @@ void testVector() {
     if (pVect->ElementAt(0) != NULL) {
 	cout << "Final Test failed!!" << endl;
     }
-    cout << "Ending testVector..." << endl;
+    cout << "Ending testList..." << endl;
 }
 #endif
 

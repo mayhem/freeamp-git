@@ -27,7 +27,6 @@ ____________________________________________________________________________*/
 #include <time.h>
 
 #include "playlist.h"
-#include "vector.h"
 #include "event.h"
 #include "eventdata.h"
 #include "mutex.h"
@@ -36,8 +35,8 @@ PlayListManager::PlayListManager(EventQueue * pPlayer)
 {
    m_plMutex = new Mutex();
    m_target = pPlayer;
-   m_pMediaElems = new Vector < PlayListItem * >();
-   m_pOrderList = new Vector < OrderListItem * >();
+   m_pMediaElems = new List < PlayListItem * >();
+   m_pOrderList = new List < OrderListItem * >();
    if (!m_pMediaElems)
    {
       cerr << "Out of memory!" << endl;
@@ -112,7 +111,7 @@ void PlayListManager::Add(char *pc, int type)
         // add a corresponding element to the order list
         OrderListItem *orderItem = new OrderListItem();
 
-        orderItem->m_indexToRealVector = m_pMediaElems->NumElements() - 1;
+        orderItem->m_indexToRealList = m_pMediaElems->NumElements() - 1;
         m_pOrderList->Insert(orderItem);
 
         //PLMGetMediaInfoEvent *gmi = new PLMGetMediaInfoEvent();
@@ -124,27 +123,25 @@ void PlayListManager::Add(char *pc, int type)
    ReleasePLManipLock();
 }
 
-Error     PlayListManager::
-AddAt(char *pc, int type, int32 at)
+
+int32 PlayListManager::IndexOf(PlayListItem* item)
 {
-    Error     rtn = kError_UnknownErr;
+    int32 result = 0;
+
+    result = m_pMediaElems->IndexOf(item);
+
+    return result;
+}
+
+Error PlayListManager::AddAt(PlayListItem* item, int32 at)
+{
+   Error     rtn = kError_UnknownErr;
 
     GetPLManipLock();
     if ((at >= 0) && (at <= m_pMediaElems->NumElements()))
     {
-        if (pc)
+        if (item)
         {
-            PlayListItem *item = new PlayListItem();
-
-            if (!item)
-            {
-                cerr << "Out of memory!!!" << endl;
-                exit(1);
-            }
-
-            item->SetURL(pc);
-            item->SetType(type);
-
             if (m_order == SHUFFLE_SHUFFLED)
             {
                 m_pMediaElems->Insert(item); // put the real thing at the end
@@ -163,12 +160,12 @@ AddAt(char *pc, int type, int32 at)
 
             if (m_order == SHUFFLE_SHUFFLED)
             {
-                orderItem->m_indexToRealVector = m_pMediaElems->NumElements() - 1;
+                orderItem->m_indexToRealList = m_pMediaElems->NumElements() - 1;
                 m_pOrderList->InsertAt(at, orderItem);
             }
             else
             {
-                orderItem->m_indexToRealVector = at;
+                orderItem->m_indexToRealList = at;
                 m_pOrderList->InsertAt(at, orderItem);
             }
 
@@ -186,6 +183,32 @@ AddAt(char *pc, int type, int32 at)
     return rtn;
 }
 
+Error     PlayListManager::
+AddAt(char *pc, int type, int32 at)
+{
+    Error     rtn = kError_UnknownErr;
+
+    PlayListItem *item = new PlayListItem();
+
+    if (!item)
+    {
+        cerr << "Out of memory!!!" << endl;
+        exit(1);
+    }
+
+    item->SetURL(pc);
+    item->SetType(type);
+
+    rtn = AddAt(item,at);
+
+    return rtn;
+}
+
+Error PlayListManager::RemoveItem(PlayListItem* item)
+{
+    return RemoveItem(IndexOf(item));
+}
+
 Error PlayListManager::RemoveItem(int32 at)
 {
    Error     rtn = kError_UnknownErr;
@@ -195,7 +218,7 @@ Error PlayListManager::RemoveItem(int32 at)
    {
       if (m_order == SHUFFLE_SHUFFLED)
       {
-         int32     realOne = m_pOrderList->ElementAt(at)->m_indexToRealVector;
+         int32     realOne = m_pOrderList->ElementAt(at)->m_indexToRealList;
 
          m_pOrderList->DeleteElementAt(at);
          m_pMediaElems->DeleteElementAt(realOne);
@@ -203,7 +226,7 @@ Error PlayListManager::RemoveItem(int32 at)
       else
       {
          // just delete the last element.  when not shuffled, the ordered
-         // vector isn't used
+         // List isn't used
          m_pMediaElems->DeleteElementAt(at);
          m_pOrderList->DeleteElementAt(m_pOrderList->NumElements() - 1);
       }
@@ -214,6 +237,7 @@ Error PlayListManager::RemoveItem(int32 at)
    return rtn;
 }
 
+
 PlayListItem *PlayListManager::ItemAt(int32 at)
 {
    PlayListItem *rtn = NULL;
@@ -223,7 +247,7 @@ PlayListItem *PlayListManager::ItemAt(int32 at)
    {
       if (m_order == SHUFFLE_SHUFFLED)
       {
-         int32     realOne = m_pOrderList->ElementAt(at)->m_indexToRealVector;
+         int32     realOne = m_pOrderList->ElementAt(at)->m_indexToRealList;
 
          rtn = m_pMediaElems->ElementAt(realOne);
       }
@@ -249,7 +273,7 @@ PlayListItem *PlayListManager::GetCurrent()
    {
       if (m_order == SHUFFLE_SHUFFLED)
       {
-         pli = m_pMediaElems->ElementAt((m_pOrderList->ElementAt(m_current))->m_indexToRealVector);
+         pli = m_pMediaElems->ElementAt((m_pOrderList->ElementAt(m_current))->m_indexToRealList);
       }
       else
       {
@@ -454,7 +478,7 @@ void PlayListManager::SetShuffle(ShuffleMode oop)
          {
             if ((elems > 0) && (m_current >= 0) && (m_current < elems))
             {
-               m_current = (m_pOrderList->ElementAt(m_current))->m_indexToRealVector;
+               m_current = (m_pOrderList->ElementAt(m_current))->m_indexToRealList;
             }
             else
             {
@@ -499,7 +523,7 @@ void PlayListManager::ShuffleOrder()
    }
    else if (m_order == SHUFFLE_SHUFFLED)
    {
-      actual_current = (m_pOrderList->ElementAt(m_current))->m_indexToRealVector;
+      actual_current = (m_pOrderList->ElementAt(m_current))->m_indexToRealList;
    }
    else
    {
@@ -509,7 +533,7 @@ void PlayListManager::ShuffleOrder()
    for (i = 0; i < element_count; i++)
    {
       order_item = m_pOrderList->ElementAt(i);
-      order_item->m_indexToRealVector = i;
+      order_item->m_indexToRealList = i;
       order_item->m_random = (int32) rand();
    }
 
@@ -525,7 +549,7 @@ void PlayListManager::ShuffleOrder()
       for (i = 0; i < element_count; i++)
       {
          order_item = m_pOrderList->ElementAt(i);
-         if (order_item->m_indexToRealVector == actual_current)
+         if (order_item->m_indexToRealList == actual_current)
          {
             m_current = i;
             break;

@@ -78,7 +78,7 @@ HANDLE Preferences::GetFirstLibDir(char *path, uint32 *len) {
     }
     pEnv = pPath;
     LibDirFindHandle *pldfh = new LibDirFindHandle();
-    pldfh->m_pLibDirs = new Vector<char *>();
+    pldfh->m_pLibDirs = new List<char *>();
     pldfh->m_current = 0;
 
     char *pCol = (char *)1;

@@ -121,6 +121,8 @@ class ListView : public View {
             bool        InternalSelect(int32 index, bool extend);
             bool        InternalSelect(int32 from, int32 to, bool extend);
 
+            void        UpdateScrollBar();
+
     static  void        thread_function(void*);
             void        ThreadFunction();
 

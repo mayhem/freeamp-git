@@ -34,6 +34,7 @@ ____________________________________________________________________________*/
 #include "listview.h"
 #include "renderer.h"
 #include "scrollview.h"
+#include "freeampui.h"
 
 
 ListView::
@@ -420,20 +421,29 @@ LeftButtonUp(int32 x, int32 y, int32 modifiers)
 
                 index -= count;
 
-                char buffer[256];
-                wsprintf(buffer, "index: %d\r\n",index);
-                OutputDebugString(buffer);
+                //char buffer[256];
+                //wsprintf(buffer, "index: %d\r\n",index);
+                //OutputDebugString(buffer);
 
                 // remove selected items from list
                 List<ListItem*>* selectList = new List<ListItem*>();
 
 	            i = m_lastSelected;
 
+                FreeAmpUI* ui = (FreeAmpUI*)GetWindowLong(Window(), GWL_USERDATA);
+                PlayListManager* plm = ui->GetPlayListManager();
+
 	            while(item = ItemAt(i--)) 
                 {
 		            if(item->IsSelected())
                     {
                         RemoveItem(item);
+
+                        PlayListItem* playlistItem;     
+                        playlistItem = (PlayListItem*)item->UserValue();
+
+                        plm->RemoveItem(playlistItem);
+
                         //item->Select(); // remove deselects
                         selectList->InsertAt(0, item);
                     }
@@ -443,6 +453,18 @@ LeftButtonUp(int32 x, int32 y, int32 modifiers)
                     index = CountItems();
 
                 AddList(selectList, index);
+
+                i = 0;
+
+                while(item = selectList->ElementAt(i++))
+                {
+                    PlayListItem* playlistItem;     
+                    playlistItem = (PlayListItem*)item->UserValue();
+
+                    plm->AddAt(playlistItem, index + i);
+                }
+
+
 
                 delete selectList;
             }
@@ -563,13 +585,9 @@ TargetedByScrollView(ScrollView *scroller)
 {
     m_scroller = scroller;
 
-    m_scroller->SetRange(0, CountItems() - 1);
-    m_scroller->SetPosition(m_firstVisible);
+    UpdateScrollBar();
 
-    if(CountItems() - 1 < 7)
-        m_scroller->SetProportion(CountItems() - 1);
-    else
-        m_scroller->SetProportion(7);
+    m_scroller->SetPosition(m_firstVisible);
 }
 
 void 
@@ -611,6 +629,8 @@ AddItem(ListItem* item)
     if(m_list->Insert(item))
     {
 		result = true;
+        UpdateScrollBar();
+        Invalidate();
 	}
 
     return result;
@@ -638,6 +658,9 @@ AddItem(ListItem* item, int32 index)
         {
 		    m_lastSelected++;
         }
+
+        UpdateScrollBar();
+        Invalidate();
 	}
 
     return result;
@@ -678,6 +701,9 @@ AddList(List<ListItem*>* items, int32 index)
         {
 		    m_lastSelected += count;
         }
+
+        UpdateScrollBar();
+        Invalidate();
     }
 
     return result;
@@ -725,6 +751,9 @@ RemoveItem(int32 index)
 			    m_lastSelected--;
             }
 	    }
+
+        UpdateScrollBar();
+        Invalidate();
     }
 
     return result;
@@ -1298,6 +1327,21 @@ DetermineLastSelected(int32 before)
 	}
 
 	return result;
+}
+
+void
+ListView::
+UpdateScrollBar()
+{
+    if(m_scroller)
+    {
+        m_scroller->SetRange(0, CountItems() - 1);
+    
+        if(CountItems() - 1 < 7)
+            m_scroller->SetProportion(CountItems() - 1);
+        else
+            m_scroller->SetProportion(7);    
+    }
 }
 
 void

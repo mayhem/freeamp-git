@@ -27,7 +27,7 @@ ____________________________________________________________________________*/
 #include "player.h"
 #include "event.h"
 #include "ui.h"
-#include "vector.h"
+#include "list.h"
 #include "hashtable.h"
 #include "semaphore.h"
 #include "registrar.h"
@@ -39,7 +39,7 @@ ____________________________________________________________________________*/
 #include "../xingmp3/include/xinglmc.h"
 #endif
 
-void testVector();
+void testList();
 void testHashTable();
 
 #if 0
@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
 	delete pLMC;
 	return 0;
 #else
-    //testVector();
+    //testList();
     //testBuffer();
     //testHashTable();
 
@@ -131,9 +131,9 @@ int main(int argc, char **argv) {
 }
 
 #if 0
-void testVector() {
-    cout << "Beginning testVector..." << endl;
-    Vector<char *> *pVect = new Vector<char *>(2);
+void testList() {
+    cout << "Beginning testList..." << endl;
+    List<char *> *pVect = new List<char *>(2);
     char *p1 = "Hey man!";
     char *p2 = "Yo dude!";
     char *p3 = "And, the third.";
@@ -156,7 +156,7 @@ void testVector() {
 	cout << "Final Test failed!!" << endl;
     }
 
-    Vector<DummyUI *> *pVect2 = new Vector<DummyUI *>(2);
+    List<DummyUI *> *pVect2 = new List<DummyUI *>(2);
     DummyUI *pd = new DummyUI(NULL);
     pVect2->Insert(pd);
     pd = new DummyUI(NULL);
@@ -168,7 +168,7 @@ void testVector() {
     if (pVect2->ElementAt(0) != NULL) {
 	cout << "Final Test failed!! (2nd one)" << endl;
    }
-    cout << "Ending testVector..." << endl;
+    cout << "Ending testList..." << endl;
 }
 #endif
 
