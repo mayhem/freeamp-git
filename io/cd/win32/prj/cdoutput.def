@@ -1,7 +1,7 @@
-;cdinput.def : Declares the module parameters for the DLL.
+;cdoutput.def : Declares the module parameters for the DLL.
 
 LIBRARY      "cd"
-DESCRIPTION  'CDDA Input Library'
+DESCRIPTION  'CDDA Output Library'
 
 EXPORTS
 	Initialize
