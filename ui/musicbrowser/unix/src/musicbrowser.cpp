@@ -82,10 +82,12 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
                 browserWindows.erase(browserWindows.begin());
             }
 
+            gdk_threads_enter();
             if (searching)
                 searching->Close();
             if (wiz)
                 wiz->Close();
+            gdk_threads_leave();
 
             m_playerEQ->AcceptEvent(new Event(INFO_ReadyToDieUI));
             break; }
@@ -100,12 +102,14 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
             if (wiz)
 	        wiz->AcceptEvent(event);
             if (event->Type() == INFO_SearchMusicDone) {
+                gdk_threads_enter();
 	        if (searching) {
                     searching->Close();
 		}
 		if (wiz) {
 		    wiz->Close();
 		}
+                gdk_threads_leave();
             }
             break; }
         case CMD_ToggleMusicBrowserUI: {
