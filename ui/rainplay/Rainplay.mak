@@ -66,6 +66,7 @@ CLEAN :
 	-@erase "$(INTDIR)\optionsetupdlg.obj"
 	-@erase "$(INTDIR)\playlist.obj"
 	-@erase "$(INTDIR)\PlayListDlg.obj"
+	-@erase "$(INTDIR)\preferences.obj"
 	-@erase "$(INTDIR)\PreferencesDlg.obj"
 	-@erase "$(INTDIR)\Rainplay.obj"
 	-@erase "$(INTDIR)\Rainplay.pch"
@@ -117,6 +118,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\optionsetupdlg.obj" \
 	"$(INTDIR)\playlist.obj" \
 	"$(INTDIR)\PlayListDlg.obj" \
+	"$(INTDIR)\preferences.obj" \
 	"$(INTDIR)\PreferencesDlg.obj" \
 	"$(INTDIR)\Rainplay.obj" \
 	"$(INTDIR)\Rainplay.res" \
@@ -148,7 +150,7 @@ OutDir=.\Release
 
 $(DS_POSTBUILD_DEP) : "xing - Win32 Release" "soundcard - Win32 Release"\
  "fileinput - Win32 Release" ".\rainplay.ui" "$(OUTDIR)\Rainplay.pch"
-   IF NOT EXIST ..\..\base\win32\prj\plugins mkdir                      ..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\base\win32\prj\plugins mkdir                       ..\..\base\win32\prj\plugins
 	copy rainplay.ui     ..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
@@ -187,6 +189,7 @@ CLEAN :
 	-@erase "$(INTDIR)\optionsetupdlg.obj"
 	-@erase "$(INTDIR)\playlist.obj"
 	-@erase "$(INTDIR)\PlayListDlg.obj"
+	-@erase "$(INTDIR)\preferences.obj"
 	-@erase "$(INTDIR)\PreferencesDlg.obj"
 	-@erase "$(INTDIR)\Rainplay.obj"
 	-@erase "$(INTDIR)\Rainplay.pch"
@@ -241,6 +244,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\optionsetupdlg.obj" \
 	"$(INTDIR)\playlist.obj" \
 	"$(INTDIR)\PlayListDlg.obj" \
+	"$(INTDIR)\preferences.obj" \
 	"$(INTDIR)\PreferencesDlg.obj" \
 	"$(INTDIR)\Rainplay.obj" \
 	"$(INTDIR)\Rainplay.res" \
@@ -272,7 +276,7 @@ OutDir=.\Debug
 
 $(DS_POSTBUILD_DEP) : "xing - Win32 Debug" "soundcard - Win32 Debug"\
  "fileinput - Win32 Debug" ".\rainplay.ui" "$(OUTDIR)\Rainplay.pch"
-   IF NOT EXIST ..\..\base\win32\prj\plugins mkdir                      ..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\base\win32\prj\plugins mkdir                       ..\..\base\win32\prj\plugins
 	copy rainplay.ui     ..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
@@ -1227,31 +1231,69 @@ CPP_SWITCHES=/nologo /G6 /MDd /W3 /Gm /Gi /GR /GX /Zi /Od /I "." /I\
 
 !ENDIF 
 
-SOURCE=.\Preferences\PreferencesDlg.cpp
+SOURCE=..\..\base\win32\src\preferences.cpp
 
 !IF  "$(CFG)" == "Rainplay - Win32 Release"
 
 DEP_CPP_PREFE=\
-	".\Preferences\optionsetupdlg.h"\
-	".\Preferences\PreferencesDlg.h"\
-	".\Rainplay.h"\
-	".\StdAfx.h"\
+	"..\..\base\include\errors.h"\
+	"..\..\base\win32\include\preferences.h"\
+	"..\..\config\config.h"\
 	
 
-"$(INTDIR)\PreferencesDlg.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"
+"$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"\
+ "..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "Rainplay - Win32 Debug"
 
 DEP_CPP_PREFE=\
+	"..\..\base\include\errors.h"\
+	"..\..\base\win32\include\preferences.h"\
+	"..\..\config\config.h"\
+	
+
+"$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"\
+ "..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
+SOURCE=.\Preferences\PreferencesDlg.cpp
+
+!IF  "$(CFG)" == "Rainplay - Win32 Release"
+
+DEP_CPP_PREFER=\
+	"..\..\base\include\errors.h"\
+	"..\..\base\win32\include\preferences.h"\
+	"..\..\config\config.h"\
 	".\Preferences\optionsetupdlg.h"\
 	".\Preferences\PreferencesDlg.h"\
 	".\Rainplay.h"\
 	".\StdAfx.h"\
 	
 
-"$(INTDIR)\PreferencesDlg.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"
+"$(INTDIR)\PreferencesDlg.obj" : $(SOURCE) $(DEP_CPP_PREFER) "$(INTDIR)"\
+ "..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "Rainplay - Win32 Debug"
+
+DEP_CPP_PREFER=\
+	"..\..\base\include\errors.h"\
+	"..\..\base\win32\include\preferences.h"\
+	"..\..\config\config.h"\
+	".\Preferences\optionsetupdlg.h"\
+	".\Preferences\PreferencesDlg.h"\
+	".\Rainplay.h"\
+	".\StdAfx.h"\
+	
+
+"$(INTDIR)\PreferencesDlg.obj" : $(SOURCE) $(DEP_CPP_PREFER) "$(INTDIR)"\
+ "..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

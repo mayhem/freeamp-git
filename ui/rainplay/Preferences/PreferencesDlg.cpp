@@ -4,6 +4,8 @@
 #include "stdafx.h"
 #include "rainplay.h"
 #include "PreferencesDlg.h"
+#include "preferences.h"
+#include "errors.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -124,23 +126,15 @@ void CPreferencesDlg::OnApply()
 
 BOOL CPreferencesDlg::SetDefaultUI(CString szDefaultUI)
 {
-	HKEY key;
-	DWORD disposition;
-	CString szTemp;
-	if (RegCreateKeyEx(HKEY_CURRENT_USER, "Software\\Freeamp\\FreeAmp v1.0", NULL, "",
-						REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS,
-						NULL, &key, &disposition)!=ERROR_SUCCESS) {
-		szTemp = "Error on create register key.";
-		AfxMessageBox(szTemp);
-		return FALSE;
-	}
-	if (RegSetValueEx(key, "UI", NULL, REG_SZ,
-					(LPBYTE)LPCTSTR(szDefaultUI), szDefaultUI.GetLength()+1)!=ERROR_SUCCESS) {
-		szTemp = "Error on set value \"" + szDefaultUI + "\"" + "to subkey \" UI \"" + ".";
-		AfxMessageBox(szTemp);
-		return FALSE;
-	}
-	RegCloseKey(key);
+    Preferences prefs;
+    int32 length = szDefaultUI.GetLength();
+    char* ui = szDefaultUI.GetBuffer(length);
+
+    if(IsError(prefs.SetDefaultUI(ui)))
+    {
+        return FALSE;
+    }
+
 	return TRUE;
 }
 
