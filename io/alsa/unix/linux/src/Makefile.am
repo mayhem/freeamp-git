@@ -28,7 +28,7 @@ PLUGIN_DIR = @top_srcdir@/plugins/
 PLUGIN_NAME = alsa-@target_os@.pmo
 PLUGIN_FULL_NAME = $(PLUGIN_DIR)$(PLUGIN_NAME)
 
-if AM_HAVE_LINUX
+if AM_HAVE_ALSA
 FILES = alsapmo.cpp 
 MYLIBS = libfaio.a
 
@@ -36,12 +36,16 @@ all-local : $(PLUGIN_FULL_NAME)
 
 $(PLUGIN_FULL_NAME) : $(libfaio_a_OBJECTS)
 	@mkdir -p @top_srcdir@/plugins
-	gcc -shared -Wl,-soname,$(PLUGIN_NAME) -o $(PLUGIN_FULL_NAME) $(libfaio_a_OBJECTS)
+	gcc -shared -Wl,-soname,$(PLUGIN_NAME) -o $(PLUGIN_FULL_NAME) $(libfaio_a_OBJECTS) -lasound
 	@chmod 644 $(PLUGIN_FULL_NAME)
 
 else
 FILES = 
 MYLIBS = 
+
+all-local :
+	  @true
+
 endif
 
 if AM_HAVE_LINUXTHREADS

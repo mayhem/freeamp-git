@@ -81,11 +81,11 @@ PLUGIN_DIR = @top_srcdir@/plugins/
 PLUGIN_NAME = alsa-@target_os@.pmo
 PLUGIN_FULL_NAME = $(PLUGIN_DIR)$(PLUGIN_NAME)
 
-@AM_HAVE_LINUX_TRUE@FILES = alsapmo.cpp 
-@AM_HAVE_LINUX_TRUE@MYLIBS = libfaio.a
+@AM_HAVE_ALSA_TRUE@FILES = alsapmo.cpp 
+@AM_HAVE_ALSA_TRUE@MYLIBS = libfaio.a
 
-@AM_HAVE_LINUX_FALSE@FILES = 
-@AM_HAVE_LINUX_FALSE@MYLIBS = 
+@AM_HAVE_ALSA_FALSE@FILES = 
+@AM_HAVE_ALSA_FALSE@MYLIBS = 
 
 @AM_HAVE_LINUXTHREADS_TRUE@REENT = -D_REENTRANT
 
@@ -109,8 +109,8 @@ X_LIBS = @X_LIBS@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
 X_PRE_LIBS = @X_PRE_LIBS@
 libfaio_a_LIBADD = 
-@AM_HAVE_LINUX_FALSE@cond0libfaio_a_OBJECTS = 
-@AM_HAVE_LINUX_TRUE@cond1libfaio_a_OBJECTS =  alsapmo.o
+@AM_HAVE_ALSA_TRUE@cond0libfaio_a_OBJECTS =  alsapmo.o
+@AM_HAVE_ALSA_FALSE@cond1libfaio_a_OBJECTS = 
 libfaio_a_OBJECTS =  $(cond0libfaio_a_OBJECTS) $(cond1libfaio_a_OBJECTS)
 AR = ar
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
@@ -312,12 +312,15 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 include @top_srcdir@/config/Makefile.header
 
-@AM_HAVE_LINUX_TRUE@all-local : $(PLUGIN_FULL_NAME)
+@AM_HAVE_ALSA_TRUE@all-local : $(PLUGIN_FULL_NAME)
 
-@AM_HAVE_LINUX_TRUE@$(PLUGIN_FULL_NAME) : $(libfaio_a_OBJECTS)
-@AM_HAVE_LINUX_TRUE@	@mkdir -p @top_srcdir@/plugins
-@AM_HAVE_LINUX_TRUE@	gcc -shared -Wl,-soname,$(PLUGIN_NAME) -o $(PLUGIN_FULL_NAME) $(libfaio_a_OBJECTS)
-@AM_HAVE_LINUX_TRUE@	@chmod 644 $(PLUGIN_FULL_NAME)
+@AM_HAVE_ALSA_TRUE@$(PLUGIN_FULL_NAME) : $(libfaio_a_OBJECTS)
+@AM_HAVE_ALSA_TRUE@	@mkdir -p @top_srcdir@/plugins
+@AM_HAVE_ALSA_TRUE@	gcc -shared -Wl,-soname,$(PLUGIN_NAME) -o $(PLUGIN_FULL_NAME) $(libfaio_a_OBJECTS) -lasound
+@AM_HAVE_ALSA_TRUE@	@chmod 644 $(PLUGIN_FULL_NAME)
+
+@AM_HAVE_ALSA_FALSE@all-local :
+@AM_HAVE_ALSA_FALSE@	  @true
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
