@@ -630,7 +630,9 @@ void MusicBrowserUI::MusicCatalogTrackRemoved(const ArtistList* artist,
 
     if(trackItem)
     {
-        TreeView_DeleteItem(m_hMusicCatalog, trackItem);
+        BOOL success;
+
+        success = TreeView_DeleteItem(m_hMusicCatalog, trackItem);
 
         if(albumItem && !TreeView_GetChild(m_hMusicCatalog, albumItem))
         {
@@ -1275,6 +1277,7 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
     static RECT dragRect;
     static HTREEITEM dragItem = NULL;
     static bool selectedOnMouseDown = false;
+    static HTREEITEM editItem = NULL;
 
     //return CallWindowProc((int (__stdcall *)(void))lpOldProc, hwnd, msg, wParam, lParam );
 
@@ -1734,32 +1737,40 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
                     
                     if(selectedOnMouseDown)
                     {
-                        // i should do this in the notify but it is ignoring me
-                        if(item != m_hCatalogItem &&
-                           item != m_hPlaylistItem &&
-                           item != m_hAllItem &&
-                           item != m_hUncatItem &&
-                           item != m_hNewPlaylistItem)
+                        if(editItem != item)
                         {
-                            Sleep(500);
-                            SetFocus(hwnd);
-                            HWND hwndEdit = TreeView_EditLabel(hwnd, item);
-
-                            if(hwndEdit)
+                            // i should do this in the notify but it is ignoring me
+                            if(item != m_hCatalogItem &&
+                               item != m_hPlaylistItem &&
+                               item != m_hAllItem &&
+                               item != m_hUncatItem &&
+                               item != m_hNewPlaylistItem)
                             {
-                                SetProp(hwndEdit, 
-                                        "oldproc",
-                                        (HANDLE)GetWindowLong(hwndEdit, GWL_WNDPROC));
+                                editItem = item;
+                                Sleep(500);
+                                SetFocus(hwnd);
+                                HWND hwndEdit = TreeView_EditLabel(hwnd, item);
 
-                                /*SetProp(m_hMusicCatalog, 
-                                        "this",
-                                        (HANDLE)this);*/
-	
-	                            // Subclass the window so we can handle multi-select
-	                            SetWindowLong(hwndEdit, 
-			                                  GWL_WNDPROC, 
-                                              (DWORD)::EditLabelWndProc);  
+                                if(hwndEdit)
+                                {
+                                    SetProp(hwndEdit, 
+                                            "oldproc",
+                                            (HANDLE)GetWindowLong(hwndEdit, GWL_WNDPROC));
+
+                                    /*SetProp(m_hMusicCatalog, 
+                                            "this",
+                                            (HANDLE)this);*/
+	    
+	                                // Subclass the window so we can handle multi-select
+	                                SetWindowLong(hwndEdit, 
+			                                      GWL_WNDPROC, 
+                                                  (DWORD)::EditLabelWndProc);  
+                                }
                             }
+                        }
+                        else
+                        {
+                            editItem = NULL;
                         }
                     }
                 }
