@@ -330,7 +330,11 @@ void TitleStreamServer::WorkerThread(void)
 		else if (strstr (line, "x-audiocast-udpseqnr:") != NULL)
 		{
 			char obuf[1024];
+#ifdef WIN32
+			_snprintf (obuf, 1024, "x-audiocast-ack: %ld\r\n", atol (valptr));
+#else
 			snprintf (obuf, 1024, "x-audiocast-ack: %ld\r\n", atol (valptr));
+#endif
 			if (send (m_hHandle, obuf, strlen (obuf), 0) == -1)
 				fprintf (stderr, "Could not send ack to server\n");
 		}
