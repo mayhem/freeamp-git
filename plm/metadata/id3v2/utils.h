@@ -47,7 +47,7 @@ namespace dami
 #endif  /* !MAXPATHLEN && !PATH_MAX */
 
 #ifndef min
-  template<typename T>
+  template <class T>
   const T& min(const T& a, const T& b)
   {
     return (a < b) ? a : b;
@@ -55,7 +55,7 @@ namespace dami
 #endif
 
 #ifndef max
-  template<typename T>
+  template<class T>
   const T& max(const T& a, const T& b)
   {
     return (b < a) ? a : b;
@@ -63,7 +63,7 @@ namespace dami
 #endif
 
 #ifndef mid
-  template<typename T>
+  template<class T>
   const T& mid(const T& lo, const T& mid, const T& hi)
   {
     return max(lo, min(mid, hi));
@@ -71,7 +71,7 @@ namespace dami
 #endif
 
 #ifndef abs
-  template<typename T>
+  template<class T>
   T abs(const T& a)
   {
     return (a < T(0)) ? -a : a;

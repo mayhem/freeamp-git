@@ -26,7 +26,7 @@
 
 #include "header.h"
 
-#include <id3config.h>
+#include "id3config.h"
 
 static const ID3_Header::Info _spec_info[] =
 {

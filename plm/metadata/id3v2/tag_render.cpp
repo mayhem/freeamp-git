@@ -25,7 +25,7 @@
 // http://download.sourceforge.net/id3lib/
 
 #include "config.h"
-#include <id3config.h>
+#include "id3config.h"
 #include <stdlib.h>
 #include <string.h>
 #include <memory.h>

@@ -24,7 +24,7 @@
 // id3lib.  These files are distributed with id3lib at
 // http://download.sourceforge.net/id3lib/
 
-#include <id3config.h>
+#include "id3config.h"
 #include <stdlib.h>
 #include "tag_impl.h"
 #include "utils.h"
@@ -112,6 +112,7 @@ namespace
   
 bool mm::parse(ID3_TagImpl& tag, ID3_Reader& rdr)
 {
+  size_t i;
   io::ExitTrigger et(rdr);
   ID3_Reader::pos_type end = rdr.getCur();
   if (end < rdr.getBeg() + 48)
@@ -156,7 +157,7 @@ bool mm::parse(ID3_TagImpl& tag, ID3_Reader& rdr)
   uint32 offsets[5];
     
   io::WindowedReader offsetWindow(rdr, 20);
-  for (size_t i = 0; i < 5; ++i)
+  for (i = 0; i < 5; ++i)
   {
     offsets[i] = io::readLENumber(rdr, sizeof(uint32));
   }
@@ -175,8 +176,8 @@ bool mm::parse(ID3_TagImpl& tag, ID3_Reader& rdr)
     // the version section signature that should precede the metadata section
     // by exactly 256 bytes.
     size_t possibleSizes[] = { 8132, 8004, 7936 };
-      
-    for (size_t i = 0; i < sizeof(possibleSizes)/sizeof(size_t); ++i)
+
+    for (i = 0; i < sizeof(possibleSizes)/sizeof(size_t); ++i)
     {
       dataWindow.setCur(dataWindow.getEnd());
         
@@ -216,7 +217,7 @@ bool mm::parse(ID3_TagImpl& tag, ID3_Reader& rdr)
   sectionSizes[4] = metadataSize;
     
   size_t lastOffset = 0;
-  for (int i = 0; i < 5; i++)
+  for (i = 0; i < 5; i++)
   {
     size_t thisOffset = offsets[i];
     //ASSERT(thisOffset > lastOffset);
@@ -243,7 +244,7 @@ bool mm::parse(ID3_TagImpl& tag, ID3_Reader& rdr)
     
   // Now calculate the adjusted offsets
   offsets[0] = dataWindow.getBeg();
-  for (size_t i = 0; i < 4; ++i)
+  for (i = 0; i < 4; ++i)
   {
     offsets[i+1] = offsets[i] + sectionSizes[i];
   }

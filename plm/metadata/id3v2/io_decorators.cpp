@@ -25,7 +25,7 @@
 // http://download.sourceforge.net/id3lib/
 
 #include "config.h"
-#include <id3config.h>
+#include "id3config.h"
 #include "io_decorators.h"
 #include "utils.h"
 #ifdef HAVE_ZLIB

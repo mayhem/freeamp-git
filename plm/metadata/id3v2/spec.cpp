@@ -24,7 +24,7 @@
 // id3lib.  These files are distributed with id3lib at
 // http://download.sourceforge.net/id3lib/
 
-#include <id3config.h>
+#include "id3config.h"
 #include "spec.h"
 
 ID3_V2Spec ID3_VerRevToV2Spec(uchar ver, uchar rev)

@@ -24,7 +24,7 @@
 // id3lib.  These files are distributed with id3lib at
 // http://download.sourceforge.net/id3lib/
 
-#include <id3config.h>
+#include "id3config.h"
 
 #if defined HAVE_ICONV_H
 # include <iconv.h>

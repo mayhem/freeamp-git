@@ -25,7 +25,7 @@
 // http://download.sourceforge.net/id3lib/
 
 #include "config.h"
-#include <id3config.h>
+#include "id3config.h"
 #include "frame_impl.h"
 #include "utils.h"
 #include "io_decorators.h"
