@@ -355,6 +355,22 @@ Error HttpInput::Win32GetHostByName(char *szHostName, struct hostent *pHostInfo)
         memcpy(pHostInfo, szBuffer, sizeof(struct hostent));
         return kError_NoErr;
     }
+    else
+    {
+        static unsigned long IP_Adr;
+        static char *AdrPtrs[2] = {(char *) &IP_Adr, NULL };
+
+        // That didn't work.  On some stacks a numeric IP address
+        // will not parse with gethostbyname.  Try to convert it as a
+        // numeric address before giving up.
+        if((int)(IP_Adr = inet_addr(szHostName)) < 0) 
+            return kError_NoDataAvail;
+
+        pHostInfo->h_length = sizeof(uint32);
+        pHostInfo->h_addrtype = AF_INET;
+        pHostInfo->h_addr_list = (char **) &AdrPtrs;
+        return kError_NoErr;
+    }
 
     return kError_NoDataAvail;
 }
@@ -902,7 +918,6 @@ void HttpInput::WorkerThread(void)
    fd_set          sSet;
    struct timeval  sTv;
    char            cNumBlocks;
-
    static int      iSize = 0;
 
    eError = Open();
@@ -912,6 +927,7 @@ void HttpInput::WorkerThread(void)
    }   
 
    m_pSleepSem->Wait(); 
+int iDebugCount = 1;
 
    for(; !m_bExit;)
    {
@@ -929,6 +945,17 @@ void HttpInput::WorkerThread(void)
           usleep(10000);
           continue;
       }
+
+//if ((iDebugCount % 100) == 0)
+//{
+//   return;
+////   printf("Sleeping for 10 secs\n");
+//   sleep(10);
+//   printf("Back from sleep\n");
+//}
+//else
+//   printf("%04d\n", iDebugCount);
+//iDebugCount++;
        
       eError = m_pOutputBuffer->BeginWrite(pBuffer, iReadSize);
       if (eError == kError_NoErr)

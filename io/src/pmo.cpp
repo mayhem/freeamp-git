@@ -213,7 +213,7 @@ void PhysicalMediaOutput::UpdateBufferStatus(void)
    }
 }
 
-void PhysicalMediaOutput::CheckForBufferUp(void)
+void PhysicalMediaOutput::CheckForBufferUp(bool bForceBufferUp)
 {
    int iInPercent, iOutPercent;
 
@@ -225,9 +225,9 @@ void PhysicalMediaOutput::CheckForBufferUp(void)
    iInPercent = m_pPmiBuffer->GetBufferPercentage(); 
    iOutPercent = m_pInputBuffer->GetBufferPercentage();
 
-   if (iOutPercent < 2 && iInPercent < 2)
+   if (bForceBufferUp || (iOutPercent <= 5 && iInPercent <= 5))
    {
-       for(; !m_bExit && iInPercent < 50;)
+       for(; !m_bExit && iInPercent < 75;)
        {
            usleep(500000);
            iInPercent = m_pPmiBuffer->GetBufferPercentage(); 

@@ -354,7 +354,7 @@ void SoundCardPMO::WorkerThread(void)
    // Don't do anything until resume is called.
    m_pPauseSem->Wait();
 
-   //CheckForBufferUp();
+   //CheckForBufferUp(true);
 
    // Wait a specified prebuffer time...
    PreBuffer();
@@ -400,7 +400,6 @@ void SoundCardPMO::WorkerThread(void)
           delete pEvent;
           continue;
       }
-
       // Set up reading a block from the buffer. If not enough bytes are
       // available, sleep for a little while and try again.
       for(;;)
@@ -413,18 +412,11 @@ void SoundCardPMO::WorkerThread(void)
           if (eErr == kError_NoDataAvail)
           {
               m_pLmc->Wake();
-              CheckForBufferUp();
 
-              if (!bPerfWarn)
-              {
-                  time_t t;
-    
-                  time(&t);
-                  m_pContext->log->Log(LogPerf, "Output buffer underflow: %s", 
-                             ctime(&t));
-                  bPerfWarn = true;
-              }
-    
+              // Only force a buffer up if the soundcard underflowed
+              ioctl(audio_fd, SNDCTL_DSP_GETOSPACE, &info);
+              CheckForBufferUp(info.fragments == 0);     
+
               WasteTime();
               continue;
           }
@@ -487,6 +479,7 @@ void SoundCardPMO::WorkerThread(void)
       // This loop could be written using non-blocking io...
       for(;;)
       {
+          CheckForBufferUp();
           if (m_bExit || m_bPause)
               break;
 
