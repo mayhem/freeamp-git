@@ -157,7 +157,7 @@ calc_size(Efont * f, int *width, int *height, char *text)
 
 static void
 render_text(TT_Raster_Map *rmap, TT_Raster_Map *rchr, Efont *f, char *text,
-	    int *xor, int *yor)
+	    int *xorblah, int *yor)
 {
    TT_Glyph_Metrics    metrics;
    TT_Instance_Metrics imetrics;
@@ -176,7 +176,7 @@ render_text(TT_Raster_Map *rmap, TT_Raster_Map *rchr, Efont *f, char *text,
 
    y_offset = -(f->max_descent / 64);
 
-   *xor = x_offset;
+   *xorblah = x_offset;
    *yor = rmap->rows - y_offset;
 
    rtmp = NULL;

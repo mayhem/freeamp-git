@@ -422,7 +422,7 @@ Error HttpInput::GetHostByName(char *szHostName, struct hostent *pResult)
 
 static void EncodeURI(string& URI)
 {
-	const char* legalCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/?";
+	const char* legalCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/?.";
 
 	string::size_type convert = 0;
 	
@@ -431,7 +431,7 @@ static void EncodeURI(string& URI)
 		string hex = "%";
 		char num[8];
 
-		sprintf(num, "%.2x", URI[convert]);
+		sprintf(num, "%02x", URI[convert] & 0xFF);
 		hex += num;
 		
 		URI.replace(convert, 1, hex);
@@ -1031,3 +1031,13 @@ void HttpInput::WorkerThread(void)
    closesocket(m_hHandle);
    m_hHandle = -1;
 }
+
+vector<string> * HttpInput::GetProtocols(void)
+{
+   vector<string> *protoList = new vector<string>;
+
+   protoList->push_back("http");
+
+   return protoList;
+}
+

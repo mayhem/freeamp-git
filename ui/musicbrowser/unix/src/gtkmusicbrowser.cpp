@@ -1009,6 +1009,12 @@ void GTKMusicBrowser::SetClickState(ClickState newState)
         gtk_container_foreach(GTK_CONTAINER(sig), set_label_menu,
                               (gpointer)"Stop Signaturing");
 
+    sig = gtk_item_factory_get_widget(menuFactory,
+                                      "/Relatable/Learn Playlist");
+    bool advancedRelate = false;
+    m_context->prefs->GetPrefBoolean(kAdvancedRelatablePref, &advancedRelate);
+    gtk_widget_set_sensitive(sig, advancedRelate);
+
     m_clickState = newState;
     if (m_clickState == kContextPlaylist) {
         gtk_widget_set_sensitive(toolRemove, TRUE);

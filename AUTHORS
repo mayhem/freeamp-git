@@ -159,3 +159,13 @@ Michael Rich <istan@alltel.net>
 
 "Martin Enlund" <maren@lysator.liu.se>
 * ORBit corba ui
+
+"Marty Schoch" <mschoch@multicasttech.com>
+* patch to PMI interface allowing use of Supported Protocols
+
+"Michael Lea" <mazeone@dcaa.net>
+* patch to select artists by keypress in the linux musicbrowser
+* many hours of testing
+
+"Stephen Frost" <sfrost@snowman.net>
+* irix and solaris porting efforts

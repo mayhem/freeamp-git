@@ -77,6 +77,8 @@ public:
 	               {return false;}
     virtual bool  PauseLoop(bool bLoop) { return false; };
 
+     virtual vector<string> *GetProtocols(void) = 0;
+
 protected:
 
     char          *m_path;

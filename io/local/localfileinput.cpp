@@ -422,3 +422,12 @@ void LocalFileInput::WorkerThread(void)
    m_pContext->log->Log(LogInput, "PMI: filebuffer thread exit\n");
 }
 
+vector<string> * LocalFileInput::GetProtocols(void)
+{
+   vector<string> *protoList = new vector<string>;
+
+   protoList->push_back("file");
+
+   return protoList;
+}
+

@@ -85,7 +85,7 @@ FREEAMPsolarisLIBS = -ldl -lpthread
 FREEAMPfreebsdLIBS = -pthread
 FREEAMPqnxLIBS = -lasound
 FREEAMPirixLIBS = -lpthread
-UNIXFREEAMPLIBS = $(FREEAMP$(HOST_OS)LIBS) -lmusicbrainz $(EXTRALIBS) #-ldmallocthcxx
+UNIXFREEAMPLIBS = $(FREEAMP$(HOST_OS)LIBS) $(EXTRALIBS) -lmusicbrainz #-ldmallocthcxx
 
 BEOSFREEAMPLIBS = -lbe -lroot
 BEOSFREEAMPPOSTLINK = util/beos/buildresources.pl -o freeamp -s "application/x-vnd.freeamp.freeamp" base/beos/res/freeamp_app.rsrc

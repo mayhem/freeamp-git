@@ -317,6 +317,7 @@ class GTKMusicBrowser {
     void DeleteEvent();
     bool AskToDelete(string url);
     void DeletePlaylistItem(uint32 loc);
+    void HandleKeypress(char key);
     void MoveUpEvent();
     void MoveDownEvent();
     void MoveItemEvent(int source, int dest);

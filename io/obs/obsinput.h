@@ -93,6 +93,8 @@ class ObsInput :public PhysicalMediaInput
 
    void           WorkerThread(void);
 
+   virtual vector<string> *GetProtocols(void);
+
  protected:
 
    virtual Error       Open(void);

@@ -98,6 +98,7 @@ const char* kMusicBrowserHeaderWidthsPref = "MusicBrowserHeaderWidths";
 const char* kCloseDLMOnCompletePref = "CloseDLMOnComplete";
 const char* kPerformDBCheckPref = "PerformDBCheck";
 const char* kPlaylistHeaderColumnsPref = "PlaylistHeaderColumns";
+const char* kAdvancedRelatablePref = "UseAdvancedRelatableFeatures";
 
 //logging
 const char* kUseDebugLogPref = "UseDebugLog";
@@ -167,6 +168,7 @@ const char* kDefaultMusicBrowserHeaderWidths = "-1,-1,-1.-1";
 const bool  kDefaultCloseDLMOnComplete = false;
 const bool kDefaultPerformDBCheck = true;
 const char* kDefaultPlaylistHeaderColumns = "Title|Artist|Album|Time|Genre";
+const bool kDefaultAdvancedRelatable = false;
 
 Error
 Preferences::
@@ -399,6 +401,9 @@ SetDefaults()
         (uint32 *)&dummyInt) == kError_NoPrefValue)
         SetPrefString(kPlaylistHeaderColumnsPref, kDefaultPlaylistHeaderColumns);
 
+    if (GetPrefBoolean(kAdvancedRelatablePref, &dummyBool) == 
+        kError_NoPrefValue)
+        SetPrefBoolean(kAdvancedRelatablePref, kDefaultAdvancedRelatable);
     return kError_NoErr;
 }
 

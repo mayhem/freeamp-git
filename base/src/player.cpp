@@ -161,6 +161,7 @@ Player(FAContext *context) : EventQueue()
     m_uiRegistry = NULL;
 
     m_lmcExtensions = NULL;
+    m_pmiProtocols = NULL;
 
     m_browserUI = NULL;
     m_downloadUI = NULL;
@@ -323,8 +324,13 @@ Player::
     map<string, RegistryItem *>::iterator i = m_lmcExtensions->begin();
     for (; i != m_lmcExtensions->end(); i++)
         delete (*i).second;
-
     TYPICAL_DELETE(m_lmcExtensions);
+
+    map<string, RegistryItem *>::iterator j = m_pmiProtocols->begin();
+    for (; j != m_pmiProtocols->end(); j++)
+        delete (*j).second;
+    TYPICAL_DELETE(m_pmiProtocols);
+
     TYPICAL_DELETE(m_context->timerManager);
     TYPICAL_DELETE(m_sigStopMutex);
 #ifndef WIN32
@@ -465,12 +471,14 @@ void Player::HandleSingleArg(char *arg)
 {
     char* path = new char[_MAX_PATH];
     char* url = new char[_MAX_PATH];
+    char *proto = NULL;
 
     // is this a URL we know how to handle
-    if( !strncasecmp(arg, "http://", 7) || 
-        !strncasecmp(arg, "rtp://", 6))
+    proto = GetProtocol(arg);
+    if(IsSupportedProtocol(proto)) 
     {
         m_plm->AddItem(arg);
+        delete proto;
     }
     else
     {
@@ -1093,12 +1101,42 @@ RegisterPMIs(Registry * registry)
 
    if (m_pmiRegistry)
    {
-    Registrar::CleanupRegistry(m_pmiRegistry);
+      Registrar::CleanupRegistry(m_pmiRegistry);
       delete    m_pmiRegistry;
    }
 
+   if (m_pmiProtocols) {
+       map<string, RegistryItem *>::iterator iter = m_pmiProtocols->begin();
+       for (; iter != m_pmiProtocols->end(); iter++)
+           delete (*iter).second;
+       delete m_pmiProtocols;
+   }
+
+   m_pmiProtocols = new map<string, RegistryItem *>;
    m_pmiRegistry = registry;
 
+   RegistryItem *pmi_item;
+   PhysicalMediaInput *pmi;
+   int iItems = registry->CountItems();
+
+   for (int iLoop = 0; iLoop < iItems; iLoop++)
+   {
+      RegistryItem *temp = registry->GetItem(iLoop);
+
+      pmi = (PhysicalMediaInput *)temp->InitFunction() (m_context);
+      vector<string> *protoList = pmi->GetProtocols();
+      vector<string>::iterator i;
+
+      for (i = protoList->begin(); i != protoList->end(); i++)
+      {
+         pmi_item = new RegistryItem(*temp);
+         (*m_pmiProtocols)[(*i)] = pmi_item;
+      }
+
+      delete protoList;
+      delete pmi;
+   }
+   
    m_pmiMutex->Release();
 
    return result;
@@ -1230,18 +1268,41 @@ SetState(PlayerState ps)
 
 char *
 Player::
+GetProtocol(const char *title)
+{
+   char *temp_proto;
+   char *proto_return = NULL;
+
+   temp_proto = strstr(title, "://");
+   if(temp_proto)
+   {
+     int proto_len = temp_proto - title;
+     proto_return = new char[ proto_len + 1];
+     strncpy(proto_return, title, proto_len);
+     proto_return[proto_len] = 0;
+   }
+
+   return proto_return;
+}
+
+char *
+Player::
 GetExtension(const char *title)
 {
    char *temp_ext;
    char *ext_return = NULL;
+   char *proto = NULL;
 
-   if (!strncasecmp(title, "http://", 7) || 
-       !strncasecmp(title, "rtp://", 6))
+   proto = GetProtocol(title);
+
+   if (IsSupportedProtocol(proto) && (strncasecmp(proto, "file", 4) != 0))
    {
        ext_return = new char[4];
        strcpy(ext_return, "MP3");
        return ext_return;
    }
+   if (proto)
+       delete proto;
 
    temp_ext = strrchr(title, '.');
    if (temp_ext)
@@ -1262,7 +1323,20 @@ bool
 Player::
 IsSupportedExtension(const char *ext)
 {
+   if (ext == NULL)
+       return false;
    if (m_lmcExtensions->find(ext) != m_lmcExtensions->end())
+       return true;
+   return false;
+}
+
+bool
+Player::
+IsSupportedProtocol(const char *proto)
+{
+   if (proto == NULL)
+       return false;
+   if (m_pmiProtocols->find(proto) != m_pmiProtocols->end())
        return true;
    return false;
 }

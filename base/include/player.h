@@ -89,6 +89,9 @@ class Player : public EventQueue, Properties, PropertyWatcher
     bool    IsSupportedExtension(const char *ext);
     char *GetExtension(const char *title);
  
+    bool  IsSupportedProtocol(const char *proto);
+    char *GetProtocol(const char *title);
+    
     // Properties
     virtual Error GetProperty(const char *, PropValue **);
     virtual Error SetProperty(const char *, PropValue *);
@@ -213,7 +216,8 @@ class Player : public EventQueue, Properties, PropertyWatcher
     char    **m_argv;
 
     map<string, RegistryItem *> *m_lmcExtensions;
-
+    map<string, RegistryItem *> *m_pmiProtocols;
+    
     MusicCatalog *m_musicCatalog;
     UserInterface *m_browserUI;
 

@@ -412,3 +412,13 @@ void ObsInput::WorkerThread(void)
    m_hHandle = -1;
    m_pContext->log->Log(LogInput, "Worker thread done");
 }
+
+vector<string> *ObsInput::GetProtocols(void)
+{
+   vector<string> *protoList = new vector<string>;
+
+   protoList->push_back("rtp");
+
+   return protoList;
+}
+

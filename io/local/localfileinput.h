@@ -63,6 +63,8 @@ class LocalFileInput:public PhysicalMediaInput
    
    void          WorkerThread(void);
 
+   virtual vector<string> *GetProtocols(void);
+
  private:
 
    virtual Error Open(void);
