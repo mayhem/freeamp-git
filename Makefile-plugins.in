@@ -84,11 +84,17 @@ SCPMOOBJ = io/soundcard/$(OSDEP)/src/soundcardpmo.o $(SCPMO$(HOST_OS)OBJ)
 plugins/soundcard-$(HOST_OS).pmo: $(SCPMOOBJ)
 	$(LINKMOD) -o $@ $(SCPMOOBJ)
 
+# alsa
+ALSAOBJ = io/alsa/$(OSDEP)/src/alsapmo.o io/alsa/$(OSDEP)/src/alsavolume.o
+
+plugins/alsa-$(HOST_OS).pmo: $(ALSAOBJ)
+	$(LINKMOD) -o $@ $(ALSAOBJ) -lasound
+
 # esound
 ESNDOBJ = io/esound/src/esdvolume.o io/esound/src/esoundpmo.o
 
-plugins/esound.pmo: $(ESNDOBJ)
-	$(LINKMOD) -o $@ $(ESNDOBJ)
+plugins/esound-$(HOST_OS).pmo: $(ESNDOBJ)
+	$(LINKMOD) -o $@ $(ESNDOBJ) -lesd
 
 #
 # UI section

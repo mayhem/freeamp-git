@@ -434,10 +434,10 @@ AC_CHECK_HEADER(sys/asoundlib.h,
 		have_alsa="false"
 )
 
-ALSAPMOPLUGIN=plugins/almasoundcard-${host_os}.pmo
-if test "$isunix" = "false" -a "$x11" = "true"; then
+ALSAPMOPLUGIN=plugins/alsa-${host_os}.pmo
+if test "$have_alsa" = "true"; then
   OSDEPPLUGINS="$OSDEPPLUGINS $ALSAPMOPLUGIN";
-  OSINC="$OSINC -Iio/soundcard/unix/linux/include"
+  OSINC="$OSINC -Iio/alsa/$OSDEP/include"
   AC_MSG_RESULT([compiling alsa soundcard plugin])
 fi
 
