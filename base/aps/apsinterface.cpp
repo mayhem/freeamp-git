@@ -295,7 +295,6 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
 
     if (mb_GetResultData(o, MBE_MEGetDescription, temp, 255))
     {
-        printf("Comment: %s\n", temp);
         pmetaData->SetComment(temp);
     }
     else

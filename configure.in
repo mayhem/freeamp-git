@@ -938,10 +938,11 @@ AC_SUBST(CFLAGS)
 
 AC_LANG_SAVE
 AC_LANG_CPLUSPLUS
-AC_CHECK_LIB(musicbrainz, mb_New, ,
+AC_CHECK_LIB(musicbrainz, mb_GetVersion, ,
   [ echo "***"
-    echo "*** FreeAmp requires the MusicBrainz client library be installed."
-    echo "*** Download the library from http://www.musicbrainz.org/download"
+    echo "*** FreeAmp requires the MusicBrainz client library version 1.0.1."
+    echo "*** Download the library from "
+    echo "***     http://www.musicbrainz.org/download.html"
     echo "***"
   AC_MSG_ERROR(Cannot continue.)],-ldl -lm -lstdc++)
 AC_LANG_RESTORE
