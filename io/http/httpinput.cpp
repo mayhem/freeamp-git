@@ -675,7 +675,6 @@ HttpInput::Open(void)
               "Icy-MetaData:1\r\n"
               "User-Agent: FreeAmp/%s\r\n", szHostName, FREEAMP_VERSION);
    }
-      puts(szQuery);
 
    m_pContext->prefs->GetPrefBoolean(kUseTitleStreamingPref,
                                      &bUseTitleStreaming);
