@@ -143,7 +143,7 @@ class     XingLMC:public LogicalMediaConverter
    int32                m_frameBytes, m_iBufferUpInterval, m_iBufferSize;
    size_t               m_lFileSize;
    MPEG_HEAD            m_sMpegHead;
-   int32                m_iBitRate;
+   int32                m_iBitRate, m_iTotalFrames;
    bool                 m_bBufferingUp;
    Thread              *m_decoderThread;
 
