@@ -888,11 +888,15 @@ void MusicCatalog::DoSearchMusic(char *path, bool bSendMessages)
                     PlaylistItem *plist = new PlaylistItem(tempurl);
                     m_plm->RetrieveMetaDataNow(plist);
 
-                    WriteMetaDataToDatabase(tempurl,
-                                            (MetaData)plist->GetMetaData());   
+                    MetaData *tempdata = ReadMetaDataFromDatabase(tempurl);
+                    if (!tempdata || !m_addImmediately) 
+                        WriteMetaDataToDatabase(tempurl,
+                                                (MetaData)plist->GetMetaData());
                     if (m_addImmediately)
                         AddSong(tempurl);
 
+                    if (tempdata)
+                        delete tempdata;
                     delete plist;
                     delete [] tempurl;
                 }

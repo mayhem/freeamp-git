@@ -823,6 +823,23 @@ void GTKMusicBrowser::DeleteEvent(void)
                 case kTreeFavStream: {
                     m_context->catalog->RemoveStream((*i)->track->URL().c_str());
                     break; }
+                case kTreeAlbum: {
+                    AlbumList *list = (*i)->album;
+                    vector<PlaylistItem *>::iterator j = 
+                                                     list->m_trackList->begin();
+                    for (; j != list->m_trackList->end(); j++) 
+                        m_context->catalog->RemoveSong((*j)->URL().c_str());
+                    break; }
+                case kTreeArtist: {
+                    ArtistList *list = (*i)->artist;
+                    vector<AlbumList *>::iterator j = list->m_albumList->begin();
+                    for (; j != list->m_albumList->end(); j++) {
+                        vector<PlaylistItem *>::iterator k =
+                                                     (*j)->m_trackList->begin();
+                        for (; k != (*j)->m_trackList->end(); k++) 
+                            m_context->catalog->RemoveSong((*k)->URL().c_str());
+                    }
+                    break; }
                 default:
                     break;
             }
