@@ -22,6 +22,7 @@
 ____________________________________________________________________________*/ 
 
 #include <stdio.h>
+#include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <netinet/in.h>
@@ -29,10 +30,33 @@ ____________________________________________________________________________*/
 #include "utility.h"
 #include "win32impl.h"
 
+#define THEME_IN_DEVEL "<theme in development>"
+
 ThemeManager::ThemeManager(FAContext *pContext)
 {
+    char   szThemePath[_MAX_PATH];
+    uint32 len = _MAX_PATH;
+    Error eRet;
+
     m_pContext = pContext;
     m_oCurrentTheme = "";
+    m_bDevelTheme = false;
+
+    szThemePath[0] = 0;
+    eRet = pContext->prefs->GetThemePath(szThemePath, &len);
+    if (IsError(eRet) || strlen(szThemePath) == 0) {
+        GetDefaultTheme(m_oCurrentTheme);
+    }
+    else {
+        struct stat buf;
+
+        m_oCurrentTheme = szThemePath;
+        if (stat(szThemePath, &buf) == 0 && S_ISDIR(buf.st_mode)) {
+            m_bDevelTheme = true; 
+            m_oDevelTheme = m_oCurrentTheme;
+            m_oCurrentTheme = THEME_IN_DEVEL;
+        }
+    }
 }
 
 ThemeManager::~ThemeManager(void)
@@ -41,7 +65,6 @@ ThemeManager::~ThemeManager(void)
 
 Error ThemeManager::GetDefaultTheme(string &oThemePath)
 {
-    char              dir[MAX_PATH];
     map<string, string> oThemeList;
 
     GetThemeList(oThemeList);
@@ -57,6 +80,9 @@ Error ThemeManager::GetThemeList(map<string, string> &oThemeFileMap)
     char            dir[MAX_PATH], *ptr;
     uint32          len = sizeof(dir);
     string          oThemePath, oThemeBasePath, oThemeFile;
+
+    if (m_bDevelTheme)
+        oThemeFileMap[THEME_IN_DEVEL] = m_oDevelTheme;
 
     m_pContext->prefs->GetInstallDirectory(dir, &len);
     oThemeBasePath = string(dir) + "/../share/freeamp/themes";
