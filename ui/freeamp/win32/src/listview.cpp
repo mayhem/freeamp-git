@@ -154,8 +154,45 @@ KeyPressed(int32 keyCode)
         }
 
         case VK_DELETE: 
-           
+        {
+            // remove selected items from list
+            List<ListItem*>* selectList = new List<ListItem*>();
+            List<PlayListItem*>* playlistList = new List<PlayListItem*>();
+
+            FreeAmpUI* ui = (FreeAmpUI*)GetWindowLong(Window(), GWL_USERDATA);
+            PlayListManager* plm = ui->GetPlayListManager();
+
+            ListItem* listItem = NULL;
+            PlayListItem* playlistItem = NULL;
+            int32 i = m_lastSelected;
+
+	        while(listItem = ItemAt(i--)) 
+            {
+		        if(listItem->IsSelected())
+                {
+                    RemoveItem(listItem);
+
+                    playlistItem = (PlayListItem*)listItem->UserValue();
+
+                    playlistList->AddItem(playlistItem, 0);
+
+                    delete listItem;
+                }
+	        }
+
+            plm->RemoveList(playlistList);
+
+            i = 0;
+
+            while(playlistItem = playlistList->ItemAt(i++)) 
+            {
+                delete playlistItem;
+            }
+
+            delete playlistList;
+
             break; 
+        }
     } 
 }
 

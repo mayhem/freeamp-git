@@ -480,7 +480,8 @@ KeyDown(int32 keyCode)
         case VK_HOME: 
         case VK_END: 
         case VK_DELETE: 
-            m_playlistView->KeyPressed(keyCode);
+            if(m_playlistView->Visible() && m_playlistView->Enabled())
+                m_playlistView->KeyPressed(keyCode);
             break;
     }
 
