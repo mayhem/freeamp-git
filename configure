@@ -1630,7 +1630,7 @@ else
 int main() {
 
 /* Ultrix mips cc rejects this.  */
-typedef int charset[2]; const charset x;
+typedef int charset[2]; const charset x = {0,0};
 /* SunOS 4.1.1 cc rejects this.  */
 char const *const *ccp;
 char **p;
@@ -2191,7 +2191,7 @@ else
 int main() {
 
 /* Ultrix mips cc rejects this.  */
-typedef int charset[2]; const charset x;
+typedef int charset[2]; const charset x = {0,0};
 /* SunOS 4.1.1 cc rejects this.  */
 char const *const *ccp;
 char **p;
@@ -3061,7 +3061,7 @@ fi
 
 if test "$have_gtk" = "true"; then
   OSDEPPLUGINS="$OSDEPPLUGINS plugins/musicbrowser.ui"
-  OSDEPPLUGINS="$OSDEPPLUGINS plugins/freeamp.ui"
+  OSDEPPLUGINS="$OSDEPPLUGINS plugins/freeamp.ui MakeTheme"
   OSDEPPLUGINS="$OSDEPPLUGINS plugins/download.ui"
   OSDEPPLUGINS="$OSDEPPLUGINS plugins/winamp.ftf"
   OSINC="$OSINC -I$srcdir/ui/musicbrowser/unix/include"

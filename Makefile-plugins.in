@@ -239,10 +239,11 @@ plugins/freeamp.ui: $(FREEAMPUIOBJ)
 # MakeTheme, only built if we're building freeamp.ui
 
 MAKETHEMEOBJ  = ui/freeamp/tools/src/MakeTheme.o ui/freeamp/src/ThemeZip.o
+MAKETHEMEOBJ += base/unix/src/win32impl.o
 MAKETHEMEOBJ += lib/zlib/lib/libzlib.a lib/unzip/lib/libunzip.la
 
 MakeTheme: $(MAKETHEMEOBJ)
-	$(CXXLINK) $(MAKETHEMEOBJ)
+	$(CXXLINK) $(MAKETHEMEOBJ) -ldl
 
 # cmdline
 CMDUIOBJ = ui/cmdline/cmdlineUI.o 
