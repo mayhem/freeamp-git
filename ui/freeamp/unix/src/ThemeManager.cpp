@@ -143,7 +143,7 @@ Error ThemeManager::UseTheme(string &oThemeFile)
     if (temp_dir) {
         temp_dir = temp_dir + 1;
 	strcpy(dir, temp_dir);
-        if (!strcmp(dir, m_oCurrentTheme.c_str()))
+        if (oThemeFile == m_oCurrentTheme)
         {
             return kError_NoErr;
         }

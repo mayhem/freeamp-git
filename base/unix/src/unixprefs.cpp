@@ -668,6 +668,7 @@ GetPrefString(const char* pref, char* buf, uint32* len)
 
     if (value_len > *len)
     {
+        *len = value_len;
         m_mutex.Release();
         return kError_BufferTooSmall;
     }

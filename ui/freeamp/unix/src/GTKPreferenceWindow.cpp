@@ -213,6 +213,7 @@ void GTKPreferenceWindow::GetPrefsValues(Preferences* prefs,
     size = bufferSize;
 
     if(kError_BufferTooSmall == prefs->GetSaveStreamsDirectory(buffer, &size)) {
+        size++;
         buffer = (char*)realloc(buffer, size);
         prefs->GetSaveStreamsDirectory(buffer, &size);
     }
@@ -238,6 +239,7 @@ void GTKPreferenceWindow::GetPrefsValues(Preferences* prefs,
     prefs->GetLogPerformance(&values->logPerformance);
 
     if(kError_BufferTooSmall == prefs->GetThemeDefaultFont(buffer, &size)) {
+        size++;
         buffer = (char*)realloc(buffer, size);
         prefs->GetThemeDefaultFont(buffer, &size);
     }
@@ -255,6 +257,7 @@ void GTKPreferenceWindow::GetPrefsValues(Preferences* prefs,
 
     if(kError_BufferTooSmall == prefs->GetSaveMusicDirectory(buffer, &size))
     {
+        size++;
         bufferSize = size;
         buffer = (char*)realloc(buffer, bufferSize);
         prefs->GetSaveMusicDirectory(buffer, &size);
@@ -313,8 +316,8 @@ void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs,
     int32 iLoop = 0;
 
     for (i = m_oThemeList.begin(); i != m_oThemeList.end(); i++, iLoop++) {
-         if (iLoop == currentValues.listboxIndex)
-             currentValues.currentTheme = (*i).first;
+         if (iLoop == values->listboxIndex)
+             values->currentTheme = (*i).first;
     }
     m_pThemeMan->UseTheme(m_oThemeList[values->currentTheme]);
 
@@ -329,6 +332,16 @@ void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs,
     }
     prefs->SetUsersPortablePlayers(portableList.c_str());
 
+    Registry *pmo = m_pContext->player->GetPMORegistry();
+    int32 k = 0;
+    RegistryItem *item;
+
+    while (pmo && (item = pmo->GetItem(k++))) {
+        if (values->outputIndex == (k-1))
+            values->defaultPMO = item->Name();
+    }
+    prefs->SetDefaultPMO(values->defaultPMO.c_str());
+    
     if (*values != currentValues) {
         m_pContext->target->AcceptEvent(new Event(INFO_PrefsChanged));
         currentValues = proposedValues = *values;
@@ -725,8 +738,26 @@ GtkWidget *GTKPreferenceWindow::CreatePage2(void)
     return pane;
 }
 
+void GTKPreferenceWindow::SetPMO(int newsel)
+{
+    proposedValues.outputIndex = newsel;
+    gtk_widget_set_sensitive(applyButton, TRUE);
+}
+
 void pmo_select(GtkWidget *item, GTKPreferenceWindow *p)
 {
+    int i = 0;
+    if (!GTK_WIDGET_MAPPED(item))
+        return;
+
+    GSList *glist = gtk_radio_menu_item_group((GtkRadioMenuItem *)
+                        (((GtkOptionMenu *)p->pmoOptionMenu)->menu_item));
+    while (glist && !((GtkCheckMenuItem *)(glist->data))->active) {
+        glist = glist->next;
+        i++;
+    }
+ 
+    p->SetPMO(p->numPMOs - i);
 }
 
 GtkWidget *GTKPreferenceWindow::CreatePage3(void)
@@ -745,7 +776,6 @@ GtkWidget *GTKPreferenceWindow::CreatePage3(void)
 
     Registry *pmo = m_pContext->player->GetPMORegistry();
     int32 i = 0;
-    int32 pos = 0;
     RegistryItem *item;
 
     GtkWidget *label = gtk_label_new("Audio Output");
@@ -754,25 +784,32 @@ GtkWidget *GTKPreferenceWindow::CreatePage3(void)
                      5, 0);
     gtk_widget_show(label);
 
-    GtkWidget *optionmenu = gtk_option_menu_new();
-    GtkWidget *menu = gtk_menu_new();
+    pmoOptionMenu = gtk_option_menu_new();
+    pmoMenu = gtk_menu_new();
+    GSList *group = NULL;
+    GtkWidget *menuitem;
 
     while (pmo && (item = pmo->GetItem(i++))) {
-        GtkWidget *menuitem = gtk_menu_item_new_with_label(item->Name());
+        menuitem = gtk_radio_menu_item_new_with_label(group, item->Name());
         gtk_signal_connect(GTK_OBJECT(menuitem), "activate",
                            GTK_SIGNAL_FUNC(pmo_select), this);
+        group = gtk_radio_menu_item_group(GTK_RADIO_MENU_ITEM(menuitem));
+        gtk_menu_append(GTK_MENU(pmoMenu), menuitem);
+        if (originalValues.defaultPMO == item->Name()) {
+            gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menuitem), TRUE);
+
+            proposedValues.outputIndex = i - 1;
+        }
         gtk_widget_show(menuitem);
-        gtk_menu_append(GTK_MENU(menu), menuitem);
-        if (originalValues.defaultPMO == item->Name())
-            pos = i;
     }
 
-    gtk_option_menu_set_menu(GTK_OPTION_MENU(optionmenu), menu);
-    gtk_table_attach(GTK_TABLE(table), optionmenu, 1, 2, 1, 2, GTK_FILL,
+    numPMOs = i - 2;
+    gtk_option_menu_set_menu(GTK_OPTION_MENU(pmoOptionMenu), pmoMenu);
+    gtk_table_attach(GTK_TABLE(table), pmoOptionMenu, 1, 2, 1, 2, GTK_FILL,
                      GTK_FILL, 5, 5);
-    gtk_widget_show(optionmenu);
-    gtk_option_menu_set_history(GTK_OPTION_MENU(optionmenu), pos - 1);
-
+    gtk_option_menu_set_history(GTK_OPTION_MENU(pmoOptionMenu),
+                                proposedValues.outputIndex);
+    gtk_widget_show(pmoOptionMenu);
 
     return pane;
 }
@@ -1005,7 +1042,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage5(void)
 
     int iLoop = 0;
     map<string, string>::iterator i;
-    currentValues.listboxIndex = 0;
+    proposedValues.listboxIndex = 0;
 
     m_pThemeMan->GetCurrentTheme(originalValues.currentTheme);
     m_oThemeList.clear();
@@ -1016,10 +1053,10 @@ GtkWidget *GTKPreferenceWindow::CreatePage5(void)
          Text[0] = (char *)((*i).first.c_str());
          gtk_clist_append(GTK_CLIST(list), Text);
          if ((*i).first == originalValues.currentTheme)
-             currentValues.listboxIndex = iLoop;
+             proposedValues.listboxIndex = currentValues.listboxIndex = iLoop;
     }
 
-    gtk_clist_select_row(GTK_CLIST(list), originalValues.listboxIndex, 1);
+    gtk_clist_select_row(GTK_CLIST(list), proposedValues.listboxIndex, 1);
 
     return pane;
 }
