@@ -67,7 +67,7 @@ LIBMOD = @LIBMOD@
 
 OSDEPOBJ = @OSDEPOBJ@
 
-INCLUDES = -I. -I$(srcdir)/lib/gdbm -I$(srcdir)/base/include -I$(srcdir)/config -I$(srcdir)/io/include -I$(srcdir)/ui/include -I$(srcdir)/lmc/include $(OSINC) -I$(srcdir)/io/soundcard/unix/$(UNIX_AUDIO_API)/include -I$(srcdir)/lmc/xingmp3/include -I$(srcdir)/lmc/cd/include -I$(srcdir)/plm/portable/pmp300/sba -I$(srcdir)/lib/xml/include -I$(srcdir)/lib/zlib/include -I$(srcdir)/lib/unzip/include -I$(srcdir)/io/cd/unix/include -I$(srcdir)/base/aps -I$(srcdir)/io/wavout/include -I$(srcdir)/ui/lcd/include -I$(srcdir)/ui/irman/include -I$(srcdir)/lib/http/include -I$(srcdir)/io/signature/include -I$(srcdir)/lmc/vorbis/include
+INCLUDES = -I. -I$(srcdir)/lib/gdbm -I$(srcdir)/base/include -I$(srcdir)/config -I$(srcdir)/io/include -I$(srcdir)/ui/include -I$(srcdir)/lmc/include -I$(srcdir)/io/soundcard/unix/$(UNIX_AUDIO_API)/include -I$(srcdir)/lmc/xingmp3/include -I$(srcdir)/lmc/cd/include -I$(srcdir)/plm/portable/pmp300/sba -I$(srcdir)/lib/xml/include -I$(srcdir)/lib/zlib/include -I$(srcdir)/lib/unzip/include -I$(srcdir)/io/cd/unix/include -I$(srcdir)/base/aps -I$(srcdir)/io/wavout/include -I$(srcdir)/ui/lcd/include -I$(srcdir)/ui/irman/include -I$(srcdir)/lib/http/include -I$(srcdir)/io/signature/include -I$(srcdir)/lmc/vorbis/include $(OSINC)
 
 CXXFLAGS = $(EXTRA_CXXFLAGS)
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
