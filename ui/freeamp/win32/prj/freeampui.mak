@@ -34,6 +34,10 @@ NULL=
 NULL=nul
 !ENDIF 
 
+CPP=cl.exe
+MTL=midl.exe
+RSC=rc.exe
+
 !IF  "$(CFG)" == "freeampui - Win32 Release"
 
 OUTDIR=.\Release
@@ -87,7 +91,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\res" /I "..\include" /I\
  "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I\
  "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I\
@@ -97,40 +100,7 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\res" /I "..\include" /I\
  /Fp"$(INTDIR)\freeampui.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\freeampui.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\freeampui.bsc" 
@@ -247,7 +217,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\res" /I "..\include" /I\
  "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I\
  "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I\
@@ -257,40 +226,7 @@ CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\res" /I "..\include" /I\
  /Fp"$(INTDIR)\freeampui.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\freeampui.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\freeampui.bsc" 
@@ -407,7 +343,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\res" /I "..\include" /I\
  "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I\
  "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I\
@@ -417,40 +352,7 @@ CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\res" /I "..\include" /I\
  /Fp"$(INTDIR)\freeampui.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\freeampui.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\freeampui.bsc" 
@@ -564,7 +466,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\res" /I "..\include" /I\
  "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I\
  "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I\
@@ -574,40 +475,7 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\res" /I "..\include" /I\
  /Fp"$(INTDIR)\freeampui.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\freeampui.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\freeampui.bsc" 
@@ -670,6 +538,36 @@ $(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Release"\
 
 !ENDIF 
 
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
 
 !IF "$(CFG)" == "freeampui - Win32 Release" || "$(CFG)" ==\
  "freeampui - Win32 Debug" || "$(CFG)" == "freeampui - Win32 NASM Debug" ||\
@@ -682,10 +580,11 @@ DEP_CPP_BITMA=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
+	"..\..\include\bitmap.h"\
 	
 
-"$(INTDIR)\Bitmap.obj" : $(SOURCE) $(DEP_CPP_BITMA) "$(INTDIR)"
+"$(INTDIR)\Bitmap.obj" : $(SOURCE) $(DEP_CPP_BITMA) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -695,10 +594,11 @@ DEP_CPP_BITMA=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
+	"..\..\include\bitmap.h"\
 	
 
-"$(INTDIR)\Bitmap.obj" : $(SOURCE) $(DEP_CPP_BITMA) "$(INTDIR)"
+"$(INTDIR)\Bitmap.obj" : $(SOURCE) $(DEP_CPP_BITMA) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -708,10 +608,11 @@ DEP_CPP_BITMA=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
+	"..\..\include\bitmap.h"\
 	
 
-"$(INTDIR)\Bitmap.obj" : $(SOURCE) $(DEP_CPP_BITMA) "$(INTDIR)"
+"$(INTDIR)\Bitmap.obj" : $(SOURCE) $(DEP_CPP_BITMA) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -721,10 +622,11 @@ DEP_CPP_BITMA=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
+	"..\..\include\bitmap.h"\
 	
 
-"$(INTDIR)\Bitmap.obj" : $(SOURCE) $(DEP_CPP_BITMA) "$(INTDIR)"
+"$(INTDIR)\Bitmap.obj" : $(SOURCE) $(DEP_CPP_BITMA) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -738,18 +640,19 @@ DEP_CPP_BUTTO=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\ButtonControl.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\Window.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\buttoncontrol.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\window.h"\
 	
 
-"$(INTDIR)\ButtonControl.obj" : $(SOURCE) $(DEP_CPP_BUTTO) "$(INTDIR)"
+"$(INTDIR)\ButtonControl.obj" : $(SOURCE) $(DEP_CPP_BUTTO) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -759,18 +662,19 @@ DEP_CPP_BUTTO=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\ButtonControl.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\Window.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\buttoncontrol.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\window.h"\
 	
 
-"$(INTDIR)\ButtonControl.obj" : $(SOURCE) $(DEP_CPP_BUTTO) "$(INTDIR)"
+"$(INTDIR)\ButtonControl.obj" : $(SOURCE) $(DEP_CPP_BUTTO) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -780,18 +684,19 @@ DEP_CPP_BUTTO=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\ButtonControl.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\Window.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\buttoncontrol.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\window.h"\
 	
 
-"$(INTDIR)\ButtonControl.obj" : $(SOURCE) $(DEP_CPP_BUTTO) "$(INTDIR)"
+"$(INTDIR)\ButtonControl.obj" : $(SOURCE) $(DEP_CPP_BUTTO) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -801,18 +706,19 @@ DEP_CPP_BUTTO=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\ButtonControl.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\Window.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\buttoncontrol.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\window.h"\
 	
 
-"$(INTDIR)\ButtonControl.obj" : $(SOURCE) $(DEP_CPP_BUTTO) "$(INTDIR)"
+"$(INTDIR)\ButtonControl.obj" : $(SOURCE) $(DEP_CPP_BUTTO) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -826,12 +732,13 @@ DEP_CPP_CANVA=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Font.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\font.h"\
 	
 
-"$(INTDIR)\Canvas.obj" : $(SOURCE) $(DEP_CPP_CANVA) "$(INTDIR)"
+"$(INTDIR)\Canvas.obj" : $(SOURCE) $(DEP_CPP_CANVA) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -841,12 +748,13 @@ DEP_CPP_CANVA=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Font.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\font.h"\
 	
 
-"$(INTDIR)\Canvas.obj" : $(SOURCE) $(DEP_CPP_CANVA) "$(INTDIR)"
+"$(INTDIR)\Canvas.obj" : $(SOURCE) $(DEP_CPP_CANVA) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -856,12 +764,13 @@ DEP_CPP_CANVA=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Font.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\font.h"\
 	
 
-"$(INTDIR)\Canvas.obj" : $(SOURCE) $(DEP_CPP_CANVA) "$(INTDIR)"
+"$(INTDIR)\Canvas.obj" : $(SOURCE) $(DEP_CPP_CANVA) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -871,14 +780,47 @@ DEP_CPP_CANVA=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Font.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\font.h"\
 	
 
-"$(INTDIR)\Canvas.obj" : $(SOURCE) $(DEP_CPP_CANVA) "$(INTDIR)"
+"$(INTDIR)\Canvas.obj" : $(SOURCE) $(DEP_CPP_CANVA) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+!ENDIF 
+
+SOURCE=..\..\..\..\config\config.win32
+
+!IF  "$(CFG)" == "freeampui - Win32 Release"
+
+InputPath=..\..\..\..\config\config.win32
+
+"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
+
+!ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
+
+InputPath=..\..\..\..\config\config.win32
+
+"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
+
+!ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Debug"
+
+InputPath=..\..\..\..\config\config.win32
+
+"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
+
+!ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Release"
+
+InputPath=..\..\..\..\config\config.win32
+
+"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ENDIF 
 
@@ -890,17 +832,18 @@ DEP_CPP_CONTR=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\Window.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\window.h"\
 	
 
-"$(INTDIR)\Control.obj" : $(SOURCE) $(DEP_CPP_CONTR) "$(INTDIR)"
+"$(INTDIR)\Control.obj" : $(SOURCE) $(DEP_CPP_CONTR) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -910,17 +853,18 @@ DEP_CPP_CONTR=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\Window.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\window.h"\
 	
 
-"$(INTDIR)\Control.obj" : $(SOURCE) $(DEP_CPP_CONTR) "$(INTDIR)"
+"$(INTDIR)\Control.obj" : $(SOURCE) $(DEP_CPP_CONTR) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -930,17 +874,18 @@ DEP_CPP_CONTR=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\Window.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\window.h"\
 	
 
-"$(INTDIR)\Control.obj" : $(SOURCE) $(DEP_CPP_CONTR) "$(INTDIR)"
+"$(INTDIR)\Control.obj" : $(SOURCE) $(DEP_CPP_CONTR) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -950,17 +895,18 @@ DEP_CPP_CONTR=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\Window.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\window.h"\
 	
 
-"$(INTDIR)\Control.obj" : $(SOURCE) $(DEP_CPP_CONTR) "$(INTDIR)"
+"$(INTDIR)\Control.obj" : $(SOURCE) $(DEP_CPP_CONTR) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -973,14 +919,15 @@ SOURCE=..\..\src\DialControl.cpp
 DEP_CPP_DIALC=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\DialControl.h"\
-	"..\..\include\Font.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\dialcontrol.h"\
+	"..\..\include\font.h"\
 	
 
-"$(INTDIR)\DialControl.obj" : $(SOURCE) $(DEP_CPP_DIALC) "$(INTDIR)"
+"$(INTDIR)\DialControl.obj" : $(SOURCE) $(DEP_CPP_DIALC) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -989,14 +936,15 @@ DEP_CPP_DIALC=\
 DEP_CPP_DIALC=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\DialControl.h"\
-	"..\..\include\Font.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\dialcontrol.h"\
+	"..\..\include\font.h"\
 	
 
-"$(INTDIR)\DialControl.obj" : $(SOURCE) $(DEP_CPP_DIALC) "$(INTDIR)"
+"$(INTDIR)\DialControl.obj" : $(SOURCE) $(DEP_CPP_DIALC) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1005,14 +953,15 @@ DEP_CPP_DIALC=\
 DEP_CPP_DIALC=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\DialControl.h"\
-	"..\..\include\Font.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\dialcontrol.h"\
+	"..\..\include\font.h"\
 	
 
-"$(INTDIR)\DialControl.obj" : $(SOURCE) $(DEP_CPP_DIALC) "$(INTDIR)"
+"$(INTDIR)\DialControl.obj" : $(SOURCE) $(DEP_CPP_DIALC) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1021,14 +970,15 @@ DEP_CPP_DIALC=\
 DEP_CPP_DIALC=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\DialControl.h"\
-	"..\..\include\Font.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\dialcontrol.h"\
+	"..\..\include\font.h"\
 	
 
-"$(INTDIR)\DialControl.obj" : $(SOURCE) $(DEP_CPP_DIALC) "$(INTDIR)"
+"$(INTDIR)\DialControl.obj" : $(SOURCE) $(DEP_CPP_DIALC) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1041,10 +991,11 @@ SOURCE=..\..\src\Font.cpp
 DEP_CPP_FONT_=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Font.h"\
+	"..\..\include\font.h"\
 	
 
-"$(INTDIR)\Font.obj" : $(SOURCE) $(DEP_CPP_FONT_) "$(INTDIR)"
+"$(INTDIR)\Font.obj" : $(SOURCE) $(DEP_CPP_FONT_) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1053,10 +1004,11 @@ DEP_CPP_FONT_=\
 DEP_CPP_FONT_=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Font.h"\
+	"..\..\include\font.h"\
 	
 
-"$(INTDIR)\Font.obj" : $(SOURCE) $(DEP_CPP_FONT_) "$(INTDIR)"
+"$(INTDIR)\Font.obj" : $(SOURCE) $(DEP_CPP_FONT_) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1065,10 +1017,11 @@ DEP_CPP_FONT_=\
 DEP_CPP_FONT_=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Font.h"\
+	"..\..\include\font.h"\
 	
 
-"$(INTDIR)\Font.obj" : $(SOURCE) $(DEP_CPP_FONT_) "$(INTDIR)"
+"$(INTDIR)\Font.obj" : $(SOURCE) $(DEP_CPP_FONT_) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1077,10 +1030,11 @@ DEP_CPP_FONT_=\
 DEP_CPP_FONT_=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Font.h"\
+	"..\..\include\font.h"\
 	
 
-"$(INTDIR)\Font.obj" : $(SOURCE) $(DEP_CPP_FONT_) "$(INTDIR)"
+"$(INTDIR)\Font.obj" : $(SOURCE) $(DEP_CPP_FONT_) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1116,26 +1070,26 @@ DEP_CPP_FREEA=\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\io\include\pipeline.h"\
 	"..\..\..\..\io\include\pullbuffer.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
+	"..\..\..\..\lib\xml\include\parse.h"\
 	"..\..\..\..\lmc\include\lmc.h"\
 	"..\..\..\include\ui.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\FreeAmpTheme.h"\
-	"..\..\include\MessageDialog.h"\
-	"..\..\include\PreferenceWindow.h"\
-	"..\..\include\Theme.h"\
-	"..\..\include\ThemeManager.h"\
-	"..\..\include\Window.h"\
-	"..\include\Win32PreferenceWindow.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\freeamptheme.h"\
+	"..\..\include\messagedialog.h"\
+	"..\..\include\preferencewindow.h"\
+	"..\..\include\theme.h"\
+	"..\..\include\thememanager.h"\
+	"..\..\include\window.h"\
+	"..\include\win32preferencewindow.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -1146,7 +1100,8 @@ NODEP_CPP_FREEA=\
 	"..\..\src\GTKUtility.h"\
 	
 
-"$(INTDIR)\FreeAmpTheme.obj" : $(SOURCE) $(DEP_CPP_FREEA) "$(INTDIR)"
+"$(INTDIR)\FreeAmpTheme.obj" : $(SOURCE) $(DEP_CPP_FREEA) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1178,29 +1133,30 @@ DEP_CPP_FREEA=\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\io\include\pipeline.h"\
 	"..\..\..\..\io\include\pullbuffer.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
+	"..\..\..\..\lib\xml\include\parse.h"\
 	"..\..\..\..\lmc\include\lmc.h"\
 	"..\..\..\include\ui.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\FreeAmpTheme.h"\
-	"..\..\include\MessageDialog.h"\
-	"..\..\include\PreferenceWindow.h"\
-	"..\..\include\Theme.h"\
-	"..\..\include\ThemeManager.h"\
-	"..\..\include\Window.h"\
-	"..\include\Win32PreferenceWindow.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\freeamptheme.h"\
+	"..\..\include\messagedialog.h"\
+	"..\..\include\preferencewindow.h"\
+	"..\..\include\theme.h"\
+	"..\..\include\thememanager.h"\
+	"..\..\include\window.h"\
+	"..\include\win32preferencewindow.h"\
 	
 
-"$(INTDIR)\FreeAmpTheme.obj" : $(SOURCE) $(DEP_CPP_FREEA) "$(INTDIR)"
+"$(INTDIR)\FreeAmpTheme.obj" : $(SOURCE) $(DEP_CPP_FREEA) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1232,29 +1188,30 @@ DEP_CPP_FREEA=\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\io\include\pipeline.h"\
 	"..\..\..\..\io\include\pullbuffer.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
+	"..\..\..\..\lib\xml\include\parse.h"\
 	"..\..\..\..\lmc\include\lmc.h"\
 	"..\..\..\include\ui.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\FreeAmpTheme.h"\
-	"..\..\include\MessageDialog.h"\
-	"..\..\include\PreferenceWindow.h"\
-	"..\..\include\Theme.h"\
-	"..\..\include\ThemeManager.h"\
-	"..\..\include\Window.h"\
-	"..\include\Win32PreferenceWindow.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\freeamptheme.h"\
+	"..\..\include\messagedialog.h"\
+	"..\..\include\preferencewindow.h"\
+	"..\..\include\theme.h"\
+	"..\..\include\thememanager.h"\
+	"..\..\include\window.h"\
+	"..\include\win32preferencewindow.h"\
 	
 
-"$(INTDIR)\FreeAmpTheme.obj" : $(SOURCE) $(DEP_CPP_FREEA) "$(INTDIR)"
+"$(INTDIR)\FreeAmpTheme.obj" : $(SOURCE) $(DEP_CPP_FREEA) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1286,26 +1243,26 @@ DEP_CPP_FREEA=\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\io\include\pipeline.h"\
 	"..\..\..\..\io\include\pullbuffer.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
+	"..\..\..\..\lib\xml\include\parse.h"\
 	"..\..\..\..\lmc\include\lmc.h"\
 	"..\..\..\include\ui.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\FreeAmpTheme.h"\
-	"..\..\include\MessageDialog.h"\
-	"..\..\include\PreferenceWindow.h"\
-	"..\..\include\Theme.h"\
-	"..\..\include\ThemeManager.h"\
-	"..\..\include\Window.h"\
-	"..\include\Win32PreferenceWindow.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\freeamptheme.h"\
+	"..\..\include\messagedialog.h"\
+	"..\..\include\preferencewindow.h"\
+	"..\..\include\theme.h"\
+	"..\..\include\thememanager.h"\
+	"..\..\include\window.h"\
+	"..\include\win32preferencewindow.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -1316,7 +1273,8 @@ NODEP_CPP_FREEA=\
 	"..\..\src\GTKUtility.h"\
 	
 
-"$(INTDIR)\FreeAmpTheme.obj" : $(SOURCE) $(DEP_CPP_FREEA) "$(INTDIR)"
+"$(INTDIR)\FreeAmpTheme.obj" : $(SOURCE) $(DEP_CPP_FREEA) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1330,18 +1288,19 @@ DEP_CPP_MULTI=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\MultiStateControl.h"\
-	"..\..\include\Window.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\multistatecontrol.h"\
+	"..\..\include\window.h"\
 	
 
-"$(INTDIR)\MultiStateControl.obj" : $(SOURCE) $(DEP_CPP_MULTI) "$(INTDIR)"
+"$(INTDIR)\MultiStateControl.obj" : $(SOURCE) $(DEP_CPP_MULTI) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1351,18 +1310,19 @@ DEP_CPP_MULTI=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\MultiStateControl.h"\
-	"..\..\include\Window.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\multistatecontrol.h"\
+	"..\..\include\window.h"\
 	
 
-"$(INTDIR)\MultiStateControl.obj" : $(SOURCE) $(DEP_CPP_MULTI) "$(INTDIR)"
+"$(INTDIR)\MultiStateControl.obj" : $(SOURCE) $(DEP_CPP_MULTI) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1372,18 +1332,19 @@ DEP_CPP_MULTI=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\MultiStateControl.h"\
-	"..\..\include\Window.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\multistatecontrol.h"\
+	"..\..\include\window.h"\
 	
 
-"$(INTDIR)\MultiStateControl.obj" : $(SOURCE) $(DEP_CPP_MULTI) "$(INTDIR)"
+"$(INTDIR)\MultiStateControl.obj" : $(SOURCE) $(DEP_CPP_MULTI) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1393,18 +1354,19 @@ DEP_CPP_MULTI=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\MultiStateControl.h"\
-	"..\..\include\Window.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\multistatecontrol.h"\
+	"..\..\include\window.h"\
 	
 
-"$(INTDIR)\MultiStateControl.obj" : $(SOURCE) $(DEP_CPP_MULTI) "$(INTDIR)"
+"$(INTDIR)\MultiStateControl.obj" : $(SOURCE) $(DEP_CPP_MULTI) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1418,10 +1380,11 @@ DEP_CPP_PARSE=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
+	"..\..\..\..\lib\xml\include\parse.h"\
 	
 
-"$(INTDIR)\Parse.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"
+"$(INTDIR)\Parse.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1431,10 +1394,11 @@ DEP_CPP_PARSE=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
+	"..\..\..\..\lib\xml\include\parse.h"\
 	
 
-"$(INTDIR)\Parse.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"
+"$(INTDIR)\Parse.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1444,10 +1408,11 @@ DEP_CPP_PARSE=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
+	"..\..\..\..\lib\xml\include\parse.h"\
 	
 
-"$(INTDIR)\Parse.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"
+"$(INTDIR)\Parse.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1457,10 +1422,11 @@ DEP_CPP_PARSE=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
+	"..\..\..\..\lib\xml\include\parse.h"\
 	
 
-"$(INTDIR)\Parse.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"
+"$(INTDIR)\Parse.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1474,18 +1440,19 @@ DEP_CPP_SLIDE=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\SliderControl.h"\
-	"..\..\include\Window.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\slidercontrol.h"\
+	"..\..\include\window.h"\
 	
 
-"$(INTDIR)\SliderControl.obj" : $(SOURCE) $(DEP_CPP_SLIDE) "$(INTDIR)"
+"$(INTDIR)\SliderControl.obj" : $(SOURCE) $(DEP_CPP_SLIDE) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1495,18 +1462,19 @@ DEP_CPP_SLIDE=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\SliderControl.h"\
-	"..\..\include\Window.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\slidercontrol.h"\
+	"..\..\include\window.h"\
 	
 
-"$(INTDIR)\SliderControl.obj" : $(SOURCE) $(DEP_CPP_SLIDE) "$(INTDIR)"
+"$(INTDIR)\SliderControl.obj" : $(SOURCE) $(DEP_CPP_SLIDE) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1516,18 +1484,19 @@ DEP_CPP_SLIDE=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\SliderControl.h"\
-	"..\..\include\Window.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\slidercontrol.h"\
+	"..\..\include\window.h"\
 	
 
-"$(INTDIR)\SliderControl.obj" : $(SOURCE) $(DEP_CPP_SLIDE) "$(INTDIR)"
+"$(INTDIR)\SliderControl.obj" : $(SOURCE) $(DEP_CPP_SLIDE) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1537,18 +1506,19 @@ DEP_CPP_SLIDE=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\SliderControl.h"\
-	"..\..\include\Window.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\slidercontrol.h"\
+	"..\..\include\window.h"\
 	
 
-"$(INTDIR)\SliderControl.obj" : $(SOURCE) $(DEP_CPP_SLIDE) "$(INTDIR)"
+"$(INTDIR)\SliderControl.obj" : $(SOURCE) $(DEP_CPP_SLIDE) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1562,18 +1532,19 @@ DEP_CPP_TEXTC=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\TextControl.h"\
-	"..\..\include\Window.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\textcontrol.h"\
+	"..\..\include\window.h"\
 	
 
-"$(INTDIR)\TextControl.obj" : $(SOURCE) $(DEP_CPP_TEXTC) "$(INTDIR)"
+"$(INTDIR)\TextControl.obj" : $(SOURCE) $(DEP_CPP_TEXTC) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1583,18 +1554,19 @@ DEP_CPP_TEXTC=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\TextControl.h"\
-	"..\..\include\Window.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\textcontrol.h"\
+	"..\..\include\window.h"\
 	
 
-"$(INTDIR)\TextControl.obj" : $(SOURCE) $(DEP_CPP_TEXTC) "$(INTDIR)"
+"$(INTDIR)\TextControl.obj" : $(SOURCE) $(DEP_CPP_TEXTC) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1604,18 +1576,19 @@ DEP_CPP_TEXTC=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\TextControl.h"\
-	"..\..\include\Window.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\textcontrol.h"\
+	"..\..\include\window.h"\
 	
 
-"$(INTDIR)\TextControl.obj" : $(SOURCE) $(DEP_CPP_TEXTC) "$(INTDIR)"
+"$(INTDIR)\TextControl.obj" : $(SOURCE) $(DEP_CPP_TEXTC) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1625,18 +1598,19 @@ DEP_CPP_TEXTC=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\TextControl.h"\
-	"..\..\include\Window.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\textcontrol.h"\
+	"..\..\include\window.h"\
 	
 
-"$(INTDIR)\TextControl.obj" : $(SOURCE) $(DEP_CPP_TEXTC) "$(INTDIR)"
+"$(INTDIR)\TextControl.obj" : $(SOURCE) $(DEP_CPP_TEXTC) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1653,27 +1627,27 @@ DEP_CPP_THEME=\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\ButtonControl.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\DialControl.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\MessageDialog.h"\
-	"..\..\include\MultiStateControl.h"\
-	"..\..\include\SliderControl.h"\
-	"..\..\include\TextControl.h"\
-	"..\..\include\Theme.h"\
-	"..\..\include\ThemeManager.h"\
-	"..\..\include\ThemeZip.h"\
-	"..\..\include\Window.h"\
-	"..\include\Win32Bitmap.h"\
-	"..\include\Win32Font.h"\
-	"..\include\Win32Window.h"\
+	"..\..\..\..\lib\xml\include\parse.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\buttoncontrol.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\dialcontrol.h"\
+	"..\..\include\font.h"\
+	"..\..\include\messagedialog.h"\
+	"..\..\include\multistatecontrol.h"\
+	"..\..\include\slidercontrol.h"\
+	"..\..\include\textcontrol.h"\
+	"..\..\include\theme.h"\
+	"..\..\include\thememanager.h"\
+	"..\..\include\themezip.h"\
+	"..\..\include\window.h"\
+	"..\include\win32bitmap.h"\
+	"..\include\win32font.h"\
+	"..\include\win32window.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -1687,7 +1661,8 @@ NODEP_CPP_THEME=\
 	"..\..\src\GTKWindow.h"\
 	
 
-"$(INTDIR)\Theme.obj" : $(SOURCE) $(DEP_CPP_THEME) "$(INTDIR)"
+"$(INTDIR)\Theme.obj" : $(SOURCE) $(DEP_CPP_THEME) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1700,30 +1675,31 @@ DEP_CPP_THEME=\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\ButtonControl.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\DialControl.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\MessageDialog.h"\
-	"..\..\include\MultiStateControl.h"\
-	"..\..\include\SliderControl.h"\
-	"..\..\include\TextControl.h"\
-	"..\..\include\Theme.h"\
-	"..\..\include\ThemeManager.h"\
-	"..\..\include\ThemeZip.h"\
-	"..\..\include\Window.h"\
-	"..\include\Win32Bitmap.h"\
-	"..\include\Win32Font.h"\
-	"..\include\Win32Window.h"\
+	"..\..\..\..\lib\xml\include\parse.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\buttoncontrol.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\dialcontrol.h"\
+	"..\..\include\font.h"\
+	"..\..\include\messagedialog.h"\
+	"..\..\include\multistatecontrol.h"\
+	"..\..\include\slidercontrol.h"\
+	"..\..\include\textcontrol.h"\
+	"..\..\include\theme.h"\
+	"..\..\include\thememanager.h"\
+	"..\..\include\themezip.h"\
+	"..\..\include\window.h"\
+	"..\include\win32bitmap.h"\
+	"..\include\win32font.h"\
+	"..\include\win32window.h"\
 	
 
-"$(INTDIR)\Theme.obj" : $(SOURCE) $(DEP_CPP_THEME) "$(INTDIR)"
+"$(INTDIR)\Theme.obj" : $(SOURCE) $(DEP_CPP_THEME) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1736,30 +1712,31 @@ DEP_CPP_THEME=\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\ButtonControl.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\DialControl.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\MessageDialog.h"\
-	"..\..\include\MultiStateControl.h"\
-	"..\..\include\SliderControl.h"\
-	"..\..\include\TextControl.h"\
-	"..\..\include\Theme.h"\
-	"..\..\include\ThemeManager.h"\
-	"..\..\include\ThemeZip.h"\
-	"..\..\include\Window.h"\
-	"..\include\Win32Bitmap.h"\
-	"..\include\Win32Font.h"\
-	"..\include\Win32Window.h"\
+	"..\..\..\..\lib\xml\include\parse.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\buttoncontrol.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\dialcontrol.h"\
+	"..\..\include\font.h"\
+	"..\..\include\messagedialog.h"\
+	"..\..\include\multistatecontrol.h"\
+	"..\..\include\slidercontrol.h"\
+	"..\..\include\textcontrol.h"\
+	"..\..\include\theme.h"\
+	"..\..\include\thememanager.h"\
+	"..\..\include\themezip.h"\
+	"..\..\include\window.h"\
+	"..\include\win32bitmap.h"\
+	"..\include\win32font.h"\
+	"..\include\win32window.h"\
 	
 
-"$(INTDIR)\Theme.obj" : $(SOURCE) $(DEP_CPP_THEME) "$(INTDIR)"
+"$(INTDIR)\Theme.obj" : $(SOURCE) $(DEP_CPP_THEME) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1772,27 +1749,27 @@ DEP_CPP_THEME=\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\ButtonControl.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\DialControl.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\MessageDialog.h"\
-	"..\..\include\MultiStateControl.h"\
-	"..\..\include\SliderControl.h"\
-	"..\..\include\TextControl.h"\
-	"..\..\include\Theme.h"\
-	"..\..\include\ThemeManager.h"\
-	"..\..\include\ThemeZip.h"\
-	"..\..\include\Window.h"\
-	"..\include\Win32Bitmap.h"\
-	"..\include\Win32Font.h"\
-	"..\include\Win32Window.h"\
+	"..\..\..\..\lib\xml\include\parse.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\buttoncontrol.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\dialcontrol.h"\
+	"..\..\include\font.h"\
+	"..\..\include\messagedialog.h"\
+	"..\..\include\multistatecontrol.h"\
+	"..\..\include\slidercontrol.h"\
+	"..\..\include\textcontrol.h"\
+	"..\..\include\theme.h"\
+	"..\..\include\thememanager.h"\
+	"..\..\include\themezip.h"\
+	"..\..\include\window.h"\
+	"..\include\win32bitmap.h"\
+	"..\include\win32font.h"\
+	"..\include\win32window.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -1806,7 +1783,8 @@ NODEP_CPP_THEME=\
 	"..\..\src\GTKWindow.h"\
 	
 
-"$(INTDIR)\Theme.obj" : $(SOURCE) $(DEP_CPP_THEME) "$(INTDIR)"
+"$(INTDIR)\Theme.obj" : $(SOURCE) $(DEP_CPP_THEME) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1822,12 +1800,13 @@ DEP_CPP_THEMEM=\
 	"..\..\..\..\base\include\facontext.h"\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\preferences.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\ThemeManager.h"\
+	"..\..\include\thememanager.h"\
 	
 
-"$(INTDIR)\ThemeManager.obj" : $(SOURCE) $(DEP_CPP_THEMEM) "$(INTDIR)"
+"$(INTDIR)\ThemeManager.obj" : $(SOURCE) $(DEP_CPP_THEMEM) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1839,12 +1818,13 @@ DEP_CPP_THEMEM=\
 	"..\..\..\..\base\include\facontext.h"\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\preferences.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\ThemeManager.h"\
+	"..\..\include\thememanager.h"\
 	
 
-"$(INTDIR)\ThemeManager.obj" : $(SOURCE) $(DEP_CPP_THEMEM) "$(INTDIR)"
+"$(INTDIR)\ThemeManager.obj" : $(SOURCE) $(DEP_CPP_THEMEM) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1856,12 +1836,13 @@ DEP_CPP_THEMEM=\
 	"..\..\..\..\base\include\facontext.h"\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\preferences.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\ThemeManager.h"\
+	"..\..\include\thememanager.h"\
 	
 
-"$(INTDIR)\ThemeManager.obj" : $(SOURCE) $(DEP_CPP_THEMEM) "$(INTDIR)"
+"$(INTDIR)\ThemeManager.obj" : $(SOURCE) $(DEP_CPP_THEMEM) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1873,12 +1854,13 @@ DEP_CPP_THEMEM=\
 	"..\..\..\..\base\include\facontext.h"\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\preferences.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\ThemeManager.h"\
+	"..\..\include\thememanager.h"\
 	
 
-"$(INTDIR)\ThemeManager.obj" : $(SOURCE) $(DEP_CPP_THEMEM) "$(INTDIR)"
+"$(INTDIR)\ThemeManager.obj" : $(SOURCE) $(DEP_CPP_THEMEM) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1894,11 +1876,12 @@ DEP_CPP_THEMEZ=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
-	"..\..\include\ThemeZip.h"\
+	"..\..\include\themezip.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\ThemeZip.obj" : $(SOURCE) $(DEP_CPP_THEMEZ) "$(INTDIR)"
+"$(INTDIR)\ThemeZip.obj" : $(SOURCE) $(DEP_CPP_THEMEZ) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1910,10 +1893,11 @@ DEP_CPP_THEMEZ=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
-	"..\..\include\ThemeZip.h"\
+	"..\..\include\themezip.h"\
 	
 
-"$(INTDIR)\ThemeZip.obj" : $(SOURCE) $(DEP_CPP_THEMEZ) "$(INTDIR)"
+"$(INTDIR)\ThemeZip.obj" : $(SOURCE) $(DEP_CPP_THEMEZ) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1925,10 +1909,11 @@ DEP_CPP_THEMEZ=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
-	"..\..\include\ThemeZip.h"\
+	"..\..\include\themezip.h"\
 	
 
-"$(INTDIR)\ThemeZip.obj" : $(SOURCE) $(DEP_CPP_THEMEZ) "$(INTDIR)"
+"$(INTDIR)\ThemeZip.obj" : $(SOURCE) $(DEP_CPP_THEMEZ) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1940,11 +1925,12 @@ DEP_CPP_THEMEZ=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
-	"..\..\include\ThemeZip.h"\
+	"..\..\include\themezip.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\ThemeZip.obj" : $(SOURCE) $(DEP_CPP_THEMEZ) "$(INTDIR)"
+"$(INTDIR)\ThemeZip.obj" : $(SOURCE) $(DEP_CPP_THEMEZ) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1958,11 +1944,12 @@ DEP_CPP_WIN32=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\include\Win32Bitmap.h"\
+	"..\..\include\bitmap.h"\
+	"..\include\win32bitmap.h"\
 	
 
-"$(INTDIR)\Win32Bitmap.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
+"$(INTDIR)\Win32Bitmap.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1972,11 +1959,12 @@ DEP_CPP_WIN32=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\include\Win32Bitmap.h"\
+	"..\..\include\bitmap.h"\
+	"..\include\win32bitmap.h"\
 	
 
-"$(INTDIR)\Win32Bitmap.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
+"$(INTDIR)\Win32Bitmap.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1986,11 +1974,12 @@ DEP_CPP_WIN32=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\include\Win32Bitmap.h"\
+	"..\..\include\bitmap.h"\
+	"..\include\win32bitmap.h"\
 	
 
-"$(INTDIR)\Win32Bitmap.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
+"$(INTDIR)\Win32Bitmap.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2000,11 +1989,12 @@ DEP_CPP_WIN32=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\include\Win32Bitmap.h"\
+	"..\..\include\bitmap.h"\
+	"..\include\win32bitmap.h"\
 	
 
-"$(INTDIR)\Win32Bitmap.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
+"$(INTDIR)\Win32Bitmap.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2018,21 +2008,22 @@ DEP_CPP_WIN32C=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\Window.h"\
-	"..\include\Win32Bitmap.h"\
-	"..\include\Win32Canvas.h"\
-	"..\include\Win32Font.h"\
-	"..\include\Win32Window.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\window.h"\
+	"..\include\win32bitmap.h"\
+	"..\include\win32canvas.h"\
+	"..\include\win32font.h"\
+	"..\include\win32window.h"\
 	
 
-"$(INTDIR)\Win32Canvas.obj" : $(SOURCE) $(DEP_CPP_WIN32C) "$(INTDIR)"
+"$(INTDIR)\Win32Canvas.obj" : $(SOURCE) $(DEP_CPP_WIN32C) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2042,21 +2033,22 @@ DEP_CPP_WIN32C=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\Window.h"\
-	"..\include\Win32Bitmap.h"\
-	"..\include\Win32Canvas.h"\
-	"..\include\Win32Font.h"\
-	"..\include\Win32Window.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\window.h"\
+	"..\include\win32bitmap.h"\
+	"..\include\win32canvas.h"\
+	"..\include\win32font.h"\
+	"..\include\win32window.h"\
 	
 
-"$(INTDIR)\Win32Canvas.obj" : $(SOURCE) $(DEP_CPP_WIN32C) "$(INTDIR)"
+"$(INTDIR)\Win32Canvas.obj" : $(SOURCE) $(DEP_CPP_WIN32C) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2066,21 +2058,22 @@ DEP_CPP_WIN32C=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\Window.h"\
-	"..\include\Win32Bitmap.h"\
-	"..\include\Win32Canvas.h"\
-	"..\include\Win32Font.h"\
-	"..\include\Win32Window.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\window.h"\
+	"..\include\win32bitmap.h"\
+	"..\include\win32canvas.h"\
+	"..\include\win32font.h"\
+	"..\include\win32window.h"\
 	
 
-"$(INTDIR)\Win32Canvas.obj" : $(SOURCE) $(DEP_CPP_WIN32C) "$(INTDIR)"
+"$(INTDIR)\Win32Canvas.obj" : $(SOURCE) $(DEP_CPP_WIN32C) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2090,21 +2083,22 @@ DEP_CPP_WIN32C=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\Window.h"\
-	"..\include\Win32Bitmap.h"\
-	"..\include\Win32Canvas.h"\
-	"..\include\Win32Font.h"\
-	"..\include\Win32Window.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\window.h"\
+	"..\include\win32bitmap.h"\
+	"..\include\win32canvas.h"\
+	"..\include\win32font.h"\
+	"..\include\win32window.h"\
 	
 
-"$(INTDIR)\Win32Canvas.obj" : $(SOURCE) $(DEP_CPP_WIN32C) "$(INTDIR)"
+"$(INTDIR)\Win32Canvas.obj" : $(SOURCE) $(DEP_CPP_WIN32C) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2118,11 +2112,12 @@ DEP_CPP_WIN32F=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Font.h"\
-	"..\include\Win32Font.h"\
+	"..\..\include\font.h"\
+	"..\include\win32font.h"\
 	
 
-"$(INTDIR)\Win32Font.obj" : $(SOURCE) $(DEP_CPP_WIN32F) "$(INTDIR)"
+"$(INTDIR)\Win32Font.obj" : $(SOURCE) $(DEP_CPP_WIN32F) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2132,11 +2127,12 @@ DEP_CPP_WIN32F=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Font.h"\
-	"..\include\Win32Font.h"\
+	"..\..\include\font.h"\
+	"..\include\win32font.h"\
 	
 
-"$(INTDIR)\Win32Font.obj" : $(SOURCE) $(DEP_CPP_WIN32F) "$(INTDIR)"
+"$(INTDIR)\Win32Font.obj" : $(SOURCE) $(DEP_CPP_WIN32F) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2146,11 +2142,12 @@ DEP_CPP_WIN32F=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Font.h"\
-	"..\include\Win32Font.h"\
+	"..\..\include\font.h"\
+	"..\include\win32font.h"\
 	
 
-"$(INTDIR)\Win32Font.obj" : $(SOURCE) $(DEP_CPP_WIN32F) "$(INTDIR)"
+"$(INTDIR)\Win32Font.obj" : $(SOURCE) $(DEP_CPP_WIN32F) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2160,11 +2157,12 @@ DEP_CPP_WIN32F=\
 	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\Font.h"\
-	"..\include\Win32Font.h"\
+	"..\..\include\font.h"\
+	"..\include\win32font.h"\
 	
 
-"$(INTDIR)\Win32Font.obj" : $(SOURCE) $(DEP_CPP_WIN32F) "$(INTDIR)"
+"$(INTDIR)\Win32Font.obj" : $(SOURCE) $(DEP_CPP_WIN32F) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2172,7 +2170,7 @@ DEP_CPP_WIN32F=\
 
 SOURCE=..\src\Win32MessageDialog.cpp
 DEP_CPP_WIN32M=\
-	"..\..\include\MessageDialog.h"\
+	"..\..\include\messagedialog.h"\
 	
 
 "$(INTDIR)\Win32MessageDialog.obj" : $(SOURCE) $(DEP_CPP_WIN32M) "$(INTDIR)"
@@ -2201,26 +2199,27 @@ DEP_CPP_WIN32P=\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\updatemanager.h"\
 	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\base\win32\include\win32updatemanager.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\PreferenceWindow.h"\
-	"..\..\include\ThemeManager.h"\
-	"..\..\include\Window.h"\
-	"..\include\Win32PreferenceWindow.h"\
-	"..\include\Win32Window.h"\
+	"..\..\..\..\lib\xml\include\parse.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\preferencewindow.h"\
+	"..\..\include\thememanager.h"\
+	"..\..\include\window.h"\
+	"..\include\win32preferencewindow.h"\
+	"..\include\win32window.h"\
 	
 NODEP_CPP_WIN32P=\
 	"..\..\..\..\base\include\win32impl.h"\
 	
 
-"$(INTDIR)\Win32PreferenceWindow.obj" : $(SOURCE) $(DEP_CPP_WIN32P) "$(INTDIR)"
+"$(INTDIR)\Win32PreferenceWindow.obj" : $(SOURCE) $(DEP_CPP_WIN32P) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2244,23 +2243,24 @@ DEP_CPP_WIN32P=\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\updatemanager.h"\
 	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\base\win32\include\win32updatemanager.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\PreferenceWindow.h"\
-	"..\..\include\ThemeManager.h"\
-	"..\..\include\Window.h"\
-	"..\include\Win32PreferenceWindow.h"\
-	"..\include\Win32Window.h"\
+	"..\..\..\..\lib\xml\include\parse.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\preferencewindow.h"\
+	"..\..\include\thememanager.h"\
+	"..\..\include\window.h"\
+	"..\include\win32preferencewindow.h"\
+	"..\include\win32window.h"\
 	
 
-"$(INTDIR)\Win32PreferenceWindow.obj" : $(SOURCE) $(DEP_CPP_WIN32P) "$(INTDIR)"
+"$(INTDIR)\Win32PreferenceWindow.obj" : $(SOURCE) $(DEP_CPP_WIN32P) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2284,23 +2284,24 @@ DEP_CPP_WIN32P=\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\updatemanager.h"\
 	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\base\win32\include\win32updatemanager.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\PreferenceWindow.h"\
-	"..\..\include\ThemeManager.h"\
-	"..\..\include\Window.h"\
-	"..\include\Win32PreferenceWindow.h"\
-	"..\include\Win32Window.h"\
+	"..\..\..\..\lib\xml\include\parse.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\preferencewindow.h"\
+	"..\..\include\thememanager.h"\
+	"..\..\include\window.h"\
+	"..\include\win32preferencewindow.h"\
+	"..\include\win32window.h"\
 	
 
-"$(INTDIR)\Win32PreferenceWindow.obj" : $(SOURCE) $(DEP_CPP_WIN32P) "$(INTDIR)"
+"$(INTDIR)\Win32PreferenceWindow.obj" : $(SOURCE) $(DEP_CPP_WIN32P) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2324,26 +2325,27 @@ DEP_CPP_WIN32P=\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\updatemanager.h"\
 	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\base\win32\include\win32updatemanager.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\PreferenceWindow.h"\
-	"..\..\include\ThemeManager.h"\
-	"..\..\include\Window.h"\
-	"..\include\Win32PreferenceWindow.h"\
-	"..\include\Win32Window.h"\
+	"..\..\..\..\lib\xml\include\parse.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\preferencewindow.h"\
+	"..\..\include\thememanager.h"\
+	"..\..\include\window.h"\
+	"..\include\win32preferencewindow.h"\
+	"..\include\win32window.h"\
 	
 NODEP_CPP_WIN32P=\
 	"..\..\..\..\base\include\win32impl.h"\
 	
 
-"$(INTDIR)\Win32PreferenceWindow.obj" : $(SOURCE) $(DEP_CPP_WIN32P) "$(INTDIR)"
+"$(INTDIR)\Win32PreferenceWindow.obj" : $(SOURCE) $(DEP_CPP_WIN32P) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2369,17 +2371,18 @@ DEP_CPP_WIN32U=\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\updatemanager.h"\
 	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\base\win32\include\win32updatemanager.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
+	"..\..\..\..\lib\xml\include\parse.h"\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\win32updatemanager.obj" : $(SOURCE) $(DEP_CPP_WIN32U) "$(INTDIR)"
+"$(INTDIR)\win32updatemanager.obj" : $(SOURCE) $(DEP_CPP_WIN32U) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2401,16 +2404,17 @@ DEP_CPP_WIN32U=\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\updatemanager.h"\
 	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\base\win32\include\win32updatemanager.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
+	"..\..\..\..\lib\xml\include\parse.h"\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	
 
-"$(INTDIR)\win32updatemanager.obj" : $(SOURCE) $(DEP_CPP_WIN32U) "$(INTDIR)"
+"$(INTDIR)\win32updatemanager.obj" : $(SOURCE) $(DEP_CPP_WIN32U) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2432,16 +2436,17 @@ DEP_CPP_WIN32U=\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\updatemanager.h"\
 	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\base\win32\include\win32updatemanager.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
+	"..\..\..\..\lib\xml\include\parse.h"\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	
 
-"$(INTDIR)\win32updatemanager.obj" : $(SOURCE) $(DEP_CPP_WIN32U) "$(INTDIR)"
+"$(INTDIR)\win32updatemanager.obj" : $(SOURCE) $(DEP_CPP_WIN32U) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2463,17 +2468,18 @@ DEP_CPP_WIN32U=\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\updatemanager.h"\
 	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\base\win32\include\win32updatemanager.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
+	"..\..\..\..\lib\xml\include\parse.h"\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\win32updatemanager.obj" : $(SOURCE) $(DEP_CPP_WIN32U) "$(INTDIR)"
+"$(INTDIR)\win32updatemanager.obj" : $(SOURCE) $(DEP_CPP_WIN32U) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2490,23 +2496,24 @@ DEP_CPP_WIN32W=\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\Theme.h"\
-	"..\..\include\ThemeManager.h"\
-	"..\..\include\Window.h"\
-	"..\include\Win32Bitmap.h"\
-	"..\include\Win32Canvas.h"\
-	"..\include\Win32Window.h"\
+	"..\..\..\..\lib\xml\include\parse.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\theme.h"\
+	"..\..\include\thememanager.h"\
+	"..\..\include\window.h"\
+	"..\include\win32bitmap.h"\
+	"..\include\win32canvas.h"\
+	"..\include\win32window.h"\
 	
 
-"$(INTDIR)\Win32Window.obj" : $(SOURCE) $(DEP_CPP_WIN32W) "$(INTDIR)"
+"$(INTDIR)\Win32Window.obj" : $(SOURCE) $(DEP_CPP_WIN32W) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2519,23 +2526,24 @@ DEP_CPP_WIN32W=\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\Theme.h"\
-	"..\..\include\ThemeManager.h"\
-	"..\..\include\Window.h"\
-	"..\include\Win32Bitmap.h"\
-	"..\include\Win32Canvas.h"\
-	"..\include\Win32Window.h"\
+	"..\..\..\..\lib\xml\include\parse.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\theme.h"\
+	"..\..\include\thememanager.h"\
+	"..\..\include\window.h"\
+	"..\include\win32bitmap.h"\
+	"..\include\win32canvas.h"\
+	"..\include\win32window.h"\
 	
 
-"$(INTDIR)\Win32Window.obj" : $(SOURCE) $(DEP_CPP_WIN32W) "$(INTDIR)"
+"$(INTDIR)\Win32Window.obj" : $(SOURCE) $(DEP_CPP_WIN32W) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2548,23 +2556,24 @@ DEP_CPP_WIN32W=\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\Theme.h"\
-	"..\..\include\ThemeManager.h"\
-	"..\..\include\Window.h"\
-	"..\include\Win32Bitmap.h"\
-	"..\include\Win32Canvas.h"\
-	"..\include\Win32Window.h"\
+	"..\..\..\..\lib\xml\include\parse.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\theme.h"\
+	"..\..\include\thememanager.h"\
+	"..\..\include\window.h"\
+	"..\include\win32bitmap.h"\
+	"..\include\win32canvas.h"\
+	"..\include\win32window.h"\
 	
 
-"$(INTDIR)\Win32Window.obj" : $(SOURCE) $(DEP_CPP_WIN32W) "$(INTDIR)"
+"$(INTDIR)\Win32Window.obj" : $(SOURCE) $(DEP_CPP_WIN32W) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2577,23 +2586,24 @@ DEP_CPP_WIN32W=\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\Theme.h"\
-	"..\..\include\ThemeManager.h"\
-	"..\..\include\Window.h"\
-	"..\include\Win32Bitmap.h"\
-	"..\include\Win32Canvas.h"\
-	"..\include\Win32Window.h"\
+	"..\..\..\..\lib\xml\include\parse.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\theme.h"\
+	"..\..\include\thememanager.h"\
+	"..\..\include\window.h"\
+	"..\include\win32bitmap.h"\
+	"..\include\win32canvas.h"\
+	"..\include\win32window.h"\
 	
 
-"$(INTDIR)\Win32Window.obj" : $(SOURCE) $(DEP_CPP_WIN32W) "$(INTDIR)"
+"$(INTDIR)\Win32Window.obj" : $(SOURCE) $(DEP_CPP_WIN32W) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2610,20 +2620,21 @@ DEP_CPP_WINDO=\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\Theme.h"\
-	"..\..\include\ThemeManager.h"\
-	"..\..\include\Window.h"\
+	"..\..\..\..\lib\xml\include\parse.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\theme.h"\
+	"..\..\include\thememanager.h"\
+	"..\..\include\window.h"\
 	
 
-"$(INTDIR)\Window.obj" : $(SOURCE) $(DEP_CPP_WINDO) "$(INTDIR)"
+"$(INTDIR)\Window.obj" : $(SOURCE) $(DEP_CPP_WINDO) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2636,20 +2647,21 @@ DEP_CPP_WINDO=\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\Theme.h"\
-	"..\..\include\ThemeManager.h"\
-	"..\..\include\Window.h"\
+	"..\..\..\..\lib\xml\include\parse.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\theme.h"\
+	"..\..\include\thememanager.h"\
+	"..\..\include\window.h"\
 	
 
-"$(INTDIR)\Window.obj" : $(SOURCE) $(DEP_CPP_WINDO) "$(INTDIR)"
+"$(INTDIR)\Window.obj" : $(SOURCE) $(DEP_CPP_WINDO) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2662,20 +2674,21 @@ DEP_CPP_WINDO=\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\Theme.h"\
-	"..\..\include\ThemeManager.h"\
-	"..\..\include\Window.h"\
+	"..\..\..\..\lib\xml\include\parse.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\theme.h"\
+	"..\..\include\thememanager.h"\
+	"..\..\include\window.h"\
 	
 
-"$(INTDIR)\Window.obj" : $(SOURCE) $(DEP_CPP_WINDO) "$(INTDIR)"
+"$(INTDIR)\Window.obj" : $(SOURCE) $(DEP_CPP_WINDO) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2688,20 +2701,21 @@ DEP_CPP_WINDO=\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\..\..\lib\xml\include\Parse.h"\
-	"..\..\include\Bitmap.h"\
-	"..\..\include\Canvas.h"\
-	"..\..\include\Control.h"\
-	"..\..\include\Font.h"\
-	"..\..\include\Theme.h"\
-	"..\..\include\ThemeManager.h"\
-	"..\..\include\Window.h"\
+	"..\..\..\..\lib\xml\include\parse.h"\
+	"..\..\include\bitmap.h"\
+	"..\..\include\canvas.h"\
+	"..\..\include\control.h"\
+	"..\..\include\font.h"\
+	"..\..\include\theme.h"\
+	"..\..\include\thememanager.h"\
+	"..\..\include\window.h"\
 	
 
-"$(INTDIR)\Window.obj" : $(SOURCE) $(DEP_CPP_WINDO) "$(INTDIR)"
+"$(INTDIR)\Window.obj" : $(SOURCE) $(DEP_CPP_WINDO) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2717,7 +2731,7 @@ DEP_RSC_FREEAM=\
 
 "$(INTDIR)\freeampui.res" : $(SOURCE) $(DEP_RSC_FREEAM) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\freeampui.res" /i\
- "\FreeAmp\freeamp\ui\freeamp\win32\res" /d "NDEBUG" $(SOURCE)
+ "\Local\src\freeamp\ui\freeamp\win32\res" /d "NDEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
@@ -2725,7 +2739,7 @@ DEP_RSC_FREEAM=\
 
 "$(INTDIR)\freeampui.res" : $(SOURCE) $(DEP_RSC_FREEAM) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\freeampui.res" /i\
- "\FreeAmp\freeamp\ui\freeamp\win32\res" /d "_DEBUG" $(SOURCE)
+ "\Local\src\freeamp\ui\freeamp\win32\res" /d "_DEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Debug"
@@ -2733,7 +2747,7 @@ DEP_RSC_FREEAM=\
 
 "$(INTDIR)\freeampui.res" : $(SOURCE) $(DEP_RSC_FREEAM) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\freeampui.res" /i\
- "\FreeAmp\freeamp\ui\freeamp\win32\res" /d "_DEBUG" $(SOURCE)
+ "\Local\src\freeamp\ui\freeamp\win32\res" /d "_DEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Release"
@@ -2741,7 +2755,7 @@ DEP_RSC_FREEAM=\
 
 "$(INTDIR)\freeampui.res" : $(SOURCE) $(DEP_RSC_FREEAM) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\freeampui.res" /i\
- "\FreeAmp\freeamp\ui\freeamp\win32\res" /d "NDEBUG" $(SOURCE)
+ "\Local\src\freeamp\ui\freeamp\win32\res" /d "NDEBUG" $(SOURCE)
 
 
 !ENDIF 
@@ -2749,12 +2763,12 @@ DEP_RSC_FREEAM=\
 !IF  "$(CFG)" == "freeampui - Win32 Release"
 
 "zlib - Win32 Release" : 
-   cd "\FreeAmp\freeamp\lib\zlib\prj"
+   cd "\Local\src\freeamp\lib\zlib\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\zlib.mak CFG="zlib - Win32 Release" 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 "zlib - Win32 ReleaseCLEAN" : 
-   cd "\FreeAmp\freeamp\lib\zlib\prj"
+   cd "\Local\src\freeamp\lib\zlib\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\zlib.mak CFG="zlib - Win32 Release"\
  RECURSE=1 
    cd "..\..\..\ui\freeamp\win32\prj"
@@ -2762,12 +2776,12 @@ DEP_RSC_FREEAM=\
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
 
 "zlib - Win32 Debug" : 
-   cd "\FreeAmp\freeamp\lib\zlib\prj"
+   cd "\Local\src\freeamp\lib\zlib\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\zlib.mak CFG="zlib - Win32 Debug" 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 "zlib - Win32 DebugCLEAN" : 
-   cd "\FreeAmp\freeamp\lib\zlib\prj"
+   cd "\Local\src\freeamp\lib\zlib\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\zlib.mak CFG="zlib - Win32 Debug" RECURSE=1\
  
    cd "..\..\..\ui\freeamp\win32\prj"
@@ -2775,12 +2789,12 @@ DEP_RSC_FREEAM=\
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Debug"
 
 "zlib - Win32 NASM Debug" : 
-   cd "\FreeAmp\freeamp\lib\zlib\prj"
+   cd "\Local\src\freeamp\lib\zlib\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\zlib.mak CFG="zlib - Win32 NASM Debug" 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 "zlib - Win32 NASM DebugCLEAN" : 
-   cd "\FreeAmp\freeamp\lib\zlib\prj"
+   cd "\Local\src\freeamp\lib\zlib\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\zlib.mak CFG="zlib - Win32 NASM Debug"\
  RECURSE=1 
    cd "..\..\..\ui\freeamp\win32\prj"
@@ -2788,12 +2802,12 @@ DEP_RSC_FREEAM=\
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Release"
 
 "zlib - Win32 NASM Release" : 
-   cd "\FreeAmp\freeamp\lib\zlib\prj"
+   cd "\Local\src\freeamp\lib\zlib\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\zlib.mak CFG="zlib - Win32 NASM Release" 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 "zlib - Win32 NASM ReleaseCLEAN" : 
-   cd "\FreeAmp\freeamp\lib\zlib\prj"
+   cd "\Local\src\freeamp\lib\zlib\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\zlib.mak CFG="zlib - Win32 NASM Release"\
  RECURSE=1 
    cd "..\..\..\ui\freeamp\win32\prj"
@@ -2803,12 +2817,12 @@ DEP_RSC_FREEAM=\
 !IF  "$(CFG)" == "freeampui - Win32 Release"
 
 "gdbm - Win32 Release" : 
-   cd "\FreeAmp\freeamp\lib\gdbm\prj"
+   cd "\Local\src\freeamp\lib\gdbm\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\gdbm.mak CFG="gdbm - Win32 Release" 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 "gdbm - Win32 ReleaseCLEAN" : 
-   cd "\FreeAmp\freeamp\lib\gdbm\prj"
+   cd "\Local\src\freeamp\lib\gdbm\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\gdbm.mak CFG="gdbm - Win32 Release"\
  RECURSE=1 
    cd "..\..\..\ui\freeamp\win32\prj"
@@ -2816,12 +2830,12 @@ DEP_RSC_FREEAM=\
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
 
 "gdbm - Win32 Debug" : 
-   cd "\FreeAmp\freeamp\lib\gdbm\prj"
+   cd "\Local\src\freeamp\lib\gdbm\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\gdbm.mak CFG="gdbm - Win32 Debug" 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 "gdbm - Win32 DebugCLEAN" : 
-   cd "\FreeAmp\freeamp\lib\gdbm\prj"
+   cd "\Local\src\freeamp\lib\gdbm\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\gdbm.mak CFG="gdbm - Win32 Debug" RECURSE=1\
  
    cd "..\..\..\ui\freeamp\win32\prj"
@@ -2829,12 +2843,12 @@ DEP_RSC_FREEAM=\
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Debug"
 
 "gdbm - Win32 NASM Debug" : 
-   cd "\FreeAmp\freeamp\lib\gdbm\prj"
+   cd "\Local\src\freeamp\lib\gdbm\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\gdbm.mak CFG="gdbm - Win32 NASM Debug" 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 "gdbm - Win32 NASM DebugCLEAN" : 
-   cd "\FreeAmp\freeamp\lib\gdbm\prj"
+   cd "\Local\src\freeamp\lib\gdbm\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\gdbm.mak CFG="gdbm - Win32 NASM Debug"\
  RECURSE=1 
    cd "..\..\..\ui\freeamp\win32\prj"
@@ -2842,12 +2856,12 @@ DEP_RSC_FREEAM=\
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Release"
 
 "gdbm - Win32 NASM Release" : 
-   cd "\FreeAmp\freeamp\lib\gdbm\prj"
+   cd "\Local\src\freeamp\lib\gdbm\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\gdbm.mak CFG="gdbm - Win32 NASM Release" 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 "gdbm - Win32 NASM ReleaseCLEAN" : 
-   cd "\FreeAmp\freeamp\lib\gdbm\prj"
+   cd "\Local\src\freeamp\lib\gdbm\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\gdbm.mak CFG="gdbm - Win32 NASM Release"\
  RECURSE=1 
    cd "..\..\..\ui\freeamp\win32\prj"
@@ -2857,12 +2871,12 @@ DEP_RSC_FREEAM=\
 !IF  "$(CFG)" == "freeampui - Win32 Release"
 
 "fabaselib - Win32 Release" : 
-   cd "\FreeAmp\freeamp\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Release" 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 "fabaselib - Win32 ReleaseCLEAN" : 
-   cd "\FreeAmp\freeamp\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak\
  CFG="fabaselib - Win32 Release" RECURSE=1 
    cd "..\..\..\ui\freeamp\win32\prj"
@@ -2870,12 +2884,12 @@ DEP_RSC_FREEAM=\
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
 
 "fabaselib - Win32 Debug" : 
-   cd "\FreeAmp\freeamp\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Debug" 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 "fabaselib - Win32 DebugCLEAN" : 
-   cd "\FreeAmp\freeamp\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak CFG="fabaselib - Win32 Debug"\
  RECURSE=1 
    cd "..\..\..\ui\freeamp\win32\prj"
@@ -2883,12 +2897,12 @@ DEP_RSC_FREEAM=\
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Debug"
 
 "fabaselib - Win32 NASM Debug" : 
-   cd "\FreeAmp\freeamp\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug" 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 "fabaselib - Win32 NASM DebugCLEAN" : 
-   cd "\FreeAmp\freeamp\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak\
  CFG="fabaselib - Win32 NASM Debug" RECURSE=1 
    cd "..\..\..\ui\freeamp\win32\prj"
@@ -2896,13 +2910,13 @@ DEP_RSC_FREEAM=\
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Release"
 
 "fabaselib - Win32 NASM Release" : 
-   cd "\FreeAmp\freeamp\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak\
  CFG="fabaselib - Win32 NASM Release" 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 "fabaselib - Win32 NASM ReleaseCLEAN" : 
-   cd "\FreeAmp\freeamp\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak\
  CFG="fabaselib - Win32 NASM Release" RECURSE=1 
    cd "..\..\..\ui\freeamp\win32\prj"
