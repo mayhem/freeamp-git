@@ -34,21 +34,6 @@ ____________________________________________________________________________*/
 #include "registrar.h"
 #include "dummycoo.h"
 #include "preferences.h"
-#include "mem.h"
-
-void* operator new(size_t size)
-{
-    void* p;
-
-    p = __malloc(size);
-
-    return p;
-}
-
-void operator delete(void* p)
-{
-   __free(p);
-}
  
 int APIENTRY WinMain(	HINSTANCE hInstance, 
 						HINSTANCE hPrevInstance,
