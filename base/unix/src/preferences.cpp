@@ -87,7 +87,7 @@ HANDLE Preferences::GetFirstLibDir(char *path, uint32 *len) {
 	pCol = strchr(pPart,':');
 	if (pCol) *pCol = '\0';
 	char *pFoo = strdup(pPart);
-	pldfh->m_pLibDirs->Insert(pFoo);
+	pldfh->m_pLibDirs->AddItem(pFoo);
 	pPart = pCol + sizeof(char);
     }
 
