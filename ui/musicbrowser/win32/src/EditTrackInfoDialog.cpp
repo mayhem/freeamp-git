@@ -35,6 +35,7 @@ ____________________________________________________________________________*/
 #include "utility.h"
 #include "resource.h"
 #include "Win32MusicBrowser.h"
+#include "help.h"
 
 
 BOOL CALLBACK EditTrackInfoDlgProc(HWND hwnd,
@@ -299,6 +300,12 @@ BOOL MusicBrowserUI::EditTrackInfoDlgProc(HWND hwnd,
                             Edit_SetText((HWND)lParam, "Unknown");
                         }
                     }
+                    break;
+                }
+
+                case IDC_SHOWHELP:
+                {
+                    ShowHelp(Edit_Info);
                     break;
                 }
             }

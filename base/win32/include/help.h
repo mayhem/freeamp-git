@@ -47,5 +47,7 @@ ____________________________________________________________________________*/
 #define Preferences_Advanced 8
 #define Preferences_About 9
 
+#define Edit_Info 11
+
 
 #endif

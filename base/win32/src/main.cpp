@@ -396,6 +396,7 @@ const char* kMimeTypes[] = {
     "audio/mp3",
     "audio/mpegurl",
     "audio/scpls",
+    "application/vnd.rn-rn_music_package",
     NULL
 };
 
