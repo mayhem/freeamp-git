@@ -39,6 +39,12 @@ ____________________________________________________________________________*/
 
 #define PIECES 50
 
+extern "C" {
+PhysicalMediaOutput *Initialize() {
+    return new SoundCardPMO();
+}
+	   }
+
 SoundCardPMO::SoundCardPMO() {
     //cout << "Creating scpmo" << endl;
     myInfo = new OutputInfo();

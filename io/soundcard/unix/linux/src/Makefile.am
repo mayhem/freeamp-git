@@ -25,7 +25,7 @@
 include @top_srcdir@/config/Makefile.header
 
 if AM_HAVE_LINUX
-FILES = soundcardpmo.cpp soundcardlib.cpp
+FILES = soundcardpmo.cpp 
 MYLIBS = libfasndcard.a
 else
 FILES = 
@@ -45,8 +45,8 @@ CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT)
 
 all-local: sndcard-local
 
-sndcard-local: soundcardpmo.o soundcardlib.o
-	gcc -shared -Wl,-soname,soundcard-@target_os@.pmo -o soundcard-@target_os@.pmo soundcardpmo.o soundcardlib.o
+sndcard-local: soundcardpmo.o 
+	gcc -shared -Wl,-soname,soundcard-@target_os@.pmo -o soundcard-@target_os@.pmo soundcardpmo.o 
 	cp soundcard-@target_os@.pmo @top_srcdir@/plugins
 
 

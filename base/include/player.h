@@ -47,14 +47,14 @@ typedef enum {
     STATE_Stopped,
 } PlayerState;
 
-class Player {
+class Player : public EventQueue {
 
  public:
     //Player();
     static Player *GetPlayer();
     ~Player();
 
-    int32 RegisterActiveUI(UIRef ui);
+    int32 RegisterActiveUI(UserInterface *ui);
     int32 RegisterLMCs(LMCRegistry* registry);
     int32 RegisterPMIs(PMIRegistry* registry);
     int32 RegisterPMOs(PMORegistry* registry);
@@ -65,7 +65,8 @@ class Player {
     void SetTerminationSemaphore(Semaphore *);
     void testQueue();
     static void EventServiceThreadFunc(void *);
-    static int32 AcceptEventStub(EventQueueRef ref, Event* e);
+//    static int32 AcceptEventStub(EventQueueRef ref, Event* e);
+    virtual int32 AcceptEvent(Event *);
 
  protected:
     Player();
@@ -76,8 +77,6 @@ class Player {
 
     bool SetState(PlayerState);
     int32 ServiceEvent(Event *);
-
-    int32 AcceptEvent(Event *);
 
 
  private:
@@ -91,7 +90,7 @@ class Player {
                                              // and COO's haven't sent in 
                                              // their "Ready To Die" infos.
     int32                   m_imQuitting;
-    Vector<UIRef>*          m_uiVector;
+    Vector<UserInterface *>*          m_uiVector;
     
     Mutex*                  m_uiManipLock;
     Mutex*                  m_lmcMutex;
@@ -100,8 +99,8 @@ class Player {
     Mutex*                  m_uiMutex;
     PlayList*               m_myPlayList;
     
-    LMCRef                  m_lmcRef;
-    UIRef                   m_uiRef;
+    LogicalMediaConverter * m_lmc;
+    UserInterface *         m_ui;
 
     LMCRegistry*            m_lmcRegistry;
     PMIRegistry*            m_pmiRegistry;

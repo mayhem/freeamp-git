@@ -40,6 +40,13 @@ ____________________________________________________________________________*/
 
 #define stdinfd 0
 
+extern "C" {
+
+UserInterface *Initialize() {
+    return new cmdlineUI();
+}
+
+	   }
 static struct termios normalTTY;
 static struct termios rawTTY;
 int getKey() {
@@ -98,12 +105,12 @@ void cmdlineUI::keyboardServiceFunction(void *pclcio) {
 	    case 'p':
 	    case 'P': {
 		Event *e = new Event(CMD_TogglePause);
-		pMe->m_playerEQ->AcceptEvent(pMe->m_playerEQ,e);
+		pMe->m_playerEQ->AcceptEvent(e);
 		break;
 	    }
 	    case '-': {
 		Event *e = new Event(CMD_PrevMediaPiece);
-		pMe->m_playerEQ->AcceptEvent(pMe->m_playerEQ,e);
+		pMe->m_playerEQ->AcceptEvent(e);
 		break;
 	    }
 	    case '=':
@@ -111,12 +118,12 @@ void cmdlineUI::keyboardServiceFunction(void *pclcio) {
 	    case 'n':
 	    case 'N': {
 		Event *e = new Event(CMD_NextMediaPiece);
-		pMe->m_playerEQ->AcceptEvent(pMe->m_playerEQ,e);
+		pMe->m_playerEQ->AcceptEvent(e);
 		break; }
 	    case 'q':
 	    case 'Q': {
 		Event *e = new Event(CMD_QuitPlayer);
-		pMe->m_playerEQ->AcceptEvent(pMe->m_playerEQ,e);
+		pMe->m_playerEQ->AcceptEvent(e);
 		break; }
 	    case 's':
 	    case 'S': {
@@ -125,9 +132,9 @@ void cmdlineUI::keyboardServiceFunction(void *pclcio) {
 		    pMe->mypl->SetFirst();
 		}
 		Event *e = new Event(CMD_Stop);
-		pMe->m_playerEQ->AcceptEvent(pMe->m_playerEQ,e);
+		pMe->m_playerEQ->AcceptEvent(e);
 		e = new Event(CMD_Play);
-		pMe->m_playerEQ->AcceptEvent(pMe->m_playerEQ,e);
+		pMe->m_playerEQ->AcceptEvent(e);
 		break;}
 //	    case 'f':{
 //		Event *e = new Event(CMD_ChangePosition,(void *)200);
@@ -143,17 +150,17 @@ void cmdlineUI::keyboardServiceFunction(void *pclcio) {
 int32 cmdlineUI::AcceptEvent(Event *e) {
     if (e) {
 	//cout << "cmdlineUI: processing event " << e->getEvent() << endl;
-	switch (e->GetEvent()) {
+	switch (e->Type()) {
 	    case INFO_PlayListDonePlay: {
 		Event *e = new Event(CMD_QuitPlayer);
-		m_playerEQ->AcceptEvent(m_playerEQ,e);
+		m_playerEQ->AcceptEvent(e);
 		break; }
 	    case CMD_Cleanup: {
-		Event *e = new Event(INFO_ReadyToDieUI,this);
-		m_playerEQ->AcceptEvent(m_playerEQ,e);
+		Event *e = new Event(INFO_ReadyToDieUI);
+		m_playerEQ->AcceptEvent(e);
 		break; }
-	    case INFO_MediaVitalStats: {
-		MediaVitalInfo *pmvi = (MediaVitalInfo *)e->GetArgument();
+	    case INFO_MediaInfo: {
+		MediaInfoEvent *pmvi = (MediaInfoEvent *)e;
 		if (pmvi) {
 		    cout << "Playing: " << pmvi->m_songTitle << endl;
 		    if (pmvi->m_tagInfo.m_containsInfo) {
@@ -185,16 +192,17 @@ void cmdlineUI::SetArgs(int argc, char **argv) {
 	}
     }
     mypl->SetFirst();
-    Event *e = new Event(CMD_SetPlaylist,mypl);
-    m_playerEQ->AcceptEvent(m_playerEQ,e);
+    Event *e = new SetPlayListEvent(mypl);
+    m_playerEQ->AcceptEvent(e);
     e = new Event(CMD_Play);
-    m_playerEQ->AcceptEvent(m_playerEQ,e);
+    m_playerEQ->AcceptEvent(e);
 }
 
 void cmdlineUI::processSwitch(char *pc) {
     return;
 }
 
+#if 0
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -238,6 +246,7 @@ void Initialize(UI *ref)
 	   }
 #endif
 
+#endif
 
 
 

@@ -30,7 +30,7 @@ MYLIBS =
 TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
 else
 FILES = cdct.c cupl3.c hwin.c iup.c l3init.c msis.c wavep.c csbt.c cwinm.c icdct.c mdct.c uph.c cup.c dec8.c isbt.c l3dq.c mhead.c \
-        upsf.c iwinm.c xinglmc.cpp xinglib.cpp
+        upsf.c iwinm.c xinglmc.cpp
 MYLIBS = libfalmcxingmp3.a
 TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
 endif

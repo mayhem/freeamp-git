@@ -36,8 +36,7 @@ class Mpg123UI : public UserInterface {
 
     virtual int32 AcceptEvent(Event *);
     virtual void SetArgs(int argc, char **argv);
-    virtual void SetTarget(struct EventQueue *);
-    virtual void SetRef(struct UI *);
+    virtual void SetTarget(EventQueue *);
     ~Mpg123UI();
 
     static EventQueue *m_playerEQ;

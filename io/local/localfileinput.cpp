@@ -43,7 +43,11 @@ ____________________________________________________________________________*/
 /* project headers */
 #include "localfileinput.h"
 
-
+extern "C" {
+PhysicalMediaInput *Initialize() {
+    return new LocalFileInput();
+}
+	   }
 LocalFileInput::
 LocalFileInput(): 
 PhysicalMediaInput()

@@ -27,7 +27,7 @@ ____________________________________________________________________________*/
 #include "config.h"
 #include "vector.h"
 
-typedef void (*InitializeFunction)(void* ref);
+typedef void *(*InitializeFunction)();
 
 class RegistryItem {
  public:

@@ -40,11 +40,13 @@ class LogicalMediaConverter {
     virtual void Reset() = 0;
     virtual bool ChangePosition(int32) = 0;
 
-    virtual void SetPMI(PMIRef) = 0;
-    virtual void SetPMO(PMORef) = 0;
+    virtual void SetPMI(PhysicalMediaInput *) = 0;
+    virtual void SetPMO(PhysicalMediaOutput *) = 0;
     virtual void SetTarget(EventQueue *) = 0;
     virtual void InitDecoder() = 0;
 };
+
+#if 0
 
 #ifdef __cplusplus
 extern "C" {
@@ -71,6 +73,8 @@ typedef struct LMC{
 
 #ifdef __cplusplus
 } // extern "C"
+#endif
+
 #endif
 
 #endif // _LMC_H_

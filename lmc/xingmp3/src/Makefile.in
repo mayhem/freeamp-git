@@ -78,7 +78,7 @@ target_os = @target_os@
 @AM_HAVE_WIN32_TRUE@MYLIBS = 
 @AM_HAVE_WIN32_TRUE@TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
 @AM_HAVE_WIN32_FALSE@FILES = cdct.c cupl3.c hwin.c iup.c l3init.c msis.c wavep.c csbt.c cwinm.c icdct.c mdct.c uph.c cup.c dec8.c isbt.c l3dq.c mhead.c \
-@AM_HAVE_WIN32_FALSE@        upsf.c iwinm.c xinglmc.cpp xinglib.cpp
+@AM_HAVE_WIN32_FALSE@        upsf.c iwinm.c xinglmc.cpp
 @AM_HAVE_WIN32_FALSE@MYLIBS = libfalmcxingmp3.a
 @AM_HAVE_WIN32_FALSE@TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
 
@@ -105,7 +105,7 @@ libfalmcxingmp3_a_LIBADD =
 @AM_HAVE_WIN32_FALSE@cond1libfalmcxingmp3_a_OBJECTS =  cdct.o cupl3.o \
 @AM_HAVE_WIN32_FALSE@hwin.o iup.o l3init.o msis.o wavep.o csbt.o \
 @AM_HAVE_WIN32_FALSE@cwinm.o icdct.o mdct.o uph.o cup.o dec8.o isbt.o \
-@AM_HAVE_WIN32_FALSE@l3dq.o mhead.o upsf.o iwinm.o xinglmc.o xinglib.o
+@AM_HAVE_WIN32_FALSE@l3dq.o mhead.o upsf.o iwinm.o xinglmc.o
 libfalmcxingmp3_a_OBJECTS =  $(cond0libfalmcxingmp3_a_OBJECTS) \
 $(cond1libfalmcxingmp3_a_OBJECTS)
 AR = ar
@@ -124,7 +124,7 @@ DEP_FILES =  .deps/cdct.P .deps/csbt.P .deps/cup.P .deps/cupl3.P \
 .deps/cwinm.P .deps/dec8.P .deps/hwin.P .deps/icdct.P .deps/isbt.P \
 .deps/iup.P .deps/iwinm.P .deps/l3dq.P .deps/l3init.P .deps/mdct.P \
 .deps/mhead.P .deps/msis.P .deps/uph.P .deps/upsf.P .deps/wavep.P \
-.deps/xinglib.P .deps/xinglmc.P
+.deps/xinglmc.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 SOURCES = $(libfalmcxingmp3_a_SOURCES)
 OBJECTS = $(libfalmcxingmp3_a_OBJECTS)

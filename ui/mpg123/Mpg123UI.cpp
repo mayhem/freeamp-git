@@ -37,7 +37,14 @@ ____________________________________________________________________________*/
 void mysigterm(int);
 void mysigint(int);
 
-EventQueueRef Mpg123UI::m_playerEQ = NULL;
+
+extern "C" {
+    UserInterface *Initialize() {
+	return new Mpg123UI();
+    }
+	   }
+
+EventQueue *Mpg123UI::m_playerEQ = NULL;
 
 Mpg123UI::Mpg123UI() {
 
@@ -58,9 +65,9 @@ Mpg123UI::Mpg123UI() {
 
 void mysigterm(int f) {
     Event *e = new Event(CMD_Stop);
-    Mpg123UI::m_playerEQ->AcceptEvent(Mpg123UI::m_playerEQ,e);
+    Mpg123UI::m_playerEQ->AcceptEvent(e);
     e = new Event(CMD_QuitPlayer);
-    Mpg123UI::m_playerEQ->AcceptEvent(Mpg123UI::m_playerEQ,e);
+    Mpg123UI::m_playerEQ->AcceptEvent(e);
 }
 
 void mysigint(int f) {
@@ -79,13 +86,13 @@ Mpg123UI::~Mpg123UI() {
 int32 Mpg123UI::AcceptEvent(Event *e) {
     if (e) {
 	//cerr << "Mpg123COO: processing event " << e->GetEvent() << endl;
-	switch (e->GetEvent()) {
+	switch (e->Type()) {
 	    case INFO_PlayListDonePlay: {
 		Event *e = new Event(CMD_QuitPlayer);
-		m_playerEQ->AcceptEvent(m_playerEQ,e);
+		m_playerEQ->AcceptEvent(e);
 		break; }
-	    case INFO_MediaVitalStats: {
-		MediaVitalInfo *pmvi = (MediaVitalInfo *)e->GetArgument();
+	    case INFO_MediaInfo: {
+		MediaInfoEvent *pmvi = (MediaInfoEvent *)e;
 		if (pmvi) {
 		    totalFrames = pmvi->m_totalFrames;
 		    totalTime = pmvi->m_totalTime;
@@ -135,14 +142,14 @@ int32 Mpg123UI::AcceptEvent(Event *e) {
 		    }
 		}
 		break; }
-	    case INFO_MediaTimePosition: {
-		MediaTimePositionInfo *pmtp = (MediaTimePositionInfo *)(e->GetArgument());
+	    case INFO_MediaTimeInfo: {
+		MediaTimeInfoEvent *pmtp = (MediaTimeInfoEvent *)e;
 		if (verboseMode == true) {
 //		    cout << "foo: " << pmtp->m_frame << "  " << pmtp->m_seconds << endl;
 		    fprintf(stderr,"\rFrame# %5d [%5d], ",pmtp->m_frame,totalFrames-pmtp->m_frame);
-		    fprintf(stderr,"Time: %3.2f [%3.2f], ",pmtp->m_seconds,totalTime-pmtp->m_seconds);
+		    fprintf(stderr,"Time: %3.2f [%3.2f], ",pmtp->m_totalSeconds,totalTime-pmtp->m_totalSeconds);
 		}
-		lastSeconds = pmtp->m_seconds;
+		lastSeconds = pmtp->m_totalSeconds;
 		break;}
 	    case INFO_Stopped: {
 		int m = (int)lastSeconds / 60;
@@ -151,9 +158,9 @@ int32 Mpg123UI::AcceptEvent(Event *e) {
 		break;
 	    }
 	    case CMD_Cleanup: {
-		Event *e = new Event(INFO_ReadyToDieUI,this);
+		Event *e = new Event(INFO_ReadyToDieUI);
 		//cout << "I'm gonna ACTUALLY kill myself" << endl;
-		m_playerEQ->AcceptEvent(m_playerEQ,e);
+		m_playerEQ->AcceptEvent(e);
 		break; }
 	    default:
 		break;
@@ -296,15 +303,17 @@ void Mpg123UI::SetArgs(int argc, char **argv) {
 
     pl->SetFirst();
     pl->SetSkip(skipFirst);
-    Event *e = new Event(CMD_SetPlaylist,pl);
-    m_playerEQ->AcceptEvent(m_playerEQ,e);
+    Event *e = new SetPlayListEvent(pl);
+    m_playerEQ->AcceptEvent(e);
     e = new Event(CMD_Play);
-    m_playerEQ->AcceptEvent(m_playerEQ,e);
+    m_playerEQ->AcceptEvent(e);
 }
 
 void Mpg123UI::SetTarget(EventQueue *eq) {
     m_playerEQ = eq;
 }
+
+#if 0
 
 void Mpg123UI::SetRef(UIRef ui) {
 
@@ -351,4 +360,6 @@ void Initialize(UI *ref)
 
 #ifdef __cplusplus
 	   }
+#endif
+
 #endif

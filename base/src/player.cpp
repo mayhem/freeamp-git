@@ -53,7 +53,7 @@ Player::Player() {
     m_eventServiceThread = Thread::CreateThread();
     m_eventServiceThread->Create(Player::EventServiceThreadFunc,this);
     //cout << "Started event thread" << endl;
-    m_uiVector = new Vector<UIRef>();
+    m_uiVector = new Vector<UserInterface *>();
     //cout << "Created vectors" << endl;
     m_uiManipLock = new Mutex();
     m_lmcMutex = new Mutex();
@@ -71,8 +71,8 @@ Player::Player() {
     m_pmoRegistry = NULL;
     m_uiRegistry = NULL;
 
-    m_lmcRef = NULL;
-    m_uiRef = NULL;
+    m_lmc = NULL;
+    m_ui = NULL;
 
     m_argUI = NULL;
 
@@ -93,11 +93,10 @@ Player::~Player() {
     //cout << "waiting for service thread to end..." << endl;
     m_eventServiceThread->Join();
     //cout << "serivce thread done.." << endl;
-    if (m_lmcRef) {
-        m_lmcRef->Stop(m_lmcRef);
-        m_lmcRef->Cleanup(m_lmcRef);
-        delete m_lmcRef;
-        m_lmcRef = NULL;
+    if (m_lmc) {
+        m_lmc->Stop();
+        delete m_lmc;
+        m_lmc = NULL;
     }
 
     //cout << "done deleting myLMC" << endl;
@@ -125,9 +124,9 @@ Player::~Player() {
     // Delete CIOs
     //cout << "Player: deleting CIOs" << endl;
     if (m_uiVector) {
-	for(int i=0;i<m_uiVector->NumElements();i++) {
-	    m_uiVector->ElementAt(i)->Cleanup(m_uiVector->ElementAt(i));
-	}
+//	for(int i=0;i<m_uiVector->NumElements();i++) {
+//	    m_uiVector->ElementAt(i)->Cleanup(m_uiVector->ElementAt(i));
+//	}
         m_uiVector->DeleteAll();
         delete m_uiVector;
         m_uiVector = NULL;
@@ -285,25 +284,20 @@ void Player::Run(){
     if(IsntError(error))
     {
         RegistryItem* item = NULL;
-		UIRef ui = NULL;
+		UserInterface *ui = NULL;
         int32 i = 0;
 	int32 uisActivated = 0;
         while(item = m_uiRegistry->GetItem(i++))
         {
             if(!CompareNames(item->Name(),name))
             {
-                m_uiRef = new UI;
-			    item->InitFunction()(m_uiRef);
-
-                EventQueueRef eq = new EventQueue;
-                eq->ref = this;
-                eq->AcceptEvent = AcceptEventStub;
-
-		    	m_uiRef->SetTarget(m_uiRef, eq);
-
-                m_uiRef->SetArgs(m_uiRef, m_argc, m_argv);
-
-                RegisterActiveUI(m_uiRef);
+		m_ui = (UserInterface *)item->InitFunction()();
+		
+		m_ui->SetTarget((EventQueue *)this);
+		
+                m_ui->SetArgs(m_argc, m_argv);
+		
+                RegisterActiveUI(m_ui);
 		uisActivated++;
             }
         }
@@ -317,11 +311,11 @@ void Player::Run(){
     delete [] name;
 }
 
-int32 Player::AcceptEventStub(EventQueueRef ref, Event* e){
-    Player *pP = (Player*)ref->ref;
-
-    return pP->AcceptEvent(e);
-}
+//int32 Player::AcceptEventStub(EventQueueRef ref, Event* e){
+//    Player *pP = (Player*)ref->ref;
+//
+//    return pP->AcceptEvent(e);
+//}
 
 void Player::EventServiceThreadFunc(void *pPlayer) {
     //cout << "Beginning event service" << endl;
@@ -334,15 +328,15 @@ void Player::EventServiceThreadFunc(void *pPlayer) {
         pC = pP->m_eventQueue->Read();
         //cout << "Read queue..." << endl;
         if (pC) {
-	        rtnVal = pP->ServiceEvent(pC);
-	        delete pC;
+	    rtnVal = pP->ServiceEvent(pC);
+	    delete pC;
         }
         //if (pP->m_eventQueue->IsEmpty()) usleep(50000);
     }
 //    cout << "EventServiceThreadFunc: quitting on " << rtnVal << endl;
     // Time to quit!!!
 }
-int32 Player::RegisterActiveUI(UIRef ui) {
+int32 Player::RegisterActiveUI(UserInterface *ui) {
     GetUIManipLock();
     if (m_uiVector && ui) {
         m_uiVector->Insert(ui);
@@ -445,7 +439,7 @@ bool Player::SetState(PlayerState ps) {
 int32 Player::ServiceEvent(Event *pC) {
     if (pC) {
 	//cout << "Player: serviceEvent: servicing Event: " << pC->GetEvent() << endl;
-	switch (pC->GetEvent()) {
+	switch (pC->Type()) {
 	    case INFO_DoneOutputting: {  // LMC or PMO sends this when its done outputting whatever.  Now, go on to next piece in playlist
                 if (SetState(STATE_Stopped)) {
 		    SEND_NORMAL_EVENT(INFO_Stopped);
@@ -458,92 +452,81 @@ int32 Player::ServiceEvent(Event *pC) {
             }
 	    
 	    case CMD_Stop: {
-                if (m_lmcRef) {
-		    m_lmcRef->Stop(m_lmcRef);
-		    m_lmcRef->Cleanup(m_lmcRef);
-		    delete m_lmcRef;
-		    m_lmcRef = NULL;
+                if (m_lmc) {
+		    m_lmc->Stop();
+		    delete m_lmc;
+		    m_lmc = NULL;
                 }
                 if (SetState(STATE_Stopped)) {
 		    SEND_NORMAL_EVENT(INFO_Stopped);
                 }
                 return 0;
-		    break;
+		break;
 	    }
 	    
-        case CMD_ChangePosition: {
-            m_lmcRef->ChangePosition(m_lmcRef, (int32) pC->GetArgument());        
-            return 0;
-		    break;
+	    case CMD_ChangePosition: {
+		m_lmc->ChangePosition(((ChangePositionEvent *)pC)->GetPosition());        
+		return 0;
+		break;
 	    }
-
+	    
 	    case CMD_Play: {
 		PlayListItem *pc = m_myPlayList->GetCurrent();
-        Error error = kError_NoErr;
+		Error error = kError_NoErr;
 
 		if (pc) {
-		    if (m_lmcRef) {
-			    m_lmcRef->Stop(m_lmcRef);
-			    m_lmcRef->Cleanup(m_lmcRef);
-			    delete m_lmcRef;
-			    m_lmcRef = NULL;
+		    if (m_lmc) {
+			m_lmc->Stop();
+			delete m_lmc;
+			m_lmc = NULL;
 		    }
 		    
 		    RegistryItem* item = NULL;
-		    PMORef pmo = NULL;
-		    PMIRef pmi = NULL;
+		    PhysicalMediaOutput *pmo = NULL;
+		    PhysicalMediaInput  *pmi = NULL;
 		    
 		    item = m_pmiRegistry->GetItem(0);
 		    
 		    if(item) {
-			    pmi = new PMI;
-			    item->InitFunction()(pmi);
-			    error = pmi->SetTo(pmi, pc->m_url);
-
-                if(IsError(error))
-                {
-                    pmi->Cleanup(pmi);
-                    delete pmi;
-                    break;
-                }
+			pmi = (PhysicalMediaInput *)item->InitFunction()();
+			error = pmi->SetTo(pc->m_url);
+			    
+			if(IsError(error))
+			{
+			    delete pmi;
+			    break;
+			}
 		    }
-
+		    
 		    item = m_pmoRegistry->GetItem(0);
 		    
 		    if(item) {
-			    pmo = new PMO;
-			    item->InitFunction()(pmo);
+			pmo = (PhysicalMediaOutput *)item->InitFunction()();
 		    }
 		    
 		    item = m_lmcRegistry->GetItem(0);
 
 		    if(item) {
-			    m_lmcRef = new LMC;
-			    item->InitFunction()(m_lmcRef);
-
-                EventQueueRef eq = new EventQueue;
-                eq->ref = this;
-                eq->AcceptEvent = AcceptEventStub;
-
-			    m_lmcRef->SetTarget(m_lmcRef, eq);
-			    m_lmcRef->SetPMI(m_lmcRef, pmi);
-			    m_lmcRef->SetPMO(m_lmcRef, pmo);
+			m_lmc = (LogicalMediaConverter *)item->InitFunction()();
+			
+			m_lmc->SetTarget((EventQueue *)this);
+			m_lmc->SetPMI(pmi);
+			m_lmc->SetPMO(pmo);
 		    }
 		    
-		    m_lmcRef->InitDecoder(m_lmcRef);
+		    m_lmc->InitDecoder();
 		    if (SetState(STATE_Playing)) {
 			    SEND_NORMAL_EVENT(INFO_Playing);
 		    }
-		    m_lmcRef->ChangePosition(m_lmcRef, m_myPlayList->GetSkip());
-		    m_lmcRef->Decode(m_lmcRef);
+		    m_lmc->ChangePosition(m_myPlayList->GetSkip());
+		    m_lmc->Decode();
 		} else {
-            m_myPlayList->SetFirst();
+		    m_myPlayList->SetFirst();
 		    //cout << "no more in playlist..." << endl;
-		    if (m_lmcRef) {
-			    m_lmcRef->Stop(m_lmcRef);
-			    m_lmcRef->Cleanup(m_lmcRef);
-			    delete m_lmcRef;
-			    m_lmcRef = NULL;
+		    if (m_lmc) {
+			m_lmc->Stop();
+			delete m_lmc;
+			m_lmc = NULL;
 		    }
 		    if (SetState(STATE_Stopped)) {
 			    SEND_NORMAL_EVENT(INFO_Stopped);
@@ -570,21 +553,21 @@ int32 Player::ServiceEvent(Event *pC) {
 	    
 	    case CMD_NextMediaPiece:
 		    m_myPlayList->SetNext();
-            AcceptEvent(new Event(CMD_Stop));
-            AcceptEvent(new Event(CMD_Play));
+		    AcceptEvent(new Event(CMD_Stop));
+		    AcceptEvent(new Event(CMD_Play));
 		    return 0;
 	    break;
 	    
-        case CMD_PrevMediaPiece:
-            m_myPlayList->SetPrev();
-            AcceptEvent(new Event(CMD_Stop));
-            AcceptEvent(new Event(CMD_Play));
-            return 0;
-            break;
-		
+	    case CMD_PrevMediaPiece:
+		m_myPlayList->SetPrev();
+		AcceptEvent(new Event(CMD_Stop));
+		AcceptEvent(new Event(CMD_Play));
+		return 0;
+		break;
+	    
 	    case CMD_Pause: {
-		if (m_lmcRef) {
-		    m_lmcRef->Pause(m_lmcRef);
+		if (m_lmc) {
+		    m_lmc->Pause();
 		    if (SetState(STATE_Paused)) {
 			SEND_NORMAL_EVENT(INFO_Paused);
 		    }
@@ -594,8 +577,8 @@ int32 Player::ServiceEvent(Event *pC) {
 	    }
 	    
 	    case CMD_UnPause: {
-                if (m_lmcRef) {
-		    m_lmcRef->Resume(m_lmcRef);
+                if (m_lmc) {
+		    m_lmc->Resume();
 		    if (SetState(STATE_Playing)) {
 			SEND_NORMAL_EVENT(INFO_Playing);
 		    }
@@ -604,14 +587,14 @@ int32 Player::ServiceEvent(Event *pC) {
                 break;
 	    }
 	    case CMD_TogglePause: {
-                if (m_lmcRef) {
+                if (m_lmc) {
 		    if (m_playerState == STATE_Playing) {
-                        m_lmcRef->Pause(m_lmcRef);
+                        m_lmc->Pause();
                         if (SetState(STATE_Paused)) {
 			    SEND_NORMAL_EVENT(INFO_Paused);
                         }
 		    } else if (m_playerState == STATE_Paused) {
-                        m_lmcRef->Resume(m_lmcRef);
+                        m_lmc->Resume();
                         if (SetState(STATE_Playing)) {
 			    SEND_NORMAL_EVENT(INFO_Playing);
                         }
@@ -622,21 +605,20 @@ int32 Player::ServiceEvent(Event *pC) {
 	    }
 	    
 	    case CMD_SetPlaylist:
-
-            if (m_myPlayList) {
-                delete m_myPlayList;
-                m_myPlayList = NULL;
-            }
-
-		    m_myPlayList = (PlayList *)pC->GetArgument();
-            m_myPlayList->SetFirst();
-
-		    return 0;
+		
+		if (m_myPlayList) {
+		    delete m_myPlayList;
+		    m_myPlayList = NULL;
+		}
+		
+		m_myPlayList = ((SetPlayListEvent *)pC)->GetPlayList();
+		m_myPlayList->SetFirst();
+		
+		return 0;
 	    	break;
 		
 	    case CMD_QuitPlayer: {
-		Event *e = new Event(CMD_Stop);
-		AcceptEvent(e);
+		AcceptEvent(new Event(CMD_Stop));
 		// 1) Set "I'm already quitting flag" (or exit if its already Set)
 		m_imQuitting = 1;
 		// 2) Get CIO/COO manipulation lock
@@ -672,32 +654,30 @@ int32 Player::ServiceEvent(Event *pC) {
 		break; 
 	    }
 	    
-	    case INFO_MediaVitalStats: {
+	    case INFO_MediaInfo: {
 		    GetUIManipLock();
-
-            MediaVitalInfo *pmvi = (MediaVitalInfo*)pC->GetArgument();
-            pmvi->indexOfSong = m_myPlayList->Current() + 1; // zero based
-            pmvi->totalSongs = m_myPlayList->Total();
-        
+		    
+		    MediaInfoEvent *pmvi = (MediaInfoEvent *)pC;
+		    pmvi->m_indexOfSong = m_myPlayList->Current() + 1; // zero based
+		    pmvi->m_totalSongs = m_myPlayList->Total();
+		    
 		    SendToUI(pC);
-
+		    
 		    ReleaseUIManipLock();
-		    delete pmvi;
 		    return 0;
 		    break; 
-        }
+	    }
 	    
-	    case INFO_MediaTimePosition: {
+	    case INFO_MediaTimeInfo: {
 		GetUIManipLock();
 		SendToUI(pC);
 		ReleaseUIManipLock();
-		delete ((MediaTimePositionInfo *)pC->GetArgument());
 		return 0;
 		break; 
 	    }
 	    
 	    default:
-		cout << "serviceEvent: Unknown event (i.e. I don't do anything with it): " << pC->GetEvent() << "  Passing..." << endl;
+		cout << "serviceEvent: Unknown event (i.e. I don't do anything with it): " << pC->Type() << "  Passing..." << endl;
 		return 0;
 		break;
 		
@@ -712,7 +692,7 @@ int32 Player::ServiceEvent(Event *pC) {
 void Player::SendToUI(Event *pe) {
     int32 i;
     for (i = 0;i<m_uiVector->NumElements();i++) {
-	m_uiVector->ElementAt(i)->AcceptEvent(m_uiVector->ElementAt(i), pe);
+	m_uiVector->ElementAt(i)->AcceptEvent(pe);
     }
 }
 

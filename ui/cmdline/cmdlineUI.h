@@ -36,12 +36,11 @@ class cmdlineUI : public UserInterface {
     cmdlineUI();
     virtual int32 AcceptEvent(Event *);
     virtual void SetArgs(int argc, char **argv);
-    virtual void SetRef(UIRef uir) { return; }
-    virtual void SetTarget(EventQueueRef eqr) { m_playerEQ = eqr; }
+    virtual void SetTarget(EventQueue *eqr) { m_playerEQ = eqr; }
     static void keyboardServiceFunction(void *);
     virtual ~cmdlineUI();
  private:
-    EventQueueRef m_playerEQ;
+    EventQueue *m_playerEQ;
     void processSwitch(char *);
     Thread *keyboardListenThread;
     PlayList *mypl;

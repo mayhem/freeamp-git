@@ -77,7 +77,7 @@ target_os = @target_os@
 @AM_HAVE_WIN32_TRUE@FILES = 
 @AM_HAVE_WIN32_TRUE@MYLIBS = 
 @AM_HAVE_WIN32_TRUE@TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
-@AM_HAVE_WIN32_FALSE@FILES = localfileinput.cpp localfilelib.cpp
+@AM_HAVE_WIN32_FALSE@FILES = localfileinput.cpp
 @AM_HAVE_WIN32_FALSE@MYLIBS = libfaiolocal.a
 @AM_HAVE_WIN32_FALSE@TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
 
@@ -100,8 +100,7 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 libfaiolocal_a_LIBADD = 
 @AM_HAVE_WIN32_TRUE@cond0libfaiolocal_a_OBJECTS = 
-@AM_HAVE_WIN32_FALSE@cond1libfaiolocal_a_OBJECTS =  localfileinput.o \
-@AM_HAVE_WIN32_FALSE@localfilelib.o
+@AM_HAVE_WIN32_FALSE@cond1libfaiolocal_a_OBJECTS =  localfileinput.o
 libfaiolocal_a_OBJECTS =  $(cond0libfaiolocal_a_OBJECTS) \
 $(cond1libfaiolocal_a_OBJECTS)
 AR = ar
@@ -114,7 +113,7 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP = --best
-DEP_FILES =  .deps/localfileinput.P .deps/localfilelib.P
+DEP_FILES =  .deps/localfileinput.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 SOURCES = $(libfaiolocal_a_SOURCES)
 OBJECTS = $(libfaiolocal_a_OBJECTS)
@@ -306,8 +305,8 @@ include @top_srcdir@/config/Makefile.header
 
 all-local: localfile-local
 
-localfile-local: localfileinput.o localfilelib.o
-	gcc -shared -Wl,-soname,localfileinput-@target_os@.pmi -o localfileinput-@target_os@.pmi localfileinput.o localfilelib.o
+localfile-local: localfileinput.o 
+	gcc -shared -Wl,-soname,localfileinput-@target_os@.pmi -o localfileinput-@target_os@.pmi localfileinput.o 
 	cp localfileinput-@target_os@.pmi @top_srcdir@/plugins
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

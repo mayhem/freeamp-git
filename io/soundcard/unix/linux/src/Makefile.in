@@ -74,7 +74,7 @@ RANLIB = @RANLIB@
 VERSION = @VERSION@
 target_os = @target_os@
 
-@AM_HAVE_LINUX_TRUE@FILES = soundcardpmo.cpp soundcardlib.cpp
+@AM_HAVE_LINUX_TRUE@FILES = soundcardpmo.cpp 
 @AM_HAVE_LINUX_TRUE@MYLIBS = libfasndcard.a
 @AM_HAVE_LINUX_FALSE@FILES = 
 @AM_HAVE_LINUX_FALSE@MYLIBS = 
@@ -98,8 +98,7 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 libfasndcard_a_LIBADD = 
 @AM_HAVE_LINUX_FALSE@cond0libfasndcard_a_OBJECTS = 
-@AM_HAVE_LINUX_TRUE@cond1libfasndcard_a_OBJECTS =  soundcardpmo.o \
-@AM_HAVE_LINUX_TRUE@soundcardlib.o
+@AM_HAVE_LINUX_TRUE@cond1libfasndcard_a_OBJECTS =  soundcardpmo.o
 libfasndcard_a_OBJECTS =  $(cond0libfasndcard_a_OBJECTS) \
 $(cond1libfasndcard_a_OBJECTS)
 AR = ar
@@ -112,7 +111,7 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP = --best
-DEP_FILES =  .deps/soundcardlib.P .deps/soundcardpmo.P
+DEP_FILES =  .deps/soundcardpmo.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 SOURCES = $(libfasndcard_a_SOURCES)
 OBJECTS = $(libfasndcard_a_OBJECTS)
@@ -304,8 +303,8 @@ include @top_srcdir@/config/Makefile.header
 
 all-local: sndcard-local
 
-sndcard-local: soundcardpmo.o soundcardlib.o
-	gcc -shared -Wl,-soname,soundcard-@target_os@.pmo -o soundcard-@target_os@.pmo soundcardpmo.o soundcardlib.o
+sndcard-local: soundcardpmo.o 
+	gcc -shared -Wl,-soname,soundcard-@target_os@.pmo -o soundcard-@target_os@.pmo soundcardpmo.o 
 	cp soundcard-@target_os@.pmo @top_srcdir@/plugins
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

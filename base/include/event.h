@@ -32,26 +32,24 @@ ____________________________________________________________________________*/
 class Event {
 
  public:
-    Event(int32);
-    Event(int32,void *);
-    Event(const Event &);
+    Event(int32 c) { m_type = c; }
 
-    ~Event();
-    int32 GetEvent();
-    void *GetArgument();
+    virtual ~Event() {}
+    int32 Type() { return m_type; }
 
- private:
-    int32 m_event;
-    void* m_arg;
-    int32 m_sizeofArg;
+ protected:
+    Event() {}
+    int32 m_type;
  
 };
 
-/*class EventQueue {
+class EventQueue {
  public:
     virtual int32 AcceptEvent(Event *) = 0;
-};*/
+};
 
+
+#if 0
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -64,6 +62,8 @@ typedef struct EventQueue{
 
 #ifdef __cplusplus
 } // extern "C"
+#endif
+
 #endif
 
 
@@ -84,14 +84,23 @@ typedef struct EventQueue{
 #define CMD_StopRead            15 // sent by player to PMI to stop reading bytes from source to its output buffer (no arg)
 #define CMD_ResetRead           16 // sent by player to PMI to set read pointer back to beginning (no arg)
 #define CMD_SeekRead            17 // sent to PMI to tell it to reset read stream to a particular point (arg = that point)
-#define INFO_MediaVitalStats    18 // info about media title, length, etc... (arg = MediaVitalInfo)
-#define INFO_MediaTimePosition  19 // info about current time during play, etc (arg = MediaTimePositionInfo)
+#define INFO_MediaInfo          18 // info about media title, length, etc... (arg = MediaVitalInfo)
+#define INFO_MediaTimeInfo      19 // info about current time during play, etc (arg = MediaTimePositionInfo)
 #define INFO_Stopped            20 // sent by player to COOs when it stops playing the current song (no arg)
 #define INFO_Paused             21 // sent by player to COOs when it pauses playing the current song (no arg)
 #define CMD_UnPause             22 // sent by CIO to player to tell it to unpause current song.  Note: a play causes the current song to be played from beginning (no arg)
 #define CMD_TogglePause         24 // sent by CIO to player to change the boolean state Paused (no arg)
 #define INFO_Playing            26 // sent by player to COO to say that it is beginning to play a song
 #define CMD_ChangePosition      27 // sent by CIO to player to change the position in the song to decode from (arg = frame position)
+
 #endif // _EVENT_H_
+
+
+
+
+
+
+
+
 
 

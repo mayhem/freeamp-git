@@ -66,6 +66,12 @@ void *
 linuxThread::
 InternalThreadFunction()
 {
+    if (!m_function) {
+//	cout << "screwwwwwwwwwwwed..." << endl;
+	return 0;
+    } else {
+//	cout << "fine..." << endl;
+    }
     m_function(m_arg);
 
     return 0;

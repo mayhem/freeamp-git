@@ -27,6 +27,7 @@ ____________________________________________________________________________*/
 #include "event.h"
 
 
+#if 0
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -44,12 +45,13 @@ typedef struct UI{
 #ifdef __cplusplus
 } // extern "C"
 #endif
+#endif
 
-class UserInterface {
+class UserInterface : public EventQueue {
  public:
     virtual int32 AcceptEvent(Event *) = 0;
     virtual void  SetArgs(int32,char **) = 0;
-    virtual void SetTarget(EventQueueRef) = 0;
+    virtual void SetTarget(EventQueue *) = 0;
     virtual ~UserInterface() {}
 };
 

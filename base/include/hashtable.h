@@ -28,8 +28,9 @@ ____________________________________________________________________________*/
 
 #define KEYLENGTH 64
 
-#include "config.h"
+#include <iostream.h>
 
+#include "config.h"
 class HashTable {
     class HashElem {
     public:
