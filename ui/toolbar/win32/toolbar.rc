@@ -67,17 +67,14 @@ IDM_TRAY MENU DISCARDABLE
 BEGIN
     POPUP "popup"
     BEGIN
-        MENUITEM "Open...",                     IDC_OPEN
-        MENUITEM "Save...",                     IDC_SAVE
+        MENUITEM "&My Music...",                IDC_MYMUSIC
         MENUITEM SEPARATOR
-        MENUITEM "Preferences...",              IDC_PREF
+        MENUITEM "&Play",                       IDC_PLAY
+        MENUITEM "&Stop",                       IDC_STOP
+        MENUITEM "&Next Track",                 IDC_NEXTTRACK
+        MENUITEM "&Previous Track",             IDC_PREVIOUSTRACK
         MENUITEM SEPARATOR
-        MENUITEM "Play",                        IDC_PLAY
-        MENUITEM "Pause",                       IDC_PAUSE
-        MENUITEM "Next Song",                   IDC_NEXTSONG
-        MENUITEM "Last Song",                   IDC_LASTSONG
-        MENUITEM SEPARATOR
-        MENUITEM "Exit",                        IDC_EXIT
+        MENUITEM "E&xit",                       IDC_EXIT
     END
 END
 

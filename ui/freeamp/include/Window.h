@@ -58,11 +58,12 @@ class Window
 
       void    GetName(string &oName);
       Canvas *GetCanvas(void);
-      void    SetStayOnTop(bool bStay);
       void    SetLiveInToolbar(bool bLive);
       void    AddControl(Control *pControl);
       void    ClearControls(void);
       void    Keystroke(unsigned char cKey);
+
+      virtual void    SetStayOnTop(bool bStay);
 
       // The following functions are designed to give access to the 
       // controls via the control's name. 

@@ -22,6 +22,8 @@
 ____________________________________________________________________________*/ 
 
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #ifdef WIN32
 #include <winsock.h>
 #else
@@ -31,6 +33,7 @@ ____________________________________________________________________________*/
 #include "debug.h"
 
 #define DB Debug_v("%s:%d\n", __FILE__, __LINE__);
+#define THEME_IN_DEVEL "<theme in development>"
 
 ThemeManager::ThemeManager(FAContext *pContext)
 {
@@ -40,13 +43,26 @@ ThemeManager::ThemeManager(FAContext *pContext)
     
     m_pContext = pContext;
 	m_oCurrentTheme = "";
+    m_bDevelTheme = false;
     
     szThemePath[0] = 0;
     eRet = pContext->prefs->GetThemePath(szThemePath, &len);
     if (IsError(eRet) || strlen(szThemePath) == 0)
+    {
         GetDefaultTheme(m_oCurrentTheme);
+    }    
     else
+    {
+        struct   _stat buf;
+
         m_oCurrentTheme = szThemePath;
+        if (_stat(szThemePath, &buf) == 0 && (buf.st_mode & _S_IFDIR))
+        {
+           m_bDevelTheme = true;
+           m_oDevelTheme = m_oCurrentTheme;
+           m_oCurrentTheme = THEME_IN_DEVEL;
+        }   
+    }    
 }
 
 ThemeManager::~ThemeManager(void)
@@ -72,6 +88,10 @@ Error ThemeManager::GetThemeList(map<string, string> &oThemeFileMap)
     char            dir[MAX_PATH], *ptr;
     uint32          len = sizeof(dir);
     string          oThemePath, oThemeBasePath, oThemeFile;
+
+
+    if (m_bDevelTheme)
+       oThemeFileMap[THEME_IN_DEVEL] = m_oDevelTheme;
 
     m_pContext->prefs->GetInstallDirectory(dir, &len);
     oThemeBasePath = string(dir) + "\\themes";

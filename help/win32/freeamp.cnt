@@ -1,0 +1,43 @@
+:Base FreeAmp.hlp>Main
+:Title FreeAmp Help
+1 Getting Started
+2 What is FreeAmp?=What_is_FreeAmp_>Main
+2 What Kinds of MP3 Files Can I Play?=What_Kinds_of_MP3_Files_Can_I_Play_>Main
+2 What is the Music Browser?=What_is_the_Music_Browser_>Main
+2 What is the Download Manager?=What_is_the_Download_Manager_
+2 What are ID3 Tags?=What_are_ID3_Tags_>Main
+2 FreeAmp Main Window=FreeAmp_Main_Window>Main
+1 Creating and Modifying Playlists
+2 Managing Music and Playlist Files=Managing_Music_and_Playlist_Files_>Main
+2 Searching for Music on Your Hard Drive=Searching_for_Music_on_Your_Hard_Drive
+2 Adding Tracks to a Playlist=Adding_Tracks_to_a_Playlist>Main
+2 Editing the Currently Playing Playlist=Editing_the_Currently_Playing_Playlist>Main
+2 Playing Files in a Playlist=Playing_Files_in_a_Playlist
+2 Opening a Playlist=Opening_a_Playlist>Main
+2 Creating a New Playlist=Creating_a_New_Playlist>Main
+2 Sorting Files in the Playlist=Sorting_Files_in_the_Playlist>Main
+2 Changing the Order of Files in a Playlist=Changing_the_Order_of_Files_in_a_Playlist>Main
+2 Saving a Playlist=Saving_a_Playlist
+2 Clearing a Playlist=Clearing_a_Playlist>Main
+2 Closing a Playlist=Closing_a_Playlist>Main
+2 Music Browser Drive Selection=Music_Browser_Drive_Selection
+1 Playing Files
+2 Repeating Playback=Repeating_Playback>Main
+1 Downloading Files
+2 Download Manager=Download_Manager
+2 Downloading Files from EMusic.com=Downloading_Files_from_EMusic_com>Main
+1 Configuring FreeAmp Settings
+2 Preferences - General =Preferences_General>Main
+2 Preferences - Themes=Preferences_Themes>Main
+2 Preferences - Streaming=Preferences_Streaming
+2 Preferences - Update=Preferences_Update
+2 Preferences - Debug=Preferences_Debug>Main
+2 Preferences - Advanced =Preferences_Advanced>Main
+2 Preferences About=Preferences_About
+1 Creating Custom Themes
+2 What are Themes?=What_are_Themes_
+2 Creating Custom Themes=Creating_Custom_Themes
+1 Updating FreeAmp
+2 Updating FreeAmp=Updating_FreeAmp>Main
+1 Glossary of Terms
+2 Glossary=Glossary>Main

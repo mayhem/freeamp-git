@@ -56,6 +56,7 @@ class FreeAmpTheme : public UserInterface, public Theme
         virtual void  DropFiles(vector<string> *pFileList);
         virtual void  InitControls(void);
         virtual void  InitWindow(void);
+        virtual void  PostWindowCreate(void);
                 void  ShowOptions(void);
 
         void  WorkerThread(void);

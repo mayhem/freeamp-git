@@ -61,8 +61,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                                     ..\..\..\..\base\win32\prj\plugins	copy toolbar.ui\
-                                       ..\..\..\..\base\win32\prj\plugins
+                                                      ..\..\..\..\base\win32\prj\plugins	copy toolbar.ui\
+                                        ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "toolbar - Win32 Debug"
@@ -93,8 +93,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                                     ..\..\..\..\base\win32\prj\plugins	copy toolbar.ui\
-                                       ..\..\..\..\base\win32\prj\plugins
+                                                      ..\..\..\..\base\win32\prj\plugins	copy toolbar.ui\
+                                        ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "toolbar - Win32 NASM Debug"
@@ -126,8 +126,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                                     ..\..\..\..\base\win32\prj\plugins	copy toolbar.ui\
-                                       ..\..\..\..\base\win32\prj\plugins
+                                                      ..\..\..\..\base\win32\prj\plugins	copy toolbar.ui\
+                                        ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "toolbar - Win32 NASM Release"
@@ -159,8 +159,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                                     ..\..\..\..\base\win32\prj\plugins	copy toolbar.ui\
-                                       ..\..\..\..\base\win32\prj\plugins
+                                                      ..\..\..\..\base\win32\prj\plugins	copy toolbar.ui\
+                                        ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
@@ -174,6 +174,10 @@ PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
 # Begin Group "src"
 
 # PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\..\..\base\src\debug.cpp
+# End Source File
 # Begin Source File
 
 SOURCE=..\Toolbar.cpp

@@ -291,6 +291,8 @@ Error Win32Window::Run(Pos &oPos)
         CreateTooltips();
         UpdateWindow( m_hWnd );
 
+        m_pTheme->PostWindowCreate();
+
         while( GetMessage( &msg, NULL, 0, 0 ) )
         {
             TranslateMessage( &msg );
@@ -556,19 +558,7 @@ Notify(int32 command, LPNMHDR notifyMsgHdr)
         int32 idCtrl = notifyMsgHdr->idFrom;
         LPTOOLTIPTEXT lpttt = (LPTOOLTIPTEXT) notifyMsgHdr; 
 
-        
-        vector<Control *>::iterator i;
-        uint32 uCtr;
         string strTip;
-
-        //
-        // find the control we are interested in.
-        // idCtrl is objects index in control array
-        // hopefully the control array is static!
-        //
-
-        i = m_oControls.begin();
-        for(uCtr = 0; uCtr<idCtrl; uCtr++) i++;    
 
         //
         // and feed it's tip
@@ -581,7 +571,6 @@ Notify(int32 command, LPNMHDR notifyMsgHdr)
         }
     }
 }
-
 
 void 
 Win32Window::
@@ -601,8 +590,7 @@ CreateTooltips()
     //
     if(hwndTooltip)
     {
-                // remove old tooltips, then
-
+        // remove old tooltips, then
         for(uCtr=0; uCtr<uTooltipCount; uCtr++)
         {
 
@@ -672,3 +660,14 @@ CreateTooltips()
         
     uTooltipCount = uCtr; // save value for next mindmeld
 }
+
+void Win32Window::SetStayOnTop(bool bStay)
+{
+    Window::SetStayOnTop(bStay);
+
+    if (m_bStayOnTop)
+       SetWindowPos(m_hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
+    else   
+       SetWindowPos(m_hWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
+}    
+

@@ -59,7 +59,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
-            ..\..\..\themes\freeamp.fat themes
+             ..\..\..\themes\freeamp.fat themes	copy ..\..\..\help\win32\freeamp.cnt .	copy\
+ ..\..\..\help\win32\freeamp.hlp .
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
@@ -92,7 +93,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
-            ..\..\..\themes\freeamp.fat themes
+             ..\..\..\themes\freeamp.fat themes	copy ..\..\..\help\win32\freeamp.cnt .	copy\
+ ..\..\..\help\win32\freeamp.hlp .
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
@@ -126,7 +128,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
-            ..\..\..\themes\freeamp.fat themes
+             ..\..\..\themes\freeamp.fat themes	copy ..\..\..\help\win32\freeamp.cnt .	copy\
+ ..\..\..\help\win32\freeamp.hlp .
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
@@ -162,7 +165,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
-            ..\..\..\themes\freeamp.fat themes
+             ..\..\..\themes\freeamp.fat themes	copy ..\..\..\help\win32\freeamp.cnt .	copy\
+ ..\..\..\help\win32\freeamp.hlp .
 # End Special Build Tool
 
 !ENDIF 

@@ -38,6 +38,7 @@ using namespace std;
 #include "eventdata.h"
 #include "Toolbar.h"
 #include "resource.h"
+#include "debug.h"
 
 #define UWM_TRAY  WM_USER + 666
 
@@ -123,6 +124,7 @@ UserInterface()
     m_trayIcon      = NULL;
 	m_state         = UIState_Stopped, 
     *m_trayTooltip  = 0x00;
+    m_uiThread      = NULL;
 }
 
 ToolbarUI::
@@ -132,137 +134,76 @@ ToolbarUI::
 
     if(m_trayIcon)
         DeleteObject(m_trayIcon);
+        
+    delete m_uiThread;    
+}
+
+Error ToolbarUI::Init(int32 startup_type)
+{
+   assert(this);
+
+   m_uiThread = Thread::CreateThread();
+   m_uiThread->Create(ui_thread_function, this);
+
+   return kError_NoErr;
 }
 
 void 
 ToolbarUI::
-Create()
+ui_thread_function(void* arg)
 {
-    assert( m_hWnd );
+    ToolbarUI* ui = (ToolbarUI*)arg;
+
+    Debug_v("ui thread starting");
+    ui->UIThreadFunction();
+}
+
+void
+ToolbarUI::
+UIThreadFunction()
+{
+    WNDCLASS wc;
+    MSG msg;
+    
+    memset(&wc, 0x00, sizeof(WNDCLASS));
+
+    wc.style = CS_OWNDC|CS_DBLCLKS ;
+    wc.lpfnWndProc = MainWndProc;
+    wc.hInstance = g_hinst;
+    wc.hCursor = LoadCursor( NULL, IDC_ARROW );
+    wc.hIcon = LoadIcon( g_hinst, MAKEINTRESOURCE(IDI_EXE_ICON) );
+    wc.hbrBackground = NULL;//(HBRUSH)( COLOR_WINDOW + 1 );
+    wc.lpszClassName = "ToolbarUI";
 
     m_trayIcon = LoadIcon(g_hinst, MAKEINTRESOURCE(IDI_EXE_ICON));
-}
 
-void 
-ToolbarUI::
-TrayNotify(int32 notifyMessage)
-{
-    switch(notifyMessage)
+    if( RegisterClass( &wc ) )    
     {
-        case WM_LBUTTONUP:
+        m_hWnd = CreateWindow(   "ToolbarUI", 
+                        "ToolbarUI Hidden Window",
+                        WS_POPUP | WS_SYSMENU, 
+                        0, 
+                        0, 
+                        0, 
+                        0,
+                        NULL, 
+                        NULL, 
+                        g_hinst, 
+                        this );
+                        
+        SetupToolIcon();
+                        
+        if( m_hWnd )
         {
-            //ShowWindow( m_hWnd, SW_NORMAL);
-			//SetForegroundWindow(m_hWnd);
-            MessageBox(m_hWnd, "Show "BRANDING, BRANDING, MB_OK);
-			break;
+            while( GetMessage( &msg, NULL, 0, 0 ) )
+            {
+                TranslateMessage( &msg );
+                DispatchMessage( &msg );
+            }
         }
-
-        case WM_RBUTTONUP:
-        {
-            HMENU menuHandle, popupHandle;
-            HINSTANCE hinst = (HINSTANCE)GetWindowLong(m_hWnd, GWL_HINSTANCE);
-            POINT pt;
-            int32 command;
-
-            // need mouse coordinates relative to screen
-            GetCursorPos(&pt);
-          
-            // load the menu and retrieve its popup
-            menuHandle = LoadMenu(hinst, MAKEINTRESOURCE(IDM_TRAY));
-            popupHandle = GetSubMenu(menuHandle, 0);
-
-            if(m_state != UIState_Stopped)
-            {
-                MENUITEMINFO mii;
-
-                memset(&mii, 0x00, sizeof(MENUITEMINFO));
-
-                mii.cbSize = sizeof(MENUITEMINFO);
-                mii.fMask = MIIM_TYPE|MIIM_ID ;
-                mii.fType = MFT_STRING;
-                mii.dwTypeData = "Stop";
-                mii.cch = strlen("Stop");
-                mii.wID = IDC_STOP;
-
-                SetMenuItemInfo(popupHandle, 
-                                5,
-                                TRUE,
-                                &mii);
-            }
-
-            if(m_state == UIState_Paused)
-            {
-                MENUITEMINFO mii;
-
-                memset(&mii, 0x00, sizeof(MENUITEMINFO));
-
-                mii.cbSize = sizeof(MENUITEMINFO);
-                mii.fMask = MIIM_STATE;
-                mii.fState = MFS_CHECKED;
-
-                SetMenuItemInfo(popupHandle, 
-                                6,
-                                TRUE,
-                                &mii);
-            }
-
-            SetForegroundWindow(m_hWnd);
-
-            // display the popup
-            command = TrackPopupMenu(   popupHandle,			
-					                    TPM_RETURNCMD | TPM_RIGHTBUTTON |
-                                        TPM_NONOTIFY,
-					                    pt.x, 
-                                        pt.y,       
-					                    0,  
-					                    m_hWnd,
-					                    NULL);
-
-            SetForegroundWindow(m_hWnd);
-
-            switch(command)
-            {
-                case IDC_OPEN:
-                    m_context->target->AcceptEvent(
-                               new Event(CMD_ToggleMusicBrowserUI));
-                    break;
-
-                case IDC_PLAY:
-                    m_context->target->AcceptEvent(
-                               new Event(CMD_Play));
-                    break;
-
-                case IDC_STOP:
-                    m_context->target->AcceptEvent(
-                               new Event(CMD_Stop));
-                    break;
-
-                case IDC_PAUSE:
-                    m_context->target->AcceptEvent(
-                               new Event(CMD_Pause));
-                    break;
-
-                case IDC_NEXTSONG:
-                    m_context->target->AcceptEvent(
-                               new Event(CMD_NextMediaPiece));
-                    break;
-
-                case IDC_LASTSONG:
-                    m_context->target->AcceptEvent(
-                               new Event(CMD_PrevMediaPiece));
-                    break;
-
-                case IDC_EXIT:
-                    m_context->target->AcceptEvent(
-                               new Event(CMD_QuitPlayer));
-                    break;
-            }
-
-			break;
-        }
-
-    }
+    }    
 }
+
 
 int32 
 ToolbarUI::
@@ -325,15 +266,147 @@ AcceptEvent(Event* event)
 
 	        case CMD_Cleanup: 
             {
-                PostQuitMessage(0);
+                PostMessage(m_hWnd, WM_QUIT, 0, 0);
+                m_uiThread->Join();
 	            m_context->target->AcceptEvent(new Event(INFO_ReadyToDieUI));
 	            break; 
             }	       
+            
+            case INFO_PrefsChanged:
+            {
+                SetupToolIcon();
+                break;
+            }
 	    }
     } 
 
     return result;
 }
+
+void ToolbarUI::SetupToolIcon(void)
+{
+    bool bShowIcon;
+    
+    m_context->prefs->GetLiveInTray(&bShowIcon);
+    if (bShowIcon)
+       AddTrayIcon();
+    else
+       RemoveTrayIcon();
+}
+
+void 
+ToolbarUI::
+TrayNotify(int32 notifyMessage)
+{
+    switch(notifyMessage)
+    {
+        case WM_LBUTTONUP:
+        {
+            Int32PropValue *pProp;
+            HWND            hWnd;
+            if (IsError(m_context->props->GetProperty("MainWindow", 
+                       (PropValue **)&pProp)))
+               return;        
+            else
+               hWnd = (HWND)pProp->GetInt32();
+
+            ShowWindow(hWnd, SW_RESTORE);
+            SetWindowPos(hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE|SWP_NOMOVE);
+            
+			break;
+        }
+
+        case WM_RBUTTONUP:
+        {
+            HMENU menuHandle, popupHandle;
+            HINSTANCE hinst = (HINSTANCE)GetWindowLong(m_hWnd, GWL_HINSTANCE);
+            POINT pt;
+            int32 command;
+
+            // need mouse coordinates relative to screen
+            GetCursorPos(&pt);
+          
+            // load the menu and retrieve its popup
+            menuHandle = LoadMenu(hinst, MAKEINTRESOURCE(IDM_TRAY));
+            popupHandle = GetSubMenu(menuHandle, 0);
+
+            if(m_state == UIState_Playing)
+            {
+                MENUITEMINFO mii;
+
+                memset(&mii, 0x00, sizeof(MENUITEMINFO));
+
+                mii.cbSize = sizeof(MENUITEMINFO);
+                mii.fMask = MIIM_TYPE|MIIM_ID ;
+                mii.fType = MFT_STRING;
+                mii.dwTypeData = "Pause";
+                mii.cch = strlen("Pause");
+                mii.wID = IDC_PAUSE;
+
+                SetMenuItemInfo(popupHandle, 
+                                2,
+                                TRUE,
+                                &mii);
+            }
+
+            SetForegroundWindow(m_hWnd);
+
+            // display the popup
+            command = TrackPopupMenu(   popupHandle,			
+					                    TPM_RETURNCMD | TPM_RIGHTBUTTON |
+                                        TPM_NONOTIFY,
+					                    pt.x, 
+                                        pt.y,       
+					                    0,  
+					                    m_hWnd,
+					                    NULL);
+
+            SetForegroundWindow(m_hWnd);
+
+            switch(command)
+            {
+                case IDC_MYMUSIC:
+                    m_context->target->AcceptEvent(
+                               new Event(CMD_ToggleMusicBrowserUI));
+                    break;
+
+                case IDC_PLAY:
+                    m_context->target->AcceptEvent(
+                               new Event(CMD_Play));
+                    break;
+
+                case IDC_STOP:
+                    m_context->target->AcceptEvent(
+                               new Event(CMD_Stop));
+                    break;
+
+                case IDC_PAUSE:
+                    m_context->target->AcceptEvent(
+                               new Event(CMD_Pause));
+                    break;
+
+                case IDC_NEXTTRACK:
+                    m_context->target->AcceptEvent(
+                               new Event(CMD_NextMediaPiece));
+                    break;
+
+                case IDC_PREVIOUSTRACK:
+                    m_context->target->AcceptEvent(
+                               new Event(CMD_PrevMediaPiece));
+                    break;
+
+                case IDC_EXIT:
+                    m_context->target->AcceptEvent(
+                               new Event(CMD_QuitPlayer));
+                    break;
+            }
+
+			break;
+        }
+
+    }
+}
+
 
 
 void 
@@ -388,52 +461,4 @@ SetTrayTooltip(char *str)
 	Shell_NotifyIcon(NIM_MODIFY, &nid); // now, modify our tooltip
 }
 
-void
-ToolbarUI::
-UIThreadFunction()
-{
-    WNDCLASS wc;
-    MSG msg;
-    
-    memset(&wc, 0x00, sizeof(WNDCLASS));
 
-    wc.style = CS_OWNDC|CS_DBLCLKS ;
-    wc.lpfnWndProc = MainWndProc;
-    wc.hInstance = g_hinst;
-    wc.hCursor = LoadCursor( NULL, IDC_ARROW );
-    wc.hIcon = LoadIcon( g_hinst, MAKEINTRESOURCE(IDI_EXE_ICON) );
-    wc.hbrBackground = NULL;//(HBRUSH)( COLOR_WINDOW + 1 );
-    wc.lpszClassName = "ToolbarUI";
-
-    if( RegisterClass( &wc ) )    
-    {
-        CreateWindow(   "ToolbarUI", 
-                        "ToolbarUI Hidden Window",
-                        WS_POPUP | WS_SYSMENU, 
-                        0, 
-                        0, 
-                        0, 
-                        0,
-                        NULL, 
-                        NULL, 
-                        g_hinst, 
-                        this );
-        if( m_hWnd )
-        {
-            while( GetMessage( &msg, NULL, 0, 0 ) )
-            {
-                TranslateMessage( &msg );
-                DispatchMessage( &msg );
-            }
-        }
-    }    
-}
-
-void 
-ToolbarUI::
-ui_thread_function(void* arg)
-{
-    ToolbarUI* ui = (ToolbarUI*)arg;
-
-    ui->UIThreadFunction();
-}

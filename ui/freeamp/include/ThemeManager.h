@@ -56,8 +56,9 @@ class ThemeManager
     
     private:
 
-	  string     m_oCurrentTheme;
+	  string     m_oCurrentTheme, m_oDevelTheme;
       FAContext *m_pContext;
+      bool       m_bDevelTheme;
 };
 
 #endif

@@ -1032,3 +1032,7 @@ void Theme::SetDefaultFont(const string &oFont)
 { 
 	m_oDefaultFont = oFont;
 }
+
+void Theme::PostWindowCreate(void)
+{
+}

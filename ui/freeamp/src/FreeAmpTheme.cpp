@@ -37,6 +37,7 @@ ____________________________________________________________________________*/
 #include "GTKUtility.h"
 #include "GTKPreferenceWindow.h"
 #elif defined(WIN32)
+#include "Win32Window.h"
 #include "Win32PreferenceWindow.h"
 #elif defined(__BEOS__)
 #include "BeOSPreferenceWindow.h"
@@ -50,6 +51,8 @@ ____________________________________________________________________________*/
 #include "PreferenceWindow.h"
 #include "playlist.h"
 #include "player.h"
+#include "help.h"
+#include "properties.h"
 
 void WorkerThreadStart(void* arg);
 
@@ -94,7 +97,6 @@ Error FreeAmpTheme::Init(int32 startup_type)
    assert(this);
 
    m_iStartupType = startup_type;
-   ParseArgs();
 
    m_uiThread = Thread::CreateThread();
    m_uiThread->Create(WorkerThreadStart, this);
@@ -160,10 +162,6 @@ Error FreeAmpTheme::Close(void)
     m_uiThread->Join();
 
     return kError_NoErr;
-}
-
-void FreeAmpTheme::ParseArgs()
-{
 }
 
 int32 FreeAmpTheme::AcceptEvent(Event * e)
@@ -388,7 +386,13 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
 
       case INFO_PrefsChanged:
       {
+         bool bStayFidoStay;
+         
          ReloadTheme();
+
+         m_pContext->prefs->GetStayOnTop(&bStayFidoStay);
+         m_pWindow->SetStayOnTop(bStayFidoStay);
+         
       	 break;
       }
       
@@ -643,10 +647,43 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
           oUrl = BRANDING_URL;
        
 #ifdef WIN32   
-       ShellExecute(NULL, "open", oUrl.c_str(),
+       Int32PropValue *pProp;
+       HWND            hWnd;
+       if (IsError(m_pContext->props->GetProperty("MainWindow", 
+                   (PropValue **)&pProp)))
+          hWnd = NULL;
+       else
+          hWnd = (HWND)pProp->GetInt32();
+             
+       ShellExecute(hWnd, "open", oUrl.c_str(),
                     NULL, NULL, SW_SHOWNORMAL);
 #else
        LaunchBrowser(oUrl.c_str());
+#endif
+   }
+   if (oControlName == string("Help") && eMesg == CM_Pressed)
+   {
+       string            oHelpFile;
+       char              dir[MAX_PATH];
+       uint32            len = sizeof(dir);
+       
+       m_pContext->prefs->GetInstallDirectory(dir, &len);
+       oHelpFile = string(dir);
+       oHelpFile += string("\\");    
+       oHelpFile += string(HELP_FILE);    
+       
+#ifdef WIN32   
+       Int32PropValue *pProp;
+       HWND            hWnd;
+       if (IsError(m_pContext->props->GetProperty("MainWindow", 
+                   (PropValue **)&pProp)))
+          hWnd = NULL;
+       else
+          hWnd = (HWND)pProp->GetInt32();
+       
+       Debug_v("Help: %x", hWnd);
+             
+       WinHelp(hWnd, oHelpFile.c_str(), HELP_FINDER, FreeAmp_Main_Window);
 #endif
    }
    
@@ -961,4 +998,12 @@ void FreeAmpTheme::DropFiles(vector<string> *pFileList)
                 }    
         }
     }
+}
+
+void FreeAmpTheme::PostWindowCreate(void)
+{
+    Int32PropValue *pProp;
+    
+    pProp = new Int32PropValue((int)((Win32Window *)m_pWindow)->GetWindowHandle());
+    m_pContext->props->SetProperty("MainWindow", pProp);
 }

@@ -52,6 +52,7 @@ CLEAN :"fabaselib - Win32 ReleaseCLEAN"
 !ELSE 
 CLEAN :
 !ENDIF 
+	-@erase "$(INTDIR)\debug.obj"
 	-@erase "$(INTDIR)\Toolbar.obj"
 	-@erase "$(INTDIR)\toolbar.res"
 	-@erase "$(INTDIR)\vc50.idb"
@@ -120,6 +121,7 @@ LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
 DEF_FILE= \
 	".\toolbar.def"
 LINK32_OBJS= \
+	"$(INTDIR)\debug.obj" \
 	"$(INTDIR)\Toolbar.obj" \
 	"$(INTDIR)\toolbar.res" \
 	"..\..\..\..\base\win32\fabaselib.lib"
@@ -159,6 +161,7 @@ CLEAN :"fabaselib - Win32 DebugCLEAN"
 !ELSE 
 CLEAN :
 !ENDIF 
+	-@erase "$(INTDIR)\debug.obj"
 	-@erase "$(INTDIR)\Toolbar.obj"
 	-@erase "$(INTDIR)\toolbar.res"
 	-@erase "$(INTDIR)\vc50.idb"
@@ -230,6 +233,7 @@ LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
 DEF_FILE= \
 	".\toolbar.def"
 LINK32_OBJS= \
+	"$(INTDIR)\debug.obj" \
 	"$(INTDIR)\Toolbar.obj" \
 	"$(INTDIR)\toolbar.res" \
 	"..\..\..\..\base\win32\fabaselib.lib"
@@ -269,6 +273,7 @@ CLEAN :"fabaselib - Win32 NASM DebugCLEAN"
 !ELSE 
 CLEAN :
 !ENDIF 
+	-@erase "$(INTDIR)\debug.obj"
 	-@erase "$(INTDIR)\Toolbar.obj"
 	-@erase "$(INTDIR)\toolbar.res"
 	-@erase "$(INTDIR)\vc50.idb"
@@ -340,6 +345,7 @@ LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
 DEF_FILE= \
 	".\toolbar.def"
 LINK32_OBJS= \
+	"$(INTDIR)\debug.obj" \
 	"$(INTDIR)\Toolbar.obj" \
 	"$(INTDIR)\toolbar.res" \
 	"..\..\..\..\base\win32\fabaselib.lib"
@@ -379,6 +385,7 @@ CLEAN :"fabaselib - Win32 NASM ReleaseCLEAN"
 !ELSE 
 CLEAN :
 !ENDIF 
+	-@erase "$(INTDIR)\debug.obj"
 	-@erase "$(INTDIR)\Toolbar.obj"
 	-@erase "$(INTDIR)\toolbar.res"
 	-@erase "$(INTDIR)\vc50.idb"
@@ -447,6 +454,7 @@ LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
 DEF_FILE= \
 	".\toolbar.def"
 LINK32_OBJS= \
+	"$(INTDIR)\debug.obj" \
 	"$(INTDIR)\Toolbar.obj" \
 	"$(INTDIR)\toolbar.res" \
 	"..\..\..\..\base\win32\fabaselib.lib"
@@ -472,11 +480,21 @@ $(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Release" ".\toolbar.ui"
 !IF "$(CFG)" == "toolbar - Win32 Release" || "$(CFG)" ==\
  "toolbar - Win32 Debug" || "$(CFG)" == "toolbar - Win32 NASM Debug" || "$(CFG)"\
  == "toolbar - Win32 NASM Release"
+SOURCE=..\..\..\..\base\src\debug.cpp
+DEP_CPP_DEBUG=\
+	"..\..\..\..\base\include\debug.h"\
+	
+
+"$(INTDIR)\debug.obj" : $(SOURCE) $(DEP_CPP_DEBUG) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
 SOURCE=..\Toolbar.cpp
 
 !IF  "$(CFG)" == "toolbar - Win32 Release"
 
 DEP_CPP_TOOLB=\
+	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
@@ -495,7 +513,7 @@ DEP_CPP_TOOLB=\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\include\ui.h"\
-	"..\Toolbar.h"\
+	"..\toolbar.h"\
 	
 
 "$(INTDIR)\Toolbar.obj" : $(SOURCE) $(DEP_CPP_TOOLB) "$(INTDIR)"
@@ -523,7 +541,7 @@ DEP_CPP_TOOLB=\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\include\ui.h"\
-	"..\Toolbar.h"\
+	"..\toolbar.h"\
 	
 
 "$(INTDIR)\Toolbar.obj" : $(SOURCE) $(DEP_CPP_TOOLB) "$(INTDIR)"
@@ -551,7 +569,7 @@ DEP_CPP_TOOLB=\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\include\ui.h"\
-	"..\Toolbar.h"\
+	"..\toolbar.h"\
 	
 
 "$(INTDIR)\Toolbar.obj" : $(SOURCE) $(DEP_CPP_TOOLB) "$(INTDIR)"
@@ -561,6 +579,7 @@ DEP_CPP_TOOLB=\
 !ELSEIF  "$(CFG)" == "toolbar - Win32 NASM Release"
 
 DEP_CPP_TOOLB=\
+	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
@@ -579,7 +598,7 @@ DEP_CPP_TOOLB=\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\include\ui.h"\
-	"..\Toolbar.h"\
+	"..\toolbar.h"\
 	
 
 "$(INTDIR)\Toolbar.obj" : $(SOURCE) $(DEP_CPP_TOOLB) "$(INTDIR)"

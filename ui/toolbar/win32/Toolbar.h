@@ -58,7 +58,7 @@ class ToolbarUI : public UserInterface
     ToolbarUI(FAContext *context);
     ~ToolbarUI();
 
-    virtual Error Init(int32 startup_type) { return kError_NoErr;}
+    virtual Error Init(int32 startup_type);
     virtual int32 AcceptEvent(Event*);
 
     void TrayNotify(int32 notifyMessage);
@@ -69,6 +69,7 @@ class ToolbarUI : public UserInterface
 
  protected:
 
+    void SetupToolIcon(void);
     void AddTrayIcon();
     void RemoveTrayIcon();
     void SetTrayTooltip(char *str);
@@ -80,6 +81,7 @@ class ToolbarUI : public UserInterface
     FAContext*          m_context;
     HWND                m_hWnd;
     UIState             m_state;
+    Thread             *m_uiThread;
 };
 
 

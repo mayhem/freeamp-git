@@ -68,6 +68,7 @@ class Win32Window : public Window
              void  CreateTooltips(void);
              void  Paint(void);
              void  TimerEvent(void);
+             void  SetStayOnTop(bool bStay);
              
     protected:
     

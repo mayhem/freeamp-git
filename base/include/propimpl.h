@@ -24,9 +24,18 @@ ____________________________________________________________________________*/
 #ifndef INCLUDED_PROPIMPL_H_
 #define INCLUDED_PROPIMPL_H_
 
+// The debugger can't handle symbols more than 255 characters long.
+// STL often creates symbols longer than that.
+// When symbols are longer than 255 characters, the warning is disabled.
+#ifdef WIN32
+#pragma warning(disable:4786)
+#endif
+
 #include <stdlib.h>
 
 #include <vector>
+#include <map>
+#include <string>
 
 using namespace std;
 
@@ -35,16 +44,21 @@ using namespace std;
 #include "properties.h"
 #include "hashtable.h"
 
+class PropElem 
+{
+   public:
+       PropElem() 
+         { m_val = NULL; }
+      ~PropElem() 
+         { if (m_val) delete m_val; }
+         
+      vector<PropertyWatcher *> m_propWatchers;
+      PropValue *m_val;
+};
+
 class PropertiesImpl : public Properties {
  private:
-    class PropElem {
-    public:
-	PropElem() { m_val = NULL; }
-	~PropElem() {if (m_val) delete m_val; }
-	vector<PropertyWatcher *> m_propWatchers;
-	PropValue *m_val;
-    };
-    HashTable<PropElem *> *m_props;
+    map<string, PropElem *> m_props;
     Mutex m_lock;
  public:
     PropertiesImpl();

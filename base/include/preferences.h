@@ -34,6 +34,7 @@ extern const char* kUIPref;
 extern const char* kTextUIPref;
 extern const char* kMusicBrowserUIPref;
 extern const char* kDownloadManagerUIPref;
+extern const char* kToolbarUIPref;
 extern const char* kPMOPref;
 extern const char* kALSADevicePref;
 extern const char* kESOUNDHostPref;

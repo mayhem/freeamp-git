@@ -103,23 +103,38 @@ void MultiStateControl::GetTip(string &oTip)
 
 void MultiStateControl::Init(void)
 {
-    char *szDup, *szToken;
+    int   iOffset, iRet;
+    char *szDup;
 
     szDup = strdup(m_oDesc.c_str());
-    szToken = strtok(szDup, "||");
-    for(; szToken;)
+    iOffset = 0;
+    for(;;)
     {
-        m_oDescs.push_back(string(szToken));
-        szToken = strtok(NULL, "||");
+        iRet = sscanf((char *)m_oDesc.c_str() + iOffset, "%[^|]", szDup);
+        if (iRet < 1) 
+            break;
+            
+        m_oDescs.push_back(string(szDup));
+            
+        iOffset += strlen(szDup) + 2;
+        if (iOffset > m_oDesc.length())
+            break;
     }
     free(szDup);
-    
+
     szDup = strdup(m_oToolTip.c_str());
-    szToken = strtok(szDup, "||");
-    for(; szToken;)
+    iOffset = 0;
+    for(;;)
     {
-        m_oTips.push_back(string(szToken));
-        szToken = strtok(NULL, "||");
+        iRet = sscanf((char *)m_oToolTip.c_str() + iOffset, "%[^|]", szDup);
+        if (iRet < 1) 
+            break;
+            
+        m_oTips.push_back(string(szDup));
+            
+        iOffset += strlen(szDup) + 2;
+        if (iOffset > m_oToolTip.length())
+            break;
     }
     free(szDup);
 

@@ -40,6 +40,7 @@ using namespace std;
 #include "win32updatemanager.h"
 #include "Win32PreferenceWindow.h"
 #include "Win32Window.h"
+#include "help.h"
 #include "Debug.h"
 
 #define DB Debug_v("%s:%d\n", __FILE__, __LINE__);
@@ -154,7 +155,7 @@ bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent, Preferences* pre
     HINSTANCE hinst = (HINSTANCE)GetWindowLong(hwndParent, GWL_HINSTANCE);
 
     psp[0].dwSize = sizeof(PROPSHEETPAGE);
-    psp[0].dwFlags = 0;
+    psp[0].dwFlags = PSP_HASHELP;
     psp[0].hInstance = hinst;
     psp[0].pszTemplate = MAKEINTRESOURCE(IDD_PREF_GENERAL);
     psp[0].pszIcon = NULL;
@@ -163,7 +164,7 @@ bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent, Preferences* pre
     psp[0].lParam = (LPARAM)prefs;
 
     psp[1].dwSize = sizeof(PROPSHEETPAGE);
-    psp[1].dwFlags = 0;
+    psp[1].dwFlags = PSP_HASHELP;
     psp[1].hInstance = hinst;
     psp[1].pszTemplate = MAKEINTRESOURCE(IDD_PREF_THEME);
     psp[1].pszIcon = NULL;
@@ -172,7 +173,7 @@ bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent, Preferences* pre
     psp[1].lParam = (LPARAM)prefs;
 
     psp[2].dwSize = sizeof(PROPSHEETPAGE);
-    psp[2].dwFlags = 0;
+    psp[2].dwFlags = PSP_HASHELP;
     psp[2].hInstance = hinst;
     psp[2].pszTemplate = MAKEINTRESOURCE(IDD_PREF_STREAMING);
     psp[2].pszIcon = NULL;
@@ -181,7 +182,7 @@ bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent, Preferences* pre
     psp[2].lParam = (LPARAM)prefs;
 
     psp[3].dwSize = sizeof(PROPSHEETPAGE);
-    psp[3].dwFlags = 0;
+    psp[3].dwFlags = PSP_HASHELP;
     psp[3].hInstance = hinst;
     psp[3].pszTemplate = MAKEINTRESOURCE(IDD_PREF_PLUGINS);
     psp[3].pszIcon = NULL;
@@ -196,7 +197,7 @@ bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent, Preferences* pre
     updateManager->SetPlatform(string("WIN32"));
 
     psp[4].dwSize = sizeof(PROPSHEETPAGE);
-    psp[4].dwFlags = 0;
+    psp[4].dwFlags = PSP_HASHELP;
     psp[4].hInstance = hinst;
     psp[4].pszTemplate = MAKEINTRESOURCE(IDD_PREF_UPDATE);
     psp[4].pszIcon = NULL;
@@ -205,7 +206,7 @@ bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent, Preferences* pre
     psp[4].lParam = (LPARAM)updateManager;
 
     psp[5].dwSize = sizeof(PROPSHEETPAGE);
-    psp[5].dwFlags = 0;
+    psp[5].dwFlags = PSP_HASHELP;
     psp[5].hInstance = hinst;
     psp[5].pszTemplate = MAKEINTRESOURCE(IDD_PREF_ADVANCED);
     psp[5].pszIcon = NULL;
@@ -214,7 +215,7 @@ bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent, Preferences* pre
     psp[5].lParam = (LPARAM)prefs;
 
     psp[6].dwSize = sizeof(PROPSHEETPAGE);
-    psp[6].dwFlags = 0;
+    psp[6].dwFlags = PSP_HASHELP;
     psp[6].hInstance = hinst;
     psp[6].pszTemplate = MAKEINTRESOURCE(IDD_PREF_ABOUT);
     psp[6].pszIcon = NULL;
@@ -224,7 +225,7 @@ bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent, Preferences* pre
 
    
     psh.dwSize = sizeof(PROPSHEETHEADER);
-    psh.dwFlags = PSH_PROPSHEETPAGE;
+    psh.dwFlags = PSH_PROPSHEETPAGE | PSH_HASHELP;
     psh.hwndParent = hwndParent;
     psh.hInstance = hinst;
     psh.pszIcon = NULL;
@@ -409,7 +410,7 @@ void Win32PreferenceWindow::SavePrefsValues(Preferences* prefs,
     prefs->SetLogPerformance(values->logPerformance);
 
     prefs->SetThemeDefaultFont(values->defaultFont.c_str());
-    m_pThemeMan->UseTheme(m_oThemeList[m_proposedValues.currentTheme]);
+    m_pThemeMan->UseTheme(m_oThemeList[values->currentTheme]);
 
     prefs->SetCheckForUpdates(values->checkForUpdates);
     prefs->SetSaveMusicDirectory(values->saveMusicDirectory.c_str());
@@ -435,6 +436,20 @@ void Win32PreferenceWindow::SavePrefsValues(Preferences* prefs,
         m_currentValues = m_proposedValues = *values;
     }
 }
+
+void Win32PreferenceWindow::LaunchHelp(HWND hwnd, uint32 topic)
+{
+    string            oHelpFile;
+    char              dir[MAX_PATH];
+    uint32            len = sizeof(dir);
+
+    m_pContext->prefs->GetInstallDirectory(dir, &len);
+    oHelpFile = string(dir);
+    oHelpFile += string("\\");    
+    oHelpFile += string(HELP_FILE);    
+
+    WinHelp(hwnd, oHelpFile.c_str(), HELP_CONTEXT, topic);
+}                
 
 bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd, 
                                             UINT msg, 
@@ -648,6 +663,12 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
 
             switch(notify->code)
             {
+                case PSN_HELP:
+                {
+                    LaunchHelp(hwnd, Preferences_General);
+                    break;
+                }
+            
                 case PSN_SETACTIVE:
                 {
                     break;
@@ -1178,6 +1199,11 @@ bool Win32PreferenceWindow::PrefStreamingProc(HWND hwnd,
 
             switch(notify->code)
             {
+                case PSN_HELP:
+                {
+                    LaunchHelp(hwnd, Preferences_Streaming);
+                    break;
+                }
                 case PSN_SETACTIVE:
                 {
                     
@@ -1513,6 +1539,11 @@ bool Win32PreferenceWindow::PrefAboutProc(HWND hwnd,
 
             switch(notify->code)
             {
+                case PSN_HELP:
+                {
+                    LaunchHelp(hwnd, Preferences_About);
+                    break;
+                }
                 case PSN_SETACTIVE:
                 {
                     
@@ -1751,6 +1782,11 @@ bool Win32PreferenceWindow::PrefThemeProc(HWND hwnd,
 
             switch(notify->code)
             {
+                case PSN_HELP:
+                {
+                    LaunchHelp(hwnd, Preferences_Themes);
+                    break;
+                }
                 case PSN_SETACTIVE:
                 {
                     
@@ -2407,6 +2443,11 @@ bool Win32PreferenceWindow::PrefUpdateProc(HWND hwnd,
             {
                 switch(notify->code)
                 {
+                    case PSN_HELP:
+                    {
+                        LaunchHelp(hwnd, Preferences_Update);
+                        break;
+                    }
                     case PSN_SETACTIVE:
                     {
                     
@@ -2756,6 +2797,11 @@ bool Win32PreferenceWindow::PrefAdvancedProc(HWND hwnd,
 
             switch(notify->code)
             {
+                case PSN_HELP:
+                {
+                    LaunchHelp(hwnd, Preferences_Advanced);
+                    break;
+                }
                 case PSN_SETACTIVE:
                 {
                     
@@ -3206,6 +3252,11 @@ bool Win32PreferenceWindow::PrefPluginsProc(HWND hwnd,
             {
                 switch(notify->code)
                 {
+                    case PSN_HELP:
+                    {
+                        LaunchHelp(hwnd, Preferences_Plugins);
+                        break;
+                    }
                     case PSN_SETACTIVE:
                     {
                         break;

@@ -143,6 +143,8 @@ class Win32PreferenceWindow : public PreferenceWindow
                                      ThemeManager *pThemeMan);
       virtual ~Win32PreferenceWindow(void); 
       
+
+               void LaunchHelp(HWND hwnd, uint32 topic);
       virtual  bool Show(Window *pParent);
 
                void GetPrefsValues(Preferences* prefs, 

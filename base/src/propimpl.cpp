@@ -23,108 +23,132 @@ ____________________________________________________________________________*/
 
 #include "propimpl.h"
 
-PropertiesImpl::PropertiesImpl() {
-    m_props = new HashTable<PropElem *>(30);
+PropertiesImpl::PropertiesImpl() 
+{
 }
 
-PropertiesImpl::~PropertiesImpl() {
-    if (m_props) {
-	delete m_props;
-	m_props = NULL;
-    }
+PropertiesImpl::~PropertiesImpl() 
+{
 }
 
-Error PropertiesImpl::GetProperty(const char *pProp, PropValue **ppVal) {
+Error PropertiesImpl::GetProperty(const char *pProp, PropValue **ppVal) 
+{
     Error rtn = kError_UnknownErr;
     m_lock.Acquire();
-    if (ppVal) {
-	*ppVal = NULL;
-	if (pProp) {
-	    if (m_props) {
-		PropElem *ppe = m_props->Value(pProp);
-		if (ppe) {
-		    *ppVal = ppe->m_val;
-		    rtn = kError_NoErr;
-		}
-	    }
-	}
+    if (ppVal) 
+    {
+	   *ppVal = NULL;
+       if (pProp) 
+       {
+           map<string, PropElem *>::iterator i;
+		   i = m_props.find(pProp);
+           if (i != m_props.end()) 
+           {
+		       *ppVal = (*i).second->m_val;
+		       rtn = kError_NoErr;
+           }
+       }
     }
     m_lock.Release();
     return rtn;
 }
 
-Error PropertiesImpl::SetProperty(const char *pProp, PropValue *pVal) {
+Error PropertiesImpl::SetProperty(const char *pProp, PropValue *pVal) 
+{
     Error rtn = kError_UnknownErr;
     m_lock.Acquire();
-    if (m_props) {
-	if (pProp) {
-	    PropElem *ppe = m_props->Value(pProp);
-	    bool needToAddItem = false;
-	    if (!ppe) {
-		ppe = new PropElem();
-		needToAddItem = true;
-	    }
-	    if (ppe) {
-		if (ppe->m_val) {
-		    delete ppe->m_val;
-		}
-		ppe->m_val = pVal;
-		if (needToAddItem) {
-		    m_props->Insert(pProp, ppe);
-		}
-		PropertyWatcher *pw = NULL;
-		for(uint32 i = 0; i < ppe->m_propWatchers.size(); i++) {
-		    pw = ppe->m_propWatchers[i];
-		    if (pw) {
-			pw->PropertyChange(pProp, pVal);
-		    }
-		}
 
-		rtn = kError_NoErr;
-	    }
-	}
+	if (pProp) 
+    {
+       map<string, PropElem *>::iterator  i;
+       PropElem                                *ppe;
+       i = m_props.find(pProp);
+       
+       bool needToAddItem = false;
+       if (i == m_props.end()) 
+       {
+	       ppe = new PropElem();
+           needToAddItem = true;
+       }
+       else
+           ppe = (*i).second;
+           
+	   if (ppe->m_val) 
+       {
+	       delete ppe->m_val;
+	   }
+       ppe->m_val = pVal;
+       if (needToAddItem) 
+       {
+	      m_props[pProp] = ppe;
+       }   
+          
+	   PropertyWatcher *pw = NULL;
+       
+	   for(uint32 j = 0; j < ppe->m_propWatchers.size(); j++) 
+       {
+	       pw = ppe->m_propWatchers[j];
+	       if (pw) 
+           {
+	   	       pw->PropertyChange(pProp, pVal);
+	       }
+	   }
+	   rtn = kError_NoErr;
     }
+    
     m_lock.Release();
     return rtn;
 }
 
-Error PropertiesImpl::RegisterPropertyWatcher(const char *pProp, PropertyWatcher *pw) {
+Error PropertiesImpl::RegisterPropertyWatcher(const char *pProp, PropertyWatcher *pw) 
+{
     Error rtn = kError_UnknownErr;
     m_lock.Acquire();
 
-    if (m_props) {
-	if (pProp) {
-	    PropElem *ppe = m_props->Value(pProp);
-	    if (ppe) {
-		ppe->m_propWatchers.push_back(pw);
-		rtn = kError_NoErr;
+	if (pProp) 
+    {
+        map<string, PropElem *>::iterator i;
+        i = m_props.find(pProp);
+        
+	    if (i != m_props.end()) 
+        {
+            PropElem *ppe = (*i).second;
+            
+	        ppe->m_propWatchers.push_back(pw);
+	        rtn = kError_NoErr;
 	    }
 	}
-    }
 
     m_lock.Release();
     return rtn;
 }
 
-Error PropertiesImpl::RemovePropertyWatcher(const char *pProp, PropertyWatcher *pw) {
+Error PropertiesImpl::RemovePropertyWatcher(const char *pProp, PropertyWatcher *pw) 
+{
     Error rtn = kError_UnknownErr;
     m_lock.Acquire();
 
-    if (m_props) {
-	if (pProp) {
-	    PropElem *ppe = m_props->Value(pProp);
-	    if (ppe) {
-		int32 endNum = ppe->m_propWatchers.size();
-		for (int i = 0; i < endNum ; i++) {
-		    if (pw == ppe->m_propWatchers[i]) {
-			ppe->m_propWatchers.erase(&ppe->m_propWatchers[i]);
-			endNum--;
-		    }
-		}
-		rtn = kError_NoErr;
+	if (pProp) 
+    {
+        map<string, PropElem *>::iterator i;
+        i = m_props.find(pProp);
+        
+	    if (i != m_props.end()) 
+        {
+           PropElem *ppe = (*i).second;
+           
+	       int32 endNum = ppe->m_propWatchers.size();
+           for (int i = 0; i < endNum ; i++) 
+           {
+	          if (pw == ppe->m_propWatchers[i]) 
+              {
+	              ppe->m_propWatchers.erase(&ppe->m_propWatchers[i]);
+		          endNum--;
+	          }
+	       }
+	       rtn = kError_NoErr;
 	    }
 	}
-    }
 
     m_lock.Release();
     return rtn;

@@ -183,6 +183,8 @@ $(DS_POSTBUILD_DEP) : "misc - Win32 Release" "fabaselib - Win32 Release"\
  "..\..\..\Authors.txt" ".\freeamp.exe"
    IF NOT EXIST themes mkdir themes
 	copy             ..\..\..\themes\freeamp.fat themes
+	copy ..\..\..\help\win32\freeamp.cnt .
+	copy ..\..\..\help\win32\freeamp.hlp .
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
@@ -339,6 +341,8 @@ $(DS_POSTBUILD_DEP) : "misc - Win32 Debug" "fabaselib - Win32 Debug"\
  "..\..\..\Changes.txt" "..\..\..\Authors.txt" ".\freeamp.exe"
    IF NOT EXIST themes mkdir themes
 	copy             ..\..\..\themes\freeamp.fat themes
+	copy ..\..\..\help\win32\freeamp.cnt .
+	copy ..\..\..\help\win32\freeamp.hlp .
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
@@ -501,6 +505,8 @@ $(DS_POSTBUILD_DEP) : "misc - Win32 NASM Release"\
  ".\freeamp.exe"
    IF NOT EXIST themes mkdir themes
 	copy             ..\..\..\themes\freeamp.fat themes
+	copy ..\..\..\help\win32\freeamp.cnt .
+	copy ..\..\..\help\win32\freeamp.hlp .
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
@@ -662,6 +668,8 @@ $(DS_POSTBUILD_DEP) : "misc - Win32 NASM Debug" "fabaselib - Win32 NASM Debug"\
  "..\..\..\Authors.txt" ".\freeamp.exe"
    IF NOT EXIST themes mkdir themes
 	copy             ..\..\..\themes\freeamp.fat themes
+	copy ..\..\..\help\win32\freeamp.cnt .
+	copy ..\..\..\help\win32\freeamp.hlp .
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 

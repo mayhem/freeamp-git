@@ -33,6 +33,7 @@ const char* kUIPref = "UI";
 const char* kTextUIPref = "TextUI";
 const char* kMusicBrowserUIPref = "MusicBrowserUI";
 const char* kDownloadManagerUIPref = "DownloadManagerUI";
+const char* kToolbarUIPref = "ToolbarUI";
 const char* kPMOPref = "PMO";
 const char* kALSADevicePref = "ALSADevice";
 const char* kESOUNDHostPref = "EsounDHost";
@@ -97,6 +98,7 @@ const char *kDefaultThemeDefaultFont = "Helvetica";
 #endif
 const char *kDefaultDownloadManagerUI = "download.ui";
 const char *kDefaultMusicBrowserUI = "musicbrowser.ui";
+const char *kDefaultToolbarUI = "toolbar.ui";
 const bool kDefaultCheckForUpdates = false;
 const int32 kDefaultPlaylistRepeat = 0;
 const bool kDefaultPlaylistShuffle = false;
@@ -202,6 +204,11 @@ SetDefaults()
     if (GetPrefString(kDownloadManagerUIPref, dummyString,
         (uint32 *)&dummyInt) == kError_NoPrefValue)
         SetPrefString(kDownloadManagerUIPref, kDefaultDownloadManagerUI);
+
+    dummyInt = 255;
+    if (GetPrefString(kToolbarUIPref, dummyString,
+        (uint32 *)&dummyInt) == kError_NoPrefValue)
+        SetPrefString(kToolbarUIPref, kDefaultToolbarUI);
 
     if (GetPrefBoolean(kCheckForUpdatesPref, &dummyBool) == kError_NoPrefValue)
         SetPrefBoolean(kCheckForUpdatesPref, kDefaultCheckForUpdates);
