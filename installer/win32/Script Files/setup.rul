@@ -406,20 +406,25 @@ begin
 			szKey = "Software\\Netscape\\Netscape Navigator\\Suffixes";
 			RegDBSetKeyValueEx(szKey, "application/vnd.rn-rn_music_package", REGDB_STRING, "rmp", -1);
 			szKey = "Software\\Netscape\\Netscape Navigator\\Viewers";
-			RegDBSetKeyValueEx(szKey, "application/vnd.rn-rn_music_package", REGDB_STRING, szAppPath, -1);
+			RegDBSetKeyValueEx(szKey, "application/vnd.rn-rn_music_package", REGDB_STRING, szAppPath ^ @PRODUCT_KEY, -1);
 			szKey = "Software\\Netscape\\Netscape Navigator\\User Trusted External Applications";
 			RegDBSetKeyValueEx(szKey, szAppPath, REGDB_STRING, "Yes", -1);		
 		endif;
 		
+		
+		if(FALSE) then		
 		// MP3 support
 		szKey = "Software\\Netscape\\Netscape Navigator\\Suffixes";
 		RegDBSetKeyValueEx(szKey, "audio/x-mpeg", REGDB_STRING, "mp1,mp2,mp3", -1);
+		RegDBSetKeyValueEx(szKey, "audio/x-mp3", REGDB_STRING, "mp3", -1);
 				
 		szKey = "Software\\Netscape\\Netscape Navigator\\Viewers";
-		RegDBSetKeyValueEx(szKey, "application/x-mpeg", REGDB_STRING, szAppPath, -1);
+		RegDBSetKeyValueEx(szKey, "application/x-mpeg", REGDB_STRING, szAppPath ^ @PRODUCT_KEY, -1);
+		RegDBSetKeyValueEx(szKey, "application/x-mp3", REGDB_STRING, szAppPath ^ @PRODUCT_KEY, -1);
 		
 		szKey = "Software\\Netscape\\Netscape Navigator\\User Trusted External Applications";
-		RegDBSetKeyValueEx(szKey, szAppPath, REGDB_STRING, "No", -1);		
+		RegDBSetKeyValueEx(szKey, szAppPath ^ @PRODUCT_KEY, REGDB_STRING, "No", -1);	
+		endif;	
 				
 	endif;
 	
@@ -929,6 +934,8 @@ end;
 // --- include script file section ---
 
 #include "sddialog.rul"
+
+
 
 
 

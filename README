@@ -19,7 +19,7 @@ From binaries:
   Or alternatively, if you prefer to install the files manually:
     - Move freeamp to /usr/local/bin (or, somewhere else in your path)
     - Move the plugins directory (complete with contents) to
-        /usr/local/lib/freeamp  (see first note under the Linux section below)
+        /usr/local/lib/freeamp
     - If you do not have ALSA installed, remove alsa.pmo from the
         /usr/local/lib/freeamp/plugins directory.
     - If you do not have EsounD installed, remove esound.pmo from the
@@ -29,161 +29,55 @@ From binaries:
 USING FREEAMP:
 ----------------------------------------------------------------------
 
-FreeAmp 1.3 for Win32:
+FreeAmp 2.0 for Win32 and Linux:
 
   freeamp [options] [file 1] [file 2]...
 
-  * right-clicking on the player brings up a menu that allows
-    you to access player functionality and preferences.
-  * dragging a file (or files) onto the Player sets the playlist.
-    If the player is currently playing, it will stop.
-  * move between files in the playlist using the |< and >| buttons
-  * pause/play again by pressing the > button
-  * stop by pressing the [] buton
-  * adjust the volume by clicking-and-dragging on the dial to the left of the display
-  * seek in the current file by clicking-and-dragging on the dial to the right of the
-    display.  This is a 'jog' mechanism in that the dial adjusts the rate of change of
-    the seeking (move it a little bit vertically, and the position of the song increments 
-    slowly.  move it a lot vertically, and the position of the song increments quickly.)
-    let up the mouse button to move to the selected point in the song.
-  * clicking on the display cycles through total time, current time and time remaining.
-  * Of the six buttons to the right of the display, the upper left is
-    disabled (in the future will switch between modes)
-  * the upper middle minimizes the player
-  * the upper right quits the player
-  * the lower left cycles through Repeat Mode in the following order:
-    Repeat Current Song, Repeat Playlist, Repeat off.
-  * the lower middle toggles 'Shuffle' mode.
-  * the lower right presents the 'Open File' dialog.  The files
-    selected here will replace the playlist in the same fashion as drag-n-drop
-  * just under the display is the playlist drawer, click it to access playlist functions
+  A lot has changed since version 1.3. In version 2.0 we have an all
+  new interface with easily labelled buttons.
+
+  * My Music - Opens a music browser which will hopefully allow you
+    to more easily manage your music. The "My Music" dialog allows
+    you to edit the current play queue as well as persistant 
+    playlists.
+  * Options - Opens the preferences dialog, enabling you to control
+    many features in FreeAmp.
+  * Playlist - Opens the "My Music" dialog in a compressed form
+  * Download - Opens the download manager.
+
+  Above the button bar are the volume slider on the left and the seek
+  slider on the right.
+
+  Below the button bar are the primary audio controls, Previous Song, 
+  Play/Pause, Stop, and Next Song.
+
+  The small buttons to the left of the primary audio controls control
+  shuffle and repeat modes.
 
 
-FreeAmp version 1.3 for Linux:
-
-freeamp [-save] [-ui <UI plugin name>] <MP3 file/stream> [MP3 file/stream] ...
-
-Example command line:
-   freeamp -ui freeamp.ui mysong1.mp3 mysong2.mp3
-
-Notes:
-
-  * The preferences, including values which used to be set on the command
-    line using "-prop", are stored in ~/.freeamp_prefs
-
-    This file will be created with default values the first time you
-    run freeamp.  Whitespace and comments starting with "#" are
-    ignored.  Otherwise, each line is of the form "<key>: <value>".
-    Both keys and values may be within double-quotes if needed.
-    Within quoted strings, backslash prefixes special characters.  The
-    following escapes are possible: "\n", "\t", "\\", "\"", as well as
-    backslash followed by 3 octal digits.  Any character other than
-    NUL is allowed.
-
-    The default values are as follows:
-
-         InstallDirectory: /usr/local/lib
-         LibraryPath: .:~/.freeamp:/usr/local/lib/freeamp
-         UI: freeamp.ui
-         TextUI: freeampcmd.ui
-         PMO: soundcard.pmo
-         ALSADevice: 1:1
-         InputBufferSize: 64
-         OutputBufferSize: 512
-         StreamBufferInterval: 3
-         DecoderThreadPriority: 1
-         UseDebugLog: false
-         LogMain: false
-         LogDecode: false
-         LogInput: false
-         LogOutput: false
-         LogPerformance: false
-         SaveStreams: false
-         SaveStreamsDirectory: .
-
-  * If you pass "-save" on the command line, or if the "SaveStreams"
-    preference is set, then all SHOUTcast/HTTP streams will be saved
-    to files in the directory specified by the "SaveStreamsDirectory"
-    preference.
-
-  * If no "-ui" parameters are specified on the command-line, the
-    "UI" preference will be used if you're running X (ie, if the
-    DISPLAY environment variable is set).  Otherwise, the "TextUI"
-    preference will be used.  This means that you can now successfully
-    run freeamp in text mode without specifying a "-ui" option.
-
-  * The default output buffer size is set to 512Kb. If you have a
-    machine that is not using X, or you are constrained in the amount
-    of memory you have, specify a lower buffer size by editing the
-    .freeamp_prefs file.
-
-  * To play an SHOUTcast/http stream, specify the HTTP URL on the
-    command line. For example:
-
-       freeamp http://206.178.45.2:8000    
-
-    Note on saving HTTP streams: If you are saving a stream that is 
-    being served from a web server, and the stream completes playing,
-    FreeAmp will write a second partial stream file to disk. This is a 
-    bug and will be addressed in the next major release of FreeAmp.
-    This bug does not occur with SHOUTcast or icecast streams.
-
-  * To play an RTP/multicast stream, specify the RTP URL on the command
-    line. Example:
-
-       freeamp rtp://225.2.1.5:4420    
-
-  * FreeAmp looks for the plugin directory using the "LibraryPath"
-    preference, unless overridden by the FREEAMP_PATH environment
-    variable.  The default path is:
-       - the current directory, then
-       - ~/.freeamp, then
-       - /usr/local/lib/freeamp
   
-  * at the moment, the only way to modify the playlist in Linux is via 
-    the command line when FreeAmp is started (playlist modification will
-    be in the next version)
-  * Move between files in the playlist using the |< and >| buttons
-  * Play by pressing the > button
-  * Pause by pressing the || button
-  * Stop by pressing the [] button
-  * Change volume clicking and dragging the left dial
-  * Seek by clicking and dragging the right dial.  This dial operates
-    in a 'jog' mode.  The farther you move the dial, the faster it
-    moves forward (or backward) in the song.  Drop to set the position
-  * Click on the display to cycle through 'total time', 'current time'
-    and 'remaining time'.
-The Six buttons on the right:
-  * Upper left is currently not functional (in the future it will
-    switch between player modes)
-  * Upper middle iconifies FreeAmp
-  * Upper right closes FreeAmp
-  * Lower left toggles Repeat Mode between None, Current and All
-  * Lower middle toggles Shuffle Mode between On and Off
-  * Lower right is currently not functional (in the future it will
-    open the file-open drawer)
 
 
 
 ABOUT FreeAmp:
 ----------------------------------------------------------------------
 
-FreeAmp is an Open Source effort to build the best digital audio player
-available.  In the interest of supporting the free software community,
-while at the same time fostering the growth of the online delivery of
-music, EMusic.com, THE Source for Downloadable Music, is funding both
-the FreeAmp.org domain and the efforts of the FreeAmp team. The FreeAmp
-team consists of: Mark B. Elrod, Robert Kaye, Brett Thomas, Jason Woodward,
-and Mark H. Weaver. 
+FreeAmp is an Open Source effort to build the best digital audio 
+player available.  In the interest of supporting the free software 
+community, while at the same time fostering the growth of the online 
+delivery of music, EMusic.com, THE Source for Downloadable Music, is 
+funding both the FreeAmp.org domain and the efforts of the FreeAmp 
+team. The FreeAmp team consists of: Mark B. Elrod, Robert Kaye, Brett 
+Thomas, Jason Woodward, and Isaac Richards. 
 
 Other people have also contributed to FreeAmp. Bill Yuan in China has
-contributed the RainPlay user interface and Gabor Fleischer in Hungary has
-contributed Linux ALSA support. If you feel like contributing to the project,
-please check out our developer pages. 
+contributed the RainPlay user interface and Gabor Fleischer in Hungary 
+has contributed Linux ALSA support. If you feel like contributing to 
+the project, please check out our developer pages. 
 
-FreeAmp is being released under the GPL.  As is provided by the GPL, all of
-EMusic's and your efforts toward FreeAmp will be released back to the
-community at large. 
+FreeAmp is being released under the GPL.  As is provided by the GPL, 
+all of EMusic's and your efforts toward FreeAmp will be released back 
+to the community at large. 
 
 The current development and release versions of FreeAmp can be found
 at http://www.freeamp.org.
@@ -196,7 +90,7 @@ To join a mailing list actively discussing the ongoing development of
 FreeAmp, send mail to freeamp-dev-request@freeamp.org with the body:
 subscribe
 
-To make feature suggestions, send mail to freeamp-features@freeamp.org, or,
-better yet, if you are able, add the feature yourself and send us the
-updates!
+To make feature suggestions, send mail to freeamp-features@freeamp.org, 
+or, better yet, if you are able, add the feature yourself and send us 
+the updates!
 
