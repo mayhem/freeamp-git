@@ -1,4 +1,5 @@
 /*____________________________________________________________________________
+#define MAXINT32 0x7FFFFFFF
         
    FreeAmp - The Free MP3 Player
 
@@ -109,6 +110,7 @@ FreeAmpTheme::FreeAmpTheme(FAContext * context)
    m_pOptionsThread = NULL;
    m_bInOptions = false;
    m_bPaused = false;
+   m_iFramesSinceSeek = 2;
 
 #if defined( WIN32 )
     m_pUpdateMan = new Win32UpdateManager(m_pContext);
@@ -481,6 +483,9 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
          if (iSeconds == m_iCurrentSeconds || m_bSeekInProgress)
              break;
 
+         if (m_iFramesSinceSeek++ < 1)
+             break;
+
          m_iCurrentSeconds = iSeconds;            
          UpdateTimeDisplay(m_iCurrentSeconds);
 
@@ -706,9 +711,10 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
        iFrame = (int)(((float)iValue * (float)m_iTotalSeconds) / 
                       ((float)100 * m_fSecondsPerFrame));
        m_bSeekInProgress = false;
-       
+      
        m_pContext->target->AcceptEvent(new 
-              VolumeEvent(CMD_ChangePosition, iFrame));
+              VolumeEvent(CMD_ChangePosition, iFrame + 1));
+       m_iFramesSinceSeek = 0;
        
        m_pWindow->ControlStringValue(oName, true, oEmpty);
               
