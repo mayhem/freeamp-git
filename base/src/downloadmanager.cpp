@@ -86,7 +86,9 @@ DownloadManager::DownloadManager(FAContext* context)
 {
     m_context = context;
     m_current = 0;
-
+    m_downloadsPaused = true;
+	m_downloadIndex = -1;
+ 
     Registrar registrar;
 
     registrar.SetSubDir("plugins");
@@ -283,24 +285,29 @@ Error DownloadManager::AddItems(vector<DownloadItem*>* list)
 // This will indicate to the download thread that it should
 // attempt to retrieve this item. Has no effect if the item's
 // state is Done, or Downloading.
-Error DownloadManager::QueueDownload(DownloadItem* item)
+Error DownloadManager::QueueDownload(DownloadItem* item,
+                                     bool          bQueueAtHead)
 {
     Error result = kError_InvalidParam;
+    int   index;
 
     assert(item);
 
     if(item)
     {
-        //*m_debug << "Queue item: " << item->SourceURL() << endl;
-
         if(item->GetState() != kDownloadItemState_Downloading &&
-           item->GetState() != kDownloadItemState_Done &&
-           item->GetState() != kDownloadItemState_Queued)
+           item->GetState() != kDownloadItemState_Done)
         {
             item->SetState(kDownloadItemState_Queued);
             SendStateChangedMessage(item);
-
-            m_queueList.push_back(item);
+            
+            if (m_downloadsPaused)
+               for(index = 0; index < m_itemList.size(); index++)
+                   if (m_itemList[index] == item)
+                   {
+                      m_downloadIndex = index;
+                      break;
+                   }
 
             m_queueSemaphore.Signal();
 
@@ -332,23 +339,6 @@ Error DownloadManager::CancelDownload(DownloadItem* item, bool allowResume)
            item->GetState() == kDownloadItemState_Queued ||
            item->GetState() == kDownloadItemState_Paused)
         {
-            m_queueMutex.Acquire();
-
-            // remove from download queue
-            if(item->GetState() == kDownloadItemState_Queued)
-            {
-                deque<DownloadItem*>::iterator position;
-                
-                if((position = find(m_queueList.begin(), 
-                                    m_queueList.end(), 
-                                    item)) != m_queueList.end())
-                {
-                    m_queueList.erase(position); 
-                }
-            }
-
-            m_queueMutex.Release();
-
             if(!allowResume)
             {
                 item->SetState(kDownloadItemState_Cancelled);
@@ -546,21 +536,25 @@ inline uint32 DownloadManager::CheckIndex(uint32 index)
 DownloadItem* DownloadManager::GetNextQueuedItem()
 {
     DownloadItem* result = NULL;
+    int           i, total = 0;
 
-    m_queueMutex.Acquire();
+	if (m_downloadIndex < 0 || m_downloadIndex >= m_itemList.size())
+        m_downloadIndex = 0;
 
-    if(m_queueList.size())
+    for(i = m_downloadIndex, total = 0; i < m_itemList.size(); 
+        i = (i + 1) % m_itemList.size(), total++)
     {
-        result = m_queueList[0];
-
-        m_queueList.pop_front();
-
-        //cout << "Queue count: " << m_queueList.size() << endl;
+        if (total >= m_itemList.size())
+            return NULL;
+           
+        if (m_itemList[i]->GetState() == kDownloadItemState_Queued)
+        {
+            m_downloadIndex++;
+            return m_itemList[i];
+        }
     }
-
-    m_queueMutex.Release();
-
-    return result;
+    
+    return NULL;
 }
 
 static int32 GetContentLengthFromHeader(const char* buffer)
@@ -1176,15 +1170,38 @@ Error DownloadManager::SubmitToDatabase(DownloadItem* item)
     return result;
 }
 
+void DownloadManager::PauseDownloads(void)
+{ 
+    m_downloadsPaused = true;
+}
+
+void DownloadManager::ResumeDownloads(void)
+{ 
+    m_downloadsPaused = false;
+    m_queueSemaphore.Signal();
+}
+
+bool DownloadManager::IsPaused(void)
+{
+    return m_downloadsPaused;
+}
+
 void DownloadManager::DownloadThreadFunction()
 {
+    DownloadItem* item;
+    Error         result;
+    
     m_quitMutex.Acquire();
 
     while(m_runDownloadThread)
     {
-        DownloadItem* item = GetNextQueuedItem();
-        Error result;
-
+        if (m_downloadsPaused)
+        {
+            m_queueSemaphore.Wait();
+            continue;
+        }
+    
+        item = GetNextQueuedItem();
         if(item)
         {
             item->SetState(kDownloadItemState_Downloading);
@@ -1198,7 +1215,8 @@ void DownloadManager::DownloadThreadFunction()
 
                 result = SubmitToDatabase(item);
             }
-            else if(result == kError_UserCancel)
+            else 
+            if(result == kError_UserCancel)
             {
                 if(item->GetState() == kDownloadItemState_Cancelled)
                 {
@@ -1215,8 +1233,10 @@ void DownloadManager::DownloadThreadFunction()
 
             SendStateChangedMessage(item);
         }
-
-        m_queueSemaphore.Wait();
+        else
+        {
+            m_queueSemaphore.Wait();
+        }    
     }
 
     m_quitMutex.Release();
@@ -1468,6 +1488,9 @@ void DownloadManager::LoadResumableDownloadItems()
                 item->SetMetaData(&metadata);
 
                 m_itemList.push_back(item);
+//                if (item->GetState() == kDownloadItemState_Queued)
+//                    m_queueList.push_back(item);
+                    
                 SendItemAddedMessage(item);
             }
             

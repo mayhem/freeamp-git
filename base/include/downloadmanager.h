@@ -201,7 +201,7 @@ class DownloadManager {
     // This will indicate to the download thread that it should
     // attempt to retrieve this item. Has no effect if the item's
     // state is Done, or Downloading.
-    Error QueueDownload(DownloadItem* item);
+    Error QueueDownload(DownloadItem* item, bool bQueueAtHead = false);
     Error QueueDownload(uint32 index);
 
     // Changes item state to cancelled if it is queued or downloading.
@@ -209,6 +209,11 @@ class DownloadManager {
     // Has no effect if the item's state is Done, Cancelled, or Error.
     Error CancelDownload(DownloadItem* item, bool allowResume = false);
     Error CancelDownload(uint32 index, bool allowResume = false);
+
+    // These functions suspend/resume the current download progress.
+    void  PauseDownloads(void);
+    void  ResumeDownloads(void);
+    bool  IsPaused(void);
 
     // File Format support
     Error GetSupportedDownloadFormats(DownloadFormatInfo* format, uint32 index);
@@ -250,7 +255,7 @@ class DownloadManager {
     Mutex m_mutex;
 
     vector<DownloadItem*> m_itemList;
-    deque<DownloadItem*> m_queueList;
+	int                   m_downloadIndex;
 
     Registry m_formatRegistry;
 
@@ -262,10 +267,8 @@ class DownloadManager {
     volatile bool m_runDownloadThread;
 
     Semaphore m_queueSemaphore;
-    Mutex m_queueMutex;
     Mutex m_quitMutex;
-
-    //ofstream* m_debug;
+    bool  m_downloadsPaused;
 };
 
 #endif // INCLUDED_DOWNLOAD_MANAGER_H_

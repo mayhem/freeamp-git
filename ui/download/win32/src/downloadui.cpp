@@ -271,6 +271,15 @@ int32 DownloadUI::AcceptEvent(Event* event)
                         {
                             if(dlinse->Item() == (DownloadItem*)item.lParam)
                             {
+                                if (dlinse->Item()->GetState() == 
+                                    kDownloadItemState_Downloading)
+                                {    
+                                    ListView_SetItemState(m_hwndList, i, 
+                                        LVIS_SELECTED | LVIS_FOCUSED, 
+                                        LVIS_SELECTED | LVIS_FOCUSED);
+                                    ListView_EnsureVisible(m_hwndList, i, false);
+                                }    
+                            
                                 ListView_RedrawItems(m_hwndList, i, i);
                                 UpdateWindow(m_hwndList);
                                 break;
@@ -1400,6 +1409,7 @@ BOOL DownloadUI::Command(int32 command, HWND src)
 		                    case IDC_PAUSE:
                             {
                                 m_dlm->CancelDownload(dli, true);
+                                m_dlm->PauseDownloads();
                                 EnableWindow(m_hwndPause, FALSE);
                                 EnableWindow(m_hwndCancel, TRUE);
                                 EnableWindow(m_hwndResume, TRUE);
@@ -1417,7 +1427,8 @@ BOOL DownloadUI::Command(int32 command, HWND src)
 
                             case IDC_RESUME:
                             {
-                                m_dlm->QueueDownload(dli); 
+                                m_dlm->QueueDownload(dli, true); 
+                                m_dlm->ResumeDownloads();
                                 EnableWindow(m_hwndPause, TRUE);
                                 EnableWindow(m_hwndCancel, TRUE);
                                 EnableWindow(m_hwndResume, FALSE);
@@ -1513,9 +1524,16 @@ BOOL DownloadUI::Notify(int32 controlId, NMHDR* nmh)
 
                 DownloadItem* dli = (DownloadItem*)nmlv->lParam;
 
+                SetWindowText(m_hwndResume, "Resume");
                 switch(dli->GetState())
                 {
                     case kDownloadItemState_Queued:
+                        EnableWindow(m_hwndPause, FALSE);
+                        EnableWindow(m_hwndCancel, TRUE);
+                        EnableWindow(m_hwndResume, m_dlm->IsPaused());
+                        SetWindowText(m_hwndResume, "Start");
+                        break;
+                        
                     case kDownloadItemState_Downloading:
                         EnableWindow(m_hwndPause, TRUE);
                         EnableWindow(m_hwndCancel, TRUE);
