@@ -28,6 +28,10 @@ ____________________________________________________________________________*/
 #include <iostream>
 using namespace std;
 
+#ifdef __QNX__
+#include <strings.h>
+#endif
+
 #include "utility.h"
 #include "gtkmusicbrowser.h"
 #include "infoeditor.h"
@@ -37,8 +41,10 @@ using namespace std;
 #include "musicbrowserui.h"
 #include "gtkmessagedialog.h"
 
+#ifndef NO_CDAUDIO
 #include "cdaudio.h"
 #include "cdpmo.h"
+#endif
 
 #include "aps.h"
 #include "apsplaylist.h"
@@ -552,6 +558,7 @@ void GTKMusicBrowser::UpdateCD(void)
 
 void GTKMusicBrowser::EjectCD(void)
 {
+#ifndef NO_CDAUDIO
     Registry *pmoRegistry = m_context->player->GetPMORegistry();
     RegistryItem *pmo_item = NULL;
     int32 i = 0;
@@ -573,6 +580,7 @@ void GTKMusicBrowser::EjectCD(void)
     ((CDPMO*)pmo)->Eject();
 
     delete pmo;
+#endif
 }
 
 void GTKMusicBrowser::PlayMenu()

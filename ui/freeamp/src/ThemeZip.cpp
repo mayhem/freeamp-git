@@ -39,6 +39,10 @@ ____________________________________________________________________________*/
 #include "win32impl.h"
 #endif
 
+#ifdef __QNX__
+#include <strings.h>
+#endif
+
 #include "zlib.h"
 #include "config.h"
 #include "ThemeZip.h"

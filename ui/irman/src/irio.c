@@ -17,6 +17,10 @@
 
 #include "ir.h"
 
+#ifndef O_NDELAY
+#define O_NDELAY O_NONBLOCK
+#endif
+
 /* wrapper for ir_close_port() for use by atexit() */
 static void ir_close_port_on_exit(void) { (void) ir_close_port(); }
 

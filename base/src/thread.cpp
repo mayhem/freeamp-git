@@ -24,7 +24,8 @@ ____________________________________________________________________________*/
 #include "config.h"
 #include "thread.h"
 
-#if defined(__LINUX__) || defined(solaris) || defined(__FreeBSD__)
+#if defined(__LINUX__) || defined(solaris) || defined(__FreeBSD__) || \
+    defined(__QNX__)
     #include "pthreadthread.h"
 #elif WIN32
     #include "win32thread.h"
@@ -37,7 +38,8 @@ ____________________________________________________________________________*/
 Thread* Thread::CreateThread()
 {
     Thread* thread = NULL;
-#if defined(__LINUX__) || defined(solaris) || defined(__FreeBSD__)
+#if defined(__LINUX__) || defined(solaris) || defined(__FreeBSD__) || \
+    defined(__QNX__)
     thread = new pthreadThread();
 #elif WIN32
     thread = new win32Thread();

@@ -206,7 +206,8 @@ bool FindNextFile(HANDLE hFindHandle, WIN32_FIND_DATA *lpFindFileData) {
 bool FindClose(HANDLE hFindFile) {
     if (!hFindFile) return false;
     FindData *pFD = (FindData *)hFindFile;
-    closedir(pFD->pDir);
+    if (pFD->pDir)
+        closedir(pFD->pDir);
     if (pFD->dir)
         delete pFD->dir;
     if (pFD->rest)

@@ -213,6 +213,9 @@ Error Parse::DoParse(void)
 
         for(;;)
         {
+#ifdef __QNX__
+cout << szElement << endl;
+#endif
             iTemp = 0;
             sscanf(szElement + iOffset, " /%n", &iTemp);
             if (iTemp > 0)
@@ -227,7 +230,7 @@ Error Parse::DoParse(void)
                 break;
 
             iRet = sscanf(szElement + iOffset, 
-                          " %254[A-Za-z0-9:] = \"%254[^\"] \" %n", 
+                          " %254[A-Za-z0-9:] = \"%254[^\"] \"%n", 
                           szAttr, szValue, &iTemp);
             if (iRet < 2 || iTemp == 0)
             {

@@ -33,15 +33,10 @@ ____________________________________________________________________________*/
 #include <assert.h>
 
 #include "downloadmanager.h"
+#include "musiccatalog.h"
 
 #if defined(unix) || defined(__BEOS__) || defined(_BSD_SOURCE)
 #define SOCKET int
-#endif
-
-#if defined(unix) || defined(_BSD_SOURCE)
-#include <arpa/inet.h>
-#define closesocket(x) close(x)
-#define O_BINARY 0
 #endif
 
 #if !defined(WIN32)
@@ -60,19 +55,26 @@ typedef ostrstream ostringstream;
 #include <algorithm>
 #include <fstream>
 
-using namespace std;
+#if defined (unix) || defined(_BSD_SOURCE)
+#include <arpa/inet.h>
+#define closesocket(x) close(x)
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
+#endif
 
+using namespace std;
 
 #include "facontext.h"
 
 #include "errors.h"
 #include "registrar.h"
 #include "utility.h"
-#include "event.h"
 #include "eventdata.h"
-#include "musiccatalog.h"
-#include "debug.h"
 
+#ifdef __QNX__
+#include <strings.h>
+#endif
 
 DownloadManager::DownloadManager(FAContext* context)
 {

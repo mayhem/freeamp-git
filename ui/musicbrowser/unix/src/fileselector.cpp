@@ -25,6 +25,10 @@ ____________________________________________________________________________*/
 
 #include <unistd.h>
 
+#ifdef __QNX__
+#include <strings.h>
+#endif
+
 #include "fileselector.h"
 #include "utility.h"
 

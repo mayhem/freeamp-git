@@ -51,6 +51,7 @@ FREEAMPunixOBJ += base/unix/src/semaphore.o base/unix/src/utility.o
 FREEAMPsolarisOBJ = $(FREEAMPunixOBJ)
 FREEAMPlinuxOBJ   = $(FREEAMPunixOBJ)
 FREEAMPfreebsdOBJ = $(FREEAMPunixOBJ)
+FREEAMPqnxOBJ     = $(FREEAMPunixOBJ)
 
 FREEAMPbeosOBJ  = base/beos/src/beosprefs.o base/beos/src/beosthread.o
 FREEAMPbeosOBJ += base/beos/src/bootstrap.o base/beos/src/debug.o 
@@ -73,13 +74,14 @@ FREEAMPOBJ += io/src/pullbuffer.o io/src/tstream.o
 FREEAMPOBJ += base/src/undomanager.o #base/src/updatemanager.o
 FREEAMPOBJ += base/src/timer.o base/src/missingfile.o io/src/pipeline.o
 FREEAMPOBJ += $(FREEAMP$(HOST_OS)OBJ) $(APSOBJ)
-FREEAMPOBJ += lib/gdbm/lib/libfagdbm.a lib/xml/lib/libfaxml.a 
-FREEAMPOBJ += lib/zlib/lib/libzlib.a lib/http/lib/libfahttp.a
+FREEAMPOBJ += lib/gdbm/lib/libfagdbm.a lib/xml/src/Parse.o 
+FREEAMPOBJ += lib/zlib/lib/libzlib.a lib/http/src/Http.o
 #FREEAMPOBJ += dmallocc.o
 
 FREEAMPlinuxLIBS = -ldl -lpthread 
 FREEAMPsolarisLIBS = -ldl -lpthread
 FREEAMPfreebsdLIBS = -pthread
+FREEAMPqnxLIBS = -lasound
 UNIXFREEAMPLIBS = $(FREEAMP$(HOST_OS)LIBS) -lmusicbrainz $(EXTRALIBS) #-ldmallocthcxx
 
 BEOSFREEAMPLIBS = -lbe -lroot

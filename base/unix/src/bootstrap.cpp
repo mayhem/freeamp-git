@@ -27,9 +27,11 @@ ____________________________________________________________________________*/
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/types.h>
+#ifdef HAVE_SEMCTL
 #include <sys/ipc.h>
 #include <sys/sem.h> 
 #include <sys/shm.h> 
+#endif
 
 #include <sys/types.h>
 #include <signal.h>
@@ -90,6 +92,7 @@ int main(int argc, char **argv)
 {
     FAContext *context = new FAContext;
     UnixPrefs *unixPrefs = new UnixPrefs;
+#ifdef HAVE_SEMCTL
     key_t      tSemKey = iSemKey;
     key_t      tMemKey = iMemKey;
     int        iCmdSem = -1, iCmdMem = -1;
@@ -98,6 +101,7 @@ int main(int argc, char **argv)
 
     union semun unsem;
     unsem.val = 0;
+#endif
     
     context->prefs = unixPrefs;
     context->log = new LogFile("freeamp.log");
@@ -114,6 +118,7 @@ int main(int argc, char **argv)
     allow_mult = true;
 #endif
 
+#ifdef HAVE_SEMCTL
     if (!allow_mult) {
         iCmdSem = semget(tSemKey, 1, IPC_CREAT | 0660);
         if (iCmdSem < 0)
@@ -173,6 +178,7 @@ int main(int argc, char **argv)
             pCmdLine[0] = 0;
         }
     }
+#endif
 
 #ifdef DEBUG_MUTEXES
     struct sigaction sigact;
@@ -210,6 +216,7 @@ int main(int argc, char **argv)
     pmi = new Registry;
     registrar->InitializeRegistry(pmi,context->prefs);
 
+    registrar->SetSubDir("plugins");
     registrar->SetSearchString("*.pmo");
     pmo = new Registry;
     registrar->InitializeRegistry(pmo,context->prefs);
@@ -220,6 +227,7 @@ int main(int argc, char **argv)
     registrar->InitializeRegistry(ui,context->prefs);
 
     delete registrar;
+
 
     Semaphore *termSemaphore;
     termSemaphore = new Semaphore();
@@ -239,6 +247,7 @@ int main(int argc, char **argv)
         {
             if (!termSemaphore->TimedWait(1000))
             {
+#ifdef HAVE_SEMCTL
                 if (pCmdLine && strlen(pCmdLine) > 0 && !allow_mult)
                 {
                     int iItems = context->plm->CountItems();
@@ -268,12 +277,14 @@ int main(int argc, char **argv)
                     if (iItems == 0 || bPlay)
                         context->target->AcceptEvent(new Event(CMD_Play));
                 }
+#endif
             }
             else
                 break;
         }
     }
 
+#ifdef HAVE_SEMCTL
     if (!allow_mult) {
         if (pCmdLine)
             shmdt(pCmdLine);
@@ -281,6 +292,7 @@ int main(int argc, char **argv)
         semctl (iCmdSem, 0, IPC_RMID, unsem);
         shmctl (iCmdMem, IPC_RMID, 0);
     }
+#endif
 
     delete pP;
     delete context;

@@ -115,11 +115,20 @@ case "$host_os" in
     ;;
   irix*)
     AC_DEFINE(IRIX_CDAUDIO)
+    CFLAGS="$CFLAGS -fsquangle"
     ;;
   linux*)
     host_os="linux"
     AC_DEFINE(HAVE_LINUX)
     LDFLAGS="$LDFLAGS -Wl,-export-dynamic"
+    ;;
+  *qnx*)
+    host_os="qnx"
+    AC_DEFINE(QNX)
+    CFLAGS="-Wall -O2 -gdwarf-2 -I/usr/local/include"
+    LDFLAGS="$LDFLAGS -Wl,-export-dynamic -L/usr/local/lib"
+    LIBS="$LIBS -lsocket -lasound"
+    UNIX_AUDIO_API="qnx"
     ;;
   solaris*)
     AC_DEFINE(SOLARIS_GETMNTENT)
@@ -147,6 +156,14 @@ case "$host_os" in
     
 esac  
 
+if test "$UNIX_AUDIO_API" = "qnx"; then
+   AC_DEFINE(NO_CDAUDIO)
+else
+   OSDEPPLUGINS="$OSDEPPLUGINS plugins/cd.lmc"
+   OSDEPPLUGINS="$OSDEPPLUGINS plugins/cd.pmo"
+   OSDEPPLUGINS="$OSDEPPLUGINS plugins/cddb.mdf"
+fi
+
 dnl *********************************
 dnl Check for dynamic loading library
 dnl *********************************
@@ -159,7 +176,8 @@ elif test "$host_os" = "freebsd"; then
   )
 else
   AC_CHECK_LIB(dl, dlopen, foo="bar", 
-    AC_MSG_ERROR([FreeAmp requires the ability to load libraries dynamically (using dlopen)])
+     AC_CHECK_LIB(c, dlopen, foo="bar",
+         AC_MSG_ERROR([FreeAmp requires the ability to load libraries dynamically (using dlopen)]))
   )
 fi
 
@@ -336,6 +354,11 @@ fi
 AC_SUBST(ESD_LIBS)
 
 dnl optional freetype support..
+save_CPPFLAGS="$CPPFLAGS"
+CPPFLAGS="$CPPFLAGS -I/usr/local/include"
+AC_LANG_SAVE
+AC_LANG_C
+AC_CHECK_HEADERS(orb/orbit.h, have_orbit="true", have_orbit="false")
 
 AC_CHECK_HEADERS(freetype.h, have_freetype="true", have_freetype="false")
 
@@ -343,6 +366,8 @@ if test "$have_freetype" = "false"; then
   AC_CHECK_HEADERS(freetype/freetype.h, have_freetype="true", 
                     have_freetype="false")
 fi
+CPPFLAGS="$save_CPPFLAGS"
+AC_LANG_RESTORE
 
 TTF_LIBS=""
 if test "$have_freetype" = "true"; then
@@ -445,8 +470,14 @@ else
   echo "so go get the latest version of GTK+ from http://www.gtk.org"
 fi
 
+if test "$host_os" = "qnx"; then
+   EXTRALIBS="$EXTRALIBS $GTK_LIBS"
+   GTK_LIBS=""
+fi
+
 AC_SUBST(GTK_CFLAGS)
 AC_SUBST(GTK_LIBS)
+AC_SUBST(EXTRALIBS)
 
 AC_SUBST(CFLAGS)
 
@@ -513,13 +544,17 @@ elif test "$host_os" = "freebsd"; then
     AC_MSG_ERROR([FreeAmp requires pthreads]))
 else
   AC_CHECK_LIB(pthread, pthread_create, foo="bar",
-    AC_MSG_ERROR([FreeAmp requires pthreads (-lpthread must work)]))
+    AC_CHECK_LIB(c, pthread_create, foor="bar",
+       AC_MSG_ERROR([FreeAmp requires pthreads (-lpthread must work)])))
 fi
 
 dnl *****
 
-AC_CHECK_LIB(musicbrainz, mb_GenerateSignature, ,
+AC_LANG_SAVE
+AC_LANG_CPLUSPLUS
+AC_CHECK_LIB(musicbrainz, mb_New, ,
   AC_MSG_ERROR([FreeAmp requires that the MusicBrainz client library be installed.]))
+AC_LANG_RESTORE
 
 #AM_CONDITIONAL(AM_HAVE_LINUXTHREADS, test "$hblt" = "true")
 
@@ -633,6 +668,10 @@ exit(0);
    else
       AC_MSG_RESULT(yes)
    fi
+fi
+
+if test "$host_os" = "qnx"; then
+   have_alsa=false
 fi
 
 ALSAPMOPLUGIN=plugins/alsa.pmo

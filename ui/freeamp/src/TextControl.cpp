@@ -26,6 +26,10 @@ ____________________________________________________________________________*/
 #include "Window.h"
 #include "debug.h"
 
+#ifdef __QNX__
+#include <strings.h>
+#endif
+
 #define DB Debug_v("%s:%d\n", __FILE__, __LINE__);
 
 static TransitionInfo pTransitions[] =

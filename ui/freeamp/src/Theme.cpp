@@ -37,7 +37,9 @@ ____________________________________________________________________________*/
 #include <io.h>
 #else
 #include <unistd.h>
+#ifndef _S_IFDIR
 #define _S_IFDIR S_IFDIR
+#endif
 #define _stat stat
 #endif
 #include <map>
@@ -68,6 +70,10 @@ ____________________________________________________________________________*/
 #define MKDIR(z) mkdir(z)
 #else
 #define MKDIR(z) mkdir(z, 0755)
+#endif
+
+#ifdef __QNX__
+#include <strings.h>
 #endif
 
 #ifdef WIN32

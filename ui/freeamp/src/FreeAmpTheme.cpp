@@ -35,13 +35,19 @@ ____________________________________________________________________________*/
 #ifndef WIN32
 #include <unistd.h>
 #define _stat stat
+#ifndef _S_IFDIR
 #define _S_IFDIR S_IFDIR
+#endif
 #endif
 #if defined(WIN32)
 #define STRICT
 #endif
 #include "config.h"
 #include "downloadmanager.h"
+
+#ifdef __QNX__
+#include <strings.h>
+#endif
 
 #ifdef HAVE_GTK
 #include "GTKUtility.h"

@@ -28,6 +28,10 @@ ____________________________________________________________________________*/
 #include <strstream>
 #include <iostream>
 
+#ifdef __QNX__
+#include <strings.h>
+#endif
+
 #include "utility.h"
 #include "downloadui.h"
 #include "help.h"

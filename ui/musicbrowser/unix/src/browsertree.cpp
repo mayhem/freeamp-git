@@ -34,6 +34,11 @@ ____________________________________________________________________________*/
 #include <unistd.h>
 #endif
 
+
+#ifdef __QNX__
+#include <strings.h>
+#endif
+
 #if defined(unix) || defined(__BEOS__)
 #define SOCKET int
 #endif
@@ -1188,6 +1193,7 @@ void GTKMusicBrowser::stream_timer_func(void *arg)
 
 void GTKMusicBrowser::StreamTimer(void)
 {
+#ifndef __QNX__
     Error  eRet;
     Http   streamDownload(m_context);
     string page;
@@ -1215,6 +1221,7 @@ void GTKMusicBrowser::StreamTimer(void)
         HandleStreamList(list);
     else
        cout << "no streams.\n";
+#endif
 }
 
 void GTKMusicBrowser::HandleStreamList(vector<FreeAmpStreamInfo> &list)

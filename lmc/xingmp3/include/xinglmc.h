@@ -117,7 +117,7 @@ class     XingLMC:public LogicalMediaConverter
 
    virtual Error SetDecodeInfo(DecodeInfo &info);
 
-   virtual vector<const char *> *GetExtensions(void);
+   virtual vector<string> *GetExtensions(void);
    
  private:
 

@@ -33,6 +33,10 @@ ____________________________________________________________________________*/
 #include <netinet/in.h>
 #endif
 
+#ifdef __QNX__
+#include <strings.h>
+#endif
+
 #include "config.h"
 #include "errors.h"
 #include "utility.h"

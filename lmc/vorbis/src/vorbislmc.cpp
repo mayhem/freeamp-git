@@ -121,9 +121,9 @@ void VorbisLMC::Clear()
       ((EventBuffer *)m_pOutputBuffer)->Clear();
 }
 
-vector<const char *> *VorbisLMC::GetExtensions(void)
+vector<string> *VorbisLMC::GetExtensions(void)
 {
-   vector<const char *> *extList = new vector<const char *>;
+   vector<string> *extList = new vector<string>;
 
    extList->push_back("OGG");
 

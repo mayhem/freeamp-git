@@ -31,7 +31,8 @@ ____________________________________________________________________________*/
 #include "config.h"
 #include "timer.h"
 
-#if defined(__linux__) || defined(solaris) || defined(__FreeBSD__)
+#if defined(__linux__) || defined(solaris) || defined(__FreeBSD__) || \
+    defined(__QNX__)
 #include <unistd.h>
 #define GoToSleep(x) usleep(x*1000)
 #elif defined(WIN32)

@@ -164,7 +164,6 @@ InitializeRegistry(Registry* registry, Preferences* prefs)
                     item->SetModule(module);
 
                     init = (InitializeFunction)GetProcAddress(module, "Initialize");
-
                     if(init)
                     {
                         error = kError_NoErr;

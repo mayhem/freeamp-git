@@ -23,6 +23,11 @@ ____________________________________________________________________________*/
 
 #include <string.h>
 #include <stdlib.h>
+
+#ifdef __QNX__
+#include <strings.h>
+#endif
+
 #include "preferences.h"
 
 

@@ -58,6 +58,8 @@ ____________________________________________________________________________*/
 
 #undef DEBUG_MUTEXES
 #undef USING_DMALLOC
+#undef HAVE_SEMCTL
+#undef NO_CDAUDIO
 
 #ifdef USING_DMALLOC
 #include <dmalloc.h>

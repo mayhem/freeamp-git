@@ -25,6 +25,10 @@ ____________________________________________________________________________*/
 #include <string>
 #include <errno.h>
 
+#ifdef __QNX__
+#include <strings.h>
+#endif
+
 using namespace std;
 
 #include "config.h"

@@ -39,7 +39,6 @@ PLUGINS += plugins/httpinput.pmi
 PLUGINS += plugins/obsinput.pmi
 
 PLUGINS += plugins/soundcard.pmo
-PLUGINS += plugins/cd.pmo
 PLUGINS += plugins/wavout.pmo
 PLUGINS += plugins/signature.pmo
 
@@ -50,13 +49,11 @@ PLUGINS += plugins/irman.ui
 
 PLUGINS += plugins/xingmp3.lmc
 PLUGINS += plugins/vorbis.lmc
-PLUGINS += plugins/cd.lmc
 
 PLUGINS += plugins/id3v1.mdf
 PLUGINS += plugins/id3v2.mdf
 PLUGINS += plugins/vorbis.mdf
 PLUGINS += plugins/misc.mdf
-PLUGINS += plugins/cddb.mdf
 
 PLUGINS += plugins/m3u.plf
 PLUGINS += plugins/pls.plf
@@ -133,12 +130,14 @@ plugins/cd.pmo: $(CDPMOOBJ)
 
 # wav out
 WAVPMOOBJ  = io/wavout/src/wavoutpmo.o io/wavout/src/wav.o 
+WAVPMOOBJ += io/src/pmo.o io/src/pipeline.lo
 
 plugins/wavout.pmo: $(WAVPMOOBJ)
 	$(LINKMOD) -o $@ $(WAVPMOOBJ)
 
 # signature
-SIGNATUREPMOOBJ = io/signature/src/signaturepmo.o
+SIGNATUREPMOOBJ  = io/signature/src/signaturepmo.o io/src/pmo.o 
+SIGNATUREPMOOBJ += io/src/pipeline.lo
 
 plugins/signature.pmo: $(SIGNATUREPMOOBJ)
 	$(LINKMOD) -o $@ $(SIGNATUREPMOOBJ)
@@ -168,7 +167,7 @@ UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/gtkmessagedialog.o
 UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/introwizard.o
 UNIXMUSICBROWSEROBJ += ui/musicbrowser/unix/src/missingfileui.o
 UNIXMUSICBROWSEROBJ += ui/musicbrowser/src/FreeAmpStreams.o
-UNIXMUSICBROWSEROBJ += lib/xml/src/Parse.lo lib/http/lib/libfahttp.la
+UNIXMUSICBROWSEROBJ += lib/xml/src/Parse.lo
 UNIXMUSICBROWSERLIBS = $(GTK_LIBS)
 
 BEOSMUSICBROWSEROBJ  = ui/musicbrowser/beos/src/MusicBrowserUI.o
@@ -207,13 +206,13 @@ FREEAMPUIOBJ += ui/freeamp/src/VSliderControl.o ui/freeamp/src/Panel.o
 FREEAMPUIOBJ += ui/freeamp/src/Window.o ui/freeamp/src/ButtonControl.o 
 FREEAMPUIOBJ += ui/freeamp/src/Control.o ui/freeamp/src/TextControl.o 
 FREEAMPUIOBJ += ui/freeamp/src/DialControl.o ui/freeamp/src/Font.o 
-FREEAMPUIOBJ += ui/freeamp/src/FreeAmpTheme.o ui/freeamp/src/ThemeZip.o 
+FREEAMPUIOBJ += ui/freeamp/src/FreeAmpTheme.doh ui/freeamp/src/ThemeZip.o 
 FREEAMPUIOBJ += ui/freeamp/src/MultiStateControl.o ui/freeamp/src/Headlines.o
 FREEAMPUIOBJ += ui/freeamp/src/ForeignTheme.o base/src/utility.lo
 FREEAMPUIOBJ += ui/freeamp/src/PixFontControl.o ui/freeamp/src/PixTimeControl.o
 FREEAMPUIOBJ += ui/freeamp/src/Equalizer.o ui/freeamp/src/PixSliderControl.o
 FREEAMPUIOBJ += lib/zlib/lib/libzlib.la lib/xml/src/Parse.lo
-FREEAMPUIOBJ += lib/unzip/lib/libunzip.la lib/http/lib/libfahttp.la
+FREEAMPUIOBJ += lib/unzip/lib/libunzip.la 
 FREEAMPUIOBJ += $($(OSTYPE)FREEAMPUIOBJ)
 FREEAMPUILIBS = $($(OSTYPE)FREEAMPUILIBS)
 
@@ -227,6 +226,7 @@ UNIXFREEAMPUIOBJ += ui/freeamp/unix/src/ttfont.o
 UNIXFREEAMPUIOBJ += ui/freeamp/unix/src/ThemeManager.o 
 UNIXFREEAMPUIOBJ += ui/freeamp/unix/src/GTKPreferenceWindow.o 
 UNIXFREEAMPUIOBJ += ui/freeamp/unix/src/GTKFileSelector.o  
+UNIXFREEAMPUIOBJ += ui/musicbrowser/unix/src/gtkmessagedialog.o
 UNIXFREEAMPUILIBS = $(GTK_LIBS) $(TTF_LIBS) $(GDK_PIXBUF_LIBS)
 
 BEOSFREEAMPUIOBJ  = ui/freeamp/beos/src/BeOSWindow.o
@@ -254,7 +254,7 @@ MAKETHEMEOBJ += base/unix/src/win32impl.o
 MAKETHEMEOBJ += lib/zlib/lib/libzlib.a lib/unzip/lib/libunzip.la
 
 MakeTheme: $(MAKETHEMEOBJ)
-	$(CXXLINK) $(MAKETHEMEOBJ) -ldl
+	$(CXXLINK) $(MAKETHEMEOBJ)
 
 # cmdline
 CMDUIOBJ = ui/cmdline/cmdlineUI.o 
@@ -446,7 +446,7 @@ plugins/winamp.ftf: $(WINAMPOBJ)
 
 # kjofol
 
-KJOFOLOBJ = ftc/kjofol/kjofol.o
+KJOFOLOBJ = ftc/kjofol/kjofol.doh
 
 plugins/kjofol.ftf: $(KJOFOLOBJ)
 	$(LINKMOD) -o $@ $(KJOFOLOBJ) $(STATICLD)

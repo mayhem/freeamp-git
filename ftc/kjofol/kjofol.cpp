@@ -33,6 +33,10 @@ using namespace std;
 #include "win32impl.h"
 #endif
 
+#ifdef __QNX__
+#include <strings.h>
+#endif
+
 #ifdef WIN32
 #include "Win32Bitmap.h"
 #elif defined(HAVE_GTK)

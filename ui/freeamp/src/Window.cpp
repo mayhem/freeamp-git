@@ -441,6 +441,7 @@ void Window::HandleMouseMove(Pos &oScreenPos)
        m_oMoveStart.y2 += (oScreenPos.y - m_oMovePos.y);
 
        oActualPos = m_oMoveStart;
+
        if (m_iDesktopWidth > 0 && m_iDesktopHeight > 0)
        {
            if ((oActualPos.x1 >= 0 && oActualPos.x1 < iDesktopSnapAmount) || 

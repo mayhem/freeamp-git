@@ -30,6 +30,10 @@ ____________________________________________________________________________*/
 #include <sys/types.h>
 #include <dirent.h>
 
+#ifdef __QNX__
+#include <strings.h>
+#endif
+
 GTKFont::GTKFont(FAContext *context, string &oName, string &oFace, 
                  string &oFile, string &oDefault) :
                 Font(oName, oFace, oFile, oDefault)

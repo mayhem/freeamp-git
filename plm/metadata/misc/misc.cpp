@@ -33,6 +33,10 @@ ____________________________________________________________________________*/
 #include <assert.h>
 #include <errno.h>
 
+#ifdef __QNX__
+#include <strings.h>
+#endif
+
 #include "config.h"
 #include "errors.h"
 #include "utility.h"
@@ -68,7 +72,7 @@ Misc::Misc(FAContext* context):MetaDataFormat(context)
         RegistryItem* temp = m_lmcReg.GetItem(i);
 
         lmc = (LogicalMediaConverter *)temp->InitFunction()(m_context);
-        vector<const char*>* extList = lmc->GetExtensions();
+        vector<string>* extList = lmc->GetExtensions();
 
         for (uint32 j = 0; j < extList->size(); j++)
         {

@@ -26,6 +26,10 @@ ____________________________________________________________________________*/
 #include <string>
 #include <stdlib.h>
 
+#ifdef __QNX__
+#include <strings.h>
+#endif
+
 using namespace std;
 
 #include "config.h"

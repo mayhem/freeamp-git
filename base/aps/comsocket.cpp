@@ -39,7 +39,9 @@ ____________________________________________________________________________*/
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
+#ifndef __QNX__
 #include <sys/poll.h>
+#endif
 #include <fcntl.h>
 #include <net/if.h>
 #include <sys/ioctl.h>
@@ -54,6 +56,70 @@ ____________________________________________________________________________*/
 #define SOL_TCP IPPROTO_TCP
 #endif
 
+#ifdef __QNX__
+struct pollfd
+{
+   int            fd;
+   unsigned short events;
+   unsigned short revents;
+};
+
+#define POLLIN   1
+#define POLLOUT  4
+#define POLLPRI  2
+#define POLLERR  8
+#define POLLHUP  16
+#define POLLNVAL 32
+
+static int poll(struct pollfd *fds, unsigned int nfds, int timeout)
+{
+    struct timeval tv;
+    fd_set rset, wset, xset;
+    struct pollfd *f;
+    int ready;
+    int maxfd = 0;
+
+    FD_ZERO(&rset);
+    FD_ZERO(&wset);
+    FD_ZERO(&xset);
+
+    for (f = fds; f < &fds[nfds]; ++f)
+        if (f->fd >= 0)
+        {
+         if (f->events & POLLIN)
+            FD_SET(f->fd, &rset);
+         if (f->events & POLLOUT)
+            FD_SET(f->fd, &wset);
+         if (f->events & POLLPRI)
+            FD_SET(f->fd, &xset);
+         if (f->fd > maxfd && (f->events & (POLLIN|POLLOUT|POLLPRI)))
+            maxfd = f->fd;
+     }
+
+  tv.tv_sec = timeout / 1000;
+  tv.tv_usec = (timeout % 1000) * 1000;
+
+  ready = select(maxfd + 1, &rset, &wset, &xset, timeout == -1 ? NULL : &tv);
+
+  if (ready > 0)
+     for (f = fds; f < &fds[nfds]; ++f)
+     {
+         f->revents = 0;
+         if (f->fd >= 0)
+         {
+             if (FD_ISSET(f->fd, &rset))
+                   f->revents |= POLLIN;
+               if (FD_ISSET(f->fd, &wset))
+                   f->revents |= POLLOUT;
+               if (FD_ISSET(f->fd, &xset))
+                   f->revents |= POLLPRI;
+           }
+       }
+
+    return ready;
+}
+#endif
+ 
 COMSocket::COMSocket(int nSocket, int nSockType)
 {
 	m_nSocket = nSocket;
@@ -90,7 +156,7 @@ int COMSocket::Connect(const char* pIP, int nPort, int nType, bool
 	}
 	memset((char*)&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
-	bcopy((char*)(pServer->h_addr), (char*)&(addr.sin_addr.s_addr), pServer->h_length);
+	memcpy((char*)&(addr.sin_addr.s_addr), (char*)(pServer->h_addr), pServer->h_length);
 	addr.sin_port = htons(nPort);
 
 	int nflag = 1;
@@ -271,7 +337,7 @@ int COMSocket::NBConnect(const char* pIP, int nPort, int nType, int nTimeout)
 	}
 	memset((char*)&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
-	bcopy((char*)(pServer->h_addr), (char*)&(addr.sin_addr.s_addr), pServer->h_length);
+	memcpy((char*)&(addr.sin_addr.s_addr), (char*)(pServer->h_addr), pServer->h_length);
 	addr.sin_port = htons(nPort);
 
 	int nflag = 1;
@@ -342,8 +408,9 @@ int COMSocket::NBConnect(const char* pIP, int nPort, int nType, int nTimeout)
 /** Sets multicast packets to only go through the NIC labeled pNIC */
 int COMSocket::SetMCastInterface(const char* pNIC)
 {
-#ifdef __FreeBSD__
+#ifndef __linux__
 #warning WARNING COMSocket::SetMCastInterface is NOT IMPLEMENTED
+    return -1;
 #else
 	struct ip_mreqn mReq;
 	memset(&mReq, 0, sizeof(ip_mreq));

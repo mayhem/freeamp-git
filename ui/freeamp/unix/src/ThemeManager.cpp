@@ -31,6 +31,10 @@ ____________________________________________________________________________*/
 #include "utility.h"
 #include "win32impl.h"
 
+#ifdef __QNX__
+#include <strings.h>
+#endif
+
 #define THEME_IN_DEVEL "<theme in development>"
 
 ThemeManager::ThemeManager(FAContext *pContext)

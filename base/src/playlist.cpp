@@ -37,6 +37,10 @@ ____________________________________________________________________________*/
 
 using namespace std;
 
+#ifdef __QNX__
+#include <strings.h>
+#endif
+
 #include "config.h"
 
 #include "playlist.h"

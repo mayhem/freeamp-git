@@ -49,8 +49,14 @@ ____________________________________________________________________________*/
 #if defined(unix) || defined(_BSD_SOURCE)
 #include <arpa/inet.h>
 #define closesocket(x) close(x)
+#ifndef O_BINARY
 #define O_BINARY 0
+#endif
 #endif  
+
+#ifdef __QNX__
+#include <strings.h>
+#endif
 
 #include "Http.h"
 

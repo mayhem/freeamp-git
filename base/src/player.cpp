@@ -41,6 +41,10 @@ ____________________________________________________________________________*/
 #define MKDIR(z) mkdir(z, 0755)
 #endif
 
+#ifdef __QNX__
+#include <strings.h>
+#endif
+
 #include <set>
 
 #include "config.h"
@@ -1030,8 +1034,8 @@ RegisterLMCs(Registry * registry)
       RegistryItem* temp = registry->GetItem(iLoop);
 
       lmc = (LogicalMediaConverter *)temp->InitFunction()(m_context);
-      vector<const char *> *extList = lmc->GetExtensions();
-      vector<const char *>::iterator i;
+      vector<string> *extList = lmc->GetExtensions();
+      vector<string>::iterator i;
 
       for (i = extList->begin(); i != extList->end(); i++)
       {
