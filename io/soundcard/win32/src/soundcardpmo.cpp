@@ -73,7 +73,7 @@ SoundCardPMO::SoundCardPMO(FAContext *context) :
 {
    MMRESULT mmresult = 0;
    Int32PropValue *pProp;
-   hWnd =0;
+   m_hWnd =0;
    
    m_wfex = NULL;
    m_wavehdr_array = NULL;
@@ -111,9 +111,9 @@ pBase = 0;
               (PropValue **)&pProp)))
       return;        
    else
-      hWnd = (HWND)pProp->GetInt32();
+      m_hWnd = (HWND)pProp->GetInt32();
    
-   SetupVolumeControl( hWnd );
+   SetupVolumeControl( m_hWnd );
 } 
 
 SoundCardPMO::~SoundCardPMO()
@@ -124,7 +124,6 @@ SoundCardPMO::~SoundCardPMO()
 
    if (m_initialized)
    {
-      mixerClose(m_hmixer);
       waveOutReset(m_hwo);
 
       for(int iLoop = 0; iLoop < m_num_headers; iLoop++)
@@ -152,6 +151,12 @@ SoundCardPMO::~SoundCardPMO()
    {
       delete g_pHeaderMutex;
       g_pHeaderMutex = NULL;
+   }
+
+   if ( m_volume )
+   {
+        delete m_volume;
+        m_volume = NULL;
    }
 }
 

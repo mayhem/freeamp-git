@@ -38,6 +38,7 @@ ____________________________________________________________________________*/
 #include "eventbuffer.h"
 #include "preferences.h"
 #include "facontext.h"
+#include "Win32Volume.h"
 
 class SoundCardPMO : public PhysicalMediaOutput
 {
@@ -55,7 +56,7 @@ public:
  
  private:
 
-    bool          SetupVolumeControl(void);
+    bool          SetupVolumeControl( HWND );
     void          WorkerThread(void); 
     virtual Error Reset(bool user_stop);
     void          HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent);
@@ -72,7 +73,6 @@ public:
     WAVEFORMATEX*   m_wfex;
     WAVEHDR*        m_wavehdr_array;
     HWAVEOUT        m_hwo;
-    HMIXER          m_hmixer;
 
     uint32          m_buffer[MAXCHANNELS];
     uint32          m_channels;
@@ -90,6 +90,9 @@ public:
     string          m_oDstLineName, m_oVolumeControlName;
     DWORD           m_dwMinimum, m_dwMaximum, m_dwVolumeControlID;
     char           *pBase;
+
+    Win32Volume    *m_volume;
+    HWND            m_hWnd;
 };
 
 #endif /* _SOUNDCARDPMO_H_ */
