@@ -490,6 +490,12 @@ WAVEHDR *SoundCardPMO::NextHeader(bool bFreeHeadersOnly)
        if (bFreeHeadersOnly)
            return NULL;
 
+	   // Toss out frames that have been consumed
+       NextHeader(true);
+	   if (m_iHead == m_iTail)
+	      m_iBaseTime = MAXINT32;
+
+       CheckForBufferUp();
        usleep(10000);
    }
 
@@ -566,14 +572,18 @@ void SoundCardPMO::WorkerThread(void)
           if (eErr == kError_NoDataAvail)
           {
               m_pLmc->Wake();
-              CheckForBufferUp();
 
               // Calling NextHeader with a true arguments just  
               // cleans up the pending headers so the bytes in use
               // value is correct.
               NextHeader(true);
               HandleTimeInfoEvent(NULL);
+			  if (m_iHead == m_iTail)
+				  m_iBaseTime = MAXINT32;
 			  WasteTime();
+
+              CheckForBufferUp();
+
               continue;
           }
 

@@ -1762,8 +1762,7 @@ void FreeAmpTheme::HandleMouseWheelClick(void)
     int    iState;
 	string oControlName("Mute");
 
-    m_pWindow->ControlIntValue(oControlName, false, iState);
-    if (iState == 0)
+    if (m_iMuteVolume < 0)
     {
         m_iMuteVolume = m_iVolume;
         m_iVolume = 0;
