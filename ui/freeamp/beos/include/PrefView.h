@@ -151,10 +151,6 @@ public:
     virtual void        MessageReceived( BMessage* message );
     void                Apply( void );
 
-    void                SetSaveMusicDirectory( const char* path );
-    void                SetCheckForUpdates( bool flag );
-    void                SetDecoderThreadPriority( int32 prio );
-
 protected:
     void                GetPrefsValues( Preferences* prefs,
                                         PrefsStruct* values );

@@ -116,7 +116,11 @@ BeOSCanvas::RenderText( int iFontHeight, Rect& oClipRect,
     BRegion clipRegion;
     clipRegion.Set( clipRect );
 
-    bitmap->Lock();
+    if ( !bitmap->Lock() )
+    {
+        puts( "lock failed" );
+        return 0;
+    }
 
     v->ConstrainClippingRegion( &clipRegion );
     v->SetDrawingMode( B_OP_OVER );
@@ -178,7 +182,11 @@ BeOSCanvas::RenderOffsetText( int iFontHeight, Rect& oClipRect,
     BRegion clipRegion;
     clipRegion.Set( clipRect );
 
-    bitmap->Lock();
+    if ( !bitmap->Lock() )
+    {
+        puts( "Lock Failed" );
+        return 0;
+    }
 
     v->ConstrainClippingRegion( &clipRegion );
     if ( bBold )

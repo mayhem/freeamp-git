@@ -43,6 +43,13 @@ public:
                                   Rect& oDestRect );
     virtual Error       MaskBlitRect( Bitmap* pSrcBitmap, Rect& oSrcRect,
                                       Rect& oDestRect );
+    virtual Error       BlitRectMaskBitmap( Bitmap* pSrcBitmap, Rect& oSrcRect, 
+                                            Rect& oDestRect );
+    virtual Bitmap*     Clone( void );
+    virtual Error       MakeTransparent( Rect& oRect );
+    virtual void        GetColor( Pos oPos, Color& oColor );
+    virtual void        GetSize( Pos& oPos );
+
     BBitmap*            GetBBitmap( void ) { return m_bitmap; }
     BView*              OffscreenView( void ) { return m_offView; }
 

@@ -48,21 +48,22 @@ BeOSPreferenceWindow::~BeOSPreferenceWindow()
 bool
 BeOSPreferenceWindow::Show( Window* parent )
 {
-#if BEOSPREF
     if ( PrefWindow::IsRunning() ) return true;
 
     if ( !m_prefWindow )
     {
         BRect r( 100, 100, 600, 500 );
-        m_prefWindow = new PrefWindow( r, "Preference" );
+        m_prefWindow = new PrefWindow( r, "Preference",
+                                       m_pContext, m_pThemeMan );
+#if 0
         r.OffsetTo( B_ORIGIN );
         m_prefView = new PrefView( m_pContext, m_pThemeMan,
                                    r, "PrefView" );
         m_prefWindow->AddChild( m_prefView );
+#endif
     }
 
     m_prefWindow->Show();
 
-#endif
     return true;
 }

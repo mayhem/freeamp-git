@@ -46,6 +46,72 @@ ____________________________________________________________________________*/
 #include <string>
 #include <map>
 
+class FormManager
+{
+public:
+    enum { ROWS, COLUMNS };
+
+                    FormManager( uint32 orientation );
+    virtual         ~FormManager();
+    void            Init( void );
+    void            AddView( BView* view );
+    void            MakeEmpty( void ) { m_views.clear(); }
+    void            SetOrigin( BPoint origin ) { m_origin = origin; }
+    void            SetSpacing( float spacing ) { m_spacing = spacing; }
+
+    static const float DEFAULT_SPACING;
+protected:
+
+private:
+    uint32          m_orientation;
+    vector<BView*>  m_views;
+    BPoint          m_origin;
+    float           m_spacing;
+};
+
+const float
+FormManager::DEFAULT_SPACING = 10;
+
+FormManager::FormManager( uint32 orientation )
+:   m_orientation( orientation ),
+    m_origin( B_ORIGIN ),
+    m_spacing( DEFAULT_SPACING )
+{
+}
+
+FormManager::~FormManager()
+{
+}
+
+void
+FormManager::AddView( BView* view )
+{
+    m_views.push_back( view );
+}
+
+void
+FormManager::Init( void )
+{
+    BPoint leftTop( m_origin );
+    vector<BView*>::iterator i;
+    for ( i = m_views.begin(); i != m_views.end(); i++ )
+    {
+        (*i)->MoveTo( leftTop );
+        (*i)->Frame().PrintToStream();
+        (*i)->ResizeToPreferred();
+        (*i)->Frame().PrintToStream();
+puts( "-" );
+        if ( m_orientation == ROWS )
+        {
+            leftTop.y = (*i)->Frame().bottom + m_spacing;
+        }
+        else
+        {
+            leftTop.x = (*i)->Frame().right + m_spacing;
+        }
+    }
+}
+
 const char* FREEAMP_ABOUT_TEXT =
     "FreeAmp is an Open Source effort to build the best digital audio player "
     "available.  In the interest of supporting the free software community, "
@@ -212,7 +278,8 @@ PrefView::MessageReceived( BMessage* message )
             BEntry entry( &ref );
             BPath path;
             entry.GetPath( &path );
-            SetPrefString(kSaveMusicDirPref,  path.Path() );
+            m_proposedValues.saveMusicDirectory = string( path.Path() );
+            m_saveMusicFolder->SetText( path.Path() );
 
             // need to delete file panel myself.
             delete m_filePanel;
@@ -221,7 +288,8 @@ PrefView::MessageReceived( BMessage* message )
         break;
     case MSG_SET_CHECK_FOR_UPDATES:
         message->PrintToStream();
-        SetPrefBoolean(kCheckForUpdatesPref,  (message->FindInt32( "be:value" ) == B_CONTROL_ON) );
+        m_proposedValues.checkForUpdates =
+            (message->FindInt32( "be:value" ) == B_CONTROL_ON);
         break;
     case MSG_SET_RECLAIM_FILETYPES:
         m_proposedValues.reclaimFiletypes =
@@ -282,7 +350,8 @@ PrefView::MessageReceived( BMessage* message )
         }
         break;
     case MSG_SET_DECODER_PRIORITY:
-        SetPrefInt32(kDecoderThreadPriorityPref,  message->FindInt32( "be:value" ) );
+        m_proposedValues.decoderThreadPriority
+            = message->FindInt32( "be:value" );
         break;
     default:
         BView::MessageReceived( message );
@@ -508,39 +577,51 @@ PrefView::CreateGeneralPane( void )
 {
     BBox* box;
     BButton* button;
-    BRect rect;
-    BRect bounds( m_general->Bounds() );
-    BRect rect1( bounds );
-    rect1.InsetBy( GRID_UNIT, GRID_UNIT );
+    BRect rect( m_general->Bounds() );
+    BRect rect1;
+    rect.InsetBy( GRID_UNIT, GRID_UNIT );
     float w, h;
 
+    FormManager layout( FormManager::ROWS );
+    layout.SetOrigin( BPoint( GRID_UNIT, GRID_UNIT ) );
+    FormManager boxLayout( FormManager::ROWS );
+    boxLayout.SetOrigin( BPoint( BOX_INSET, BOX_INSET ) );
+
     // --------------------- Save Music Folder Box ----------------------------
+    rect1 = rect;
     box = new BBox( rect1, "SaveMusicFolderBox",
                     B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP );
     box->SetLabel( "Save Music Folder" );
+
+    rect1 = box->Bounds();
+    rect1.InsetBy( BOX_INSET, BOX_INSET );
+
     button = new BButton( BRect(0,0,0,0), "Browse", "Browse"B_UTF8_ELLIPSIS,
                           new BMessage( MSG_BROWSE_DIR ),
                           B_FOLLOW_RIGHT|B_FOLLOW_TOP );
     button->ResizeToPreferred();
     button->GetPreferredSize( &w, &h );
-    button->MoveTo( rect1.right - GRID_UNIT - w, rect1.top + GRID_UNIT );
-    m_general->AddChild( button );
+    button->MoveTo( rect1.right - w, rect1.top );
+    box->AddChild( button );
     m_controls.push_back( button );
 
-    rect.Set( 0, 0, button->Frame().left, 0 );
-    rect.InsetBy( GRID_UNIT, GRID_UNIT );
-    m_saveMusicFolder = new BTextControl( rect, "SaveMusicFolder",
+    rect1.Set( BOX_INSET, BOX_INSET, button->Frame().left - BOX_INSET, 0 );
+    m_saveMusicFolder = new BTextControl( rect1, "SaveMusicFolder",
                                           NULL, NULL, NULL,
                                           B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP );
     m_saveMusicFolder->SetText( m_originalValues.saveMusicDirectory.c_str() );
     m_saveMusicFolder->GetPreferredSize( &w, &h );
-    rect1.bottom = rect1.top + h + 2 * GRID_UNIT;
-    box->ResizeTo( rect1.Width(), rect1.Height() );
     box->AddChild( m_saveMusicFolder );
+    rect1 = m_saveMusicFolder->Frame();
+
+    box->ResizeTo( box->Frame().Width(), rect1.bottom + BOX_INSET );
     m_general->AddChild( box );
+    rect1 = box->Frame();
+
+    layout.AddView( box );
 
     // ------------------ Update Manager box ---------------------------------
-    rect1.top = rect1.bottom + GRID_UNIT;
+    rect1 = rect;
     box = new BBox( rect1, "UpdateManager", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP );
     box->SetLabel( "Update Manager" );
 
@@ -551,9 +632,10 @@ PrefView::CreateGeneralPane( void )
     BCheckBox* checkBox;
     checkBox = new BCheckBox( rect1, "CheckForUpdates", "Check for updates",
                               new BMessage( MSG_SET_CHECK_FOR_UPDATES ),
-                              B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP );
+                              B_FOLLOW_LEFT | B_FOLLOW_TOP );
     checkBox->SetValue( m_originalValues.checkForUpdates ? B_CONTROL_ON
                                                          : B_CONTROL_OFF );
+    checkBox->ResizeToPreferred();
     box->AddChild( checkBox );
     m_controls.push_back( checkBox );
     rect1 = checkBox->Frame();
@@ -563,8 +645,10 @@ PrefView::CreateGeneralPane( void )
     m_general->AddChild( box );
     rect1 = box->Frame();
 
+    layout.AddView( box );
+
     // ------------------- File Association box ----------------------------
-    rect1.top = rect1.bottom + GRID_UNIT;
+    rect1 = rect;
     box = new BBox( rect1, "FileAssociationBox",
                     B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP );
     box->SetLabel( "File Association" );
@@ -575,10 +659,12 @@ PrefView::CreateGeneralPane( void )
     // Reclaim file types
     checkBox = new BCheckBox( rect1, "ReclaimFileTypes", "Reclaim file types",
                               new BMessage( MSG_SET_RECLAIM_FILETYPES ),
-                              B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP );
+                              B_FOLLOW_LEFT | B_FOLLOW_TOP );
     checkBox->SetValue( m_originalValues.reclaimFiletypes ? B_CONTROL_ON
                                                           : B_CONTROL_OFF );
+    checkBox->ResizeToPreferred();
     box->AddChild( checkBox );
+    boxLayout.AddView( checkBox );
     m_controls.push_back( checkBox );
     rect1 = checkBox->Frame();
 
@@ -587,19 +673,26 @@ PrefView::CreateGeneralPane( void )
     checkBox = new BCheckBox( rect1, "AskToReclaimFiletypes",
                               "Ask to reclaim file types",
                               new BMessage( MSG_SET_ASK_RECLAIM_FILETYPES ),
-                              B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP );
+                              B_FOLLOW_LEFT | B_FOLLOW_TOP );
     checkBox->SetValue( m_originalValues.askReclaimFiletypes ? B_CONTROL_ON
                                                              : B_CONTROL_OFF );
+    checkBox->ResizeToPreferred();
     box->AddChild( checkBox );
+    boxLayout.AddView( checkBox );
     m_controls.push_back( checkBox );
     rect1 = checkBox->Frame();
+
+    boxLayout.Init();
 
     box->ResizeTo( box->Frame().Width(), rect1.bottom + BOX_INSET );
     m_general->AddChild( box );
     rect1 = box->Frame();
 
+    layout.AddView( box );
+
     // ------------- My Music Toolbar appearance box group ------------------
-    rect1.top = rect1.bottom + GRID_UNIT;
+    boxLayout.MakeEmpty();
+    rect1 = rect;
     box = new BBox( rect1, "ToolbarAppearance",
                     B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP );
     box->SetLabel( "Show 'My Music' Toolbars As" );
@@ -645,8 +738,11 @@ PrefView::CreateGeneralPane( void )
     m_general->AddChild( box );
     rect1 = box->Frame();
 
+    layout.AddView( box );
+
     // -------------- Miscellaneous box group -------------------------------
-    rect1.top = rect1.bottom + GRID_UNIT;
+    boxLayout.MakeEmpty();
+    rect1 = rect;
     box = new BBox( rect1, "Miscellaneous",
                     B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP );
     box->SetLabel( "Miscellaneous" );
@@ -658,10 +754,12 @@ PrefView::CreateGeneralPane( void )
                               "Save current playlist when exiting "
                               "the application",
                               new BMessage( MSG_SET_SAVE_PLAYLIST_ON_EXIT ),
-                              B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP );
+                              B_FOLLOW_LEFT | B_FOLLOW_TOP );
     checkBox->SetValue( m_originalValues.savePlaylistOnExit ? B_CONTROL_ON
                                                             : B_CONTROL_OFF );
+    checkBox->ResizeToPreferred();
     box->AddChild( checkBox );
+    boxLayout.AddView( checkBox );
     m_controls.push_back( checkBox );
     rect1 = checkBox->Frame();
 
@@ -671,15 +769,23 @@ PrefView::CreateGeneralPane( void )
                               "By default queue tracks rather than play "
                               "them immediately",
                               new BMessage( MSG_SET_PLAY_IMMEDIATELY ),
-                              B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP );
+                              B_FOLLOW_LEFT | B_FOLLOW_TOP );
     checkBox->SetValue( m_originalValues.playImmediately ? B_CONTROL_ON
                                                          : B_CONTROL_OFF );
+    checkBox->ResizeToPreferred();
     box->AddChild( checkBox );
+    boxLayout.AddView( checkBox );
     m_controls.push_back( checkBox );
     rect1 = checkBox->Frame();
 
+    boxLayout.Init();
+
     box->ResizeTo( box->Frame().Width(), rect1.bottom + GRID_UNIT );
     m_general->AddChild( box );
+
+    layout.AddView( box );
+
+    layout.Init();
 }
 
 void
@@ -831,29 +937,6 @@ PrefView::CreateAboutPane( void )
     textView->MakeEditable( false );
     textView->SetText( FREEAMP_ABOUT_TEXT );
     m_about->AddChild( textView );
-}
-
-// ----------------------------------------------------
-// methods for setting pref values
-// ----------------------------------------------------
-
-void
-PrefView::SetPrefString(kSaveMusicDirPref,  const char* path )
-{
-    m_proposedValues.saveMusicDirectory = string( path );
-    m_saveMusicFolder->SetText( path );
-}
-
-void
-PrefView::SetPrefBoolean(kCheckForUpdatesPref,  bool flag )
-{
-    m_proposedValues.checkForUpdates = flag;
-}
-
-void
-PrefView::SetPrefInt32(kDecoderThreadPriorityPref,  int32 prio )
-{
-    m_proposedValues.decoderThreadPriority = prio;
 }
 
 // ---------------------------------------------------

@@ -203,4 +203,51 @@ BeOSBitmap::MaskBlitRect( Bitmap* pSrcBitmap, Rect& oSrcRect, Rect& oDestRect )
     return kError_NoErr;
 }
 
+Error
+BeOSBitmap::BlitRectMaskBitmap( Bitmap* pSrcBitmap, Rect& oSrcRect, 
+                                Rect& oDestRect )
+{
+    return MaskBlitRect( pSrcBitmap, oSrcRect, oDestRect );
+}
+
+Bitmap*
+BeOSBitmap::Clone( void )
+{
+    BeOSBitmap* tmp = new BeOSBitmap( m_oBitmapName );
+    tmp->m_oTransColor = m_oTransColor;
+    tmp->m_bHasTransColor = m_bHasTransColor;
+    if ( OffscreenView() )
+    {
+        tmp->m_bitmap = new BBitmap( m_bitmap, true );
+        tmp->m_offView = new BView( tmp->m_bitmap->Bounds(), "BeOSBitmap",
+                                    B_FOLLOW_NONE, 0 );
+        tmp->m_bitmap->AddChild( tmp->m_offView );
+        tmp->m_hasOffscreenView = true;
+    }
+    else
+    {
+        tmp->m_bitmap = new BBitmap( m_bitmap );
+        tmp->m_offView = NULL;
+        tmp->m_hasOffscreenView = false;
+    }
+}
+
+Error
+BeOSBitmap::MakeTransparent( Rect& oRect )
+{
+    return kError_NoErr;
+}
+
+void
+BeOSBitmap::GetColor( Pos oPos, Color& oColor )
+{
+}
+
+void
+BeOSBitmap::GetSize( Pos& oPos )
+{
+    oPos.x = m_bitmap->Bounds().IntegerWidth();
+    oPos.y = m_bitmap->Bounds().IntegerHeight();
+}
+
 // vi: set ts=4:
