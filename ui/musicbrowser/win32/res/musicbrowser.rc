@@ -208,6 +208,23 @@ BEGIN
     ICON            IDI_WARN,IDC_STATIC,7,7,20,20
 END
 
+IDD_FAVORITE DIALOG DISCARDABLE  0, 0, 222, 111
+STYLE DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Favorite Stream"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,102,90,54,14
+    PUSHBUTTON      "Cancel",IDCANCEL,161,90,54,14
+    LTEXT           "Name :",IDC_STATIC,7,10,24,8
+    LTEXT           "Location (URL) :",IDC_STATIC,7,29,53,8
+    LTEXT           "Description :",IDC_STATIC,7,48,40,8
+    EDITTEXT        IDC_NAME,63,7,152,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_URL,63,26,152,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_DESCRIPTION,63,45,152,38,ES_MULTILINE | 
+                    ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_WANTRETURN
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -269,6 +286,14 @@ BEGIN
         RIGHTMARGIN, 250
         TOPMARGIN, 7
         BOTTOMMARGIN, 138
+    END
+
+    IDD_FAVORITE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 215
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 104
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -347,6 +372,8 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Move to Pre&vious Track",     ID_CONTROLS_PREVIOUSSONG
         MENUITEM "Move to &Next Track",         ID_CONTROLS_NEXTSONG
+        MENUITEM SEPARATOR
+        MENUITEM "&Eject CD",                   ID_CONTROLS_EJECT
         MENUITEM SEPARATOR
         MENUITEM "Play Tracks in Nor&mal Order", ID_CONTROLS_NORMALORDER
         MENUITEM "Play Tracks in &Random Order", ID_CONTROLS_SHUFFLE
@@ -510,9 +537,9 @@ BEGIN
         MENUITEM "Add to &Favorites",           ID_POPUP_FAVORITE
         MENUITEM SEPARATOR
         MENUITEM "Rena&me",                     ID_POPUP_RENAME
-        MENUITEM "&Remove...",                  ID_POPUP_REMOVE
+        MENUITEM "&Remove...",                  ID_POPUP_REMOVEFAVORITE
         MENUITEM SEPARATOR
-        MENUITEM "&Edit Info...",               ID_POPUP_EDITINFO
+        MENUITEM "&Edit Info...",               ID_POPUP_EDITSTREAMINFO
     END
 END
 

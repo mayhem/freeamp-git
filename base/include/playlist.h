@@ -137,7 +137,7 @@ class PlaylistItem {
     bool operator==(const PlaylistItem& item) const
     {
         bool result = false;
-
+        
         result = ( m_metadata == item.m_metadata &&
                    m_url == item.m_url);
 

@@ -435,6 +435,10 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
                 {
                     m_context->target->AcceptEvent(new ShowPreferencesEvent(3));
                 }
+                else if(tv_htinfo.hItem == m_hNewFavoritesItem)
+                {
+                    NewFavoriteEvent();
+                }
             }
             break;
         }
@@ -763,6 +767,8 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
                                item != m_hUncatItem &&
                                item != m_hNewPlaylistItem &&
                                item != m_hStreamsItem &&
+                               item != m_hFavoritesItem &&
+                               item != m_hNewFavoritesItem &&
                                item != m_hPortableItem &&
                                TreeView_GetParent(m_hMusicView, item) != m_hPortableItem &&
                                item != m_hWiredPlanetItem &&

@@ -59,6 +59,7 @@ CLEAN :
 	-@erase "$(INTDIR)\EditTrackInfoDialog.obj"
 	-@erase "$(INTDIR)\EnumFormatEtc.obj"
 	-@erase "$(INTDIR)\Event.obj"
+	-@erase "$(INTDIR)\FavoriteDialog.obj"
 	-@erase "$(INTDIR)\FooCast.obj"
 	-@erase "$(INTDIR)\Icecast.obj"
 	-@erase "$(INTDIR)\IntroductionWizard.obj"
@@ -89,7 +90,7 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\musicbrowser.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=fabaselib.lib gdbm.lib comctl32.lib version.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x10900000" /subsystem:windows /dll /incremental:no /pdb:"$(OUTDIR)\musicbrowser.pdb" /machine:I386 /def:".\musicbrowser.def" /out:"musicbrowser.ui" /implib:"$(OUTDIR)\musicbrowser.lib" /libpath:"..\..\..\..\lib\gdbm" /libpath:"..\..\..\..\base\win32" 
+LINK32_FLAGS=winmm.lib fabaselib.lib gdbm.lib comctl32.lib version.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x10900000" /subsystem:windows /dll /incremental:no /pdb:"$(OUTDIR)\musicbrowser.pdb" /machine:I386 /def:".\musicbrowser.def" /out:"musicbrowser.ui" /implib:"$(OUTDIR)\musicbrowser.lib" /libpath:"..\..\..\..\lib\gdbm" /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
 	".\musicbrowser.def"
 LINK32_OBJS= \
@@ -114,6 +115,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\musicbrowser.res" \
 	"$(INTDIR)\Icecast.obj" \
 	"$(INTDIR)\MissingFileDialog.obj" \
+	"$(INTDIR)\FavoriteDialog.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\gdbm\gdbm.lib"
 
@@ -160,6 +162,7 @@ CLEAN :
 	-@erase "$(INTDIR)\EditTrackInfoDialog.obj"
 	-@erase "$(INTDIR)\EnumFormatEtc.obj"
 	-@erase "$(INTDIR)\Event.obj"
+	-@erase "$(INTDIR)\FavoriteDialog.obj"
 	-@erase "$(INTDIR)\FooCast.obj"
 	-@erase "$(INTDIR)\Icecast.obj"
 	-@erase "$(INTDIR)\IntroductionWizard.obj"
@@ -193,7 +196,7 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\musicbrowser.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=fabaselib.lib gdbm.lib comctl32.lib version.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x10900000" /subsystem:windows /dll /incremental:yes /pdb:"$(OUTDIR)\musicbrowser.pdb" /debug /machine:I386 /def:".\musicbrowser.def" /out:"musicbrowser.ui" /implib:"$(OUTDIR)\musicbrowser.lib" /pdbtype:sept /libpath:"..\..\..\..\lib\gdbm" /libpath:"..\..\..\..\base\win32" 
+LINK32_FLAGS=winmm.lib fabaselib.lib gdbm.lib comctl32.lib version.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x10900000" /subsystem:windows /dll /incremental:yes /pdb:"$(OUTDIR)\musicbrowser.pdb" /debug /machine:I386 /def:".\musicbrowser.def" /out:"musicbrowser.ui" /implib:"$(OUTDIR)\musicbrowser.lib" /pdbtype:sept /libpath:"..\..\..\..\lib\gdbm" /libpath:"..\..\..\..\base\win32" 
 LINK32_OBJS= \
 	"$(INTDIR)\DataIndex.obj" \
 	"$(INTDIR)\Dialog.obj" \
@@ -216,6 +219,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\musicbrowser.res" \
 	"$(INTDIR)\Icecast.obj" \
 	"$(INTDIR)\MissingFileDialog.obj" \
+	"$(INTDIR)\FavoriteDialog.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\gdbm\gdbm.lib"
 
@@ -262,6 +266,7 @@ CLEAN :
 	-@erase "$(INTDIR)\EditTrackInfoDialog.obj"
 	-@erase "$(INTDIR)\EnumFormatEtc.obj"
 	-@erase "$(INTDIR)\Event.obj"
+	-@erase "$(INTDIR)\FavoriteDialog.obj"
 	-@erase "$(INTDIR)\FooCast.obj"
 	-@erase "$(INTDIR)\Icecast.obj"
 	-@erase "$(INTDIR)\IntroductionWizard.obj"
@@ -294,7 +299,7 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\musicbrowser.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=fabaselib.lib gdbm.lib comctl32.lib version.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x10900000" /subsystem:windows /dll /incremental:yes /pdb:"$(OUTDIR)\musicbrowser.pdb" /debug /machine:I386 /def:".\musicbrowser.def" /out:"musicbrowser.ui" /implib:"$(OUTDIR)\musicbrowser.lib" /pdbtype:sept /libpath:"..\..\..\..\lib\gdbm" /libpath:"..\..\..\..\base\win32" 
+LINK32_FLAGS=winmm.lib fabaselib.lib gdbm.lib comctl32.lib version.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x10900000" /subsystem:windows /dll /incremental:yes /pdb:"$(OUTDIR)\musicbrowser.pdb" /debug /machine:I386 /def:".\musicbrowser.def" /out:"musicbrowser.ui" /implib:"$(OUTDIR)\musicbrowser.lib" /pdbtype:sept /libpath:"..\..\..\..\lib\gdbm" /libpath:"..\..\..\..\base\win32" 
 LINK32_OBJS= \
 	"$(INTDIR)\DataIndex.obj" \
 	"$(INTDIR)\Dialog.obj" \
@@ -317,6 +322,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\musicbrowser.res" \
 	"$(INTDIR)\Icecast.obj" \
 	"$(INTDIR)\MissingFileDialog.obj" \
+	"$(INTDIR)\FavoriteDialog.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\gdbm\gdbm.lib"
 
@@ -363,6 +369,7 @@ CLEAN :
 	-@erase "$(INTDIR)\EditTrackInfoDialog.obj"
 	-@erase "$(INTDIR)\EnumFormatEtc.obj"
 	-@erase "$(INTDIR)\Event.obj"
+	-@erase "$(INTDIR)\FavoriteDialog.obj"
 	-@erase "$(INTDIR)\FooCast.obj"
 	-@erase "$(INTDIR)\Icecast.obj"
 	-@erase "$(INTDIR)\IntroductionWizard.obj"
@@ -393,7 +400,7 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\musicbrowser.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=fabaselib.lib gdbm.lib comctl32.lib version.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x10900000" /subsystem:windows /dll /incremental:no /pdb:"$(OUTDIR)\musicbrowser.pdb" /machine:I386 /def:".\musicbrowser.def" /out:"musicbrowser.ui" /implib:"$(OUTDIR)\musicbrowser.lib" /libpath:"..\..\..\..\lib\gdbm" /libpath:"..\..\..\..\base\win32" 
+LINK32_FLAGS=winmm.lib fabaselib.lib gdbm.lib comctl32.lib version.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x10900000" /subsystem:windows /dll /incremental:no /pdb:"$(OUTDIR)\musicbrowser.pdb" /machine:I386 /def:".\musicbrowser.def" /out:"musicbrowser.ui" /implib:"$(OUTDIR)\musicbrowser.lib" /libpath:"..\..\..\..\lib\gdbm" /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
 	".\musicbrowser.def"
 LINK32_OBJS= \
@@ -418,6 +425,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\musicbrowser.res" \
 	"$(INTDIR)\Icecast.obj" \
 	"$(INTDIR)\MissingFileDialog.obj" \
+	"$(INTDIR)\FavoriteDialog.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\gdbm\gdbm.lib"
 
@@ -572,6 +580,12 @@ SOURCE=..\src\EnumFormatEtc.cpp
 SOURCE=..\src\Event.cpp
 
 "$(INTDIR)\Event.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\src\FavoriteDialog.cpp
+
+"$(INTDIR)\FavoriteDialog.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

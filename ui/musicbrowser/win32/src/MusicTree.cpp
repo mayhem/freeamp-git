@@ -642,7 +642,7 @@ void MusicBrowserUI::FillFavorites()
     insert.item.lParam = NULL;
     insert.hInsertAfter = TVI_FIRST;
     insert.hParent = m_hFavoritesItem;
-    m_hNewPlaylistItem = TreeView_InsertItem(m_hMusicView, &insert);
+    m_hNewFavoritesItem = TreeView_InsertItem(m_hMusicView, &insert);
 }
 void MusicBrowserUI::FillWiredPlanet()
 {
@@ -1066,6 +1066,45 @@ HTREEITEM MusicBrowserUI::FindPlaylist(const string playlist)
     return result;
 }
 
+HTREEITEM MusicBrowserUI::FindFavorite(const PlaylistItem* stream)
+{
+    HTREEITEM result = NULL;
+    HWND hwnd = m_hMusicView;
+
+    TV_ITEM tv_item;
+
+    tv_item.hItem = NULL;
+    tv_item.mask = TVIF_PARAM;
+
+    // this should retrieve the first stream
+    tv_item.hItem = TreeView_GetChild(m_hMusicView, m_hFavoritesItem);
+
+    // but we want the second one... not the magic "Add New Stream..."
+    tv_item.hItem = TreeView_GetNextSibling(m_hMusicView, tv_item.hItem);
+
+    BOOL success;
+
+    do
+    {
+        success = TreeView_GetItem(hwnd, &tv_item);
+
+        if(success)
+        {
+            TreeData* treedata = (TreeData*)tv_item.lParam;
+
+            if(treedata && *stream == *treedata->m_pStream)
+            {
+                result = tv_item.hItem;
+                break;
+            }
+        }
+
+    }while(success && (tv_item.hItem = TreeView_GetNextSibling(hwnd, tv_item.hItem)));
+    
+    return result;
+}
+
+
 void MusicBrowserUI::MusicCatalogCleared()
 {
     if(m_initialized)
@@ -1289,6 +1328,59 @@ void MusicBrowserUI::MusicCatalogTrackRemoved(const ArtistList* artist,
         }
     }
 
+}
+
+void MusicBrowserUI::MusicCatalogStreamAdded(const PlaylistItem* item)
+{
+    if(TreeView_GetChild(m_hMusicView, m_hFavoritesItem))
+    {
+        TV_INSERTSTRUCT insert;
+        TreeData        data;
+
+        insert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
+                            TVIF_SELECTEDIMAGE | TVIF_PARAM; 
+
+        data.m_iLevel = 1;
+
+    
+        PlaylistItem* stream = new PlaylistItem(*item);
+        MetaData metadata;
+
+        data.m_pStream = stream;
+
+        insert.item.pszText = (char*)stream->GetMetaData().Title().c_str();
+        insert.item.cchTextMax = strlen(insert.item.pszText);
+        insert.item.iImage = 8;
+        insert.item.iSelectedImage = 8;
+        insert.item.cChildren= 0;
+        insert.item.lParam = (LPARAM) new TreeData(data);
+        insert.hInsertAfter = TVI_SORT;
+        insert.hParent = m_hFavoritesItem;
+        TreeView_InsertItem(m_hMusicView, &insert);
+
+        TreeView_DeleteItem(m_hMusicView, m_hNewFavoritesItem);
+        insert.item.pszText = kNewFavorite;
+        insert.item.cchTextMax = strlen(insert.item.pszText);
+        insert.item.iImage = 8;
+        insert.item.iSelectedImage = 8;
+        insert.item.cChildren= 0;
+        insert.item.lParam = NULL;
+        insert.hInsertAfter = TVI_FIRST;
+        insert.hParent = m_hFavoritesItem;
+        m_hNewFavoritesItem = TreeView_InsertItem(m_hMusicView, &insert);
+    }
+}
+
+void MusicBrowserUI::MusicCatalogStreamRemoved(const PlaylistItem* item)
+{
+    HTREEITEM streamItem = NULL;
+
+    streamItem = FindFavorite(item);
+
+    if(streamItem)
+    {
+        TreeView_DeleteItem(m_hMusicView, streamItem);
+    }
 }
 
 void MusicBrowserUI::MusicCatalogTrackAdded(const ArtistList* artist,
@@ -1597,7 +1689,9 @@ void MusicBrowserUI::TVBeginDrag(HWND hwnd, NM_TREEVIEW* nmtv)
 {
     if(nmtv->itemNew.hItem != m_hNewPlaylistItem && 
        nmtv->itemNew.hItem != m_hPortableItem &&
-       nmtv->itemNew.hItem != m_hNewPortableItem)
+       nmtv->itemNew.hItem != m_hNewPortableItem &&
+       nmtv->itemNew.hItem != m_hNewFavoritesItem &&
+       nmtv->itemNew.hItem != m_hStreamsItem)
     {
         vector<PlaylistItem*> items;
         vector<string>* urls = new vector<string>;
@@ -1612,7 +1706,17 @@ void MusicBrowserUI::TVBeginDrag(HWND hwnd, NM_TREEVIEW* nmtv)
         }
 
         GetSelectedPlaylistItems(urls);
-        GetSelectedStreamItems(urls);
+        
+        items.clear();
+
+        GetSelectedFavoritesItems(&items);
+        GetSelectedStreamItems(&items);
+
+        for(i = items.begin(); i != items.end(); i++)
+        {
+            urls->push_back((*i)->URL().c_str());
+        }
+
         GetSelectedCDItems(urls);
 
         HIMAGELIST himl;
@@ -1824,7 +1928,58 @@ void MusicBrowserUI::GetSelectedCDItems(vector<string>* urls)
     }
 }
 
-void MusicBrowserUI::GetSelectedStreamItems(vector<string>* urls)
+void MusicBrowserUI::GetSelectedFavoritesItems(vector<PlaylistItem*>* items)
+{
+    TV_ITEM tv_root;
+
+    tv_root.hItem = m_hFavoritesItem;
+    tv_root.mask = TVIF_STATE;
+    tv_root.stateMask = TVIS_SELECTED;
+    tv_root.state = 0;
+
+    TreeView_GetItem(m_hMusicView, &tv_root);
+
+    bool addAll = false;
+
+    // if selected then we add all the streams
+    if(tv_root.state & TVIS_SELECTED)
+    {
+        addAll = true;
+    }
+
+    TV_ITEM tv_item;
+
+    // get the first item
+    tv_item.hItem = TreeView_GetChild(m_hMusicView, m_hFavoritesItem);
+    tv_item.mask = TVIF_STATE|TVIF_PARAM;
+    tv_item.stateMask = TVIS_SELECTED;
+    tv_item.state = 0;
+
+    if(tv_item.hItem)
+    {
+        BOOL result = FALSE;
+
+        do
+        {
+            result = TreeView_GetItem(m_hMusicView, &tv_item);
+
+            if(result && ((tv_item.state & TVIS_SELECTED) || addAll))
+            {
+                TreeData* treedata = (TreeData*)tv_item.lParam;
+
+                if(treedata)
+                {
+                    items->push_back(treedata->m_pStream);
+                }
+            }
+    
+        }while(result && 
+               (tv_item.hItem = TreeView_GetNextSibling(m_hMusicView, 
+                                                        tv_item.hItem)));
+    }
+}
+
+void MusicBrowserUI::GetSelectedStreamItems(vector<PlaylistItem*>* items)
 {
     TV_ITEM tv_root;
 
@@ -1835,42 +1990,88 @@ void MusicBrowserUI::GetSelectedStreamItems(vector<string>* urls)
 
     TreeView_GetItem(m_hMusicView, &tv_root);
 
-    // if selected then we add all the wired planet streams
+    bool addAll = false;
+
+    // if selected then we add all the streams
     if(tv_root.state & TVIS_SELECTED)
     {
-        TV_ITEM tv_item;
-
-        // get the first stream item
-        tv_item.hItem = TreeView_GetChild(m_hMusicView, m_hWiredPlanetItem);
-        tv_item.mask = TVIF_STATE|TVIF_PARAM;
-        tv_item.stateMask = TVIS_SELECTED;
-        tv_item.state = 0;
-
-        if(tv_item.hItem)
-        {
-            BOOL result = FALSE;
-
-            do
-            {
-                result = TreeView_GetItem(m_hMusicView, &tv_item);
-
-                if(result)
-                {
-                    TreeData* treedata = (TreeData*)tv_item.lParam;
-
-                    if(treedata)
-                    {
-                        PlaylistItem* stream = treedata->m_pStream;
-
-                        urls->push_back(stream->URL());
-                    }
-                }
-        
-            }while(result && 
-                   (tv_item.hItem = TreeView_GetNextSibling(m_hMusicView, 
-                                                            tv_item.hItem)));
-        }    
+        addAll = true;
     }
+   
+    TV_ITEM tv_item;
+
+    // get the first stream item
+    tv_item.hItem = TreeView_GetChild(m_hMusicView, m_hWiredPlanetItem);
+    tv_item.mask = TVIF_STATE|TVIF_PARAM;
+    tv_item.stateMask = TVIS_SELECTED;
+    tv_item.state = 0;
+
+    if(tv_item.hItem)
+    {
+        BOOL result = FALSE;
+
+        do
+        {
+            result = TreeView_GetItem(m_hMusicView, &tv_item);
+
+            if(result && ((tv_item.state & TVIS_SELECTED) || addAll))
+            {
+                TreeData* treedata = (TreeData*)tv_item.lParam;
+
+                if(treedata)
+                {
+                    items->push_back(treedata->m_pStream);
+                }
+            }
+    
+        }while(result && 
+               (tv_item.hItem = TreeView_GetNextSibling(m_hMusicView, 
+                                                        tv_item.hItem)));
+    }
+
+    tv_root.hItem = m_hIceCastItem;
+    tv_root.mask = TVIF_STATE;
+    tv_root.stateMask = TVIS_SELECTED;
+    tv_root.state = 0;
+
+    TreeView_GetItem(m_hMusicView, &tv_root);
+
+    addAll = false;
+
+    // if selected then we add all the streams
+    if(tv_root.state & TVIS_SELECTED)
+    {
+        addAll = true;
+    }
+   
+    // get the first stream item
+    tv_item.hItem = TreeView_GetChild(m_hMusicView, m_hIceCastItem);
+    tv_item.mask = TVIF_STATE|TVIF_PARAM;
+    tv_item.stateMask = TVIS_SELECTED;
+    tv_item.state = 0;
+
+    if(tv_item.hItem)
+    {
+        BOOL result = FALSE;
+
+        do
+        {
+            result = TreeView_GetItem(m_hMusicView, &tv_item);
+
+            if(result && ((tv_item.state & TVIS_SELECTED) || addAll))
+            {
+                TreeData* treedata = (TreeData*)tv_item.lParam;
+
+                if(treedata)
+                {
+                    items->push_back(treedata->m_pStream);
+                }
+            }
+    
+        }while(result && 
+               (tv_item.hItem = TreeView_GetNextSibling(m_hMusicView, 
+                                                        tv_item.hItem)));
+    }    
 }
 
 void MusicBrowserUI::GetSelectedPlaylistItems(vector<string>* urls)

@@ -34,6 +34,7 @@ ____________________________________________________________________________*/
 #include "EditTrackInfoDialog.h"
 #include "eventdata.h"
 #include "debug.h"
+#include "FavoriteDialog.h"
 
 const char* kAudioFileFilter =
             "MPEG Audio Streams (.mpg, .mp1, .mp2, .mp3, .mpp)\0"
@@ -515,6 +516,69 @@ void MusicBrowserUI::EjectCDEvent()
     mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
 }
 
+void MusicBrowserUI::NewFavoriteEvent()
+{
+    FavoriteDialog favoriteDialog(m_context,
+                                  m_hWnd,
+                                  NULL);
+
+    favoriteDialog.Show();
+}
+
+void MusicBrowserUI::AddFavoriteEvent()
+{
+    vector<PlaylistItem*> items;
+
+    GetSelectedStreamItems(&items);
+
+    if(items.size())
+    {
+        vector<PlaylistItem*>::iterator i = items.begin();
+        
+        for(; i != items.end(); i++)
+        {
+            m_context->catalog->WriteMetaDataToDatabase((*i)->URL().c_str(),
+                                                        (*i)->GetMetaData(),
+                                                        kTypeStream);
+
+            m_context->catalog->AddStream((*i)->URL().c_str());
+        }
+    }  
+}
+
+void MusicBrowserUI::RemoveFavoriteEvent()
+{
+    vector<PlaylistItem*> items;
+
+    GetSelectedFavoritesItems(&items);
+
+    if(items.size())
+    {
+        vector<PlaylistItem*>::iterator i = items.begin();
+        
+        for(; i != items.end(); i++)
+        {
+            m_context->catalog->RemoveStream((*i)->URL().c_str());
+        }
+    }
+}
+
+void MusicBrowserUI::EditStreamInfoEvent()
+{
+    vector<PlaylistItem*> items;
+
+    GetSelectedFavoritesItems(&items);
+
+    if(items.size())
+    {
+        FavoriteDialog favoriteDialog(m_context,
+                                      m_hWnd,
+                                      items[0]);
+
+        favoriteDialog.Show();  
+    }
+}
+
 int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
 {
     int32 result = 0;
@@ -761,10 +825,47 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                 streamMenu = LoadMenu(g_hinst, MAKEINTRESOURCE(IDR_TVPOPUP2));
 
 
-                if(tv_htinfo.hItem == m_hFavoritesItem || 
-                   TreeView_GetParent(m_hMusicView, tv_htinfo.hItem) == m_hFavoritesItem)
+                if(tv_htinfo.hItem == m_hStreamsItem || 
+                   TreeView_GetParent(m_hMusicView, tv_htinfo.hItem) == m_hStreamsItem ||
+                   TreeView_GetParent(m_hMusicView, TreeView_GetParent(m_hMusicView, tv_htinfo.hItem)) == m_hStreamsItem)
                 {
                     subMenu = GetSubMenu(streamMenu, 0);
+
+                    if(tv_htinfo.hItem == m_hStreamsItem)
+                    {
+                        EnableMenuItem(subMenu, ID_POPUP_ADDTRACK, MF_BYCOMMAND|MF_GRAYED);
+                        EnableMenuItem(subMenu, ID_POPUP_ADDTRACK_PLAY, MF_BYCOMMAND|MF_GRAYED);
+                        EnableMenuItem(subMenu, ID_POPUP_FAVORITE, MF_BYCOMMAND|MF_GRAYED);
+                    }
+
+                    if(tv_htinfo.hItem == m_hFavoritesItem || 
+                       TreeView_GetParent(m_hMusicView, tv_htinfo.hItem) == m_hFavoritesItem)
+                    {
+                        DeleteMenu(subMenu, 2, MF_BYPOSITION);
+                        DeleteMenu(subMenu, 2, MF_BYPOSITION);
+
+                        if(tv_htinfo.hItem == m_hFavoritesItem ||
+                           tv_htinfo.hItem == m_hNewFavoritesItem)
+                        {
+                            EnableMenuItem(subMenu, ID_POPUP_RENAME, MF_BYCOMMAND|MF_GRAYED);
+                            EnableMenuItem(subMenu, ID_POPUP_REMOVEFAVORITE, MF_BYCOMMAND|MF_GRAYED);
+                            EnableMenuItem(subMenu, ID_POPUP_EDITSTREAMINFO, MF_BYCOMMAND|MF_GRAYED);
+
+                            if(tv_htinfo.hItem == m_hNewFavoritesItem)
+                            {
+                                EnableMenuItem(subMenu, ID_POPUP_ADDTRACK, MF_BYCOMMAND|MF_GRAYED);
+                                EnableMenuItem(subMenu, ID_POPUP_ADDTRACK_PLAY, MF_BYCOMMAND|MF_GRAYED);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        DeleteMenu(subMenu, 4, MF_BYPOSITION);
+                        DeleteMenu(subMenu, 4, MF_BYPOSITION);
+                        DeleteMenu(subMenu, 4, MF_BYPOSITION);
+                        DeleteMenu(subMenu, 4, MF_BYPOSITION);
+                        DeleteMenu(subMenu, 4, MF_BYPOSITION);
+                    }
                 }
                 else if(tv_htinfo.hItem == m_hCDItem ||
                         TreeView_GetParent(m_hMusicView, tv_htinfo.hItem) == m_hCDItem)
@@ -1205,7 +1306,17 @@ void MusicBrowserUI::AddTrackEvent(void)
     }
 
     GetSelectedPlaylistItems(&urls);
-    GetSelectedStreamItems(&urls);
+
+    items.clear();
+
+    GetSelectedFavoritesItems(&items);
+    GetSelectedStreamItems(&items);
+
+    for(i = items.begin(); i != items.end(); i++)
+    {
+        urls.push_back((*i)->URL().c_str());
+    }
+
     GetSelectedCDItems(&urls);
 
     // we know that we are gonna be adding a 

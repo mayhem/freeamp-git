@@ -47,6 +47,7 @@
 #define IDD_INTROWIZARD_SEARCH          263
 #define IDD_INTROWIZARD_HELLO1          264
 #define IDD_MISSINGTRACK                264
+#define IDD_FAVORITE                    265
 #define IDB_PLAYING                     542
 #define IDB_CATALOG                     543
 #define IDB_ARTIST                      544
@@ -90,6 +91,7 @@
 #define IDC_REMOVE                      1040
 #define IDC_RADIO2                      1041
 #define IDC_LOCATE                      1041
+#define IDC_DESCRIPTION                 1041
 #define IDC_EDIT1                       1042
 #define IDC_PATH                        1042
 #define IDC_BUTTON1                     1043
@@ -174,8 +176,10 @@
 #define ID_POPUP_EDITPLAYLIST           40075
 #define ID_SORT_FILENAME                40076
 #define ID_POPUP_EJECT                  40077
-#define ID_POPUP_LOOKUPINFO             40078
 #define ID_POPUP_FAVORITE               40079
+#define ID_POPUP_EDITSTREAMINFO         40080
+#define ID_CONTROLS_EJECT               40081
+#define ID_POPUP_REMOVEFAVORITE         40082
 #define IDS_URL                         65535
 #define IDC_TRACKTEXT                   65535
 #define IDC_TITLETEXT                   65535
@@ -185,8 +189,8 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        138
-#define _APS_NEXT_COMMAND_VALUE         40080
-#define _APS_NEXT_CONTROL_VALUE         1040
+#define _APS_NEXT_COMMAND_VALUE         40083
+#define _APS_NEXT_CONTROL_VALUE         1042
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

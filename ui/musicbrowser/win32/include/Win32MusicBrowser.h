@@ -215,7 +215,7 @@ class MusicBrowserUI : public UserInterface
     void SavePortablePlaylist();
 
     // Functions in Event.cpp
-    int   Notify(WPARAM wParam, NMHDR *pNMHDR);
+    int   Notify(WPARAM wParam, NMHDR* pNMHDR);
     void  StartStopMusicSearch(bool useWizard = false);
     void  MoveUpEvent();
     void  MoveDownEvent();
@@ -239,6 +239,10 @@ class MusicBrowserUI : public UserInterface
     void  PlayNowEvent();
     bool  DeleteFromDrive(const char* url);
     void  EjectCDEvent();
+    void  AddFavoriteEvent();
+    void  NewFavoriteEvent();
+    void  EditStreamInfoEvent();
+    void  RemoveFavoriteEvent();
 
     // Functions in PlaylistView.cpp
     void  PlaylistListItemAdded(const PlaylistItem* item);
@@ -257,8 +261,8 @@ class MusicBrowserUI : public UserInterface
 
 
     // Functions in Win32MusicBrowser.cpp
-    void  AddMusicBrowserWindow(MusicBrowserUI *pWindow);
-    void  RemoveMusicBrowserWindow(MusicBrowserUI *pWindow);
+    void  AddMusicBrowserWindow(MusicBrowserUI* pWindow);
+    void  RemoveMusicBrowserWindow(MusicBrowserUI* pWindow);
     void  MusicSearchDone();
     void  DisplayBrowserMessage(const char* msg);
     void  SaveCurrentPlaylist();
@@ -266,9 +270,9 @@ class MusicBrowserUI : public UserInterface
     // Functions is MusicTree.cpp
     void    InitTree();
     void    FillArtists();
-    void    FillAlbums(TV_ITEM *pItem);
+    void    FillAlbums(TV_ITEM* pItem);
     void    FillPlaylists();
-    void    FillTracks(TV_ITEM *pItem);
+    void    FillTracks(TV_ITEM* pItem);
 	static void fill_all_tracks(void* arg);
     void    FillAllTracks();
     void    FillUncatTracks();
@@ -283,8 +287,9 @@ class MusicBrowserUI : public UserInterface
     void    AddAllTrackItems(vector<PlaylistItem*>* items);
     void    AddUncatagorizedTrackItems(vector<PlaylistItem*>* items);
     void    GetSelectedPlaylistItems(vector<string>* urls);
-    void    GetSelectedStreamItems(vector<string>* urls);
+    void    GetSelectedStreamItems(vector<PlaylistItem*>* items);
     void    GetSelectedCDItems(vector<string>* urls);
+    void    GetSelectedFavoritesItems(vector<PlaylistItem*>* items);
     void    TVBeginDrag(HWND hwnd, NM_TREEVIEW* nmtv);
     void    MusicCatalogTrackChanged(const ArtistList *oldArtist,
                                      const ArtistList *newArtist,
@@ -301,11 +306,14 @@ class MusicBrowserUI : public UserInterface
                                      const PlaylistItem* item);
     void    MusicCatalogPlaylistRemoved(string item);
     void    MusicCatalogCleared();
+    void    MusicCatalogStreamAdded(const PlaylistItem* item);
+    void    MusicCatalogStreamRemoved(const PlaylistItem* item);
 
     HTREEITEM FindArtist(const ArtistList* artist);
     HTREEITEM FindAlbum(HTREEITEM artistItem, const AlbumList* album);
     HTREEITEM FindTrack(HTREEITEM albumItem, const PlaylistItem* track);
     HTREEITEM FindPlaylist(const string playlist);
+    HTREEITEM MusicBrowserUI::FindFavorite(const PlaylistItem* stream);
 
     void UpdateTrackName(PlaylistItem* track, const char* name);
     void UpdatePlaylistName(const string& playlist, const char* name);
@@ -344,7 +352,7 @@ class MusicBrowserUI : public UserInterface
     HTREEITEM           m_hAllItem, m_hUncatItem, m_hStreamsItem, m_hCDItem;
     HTREEITEM           m_hNewPlaylistItem, m_hNewPortableItem;
     HTREEITEM           m_hWiredPlanetItem, m_hShoutCastItem, m_hIceCastItem;
-    HTREEITEM           m_hFavoritesItem;
+    HTREEITEM           m_hFavoritesItem, m_hNewFavoritesItem;
     int                 m_iCollapseMoveAmount;
     HCURSOR             m_hSavedCursor, m_hDragCursor, m_hNoDropCursor;
     HCURSOR             m_hSplitterCursor, m_hPointerCursor, m_hCurrentCursor;

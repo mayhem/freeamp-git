@@ -236,6 +236,7 @@ void MusicBrowserUI::Init()
     m_hStreamsItem = NULL;
     m_hCDItem = NULL;
     m_hFavoritesItem = NULL;
+    m_hNewFavoritesItem = NULL;
     
     m_hMusicView = NULL;
     m_hPortableItem = NULL;
@@ -500,6 +501,38 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
                                      pie->NewItem());
             
             break; 
+        }
+
+        case INFO_MusicCatalogStreamAdded:
+        {
+            MusicCatalogStreamAddedEvent* pie = (MusicCatalogStreamAddedEvent*)event;
+
+            vector<MusicBrowserUI *>::iterator i;
+
+            for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
+            {
+                (*i)->MusicCatalogStreamAdded(pie->Item());
+            }
+
+            MusicCatalogStreamAdded(pie->Item());
+
+            break;
+        }
+
+        case INFO_MusicCatalogStreamRemoved:
+        {
+            MusicCatalogStreamRemovedEvent* pie = (MusicCatalogStreamRemovedEvent*)event;
+
+            vector<MusicBrowserUI *>::iterator i;
+
+            for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
+            {
+                (*i)->MusicCatalogStreamRemoved(pie->Item());
+            }
+
+            MusicCatalogStreamRemoved(pie->Item());
+
+            break;
         }
 
         case INFO_MusicCatalogTrackAdded:

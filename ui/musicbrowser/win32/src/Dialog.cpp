@@ -272,6 +272,19 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                     EditInfoEvent();
                     return 1;
 
+                case ID_POPUP_FAVORITE:
+                    AddFavoriteEvent();
+                    return 1;
+
+                case ID_POPUP_REMOVEFAVORITE:
+                    RemoveFavoriteEvent();
+                    return 1;
+
+                case ID_POPUP_EDITSTREAMINFO:
+                    EditStreamInfoEvent();
+                    return 1;
+
+                case ID_CONTROLS_EJECT:
                 case ID_POPUP_EJECT:
                     EjectCDEvent();
                     return 1;
