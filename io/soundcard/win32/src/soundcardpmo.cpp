@@ -30,6 +30,7 @@ ____________________________________________________________________________*/
 #include "config.h"
 #include "SoundCardPMO.h"
 
+
 HANDLE MCISemaphore;
 
 extern "C" {
@@ -84,7 +85,6 @@ SoundCardPMO()
 SoundCardPMO::
 ~SoundCardPMO()
 {
-
     if(m_initialized)
 	{
         char* buf = new char [m_data_size];
@@ -243,7 +243,6 @@ Write(int32& wrote, void *pBuffer,int32 length)
 	// Prepare & write newest header
 	waveOutPrepareHeader(m_hwo, wavhdr, m_hdr_size);
 	waveOutWrite(m_hwo, wavhdr, m_hdr_size);
-	
 	//cerr << "Wrote: " << length << " bytes" << endl;
     wrote = length;
     return result;
@@ -278,8 +277,7 @@ Error
 SoundCardPMO::
 Pause()
 {
-     waveOutPause(m_hwo);
-
+	waveOutPause(m_hwo);
      return kError_NoErr;
 }
 
@@ -288,6 +286,5 @@ SoundCardPMO::
 Resume()
 {
     waveOutRestart(m_hwo);
-
     return kError_NoErr;
 }

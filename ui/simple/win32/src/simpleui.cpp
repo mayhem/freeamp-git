@@ -184,6 +184,7 @@ AcceptEvent(Event* event)
 				{
 					MpegInfoEvent *info = (MpegInfoEvent *)event;
 					char szTemp[256];
+					m_secondsPerFrame = info->GetSecondsPerFrame();
                 sprintf(szTemp, "%d kbps",  info->GetBitRate()/1000);
                 SendMessage(m_hwndStatus, 
 						    SB_SETTEXT, 
@@ -214,11 +215,12 @@ AcceptEvent(Event* event)
 
 
                 int32 seconds = (int32)ceil(info->m_totalSeconds);
+				m_totalSeconds = seconds;
 			    int32 hours = seconds / 3600;
 			    int32 minutes = seconds / 60 - hours * 60;
 			    seconds = seconds - minutes * 60 - hours * 3600;
 
-
+				
                 sprintf(timeString,"%02d:%02d:%02d",hours,
 				                                    minutes,
 				                                    seconds);
@@ -712,7 +714,22 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 											0, 
 											0);
                     
-                    m_ui->m_target->AcceptEvent(new ChangePositionEvent(position));
+
+	                char timeString[256] = "00:00:00";
+
+					int32 seconds = m_ui->m_totalSeconds;
+					int32 hours = seconds / 3600;
+					int32 minutes = seconds / 60 - hours * 60;
+					seconds = seconds - minutes * 60 - hours * 3600;
+
+
+					sprintf(timeString,"%02d:%02d:%02d",hours,
+														minutes,
+														seconds);
+
+					SetWindowText(m_ui->m_hwndTotal, timeString);
+                   
+					m_ui->m_target->AcceptEvent(new ChangePositionEvent(position));
 		  	
 					m_ui->m_scrolling = false;
 					break;
@@ -720,6 +737,23 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 
 				case TB_THUMBTRACK:
 				{
+					position = SendMessage( hwndSlider, TBM_GETPOS,0,0);
+
+	                char timeString[256] = "00:00:00";
+
+					int32 seconds = (int32)ceil(m_ui->m_secondsPerFrame * position);
+					int32 hours = seconds / 3600;
+					int32 minutes = seconds / 60 - hours * 60;
+					seconds = seconds - minutes * 60 - hours * 3600;
+
+
+					sprintf(timeString,"%02d:%02d:%02d",hours,
+														minutes,
+														seconds);
+
+					SetWindowText(m_ui->m_hwndTotal, timeString);
+ 					
+					
 					m_ui->m_scrolling = true;
 					break;
 				}

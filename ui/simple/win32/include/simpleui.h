@@ -67,6 +67,8 @@ class SimpleUI : public UserInterface {
 
 
  private:
+	 int32			m_totalSeconds;
+	 float			m_secondsPerFrame;
     Thread*         m_uiThread;
     EventQueue*     m_target;
 

@@ -115,6 +115,7 @@ public:
     enum {MPEG_1=1,MPEG_2=2, MPEG_25=3};
  private:
     int32 m_totalFrames;
+	float m_secondsPerFrame;
     int32 m_bytesPerFrame;
     int32 m_bitrate;
     int32 m_sampleRate;
@@ -129,9 +130,10 @@ public:
     int32 m_crc;
  public:
     MpegInfoEvent() { m_type = INFO_MPEGInfo; }
-    MpegInfoEvent(int32 tf, int32 bpf, int32 br,int32 sr,int32 layer,int32 mpeg,int32 chans,int32 orig, int32 copy,int32 emph,int32 stereo, int32 mode_ext) { 
+    MpegInfoEvent(int32 tf, float spf, int32 bpf, int32 br,int32 sr,int32 layer,int32 mpeg,int32 chans,int32 orig, int32 copy,int32 emph,int32 stereo, int32 mode_ext) { 
 	m_type = INFO_MPEGInfo; 
 	m_totalFrames = tf;
+	m_secondsPerFrame = spf;
 	m_bytesPerFrame = bpf;
 	m_bitrate = br;
 	m_sampleRate = sr;
@@ -145,6 +147,7 @@ public:
 	m_modeExt = mode_ext;
     }
     int32 GetTotalFrames() { return m_totalFrames; }
+	float GetSecondsPerFrame() { return m_secondsPerFrame; }
     int32 GetBytesPerFrame() { return m_bytesPerFrame; }
     int32 GetBitRate() { return m_bitrate; }
     int32 GetSampleRate() { return m_sampleRate; }

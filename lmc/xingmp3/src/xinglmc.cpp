@@ -191,6 +191,7 @@ Error XingLMC::InitDecoder() {
 		}
 
 		MpegInfoEvent *mie = new MpegInfoEvent(totalFrames,
+								milliseconds_per_frame / 1000,
 						       m_frameBytes, 
 						       bitrate, 
 						       samprate, 
