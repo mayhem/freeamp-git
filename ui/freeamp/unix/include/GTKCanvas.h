@@ -55,6 +55,7 @@ class GTKCanvas : public Canvas
 
      GdkPixmap *GetMask() { return ((GTKBitmap *)m_pBGBitmap)->GetMask(); }
      void SetParent(GTKWindow *newParent) { m_pParent = newParent; }
+     void InitBackgrounds(vector<Panel *> *pPanels);
 
     protected:
      GTKBitmap *m_pBufferBitmap;

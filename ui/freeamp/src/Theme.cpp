@@ -1604,6 +1604,7 @@ Error Theme::EndElement(string &oElement)
            m_pParsedWindows = new vector<Window *>;
 
        m_pParsedWindows->push_back(m_pCurrentWindow);
+       m_oPanels.clear();
            
        m_pCurrentWindow = NULL;
 

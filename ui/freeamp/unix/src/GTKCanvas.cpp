@@ -160,3 +160,11 @@ void GTKCanvas::Erase(Rect &oRect)
     if (m_pBufferBitmap)
         m_pBufferBitmap->MaskBlitRect(m_pBGBitmap, newRect, newRect);
 }
+
+void GTKCanvas::InitBackgrounds(vector<Panel *> *pPanels)
+{
+   Canvas::InitBackgrounds(pPanels);
+
+   if (m_pBufferBitmap)
+      m_pBufferBitmap->BlitRect(m_pBGBitmap, m_oBGRect, m_oBGRect);
+}  
