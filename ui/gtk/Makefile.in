@@ -68,6 +68,9 @@ target_alias = @target_alias@
 target_triplet = @target@
 CC = @CC@
 CXX = @CXX@
+GTK_CFLAGS = @GTK_CFLAGS@
+GTK_CONFIG = @GTK_CONFIG@
+GTK_LIBS = @GTK_LIBS@
 MAKEINFO = @MAKEINFO@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
@@ -309,6 +312,8 @@ include @top_srcdir@/config/Makefile.header
 @AM_ENABLE_GTK_TRUE@cmdline-local: freeamp-gtk.o
 @AM_ENABLE_GTK_TRUE@	gcc -shared -Wl,-soname,freeampgui-@target_os@.ui -o freeampgui-@target_os@.ui freeamp-gtk.o $(GTK_LINK_TAIL)
 @AM_ENABLE_GTK_TRUE@	cp freeampgui-@target_os@.ui @top_srcdir@/plugins
+@AM_ENABLE_GTK_FALSE@all-local:
+@AM_ENABLE_GTK_FALSE@	@true
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

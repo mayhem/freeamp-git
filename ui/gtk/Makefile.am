@@ -39,6 +39,8 @@ else
 FILES = 
 MYLIBS = 
 TRGT_SYS_HEADS =
+all-local:
+	@true
 endif
 
 if AM_HAVE_LINUXTHREADS

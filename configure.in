@@ -56,6 +56,18 @@ else
    cmdline="true"
 fi
 
+gtk="true"
+
+dnl ****
+dnl Check for GTK+
+dnl ****
+AM_PATH_GTK(1.1.2	, echo "             GTK+ compilation enabled", 
+dnl                   AC_MSG_ERROR(GTK+ distribution not found.)
+gtk="false"
+echo GTK+ compilation disabled
+)
+
+
 
 dnl *****
 dnl Check for LinuxThreads or MIT pthreads
