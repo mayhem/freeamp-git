@@ -30,6 +30,8 @@ ____________________________________________________________________________*/
 
 #include <set>
 #include <string>
+#include <functional>
+#include <algorithm>
 
 using namespace std;
 
@@ -148,10 +150,12 @@ void MusicBrowserUI::FillArtists(void)
        sInsert.item.iSelectedImage = 2;
        sInsert.item.cChildren= 1;
        sInsert.item.lParam = m_oTreeIndex.Add(oCrossRef);
-       sInsert.hInsertAfter = TVI_SORT;
+       sInsert.hInsertAfter = TVI_LAST;
        sInsert.hParent = m_hCatalogItem;
        TreeView_InsertItem(m_hMusicCatalog, &sInsert);
     }    
+
+    TreeView_SortChildren(m_hMusicCatalog, m_hCatalogItem, 0);
 }
 
 void MusicBrowserUI::FillAlbums(TV_ITEM *pItem)
@@ -182,10 +186,12 @@ void MusicBrowserUI::FillAlbums(TV_ITEM *pItem)
         sInsert.item.iSelectedImage = 3;
         sInsert.item.cChildren= 1;
         sInsert.item.lParam = m_oTreeIndex.Add(oCrossRef);
-        sInsert.hInsertAfter = TVI_SORT;
+        sInsert.hInsertAfter = TVI_LAST;
         sInsert.hParent = pItem->hItem;
         TreeView_InsertItem(m_hMusicCatalog, &sInsert);
     }
+
+    TreeView_SortChildren(m_hMusicCatalog, pItem->hItem, 0);
 }
 
 void MusicBrowserUI::FillTracks(TV_ITEM *pItem)
@@ -195,6 +201,7 @@ void MusicBrowserUI::FillTracks(TV_ITEM *pItem)
     int                               iIndex;
     TreeData                          oCrossRef;
     MetaData                          oData;
+    //bool                              needToSort = false;
 
     sInsert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
                  TVIF_SELECTEDIMAGE | TVIF_PARAM; 
@@ -202,12 +209,22 @@ void MusicBrowserUI::FillTracks(TV_ITEM *pItem)
     oCrossRef.m_iLevel = 3;
     oCrossRef.m_pArtist = m_oTreeIndex.Data(pItem->lParam).m_pArtist;
     oCrossRef.m_pAlbum = m_oTreeIndex.Data(pItem->lParam).m_pAlbum;
+
+    stable_sort(oCrossRef.m_pAlbum->m_trackList->begin(), 
+                oCrossRef.m_pAlbum->m_trackList->end(), 
+                TrackSort());
+
     for(i = oCrossRef.m_pAlbum->m_trackList->begin(), iIndex = 0; 
         i != oCrossRef.m_pAlbum->m_trackList->end(); i++, iIndex++)
     {
         oCrossRef.m_pTrack = (*i);
 
         oData = (*i)->GetMetaData();
+
+        if(oData.Track() == 0)
+            sInsert.hInsertAfter = TVI_SORT;
+        else
+            sInsert.hInsertAfter = TVI_LAST;
 
         if (oData.Title() == string(" ") || 
             oData.Title().length() == 0)
@@ -220,10 +237,13 @@ void MusicBrowserUI::FillTracks(TV_ITEM *pItem)
         sInsert.item.iSelectedImage = 4;
         sInsert.item.cChildren= 0;
         sInsert.item.lParam = m_oTreeIndex.Add(oCrossRef);
-        sInsert.hInsertAfter = TVI_SORT;
+        //sInsert.hInsertAfter = TVI_LAST;
         sInsert.hParent = pItem->hItem;
         TreeView_InsertItem(m_hMusicCatalog, &sInsert);
     }
+
+    //if(needToSort)
+        //TreeView_SortChildren(m_hMusicCatalog, pItem->hItem, 0);
 }
 
 void MusicBrowserUI::FillAllTracks(void)
@@ -268,7 +288,7 @@ void MusicBrowserUI::FillAllTracks(void)
                 sInsert.item.iSelectedImage = 4;
                 sInsert.item.cChildren= 0;
                 sInsert.item.lParam = m_oTreeIndex.Add(oCrossRef);
-                sInsert.hInsertAfter = TVI_SORT;
+                sInsert.hInsertAfter = TVI_LAST;
                 sInsert.hParent = m_hAllItem;
                 TreeView_InsertItem(m_hMusicCatalog, &sInsert);
             }
@@ -297,10 +317,12 @@ void MusicBrowserUI::FillAllTracks(void)
         sInsert.item.iSelectedImage = 4;
         sInsert.item.cChildren= 0;
         sInsert.item.lParam = m_oTreeIndex.Add(oCrossRef);
-        sInsert.hInsertAfter = TVI_SORT;
+        sInsert.hInsertAfter = TVI_LAST;
         sInsert.hParent = m_hAllItem;
         TreeView_InsertItem(m_hMusicCatalog, &sInsert);
     }
+
+    TreeView_SortChildren(m_hMusicCatalog, m_hAllItem, 0);
 }
 
 void MusicBrowserUI::FillUncatTracks(void)
@@ -336,10 +358,12 @@ void MusicBrowserUI::FillUncatTracks(void)
         sInsert.item.iSelectedImage = 4;
         sInsert.item.cChildren= 0;
         sInsert.item.lParam = m_oTreeIndex.Add(oCrossRef);
-        sInsert.hInsertAfter = TVI_SORT;
+        sInsert.hInsertAfter = TVI_LAST;
         sInsert.hParent = m_hUncatItem;
         TreeView_InsertItem(m_hMusicCatalog, &sInsert);
     }
+
+    TreeView_SortChildren(m_hMusicCatalog, m_hUncatItem, 0);
 }
 
 int32 MusicBrowserUI::GetMusicTreeSelection(HTREEITEM* hItem)
@@ -932,8 +956,56 @@ void MusicBrowserUI::MusicCatalogTrackAdded(const ArtistList* artist,
                     sInsert.item.iSelectedImage = 4;
                     sInsert.item.cChildren= 0;
                     sInsert.item.lParam = m_oTreeIndex.Add(oCrossRef);
-                    sInsert.hInsertAfter = TVI_SORT;
+                    sInsert.hInsertAfter = TVI_LAST;
                     sInsert.hParent = albumItem;
+
+                    TV_ITEM tv_item;
+                    HTREEITEM sibling = NULL;
+
+                    if(tv_item.hItem = TreeView_GetChild(m_hMusicCatalog, albumItem))
+                    {
+                        BOOL success;
+
+                        do
+                        {
+                            success = TreeView_GetItem(m_hMusicCatalog, &tv_item);
+
+                            if(success)
+                            {
+                                PlaylistItem* track = m_oTreeIndex.Data(tv_item.lParam).m_pTrack;
+                                MetaData metadata = track->GetMetaData();
+                                
+                                if(oData.Track())
+                                {
+                                    if(metadata.Track() > oData.Track())
+                                    {
+                                        if(sibling)
+                                            sInsert.hInsertAfter = sibling;
+                                        else
+                                            sInsert.hInsertAfter = TVI_FIRST;
+                                        break;
+                                    }
+                                }
+                                else
+                                {
+                                    if(metadata.Track() || metadata.Title() >  oData.Title())
+                                    {
+                                        if(sibling)
+                                            sInsert.hInsertAfter = sibling;
+                                        else
+                                            sInsert.hInsertAfter = TVI_FIRST;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            sibling = tv_item.hItem;
+        
+                        }while(success && 
+                               (tv_item.hItem = TreeView_GetNextSibling(m_hMusicCatalog, 
+                                                                        tv_item.hItem)));
+                    }
+
                     newItem = TreeView_InsertItem(m_hMusicCatalog, &sInsert);
                 }
             }
@@ -1583,4 +1655,24 @@ void MusicBrowserUI::UpdateArtistName(ArtistList* artist,
         }
 
     }
+}
+
+// Function object used for sorting PlaylistItems in PlaylistManager
+bool TrackSort::operator() (PlaylistItem* item1, 
+                            PlaylistItem* item2) const
+{
+    bool result = true;
+
+    assert(item1);
+    assert(item2);
+
+    if(item1 && item2)
+    {
+        MetaData m1 = item1->GetMetaData();
+        MetaData m2 = item2->GetMetaData();
+
+        result = m1.Track() < m2.Track();        
+    }
+
+    return result;
 }

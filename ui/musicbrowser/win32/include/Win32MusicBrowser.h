@@ -61,6 +61,15 @@ bool operator==(const TreeData &A, const TreeData &b);
 void ClientToWindow(HWND hWnd, POINT *Pt); 
 extern HINSTANCE g_hinst;
 
+class TrackSort : public binary_function<PlaylistItem*, PlaylistItem*, bool> {
+
+ public:
+    TrackSort(){ }
+
+    bool operator() (PlaylistItem* item1, PlaylistItem* item2) const;
+};
+
+
 bool FileOpenDialog(HWND hwnd, 
                     const char* title,
                     const char* filter,
