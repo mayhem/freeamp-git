@@ -1,45 +1,49 @@
 [RegisterFileTypes:HKCR:MP2AudioFile]
-(Default)=S,MP2 Audio File
 ---Comment---=
+(Default)=S,MP2 Audio File
 
 [FreeAmpSet:HKCU:Software\FreeAmp\FreeAmp v2.0\Main]
----Comment---=
 (Default)=S,
+---Comment---=
 UI=S,freeamp.ui
 
 [RegisterFileTypes:HKCR:MP3AudioFile\shell\open\command]
----Comment---=
 (Default)=S,"<TARGETDIR>\freeamp.exe" "%1"
-
-[RegisterFileTypes:HKCR:PlayListFile\shell\open\command]
 ---Comment---=
-(Default)=S,"<TARGETDIR>\freeamp.exe" "%1"
 
 [RegisterFileTypes:HKCR:PlayListFile\DefaultIcon]
----Comment---=
 (Default)=S,<TARGETDIR>\freeamp.exe,0
+---Comment---=
+
+[RegisterFileTypes:HKCR:PlayListFile\shell\open\command]
+(Default)=S,"<TARGETDIR>\freeamp.exe" "%1"
+---Comment---=
+
+[RegisterFileTypes:HKCR:.m3u]
+(Default)=S,PlayListFile
+---Comment---=
+
+[RegisterFileTypes:HKCR:MP3AudioFile]
+(Default)=S,MP3 Audio File
+---Comment---=
 
 [FreeAmpSet]
 ---Comment---=
 ---FileGroup---=
 HKCU0=Software\FreeAmp\FreeAmp v2.0\Main
 
-[RegisterFileTypes:HKCR:MP3AudioFile]
----Comment---=
-(Default)=S,MP3 Audio File
-
-[RegisterFileTypes:HKCR:.m3u]
----Comment---=
-(Default)=S,PlayListFile
-
 [DSoundSet:HKCU:Software\FreeAmp\FreeAmp v2.0\Main]
----Comment---=
 (Default)=S,
+---Comment---=
 PMO=S,dsoundcard.pmo
 
 [RegisterFileTypes:HKCR:PlayListFile]
----Comment---=
 (Default)=S,PlayList File
+---Comment---=
+
+[RegisterFileTypes:HKCR:MP3AudioFile\DefaultIcon]
+(Default)=S,<TARGETDIR>\freeamp.exe,0
+---Comment---=
 
 [Data]
 Set0=MainSet
@@ -48,91 +52,88 @@ Set2=RegisterFileTypes
 Set3=FreeAmpSet
 Set4=SoundCardSet
 
-[RegisterFileTypes:HKCR:MP3AudioFile\DefaultIcon]
----Comment---=
-(Default)=S,<TARGETDIR>\freeamp.exe,0
-
 [RegisterFileTypes:HKCR:MP2AudioFile\shell\open\command]
-(Default)=S,"<TARGETDIR>\freeamp.exe" "%1"
 ---Comment---=
+(Default)=S,"<TARGETDIR>\freeamp.exe" "%1"
 
 [SoundCardSet]
 ---Comment---=
 ---FileGroup---=Soundcard Output
 HKCU0=Software\FreeAmp\FreeAmp v2.0\Main
 
-[RegisterFileTypes:HKCR:.mp2]
-(Default)=S,MP2AudioFile
----Comment---=
-
-[General]
-Type=REGISTRYDATA
-Version=1.00.000
-
 [DSoundSet]
 ---Comment---=
 ---FileGroup---=Direct Sound Output
 HKCU0=Software\FreeAmp\FreeAmp v2.0\Main
 
-[RegisterFileTypes:HKCR:.mp3]
+[General]
+Type=REGISTRYDATA
+Version=1.00.000
+
+[RegisterFileTypes:HKCR:.mp2]
 ---Comment---=
-(Default)=S,MP3AudioFile
+(Default)=S,MP2AudioFile
+
+[MainSet:HKCU:Software\FreeAmp\FreeAmp v2.0\Main]
+TimeDisplay=N,0
+LogInput=N,0
+SaveStreams=N,0
+ThemePath=S,
+UseDebugLog=N,0
+(Default)=S,
+---Comment---=
+OutputBufferSize=N,512
+LogMain=N,0
+LogDecode=N,0
+UseTitleStreaming=N,1
+MainWindowPos=S,-1,-1
+DownloadManagerUI=S,download.ui
+UI=S,freeamp.ui
+UseAlternateNIC=N,0
+LogOutput=N,0
+SaveStreamsDirectory=S,<TARGETDIR>
+PreBuffer=N,0
+ProxyHost=S,http://proxy.yourdomain.com:8080
+PlaylistShuffle=N,0
+Volume=N,85
+UserName=S,
+StreamBufferInterval=N,3
+InstallDirectory=S,<TARGETDIR>
+DatabaseDirectory=S,<TARGETDIR>\db
+StayOnTop=N,0
+LiveInTray=N,0
+DecoderThreadPriority=N,4
+PlaylistRepeat=N,0
+OpenSaveDirectory=S,<TARGETDIR>
+AlternateNICAddress=S,192.168.1.1
+SaveMusicDirectory=S,<TARGETDIR>\My Music
+MusicBrowserUI=S,musicbrowser.ui
+LogPerformance=N,0
+UseProxy=N,0
+ThemeDefaultFont=S,Arial
+InputBufferSize=N,64
+PMO=S,soundcard.pmo
 
 [MainSet]
 ---Comment---=
 ---FileGroup---=
 HKCU0=Software\FreeAmp\FreeAmp v2.0\Main
 
-[MainSet:HKCU:Software\FreeAmp\FreeAmp v2.0\Main]
-SaveStreams=N,0
-LogInput=N,0
-TimeDisplay=N,0
+[RegisterFileTypes:HKCR:.mp3]
+(Default)=S,MP3AudioFile
+---Comment---=
+
+[SoundCardSet:HKCU:Software\FreeAmp\FreeAmp v2.0\Main]
 ---Comment---=
 (Default)=S,
-UseDebugLog=N,0
-ThemePath=S,
-LogMain=N,0
-OutputBufferSize=N,512
-LogDecode=N,0
-UseTitleStreaming=N,1
-UseAlternateNIC=N,0
-UI=S,freeamp.ui
-DownloadManagerUI=S,download.ui
-MainWindowPos=S,-1,-1
-ProxyHost=S,http://proxy.yourdomain.com:8080
-PreBuffer=N,0
-SaveStreamsDirectory=S,<TARGETDIR>
-LogOutput=N,0
-PlaylistShuffle=N,0
-InstallDirectory=S,<TARGETDIR>
-StreamBufferInterval=N,3
-UserName=S,
-Volume=N,85
-StayOnTop=N,0
-DatabaseDirectory=S,<TARGETDIR>\db
-DecoderThreadPriority=N,4
-LiveInTray=N,0
-AlternateNICAddress=S,192.168.1.1
-OpenSaveDirectory=S,<TARGETDIR>
-PlaylistRepeat=N,0
-UseProxy=N,0
-LogPerformance=N,0
-MusicBrowserUI=S,musicbrowser.ui
-SaveMusicDirectory=S,<TARGETDIR>\MyMusic
 PMO=S,soundcard.pmo
-InputBufferSize=N,64
-ThemeDefaultFont=S,Arial
-
-[RegisterFileTypes:HKCR:MP2AudioFile\DefaultIcon]
-(Default)=S,<TARGETDIR>\freeamp.exe,0
----Comment---=
 
 [RegisterFileTypes]
-HKCR10=MP2AudioFile\DefaultIcon
 HKCR4=PlayListFile
-HKCR11=MP2AudioFile\shell\open\command
----Comment---=
+HKCR10=MP2AudioFile\DefaultIcon
 HKCR5=PlayListFile\shell\open\command
+---Comment---=
+HKCR11=MP2AudioFile\shell\open\command
 HKCR6=PlayListFile\DefaultIcon
 HKCR7=MP3AudioFile\DefaultIcon
 HKCR8=.mp2
@@ -143,8 +144,7 @@ HKCR1=MP3AudioFile
 HKCR2=MP3AudioFile\shell\open\command
 HKCR3=.m3u
 
-[SoundCardSet:HKCU:Software\FreeAmp\FreeAmp v2.0\Main]
-(Default)=S,
+[RegisterFileTypes:HKCR:MP2AudioFile\DefaultIcon]
 ---Comment---=
-PMO=S,soundcard.pmo
+(Default)=S,<TARGETDIR>\freeamp.exe,0
 

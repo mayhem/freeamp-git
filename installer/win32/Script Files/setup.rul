@@ -69,6 +69,7 @@
     prototype DialogSdRegisterUser();
     prototype DialogShowAskAboutFileTypes();
 	prototype DialogShowAskToRestartNetscape();
+	prototype DialogAskForMusicFolder();
 
 
     // ----- global variables ------
@@ -91,6 +92,7 @@
 
     // your global variables
     STRING      svFirstName, svLastName;
+    STRING		svDefaultMusicDir;
     BOOL		bNetscapeDetected;
     BOOL		bRegisterFileTypes, bReclaimFileTypes, bRegisterForRMPs;
 
@@ -195,9 +197,13 @@ begin
     nResult = DialogShowAskAboutFileTypes();
     if (nResult = BACK) goto Dlg_SdComponentDialog2;
 
+    Dlg_AskForMusicFolder:
+    nResult = DialogAskForMusicFolder();
+    if (nResult = BACK) goto Dlg_SdFileTypes;
+
     Dlg_SdSelectFolder:
     nResult = DialogShowSdSelectFolder();
-    if (nResult = BACK) goto Dlg_SdFileTypes;
+    if (nResult = BACK) goto Dlg_AskForMusicFolder;
 
 
 //    Dlg_SdStartCopy:
@@ -377,6 +383,7 @@ begin
 	// Create the ones that are dynamic
 	szUserName = svFirstName + " " + svLastName;
 	RegDBSetKeyValueEx(szKey, "UserName", REGDB_STRING, szUserName, -1);	
+	RegDBSetKeyValueEx(szKey, "SaveMusicDirectory", REGDB_STRING, svDefaultMusicDir, -1);
 	
 	if(bReclaimFileTypes = TRUE) then
 		szReclaimFileTypes = "1";
@@ -662,7 +669,8 @@ end;
 //
 // Function: DialogSdRegisterUser
 //
-//  Purpose: This function asks the user for the destination folder.
+//  Purpose: This function asks the user who they are so that ater we can
+//           customize our interface for them.
 //
 ///////////////////////////////////////////////////////////////////////////////
 function DialogSdRegisterUser()
@@ -683,6 +691,30 @@ begin
     return nResult;
 end;
 
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: DialogAskForMusicFolder
+//
+//  Purpose: This function asks the user for the music destination folder.
+//
+///////////////////////////////////////////////////////////////////////////////
+function DialogAskForMusicFolder()
+    NUMBER nResult;
+    STRING szTitle, szMsg;
+
+begin
+
+    szTitle = "Default Music Folder";
+    szMsg   = @PRODUCT_NAME + " features the ability to download music " +
+    		  "directly from within the player. Where would you like to save " +
+    		  "your downloaded music files?";
+    		
+    SetDialogTitle(DLG_ASK_PATH, szTitle);	
+    nResult = AskPath( szMsg, TARGETDIR ^ "My Music", svDefaultMusicDir);
+    StrRemoveLastSlash(svDefaultMusicDir);
+
+    return nResult;
+end;
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -711,7 +743,7 @@ begin
 
     szTitle = "";
     szMsg   = "";
-    nResult = SetupType( szTitle, szMsg, svDir, nType, 0 );
+    nResult = SdSetupType( szTitle, szMsg, svDir, nType );
     //nResult = SdSetupTypeEx ( szTitle , szMsg , "" , svSetupType , 0 );
 
     TARGETDIR = svDir;
@@ -934,6 +966,7 @@ end;
 // --- include script file section ---
 
 #include "sddialog.rul"
+
 
 
 
