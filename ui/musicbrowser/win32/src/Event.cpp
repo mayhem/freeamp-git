@@ -487,7 +487,7 @@ void MusicBrowserUI::EditInfoEvent()
 
                 m_context->catalog->UpdateSong(*track);
 
-                m_plm->UpdateTrackMetaData(*track);
+                m_plm->UpdateTrackMetaData(*track, true);
             }
         } 
     }

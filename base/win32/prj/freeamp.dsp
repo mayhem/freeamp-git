@@ -1014,5 +1014,60 @@ SOURCE=..\..\include\utility.h
 SOURCE=..\include\win32prefs.h
 # End Source File
 # End Group
+# Begin Group "dlls"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\..\lib\id3\id3lib.dll
+
+!IF  "$(CFG)" == "freeamp - Win32 Release"
+
+# Begin Custom Build
+InputPath=..\..\..\lib\id3\id3lib.dll
+InputName=id3lib
+
+".\$(InputName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy $(InputPath) .
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
+
+# Begin Custom Build
+InputPath=..\..\..\lib\id3\id3lib.dll
+InputName=id3lib
+
+".\$(InputName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy $(InputPath) .
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
+
+# Begin Custom Build
+InputPath=..\..\..\lib\id3\id3lib.dll
+InputName=id3lib
+
+".\$(InputName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy $(InputPath) .
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
+
+# Begin Custom Build
+InputPath=..\..\..\lib\id3\id3lib.dll
+InputName=id3lib
+
+".\$(InputName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy $(InputPath) .
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# End Group
 # End Target
 # End Project

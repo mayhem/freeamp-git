@@ -650,6 +650,8 @@ void SoundCardPMO::WorkerThread(void)
               // cleans up the pending headers so the bytes in use
               // value is correct.
               NextHeader(true);
+			  if (m_iHead == m_iTail)
+				 Debug_v("Underflow!");
     
               WasteTime();
               continue;

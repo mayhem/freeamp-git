@@ -154,7 +154,6 @@ InitializeRegistry(Registry* registry, Preferences* prefs)
                 error = kError_LoadLibFailed;
 
                 module = LoadLibrary(file);
-            
                 if(module)
                 {
                     InitializeFunction init = NULL;
