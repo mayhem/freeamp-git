@@ -1290,9 +1290,13 @@ void GTKMusicBrowser::HandleStreamList(vector<FreeAmpStreamInfo> &list)
         newitem->SetMetaData(&metadata);
 
         char *tempname = new char[i->m_name.size() + 128];
-        sprintf(tempname, "%s (%.2fkBps / %d out of %d listeners)",
-                i->m_name.c_str(), (double)i->m_bitrate / 1000.0, i->m_numUsers,
-                i->m_maxUsers);
+        if (i->m_numUsers < 0)
+            sprintf(tempname, "%s (%.2fkBps)", i->m_name.c_str(), 
+                    (double)i->m_bitrate / 1000.0);
+        else
+            sprintf(tempname, "%s (%.2fkBps / %d out of %d listeners)",
+                    i->m_name.c_str(), (double)i->m_bitrate / 1000.0, 
+                    i->m_numUsers, i->m_maxUsers);
         name[0] = tempname;
 
         GtkCTreeNode *parent = StreamGetParentNode(i->m_treePath);
@@ -1381,9 +1385,12 @@ void GTKMusicBrowser::FillStreams(void)
     if (streamExpanded)
         return;
 
-    if (!stream_timer_started)
-        m_context->timerManager->StartTimer(&stream_timer, stream_timer_func, 
-                                            1, this);
+    gdk_threads_leave();
+    StreamTimer();
+    gdk_threads_enter();
+    //if (!stream_timer_started)
+    //    m_context->timerManager->StartTimer(&stream_timer, stream_timer_func, 
+    //                                        1, this);
     stream_timer_started = true;
     streamExpanded = true;
 }
@@ -1455,7 +1462,7 @@ void GTKMusicBrowser::CloseStreams(void)
     if (!streamExpanded)
         return;
 
-    streamExpanded = false;
+    //streamExpanded = false;
 }
 
 static void ctree_expand(GtkWidget *widget, GList *list, GTKMusicBrowser *p)
@@ -1568,6 +1575,13 @@ static void add_stream_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
     p->AddNewStream();
 }
 
+static void update_stream(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+    gdk_threads_leave();
+    p->StreamTimer();
+    gdk_threads_enter();
+}
+
 static void add_fav_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
     p->AddStreamToFavs();
@@ -1601,7 +1615,8 @@ void GTKMusicBrowser::CreateTreePopups(void)
                                   relatable_items, (void*)this);
 
     GtkItemFactoryEntry genstream_items[] = {
-     {"/Add New Stream", NULL,    (GtkItemFactoryCallback)add_stream_pop, 0, 0 }
+     {"/Add New Stream", NULL,    (GtkItemFactoryCallback)add_stream_pop, 0, 0},
+     {"/Update Streams", NULL,    (GtkItemFactoryCallback)update_stream,  0, 0}
     };
     int ngenstream_items = sizeof(genstream_items) / sizeof(genstream_items[0]);
 

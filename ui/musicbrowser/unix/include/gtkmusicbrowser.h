@@ -138,11 +138,12 @@ class GTKMusicBrowser {
     void CloseStreams(void);
     void HandleStreamList(vector<FreeAmpStreamInfo> & list);
 
+    void StreamTimer(void);
+
  protected:
     FAContext *m_context;
 
     static void stream_timer_func(void *arg);
-    void StreamTimer(void);
 
  private:
     MusicBrowserUI *parentUI;
