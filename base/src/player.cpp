@@ -860,8 +860,12 @@ CreatePMO(PlayListItem * pc, Event * pC)
    pmi_item = ChoosePMI(pc->URL());
    if (!pmi_item)
    {
-      m_context->log->Error("Cannot determine what pmi to use for %s\n",
-			    pc->URL());
+      char szErr[1024];
+
+      sprintf(szErr, "Cannot determine what pmi to use for %s\n", pc->URL());
+      m_context->log->Error(szErr);
+      AcceptEvent(new LMCErrorEvent(szErr));
+
       return;
    }
 
@@ -923,7 +927,12 @@ CreatePMO(PlayListItem * pc, Event * pC)
    error = pmo->SetTo(pc->URL());
    if (IsError(error))
    {
-      m_context->log->Error("Cannot initialize pmo: %d\n", error);
+      char szErr[1024];
+
+      sprintf(szErr, "Cannot initialize pmo: %d\n", error);
+      m_context->log->Error(szErr);
+      AcceptEvent(new LMCErrorEvent(szErr));
+
       goto epilogue;
    }
 
@@ -1080,7 +1089,7 @@ GetMediaTitle(Event *pEventArg)
 
      pItem = pEvent->GetPlayListItem();
      pRegItem = ChoosePMI(pItem->URL(), szTitle);
-     if (!strlen(szTitle))
+     if (pRegItem && !strlen(szTitle))
      {
          pPmi = (PhysicalMediaInput *)pRegItem->InitFunction()(m_context);
 
