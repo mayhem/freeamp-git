@@ -754,8 +754,8 @@ GetFirstLibDir(char *path, uint32 *len)
         pPart = pCol + sizeof(char);
     }
 
-    pPath = (*hLibDirFind->m_pLibDirs)[0];
-    if (pPath) {
+    if (hLibDirFind->m_pLibDirs->size() > 0) {
+        pPath = (*hLibDirFind->m_pLibDirs)[0];
         strncpy(path,pPath,*len);
         *len = strlen(pPath);
     } else {
@@ -776,19 +776,16 @@ UnixPrefs::
 GetNextLibDir(LibDirFindHandle *hLibDirFind, char *path, uint32 *len)
 {
     if (hLibDirFind) {
-        hLibDirFind->m_current++;
-        char *pPath = (*hLibDirFind->m_pLibDirs)[hLibDirFind->m_current];
-        if (pPath) {
+        if (++hLibDirFind->m_current < (int32)hLibDirFind->m_pLibDirs->size()) {
+            char *pPath = (*hLibDirFind->m_pLibDirs)[hLibDirFind->m_current];
             strncpy(path,pPath,*len);
             *len = strlen(pPath);
 //          cout << "returning next: " << path << endl;
             return kError_NoErr;
-        } else {
-            *path = '\0';
-            *len = 0;
-//          cout << "returning no next " << path << endl;
-            return kError_NoMoreLibDirs;
         }
+        *path = '\0';
+        *len = 0;
+//      cout << "returning no next " << path << endl;
     }
     return kError_NoMoreLibDirs;
 }
