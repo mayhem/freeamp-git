@@ -1,5 +1,7 @@
 [TopDir]
 file0=C:\WINNT\system32\msvcirt.dll
+file1=C:\WINNT\system32\msvcrtd.dll
+file2=C:\WINNT\system32\msvcp50d.dll
 
 [General]
 Type=FILELIST

@@ -21,7 +21,7 @@ Type=2
 Compress=1
 Sign=0
 Transfer=0
-Files=37
+Files=38
 
 [Engine]
 Setup=disk1\SETUP.EXE
@@ -168,114 +168,120 @@ Flags=131089
 Disk=0
 
 [File 19]
-Name=msvcrtd.dll
+Name=msvcp50d.dll
 Path=Media\32bit\Disk Images\disk1\
 Flags=131089
 Disk=0
 
 [File 20]
+Name=msvcrtd.dll
+Path=Media\32bit\Disk Images\disk1\
+Flags=131089
+Disk=0
+
+[File 21]
 Name=musicbrowser.ui
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
-[File 21]
+[File 22]
 Name=obsinput.pmi
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
-[File 22]
+[File 23]
 Name=os.dat
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
-[File 23]
+[File 24]
 Name=pmp300.ppp
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
-[File 24]
+[File 25]
 Name=portio.sys
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
-[File 25]
+[File 26]
 Name=ReadMe.txt
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
-[File 26]
+[File 27]
 Name=SETUP.EXE
 Path=Media\32bit\Disk Images\disk1\
 Flags=589825
 Disk=0
 
-[File 27]
+[File 28]
 Name=SETUP.INI
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
-[File 28]
+[File 29]
 Name=setup.ins
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
-[File 29]
+[File 30]
 Name=setup.lid
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
-[File 30]
+[File 31]
 Name=soundcard.pmo
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
-[File 31]
+[File 32]
 Name=update.exe
 Path=Media\32bit\Disk Images\disk1\
 Flags=65537
 Disk=0
 
-[File 32]
+[File 33]
 Name=xing.lmc
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
-[File 33]
+[File 34]
 Name=_INST32I.EX_
 Path=Media\32bit\Disk Images\disk1\
 Flags=524289
 Disk=0
 
-[File 34]
+[File 35]
 Name=_ISDEL.EXE
 Path=Media\32bit\Disk Images\disk1\
 Flags=589825
 Disk=0
 
-[File 35]
+[File 36]
 Name=_SETUP.DLL
 Path=Media\32bit\Disk Images\disk1\
 Flags=655377
 Disk=0
 
-[File 36]
+[File 37]
 Name=_sys1.cab
 Path=Media\32bit\Disk Images\disk1\
 Flags=2097153
 Disk=0
 
-[File 37]
+[File 38]
 Name=_user1.cab
 Path=Media\32bit\Disk Images\disk1\
 Flags=2097153
