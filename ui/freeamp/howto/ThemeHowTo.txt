@@ -3,29 +3,31 @@
                             written by
                             Robert Kaye
                          (rob@emusic.com)
+        $Id$
 
 INTRODUCTION
 
 FreeAmp 2.0 supports fully customizable themes -- anyone with experience
 in Photoshop/Gimp and HTML should be able to create their own Themes.
-These themes are platform independent -- they will look exactly alike on
-Windows as they will on Linux. 
+These themes are platform independent -- they will look exactly the same
+on Windows as they will on Linux. 
 
-FreeAmp themes are not limited to having one layout for the controls
-unlike WinAmp. The FreeAmp window can be any shape and the button layouts
+Unlike WinAmp, FreeAmp themes are not limited to having one layout for the 
+controls. The FreeAmp window can be any shape and the button layouts
 can be anything the theme designer desires. Care to leave out some 
 buttons or display items you don't care for? Go ahead leave them out --
 FreeAmp doesn't care.
 
-This howto will get you started writing themes for FreeAmp. Please note
+This HOWTO will get you started writing themes for FreeAmp. Please note
 that this HOWTO is still in the beta stages, much like FreeAmp 2.0.
 If you find any problems with this HOWTO, please mail rob@emusic.com
-with your comments.
+with your comments, or better yet head over to Bugzilla and enter a 
+bug report <http://www.freeamp.org/bugzilla>.
 
 
 NEW FEATURES IN BETA 3 (November 1, 1999)
 
-There are a few features that didn't make it into beta II:
+There are a few features that didn't make it into beta 2:
 
 - The location for buttons on the theme can be specified as a point
   and not as a rect.
@@ -42,13 +44,13 @@ NEW FEATURES BEFORE RELEASE
 GETTING STARTED
 
 To get started working on FreeAmp themes, I recommend that you 
-grab freeamp.fat from the themes directory in your FreeAmp
+grab FreeAmp.fat from the themes directory in your FreeAmp
 installation and decompile it using the supplied program MakeTheme:
 
    MakeTheme -d freeamp.fat
 
 Take a brief look at the theme.xml file and the bitmaps that get
-unpackaged. Or you can look at Appendix B. :-) Then read on.
+unpacked. Or you can look at Appendix B. :-) Then read on.
 
 
 THEMES
@@ -64,7 +66,7 @@ A theme consists of at least three files that get packaged into one
 Don't be scared by the XML -- in this case you might as well call it
 an HTML-like syntax, which sounds less intimidating. :-)
 
-A theme designer creates these three or more files in a seperate 
+A theme designer creates these three or more files in a separate 
 directory and then points FreeAmp to these files. 
 
 The ThemePath preference should point to the theme directory or a 
@@ -98,7 +100,7 @@ while keeping the size of the theme down.
 For each bitmap the theme designer can specify a color which will
 be used as the transparent color in the bitmap. All pixels in that
 bitmap that are deemed to be transparent, will never be shown on
-a FreeAmp theme. This allows theme designers to create aribitrarily
+a FreeAmp theme. This allows theme designers to create arbitrarily
 shaped FreeAmp windows and controls.
 
 Each bitmap is given a name -- other controls will refer back to
@@ -125,7 +127,7 @@ To alleviate this problem there are two solutions:
     a bad idea from a legal perspective -- a lot of fonts in use today
     are copyrighted non free fonts and including a non-free font
     presents a legal liability to us if we want to have a FreeAmp
-    theme respository on the FreeAmp site.
+    theme repository on the FreeAmp site.
  2) Allow a theme designer to include a URL to a font. This way a theme
     designer can use fonts that are freely available on the free font
     repositories on the net. When FreeAmp comes across a font it does
@@ -141,7 +143,7 @@ to.
 
 RECTS
 
-All througout a theme descriptions Rect attributes are used. A Rect
+All throughout a theme descriptions Rect attributes are used. A Rect
 specifies a rectangular region on a bitmap. The Rect is defined as
 
    Rect="x1,y1,x2,y2"
@@ -153,7 +155,7 @@ THEME.XML
 
 The actual theme file is an XML document. Right now FreeAmp only
 supports XML documents encoded in ISO8859/1 (and even that has
-not been thouroughly tested). Just assume that the theme.xml
+not been thoroughly tested). Just assume that the theme.xml
 file is a regular text file.
 
 XML differs from HTML in quite a few respects, but if you are
@@ -169,7 +171,7 @@ constructs are equivalent:
 
    <Info Desc="Subvert the dominant paradigm"/>
 
-The default FreeAmp theme makes copious use of the empty tag contsruct
+The default FreeAmp theme makes copious use of the empty tag construct
 since many theme details are specified using attributes. 'Desc' in the 
 example above is an attribute to the Info tag. Attributes values *must*
 always be enclosed by double quotes and the attribute names are
@@ -209,14 +211,14 @@ To specify a font:
 
 The Name attribute specifies the given name for this font that 
 TextControls will use. The Face attribute specifies which font to use.
-This can be a comma seperated list. FreeAmp will first attempt to
+This can be a comma separated list. FreeAmp will first attempt to
 find a font named Arial, and if it can't find that it will attempt
 to font font called Helvetica and so on. If FreeAmp can't find any
 of the specified fonts, it will use the default font.
 
-This comma seperated list is useful for specfying similar fonts on
-different operating systems. Using the contstruct above will pretty
-much garantee that you're going to get a san serif font on either
+This comma separated list is useful for specfying similar fonts on
+different operating systems. Using the construct above will pretty
+much guarantee that you're going to get a san serif font on either
 Windows or Linux.
 
 
@@ -243,7 +245,7 @@ define <BackgroundBitmap> and <Controls>.
 BackgroundBitmap:
 -----------------
 
-This tag tells freeamp which bitmap to use a the background for this
+This tag tells FreeAmp which bitmap to use a the background for this
 window:
 
     <BackgroundBitmap Name="Background" Rect="0, 0, 327, 191"/>
@@ -389,11 +391,11 @@ coordinates. In the above case, the control bitmap starts 237 pixels
 to the right of the left edge of the Buttons bitmap, and 148 pixels
 below the top edge of the Buttons bitmap.
 
-The x2 and y2 coordinates of the control bitmap depend how many 'frames'
-the control expects in the ControlBitmap. For instance, the regular
-ButtonControl has 4 frames (Normal, MouseOver, Pressed and Disabled)
-and the ControlBitmap for a ButtonControl should be 4 times as wide as
-the specified Rect from the Position tag.
+The x2 and y2 coordinates of the control bitmap depend on how many 
+'frames' the control expects in the ControlBitmap. For instance, the 
+regular ButtonControl has 4 frames (Normal, MouseOver, Pressed and 
+Disabled) and the ControlBitmap for a ButtonControl should be 4 times as 
+wide as the specified Rect from the Position tag.
 
 For instance:
 
@@ -411,7 +413,7 @@ arrive at: Rect="0,203,259,218"
 
 For a SliderControl thumb, you will need 3 frames. For a MultiStateControl
 you will need the ControlBitmap to be 4 frames wide and n frames high
-wheren is the value defined by the NumStates attribute. State 0 will
+where n is the value defined by the NumStates attribute. State 0 will
 be in the first row of bitmaps, state 1 in the second row and so on.
 
 Style:
@@ -464,7 +466,7 @@ QUICK REFERENCE
    Attributes:   
 
    Name -- The name of the bitmap as referenced by other controls
-   Face -- A comma seperated list of font faces to use
+   Face -- A comma separated list of font faces to use
 
    Subtags:
    
@@ -513,7 +515,7 @@ QUICK REFERENCE
    <SliderControl>
 
    
-<ButtonControls>
+<ButtonControl>
 
    -- specifies a name button control
    
@@ -646,8 +648,8 @@ Options		-- open options dialog
 Playlist	-- open playlist view (this will go away in beta III)
 Download	-- open the download manager
 Logo		-- FreeAmp logo, clicking it will open a web browser to 
-               the freeamp site.
-Minimize	-- Minimizes freeamp
+               the FreeAmp site.
+Minimize	-- Minimizes FreeAmp
 ReloadTheme -- Reload the current theme
 
 TextControls:
