@@ -100,6 +100,17 @@ union tar_record {
 // The magic field is filled with this if uname and gname are valid.
 #define    TMAGIC    "ustar  "        // 7 chars and a null
 
+/* Values used in typeflag field.  */
+#define REGTYPE  '0'        /* regular file */
+#define AREGTYPE '\0'       /* regular file */
+#define LNKTYPE  '1'        /* link */
+#define SYMTYPE  '2'        /* reserved */
+#define CHRTYPE  '3'        /* character special */
+#define BLKTYPE  '4'        /* block special */
+#define DIRTYPE  '5'        /* directory */
+#define FIFOTYPE '6'        /* FIFO special */
+#define CONTTYPE '7'        /* reserved */
+
 
 Error ThemeZip::CompressThemeZip(const string &oDestFile, 
                                  vector<string *> &oFileList)
@@ -152,15 +163,15 @@ Error ThemeZip::CompressThemeZip(const string &oDestFile,
        sprintf(TarRecord.header.mtime,"%11o",ltime);
        TarRecord.header.mtime[11]='\x20';
 
-       TarRecord.header.typeflag = '0'; // normal file
+       TarRecord.header.typeflag = REGTYPE; // normal file
        strcpy(TarRecord.header.magic,TMAGIC);
 
 
        // last, create checksum
        memcpy(TarRecord.header.chksum,CHKBLANKS,8);
        int ctr,sum;
-       for (ctr = sum = 0; ctr < (int)sizeof(tar_record); ctr++) 
-           sum += TarRecord.charptr[ctr];
+       for(ctr=sum=0;ctr<sizeof(tar_record);ctr++) 
+           sum+=TarRecord.charptr[ctr];
        sprintf(TarRecord.header.chksum,"%6o",sum);
 
        if (gzwrite(pOut, (void *)&TarRecord, sizeof(tar_record)) != sizeof(tar_record))
@@ -209,7 +220,7 @@ Error ThemeZip::CompressThemeZip(const string &oDestFile,
    // write end-marker (zero-ed tar-record)
    memset(&TarRecord,0,sizeof(tar_record));
    gzwrite(pOut,(void*)&TarRecord, sizeof(tar_record));
-   // and padding (and why the hell TAR needs extra 4kb with zeroes?)
+   // ... and padding (and why the hell TAR needs extra 4kb with zeroes?)
    iSize=gztell(pOut);
    iPadding = (iSize/512+1)*512-iSize;
    if(iPadding)
@@ -230,7 +241,7 @@ Error ThemeZip::CompressThemeZip(const string &oDestFile,
 #define ISSPACE(Char) (__isascii (Char) && isspace (Char))
 
 
-int from_oct (int digs, char *where)
+long from_oct (int digs, char *where)
 {
   long value;
 
@@ -262,11 +273,12 @@ Error ThemeZip::DecompressThemeZip(const string &oSrcFile,
 {
    FILE   *pOut;
    gzFile  pIn;
+   tar_record TarRecord;
+
    char   *pBuffer;
    int     iWrite, iRead, iSize, iBlock, iPadding;
-   int     fDone;
-   string  oFile;
-   tar_record TarRecord;
+   int     fDone,fOneDirectory;
+   string  oFile,oUnpackFile;
 
    if (oSrcFile.length() == 0)
       return kError_FileNotFound;
@@ -279,44 +291,107 @@ Error ThemeZip::DecompressThemeZip(const string &oSrcFile,
 
    pBuffer = new char[iBufferSize];
    fDone = FALSE;
+   fOneDirectory = FALSE; // make sure TAR contains only one directory at most
+
+   //
+   // unpack the TAR inside GZ
+   //
 
    while(!fDone)
    {
        if (gzread(pIn, &TarRecord, sizeof(tar_record)) != sizeof(tar_record))
        {
            gzclose(pIn);
+           delete pBuffer;
+           CleanupThemeZip();
            return kError_ReadFile;
        }
-       // check if we are done
+
+       //
+       // sanity checks
+       //
+
+       // check if we are done (header record all 0)
        int ctr,sum;
-       for (ctr = sum = 0; ctr < (int)sizeof(tar_record); ctr++) 
-            sum += TarRecord.charptr[ctr];
+       for(ctr=sum=0; ctr<sizeof(tar_record); ctr++) 
+           sum+=TarRecord.charptr[ctr];
        if(sum==0)
        {
-           // empty record detected, done
+           // empty record detected, bail out
            fDone = TRUE;
            break;
        }
-       // check if checksum is still OK
-       int our_sum = from_oct(6,TarRecord.header.chksum);
-       memcpy(TarRecord.header.chksum,CHKBLANKS,8);
-       for (ctr = sum = 0; ctr < (int)sizeof(tar_record); ctr++) 
-            sum += TarRecord.charptr[ctr];
-       if(sum!=our_sum)
+
+       // check for magic
+       if(TarRecord.header.magic[7]!=0 || strcmp(TarRecord.header.magic,TMAGIC))
        {
+           // nope, something not right
            gzclose(pIn);
            delete pBuffer;
            CleanupThemeZip();
            return kError_NoDataAvail;
        }
-       // yes, can proceed
 
-       oFile = oDestPath + string(DIR_MARKER_STR) + string(TarRecord.header.name);
+       // check if checksum is still OK
+       int our_sum = from_oct(6,TarRecord.header.chksum);
+       memcpy(TarRecord.header.chksum,CHKBLANKS,8);
+       for(ctr=sum=0;ctr<sizeof(tar_record);ctr++) 
+           sum+=TarRecord.charptr[ctr];
+       if(sum!=our_sum)
+       {
+           // checksum failed
+           gzclose(pIn);
+           delete pBuffer;
+           CleanupThemeZip();
+           return kError_NoDataAvail;
+       }
+
+       // check if we are dealing with file
+       if(TarRecord.header.typeflag == REGTYPE || TarRecord.header.typeflag == AREGTYPE)
+       {
+           // all fine, just proceed
+           ;
+       }
+       else
+       {
+           if(TarRecord.header.typeflag == DIRTYPE && !fOneDirectory)
+           {
+               // will tolearate one directory
+               fOneDirectory = TRUE;
+
+               continue; // go on to next record
+           }
+           else
+           {
+               // ... but not many:
+               // this archive is likely not theme anyway!
+               gzclose(pIn);
+               delete pBuffer;
+               CleanupThemeZip();
+               return kError_NoDataAvail;
+           }
+       }
+       // ... sanity checks ok, proceed with file
+
+
+       //
+       // the unpacking itself
+       //
+
+       oUnpackFile = string(TarRecord.header.name);
+       // in case we have sub-directory in tar, take only filename
+       unsigned int uPos;
+       uPos=oUnpackFile.rfind('/');
+       if(uPos!=oUnpackFile.npos) oUnpackFile.erase(0,uPos+1);
+
+       // open output file
+       oFile = oDestPath + string(DIR_MARKER_STR) + oUnpackFile;
        pOut = fopen(oFile.c_str(), "wb");
        if (pOut == NULL)
        {
            gzclose(pIn);
            delete pBuffer;
+           CleanupThemeZip();
            return kError_FileNotFound;
        }
        m_oCreatedFiles.push_back(oFile);
@@ -324,6 +399,7 @@ Error ThemeZip::DecompressThemeZip(const string &oSrcFile,
        iSize = from_oct(11,TarRecord.header.size); 
        iPadding = (iSize/512+1)*512-iSize;
 
+       // write it's data out
        for(; iSize > 0;)
        {
            iBlock = min(iSize, iBufferSize);
@@ -356,10 +432,107 @@ Error ThemeZip::DecompressThemeZip(const string &oSrcFile,
        }
 
    }
+
+   // all went fine
+
    delete pBuffer;
    gzclose(pIn);
 
    return kError_NoErr;
+}
+
+Error ThemeZip::GetDescriptiveName(const string &oSrcFile, string &oDescriptiveName)
+{
+    gzFile pIn;
+    tar_record TarRecord;
+    int iSize, iPadding;
+    int fDone;
+
+    // sanity check
+    if (oSrcFile.length() == 0)
+       return kError_FileNotFound;
+
+    oDescriptiveName=string(""); // return at least empty string in any case
+
+    // open theme file
+    pIn = gzopen(oSrcFile.c_str(), "rb");
+    if (pIn == NULL)
+        return kError_FileNotFound;
+
+    //
+    // loop to find directory record (descriptive name, that is)
+    //
+    fDone = FALSE;
+    while(!fDone)
+    {
+        if (gzread(pIn, &TarRecord, sizeof(tar_record)) != sizeof(tar_record))
+        {
+            gzclose(pIn);
+            return kError_ReadFile;
+        }
+
+        //
+        // sanity checks
+        //
+
+        // check if we are done (header record all 0)
+        int ctr,sum;
+        for(ctr=sum=0; ctr<sizeof(tar_record); ctr++) 
+            sum+=TarRecord.charptr[ctr];
+        if(sum==0)
+        {
+            // empty record detected, bail out
+            fDone = TRUE;
+            break;
+        }
+
+        // check for magic
+        if(TarRecord.header.magic[7]!=0 || strcmp(TarRecord.header.magic,TMAGIC))
+        {
+            // nope, something not right
+            gzclose(pIn);
+            return kError_NoDataAvail;
+        }
+
+        // check if checksum is still OK
+        int our_sum = from_oct(6,TarRecord.header.chksum);
+        memcpy(TarRecord.header.chksum,CHKBLANKS,8);
+        for(ctr=sum=0;ctr<sizeof(tar_record);ctr++) 
+            sum+=TarRecord.charptr[ctr];
+        if(sum!=our_sum)
+        {
+            // checksum failed
+            gzclose(pIn);
+            return kError_NoDataAvail;
+        }
+
+        // see if it is directory record we are looking for
+        if(TarRecord.header.typeflag == DIRTYPE)
+        {
+            unsigned int uPos;
+            oDescriptiveName = string (TarRecord.header.name);
+
+            // erase trailing slash
+            uPos=oDescriptiveName.rfind('/');
+            if(uPos!=oDescriptiveName.npos) oDescriptiveName.erase(uPos,uPos+1);
+            // erase (possible) extension
+            uPos=oDescriptiveName.rfind(string(".fat"));
+            if(uPos!=oDescriptiveName.npos) oDescriptiveName.erase(uPos,uPos+1);
+
+            break; //we're done
+        }
+
+        // skip actual content
+        iSize = from_oct(11,TarRecord.header.size);
+        if(iSize)
+        {
+            iPadding = (iSize/512+1)*512-iSize;
+            gzseek(pIn, iSize+iPadding, SEEK_CUR);
+        }
+    }
+
+    gzclose(pIn);
+    return kError_NoErr;
 }
 
 Error ThemeZip::CleanupThemeZip(void)

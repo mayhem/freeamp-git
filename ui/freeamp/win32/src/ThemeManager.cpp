@@ -29,6 +29,7 @@ ____________________________________________________________________________*/
 #else
 #include <netinet/in.h>
 #endif
+#include "ThemeZip.h"
 #include "ThemeManager.h"
 #include "debug.h"
 
@@ -42,7 +43,7 @@ ThemeManager::ThemeManager(FAContext *pContext)
     Error  eRet;
     
     m_pContext = pContext;
-	m_oCurrentTheme = "";
+    m_oCurrentTheme = "";
     m_bDevelTheme = false;
     
     szThemePath[0] = 0;
@@ -50,7 +51,7 @@ ThemeManager::ThemeManager(FAContext *pContext)
     if (IsError(eRet) || strlen(szThemePath) == 0)
     {
         GetDefaultTheme(m_oCurrentTheme);
-     	_splitpath(m_oCurrentTheme.c_str(), NULL, NULL, szThemePath, NULL);
+        _splitpath(m_oCurrentTheme.c_str(), NULL, NULL, szThemePath, NULL);
         m_oCurrentTheme = szThemePath;
     }    
     else
@@ -66,7 +67,7 @@ ThemeManager::ThemeManager(FAContext *pContext)
         }   
         else
         {
-     	   _splitpath(m_oCurrentTheme.c_str(), NULL, NULL, szThemePath, NULL);
+           _splitpath(m_oCurrentTheme.c_str(), NULL, NULL, szThemePath, NULL);
            m_oCurrentTheme = szThemePath;
         }   
     }    
@@ -85,7 +86,7 @@ Error ThemeManager::GetDefaultTheme(string &oThemePath)
     oThemePath = string(dir);
     oThemePath += string("\\themes\\freeamp.fat");    
 
-	return kError_NoErr;
+    return kError_NoErr;
 }
 
 Error ThemeManager::GetThemeList(map<string, string> &oThemeFileMap)
@@ -95,6 +96,8 @@ Error ThemeManager::GetThemeList(map<string, string> &oThemeFileMap)
     char            dir[MAX_PATH], *ptr;
     uint32          len = sizeof(dir);
     string          oThemePath, oThemeBasePath, oThemeFile;
+    string          oThemeName;
+    ThemeZip        oZip;
 
 
     if (m_bDevelTheme)
@@ -108,19 +111,30 @@ Error ThemeManager::GetThemeList(map<string, string> &oThemeFileMap)
     if(handle == INVALID_HANDLE_VALUE)
         return kError_NoErr;
 
-	do
+    do
     {
-		oThemeFile = oThemeBasePath + string("\\") + 
+        oThemeFile = oThemeBasePath + string("\\") + 
                      string(find.cFileName);
-    	ptr = strrchr(find.cFileName, '.');
-        if (ptr)
-           *ptr = 0;
 
+        // check for extended info
+        oZip.GetDescriptiveName(oThemeFile,oThemeName); 
+        if(oThemeName.length())
+        {
+            // got something
+            oThemeFileMap[oThemeName] = oThemeFile;
+        }
+        else
+        {
+            // fine... use the filename instead.
+            ptr = strrchr(find.cFileName, '.');
+            if (ptr)
+               *ptr = 0;
+        }
         oThemeFileMap[find.cFileName] = oThemeFile;
     }
     while(FindNextFile(handle, &find));
 
-	return kError_NoErr;
+    return kError_NoErr;
 }
 
 Error ThemeManager::UseTheme(string &oThemeFile)
@@ -129,7 +143,7 @@ Error ThemeManager::UseTheme(string &oThemeFile)
     uint32 len = sizeof(dir);
     string oThemePath;
 
-	_splitpath(oThemeFile.c_str(), NULL, NULL, dir, NULL);
+    _splitpath(oThemeFile.c_str(), NULL, NULL, dir, NULL);
     if (strcmp(dir, m_oCurrentTheme.c_str()) == 0)
     {
        return kError_NoErr;
@@ -141,7 +155,7 @@ Error ThemeManager::UseTheme(string &oThemeFile)
     else    
         m_oCurrentTheme = string(dir);
     
-	return kError_NoErr;
+    return kError_NoErr;
 }
 
 Error ThemeManager::AddTheme(string &oThemeFile)
@@ -153,26 +167,26 @@ Error ThemeManager::AddTheme(string &oThemeFile)
     m_pContext->prefs->GetInstallDirectory(dir, &len);
     oThemeDest = string(dir);
     
-	_splitpath(oThemeFile.c_str(), NULL, NULL, dir, ext);
+    _splitpath(oThemeFile.c_str(), NULL, NULL, dir, ext);
     if (strcmp(dir, m_oCurrentTheme.c_str()) == 0)
     {
        return kError_NoErr;
     }   
 
-	oThemeDest += string("\\themes\\") + string(dir) + string(ext);
+    oThemeDest += string("\\themes\\") + string(dir) + string(ext);
     return CopyFile(oThemeFile.c_str(), oThemeDest.c_str(), false) ? 
            kError_NoErr : kError_CopyFailed;
 }
 
 Error ThemeManager::DeleteTheme(string &oThemeFile)
 {
-	return _unlink(oThemeFile.c_str()) == 0 ? kError_NoErr : kError_UnlinkFailed;
+    return _unlink(oThemeFile.c_str()) == 0 ? kError_NoErr : kError_UnlinkFailed;
 }
 
 Error ThemeManager::GetCurrentTheme(string &oTheme)
 {
-	oTheme = m_oCurrentTheme;
-	return kError_NoErr;
+    oTheme = m_oCurrentTheme;
+    return kError_NoErr;
 }
 
     

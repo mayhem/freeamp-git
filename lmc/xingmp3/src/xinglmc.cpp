@@ -49,7 +49,7 @@ ____________________________________________________________________________*/
 #include "lmc.h"
 #include "facontext.h"
 #include "log.h"
-#include "Debug.h"
+#include "debug.h"
 
 #define DB Debug_v("%s:%d\n",  __FILE__, __LINE__);
 

@@ -49,6 +49,8 @@ class ThemeZip
       virtual  Error DecompressThemeZip(const string &oSrcFile,
                                         const string &oDestPath);
       virtual  Error CleanupThemeZip(void);                                  
+      virtual  Error GetDescriptiveName(const string &oSrcFile, 
+                                        string &oDescriptiveName);
 
     protected:
      
