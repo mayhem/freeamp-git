@@ -86,7 +86,7 @@ void FileBuffer::Clear(void)
 
 Error FileBuffer::Open(void)
 {
-    m_fpFile = fopen(m_szFile, "r");
+    m_fpFile = fopen(m_szFile, "rb");
     if (m_fpFile == NULL)
     {
         switch (errno)
