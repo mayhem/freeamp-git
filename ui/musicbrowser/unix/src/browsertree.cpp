@@ -28,6 +28,7 @@ ____________________________________________________________________________*/
 #ifdef WIN32
 #include <io.h>
 #else
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
 #include <unistd.h>
