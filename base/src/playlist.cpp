@@ -1537,7 +1537,7 @@ Error PlaylistManager::Sort(PlaylistSortKey key, PlaylistSortType type)
 
     const PlaylistItem* currentItem = GetCurrentItem();
 
-    if(currentItem && key >= kPlaylistSortKey_FirstKey && key < kPlaylistSortKey_LastKey)
+    if(key >= kPlaylistSortKey_FirstKey && key < kPlaylistSortKey_LastKey)
     {
         if(type == kPlaylistSortType_Ascending)
             stable_sort(m_activeList->begin(), m_activeList->end(), PlaylistItemSort(key));
@@ -1549,7 +1549,7 @@ Error PlaylistManager::Sort(PlaylistSortKey key, PlaylistSortType type)
 
         result = kError_NoErr;
     }
-    else if(currentItem && key == kPlaylistSortKey_Random)
+    else if(key == kPlaylistSortKey_Random)
     {
         pointer_to_unary_function<int, int> lRand = 
                        pointer_to_unary_function<int, int>(my_rand);
@@ -1563,7 +1563,7 @@ Error PlaylistManager::Sort(PlaylistSortKey key, PlaylistSortType type)
 
     if(IsntError(result))
     {
-        if(kPlaylistKey_MasterPlaylist == GetActivePlaylist())
+        if(kPlaylistKey_MasterPlaylist == GetActivePlaylist() && currentItem)
             InternalSetCurrentIndex(IndexOf(currentItem));
            
         m_context->target->AcceptEvent(new PlaylistSortedEvent(key, this));
