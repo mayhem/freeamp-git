@@ -34,6 +34,10 @@ Canvas::Canvas(void)
 
 Canvas::~Canvas(void)
 {
+	// The bitmap that was loaded by the theme will be destroyed by the theme
+	// However, if we created any clones, we need to kill those...
+	if (m_pCompleteBGBitmap)
+		delete m_pBGBitmap;
 }
 
 void Canvas::SetBackgroundRect(Rect &oRect)
@@ -80,8 +84,10 @@ void Canvas::InitBackgrounds(vector<Panel *> *pPanels)
         return;
     }
 
-    m_pBGBitmap = m_pCompleteBGBitmap->Clone();
+	if (m_pBGBitmap)
+	   delete m_pBGBitmap;
 
+    m_pBGBitmap = m_pCompleteBGBitmap->Clone();
     for(i = pPanels->begin(); i != pPanels->end(); i++)
     {
         if (!(*i)->m_bIsOpen)

@@ -62,14 +62,20 @@ Window::Window(Theme *pTheme, string &oName)
 
 Window::~Window(void)
 {
+    vector<Panel *>::iterator i;
+
     if (!m_bIsVulcanMindMeldHost)
     {
        delete m_pCanvas;
        ClearControls();
+
+       for(i = m_oPanels.begin(); i != m_oPanels.end(); i++)
+	     	delete (Panel *)*i;
     }   
 
     delete m_pUsageMutex;
     delete m_pUsageSem;
+
 }
 
 void Window::IncUsageRef(void)
