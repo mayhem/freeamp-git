@@ -423,7 +423,7 @@ void MusicBrowserUI::FillAllTracks()
                 insert.item.iSelectedImage = 4;
                 insert.item.cChildren= 0;
                 insert.item.lParam = (LPARAM) new TreeData(data);
-                insert.hInsertAfter = TVI_LAST;
+                insert.hInsertAfter = TVI_SORT;
                 insert.hParent = m_hAllItem;
                 TreeView_InsertItem(m_hMusicView, &insert);
 
@@ -509,7 +509,7 @@ void MusicBrowserUI::FillUncatTracks()
         insert.item.iSelectedImage = 4;
         insert.item.cChildren= 0;
         insert.item.lParam = (LPARAM) new TreeData(data);
-        insert.hInsertAfter = TVI_LAST;
+        insert.hInsertAfter = TVI_SORT;
         insert.hParent = m_hUncatItem;
         TreeView_InsertItem(m_hMusicView, &insert);
     }
