@@ -1178,12 +1178,15 @@ void FreeAmpTheme::PostWindowCreate(void)
 void FreeAmpTheme::ShowHelp(void)
 {
     string            oHelpFile;
-    char              dir[MAX_PATH];
+    char              dir[_MAX_PATH];
     uint32            len = sizeof(dir);
     
     m_pContext->prefs->GetInstallDirectory(dir, &len);
     oHelpFile = string(dir);
     oHelpFile += string(DIR_MARKER_STR);    
+#ifdef unix
+    oHelpFile += string("../share/");
+#endif
     oHelpFile += string(HELP_FILE);    
     
 #ifdef WIN32   

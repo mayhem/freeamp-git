@@ -128,8 +128,8 @@ install-themes:
 	done
 
 install-docs:
-	$(mkinstalldirs) $(DESTDIR)$(libdir)/freeamp
-	gzip -d -c < $(srcdir)/help/unix/freeamphelp.tar.gz | (cd $(DESTDIR)$(libdir)/freeamp; rm -rf help; tar -xmf -)
+	$(mkinstalldirs) $(DESTDIR)$(datadir)/freeamp
+	gzip -d -c < $(srcdir)/help/unix/freeamphelp.tar.gz | (cd $(DESTDIR)$(datadir)/freeamp; rm -rf help; tar -xmf -)
 
 depend:
 	makedepend -- $(DEFS) $(INCLUDES) $(CFLAGS) -- `echo $(FREEAMPOBJ) | sed -e 's,\.o,.cpp,g'`

@@ -128,7 +128,6 @@ class GTKPreferenceWindow : public PreferenceWindow
 
                void SavePrefsValues(Preferences* prefs, 
                                     PrefsStruct* values);
-
   protected:
     
       PrefsStruct  currentValues;
@@ -206,6 +205,8 @@ class GTKPreferenceWindow : public PreferenceWindow
       void SelectTheme(int number);
 
       void SetPMO(int newsel);
+
+      void ShowHelp(void);
 };
 
 #endif

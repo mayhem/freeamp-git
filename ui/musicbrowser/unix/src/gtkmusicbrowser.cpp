@@ -24,6 +24,7 @@ ____________________________________________________________________________*/
 #include "config.h"
 
 #include <gtk/gtk.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <iostream>
 
@@ -36,6 +37,7 @@ ____________________________________________________________________________*/
 #include "player.h"
 #include "musicbrowserui.h"
 #include "gtkmessagedialog.h"
+#include "help.h"
 
 #include "../res/down_pic.xpm"
 #include "../res/edit_pic.xpm"
@@ -128,6 +130,23 @@ void GTKMusicBrowser::SetRepeat(int numrepeat)
 
 void show_help(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
+    string oHelpFile;
+    char   dir[_MAX_PATH];
+    uint32 len = _MAX_PATH;
+
+    p->GetContext()->prefs->GetInstallDirectory(dir, &len);
+    oHelpFile = string(dir) + string(DIR_MARKER_STR) + string("../share/");
+    oHelpFile += string(HELP_FILE);
+
+    struct stat st;
+    
+    if (stat(oHelpFile.c_str(), &st) == 0 && st.st_mode & S_IFREG)
+        LaunchBrowser((char *)oHelpFile.c_str());
+    else {
+        GTKMessageDialog oBox;
+        string oMessage("Cannot find the help files. Please make sure that the help files are properly installed, and you are not running "BRANDING" from the build directory.");
+        oBox.Show(oMessage.c_str(), string(BRANDING), kMessageOk, true);
+    }
 }
 
 void freeamp_web(GTKMusicBrowser *p, guint action, GtkWidget *w)
