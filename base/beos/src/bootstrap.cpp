@@ -28,6 +28,8 @@ ____________________________________________________________________________*/
 #include <iostream>
 
 #include <be/app/Application.h>
+#include <be/storage/Entry.h>
+#include <be/storage/Path.h>
 
 #include "config.h"
 #include "player.h"
@@ -41,27 +43,55 @@ ____________________________________________________________________________*/
 #include "facontext.h"
 #include "beosprefs.h"
 
-int main(int argc, char **argv) {
-
-	// *** BeOS specific section begin ***
-
-	// Add the current directory to the ADDON_PATH environment var.
-	char*	old_addon_path = getenv( "ADDON_PATH" );
-	char*	new_addon_path = new char[ strlen( old_addon_path ) + 20 ];
-	sprintf( new_addon_path, "ADDON_PATH=%s:.", old_addon_path );
-	if ( putenv( new_addon_path ) != 0 )
-	{
-		cerr << "couldn't add . to the environment variable ADDON_PATH" << endl;
-	}
-
-	// BSoundPlayer needs BApplication.
-	BApplication*	app = new BApplication( "application/x-vnd.freeamp-freeamp" );
-
-	// *** BeOS specific section end ***
-
+int main(int argc, char **argv)
+{
     FAContext *context = new FAContext;
     context->prefs = new BeOSPrefs();
     context->log = new LogFile("freeamp.log");
+
+    // *** BeOS specific section begin ***
+
+    // BSoundPlayer needs BApplication.
+    BApplication* app = new BApplication( "application/x-vnd.freeamp-freeamp" );
+
+    app_info appInfo;
+    be_app->GetAppInfo( &appInfo );
+    BEntry entry( &appInfo.ref );
+    BPath path;
+    entry.GetPath( &path );
+    path.GetParent( &path );
+
+    const char* kUserAddOnPath = "/boot/home/config/add-ons/freeamp";
+    char* new_freeamp_path = new char[ strlen( FREEAMP_PATH_ENV ) +
+                                       strlen( kUserAddOnPath ) +
+                                       strlen( path.Path() ) + 40 ];
+    sprintf( new_freeamp_path, "%s=%s:%s", FREEAMP_PATH_ENV, path.Path(),
+                                           kUserAddOnPath );
+    if ( putenv( new_freeamp_path ) != 0 )
+    {
+        cerr << "couldn't add app path to the environment variable "
+                "FREEAMP_PATH_ENV" << endl;
+    }
+    delete[] new_freeamp_path;
+
+    context->prefs->SetInstallDirectory( path.Path() );
+
+#if 0
+    // Add the current directory to the ADDON_PATH environment var.
+    char* old_addon_path = getenv( "ADDON_PATH" );
+    char* new_addon_path = new char[ strlen( old_addon_path ) +
+                                     strlen( path.Path() ) + 20 ];
+    sprintf( new_addon_path, "ADDON_PATH=%s:%s:.", old_addon_path, path.Path() );
+    cout << "addon path = " << new_addon_path << endl;
+    if ( putenv( new_addon_path ) != 0 )
+    {
+        cerr << "couldn't add . to the environment variable ADDON_PATH" << endl;
+    }
+    delete[] new_addon_path;
+#endif
+
+    // *** BeOS specific section end ***
+
     Registrar *registrar= new Registrar();
     Registry *lmc;
     Registry *pmi;
@@ -70,12 +100,10 @@ int main(int argc, char **argv) {
     
     lmc = new Registry();
 
-//    registrar->SetSubDir("lmc");
     registrar->SetSubDir("plugins");
     registrar->SetSearchString("*.lmc");
     registrar->InitializeRegistry(lmc,context->prefs);
 
-//    registrar->SetSubDir("io");
     registrar->SetSubDir("plugins");
     registrar->SetSearchString("*.pmi");
     pmi = new Registry;
@@ -85,8 +113,6 @@ int main(int argc, char **argv) {
     pmo = new Registry;
     registrar->InitializeRegistry(pmo,context->prefs);
 
-
-//    registrar->SetSubDir("ui");
     registrar->SetSubDir("plugins");
     registrar->SetSearchString("*.ui");
     ui = new Registry;
@@ -103,11 +129,12 @@ int main(int argc, char **argv) {
     pP->RegisterPMOs(pmo);
     pP->RegisterUIs(ui);
 
-    if (pP->SetArgs(argc,argv)) {
-		pP->SetTerminationSemaphore(termSemaphore);
-		pP->Run();
-	
-		termSemaphore->Wait();
+    if (pP->SetArgs(argc,argv))
+    {
+        pP->SetTerminationSemaphore(termSemaphore);
+        pP->Run();
+
+        termSemaphore->Wait();
     }
     
     delete pP;
@@ -115,5 +142,3 @@ int main(int argc, char **argv) {
     delete app;
     return 0;
 }
-
-

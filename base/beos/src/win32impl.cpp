@@ -195,12 +195,12 @@ LoadLibrary(char *lpLibFileName)
 	addon_image = load_add_on( lpLibFileName );
 	if ( addon_image > 0 )
 	{
-		PRINT(( "Add-on loaded successfully\n" ));
+		PRINT(( "Add-on loaded successfully: %s\n", lpLibFileName ));
 		return (HINSTANCE)addon_image;
 	}
 	else
 	{
-		PRINT(( "error loading add-on\n" ));
+		PRINT(( "error loading add-on: %s\n", lpLibFileName ));
 		return (HINSTANCE)NULL;
 	}
 }
