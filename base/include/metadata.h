@@ -80,6 +80,28 @@ class MetaData {
 
     Error SetSize(uint32 bytes){ m_size = bytes; return kError_NoErr;}
     uint32 Size() const { return m_size; }
+
+    bool operator==(const MetaData& data) const
+    {
+        bool result = false;
+
+        result = ( m_artist == data.m_artist &&
+                   m_album == data.m_album &&
+                   m_title == data.m_title &&
+                   m_genre == data.m_genre &&
+                   m_comment == data.m_comment &&
+                   m_year == data.m_year &&
+                   m_track == data.m_track &&
+                   m_time == data.m_time &&
+                   m_size == data.m_size );
+
+        return result;
+    }
+
+    bool operator!=(const MetaData& data) const
+    {
+	    return !(*this == data);
+    }
  
  protected:
     Error SetBuffer(char* dest, const char* src, uint32* len)

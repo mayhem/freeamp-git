@@ -229,10 +229,7 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                     return 1;
 
                 case ID_EDIT_EDITINFO:
-                    MessageBox(hwnd, 
-                               "This feature is not yet implemented under win32.", 
-                               "doh!", 
-                               MB_OK);
+                    EditInfoEvent();
                     return 1;
                 
                 case ID_VIEW_MUSICCATALOG:

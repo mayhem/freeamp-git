@@ -82,23 +82,24 @@ void MusicBrowserUI::RemoveEvent(void)
                               (int (__stdcall *)(void))::RemoveTracksDlgProc, 
                               (LPARAM)&deleteFromDrive))
         {       
-            vector<string> urls;
-            GetSelectedMusicTreeItems(&urls, false); 
+            vector<PlaylistItem*> items;
+            GetSelectedMusicTreeItems(&items); 
 
-            vector<string>::iterator i;
+            vector<PlaylistItem*>::iterator i;
 
-            for(i = urls.begin(); i != urls.end(); i++)
+            for(i = items.begin(); i != items.end(); i++)
             {
-                m_context->browser->m_catalog->RemoveSong((*i).c_str());
+                m_context->browser->m_catalog->RemoveSong((*i)->URL().c_str());
             }
 
-            urls.clear();
-            
+            vector<string> urls;            
             GetSelectedPlaylistItems(&urls);
 
-            for(i = urls.begin(); i != urls.end(); i++)
+            vector<string>::iterator j;
+
+            for(j = urls.begin(); j != urls.end(); j++)
             {
-                m_context->browser->m_catalog->RemovePlaylist((*i).c_str());
+                m_context->browser->m_catalog->RemovePlaylist((*j).c_str());
             }
         }
     }
@@ -236,6 +237,107 @@ void MusicBrowserUI::ExportPlaylistEvent()
         }while(result && 
                (tv_item.hItem = TreeView_GetNextSibling(m_hMusicCatalog, 
                                                         tv_item.hItem)));
+    }
+}
+
+const char* kMultipleArtists =  "<Multiple Artists Selected>";
+const char* kMultipleAlbums =   "<Multiple Albums Selected>";
+const char* kMultipleGenres =   "<Multiple Genres Selected>";
+const char* kMultipleTracks =   "<Multiple Tracks Selected>";
+const char* kMultipleComments = "<Enter a new comment for all selected tracks.>";
+
+void MusicBrowserUI::EditInfoEvent()
+{
+    vector<PlaylistItem*> items;
+
+    GetSelectedMusicTreeItems(&items); 
+
+    m_editTrackMetaData = items[0]->GetMetaData();
+
+    bool sameArtist = true;
+    bool sameAlbum = true;
+    bool sameGenre = true;
+    bool sameYear = true;
+    vector<PlaylistItem*>::iterator track;
+
+    for(track = items.begin(); track != items.end(); track++)
+    {
+        MetaData metadata = (*track)->GetMetaData();
+
+        if(metadata.Artist() != m_editTrackMetaData.Artist())
+            sameArtist = false;
+
+        if(metadata.Album() != m_editTrackMetaData.Album())
+            sameAlbum = false;
+
+        if(metadata.Genre() != m_editTrackMetaData.Genre())
+            sameGenre = false;
+
+        if(metadata.Year() != m_editTrackMetaData.Year())
+            sameYear = false;
+    }
+
+    if(!sameArtist)
+        m_editTrackMetaData.SetArtist(kMultipleArtists);
+
+    if(!sameAlbum)
+        m_editTrackMetaData.SetAlbum(kMultipleAlbums);
+
+    if(!sameYear)
+        m_editTrackMetaData.SetYear(-1);
+
+    if(!sameGenre)
+        m_editTrackMetaData.SetGenre(kMultipleGenres);
+
+
+    if(items.size() > 1)
+    {
+        m_editTrackMetaData.SetTitle(kMultipleTracks);
+        m_editTrackMetaData.SetTrack(-1);
+        m_editTrackMetaData.SetComment(kMultipleComments);
+    }
+
+    if(0 < DialogBoxParam(g_hinst, 
+                          MAKEINTRESOURCE(IDD_EDITINFO),
+                          m_hWnd, 
+                          (int (__stdcall *)(void))::EditTrackInfoDlgProc, 
+                          (LPARAM )this))
+    {
+        for(track = items.begin(); track != items.end(); track++)
+        {
+            MetaData oldMetaData, newMetaData;
+
+            oldMetaData = newMetaData = (*track)->GetMetaData();
+
+            if(m_editTrackMetaData.Artist() != kMultipleArtists)
+                newMetaData.SetArtist(m_editTrackMetaData.Artist().c_str());
+
+            if(m_editTrackMetaData.Album() != kMultipleAlbums)
+                newMetaData.SetAlbum(m_editTrackMetaData.Album().c_str());
+
+            if(m_editTrackMetaData.Genre() != kMultipleGenres)
+                newMetaData.SetGenre(m_editTrackMetaData.Genre().c_str());
+
+            if(m_editTrackMetaData.Comment() != kMultipleComments)
+                newMetaData.SetComment(m_editTrackMetaData.Comment().c_str());
+
+            if(m_editTrackMetaData.Year() != -1)
+               newMetaData.SetYear(m_editTrackMetaData.Year());
+
+            if(m_editTrackMetaData.Track() != -1)
+                newMetaData.SetTrack(m_editTrackMetaData.Track());
+
+            if(newMetaData != oldMetaData)
+            {
+                (*track)->SetMetaData(&newMetaData);
+
+                m_context->browser->m_catalog->UpdateSong(*track);
+            }
+        }
+
+        
+        
+        
     }
 }
 
@@ -645,9 +747,19 @@ void MusicBrowserUI::ToggleVisEvent(void)
 
 void MusicBrowserUI::AddTrackEvent(void)
 {
+    vector<PlaylistItem*> items;
     vector<string> urls;
 
-    GetSelectedMusicTreeItems(&urls);    
+    GetSelectedMusicTreeItems(&items);   
+    
+    vector<PlaylistItem*>::iterator i;
+
+    for(i = items.begin(); i != items.end(); i++)
+    {
+        urls.push_back((*i)->URL().c_str());
+    }
+
+    GetSelectedPlaylistItems(&urls);
 
     // we know that we are gonna be adding a 
     // bunch of items so let windows know.

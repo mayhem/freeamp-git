@@ -215,6 +215,7 @@ class MusicBrowserUI : public UserInterface
     void  ChangePlayerState(int32 event);
     void  ChangeRepeatMode(RepeatMode mode);
     void  ExportPlaylistEvent(void);
+    void  EditInfoEvent(void);
 
     // Functions in PlaylistView.cpp
     void  PlaylistListItemAdded(const PlaylistItem* item);
@@ -242,12 +243,11 @@ class MusicBrowserUI : public UserInterface
     void    FillUncatTracks(void);
     int32   GetCurrentItemFromMousePos(void);
     int32   GetMusicTreeSelection(HTREEITEM hItem);
-    void    GetSelectedMusicTreeItems(vector<string>* urls,
-                                      bool includePlaylists = true);
-    BOOL    FindSelectedItems(HTREEITEM root, vector<string>* urls);
-    void    AddTrackURLs(TV_ITEM* tv_item, vector<string>* urls);
-    void    AddAllTrackURLs(vector<string>* urls);
-    void    AddUncatagorizedTrackURLs(vector<string>* urls);
+    void    GetSelectedMusicTreeItems(vector<PlaylistItem*>* items);
+    BOOL    FindSelectedItems(HTREEITEM root, vector<PlaylistItem*>* items);
+    void    AddTrackItems(TV_ITEM* tv_item, vector<PlaylistItem*>* items);
+    void    AddAllTrackItems(vector<PlaylistItem*>* items);
+    void    AddUncatagorizedTrackItems(vector<PlaylistItem*>* items);
     void    GetSelectedPlaylistItems(vector<string>* urls);
     void    TVBeginDrag(HWND hwnd, NM_TREEVIEW* nmtv);
     void    MusicCatalogTrackAdded(const ArtistList* artist,
@@ -270,9 +270,9 @@ class MusicBrowserUI : public UserInterface
     void UpdateArtistName(ArtistList* artist, const char* name);
 
     // Functions in EditTrackInfoDialog.cpp
-    void CreateArtistList(vector<string>& artists);
-    void CreateAlbumList(vector<string>& albums);
-    void CreateGenreList(set<string> genres);
+    void CreateEditInfoLists(vector<string>& artists,
+                             vector<string>& albums,
+                             set<string>& genres);
     
 
     // Data members

@@ -480,7 +480,6 @@ void MusicBrowserUI::LVBeginDrag(HWND hwnd, NM_LISTVIEW* nmlv)
 
     m_playlistDropTarget->TargetIsSource(true);
 
-    //GetSelectedMusicTreeItems(urls); 
     uint32 selected = ListView_GetSelectedCount(hwnd);
     uint32 count = ListView_GetItemCount(hwnd);
     uint32 index = 0;

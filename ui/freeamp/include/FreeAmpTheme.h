@@ -49,10 +49,10 @@ class FreeAmpTheme : public UserInterface, public Theme
 {
     public:
 
-        FreeAmpTheme(FAContext * context);
+        FreeAmpTheme(FAContext* context);
         virtual ~FreeAmpTheme();
 
-        virtual int32 AcceptEvent(Event * e);
+        virtual int32 AcceptEvent(Event* e);
         virtual Error Close(void);
         virtual Error Init(int32 startup_type);
         virtual void  LoadFreeAmpTheme(void);

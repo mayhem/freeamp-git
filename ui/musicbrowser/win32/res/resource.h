@@ -54,7 +54,10 @@
 #define IDC_NAME                        1020
 #define IDC_YEAR                        1023
 #define IDC_SPIN1                       1024
+#define IDC_SPINYEAR                    1024
 #define IDC_OPEN_URL                    1029
+#define IDC_SPIN2                       1029
+#define IDC_SPINTRACK                   1029
 #define IDC_BROWSE                      1110
 #define IDC_DRIVES                      1231
 #define IDC_ALBUM                       1462
@@ -119,6 +122,8 @@
 #define ID_FILE_CLOSEPLAYLIST           40061
 #define ID_CONTROLS_NORMALORDER         40063
 #define IDS_URL                         65535
+#define IDC_TRACKTEXT                   65535
+#define IDC_TITLETEXT                   65535
 
 // Next default values for new objects
 // 
@@ -126,7 +131,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        123
 #define _APS_NEXT_COMMAND_VALUE         40064
-#define _APS_NEXT_CONTROL_VALUE         1025
+#define _APS_NEXT_CONTROL_VALUE         1030
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

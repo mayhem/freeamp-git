@@ -132,6 +132,21 @@ class PlaylistItem {
     void SetState(PlaylistItemState state) { m_state = state; }
     PlaylistItemState GetState() const { return m_state; }
 
+    bool operator==(const PlaylistItem& item) const
+    {
+        bool result = false;
+
+        result = ( m_metadata == item.m_metadata &&
+                   m_url == item.m_url);
+
+        return result;
+    }
+
+    bool operator!=(const PlaylistItem& item) const
+    {
+	    return !(*this == item);
+    }
+
  protected:
     Error SetBuffer(char* dest, const char* src, uint32* len)
     {
