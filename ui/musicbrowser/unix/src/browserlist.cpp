@@ -488,8 +488,74 @@ static gint list_drag_motion_internal(GtkWidget *widget,
     return TRUE;
 }
 
+static void play_now_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+
+}
+
+static void move_up_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+
+}
+
+static void move_down_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+
+}
+
+static void delete_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+
+}
+
+static void edit_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+
+}
+
+void GTKMusicBrowser::PlaylistRightClick(int x, int y, uint32 time)
+{
+    gtk_item_factory_popup(playlistPopup, x, y, 3, time);
+}
+
+static void list_clicked(GtkWidget *w, GdkEventButton *event,
+                         GTKMusicBrowser *p)
+{
+    if (!event)
+        return;
+
+cout << "list click\n";
+
+    g_return_if_fail(w != NULL);
+    g_return_if_fail(GTK_IS_CLIST(w));
+    g_return_if_fail(event != NULL);
+
+    GtkCList *clist = GTK_CLIST(w);
+
+    if (event->window != clist->clist_window)
+        return;
+
+cout << "button press " << event->button << endl;
+    if (event->button == 3)
+        p->PlaylistRightClick((int)event->x_root, 
+                              (int)event->y_root,
+                              event->time);
+}
+
 void GTKMusicBrowser::CreatePlaylistList(GtkWidget *box)
 {
+    GtkItemFactoryEntry popup_items[] = {
+     {"/Play Now",     NULL,      (void(*)())play_now_pop,  0, 0 },
+     {"/Move Up",      NULL,      (void(*)())move_up_pop,   0, 0 },
+     {"/Move Down",    NULL,      (void(*)())move_down_pop, 0, 0 },
+     {"/sep1",         NULL,      0,                        0, "<Separator>" },
+     {"/Remove",       NULL,      (void(*)())delete_pop,     0, 0 },
+     {"/sep2",         NULL,      0,                        0, "<Separator>" },
+     {"/Edit Info",    NULL,      (void(*)())edit_pop,      0, 0 }
+    };
+ 
+    int nmenu_items = sizeof(popup_items) / sizeof(popup_items[0]);
+ 
     static char *titles[] =
     {
       "# ", "Title", "Artist", "Length"
@@ -520,6 +586,13 @@ void GTKMusicBrowser::CreatePlaylistList(GtkWidget *box)
                        GTK_SIGNAL_FUNC(list_drag_motion_internal), this);
     gtk_signal_connect(GTK_OBJECT(playlistList), "key_press_event",
                        GTK_SIGNAL_FUNC(list_keypress), this);
+    gtk_signal_connect(GTK_OBJECT(playlistList), "button_press_event",
+                       GTK_SIGNAL_FUNC(list_clicked), this);
+
+    playlistPopup = gtk_item_factory_new(GTK_TYPE_MENU, "<plist_popup>",
+                                         NULL);
+    gtk_item_factory_create_items(playlistPopup, nmenu_items, popup_items, 
+                                  (void *)this);
 
     gtk_clist_columns_autosize(GTK_CLIST(playlistList));
     gtk_widget_show(playlistList);

@@ -180,7 +180,8 @@ class GTKMusicBrowser {
     GtkWidget *toolDown;
     GtkWidget *toolbar;
     GtkItemFactory *menuFactory;
-
+    GtkItemFactory *playlistPopup;
+    
     GtkCTreeNode *mainTree;
     GtkCTreeNode *allTree;
     GtkCTreeNode *uncatTree;
@@ -282,6 +283,8 @@ class GTKMusicBrowser {
     void NextMenu(void);
     void PrevMenu(void);
     void SetRepeat(int numrepeat);
+
+    void PlaylistRightClick(int x, int y, uint32 time);
 };
 
 #endif
