@@ -412,7 +412,7 @@ SetArgs(int32 argc, char** argv)
     playlist->SetFirst();
 
     if(shuffle) 
-        playlist->SetOrder(PlayListManager::ORDER_SHUFFLED);
+        playlist->SetShuffle(SHUFFLE_SHUFFLED);
     
     if(count)
     {

@@ -1998,26 +1998,14 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 	        {
                 case kRepeatControl:
                 {
-                    if(g_displayInfo.repeatAll)
-                    {
-                        g_displayInfo.repeat = false;
-                        g_displayInfo.repeatAll = false;
-                    }
-                    else if(g_displayInfo.repeat)
-                    {
-                        g_displayInfo.repeatAll = true;
-                    }
-                    else
-                    {
-                        g_displayInfo.repeat = true;
-                    }
-
+					//OutputDebugString("Repeat Control\n");
+					g_ui->m_plm->ToggleRepeat();
 			        break;        
 		        }
 
                 case kShuffleControl:
                 {
-                    g_displayInfo.shuffled = !g_displayInfo.shuffled;
+					g_ui->m_plm->ToggleShuffle();
 			        break;        
 		        }
 
@@ -2157,7 +2145,12 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
 		        case kNextControl:
 		        {
-					if (g_displayInfo.indexOfSong != g_displayInfo.totalSongs) {
+					if ((g_displayInfo.indexOfSong != g_displayInfo.totalSongs)) {
+						g_ui->m_target->AcceptEvent(new Event(CMD_NextMediaPiece));
+						g_displayInfo.seconds = 0;
+						g_displayInfo.minutes = 0;
+						g_displayInfo.hours = 0;
+					} else if ((g_ui->m_plm->GetRepeat() != REPEAT_NOT)) {
 						g_ui->m_target->AcceptEvent(new Event(CMD_NextMediaPiece));
 						g_displayInfo.seconds = 0;
 						g_displayInfo.minutes = 0;

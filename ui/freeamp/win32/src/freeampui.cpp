@@ -142,6 +142,42 @@ AcceptEvent(Event* event)
         
         switch (event->Type()) 
         {
+		case INFO_PlayListRepeat:
+			{
+				PlayListRepeatEvent *plre = (PlayListRepeatEvent *)event;
+				switch (plre->GetRepeatMode()) {
+				case REPEAT_CURRENT:
+					g_displayInfo.repeat = true;
+					g_displayInfo.repeatAll = false;
+					break;
+				case REPEAT_ALL:
+					g_displayInfo.repeat = true;
+					g_displayInfo.repeatAll = true;
+					break;
+				case REPEAT_NOT:
+				default:
+					g_displayInfo.repeat = false;
+					g_displayInfo.repeatAll = false;
+					break;
+				}
+				break;
+			}
+		case INFO_PlayListShuffle:
+			{
+				PlayListShuffleEvent *plse = (PlayListShuffleEvent *)event;
+				switch (plse->GetShuffleMode()) {
+				case SHUFFLE_NOT_SHUFFLED:
+					g_displayInfo.shuffled = false;
+					break;
+				case SHUFFLE_SHUFFLED:
+					g_displayInfo.shuffled = true;
+					break;
+				default:
+					g_displayInfo.shuffled = false;
+					OutputDebugString("PlayListShuffle sent a type I don't know about");
+				};
+				break;
+			}
             case INFO_Playing: 
             {   
 				m_state = STATE_Playing;
@@ -346,7 +382,7 @@ SetArgs(int32 argc, char** argv)
     m_plm->SetFirst();
 
     if(shuffle) 
-        m_plm->SetOrder(PlayListManager::ORDER_SHUFFLED);
+        m_plm->SetShuffle(SHUFFLE_SHUFFLED);
     
     //if(autoplay)
        //m_target->AcceptEvent(m_target, new Event(CMD_Play));

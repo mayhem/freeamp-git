@@ -30,6 +30,7 @@ ____________________________________________________________________________*/
 #include "event.h"
 #include "registry.h"
 #include "eventdata.h"
+#include "mutex.h"
 
 class PlayListItem {
  private:
@@ -70,7 +71,7 @@ class PlayListItem {
 
 class OrderListItem {
  public:
-    int32 m_index;
+    int32 m_indexToRealVector;
     int32 m_random;
 };
 
@@ -116,20 +117,45 @@ class PLMSetMediaInfoEvent : public Event {
     MediaInfoEvent *GetMediaInfo() { return m_mie; }
 };
 
+enum ShuffleMode {
+	SHUFFLE_NOT_SHUFFLED = 0,  // normal playlist playback
+	SHUFFLE_SHUFFLED = 1,      // playlist is shuffled, with playback in order of shuffled list
+	SHUFFLE_INTERNAL_NUMBER = 2, // swap this and SHUFFLE_RANDOM to enable random shuffling
+	SHUFFLE_RANDOM = 3         // random song is played (and, GetCurrent() never returns NULL)
+};
+    
+enum RepeatMode {
+	REPEAT_NOT = 0,
+	REPEAT_CURRENT = 1,
+	REPEAT_ALL = 2,
+	REPEAT_INTERNAL_NUMBER = 3
+};
+
+
+
+class PlayListRepeatEvent : public Event {
+private:
+	RepeatMode m_rm;
+public:
+	PlayListRepeatEvent(RepeatMode rm) { m_type = INFO_PlayListRepeat; m_rm = rm; }
+	virtual ~PlayListRepeatEvent() {}
+
+	RepeatMode GetRepeatMode() { return m_rm; }
+};
+
+class PlayListShuffleEvent : public Event {
+private:
+	ShuffleMode m_sm;
+public:
+	PlayListShuffleEvent(ShuffleMode sm) { m_type = INFO_PlayListShuffle; m_sm = sm; }
+	virtual ~PlayListShuffleEvent() {}
+
+	ShuffleMode GetShuffleMode() { return m_sm; }
+};
+
 
 class PlayListManager {
 public:
-    enum OrderOfPlay {
-	ORDER_STRAIGHT = 1,
-	ORDER_SHUFFLED = 2,
-	ORDER_RANDOM = 3
-    };
-    
-    enum RepeatPlay {
-	REPEAT_NOT = 1,
-	REPEAT_ALL,
-	REPEAT_CURRENT
-    };
 
  public:
     PlayListManager(EventQueue *);
@@ -141,9 +167,6 @@ public:
 
     void AcceptEvent(Event *);
 
-    PlayListItem *GetFirst();
-    PlayListItem *GetNext();
-    PlayListItem *GetPrev();
     PlayListItem *GetCurrent();
     void SetFirst();
     void SetNext();
@@ -152,10 +175,12 @@ public:
     int32 Current() const {return m_current;}
     int32 Total() const {return m_pOrderList->NumElements();}
 
-    void SetOrder(OrderOfPlay oop);
-    void SetRepeat(RepeatPlay rp);
-    OrderOfPlay GetOrder() {return m_order;}
-    RepeatPlay GetRepeat() {return m_repeat;}
+    void SetShuffle(ShuffleMode oop);
+    void SetRepeat(RepeatMode rp);
+    ShuffleMode GetOrder() {return m_order;}
+    RepeatMode GetRepeat() {return m_repeat;}
+	Error ToggleRepeat();
+	Error ToggleShuffle();
 
  private:
     
@@ -163,18 +188,23 @@ public:
     Vector<PlayListItem *>* m_pMediaElems;
     int32                   m_current;
     int32                   m_skipNum;
+	Mutex *					m_plMutex;
 
     Vector<OrderListItem *> *m_pOrderList;
-    OrderOfPlay m_order;
-    RepeatPlay m_repeat;
+    ShuffleMode m_order;
+    RepeatMode m_repeat;
 
     void SendInfoToPlayer();
+	void SendShuffleModeToPlayer();
+	void SendRepeatModeToPlayer();
 
     void InitializeOrder();
     void ShuffleOrder();
     void QuickSortOrderList(int32 first, int32 last);
     int32 PartitionOrderList(int32 first, int32 last);
  
+	void GetPLManipLock() { m_plMutex->Acquire(WAIT_FOREVER); }
+	void ReleasePLManipLock() { m_plMutex->Release(); }
 };
 
 

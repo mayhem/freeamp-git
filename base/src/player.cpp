@@ -762,6 +762,18 @@ int32 Player::ServiceEvent(Event *pC) {
 		return 0;
 		break; 
 	    }
+		case INFO_PlayListShuffle:
+		case INFO_PlayListRepeat: 
+		case INFO_PlayListUpdated:
+			{
+				GetUIManipLock();
+				SendToUI(pC);
+				ReleaseUIManipLock();
+				delete pC;
+				return 0;
+				break;
+			}
+
 	    case INFO_LMCError: {
 		LMCErrorEvent *e = (LMCErrorEvent *)pC;
 		DISPLAY_ERROR(m_lmc,(e->GetError()));
