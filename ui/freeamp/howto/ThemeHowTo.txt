@@ -25,15 +25,23 @@ with your comments, or better yet head over to Bugzilla and enter a
 bug report <http://www.freeamp.org/bugzilla>.
 
 
-NEW FEATURES IN BETA 3 (November 1, 1999)
+UPDATED FOR BETA 3 (November X, 1999)
 
-There are a few features that didn't make it into beta 2:
+New features for beta 3:
 
 - The location for buttons on the theme can be specified as a point
-  and not as a rect.
-- Currently the Play and Pause buttons are implemented as a MultiState
-  button. For beta 3 the theme designer will also be able to choose
-  independent play and pause buttons called IPlay and IPause.
+  and not as a rect for ButtonControls and MultiStateControls you can
+  now use this:
+  
+       <Position Pos="202,122"/>
+  
+  instead of having to specify a complete Rect for the position of
+  the Theme.
+  
+- The Play and Pause buttons are implemented as a MultiState button. 
+  If you would rather have indenpendent Play/Pause buttons, simply
+  use the ButtonControls IPlay and IPause instead of the 
+  MultiStateControl Play.
 
 
 NEW FEATURES BEFORE RELEASE
@@ -295,9 +303,14 @@ button, a hint for that button is displayed in the Info text field.
 If the user clicks on the active area of a button it will be
 interpreted as a button press.
 
+For the 'Logo' button the theme designer can specifiy a 'URL' attribute,
+which will pop open the web browser and go to that web page. If the
+URL attribute is not specified, the button will open the browser to
+http://www.freeamp.org
+
+
 The ButtonControl will need to include the <Info>, <Position>, and
 <ControlBitmap> and optionally include the <ChangeWindow> tag.
-
 
 MultiStateControl:
 ------------------
@@ -353,13 +366,25 @@ Info:
 
 The Info tag is used to give the user feedback about a control:
 
-   	<Info Desc="Play/Pause the current track" Tip="Play"/>
+   	<Info Desc="Stop the player" Tip="Stop"/>
 
 The text contained in the Desc attribute is displayed in the Info
 TextControl when the user moves the mouse over the control that
 specifies the Info tag. And, once we get tooltips implemented,
 the Tip attribute will define the text shown in the tooltip when
 the mouse hovers over a button.
+
+For a MultiStateControl, set Desc and Tip attribute strings for each of
+the states can be seperated by '||'. The play/pause button <Info>
+tag looks like this:
+
+  	<Info Desc="Play the current track||Pause the current track" 
+          Tip="Play||Pause"/>
+
+If the Desc and Tip attributes are not seperated by '||' then the
+entire Desc and Tip attribute text will be shown for all states of the
+button.
+          
 
 Position:
 ---------
@@ -523,6 +548,9 @@ QUICK REFERENCE
    
    Name -- the name of the control. See Appendix A for a list of
            possible control names.
+   URL -- For the 'Logo' button only. This specifies the web page to
+          go to if the user clicks on the button. Defaults to 
+          http://www.freeamp.org if not specified.        
 
    Subtags:
    
@@ -639,6 +667,8 @@ Shuffle  -- Normal/Shuffle mode
 
 Buttons:
 
+IPlay       -- The play button that gets disabled during playback
+IPause      -- The pause button that gets disabled during non playback
 Stop	    -- stop playing
 Prev	    -- go to previous track
 Next        -- go to next track
@@ -670,7 +700,6 @@ APPENDIX B
 
 This is the current theme.xml file:
 
-
 <Bitmap Name="Background" File="background.bmp" TransColor="#FF0000"/>
 <Bitmap Name="Buttons" File="buttons.bmp" TransColor="#FF0000"/>
 <Font Name="San Serif" Face="Arial,Helvetica"/>
@@ -682,12 +711,12 @@ This is the current theme.xml file:
     <Controls>
         <MultiStateControl Name="Play" NumStates="2">
         	<Info Desc="Play/Pause the current track" Tip="Play"/>
-            <Position Rect="202,122,234,155"/>
+            <Position Pos="202,122"/>
             <ControlBitmap Rect="0,68,127,135" Name="Buttons"/>
         </MultiStateControl>
         <ButtonControl Name="Logo">
         	<Info Desc="Go to the FreeAmp web site" Tip="FreeAmp"/>
-            <Position Rect="23,128,89,147"/>
+            <Position Pos="23,128"/>
             <ControlBitmap Rect="0,236,267,255" Name="Buttons"/>
         </ButtonControl>
         <ButtonControl Name="Stop">
@@ -787,3 +816,4 @@ This is the current theme.xml file:
         </SliderControl>
     </Controls>
 </Window>            
+

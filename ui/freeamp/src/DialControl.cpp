@@ -60,19 +60,15 @@ void DialControl::Transition(ControlTransitionEnum  eTrans,
     switch(eTrans)
     {
        case CS_Normal:
-          printf("Normal state\n");
           break;
 
        case CS_MouseOver:
-          printf("Mouse over state\n");
           break;
 
        case CS_Dragging:
-          printf("Draggin state\n");
           break;
 
        case CS_Disabled:
-          printf("Disabled state\n");
           break;
 
        default:

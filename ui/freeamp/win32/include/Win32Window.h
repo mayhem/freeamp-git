@@ -30,6 +30,7 @@ ____________________________________________________________________________*/
 #include <deque>
 #include <windows.h>
 #include <shellapi.h>
+#include <commctrl.h>
 
 #include "Window.h"
 
@@ -63,7 +64,9 @@ class Win32Window : public Window
 	 virtual HWND  GetWindowHandle(void);
              void  SaveWindowPos(Pos &oPos);
              void  DropFiles(HDROP dropHandle);
-
+             void  Notify(int32 command, LPNMHDR notifyMsgHdr);
+             void  CreateTooltips(void);
+             
     protected:
     
      HWND     m_hWnd;

@@ -34,8 +34,19 @@ ____________________________________________________________________________*/
 
 ThemeManager::ThemeManager(FAContext *pContext)
 {
+    char   szThemePath[MAX_PATH];
+    uint32 len = MAX_PATH;
+    Error  eRet;
+    
     m_pContext = pContext;
 	m_oCurrentTheme = "";
+    
+    szThemePath[0] = 0;
+    eRet = pContext->prefs->GetThemePath(szThemePath, &len);
+    if (IsError(eRet) || strlen(szThemePath) == 0)
+        GetDefaultTheme(m_oCurrentTheme);
+    else
+        m_oCurrentTheme = szThemePath;
 }
 
 ThemeManager::~ThemeManager(void)

@@ -153,9 +153,6 @@ Package=<4>
     Project_Dep_Name zlib
     End Project Dependency
     Begin Project Dependency
-    Project_Dep_Name gdbm
-    End Project Dependency
-    Begin Project Dependency
     Project_Dep_Name fabaselib
     End Project Dependency
 }}}

@@ -450,8 +450,10 @@ SetArgs(int32 argc, char **argv)
         }
     }
 
-    if(autoplay)
+    if(m_autoplay)
+    { 
         AcceptEvent(new Event(CMD_Play));
+    }    
 
     delete [] path;
     delete [] url;
@@ -691,13 +693,10 @@ Run()
       if (!uisActivated)
       {
 #ifdef WIN32
-         char      foo[1024];
-         char      bar[MAX_PATH];
-         uint32    size = MAX_PATH - 1;
-
-         m_context->prefs->GetInstallDirectory(bar, &size);
-         sprintf(foo, "No UI plugin matched 'plugins\\%s' or 'plugins\\%s.ui' in '%s'.  " BRANDING " will quit.", name, name, bar);
-         MessageBox(NULL, foo, BRANDING " Error", MB_OK);
+         MessageBox(NULL, BRANDING" Cannot find user a valid interface module.\r\n"
+                          "Please make sure that FreeAmp is installed correctly.\r\n"
+                          "You may wish to remove and reinstall FreeAmp to fix this problem",
+                    BRANDING " Error", MB_OK);
 #else
          const char *thePath = getenv(FREEAMP_PATH_ENV);
 

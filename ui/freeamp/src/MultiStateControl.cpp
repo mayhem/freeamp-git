@@ -69,8 +69,68 @@ MultiStateControl::~MultiStateControl(void)
 
 }
 
+void MultiStateControl::GetDesc(string &oDesc)
+{
+    int i = m_iState;
+
+    if (m_oDescs.size() == 0)
+    {
+       oDesc = "";
+       return;
+    }
+    
+    if (i >= m_oDescs.size())
+      i = 0;
+       
+    oDesc = m_oDescs[i];
+}    
+
+void MultiStateControl::GetTip(string &oTip)
+{
+    int i = m_iState;
+    
+    if (m_oTips.size() == 0)
+    {
+       oTip = "";
+       return;
+    }
+    
+    if (i >= m_oTips.size())
+      i = 0;
+       
+    oTip = m_oTips[i];
+}    
+
 void MultiStateControl::Init(void)
 {
+    char *szDup, *szToken;
+
+    szDup = strdup(m_oDesc.c_str());
+    szToken = strtok(szDup, "||");
+    for(; szToken;)
+    {
+        m_oDescs.push_back(string(szToken));
+        szToken = strtok(NULL, "||");
+    }
+    free(szDup);
+    
+    szDup = strdup(m_oToolTip.c_str());
+    szToken = strtok(szDup, "||");
+    for(; szToken;)
+    {
+        m_oTips.push_back(string(szToken));
+        szToken = strtok(NULL, "||");
+    }
+    free(szDup);
+
+    if (m_oRect.x2 == -1 && m_oRect.y2 == -1)
+    {
+        m_oRect.x2 = m_oRect.x1 + 
+                     (m_oBitmapRect.x2 - m_oBitmapRect.x1)/4;
+        m_oRect.y2 = m_oRect.y1 + 
+                     (m_oBitmapRect.y2 - m_oBitmapRect.y1)/m_iNumStates;
+    }    
+    
     BlitMultiStateFrame(0, 4, m_iState, m_iNumStates);
 }
 

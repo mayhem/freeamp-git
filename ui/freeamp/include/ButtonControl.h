@@ -42,6 +42,7 @@ class ButtonControl : public Control
     public:
 
                ButtonControl(Window *pParent, string &oName);
+               ButtonControl(Window *pParent, string &oName, string &oUrl);
       virtual ~ButtonControl(void);
 
       virtual void SetTargetWindow(string &oWindow);
@@ -49,7 +50,7 @@ class ButtonControl : public Control
       void Transition(ControlTransitionEnum eTrans, Pos *pMousePos);
       virtual void Init(void);
       virtual bool PosInControl(Pos &oPos);
-
+      
     private:
 
 	  string m_oTargetWindow;

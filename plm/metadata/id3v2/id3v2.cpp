@@ -173,6 +173,7 @@ bool ID3v2::ReadMetaData(const char* url, MetaData* metadata)
             frameData = new char[sFrame.size + 1];
             if (fread(frameData, 1, sFrame.size, inFile) != sFrame.size)
             {
+                delete frameData;
                 fclose(inFile);
                 return result;
             }

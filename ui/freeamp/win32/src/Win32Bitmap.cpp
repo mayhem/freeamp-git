@@ -249,3 +249,44 @@ Error Win32Bitmap::MaskBlitRect(Bitmap *pOther, Rect &oSrcRect,
    return kError_NoErr;
 }
 
+HPALETTE Win32Bitmap::GetPaletteFromBackground(HDC hDC)
+{
+   HPALETTE hPal;
+   BITMAP   sBitmap;
+   HDC      hMemDC;
+   int      nColors;
+   
+   GetObject(m_hBitmap, sizeof(sBitmap), &sBitmap);
+   
+   if (sBitmap.bmBitsPixel > 8)
+      return NULL;
+      
+   nColors = 1 << sBitmap.bmBitsPixel;   
+
+   RGBQUAD *pRGB = new RGBQUAD[sBitmap.bmBitsPixel];
+   hMemDC = CreateCompatibleDC(hDC);
+
+   SelectObject(hMemDC, m_hBitmap);
+   GetDIBColorTable(hMemDC, 0, nColors, pRGB );
+
+   UINT nSize = sizeof(LOGPALETTE) + (sizeof(PALETTEENTRY) * nColors);
+   LOGPALETTE *pLP = (LOGPALETTE *) new BYTE[nSize];
+
+   pLP->palVersion = 0x300;
+   pLP->palNumEntries = nColors;
+
+   for (int i=0; i < nColors; i++)
+   {
+       pLP->palPalEntry[i].peRed = pRGB[i].rgbRed;
+       pLP->palPalEntry[i].peGreen = pRGB[i].rgbGreen;
+       pLP->palPalEntry[i].peBlue = pRGB[i].rgbBlue;
+       pLP->palPalEntry[i].peFlags = 0;
+   }
+
+   hPal = CreatePalette(pLP);
+
+   delete[] pLP;
+   delete[] pRGB;
+
+   return hPal;
+}

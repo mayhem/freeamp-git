@@ -247,6 +247,16 @@ void Win32Canvas::Paint(HDC hDC, Rect &oRect)
    hMemDC = CreateCompatibleDC(hDC);
    
    DeleteObject(SelectObject(hMemDC, m_pBufferBitmap->GetBitmapHandle()));
+   
+//   if (GetDeviceCaps(hDC, RASTERCAPS) & RC_PALETTE)
+//   {
+//      HPALETTE hPal;
+//      
+//      hPal = m_pBufferBitmap->GetPaletteFromBackground(hDC);
+//      SelectPalette(hDC, hPal, true);
+//      RealizePalette(hDC);
+//      DeleteObject(hPal);
+//   }
    BitBlt(hDC, oRect.x1, oRect.y1, oRect.Width(), oRect.Height(),
           hMemDC, oRect.x1, oRect.y1, SRCCOPY);
    DeleteDC(hMemDC);       

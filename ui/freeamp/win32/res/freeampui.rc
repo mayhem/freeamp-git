@@ -428,8 +428,8 @@ END
 // Bitmap
 //
 
-IDB_CHECKED             BITMAP  FIXED IMPURE    "checked.bmp"
-IDB_UNCHECKED           BITMAP  FIXED IMPURE    "unchecked.bmp"
+//IDB_CHECKED             BITMAP  FIXED IMPURE    "checked.bmp"
+//IDB_UNCHECKED           BITMAP  FIXED IMPURE    "unchecked.bmp"
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 

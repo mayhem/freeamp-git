@@ -194,6 +194,11 @@ static LRESULT WINAPI MainWndProc(HWND hwnd, UINT msg,
             ui->Keystroke((unsigned char)wParam);
             break;
         }
+        
+        case WM_NOTIFY:
+            ui->Notify(wParam, (LPNMHDR)lParam);
+            break;
+            
         case WM_DROPFILES:
             ui->DropFiles((HDROP) wParam);
             break;
@@ -296,6 +301,7 @@ Error Win32Window::Run(Pos &oPos)
         if (m_bStayOnTop)
             SetWindowPos(m_hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
         
+        CreateTooltips();
         UpdateWindow( m_hWnd );
 
         while( GetMessage( &msg, NULL, 0, 0 ) )
@@ -348,6 +354,8 @@ Error Win32Window::VulcanMindMeld(Window *pOther)
         hRgn = ((Win32Canvas *)m_pCanvas)->GetMaskRgn(); 
         if (hRgn)
            SetWindowRgn(m_hWnd, hRgn, false);
+
+        CreateTooltips();
 
 	    InvalidateRect(m_hWnd, NULL, false);
         UpdateWindow(m_hWnd);
@@ -517,4 +525,130 @@ void Win32Window::DropFiles(HDROP dropHandle)
         oFileList.push_back(string(file));
     }
     m_pTheme->DropFiles(&oFileList);
+}
+
+void 
+Win32Window::
+Notify(int32 command, LPNMHDR notifyMsgHdr)
+{
+    if(notifyMsgHdr->code == TTN_NEEDTEXT)
+    {
+        int32 idCtrl = notifyMsgHdr->idFrom;
+        LPTOOLTIPTEXT lpttt = (LPTOOLTIPTEXT) notifyMsgHdr; 
+
+        
+        vector<Control *>::iterator i;
+        uint32 uCtr;
+        string strTip;
+
+        //
+        // find the control we are interested in.
+        // idCtrl is objects index in control array
+        // hopefully the control array is static!
+        //
+
+        i = m_oControls.begin();
+        for(uCtr = 0; uCtr<idCtrl; uCtr++) i++;    
+
+        //
+        // and feed it's tip
+        //
+
+        m_oControls[idCtrl]->GetTip(strTip);
+        if(strTip.length())
+        {
+            strcpy(lpttt->szText,strTip.c_str()); // if tip is there
+        }
+    }
+}
+
+
+void 
+Win32Window::
+CreateTooltips()
+{
+    // tooltip support
+    static HWND hwndTooltip = NULL;
+        static uint32 uTooltipCount = 0;
+    HINSTANCE hinst = (HINSTANCE)GetWindowLong( m_hWnd, 
+                                                GWL_HINSTANCE);
+    TOOLINFO ti;
+    vector<Control *>::iterator i;
+    uint32 uCtr;
+
+    //
+    // check if we have been here
+    //
+    if(hwndTooltip)
+    {
+                // remove old tooltips, then
+
+        for(uCtr=0; uCtr<uTooltipCount; uCtr++)
+        {
+
+            ti.cbSize = sizeof(TOOLINFO); 
+            ti.hwnd = m_hWnd; 
+            ti.uId = uCtr; 
+ 
+            SendMessage(hwndTooltip, 
+                    TTM_DELTOOL, 
+                    0, 
+                    (LPARAM) &ti);
+        }
+    }
+
+    if(!hwndTooltip)
+    {
+        // for some reason if mindmeld, destroying and
+        // re-creating window does not work. we can
+        // create it only once.
+
+        hwndTooltip = CreateWindowEx(WS_EX_TOPMOST,
+            TOOLTIPS_CLASS, 
+            NULL, 
+            0, 
+            CW_USEDEFAULT, 
+            CW_USEDEFAULT, 
+            CW_USEDEFAULT, 
+            CW_USEDEFAULT, 
+            m_hWnd, 
+            (HMENU) NULL, 
+            hinst, 
+            NULL);
+    }
+
+    //
+    // now go adding tooltip regions
+    //
+    uCtr=0;
+    for(i = m_oControls.begin(); i != m_oControls.end(); i++)
+    {
+        Rect rect;
+        string strTip;
+
+        (*i)->GetTip(strTip);
+        (*i)->GetRect(rect);
+
+        // add a tool tip
+
+        ti.cbSize = sizeof(TOOLINFO); 
+        ti.uFlags =  TTF_SUBCLASS; 
+        ti.hwnd = m_hWnd; 
+        ti.hinst = hinst; 
+        ti.uId = uCtr; 
+        ti.lpszText = (LPSTR) LPSTR_TEXTCALLBACK; 
+        ti.rect.left = rect.x1; 
+        ti.rect.top = rect.y1; 
+        ti.rect.right = rect.x2; 
+        ti.rect.bottom = rect.y2; 
+
+        SendMessage(hwndTooltip, 
+            TTM_ADDTOOL, 
+            0, 
+            (LPARAM) &ti);
+
+        uCtr++;
+    }
+        
+    uTooltipCount = uCtr; // save value for next mindmeld
 }

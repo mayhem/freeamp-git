@@ -48,6 +48,7 @@ class Win32Bitmap : public Bitmap
 
      HBITMAP       GetBitmapHandle(void);
      HBITMAP       GetMaskBitmapHandle(void);
+     HPALETTE      GetPaletteFromBackground(HDC hDc);
 
     protected:
 

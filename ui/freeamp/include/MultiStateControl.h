@@ -48,10 +48,13 @@ class MultiStateControl : public Control
       void Transition(ControlTransitionEnum eTrans, Pos *pMousePos);
       virtual void Init(void);
       virtual bool PosInControl(Pos &oPos);
+      virtual void GetDesc(string &oDesc);
+      virtual void GetTip(string &oTip);
 
     private:
 
-	  int     m_iState, m_iNumStates;
+	  int            m_iState, m_iNumStates;
+      vector<string> m_oTips, m_oDescs;   
 };
 
 #endif

@@ -556,10 +556,21 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
            m_oLastError = string("the <ButtonControl> tag needs a Name attribute");
            return kError_ParseError;
        }        
+	   if (oAttrMap.find("URL") != oAttrMap.end() &&
+           oAttrMap["Name"] != string("Logo"))
+       {
+           m_oLastError = string("only the Logo button can have a URL attribute");
+           return kError_ParseError;
+       }        
 
        m_eCurrentControl = eButtonControl;
-       m_pCurrentControl = new ButtonControl(m_pCurrentWindow, 
-                                             oAttrMap["Name"]);
+	   if (oAttrMap.find("URL") != oAttrMap.end())
+           m_pCurrentControl = new ButtonControl(m_pCurrentWindow, 
+                                                 oAttrMap["Name"],
+                                                 oAttrMap["URL"]);
+       else                                          
+           m_pCurrentControl = new ButtonControl(m_pCurrentWindow, 
+                                                 oAttrMap["Name"]);
        return kError_NoErr;
     }
 
@@ -730,6 +741,7 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
     if (oElement == string("Position"))
     {
        Rect oRect;
+       Pos  oPos;
 
        if (m_pCurrentControl == NULL)
        {
@@ -738,20 +750,45 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
           return kError_InvalidParam;
        }
 
-       if (oAttrMap.find("Rect") == oAttrMap.end())
+       if (oAttrMap.find("Rect") == oAttrMap.end() &&
+           oAttrMap.find("Pos") == oAttrMap.end())
        {
-           m_oLastError = string("the <Position> tag needs a Rect attribute");
+           m_oLastError = string("the <Position> tag needs a Rect or a Pos attribute");
            return kError_ParseError;
        }        
-       eRet = ParseRect(oAttrMap["Rect"], oRect);
-       if (eRet != kError_NoErr)
-       {
-          m_oLastError = string("Improperly formatted Rect coordinates: ") +
-                         oAttrMap["Rect"];
-          return kError_InvalidParam;
-       }
 
-       m_pCurrentControl->SetRect(oRect);
+       if (oAttrMap.find("Pos") != oAttrMap.end() &&
+           m_eCurrentControl != eButtonControl &&
+           m_eCurrentControl != eMultiStateControl)
+       {
+           m_oLastError = string("the Pos attribute in the <Position> tag can only be used "
+                                 "for a MultiStateControl or a ButtonControl");
+           return kError_ParseError;
+       }        
+       
+       if (oAttrMap.find("Rect") != oAttrMap.end())
+       {
+           eRet = ParseRect(oAttrMap["Rect"], oRect);
+           if (eRet != kError_NoErr)
+           {
+               m_oLastError = string("Improperly formatted Rect coordinates: ") +
+                              oAttrMap["Rect"];
+               return kError_InvalidParam;
+           }
+           m_pCurrentControl->SetRect(oRect);
+       }    
+       if (oAttrMap.find("Pos") != oAttrMap.end())
+       {
+           eRet = ParsePos(oAttrMap["Pos"], oPos);
+           if (eRet != kError_NoErr)
+           {
+               m_oLastError = string("Improperly formatted Rect coordinates: ") +
+                              oAttrMap["Rect"];
+               return kError_InvalidParam;
+           }
+           m_pCurrentControl->SetPos(oPos);
+       }    
+
        return kError_NoErr;
     }
 

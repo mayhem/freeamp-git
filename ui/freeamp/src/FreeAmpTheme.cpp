@@ -62,6 +62,7 @@ extern    "C"
 {
    UserInterface *Initialize(FAContext * context)
    {
+      Debug_v("##Clear");
       return new FreeAmpTheme(context);
    }
 }
@@ -116,8 +117,7 @@ void FreeAmpTheme::WorkerThread(void)
        sprintf(szTemp, "%d,%d", m_oWindowPos.x, m_oWindowPos.y);
        m_pContext->prefs->SetPrefString(kMainWindowPosPref, szTemp);
    }    
-   else   
-       m_pContext->target->AcceptEvent(new Event(CMD_QuitPlayer));
+   m_pContext->target->AcceptEvent(new Event(CMD_QuitPlayer));
 }
 
 void WorkerThreadStart(void* arg)
@@ -198,8 +198,14 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
       }   
       case INFO_Playing:
       {
+         bool bEnable = false;
+         
          int iState = 1;
          m_pWindow->ControlIntValue(string("Play"), true, iState);
+         m_pWindow->ControlEnable(string("IPlay"), true, bEnable);
+         bEnable = true;
+         m_pWindow->ControlEnable(string("IPause"), true, bEnable);
+         
          m_bPlayShown = true;
          break;
       }   
@@ -207,8 +213,13 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
       case INFO_Stopped:
       {
          int iState = 0;
+         bool bEnable = true;
+         
          m_pWindow->ControlIntValue(string("Play"), true, iState);
-         m_bPlayShown = true;
+         m_pWindow->ControlEnable(string("IPlay"), true, bEnable);
+         bEnable = false;
+         m_pWindow->ControlEnable(string("IPause"), true, bEnable);
+         m_bPlayShown = false;
          break;
       }   
       case INFO_DoneOutputting:
@@ -486,30 +497,31 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
            m_pContext->target->AcceptEvent(new Event(CMD_ToggleMusicBrowserUI));
            return kError_NoErr;
        }
-
        m_pWindow->ControlIntValue(oControlName, false, iState);
        if (iState == 0)
-       {
-       	   iState = 1;
-           m_pWindow->ControlIntValue(oControlName, true, iState);
            m_pContext->target->AcceptEvent(new Event(CMD_Play));
-           m_bPlayShown = false;
-       }    
 	   else
-       {
-       	   iState = 0;
-           m_pWindow->ControlIntValue(oControlName, true, iState);
            m_pContext->target->AcceptEvent(new Event(CMD_Pause));
-           m_bPlayShown = true;
-       }    
+       return kError_NoErr;
+   }
+   if (oControlName == string("IPlay") && eMesg == CM_Pressed)
+   {
+       if (m_pContext->plm->CountItems() == 0)
+       {
+           m_pContext->target->AcceptEvent(new Event(CMD_ToggleMusicBrowserUI));
+           return kError_NoErr;
+       }
+       m_pContext->target->AcceptEvent(new Event(CMD_Play));
+       return kError_NoErr;
+   }
+   if (oControlName == string("IPause") && eMesg == CM_Pressed)
+   {
+       m_pContext->target->AcceptEvent(new Event(CMD_Pause));
        return kError_NoErr;
    }
    if (oControlName == string("Stop") && eMesg == CM_Pressed)
    {
-   	   int iState = 0;
-       m_pWindow->ControlIntValue(oControlName, true, iState);
        m_pContext->target->AcceptEvent(new Event(CMD_Stop));
-       m_bPlayShown = true;
        return kError_NoErr;
    }
    if (oControlName == string("Next") && eMesg == CM_Pressed)
@@ -563,31 +575,23 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
    if (oControlName == string("Shuffle") && eMesg == CM_Pressed)
    {
        int iState = 0;
-       string oStatus;
+       string     oName("Info"), oDesc("");
 
        m_pWindow->ControlIntValue(oControlName, false, iState);
        iState = (iState + 1) % 2;
        m_pContext->plm->SetShuffleMode(iState == 1);
        m_pWindow->ControlIntValue(oControlName, true, iState);
        
-       switch(iState)
-       {
-          case 0:  
-              oStatus = string("Dont shuffle tracks");
-              break;
-          case 1:  
-              oStatus = string("Shuffle track");
-              break;
-       }
-       m_pWindow->ControlStringValue(string("Info"), true, oStatus);
+       m_pWindow->ControlGetDesc(oControlName, oDesc);
+       m_pWindow->ControlStringValue(oName, true, oDesc);
        
        return kError_NoErr;
    }    
    if (oControlName == string("Repeat") && eMesg == CM_Pressed)
    {
        int        iState = 0;
-       string     oStatus;
        RepeatMode eMode = kPlaylistMode_RepeatNone;
+       string     oName("Info"), oDesc("");
 
        m_pWindow->ControlIntValue(oControlName, false, iState);
        iState = (iState + 1) % 3;
@@ -596,20 +600,19 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
        switch(iState)
        {
           case 0:  
-              oStatus = string("Repeat none");
               eMode = kPlaylistMode_RepeatNone;
               break;
           case 1:  
-              oStatus = string("Repeat current track");
               eMode = kPlaylistMode_RepeatOne;
               break;
           case 2:  
-              oStatus = string("Repeat all");
               eMode = kPlaylistMode_RepeatAll;
               break;
        }
        m_pContext->plm->SetRepeatMode(eMode);
-       m_pWindow->ControlStringValue(string("Info"), true, oStatus);
+       
+       m_pWindow->ControlGetDesc(oControlName, oDesc);
+       m_pWindow->ControlStringValue(oName, true, oDesc);
        
        return kError_NoErr;
    }    
@@ -633,11 +636,17 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
    }
    if (oControlName == string("Logo") && eMesg == CM_Pressed)
    {
+       string oUrl;
+       
+       m_pWindow->ControlStringValue("Logo", false, oUrl);
+       if (oUrl.length() == 0)
+          oUrl = BRANDING_URL;
+       
 #ifdef WIN32   
-       ShellExecute(NULL, "open", BRANDING_URL,
+       ShellExecute(NULL, "open", oUrl.c_str(),
                     NULL, NULL, SW_SHOWNORMAL);
 #else
-       LaunchBrowser(BRANDING_URL);
+       LaunchBrowser(oUrl.c_str());
 #endif
    }
    
@@ -646,7 +655,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
 
 void FreeAmpTheme::InitControls(void)
 {
-	bool   bSet;
+	bool   bSet, bEnable;
     int    iState;
     string oWelcome("Welcome to the "BRANDING" player!");
     
@@ -674,6 +683,11 @@ void FreeAmpTheme::InitControls(void)
     // Set the Play/Pause buttons
     iState = m_bPlayShown ? 0 : 1;
     m_pWindow->ControlIntValue(string("Play"), true, iState);
+    bEnable = m_bPlayShown;
+    m_pWindow->ControlEnable(string("IPlay"), true, bEnable);
+    bEnable = !m_bPlayShown;
+    m_pWindow->ControlEnable(string("IPause"), true, bEnable);
+    
     
     if (m_oTitle.length() == 0)
         m_pWindow->ControlStringValue(string("Title"), true, oWelcome);

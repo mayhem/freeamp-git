@@ -86,7 +86,6 @@ class Theme : public Parse
       string        m_oThemePath;
       Window       *m_pWindow;
       FAContext    *m_pContext;
-      
 
     private:
 
