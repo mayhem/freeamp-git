@@ -869,7 +869,7 @@ int APSInterface::SyncLog()
         }
        
         fIn.close();
-        if (TheLog.size() > 0)
+        if (TheLog.size() > 2)
         {
             nRes = m_pYpClient->SyncLog(TheLog, 
                                         (*m_pProfileMap)[m_strCurrentProfile]);
