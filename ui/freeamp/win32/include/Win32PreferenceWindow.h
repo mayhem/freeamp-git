@@ -38,6 +38,7 @@ using namespace std;
 
 #include "config.h"
 #include "PreferenceWindow.h"
+#include "win32updatemanager.h"
 #include "preferences.h"
 #include "log.h"
 #include "registrar.h"
@@ -148,6 +149,17 @@ typedef struct PrefsStruct
 
 } PrefsStruct;
 
+typedef struct PrefPage {    
+	HINSTANCE hInstance;
+	LPCSTR pszTemplate;
+	DLGPROC pfnDlgProc;
+	LPARAM lParam;
+	bool bChild;
+    
+    HWND hwnd;
+} PrefPage;
+
+
 class Win32PreferenceWindow : public PreferenceWindow
 {
     public:
@@ -162,11 +174,14 @@ class Win32PreferenceWindow : public PreferenceWindow
                void LaunchHelp(HWND hwnd, uint32 topic);
       virtual  bool Show(Window *pParent);
 
-               void GetPrefsValues(Preferences* prefs, 
-                                   PrefsStruct* values);
+               void GetPrefsValues(PrefsStruct* values);
 
-               void SavePrefsValues(Preferences* prefs, 
-                                    PrefsStruct* values);
+               void SavePrefsValues(PrefsStruct* values);
+
+               bool MainProc( HWND hwnd, 
+                              UINT msg, 
+                              WPARAM wParam, 
+                              LPARAM lParam);
 
                bool PrefGeneralProc(HWND hwnd, 
                                   UINT msg, 
@@ -203,19 +218,28 @@ class Win32PreferenceWindow : public PreferenceWindow
 
 	protected:
     
-               bool DisplayPreferences(HWND hwndParent, 
-                                       Preferences* prefs);
-               void LoadThemeListBox  (HWND hwnd);
-    
-    
+               bool DisplayPreferences(HWND hwndParent);
+               void LoadThemeListBox(HWND hwnd);
+               void InitializePrefDialog();
+               void ShowPrefPage(PrefPage* page, bool show);
+
+
       PrefsStruct  m_originalValues;
       PrefsStruct  m_currentValues;
       PrefsStruct  m_proposedValues;
       uint32       m_defaultPage;
 
-      UpdateManager *m_pUpdateManager;
-    
+      bool deleteUpdateManager;
+      Win32UpdateManager* m_updateManager;
+      Preferences*   m_prefs;      
+
       map<string, string> m_oThemeList;
+
+      vector<PrefPage> m_pages;
+      HWND m_hwndPref;
+      string m_caption;
+      uint32 m_startPage;
+      
 };
 
 #endif

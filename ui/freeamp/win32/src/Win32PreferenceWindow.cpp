@@ -62,6 +62,15 @@ const char* kThemeFileFilter =
 uint32 CalcStringEllipsis(HDC hdc, string& displayString, int32 columnWidth);
 
 static BOOL CALLBACK 
+MainCallback(HWND hwnd, 
+                    UINT msg, 
+                    WPARAM wParam, 
+                    LPARAM lParam)
+{
+	return g_pCurrentPrefWindow->MainProc(hwnd, msg, wParam, lParam);
+}   
+
+static BOOL CALLBACK 
 PrefGeneralCallback(HWND hwnd, 
                     UINT msg, 
                     WPARAM wParam, 
@@ -133,23 +142,6 @@ PrefDebugCallback(HWND hwnd,
 	return g_pCurrentPrefWindow->PrefDebugProc(hwnd, msg, wParam, lParam);
 }            
 
-static int CALLBACK PropSheetProc( HWND hwnd, UINT msg, LPARAM lParam)
-{
-    if(msg == PSCB_INITIALIZED)
-    {
-        //DLGTEMPLATE* dlg = (DLGTEMPLATE*)lParam;
-
-        //dlg->dwExtendedStyle ^= WS_EX_CONTEXTHELP;
-        LONG style = GetWindowLong(GetParent(hwnd), GWL_EXSTYLE);
-
-        style ^= WS_EX_CONTEXTHELP;
-
-        SetWindowLong(GetParent(hwnd), GWL_EXSTYLE, style);
-    }
-
-    return 0;
-}
-
 Win32PreferenceWindow::Win32PreferenceWindow(FAContext *context,
                                              ThemeManager *pThemeMan,
                                              UpdateManager *pUpdateMan,
@@ -158,7 +150,24 @@ Win32PreferenceWindow::Win32PreferenceWindow(FAContext *context,
 {     
 	g_pCurrentPrefWindow = this;
     m_defaultPage = defaultPage;
-    m_pUpdateManager = pUpdateMan;
+    m_updateManager = (Win32UpdateManager*)pUpdateMan;
+    m_prefs = context->prefs;
+    deleteUpdateManager = false;
+    m_hwndPref = NULL;
+    m_startPage = defaultPage;
+
+    if(!m_updateManager)
+    {
+        deleteUpdateManager = true;
+        m_updateManager = new Win32UpdateManager(m_pContext);
+        m_updateManager->DetermineLocalVersions();
+        m_updateManager->SetPlatform(string("WIN32"));
+#if defined( _M_ALPHA )
+        m_updateManager->SetArchitecture(string("ALPHA"));
+#else
+        m_updateManager->SetArchitecture(string("X86"));
+#endif
+    }
 }
 
 Win32PreferenceWindow::~Win32PreferenceWindow(void)
@@ -171,124 +180,92 @@ bool Win32PreferenceWindow::Show(Window *pWindow)
 	HWND hWnd;
     
     hWnd = ((Win32Window *)pWindow)->GetWindowHandle(); 
-    return DisplayPreferences(hWnd, m_pContext->prefs);
+    return DisplayPreferences(hWnd);
 }
 
-bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent, Preferences* prefs)
+bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent)
 {
     bool result = false;
-    PROPSHEETPAGE psp[7];
-    PROPSHEETHEADER psh;
-	
     HINSTANCE hinst = (HINSTANCE)GetWindowLong(hwndParent, GWL_HINSTANCE);
 
-    psp[0].dwSize = sizeof(PROPSHEETPAGE);
-    psp[0].dwFlags = PSP_HASHELP;
-    psp[0].hInstance = hinst;
-    psp[0].pszTemplate = MAKEINTRESOURCE(IDD_PREF_GENERAL);
-    psp[0].pszIcon = NULL;
-    psp[0].pfnDlgProc = PrefGeneralCallback;
-    psp[0].pszTitle = NULL;
-    psp[0].lParam = (LPARAM)prefs;
+    PrefPage page;
 
-    psp[1].dwSize = sizeof(PROPSHEETPAGE);
-    psp[1].dwFlags = PSP_HASHELP;
-    psp[1].hInstance = hinst;
-    psp[1].pszTemplate = MAKEINTRESOURCE(IDD_PREF_THEME);
-    psp[1].pszIcon = NULL;
-    psp[1].pfnDlgProc = PrefThemeCallback;
-    psp[1].pszTitle = NULL;
-    psp[1].lParam = (LPARAM)prefs;
+    page.hInstance = hinst;
+    page.pszTemplate = MAKEINTRESOURCE(IDD_PREF_GENERAL);
+    page.pfnDlgProc = PrefGeneralCallback;
+    page.bChild = false;
+    page.lParam = 0;
+    page.hwnd = NULL;
+    
+    m_pages.push_back(page);
 
-    psp[2].dwSize = sizeof(PROPSHEETPAGE);
-    psp[2].dwFlags = PSP_HASHELP;
-    psp[2].hInstance = hinst;
-    psp[2].pszTemplate = MAKEINTRESOURCE(IDD_PREF_STREAMING);
-    psp[2].pszIcon = NULL;
-    psp[2].pfnDlgProc = PrefStreamingCallback;
-    psp[2].pszTitle = NULL;
-    psp[2].lParam = (LPARAM)prefs;
+    page.pszTemplate = MAKEINTRESOURCE(IDD_PREF_THEME);
+    page.pfnDlgProc = PrefThemeCallback;
+    m_pages.push_back(page);
 
-    psp[3].dwSize = sizeof(PROPSHEETPAGE);
-    psp[3].dwFlags = PSP_HASHELP;
-    psp[3].hInstance = hinst;
-    psp[3].pszTemplate = MAKEINTRESOURCE(IDD_PREF_PLUGINS);
-    psp[3].pszIcon = NULL;
-    psp[3].pfnDlgProc = PrefPluginsCallback;
-    psp[3].pszTitle = NULL;
-    psp[3].lParam = (LPARAM)prefs;
+    page.pszTemplate = MAKEINTRESOURCE(IDD_PREF_STREAMING);
+    page.pfnDlgProc = PrefStreamingCallback;
+    m_pages.push_back(page);
 
-    UpdateManager* updateManager = NULL;
+    page.pszTemplate = MAKEINTRESOURCE(IDD_PREF_PLUGINS);
+    page.pfnDlgProc = PrefPluginsCallback;
+    m_pages.push_back(page);
 
-    if(!m_pUpdateManager)
-    {
+    page.pszTemplate = MAKEINTRESOURCE(IDD_PREF_UPDATE);
+    page.pfnDlgProc = PrefUpdateCallback;
+    m_pages.push_back(page);
 
-        updateManager = new Win32UpdateManager(m_pContext);
-        updateManager->DetermineLocalVersions();
-        updateManager->SetPlatform(string("WIN32"));
-#if defined( _M_ALPHA )
-        updateManager->SetArchitecture(string("ALPHA"));
-#else
-        updateManager->SetArchitecture(string("X86"));
-#endif
-    }
-    else
-    {
-        updateManager = m_pUpdateManager;
-    }
+    page.pszTemplate = MAKEINTRESOURCE(IDD_PREF_ADVANCED);
+    page.pfnDlgProc = PrefAdvancedCallback;
+    m_pages.push_back(page);
 
-    psp[4].dwSize = sizeof(PROPSHEETPAGE);
-    psp[4].dwFlags = PSP_HASHELP;
-    psp[4].hInstance = hinst;
-    psp[4].pszTemplate = MAKEINTRESOURCE(IDD_PREF_UPDATE);
-    psp[4].pszIcon = NULL;
-    psp[4].pfnDlgProc = PrefUpdateCallback;
-    psp[4].pszTitle = NULL;
-    psp[4].lParam = (LPARAM)updateManager;
-
-    psp[5].dwSize = sizeof(PROPSHEETPAGE);
-    psp[5].dwFlags = PSP_HASHELP;
-    psp[5].hInstance = hinst;
-    psp[5].pszTemplate = MAKEINTRESOURCE(IDD_PREF_ADVANCED);
-    psp[5].pszIcon = NULL;
-    psp[5].pfnDlgProc = PrefAdvancedCallback;
-    psp[5].pszTitle = NULL;
-    psp[5].lParam = (LPARAM)prefs;
-
-    psp[6].dwSize = sizeof(PROPSHEETPAGE);
-    psp[6].dwFlags = PSP_HASHELP;
-    psp[6].hInstance = hinst;
-    psp[6].pszTemplate = MAKEINTRESOURCE(IDD_PREF_ABOUT);
-    psp[6].pszIcon = NULL;
-    psp[6].pfnDlgProc = PrefAboutCallback;
-    psp[6].pszTitle = NULL;
-    psp[6].lParam = (LPARAM)prefs;
-
-   
-    psh.dwSize = sizeof(PROPSHEETHEADER);
-    psh.dwFlags = PSH_PROPSHEETPAGE | PSH_HASHELP;
-    psh.hwndParent = hwndParent;
-    psh.hInstance = hinst;
-    psh.pszIcon = NULL;
-    psh.pszCaption = BRANDING" Preferences";
-    psh.nPages = sizeof(psp)/sizeof(PROPSHEETPAGE);
-    psh.nStartPage = m_defaultPage;
-    psh.ppsp = psp;
-    psh.pfnCallback = NULL;
-
-    GetPrefsValues(prefs, &m_originalValues);
+    page.pszTemplate = MAKEINTRESOURCE(IDD_PREF_ABOUT);
+    page.pfnDlgProc = PrefAboutCallback;
+    m_pages.push_back(page);
+    
+    
+    GetPrefsValues(&m_originalValues);
 
     m_proposedValues = m_currentValues = m_originalValues;
-    result = (PropertySheet(&psh) > 0);
 
-    if(!m_pUpdateManager)
-        delete updateManager;
+    //result = (PropertySheet(&psh) > 0);
+    result = (DialogBox(hinst, 
+                        MAKEINTRESOURCE(IDD_MAIN_PREF_DIALOG),
+                        hwndParent,
+                        MainCallback) > 0);
+
+    /*HWND hwnd = CreateDialog(
+                hinst, 
+                MAKEINTRESOURCE(IDD_MAIN_PREF_DIALOG),
+                hwndParent,
+                MainCallback);
+
+    if(hwnd)
+    {
+        MSG msg;
+
+        ShowWindow(hwnd, SW_NORMAL);
+        UpdateWindow(hwnd);
+
+        while(GetMessage(&msg, NULL, 0, 0))
+        {
+            if(!IsDialogMessage(hwnd, &msg))
+            {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);  
+            }
+        }
+
+        DestroyWindow(hwnd);
+    }*/
+
+    if(deleteUpdateManager)
+        delete m_updateManager;
 
     return result;
 }
 
-void Win32PreferenceWindow::GetPrefsValues(Preferences* prefs, 
-                                           PrefsStruct* values)
+void Win32PreferenceWindow::GetPrefsValues(PrefsStruct* values)
 {
     uint32 bufferSize = 1;
     uint32 size;
@@ -298,81 +275,81 @@ void Win32PreferenceWindow::GetPrefsValues(Preferences* prefs,
 
     size = bufferSize;
 
-    if(kError_BufferTooSmall == prefs->GetDefaultPMO(buffer, &size))
+    if(kError_BufferTooSmall == m_prefs->GetDefaultPMO(buffer, &size))
     {
         bufferSize = size;
         buffer = (char*)realloc(buffer, bufferSize);
-        prefs->GetDefaultPMO(buffer, &size);
+        m_prefs->GetDefaultPMO(buffer, &size);
     }
 
     values->defaultPMO = buffer;
     size = bufferSize;
 
-    if(kError_BufferTooSmall == prefs->GetDefaultUI(buffer, &size))
+    if(kError_BufferTooSmall == m_prefs->GetDefaultUI(buffer, &size))
     {
         bufferSize = size;
         buffer = (char*)realloc(buffer, bufferSize);
-        prefs->GetDefaultUI(buffer, &size);
+        m_prefs->GetDefaultUI(buffer, &size);
     }
     
     values->defaultUI = buffer;
     size = bufferSize;
 
-    if(kError_BufferTooSmall == prefs->GetProxyServerAddress(buffer, &size))
+    if(kError_BufferTooSmall == m_prefs->GetProxyServerAddress(buffer, &size))
     {
         bufferSize = size;
         buffer = (char*)realloc(buffer, bufferSize);
-        prefs->GetProxyServerAddress(buffer, &size);
+        m_prefs->GetProxyServerAddress(buffer, &size);
     }
 
     values->proxyServer = buffer;
     size = bufferSize;
 
-    if(kError_BufferTooSmall == prefs->GetSaveStreamsDirectory(buffer, &size))
+    if(kError_BufferTooSmall == m_prefs->GetSaveStreamsDirectory(buffer, &size))
     {
         bufferSize = size;
         buffer = (char*)realloc(buffer, bufferSize);
-        prefs->GetSaveStreamsDirectory(buffer, &size);
+        m_prefs->GetSaveStreamsDirectory(buffer, &size);
     }
 
     values->saveStreamsDirectory = buffer;
     size = bufferSize;
 
-    if(kError_BufferTooSmall == prefs->GetAlternateNICAddress(buffer, &size))
+    if(kError_BufferTooSmall == m_prefs->GetAlternateNICAddress(buffer, &size))
     {
         bufferSize = size;
         buffer = (char*)realloc(buffer, bufferSize);
-        prefs->GetAlternateNICAddress(buffer, &size);
+        m_prefs->GetAlternateNICAddress(buffer, &size);
     }
 
     values->alternateIP = buffer;
     size = bufferSize;
 
-    if(kError_BufferTooSmall == prefs->GetThemeDefaultFont(buffer, &size))
+    if(kError_BufferTooSmall == m_prefs->GetThemeDefaultFont(buffer, &size))
     {
         bufferSize = size;
         buffer = (char*)realloc(buffer, bufferSize);
-        prefs->GetThemeDefaultFont(buffer, &size);
+        m_prefs->GetThemeDefaultFont(buffer, &size);
     }
 
     values->defaultFont = buffer;
     size = bufferSize;
 
-    if(kError_BufferTooSmall == prefs->GetSaveMusicDirectory(buffer, &size))
+    if(kError_BufferTooSmall == m_prefs->GetSaveMusicDirectory(buffer, &size))
     {
         bufferSize = size;
         buffer = (char*)realloc(buffer, bufferSize);
-        prefs->GetSaveMusicDirectory(buffer, &size);
+        m_prefs->GetSaveMusicDirectory(buffer, &size);
     }
 
     values->saveMusicDirectory = buffer;
     size = bufferSize;
 
-    if(kError_BufferTooSmall == prefs->GetUsersPortablePlayers(buffer, &size))
+    if(kError_BufferTooSmall == m_prefs->GetUsersPortablePlayers(buffer, &size))
     {
         bufferSize = size;
         buffer = (char*)realloc(buffer, bufferSize);
-        prefs->GetUsersPortablePlayers(buffer, &size);
+        m_prefs->GetUsersPortablePlayers(buffer, &size);
     }
 
     char* cp = buffer;
@@ -399,70 +376,69 @@ void Win32PreferenceWindow::GetPrefsValues(Preferences* prefs,
 
     m_pThemeMan->GetCurrentTheme(values->currentTheme);
 
-    // get the other prefs
-    prefs->GetDecoderThreadPriority(&values->decoderThreadPriority);
-    prefs->GetInputBufferSize(&values->inputBufferSize);
-    prefs->GetOutputBufferSize(&values->outputBufferSize);
-    prefs->GetPrebufferLength(&values->preBufferLength);
-    prefs->GetStayOnTop(&values->stayOnTop);
-    prefs->GetLiveInTray(&values->liveInTray);
-    prefs->GetStreamBufferInterval(&values->streamInterval);
-    prefs->GetSaveStreams(&values->saveStreams);
-    prefs->GetUseProxyServer(&values->useProxyServer);
-    prefs->GetUseAlternateNIC(&values->useAlternateIP);
-    prefs->GetUseDebugLog(&values->enableLogging);
-    prefs->GetLogMain(&values->logMain);
-    prefs->GetLogDecode(&values->logDecoder);
-    prefs->GetLogInput(&values->logInput);
-    prefs->GetLogOutput(&values->logOutput);
-    prefs->GetLogPerformance(&values->logPerformance);
-    prefs->GetCheckForUpdates(&values->checkForUpdates);
-    prefs->GetAskToReclaimFiletypes(&values->askReclaimFiletypes);
-    prefs->GetReclaimFiletypes(&values->reclaimFiletypes);
-    prefs->GetShowToolbarTextLabels(&values->useTextLabels);
-    prefs->GetShowToolbarImages(&values->useImages);
-    prefs->GetSaveCurrentPlaylistOnExit(&values->savePlaylistOnExit);
-    prefs->GetPlayImmediately(&values->playImmediately);
-    prefs->GetConvertUnderscoresToSpaces(&values->convertUnderscores);
+    // get the other m_prefs
+    m_prefs->GetDecoderThreadPriority(&values->decoderThreadPriority);
+    m_prefs->GetInputBufferSize(&values->inputBufferSize);
+    m_prefs->GetOutputBufferSize(&values->outputBufferSize);
+    m_prefs->GetPrebufferLength(&values->preBufferLength);
+    m_prefs->GetStayOnTop(&values->stayOnTop);
+    m_prefs->GetLiveInTray(&values->liveInTray);
+    m_prefs->GetStreamBufferInterval(&values->streamInterval);
+    m_prefs->GetSaveStreams(&values->saveStreams);
+    m_prefs->GetUseProxyServer(&values->useProxyServer);
+    m_prefs->GetUseAlternateNIC(&values->useAlternateIP);
+    m_prefs->GetUseDebugLog(&values->enableLogging);
+    m_prefs->GetLogMain(&values->logMain);
+    m_prefs->GetLogDecode(&values->logDecoder);
+    m_prefs->GetLogInput(&values->logInput);
+    m_prefs->GetLogOutput(&values->logOutput);
+    m_prefs->GetLogPerformance(&values->logPerformance);
+    m_prefs->GetCheckForUpdates(&values->checkForUpdates);
+    m_prefs->GetAskToReclaimFiletypes(&values->askReclaimFiletypes);
+    m_prefs->GetReclaimFiletypes(&values->reclaimFiletypes);
+    m_prefs->GetShowToolbarTextLabels(&values->useTextLabels);
+    m_prefs->GetShowToolbarImages(&values->useImages);
+    m_prefs->GetSaveCurrentPlaylistOnExit(&values->savePlaylistOnExit);
+    m_prefs->GetPlayImmediately(&values->playImmediately);
+    m_prefs->GetConvertUnderscoresToSpaces(&values->convertUnderscores);
 
     free(buffer);
 }
 
-void Win32PreferenceWindow::SavePrefsValues(Preferences* prefs, 
-                                            PrefsStruct* values)
+void Win32PreferenceWindow::SavePrefsValues(PrefsStruct* values)
 {
-    prefs->SetDefaultPMO(values->defaultPMO.c_str());
-    prefs->SetDefaultUI(values->defaultUI.c_str());
-    prefs->SetDecoderThreadPriority(values->decoderThreadPriority);
-    prefs->SetInputBufferSize(values->inputBufferSize);
-    prefs->SetOutputBufferSize(values->outputBufferSize);
-    prefs->SetPrebufferLength(values->preBufferLength);
-    prefs->SetStayOnTop(values->stayOnTop);
-    prefs->SetLiveInTray(values->liveInTray);
+    m_prefs->SetDefaultPMO(values->defaultPMO.c_str());
+    m_prefs->SetDefaultUI(values->defaultUI.c_str());
+    m_prefs->SetDecoderThreadPriority(values->decoderThreadPriority);
+    m_prefs->SetInputBufferSize(values->inputBufferSize);
+    m_prefs->SetOutputBufferSize(values->outputBufferSize);
+    m_prefs->SetPrebufferLength(values->preBufferLength);
+    m_prefs->SetStayOnTop(values->stayOnTop);
+    m_prefs->SetLiveInTray(values->liveInTray);
 
-    prefs->SetStreamBufferInterval(values->streamInterval);
-    prefs->SetSaveStreams(values->saveStreams);
-    prefs->SetSaveStreamsDirectory(values->saveStreamsDirectory.c_str());
-    prefs->SetProxyServerAddress(values->proxyServer.c_str());
-    prefs->SetUseProxyServer(values->useProxyServer);
-    prefs->SetAlternateNICAddress(values->alternateIP.c_str());
-    prefs->SetUseAlternateNIC(values->useAlternateIP);
+    m_prefs->SetStreamBufferInterval(values->streamInterval);
+    m_prefs->SetSaveStreams(values->saveStreams);
+    m_prefs->SetSaveStreamsDirectory(values->saveStreamsDirectory.c_str());
+    m_prefs->SetProxyServerAddress(values->proxyServer.c_str());
+    m_prefs->SetUseProxyServer(values->useProxyServer);
+    m_prefs->SetAlternateNICAddress(values->alternateIP.c_str());
+    m_prefs->SetUseAlternateNIC(values->useAlternateIP);
 
-    prefs->SetUseDebugLog(values->enableLogging);
-    prefs->SetLogMain(values->logMain);
-    prefs->SetLogDecode(values->logDecoder);
-    prefs->SetLogInput(values->logInput);
-    prefs->SetLogOutput(values->logOutput);
-    prefs->SetLogPerformance(values->logPerformance);
+    m_prefs->SetUseDebugLog(values->enableLogging);
+    m_prefs->SetLogMain(values->logMain);
+    m_prefs->SetLogDecode(values->logDecoder);
+    m_prefs->SetLogInput(values->logInput);
+    m_prefs->SetLogOutput(values->logOutput);
+    m_prefs->SetLogPerformance(values->logPerformance);
 
-    prefs->SetThemeDefaultFont(values->defaultFont.c_str());
+    m_prefs->SetThemeDefaultFont(values->defaultFont.c_str());
     if (m_oThemeList[values->currentTheme].length() > 0)
        m_pThemeMan->UseTheme(m_oThemeList[values->currentTheme]);
 
-    prefs->SetCheckForUpdates(values->checkForUpdates);
-    prefs->SetSaveMusicDirectory(values->saveMusicDirectory.c_str());
-    prefs->SetAskToReclaimFiletypes(values->askReclaimFiletypes);
-    prefs->SetReclaimFiletypes(values->reclaimFiletypes);
+    m_prefs->SetCheckForUpdates(values->checkForUpdates);
+    m_prefs->SetSaveMusicDirectory(values->saveMusicDirectory.c_str());
+    m_prefs->SetAskToReclaimFiletypes(values->askReclaimFiletypes);
+    m_prefs->SetReclaimFiletypes(values->reclaimFiletypes);
 
     PortableSet::const_iterator i;
     string portableList;
@@ -473,13 +449,13 @@ void Win32PreferenceWindow::SavePrefsValues(Preferences* prefs,
         portableList += ";";
     }
 
-    prefs->SetUsersPortablePlayers(portableList.c_str());
-    prefs->SetShowToolbarTextLabels(values->useTextLabels);
-    prefs->SetShowToolbarImages(values->useImages);
+    m_prefs->SetUsersPortablePlayers(portableList.c_str());
+    m_prefs->SetShowToolbarTextLabels(values->useTextLabels);
+    m_prefs->SetShowToolbarImages(values->useImages);
 
-    prefs->SetSaveCurrentPlaylistOnExit(values->savePlaylistOnExit);
-    prefs->SetPlayImmediately(values->playImmediately);
-    prefs->SetConvertUnderscoresToSpaces(values->convertUnderscores);
+    m_prefs->SetSaveCurrentPlaylistOnExit(values->savePlaylistOnExit);
+    m_prefs->SetPlayImmediately(values->playImmediately);
+    m_prefs->SetConvertUnderscoresToSpaces(values->convertUnderscores);
 
 
     // this gets called by each page unfortunately
@@ -505,14 +481,185 @@ void Win32PreferenceWindow::LaunchHelp(HWND hwnd, uint32 topic)
     WinHelp(hwnd, oHelpFile.c_str(), HELP_CONTEXT, topic);
 }                
 
+bool Win32PreferenceWindow::MainProc(HWND hwnd, 
+						             UINT msg, 
+						             WPARAM wParam, 
+						             LPARAM lParam)
+{
+	bool result = false;
+
+	switch(msg)
+	{
+		case WM_INITDIALOG:
+		{
+            m_hwndPref = hwnd;
+
+            SetWindowText(hwnd, BRANDING" Preferences");
+
+            m_caption = "Testing...1...2...3...";
+
+            InitializePrefDialog();
+
+            HWND hwndList = GetDlgItem(hwnd, IDC_LIST);
+
+            HTREEITEM item = TreeView_GetRoot(hwndList);
+
+            for(uint32 i = 0; i < m_startPage; i++)
+            {
+                HTREEITEM child = TreeView_GetChild(hwndList, item);
+
+                if(child)
+                    item = child;
+                else
+                {
+                    HTREEITEM sibling = TreeView_GetNextSibling(hwndList, item);
+
+                    if(sibling)
+                        item = sibling;
+                    else
+                    {
+                        item = TreeView_GetNextSibling(hwndList, 
+                                                       TreeView_GetParent(hwndList, 
+                                                                          item));
+                    }
+                }
+            }
+
+            TreeView_Select(hwndList, item, TVGN_CARET);
+
+			result = TRUE;
+
+			break;
+		}
+
+        case WM_PAINT:
+        {
+            RECT fadeRect;
+            HWND hwndFade = GetDlgItem(hwnd, IDC_FADE);
+            GetClientRect(hwndFade, &fadeRect);
+
+            MapWindowPoints(hwndFade, hwnd, (LPPOINT)&fadeRect, 2);
+
+            PAINTSTRUCT ps;
+            HDC hdc = BeginPaint(hwnd, &ps);
+            COLORREF c1, c2, textColor;
+
+            c1 = GetSysColor(COLOR_ACTIVECAPTION);
+            c2 = GetSysColor(COLOR_3DFACE);
+            textColor = GetSysColor(COLOR_CAPTIONTEXT);
+
+            float r1 = GetRValue(c1);
+            float g1 = GetGValue(c1);
+            float b1 = GetBValue(c1);
+
+            float r2 = GetRValue(c2);
+            float g2 = GetGValue(c2);
+            float b2 = GetBValue(c2);
+
+            float r3, g3, b3;
+
+            int dx = fadeRect.right - fadeRect.left;
+            float dt = 1/(float)dx;
+            float t = 1;
+
+            for(int x = 0; x < dx; x++)
+            {
+                r3 = r1*t + r2*(1-t);
+                g3 = g1*t + g2*(1-t);
+                b3 = b1*t + b2*(1-t);
+
+                RECT rect = fadeRect;
+
+                rect.left += x;
+                rect.right = rect.left + 1;
+
+                HBRUSH brush = CreateSolidBrush(RGB(r3, g3, b3));
+                FillRect(hdc, &rect, brush);
+                DeleteObject(brush);
+
+                t -= dt;
+            }
+
+            RECT textRect = fadeRect;
+
+            textRect.left += 5;
+
+            SetTextColor(hdc, textColor);
+            SetBkMode(hdc, TRANSPARENT);
+
+            DrawText(hdc, m_caption.c_str(), m_caption.size(), &textRect, 
+                        DT_VCENTER|DT_SINGLELINE|DT_LEFT);
+       
+            EndPaint(hwnd, &ps);
+            break;
+        }
+
+        case WM_CLOSE:
+		{
+            //PostQuitMessage(0);
+            EndDialog(hwnd, FALSE);
+			result = TRUE;
+			break;
+		}
+
+        case WM_NOTIFY:
+        {
+            LPNMTREEVIEW pnmtv = (LPNMTREEVIEW) lParam;
+
+            if(pnmtv->hdr.idFrom == IDC_LIST)
+            {
+                if(pnmtv->hdr.code == TVN_SELCHANGED)
+                {
+                    ShowPrefPage((PrefPage*)pnmtv->itemOld.lParam, false);
+
+                    ShowPrefPage((PrefPage*)pnmtv->itemNew.lParam, true);
+                }
+            }
+
+            break;
+        }
+
+        case WM_COMMAND:
+        {
+            switch(LOWORD(wParam))
+            {
+                case IDCANCEL:
+                    //PostQuitMessage(0);
+                    EndDialog(hwnd, FALSE);
+                    break;
+
+                case IDOK:
+                    //PostQuitMessage(0);
+                    EndDialog(hwnd, TRUE);
+                    break;
+
+                case IDC_HELPME:
+                    break;
+
+                case IDC_APPLY:
+                    break;
+
+                case IDC_LIST:
+                {
+                    break;
+                }
+
+            }
+
+            break;
+        }
+	
+	}
+
+	return result;
+}
+
 bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd, 
                                             UINT msg, 
                                             WPARAM wParam, 
                                             LPARAM lParam)      
 {
     bool result = false;
-    static PROPSHEETPAGE* psp = NULL;
-    static Preferences* prefs = NULL;
     static HWND hwndAskReclaimFiletypes = NULL;
     static HWND hwndReclaimFiletypes = NULL;
     static HWND hwndSaveMusicDir = NULL;
@@ -530,10 +677,6 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
     {
         case WM_INITDIALOG:
         {
-            // remember these for later...
-            psp = (PROPSHEETPAGE*)lParam;
-            prefs = (Preferences*)psp->lParam;
-
             // get the handles to all our controls
             hwndStayOnTop = GetDlgItem(hwnd, IDC_STAYONTOP);
             hwndLiveInTray = GetDlgItem(hwnd, IDC_TRAY);
@@ -569,12 +712,6 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
 
             Edit_SetText(hwndSaveMusicDir, 
                          m_originalValues.saveMusicDirectory.c_str());
-
-            LONG style = GetWindowLong(GetParent(hwnd), GWL_EXSTYLE);
-
-            style ^= WS_EX_CONTEXTHELP;
-
-            SetWindowLong(GetParent(hwnd), GWL_EXSTYLE, style);
             
             break;
         }
@@ -894,7 +1031,7 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
 
                 case PSN_APPLY:
                 {
-                    SavePrefsValues(prefs, &m_proposedValues);
+                    SavePrefsValues(&m_proposedValues);
                     break;
                 }
 
@@ -905,7 +1042,7 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
 
                 case PSN_RESET:
                 {
-                    SavePrefsValues(prefs, &m_originalValues);
+                    SavePrefsValues(&m_originalValues);
                     break;
                 }
             }
@@ -923,8 +1060,6 @@ bool Win32PreferenceWindow::PrefStreamingProc(HWND hwnd,
                                               LPARAM lParam)      
 {
     bool result = false;
-    static PROPSHEETPAGE* psp = NULL;
-    static Preferences* prefs = NULL;
     static HWND hwndStreamInterval = NULL;
     static HWND hwndSaveStreams = NULL;
     static HWND hwndSaveStreamsDirectory = NULL;
@@ -951,10 +1086,6 @@ bool Win32PreferenceWindow::PrefStreamingProc(HWND hwnd,
     {
         case WM_INITDIALOG:
         {
-            // remember these for later...
-            psp = (PROPSHEETPAGE*)lParam;
-            prefs = (Preferences*)psp->lParam;
-
             // get the handles to all our controls
             hwndStreamInterval = GetDlgItem(hwnd, IDC_STREAM_INTERVAL);
 
@@ -1426,7 +1557,7 @@ bool Win32PreferenceWindow::PrefStreamingProc(HWND hwnd,
 
                 case PSN_APPLY:
                 {
-                    SavePrefsValues(prefs, &m_proposedValues);
+                    SavePrefsValues(&m_proposedValues);
                     break;
                 }
 
@@ -1438,7 +1569,7 @@ bool Win32PreferenceWindow::PrefStreamingProc(HWND hwnd,
 
                 case PSN_RESET:
                 {
-                    SavePrefsValues(prefs, &m_originalValues);
+                    SavePrefsValues(&m_originalValues);
                     break;
                 }
             }
@@ -1456,8 +1587,6 @@ bool Win32PreferenceWindow::PrefDebugProc(HWND hwnd,
                                           LPARAM lParam)      
 {
     bool result = false;
-    static PROPSHEETPAGE* psp = NULL;
-    static Preferences* prefs = NULL;
     static HWND hwndLog = NULL;
     static HWND hwndLogDecoder = NULL;
     static HWND hwndLogInput = NULL;
@@ -1469,10 +1598,6 @@ bool Win32PreferenceWindow::PrefDebugProc(HWND hwnd,
     {
         case WM_INITDIALOG:
         {
-            // remember these for later...
-            psp = (PROPSHEETPAGE*)lParam;
-            prefs = (Preferences*)psp->lParam;
-
             // get the handles to all our controls
             hwndLog = GetDlgItem(hwnd, IDC_LOG);
             hwndLogDecoder = GetDlgItem(hwnd, IDC_LOGDECODER);
@@ -1673,7 +1798,7 @@ bool Win32PreferenceWindow::PrefDebugProc(HWND hwnd,
 
                 case PSN_APPLY:
                 {
-                    SavePrefsValues(prefs, &m_proposedValues);
+                    SavePrefsValues(&m_proposedValues);
                     break;
                 }
 
@@ -1685,7 +1810,7 @@ bool Win32PreferenceWindow::PrefDebugProc(HWND hwnd,
 
                 case PSN_RESET:
                 {
-                    SavePrefsValues(prefs, &m_originalValues);
+                    SavePrefsValues(&m_originalValues);
                     break;
                 }
             }
@@ -1703,17 +1828,11 @@ bool Win32PreferenceWindow::PrefAboutProc(HWND hwnd,
                                           LPARAM lParam)      
 {
     bool result = false;
-    static PROPSHEETPAGE* psp = NULL;
-    static Preferences* prefs = NULL;
     
     switch(msg)
     {
         case WM_INITDIALOG:
         {
-            // remember these for later...
-            psp = (PROPSHEETPAGE*)lParam;
-            prefs = (Preferences*)psp->lParam;
-
             break;
         }
 
@@ -1912,7 +2031,7 @@ bool Win32PreferenceWindow::PrefAboutProc(HWND hwnd,
 
                 case PSN_APPLY:
                 {
-                    SavePrefsValues(prefs, &m_proposedValues);
+                    SavePrefsValues(&m_proposedValues);
                     break;
                 }
 
@@ -1924,7 +2043,7 @@ bool Win32PreferenceWindow::PrefAboutProc(HWND hwnd,
 
                 case PSN_RESET:
                 {
-                    SavePrefsValues(prefs, &m_originalValues);
+                    SavePrefsValues(&m_originalValues);
                     break;
                 }
             }
@@ -1968,20 +2087,14 @@ bool Win32PreferenceWindow::PrefThemeProc(HWND hwnd,
                                           LPARAM lParam)      
 {
     bool result = false;
-    static PROPSHEETPAGE* psp = NULL;
-    static Preferences* prefs = NULL;
     
     switch(msg)
     {
         case WM_INITDIALOG:
         {
-            // remember these for later...
-            psp = (PROPSHEETPAGE*)lParam;
-            prefs = (Preferences*)psp->lParam;
-
             LoadThemeListBox(hwnd);
 
-            SetFocus(GetDlgItem(hwnd, IDC_THEMELISTBOX));
+            //SetFocus(GetDlgItem(hwnd, IDC_THEMELISTBOX));
             result = false;
             break;
         }
@@ -2161,7 +2274,7 @@ bool Win32PreferenceWindow::PrefThemeProc(HWND hwnd,
 
                 case PSN_APPLY:
                 {
-                    SavePrefsValues(prefs, &m_proposedValues);
+                    SavePrefsValues(&m_proposedValues);
                     LoadThemeListBox(hwnd);
                     break;
                 }
@@ -2174,7 +2287,7 @@ bool Win32PreferenceWindow::PrefThemeProc(HWND hwnd,
 
                 case PSN_RESET:
                 {
-                    SavePrefsValues(prefs, &m_originalValues);                         
+                    SavePrefsValues(&m_originalValues);                         
                     break;
                 }
             }
@@ -2490,9 +2603,6 @@ bool Win32PreferenceWindow::PrefUpdateProc(HWND hwnd,
                                            LPARAM lParam)      
 {
     bool result = false;
-    static PROPSHEETPAGE* psp = NULL;
-    static Win32UpdateManager* um = NULL;
-    static Preferences* prefs = NULL;
     static HWND hwndList = NULL;
     static HWND hwndDescription = NULL;
     static HWND hwndUpdate = NULL;
@@ -2506,12 +2616,6 @@ bool Win32PreferenceWindow::PrefUpdateProc(HWND hwnd,
     {
         case WM_INITDIALOG:
         {
-            // remember these for later...
-            psp = (PROPSHEETPAGE*)lParam;
-            um = (Win32UpdateManager*)psp->lParam;
-            prefs = m_pContext->prefs;
-
-
             hwndList = GetDlgItem(hwnd, IDC_LIST);
             hwndDescription = GetDlgItem(hwnd, IDC_DESCRIPTION);
             hwndUpdate = GetDlgItem(hwnd, IDC_UPDATE);
@@ -2556,7 +2660,7 @@ bool Win32PreferenceWindow::PrefUpdateProc(HWND hwnd,
             UpdateItem* item = NULL;
             uint32 i = 0;
 
-            while(item = um->ItemAt(i++))
+            while(item = m_updateManager->ItemAt(i++))
             {
                 if(!strstr(item->GetCurrentFileLocation().c_str(), "_system_"))
                 {
@@ -2592,7 +2696,7 @@ bool Win32PreferenceWindow::PrefUpdateProc(HWND hwnd,
                     if(thread)
                     {
                         ts->thread = thread;
-                        ts->um = um;
+                        ts->um = m_updateManager;
                         ts->hwndList = hwndList;
                         ts->context = m_pContext;
                         ts->cancel = false;
@@ -2611,7 +2715,7 @@ bool Win32PreferenceWindow::PrefUpdateProc(HWND hwnd,
                     if(thread)
                     {
                         ts->thread = thread;
-                        ts->um = um;
+                        ts->um = m_updateManager;
                         ts->hwndList = hwndList;
                         ts->context = m_pContext;
                         ts->cancel = false;
@@ -2932,7 +3036,7 @@ bool Win32PreferenceWindow::PrefUpdateProc(HWND hwnd,
 
                     case PSN_APPLY:
                     {
-                        SavePrefsValues(prefs, &m_proposedValues);
+                        SavePrefsValues(&m_proposedValues);
                         break;
                     }
 
@@ -2944,7 +3048,7 @@ bool Win32PreferenceWindow::PrefUpdateProc(HWND hwnd,
 
                     case PSN_RESET:
                     {
-                        SavePrefsValues(prefs, &m_originalValues);
+                        SavePrefsValues(&m_originalValues);
                         break;
                     }
                 }
@@ -3011,8 +3115,6 @@ bool Win32PreferenceWindow::PrefAdvancedProc(HWND hwnd,
                                              LPARAM lParam)      
 {
     bool result = false;
-    static PROPSHEETPAGE* psp = NULL;
-    static Preferences* prefs = NULL;
     static HWND hwndPMO = NULL;
     static HWND hwndPriority = NULL;
     static HWND hwndInput = NULL;
@@ -3026,10 +3128,6 @@ bool Win32PreferenceWindow::PrefAdvancedProc(HWND hwnd,
     {
         case WM_INITDIALOG:
         {
-            // remember these for later...
-            psp = (PROPSHEETPAGE*)lParam;
-            prefs = (Preferences*)psp->lParam;
-
             // get the handles to all our controls
             hwndPMO = GetDlgItem(hwnd, IDC_PMO);
             hwndPriority = GetDlgItem(hwnd, IDC_PRIORITY);
@@ -3044,9 +3142,9 @@ bool Win32PreferenceWindow::PrefAdvancedProc(HWND hwnd,
 
             registrar.SetSubDir("plugins");
             registrar.SetSearchString("*.pmo");
-            registrar.InitializeRegistry(&pmo, prefs);
+            registrar.InitializeRegistry(&pmo, m_prefs);
             registrar.SetSearchString("*.ui");
-            registrar.InitializeRegistry(&ui, prefs);
+            registrar.InitializeRegistry(&ui, m_prefs);
 
             // initialize our controls
 
@@ -3327,7 +3425,7 @@ bool Win32PreferenceWindow::PrefAdvancedProc(HWND hwnd,
 
                 case PSN_APPLY:
                 {
-                    SavePrefsValues(prefs, &m_proposedValues);
+                    SavePrefsValues(&m_proposedValues);
                     break;
                 }
 
@@ -3339,7 +3437,7 @@ bool Win32PreferenceWindow::PrefAdvancedProc(HWND hwnd,
 
                 case PSN_RESET:
                 {
-                    SavePrefsValues(prefs, &m_originalValues);
+                    SavePrefsValues(&m_originalValues);
                     break;
                 }
             }
@@ -3370,8 +3468,6 @@ bool Win32PreferenceWindow::PrefPluginsProc(HWND hwnd,
                                             LPARAM lParam)      
 {
     bool result = false;
-    static PROPSHEETPAGE* psp = NULL;
-    static Preferences* prefs = NULL;
     static HWND hwndList = NULL;
     static HWND hwndPMO = NULL;
     static HIMAGELIST imageList = NULL;
@@ -3383,10 +3479,6 @@ bool Win32PreferenceWindow::PrefPluginsProc(HWND hwnd,
     {
         case WM_INITDIALOG:
         {
-            // remember these for later...
-            psp = (PROPSHEETPAGE*)lParam;
-            prefs = (Preferences*)psp->lParam;
-
             // get the handles to all our controls
             hwndList = GetDlgItem(hwnd, IDC_PORTABLELIST);
             hwndPMO = GetDlgItem(hwnd, IDC_PMO);
@@ -3400,10 +3492,10 @@ bool Win32PreferenceWindow::PrefPluginsProc(HWND hwnd,
 
             registrar.SetSubDir("plugins");
             registrar.SetSearchString("*.pmo");
-            registrar.InitializeRegistry(&pmo, prefs);
+            registrar.InitializeRegistry(&pmo, m_prefs);
 
             registrar.SetSearchString("*.ppp");
-            registrar.InitializeRegistry(&ppp, prefs);
+            registrar.InitializeRegistry(&ppp, m_prefs);
 
             uint32 i = 0;
             int32 pos = 0;
@@ -3790,7 +3882,7 @@ bool Win32PreferenceWindow::PrefPluginsProc(HWND hwnd,
 
                     case PSN_APPLY:
                     {
-                        SavePrefsValues(prefs, &m_proposedValues);
+                        SavePrefsValues(&m_proposedValues);
                         break;
                     }
 
@@ -3801,7 +3893,7 @@ bool Win32PreferenceWindow::PrefPluginsProc(HWND hwnd,
 
                     case PSN_RESET:
                     {
-                        SavePrefsValues(prefs, &m_originalValues);
+                        SavePrefsValues(&m_originalValues);
                         break;
                     }
                 }
@@ -3812,4 +3904,310 @@ bool Win32PreferenceWindow::PrefPluginsProc(HWND hwnd,
     }
 
     return result;
+}
+
+// MS does not define the Extended version of the 
+// dialog template structure so we do so here. This is 
+// only a partial definition that will allow us to get 
+// to the caption.
+#include <pshpack2.h>
+typedef struct {  
+    WORD   dlgVer; // 0x001
+    WORD   signature; // 0xFFFF
+    DWORD  helpID; 
+    DWORD  exStyle; 
+    DWORD  style; 
+    WORD   cDlgItems; 
+    short  x; 
+    short  y; 
+    short  cx; 
+    short  cy; 
+} DLGTEMPLATEEX;
+#include <poppack.h> /* Resume normal packing */
+
+void Win32PreferenceWindow::InitializePrefDialog()
+{
+    HGLOBAL         hDlgResMem;
+    HRSRC           hDlgRes;
+    DLGTEMPLATE*    lpDlgRes;
+    DLGTEMPLATEEX*  lpDlgExRes;
+    long            cx = 0, cy = 0;
+    WORD*           caption;
+
+    HWND hwndList = GetDlgItem(m_hwndPref, IDC_LIST);
+    HTREEITEM parentItem = NULL;
+
+    vector<PrefPage>::iterator i = m_pages.begin();
+
+    for(;i != m_pages.end(); i++)
+    {
+        // We have not loaded this yet so make sure it is NULL
+        (*i).hwnd = NULL;
+
+        // Load the resource
+        hDlgRes = FindResource( (*i).hInstance,
+                                (*i).pszTemplate,
+                                RT_DIALOG);
+
+        hDlgResMem = LoadResource((*i).hInstance, hDlgRes);
+        lpDlgRes = (DLGTEMPLATE*) LockResource(hDlgResMem);
+        lpDlgExRes = (DLGTEMPLATEEX*)lpDlgRes;
+
+        if(lpDlgExRes->dlgVer == 1 && lpDlgExRes->signature == 0xFFFF)
+        {
+            // How big is this dialog?
+            if(lpDlgExRes->cx > cx)
+                cx = lpDlgExRes->cx;
+
+            if(lpDlgExRes->cy > cy)
+                cy = lpDlgExRes->cy;
+
+            // What is the caption for this pref page?
+            caption = (WORD*)((char*)lpDlgExRes + sizeof(DLGTEMPLATEEX));
+        }
+        else
+        {
+            // How big is this dialog?
+            if(lpDlgRes->cx > cx)
+                cx = lpDlgRes->cx;
+
+            if(lpDlgRes->cy > cy)
+                cy = lpDlgRes->cy;
+
+            // What is the caption for this pref page?
+            caption = (WORD*)((char*)lpDlgRes + sizeof(DLGTEMPLATE));
+        }
+
+        // Skip menu if it is there
+        if (0xffff == *caption)
+            caption += 2;     // Menu by ordinal.  Skip 0xffff and the ordinal.
+        else
+            caption += (wcslen(caption) + 1);      // Menu by name, or no menu at all.
+        
+        // Pass the class name
+        caption += wcslen(caption); ++caption; 
+
+        // Here we are...
+        size_t captionLength = wcslen(caption) + 1;
+
+		char* buf = (char*)malloc(captionLength);
+
+		WideCharToMultiByte(CP_ACP, 
+							0,
+							caption,
+							captionLength,
+							buf,
+							captionLength,
+							NULL, NULL);					
+
+
+
+        // Add the item to the list
+        TVINSERTSTRUCT tv_insert;
+        
+        tv_insert.hParent = ((*i).bChild ? parentItem : NULL);
+        tv_insert.hInsertAfter = TVI_LAST ;
+        tv_insert.item.mask = TVIF_PARAM | TVIF_TEXT;
+        tv_insert.item.pszText = buf;
+        tv_insert.item.cchTextMax = strlen(tv_insert.item.pszText);
+        tv_insert.item.lParam = (LPARAM)&(*i);
+
+        TreeView_InsertItem(hwndList, &tv_insert);
+
+        free(buf);
+
+        // Free the resource
+        UnlockResource(hDlgResMem);
+        FreeResource(hDlgResMem);
+    }
+
+    RECT pageRect;
+    HWND hwndPage = GetDlgItem(m_hwndPref, IDC_PAGE);
+
+    GetClientRect(hwndPage, &pageRect);
+
+    MapWindowPoints(hwndPage, m_hwndPref, (LPPOINT)&pageRect, 2);
+
+    RECT mapRect;
+
+    mapRect.left = 0;
+    mapRect.top = 0;
+    mapRect.right = cx;
+    mapRect.bottom = cy;
+
+    MapDialogRect(m_hwndPref, &mapRect);
+
+    cx = mapRect.right;
+    cy = mapRect.bottom;
+
+    if(cx > pageRect.right - pageRect.left)
+        cx -= pageRect.right - pageRect.left;
+    else
+        cx = 0;
+
+    if(cy > pageRect.bottom - pageRect.top)
+        cy -= pageRect.bottom - pageRect.top;
+    else
+        cy = 0;  
+
+    // Move windows into position
+    HWND hwndFade = GetDlgItem(m_hwndPref, IDC_FADE);
+    HWND hwndOK = GetDlgItem(m_hwndPref, IDOK);
+    HWND hwndCancel = GetDlgItem(m_hwndPref, IDCANCEL);
+    HWND hwndApply = GetDlgItem(m_hwndPref, IDC_APPLY);
+    HWND hwndHelp = GetDlgItem(m_hwndPref, IDC_HELPME);
+    
+    HWND hwndEtch = FindWindowEx(m_hwndPref, NULL, "STATIC", NULL);
+
+    RECT rect;
+
+    GetWindowRect(m_hwndPref, &rect);
+
+    SetWindowPos(m_hwndPref, NULL, 0, 0, 
+                 rect.right - rect.left + cx, 
+                 rect.bottom - rect.top + cy, 
+                 SWP_NOMOVE|SWP_NOZORDER);
+
+    GetWindowRect(hwndFade, &rect);
+    MapWindowPoints(NULL, m_hwndPref, (LPPOINT)&rect, 2);
+    
+    SetWindowPos(hwndFade, NULL, 0, 0, 
+                 rect.right - rect.left + cx, 
+                 rect.bottom - rect.top, 
+                 SWP_NOMOVE|SWP_NOZORDER);
+
+    GetWindowRect(hwndList, &rect);
+    MapWindowPoints(NULL, m_hwndPref, (LPPOINT)&rect, 2);
+    
+    SetWindowPos(hwndList, NULL, 0, 0, 
+                 rect.right - rect.left, 
+                 rect.bottom - rect.top + cy, 
+                 SWP_NOMOVE|SWP_NOZORDER);
+
+    GetWindowRect(hwndOK, &rect);
+    MapWindowPoints(NULL, m_hwndPref, (LPPOINT)&rect, 2);
+
+    SetWindowPos(hwndOK, NULL, rect.left + cx, rect.top + cy, 
+                    0, 0, SWP_NOSIZE|SWP_NOZORDER);
+
+    GetWindowRect(hwndCancel, &rect);
+    MapWindowPoints(NULL, m_hwndPref, (LPPOINT)&rect, 2);
+
+    SetWindowPos(hwndCancel, NULL, rect.left + cx, rect.top + cy, 
+                    0, 0, SWP_NOSIZE|SWP_NOZORDER);
+
+    GetWindowRect(hwndApply, &rect);
+    MapWindowPoints(NULL, m_hwndPref, (LPPOINT)&rect, 2);
+
+    SetWindowPos(hwndApply, NULL, rect.left + cx, rect.top + cy, 
+                    0, 0, SWP_NOSIZE|SWP_NOZORDER);
+
+    GetWindowRect(hwndHelp, &rect);
+    MapWindowPoints(NULL, m_hwndPref, (LPPOINT)&rect, 2);
+
+    SetWindowPos(hwndHelp, NULL, rect.left + cx, rect.top + cy, 
+                    0, 0, SWP_NOSIZE|SWP_NOZORDER);
+
+    GetWindowRect(hwndEtch, &rect);
+    MapWindowPoints(NULL, m_hwndPref, (LPPOINT)&rect, 2);
+
+    SetWindowPos(hwndEtch, NULL, rect.left, rect.top + cy, 
+                 rect.right - rect.left + cx, 
+                 rect.bottom - rect.top, 
+                 SWP_NOZORDER);
+}
+
+void Win32PreferenceWindow::ShowPrefPage(PrefPage* page, bool show)
+{
+    if(!page)
+        return;
+
+    if(!show)
+    {
+        if(page->hwnd)
+            ShowWindow(page->hwnd, FALSE);
+    }
+    else
+    {
+        if(page->hwnd)
+            ShowWindow(page->hwnd, TRUE);
+        else
+        {
+
+            HGLOBAL         hDlgResMem;
+            HRSRC           hDlgRes;
+            DLGTEMPLATE*    lpDlgRes;
+            DLGTEMPLATEEX*  lpDlgExRes;
+        
+            // Find the dialog resource
+            hDlgRes = FindResource( page->hInstance,
+                                    page->pszTemplate,
+                                    RT_DIALOG);
+
+            hDlgResMem = LoadResource(page->hInstance, hDlgRes);
+            lpDlgRes = (DLGTEMPLATE*) LockResource(hDlgResMem);
+            lpDlgExRes = (DLGTEMPLATEEX*)lpDlgRes;
+
+            // The positioning of the controls will be aligned 
+            // with the invisible page control
+            RECT pageRect;
+
+            HWND hwndPage = GetDlgItem(m_hwndPref, IDC_PAGE);
+
+            GetClientRect(hwndPage, &pageRect);
+
+            MapWindowPoints(hwndPage, m_hwndPref, (LPPOINT)&pageRect, 2);
+
+            // Need to twiddle with some stuff so this works
+            // as a child window
+            if(lpDlgExRes->dlgVer == 1 && lpDlgExRes->signature == 0xFFFF)
+            {
+                lpDlgExRes->style &= ~WS_POPUP;
+                lpDlgExRes->style &= ~DS_MODALFRAME;
+
+                lpDlgExRes->style |= WS_CHILD | WS_OVERLAPPED | DS_CONTROL | WS_VISIBLE;
+            }
+            else
+            {
+                lpDlgRes->style &= ~WS_POPUP;
+                lpDlgRes->style &= ~DS_MODALFRAME;
+
+                lpDlgRes->style |= WS_CHILD | WS_OVERLAPPED | DS_CONTROL | WS_VISIBLE;
+            }
+
+            // Create the Pref page
+            page->hwnd = CreateDialogIndirect(
+                                 page->hInstance, 
+                                 lpDlgRes, 
+                                 m_hwndPref, 
+                                 page->pfnDlgProc);
+
+            // Move it into position
+            SetWindowPos(page->hwnd, NULL, pageRect.left, pageRect.top, 
+                            0, 0, SWP_NOSIZE|SWP_NOZORDER);
+
+            
+            // Free the resource
+            UnlockResource(hDlgResMem);
+            FreeResource(hDlgResMem);
+        }
+
+        // change the caption for this page
+        uint32 length = GetWindowTextLength(page->hwnd) + 1;
+        char* foo = new char[length];
+
+        GetWindowText(page->hwnd, foo, length);
+
+        m_caption = foo;
+
+        delete [] foo;
+
+        RECT fadeRect;
+        HWND hwndFade = GetDlgItem(m_hwndPref, IDC_FADE);
+        GetClientRect(hwndFade, &fadeRect);
+
+        MapWindowPoints(hwndFade, m_hwndPref, (LPPOINT)&fadeRect, 2);
+
+        InvalidateRect(m_hwndPref, &fadeRect, FALSE);
+    }
 }

@@ -81,6 +81,7 @@
 #define IDD_PREF                        193
 #define IDD_PREF1                       193
 #define IDD_PREF_GENERAL                193
+#define IDD_MAIN_PREF_DIALOG            195
 #define IDD_OPENURL                     219
 #define IDD_SAVERIO                     220
 #define IDD_UPDATEAVAILABLE             220
@@ -99,9 +100,12 @@
 #define IDD_PREF_PLUGINS                234
 #define IDB_CHECKED                     542
 #define IDB_UNCHECKED                   543
+#define IDC_FADE                        1001
 #define IDC_SAVE_RIO                    1002
 #define IDC_UI                          1005
+#define IDC_APPLY                       1005
 #define IDC_PMO                         1006
+#define IDC_HELPME                      1006
 #define IDC_PRIORITY                    1007
 #define IDC_INPUT                       1008
 #define IDC_LOGOUTPUT                   1009
@@ -110,6 +114,7 @@
 #define IDC_STREAM_INTERVAL             1011
 #define IDC_LOGINPUT                    1012
 #define IDC_LOGDECODER                  1013
+#define IDC_PAGE                        1013
 #define IDC_LOGPERFORMANCE              1014
 #define IDC_TRAY                        1015
 #define IDC_LOGMAIN                     1015

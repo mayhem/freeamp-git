@@ -110,6 +110,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\ForeignTheme.obj" \
 	"$(INTDIR)\FreeAmpTheme.obj" \
 	"$(INTDIR)\Headlines.obj" \
+	"$(INTDIR)\Http.obj" \
 	"$(INTDIR)\Median.obj" \
 	"$(INTDIR)\MultiStateControl.obj" \
 	"$(INTDIR)\Parse.obj" \
@@ -129,7 +130,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32Window.obj" \
 	"$(INTDIR)\Window.obj" \
 	"$(INTDIR)\freeampui.res" \
-	"$(INTDIR)\Http.obj" \
 	"..\..\..\..\lib\zlib\zlib.lib" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\unzip\unzip.lib"
@@ -230,6 +230,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\ForeignTheme.obj" \
 	"$(INTDIR)\FreeAmpTheme.obj" \
 	"$(INTDIR)\Headlines.obj" \
+	"$(INTDIR)\Http.obj" \
 	"$(INTDIR)\Median.obj" \
 	"$(INTDIR)\MultiStateControl.obj" \
 	"$(INTDIR)\Parse.obj" \
@@ -249,7 +250,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32Window.obj" \
 	"$(INTDIR)\Window.obj" \
 	"$(INTDIR)\freeampui.res" \
-	"$(INTDIR)\Http.obj" \
 	"..\..\..\..\lib\zlib\zlib.lib" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\unzip\unzip.lib"
@@ -350,6 +350,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\ForeignTheme.obj" \
 	"$(INTDIR)\FreeAmpTheme.obj" \
 	"$(INTDIR)\Headlines.obj" \
+	"$(INTDIR)\Http.obj" \
 	"$(INTDIR)\Median.obj" \
 	"$(INTDIR)\MultiStateControl.obj" \
 	"$(INTDIR)\Parse.obj" \
@@ -369,7 +370,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32Window.obj" \
 	"$(INTDIR)\Window.obj" \
 	"$(INTDIR)\freeampui.res" \
-	"$(INTDIR)\Http.obj" \
 	"..\..\..\..\lib\zlib\zlib.lib" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\unzip\unzip.lib"
@@ -468,6 +468,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\ForeignTheme.obj" \
 	"$(INTDIR)\FreeAmpTheme.obj" \
 	"$(INTDIR)\Headlines.obj" \
+	"$(INTDIR)\Http.obj" \
 	"$(INTDIR)\Median.obj" \
 	"$(INTDIR)\MultiStateControl.obj" \
 	"$(INTDIR)\Parse.obj" \
@@ -487,7 +488,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32Window.obj" \
 	"$(INTDIR)\Window.obj" \
 	"$(INTDIR)\freeampui.res" \
-	"$(INTDIR)\Http.obj" \
 	"..\..\..\..\lib\zlib\zlib.lib" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\unzip\unzip.lib"

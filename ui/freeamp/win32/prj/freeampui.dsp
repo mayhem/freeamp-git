@@ -360,6 +360,10 @@ SOURCE=..\res\unchecked.bmp
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE="..\..\..\..\..\..\..\Program Files\Microsoft Visual Studio\VC98\Include\BASETSD.H"
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\include\Bitmap.h
 # End Source File
 # Begin Source File
@@ -420,6 +424,10 @@ SOURCE=..\..\include\Font.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\include\ForeignTheme.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\include\FreeAmpTheme.h
 # End Source File
 # Begin Source File
@@ -437,6 +445,10 @@ SOURCE=..\..\include\Headlines.h
 # Begin Source File
 
 SOURCE=..\..\..\..\base\win32\include\help.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\http\include\Http.h
 # End Source File
 # Begin Source File
 
@@ -477,6 +489,10 @@ SOURCE=..\..\..\..\lib\xml\include\Parse.h
 # Begin Source File
 
 SOURCE=..\..\..\..\io\include\pipeline.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\PixFontControl.h
 # End Source File
 # Begin Source File
 
@@ -552,6 +568,10 @@ SOURCE=..\..\include\Theme.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\include\themeformat.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\include\ThemeManager.h
 # End Source File
 # Begin Source File
@@ -561,6 +581,10 @@ SOURCE=..\..\include\ThemeZip.h
 # Begin Source File
 
 SOURCE=..\..\..\..\base\include\thread.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\timer.h
 # End Source File
 # Begin Source File
 
@@ -613,6 +637,26 @@ SOURCE=..\..\include\Window.h
 # Begin Source File
 
 SOURCE=..\..\..\..\lib\zlib\include\zconf.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\unzip\include\zip_header.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\unzip\include\zip_inflate.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\unzip\include\zip_testcrc.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\unzip\include\zip_utils.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\unzip\include\zip_wrapper.h
 # End Source File
 # Begin Source File
 
