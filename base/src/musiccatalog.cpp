@@ -50,7 +50,8 @@ using namespace std;
 #include "pmo.h"
 #include "debug.h"
 
-#define METADATABASE_VERSION 2
+#define METADATABASE_VERSION 1
+#define DATABASE_SUB_VERSION 2
 
 MusicCatalog::MusicCatalog(FAContext *context, char *databasepath)
 {
@@ -73,6 +74,8 @@ MusicCatalog::MusicCatalog(FAContext *context, char *databasepath)
     m_guidTable = new multimap<string, string, less<string> >;
     m_MBRequests = new vector<pair<string, string> >;
     m_watchTimer = NULL;
+
+    m_killGUIDs = false;
 
     m_killMBThread = false;
     m_MBLookupThreadActive = false;
@@ -532,6 +535,12 @@ Error MusicCatalog::AddSong(const char *url)
         meta = ReadMetaDataFromDatabase(url);
     }
 
+    if (m_killGUIDs)
+    { 
+        meta->SetGUID("");
+        WriteMetaDataToDatabase(url, *meta);
+    }
+
     newtrack = new PlaylistItem(url, meta);
 
     m_catMutex->Acquire();
@@ -755,6 +764,12 @@ Error MusicCatalog::RePopulateFromDatabase()
     ClearCatalog();
     m_context->target->AcceptEvent(new Event(INFO_MusicCatalogCleared));
 
+    int subversion = m_database->GetSubVersion();
+    if (subversion < DATABASE_SUB_VERSION)
+    {
+        m_killGUIDs = true;
+    }
+
     m_catMutex->Acquire(); 
     m_bSurpressAddMessages = true;
     char *key = m_database->NextKey(NULL);
@@ -771,6 +786,11 @@ Error MusicCatalog::RePopulateFromDatabase()
             
         key = m_database->NextKey(key);
     }
+ 
+    if (subversion < DATABASE_SUB_VERSION)
+        m_killGUIDs = false;
+    m_database->StoreSubVersion(DATABASE_SUB_VERSION);
+
     m_catMutex->Release();
     m_bSurpressAddMessages = false;
     if (!m_sigs->empty() && m_context->aps->IsTurnedOn()) 

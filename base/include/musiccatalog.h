@@ -191,6 +191,8 @@ class MusicCatalog : public EventQueue
     TimerRef m_watchTimer;
 
     int32    m_trackCount;
+  
+    bool     m_killGUIDs;
     
     int      m_pendingMBLookups;
     Mutex   *m_MBLookupLock;

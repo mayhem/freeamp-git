@@ -36,6 +36,9 @@ ____________________________________________________________________________*/
 #define S_IRWXU _S_IREAD|_S_IWRITE
 #endif
 
+#define DATABASE_VERSION_KEY "FREEAMP_DATABASE_VERSION"
+#define SUB_VERSION_KEY      "FREEAMP_SUB_VERSION"
+
 Database::Database(const char *name, int version)
 {
     m_dbase = NULL;
@@ -193,6 +196,31 @@ void Database::Sync(void)
     m_lock->Acquire();
     gdbm_sync(m_dbase);
     m_lock->Release();
+}
+
+int Database::GetSubVersion(void)
+{
+    int sub_ver = 0;
+    char *stored_ver = NULL;
+
+    stored_ver = Value(SUB_VERSION_KEY);
+
+    if (!stored_ver)
+        sub_ver = 0;
+    
+    sub_ver = atoi(stored_ver);
+
+    delete [] stored_ver;
+    return sub_ver;
+}
+
+void Database::StoreSubVersion(int version)
+{
+    char version_store[15];
+
+    sprintf(version_store, "%d", version);
+
+    Insert(SUB_VERSION_KEY, version_store);
 }
 
 bool Database::TestDatabaseVersion(int version)

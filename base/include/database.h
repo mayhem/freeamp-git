@@ -28,8 +28,6 @@ ____________________________________________________________________________*/
 #include "gdbm_fa.h"
 #include "mutex.h"
 
-#define DATABASE_VERSION_KEY "FREEAMP_DATABASE_VERSION"
-
 class Database
 {
  public:
@@ -45,6 +43,9 @@ class Database
    void  Sync(void);
 
    bool  IsUpgraded(void);
+  
+   int   GetSubVersion(void);
+   void  StoreSubVersion(int version);
 
  private:
    bool  TestDatabaseVersion(int version);
