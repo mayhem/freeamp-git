@@ -22,6 +22,13 @@
    $Id$
 ____________________________________________________________________________*/
 
+// The debugger can't handle symbols more than 255 characters long.
+// STL often creates symbols longer than that.
+// When symbols are longer than 255 characters, the warning is disabled.
+#ifdef WIN32
+#pragma warning(disable:4786) 
+#endif
+
 #include <stdio.h> 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -1549,7 +1556,7 @@ void FreeAmpTheme::UpdateThread()
         if(0 < DialogBoxParam(g_hinst, 
                               MAKEINTRESOURCE(IDD_UPDATEAVAILABLE),
                               NULL, 
-                              (int (__stdcall *)(void))::UpdateAvailableDlgProc, 
+                              ::UpdateAvailableDlgProc, 
                               (LPARAM) 0))
         {
             ShowOptions(4);

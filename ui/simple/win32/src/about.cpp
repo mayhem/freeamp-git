@@ -21,7 +21,6 @@
 ____________________________________________________________________________*/
 
 /* System Includes */
-#define STRICT
 #include <windows.h>
 #include <commctrl.h>
 #include <stdio.h>

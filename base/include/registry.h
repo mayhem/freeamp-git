@@ -25,7 +25,6 @@ ____________________________________________________________________________*/
 #define INCLUDED_REGISTRY_H_
 
 #ifdef WIN32
-#define STRICT
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif

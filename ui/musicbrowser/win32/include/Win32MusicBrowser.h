@@ -24,13 +24,15 @@ ____________________________________________________________________________*/
 #ifndef INCLUDED_WIN32MUSICBROWSER_H_
 #define INCLUDED_WIN32MUSICBROWSER_H_
 
-#define STRICT
-#include <windows.h>
-#include <commctrl.h>
-
+// The debugger can't handle symbols more than 255 characters long.
+// STL often creates symbols longer than that.
+// When symbols are longer than 255 characters, the warning is disabled.
 #ifdef WIN32
 #pragma warning(disable:4786)
 #endif
+
+#include <windows.h>
+#include <commctrl.h>
 
 #include <vector>
 #include <string>

@@ -21,7 +21,6 @@
         $Id$
 ____________________________________________________________________________*/
 
-#define STRICT
 #include <windows.h>
 #include <windowsx.h>
 #include <sys/types.h>

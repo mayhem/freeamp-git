@@ -1,5 +1,5 @@
 # Microsoft Developer Studio Project File - Name="MakeTheme" - Package Owner=<4>
-# Microsoft Developer Studio Generated Build File, Format Version 5.00
+# Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Console Application" 0x0103
@@ -17,16 +17,14 @@ CFG=MakeTheme - Win32 NASM Debug
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "MakeTheme - Win32 Release" (based on\
- "Win32 (x86) Console Application")
+!MESSAGE "MakeTheme - Win32 Release" (based on "Win32 (x86) Console Application")
 !MESSAGE "MakeTheme - Win32 Debug" (based on "Win32 (x86) Console Application")
-!MESSAGE "MakeTheme - Win32 NASM Debug" (based on\
- "Win32 (x86) Console Application")
-!MESSAGE "MakeTheme - Win32 NASM Release" (based on\
- "Win32 (x86) Console Application")
+!MESSAGE "MakeTheme - Win32 NASM Debug" (based on "Win32 (x86) Console Application")
+!MESSAGE "MakeTheme - Win32 NASM Release" (based on "Win32 (x86) Console Application")
 !MESSAGE 
 
 # Begin Project
+# PROP AllowPerConfigDependencies 0
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
 CPP=cl.exe
@@ -56,11 +54,8 @@ LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
 # ADD LINK32 setargv.obj kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386 /out:"MakeTheme.exe"
 # Begin Special Build Tool
-SOURCE=$(InputPath)
-PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir\
-                                                   ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
-    ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
-    ..\..\..\..\base\win32\prj\tools
+SOURCE="$(InputPath)"
+PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                    ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe     ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt     ..\..\..\..\base\win32\prj\tools
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 Debug"
@@ -77,7 +72,7 @@ PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir\
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /W3 /Gm /GX /Zi /Od /I "../../include" /I "../../../../lib/zlib/include" /I "../../../../config" /I "../../../../base/include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "../../include" /I "../../../../lib/zlib/include" /I "../../../../config" /I "../../../../base/include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -87,11 +82,8 @@ LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
 # ADD LINK32 wsock32.lib setargv.obj kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /out:"MakeTheme.exe" /pdbtype:sept
 # Begin Special Build Tool
-SOURCE=$(InputPath)
-PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir\
-                                                   ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
-    ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
-    ..\..\..\..\base\win32\prj\tools
+SOURCE="$(InputPath)"
+PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                    ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe     ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt     ..\..\..\..\base\win32\prj\tools
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Debug"
@@ -109,7 +101,7 @@ PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir\
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /I "../../include" /I "../../../../lib/zlib/include" /I "../../../../config" /I "../../../../base/include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /W3 /Gm /GX /Zi /Od /I "../../include" /I "../../../../lib/zlib/include" /I "../../../../config" /I "../../../../base/include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "../../include" /I "../../../../lib/zlib/include" /I "../../../../config" /I "../../../../base/include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -119,11 +111,8 @@ LINK32=link.exe
 # ADD BASE LINK32 wsock32.lib setargv.obj kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
 # ADD LINK32 wsock32.lib setargv.obj kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /out:"MakeTheme.exe" /pdbtype:sept
 # Begin Special Build Tool
-SOURCE=$(InputPath)
-PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir\
-                                                   ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
-    ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
-    ..\..\..\..\base\win32\prj\tools
+SOURCE="$(InputPath)"
+PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                    ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe     ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt     ..\..\..\..\base\win32\prj\tools
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Release"
@@ -151,11 +140,8 @@ LINK32=link.exe
 # ADD BASE LINK32 setargv.obj kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
 # ADD LINK32 setargv.obj kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386 /out:"MakeTheme.exe"
 # Begin Special Build Tool
-SOURCE=$(InputPath)
-PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir\
-                                                   ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
-    ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
-    ..\..\..\..\base\win32\prj\tools
+SOURCE="$(InputPath)"
+PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                    ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe     ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt     ..\..\..\..\base\win32\prj\tools
 # End Special Build Tool
 
 !ENDIF 

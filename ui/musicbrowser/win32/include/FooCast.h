@@ -24,13 +24,9 @@ ____________________________________________________________________________*/
 #ifndef INCLUDED_FOOCAST_H_
 #define INCLUDED_FOOCAST_H_
 
-#define STRICT
 #include <windows.h>
 #include <commctrl.h>
 
-#ifdef WIN32
-#pragma warning(disable:4786)
-#endif
 
 class FooCast {
  public:

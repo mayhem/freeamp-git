@@ -25,7 +25,6 @@ ____________________________________________________________________________*/
 #define INCLUDED_TOOLBAR_UI_H_
 
 /* system headers */
-#define STRICT
 #define WIN32_LEAN_AND_MEAN 
 #include <windows.h>
 #include <windowsx.h>

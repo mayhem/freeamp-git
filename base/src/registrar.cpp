@@ -21,7 +21,6 @@
 ____________________________________________________________________________*/
 
 /* System Includes */
-#define STRICT
 #ifdef WIN32
 #include <windows.h>
 #else

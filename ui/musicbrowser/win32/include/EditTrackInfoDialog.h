@@ -24,13 +24,8 @@ ____________________________________________________________________________*/
 #ifndef INCLUDED_EDITTRACKINFO_H_
 #define INCLUDED_EDITTRACKINFO_H_
 
-#define STRICT
 #include <windows.h>
 #include <commctrl.h>
-
-#ifdef WIN32
-#pragma warning(disable:4786)
-#endif
 
 #include <vector>
 #include <string>

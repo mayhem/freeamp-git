@@ -63,6 +63,7 @@ ARRAY36 *hwin_init_addr()
 #ifdef ASM_X86
 #ifdef _MSC_VER
 #pragma warning(disable: 4035)
+#pragma warning(disable:4716)
 #endif /* _MSC_VER */ 
 #endif /* ASM_X86 */
 

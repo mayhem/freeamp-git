@@ -22,7 +22,6 @@
 ____________________________________________________________________________*/
 
 /* system headers */
-#define STRICT
 #include <windows.h>
 #include <windowsx.h>
 #include <shlobj.h>
