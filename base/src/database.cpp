@@ -23,6 +23,7 @@ ____________________________________________________________________________*/
 
 
 #include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 
@@ -35,16 +36,27 @@ ____________________________________________________________________________*/
 #define S_IRWXU _S_IREAD|_S_IWRITE
 #endif
 
-Database::Database(const char *name)
+Database::Database(const char *name, int version)
 {
     m_dbase = NULL;
 
     assert(name);
 
     m_lock = new Mutex();
-    m_dbase = gdbm_open((char *)name, 0, GDBM_WRCREAT|GDBM_NOLOCK, S_IRWXU, NULL);
+    m_dbase = gdbm_open((char *)name, 0, GDBM_WRCREAT|GDBM_NOLOCK, S_IRWXU, 
+                        NULL);
     
     assert(m_dbase);
+
+    if (version >= 0) {
+        if (!TestDatabaseVersion(version)) {
+            gdbm_close(m_dbase);
+            m_dbase = gdbm_open((char *)name, 0, GDBM_NEWDB|GDBM_NOLOCK, 
+                                S_IRWXU, NULL);
+            assert(m_dbase);
+        }
+        StoreDatabaseVersion(version);
+    }
 }
 
 Database::~Database()
@@ -162,6 +174,9 @@ char *Database::NextKey(char *key)
 
     m_lock->Release();
 
+    if ((nextKey != NULL) && (!strcmp(DATABASE_VERSION_KEY, nextKey)))
+        nextKey = NextKey(nextKey);
+
     return nextKey;
 }
 
@@ -170,4 +185,32 @@ void Database::Sync(void)
     m_lock->Acquire();
     gdbm_sync(m_dbase);
     m_lock->Release();
+}
+
+bool Database::TestDatabaseVersion(int version)
+{
+    int database_ver = 0;
+    char *stored_ver = NULL;
+    
+    stored_ver = Value(DATABASE_VERSION_KEY);
+ 
+    if (!stored_ver)
+        return false;
+
+    database_ver = atoi(stored_ver);
+
+    delete [] stored_ver;
+
+    if (version != database_ver)
+        return false;
+    return true;
+}
+
+void Database::StoreDatabaseVersion(int version)
+{
+    char version_store[15];
+    
+    sprintf(version_store, "%d", version);
+
+    Insert(DATABASE_VERSION_KEY, version_store);
 }

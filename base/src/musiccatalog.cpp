@@ -53,7 +53,7 @@ using namespace std;
 #include "utility.h"
 #include "debug.h"
 
-#define DBASEDELIM ":"
+#define METADATABASE_VERSION 1
 
 MusicCatalog::MusicCatalog(FAContext *context)
 {
@@ -472,7 +472,7 @@ void MusicBrowser::SetDatabase(const char *path)
     if (m_database)
         delete m_database;
 
-    m_database = new Database(path);
+    m_database = new Database(path, METADATABASE_VERSION);
 
     if (!m_database->Working()) {
         delete m_database;

@@ -605,15 +605,19 @@ AC_SUBST(EXTRALIBS)
 AC_SUBST(OSDEPPLUGINS)
 AC_SUBST(OSINC)
 
-if expr "$host_cpu" : "i.86$" > /dev/null; then
-  if test -n "$NASM"; then
-    AC_MSG_RESULT([Using x86 optimizations])
-    XINGASM="`echo lmc/xingmp3/src/{cdct,cwin,cwin8,mdct,msis}asm.o`"
-    AC_DEFINE(ASM_X86)
-  else
-    AC_MSG_RESULT([nasm not available, using older x86 optimizations])
-    XINGASM=lmc/xingmp3/src/x86gas.o
-    AC_DEFINE(ASM_X86_OLD)
+AC_ARG_ENABLE(x86opts, [  --disable-x86opts       Don't use any x86 assembly optimizations], enable_x86=no, enable_x86=yes)
+
+if test "x$enable_x86" = "xyes"; then
+  if expr "$host_cpu" : "i.86$" > /dev/null; then
+    if test -n "$NASM"; then
+      AC_MSG_RESULT([Using x86 optimizations])
+      XINGASM="`echo lmc/xingmp3/src/{cdct,cwin,cwin8,mdct,msis}asm.o`"
+      AC_DEFINE(ASM_X86)
+    else
+      AC_MSG_RESULT([nasm not available, using older x86 optimizations])
+      XINGASM=lmc/xingmp3/src/x86gas.o
+      AC_DEFINE(ASM_X86_OLD)
+    fi
   fi
 fi
 

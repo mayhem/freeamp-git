@@ -28,10 +28,12 @@ ____________________________________________________________________________*/
 #include "gdbm_fa.h"
 #include "mutex.h"
 
+#define DATABASE_VERSION_KEY "FREEAMP_DATABASE_VERSION"
+
 class Database
 {
  public:
-   Database(const char *name = NULL);
+   Database(const char *name = NULL, int version = -1);
    ~Database();
    bool  Working(void);
    
@@ -43,6 +45,9 @@ class Database
    void  Sync(void);
 
  private:
+   bool  TestDatabaseVersion(int version);
+   void  StoreDatabaseVersion(int version);
+
    GDBM_FILE m_dbase;
    Mutex    *m_lock;
 };
