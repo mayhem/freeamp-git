@@ -77,6 +77,14 @@ if test "$x11"="true"; then
 
   fi
 
+
+  if test "$x11" = "true"; then
+     AC_CHECK_HEADER(X11/xpm.h, x11="true",
+       x11="false"
+       echo XPM Header not found. X11 UI build disabled.
+     )
+  fi
+
   dnl ******************
   dnl Check for libc5.  If found warn the user about potential problems
   dnl ******************
