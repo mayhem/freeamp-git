@@ -145,6 +145,10 @@ AcceptEvent(Event* event)
 				EnableWindow(m_hwndSlider, TRUE);
 				m_state = STATE_Playing;
                 g_buttonStateArray[kPlayControl].state = Activated;
+
+                if(g_displayInfo.state == TotalTime)
+                    g_displayInfo.state = CurrentTime;
+
 	            break; 
             }
 

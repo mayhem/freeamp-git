@@ -1333,8 +1333,8 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 			        OutputDebugString("play clicked\n");
 			        if (g_ui->m_state == STATE_Stopped) {
 				        g_ui->m_target->AcceptEvent(new Event(CMD_Play));
-                        if(g_displayInfo.state == TotalTime)
-                            g_displayInfo.state = CurrentTime;
+                        //if(g_displayInfo.state == TotalTime)
+                            //g_displayInfo.state = CurrentTime;
                         
 			        } else if (g_ui->m_state == STATE_Paused) {
 				        g_ui->m_target->AcceptEvent(new Event(CMD_TogglePause));
