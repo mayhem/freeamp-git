@@ -1,3 +1,17 @@
+Changes for Linux and Windows version 2.0 beta 4
+--------------------------------------------------------------------
+
+- Again, Lots and lots of bug fixes.
+- Help files for both Linux and Win32 have been updated.
+- New artwork in the music browser.
+- Ability to organize music in playlist manager with drag and drop.
+- VBR files are now handled correctly.
+- Large ID3v2 tags are handled correctly.
+- Fixed alignment issues in default theme
+- Added support for PLS playlist files
+- Added new toolbar UI which allows app to live in system tray.
+
+
 Changes for Linux and Windows version 2.0 beta 3
 --------------------------------------------------------------------
 

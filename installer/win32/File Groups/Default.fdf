@@ -4,14 +4,15 @@ group1=PLS Playlist
 group2=ID3v1 MetaData
 group3=Program Executable Files
 group4=Direct Sound Output
-group5=Default Plugins
-group6=Soundcard Output
-group10=HTTP Input
-group7=ID3v2 MetaData
-group11=PMP300 Portable
-group8=OBS Input
-group12=M3U Playlist
-group9=Default Theme
+group5=Theme Tools
+group6=Default Plugins
+group10=Default Theme
+group7=Soundcard Output
+group11=HTTP Input
+group8=ID3v2 MetaData
+group12=PMP300 Portable
+group9=OBS Input
+group13=M3U Playlist
 
 [System DLLs]
 SELFREGISTERING=No
@@ -56,6 +57,20 @@ POTENTIALLY=No
 MISC=
 
 [Program Executable Files]
+SELFREGISTERING=No
+HTTPLOCATION=
+LANGUAGE=
+OPERATINGSYSTEM=
+FTPLOCATION=
+FILETYPE=No
+INFOTYPE=Standard
+COMMENT=
+COMPRESS=Yes
+COMPRESSDLL=
+POTENTIALLY=No
+MISC=
+
+[Theme Tools]
 SELFREGISTERING=No
 HTTPLOCATION=
 LANGUAGE=
