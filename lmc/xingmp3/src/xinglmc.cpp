@@ -1025,12 +1025,14 @@ float equalizer[32] = {
     1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
 };
 int enableEQ = false;
+float EQ_gain_adjust = 1.0;
 	   }
 
-Error XingLMC::SetEQData(float *arrayEQ) {
+Error XingLMC::SetEQData(float *arrayEQ, float preamp) {
     Error error = kError_NoErr;
         for(int i=0; i<32; i++)
                 equalizer[i] = arrayEQ[i];
+        EQ_gain_adjust = preamp;
         return error;
 }
 

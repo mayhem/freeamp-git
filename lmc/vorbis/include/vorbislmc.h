@@ -64,7 +64,7 @@ class VorbisLMC : public LogicalMediaConverter
 
    virtual vector<const char *> *GetExtensions(void);
 
-   virtual Error SetEQData(float *f) { return kError_YouScrewedUp; };
+   virtual Error SetEQData(float *f, float) { return kError_YouScrewedUp; };
    virtual Error SetEQData(bool b) { return kError_YouScrewedUp; };
   
    virtual Error SetDecodeInfo(DecodeInfo &info);

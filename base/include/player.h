@@ -220,7 +220,7 @@ class Player : public EventQueue, Properties, PropertyWatcher
 
     TimerRef m_cdTimer;
     TimerRef m_syncTimer;
-    float    m_eqValues[32];
+    float    m_eqValues[32], m_eqPreamp;
     bool     m_eqEnabled;
 };
 

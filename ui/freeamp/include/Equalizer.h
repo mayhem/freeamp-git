@@ -46,13 +46,14 @@ class Equalizer
         void SaveSettings(void);
         void InitControls(Window *pWindow);
         void ChangeValue(int sliderNum, int value);
+        void ChangePreamp(int value);
         bool IsEnabled(void);
 
     protected:
 
         FAContext       *m_context;
         bool             m_settingsChanged, m_enabled;
-        float            m_equalizer[32];
+        float            m_equalizer[32], m_preamp;
         int              m_sliders[10];
 };
 

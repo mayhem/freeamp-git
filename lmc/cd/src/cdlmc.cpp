@@ -99,7 +99,7 @@ Error CDLMC::ChangePosition(int32 position)
    return kError_NoErr;
 }
 
-Error CDLMC::SetEQData(float *arrayEQ) 
+Error CDLMC::SetEQData(float *arrayEQ, float preamp) 
 {
     return kError_NoErr;
 }

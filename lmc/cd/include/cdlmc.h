@@ -50,7 +50,7 @@ class  CDLMC:public LogicalMediaConverter
    virtual Error Prepare(PullBuffer *pInputBuffer, PullBuffer *&pOutBuffer);
    virtual Error InitDecoder();
 
-   virtual Error SetEQData(float *);
+   virtual Error SetEQData(float *, float);
    virtual Error SetEQData(bool);
 
    virtual Error SetDecodeInfo(DecodeInfo &info);

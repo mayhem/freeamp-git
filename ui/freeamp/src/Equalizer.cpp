@@ -28,20 +28,13 @@ ____________________________________________________________________________*/
 #include "eventdata.h"
 #include "Equalizer.h"
 
-#define	LOWER_LIMIT_DB	-20
-#define	UPPER_LIMIT_DB	20
-#define	NUM_TICKS		10
-#define	LIMIT_DB_RATIO	3
-#define	LOWER_LIMIT		LOWER_LIMIT_DB*LIMIT_DB_RATIO
-#define	UPPER_LIMIT		UPPER_LIMIT_DB*LIMIT_DB_RATIO
-#define	TOTAL_LIMIT		(UPPER_LIMIT-(LOWER_LIMIT))
-
 Equalizer::Equalizer(FAContext *context)
 {
 
     m_context = context;
     m_settingsChanged = false;
     m_enabled = false;
+    m_preamp = 0;
 
     int i;
 
@@ -72,18 +65,20 @@ bool Equalizer::IsEnabled(void)
 void Equalizer::LoadSettings(void)
 {
    char   settings[255];
-   int    enabled, i;
+   int    enabled, i, preamp = 0;
    uint32 len = 255;
 
    m_context->prefs->GetPrefString(kEqualizerSettingsPref, settings, &len);
 
-   sscanf(settings, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
+   sscanf(settings, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
         &enabled, &m_sliders[0], &m_sliders[1], &m_sliders[2],
         &m_sliders[3], &m_sliders[4], &m_sliders[5], &m_sliders[6],
-        &m_sliders[7], &m_sliders[8], &m_sliders[9]);
+        &m_sliders[7], &m_sliders[8], &m_sliders[9], &preamp);
 
    for(i = 0; i < 10; i++)
       ChangeValue(i, m_sliders[i]);
+
+   ChangePreamp((preamp * 5) + 50);
 
    Enable((enabled != 0));
    m_settingsChanged = false;
@@ -96,10 +91,10 @@ void Equalizer::SaveSettings(void)
    if (!m_settingsChanged)
        return;
 
-   sprintf(settings, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
+   sprintf(settings, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
         m_enabled, m_sliders[0], m_sliders[1], m_sliders[2],
         m_sliders[3], m_sliders[4], m_sliders[5], m_sliders[6],
-        m_sliders[7], m_sliders[8], m_sliders[9]);
+        m_sliders[7], m_sliders[8], m_sliders[9], (int)m_preamp);
    m_context->prefs->SetPrefString(kEqualizerSettingsPref, settings);
 }
 
@@ -115,30 +110,21 @@ void Equalizer::InitControls(Window *pWindow)
        nameString = string(name);
        pWindow->ControlIntValue(nameString, true, m_sliders[i]);
    }
+   i = (int)(m_preamp * 5) + 50;
+   pWindow->ControlIntValue(string("Preamp"), true, i);
 }
 
 void Equalizer::ChangeValue(int sliderNum, int value) 
 {
-   float temp;
+   float temp, db;
 
    if (sliderNum < 0 || sliderNum > 9)
       return;
 
    m_sliders[sliderNum] = value;
+   db = ((value - 50) * 2) / 10;
+   temp = pow(10, db / 20.0);
 
-   value = LOWER_LIMIT + ((UPPER_LIMIT - LOWER_LIMIT) * (100 - value)) / 100; 
-   temp = (float)pow(10,(double)(0-value/LIMIT_DB_RATIO)/20);
-
-   //printf("temp[%d]: %f %d slider: %d\n", 
-   //        sliderNum, temp, value, m_sliders[sliderNum]);
-
-	//                         power
-	//power gain(db) = 10 * log 
-	//                         10
-	//
-	//						     voltage
-	//voltage gain(db) = 20 * log
-	//                           10
 	//1,1,1,1,1,1,2,4,8,12
 	switch(sliderNum) 
    {
@@ -200,6 +186,14 @@ void Equalizer::ChangeValue(int sliderNum, int value)
 	}
 
    m_settingsChanged = true;
-	m_context->target->AcceptEvent(new SetEqualizerDataEvent((float *)&m_equalizer));
+	m_context->target->AcceptEvent(new 
+       SetEqualizerDataEvent((float *)&m_equalizer, m_preamp));
 }
 
+void Equalizer::ChangePreamp(int value) 
+{
+   m_preamp = (value - 50) / 5;
+   m_settingsChanged = true;
+	m_context->target->AcceptEvent(new 
+       SetEqualizerDataEvent((float *)&m_equalizer, m_preamp));
+}

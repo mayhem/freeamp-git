@@ -69,7 +69,7 @@ class LogicalMediaConverter : public PipelineUnit
     virtual void  SetPMI(PhysicalMediaInput *pmi) { m_pmi = pmi; };
     virtual void  SetPMO(PhysicalMediaOutput *pmo) { m_pmo = pmo; };
 
-    virtual Error SetEQData(float *) = 0;
+    virtual Error SetEQData(float *, float) = 0;
     virtual Error SetEQData(bool) = 0;
 
     virtual Error SetDecodeInfo(DecodeInfo &info) = 0;

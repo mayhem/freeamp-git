@@ -622,6 +622,11 @@ static int unpack_side_MPEG2(int igr)
 /* return  bytes in header + side info */
    return side_bytes;
 }
+
+extern float equalizer[32];
+extern float EQ_gain_adjust;
+extern int enableEQ; 
+
 /*-----------------------------------------------------------------*/
 static void unpack_main(unsigned char *pcm, int igr)
 {
@@ -648,6 +653,10 @@ static void unpack_main(unsigned char *pcm, int igr)
       else
 	 unpack_sf_sub_MPEG2(&sf[igr][ch],
 			 &side_info.gr[igr][ch], is_mode & ch, &is_sf_info);
+
+      if (enableEQ)
+          side_info.gr[igr][ch].global_gain += EQ_gain_adjust;
+
 /*--- huff data ---*/
       n1 = sfBandIndex[0][side_info.gr[igr][ch].region0_count];
       n2 = sfBandIndex[0][side_info.gr[igr][ch].region0_count

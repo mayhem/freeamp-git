@@ -1423,7 +1423,7 @@ GenerateSigsWork(set<string> *items)
         decInfo.sendInfo = false;
 
         lmc->SetDecodeInfo(decInfo);
-        lmc->SetEQData(m_eqValues);
+        lmc->SetEQData(m_eqValues, m_eqPreamp);
         lmc->SetEQData(m_eqEnabled);
 
         error = pmo->SetTo(url.c_str());
@@ -1604,7 +1604,7 @@ CreatePMO(const PlaylistItem * pc, Event * pC)
    pmo->SetPMI(pmi);
    pmo->SetLMC(lmc);
 
-   lmc->SetEQData(m_eqValues);
+   lmc->SetEQData(m_eqValues, m_eqPreamp);
    lmc->SetEQData(m_eqEnabled);
 
    pmi = NULL;
@@ -2094,15 +2094,21 @@ Player::
 SetEQData(Event *pEvent)
 {
    if (((SetEqualizerDataEvent *) pEvent)->IsEQData())
+   {
        memcpy(m_eqValues, ((SetEqualizerDataEvent *) pEvent)->GetEQData(), 
               sizeof(float) * 32);
+       m_eqPreamp = ((SetEqualizerDataEvent *) pEvent)->GetPreamp(); 
+   }
    else
        m_eqEnabled = ((SetEqualizerDataEvent *) pEvent)->GetEnableState();
 
    if (m_lmc)
    {
        if (((SetEqualizerDataEvent *) pEvent)->IsEQData())
-           m_lmc->SetEQData(m_eqValues);
+       {
+           m_eqPreamp = ((SetEqualizerDataEvent *) pEvent)->GetPreamp(); 
+           m_lmc->SetEQData(m_eqValues, m_eqPreamp);
+       }
        else
            m_lmc->SetEQData(m_eqEnabled);
    }

@@ -499,6 +499,7 @@ class     SetEqualizerDataEvent:public Event
       float    *m_eq;
       bool      m_enable;
       bool      m_IsEQData;
+      float     m_preamp;
 
    public:
 
@@ -508,11 +509,12 @@ class     SetEqualizerDataEvent:public Event
       m_enable = enable;
       m_IsEQData = false;
    }
-   SetEqualizerDataEvent(float *eq)
+   SetEqualizerDataEvent(float *eq, float preamp)
    {
       m_type = CMD_SetEQData;
       m_eq = eq;
       m_IsEQData = true;
+      m_preamp = preamp;
    }
    float    *GetEQData()
    {
@@ -521,6 +523,10 @@ class     SetEqualizerDataEvent:public Event
    bool      IsEQData()
    {
       return m_IsEQData;
+   }
+   float     GetPreamp()
+   {
+      return m_preamp;
    }
    bool      GetEnableState()
    {

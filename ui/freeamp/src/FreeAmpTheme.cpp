@@ -1315,6 +1315,14 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
        m_eq->ChangeValue(atoi(oControlName.c_str() + 2), iValue); 
        return kError_NoErr;
    }
+   if (oControlName == string("Preamp") && eMesg == CM_ValueChanged)
+   {
+       int iValue;
+
+       m_pWindow->ControlIntValue(oControlName, false, iValue);
+       m_eq->ChangePreamp(iValue); 
+       return kError_NoErr;
+   }
    if (oControlName == string("EqEnable") && eMesg == CM_Pressed)
    {
        int iState;

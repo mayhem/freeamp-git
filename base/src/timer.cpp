@@ -1,24 +1,24 @@
 /*____________________________________________________________________________
-	
-	FreeAmp - The Free MP3 Player
+        
+        FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1998-1999 EMusic.com
+        Portions Copyright (C) 1998-1999 EMusic.com
 
-	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; either version 2 of the License, or
-	(at your option) any later version.
+        This program is free software; you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation; either version 2 of the License, or
+        (at your option) any later version.
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+        This program is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-	
-	$Id$
+        You should have received a copy of the GNU General Public License
+        along with this program; if not, write to the Free Software
+        Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+        
+        $Id$
 ____________________________________________________________________________*/
 
 // The debugger can't handle symbols more than 255 characters long.
@@ -47,8 +47,8 @@ ____________________________________________________________________________*/
 
 TimerManager::TimerManager(): m_alive(true)
 {
-	m_thread = Thread::CreateThread();
-	m_thread->Create(TimerManager::thread_function, this);
+        m_thread = Thread::CreateThread();
+        m_thread->Create(TimerManager::thread_function, this);
 }
 
 TimerManager::~TimerManager()
@@ -134,21 +134,21 @@ void TimerManager::ThreadFunction()
 
         vector<TimerRef>::iterator i = m_list.begin();
 
-	for(; i != m_list.end(); i++)
-	{
-                if (!(*i)->function)
+        for(; i != m_list.end(); i++)
+        {
+                if (!(*i) || !(*i)->function)
                     continue;
 
-		(*i)->ticks++;
+                (*i)->ticks++;
 
-		if((*i)->duration && (*i)->ticks >= (*i)->duration)
-		{
+                if((*i)->duration && (*i)->ticks >= (*i)->duration)
+                {
                     Timer* t = new Timer(*(*i));
                     t->thread = Thread::CreateThread();
-	            t->thread->Create(TimerManager::timer_function, t, true);
+                    t->thread->Create(TimerManager::timer_function, t, true);
                     (*i)->ticks = 0;
-		}
-	}
+                }
+        }
 
         m_mutex.Release();
 
