@@ -265,6 +265,7 @@ class MusicBrowserUI : public UserInterface
     void  NewFavoriteEvent();
     void  EditStreamInfoEvent();
     void  RemoveFavoriteEvent();
+	void  TipEvent(PlaylistItem *item = NULL);
 
     // Functions in PlaylistView.cpp
     void  PlaylistListItemAdded(const PlaylistItem* item);

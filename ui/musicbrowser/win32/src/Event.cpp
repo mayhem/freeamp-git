@@ -52,6 +52,33 @@ using namespace std;
 //            "All Files (*.*)\0"
 //            "*.*\0";
 
+void MusicBrowserUI::TipEvent(PlaylistItem *item)
+{
+   vector<PlaylistItem*> items;
+   PlaylistItem *tip = NULL;
+   if (item)
+       tip = item;
+
+   if (!tip) {
+	   GetSelectedPlaylistItems(&items);
+       tip = *(items.begin());
+   }
+ 
+   if (!tip)
+	   return;
+
+   string artistname = tip->GetMetaData().Artist();
+
+   if (artistname.size() == 0 || artistname == "Unknown")
+       return;
+
+   string encoded;
+   ReplaceSpaces(artistname, encoded);
+   string url = string("http://www.fairtunes.com/servlet/ArtistLookupServlet?redirectPage=http://www.fairtunes.com/search.jsp&searchTerms=") + encoded;
+
+   ShellExecute(m_hWnd, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
+}
+
 void MusicBrowserUI::ClearPlaylistEvent(void)
 {
     m_context->target->AcceptEvent(new Event(CMD_Stop));

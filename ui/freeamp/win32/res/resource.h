@@ -153,6 +153,7 @@
 #define IDC_CREDIT                      1038
 #define IDC_BASED_ON_FREEAMP            1039
 #define IDC_THEMELISTBOX                1040
+#define IDC_GOTORELATABLE               1040
 #define IDC_ADDTHEME                    1041
 #define IDC_DELETETHEME                 1042
 #define IDC_CHOOSEFONT                  1043

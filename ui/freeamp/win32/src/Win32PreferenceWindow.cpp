@@ -2290,6 +2290,16 @@ bool Win32PreferenceWindow::PrefAboutProc(HWND hwnd,
                                     SW_SHOWNORMAL);
                     break;
                 }
+				case IDC_GOTORELATABLE:
+				{
+					ShellExecute(	hwnd,
+									"open",
+									"http://www.relatable.com/",
+									NULL,
+									NULL,
+									SW_SHOWNORMAL);
+					break;
+				}
             }
 
             break;

@@ -469,11 +469,12 @@ BEGIN
     POPUP "&Relatable"
     BEGIN
         MENUITEM "&Recommend Playlist",         ID_EDIT_GENERATEPLAYLIST
+        MENUITEM "SoundsLike Recommendation",   ID_SL_QUERY_NOMAX
         MENUITEM "&Learn Playlist",             ID_EDIT_SUBMITPLAYLIST
         MENUITEM SEPARATOR
-        MENUITEM "SoundsLike Recommendation",   ID_SL_QUERY_NOMAX
-        MENUITEM SEPARATOR
         MENUITEM "&Start Signaturing",          ID_EDIT_STARTSIGNATURING
+        MENUITEM SEPARATOR
+        MENUITEM "Edit Profile",                ID_RELATABLE_EDITPROFILE
     END
     POPUP "&Help"
     BEGIN
@@ -481,6 +482,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&FreeAmp Web Site",           ID_HELP_FREEAMPWEBSITE
         MENUITEM "&EMusic.com Web Site",        ID_HELP_EMUSICCOMWEBSITE
+        MENUITEM "&Relatable Web Site",         ID_HELP_RELATABLEWEBSITE
         MENUITEM SEPARATOR
         MENUITEM "&About...",                   ID_HELP_ABOUT
     END
@@ -593,6 +595,8 @@ BEGIN
         MENUITEM "&Remove",                     ID_POPUP_REMOVE
         MENUITEM SEPARATOR
         MENUITEM "&Edit Info...",               ID_POPUP_EDITINFO
+        MENUITEM SEPARATOR
+        MENUITEM "&Tip This Artist",            ID_POPUP_TIP
     END
 END
 
