@@ -715,6 +715,7 @@ void HttpInput::WorkerThread(void)
           usleep(10000);
           continue;
       }
+
         
       eError = m_pOutputBuffer->BeginWrite(pBuffer, iReadSize);
       if (eError == kError_NoErr)
@@ -756,8 +757,18 @@ void HttpInput::WorkerThread(void)
               iMaxReadBytes = iReadSize;
               
           iRead = recv(m_hHandle, (char *)pBuffer, iMaxReadBytes, 0);
-          if (iRead <= 0)
+		  if (iRead < 0)
+		  {
+#ifdef WIN32
+			 if (WSAGetLastError() == WSAEWOULDBLOCK)
+#else
+	         if (errno == EAGAIN)
+#endif
+				 iRead = 0;
+		  }
+          if (iRead < 0)
           {
+			 Debug_v("iRead: %d (le: %d)", iRead, WSAGetLastError());
              m_pOutputBuffer->SetEndOfStream(true);
              m_pOutputBuffer->EndWrite(0);
              break;
@@ -797,7 +808,6 @@ void HttpInput::WorkerThread(void)
           continue;
       }
    }
-
    shutdown(m_hHandle, 2);
    closesocket(m_hHandle);
    m_hHandle = -1;
