@@ -155,7 +155,8 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
 
     o = mb_New();
     mb_SetServer(o, "www.musicbrainz.org", 80);
-    mb_SetProxy(o, (char *)m_strProxyAddr.c_str(), m_nProxyPort);
+    if (m_strProxyAddr.size() > 7)
+        mb_SetProxy(o, (char *)m_strProxyAddr.c_str(), m_nProxyPort);
 
     uuid_ascii((unsigned char*)pmetaData->GUID().c_str(), guid);
 
