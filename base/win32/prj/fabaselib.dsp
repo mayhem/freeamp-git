@@ -132,7 +132,7 @@ LIB32=link.exe -lib
 # Name "fabaselib - Win32 NASM Release"
 # Begin Source File
 
-SOURCE=..\..\aps\apshistory.cpp
+SOURCE=..\..\aps\apsconvert.cpp
 # End Source File
 # Begin Source File
 
@@ -215,7 +215,7 @@ SOURCE=..\..\aps\gencrc.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\src\hosttonet.cpp
+SOURCE=..\..\aps\hosttonet.cpp
 # End Source File
 # Begin Source File
 
@@ -272,6 +272,14 @@ SOURCE=..\..\src\registry.cpp
 # Begin Source File
 
 SOURCE=..\src\semaphore.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\aps\sigclient.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\aps\sigxdr.cpp
 # End Source File
 # Begin Source File
 

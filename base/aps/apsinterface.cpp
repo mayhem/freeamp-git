@@ -301,7 +301,7 @@ int APSInterface::APSSubmitPlaylist(APSPlaylist* pPlayList)
     return nRes;
 }
 
-void APSInterface::WriteToLog(const string& strGUID, int nEventType = SongDone)
+void APSInterface::WriteToLog(const string& strGUID, int nEventType)
 {
     if (m_strCurrentProfile.empty())
         return;  // if no active profile, don't log anything
@@ -409,7 +409,7 @@ int APSInterface::CreateProfile(const char *pczNewName)
     return APS_PARAMERROR;
 }
 
-int APSInterface::DeleteProfile(const char *pczNewName, bool bServerToo = false)
+int APSInterface::DeleteProfile(const char *pczNewName, bool bServerToo)
 {
     // TODO: add server side deletion as well
     if (pczNewName == NULL) 
