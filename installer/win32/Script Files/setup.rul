@@ -481,7 +481,7 @@ begin
 ///////////////////////////////////////////////////////////////////////////////
 function SetupFolders()
     NUMBER nResult;
-
+	STRING szPath;
 begin
 
 
@@ -493,6 +493,20 @@ begin
     //        your log file.  Under 32-bit this is automatically done by Windows.
 
     nResult = CreateShellObjects( "" );
+
+    ProgDefGroupType(PERSONAL);
+
+    szPath = TARGETDIR ^ "FreeAmp.exe";
+    LongPathToQuote(szPath, TRUE);
+
+    nResult = AddFolderIcon(FOLDER_PROGRAMS ^ SHELL_OBJECT_FOLDER,
+    						@PRODUCT_NAME,
+    						szPath,
+    						"",
+    						"",
+    						0,
+    						"",
+    						REPLACE);
 
     return nResult;
  end;
@@ -835,7 +849,7 @@ function DialogShowSdSelectFolder()
 begin
 
     if (SHELL_OBJECT_FOLDER = "") then
-        SHELL_OBJECT_FOLDER = svFolderName;
+        SHELL_OBJECT_FOLDER = @PRODUCT_NAME + " " + @PRODUCT_VERSION;
     endif;
 
     szTitle    = "";
@@ -1003,6 +1017,7 @@ end;
 // --- include script file section ---
 
 #include "sddialog.rul"
+
 
 
 

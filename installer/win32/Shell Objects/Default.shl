@@ -13,31 +13,9 @@ InternetShortcut=No
 DisplayText=PRODUCT_NAME
 Comments=
 
-[Shortcut1]
-Target=<TARGETDIR>\FreeAmp.exe
-Parameters=
-ShortcutKey=
-SeparateMemorySpace=No
-Run=Normal Window
-FileGroup=
-Replace=Yes
-IconIndex=0
-StartIn=<TARGETDIR>
-InternetShortcut=No
-IconFile=
-Comments=
-DisplayText=PRODUCT_NAME
-
-[Folder4]
-Type=Personal
-Comments=
-DisplayText=
-
 [Data]
+Shortcut0=Folder0\FreeAmp
 Folder3=<FOLDER_STARTUP>
-Shortcut0=Folder4\FreeAmp
-Shortcut1=Folder0\FreeAmp
-Folder4=Folder2\FreeAmp 2.0
 Group0=Main
 Group1=Startup
 Folder0=<FOLDER_DESKTOP>
