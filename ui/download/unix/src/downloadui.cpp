@@ -74,9 +74,16 @@ void DownloadUI::UIThreadFunc(void *p)
     ((DownloadUI *)p)->GTKEventService();
 }
 
+static int download_timeout(DownloadUI *p)
+{
+    if (p->doQuitNow)
+        gtk_main_quit();
+}
+
 void DownloadUI::GTKEventService(void)
 {
     weAreGTK = false;
+    doQuitNow = false;
 
     m_context->gtkLock.Acquire();
     if (!m_context->gtkInitialized) {
@@ -91,6 +98,7 @@ void DownloadUI::GTKEventService(void)
     m_context->gtkLock.Release();
 
     if (weAreGTK) {
+        gtk_timeout_add(250, download_timeout, this);
         gtk_main();
         gdk_threads_leave();
     }
@@ -101,11 +109,8 @@ int32 DownloadUI::AcceptEvent(Event *event)
     
     switch (event->Type()) {
         case CMD_Cleanup: {
-            if (weAreGTK) {
-                gdk_threads_enter();
-                gtk_main_quit();
-                gdk_threads_leave();
-            }
+            if (weAreGTK) 
+                doQuitNow = true;
 
             gtkThread->Join();
            

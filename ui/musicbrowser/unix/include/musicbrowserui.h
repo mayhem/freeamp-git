@@ -51,6 +51,8 @@ class MusicBrowserUI : public UserInterface {
 
     void StartSearch(bool runMain = true);
 
+    bool doQuitNow;
+
  protected:
     FAContext *m_context;
 

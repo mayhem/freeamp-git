@@ -58,6 +58,8 @@ class DownloadUI : public UserInterface {
     void SelChangeEvent(int row);
     void AddURLEvent(void);
 
+    bool doQuitNow;
+
  protected:
 
     void ParseArgs(int32 argc, char** argv);

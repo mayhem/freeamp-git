@@ -591,6 +591,8 @@ Run()
    if (bValue)
       m_context->log->AddLogLevel(LogPerf);
 
+   bool loadSecondaryUIs = true;
+
    // which ui should we instantiate first??
    if (m_argUIList->size() == 0)
    {
@@ -598,8 +600,10 @@ Run()
       name = new char[len];
 
 #ifdef unix
-      if (!getenv("DISPLAY")) 
+      if (!getenv("DISPLAY")) {
 	  pref = kTextUIPref;
+          loadSecondaryUIs = false;
+      }
 #endif
       while ((error = m_context->prefs->GetPrefString(pref, name, &len)) ==
              kError_BufferTooSmall)
@@ -636,6 +640,11 @@ Run()
       strcpy(name, orig);
    }
 
+#ifdef HAVE_GTK
+   if (strcmp("freeamp.ui", name))
+       loadSecondaryUIs = false;
+#endif
+
    len = 255;
    char *downloadName = new char[len];
    while  ((error = m_context->prefs->GetPrefString(kDownloadManagerUIPref,
@@ -659,6 +668,7 @@ Run()
 
        musicBrowserName = new char[len];
    }
+
 #ifdef WIN32
    len = 255;
    char *toolbarName = new char[len];
@@ -683,7 +693,7 @@ Run()
 
          while (NULL != (item = m_uiRegistry->GetItem(i++)))
          {
-            if (!CompareNames(item->Name(), downloadName))
+            if (!CompareNames(item->Name(), downloadName) && loadSecondaryUIs)
             {
                m_ui = (UserInterface *) item->InitFunction()(m_context);
 
@@ -699,7 +709,8 @@ Run()
                    m_ui = NULL;
                }
             }
-            else if (!CompareNames(item->Name(), musicBrowserName))
+            else if (!CompareNames(item->Name(), musicBrowserName) && 
+                     loadSecondaryUIs)
             {
                m_ui = (UserInterface *) item->InitFunction()(m_context);
               
