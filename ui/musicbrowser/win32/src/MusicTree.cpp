@@ -89,8 +89,6 @@ void MusicBrowserUI::InitTree(void)
     insert.hParent = NULL;
     m_hPlaylistItem = TreeView_InsertItem(m_hMusicView, &insert);
 
-	/*
-
     HTREEITEM temp;
 
     insert.item.pszText = "Streams";
@@ -122,8 +120,7 @@ void MusicBrowserUI::InitTree(void)
     insert.hInsertAfter = TVI_LAST;
     insert.hParent = temp;
     m_hIceCastItem = TreeView_InsertItem(m_hMusicView, &insert);
-
-    
+   
     insert.item.pszText = kShoutCast;
     insert.item.cchTextMax = lstrlen(insert.item.pszText);
     insert.item.iImage = 11;
@@ -131,9 +128,8 @@ void MusicBrowserUI::InitTree(void)
     insert.item.cChildren= 1;
     insert.item.lParam = NULL;
     insert.hInsertAfter = TVI_LAST;
-    insert.hParent = NULL;
+    insert.hParent = temp;
     m_hShoutCastItem = TreeView_InsertItem(m_hMusicView, &insert);
-    */
 
     /*
     insert.item.pszText = kPortables;
@@ -474,20 +470,47 @@ void MusicBrowserUI::FillWiredPlanet()
 
     char* stations[] = {
         "Alpha 2.0", // (Downtempo / Trip-Hop)",
+		"Amplified", // (Punk, Garage, and Hard Alternative),
         "Axis", // (Jazz in its many forms)",
+		"Butter", // (Melted grooves and dubbed out world-flavored Funk.),
+		"DJ Mix",
+		"Flipside",
+		"Hearts of Space",
         "Nova Mundi", // (New Age / Ambient)",
         "Oscillations", // (Electronic / Trance / House)",
+		"Pop 3",
         "Red Shift", // (Drum \'n Bass / Jungle)",
-        "Radio TMBG" // (They Might Be Giants)"
+		"The Cut",
+		"The Fringe",
+		"World",
+		"Radio EMusic",
+		"Radio Epitaph",
+		"Radio Radio",
+        "Radio TMBG", // (They Might Be Giants)",
+		"Noise Pop"
+		
     };
 
     char* urls[] = {
-        "http://209.209.9.15:8001/alph",
-        "http://209.209.9.15:8001/axis",
-        "http://209.209.9.15:8001/nova",
-        "http://209.209.9.15:8001/oscl",
-        "http://209.209.9.15:8001/reds",
-        "http://209.209.9.15:8001/tmbg"
+        "http://ice1.wiredplanet.com:8001/alph",
+		"http://ice1.wiredplanet.com:8001/ampp",
+        "http://ice1.wiredplanet.com:8001/axis",
+		"http://ice1.wiredplanet.com:8001/cjwp",
+		"http://ice1.wiredplanet.com:8001/oaky",
+		"http://ice1.wiredplanet.com:8001/flip",
+		"http://ice1.wiredplanet.com:8001/hrts",
+        "http://ice1.wiredplanet.com:8001/nova",
+        "http://ice1.wiredplanet.com:8001/oscl",
+		"http://ice1.wiredplanet.com:8001/popo",
+        "http://ice1.wiredplanet.com:8001/reds",
+		"http://ice1.wiredplanet.com:8001/tcut",
+		"http://ice1.wiredplanet.com:8001/frng",
+		"http://ice1.wiredplanet.com:8001/wrld",
+		"http://ice1.wiredplanet.com:8001/emus",
+		"http://ice1.wiredplanet.com:8001/punk",
+		"http://ice1.wiredplanet.com:8001/elvi",
+        "http://ice1.wiredplanet.com:8001/tmbg",
+		"http://ice1.wiredplanet.com:8001/nois"
     };
 
     uint32 numStations = (sizeof(stations)/sizeof(char*));
