@@ -131,7 +131,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     FAContext *context = new FAContext;
 
     context->prefs = new Win32Prefs();
-    context->log = new LogFile("freeamp.log");
+     context->log = new LogFile("freeamp.log");
 
     // find all the plug-ins we use
     Registrar* registrar;
@@ -571,7 +571,12 @@ static LRESULT WINAPI HiddenWndProc(HWND hwnd,
             
             break;
         }
-
+        
+        case WM_DISPLAYCHANGE:
+        {
+            context->target->AcceptEvent(new Event(INFO_PrefsChanged));
+            break;
+        }
         default:
             result = DefWindowProc(hwnd, msg, wParam, lParam);
             break;
