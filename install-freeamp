@@ -1,16 +1,21 @@
 #!/bin/sh -e
 
 prefix=/usr/local
+
 bindir="$prefix/bin"
 libdir="$prefix/lib"
 fadir="$libdir/freeamp"
 plugdir="$fadir/plugins"
 
-# Yes, we could use mkdir -p, but not all unix systems' mkdir's support -p
+# We could use mkdir -p, but not all unix systems' mkdir's support -p
 for dir in "$bindir" "$libdir" "$fadir" "$plugdir"; do
     if [ \! -d "$dir" ]; then
-	echo "mkdir $dir && chown root.root $dir && chmod 755 $dir"
-	mkdir "$dir" && chown root.root "$dir" && chmod 755 "$dir"
+	echo "mkdir $dir"
+	mkdir "$dir"
+	echo "chown root $dir"
+	chown root "$dir"
+	echo "chmod 755 $dir"
+	chmod 755 "$dir"
     fi
 done
 
@@ -23,14 +28,16 @@ for file in plugins/*.*; do
 	    	enable=t
 	    else
 	    	enable=f
+		echo "rm -f $fadir/$file"
+		rm -f "$fadir/$file"
 	    fi
 	    ;;
 	*)
 	    enable=t
 	    ;;
     esac
-    if [ "$enable" = "t" ]; then
-        echo install -c -m 755 "$file" "$prefix/lib/freeamp/plugins"
-        install -c -m 755 "$file" "$prefix/lib/freeamp/plugins"
+    if [ "$enable" = t ]; then
+        echo "install -c -o root -m 755 $file $plugdir"
+        install -c -o root -m 755 "$file" "$plugdir"
     fi
 done
