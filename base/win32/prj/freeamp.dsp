@@ -98,6 +98,10 @@ SOURCE=..\..\src\hashtable.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\src\log.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\main.cpp
 # End Source File
 # Begin Source File

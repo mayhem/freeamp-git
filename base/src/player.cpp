@@ -841,8 +841,6 @@ void Player::CreateLMC(PlayListItem * pc, Event * pC)
 
 void Player::DoneOutputting(Event *pEvent)
 {
-   Event *e;
-  
    // LMC or PMO sends this when its done
    // outputting whatever.  Now, go on to next
    // piece in playlist

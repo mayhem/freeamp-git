@@ -31,7 +31,9 @@ ____________________________________________________________________________*/
 
 extern LogFile *g_Log;
 
+#ifndef min
 #define min(a,b) ((a) < (b) ? (a) : (b))
+#endif
 #define DB printf("%d\n", __LINE__);
 
 PullBuffer::PullBuffer(size_t iBufferSize,
@@ -226,9 +228,6 @@ Error PullBuffer::BeginWrite(void *&pBuffer, size_t &iBytesToWrite)
 
 Error PullBuffer::EndWrite(size_t iBytesWritten)
 {
-   int32 iBlock;
-   Error eError;
-
    assert(m_pPullBuffer != NULL);
 
    m_pMutex->Acquire();
@@ -325,9 +324,6 @@ Error PullBuffer::BeginRead(void *&pBuffer, size_t &iBytesNeeded)
 
 Error PullBuffer::EndRead(size_t iBytesUsed)
 {
-   int32 iBlock;
-   Error eError;
-
    assert(m_pPullBuffer != NULL);
 
    m_pMutex->Acquire();

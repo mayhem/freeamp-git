@@ -42,6 +42,9 @@ ____________________________________________________________________________*/
 
 /* project headers */
 #include "localfileinput.h"
+#include "log.h"
+
+LogFile *g_Log;
 
 const int32 iBufferSize = 65536;
 const int32 iOverflowSize = 8192;
@@ -49,8 +52,9 @@ const int32 iTriggerSize = 8192;
 
 extern    "C"
 {
-   PhysicalMediaInput *Initialize()
+   PhysicalMediaInput *Initialize(LogFile *pLog)
    {
+	  g_Log = pLog;
       return new LocalFileInput();
    }
 }

@@ -166,8 +166,6 @@ Error FileBuffer::GetID3v1Tag(unsigned char *pTag)
 
 Error FileBuffer::Run(void)
 {
-    int32 iRet;
-
     if (!m_pBufferThread)
     {
        m_pBufferThread = Thread::CreateThread();

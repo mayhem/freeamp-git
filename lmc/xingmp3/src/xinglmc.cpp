@@ -47,7 +47,7 @@ ____________________________________________________________________________*/
 #include "lmc.h"
 #include "log.h"
 
-static LogFile *g_Log = NULL;
+LogFile *g_Log = NULL;
 
 #define DB printf("%08x: %s:%d\n", pthread_self(), __FILE__, __LINE__);
 
@@ -348,10 +348,9 @@ Error XingLMC::AdvanceBufferToNextFrame()
 Error XingLMC::GetHeadInfo()
 {
    int          iNumBytes, iLoop;
-	unsigned int iForward;
-	bool         bRet;
-	void        *pBuffer;
-	Error        Err;
+   unsigned int iForward;
+   void        *pBuffer;
+   Error        Err;
 
    for(iLoop = 0; iLoop < iMaxDecodeRetries; iLoop++)
    {
@@ -395,10 +394,8 @@ Error XingLMC::GetHeadInfo()
 bool XingLMC::CanDecode()
 {
    Error  Err;
-   int32  dummy, iLoop;
-   void  *pBuffer;
+   int32  dummy;
    bool   bRet = false;
-   size_t iNumBytes;
 
    if (!m_input)
    {
@@ -424,7 +421,6 @@ bool XingLMC::CanDecode()
 
 Error XingLMC::ExtractMediaInfo()
 {
-   size_t          iNumBytes;
    int32           totalFrames = 0;
    int32           bytesPerFrame;
    size_t          end;
@@ -535,10 +531,6 @@ Error XingLMC::ExtractMediaInfo()
 
 Error XingLMC::InitDecoder()
 {
-   void          *pBuffer;
-   int32          bitrate;
-   unsigned int   dummy;
-   size_t         iNumBytes;
    Error          Err;
 
    if (!m_target || !m_input || !m_output)
