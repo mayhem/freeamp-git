@@ -628,7 +628,10 @@ Error HttpInput::Open(void)
         m_pID3Tag = new Id3TagInfo();
         memset(m_pID3Tag, 0, sizeof(Id3TagInfo));
         m_pID3Tag->m_containsInfo = true;
-        sscanf(szFile, "%30[^\r\n]", m_pID3Tag->m_songName);
+		if (szFile)
+            sscanf(szFile, "%30[^\r\n]", m_pID3Tag->m_songName);
+        else
+		    *m_pID3Tag->m_songName = 0;
 
         // Its a regular HTTP download. Let's save the bytes we've
         // read into the pullbuffer.
