@@ -1,0 +1,13 @@
+Welcome!
+
+This wizard will help you begin organizing your music collection and get you started playing your music.
+
+What is 'My Music'?
+
+My Music helps you organize the music you have on your computer. The My Music window is divided into two panes: My Music Collection and Currently Listening To.
+
+My Music Collection provides a convenient, organized view of the music you have on your computer. It might help to think of this pane as a CD rack for your computer.
+
+Currently Listening To displays a list of the songs you have chosen to play. In order to listen to music, all you have to do is add items to the list by dragging them from the My Music Collection pane on the left to the Currently Listening To pane on the right.
+
+For a more detailed explanation of how to use the My Music window, you should access the application's help system through the Help menu.

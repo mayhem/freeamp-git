@@ -1,0 +1,5 @@
+Search Computer For Music
+
+In order to populate the My Music Collection pane <the_BRANDING/> will search your computer for supported music files. The files will not be moved or modified during this process. Their location will be remembered in order to provide you with an organized view of your music collection.
+
+By default <the_BRANDING/> will search all the disk drives on your computer for music. If you would like to limit the scope of the search you may do so by selecting a directory for us to search. If you wish, you may also just restrict the search to your home directory.
