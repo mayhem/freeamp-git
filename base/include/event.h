@@ -147,5 +147,6 @@ class EventQueue {
 #define INFO_MusicCatalogRegenerating 80 // sent by the MC to tell the UIs to ignore it for awhile
 #define INFO_MusicCatalogDoneRegenerating 81 // sent by the MC to tell the UIs to regenerate their database
 #define INFO_VorbisInfo             82 // Used to send vorbis stream info
+#define INFO_FileNotFound           83 // Used to send file not found info
 #endif // _EVENT_H_
 

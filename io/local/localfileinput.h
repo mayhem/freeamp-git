@@ -26,6 +26,7 @@ ____________________________________________________________________________*/
 
 /* system headers */
 #include <stdlib.h>
+#include <string>
 
 /* project headers */
 #include "thread.h"
@@ -72,6 +73,7 @@ class LocalFileInput:public PhysicalMediaInput
    bool            m_bLoop;
    size_t          m_iFileSize;
    Thread        *m_pBufferThread; 
+   string          m_url;
 };
 
 #endif /* _LOCALFILEINPUT_H_ */

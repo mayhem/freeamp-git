@@ -64,6 +64,7 @@ extern HINSTANCE g_hinst;
 #include "player.h"
 #include "help.h"
 #include "properties.h"
+#include "missingfile.h"
 
 void WorkerThreadStart(void* arg);
 

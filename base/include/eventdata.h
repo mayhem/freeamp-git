@@ -959,4 +959,15 @@ class ShowPreferencesEvent:public Event
    virtual ~ ShowPreferencesEvent(){ }
 };
 
+class MissingFileEvent:public Event
+{
+ private:
+   string m_url;
+ public:
+   MissingFileEvent(const string &url)
+   { m_type = INFO_FileNotFound; m_url = url; }
+   virtual ~ MissingFileEvent(){ }
+   const string &URL() const{ return m_url; }
+};
+
 #endif /* _EVENTDATA_H_ */
