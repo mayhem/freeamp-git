@@ -132,6 +132,10 @@ class PlaylistItem {
     Error GetURL(char* buf, uint32* len) { return SetBuffer(buf, m_url.c_str(), len); }
     const string& URL() const { return m_url; }
 
+    Error SetWebURL(const char* webUrl) { m_webUrl = string(webUrl); return kError_NoErr;}
+    Error GetWebURL(char* buf, uint32* len) { return SetBuffer(buf, m_webUrl.c_str(), len); }
+    const string& WebURL() const { return m_webUrl; }
+
     void SetState(PlaylistItemState state) { m_state = state; }
     PlaylistItemState GetState() const { return m_state; }
 
@@ -181,7 +185,7 @@ class PlaylistItem {
 
  private:
     MetaData m_metadata;
-    string m_url;
+    string m_url, m_webUrl;
     PlaylistItemState m_state;
 };
 
