@@ -68,7 +68,8 @@ void button_down(GtkWidget *w, GdkEvent *e, GTKWindow *ui)
     else
     if (e->button.button == 3)
     {
-        ui->BringWindowToFront();
+        //ui->BringWindowToFront();
+        ui->ContextClick(oPos.x, oPos.y, e->button.time);
     }
     else
     if (e->button.button == 4) 
@@ -125,6 +126,53 @@ void leave_notify(GtkWidget *w, GdkEventCrossing *e, GTKWindow *ui)
     ui->m_pMindMeldMutex->Release();
     gdk_threads_enter();
 }
+void mymusic_pop(GTKWindow *p, guint action, GtkWidget *w)
+{
+    string oControl("MyMusic");
+    gdk_threads_leave();
+    p->m_theme->HandleControlMessage(oControl, CM_Pressed);
+    gdk_threads_enter();
+}
+
+void open_pop(GTKWindow *p, guint action, GtkWidget *w)
+{
+    string oControl("Files");
+    gdk_threads_leave();
+    p->m_theme->HandleControlMessage(oControl, CM_Pressed);
+    gdk_threads_enter();
+}
+
+void edit_pop(GTKWindow *p, guint action, GtkWidget *w)
+{
+    string oControl("Title");
+    gdk_threads_leave();
+    p->m_theme->HandleControlMessage(oControl, CM_MouseDoubleClick);
+    gdk_threads_enter();
+}
+
+void suggest_pop(GTKWindow *p, guint action, GtkWidget *w)
+{
+    string oControl("Relatable Playlist");
+    gdk_threads_leave();
+    p->m_theme->HandleControlMessage(oControl, CM_Pressed);
+    gdk_threads_enter();
+}
+
+void bitzi_pop(GTKWindow *p, guint action, GtkWidget *w)
+{
+    string oControl("BitziLookup");
+    gdk_threads_leave();
+    p->m_theme->HandleControlMessage(oControl, CM_Pressed);
+    gdk_threads_enter();
+}
+
+void exit_pop(GTKWindow *p, guint action, GtkWidget *w)
+{
+    string oControl("Quit");
+    gdk_threads_leave();
+    p->m_theme->HandleControlMessage(oControl, CM_Pressed);
+    gdk_threads_enter();
+}
 
 void drop_file(GtkWidget *w, GdkDragContext *context, gint x, gint y,
                GtkSelectionData *data, guint info, guint time, 
@@ -153,6 +201,7 @@ static gint do_timeout(void *p)
 GTKWindow::GTKWindow(Theme *pTheme, string &oName)
           :Window(pTheme, oName)
 {
+    m_theme = pTheme;
     m_pCanvas = new GTKCanvas(this);
     m_pMindMeldMutex = new Mutex();
 
@@ -192,6 +241,24 @@ Error GTKWindow::Run(Pos &oPos)
     GetCanvas()->GetBackgroundRect(oRect);
 
     gdk_threads_enter();
+
+    GtkItemFactoryEntry popup_items[] = {
+     {"/MyMusic ",     NULL,      (GtkItemFactoryCallback)mymusic_pop,  0, 0 },
+     {"/Open",         NULL,      (GtkItemFactoryCallback)open_pop,     0, 0 },
+     {"/sep1",         NULL,      0,                        0, "<Separator>" },
+     {"/Edit Info",    NULL,      (GtkItemFactoryCallback)edit_pop,     0, 0 },
+     {"/Suggest Playlist", NULL,  (GtkItemFactoryCallback)suggest_pop,  0, 0 },
+     {"/Lookup at Bitzi", NULL,   (GtkItemFactoryCallback)bitzi_pop,       0, 0},
+     {"/sep2",         NULL,      0,                        0, "<Separator>" },
+     {"/Exit",         NULL,      (GtkItemFactoryCallback)exit_pop,      0, 0 },
+    };
+
+    int nmenu_items = sizeof(popup_items) / sizeof(popup_items[0]);
+
+    contextPopup = gtk_item_factory_new(GTK_TYPE_MENU, "<context_popup>",
+                                         NULL);
+    gtk_item_factory_create_items(contextPopup, nmenu_items, popup_items,
+                                  (void *)this);
 
     gtk_signal_connect(GTK_OBJECT(mainWindow), "motion_notify_event",
                        GTK_SIGNAL_FUNC(mouse_move), this);
@@ -581,4 +648,9 @@ void GTKWindow::DockCheck(void)
             lastDockPos.y = dock.y;
         }
     } 
+}
+
+void GTKWindow::ContextClick(int x, int y, int t)
+{
+    gtk_item_factory_popup(contextPopup, x, y, 3, t);
 }

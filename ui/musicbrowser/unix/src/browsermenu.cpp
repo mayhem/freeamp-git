@@ -527,7 +527,7 @@ static void relatable_web(GTKMusicBrowser *p, guint action, GtkWidget *w)
 
 static void bitzi_web(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
-    LaunchBrowser("http://bitzi.com/");
+    LaunchBrowser("http://www.bitzi.com/welcome/freeamp/");
 }
 
 static void show_about(GTKMusicBrowser *p, guint action, GtkWidget *w)

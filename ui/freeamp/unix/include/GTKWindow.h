@@ -57,6 +57,7 @@ class GTKWindow : public Window
      virtual Error GetDesktopSize(int32 &iX, int32 &iY);
      virtual void  BringWindowToFront(void);
      virtual void  PanelStateChanged(void);
+     virtual void  ContextClick(int x, int y, int t);
 
      GtkWidget *GetWindow(void) { return mainWindow; }
 
@@ -71,6 +72,7 @@ class GTKWindow : public Window
      void DockCheck(void);
 
      Mutex *m_pMindMeldMutex;
+     Theme *m_theme;
  
    protected:
      Pos m_oWindowPos;
@@ -79,6 +81,7 @@ class GTKWindow : public Window
      void GTKEventService(void);
 
      GtkWidget *mainWindow;
+     GtkItemFactory *contextPopup;
      int gtkTimer;
      bool quitLoop;
      bool initialized;

@@ -2016,8 +2016,10 @@ void FreeAmpTheme::UpdateMetaData(const PlaylistItem *pItem)
     else
         m_oComment = "";
 
+    int dummy;
     if (strncmp(pItem->URL().c_str(), "http://", 7) == 0 ||
-        strncmp(pItem->URL().c_str(), "rtp://", 7) == 0)
+        strncmp(pItem->URL().c_str(), "rtp://", 7) == 0 ||
+        sscanf(pItem->URL().c_str(), "file://%d.cda", &dummy) == 1)
     {
         bEnable = false;
         m_oFileName.erase();
