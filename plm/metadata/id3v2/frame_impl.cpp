@@ -39,6 +39,8 @@ ID3_FrameImpl::ID3_FrameImpl(ID3_FrameID id)
     _encryption_id('\0'),
     _grouping_id('\0')
 {
+  this->_InitFieldBits();
+  this->_InitFields();
   this->SetSpec(ID3V2_LATEST);
   this->SetID(id);
 }
@@ -51,8 +53,8 @@ ID3_FrameImpl::ID3_FrameImpl(const ID3_FrameHeader &hdr)
     _encryption_id('\0'),
     _grouping_id('\0')
 {
-  this->_InitFields();
   this->_InitFieldBits();
+  this->_InitFields();
 }
 
 ID3_FrameImpl::ID3_FrameImpl(const ID3_Frame& frame)
@@ -62,8 +64,12 @@ ID3_FrameImpl::ID3_FrameImpl(const ID3_Frame& frame)
     _encryption_id('\0'),
     _grouping_id('\0')
 {
-  this->_InitFieldBits();
   *this = frame;
+  if(_field_bitset == NULL)
+  {
+ this->_InitFieldBits();
+    this->_InitFields();
+  }
 }
 
 ID3_FrameImpl::~ID3_FrameImpl()
@@ -95,7 +101,10 @@ bool ID3_FrameImpl::_ClearFields()
 
   for (index_t i = 0; i < lWordsForFields; i++)
   {
-    _field_bitset[i] = 0;
+    if(_field_bitset)
+ {
+      _field_bitset[i] = 0;
+ }
   }
 
   _changed = true;
