@@ -57,6 +57,9 @@ class SimpleUI : public UserInterface {
 
     Semaphore*      m_uiSemaphore;
 
+    bool            m_scrolling;
+
+
  protected:
       static void UIThreadFunc(void *);
 

@@ -77,5 +77,7 @@ const char* Url(PMIRef ref)
 
 void Cleanup(PMIRef ref)
 {
-    delete ref->ref;
+    PhysicalMediaInput* pmi = (PhysicalMediaInput*)ref->ref;
+
+    delete pmi;
 }

@@ -78,6 +78,8 @@ SimpleUI::
 SimpleUI():
 UserInterface()
 {
+    m_scrolling = false;
+
     m_uiSemaphore = new Semaphore();
 
     m_uiThread = Thread::CreateThread();
@@ -286,10 +288,14 @@ AcceptEvent(Event* event)
 			        SetWindowText(m_hwndCurrent, timeString);
                 }
 
-                SendMessage(m_hwndSlider,
-						    TBM_SETPOS,
-						    (WPARAM)TRUE,
-						    (LPARAM)pmtp->m_frame);
+                if(!m_scrolling)
+                {
+
+                    SendMessage(m_hwndSlider,
+						        TBM_SETPOS,
+						        (WPARAM)TRUE,
+						        (LPARAM)pmtp->m_frame);
+                }
 
 	            break; 
             }
@@ -302,6 +308,7 @@ AcceptEvent(Event* event)
 
             case INFO_PlayListDonePlay:
             {
+                
                 break;
             }
 
@@ -410,7 +417,6 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 						            LPARAM lParam )
 {
 	BOOL result = FALSE;
-	static bool scrolling = false;
     static SimpleUI* m_ui = NULL;
 
 	switch(msg)
@@ -677,13 +683,13 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 
 					//player->SeekToPosition(position);
 		  	
-					scrolling = false;
+					m_ui->m_scrolling = false;
 					break;
 				}
 
 				case TB_THUMBTRACK:
 				{
-					scrolling = true;
+					m_ui->m_scrolling = true;
 					break;
 				}
 			}

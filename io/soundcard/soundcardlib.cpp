@@ -87,5 +87,7 @@ void Clear(PMORef ref)
 
 void Cleanup(PMORef ref)
 {
-    delete (PhysicalMediaOutput*)ref->ref;
+    PhysicalMediaOutput* pmo = (PhysicalMediaOutput*)ref->ref;
+
+    delete pmo;
 }
