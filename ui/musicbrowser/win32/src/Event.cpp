@@ -539,6 +539,23 @@ void MusicBrowserUI::ToggleVisEvent(void)
 
 void MusicBrowserUI::AddTrackEvent(void)
 {
+    vector<string> urls;
+
+    GetSelectedMusicTreeItems(&urls);    
+
+    // we know that we are gonna be adding a 
+    // bunch of items so let windows know.
+    // it will make the adds more efficient
+    uint32 newSize = ListView_GetItemCount(m_hPlaylistView);
+    newSize += urls.size();
+    ListView_SetItemCount(m_hPlaylistView, newSize);
+
+    m_oPlm->AddItems(urls);
+    
+}
+
+/*
+{
     vector<string>           oFileList;
     vector<string>::iterator i;
     Error                   eRet;
@@ -552,6 +569,7 @@ void MusicBrowserUI::AddTrackEvent(void)
            eRet = m_oPlm->AddItem((*i).c_str());
     }
 }
+*/
 
 void MusicBrowserUI::EmptyDBCheck(void)
 {
