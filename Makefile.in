@@ -62,3 +62,9 @@ install-freeamp: freeamp
 	$(mkinstalldirs) $(DESTDIR)$(bindir)
 	$(INSTALL_PROGRAM) freeamp $(DESTDIR)$(bindir)
 
+depend:
+	makedepend -- $(DEFS) $(INCLUDES) $(CFLAGS) -- `echo $(FREEAMPOBJ) | sed -e 's,\.o,.cpp,g'`
+	+$(PIMAKE) depend
+
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+
