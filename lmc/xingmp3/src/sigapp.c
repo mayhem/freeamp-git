@@ -184,7 +184,6 @@ int ff_decode(char *filename, char ascii_sig[37],
 
 /*---- init decoder -------*/
    mpeg_init(&m);
-   mpeg_eq_init(&m);
    if (!audio_decode_init(&m, &head, framebytes,
                           reduction_code, 0, convert_code, freq_limit))
    {

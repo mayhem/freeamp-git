@@ -117,6 +117,7 @@ XingLMC::XingLMC(FAContext *context) :
    m_decodeInfo.mono = false;
    m_decodeInfo.eightbit = false;
    m_decodeInfo.sendInfo = true;
+   mpeg_init(&m_sMPEG);
 }
 
 XingLMC::~XingLMC()
@@ -619,8 +620,6 @@ Error XingLMC::InitDecoder()
 //   if (m_decodeInfo.eightbit)
 //       iConvCode += 8;
 
-   mpeg_init(&m_sMPEG);
-   mpeg_eq_init(&m_sMPEG);
    if (audio_decode_init(&m_sMPEG, &m_sMpegHead, m_frameBytes,
                    iRedCode /* reduction code */, 
                    0 /* transform code (ignored) */ ,

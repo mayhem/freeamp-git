@@ -383,8 +383,6 @@ int ff_decode(char *filename, char *fileout,
 
 
    mpeg_init(&m);
-   mpeg_eq_init(&m);
-   //memset(&m, 0, sizeof(MPEG));
    in_bytes = out_bytes = 0;
 /*-----------------------*/
    handout = -1;
