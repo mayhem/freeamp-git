@@ -85,6 +85,8 @@ Error TitleStreamServer::Init(int &iPort)
    struct sockaddr_in sin;
    socklen_t sinlen = sizeof(struct sockaddr_in);
    int       port, startport = 10000;
+   char      szSourceAddr[100];
+   bool      bUseAltNIC;
 
    if ((m_hHandle = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
    {
@@ -94,7 +96,21 @@ Error TitleStreamServer::Init(int &iPort)
    {
       memset(&sin, 0, sinlen);
       sin.sin_family = AF_INET;
-      sin.sin_addr.s_addr = htonl(INADDR_ANY);
+
+      m_pContext->prefs->GetPrefBoolean(kUseNIC, &bUseAltNIC);
+      if (bUseAltNIC)
+      {
+          uint32 len = 100;
+  
+          m_pContext->prefs->GetPrefString(kNICAddress, szSourceAddr, &len);
+          if ( len == 0 )
+              m_pContext->log->Error("UseAlternateNIC is true but AlternateNIC "
+                                     "has no value ?!");
+  
+          sin.sin_addr.s_addr = inet_addr(szSourceAddr);
+      }
+      else
+          sin.sin_addr.s_addr = htonl(INADDR_ANY);
 
       for (port = startport; port < 32767; port++)
       {
@@ -120,6 +136,7 @@ Error TitleStreamServer::MulticastInit(char *szAddr, int iPort)
     struct ip_mreq sMreq;
     int    iReuse=0;
     char   szSourceAddr[100];
+    bool   bUseAltNIC = false;
 
     m_bUseMulticast = true;
 
@@ -135,7 +152,21 @@ Error TitleStreamServer::MulticastInit(char *szAddr, int iPort)
     iReuse = 1;
     m_pSin->sin_family = AF_INET;
     m_pSin->sin_port = htons(iPort);
-    m_pSin->sin_addr.s_addr = inet_addr(szAddr);
+
+    m_pContext->prefs->GetPrefBoolean(kUseNIC, &bUseAltNIC);
+    if (bUseAltNIC)
+    {
+        uint32 len = 100;
+
+        m_pContext->prefs->GetPrefString(kNICAddress, szSourceAddr, &len);
+        if ( len == 0 )
+            m_pContext->log->Error("UseAlternateNIC is true but AlternateNIC "
+                                   "has no value ?!");
+
+        m_pSin->sin_addr.s_addr = inet_addr(szSourceAddr);
+    }
+    else
+        m_pSin->sin_addr.s_addr = htonl(INADDR_ANY); 
 
     iRet = setsockopt(m_hHandle, SOL_SOCKET, SO_REUSEADDR, 
                       (const char *)&iReuse, sizeof(int));

@@ -294,7 +294,7 @@ Error GetHostByName(char *szHostName, struct hostent *pResult)
         // That didn't work.  On some stacks a numeric IP address
         // will not parse with gethostbyname.  Try to convert it as a
         // numeric address before giving up.
-        if((IP_Adr = inet_addr(szHostName)) == INADDR_NONE) 
+        if((IP_Adr = inet_addr(szHostName)) < 0) 
             return kError_NoDataAvail;
 
         TempHostent.h_length = sizeof(uint32_t);
@@ -315,13 +315,13 @@ Error HttpInput::Open(void)
     char               *pInitialBuffer, szStreamName[255], szSourceAddr[100];
     unsigned            iPort;
     int                 iRet, iRead = 0, iConnect;
-    struct sockaddr_in  sAddr;
+    struct sockaddr_in  sAddr, sSourceAddr;
     struct hostent      sHost;
     Error               eRet;
     void               *pPtr;
     fd_set              sSet; 
     struct timeval      sTv;
-    bool                bUseTitleStreaming;
+    bool                bUseTitleStreaming = true, bUseAltNIC = false;
 
     szStreamName[0] = 0;
     if (!m_bUseProxy)
@@ -374,6 +374,31 @@ Error HttpInput::Open(void)
           LogError("Cannot create socket");
           return (Error)httpError_CannotOpenSocket;
      }    
+
+     m_pContext->prefs->GetPrefBoolean(kUseNIC, &bUseAltNIC);
+     if (bUseAltNIC)
+     {
+         uint32 len = 100;
+
+         m_pContext->prefs->GetPrefString(kNICAddress, szSourceAddr, &len);
+         if ( len == 0 )
+             m_pContext->log->Error("UseAlternateNIC is true but AlternateNIC "
+                                    "has no value ?!");
+
+         sSourceAddr.sin_family= AF_INET;
+         sSourceAddr.sin_port = 0; 
+         sSourceAddr.sin_addr.s_addr = inet_addr(szSourceAddr);
+         iRet = bind(m_hHandle, (struct sockaddr *)&sSourceAddr, 
+                     sizeof(struct sockaddr_in));
+         if (iRet < 0)
+         {
+             close(m_hHandle);
+             m_hHandle= -1;
+             perror("Error");
+             ReportError("Cannot bind the socket.");
+             return kError_CannotBind;
+         }  
+     }   
 
 #ifndef WIN32
     fcntl(m_hHandle, F_SETFL, fcntl(m_hHandle, F_GETFL) | O_NONBLOCK);

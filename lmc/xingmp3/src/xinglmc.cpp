@@ -717,6 +717,7 @@ Error XingLMC::BeginRead(void *&pBuffer, unsigned int iBytesNeeded,
 {
    time_t iNow;
    int32  iInPercent, iOutPercent;
+   unsigned iBufferUpBytes;
 
    if (m_pPmi && m_pInputBuffer && (!m_pPmi->IsStreaming() || m_iBitRate <= 0))
    {
@@ -743,19 +744,16 @@ Error XingLMC::BeginRead(void *&pBuffer, unsigned int iBytesNeeded,
        m_pInputBuffer->DiscardBytes();
    }
 
-   if (bBufferUp && iInPercent < 50 && iOutPercent < 5)
-   {
-       unsigned iBufferUpBytes;
+   iBufferUpBytes = (m_iBitRate * m_iBufferUpInterval * 1000) / 8192;
+   if (iBufferUpBytes > (unsigned)m_iBufferSize)
+       iBufferUpBytes = m_iBufferSize / 2;
 
+   if (bBufferUp && iOutPercent < 1 &&
+       m_pInputBuffer->GetNumBytesInBuffer() < iBufferUpBytes / 2)
+   {
        assert(m_iBufferSize > 0);
        assert(m_iBufferUpInterval > 0);
        assert(m_iBitRate > 0);
-
-       iBufferUpBytes = (m_iBitRate * m_iBufferUpInterval * 1000) / 8192;
-       if (iBufferUpBytes > (unsigned)m_iBufferSize)
-          iBufferUpBytes = (m_iBufferSize * 10) / 8;
-       //printf("iBufferUpBytes: %d Interval: %d bitrate: %d\n",
-       //   iBufferUpBytes, m_iBufferUpInterval, m_iBitRate);
 
        printf("Buffering up...           \n");
        for(; !m_bExit;)
@@ -767,7 +765,7 @@ Error XingLMC::BeginRead(void *&pBuffer, unsigned int iBytesNeeded,
            fflush(stdout);
            
            if (m_pInputBuffer->GetNumBytesInBuffer() >= iBufferUpBytes)
-              break;
+               break;
            if (m_pInputBuffer->GetBufferPercentage() > 90)
            {
                printf("iBufferUpBytes: %d Interval: %d bitrate: %d\n",

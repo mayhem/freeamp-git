@@ -186,7 +186,7 @@ Error ObsInput::Open(void)
     struct ip_mreq sMreq;
     int    iReuse=0;
     char   szAddr[100], szSourceAddr[100];
-    bool   bUseTitleStreaming;
+    bool   bUseTitleStreaming = false, bUseAltNIC = false;;
 
     iRet = sscanf(m_path, "rtp://%[^:]:%d", szAddr, &iPort);
     if (iRet < 2)
@@ -208,7 +208,21 @@ Error ObsInput::Open(void)
     iReuse = 1;
     m_pSin->sin_family = AF_INET;
     m_pSin->sin_port = htons(iPort);
-    m_pSin->sin_addr.s_addr = htonl(INADDR_ANY);
+
+    m_pContext->prefs->GetPrefBoolean(kUseNIC, &bUseAltNIC);
+    if (bUseAltNIC)
+    {
+        uint32 len = 100;
+
+        m_pContext->prefs->GetPrefString(kNICAddress, szSourceAddr, &len);
+        if ( len == 0 )
+            m_pContext->log->Error("UseAlternateNIC is true but AlternateNIC "
+                                   "has no value ?!");
+
+        m_pSin->sin_addr.s_addr = inet_addr(szSourceAddr);
+    }  
+    else
+        m_pSin->sin_addr.s_addr = htonl(INADDR_ANY);
 
     iRet = setsockopt(m_hHandle, SOL_SOCKET, SO_REUSEADDR, 
                       (const char *)&iReuse, sizeof(int));
