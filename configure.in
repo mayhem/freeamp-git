@@ -1,0 +1,94 @@
+dnl FreeAmp - The Free MP3 Player
+dnl Portions copyright (C) 1998 GoodNoise
+dnl
+dnl This program is free software; you can redistribute it and/or modify
+dnl it under the terms of the GNU General Public License as published by
+dnl the Free Software Foundation; either version 2 of the License, or
+dnl (at your option) any later version.
+dnl
+dnl This program is distributed in the hope that it will be useful,
+dnl but WITHOUT ANY WARRANTY; without even the implied warranty of
+dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+dnl GNU General Public License for more details.
+dnl
+dnl You should have received a copy of the GNU General Public License
+dnl along with this program; if not, write to the Free Software
+dnl Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+dnl
+
+dnl Process this file with your mom to produce a configure script
+AC_INIT(base/src/player.cpp)
+AC_CONFIG_AUX_DIR(config)
+AC_CANONICAL_SYSTEM
+AM_INIT_AUTOMAKE(freeamp, 0.2)
+AM_CONFIG_HEADER(config/config.h)
+
+AC_PROG_MAKE_SET
+
+dnl Checks for programs.
+AC_PROG_CC
+AC_PROG_CXX
+AC_ISC_POSIX
+AC_PROG_RANLIB
+
+dnl Checks for libraries.
+
+dnl Checks for header files.
+AC_STDC_HEADERS
+AC_HAVE_HEADERS(unistd.h io.h pthread.h)
+
+dnl Checks for library functions.
+
+dnl Check for some more stuff
+
+
+AC_SUBST(target_os)
+
+if test "$target_os" = "windowsnt"; then
+   cmdline="false"
+else
+   cmdline="true"
+fi
+
+
+dnl *****
+dnl Check for LinuxThreads or MIT pthreads
+dnl *****
+
+AC_MSG_CHECKING(for MIT PThreads)
+AC_EGREP_HEADER(PTHREAD_MUTEXTYPE_FAST, pthread.h,AC_DEFINE(HAVE_MITPTHREADS) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+
+AC_MSG_CHECKING(for Base LinuxThreads)
+AC_EGREP_HEADER(PTHREAD_MUTEX_FAST_NP,pthread.h,AC_DEFINE(HAVE_BASELINUXTHREADS) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+
+AC_MSG_CHECKING(for LinuxThreads w/ErrorCheck Mutex)
+AC_EGREP_HEADER(PTHREAD_MUTEX_ERRORCHECK_NP,pthread.h,AC_DEFINE(HAVE_ENHLINUXTHREADS) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+
+dnl *****
+
+
+AC_ARG_ENABLE(cmdline,
+	      [  --enable-cmdline     Build command line freeamp],
+	      [case "${enableval}" in
+	        yes) cmdline="true" ;;
+		no)  cmdline="false" ;;
+		*) AC_MSG_ERROR(bad value ${enableval} for --enable-cmdline) ;;
+	      esac])
+AM_CONDITIONAL(AM_ENABLE_CMDLINE, test "$cmdline" = "true")
+
+AM_CONDITIONAL(AM_HAVE_WIN32, test "$target_os" = "windowsnt")
+AM_CONDITIONAL(AM_HAVE_LINUX, test "$target_os" = "linux")
+AC_OUTPUT(Makefile base/Makefile base/src/Makefile io/Makefile
+          base/Makefile base/unix/Makefile
+	  ui/Makefile base/unix/linux/Makefile base/unix/linux/src/Makefile
+	  io/local/Makefile ui/cmdline/Makefile lmc/Makefile lmc/xingmp3/Makefile
+)
+
+
+
+
+
+
+
+
+

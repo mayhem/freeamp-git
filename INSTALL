@@ -1,0 +1,44 @@
+The installation of FreeAmp is fairly straight forward.
+
+
+Linux:
+	Under Linux you must first build the binary:
+
+	./configure
+	make ; make
+
+	unfortunately, there is an issue with the build that is
+	currently open which makes you have to type make twice.  If
+	you are a Make and Autoconf wizard, we'd appreciate a fix.
+	Otherwise, please check out the Tar-O-Matic soon.
+
+	then install it (by default, /usr/local/bin  which can be 
+	changed by providing the --bindir switch on the configure command 
+	line.  do a ./configure --help for more info) :
+
+	make install
+
+	you may also wish to enable mpg123 compatability mode by
+	invoking freeamp as 'mpg123'  (i.e. do a ln -s freeamp mpg123
+	to make a symbolic link, then do a ./mpg123)  This makes it
+	useful as a decoder for such gui mpg123 frontends as GQmpeg.
+
+
+
+Windows:
+	In addition to the makefiles provided for the unix platforms
+	project files are located in the base\win32\prj directory. As of
+	the first release only MS Visual C++ 5.0 project files are 
+	provided. Feel free to add other development environments
+	such as Borland. 
+
+	Under MS VC++ you should only have to open the project file
+	and build it. The output will go to either the win32\prj\gui 
+	or win32\prj\console directory, depending on which project 
+	you are using. There are no special installation instructions.
+
+
+
+
+
+

@@ -1,0 +1,27 @@
+FreeAmp is an Open Source effort to build the best digital audio
+player available.  In the interest of supporting the free software
+community, while at the same time fostering the growth of the online
+delivery of music, GoodNoise Corporation, The Internet Record Company,
+is funding both the freeamp.org domain and the efforts of three
+developers: Mark B. Elrod, Brett Thomas, and Jason Woodward.
+
+FreeAmp is being released under the GPL (www.gnu.org).  As is provided
+by the GPL, all our (GoodNoise's) and your efforts toward FreeAmp will
+be released back to the community at large.
+
+The current development and release versions of FreeAmp can be found
+at http://www.freeamp.org.
+
+To join a low volume mailing list which will announce updates to the
+release software, send mail to freeamp-announce-request@freeamp.org
+with the body:  subscribe
+
+To join a mailing list actively discussing the ongoing development of
+FreeAmp, send mail to freeamp-dev-request@freeamp.org with the body:
+subscribe
+
+To make feature suggestions, send mail to freeamp-features@freeamp.org, or,
+better yet, if you are able, add the feature yourself and send us the
+updates!
+
+For information on building FreeAmp, check out INSTALL
