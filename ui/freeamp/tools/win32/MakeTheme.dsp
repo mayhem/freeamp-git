@@ -58,9 +58,9 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir\
-                                                  ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
-   ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
-   ..\..\..\..\base\win32\prj\tools
+                                                   ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
+    ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
+    ..\..\..\..\base\win32\prj\tools
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 Debug"
@@ -89,9 +89,9 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir\
-                                                  ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
-   ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
-   ..\..\..\..\base\win32\prj\tools
+                                                   ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
+    ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
+    ..\..\..\..\base\win32\prj\tools
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Debug"
@@ -121,9 +121,9 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir\
-                                                  ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
-   ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
-   ..\..\..\..\base\win32\prj\tools
+                                                   ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
+    ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
+    ..\..\..\..\base\win32\prj\tools
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Release"
@@ -153,9 +153,9 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir\
-                                                  ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
-   ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
-   ..\..\..\..\base\win32\prj\tools
+                                                   ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
+    ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
+    ..\..\..\..\base\win32\prj\tools
 # End Special Build Tool
 
 !ENDIF 
@@ -173,6 +173,53 @@ SOURCE=..\..\..\..\lib\zlib\src\adler32.c
 # Begin Source File
 
 SOURCE=..\..\..\..\lib\zlib\src\compress.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\config\config.win32
+
+!IF  "$(CFG)" == "MakeTheme - Win32 Release"
+
+# Begin Custom Build
+InputPath=..\..\..\..\config\config.win32
+
+"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "MakeTheme - Win32 Debug"
+
+# Begin Custom Build
+InputPath=..\..\..\..\config\config.win32
+
+"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Debug"
+
+# Begin Custom Build
+InputPath=..\..\..\..\config\config.win32
+
+"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Release"
+
+# Begin Custom Build
+InputPath=..\..\..\..\config\config.win32
+
+"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
+
+# End Custom Build
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
