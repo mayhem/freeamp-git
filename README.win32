@@ -8,7 +8,9 @@
 2) Download and install NASM (http://www.web-sites.co.uk/nasm/).
 
 3) Download and install the Win32 port of the SGI stl from:
-   http://www.sirius.com/~ouchida/
+   http://www.freeamp.org/~robert/stl.html
+
+   (This page is a mirror of the original page, which no longer exists)
 
 4) Run Developer Studio and open the FreeAmp workspace located at:
    freeamp\base\win32\prj\freeamp.dsw
