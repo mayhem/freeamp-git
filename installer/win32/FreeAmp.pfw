@@ -15,13 +15,13 @@ Description=
 Comments=
 Notice=
 Version=2.0
-OutputSpec=..\FreeAmpSetup_2_0_0.exe
+OutputSpec=..\FreeAmpSetup_2_0_beta4.exe
 GUIDs=0
 Type=2
 Compress=1
 Sign=0
 Transfer=0
-Files=40
+Files=45
 
 [Engine]
 Setup=disk1\SETUP.EXE
@@ -174,126 +174,156 @@ Flags=1
 Disk=0
 
 [File 20]
+Name=MakeTheme.exe
+Path=Media\32bit\Disk Images\disk1\
+Flags=65537
+Disk=0
+
+[File 21]
 Name=misc.mdf
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
-[File 21]
+[File 22]
 Name=msvcp50.dll
 Path=Media\32bit\Disk Images\disk1\
 Flags=131089
 Disk=0
 
-[File 22]
+[File 23]
 Name=musicbrowser.ui
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
-[File 23]
+[File 24]
 Name=obsinput.pmi
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
-[File 24]
+[File 25]
 Name=os.dat
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
-[File 25]
-Name=pmp300.ppp
-Path=Media\32bit\Disk Images\disk1\
-Flags=1
-Disk=0
-
 [File 26]
-Name=portio.sys
+Name=pls.plf
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
 [File 27]
-Name=ReadMe.txt
+Name=pmp300.ppp
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
 [File 28]
-Name=roboex32.dll
+Name=portio.sys
 Path=Media\32bit\Disk Images\disk1\
-Flags=131089
+Flags=1
 Disk=0
 
 [File 29]
-Name=SETUP.EXE
+Name=ReadMe.txt
 Path=Media\32bit\Disk Images\disk1\
-Flags=589825
+Flags=1
 Disk=0
 
 [File 30]
-Name=SETUP.INI
+Name=rmp.dlf
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
 [File 31]
-Name=setup.ins
+Name=roboex32.dll
 Path=Media\32bit\Disk Images\disk1\
-Flags=1
+Flags=131089
 Disk=0
 
 [File 32]
-Name=setup.lid
+Name=SETUP.EXE
 Path=Media\32bit\Disk Images\disk1\
-Flags=1
+Flags=589825
 Disk=0
 
 [File 33]
-Name=soundcard.pmo
+Name=SETUP.INI
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
 [File 34]
-Name=update.exe
+Name=setup.ins
 Path=Media\32bit\Disk Images\disk1\
-Flags=65537
+Flags=1
 Disk=0
 
 [File 35]
-Name=xing.lmc
+Name=setup.lid
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
 [File 36]
+Name=soundcard.pmo
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 37]
+Name=ThemeHowTo.txt
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 38]
+Name=toolbar.ui
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 39]
+Name=update.exe
+Path=Media\32bit\Disk Images\disk1\
+Flags=65537
+Disk=0
+
+[File 40]
+Name=xing.lmc
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 41]
 Name=_INST32I.EX_
 Path=Media\32bit\Disk Images\disk1\
 Flags=524289
 Disk=0
 
-[File 37]
+[File 42]
 Name=_ISDEL.EXE
 Path=Media\32bit\Disk Images\disk1\
 Flags=589825
 Disk=0
 
-[File 38]
+[File 43]
 Name=_SETUP.DLL
 Path=Media\32bit\Disk Images\disk1\
 Flags=655377
 Disk=0
 
-[File 39]
+[File 44]
 Name=_sys1.cab
 Path=Media\32bit\Disk Images\disk1\
 Flags=2097153
 Disk=0
 
-[File 40]
+[File 45]
 Name=_user1.cab
 Path=Media\32bit\Disk Images\disk1\
 Flags=2097153
