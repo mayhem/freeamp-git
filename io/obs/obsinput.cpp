@@ -209,12 +209,12 @@ Error ObsInput::Open(void)
     m_pSin->sin_family = AF_INET;
     m_pSin->sin_port = htons(iPort);
 
-    m_pContext->prefs->GetPrefBoolean(kUseNIC, &bUseAltNIC);
+    m_pContext->prefs->GetPrefBoolean(kUseAlternateNICPref, &bUseAltNIC);
     if (bUseAltNIC)
     {
         uint32 len = 100;
 
-        m_pContext->prefs->GetPrefString(kNICAddress, szSourceAddr, &len);
+        m_pContext->prefs->GetPrefString(kAlternateNICAddressPref, szSourceAddr, &len);
         if ( len == 0 )
             m_pContext->log->Error("UseAlternateNIC is true but AlternateNIC "
                                    "has no value ?!");
@@ -256,7 +256,7 @@ Error ObsInput::Open(void)
        return (Error)obsError_CannotSetSocketOpts;
     }
 
-    m_pContext->prefs->GetPrefBoolean(kUseTitleStreaming, &bUseTitleStreaming);
+    m_pContext->prefs->GetPrefBoolean(kUseTitleStreamingPref, &bUseTitleStreaming);
     if (bUseTitleStreaming)
     {
         Error eRet;

@@ -56,9 +56,9 @@ extern const char* kSaveStreamsDirPref;
 extern const char* kUseProxyPref;
 extern const char* kProxyHostPref;
 extern const char* kPreBufferPref;
-extern const char* kUseNIC;
-extern const char* kNICAddress;
-extern const char* kUseTitleStreaming;  
+extern const char* kUseAlternateNICPref;
+extern const char* kAlternateNICAddressPref;
+extern const char* kUseTitleStreamingPref;  
 
 class LibDirFindHandle;
 
@@ -168,6 +168,12 @@ class Preferences {
 
     Error GetPrebufferLength(int32* value);
     Error SetPrebufferLength(int32 value);
+
+    Error GetUseAlternateNIC(bool* value);
+    Error SetUseAlternateNIC(bool value);
+
+    Error GetAlternateNICAddress(char* address, uint32* len);
+    Error SetAlternateNICAddress(char* address);
 
 };
 

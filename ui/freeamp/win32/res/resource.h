@@ -84,6 +84,7 @@
 #define IDD_PREF3                       221
 #define IDD_PREF2                       223
 #define IDD_PREF4                       224
+#define IDD_PREF5                       225
 #define IDC_SAVE_RIO                    1002
 #define IDC_UI                          1005
 #define IDC_PMO                         1006
@@ -110,7 +111,14 @@
 #define IDC_PROXYADDRESS                1024
 #define IDC_COLON_TEXT                  1025
 #define IDC_PREBUFFER                   1026
+#define IDC_USETHISIP                   1026
+#define IDC_IPADDRESS                   1027
+#define IDC_IPADDRESS1                  1027
+#define IDC_IPADDRESS_TEXT              1028
 #define IDC_OPEN_URL                    1029
+#define IDC_IPADDRESS2                  1032
+#define IDC_IPADDRESS3                  1033
+#define IDC_IPADDRESS4                  1034
 #define IDC_ITEM                        40001
 #define IDC_ABOUT                       40002
 #define IDC_OPEN                        40003
@@ -132,7 +140,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        195
 #define _APS_NEXT_COMMAND_VALUE         40013
-#define _APS_NEXT_CONTROL_VALUE         1027
+#define _APS_NEXT_CONTROL_VALUE         1030
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

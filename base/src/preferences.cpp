@@ -49,9 +49,9 @@ const char* kSaveStreamsDirPref = "SaveStreamsDirectory";
 const char* kUseProxyPref = "UseProxy";
 const char* kProxyHostPref = "ProxyHost";  
 const char* kPreBufferPref = "PreBuffer";  
-const char* kUseNIC = "UseAlternateNIC";  
-const char* kNICAddress = "AlternateNIC";  
-const char* kUseTitleStreaming = "UseTitleStreaming";  
+const char* kUseAlternateNICPref = "UseAlternateNIC";  
+const char* kAlternateNICAddressPref = "AlternateNICAddress";  
+const char* kUseTitleStreamingPref = "UseTitleStreaming";  
 
 //logging
 const char* kUseDebugLogPref = "UseDebugLog";
@@ -136,16 +136,16 @@ SetDefaults()
         (unsigned int *)&dummyInt) == kError_NoPrefValue)
         SetPrefString(kProxyHostPref, kDefaultProxyHost);
 
-    if (GetPrefBoolean(kUseNIC, &dummyBool) == kError_NoPrefValue)
-        SetPrefBoolean(kUseNIC, kDefaultUseNIC);
+    if (GetPrefBoolean(kUseAlternateNICPref, &dummyBool) == kError_NoPrefValue)
+        SetPrefBoolean(kUseAlternateNICPref, kDefaultUseNIC);
 
     dummyInt = 255;
-    if (GetPrefString(kNICAddress, dummyString, 
+    if (GetPrefString(kAlternateNICAddressPref, dummyString, 
         (unsigned int *)&dummyInt) == kError_NoPrefValue)
-        SetPrefString(kNICAddress, kDefaultNICAddress);
+        SetPrefString(kAlternateNICAddressPref, kDefaultNICAddress);
 
-    if (GetPrefBoolean(kUseTitleStreaming, &dummyBool) == kError_NoPrefValue)
-        SetPrefBoolean(kUseTitleStreaming, kDefaultUseTitleStreaming);
+    if (GetPrefBoolean(kUseTitleStreamingPref, &dummyBool) == kError_NoPrefValue)
+        SetPrefBoolean(kUseTitleStreamingPref, kDefaultUseTitleStreaming);
 
     return kError_NoErr;
 }
@@ -591,6 +591,33 @@ SetPrebufferLength(int32 value)
     return SetPrefInt32(kPreBufferPref, value);
 }
 
+Error
+Preferences::
+GetUseAlternateNIC(bool* value)
+{
+    return GetPrefBoolean(kUseAlternateNICPref, value);
+}
+
+Error
+Preferences::
+SetUseAlternateNIC(bool value)
+{
+    return SetPrefBoolean(kUseAlternateNICPref, value);
+}
+
+Error
+Preferences::
+GetAlternateNICAddress(char* address, uint32* len)
+{
+    return GetPrefString(kAlternateNICAddressPref, address, len);
+}
+
+Error
+Preferences::
+SetAlternateNICAddress(char* address)
+{
+    return SetPrefString(kAlternateNICAddressPref, address);
+}
 
 LibDirFindHandle *
 Preferences::

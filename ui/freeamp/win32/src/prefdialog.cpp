@@ -58,6 +58,8 @@ typedef struct PrefsStruct {
     char saveStreamsDirectory[MAX_PATH + 1];
     bool useProxyServer;
     char proxyServer[256]; // is there a domain name length limit???
+    bool useAlternateIP;
+    char alternateIP[16];
     
     // page 3
     bool enableLogging;
@@ -73,6 +75,7 @@ typedef struct PrefsStruct {
         memset(defaultPMO, 0x00, sizeof(defaultPMO));
         memset(saveStreamsDirectory, 0x00, sizeof(saveStreamsDirectory));
         memset(proxyServer, 0x00, sizeof(proxyServer));
+        memset(alternateIP, 0x00, sizeof(alternateIP));
     }
 
 }PrefsStruct;
@@ -105,6 +108,9 @@ GetPrefsValues(Preferences* prefs,
     prefs->GetUseProxyServer(&values->useProxyServer);
     size = MAX_PATH;
     prefs->GetSaveStreamsDirectory(values->saveStreamsDirectory, &size);
+    size = 16;
+    prefs->GetAlternateNICAddress(values->alternateIP, &size);
+    prefs->GetUseAlternateNIC(&values->useAlternateIP);
 
     prefs->GetUseDebugLog(&values->enableLogging);
     prefs->GetLogMain(&values->logMain);
@@ -112,12 +118,11 @@ GetPrefsValues(Preferences* prefs,
     prefs->GetLogInput(&values->logInput);
     prefs->GetLogOutput(&values->logOutput);
     prefs->GetLogPerformance(&values->logPerformance);
-
 }
 
 static 
 void 
-SavePrefsValues( Preferences* prefs, 
+SavePrefsValues(Preferences* prefs, 
                 PrefsStruct* values)
 {
     prefs->SetDefaultPMO(values->defaultPMO);
@@ -134,6 +139,8 @@ SavePrefsValues( Preferences* prefs,
     prefs->SetSaveStreamsDirectory(values->saveStreamsDirectory);
     prefs->SetProxyServerAddress(values->proxyServer);
     prefs->SetUseProxyServer(values->useProxyServer);
+    prefs->SetAlternateNICAddress(values->alternateIP);
+    prefs->SetUseAlternateNIC(values->useAlternateIP);
 
     prefs->SetUseDebugLog(values->enableLogging);
     prefs->SetLogMain(values->logMain);
@@ -141,7 +148,6 @@ SavePrefsValues( Preferences* prefs,
     prefs->SetLogInput(values->logInput);
     prefs->SetLogOutput(values->logOutput);
     prefs->SetLogPerformance(values->logPerformance);
-
 }
 
 

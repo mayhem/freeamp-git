@@ -375,12 +375,12 @@ Error HttpInput::Open(void)
           return (Error)httpError_CannotOpenSocket;
      }    
 
-     m_pContext->prefs->GetPrefBoolean(kUseNIC, &bUseAltNIC);
+     m_pContext->prefs->GetPrefBoolean(kUseAlternateNICPref, &bUseAltNIC);
      if (bUseAltNIC)
      {
          uint32 len = 100;
 
-         m_pContext->prefs->GetPrefString(kNICAddress, szSourceAddr, &len);
+         m_pContext->prefs->GetPrefString(kAlternateNICAddressPref, szSourceAddr, &len);
          if ( len == 0 )
              m_pContext->log->Error("UseAlternateNIC is true but AlternateNIC "
                                     "has no value ?!");
@@ -438,7 +438,7 @@ Error HttpInput::Open(void)
         sprintf(szQuery, "GET / HTTP/1.0\nHost %s\nAccept: */*\n", 
                 szLocalName);
 
-    m_pContext->prefs->GetPrefBoolean(kUseTitleStreaming, &bUseTitleStreaming);
+    m_pContext->prefs->GetPrefBoolean(kUseTitleStreamingPref, &bUseTitleStreaming);
     if (bUseTitleStreaming)
     {
         int   iPort;
