@@ -21,10 +21,46 @@
         $Id$
 ____________________________________________________________________________*/
 
+#include "config.h"
+
+#include <set>
+using namespace std;
+
 #include "utility.h"
 #include "infoeditor.h"
 #include "metadata.h"
 #include "musiccatalog.h"
+
+infoeditorUI::infoeditorUI(FAContext *context, PlaylistManager *plm,
+                           vector<PlaylistItem *> *itemlist)
+{
+    m_context = context;
+    m_itemlist = itemlist;
+    m_plm = plm;
+    title_change = false;
+    artist_change = false;
+    album_change = false;
+    genre_change = false;
+    year_change = false;
+    comment_change = false;
+    track_change = false;
+    gartistlist = NULL;
+    galbumlist = NULL;
+    ggenrelist = NULL;
+}
+
+infoeditorUI::~infoeditorUI()
+{
+   gtk_widget_destroy(m_window);
+   delete m_itemlist;
+
+   if (gartistlist)
+       g_list_free(gartistlist);
+   if (galbumlist)
+       g_list_free(galbumlist); 
+   if (ggenrelist)
+       g_list_free(ggenrelist);
+}
 
 void infoeditorUI::DoApplyInfoEdit(void)
 {
@@ -129,21 +165,6 @@ void infoeditorUI::CheckWidget(GtkWidget *widget)
        comment_change = true;
 }
 
-infoeditorUI::infoeditorUI(FAContext *context, PlaylistManager *plm,
-                           vector<PlaylistItem *> *itemlist)
-{
-    m_context = context;
-    m_itemlist = itemlist;
-    m_plm = plm;
-    title_change = false;
-    artist_change = false;
-    album_change = false;
-    genre_change = false;
-    year_change = false;
-    comment_change = false;
-    track_change = false;
-}
-
 void infoeditorUI::DisplayInfo(void)
 {
    GtkWidget *vbox;
@@ -155,6 +176,8 @@ void infoeditorUI::DisplayInfo(void)
 
    if (!m_itemlist || m_itemlist->size() == 0) 
        return;
+
+   BuildLists();
 
    m_listsize = m_itemlist->size();
    m_artists = true;
@@ -178,7 +201,7 @@ void infoeditorUI::DisplayInfo(void)
    }
 
    m_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-   gtk_window_set_title(GTK_WINDOW(m_window), BRANDING" - Information Editor");
+   gtk_window_set_title(GTK_WINDOW(m_window), BRANDING" - Edit Track Info");
    gtk_signal_connect(GTK_OBJECT(m_window), "delete_event",
                       GTK_SIGNAL_FUNC(info_delete_event), this);
    gtk_container_set_border_width(GTK_CONTAINER(m_window), 5);
@@ -187,12 +210,18 @@ void infoeditorUI::DisplayInfo(void)
    gtk_container_add(GTK_CONTAINER(m_window), vbox);
    gtk_widget_show(vbox);
 
-   table = gtk_table_new(10, 2, FALSE);
-   gtk_box_pack_start(GTK_BOX(vbox), table, FALSE, FALSE, 0);
+   label = gtk_label_new("Use the fields below to change the information associated with your selected\ntrack(s).");
+   gtk_label_set_line_wrap(GTK_LABEL(label), FALSE);
+   gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+   gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 5);
+   gtk_widget_show(label);
+
+   table = gtk_table_new(6, 5, FALSE);
+   gtk_box_pack_start(GTK_BOX(vbox), table, FALSE, FALSE, 5);
    gtk_widget_show(table);
 
    /* Song title entry */
-   label = gtk_label_new("Song Title:");
+   label = gtk_label_new("Title:");
    gtk_misc_set_alignment(GTK_MISC(label), (gfloat)1.0, (gfloat)0.5);
    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 0, 1, GTK_FILL, GTK_FILL,
                     10, 1);
@@ -205,7 +234,7 @@ void infoeditorUI::DisplayInfo(void)
       gtk_entry_set_text(GTK_ENTRY(m_titleEntry), firstdata.Title().c_str());
    gtk_signal_connect(GTK_OBJECT(m_titleEntry), "changed",
                       GTK_SIGNAL_FUNC(text_changed_event), this);
-   gtk_table_attach_defaults(GTK_TABLE(table), m_titleEntry, 1, 2, 0, 1);
+   gtk_table_attach_defaults(GTK_TABLE(table), m_titleEntry, 1, 3, 0, 1);
    gtk_widget_show(m_titleEntry);
 
    if (m_listsize > 1) {
@@ -213,45 +242,49 @@ void infoeditorUI::DisplayInfo(void)
        gtk_widget_set_sensitive(m_titleEntry, FALSE);
    }
 
-   /* Artist entry */
-   label = gtk_label_new("Artist:");
-   gtk_misc_set_alignment(GTK_MISC(label), (gfloat)1.0, (gfloat)0.5);
-   gtk_table_attach(GTK_TABLE(table), label, 0, 1, 1, 2, GTK_FILL, GTK_FILL,
-                    10, 1);
-   gtk_widget_show(label);
-
-   m_artistEntry = gtk_entry_new();
-   if (!m_artists) 
-      gtk_entry_set_text(GTK_ENTRY(m_artistEntry), "<Multiple Artists Selected>");
-   else if (firstdata.Artist().c_str())
-      gtk_entry_set_text(GTK_ENTRY(m_artistEntry), firstdata.Artist().c_str());
-   gtk_signal_connect(GTK_OBJECT(m_artistEntry), "changed",
-                      GTK_SIGNAL_FUNC(text_changed_event), this);
-   gtk_table_attach_defaults(GTK_TABLE(table), m_artistEntry, 1, 2, 1, 2);
-   gtk_widget_show(m_artistEntry);
-
    /* Album entry */
    label = gtk_label_new("Album:");
    gtk_misc_set_alignment(GTK_MISC(label), (gfloat)1.0, (gfloat)0.5);
-   gtk_table_attach(GTK_TABLE(table), label, 0, 1, 2, 3, GTK_FILL, GTK_FILL,
-                    10, 1);
+   gtk_table_attach(GTK_TABLE(table), label, 0, 1, 1, 2, GTK_FILL, GTK_FILL,
+                    10, 5);
    gtk_widget_show(label);
 
-   m_albumEntry = gtk_entry_new();
+   GtkWidget *combo = gtk_combo_new();
+   gtk_combo_set_popdown_strings(GTK_COMBO(combo), galbumlist);
+   m_albumEntry = GTK_COMBO(combo)->entry;
    if (!m_albums)
       gtk_entry_set_text(GTK_ENTRY(m_albumEntry), "<Multiple Albums Selected>");
    else if (firstdata.Album().c_str())
       gtk_entry_set_text(GTK_ENTRY(m_albumEntry), firstdata.Album().c_str());
    gtk_signal_connect(GTK_OBJECT(m_albumEntry), "changed",
                       GTK_SIGNAL_FUNC(text_changed_event), this);
-   gtk_table_attach_defaults(GTK_TABLE(table), m_albumEntry, 1, 2, 2, 3);
-   gtk_widget_show(m_albumEntry);
+   gtk_table_attach_defaults(GTK_TABLE(table), combo, 1, 3, 1, 2);
+   gtk_widget_show(combo);
+
+   /* Artist entry */
+   label = gtk_label_new("Artist:");
+   gtk_misc_set_alignment(GTK_MISC(label), (gfloat)1.0, (gfloat)0.5);
+   gtk_table_attach(GTK_TABLE(table), label, 0, 1, 2, 3, GTK_FILL, GTK_FILL,
+                    10, 5);
+   gtk_widget_show(label);
+
+   combo = gtk_combo_new();
+   gtk_combo_set_popdown_strings(GTK_COMBO(combo), gartistlist);
+   m_artistEntry = GTK_COMBO(combo)->entry;
+   if (!m_artists) 
+      gtk_entry_set_text(GTK_ENTRY(m_artistEntry), "<Multiple Artists Selected>");
+   else if (firstdata.Artist().c_str())
+      gtk_entry_set_text(GTK_ENTRY(m_artistEntry), firstdata.Artist().c_str());
+   gtk_signal_connect(GTK_OBJECT(m_artistEntry), "changed",
+                      GTK_SIGNAL_FUNC(text_changed_event), this);
+   gtk_table_attach_defaults(GTK_TABLE(table), combo, 1, 3, 2, 3);
+   gtk_widget_show(combo);
 
    /* Year entry */
    label = gtk_label_new("Year:");
    gtk_misc_set_alignment(GTK_MISC(label), (gfloat)1.0, (gfloat)0.5);
-   gtk_table_attach(GTK_TABLE(table), label, 0, 1, 3, 4, GTK_FILL, GTK_FILL,
-                    10, 1);
+   gtk_table_attach(GTK_TABLE(table), label, 3, 4, 1, 2, GTK_FILL, GTK_FILL,
+                    10, 5);
    gtk_widget_show(label);
 
    m_yearEntry = gtk_entry_new();
@@ -264,32 +297,33 @@ void infoeditorUI::DisplayInfo(void)
    }
    gtk_signal_connect(GTK_OBJECT(m_yearEntry), "changed",
                       GTK_SIGNAL_FUNC(text_changed_event), this);
-   gtk_table_attach_defaults(GTK_TABLE(table), m_yearEntry, 1, 2, 3, 4);
+   gtk_table_attach_defaults(GTK_TABLE(table), m_yearEntry, 4, 5, 1, 2);
    gtk_widget_show(m_yearEntry);
 
    /* Genre entry */
    label = gtk_label_new("Genre:");
    gtk_misc_set_alignment(GTK_MISC(label), (gfloat)1.0, (gfloat)0.5);
-   gtk_table_attach(GTK_TABLE(table), label, 0, 1, 4, 5, GTK_FILL, GTK_FILL,
-                    10, 1);
+   gtk_table_attach(GTK_TABLE(table), label, 0, 1, 3, 4, GTK_FILL, GTK_FILL,
+                    10, 5);
    gtk_widget_show(label);
 
-   m_genreEntry = gtk_entry_new();
-   
+   combo = gtk_combo_new();
+   gtk_combo_set_popdown_strings(GTK_COMBO(combo), ggenrelist);
+   m_genreEntry = GTK_COMBO(combo)->entry;
    if (!m_genres) 
       gtk_entry_set_text(GTK_ENTRY(m_genreEntry), "<Multiple Genres Selected>");
    else if (firstdata.Genre().c_str())
       gtk_entry_set_text(GTK_ENTRY(m_genreEntry), firstdata.Genre().c_str());
    gtk_signal_connect(GTK_OBJECT(m_genreEntry), "changed",
                       GTK_SIGNAL_FUNC(text_changed_event), this);
-   gtk_table_attach_defaults(GTK_TABLE(table), m_genreEntry, 1, 2, 4, 5);
-   gtk_widget_show(m_genreEntry);
+   gtk_table_attach_defaults(GTK_TABLE(table), combo, 1, 3, 3, 4);
+   gtk_widget_show(combo);
 
    /* Track Entry */
-   label = gtk_label_new("Track:");
+   label = gtk_label_new("Track #:");
    gtk_misc_set_alignment(GTK_MISC(label), (gfloat)1.0, (gfloat)0.5);
-   gtk_table_attach(GTK_TABLE(table), label, 0, 1, 5, 6, GTK_FILL, GTK_FILL,
-                    10, 1);
+   gtk_table_attach(GTK_TABLE(table), label, 3, 4, 0, 1, GTK_FILL, GTK_FILL,
+                    10, 5);
    gtk_widget_show(label);
 
    m_trackEntry = gtk_entry_new();
@@ -302,7 +336,7 @@ void infoeditorUI::DisplayInfo(void)
    }
    gtk_signal_connect(GTK_OBJECT(m_trackEntry), "changed",
                       GTK_SIGNAL_FUNC(text_changed_event), this);
-   gtk_table_attach_defaults(GTK_TABLE(table), m_trackEntry, 1, 2, 5, 6);
+   gtk_table_attach_defaults(GTK_TABLE(table), m_trackEntry, 4, 5, 0, 1);
    gtk_widget_show(m_trackEntry);
 
    if (m_listsize > 1) {
@@ -313,18 +347,18 @@ void infoeditorUI::DisplayInfo(void)
    /* Comment entry */
    label = gtk_label_new("Comments:");
    gtk_misc_set_alignment(GTK_MISC(label), (gfloat)1.0, (gfloat)0.5);
-   gtk_table_attach(GTK_TABLE(table), label, 0, 1, 6, 7, GTK_FILL, GTK_FILL,
-                    10, 1);
+   gtk_table_attach(GTK_TABLE(table), label, 0, 1, 4, 5, GTK_FILL, GTK_FILL,
+                    10, 5);
    gtk_widget_show(label);
 
    m_commentEntry = gtk_entry_new();
    if (m_listsize > 1)
       gtk_entry_set_text(GTK_ENTRY(m_commentEntry), "<Multiple Tracks Selected>");
-   if (firstdata.Comment().c_str())
+   else if (firstdata.Comment().c_str())
       gtk_entry_set_text(GTK_ENTRY(m_commentEntry), firstdata.Comment().c_str());
    gtk_signal_connect(GTK_OBJECT(m_commentEntry), "changed",
                       GTK_SIGNAL_FUNC(text_changed_event), this);
-   gtk_table_attach_defaults(GTK_TABLE(table), m_commentEntry, 1, 2, 6, 7);
+   gtk_table_attach_defaults(GTK_TABLE(table), m_commentEntry, 1, 5, 4, 5);
    gtk_widget_show(m_commentEntry);
 
    if (m_listsize > 1) {
@@ -335,13 +369,13 @@ void infoeditorUI::DisplayInfo(void)
    /* Length display */
    label = gtk_label_new("Length:");
    gtk_misc_set_alignment(GTK_MISC(label), (gfloat)1.0, (gfloat)0.5);
-   gtk_table_attach(GTK_TABLE(table), label, 0, 1, 7, 8, GTK_FILL, GTK_FILL,
-                    10, 1);
+   gtk_table_attach(GTK_TABLE(table), label, 3, 4, 2, 3, GTK_FILL, GTK_FILL,
+                    10, 5);
    gtk_widget_show(label);
 
-   GtkWidget *time_label;
+   GtkWidget *time_entry = gtk_entry_new();
    if (m_listsize > 1) {
-       time_label = gtk_label_new("<Multiple Tracks Selected>");
+       gtk_entry_set_text(GTK_ENTRY(time_entry), "<Multiple Tracks Selected>");
    }
    else {
        gchar *length;
@@ -354,25 +388,33 @@ void infoeditorUI::DisplayInfo(void)
        sprintf(minutes, "%02d", min);
        sprintf(seconds, "%02d", sec);
        length = g_strconcat((gchar *) minutes, ":", (gchar *) seconds, NULL);
-       time_label = gtk_label_new(length);
+       gtk_entry_set_text(GTK_ENTRY(time_entry), length);
    }
-   gtk_table_attach_defaults(GTK_TABLE(table), time_label, 1, 2, 7, 8);
-   gtk_widget_show(time_label);
-   
+   gtk_entry_set_editable(GTK_ENTRY(time_entry), FALSE);
+   gtk_table_attach_defaults(GTK_TABLE(table), time_entry, 4, 5, 2, 3);
+   gtk_widget_show(time_entry);
+ 
+   gtk_widget_set_sensitive(time_entry, FALSE);  
+ 
    /* location */
    label = gtk_label_new("Location:");
    gtk_misc_set_alignment(GTK_MISC(label), (gfloat)1.0, (gfloat)0.5);
-   gtk_table_attach(GTK_TABLE(table), label, 0, 1, 8, 9, GTK_FILL, GTK_FILL,
-                    10, 1);
+   gtk_table_attach(GTK_TABLE(table), label, 0, 1, 5, 6, GTK_FILL, GTK_FILL,
+                    10, 5);
    gtk_widget_show(label);
 
-   GtkWidget *location_label;
+   GtkWidget *location_entry = gtk_entry_new();
    if (m_listsize > 1)
-       location_label = gtk_label_new("<Multiple Tracks Selected>");
+       gtk_entry_set_text(GTK_ENTRY(location_entry), 
+                          "<Multiple Tracks Selected>");
    else
-       location_label = gtk_label_new((*(m_itemlist->begin()))->URL().c_str());
-   gtk_table_attach_defaults(GTK_TABLE(table), location_label, 1, 2, 8, 9);
-   gtk_widget_show(location_label);
+       gtk_entry_set_text(GTK_ENTRY(location_entry), 
+                          (*(m_itemlist->begin()))->URL().c_str());
+   gtk_entry_set_editable(GTK_ENTRY(location_entry), FALSE);
+   gtk_table_attach_defaults(GTK_TABLE(table), location_entry, 1, 5, 5, 6);
+   gtk_widget_show(location_entry);
+
+   gtk_widget_set_sensitive(location_entry, FALSE);
 
    /* Control buttons at the bottom */
    separator = gtk_hseparator_new();
@@ -384,23 +426,23 @@ void infoeditorUI::DisplayInfo(void)
    gtk_container_add(GTK_CONTAINER(vbox), hbox);
    gtk_widget_show(hbox);
 
-   m_okButton = gtk_button_new_with_label("OK");
-   gtk_signal_connect(GTK_OBJECT(m_okButton), "clicked",
-                      GTK_SIGNAL_FUNC(info_ok_button_event), this);
-   gtk_container_add(GTK_CONTAINER(hbox), m_okButton);
-   gtk_widget_show(m_okButton);
-
-   m_applyButton = gtk_button_new_with_label("Apply");
-   gtk_signal_connect(GTK_OBJECT(m_applyButton), "clicked",
-                      GTK_SIGNAL_FUNC(info_apply_button_event), this);
-   gtk_container_add(GTK_CONTAINER(hbox), m_applyButton);
-   gtk_widget_show(m_applyButton);
-
-   close_button = gtk_button_new_with_label("Close");
+   close_button = gtk_button_new_with_label("  Close  ");
    gtk_signal_connect(GTK_OBJECT(close_button), "clicked",
                       GTK_SIGNAL_FUNC(info_close_button_event), this);
-   gtk_container_add(GTK_CONTAINER(hbox), close_button);
+   gtk_box_pack_end(GTK_BOX(hbox), close_button, FALSE, FALSE, 2);
    gtk_widget_show(close_button);
+
+   m_applyButton = gtk_button_new_with_label("  Apply  ");
+   gtk_signal_connect(GTK_OBJECT(m_applyButton), "clicked",
+                      GTK_SIGNAL_FUNC(info_apply_button_event), this);
+   gtk_box_pack_end(GTK_BOX(hbox), m_applyButton, FALSE, FALSE, 2);
+   gtk_widget_show(m_applyButton);
+
+   m_okButton = gtk_button_new_with_label("  OK  ");
+   gtk_signal_connect(GTK_OBJECT(m_okButton), "clicked",
+                      GTK_SIGNAL_FUNC(info_ok_button_event), this);
+   gtk_box_pack_end(GTK_BOX(hbox), m_okButton, FALSE, FALSE, 2);
+   gtk_widget_show(m_okButton);
 
    gtk_widget_show(m_window);
 
@@ -410,8 +452,41 @@ void infoeditorUI::DisplayInfo(void)
    changed = FALSE;
 }
 
-infoeditorUI::~infoeditorUI()
+void infoeditorUI::BuildLists(void)
 {
-   gtk_widget_destroy(m_window);
-   delete m_itemlist;
+    set<string> artists;
+    set<string> albums;
+    set<string> genres;
+
+    const vector<ArtistList *> *artList = m_context->catalog->GetMusicList();
+    vector<ArtistList *>::const_iterator artist;
+
+    for (artist = artList->begin(); artist != artList->end(); artist++) 
+    {
+        vector<AlbumList *>::iterator album;
+        artists.insert((*artist)->name);
+        for (album = (*artist)->m_albumList->begin();
+             album != (*artist)->m_albumList->end(); album++) 
+        {
+            vector<PlaylistItem *>::iterator track;
+            albums.insert((*album)->name);
+            for (track = (*album)->m_trackList->begin();
+                 track != (*album)->m_trackList->end(); track++)
+            {
+                MetaData metadata = (*track)->GetMetaData();
+                genres.insert(metadata.Genre());
+            }
+        }
+    }
+
+    set<string>::iterator i;
+
+    for (i = artists.begin(); i != artists.end(); i++) 
+        gartistlist = g_list_append(gartistlist, (char *)(*i).c_str());
+
+    for (i = albums.begin(); i != albums.end(); i++)
+        galbumlist = g_list_append(galbumlist, (char *)(*i).c_str());
+   
+    for (i = genres.begin(); i != genres.end(); i++)
+        ggenrelist = g_list_append(ggenrelist, (char *)(*i).c_str());
 }

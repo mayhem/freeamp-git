@@ -76,6 +76,12 @@ class infoeditorUI {
      bool track_change;
 
      PlaylistManager *m_plm;
+
+     void BuildLists();
+
+     GList *gartistlist;
+     GList *galbumlist;
+     GList *ggenrelist;
 };
 
 #endif
