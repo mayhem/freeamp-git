@@ -76,6 +76,7 @@ const char* kWelcomePref = "Welcome";
 const char* kPlayImmediatelyPref = "PlayImmediately";
 const char* kNumberOfURLsToRememberPref = "NumberOfURLsToRemember";
 const char* kCDDevicePathPref = "CDDevice";
+const char* kCheckCDAutomaticallyPref = "AutoUpdateCD";
 const char* kCDDBServerPref = "CDDBServer";
 const char* kConvertUnderscoresToSpacesPref = "ConvertUnderscoresToSpaces";
 const char* kAllowMultipleInstancesPref = "AllowMultipleInstances";
@@ -124,6 +125,7 @@ const char *kDefaultCDDevicePath = "cdaudio";
 const char *kDefaultThemeDefaultFont = "Helvetica";
 const char *kDefaultCDDevicePath = "/dev/cdrom";
 #endif
+const bool  kDefaultCheckCDAutomatically = false;
 const char *kDefaultDownloadManagerUI = "download.ui";
 const char *kDefaultMusicBrowserUI = "musicbrowser.ui";
 const char *kDefaultToolbarUI = "toolbar.ui";
@@ -380,6 +382,10 @@ SetDefaults()
     if (GetPrefBoolean(kPerformDBCheckPref, &dummyBool) == 
         kError_NoPrefValue)
         SetPrefBoolean(kPerformDBCheckPref, kDefaultPerformDBCheck);
+
+    if (GetPrefBoolean(kCheckCDAutomaticallyPref, &dummyBool) == 
+        kError_NoPrefValue)
+        SetPrefBoolean(kCheckCDAutomaticallyPref, kDefaultCheckCDAutomatically);
 
     return kError_NoErr;
 }

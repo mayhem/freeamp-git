@@ -184,7 +184,8 @@ class GTKPreferenceWindow : public PreferenceWindow
       GtkWidget *CreateAdvanced(void);
       GtkWidget *CreateDirectories(void);
       GtkWidget *CreateProfiles(void);
-
+      GtkWidget *CreateCD(void);
+      
       GtkWidget *saveMusicBox;
 
       GtkWidget *applyButton;

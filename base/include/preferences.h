@@ -83,6 +83,7 @@ extern const char* kWelcomePref;
 extern const char* kPlayImmediatelyPref;
 extern const char* kNumberOfURLsToRememberPref;
 extern const char* kCDDevicePathPref;
+extern const char* kCheckCDAutomaticallyPref;
 extern const char* kCDDBServerPref;
 extern const char* kConvertUnderscoresToSpacesPref;
 extern const char* kAllowMultipleInstancesPref;
@@ -98,6 +99,7 @@ extern const char* kMusicBrowserHeaderWidthsPref;
 extern const char* kCloseDLMOnCompletePref;
 extern const char* kPerformDBCheckPref;
 extern const char* kWAVOutputPathPref;
+
 
 extern const int32 kDefaultWatchThisDirTimeout;
 

@@ -89,7 +89,7 @@ void GTKMusicBrowser::AskOptIn(bool inMain)
     if (dialog->Show(message.c_str(), caption.c_str(), kMessageYesNo, inMain) ==
         kMessageReturnYes)
     {
-        ShowOptions(6);
+        ShowOptions(7);
     }
 
     delete dialog;

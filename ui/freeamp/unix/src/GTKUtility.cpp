@@ -39,7 +39,7 @@ ____________________________________________________________________________*/
 #include <map>
 using namespace std;
 
-#include "MessageDialog.h"
+#include "gtkmessagedialog.h"
 
 static Thread *gtkThread = NULL;
 static bool weAreGTK = false;
@@ -371,11 +371,37 @@ void ReclaimFileTypes(FAContext *context, bool askBeforeReclaiming)
 
     if (needRewrite) {
         if (askBeforeReclaiming) {
-            MessageDialog oBox(context);
+            gdk_threads_enter();
+
+            GTKMessageDialog *oBox = new GTKMessageDialog();
             string oMessage(kNotifyStolen);
 
-            if (oBox.Show(oMessage.c_str(), string("Reclaim File Types?"),
-                          kMessageYesNo) == kMessageReturnNo)
+            MessageDialogReturnEnum answer;
+
+            answer = oBox->Show(oMessage.c_str(), "Reclaim File Types?",
+                                kMessageYesNo, false, false, 
+                                "Don't ask me this again");
+
+            if (oBox->GetCheckStatus()) {
+                bool setFileTypes = false;
+
+                if (answer == kMessageReturnYes) {
+                    setFileTypes = true;
+                }
+                else {
+                    setFileTypes = false;
+                }
+
+                context->prefs->SetPrefBoolean(kReclaimFiletypesPref, 
+                                               setFileTypes);
+                context->prefs->SetPrefBoolean(kAskToReclaimFiletypesPref, 
+                                               false);
+            }
+
+            delete oBox;
+            gdk_threads_leave();
+
+            if (answer == kMessageReturnNo)
                 goto failed_reclaim_open;
         }
 

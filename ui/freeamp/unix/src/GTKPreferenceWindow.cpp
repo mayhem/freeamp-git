@@ -51,7 +51,10 @@ GTKPreferenceWindow::GTKPreferenceWindow(FAContext *context,
 
 GTKPreferenceWindow::~GTKPreferenceWindow(void)
 {
-    delete m_PMOnames;
+    if (m_PMOnames)
+        delete m_PMOnames;
+    if (paneList)
+        delete paneList;
 } 
 
 static gboolean pref_destroy(GtkWidget *widget, GTKPreferenceWindow *p)
@@ -211,7 +214,7 @@ bool GTKPreferenceWindow::Show(Window *pWindow)
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledWindow),
                                    GTK_POLICY_NEVER, GTK_POLICY_NEVER);
     gtk_box_pack_start(GTK_BOX(mainHbox), scrolledWindow, TRUE, TRUE, 0);
-    gtk_widget_set_usize(scrolledWindow, 100, 300);
+    gtk_widget_set_usize(scrolledWindow, 140, 300);
     gtk_widget_show(scrolledWindow);
 
     const char *name[1];
@@ -279,17 +282,21 @@ bool GTKPreferenceWindow::Show(Window *pWindow)
     opane = new OptionsPane("Plugins", " Plugin Preferences", 4, pane);
     AddPane(opane);
 
+    pane = CreateCD();
+    opane = new OptionsPane("CD Audio", "CD Audio Preferences", 5, pane);
+    AddPane(opane);
+
     pane = CreateAdvanced();
-    opane = new OptionsPane("Advanced", " Advanced Preferences", 5, pane);
+    opane = new OptionsPane("Advanced", " Advanced Preferences", 6, pane);
     AddPane(opane);
 
     pane = CreateProfiles();
-    opane = new OptionsPane("Relatable Profiles", " Relatable Profiles", 6, 
+    opane = new OptionsPane("Relatable Profiles", " Relatable Profiles", 7, 
                             pane);
     AddPane(opane);
 
     pane = CreateAbout();
-    opane = new OptionsPane("About", " About "The_BRANDING, 7, pane);
+    opane = new OptionsPane("About", " About "The_BRANDING, 8, pane);
     AddPane(opane);
 
     GtkWidget *separator = gtk_hseparator_new();
@@ -2232,5 +2239,16 @@ GtkWidget *GTKPreferenceWindow::CreateDirectories(void)
     if (!setSomething)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
 
+    return pane;
+}
+
+GtkWidget *GTKPreferenceWindow::CreateCD(void)
+{
+    GtkWidget *pane = gtk_vbox_new(FALSE, 5);
+    gtk_container_set_border_width(GTK_CONTAINER(pane), 5);
+    gtk_widget_show(pane);
+
+    
+    
     return pane;
 }

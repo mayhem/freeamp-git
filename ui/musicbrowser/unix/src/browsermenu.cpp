@@ -504,7 +504,7 @@ static void emusic_web(GTKMusicBrowser *p, guint action, GtkWidget *w)
 
 static void show_about(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
-    p->ShowOptions(7);
+    p->ShowOptions(8);
 }
 
 static void options_show(GTKMusicBrowser *p, guint action, GtkWidget *w)

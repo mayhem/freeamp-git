@@ -69,15 +69,17 @@ class GTKMessageDialog
        char *GetEntryText();
  
        void      SetText(char *text) { entryText = text; }
+       void      SetCheck(bool check) { checkStatus = check; }
 
   private:
        bool       hasCheck;
        GtkWidget *checkBox;
        string     checkText;
+       bool       checkStatus;
 
        bool       hasEntry;
        string     entryText;
-       GtkWidget *entryBox;       
+       GtkWidget *entryBox; 
 };
 
 #endif

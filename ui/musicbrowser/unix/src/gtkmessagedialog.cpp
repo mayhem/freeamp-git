@@ -58,11 +58,8 @@ MessageDialogReturnEnum GTKMessageDialog::
 bool GTKMessageDialog::GetCheckStatus(void)
 {
     bool retvalue = false;
-    if (hasCheck) {
-        retvalue = GTK_IS_CHECK_BUTTON(checkBox);
-        retvalue = GTK_IS_TOGGLE_BUTTON(checkBox);
-        retvalue = GTK_TOGGLE_BUTTON(checkBox)->active;
-    }
+    if (hasCheck) 
+        retvalue = checkStatus;
 
     return retvalue;
 }
@@ -115,6 +112,12 @@ static void entry_change(GtkWidget *w, GTKMessageDialog *p)
     p->SetText(gtk_entry_get_text(GTK_ENTRY(w)));
 }
 
+static void check_box_toggle(GtkWidget *w, GTKMessageDialog *p)
+{
+    int i = GTK_TOGGLE_BUTTON(w)->active;
+    p->SetCheck(bool(i));
+}
+
 MessageDialogReturnEnum GTKMessageDialog::
                         Show(const string      &oMessage, 
                              const string      &oTitle, 
@@ -139,9 +142,12 @@ MessageDialogReturnEnum GTKMessageDialog::
     gtk_box_pack_start(GTK_BOX(vbox), message, TRUE, TRUE, 5);
     gtk_widget_show(message);
 
+    checkStatus = false;
     if (hasCheck) {
         checkBox = gtk_check_button_new_with_label(checkText.c_str());
         gtk_box_pack_start(GTK_BOX(vbox), checkBox, FALSE, FALSE, 5);
+        gtk_signal_connect(GTK_OBJECT(checkBox), "toggled",
+                           GTK_SIGNAL_FUNC(check_box_toggle), this);
         gtk_widget_show(checkBox);
     }
 
