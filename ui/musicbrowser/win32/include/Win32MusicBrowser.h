@@ -258,6 +258,7 @@ class MusicBrowserUI : public UserInterface
     void  UpdateTotalTime();
     void  GetSelectedPlaylistItems(vector<PlaylistItem*>* items);
     void  ResizeHeader(HWND hwnd, uint32 column);
+    void  DisplayCurrentItem();
 
 
     // Functions in Win32MusicBrowser.cpp

@@ -176,7 +176,7 @@ bool PlaylistItemSort::operator() (PlaylistItem* item1,
                 pos = item2->URL().find_last_of('/');
                 file2 = item2->URL().substr(pos + 1);
 
-                result = file1 < file2;
+                result = lstrcmpi(file1.c_str(), file2.c_str());
                 break;
             }
 

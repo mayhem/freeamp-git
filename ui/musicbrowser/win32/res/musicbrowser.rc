@@ -363,6 +363,7 @@ BEGIN
     POPUP "&View"
     BEGIN
         MENUITEM "View &Playlist Only",         ID_VIEW_MUSICCATALOG
+        MENUITEM "&Locate Current Track",       ID_VIEW_LOCATECURRENTITEM
         MENUITEM "&Options...",                 ID_VIEW_OPTIONS
     END
     POPUP "&Controls"

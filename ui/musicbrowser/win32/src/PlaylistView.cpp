@@ -366,6 +366,18 @@ void MusicBrowserUI::InitList(void)
     lvc.cx = INDEX_COLUMN_WIDTH; // width of column in pixels
     ListView_InsertColumn(m_hPlaylistView, 0, &lvc);
 
+    m_hPlaylistHeader = FindWindowEx(m_hPlaylistView, NULL, WC_HEADER, NULL);
+
+    if(m_hPlaylistHeader)
+    {
+        HD_ITEM hd_item;
+    
+        hd_item.mask = HDI_FORMAT;
+        hd_item.fmt = HDF_OWNERDRAW;
+
+        Header_SetItem(m_hPlaylistHeader, 0, &hd_item);
+    }
+
     int32 remainder = (sRect.right-sRect.left - FIXED_COLUMN_WIDTH)%3;
 
     lvc.pszText = "Title";
@@ -717,7 +729,20 @@ void MusicBrowserUI::PlaylistListItemsAdded(const vector<PlaylistItem*>* items)
         m_itemsAddedBeforeWeWereCreated += items->size();
     }
 
+    if(count > 999)
+    {
+        //ListView_SetColumnWidth(m_hPlaylistView, 0, INDEX_COLUMN_WIDTH + 6);
+        //ListView_SetColumnWidth(m_hPlaylistView, 1, ListView_GetColumnWidth(m_hPlaylistView, 1) - 2);
+        //ListView_SetColumnWidth(m_hPlaylistView, 2, ListView_GetColumnWidth(m_hPlaylistView, 2) - 2);
+        //ListView_SetColumnWidth(m_hPlaylistView, 3, ListView_GetColumnWidth(m_hPlaylistView, 3) - 2);
+    }
+}
 
+void MusicBrowserUI::DisplayCurrentItem()
+{
+    ListView_EnsureVisible(m_hPlaylistView, 
+                           m_plm->GetCurrentIndex(), 
+                           FALSE);
 }
 
 void MusicBrowserUI::GetSelectedPlaylistItems(vector<PlaylistItem*>* items)

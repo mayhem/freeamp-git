@@ -296,6 +296,10 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                 case ID_VIEW_OPTIONS:
                     m_context->target->AcceptEvent(new ShowPreferencesEvent());
                     return 1;
+
+                case ID_VIEW_LOCATECURRENTITEM:
+                    DisplayCurrentItem();
+                    return 1;
                     
 
                 case ID_CONTROLS_PLAYPAUSE:
@@ -319,6 +323,7 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                 case ID_SORT_TRACK:
                 case ID_SORT_GENRE:
                 case ID_SORT_LOCATION:
+                case ID_SORT_FILENAME:
                 case ID_SORT_RANDOMIZE:
                 case IDC_RANDOMIZE:
                     SortEvent(LOWORD(wParam));
@@ -942,18 +947,6 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
 	SetWindowLong(m_hPlaylistView,
                   GWL_WNDPROC,
                   (DWORD)::ListViewWndProc);
-
-    m_hPlaylistHeader = FindWindowEx(m_hPlaylistView, NULL, WC_HEADER, NULL);
-
-    if(m_hPlaylistHeader)
-    {
-        HD_ITEM hd_item;
-    
-        hd_item.mask = HDI_FORMAT;
-        hd_item.fmt = HDF_OWNERDRAW;
-
-        Header_SetItem(m_hPlaylistHeader, 0, &hd_item);
-    }
 
     // Subclass the treeview
 
@@ -1876,8 +1869,16 @@ void MusicBrowserUI::UpdateMenuStates()
     //SendMessage(m_hToolbar, TB_ENABLEBUTTON, ID_EDIT_REMOVE, 
     ///            MAKELONG(oType.length() != 0, 0)); 
     
-    hMenu = GetSubMenu(hMenuRoot, 3);
+    // View Menu
+    hMenu = GetSubMenu(hMenuRoot, 2);
 
+    if(m_pParent)
+    {
+        EnableMenuItem(hMenu, ID_VIEW_LOCATECURRENTITEM, MF_GRAYED);  
+    }
+
+    // Controls Menu
+    hMenu = GetSubMenu(hMenuRoot, 3);
 
     sMenuItem.fMask = MIIM_STATE;
 
