@@ -691,16 +691,20 @@ int32 Player::ServiceEvent(Event *pC) {
 		    SendToUI(pC);
 		    
 		    ReleaseUIManipLock();
-		    return 0;
+
+            return 0;
 		    break; 
 	    }
 	    
 	    case INFO_MediaTimeInfo: {
-		GetUIManipLock();
-		SendToUI(pC);
-		ReleaseUIManipLock();
-		return 0;
-		break; 
+            if(m_playerState == STATE_Playing)
+            {
+		        GetUIManipLock();
+		        SendToUI(pC);
+		        ReleaseUIManipLock();
+            }
+		    return 0;
+		    break; 
 	    }
 	    case INFO_LMCError: {
 		LMCErrorEvent *e = (LMCErrorEvent *)pC;

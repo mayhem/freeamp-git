@@ -129,7 +129,7 @@ Init(OutputInfo* info)
 	m_channels				= info->number_of_channels;
 	m_data_size				= info->max_buffer_size;
 
-	m_num_headers			= 20;
+	m_num_headers			= 2;
 	m_hdr_size				= sizeof(WAVEHDR);
 	m_wavehdr_array			= new LPWAVEHDR[m_num_headers];
 

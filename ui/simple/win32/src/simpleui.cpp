@@ -150,7 +150,7 @@ AcceptEvent(Event* event)
             {
                 EnableWindow(m_hwndPlay, TRUE);
 				EnableWindow(m_hwndNext, FALSE);
-				EnableWindow(m_hwndLast, FALSE);
+				EnableWindow(m_hwndLast, FALSE);  
 
 				EnableWindow(m_hwndStop, TRUE);
 				EnableWindow(m_hwndPause, FALSE);
@@ -166,12 +166,13 @@ AcceptEvent(Event* event)
 
 				EnableWindow(m_hwndStop, FALSE);
 				EnableWindow(m_hwndPause, FALSE);
-				EnableWindow(m_hwndSlider, FALSE);
-
+				
                 SendMessage(m_hwndSlider,
 						    TBM_SETPOS,
 						    (WPARAM)TRUE,
 						    (LPARAM)0);
+
+                EnableWindow(m_hwndSlider, FALSE);
 
                 char timeString[256] = "00:00:00";
 
