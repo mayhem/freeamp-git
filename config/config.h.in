@@ -257,10 +257,6 @@ typedef short			int32;
 #define MAX_PATH 4096
 #endif
 
-#ifdef irix
-#define socklen_t int
-#endif
-
 #ifndef socklen_t
 #undef socklen_t
 #endif
