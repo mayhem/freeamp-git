@@ -28,7 +28,7 @@ ____________________________________________________________________________*/
 #include "thread.h"
 #include "debug.h"
 #include "vector.h"
-#include "ctrlobj.h"
+#include "ui.h"
 #include "queue.h"
 #include "semaphore.h"
 #include "eventdata.h"

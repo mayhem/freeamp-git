@@ -26,7 +26,7 @@ ____________________________________________________________________________*/
 #ifndef _COMMANDLINECIO_H_
 #define _COMMANDLINECIO_H_
 
-#include "ctrlobj.h"
+#include "ui.h"
 #include "event.h"
 #include "thread.h"
 #include "playlist.h"

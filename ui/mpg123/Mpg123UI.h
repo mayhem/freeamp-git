@@ -27,7 +27,7 @@ ____________________________________________________________________________*/
 #ifndef _Mpg123UI_H_
 #define _Mpg123UI_H_
 
-#include "ctrlobj.h"
+#include "ui.h"
 #include "event.h"
 
 class Mpg123UI : public UserInterface {

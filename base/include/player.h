@@ -28,7 +28,7 @@ ____________________________________________________________________________*/
 #include "thread.h"
 #include "event.h"
 #include "queue.h"
-#include "ctrlobj.h"
+#include "ui.h"
 #include "vector.h"
 #include "mutex.h"
 #include "playlist.h"

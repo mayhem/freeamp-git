@@ -21,8 +21,8 @@
 	$Id$
 ____________________________________________________________________________*/
 
-#ifndef _CTRLOBJ_H_
-#define _CTRLOBJ_H_
+#ifndef _UI_H_
+#define _UI_H_
 
 #include "event.h"
 
@@ -50,9 +50,8 @@ class UserInterface {
     virtual int32 AcceptEvent(Event *) = 0;
     virtual void  SetArgs(int32,char **) = 0;
     virtual void SetTarget(EventQueueRef) = 0;
-    virtual void SetRef(UIRef) = 0;
     virtual ~UserInterface() {}
 };
 
-#endif // _CTRLOBJ_H_
+#endif // _UI_H_
 

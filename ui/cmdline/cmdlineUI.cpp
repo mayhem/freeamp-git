@@ -25,13 +25,14 @@ ____________________________________________________________________________*/
 #include <stdio.h>
 #include <unistd.h>
 
+#include <sys/time.h>
 #include <termios.h>
 #include <signal.h>
 
 
+#include "config.h"
 #include "cmdlineUI.h"
 #include "event.h"
-#include "player.h"
 #include "playlist.h"
 #include "thread.h"
 #include "eventdata.h"

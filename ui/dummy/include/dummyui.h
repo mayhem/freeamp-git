@@ -24,8 +24,7 @@ ____________________________________________________________________________*/
 #ifndef _DUMMY_UI_H_
 #define _DUMMY_UI_H_
 
-#include "ctrlobj.h"
-#include "player.h"
+#include "ui.h"
 #include "semaphore.h"
 
 class DummyUI : public UserInterface {

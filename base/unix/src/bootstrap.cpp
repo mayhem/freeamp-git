@@ -26,7 +26,7 @@ ____________________________________________________________________________*/
 
 #include "player.h"
 #include "event.h"
-#include "ctrlobj.h"
+#include "ui.h"
 #include "vector.h"
 #include "hashtable.h"
 #include "semaphore.h"
