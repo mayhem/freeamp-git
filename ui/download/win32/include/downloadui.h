@@ -62,7 +62,7 @@ class DownloadUI : public UserInterface {
     BOOL DrawItem(int32 controlId, DRAWITEMSTRUCT* dis);
     BOOL MeasureItem(HWND hwnd, MEASUREITEMSTRUCT* mis);
     BOOL Destroy();
-
+    void ShowHelp(uint32 topic);
    
  protected:
 

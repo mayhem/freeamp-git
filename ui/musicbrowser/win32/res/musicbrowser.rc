@@ -31,7 +31,7 @@ STYLE DS_CENTER | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP |
     WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "My Music - FreeAmp"
 MENU IDR_MENU1
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     CONTROL         "Tree1",IDC_MUSICTREE,"SysTreeView32",TVS_HASBUTTONS | 
                     TVS_HASLINES | TVS_LINESATROOT | TVS_SHOWSELALWAYS | 
@@ -217,7 +217,6 @@ BEGIN
     POPUP "&Help"
     BEGIN
         MENUITEM "&Contents",                   ID_HELP_CONTENTS
-        MENUITEM "&Search...",                  ID_HELP_SEARCH
         MENUITEM SEPARATOR
         MENUITEM "&FreeAmp Website",            ID_HELP_FREEAMPWEBSITE
         MENUITEM "&EMusic.com Website",         ID_HELP_EMUSICCOMWEBSITE

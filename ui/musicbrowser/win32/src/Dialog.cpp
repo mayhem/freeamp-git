@@ -159,6 +159,10 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
             EmptyDBCheck();
             return 1;
 
+        case WM_HELP:
+            ShowHelp(Music_Browser);
+            return 1;
+
         case WM_COMMAND:
         {
         	switch(LOWORD(wParam))
@@ -201,7 +205,6 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                 case ID_FILE_CLOSEPLAYLIST:
                     Close();
                     return 1;
-
 
                 case ID_EDIT_ADDTRACK:
                     AddTrackEvent();
@@ -271,25 +274,8 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
 
 
                 case ID_HELP_CONTENTS:
-                case ID_HELP_SEARCH:
-                {
-                    string            oHelpFile;
-                    char              dir[MAX_PATH];
-                    uint32            len = sizeof(dir);
-
-                    m_context->prefs->GetInstallDirectory(dir, &len);
-                    oHelpFile = string(dir);
-                    oHelpFile += string("\\");    
-                    oHelpFile += string(HELP_FILE);    
-
-                    //WinHelp(m_hWnd, oHelpFile.c_str(), HELP_FINDER, 0);
-                    WinHelp(m_hWnd, oHelpFile.c_str(), HELP_CONTEXT, Music_Browser);
+                    ShowHelp(Music_Browser);
                     return 1;
-                }
-
-                //case ID_HELP_SEARCH:
-                //    ShowHelp(0);
-                //    return 1;
 
                 case ID_HELP_FREEAMPWEBSITE:
                     ShellExecute(   hwnd, 
@@ -1716,3 +1702,4 @@ uint32 MusicBrowserUI::CalcStringEllipsis(HDC hdc, string& displayString, int32 
 
     return sizeString.cx;
 }
+

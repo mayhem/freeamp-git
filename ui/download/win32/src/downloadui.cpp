@@ -42,6 +42,7 @@ using namespace std;
 #include "eventdata.h"
 #include "playlist.h"
 #include "errors.h"
+#include "help.h"
 #include "resource.h"
 
 static const int32 kProgressHeight = 8;
@@ -1429,6 +1430,12 @@ BOOL CALLBACK DownloadUI::MainProc(	HWND hwnd,
             break;
         }     
         
+        case WM_HELP:
+        {
+            m_ui->ShowHelp(Download_Manager);
+            return 1;
+        }
+            
         case WM_NOTIFY:
         {
             result = m_ui->Notify(wParam, (NMHDR*)lParam);
@@ -1743,3 +1750,17 @@ ProgressWndProc(HWND hwnd,
 	//  Pass all non-custom messages to old window proc
 	return CallWindowProc(lpOldProc, hwnd, msg, wParam, lParam ) ;
 }
+
+void DownloadUI::ShowHelp(uint32 topic)
+{
+    string            oHelpFile;
+    char              dir[MAX_PATH];
+    uint32            len = sizeof(dir);
+
+    m_context->prefs->GetInstallDirectory(dir, &len);
+    oHelpFile = string(dir);
+    oHelpFile += string("\\freeamp.hlp");    
+
+    WinHelp(m_hwnd, oHelpFile.c_str(), HELP_CONTEXT, topic);
+}        
+

@@ -534,12 +534,9 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
             break;
         }
 
-        case WM_KEYDOWN:
+        case WM_HELP:
         {
-            if(VK_F1 == wParam)
-            {
-                PropSheet_PressButton(hwnd, PSBTN_HELP);
-            }
+            LaunchHelp(hwnd, Preferences_General);
             break;
         }
 
@@ -925,6 +922,12 @@ bool Win32PreferenceWindow::PrefStreamingProc(HWND hwnd,
                             m_originalValues.useAlternateIP);
 
             
+            break;
+        }
+
+        case WM_HELP:
+        {
+            LaunchHelp(hwnd, Preferences_Streaming);
             break;
         }
 
@@ -1580,6 +1583,12 @@ bool Win32PreferenceWindow::PrefAboutProc(HWND hwnd,
             break;
         }
 
+        case WM_HELP:
+        {
+            LaunchHelp(hwnd, Preferences_About);
+            break;
+        }
+
         case WM_NOTIFY:
         {
             NMHDR* notify = (NMHDR*)lParam;
@@ -1820,6 +1829,12 @@ bool Win32PreferenceWindow::PrefThemeProc(HWND hwnd,
                 }
             }
 
+            break;
+        }
+
+        case WM_HELP:
+        {
+            LaunchHelp(hwnd, Preferences_Themes);
             break;
         }
 
@@ -2472,6 +2487,12 @@ bool Win32PreferenceWindow::PrefUpdateProc(HWND hwnd,
             break;
         }
 
+        case WM_HELP:
+        {
+            LaunchHelp(hwnd, Preferences_Update);
+            break;
+        }
+
         case WM_NOTIFY:
         {
             NMHDR* notify = (NMHDR*)lParam;
@@ -2773,6 +2794,32 @@ bool Win32PreferenceWindow::PrefAdvancedProc(HWND hwnd,
 
                     break;
                 }
+                
+                case IDC_USEDEFAULTS:
+                {
+                    // We should pull these values from the 
+                    // preferences rather than just hard coding them
+                    SendMessage(hwndPriority, 
+                                TBM_SETRANGE, 
+                                (WPARAM) TRUE,                   
+                                (LPARAM) MAKELONG(0, 6));
+                    
+                    SendMessage(hwndPriority, 
+                                TBM_SETPOS, 
+                                (WPARAM) TRUE,                   
+                                (LPARAM) 5);
+                    
+                    Edit_LimitText(hwndInput, 4);
+                    Edit_SetText(hwndInput, "64");
+                    
+                    Edit_LimitText(hwndOutput, 4);
+                    Edit_SetText(hwndOutput, "512");
+                    
+                    Edit_LimitText(hwndPrebuffer, 2);
+                    Edit_SetText(hwndPrebuffer, "0");
+                
+                    break;
+                }
 
                 case IDC_PREBUFFER:
                 {
@@ -2837,6 +2884,12 @@ bool Win32PreferenceWindow::PrefAdvancedProc(HWND hwnd,
 			}
 
 			break;
+        }
+
+        case WM_HELP:
+        {
+            LaunchHelp(hwnd, Preferences_Advanced);
+            break;
         }
 
         case WM_NOTIFY:
@@ -3239,6 +3292,12 @@ bool Win32PreferenceWindow::PrefPluginsProc(HWND hwnd,
             
 
             result = true;
+            break;
+        }
+
+        case WM_HELP:
+        {
+            LaunchHelp(hwnd, Preferences_Plugins);
             break;
         }
 
