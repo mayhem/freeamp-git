@@ -37,7 +37,7 @@ Semaphore::~Semaphore() {
    CloseHandle(m_sem);
 }
 
-void Semaphore::Wait(int ms) 
+bool Semaphore::Wait(int ms) 
 {	
    if (ms > 0)
    {

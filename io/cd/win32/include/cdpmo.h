@@ -59,8 +59,8 @@ class CDPMO:public PhysicalMediaOutput
 
    virtual Error Init(OutputInfo * info);
    static  void  StartWorkerThread(void *);
-   virtual int32 GetVolume(void);
-   virtual void  SetVolume(int32);
+   virtual void  GetVolume(int32 &, int32 &);
+   virtual void  SetVolume(int32, int32);
    virtual void  Pause(void);
    virtual void  Resume(void);
    virtual Error ChangePosition(int32);

@@ -220,7 +220,7 @@ void SoundCardPMO::GetVolume(int32 &left, int32 &right)
                                  MIXER_OBJECTF_HMIXER |
                                  MIXER_GETCONTROLDETAILSF_VALUE);
     if (ret != MMSYSERR_NOERROR)
-        return false;
+        return;
 
     left = (int)(((float)((mxcdVolume[0].dwValue - m_dwMinimum) * 100) /  
                   (float)(m_dwMaximum - m_dwMinimum)) + 0.5); 
