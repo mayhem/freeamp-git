@@ -37,7 +37,7 @@ ____________________________________________________________________________*/
 #define the_BRANDING "FreeAmp"
 
 #define BRANDING_URL "http://www.freeamp.org"
-#define BRANDING_UPDATE_SERVER "fatman.freeamp.org"
+#define BRANDING_UPDATE_SERVER "update.freeamp.org"
 #define BRANDING_UPDATE_PATH "/update/freeamp/"
 #define BRANDING_DEFAULT_THEME "FreeAmp.fat"
 #define BRANDING_HELP_FILE "freeamp.hlp"
