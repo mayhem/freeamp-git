@@ -241,14 +241,14 @@ class PlayListManager {
     Error ToggleRepeat();
     Error ToggleShuffle();
 
-    PlayListItem* FirstItem() const;
-	PlayListItem* LastItem() const;
+    PlayListItem* FirstItem();
+	PlayListItem* LastItem();
 
-	bool HasItem(PlayListItem* item) const;
-	int32 CountItems() const;
+	bool HasItem(PlayListItem* item);
+	int32 CountItems();
 
-    PlayListItem*   ItemAt(int32 index) const;
-	int32	        IndexOf(PlayListItem* item) const;
+    PlayListItem*   ItemAt(int32 index);
+	int32	        IndexOf(PlayListItem* item);
 
     virtual	Error AddItem(char *url,int32 type);
     virtual	Error AddItem(char *url,int32 type, int32 index);
@@ -264,7 +264,7 @@ class PlayListManager {
     virtual Error           RemoveAll();
 
     virtual	void MakeEmpty();
-		    bool IsEmpty() const;
+		    bool IsEmpty();
 
     void DoForEach(bool (*func)(PlayListItem*));
     void DoForEach(bool (*func)(PlayListItem*, void*), void*);

@@ -335,7 +335,7 @@ ToggleRepeat()
 
 PlayListItem* 
 PlayListManager::
-FirstItem() const
+FirstItem()
 {
     PlayListItem* result = NULL;
 
@@ -350,7 +350,7 @@ FirstItem() const
 
 PlayListItem* 
 PlayListManager::
-LastItem() const
+LastItem()
 {
     PlayListItem* result = NULL;
 
@@ -365,7 +365,7 @@ LastItem() const
 
 bool 
 PlayListManager::
-HasItem(PlayListItem* item) const
+HasItem(PlayListItem* item)
 {
     bool result = false;
 
@@ -380,7 +380,7 @@ HasItem(PlayListItem* item) const
 
 int32 
 PlayListManager::
-CountItems() const
+CountItems()
 {
     int32 result = 0;
 
@@ -395,7 +395,7 @@ CountItems() const
 
 PlayListItem*   
 PlayListManager::
-ItemAt(int32 index) const
+ItemAt(int32 index)
 {
     PlayListItem* result = NULL;
 
@@ -410,7 +410,7 @@ ItemAt(int32 index) const
 
 int32
 PlayListManager::
-IndexOf(PlayListItem* item) const
+IndexOf(PlayListItem* item)
 {
     int32 result = 0;
 
@@ -640,7 +640,7 @@ RemoveItem(PlayListItem* item)
 {
     Error result = kError_UnknownErr;
 
-    if(RemoveItem(IndexOf(item))
+    if(RemoveItem(IndexOf(item)))
     {
         result = kError_NoErr;
     }
@@ -711,7 +711,7 @@ MakeEmpty()
 
 bool 
 PlayListManager::
-IsEmpty() const
+IsEmpty()
 {
     bool result = false;
 
