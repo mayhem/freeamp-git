@@ -1470,7 +1470,7 @@ void DownloadManager::LoadResumableDownloadItems()
 
                 string data = string(value);
                 data.erase(0, offset);
-                delete value;
+                delete [] value;
                 value = NULL;
 
                 DownloadItem* item = new DownloadItem();
@@ -1562,7 +1562,7 @@ void DownloadManager::LoadResumableDownloadItems()
             while ((key = database.NextKey(NULL)))
             {
                 database.Remove(key);
-                delete key;
+                delete [] key;
             }
         }
     }

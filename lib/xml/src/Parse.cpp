@@ -116,7 +116,7 @@ int Parse::Scanf(const char *szFormat, char *szData)
     if (iRet > 0 || iOffset > 0)
        m_uScanOffset += iOffset;
 
-    delete szCustomFormat;
+    delete [] szCustomFormat;
 
     return iRet;
 }
@@ -264,11 +264,11 @@ cout << szElement << endl;
         }
     }
 
-    delete szElement;
-    delete szElementName,
-    delete szAttr;
-    delete szValue;
-    delete szData;
+    delete [] szElement;
+    delete [] szElementName,
+    delete [] szAttr;
+    delete [] szValue;
+    delete [] szData;
 
     if (bError)
     {
@@ -286,7 +286,7 @@ void Parse::GetErrorString(string &oError)
     sprintf(szError, "%s on line %d.", 
             m_oLastError.c_str(), m_iErrorLine - 1);
     oError = string(szError);
-    delete szError;
+    delete [] szError;
 }
 
 

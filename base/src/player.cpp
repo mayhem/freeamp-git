@@ -470,7 +470,7 @@ void Player::HandleSingleArg(char *arg)
     if(IsSupportedProtocol(proto)) 
     {
         m_plm->AddItem(arg);
-        delete proto;
+        delete [] proto;
     }
     else
     {

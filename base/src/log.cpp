@@ -103,7 +103,7 @@ void LogFile::Error(const char *format, ...)
     fprintf(m_fpLog, "Error: %s", szBuffer);
     fflush(m_fpLog);
 
-    delete szBuffer;
+    delete [] szBuffer;
 }
 
 void LogFile::Log(int iLogLevel, const char *format, ...)
@@ -123,5 +123,5 @@ void LogFile::Log(int iLogLevel, const char *format, ...)
     fprintf(m_fpLog, "%s: %s", szLogLevelNames[iLogLevel], szBuffer);
     fflush(m_fpLog);
 
-    delete szBuffer;
+    delete [] szBuffer;
 }
