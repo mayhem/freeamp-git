@@ -47,11 +47,11 @@ public:
     SoundCardPMO();
     virtual ~SoundCardPMO();
     
-    virtual bool Init(OutputInfo* info);
-    virtual bool Reset(bool user_stop);
+    virtual Error Init(OutputInfo* info);
+    virtual Error Reset(bool user_stop);
     virtual int32 Write(void*,int32);
-    virtual void Pause();
-    virtual void Resume();
+    virtual Error Pause();
+    virtual Error Resume();
     
     
  private:

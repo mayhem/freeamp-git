@@ -42,9 +42,11 @@ class SimpleUI : public UserInterface {
     SimpleUI();
     ~SimpleUI();
 
+    virtual void Init() {}
     virtual void SetTarget(EventQueue*);
     virtual int32 AcceptEvent(Event *);
     virtual void SetArgs(int32,char **);
+
 
     void CreateUI();
 

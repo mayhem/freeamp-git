@@ -48,11 +48,10 @@ BOOL CALLBACK MainProc(	HWND hwnd,
 						WPARAM wParam, 
 						LPARAM lParam ); 
 
-extern "C" {
-SimpleUI *Initialize() {
+extern "C" SimpleUI *Initialize() 
+{
     return new SimpleUI();
 }
-	   }
 
 
 INT WINAPI DllMain (HINSTANCE hInst,

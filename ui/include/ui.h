@@ -50,7 +50,7 @@ typedef struct UI{
 class UserInterface : public EventQueue {
  public:
     virtual int32 AcceptEvent(Event *) = 0;
-    virtual void  SetArgs(int32,char **) = 0;
+    virtual void SetArgs(int32,char **) = 0;
     virtual void SetTarget(EventQueue *) = 0;
     virtual void Init() = 0;
     virtual ~UserInterface() {}
