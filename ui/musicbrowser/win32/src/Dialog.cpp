@@ -618,6 +618,7 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
     SetTitles();
     CreateToolbar();
 
+    // Subclass the listview
     m_hPlaylistHeader = FindWindowEx(m_hPlaylistView, NULL, WC_HEADER, NULL);
 
     if(m_hPlaylistHeader)
@@ -626,12 +627,12 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
 	    // of the window so it can get it
 	    SetProp(m_hPlaylistView, 
 			    "oldproc",
-			    (HANDLE)GetWindowLong(m_hPlaylistView, GWL_WNDPROC));
+                (HANDLE)GetWindowLong(m_hPlaylistView, GWL_WNDPROC));
 	    
 	    // Subclass the window so we can draw it
-	    SetWindowLong(	m_hPlaylistView, 
-					    GWL_WNDPROC, 
-					    (DWORD)ListViewWndProc );  
+	    SetWindowLong(m_hPlaylistView, 
+                      GWL_WNDPROC, 
+                      (DWORD)ListViewWndProc );  
 
         HD_ITEM hd_item;
     
@@ -645,6 +646,19 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
         //Header_SetItem(m_hPlaylistHeader, 2, &hd_item);
         //Header_SetItem(m_hPlaylistHeader, 3, &hd_item);
     }
+
+    // Subclass the treetview
+
+    // Set the proc address as a property 
+	// of the window so it can get it
+	SetProp(m_hMusicCatalog, 
+            "oldproc",
+            (HANDLE)GetWindowLong(m_hMusicCatalog, GWL_WNDPROC));
+	
+	// Subclass the window so we can draw it
+	SetWindowLong(m_hMusicCatalog, 
+			      GWL_WNDPROC, 
+                  (DWORD)TreeViewWndProc );  
     
     m_hStatus= CreateStatusWindow(WS_CHILD | WS_VISIBLE,
                                   "", m_hWnd, IDC_STATUS);

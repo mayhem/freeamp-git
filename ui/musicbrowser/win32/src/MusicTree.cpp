@@ -51,6 +51,8 @@ void MusicBrowserUI::InitTree(void)
     sItem.iSelectedImage = 0;
     sItem.cChildren= 1;
     sItem.lParam = -1;
+    //sItem.state = TVIS_SELECTED;
+    //sItem.stateMask = TVIS_SELECTED;
         
     sInsert.item = sItem;
     sInsert.hInsertAfter = TVI_FIRST;
@@ -305,8 +307,8 @@ void MusicBrowserUI::FillUncatTracks(void)
             sInsert.item.pszText = (char *)(oData.Title().c_str());
             
         sInsert.item.cchTextMax = oData.Title().length();
-        sInsert.item.iImage = 2;
-        sInsert.item.iSelectedImage = 2;
+        sInsert.item.iImage = 4;
+        sInsert.item.iSelectedImage = 4;
         sInsert.item.cChildren= 0;
         sInsert.item.lParam = m_oTreeIndex.Add(oCrossRef);
         sInsert.hInsertAfter = TVI_SORT;
@@ -388,4 +390,233 @@ int32 MusicBrowserUI::GetCurrentItemFromMousePos(void)
         return sItem.lParam;
     }
     return -1;
+}
+
+#define IsCtrlDown()  (GetKeyState(VK_CONTROL) < 0)
+#define IsShiftDown()  (GetKeyState(VK_SHIFT) < 0)
+
+
+
+static BOOL TreeView_SetTree(HWND hwnd, TV_ITEM* root)
+{
+    BOOL result = FALSE;
+    HTREEITEM childItem; 
+    TV_ITEM tv_item = *root;
+
+    do
+    {
+        result = TreeView_SetItem(hwnd, &tv_item);
+
+        childItem = TreeView_GetChild(hwnd, tv_item.hItem);
+
+        if(result && childItem)
+        {
+            TV_ITEM child_tv_item = tv_item;
+
+            child_tv_item.hItem = childItem;
+            result = TreeView_SetTree(hwnd, &child_tv_item);
+        }
+
+    }while(result && (tv_item.hItem = TreeView_GetNextSibling(hwnd, tv_item.hItem)));
+    
+    return result;
+}
+
+static BOOL TreeView_SetBranch(HWND hwnd, TV_ITEM* root)
+{
+    BOOL result = FALSE;
+    TV_ITEM tv_item = *root;
+
+    result = TreeView_SetItem(hwnd, &tv_item);
+
+    tv_item.hItem = TreeView_GetChild(hwnd, tv_item.hItem);
+
+    if(result && tv_item.hItem)
+    {
+        TreeView_SetTree(hwnd, &tv_item);
+    }
+    
+    return result;
+}
+
+LRESULT WINAPI 
+TreeViewWndProc(HWND hwnd, 
+                UINT msg, 
+                WPARAM wParam, 
+                LPARAM lParam)
+{
+    WNDPROC lpOldProc = (WNDPROC)GetProp( hwnd, "oldproc" );
+
+	switch(msg)
+	{
+		case WM_DESTROY:   
+		{
+			//  Put back old window proc and
+			SetWindowLong( hwnd, GWL_WNDPROC, (DWORD)lpOldProc );
+
+			// remove window property
+			RemoveProp( hwnd, "oldproc" ); 
+
+			break;
+        }
+
+        case WM_LBUTTONDOWN:
+        {
+            bool shiftKeyPressed = IsShiftDown();
+            bool ctrlKeyPressed = IsCtrlDown();
+
+            HTREEITEM item;
+            TV_HITTESTINFO hti;
+
+            hti.pt.x = LOWORD(lParam);
+            hti.pt.y = HIWORD(lParam);
+        
+            item = TreeView_HitTest(hwnd, &hti);  
+
+            if(item && (hti.flags & TVHT_ONITEM))
+            {
+                HTREEITEM focusItem = TreeView_GetSelection(hwnd);
+                TV_ITEM tv_item;
+
+                tv_item.hItem = item;
+                tv_item.mask = TVIF_STATE;
+                tv_item.stateMask = TVIS_SELECTED;
+
+                TreeView_GetItem(hwnd, &tv_item);
+
+                bool wasFocus = item == focusItem;
+                bool wasSelected = (tv_item.state & TVIS_SELECTED) != 0;
+                
+                if(ctrlKeyPressed)
+                {
+                    TreeView_Select(hwnd, item, TVGN_CARET);
+
+                    if(focusItem)
+                    {
+                        tv_item.hItem = focusItem;
+                        tv_item.mask = TVIF_STATE;
+                        tv_item.stateMask = TVIS_SELECTED;
+                        tv_item.state = TVIS_SELECTED;
+
+                        TreeView_SetItem(hwnd, &tv_item);
+                    }
+
+                    return TRUE;
+                }
+                else if(shiftKeyPressed)
+                {
+                    // need to iterate all the items and 
+                    // make sure they aren't selected
+                    HTREEITEM rootItem = TreeView_GetRoot(hwnd);
+
+                    if(rootItem)
+                    {
+                        do
+                        {
+                            tv_item.hItem = rootItem;
+                            tv_item.mask = TVIF_STATE;
+                            tv_item.stateMask = TVIS_SELECTED | TVIS_EXPANDEDONCE;
+                            tv_item.state = TVIS_EXPANDEDONCE;
+
+                            TreeView_SetBranch(hwnd, &tv_item);
+                            
+                        }while(rootItem = TreeView_GetNextSibling(hwnd, rootItem));
+                    }
+
+                    HTREEITEM topItem = NULL;
+                    HTREEITEM bottomItem = NULL;
+                    HTREEITEM dummyItem = NULL;
+
+                    dummyItem = focusItem;
+
+                    // which item is above the other? search downward first
+                    while(dummyItem = TreeView_GetNextSibling(hwnd, dummyItem))
+                    {
+                        if(dummyItem == item)
+                        {
+                            topItem = focusItem;
+                            bottomItem = item;
+                            break;
+                        }
+                    }
+                    
+                    // did we find out? no? search upward next
+                    if(!topItem)
+                    {
+                        dummyItem = focusItem;
+
+                        // which item is above the other? search downward first
+                        while(dummyItem = TreeView_GetPrevSibling(hwnd, dummyItem))
+                        {
+                            if(dummyItem == item)
+                            {
+                                topItem = item;
+                                bottomItem = focusItem;
+                                break;
+                            }
+                        }
+                    }
+
+                    // if they are not siblings then we do not support shift
+                    // selection so just pass it on
+                    if(topItem)
+                    {
+                        // need to iterate all the items and 
+                        // select them
+                        
+                        rootItem = topItem;
+
+                        do
+                        {
+                            tv_item.hItem = rootItem;
+                            tv_item.mask = TVIF_STATE;
+                            tv_item.stateMask = TVIS_SELECTED;
+                            tv_item.state = TVIS_SELECTED;
+
+                            TreeView_SetBranch(hwnd, &tv_item);
+                    
+                        }while(rootItem != bottomItem && (rootItem = TreeView_GetNextSibling(hwnd, rootItem)));
+
+                        
+                        return TRUE;
+                    }
+                }
+                else
+                {
+                    if(!wasSelected)
+                    {
+                        // need to iterate all the items and 
+                        // make sure they aren't selected
+                        HTREEITEM rootItem = TreeView_GetRoot(hwnd);
+
+                        if(rootItem)
+                        {
+                            do
+                            {
+                                tv_item.hItem = rootItem;
+                                tv_item.mask = TVIF_STATE;
+                                tv_item.stateMask = TVIS_SELECTED | TVIS_EXPANDEDONCE;
+                                tv_item.state = TVIS_EXPANDEDONCE;
+
+                                TreeView_SetBranch(hwnd, &tv_item);
+                                
+                            }while(rootItem = TreeView_GetNextSibling(hwnd, rootItem));
+                        }
+                    }
+                }
+            }
+                    
+            break;
+        }
+
+        case WM_NOTIFY:
+        {
+            
+
+            break;
+        }
+    } 
+	
+	//  Pass all non-custom messages to old window proc
+	return CallWindowProc((int (__stdcall *)(void))lpOldProc, hwnd, msg, wParam, lParam );
 }

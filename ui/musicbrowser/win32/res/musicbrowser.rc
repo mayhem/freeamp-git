@@ -34,8 +34,8 @@ MENU IDR_MENU1
 FONT 8, "MS Sans Serif"
 BEGIN
     CONTROL         "Tree1",IDC_MUSICTREE,"SysTreeView32",TVS_HASBUTTONS | 
-                    TVS_HASLINES | WS_BORDER | WS_TABSTOP,0,40,136,198,
-                    WS_EX_CLIENTEDGE
+                    TVS_HASLINES | TVS_LINESATROOT | TVS_SHOWSELALWAYS | 
+                    WS_BORDER | WS_TABSTOP,0,40,136,198,WS_EX_CLIENTEDGE
     LTEXT           "My Music Collection",IDC_MUSICCATALOGTEXT,4,29,64,8
     CONTROL         "List1",IDC_PLAYLISTBOX,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_OWNERDRAWFIXED | WS_BORDER | 

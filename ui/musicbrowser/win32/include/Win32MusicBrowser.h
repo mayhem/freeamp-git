@@ -61,6 +61,12 @@ ListViewWndProc(HWND hwnd,
                 WPARAM wParam, 
                 LPARAM lParam);
 
+LRESULT WINAPI 
+TreeViewWndProc(HWND hwnd, 
+                UINT msg, 
+                WPARAM wParam, 
+                LPARAM lParam);
+
 class MusicBrowserUI : public UserInterface 
 {
  public:
