@@ -206,9 +206,28 @@ SetPrev(bool bUserAction)
     {
         if(!(m_repeat == REPEAT_CURRENT))
         {
-            if(m_order == SHUFFLE_RANDOM)
+            if(SHUFFLE_RANDOM == m_order)
             {
-                m_current = rand() % count;
+                m_current = 0;
+
+                if( m_shuffleList->CountItems() != m_playList->CountItems())
+                {
+                    CreateShuffleList();
+                }
+
+                m_shuffle--;
+
+                if(m_shuffle < 0)
+                {
+                    m_shuffle = count - 1;
+                }
+
+                ShuffleItem* item = m_shuffleList->ItemAt(m_shuffle);
+
+                if(item)
+                {
+                    m_current = item->m_index;
+                }                
             }
             else
             {

@@ -203,15 +203,16 @@ PrefPage1Proc(  HWND hwnd,
             // initialize our controls
 
             int32 i = 0;
+            int32 pos = 0;
             RegistryItem *item;
 
             while(item = pmo.GetItem(i++))
             {
-                ComboBox_AddString(hwndPMO, item->Name());
+                pos = ComboBox_AddString(hwndPMO, item->Name());
 
                 if(!strcmp(originalValues.defaultPMO, item->Name()))
                 {
-                    ComboBox_SetCurSel(hwndPMO, i-1);
+                    ComboBox_SetCurSel(hwndPMO, pos);
                 }
             }
             
@@ -219,11 +220,11 @@ PrefPage1Proc(  HWND hwnd,
 
             while(item = ui.GetItem(i++))
             {
-                ComboBox_AddString(hwndUI, item->Name());
+                pos = ComboBox_AddString(hwndUI, item->Name());
 
                 if(!strcmp(originalValues.defaultUI, item->Name()))
                 {
-                    ComboBox_SetCurSel(hwndUI, i-1);
+                    ComboBox_SetCurSel(hwndUI, pos);
                 }
             }
 
