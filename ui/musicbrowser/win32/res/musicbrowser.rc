@@ -476,6 +476,10 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Edit Profile",                ID_RELATABLE_EDITPROFILE
     END
+    POPUP "&Bitzi"
+    BEGIN
+        MENUITEM "&Lookup at Bitzi",            ID_BITZI_LOOKUP
+    END
     POPUP "&Help"
     BEGIN
         MENUITEM "&Contents",                   ID_HELP_CONTENTS
@@ -483,6 +487,7 @@ BEGIN
         MENUITEM "&FreeAmp Web Site",           ID_HELP_FREEAMPWEBSITE
         MENUITEM "&EMusic.com Web Site",        ID_HELP_EMUSICCOMWEBSITE
         MENUITEM "&Relatable Web Site",         ID_HELP_RELATABLEWEBSITE
+        MENUITEM "&Bitzi Web Site",             ID_HELP_BITZIWEBSITE
         MENUITEM SEPARATOR
         MENUITEM "&About...",                   ID_HELP_ABOUT
     END
@@ -500,6 +505,7 @@ BEGIN
         MENUITEM "&Remove...",                  ID_POPUP_REMOVE
         MENUITEM SEPARATOR
         MENUITEM "&Edit Info...",               ID_POPUP_EDITINFO
+        MENUITEM "&Lookup at Bitzi",            ID_BITZI_LOOKUP
     END
 END
 
@@ -595,6 +601,7 @@ BEGIN
         MENUITEM "&Remove",                     ID_POPUP_REMOVE
         MENUITEM SEPARATOR
         MENUITEM "&Edit Info...",               ID_POPUP_EDITINFO
+        MENUITEM "&Lookup at Bitzi",            ID_BITZI_LOOKUP
         MENUITEM SEPARATOR
         MENUITEM "&Tip This Artist",            ID_POPUP_TIP
     END

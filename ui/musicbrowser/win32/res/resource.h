@@ -215,6 +215,8 @@
 #define ID_HELP_RELATABLEWEBSITE        40099
 #define ID_POPUP_SUPDATE                40100
 #define ID_POPUP_VISITWEB               40101
+#define ID_LOOKUP_BITZI                 40102
+#define ID_HELP_BITZIWEBSITE            40103
 #define IDS_URL                         65535
 #define IDC_TRACKTEXT                   65535
 #define IDC_TITLETEXT                   65535

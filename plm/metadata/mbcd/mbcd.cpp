@@ -109,11 +109,11 @@ bool MusicBrainzCD::ReadMetaData(const char* url, MetaData* metadata)
     mb_Select1(o, MBS_SelectAlbum, 1);  
 
     numTracks = mb_GetResultInt(o, MBE_AlbumGetNumTracks);
-    mb_GetResultData(o, MBE_AlbumGetAlbumName, data, iDataLen);
+    mb_GetResultData1(o, MBE_AlbumGetAlbumName, data, iDataLen, track);
     metadata->SetAlbum(data);
-    mb_GetResultData1(o, MBE_AlbumGetArtistName, data, 256, track + 1);
+    mb_GetResultData1(o, MBE_AlbumGetArtistName, data, 256, track);
     metadata->SetArtist(data);
-    mb_GetResultData1(o, MBE_AlbumGetTrackName, data, 256, track + 1);
+    mb_GetResultData1(o, MBE_AlbumGetTrackName, data, 256, track);
     metadata->SetTitle(string(data));
     metadata->SetTrack(track + 1);
     metadata->SetTime(m_trackLens[track - 1]);
