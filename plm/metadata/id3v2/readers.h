@@ -28,8 +28,10 @@
 #ifndef _ID3LIB_READERS_H_
 #define _ID3LIB_READERS_H_
 
+#ifndef WIN32
 #include <iostream>
 using namespace std;
+#endif
 
 #include <fstream.h>
 #include "reader.h"

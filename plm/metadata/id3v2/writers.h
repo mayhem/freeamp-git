@@ -28,8 +28,10 @@
 #ifndef _ID3LIB_WRITERS_H_
 #define _ID3LIB_WRITERS_H_
 
+#ifndef WIN32
 #include <iostream>
 using namespace std;
+#endif
 
 #include "writer.h"
 #include <fstream.h>
