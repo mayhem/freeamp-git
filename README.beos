@@ -1,5 +1,17 @@
 $Id$
 
+THINGS YOU NEED
+
+- perl
+  I use the one from GeekGadgets. Needed for some assembly codes and
+  some scripts that may be invoked by Makefile's.
+
+- nasm (http://www.web-sites.co.uk/nasm/)
+  A binary distribution for BeOS is also available at www.bebits.com.
+  If you don't have nasm installed, the configure will simply choose
+  the C versions for the some xingmp3 functions, which will probably
+  work just fine, just slower.
+
 TO BUILD FREEAMP ON BEOS
 
 In Makefile-plugins.in, comment out the lines that say:
