@@ -1,79 +1,136 @@
 [RainPlaySet]
 ---Comment---=
 ---FileGroup---=RainPlay UI
-HKCU0=Software\FreeAmp\FreeAmp v1.2
+HKCU0=Software\FreeAmp\FreeAmp v1.2\Main
 
-[RainPlaySet:HKCU:Software\FreeAmp\FreeAmp v1.2]
----Comment---=
-(Default)=S,
-UI=S,rainplay.ui
-InstallDirectory=S,<TARGETDIR>
-OpenSaveDirectory=S,<TARGETDIR>
-PMO=S,soundcard.pmo
-
-[DSoundSet:HKCU:Software\FreeAmp\FreeAmp v1.2]
----Comment---=
-(Default)=S,
-PMO=S,dsoundcard.pmo
-
-[RegisterFileTypes:HKCR:freeAmpFile\shell\open\command]
----Comment---=
+[RegisterFileTypes:HKCR:MP3AudioFile\shell\open\command]
 (Default)=S,<TARGETDIR>\freeamp.exe %1
-
-[RegisterFileTypes:HKCR:freeAmpFile]
 ---Comment---=
-(Default)=S,FreeAmp File
+
+[RegisterFileTypes:HKCR:PlayListFile\DefaultIcon]
+(Default)=S,<TARGETDIR>\freeamp.exe,0
+---Comment---=
+
+[RegisterFileTypes:HKCR:PlayListFile\shell\open\command]
+(Default)=S,<TARGETDIR>\freeamp.exe %1
+---Comment---=
+
+[RegisterFileTypes:HKCR:.m3u]
+(Default)=S,PlayListFile
+---Comment---=
+
+[RegisterFileTypes:HKCR:MP3AudioFile]
+(Default)=S,MP3 Audio File
+---Comment---=
 
 [FreeAmpSet]
 ---Comment---=
 ---FileGroup---=FreeAmp UI
-HKCU0=Software\FreeAmp\FreeAmp v1.2
+HKCU0=Software\FreeAmp\FreeAmp v1.2\Main
+
+[MainSet:HKCU:Software\FreeAmp\FreeAmp v1.2\Main]
+LogInput=N,0
+UseDebugLog=N,0
+(Default)=S,
+---Comment---=
+OutputBufferSize=N,512
+LogMain=N,0
+LogDecode=N,0
+UI=S,freeamp.ui
+WindowPositionWidth=N,0
+LogOutput=N,0
+StreamBufferInterval=N,3
+InstallDirectory=S,<TARGETDIR>
+StayOnTop=N,0
+LiveInTray=N,0
+DecoderThreadPriority=N,4
+WindowPositionTop=N,0
+OpenSaveDirectory=S,<TARGETDIR>
+LogPerformance=N,0
+InputBufferSize=N,64
+WindowPositionLeft=N,0
+WindowPositionHeight=N,0
+PMO=S,soundcard.pmo
+
+[RegisterFileTypes:HKCR:PlayListFile]
+(Default)=S,PlayList File
+---Comment---=
+
+[SoundCardSet:HKCU:Software\FreeAmp\FreeAmp v1.2\Main]
+---Comment---=
+(Default)=S,
+PMO=S,soundcard.pmo
+
+[RegisterFileTypes:HKCR:MP3AudioFile\DefaultIcon]
+(Default)=S,<TARGETDIR>\freeamp.exe,0
+---Comment---=
+
+[SimpleSet:HKCU:Software\FreeAmp\FreeAmp v1.2\Main]
+---Comment---=
+(Default)=S,
+UI=S,simple.ui
 
 [Data]
-Set0=FreeAmpSet
+Set0=MainSet
 Set1=SimpleSet
 Set2=DSoundSet
 Set3=RegisterFileTypes
 Set4=RainPlaySet
+Set5=FreeAmpSet
+Set6=SoundCardSet
+
+[FreeAmpSet:HKCU:Software\FreeAmp\FreeAmp v1.2\Main]
+(Default)=S,
+---Comment---=
+UI=S,freeamp.ui
 
 [SimpleSet]
 ---Comment---=
 ---FileGroup---=Simple UI
-HKCU0=Software\FreeAmp\FreeAmp v1.2
+HKCU0=Software\FreeAmp\FreeAmp v1.2\Main
 
-[SimpleSet:HKCU:Software\FreeAmp\FreeAmp v1.2]
-(Default)=S,
+[SoundCardSet]
 ---Comment---=
-UI=S,simple.ui
-InstallDirectory=S,<TARGETDIR>
-OpenSaveDirectory=S,<TARGETDIR>
-PMO=S,soundcard.pmo
+---FileGroup---=Sound Card Output
+HKCU0=Software\FreeAmp\FreeAmp v1.2\Main
+
+[DSoundSet]
+---Comment---=
+---FileGroup---=Direct Sound Output
+HKCU0=Software\FreeAmp\FreeAmp v1.2\Main
 
 [General]
 Type=REGISTRYDATA
 Version=1.00.000
 
-[DSoundSet]
+[MainSet]
 ---Comment---=
----FileGroup---=Direct Sound Output
-HKCU0=Software\FreeAmp\FreeAmp v1.2
+---FileGroup---=
+HKCU0=Software\FreeAmp\FreeAmp v1.2\Main
 
 [RegisterFileTypes:HKCR:.mp3]
+(Default)=S,MP3AudioFile
 ---Comment---=
-(Default)=S,FreeAmpFile
 
-[FreeAmpSet:HKCU:Software\FreeAmp\FreeAmp v1.2]
----Comment---=
+[RainPlaySet:HKCU:Software\FreeAmp\FreeAmp v1.2\Main]
 (Default)=S,
-UI=S,freeamp.ui
-InstallDirectory=S,<TARGETDIR>
-OpenSaveDirectory=S,<TARGETDIR>
-PMO=S,soundcard.pmo
+---Comment---=
+UI=S,rainplay.ui
+
+[DSoundSet:HKCU:Software\FreeAmp\FreeAmp v1.2\Main]
+(Default)=S,
+---Comment---=
+PMO=S,dsoundcard.pmo
 
 [RegisterFileTypes]
+HKCR4=PlayListFile
+HKCR5=PlayListFile\shell\open\command
 ---Comment---=
+HKCR6=PlayListFile\DefaultIcon
+HKCR7=MP3AudioFile\DefaultIcon
 ---FileGroup---=Program Executable Files
 HKCR0=.mp3
-HKCR1=freeAmpFile
-HKCR2=freeAmpFile\shell\open\command
+HKCR1=MP3AudioFile
+HKCR2=MP3AudioFile\shell\open\command
+HKCR3=.m3u
 

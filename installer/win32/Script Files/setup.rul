@@ -197,12 +197,15 @@ end;
 function ProcessBeforeDataMove()
     STRING svLogFile;
     NUMBER nResult;
+    STRING svVersion;
 
 begin
 
   // Create app information, uninstallation, and App Paths registry keys.
 
-    InstallationInfo( @COMPANY_NAME, svProductName, @PRODUCT_VERSION, @PRODUCT_KEY );
+	svVersion = @PRODUCT_VERSION + @VERSION_STRING_SPECIAL;
+	
+    InstallationInfo( @COMPANY_NAME, svProductName, svVersion, @PRODUCT_KEY );
 
     svLogFile = UNINST_LOGFILE_NAME;
 
@@ -330,10 +333,12 @@ begin
     // the InstallShield IDE's Resources pane.
 
 //    nResult = CreateRegistrySet( "" );
+	nResult = CreateRegistrySet("MainSet");
     nResult = CreateRegistrySet("SimpleSet");
-    nResult = CreateRegistrySet("FreeAmpSet");
     nResult = CreateRegistrySet("RainPlaySet");
+    nResult = CreateRegistrySet("FreeAmpSet");
 	nResult = CreateRegistrySet("DSoundSet");
+	nResult = CreateRegistrySet("SoundCardSet");
     return nResult;
  end;
 
@@ -408,11 +413,11 @@ begin
     bInstallAborted = FALSE;
 
     // Append product version to appropriate strings
-    svProductName = @PRODUCT_NAME + " " + @VERSION_STRING_MAIN + @VERSION_STRING_SPECIAL;
-    svFolderName = @FOLDER_NAME + " " + @VERSION_STRING_MAIN;
-    svMainTitle = @TITLE_MAIN + " " + @VERSION_STRING_MAIN + @VERSION_STRING_SPECIAL;
-    svUninstallDisplayName = @UNINST_DISPLAY_NAME + " " + @VERSION_STRING_MAIN + @VERSION_STRING_SPECIAL;
-    svUninstallKey = @UNINST_KEY + " " + @VERSION_STRING_MAIN + @VERSION_STRING_SPECIAL;
+    svProductName = @PRODUCT_NAME + " " + @PRODUCT_VERSION + @VERSION_STRING_SPECIAL;
+    svFolderName = @FOLDER_NAME + " " + @PRODUCT_VERSION;
+    svMainTitle = @TITLE_MAIN + " " + @PRODUCT_VERSION + @VERSION_STRING_SPECIAL;
+    svUninstallDisplayName = @UNINST_DISPLAY_NAME + " " + @PRODUCT_VERSION + @VERSION_STRING_SPECIAL;
+    svUninstallKey = @UNINST_KEY + " " + @PRODUCT_VERSION + @VERSION_STRING_SPECIAL;
 
     //  Create list of end user selections to be displayed by DialogShowSdStartCopy()  //
 
@@ -752,6 +757,9 @@ end;
 // --- include script file section ---
 
 #include "sddialog.rul"
+
+
+
 
 
 

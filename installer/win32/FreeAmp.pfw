@@ -1,0 +1,222 @@
+[PackageForTheWeb]
+Version=2.0
+
+[Options]
+Title=FreeAmp
+Company=FreeAmp
+CompanyEMail=info@freeamp.org
+BasePath=Media\32bit\Disk Images
+ImportPath=Media\32bit
+UseRTF=0
+SaveFiles=0
+SubFolders=1
+ApplicationName=FreeAmp
+Description=
+Comments=
+Notice=
+Version=1.2
+OutputSpec=..\FreeAmpSetup.exe
+GUIDs=0
+Type=2
+Compress=1
+Sign=0
+Transfer=0
+Files=27
+
+[Engine]
+Setup=disk1\SETUP.EXE
+
+[Web Page]
+Generate=1
+Template=
+MSClient=
+NClient=
+
+[Runtime]
+Welcome=
+License=
+Prompt=
+Password=
+DefaultPath=
+Language=
+WindowStyle=0
+Options=2
+Execute=disk1\SETUP.EXE
+CmdLine=/SMS
+
+[Extension]
+Server=
+Calls=0
+
+[Code Signing]
+CompanyURL=
+SpecFile=
+KeyFile=
+Method=0
+
+; ~~~~~~~~~~ File Section ~~~~~~~~~~~
+[SubFolders]
+Count=1
+Folder1=disk1
+
+[File 1]
+Name=DATA.TAG
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 2]
+Name=data1.cab
+Path=Media\32bit\Disk Images\disk1\
+Flags=2097153
+Disk=0
+
+[File 3]
+Name=dsoundcard.pmo
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 4]
+Name=fileinput.pmi
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 5]
+Name=freeamp.exe
+Path=Media\32bit\Disk Images\disk1\
+Flags=65537
+Disk=0
+
+[File 6]
+Name=freeamp.ui
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 7]
+Name=httpinput.pmi
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 8]
+Name=lang.dat
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 9]
+Name=layout.bin
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 10]
+Name=msvcirt.dll
+Path=Media\32bit\Disk Images\disk1\
+Flags=131089
+Disk=0
+
+[File 11]
+Name=obsinput.pmi
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 12]
+Name=os.dat
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 13]
+Name=portio.sys
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 14]
+Name=rainplay.ui
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 15]
+Name=ReadMe.txt
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 16]
+Name=SETUP.EXE
+Path=Media\32bit\Disk Images\disk1\
+Flags=589825
+Disk=0
+
+[File 17]
+Name=SETUP.INI
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 18]
+Name=setup.ins
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 19]
+Name=setup.lid
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 20]
+Name=simple.ui
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 21]
+Name=soundcard.pmo
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 22]
+Name=xing.lmc
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 23]
+Name=_INST32I.EX_
+Path=Media\32bit\Disk Images\disk1\
+Flags=524289
+Disk=0
+
+[File 24]
+Name=_ISDEL.EXE
+Path=Media\32bit\Disk Images\disk1\
+Flags=589825
+Disk=0
+
+[File 25]
+Name=_SETUP.DLL
+Path=Media\32bit\Disk Images\disk1\
+Flags=655377
+Disk=0
+
+[File 26]
+Name=_sys1.cab
+Path=Media\32bit\Disk Images\disk1\
+Flags=2097153
+Disk=0
+
+[File 27]
+Name=_user1.cab
+Path=Media\32bit\Disk Images\disk1\
+Flags=2097153
+Disk=0
