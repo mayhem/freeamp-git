@@ -34,7 +34,6 @@ Changes for Windows version 1.2:
 
 Changes for Linux version 1.2:
 --------------------------------------------------------------------
-
 - Added assembly decoder optimizations, input and output buffering. FreeAmp
   should now be able to play audio uninterrupted, unless the load
   on the machine gets too great. FreeAmp is now much less processor 
