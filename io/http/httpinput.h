@@ -30,7 +30,25 @@ ____________________________________________________________________________*/
 /* project headers */
 #include "config.h"
 #include "pmi.h"
-#include "httpbuffer.h"
+#include "thread.h"
+#include "semaphore.h"
+#include "streambuffer.h"  
+
+const int iMaxUrlLen = 1024;
+const int iMaxErrorLen = 1024;   
+
+enum
+{
+   httpError_MinimumError = 2000,
+   httpError_BadUrl,
+   httpError_GetHostByNameFailed,
+   httpError_CannotOpenSocket,
+   httpError_CannotConnect,
+   httpError_SocketRead,
+   httpError_SocketWrite,
+   httpError_CustomError,
+   httpError_MaximumError
+};
 
 class FAContext;
 
@@ -42,50 +60,34 @@ class HttpInput:public PhysicalMediaInput
    HttpInput(char *path);
    virtual ~ HttpInput(void);
 
-   virtual Error BeginRead(void *&buf, size_t &bytesneeded);
-   virtual Error EndRead(size_t bytesused);
-
-   virtual Error Seek(int32 & rtn, int32 offset, int32 origin);
-   virtual Error GetLength(size_t &iSize); 
-   virtual Error GetID3v1Tag(unsigned char *pTag);
+   virtual Error Prepare(PullBuffer *&pBuffer, bool bStartThread);  
+   virtual Error Run(void);  
 
    virtual bool  CanHandle(char *szUrl, char *szTitle);
    virtual bool  IsStreaming(void)
                  { return true; };
-	virtual int32 GetBufferPercentage();
-	virtual int32 GetNumBytesInBuffer();
-   virtual Error SetBufferSize(size_t iNewSize);
-	virtual bool  CachePMI()
-	              { return true; };
-
-   virtual void  Pause();
-   virtual bool  Resume();
-   virtual void  Break();
-
-   virtual Error SetTo(char *url, bool bStartThread = true);
+   virtual bool  PauseLoop(bool bLoop);  
    virtual Error Close(void);
    virtual const char *Url(void) const
    {
       return m_path;
    }
 
-   virtual Error SetPropManager(Properties *p) 
-	{ 
-	   m_propManager = p; 
-		if (p) 
-		    return kError_NoErr; 
-	   else 
-		    return kError_UnknownErr; 
-	};
+   void            WorkerThread(void); 
 
- protected:
-   FAContext  *m_context;
+protected:
 
- private:
-   Properties *m_propManager;
+   virtual Error     Open(void);
+   static  void      StartWorkerThread(void *);
+   void              LogError(char *);
 
-   HttpBuffer *m_pPullBuffer;
-   char       *m_path;
+private:
+
+   int             m_hHandle;
+   Thread         *m_pBufferThread;
+   bool            m_bLoop, m_bDiscarded;
+   FILE           *m_fpSave;
+   char           *m_szError;
 };
 
 #endif /* _HTTPFILEINPUT_H_ */

@@ -766,8 +766,6 @@ IN_OUT L3audio_decode(unsigned char *bs, unsigned char *pcm)
    return decode_function(bs, pcm);
 }
 
-extern int actually_decode;
-
 /*--------------------------------------------------------------------*/
 IN_OUT L3audio_decode_MPEG1(unsigned char *bs, unsigned char *pcm)
 {
@@ -818,7 +816,7 @@ w---------------------------------------------*/
    buf_ptr1 += nbytes;
 /*-----------------------*/
 
-   if (actually_decode && (buf_ptr0 >= 0)) // JDW modification...
+   if (buf_ptr0 >= 0)
    {
 // dump_frame(buf+buf_ptr0, 64);
       main_pos_bit = buf_ptr0 << 3;
@@ -889,7 +887,7 @@ IN_OUT L3audio_decode_MPEG2(unsigned char *bs, unsigned char *pcm)
    buf_ptr1 += nbytes;
 /*-----------------------*/
 
-   if (actually_decode && (buf_ptr0 >= 0))
+   if (buf_ptr0 >= 0)
    {
       main_pos_bit = buf_ptr0 << 3;
       unpack_main(pcm, igr);

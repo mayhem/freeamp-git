@@ -27,6 +27,8 @@ ____________________________________________________________________________*/
 #include <iostream.h>
 #include <string.h>
 
+const int iID3TagSize = 128;
+
 class Id3TagInfo {
  public:
     bool m_containsInfo;

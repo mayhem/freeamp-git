@@ -46,9 +46,7 @@ ____________________________________________________________________________*/
 #include "facontext.h"
 #include "log.h"
 
-const int32 iBufferSize = 65536;
-const int32 iOverflowSize = 8192;
-const int32 iTriggerSize = 8192;
+const uint32 iReadBlock = 8192;
 
 #define DB printf("%s:%d\n", __FILE__, __LINE__);
 
@@ -63,27 +61,17 @@ extern    "C"
 LocalFileInput::LocalFileInput(FAContext *context):
                 PhysicalMediaInput(context)
 {
-    printf("Local ctor\n");
     m_fpFile = NULL;
     m_bLoop = false;
     m_pBufferThread = NULL;
-    m_pID3Tag = NULL;
 }
 
 LocalFileInput::~LocalFileInput()
 {
-    printf("Local dtor\n");
-
     m_bExit = true;
     m_bPause = false;
     m_pSleepSem->Signal();
     m_pPauseSem->Signal();
-
-    if (m_path)
-    {
-       delete m_path;
-       m_path = NULL;
-    }
 
     if (m_pBufferThread)
     {
@@ -92,43 +80,36 @@ LocalFileInput::~LocalFileInput()
     }
 
     if (m_fpFile)
-       fclose(m_fpFile); 
-
-    if (m_pID3Tag)
-       delete m_pID3Tag;
-
-    if (m_pOutputBuffer)
     {
-       delete m_pOutputBuffer;
-       m_pOutputBuffer = NULL;
+       fclose(m_fpFile); 
+       m_fpFile = NULL;
     }
+
 }
 
 Error LocalFileInput::Prepare(PullBuffer *&pBuffer, bool bStartThread)
 {
-    int   iBufferSize;
+    int iBufferSize = iDefaultBufferSize;
     Error result;
- 
-    printf("local prepare\n");
- 
+
     if (m_pOutputBuffer)
     {
        delete m_pOutputBuffer;
        m_pOutputBuffer = NULL;
     }
 
-DB
-    m_pOutputBuffer = new PullBuffer(iBufferSize, iOverflowSize, 
-                                     iTriggerSize, m_pContext);
+    if (!IsError(m_pContext->prefs->GetInputBufferSize(&iBufferSize)))
+       iBufferSize *= 1024;
+
+    m_pOutputBuffer = new PullBuffer(iBufferSize, iDefaultOverflowSize,
+                                     m_pContext);
     assert(m_pOutputBuffer);
 
-DB
     result = Open();
     if (!IsError(result))
     {
         if (bStartThread)
         {
-DB
             result = Run();
             if (IsError(result))
             {
@@ -142,19 +123,12 @@ DB
        ReportError("Could not open the specified file.");
        return result;
     }
-DB
 
-    if (!IsError(m_pContext->prefs->GetInputBufferSize(&iBufferSize)))
-    {
-        iBufferSize *= 1024;
-        m_pOutputBuffer->Resize(iBufferSize, iOverflowSize, iTriggerSize);
-    }
-
-DB
     pBuffer = m_pOutputBuffer;
 
     return kError_NoErr;
 }
+
 
 bool LocalFileInput::CanHandle(char *szUrl, char *szTitle)
 {
@@ -172,7 +146,6 @@ Error LocalFileInput::SetTo(char *url)
     Error  result = kError_NoErr;
     int32  len = strlen(url) + 1;
     
-    DB
     if (m_path)
     {
        delete m_path;
@@ -195,36 +168,15 @@ Error LocalFileInput::SetTo(char *url)
    return result;
 }
 
-Error LocalFileInput::GetID3v1Tag(unsigned char *pTag)
-{
-    Error eRet = kError_NoErr;
-
-    DB
- 
-    if (m_pOutputBuffer == NULL)
-    {
-        eRet = Open();
-        if (!IsError(eRet))
-        {
-            memcpy(pTag, m_pID3Tag, iID3TagSize);
-        }
-       
-        Close();
- 
-        return eRet;
-    }
-    else
-       memcpy(pTag, m_pID3Tag, iID3TagSize);
-
-    return kError_NoErr;
-}
-
 Error LocalFileInput::Close(void)
 {
     if (m_fpFile)
-      fclose(m_fpFile);
- 
-    m_pOutputBuffer->Clear();
+    {
+       fclose(m_fpFile);
+       m_fpFile = NULL;
+    }
+
+    PipelineUnit::Clear();
 
     return kError_NoErr;
 }
@@ -259,6 +211,8 @@ void LocalFileInput::Clear(void)
 
 Error LocalFileInput::Open(void)
 {
+    char pBuffer[iID3TagSize];
+
     if (strcmp(m_path, "-") == 0)
     {
        m_fpFile = stdin;
@@ -301,24 +255,22 @@ Error LocalFileInput::Open(void)
 
     fseek(m_fpFile, -iID3TagSize, SEEK_CUR);
 
-    if (m_pID3Tag == NULL)
-        m_pID3Tag = new unsigned char[iID3TagSize];
+    if (m_pID3Tag)
+       delete m_pID3Tag;
 
-    int iRet = fread(m_pID3Tag, sizeof(char), iID3TagSize, m_fpFile);
+    int iRet = fread(pBuffer, sizeof(char), iID3TagSize, m_fpFile);
     if (iRet == iID3TagSize)
     {
-        if (strncmp((char *)m_pID3Tag, "TAG", 3))
+        m_pID3Tag = new Id3TagInfo(pBuffer);
+        if (!m_pID3Tag->m_containsInfo)
         {
             delete m_pID3Tag;
             m_pID3Tag = NULL;
         }
         else
+        {
             m_iFileSize -= iID3TagSize;
-    }
-    else
-    {
-        delete m_pID3Tag;
-        m_pID3Tag = NULL;
+        }
     }
 
     fseek(m_fpFile, 0, SEEK_SET);
@@ -345,11 +297,11 @@ Error LocalFileInput::Run(void)
 void LocalFileInput::StartWorkerThread(void *pVoidBuffer)
 {
    ((LocalFileInput*)pVoidBuffer)->WorkerThread();
-}
+}  
 
 void LocalFileInput::WorkerThread(void)
 {
-   size_t  iToCopy, iRead; 
+   size_t  iRead; 
    void   *pBuffer;
    Error   eError;
 
@@ -368,10 +320,13 @@ void LocalFileInput::WorkerThread(void)
           continue;
       }
           
-      eError = m_pOutputBuffer->BeginWrite(pBuffer, iToCopy);
+      eError = m_pOutputBuffer->BeginWrite(pBuffer, iReadBlock);
+      if (eError == kError_Interrupt)
+         break;
+
       if (eError == kError_NoErr)
       {
-          iRead = fread((unsigned char *)pBuffer, 1, iToCopy, m_fpFile);
+          iRead = fread((unsigned char *)pBuffer, 1, iReadBlock, m_fpFile);
           eError = m_pOutputBuffer->EndWrite(iRead);
           if (IsError(eError))
           {
@@ -379,7 +334,7 @@ void LocalFileInput::WorkerThread(void)
               break;
           }
 
-          if (iRead < iToCopy)
+          if (iRead < iReadBlock)
              m_pOutputBuffer->SetEndOfStream(true);
       }
       if (eError == kError_BufferTooSmall)

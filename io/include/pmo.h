@@ -77,6 +77,7 @@ public:
 
     virtual Error Reset(bool bUserReset) = 0;
     virtual void  Pause(void);
+    virtual void  Resume(void);
     virtual Error ChangePosition(int32);
 
     virtual void  SetLMC(LogicalMediaConverter *pLMC);

@@ -865,7 +865,6 @@ CreatePMO(PlayListItem * pc, Event * pC)
 
    lmc_item = m_lmcRegistry->GetItem(0);
 
-DB
    if (pmi_item)
    {
       pmi = (PhysicalMediaInput *) pmi_item->InitFunction()(m_context);
@@ -893,7 +892,6 @@ DB
    if(!item)
       item = m_pmoRegistry->GetItem(0);
 
-DB
    if (item)
    {
       pmo = (PhysicalMediaOutput *) item->InitFunction()(m_context);
@@ -909,16 +907,12 @@ DB
       lmc->SetPropManager((Properties *) this);
       lmc->SetTarget((EventQueue *) this);
    }
-DB
 
    lmc->SetPMI(pmi);
    lmc->SetPMO(pmo);
 
    pmo->SetPMI(pmi);
    pmo->SetLMC(lmc);
-
-   pmi = NULL;
-DB
 
    error = pmo->SetTo(pc->URL());
    if (IsError(error))
@@ -927,16 +921,18 @@ DB
       goto epilogue;
    }
 
+   pmi = NULL;
    m_pmo = pmo;
    pmo = NULL;
    m_lmc = lmc;
    lmc = NULL;
-DB
 
    epilogue:
 
    if (pmi)
+   {
        delete pmi;
+   }
 
    if (pmo)
    {
@@ -944,8 +940,9 @@ DB
    }
 
    if (lmc)
+   {
        delete lmc;
-DB
+   }
 }
 
 void 
@@ -1071,8 +1068,7 @@ GetMediaTitle(Event *pEventArg)
      RegistryItem          *pRegItem;
      PhysicalMediaInput    *pPmi;
      char                   szTitle[1024];
-     unsigned char          szTagBuffer[128];
-     Id3TagInfo            *pID3Tag;
+     Id3TagInfo             sID3Tag;
      Error                  eRet;
 
      szTitle[0] = 0;
@@ -1089,18 +1085,12 @@ GetMediaTitle(Event *pEventArg)
          eRet = pPmi->SetTo(pItem->URL());
          if (!IsError(eRet))
          {
-            eRet = pPmi->GetID3v1Tag(szTagBuffer);
+            eRet = pPmi->GetID3v1Tag(sID3Tag);
             if (!IsError(eRet))
             {
-                pID3Tag = new Id3TagInfo((char *)szTagBuffer);
-
-                strcpy(szTitle, pID3Tag->m_artist);
-
+                strcpy(szTitle, sID3Tag.m_artist);
                 strcat(szTitle, " - ");
-
-                strcat(szTitle, pID3Tag->m_songName);
-
-                delete pID3Tag;
+                strcat(szTitle, sID3Tag.m_songName);
              }
          }
 
@@ -1432,7 +1422,7 @@ ServiceEvent(Event * pC)
       return 255;
    }
 
-   //print("Got event %d\n", pC->Type());
+   //printf("Got event %d\n", pC->Type());
    switch (pC->Type())
    {
       case INFO_DoneOutputting:
@@ -1520,6 +1510,7 @@ ServiceEvent(Event * pC)
            break;
 
       case INFO_LMCError:
+           printf("Got error event\n");
            LMCError(pC);
            break;
 

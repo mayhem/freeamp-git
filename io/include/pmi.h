@@ -39,6 +39,8 @@ ____________________________________________________________________________*/
 
 /* project headers */
 #include "pipeline.h"
+#include "thread.h"
+#include "id3v1.h"
 #include "config.h"
 #include "errors.h"
 #include "eventdata.h"
@@ -47,31 +49,36 @@ ____________________________________________________________________________*/
 #define SEEK_FROM_CURRENT	SEEK_CUR
 #define SEEK_FROM_END		SEEK_END
 
+const int32 iDefaultBufferSize = 65536;
+const int32 iDefaultOverflowSize = 8192; 
+
 class PhysicalMediaInput : public PipelineUnit
 {
 public:
-            PhysicalMediaInput(FAContext *context) :
-                  PipelineUnit(context) { };
-    virtual ~PhysicalMediaInput() { }
+            PhysicalMediaInput(FAContext *context);
+    virtual ~PhysicalMediaInput();
 
-    virtual Error Prepare(PullBuffer *&pInputBuffer, 
-                          bool bStartThread = true) = 0;
+    virtual Error SetTo(char *url);
+    virtual Error Close(void);
+    virtual Error Open(void) = 0;
+    virtual const char* Url(void) const = 0;
+    virtual Error Prepare(PullBuffer *&pBuffer, bool bStartThread = true) = 0;
+
     virtual Error Seek(int32 & rtn, int32 offset, int32 origin)
                   { return kError_FileSeekNotSupported; };
-	 virtual Error GetID3v1Tag(unsigned char *pTag)
-	               {return kError_GotDefaultMethod;}
+	 virtual Error GetID3v1Tag(Id3TagInfo &sTag);
 	 virtual bool  CanHandle(char *szUrl, char *szTitle)
 	               {return false;}
     virtual Error GetLength(size_t &iSize)
                   { return kError_FileSeekNotSupported; };
 	 virtual bool  IsStreaming(void)
 	               {return false;}
+    virtual bool  PauseLoop(bool bLoop) { return false; };
 
-    virtual Error SetTo(char* url) = 0;
-    virtual Error Close(void) = 0;
-    virtual const char* Url(void) const = 0;
+protected:
 
-    protected:
+    char          *m_path;
+    Id3TagInfo    *m_pID3Tag;
 };
 
 #endif /* _PMI_H_ */

@@ -71,6 +71,7 @@ class SoundCardPMO:public PhysicalMediaOutput
    void          WorkerThread(void); 
    virtual Error Reset(bool user_stop);
    void          HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent);
+   bool          WaitForDrain(void);
 
    bool         m_properlyInitialized;
    int16        buffer[OBUFFERSIZE];
@@ -80,7 +81,8 @@ class SoundCardPMO:public PhysicalMediaOutput
    OutputInfo  *myInfo;
    int32        getprocessed(void);
    Thread      *m_pBufferThread;
-   int          m_iOutputBufferSize, m_iTotalBytesWritten, m_iBytesPerSample;
+   int          m_iOutputBufferSize, m_iBytesPerSample, m_iTotalFragments;
+   long long    m_iTotalBytesWritten;
    int          m_iLastFrame;
    unsigned     m_iDataSize;
 };

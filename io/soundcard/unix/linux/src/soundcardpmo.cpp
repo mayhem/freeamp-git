@@ -53,7 +53,6 @@ extern    "C"
 SoundCardPMO::SoundCardPMO(FAContext *context) :
        PhysicalMediaOutput(context)
 {
-   printf("SoundPMO: ctor\n");
    m_properlyInitialized = false;
 
    myInfo = new OutputInfo();
@@ -78,7 +77,7 @@ SoundCardPMO::SoundCardPMO(FAContext *context) :
 
 SoundCardPMO::~SoundCardPMO()
 {
-   printf("SoundPMO: dtor\n");
+
    m_bExit = true;
    m_pSleepSem->Signal();
    m_pPauseSem->Signal();
@@ -88,7 +87,7 @@ SoundCardPMO::~SoundCardPMO()
       m_pBufferThread->Join();
       delete m_pBufferThread;
    }
-
+   Reset(true);
    close(audio_fd);
 
    if (myInfo)
@@ -106,11 +105,10 @@ VolumeManager *SoundCardPMO::GetVolumeManager()
 
 int SoundCardPMO::audio_fd = -1;
 
+//PORTING: This function contains a ton of OS specific stuff. Hack and
+//         slash at will.
 Error SoundCardPMO::Init(OutputInfo * info)
 {
-   int        iNewSize;
-   Error      result;
-
    m_properlyInitialized = false;
 
    if (!info)
@@ -137,18 +135,6 @@ Error SoundCardPMO::Init(OutputInfo * info)
       }
 
       m_iDataSize = info->max_buffer_size;
-
-      m_pContext->prefs->GetOutputBufferSize(&iNewSize);
-      iNewSize *= 1024;
-
-      iNewSize -= iNewSize % m_iDataSize;
-      result = m_pOutputBuffer->Resize(iNewSize, 0, m_iDataSize);
-      if (IsError(result))
-      {
-         ReportError("Internal buffer sizing error occurred.");
-         m_pContext->log->Error("Resize output buffer failed.");
-         return result;
-      }
    }
 
    int       fd = audio_fd;
@@ -210,9 +196,12 @@ Error SoundCardPMO::Init(OutputInfo * info)
    myInfo->max_buffer_size = info->max_buffer_size;
    m_properlyInitialized = true;
 
+   // PORTING: The GETOSPACE ioctl determines how much space the kernel's
+   // output buffer has. Your OS may not have this.
    audio_buf_info sInfo;
    ioctl(audio_fd, SNDCTL_DSP_GETOSPACE, &sInfo);
    m_iOutputBufferSize = sInfo.fragsize * sInfo.fragstotal;
+   m_iTotalFragments = sInfo.fragstotal;
    m_iBytesPerSample = info->number_of_channels * (info->bits_per_sample / 8);
 
    return kError_NoErr;
@@ -227,6 +216,7 @@ Error SoundCardPMO::Reset(bool user_stop)
 
    if (user_stop)
    {
+      //PORTING: DSP_RESET stops playback immediately and returns
       if (ioctl(audio_fd, SNDCTL_DSP_RESET, &a) == -1)
       {
          ReportError("Cannot reset the soundcard.");
@@ -236,6 +226,8 @@ Error SoundCardPMO::Reset(bool user_stop)
    }
    else
    {
+      //PORTING: DSP_SYNC blocks until the soundcard is done playing and
+      //         then returns
       if (ioctl(audio_fd, SNDCTL_DSP_SYNC, &a) == -1)
       {
          ReportError("Cannot reset the soundcard.");
@@ -245,11 +237,38 @@ Error SoundCardPMO::Reset(bool user_stop)
    return kError_NoErr;
 }
 
+// PORTING: This function returns when the sound card is done playing, or
+// when exit or pause is signaled. Returns true if the card naturally ran
+// out of things to play. False if m_bExit or m_bPause became true
+bool SoundCardPMO::WaitForDrain(void)
+{
+   audio_buf_info info;
+
+   for(; !m_bExit && !m_bPause; )
+   {
+       ioctl(audio_fd, SNDCTL_DSP_GETOSPACE, &info);
+       if (info.fragments == m_iTotalFragments - 1)
+       {
+           return true;
+       }
+       WasteTime();
+   }
+   return false;
+}
+
+// PORTING: This is the bitchy function. In essence, this function is
+// trying to figure out what samples are currently playing. Under linux
+// you don't always know how many bytes have been played so far, so
+// this function makes a best guess by keeping track of the
+// total number of bytes fed to the card (m_iTotalBytesWritten).
+// It uses that number minus the amount of data in the buffer to
+// guess at which sample is currently playing. That info is converted
+// into time and then set to the UI. Have fun!
 void SoundCardPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
 {
    MediaTimeInfoEvent *pmtpi;
    int32               hours, minutes, seconds;
-   int                 iTotalTime = 0;
+   int                 iTotalTime = 0, iDataInBuffer;
    audio_buf_info      info;
 
    if (pEvent->GetFrameNumber() != m_iLastFrame + 1)
@@ -259,12 +278,12 @@ void SoundCardPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
    }
    m_iLastFrame = pEvent->GetFrameNumber();
 
-   if (myInfo->samples_per_second <= 0 || pEvent->GetFrameNumber() < 3)
+   if (myInfo->samples_per_second <= 0 || pEvent->GetFrameNumber() < 2)
       return;
 
    ioctl(audio_fd, SNDCTL_DSP_GETOSPACE, &info);
-
-   iTotalTime = (m_iTotalBytesWritten - (info.fragments * info.fragsize)) /
+   iDataInBuffer = m_iOutputBufferSize - (info.fragments * info.fragsize);
+   iTotalTime = (m_iTotalBytesWritten - iDataInBuffer) /
                 (m_iBytesPerSample * myInfo->samples_per_second);
 
    hours = iTotalTime / 3600;
@@ -289,7 +308,6 @@ void SoundCardPMO::StartWorkerThread(void *pVoidBuffer)
 void SoundCardPMO::WorkerThread(void)
 {
    void       *pBuffer;
-   size_t      iToCopy;
    Error       eErr;
    size_t      iRet;
    Event      *pEvent;
@@ -310,14 +328,22 @@ void SoundCardPMO::WorkerThread(void)
 
    for(; !m_bExit;)
    {
+      if (m_bPause)
+      {
+          m_pPauseSem->Wait();
+          continue;
+      }
+
       // Loop until we get an Init event from the LMC
       if (!m_properlyInitialized)
       {
-          pEvent = ((EventBuffer *)m_pOutputBuffer)->GetEvent();
+          pEvent = ((EventBuffer *)m_pInputBuffer)->GetEvent();
 
           if (pEvent == NULL)
           {
               m_pLmc->Wake();
+              WasteTime();
+
               continue;
           }
 
@@ -338,13 +364,12 @@ void SoundCardPMO::WorkerThread(void)
       // available, sleep for a little while and try again.
       for(;;)
       {
-          iToCopy = m_iDataSize;
-          eErr = m_pOutputBuffer->BeginRead(pBuffer, iToCopy);
+          eErr = ((EventBuffer *)m_pInputBuffer)->BeginRead(pBuffer, 
+                                                             m_iDataSize);
+          if (eErr == kError_EndOfStream || eErr == kError_Interrupt)
+             break;
 
-          // Enough bytes available?
-          if (eErr == kError_InputUnsuccessful || 
-              eErr == kError_NoDataAvail ||
-              iToCopy < m_iDataSize)
+          if (eErr == kError_NoDataAvail)
           {
               m_pLmc->Wake();
 
@@ -358,23 +383,15 @@ void SoundCardPMO::WorkerThread(void)
                   bPerfWarn = true;
               }
     
-              m_pOutputBuffer->EndRead(0);
-    
-              if (WasteTime())
-                 return;
-    
+              WasteTime();
               continue;
           }
-          if (eErr == kError_Interrupt)
-          {
-              return;
-          }
-    
+
           // Is there an event pending that we need to take care of
           // before we play this block of samples?
           if (eErr == kError_EventPending)
           {
-              pEvent = ((EventBuffer *)m_pOutputBuffer)->GetEvent();
+              pEvent = ((EventBuffer *)m_pInputBuffer)->GetEvent();
 
               if (pEvent->Type() == PMO_Init)
                   Init(((PMOInitEvent *)pEvent)->GetInfo());
@@ -387,15 +404,16 @@ void SoundCardPMO::WorkerThread(void)
     
               if (pEvent->Type() == PMO_Quit) 
               {
-                  Reset(false);
                   delete pEvent;
-                  m_pTarget->AcceptEvent(new Event(INFO_DoneOutputting));
-                  break;
+                  if (WaitForDrain())
+                     m_pTarget->AcceptEvent(new Event(INFO_DoneOutputting));
+
+                  return;
               }
  
               delete pEvent;
     
-              return;
+              continue;
           }
           
           if (IsError(eErr))
@@ -406,6 +424,7 @@ void SoundCardPMO::WorkerThread(void)
               break;
           }
           bPerfWarn = false;
+          break;
       }
 
       // Now write the block to the audio device. If the block doesn't
@@ -413,17 +432,27 @@ void SoundCardPMO::WorkerThread(void)
       // This loop could be written using non-blocking io...
       for(;;)
       {
+          if (m_bExit || m_bPause)
+              break;
+
           ioctl(audio_fd, SNDCTL_DSP_GETOSPACE, &info);
-          if ((unsigned)(info.fragments * info.fragsize) < iToCopy)      
+          if ((unsigned)(info.fragments * info.fragsize) < m_iDataSize)      
           {
-              if (WasteTime())
-                 return;
+              WasteTime();
+              continue;
           }
+          break;
       }        
-      iRet = write(audio_fd, pBuffer, iToCopy);
+      if (m_bExit || m_bPause)
+      {
+          m_pInputBuffer->EndRead(0);
+          continue;
+      }
+
+      iRet = write(audio_fd, pBuffer, m_iDataSize);
       if (iRet < 0)
       {
-         m_pOutputBuffer->EndRead(0);
+         m_pInputBuffer->EndRead(0);
          ReportError("Could not write sound data to the soundcard.");
          m_pContext->log->Error("Failed to write to the soundcard: %s\n", 
                                strerror(errno));
@@ -431,7 +460,7 @@ void SoundCardPMO::WorkerThread(void)
       }
 
       m_iTotalBytesWritten += iRet;
-      m_pOutputBuffer->EndRead(iRet);
+      m_pInputBuffer->EndRead(iRet);
       m_pLmc->Wake();
    }
 }

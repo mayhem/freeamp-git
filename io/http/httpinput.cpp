@@ -29,8 +29,18 @@ ____________________________________________________________________________*/
 #include <iostream.h>
 #include <errno.h>
 #include <assert.h>
+#ifdef WIN32
+#include <winsock.h>
+#include <time.h>
+#else
+#include <sys/time.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <fcntl.h>
+#endif 
 
-#include <config.h>
+#include "config.h"
 
 #if HAVE_UNISTD_H
 #include <unistd.h>
@@ -42,11 +52,42 @@ ____________________________________________________________________________*/
 
 /* project headers */
 #include "httpinput.h"
+#include "facontext.h"
+#include "log.h"
 
 const int iBufferSize = 8192;
 const int iOverflowSize = 1536;
 const int iTriggerSize = 1024;
 const char *szDefaultStreamTitle = "SHOUTcast Stream";
+
+#ifndef WIN32
+#define closesocket(s) close(s)
+#endif
+
+#ifndef F_OK
+#define F_OK 0
+#endif
+
+const int iHttpPort = 80;
+const int iMaxHostNameLen = 64;
+const int iGetHostNameBuffer = 1024;
+const int iBufferUpInterval = 3;
+const int iInitialBufferSize = 1024;
+const int iHeaderSize = 1024;
+const int iICY_OK = 200;
+const int iTransmitTimeout = 60;
+
+#ifdef WIN32
+const char cDirSepChar = '\\';
+#else
+const char cDirSepChar = '/';
+#endif
+
+#define DB printf("%s:%d\n", __FILE__, __LINE__);
+
+#ifndef min
+#define min(a,b) ((a) < (b) ? (a) : (b))
+#endif 
 
 extern    "C"
 {
@@ -55,190 +96,529 @@ extern    "C"
       return new HttpInput(context);
    }
 }
-HttpInput::HttpInput(FAContext *context):
-           PhysicalMediaInput()
-{
-    m_context = context;
-    m_path = NULL;
-    m_pPullBuffer = NULL;
-}
 
-HttpInput::HttpInput(char *path):
-           PhysicalMediaInput()
+HttpInput::HttpInput(FAContext *context):
+           PhysicalMediaInput(context)
 {
-   if (path)
-   {
-      assert(0);
-   }
-   else
-   {
-      m_path = NULL;
-      m_pPullBuffer = NULL;
-   }
+    m_path = NULL;
+    m_hHandle = -1;
+    m_bLoop = false;
+    m_bDiscarded = false;
+    m_pBufferThread = NULL;
+    m_fpSave = NULL;
+    m_szError = new char[iMaxErrorLen];
 }
 
 HttpInput::~HttpInput()
 {
-   if (m_path)
-   {
-      delete[]m_path;
-      m_path = NULL;
-   }
-   if (m_pPullBuffer >= 0)
-   {
-      delete m_pPullBuffer;
-      m_pPullBuffer = NULL;
-   }
+    m_bExit = true;
+    m_pSleepSem->Signal();
+    m_pPauseSem->Signal();
+
+    if (m_pBufferThread)
+    {
+       m_pBufferThread->Join();
+       delete m_pBufferThread;
+    }  
+
+    if (m_hHandle >= 0)
+    {
+       shutdown(m_hHandle, 2);
+       closesocket(m_hHandle);
+    }
+
+    if (m_fpSave)
+       fclose(m_fpSave);
+
+    delete m_szError; 
 }
 
 bool HttpInput::CanHandle(char *szUrl, char *szTitle)
 {
-   bool bRet;
+    bool bRet;
 
-   bRet = strncmp(szUrl, "http://", 7) == 0;
+    bRet = strncmp(szUrl, "http://", 7) == 0;
+ 
+    if (szTitle && bRet)
+       strcpy(szTitle, szDefaultStreamTitle);
 
-   if (szTitle && bRet)
-      strcpy(szTitle, szDefaultStreamTitle);
-
-   return bRet;
+    return bRet;
 }
 
-Error HttpInput::SetTo(char *url, bool bStartThread)
+Error HttpInput::Prepare(PullBuffer *&pBuffer, bool bStartThread)
 {
-   Error     result = kError_NoErr;
+    int iBufferSize = iDefaultBufferSize;
+    Error result;
 
-   if (m_pPullBuffer)
-   {
-      delete m_pPullBuffer;
-      m_pPullBuffer = NULL;
-   }
+    if (m_pOutputBuffer)
+    {
+       delete m_pOutputBuffer;
+       m_pOutputBuffer = NULL;
+    }
 
-   if (m_path)
-   {
-      delete[]m_path;
-      m_path = NULL;
-   }
+    if (!IsError(m_pContext->prefs->GetInputBufferSize(&iBufferSize)))
+       iBufferSize *= 1024;
 
-   if (url)
-   {
-      int32     len = strlen(url) + 1;
-      m_path = new char[len];
+    m_pOutputBuffer = new PullBuffer(iBufferSize, iDefaultOverflowSize,
+                                     m_pContext);
+    assert(m_pOutputBuffer);
 
-      if (m_path)
-      {
-         memcpy(m_path, url, len);
-      }
-      else
-      {
-         result = kError_OutOfMemory;
-      }
+    result = Open();
+    if (!IsError(result))
+    {
+        if (bStartThread)
+        {
+            result = Run();
+            if (IsError(result))
+            {
+                ReportError("Could not run the input plugin.");
+                return result;
+            }
+        }
+    }
+    else
+    {
+       ReportError("Could not open the specified file.");
+       return result;
+    }
 
-      if (IsntError(result))
-      {
-         m_pPullBuffer = new HttpBuffer(iBufferSize, iOverflowSize, 
-                                         iTriggerSize, url, this, m_context);
-         assert(m_pPullBuffer);
+    pBuffer = m_pOutputBuffer;
 
-         result = m_pPullBuffer->Open();
-         if (result == kError_NoErr && bStartThread)
-             result = m_pPullBuffer->Run();
-      }
-   }
-   else
-   {
-      result = kError_InvalidParam;
-   }
+    return kError_NoErr;
+} 
 
-   return result;
-}
-
-Error HttpInput::
-SetBufferSize(size_t iNewSize)
+Error HttpInput::Close(void)
 {
-    return m_pPullBuffer->Resize(iNewSize, iNewSize / 6, iNewSize / 8);
-}
+    delete m_pOutputBuffer;
+    m_pOutputBuffer = NULL;
+ 
+    if (m_hHandle >= 0)
+    {
+       shutdown(m_hHandle, 2);
+       closesocket(m_hHandle);
+    }
 
-Error HttpInput::
-GetLength(size_t &iSize)
-{
-    iSize = 0;
-
-    return kError_FileSeekNotSupported;
-}
-
-Error HttpInput::
-GetID3v1Tag(unsigned char *pTag)
-{
-   assert(m_pPullBuffer);
-    return m_pPullBuffer->GetID3v1Tag(pTag);
-}
-
-Error HttpInput::
-BeginRead(void *&buf, size_t &bytesneeded)
-{
-   assert(m_pPullBuffer);
-   return m_pPullBuffer->BeginRead(buf, bytesneeded);
-}
-
-Error HttpInput::
-EndRead(size_t bytesused)
-{
-   assert(m_pPullBuffer);
-   return m_pPullBuffer->EndRead(bytesused);
-}
-
-int32 HttpInput::GetBufferPercentage()
-{
-   assert(m_pPullBuffer);
-   return m_pPullBuffer->GetBufferPercentage();
-}
-
-int32 HttpInput::GetNumBytesInBuffer()
-{
-   assert(m_pPullBuffer);
-   return m_pPullBuffer->GetNumBytesInBuffer();
-}
-
-void HttpInput::Pause()
-{
-   if (m_pPullBuffer)
-   {
-      m_pPullBuffer->DidDiscardBytes();
-      m_pPullBuffer->Pause();
-   }
-}
-
-void HttpInput::Break()
-{
-   if (m_pPullBuffer)
-       m_pPullBuffer->BreakBlocks();
-}
-
-bool HttpInput::Resume()
-{
-   bool bRet;
-
-   if (!m_pPullBuffer)
-      return false;
-
-   bRet = m_pPullBuffer->DidDiscardBytes();
-
-   m_pPullBuffer->Resume();
-
-   return bRet;
-}
-
-Error     HttpInput::
-Seek(int32 & rtn, int32 offset, int32 origin)
-{
-   return kError_FileSeekNotSupported;
-}
-
-Error     HttpInput::
-Close(void)
-{
-   delete m_pPullBuffer;
-   m_pPullBuffer = NULL;
+    if (m_fpSave)
+       fclose(m_fpSave);  
 
    return kError_NoErr;
+}
+
+Error HttpInput::Run(void)
+{
+    if (!m_pBufferThread)
+    {
+       m_pBufferThread = Thread::CreateThread();
+       if (!m_pBufferThread)
+       {
+           return (Error)kError_CreateThreadFailed;
+       }
+       m_pBufferThread->Create(HttpInput::StartWorkerThread, this);
+    }
+
+    return kError_NoErr;
+}
+
+bool HttpInput::PauseLoop(bool bLoop)
+{
+   bool bRet;
+
+   m_bLoop = bLoop;
+   bRet = m_bDiscarded;
+   m_bDiscarded = false;
+
+   return bRet;
+} 
+
+void HttpInput::LogError(char *szErrorMsg)
+{
+#ifdef WIN32
+   char *lpMessageBuffer;
+
+    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, N
+ULL,
+                  WSAGetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                  (LPTSTR) &lpMessageBuffer, 0, NULL );
+
+    sprintf(m_szError, "%s: %s", szErrorMsg, lpMessageBuffer);
+   LocalFree(lpMessageBuffer);
+
+#else
+    sprintf(m_szError, "%s: %s", szErrorMsg, strerror(errno));
+#endif
+    ReportError(m_szError);
+    m_pContext->log->Error("%s\n", m_szError);
+}
+
+// NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
+// The function gethostbyname_r() differs greatly from system to system
+// and on linux it seems to behave quite erratically. I've elected to
+// use gethostbyname() (the non-reentrant version) because it works,
+// and I don't see two threads conflicting each other during a gethostbyname
+// lookup in FreeAmp.
+// NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
+Error GetHostByName(char *szHostName, struct hostent *pResult)
+{
+    struct hostent *pTemp;
+
+    pTemp = gethostbyname(szHostName);
+    if (pTemp == NULL)
+        return kError_NoDataAvail;
+
+    memcpy(pResult, pTemp, sizeof(struct hostent));
+
+    return kError_NoErr;
+}
+
+Error HttpInput::Open(void)
+{
+    char                szHostName[iMaxHostNameLen+1], *szFile, *szQuery;
+    char                szLocalName[iMaxHostNameLen+1];
+    char               *pInitialBuffer, szStreamName[255];
+    unsigned            iPort;
+    int                 iRet, iRead = 0, iConnect;
+    struct sockaddr_in  sAddr;
+    struct hostent      sHost;
+    Error               eRet;
+    void               *pPtr;
+    fd_set              sSet; 
+    struct timeval      sTv;
+
+    szStreamName[0] = 0;
+
+    iRet = sscanf(m_path, "http://%[^:/]:%d", szHostName, &iPort);
+    if (iRet < 1)
+    {
+        ReportError("Bad URL format. URL format: http:<host name>"
+                             ":[port][/path]");
+        m_pContext->log->Error("Badly formatted URL: %s\n", m_path);
+        return (Error)httpError_BadUrl;
+    }
+
+    if (iRet < 2)
+       iPort = iHttpPort;
+
+    szFile = strchr(m_path + 7, '/');
+    memset(&sAddr, 0, sizeof(struct sockaddr_in));
+
+    eRet = GetHostByName(szHostName, &sHost);
+    if (eRet != kError_NoErr)
+    {
+       sprintf(m_szError, "Cannot find host %s\n", szHostName);
+       ReportError(m_szError);
+       m_pContext->log->Error("Cannot find host %s\n", szHostName);
+       return (Error)httpError_CustomError;
+    }
+
+    memcpy((char *)&sAddr.sin_addr,sHost.h_addr, sHost.h_length);
+    sAddr.sin_family= sHost.h_addrtype;
+    sAddr.sin_port= htons((unsigned short)iPort);
+
+    m_hHandle = socket(sHost.h_addrtype,SOCK_STREAM,0);
+    if (m_hHandle < 0)
+    {
+       LogError("Cannot create socket");
+       return (Error)httpError_CannotOpenSocket;
+    }
+
+#ifndef WIN32
+    fcntl(m_hHandle, F_SETFL, fcntl(m_hHandle, F_GETFL) | O_NONBLOCK);
+#else
+	unsigned long lMicrosoftSucksBalls = 1;
+	ioctlsocket(m_hHandle, FIONBIO, &lMicrosoftSucksBalls);
+#endif
+    iConnect = connect(m_hHandle,(const sockaddr *)&sAddr,sizeof(sAddr));
+    for(; iConnect && !m_bExit;)
+    {
+        sTv.tv_sec = 0; sTv.tv_usec = 0;
+        FD_ZERO(&sSet); FD_SET(m_hHandle, &sSet);
+        iRet = select(m_hHandle + 1, NULL, &sSet, NULL, &sTv);
+        if (!iRet)
+        {
+		     usleep(100000);
+           continue;
+        }
+
+        if (iRet < 0)
+        { 
+           LogError("Cannot connect socket");
+           closesocket(m_hHandle);
+           return (Error)httpError_CannotConnect;
+        }
+        break;
+    }
+    if (m_bExit)
+        return (Error)kError_Interrupt;
+
+    gethostname(szLocalName, iMaxHostNameLen);    
+    szQuery = new char[iMaxUrlLen];
+
+    if (szFile)
+        sprintf(szQuery, "GET %s HTTP/1.0\n\n", szFile);
+    else
+        sprintf(szQuery, "GET / HTTP/1.0\nHost %s\nAccept: */*\n\n", 
+                szLocalName);
+
+    iRet = send(m_hHandle, szQuery, strlen(szQuery), 0);
+    if (iRet != (int)strlen(szQuery))
+    {
+		delete szQuery;
+        LogError("Cannot write to socket");
+        closesocket(m_hHandle);
+        return (Error)httpError_SocketWrite;
+    }
+	delete szQuery;
+
+    pInitialBuffer = new char[iInitialBufferSize + 1];
+
+    for(;!m_bExit;)
+    {
+        sTv.tv_sec = 0; sTv.tv_usec = 0;
+        FD_ZERO(&sSet); FD_SET(m_hHandle, &sSet);
+        iRet = select(m_hHandle + 1, &sSet, NULL, NULL, &sTv);
+        if (!iRet)
+        {
+		   usleep(10000);
+           continue;
+        }
+        iRead = recv(m_hHandle, pInitialBuffer, iInitialBufferSize, 0);
+        if (iRead < 0)
+        {
+            LogError("Cannot read from socket");
+            closesocket(m_hHandle);
+            return (Error)httpError_SocketRead;
+        }
+        break;
+    }
+    if (m_bExit)
+        return (Error)kError_Interrupt;
+
+    if (sscanf(pInitialBuffer, " ICY %d %255[^\n\r]", &iRet, m_szError) ||
+        sscanf(pInitialBuffer, " HTTP/1.0 %d %255[^\n\r]", &iRet, m_szError))
+    {
+        char *pHeaderData, *pPtr;
+        int   iHeaderBytes = 0, iCurHeaderSize = iHeaderSize;
+
+		  if (iRet != iICY_OK)
+		  {
+            char szErr[255];
+
+            sprintf(szErr, "This stream is not available: %s\n", m_szError);
+            m_pContext->log->Error(szErr);
+            ReportError(szErr);
+
+		      delete pInitialBuffer;
+		      closesocket(m_hHandle);
+				return (Error)httpError_CustomError;
+		  }
+
+        pHeaderData = new char[iHeaderSize];
+
+        // This is a SHOUTcast stream
+        for(;;)
+        {
+            if (iHeaderBytes + iRead > iCurHeaderSize)
+            {
+                char *pNew;
+
+                iCurHeaderSize += iHeaderSize;
+                pNew = new char[iCurHeaderSize];
+                memcpy(pNew, pHeaderData, iHeaderBytes);
+                delete pHeaderData;
+                pHeaderData = pNew;
+            }
+
+            memcpy(pHeaderData + iHeaderBytes, pInitialBuffer, iRead);
+            iHeaderBytes += iRead;
+
+            if (strstr(pHeaderData, "\r\n\r\n") ||
+                strstr(pHeaderData, "\n\n"))
+                break;
+               
+            for(;!m_bExit;)
+            {
+                sTv.tv_sec = 0; sTv.tv_usec = 0;
+                FD_ZERO(&sSet); FD_SET(m_hHandle, &sSet);
+                iRet = select(m_hHandle + 1, &sSet, NULL, NULL, &sTv);
+                if (!iRet)
+                {
+                   usleep(10000);
+                   continue;
+                }
+                iRead = recv(m_hHandle, pInitialBuffer, iInitialBufferSize, 0);
+                if (iRead < 0)
+                {
+                    LogError("Cannot read from socket");
+                    closesocket(m_hHandle);
+                    return (Error)httpError_SocketRead;
+                }
+                break;
+            }
+            if (m_bExit)
+                return (Error)kError_Interrupt;
+        }
+
+        // Let's make up a ficticous ID3 tag.
+        if (m_pID3Tag)
+           delete m_pID3Tag;
+
+        m_pID3Tag = new Id3TagInfo();
+        memset(m_pID3Tag, 0, sizeof(Id3TagInfo));
+        m_pID3Tag->m_containsInfo = true;
+       
+        pPtr = strstr(pHeaderData, "icy-name");
+        if (pPtr)
+        {
+            pPtr += strlen("icy-name:");
+            sscanf(pPtr, "%254[^\r\n]", szStreamName);
+            sscanf(pPtr, "%30[^\r\n]", m_pID3Tag->m_songName);
+        }
+
+        pPtr = strstr(pHeaderData, "icy-url");
+        if (pPtr)
+        {
+            pPtr += strlen("icy-url:");
+            sscanf(pPtr, "%30[^\r\n]", m_pID3Tag->m_artist);
+        }
+        delete pHeaderData;
+
+        // Don't bother saving the beginning of the frame -- the
+        // data in a shoutcast stream does not necessarily start on
+        // a frame boundary. Adding extra logic for the case that
+        // the stream does start on a boundary doesn't make sense.
+    }
+    else
+    {
+        unsigned int iSize;
+
+        // Its a regular HTTP download. Let's save the bytes we've
+        // read into the pullbuffer.
+
+        // Set the pull buffer to not keep streaming while we're
+		  // not playing. Otherwise portions (if not all the) MP3
+		  // file will be consumed before the user can hit play.
+
+        iSize = iRead;
+        m_pOutputBuffer->BeginWrite(pPtr, iSize);
+        memcpy(pPtr, pInitialBuffer, iRead);
+        m_pOutputBuffer->EndWrite(iRead);
+    }
+
+    delete pInitialBuffer;
+
+    bool bSave;
+    unsigned  size = 255;
+    m_pContext->prefs->GetPrefBoolean(kSaveStreamsPref, &bSave);
+    if (bSave || (m_pContext->argFlags & FAC_ARGFLAGS_SAVE_STREAMS))
+    {
+        char szPath[255], szFile[255];
+        unsigned i;
+					
+        if (szStreamName[0] == 0)
+           sprintf(szStreamName, "%s:%d", szHostName, iPort);
+
+        for(i = 0; i < strlen(szStreamName); i++)
+           if (strchr("\\/?*{}[]()*|:<>\"'", szStreamName[i]))
+               szStreamName[i] = '-';
+
+        if (m_pContext->prefs->GetPrefString(kSaveStreamsDirPref, szPath, &size) == 
+            kError_NoPrefValue)
+           strcpy(szPath, ".");
+        if (szPath[strlen(szPath) - 1] == cDirSepChar)
+            szPath[strlen(szPath) - 1]  = 0;
+
+        for(i = 0;; i++)
+        {
+            if (!i)
+                sprintf(szFile, "%s%c%s.mp3", szPath, cDirSepChar, szStreamName);
+            else
+                sprintf(szFile, "%s%c%s-%d.mp3", szPath, cDirSepChar, szStreamName, i);
+
+            if (access(szFile, F_OK))
+                break;
+        }
+
+        m_fpSave = fopen(szFile, "wb");
+    }
+
+    return kError_NoErr;
+}
+
+void HttpInput::StartWorkerThread(void *pVoidBuffer)
+{
+   ((HttpInput*)pVoidBuffer)->WorkerThread();
+}
+
+void HttpInput::WorkerThread(void)
+{
+   int             iRead, iRet, iReadSize = 1024;
+   void           *pBuffer;
+   Error           eError;
+   fd_set          sSet;
+   struct timeval  sTv;
+
+   m_pSleepSem->Wait(); 
+
+   for(; !m_bExit;)
+   {
+      if (m_pOutputBuffer->IsEndOfStream())
+      {
+          m_pSleepSem->Wait();
+          continue;
+      }
+
+      sTv.tv_sec = 0; sTv.tv_usec = 0;
+      FD_ZERO(&sSet); FD_SET(m_hHandle, &sSet);
+      iRet = select(m_hHandle + 1, &sSet, NULL, NULL, &sTv);
+      if (!iRet)
+      {
+		   usleep(10000);
+         continue;
+      }
+        
+      eError = m_pOutputBuffer->BeginWrite(pBuffer, iReadSize);
+      if (eError == kError_NoErr)
+      {
+          iRead = recv(m_hHandle, (char *)pBuffer, iReadSize, 0);
+          if (iRead <= 0)
+          {
+             m_pOutputBuffer->SetEndOfStream(true);
+             m_pOutputBuffer->EndWrite(0);
+             break;
+          }
+
+          if (m_fpSave)
+          {
+             iRet = fwrite(pBuffer, sizeof(char), iRead, m_fpSave);
+             if (iRet != iRead)
+             {
+                 ReportError("Cannot save http stream to disk. Disk full?");
+                 break;
+             }
+          }
+
+          eError = m_pOutputBuffer->EndWrite(iRead);
+          if (IsError(eError))
+          {
+              m_pContext->log->Error("http: EndWrite returned: %d\n", eError);
+              break;
+          }
+      }
+      if (eError == kError_BufferTooSmall)
+      {
+          if (m_bLoop)
+          {
+             m_pOutputBuffer->DiscardBytes();
+             m_bDiscarded = true;
+          }
+          else
+             m_pSleepSem->Wait();
+
+          continue;
+      }
+   }
+
+   shutdown(m_hHandle, 2);
+   closesocket(m_hHandle);
+   m_hHandle = -1;
 }

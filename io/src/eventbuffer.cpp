@@ -32,8 +32,8 @@ ____________________________________________________________________________*/
 #define DB printf("%x: %s:%d\n", pthread_self(), __FILE__, __LINE__);
 
 EventBuffer::EventBuffer(size_t iBufferSize, size_t iOverFlowSize, 
-                         size_t iWriteTriggerSize, FAContext *context) : 
-				 PullBuffer(iBufferSize, iOverFlowSize, iWriteTriggerSize, context)
+                         FAContext *context) : 
+				 PullBuffer(iBufferSize, iOverFlowSize, context)
 {
     m_pQueue = new Queue < BufferEvent * >();
 }
@@ -43,10 +43,11 @@ EventBuffer::~EventBuffer(void)
     delete m_pQueue;
 }
 
-Error EventBuffer::BeginRead(void *&pBuffer, size_t &iBytesWanted)
+Error EventBuffer::BeginRead(void *&pBuffer, size_t iBytesWanted)
 {
    BufferEvent   *pEvent;
-   int   iReadIndex, iMaxBytes;
+   int   iReadIndex;
+   size_t iMaxBytes;
 
    pEvent = m_pQueue->Peek();
    iReadIndex = GetReadIndex();
@@ -62,19 +63,27 @@ Error EventBuffer::BeginRead(void *&pBuffer, size_t &iBytesWanted)
    }
 
    if (pEvent->iIndex > iReadIndex)
+   {
       iMaxBytes = pEvent->iIndex - iReadIndex;
+   }
    else
+   {
       iMaxBytes = (GetBufferSize() - iReadIndex) + pEvent->iIndex;
+   }
 
    if (iBytesWanted > iMaxBytes)
-      iBytesWanted = iMaxBytes;
-
-   return PullBuffer::BeginRead(pBuffer, iBytesWanted);
+      return kError_EventPending;
+   else
+      return PullBuffer::BeginRead(pBuffer, iBytesWanted);
 }
 
 Error EventBuffer::AcceptEvent(Event *pPMOEvent)
 {
    BufferEvent *pEvent;
+
+   assert(this);
+   assert(m_pQueue);
+   assert(pPMOEvent);
 
    pEvent = new BufferEvent;
    pEvent->iIndex = GetWriteIndex(); 
@@ -89,6 +98,9 @@ Event *EventBuffer::GetEvent()
 {
    BufferEvent *pEvent;
    Event       *pPMOEvent;
+
+   assert(this);
+   assert(m_pQueue);
 
    pEvent = m_pQueue->Read();
    if (pEvent == NULL)

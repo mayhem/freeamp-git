@@ -46,7 +46,7 @@ plugins plugins-cc: $(PLUGINS) $(OSDEPPLUGINS)
 
 #
 # localfileinput is a nice simple example of a plugin dependency.
-LFIOBJ = io/local/localfileinput.o io/src/pipeline.o
+LFIOBJ = io/src/pmi.o io/local/localfileinput.o io/src/pipeline.o
 
 plugins/localfileinput-$(HOST_OS).pmi: $(LFIOBJ)
 	$(LINKMOD) -o $@ $(LFIOBJ)
@@ -56,7 +56,7 @@ plugins/localfileinput-$(HOST_OS).pmi: $(LFIOBJ)
 
 #
 # here's httpinput
-HTTPOBJ = io/http/httpinput.o io/http/httpbuffer.o io/src/pipeline.o
+HTTPOBJ = io/src/pmi.o io/http/httpinput.o io/src/pipeline.o
 
 plugins/httpinput-$(HOST_OS).pmi: $(HTTPOBJ)
 	$(LINKMOD) -o $@ $(HTTPOBJ)
@@ -65,7 +65,7 @@ plugins/httpinput-$(HOST_OS).pmi: $(HTTPOBJ)
 #	$(CXXCOMPILE) $(FPIC) -o $(*).o -c ${*:%.o=%}.c
 
 # obsinput
-OBSPMI = io/obs/obsbuffer.o io/obs/obsinput.o io/src/pipeline.o
+OBSPMI = io/src/pmi.o io/obs/obsinput.o io/src/pipeline.o
 
 plugins/obsinput-$(HOST_OS).pmi: $(OBSPMI)
 	$(LINKMOD) -o $@ $(OBSPMI)

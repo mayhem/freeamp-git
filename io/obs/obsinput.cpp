@@ -24,11 +24,23 @@ ____________________________________________________________________________*/
 /* system headers */
 #include <stdio.h>
 #include <stdlib.h>
-#include <fcntl.h>
+#include <assert.h>
 #include <string.h>
-#include <iostream.h>
+#include <sys/types.h>
+#include <fcntl.h>
 #include <errno.h>
 #include <assert.h>
+#ifdef WIN32
+#include <winsock.h>
+#include <time.h>
+#else
+#include <sys/time.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h> 
+#include <netdb.h>
+#include <fcntl.h>
+#endif
 
 #include <config.h>
 
@@ -40,15 +52,22 @@ ____________________________________________________________________________*/
 #error Must have unistd.h or io.h!
 #endif // HAVE_UNISTD_H
 
-/* project headers */
 #include "obsinput.h"
+#include "log.h"
+#include "facontext.h"
+#include "id3v1.h"
 
+const int iMaxHostNameLen = 64;
+const int iGetHostNameBuffer = 1024;
+const int iInitialBufferSize = 64;
+const int iReadTimeout       = 10;       // in secs
 const int iBufferSize = 8192;
 const int iOverflowSize = 1536;
-const int iTriggerSize = 1024;
 const char *szDefaultStreamTitle = "RTP Stream";
 
-extern    "C"
+#define DB printf("%s:%d\n", __FILE__, __LINE__);
+
+extern "C"
 {
    PhysicalMediaInput *Initialize(FAContext *context)
    {
@@ -57,39 +76,36 @@ extern    "C"
 }
 
 ObsInput::ObsInput(FAContext *context): 
-          PhysicalMediaInput()
+          PhysicalMediaInput(context)
 {
-    m_context = context;
     m_path = NULL;
-    m_pPullBuffer = NULL;
+    m_hHandle = -1;
+    m_pBufferThread = NULL;
+    m_bLoop = true;
+    m_bDiscarded = false;
+
+    // Let's make up a ficticous ID3 tag.
+    m_pID3Tag = new Id3TagInfo();
+    memset(m_pID3Tag, 0, sizeof(ID3Tag));
+    m_pID3Tag->m_containsInfo = true;
+    strcpy(m_pID3Tag->m_songName, "RTP Stream");
 }
 
-ObsInput::ObsInput(char *path):
-          PhysicalMediaInput()
-{
-   if (path)
-   {
-      assert(0);
-   }
-   else
-   {
-      m_path = NULL;
-      m_pPullBuffer = NULL;
-   }
-}
 
 ObsInput::~ObsInput()
 {
-   if (m_path)
-   {
-      delete[]m_path;
-      m_path = NULL;
-   }
-   if (m_pPullBuffer >= 0)
-   {
-      delete m_pPullBuffer;
-      m_pPullBuffer = NULL;
-   }
+    m_bExit = true;
+    m_pSleepSem->Signal();
+    m_pPauseSem->Signal();
+
+    if (m_pBufferThread)
+    {
+       m_pBufferThread->Join();
+       delete m_pBufferThread;
+    }
+
+    if (m_hHandle >= 0)
+       close(m_hHandle);
 }
 
 bool ObsInput::CanHandle(char *szUrl, char *szTitle)
@@ -100,159 +116,258 @@ bool ObsInput::CanHandle(char *szUrl, char *szTitle)
    if (szTitle && bRet)
       strcpy(szTitle, szDefaultStreamTitle);
 
-
    return bRet;
 }
 
-Error ObsInput::SetTo(char *url, bool bStartThread)
+Error ObsInput::Prepare(PullBuffer *&pBuffer, bool bStartThread)
 {
-   Error     result = kError_NoErr;
+    int iBufferSize = iDefaultBufferSize;
+    Error result;
 
-   if (m_pPullBuffer)
+
+    if (m_pOutputBuffer)
+    {
+       delete m_pOutputBuffer;
+       m_pOutputBuffer = NULL;
+    }
+
+    if (!IsError(m_pContext->prefs->GetInputBufferSize(&iBufferSize)))
+       iBufferSize *= 1024;
+
+    m_pOutputBuffer = new PullBuffer(iBufferSize, iDefaultOverflowSize,
+                                     m_pContext);
+    assert(m_pOutputBuffer);
+
+    result = Open();
+    if (!IsError(result))
+    {
+        if (bStartThread)
+        {
+            result = Run();
+            if (IsError(result))
+            {
+                ReportError("Could not run the input plugin.");
+                return result;
+            }
+        }
+    }
+    else
+    {
+       ReportError("Could not open the specified file.");
+       return result;
+    }
+
+    pBuffer = m_pOutputBuffer;
+
+    return kError_NoErr;
+}  
+
+Error ObsInput::Close(void)
+{
+   delete m_pOutputBuffer;
+   m_pOutputBuffer = NULL;
+
+   if (m_hHandle != 0)
    {
-      delete m_pPullBuffer;
-      m_pPullBuffer = NULL;
+      close(m_hHandle);
+      m_hHandle = -1;
    }
-
-   if (m_path)
-   {
-      delete[]m_path;
-      m_path = NULL;
-   }
-
-   if (url)
-   {
-      int32     len = strlen(url) + 1;
-      m_path = new char[len];
-
-      if (m_path)
-      {
-         memcpy(m_path, url, len);
-      }
-      else
-      {
-         result = kError_OutOfMemory;
-      }
-
-      if (IsntError(result))
-      {
-         m_pPullBuffer = new ObsBuffer(iBufferSize, iOverflowSize, 
-                                       iTriggerSize, url, this, m_context);
-         assert(m_pPullBuffer);
-
-         result = m_pPullBuffer->Open();
-         if (!IsError(result) && bStartThread)
-            result = m_pPullBuffer->Run();
-      }
-   }
-   else
-   {
-      result = kError_InvalidParam;
-   }
-
-   return result;
-}
-
-Error ObsInput::
-SetBufferSize(size_t iNewSize)
-{
-    assert(m_pPullBuffer);
-    return m_pPullBuffer->Resize(iNewSize, iNewSize / 6, iNewSize / 8);
-}
-
-Error ObsInput::
-GetLength(size_t &iSize)
-{
-    iSize = 0;
-
-    return kError_FileSeekNotSupported;
-}
-
-Error ObsInput::
-GetID3v1Tag(unsigned char *pTag)
-{
-    assert(m_pPullBuffer);
-    return m_pPullBuffer->GetID3v1Tag(pTag);
-}
-
-Error ObsInput::
-BeginRead(void *&buf, size_t &bytesneeded)
-{
-   assert(m_pPullBuffer);
-   return m_pPullBuffer->BeginRead(buf, bytesneeded);
-}
-
-Error ObsInput::
-EndRead(size_t bytesused)
-{
-   assert(m_pPullBuffer);
-   return m_pPullBuffer->EndRead(bytesused);
-}
-
-int32 ObsInput::GetBufferPercentage()
-{
-   if (m_pPullBuffer)
-      return m_pPullBuffer->GetBufferPercentage();
-
-   return 0;
-}
-
-int32 ObsInput::GetNumBytesInBuffer()
-{
-   if (m_pPullBuffer)
-       return m_pPullBuffer->GetNumBytesInBuffer();
-
-   return 0;
-}
-
-Error ObsInput::DiscardBytes()
-{
-   if (m_pPullBuffer)
-       return m_pPullBuffer->DiscardBytes();
 
    return kError_NoErr;
 }
 
-void ObsInput::Pause()
+Error ObsInput::Open(void)
 {
-   if (m_pPullBuffer)
-   {
-      m_pPullBuffer->DidDiscardBytes();
-      m_pPullBuffer->Pause();
-   }
+    int    iRet, iPort;
+    struct ip_mreq sMreq;
+    int    iReuse=0;
+    char   szAddr[100];
+
+    iRet = sscanf(m_path, "rtp://%[^:]:%d", szAddr, &iPort);
+    if (iRet < 2)
+    {
+        ReportError("Invalid URL. URL format: rtp://<multicast addr>[:port]");
+        return (Error)obsError_BadUrl;
+    }
+
+    m_hHandle = socket( AF_INET, SOCK_DGRAM, 0 );
+    if (m_hHandle < 0)
+    {
+       ReportError("Cannot create socket.");
+       return (Error)obsError_CannotCreateSocket;
+    }
+
+    m_pSin = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in));
+    assert(m_pSin);
+
+    iReuse = 1;
+    m_pSin->sin_family = AF_INET;
+    m_pSin->sin_port = htons(iPort);
+    m_pSin->sin_addr.s_addr = htonl(INADDR_ANY);
+
+    iRet = setsockopt(m_hHandle, SOL_SOCKET, SO_REUSEADDR, 
+                      (const char *)&iReuse, sizeof(int));
+    if (iRet < 0)
+    {
+       close(m_hHandle);
+       m_hHandle= -1;
+       ReportError("Cannot set socket options.");
+       return (Error)obsError_CannotSetSocketOpts;
+    }
+
+    iRet = bind(m_hHandle, (struct sockaddr *)m_pSin, 
+                sizeof(struct sockaddr_in));
+    if (iRet < 0)
+    {
+       close(m_hHandle);
+       m_hHandle= -1;
+       ReportError("Cannot bind the socket.");
+       return (Error)obsError_CannotBind;
+    }
+
+    sMreq.imr_multiaddr.s_addr = inet_addr(szAddr);
+    sMreq.imr_interface.s_addr = htonl(INADDR_ANY);
+    iRet = setsockopt(m_hHandle, IPPROTO_IP, IP_ADD_MEMBERSHIP,
+                   (char *)&sMreq, sizeof(sMreq));
+    if (iRet < 0)
+    {
+       close(m_hHandle);
+       m_hHandle= -1;
+       ReportError("Cannot set socket options.");
+       return (Error)obsError_CannotSetSocketOpts;
+    }
+
+    return kError_NoErr;
 }
 
-void ObsInput::Break()
+Error ObsInput::Run(void)
 {
-   if (m_pPullBuffer)
-       m_pPullBuffer->BreakBlocks();
+    if (!m_pBufferThread)
+    {
+       m_pBufferThread = Thread::CreateThread();
+       if (!m_pBufferThread)
+       {
+           return (Error)kError_CreateThreadFailed;
+       }
+       m_pBufferThread->Create(ObsInput::StartWorkerThread, this);
+    }
+
+    return kError_NoErr;
 }
 
-bool ObsInput::Resume()
+bool ObsInput::PauseLoop(bool bLoop)
 {
    bool bRet;
 
-   if (!m_pPullBuffer)
-      return false;
-
-   bRet = m_pPullBuffer->DidDiscardBytes();
-
-   m_pPullBuffer->Resume();
+   m_bLoop = bLoop;
+   bRet = m_bDiscarded;
+   m_bDiscarded = false;
 
    return bRet;
+} 
+
+void ObsInput::StartWorkerThread(void *pVoidBuffer)
+{
+   ((ObsInput*)pVoidBuffer)->WorkerThread();
 }
 
-Error     ObsInput::
-Seek(int32 & rtn, int32 offset, int32 origin)
-{
-   return kError_FileSeekNotSupported;
-}
+#ifndef min
+#define min(a,b) ((a) < (b) ? (a) : (b))
+#endif
 
-Error     ObsInput::
-Close(void)
+void ObsInput::WorkerThread(void)
 {
-   delete m_pPullBuffer;
-   m_pPullBuffer = NULL;
+   int             iRead, iPacketNum = -1, iCurrNum, iRet, iHeaderSize;
+   int           iStructSize;
+   RTPHeader      *pHeader;
+   void           *pBuffer;
+   unsigned        char *pTemp;
+   Error           eError;
+   fd_set          sSet;
+   struct timeval  sTv;
 
-   return kError_NoErr;
+   m_pSleepSem->Wait(); 
+
+   pTemp = new unsigned char[iMAX_PACKET_SIZE];
+   pHeader = (RTPHeader *)pTemp;
+   for(; !m_bExit;)
+   {
+      if (m_pOutputBuffer->IsEndOfStream())
+      {
+          m_pSleepSem->Wait();
+          continue;
+      }
+      if (m_bPause)
+      {
+          m_pPauseSem->Wait();
+          continue;
+      }
+
+      sTv.tv_sec = 0;
+      sTv.tv_usec = 100000;  // .1 second
+      FD_ZERO(&sSet);
+      FD_SET(m_hHandle, &sSet);
+      iRet = select(m_hHandle + 1, &sSet, NULL, NULL, &sTv);  
+      if (!iRet)
+      {
+         continue;
+      }
+
+      iStructSize = sizeof(struct sockaddr_in);
+      iRead = recvfrom(m_hHandle, (char *)pTemp, iMAX_PACKET_SIZE, 0,
+                       (struct sockaddr *)m_pSin, &iStructSize);
+      if (iRead <= 0)
+      {
+         m_pOutputBuffer->SetEndOfStream(true);
+         break;
+      }
+
+      for(;;)
+      {
+          eError = m_pOutputBuffer->BeginWrite(pBuffer, iRead);
+          if (eError == kError_BufferTooSmall)
+          {
+              if (m_bLoop)
+              {
+                 m_pOutputBuffer->DiscardBytes();
+                 m_bDiscarded = true;
+              }
+              else
+                 m_pSleepSem->Wait();
+
+              continue;
+          }
+          break;
+      }
+      if (eError != kError_NoErr)
+         break; 
+
+      pHeader->iFlags = ntohl(pHeader->iFlags);
+      iCurrNum = pHeader->iFlags & 0xFFFF;
+      if (iPacketNum != -1 && iPacketNum != iCurrNum - 1)
+      {
+          time_t t;
+
+          time(&t);
+          m_pContext->log->Log(LogPerf, "Lost packet (%d, %d): %s", 
+             iPacketNum, iCurrNum, ctime(&t)); 
+      }
+      iPacketNum = iCurrNum;
+
+      iHeaderSize = sizeof(RTPHeader) + sizeof(int32);
+      iHeaderSize += sizeof(int32) * ((pHeader->iFlags >> 24) & 0xF);
+
+      iRead -= iHeaderSize;
+      memcpy(pBuffer, pTemp + iHeaderSize, iRead);
+      eError = m_pOutputBuffer->EndWrite(iRead);
+      if (IsError(eError))
+      {
+         m_pContext->log->Error("Obs: EndWrite returned: %d\n", eError);
+      }
+   }
+
+   delete pTemp;
+   close(m_hHandle);
+   m_hHandle = -1;
+   m_pContext->log->Log(LogInput, "Worker thread done");
 }

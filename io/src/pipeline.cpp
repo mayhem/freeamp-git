@@ -38,6 +38,8 @@ ____________________________________________________________________________*/
 #include "facontext.h"
 #include "log.h"
 
+#define DB printf("%s:%d\n", __FILE__, __LINE__); 
+
 PipelineUnit::PipelineUnit(FAContext *context)
 {
     m_pContext = context;
@@ -49,13 +51,13 @@ PipelineUnit::PipelineUnit(FAContext *context)
     m_pOutputBuffer = NULL;
     m_pInputBuffer = NULL;
 
-    m_pPauseSem = new Semaphore;
+    m_pPauseSem = new Semaphore();
     assert(m_pPauseSem);
 
-    m_pSleepSem = new Semaphore;
+    m_pSleepSem = new Semaphore();
     assert(m_pSleepSem);
 
-    m_pMutex = new Mutex;
+    m_pMutex = new Mutex();
     assert(m_pMutex);
 }
 
@@ -71,7 +73,8 @@ PipelineUnit::~PipelineUnit()
 
     m_pMutex->Release();
 
-    delete m_pOutputBuffer;
+    if (m_pOutputBuffer)
+        delete m_pOutputBuffer;
 
     delete m_pMutex;
     delete m_pPauseSem;
@@ -114,6 +117,7 @@ void PipelineUnit::Pause()
     m_pMutex->Acquire();
 
     m_bPause = true;
+    Wake();
 
     m_pMutex->Release();
 }
@@ -132,7 +136,8 @@ void PipelineUnit::Clear()
 {
     m_pMutex->Acquire();
 
-    m_pOutputBuffer->Clear();
+    if (m_pOutputBuffer)
+        m_pOutputBuffer->Clear();
     
     m_pMutex->Release();
 }

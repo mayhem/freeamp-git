@@ -81,10 +81,11 @@ class     XingLMC:public LogicalMediaConverter
    virtual Error ChangePosition(int32 position);
 
    virtual bool  CanDecode();
+   virtual void  Clear();
    virtual Error ExtractMediaInfo();
 
-   virtual void  SetPMI(PhysicalMediaInput *pmi) { m_input = pmi; };
-   virtual void  SetPMO(PhysicalMediaOutput *pmo) { m_output = pmo; };
+   virtual void  SetPMI(PhysicalMediaInput *pmi) { m_pPmi = pmi; };
+   virtual void  SetPMO(PhysicalMediaOutput *pmo) { m_pPmo = pmo; };
    virtual Error Prepare(PullBuffer *pInputBuffer, PullBuffer *&pOutBuffer);
    virtual Error InitDecoder();
 
@@ -97,11 +98,13 @@ class     XingLMC:public LogicalMediaConverter
    void                 DecodeWork();
 	Error                BeginRead(void *&pBuffer, unsigned int iBytesNeeded,
                              bool bBufferUp = true);
+	Error                BlockingBeginRead(void *&pBuffer, 
+                                          unsigned int iBytesNeeded);
 	Error                AdvanceBufferToNextFrame();
 	Error                GetHeadInfo();
 
-   PhysicalMediaInput  *m_input;
-   PhysicalMediaOutput *m_output;
+   PhysicalMediaInput  *m_pPmi;
+   PhysicalMediaOutput *m_pPmo;
 
    int                  m_iMaxWriteSize;
    int                  m_frameBytes, m_iBufferUpInterval, m_iBufferSize;

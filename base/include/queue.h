@@ -162,15 +162,18 @@ template<class T> void Queue<T>::Clear()
 
 
 template<class T> bool Queue<T>::IsEmpty() {
+    assert(m_myLock);
     return (m_head ? false : true);
 }
 
 template<class T> void Queue<T>::GetLock() {
+    assert(m_myLock);
     m_myLock->Acquire(WAIT_FOREVER);
     return;
 }
 
 template<class T> void Queue<T>::ReleaseLock() {
+    assert(m_myLock);
     m_myLock->Release();
     return;
 }

@@ -33,7 +33,6 @@ ____________________________________________________________________________*/
 #include "pmi.h"
 
 const int32 iMaxFileNameLen = 255;
-const int32 iID3TagSize = 128;
 class FAContext;
 
 class LocalFileInput:public PhysicalMediaInput
@@ -44,17 +43,13 @@ class LocalFileInput:public PhysicalMediaInput
    LocalFileInput(char *path);
    virtual ~ LocalFileInput(void);
 
-   virtual Error Run(void);
-   virtual Error Seek(int32 & rtn, int32 offset, int32 origin);
-   virtual Error GetLength(size_t &iSize); 
-   virtual Error GetID3v1Tag(unsigned char *pTag);
-
 	virtual bool  CanHandle(char *szUrl, char *szTitle);
 	virtual bool  IsStreaming(void)
 	              { return false; };
+   virtual Error Seek(int32 & rtn, int32 offset, int32 origin);
+   virtual Error GetLength(size_t &iSize);
 
-   virtual Error Prepare(PullBuffer *&pBuffer, bool bStartThread = true);
-
+   virtual Error Prepare(PullBuffer *&pBuffer, bool bStartThread);
    virtual Error SetTo(char *url);
    virtual Error Close(void);
    virtual void  Clear(void);
@@ -62,22 +57,19 @@ class LocalFileInput:public PhysicalMediaInput
    {
       return m_path;
    }
+   virtual Error Run(void);
    
-
-   void           WorkerThread(void);
+   void          WorkerThread(void);
 
  private:
 
-   static   void  StartWorkerThread(void *);
-   virtual  Error Open(void);
+   virtual Error Open(void);
+   static  void  StartWorkerThread(void *pVoidBuffer);
 
-   char           *m_path;
    FILE           *m_fpFile;
-   Thread         *m_pBufferThread;
    bool            m_bLoop;
    size_t          m_iFileSize;
-   unsigned char  *m_pID3Tag;
-
+   Thread        *m_pBufferThread; 
 };
 
 #endif /* _LOCALFILEINPUT_H_ */

@@ -41,23 +41,24 @@ ____________________________________________________________________________*/
 #include "facontext.h"
 #include "log.h"
 
+#define DB printf("%s:%d\n", __FILE__, __LINE__);
+
 PhysicalMediaOutput::PhysicalMediaOutput(FAContext *context) :
                      PipelineUnit(context)
 {
-    printf("pmo ctor\n");
     m_pPmi = NULL;
     m_pLmc = NULL;
 }
 
 PhysicalMediaOutput::~PhysicalMediaOutput()
 {
-    printf("pmo dtor\n");
     m_bExit = true;
 
     if (m_pLmc)
         m_pLmc->Pause();
     if (m_pPmi)
         m_pPmi->Pause();
+
     m_pPauseSem->Signal();
     m_pSleepSem->Signal();
 
@@ -67,15 +68,20 @@ PhysicalMediaOutput::~PhysicalMediaOutput()
 
 Error PhysicalMediaOutput::SetTo(char *url)
 {
-    Error eRet;
+    Error       eRet;
+    PullBuffer *pBuffer;
+
+    m_pMutex->Acquire();
 
     assert(m_pPmi != NULL);
     assert(m_pLmc != NULL);
 
     m_pPmi->SetTo(url);
-    eRet = m_pPmi->Prepare(m_pInputBuffer);
+    eRet = m_pPmi->Prepare(pBuffer);
     if (!IsError(eRet))
-         eRet = m_pLmc->Prepare(m_pInputBuffer, m_pOutputBuffer);
+         eRet = m_pLmc->Prepare(pBuffer, m_pInputBuffer);
+
+    m_pMutex->Release();
 
     return eRet;
 }
@@ -100,35 +106,32 @@ void PhysicalMediaOutput::SetPMI(PhysicalMediaInput *pPMI)
 
 void PhysicalMediaOutput::Pause()
 {
-    m_pMutex->Acquire();
+    PipelineUnit::Pause();
 
-    if (!m_bPause)
+    m_pPmi->PauseLoop(true);
+
+    Reset(true);
+}
+
+void PhysicalMediaOutput::Resume()
+{
+    if (m_pPmi->PauseLoop(false))
     {
-        m_bPause = true;
-        Reset(true);
+        m_pLmc->Pause();
+        m_pPmi->Pause();
+        m_pLmc->Clear();
+        m_pPmi->Resume();
+        m_pLmc->Resume();
     }
 
-    m_pMutex->Release();
+    PipelineUnit::Resume();
 }
 
 bool PhysicalMediaOutput::WasteTime()
 {
     usleep(10000);
 
-    m_pMutex->Acquire();
-    if (m_bExit)
-    {
-        m_pMutex->Release();
-        return true;
-    }
-
-    if (m_bPause)
-    {
-        m_pMutex->Release();
-        m_pPauseSem->Wait();
-    }
-
-    return m_bExit;
+    return m_bExit || m_bPause;
 }       
 
 Error PhysicalMediaOutput::ChangePosition(int32 position)
@@ -144,8 +147,8 @@ Error PhysicalMediaOutput::ChangePosition(int32 position)
    m_pLmc->Pause();
    m_pPmi->Pause();
 
-   m_pInputBuffer->Clear();
-   m_pOutputBuffer->Clear();
+   m_pLmc->Clear();
+   m_pPmi->Clear();
 
    m_pLmc->ChangePosition(position);
 

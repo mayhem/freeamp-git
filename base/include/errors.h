@@ -60,7 +60,8 @@ typedef enum Error
     kError_EventPending         = 29,
     kError_YouScrewedUp         = 30,
     kError_NoPrefValue          = 31,
-    kError_SyntaxError          = 32
+    kError_SyntaxError          = 32,
+    kError_EndOfStream          = 33
 }Error;
 
 

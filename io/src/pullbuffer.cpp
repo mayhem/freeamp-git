@@ -35,26 +35,24 @@ ____________________________________________________________________________*/
 #ifndef min
 #define min(a,b) ((a) < (b) ? (a) : (b))
 #endif
-#define DB printf("%x %s:%d\n", pthread_self(), __FILE__, __LINE__);
+#define DB //printf("%s:%d\n",  __FILE__, __LINE__);
 
 PullBuffer::PullBuffer(size_t iBufferSize,
                        size_t iOverflowSize,
-                       size_t iWriteTriggerSize,
-		       FAContext *context)
+		                 FAContext *context)
 {
    m_context = context;
 
    m_bEOS = false;
    m_bExit = false;
-   m_bReadOpPending = false;
-   m_bWriteOpPending = false;
+   m_iBytesToRead = 0;
+   m_iBytesToWrite = 0;
 
    m_iReadIndex =  m_iWriteIndex = 0;
    m_iBytesInBuffer = 0;
 
    m_iOverflowSize = iOverflowSize;
    m_iBufferSize = iBufferSize;
-   m_iWriteTriggerSize = iWriteTriggerSize;
 
    m_pPullBuffer = new unsigned char[m_iBufferSize + iOverflowSize];
    assert(m_pPullBuffer != NULL);
@@ -64,16 +62,12 @@ PullBuffer::PullBuffer(size_t iBufferSize,
 
 PullBuffer::~PullBuffer(void)
 {
-   // In case anyone is blocked on a BeginRead 
    m_bExit = true;
 
-   delete m_pPullBuffer;
+   if (m_pPullBuffer)
+      delete m_pPullBuffer;
+
    delete m_pMutex;
-}
-
-void PullBuffer::BreakBlocks(void)
-{
-   m_bExit = true;
 }
 
 Error PullBuffer::Clear(void)
@@ -85,9 +79,10 @@ Error PullBuffer::Clear(void)
 
        m_pMutex->Acquire();
 
-       if (m_bReadOpPending || m_bWriteOpPending)
+       if (m_iBytesToRead || m_iBytesToWrite)
        {
            m_pMutex->Release();
+           usleep(10000);
            continue;
        }
        break;
@@ -113,9 +108,10 @@ int PullBuffer::GetReadIndex(void)
 
        m_pMutex->Acquire();
 
-       if (m_bReadOpPending)
+       if (m_iBytesToRead)
        {
            m_pMutex->Release();
+           usleep(10000);
            continue;
        }
        break;
@@ -139,9 +135,10 @@ int PullBuffer::GetWriteIndex(void)
 
        m_pMutex->Acquire();
 
-       if (m_bWriteOpPending)
+       if (m_iBytesToWrite)
        {
            m_pMutex->Release();
+           usleep(10000);
            continue;
        }
        break;
@@ -168,8 +165,7 @@ void PullBuffer::WrapPointer(void *&pBuffer)
 
 
 Error PullBuffer::Resize(size_t iNewSize, 
-                         size_t iNewOverflowSize, 
-                         size_t iNewWriteTriggerSize)
+                         size_t iNewOverflowSize)
 {
    unsigned char *pNew;
 
@@ -193,7 +189,7 @@ Error PullBuffer::Resize(size_t iNewSize,
 
        m_pMutex->Acquire();
 
-       if (m_bReadOpPending || m_bWriteOpPending)
+       if (m_iBytesToRead || m_iBytesToWrite)
        {
            m_pMutex->Release();
 		     usleep(10000);
@@ -209,7 +205,6 @@ Error PullBuffer::Resize(size_t iNewSize,
    m_pPullBuffer = pNew;
    m_iBufferSize = iNewSize;
    m_iOverflowSize = iNewOverflowSize;
-   m_iWriteTriggerSize = iNewWriteTriggerSize;
    m_iWriteIndex = m_iBytesInBuffer;
 
    m_pMutex->Release();
@@ -235,16 +230,20 @@ void PullBuffer::SetEndOfStream(bool bEOS)
    m_pMutex->Release();
 }
 
-Error PullBuffer::BeginWrite(void *&pBuffer, size_t &iBytesToWrite)
+// BeginWrite requests writing a certain number of bytes. If that number
+// of bytes in not available, it returns buffertoosmall.
+// Returns kError_Interrupt, kError_BufferTooSmall, kError_NoErr
+Error PullBuffer::BeginWrite(void *&pBuffer, size_t iBytesNeeded)
 {
-   Error eError = kError_NoErr;
+   Error    eError = kError_NoErr;
+   unsigned iAvail = 0;
+
+   m_pMutex->Acquire();
 
    assert(m_pPullBuffer != NULL);
    assert(m_iReadIndex >= 0 && (uint32)m_iReadIndex < m_iBufferSize);
    assert(m_iWriteIndex >= 0 && (uint32)m_iWriteIndex < m_iBufferSize);
-   assert(m_bWriteOpPending == false);
-
-   m_pMutex->Acquire();
+   assert(m_iBytesToWrite == 0);
 
    if (m_bExit)
    {
@@ -258,45 +257,34 @@ Error PullBuffer::BeginWrite(void *&pBuffer, size_t &iBytesToWrite)
    //    pthread_self(), m_iReadIndex, m_iWriteIndex, m_iBufferSize, m_iBytesInBuffer);
    if (m_iWriteIndex > m_iReadIndex)
    {
-       iBytesToWrite = m_iBufferSize - m_iWriteIndex + 
-                            min((uint32)m_iReadIndex, m_iOverflowSize);
-
-       if (iBytesToWrite > m_iWriteTriggerSize)
-          iBytesToWrite = m_iWriteTriggerSize;
-
+       iAvail = m_iBufferSize - m_iWriteIndex + 
+                min((uint32)m_iReadIndex, m_iOverflowSize);
    }
    else
    {
       if (m_iWriteIndex == m_iReadIndex)
       {
           if (m_iBytesInBuffer == 0)
-              iBytesToWrite = m_iWriteTriggerSize; 
+              iAvail = iBytesNeeded; 
           else
-              iBytesToWrite = 0;
+              iAvail = 0;
       }
       else
       {
-          iBytesToWrite = m_iReadIndex - m_iWriteIndex;
+          iAvail = m_iReadIndex - m_iWriteIndex;
       }
-
-      if (iBytesToWrite < m_iWriteTriggerSize)
-	  {
-         eError = kError_BufferTooSmall;
-	  }
-      else
-      if (iBytesToWrite > m_iWriteTriggerSize)
-         iBytesToWrite = m_iWriteTriggerSize;
-   }
-   //printf("%08X: iBytesToWrite: %d\n", pthread_self(), iBytesToWrite);
-
-   assert(m_iWriteIndex + iBytesToWrite <= m_iBufferSize + m_iOverflowSize);
-   assert(m_iBytesInBuffer + iBytesToWrite <= m_iBufferSize);
-
-   if (eError == kError_NoErr)
-   {
-      m_bWriteOpPending = true;
    }
 
+   if (iBytesNeeded > iAvail)
+	{
+      m_pMutex->Release();
+      return kError_BufferTooSmall;
+	}
+
+   assert(m_iWriteIndex + iBytesNeeded <= m_iBufferSize + m_iOverflowSize);
+   assert(m_iBytesInBuffer + iBytesNeeded <= m_iBufferSize);
+
+   m_iBytesToWrite = iBytesNeeded;
    m_pMutex->Release();
   
    return eError;
@@ -304,16 +292,11 @@ Error PullBuffer::BeginWrite(void *&pBuffer, size_t &iBytesToWrite)
 
 Error PullBuffer::EndWrite(size_t iBytesWritten)
 {
-   assert(m_pPullBuffer != NULL);
-
    m_pMutex->Acquire();
 
-   if (m_iBytesInBuffer + iBytesWritten > m_iBufferSize)
-   {
-       m_pMutex->Release();
-
-       return kError_YouScrewedUp;
-   }
+   assert(m_pPullBuffer != NULL);
+   assert(iBytesWritten <= m_iBytesToWrite);
+   assert(m_iBytesInBuffer + iBytesWritten <= m_iBufferSize);
 
    m_iWriteIndex = m_iWriteIndex + iBytesWritten;
    if ((uint32)m_iWriteIndex > m_iBufferSize)
@@ -321,16 +304,12 @@ Error PullBuffer::EndWrite(size_t iBytesWritten)
               m_iWriteIndex - m_iBufferSize);
 
    m_iWriteIndex %= m_iBufferSize;
-   assert(m_iWriteIndex >= 0 && (uint32)m_iWriteIndex < m_iBufferSize);
    m_iBytesInBuffer += iBytesWritten;
 
    //printf("%08X: bytesinbuffer: %d byteswritten %d buffsize: %d\n", 
    //   pthread_self(), m_iBytesInBuffer, iBytesWritten, m_iBufferSize);
-
    
-   assert(m_iBytesInBuffer <= m_iBufferSize);
-
-   m_bWriteOpPending = false;
+   m_iBytesToWrite = 0;
 
    m_context->log->Log(LogInput, "EndWrite: ReadIndex: %d WriteIndex %d\n", m_iReadIndex, m_iWriteIndex);
    m_pMutex->Release();
@@ -338,76 +317,91 @@ Error PullBuffer::EndWrite(size_t iBytesWritten)
    return kError_NoErr;
 }
 
-Error PullBuffer::BeginRead(void *&pBuffer, size_t &iBytesNeeded)
+// returns: kError_EndOfStream, kError_NoDataAvail, kError_NoErr
+Error PullBuffer::BeginRead(void *&pBuffer, size_t iBytesNeeded)
 {
    assert(m_pPullBuffer != NULL);
-   assert(m_bReadOpPending == false);
+   assert(m_iBytesToRead == 0);
+   assert(iBytesNeeded <= m_iBufferSize);
+
    Error  eError = kError_UnknownErr;
-   size_t iOverflow;
+   int    iOverflow;
+   size_t iAvail = 0;
 
-   for(;;)
+   if (m_bExit)
    {
-      if (m_bExit)
-      {
-          return kError_Interrupt;
-      }
-      m_pMutex->Acquire();
-
-      if (m_bEOS && iBytesNeeded > m_iBytesInBuffer)
-      {
-          iBytesNeeded = m_iBytesInBuffer;
-          eError = kError_InputUnsuccessful;
-          break;
-      }
-
-      if (iBytesNeeded > m_iBytesInBuffer)
-      {
-          m_pMutex->Release();
-
-          return kError_NoDataAvail;
-      }
-
-      pBuffer = m_pPullBuffer + m_iReadIndex;
-      if (m_iWriteIndex > m_iReadIndex ||
-          m_iBufferSize - m_iReadIndex >= iBytesNeeded)
-      {
-          eError = kError_NoErr;
-          break;
-      }
-
-      // We need to copy the beginning part of the buffer into the
-      // overflow.
-      iOverflow = (m_iReadIndex + iBytesNeeded) - m_iBufferSize; 
-      if (iOverflow > m_iOverflowSize)
-      {
-          m_context->log->Error("Overflow buffer is too small!! \n"
-                       "Needed %d but had only %d for overflow.\n",
-                       iOverflow, m_iOverflowSize);
-
-          eError = kError_InvalidParam;
-          break;
-      } 
-      
-      memcpy(m_pPullBuffer + m_iBufferSize, m_pPullBuffer, iOverflow);
-      eError = kError_NoErr;
-
-      break;
-   }   
-
-   if (eError == kError_NoErr)
-   {
-      m_bReadOpPending = true;
+       return kError_Interrupt;
    }
 
+   m_pMutex->Acquire();
+   if (m_bEOS && iBytesNeeded > m_iBytesInBuffer)
+   {
+       m_pMutex->Release();
+       return kError_EndOfStream;
+   }
+
+   if (iBytesNeeded > m_iBytesInBuffer)
+   {
+       m_pMutex->Release();
+
+       return kError_NoDataAvail;
+   }
+
+   if (m_iReadIndex > m_iWriteIndex)
+   {
+       iAvail = m_iBufferSize - m_iReadIndex + 
+                min((uint32)m_iWriteIndex, m_iOverflowSize);
+   }
+   else
+   {
+      if (m_iReadIndex == m_iWriteIndex)
+      {
+          if (m_iBytesInBuffer == 0)
+              iAvail = 0; 
+          else
+              iAvail = iBytesNeeded;
+      }
+      else
+      {
+          iAvail = m_iWriteIndex - m_iReadIndex;
+      }
+   }
+
+   if (iBytesNeeded > iAvail)
+	{
+      m_pMutex->Release();
+      return kError_NoDataAvail;
+	}
+
+   // We need to copy the beginning part of the buffer into the
+   // overflow.
+   iOverflow = (m_iReadIndex + iBytesNeeded) - m_iBufferSize; 
+   if (iOverflow > (int)m_iOverflowSize)
+   {
+       m_pMutex->Release();
+       m_context->log->Error("Overflow buffer is too small!! \n"
+                    "Needed %d but had only %d for overflow.\n",
+                    iOverflow, m_iOverflowSize);
+
+       return kError_InvalidParam;
+   } 
+   if (iOverflow > 0)
+       memcpy(m_pPullBuffer + m_iBufferSize, m_pPullBuffer, iOverflow);
+
+   m_iBytesToRead = iBytesNeeded;
    m_pMutex->Release();
 
-   return eError;
+   pBuffer = m_pPullBuffer + m_iReadIndex;
+ 
+   return eError = kError_NoErr;
 }
 
 Error PullBuffer::EndRead(size_t iBytesUsed)
 {
    assert(m_pPullBuffer != NULL);
-   assert(iBytesUsed >= 0 && iBytesUsed <= m_iBytesInBuffer);
+   assert(iBytesUsed <= m_iBytesToRead);
+   assert(iBytesUsed >= 0);
+   assert(iBytesUsed <= m_iBytesInBuffer);
 
    m_pMutex->Acquire();
 
@@ -416,7 +410,7 @@ Error PullBuffer::EndRead(size_t iBytesUsed)
    m_iBytesInBuffer -= iBytesUsed;
    assert(m_iBytesInBuffer <= m_iBufferSize);
 
-   m_bReadOpPending = false;
+   m_iBytesToRead = 0;
 
    m_context->log->Log(LogInput, "EndRead: ReadIndex: %d WriteIndex %d\n", m_iReadIndex, m_iWriteIndex);
 
@@ -435,7 +429,7 @@ Error PullBuffer::DiscardBytes()
            return kError_Interrupt;
 
         m_pMutex->Acquire();
-        if (m_bReadOpPending || m_bWriteOpPending)
+        if (m_iBytesToRead || m_iBytesToWrite)
         {
             m_pMutex->Release();
             continue;

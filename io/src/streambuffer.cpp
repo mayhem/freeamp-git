@@ -30,8 +30,8 @@ ____________________________________________________________________________*/
 #include "streambuffer.h"
 
 StreamBuffer::StreamBuffer(size_t iBufferSize, size_t iOverFlowSize, 
-                           size_t iWriteTriggerSize, FAContext *context) : 
-     PullBuffer(iBufferSize, iOverFlowSize, iWriteTriggerSize, context)
+                           FAContext *context) : 
+     PullBuffer(iBufferSize, iOverFlowSize, context)
 {
    m_bBufferingUp = true;
    m_bPause = true;
@@ -58,7 +58,7 @@ bool StreamBuffer::DidDiscardBytes()
    return bRet;
 }
 
-Error StreamBuffer::BeginWrite(void *&pBuffer, size_t &iBytesNeeded)
+Error StreamBuffer::BeginWrite(void *&pBuffer, size_t iBytesNeeded)
 {
    Error eRet;
 
