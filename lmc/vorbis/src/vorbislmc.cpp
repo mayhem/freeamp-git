@@ -58,7 +58,7 @@ extern    "C"
 const int iDecodeBlockSize = 8192;
 const int iFramesPerSecond = 10;
 const int iBitrateLoopsPerUpdate = iFramesPerSecond * 3;
-const int iInitialOutputBufferSize = 64512; 
+const int iInitialOutputBufferSize = 65536; 
 const char *szFailRead = "Cannot read vorbis data from input plugin.";
 const char *szFailWrite = "Cannot write audio data to output buffer.";
 const char *szCannotDecode = "Skipped corrupted file.";
@@ -172,7 +172,7 @@ Error VorbisLMC::InitDecoder()
    m_section = -1;
 
    m_pContext->prefs->GetPrefInt32(kOutputBufferSizePref, &iNewSize);
-   iNewSize = max(iNewSize, iMinimumOutputBufferSize);
+   iNewSize = max(iNewSize, iInitialOutputBufferSize);
    iNewSize *= 1024;
 
    result = m_pOutputBuffer->Resize(iNewSize, iNewSize / 6);
@@ -549,7 +549,8 @@ size_t VorbisLMC::Read(void *buf, size_t size, size_t num)
        if (Err == kError_NoDataAvail)
        {
            m_pPmi->Wake();
-           usleep(10000);
+           if (Sleep())
+              return kError_Interrupt;
            continue;
        }
        if (Err == kError_EndOfStream)
