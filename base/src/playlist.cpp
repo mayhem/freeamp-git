@@ -1047,36 +1047,40 @@ ExpandM3U(char *szM3UFile, List<char *> &MP3List)
 
 	for(;;)
     {
-		 if (fgets(szLine, iMaxFileNameLen - 1, fpFile) == NULL)
+        if (fgets(szLine, iMaxFileNameLen - 1, fpFile) == NULL)
 			 break;
 
-         // enable people with different platforms 
+        // enable people with different platforms 
         // to swap files by changing the path 
         // separator as necessary
-        for (iIndex = strlen(szLine) - 1; iIndex >=0; iIndex--)
+        if( strncmp(szLine, "http://", 7) &&
+            strncmp(szLine, "rtp://", 6))
         {
-            if(szLine[iIndex] == '\\' && DIR_MARKER == '/')
-                szLine[iIndex] = DIR_MARKER;
-            else if(szLine[iIndex] == '/' && DIR_MARKER == '\\')
-                szLine[iIndex] = DIR_MARKER;
+            for (iIndex = strlen(szLine) - 1; iIndex >=0; iIndex--)
+            {
+                if(szLine[iIndex] == '\\' && DIR_MARKER == '/')
+                    szLine[iIndex] = DIR_MARKER;
+                else if(szLine[iIndex] == '/' && DIR_MARKER == '\\')
+                    szLine[iIndex] = DIR_MARKER;
+            }
+
+            for(iIndex = strlen(szLine) -1; iIndex >= 0; iIndex--)
+                if(szLine[iIndex] == '\n' || 
+                   szLine[iIndex] == '\r' ||
+                   szLine[iIndex] == ' ')
+                    szLine[iIndex] = 0;
+                else
+                    break;
         }
 
-		 for(iIndex = strlen(szLine) -1; iIndex >= 0; iIndex--)
-			 if (szLine[iIndex] == '\n' || 
-				 szLine[iIndex] == '\r' ||
-				 szLine[iIndex] == ' ')
-				szLine[iIndex] = 0;
-			 else
-				break;
-
-		 if (strlen(szLine))
-		 {
-             if( !strncmp(szLine, "..", 2) ||
-                 (strncmp(szLine + 1, ":\\", 2) &&
-                  strncmp(szLine, "\\", 1)) &&
-                 (strncmp(szLine, "http://", 7) &&
-                  strncmp(szLine, "rtp://", 6)) )
-             {
+        if (strlen(szLine))
+        {
+            if(!strncmp(szLine, "..", 2) ||
+               (strncmp(szLine + 1, ":\\", 2) &&
+                strncmp(szLine, "\\", 1)) &&
+               (strncmp(szLine, "http://", 7) &&
+                strncmp(szLine, "rtp://", 6)) )
+            {
                 char* cp;
 
                 strcpy(szTemp, szM3UFile);
@@ -1088,13 +1092,13 @@ ExpandM3U(char *szM3UFile, List<char *> &MP3List)
                     strcpy(cp + 1, szLine);
                     strcpy(szLine, szTemp);
                 }
-             }
+            }
 
-			 szMP3 = new char[strlen(szLine) + 1];
-			 strcpy(szMP3, szLine);
-			 MP3List.AddItem(szMP3);
-			 szMP3 = NULL;
-		 }
+            szMP3 = new char[strlen(szLine) + 1];
+            strcpy(szMP3, szLine);
+            MP3List.AddItem(szMP3);
+            szMP3 = NULL;
+        }
     }
 
 	delete [] szLine;
