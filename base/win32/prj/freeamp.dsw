@@ -522,6 +522,21 @@ Package=<4>
 
 ###############################################################################
 
+Project: "vorbis"=..\..\..\lmc\vorbis\win32\prj\vorbis.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name fabaselib
+    End Project Dependency
+}}}
+
+###############################################################################
+
 Project: "wavout"=..\..\..\io\wavout\win32\prj\wavout.dsp - Package Owner=<4>
 
 Package=<5>

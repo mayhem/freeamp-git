@@ -31,7 +31,6 @@ ____________________________________________________________________________*/
 
 #include "config.h"
 #include "errors.h"
-#include "xinglmc.h"
 #include "pmoevent.h"
 #include "eventbuffer.h"
 #include "event.h"
@@ -102,7 +101,7 @@ Error VorbisLMC::Prepare(PullBuffer *pInputBuffer, PullBuffer *&pOutBuffer)
       m_decoderThread = Thread::CreateThread();
       if (!m_decoderThread)
       {
-         return (Error) lmcError_DecoderThreadFailed;
+         return kError_CreateThreadFailed;
       }
       m_decoderThread->Create(VorbisLMC::DecodeWorkerThreadFunc, this);
    }

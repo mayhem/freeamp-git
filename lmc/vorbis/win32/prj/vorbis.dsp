@@ -45,7 +45,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\..\\" /I "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\..\\" /I "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\..\vorbis\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
@@ -75,7 +75,7 @@ PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir            
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\..\\" /I "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
+# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\..\\" /I "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\..\vorbis\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
@@ -107,7 +107,7 @@ PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir            
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\..\\" /I "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\..\\" /I "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "ASM_X86" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\..\\" /I "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\..\vorbis\include" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "ASM_X86" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
@@ -138,7 +138,7 @@ PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir            
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\..\\" /I "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\..\\" /I "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "ASM_X86" /YX /FD /c
+# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\..\\" /I "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\..\vorbis\include" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "ASM_X86" /YX /FD /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
@@ -220,11 +220,19 @@ SOURCE=..\..\..\..\io\src\eventbuffer.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\..\base\src\log.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\io\src\pipeline.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\..\..\io\src\pullbuffer.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\win32\src\semaphore.cpp
 # End Source File
 # Begin Source File
 
@@ -234,97 +242,13 @@ SOURCE=.\vorbis.def
 
 SOURCE=..\res\vorbis.rc
 # End Source File
-# End Group
-# Begin Group "decoder"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\..\src\cdct.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\csbt.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\cup.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\cupl3.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\cwinm.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\dec8.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\hwin.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\icdct.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\isbt.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\iup.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\iwinm.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\l3dq.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\l3init.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\mdct.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\mhead.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\msis.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\uph.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\upsf.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\wavep.c
-# End Source File
 # Begin Source File
 
 SOURCE=..\..\src\vorbislmc.cpp
 # End Source File
-# End Group
-# Begin Group "Assembly Files"
-
-# PROP Default_Filter "asm"
 # Begin Source File
 
-SOURCE=..\..\src\cdctasm.asm
+SOURCE=..\..\..\..\..\vorbis\vorbis_vc6\Debug\vorbis_debug.lib
 
 !IF  "$(CFG)" == "vorbis - Win32 Release"
 
@@ -332,42 +256,20 @@ SOURCE=..\..\src\cdctasm.asm
 
 !ELSEIF  "$(CFG)" == "vorbis - Win32 Debug"
 
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Release"
 
-# Begin Custom Build
-IntDir=.\Release
-InputPath=..\..\src\cdctasm.asm
-InputName=cdctasm
-
-"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-
-# End Custom Build
+# PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Debug"
-
-# Begin Custom Build
-IntDir=.\Debug
-InputPath=..\..\src\cdctasm.asm
-InputName=cdctasm
-
-"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-
-# End Custom Build
 
 !ENDIF 
 
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\src\cwin8asm.asm
+SOURCE=..\..\..\..\..\vorbis\vorbis_vc6\Release\vorbis.lib
 
 !IF  "$(CFG)" == "vorbis - Win32 Release"
-
-# PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "vorbis - Win32 Debug"
 
@@ -375,144 +277,9 @@ SOURCE=..\..\src\cwin8asm.asm
 
 !ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Release"
 
-# Begin Custom Build
-IntDir=.\Release
-InputPath=..\..\src\cwin8asm.asm
-InputName=cwin8asm
-
-"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-
-# End Custom Build
-
 !ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Debug"
 
-# Begin Custom Build
-IntDir=.\Debug
-InputPath=..\..\src\cwin8asm.asm
-InputName=cwin8asm
-
-"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\cwinasm.asm
-
-!IF  "$(CFG)" == "vorbis - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "vorbis - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Release"
-
-# Begin Custom Build
-IntDir=.\Release
-InputPath=..\..\src\cwinasm.asm
-InputName=cwinasm
-
-"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Debug"
-
-# Begin Custom Build
-IntDir=.\Debug
-InputPath=..\..\src\cwinasm.asm
-InputName=cwinasm
-
-"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\mdctasm.asm
-
-!IF  "$(CFG)" == "vorbis - Win32 Release"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "vorbis - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Release"
-
-# Begin Custom Build
-IntDir=.\Release
-InputPath=..\..\src\mdctasm.asm
-InputName=mdctasm
-
-"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Debug"
-
-# Begin Custom Build
-IntDir=.\Debug
-InputPath=..\..\src\mdctasm.asm
-InputName=mdctasm
-
-"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\msisasm.asm
-
-!IF  "$(CFG)" == "vorbis - Win32 Release"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "vorbis - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Release"
-
-# Begin Custom Build
-IntDir=.\Release
-InputPath=..\..\src\msisasm.asm
-InputName=msisasm
-
-"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Debug"
-
-# Begin Custom Build
-IntDir=.\Debug
-InputPath=..\..\src\msisasm.asm
-InputName=msisasm
-
-"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-
-# End Custom Build
 
 !ENDIF 
 
