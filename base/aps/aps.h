@@ -44,6 +44,7 @@ ____________________________________________________________________________*/
 #include <map>
 #include <vector>
 #include <fstream>
+#include "facontext.h"
 
 using namespace std;
 #define MAX_METADATAQUERIES 10
@@ -81,7 +82,7 @@ public:
     } APSEvent;
        
     /** IP of APS Servers can be overwridden in constructor. */
-    APSInterface(char *profilePath, const char* pYpIP  = "209.249.187.199", 
+    APSInterface(FAContext *context, const char* pYpIP  = "209.249.187.199", 
                  const char* pSigIP = "209.249.187.199");
     virtual ~APSInterface(); // to be or not to be virtual....
  
@@ -186,6 +187,7 @@ protected:
     int LoadProfileMap(const char* pczFile);
 
 private:
+    FAContext *m_context;
     vector<string>* m_pActiveProfiles;// list of multiple profiles for 
                                       // combination recommendations
     string m_strCurrentProfile;      // name of current active profile.

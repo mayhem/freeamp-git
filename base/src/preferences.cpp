@@ -82,7 +82,7 @@ const char* kPlayImmediatelyPref = "PlayImmediately";
 const char* kNumberOfURLsToRememberPref = "NumberOfURLsToRemember";
 const char* kCDDevicePathPref = "CDDevice";
 const char* kCheckCDAutomaticallyPref = "AutoUpdateCD";
-const char* kCDDBServerPref = "CDDBServer";
+const char* kMBServerPref = "MBServer";
 const char* kConvertUnderscoresToSpacesPref = "ConvertUnderscoresToSpaces";
 const char* kAllowMultipleInstancesPref = "AllowMultipleInstances";
 const char* kWAVOutputPathPref = "WAVOutputPath";
@@ -153,7 +153,7 @@ const bool kDefaultViewMusicBrowser = true;
 const bool kDefaultWelcome = true;
 const bool kDefaultPlayImmediately = true;
 const int32 kDefaultNumberOfURLsToRemember = 10;
-const char* kDefaultCDDBServer = "http://www2.freedb.org/cgi-bin/cddb.cgi";
+const char* kDefaultMBServer = "http://www.musicbrainz.org:80";
 const bool kDefaultConvertUnderscoresToSpaces = true;
 const bool kDefaultAllowMultipleInstances = false;
 const char* kDefaultWAVOutPath = ".";
@@ -231,9 +231,9 @@ SetDefaults()
         SetPrefString(kProxyHostPref, kDefaultProxyHost);
 
     dummyInt = 255;
-    if (GetPrefString(kCDDBServerPref, dummyString, (uint32 *)&dummyInt) == 
+    if (GetPrefString(kMBServerPref, dummyString, (uint32 *)&dummyInt) == 
         kError_NoPrefValue)
-        SetPrefString(kCDDBServerPref, kDefaultCDDBServer);
+        SetPrefString(kMBServerPref, kDefaultMBServer);
 
     if (GetPrefBoolean(kUseAlternateNICPref, &dummyBool) == kError_NoPrefValue)
         SetPrefBoolean(kUseAlternateNICPref, kDefaultUseNIC);

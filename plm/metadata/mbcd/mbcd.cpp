@@ -164,6 +164,9 @@ bool MusicBrainzCD::LookupCD(void)
     uint32        length = _MAX_PATH;
     Database     *db;
     string        rdf, proxyServer;
+    char          url[MAX_PATH], hostname[MAX_PATH];
+    int           i, port;
+    uint32        len = MAX_PATH;
 
     error[0] = 0;
     m_context->prefs->GetPrefString(kDatabaseDirPref, tempDir, &length);
@@ -174,7 +177,17 @@ bool MusicBrainzCD::LookupCD(void)
     m_context->prefs->GetPrefString(kCDDevicePathPref, tempDir, &length);
     mb_SetDevice(o, tempDir);
 
-    mb_SetServer(o, MUSICBRAINZ_SERVER, MUSICBRAINZ_PORT);
+    // Parse the musicbrainz server from the preference
+    m_context->prefs->GetPrefString(kMBServerPref, url, &len);
+    i = sscanf(url, " http://%[^:/]:%d", hostname, &port);
+    if (i == 0)
+        i = sscanf(url, " %[^:/]:%d", hostname, &port);
+    if (i < 2)
+        port = MUSICBRAINZ_PORT;
+    if (i < 1)
+        strcpy(hostname, MUSICBRAINZ_SERVER);
+
+    mb_SetServer(o, hostname, port);
     if (GetProxySettings(m_context, proxyServer, proxyPort))
        mb_SetProxy(o, (char *)proxyServer.c_str(), proxyPort);
 

@@ -64,7 +64,7 @@ ____________________________________________________________________________*/
 const int nAPSYPPort  = 4444;
 const int nAPSSigPort = 4445;
 
-APSInterface::APSInterface(char *profilePath, const char* pIP, 
+APSInterface::APSInterface(FAContext *context, const char* pIP, 
                            const char *pSigIP)
 {
     //srand((unsigned)time(NULL)); // comment out if already inited elsewhere
@@ -78,7 +78,8 @@ APSInterface::APSInterface(char *profilePath, const char* pIP,
     m_bRelatableOn = true;
 
     m_pLogFile = NULL;
-    m_profilePath = string(profilePath);
+    m_context = context;
+    m_profilePath = string(FreeampDir(m_context->prefs));
     string savedProfiles = m_profilePath + string(DIR_MARKER_STR) +
                            string("profiles.txt");
 
@@ -151,12 +152,23 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
     musicbrainz_t o;
     int    ret;
     char   *args[11];
-    char    temp[255], guid[40];
-    int     i;
+    char    temp[255], guid[40], url[MAX_PATH], hostname[MAX_PATH];
+    int     i, port;
+    uint32  len = MAX_PATH;
+
+    // Parse the musicbrainz server from the preference
+    m_context->prefs->GetPrefString(kMBServerPref, url, &len);
+    i = sscanf(url, " http://%[^:/]:%d", hostname, &port);
+    if (i == 0)
+        i = sscanf(url, " %[^:/]:%d", hostname, &port);
+    if (i < 2)
+        port = MUSICBRAINZ_PORT;
+    if (i < 1)
+        strcpy(hostname, MUSICBRAINZ_SERVER);
 
     o = mb_New();
     mb_UseUTF8(o, 0);
-    mb_SetServer(o, MUSICBRAINZ_SERVER, MUSICBRAINZ_PORT);
+    mb_SetServer(o, hostname, port);
     if (m_strProxyAddr.size() > 7)
         mb_SetProxy(o, (char *)m_strProxyAddr.c_str(), m_nProxyPort);
 

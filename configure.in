@@ -226,7 +226,6 @@ if test "$UNIX_AUDIO_API" = "qnx"; then
 else
    OSDEPPLUGINS="$OSDEPPLUGINS plugins/cd.lmc"
    OSDEPPLUGINS="$OSDEPPLUGINS plugins/cd.pmo"
-   OSDEPPLUGINS="$OSDEPPLUGINS plugins/cddb.mdf"
 fi
 
 dnl *********************************

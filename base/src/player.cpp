@@ -93,12 +93,8 @@ Player(FAContext *context) : EventQueue()
     m_context = context;
     m_context->player = this;
 
-    char *m_faDir = FreeampDir(m_context->prefs);
-
-    m_APSInterface = new APSInterface(m_faDir);
+    m_APSInterface = new APSInterface(context);
     m_context->aps = m_APSInterface;
-
-    delete [] m_faDir;
 
     bool useProxy = false;
     m_context->prefs->GetPrefBoolean(kUseProxyPref, &useProxy);

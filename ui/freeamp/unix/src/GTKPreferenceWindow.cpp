@@ -493,15 +493,15 @@ void GTKPreferenceWindow::GetPrefsValues(Preferences* prefs,
     values->CDDevicePath = buffer;
     size = bufferSize;
 
-    if(kError_BufferTooSmall == prefs->GetPrefString(kCDDBServerPref,
+    if(kError_BufferTooSmall == prefs->GetPrefString(kMBServerPref,
                                                      buffer, &size)) {
         size++;
         bufferSize = size;
         buffer = (char*)realloc(buffer, bufferSize);
-        prefs->GetPrefString(kCDDBServerPref, buffer, &size);
+        prefs->GetPrefString(kMBServerPref, buffer, &size);
     }
 
-    values->CDDBServer = buffer;
+    values->MBServer = buffer;
     size = bufferSize;
 
     if(kError_BufferTooSmall == prefs->GetPrefString(kUsersPortablePlayersPref, buffer, &size)) {
@@ -567,7 +567,7 @@ void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs,
 
     prefs->SetPrefString(kALSADevicePref, values->alsaOutput.c_str());
     prefs->SetPrefString(kCDDevicePathPref, values->CDDevicePath.c_str());
-    prefs->SetPrefString(kCDDBServerPref, values->CDDBServer.c_str());
+    prefs->SetPrefString(kMBServerPref, values->MBServer.c_str());
 
     map<string, string>::iterator i;
     int32 iLoop = 0;
@@ -2339,18 +2339,18 @@ static void cd_path_change(GtkWidget *w, GTKPreferenceWindow *p)
     p->CDPathSet(text, false);
 }
 
-void GTKPreferenceWindow::CDDBServerSet(char *newpath, bool set)
+void GTKPreferenceWindow::MBServerSet(char *newpath, bool set)
 {
-    proposedValues.CDDBServer = newpath;
+    proposedValues.MBServer = newpath;
     gtk_widget_set_sensitive(applyButton, TRUE);
     if (set)
-        gtk_entry_set_text(GTK_ENTRY(cddbServer), newpath);
+        gtk_entry_set_text(GTK_ENTRY(mbServer), newpath);
 }
 
-static void cddb_server_change(GtkWidget *w, GTKPreferenceWindow *p)
+static void mb_server_change(GtkWidget *w, GTKPreferenceWindow *p)
 {
     char *text = gtk_entry_get_text(GTK_ENTRY(w));
-    p->CDDBServerSet(text, false);
+    p->MBServerSet(text, false);
 }
 
 GtkWidget *GTKPreferenceWindow::CreateCD(void)
@@ -2393,19 +2393,19 @@ GtkWidget *GTKPreferenceWindow::CreateCD(void)
     gtk_box_pack_start(GTK_BOX(pane), temphbox, FALSE, FALSE, 5);
     gtk_widget_show(temphbox);
 
-    label = gtk_label_new("CDDB URL: ");
+    label = gtk_label_new("MusicBrainz server URL for Audio CD/metadata lookups: ");
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
-    gtk_box_pack_start(GTK_BOX(temphbox), label, FALSE, FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(pane), label, FALSE, FALSE, 5);
     gtk_widget_show(label);
 
-    strncpy(copys, originalValues.CDDBServer.c_str(), 256);
-    cddbServer = gtk_entry_new();
-    gtk_entry_set_text(GTK_ENTRY(cddbServer), copys);
-    gtk_entry_set_max_length(GTK_ENTRY(cddbServer), 64);
-    gtk_signal_connect(GTK_OBJECT(cddbServer), "changed",
-                       GTK_SIGNAL_FUNC(cddb_server_change), this);
-    gtk_box_pack_start(GTK_BOX(temphbox), cddbServer, TRUE, TRUE, 0);
-    gtk_widget_show(cddbServer);
+    strncpy(copys, originalValues.MBServer.c_str(), 256);
+    mbServer = gtk_entry_new();
+    gtk_entry_set_text(GTK_ENTRY(mbServer), copys);
+    gtk_entry_set_max_length(GTK_ENTRY(mbServer), 64);
+    gtk_signal_connect(GTK_OBJECT(mbServer), "changed",
+                       GTK_SIGNAL_FUNC(mb_server_change), this);
+    gtk_box_pack_start(GTK_BOX(pane), mbServer, TRUE, TRUE, 0);
+    gtk_widget_show(mbServer);
 
     return pane;
 }

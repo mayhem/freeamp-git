@@ -84,7 +84,7 @@ extern const char* kPlayImmediatelyPref;
 extern const char* kNumberOfURLsToRememberPref;
 extern const char* kCDDevicePathPref;
 extern const char* kCheckCDAutomaticallyPref;
-extern const char* kCDDBServerPref;
+extern const char* kMBServerPref;
 extern const char* kConvertUnderscoresToSpacesPref;
 extern const char* kAllowMultipleInstancesPref;
 extern const char* kAudioCDLengthPref;
