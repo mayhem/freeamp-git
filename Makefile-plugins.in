@@ -413,6 +413,7 @@ ID3V2OBJ += plm/metadata/id3v2/tag_parse_v1.o
 ID3V2OBJ += plm/metadata/id3v2/tag_render.o
 ID3V2OBJ += plm/metadata/id3v2/utils.o
 ID3V2OBJ += plm/metadata/id3v2/writers.o
+ID3V2OBJ += plm/metadata/id3v2/c_wrapper.o
 
 plugins/id3v2.mdf: $(ID3V2OBJ)
 	$(LINKMOD) -o $@ $(ID3V2OBJ) $(STATICLD) $(ID3_LIBS)
