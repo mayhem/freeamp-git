@@ -42,7 +42,7 @@ noinst_LIBRARIES = $(MYLIBS)
 libfaiolocal_a_SOURCES = $(FILES)
 
 INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS)
-CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT) -D__@target_os@__
+CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT)
 
 all-local: localfile-local
 

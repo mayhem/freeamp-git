@@ -32,8 +32,15 @@
 #define HAVE_ENHLINUXTHREADS 0
 #define HAVE_MITPTHREADS 0
 
+#define HAVE_LINUX 0
+#define HAVE_SOLARIS 0
 
-#ifdef __linux__ /* Linux requires thread support */
+#if HAVE_SOLARIS
+#define __SOLARIS__
+#endif
+
+#if HAVE_LINUX /* Linux requires thread support */
+#define __LINUX__
 #if HAVE_BASELINUXTHREADS == 1 && HAVE_MITPTHREADS == 1
 #error "Can't have both MIT Pthreads and LinuxThreads!! (i.e. I don't know which to use...)"
 #endif
@@ -41,7 +48,7 @@
 #if HAVE_MITPTHREADS == 0 && HAVE_BASELINUXTHREADS == 0
 #error "Must have threads support!  (i.e. I can't find evidence of MIT pthreads or LinuxThreads)"
 #endif
-#endif /* __linux__ */
+#endif /* HAVE_LINUX */
 
 #if HAVE_UNISTD_H
 #define RD_BNRY_FLAGS O_RDONLY
@@ -50,9 +57,9 @@
 #endif
 
 /* Endian Issues */
-#ifdef LINUX
+#ifdef __LINUX__
 #include <endian.h>
-#endif /* LINUX */
+#endif /* __LINUX__ */
 
 #ifdef WIN32
 #define __LITTLE_ENDIAN 1234

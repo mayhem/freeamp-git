@@ -44,6 +44,12 @@ dnl Check for some more stuff
 
 AC_SUBST(target_os)
 
+if test "$target_os" = "linux"; then
+   AC_DEFINE(HAVE_LINUX)
+elif test "$target_os" = "solaris2.6"; then
+   AC_DEFINE(HAVE_SOLARIS)
+fi
+
 if test "$target_os" = "windowsnt"; then
    cmdline="false"
 else

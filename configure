@@ -1457,6 +1457,18 @@ done
 
 
 
+if test "$target_os" = "linux"; then
+   cat >> confdefs.h <<\EOF
+#define HAVE_LINUX 1
+EOF
+
+elif test "$target_os" = "solaris2.6"; then
+   cat >> confdefs.h <<\EOF
+#define HAVE_SOLARIS 1
+EOF
+
+fi
+
 if test "$target_os" = "windowsnt"; then
    cmdline="false"
 else
@@ -1466,9 +1478,9 @@ fi
 
 
 echo $ac_n "checking for MIT PThreads""... $ac_c" 1>&6
-echo "configure:1470: checking for MIT PThreads" >&5
+echo "configure:1482: checking for MIT PThreads" >&5
 cat > conftest.$ac_ext <<EOF
-#line 1472 "configure"
+#line 1484 "configure"
 #include "confdefs.h"
 #include <pthread.h>
 EOF
@@ -1487,9 +1499,9 @@ rm -f conftest*
 
 
 echo $ac_n "checking for Base LinuxThreads""... $ac_c" 1>&6
-echo "configure:1491: checking for Base LinuxThreads" >&5
+echo "configure:1503: checking for Base LinuxThreads" >&5
 cat > conftest.$ac_ext <<EOF
-#line 1493 "configure"
+#line 1505 "configure"
 #include "confdefs.h"
 #include <pthread.h>
 EOF
@@ -1510,9 +1522,9 @@ rm -f conftest*
 
 
 echo $ac_n "checking for LinuxThreads w/ErrorCheck Mutex""... $ac_c" 1>&6
-echo "configure:1514: checking for LinuxThreads w/ErrorCheck Mutex" >&5
+echo "configure:1526: checking for LinuxThreads w/ErrorCheck Mutex" >&5
 cat > conftest.$ac_ext <<EOF
-#line 1516 "configure"
+#line 1528 "configure"
 #include "confdefs.h"
 #include <pthread.h>
 EOF

@@ -44,8 +44,8 @@ noinst_LIBRARIES = $(MYLIBS)
 libfalmcxingmp3_a_SOURCES = $(FILES)
 
 INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) -I@top_srcdir@/io/include -I@top_srcdir@/ui/include -I@top_srcdir@/lmc/include
-CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT) -D__@target_os@__ -fPIC
-CFLAGS = $(EXTRA_CFLAGS) $(REENT) -D__@target_os@__ -fPIC
+CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT)
+CFLAGS = $(EXTRA_CFLAGS) $(REENT)
 
 all-local: $(MYLIBS)
 	gcc -shared -Wl,-soname,xingmp3-@target_os@.lmc -o xingmp3-@target_os@.lmc *.o

@@ -24,7 +24,7 @@ ____________________________________________________________________________*/
 #include "config.h"
 #include "thread.h"
 
-#ifdef __linux__
+#ifdef __LINUX__
     #include "linuxthread.h"
 #elif WIN32
     #include "win32thread.h"
