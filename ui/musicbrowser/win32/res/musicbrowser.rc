@@ -240,7 +240,7 @@ BEGIN
     BEGIN
         MENUITEM "&Add Selected Tracks and Playlists", ID_EDIT_ADDTRACK
         MENUITEM "Add &File From Disk...",      ID_EDIT_ADDFILE
-        MENUITEM "&Remove Items",               ID_EDIT_REMOVE
+        MENUITEM "&Remove...",                  ID_EDIT_REMOVE
         MENUITEM SEPARATOR
         MENUITEM "Move &Up",                    ID_EDIT_MOVEUP
         MENUITEM "Move &Down",                  ID_EDIT_MOVEDOWN
@@ -248,7 +248,7 @@ BEGIN
         MENUITEM "&Clear Playlist",             ID_EDIT_CLEARPLAYLIST
         MENUITEM SEPARATOR
         MENUITEM "&Edit Playlist...",           ID_EDIT_EDITPLAYLIST
-        MENUITEM "Edit Track and Playlist &Info...", ID_EDIT_EDITINFO
+        MENUITEM "Edit Track &Info...",         ID_EDIT_EDITINFO
     END
     POPUP "&View"
     BEGIN
@@ -297,11 +297,13 @@ IDR_POPUP MENU DISCARDABLE
 BEGIN
     POPUP "Sheep?"
     BEGIN
-        MENUITEM "&Add to Playlist",            ID_ADD
-        MENUITEM "&Play Now",                   ID_PLAY
-        MENUITEM "&Remove ",                    ID_EDIT_REMOVE
+        MENUITEM "&Add to Playlist",            ID_POPUP_ADDTRACK
+        MENUITEM "Add and Play &Now",           ID_POPUP_ADDTRACK_PLAY
         MENUITEM SEPARATOR
-        MENUITEM "&Edit Info",                  ID_EDIT_EDIT
+        MENUITEM "Rena&me",                     ID_POPUP_RENAME
+        MENUITEM "&Remove...",                  ID_POPUP_REMOVE
+        MENUITEM SEPARATOR
+        MENUITEM "&Edit Info...",               ID_POPUP_EDITINFO
     END
 END
 

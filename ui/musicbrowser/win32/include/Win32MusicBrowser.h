@@ -60,6 +60,8 @@ bool operator==(const TreeData &A, const TreeData &b);
 void ClientToWindow(HWND hWnd, POINT *Pt); 
 extern HINSTANCE g_hinst;
 
+void EditItemLabel(HWND hwnd, HTREEITEM item);
+
 bool FileOpenDialog(HWND hwnd, 
                     const char* title,
                     const char* filter,
@@ -143,6 +145,7 @@ class MusicBrowserUI : public UserInterface
                               WPARAM wParam, 
                               LPARAM lParam);
 
+
     
 
     const PlaylistManager* PLManager() const { return m_oPlm; }
@@ -196,6 +199,7 @@ class MusicBrowserUI : public UserInterface
     void  MoveUpEvent(void);
     void  MoveDownEvent(void);
     void  AddTrackEvent(void);
+    void  AddTrackAndPlayEvent(void);
     void  AddFileEvent(HWND hwndParent);
     void  EditPlaylistEvent(void);
     void  ClearPlaylistEvent(void);
@@ -211,6 +215,7 @@ class MusicBrowserUI : public UserInterface
     void  ChangeRepeatMode(RepeatMode mode);
     void  ExportPlaylistEvent(void);
     void  EditInfoEvent(void);
+    void  RenameEvent(void);
 
     // Functions in PlaylistView.cpp
     void  PlaylistListItemAdded(const PlaylistItem* item);
@@ -263,6 +268,11 @@ class MusicBrowserUI : public UserInterface
     void UpdatePlaylistName(string playlist, const char* name);
     void UpdateAlbumName(AlbumList* album, const char* name);
     void UpdateArtistName(ArtistList* artist, const char* name);
+
+    uint32 GetSelectedTrackCount(void);
+    uint32 GetSelectedPlaylistCount(void);
+    uint32 CountSelectedItems(HTREEITEM root);
+    bool IsItemSelected(HTREEITEM item);
 
     // Functions in EditTrackInfoDialog.cpp
     void CreateEditInfoLists(vector<string>& artists,

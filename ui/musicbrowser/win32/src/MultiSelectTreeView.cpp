@@ -37,6 +37,9 @@ ____________________________________________________________________________*/
 #define IsCtrlDown()  (GetKeyState(VK_CONTROL) < 0)
 #define IsShiftDown()  (GetKeyState(VK_SHIFT) < 0)
 
+static HTREEITEM g_editItem = NULL;
+
+
 static BOOL TreeView_SetTree(HWND hwnd, TV_ITEM* root)
 {
     BOOL result = FALSE;
@@ -128,6 +131,26 @@ EditLabelWndProc(HWND hwnd,
     return CallWindowProc((int (__stdcall *)(void))lpOldProc, hwnd, msg, wParam, lParam );
 }
 
+void EditItemLabel(HWND hwnd, HTREEITEM item)
+{
+    g_editItem = item;
+    SetFocus(hwnd);
+
+    HWND hwndEdit = TreeView_EditLabel(hwnd, item);
+
+    if(hwndEdit)
+    {
+        SetProp(hwndEdit, 
+                "oldproc",
+                (HANDLE)GetWindowLong(hwndEdit, GWL_WNDPROC));
+
+	    // Subclass the window so we can handle multi-select
+	    SetWindowLong(hwndEdit, 
+			          GWL_WNDPROC, 
+                      (DWORD)::EditLabelWndProc);  
+    }
+}
+
 LRESULT WINAPI 
 TreeViewWndProc(HWND hwnd, 
                 UINT msg, 
@@ -149,7 +172,6 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
     static RECT dragRect;
     static HTREEITEM dragItem = NULL;
     static bool selectedOnMouseDown = false;
-    static HTREEITEM editItem = NULL;
 
     //return CallWindowProc((int (__stdcall *)(void))lpOldProc, hwnd, msg, wParam, lParam );
 
@@ -609,7 +631,7 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
                     
                     if(selectedOnMouseDown)
                     {
-                        if(editItem != item)
+                        if(g_editItem != item)
                         {
                             // i should do this in the notify but it is ignoring me
                             if(item != m_hCatalogItem &&
@@ -618,31 +640,16 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
                                item != m_hUncatItem &&
                                item != m_hNewPlaylistItem)
                             {
-                                editItem = item;
+                                // pause a half sec so this does not
+                                // look so jarring
                                 Sleep(500);
-                                SetFocus(hwnd);
-                                HWND hwndEdit = TreeView_EditLabel(hwnd, item);
 
-                                if(hwndEdit)
-                                {
-                                    SetProp(hwndEdit, 
-                                            "oldproc",
-                                            (HANDLE)GetWindowLong(hwndEdit, GWL_WNDPROC));
-
-                                    /*SetProp(m_hMusicCatalog, 
-                                            "this",
-                                            (HANDLE)this);*/
-	    
-	                                // Subclass the window so we can handle multi-select
-	                                SetWindowLong(hwndEdit, 
-			                                      GWL_WNDPROC, 
-                                                  (DWORD)::EditLabelWndProc);  
-                                }
+                                EditItemLabel(hwnd, item);
                             }
                         }
                         else
                         {
-                            editItem = NULL;
+                            g_editItem = NULL;
                         }
                     }
                 }

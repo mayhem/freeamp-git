@@ -172,6 +172,14 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                     }
                     return 1;
 
+                case ID_POPUP_RENAME:
+                    RenameEvent();
+                    break;
+
+                case ID_POPUP_ADDTRACK_PLAY:
+                    AddTrackAndPlayEvent();
+                    break;
+
                 case ID_FILE_NEWPLAYLIST:
                     NewPlaylist();
                     return 1;
@@ -204,6 +212,7 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                     Close();
                     return 1;
 
+                case ID_POPUP_ADDTRACK:
                 case ID_EDIT_ADDTRACK:
                     AddTrackEvent();
                     return 1;
@@ -212,6 +221,7 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                     AddFileEvent(m_hWnd);
                     return 1;
 
+                case ID_POPUP_REMOVE:
                 case ID_EDIT_REMOVE:
                     RemoveEvent();
                     return 1;
@@ -232,6 +242,7 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                     EditPlaylistEvent();
                     return 1;
 
+                case ID_POPUP_EDITINFO:
                 case ID_EDIT_EDITINFO:
                     EditInfoEvent();
                     return 1;

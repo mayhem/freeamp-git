@@ -96,9 +96,11 @@
 #define ID_EDIT_MOVEUP                  40025
 #define ID_EDIT_CLEARPLAYLIST           40027
 #define ID_PLAY                         40029
+#define ID_POPUP_ADDTRACK_PLAY          40029
 #define ID_EDIT                         40031
 #define ID_RENAME                       40032
 #define ID_ADD                          40033
+#define ID_POPUP_ADDTRACK               40033
 #define ID_EDIT_MOVEDOWN                40034
 #define ID_FILE_EXPORTPLAYLIST          40035
 #define ID_EDIT_ADDFILE                 40036
@@ -125,6 +127,9 @@
 #define ID_EDIT_EDITPLAYLIST            40060
 #define ID_FILE_CLOSEPLAYLIST           40061
 #define ID_CONTROLS_NORMALORDER         40063
+#define ID_POPUP_RENAME                 40065
+#define ID_POPUP_REMOVE                 40066
+#define ID_POPUP_EDITINFO               40067
 #define IDS_URL                         65535
 #define IDC_TRACKTEXT                   65535
 #define IDC_TITLETEXT                   65535
@@ -134,7 +139,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        127
-#define _APS_NEXT_COMMAND_VALUE         40065
+#define _APS_NEXT_COMMAND_VALUE         40068
 #define _APS_NEXT_CONTROL_VALUE         1030
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

@@ -44,6 +44,30 @@ void MusicBrowserUI::ClearPlaylistEvent(void)
     m_oPlm->RemoveAll();
 }
 
+void MusicBrowserUI::RenameEvent(void)
+{
+    HWND hwnd = m_hMusicCatalog;
+
+    HTREEITEM item;
+    //TV_HITTESTINFO hti;
+
+    //GetCursorPos(&hti.pt);
+    //ScreenToClient(hwnd, &hti.pt);
+    //item = TreeView_HitTest(hwnd, &hti);  
+
+    item = TreeView_GetSelection(hwnd);
+
+    if(item /*&& (hti.flags & TVHT_ONITEM)*/ &&
+       item != m_hCatalogItem &&
+       item != m_hPlaylistItem &&
+       item != m_hAllItem &&
+       item != m_hUncatItem &&
+       item != m_hNewPlaylistItem)
+    {
+        EditItemLabel(hwnd, item);
+    }
+}
+
 void MusicBrowserUI::RemoveEvent(void)
 {
     // first figure out which control has focus
@@ -521,9 +545,8 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                 }
             }
         }
-        
-        // What is the define for -17? what is -17??
-	    if (pTreeView->hdr.code == -17)
+        /*
+	    if (pTreeView->hdr.code == ??)
         {
             TV_HITTESTINFO sHit;
             HTREEITEM      hItem;
@@ -554,15 +577,72 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
             else               
                SendMessage(m_hStatus, SB_SETTEXT, 0, (LPARAM)"");
         }
+        */
        
         if (pTreeView->hdr.code == NM_RCLICK)
         {
+            HMENU menu;
+            HMENU subMenu;
             POINT sPoint;
+            uint32 trackCount = 0;
+            uint32 playlistCount = 0;
+
+            trackCount = GetSelectedTrackCount();
+            playlistCount = GetSelectedPlaylistCount();
             
             GetCursorPos(&sPoint);
-            TrackPopupMenu(GetSubMenu(LoadMenu(g_hinst, MAKEINTRESOURCE(IDR_POPUP)), 0), 
+
+            menu = LoadMenu(g_hinst, MAKEINTRESOURCE(IDR_POPUP));
+            subMenu = GetSubMenu(menu, 0);
+
+            if( trackCount > 1 ||
+                playlistCount > 1 ||
+                IsItemSelected(m_hCatalogItem) ||
+                IsItemSelected(m_hPlaylistItem) ||
+                IsItemSelected(m_hAllItem) ||
+                IsItemSelected(m_hUncatItem) ||
+                IsItemSelected(m_hNewPlaylistItem))
+            {
+                EnableMenuItem(subMenu,
+                               ID_POPUP_RENAME,
+                               MF_BYCOMMAND|MF_GRAYED);
+            }
+
+            if(trackCount == 0)
+            {
+                EnableMenuItem(subMenu,
+                               ID_POPUP_EDITINFO,
+                               MF_BYCOMMAND|MF_GRAYED);
+
+                if( IsItemSelected(m_hNewPlaylistItem) &&
+                    playlistCount == 1)
+                {
+                    EnableMenuItem(subMenu,
+                               ID_POPUP_ADDTRACK,
+                               MF_BYCOMMAND|MF_GRAYED);
+
+                    EnableMenuItem(subMenu,
+                               ID_POPUP_ADDTRACK_PLAY,
+                               MF_BYCOMMAND|MF_GRAYED);
+
+                    EnableMenuItem(subMenu,
+                               ID_POPUP_REMOVE,
+                               MF_BYCOMMAND|MF_GRAYED);
+
+                    EnableMenuItem(subMenu,
+                               ID_POPUP_RENAME,
+                               MF_BYCOMMAND|MF_GRAYED);
+
+
+                }
+            }
+
+
+            TrackPopupMenu(subMenu, 
                            TPM_LEFTALIGN, sPoint.x, sPoint.y, 
                            0, m_hWnd, NULL);
+
+            DestroyMenu(menu);
         }
         
         return 0;
@@ -769,6 +849,20 @@ void MusicBrowserUI::AddTrackEvent(void)
     m_oPlm->AddItems(urls);
     
 }
+
+void MusicBrowserUI::AddTrackAndPlayEvent(void)
+{
+    uint32 count = m_oPlm->CountItems();
+
+    AddTrackEvent();
+
+    if(m_oPlm->CountItems())
+    {
+        m_oPlm->SetCurrentIndex(count);
+        m_context->target->AcceptEvent(new Event(CMD_Play));
+    }
+}
+
 void MusicBrowserUI::AddFileEvent(HWND hwndParent)
 {
     PlaylistFormatInfo format;
