@@ -146,7 +146,7 @@ InitMenuPopup(HMENU menuHandle,
         char szStayOnTop[] = "Stay On Top";
         char buffer[256];
 
-        prefs.GetStayOnTop(&stayOnTop);
+        prefs.GetPrefBoolean(kStayOnTopPref, &stayOnTop);
 
         GetMenuString(  menuHandle, 
                         0, 

@@ -90,7 +90,7 @@ Error ThemeManager::GetDefaultTheme(string &oThemePath)
     char              dir[MAX_PATH];
     uint32            len = sizeof(dir);
 
-    m_pContext->prefs->GetInstallDirectory(dir, &len);
+    m_pContext->prefs->GetPrefString(kInstallDirPref, dir, &len);
     oThemePath = string(dir);
     oThemePath += string("\\themes\\") + string(BRANDING_DEFAULT_THEME);
 
@@ -110,7 +110,7 @@ Error ThemeManager::GetThemeList(map<string, string> &oThemeFileMap)
     if (m_bDevelTheme)
        oThemeFileMap[THEME_IN_DEVEL] = m_oDevelTheme;
 
-    m_pContext->prefs->GetInstallDirectory(dir, &len);
+    m_pContext->prefs->GetPrefString(kInstallDirPref, dir, &len);
     oThemeBasePath = string(dir) + "\\themes";
     oThemePath = oThemeBasePath + string("\\*.*");    
 
@@ -185,7 +185,7 @@ Error ThemeManager::AddTheme(string &oThemeFile, bool bRename)
     }
     else
     {
-        m_pContext->prefs->GetInstallDirectory(dir, &len);
+        m_pContext->prefs->GetPrefString(kInstallDirPref, dir, &len);
         oThemeDest = string(dir);
     
         if (bRename)

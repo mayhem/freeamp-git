@@ -105,7 +105,7 @@ bool MusicBrowserUI::SaveNewPlaylist(string &oName)
     bool                addToDB = false;
     
     length = MAX_PATH;
-    m_context->prefs->GetInstallDirectory(szPlaylistDir, &length);
+    m_context->prefs->GetPrefString(kInstallDirPref, szPlaylistDir, &length);
 
     strcat(szPlaylistDir, "\\Playlists");
 
@@ -526,7 +526,7 @@ bool MusicBrowserUI::ExportPlaylist(string &oPlaylist)
     bool                addToDB = false;
     
     size = MAX_PATH;
-    m_context->prefs->GetOpenSaveDirectory(szInitialDir, &size);
+    m_context->prefs->GetPrefString(kOpenSaveDirPref, szInitialDir, &size);
 
     for(i = 0; ; i++)
     {

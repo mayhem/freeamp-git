@@ -82,7 +82,7 @@ Error Winamp::ConvertToNative(string &oDir)
     char *dir = new char[_MAX_PATH];
     uint32 len = _MAX_PATH;
 
-    m_context->prefs->GetInstallDirectory(dir, &len);
+    m_context->prefs->GetPrefString(kInstallDirPref, dir, &len);
     sourcePath = string(dir);
 #ifdef unix
     sourcePath += string("/freeamp");

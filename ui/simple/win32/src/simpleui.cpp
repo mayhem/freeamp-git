@@ -457,8 +457,8 @@ void
 SimpleUI::
 ReadPreferences()
 {
-    m_prefs->GetStayOnTop(&m_onTop);
-    m_prefs->GetLiveInTray(&m_liveInTray);
+    m_prefs->GetPrefBoolean(kStayOnTopPref, &m_onTop);
+    m_prefs->GetPrefBoolean(kLiveInTrayPref, &m_liveInTray);
 
     SetWindowPos(   m_hwnd, 
                     (m_onTop ? HWND_TOPMOST: HWND_NOTOPMOST), 

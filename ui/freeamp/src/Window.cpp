@@ -729,7 +729,7 @@ void Window::EnableTimer(bool bEnable)
     m_bTimerEnabled = bEnable;
 }  
 
-void Window::SetStayOnTop(bool bStay)
+void Window::SetPrefBoolean(kStayOnTopPref, bool bStay)
 {
     m_bStayOnTop = bStay;
 }

@@ -96,7 +96,7 @@ Error ThemeManager::GetThemeList(map<string, string> &oThemeFileMap)
     if (m_bDevelTheme)
         oThemeFileMap[THEME_IN_DEVEL] = m_oDevelTheme;
 
-    m_pContext->prefs->GetInstallDirectory(dir, &len);
+    m_pContext->prefs->GetPrefString(kInstallDirPref, dir, &len);
     oThemeBasePath = string(dir) + "/" + BRANDING_SHARE_PATH + "/themes";
     oThemePath = oThemeBasePath + string("/*.*");    
 

@@ -180,7 +180,7 @@ Initialize()
         // people DO move their apps around on windows
         length = sizeof(path);
 
-        error = GetInstallDirectory(path, &length);
+        error = GetPrefString(kInstallDirPref, path, &length);
 
 		char foo[MAX_PATH] = {0x00};
 		sprintf(foo,"%s\\freeamp.exe",cwd);

@@ -292,21 +292,21 @@ void Win32PreferenceWindow::GetPrefsValues(PrefsStruct* values)
 
     size = bufferSize;
 
-    if(kError_BufferTooSmall == m_prefs->GetDefaultPMO(buffer, &size))
+    if(kError_BufferTooSmall == m_prefs->GetPrefString(kPMOPref, buffer, &size))
     {
         bufferSize = size;
         buffer = (char*)realloc(buffer, bufferSize);
-        m_prefs->GetDefaultPMO(buffer, &size);
+        m_prefs->GetPrefString(kPMOPref, buffer, &size);
     }
 
     values->defaultPMO = buffer;
     size = bufferSize;
 
-    if(kError_BufferTooSmall == m_prefs->GetDefaultUI(buffer, &size))
+    if(kError_BufferTooSmall == m_prefs->GetPrefString(kUIPref, buffer, &size))
     {
         bufferSize = size;
         buffer = (char*)realloc(buffer, bufferSize);
-        m_prefs->GetDefaultUI(buffer, &size);
+        m_prefs->GetPrefString(kUIPref, buffer, &size);
     }
     
     values->defaultUI = buffer;
@@ -423,11 +423,11 @@ void Win32PreferenceWindow::GetPrefsValues(PrefsStruct* values)
 
     // get the other m_prefs
     m_prefs->GetPrefInt32(kDecoderThreadPriorityPref, &values->decoderThreadPriority);
-    m_prefs->GetInputBufferSize(&values->inputBufferSize);
+    m_prefs->GetPrefInt32(kInputBufferSizePref, &values->inputBufferSize);
     m_prefs->GetPrefInt32(kOutputBufferSizePref, &values->outputBufferSize);
     m_prefs->GetPrefInt32(kPreBufferPref, &values->preBufferLength);
-    m_prefs->GetStayOnTop(&values->stayOnTop);
-    m_prefs->GetLiveInTray(&values->liveInTray);
+    m_prefs->GetPrefBoolean(kStayOnTopPref, &values->stayOnTop);
+    m_prefs->GetPrefBoolean(kLiveInTrayPref, &values->liveInTray);
     m_prefs->GetPrefBoolean(kSaveStreamsPref, &values->saveStreams);
     m_prefs->GetPrefBoolean(kUseProxyPref, &values->useProxyServer);
     m_prefs->GetPrefBoolean(kUseAlternateNICPref, &values->useAlternateIP);
@@ -451,14 +451,14 @@ void Win32PreferenceWindow::GetPrefsValues(PrefsStruct* values)
 
 void Win32PreferenceWindow::SavePrefsValues(PrefsStruct* values)
 {
-    m_prefs->SetDefaultPMO(values->defaultPMO.c_str());
-    m_prefs->SetDefaultUI(values->defaultUI.c_str());
+    m_prefs->SetPrefString(kPMOPref, values->defaultPMO.c_str());
+    m_prefs->SetPrefString(kUIPref, values->defaultUI.c_str());
     m_prefs->SetPrefInt32(kDecoderThreadPriorityPref, values->decoderThreadPriority);
     m_prefs->SetPrefInt32(kInputBufferSizePref, values->inputBufferSize);
     m_prefs->SetPrefInt32(kOutputBufferSizePref, values->outputBufferSize);
     m_prefs->SetPrefInt32(kPreBufferPref, values->preBufferLength);
-    m_prefs->SetStayOnTop(values->stayOnTop);
-    m_prefs->SetLiveInTray(values->liveInTray);
+    m_prefs->SetPrefBoolean(kStayOnTopPref, values->stayOnTop);
+    m_prefs->SetPrefBoolean(kLiveInTrayPref, values->liveInTray);
 
     m_prefs->SetPrefBoolean(kSaveStreamsPref, values->saveStreams);
     m_prefs->SetPrefString(kSaveStreamsDirPref, values->saveStreamsDirectory.c_str());

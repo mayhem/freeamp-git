@@ -346,14 +346,14 @@ void GTKPreferenceWindow::GetPrefsValues(Preferences* prefs,
 
     size = bufferSize;
 
-    if (kError_BufferTooSmall == prefs->GetDefaultPMO(buffer, &size)) {
+    if (kError_BufferTooSmall == prefs->GetPrefString(kPMOPref, buffer, &size)) {
         buffer = (char *)realloc(buffer, size);
-        prefs->GetDefaultPMO(buffer, &size);
+        prefs->GetPrefString(kPMOPref, buffer, &size);
     }
     values->defaultPMO = buffer;
     size = bufferSize;
 
-    prefs->GetInputBufferSize(&values->inputBufferSize);
+    prefs->GetPrefInt32(kInputBufferSizePref, &values->inputBufferSize);
     prefs->GetPrefInt32(kOutputBufferSizePref, &values->outputBufferSize);
     prefs->GetPrefInt32(kPreBufferPref, &values->preBufferLength);
 
@@ -488,7 +488,7 @@ void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs,
     prefs->SetPrefBoolean(kAskToReclaimFiletypesPref, values->askReclaimFiletypes);
     prefs->SetPrefBoolean(kReclaimFiletypesPref, values->reclaimFiletypes);
 
-    prefs->SetDefaultPMO(values->defaultPMO.c_str());
+    prefs->SetPrefString(kPMOPref, values->defaultPMO.c_str());
     prefs->SetPrefInt32(kInputBufferSizePref, values->inputBufferSize);
     prefs->SetPrefInt32(kOutputBufferSizePref, values->outputBufferSize);
     prefs->SetPrefInt32(kPreBufferPref, values->preBufferLength);
@@ -533,7 +533,7 @@ void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs,
     }
     prefs->SetPrefString(kUsersPortablePlayersPref, portableList.c_str());
 
-    prefs->SetDefaultPMO(values->defaultPMO.c_str());
+    prefs->SetPrefString(kPMOPref, values->defaultPMO.c_str());
     
     if (*values != currentValues) {
         m_pContext->target->AcceptEvent(new Event(INFO_PrefsChanged));

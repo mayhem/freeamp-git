@@ -73,7 +73,7 @@ GTKFont::GTKFont(FAContext *context, string &oName, string &oFace,
     WIN32_FIND_DATA find;
     HANDLE handle;
  
-    m_context->prefs->GetInstallDirectory(dir, &len);
+    m_context->prefs->GetPrefString(kInstallDirPref, dir, &len);
     ttfbase = string(dir) + "/" + BRANDING_SHARE_PATH + "/fonts";
     ttfpath = ttfbase + "/*.ttf";
  

@@ -149,7 +149,7 @@ PMP300::PMP300(FAContext* context):PortableDevice(context)
                 char path[MAX_PATH];
                 uint32 size = sizeof(path);
 
-                context->prefs->GetInstallDirectory(path, &size);
+                context->prefs->GetPrefString(kInstallDirPref, path, &size);
 
                 strcat(path, "\\");
                 strcat(path, driver);
@@ -544,7 +544,7 @@ Error PMP300::WritePlaylist(DeviceInfo* device,
                 uint32 length = _MAX_PATH;
 
                 // get a temp path
-                m_context->prefs->GetInstallDirectory(tempPath, &length);
+                m_context->prefs->GetPrefString(kInstallDirPref, tempPath, &length);
                 strcat(tempPath, tmpnam(NULL));
 
 #ifdef WIN32

@@ -249,7 +249,7 @@ void FreeAmpTheme::LoadFreeAmpTheme(void)
 
       dir = new char[_MAX_PATH];
    
-      m_pContext->prefs->GetInstallDirectory(dir, &len);
+      m_pContext->prefs->GetPrefString(kInstallDirPref, dir, &len);
       oThemePath = string(dir);
 #if defined(unix)
       oThemePath += string(BRANDING_SHARE_PATH);
@@ -774,9 +774,9 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
 
          ReloadTheme();
 
-         m_pContext->prefs->GetStayOnTop(&bValue);
-         m_pWindow->SetStayOnTop(bValue);
-         m_pContext->prefs->GetLiveInTray(&bValue);
+         m_pContext->prefs->GetPrefBoolean(kStayOnTopPref, &bValue);
+         m_pWindow->SetPrefBoolean(kStayOnTopPref, bValue);
+         m_pContext->prefs->GetPrefBoolean(kLiveInTrayPref, &bValue);
          m_pWindow->SetLiveInToolbar(bValue);
          
       	break;
@@ -1409,10 +1409,10 @@ void FreeAmpTheme::InitWindow(void)
 {        
 	bool   bValue;
     
-    m_pContext->prefs->GetStayOnTop(&bValue);
-    m_pWindow->SetStayOnTop(bValue);
+    m_pContext->prefs->GetPrefBoolean(kStayOnTopPref, &bValue);
+    m_pWindow->SetPrefBoolean(kStayOnTopPref, bValue);
 
-    m_pContext->prefs->GetLiveInTray(&bValue);
+    m_pContext->prefs->GetPrefBoolean(kLiveInTrayPref, &bValue);
     m_pWindow->SetLiveInToolbar(bValue);
 }
 
@@ -1436,7 +1436,7 @@ void FreeAmpTheme::ReloadTheme(void)
 
        dir = new char[_MAX_PATH];
     
-       m_pContext->prefs->GetInstallDirectory(dir, &len);
+       m_pContext->prefs->GetPrefString(kInstallDirPref, dir, &len);
        oThemePath = string(dir);
 #if defined(unix)
        oThemePath += string(BRANDING_SHARE_PATH);

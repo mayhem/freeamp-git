@@ -851,9 +851,9 @@ CreateTooltips()
     uTooltipCount = uCtr; // save value for next mindmeld
 }
 
-void Win32Window::SetStayOnTop(bool bStay)
+void Win32Window::SetPrefBoolean(kStayOnTopPref, bool bStay)
 {
-    Window::SetStayOnTop(bStay);
+    Window::SetPrefBoolean(kStayOnTopPref, bStay);
 
     if (m_hWnd == NULL || m_bMindMeldInProgress)
        return;

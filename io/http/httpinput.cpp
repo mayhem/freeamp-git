@@ -215,7 +215,7 @@ Error HttpInput::Prepare(PullBuffer *&pBuffer)
        m_pOutputBuffer = NULL;
     }
 
-    if (!IsError(m_pContext->prefs->GetInputBufferSize(&iBufferSize)))
+    if (!IsError(m_pContext->prefs->GetPrefInt32(kInputBufferSizePref, &iBufferSize)))
        iBufferSize *= 1024;
 
     m_pOutputBuffer = new PullBuffer(iBufferSize, iDefaultOverflowSize,

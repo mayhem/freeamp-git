@@ -284,7 +284,7 @@ void ToolbarUI::SetupToolIcon(void)
 {
     bool bShowIcon;
     
-    m_context->prefs->GetLiveInTray(&bShowIcon);
+    m_context->prefs->GetPrefBoolean(kLiveInTrayPref, &bShowIcon);
     if (bShowIcon)
        AddTrayIcon();
     else

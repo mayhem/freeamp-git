@@ -86,7 +86,7 @@ int main(int argc, char **argv)
     }
     delete[] new_freeamp_path;
 
-    context->prefs->SetInstallDirectory( path.Path() );
+    context->prefs->SetPrefString(kInstallDirPref,  path.Path() );
 
 #if 0
     // Add the current directory to the ADDON_PATH environment var.

@@ -295,7 +295,7 @@ char *FreeampDir(Preferences *pref)
     uint32 len = sizeof(path);
     char *s;
 
-    pref->GetInstallDirectory(path, &len);
+    pref->GetPrefString(kInstallDirPref, path, &len);
 
     s = new char[strlen(path) + 1];
     strcpy(s, path);
@@ -818,7 +818,7 @@ bool ShowHelp(FAContext *m_context, const char *helpurl)
 
     dir = new char[_MAX_PATH];
 
-    m_context->prefs->GetInstallDirectory(dir, &len);
+    m_context->prefs->GetPrefString(kInstallDirPref, dir, &len);
     oHelpFile = string(dir);
 
     oHelpFile += string(DIR_MARKER_STR);

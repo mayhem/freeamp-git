@@ -165,7 +165,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     uint32 length = sizeof(path);
     context->prefs->GetPrefBoolean(kReclaimFiletypesPref, &reclaimFileTypes);
     context->prefs->GetPrefBoolean(kAskToReclaimFiletypesPref, &askBeforeReclaiming);
-    context->prefs->GetInstallDirectory(path, &length);
+    context->prefs->GetPrefString(kInstallDirPref, path, &length);
     strcat(path, "\\freeamp.exe");
 
     if(reclaimFileTypes)

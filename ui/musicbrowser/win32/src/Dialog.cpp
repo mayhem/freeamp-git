@@ -2154,7 +2154,7 @@ FileOpenDialog(HWND hwnd,
 
     *fileBuffer = 0x00;
 
-    m_context->prefs->GetInstallDirectory( installDir, &initialDirSize);
+    m_context->prefs->GetPrefString(kInstallDirPref,  installDir, &initialDirSize);
 
     if(*installDir)
     {
@@ -2166,7 +2166,7 @@ FileOpenDialog(HWND hwnd,
         }
     }
 
-    m_context->prefs->GetOpenSaveDirectory( initialDir, &initialDirSize);
+    m_context->prefs->GetPrefString(kOpenSaveDirPref,  initialDir, &initialDirSize);
 
     int hookFlags = 0;
 
@@ -2276,7 +2276,7 @@ FileOpenDialog(HWND hwnd,
 
             *(fileBuffer + ofn.nFileOffset - 1) = 0x00;
 
-            m_context->prefs->SetOpenSaveDirectory(fileBuffer);
+            m_context->prefs->SetPrefString(kOpenSaveDirPref, fileBuffer);
         }
 
         result = true;

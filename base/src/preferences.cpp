@@ -466,119 +466,119 @@ SetPrefInt32(const char* pref, int32 value)
 
 Error 
 Preferences::
-GetInstallDirectory(char* path, uint32* len)
+GetPrefString(kInstallDirPref, char* path, uint32* len)
 {
     return GetPrefString(kInstallDirPref, path, len);
 }
 
 Error 
 Preferences::
-SetInstallDirectory(const char* path)
+SetPrefString(kInstallDirPref, const char* path)
 {
     return SetPrefString(kInstallDirPref, path);
 }
 
 Error 
 Preferences::
-GetDefaultUI(char* name, uint32* len)
+GetPrefString(kUIPref, char* name, uint32* len)
 {
     return GetPrefString(kUIPref, name, len);
 }
 
 Error 
 Preferences::
-SetDefaultUI(const char* name)
+SetPrefString(kUIPref, const char* name)
 {
     return SetPrefString(kUIPref, name);
 }
 
 Error 
 Preferences::
-GetDefaultTextUI(char* name, uint32* len)
+GetPrefString(kTextUIPref, char* name, uint32* len)
 {
     return GetPrefString(kTextUIPref, name, len);
 }
 
 Error 
 Preferences::
-SetDefaultTextUI(const char* name)
+SetPrefString(kTextUIPref, const char* name)
 {
     return SetPrefString(kTextUIPref, name);
 }
 
 Error 
 Preferences::
-GetSecondaryUI(char* name, uint32* len)
+GetPrefString(kSecondaryUIPref, char* name, uint32* len)
 {
     return GetPrefString(kSecondaryUIPref, name, len);
 }
 
 Error 
 Preferences::
-SetSecondaryUI(const char* name)
+SetPrefString(kSecondaryUIPref, const char* name)
 {
     return SetPrefString(kSecondaryUIPref, name);
 }
 
 Error 
 Preferences::
-GetDefaultPMO(char* name, uint32* len)
+GetPrefString(kPMOPref, char* name, uint32* len)
 {
     return GetPrefString(kPMOPref, name, len);
 }
 
 Error 
 Preferences::
-SetDefaultPMO(const char* name)
+SetPrefString(kPMOPref, const char* name)
 {
     return SetPrefString(kPMOPref, name);
 }
 
 Error 
 Preferences::
-GetOpenSaveDirectory(char* path, uint32* len)
+GetPrefString(kOpenSaveDirPref, char* path, uint32* len)
 {
     return GetPrefString(kOpenSaveDirPref, path, len);
 }
 
 Error 
 Preferences::
-SetOpenSaveDirectory(const char* path)
+SetPrefString(kOpenSaveDirPref, const char* path)
 {
     return SetPrefString(kOpenSaveDirPref, path);
 }
 
 Error 
 Preferences::
-GetStayOnTop(bool* value)
+GetPrefBoolean(kStayOnTopPref, bool* value)
 {
     return GetPrefBoolean(kStayOnTopPref, value);
 }
 
 Error 
 Preferences::
-SetStayOnTop(bool value)
+SetPrefBoolean(kStayOnTopPref, bool value)
 {
     return SetPrefBoolean(kStayOnTopPref, value);
 }
 
 Error 
 Preferences::
-GetLiveInTray(bool* value)
+GetPrefBoolean(kLiveInTrayPref, bool* value)
 {
     return GetPrefBoolean(kLiveInTrayPref, value);
 }
 
 Error 
 Preferences::
-SetLiveInTray(bool value)
+SetPrefBoolean(kLiveInTrayPref, bool value)
 {
     return SetPrefBoolean(kLiveInTrayPref, value);
 }
 
 Error 
 Preferences::
-GetInputBufferSize(int32* value)
+GetPrefInt32(kInputBufferSizePref, int32* value)
 {
     return GetPrefInt32(kInputBufferSizePref, value);
 }
@@ -1256,7 +1256,7 @@ GetFirstLibDir(char *path, uint32 *len)
 {
     Error error;
     
-    error = GetInstallDirectory(path, len);
+    error = GetPrefString(kInstallDirPref, path, len);
     return IsError(error) ? 0 : (LibDirFindHandle *) 1;
 }
 

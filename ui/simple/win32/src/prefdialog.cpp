@@ -89,15 +89,15 @@ GetPrefsValues(Preferences* prefs,
 {
     uint32 size = 256;
 
-    prefs->GetDefaultPMO(values->defaultPMO, &size);
+    prefs->GetPrefString(kPMOPref, values->defaultPMO, &size);
     size = 256;
-    prefs->GetDefaultUI(values->defaultUI, &size);
+    prefs->GetPrefString(kUIPref, values->defaultUI, &size);
     prefs->GetPrefInt32(kDecoderThreadPriorityPref, &values->decoderThreadPriority);
-    prefs->GetInputBufferSize(&values->inputBufferSize);
+    prefs->GetPrefInt32(kInputBufferSizePref, &values->inputBufferSize);
     prefs->GetPrefInt32(kOutputBufferSizePref, &values->outputBufferSize);
     prefs->GetPrefInt32(kPreBufferPref, &values->preBufferLength);
-    prefs->GetStayOnTop(&values->stayOnTop);
-    prefs->GetLiveInTray(&values->liveInTray);
+    prefs->GetPrefBoolean(kStayOnTopPref, &values->stayOnTop);
+    prefs->GetPrefBoolean(kLiveInTrayPref, &values->liveInTray);
 
     prefs->GetPrefInt32(kStreamBufferIntervalPref, &values->streamInterval);
     prefs->GetPrefBoolean(kSaveStreamsPref, &values->saveStreams);
@@ -123,14 +123,14 @@ void
 SavePrefsValues(Preferences* prefs, 
                 PrefsStruct* values)
 {
-    prefs->SetDefaultPMO(values->defaultPMO);
-    prefs->SetDefaultUI(values->defaultUI);
+    prefs->SetPrefString(kPMOPref, values->defaultPMO);
+    prefs->SetPrefString(kUIPref, values->defaultUI);
     prefs->SetPrefInt32(kDecoderThreadPriorityPref, values->decoderThreadPriority);
     prefs->SetPrefInt32(kInputBufferSizePref, values->inputBufferSize);
     prefs->SetPrefInt32(kOutputBufferSizePref, values->outputBufferSize);
     prefs->SetPrefInt32(kPreBufferPref, values->preBufferLength);
-    prefs->SetStayOnTop(values->stayOnTop);
-    prefs->SetLiveInTray(values->liveInTray);
+    prefs->SetPrefBoolean(kStayOnTopPref, values->stayOnTop);
+    prefs->SetPrefBoolean(kLiveInTrayPref, values->liveInTray);
 
     prefs->SetPrefInt32(kStreamBufferIntervalPref, values->streamInterval);
     prefs->SetPrefBoolean(kSaveStreamsPref, values->saveStreams);

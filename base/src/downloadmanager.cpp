@@ -116,7 +116,7 @@ DownloadManager::DownloadManager(FAContext* context)
     char path[MAX_PATH];
     uint32 length = sizeof(path);
 
-    context->prefs->GetInstallDirectory(path, &length);
+    context->prefs->GetPrefString(kInstallDirPref, path, &length);
     strcat(path, "\\DownloadLog.txt");
 
     m_runDownloadThread = true;

@@ -157,7 +157,7 @@ MusicBrowserUI::MusicBrowserUI(FAContext      *context,
                 char url[MAX_PATH + 7];
                 uint32 length = sizeof(path);
 
-                m_context->prefs->GetInstallDirectory(path, &length);
+                m_context->prefs->GetPrefString(kInstallDirPref, path, &length);
 
                 strcat(path, "\\freeamp.m3u");
 
@@ -359,7 +359,7 @@ void MusicBrowserUI::SaveCurrentPlaylist()
         char url[MAX_PATH + 7];
         uint32 length = sizeof(path);
 
-        m_context->prefs->GetInstallDirectory(path, &length);
+        m_context->prefs->GetPrefString(kInstallDirPref, path, &length);
 
         strcat(path, "\\freeamp.m3u");
 

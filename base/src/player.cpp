@@ -1333,7 +1333,7 @@ CreatePMO(const PlaylistItem * pc, Event * pC)
        char defaultPMO[256];
        uint32 size = sizeof(defaultPMO);
 
-       m_context->prefs->GetDefaultPMO(defaultPMO, &size);
+       m_context->prefs->GetPrefString(kPMOPref, defaultPMO, &size);
 
        int32 i = 0;
 
