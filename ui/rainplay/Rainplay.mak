@@ -226,7 +226,7 @@ CPP_PROJ=/nologo /G6 /MDd /W3 /Gm /Gi /GR /GX /Zi /Od /I "." /I ".\Equalizer"\
  "..\..\base\win32\include" /I "..\..\lmc\include" /I "..\..\io\include" /I\
  "..\..\config" /I "..\include" /I "..\..\base\include" /D "_DEBUG" /D "_AFXDLL"\
  /D "WIN32" /D "_WINDOWS" /D "_WINDLL" /D "_MBCS" /D "_USRDLL"\
- /Fp"$(INTDIR)\Rainplay.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /ZI /c 
+ /Fp"$(INTDIR)\Rainplay.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /win32 
@@ -354,7 +354,7 @@ CPP_PROJ=/nologo /G6 /MDd /W3 /Gm /Gi /GR /GX /Zi /Od /I "." /I ".\Equalizer"\
  "..\..\base\win32\include" /I "..\..\lmc\include" /I "..\..\io\include" /I\
  "..\..\config" /I "..\include" /I "..\..\base\include" /D "_DEBUG" /D "_AFXDLL"\
  /D "WIN32" /D "_WINDOWS" /D "_WINDLL" /D "_MBCS" /D "_USRDLL"\
- /Fp"$(INTDIR)\Rainplay.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /ZI /c 
+ /Fp"$(INTDIR)\Rainplay.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /win32 
@@ -1487,7 +1487,7 @@ CPP_SWITCHES=/nologo /G6 /MDd /W3 /Gm /Gi /GR /GX /Zi /Od /I "." /I\
  "..\..\io\include" /I "..\..\config" /I "..\include" /I "..\..\base\include" /D\
  "_DEBUG" /D "_AFXDLL" /D "WIN32" /D "_WINDOWS" /D "_WINDLL" /D "_MBCS" /D\
  "_USRDLL" /Fp"$(INTDIR)\Rainplay.pch" /Yc"stdafx.h" /Fo"$(INTDIR)\\"\
- /Fd"$(INTDIR)\\" /FD /ZI /c 
+ /Fd"$(INTDIR)\\" /FD /c 
 
 "$(INTDIR)\StdAfx.obj"	"$(INTDIR)\Rainplay.pch" : $(SOURCE) $(DEP_CPP_STDAF)\
  "$(INTDIR)"
@@ -1504,7 +1504,7 @@ CPP_SWITCHES=/nologo /G6 /MDd /W3 /Gm /Gi /GR /GX /Zi /Od /I "." /I\
  "..\..\io\include" /I "..\..\config" /I "..\include" /I "..\..\base\include" /D\
  "_DEBUG" /D "_AFXDLL" /D "WIN32" /D "_WINDOWS" /D "_WINDLL" /D "_MBCS" /D\
  "_USRDLL" /Fp"$(INTDIR)\Rainplay.pch" /Yc"stdafx.h" /Fo"$(INTDIR)\\"\
- /Fd"$(INTDIR)\\" /FD /ZI /c 
+ /Fd"$(INTDIR)\\" /FD /c 
 
 "$(INTDIR)\StdAfx.obj"	"$(INTDIR)\Rainplay.pch" : $(SOURCE) $(DEP_CPP_STDAF)\
  "$(INTDIR)"
@@ -2249,7 +2249,7 @@ CPP_SWITCHES=/nologo /G6 /MDd /W3 /Gm /Gi /GR /GX /Zi /Od /I "." /I\
  "..\..\io\include" /I "..\..\config" /I "..\include" /I "..\..\base\include" /I\
  ".." /D "_DEBUG" /D "_AFXDLL" /D "WIN32" /D "_WINDOWS" /D "_WINDLL" /D "_MBCS"\
  /D "_USRDLL" /Fp"$(INTDIR)\Rainplay.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\"\
- /FD /ZI /c 
+ /FD /c 
 
 "$(INTDIR)\optionsetupdlg.obj" : $(SOURCE) $(DEP_CPP_OPTIO) "$(INTDIR)"
 	$(CPP) @<<
@@ -2265,7 +2265,7 @@ CPP_SWITCHES=/nologo /G6 /MDd /W3 /Gm /Gi /GR /GX /Zi /Od /I "." /I\
  "..\..\io\include" /I "..\..\config" /I "..\include" /I "..\..\base\include" /I\
  ".." /D "_DEBUG" /D "_AFXDLL" /D "WIN32" /D "_WINDOWS" /D "_WINDLL" /D "_MBCS"\
  /D "_USRDLL" /Fp"$(INTDIR)\Rainplay.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\"\
- /FD /ZI /c 
+ /FD /c 
 
 "$(INTDIR)\optionsetupdlg.obj" : $(SOURCE) $(DEP_CPP_OPTIO) "$(INTDIR)"
 	$(CPP) @<<
