@@ -399,7 +399,7 @@ void VorbisLMC::DecodeWork()
       section = -1;
       ret = ov_read(&m_vf, (char *)pOutBuffer, iDecodeBlockSize, 
                     0, 2, 1, &section);
-      if (ret <= 0)
+      if (ret == 0)
       {
          m_pOutputBuffer->EndWrite(0);
          break;
@@ -425,7 +425,8 @@ void VorbisLMC::DecodeWork()
           ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(new PMOInitEvent(info));
           ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(
              new PMOTimeInfoEvent(m_frameCounter));
-          Err = m_pOutputBuffer->BeginWrite(pOutBuffer, ret);
+
+          Err = m_pOutputBuffer->BeginWrite(pOutBuffer, iDecodeBlockSize);
           if (Err != kError_NoErr)
           {
              assert(0);
@@ -476,7 +477,10 @@ void VorbisLMC::DecodeWork()
               }
           }
       }
+      if(ret <0) 
+         ret=0; // hole/error in data - we can safely ignore this
       m_pOutputBuffer->EndWrite(ret);
+
       bytesCopied += ret;
    }
    ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(new PMOQuitEvent());
