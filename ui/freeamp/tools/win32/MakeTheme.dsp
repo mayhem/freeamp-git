@@ -46,7 +46,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /I "../../include" /I "../../../../lib/zlib/include" /I "../../../../config" /I "../../../../base/include" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -58,9 +58,9 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir\
-                                                ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
- ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
- ..\..\..\..\base\win32\prj\tools
+                                                 ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
+  ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
+  ..\..\..\..\base\win32\prj\tools
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 Debug"
@@ -89,9 +89,9 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir\
-                                                ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
- ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
- ..\..\..\..\base\win32\prj\tools
+                                                 ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
+  ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
+  ..\..\..\..\base\win32\prj\tools
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Debug"
@@ -121,9 +121,9 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir\
-                                                ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
- ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
- ..\..\..\..\base\win32\prj\tools
+                                                 ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
+  ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
+  ..\..\..\..\base\win32\prj\tools
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Release"
@@ -141,7 +141,7 @@ PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir\
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /I "../../include" /I "../../../../lib/zlib/include" /I "../../../../config" /I "../../../../base/include" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -153,9 +153,9 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir\
-                                                ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
- ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
- ..\..\..\..\base\win32\prj\tools
+                                                 ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
+  ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
+  ..\..\..\..\base\win32\prj\tools
 # End Special Build Tool
 
 !ENDIF 

@@ -74,9 +74,10 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /ML /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D\
- "_MBCS" /Fp"$(INTDIR)\MakeTheme.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD\
- /c 
+CPP_PROJ=/nologo /ML /W3 /GX /O2 /I "../../include" /I\
+ "../../../../lib/zlib/include" /I "../../../../config" /I\
+ "../../../../base/include" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS"\
+ /Fp"$(INTDIR)\MakeTheme.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
 BSC32=bscmake.exe
@@ -117,9 +118,9 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : ".\MakeTheme.exe"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                ..\..\..\..\base\win32\prj\tools
-	copy MakeTheme.exe ..\..\..\..\base\win32\prj\tools
-	copy ..\..\howto\ThemeHowTo.txt ..\..\..\..\base\win32\prj\tools
+   IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                 ..\..\..\..\base\win32\prj\tools
+	copy MakeTheme.exe  ..\..\..\..\base\win32\prj\tools
+	copy ..\..\howto\ThemeHowTo.txt  ..\..\..\..\base\win32\prj\tools
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 Debug"
@@ -208,9 +209,9 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : ".\MakeTheme.exe"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                ..\..\..\..\base\win32\prj\tools
-	copy MakeTheme.exe ..\..\..\..\base\win32\prj\tools
-	copy ..\..\howto\ThemeHowTo.txt ..\..\..\..\base\win32\prj\tools
+   IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                 ..\..\..\..\base\win32\prj\tools
+	copy MakeTheme.exe  ..\..\..\..\base\win32\prj\tools
+	copy ..\..\howto\ThemeHowTo.txt  ..\..\..\..\base\win32\prj\tools
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Debug"
@@ -299,9 +300,9 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : ".\MakeTheme.exe"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                ..\..\..\..\base\win32\prj\tools
-	copy MakeTheme.exe ..\..\..\..\base\win32\prj\tools
-	copy ..\..\howto\ThemeHowTo.txt ..\..\..\..\base\win32\prj\tools
+   IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                 ..\..\..\..\base\win32\prj\tools
+	copy MakeTheme.exe  ..\..\..\..\base\win32\prj\tools
+	copy ..\..\howto\ThemeHowTo.txt  ..\..\..\..\base\win32\prj\tools
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Release"
@@ -342,9 +343,10 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /ML /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D\
- "_MBCS" /Fp"$(INTDIR)\MakeTheme.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD\
- /c 
+CPP_PROJ=/nologo /ML /W3 /GX /O2 /I "../../include" /I\
+ "../../../../lib/zlib/include" /I "../../../../config" /I\
+ "../../../../base/include" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS"\
+ /Fp"$(INTDIR)\MakeTheme.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
 BSC32=bscmake.exe
@@ -385,9 +387,9 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : ".\MakeTheme.exe"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                ..\..\..\..\base\win32\prj\tools
-	copy MakeTheme.exe ..\..\..\..\base\win32\prj\tools
-	copy ..\..\howto\ThemeHowTo.txt ..\..\..\..\base\win32\prj\tools
+   IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                 ..\..\..\..\base\win32\prj\tools
+	copy MakeTheme.exe  ..\..\..\..\base\win32\prj\tools
+	copy ..\..\howto\ThemeHowTo.txt  ..\..\..\..\base\win32\prj\tools
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 
@@ -430,11 +432,12 @@ SOURCE=..\..\..\..\lib\zlib\src\adler32.c
 
 !IF  "$(CFG)" == "MakeTheme - Win32 Release"
 
-NODEP_CPP_ADLER=\
-	"..\..\..\..\lib\zlib\src\zlib.h"\
+DEP_CPP_ADLER=\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
 	
 
-"$(INTDIR)\adler32.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\adler32.obj" : $(SOURCE) $(DEP_CPP_ADLER) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -443,6 +446,7 @@ NODEP_CPP_ADLER=\
 DEP_CPP_ADLER=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\adler32.obj" : $(SOURCE) $(DEP_CPP_ADLER) "$(INTDIR)"
@@ -454,6 +458,7 @@ DEP_CPP_ADLER=\
 DEP_CPP_ADLER=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\adler32.obj" : $(SOURCE) $(DEP_CPP_ADLER) "$(INTDIR)"
@@ -462,11 +467,12 @@ DEP_CPP_ADLER=\
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Release"
 
-NODEP_CPP_ADLER=\
-	"..\..\..\..\lib\zlib\src\zlib.h"\
+DEP_CPP_ADLER=\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
 	
 
-"$(INTDIR)\adler32.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\adler32.obj" : $(SOURCE) $(DEP_CPP_ADLER) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -476,11 +482,12 @@ SOURCE=..\..\..\..\lib\zlib\src\compress.c
 
 !IF  "$(CFG)" == "MakeTheme - Win32 Release"
 
-NODEP_CPP_COMPR=\
-	"..\..\..\..\lib\zlib\src\zlib.h"\
+DEP_CPP_COMPR=\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
 	
 
-"$(INTDIR)\compress.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\compress.obj" : $(SOURCE) $(DEP_CPP_COMPR) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -489,6 +496,7 @@ NODEP_CPP_COMPR=\
 DEP_CPP_COMPR=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\compress.obj" : $(SOURCE) $(DEP_CPP_COMPR) "$(INTDIR)"
@@ -500,6 +508,7 @@ DEP_CPP_COMPR=\
 DEP_CPP_COMPR=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\compress.obj" : $(SOURCE) $(DEP_CPP_COMPR) "$(INTDIR)"
@@ -508,11 +517,12 @@ DEP_CPP_COMPR=\
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Release"
 
-NODEP_CPP_COMPR=\
-	"..\..\..\..\lib\zlib\src\zlib.h"\
+DEP_CPP_COMPR=\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
 	
 
-"$(INTDIR)\compress.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\compress.obj" : $(SOURCE) $(DEP_CPP_COMPR) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -522,11 +532,12 @@ SOURCE=..\..\..\..\lib\zlib\src\crc32.c
 
 !IF  "$(CFG)" == "MakeTheme - Win32 Release"
 
-NODEP_CPP_CRC32=\
-	"..\..\..\..\lib\zlib\src\zlib.h"\
+DEP_CPP_CRC32=\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
 	
 
-"$(INTDIR)\crc32.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\crc32.obj" : $(SOURCE) $(DEP_CPP_CRC32) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -535,6 +546,7 @@ NODEP_CPP_CRC32=\
 DEP_CPP_CRC32=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\crc32.obj" : $(SOURCE) $(DEP_CPP_CRC32) "$(INTDIR)"
@@ -546,6 +558,7 @@ DEP_CPP_CRC32=\
 DEP_CPP_CRC32=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\crc32.obj" : $(SOURCE) $(DEP_CPP_CRC32) "$(INTDIR)"
@@ -554,11 +567,12 @@ DEP_CPP_CRC32=\
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Release"
 
-NODEP_CPP_CRC32=\
-	"..\..\..\..\lib\zlib\src\zlib.h"\
+DEP_CPP_CRC32=\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
 	
 
-"$(INTDIR)\crc32.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\crc32.obj" : $(SOURCE) $(DEP_CPP_CRC32) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -568,11 +582,14 @@ SOURCE=..\..\..\..\lib\zlib\src\deflate.c
 
 !IF  "$(CFG)" == "MakeTheme - Win32 Release"
 
-NODEP_CPP_DEFLA=\
-	"..\..\..\..\lib\zlib\src\deflate.h"\
+DEP_CPP_DEFLA=\
+	"..\..\..\..\lib\zlib\include\deflate.h"\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
+	"..\..\..\..\lib\zlib\include\zutil.h"\
 	
 
-"$(INTDIR)\deflate.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\deflate.obj" : $(SOURCE) $(DEP_CPP_DEFLA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -583,6 +600,7 @@ DEP_CPP_DEFLA=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\deflate.obj" : $(SOURCE) $(DEP_CPP_DEFLA) "$(INTDIR)"
@@ -596,6 +614,7 @@ DEP_CPP_DEFLA=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\deflate.obj" : $(SOURCE) $(DEP_CPP_DEFLA) "$(INTDIR)"
@@ -604,11 +623,14 @@ DEP_CPP_DEFLA=\
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Release"
 
-NODEP_CPP_DEFLA=\
-	"..\..\..\..\lib\zlib\src\deflate.h"\
+DEP_CPP_DEFLA=\
+	"..\..\..\..\lib\zlib\include\deflate.h"\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
+	"..\..\..\..\lib\zlib\include\zutil.h"\
 	
 
-"$(INTDIR)\deflate.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\deflate.obj" : $(SOURCE) $(DEP_CPP_DEFLA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -618,11 +640,13 @@ SOURCE=..\..\..\..\lib\zlib\src\gzio.c
 
 !IF  "$(CFG)" == "MakeTheme - Win32 Release"
 
-NODEP_CPP_GZIO_=\
-	"..\..\..\..\lib\zlib\src\zutil.h"\
+DEP_CPP_GZIO_=\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
+	"..\..\..\..\lib\zlib\include\zutil.h"\
 	
 
-"$(INTDIR)\gzio.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\gzio.obj" : $(SOURCE) $(DEP_CPP_GZIO_) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -632,6 +656,7 @@ DEP_CPP_GZIO_=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\gzio.obj" : $(SOURCE) $(DEP_CPP_GZIO_) "$(INTDIR)"
@@ -644,6 +669,7 @@ DEP_CPP_GZIO_=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\gzio.obj" : $(SOURCE) $(DEP_CPP_GZIO_) "$(INTDIR)"
@@ -652,11 +678,13 @@ DEP_CPP_GZIO_=\
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Release"
 
-NODEP_CPP_GZIO_=\
-	"..\..\..\..\lib\zlib\src\zutil.h"\
+DEP_CPP_GZIO_=\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
+	"..\..\..\..\lib\zlib\include\zutil.h"\
 	
 
-"$(INTDIR)\gzio.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\gzio.obj" : $(SOURCE) $(DEP_CPP_GZIO_) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -666,15 +694,17 @@ SOURCE=..\..\..\..\lib\zlib\src\infblock.c
 
 !IF  "$(CFG)" == "MakeTheme - Win32 Release"
 
-NODEP_CPP_INFBL=\
-	"..\..\..\..\lib\zlib\src\infblock.h"\
-	"..\..\..\..\lib\zlib\src\infcodes.h"\
-	"..\..\..\..\lib\zlib\src\inftrees.h"\
-	"..\..\..\..\lib\zlib\src\infutil.h"\
-	"..\..\..\..\lib\zlib\src\zutil.h"\
+DEP_CPP_INFBL=\
+	"..\..\..\..\lib\zlib\include\infblock.h"\
+	"..\..\..\..\lib\zlib\include\infcodes.h"\
+	"..\..\..\..\lib\zlib\include\inftrees.h"\
+	"..\..\..\..\lib\zlib\include\infutil.h"\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
+	"..\..\..\..\lib\zlib\include\zutil.h"\
 	
 
-"$(INTDIR)\infblock.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\infblock.obj" : $(SOURCE) $(DEP_CPP_INFBL) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -688,6 +718,7 @@ DEP_CPP_INFBL=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\infblock.obj" : $(SOURCE) $(DEP_CPP_INFBL) "$(INTDIR)"
@@ -704,6 +735,7 @@ DEP_CPP_INFBL=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\infblock.obj" : $(SOURCE) $(DEP_CPP_INFBL) "$(INTDIR)"
@@ -712,15 +744,17 @@ DEP_CPP_INFBL=\
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Release"
 
-NODEP_CPP_INFBL=\
-	"..\..\..\..\lib\zlib\src\infblock.h"\
-	"..\..\..\..\lib\zlib\src\infcodes.h"\
-	"..\..\..\..\lib\zlib\src\inftrees.h"\
-	"..\..\..\..\lib\zlib\src\infutil.h"\
-	"..\..\..\..\lib\zlib\src\zutil.h"\
+DEP_CPP_INFBL=\
+	"..\..\..\..\lib\zlib\include\infblock.h"\
+	"..\..\..\..\lib\zlib\include\infcodes.h"\
+	"..\..\..\..\lib\zlib\include\inftrees.h"\
+	"..\..\..\..\lib\zlib\include\infutil.h"\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
+	"..\..\..\..\lib\zlib\include\zutil.h"\
 	
 
-"$(INTDIR)\infblock.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\infblock.obj" : $(SOURCE) $(DEP_CPP_INFBL) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -730,16 +764,18 @@ SOURCE=..\..\..\..\lib\zlib\src\infcodes.c
 
 !IF  "$(CFG)" == "MakeTheme - Win32 Release"
 
-NODEP_CPP_INFCO=\
-	"..\..\..\..\lib\zlib\src\infblock.h"\
-	"..\..\..\..\lib\zlib\src\infcodes.h"\
-	"..\..\..\..\lib\zlib\src\inffast.h"\
-	"..\..\..\..\lib\zlib\src\inftrees.h"\
-	"..\..\..\..\lib\zlib\src\infutil.h"\
-	"..\..\..\..\lib\zlib\src\zutil.h"\
+DEP_CPP_INFCO=\
+	"..\..\..\..\lib\zlib\include\infblock.h"\
+	"..\..\..\..\lib\zlib\include\infcodes.h"\
+	"..\..\..\..\lib\zlib\include\inffast.h"\
+	"..\..\..\..\lib\zlib\include\inftrees.h"\
+	"..\..\..\..\lib\zlib\include\infutil.h"\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
+	"..\..\..\..\lib\zlib\include\zutil.h"\
 	
 
-"$(INTDIR)\infcodes.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\infcodes.obj" : $(SOURCE) $(DEP_CPP_INFCO) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -754,6 +790,7 @@ DEP_CPP_INFCO=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\infcodes.obj" : $(SOURCE) $(DEP_CPP_INFCO) "$(INTDIR)"
@@ -771,6 +808,7 @@ DEP_CPP_INFCO=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\infcodes.obj" : $(SOURCE) $(DEP_CPP_INFCO) "$(INTDIR)"
@@ -779,16 +817,18 @@ DEP_CPP_INFCO=\
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Release"
 
-NODEP_CPP_INFCO=\
-	"..\..\..\..\lib\zlib\src\infblock.h"\
-	"..\..\..\..\lib\zlib\src\infcodes.h"\
-	"..\..\..\..\lib\zlib\src\inffast.h"\
-	"..\..\..\..\lib\zlib\src\inftrees.h"\
-	"..\..\..\..\lib\zlib\src\infutil.h"\
-	"..\..\..\..\lib\zlib\src\zutil.h"\
+DEP_CPP_INFCO=\
+	"..\..\..\..\lib\zlib\include\infblock.h"\
+	"..\..\..\..\lib\zlib\include\infcodes.h"\
+	"..\..\..\..\lib\zlib\include\inffast.h"\
+	"..\..\..\..\lib\zlib\include\inftrees.h"\
+	"..\..\..\..\lib\zlib\include\infutil.h"\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
+	"..\..\..\..\lib\zlib\include\zutil.h"\
 	
 
-"$(INTDIR)\infcodes.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\infcodes.obj" : $(SOURCE) $(DEP_CPP_INFCO) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -798,16 +838,18 @@ SOURCE=..\..\..\..\lib\zlib\src\inffast.c
 
 !IF  "$(CFG)" == "MakeTheme - Win32 Release"
 
-NODEP_CPP_INFFA=\
-	"..\..\..\..\lib\zlib\src\infblock.h"\
-	"..\..\..\..\lib\zlib\src\infcodes.h"\
-	"..\..\..\..\lib\zlib\src\inffast.h"\
-	"..\..\..\..\lib\zlib\src\inftrees.h"\
-	"..\..\..\..\lib\zlib\src\infutil.h"\
-	"..\..\..\..\lib\zlib\src\zutil.h"\
+DEP_CPP_INFFA=\
+	"..\..\..\..\lib\zlib\include\infblock.h"\
+	"..\..\..\..\lib\zlib\include\infcodes.h"\
+	"..\..\..\..\lib\zlib\include\inffast.h"\
+	"..\..\..\..\lib\zlib\include\inftrees.h"\
+	"..\..\..\..\lib\zlib\include\infutil.h"\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
+	"..\..\..\..\lib\zlib\include\zutil.h"\
 	
 
-"$(INTDIR)\inffast.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\inffast.obj" : $(SOURCE) $(DEP_CPP_INFFA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -822,6 +864,7 @@ DEP_CPP_INFFA=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\inffast.obj" : $(SOURCE) $(DEP_CPP_INFFA) "$(INTDIR)"
@@ -839,6 +882,7 @@ DEP_CPP_INFFA=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\inffast.obj" : $(SOURCE) $(DEP_CPP_INFFA) "$(INTDIR)"
@@ -847,16 +891,18 @@ DEP_CPP_INFFA=\
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Release"
 
-NODEP_CPP_INFFA=\
-	"..\..\..\..\lib\zlib\src\infblock.h"\
-	"..\..\..\..\lib\zlib\src\infcodes.h"\
-	"..\..\..\..\lib\zlib\src\inffast.h"\
-	"..\..\..\..\lib\zlib\src\inftrees.h"\
-	"..\..\..\..\lib\zlib\src\infutil.h"\
-	"..\..\..\..\lib\zlib\src\zutil.h"\
+DEP_CPP_INFFA=\
+	"..\..\..\..\lib\zlib\include\infblock.h"\
+	"..\..\..\..\lib\zlib\include\infcodes.h"\
+	"..\..\..\..\lib\zlib\include\inffast.h"\
+	"..\..\..\..\lib\zlib\include\inftrees.h"\
+	"..\..\..\..\lib\zlib\include\infutil.h"\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
+	"..\..\..\..\lib\zlib\include\zutil.h"\
 	
 
-"$(INTDIR)\inffast.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\inffast.obj" : $(SOURCE) $(DEP_CPP_INFFA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -866,12 +912,14 @@ SOURCE=..\..\..\..\lib\zlib\src\inflate.c
 
 !IF  "$(CFG)" == "MakeTheme - Win32 Release"
 
-NODEP_CPP_INFLA=\
-	"..\..\..\..\lib\zlib\src\infblock.h"\
-	"..\..\..\..\lib\zlib\src\zutil.h"\
+DEP_CPP_INFLA=\
+	"..\..\..\..\lib\zlib\include\infblock.h"\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
+	"..\..\..\..\lib\zlib\include\zutil.h"\
 	
 
-"$(INTDIR)\inflate.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\inflate.obj" : $(SOURCE) $(DEP_CPP_INFLA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -882,6 +930,7 @@ DEP_CPP_INFLA=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\inflate.obj" : $(SOURCE) $(DEP_CPP_INFLA) "$(INTDIR)"
@@ -895,6 +944,7 @@ DEP_CPP_INFLA=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\inflate.obj" : $(SOURCE) $(DEP_CPP_INFLA) "$(INTDIR)"
@@ -903,12 +953,14 @@ DEP_CPP_INFLA=\
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Release"
 
-NODEP_CPP_INFLA=\
-	"..\..\..\..\lib\zlib\src\infblock.h"\
-	"..\..\..\..\lib\zlib\src\zutil.h"\
+DEP_CPP_INFLA=\
+	"..\..\..\..\lib\zlib\include\infblock.h"\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
+	"..\..\..\..\lib\zlib\include\zutil.h"\
 	
 
-"$(INTDIR)\inflate.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\inflate.obj" : $(SOURCE) $(DEP_CPP_INFLA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -918,13 +970,15 @@ SOURCE=..\..\..\..\lib\zlib\src\inftrees.c
 
 !IF  "$(CFG)" == "MakeTheme - Win32 Release"
 
-NODEP_CPP_INFTR=\
-	"..\..\..\..\lib\zlib\src\inffixed.h"\
-	"..\..\..\..\lib\zlib\src\inftrees.h"\
-	"..\..\..\..\lib\zlib\src\zutil.h"\
+DEP_CPP_INFTR=\
+	"..\..\..\..\lib\zlib\include\inffixed.h"\
+	"..\..\..\..\lib\zlib\include\inftrees.h"\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
+	"..\..\..\..\lib\zlib\include\zutil.h"\
 	
 
-"$(INTDIR)\inftrees.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\inftrees.obj" : $(SOURCE) $(DEP_CPP_INFTR) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -936,6 +990,7 @@ DEP_CPP_INFTR=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\inftrees.obj" : $(SOURCE) $(DEP_CPP_INFTR) "$(INTDIR)"
@@ -950,6 +1005,7 @@ DEP_CPP_INFTR=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\inftrees.obj" : $(SOURCE) $(DEP_CPP_INFTR) "$(INTDIR)"
@@ -958,13 +1014,15 @@ DEP_CPP_INFTR=\
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Release"
 
-NODEP_CPP_INFTR=\
-	"..\..\..\..\lib\zlib\src\inffixed.h"\
-	"..\..\..\..\lib\zlib\src\inftrees.h"\
-	"..\..\..\..\lib\zlib\src\zutil.h"\
+DEP_CPP_INFTR=\
+	"..\..\..\..\lib\zlib\include\inffixed.h"\
+	"..\..\..\..\lib\zlib\include\inftrees.h"\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
+	"..\..\..\..\lib\zlib\include\zutil.h"\
 	
 
-"$(INTDIR)\inftrees.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\inftrees.obj" : $(SOURCE) $(DEP_CPP_INFTR) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -974,15 +1032,17 @@ SOURCE=..\..\..\..\lib\zlib\src\infutil.c
 
 !IF  "$(CFG)" == "MakeTheme - Win32 Release"
 
-NODEP_CPP_INFUT=\
-	"..\..\..\..\lib\zlib\src\infblock.h"\
-	"..\..\..\..\lib\zlib\src\infcodes.h"\
-	"..\..\..\..\lib\zlib\src\inftrees.h"\
-	"..\..\..\..\lib\zlib\src\infutil.h"\
-	"..\..\..\..\lib\zlib\src\zutil.h"\
+DEP_CPP_INFUT=\
+	"..\..\..\..\lib\zlib\include\infblock.h"\
+	"..\..\..\..\lib\zlib\include\infcodes.h"\
+	"..\..\..\..\lib\zlib\include\inftrees.h"\
+	"..\..\..\..\lib\zlib\include\infutil.h"\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
+	"..\..\..\..\lib\zlib\include\zutil.h"\
 	
 
-"$(INTDIR)\infutil.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\infutil.obj" : $(SOURCE) $(DEP_CPP_INFUT) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -996,6 +1056,7 @@ DEP_CPP_INFUT=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\infutil.obj" : $(SOURCE) $(DEP_CPP_INFUT) "$(INTDIR)"
@@ -1012,6 +1073,7 @@ DEP_CPP_INFUT=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\infutil.obj" : $(SOURCE) $(DEP_CPP_INFUT) "$(INTDIR)"
@@ -1020,15 +1082,17 @@ DEP_CPP_INFUT=\
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Release"
 
-NODEP_CPP_INFUT=\
-	"..\..\..\..\lib\zlib\src\infblock.h"\
-	"..\..\..\..\lib\zlib\src\infcodes.h"\
-	"..\..\..\..\lib\zlib\src\inftrees.h"\
-	"..\..\..\..\lib\zlib\src\infutil.h"\
-	"..\..\..\..\lib\zlib\src\zutil.h"\
+DEP_CPP_INFUT=\
+	"..\..\..\..\lib\zlib\include\infblock.h"\
+	"..\..\..\..\lib\zlib\include\infcodes.h"\
+	"..\..\..\..\lib\zlib\include\inftrees.h"\
+	"..\..\..\..\lib\zlib\include\infutil.h"\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
+	"..\..\..\..\lib\zlib\include\zutil.h"\
 	
 
-"$(INTDIR)\infutil.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\infutil.obj" : $(SOURCE) $(DEP_CPP_INFUT) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1038,11 +1102,13 @@ SOURCE=..\src\MakeTheme.cpp
 
 !IF  "$(CFG)" == "MakeTheme - Win32 Release"
 
-NODEP_CPP_MAKET=\
-	"..\src\ThemeZip.h"\
+DEP_CPP_MAKET=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\include\themezip.h"\
 	
 
-"$(INTDIR)\MakeTheme.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\MakeTheme.obj" : $(SOURCE) $(DEP_CPP_MAKET) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1072,11 +1138,13 @@ DEP_CPP_MAKET=\
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Release"
 
-NODEP_CPP_MAKET=\
-	"..\src\ThemeZip.h"\
+DEP_CPP_MAKET=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\include\themezip.h"\
 	
 
-"$(INTDIR)\MakeTheme.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\MakeTheme.obj" : $(SOURCE) $(DEP_CPP_MAKET) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1086,14 +1154,16 @@ SOURCE=..\..\src\ThemeZip.cpp
 
 !IF  "$(CFG)" == "MakeTheme - Win32 Release"
 
-NODEP_CPP_THEME=\
-	"..\..\src\config.h"\
-	"..\..\src\debug.h"\
-	"..\..\src\ThemeZip.h"\
-	"..\..\src\zlib.h"\
+DEP_CPP_THEME=\
+	"..\..\..\..\base\include\debug.h"\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
+	"..\..\include\themezip.h"\
 	
 
-"$(INTDIR)\ThemeZip.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\ThemeZip.obj" : $(SOURCE) $(DEP_CPP_THEME) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1106,6 +1176,7 @@ DEP_CPP_THEME=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\include\themezip.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\ThemeZip.obj" : $(SOURCE) $(DEP_CPP_THEME) "$(INTDIR)"
@@ -1121,6 +1192,7 @@ DEP_CPP_THEME=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\include\themezip.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\ThemeZip.obj" : $(SOURCE) $(DEP_CPP_THEME) "$(INTDIR)"
@@ -1129,14 +1201,16 @@ DEP_CPP_THEME=\
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Release"
 
-NODEP_CPP_THEME=\
-	"..\..\src\config.h"\
-	"..\..\src\debug.h"\
-	"..\..\src\ThemeZip.h"\
-	"..\..\src\zlib.h"\
+DEP_CPP_THEME=\
+	"..\..\..\..\base\include\debug.h"\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
+	"..\..\include\themezip.h"\
 	
 
-"$(INTDIR)\ThemeZip.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\ThemeZip.obj" : $(SOURCE) $(DEP_CPP_THEME) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1146,12 +1220,15 @@ SOURCE=..\..\..\..\lib\zlib\src\trees.c
 
 !IF  "$(CFG)" == "MakeTheme - Win32 Release"
 
-NODEP_CPP_TREES=\
-	"..\..\..\..\lib\zlib\src\deflate.h"\
-	"..\..\..\..\lib\zlib\src\trees.h"\
+DEP_CPP_TREES=\
+	"..\..\..\..\lib\zlib\include\deflate.h"\
+	"..\..\..\..\lib\zlib\include\trees.h"\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
+	"..\..\..\..\lib\zlib\include\zutil.h"\
 	
 
-"$(INTDIR)\trees.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\trees.obj" : $(SOURCE) $(DEP_CPP_TREES) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1163,6 +1240,7 @@ DEP_CPP_TREES=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\trees.obj" : $(SOURCE) $(DEP_CPP_TREES) "$(INTDIR)"
@@ -1177,6 +1255,7 @@ DEP_CPP_TREES=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\trees.obj" : $(SOURCE) $(DEP_CPP_TREES) "$(INTDIR)"
@@ -1185,12 +1264,15 @@ DEP_CPP_TREES=\
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Release"
 
-NODEP_CPP_TREES=\
-	"..\..\..\..\lib\zlib\src\deflate.h"\
-	"..\..\..\..\lib\zlib\src\trees.h"\
+DEP_CPP_TREES=\
+	"..\..\..\..\lib\zlib\include\deflate.h"\
+	"..\..\..\..\lib\zlib\include\trees.h"\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
+	"..\..\..\..\lib\zlib\include\zutil.h"\
 	
 
-"$(INTDIR)\trees.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\trees.obj" : $(SOURCE) $(DEP_CPP_TREES) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1200,11 +1282,12 @@ SOURCE=..\..\..\..\lib\zlib\src\uncompr.c
 
 !IF  "$(CFG)" == "MakeTheme - Win32 Release"
 
-NODEP_CPP_UNCOM=\
-	"..\..\..\..\lib\zlib\src\zlib.h"\
+DEP_CPP_UNCOM=\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
 	
 
-"$(INTDIR)\uncompr.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\uncompr.obj" : $(SOURCE) $(DEP_CPP_UNCOM) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1213,6 +1296,7 @@ NODEP_CPP_UNCOM=\
 DEP_CPP_UNCOM=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\uncompr.obj" : $(SOURCE) $(DEP_CPP_UNCOM) "$(INTDIR)"
@@ -1224,6 +1308,7 @@ DEP_CPP_UNCOM=\
 DEP_CPP_UNCOM=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\uncompr.obj" : $(SOURCE) $(DEP_CPP_UNCOM) "$(INTDIR)"
@@ -1232,11 +1317,12 @@ DEP_CPP_UNCOM=\
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Release"
 
-NODEP_CPP_UNCOM=\
-	"..\..\..\..\lib\zlib\src\zlib.h"\
+DEP_CPP_UNCOM=\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
 	
 
-"$(INTDIR)\uncompr.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\uncompr.obj" : $(SOURCE) $(DEP_CPP_UNCOM) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1246,11 +1332,13 @@ SOURCE=..\..\..\..\lib\zlib\src\zutil.c
 
 !IF  "$(CFG)" == "MakeTheme - Win32 Release"
 
-NODEP_CPP_ZUTIL=\
-	"..\..\..\..\lib\zlib\src\zutil.h"\
+DEP_CPP_ZUTIL=\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
+	"..\..\..\..\lib\zlib\include\zutil.h"\
 	
 
-"$(INTDIR)\zutil.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\zutil.obj" : $(SOURCE) $(DEP_CPP_ZUTIL) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1260,6 +1348,7 @@ DEP_CPP_ZUTIL=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\zutil.obj" : $(SOURCE) $(DEP_CPP_ZUTIL) "$(INTDIR)"
@@ -1272,6 +1361,7 @@ DEP_CPP_ZUTIL=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\zutil.obj" : $(SOURCE) $(DEP_CPP_ZUTIL) "$(INTDIR)"
@@ -1280,11 +1370,13 @@ DEP_CPP_ZUTIL=\
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Release"
 
-NODEP_CPP_ZUTIL=\
-	"..\..\..\..\lib\zlib\src\zutil.h"\
+DEP_CPP_ZUTIL=\
+	"..\..\..\..\lib\zlib\include\zconf.h"\
+	"..\..\..\..\lib\zlib\include\zlib.h"\
+	"..\..\..\..\lib\zlib\include\zutil.h"\
 	
 
-"$(INTDIR)\zutil.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\zutil.obj" : $(SOURCE) $(DEP_CPP_ZUTIL) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
