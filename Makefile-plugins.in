@@ -47,6 +47,7 @@ PLUGINS += plugins/lcd.ui
 PLUGINS += plugins/irman.ui
 
 PLUGINS += plugins/xingmp3.lmc
+PLUGINS += plugins/wav.lmc
 
 PLUGINS += plugins/mbcd.mdf
 PLUGINS += plugins/id3v1.mdf
@@ -372,6 +373,11 @@ lmc/vorbis/src/lib/libvorbis.la: $(VORBISLIBOBJ)
 VORBISOBJ = lmc/vorbis/src/vorbislmc.o
 plugins/vorbis.lmc: $(VORBISOBJ) 
 	$(LINKMOD) -o $@ $(VORBISOBJ) -lvorbis -lvorbisfile $(STATICLD)
+
+# wav lmc
+WAVOBJ = lmc/wav/src/wavlmc.o
+plugins/wav.lmc: $(WAVOBJ) 
+	$(LINKMOD) -o $@ $(WAVOBJ) $(STATICLD)
 
 # MDF section 
 
