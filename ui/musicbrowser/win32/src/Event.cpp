@@ -923,7 +923,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
             case LVN_ITEMCHANGED:
             {
                 // update only when focus is set
-                if(pListView->uNewState&LVIS_FOCUSED)
+                //if(pListView->uNewState&LVIS_FOCUSED)
                     UpdateButtonStates();
                 break;
             }

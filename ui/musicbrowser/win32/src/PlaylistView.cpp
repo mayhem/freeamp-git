@@ -484,7 +484,9 @@ void MusicBrowserUI::PlaylistListItemRemoved(const vector<PlaylistItem*>* itemLi
             if(oldIndex >= ListView_GetItemCount(m_hPlaylistView))
                 oldIndex = ListView_GetItemCount(m_hPlaylistView) - 1;
 
-            if(lv_item.state & LVIS_SELECTED)
+            ListView_SetItemState(m_hPlaylistView, oldIndex, lv_item.state, LVIS_SELECTED|LVIS_FOCUSED);
+
+            /*if(lv_item.state & LVIS_SELECTED)
             {
                 ListView_SetItemState(m_hPlaylistView, oldIndex, LVIS_SELECTED, LVIS_SELECTED);
             }
@@ -492,15 +494,17 @@ void MusicBrowserUI::PlaylistListItemRemoved(const vector<PlaylistItem*>* itemLi
             if(lv_item.state & LVIS_FOCUSED)
             {
                 ListView_SetItemState(m_hPlaylistView, oldIndex, LVIS_FOCUSED, LVIS_FOCUSED);
-            }
+            }*/
 
             m_bListChanged = true;
         }
     }
     
-    UpdateTotalTime();
-    UpdateButtonStates();
     SetFocus(m_hPlaylistView);
+
+    UpdateTotalTime();
+    //UpdateButtonStates();
+    
 
     //HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
 
