@@ -77,12 +77,13 @@ MusicCatalog::MusicCatalog(FAContext *context, char *databasepath)
 
 MusicCatalog::~MusicCatalog()
 {
-    vector<ArtistList *>::iterator a;
-    vector<PlaylistItem *>::iterator p;
+//    vector<ArtistList *>::iterator a;
+//    vector<PlaylistItem *>::iterator p;
 
     if (m_database)
         delete m_database;
 
+/*
     for(a = m_artistList->begin(); a != m_artistList->end(); a++)
        delete (*a);
     delete m_artistList;
@@ -94,6 +95,7 @@ MusicCatalog::~MusicCatalog()
     for(p = m_streams->begin(); p != m_streams->end(); p++)
        delete (*p);
     delete m_streams;
+*/
 
     delete m_playlists;
     delete m_mutex;
