@@ -1,4 +1,4 @@
-Changes for Linux version 1.3.1:
+Changes for Linux and Windows version 1.3.1:
 --------------------------------------------------------------------
 
 - Fixed binary installs requiring esd and asound libs, when they
@@ -9,6 +9,7 @@ Changes for Linux version 1.3.1:
 - Added README.linux with some PMO change docs
 - The linux version can now play Windows .m3u files
 - Removed GTK config stuff in the configure.in script
+- Fixed half implemented shuffle improvement
 
 Changes for Linux and Windows version 1.3.0:
 --------------------------------------------------------------------
