@@ -175,7 +175,7 @@ void InitializeGTK(FAContext *context)
         context->gtkInitialized = true;
 	g_thread_init(NULL);
         gtk_set_locale();
-	gtk_init(&context->argc, &context->argv);
+	gtk_init(NULL, NULL);
 	gdk_rgb_init();
 	weAreGTK = true;
     }
