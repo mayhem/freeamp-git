@@ -56,10 +56,10 @@ static int pControls[] =
 TBBUTTON tbButtons[] = {
 	{ 7, ID_FILE_SEARCHFORMUSIC, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
 	{ 0, 0, TBSTATE_ENABLED, TBSTYLE_SEP, 0L, 0},
-	{ 0, ID_FILE_NEWPLAYLIST, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-	{ 1, ID_FILE_IMPORT, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-	{ 3, ID_EDIT_REMOVE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-	{ 4, ID_EDIT_EDIT, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0}
+	{ 0, ID_FILE_NEWPLAYLIST, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 1},
+	{ 1, ID_FILE_IMPORT, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 2},
+	{ 3, ID_EDIT_REMOVE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 3},
+	{ 4, ID_EDIT_EDIT, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 4}
 };
 
 static BOOL CALLBACK MainDlgProc(HWND hwnd, UINT msg, 
@@ -96,15 +96,15 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
 
 		case WM_SIZE:
         {
-            SizeWindow(LOWORD(lParam), HIWORD(lParam));
+            SizeWindow(wParam, LOWORD(lParam), HIWORD(lParam));
             return 1;
         } 
 		case WM_NOTIFY:
             return Notify(wParam, (LPNMHDR)lParam);
             
-//		case WM_GETMINMAXINFO:
-//            GetMinMaxInfo((MINMAXINFO *)lParam);
-//            break;
+		case WM_GETMINMAXINFO:
+            GetMinMaxInfo((MINMAXINFO *)lParam);
+            break;
 
         case WM_MOUSEMOVE:
         {
@@ -281,10 +281,10 @@ bool MusicBrowserUI::CreateMainDialog(void)
     }
     
     ImageList_Destroy(TreeView_SetImageList(
-                      GetDlgItem(m_hWnd, IDC_MUSICTREE),
+                      m_hMusicCatalog,
                           NULL, TVSIL_NORMAL)); 
     ImageList_Destroy(ListView_SetImageList(
-                      GetDlgItem(m_hWnd, IDC_PLAYLISTBOX),
+                      m_hPlaylistView,
                           NULL, LVSIL_SMALL)); 
     DestroyWindow(m_hWnd);
     m_hWnd = NULL;
@@ -418,27 +418,95 @@ void MusicBrowserUI::MoveControls(int iPixelsToMove)
     }                 
 }
 
-void MusicBrowserUI::SizeWindow(int iWidth, int iHeight)
+void MusicBrowserUI::SizeWindow(int iType, int iWidth, int iHeight)
 {
+    RECT windowRect;
+    RECT clientRect;
+    RECT controlRect;
+    uint32 windowHeight, windowWidth;
+    uint32 clientHeight, clientWidth;
+    uint32 controlHeight, controlWidth;
+    uint32 statusbarHeight;
+
+    GetWindowRect(m_hWnd, &windowRect);
+    windowHeight = windowRect.bottom - windowRect.top;
+    windowWidth = windowRect.right - windowRect.left;
+
+    GetClientRect(m_hWnd, &clientRect);
+    clientHeight = clientRect.bottom - clientRect.top;
+    clientWidth = clientRect.right - clientRect.left;
+
+    HDWP hdwp = BeginDeferWindowPos(5);
+    
+    // Status Bar
+    GetWindowRect(m_hStatus, &controlRect); 
+    controlHeight = controlRect.bottom - controlRect.top;
+    controlWidth = controlRect.right - controlRect.left;
+
+    statusbarHeight = controlHeight;
+    hdwp = DeferWindowPos(hdwp, m_hStatus, NULL,
+                           windowRect.left, 
+                           windowRect.bottom - controlHeight,
+                           windowWidth,
+                           controlHeight,
+                           SWP_NOZORDER);
+
+    // Tool Bar
+    GetWindowRect(m_hRebar, &controlRect); 
+    controlHeight = controlRect.bottom - controlRect.top;
+    controlWidth = controlRect.right - controlRect.left;
+
+    hdwp = DeferWindowPos(hdwp, m_hRebar, NULL,
+                           0, 
+                           0,
+                           clientWidth,
+                           controlHeight,
+                           SWP_NOZORDER);
+
+    // Playlist View
+    GetWindowRect(m_hPlaylistView, &controlRect); 
+    MapWindowPoints(NULL, m_hWnd, (LPPOINT)&controlRect, 2);
+    controlHeight = controlRect.bottom - controlRect.top;
+    controlWidth = controlRect.right - controlRect.left;
+
+    hdwp = DeferWindowPos(hdwp, m_hPlaylistView, NULL,
+                           controlRect.left,
+                           controlRect.top,
+                           clientRect.right - controlRect.left,
+                           clientRect.bottom - controlRect.top - statusbarHeight,
+                           SWP_NOZORDER);
+
+
+    // Music Catalog View
+    GetWindowRect(m_hMusicCatalog, &controlRect); 
+    MapWindowPoints(NULL, m_hWnd, (LPPOINT)&controlRect, 2);
+    controlHeight = controlRect.bottom - controlRect.top;
+    controlWidth = controlRect.right - controlRect.left;
+
+    hdwp = DeferWindowPos(hdwp, m_hMusicCatalog, NULL,
+                           controlRect.left,
+                           controlRect.top,
+                           controlWidth,
+                           clientRect.bottom - controlRect.top - statusbarHeight,
+                           SWP_NOZORDER);
+
+
+                           
+
+    EndDeferWindowPos(hdwp);
 }
 
 void MusicBrowserUI::GetMinMaxInfo(MINMAXINFO *pInfo)
 {
-    pInfo->ptMaxSize.x = 10000; 
-    pInfo->ptMaxSize.y = 10000; 
-    pInfo->ptMaxPosition.x = 10000; 
-    pInfo->ptMaxPosition.y = 10000; 
     pInfo->ptMinTrackSize = m_sMinSize;
-    pInfo->ptMaxTrackSize.x = 10000; 
-    pInfo->ptMaxTrackSize.y = 10000; 
 }
 
 void MusicBrowserUI::SetMinMaxInfo(void)
 {
 	RECT  sLoc, sLoc2;
     
-	GetWindowRect(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sLoc);
-	GetWindowRect(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), &sLoc2);
+	GetWindowRect(m_hMusicCatalog, &sLoc);
+	GetWindowRect(m_hPlaylistView, &sLoc2);
     m_iCollapseMoveAmount = sLoc2.left - sLoc.left;
 }
 
@@ -449,8 +517,12 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
     DWORD           dwIcon;
     const int32     kNumPanes = 1;
     int32           panes[kNumPanes]= {-1};
+    RECT            rect;
 
     m_hWnd = hWnd;
+    m_hMusicCatalog = GetDlgItem(m_hWnd, IDC_MUSICTREE);
+    m_hPlaylistView = GetDlgItem(m_hWnd, IDC_PLAYLISTBOX);
+
     hShell = GetModuleHandle("SHELL32.DLL");
     
     hList = ImageList_Create(16, 16, ILC_COLOR24|ILC_MASK, 4, 0);
@@ -462,8 +534,7 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
     ImageList_AddIcon(hList, LoadIcon(hShell, MAKEINTRESOURCE(dwIcon)));
     ImageList_AddIcon(hList, LoadIcon(g_hinst, MAKEINTRESOURCE(IDI_ACTIVELIST)));
  
-    TreeView_SetImageList(GetDlgItem(m_hWnd, IDC_MUSICTREE),
-                          hList, TVSIL_NORMAL); 
+    TreeView_SetImageList(m_hMusicCatalog, hList, TVSIL_NORMAL); 
 	FreeLibrary(hShell);
     
     hList = ImageList_Create(16, 16, ILC_COLOR24|ILC_MASK, 1, 0);
@@ -472,8 +543,7 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
     ImageList_AddMasked(hList, bmp, RGB(255,0,0));
     DeleteObject(bmp);
  
-    ListView_SetImageList(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX),
-                          hList, LVSIL_SMALL); 
+    ListView_SetImageList(m_hPlaylistView, hList, LVSIL_SMALL); 
 
     if (m_pParent == NULL)
     {
@@ -502,19 +572,114 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
     SendMessage(m_hStatus, SB_SETPARTS, kNumPanes, (LPARAM) panes);
     m_currentindex = -1;
     UpdateButtonStates();
+
+    // now that we have added all our decorations
+    // (toolbar and statusbar) let's calculate our size.
+    GetWindowRect(hWnd, &rect);
+
+    m_sMinSize.x = rect.right - rect.left;
+    m_sMinSize.y = rect.bottom - rect.top;
     
     if (m_pParent)
         ShowWindow(m_hWnd, SW_SHOW);
 }
 
+#define ID_TOOLBAR         13000
+#define ID_REBAR           13001
+#define TOOLBAR_INDENT	   8
+
 void MusicBrowserUI::CreateToolbar(void)
 {
-	m_hToolbar = CreateToolbarEx(m_hWnd, 
-                     WS_CHILD | WS_BORDER | WS_VISIBLE | 
-                     TBSTYLE_TOOLTIPS | CCS_ADJUSTABLE,
+    INITCOMMONCONTROLSEX icex;
+    //REBARINFO rbi;
+    REBARBANDINFO rbb;
+    RECT rect;
+    RECT dummyRect;
+    HWND hwndDummy = GetDlgItem(m_hWnd, IDC_DUMMYCONTROL);
+
+    GetWindowRect(hwndDummy, &dummyRect);
+    int32 toolbarHeight = dummyRect.bottom - dummyRect.top;
+
+    icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
+    icex.dwICC = ICC_COOL_CLASSES ;	// load the rebar
+	InitCommonControlsEx(&icex);
+
+    GetClientRect(m_hWnd, &rect);
+
+    // Create the REBAR control
+	m_hRebar = CreateWindowEx( 
+				0L,
+				REBARCLASSNAME,
+				NULL,
+                WS_VISIBLE | WS_BORDER | WS_CHILD | 0 |
+                  WS_CLIPSIBLINGS | CCS_NODIVIDER | RBS_VARHEIGHT | 
+                  RBS_BANDBORDERS | CCS_NOPARENTALIGN,
+				0, 0, rect.right - rect.left, toolbarHeight,
+				m_hWnd,
+				(HMENU)ID_REBAR,
+				g_hinst,
+				NULL );
+
+    /*m_hToolbar = CreateToolbarEx(hwndRebar, 
+                     WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT |
+                     TBSTYLE_TOOLTIPS | TBSTYLE_LIST | WS_CLIPCHILDREN | 
+                     WS_CLIPSIBLINGS | CCS_NODIVIDER | CCS_NORESIZE,
                      0, 8, g_hinst, IDB_TOOLBAR,
 		             (LPCTBBUTTON)&tbButtons,
-		             6, 16,16, 16,16, sizeof(TBBUTTON));
+		             6, 44, 44, 16, 16, sizeof(TBBUTTON));*/
+
+    m_hToolbar = CreateWindowEx(0, TOOLBARCLASSNAME, (LPSTR) NULL, 
+                     WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT |
+                     TBSTYLE_TOOLTIPS |  WS_CLIPCHILDREN | 
+                     WS_CLIPSIBLINGS | CCS_NODIVIDER | CCS_NORESIZE, 
+                     0, 0, 0, 0, m_hRebar, (HMENU) ID_TOOLBAR, g_hinst, NULL); 
+
+    // Send the TB_BUTTONSTRUCTSIZE message, which is required for 
+    // backward compatibility. 
+    SendMessage(m_hToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM) sizeof(TBBUTTON), 0); 
+
+    TBADDBITMAP tbab; 
+
+    // Add the bitmap containing button images to the toolbar. 
+    tbab.hInst = g_hinst; 
+    tbab.nID   = IDB_TOOLBAR; 
+    SendMessage(m_hToolbar, TB_ADDBITMAP, (WPARAM) 8, (WPARAM) &tbab); 
+
+    int32 index;
+    index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Music Search");
+    tbButtons[0].iString = index;
+    index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"New Playlist");
+    tbButtons[2].iString = index;
+    index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Import Playlist");
+    tbButtons[3].iString = index;
+    index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Remove Item");
+    tbButtons[4].iString = index;
+    index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Edit playlist");
+    tbButtons[5].iString = index;
+
+    SendMessage(m_hToolbar, TB_ADDBUTTONS, (WPARAM) 6, (LPARAM) &tbButtons);
+    SendMessage(m_hToolbar, TB_SETBUTTONSIZE, (WPARAM) 0, MAKELPARAM(72, toolbarHeight - TOOLBAR_INDENT)); 
+
+    // Initialize REBARBANDINFO for all rebar bands
+	rbb.cbSize = sizeof(REBARBANDINFO);
+	rbb.fMask = RBBIM_COLORS |	// clrFore and clrBack are valid
+		RBBIM_CHILD |				// hwndChild is valid
+		RBBIM_CHILDSIZE |			// cxMinChild and cyMinChild are valid
+		RBBIM_STYLE |				// fStyle is valid
+		RBBIM_ID;					// wID is valid
+	rbb.clrFore = GetSysColor(COLOR_BTNTEXT);
+	rbb.clrBack = GetSysColor(COLOR_BTNFACE);
+	rbb.fStyle = RBBS_NOVERT |	// do not display in vertical orientation
+		            RBBS_CHILDEDGE;
+	rbb.hbmBack = NULL;
+	rbb.hwndChild = m_hToolbar;
+	rbb.wID = ID_TOOLBAR;
+	rbb.cxMinChild = rect.right - rect.left;
+	rbb.cyMinChild = toolbarHeight - TOOLBAR_INDENT;
+
+	// Insert band into rebar
+	SendMessage(m_hRebar, RB_INSERTBAND, (UINT) -1, (LPARAM) &rbb);
+
 }
 
 void MusicBrowserUI::SetTitles(void)
@@ -573,7 +738,7 @@ void MusicBrowserUI::MouseMove(uint32 uFlags, POINT &sPoint)
         
         ClientToWindow(m_hWnd, &sPoint); 
         sHit.pt = sPoint;
-        m_hDropTarget = TreeView_HitTest(GetDlgItem(m_hWnd, IDC_MUSICTREE),
+        m_hDropTarget = TreeView_HitTest(m_hMusicCatalog,
                                          &sHit);
         if (m_hDropTarget != NULL)
         {
@@ -581,7 +746,7 @@ void MusicBrowserUI::MouseMove(uint32 uFlags, POINT &sPoint)
             
             sItem.hItem = m_hDropTarget;
             sItem.mask = TVIF_PARAM;
-            TreeView_GetItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sItem);
+            TreeView_GetItem(m_hMusicCatalog, &sItem);
             if (sItem.lParam < 0)
                SetCursor(m_hDragCursor);
             else    
@@ -612,7 +777,7 @@ void MusicBrowserUI::MouseButtonUp(void)
             
             sItem.hItem = m_hDropTarget;
             sItem.mask = TVIF_PARAM;
-            TreeView_GetItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sItem);
+            TreeView_GetItem(m_hMusicCatalog, &sItem);
 
             assert(sItem.lParam < 0);
             
@@ -634,7 +799,7 @@ void MusicBrowserUI::MouseButtonUp(void)
             UpdatePlaylistList();
             m_bListChanged = true;
                      
-            SetFocus(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX));
+            SetFocus(m_hPlaylistView);
         }    
     }    
 }

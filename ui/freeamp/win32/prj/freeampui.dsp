@@ -323,20 +323,20 @@ SOURCE=..\..\src\Window.cpp
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=..\res\checked.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=..\res\freeampui.rc
 # End Source File
 # Begin Source File
 
 SOURCE=..\res\icon1.ico
 # End Source File
-# End Group
-# Begin Source File
-
-SOURCE=..\res\checked.bmp
-# End Source File
 # Begin Source File
 
 SOURCE=..\res\unchecked.bmp
 # End Source File
+# End Group
 # End Target
 # End Project

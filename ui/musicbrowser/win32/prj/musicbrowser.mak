@@ -121,8 +121,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 Release" "fabaselib - Win32 Release"\
  ".\musicbrowser.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                            ..\..\..\..\base\win32\prj\plugins
-	copy musicbrowser.ui                                                              ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                             ..\..\..\..\base\win32\prj\plugins
+	copy musicbrowser.ui                                                               ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 Debug"
@@ -209,8 +209,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 Debug" "fabaselib - Win32 Debug"\
  ".\musicbrowser.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                            ..\..\..\..\base\win32\prj\plugins
-	copy musicbrowser.ui                                                              ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                             ..\..\..\..\base\win32\prj\plugins
+	copy musicbrowser.ui                                                               ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Debug"
@@ -298,8 +298,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 NASM Debug" "fabaselib - Win32 NASM Debug"\
  ".\musicbrowser.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                            ..\..\..\..\base\win32\prj\plugins
-	copy musicbrowser.ui                                                              ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                             ..\..\..\..\base\win32\prj\plugins
+	copy musicbrowser.ui                                                               ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Release"
@@ -386,8 +386,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 NASM Release"\
  "fabaselib - Win32 NASM Release" ".\musicbrowser.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                            ..\..\..\..\base\win32\prj\plugins
-	copy musicbrowser.ui                                                              ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                             ..\..\..\..\base\win32\prj\plugins
+	copy musicbrowser.ui                                                               ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 
@@ -427,6 +427,9 @@ $(DS_POSTBUILD_DEP) : "gdbm - Win32 NASM Release"\
  "musicbrowser - Win32 Debug" || "$(CFG)" == "musicbrowser - Win32 NASM Debug"\
  || "$(CFG)" == "musicbrowser - Win32 NASM Release"
 SOURCE=..\src\DataIndex.cpp
+
+!IF  "$(CFG)" == "musicbrowser - Win32 Release"
+
 DEP_CPP_DATAI=\
 	"..\..\..\..\base\include\database.h"\
 	"..\..\..\..\base\include\debug.h"\
@@ -446,24 +449,123 @@ DEP_CPP_DATAI=\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\DataIndex.h"\
-	"..\include\Win32MusicBrowser.h"\
+	"..\include\dataindex.h"\
+	"..\include\win32musicbrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
-	
-NODEP_CPP_DATAI=\
-	"..\..\..\..\base\include\config.h"\
-	"..\include\config.h"\
-	"..\src\config.h"\
 	
 
 "$(INTDIR)\DataIndex.obj" : $(SOURCE) $(DEP_CPP_DATAI) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+!ELSEIF  "$(CFG)" == "musicbrowser - Win32 Debug"
+
+DEP_CPP_DATAI=\
+	"..\..\..\..\base\include\database.h"\
+	"..\..\..\..\base\include\debug.h"\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\musicbrowser.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
+	"..\..\..\include\ui.h"\
+	"..\include\dataindex.h"\
+	"..\include\win32musicbrowser.h"\
+	
+
+"$(INTDIR)\DataIndex.obj" : $(SOURCE) $(DEP_CPP_DATAI) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Debug"
+
+DEP_CPP_DATAI=\
+	"..\..\..\..\base\include\database.h"\
+	"..\..\..\..\base\include\debug.h"\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\musicbrowser.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
+	"..\..\..\include\ui.h"\
+	"..\include\dataindex.h"\
+	"..\include\win32musicbrowser.h"\
+	
+
+"$(INTDIR)\DataIndex.obj" : $(SOURCE) $(DEP_CPP_DATAI) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Release"
+
+DEP_CPP_DATAI=\
+	"..\..\..\..\base\include\database.h"\
+	"..\..\..\..\base\include\debug.h"\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\musicbrowser.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
+	"..\..\..\include\ui.h"\
+	"..\include\dataindex.h"\
+	"..\include\win32musicbrowser.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
+	
+
+"$(INTDIR)\DataIndex.obj" : $(SOURCE) $(DEP_CPP_DATAI) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
 SOURCE=..\src\Dialog.cpp
+
+!IF  "$(CFG)" == "musicbrowser - Win32 Release"
+
 DEP_CPP_DIALO=\
 	"..\..\..\..\base\include\database.h"\
 	"..\..\..\..\base\include\debug.h"\
@@ -483,24 +585,123 @@ DEP_CPP_DIALO=\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\DataIndex.h"\
-	"..\include\Win32MusicBrowser.h"\
+	"..\include\dataindex.h"\
+	"..\include\win32musicbrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
-	
-NODEP_CPP_DIALO=\
-	"..\..\..\..\base\include\config.h"\
-	"..\include\config.h"\
-	"..\src\config.h"\
 	
 
 "$(INTDIR)\Dialog.obj" : $(SOURCE) $(DEP_CPP_DIALO) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+!ELSEIF  "$(CFG)" == "musicbrowser - Win32 Debug"
+
+DEP_CPP_DIALO=\
+	"..\..\..\..\base\include\database.h"\
+	"..\..\..\..\base\include\debug.h"\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\musicbrowser.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
+	"..\..\..\include\ui.h"\
+	"..\include\dataindex.h"\
+	"..\include\win32musicbrowser.h"\
+	
+
+"$(INTDIR)\Dialog.obj" : $(SOURCE) $(DEP_CPP_DIALO) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Debug"
+
+DEP_CPP_DIALO=\
+	"..\..\..\..\base\include\database.h"\
+	"..\..\..\..\base\include\debug.h"\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\musicbrowser.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
+	"..\..\..\include\ui.h"\
+	"..\include\dataindex.h"\
+	"..\include\win32musicbrowser.h"\
+	
+
+"$(INTDIR)\Dialog.obj" : $(SOURCE) $(DEP_CPP_DIALO) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Release"
+
+DEP_CPP_DIALO=\
+	"..\..\..\..\base\include\database.h"\
+	"..\..\..\..\base\include\debug.h"\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\musicbrowser.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
+	"..\..\..\include\ui.h"\
+	"..\include\dataindex.h"\
+	"..\include\win32musicbrowser.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
+	
+
+"$(INTDIR)\Dialog.obj" : $(SOURCE) $(DEP_CPP_DIALO) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
 SOURCE=..\src\Event.cpp
+
+!IF  "$(CFG)" == "musicbrowser - Win32 Release"
+
 DEP_CPP_EVENT=\
 	"..\..\..\..\base\include\database.h"\
 	"..\..\..\..\base\include\debug.h"\
@@ -520,24 +721,123 @@ DEP_CPP_EVENT=\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\DataIndex.h"\
-	"..\include\Win32MusicBrowser.h"\
+	"..\include\dataindex.h"\
+	"..\include\win32musicbrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
-	
-NODEP_CPP_EVENT=\
-	"..\..\..\..\base\include\config.h"\
-	"..\include\config.h"\
-	"..\src\config.h"\
 	
 
 "$(INTDIR)\Event.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+!ELSEIF  "$(CFG)" == "musicbrowser - Win32 Debug"
+
+DEP_CPP_EVENT=\
+	"..\..\..\..\base\include\database.h"\
+	"..\..\..\..\base\include\debug.h"\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\musicbrowser.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
+	"..\..\..\include\ui.h"\
+	"..\include\dataindex.h"\
+	"..\include\win32musicbrowser.h"\
+	
+
+"$(INTDIR)\Event.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Debug"
+
+DEP_CPP_EVENT=\
+	"..\..\..\..\base\include\database.h"\
+	"..\..\..\..\base\include\debug.h"\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\musicbrowser.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
+	"..\..\..\include\ui.h"\
+	"..\include\dataindex.h"\
+	"..\include\win32musicbrowser.h"\
+	
+
+"$(INTDIR)\Event.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Release"
+
+DEP_CPP_EVENT=\
+	"..\..\..\..\base\include\database.h"\
+	"..\..\..\..\base\include\debug.h"\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\musicbrowser.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
+	"..\..\..\include\ui.h"\
+	"..\include\dataindex.h"\
+	"..\include\win32musicbrowser.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
+	
+
+"$(INTDIR)\Event.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
 SOURCE=..\src\MusicTree.cpp
+
+!IF  "$(CFG)" == "musicbrowser - Win32 Release"
+
 DEP_CPP_MUSIC=\
 	"..\..\..\..\base\include\database.h"\
 	"..\..\..\..\base\include\debug.h"\
@@ -557,24 +857,123 @@ DEP_CPP_MUSIC=\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\DataIndex.h"\
-	"..\include\Win32MusicBrowser.h"\
+	"..\include\dataindex.h"\
+	"..\include\win32musicbrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
-	
-NODEP_CPP_MUSIC=\
-	"..\..\..\..\base\include\config.h"\
-	"..\include\config.h"\
-	"..\src\config.h"\
 	
 
 "$(INTDIR)\MusicTree.obj" : $(SOURCE) $(DEP_CPP_MUSIC) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+!ELSEIF  "$(CFG)" == "musicbrowser - Win32 Debug"
+
+DEP_CPP_MUSIC=\
+	"..\..\..\..\base\include\database.h"\
+	"..\..\..\..\base\include\debug.h"\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\musicbrowser.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
+	"..\..\..\include\ui.h"\
+	"..\include\dataindex.h"\
+	"..\include\win32musicbrowser.h"\
+	
+
+"$(INTDIR)\MusicTree.obj" : $(SOURCE) $(DEP_CPP_MUSIC) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Debug"
+
+DEP_CPP_MUSIC=\
+	"..\..\..\..\base\include\database.h"\
+	"..\..\..\..\base\include\debug.h"\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\musicbrowser.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
+	"..\..\..\include\ui.h"\
+	"..\include\dataindex.h"\
+	"..\include\win32musicbrowser.h"\
+	
+
+"$(INTDIR)\MusicTree.obj" : $(SOURCE) $(DEP_CPP_MUSIC) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Release"
+
+DEP_CPP_MUSIC=\
+	"..\..\..\..\base\include\database.h"\
+	"..\..\..\..\base\include\debug.h"\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\musicbrowser.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
+	"..\..\..\include\ui.h"\
+	"..\include\dataindex.h"\
+	"..\include\win32musicbrowser.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
+	
+
+"$(INTDIR)\MusicTree.obj" : $(SOURCE) $(DEP_CPP_MUSIC) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
 SOURCE=..\src\PlaylistView.cpp
+
+!IF  "$(CFG)" == "musicbrowser - Win32 Release"
+
 DEP_CPP_PLAYL=\
 	"..\..\..\..\base\include\database.h"\
 	"..\..\..\..\base\include\debug.h"\
@@ -594,24 +993,123 @@ DEP_CPP_PLAYL=\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\DataIndex.h"\
-	"..\include\Win32MusicBrowser.h"\
+	"..\include\dataindex.h"\
+	"..\include\win32musicbrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
-	
-NODEP_CPP_PLAYL=\
-	"..\..\..\..\base\include\config.h"\
-	"..\include\config.h"\
-	"..\src\config.h"\
 	
 
 "$(INTDIR)\PlaylistView.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+!ELSEIF  "$(CFG)" == "musicbrowser - Win32 Debug"
+
+DEP_CPP_PLAYL=\
+	"..\..\..\..\base\include\database.h"\
+	"..\..\..\..\base\include\debug.h"\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\musicbrowser.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
+	"..\..\..\include\ui.h"\
+	"..\include\dataindex.h"\
+	"..\include\win32musicbrowser.h"\
+	
+
+"$(INTDIR)\PlaylistView.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Debug"
+
+DEP_CPP_PLAYL=\
+	"..\..\..\..\base\include\database.h"\
+	"..\..\..\..\base\include\debug.h"\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\musicbrowser.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
+	"..\..\..\include\ui.h"\
+	"..\include\dataindex.h"\
+	"..\include\win32musicbrowser.h"\
+	
+
+"$(INTDIR)\PlaylistView.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Release"
+
+DEP_CPP_PLAYL=\
+	"..\..\..\..\base\include\database.h"\
+	"..\..\..\..\base\include\debug.h"\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\musicbrowser.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
+	"..\..\..\include\ui.h"\
+	"..\include\dataindex.h"\
+	"..\include\win32musicbrowser.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
+	
+
+"$(INTDIR)\PlaylistView.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
 SOURCE=..\src\Win32MusicBrowser.cpp
+
+!IF  "$(CFG)" == "musicbrowser - Win32 Release"
+
 DEP_CPP_WIN32=\
 	"..\..\..\..\base\include\database.h"\
 	"..\..\..\..\base\include\debug.h"\
@@ -632,22 +1130,121 @@ DEP_CPP_WIN32=\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\DataIndex.h"\
-	"..\include\Win32MusicBrowser.h"\
+	"..\include\dataindex.h"\
+	"..\include\win32musicbrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
-	
-NODEP_CPP_WIN32=\
-	"..\..\..\..\base\include\config.h"\
-	"..\include\config.h"\
-	"..\src\config.h"\
 	
 
 "$(INTDIR)\Win32MusicBrowser.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+!ELSEIF  "$(CFG)" == "musicbrowser - Win32 Debug"
+
+DEP_CPP_WIN32=\
+	"..\..\..\..\base\include\database.h"\
+	"..\..\..\..\base\include\debug.h"\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\musicbrowser.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
+	"..\..\..\include\ui.h"\
+	"..\include\dataindex.h"\
+	"..\include\win32musicbrowser.h"\
+	
+
+"$(INTDIR)\Win32MusicBrowser.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Debug"
+
+DEP_CPP_WIN32=\
+	"..\..\..\..\base\include\database.h"\
+	"..\..\..\..\base\include\debug.h"\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\musicbrowser.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
+	"..\..\..\include\ui.h"\
+	"..\include\dataindex.h"\
+	"..\include\win32musicbrowser.h"\
+	
+
+"$(INTDIR)\Win32MusicBrowser.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Release"
+
+DEP_CPP_WIN32=\
+	"..\..\..\..\base\include\database.h"\
+	"..\..\..\..\base\include\debug.h"\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\musicbrowser.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
+	"..\..\..\include\ui.h"\
+	"..\include\dataindex.h"\
+	"..\include\win32musicbrowser.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
+	
+
+"$(INTDIR)\Win32MusicBrowser.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\res\musicbrowser.rc
 DEP_RSC_MUSICB=\

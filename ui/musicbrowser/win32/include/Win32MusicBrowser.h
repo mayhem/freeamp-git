@@ -86,7 +86,7 @@ class MusicBrowserUI : public UserInterface
     void   Close(void);
 	void   ExpandCollapseEvent(void);
     void   GetMinMaxInfo(MINMAXINFO *pInfo);
-    void   SizeWindow(int iWidth, int iHeight);
+    void   SizeWindow(int type, int iWidth, int iHeight);
     void   MouseMove(uint32 uFlags, POINT &sPoint);
     void   MouseButtonUp(void);
     BOOL   DrawItem(int32 controlId, DRAWITEMSTRUCT* dis);
@@ -149,7 +149,8 @@ class MusicBrowserUI : public UserInterface
     EventQueue          *m_playerEQ;
     int32                m_state, m_startupType;
     int32                m_currentindex, m_currentplaying;
-  	HWND                 m_hWnd, m_hStatus, m_hParent, m_hToolbar;
+  	HWND                 m_hWnd, m_hStatus, m_hParent, m_hToolbar, m_hRebar;
+    HWND                 m_hMusicCatalog, m_hPlaylistView;
     PlaylistManager     *m_oPlm;
     bool                 m_initialized, isVisible, m_bListChanged, 
                          m_bSearchInProgress, m_bDragging;

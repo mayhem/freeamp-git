@@ -26,27 +26,23 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // Dialog
 //
 
-IDD_MUSICBROWSER DIALOGEX 0, 0, 359, 180
-STYLE DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_MUSICBROWSER DIALOGEX 0, 0, 360, 200
+STYLE DS_CENTER | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | 
+    WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "FreeAmp - My Music"
 MENU IDR_MENU1
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Sans Serif"
 BEGIN
     CONTROL         "Tree1",IDC_MUSICTREE,"SysTreeView32",TVS_HASBUTTONS | 
-                    TVS_HASLINES | WS_BORDER | WS_TABSTOP,2,19,134,149,
+                    TVS_HASLINES | WS_BORDER | WS_TABSTOP,0,40,136,148,
                     WS_EX_CLIENTEDGE
-    LTEXT           "My Music Catalog:",IDC_MUSICCATALOGTEXT,4,7,59,8
-    PUSHBUTTON      "&Up",IDC_UP,307,21,50,14
-    PUSHBUTTON      "D&elete",IDC_DELETE,307,99,50,14
-    PUSHBUTTON      "&Add",IDC_ADD,307,73,50,14
-    PUSHBUTTON      "&Down",IDC_DOWN,307,47,50,14
-    PUSHBUTTON      "&Save List",IDC_SAVELIST,307,125,50,14
-    PUSHBUTTON      "Clear List",IDC_CLEARLIST,307,151,50,14
+    LTEXT           "My Music Collection",IDC_MUSICCATALOGTEXT,4,29,64,8
     CONTROL         "List1",IDC_PLAYLISTBOX,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_OWNERDRAWFIXED | WS_BORDER | 
-                    WS_TABSTOP,138,19,166,149,WS_EX_CLIENTEDGE
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,0,357,1
-    LTEXT           "",IDC_PLAYLISTTITLE,140,7,217,8
+                    WS_TABSTOP,139,40,220,148,WS_EX_CLIENTEDGE
+    LTEXT           "",IDC_PLAYLISTTITLE,143,29,217,8
+    PUSHBUTTON      "DUMMY",IDC_DUMMYCONTROL,0,0,359,27,BS_FLAT | NOT 
+                    WS_VISIBLE | NOT WS_TABSTOP
 END
 
 IDD_OPENURL DIALOG FIXED IMPURE  0, 0, 280, 21
@@ -70,8 +66,7 @@ GUIDELINES DESIGNINFO DISCARDABLE
 BEGIN
     IDD_MUSICBROWSER, DIALOG
     BEGIN
-        RIGHTMARGIN, 357
-        BOTTOMMARGIN, 168
+        BOTTOMMARGIN, 189
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -232,6 +227,17 @@ BEGIN
 END
 
 #endif    // !_MAC
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_TOOLBAR             "button1"
+END
 
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
