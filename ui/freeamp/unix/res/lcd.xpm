@@ -1,5 +1,5 @@
 /* XPM */
-static char *lcd[] = {
+char *lcd[] = {
 /* width height num_colors chars_per_pixel */
 "   190    51      149            2",
 /* colors */

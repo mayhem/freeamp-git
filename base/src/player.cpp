@@ -53,8 +53,7 @@ EventQueue() {
     m_eventSem = new Semaphore();
     m_eventQueue = new Queue<Event *>();
     //cout << "Created queue" << endl;
-    m_eventServiceThread = Thread::CreateThread();
-    m_eventServiceThread->Create(Player::EventServiceThreadFunc,this);
+    m_eventServiceThread = NULL;
     //cout << "Started event thread" << endl;
     m_uiVector = new Vector<UserInterface *>();
     //cout << "Created vectors" << endl;
@@ -81,20 +80,25 @@ EventQueue() {
 
     m_argc  = 0;
     m_argv  = NULL;
-
+    m_prefs = NULL;
     m_pTermSem = NULL;
 
+    m_didUsage = false;
     //m_autoplay = false;
 }
 
-#define TYPICAL_DELETE(x) if (x) { delete x; x = NULL; }
+#define TYPICAL_DELETE(x) /*printf("deleting...\n");*/ if (x) { delete x; x = NULL; }
 
 Player::~Player() {
 
-	TYPICAL_DELETE(m_pTermSem);
-
+    TYPICAL_DELETE(m_pTermSem);
+    
     //cout << "waiting for service thread to end..." << endl;
-    m_eventServiceThread->Join();
+    if (m_eventServiceThread) {
+	m_eventServiceThread->Join();
+	delete m_eventServiceThread;
+	m_eventServiceThread = NULL;
+    }
 
     //cout << "serivce thread done.." << endl;
     if (m_lmc) {
@@ -105,9 +109,6 @@ Player::~Player() {
 
     //cout << "done deleting myLMC" << endl;
 	TYPICAL_DELETE(m_eventSem);
-
-    //cout << "Player: deleting event service thread" << endl;
-	TYPICAL_DELETE(m_eventServiceThread);
 
     //cout << "Player: deleting event queue" << endl;
 	TYPICAL_DELETE(m_eventQueue);
@@ -152,10 +153,10 @@ void Player::SetTerminationSemaphore(Semaphore *pSem) {
     m_pTermSem = pSem;
 }
 
+/* return true if parsing was successful, false otherwise. */
 
-void Player::SetArgs(int32 argc, char** argv){
-    m_argc = argc;
-    m_argv = argv;
+bool Player::SetArgs(int32 argc, char** argv){
+    Vector<char *> argVector;
 
     char *arg = NULL;
 #ifndef WIN32
@@ -169,36 +170,69 @@ void Player::SetArgs(int32 argc, char** argv){
     }
     sprintf(m_argUI,"%s.ui",pBegin);
 #endif
-    for(int32 i = 1;i < m_argc; i++) 
+    argVector.Insert(argv[0]);
+    for(int32 i = 1;i < argc; i++) 
     {
-	    arg = m_argv[i];
-
-	    if (arg[0] == '-') 
-        {
-	        switch (arg[1]) 
-            {
-                case 'u':
+	arg = argv[i];
+	
+	if (arg[0] == '-') 
+	{
+	    switch (arg[1]) 
+	    {
+		case '-':
+		    if (!strcmp(&(arg[2]),"help")) {
+			Usage(argv[0]);
+			argVector.Insert(argv[i]);
+		    }
+		    break;
+		case 'u':
                 case 'U':
                 {
                     if( arg[2] == 'i' ||
                         arg[2] == 'I')
                     {
                         i++;
-			if (i >= m_argc) {
-			    cerr << "FreeAmp: -ui switch requires an argument" << endl;
-			    cerr << "FreeAmp will exit." << endl;
-			    exit(1);
+			if (i >= argc) {
+			    Usage(argv[0]);
+			    AcceptEvent(new Event(CMD_QuitPlayer));
+			    return false;
 			}
-			arg = m_argv[i];
+			arg = argv[i];
 			if (m_argUI) delete m_argUI;
                         m_argUI = new char[strlen(arg) + 1];
                         strcpy(m_argUI, arg);
                     }
 		    break;
-		} 
+		}
+		case 'h':
+		case 'H':
+		    Usage(argv[0]);
+		    argVector.Insert(argv[i]);
+		    break;
+		default:
+		    argVector.Insert(argv[i]);
             }
-        }
+        } else {
+	    argVector.Insert(argv[i]);
+	}
     }
+    m_argc = argVector.NumElements();
+    if (m_argc) {
+	m_argv = new (char *)[m_argc];
+	for(int f = 0;f < m_argc;f++) {
+	    m_argv[f] = argVector.ElementAt(f);
+	    //cerr << "Adding argument (" << f << "): " << m_argv[f] << endl;
+	}
+    }
+    return true;
+}
+
+void Player::Usage(const char *progname) {
+    if (m_didUsage) return;
+    cout << "freeamp global usage:" << endl;
+    cout << "   " << progname << " [-ui <UI plugin name>]..." << endl;
+    cout << endl;
+    m_didUsage = true;
 }
 
 int32 Player::CompareNames(const char *p1, const char *p2) {
@@ -230,6 +264,9 @@ void Player::Run(){
     uint32 len = 256;
     Error error = kError_NoErr;
 
+    m_eventServiceThread = Thread::CreateThread();
+    m_eventServiceThread->Create(Player::EventServiceThreadFunc,this);
+
     // which ui should we instantiate first??
     if(m_argUI == NULL)
     {
@@ -256,7 +293,7 @@ void Player::Run(){
     if(IsntError(error))
     {
         RegistryItem* item = NULL;
-		UserInterface *ui = NULL;
+	UserInterface *ui = NULL;
         int32 i = 0;
 	    int32 uisActivated = 0;
 	
@@ -267,11 +304,16 @@ void Player::Run(){
 		        m_ui = (UserInterface *)item->InitFunction()();
 		
 		        m_ui->SetTarget((EventQueue *)this);
-		        m_ui->SetPlayListManager(m_plm);
-                m_ui->SetArgs(m_argc, m_argv);
-                RegisterActiveUI(m_ui);
-		        m_ui->Init();
-		        uisActivated++;
+ 		        m_ui->SetPlayListManager(m_plm);
+			m_ui->SetArgs(m_argc, m_argv);
+		        Error er = m_ui->Init();
+			if (er == kError_NoErr) {
+			    RegisterActiveUI(m_ui);
+			} else {
+			    delete m_ui;
+			    m_ui = NULL;
+			}
+			uisActivated++;
                 break;
             }
         }
@@ -737,10 +779,17 @@ int32 Player::ServiceEvent(Event *pC) {
 		Event *pe = new Event(CMD_Cleanup);
 		SendToUI(pe);
 		delete pe;
-		// 5) Release CIO/COO manipulation lock
-		ReleaseUIManipLock();
+
 		delete pC;
-		return 0;
+		if (m_quitWaitingFor == 0) {
+		    if (m_pTermSem) {
+			m_pTermSem->Signal();
+		    }
+		    return 1;
+		} else {
+		    ReleaseUIManipLock();
+		    return 0;
+		}
 		break; 
             }
 	    
@@ -757,7 +806,9 @@ int32 Player::ServiceEvent(Event *pC) {
 		}
 		
 		GetUIManipLock();
-		m_pTermSem->Signal();
+		if (m_pTermSem) {
+		    m_pTermSem->Signal();
+		}
 		//Event* pe = new Event(CMD_Terminate);
 		//SendToUI(pe);
 		//delete pe;

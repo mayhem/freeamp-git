@@ -1,5 +1,5 @@
 /* XPM */
-static char *leftside256[] = {
+char *leftside256[] = {
 /* width height num_colors chars_per_pixel */
 "   138    51       36            1",
 /* colors */

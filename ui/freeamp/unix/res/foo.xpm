@@ -1,5 +1,5 @@
 /* XPM */
-static char * foo_xpm[] = {
+char * foo_xpm[] = {
 "433 51 3 1",
 " 	c None",
 ".	c #FFFFFF",

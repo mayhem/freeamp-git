@@ -25,6 +25,8 @@ ____________________________________________________________________________*/
 #define _UI_H_
 
 #include "event.h"
+#include "errors.h"
+
 #include "playlist.h"
 
 class UserInterface : public EventQueue {
@@ -32,8 +34,8 @@ class UserInterface : public EventQueue {
     virtual int32 AcceptEvent(Event *) = 0;
     virtual void SetArgs(int32,char **) = 0;
     virtual void SetTarget(EventQueue *) = 0;
-	virtual void SetPlayListManager(PlayListManager *) = 0;
-    virtual void Init() = 0;
+    virtual void SetPlayListManager(PlayListManager *) = 0;
+    virtual Error Init() = 0;
     virtual ~UserInterface() {}
 };
 

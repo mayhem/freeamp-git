@@ -41,11 +41,6 @@ USAGE (Unix):
   $(libdir) is the libdir directory set by 'configure' when freeamp
   was built.  This is usually /usr/local/lib.  
 
-  (As a side note, the ~ (of course) means your home directory.  We grab this information
-  from the environment variable $HOME, rather than parse
-  /etc/passwd).  We plan to parse /etc/password later, but for now...)
-
-
 USAGE (Windows):
 
   freeamp [options] [file 1] [file 2]...

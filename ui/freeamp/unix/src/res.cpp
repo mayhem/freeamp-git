@@ -20,33 +20,9 @@
 	
 	$Id$
 ____________________________________________________________________________*/
-// CommandLineCIO.h
 
 
-#ifndef _COMMANDLINECIO_H_
-#define _COMMANDLINECIO_H_
 
-#include "ui.h"
-#include "event.h"
-#include "thread.h"
-#include "playlist.h"
-
-class cmdlineUI : public UserInterface {
- public:
-    cmdlineUI();
-    virtual int32 AcceptEvent(Event *);
-    virtual void SetArgs(int argc, char **argv);
-    virtual void SetTarget(EventQueue *eqr) { m_playerEQ = eqr; }
-    virtual Error Init() { return kError_NoErr; }
-    virtual void SetPlayListManager(PlayListManager *);
-    static void keyboardServiceFunction(void *);
-    virtual ~cmdlineUI();
- private:
-    EventQueue *m_playerEQ;
-    void processSwitch(char *);
-    Thread *keyboardListenThread;
-    PlayListManager *m_plm;
-};
-
-
-#endif // _COMMANDLINECIO_H_
+#define LOAD_GRAPHICS
+#include "graphics.h"
+#undef LOAD_GRAPHICS

@@ -1,5 +1,5 @@
 /* XPM */
-static char *repeat_icon256[] = {
+char *repeat_icon256[] = {
 /* width height num_colors chars_per_pixel */
 "    12     7       14            1",
 /* colors */

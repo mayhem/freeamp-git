@@ -1,5 +1,5 @@
 /* XPM */
-static char *all_icon256[] = {
+char *all_icon256[] = {
 /* width height num_colors chars_per_pixel */
 "    11     8       11            1",
 /* colors */

@@ -25,7 +25,9 @@ ____________________________________________________________________________*/
 #ifdef WIN32
 #include <windows.h>
 #else
+#include <pwd.h>
 #include <stdlib.h>
+#include <unistd.h>
 #endif // WIN32
 
 #include <stdio.h>
@@ -75,13 +77,36 @@ InitializeRegistry(Registry* registry, Preferences* prefs)
     {
 #ifndef WIN32
         if (dir[0] == '~') {
-	    char newdir[MAX_PATH];
-	    strcpy(newdir,getenv("HOME"));
-	    char *pSlash = strchr(dir,'/');
-	    if (pSlash) {
-		strcat(newdir,pSlash);
+	    if (dir[1] != '/') {
+		// a ~ then a users name
+		char newdir[MAX_PATH];
+		char *tmp = strchr(dir,'/');
+		char tmpChar = 0x00;
+		if (tmp) { tmpChar = *tmp; *tmp = '\0'; }
+		struct passwd *pwd = getpwnam(&(dir[1]));
+		if (pwd) {
+		    strcpy(newdir, pwd->pw_dir);
+		    if (tmpChar) { *tmp = tmpChar; }
+		    if (tmp) { strcat(newdir,tmp); }
+		    memcpy(dir,newdir,MAX_PATH);
+		} else {
+		    cerr << "Couldn't get user's identity: " << &(dir[1]) << endl;
+		}
+	    } else {
+		// just a ~
+		char newdir[MAX_PATH];
+		struct passwd *pwd = getpwuid(getuid());
+		if (pwd) {
+		    strcpy(newdir,pwd->pw_dir);
+		    char *pSlash = strchr(dir,'/');
+		    if (pSlash) {
+			strcat(newdir,pSlash);
+		    }
+		    memcpy(dir,newdir,MAX_PATH);
+		} else {
+		    cerr << "Couldn't get user's identity: " << getuid() << endl;
+		}
 	    }
-	    memcpy(dir,newdir,MAX_PATH);
 	}
 #endif
 	len = sizeof(dir);
@@ -103,6 +128,8 @@ InitializeRegistry(Registry* registry, Preferences* prefs)
 
         handle = FindFirstFile(search, &find);
 
+	//cerr << "Searching: " << search << endl;
+
         if(handle != INVALID_HANDLE_VALUE)
         {
             do
@@ -117,7 +144,11 @@ InitializeRegistry(Registry* registry, Preferences* prefs)
 #endif
                 char file[MAX_PATH];
 
+		//cerr << "Found file: " << find.cFileName << endl;
+
                 sprintf(file, "%s%s%s", dir, DIR_MARKER_STR, find.cFileName);
+
+		//cerr << "Trying to load: " << file << endl;
 
                 RegistryItem* item = new RegistryItem;
 

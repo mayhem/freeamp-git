@@ -65,6 +65,13 @@ FreeAmpUI::FreeAmpUI() {
     m_done = false;
     m_initialized = false;
     m_needsWiggling = true;
+    m_noStartUp = false;
+    m_timerThread = NULL;
+    m_seekDelta = 0;
+    m_seekSlice = 0;
+    m_currSeconds = 0;
+    m_totalSeconds = 0;
+    m_seekSeconds = 0;
 }
 FreeAmpUI::~FreeAmpUI() {
     if (m_windowHash) {
@@ -77,8 +84,10 @@ FreeAmpUI::~FreeAmpUI() {
 	delete m_timerThread;
 	m_timerThread = NULL;
     }
-    XFreeGC(m_display, m_gc);
-    XCloseDisplay(m_display);
+    if (!m_noStartUp) {
+	XFreeGC(m_display, m_gc);
+	XCloseDisplay(m_display);
+    }
 
 }
 
@@ -86,8 +95,11 @@ void FreeAmpUI::SetPlayListManager(PlayListManager *plm) {
     m_plm = plm;
 }
 
-void FreeAmpUI::Init()
+Error FreeAmpUI::Init()
 {
+    if (m_noStartUp) {
+	return kError_InitFailedSafely;
+    }
 
     XSizeHints *size_hints;
     XIconSize *size_list;
@@ -266,7 +278,7 @@ void FreeAmpUI::Init()
     } else {
 	cerr << "Only know how to deal with bit depths  >= 8 !!!" << endl;
 	m_playerEQ->AcceptEvent(new Event(CMD_QuitPlayer));
-	return;
+	return kError_InitFailed;
     }
 
     int x=0;
@@ -311,6 +323,10 @@ void FreeAmpUI::Init()
     m_lcdWindow->SetRepeatAllPixmap(all_icon_pixmap);
     r.x = REPEAT_ALL_ICON_X; r.y = REPEAT_ALL_ICON_Y; r.width = REPEAT_ALL_ICON_WIDTH; r.height = REPEAT_ALL_ICON_HEIGHT;
     m_lcdWindow->SetRepeatAllRect(r);
+
+    m_lcdWindow->SetCurrentTime(0,0,0);
+    m_lcdWindow->SetSeekTime(0,0,0);
+    m_lcdWindow->SetTotalTime(0,0,0);
 
     m_playListDrawerWindow->SetPixmap(playlist_drawer_pixmap);
     m_playListDrawerWindow->SetMask(playlist_drawer_mask_pixmap);
@@ -436,6 +452,8 @@ void FreeAmpUI::Init()
     m_timerContinue = true;
     m_timerThread = Thread::CreateThread();
     m_timerThread->Create(FreeAmpUI::TimerEventFunction,this);
+    
+    return kError_NoErr;
 
 }
 
@@ -646,8 +664,28 @@ int32 FreeAmpUI::AcceptEvent(Event *e) {
 void FreeAmpUI::SetArgs(int argc, char **argv) {
     m_argc = argc;
     m_argv = argv;
+    // delay arg parsing till later, except for looking for -h and --help
+    // if found, set m_noStartUp to true and send the QuitPlayer message...
+    for (int i = 0;i < m_argc;i++) {
+	if (m_argv[i][0] == '-') {
+	    if ((m_argv[i][1] == 'h') ||
+		(m_argv[i][1] == 'H') ||
+		!strcmp(&(m_argv[i][1]),"-help")) {
+		m_noStartUp = true;
+		Usage();
+		m_playerEQ->AcceptEvent(new Event(CMD_QuitPlayer));
+	    }
+	    
+	}
+    }
+
 }
 
+void FreeAmpUI::Usage() {
+    cout << "FreeAmp X11 UI PlugIn usage:" << endl;
+    cout << "   [any global FreeAmp option] <file1> [file2] ..." << endl;
+    cout << endl;
+}
 
 
 void FreeAmpUI::playFunction(void *p) {
@@ -677,7 +715,11 @@ void FreeAmpUI::pauseFunction(void *p) {
 
 void FreeAmpUI::prevFunction(void *p) {
     //cerr << "prev" << endl;
-    ((FreeAmpUI *)p)->m_playerEQ->AcceptEvent(new Event(CMD_PrevMediaPiece));
+    if ( ((FreeAmpUI *)p)->m_currSeconds < 2) {
+	((FreeAmpUI *)p)->m_playerEQ->AcceptEvent(new Event(CMD_PrevMediaPiece));
+    } else {
+	((FreeAmpUI *)p)->m_playerEQ->AcceptEvent(new Event(CMD_Play));
+    }
 }
 
 void FreeAmpUI::nextFunction(void *p) {
@@ -774,16 +816,26 @@ void FreeAmpUI::VolumeDialFunction(void *p, int32 c,int32 x, int32 y) {
     }
 }
 
+#define PIXELS_PER_DELTA 8
+#define SEEK_SLICE 6
 void FreeAmpUI::SeekDialFunction(void *p, int32 c,int32 x,int32 y) {
     FreeAmpUI *pMe = (FreeAmpUI *)p;
     //cout << "seek c: " << c << endl;
     switch (c) {
-	case 0:
+	case 0: {
+	    pMe->m_seekDelta = 0;
+	    pMe->m_currSeconds = pMe->m_seekSeconds;
+	    int32 s = pMe->m_seekSeconds;
+	    int32 h = s / 3600;
+	    int32 m = (s % 3600) / 60;
+	    s = ((s % 3600) % 60);
+	    pMe->m_lcdWindow->SetCurrentTime(h,m,s);
 	    pMe->m_lcdWindow->SetDisplayState( pMe->m_oldLcdState);
 	    pMe->m_playerEQ->AcceptEvent(new ChangePositionEvent( pMe->m_seekSeconds / pMe->m_secondsPerFrame ));
 
-	    break;
+	    break; }
 	case 1: {
+	    pMe->m_seekDelta = 0;
 	    pMe->m_oldLcdState = pMe->m_lcdWindow->GetDisplayState();
 	    pMe->m_seekSeconds = pMe->m_currSeconds;
 	    int32 s = pMe->m_seekSeconds;
@@ -792,9 +844,10 @@ void FreeAmpUI::SeekDialFunction(void *p, int32 c,int32 x,int32 y) {
 	    s = ((s % 3600) % 60);
 	    pMe->m_lcdWindow->SetSeekTime(h,m,s);
 	    pMe->m_lcdWindow->SetDisplayState(FALcdWindow::SeekTimeState);
-
 	    break; }
 	case 2: {
+	    pMe->m_seekDelta = (y * -1) / PIXELS_PER_DELTA;
+#if 0
 	    pMe->m_seekSeconds++;
 	    if (pMe->m_seekSeconds > pMe->m_totalSeconds) {
 		pMe->m_seekSeconds = pMe->m_totalSeconds;
@@ -805,8 +858,11 @@ void FreeAmpUI::SeekDialFunction(void *p, int32 c,int32 x,int32 y) {
 	    s = ((s % 3600) % 60);
 	    pMe->m_lcdWindow->SetSeekTime(h,m,s);
 	    pMe->m_lcdWindow->Draw(FALcdWindow::TimeOnly);
+#endif
 	    break; }
 	case 3: {
+	    pMe->m_seekDelta = (y * -1) / PIXELS_PER_DELTA;
+#if 0
 	    pMe->m_seekSeconds--;
 	    if (pMe->m_seekSeconds < 0) {
 		pMe->m_seekSeconds = 0;
@@ -817,12 +873,26 @@ void FreeAmpUI::SeekDialFunction(void *p, int32 c,int32 x,int32 y) {
 	    s = ((s % 3600) % 60);
 	    pMe->m_lcdWindow->SetSeekTime(h,m,s);
 	    pMe->m_lcdWindow->Draw(FALcdWindow::TimeOnly);
+#endif
 	    break; }
     }
 }
 
-void FreeAmpUI::SeekAction() {
-    
+void FreeAmpUI::SeekJogAction() {
+    //cout << "seek delta: " << m_seekDelta << endl;
+    m_seekSeconds += m_seekDelta;
+    if (m_seekSeconds < 0) m_seekSeconds = 0;
+    if (m_seekSeconds > m_totalSeconds) m_seekSeconds = 0;
+    int32 s = m_seekSeconds;
+    int32 h = s / 3600;
+    int32 m = (s % 3600) / 60;
+    s = ((s % 3600) % 60);
+    m_lcdWindow->SetSeekTime(h,m,s);
+    if (m_seekDelta) {
+	XLockDisplay(m_display);
+	m_lcdWindow->Draw(FALcdWindow::TimeOnly);
+	XUnlockDisplay(m_display);
+    }
 }
 
 void FreeAmpUI::TimerEventFunction(void *p) {
@@ -834,7 +904,10 @@ void FreeAmpUI::TimerEventFunction(void *p) {
 	    pMe->m_needsWiggling = pMe->m_lcdWindow->WiggleMainText();
 	    XUnlockDisplay(pMe->m_display);
 	}
-	pMe->SeekAction();
+	if (pMe->m_seekSlice) {
+	    pMe->SeekJogAction();
+	}
+	pMe->m_seekSlice = ++(pMe->m_seekSlice) % SEEK_SLICE;
 	usleep(170000);
     }
 }

@@ -1,5 +1,5 @@
 /* XPM */
-static char *mode_buttons256[] = {
+char *mode_buttons256[] = {
 /* width height num_colors chars_per_pixel */
 "    13    39       18            1",
 /* colors */

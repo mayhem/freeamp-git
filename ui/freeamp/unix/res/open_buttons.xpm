@@ -1,5 +1,5 @@
 /* XPM */
-static char *open_buttons[] = {
+char *open_buttons[] = {
 /* width height num_colors chars_per_pixel */
 "    13    39       65            2",
 /* colors */

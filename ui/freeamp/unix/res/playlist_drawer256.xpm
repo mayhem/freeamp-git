@@ -1,5 +1,5 @@
 /* XPM */
-static char * playlist_drawer256[] = {
+char * playlist_drawer256[] = {
 "190 26 23 1",
 " 	c None",
 ".	c #808080",

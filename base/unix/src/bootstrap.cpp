@@ -101,12 +101,13 @@ int main(int argc, char **argv) {
 
 
 
-    pP->SetArgs(argc,argv);
-    pP->SetPreferences(prefs);
-    pP->SetTerminationSemaphore(termSemaphore);
-    pP->Run();
-
-    termSemaphore->Wait();
+    if (pP->SetArgs(argc,argv)) {
+	pP->SetPreferences(prefs);
+	pP->SetTerminationSemaphore(termSemaphore);
+	pP->Run();
+	
+	termSemaphore->Wait();
+    }
     delete pP;
     return 0;
 }

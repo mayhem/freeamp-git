@@ -1,5 +1,5 @@
 /* XPM */
-static char * small_font[] = {
+char * small_font[] = {
 "10 1500 573 2",
 "  	c None",
 ". 	c #C5C5B8",

@@ -1,5 +1,5 @@
 /* XPM */
-static char * lcd_upper_frame256[] = {
+char * lcd_upper_frame256[] = {
 "190 25 20 1",
 " 	c None",
 ".	c #000000",

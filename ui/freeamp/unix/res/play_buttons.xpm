@@ -1,5 +1,5 @@
 /* XPM */
-static char * play_buttons[] = {
+char * play_buttons[] = {
 "20 60 995 2",
 "  	c None",
 ". 	c #747986",

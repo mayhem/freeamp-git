@@ -1,5 +1,5 @@
 /* XPM */
-static char *next_buttons[] = {
+char *next_buttons[] = {
 /* width height num_colors chars_per_pixel */
 "    20    60      241            2",
 /* colors */

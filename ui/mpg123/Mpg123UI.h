@@ -39,7 +39,7 @@ class Mpg123UI : public UserInterface {
     virtual int32 AcceptEvent(Event *);
     virtual void SetArgs(int argc, char **argv);
     virtual void SetTarget(EventQueue *);
-    virtual void Init() {}
+    virtual Error Init() { return kError_NoErr; }
     virtual void SetPlayListManager(PlayListManager *);
     
     ~Mpg123UI();

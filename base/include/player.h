@@ -61,7 +61,7 @@ class Player : public EventQueue {
     int32 RegisterUIs(UIRegistry* registry);
 
     void Run();
-    void SetArgs(int32 argc, char** argv);
+    bool SetArgs(int32 argc, char** argv);
     void SetPreferences(Preferences *);
     void SetTerminationSemaphore(Semaphore *);
     void testQueue();
@@ -75,12 +75,13 @@ class Player : public EventQueue {
     void ReleaseUIManipLock();
     int32 CompareNames(const char *,const char *);
     void SendToUI(Event *);
-
+    void Usage(const char *);
     bool SetState(PlayerState);
     int32 ServiceEvent(Event *);
 
 
  private:
+    bool                    m_didUsage;
     Preferences*            m_prefs;
     Semaphore*              m_pTermSem;
     static Player*          m_thePlayer;

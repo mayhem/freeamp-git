@@ -1,5 +1,5 @@
 /* XPM */
-static char * lcd_display256[] = {
+char * lcd_display256[] = {
 "159 30 14 1",
 " 	c None",
 ".	c #2A3F55",

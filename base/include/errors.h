@@ -28,8 +28,8 @@ ____________________________________________________________________________*/
 
 typedef enum Error
 {
-	kError_NoErr		    = 0,
-	kError_UnknownErr	    = 1,
+    kError_NoErr		    = 0,
+    kError_UnknownErr	    = 1,
     kError_InvalidParam     = 2,
     kError_LoadLibFailed    = 3,
     kError_FindFuncFailed   = 4,
@@ -49,7 +49,9 @@ typedef enum Error
     kError_GotDefaultMethod = 18,
     kError_InputUnsuccessful = 19,
     kError_FileSeekNotSupported = 20,
-    kError_OutputUnsuccessful = 21
+    kError_OutputUnsuccessful = 21,
+    kError_InitFailed = 22,
+    kError_InitFailedSafely
 }Error;
 
 

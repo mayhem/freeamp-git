@@ -1,5 +1,5 @@
 /* XPM */
-static char *dials256[] = {
+char *dials256[] = {
 /* width height num_colors chars_per_pixel */
 "    66    51       31            1",
 /* colors */

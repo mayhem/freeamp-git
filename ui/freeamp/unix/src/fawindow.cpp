@@ -785,11 +785,11 @@ void FADialWindow::DoEvent(XEvent e) {
 		    m_currentDial = tmpInt * -1;
 		}
 		if (m_prevY < e.xmotion.y_root) {
-		    m_func(m_cookie,3,e.xmotion.x_root,e.xmotion.y_root);
+		    m_func(m_cookie,3,e.xmotion.x_root - m_buttonClickSpotX,e.xmotion.y_root - m_buttonClickSpotY);
 		} else if (m_prevY == e.xmotion.y_root) {
-		    m_func(m_cookie,5,e.xmotion.x_root,e.xmotion.y_root);
+		    m_func(m_cookie,5,e.xmotion.x_root - m_buttonClickSpotX,e.xmotion.y_root - m_buttonClickSpotY);
 		} else {
-		    m_func(m_cookie,2,e.xmotion.x_root,e.xmotion.y_root);
+		    m_func(m_cookie,2,e.xmotion.x_root - m_buttonClickSpotX,e.xmotion.y_root - m_buttonClickSpotY);
 		}
 		m_prevY = e.xmotion.y_root;
 		Draw();
@@ -824,6 +824,5 @@ void FADialWindow::SetMotionFunction(dial_motion_function f, void *c) {
     m_func = f;
     m_cookie = c;
 }
-
 
 

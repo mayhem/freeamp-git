@@ -1,5 +1,5 @@
 /* XPM */
-static char *last_buttons256[] = {
+char *last_buttons256[] = {
 /* width height num_colors chars_per_pixel */
 "    20    60       50            1",
 /* colors */

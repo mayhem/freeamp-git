@@ -1,5 +1,5 @@
 /* XPM */
-static char *shuffled_icon256[] = {
+char *shuffled_icon256[] = {
 /* width height num_colors chars_per_pixel */
 "    11     6       12            1",
 /* colors */
