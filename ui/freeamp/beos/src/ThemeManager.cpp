@@ -41,7 +41,7 @@ ThemeManager::~ThemeManager(void)
 
 Error ThemeManager::GetDefaultTheme(string &oThemePath)
 {
-    char              dir[MAX_PATH];
+    char              dir[_MAX_PATH];
     uint32            len = sizeof(dir);
 
     m_pContext->prefs->GetInstallDirectory(dir, &len);
@@ -55,7 +55,7 @@ Error ThemeManager::GetThemeList(map<string, string> &oThemeFileMap)
 {
     WIN32_FIND_DATA find;
     HANDLE          handle;
-    char            dir[MAX_PATH], *ptr;
+    char            dir[_MAX_PATH], *ptr;
     uint32          len = sizeof(dir);
     string          oThemePath, oThemeBasePath, oThemeFile;
 

@@ -77,8 +77,8 @@ CanvasView::MouseDown( BPoint p )
     ConvertToScreen( &p );
 
     Pos pos;
-    pos.x = p.x;
-    pos.y = p.y;
+    pos.x = (int)p.x;
+    pos.y = (int)p.y;
     m_parent->HandleMouseLButtonDown( pos );
 }
 

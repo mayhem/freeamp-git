@@ -32,14 +32,14 @@ ____________________________________________________________________________*/
 #define CHECK_POINT CHECK_POINT_MSG("")
 #define CHECK_POINT_MSG(a) PRINT(( "File %s Line %d: %s\n", __FILE__, __LINE__, a ))
 
-BeOSBitmap::BeOSBitmap( string& oName )
+BeOSBitmap::BeOSBitmap( const string& oName )
 :   Bitmap( oName ),
     m_bitmap( NULL )
 {
     CHECK_POINT;
 }
 
-BeOSBitmap::BeOSBitmap( int iWidth, int iHeight, string& oName,
+BeOSBitmap::BeOSBitmap( int iWidth, int iHeight, const string& oName,
                         bool acceptViews )
 :   Bitmap( oName ),
     m_bitmap( NULL ),
@@ -69,6 +69,30 @@ BeOSBitmap::~BeOSBitmap()
 bool
 BeOSBitmap::IsPosVisible( Pos& oPos )
 {
+	char* bits = (char*)m_bitmap->Bits();
+	int32 bytesPerPixel;
+	color_space space = m_bitmap->ColorSpace();
+	
+	switch(space)
+	{
+		case B_RGB32:
+			bytesPerPixel = 4;
+			break;
+		case B_CMAP8:
+			bytesPerPixel = 1;
+			break;
+		default:
+			bytesPerPixel = 0; 
+	}
+	
+	
+	uint32* pixel = (uint32*)(bits + (m_bitmap->BytesPerRow()*oPos.y) + (bytesPerPixel*oPos.x));
+	
+	if ( *pixel == B_TRANSPARENT_MAGIC_RGBA32)
+	{
+		return false;
+	}
+	
     return true;
 }
 
@@ -110,13 +134,16 @@ BeOSBitmap::LoadBitmapFromDisk( string& oFile )
     // set transparency
     if ( m_bHasTransColor )
     {
-        uint32  trans = (m_oTransColor.red << 16) |
+        uint32  trans1 = (0xff << 24) |
+        				(m_oTransColor.red << 16) |
                         (m_oTransColor.green << 8) |
                         (m_oTransColor.blue);
+                                                
         uint32* pixel = (uint32*)m_bitmap->Bits();
+        
         for ( int i = 0; i < m_bitmap->BitsLength(); i += 4 )
         {
-            if ( *pixel == trans )
+            if ( *pixel == trans1)
             {
                 *pixel = B_TRANSPARENT_MAGIC_RGBA32;
             }
@@ -151,7 +178,7 @@ BeOSBitmap::MaskBlitRect( Bitmap* pSrcBitmap, Rect& oSrcRect, Rect& oDestRect )
     int32 srcBytesPerRow = srcBitmap->BytesPerRow();
     int32 dstBytesPerRow = m_bitmap->BytesPerRow();
 
-    size_t len = (oSrcRect.Width() + (0)) * sizeof(int32);
+    //size_t len = (oSrcRect.Width() + (0)) * sizeof(int32);
     src += oSrcRect.y1 * srcBytesPerRow + oSrcRect.x1 * 4;
     dst += oDestRect.y1 * dstBytesPerRow + oDestRect.x1 * 4;
     for ( int y = 0; y < oDestRect.Height(); y++ )

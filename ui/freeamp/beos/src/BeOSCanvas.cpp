@@ -29,6 +29,8 @@ ____________________________________________________________________________*/
 #include <be/interface/Bitmap.h>
 #include <be/interface/Region.h>
 
+#include <string>
+
 #define CHECK_POINT CHECK_POINT_MSG("")
 #define CHECK_POINT_MSG(a) PRINT(( "File %s Line %d, %x: %s\n", __FILE__, __LINE__, this, a ))
 

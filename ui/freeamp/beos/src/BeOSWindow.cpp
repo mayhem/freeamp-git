@@ -23,7 +23,10 @@ ____________________________________________________________________________*/
 
 #include <stdio.h>
 #define DEBUG 0
+
 #include <be/support/Debug.h>
+#include <be/app/AppDefs.h>
+#include <Screen.h>
 #include "Theme.h"
 #include "BeOSWindow.h"
 #include "BeOSCanvas.h"
@@ -209,6 +212,28 @@ BeOSWindow::Restore( void )
 {
     CHECK_POINT_MSG( "Restore" );
     return kError_NoErr;
+}
+
+bool  
+BeOSWindow::LButtonDown(void)
+{
+	BPoint pt;
+	uint32 buttons = 0;
+ 	m_canvasView->GetMouse(&pt, &buttons );
+ 	
+	return (buttons & B_PRIMARY_MOUSE_BUTTON);
+}
+
+Error
+BeOSWindow::GetDesktopSize(int &iX, int &iY)
+{
+	BScreen s;
+	BRect r = s.Frame();
+	
+	iX = (int)r.Width();
+	iY = (int)r.Height();
+	
+	return kError_NoErr;
 }
 
 void

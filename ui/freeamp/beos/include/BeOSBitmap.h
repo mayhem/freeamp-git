@@ -33,8 +33,8 @@ class BView;
 class BeOSBitmap : public Bitmap
 {
 public:
-                        BeOSBitmap( string& oName );
-                        BeOSBitmap( int iWidth, int iHeight, string& oName,
+                        BeOSBitmap( const string& oName );
+                        BeOSBitmap( int iWidth, int iHeight, const string& oName,
                                     bool acceptViews = false );
     virtual             ~BeOSBitmap();
     virtual bool        IsPosVisible( Pos& oPos );
