@@ -30,7 +30,8 @@ PLUGIN_FULL_NAME = $(PLUGIN_DIR)$(PLUGIN_NAME)
 
 
 
-FILES = MtxOrb.c lcdui.cpp lcd.c drv_base.c
+# FILES = MtxOrb.c lcdui.cpp lcd.c drv_base.c
+FILES = lcdui.cpp sockets.c
 MYLIBS = libfaui.a
 TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
 

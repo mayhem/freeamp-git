@@ -49,6 +49,9 @@ class LcdUI : public UserInterface {
     static void keyboardServiceFunction(void *);
     virtual ~LcdUI();
  private:
+
+    int32 m_sock;
+
     int32 m_startupType;
     int32 m_argc;
     char **m_argv;

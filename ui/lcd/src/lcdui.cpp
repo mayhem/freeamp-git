@@ -34,17 +34,25 @@ ____________________________________________________________________________*/
 
 #include "config.h"
 #include "lcdui.h"
-extern "C" {
-#include "MtxOrb.h"
-#include "lcd.h"
-#include "drv_base.h"
-	   }
+
 #include "event.h"
 #include "playlist.h"
 #include "thread.h"
 #include "eventdata.h"
 
+#define LCDPROC_4 1
 
+#if LCDPROC_4
+extern "C" {
+#include "sockets.h"
+	   }
+#else
+extern "C" {
+#include "MtxOrb.h"
+#include "lcd.h"
+#include "drv_base.h"
+	   }
+#endif
 #define stdinfd 0
 
 extern "C" {
@@ -99,11 +107,14 @@ LcdUI::~LcdUI() {
     //cout << "LcdUI: begin deleted..." << endl;
     
     m_lcdLock->Acquire();
+#if LCDPROC_4
+    sock_close(m_sock);
+#else
     lcd.clear();
     lcd.string(1,2,"  Thanks for using  ");
     lcd.string(1,3,"       FreeAmp      ");
     lcd.flush();
-
+#endif
     
     if (keyboardListenThread) {
 	keyboardListenThread->Destroy();
@@ -119,12 +130,32 @@ LcdUI::~LcdUI() {
 #define STOCK_CONTRAST 140
 
 Error LcdUI::Init(int32 startupType) {
+#if !LCDPROC_4
     lcd_init("/dev/lcd","MtxOrb");
     lcd.contrast(STOCK_CONTRAST);
-
+#endif
+    cout << "startup..." << endl;
     m_lcdLock->Acquire(WAIT_FOREVER);
+#if LCDPROC_4
+    m_sock = sock_connect("localhost",LCDPORT);
+    cout << "connecting" << endl;
+    if (m_sock <= 0) {
+	//screwwwwed
+	return kError_InitFailed;
+    }
+    cout << "done connecting" << endl;
+    sock_send_string(m_sock, "hello\n");
+    sock_send_string(m_sock, "screen_add FA\n");
+    sock_send_string(m_sock, "screen_set FA name {FreeAmp}\n");
+    sock_send_string(m_sock, "widget_add FA songname string\n");
+    sock_send_string(m_sock, "widget_add FA timeline string\n");
+    sock_send_string(m_sock, "widget_add FA artist string\n");
+    sock_send_string(m_sock, "widget_set FA songname 1 1 {Welcome To FreeAmp}\n");
+    sock_send_string(m_sock, "widget_set FA timeline 4 1 {total       00:00:00}\n");
+#else 
     lcd.string(1,1," Welcome To FreeAmp");
     lcd.flush();
+#endif
     m_lcdLock->Release();
 
     if ((m_startupType = startupType) == PRIMARY_UI) {
@@ -146,10 +177,21 @@ Error LcdUI::Init(int32 startupType) {
 
 void LcdUI::keyboardServiceFunction(void *pclcio) {
     LcdUI *pMe = (LcdUI *)pclcio;
+    char *buf = new char[8000];
     char *pkey = new char[1];
     char chr;
     size_t rtn;
     int fn = STDIN_FILENO;
+
+//#if LCDPROC_4    
+#if 0
+    while(1) {
+	len = sock_recv(m_sock,buf,8000);
+	if (len) {
+	    printf(buf);
+	}
+    }
+#else 
     for (;;) {
 	::getKey();
 	read(stdinfd,&chr,1);
@@ -158,7 +200,9 @@ void LcdUI::keyboardServiceFunction(void *pclcio) {
 		pMe->m_timeType = (pMe->m_timeType + 1) % TIME_MAX;
 		pMe->m_lcdLock->Acquire();
 		pMe->BlitTimeLine();
+#if !LCDPROC_4
 		lcd.flush();
+#endif
 		pMe->m_lcdLock->Release();
 		break;
 	    }
@@ -204,7 +248,7 @@ void LcdUI::keyboardServiceFunction(void *pclcio) {
 		break;
 	}
     }
-
+#endif
 }
 
 int32 LcdUI::AcceptEvent(Event *e) {
@@ -225,7 +269,9 @@ int32 LcdUI::AcceptEvent(Event *e) {
 		m_currHours = m_currMinutes = m_currSeconds = 0;
 		m_lcdLock->Acquire();
 		BlitTimeLine();
+#if !LCDPROC_4
 		lcd.flush();
+#endif
 		m_lcdLock->Release();
 		break;
 	    }
@@ -234,20 +280,26 @@ int32 LcdUI::AcceptEvent(Event *e) {
 		    m_timeType = TIME_CURR;
 		    m_lcdLock->Acquire();
 		    BlitTimeLine();
+#if !LCDPROC_4
 		    lcd.flush();
+#endif
 		    m_lcdLock->Release();
 		} else if (!strcmp("time_remain_mode",((UserMessageEvent *)e)->GetInfo())) {
 		    m_timeType = TIME_REMAIN;
 		    m_lcdLock->Acquire();
 		    BlitTimeLine();
+#if !LCDPROC_4
 		    lcd.flush();
+#endif
 		    m_lcdLock->Release();
 
 		}else if (!strcmp("time_total_mode",((UserMessageEvent *)e)->GetInfo())) {
 		    m_timeType = TIME_TOTAL;
 		    m_lcdLock->Acquire();
 		    BlitTimeLine();
+#if !LCDPROC_4
 		    lcd.flush();
+#endif
 		    m_lcdLock->Release();
 
 		}
@@ -256,19 +308,30 @@ int32 LcdUI::AcceptEvent(Event *e) {
 	    case INFO_MediaInfo: {
 		MediaInfoEvent *pmvi = (MediaInfoEvent *)e;
 		if (pmvi) {
-		    cout << "writing lcd" << endl;
+		    //cout << "writing lcd" << endl;
 		    //cout << "total seconds" << pmvi->m_totalSeconds << endl;
 		    m_totalHours = (int32)pmvi->m_totalSeconds / 3600;
 		    m_totalMinutes = ((int32)pmvi->m_totalSeconds - m_totalHours*3600) / 60;
 		    m_totalSeconds = ((int32)pmvi->m_totalSeconds - m_totalHours*3600 - m_totalMinutes*60);
-		    cout << "total hours " << m_totalHours << " " << m_totalMinutes << " " << m_totalSeconds << endl;
+		    //cout << "total hours " << m_totalHours << " " << m_totalMinutes << " " << m_totalSeconds << endl;
 		    m_lcdLock->Acquire(WAIT_FOREVER);
+#if !LCDPROC_4
 		    lcd.clear();
+#endif
 		    char *foo = strrchr(pmvi->m_filename,'/');
 		    if (foo) foo++; else foo = pmvi->m_filename;
+#if LCDPROC_4
+		    char bar[128];
+		    sprintf(bar,"widget_set FA songname 1 1 {%s}\n",foo);
+		    sock_send_string(m_sock,bar);
+		    sock_send_string(m_sock,"widget_set FA artist 1 3 {}\n");
+#else
 		    lcd.string(1,1,foo);
+#endif
 		    BlitTimeLine();
+#if !LCDPROC_4		    
 		    lcd.flush();
+#endif
 		    m_lcdLock->Release();
 		    //cout << "wrote lcd" << endl;
 		    //cout << "Playing: " << pmvi->m_filename << endl;
@@ -282,7 +345,9 @@ int32 LcdUI::AcceptEvent(Event *e) {
 		    m_currSeconds = info->m_seconds;
 		    m_lcdLock->Acquire();
 		    BlitTimeLine();
+#if !LCDPROC_4
 		    lcd.flush();
+#endif
 		    m_lcdLock->Release();
 		}
 		break;
@@ -293,11 +358,23 @@ int32 LcdUI::AcceptEvent(Event *e) {
 		    Id3TagInfo ti = ite->GetId3Tag();
 		    if (ti.m_containsInfo) {
 			m_lcdLock->Acquire(WAIT_FOREVER);
+#if !LCDPROC_4
 			lcd.clear();
+#endif
+#if LCDPROC_4
+		    char bar[64];
+		    sprintf(bar,"widget_set FA artist 1 1 {%s}\n",ti.m_artist);
+		    sock_send_string(m_sock,bar);
+		    sprintf(bar,"widget_set FA songname 1 2 {%s}\n",ti.m_songName);
+		    sock_send_string(m_sock,bar);
+#else
 			lcd.string(1,1,ti.m_artist);
 			lcd.string(1,2,ti.m_songName);
+#endif
 			BlitTimeLine();
+#if !LCDPROC_4
 			lcd.flush();
+#endif
 			m_lcdLock->Release();
 			//cout << "Title  : " << ti.m_songName << endl;
 			//cout << "Artist : " << ti.m_artist << endl;
@@ -335,7 +412,13 @@ void LcdUI::BlitTimeLine() {
 	default:
 	    sprintf(foo,"Screwed up!!");
     }
+#if LCDPROC_4
+    char bar[64];
+    sprintf(bar,"widget_set FA timeline 1 4 {%s}\n",foo);
+    sock_send_string(m_sock,bar);
+#else 
     lcd.string(1,4,foo);
+#endif
 }
 
 void LcdUI::SetArgs(int argc, char **argv) {
