@@ -201,8 +201,8 @@ Error MusicCatalog::RemoveSong(const char *url)
         for (; i != m_unsorted->end(); i++)
             if (url == (*i)->URL())
             {
+                m_context->target->AcceptEvent(new MusicCatalogTrackRemovedEvent(*i, NULL, NULL));     
                 m_unsorted->erase(i);
-                m_context->target->AcceptEvent(new MusicCatalogTrackRemovedEvent(*i, NULL, NULL));                
                 break;
             }
     }
@@ -231,8 +231,8 @@ Error MusicCatalog::RemoveSong(const char *url)
                         for (; k != trList->end() && !found; k++)
                             if (url == (*k)->URL())
                             {
-                                trList->erase(k);
                                 m_context->target->AcceptEvent(new MusicCatalogTrackRemovedEvent(*k, *i, *j));
+                                trList->erase(k);
                                 found = true;
                                 break;
                             }    

@@ -25,6 +25,7 @@
 #define IDD_OPENURL                     219
 #define IDD_DELETETRACKS                220
 #define IDD_REMOVETRACKS                220
+#define IDD_EDITINFO                    221
 #define IDB_PLAYING                     542
 #define IDB_CATALOG                     543
 #define IDB_ARTIST                      544
@@ -115,7 +116,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        122
+#define _APS_NEXT_RESOURCE_VALUE        123
 #define _APS_NEXT_COMMAND_VALUE         40064
 #define _APS_NEXT_CONTROL_VALUE         1023
 #define _APS_NEXT_SYMED_VALUE           101

@@ -109,6 +109,18 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,34,30,165,10
 END
 
+IDD_EDITINFO DIALOG DISCARDABLE  0, 0, 209, 127
+STYLE DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Edit Info"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,35,109,54,14
+    PUSHBUTTON      "Cancel",IDCANCEL,93,109,54,14
+    CONTROL         "",-1,"Static",SS_ETCHEDHORZ,0,103,209,1
+    PUSHBUTTON      "Help",9,151,109,54,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -142,6 +154,11 @@ BEGIN
         RIGHTMARGIN, 202
         TOPMARGIN, 7
         BOTTOMMARGIN, 61
+    END
+
+    IDD_EDITINFO, DIALOG
+    BEGIN
+        TOPMARGIN, 7
     END
 END
 #endif    // APSTUDIO_INVOKED
