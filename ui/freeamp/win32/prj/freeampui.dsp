@@ -321,6 +321,10 @@ SOURCE=..\res\stop_buttons256.bmp
 # End Group
 # Begin Source File
 
+SOURCE=..\res\colors.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=..\res\open_buttons.bmp
 # End Source File
 # Begin Source File

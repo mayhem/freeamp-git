@@ -110,6 +110,7 @@ IDB_SHUFFLE             BITMAP  DISCARDABLE     "shuffle_buttons.bmp"
 IDB_SHUFFLE_256         BITMAP  DISCARDABLE     "shuffle_buttons256.bmp"
 IDB_REPEAT_256          BITMAP  DISCARDABLE     "repeat_buttons256.bmp"
 IDB_OPEN_256            BITMAP  DISCARDABLE     "open_buttons256.bmp"
+IDB_COLORS              BITMAP  DISCARDABLE     "colors.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //

@@ -75,10 +75,10 @@ Color g_buttonColorArray[] = {
         {0,   0,   128, 0}, // kCloseControl
         {0,   128, 128, 0}, // kRepeatControl
         {0,   128, 0,   0}, // kShuffleControl
-        {255, 127, 0,   0}, // kOpenControl
+        {255, 0,   0,   0}, // kOpenControl
         {255, 0,   255, 0}, // kVolumeControl
         {128, 0,   0,   0}, // kSeekControl
-        {255, 0,   0,   0}, // kPlaylistControl
+        {203, 203, 203, 0}, // kPlaylistControl
         {128, 128, 128, 0}, // kDisplayControl
 };
 
@@ -113,7 +113,9 @@ static HDC playerMaskDC;
 static HCURSOR dialCursor, arrowCursor, currentCursor;
 static HPALETTE palette = NULL;
 
-void DrawPlayer(HDC hdc, ControlInfo* state)
+
+
+static void DrawPlayer(HDC hdc, ControlInfo* state)
 {
     HDC memdc, bufferdc;
     HBITMAP oldMemBitmap, bufferBitmap, oldBufferBitmap;
@@ -206,7 +208,7 @@ void DrawPlayer(HDC hdc, ControlInfo* state)
 
         GetRgnBox(g_buttonStateArray[i].region, &rect);
 
-        if(g_buttonStateArray[i].dirty)
+        if(1)//g_buttonStateArray[i].dirty)
         {
             switch(g_buttonStateArray[i].control_id)
             {
@@ -787,6 +789,24 @@ void DrawDisplay(HDC hdc, DisplayInfo* state)
     DeleteObject(bufferBitmap);
 }
 
+void UpdateControls(HWND hwnd)
+{
+    HDC hdc = GetDC(hwnd);
+
+    DrawPlayer(hdc, g_buttonStateArray);
+
+    ReleaseDC(hwnd, hdc);
+}
+
+void UpdateDisplay(HWND hwnd)
+{
+    HDC hdc = GetDC(hwnd);
+
+    DrawDisplay(hdc, &g_displayInfo);
+
+    ReleaseDC(hwnd, hdc);
+}
+
 static HPALETTE 
 CreateDIBPalette (LPBITMAPINFO lpbmi, 
 				  LPINT lpiNumColors) 
@@ -939,7 +959,7 @@ DetermineRegion(HBITMAP bitmap,
 
 static HRGN*
 DetermineRegions(   HBITMAP bitmap, 
-			        Color* color,
+			        HBITMAP colors,
                     int32 numColors)
 {
 	HRGN* result = NULL;
@@ -951,11 +971,15 @@ DetermineRegions(   HBITMAP bitmap,
     int32 width, height;
     int32 i;
 
+    hdc = CreateCompatibleDC(NULL);
+
+    oldBitmap = (HBITMAP)SelectObject(hdc, colors);
+
     regionColors = new COLORREF[numColors];
 
     for(i = 0; i < numColors; i++)
     {
-        regionColors[i] = RGB(color[i].r, color[i].g, color[i].b);
+        regionColors[i] = GetPixel(hdc, i, 0);
     }
 
     result = new HRGN[numColors];
@@ -970,9 +994,7 @@ DetermineRegions(   HBITMAP bitmap,
     width = bmp.bmWidth; 
     height = bmp.bmHeight;
 
-    hdc = CreateCompatibleDC(NULL);
-
-    oldBitmap = (HBITMAP)SelectObject(hdc, bitmap);
+    SelectObject(hdc, bitmap);
 
     COLORREF black = RGB(0, 0, 0);
     COLORREF white = RGB(255, 255, 255);
@@ -995,7 +1017,7 @@ DetermineRegions(   HBITMAP bitmap,
                 {
                     scanning = false;
                     // regions are non-inclusive of their bottom & right edges
-                    // so need to add one to values
+                    // so need to add one
                     scanline = CreateRectRgn(start, y, x, y + 1);
 
                     CombineRgn( result[scanIndex],
@@ -1059,6 +1081,8 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 	{
 		case WM_CREATE:
 		{
+            g_ui->SetHwnd(hwnd);
+
 			DragAcceptFiles(hwnd, TRUE);
 
             InitCommonControls();
@@ -1173,12 +1197,14 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                 openButtonBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_OPEN));
             }
             
-            HPALETTE tempPalette;
-            playerMask = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_PLAYER_MASK), &tempPalette);
+            playerMask = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_PLAYER_MASK));
+            HBITMAP colors = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_COLORS));
 
             g_controlRegions = DetermineRegions(    playerMask,
-                                                    g_buttonColorArray,
+                                                    colors,
                                                     kFinalControl);
+
+            DeleteObject(colors);
 
             playerMaskDC = CreateCompatibleDC(NULL);
 
@@ -1223,6 +1249,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
             // stop shown when play is pressed
             g_buttonStateArray[kStopControl].shown = FALSE;
+            g_buttonStateArray[kStopControl].region = g_buttonStateArray[kPlayControl].region;
 
             // display
             int32 displayOffset = LEFT_SECTION + DIAL_SECTION + 19;
@@ -1607,7 +1634,8 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
             for(i = 0; i < kNumControls; i++)
             {
-                if( PtInRegion(g_buttonStateArray[i].region, pressPt.x, pressPt.y) )
+                if( PtInRegion(g_buttonStateArray[i].region, pressPt.x, pressPt.y) &&
+                    g_buttonStateArray[i].shown)
                 {
                     pressed = TRUE;
                     pressedIndex = i;
@@ -1758,7 +1786,8 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                 for(i = 0; i < kNumControls; i++)
                 {
                     if( PtInRegion(g_buttonStateArray[i].region, pt.x, pt.y) &&
-                        g_buttonStateArray[i].state != Activated)
+                        g_buttonStateArray[i].state != Activated &&
+                        g_buttonStateArray[i].shown)
                     {
                         if(g_buttonStateArray[i].state != Selected )
                         {
@@ -1767,7 +1796,8 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                             dirtyPlayer = true;
                         }
                     }
-                    else if(g_buttonStateArray[i].state == Selected )
+                    else if(g_buttonStateArray[i].state == Selected &&
+                            g_buttonStateArray[i].shown)
                     {
                         g_buttonStateArray[i].state = Deactivated;
                         g_buttonStateArray[i].dirty = TRUE;

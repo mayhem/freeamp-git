@@ -78,15 +78,6 @@ class FreeAmpUI : public UserInterface {
     Thread*         m_uiThread;
 
     HWND            m_hwnd;
-    HWND            m_hwndPlay;
-	HWND            m_hwndStop;
-	HWND            m_hwndPause;
-	HWND            m_hwndNext;
-	HWND            m_hwndLast;
-	HWND            m_hwndSlider;
-    HWND            m_hwndCurrent;
-    HWND            m_hwndTotal;
-	HWND            m_hwndStatus;
 
     
 };

@@ -89,7 +89,7 @@ typedef struct ControlInfo{
 #define kDisplayControl     14
 #define kFinalControl       15
 
-#define kNumControls        13
+#define kNumControls        14
 
 #ifdef __cplusplus
 extern "C" {
@@ -99,8 +99,8 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                             WPARAM wParam, 
                             LPARAM lParam );
 
-void DrawPlayer(HDC hdc, ControlInfo* state);
-void DrawDisplay(HDC hdc, DisplayInfo* state);
+void UpdateControls(HWND hwnd);
+void UpdateDisplay(HWND hwnd);
 
 
 #ifdef __cplusplus

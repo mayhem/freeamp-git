@@ -90,6 +90,8 @@ FreeAmpUI::
 FreeAmpUI():
 UserInterface()
 {
+    g_ui = this;
+
     m_scrolling = false;
 
     m_uiSemaphore = new Semaphore();
@@ -99,7 +101,6 @@ UserInterface()
 
     m_uiSemaphore->Wait();
 
-	g_ui = this;
 	m_state = STATE_Stopped;
 
     g_displayInfo.hours = 0;
@@ -123,6 +124,13 @@ SetTarget(EventQueue* eq)
     m_target = eq;
 }
 
+void 
+FreeAmpUI::
+SetHwnd(HWND hwnd)
+{
+    m_hwnd = hwnd;
+}
+
 int32 
 FreeAmpUI::
 AcceptEvent(Event* event)
@@ -136,54 +144,30 @@ AcceptEvent(Event* event)
         {
             case INFO_Playing: 
             {   
-                EnableWindow(m_hwndPlay, FALSE);
-				EnableWindow(m_hwndNext, TRUE);
-				EnableWindow(m_hwndLast, TRUE);
-
-				EnableWindow(m_hwndStop, TRUE);
-				EnableWindow(m_hwndPause, TRUE);
-				EnableWindow(m_hwndSlider, TRUE);
 				m_state = STATE_Playing;
                 g_buttonStateArray[kPlayControl].shown = FALSE;
                 g_buttonStateArray[kStopControl].shown = TRUE;
+                g_buttonStateArray[kStopControl].dirty = TRUE;
                 g_buttonStateArray[kPauseControl].state = Deactivated;
 
                 if(g_displayInfo.state == TotalTime)
                     g_displayInfo.state = CurrentTime;
+
+                UpdateControls(m_hwnd);
 
 	            break; 
             }
 
             case INFO_Paused: 
             {
-                EnableWindow(m_hwndPlay, TRUE);
-				EnableWindow(m_hwndNext, FALSE);
-				EnableWindow(m_hwndLast, FALSE);  
-
-				EnableWindow(m_hwndStop, TRUE);
-				EnableWindow(m_hwndPause, FALSE);
-				EnableWindow(m_hwndSlider, TRUE);
 				m_state = STATE_Paused;
                 g_buttonStateArray[kPauseControl].state = Activated;
+                UpdateControls(m_hwnd);
 	            break; 
             }
 
             case INFO_Stopped: 
             {
-                //EnableWindow(m_hwndPlay, TRUE);
-				//EnableWindow(m_hwndNext, TRUE);
-				//EnableWindow(m_hwndLast, TRUE);
-
-				//EnableWindow(m_hwndStop, FALSE);
-				//EnableWindow(m_hwndPause, FALSE);
-				
-           
-                //EnableWindow(m_hwndSlider, FALSE);
-
-                //char timeString[256] = "00:00:00";
-
-                //SetWindowText(m_hwndCurrent, timeString);
-
                 g_displayInfo.hours = 0;
 				g_displayInfo.minutes = 0;
 				g_displayInfo.seconds = 0;
@@ -195,6 +179,7 @@ AcceptEvent(Event* event)
                 g_buttonStateArray[kPauseControl].state = Deactivated;
                 g_buttonStateArray[kPlayControl].shown = TRUE;
                 g_buttonStateArray[kStopControl].shown = FALSE;
+                UpdateControls(m_hwnd);
 	            break; 
             }
 
@@ -363,14 +348,6 @@ SetArgs(int32 argc, char** argv)
     if(shuffle) 
         m_plm->SetOrder(PlayListManager::ORDER_SHUFFLED);
     
-
-    if(count)
-    {
-        EnableWindow(m_hwndPlay, TRUE);
-
-        if(count > 1)
-			EnableWindow(m_hwndNext, TRUE);
-    }
     //if(autoplay)
        //m_target->AcceptEvent(m_target, new Event(CMD_Play));
 }
@@ -389,7 +366,7 @@ CreateUI()
     MSG msg;
     HWND hwnd;
     	
-    wc.style = 0;
+    wc.style = CS_OWNDC;
     wc.lpfnWndProc = MainWndProc;
     wc.cbClsExtra = 0;
     wc.cbWndExtra = 0;
