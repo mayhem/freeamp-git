@@ -170,15 +170,13 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
     pTreeView = (NM_TREEVIEW *)pHdr;
     if (pTreeView->hdr.idFrom == IDC_MUSICTREE)
     {
-//	    if (pTreeView->hdr.code == TVN_BEGINDRAG &&
-//            m_oTreeData.GetLevel(pTreeView->itemNew.lParam) == 3)
-//        {
-//            TreeView_SelectItem(GetDlgItem(m_hWnd, IDC_MUSICTREE),
-//                                pTreeView->itemNew.hItem);
-//
-//            BeginDrag(pTreeView);
-//            return 0;
-//        }    
+	    if (pTreeView->hdr.code == TVN_BEGINDRAG )//&&
+            //m_oTreeData.GetLevel(pTreeView->itemNew.lParam) == 3)
+        {
+            BeginDrag(GetDlgItem(m_hWnd, IDC_MUSICTREE), 
+                      (NM_TREEVIEW*)pHdr);
+            return 0;
+        }    
  
 	    if (pTreeView->hdr.code == TVN_ITEMEXPANDING && 
             pTreeView->itemNew.hItem == m_hPlaylistItem)
@@ -262,10 +260,10 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                 
                 item = new PlaylistItem(*m_oTreeIndex.Data(lParam).m_pTrack);
                 m_oPlm->AddItem(item, false);
-                UpdatePlaylistList();
+                //UpdatePlaylistList();
                 m_bListChanged = true;
-            }
-            if (m_oTreeIndex.IsPlaylist(lParam))
+            } 
+            else if (m_oTreeIndex.IsPlaylist(lParam))
             {
                 AddPlaylist(m_oTreeIndex.Data(lParam).m_oPlaylistPath);
                 SetFocus(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX));
@@ -426,7 +424,7 @@ void MusicBrowserUI::SortEvent(int id)
              return;
     }
     m_oPlm->Sort(key);
-    UpdatePlaylistList();
+    //UpdatePlaylistList();
 }
 
 void MusicBrowserUI::ToggleVisEvent(void)
@@ -458,7 +456,7 @@ void MusicBrowserUI::AddEvent(void)
         for(i = oFileList.begin(); i != oFileList.end(); i++)
            eRet = m_oPlm->AddItem(*i);
         m_bListChanged = true;
-        UpdatePlaylistList();
+        //UpdatePlaylistList();
     }
 }
 

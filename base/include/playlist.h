@@ -214,6 +214,10 @@ class PlaylistManager {
     // Functions for adding items to playlist       
     Error AddItem(const char* url);
     Error AddItem(const char* url, uint32 index);
+    Error AddItem(const string& url);
+    Error AddItem(const string& url, uint32 index);
+    Error AddItems(const vector<string>& urls);
+    Error AddItems(const vector<string>& urls, uint32 index);
     Error AddItem(PlaylistItem* item, bool queryForMetaData = true);
     Error AddItem(PlaylistItem* item, uint32 index, bool queryForMetaData = true);
     Error AddItems(vector<PlaylistItem*>* list, bool queryForMetaData = true);
@@ -296,15 +300,15 @@ class PlaylistManager {
     bool            IsEmpty();
     uint32          CountItems();
     PlaylistItem*   ItemAt(uint32 index);
-	uint32          IndexOf(PlaylistItem* item);
-    bool            HasItem(PlaylistItem* item);
+	uint32          IndexOf(const PlaylistItem* item);
+    bool            HasItem(const PlaylistItem* item);
 
     void RetrieveMetaData(PlaylistItem* item);
     void RetrieveMetaData(vector<PlaylistItem*>* list);
 
  protected:
     inline uint32 CheckIndex(uint32 index);
-    uint32 InternalIndexOf(vector<PlaylistItem*>* list, PlaylistItem* item);
+    uint32 InternalIndexOf(vector<PlaylistItem*>* list, const PlaylistItem* item);
 
     void AddItemToShuffleList(PlaylistItem* item);
     void AddItemsToShuffleList(vector<PlaylistItem*>* list);

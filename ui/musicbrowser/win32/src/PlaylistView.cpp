@@ -372,7 +372,7 @@ void MusicBrowserUI::AddPlaylist(const string &oName)
 
     m_bListChanged = true;
 
-    UpdatePlaylistList();
+    //UpdatePlaylistList();
 }
 
 void MusicBrowserUI::LoadPlaylist(const string &oPlaylist)
@@ -381,7 +381,7 @@ void MusicBrowserUI::LoadPlaylist(const string &oPlaylist)
     m_oPlm->ReadPlaylist((char *)oPlaylist.c_str());
        
     m_currentindex = 0;
-    UpdatePlaylistList();
+    //UpdatePlaylistList();
 }
 
 void MusicBrowserUI::WritePlaylist(void)
@@ -468,12 +468,101 @@ void MusicBrowserUI::SaveAsPlaylist(void)
     }   
 }
 
+void MusicBrowserUI::UpdatePlaylistListItem(const PlaylistItem* item)
+{
+    LV_ITEM       sItem;
+    char          szText[256];
+    uint32        index = m_oPlm->IndexOf(item);
+    HWND          hwnd = GetDlgItem(m_hWnd, IDC_PLAYLISTBOX);
+
+    sItem.mask = LVIF_TEXT;
+    sItem.iItem = index;
+
+    // Update Title
+    sItem.pszText = (char*)item->GetMetaData().Title().c_str();
+    sItem.cchTextMax = item->GetMetaData().Title().length();
+    sItem.iSubItem = 1;
+    ListView_SetItem(hwnd, &sItem);
+
+    // Update Artist
+    sItem.pszText = (char*)item->GetMetaData().Artist().c_str();
+    sItem.cchTextMax = item->GetMetaData().Artist().length();
+    sItem.iSubItem = 2;
+    ListView_SetItem(hwnd, &sItem);
+
+    // Update Album
+    sItem.pszText = (char*)item->GetMetaData().Album().c_str();
+    sItem.cchTextMax = item->GetMetaData().Album().length();
+    sItem.iSubItem = 3;
+    ListView_SetItem(hwnd, &sItem);
+
+    // Update Time
+    if (item->GetMetaData().Time() != 0)
+        sprintf(szText, "%d", item->GetMetaData().Time());
+    else    
+        strcpy(szText, "Unknown");
+    sItem.pszText = szText;
+    sItem.cchTextMax = strlen(szText);
+    sItem.iSubItem = 4;
+    ListView_SetItem(hwnd, &sItem);
+}
+
+void MusicBrowserUI::AddPlaylistListItem(const PlaylistItem* item)
+{
+    LV_ITEM       sItem;
+    char          szText[256];
+    uint32        index = m_oPlm->IndexOf(item);
+    HWND          hwnd = GetDlgItem(m_hWnd, IDC_PLAYLISTBOX);
+
+    sprintf(szText, "%d", index + 1);
+
+    sItem.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM;
+    sItem.pszText = szText;
+    sItem.cchTextMax = strlen(szText);
+    sItem.iSubItem = 0;
+    sItem.iItem = index;
+    sItem.lParam = index;
+    sItem.iImage = 0;
+
+    ListView_InsertItem(hwnd, &sItem);
+
+    sItem.mask = LVIF_TEXT;
+
+    // Update Title
+    sItem.pszText = (char*)item->GetMetaData().Title().c_str();
+    sItem.cchTextMax = item->GetMetaData().Title().length();
+    sItem.iSubItem = 1;
+    ListView_SetItem(hwnd, &sItem);
+
+    // Update Artist
+    sItem.pszText = (char*)item->GetMetaData().Artist().c_str();
+    sItem.cchTextMax = item->GetMetaData().Artist().length();
+    sItem.iSubItem = 2;
+    ListView_SetItem(hwnd, &sItem);
+
+    // Update Album
+    sItem.pszText = (char*)item->GetMetaData().Album().c_str();
+    sItem.cchTextMax = item->GetMetaData().Album().length();
+    sItem.iSubItem = 3;
+    ListView_SetItem(hwnd, &sItem);
+
+    // Update Time
+    if (item->GetMetaData().Time() != 0)
+        sprintf(szText, "%d", item->GetMetaData().Time());
+    else    
+        strcpy(szText, "Unknown");
+    sItem.pszText = szText;
+    sItem.cchTextMax = strlen(szText);
+    sItem.iSubItem = 4;
+    ListView_SetItem(hwnd, &sItem);
+}
+
 void MusicBrowserUI::UpdatePlaylistList(void)
 {
     LV_ITEM       sItem;
     int           i;
     PlaylistItem *pItem;
-    char          szText[100];
+    char          szText[256];
 
     ListView_DeleteAllItems(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX));
     sItem.state = sItem.stateMask = 0;
@@ -670,7 +759,19 @@ ListViewWndProc(HWND hwnd,
                 WPARAM wParam, 
                 LPARAM lParam)
 {
+    MusicBrowserUI* ui = (MusicBrowserUI*)GetProp(hwnd, "this" );
+
+    return ui->ListViewWndProc(hwnd, msg, wParam, lParam);
+}
+
+
+LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd, 
+                                        UINT msg, 
+                                        WPARAM wParam, 
+                                        LPARAM lParam)
+{
     WNDPROC lpOldProc = (WNDPROC)GetProp( hwnd, "oldproc" );
+    bool filesAreURLs = false;
 
 	switch(msg)
 	{
@@ -681,9 +782,48 @@ ListViewWndProc(HWND hwnd,
 
 			// remove window property
 			RemoveProp( hwnd, "oldproc" ); 
+            RemoveProp( hwnd, "this" ); 
 
 			break;
 		}
+        
+        case WM_DROPURLS:
+            filesAreURLs = true;
+        case WM_DROPFILES:
+        {
+            HDROP dropHandle = (HDROP)wParam;
+            uint32 count;
+            char url[1024];
+            vector<string> fileList;
+
+            count = DragQueryFile(  dropHandle,
+                                    -1L,
+                                    url,
+                                    sizeof(url));
+
+            for(uint32 i = 0; i < count; i++)
+            {
+                DragQueryFile(  dropHandle,
+                                i,
+                                url,
+                                sizeof(url));
+
+                fileList.push_back(url);
+
+                //MessageBox(NULL, url, "url", MB_OK);
+            }
+
+            m_oPlm->AddItems(fileList);
+
+            /*POINT pt;
+            DragQueryPoint(dropHandle, &pt);
+
+            char buf[256];
+            sprintf(buf, "x: %d   y: %d", pt.x, pt.y);
+
+            MessageBox(NULL, buf, "pt", MB_OK);*/
+            break;
+        }
 
         case WM_DRAWITEM:
         {

@@ -55,12 +55,50 @@ bool TreeDataIndex::IsPlaylist(int32 lParam)
     return m_oTreeData[lParam].m_oPlaylistName.length() > 0;
 }
 
+bool TreeDataIndex::IsArtist(int32 lParam)
+{
+    bool result = false;
+
+    if (!IsValidParam(lParam))
+       return false;
+
+    result = m_oTreeData[lParam].m_pArtist != NULL &&
+             m_oTreeData[lParam].m_pAlbum == NULL &&
+             m_oTreeData[lParam].m_pTrack == NULL;
+
+    
+    return result;
+}
+
+bool TreeDataIndex::IsAlbum(int32 lParam)
+{
+    bool result = false;
+
+    if (!IsValidParam(lParam))
+       return false;
+
+    result = m_oTreeData[lParam].m_pAlbum != NULL &&
+             m_oTreeData[lParam].m_pArtist != NULL &&
+             m_oTreeData[lParam].m_pTrack == NULL;
+
+    
+    return result;
+}
+
 bool TreeDataIndex::IsTrack(int32 lParam)
 {
     if (!IsValidParam(lParam))
        return false;
     
     return m_oTreeData[lParam].m_pTrack != NULL;
+}
+
+bool TreeDataIndex::IsLeaf(int32 lParam)
+{
+    if (!IsValidParam(lParam))
+       return false;
+    
+    return ( IsTrack(lParam) || IsPlaylist(lParam) );
 }
 
 int32 TreeDataIndex::GetLevel(int32 lParam)

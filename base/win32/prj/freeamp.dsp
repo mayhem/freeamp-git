@@ -59,8 +59,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
-             ..\..\..\themes\freeamp.fat themes	copy ..\..\..\help\win32\freeamp.cnt .	copy\
- ..\..\..\help\win32\freeamp.hlp .
+              ..\..\..\themes\freeamp.fat themes
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
@@ -93,8 +92,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
-             ..\..\..\themes\freeamp.fat themes	copy ..\..\..\help\win32\freeamp.cnt .	copy\
- ..\..\..\help\win32\freeamp.hlp .
+              ..\..\..\themes\freeamp.fat themes
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
@@ -128,8 +126,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
-             ..\..\..\themes\freeamp.fat themes	copy ..\..\..\help\win32\freeamp.cnt .	copy\
- ..\..\..\help\win32\freeamp.hlp .
+              ..\..\..\themes\freeamp.fat themes
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
@@ -165,8 +162,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
-             ..\..\..\themes\freeamp.fat themes	copy ..\..\..\help\win32\freeamp.cnt .	copy\
- ..\..\..\help\win32\freeamp.hlp .
+              ..\..\..\themes\freeamp.fat themes
 # End Special Build Tool
 
 !ENDIF 
@@ -421,6 +417,104 @@ InputPath=..\..\..\README
 
 "..\..\..\ReadMe.txt" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\README ..\..\..\ReadMe.txt
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# End Group
+# Begin Group "help files"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\..\help\win32\freeamp.cnt
+
+!IF  "$(CFG)" == "freeamp - Win32 Release"
+
+# Begin Custom Build
+InputPath=..\..\..\help\win32\freeamp.cnt
+
+"freeamp.cnt" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy  ..\..\..\help\win32\freeamp.cnt .
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
+
+# Begin Custom Build
+InputPath=..\..\..\help\win32\freeamp.cnt
+
+"freeamp.cnt" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy  ..\..\..\help\win32\freeamp.cnt .
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
+
+# Begin Custom Build
+InputPath=..\..\..\help\win32\freeamp.cnt
+
+"freeamp.cnt" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy  ..\..\..\help\win32\freeamp.cnt .
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
+
+# Begin Custom Build
+InputPath=..\..\..\help\win32\freeamp.cnt
+
+"freeamp.cnt" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy  ..\..\..\help\win32\freeamp.cnt .
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\help\win32\freeamp.hlp
+
+!IF  "$(CFG)" == "freeamp - Win32 Release"
+
+# Begin Custom Build
+InputPath=..\..\..\help\win32\freeamp.hlp
+
+"freeamp.hlp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy  ..\..\..\help\win32\freeamp.hlp .
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
+
+# Begin Custom Build
+InputPath=..\..\..\help\win32\freeamp.hlp
+
+"freeamp.hlp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy  ..\..\..\help\win32\freeamp.hlp .
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
+
+# Begin Custom Build
+InputPath=..\..\..\help\win32\freeamp.hlp
+
+"freeamp.hlp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy  ..\..\..\help\win32\freeamp.hlp .
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
+
+# Begin Custom Build
+InputPath=..\..\..\help\win32\freeamp.hlp
+
+"freeamp.hlp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy  ..\..\..\help\win32\freeamp.hlp .
 
 # End Custom Build
 

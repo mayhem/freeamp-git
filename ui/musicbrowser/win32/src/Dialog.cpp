@@ -31,6 +31,8 @@ ____________________________________________________________________________*/
 #include "utility.h"
 #include "resource.h"
 #include "Win32MusicBrowser.h"
+#include "DropSource.h"
+#include "DropObject.h"
 #include "debug.h"
 
 #define WM_EMPTYDBCHECK WM_USER + 69
@@ -86,13 +88,32 @@ static BOOL CALLBACK MainDlgProc(HWND hwnd, UINT msg,
 BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg, 
                                 WPARAM wParam, LPARAM lParam )
 {
+    bool filesAreURLs = false;
+
     switch (msg)
     {
+        case WM_DESTROY:
+        {
+            RevokeDragDrop(m_hPlaylistView);
+            OleUninitialize(); 
+
+            break;
+        }
+
 		case WM_CLOSE:
         {
 			Close();
             return 1;
         }    
+
+        case WM_DROPURLS:
+            filesAreURLs = true;
+        case WM_DROPFILES:
+        {
+
+            DropFiles((HDROP)wParam, filesAreURLs);
+            return 0;
+        }
 
 		case WM_SIZE:
         {
@@ -628,11 +649,15 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
 	    SetProp(m_hPlaylistView, 
 			    "oldproc",
                 (HANDLE)GetWindowLong(m_hPlaylistView, GWL_WNDPROC));
+
+        SetProp(m_hPlaylistView, 
+            "this",
+            (HANDLE)this);
 	    
 	    // Subclass the window so we can draw it
 	    SetWindowLong(m_hPlaylistView, 
                       GWL_WNDPROC, 
-                      (DWORD)ListViewWndProc );  
+                      (DWORD)::ListViewWndProc );  
 
         HD_ITEM hd_item;
     
@@ -647,18 +672,54 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
         //Header_SetItem(m_hPlaylistHeader, 3, &hd_item);
     }
 
-    // Subclass the treetview
+    // Subclass the treeview
 
     // Set the proc address as a property 
 	// of the window so it can get it
 	SetProp(m_hMusicCatalog, 
             "oldproc",
             (HANDLE)GetWindowLong(m_hMusicCatalog, GWL_WNDPROC));
+
+    SetProp(m_hMusicCatalog, 
+            "this",
+            (HANDLE)this);
 	
 	// Subclass the window so we can draw it
 	SetWindowLong(m_hMusicCatalog, 
 			      GWL_WNDPROC, 
-                  (DWORD)TreeViewWndProc );  
+                  (DWORD)::TreeViewWndProc );  
+
+
+    // register our OLE drag and drop crap
+    OleInitialize(NULL);
+
+    int result;
+    m_playlistDropTarget = new DropTarget(m_hPlaylistView);
+    //CoLockObjectExternal ((IUnknown*)m_playlistDropTarget, TRUE, TRUE);
+    result = RegisterDragDrop(m_hPlaylistView, m_playlistDropTarget);
+
+    if(result != S_OK)
+    {
+        LPVOID lpMessageBuffer;
+
+        FormatMessage(
+		  FORMAT_MESSAGE_ALLOCATE_BUFFER |
+		  FORMAT_MESSAGE_FROM_SYSTEM,
+		  NULL,
+		  result,
+		  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		  (LPTSTR) &lpMessageBuffer,
+		  0,
+		  NULL );
+
+		// now display this string
+ 		MessageBox(NULL, (char*)lpMessageBuffer, 0, MB_OK);
+
+		// Free the buffer allocated by the system
+		LocalFree( lpMessageBuffer );
+
+
+    }
     
     m_hStatus= CreateStatusWindow(WS_CHILD | WS_VISIBLE,
                                   "", m_hWnd, IDC_STATUS);
@@ -807,7 +868,7 @@ void MusicBrowserUI::SetTitles(void)
     }   
 }
 
-void MusicBrowserUI::BeginDrag(NM_TREEVIEW *pTreeView)
+/*void MusicBrowserUI::BeginDrag(NM_TREEVIEW *pTreeView)
 {
     POINT      sPoint;
     
@@ -820,6 +881,85 @@ void MusicBrowserUI::BeginDrag(NM_TREEVIEW *pTreeView)
     
     SetCapture(m_hWnd);
     m_bDragging = true;
+}*/
+
+void MusicBrowserUI::BeginDrag(HWND hwnd, NM_TREEVIEW* nmtv)
+{
+    /*HIMAGELIST himl;    // handle of image list 
+    RECT rcItem;        // bounding rectangle of item 
+    //DWORD dwLevel;      // heading level of item 
+    DWORD dwIndent;     // amount that child items are indented 
+ 
+    // Tell the tree-view control to create an image to use 
+    // for dragging. 
+    himl = TreeView_CreateDragImage(hwnd, nmtv->itemNew.hItem);
+ 
+    // Get the bounding rectangle of the item being dragged. 
+    TreeView_GetItemRect(hwnd, nmtv->itemNew.hItem, &rcItem, TRUE); 
+ 
+    // Get the heading level and the amount that the child items are 
+    // indented. 
+    //dwLevel = nmtv->itemNew.lParam; 
+    dwIndent = (DWORD) SendMessage(hwnd, TVM_GETINDENT, 0, 0);
+ 
+    //MapWindowPoints(hwnd, GetParent(hwnd), &nmtv->ptDrag, 1);
+
+    // Start the drag operation. 
+    //ImageList_DragEnter(GetParent(hwnd), nmtv->ptDrag.x, nmtv->ptDrag.y);
+    ImageList_BeginDrag(himl, 
+                        0, 
+                        nmtv->ptDrag.x - rcItem.left, 
+                        nmtv->ptDrag.y - rcItem.top);
+ 
+    POINT pt = nmtv->ptDrag;
+    //ClientToScreen(hwnd, &pt);
+    //MapWindowPoints(hwnd, GetParent(hwnd), &pt, 1);
+    
+    ClientToScreen(hwnd, &pt);
+
+    //ImageList_DragEnter(NULL, pt.x, pt.y);
+    ImageList_DragEnter(NULL, pt.x, pt.y);
+ 
+    // Hide the mouse cursor, and direct mouse input to the 
+    // parent window. 
+    ShowCursor(FALSE); 
+    SetCapture(GetParent(hwnd)); 
+    m_bDragging = true; */
+    
+    vector<string>* urls = new vector<string>;
+
+    GetSelectedMusicTreeItems(urls);
+    //urls->push_back("file://c|/local/mpegs/311 - Beautiful Disaster.mp3");
+    //urls->push_back("file://c|/local/mpegs/Age of Aquarius.mp3");
+    //urls->push_back("file://c|/local/mpegs/B-52s - Loveshack.mp3");
+
+    DataObject* data = new DataObject(urls);
+    DropSource* src = new DropSource(hwnd, nmtv);
+    DWORD dwEffect = 0;
+
+    DoDragDrop(data, src, DROPEFFECT_COPY|DROPEFFECT_SCROLL, &dwEffect); 
+
+}
+
+void MusicBrowserUI::DropFiles(HDROP dropHandle, bool filesAreURLs)
+{
+    uint32 count;
+    char url[1024];
+
+    count = DragQueryFile(  dropHandle,
+                            -1L,
+                            url,
+                            sizeof(url));
+
+    for(uint32 i = 0; i < count; i++)
+    {
+        DragQueryFile(  dropHandle,
+                        i,
+                        url,
+                        sizeof(url));
+
+        //MessageBox(NULL, url, "url", MB_OK);
+    }
 }
 
 BOOL MusicBrowserUI::SetCursor(int hitTest, int mouseMsg)
@@ -837,6 +977,17 @@ BOOL MusicBrowserUI::SetCursor(int hitTest, int mouseMsg)
 void MusicBrowserUI::MouseMove(uint32 uFlags, POINT &sPoint)
 {
     if(m_bDragging)
+    {
+        // Drag the item to the current position of the mouse cursor. 
+
+        //ClientToScreen(m_hWnd, &sPoint);
+
+        GetCursorPos(&sPoint);
+        
+        ImageList_DragMove(sPoint.x, sPoint.y); 
+    }
+
+    /*if(m_bDragging)
     {
         TV_HITTESTINFO sHit;
         
@@ -863,7 +1014,7 @@ void MusicBrowserUI::MouseMove(uint32 uFlags, POINT &sPoint)
         }       
         else    
             ::SetCursor(m_hNoDropCursor);
-    }
+    }*/
     else if(m_trackSplitter)
     {
         HDC hdc = GetDC(NULL);
@@ -968,7 +1119,6 @@ void MusicBrowserUI::MouseButtonDown(int keys, int x, int y)
 
 void MusicBrowserUI::MouseButtonUp(int keys, int x, int y)
 {
-    int i;
     POINT pt;
 
     pt.x = x;
@@ -1037,8 +1187,18 @@ void MusicBrowserUI::MouseButtonUp(int keys, int x, int y)
 
 
     }
+    else if(m_bDragging) 
+    { 
+        ImageList_EndDrag(); 
+        ReleaseCapture(); 
+        ShowCursor(TRUE); 
+        m_bDragging = false; 
+    } 
+    /*
     else if(m_bDragging)
     {
+        int i;
+
         ReleaseCapture();
         ::SetCursor(m_hSavedCursor);
         m_bDragging = false; 
@@ -1074,7 +1234,7 @@ void MusicBrowserUI::MouseButtonUp(int keys, int x, int y)
                      
             SetFocus(m_hPlaylistView);
         }    
-    }    
+    }    */
 }
 
 void MusicBrowserUI::UpdateButtonStates()
@@ -1215,7 +1375,7 @@ OpenFileHookProc(   HWND hwnd,
                 {
                     
                     break;
-                }
+                }                
             }
 
             break;

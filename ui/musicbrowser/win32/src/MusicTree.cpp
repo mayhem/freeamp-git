@@ -33,6 +33,13 @@ ____________________________________________________________________________*/
 #include "Win32MusicBrowser.h"
 #include "debug.h"
 
+char* kMusicCatalog = "My Music Catalog";
+char* kAllTracks = "<All>";
+char* kUncatagorized = "<Uncategorized>";
+char* kPlaylists = "My Playlists";
+char* kStreams = "My Favorite Streams";
+char* kPortables = "My Portables";
+
 
 void MusicBrowserUI::InitTree(void)
 {                          
@@ -45,7 +52,7 @@ void MusicBrowserUI::InitTree(void)
     sItem.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
                  TVIF_SELECTEDIMAGE | TVIF_PARAM; 
         
-    sItem.pszText = "My Music Catalog";
+    sItem.pszText = kMusicCatalog;
     sItem.cchTextMax = lstrlen(sItem.pszText);
     sItem.iImage = 0;
     sItem.iSelectedImage = 0;
@@ -59,7 +66,7 @@ void MusicBrowserUI::InitTree(void)
     sInsert.hParent = NULL;
     m_hCatalogItem = TreeView_InsertItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sInsert);
 
-    sItem.pszText = "<All>";
+    sItem.pszText = kAllTracks;
     sItem.cchTextMax = lstrlen(sItem.pszText);
     sItem.iImage = 1;
     sItem.iSelectedImage = 1;
@@ -71,7 +78,7 @@ void MusicBrowserUI::InitTree(void)
     sInsert.hParent = m_hCatalogItem;
     m_hAllItem = TreeView_InsertItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sInsert);
 
-    sItem.pszText = "<Uncategorized>";
+    sItem.pszText = kUncatagorized;
     sItem.cchTextMax = lstrlen(sItem.pszText);
     sItem.iImage = 1;
     sItem.iSelectedImage = 1;
@@ -83,14 +90,15 @@ void MusicBrowserUI::InitTree(void)
     sInsert.hParent = m_hCatalogItem;
     m_hUncatItem = TreeView_InsertItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sInsert);
 
-    sItem.pszText = "My Playlists";
+    sItem.pszText = kPlaylists;
     sItem.cchTextMax = lstrlen(sItem.pszText);
     sItem.iImage = 1;
     sItem.iSelectedImage = 1;
     sItem.cChildren= 1;
+    sItem.lParam = -1;
         
     sInsert.item = sItem;
-    sInsert.hInsertAfter = m_hPlaylistItem;
+    sInsert.hInsertAfter = TVI_LAST;
     sInsert.hParent = NULL;
     m_hPlaylistItem = TreeView_InsertItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sInsert);
 }
@@ -392,10 +400,218 @@ int32 MusicBrowserUI::GetCurrentItemFromMousePos(void)
     return -1;
 }
 
+void MusicBrowserUI::AddAllTrackURLs(vector<string>* urls)
+{
+    vector<ArtistList*>*            artistList;
+    vector<ArtistList*>::iterator   artist;    
+
+    artistList = (vector<ArtistList*>*)
+            m_context->browser->m_catalog->GetMusicList();
+
+    for(artist = artistList->begin(); 
+        artist != artistList->end(); 
+        artist++)
+    {
+        vector<AlbumList*>::iterator album;
+
+        for(album = (*artist)->m_albumList->begin();
+            album != (*artist)->m_albumList->end();
+            album++)
+        {
+            vector<PlaylistItem*>::iterator track;
+
+            for(track = (*album)->m_trackList->begin();
+                track != (*album)->m_trackList->end();
+                track++)
+            {
+                urls->push_back((*track)->URL());
+            }
+        }
+    }
+
+    AddUncatagorizedTrackURLs(urls);
+}
+
+void MusicBrowserUI::AddUncatagorizedTrackURLs(vector<string>* urls)
+{
+    vector<PlaylistItem*>*          trackList;
+    vector<PlaylistItem*>::iterator track;
+
+    trackList = (vector<PlaylistItem*>*)
+            m_context->browser->m_catalog->GetUnsortedMusic();
+
+    for(track = trackList->begin(); 
+        track != trackList->end(); 
+        track++)
+    {
+        urls->push_back((*track)->URL());
+    }
+}
+
+void MusicBrowserUI::AddTrackURLs(TV_ITEM* tv_item, 
+                                  vector<string>* urls)
+{
+    // we need to determine what this item is 
+    // so we can properly iterate it
+
+    if(m_oTreeIndex.IsArtist(tv_item->lParam))
+    {
+        ArtistList* artist = m_oTreeIndex.Data(tv_item->lParam).m_pArtist;
+        vector<AlbumList*>::iterator album;
+        
+        for(album = artist->m_albumList->begin();
+            album != artist->m_albumList->end();
+            album++)
+        {
+            vector<PlaylistItem*>::iterator track;
+
+            for(track = (*album)->m_trackList->begin();
+                track != (*album)->m_trackList->end();
+                track++)
+            {
+                urls->push_back((*track)->URL());
+            }
+
+        }
+    }
+    else if(m_oTreeIndex.IsAlbum(tv_item->lParam))
+    {
+        AlbumList* album = m_oTreeIndex.Data(tv_item->lParam).m_pAlbum;
+        vector<PlaylistItem *>::iterator track;
+
+        for(track = album->m_trackList->begin();
+            track != album->m_trackList->end();
+            track++)
+        {
+            urls->push_back((*track)->URL());
+        }
+    }
+    else if(m_oTreeIndex.IsTrack(tv_item->lParam))
+    {
+        PlaylistItem* track = m_oTreeIndex.Data(tv_item->lParam).m_pTrack;
+
+        urls->push_back(track->URL());
+    }
+}
+
+BOOL MusicBrowserUI::FindSelectedItems(HWND hwnd, HTREEITEM root, vector<string>* urls)
+{
+    BOOL result = FALSE;
+    TV_ITEM tv_item;
+    char name[256];
+
+    tv_item.hItem = root;
+    tv_item.mask = TVIF_STATE|TVIF_TEXT|TVIF_PARAM;
+    tv_item.stateMask = TVIS_SELECTED;
+    tv_item.state = 0;
+    tv_item.pszText = name;
+    tv_item.cchTextMax = sizeof(name);
+
+    do
+    {
+        result = TreeView_GetItem(hwnd, &tv_item);
+
+        HTREEITEM childItem = TreeView_GetChild(hwnd, tv_item.hItem);
+
+        if(result && (tv_item.state & TVIS_SELECTED))
+        {
+            AddTrackURLs(&tv_item, urls);
+        }
+        else if(result && childItem)
+        {
+            FindSelectedItems(hwnd, childItem, urls);        
+        }
+
+    }while(result && (tv_item.hItem = TreeView_GetNextSibling(hwnd, tv_item.hItem)));
+    
+    return result;
+}
+
+// get all the selected items... there are some special
+// cases:
+//
+// 1. If "Music Catalog" item is selected we just 
+//    add all the items as if it were "All Tracks".
+//
+// 2. If either "All Tracks" is selected we add all 
+//    tracks and stop iterating.
+//
+// 3. Otherwise we iterate the children and if selected
+//    add the track items beneath that item. 
+
+void MusicBrowserUI::GetSelectedMusicTreeItems(vector<string>* urls)
+{
+    // need to iterate all the items and add selected
+    // items and their children
+    HTREEITEM rootItem = TreeView_GetRoot(m_hMusicCatalog);
+
+    if(rootItem)
+    {
+        // is the "Music Catalog" item selected?
+        TV_ITEM tv_root;
+
+        tv_root.hItem = rootItem;
+        tv_root.mask = TVIF_STATE;
+        tv_root.stateMask = TVIS_SELECTED;
+        tv_root.state = 0;
+
+        TreeView_GetItem(m_hMusicCatalog, &tv_root);
+
+        // if so then we add all the items under "All Tracks"
+        if(tv_root.state & TVIS_SELECTED)
+        {
+            AddAllTrackURLs(urls);
+        }
+        else
+        {
+            TV_ITEM tv_all;
+
+            // is the "All Tracks" item selected
+            tv_all.hItem = TreeView_GetChild(m_hMusicCatalog, rootItem);
+            tv_all.mask = TVIF_STATE;
+            tv_all.stateMask = TVIS_SELECTED;
+            tv_all.state = 0;
+
+            TreeView_GetItem(m_hMusicCatalog, &tv_all);
+
+            // if so then we add all the items under "All Tracks"
+            if(tv_all.state & TVIS_SELECTED)
+            {
+                AddAllTrackURLs(urls);
+            }
+            else // if not we iterate the catalog for selected items
+            {
+                TV_ITEM tv_uncat;
+                
+
+                // is the "Uncatagorized" item selected
+                tv_uncat.hItem = TreeView_GetNextSibling(m_hMusicCatalog, tv_all.hItem);
+                tv_uncat.mask = TVIF_STATE;
+                tv_uncat.stateMask = TVIS_SELECTED;
+                tv_uncat.state = 0;
+
+                TreeView_GetItem(m_hMusicCatalog, &tv_uncat);
+
+                HTREEITEM firstSearchItem = tv_uncat.hItem;
+
+                // if so then we add all the items under "Uncatagorized"
+                if(tv_all.state & TVIS_SELECTED)
+                {
+                    AddUncatagorizedTrackURLs(urls);
+
+                    // wanna skip the uncated tracks if we just added them all
+                    firstSearchItem = TreeView_GetNextSibling(m_hMusicCatalog, tv_uncat.hItem);
+                }
+
+                if(firstSearchItem)
+                    FindSelectedItems(m_hMusicCatalog, firstSearchItem, urls);
+            }
+        }
+    }
+}
+
 #define IsCtrlDown()  (GetKeyState(VK_CONTROL) < 0)
 #define IsShiftDown()  (GetKeyState(VK_SHIFT) < 0)
-
-
 
 static BOOL TreeView_SetTree(HWND hwnd, TV_ITEM* root)
 {
@@ -445,7 +661,17 @@ TreeViewWndProc(HWND hwnd,
                 WPARAM wParam, 
                 LPARAM lParam)
 {
-    WNDPROC lpOldProc = (WNDPROC)GetProp( hwnd, "oldproc" );
+    MusicBrowserUI* ui = (MusicBrowserUI*)GetProp(hwnd, "this" );
+
+    return ui->TreeViewWndProc(hwnd, msg, wParam, lParam);
+}
+
+LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd, 
+                                        UINT msg, 
+                                        WPARAM wParam, 
+                                        LPARAM lParam)
+{
+    WNDPROC lpOldProc = (WNDPROC)GetProp(hwnd, "oldproc" );
 
 	switch(msg)
 	{
@@ -456,7 +682,13 @@ TreeViewWndProc(HWND hwnd,
 
 			// remove window property
 			RemoveProp( hwnd, "oldproc" ); 
+            RemoveProp( hwnd, "this" ); 
 
+			break;
+        }
+
+        case WM_MOUSEMOVE:
+        {
 			break;
         }
 

@@ -38,6 +38,7 @@ ____________________________________________________________________________*/
 #include "playlist.h"
 #include "musicbrowser.h"
 #include "DataIndex.h"
+#include "DropTarget.h"
 
 class FAContext;
 
@@ -86,6 +87,17 @@ class MusicBrowserUI : public UserInterface
 
     BOOL   DialogProc(HWND hwnd, UINT msg, 
                       WPARAM wParam, LPARAM lParam);
+
+
+    LRESULT TreeViewWndProc(HWND hwnd, 
+                            UINT msg, 
+                            WPARAM wParam, 
+                            LPARAM lParam);
+
+    LRESULT ListViewWndProc(HWND hwnd, 
+                            UINT msg, 
+                            WPARAM wParam, 
+                            LPARAM lParam);
  
  protected:
     FAContext *m_context;
@@ -100,6 +112,7 @@ class MusicBrowserUI : public UserInterface
     void   GetMinMaxInfo(MINMAXINFO *pInfo);
     void   SizeWindow(int type, int iWidth, int iHeight);
     BOOL   SetCursor(int hitTest, int mouseMsg);
+    void   DropFiles(HDROP dropHandle, bool filesAreURLs);
     void   MouseMove(uint32 uFlags, POINT &sPoint);
     void   MouseButtonDown(int keys, int x, int y);
     void   MouseButtonUp(int keys, int x, int y);
@@ -113,7 +126,7 @@ class MusicBrowserUI : public UserInterface
     void   MoveControls(int iPixelsToMove);
     bool   CreateMainDialog(void);
     Error  CloseMainDialog(void);
-    void   BeginDrag(NM_TREEVIEW *pTreeView);
+    void   BeginDrag(HWND hwnd, NM_TREEVIEW* nmtv);
     uint32 CalcStringEllipsis(HDC hdc, string& displayString, int32 columnWidth);
 
     // Functions in Event.cpp
@@ -138,6 +151,8 @@ class MusicBrowserUI : public UserInterface
     void  WritePlaylist(void);
     void  SaveAsPlaylist(void);
     void  UpdatePlaylistList(void);
+    void  AddPlaylistListItem(const PlaylistItem* item);
+    void  UpdatePlaylistListItem(const PlaylistItem* item);
     void  InitList(void);
     void  AddPlaylist(const string &oName);
     void  LoadPlaylist(const string &oPlaylist);
@@ -149,15 +164,20 @@ class MusicBrowserUI : public UserInterface
     void  RemoveMusicBrowserWindow(MusicBrowserUI *pWindow);
 
     // Functions is MusicTree.cpp
-    void      InitTree(void);
-    void      FillArtists(void);
-    void      FillAlbums(TV_ITEM *pItem);
-    void      FillPlaylists(void);
-    void      FillTracks(TV_ITEM *pItem);
-    void      FillAllTracks(void);
-    void      FillUncatTracks(void);
-    int32     GetCurrentItemFromMousePos(void);
-    int32     GetMusicTreeSelection(HTREEITEM hItem);
+    void    InitTree(void);
+    void    FillArtists(void);
+    void    FillAlbums(TV_ITEM *pItem);
+    void    FillPlaylists(void);
+    void    FillTracks(TV_ITEM *pItem);
+    void    FillAllTracks(void);
+    void    FillUncatTracks(void);
+    int32   GetCurrentItemFromMousePos(void);
+    int32   GetMusicTreeSelection(HTREEITEM hItem);
+    void    GetSelectedMusicTreeItems(vector<string>* urls);
+    BOOL    FindSelectedItems(HWND hwnd, HTREEITEM root, vector<string>* urls);
+    void    AddTrackURLs(TV_ITEM* tv_item, vector<string>* urls);
+    void    AddAllTrackURLs(vector<string>* urls);
+    void    AddUncatagorizedTrackURLs(vector<string>* urls);
 
     // Data members
     EventQueue          *m_playerEQ;
@@ -187,6 +207,7 @@ class MusicBrowserUI : public UserInterface
     HBRUSH               m_splitterBrush;
 
     HWND                 m_hPlaylistHeader;
+    DropTarget*          m_playlistDropTarget;
 };
 
 #endif

@@ -585,6 +585,80 @@ Error PlaylistManager::AddItem(const char* url, uint32 index)
     return result;
 }
 
+Error PlaylistManager::AddItem(const string& url)
+{
+    Error result = kError_InvalidParam;
+
+    result = AddItem(url.c_str());
+
+    return result;
+}
+
+Error PlaylistManager::AddItem(const string& url, uint32 index)
+{
+    Error result = kError_InvalidParam;
+
+    result = AddItem(url.c_str(), index);
+
+    return result;
+}
+
+Error PlaylistManager::AddItems(const vector<string>& urls)
+{
+    Error result = kError_InvalidParam;
+    vector<string>::const_iterator i;
+    vector<PlaylistItem*> list;
+
+    for(i = urls.begin(); i != urls.end(); i++)
+    {
+        result = ReadPlaylist((*i).c_str());
+
+        if(IsError(result))
+        {
+            result = kError_OutOfMemory;
+
+            PlaylistItem* item = new PlaylistItem((*i).c_str());
+
+            if(item)
+            {
+                list.push_back(item);
+            }
+        }
+    }
+
+    result = AddItems(&list);
+
+    return result;
+}
+
+Error PlaylistManager::AddItems(const vector<string>& urls, uint32 index)
+{
+    Error result = kError_InvalidParam;
+    vector<string>::const_iterator i;
+    vector<PlaylistItem*> list;
+
+    for(i = urls.begin(); i != urls.end(); i++)
+    {
+        result = ReadPlaylist((*i).c_str());
+
+        if(IsError(result))
+        {
+            result = kError_OutOfMemory;
+
+            PlaylistItem* item = new PlaylistItem((*i).c_str());
+
+            if(item)
+            {
+                list.push_back(item);
+            }
+        }
+    }
+
+    result = AddItems(&list, index);
+
+    return result;
+}
+
 Error PlaylistManager::AddItem(PlaylistItem* item, bool queryForMetaData)
 {
     Error result = kError_InvalidParam;
@@ -1623,13 +1697,13 @@ PlaylistItem* PlaylistManager::ItemAt(uint32 index)
     return result;
 }
 
-uint32 PlaylistManager::IndexOf(PlaylistItem* item)
+uint32 PlaylistManager::IndexOf(const PlaylistItem* item)
 {
     return InternalIndexOf(m_activeList, item);
 }
 
 uint32 PlaylistManager::InternalIndexOf(vector<PlaylistItem*>* list,
-                                        PlaylistItem* item)
+                                        const PlaylistItem* item)
 {
     uint32 result = kInvalidIndex;
     uint32 index = 0;
@@ -1655,7 +1729,7 @@ uint32 PlaylistManager::InternalIndexOf(vector<PlaylistItem*>* list,
     return result;
 }
 
-bool PlaylistManager::HasItem(PlaylistItem* item)
+bool PlaylistManager::HasItem(const PlaylistItem* item)
 {
     return (IndexOf(item) != kInvalidIndex);
 }

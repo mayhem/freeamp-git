@@ -516,7 +516,7 @@ Error ThemeZip::GetDescriptiveName(const string &oSrcFile, string &oDescriptiveN
             uPos=oDescriptiveName.rfind('/');
             if(uPos!=oDescriptiveName.npos) oDescriptiveName.erase(uPos,uPos+1);
             // erase (possible) extension
-            uPos=oDescriptiveName.rfind(string(".fat"));
+            uPos=oDescriptiveName.rfind(".fat");
             if(uPos!=oDescriptiveName.npos) oDescriptiveName.erase(uPos,uPos+1);
 
             break; //we're done
