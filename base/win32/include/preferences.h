@@ -45,6 +45,9 @@ class Preferences {
     Error GetDefaultUI(char* name, uint32* len);
     Error SetDefaultUI(char* path);
 
+    Error GetOpenSaveDirectory(char* path, uint32* len);
+    Error SetOpenSaveDirectory(char* path);
+
  protected:
     Error GetPrefString(const char* pref, char* buf, uint32* len);
     Error SetPrefString(const char* pref, char* buf);

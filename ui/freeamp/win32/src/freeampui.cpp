@@ -44,13 +44,12 @@ ____________________________________________________________________________*/
 #include "eventdata.h"
 #include "playlist.h"
 #include "utility.h"
-#include "resource.h"
-
 #include "renderer.h"
 #include "fontwidth.h"
-
-#include "testitem.h"
+#include "preferences.h"
 #include "stringitem.h"
+
+#include "resource.h"
 
 #define TIMER_MOUSE_POSITION    0
 #define TIMER_SEEK_POSITION     1
@@ -2022,43 +2021,16 @@ AcceptEvent(Event* event)
 					char foo[1024];
 					strncpy(foo,info->GetId3Tag().m_artist,sizeof(foo)-1);
 
-					//kill trailing spaces
-					char *pFoo = &(foo[strlen(foo)-1]);
-
-					while ((pFoo >= foo) && pFoo && (*pFoo == ' ')) 
-                    {
-						*pFoo = '\0';
-						pFoo--;
-					}
-
                     if(*info->GetId3Tag().m_album && *info->GetId3Tag().m_album != ' ')
                     {
 					    strncat(foo," - ",sizeof(foo)-strlen(foo));
 
 					    strncat(foo,info->GetId3Tag().m_album,sizeof(foo)-strlen(foo));
-
-					    // kill trailing spaces
-					    pFoo = &(foo[strlen(foo)-1]);
-
-					    while ((pFoo >= foo) && pFoo && (*pFoo == ' ')) 
-                        {
-						    *pFoo = '\0';
-						    pFoo--;
-					    }
                     }
 
                     strncat(foo," - ",sizeof(foo)-strlen(foo));
 
 					strncat(foo,info->GetId3Tag().m_songName,sizeof(foo)-strlen(foo));
-
-					// kill trailing spaces
-					pFoo = &(foo[strlen(foo)-1]);
-
-					while ((pFoo >= foo) && pFoo && (*pFoo == ' ')) 
-                    {
-						*pFoo = '\0';
-						pFoo--;
-					}
 
                     m_songTitleView->SetText(foo);
 				}
@@ -2350,6 +2322,7 @@ OpenSongDialogProc( HWND hwnd,
                 {            
                     ShowWindow(hwnd, SW_HIDE);
 
+                    Preferences prefs;
                     OPENFILENAME ofn;
 	                char szTitle[] = "Open Audio File";
 	                char szFilter[] =
@@ -2359,10 +2332,15 @@ OpenSongDialogProc( HWND hwnd,
 	                "*.m3u\0"
 	                "All Files (*.*)\0"
 	                "*.*\0";
+                    char szInitialDir[MAX_PATH + 1];
+                    uint32 initialDirSize = sizeof(szInitialDir);
                     const int32 kBufferSize = MAX_PATH * 128;
                     char* fileBuffer = new char[kBufferSize];
 			
 			        *fileBuffer = 0x00;
+
+                    prefs.GetOpenSaveDirectory( szInitialDir, 
+                                                &initialDirSize);
 
 	                // Setup open file dialog box structure
 	                ofn.lStructSize       = sizeof(OPENFILENAME);
@@ -2377,7 +2355,7 @@ OpenSongDialogProc( HWND hwnd,
 	                ofn.nMaxFile          = kBufferSize;
 	                ofn.lpstrFileTitle    = NULL;
 	                ofn.nMaxFileTitle     = 0;
-	                ofn.lpstrInitialDir   = "";
+	                ofn.lpstrInitialDir   = szInitialDir;
 	                ofn.lpstrTitle        = szTitle;
 	                ofn.Flags             = OFN_FILEMUSTEXIST | 
 							                OFN_PATHMUSTEXIST |
@@ -2393,9 +2371,10 @@ OpenSongDialogProc( HWND hwnd,
 
                     if(GetOpenFileName(&ofn))
                     {
-
                         char file[MAX_PATH + 1];
 				        char* cp = NULL;
+
+                        prefs.SetOpenSaveDirectory(szInitialDir);
 
 				        strncpy(file, fileBuffer, ofn.nFileOffset);
 

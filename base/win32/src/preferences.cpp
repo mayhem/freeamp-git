@@ -27,11 +27,12 @@ ____________________________________________________________________________*/
 
 
 const HKEY  kMainKey = HKEY_CURRENT_USER;
-const char* kPrefsKey = "SOFTWARE\\FreeAmp\\FreeAmp v1.0";
+const char* kPrefsKey = "SOFTWARE\\FreeAmp\\FreeAmp v1.2";
 const char* kFreeAmpKey = "SOFTWARE\\FreeAmp";
-const char* kFreeAmpVersionKey = "FreeAmp v1.0";
+const char* kFreeAmpVersionKey = "FreeAmp v1.2";
 const char* kInstallDirPref = "InstallDirectory";
 const char* kUIPref = "UI";
+const char* kOpenSaveDirPref = "OpenSaveDir";
 const char* kDefaultUI = "freeamp.ui";
 
 
@@ -157,6 +158,14 @@ Initialize()
                                     (LPBYTE)kDefaultUI, 
                                     strlen(kDefaultUI) + 1);
 
+            // set default open/save dlg path value
+            result = RegSetValueEx( m_prefsKey,
+                                    kOpenSaveDirPref, 
+                                    NULL, 
+                                    REG_SZ, 
+                                    (LPBYTE)cwd, 
+                                    strlen(cwd) + 1);
+
              error = kError_NoErr;
         }
         else
@@ -186,7 +195,6 @@ SetInstallDirectory(char* path)
     return SetPrefString(kInstallDirPref, path);
 }
 
-
 Error 
 Preferences::
 GetDefaultUI(char* name, uint32* len)
@@ -201,6 +209,19 @@ SetDefaultUI(char* name)
     return SetPrefString(kUIPref, name);
 }
 
+Error 
+Preferences::
+GetOpenSaveDirectory(char* path, uint32* len)
+{
+    return GetPrefString(kOpenSaveDirPref, path, len);
+}
+
+Error 
+Preferences::
+SetOpenSaveDirectory(char* path)
+{
+    return SetPrefString(kOpenSaveDirPref, path);
+}
 
 Error
 Preferences::

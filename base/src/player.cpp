@@ -967,36 +967,11 @@ void Player::GetMediaTitle(Event *pEventArg)
             {
                 pID3Tag = new Id3TagInfo((char *)szTagBuffer);
 
-                /*OutputDebugString(sID3Tag.szArtist);
-                OutputDebugString("\r\n");
-                OutputDebugString(sID3Tag.szAlbum);
-                OutputDebugString("\r\n");
-                OutputDebugString(sID3Tag.szTitle);
-                OutputDebugString("\r\n");*/
-
                 strcpy(szTitle, pID3Tag->m_artist);
-
-                //kill trailing spaces
-                char *pFoo = &(szTitle[strlen(szTitle)-1]);
-
-                while ((pFoo >= szTitle) && pFoo && (*pFoo == ' ')) 
-                {
-                    *pFoo = '\0';
-                    pFoo--;
-                }
 
                 strcat(szTitle, " - ");
 
                 strcat(szTitle, pID3Tag->m_songName);
-
-                //kill trailing spaces
-                pFoo = &(szTitle[strlen(szTitle)-1]);
-
-                while ((pFoo >= szTitle) && pFoo && (*pFoo == ' ')) 
-                {
-                    *pFoo = '\0';
-                    pFoo--;
-                }
 
                 delete pID3Tag;
              }
