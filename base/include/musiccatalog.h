@@ -173,6 +173,7 @@ class MusicCatalog : public EventQueue
 
     bool   m_inUpdateSong;
     bool   m_addImmediately;
+    bool   m_bSurpressAddMessages;
 
     PlaylistItem *m_newItem;
     PlaylistItem *m_oldItem;
