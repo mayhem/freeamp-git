@@ -195,7 +195,7 @@ Error XingLMC::AdvanceBufferToNextFrame()
 
    for(;;)
    {
-	   pBuffer = ((unsigned char *)pBufferBase) + 1;
+	    pBuffer = ((unsigned char *)pBufferBase) + 1;
        for(iCount = 0; iCount < iMaxFrameSize - 1 &&
            !(*pBuffer == 0xFF && ((*(pBuffer+1) & 0xF0) == 0xF0 || 
                                   (*(pBuffer+1) & 0xF0) == 0xE0)); 
@@ -1003,7 +1003,7 @@ Error XingLMC::EndRead(size_t iBytesUsed)
 {
    if (m_fpFile)
    {
-      delete m_pLocalReadBuffer;
+      delete [] m_pLocalReadBuffer;
       m_pLocalReadBuffer = NULL;
       return kError_NoErr;
    }
