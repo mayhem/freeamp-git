@@ -275,7 +275,7 @@ SetDefaults()
     char buf[1024];
     uint32 size;
     bool dummyBool;
-    int32 dummyInt32;
+    //int32 dummyInt32;
 
     // Where are we starting the program from?
     GetCurrentDirectory(sizeof(cwd), cwd);
@@ -327,15 +327,6 @@ SetDefaults()
     // set default for minimizing to tray
     if (GetPrefBoolean(kLiveInTrayPref, &dummyBool) == kError_NoPrefValue)
         SetPrefBoolean(kLiveInTrayPref, kDefaultLiveInTray);
-
-    // set default for window position
-    if (GetPrefInt32(kWindowPositionLeftPref, &dummyInt32) == kError_NoPrefValue)
-    {
-        SetPrefInt32(kWindowPositionLeftPref, kDefaultWindowPosition);
-        SetPrefInt32(kWindowPositionTopPref, kDefaultWindowPosition);
-        SetPrefInt32(kWindowPositionWidthPref, kDefaultWindowPosition);
-        SetPrefInt32(kWindowPositionHeightPref, kDefaultWindowPosition);
-    }
 
     Preferences::SetDefaults();
 
