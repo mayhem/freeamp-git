@@ -24,10 +24,11 @@ ____________________________________________________________________________*/
 #include <assert.h>
 #include <string.h>
 #include <sys/types.h>
-#include <sys/time.h>
 #ifdef WIN32
 #include <winsock.h>
+#include <time.h>
 #else
+#include <sys/time.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h> 

@@ -26,11 +26,12 @@ ____________________________________________________________________________*/
 #include <assert.h>
 #include <string.h>
 #include <sys/types.h>
-#include <sys/time.h>
 #include <errno.h>
 #ifdef WIN32
 #include <winsock.h>
+#include <time.h>
 #else
+#include <sys/time.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
@@ -52,7 +53,10 @@ const int iICY_OK = 200;
 const int iTransmitTimeout = 60;
 
 #define DB printf("%s:%d\n", __FILE__, __LINE__);
+
+#ifndef min
 #define min(a,b) ((a) < (b) ? (a) : (b))
+#endif
 
 static char *g_ErrorArray[9] =
 {
