@@ -60,8 +60,7 @@ Error RegisterLMCs(LMCRegistry* registry)
             {
                 char file[MAX_PATH];
 
-                strcpy(file, dir);
-                strcat(file, find.cFileName);
+                sprintf(file, "%s\\%s", dir, find.cFileName);
 
                 LMCInfo* info = new LMCInfo;
 
@@ -109,8 +108,7 @@ Error RegisterPMOs(PMORegistry* registry)
             {
                 char file[MAX_PATH];
 
-                strcpy(file, dir);
-                strcat(file, find.cFileName);
+                sprintf(file, "%s\\%s", dir, find.cFileName);
 
                 PMOInfo* info = new PMOInfo;
 
@@ -158,8 +156,7 @@ Error RegisterPMIs(PMIRegistry* registry)
             {
                 char file[MAX_PATH];
 
-                strcpy(file, dir);
-                strcat(file, find.cFileName);
+                sprintf(file, "%s\\%s", dir, find.cFileName);
 
                 PMIInfo* info = new PMIInfo;
 

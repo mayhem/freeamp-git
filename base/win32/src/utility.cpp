@@ -35,6 +35,8 @@ ____________________________________________________________________________*/
 #define MAIN_KEY    HKEY_CURRENT_USER
 #define SUB_KEY     "SOFTWARE\\FreeAmp\\FreeAmp v1.0"
 #define INSTALL     "InstallDirectory"
+#define UI          "UI"
+#define DEFAULT_UI  "freeamp"
 
 Error InitWindowsRegistry()
 {
@@ -98,6 +100,14 @@ Error InitWindowsRegistry()
                                     REG_SZ, 
                                     (LPBYTE)cwd, 
                                     strlen(cwd) + 1);
+
+            result = RegSetValueEx( hkey,
+                                    UI, 
+                                    NULL, 
+                                    REG_SZ, 
+                                    (LPBYTE)DEFAULT_UI, 
+                                    strlen(DEFAULT_UI) + 1);
+
             error = kError_NoErr;
             RegCloseKey(hkey);
         }
