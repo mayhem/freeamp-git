@@ -47,7 +47,6 @@ LogFile *g_Log = NULL;
 
 const char *szPlaylistExt = ".M3U";
 
-#define DB //printf("%s:%d\n", __FILE__, __LINE__);
 #define SEND_NORMAL_EVENT(e) { Event *ev = new Event(e); GetUIManipLock();    \
                                SendToUI(ev); ReleaseUIManipLock(); delete ev; \
                              }
@@ -890,9 +889,11 @@ void Player::DoneOutputting(Event *pEvent)
    {
        SEND_NORMAL_EVENT(INFO_Stopped);
    }
-   if (!m_plm->NextIsSame())
+
+   if (m_plm->HasAnotherSong())
    {
       AcceptEvent(new Event(CMD_NextMediaPiece));
+
       if (m_playerState == STATE_Paused)
       {
          AcceptEvent(new Event(CMD_PlayPaused));

@@ -267,7 +267,7 @@ class PlayListManager {
 
     void AcceptEvent(Event *);
 
-    bool NextIsSame();
+    bool HasAnotherSong();
 
     PlayListItem *GetCurrent();
     void SetFirst();

@@ -101,40 +101,29 @@ SetFirst()
 
 bool 
 PlayListManager::
-NextIsSame()
+HasAnotherSong()
 {
     GetPLManipLock();
     bool result = false;
 
-    if (m_repeat == REPEAT_CURRENT)
+    if(m_repeat == REPEAT_CURRENT || m_repeat == REPEAT_ALL)
     {
         result = true;
     }
     else
     {
-        if (m_order == SHUFFLE_RANDOM)
+        if(m_order == SHUFFLE_RANDOM)
         {
-            if (m_list->CountItems() == 1)
+            if(m_list->CountItems() != 1)
                 result = true;
-            else
-                result = false;
         }
         else
         {
-            if (m_repeat == REPEAT_ALL)
-            {
-                // only same if there is only one song in list
-                if (m_list->CountItems() == 1)
-                    result = true;
-            }
-            else
-            {
-                // only same if current is the last song
-                if (m_current == m_list->CountItems() - 1)
-                    result = true;
-            }
+            if (m_current != m_list->CountItems() - 1)
+                result = true;
         }
     }
+
     ReleasePLManipLock();
     return result;
 }
