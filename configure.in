@@ -172,6 +172,12 @@ AC_SUBST(CFLAGS)
 
 AC_CHECK_HEADER(esd.h, have_esound="true", have_esound="false")
 
+AC_ARG_ENABLE(esd, [  --disable-esd           Don't compile the EsounD output plugin], enable_esd=no, enable_esd=yes)
+
+if test "x$enable_esd" = "xno"; then
+   have_esound="false"; 
+fi
+
 if test "$have_esound" = "true"; then
   AC_PATH_PROG(ESD_CONFIG, esd-config, no)
   if test "$ESD_CONFIG" = "no" ; then
@@ -404,6 +410,12 @@ AC_CHECK_HEADER(sys/asoundlib.h,
 		,
 		have_alsa="false"
 )
+
+
+AC_ARG_ENABLE(alsa, [  --disable-alsa          Don't compile the ALSA output plugin], enable_alsa=no, enable_alsa=yes)
+if test "x$enable_alsa" = "xno"; then
+   have_alsa="false";
+fi
 
 ALSAPMOPLUGIN=plugins/alsa.pmo
 if test "$have_alsa" = "true"; then
