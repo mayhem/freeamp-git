@@ -2,7 +2,7 @@
 
    FreeAmp - The Free MP3 Player
 
-   Copyright (C) 1999 EMusic
+   Copyright (C) 1999-2000 EMusic
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -74,12 +74,50 @@ void ButtonControl::Init(void)
     m_oMutex.Acquire();
 
     m_eCurrentState = CS_Normal;
+
+    if (!m_bUsesStateBitmapRects) {
+        for (int i = 0; i < 4; i++) {
+           int iFrameWidth;
+           Rect oFrameRect;
+           
+           if (m_bHorizontalBitmap) {
+               iFrameWidth = (m_oBitmapRect.Width() + 1) / 4;
+               oFrameRect = m_oBitmapRect;
+               oFrameRect.x1 += i * iFrameWidth;
+               oFrameRect.x2 = oFrameRect.x1 + iFrameWidth - 1;
+           }
+           else {
+               iFrameWidth = (m_oBitmapRect.Height() + 1) / 4;
+               oFrameRect = m_oBitmapRect;
+               oFrameRect.y1 += i * iFrameWidth;
+               oFrameRect.y2 = oFrameRect.y1 + iFrameWidth - 1;
+           }
+
+           switch (i) {
+               case 0:
+                   SetStateBitmap(m_pBitmap, oFrameRect, CS_Normal);
+                    break;
+               case 1:
+                   SetStateBitmap(m_pBitmap, oFrameRect, CS_MouseOver);
+                    break;
+               case 2:
+                   SetStateBitmap(m_pBitmap, oFrameRect, CS_Pressed);
+                    break;
+               case 3:
+                   SetStateBitmap(m_pBitmap, oFrameRect, CS_Disabled);
+                    break;
+                default:
+                   break;
+            }
+        }
+    }
+
     if (m_oRect.x2 == -1 && m_oRect.y2 == -1)
     {
-        m_oRect.x2 = m_oRect.x1 + 
-                     (m_oBitmapRect.x2 - m_oBitmapRect.x1)/4;
-        m_oRect.y2 = m_oRect.y1 + 
-                     (m_oBitmapRect.y2 - m_oBitmapRect.y1);
+        m_oRect.x2 = m_oRect.x1 + m_oStateBitmapRect[0][CS_Normal].x2 - 
+                     m_oStateBitmapRect[0][CS_Normal].x1;
+        m_oRect.y2 = m_oRect.y1 + m_oStateBitmapRect[0][CS_Normal].y2 -
+                     m_oStateBitmapRect[0][CS_Normal].y1;
     }    
     m_oMutex.Release();
 
@@ -89,7 +127,7 @@ void ButtonControl::Init(void)
 void ButtonControl::Transition(ControlTransitionEnum  eTrans,
                                Pos                   *pMousePos)
 {
-	Canvas *pCanvas;
+    Canvas *pCanvas;
 
     switch(eTrans)
     {
@@ -112,7 +150,7 @@ void ButtonControl::Transition(ControlTransitionEnum  eTrans,
           break;
     }
 
-	if (m_eCurrentState == CS_MouseOver && 
+    if (m_eCurrentState == CS_MouseOver && 
         eTrans == CT_MouseLButtonUp)
     {    
        if (m_oTargetWindow.length() == 0)
@@ -134,27 +172,7 @@ void ButtonControl::Transition(ControlTransitionEnum  eTrans,
        }
     }       
 
-    switch(m_eCurrentState)
-    {
-       case CS_Normal:
-          BlitFrame(0, 4);
-          break;
-
-       case CS_MouseOver:
-          BlitFrame(1, 4);
-          break;
-
-       case CS_Pressed:
-          BlitFrame(2, 4);
-          break;
-
-       case CS_Disabled:
-          BlitFrame(3, 4);
-          break;
-
-       default:
-          break;
-    }
+    BlitFrame(m_eCurrentState);
 }
 
 bool ButtonControl::PosInControl(Pos &oPos)
@@ -168,8 +186,10 @@ bool ButtonControl::PosInControl(Pos &oPos)
     {
     	Pos oLocalPos;
         
-        oLocalPos.x = (oPos.x - m_oRect.x1) + m_oBitmapRect.x1;
-        oLocalPos.y = (oPos.y - m_oRect.y1) + m_oBitmapRect.y1;
+        oLocalPos.x = (oPos.x - m_oRect.x1) + 
+                      m_oStateBitmapRect[0][m_eCurrentState].x1;
+        oLocalPos.y = (oPos.y - m_oRect.y1) + 
+                      m_oStateBitmapRect[0][m_eCurrentState].y1;
         m_oMutex.Release();
         
         return m_pBitmap->IsPosVisible(oLocalPos);
@@ -183,7 +203,7 @@ bool ButtonControl::PosInControl(Pos &oPos)
 void ButtonControl::SetTargetWindow(string &oWindow)
 {
     m_oMutex.Acquire();
-	m_oTargetWindow = oWindow;
+    m_oTargetWindow = oWindow;
     m_oMutex.Release();
 }
 

@@ -2,7 +2,7 @@
 
    FreeAmp - The Free MP3 Player
 
-   Copyright (C) 1999 EMusic
+   Copyright (C) 1999-2000 EMusic
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -234,7 +234,6 @@ void Window::GetName(string &oName)
 Error Window::ControlEnable(const string &oTarget, bool bSet, bool &bEnable)
 {
     ControlMapIterator i;
-    int                j;
 
     IncUsageRef();
        
@@ -248,7 +247,7 @@ Error Window::ControlEnable(const string &oTarget, bool bSet, bool &bEnable)
 
     DecUsageRef();
 
-    return (j == 0) ? kError_InvalidParam : kError_NoErr;
+    return kError_NoErr;
 }
 
 Error Window::ControlShow(const string &oTarget, bool bSet, bool &bShow)

@@ -2,7 +2,7 @@
 
    FreeAmp - The Free MP3 Player
 
-   Portions Copyright (C) 1999 EMusic
+   Portions Copyright (C) 1999-2000 EMusic
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -218,8 +218,22 @@ void Control::SetBitmap(Bitmap *pBitmap, Rect &oBitmapRect, bool bHoriz)
     m_pBitmap = pBitmap;
     m_oBitmapRect = oBitmapRect;
     m_bHorizontalBitmap = bHoriz;
+    m_bUsesStateBitmapRects = false;
     m_oMutex.Release();
 }
+
+void Control::SetStateBitmap(Bitmap *pBitmap, Rect &oBitmapRect, 
+                             ControlStateEnum eClickState, int iState)
+{
+    m_oMutex.Acquire();
+    m_pBitmap = pBitmap;
+    if (m_oStateBitmapRect.size() < (unsigned int)(iState + 1)) 
+        m_oStateBitmapRect.resize(iState + 1);
+    m_oStateBitmapRect[iState][eClickState] = oBitmapRect;
+    m_bUsesStateBitmapRects = true;
+    m_oMutex.Release();
+}
+
 
 Bitmap *Control::GetBitmap(void)
 {
@@ -237,6 +251,39 @@ void Control::Erase(void)
 
     pCanvas = m_pParent->GetCanvas();
     pCanvas->Erase(m_oRect);
+}
+
+void Control::BlitFrame(ControlStateEnum eFrame, int iState, Rect *pRect)
+{
+    Canvas *pCanvas;
+    Rect    oFrameRect, oDestRect;
+
+    if (pRect == NULL)
+        oDestRect = m_oRect;
+    else
+        oDestRect = *pRect;
+
+    if ((unsigned int)(iState + 1) > m_oStateBitmapRect.size())
+        iState = 0;
+
+    if (m_oStateBitmapRect[iState].find(eFrame) == 
+        m_oStateBitmapRect[iState].end())
+        m_oStateBitmapRect[iState][eFrame] = 
+                                    m_oStateBitmapRect[iState][CS_Normal];
+
+    oFrameRect = m_oStateBitmapRect[iState][eFrame];
+
+    oFrameRect.x2++;
+    oFrameRect.y2++;
+
+    oDestRect.x2++;
+    oDestRect.y2++;
+
+    pCanvas = m_pParent->GetCanvas();
+    pCanvas->MaskBlitRect(m_pBitmap, oFrameRect, oDestRect);
+
+    pCanvas->Invalidate(oDestRect);
+    pCanvas->Update();
 }
 
 void Control::BlitFrame(int iFrame, int iNumFramesInBitmap, Rect *pRect)
@@ -305,35 +352,6 @@ void Control::BlitFrameVert(int iFrame, int iNumFramesInBitmap, Rect *pRect)
     pCanvas->Update();
 }
 
-void Control::BlitMultiStateFrame(int iFrame, int iNumFramesInBitmap,
-                                  int iRow, int iNumRowsInBitmap)  
-{
-    Canvas *pCanvas;
-    int     iFrameWidth, iFrameHeight;
-    Rect    oFrameRect, oDestRect;
-
-    oDestRect = m_oRect;
-
-    iFrameWidth = (m_oBitmapRect.Width() + 1) / iNumFramesInBitmap;
-    iFrameHeight = (m_oBitmapRect.Height() + 1) / iNumRowsInBitmap;
-
-    oFrameRect = m_oBitmapRect;
-    oFrameRect.x1 += iFrame * iFrameWidth;
-    oFrameRect.x2 = oFrameRect.x1 + iFrameWidth + 1;
-    oFrameRect.y1 += iRow * iFrameHeight;
-    oFrameRect.y2 = oFrameRect.y1 + iFrameHeight + 1;
-
-    oDestRect.x2++;
-    oDestRect.y2++;
-
-    pCanvas = m_pParent->GetCanvas();
-    pCanvas->MaskBlitRect(m_pBitmap, oFrameRect, oDestRect);
-    
-    pCanvas->Invalidate(oDestRect);
-    pCanvas->Update();
-}
-
-
 bool Control::PosInControl(Pos &oPos)
 {
     return m_oRect.IsPosInRect(oPos);
@@ -365,5 +383,5 @@ void Control::GetTip(string &oTip)
 
 bool Control::WantsTimingMessages(void)
 {
-	return m_bWantsTimingMessages;
+    return m_bWantsTimingMessages;
 }

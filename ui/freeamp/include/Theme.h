@@ -2,7 +2,7 @@
 
    FreeAmp - The Free MP3 Player
 
-   Copyright (C) 1999 EMusic
+   Copyright (C) 1999-2000 EMusic
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -100,6 +100,7 @@ class Theme : public Parse
 
       Bitmap *FindBitmap(string &oName);
       Font   *FindFont(string &oName);
+      Error   ParseState(string &oStateString, ControlStateEnum &eState);
       Error   ParseRect(string &oRectString, Rect &oRect);
       Error   ParseColor(string &oColorString, Color &oColor);
       Error   ParsePos(string &oPosString, Pos &oPos);

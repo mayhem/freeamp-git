@@ -2,7 +2,7 @@
 
    FreeAmp - The Free MP3 Player
 
-   Portions Copyright (C) 1999 EMusic
+   Portions Copyright (C) 1999-2000 EMusic
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ class SliderControl : public Control
 {
     public:
 
-               SliderControl(Window *pWindow, string &oName);
+               SliderControl(Window *pWindow, string &oName, int iThumbs);
       virtual ~SliderControl(void);
 
               void Transition(ControlTransitionEnum eTrans, Pos *pMousePos);
@@ -39,16 +39,24 @@ class SliderControl : public Control
                               Pos                   *pPos);
               void HandleJump(ControlTransitionEnum  eTrans,
                               Pos                   *pPos);
+              void SetTroughBitmap(Bitmap *pBitmap, Rect &oBitmapRect,
+                                   int iFrames, bool bHoriz, int iDelta);
 
     private:
 
               void MoveThumb(int iCurrentPos, int iNewPos);
+              void BlitTrough(int iPos);
 					  
-      Pos   m_oOrigin, m_oLastPos;
-      int   m_iRange;
-      int   m_iCurrentPos;
-      int   m_iThumbWidth;
-      bool  m_bIsDrag, m_bInUpdate;
+      Pos     m_oOrigin, m_oLastPos;
+      int     m_iRange;
+      int     m_iCurrentPos;
+      int     m_iThumbWidth;
+      bool    m_bIsDrag, m_bInUpdate;
+      int     m_iNumThumbStates;
+      bool    m_bHasTroughBitmap, m_bHorizontalTroughBitmap;
+      int     m_iTroughFrames, m_iCurrentTroughFrame, m_iTroughDelta;
+      Rect    m_oTroughBitmapRect;
+      Bitmap *m_pTroughBitmap;
 };
 
 #endif

@@ -2,7 +2,7 @@
 
    FreeAmp - The Free MP3 Player
 
-   Copyright (C) 1999 EMusic
+   Copyright (C) 1999-2000 EMusic
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ MultiStateControl::MultiStateControl(Window *pWindow,
                                      int iNumStates) :
                Control(pWindow, oName, pTransitions)
 {
-	m_iState = 0;
+    m_iState = 0;
     m_iNumStates = iNumStates;
 }
 
@@ -151,23 +151,58 @@ void MultiStateControl::Init(void)
     }
     free(szDup);
 
+    if (!m_bUsesStateBitmapRects) {
+        for (int row = 0; row < m_iNumStates; row++) { 
+            for (int i = 0; i < 4; i++) {
+                int iFrameWidth, iFrameHeight;
+                Rect oFrameRect;
+    
+                iFrameWidth = (m_oBitmapRect.Width() + 1) / 4;
+                iFrameHeight = (m_oBitmapRect.Height() + 1) / m_iNumStates;
+     
+                oFrameRect = m_oBitmapRect;
+                oFrameRect.x1 += i * iFrameWidth;
+                oFrameRect.x2 = oFrameRect.x1 + iFrameWidth - 1;
+                oFrameRect.y1 += row * iFrameHeight;
+                oFrameRect.y2 = oFrameRect.y1 + iFrameHeight - 1;
+
+                switch (i) {
+                    case 0:
+                        SetStateBitmap(m_pBitmap, oFrameRect, CS_Normal, row);
+                        break;
+                    case 1:
+                        SetStateBitmap(m_pBitmap, oFrameRect, CS_MouseOver, row);
+                        break;
+                    case 2:
+                        SetStateBitmap(m_pBitmap, oFrameRect, CS_Pressed, row);
+                        break;
+                    case 3:
+                        SetStateBitmap(m_pBitmap, oFrameRect, CS_Disabled, row);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+
     if (m_oRect.x2 == -1 && m_oRect.y2 == -1)
     {
-        m_oRect.x2 = m_oRect.x1 + 
-                     (m_oBitmapRect.x2 - m_oBitmapRect.x1)/4;
-        m_oRect.y2 = m_oRect.y1 + 
-                     (m_oBitmapRect.y2 - m_oBitmapRect.y1)/m_iNumStates;
+        m_oRect.x2 = m_oRect.x1 + m_oStateBitmapRect[0][CS_Normal].x2 -
+                     m_oStateBitmapRect[0][CS_Normal].x1; 
+        m_oRect.y2 = m_oRect.y1 + m_oStateBitmapRect[0][CS_Normal].y2 -
+                     m_oStateBitmapRect[0][CS_Normal].y1; 
+
     }    
     m_oMutex.Release();
     
-    BlitMultiStateFrame(0, 4, m_iState, m_iNumStates);
+    BlitFrame(CS_Normal, m_iState);
 }
 
 void MultiStateControl::Transition(ControlTransitionEnum  eTrans,
                                    Pos                   *pMousePos)
 {
-	Canvas *pCanvas;
-    
+    Canvas *pCanvas;
     
     switch(eTrans)
     {
@@ -193,31 +228,11 @@ void MultiStateControl::Transition(ControlTransitionEnum  eTrans,
           break;
     }
 
-	if (m_eCurrentState == CS_MouseOver && 
+    if (m_eCurrentState == CS_MouseOver && 
         eTrans == CT_MouseLButtonUp)
         m_pParent->SendControlMessage(this, CM_Pressed);
 
-    switch(m_eCurrentState)
-    {
-       case CS_Normal:
-          BlitMultiStateFrame(0, 4, m_iState, m_iNumStates);
-          break;
-
-       case CS_MouseOver:
-          BlitMultiStateFrame(1, 4, m_iState, m_iNumStates);
-          break;
-
-       case CS_Pressed:
-          BlitMultiStateFrame(2, 4, m_iState, m_iNumStates);
-          break;
-
-       case CS_Disabled:
-          BlitMultiStateFrame(3, 4, m_iState, m_iNumStates);
-          break;
-
-       default:
-          break;
-    }
+    BlitFrame(m_eCurrentState, m_iState);
 }
 
 bool MultiStateControl::PosInControl(Pos &oPos)
@@ -231,8 +246,10 @@ bool MultiStateControl::PosInControl(Pos &oPos)
     {
     	Pos oLocalPos;
         
-        oLocalPos.x = (oPos.x - m_oRect.x1) + m_oBitmapRect.x1;
-        oLocalPos.y = (oPos.y - m_oRect.y1) + m_oBitmapRect.y1;
+        oLocalPos.x = (oPos.x - m_oRect.x1) + 
+                      m_oStateBitmapRect[m_iState][m_eCurrentState].x1;
+        oLocalPos.y = (oPos.y - m_oRect.y1) + 
+                      m_oStateBitmapRect[m_iState][m_eCurrentState].y1;
         
         m_oMutex.Release();
         return m_pBitmap->IsPosVisible(oLocalPos);

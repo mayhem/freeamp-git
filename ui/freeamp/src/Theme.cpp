@@ -2,7 +2,7 @@
 
    FreeAmp - The Free MP3 Player
 
-   Copyright (C) 1999 EMusic
+   Copyright (C) 1999-2000 EMusic
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -628,7 +628,7 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
 
     if (oElement == string("ButtonControl"))
     {
-	   m_bPosDefined = m_bBitmapDefined = m_bInfoDefined = false;
+       m_bPosDefined = m_bBitmapDefined = m_bInfoDefined = false;
        
        if (m_pCurrentControl)
        {
@@ -636,12 +636,12 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
            return kError_InvalidParam;
        }
 
-	   if (oAttrMap.find("Name") == oAttrMap.end())
+       if (oAttrMap.find("Name") == oAttrMap.end())
        {
            m_oLastError = string("the <ButtonControl> tag needs a Name attribute");
            return kError_ParseError;
        }        
-	   if (oAttrMap.find("URL") != oAttrMap.end() &&
+       if (oAttrMap.find("URL") != oAttrMap.end() &&
            oAttrMap["Name"] != string("Logo"))
        {
            m_oLastError = string("only the Logo button can have a URL attribute");
@@ -649,7 +649,7 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
        }        
 
        m_eCurrentControl = eButtonControl;
-	   if (oAttrMap.find("URL") != oAttrMap.end())
+       if (oAttrMap.find("URL") != oAttrMap.end())
            m_pCurrentControl = new ButtonControl(m_pCurrentWindow, 
                                                  oAttrMap["Name"],
                                                  oAttrMap["URL"]);
@@ -662,7 +662,7 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
 
     if (oElement == string("DialControl"))
     {
-	   m_bPosDefined = m_bBitmapDefined = m_bInfoDefined = false;
+       m_bPosDefined = m_bBitmapDefined = m_bInfoDefined = false;
        
        if (m_pCurrentControl)
        {
@@ -670,21 +670,21 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
            return kError_InvalidParam;
        }
 
-	   if (oAttrMap.find("Name") == oAttrMap.end())
+       if (oAttrMap.find("Name") == oAttrMap.end())
        {
            m_oLastError = string("the <DialControl> tag needs a Name attribute");
            return kError_ParseError;
        }        
 
-	   if (oAttrMap.find("NumFrames") == oAttrMap.end())
+       if (oAttrMap.find("NumFrames") == oAttrMap.end())
        {
-           m_oLastError = string("the <MultiStateControl> tag needs a NumFrames attribute");
+           m_oLastError = string("the <DialControl> tag needs a NumFrames attribute");
            return kError_ParseError;
        }        
 
-	   if (oAttrMap.find("PixelsPerFrame") == oAttrMap.end())
+       if (oAttrMap.find("PixelsPerFrame") == oAttrMap.end())
        {
-           m_oLastError = string("the <MultiStateControl> tag needs a PixelsPerFrame attribute");
+           m_oLastError = string("the <DialControl> tag needs a PixelsPerFrame attribute");
            return kError_ParseError;
        }        
 
@@ -698,7 +698,7 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
 
     if (oElement == string("MultiStateControl"))
     {
-	   m_bPosDefined = m_bBitmapDefined = m_bInfoDefined = false;
+       m_bPosDefined = m_bBitmapDefined = m_bInfoDefined = false;
        
        if (m_pCurrentControl)
        {
@@ -706,12 +706,12 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
            return kError_InvalidParam;
        }
 
-	   if (oAttrMap.find("Name") == oAttrMap.end())
+       if (oAttrMap.find("Name") == oAttrMap.end())
        {
            m_oLastError = string("the <MultiStateControl> tag needs a Name attribute");
            return kError_ParseError;
        }        
-	   if (oAttrMap.find("NumStates") == oAttrMap.end())
+       if (oAttrMap.find("NumStates") == oAttrMap.end())
        {
            m_oLastError = string("the <MultiStateControl> tag needs a NumStates attribute");
            return kError_ParseError;
@@ -727,56 +727,70 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
 
     if (oElement == string("SliderControl"))
     {
-	   m_bPosDefined = m_bBitmapDefined = m_bInfoDefined = false;
-    
+       m_bPosDefined = m_bBitmapDefined = m_bInfoDefined = false;
+       int iThumbStates = 1;    
+
        if (m_pCurrentControl)
        {
            m_oLastError = string("Controls cannot be nested");
            return kError_InvalidParam;
        }
-	   if (oAttrMap.find("Name") == oAttrMap.end())
+       if (oAttrMap.find("Name") == oAttrMap.end())
        {
            m_oLastError = string("the <SliderControl> tag needs a Name attribute");
            return kError_ParseError;
        }        
 
+       if (oAttrMap.find("ThumbStates") != oAttrMap.end())
+       {
+           iThumbStates = atoi(oAttrMap["ThumbStates"].c_str());
+       }
+
        m_eCurrentControl = eSliderControl;
        m_pCurrentControl = new SliderControl(m_pCurrentWindow,
-                                             oAttrMap["Name"]);
+                                             oAttrMap["Name"],
+                                             iThumbStates);
        return kError_NoErr;
     }
 
     if (oElement == string("VSliderControl"))
     {
-	   m_bPosDefined = m_bBitmapDefined = m_bInfoDefined = false;
-       
+       m_bPosDefined = m_bBitmapDefined = m_bInfoDefined = false;
+       int iThumbStates;    
+   
        if (m_pCurrentControl)
        {
            m_oLastError = string("Controls cannot be nested");
            return kError_InvalidParam;
        }
-	   if (oAttrMap.find("Name") == oAttrMap.end())
+       if (oAttrMap.find("Name") == oAttrMap.end())
        {
            m_oLastError = string("the <VSliderControl> tag needs a Name attribute");
            return kError_ParseError;
        }        
 
+       if (oAttrMap.find("ThumbStates") != oAttrMap.end())
+       {
+           iThumbStates = atoi(oAttrMap["ThumbStates"].c_str());
+       }
+
        m_eCurrentControl = eVSliderControl;
        m_pCurrentControl = new VSliderControl(m_pCurrentWindow,
-                                              oAttrMap["Name"]);
+                                              oAttrMap["Name"],
+                                              iThumbStates);
        return kError_NoErr;
     }
 
     if (oElement == string("TextControl"))
     {
-	   m_bPosDefined = m_bBitmapDefined = m_bInfoDefined = false;
+       m_bPosDefined = m_bBitmapDefined = m_bInfoDefined = false;
        
        if (m_pCurrentControl)
        {
            m_oLastError = string("Controls cannot be nested");
            return kError_InvalidParam;
        }
-	   if (oAttrMap.find("Name") == oAttrMap.end())
+       if (oAttrMap.find("Name") == oAttrMap.end())
        {
            m_oLastError = string("the <TextControl> tag needs a Name attribute");
            return kError_ParseError;
@@ -969,7 +983,7 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
        {
            m_oLastError = string("Undefined bitmap ") +
                           oAttrMap["Name"] +
-                          string(" in tag <BackgroundBitmap>");
+                          string(" in tag <ControlBitmap>");
            return kError_InvalidParam;
        }
 
@@ -977,6 +991,153 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
        
        m_bBitmapDefined = true;
        
+       return kError_NoErr;
+    }
+
+    if (oElement == string("SliderTroughBitmap"))
+    {
+       Bitmap *pBitmap = NULL;
+       Rect    oRect;
+       bool    bHoriz = true;
+       int     iDelta = 0;
+
+       if (m_pCurrentControl == NULL)
+       {
+          m_oLastError = string("The <SliderTroughBitmap> tag must be inside of a <XXXXControl> tag");
+          return kError_InvalidParam;
+       }
+
+       if (m_eCurrentControl != eSliderControl &&
+           m_eCurrentControl != eVSliderControl)
+       {
+           m_oLastError = string("the <SliderTroughBitmap> tag can only be used "
+                                 "for a SliderControl or a VSliderControl");
+           return kError_ParseError;
+       }
+
+       if (oAttrMap.find("Rect") == oAttrMap.end())
+       {
+           m_oLastError = string("the <SliderTroughBitmap> tag needs a Rect attribute");
+           return kError_ParseError;
+       }
+       if (oAttrMap.find("Name") == oAttrMap.end())
+       {
+           m_oLastError = string("the <SliderTroughBitmap> tag needs a Name attribute");
+           return kError_ParseError;
+       }
+       if (oAttrMap.find("NumFrames") == oAttrMap.end())
+       {
+           m_oLastError = string("the <SliderTroughBitmap> tag needs a NumFrames attribute");
+           return kError_ParseError;
+       }
+
+       if (oAttrMap.find("Style") != oAttrMap.end())
+       {
+           if (oAttrMap["Style"] == string("Vert"))
+               bHoriz = false;
+       }
+
+       eRet = ParseRect(oAttrMap["Rect"], oRect);
+       if (eRet != kError_NoErr)
+       {
+           m_oLastError = string("Improperly formatted Rect coordinates: ") +
+                                 oAttrMap["Rect"];
+           return kError_InvalidParam;
+       }
+
+       pBitmap = FindBitmap(oAttrMap["Name"]);
+       if (pBitmap == NULL)
+       {
+           m_oLastError = string("Undefined bitmap ") +
+                          oAttrMap["Name"] +
+                          string(" in tag <ControlBitmap>");
+           return kError_InvalidParam;
+       }
+
+       int iFrames = atoi(oAttrMap["NumFrames"].c_str());
+ 
+       if (oAttrMap.find("DeltaBetweenFrames") != oAttrMap.end()) 
+       {
+           iDelta = atoi(oAttrMap["DeltaBetweenFrames"].c_str());
+       }
+
+       if (m_eCurrentControl == eSliderControl)
+           ((SliderControl *)m_pCurrentControl)->SetTroughBitmap(pBitmap, oRect, 
+                                                                 iFrames, 
+                                                                 bHoriz, 
+                                                                 iDelta);
+       else
+           ((VSliderControl *)m_pCurrentControl)->SetTroughBitmap(pBitmap, oRect,
+                                                                 iFrames,
+                                                                 bHoriz,
+                                                                 iDelta);
+
+       return kError_NoErr;
+    }
+
+    if (oElement == string("ControlStateBitmap"))
+    {
+       Bitmap *pBitmap = NULL;
+       Rect    oRect;
+       ControlStateEnum eState;
+       int     iFrameSet = 0;
+
+       if (m_pCurrentControl == NULL)
+       {
+          m_oLastError = string("The <ControlStateBitmap> tag must be inside of a <XXXXControl> tag");
+          return kError_InvalidParam;
+       }
+
+       if (oAttrMap.find("Rect") == oAttrMap.end())
+       {
+           m_oLastError = string("the <ControlStateBitmap> tag needs a Rect attribute");
+           return kError_ParseError;
+       }
+       if (oAttrMap.find("Name") == oAttrMap.end())
+       {
+           m_oLastError = string("the <ControlStateBitmap> tag needs a Name attribute");
+           return kError_ParseError;
+       }
+
+       if (oAttrMap.find("State") == oAttrMap.end())
+       {
+           m_oLastError = string("the <ControlStateBitmap> tag needs a State attribute");
+           return kError_ParseError;
+       }
+
+       if (oAttrMap.find("StateNum") != oAttrMap.end())
+       {
+           iFrameSet = atoi(oAttrMap["StateNum"].c_str());
+       }
+
+       eRet = ParseRect(oAttrMap["Rect"], oRect);
+       if (eRet != kError_NoErr)
+       {
+           m_oLastError = string("Improperly formatted Rect coordinates: ") +
+                                 oAttrMap["Rect"];
+           return kError_InvalidParam;
+       }
+
+       eRet = ParseState(oAttrMap["State"], eState);
+       if (eRet != kError_NoErr)
+       {
+           m_oLastError = string("Unknown State: ") + oAttrMap["State"];
+           return kError_InvalidParam;
+       }
+
+       pBitmap = FindBitmap(oAttrMap["Name"]);
+       if (pBitmap == NULL)
+       {
+           m_oLastError = string("Undefined bitmap ") +
+                          oAttrMap["Name"] +
+                          string(" in tag <ControlStateBitmap>");
+           return kError_InvalidParam;
+       }
+
+       m_pCurrentControl->SetStateBitmap(pBitmap, oRect, eState, iFrameSet);
+
+       m_bBitmapDefined = true;
+
        return kError_NoErr;
     }
 
@@ -1007,15 +1168,15 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
           return kError_InvalidParam;
        }
 
-	   if (oAttrMap.find("Name") != oAttrMap.end())
+       if (oAttrMap.find("Name") != oAttrMap.end())
            m_oThemeName = oAttrMap["Name"];
-	   if (oAttrMap.find("Author") != oAttrMap.end())
+       if (oAttrMap.find("Author") != oAttrMap.end())
            m_oThemeAuthor = oAttrMap["Author"];
-	   if (oAttrMap.find("EMail") != oAttrMap.end())
+       if (oAttrMap.find("EMail") != oAttrMap.end())
            m_oAuthorEMail = oAttrMap["EMail"];
-	   if (oAttrMap.find("WebPage") != oAttrMap.end())
+       if (oAttrMap.find("WebPage") != oAttrMap.end())
            m_oAuthorWebPage = oAttrMap["WebPage"];
-	   if (oAttrMap.find("Misc") != oAttrMap.end())
+       if (oAttrMap.find("Misc") != oAttrMap.end())
            m_oMiscInfo = oAttrMap["Misc"];
        
        return kError_NoErr;
@@ -1025,35 +1186,35 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
     {
        if (m_pCurrentWindow)
        {
-           m_oLastError = string("A Headlines tag must be outside any Window tags.");
+           m_oLastError = string("A <Headlines> tag must be outside any <Window> tags.");
            return kError_InvalidParam;
        }
 
        if (m_pParsedHeadlines)
        {
-           m_oLastError = string("Each theme file can only have one Headlines tag.");
+           m_oLastError = string("Each theme file can only have one <Headlines> tag.");
            return kError_InvalidParam;
        }
 
-	   if (oAttrMap.find("URL") == oAttrMap.end())
+       if (oAttrMap.find("URL") == oAttrMap.end())
        {
            m_oLastError = string("the <Headlines> tag needs a URL attribute");
            return kError_ParseError;
        }        
 
-	   if (oAttrMap.find("XMLPath") == oAttrMap.end())
+       if (oAttrMap.find("XMLPath") == oAttrMap.end())
        {
            m_oLastError = string("the <Headlines> tag needs a XMLPath attribute");
            return kError_ParseError;
        }        
 
-	   if (oAttrMap.find("DownloadInterval") == oAttrMap.end())
+       if (oAttrMap.find("DownloadInterval") == oAttrMap.end())
        {
            m_oLastError = string("the <Headlines> tag needs a DownloadInterval attribute");
            return kError_ParseError;
        }        
 
-	   if (oAttrMap.find("ChangeInterval") == oAttrMap.end())
+       if (oAttrMap.find("ChangeInterval") == oAttrMap.end())
        {
            m_oLastError = string("the <Headlines> tag needs a ChangeInterval attribute");
            return kError_ParseError;
@@ -1097,7 +1258,9 @@ Error Theme::EndElement(string &oElement)
         oElement == string("Position") ||
         oElement == string("Style") ||
         oElement == string("Info") ||
-        oElement == string("ControlBitmap"))
+        oElement == string("ControlBitmap") ||
+        oElement == string("ControlStateBitmap") ||
+        oElement == string("SliderTroughBitmap"))
     {
        if (m_pCurrentControl == NULL)
        {
@@ -1205,6 +1368,32 @@ Font *Theme::FindFont(string &oName)
     }
 
     return NULL;
+}
+
+Error Theme::ParseState(string &oStatestring, ControlStateEnum &eState)
+{
+    Error ret = kError_NoErr;;
+
+    if (!strcmp("Normal", oStatestring.c_str())) 
+        eState = CS_Normal;
+    else if (!strcmp("MouseOver", oStatestring.c_str())) 
+        eState = CS_MouseOver;
+    else if (!strcmp("Pressed", oStatestring.c_str()))
+        eState = CS_Pressed;
+    else if (!strcmp("DisabledMouseOver", oStatestring.c_str()))
+        eState = CS_DisabledMO;
+    else if (!strcmp("Disabled", oStatestring.c_str()))
+        eState = CS_Disabled;
+    else if (!strcmp("Dragging", oStatestring.c_str()))
+        eState = CS_Dragging;
+    else if (!strcmp("HiddenMouseOver", oStatestring.c_str()))
+        eState = CS_HiddenMO;
+    else if (!strcmp("Hidden", oStatestring.c_str()))
+        eState = CS_Hidden;
+    else
+        ret = kError_InvalidParam;
+
+    return ret;
 }
 
 Error Theme::ParseRect(string &oRectstring, Rect &oRect)

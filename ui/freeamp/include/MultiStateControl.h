@@ -2,7 +2,7 @@
 
    FreeAmp - The Free MP3 Player
 
-   Portions Copyright (C) 1999 EMusic
+   Portions Copyright (C) 1999-2000 EMusic
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ class MultiStateControl : public Control
 
     private:
 
-	  int            m_iState, m_iNumStates;
+      int            m_iState, m_iNumStates;
       vector<string> m_oTips, m_oDescs;   
 };
 
