@@ -287,11 +287,11 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
          string oEmpty("");
          
          m_pWindow->ControlIntValue(string("PlayPause"), true, iState);
+         iState = e->Type() == INFO_Paused ? 1 : 0;
          m_pWindow->ControlIntValue(string("PlayStop"), true, iState);
+         m_pWindow->ControlIntValue(string("MPause"), true, iState);
          m_pWindow->ControlEnable(string("Play"), true, bEnable);
          
-         iState = e->Type() == INFO_Paused ? 1 : 0;
-         m_pWindow->ControlIntValue(string("MPause"), true, iState);
          
          bEnable = false;
          m_pWindow->ControlEnable(string("Pause"), true, bEnable);
