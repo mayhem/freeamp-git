@@ -132,13 +132,13 @@ uint32
 linuxThread::
 GetPriority() const
 {
-    return((Priority) 0);
+    return( 0);
 }
 
 uint32 
 linuxThread::
 SetPriority(uint32 priority)
 {
-    return((Priority) 0);
+    return( 0);
 }
 
