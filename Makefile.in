@@ -83,7 +83,7 @@ FREEAMPlinuxLIBS = -ldl -lpthread
 FREEAMPsolarisLIBS = -ldl -lpthread
 FREEAMPfreebsdLIBS = -pthread
 FREEAMPqnxLIBS = -lasound
-FREEAMPirixLIBX = -lpthread
+FREEAMPirixLIBS = -lpthread
 UNIXFREEAMPLIBS = $(FREEAMP$(HOST_OS)LIBS) -lmusicbrainz $(EXTRALIBS) #-ldmallocthcxx
 
 BEOSFREEAMPLIBS = -lbe -lroot
