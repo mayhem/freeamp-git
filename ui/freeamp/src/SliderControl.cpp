@@ -192,7 +192,8 @@ void SliderControl::Transition(ControlTransitionEnum  eTrans,
            m_bInUpdate = false;
            m_oMutex.Release();
 
-           MoveThumb(iOldPos, iNewPos);
+           if (!m_pPanel->IsHidden())
+               MoveThumb(iOldPos, iNewPos);
            
            return;
        }   
@@ -200,6 +201,9 @@ void SliderControl::Transition(ControlTransitionEnum  eTrans,
        default:
           break;
     }  
+
+    if (m_pPanel->IsHidden())
+       return;
 
     oRect.x1 = m_oRect.x1 + m_iCurrentPos;
     oRect.x2 = oRect.x1 + m_iThumbWidth;

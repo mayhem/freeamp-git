@@ -133,6 +133,9 @@ void ButtonControl::Transition(ControlTransitionEnum  eTrans,
 {
     Canvas *pCanvas;
 
+    if (m_pPanel->IsHidden())
+       return;
+
     switch(eTrans)
     {
        case CT_MouseEnter:

@@ -161,7 +161,7 @@ void Control::AcceptTransition(ControlTransitionEnum eTrans, Pos *pPos)
     vector<TransitionInfo>::iterator i;
 
     m_oMutex.Acquire();
-   
+
     for(i = m_oTransitions.begin(); i != m_oTransitions.end(); i++)
     {
         if (((*i).eState == m_eCurrentState || (*i).eState == CS_Any) && 

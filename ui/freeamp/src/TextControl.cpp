@@ -143,6 +143,9 @@ void TextControl::TextChanged(void)
     Canvas *pCanvas;
     int    iRet;
 
+    if (m_pPanel->IsHidden())
+        return;
+
     m_oMutex.Acquire();
     
     m_iMarqueePos = 0;

@@ -219,15 +219,22 @@ void MultiStateControl::Transition(ControlTransitionEnum  eTrans,
        case CT_Hide:
        {
        	  Rect oRect = m_oRect;
-          pCanvas = m_pParent->GetCanvas();
-          pCanvas->Erase(oRect);
-          pCanvas->Invalidate(oRect);
+
+           if (m_pPanel->IsHidden())
+               return;
+
+           pCanvas = m_pParent->GetCanvas();
+           pCanvas->Erase(oRect);
+           pCanvas->Invalidate(oRect);
        	  break;
        }   
 
        default:
           break;
     }
+
+    if (m_pPanel->IsHidden())
+        return;
 
     if (m_eCurrentState == CS_MouseOver && 
         eTrans == CT_MouseLButtonUp)

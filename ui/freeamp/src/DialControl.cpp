@@ -69,6 +69,9 @@ void DialControl::Transition(ControlTransitionEnum  eTrans,
 
 {
     int iFrames, iValue;
+
+    if (m_pPanel->IsHidden())
+       return;
     
     switch(eTrans)
     {
