@@ -1107,7 +1107,27 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                 TV_KEYDOWN* pnkd = (TV_KEYDOWN*)pHdr; 
 
                 if(pnkd->wVKey == VK_DELETE)
-                    RemoveEvent();  
+                    RemoveEvent();
+                else if(pnkd->wVKey == VK_F2)
+                {
+                    HTREEITEM item = TreeView_GetSelection(m_hMusicView);
+
+                    if(item &&
+                       item != m_hMyMusicItem &&
+                       item != m_hPlaylistItem &&
+                       item != m_hAllItem &&
+                       item != m_hUncatItem &&
+                       item != m_hNewPlaylistItem &&
+                       item != m_hPortableItem &&
+                       item != m_hStreamsItem &&
+                       item != m_hCDItem &&
+                       item != m_hFavoritesItem &&
+                       item != m_hNewFavoritesItem &&
+                       item != m_hRelatableItem &&
+                       TreeView_GetParent(m_hMusicView, item) != m_hStreamsItem &&
+                       TreeView_GetParent(m_hMusicView,TreeView_GetParent(m_hMusicView, item)) != m_hStreamsItem)
+                        TreeView_EditLabel(m_hMusicView, item);
+                }
 
                 break;
             }
