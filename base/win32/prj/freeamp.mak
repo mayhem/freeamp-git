@@ -157,7 +157,7 @@ $(DS_POSTBUILD_DEP) : "pls - Win32 Release" "MakeTheme - Win32 Release"\
  "freeamp.cnt" ".\portio.sys" "..\..\..\ReadMe.txt" "..\..\..\Copying.txt"\
  "..\..\..\Changes.txt" "..\..\..\Authors.txt" ".\freeamp.exe"
    IF NOT EXIST themes mkdir themes
-	copy                ..\..\..\themes\freeamp.fat themes
+	copy                 ..\..\..\themes\freeamp.fat themes
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
@@ -286,7 +286,7 @@ $(DS_POSTBUILD_DEP) : "pls - Win32 Debug" "MakeTheme - Win32 Debug"\
  ".\portio.sys" "..\..\..\ReadMe.txt" "..\..\..\Copying.txt"\
  "..\..\..\Changes.txt" "..\..\..\Authors.txt" ".\freeamp.exe"
    IF NOT EXIST themes mkdir themes
-	copy                ..\..\..\themes\freeamp.fat themes
+	copy                 ..\..\..\themes\freeamp.fat themes
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
@@ -421,7 +421,7 @@ $(DS_POSTBUILD_DEP) : "pls - Win32 NASM Release"\
  "..\..\..\ReadMe.txt" "..\..\..\Copying.txt" "..\..\..\Changes.txt"\
  "..\..\..\Authors.txt" ".\freeamp.exe"
    IF NOT EXIST themes mkdir themes
-	copy                ..\..\..\themes\freeamp.fat themes
+	copy                 ..\..\..\themes\freeamp.fat themes
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
@@ -555,7 +555,7 @@ $(DS_POSTBUILD_DEP) : "pls - Win32 NASM Debug" "MakeTheme - Win32 NASM Debug"\
  "freeamp.cnt" ".\portio.sys" "..\..\..\ReadMe.txt" "..\..\..\Copying.txt"\
  "..\..\..\Changes.txt" "..\..\..\Authors.txt" ".\freeamp.exe"
    IF NOT EXIST themes mkdir themes
-	copy                ..\..\..\themes\freeamp.fat themes
+	copy                 ..\..\..\themes\freeamp.fat themes
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 
@@ -1073,6 +1073,7 @@ DEP_RSC_FREEA=\
 	"..\res\music4.ico"\
 	"..\res\music5.ico"\
 	"..\res\music6.ico"\
+	"..\res\warn.ico"\
 	
 
 !IF  "$(CFG)" == "freeamp - Win32 Release"
