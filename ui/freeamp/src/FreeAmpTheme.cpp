@@ -651,7 +651,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
    if (oControlName == string("Volume") && 
        (eMesg == CM_ValueChanged || eMesg == CM_SliderUpdate))
    {
-   	   int iVol;
+       int iVol;
        
        m_pWindow->ControlIntValue(oControlName, false, iVol);
        SetVolume(iVol);
@@ -660,18 +660,18 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
    }    
    if (oControlName == string("VolumePlus") && eMesg == CM_Pressed)
    {
-   	   int iVol;
+       int iVol;
        
-	   iVol = min(m_iVolume + iVolumeChangeIncrement, 100);
+       iVol = min(m_iVolume + iVolumeChangeIncrement, 100);
        SetVolume(iVol);
            
        return kError_NoErr;
    }    
    if (oControlName == string("VolumeMinus") && eMesg == CM_Pressed)
    {
-   	   int iVol;
+       int iVol;
        
-	   iVol = max(m_iVolume - iVolumeChangeIncrement, 0);
+       iVol = max(m_iVolume - iVolumeChangeIncrement, 0);
        SetVolume(iVol);
            
        return kError_NoErr;
@@ -680,7 +680,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
    if (oControlName == string("Seek") && eMesg == CM_ValueChanged)
    {
        string oName("Info"), oEmpty("");
-   	   int    iValue, iFrame;
+       int    iValue, iFrame;
        
        m_pWindow->ControlIntValue(oControlName, false, iValue);
        
@@ -698,8 +698,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
    if (oControlName == string("Seek") && eMesg == CM_SliderUpdate)
    {
        string oName("Time"), oText("");
-   	   int    iValue, iTime;
-       
+       int    iValue, iTime;
        
        m_pWindow->ControlIntValue(oControlName, false, iValue);
        
@@ -711,7 +710,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
    }    
    if (oControlName == string("PlayPause") && eMesg == CM_Pressed)
    {
-   	   int iState = 0;
+       int iState = 0;
 
        if (m_pContext->plm->CountItems() == 0)
        {
@@ -721,14 +720,14 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
        m_pWindow->ControlIntValue(oControlName, false, iState);
        if (iState == 0)
            m_pContext->target->AcceptEvent(new Event(CMD_Play));
-	   else
+       else
            m_pContext->target->AcceptEvent(new Event(CMD_Pause));
        return kError_NoErr;
    }
    
    if (oControlName == string("PlayStop") && eMesg == CM_Pressed)
    {
-   	   int iState = 0;
+       int iState = 0;
 
        if (m_pContext->plm->CountItems() == 0)
        {
