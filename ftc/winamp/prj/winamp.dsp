@@ -198,8 +198,8 @@ SOURCE=..\winamp_theme.xml
 # Begin Custom Build
 InputPath=..\winamp_theme.xml
 
-"..\..\..\base\win32\prj\winamp_theme.xml" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\winamp_theme.xml ..\..\..\base\win32\prj
+"..\..\..\base\win32\prj\plugins\winamp_theme.xml" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\winamp_theme.xml ..\..\..\base\win32\prj\plugins
 
 # End Custom Build
 
@@ -208,8 +208,8 @@ InputPath=..\winamp_theme.xml
 # Begin Custom Build
 InputPath=..\winamp_theme.xml
 
-"..\..\..\base\win32\prj\winamp_theme.xml" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\winamp_theme.xml ..\..\..\base\win32\prj
+"..\..\..\base\win32\prj\plugins\winamp_theme.xml" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\winamp_theme.xml ..\..\..\base\win32\prj\plugins
 
 # End Custom Build
 
@@ -218,8 +218,8 @@ InputPath=..\winamp_theme.xml
 # Begin Custom Build
 InputPath=..\winamp_theme.xml
 
-"..\..\..\base\win32\prj\winamp_theme.xml" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\winamp_theme.xml ..\..\..\base\win32\prj
+"..\..\..\base\win32\prj\plugins\winamp_theme.xml" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\winamp_theme.xml ..\..\..\base\win32\prj\plugins
 
 # End Custom Build
 
@@ -228,8 +228,8 @@ InputPath=..\winamp_theme.xml
 # Begin Custom Build
 InputPath=..\winamp_theme.xml
 
-"..\..\..\base\win32\prj\winamp_theme.xml" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\winamp_theme.xml ..\..\..\base\win32\prj
+"..\..\..\base\win32\prj\plugins\winamp_theme.xml" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\winamp_theme.xml ..\..\..\base\win32\prj\plugins
 
 # End Custom Build
 

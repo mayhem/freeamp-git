@@ -36,7 +36,7 @@ RSC=rc.exe
 OUTDIR=.\Release
 INTDIR=.\Release
 
-ALL : "..\..\..\base\win32\prj\winamp_theme.xml" ".\winamp.ftf"
+ALL : "..\..\..\base\win32\prj\plugins\winamp_theme.xml" ".\winamp.ftf"
 
 
 CLEAN :
@@ -47,7 +47,7 @@ CLEAN :
 	-@erase "$(OUTDIR)\winamp.exp"
 	-@erase "$(OUTDIR)\winamp.lib"
 	-@erase ".\winamp.ftf"
-	-@erase "..\..\..\base\win32\prj\winamp_theme.xml"
+	-@erase "..\..\..\base\win32\prj\plugins\winamp_theme.xml"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -78,7 +78,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "..\..\..\base\win32\prj\winamp_theme.xml" ".\winamp.ftf"
+$(DS_POSTBUILD_DEP) : "..\..\..\base\win32\prj\plugins\winamp_theme.xml" ".\winamp.ftf"
    IF NOT EXIST ..\..\..\base\win32\prj\plugins mkdir                                  ..\..\..\base\win32\prj\plugins
 	copy winamp.ftf  ..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -88,7 +88,7 @@ $(DS_POSTBUILD_DEP) : "..\..\..\base\win32\prj\winamp_theme.xml" ".\winamp.ftf"
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
-ALL : "..\..\..\base\win32\prj\winamp_theme.xml" ".\winamp.ftf"
+ALL : "..\..\..\base\win32\prj\plugins\winamp_theme.xml" ".\winamp.ftf"
 
 
 CLEAN :
@@ -102,7 +102,7 @@ CLEAN :
 	-@erase "$(OUTDIR)\winamp.pdb"
 	-@erase ".\winamp.ftf"
 	-@erase ".\winamp.ilk"
-	-@erase "..\..\..\base\win32\prj\winamp_theme.xml"
+	-@erase "..\..\..\base\win32\prj\plugins\winamp_theme.xml"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -133,7 +133,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "..\..\..\base\win32\prj\winamp_theme.xml" ".\winamp.ftf"
+$(DS_POSTBUILD_DEP) : "..\..\..\base\win32\prj\plugins\winamp_theme.xml" ".\winamp.ftf"
    IF NOT EXIST ..\..\..\base\win32\prj\plugins mkdir                                  ..\..\..\base\win32\prj\plugins
 	copy winamp.ftf  ..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -143,7 +143,7 @@ $(DS_POSTBUILD_DEP) : "..\..\..\base\win32\prj\winamp_theme.xml" ".\winamp.ftf"
 OUTDIR=.\Release
 INTDIR=.\Release
 
-ALL : "..\..\..\base\win32\prj\winamp_theme.xml" ".\winamp.ftf"
+ALL : "..\..\..\base\win32\prj\plugins\winamp_theme.xml" ".\winamp.ftf"
 
 
 CLEAN :
@@ -154,7 +154,7 @@ CLEAN :
 	-@erase "$(OUTDIR)\winamp.exp"
 	-@erase "$(OUTDIR)\winamp.lib"
 	-@erase ".\winamp.ftf"
-	-@erase "..\..\..\base\win32\prj\winamp_theme.xml"
+	-@erase "..\..\..\base\win32\prj\plugins\winamp_theme.xml"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -185,7 +185,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "..\..\..\base\win32\prj\winamp_theme.xml" ".\winamp.ftf"
+$(DS_POSTBUILD_DEP) : "..\..\..\base\win32\prj\plugins\winamp_theme.xml" ".\winamp.ftf"
    IF NOT EXIST ..\..\..\base\win32\prj\plugins mkdir                                  ..\..\..\base\win32\prj\plugins
 	copy winamp.ftf  ..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -195,7 +195,7 @@ $(DS_POSTBUILD_DEP) : "..\..\..\base\win32\prj\winamp_theme.xml" ".\winamp.ftf"
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
-ALL : "..\..\..\base\win32\prj\winamp_theme.xml" ".\winamp.ftf"
+ALL : "..\..\..\base\win32\prj\plugins\winamp_theme.xml" ".\winamp.ftf"
 
 
 CLEAN :
@@ -209,7 +209,7 @@ CLEAN :
 	-@erase "$(OUTDIR)\winamp.pdb"
 	-@erase ".\winamp.ftf"
 	-@erase ".\winamp.ilk"
-	-@erase "..\..\..\base\win32\prj\winamp_theme.xml"
+	-@erase "..\..\..\base\win32\prj\plugins\winamp_theme.xml"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -240,7 +240,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "..\..\..\base\win32\prj\winamp_theme.xml" ".\winamp.ftf"
+$(DS_POSTBUILD_DEP) : "..\..\..\base\win32\prj\plugins\winamp_theme.xml" ".\winamp.ftf"
    IF NOT EXIST ..\..\..\base\win32\prj\plugins mkdir                                  ..\..\..\base\win32\prj\plugins
 	copy winamp.ftf  ..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -338,10 +338,10 @@ SOURCE=..\winamp_theme.xml
 
 InputPath=..\winamp_theme.xml
 
-"..\..\..\base\win32\prj\winamp_theme.xml" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\base\win32\prj\plugins\winamp_theme.xml" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	<<tempfile.bat 
 	@echo off 
-	copy ..\winamp_theme.xml ..\..\..\base\win32\prj
+	copy ..\winamp_theme.xml ..\..\..\base\win32\prj\plugins
 << 
 	
 
@@ -349,10 +349,10 @@ InputPath=..\winamp_theme.xml
 
 InputPath=..\winamp_theme.xml
 
-"..\..\..\base\win32\prj\winamp_theme.xml" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\base\win32\prj\plugins\winamp_theme.xml" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	<<tempfile.bat 
 	@echo off 
-	copy ..\winamp_theme.xml ..\..\..\base\win32\prj
+	copy ..\winamp_theme.xml ..\..\..\base\win32\prj\plugins
 << 
 	
 
@@ -360,10 +360,10 @@ InputPath=..\winamp_theme.xml
 
 InputPath=..\winamp_theme.xml
 
-"..\..\..\base\win32\prj\winamp_theme.xml" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\base\win32\prj\plugins\winamp_theme.xml" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	<<tempfile.bat 
 	@echo off 
-	copy ..\winamp_theme.xml ..\..\..\base\win32\prj
+	copy ..\winamp_theme.xml ..\..\..\base\win32\prj\plugins
 << 
 	
 
@@ -371,10 +371,10 @@ InputPath=..\winamp_theme.xml
 
 InputPath=..\winamp_theme.xml
 
-"..\..\..\base\win32\prj\winamp_theme.xml" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\base\win32\prj\plugins\winamp_theme.xml" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	<<tempfile.bat 
 	@echo off 
-	copy ..\winamp_theme.xml ..\..\..\base\win32\prj
+	copy ..\winamp_theme.xml ..\..\..\base\win32\prj\plugins
 << 
 	
 
