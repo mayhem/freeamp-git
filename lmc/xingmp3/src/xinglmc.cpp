@@ -699,6 +699,7 @@ void XingLMC::DecodeWork()
    Error          Err;
    int32          iLoop = 0, iValue, iReadSize;
    IN_OUT         x = {0, 0};
+   bool           bRestart = false;
 
    assert(m_pPmi);
    assert(m_pPmo);
@@ -746,10 +747,10 @@ void XingLMC::DecodeWork()
 
    for (m_frameCounter = 0; !m_bExit;)
    {
+      bRestart = false;
       ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(
              new PMOTimeInfoEvent(m_frameCounter));
 
-      // TODO: This loop needs to be terminated after 64k worth of data..
       for(; !m_bExit; )
 	  {
           if (m_bPause)
@@ -801,6 +802,19 @@ void XingLMC::DecodeWork()
           {
               m_pOutputBuffer->EndWrite(0);
               ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(new PMOQuitEvent());
+
+              // Hang around until we're told to leave in case
+              // the user seeks and wants to restart the decoder.
+              while(!m_bExit && m_pInputBuffer->IsEndOfStream())
+              {
+                  Sleep();
+              }   
+              if (!m_pInputBuffer->IsEndOfStream())
+              {
+                 bRestart = true;
+                 break;
+              }   
+              
               return;
           }
           if (Err == kError_NoDataAvail)
@@ -834,8 +848,9 @@ void XingLMC::DecodeWork()
 
              if (Err == kError_EndOfStream)
              {
+                 EndRead(0);
                  ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(new PMOQuitEvent());
-                 return;
+                 break;
              }
 
              if (Err != kError_NoErr)
@@ -851,6 +866,9 @@ void XingLMC::DecodeWork()
 			    break;
           }
       }
+      if (bRestart)
+         continue;
+         
       if (m_bExit || Err == kError_Interrupt)
       {
           return;
