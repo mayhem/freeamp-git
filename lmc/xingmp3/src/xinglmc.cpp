@@ -318,7 +318,6 @@ Error XingLMC::AdvanceBufferToNextFrame()
                ; // <=== Empty body!
  
        m_context->log->Log(LogDecode, "Skipped %d bytes in advance frame.\n", iCount + 1);
-       printf("Skipped %d bytes in advance frame.\n", iCount + 1);
        if (m_input)
            m_input->EndRead(iCount + 1);
 
@@ -355,7 +354,6 @@ Error XingLMC::GetHeadInfo()
            m_frameBytes = head_info3((unsigned char *)pBuffer,
 			                            iNumBytes, &m_sMpegHead, 
                                      &m_iBitRate, &iForward);
-           printf("m_frameBytes: %d, br: %d\n", m_frameBytes, m_iBitRate);
            if (m_frameBytes > 0 && m_frameBytes < 1050 && 
                m_sMpegHead.option == 1)
            {
