@@ -845,7 +845,7 @@ Error DownloadManager::Download(DownloadItem* item)
 
                         cout << destPath << endl;
 
-                        int openFlags = O_BINARY|O_CREAT|O_RDWR;
+                        int openFlags = O_BINARY|O_CREAT|O_RDWR|O_APPEND;
 
                         if(returnCode == 200) // always whole file
                         {
