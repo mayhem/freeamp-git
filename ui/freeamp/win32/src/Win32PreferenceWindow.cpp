@@ -62,11 +62,13 @@ const char* kThemeFileFilter =
 
 uint32 CalcStringEllipsis(HDC hdc, string& displayString, int32 columnWidth);
 
+#define UWM_HELP WM_USER + 1
+
 static BOOL CALLBACK 
 MainCallback(HWND hwnd, 
-                    UINT msg, 
-                    WPARAM wParam, 
-                    LPARAM lParam)
+             UINT msg, 
+             WPARAM wParam, 
+             LPARAM lParam)
 {
 	return g_pCurrentPrefWindow->MainProc(hwnd, msg, wParam, lParam);
 }
@@ -690,6 +692,13 @@ bool Win32PreferenceWindow::MainProc(HWND hwnd,
             break;
         }
        
+        case WM_HELP:
+        {
+            if(m_currentPage)
+                SendMessage(m_currentPage->hwnd, UWM_HELP, 0, 0);
+            break;
+        }
+
         case WM_COMMAND:
         {
             switch(LOWORD(wParam))
@@ -708,7 +717,7 @@ bool Win32PreferenceWindow::MainProc(HWND hwnd,
 
                 case IDC_HELPME:
                     if(m_currentPage)
-                        SendMessage(m_currentPage->hwnd, WM_HELP, 0, 0);
+                        SendMessage(m_currentPage->hwnd, UWM_HELP, 0, 0);
                     break;
 
                 case IDC_APPLY:
@@ -775,6 +784,7 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
             break;
         }
 
+        case UWM_HELP:
         case WM_HELP:
         {
             LaunchHelp(hwnd, Preferences_General);
@@ -1213,6 +1223,7 @@ bool Win32PreferenceWindow::PrefStreamingProc(HWND hwnd,
             break;
         }
 
+        case UWM_HELP:
         case WM_HELP:
         {
             LaunchHelp(hwnd, Preferences_Streaming);
@@ -1975,6 +1986,7 @@ bool Win32PreferenceWindow::PrefAboutProc(HWND hwnd,
             break;
         }
 
+        case UWM_HELP:
         case WM_HELP:
         {
             LaunchHelp(hwnd, Preferences_About);
@@ -2357,6 +2369,7 @@ bool Win32PreferenceWindow::PrefDirectoryProc(HWND hwnd,
         }
 
         case WM_HELP:
+        case UWM_HELP:
         {
             //LaunchHelp(hwnd, Preferences_Directory);
             break;
@@ -2600,6 +2613,7 @@ bool Win32PreferenceWindow::PrefThemeProc(HWND hwnd,
         }
 
         case WM_HELP:
+        case UWM_HELP:
         {
             LaunchHelp(hwnd, Preferences_Themes);
             break;
@@ -3349,6 +3363,7 @@ bool Win32PreferenceWindow::PrefUpdateProc(HWND hwnd,
         }
 
         case WM_HELP:
+        case UWM_HELP:
         {
             LaunchHelp(hwnd, Preferences_Update);
             break;
@@ -3750,6 +3765,7 @@ bool Win32PreferenceWindow::PrefAdvancedProc(HWND hwnd,
 			break;
         }
 
+        case UWM_HELP:
         case WM_HELP:
         {
             LaunchHelp(hwnd, Preferences_Advanced);
@@ -4156,6 +4172,7 @@ bool Win32PreferenceWindow::PrefPluginsProc(HWND hwnd,
         }
 
         case WM_HELP:
+        case UWM_HELP:
         {
             LaunchHelp(hwnd, Preferences_Plugins);
             break;
