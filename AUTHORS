@@ -181,3 +181,7 @@ Michael Rich <istan@alltel.net>
 
 "Michael Smith" <msmith@labyrinth.net.au>
 * A patch to help the vorbis streaming along
+
+"Kris" <kris@cs.ucsb.edu>
+* A patch to fix some theme manager inconsistencies in linux
+

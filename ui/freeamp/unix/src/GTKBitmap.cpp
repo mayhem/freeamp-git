@@ -717,9 +717,11 @@ void GTKBitmap::GetColor(Pos oPos, Color &oColor)
         default:
             break;
     }
-    gdk_image_destroy(m_image);
-    m_image = NULL;
-    m_cache = false;
+
+    // RAK: Are these debug lines that should've gotten deleted?
+    //gdk_image_destroy(m_image);
+    //m_image = NULL;
+    //m_cache = false;
     gdk_threads_leave();
 }
 

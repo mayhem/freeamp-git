@@ -50,7 +50,7 @@ ThemeManager::ThemeManager(FAContext *pContext)
     szThemePath[0] = 0;
     eRet = pContext->prefs->GetPrefString(kThemePathPref, szThemePath, &len);
     if (IsError(eRet) || strlen(szThemePath) == 0) {
-        GetDefaultTheme(m_oCurrentTheme);
+        m_oCurrentTheme = BRANDING_DEFAULT_THEME;
     }
     else {
         struct stat buf;
@@ -183,7 +183,7 @@ Error ThemeManager::UseTheme(string &oThemeFile)
     temp_dir = strrchr(oThemeFile.c_str(), '/');
     if (temp_dir) {
         temp_dir = temp_dir + 1;
-	strcpy(dir, temp_dir);
+        strcpy(dir, temp_dir);
         if (oThemeFile == m_oCurrentTheme)
         {
             return kError_NoErr;
