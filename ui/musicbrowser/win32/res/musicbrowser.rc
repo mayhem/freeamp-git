@@ -144,7 +144,8 @@ BEGIN
     LTEXT           "Track #:",IDC_TRACKTEXT,168,33,28,8
     PUSHBUTTON      "Help",9,200,137,50,14
     LTEXT           "Location:",IDC_LOCATIONTEXT,7,120,30,8
-    EDITTEXT        IDC_LOCATION,47,116,203,14,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_LOCATION,47,116,203,14,ES_AUTOHSCROLL | ES_READONLY | 
+                    NOT WS_TABSTOP
     EDITTEXT        IDC_PLAYCOUNT,200,63,50,11,ES_AUTOHSCROLL
     LTEXT           "Playcount:",IDC_TRACKTEXT,164,65,34,8
 END
@@ -670,8 +671,8 @@ IDB_RELATABLE           BITMAP  DISCARDABLE     "relatable.bmp"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,1,0,6
- PRODUCTVERSION 2,1,0,6
+ FILEVERSION 2,1,0,7
+ PRODUCTVERSION 2,1,0,7
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -689,7 +690,7 @@ BEGIN
             VALUE "Comments", "For the latest version go to http://www.freeamp.org\0"
             VALUE "CompanyName", "FreeAmp Open Source Development Effort\0"
             VALUE "FileDescription", "The Music Browser user interface enables you to organize your music collection and select music to listen to.\0"
-            VALUE "FileVersion", "2.1.0.6\0"
+            VALUE "FileVersion", "2.1.0.7\0"
             VALUE "InternalName", "MusicBrowser\0"
             VALUE "LegalCopyright", "Copyright © EMusic.com 1999-2000 (http://www.gnu.org/copyleft/gpl.html)\0"
             VALUE "LegalTrademarks", "FreeAmp, EMusic\0"

@@ -6,12 +6,13 @@ SeparateMemorySpace=No
 Run=Normal Window
 IconIndex=0
 Replace=Yes
-FileGroup=
 StartIn=<TARGETDIR>
 IconFile=
 InternetShortcut=No
 DisplayText=PRODUCT_NAME
 Comments=
+FileGroup0=
+Type=Automatic
 
 [Data]
 Shortcut0=Folder0\FreeAmp
@@ -24,5 +25,5 @@ Folder2=<FOLDER_PROGRAMS>
 
 [Info]
 Type=ShellObject
-Version=1.00.000
+Version=2.10.000
 

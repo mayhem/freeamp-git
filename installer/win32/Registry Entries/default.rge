@@ -47,8 +47,8 @@ PMO=S,dsoundcard.pmo
 
 [FreeAmpSet]
 ---Comment---=
----FileGroup---=
 HKCU0=Software\FreeAmp\FreeAmp v2.1\Main
+---FileGroup0---=
 
 [RegisterFileTypes:HKCR:.m3u]
 ---Comment---=
@@ -91,8 +91,8 @@ Content Type=S,audio/x-mpeg
 
 [SoundCardSet]
 ---Comment---=
----FileGroup---=Soundcard Output
 HKCU0=Software\FreeAmp\FreeAmp v2.1\Main
+---FileGroup0---=Soundcard Output
 
 [RegisterFileTypes:HKCR:PLSPlaylistFile\shell\open\command]
 ---Comment---=
@@ -157,12 +157,12 @@ Content Type=S,audio/x-mpeg
 
 [General]
 Type=REGISTRYDATA
-Version=1.00.000
+Version=2.10.000
 
 [DSoundSet]
 ---Comment---=
----FileGroup---=Direct Sound Output
 HKCU0=Software\FreeAmp\FreeAmp v2.1\Main
+---FileGroup0---=Direct Sound Output
 
 [RegisterFileTypes:HKCR:RealMusicPackage\DefaultIcon]
 ---Comment---=
@@ -180,8 +180,9 @@ Content Type=S,audio/x-mpeg
 
 [MainSet]
 ---Comment---=
----FileGroup---=
 HKCU0=Software\FreeAmp\FreeAmp v2.1\Main
+---FileGroup0---=
+HKCU1=Software
 
 [RegisterFileTypes:HKCR:M3UPlaylistFile\shell\open\command]
 ---Comment---=
@@ -206,12 +207,12 @@ HKCR16=RealMusicPackage\DefaultIcon
 HKCR17=RealMusicPackage\shell\open\command
 HKCR18=.fat
 HKCR19=FreeAmpTheme
----FileGroup---=Program Executable Files
 HKCR0=.mp3
 HKCR1=MPEGAudioFile
 HKCR2=MPEGAudioFile\shell\open\command
 HKCR20=FreeAmpTheme\DefaultIcon
 HKCR3=.m3u
+---FileGroup0---=Program Executable Files
 
 [RegisterFileTypes:HKCR:.rmp]
 ---Comment---=
@@ -221,4 +222,9 @@ Content Type=S,application/vnd.rn-rn_music_package
 [RegisterFileTypes:HKCR:MPEGAudioFile\shell\open\command]
 ---Comment---=
 (Default)=S,"<TARGETDIR>\freeamp.exe" "%1"
+
+[MainSet:HKCU:Software]
+---Shared---=No
+---Comment---=
+(Default)=S,
 

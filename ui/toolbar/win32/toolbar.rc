@@ -86,8 +86,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,1,0,6
- PRODUCTVERSION 2,1,0,6
+ FILEVERSION 2,1,0,7
+ PRODUCTVERSION 2,1,0,7
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -105,7 +105,7 @@ BEGIN
             VALUE "Comments", "For the latest version go to http://www.freeamp.org\0"
             VALUE "CompanyName", "FreeAmp Open Source Development Effort\0"
             VALUE "FileDescription", "The Toolbar user interface allows FreeAmp to live in the Windows System Tray. \0"
-            VALUE "FileVersion", "2.1.0.6\0"
+            VALUE "FileVersion", "2.1.0.7\0"
             VALUE "InternalName", "toolbar\0"
             VALUE "LegalCopyright", "Copyright © EMusic.com 1999-2000 (http://www.gnu.org/copyleft/gpl.html)\0"
             VALUE "LegalTrademarks", "FreeAmp, EMusic\0"

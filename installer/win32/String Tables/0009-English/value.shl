@@ -2,7 +2,7 @@
 THE_PRODUCT_NAME_UC=FreeAmp
 COMPANY_NAME=FreeAmp
 ERROR_COMPONENT=Component:
-VERSION_STRING_SPECIAL= beta 5
+VERSION_STRING_SPECIAL= beta 6
 PRODUCT_VERSION=2.1
 ERROR_MOVEDATA=An error occurred during the move data process: %d
 ERROR_FILEGROUP=File Group:

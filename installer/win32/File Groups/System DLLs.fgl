@@ -1,8 +1,8 @@
+[General]
+Type=FILELIST
+Version=1.10.000
+
 [TopDir]
 file0=c:\winnt\system32\msvcp60.dll
 file1=c:\winnt\system32\msvcrt.dll
-
-[General]
-Type=FILELIST
-Version=1.00.000
 

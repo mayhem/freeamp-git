@@ -23,7 +23,7 @@ ____________________________________________________________________________*/
 
 ///////////////////////////////////////////////////////////////////
 // Copyright 1999 Relatable, LLC. All Rights Reserved
-// Programmed By: Sean Ward
+// Programed By: Sean Ward
 // Description: Interface declaration file for Relatable APS system
 // Date: 12/13/1999
 // Modification History:
