@@ -23,9 +23,12 @@ ____________________________________________________________________________*/
 
 #ifndef INCLUDED_GTKUTILITY__H_
 #define INCLUDED_GTKUTILITY__H_
+#include "config.h"
 
 #include <gdk/gdk.h>
 #include "facontext.h"
+
+#include "Types.h"
 
 void IconifyWindow(GdkWindow *win);
 void WarpPointer(GdkWindow *win, int x, int y);
@@ -33,6 +36,8 @@ void InitializeGTK(FAContext *context);
 void ShutdownGTK(void);
 
 bool ListFonts(char *mask);
+
+Pos GetFocusPos(void);
 
 void ReclaimFileTypes(FAContext *context, bool askBeforeReclaiming);
 #endif

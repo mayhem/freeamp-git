@@ -130,6 +130,7 @@ static gint do_timeout(void *p)
 
     ui->m_pMindMeldMutex->Acquire();
     ui->TimerEvent();
+    ui->DockCheck();
     ui->m_pMindMeldMutex->Release();
     
     return TRUE;
@@ -140,6 +141,9 @@ GTKWindow::GTKWindow(Theme *pTheme, string &oName)
 {
     m_pCanvas = new GTKCanvas(this);
     m_pMindMeldMutex = new Mutex();
+
+    lastDockPos.x = -1;
+    lastDockPos.y = -1;
 
     gdk_threads_enter();
     mainWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -287,7 +291,7 @@ Error GTKWindow::VulcanMindMeld(Window *pOther)
 
 void GTKWindow::PanelStateChanged(void)
 {
-    Rect       oRect, oWindowRect;
+    Rect       oRect;
     GdkBitmap *mask;
 
     GetCanvas()->SetNoScreenUpdate(true);
@@ -530,4 +534,37 @@ void GTKWindow::BringWindowToFront(void)
     gdk_threads_enter();
     gdk_window_raise(mainWindow->window);
     gdk_threads_leave();
+}
+
+void GTKWindow::DockCheck(void)
+{
+    if (!m_bIsDockWindow)
+        return;
+
+    gdk_threads_enter();
+    Pos dock = GetFocusPos();
+    gdk_threads_leave();
+
+    if (dock.x == -1 && dock.y == -1)
+        return;
+
+    if (dock.x <= 0)
+        dock.x = 1; 
+    if (dock.y <= 0)
+        dock.y = 1;
+
+    dock.x += m_oDockPos.x;
+    dock.y += m_oDockPos.y;
+
+    if (dock.x != lastDockPos.x || dock.y != lastDockPos.y) 
+    {
+        if (dock.x > 0 && dock.y > 0) {
+            gdk_threads_enter();
+            gdk_window_move(mainWindow->window, dock.x, dock.y);
+            gdk_window_raise(mainWindow->window);
+            gdk_threads_leave();
+            lastDockPos.x = dock.x;
+            lastDockPos.y = dock.y;
+        }
+    } 
 }

@@ -29,6 +29,13 @@ ____________________________________________________________________________*/
 struct Pos
 {
     int x, y;
+
+    Pos(void) { };
+    Pos(const Pos &other) 
+    {
+        x = other.x;
+        y = other.y;
+    }
 };
 
 struct Rect

@@ -68,6 +68,8 @@ class KJofol : public ThemeFormat
     private:
         string FindRCFile(string &oDir);
 
+        void  ParseRCFile(string rcfile, string windowname, bool dock = false);
+
         Error GetNextLine(char *line);
         bool  TestForComment(char *line);
         void  BuildImageList(string &oDir);
@@ -80,13 +82,14 @@ class KJofol : public ThemeFormat
 
         void HandleBitmap(string &oDir, char *name);
         void HandleButton(string name, string inf, string tip, Rect oRect, 
-                          string bmpname);
+                          string bmpname, bool hasextra, string extrainfo);
         void HandleFont(KJofol_Font font);
         void HandleTextWindow(char *desc, string name, KJofol_Font font);
         void HandleTimeWindow(char *desc, string name, KJofol_Font font);
 
         void Seek(char *desc);
-        void Button(char *desc, string name, string inf, string tip);
+        void Button(char *desc, string name, string inf, string tip, 
+                    bool hasextra = false, string extrainfo = "");
         void VolumeBMP(void);
 
         FAContext *m_context;
@@ -104,6 +107,13 @@ class KJofol : public ThemeFormat
         bool m_understandvolume;
         int m_volxsize;
         int m_volnum;
+
+        string dockrcfilename;
+        bool   hasdock;
+        Pos    dockposxy;
+
+        string winshadercfilename;
+        bool   haswinshade;
 };
 
 #endif

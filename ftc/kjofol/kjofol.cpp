@@ -91,13 +91,12 @@ Error KJofol::ConvertToNative(string &oDir)
 {
     m_bmpvolume = false;
     m_understandvolume = false;
-
-    Error eErr = kError_NoErr;
+    haswinshade = false;
+    hasdock = false;
 
     string outpath = oDir + string(DIR_MARKER_STR) + string("theme.xml");
     string inpath = FindRCFile(oDir);
  
-    infile = fopen(inpath.c_str(), "r");
     outfile = fopen(outpath.c_str(), "w");
 
     if (!outfile)
@@ -109,11 +108,41 @@ Error KJofol::ConvertToNative(string &oDir)
     Write("<ThemeInfo Name=\"Converted KJofol Skin\" Author=\"Isaac Richards\"\n");
     Write("           EMail=\"info@freeamp.org\" WebPage=\"http://www.freeamp.org\"/>\n\n");
 
-    Write("<Window Name=\"MainWindow\">\n");
+    ParseRCFile(inpath, "MainWindow");
 
+    if (haswinshade) {
+        inpath = oDir + string(DIR_MARKER_STR) + winshadercfilename;
+        ParseRCFile(inpath, "ShadeMode");
+    } 
+
+    if (hasdock) {
+        inpath = oDir + string(DIR_MARKER_STR) + dockrcfilename;
+        ParseRCFile(inpath, "DockMode", true);
+    }      
+
+    fclose(outfile);
+cout << "done outputting " << outpath << endl;
+
+    return kError_NoErr;
+}
+
+void KJofol::ParseRCFile(string rcfile, string windowname, bool dock)
+{
     char line[_MAX_PATH];
     char outline[_MAX_PATH];
     char left[_MAX_PATH], right[_MAX_PATH];
+
+    infile = fopen(rcfile.c_str(), "r");
+    if (!infile)
+        return;
+
+    sprintf(outline, "<Window Name=\"%s\">\n", windowname.c_str());
+    Write(outline);
+    if (dock) {
+        sprintf(outline, "<DockPosition Pos=\"%d, %d\"/>\n", dockposxy.x, 
+                dockposxy.y);
+        Write(outline, 1);
+    }
 
     while (IsntError(GetNextLine(line))) {
         MunchLine(line, left, right);
@@ -170,6 +199,18 @@ Error KJofol::ConvertToNative(string &oDir)
         else if (!strcasecmp(left, "PlaylistButton")) {
             Button(right, "MyMusic", "Browse my music collection", "MyMusic");
         }
+        else if (!strcasecmp(left, "DockModeButton")) {
+            Button(right, "DockView", "Change to Dock view", "Dock view",
+                   true, "<ChangeWindow Window=\"DockMode\"/>\n");
+        }
+        else if (!strcasecmp(left, "UnDockModeButton")) {
+            Button(right, "UnDock", "Change to Normal view", "Normal view",
+                   true, "<ChangeWindow Window=\"MainWindow\"/>\n");
+        }
+        //else if (!strcasecmp(left, "")) {
+        //    Button(right, "MiniView", "Change to Shade view", "Shade view",
+        //           true, "<ChangeWindow Window=\"ShadeMode\"/>\n");
+        //}
         else if (!strcasecmp(left, "FontImage")) {
             KJofol_Font f = fonts["Default"];
             f.image = right;
@@ -268,6 +309,17 @@ Error KJofol::ConvertToNative(string &oDir)
             info["VolumeBMPControl"] = right;
             m_bmpvolfields++;
         }
+        else if (!strcasecmp(left, "DockModePositionXY")) {
+            ParsePosition(right, dockposxy);
+        }
+        else if (!strcasecmp(left, "DockModeRCFile")) {
+            dockrcfilename = right;
+            hasdock = true;
+        }
+        else if (!strcasecmp(left, "WinshadeModeRCFile")) {
+            winshadercfilename = right;
+            haswinshade = true;
+        }
         else if (!strncasecmp(left, "Playlist", 8)) {
         }
         else
@@ -280,13 +332,9 @@ Error KJofol::ConvertToNative(string &oDir)
     }
 
     Write("</Controls>\n", 1);
-    Write("</Window>\n");
+    Write("</Window>\n\n\n");
 
-    fclose(outfile);
     fclose(infile);
-
-cout << "done writing themefile " << outpath << endl;
-    return eErr;
 }
 
 string KJofol::FindRCFile(string &oDir)
@@ -442,7 +490,8 @@ void KJofol::HandleBitmap(string &oDir, char *name)
 }
 
 void KJofol::HandleButton(string name, string inf, string tip,
-                          Rect oRect, string bmpname)
+                          Rect oRect, string bmpname, bool hasextra,
+                          string extrainfo)
 {
     char outline[_MAX_PATH];
     sprintf(outline, "<ButtonControl Name=\"%s\">\n", name.c_str());
@@ -458,17 +507,20 @@ void KJofol::HandleButton(string name, string inf, string tip,
     Write(outline, 3);
     sprintf(outline, "<ControlStateBitmap Rect=\"%d, %d, %d, %d\" State=\"Disabled\" Name=\"%s\"/>\n", oRect.x1, oRect.y1, oRect.x2, oRect.y2, info["Inactive"].c_str());
     Write(outline, 3);
+    if (hasextra)
+        Write((char *)extrainfo.c_str(), 3);
     sprintf(outline, "</ButtonControl>\n");
     Write(outline, 2);
 }
 
-void KJofol::Button(char *desc, string name, string inf, string tip)
+void KJofol::Button(char *desc, string name, string inf, string tip,
+                    bool hasextra, string extrainfo)
 {
    Rect oRect;
    string bmpname;
 
    ParseButton(desc, oRect, bmpname);
-   HandleButton(name, inf, tip, oRect, bmpname);
+   HandleButton(name, inf, tip, oRect, bmpname, hasextra, extrainfo);
 }
 
 void KJofol::HandleFont(KJofol_Font font)

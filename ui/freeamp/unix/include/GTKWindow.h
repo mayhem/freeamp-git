@@ -68,6 +68,8 @@ class GTKWindow : public Window
 
      void DropFiles(char *filename);
 
+     void DockCheck(void);
+
      Mutex *m_pMindMeldMutex;
  
    protected:
@@ -81,6 +83,8 @@ class GTKWindow : public Window
      bool quitLoop;
      bool initialized;
      bool m_bMouseInWindow;
+
+     Pos  lastDockPos;
 };
 
 #endif

@@ -68,6 +68,7 @@ class Window
 
       virtual void SetStayOnTop(bool bStay);
       virtual void SetLiveInToolbar(bool bLive);
+      virtual void SetDockPosition(Pos &oPos);
 
       // The following functions are designed to give access to the 
       // controls via the control's name. 
@@ -164,6 +165,8 @@ class Window
       Mutex                    *m_pUsageMutex;
       Semaphore                *m_pUsageSem;
       int32                     m_iUsageCount;
+      bool                      m_bIsDockWindow;
+      Pos                       m_oDockPos;
 };
 
 #endif

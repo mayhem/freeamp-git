@@ -47,14 +47,15 @@ Window::Window(Theme *pTheme, string &oName)
     m_bLButtonDown = false;
     m_bStayOnTop = false;
     m_bLiveInToolbar = false;
+    m_bIsDockWindow = false;
 
     m_pCanvas = NULL;
     m_pMouseInControl = NULL;
     m_pCaptureControl = NULL;
     m_pMouseDownControl = NULL;
     m_bIsVulcanMindMeldHost = false;
-    m_bMindMeldInProgress = false;
-    
+    m_bMindMeldInProgress = false;    
+
     m_pUsageMutex = new Mutex();
     m_pUsageSem = new Semaphore();
     m_iUsageCount = 0;
@@ -156,6 +157,8 @@ Error Window::VulcanMindMeld(Window *pOther)
 
     m_bWindowMove = pOther->m_bWindowMove;
     m_bStayOnTop = pOther->m_bLiveInToolbar;
+    m_bIsDockWindow = pOther->m_bIsDockWindow;
+    m_oDockPos = pOther->m_oDockPos;
 
     m_pMouseInControl = NULL;
     m_pCaptureControl = NULL;
@@ -244,6 +247,12 @@ Canvas *Window::GetCanvas(void)
 void Window::GetName(string &oName)
 {
     oName = m_oName;
+}
+
+void Window::SetDockPosition(Pos &oPos)
+{
+    m_oDockPos = oPos;
+    m_bIsDockWindow = true;
 }
 
 Error Window::ControlEnable(const string &oTarget, bool bSet, bool &bEnable)
