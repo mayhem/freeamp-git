@@ -685,6 +685,17 @@ void Window::HandleMouseLButtonUp(Pos &oScreenPos)
     return;
 }
 
+void Window::HandleMouseMButtonDown(Pos &oScreenPos)
+{
+    return;
+}
+
+void Window::HandleMouseMButtonUp(Pos &oScreenPos)
+{
+    m_pTheme->HandleMouseWheelClick();
+    return;
+}
+
 void Window::MouseHasEnteredWindow(void)
 {
     IncUsageRef();

@@ -1,3 +1,4 @@
+
 /*____________________________________________________________________________
         
    FreeAmp - The Free MP3 Player
@@ -79,6 +80,7 @@ class FreeAmpTheme : public UserInterface, public Theme
         virtual void  HandleKeystroke(unsigned char cKey);
         virtual bool  HandleMenuCommand(uint32 uCommand);
         virtual void  HandleMouseWheelChange(int iSteps);
+        virtual void  HandleMouseWheelClick(void);
         virtual void  VolumeChanged(void);
         virtual Error HandleControlMessage(string &oControlName, 
                                            ControlMessageEnum eMesg);

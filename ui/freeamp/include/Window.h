@@ -94,6 +94,8 @@ class Window
       virtual void  HandleMouseWheelChange(int iSteps);
       virtual void  MouseHasEnteredWindow(void);
       virtual void  MouseHasLeftWindow(void);
+      virtual void  HandleMouseMButtonDown(Pos &oPos);
+      virtual void  HandleMouseMButtonUp(Pos &oPos);
 
       virtual Error StartMouseCapture(Control *);
       virtual Error EndMouseCapture(void);

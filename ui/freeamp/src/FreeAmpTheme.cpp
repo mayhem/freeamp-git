@@ -1757,6 +1757,28 @@ void FreeAmpTheme::HandleMouseWheelChange(int iSteps)
     SetVolume(iVol, m_iBalance);
 }
 
+void FreeAmpTheme::HandleMouseWheelClick(void)
+{
+    int    iState;
+	string oControlName("Mute");
+
+    m_pWindow->ControlIntValue(oControlName, false, iState);
+    if (iState == 0)
+    {
+        m_iMuteVolume = m_iVolume;
+        m_iVolume = 0;
+        iState = 1;
+    }
+    else
+    {
+        m_iVolume = m_iMuteVolume;
+        m_iMuteVolume = -1;
+        iState = 0;
+    }
+    SetVolume(m_iVolume, m_iBalance);
+    m_pWindow->ControlIntValue(oControlName, true, iState);
+}
+
 void FreeAmpTheme::VolumeChanged(void)
 {
     if (!m_bVolumeChangeInProgress)
