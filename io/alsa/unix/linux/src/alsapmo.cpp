@@ -198,6 +198,7 @@ Error AlsaPMO::Resume() {
 Error AlsaPMO::Break()
 {
    m_bExit = true;
+   Reset(true);
    PullBuffer::BreakBlocks();
 
    return kError_NoErr;
@@ -269,8 +270,9 @@ Error AlsaPMO::Init(OutputInfo* info) {
 
 Error AlsaPMO::Reset(bool user_stop) {
 
-    if (user_stop) {
-        Init(NULL);
+    if (user_stop) 
+    {
+        snd_pcm_drain_playback(ai->handle);
     }
     return kError_NoErr;
 }

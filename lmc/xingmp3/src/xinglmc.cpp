@@ -185,29 +185,29 @@ Stop()
       m_bExit = true;
       m_pauseSemaphore->Signal();
 
-	  //Debug_v("output break");
+	  //printf("output break\n");
       m_output->Break();
-	  //Debug_v("output pause");
+	  //printf("output pause\n");
       m_output->Pause();
-	  //Debug_v("input break");
+	  //printf("input break\n");
       m_input->Break();
 
-	  //Debug_v("decode join");
+	  //printf("decode join\n");
       m_decoderThread->Join();  // wait for thread to exit
-	  //Debug_v("decode joined");
+	  //printf("decode joined\n");
       m_context->log->Log(LogDecode, "LMC: Decoder thread exited.\n");
 
-	  //Debug_v("delete input");
+	  //printf("delete input\n");
       delete m_input;
       m_input = NULL;
 
-	  //Debug_v("delete output");
+	  //printf("delete output\n");
       delete m_output;
       m_output = NULL;
 
-	  //Debug_v("delete thread");
+	  //printf("delete thread\n");
       delete    m_decoderThread;
-	  //Debug_v("stop done");
+	  //printf("stop done\n");
 
       m_decoderThread = NULL;
    }

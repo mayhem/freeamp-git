@@ -206,7 +206,7 @@ Error PullBuffer::Resize(size_t iNewSize,
        if (m_bReadOpPending || m_bWriteOpPending)
        {
            m_pMutex->Release();
-		   usleep(10000);
+		     usleep(10000);
            continue;
        }
        break;
