@@ -104,6 +104,7 @@ ____________________________________________________________________________*/
 #define HAVE_LINUX 0
 #define HAVE_LINUX_LIBC5 0
 #define HAVE_SOLARIS 0
+#define HAVE_BEOS 0
 
 #define HOST_OS "unknown"
 #define HOST_CPU "unknown"
@@ -154,6 +155,11 @@ ____________________________________________________________________________*/
 // real number
 typedef double real;
 
+#if HAVE_BEOS
+# include <support/SupportDefs.h>
+# include <endian.h>
+#else
+
 #if UCHAR_MAX == 0xff
 
 typedef unsigned char	uint8;
@@ -197,6 +203,7 @@ typedef short			int32;
 #error This machine has no 32-bit type
 #endif
 
+#endif
 
 // What character marks the end of a directory entry? For DOS and
 // Windows, it is "\"; in UNIX it is "/".
@@ -238,6 +245,12 @@ typedef short			int32;
 
 #ifndef socklen_t
 #undef socklen_t
+#endif
+
+// kludges for beos
+#if HAVE_BEOS
+# include <be/kernel/OS.h>
+# define usleep(a)	snooze(a)
 #endif
 
 #endif /* CONFIG_H */

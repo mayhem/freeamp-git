@@ -636,12 +636,12 @@ GetPrefString(const char* pref, char* buf, uint32* len)
         m_mutex.Release();
         return kError_NoPrefValue;
     }
-
     char *value = entry->value;
     uint32 value_len = strlen(value) + 1;
 
     if (value_len > *len)
     {
+        *len = value_len;
         m_mutex.Release();
         return kError_BufferTooSmall;
     }

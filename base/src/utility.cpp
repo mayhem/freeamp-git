@@ -453,7 +453,38 @@ void ToLower(char *s)
        *p = tolower(*p);
 }      
 
-#ifndef WIN32
+#ifdef WIN32
+#elif __BEOS__
+
+#include <be/app/Roster.h>
+#include <be/be_apps/NetPositive/NetPositive.h>
+
+void LaunchBrowser(char* url)
+{
+    status_t err;
+
+    BMessenger netpositive(B_NETPOSITIVE_APP_SIGNATURE, -1, &err);
+    if (err == B_OK)
+    {
+        BMessage msg(B_NETPOSITIVE_OPEN_URL);
+        msg.AddString("be:url", url);
+        err = netpositive.SendMessage(&msg);
+        if (err < B_OK)
+        {
+            printf("error sending msg to netpositive: %s\n", strerror(err));
+        }
+    }
+    else
+    {
+        const char *browser = "NetPositive";
+        char *command = new char[strlen(browser) + strlen(url) + 10];
+        sprintf(command, "%s \"%s\" &", browser, url);
+        system(command);
+        delete[] command;
+    }
+}
+
+#else
 void LaunchBrowser(char* url)
 {
     char         url2[_MAX_PATH];

@@ -71,12 +71,12 @@ int main(int argc, char **argv) {
     lmc = new Registry();
 
 //    registrar->SetSubDir("lmc");
-    registrar->SetSubDir("");
+    registrar->SetSubDir("plugins");
     registrar->SetSearchString("*.lmc");
     registrar->InitializeRegistry(lmc,context->prefs);
 
 //    registrar->SetSubDir("io");
-    registrar->SetSubDir("");
+    registrar->SetSubDir("plugins");
     registrar->SetSearchString("*.pmi");
     pmi = new Registry;
     registrar->InitializeRegistry(pmi,context->prefs);
@@ -87,7 +87,7 @@ int main(int argc, char **argv) {
 
 
 //    registrar->SetSubDir("ui");
-    registrar->SetSubDir("");
+    registrar->SetSubDir("plugins");
     registrar->SetSearchString("*.ui");
     ui = new Registry;
     registrar->InitializeRegistry(ui,context->prefs);
