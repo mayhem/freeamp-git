@@ -219,14 +219,14 @@ Error XingLMC::GetHeadInfo()
            m_frameBytes = head_info3((unsigned char *)pBuffer,
 			                            iNumBytes, &m_sMpegHead, 
                                      &m_iBitRate, &iForward);
-           if (m_frameBytes > 0 || m_frameBytes < 1050)
+           if (m_frameBytes > 0 && m_frameBytes < 1050)
            {
               MPEG_HEAD sHead;
               int       iFrameBytes, iBitRate;
              
               iFrameBytes = head_info3(((unsigned char *)pBuffer) + 
-                                       m_frameBytes - 1,
-                                       iNumBytes - (m_frameBytes - 1), &sHead,
+                                       m_frameBytes,
+                                       iNumBytes - m_frameBytes, &sHead,
                                        &iBitRate, &iForward);
               m_input->EndRead(0);
 
@@ -235,6 +235,14 @@ Error XingLMC::GetHeadInfo()
               {
 			         return kError_NoErr;
               }
+//              else
+//              {
+//                  printf("The two frame headers did not agree.\n");
+//                  printf("Header 1: Sync: %d Id: %d Br: %d\n", 
+//                      m_sMpegHead.sync, m_sMpegHead.id, m_sMpegHead.br_index);
+//                  printf("Header 2: Sync: %d Id: %d Br: %d\n\n", 
+//                      sHead.sync, sHead.id, sHead.br_index);
+//              }
            }
            else
               m_input->EndRead(0);
