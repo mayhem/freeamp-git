@@ -1147,7 +1147,6 @@ void GTKMusicBrowser::StreamTimer(void)
         return;
     }
 
-    printf("xml: '%s'\n", page.c_str());
     eRet = o.ParseStreamXML(page, list);
    
     if (eRet != kError_NoErr) {
