@@ -288,66 +288,144 @@ SOURCE=..\..\src\registry.cpp
 SOURCE=..\..\..\ui\src\uiregistry.cpp
 # End Source File
 # End Group
+# Begin Group "text files"
+
+# PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\res\freeamp.rc
+SOURCE=..\..\..\AUTHORS
 
 !IF  "$(CFG)" == "freeamp - Win32 Release"
 
+# Begin Custom Build
+InputPath=..\..\..\AUTHORS
+
+"..\..\..\Authors.txt" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\AUTHORS ..\..\..\Authors.txt
+
+# End Custom Build
+
 !ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
+
+# Begin Custom Build
+InputPath=..\..\..\AUTHORS
+
+"..\..\..\Authors.txt" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\AUTHORS ..\..\..\Authors.txt
+
+# End Custom Build
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
 
+# Begin Custom Build
+InputPath=..\..\..\AUTHORS
+
+"..\..\..\Authors.txt" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\AUTHORS ..\..\..\Authors.txt
+
+# End Custom Build
+
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
+
+# Begin Custom Build
+InputPath=..\..\..\AUTHORS
+
+"..\..\..\Authors.txt" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\AUTHORS ..\..\..\Authors.txt
+
+# End Custom Build
 
 !ENDIF 
 
 # End Source File
 # Begin Source File
 
-SOURCE=..\res\icon1.ico
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\io\rio\win32\i386\free\portio.sys
+SOURCE=..\..\..\CHANGES
 
 !IF  "$(CFG)" == "freeamp - Win32 Release"
 
 # Begin Custom Build
-InputPath=..\..\..\io\rio\win32\i386\free\portio.sys
+InputPath=..\..\..\CHANGES
 
-".\portio.sys" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\io\rio\win32\i386\free\portio.sys .\portio.sys
+"..\..\..\Changes.txt" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\CHANGES ..\..\..\Changes.txt
 
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
 
 # Begin Custom Build
-InputPath=..\..\..\io\rio\win32\i386\free\portio.sys
+InputPath=..\..\..\CHANGES
 
-".\portio.sys" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\io\rio\win32\i386\free\portio.sys .\portio.sys
+"..\..\..\Changes.txt" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\CHANGES ..\..\..\Changes.txt
 
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
 
 # Begin Custom Build
-InputPath=..\..\..\io\rio\win32\i386\free\portio.sys
+InputPath=..\..\..\CHANGES
 
-".\portio.sys" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\io\rio\win32\i386\free\portio.sys .\portio.sys
+"..\..\..\Changes.txt" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\CHANGES ..\..\..\Changes.txt
 
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
 
 # Begin Custom Build
-InputPath=..\..\..\io\rio\win32\i386\free\portio.sys
+InputPath=..\..\..\CHANGES
 
-".\portio.sys" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\io\rio\win32\i386\free\portio.sys .\portio.sys
+"..\..\..\Changes.txt" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\CHANGES ..\..\..\Changes.txt
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\COPYING
+
+!IF  "$(CFG)" == "freeamp - Win32 Release"
+
+# Begin Custom Build
+InputPath=..\..\..\COPYING
+
+"..\..\..\Copying.txt" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\COPYING ..\..\..\Copying.txt
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
+
+# Begin Custom Build
+InputPath=..\..\..\COPYING
+
+"..\..\..\Copying.txt" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\COPYING ..\..\..\Copying.txt
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
+
+# Begin Custom Build
+InputPath=..\..\..\COPYING
+
+"..\..\..\Copying.txt" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\COPYING ..\..\..\Copying.txt
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
+
+# Begin Custom Build
+InputPath=..\..\..\COPYING
+
+"..\..\..\Copying.txt" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\COPYING ..\..\..\Copying.txt
 
 # End Custom Build
 
@@ -395,6 +473,62 @@ InputPath=..\..\..\README
 
 "..\..\..\ReadMe.txt" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\README ..\..\..\ReadMe.txt
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=..\res\freeamp.rc
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\icon1.ico
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\io\rio\win32\i386\free\portio.sys
+
+!IF  "$(CFG)" == "freeamp - Win32 Release"
+
+# Begin Custom Build
+InputPath=..\..\..\io\rio\win32\i386\free\portio.sys
+
+".\portio.sys" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\io\rio\win32\i386\free\portio.sys .\portio.sys
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
+
+# Begin Custom Build
+InputPath=..\..\..\io\rio\win32\i386\free\portio.sys
+
+".\portio.sys" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\io\rio\win32\i386\free\portio.sys .\portio.sys
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
+
+# Begin Custom Build
+InputPath=..\..\..\io\rio\win32\i386\free\portio.sys
+
+".\portio.sys" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\io\rio\win32\i386\free\portio.sys .\portio.sys
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
+
+# Begin Custom Build
+InputPath=..\..\..\io\rio\win32\i386\free\portio.sys
+
+".\portio.sys" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\io\rio\win32\i386\free\portio.sys .\portio.sys
 
 # End Custom Build
 

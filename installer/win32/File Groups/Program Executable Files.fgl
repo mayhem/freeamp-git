@@ -2,6 +2,9 @@
 file0=..\..\base\win32\prj\freeamp.exe
 file1=..\..\ReadMe.txt
 file2=..\..\base\win32\prj\portio.sys
+file3=..\..\Copying.txt
+file4=..\..\Changes.txt
+file5=..\..\Authors.txt
 
 [General]
 Type=FILELIST

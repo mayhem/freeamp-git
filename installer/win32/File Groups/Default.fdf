@@ -1,13 +1,13 @@
 [FileGroups]
 group0=System DLLs
-group1=Simple UI
-group2=Sound Card Output
+group1=Sound Card Output
+group2=Simple UI
 group3=Program Executable Files
-group4=Xing Decoder
-group5=Direct Sound Output
-group6=File Input
+group4=Direct Sound Output
+group5=Xing Decoder
+group6=OBS Input
 group10=HTTP Input
-group7=OBS Input
+group7=File Input
 group8=RainPlay UI
 group9=FreeAmp UI
 
@@ -25,7 +25,7 @@ COMPRESSDLL=
 POTENTIALLY=No
 MISC=
 
-[Sound Card Output]
+[Simple UI]
 SELFREGISTERING=No
 HTTPLOCATION=
 LANGUAGE=
@@ -39,7 +39,7 @@ COMPRESSDLL=
 POTENTIALLY=No
 MISC=
 
-[Simple UI]
+[Sound Card Output]
 SELFREGISTERING=No
 HTTPLOCATION=
 LANGUAGE=
@@ -67,20 +67,6 @@ COMPRESSDLL=
 POTENTIALLY=No
 MISC=
 
-[Direct Sound Output]
-SELFREGISTERING=No
-HTTPLOCATION=
-LANGUAGE=
-OPERATINGSYSTEM=
-FTPLOCATION=
-FILETYPE=No
-INFOTYPE=Standard
-COMMENT=
-COMPRESS=Yes
-COMPRESSDLL=
-POTENTIALLY=No
-MISC=
-
 [Xing Decoder]
 SELFREGISTERING=No
 HTTPLOCATION=
@@ -95,7 +81,7 @@ COMPRESSDLL=
 POTENTIALLY=No
 MISC=
 
-[OBS Input]
+[Direct Sound Output]
 SELFREGISTERING=No
 HTTPLOCATION=
 LANGUAGE=
@@ -110,6 +96,20 @@ POTENTIALLY=No
 MISC=
 
 [File Input]
+SELFREGISTERING=No
+HTTPLOCATION=
+LANGUAGE=
+OPERATINGSYSTEM=
+FTPLOCATION=
+FILETYPE=No
+INFOTYPE=Standard
+COMMENT=
+COMPRESS=Yes
+COMPRESSDLL=
+POTENTIALLY=No
+MISC=
+
+[OBS Input]
 SELFREGISTERING=No
 HTTPLOCATION=
 LANGUAGE=
