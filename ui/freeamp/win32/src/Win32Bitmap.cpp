@@ -543,3 +543,12 @@ void Win32Bitmap::BlitIt(int x, int y)
    DeleteDC(hSrcDC);
 }
 
+void Win32Bitmap::GetColor(Pos oPos, Color &oColor)
+{
+}
+
+void Win32Bitmap::GetSize(Pos &oPos)
+{
+    oPos.x = m_iWidth;
+    oPos.y = m_iHeight;
+}

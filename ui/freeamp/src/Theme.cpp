@@ -50,6 +50,7 @@ ____________________________________________________________________________*/
 #include "MultiStateControl.h"
 #include "PixFontControl.h"
 #include "PixTimeControl.h"
+#include "PixSliderControl.h"
 #include "ThemeZip.h"
 #include "MessageDialog.h"
 #include "debug.h"
@@ -850,6 +851,40 @@ DB
        return kError_NoErr;
     }
 
+    if (oElement == string("PixSliderControl"))
+    {
+       bool reveal = true;
+       m_bPosDefined = m_bBitmapDefined = m_bInfoDefined = false;
+
+       if (m_pCurrentControl)
+       {
+           m_oLastError = string("Controls cannot be nested");
+           return kError_InvalidParam;
+       }
+
+       if (oAttrMap.find("Name") == oAttrMap.end())
+       {
+           m_oLastError = string("the <PixSliderControl> tag needs a Name attribute");
+           return kError_ParseError;
+       }
+       if (oAttrMap.find("NumStates") == oAttrMap.end())
+       {
+           m_oLastError = string("the <PixSliderControl> tag needs a NumStates attribute");
+           return kError_ParseError;
+       }
+       if (oAttrMap.find("Reveal") != oAttrMap.end())
+       {
+           reveal = strcasecmp(oAttrMap["Reveal"].c_str(), "yes") == 0;
+       }
+
+       m_eCurrentControl = ePixSliderControl;
+       m_pCurrentControl = new PixSliderControl(m_pCurrentWindow,
+                                                oAttrMap["Name"],
+                                                atoi(oAttrMap["NumStates"].
+                                                c_str()), reveal);
+       return kError_NoErr;
+    }
+
     if (oElement == string("SliderControl"))
     {
        m_bPosDefined = m_bBitmapDefined = m_bInfoDefined = false;
@@ -1351,6 +1386,58 @@ DB
        return kError_NoErr;
     }
 
+    if (oElement == string("ActivationBitmap"))
+    {
+       Bitmap *pBitmap = NULL;
+       Rect    oRect;
+
+       if (m_pCurrentControl == NULL)
+       {
+          m_oLastError = string("The <ActivationBitmap> tag must be inside of a <XXXXControl> tag");
+          return kError_InvalidParam;
+       }
+
+       if (m_eCurrentControl != ePixSliderControl) 
+       {
+           m_oLastError = string("the <ActivationBitmap> tag can only be used "
+                                 "for a PixSliderControl");
+           return kError_ParseError;
+       }
+
+       if (oAttrMap.find("Rect") == oAttrMap.end())
+       {
+           m_oLastError = string("the <ActivationBitmap> tag needs a Rect attribute");
+           return kError_ParseError;
+       }
+       if (oAttrMap.find("Name") == oAttrMap.end())
+       {
+           m_oLastError = string("the <ActivationBitmap> tag needs a Name attribute");
+           return kError_ParseError;
+       }
+
+       eRet = ParseRect(oAttrMap["Rect"], oRect);
+       if (eRet != kError_NoErr)
+       {
+           m_oLastError = string("Improperly formatted Rect coordinates: ") +
+                                 oAttrMap["Rect"];
+           return kError_InvalidParam;
+       }
+       pBitmap = FindBitmap(oAttrMap["Name"]);
+       if (pBitmap == NULL)
+       {
+           m_oLastError = string("Undefined bitmap ") +
+                          oAttrMap["Name"] +
+                          string(" in tag <ActivationBitmap>");
+           return kError_InvalidParam;
+       }
+
+       ((PixSliderControl *)m_pCurrentControl)->SetActivationBitmap(pBitmap, 
+                                                                    oRect, 
+                                                                    true);
+       return kError_NoErr;
+    }
+
+
     if (oElement == string("ControlStateBitmap"))
     {
        Bitmap *pBitmap = NULL;
@@ -1541,6 +1628,7 @@ Error Theme::EndElement(string &oElement)
         oElement == string("ControlBitmap") ||
         oElement == string("ControlStateBitmap") ||
         oElement == string("SliderTroughBitmap") ||
+        oElement == string("ActivationBitmap") ||
         oElement == string("FontMap") ||
         oElement == string("PartName"))
     {
@@ -1560,7 +1648,8 @@ Error Theme::EndElement(string &oElement)
         oElement == string("VSliderControl") ||
         oElement == string("MultiStateControl") ||
         oElement == string("TextControl") ||
-        oElement == string("PixmapFontControl")) 
+        oElement == string("PixmapFontControl") ||
+        oElement == string("PixSliderControl")) 
     {
        if (!m_bPosDefined)
        {

@@ -193,6 +193,7 @@ class Control
 
       // this is cute
       vector<map<ControlStateEnum, Rect> > m_oStateBitmapRect;
+      vector<map<ControlStateEnum, Bitmap *> > m_oStateBitmaps;
 };
 
 #endif

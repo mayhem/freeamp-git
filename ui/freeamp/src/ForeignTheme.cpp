@@ -24,6 +24,15 @@ ____________________________________________________________________________*/
 #include "config.h"
 #include "ForeignTheme.h"
 
+#ifdef WIN32
+#include <windows.h>
+#else
+#include <unistd.h>
+#endif
+
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #include "facontext.h"
 #include "registrar.h"
 
@@ -62,6 +71,13 @@ void ForeignTheme::TryToConvert(string &oDir)
 {
     ThemeFormat *ftf = NULL;
     uint32 numFormats = m_formats.size();
+
+    string testfile = oDir + string(DIR_MARKER_STR) + string("theme.xml");
+    struct stat st;
+ 
+// FIXME: remember to uncomment this eventually
+//    if (stat(testfile.c_str(), &st) != -1)
+//        return;
 
     for (uint32 i = 0; i < numFormats; i++) {
         ftf = m_formats[i];

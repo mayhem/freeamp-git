@@ -53,6 +53,9 @@ class Win32Bitmap : public Bitmap
      virtual Error   MakeTransparent(Rect &oRect); 
      virtual Bitmap *Clone(void);
 
+     virtual void GetColor(Pos oPos, Color &oColor);
+     virtual void GetSize(Pos &oPos);
+
      HBITMAP       GetBitmapHandle(void);
      HBITMAP       GetMaskBitmapHandle(void);
      void          UpdateHistogram(WORD *pHist);

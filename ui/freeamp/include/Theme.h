@@ -58,6 +58,7 @@ enum ControlTypeEnum
     eMultiStateControl,
     ePixFontControl,
     ePixTimeControl,
+    ePixSliderControl,
     
     eUndefinedControl
 };

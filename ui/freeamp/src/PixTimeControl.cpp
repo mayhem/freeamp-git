@@ -169,9 +169,11 @@ void PixTimeControl::TextChanged(void)
     string tempstr;
 
     if (show_hours) {
-        if (m_MinuteColon.size() > 0)
-            m_pParent->ControlEnable(m_MinuteColon, true, show_hours);
-
+        if (m_MinuteColon.size() > 0) {
+            sprintf(digit, ":");
+            tempstr = digit;
+            m_pParent->ControlStringValue(m_MinuteColon, true, tempstr);
+        }
         if (m_HourHundred.size() > 0) {
             sprintf(digit, "%d", hours / 100);
             tempstr = digit;
@@ -191,9 +193,11 @@ void PixTimeControl::TextChanged(void)
         }
     }
 
-    bool bEnable = true;
-    if (m_SecondColon.size() > 0)
-        m_pParent->ControlEnable(m_SecondColon, true, bEnable);
+    if (m_SecondColon.size() > 0) {
+        sprintf(digit, ":");
+        tempstr = digit;
+        m_pParent->ControlStringValue(m_SecondColon, true, tempstr);
+    }
 
     if (m_MinuteTen.size() > 0) {
         sprintf(digit, "%d", minutes / 10);

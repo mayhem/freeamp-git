@@ -81,6 +81,7 @@ GTKBitmap::GTKBitmap(int iWidth, int iHeight, const string &oName)
     gdk_threads_leave();
     m_width = iWidth;
     m_height = iHeight;
+    m_image = NULL;
 }
 
 GTKBitmap::~GTKBitmap(void)
@@ -97,6 +98,9 @@ GTKBitmap::~GTKBitmap(void)
     if (m_GC)
         gdk_gc_unref(m_GC);
     m_GC = NULL; 
+
+    if (m_cache)
+        gdk_image_destroy(m_image);
     gdk_threads_leave();
 }
 
@@ -133,6 +137,8 @@ Error GTKBitmap::LoadBitmapFromDisk(string &oFile)
             return kError_LoadBitmapFailed;
     }
 
+    m_cache = false;
+
 #ifdef USING_GDKPIXBUF
     GdkPixbuf *pixbuf;
 
@@ -140,17 +146,21 @@ Error GTKBitmap::LoadBitmapFromDisk(string &oFile)
     pixbuf = gdk_pixbuf_new_from_file(filename.c_str());
     if (pixbuf) {
         GdkPixbuf *newbuf;
-        newbuf = gdk_pixbuf_add_alpha(pixbuf, TRUE, m_oTransColor.red, 
+        newbuf = gdk_pixbuf_add_alpha(pixbuf, m_bHasTransColor, 
+                                      m_oTransColor.red, 
                                       m_oTransColor.green, m_oTransColor.blue);
         gdk_pixbuf_render_pixmap_and_mask(newbuf, &m_Bitmap, &m_MaskBitmap, 
                                           255);
+        m_width = gdk_pixbuf_get_width(newbuf);
+        m_height = gdk_pixbuf_get_height(newbuf);
         gdk_pixbuf_unref(newbuf);
         gdk_pixbuf_unref(pixbuf);
         gdk_threads_leave();
         return kError_NoErr;
     }
     gdk_threads_leave();
-    cout << "Gdk-Pixbuf: Falling back to native loader.\n";
+    cout << "Gdk-Pixbuf: Falling back to native loader for " << filename 
+         << ".\n";
 #endif
 
     FILE *file;
@@ -551,6 +561,12 @@ Error GTKBitmap::LoadBitmapFromDisk(string &oFile)
 
 bool GTKBitmap::IsPosVisible(Pos &oPos)
 {
+    Color col;
+   
+    GetColor(oPos, col);
+
+    if (col.IsEqual(m_oTransColor))
+        return false;
     return true;
 }
 
@@ -641,4 +657,68 @@ Error GTKBitmap::MakeTransparent(Rect &oRect)
     gdk_gc_unref(tempgc);
     gdk_threads_leave();    
     return kError_NoErr;
+}
+
+void GTKBitmap::GetColor(Pos oPos, Color &oColor)
+{
+    gdk_threads_enter();
+
+    if (!m_cache) {
+        m_image = gdk_image_get(m_Bitmap, 0, 0, m_width, m_height);
+        m_cmap = gdk_rgb_get_cmap();
+        m_v = gdk_colormap_get_visual(m_cmap);
+        m_cache = true;
+    }
+
+    guint32 pixel = gdk_image_get_pixel(m_image, oPos.x, oPos.y);
+
+    switch (m_v->type) {
+        case GDK_VISUAL_STATIC_GRAY:
+        case GDK_VISUAL_GRAYSCALE:
+        case GDK_VISUAL_STATIC_COLOR:
+        case GDK_VISUAL_PSEUDO_COLOR: {
+            oColor.red = m_cmap->colors[pixel].red;
+            oColor.green = m_cmap->colors[pixel].green;
+            oColor.blue = m_cmap->colors[pixel].blue;
+            break; }
+        case GDK_VISUAL_TRUE_COLOR: {
+            uint32 component = 0;
+            uint32 i;
+            for (i = 24; i < 32; i += m_v->red_prec)
+                component |= ((pixel & m_v->red_mask) << 
+                              (32 - m_v->red_shift - m_v->red_prec)) >> i;
+            oColor.red = component;
+            component = 0;
+            for (i = 24; i < 32; i += m_v->green_prec)
+                component |= ((pixel & m_v->green_mask) << 
+                              (32 - m_v->green_shift - m_v->green_prec)) >> i;
+            oColor.green = component;
+            component = 0;
+            for (i = 24; i < 32; i += m_v->blue_prec)
+                component |= ((pixel & m_v->blue_mask) << 
+                              (32 - m_v->blue_shift - m_v->blue_prec)) >> i;
+            oColor.blue = component;
+
+            break; }
+        case GDK_VISUAL_DIRECT_COLOR: {
+            oColor.red = m_cmap->colors[((pixel & m_v->red_mask) << 
+                                      (32 - m_v->red_shift - m_v->red_prec)) 
+                                      >> 24].red;
+            oColor.green = m_cmap->colors[((pixel & m_v->green_mask) << 
+                                      (32 - m_v->green_shift - m_v->green_prec))
+                                      >> 24].green;
+            oColor.blue = m_cmap->colors[((pixel & m_v->blue_mask) << 
+                                      (32 - m_v->blue_shift - m_v->blue_prec)) 
+                                      >> 24].blue;
+            break; }
+        default:
+            break;
+    }
+    gdk_threads_leave();
+}
+
+void GTKBitmap::GetSize(Pos &oPos)
+{
+    oPos.x = m_width;
+    oPos.y = m_height;
 }

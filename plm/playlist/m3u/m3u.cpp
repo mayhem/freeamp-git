@@ -42,7 +42,8 @@ typedef struct FormatInfoStruct {
 } FormatInfoStruct; 
 
 static FormatInfoStruct formats[] = {
-    {"m3u", "M3U Playlist Format"}
+    {"m3u", "M3U Playlist Format"},
+    {"gqmpeg", "M3U Playlist Format"}
 };
 
 #define kNumFormats (sizeof(formats)/sizeof(FormatInfoStruct))

@@ -229,9 +229,15 @@ void Control::SetStateBitmap(Bitmap *pBitmap, Rect &oBitmapRect,
 {
     m_oMutex.Acquire();
     m_pBitmap = pBitmap;
+
     if (m_oStateBitmapRect.size() < (unsigned int)(iState + 1)) 
         m_oStateBitmapRect.resize(iState + 1);
     m_oStateBitmapRect[iState][eClickState] = oBitmapRect;
+
+    if (m_oStateBitmaps.size() < (unsigned int)(iState + 1))
+        m_oStateBitmaps.resize(iState + 1);
+    m_oStateBitmaps[iState][eClickState] = pBitmap;
+
     m_bUsesStateBitmapRects = true;
     m_oMutex.Release();
 }
@@ -275,12 +281,20 @@ void Control::BlitFrame(ControlStateEnum eFrame, int iState, Rect *pRect,
         m_oStateBitmapRect[iState].end()) {
         if (eFrame == CS_DisabledMO && 
            m_oStateBitmapRect[iState].find(CS_Disabled) != 
-           m_oStateBitmapRect[iState].end())
+           m_oStateBitmapRect[iState].end()) 
+        {
             m_oStateBitmapRect[iState][eFrame] = 
                                     m_oStateBitmapRect[iState][CS_Disabled]; 
+            m_oStateBitmaps[iState][eFrame] = 
+                                    m_oStateBitmaps[iState][CS_Disabled];
+        }
         else
+        {
             m_oStateBitmapRect[iState][eFrame] = 
                                     m_oStateBitmapRect[iState][CS_Normal];
+            m_oStateBitmaps[iState][eFrame] =
+                                    m_oStateBitmaps[iState][CS_Normal];
+        }
     }
  
     oFrameRect = m_oStateBitmapRect[iState][eFrame];
@@ -292,7 +306,8 @@ void Control::BlitFrame(ControlStateEnum eFrame, int iState, Rect *pRect,
     oDestRect.y2++;
 
     pCanvas = m_pParent->GetCanvas();
-    pCanvas->MaskBlitRect(m_pBitmap, oFrameRect, oDestRect);
+    pCanvas->MaskBlitRect(m_oStateBitmaps[iState][eFrame], oFrameRect, 
+                          oDestRect);
 
     if (bUpdate)
     {

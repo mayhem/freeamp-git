@@ -153,7 +153,7 @@ void PixFontControl::BlitLetter(char letter, Rect oDestRect)
     srcRect.x2 = srcRect.x1 + m_LetterWidth - 1;
     srcRect.y2 = srcRect.y1 + m_LetterHeight;
 
-    oDestRect.y2++;
+    //oDestRect.y2++;
 
     m_pParent->GetCanvas()->MaskBlitRect(m_pBitmap, srcRect, oDestRect);
 }

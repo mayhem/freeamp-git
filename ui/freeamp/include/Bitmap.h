@@ -61,6 +61,8 @@ class Bitmap
      virtual Bitmap *Clone(void) = 0;
      virtual Error   MakeTransparent(Rect &oRect) = 0; 
 
+     virtual void    GetColor(Pos oPos, Color &oColor) = 0;
+     virtual void    GetSize(Pos &oPos) = 0;
     protected:
 
      string  m_oBitmapName, m_oLastError;
