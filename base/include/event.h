@@ -96,6 +96,8 @@ class EventQueue {
 #endif  //_VISUAL_ENABLE_
 #undef  _VISUAL_ENABLE_
 
+#define CMD_VolumeUp           39
+#define CMD_VolumeDown         40
 
 #endif // _EVENT_H_
 

@@ -38,6 +38,7 @@ ____________________________________________________________________________*/
 #include "event.h"
 #include "thread.h"
 #include "eventdata.h"
+#include "volume.h"
 
 extern "C" {
 #include "ir.h"
@@ -58,6 +59,9 @@ void IRManUI::SetPlayListManager(PlayListManager *plm) {
 
 #define ASSOCIATE(x,y) pInt = new int32; *pInt = y; m_commands.Insert(x,pInt);
 
+#define IR_VolumeUp 9998
+#define IR_VolumeDown 9999
+
 
 IRManUI::IRManUI() {
     m_plm = NULL;
@@ -67,11 +71,14 @@ IRManUI::IRManUI() {
     irListenThread = NULL;
 
     int32 *pInt = NULL;
-    ASSOCIATE("d14000000000",CMD_Play);
-    ASSOCIATE("d12000000000",CMD_Stop);
-    ASSOCIATE("d16000000000",CMD_NextMediaPiece);
-    ASSOCIATE("d1a000000000",CMD_PrevMediaPiece);
-    ASSOCIATE("d66000000000",CMD_QuitPlayer);
+    ASSOCIATE("4297ac000000",CMD_Play);
+    ASSOCIATE("4017fc000000",CMD_Stop);
+    ASSOCIATE("46173c000000",CMD_NextMediaPiece);
+    ASSOCIATE("4217bc000000",CMD_PrevMediaPiece);
+    ASSOCIATE("4037f8000000",CMD_QuitPlayer);
+    ASSOCIATE("4237b8000000",IR_VolumeUp);
+    ASSOCIATE("463738000000",IR_VolumeDown);
+    ASSOCIATE("43179c000000",CMD_TogglePause);
 }
 
 
@@ -123,6 +130,7 @@ void IRManUI::irServiceFunction(void *pclcio) {
     int32 lastTimeSec = 0;
     struct timeval tv;
     struct timezone tz;
+    int32 bounceTime = 300000;
     while (!pMe->m_quitIRListen) {
 	code = ir_poll_code();
 	gettimeofday(&tv,&tz);
@@ -139,15 +147,33 @@ void IRManUI::irServiceFunction(void *pclcio) {
 		    
 		    ((*cmd == lastCmd) && ((tv.tv_sec - lastTimeSec) == 1) && (tv.tv_usec > lastTimeMill)) ||
 
-		    ((*cmd == lastCmd) && ( ((tv.tv_usec > lastTimeMill) && ((tv.tv_usec - lastTimeMill) > 300000)) ||
-					    ((tv.tv_usec < lastTimeMill) && ((tv.tv_usec + 1000000 - lastTimeMill) > 300000)) ) ) ) {
+		    ((*cmd == lastCmd) && ( ((tv.tv_usec > lastTimeMill) && ((tv.tv_usec - lastTimeMill) > bounceTime)) ||
+					    ((tv.tv_usec < lastTimeMill) && ((tv.tv_usec + 1000000 - lastTimeMill) > bounceTime)) ) ) ) {
 
 		    lastCmd = *cmd;
 		    lastTimeMill = tv.tv_usec;
 		    lastTimeSec = tv.tv_sec;
 		    switch (*cmd) {
-			    
+			case IR_VolumeUp: {
+			    bounceTime = 100000;
+			    PropValue *pv = NULL;
+			    int32 vol = VolumeManager::GetVolume(); 
+			    vol += 5;
+			    if (vol > 100) vol == 100;
+			    Int32PropValue *ipv = new Int32PropValue(vol);
+			    pMe->m_propManager->SetProperty("pcm_volume",(PropValue *)ipv);
+			    break; }
+			case IR_VolumeDown: {
+			    bounceTime = 100000;
+			    PropValue *pv = NULL;
+			    int32 vol = VolumeManager::GetVolume();
+			    vol -= 5;
+			    if (vol < 0) vol == 0;
+			    Int32PropValue *ipv = new Int32PropValue(vol);
+			    pMe->m_propManager->SetProperty("pcm_volume",(PropValue *)ipv);
+			    break; }
 			default:
+			    bounceTime = 300000;
 			    Event *e = new Event(*cmd);
 			    pMe->m_playerEQ->AcceptEvent(e);
 		    }

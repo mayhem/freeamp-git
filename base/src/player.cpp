@@ -85,6 +85,12 @@ EventQueue() {
 
     m_didUsage = false;
     //m_autoplay = false;
+
+    int32 vol = VolumeManager::GetVolume();
+    Int32PropValue *ipv = new Int32PropValue(vol);
+    m_props.SetProperty("pcm_volume",ipv);
+    m_props.RegisterPropertyWatcher("pcm_volume",(PropertyWatcher *)this);
+
 }
 
 #define TYPICAL_DELETE(x) /*printf("deleting...\n");*/ if (x) { delete x; x = NULL; }
@@ -972,6 +978,16 @@ int32 Player::ServiceEvent(Event *pC) {
 	cout << "serviceEvent: passed NULL event!!!" << endl;
 	return 255;
     }
+}
+
+Error Player::PropertyChange(const char *pProp, PropValue *ppv) {
+    Error rtn = kError_UnknownErr;
+    if (!strcmp(pProp,"pcm_volume")) {
+	int32 newVol = ((Int32PropValue *)ppv)->GetInt32();
+	VolumeManager::SetVolume(newVol);
+	rtn = kError_NoErr;
+    }
+    return rtn;
 }
 
 void Player::SendToUI(Event *pe) {

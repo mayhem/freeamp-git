@@ -40,6 +40,7 @@ ____________________________________________________________________________*/
 #include "preferences.h"
 #include "properties.h"
 #include "propimpl.h"
+#include "volume.h"
 
 #include "lmc.h"
 
@@ -49,7 +50,7 @@ typedef enum {
     STATE_Stopped,
 } PlayerState;
 
-class Player : public EventQueue, Properties  {
+class Player : public EventQueue, Properties, PropertyWatcher  {
 
  public:
     //Player();
@@ -76,6 +77,8 @@ class Player : public EventQueue, Properties  {
     virtual Error SetProperty(const char *, PropValue *);
     virtual Error RegisterPropertyWatcher(const char *, PropertyWatcher *);
     virtual Error RemovePropertyWatcher(const char *, PropertyWatcher *);
+
+    virtual Error PropertyChange(const char *, PropValue *);
  protected:
     Player();
     void GetUIManipLock();
