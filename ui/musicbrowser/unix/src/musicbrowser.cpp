@@ -158,6 +158,7 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
         case INFO_Paused:
         case INFO_Stopped:
         case INFO_Playing:
+        case INFO_MusicCatalogCleared:
         case INFO_MusicCatalogPlaylistAdded:
         case INFO_MusicCatalogPlaylistRemoved:
         case INFO_MusicCatalogTrackChanged:

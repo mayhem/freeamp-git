@@ -173,6 +173,21 @@ class GTKMusicBrowser {
 
     void SetToolbarType();
 
+    GtkCTreeNode *FindNode(TreeNodeType type, ArtistList *artist,
+                           AlbumList *album, PlaylistItem *item,
+                           GtkCTreeNode *searchFrom = NULL);
+    GtkCTreeNode *FindPlaylistNode(string playlist);
+
+    void CreateMainTreeItems(void);
+
+    void ClearTree(void);
+    void AddCatTrack(ArtistList *artist, AlbumList *album, PlaylistItem *item,
+                     bool expand = false);
+    void RemoveCatTrack(ArtistList *artist, AlbumList *album, 
+                        PlaylistItem *item);
+    void AddCatPlaylist(string playlist);
+    void RemoveCatPlaylist(string playlist);
+
   public:
     ClickState GetClickState() { return m_clickState; }
     void SetClickState(ClickState newState);

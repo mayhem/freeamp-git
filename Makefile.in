@@ -102,7 +102,7 @@ clean-freeamp freeamp-clean:
 
 plugins: plugins-cc
 
-plugins-cc install-plugins clean-plugins plugins-install plugins-clean:
+plugins-cc install-plugins uninstall-plugins clean-plugins plugins-install plugins-clean:
 	+test -d plugins || mkdir plugins
 	+$(PIMAKE) $@
 
@@ -112,12 +112,20 @@ distclean: clean
 
 install: install-freeamp install-themes install-plugins install-docs
 
+uninstall: uninstall-freeamp uninstall-themes uninstall-plugins uninstall-docs
+	-rmdir -p $(DESTDIR)$(datadir)/freeamp/themes
+	-rmdir -p $(DESTDIR)$(libdir)/freeamp
+
 install-freeamp: freeamp
 	$(mkinstalldirs) $(DESTDIR)$(bindir)
 	$(INSTALL_PROGRAM) freeamp $(DESTDIR)$(bindir)
 	if test -f "MakeTheme"; then \
 		$(INSTALL_PROGRAM) MakeTheme $(DESTDIR)$(bindir);\
 	fi;
+
+uninstall-freeamp:
+	-${RM} $(DESTDIR)$(bindir)/freeamp
+	-${RM} $(DESTDIR)$(bindir)/MakeTheme
 
 install-themes:
 	$(mkinstalldirs) $(DESTDIR)$(datadir)/freeamp/themes
@@ -128,9 +136,19 @@ install-themes:
 	  else :; fi; \
 	done
 
+uninstall-themes:
+	@list=`ls $(srcdir)/themes/*.*`; for p in $$list; do \
+	  if test -f $$p; then \
+	    ${RM} "$(DESTDIR)$(datadir)/freeamp/themes/`basename $$p`"; \
+	  fi; \
+	done
+
 install-docs:
 	$(mkinstalldirs) $(DESTDIR)$(datadir)/freeamp
 	gzip -d -c < $(srcdir)/help/unix/freeamphelp.tar.gz | (cd $(DESTDIR)$(datadir)/freeamp; rm -rf help; tar -xmf -)
+
+uninstall-docs:
+	${RM} -rf $(DESTDIR)$(datadir)/freeamp/help
 
 depend:
 	makedepend -- $(DEFS) $(INCLUDES) $(CFLAGS) -- `echo $(FREEAMPOBJ) | sed -e 's,\.o,.cpp,g'`

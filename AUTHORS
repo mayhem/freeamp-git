@@ -94,4 +94,7 @@ Other major contributors and their contributions:
 
 "Brian Almeida" <bma@debian.org>
 * Debian maintainer
-* various small fixes and patches
+* various fixes and patches
+
+"Reece Hart" <reece@in-machina.com>
+* make uninstall target

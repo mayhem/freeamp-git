@@ -275,6 +275,7 @@ void GTKFont::Render(Rect &oClipRect, string &oText, int iOffset,
            ycoord -= ttfont->descent;
        else
            ycoord -= ttfont->descent / 2;
+       ycoord++;
        EFont_draw_string(bitmap->GetBitmap(), gc, oClipRect.x1 + iOffset, 
                          ycoord, (char *)oText.c_str(), ttfont);
     }

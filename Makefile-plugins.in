@@ -23,6 +23,7 @@ uninstall_plugins uninstall-plugins:
 	    rm -f $(DESTDIR)$(libdir)/freeamp/`echo $$p|sed '$(transform)'`; \
 	  else :; fi; \
 	done
+	-rmdir $(DESTDIR)/$(libdir)/freeamp/plugins
 
 OSDEPPLUGINS = @OSDEPPLUGINS@
 

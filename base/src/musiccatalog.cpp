@@ -457,6 +457,7 @@ void MusicCatalog::ClearCatalog()
     m_unsorted = new vector<PlaylistItem *>;
     m_playlists = new vector<string>;
     m_catMutex->Release();
+    m_context->target->AcceptEvent(new Event(INFO_MusicCatalogCleared));
 }
 
 Error MusicCatalog::RePopulateFromDatabase()
