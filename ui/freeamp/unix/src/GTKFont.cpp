@@ -338,11 +338,12 @@ void GTKFont::Render(Rect &oClipRect, string &oText, int iOffset,
     else if (type == kFontTypeTTF) {
        int ycoord;
        ycoord = oClipRect.y1 + oClipRect.Height();
-       if (ttfont->ascent <= oClipRect.Height()) 
+       if (ttfont->ascent < oClipRect.Height()) 
            ycoord -= ttfont->descent;
        else 
            ycoord -= ttfont->descent / 2;
        ycoord++;
+
        EFont_draw_string(bitmap->GetBitmap(), gc, oClipRect.x1 + iOffset, 
                          ycoord, (char *)oText.c_str(), ttfont);
     }
