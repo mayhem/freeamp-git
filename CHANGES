@@ -1,3 +1,11 @@
+Changes for Linux and Windows version 2.1.0 beta 3
+--------------------------------------------------------------------
+
+- See note for beta 1. It still applies. 
+- Fixed lots of bugs... for details go to:
+
+http://www.freeamp.org/bugzilla/buglist.cgi?bug_status=RESOLVED&bug_status=VERIFIED&bug_status=CLOSED&email1=&emailtype1=substring&emailassigned_to1=1&email2=&emailtype2=substring&emailreporter2=1&bugidtype=include&bug_id=&changedin=&votes=&chfield=resolution&chfieldfrom=5%2F18%2F2000&chfieldto=5%2F30%2F2000&chfieldvalue=&product=FreeAmp&short_desc=&short_desc_type=substring&long_desc=&long_desc_type=substring&bug_file_loc=&bug_file_loc_type=substring&field0-0-0=noop&type0-0-0=noop&value0-0-0=&cmdtype=doit&newqueryname=&order=Reuse+same+sort+as+last+time
+
 Changes for Linux and Windows version 2.1.0 beta 1
 --------------------------------------------------------------------
 
