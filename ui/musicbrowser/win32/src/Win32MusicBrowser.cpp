@@ -232,6 +232,9 @@ MusicBrowserUI::~MusicBrowserUI()
           delete (*i);
     }   
     
+    if(!m_pParent)
+        m_context->prefs->SetViewMusicBrowser(m_state == STATE_EXPANDED);
+
     CloseMainDialog();
 
     delete m_uiThread;
@@ -606,8 +609,9 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
                     m_initialized = true;
                 }
             }
-            if (m_state == STATE_COLLAPSED)
-                ExpandCollapseEvent();
+
+            //if (m_state == STATE_COLLAPSED)
+                //ExpandCollapseEvent();
             break; 
         }
 

@@ -76,6 +76,7 @@ extern const char* kUsersPortablePlayersPref;
 extern const char* kShowToolbarTextLabelsPref;
 extern const char* kShowToolbarImagesPref;
 extern const char* kSaveCurrentPlaylistOnExitPref;
+extern const char* kViewMusicBrowserPref;
 
 class LibDirFindHandle;
 
@@ -236,6 +237,9 @@ class Preferences {
 
     Error GetSaveCurrentPlaylistOnExit(bool* value);
     Error SetSaveCurrentPlaylistOnExit(bool value);
+
+    Error GetViewMusicBrowser(bool* value);
+    Error SetViewMusicBrowser(bool value);
 
 };
 
