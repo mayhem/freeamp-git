@@ -139,14 +139,23 @@ bool NeedToScroll()
     return result;
 }
 
-static void DrawPlayer(HDC hdc, ControlInfo* state)
+static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
 {
     HDC memdc, bufferdc;
     HBITMAP oldMemBitmap, bufferBitmap, oldBufferBitmap;
     int width, height;
     BITMAP bmp;
     int32 i;
+    HRGN clipRegion = CreateRectRgn(0,0,0,0);
 
+    if(repaintAll)
+    {
+        CombineRgn( clipRegion,
+                    clipRegion,
+                    g_playerRegion,
+                    RGN_OR);
+    }
+    
     if(palette)
     {
         SelectPalette (hdc, palette, FALSE);
@@ -232,8 +241,13 @@ static void DrawPlayer(HDC hdc, ControlInfo* state)
 
         GetRgnBox(g_buttonStateArray[i].region, &rect);
 
-        if(1)//g_buttonStateArray[i].dirty)
+        if(g_buttonStateArray[i].dirty)
         {
+            CombineRgn( clipRegion,
+                        clipRegion,
+                        g_buttonStateArray[i].region,
+                        RGN_OR);
+
             switch(g_buttonStateArray[i].control_id)
             {
                 case kModeControl:
@@ -416,7 +430,7 @@ static void DrawPlayer(HDC hdc, ControlInfo* state)
         }
     }
 
-    SelectClipRgn(hdc, g_playerRegion);
+    SelectClipRgn(hdc, clipRegion);
 
     BitBlt( hdc, 
             0, 
@@ -429,6 +443,8 @@ static void DrawPlayer(HDC hdc, ControlInfo* state)
             SRCCOPY);
 
     SelectClipRgn(hdc, NULL);
+
+    DeleteObject(clipRegion);
 
     SelectObject(bufferdc, oldBufferBitmap); 
     SelectObject(memdc, oldMemBitmap); 
@@ -874,7 +890,7 @@ void UpdateControls(HWND hwnd)
 {
     HDC hdc = GetDC(hwnd);
 
-    DrawPlayer(hdc, g_buttonStateArray);
+    DrawPlayer(hdc, g_buttonStateArray, false);
 
     ReleaseDC(hwnd, hdc);
 }
@@ -1302,7 +1318,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
             for(i = 0; i < kNumControls; i++)
             {
                 g_buttonStateArray[i].control_id = i;
-                g_buttonStateArray[i].dirty = FALSE;
+                g_buttonStateArray[i].dirty = TRUE;
                 g_buttonStateArray[i].enabled = TRUE;
                 g_buttonStateArray[i].shown = TRUE;
                 g_buttonStateArray[i].state = Deactivated;
@@ -1572,7 +1588,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
             
             hdc = BeginPaint( hwnd, &ps );
 
-            DrawPlayer(hdc, g_buttonStateArray);
+            DrawPlayer(hdc, g_buttonStateArray, true);
             DrawDisplay(hdc, &g_displayInfo);
             
             EndPaint( hwnd, &ps );          
@@ -1703,7 +1719,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
             hdc = GetDC(hwnd);
 
-            DrawPlayer(hdc, g_buttonStateArray);
+            DrawPlayer(hdc, g_buttonStateArray, false);
             DrawDisplay(hdc, &g_displayInfo);
 
             ReleaseDC(hwnd, hdc);
@@ -1757,7 +1773,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
                     hdc = GetDC(hwnd);
 
-                    DrawPlayer(hdc, g_buttonStateArray);
+                    DrawPlayer(hdc, g_buttonStateArray, false);
 
                     ReleaseDC(hwnd, hdc);
 
@@ -1915,7 +1931,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                     DrawDisplay(hdc, &g_displayInfo);
 
                 if(dirtyPlayer)
-                    DrawPlayer(hdc, g_buttonStateArray);
+                    DrawPlayer(hdc, g_buttonStateArray, false);
 
                 ReleaseDC(hwnd, hdc);
             }
