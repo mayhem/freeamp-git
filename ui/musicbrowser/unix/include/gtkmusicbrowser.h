@@ -43,6 +43,7 @@ typedef enum {
 } MusicBrowserView;
 
 typedef enum {
+    kContextNone,
     kContextPlaylist,
     kContextBrowser
 } ClickState;
@@ -148,6 +149,7 @@ class GTKMusicBrowser {
     GtkWidget *playlistMenu;
     GtkWidget *addTrack;
     GtkWidget *addFile;
+    GtkWidget *toolRemove;
     GtkWidget *toolUp;
     GtkWidget *toolDown;
     GtkWidget *toolbar;

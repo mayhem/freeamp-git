@@ -1469,31 +1469,31 @@ static void add_tool(GtkWidget *widget, GTKMusicBrowser *p)
 
 static void move_up_tool(GtkWidget *widget, GTKMusicBrowser *p)
 {
-    p->SetClickState(kContextPlaylist);
     p->MoveUpEvent();
+    p->SetClickState(kContextPlaylist);
 }
 
 static void move_down_tool(GtkWidget *widget, GTKMusicBrowser *p)
 {
-    p->SetClickState(kContextPlaylist);
     p->MoveDownEvent();
+    p->SetClickState(kContextPlaylist);
 }
 
 static void playlist_row_move_internal(GtkWidget *widget, int source, int dest, 
                                        GTKMusicBrowser *p)
 {
-    p->SetClickState(kContextPlaylist);
     p->MoveItemEvent(source, dest);
+    p->SetClickState(kContextPlaylist);
 }
 
 static void set_current_index_internal(GtkWidget *widget, int row, int column, 
                                        GdkEventButton *button, 
                                        GTKMusicBrowser *p)
 {
-    p->SetClickState(kContextPlaylist);
     p->m_currentindex = row;
     if (button && button->type == GDK_2BUTTON_PRESS)
         p->PlayEvent();
+    p->SetClickState(kContextPlaylist);
 }
 
 static void quit_menu(GTKMusicBrowser *p, guint action, GtkWidget *w)
@@ -1965,10 +1965,10 @@ void GTKMusicBrowser::CreatePlaylist(void)
                             "Toolbar/Import", NewPixmap(import_pic),
                             GTK_SIGNAL_FUNC(import_tool), this);
 
-    gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Remove Track",
-                            "Remove a Track from the Playlist",
-                            "Toolbar/Remove", NewPixmap(trash_pic),
-                            GTK_SIGNAL_FUNC(remove_tool), this);
+    toolRemove = gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Remove Track",
+                                         "Remove a Track from the Playlist",
+                                         "Toolbar/Remove", NewPixmap(trash_pic),
+                                         GTK_SIGNAL_FUNC(remove_tool), this);
 
     gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Edit",
                             "Edit a Track or Playlist",
@@ -2046,7 +2046,7 @@ void GTKMusicBrowser::CreatePlaylist(void)
 
     CreatePlaylistList(playlistwindow);
 
-    SetClickState(kContextPlaylist);
+    SetClickState(kContextNone);
     gtk_widget_show(musicBrowser);
 
     m_state = kStateCollapsed;
@@ -2076,17 +2076,36 @@ void GTKMusicBrowser::SetToolbarType(void)
 
 void GTKMusicBrowser::SetClickState(ClickState newState)
 {
-    if (m_clickState == newState)
+    if ((m_clickState == newState) && (newState != kContextPlaylist))
         return;
 
     m_clickState = newState;
     if (m_clickState == kContextPlaylist) {
+        gtk_widget_set_sensitive(toolRemove, TRUE);
         gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
                                  "/Edit/Remove Items from My Music"), FALSE);
-        gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
-                                 "/Edit/Move Up"), TRUE);
-        gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
-                                 "/Edit/Move Down"), TRUE);
+        if (m_currentindex != 0) {
+            gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
+                                     "/Edit/Move Up"), TRUE);
+            gtk_widget_set_sensitive(toolUp, TRUE);
+        }
+        else {
+            gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
+                                     "/Edit/Move Up"), FALSE);
+            gtk_widget_set_sensitive(toolUp, FALSE);
+        }
+        if (m_currentindex != m_plm->CountItems() - 1) {
+            gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
+                                     "/Edit/Move Down"), TRUE);
+            gtk_widget_set_sensitive(toolDown, TRUE);
+        }
+        else {
+            gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
+                                     "/Edit/Move Down"), FALSE);
+            gtk_widget_set_sensitive(toolDown, FALSE);
+        }
+        gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory, 
+                                 "/Edit/Edit Info"), TRUE);
 
         if (musicBrowserTree)
             gtk_clist_unselect_all(GTK_CLIST(musicBrowserTree));
@@ -2098,6 +2117,9 @@ void GTKMusicBrowser::SetClickState(ClickState newState)
 
     }
     else if (m_clickState == kContextBrowser) {
+        gtk_widget_set_sensitive(toolUp, FALSE);
+        gtk_widget_set_sensitive(toolDown, FALSE);
+        gtk_widget_set_sensitive(toolRemove, FALSE);
         gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
                                  "/Edit/Remove Items from My Music"), TRUE);
         gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
@@ -2119,6 +2141,8 @@ void GTKMusicBrowser::SetClickState(ClickState newState)
                                             "/Edit/Remove Items from My Music");
             gtk_container_foreach(GTK_CONTAINER(w), set_label_menu,
                                   (gpointer)"Remove Items from My Music");
+            gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
+                                     "/Edit/Edit Info"), FALSE);
         }
         else if (m_mbState == kClickPlaylist) {
             GtkWidget *w = gtk_item_factory_get_widget(menuFactory,
@@ -2147,8 +2171,17 @@ void GTKMusicBrowser::SetClickState(ClickState newState)
                                             "/Edit/Remove Items from My Music");
             gtk_container_foreach(GTK_CONTAINER(w), set_label_menu,
                                   (gpointer)"Remove Track from My Music");
+            gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
+                                     "/Edit/Edit Info"), TRUE);
         }
     }
+    else {
+        gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
+                                 "/Edit/Edit Info"), FALSE);
+        gtk_widget_set_sensitive(toolUp, FALSE);
+        gtk_widget_set_sensitive(toolDown, FALSE);
+    }
+
     if (!master) {
         gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
                                  "/Controls/Play"), FALSE);
