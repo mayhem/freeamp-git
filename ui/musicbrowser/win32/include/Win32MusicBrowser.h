@@ -109,6 +109,8 @@ class MusicBrowserUI : public UserInterface
                             UINT msg, 
                             WPARAM wParam, 
                             LPARAM lParam);
+
+    const PlaylistManager* PLManager() const { return m_oPlm; }
  
  protected:
     FAContext *m_context;
@@ -166,6 +168,7 @@ class MusicBrowserUI : public UserInterface
     void  UpdatePlaylistListItem(const PlaylistItem* item);
     void  PlaylistListItemMoved(const PlaylistItem* item, 
                                 uint32 oldIndex, uint32 newIndex);
+    void  PlaylistListItemRemoved(const PlaylistItem* item, uint32 oldIndex);
     void  InitList(void);
     void  AddPlaylist(const string &oName);
     void  LoadPlaylist(const string &oPlaylist);

@@ -551,85 +551,102 @@ public:
 class PlaylistItemAddedEvent : public Event {
 private:
 	const PlaylistItem* m_item;
+    const PlaylistManager* m_plm;
 public:
-	PlaylistItemAddedEvent(const PlaylistItem* item) 
-    { m_type = INFO_PlaylistItemAdded; m_item = item; }
+	PlaylistItemAddedEvent(const PlaylistItem* item, const PlaylistManager* plm) 
+    { m_type = INFO_PlaylistItemAdded; m_item = item; m_plm = plm;}
 	virtual ~PlaylistItemAddedEvent() {}
 
-	const PlaylistItem* Item() { return m_item; }
+	const PlaylistItem* Item() const { return m_item; }
+    const PlaylistManager* Manager() const { return m_plm; }
 };
 
 class PlaylistItemMovedEvent : public Event {
 private:
 	const PlaylistItem* m_item;
+    const PlaylistManager* m_plm;
     uint32 m_oldIndex, m_newIndex;
 public:
 	PlaylistItemMovedEvent(uint32 oldIndex, 
                            uint32 newIndex, 
-                           const PlaylistItem* item) 
-    { m_type = INFO_PlaylistItemMoved; m_item = item; 
+                           const PlaylistItem* item,
+                           const PlaylistManager* plm) 
+    { m_type = INFO_PlaylistItemMoved; m_item = item; m_plm = plm;
       m_oldIndex = oldIndex; m_newIndex = newIndex;}
 	virtual ~PlaylistItemMovedEvent() {}
 
-	const PlaylistItem* Item() { return m_item; }
-    uint32 OldIndex() { return m_oldIndex; }
-    uint32 NewIndex() { return m_newIndex; }
+	const PlaylistItem* Item() const { return m_item; }
+    const PlaylistManager* Manager() const { return m_plm; }
+    uint32 OldIndex() const { return m_oldIndex; }
+    uint32 NewIndex() const { return m_newIndex; }
 };
 
 class PlaylistItemRemovedEvent : public Event {
 private:
 	const PlaylistItem* m_item;
+    const PlaylistManager* m_plm;
+    uint32 m_index;
 public:
-	PlaylistItemRemovedEvent(const PlaylistItem* item) 
-    { m_type = INFO_PlaylistItemRemoved; m_item = item; }
+	PlaylistItemRemovedEvent(const PlaylistItem* item, uint32 index, const PlaylistManager* plm) 
+    { m_type = INFO_PlaylistItemRemoved; m_item = item; m_plm = plm; m_index = index; }
 	virtual ~PlaylistItemRemovedEvent() {}
 
-	const PlaylistItem* Item() { return m_item; }
+	const PlaylistItem* Item() const { return m_item; }
+    uint32 Index() const { return m_index; }
+    const PlaylistManager* Manager() const { return m_plm; }
 };
 
 class PlaylistItemUpdatedEvent : public Event {
 private:
 	const PlaylistItem* m_item;
+    const PlaylistManager* m_plm;
 public:
-	PlaylistItemUpdatedEvent(const PlaylistItem* item) 
-    { m_type = INFO_PlaylistItemUpdated; m_item = item; }
+	PlaylistItemUpdatedEvent(const PlaylistItem* item, const PlaylistManager* plm) 
+    { m_type = INFO_PlaylistItemUpdated; m_item = item; m_plm = plm;}
 	virtual ~PlaylistItemUpdatedEvent() {}
 
-	const PlaylistItem* Item() { return m_item; }
+	const PlaylistItem* Item() const { return m_item; }
+    const PlaylistManager* Manager() const { return m_plm; }
 };
 
 class PlaylistCurrentItemInfoEvent : public Event {
 private:
 	const PlaylistItem* m_item;
+    const PlaylistManager* m_plm;
 public:
-	PlaylistCurrentItemInfoEvent(const PlaylistItem* item) 
-    { m_type = INFO_PlaylistCurrentItemInfo; m_item = item; }
+	PlaylistCurrentItemInfoEvent(const PlaylistItem* item, const PlaylistManager* plm) 
+    { m_type = INFO_PlaylistCurrentItemInfo; m_item = item; m_plm = plm;}
 	virtual ~PlaylistCurrentItemInfoEvent() {}
 
-	const PlaylistItem* Item() { return m_item; }
+	const PlaylistItem* Item() const { return m_item; }
+    const PlaylistManager* Manager() const { return m_plm; }
 };
 
 
 class PlaylistRepeatEvent : public Event {
 private:
 	RepeatMode m_rm;
+    const PlaylistManager* m_plm;
 public:
-	PlaylistRepeatEvent(RepeatMode rm) 
-    { m_type = INFO_PlaylistRepeat; m_rm = rm; }
+	PlaylistRepeatEvent(RepeatMode rm, const PlaylistManager* plm) 
+    { m_type = INFO_PlaylistRepeat; m_rm = rm; m_plm = plm;}
 	virtual ~PlaylistRepeatEvent() {}
 
-	RepeatMode GetRepeatMode() { return m_rm; }
+	RepeatMode GetRepeatMode() const { return m_rm; }
+    const PlaylistManager* Manager() const { return m_plm; }
 };
 
 class PlaylistShuffleEvent : public Event {
 private:
 	bool m_sm;
+    const PlaylistManager* m_plm;
 public:
-	PlaylistShuffleEvent(bool sm) 
-    { m_type = INFO_PlaylistShuffle; m_sm = sm; }
+	PlaylistShuffleEvent(bool sm, const PlaylistManager* plm) 
+    { m_type = INFO_PlaylistShuffle; m_sm = sm; m_plm = plm;}
 	virtual ~PlaylistShuffleEvent() {}
 
-	bool GetShuffleMode() { return m_sm; }
+	bool GetShuffleMode() const { return m_sm; }
+    const PlaylistManager* Manager() const { return m_plm; }
 };
 
 class DownloadItem;

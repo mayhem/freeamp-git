@@ -48,23 +48,33 @@ void MusicBrowserUI::DeleteListEvent(void)
 
 void MusicBrowserUI::DeleteEvent(void)
 {
-    uint32 count = ListView_GetSelectedCount(m_hPlaylistView);
-    uint32 found = 0;
-    uint32 index = ListView_GetItemCount(m_hPlaylistView) - 1;
+    // first figure out which control has focus
+    HWND hwndFocus = GetFocus();
 
-    while(found < count)
+    if(hwndFocus == m_hPlaylistView)
     {
-        uint32 state = ListView_GetItemState(m_hPlaylistView, 
-                                             index, 
-                                             LVIS_SELECTED);
+        uint32 count = ListView_GetSelectedCount(m_hPlaylistView);
+        uint32 found = 0;
+        uint32 index = ListView_GetItemCount(m_hPlaylistView) - 1;
 
-        if(state & LVIS_SELECTED)
+        while(found < count)
         {
-            found++;
-            m_oPlm->RemoveItem(index);
-        }
+            uint32 state = ListView_GetItemState(m_hPlaylistView, 
+                                                 index, 
+                                                 LVIS_SELECTED);
 
-        index--;
+            if(state & LVIS_SELECTED)
+            {
+                found++;
+                m_oPlm->RemoveItem(index);
+            }
+
+            index--;
+        }
+    }
+    else if(hwndFocus == m_hMusicCatalog)
+    {
+        MessageBox(NULL, "Deleting from Catalog not yet implemented.", "doh!", MB_OK);
     }
 }
 

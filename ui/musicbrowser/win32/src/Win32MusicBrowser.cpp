@@ -199,38 +199,93 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
 
         case INFO_PlaylistItemAdded:
         {
-            PlaylistItemAddedEvent* piae = (PlaylistItemAddedEvent*)event;
+            PlaylistItemAddedEvent* pie = (PlaylistItemAddedEvent*)event;
 
-            vector<MusicBrowserUI *>::iterator i;
+            if(pie->Manager() == m_oPlm)
+                AddPlaylistListItem(pie->Item());
+            else
+            {
+                vector<MusicBrowserUI *>::iterator i;
+
+                for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
+                {
+                    if((*i)->PLManager() == pie->Manager())
+                    {
+                        (*i)->AddPlaylistListItem(pie->Item());
+                        break;
+                    }
+                }
+            }
             
-            for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
-               (*i)->AddPlaylistListItem(piae->Item());
-               
-            AddPlaylistListItem(piae->Item());
             break; 
         }
 
         case INFO_PlaylistItemUpdated:
         {
-            PlaylistItemUpdatedEvent* piue = (PlaylistItemUpdatedEvent*)event;
-            vector<MusicBrowserUI *>::iterator i;
+            PlaylistItemUpdatedEvent* pie = (PlaylistItemUpdatedEvent*)event;
+
+            if(pie->Manager() == m_oPlm)
+                UpdatePlaylistListItem(pie->Item());
+            else
+            {
+                vector<MusicBrowserUI *>::iterator i;
+
+                for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
+                {
+                    if((*i)->PLManager() == pie->Manager())
+                    {
+                        (*i)->UpdatePlaylistListItem(pie->Item());
+                        break;
+                    }
+                }
+            }
             
-            for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
-               (*i)->UpdatePlaylistListItem(piue->Item());
-               
-            UpdatePlaylistListItem(piue->Item());
             break; 
         }
 
         case INFO_PlaylistItemMoved:
         {
-            PlaylistItemMovedEvent* pime = (PlaylistItemMovedEvent*)event;
-            vector<MusicBrowserUI *>::iterator i;
-            
-            for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
-               (*i)->PlaylistListItemMoved(pime->Item(), pime->OldIndex(), pime->NewIndex());
-               
-            PlaylistListItemMoved(pime->Item(), pime->OldIndex(), pime->NewIndex());
+            PlaylistItemMovedEvent* pie = (PlaylistItemMovedEvent*)event;
+
+            if(pie->Manager() == m_oPlm)
+                PlaylistListItemMoved(pie->Item(), pie->OldIndex(), pie->NewIndex());
+            else
+            {
+                vector<MusicBrowserUI *>::iterator i;
+
+                for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
+                {
+                    if((*i)->PLManager() == pie->Manager())
+                    {
+                        (*i)->PlaylistListItemMoved(pie->Item(), pie->OldIndex(), pie->NewIndex());
+                        break;
+                    }
+                }
+            }
+          
+            break; 
+        }
+
+        case INFO_PlaylistItemRemoved:
+        {
+            PlaylistItemRemovedEvent* pie = (PlaylistItemRemovedEvent*)event;
+
+            if(pie->Manager() == m_oPlm)
+                PlaylistListItemRemoved(pie->Item(), pie->Index());
+            else
+            {
+                vector<MusicBrowserUI *>::iterator i;
+
+                for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
+                {
+                    if((*i)->PLManager() == pie->Manager())
+                    {
+                        (*i)->PlaylistListItemRemoved(pie->Item(), pie->Index());
+                        break;
+                    }
+                }
+            }
+          
             break; 
         }
 

@@ -60,7 +60,7 @@ TBBUTTON tbButtons[] = {
     { 2, ID_FILE_SAVEPLAYLIST, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
 	{ 0, 0, TBSTATE_ENABLED, TBSTYLE_SEP, 0L, 0},
     { 1, ID_FILE_IMPORT, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-	{ 12, ID_EDIT_REMOVE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+	{ 12, IDC_DELETE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
 	{ 5, ID_EDIT_EDIT, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
     { 0, 0, TBSTATE_ENABLED, TBSTYLE_SEP, 0L, 0},
     { 1, ID_EDIT_ADDTRACK, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
@@ -172,45 +172,42 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                 case ID_FILE_SEARCHFORMUSIC:
                 case IDC_SEARCH:
                     StartStopMusicSearch();
-                return 1;
+                    return 1;
                 case ID_EDIT_MOVEUP:
                 case IDC_UP:
                     MoveUpEvent();
-                return 1;
+                    return 1;
                 case ID_EDIT_MOVEDOWN:
                 case IDC_DOWN:
                     MoveDownEvent();
-                return 1;
-                case IDC_DELETE:
-                    DeleteEvent();
-                return 1;
+                    return 1;
                 case ID_EDIT_ADDTRACK:
                 case IDC_ADD:
                     AddEvent();
-                return 1;
+                    return 1;
                 case ID_EDIT_CLEARPLAYLIST:
                 case IDC_CLEARLIST:
                     DeleteListEvent();
-                return 1;
+                    return 1;
                 case ID_VIEW_MUSICCATALOG:
                     ExpandCollapseEvent();
-                return 1;
+                    return 1;
                 case ID_FILE_OPENPLAYLIST:
                     OpenPlaylist();
-                return 1;
+                    return 1;
                 case ID_FILE_EXIT:
                     Close();
-                return 1;
+                    return 1;
                 case ID_FILE_SAVEPLAYLIST:
                     WritePlaylist();
-                return 1;
+                    return 1;
                 case ID_FILE_SAVEASPLAYLIST:
                     SaveAsPlaylist();
-                return 1;
+                    return 1;
                 case IDC_NEWLIST:
                 case ID_FILE_NEWPLAYLIST:
                     NewPlaylist();
-                return 1;
+                    return 1;
                 case ID_SORT_ARTIST:
                 case ID_SORT_ALBUM:
                 case ID_SORT_TITLE:
@@ -222,19 +219,22 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                 case ID_SORT_RANDOMIZE:
                 case IDC_RANDOMIZE:
                     SortEvent(LOWORD(wParam));
-                return 1;
+                    return 1;
                 case ID_EDIT_EDIT:
                     EditEvent();
-                return 1;
+                    return 1;
+                case IDC_DELETE:
+                    DeleteEvent();
+                    return 1;
                 case ID_EDIT_REMOVE:
                     RemoveEvent();
-                return 1;
+                    return 1;
                 case ID_EDIT_REMOVEFROMDISK:
                     RemoveFromDiskEvent();
-                return 1;
+                    return 1;
                 case ID_FILE_IMPORT:
                     ImportEvent();
-                return 1;
+                    return 1;
             }    
         }     
 

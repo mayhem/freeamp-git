@@ -541,6 +541,25 @@ void MusicBrowserUI::PlaylistListItemMoved(const PlaylistItem* item,
     }
 }
 
+void MusicBrowserUI::PlaylistListItemRemoved(const PlaylistItem* item, 
+                                             uint32 oldIndex)
+{
+    // item has already been deleted when we get this 
+    // msg so don't access it. only use it for comparison
+
+    if(oldIndex != kInvalidIndex)
+    {
+        ListView_DeleteItem(m_hPlaylistView, oldIndex);
+
+        if(oldIndex >= ListView_GetItemCount(m_hPlaylistView))
+            oldIndex = ListView_GetItemCount(m_hPlaylistView) - 1;
+
+        ListView_SetItemState(m_hPlaylistView, oldIndex, LVIS_SELECTED, LVIS_SELECTED);
+        ListView_RedrawItems(m_hPlaylistView, oldIndex, ListView_GetItemCount(m_hPlaylistView) - 1);
+
+    }
+}
+
 void MusicBrowserUI::UpdatePlaylistListItem(const PlaylistItem* item)
 {
     LV_ITEM       sItem;

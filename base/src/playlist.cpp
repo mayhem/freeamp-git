@@ -373,7 +373,7 @@ Error PlaylistManager::SetCurrentIndex(uint32 index)
 void PlaylistManager::InternalSetCurrentIndex(uint32 index)
 {
     m_current = index;
-    m_context->target->AcceptEvent(new PlaylistCurrentItemInfoEvent(GetCurrentItem()));
+    m_context->target->AcceptEvent(new PlaylistCurrentItemInfoEvent(GetCurrentItem(), this));
 }
 
 uint32 PlaylistManager::GetCurrentIndex() const
@@ -498,7 +498,7 @@ Error PlaylistManager::SetShuffleMode(bool shuffle)
         random_shuffle(m_shuffleList.begin(), m_shuffleList.end());
     }
 
-    m_context->target->AcceptEvent(new PlaylistShuffleEvent(m_shuffle));
+    m_context->target->AcceptEvent(new PlaylistShuffleEvent(m_shuffle, this));
 
     m_mutex.Release();
 
@@ -508,7 +508,7 @@ Error PlaylistManager::SetShuffleMode(bool shuffle)
 Error PlaylistManager::SetRepeatMode(RepeatMode mode)
 {
     m_repeatMode = mode;
-    m_context->target->AcceptEvent(new PlaylistRepeatEvent(m_repeatMode));
+    m_context->target->AcceptEvent(new PlaylistRepeatEvent(m_repeatMode, this));
     return kError_NoErr;
 }
 
@@ -681,7 +681,7 @@ Error PlaylistManager::AddItem(PlaylistItem* item, bool queryForMetaData)
         if(queryForMetaData)
             RetrieveMetaData(item);
      
-        m_context->target->AcceptEvent(new PlaylistItemAddedEvent(item));
+        m_context->target->AcceptEvent(new PlaylistItemAddedEvent(item, this));
 
         result = kError_NoErr;
     }
@@ -717,7 +717,7 @@ Error PlaylistManager::AddItem(PlaylistItem* item, uint32 index, bool queryForMe
         if(queryForMetaData)
             RetrieveMetaData(item);
 
-        m_context->target->AcceptEvent(new PlaylistItemAddedEvent(item));
+        m_context->target->AcceptEvent(new PlaylistItemAddedEvent(item, this));
 
         result = kError_NoErr;
     }
@@ -760,7 +760,7 @@ Error PlaylistManager::AddItems(vector<PlaylistItem*>* list, bool queryForMetaDa
 
         vector<PlaylistItem *>::iterator i = list->begin();
         for (; i != list->end(); i++)
-            m_context->target->AcceptEvent(new PlaylistItemAddedEvent(*i));
+            m_context->target->AcceptEvent(new PlaylistItemAddedEvent(*i, this));
 
         result = kError_NoErr;
     }
@@ -811,7 +811,7 @@ Error PlaylistManager::AddItems(vector<PlaylistItem*>* list, uint32 index, bool 
 
         vector<PlaylistItem *>::iterator i = list->begin();
         for (; i != list->end(); i++)
-            m_context->target->AcceptEvent(new PlaylistItemAddedEvent(*i));
+            m_context->target->AcceptEvent(new PlaylistItemAddedEvent(*i, this));
 
         result = kError_NoErr;
     }
@@ -877,7 +877,7 @@ Error PlaylistManager::RemoveItem(uint32 index)
             delete item;
         }
 
-        m_context->target->AcceptEvent(new PlaylistItemRemovedEvent(item));
+        m_context->target->AcceptEvent(new PlaylistItemRemovedEvent(item, index, this));
 
         result = kError_NoErr;
     }
@@ -924,7 +924,7 @@ Error PlaylistManager::RemoveItems(uint32 index, uint32 count)
                 delete item;
             }
 
-            m_context->target->AcceptEvent(new PlaylistItemRemovedEvent(item));
+            m_context->target->AcceptEvent(new PlaylistItemRemovedEvent(item, index + i, this));
         }
 
         m_activeList->erase(&(*m_activeList)[index], &(*m_activeList)[index + count]);
@@ -948,6 +948,7 @@ Error PlaylistManager::RemoveItems(vector<PlaylistItem*>* items)
         uint32 index = 0;
         uint32 size = 0;
         PlaylistItem* item = NULL;
+        uint32 oldIndex;
 
         size = items->size();
 
@@ -957,18 +958,15 @@ Error PlaylistManager::RemoveItems(vector<PlaylistItem*>* items)
 
             if(item)
             {
-                m_activeList->erase(&(*m_activeList)[IndexOf(item)]);
+                oldIndex = IndexOf(item);
+
+                m_activeList->erase(&(*m_activeList)[oldIndex]);
 
                 if(kPlaylistKey_MasterPlaylist == GetActivePlaylist())
                 {
                     int32 shuffleIndex = InternalIndexOf(&m_shuffleList, item);
 
                     m_shuffleList.erase(&m_shuffleList[shuffleIndex]);
-
-                    if(!m_activeList->size())
-                    {
-                       m_current = kInvalidIndex;
-                    }
                 }
 
                 // if the metadata thread is still accessing this item
@@ -984,11 +982,21 @@ Error PlaylistManager::RemoveItems(vector<PlaylistItem*>* items)
                     delete item;
                 }
 
-                m_context->target->AcceptEvent(new PlaylistItemRemovedEvent(item));
+                m_context->target->AcceptEvent(new PlaylistItemRemovedEvent(item, oldIndex, this));
 
                 result = kError_NoErr;
             }
         }  
+
+
+        if(kPlaylistKey_MasterPlaylist == GetActivePlaylist())
+        {
+            if(!m_activeList->size())
+                m_current = kInvalidIndex;
+            else if(m_current >= m_activeList->size())
+                InternalSetCurrentIndex(m_activeList->size() - 1);
+        }
+
     }
 
     m_mutex.Release();
@@ -998,16 +1006,16 @@ Error PlaylistManager::RemoveItems(vector<PlaylistItem*>* items)
 Error PlaylistManager::RemoveAll()
 {
     Error result = kError_InvalidParam;
-    uint32 index = 0;
-    uint32 size = 0;
+    uint32 index = m_activeList->size() - 1;
+    uint32 size = m_activeList->size();
     PlaylistItem* item = NULL;
     m_mutex.Acquire();
 
-    size = m_activeList->size();
+    vector<PlaylistItem*>::reverse_iterator i;
 
-    for(index = 0; index < size; index++)
+    for(i = m_activeList->rbegin(); i !=  m_activeList->rend(); i++, index--)
     {
-        item = (*m_activeList)[index];
+        item = (*i);
 
         if(item)
         {            
@@ -1024,7 +1032,7 @@ Error PlaylistManager::RemoveAll()
                 delete item;
             }          
             
-            m_context->target->AcceptEvent(new PlaylistItemRemovedEvent(item));
+            m_context->target->AcceptEvent(new PlaylistItemRemovedEvent(item, index, this));
         }
     }  
 
@@ -1064,13 +1072,22 @@ Error PlaylistManager::SwapItems(uint32 index1, uint32 index2)
         temp = (*m_activeList)[index1];
         (*m_activeList)[index1] = (*m_activeList)[index2];
         (*m_activeList)[index2] = temp;
-/*
-        m_context->target->AcceptEvent(
-                new PlaylistItemMovedEvent(index1, index2, (*m_activeList)[index2]));
 
         m_context->target->AcceptEvent(
-                new PlaylistItemMovedEvent(index2, index1, (*m_activeList)[index1]));
-*/
+                new PlaylistItemMovedEvent(index1, index2, (*m_activeList)[index2], this));
+
+        // we add 1 to index2 bc it was shifted down by the above move
+        m_context->target->AcceptEvent(
+                new PlaylistItemMovedEvent(index2 + 1, index1, (*m_activeList)[index1], this));
+
+        if(kPlaylistKey_MasterPlaylist == GetActivePlaylist())
+        {
+            if(m_current == index1)
+                InternalSetCurrentIndex(index2);
+            else if(m_current == index2)
+                InternalSetCurrentIndex(index1);
+        }
+
         result = kError_NoErr;
     }
 
@@ -1102,18 +1119,21 @@ Error PlaylistManager::MoveItem(uint32 oldIndex, uint32 newIndex)
 
         m_activeList->insert(&(*m_activeList)[newIndex],item);
 
-        if(oldIndex == m_current)
-            InternalSetCurrentIndex(newIndex);
-        else if(newIndex == m_current)
+        if(kPlaylistKey_MasterPlaylist == GetActivePlaylist())
         {
-            if(oldIndex > m_current)
-                InternalSetCurrentIndex(m_current + 1);
-            else
-                InternalSetCurrentIndex(m_current - 1);
+            if(oldIndex == m_current)
+                InternalSetCurrentIndex(newIndex);
+            else if(newIndex == m_current)
+            {
+                if(oldIndex > m_current)
+                    InternalSetCurrentIndex(m_current + 1);
+                else
+                    InternalSetCurrentIndex(m_current - 1);
+            }
         }
 
         m_context->target->AcceptEvent(
-                new PlaylistItemMovedEvent(oldIndex, newIndex, item));
+                new PlaylistItemMovedEvent(oldIndex, newIndex, item, this));
 
         result = kError_NoErr;
     }
@@ -1144,7 +1164,6 @@ Error PlaylistManager::MoveItems(vector<PlaylistItem*>* items, uint32 index)
 
             if(item)
             {
-                cout << "Erasing " << item->URL() << endl;
                 m_activeList->erase(&(*m_activeList)[IndexOf(item)]);
             }
         }  
@@ -1849,7 +1868,7 @@ MetaDataThreadFunction(vector<PlaylistItem*>* list)
                     item->SetMetaData(&metadata);
                     item->SetState(kPlaylistItemState_Normal);
 
-                    m_context->target->AcceptEvent(new PlaylistItemUpdatedEvent(item));
+                    m_context->target->AcceptEvent(new PlaylistItemUpdatedEvent(item, this));
                 }
 
                 m_mutex.Release();
