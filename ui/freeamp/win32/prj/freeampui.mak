@@ -34,6 +34,10 @@ NULL=
 NULL=nul
 !ENDIF 
 
+CPP=cl.exe
+MTL=midl.exe
+RSC=rc.exe
+
 !IF  "$(CFG)" == "freeampui - Win32 Release"
 
 OUTDIR=.\Release
@@ -85,7 +89,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\res" /I "..\include" /I\
  "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I\
  "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I\
@@ -95,40 +98,7 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\res" /I "..\include" /I\
  /Fp"$(INTDIR)\freeampui.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\freeampui.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\freeampui.bsc" 
@@ -242,7 +212,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\res" /I "..\include" /I\
  "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I\
  "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I\
@@ -252,40 +221,7 @@ CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\res" /I "..\include" /I\
  /Fp"$(INTDIR)\freeampui.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\freeampui.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\freeampui.bsc" 
@@ -399,7 +335,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\res" /I "..\include" /I\
  "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I\
  "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I\
@@ -409,40 +344,7 @@ CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\res" /I "..\include" /I\
  /Fp"$(INTDIR)\freeampui.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\freeampui.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\freeampui.bsc" 
@@ -554,7 +456,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\res" /I "..\include" /I\
  "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I\
  "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I\
@@ -564,40 +465,7 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\res" /I "..\include" /I\
  /Fp"$(INTDIR)\freeampui.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\freeampui.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\freeampui.bsc" 
@@ -658,6 +526,36 @@ $(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Release"\
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 
+
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
 
 
 !IF "$(CFG)" == "freeampui - Win32 Release" || "$(CFG)" ==\
@@ -889,28 +787,28 @@ SOURCE=..\..\..\..\config\config.win32
 
 InputPath=..\..\..\..\config\config.win32
 
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
 
 InputPath=..\..\..\..\config\config.win32
 
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Debug"
 
 InputPath=..\..\..\..\config\config.win32
 
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Release"
 
 InputPath=..\..\..\..\config\config.win32
 
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ENDIF 
@@ -1076,9 +974,6 @@ DEP_CPP_DIALC=\
 !ENDIF 
 
 SOURCE=..\..\src\Font.cpp
-
-!IF  "$(CFG)" == "freeampui - Win32 Release"
-
 DEP_CPP_FONT_=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
@@ -1089,47 +984,6 @@ DEP_CPP_FONT_=\
  "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
-
-DEP_CPP_FONT_=\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\config\config.h"\
-	"..\..\include\Font.h"\
-	
-
-"$(INTDIR)\Font.obj" : $(SOURCE) $(DEP_CPP_FONT_) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Debug"
-
-DEP_CPP_FONT_=\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\config\config.h"\
-	"..\..\include\Font.h"\
-	
-
-"$(INTDIR)\Font.obj" : $(SOURCE) $(DEP_CPP_FONT_) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Release"
-
-DEP_CPP_FONT_=\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\config\config.h"\
-	"..\..\include\Font.h"\
-	
-
-"$(INTDIR)\Font.obj" : $(SOURCE) $(DEP_CPP_FONT_) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 SOURCE=..\..\src\FreeAmpTheme.cpp
 
@@ -1751,7 +1605,7 @@ DEP_CPP_THEME=\
 	"..\..\include\Theme.h"\
 	"..\..\include\ThemeManager.h"\
 	"..\..\include\ThemeZip.h"\
-	"..\..\include\VSliderControl.h"\
+	"..\..\include\vslidercontrol.h"\
 	"..\..\include\Window.h"\
 	"..\include\Win32Bitmap.h"\
 	"..\include\Win32Font.h"\
@@ -1800,7 +1654,7 @@ DEP_CPP_THEME=\
 	"..\..\include\Theme.h"\
 	"..\..\include\ThemeManager.h"\
 	"..\..\include\ThemeZip.h"\
-	"..\..\include\VSliderControl.h"\
+	"..\..\include\vslidercontrol.h"\
 	"..\..\include\Window.h"\
 	"..\include\Win32Bitmap.h"\
 	"..\include\Win32Font.h"\
@@ -1838,7 +1692,7 @@ DEP_CPP_THEME=\
 	"..\..\include\Theme.h"\
 	"..\..\include\ThemeManager.h"\
 	"..\..\include\ThemeZip.h"\
-	"..\..\include\VSliderControl.h"\
+	"..\..\include\vslidercontrol.h"\
 	"..\..\include\Window.h"\
 	"..\include\Win32Bitmap.h"\
 	"..\include\Win32Font.h"\
@@ -1876,7 +1730,7 @@ DEP_CPP_THEME=\
 	"..\..\include\Theme.h"\
 	"..\..\include\ThemeManager.h"\
 	"..\..\include\ThemeZip.h"\
-	"..\..\include\VSliderControl.h"\
+	"..\..\include\vslidercontrol.h"\
 	"..\..\include\Window.h"\
 	"..\include\Win32Bitmap.h"\
 	"..\include\Win32Font.h"\
@@ -2067,7 +1921,7 @@ DEP_CPP_VSLID=\
 	"..\..\include\Canvas.h"\
 	"..\..\include\Control.h"\
 	"..\..\include\Font.h"\
-	"..\..\include\VSliderControl.h"\
+	"..\..\include\vslidercontrol.h"\
 	"..\..\include\Window.h"\
 	
 
@@ -2800,6 +2654,7 @@ DEP_CPP_WINDO=\
 
 SOURCE=..\res\freeampui.rc
 DEP_RSC_FREEAM=\
+	"..\..\..\..\config\config.h"\
 	"..\res\checked.bmp"\
 	"..\res\icon1.ico"\
 	"..\res\info.ico"\
@@ -2809,33 +2664,37 @@ DEP_RSC_FREEAM=\
 !IF  "$(CFG)" == "freeampui - Win32 Release"
 
 
-"$(INTDIR)\freeampui.res" : $(SOURCE) $(DEP_RSC_FREEAM) "$(INTDIR)"
+"$(INTDIR)\freeampui.res" : $(SOURCE) $(DEP_RSC_FREEAM) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\freeampui.res" /i\
- "\FreeAmp\freeamp\ui\freeamp\win32\res" /d "NDEBUG" $(SOURCE)
+ "\Local\src\freeamp\ui\freeamp\win32\res" /d "NDEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
 
 
-"$(INTDIR)\freeampui.res" : $(SOURCE) $(DEP_RSC_FREEAM) "$(INTDIR)"
+"$(INTDIR)\freeampui.res" : $(SOURCE) $(DEP_RSC_FREEAM) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\freeampui.res" /i\
- "\FreeAmp\freeamp\ui\freeamp\win32\res" /d "_DEBUG" $(SOURCE)
+ "\Local\src\freeamp\ui\freeamp\win32\res" /d "_DEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Debug"
 
 
-"$(INTDIR)\freeampui.res" : $(SOURCE) $(DEP_RSC_FREEAM) "$(INTDIR)"
+"$(INTDIR)\freeampui.res" : $(SOURCE) $(DEP_RSC_FREEAM) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\freeampui.res" /i\
- "\FreeAmp\freeamp\ui\freeamp\win32\res" /d "_DEBUG" $(SOURCE)
+ "\Local\src\freeamp\ui\freeamp\win32\res" /d "_DEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Release"
 
 
-"$(INTDIR)\freeampui.res" : $(SOURCE) $(DEP_RSC_FREEAM) "$(INTDIR)"
+"$(INTDIR)\freeampui.res" : $(SOURCE) $(DEP_RSC_FREEAM) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\freeampui.res" /i\
- "\FreeAmp\freeamp\ui\freeamp\win32\res" /d "NDEBUG" $(SOURCE)
+ "\Local\src\freeamp\ui\freeamp\win32\res" /d "NDEBUG" $(SOURCE)
 
 
 !ENDIF 
@@ -2843,12 +2702,12 @@ DEP_RSC_FREEAM=\
 !IF  "$(CFG)" == "freeampui - Win32 Release"
 
 "zlib - Win32 Release" : 
-   cd "\FreeAmp\freeamp\lib\zlib\prj"
+   cd "\Local\src\freeamp\lib\zlib\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\zlib.mak CFG="zlib - Win32 Release" 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 "zlib - Win32 ReleaseCLEAN" : 
-   cd "\FreeAmp\freeamp\lib\zlib\prj"
+   cd "\Local\src\freeamp\lib\zlib\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\zlib.mak CFG="zlib - Win32 Release"\
  RECURSE=1 
    cd "..\..\..\ui\freeamp\win32\prj"
@@ -2856,12 +2715,12 @@ DEP_RSC_FREEAM=\
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
 
 "zlib - Win32 Debug" : 
-   cd "\FreeAmp\freeamp\lib\zlib\prj"
+   cd "\Local\src\freeamp\lib\zlib\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\zlib.mak CFG="zlib - Win32 Debug" 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 "zlib - Win32 DebugCLEAN" : 
-   cd "\FreeAmp\freeamp\lib\zlib\prj"
+   cd "\Local\src\freeamp\lib\zlib\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\zlib.mak CFG="zlib - Win32 Debug" RECURSE=1\
  
    cd "..\..\..\ui\freeamp\win32\prj"
@@ -2869,12 +2728,12 @@ DEP_RSC_FREEAM=\
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Debug"
 
 "zlib - Win32 NASM Debug" : 
-   cd "\FreeAmp\freeamp\lib\zlib\prj"
+   cd "\Local\src\freeamp\lib\zlib\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\zlib.mak CFG="zlib - Win32 NASM Debug" 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 "zlib - Win32 NASM DebugCLEAN" : 
-   cd "\FreeAmp\freeamp\lib\zlib\prj"
+   cd "\Local\src\freeamp\lib\zlib\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\zlib.mak CFG="zlib - Win32 NASM Debug"\
  RECURSE=1 
    cd "..\..\..\ui\freeamp\win32\prj"
@@ -2882,12 +2741,12 @@ DEP_RSC_FREEAM=\
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Release"
 
 "zlib - Win32 NASM Release" : 
-   cd "\FreeAmp\freeamp\lib\zlib\prj"
+   cd "\Local\src\freeamp\lib\zlib\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\zlib.mak CFG="zlib - Win32 NASM Release" 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 "zlib - Win32 NASM ReleaseCLEAN" : 
-   cd "\FreeAmp\freeamp\lib\zlib\prj"
+   cd "\Local\src\freeamp\lib\zlib\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\zlib.mak CFG="zlib - Win32 NASM Release"\
  RECURSE=1 
    cd "..\..\..\ui\freeamp\win32\prj"
@@ -2897,12 +2756,12 @@ DEP_RSC_FREEAM=\
 !IF  "$(CFG)" == "freeampui - Win32 Release"
 
 "fabaselib - Win32 Release" : 
-   cd "\FreeAmp\freeamp\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Release" 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 "fabaselib - Win32 ReleaseCLEAN" : 
-   cd "\FreeAmp\freeamp\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak\
  CFG="fabaselib - Win32 Release" RECURSE=1 
    cd "..\..\..\ui\freeamp\win32\prj"
@@ -2910,12 +2769,12 @@ DEP_RSC_FREEAM=\
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
 
 "fabaselib - Win32 Debug" : 
-   cd "\FreeAmp\freeamp\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Debug" 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 "fabaselib - Win32 DebugCLEAN" : 
-   cd "\FreeAmp\freeamp\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak CFG="fabaselib - Win32 Debug"\
  RECURSE=1 
    cd "..\..\..\ui\freeamp\win32\prj"
@@ -2923,12 +2782,12 @@ DEP_RSC_FREEAM=\
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Debug"
 
 "fabaselib - Win32 NASM Debug" : 
-   cd "\FreeAmp\freeamp\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug" 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 "fabaselib - Win32 NASM DebugCLEAN" : 
-   cd "\FreeAmp\freeamp\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak\
  CFG="fabaselib - Win32 NASM Debug" RECURSE=1 
    cd "..\..\..\ui\freeamp\win32\prj"
@@ -2936,13 +2795,13 @@ DEP_RSC_FREEAM=\
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Release"
 
 "fabaselib - Win32 NASM Release" : 
-   cd "\FreeAmp\freeamp\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak\
  CFG="fabaselib - Win32 NASM Release" 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 "fabaselib - Win32 NASM ReleaseCLEAN" : 
-   cd "\FreeAmp\freeamp\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak\
  CFG="fabaselib - Win32 NASM Release" RECURSE=1 
    cd "..\..\..\ui\freeamp\win32\prj"

@@ -937,6 +937,11 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
 
             SCROLLINFO si;
             uint32 columnWidth = ListView_GetColumnWidth(hwnd, 0);
+            
+            RECT headerRect;
+            GetClientRect(m_hPlaylistHeader, &headerRect);
+
+            uint32 headerHeight = headerRect.bottom - headerRect.top;
 
             si.cbSize = sizeof(SCROLLINFO);
             si.fMask = SIF_ALL;
@@ -946,12 +951,15 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
             RECT rectClient, rectColumn;
 
             GetClientRect(hwnd, &rectClient);
+            
+            rectClient.top += headerHeight;
 
             if(si.nPos < columnWidth)
             {
                 rectColumn = rectClient;
                 rectColumn.right = rectColumn.left + columnWidth - si.nPos - 1;
                 rectClient.left = rectColumn.right;
+                
                 FillRect(hdc, &rectColumn, (HBRUSH)(COLOR_INFOBK + 1));
             }
 
