@@ -45,13 +45,13 @@ ALL : ".\portio.sys" "..\..\..\ReadMe.txt" "..\..\..\Copying.txt"\
 
 !ELSE 
 
-ALL : "misc - Win32 Release" "fabaselib - Win32 Release"\
- "toolbar - Win32 Release" "musicbrowser - Win32 Release"\
- "pmp300 - Win32 Release" "zlib - Win32 Release" "xing - Win32 Release"\
- "update - Win32 Release" "soundcard - Win32 Release" "rmp - Win32 Release"\
- "obsinput - Win32 Release" "m3u - Win32 Release" "id3v2 - Win32 Release"\
- "id3v1 - Win32 Release" "httpinput - Win32 Release" "gdbm - Win32 Release"\
- "freeampui - Win32 Release" "fileinput - Win32 Release"\
+ALL : "MakeTheme - Win32 Release" "misc - Win32 Release"\
+ "fabaselib - Win32 Release" "toolbar - Win32 Release"\
+ "musicbrowser - Win32 Release" "pmp300 - Win32 Release" "zlib - Win32 Release"\
+ "xing - Win32 Release" "update - Win32 Release" "soundcard - Win32 Release"\
+ "rmp - Win32 Release" "obsinput - Win32 Release" "m3u - Win32 Release"\
+ "id3v2 - Win32 Release" "id3v1 - Win32 Release" "httpinput - Win32 Release"\
+ "gdbm - Win32 Release" "freeampui - Win32 Release" "fileinput - Win32 Release"\
  "dsoundcard - Win32 Release" "download - Win32 Release" ".\portio.sys"\
  "..\..\..\ReadMe.txt" "..\..\..\Copying.txt" "..\..\..\Changes.txt"\
  "..\..\..\Authors.txt" ".\freeamp.exe"
@@ -68,7 +68,8 @@ CLEAN :"download - Win32 ReleaseCLEAN" "dsoundcard - Win32 ReleaseCLEAN"\
  "update - Win32 ReleaseCLEAN" "xing - Win32 ReleaseCLEAN"\
  "zlib - Win32 ReleaseCLEAN" "pmp300 - Win32 ReleaseCLEAN"\
  "musicbrowser - Win32 ReleaseCLEAN" "toolbar - Win32 ReleaseCLEAN"\
- "fabaselib - Win32 ReleaseCLEAN" "misc - Win32 ReleaseCLEAN" 
+ "fabaselib - Win32 ReleaseCLEAN" "misc - Win32 ReleaseCLEAN"\
+ "MakeTheme - Win32 ReleaseCLEAN" 
 !ELSE 
 CLEAN :
 !ENDIF 
@@ -141,18 +142,18 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "misc - Win32 Release" "fabaselib - Win32 Release"\
- "toolbar - Win32 Release" "musicbrowser - Win32 Release"\
- "pmp300 - Win32 Release" "zlib - Win32 Release" "xing - Win32 Release"\
- "update - Win32 Release" "soundcard - Win32 Release" "rmp - Win32 Release"\
- "obsinput - Win32 Release" "m3u - Win32 Release" "id3v2 - Win32 Release"\
- "id3v1 - Win32 Release" "httpinput - Win32 Release" "gdbm - Win32 Release"\
- "freeampui - Win32 Release" "fileinput - Win32 Release"\
+$(DS_POSTBUILD_DEP) : "MakeTheme - Win32 Release" "misc - Win32 Release"\
+ "fabaselib - Win32 Release" "toolbar - Win32 Release"\
+ "musicbrowser - Win32 Release" "pmp300 - Win32 Release" "zlib - Win32 Release"\
+ "xing - Win32 Release" "update - Win32 Release" "soundcard - Win32 Release"\
+ "rmp - Win32 Release" "obsinput - Win32 Release" "m3u - Win32 Release"\
+ "id3v2 - Win32 Release" "id3v1 - Win32 Release" "httpinput - Win32 Release"\
+ "gdbm - Win32 Release" "freeampui - Win32 Release" "fileinput - Win32 Release"\
  "dsoundcard - Win32 Release" "download - Win32 Release" ".\portio.sys"\
  "..\..\..\ReadMe.txt" "..\..\..\Copying.txt" "..\..\..\Changes.txt"\
  "..\..\..\Authors.txt" ".\freeamp.exe"
    IF NOT EXIST themes mkdir themes
-	copy           ..\..\..\themes\freeamp.fat themes
+	copy            ..\..\..\themes\freeamp.fat themes
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
@@ -167,15 +168,15 @@ ALL : ".\portio.sys" "..\..\..\ReadMe.txt" "..\..\..\Copying.txt"\
 
 !ELSE 
 
-ALL : "misc - Win32 Debug" "fabaselib - Win32 Debug" "toolbar - Win32 Debug"\
- "musicbrowser - Win32 Debug" "pmp300 - Win32 Debug" "zlib - Win32 Debug"\
- "xing - Win32 Debug" "update - Win32 Debug" "soundcard - Win32 Debug"\
- "rmp - Win32 Debug" "obsinput - Win32 Debug" "m3u - Win32 Debug"\
- "id3v2 - Win32 Debug" "id3v1 - Win32 Debug" "httpinput - Win32 Debug"\
- "gdbm - Win32 Debug" "freeampui - Win32 Debug" "fileinput - Win32 Debug"\
- "dsoundcard - Win32 Debug" "download - Win32 Debug" ".\portio.sys"\
- "..\..\..\ReadMe.txt" "..\..\..\Copying.txt" "..\..\..\Changes.txt"\
- "..\..\..\Authors.txt" ".\freeamp.exe"
+ALL : "MakeTheme - Win32 Debug" "misc - Win32 Debug" "fabaselib - Win32 Debug"\
+ "toolbar - Win32 Debug" "musicbrowser - Win32 Debug" "pmp300 - Win32 Debug"\
+ "zlib - Win32 Debug" "xing - Win32 Debug" "update - Win32 Debug"\
+ "soundcard - Win32 Debug" "rmp - Win32 Debug" "obsinput - Win32 Debug"\
+ "m3u - Win32 Debug" "id3v2 - Win32 Debug" "id3v1 - Win32 Debug"\
+ "httpinput - Win32 Debug" "gdbm - Win32 Debug" "freeampui - Win32 Debug"\
+ "fileinput - Win32 Debug" "dsoundcard - Win32 Debug" "download - Win32 Debug"\
+ ".\portio.sys" "..\..\..\ReadMe.txt" "..\..\..\Copying.txt"\
+ "..\..\..\Changes.txt" "..\..\..\Authors.txt" ".\freeamp.exe"
 
 !ENDIF 
 
@@ -188,7 +189,8 @@ CLEAN :"download - Win32 DebugCLEAN" "dsoundcard - Win32 DebugCLEAN"\
  "soundcard - Win32 DebugCLEAN" "update - Win32 DebugCLEAN"\
  "xing - Win32 DebugCLEAN" "zlib - Win32 DebugCLEAN" "pmp300 - Win32 DebugCLEAN"\
  "musicbrowser - Win32 DebugCLEAN" "toolbar - Win32 DebugCLEAN"\
- "fabaselib - Win32 DebugCLEAN" "misc - Win32 DebugCLEAN" 
+ "fabaselib - Win32 DebugCLEAN" "misc - Win32 DebugCLEAN"\
+ "MakeTheme - Win32 DebugCLEAN" 
 !ELSE 
 CLEAN :
 !ENDIF 
@@ -264,17 +266,18 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "misc - Win32 Debug" "fabaselib - Win32 Debug"\
- "toolbar - Win32 Debug" "musicbrowser - Win32 Debug" "pmp300 - Win32 Debug"\
- "zlib - Win32 Debug" "xing - Win32 Debug" "update - Win32 Debug"\
- "soundcard - Win32 Debug" "rmp - Win32 Debug" "obsinput - Win32 Debug"\
- "m3u - Win32 Debug" "id3v2 - Win32 Debug" "id3v1 - Win32 Debug"\
- "httpinput - Win32 Debug" "gdbm - Win32 Debug" "freeampui - Win32 Debug"\
- "fileinput - Win32 Debug" "dsoundcard - Win32 Debug" "download - Win32 Debug"\
- ".\portio.sys" "..\..\..\ReadMe.txt" "..\..\..\Copying.txt"\
- "..\..\..\Changes.txt" "..\..\..\Authors.txt" ".\freeamp.exe"
+$(DS_POSTBUILD_DEP) : "MakeTheme - Win32 Debug" "misc - Win32 Debug"\
+ "fabaselib - Win32 Debug" "toolbar - Win32 Debug" "musicbrowser - Win32 Debug"\
+ "pmp300 - Win32 Debug" "zlib - Win32 Debug" "xing - Win32 Debug"\
+ "update - Win32 Debug" "soundcard - Win32 Debug" "rmp - Win32 Debug"\
+ "obsinput - Win32 Debug" "m3u - Win32 Debug" "id3v2 - Win32 Debug"\
+ "id3v1 - Win32 Debug" "httpinput - Win32 Debug" "gdbm - Win32 Debug"\
+ "freeampui - Win32 Debug" "fileinput - Win32 Debug" "dsoundcard - Win32 Debug"\
+ "download - Win32 Debug" ".\portio.sys" "..\..\..\ReadMe.txt"\
+ "..\..\..\Copying.txt" "..\..\..\Changes.txt" "..\..\..\Authors.txt"\
+ ".\freeamp.exe"
    IF NOT EXIST themes mkdir themes
-	copy           ..\..\..\themes\freeamp.fat themes
+	copy            ..\..\..\themes\freeamp.fat themes
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
@@ -289,18 +292,19 @@ ALL : ".\portio.sys" "..\..\..\ReadMe.txt" "..\..\..\Copying.txt"\
 
 !ELSE 
 
-ALL : "misc - Win32 NASM Release" "fabaselib - Win32 NASM Release"\
- "toolbar - Win32 NASM Release" "musicbrowser - Win32 NASM Release"\
- "pmp300 - Win32 NASM Release" "zlib - Win32 NASM Release"\
- "xing - Win32 NASM Release" "update - Win32 NASM Release"\
- "soundcard - Win32 NASM Release" "rmp - Win32 NASM Release"\
- "obsinput - Win32 NASM Release" "m3u - Win32 NASM Release"\
- "id3v2 - Win32 NASM Release" "id3v1 - Win32 NASM Release"\
- "httpinput - Win32 NASM Release" "gdbm - Win32 NASM Release"\
- "freeampui - Win32 NASM Release" "fileinput - Win32 NASM Release"\
- "dsoundcard - Win32 NASM Release" "download - Win32 NASM Release"\
- ".\portio.sys" "..\..\..\ReadMe.txt" "..\..\..\Copying.txt"\
- "..\..\..\Changes.txt" "..\..\..\Authors.txt" ".\freeamp.exe"
+ALL : "MakeTheme - Win32 NASM Release" "misc - Win32 NASM Release"\
+ "fabaselib - Win32 NASM Release" "toolbar - Win32 NASM Release"\
+ "musicbrowser - Win32 NASM Release" "pmp300 - Win32 NASM Release"\
+ "zlib - Win32 NASM Release" "xing - Win32 NASM Release"\
+ "update - Win32 NASM Release" "soundcard - Win32 NASM Release"\
+ "rmp - Win32 NASM Release" "obsinput - Win32 NASM Release"\
+ "m3u - Win32 NASM Release" "id3v2 - Win32 NASM Release"\
+ "id3v1 - Win32 NASM Release" "httpinput - Win32 NASM Release"\
+ "gdbm - Win32 NASM Release" "freeampui - Win32 NASM Release"\
+ "fileinput - Win32 NASM Release" "dsoundcard - Win32 NASM Release"\
+ "download - Win32 NASM Release" ".\portio.sys" "..\..\..\ReadMe.txt"\
+ "..\..\..\Copying.txt" "..\..\..\Changes.txt" "..\..\..\Authors.txt"\
+ ".\freeamp.exe"
 
 !ENDIF 
 
@@ -315,7 +319,7 @@ CLEAN :"download - Win32 NASM ReleaseCLEAN"\
  "xing - Win32 NASM ReleaseCLEAN" "zlib - Win32 NASM ReleaseCLEAN"\
  "pmp300 - Win32 NASM ReleaseCLEAN" "musicbrowser - Win32 NASM ReleaseCLEAN"\
  "toolbar - Win32 NASM ReleaseCLEAN" "fabaselib - Win32 NASM ReleaseCLEAN"\
- "misc - Win32 NASM ReleaseCLEAN" 
+ "misc - Win32 NASM ReleaseCLEAN" "MakeTheme - Win32 NASM ReleaseCLEAN" 
 !ELSE 
 CLEAN :
 !ENDIF 
@@ -388,21 +392,21 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "misc - Win32 NASM Release"\
- "fabaselib - Win32 NASM Release" "toolbar - Win32 NASM Release"\
- "musicbrowser - Win32 NASM Release" "pmp300 - Win32 NASM Release"\
- "zlib - Win32 NASM Release" "xing - Win32 NASM Release"\
- "update - Win32 NASM Release" "soundcard - Win32 NASM Release"\
- "rmp - Win32 NASM Release" "obsinput - Win32 NASM Release"\
- "m3u - Win32 NASM Release" "id3v2 - Win32 NASM Release"\
- "id3v1 - Win32 NASM Release" "httpinput - Win32 NASM Release"\
- "gdbm - Win32 NASM Release" "freeampui - Win32 NASM Release"\
- "fileinput - Win32 NASM Release" "dsoundcard - Win32 NASM Release"\
- "download - Win32 NASM Release" ".\portio.sys" "..\..\..\ReadMe.txt"\
- "..\..\..\Copying.txt" "..\..\..\Changes.txt" "..\..\..\Authors.txt"\
- ".\freeamp.exe"
+$(DS_POSTBUILD_DEP) : "MakeTheme - Win32 NASM Release"\
+ "misc - Win32 NASM Release" "fabaselib - Win32 NASM Release"\
+ "toolbar - Win32 NASM Release" "musicbrowser - Win32 NASM Release"\
+ "pmp300 - Win32 NASM Release" "zlib - Win32 NASM Release"\
+ "xing - Win32 NASM Release" "update - Win32 NASM Release"\
+ "soundcard - Win32 NASM Release" "rmp - Win32 NASM Release"\
+ "obsinput - Win32 NASM Release" "m3u - Win32 NASM Release"\
+ "id3v2 - Win32 NASM Release" "id3v1 - Win32 NASM Release"\
+ "httpinput - Win32 NASM Release" "gdbm - Win32 NASM Release"\
+ "freeampui - Win32 NASM Release" "fileinput - Win32 NASM Release"\
+ "dsoundcard - Win32 NASM Release" "download - Win32 NASM Release"\
+ ".\portio.sys" "..\..\..\ReadMe.txt" "..\..\..\Copying.txt"\
+ "..\..\..\Changes.txt" "..\..\..\Authors.txt" ".\freeamp.exe"
    IF NOT EXIST themes mkdir themes
-	copy           ..\..\..\themes\freeamp.fat themes
+	copy            ..\..\..\themes\freeamp.fat themes
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
@@ -417,11 +421,12 @@ ALL : ".\portio.sys" "..\..\..\ReadMe.txt" "..\..\..\Copying.txt"\
 
 !ELSE 
 
-ALL : "misc - Win32 NASM Debug" "fabaselib - Win32 NASM Debug"\
- "toolbar - Win32 NASM Debug" "musicbrowser - Win32 NASM Debug"\
- "pmp300 - Win32 NASM Debug" "zlib - Win32 NASM Debug" "xing - Win32 NASM Debug"\
- "update - Win32 NASM Debug" "soundcard - Win32 NASM Debug"\
- "rmp - Win32 NASM Debug" "obsinput - Win32 NASM Debug" "m3u - Win32 NASM Debug"\
+ALL : "MakeTheme - Win32 NASM Debug" "misc - Win32 NASM Debug"\
+ "fabaselib - Win32 NASM Debug" "toolbar - Win32 NASM Debug"\
+ "musicbrowser - Win32 NASM Debug" "pmp300 - Win32 NASM Debug"\
+ "zlib - Win32 NASM Debug" "xing - Win32 NASM Debug" "update - Win32 NASM Debug"\
+ "soundcard - Win32 NASM Debug" "rmp - Win32 NASM Debug"\
+ "obsinput - Win32 NASM Debug" "m3u - Win32 NASM Debug"\
  "id3v2 - Win32 NASM Debug" "id3v1 - Win32 NASM Debug"\
  "httpinput - Win32 NASM Debug" "gdbm - Win32 NASM Debug"\
  "freeampui - Win32 NASM Debug" "fileinput - Win32 NASM Debug"\
@@ -441,7 +446,8 @@ CLEAN :"download - Win32 NASM DebugCLEAN" "dsoundcard - Win32 NASM DebugCLEAN"\
  "update - Win32 NASM DebugCLEAN" "xing - Win32 NASM DebugCLEAN"\
  "zlib - Win32 NASM DebugCLEAN" "pmp300 - Win32 NASM DebugCLEAN"\
  "musicbrowser - Win32 NASM DebugCLEAN" "toolbar - Win32 NASM DebugCLEAN"\
- "fabaselib - Win32 NASM DebugCLEAN" "misc - Win32 NASM DebugCLEAN" 
+ "fabaselib - Win32 NASM DebugCLEAN" "misc - Win32 NASM DebugCLEAN"\
+ "MakeTheme - Win32 NASM DebugCLEAN" 
 !ELSE 
 CLEAN :
 !ENDIF 
@@ -517,11 +523,12 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "misc - Win32 NASM Debug" "fabaselib - Win32 NASM Debug"\
- "toolbar - Win32 NASM Debug" "musicbrowser - Win32 NASM Debug"\
- "pmp300 - Win32 NASM Debug" "zlib - Win32 NASM Debug" "xing - Win32 NASM Debug"\
- "update - Win32 NASM Debug" "soundcard - Win32 NASM Debug"\
- "rmp - Win32 NASM Debug" "obsinput - Win32 NASM Debug" "m3u - Win32 NASM Debug"\
+$(DS_POSTBUILD_DEP) : "MakeTheme - Win32 NASM Debug" "misc - Win32 NASM Debug"\
+ "fabaselib - Win32 NASM Debug" "toolbar - Win32 NASM Debug"\
+ "musicbrowser - Win32 NASM Debug" "pmp300 - Win32 NASM Debug"\
+ "zlib - Win32 NASM Debug" "xing - Win32 NASM Debug" "update - Win32 NASM Debug"\
+ "soundcard - Win32 NASM Debug" "rmp - Win32 NASM Debug"\
+ "obsinput - Win32 NASM Debug" "m3u - Win32 NASM Debug"\
  "id3v2 - Win32 NASM Debug" "id3v1 - Win32 NASM Debug"\
  "httpinput - Win32 NASM Debug" "gdbm - Win32 NASM Debug"\
  "freeampui - Win32 NASM Debug" "fileinput - Win32 NASM Debug"\
@@ -529,7 +536,7 @@ $(DS_POSTBUILD_DEP) : "misc - Win32 NASM Debug" "fabaselib - Win32 NASM Debug"\
  "..\..\..\ReadMe.txt" "..\..\..\Copying.txt" "..\..\..\Changes.txt"\
  "..\..\..\Authors.txt" ".\freeamp.exe"
    IF NOT EXIST themes mkdir themes
-	copy           ..\..\..\themes\freeamp.fat themes
+	copy            ..\..\..\themes\freeamp.fat themes
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 
@@ -639,9 +646,6 @@ DEP_CPP_MAIN_=\
 	"..\include\semaphore.h"\
 	"..\include\win32prefs.h"\
 	
-NODEP_CPP_MAIN_=\
-	"..\..\include\win32impl.h"\
-	
 
 "$(INTDIR)\main.obj" : $(SOURCE) $(DEP_CPP_MAIN_) "$(INTDIR)"\
  "..\..\..\config\config.h"
@@ -727,9 +731,6 @@ DEP_CPP_MAIN_=\
 	"..\include\mutex.h"\
 	"..\include\semaphore.h"\
 	"..\include\win32prefs.h"\
-	
-NODEP_CPP_MAIN_=\
-	"..\..\include\win32impl.h"\
 	
 
 "$(INTDIR)\main.obj" : $(SOURCE) $(DEP_CPP_MAIN_) "$(INTDIR)"\
@@ -2146,6 +2147,61 @@ InputPath=..\..\..\lib\portio\i386\free\portio.sys
    cd "\Local\src\freeamp\plm\metadata\misc\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\misc.mak CFG="misc - Win32 NASM Debug"\
  RECURSE=1 
+   cd "..\..\..\..\base\win32\prj"
+
+!ENDIF 
+
+!IF  "$(CFG)" == "freeamp - Win32 Release"
+
+"MakeTheme - Win32 Release" : 
+   cd "\Local\src\freeamp\ui\freeamp\tools\win32"
+   $(MAKE) /$(MAKEFLAGS) /F .\MakeTheme.mak CFG="MakeTheme - Win32 Release" 
+   cd "..\..\..\..\base\win32\prj"
+
+"MakeTheme - Win32 ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\ui\freeamp\tools\win32"
+   $(MAKE) /$(MAKEFLAGS) CLEAN /F .\MakeTheme.mak\
+ CFG="MakeTheme - Win32 Release" RECURSE=1 
+   cd "..\..\..\..\base\win32\prj"
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
+
+"MakeTheme - Win32 Debug" : 
+   cd "\Local\src\freeamp\ui\freeamp\tools\win32"
+   $(MAKE) /$(MAKEFLAGS) /F .\MakeTheme.mak CFG="MakeTheme - Win32 Debug" 
+   cd "..\..\..\..\base\win32\prj"
+
+"MakeTheme - Win32 DebugCLEAN" : 
+   cd "\Local\src\freeamp\ui\freeamp\tools\win32"
+   $(MAKE) /$(MAKEFLAGS) CLEAN /F .\MakeTheme.mak CFG="MakeTheme - Win32 Debug"\
+ RECURSE=1 
+   cd "..\..\..\..\base\win32\prj"
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
+
+"MakeTheme - Win32 NASM Release" : 
+   cd "\Local\src\freeamp\ui\freeamp\tools\win32"
+   $(MAKE) /$(MAKEFLAGS) /F .\MakeTheme.mak\
+ CFG="MakeTheme - Win32 NASM Release" 
+   cd "..\..\..\..\base\win32\prj"
+
+"MakeTheme - Win32 NASM ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\ui\freeamp\tools\win32"
+   $(MAKE) /$(MAKEFLAGS) CLEAN /F .\MakeTheme.mak\
+ CFG="MakeTheme - Win32 NASM Release" RECURSE=1 
+   cd "..\..\..\..\base\win32\prj"
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
+
+"MakeTheme - Win32 NASM Debug" : 
+   cd "\Local\src\freeamp\ui\freeamp\tools\win32"
+   $(MAKE) /$(MAKEFLAGS) /F .\MakeTheme.mak CFG="MakeTheme - Win32 NASM Debug" 
+   cd "..\..\..\..\base\win32\prj"
+
+"MakeTheme - Win32 NASM DebugCLEAN" : 
+   cd "\Local\src\freeamp\ui\freeamp\tools\win32"
+   $(MAKE) /$(MAKEFLAGS) CLEAN /F .\MakeTheme.mak\
+ CFG="MakeTheme - Win32 NASM Debug" RECURSE=1 
    cd "..\..\..\..\base\win32\prj"
 
 !ENDIF 

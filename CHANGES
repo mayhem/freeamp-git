@@ -3,7 +3,8 @@ Changes for Linux and Windows version 2.0 beta 2
 
 - Win32 and Linux are now at 100% feature parity.
 - All new user interface with Themes support. Let's see how creative
-  you guys are.
+  you guys are. Check out http://www.freeamp.org/text/ThemeHowTo.txt
+  for more info on making your own themes.
 - Totally rewritten playlist management. New Playlist Manager and
   more robust back end.
 - Download Manager

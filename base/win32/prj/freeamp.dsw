@@ -3,6 +3,18 @@ Microsoft Developer Studio Workspace File, Format Version 5.00
 
 ###############################################################################
 
+Project: "MakeTheme"=..\..\..\ui\freeamp\tools\win32\MakeTheme.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "download"=..\..\..\ui\download\win32\prj\download.dsp - Package Owner=<4>
 
 Package=<5>
@@ -136,6 +148,9 @@ Package=<4>
     End Project Dependency
     Begin Project Dependency
     Project_Dep_Name misc
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name MakeTheme
     End Project Dependency
 }}}
 
