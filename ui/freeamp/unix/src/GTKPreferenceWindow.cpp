@@ -1446,7 +1446,7 @@ GtkWidget *GTKPreferenceWindow::CreateAdvanced(void)
     value = originalValues.inputBufferSize;
     sprintf(tempstr, "%d", value);
     gtk_entry_set_text(GTK_ENTRY(entry), tempstr);
-    gtk_entry_set_max_length(GTK_ENTRY(entry), 4);
+    gtk_entry_set_max_length(GTK_ENTRY(entry), 6);
     gtk_signal_connect(GTK_OBJECT(entry), "changed",
                        GTK_SIGNAL_FUNC(input_buffer_change), this);
     gtk_table_attach(GTK_TABLE(table), entry, 1, 2, 0, 1, GTK_FILL, GTK_FILL,
