@@ -521,8 +521,8 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             }
             else
             {
-                // Set the text background and foreground colors to the standard window
-                // colors
+                // Set the text background and foreground colors to the
+                // standard window colors
                 SetTextColor(dis->hDC, GetSysColor(COLOR_WINDOWTEXT));
                 SetBkColor(dis->hDC, GetSysColor(COLOR_WINDOW));
             }
@@ -532,8 +532,8 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             //LV_ITEM* item = (LV_ITEM*)dis->itemData;
             DownloadItem* dli = (DownloadItem*)dis->itemData;
 
-            // Check to see if the string fits in the clip rect.  If not, truncate
-            // the string and add "...".
+            // Check to see if the string fits in the clip rect.
+            // If not, truncate the string and add "...".
             string displayString = dli->GetMetaData().Title();
 
             CalcStringEllipsis(dis->hDC, 
@@ -664,7 +664,6 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                         progressRect.bottom = progressRect.top + kProgressHeight + 2;
                         progressRect.right = progressRect.left + progressWidth;
 
-
                         if(dis->itemState & ODS_SELECTED)
                         {
                             HBRUSH brush = CreateSolidBrush(GetSysColor(COLOR_WINDOW));
@@ -689,7 +688,6 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                             BitBlt(dis->hDC, progressRect.left + 2 + i*kProgressWidth, progressRect.top + 2, remainder, kProgressHeight, 
                                    memDC, 0, 0, SRCCOPY);
                         }
-
 
                         DeleteDC(memDC);
                     }
@@ -1255,7 +1253,7 @@ BOOL DownloadUI::Notify(int32 controlId, NMHDR* nmh)
                         break;
                 }
 
-                 //OutputDebugString("LVN_ITEMCHANGING\r\n");
+                //OutputDebugString("LVN_ITEMCHANGING\r\n");
             }
 
             break;
@@ -1555,10 +1553,10 @@ ProgressWndProc(HWND hwnd,
                 //FillRect(hdc, &rcClip, brush);
                 //DeleteObject(brush);
 
-                // Set the text background and foreground colors to the standard window
-                // colors
+                // Set the text background and foreground colors to the
+                // standard window colors
                 SetTextColor(hdc, GetSysColor(COLOR_WINDOWTEXT));
-                SetBkColor(hdc, GetSysColor(COLOR_WINDOW));
+                SetBkColor(hdc, GetSysColor(COLOR_3DFACE));
 
                 ost.precision(2);
                 ost.flags(ios_base::fixed);
