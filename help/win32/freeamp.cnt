@@ -10,7 +10,7 @@
 2 What is a Playlist?=What_is_a_Playlist_>Main
 2 What is the Download Manager?=What_is_the_Download_Manager_
 1 Creating Your Music Collection
-2 Searching for Music on Your Hard Drive=Searching_for_Music_on_Your_Hard_Drive
+2 Searching for Music on Your Computer=Searching_for_Music_on_Your_Computer>Main
 1 Creating and Modifying Playlists
 2 Managing Music and Playlist Files=Managing_Music_and_Playlist_Files_>Main
 2 Creating a New Playlist=Creating_a_New_Playlist>Main
@@ -35,7 +35,11 @@
 2 Moving to the Next Track=Moving_to_the_Next_Track>Main
 2 Moving to the Previous Track=Moving_to_the_Previous_Track>Main
 2 Adjusting the Playback Volume=Adjusting_the_Playback_Volume>Main
+1 Streaming Files
+2 What is Streaming?=What_is_Streaming_>Main
+2 Saving a Stream on Your Computer=Saving_a_Stream_on_Your_Computer>Main
 1 Viewing Information about a Track
+2 What are ID3 Tags?=What_are_ID3_Tags_>Main
 2 Viewing the Track Duration=Viewing_the_Track_Duration>Main
 2 Viewing the Track Name=Viewing_the_Track_Name>Main
 1 Downloading MP3 Files and Streams from Web Sites
@@ -56,8 +60,8 @@
 2 Preferences - Advanced=Preferences_Advanced>Main
 2 Preferences - Plugins=Preferences_Plugins>Main
 2 Preferences - About=Preferences_About>Main
-2 Music Browser Drive Selection=Music_Browser_Drive_Selection
 2 FreeAmp Main Window=FreeAmp_Main_Window>Main
+2 Search Computer for Music=Search_Computer_for_Music_dialog>Main
 2 Keyboard Shortcuts=Keyboard_Shortcuts>Main
 1 Changing FreeAmp's Appearance
 2 What are Themes?=What_are_Themes_
