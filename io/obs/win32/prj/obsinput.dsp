@@ -19,8 +19,7 @@ CFG=obsinput - Win32 Debug
 !MESSAGE 
 !MESSAGE "obsinput - Win32 Release" (based on\
  "Win32 (x86) Dynamic-Link Library")
-!MESSAGE "obsinput - Win32 Debug" (based on\
- "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "obsinput - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE 
 
 # Begin Project
@@ -54,12 +53,12 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386 /out:"obsinput.pmi"
+# ADD LINK32 wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386 /out:"obsinput.pmi"
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-            ..\..\..\..\base\win32\prj\plugins	copy obsinput.pmi\
-       ..\..\..\..\base\win32\prj\plugins
+             ..\..\..\..\base\win32\prj\plugins	copy obsinput.pmi\
+        ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "obsinput - Win32 Debug"
@@ -86,12 +85,12 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"obsinput.pmi" /pdbtype:sept
+# ADD LINK32 wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"obsinput.pmi" /pdbtype:sept
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-            ..\..\..\..\base\win32\prj\plugins	copy obsinput.pmi\
-       ..\..\..\..\base\win32\prj\plugins
+             ..\..\..\..\base\win32\prj\plugins	copy obsinput.pmi\
+        ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
@@ -129,11 +128,15 @@ InputPath=..\..\..\..\config\config.win32
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\obsbuffer.cpp
+SOURCE=..\..\..\..\base\src\log.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\obsinput.def
+SOURCE=..\..\..\..\base\win32\src\mutex.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\obsbuffer.cpp
 # End Source File
 # Begin Source File
 
@@ -141,11 +144,7 @@ SOURCE=..\..\obsinput.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\..\base\src\log.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\base\win32\src\mutex.cpp
+SOURCE=.\obsinput.def
 # End Source File
 # Begin Source File
 
