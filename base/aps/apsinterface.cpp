@@ -155,6 +155,7 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
     int     i;
 
     o = mb_New();
+    mb_UseUTF8(o, 0);
     mb_SetServer(o, MUSICBRAINZ_SERVER, MUSICBRAINZ_PORT);
     if (m_strProxyAddr.size() > 7)
         mb_SetProxy(o, (char *)m_strProxyAddr.c_str(), m_nProxyPort);

@@ -1865,7 +1865,7 @@ void GTKPreferenceWindow::AddProfileEvent(void)
         return;
 
     char *name = gtk_entry_get_text(GTK_ENTRY(profileEntry));
-    if (name) {
+    if (name && strlen(name) > 0) {
         vector<string> *profiles = aps->GetKnownProfiles();
         if (!profiles || profiles->size() == 0) 
             firstProfile = true;

@@ -58,9 +58,9 @@ cd_init_device(string device_name)
 
    if (ret != 0) 
    {
-	   mciGetErrorString(ret, mciCommand, 128);
-	   sprintf(mciReturn, "error opening %s", device_name.c_str());
-	   MessageBox(NULL, mciReturn, mciCommand, MB_OK|MB_SETFOREGROUND);
+//	   mciGetErrorString(ret, mciCommand, 128);
+//	   sprintf(mciReturn, "error opening %s", device_name.c_str());
+//	   MessageBox(NULL, mciReturn, mciCommand, MB_OK|MB_SETFOREGROUND);
 	   return -1;
    }
 

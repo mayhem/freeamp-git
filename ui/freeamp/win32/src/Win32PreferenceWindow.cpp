@@ -1960,7 +1960,7 @@ bool Win32PreferenceWindow::PrefProfileProc(HWND hwnd,
                     memset(szCurSel, 0, sizeof(szCurSel));
                     Edit_GetText(hwndAddProfile, szCurSel, sizeof(szCurSel));
                     
-                    if (strlen(szCurSel) != 0)
+                    if (strlen(szCurSel) > 0)
                     {
                         APSInterface *pAPS = m_pContext->aps;
                         if (pAPS)
@@ -3983,7 +3983,8 @@ bool Win32PreferenceWindow::PrefBrowserProc(HWND hwnd,
                     m_proposedValues.playlistHeaderColumns = columns;
                     break;
                 }
-            }       
+            }    
+            break;   
         }
 
         case UWM_HELP:
