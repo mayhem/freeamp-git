@@ -174,7 +174,6 @@ class Win32PreferenceWindow : public PreferenceWindow
       virtual ~Win32PreferenceWindow(void); 
       
 
-               void LaunchHelp(HWND hwnd, uint32 topic);
       virtual  bool Show(Window *pParent);
 
                void GetPrefsValues(PrefsStruct* values);

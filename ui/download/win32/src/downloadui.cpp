@@ -1,24 +1,24 @@
 /*____________________________________________________________________________
-	
-	FreeAmp - The Free MP3 Player
+    
+    FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1999 EMusic.com
+    Portions Copyright (C) 1999 EMusic.com
 
-	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; either version 2 of the License, or
-	(at your option) any later version.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-	
-	$Id$
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    
+    $Id$
 ____________________________________________________________________________*/
 
 /* system headers */
@@ -43,6 +43,7 @@ using namespace std;
 #include "errors.h"
 #include "help.h"
 #include "resource.h"
+#include "utility.h"
 #include "debug.h"
 
 static const int32 kProgressHeight = 8;
@@ -71,10 +72,10 @@ static const char *szFreeAmpURL = "http://www.emusic.com/music/free.html";
 
 HINSTANCE g_hInstance = NULL;
 
-BOOL CALLBACK MainProc(	HWND hwnd, 
-						UINT msg, 
-						WPARAM wParam, 
-						LPARAM lParam ); 
+BOOL CALLBACK MainProc( HWND hwnd, 
+                        UINT msg, 
+                        WPARAM wParam, 
+                        LPARAM lParam ); 
 
 LRESULT WINAPI 
 ProgressWndProc(HWND hwnd, 
@@ -100,23 +101,23 @@ extern "C" DownloadUI *Initialize(FAContext *context)
 
 INT WINAPI DllMain (HINSTANCE hInst,
                     ULONG ul_reason_being_called,
-	                LPVOID lpReserved)
+                    LPVOID lpReserved)
 {
-	switch (ul_reason_being_called)
-	{
-		case DLL_PROCESS_ATTACH:
-			g_hInstance = hInst;
-	    	break;
+    switch (ul_reason_being_called)
+    {
+        case DLL_PROCESS_ATTACH:
+            g_hInstance = hInst;
+            break;
 
-		case DLL_THREAD_ATTACH:
-		    break;
+        case DLL_THREAD_ATTACH:
+            break;
 
-		case DLL_THREAD_DETACH:
-		    break;
+        case DLL_THREAD_DETACH:
+            break;
 
-		case DLL_PROCESS_DETACH:
-		    break;
-	}
+        case DLL_PROCESS_DETACH:
+            break;
+    }
 
     return 1;                 
 }
@@ -168,7 +169,7 @@ Error DownloadUI::AcceptEvent(Event* event)
     {
         switch(event->Type()) 
         {
-	        case CMD_Cleanup: 
+            case CMD_Cleanup: 
             {
                 LV_ITEM item;
                 
@@ -196,8 +197,8 @@ Error DownloadUI::AcceptEvent(Event* event)
                 PostMessage(m_hwnd, WM_QUIT, 0, 0);
                 m_uiThread->Join();
                 
-	            m_target->AcceptEvent(new Event(INFO_ReadyToDieUI));
-	            break; 
+                m_target->AcceptEvent(new Event(INFO_ReadyToDieUI));
+                break; 
             }
 
             case CMD_ToggleDownloadUI:
@@ -235,12 +236,12 @@ Error DownloadUI::AcceptEvent(Event* event)
                 if (m_dlm->IsPaused())
                    m_dlm->ResumeDownloads();
                
-	            break; 
+                break; 
             }
 
             case INFO_DownloadItemRemoved: 
             {
-	            DownloadItemRemovedEvent* dlire = (DownloadItemRemovedEvent*)event;
+                DownloadItemRemovedEvent* dlire = (DownloadItemRemovedEvent*)event;
 
                 uint32 itemCount = ListView_GetItemCount(m_hwndList);
 
@@ -268,12 +269,12 @@ Error DownloadUI::AcceptEvent(Event* event)
 
                 UpdateOverallProgress();
 
-	            break; 
+                break; 
             }
 
             case INFO_DownloadItemNewState: 
             {
-	            DownloadItemNewStateEvent* dlinse = (DownloadItemNewStateEvent*)event;
+                DownloadItemNewStateEvent* dlinse = (DownloadItemNewStateEvent*)event;
 
                 uint32 itemCount = ListView_GetItemCount(m_hwndList);
 
@@ -311,12 +312,12 @@ Error DownloadUI::AcceptEvent(Event* event)
 
                 UpdateOverallProgress();
 
-	            break; 
+                break; 
             }
 
             case INFO_DownloadItemProgress: 
             {
-	            DownloadItemProgressEvent* dlipe = (DownloadItemProgressEvent*)event;
+                DownloadItemProgressEvent* dlipe = (DownloadItemProgressEvent*)event;
 
                 uint32 itemCount = ListView_GetItemCount(m_hwndList);
 
@@ -346,14 +347,14 @@ Error DownloadUI::AcceptEvent(Event* event)
 
                 UpdateOverallProgress();
 
-	            break; 
+                break; 
             }
             
-	        default:
-	            break;
-	    }
+            default:
+                break;
+        }
 
-	    result = kError_NoErr;
+        result = kError_NoErr;
 
     } 
 
@@ -368,13 +369,13 @@ void DownloadUI::ParseArgs(int32 argc, char** argv)
 
     for(int32 i = 1;i < argc; i++) 
     {
-	    arg = argv[i];
+        arg = argv[i];
 
-	    if(arg[0] == '-') 
+        if(arg[0] == '-') 
         {
-	        switch(arg[1]) 
+            switch(arg[1]) 
             {
-		        
+                
             }
         }
        
@@ -389,7 +390,7 @@ void DownloadUI::CreateUI()
     HWND hwnd;
     MSG msg;
 
-	hwnd = CreateDialogParam( g_hInstance, 
+    hwnd = CreateDialogParam( g_hInstance, 
                     MAKEINTRESOURCE(IDD_DIALOG),
                     NULL,
                     MainProc, 
@@ -449,49 +450,49 @@ BOOL DownloadUI::InitDialog()
     m_hwndText = GetDlgItem(m_hwnd, IDC_FREETRACKS);
     
     // Set the proc address as a property 
-	// of the window so it can get it
-	SetProp(m_hwndText, 
-			"oldproc",
-			(HANDLE)GetWindowLong(m_hwndText, GWL_WNDPROC));
+    // of the window so it can get it
+    SetProp(m_hwndText, 
+            "oldproc",
+            (HANDLE)GetWindowLong(m_hwndText, GWL_WNDPROC));
 
     SetProp(m_hwndText, 
-			"ui",
-			(HANDLE)this);
+            "ui",
+            (HANDLE)this);
 
     // Subclass the window so we can draw it
-	SetWindowLong(	m_hwndText, 
-					GWL_WNDPROC, 
+    SetWindowLong(  m_hwndText, 
+                    GWL_WNDPROC, 
                     (DWORD)::FreeTracksWndProc ); 
 
 
     // Set the proc address as a property 
-	// of the window so it can get it
-	SetProp(m_hwndList, 
-			"oldproc",
-			(HANDLE)GetWindowLong(m_hwndList, GWL_WNDPROC));
+    // of the window so it can get it
+    SetProp(m_hwndList, 
+            "oldproc",
+            (HANDLE)GetWindowLong(m_hwndList, GWL_WNDPROC));
 
     SetProp(m_hwndList, 
-			"ui",
-			(HANDLE)this);
+            "ui",
+            (HANDLE)this);
 
     // Subclass the window so we can draw it
-	SetWindowLong(m_hwndList, 
-					GWL_WNDPROC, 
+    SetWindowLong(m_hwndList, 
+                    GWL_WNDPROC, 
                   (DWORD)::ListWndProc ); 
 
     // Set the proc address as a property 
-	// of the window so it can get it
-	SetProp(m_hwndProgress, 
-			"oldproc",
-			(HANDLE)GetWindowLong(m_hwndProgress, GWL_WNDPROC));
+    // of the window so it can get it
+    SetProp(m_hwndProgress, 
+            "oldproc",
+            (HANDLE)GetWindowLong(m_hwndProgress, GWL_WNDPROC));
 
     SetProp(m_hwndProgress, 
-			"ui",
-			(HANDLE)this);
+            "ui",
+            (HANDLE)this);
 
     // Subclass the window so we can draw it
-	SetWindowLong(m_hwndProgress, 
-					GWL_WNDPROC, 
+    SetWindowLong(m_hwndProgress, 
+                    GWL_WNDPROC, 
                   (DWORD)::ProgressWndProc ); 
 
     HINSTANCE hinst = (HINSTANCE)GetWindowLong(m_hwnd, GWL_HINSTANCE);
@@ -537,9 +538,9 @@ BOOL DownloadUI::InitDialog()
     m_progressBitmap = LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_PROGRESS));
 
     // Set progress bitmap for overall progress view
-	SetProp(m_hwndProgress, 
-			"bitmap",
-			(HANDLE)m_progressBitmap);
+    SetProp(m_hwndProgress, 
+            "bitmap",
+            (HANDLE)m_progressBitmap);
 
     ListView_SetImageList(m_hwndList, m_noteImage, LVSIL_SMALL);
 
@@ -803,9 +804,9 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                                  dis->rcItem.bottom - dis->rcItem.top, 
                        hDc, 0, 0, SRCCOPY);          
 
-				SelectObject(hDc, hSavedBitmap);
+                SelectObject(hDc, hSavedBitmap);
                 DeleteObject(hBitmap);
-				SelectObject(hDc, oldFont);
+                SelectObject(hDc, oldFont);
                 DeleteDC(hDc);
             }
 
@@ -822,7 +823,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             int32 cxImage = 0, cyImage = 0;
             HDC hDc;
             HBITMAP hBitmap, hSavedBitmap;
-			HFONT   hSavedFont;
+            HFONT   hSavedFont;
             
             hDc = CreateCompatibleDC(dis->hDC);
             hBitmap = CreateCompatibleBitmap(dis->hDC, 
@@ -1146,9 +1147,9 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                              dis->rcItem.bottom - dis->rcItem.top, 
                    hDc, 0, 0, SRCCOPY);          
 
-			SelectObject(hDc, hSavedBitmap);
+            SelectObject(hDc, hSavedBitmap);
             DeleteObject(hBitmap);
-			SelectObject(hDc, hSavedFont);
+            SelectObject(hDc, hSavedFont);
             DeleteDC(hDc);
 
             break;
@@ -1471,17 +1472,17 @@ BOOL DownloadUI::Destroy()
 BOOL DownloadUI::Command(int32 command, HWND src)
 {
     switch(command)
-	{
+    {
         case IDC_SHOWHELP:
         {
-            ShowHelp(Download_Manager);
+            ShowHelp(m_context, Download_Manager);
             break;
         }
 
         case IDC_RESUME:
-		case IDC_PAUSE:
+        case IDC_PAUSE:
         case IDC_CANCEL:
-		{
+        {
             uint32 itemCount = ListView_GetItemCount(m_hwndList);
 
             if(itemCount)
@@ -1513,7 +1514,7 @@ BOOL DownloadUI::Command(int32 command, HWND src)
                     {
                        switch(command)
                        {
-		                    case IDC_PAUSE:
+                            case IDC_PAUSE:
                             {
                                 m_dlm->PauseDownloads();
                                 m_dlm->CancelDownload(dli, true);
@@ -1521,7 +1522,7 @@ BOOL DownloadUI::Command(int32 command, HWND src)
                             }
 
                             case IDC_CANCEL:
-		                    {
+                            {
                                 m_dlm->CancelDownload(dli, false);  
                                 break;
                             }
@@ -1544,14 +1545,14 @@ BOOL DownloadUI::Command(int32 command, HWND src)
                 }
             }
 
-			break;
-		}
+            break;
+        }
 
         case IDC_ADDURL:
-		{
+        {
             HWND hwndURL = GetDlgItem(m_hwnd, IDC_URL);
 
-			uint32 length = GetWindowTextLength(hwndURL) + 1; // + 0x00
+            uint32 length = GetWindowTextLength(hwndURL) + 1; // + 0x00
 
             if(length)
             {
@@ -1585,11 +1586,11 @@ BOOL DownloadUI::Command(int32 command, HWND src)
                 
                 SetWindowText(hwndURL, "");
             }
-			break;
-		}
+            break;
+        }
 
-		case IDC_CLOSE:
-		{
+        case IDC_CLOSE:
+        {
             if (GetAsyncKeyState(VK_SHIFT) < 0)
             {
                 ShowWindow(GetDlgItem(m_hwnd, IDC_DLMTEXT), SW_HIDE);
@@ -1599,12 +1600,12 @@ BOOL DownloadUI::Command(int32 command, HWND src)
                 break;
             }
 
-			SendMessage(m_hwnd, WM_CLOSE, 0, 0);
-			break;
-		}
-	}
+            SendMessage(m_hwnd, WM_CLOSE, 0, 0);
+            break;
+        }
+    }
 
-	return TRUE;		
+    return TRUE;        
 }
 
 BOOL DownloadUI::Notify(int32 controlId, NMHDR* nmh)
@@ -1677,18 +1678,18 @@ void DownloadUI::SetButtonStates(DownloadItem *dli)
    }
 }
 
-BOOL CALLBACK DownloadUI::MainProc(	HWND hwnd, 
-						            UINT msg, 
-						            WPARAM wParam, 
-						            LPARAM lParam )
+BOOL CALLBACK DownloadUI::MainProc( HWND hwnd, 
+                                    UINT msg, 
+                                    WPARAM wParam, 
+                                    LPARAM lParam )
 {
-	BOOL result = FALSE;
+    BOOL result = FALSE;
     static DownloadUI* m_ui = NULL;
 
-	switch(msg)
-	{
-		case WM_INITDIALOG:
-		{
+    switch(msg)
+    {
+        case WM_INITDIALOG:
+        {
             m_ui = (DownloadUI*)lParam;
 
             m_ui->SetWindowHandle(hwnd);
@@ -1696,8 +1697,8 @@ BOOL CALLBACK DownloadUI::MainProc(	HWND hwnd,
             result = m_ui->InitDialog();
 
             result = FALSE;
-			break;
-		}     
+            break;
+        }     
 
         case WM_INITMENUPOPUP:
         {
@@ -1728,23 +1729,23 @@ BOOL CALLBACK DownloadUI::MainProc(	HWND hwnd,
             MEASUREITEMSTRUCT* mis = (MEASUREITEMSTRUCT*) lParam;
             TEXTMETRIC tm;
             HDC hdc;
-	        HFONT hFont;
-	        HWND hwndLV;
+            HFONT hFont;
+            HWND hwndLV;
 
 
             // Make sure the control is the listview control
             if (mis->CtlType != ODT_LISTVIEW || mis->CtlID == IDC_INFO)
                 return FALSE;
 
-	        // Get the handle of the ListView control we're using
-	        hwndLV = GetDlgItem(hwnd, mis->CtlID);
+            // Get the handle of the ListView control we're using
+            hwndLV = GetDlgItem(hwnd, mis->CtlID);
 
-	        // Get the font the control is currently using
-	        hFont = (HFONT)(DWORD) SendMessage(hwndLV, WM_GETFONT, 0, 0L);
+            // Get the font the control is currently using
+            hFont = (HFONT)(DWORD) SendMessage(hwndLV, WM_GETFONT, 0, 0L);
 
-	        // Set the font of the DC to the same font the control is using
+            // Set the font of the DC to the same font the control is using
             hdc = GetDC(hwndLV);
-	        SelectObject(hdc, hFont);
+            SelectObject(hdc, hFont);
 
             // Get the height of the font used by the control
             if (!GetTextMetrics(hdc, &tm))
@@ -1755,10 +1756,10 @@ BOOL CALLBACK DownloadUI::MainProc(	HWND hwnd,
 
             // Make sure there is enough room for the images which are CY_SMICON high
             if (mis->itemHeight < 17)
-    	        mis->itemHeight = 17;
+                mis->itemHeight = 17;
 
-	        // Clean up
-	        ReleaseDC(hwndLV, hdc);
+            // Clean up
+            ReleaseDC(hwndLV, hdc);
 
             result =  TRUE;
             break;
@@ -1770,15 +1771,15 @@ BOOL CALLBACK DownloadUI::MainProc(	HWND hwnd,
             break;
         }
 
-		case WM_COMMAND:
-		{
+        case WM_COMMAND:
+        {
             result = m_ui->Command(wParam, (HWND)lParam);
             break;
         }     
         
         case WM_HELP:
         {
-            m_ui->ShowHelp(Download_Manager);
+            m_ui->LaunchHelp(m_context, Download_Manager);
             return 1;
         }
             
@@ -1788,11 +1789,11 @@ BOOL CALLBACK DownloadUI::MainProc(	HWND hwnd,
             break;
         }  
 
-		case WM_CLOSE:
-		{
-			ShowWindow(hwnd, SW_HIDE);
-			result = TRUE;
-			break;
+        case WM_CLOSE:
+        {
+            ShowWindow(hwnd, SW_HIDE);
+            result = TRUE;
+            break;
         }
 
         case WM_DESTROY:
@@ -1800,9 +1801,9 @@ BOOL CALLBACK DownloadUI::MainProc(	HWND hwnd,
             result = m_ui->Destroy();
             break;
         }
-	}
+    }
 
-	return result;
+    return result;
 }
 
 uint32 DownloadUI::CalcStringEllipsis(HDC hdc, string& displayString, int32 columnWidth)
@@ -1910,7 +1911,7 @@ ListWndProc(HWND hwnd,
     DownloadUI* ui = (DownloadUI*)GetProp( hwnd, "ui" );
 
     //  Pass all non-custom messages to old window proc
-	return ui->ListWndProc(hwnd, msg, wParam, lParam);
+    return ui->ListWndProc(hwnd, msg, wParam, lParam);
 }
 
 LRESULT DownloadUI::ListWndProc(HWND hwnd, 
@@ -1921,13 +1922,13 @@ LRESULT DownloadUI::ListWndProc(HWND hwnd,
     WNDPROC lpOldProc = (WNDPROC)GetProp( hwnd, "oldproc" );
 
     switch(msg)
-	{
-		case WM_ERASEBKGND:
-		{
+    {
+        case WM_ERASEBKGND:
+        {
             if (m_duringUpdate)
                return 1;
             break;
-		}
+        }
     }
 
     return CallWindowProc(lpOldProc, hwnd, msg, wParam, lParam);
@@ -1942,11 +1943,11 @@ LRESULT WINAPI ProgressWndProc(HWND hwnd,
     WNDPROC lpOldProc = (WNDPROC)GetProp( hwnd, "oldproc" );
 
     switch(msg)
-	{
-		case WM_ERASEBKGND:
-		{
+    {
+        case WM_ERASEBKGND:
+        {
             return 1;
-		}
+        }
     }
 
     return CallWindowProc(lpOldProc, hwnd, msg, wParam, lParam);
@@ -1960,10 +1961,10 @@ FreeTracksWndProc(HWND hwnd,
 {
     DownloadUI* ui = (DownloadUI*)GetProp( hwnd, "ui" );
 
-	
+    
 
     //  Pass all non-custom messages to old window proc
-	return ui->FreeTracksWndProc(hwnd, msg, wParam, lParam);
+    return ui->FreeTracksWndProc(hwnd, msg, wParam, lParam);
 }
 
 LRESULT DownloadUI::FreeTracksWndProc(HWND hwnd, 
@@ -1974,47 +1975,47 @@ LRESULT DownloadUI::FreeTracksWndProc(HWND hwnd,
     WNDPROC lpOldProc = (WNDPROC)GetProp( hwnd, "oldproc" );
 
     switch(msg)
-	{
-		case WM_DESTROY:   
-		{
-			//  Put back old window proc and
-			SetWindowLong( hwnd, GWL_WNDPROC, (DWORD)lpOldProc );
+    {
+        case WM_DESTROY:   
+        {
+            //  Put back old window proc and
+            SetWindowLong( hwnd, GWL_WNDPROC, (DWORD)lpOldProc );
 
-			// remove window property
-			RemoveProp( hwnd, "oldproc" );
+            // remove window property
+            RemoveProp( hwnd, "oldproc" );
             RemoveProp( hwnd, "ui" ); 
-			break;
-		}
+            break;
+        }
 
         case WM_SETCURSOR:   
-		{
-		    if(m_overURL)
+        {
+            if(m_overURL)
             {
                 SetCursor(m_handCursor);
                 return TRUE;
             }
-			break;
-		}
+            break;
+        }
 
         case WM_MOUSEMOVE:
         {
             POINT pt;
 
-		    pt.x = LOWORD(lParam);  // horizontal position of cursor 
+            pt.x = LOWORD(lParam);  // horizontal position of cursor 
             pt.y = HIWORD(lParam);  // vertical position of cursor 
 
             if(PtInRect(&m_urlRect, pt))
                 m_overURL = true;
             else
                 m_overURL = false;
-			break;
-		}
+            break;
+        }
 
         case WM_LBUTTONDOWN:
         {
             POINT pt;
 
-		    pt.x = LOWORD(lParam);  // horizontal position of cursor 
+            pt.x = LOWORD(lParam);  // horizontal position of cursor 
             pt.y = HIWORD(lParam);  // vertical position of cursor 
 
             if(PtInRect(&m_urlRect, pt))
@@ -2027,23 +2028,10 @@ LRESULT DownloadUI::FreeTracksWndProc(HWND hwnd,
                                  NULL, SW_SHOWNORMAL);
             }
                 
-			break;
-		}
+            break;
+        }
     }
 
     return CallWindowProc(lpOldProc, hwnd, msg, wParam, lParam);
 }
-
-void DownloadUI::ShowHelp(uint32 topic)
-{
-    string            oHelpFile;
-    char              dir[MAX_PATH];
-    uint32            len = sizeof(dir);
-
-    m_context->prefs->GetInstallDirectory(dir, &len);
-    oHelpFile = string(dir);
-    oHelpFile += string("\\"HELP_FILE);    
-
-    WinHelp(m_hwnd, oHelpFile.c_str(), HELP_CONTEXT, topic);
-}        
 

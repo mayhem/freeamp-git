@@ -24,6 +24,18 @@ ____________________________________________________________________________*/
 #ifndef INCLUDED_HELP_H
 #define INCLUDED_HELP_H
 
-#define HELP_FILE "freeamp/help/freeamp.html"
+#define FreeAmp_Main_Window           "help.html"
+#define Music_Browser                 "music_browser_entry.html"
+#define Music_Browser_Drive_Selection "drive_selection_entry.html"
+#define Download_Manager              "download_manager_entry.html"
+#define Preferences_General           "preferences_general_entry.thml"
+#define Preferences_Themes            "preferences_themes_entry.html"
+#define Preferences_Streaming         "preferences_streaming_entry.html"
+#define Preferences_Update            "preferences_update_entry.html"
+#define Preferences_Plugins           "preferences_plugins_entry.html"
+#define Preferences_Advanced          "preferences_advanced_entry.html"
+#define Preferences_About             "preferences_about_entry.html"
+#define Preferences_Directory         "preferences_directory_entry.html"
+#define Edit_Info                     "edit_info_entry.html"
 
 #endif

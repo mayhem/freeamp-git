@@ -54,8 +54,6 @@ class EditTrackInfoDialog
 
     bool Show();
 
-    void Help();
-
     BOOL DialogProc(HWND hwnd, 
                     UINT msg, 
                     WPARAM wParam, 

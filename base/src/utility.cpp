@@ -52,7 +52,9 @@ using namespace std;
 #endif
 
 #include "config.h"
+#include "facontext.h"
 #include "utility.h"
+#include "errors.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -806,3 +808,39 @@ string FindFile(string oPath)
 
     return retvalue;
 }
+
+void ShowHelp(FAContext *m_context, const char *helpurl)
+{
+    string  oHelpFile;
+    char   *dir;
+    uint32  len = _MAX_PATH;
+
+    dir = new char[_MAX_PATH];
+
+    m_context->prefs->GetInstallDirectory(dir, &len);
+    oHelpFile = string(dir);
+    delete [] dir;
+
+    oHelpFile += string(DIR_MARKER_STR);
+#ifdef WIN32
+    oHelpFile += string("help");
+    oHelpFile += string(DIR_MARKER_STR);
+#endif
+#ifdef unix
+    oHelpFile += string("../share/"BRANDING_APP_NAME"/help/");
+#endif
+    oHelpFile += string(helpurl);
+
+#if 0
+    struct _stat   st;
+    if (_stat(oHelpFile.c_str(), &st) != 0 || st.st_mode & S_IFREG == 0)
+    {
+          MessageDialog oBox(m_context);
+          string        oMessage(szCantFindHelpError);
+
+          oBox.Show(oMessage.c_str(), string(BRANDING), kMessageOk, true);
+    }
+#endif
+ 
+    LaunchBrowser((char *)oHelpFile.c_str());
+} 

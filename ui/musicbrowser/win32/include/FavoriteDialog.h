@@ -53,7 +53,6 @@ class FavoriteDialog
                     WPARAM wParam, 
                     LPARAM lParam); 
  protected:
-    void Help();
 
  private:
     FAContext* m_context;

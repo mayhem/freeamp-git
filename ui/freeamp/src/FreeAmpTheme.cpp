@@ -1248,7 +1248,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
 
    if (oControlName == string("Help") && eMesg == CM_Pressed)
    {
-       ShowHelp();
+       ShowHelp(m_pContext, FreeAmp_Main_Window);
        return kError_NoErr;
    }
    if (oControlName == string("Credits") && eMesg == CM_Pressed)
@@ -1572,7 +1572,7 @@ void FreeAmpTheme::HandleKeystroke(unsigned char cKey)
        
      case 'h':
      case 'H':
-     	ShowHelp();
+        ShowHelp(m_pContext, FreeAmp_Main_Window);
         break;
 
      case '@':
@@ -1824,50 +1824,6 @@ void FreeAmpTheme::PostWindowCreate(void)
     string winTitle = string(BRANDING);
     m_pWindow->SetTitle(winTitle);
 
-}
-
-void FreeAmpTheme::ShowHelp(void)
-{
-    string  oHelpFile;
-    char   *dir;
-    uint32  len = _MAX_PATH;
-
-    dir = new char[_MAX_PATH];
-    
-    m_pContext->prefs->GetInstallDirectory(dir, &len);
-    oHelpFile = string(dir);
-    oHelpFile += string(DIR_MARKER_STR);    
-#ifdef unix
-    oHelpFile += string("../share/");
-#endif
-    oHelpFile += string(HELP_FILE);    
-    
-#ifdef WIN32   
-    Int32PropValue *pProp;
-    HWND            hWnd;
-    if (IsError(m_pContext->props->GetProperty("MainWindow", 
-                (PropValue **)&pProp)))
-       hWnd = NULL;
-    else
-       hWnd = (HWND)pProp->GetInt32();
-    
-    WinHelp(hWnd, oHelpFile.c_str(), HELP_FINDER, FreeAmp_Main_Window);
-#endif
-#ifdef HAVE_GTK   
-    struct _stat   st;
-
-
-    if (_stat(oHelpFile.c_str(), &st) == 0 && st.st_mode & S_IFREG)
-        LaunchBrowser((char *)oHelpFile.c_str());
-    else
-    {
-          MessageDialog oBox(m_pContext);
-          string        oMessage(szCantFindHelpError);
-
-          oBox.Show(oMessage.c_str(), string(BRANDING), kMessageOk, true);
-    }
-#endif
-    delete [] dir;
 }
 
 void FreeAmpTheme::update_thread(void* arg)

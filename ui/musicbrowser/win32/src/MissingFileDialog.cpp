@@ -133,7 +133,7 @@ BOOL MissingFileDialog::DialogProc(HWND hwnd,
 
         case WM_HELP:
         {
-            Help();
+            ShowHelp(m_context, Edit_Info);
             result = TRUE;
             break;
         }
@@ -144,7 +144,7 @@ BOOL MissingFileDialog::DialogProc(HWND hwnd,
             {
                 case IDHELP:
                 {
-                    Help();
+                    ShowHelp(m_context, Edit_Info);
                     break;
                 }
 
@@ -250,15 +250,3 @@ BOOL MissingFileDialog::DialogProc(HWND hwnd,
     return result;
 }
 
-void MissingFileDialog::Help()
-{
-    string            helpFile;
-    char              dir[MAX_PATH];
-    uint32            len = sizeof(dir);
-
-    m_context->prefs->GetInstallDirectory(dir, &len);
-    helpFile = dir;
-    helpFile += "\\"HELP_FILE;    
-
-    WinHelp(m_hwnd, helpFile.c_str(), HELP_CONTEXT, Edit_Info);
-}

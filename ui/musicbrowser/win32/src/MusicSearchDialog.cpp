@@ -134,17 +134,7 @@ BOOL MusicBrowserUI::MusicSearchDlgProc(HWND hwnd,
             {
                 case IDHELP:
                 {
-                    string            oHelpFile;
-                    char              dir[MAX_PATH];
-                    uint32            len = sizeof(dir);
-
-                    m_context->prefs->GetInstallDirectory(dir, &len);
-                    oHelpFile = string(dir);
-                    oHelpFile += string("\\");
-                    oHelpFile += string(HELP_FILE);
-
-                    //WinHelp(m_hWnd, oHelpFile.c_str(), HELP_FINDER, 0);
-                    WinHelp(m_hWnd, oHelpFile.c_str(), HELP_CONTEXT, Music_Browser_Drive_Selection);
+                    ShowHelp(m_context, Music_Browser_Drive_Selection);
                     break;
                 }
 

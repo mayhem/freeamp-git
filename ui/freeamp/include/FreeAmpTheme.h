@@ -91,7 +91,6 @@ class FreeAmpTheme : public UserInterface, public Theme
         void             SetVolume(int iVolume, int iBalance);
         void             UpdateTimeDisplay(int iCurrentTime);
         void             UpdateMetaData(const PlaylistItem *pItem);
-        void             ShowHelp(void);
         void             UpdateThread();
         void             OptionsThread(uint32 defaultPage);
 

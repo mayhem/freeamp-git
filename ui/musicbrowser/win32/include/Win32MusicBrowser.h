@@ -197,8 +197,6 @@ class MusicBrowserUI : public UserInterface
     Error  CloseMainDialog();
     uint32 CalcStringEllipsis(HDC hdc, string& displayString, 
                                  int32 columnWidth);
-    void   ShowHelp(uint32 topic);
-
 
     // Functions in OpenSavePlaylist.cpp
     void OpenPlaylist();

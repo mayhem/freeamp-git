@@ -37,6 +37,7 @@ ____________________________________________________________________________*/
 using namespace std;
 
 #include "config.h"
+#include "facontext.h"
 #include "errors.h"
 #include "preferences.h"
 
@@ -66,5 +67,7 @@ bool ResolveLink(string& path);
 
 /* func to find the real filename of a path, irregardless of case */
 string FindFile(string oPath);
+
+void ShowHelp(FAContext *context, const char *helptopic);
 
 #endif /* INCLUDED_UTILITY_H */

@@ -168,7 +168,7 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
             return 1;
 
         case WM_HELP:
-            ShowHelp(Music_Browser);
+            ShowHelp(m_context, Music_Browser);
             return 1;
 
         case WM_COMMAND:
@@ -331,7 +331,7 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
 
 
                 case ID_HELP_CONTENTS:
-                    ShowHelp(Music_Browser);
+                    ShowHelp(m_context, Music_Browser);
                     return 1;
 
                 case ID_HELP_FREEAMPWEBSITE:
@@ -2034,20 +2034,6 @@ void MusicBrowserUI::UpdateMenuStates()
     SetMenuItemInfo(hMenu, ID_CONTROLS_NORMALORDER, false, &sMenuItem);
 
 }
-
-void MusicBrowserUI::ShowHelp(uint32 topic)
-{
-    string            oHelpFile;
-    char              dir[MAX_PATH];
-    uint32            len = sizeof(dir);
-
-    m_context->prefs->GetInstallDirectory(dir, &len);
-    oHelpFile = string(dir);
-    oHelpFile += string("\\"BRANDING_HELP_FILE);    
-
-    WinHelp(m_hWnd, oHelpFile.c_str(), HELP_CONTEXT, topic);
-}        
-
 
 static
 UINT 

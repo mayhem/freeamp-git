@@ -521,20 +521,6 @@ void Win32PreferenceWindow::SavePrefsValues(PrefsStruct* values)
     m_currentValues = m_proposedValues = *values;
 }
 
-void Win32PreferenceWindow::LaunchHelp(HWND hwnd, uint32 topic)
-{
-    string            oHelpFile;
-    char              dir[MAX_PATH];
-    uint32            len = sizeof(dir);
-
-    m_pContext->prefs->GetInstallDirectory(dir, &len);
-    oHelpFile = string(dir);
-    oHelpFile += string("\\");    
-    oHelpFile += string(HELP_FILE);    
-
-    WinHelp(hwnd, oHelpFile.c_str(), HELP_CONTEXT, topic);
-}                
-
 bool Win32PreferenceWindow::MainProc(HWND hwnd, 
 						             UINT msg, 
 						             WPARAM wParam, 
@@ -787,7 +773,7 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
         case UWM_HELP:
         case WM_HELP:
         {
-            LaunchHelp(hwnd, Preferences_General);
+            ShowHelp(m_pContext, Preferences_General);
             break;
         }
 
@@ -1031,7 +1017,7 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
             {
                 case PSN_HELP:
                 {
-                    LaunchHelp(hwnd, Preferences_General);
+                    ShowHelp(m_pContext, Preferences_General);
                     break;
                 }
             
@@ -1226,7 +1212,7 @@ bool Win32PreferenceWindow::PrefStreamingProc(HWND hwnd,
         case UWM_HELP:
         case WM_HELP:
         {
-            LaunchHelp(hwnd, Preferences_Streaming);
+            ShowHelp(m_pContext, Preferences_Streaming);
             break;
         }
 
@@ -1526,7 +1512,7 @@ bool Win32PreferenceWindow::PrefStreamingProc(HWND hwnd,
             {
                 case PSN_HELP:
                 {
-                    LaunchHelp(hwnd, Preferences_Streaming);
+                    ShowHelp(m_pContext, Preferences_Streaming);
                     break;
                 }
                 case PSN_SETACTIVE:
@@ -1989,7 +1975,7 @@ bool Win32PreferenceWindow::PrefAboutProc(HWND hwnd,
         case UWM_HELP:
         case WM_HELP:
         {
-            LaunchHelp(hwnd, Preferences_About);
+            ShowHelp(m_pContext, Preferences_About);
             break;
         }
 
@@ -2001,7 +1987,7 @@ bool Win32PreferenceWindow::PrefAboutProc(HWND hwnd,
             {
                 case PSN_HELP:
                 {
-                    LaunchHelp(hwnd, Preferences_About);
+                    ShowHelp(m_pContext, Preferences_About);
                     break;
                 }
                 case PSN_SETACTIVE:
@@ -2371,7 +2357,7 @@ bool Win32PreferenceWindow::PrefDirectoryProc(HWND hwnd,
         case WM_HELP:
         case UWM_HELP:
         {
-            //LaunchHelp(hwnd, Preferences_Directory);
+            ShowHelp(m_pContext, Preferences_About);
             break;
         }
 
@@ -2383,7 +2369,7 @@ bool Win32PreferenceWindow::PrefDirectoryProc(HWND hwnd,
             {
                 case PSN_HELP:
                 {
-                    LaunchHelp(hwnd, Preferences_About);
+                    ShowHelp(m_pContext, Preferences_About);
                     break;
                 }
                 case PSN_SETACTIVE:
@@ -2656,7 +2642,7 @@ bool Win32PreferenceWindow::PrefThemeProc(HWND hwnd,
         case WM_HELP:
         case UWM_HELP:
         {
-            LaunchHelp(hwnd, Preferences_Themes);
+            ShowHelp(m_pContext, Preferences_Themes);
             break;
         }
 
@@ -2668,7 +2654,7 @@ bool Win32PreferenceWindow::PrefThemeProc(HWND hwnd,
             {
                 case PSN_HELP:
                 {
-                    LaunchHelp(hwnd, Preferences_Themes);
+                    ShowHelp(m_pContext, Preferences_Themes);
                     break;
                 }
                 case PSN_SETACTIVE:
@@ -3406,7 +3392,7 @@ bool Win32PreferenceWindow::PrefUpdateProc(HWND hwnd,
         case WM_HELP:
         case UWM_HELP:
         {
-            LaunchHelp(hwnd, Preferences_Update);
+            ShowHelp(m_pContext, Preferences_Update);
             break;
         }
 
@@ -3431,7 +3417,7 @@ bool Win32PreferenceWindow::PrefUpdateProc(HWND hwnd,
                 {
                     case PSN_HELP:
                     {
-                        LaunchHelp(hwnd, Preferences_Update);
+                        ShowHelp(m_pContext, Preferences_Update);
                         break;
                     }
                     case PSN_SETACTIVE:
@@ -3809,7 +3795,7 @@ bool Win32PreferenceWindow::PrefAdvancedProc(HWND hwnd,
         case UWM_HELP:
         case WM_HELP:
         {
-            LaunchHelp(hwnd, Preferences_Advanced);
+            ShowHelp(m_pContext, Preferences_Advanced);
             break;
         }
 
@@ -3821,7 +3807,7 @@ bool Win32PreferenceWindow::PrefAdvancedProc(HWND hwnd,
             {
                 case PSN_HELP:
                 {
-                    LaunchHelp(hwnd, Preferences_Advanced);
+                    ShowHelp(m_pContext, Preferences_Advanced);
                     break;
                 }
                 case PSN_SETACTIVE:
@@ -4215,7 +4201,7 @@ bool Win32PreferenceWindow::PrefPluginsProc(HWND hwnd,
         case WM_HELP:
         case UWM_HELP:
         {
-            LaunchHelp(hwnd, Preferences_Plugins);
+            ShowHelp(m_pContext, Preferences_Plugins);
             break;
         }
 
@@ -4279,7 +4265,7 @@ bool Win32PreferenceWindow::PrefPluginsProc(HWND hwnd,
                 {
                     case PSN_HELP:
                     {
-                        LaunchHelp(hwnd, Preferences_Plugins);
+                        ShowHelp(m_pContext, Preferences_Plugins);
                         break;
                     }
                     case PSN_SETACTIVE:
