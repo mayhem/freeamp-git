@@ -47,7 +47,6 @@ ____________________________________________________________________________*/
 #include "semaphore.h"
 #include "lmc.h"
 #include "log.h"
-//#include "debug.hpp"
 
 #if MP3_PROF
 extern LogFile *g_Log;
@@ -206,6 +205,7 @@ Stop()
 
       m_bExit = true;
       m_output->Pause();
+      m_output->Break();
       m_input->Break();
 
       m_decoderThread->Join();  // wait for thread to exit
@@ -217,26 +217,37 @@ Stop()
 
       m_decoderThread = NULL;
    }
+
    return kError_NoErr;
 }
 
 Error XingLMC::Pause()
 {
-   XingCommand *xc = new XingCommand[1];
+#if 0
+	XingCommand *xc = new XingCommand[1];
 
    xc[0] = XING_Pause;
    m_xcqueue->Write(xc);
+#endif
+
+   m_output->Pause();
+   m_input->Pause();
 
    return kError_NoErr;
 }
 
 Error XingLMC::Resume()
 {
+#if 0
    XingCommand *xc = new XingCommand[1];
 
    xc[0] = XING_Resume;
    m_xcqueue->Write(xc);
    m_pauseSemaphore->Signal();
+#endif
+
+   m_output->Resume();
+   m_input->Resume();
 
    return kError_NoErr;
 }
@@ -704,7 +715,7 @@ void XingLMC::DecodeWork()
        return;
    }
 
-   for (m_frameCounter = 0;;)
+   for (m_frameCounter = 0; !m_bExit;)
    {
       if (m_frameCounter >= m_frameWaitTill)
       {
@@ -722,6 +733,7 @@ void XingLMC::DecodeWork()
          case XING_Pause:
             if (m_output)
                m_output->Pause();
+
             if (m_input)
                m_input->Pause();
 
@@ -745,9 +757,37 @@ void XingLMC::DecodeWork()
 
       m_output->AcceptEvent(new PMOTimeInfoEvent(m_frameCounter));
 
-      for(iLoop = 0; iLoop < iMaxDecodeRetries; iLoop++)
+      for(iLoop = 0; !m_bExit && iLoop < iMaxDecodeRetries; iLoop++)
 		{
           x.in_bytes = 0;
+          iOutBytesNeeded = m_iMaxWriteSize;
+          Err = m_output->BeginWrite(pOutBuffer, iOutBytesNeeded);
+//		  if (Err == kError_BufferTooSmall)
+//		  {
+//			  usleep(10000);
+//			  iLoop--;
+//			  continue;
+//		  }
+//		  if (Err == kError_NoErr && iOutBytesNeeded < m_iMaxWriteSize)
+//		  {
+//			  m_output->EndWrite(0);
+//			  usleep(10000);
+//			  iLoop--;
+//			  continue;
+//		  }
+
+          if (Err == kError_Interrupt)
+             break;
+
+          if (Err != kError_NoErr)
+          {
+              m_seekMutex->Release();
+              ReportError(szFailWrite);
+              g_Log->Error("LMC: Cannot write to eventbuffer: %s (%d)\n", 
+                        m_szError, Err); 
+              return;
+          }
+
           iBytesNeeded = iMaxFrameSize;
           Err = BeginRead(pBuffer, iBytesNeeded);
           if (Err == kError_Interrupt || Err == kError_InputUnsuccessful)
@@ -758,21 +798,6 @@ void XingLMC::DecodeWork()
               m_seekMutex->Release();
               ReportError(szFailRead);
               g_Log->Error("LMC: Cannot read from pullbuffer: %s\n", m_szError); 
-              return;
-          }
-        
-
-          iOutBytesNeeded = m_iMaxWriteSize;
-          Err = m_output->BeginWrite(pOutBuffer, iOutBytesNeeded);
-          if (Err == kError_Interrupt)
-             break;
-
-          if (Err != kError_NoErr)
-          {
-              m_seekMutex->Release();
-              ReportError(szFailWrite);
-              g_Log->Error("LMC: Cannot write to eventbuffer: %s (%d)\n", 
-                        m_szError, Err); 
               return;
           }
 
@@ -798,7 +823,7 @@ void XingLMC::DecodeWork()
              m_audioMethods.decode_init(&m_sMpegHead, m_frameBytes,
 				                           0, 0, 0, 24000);
 
-			    Err = AdvanceBufferToNextFrame();
+             Err = AdvanceBufferToNextFrame();
              if (Err == kError_Interrupt)
                  break;
 
@@ -862,6 +887,8 @@ void XingLMC::DecodeWork()
       in_bytes += x.in_bytes;
       m_seekMutex->Release();
    }
+   if (m_bExit)
+	  return;
 
    m_output->AcceptEvent(new PMOQuitEvent());
    m_output->WaitToQuit();

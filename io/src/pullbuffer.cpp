@@ -73,7 +73,7 @@ PullBuffer::~PullBuffer(void)
    delete m_pMutex;
 }
 
-void PullBuffer::Break(void)
+void PullBuffer::BreakBlocks(void)
 {
    m_bExit = true;
    m_pReadSem->Signal();

@@ -55,6 +55,7 @@ public:
     virtual Error Write(int32&,void*,int32);
     virtual Error Pause();
     virtual Error Resume();
+    virtual Error Break();
     virtual void  WaitToQuit();
     virtual Error Clear();
 
@@ -93,7 +94,7 @@ public:
 	bool			m_initialized;
 
     Thread         *m_pBufferThread;
-    Semaphore      *m_pPauseSem;
+    Mutex          *m_pPauseMutex;
     bool            m_bPause;
     int             m_iOutputBufferSize, m_iTotalBytesWritten, m_iBytesPerSample;
     int             m_iLastFrame;

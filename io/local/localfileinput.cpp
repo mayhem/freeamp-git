@@ -58,17 +58,15 @@ extern    "C"
       return new LocalFileInput();
    }
 }
-LocalFileInput::
-LocalFileInput():
-PhysicalMediaInput()
+LocalFileInput::LocalFileInput():
+                PhysicalMediaInput()
 {
    m_path = NULL;
    m_pPullBuffer = NULL;
 }
 
-LocalFileInput::
-LocalFileInput(char *path):
-PhysicalMediaInput()
+LocalFileInput::LocalFileInput(char *path):
+                PhysicalMediaInput()
 {
    if (path)
    {
@@ -81,8 +79,7 @@ PhysicalMediaInput()
    }
 }
 
-LocalFileInput::
-~LocalFileInput()
+LocalFileInput::~LocalFileInput()
 {
    if (m_path)
    {
@@ -96,14 +93,12 @@ LocalFileInput::
    }
 }
 
-bool LocalFileInput::
-CanHandle(char *szUrl)
+bool LocalFileInput::CanHandle(char *szUrl)
 {
    return strncmp(szUrl, "file://", 7) == 0;
 }
 
-Error     LocalFileInput::
-SetTo(char *url)
+Error     LocalFileInput::SetTo(char *url)
 {
    Error     result = kError_NoErr;
    
@@ -163,38 +158,32 @@ SetTo(char *url)
    return result;
 }
 
-Error LocalFileInput::
-GetLength(size_t &iSize)
+Error LocalFileInput::GetLength(size_t &iSize)
 {
     return m_pPullBuffer->GetLength(iSize);
 }
 
-Error LocalFileInput::
-GetID3v1Tag(unsigned char *pTag)
+Error LocalFileInput::GetID3v1Tag(unsigned char *pTag)
 {
 	return m_pPullBuffer->GetID3v1Tag(pTag);
 }
 
-Error LocalFileInput::
-BeginRead(void *&buf, size_t &bytesneeded)
+Error LocalFileInput::BeginRead(void *&buf, size_t &bytesneeded)
 {
    return m_pPullBuffer->BeginRead(buf, bytesneeded);
 }
 
-Error LocalFileInput::
-EndRead(size_t bytesused)
+Error LocalFileInput::EndRead(size_t bytesused)
 {
    return m_pPullBuffer->EndRead(bytesused);
 }
 
-Error     LocalFileInput::
-Seek(int32 & rtn, int32 offset, int32 origin)
+Error LocalFileInput::Seek(int32 & rtn, int32 offset, int32 origin)
 {
    return m_pPullBuffer->Seek(rtn, offset, origin);
 }
 
-Error     LocalFileInput::
-Close(void)
+Error LocalFileInput::Close(void)
 {
    delete m_pPullBuffer;
    m_pPullBuffer = NULL;
@@ -202,8 +191,3 @@ Close(void)
    return kError_NoErr;
 }
 
-const char *LocalFileInput::
-GetErrorString(int32 error)
-{
-   return NULL;
-}

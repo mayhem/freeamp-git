@@ -77,6 +77,7 @@ public:
                   {m_target = target; return kError_NoErr; }
     virtual Error Pause(){ return kError_GotDefaultMethod;}
     virtual Error Resume(){ return kError_GotDefaultMethod; }
+    virtual Error Break(){ return kError_GotDefaultMethod; }
     virtual Error Clear(){ return kError_GotDefaultMethod; }
     virtual void  WaitToQuit(){ };
     virtual const char *GetErrorString(int32) { return NULL; }

@@ -42,6 +42,9 @@ ____________________________________________________________________________*/
 
 /* project headers */
 #include "httpinput.h"
+#include "log.h"
+
+LogFile *g_Log;
 
 const int iBufferSize = 8192;
 const int iOverflowSize = 1536;
@@ -49,8 +52,9 @@ const int iTriggerSize = 1024;
 
 extern    "C"
 {
-   PhysicalMediaInput *Initialize()
+   PhysicalMediaInput *Initialize(LogFile *pLog)
    {
+	  g_Log = pLog;
       return new HttpInput();
    }
 }
@@ -185,22 +189,19 @@ int32 HttpInput::GetNumBytesInBuffer()
    return m_pPullBuffer->GetNumBytesInBuffer();
 }
 
-void HttpInput::
-Pause()
+void HttpInput::Pause()
 {
-   return m_pPullBuffer->Pause();
+   m_pPullBuffer->Pause();
 }
 
-void HttpInput::
-Resume()
+void HttpInput::Resume()
 {
-   return m_pPullBuffer->Resume();
+   m_pPullBuffer->Resume();
 }
 
-void HttpInput::
-Break()
+void HttpInput::Break()
 {
-   return m_pPullBuffer->Break();
+   m_pPullBuffer->BreakBlocks();
 }
 
 Error     HttpInput::

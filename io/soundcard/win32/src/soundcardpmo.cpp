@@ -37,7 +37,7 @@ LogFile  *g_Log;
 const int iBufferSize = 256 * 1024;
 const int iOverflowSize = 24 * 1024;
 const int iWriteTriggerSize = 18432;
-const int iWriteToCard = 8 * 1024;
+const int iWriteToCard = 16 * 1024;
 
 HANDLE    MCISemaphore;
 
@@ -86,9 +86,8 @@ SoundCardPMO::SoundCardPMO() :
    m_initialized = false;
    m_pBufferThread = NULL;
    m_bExit = false;
-   m_bPause = false;
-
-   m_pPauseSem = new Semaphore(); 
+   m_pPauseMutex = new Mutex(); 
+   m_iTotalBytesWritten = 0;
 
    if (!m_pBufferThread)
    {
@@ -132,7 +131,7 @@ SoundCardPMO::~SoundCardPMO()
    m_bExit = true;
    m_pWriteSem->Signal();
    m_pReadSem->Signal();
-   m_pPauseSem->Signal();
+   m_pPauseMutex->Release();
 
    if (m_pBufferThread)
    {
@@ -140,10 +139,10 @@ SoundCardPMO::~SoundCardPMO()
       delete m_pBufferThread;
    }
 
-   if (m_pPauseSem)
+   if (m_pPauseMutex)
    {
-      delete m_pPauseSem;
-      m_pPauseSem = NULL;
+      delete m_pPauseMutex;
+      m_pPauseMutex = NULL;
    }
 }
 
@@ -155,6 +154,7 @@ Error SoundCardPMO::Init(OutputInfo * info)
    m_channels = info->number_of_channels;
    m_samples_per_second = info->samples_per_second;
    m_data_size = info->max_buffer_size;
+   m_iBytesPerSample = info->number_of_channels * (info->bits_per_sample / 8);
 
    m_num_headers = 4;
    m_hdr_size = sizeof(WAVEHDR);
@@ -245,17 +245,24 @@ int SoundCardPMO::GetBufferPercentage()
    return PullBuffer::GetBufferPercentage();
 }
 
+Error SoundCardPMO::Break()
+{
+   PullBuffer::BreakBlocks();
+
+   return kError_NoErr;
+}
+
+
 Error SoundCardPMO::Pause()
 {
-   //Debug_v("Got pause message");
-   m_bPause = true;
+   m_pPauseMutex->Acquire();
 
    return kError_NoErr;
 }
 
 Error SoundCardPMO::Resume()
 {
-   m_pPauseSem->Signal();
+   m_pPauseMutex->Release();
 
    return kError_NoErr;
 }
@@ -313,11 +320,10 @@ Error SoundCardPMO::Clear()
 
 void SoundCardPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
 {
-#if 0
    MediaTimeInfoEvent *pmtpi;
    int32               hours, minutes, seconds;
    int                 iTotalTime = 0;
-   audio_buf_info      info;
+   MMTIME              sTime;
 
    if (pEvent->GetFrameNumber() != m_iLastFrame + 1)
    {
@@ -326,13 +332,15 @@ void SoundCardPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
    }
    m_iLastFrame = pEvent->GetFrameNumber();
 
-   if (myInfo->samples_per_second <= 0)
+   if (m_samples_per_second <= 0)
       return;
 
-   ioctl(audio_fd, SNDCTL_DSP_GETOSPACE, &info);
+   sTime.wType = TIME_BYTES;
+   if (waveOutGetPosition(m_hwo, &sTime, sizeof(sTime)) != MMSYSERR_NOERROR)
+	   return;
 
-   iTotalTime = (m_iTotalBytesWritten - (info.fragments * info.fragsize)) /
-                (m_iBytesPerSample * myInfo->samples_per_second);
+   iTotalTime = (m_iTotalBytesWritten + sTime.u.cb) /
+                (m_iBytesPerSample * m_samples_per_second);
    hours = iTotalTime / 3600;
    minutes = (iTotalTime - hours) / 60;
    seconds = iTotalTime - hours * 3600 - minutes * 60;
@@ -343,7 +351,6 @@ void SoundCardPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
    pmtpi = new MediaTimeInfoEvent(hours, minutes, seconds, 0,
                                   iTotalTime, 0);
    m_target->AcceptEvent(pmtpi);
-#endif
 }
 
 void SoundCardPMO::StartWorkerThread(void *pVoidBuffer)
@@ -360,6 +367,7 @@ void SoundCardPMO::WorkerThread(void)
    Event      *pEvent;
    OutputInfo *pInfo;
 
+   m_bPause = false;
    for(; !m_bExit;)
    {
       iToCopy = iWriteToCard;
@@ -403,31 +411,10 @@ void SoundCardPMO::WorkerThread(void)
           break;
       }
 
-	  //Debug_v("write % bytes\n", iToCopy);
       Write(iRet, pBuffer, iToCopy);
 
-//      if (m_bPause)
-//      {
-//         Reset(true);
-//         EndRead(iCopied);
-//         m_pPauseSem->Wait();
-//         m_bPause = false;
-//         continue;
-//      }
-
-#if 0
-      if (iCopied < iToCopy)
-      {
-         EndRead(0);
-         ReportError("Could not write sound data to the soundcard.");
-         g_Log->Error("Failed to write to the soundcard: %s\n", strerror(errno))
-;
-         break;
-      }
-#endif
       EndRead(iToCopy);
    }
-   //Debug_v("Thread exit");
 }    
 
 Error SoundCardPMO::Write(int32 & wrote, void *pBuffer, int32 length)
@@ -450,9 +437,9 @@ Error SoundCardPMO::Write(int32 & wrote, void *pBuffer, int32 length)
 
    // Prepare & write newest header
    waveOutPrepareHeader(m_hwo, wavhdr, m_hdr_size);
-//   m_pauseMutex->Acquire(WAIT_FOREVER);
+   m_pPauseMutex->Acquire(WAIT_FOREVER);
    waveOutWrite(m_hwo, wavhdr, m_hdr_size);
-//   m_pauseMutex->Release();
+   m_pPauseMutex->Release();
    wrote = length;
 
    return result;

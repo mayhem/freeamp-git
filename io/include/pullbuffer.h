@@ -52,7 +52,7 @@ class PullBuffer
       virtual  Error    EndRead    (size_t iBytesUsed);
 
       virtual  Error    DiscardBytes();
-      virtual  void     Break();
+      virtual  void     BreakBlocks();
 
       Error    Clear        (void);
       Error    Resize       (size_t iNewSize,

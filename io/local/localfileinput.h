@@ -59,7 +59,6 @@ class     LocalFileInput:public PhysicalMediaInput
    {
       return m_path;
    }
-   virtual const char *GetErrorString(int32);
    
    virtual Error SetPropManager(Properties *p) 
 	{ 

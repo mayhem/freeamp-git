@@ -191,13 +191,13 @@ int32 ObsInput::GetNumBytesInBuffer()
 
 void ObsInput:: Pause()
 {
-   return m_pPullBuffer->Pause();
+   m_pPullBuffer->Pause();
 }
 
 void ObsInput::
 Resume()
 {
-   return m_pPullBuffer->Resume();
+   m_pPullBuffer->Resume();
 }
 
 Error     ObsInput::

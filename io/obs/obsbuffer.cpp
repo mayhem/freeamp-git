@@ -121,7 +121,7 @@ Error ObsBuffer::Open(void)
     m_pSin->sin_addr.s_addr = htonl(INADDR_ANY);
 
     iRet = setsockopt(m_hHandle, SOL_SOCKET, SO_REUSEADDR, 
-                      &iReuse, sizeof(int));
+                      (const char *)&iReuse, sizeof(int));
     if (iRet < 0)
     {
        close(m_hHandle);
@@ -161,7 +161,7 @@ Error ObsBuffer::Open(void)
 
     strcpy(m_pID3Tag->szTitle, "RTP Stream");
 
-    fcntl(m_hHandle, F_SETFL, fcntl(m_hHandle, F_GETFL) | O_NONBLOCK);
+    //fcntl(m_hHandle, F_SETFL, fcntl(m_hHandle, F_GETFL) | O_NONBLOCK);
 
     return kError_NoErr;
 }
@@ -199,12 +199,15 @@ void ObsBuffer::StartWorkerThread(void *pVoidBuffer)
    ((ObsBuffer*)pVoidBuffer)->WorkerThread();
 }
 
+#ifndef min
 #define min(a,b) ((a) < (b) ? (a) : (b))
+#endif
 
 void ObsBuffer::WorkerThread(void)
 {
-   size_t          iToCopy, iStructSize, iActual; 
+   size_t          iToCopy, iActual; 
    int             iRead, iPacketNum = -1, iCurrNum, iRet, iHeaderSize;
+   int             iStructSize;
    RTPHeader      *pHeader;
    void           *pBuffer;
    unsigned        char *pTemp, *pCopy;
@@ -234,7 +237,7 @@ void ObsBuffer::WorkerThread(void)
       }
 
       iStructSize = sizeof(struct sockaddr_in);
-      iRead = recvfrom(m_hHandle, pTemp, iMAX_PACKET_SIZE, 0,
+      iRead = recvfrom(m_hHandle, (char *)pTemp, iMAX_PACKET_SIZE, 0,
                        (struct sockaddr *)m_pSin, &iStructSize);
       if (iRead <= 0)
       {

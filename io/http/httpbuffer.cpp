@@ -42,6 +42,10 @@ ____________________________________________________________________________*/
 #include "httpinput.h"
 #include "log.h"
 
+#ifndef WIN32
+check the closesocket shit!
+#endif
+
 extern LogFile *g_Log;
 
 const int iHttpPort = 80;
@@ -89,7 +93,7 @@ HttpBuffer::~HttpBuffer(void)
     if (m_hHandle >= 0)
     {
        shutdown(m_hHandle, 2);
-       close(m_hHandle);
+       closesocket(m_hHandle);
     }
 
     if (m_pID3Tag)
@@ -208,7 +212,11 @@ Error HttpBuffer::Open(void)
        return (Error)httpError_CannotOpenSocket;
     }
 
+#ifndef WIN32
     fcntl(m_hHandle, F_SETFL, fcntl(m_hHandle, F_GETFL) | O_NONBLOCK);
+#else
+
+#endif
     iConnect = connect(m_hHandle,(const sockaddr *)&sAddr,sizeof sAddr);
     for(; iConnect && !m_bExit;)
     {
@@ -223,7 +231,7 @@ Error HttpBuffer::Open(void)
         if (iRet < 0)
         { 
            LogError("Cannot connect socket");
-           close(m_hHandle);
+           closesocket(m_hHandle);
            return (Error)httpError_CannotConnect;
         }
         break;
@@ -244,7 +252,7 @@ Error HttpBuffer::Open(void)
     if (iRet != strlen(szQuery))
     {
         LogError("Cannot write to socket");
-        close(m_hHandle);
+        closesocket(m_hHandle);
         return (Error)httpError_SocketWrite;
     }
 
@@ -266,7 +274,7 @@ Error HttpBuffer::Open(void)
         if (iRead < 0)
         {
             LogError("Cannot read from socket");
-            close(m_hHandle);
+            closesocket(m_hHandle);
             return (Error)httpError_SocketRead;
         }
         break;
@@ -283,7 +291,7 @@ Error HttpBuffer::Open(void)
 		  {
             g_Log->Error("This stream is not available: %s\n", m_szError);
 		      delete pInitialBuffer;
-		      close(m_hHandle);
+		      closesocket(m_hHandle);
 				return (Error)httpError_CustomError;
 		  }
 
@@ -333,7 +341,7 @@ Error HttpBuffer::Open(void)
                 if (iRead < 0)
                 {
                     LogError("Cannot read from socket");
-                    close(m_hHandle);
+                    closesocket(m_hHandle);
                     return (Error)httpError_SocketRead;
                 }
                 break;
@@ -394,8 +402,6 @@ Error HttpBuffer::Open(void)
 
     delete pInitialBuffer;
 
-    fcntl(m_hHandle, F_SETFL, fcntl(m_hHandle, F_GETFL) | O_NONBLOCK);
-         
     return kError_NoErr;
 }
 
@@ -464,7 +470,7 @@ void HttpBuffer::WorkerThread(void)
       eError = BeginWrite(pBuffer, iToCopy);
       if (eError == kError_NoErr)
       {
-          iRead = recv(m_hHandle, (unsigned char *)pBuffer, iToCopy, 0);
+          iRead = recv(m_hHandle, (char *)pBuffer, iToCopy, 0);
           if (iRead <= 0)
           {
              SetEndOfStream(true);
@@ -490,6 +496,6 @@ void HttpBuffer::WorkerThread(void)
    }
 
    shutdown(m_hHandle, 2);
-   close(m_hHandle);
+   closesocket(m_hHandle);
    m_hHandle = -1;
 }
