@@ -598,7 +598,7 @@ Run()
       name = new char[len];
 
 #ifdef unix
-      if (!getenv("DISPLAY"))
+      if (!getenv("DISPLAY")) 
 	  pref = kTextUIPref;
 #endif
       while ((error = m_context->prefs->GetPrefString(pref, name, &len)) ==

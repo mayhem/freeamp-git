@@ -53,6 +53,9 @@ Error MusicBrowserUI::Init(int32 startup_level)
         return kError_InitFailedSafely;
     }
 
+    if (!getenv("DISPLAY"))
+        return kError_InitFailedSafely;
+
     m_playerEQ = m_context->target;
 
     m_argc = m_context->argc;

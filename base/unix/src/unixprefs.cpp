@@ -447,7 +447,6 @@ UnixPrefs()
                 if (!entry->value && !m_errorLineNumber)
                     m_errorLineNumber = lineNumber;
                 p = end;
-                
                 length = strlen(p);
                 if (p[length - 1] != '\n')
                 {

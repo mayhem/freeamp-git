@@ -59,6 +59,9 @@ Error DownloadUI::Init(int32 startup_level)
         return kError_InitFailedSafely;
     }
 
+    if (!getenv("DISPLAY"))
+        return kError_InitFailedSafely;
+
     gtkThread = Thread::CreateThread();
     gtkThread->Create(DownloadUI::UIThreadFunc, this);
 
