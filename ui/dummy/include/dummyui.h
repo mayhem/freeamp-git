@@ -36,7 +36,8 @@ class DummyCOO : public UserInterface {
     virtual ~DummyCOO();
 
  private:
-    Semaphore* m_termSemaphore;
+    Semaphore*      m_termSemaphore;
+    EventQueueRef   m_target;
 
 };
 
