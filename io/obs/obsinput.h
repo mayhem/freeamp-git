@@ -54,7 +54,8 @@ class     ObsInput:public PhysicalMediaInput
 	virtual int32 GetNumBytesInBuffer();
 	virtual Error SetBufferSize(size_t iNewSize);
 	virtual void  Pause();
-	virtual void  Resume();
+	virtual bool  Resume();
+   virtual void  Break();
 	virtual bool  CachePMI() 
 	              { return true; };
 

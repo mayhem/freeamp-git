@@ -42,9 +42,10 @@ LogFile  *g_Log;
 #define PIECES 50
 #define DB printf("%s:%d\n", __FILE__, __LINE__);
 
-const int iBufferSize = 256 * 1024;
+const int iInitialBufferSize = 64 * 1024;
+const int iBufferSize = 512 * 1024;
 const int iOverflowSize = 24 * 1024;
-const int iWriteTriggerSize = 18432;
+const int iWriteTriggerSize = 8 * 1024;
 const int iWriteToCard = 8 * 1024;
 
 extern    "C"
@@ -57,7 +58,7 @@ extern    "C"
 }
 
 SoundCardPMO::SoundCardPMO() :
-              EventBuffer(iBufferSize, iOverflowSize, iWriteTriggerSize)
+              EventBuffer(iInitialBufferSize, iOverflowSize, iWriteTriggerSize)
 {
    //printf("PMO ctor\n");
    m_properlyInitialized = false;
@@ -132,9 +133,11 @@ Error SoundCardPMO::SetPropManager(Properties * p)
    if (pProp)
    {
        iNewSize = atoi(((StringPropValue *)pProp)->GetString()) * 1024;
-       if (iNewSize > iBufferSize)
+       if (iNewSize > iInitialBufferSize)
            Resize(iNewSize, iOverflowSize, iWriteTriggerSize);
    }
+   else
+      Resize(iBufferSize, iOverflowSize, iWriteTriggerSize);
 
    return kError_NoErr;
 }
@@ -353,7 +356,7 @@ void SoundCardPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
    }
    m_iLastFrame = pEvent->GetFrameNumber();
 
-   if (myInfo->samples_per_second <= 0)
+   if (myInfo->samples_per_second <= 0 || pEvent->GetFrameNumber() < 3)
       return;
 
    ioctl(audio_fd, SNDCTL_DSP_GETOSPACE, &info);
@@ -365,7 +368,9 @@ void SoundCardPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
    minutes = (iTotalTime / 60) % 60;
    seconds = iTotalTime % 60;
 
-   if (minutes < 0 || minutes > 59 || seconds < 0 || seconds > 59)
+   if (hours < 0 || hours > 23 ||
+       minutes < 0 || minutes > 59 || 
+       seconds < 0 || seconds > 59)
       return;
 
    pmtpi = new MediaTimeInfoEvent(hours, minutes, seconds, 0, 
@@ -453,22 +458,16 @@ void SoundCardPMO::WorkerThread(void)
           ioctl(audio_fd, SNDCTL_DSP_GETOSPACE, &info);
           if (info.fragments * info.fragsize < iToCopy)
           {
-              //printf("before end read\n");
               EndRead(0);
               m_pPauseMutex->Release();
 
               usleep(10000);
 
-              //printf("aqcuire pause mutex...\n");
               for(;!m_bExit;)
                  if (m_pPauseMutex->Acquire(10000))
                      break;
-                 //else
-                     //printf("nope: %d\n", m_bExit);
               if (m_bExit)
                  iToCopy = 0;
-
-              //printf("Got pause mutex...\n");
 
               // If beginread returns an error, break out...
               if (BeginRead(pBuffer, iToCopy) != kError_NoErr)
@@ -477,9 +476,6 @@ void SoundCardPMO::WorkerThread(void)
               continue;
           }
           iRet = write(audio_fd, pBuffer, iToCopy);
-          //if (iRet <= 0)
-          //    printf("Write to soundcard, iToCopy: %d iRet: %d\n", 
-          //        iToCopy, iRet);
           if (iRet > 0)
           {
               pBuffer = ((char *)pBuffer + iRet);

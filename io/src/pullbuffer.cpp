@@ -179,8 +179,11 @@ Error PullBuffer::Resize(size_t iNewSize,
 {
    unsigned char *pNew;
 
-   if (iNewSize <= m_iBufferSize)
+   if (iNewSize < m_iBytesInBuffer)
+   {
+       g_Log->Error("Pullbuffer: Not resized. Too many bytes in buffer.\n");
        return kError_BufferTooSmall;
+   }
 
    // Nothing should've been read from the buffer yet!
    if (m_iReadIndex != 0)

@@ -114,7 +114,7 @@ static int sample_rate_table[8] =
 const int ID3_TAG_SIZE = 128;
 const int iMaxDecodeRetries = 32;
 const int iStreamingBufferSize = 64;  // in kbytes 
-const int iBufferUpInterval = 3;
+const int iDefaultBufferUpInterval = 3;
 const int iMaxFrameSize = 1046;
 
 const char *szFailRead = "Cannot read MP3 data from input plugin.";
@@ -140,10 +140,10 @@ XingLMC::XingLMC()
    m_szError = NULL;
    m_iMaxWriteSize = 0;
    m_bExit = false;
-   m_iBufferUpBytes = 0;
-
+   m_iBufferUpInterval = iDefaultBufferUpInterval;
    m_frameCounter = 0;
    m_frameWaitTill = 0;
+   m_iBufferSize = iStreamingBufferSize * 1024;
    actually_decode = 0;
 }
 
@@ -245,8 +245,10 @@ Error XingLMC::Resume()
    m_pauseSemaphore->Signal();
 #endif
 
+   if (m_input->Resume())
+      m_output->Clear();
+
    m_output->Resume();
-   m_input->Resume();
 
    return kError_NoErr;
 }
@@ -379,7 +381,7 @@ Error XingLMC::GetHeadInfo()
    for(iLoop = 0; iLoop < iMaxDecodeRetries; iLoop++)
    {
        iNumBytes = iMaxFrameSize;
-       Err = BeginRead(pBuffer, iNumBytes);
+       Err = BeginRead(pBuffer, iNumBytes, false);
        if (Err == kError_NoErr)
        {
            m_frameBytes = head_info3((unsigned char *)pBuffer,
@@ -421,7 +423,6 @@ bool XingLMC::CanDecode()
    Error      Err;
    int32      dummy;
    bool       bRet = false;
-   int        iBufferSize = iStreamingBufferSize;
    PropValue *pProp;
 
    if (!m_input)
@@ -430,11 +431,11 @@ bool XingLMC::CanDecode()
       return false;
    }
 
-   m_propManager->GetProperty("StreamBuffer", &pProp);
+   m_propManager->GetProperty("InputBuffer", &pProp);
    if (pProp)
-       iBufferSize = atoi(((StringPropValue *)pProp)->GetString());
+       m_iBufferSize = atoi(((StringPropValue *)pProp)->GetString()) * 1024;
 
-   m_input->SetBufferSize(iBufferSize * 1024);
+   m_input->SetBufferSize(m_iBufferSize);
 
    if (!m_input->IsStreaming())
        m_input->Seek(dummy, 0, SEEK_FROM_START);
@@ -446,7 +447,13 @@ bool XingLMC::CanDecode()
        return false;
    }
 
-   m_iBufferUpBytes = (m_iBitRate * iBufferUpInterval * 1000) / 8192;
+   m_propManager->GetProperty("BufferUpInterval", &pProp);
+   if (pProp)
+   {
+       m_iBufferUpInterval = atoi(((StringPropValue *)pProp)->GetString());
+       if (m_iBufferUpInterval <= 0)
+           m_iBufferUpInterval = iDefaultBufferUpInterval;
+   }
 
    return true;
 }
@@ -577,9 +584,6 @@ Error XingLMC::InitDecoder()
 		 if (Err != kError_NoErr)
 		    return Err;
    }
-
-   //   if (!m_input->IsStreaming())
-   //    m_input->SetBufferSize((m_iBitRate * iStreamingBufferSize * 1000) / 8192);
 
    // select decoder
    m_audioMethods = audio_table[0][0];       // not integer, non 8 bit mode
@@ -774,7 +778,6 @@ void XingLMC::DecodeWork()
 		{
           x.in_bytes = 0;
           iOutBytesNeeded = m_iMaxWriteSize;
-          //printf("BeginWrite\n"); 
           Err = m_output->BeginWrite(pOutBuffer, iOutBytesNeeded);
 //		  if (Err == kError_BufferTooSmall)
 //		  {
@@ -803,12 +806,10 @@ void XingLMC::DecodeWork()
           }
 
           iBytesNeeded = iMaxFrameSize;
-          //printf("BeginRead\n"); 
           Err = BeginRead(pBuffer, iBytesNeeded);
           if (Err == kError_Interrupt || Err == kError_InputUnsuccessful)
              break;
 
-          //printf("Ready to decode\n"); 
           if (Err != kError_NoErr)
           {
               m_seekMutex->Release();
@@ -826,6 +827,9 @@ void XingLMC::DecodeWork()
              if (m_output)
              {
                  Err = m_output->EndWrite(x.in_bytes);
+                 if (Err == kError_Interrupt)
+                    break;
+
                  if (IsError(Err))
                  {
                      m_seekMutex->Release();
@@ -874,6 +878,9 @@ void XingLMC::DecodeWork()
 #undef  _VISUAL_ENABLE_
 
          Err = m_output->EndWrite(x.out_bytes);
+         if (Err == kError_Interrupt || Err == kError_YouScrewedUp)
+            break;
+
          if (IsError(Err))
          {
              m_seekMutex->Release();
@@ -915,7 +922,8 @@ void XingLMC::DecodeWork()
 }
 
 // This function encapsulates all the buffering event management
-Error XingLMC::BeginRead(void *&pBuffer, unsigned int iBytesNeeded)
+Error XingLMC::BeginRead(void *&pBuffer, unsigned int iBytesNeeded,
+                         bool bBufferUp)
 {
    time_t iNow;
 	Error  Err;
@@ -937,8 +945,14 @@ Error XingLMC::BeginRead(void *&pBuffer, unsigned int iBytesNeeded)
        m_iBufferUpdate = iNow;
   	}
 
-   if (iInPercent < 10 && iOutPercent < 10)
+   if (bBufferUp && iInPercent < 10 && iOutPercent < 10)
    {
+       int iBufferUpBytes;
+
+       iBufferUpBytes = (m_iBitRate * m_iBufferUpInterval * 1000) / 8192;
+       if (iBufferUpBytes > m_iBufferSize)
+          iBufferUpBytes = (m_iBufferSize * 10) / 8;
+
        printf("Buffering up...           \n");
        for(; !m_bExit;)
        {
@@ -948,7 +962,7 @@ Error XingLMC::BeginRead(void *&pBuffer, unsigned int iBytesNeeded)
   	        printf("Input: %3d%% Output: %3d%%\r", iInPercent, iOutPercent);
            fflush(stdout);
 
-           if (m_input->GetNumBytesInBuffer() >= m_iBufferUpBytes)
+           if (m_input->GetNumBytesInBuffer() >= iBufferUpBytes)
               break;
        }
        printf("Done buffering up.              \n");

@@ -36,6 +36,7 @@ StreamBuffer::StreamBuffer(size_t iBufferSize, size_t iOverFlowSize,
    m_bBufferingUp = true;
    m_bPause = true;
 	m_pStreamMutex = new Mutex();
+   m_bDiscardedBytes = false;
 }
 
 StreamBuffer::~StreamBuffer(void)
@@ -46,6 +47,15 @@ StreamBuffer::~StreamBuffer(void)
 bool StreamBuffer::IsBufferingUp(int32 iBytesNeeded)
 {
    return GetNumBytesInBuffer() < iBytesNeeded;
+}
+
+bool StreamBuffer::DidDiscardBytes()
+{
+   bool bRet = m_bDiscardedBytes;
+
+   m_bDiscardedBytes = false;
+
+   return bRet;
 }
 
 #if 0
@@ -109,6 +119,7 @@ Error StreamBuffer::BeginWrite(void *&pBuffer, size_t &iBytesNeeded)
 	if (m_bPause && eRet == kError_BufferTooSmall)
 	{
 	    eRet = DiscardBytes();
+       m_bDiscardedBytes = true;
   
 	    m_pStreamMutex->Release();
 

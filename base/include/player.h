@@ -127,6 +127,7 @@ class     Player:public EventQueue, Properties, PropertyWatcher
 
    PropertiesImpl m_props;
    bool      m_didUsage;
+   bool      m_autoplay;
    Preferences *m_prefs;
    Semaphore *m_pTermSem;
    static Player *m_thePlayer;

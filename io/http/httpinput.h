@@ -57,7 +57,7 @@ class HttpInput:public PhysicalMediaInput
 	              { return true; };
 
    virtual void  Pause();
-   virtual void  Resume();
+   virtual bool  Resume();
    virtual void  Break();
 
    virtual Error SetTo(char *url);

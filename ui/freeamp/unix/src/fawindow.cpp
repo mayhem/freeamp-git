@@ -341,7 +341,7 @@ FALcdWindow::FALcdWindow(Display *display, int32 screen_num,GC gc, Window parent
     strcpy(m_text,"Welcome to FreeAmp");
     m_mainTextWiggleBegin = 0;
     m_wiggleLeft = false;
-    m_displayState = TotalTimeState;
+    m_displayState = CurrentTimeState;
     m_totalHours = m_totalMinutes = m_totalSeconds = m_currHours = m_currMinutes = m_currSeconds = 0;
 };
 

@@ -54,6 +54,9 @@ LogFile::~LogFile(void)
 bool LogFile::Open(void)
 {
     m_fpLog = fopen(m_szLogFile, "a");
+    if (m_fpLog == NULL)
+       printf("Cannot open logfile freeamp.log\n");
+
     return m_fpLog != NULL;
 }
 
@@ -71,8 +74,7 @@ void LogFile::Error(char *format, ...)
     va_list argptr;
 
     if (m_fpLog == NULL)
-        if (!Open())
-           return;
+       return;
 
     szBuffer = new char[iMaxLogLineLen];
 

@@ -199,17 +199,33 @@ int32 ObsInput::GetNumBytesInBuffer()
    return 0;
 }
 
-void ObsInput:: Pause()
+void ObsInput::Pause()
 {
    if (m_pPullBuffer)
+   {
+      m_pPullBuffer->DidDiscardBytes();
       m_pPullBuffer->Pause();
+   }
 }
 
-void ObsInput::
-Resume()
+void ObsInput::Break()
 {
    if (m_pPullBuffer)
-      m_pPullBuffer->Resume();
+       m_pPullBuffer->BreakBlocks();
+}
+
+bool ObsInput::Resume()
+{
+   bool bRet;
+
+   if (!m_pPullBuffer)
+      return false;
+
+   bRet = m_pPullBuffer->DidDiscardBytes();
+
+   m_pPullBuffer->Resume();
+
+   return bRet;
 }
 
 Error     ObsInput::

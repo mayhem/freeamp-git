@@ -46,6 +46,7 @@
 #define __PDP_ENDIAN    3412
 #define __BYTE_ORDER    __LITTLE_ENDIAN
 #define usleep(x) Sleep(x/1000)
+#define strcasecmp(a,b) stricmp(a,b)
 #endif
 
 /* define our datatypes */

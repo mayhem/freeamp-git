@@ -64,10 +64,6 @@ EventQueue()
    g_Log = new LogFile("freeamp.log");
    assert(g_Log);
 
-   assert(g_Log->Open());
-   //g_Log->AddLogLevel(LogInput);
-   //g_Log->AddLogLevel(LogDecode);
-
    // cout << "Creating player..." << endl;
    m_eventSem = new Semaphore();
    m_eventQueue = new Queue < Event * >();
@@ -103,7 +99,7 @@ EventQueue()
    m_pTermSem = NULL;
 
    m_didUsage = false;
-   // m_autoplay = false;
+   m_autoplay = true;
 
    m_props.RegisterPropertyWatcher("pcm_volume", (PropertyWatcher *) this);
 }
@@ -112,7 +108,6 @@ EventQueue()
 
 Player::~Player()
 {
-
    TYPICAL_DELETE(m_pTermSem);
    TYPICAL_DELETE(m_argUIList);
 
@@ -179,6 +174,13 @@ SetArgs(int32 argc, char **argv)
    char     *argUI = NULL;
 
 #ifndef WIN32
+   
+   if (argc == 1)
+   {
+       Usage(argv[0]);
+       exit(0);
+   }
+
    // grab the UI name from how we are invoked.
    argUI = new char[strlen(argv[0]) + 1 + 3];
    char     *pBegin = strrchr(argv[0], '/');
@@ -196,6 +198,7 @@ SetArgs(int32 argc, char **argv)
    m_argUIList->AddItem(argUI);
    justGotArgvZero = true;
 #endif
+
    argList.AddItem(argv[0]);
    for (int32 i = 1; i < argc; i++)
    {
@@ -205,10 +208,13 @@ SetArgs(int32 argc, char **argv)
       {
          switch (arg[1])
          {
+         case 'h':
+         case 'H':
          case '-':
-            if (!strcmp(&(arg[2]), "help"))
+            if (!strcmp(arg + 1, "help") || !strcmp(arg + 2, "help"))
             {
                Usage(argv[0]);
+               exit(0);
                argList.AddItem(argv[i]);
             }
             break;
@@ -239,11 +245,6 @@ SetArgs(int32 argc, char **argv)
                }
                break;
             }
-         case 'h':
-         case 'H':
-            Usage(argv[0]);
-            argList.AddItem(argv[i]);
-            break;
          case 'p':
             if (!strcmp(&(arg[2]), "rop"))
             {
@@ -300,6 +301,7 @@ SetArgs(int32 argc, char **argv)
          // cerr << "Adding argument (" << f << "): " << m_argv[f] << endl;
       }
    }
+
    return true;
 }
 
@@ -308,9 +310,23 @@ Usage(const char *progname)
 {
    if (m_didUsage)
       return;
-   cout << "freeamp global usage:" << endl;
-   cout << "   " << progname << " [-ui <UI plugin name>]..." << endl;
-   cout << endl;
+
+   printf("FreeAmp version 1.20 -- Usage:\n\n");
+   printf("freeamp [-ui <UI plugin name>] "
+          "[-prop <PropertyName>=<PropertyValue>]\n");
+   printf("        <MP3 file/stream> [MP3 file/stream] ...\n\n");
+   printf("The following properties can be set:\n\n");
+   printf("  InputBuffer      - the size (in Kb) of the input buffer\n");
+   printf("  OutputBuffer     - the size (in Kb) of the output buffer\n");
+   printf("  BufferUpInterval - how many seconds to buffer up for streaming\n");
+   printf("  Logging          - a value of 'yes' turns on logging\n");
+   printf("  LoggingInput     - a value of 'yes' logs input events\n");
+   printf("  LoggingDecode    - a value of 'yes' logs decode events\n\n");
+   printf("Example command line:\n\n");
+   printf("   freeamp -prop OutputBuffer=256 mysong1.mp3 mysong2.mp3\n\n");
+   printf("Note:\n\n");
+   printf("   The default output buffer size is set to 512Kb.\n\n");
+
    m_didUsage = true;
 }
 
@@ -379,6 +395,26 @@ Run()
    uint32    len = 256;
    Error     error = kError_NoErr;
    int32     uisActivated = 0;
+   PropValue *pProp; 
+
+   m_props.GetProperty("Logging", &pProp);
+   if (pProp)
+   {
+      if (strcasecmp(((StringPropValue *)pProp)->GetString(), "yes") == 0)
+         g_Log->Open();
+   }
+   m_props.GetProperty("LogInput", &pProp);
+   if (pProp)
+   {
+      if (strcasecmp(((StringPropValue *)pProp)->GetString(), "yes") == 0)
+         g_Log->AddLogLevel(LogInput);
+   }
+   m_props.GetProperty("LogDecode", &pProp);
+   if (pProp)
+   {
+      if (strcasecmp(((StringPropValue *)pProp)->GetString(), "yes") == 0)
+         g_Log->AddLogLevel(LogDecode);
+   }
 
    // which ui should we instantiate first??
    if (m_argUIList->CountItems() == 0)
@@ -1078,6 +1114,12 @@ void Player::HandleMediaInfo(Event *pEvent)
    }
 
    ReleaseUIManipLock();
+
+   if (m_autoplay)
+   {
+      m_autoplay = false;
+      AcceptEvent(new Event(CMD_Play));
+   }
 }
 
 void Player::HandleMediaTimeInfo(Event *pEvent)

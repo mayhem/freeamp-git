@@ -117,7 +117,8 @@ class     XingLMC:public LogicalMediaConverter
 
    static void DecodeWorkerThreadFunc(void *);
    void        DecodeWork();
-	Error       BeginRead(void *&pBuffer, unsigned int iBytesNeeded);
+	Error       BeginRead(void *&pBuffer, unsigned int iBytesNeeded,
+                         bool bBufferUp = true);
 	Error       AdvanceBufferToNextFrame();
 	Error       GetHeadInfo();
 
@@ -131,7 +132,7 @@ class     XingLMC:public LogicalMediaConverter
    PhysicalMediaOutput *m_output;
 
    int       m_iMaxWriteSize;
-   int       m_frameBytes, m_iBufferUpBytes;
+   int       m_frameBytes, m_iBufferUpInterval, m_iBufferSize;
 	MPEG_HEAD m_sMpegHead;
 	int32     m_iBitRate;
    bool      m_isPaused, m_bBufferingUp;

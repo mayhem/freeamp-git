@@ -197,19 +197,30 @@ int32 HttpInput::GetNumBytesInBuffer()
 void HttpInput::Pause()
 {
    if (m_pPullBuffer)
-       m_pPullBuffer->Pause();
-}
-
-void HttpInput::Resume()
-{
-   if (m_pPullBuffer)
-       m_pPullBuffer->Resume();
+   {
+      m_pPullBuffer->DidDiscardBytes();
+      m_pPullBuffer->Pause();
+   }
 }
 
 void HttpInput::Break()
 {
    if (m_pPullBuffer)
        m_pPullBuffer->BreakBlocks();
+}
+
+bool HttpInput::Resume()
+{
+   bool bRet;
+
+   if (!m_pPullBuffer)
+      return false;
+
+   bRet = m_pPullBuffer->DidDiscardBytes();
+
+   m_pPullBuffer->Resume();
+
+   return bRet;
 }
 
 Error     HttpInput::

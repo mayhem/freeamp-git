@@ -48,10 +48,11 @@ class StreamBuffer : public PullBuffer
 		                  { m_bPause = true; };     
 		virtual  void     Resume()
 		                  { m_bPause = false; };     
+      virtual  bool     DidDiscardBytes();
 
     protected:
 
-	   bool      m_bBufferingUp, m_bPause;
+	   bool      m_bBufferingUp, m_bPause, m_bDiscardedBytes;
 		Mutex    *m_pStreamMutex;
 };
 
