@@ -35,6 +35,7 @@ ____________________________________________________________________________*/
 #include <iostream.h>
 #include <math.h>
 #include <mmsystem.h >
+#include <sys/stat.h>
 
 /* project headers */
 #include "config.h"
@@ -879,35 +880,66 @@ DropFiles(HDROP dropHandle)
 
         char* pExtension = NULL;
         List<char*> fileList;
+        struct stat st;
 
-        pExtension = strrchr(file, '.');
+        stat(file, &st);
 
-        if(pExtension && strcasecmp(pExtension, ".m3u") == 0)
-        { 
-            Error error;
+        if(st.st_mode & _S_IFDIR)
+        {
+            HANDLE findFileHandle = NULL;
+            WIN32_FIND_DATA findData;
+            char findPath[MAX_PATH + 1];
 
-            error = m_plm->ExpandM3U(file, fileList);
+            strcpy(findPath, file);
+            strcat(findPath, "\\*.mp?");
 
-            if(IsError(error))
+            findFileHandle = FindFirstFile(findPath, &findData);
+
+            if(findFileHandle != INVALID_HANDLE_VALUE)
             {
-                MessageBox(NULL, "Cannot open playlist file", file, MB_OK); 
-            }
-            else
-            {
-                char* item = NULL;
-                int32 i = 0;
-
-                while(item = fileList.ItemAt(i++))
+                do
                 {
-                    m_plm->AddItem(item,0);
-                }
+                    strcpy(findPath, file);
+                    strcat(findPath, "\\");
+                    strcat(findPath, findData.cFileName);
+                    m_plm->AddItem(findPath,0);
+
+                }while(FindNextFile(findFileHandle, &findData));
+
+                FindClose(findFileHandle);
             }
         }
         else
         {
-            /*OutputDebugString(file);
-            OutputDebugString("\r\n");*/
-            m_plm->AddItem(file,0);
+            pExtension = strrchr(file, '.');
+
+            if(pExtension && strcasecmp(pExtension, ".m3u") == 0)
+            { 
+                Error error;
+
+                error = m_plm->ExpandM3U(file, fileList);
+
+                if(IsError(error))
+                {
+                    MessageBox(NULL, "Cannot open playlist file", file, MB_OK); 
+                }
+                else
+                {
+                    char* item = NULL;
+                    int32 i = 0;
+
+                    while(item = fileList.ItemAt(i++))
+                    {
+                        m_plm->AddItem(item,0);
+                    }
+                }
+            }
+            else
+            {
+                /*OutputDebugString(file);
+                OutputDebugString("\r\n");*/
+                m_plm->AddItem(file,0);
+            }
         }
 	}
 
