@@ -115,6 +115,16 @@ class Preferences {
     Error GetLogPerformance(bool* value);
     Error SetLogPerformance(bool value);
 
+    Error GetWindowPosition(int32* left,
+                            int32* top,
+                            int32* width,
+                            int32* height);
+
+    Error SetWindowPosition(int32 left,
+                            int32 top,
+                            int32 width,
+                            int32 height);
+
  protected:
     
 

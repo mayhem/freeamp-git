@@ -44,6 +44,10 @@ const char* kInputBufferSizePref = "InputBufferSize";
 const char* kOutputBufferSizePref = "OutputBufferSize";
 const char* kStreamBufferIntervalPref = "StreamBufferInterval";
 const char* kDecoderThreadPriorityPref = "DecoderThreadPriority";
+const char* kWindowPositionLeftPref = "WindowPositionLeft";
+const char* kWindowPositionTopPref = "WindowPositionTop";
+const char* kWindowPositionWidthPref = "WindowPositionWidth";
+const char* kWindowPositionHeightPref = "WindowPositionHeight";
 
 //logging
 const char* kUseDebugLogPref = "UseDebugLog";
@@ -62,9 +66,8 @@ const int32  kDefaultInputBufferSize = 64;
 const int32  kDefaultOutputBufferSize = 512;
 const int32  kDefaultStreamBufferInterval = 3;
 const int32  kDefaultDecoderThreadPriority = 1;
-const int32  kDefaultLogging = false;
-
-
+const bool   kDefaultLogging = false;
+const int32  kDefaultWindowPosition = 0;
 
 
 Preferences::
@@ -323,6 +326,12 @@ Initialize()
             SetPrefBoolean(kLogOutputPref, kDefaultLogging);
             SetPrefBoolean(kLogPerformancePref, kDefaultLogging);
 
+            // set default for window position
+            SetPrefInt32(kWindowPositionLeftPref, kDefaultWindowPosition);
+            SetPrefInt32(kWindowPositionTopPref, kDefaultWindowPosition);
+            SetPrefInt32(kWindowPositionWidthPref, kDefaultWindowPosition);
+            SetPrefInt32(kWindowPositionHeightPref, kDefaultWindowPosition);
+
             error = kError_NoErr;
         }
         else
@@ -561,6 +570,52 @@ Preferences::
 GetLogPerformance(bool* value)
 {
     return GetPrefBoolean(kLogPerformancePref, value);
+}
+
+Error 
+Preferences::
+GetWindowPosition(  int32* left,
+                    int32* top,
+                    int32* width,
+                    int32* height)
+{
+    Error result;
+
+    result = GetPrefInt32(kWindowPositionLeftPref, left);
+
+    if(IsntError(result))
+        result = GetPrefInt32(kWindowPositionTopPref, top);
+
+    if(IsntError(result))
+        result = GetPrefInt32(kWindowPositionWidthPref, width);
+
+    if(IsntError(result))
+        result = GetPrefInt32(kWindowPositionHeightPref, height);
+
+    return result;
+}
+
+Error 
+Preferences::
+SetWindowPosition(  int32 left,
+                    int32 top,
+                    int32 width,
+                    int32 height)
+{
+    Error result;
+
+    result = SetPrefInt32(kWindowPositionLeftPref, left);
+
+    if(IsntError(result))
+        result = SetPrefInt32(kWindowPositionTopPref, top);
+
+    if(IsntError(result))
+        result = SetPrefInt32(kWindowPositionWidthPref, width);
+
+    if(IsntError(result))
+        result = SetPrefInt32(kWindowPositionHeightPref, height);
+
+    return result;
 }
 
 

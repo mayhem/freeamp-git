@@ -518,16 +518,25 @@ Create()
 
     GetRgnBox(m_windowRegion, &windowRect);
     
-    m_width = windowRect.right - windowRect.left;
-    m_height = windowRect.bottom - windowRect.top;
+    int32 left, top;
 
-    int32 xPos = (GetSystemMetrics (SM_CXFULLSCREEN) - m_width) / 2;
-	int32 yPos = (GetSystemMetrics (SM_CYFULLSCREEN) - m_height) / 2;
-				
+    m_prefs->GetWindowPosition( &left, 
+                                &top,
+                                &m_width, 
+                                &m_height);
+
+    if(left == 0 && top == 0 && m_width == 0 && m_height == 0)
+    {
+        m_width = windowRect.right - windowRect.left;
+        m_height = windowRect.bottom - windowRect.top;
+        left = (GetSystemMetrics (SM_CXFULLSCREEN) - m_width) / 2;
+	    top = (GetSystemMetrics (SM_CYFULLSCREEN) - m_height) / 2;
+    }
+    		
 	SetWindowPos (	m_hwnd,
 					0, 
-					xPos, 
-					yPos, 
+					left, 
+					top, 
 					m_width, 
 					m_height, 
 					SWP_NOZORDER);
@@ -630,6 +639,17 @@ Destroy()
             break;
         }
     }
+
+
+    // save window position
+    RECT windowRect;
+
+    GetWindowRect(m_hwnd, &windowRect);
+    
+    m_prefs->SetWindowPosition( windowRect.left, 
+                                windowRect.top,
+                                windowRect.right - windowRect.left, 
+                                windowRect.bottom - windowRect.top);
 
     // Tell windows msg loop we wanna die
     PostQuitMessage(0);
