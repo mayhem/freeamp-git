@@ -32,17 +32,17 @@ void launch_browser(const char* url, BrowserEnum browser)
                 strcpy(command, "netscape -raise -remote "
                                 "\"openURL(%s)\""); 
            else
-                strcpy(command, "netscape %s &");
+                strcpy(command, "netscape %s");
 
            break;
         case eBrowserMozilla:
-           strcpy(command, "mozilla file://%s &");
+           strcpy(command, "mozilla file://%s");
            break;
         case eBrowserKonqueror:
-           strcpy(command, "konqueror file://%s &");
+           strcpy(command, "konqueror file://%s");
            break;
         case eBrowserOpera:
-           strcpy(command, "opera file://%s &");
+           strcpy(command, "opera file://%s");
            break;
         case eBrowserLynx:
            strcpy(command, "lynx file://%s");
