@@ -148,7 +148,7 @@ OutDir=.\Release
 
 $(DS_POSTBUILD_DEP) : "xing - Win32 Release" "soundcard - Win32 Release"\
  "fileinput - Win32 Release" ".\rainplay.ui" "$(OUTDIR)\Rainplay.pch"
-   IF NOT EXIST ..\..\base\win32\prj\plugins mkdir                     ..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\base\win32\prj\plugins mkdir                      ..\..\base\win32\prj\plugins
 	copy rainplay.ui     ..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
@@ -272,7 +272,7 @@ OutDir=.\Debug
 
 $(DS_POSTBUILD_DEP) : "xing - Win32 Debug" "soundcard - Win32 Debug"\
  "fileinput - Win32 Debug" ".\rainplay.ui" "$(OUTDIR)\Rainplay.pch"
-   IF NOT EXIST ..\..\base\win32\prj\plugins mkdir                     ..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\base\win32\prj\plugins mkdir                      ..\..\base\win32\prj\plugins
 	copy rainplay.ui     ..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
@@ -378,6 +378,24 @@ DEP_CPP_BMPSI=\
 
 !ENDIF 
 
+SOURCE=..\..\config\config.win32
+
+!IF  "$(CFG)" == "Rainplay - Win32 Release"
+
+InputPath=..\..\config\config.win32
+
+"..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\config\config.win32 ..\..\config\config.h
+
+!ELSEIF  "$(CFG)" == "Rainplay - Win32 Debug"
+
+InputPath=..\..\config\config.win32
+
+"..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\config\config.win32 ..\..\config\config.h
+
+!ENDIF 
+
 SOURCE=.\EnumFonts.cpp
 DEP_CPP_ENUMF=\
 	".\StdAfx.h"\
@@ -420,7 +438,8 @@ DEP_CPP_PLAYL=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"
+"$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"\
+ "..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -445,7 +464,8 @@ DEP_CPP_PLAYL=\
 	"..\..\io\include\std.h"\
 	
 
-"$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"
+"$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"\
+ "..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -540,6 +560,7 @@ DEP_CPP_RAINPLA=\
 	"..\..\io\include\pmiregistry.h"\
 	"..\..\io\include\pmo.h"\
 	"..\..\io\include\pmoregistry.h"\
+	"..\..\io\include\std.h"\
 	"..\..\lmc\include\lmc.h"\
 	"..\..\lmc\include\lmcregistry.h"\
 	"..\include\ui.h"\
@@ -562,7 +583,8 @@ DEP_CPP_RAINPLA=\
 	".\VisualView\VisualView.h"\
 	
 
-"$(INTDIR)\RainplayDlg.obj" : $(SOURCE) $(DEP_CPP_RAINPLA) "$(INTDIR)"
+"$(INTDIR)\RainplayDlg.obj" : $(SOURCE) $(DEP_CPP_RAINPLA) "$(INTDIR)"\
+ "..\..\config\config.h"
 
 
 !ELSEIF  "$(CFG)" == "Rainplay - Win32 Debug"
@@ -612,7 +634,8 @@ DEP_CPP_RAINPLA=\
 	".\VisualView\VisualView.h"\
 	
 
-"$(INTDIR)\RainplayDlg.obj" : $(SOURCE) $(DEP_CPP_RAINPLA) "$(INTDIR)"
+"$(INTDIR)\RainplayDlg.obj" : $(SOURCE) $(DEP_CPP_RAINPLA) "$(INTDIR)"\
+ "..\..\config\config.h"
 
 
 !ENDIF 
@@ -644,6 +667,7 @@ DEP_CPP_RAINPLAY=\
 	"..\..\io\include\pmiregistry.h"\
 	"..\..\io\include\pmo.h"\
 	"..\..\io\include\pmoregistry.h"\
+	"..\..\io\include\std.h"\
 	"..\..\lmc\include\lmc.h"\
 	"..\..\lmc\include\lmcregistry.h"\
 	"..\include\ui.h"\
@@ -665,7 +689,8 @@ DEP_CPP_RAINPLAY=\
 	".\VisualView\VisualView.h"\
 	
 
-"$(INTDIR)\RainplayUI.obj" : $(SOURCE) $(DEP_CPP_RAINPLAY) "$(INTDIR)"
+"$(INTDIR)\RainplayUI.obj" : $(SOURCE) $(DEP_CPP_RAINPLAY) "$(INTDIR)"\
+ "..\..\config\config.h"
 
 
 !ELSEIF  "$(CFG)" == "Rainplay - Win32 Debug"
@@ -714,7 +739,8 @@ DEP_CPP_RAINPLAY=\
 	".\VisualView\VisualView.h"\
 	
 
-"$(INTDIR)\RainplayUI.obj" : $(SOURCE) $(DEP_CPP_RAINPLAY) "$(INTDIR)"
+"$(INTDIR)\RainplayUI.obj" : $(SOURCE) $(DEP_CPP_RAINPLAY) "$(INTDIR)"\
+ "..\..\config\config.h"
 
 
 !ENDIF 
@@ -812,7 +838,8 @@ NODEP_CPP_THREA=\
 	"..\..\base\src\linuxthread.h"\
 	
 
-"$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"
+"$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"\
+ "..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -824,7 +851,8 @@ DEP_CPP_THREA=\
 	"..\..\config\config.h"\
 	
 
-"$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"
+"$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"\
+ "..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -840,7 +868,8 @@ DEP_CPP_WIN32=\
 	"..\..\config\config.h"\
 	
 
-"$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
+"$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
+ "..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -852,7 +881,8 @@ DEP_CPP_WIN32=\
 	"..\..\config\config.h"\
 	
 
-"$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
+"$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
+ "..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -885,6 +915,7 @@ DEP_CPP_EQDLG=\
 	"..\..\io\include\pmiregistry.h"\
 	"..\..\io\include\pmo.h"\
 	"..\..\io\include\pmoregistry.h"\
+	"..\..\io\include\std.h"\
 	"..\..\lmc\include\lmc.h"\
 	"..\..\lmc\include\lmcregistry.h"\
 	"..\include\ui.h"\
@@ -907,7 +938,8 @@ DEP_CPP_EQDLG=\
 	".\VisualView\VisualView.h"\
 	
 
-"$(INTDIR)\EQDlg.obj" : $(SOURCE) $(DEP_CPP_EQDLG) "$(INTDIR)"
+"$(INTDIR)\EQDlg.obj" : $(SOURCE) $(DEP_CPP_EQDLG) "$(INTDIR)"\
+ "..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -958,7 +990,8 @@ DEP_CPP_EQDLG=\
 	".\VisualView\VisualView.h"\
 	
 
-"$(INTDIR)\EQDlg.obj" : $(SOURCE) $(DEP_CPP_EQDLG) "$(INTDIR)"
+"$(INTDIR)\EQDlg.obj" : $(SOURCE) $(DEP_CPP_EQDLG) "$(INTDIR)"\
+ "..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -991,6 +1024,7 @@ DEP_CPP_PLAYLI=\
 	"..\..\io\include\pmiregistry.h"\
 	"..\..\io\include\pmo.h"\
 	"..\..\io\include\pmoregistry.h"\
+	"..\..\io\include\std.h"\
 	"..\..\lmc\include\lmc.h"\
 	"..\..\lmc\include\lmcregistry.h"\
 	"..\include\ui.h"\
@@ -1013,7 +1047,8 @@ DEP_CPP_PLAYLI=\
 	".\VisualView\VisualView.h"\
 	
 
-"$(INTDIR)\PlayListDlg.obj" : $(SOURCE) $(DEP_CPP_PLAYLI) "$(INTDIR)"
+"$(INTDIR)\PlayListDlg.obj" : $(SOURCE) $(DEP_CPP_PLAYLI) "$(INTDIR)"\
+ "..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1064,7 +1099,8 @@ DEP_CPP_PLAYLI=\
 	".\VisualView\VisualView.h"\
 	
 
-"$(INTDIR)\PlayListDlg.obj" : $(SOURCE) $(DEP_CPP_PLAYLI) "$(INTDIR)"
+"$(INTDIR)\PlayListDlg.obj" : $(SOURCE) $(DEP_CPP_PLAYLI) "$(INTDIR)"\
+ "..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

@@ -2596,7 +2596,8 @@ UpdatePlayList()
 
             while(playlistItem = m_plm->ItemAt(i))
             {
-                if(playlistItem != (PlayListItem*) m_playlistView->ItemAt(i++)->UserValue())
+                if( m_playlistView->ItemAt(i) &&
+                    playlistItem != (PlayListItem*) m_playlistView->ItemAt(i++)->UserValue())
                 {
                     different = true;
                     break;

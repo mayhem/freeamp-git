@@ -27,6 +27,7 @@ ____________________________________________________________________________*/
 #include <windows.h>
 #include <windowsx.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <assert.h>
 
 /* project headers */
@@ -55,11 +56,18 @@ View(hwnd, parent, viewRegion)
 
     m_min = 0;
     m_max = 0;
+    m_min = 0;
+    m_max = 0;
+    m_smallStep = 1;
+    m_largeStep = 10;
     m_position = 0;
-    m_visible = 0;
+
     m_target = NULL;
+
+    RECT viewRect;
+    Bounds(&viewRect);
     
-    SetRect(&m_scrollRect, 0,0,0,0);
+    CopyRect(&m_thumbRect, &viewRect);
 }
 
 ScrollView::
@@ -83,11 +91,15 @@ View(hwnd, parent, viewRect)
 
     m_min = 0;
     m_max = 0;
+    m_min = 0;
+    m_max = 0;
+    m_smallStep = 1;
+    m_largeStep = 10;
     m_position = 0;
-    m_visible = 0;
-    m_target = NULL;
 
-    SetRect(&m_scrollRect, 0,0,0,0);
+    m_target = NULL;
+    
+    CopyRect(&m_thumbRect, viewRect);
 }
 
 ScrollView::
@@ -119,59 +131,72 @@ MouseMove(int32 x, int32 y, int32 modifiers)
 {
     if(m_pressed)
     {
-        int32 dy;
+        int32 delta;
         RECT viewRect;
+        RECT rect;
         Bounds(&viewRect);
 
-        if( x <= m_scrollRect.right + SCROLL_SLOP &&
-            x >= m_scrollRect.left - SCROLL_SLOP &&
-            y <= viewRect.bottom + SCROLL_SLOP &&
-            y >= viewRect.top - SCROLL_SLOP )
+        rect = m_thumbRect;
+
+        if(Orientation() == ScrollType_Vertical)
         {
-            dy = y - m_lastPoint.y;
-        }
-        else
-        {
-            dy = m_pressedPoint.y - m_lastPoint.y;
-        }
+            if( x <= m_thumbRect.right + SCROLL_SLOP &&
+                x >= m_thumbRect.left - SCROLL_SLOP &&
+                y <= viewRect.bottom + SCROLL_SLOP &&
+                y >= viewRect.top - SCROLL_SLOP )
+            {
+                delta = y - m_lastPoint.y;
+            }
+            else
+            {
+                delta = m_pressedPoint.y - m_lastPoint.y;
+            }
 
-        RECT rect = m_scrollRect;
-       
-        OffsetRect(&rect, 0, dy);
+            OffsetRect(&rect, 0, delta);
 
-        if(rect.top < viewRect.top)
-        {
-            dy += viewRect.top - rect.top;
-            rect = m_scrollRect;
-            OffsetRect(&rect, 0, dy);
-        }
-        else if(rect.bottom > viewRect.bottom)
-        {
-            dy -= rect.bottom - viewRect.bottom;
-            rect = m_scrollRect;
-            OffsetRect(&rect, 0, dy);
-        }
-    
-        if(dy)
-        {
-            m_scrollRect = rect;
+            if(rect.top < viewRect.top)
+            {
+                delta += viewRect.top - rect.top;
+                rect = m_thumbRect;
+                OffsetRect(&rect, 0, delta);
+            }
+            else if(rect.bottom > viewRect.bottom)
+            {
+                delta -= rect.bottom - viewRect.bottom;
+                rect = m_thumbRect;
+                OffsetRect(&rect, 0, delta);
+            }
 
-            m_lastPoint.y += dy;
+            if(delta)
+            {
+                int32 total = m_max - m_min;
 
-            int32 total = m_max - m_min;
+                m_lastPoint.y += delta;
 
-            dy = rect.top - rect.top;
-            float proportion = ((float)(rect.top - viewRect.top)/
-                                (float)(viewRect.bottom - viewRect.top));
+                m_thumbRect = rect;
 
+                float proportion = ((float)(rect.top - viewRect.top)/
+                                    (float)(viewRect.bottom - viewRect.top));
 
-            int32 index = (int32)((float)total * proportion);
+                int32 index = (int32)((float)total * proportion);
 
-            m_target->ScrollTo(index);
+                /*proportion = ((float)(rect.bottom - rect.top)/
+                                    (float)(viewRect.bottom - viewRect.top));
 
-            //m_position = index;
+                proportion /= ((float)(m_largeStep)/(float)(total));
 
-            Invalidate();
+                char buf[256];
+                sprintf(buf, "%f\r\n", proportion);
+                OutputDebugString(buf);
+
+                index += proportion;*/
+
+                m_position = index;
+
+                m_target->ScrollTo(index);
+
+                Invalidate();
+            }
         }
     }
 }
@@ -186,33 +211,35 @@ LeftButtonDown(int32 x, int32 y, int32 modifiers)
     m_lastPoint = m_pressedPoint;
 
 
-    if(PtInRect(&m_scrollRect, m_pressedPoint))
+    if(PtInRect(&m_thumbRect, m_pressedPoint))
     {
         m_pressed = true;
     }
     else
     {
-        if(y < m_scrollRect.top)
+        if(y < m_thumbRect.top)
         {
-            int32 index = Position() - Proportion();
+            int32 index = Position() - m_largeStep;
 
             if(index < m_min)
                 index = m_min;
 
-            m_target->ScrollTo(index);
+            //m_target->ScrollTo(index);
+            //SetPosition(index);
 
-            SetPosition(index);
+            SetPositionInternal(index, true);
         }
-        else if(y > m_scrollRect.bottom)
+        else if(y > m_thumbRect.bottom)
         {
-            int32 index = Position() + Proportion();
+            int32 index = Position() + m_largeStep;
 
-            if(index > m_max - Proportion())
-                index = m_max - Proportion();
+            if(index > m_max - (int32)m_largeStep)
+                index = m_max - m_largeStep;
 
-            m_target->ScrollTo(index);
+            //m_target->ScrollTo(index);
+            //SetPosition(index);
 
-            SetPosition(index);
+            SetPositionInternal(index, true);
         }
     }
 }
@@ -255,43 +282,28 @@ void
 ScrollView::
 SetPosition(int32 position)
 {
-    /*if(position < m_min)
+    SetPositionInternal(position, false);
+}
+
+void 
+ScrollView::
+SetPositionInternal(int32 position, bool notifyTarget)
+{
+    if(position < m_min)
         position = m_min;
     else if(position > m_max)
-        position = m_max;*/
+        position = m_max;
 
-    if( m_position != position &&
-        position >= m_min &&
-        position <= m_max)
+    if(m_position != position)
     {
         m_position = position;
 
-        int32 length;
-        RECT viewRect;
-        int32 total = m_max - m_min;
-        float proportion = 0;
-
-        Bounds(&viewRect);
-        
-        if(Orientation() == ScrollType_Horizontal)
+        if(notifyTarget && m_target)
         {
-            length = m_scrollRect.right - m_scrollRect.left;
+            m_target->ScrollTo(position);
         }
-        else
-        {
-            length = m_scrollRect.bottom - m_scrollRect.top;
 
-            int32 dest_y = viewRect.top;
-
-            if(total)
-            {
-                proportion = ((float)m_position/(float)total);
-            
-                dest_y += (int32)((float)(viewRect.bottom - viewRect.top) * proportion);
-            }
-
-            SetRect(&m_scrollRect, viewRect.left, dest_y, viewRect.right, dest_y + length);
-        }
+        DetermineThumbRect();
 
         Invalidate();
     }
@@ -299,7 +311,7 @@ SetPosition(int32 position)
 
 void 
 ScrollView::
-Range(int32* min, int32* max)
+Range(int32* min, int32* max) const
 {
     *min = m_min;
     *max = m_max;
@@ -314,122 +326,39 @@ SetRange(int32 min, int32 max)
         m_min = min;
         m_max = max;
 
-        int32 length;
-        RECT viewRect;
-
-        Bounds(&viewRect);
-
-        // calculate length of scrollbar
-        int32 total = m_max - m_min;
-        float proportion = 0;
-
-        if(total)
+        if(m_max < m_min)
         {
-            proportion = ((float)m_visible/(float)total);
+            m_max = min;
+            m_min = max;
         }
 
-        if(Orientation() == ScrollType_Horizontal)
-        {
-            length = (int32)((float)(viewRect.right - viewRect.left) * proportion);
-
-            if(length == 0)
-                length = viewRect.right - viewRect.left;
-            else if(length < m_viewBitmap->Width())
-                length = m_viewBitmap->Width();
-
-        }
-        else
-        {
-            length = (int32)((float)(viewRect.bottom - viewRect.top) * proportion);
-
-            if(length == 0)
-                length = viewRect.bottom - viewRect.top;
-            else if(length < m_viewBitmap->Height())
-                length = m_viewBitmap->Height();
-
-            int32 dest_y;
-
-            dest_y = viewRect.top;
-
-            if(total)
-            {
-                proportion = ((float)m_position/(float)total);
-            
-                dest_y += (int32)((float)(viewRect.bottom - viewRect.top) * proportion);
-            }
-
-            SetRect(&m_scrollRect, viewRect.left, dest_y, viewRect.right, dest_y + length);
-        }
-
+        DetermineThumbRect();
+       
         Invalidate();
     }
-}
-
-
-int32 
-ScrollView::
-Proportion() const
-{
-    return m_visible;
 }
 
 void 
 ScrollView::
-SetProportion(int32 visible)
+SetSteps(uint32 smallStep, uint32 largeStep)
 {
-    if(m_visible != visible)
+    if(m_smallStep != smallStep || m_largeStep != largeStep)
     {
-        m_visible = visible;
+        m_smallStep = smallStep;
+        m_largeStep = largeStep;
 
-        int32 length;
-        RECT viewRect;
-
-        Bounds(&viewRect);
-
-        // calculate length of scrollbar
-        int32 total = m_max - m_min;
-        float proportion = 0;
-
-        if(total)
-        {
-            proportion = ((float)m_visible/(float)total);
-        }
-
-        if(Orientation() == ScrollType_Horizontal)
-        {
-            length = (int32)((float)(viewRect.right - viewRect.left) * proportion);
-
-            if(length == 0)
-                length = viewRect.right - viewRect.left;
-            else if(length < m_viewBitmap->Width())
-                length = m_viewBitmap->Width();
-
-        }
-        else
-        {
-            length = (int32)((float)(viewRect.bottom - viewRect.top) * proportion);
-
-            if(length == 0)
-                length = viewRect.bottom - viewRect.top;
-            else if(length < m_viewBitmap->Height())
-                length = m_viewBitmap->Height();
-
-            int32 dest_y;
-
-            dest_y = viewRect.top;
-
-            if(total)
-            {
-                proportion = ((float)m_position/(float)total);
-            
-                dest_y += (int32)((float)(viewRect.bottom - viewRect.top) * proportion);
-            }
-
-            SetRect(&m_scrollRect, viewRect.left, dest_y, viewRect.right, dest_y + length);
-        }
-
+        DetermineThumbRect();
+       
         Invalidate();
     }
+}
+
+void 
+ScrollView::
+Steps(uint32* smallStep, uint32* largeStep) const
+{
+    *smallStep = m_smallStep;
+    *largeStep = m_largeStep;
 }
 
 int32 
@@ -439,6 +368,45 @@ Orientation() const
     return m_orientation;
 }
 
+
+void 
+ScrollView::
+DetermineThumbRect()
+{
+    uint32 range = 0;
+    float proportion = 0;
+    RECT viewRect;
+
+    Bounds(&viewRect);
+    range = m_max - m_min;
+
+    if(range <= m_largeStep)
+    {
+        CopyRect(&m_thumbRect, &viewRect);
+    }
+    else if(Orientation() == ScrollType_Vertical)
+    {
+        int32 thumb = 0;
+
+        proportion = ((float)m_largeStep/(float)range);
+
+        thumb = (int32)((float)(viewRect.bottom - viewRect.top) * proportion);
+
+        if(thumb == 0)
+            thumb = viewRect.bottom - viewRect.top;
+        if(thumb < m_viewBitmap->Width())
+            thumb = m_viewBitmap->Width();
+
+        range = viewRect.bottom - viewRect.top - thumb;
+
+        m_thumbRect.top = viewRect.top;
+
+        float d = (float)(range * (m_position - m_min)) / (float)(m_max - m_min - m_largeStep);
+
+        m_thumbRect.top += (int32)d;
+		m_thumbRect.bottom = m_thumbRect.top + thumb;
+    }
+}
 
 void 
 ScrollView::
@@ -473,17 +441,6 @@ Draw(DIB* canvas, RECT* invalidRect)
         CopyRect(&drawRect, &tempRect);
     }
 
-    // calculate length of scrollbar
-    /*int32 total = m_max - m_min;
-    float proportion = 0;
-
-    if(total)
-    {
-        proportion = ((float)m_visible/(float)total);
-    }
-
-    */
-
     if(Orientation() == ScrollType_Horizontal)
     {
         /*length = (int32)((float)(viewRect.right - viewRect.left) * proportion);
@@ -496,31 +453,12 @@ Draw(DIB* canvas, RECT* invalidRect)
     }
     else
     {
-        /*length = (int32)((float)(viewRect.bottom - viewRect.top) * proportion);
-
-        if(length == 0)
-            length = viewRect.bottom - viewRect.top;
-        else if(length < m_viewBitmap->Height())
-            length = m_viewBitmap->Height();
-
-        int32 dest_x, dest_y;
-
-        dest_x = viewRect.left;
-        dest_y = viewRect.top;
-
-        if(total)
-        {
-            proportion = ((float)m_position/(float)total);
-            
-            dest_y += (int32)((float)(viewRect.bottom - viewRect.top) * proportion);
-        }*/
-
         int32 dest_x, dest_y;
         int32 length;
 
-        dest_x = m_scrollRect.left;
-        dest_y = m_scrollRect.top;
-        length = m_scrollRect.bottom - m_scrollRect.top;
+        dest_x = m_thumbRect.left;
+        dest_y = m_thumbRect.top;
+        length = m_thumbRect.bottom - m_thumbRect.top;
 
         Renderer::Copy( canvas,
                         dest_x, 

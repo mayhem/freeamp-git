@@ -57,7 +57,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\base\win32\prj\plugins mkdir\
-                     ..\..\base\win32\prj\plugins	copy rainplay.ui     ..\..\base\win32\prj\plugins
+                      ..\..\base\win32\prj\plugins	copy rainplay.ui     ..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "Rainplay - Win32 Debug"
@@ -89,7 +89,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\base\win32\prj\plugins mkdir\
-                     ..\..\base\win32\prj\plugins	copy rainplay.ui     ..\..\base\win32\prj\plugins
+                      ..\..\base\win32\prj\plugins	copy rainplay.ui     ..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
@@ -112,6 +112,33 @@ SOURCE=.\active.cpp
 # Begin Source File
 
 SOURCE=.\BmpSize.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\config\config.win32
+
+!IF  "$(CFG)" == "Rainplay - Win32 Release"
+
+# Begin Custom Build
+InputPath=..\..\config\config.win32
+
+"..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\config\config.win32 ..\..\config\config.h
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "Rainplay - Win32 Debug"
+
+# Begin Custom Build
+InputPath=..\..\config\config.win32
+
+"..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\config\config.win32 ..\..\config\config.h
+
+# End Custom Build
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 

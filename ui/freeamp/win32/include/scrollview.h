@@ -63,8 +63,11 @@ class ScrollView : public View {
             int32 Position() const;
             void SetPosition(int32 position);
 
-            void Range(int32* min, int32* max);
+            void Range(int32* min, int32* max) const;
             void SetRange(int32 min, int32 max);
+
+		    void Steps(uint32* smallStep, uint32* largeStep) const;
+            void SetSteps(uint32 smallStep, uint32 largeStep);
 
             int32 Proportion() const;
             void SetProportion(int32 visible);
@@ -72,20 +75,28 @@ class ScrollView : public View {
             int32 Orientation() const;
 
  protected:
+     void SetPositionInternal(int32 position, bool notifyTarget);
+     void DetermineThumbRect();
     
  private:
     DIB*            m_viewBitmap;
     bool            m_pressed;
     int32           m_flags;
+
     int32           m_orientation;
     int32           m_min;
     int32           m_max;
     int32           m_position;
-    int32           m_visible;
+    uint32          m_smallStep;
+    uint32          m_largeStep;
+
+    
     View*           m_target;
-    RECT            m_scrollRect;
+    RECT            m_thumbRect;
     POINT           m_pressedPoint;
     POINT           m_lastPoint;
+
+    int32           m_visible;
 };
 
 #endif /* _SCROLLVIEW_H_ */
