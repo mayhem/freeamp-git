@@ -21,37 +21,61 @@
 	$Id$
 ____________________________________________________________________________*/
 
-#ifndef INCLUDED_ID3V1_H
-#define INCLUDED_ID3V1_H
-
-#include <string>
-
-using namespace std;
-
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include <assert.h>
+#include <errno.h>
 
 #include "config.h"
 #include "errors.h"
-#include "facontext.h"
+#include "utility.h"
 
-#include "metadata.h"
-
-class ID3v1 : public MetaDataFormat {
- public:
-    ID3v1(FAContext *context);
-    virtual ~ID3v1();
-
-    virtual bool ReadMetaData(const char* url, MetaData* metadata);
-    virtual bool WriteMetaData(const char* url, const MetaData& metadata);
-    virtual MetaDataOrder Order() { return MetaDataOrder_Medium; }
-
- private:
-     FAContext* m_context;
-
-     void KillTrailingSpaces(char* string);
-};
+#include "misc.h"
 
 
 
-#endif // INCLUDED_ID3V1_H
+extern "C"
+{
+   MetaDataFormat *Initialize(FAContext* context)
+   {
+      return new Misc(context);
+   }
+}
+
+Misc::Misc(FAContext* context):MetaDataFormat(context)
+{
+    m_context = context;
+}
+
+Misc::~Misc()
+{
+
+}
+
+bool Misc::ReadMetaData(const char* url, MetaData* metadata)
+{
+    bool result = false;
+    Error error;
+
+    assert(url);
+    assert(metadata);
+
+    char path[_MAX_PATH];
+    uint32 length = sizeof(path);
+
+    error = URLToFilePath(url, path, &length);
+
+    if(IsntError(error))
+    {
+        
+    }
+    return true;
+}
+
+bool Misc::WriteMetaData(const char* url, const MetaData& metadata)
+{
+    bool result = false;
+    return result;
+}
 

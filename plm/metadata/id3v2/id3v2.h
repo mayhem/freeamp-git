@@ -44,6 +44,7 @@ class ID3v2 : public MetaDataFormat
 
     virtual bool ReadMetaData(const char* url, MetaData* metadata);
     virtual bool WriteMetaData(const char* url, const MetaData& metadata);
+    virtual MetaDataOrder Order() { return MetaDataOrder_High; }
 
  private:
 

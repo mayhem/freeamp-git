@@ -21,8 +21,8 @@
 	$Id$
 ____________________________________________________________________________*/
 
-#ifndef INCLUDED_ID3V1_H
-#define INCLUDED_ID3V1_H
+#ifndef INCLUDED_MISC_H
+#define INCLUDED_MISC_H
 
 #include <string>
 
@@ -36,22 +36,21 @@ using namespace std;
 
 #include "metadata.h"
 
-class ID3v1 : public MetaDataFormat {
+class Misc : public MetaDataFormat 
+{
  public:
-    ID3v1(FAContext *context);
-    virtual ~ID3v1();
+    Misc(FAContext *context);
+    virtual ~Misc();
 
     virtual bool ReadMetaData(const char* url, MetaData* metadata);
     virtual bool WriteMetaData(const char* url, const MetaData& metadata);
-    virtual MetaDataOrder Order() { return MetaDataOrder_Medium; }
+    virtual MetaDataOrder Order() { return MetaDataOrder_Last; }
 
  private:
-     FAContext* m_context;
 
-     void KillTrailingSpaces(char* string);
+     FAContext* m_context;
 };
 
 
-
-#endif // INCLUDED_ID3V1_H
+#endif // INCLUDED_MISC_H
 
