@@ -71,6 +71,7 @@ ButtonControl::~ButtonControl(void)
 
 void ButtonControl::Init(void)
 {
+    m_eCurrentState = CS_Normal;
     if (m_oRect.x2 == -1 && m_oRect.y2 == -1)
     {
         m_oRect.x2 = m_oRect.x1 + 
@@ -86,7 +87,7 @@ void ButtonControl::Transition(ControlTransitionEnum  eTrans,
                                Pos                   *pMousePos)
 {
 	Canvas *pCanvas;
-    
+
     switch(eTrans)
     {
        case CT_MouseEnter:

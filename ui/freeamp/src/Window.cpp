@@ -84,11 +84,6 @@ Error Window::VulcanMindMeld(Window *pOther)
     m_bWindowMove = pOther->m_bWindowMove;
     m_bStayOnTop = pOther->m_bLiveInToolbar;
 
-#ifdef WIN32
-    if (m_pMouseInControl)
-       m_pMouseInControl->AcceptTransition(CT_MouseLeave);
-#endif
-    
     m_pMouseInControl = NULL;
     m_pCaptureControl = NULL;
     m_pMouseDownControl = NULL;
@@ -231,7 +226,7 @@ Error Window::SendControlMessage(Control *pControl,
                                  ControlMessageEnum eMesg)
 {
     string oControlName;
-    
+   
     pControl->GetName(oControlName);
 
     return m_pTheme->HandleControlMessage(oControlName, eMesg);
@@ -278,7 +273,7 @@ void Window::HandleMouseMove(Pos &oScreenPos)
     if (m_bWindowMove)
     {
        Rect oActualPos;
-       
+
        m_oMoveStart.x1 += (oScreenPos.x - m_oMovePos.x);
        m_oMoveStart.x2 += (oScreenPos.x - m_oMovePos.x);
        m_oMoveStart.y1 += (oScreenPos.y - m_oMovePos.y);

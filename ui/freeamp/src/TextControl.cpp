@@ -95,6 +95,7 @@ void TextControl::Init(void)
 void TextControl::Transition(ControlTransitionEnum  eTrans,
                              Pos                   *pMousePos)
 {
+
     if (m_eCurrentState == CS_MouseOver && 
         eTrans == CT_MouseLButtonUp)
        m_pParent->SendControlMessage(this, CM_Pressed);

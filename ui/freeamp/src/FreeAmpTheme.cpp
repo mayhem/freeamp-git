@@ -612,7 +612,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
    if (eMesg == CM_MouseLeave)
    {
        string oName("Info"), oEmpty("");
-       
+      
        m_pWindow->ControlStringValue(oName, true, oEmpty);
                                 
        return kError_NoErr;
