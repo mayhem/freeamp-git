@@ -33,9 +33,6 @@ NULL=
 NULL=nul
 !ENDIF 
 
-CPP=cl.exe
-RSC=rc.exe
-
 !IF  "$(CFG)" == "MakeTheme - Win32 Release"
 
 OUTDIR=.\Release
@@ -74,325 +71,13 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
+CPP=cl.exe
 CPP_PROJ=/nologo /ML /W3 /GX /O2 /I "../../include" /I\
  "../../../../lib/zlib/include" /I "../../../../config" /I\
  "../../../../base/include" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS"\
  /Fp"$(INTDIR)\MakeTheme.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
-BSC32=bscmake.exe
-BSC32_FLAGS=/nologo /o"$(OUTDIR)\MakeTheme.bsc" 
-BSC32_SBRS= \
-	
-LINK32=link.exe
-LINK32_FLAGS=setargv.obj kernel32.lib user32.lib gdi32.lib winspool.lib\
- comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
- odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:no\
- /pdb:"$(OUTDIR)\MakeTheme.pdb" /machine:I386 /out:"MakeTheme.exe" 
-LINK32_OBJS= \
-	"$(INTDIR)\adler32.obj" \
-	"$(INTDIR)\compress.obj" \
-	"$(INTDIR)\crc32.obj" \
-	"$(INTDIR)\deflate.obj" \
-	"$(INTDIR)\gzio.obj" \
-	"$(INTDIR)\infblock.obj" \
-	"$(INTDIR)\infcodes.obj" \
-	"$(INTDIR)\inffast.obj" \
-	"$(INTDIR)\inflate.obj" \
-	"$(INTDIR)\inftrees.obj" \
-	"$(INTDIR)\infutil.obj" \
-	"$(INTDIR)\MakeTheme.obj" \
-	"$(INTDIR)\ThemeZip.obj" \
-	"$(INTDIR)\trees.obj" \
-	"$(INTDIR)\uncompr.obj" \
-	"$(INTDIR)\zutil.obj"
-
-".\MakeTheme.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
-    $(LINK32) @<<
-  $(LINK32_FLAGS) $(LINK32_OBJS)
-<<
-
-SOURCE=$(InputPath)
-DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
-
-ALL : $(DS_POSTBUILD_DEP)
-
-$(DS_POSTBUILD_DEP) : ".\MakeTheme.exe"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                 ..\..\..\..\base\win32\prj\tools
-	copy MakeTheme.exe  ..\..\..\..\base\win32\prj\tools
-	copy ..\..\howto\ThemeHowTo.txt  ..\..\..\..\base\win32\prj\tools
-	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
-
-!ELSEIF  "$(CFG)" == "MakeTheme - Win32 Debug"
-
-OUTDIR=.\Debug
-INTDIR=.\Debug
-
-!IF "$(RECURSE)" == "0" 
-
-ALL : ".\MakeTheme.exe"
-
-!ELSE 
-
-ALL : ".\MakeTheme.exe"
-
-!ENDIF 
-
-CLEAN :
-	-@erase "$(INTDIR)\adler32.obj"
-	-@erase "$(INTDIR)\compress.obj"
-	-@erase "$(INTDIR)\crc32.obj"
-	-@erase "$(INTDIR)\deflate.obj"
-	-@erase "$(INTDIR)\gzio.obj"
-	-@erase "$(INTDIR)\infblock.obj"
-	-@erase "$(INTDIR)\infcodes.obj"
-	-@erase "$(INTDIR)\inffast.obj"
-	-@erase "$(INTDIR)\inflate.obj"
-	-@erase "$(INTDIR)\inftrees.obj"
-	-@erase "$(INTDIR)\infutil.obj"
-	-@erase "$(INTDIR)\MakeTheme.obj"
-	-@erase "$(INTDIR)\ThemeZip.obj"
-	-@erase "$(INTDIR)\trees.obj"
-	-@erase "$(INTDIR)\uncompr.obj"
-	-@erase "$(INTDIR)\vc50.idb"
-	-@erase "$(INTDIR)\vc50.pdb"
-	-@erase "$(INTDIR)\zutil.obj"
-	-@erase "$(OUTDIR)\MakeTheme.pdb"
-	-@erase ".\MakeTheme.exe"
-	-@erase ".\MakeTheme.ilk"
-
-"$(OUTDIR)" :
-    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
-
-CPP_PROJ=/nologo /MLd /W3 /Gm /GX /Zi /Od /I "../../include" /I\
- "../../../../lib/zlib/include" /I "../../../../config" /I\
- "../../../../base/include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS"\
- /Fp"$(INTDIR)\MakeTheme.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
-CPP_OBJS=.\Debug/
-CPP_SBRS=.
-BSC32=bscmake.exe
-BSC32_FLAGS=/nologo /o"$(OUTDIR)\MakeTheme.bsc" 
-BSC32_SBRS= \
-	
-LINK32=link.exe
-LINK32_FLAGS=wsock32.lib setargv.obj kernel32.lib user32.lib gdi32.lib\
- winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
- uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:yes\
- /pdb:"$(OUTDIR)\MakeTheme.pdb" /debug /machine:I386 /out:"MakeTheme.exe"\
- /pdbtype:sept 
-LINK32_OBJS= \
-	"$(INTDIR)\adler32.obj" \
-	"$(INTDIR)\compress.obj" \
-	"$(INTDIR)\crc32.obj" \
-	"$(INTDIR)\deflate.obj" \
-	"$(INTDIR)\gzio.obj" \
-	"$(INTDIR)\infblock.obj" \
-	"$(INTDIR)\infcodes.obj" \
-	"$(INTDIR)\inffast.obj" \
-	"$(INTDIR)\inflate.obj" \
-	"$(INTDIR)\inftrees.obj" \
-	"$(INTDIR)\infutil.obj" \
-	"$(INTDIR)\MakeTheme.obj" \
-	"$(INTDIR)\ThemeZip.obj" \
-	"$(INTDIR)\trees.obj" \
-	"$(INTDIR)\uncompr.obj" \
-	"$(INTDIR)\zutil.obj"
-
-".\MakeTheme.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
-    $(LINK32) @<<
-  $(LINK32_FLAGS) $(LINK32_OBJS)
-<<
-
-SOURCE=$(InputPath)
-DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
-
-ALL : $(DS_POSTBUILD_DEP)
-
-$(DS_POSTBUILD_DEP) : ".\MakeTheme.exe"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                 ..\..\..\..\base\win32\prj\tools
-	copy MakeTheme.exe  ..\..\..\..\base\win32\prj\tools
-	copy ..\..\howto\ThemeHowTo.txt  ..\..\..\..\base\win32\prj\tools
-	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
-
-!ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Debug"
-
-OUTDIR=.\Debug
-INTDIR=.\Debug
-
-!IF "$(RECURSE)" == "0" 
-
-ALL : ".\MakeTheme.exe"
-
-!ELSE 
-
-ALL : ".\MakeTheme.exe"
-
-!ENDIF 
-
-CLEAN :
-	-@erase "$(INTDIR)\adler32.obj"
-	-@erase "$(INTDIR)\compress.obj"
-	-@erase "$(INTDIR)\crc32.obj"
-	-@erase "$(INTDIR)\deflate.obj"
-	-@erase "$(INTDIR)\gzio.obj"
-	-@erase "$(INTDIR)\infblock.obj"
-	-@erase "$(INTDIR)\infcodes.obj"
-	-@erase "$(INTDIR)\inffast.obj"
-	-@erase "$(INTDIR)\inflate.obj"
-	-@erase "$(INTDIR)\inftrees.obj"
-	-@erase "$(INTDIR)\infutil.obj"
-	-@erase "$(INTDIR)\MakeTheme.obj"
-	-@erase "$(INTDIR)\ThemeZip.obj"
-	-@erase "$(INTDIR)\trees.obj"
-	-@erase "$(INTDIR)\uncompr.obj"
-	-@erase "$(INTDIR)\vc50.idb"
-	-@erase "$(INTDIR)\vc50.pdb"
-	-@erase "$(INTDIR)\zutil.obj"
-	-@erase "$(OUTDIR)\MakeTheme.pdb"
-	-@erase ".\MakeTheme.exe"
-	-@erase ".\MakeTheme.ilk"
-
-"$(OUTDIR)" :
-    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
-
-CPP_PROJ=/nologo /MLd /W3 /Gm /GX /Zi /Od /I "../../include" /I\
- "../../../../lib/zlib/include" /I "../../../../config" /I\
- "../../../../base/include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS"\
- /Fp"$(INTDIR)\MakeTheme.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
-CPP_OBJS=.\Debug/
-CPP_SBRS=.
-BSC32=bscmake.exe
-BSC32_FLAGS=/nologo /o"$(OUTDIR)\MakeTheme.bsc" 
-BSC32_SBRS= \
-	
-LINK32=link.exe
-LINK32_FLAGS=wsock32.lib setargv.obj kernel32.lib user32.lib gdi32.lib\
- winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
- uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:yes\
- /pdb:"$(OUTDIR)\MakeTheme.pdb" /debug /machine:I386 /out:"MakeTheme.exe"\
- /pdbtype:sept 
-LINK32_OBJS= \
-	"$(INTDIR)\adler32.obj" \
-	"$(INTDIR)\compress.obj" \
-	"$(INTDIR)\crc32.obj" \
-	"$(INTDIR)\deflate.obj" \
-	"$(INTDIR)\gzio.obj" \
-	"$(INTDIR)\infblock.obj" \
-	"$(INTDIR)\infcodes.obj" \
-	"$(INTDIR)\inffast.obj" \
-	"$(INTDIR)\inflate.obj" \
-	"$(INTDIR)\inftrees.obj" \
-	"$(INTDIR)\infutil.obj" \
-	"$(INTDIR)\MakeTheme.obj" \
-	"$(INTDIR)\ThemeZip.obj" \
-	"$(INTDIR)\trees.obj" \
-	"$(INTDIR)\uncompr.obj" \
-	"$(INTDIR)\zutil.obj"
-
-".\MakeTheme.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
-    $(LINK32) @<<
-  $(LINK32_FLAGS) $(LINK32_OBJS)
-<<
-
-SOURCE=$(InputPath)
-DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
-
-ALL : $(DS_POSTBUILD_DEP)
-
-$(DS_POSTBUILD_DEP) : ".\MakeTheme.exe"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                 ..\..\..\..\base\win32\prj\tools
-	copy MakeTheme.exe  ..\..\..\..\base\win32\prj\tools
-	copy ..\..\howto\ThemeHowTo.txt  ..\..\..\..\base\win32\prj\tools
-	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
-
-!ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Release"
-
-OUTDIR=.\Release
-INTDIR=.\Release
-
-!IF "$(RECURSE)" == "0" 
-
-ALL : ".\MakeTheme.exe"
-
-!ELSE 
-
-ALL : ".\MakeTheme.exe"
-
-!ENDIF 
-
-CLEAN :
-	-@erase "$(INTDIR)\adler32.obj"
-	-@erase "$(INTDIR)\compress.obj"
-	-@erase "$(INTDIR)\crc32.obj"
-	-@erase "$(INTDIR)\deflate.obj"
-	-@erase "$(INTDIR)\gzio.obj"
-	-@erase "$(INTDIR)\infblock.obj"
-	-@erase "$(INTDIR)\infcodes.obj"
-	-@erase "$(INTDIR)\inffast.obj"
-	-@erase "$(INTDIR)\inflate.obj"
-	-@erase "$(INTDIR)\inftrees.obj"
-	-@erase "$(INTDIR)\infutil.obj"
-	-@erase "$(INTDIR)\MakeTheme.obj"
-	-@erase "$(INTDIR)\ThemeZip.obj"
-	-@erase "$(INTDIR)\trees.obj"
-	-@erase "$(INTDIR)\uncompr.obj"
-	-@erase "$(INTDIR)\vc50.idb"
-	-@erase "$(INTDIR)\zutil.obj"
-	-@erase ".\MakeTheme.exe"
-
-"$(OUTDIR)" :
-    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
-
-CPP_PROJ=/nologo /ML /W3 /GX /O2 /I "../../include" /I\
- "../../../../lib/zlib/include" /I "../../../../config" /I\
- "../../../../base/include" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS"\
- /Fp"$(INTDIR)\MakeTheme.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
-CPP_OBJS=.\Release/
-CPP_SBRS=.
-BSC32=bscmake.exe
-BSC32_FLAGS=/nologo /o"$(OUTDIR)\MakeTheme.bsc" 
-BSC32_SBRS= \
-	
-LINK32=link.exe
-LINK32_FLAGS=setargv.obj kernel32.lib user32.lib gdi32.lib winspool.lib\
- comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
- odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:no\
- /pdb:"$(OUTDIR)\MakeTheme.pdb" /machine:I386 /out:"MakeTheme.exe" 
-LINK32_OBJS= \
-	"$(INTDIR)\adler32.obj" \
-	"$(INTDIR)\compress.obj" \
-	"$(INTDIR)\crc32.obj" \
-	"$(INTDIR)\deflate.obj" \
-	"$(INTDIR)\gzio.obj" \
-	"$(INTDIR)\infblock.obj" \
-	"$(INTDIR)\infcodes.obj" \
-	"$(INTDIR)\inffast.obj" \
-	"$(INTDIR)\inflate.obj" \
-	"$(INTDIR)\inftrees.obj" \
-	"$(INTDIR)\infutil.obj" \
-	"$(INTDIR)\MakeTheme.obj" \
-	"$(INTDIR)\ThemeZip.obj" \
-	"$(INTDIR)\trees.obj" \
-	"$(INTDIR)\uncompr.obj" \
-	"$(INTDIR)\zutil.obj"
-
-".\MakeTheme.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
-    $(LINK32) @<<
-  $(LINK32_FLAGS) $(LINK32_OBJS)
-<<
-
-SOURCE=$(InputPath)
-DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
-
-ALL : $(DS_POSTBUILD_DEP)
-
-$(DS_POSTBUILD_DEP) : ".\MakeTheme.exe"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                 ..\..\..\..\base\win32\prj\tools
-	copy MakeTheme.exe  ..\..\..\..\base\win32\prj\tools
-	copy ..\..\howto\ThemeHowTo.txt  ..\..\..\..\base\win32\prj\tools
-	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
-
-!ENDIF 
 
 .c{$(CPP_OBJS)}.obj::
    $(CPP) @<<
@@ -424,6 +109,420 @@ $(DS_POSTBUILD_DEP) : ".\MakeTheme.exe"
    $(CPP_PROJ) $< 
 <<
 
+RSC=rc.exe
+BSC32=bscmake.exe
+BSC32_FLAGS=/nologo /o"$(OUTDIR)\MakeTheme.bsc" 
+BSC32_SBRS= \
+	
+LINK32=link.exe
+LINK32_FLAGS=setargv.obj kernel32.lib user32.lib gdi32.lib winspool.lib\
+ comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
+ odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:no\
+ /pdb:"$(OUTDIR)\MakeTheme.pdb" /machine:I386 /out:"MakeTheme.exe" 
+LINK32_OBJS= \
+	"$(INTDIR)\adler32.obj" \
+	"$(INTDIR)\compress.obj" \
+	"$(INTDIR)\crc32.obj" \
+	"$(INTDIR)\deflate.obj" \
+	"$(INTDIR)\gzio.obj" \
+	"$(INTDIR)\infblock.obj" \
+	"$(INTDIR)\infcodes.obj" \
+	"$(INTDIR)\inffast.obj" \
+	"$(INTDIR)\inflate.obj" \
+	"$(INTDIR)\inftrees.obj" \
+	"$(INTDIR)\infutil.obj" \
+	"$(INTDIR)\MakeTheme.obj" \
+	"$(INTDIR)\ThemeZip.obj" \
+	"$(INTDIR)\trees.obj" \
+	"$(INTDIR)\uncompr.obj" \
+	"$(INTDIR)\zutil.obj"
+
+".\MakeTheme.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+    $(LINK32) @<<
+  $(LINK32_FLAGS) $(LINK32_OBJS)
+<<
+
+SOURCE=$(InputPath)
+DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
+
+ALL : $(DS_POSTBUILD_DEP)
+
+$(DS_POSTBUILD_DEP) : ".\MakeTheme.exe"
+   IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                  ..\..\..\..\base\win32\prj\tools
+	copy MakeTheme.exe   ..\..\..\..\base\win32\prj\tools
+	copy ..\..\howto\ThemeHowTo.txt   ..\..\..\..\base\win32\prj\tools
+	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
+
+!ELSEIF  "$(CFG)" == "MakeTheme - Win32 Debug"
+
+OUTDIR=.\Debug
+INTDIR=.\Debug
+
+!IF "$(RECURSE)" == "0" 
+
+ALL : ".\MakeTheme.exe"
+
+!ELSE 
+
+ALL : ".\MakeTheme.exe"
+
+!ENDIF 
+
+CLEAN :
+	-@erase "$(INTDIR)\adler32.obj"
+	-@erase "$(INTDIR)\compress.obj"
+	-@erase "$(INTDIR)\crc32.obj"
+	-@erase "$(INTDIR)\deflate.obj"
+	-@erase "$(INTDIR)\gzio.obj"
+	-@erase "$(INTDIR)\infblock.obj"
+	-@erase "$(INTDIR)\infcodes.obj"
+	-@erase "$(INTDIR)\inffast.obj"
+	-@erase "$(INTDIR)\inflate.obj"
+	-@erase "$(INTDIR)\inftrees.obj"
+	-@erase "$(INTDIR)\infutil.obj"
+	-@erase "$(INTDIR)\MakeTheme.obj"
+	-@erase "$(INTDIR)\ThemeZip.obj"
+	-@erase "$(INTDIR)\trees.obj"
+	-@erase "$(INTDIR)\uncompr.obj"
+	-@erase "$(INTDIR)\vc50.idb"
+	-@erase "$(INTDIR)\vc50.pdb"
+	-@erase "$(INTDIR)\zutil.obj"
+	-@erase "$(OUTDIR)\MakeTheme.pdb"
+	-@erase ".\MakeTheme.exe"
+	-@erase ".\MakeTheme.ilk"
+
+"$(OUTDIR)" :
+    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
+
+CPP=cl.exe
+CPP_PROJ=/nologo /MLd /W3 /Gm /GX /Zi /Od /I "../../include" /I\
+ "../../../../lib/zlib/include" /I "../../../../config" /I\
+ "../../../../base/include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS"\
+ /Fp"$(INTDIR)\MakeTheme.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_OBJS=.\Debug/
+CPP_SBRS=.
+
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+RSC=rc.exe
+BSC32=bscmake.exe
+BSC32_FLAGS=/nologo /o"$(OUTDIR)\MakeTheme.bsc" 
+BSC32_SBRS= \
+	
+LINK32=link.exe
+LINK32_FLAGS=wsock32.lib setargv.obj kernel32.lib user32.lib gdi32.lib\
+ winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
+ uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:yes\
+ /pdb:"$(OUTDIR)\MakeTheme.pdb" /debug /machine:I386 /out:"MakeTheme.exe"\
+ /pdbtype:sept 
+LINK32_OBJS= \
+	"$(INTDIR)\adler32.obj" \
+	"$(INTDIR)\compress.obj" \
+	"$(INTDIR)\crc32.obj" \
+	"$(INTDIR)\deflate.obj" \
+	"$(INTDIR)\gzio.obj" \
+	"$(INTDIR)\infblock.obj" \
+	"$(INTDIR)\infcodes.obj" \
+	"$(INTDIR)\inffast.obj" \
+	"$(INTDIR)\inflate.obj" \
+	"$(INTDIR)\inftrees.obj" \
+	"$(INTDIR)\infutil.obj" \
+	"$(INTDIR)\MakeTheme.obj" \
+	"$(INTDIR)\ThemeZip.obj" \
+	"$(INTDIR)\trees.obj" \
+	"$(INTDIR)\uncompr.obj" \
+	"$(INTDIR)\zutil.obj"
+
+".\MakeTheme.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+    $(LINK32) @<<
+  $(LINK32_FLAGS) $(LINK32_OBJS)
+<<
+
+SOURCE=$(InputPath)
+DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
+
+ALL : $(DS_POSTBUILD_DEP)
+
+$(DS_POSTBUILD_DEP) : ".\MakeTheme.exe"
+   IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                  ..\..\..\..\base\win32\prj\tools
+	copy MakeTheme.exe   ..\..\..\..\base\win32\prj\tools
+	copy ..\..\howto\ThemeHowTo.txt   ..\..\..\..\base\win32\prj\tools
+	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
+
+!ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Debug"
+
+OUTDIR=.\Debug
+INTDIR=.\Debug
+
+!IF "$(RECURSE)" == "0" 
+
+ALL : ".\MakeTheme.exe"
+
+!ELSE 
+
+ALL : ".\MakeTheme.exe"
+
+!ENDIF 
+
+CLEAN :
+	-@erase "$(INTDIR)\adler32.obj"
+	-@erase "$(INTDIR)\compress.obj"
+	-@erase "$(INTDIR)\crc32.obj"
+	-@erase "$(INTDIR)\deflate.obj"
+	-@erase "$(INTDIR)\gzio.obj"
+	-@erase "$(INTDIR)\infblock.obj"
+	-@erase "$(INTDIR)\infcodes.obj"
+	-@erase "$(INTDIR)\inffast.obj"
+	-@erase "$(INTDIR)\inflate.obj"
+	-@erase "$(INTDIR)\inftrees.obj"
+	-@erase "$(INTDIR)\infutil.obj"
+	-@erase "$(INTDIR)\MakeTheme.obj"
+	-@erase "$(INTDIR)\ThemeZip.obj"
+	-@erase "$(INTDIR)\trees.obj"
+	-@erase "$(INTDIR)\uncompr.obj"
+	-@erase "$(INTDIR)\vc50.idb"
+	-@erase "$(INTDIR)\vc50.pdb"
+	-@erase "$(INTDIR)\zutil.obj"
+	-@erase "$(OUTDIR)\MakeTheme.pdb"
+	-@erase ".\MakeTheme.exe"
+	-@erase ".\MakeTheme.ilk"
+
+"$(OUTDIR)" :
+    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
+
+CPP=cl.exe
+CPP_PROJ=/nologo /MLd /W3 /Gm /GX /Zi /Od /I "../../include" /I\
+ "../../../../lib/zlib/include" /I "../../../../config" /I\
+ "../../../../base/include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS"\
+ /Fp"$(INTDIR)\MakeTheme.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_OBJS=.\Debug/
+CPP_SBRS=.
+
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+RSC=rc.exe
+BSC32=bscmake.exe
+BSC32_FLAGS=/nologo /o"$(OUTDIR)\MakeTheme.bsc" 
+BSC32_SBRS= \
+	
+LINK32=link.exe
+LINK32_FLAGS=wsock32.lib setargv.obj kernel32.lib user32.lib gdi32.lib\
+ winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
+ uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:yes\
+ /pdb:"$(OUTDIR)\MakeTheme.pdb" /debug /machine:I386 /out:"MakeTheme.exe"\
+ /pdbtype:sept 
+LINK32_OBJS= \
+	"$(INTDIR)\adler32.obj" \
+	"$(INTDIR)\compress.obj" \
+	"$(INTDIR)\crc32.obj" \
+	"$(INTDIR)\deflate.obj" \
+	"$(INTDIR)\gzio.obj" \
+	"$(INTDIR)\infblock.obj" \
+	"$(INTDIR)\infcodes.obj" \
+	"$(INTDIR)\inffast.obj" \
+	"$(INTDIR)\inflate.obj" \
+	"$(INTDIR)\inftrees.obj" \
+	"$(INTDIR)\infutil.obj" \
+	"$(INTDIR)\MakeTheme.obj" \
+	"$(INTDIR)\ThemeZip.obj" \
+	"$(INTDIR)\trees.obj" \
+	"$(INTDIR)\uncompr.obj" \
+	"$(INTDIR)\zutil.obj"
+
+".\MakeTheme.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+    $(LINK32) @<<
+  $(LINK32_FLAGS) $(LINK32_OBJS)
+<<
+
+SOURCE=$(InputPath)
+DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
+
+ALL : $(DS_POSTBUILD_DEP)
+
+$(DS_POSTBUILD_DEP) : ".\MakeTheme.exe"
+   IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                  ..\..\..\..\base\win32\prj\tools
+	copy MakeTheme.exe   ..\..\..\..\base\win32\prj\tools
+	copy ..\..\howto\ThemeHowTo.txt   ..\..\..\..\base\win32\prj\tools
+	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
+
+!ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Release"
+
+OUTDIR=.\Release
+INTDIR=.\Release
+
+!IF "$(RECURSE)" == "0" 
+
+ALL : ".\MakeTheme.exe"
+
+!ELSE 
+
+ALL : ".\MakeTheme.exe"
+
+!ENDIF 
+
+CLEAN :
+	-@erase "$(INTDIR)\adler32.obj"
+	-@erase "$(INTDIR)\compress.obj"
+	-@erase "$(INTDIR)\crc32.obj"
+	-@erase "$(INTDIR)\deflate.obj"
+	-@erase "$(INTDIR)\gzio.obj"
+	-@erase "$(INTDIR)\infblock.obj"
+	-@erase "$(INTDIR)\infcodes.obj"
+	-@erase "$(INTDIR)\inffast.obj"
+	-@erase "$(INTDIR)\inflate.obj"
+	-@erase "$(INTDIR)\inftrees.obj"
+	-@erase "$(INTDIR)\infutil.obj"
+	-@erase "$(INTDIR)\MakeTheme.obj"
+	-@erase "$(INTDIR)\ThemeZip.obj"
+	-@erase "$(INTDIR)\trees.obj"
+	-@erase "$(INTDIR)\uncompr.obj"
+	-@erase "$(INTDIR)\vc50.idb"
+	-@erase "$(INTDIR)\zutil.obj"
+	-@erase ".\MakeTheme.exe"
+
+"$(OUTDIR)" :
+    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
+
+CPP=cl.exe
+CPP_PROJ=/nologo /ML /W3 /GX /O2 /I "../../include" /I\
+ "../../../../lib/zlib/include" /I "../../../../config" /I\
+ "../../../../base/include" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS"\
+ /Fp"$(INTDIR)\MakeTheme.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_OBJS=.\Release/
+CPP_SBRS=.
+
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+RSC=rc.exe
+BSC32=bscmake.exe
+BSC32_FLAGS=/nologo /o"$(OUTDIR)\MakeTheme.bsc" 
+BSC32_SBRS= \
+	
+LINK32=link.exe
+LINK32_FLAGS=setargv.obj kernel32.lib user32.lib gdi32.lib winspool.lib\
+ comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
+ odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:no\
+ /pdb:"$(OUTDIR)\MakeTheme.pdb" /machine:I386 /out:"MakeTheme.exe" 
+LINK32_OBJS= \
+	"$(INTDIR)\adler32.obj" \
+	"$(INTDIR)\compress.obj" \
+	"$(INTDIR)\crc32.obj" \
+	"$(INTDIR)\deflate.obj" \
+	"$(INTDIR)\gzio.obj" \
+	"$(INTDIR)\infblock.obj" \
+	"$(INTDIR)\infcodes.obj" \
+	"$(INTDIR)\inffast.obj" \
+	"$(INTDIR)\inflate.obj" \
+	"$(INTDIR)\inftrees.obj" \
+	"$(INTDIR)\infutil.obj" \
+	"$(INTDIR)\MakeTheme.obj" \
+	"$(INTDIR)\ThemeZip.obj" \
+	"$(INTDIR)\trees.obj" \
+	"$(INTDIR)\uncompr.obj" \
+	"$(INTDIR)\zutil.obj"
+
+".\MakeTheme.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+    $(LINK32) @<<
+  $(LINK32_FLAGS) $(LINK32_OBJS)
+<<
+
+SOURCE=$(InputPath)
+DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
+
+ALL : $(DS_POSTBUILD_DEP)
+
+$(DS_POSTBUILD_DEP) : ".\MakeTheme.exe"
+   IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                  ..\..\..\..\base\win32\prj\tools
+	copy MakeTheme.exe   ..\..\..\..\base\win32\prj\tools
+	copy ..\..\howto\ThemeHowTo.txt   ..\..\..\..\base\win32\prj\tools
+	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
+
+!ENDIF 
+
 
 !IF "$(CFG)" == "MakeTheme - Win32 Release" || "$(CFG)" ==\
  "MakeTheme - Win32 Debug" || "$(CFG)" == "MakeTheme - Win32 NASM Debug" ||\
@@ -435,6 +534,7 @@ SOURCE=..\..\..\..\lib\zlib\src\adler32.c
 DEP_CPP_ADLER=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\adler32.obj" : $(SOURCE) $(DEP_CPP_ADLER) "$(INTDIR)"
@@ -446,7 +546,6 @@ DEP_CPP_ADLER=\
 DEP_CPP_ADLER=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\adler32.obj" : $(SOURCE) $(DEP_CPP_ADLER) "$(INTDIR)"
@@ -458,7 +557,6 @@ DEP_CPP_ADLER=\
 DEP_CPP_ADLER=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\adler32.obj" : $(SOURCE) $(DEP_CPP_ADLER) "$(INTDIR)"
@@ -470,6 +568,7 @@ DEP_CPP_ADLER=\
 DEP_CPP_ADLER=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\adler32.obj" : $(SOURCE) $(DEP_CPP_ADLER) "$(INTDIR)"
@@ -485,6 +584,7 @@ SOURCE=..\..\..\..\lib\zlib\src\compress.c
 DEP_CPP_COMPR=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\compress.obj" : $(SOURCE) $(DEP_CPP_COMPR) "$(INTDIR)"
@@ -496,7 +596,6 @@ DEP_CPP_COMPR=\
 DEP_CPP_COMPR=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\compress.obj" : $(SOURCE) $(DEP_CPP_COMPR) "$(INTDIR)"
@@ -508,7 +607,6 @@ DEP_CPP_COMPR=\
 DEP_CPP_COMPR=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\compress.obj" : $(SOURCE) $(DEP_CPP_COMPR) "$(INTDIR)"
@@ -520,6 +618,7 @@ DEP_CPP_COMPR=\
 DEP_CPP_COMPR=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\compress.obj" : $(SOURCE) $(DEP_CPP_COMPR) "$(INTDIR)"
@@ -535,6 +634,7 @@ SOURCE=..\..\..\..\lib\zlib\src\crc32.c
 DEP_CPP_CRC32=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\crc32.obj" : $(SOURCE) $(DEP_CPP_CRC32) "$(INTDIR)"
@@ -546,7 +646,6 @@ DEP_CPP_CRC32=\
 DEP_CPP_CRC32=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\crc32.obj" : $(SOURCE) $(DEP_CPP_CRC32) "$(INTDIR)"
@@ -558,7 +657,6 @@ DEP_CPP_CRC32=\
 DEP_CPP_CRC32=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\crc32.obj" : $(SOURCE) $(DEP_CPP_CRC32) "$(INTDIR)"
@@ -570,6 +668,7 @@ DEP_CPP_CRC32=\
 DEP_CPP_CRC32=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\crc32.obj" : $(SOURCE) $(DEP_CPP_CRC32) "$(INTDIR)"
@@ -587,6 +686,7 @@ DEP_CPP_DEFLA=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\deflate.obj" : $(SOURCE) $(DEP_CPP_DEFLA) "$(INTDIR)"
@@ -600,7 +700,6 @@ DEP_CPP_DEFLA=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\deflate.obj" : $(SOURCE) $(DEP_CPP_DEFLA) "$(INTDIR)"
@@ -614,7 +713,6 @@ DEP_CPP_DEFLA=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\deflate.obj" : $(SOURCE) $(DEP_CPP_DEFLA) "$(INTDIR)"
@@ -628,6 +726,7 @@ DEP_CPP_DEFLA=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\deflate.obj" : $(SOURCE) $(DEP_CPP_DEFLA) "$(INTDIR)"
@@ -644,6 +743,7 @@ DEP_CPP_GZIO_=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\gzio.obj" : $(SOURCE) $(DEP_CPP_GZIO_) "$(INTDIR)"
@@ -656,7 +756,6 @@ DEP_CPP_GZIO_=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\gzio.obj" : $(SOURCE) $(DEP_CPP_GZIO_) "$(INTDIR)"
@@ -669,7 +768,6 @@ DEP_CPP_GZIO_=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\gzio.obj" : $(SOURCE) $(DEP_CPP_GZIO_) "$(INTDIR)"
@@ -682,6 +780,7 @@ DEP_CPP_GZIO_=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\gzio.obj" : $(SOURCE) $(DEP_CPP_GZIO_) "$(INTDIR)"
@@ -702,6 +801,7 @@ DEP_CPP_INFBL=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\infblock.obj" : $(SOURCE) $(DEP_CPP_INFBL) "$(INTDIR)"
@@ -718,7 +818,6 @@ DEP_CPP_INFBL=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\infblock.obj" : $(SOURCE) $(DEP_CPP_INFBL) "$(INTDIR)"
@@ -735,7 +834,6 @@ DEP_CPP_INFBL=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\infblock.obj" : $(SOURCE) $(DEP_CPP_INFBL) "$(INTDIR)"
@@ -752,6 +850,7 @@ DEP_CPP_INFBL=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\infblock.obj" : $(SOURCE) $(DEP_CPP_INFBL) "$(INTDIR)"
@@ -773,6 +872,7 @@ DEP_CPP_INFCO=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\infcodes.obj" : $(SOURCE) $(DEP_CPP_INFCO) "$(INTDIR)"
@@ -790,7 +890,6 @@ DEP_CPP_INFCO=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\infcodes.obj" : $(SOURCE) $(DEP_CPP_INFCO) "$(INTDIR)"
@@ -808,7 +907,6 @@ DEP_CPP_INFCO=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\infcodes.obj" : $(SOURCE) $(DEP_CPP_INFCO) "$(INTDIR)"
@@ -826,6 +924,7 @@ DEP_CPP_INFCO=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\infcodes.obj" : $(SOURCE) $(DEP_CPP_INFCO) "$(INTDIR)"
@@ -847,6 +946,7 @@ DEP_CPP_INFFA=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\inffast.obj" : $(SOURCE) $(DEP_CPP_INFFA) "$(INTDIR)"
@@ -864,7 +964,6 @@ DEP_CPP_INFFA=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\inffast.obj" : $(SOURCE) $(DEP_CPP_INFFA) "$(INTDIR)"
@@ -882,7 +981,6 @@ DEP_CPP_INFFA=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\inffast.obj" : $(SOURCE) $(DEP_CPP_INFFA) "$(INTDIR)"
@@ -900,6 +998,7 @@ DEP_CPP_INFFA=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\inffast.obj" : $(SOURCE) $(DEP_CPP_INFFA) "$(INTDIR)"
@@ -917,6 +1016,7 @@ DEP_CPP_INFLA=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\inflate.obj" : $(SOURCE) $(DEP_CPP_INFLA) "$(INTDIR)"
@@ -930,7 +1030,6 @@ DEP_CPP_INFLA=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\inflate.obj" : $(SOURCE) $(DEP_CPP_INFLA) "$(INTDIR)"
@@ -944,7 +1043,6 @@ DEP_CPP_INFLA=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\inflate.obj" : $(SOURCE) $(DEP_CPP_INFLA) "$(INTDIR)"
@@ -958,6 +1056,7 @@ DEP_CPP_INFLA=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\inflate.obj" : $(SOURCE) $(DEP_CPP_INFLA) "$(INTDIR)"
@@ -976,6 +1075,7 @@ DEP_CPP_INFTR=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\inftrees.obj" : $(SOURCE) $(DEP_CPP_INFTR) "$(INTDIR)"
@@ -990,7 +1090,6 @@ DEP_CPP_INFTR=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\inftrees.obj" : $(SOURCE) $(DEP_CPP_INFTR) "$(INTDIR)"
@@ -1005,7 +1104,6 @@ DEP_CPP_INFTR=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\inftrees.obj" : $(SOURCE) $(DEP_CPP_INFTR) "$(INTDIR)"
@@ -1020,6 +1118,7 @@ DEP_CPP_INFTR=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\inftrees.obj" : $(SOURCE) $(DEP_CPP_INFTR) "$(INTDIR)"
@@ -1040,6 +1139,7 @@ DEP_CPP_INFUT=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\infutil.obj" : $(SOURCE) $(DEP_CPP_INFUT) "$(INTDIR)"
@@ -1056,7 +1156,6 @@ DEP_CPP_INFUT=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\infutil.obj" : $(SOURCE) $(DEP_CPP_INFUT) "$(INTDIR)"
@@ -1073,7 +1172,6 @@ DEP_CPP_INFUT=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\infutil.obj" : $(SOURCE) $(DEP_CPP_INFUT) "$(INTDIR)"
@@ -1090,6 +1188,7 @@ DEP_CPP_INFUT=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\infutil.obj" : $(SOURCE) $(DEP_CPP_INFUT) "$(INTDIR)"
@@ -1105,7 +1204,7 @@ SOURCE=..\src\MakeTheme.cpp
 DEP_CPP_MAKET=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\themezip.h"\
+	"..\..\include\ThemeZip.h"\
 	
 
 "$(INTDIR)\MakeTheme.obj" : $(SOURCE) $(DEP_CPP_MAKET) "$(INTDIR)"
@@ -1117,7 +1216,7 @@ DEP_CPP_MAKET=\
 DEP_CPP_MAKET=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\themezip.h"\
+	"..\..\include\ThemeZip.h"\
 	
 
 "$(INTDIR)\MakeTheme.obj" : $(SOURCE) $(DEP_CPP_MAKET) "$(INTDIR)"
@@ -1129,7 +1228,7 @@ DEP_CPP_MAKET=\
 DEP_CPP_MAKET=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\themezip.h"\
+	"..\..\include\ThemeZip.h"\
 	
 
 "$(INTDIR)\MakeTheme.obj" : $(SOURCE) $(DEP_CPP_MAKET) "$(INTDIR)"
@@ -1141,7 +1240,7 @@ DEP_CPP_MAKET=\
 DEP_CPP_MAKET=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\config\config.h"\
-	"..\..\include\themezip.h"\
+	"..\..\include\ThemeZip.h"\
 	
 
 "$(INTDIR)\MakeTheme.obj" : $(SOURCE) $(DEP_CPP_MAKET) "$(INTDIR)"
@@ -1160,7 +1259,8 @@ DEP_CPP_THEME=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
-	"..\..\include\themezip.h"\
+	"..\..\include\ThemeZip.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\ThemeZip.obj" : $(SOURCE) $(DEP_CPP_THEME) "$(INTDIR)"
@@ -1175,8 +1275,7 @@ DEP_CPP_THEME=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
-	"..\..\include\themezip.h"\
-	{$(INCLUDE)}"sys\types.h"\
+	"..\..\include\ThemeZip.h"\
 	
 
 "$(INTDIR)\ThemeZip.obj" : $(SOURCE) $(DEP_CPP_THEME) "$(INTDIR)"
@@ -1191,8 +1290,7 @@ DEP_CPP_THEME=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
-	"..\..\include\themezip.h"\
-	{$(INCLUDE)}"sys\types.h"\
+	"..\..\include\ThemeZip.h"\
 	
 
 "$(INTDIR)\ThemeZip.obj" : $(SOURCE) $(DEP_CPP_THEME) "$(INTDIR)"
@@ -1207,7 +1305,8 @@ DEP_CPP_THEME=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
-	"..\..\include\themezip.h"\
+	"..\..\include\ThemeZip.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\ThemeZip.obj" : $(SOURCE) $(DEP_CPP_THEME) "$(INTDIR)"
@@ -1226,6 +1325,7 @@ DEP_CPP_TREES=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\trees.obj" : $(SOURCE) $(DEP_CPP_TREES) "$(INTDIR)"
@@ -1240,7 +1340,6 @@ DEP_CPP_TREES=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\trees.obj" : $(SOURCE) $(DEP_CPP_TREES) "$(INTDIR)"
@@ -1255,7 +1354,6 @@ DEP_CPP_TREES=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\trees.obj" : $(SOURCE) $(DEP_CPP_TREES) "$(INTDIR)"
@@ -1270,6 +1368,7 @@ DEP_CPP_TREES=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\trees.obj" : $(SOURCE) $(DEP_CPP_TREES) "$(INTDIR)"
@@ -1285,6 +1384,7 @@ SOURCE=..\..\..\..\lib\zlib\src\uncompr.c
 DEP_CPP_UNCOM=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\uncompr.obj" : $(SOURCE) $(DEP_CPP_UNCOM) "$(INTDIR)"
@@ -1296,7 +1396,6 @@ DEP_CPP_UNCOM=\
 DEP_CPP_UNCOM=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\uncompr.obj" : $(SOURCE) $(DEP_CPP_UNCOM) "$(INTDIR)"
@@ -1308,7 +1407,6 @@ DEP_CPP_UNCOM=\
 DEP_CPP_UNCOM=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\uncompr.obj" : $(SOURCE) $(DEP_CPP_UNCOM) "$(INTDIR)"
@@ -1320,6 +1418,7 @@ DEP_CPP_UNCOM=\
 DEP_CPP_UNCOM=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\uncompr.obj" : $(SOURCE) $(DEP_CPP_UNCOM) "$(INTDIR)"
@@ -1336,6 +1435,7 @@ DEP_CPP_ZUTIL=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\zutil.obj" : $(SOURCE) $(DEP_CPP_ZUTIL) "$(INTDIR)"
@@ -1348,7 +1448,6 @@ DEP_CPP_ZUTIL=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\zutil.obj" : $(SOURCE) $(DEP_CPP_ZUTIL) "$(INTDIR)"
@@ -1361,7 +1460,6 @@ DEP_CPP_ZUTIL=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\zutil.obj" : $(SOURCE) $(DEP_CPP_ZUTIL) "$(INTDIR)"
@@ -1374,6 +1472,7 @@ DEP_CPP_ZUTIL=\
 	"..\..\..\..\lib\zlib\include\zconf.h"\
 	"..\..\..\..\lib\zlib\include\zlib.h"\
 	"..\..\..\..\lib\zlib\include\zutil.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\zutil.obj" : $(SOURCE) $(DEP_CPP_ZUTIL) "$(INTDIR)"

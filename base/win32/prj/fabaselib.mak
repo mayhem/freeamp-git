@@ -558,15 +558,31 @@ DEP_CPP_DATAB=\
 
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 Debug"
 
+DEP_CPP_DATAB=\
+	"..\..\..\config\config.h"\
+	"..\..\..\lib\gdbm\gdbm_fa.h"\
+	"..\..\include\database.h"\
+	"..\..\include\errors.h"\
+	"..\include\mutex.h"\
+	
 
-"$(INTDIR)\database.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\database.obj" : $(SOURCE) $(DEP_CPP_DATAB) "$(INTDIR)"\
+ "..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Debug"
 
+DEP_CPP_DATAB=\
+	"..\..\..\config\config.h"\
+	"..\..\..\lib\gdbm\gdbm_fa.h"\
+	"..\..\include\database.h"\
+	"..\..\include\errors.h"\
+	"..\include\mutex.h"\
+	
 
-"$(INTDIR)\database.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\database.obj" : $(SOURCE) $(DEP_CPP_DATAB) "$(INTDIR)"\
+ "..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -590,9 +606,6 @@ DEP_CPP_DATAB=\
 !ENDIF 
 
 SOURCE=..\..\src\debug.cpp
-
-!IF  "$(CFG)" == "fabaselib - Win32 Release"
-
 DEP_CPP_DEBUG=\
 	"..\..\include\debug.h"\
 	
@@ -600,32 +613,6 @@ DEP_CPP_DEBUG=\
 "$(INTDIR)\debug.obj" : $(SOURCE) $(DEP_CPP_DEBUG) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "fabaselib - Win32 Debug"
-
-
-"$(INTDIR)\debug.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Debug"
-
-
-"$(INTDIR)\debug.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Release"
-
-DEP_CPP_DEBUG=\
-	"..\..\include\debug.h"\
-	
-
-"$(INTDIR)\debug.obj" : $(SOURCE) $(DEP_CPP_DEBUG) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 SOURCE=..\..\src\downloadmanager.cpp
 
@@ -691,6 +678,7 @@ DEP_CPP_DOWNL=\
 	"..\..\include\registrar.h"\
 	"..\..\include\registry.h"\
 	"..\..\include\thread.h"\
+	"..\..\include\undomanager.h"\
 	"..\..\include\utility.h"\
 	"..\include\mutex.h"\
 	"..\include\semaphore.h"\
@@ -724,6 +712,7 @@ DEP_CPP_DOWNL=\
 	"..\..\include\registrar.h"\
 	"..\..\include\registry.h"\
 	"..\..\include\thread.h"\
+	"..\..\include\undomanager.h"\
 	"..\..\include\utility.h"\
 	"..\include\mutex.h"\
 	"..\include\semaphore.h"\
@@ -776,9 +765,6 @@ NODEP_CPP_DOWNL=\
 !ENDIF 
 
 SOURCE=..\..\src\errors.cpp
-
-!IF  "$(CFG)" == "fabaselib - Win32 Release"
-
 DEP_CPP_ERROR=\
 	"..\..\..\config\config.h"\
 	
@@ -787,38 +773,8 @@ DEP_CPP_ERROR=\
  "..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "fabaselib - Win32 Debug"
-
-
-"$(INTDIR)\errors.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Debug"
-
-
-"$(INTDIR)\errors.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Release"
-
-DEP_CPP_ERROR=\
-	"..\..\..\config\config.h"\
-	
-
-"$(INTDIR)\errors.obj" : $(SOURCE) $(DEP_CPP_ERROR) "$(INTDIR)"\
- "..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 SOURCE=..\..\src\log.cpp
-
-!IF  "$(CFG)" == "fabaselib - Win32 Release"
-
 DEP_CPP_LOG_C=\
 	"..\..\include\log.h"\
 	
@@ -826,32 +782,6 @@ DEP_CPP_LOG_C=\
 "$(INTDIR)\log.obj" : $(SOURCE) $(DEP_CPP_LOG_C) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "fabaselib - Win32 Debug"
-
-
-"$(INTDIR)\log.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Debug"
-
-
-"$(INTDIR)\log.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Release"
-
-DEP_CPP_LOG_C=\
-	"..\..\include\log.h"\
-	
-
-"$(INTDIR)\log.obj" : $(SOURCE) $(DEP_CPP_LOG_C) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 SOURCE=..\..\src\musiccatalog.cpp
 
@@ -935,6 +865,7 @@ DEP_CPP_MUSIC=\
 	"..\..\include\queue.h"\
 	"..\..\include\registry.h"\
 	"..\..\include\thread.h"\
+	"..\..\include\undomanager.h"\
 	"..\..\include\utility.h"\
 	"..\include\mutex.h"\
 	"..\include\semaphore.h"\
@@ -977,6 +908,7 @@ DEP_CPP_MUSIC=\
 	"..\..\include\queue.h"\
 	"..\..\include\registry.h"\
 	"..\..\include\thread.h"\
+	"..\..\include\undomanager.h"\
 	"..\..\include\utility.h"\
 	"..\include\mutex.h"\
 	"..\include\semaphore.h"\
@@ -1038,9 +970,6 @@ NODEP_CPP_MUSIC=\
 !ENDIF 
 
 SOURCE=..\src\mutex.cpp
-
-!IF  "$(CFG)" == "fabaselib - Win32 Release"
-
 DEP_CPP_MUTEX=\
 	"..\include\mutex.h"\
 	
@@ -1048,32 +977,6 @@ DEP_CPP_MUTEX=\
 "$(INTDIR)\mutex.obj" : $(SOURCE) $(DEP_CPP_MUTEX) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "fabaselib - Win32 Debug"
-
-
-"$(INTDIR)\mutex.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Debug"
-
-
-"$(INTDIR)\mutex.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Release"
-
-DEP_CPP_MUTEX=\
-	"..\include\mutex.h"\
-	
-
-"$(INTDIR)\mutex.obj" : $(SOURCE) $(DEP_CPP_MUTEX) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 SOURCE=..\..\src\player.cpp
 
@@ -1163,6 +1066,7 @@ DEP_CPP_PLAYE=\
 	"..\..\include\registrar.h"\
 	"..\..\include\registry.h"\
 	"..\..\include\thread.h"\
+	"..\..\include\undomanager.h"\
 	"..\..\include\utility.h"\
 	"..\include\mutex.h"\
 	"..\include\semaphore.h"\
@@ -1208,6 +1112,7 @@ DEP_CPP_PLAYE=\
 	"..\..\include\registrar.h"\
 	"..\..\include\registry.h"\
 	"..\..\include\thread.h"\
+	"..\..\include\undomanager.h"\
 	"..\..\include\utility.h"\
 	"..\include\mutex.h"\
 	"..\include\semaphore.h"\
@@ -1329,8 +1234,10 @@ DEP_CPP_PLAYL=\
 	"..\..\include\registrar.h"\
 	"..\..\include\registry.h"\
 	"..\..\include\thread.h"\
+	"..\..\include\undomanager.h"\
 	"..\..\include\utility.h"\
 	"..\include\mutex.h"\
+	"..\include\semaphore.h"\
 	
 
 "$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"\
@@ -1359,8 +1266,10 @@ DEP_CPP_PLAYL=\
 	"..\..\include\registrar.h"\
 	"..\..\include\registry.h"\
 	"..\..\include\thread.h"\
+	"..\..\include\undomanager.h"\
 	"..\..\include\utility.h"\
 	"..\include\mutex.h"\
+	"..\include\semaphore.h"\
 	
 
 "$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"\
@@ -1481,15 +1390,33 @@ DEP_CPP_PROPI=\
 
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 Debug"
 
+DEP_CPP_PROPI=\
+	"..\..\..\config\config.h"\
+	"..\..\include\debug.h"\
+	"..\..\include\errors.h"\
+	"..\..\include\properties.h"\
+	"..\..\include\propimpl.h"\
+	"..\include\mutex.h"\
+	
 
-"$(INTDIR)\propimpl.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\propimpl.obj" : $(SOURCE) $(DEP_CPP_PROPI) "$(INTDIR)"\
+ "..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Debug"
 
+DEP_CPP_PROPI=\
+	"..\..\..\config\config.h"\
+	"..\..\include\debug.h"\
+	"..\..\include\errors.h"\
+	"..\..\include\properties.h"\
+	"..\..\include\propimpl.h"\
+	"..\include\mutex.h"\
+	
 
-"$(INTDIR)\propimpl.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\propimpl.obj" : $(SOURCE) $(DEP_CPP_PROPI) "$(INTDIR)"\
+ "..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1535,15 +1462,35 @@ NODEP_CPP_REGIS=\
 
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 Debug"
 
+DEP_CPP_REGIS=\
+	"..\..\..\config\config.h"\
+	"..\..\include\debug.h"\
+	"..\..\include\errors.h"\
+	"..\..\include\hashtable.h"\
+	"..\..\include\preferences.h"\
+	"..\..\include\registrar.h"\
+	"..\..\include\registry.h"\
+	
 
-"$(INTDIR)\registrar.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\registrar.obj" : $(SOURCE) $(DEP_CPP_REGIS) "$(INTDIR)"\
+ "..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Debug"
 
+DEP_CPP_REGIS=\
+	"..\..\..\config\config.h"\
+	"..\..\include\debug.h"\
+	"..\..\include\errors.h"\
+	"..\..\include\hashtable.h"\
+	"..\..\include\preferences.h"\
+	"..\..\include\registrar.h"\
+	"..\..\include\registry.h"\
+	
 
-"$(INTDIR)\registrar.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\registrar.obj" : $(SOURCE) $(DEP_CPP_REGIS) "$(INTDIR)"\
+ "..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1570,9 +1517,6 @@ NODEP_CPP_REGIS=\
 !ENDIF 
 
 SOURCE=..\..\src\registry.cpp
-
-!IF  "$(CFG)" == "fabaselib - Win32 Release"
-
 DEP_CPP_REGIST=\
 	"..\..\..\config\config.h"\
 	"..\..\include\registry.h"\
@@ -1582,39 +1526,8 @@ DEP_CPP_REGIST=\
  "..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "fabaselib - Win32 Debug"
-
-
-"$(INTDIR)\registry.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Debug"
-
-
-"$(INTDIR)\registry.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Release"
-
-DEP_CPP_REGIST=\
-	"..\..\..\config\config.h"\
-	"..\..\include\registry.h"\
-	
-
-"$(INTDIR)\registry.obj" : $(SOURCE) $(DEP_CPP_REGIST) "$(INTDIR)"\
- "..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 SOURCE=..\src\semaphore.cpp
-
-!IF  "$(CFG)" == "fabaselib - Win32 Release"
-
 DEP_CPP_SEMAP=\
 	"..\include\semaphore.h"\
 	
@@ -1622,32 +1535,6 @@ DEP_CPP_SEMAP=\
 "$(INTDIR)\semaphore.obj" : $(SOURCE) $(DEP_CPP_SEMAP) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "fabaselib - Win32 Debug"
-
-
-"$(INTDIR)\semaphore.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Debug"
-
-
-"$(INTDIR)\semaphore.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Release"
-
-DEP_CPP_SEMAP=\
-	"..\include\semaphore.h"\
-	
-
-"$(INTDIR)\semaphore.obj" : $(SOURCE) $(DEP_CPP_SEMAP) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 SOURCE=..\..\src\thread.cpp
 
@@ -1671,15 +1558,27 @@ NODEP_CPP_THREA=\
 
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 Debug"
 
+DEP_CPP_THREA=\
+	"..\..\..\config\config.h"\
+	"..\..\include\thread.h"\
+	"..\include\win32thread.h"\
+	
 
-"$(INTDIR)\thread.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"\
+ "..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Debug"
 
+DEP_CPP_THREA=\
+	"..\..\..\config\config.h"\
+	"..\..\include\thread.h"\
+	"..\include\win32thread.h"\
+	
 
-"$(INTDIR)\thread.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"\
+ "..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1704,6 +1603,9 @@ NODEP_CPP_THREA=\
 !ENDIF 
 
 SOURCE=..\..\src\undomanager.cpp
+
+!IF  "$(CFG)" == "fabaselib - Win32 Release"
+
 DEP_CPP_UNDOM=\
 	"..\..\..\config\config.h"\
 	"..\..\include\errors.h"\
@@ -1720,6 +1622,65 @@ DEP_CPP_UNDOM=\
  "..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+!ELSEIF  "$(CFG)" == "fabaselib - Win32 Debug"
+
+DEP_CPP_UNDOM=\
+	"..\..\..\config\config.h"\
+	"..\..\include\errors.h"\
+	"..\..\include\facontext.h"\
+	"..\..\include\log.h"\
+	"..\..\include\preferences.h"\
+	"..\..\include\thread.h"\
+	"..\..\include\undomanager.h"\
+	"..\include\mutex.h"\
+	"..\include\semaphore.h"\
+	
+
+"$(INTDIR)\undomanager.obj" : $(SOURCE) $(DEP_CPP_UNDOM) "$(INTDIR)"\
+ "..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Debug"
+
+DEP_CPP_UNDOM=\
+	"..\..\..\config\config.h"\
+	"..\..\include\errors.h"\
+	"..\..\include\facontext.h"\
+	"..\..\include\log.h"\
+	"..\..\include\preferences.h"\
+	"..\..\include\thread.h"\
+	"..\..\include\undomanager.h"\
+	"..\include\mutex.h"\
+	"..\include\semaphore.h"\
+	
+
+"$(INTDIR)\undomanager.obj" : $(SOURCE) $(DEP_CPP_UNDOM) "$(INTDIR)"\
+ "..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Release"
+
+DEP_CPP_UNDOM=\
+	"..\..\..\config\config.h"\
+	"..\..\include\errors.h"\
+	"..\..\include\facontext.h"\
+	"..\..\include\log.h"\
+	"..\..\include\preferences.h"\
+	"..\..\include\thread.h"\
+	"..\..\include\undomanager.h"\
+	"..\include\mutex.h"\
+	"..\include\semaphore.h"\
+	
+
+"$(INTDIR)\undomanager.obj" : $(SOURCE) $(DEP_CPP_UNDOM) "$(INTDIR)"\
+ "..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\..\src\updatemanager.cpp
 
@@ -1777,6 +1738,7 @@ DEP_CPP_UPDAT=\
 	"..\..\include\preferences.h"\
 	"..\..\include\registry.h"\
 	"..\..\include\thread.h"\
+	"..\..\include\undomanager.h"\
 	"..\..\include\updatemanager.h"\
 	"..\..\include\utility.h"\
 	"..\include\mutex.h"\
@@ -1808,6 +1770,7 @@ DEP_CPP_UPDAT=\
 	"..\..\include\preferences.h"\
 	"..\..\include\registry.h"\
 	"..\..\include\thread.h"\
+	"..\..\include\undomanager.h"\
 	"..\..\include\updatemanager.h"\
 	"..\..\include\utility.h"\
 	"..\include\mutex.h"\
@@ -1875,15 +1838,29 @@ DEP_CPP_UTILI=\
 
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 Debug"
 
+DEP_CPP_UTILI=\
+	"..\..\..\config\config.h"\
+	"..\..\include\errors.h"\
+	"..\..\include\preferences.h"\
+	"..\..\include\utility.h"\
+	
 
-"$(INTDIR)\utility.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\utility.obj" : $(SOURCE) $(DEP_CPP_UTILI) "$(INTDIR)"\
+ "..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Debug"
 
+DEP_CPP_UTILI=\
+	"..\..\..\config\config.h"\
+	"..\..\include\errors.h"\
+	"..\..\include\preferences.h"\
+	"..\..\include\utility.h"\
+	
 
-"$(INTDIR)\utility.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\utility.obj" : $(SOURCE) $(DEP_CPP_UTILI) "$(INTDIR)"\
+ "..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1923,15 +1900,29 @@ DEP_CPP_WIN32=\
 
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 Debug"
 
+DEP_CPP_WIN32=\
+	"..\..\..\config\config.h"\
+	"..\..\include\errors.h"\
+	"..\..\include\preferences.h"\
+	"..\include\win32prefs.h"\
+	
 
-"$(INTDIR)\win32prefs.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\win32prefs.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
+ "..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Debug"
 
+DEP_CPP_WIN32=\
+	"..\..\..\config\config.h"\
+	"..\..\include\errors.h"\
+	"..\..\include\preferences.h"\
+	"..\include\win32prefs.h"\
+	
 
-"$(INTDIR)\win32prefs.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\win32prefs.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
+ "..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1968,15 +1959,27 @@ DEP_CPP_WIN32T=\
 
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 Debug"
 
+DEP_CPP_WIN32T=\
+	"..\..\..\config\config.h"\
+	"..\..\include\thread.h"\
+	"..\include\win32thread.h"\
+	
 
-"$(INTDIR)\win32thread.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32T) "$(INTDIR)"\
+ "..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Debug"
 
+DEP_CPP_WIN32T=\
+	"..\..\..\config\config.h"\
+	"..\..\include\thread.h"\
+	"..\include\win32thread.h"\
+	
 
-"$(INTDIR)\win32thread.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32T) "$(INTDIR)"\
+ "..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2051,6 +2054,7 @@ DEP_CPP_WIN32U=\
 	"..\..\include\preferences.h"\
 	"..\..\include\registry.h"\
 	"..\..\include\thread.h"\
+	"..\..\include\undomanager.h"\
 	"..\..\include\updatemanager.h"\
 	"..\..\include\utility.h"\
 	"..\include\mutex.h"\
@@ -2083,6 +2087,7 @@ DEP_CPP_WIN32U=\
 	"..\..\include\preferences.h"\
 	"..\..\include\registry.h"\
 	"..\..\include\thread.h"\
+	"..\..\include\undomanager.h"\
 	"..\..\include\updatemanager.h"\
 	"..\..\include\utility.h"\
 	"..\include\mutex.h"\

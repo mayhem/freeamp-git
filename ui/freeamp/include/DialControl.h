@@ -30,7 +30,8 @@ class DialControl : public Control
 {
     public:
 
-               DialControl(Window *pParent, string &oName);
+               DialControl(Window *pParent, string &oName,
+			               int iNumFrames, int iNumPixelsPerFrame);
       virtual ~DialControl(void);
 
       void Transition(ControlTransitionEnum eTrans, Pos *pMousePos);
@@ -38,6 +39,9 @@ class DialControl : public Control
 
     private:
 
+      int32    m_iCurrentFrame, m_iNumFrames, m_iNumPixelsPerFrame;
+	  int32    m_iLastPos;
+	  Pos      m_oOrigin;
 };
 
 #endif

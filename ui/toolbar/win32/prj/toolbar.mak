@@ -137,8 +137,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "fabaselib - Win32 Release" ".\toolbar.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                      ..\..\..\..\base\win32\prj\plugins
-	copy toolbar.ui                                        ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                       ..\..\..\..\base\win32\prj\plugins
+	copy toolbar.ui                                         ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "toolbar - Win32 Debug"
@@ -249,8 +249,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "fabaselib - Win32 Debug" ".\toolbar.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                      ..\..\..\..\base\win32\prj\plugins
-	copy toolbar.ui                                        ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                       ..\..\..\..\base\win32\prj\plugins
+	copy toolbar.ui                                         ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "toolbar - Win32 NASM Debug"
@@ -361,8 +361,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Debug" ".\toolbar.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                      ..\..\..\..\base\win32\prj\plugins
-	copy toolbar.ui                                        ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                       ..\..\..\..\base\win32\prj\plugins
+	copy toolbar.ui                                         ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "toolbar - Win32 NASM Release"
@@ -470,8 +470,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Release" ".\toolbar.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                      ..\..\..\..\base\win32\prj\plugins
-	copy toolbar.ui                                        ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                       ..\..\..\..\base\win32\prj\plugins
+	copy toolbar.ui                                         ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 
@@ -509,11 +509,13 @@ DEP_CPP_TOOLB=\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\undomanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\include\ui.h"\
-	"..\toolbar.h"\
+	"..\Toolbar.h"\
 	
 
 "$(INTDIR)\Toolbar.obj" : $(SOURCE) $(DEP_CPP_TOOLB) "$(INTDIR)"
@@ -523,6 +525,7 @@ DEP_CPP_TOOLB=\
 !ELSEIF  "$(CFG)" == "toolbar - Win32 Debug"
 
 DEP_CPP_TOOLB=\
+	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
@@ -537,11 +540,13 @@ DEP_CPP_TOOLB=\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\undomanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\include\ui.h"\
-	"..\toolbar.h"\
+	"..\Toolbar.h"\
 	
 
 "$(INTDIR)\Toolbar.obj" : $(SOURCE) $(DEP_CPP_TOOLB) "$(INTDIR)"
@@ -551,6 +556,7 @@ DEP_CPP_TOOLB=\
 !ELSEIF  "$(CFG)" == "toolbar - Win32 NASM Debug"
 
 DEP_CPP_TOOLB=\
+	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
@@ -565,11 +571,13 @@ DEP_CPP_TOOLB=\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\undomanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\include\ui.h"\
-	"..\toolbar.h"\
+	"..\Toolbar.h"\
 	
 
 "$(INTDIR)\Toolbar.obj" : $(SOURCE) $(DEP_CPP_TOOLB) "$(INTDIR)"
@@ -594,11 +602,13 @@ DEP_CPP_TOOLB=\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\undomanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\include\ui.h"\
-	"..\toolbar.h"\
+	"..\Toolbar.h"\
 	
 
 "$(INTDIR)\Toolbar.obj" : $(SOURCE) $(DEP_CPP_TOOLB) "$(INTDIR)"

@@ -270,7 +270,7 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
          bEnable = true;
          m_pWindow->ControlEnable(string("Pause"), true, bEnable);
          
-         m_bPlayShown = true;
+         m_bPlayShown = false;
          break;
       }   
       case INFO_Paused:
@@ -284,7 +284,7 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
          m_pWindow->ControlEnable(string("Play"), true, bEnable);
          bEnable = false;
          m_pWindow->ControlEnable(string("Pause"), true, bEnable);
-         m_bPlayShown = false;
+         m_bPlayShown = true;
          m_pWindow->ControlStringValue("BufferInfo", true, oEmpty);
          m_oStreamInfo = "";
          m_pWindow->ControlStringValue("StreamInfo", true, oEmpty);

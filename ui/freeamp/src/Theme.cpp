@@ -603,9 +603,23 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
            return kError_ParseError;
        }        
 
+	   if (oAttrMap.find("NumFrames") == oAttrMap.end())
+       {
+           m_oLastError = string("the <MultiStateControl> tag needs a NumFrames attribute");
+           return kError_ParseError;
+       }        
+
+	   if (oAttrMap.find("PixelsPerFrame") == oAttrMap.end())
+       {
+           m_oLastError = string("the <MultiStateControl> tag needs a PixelsPerFrame attribute");
+           return kError_ParseError;
+       }        
+
        m_eCurrentControl = eDialControl;
        m_pCurrentControl = new DialControl(m_pCurrentWindow, 
-                                           oAttrMap["Name"]);
+                                           oAttrMap["Name"],
+                                           atoi(oAttrMap["NumFrames"].c_str()),
+                                           atoi(oAttrMap["PixelsPerFrame"].c_str()));
        return kError_NoErr;
     }
 

@@ -118,12 +118,10 @@ BSC32_SBRS= \
 LINK32=link.exe
 LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
  comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
- odbc32.lib odbccp32.lib wsock32.lib  fabaselib.lib wsock32.lib kernel32.lib\
- user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib\
- ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo\
- /subsystem:windows /dll /incremental:no /pdb:"$(OUTDIR)\fileinput.pdb"\
- /machine:I386 /def:".\fileinput.def" /out:"fileinput.pmi"\
- /implib:"$(OUTDIR)\fileinput.lib" /libpath:"..\..\..\..\base\win32" 
+ odbc32.lib odbccp32.lib wsock32.lib /nologo /subsystem:windows /dll\
+ /incremental:no /pdb:"$(OUTDIR)\fileinput.pdb" /machine:I386\
+ /def:".\fileinput.def" /out:"fileinput.pmi" /implib:"$(OUTDIR)\fileinput.lib"\
+ /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
 	".\fileinput.def"
 LINK32_OBJS= \
@@ -234,15 +232,12 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\fileinput.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
- comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
- odbc32.lib odbccp32.lib wsock32.lib  fabaselib.lib wsock32.lib kernel32.lib\
- user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib\
- ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo\
- /subsystem:windows /dll /incremental:yes /pdb:"$(OUTDIR)\fileinput.pdb" /debug\
- /machine:I386 /def:".\fileinput.def" /out:"fileinput.pmi"\
- /implib:"$(OUTDIR)\fileinput.lib" /pdbtype:sept\
- /libpath:"..\..\..\..\base\win32" 
+LINK32_FLAGS=fabaselib.lib wsock32.lib kernel32.lib user32.lib gdi32.lib\
+ winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
+ uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll\
+ /incremental:yes /pdb:"$(OUTDIR)\fileinput.pdb" /debug /machine:I386\
+ /def:".\fileinput.def" /out:"fileinput.pmi" /implib:"$(OUTDIR)\fileinput.lib"\
+ /pdbtype:sept /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
 	".\fileinput.def"
 LINK32_OBJS= \
@@ -353,15 +348,12 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\fileinput.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
- comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
- odbc32.lib odbccp32.lib wsock32.lib  fabaselib.lib wsock32.lib kernel32.lib\
- user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib\
- ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo\
- /subsystem:windows /dll /incremental:yes /pdb:"$(OUTDIR)\fileinput.pdb" /debug\
- /machine:I386 /def:".\fileinput.def" /out:"fileinput.pmi"\
- /implib:"$(OUTDIR)\fileinput.lib" /pdbtype:sept\
- /libpath:"..\..\..\..\base\win32" 
+LINK32_FLAGS=fabaselib.lib wsock32.lib kernel32.lib user32.lib gdi32.lib\
+ winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
+ uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll\
+ /incremental:yes /pdb:"$(OUTDIR)\fileinput.pdb" /debug /machine:I386\
+ /def:".\fileinput.def" /out:"fileinput.pmi" /implib:"$(OUTDIR)\fileinput.lib"\
+ /pdbtype:sept /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
 	".\fileinput.def"
 LINK32_OBJS= \
@@ -469,14 +461,12 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\fileinput.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
- comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
- odbc32.lib odbccp32.lib wsock32.lib  fabaselib.lib wsock32.lib kernel32.lib\
- user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib\
- ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo\
- /subsystem:windows /dll /incremental:no /pdb:"$(OUTDIR)\fileinput.pdb"\
- /machine:I386 /def:".\fileinput.def" /out:"fileinput.pmi"\
- /implib:"$(OUTDIR)\fileinput.lib" /libpath:"..\..\..\..\base\win32" 
+LINK32_FLAGS=fabaselib.lib wsock32.lib kernel32.lib user32.lib gdi32.lib\
+ winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
+ uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll\
+ /incremental:no /pdb:"$(OUTDIR)\fileinput.pdb" /machine:I386\
+ /def:".\fileinput.def" /out:"fileinput.pmi" /implib:"$(OUTDIR)\fileinput.lib"\
+ /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
 	".\fileinput.def"
 LINK32_OBJS= \
@@ -652,6 +642,7 @@ DEP_CPP_LOCAL=\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\undomanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
@@ -685,6 +676,7 @@ DEP_CPP_LOCAL=\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\undomanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
@@ -718,6 +710,7 @@ DEP_CPP_LOCAL=\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\undomanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
@@ -751,6 +744,7 @@ DEP_CPP_LOCAL=\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\undomanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
@@ -789,6 +783,7 @@ DEP_CPP_PIPEL=\
 	"..\..\..\..\base\include\queue.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\undomanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
@@ -826,6 +821,7 @@ DEP_CPP_PIPEL=\
 	"..\..\..\..\base\include\queue.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\undomanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
@@ -863,6 +859,7 @@ DEP_CPP_PIPEL=\
 	"..\..\..\..\base\include\queue.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\undomanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
@@ -900,6 +897,7 @@ DEP_CPP_PIPEL=\
 	"..\..\..\..\base\include\queue.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\undomanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
@@ -939,6 +937,7 @@ DEP_CPP_PMI_C=\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\undomanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
@@ -970,6 +969,7 @@ DEP_CPP_PMI_C=\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\undomanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
@@ -1001,6 +1001,7 @@ DEP_CPP_PMI_C=\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\undomanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
@@ -1032,6 +1033,7 @@ DEP_CPP_PMI_C=\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\undomanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
