@@ -594,8 +594,10 @@ static BOOL CALLBACK IntroWizardSearch( HWND hwnd,
                     if(allDrives)
                     {
                         DWORD  dwDrives;
-                        char   *szDrive = "X:\\";
-                        int32  i, ret;
+                        char   *szDrive = new char[5];
+						memset(szDrive, 0x00, sizeof(char)*5);
+                        szDrive[1] = ':';
+						int32  i, ret;
 
                         dwDrives = GetLogicalDrives();
                         for(i = 0; i < sizeof(DWORD) * 8; i++)
@@ -610,6 +612,7 @@ static BOOL CALLBACK IntroWizardSearch( HWND hwnd,
                               }
                            }   
                         }
+						delete [] szDrive;
                     }
                     else
                     {
