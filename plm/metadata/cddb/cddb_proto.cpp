@@ -117,7 +117,6 @@ int CDDB::cddb_genre_value(char *genre)
 int CDDB::cddb_query(int sock, int mode, struct cddb_query_t *query, ...) 
 {
    int index, slashed = 0, token[3];
-   struct disc_info disc = m_discinfo;
    char *outbuffer, *outtemp, *inbuffer, *origchunk, *http_string;
    va_list arglist;
 
@@ -133,19 +132,19 @@ int CDDB::cddb_query(int sock, int mode, struct cddb_query_t *query, ...)
 
       snprintf(outbuffer, 1024, "%d", m_total_tracks);
       for(index = 0; index < m_total_tracks; index++) {
-         snprintf(outtemp, 1024, "%s+%d", outbuffer, (disc.disc_track[index].track_pos.minutes * 60 + disc.disc_track[index].track_pos.seconds) * 75 + disc.disc_track[index].track_pos.frames);
+         snprintf(outtemp, 1024, "%s+%d", outbuffer, (m_discinfo->disc_track[index].track_pos.minutes * 60 + m_discinfo->disc_track[index].track_pos.seconds) * 75 + m_discinfo->disc_track[index].track_pos.frames);
          strncpy(outbuffer, outtemp, 1024);
       }
-      snprintf(outtemp, 1024, "cddb+query+%08lx+%s+%d", m_discid, outbuffer, disc.disc_length.minutes * 60 + disc.disc_length.seconds);
+      snprintf(outtemp, 1024, "cddb+query+%08lx+%s+%d", m_discid, outbuffer, m_discinfo->disc_length.minutes * 60 + m_discinfo->disc_length.seconds);
       cddb_generate_http_request(outbuffer, outtemp, http_string, 1024);
    } else {
       snprintf(outbuffer, 1024, "%d", m_total_tracks);
       for(index = 0; index < m_total_tracks; index++) {
-         snprintf(outtemp, 1024, "%s %d", outbuffer, (disc.disc_track[index].track_pos.minutes * 60 + disc.disc_track[index].track_pos.seconds) * 75 + disc.disc_track[index].track_pos.frames);
+         snprintf(outtemp, 1024, "%s %d", outbuffer, (m_discinfo->disc_track[index].track_pos.minutes * 60 + m_discinfo->disc_track[index].track_pos.seconds) * 75 + m_discinfo->disc_track[index].track_pos.frames);
          strncpy(outbuffer, outtemp, 1024);
       }
       strncpy(outtemp, outbuffer, 1024);
-      snprintf(outbuffer, 1024, "cddb query %08lx %s %d\n", m_discid, outtemp, disc.disc_length.minutes * 60 + disc.disc_length.seconds);
+      snprintf(outbuffer, 1024, "cddb query %08lx %s %d\n", m_discid, outtemp, m_discinfo->disc_length.minutes * 60 + m_discinfo->disc_length.seconds);
    }
 
    delete outtemp;
@@ -455,7 +454,7 @@ int CDDB::cddb_connect(struct cddb_server *server)
 }
 
 int CDDB::cddb_connect_server(struct cddb_host host, struct cddb_server *proxy,
-                              struct cddb_hello hello, ...)
+                              struct cddb_hello *hello, ...)
 {
    int sock, token[3], http_string_len;
    char *outbuffer, *http_string;
@@ -476,9 +475,9 @@ int CDDB::cddb_connect_server(struct cddb_host host, struct cddb_server *proxy,
        http_string = va_arg(arglist, char *);
        http_string_len = va_arg(arglist, int);
        if (proxy != NULL)
-           snprintf(http_string, http_string_len, "GET http://%s:%d/%s?hello=anonymous+anonymous+%s+%s&proto=%d HTTP/1.0\n\n", host.host_server.server_name, host.host_server.server_port, host.host_addressing, hello.hello_program, hello.hello_version, CDDB_PROTOCOL_LEVEL);
+           snprintf(http_string, http_string_len, "GET http://%s:%d/%s?hello=anonymous+anonymous+%s+%s&proto=%d HTTP/1.0\n\n", host.host_server.server_name, host.host_server.server_port, host.host_addressing, hello->hello_program, hello->hello_version, CDDB_PROTOCOL_LEVEL);
        else
-           snprintf(http_string, http_string_len, "GET /%s?hello=anonymous+anonymous+%s+%s&proto=%d HTTP/1.0\n\n", host.host_addressing, hello.hello_program, hello.hello_version, CDDB_PROTOCOL_LEVEL);
+           snprintf(http_string, http_string_len, "GET /%s?hello=anonymous+anonymous+%s+%s&proto=%d HTTP/1.0\n\n", host.host_addressing, hello->hello_program, hello->hello_version, CDDB_PROTOCOL_LEVEL);
    } 
    else {
        if (cddb_read_token(sock, token) < 0) {
@@ -493,34 +492,34 @@ int CDDB::cddb_connect_server(struct cddb_host host, struct cddb_server *proxy,
 
        outbuffer = new char[256];
 
-       snprintf(outbuffer, 256, "cddb hello anonymous anonymous %s %s\n", hello.hello_program, hello.hello_version);
+       snprintf(outbuffer, 256, "cddb hello anonymous anonymous %s %s\n", hello->hello_program, hello->hello_version);
 
        if (send(sock, outbuffer, strlen(outbuffer), 0) < 0) {
-           delete outbuffer;
+           delete [] outbuffer;
            va_end(arglist);
            return -1;
        }
 
        if (cddb_read_token(sock, token) < 0) {
-           delete outbuffer;
+           delete [] outbuffer;
            va_end(arglist);
            return -1;
        }
 
        if (token[0] != 2) {
-           delete outbuffer;
+           delete [] outbuffer;
            va_end(arglist);
            return -1;
        }
 
        snprintf(outbuffer, 256, "proto %d\n", CDDB_PROTOCOL_LEVEL);
        if (send(sock, outbuffer, strlen(outbuffer), 0) < 0) {
-           delete outbuffer;
+           delete [] outbuffer;
            va_end(arglist);
            return -1;
        }
 
-       delete outbuffer;
+       delete [] outbuffer;
 
        if (cddb_read_token(sock, token) < 0) {
            va_end(arglist);
@@ -620,11 +619,11 @@ int CDDB::cddb_read_line(int sock, char *inbuffer, int len)
     return index;
 }
 
-int CDDB::cddb_vread(int sock, int mode, struct cddb_entry *entry, 
-                     struct disc_data *data, va_list arglist)
+int CDDB::cddb_read(int sock, int mode, struct cddb_entry *entry, 
+                    struct disc_data *data, char *http_string)
 {
    int index, token[3];
-   char *outbuffer, *proc, *http_string;
+   char *outbuffer, *proc;
    struct __unprocessed_disc_data indata;
 
    indata.data_id = m_discid;
@@ -640,7 +639,6 @@ int CDDB::cddb_vread(int sock, int mode, struct cddb_entry *entry,
    }
 
    if (mode == CDDB_MODE_HTTP) {
-       http_string = va_arg(arglist, char *);
        snprintf(proc, 512, "cddb+read+%s+%08lx", 
                 cddb_genre(entry->entry_genre), entry->entry_id);
        cddb_generate_http_request(outbuffer, proc, http_string, 512);
@@ -673,19 +671,6 @@ int CDDB::cddb_vread(int sock, int mode, struct cddb_entry *entry,
    return 0;
 }
 
-int CDDB::cddb_read(int sock, int mode, struct cddb_entry entry, 
-                    struct disc_data *data, ...)
-{
-    int ret;
-    va_list arglist;
-
-    va_start(arglist, data);
-    ret = cddb_vread(sock, mode, &entry, data, arglist);
-    va_end(arglist);
-
-    return ret;
-}
-
 int CDDB::cddb_quit(int sock)
 {
     char outbuffer[8];
@@ -703,104 +688,131 @@ int CDDB::cddb_read_data(struct disc_data *data)
 {
    int sock = -1, index;
    char *http_string;
-   struct cddb_entry entry;
-   struct cddb_hello hello;
-   struct cddb_query_t query;
-   struct cddb_conf conf;
+   struct cddb_entry *entry;
+   struct cddb_hello *hello;
+   struct cddb_query_t *query;
+   struct cddb_conf *conf;
    struct cddb_server *proxy_ptr;
-   struct cddb_serverlist list;
+   struct cddb_serverlist *list;
 
    http_string = new char[512];
    proxy_ptr = new struct cddb_server;
+   conf = new struct cddb_conf;
+   list = new struct cddb_serverlist;
    
-   cddb_read_serverlist(&conf, &list, proxy_ptr);
-   if (!conf.conf_access) {
+   cddb_read_serverlist(conf, list, proxy_ptr);
+   if (!conf->conf_access) {
        delete [] http_string;
        delete proxy_ptr;
+	   delete list;
+	   delete conf;
        return -1;
    }
-   if (!conf.conf_proxy) {
+   if (!conf->conf_proxy) {
        delete proxy_ptr;
        proxy_ptr = NULL;
    }
 
-   if (list.list_len < 1) {
+   if (list->list_len < 1) {
        delete [] http_string;
+	   delete conf;
+	   delete list;
        return -1;
    }
 
-   strncpy(hello.hello_program, "libcdaudio", 256);
-   strncpy(hello.hello_version, "0.99.4", 256);
+   hello = new struct cddb_hello;
+   strncpy(hello->hello_program, "libcdaudio", 256);
+   strncpy(hello->hello_version, "0.99.4", 256);
 
    index = 0;
 
    /* Connect to a server */
    do {
-      switch(list.list_host[index].host_protocol) {
+      switch(list->list_host[index].host_protocol) {
           case CDDB_MODE_CDDBP:
-              sock = cddb_connect_server(list.list_host[index++], proxy_ptr, 
+              sock = cddb_connect_server(list->list_host[index++], proxy_ptr, 
                                          hello);
               break;
           case CDDB_MODE_HTTP:
-              sock = cddb_connect_server(list.list_host[index++], proxy_ptr, 
+              sock = cddb_connect_server(list->list_host[index++], proxy_ptr, 
                                          hello, http_string, 512);
               break;
       }
-   } while (index < list.list_len && sock == -1);
+   } while (index < list->list_len && sock == -1);
 
    if (sock < 0) {
-       if (conf.conf_proxy)
+       if (conf->conf_proxy)
            delete proxy_ptr;
        delete [] http_string;
+	   delete list;
+	   delete conf;
+	   delete hello;
        return -1;
    }
     
    index--;
 
+   query = new struct cddb_query_t;
+
    /* CDDB Query, not nessecary for CD Index operations */
-   switch (list.list_host[index].host_protocol) {
+   switch (list->list_host[index].host_protocol) {
        case CDDB_MODE_CDDBP: {
-           if (cddb_query(sock, CDDB_MODE_CDDBP, &query) < 0) {
-              if (conf.conf_proxy) 
+           if (cddb_query(sock, CDDB_MODE_CDDBP, query) < 0) {
+              if (conf->conf_proxy) 
                   delete proxy_ptr;
               delete [] http_string;
               return -1;
            } 
            break; }
        case CDDB_MODE_HTTP: {
-           if (cddb_query(sock, CDDB_MODE_HTTP, &query, http_string) < 0) {
-              if (conf.conf_proxy) 
+           if (cddb_query(sock, CDDB_MODE_HTTP, query, http_string) < 0) {
+              if (conf->conf_proxy) 
                   delete proxy_ptr;
               delete http_string;
+			  delete list;
+			  delete conf;
+			  delete hello;
+			  delete query;
               return -1;
            }
            shutdown(sock, 2);
            closesocket(sock);
 
-           if ((sock = cddb_connect_server(list.list_host[index], proxy_ptr, 
+           if ((sock = cddb_connect_server(list->list_host[index], proxy_ptr, 
                                            hello, http_string, 512)) < 0) {
-               if (conf.conf_proxy) 
+               if (conf->conf_proxy) 
                    delete proxy_ptr;
                delete http_string;
+			   delete list;
+			   delete conf;
+			   delete hello;
+			   delete query;
                return -1;
             }
             break; }
    }
 
-   if (conf.conf_proxy) 
+   if (conf->conf_proxy) 
        delete proxy_ptr;
    
    /* Since this is an automated operation, we'll assume inexact matches are
       correct. */
 
-   entry.entry_id = query.query_list[0].list_id;
-   entry.entry_genre = query.query_list[0].list_genre;
+   entry = new struct cddb_entry;
+
+   entry->entry_id = query->query_list[0].list_id;
+   entry->entry_genre = query->query_list[0].list_genre;
 
    /* Read operation */
-   switch (list.list_host[index].host_protocol) {
+   switch (list->list_host[index].host_protocol) {
        case CDDB_MODE_CDDBP: {
            if (cddb_read(sock, CDDB_MODE_CDDBP, entry, data) < 0) {
                delete http_string;
+			   delete list;
+			   delete conf;
+			   delete hello;
+			   delete entry;
+			   delete query;
                return -1;
            }
 
@@ -809,6 +821,11 @@ int CDDB::cddb_read_data(struct disc_data *data)
        case CDDB_MODE_HTTP: {
            if (cddb_read(sock, CDDB_MODE_HTTP, entry, data, http_string) < 0) {
                delete http_string;
+			   delete list;
+			   delete conf;
+			   delete hello;
+			   delete entry;
+			   delete query;
                return -1;
            }
 
@@ -817,7 +834,12 @@ int CDDB::cddb_read_data(struct disc_data *data)
            break; }
    }
 
-   delete http_string;
+   delete [] http_string;
+   delete list;
+   delete conf;
+   delete hello;
+   delete entry;
+   delete query;
    return 0;
 }
 
@@ -954,7 +976,6 @@ int CDDB::cddb_read_disc_data(struct disc_data *outdata)
 
 int CDDB::cddb_write_data(struct disc_data *indata)
 {
-   struct disc_info disc = m_discinfo;
    struct __unprocessed_disc_data *data;
    int index, tracks;
 
@@ -980,12 +1001,12 @@ int CDDB::cddb_write_data(struct disc_data *indata)
    snprintf(temps, 1024, "# xmcd CD database file generated by %s %s\n", "libcdaudio", "0.99.4");
    cdata.append(temps);
    cdata.append("# \n# Track frame offsets:\n");
-   for (index = 0; index < disc.disc_total_tracks; index++) {
-       snprintf(temps, 1024, "#       %d\n", (disc.disc_track[index].track_pos.minutes * 60 + disc.disc_track[index].track_pos.seconds) * 75 + disc.disc_track[index].track_pos.frames);
+   for (index = 0; index < m_discinfo->disc_total_tracks; index++) {
+       snprintf(temps, 1024, "#       %d\n", (m_discinfo->disc_track[index].track_pos.minutes * 60 + m_discinfo->disc_track[index].track_pos.seconds) * 75 + m_discinfo->disc_track[index].track_pos.frames);
        cdata.append(temps);
    }
    cdata.append("# \n");
-   snprintf(temps, 1024, "# Disc length: %d seconds\n", disc.disc_length.minutes * 60 + disc.disc_length.seconds);
+   snprintf(temps, 1024, "# Disc length: %d seconds\n", m_discinfo->disc_length.minutes * 60 + m_discinfo->disc_length.seconds);
    cdata.append(temps);
    cdata.append("# \n");
    snprintf(temps, 1024, "# Revision: %d\n", data->data_revision);
@@ -999,7 +1020,7 @@ int CDDB::cddb_write_data(struct disc_data *indata)
        snprintf(temps, 1024, "DTITLE=%s\n", data->data_title[index]);
        cdata.append(temps);
    }
-   for(tracks = 0; tracks < disc.disc_total_tracks; tracks++) {
+   for(tracks = 0; tracks < m_discinfo->disc_total_tracks; tracks++) {
       for(index = 0; index < data->data_track[tracks].track_name_index; index++)
       {
         snprintf(temps, 1024, "TTITLE%d=%s\n", tracks, data->data_track[tracks].track_name[index]);
@@ -1016,7 +1037,7 @@ int CDDB::cddb_write_data(struct disc_data *indata)
       }
    }
 
-   for(tracks = 0; tracks < disc.disc_total_tracks; tracks++) {
+   for(tracks = 0; tracks < m_discinfo->disc_total_tracks; tracks++) {
       if(data->data_track[tracks].track_extended_index == 0) {
         snprintf(temps, 1024, "EXTT%d=\n", tracks);
         cdata.append(temps);

@@ -35,7 +35,11 @@ ____________________________________________________________________________*/
 #include "facontext.h"
 #include "log.h"
 
+#include <windows.h>
+
 #define DB printf("%s:%d\n", __FILE__, __LINE__);
+
+static Mutex m_locker;
 
 extern    "C"
 {
@@ -53,6 +57,7 @@ CDPMO::CDPMO(FAContext *context) :
    m_pBufferThread = NULL;
    m_track = -1;
    m_cdDesc = "";
+   cddbid = 0;
    sentData = false;
    trackDone = false;
 
@@ -90,7 +95,9 @@ void CDPMO::SetVolume(int32 v)
         vol.vol_front.left = vol.vol_front.right = v;
         vol.vol_back.left = vol.vol_back.right = v;
 
+		m_locker.Acquire();
         cd_set_volume(m_cdDesc, vol);
+		m_locker.Release();
     }
 }
 
@@ -101,7 +108,9 @@ int32 CDPMO::GetVolume()
     {
         struct disc_volume vol;
       
+		m_locker.Acquire();
         cd_get_volume(m_cdDesc, &vol);
+		m_locker.Release();
         volume = (vol.vol_front.left + vol.vol_front.right) / 2; 
 
         volume = (int32)(((double)volume / (double)255) * 100);
@@ -136,7 +145,9 @@ Error CDPMO::SetTo(const char *url)
        return kError_InvalidTrack;
    }
 
+   m_locker.Acquire();
    cd_play_track(m_cdDesc, m_track, m_track);
+   m_locker.Release();
 
    m_properlyInitialized = true;
    return kError_NoErr;
@@ -150,12 +161,15 @@ Error CDPMO::Init(OutputInfo *info)
    int initreturn;
    uint32 tracks = 0;
 
+   m_locker.Acquire();
+
    cddbid = 0;
    cdindexid = "";
 
    if (IsError(m_pContext->prefs->GetCDDevicePath(device, &len))) {
        CDInfoEvent *cie = new CDInfoEvent(tracks, cddbid, (char *)cdindexid.c_str());
        m_pTarget->AcceptEvent(cie);
+	   m_locker.Release();
        return retvalue;
    }
 
@@ -163,6 +177,9 @@ Error CDPMO::Init(OutputInfo *info)
    if (m_cdDesc == "") 
 	   m_cdDesc = "cdaudio";
    
+   sprintf(device, "%d", GetCurrentThreadId());
+   m_cdDesc += device;
+
    if ((initreturn = cd_init_device(m_cdDesc)) != 0) {
        if (info) {
 		   char errormsg[256];
@@ -171,6 +188,7 @@ Error CDPMO::Init(OutputInfo *info)
 	   }
        CDInfoEvent *cie = new CDInfoEvent(tracks, cddbid, (char *)cdindexid.c_str());
        m_pTarget->AcceptEvent(cie);
+	   m_locker.Release();
        return retvalue;
    }
 
@@ -181,6 +199,7 @@ Error CDPMO::Init(OutputInfo *info)
            ReportError("There is no disc in the CD-ROM drive.");
        CDInfoEvent *cie = new CDInfoEvent(tracks, cddbid, (char *)cdindexid.c_str());
        m_pTarget->AcceptEvent(cie);
+	   m_locker.Release();
        return retvalue;
    }
    
@@ -189,23 +208,28 @@ Error CDPMO::Init(OutputInfo *info)
            ReportError("There is no disc in the CD-ROM drive.");
        CDInfoEvent *cie = new CDInfoEvent(tracks, cddbid, (char *)cdindexid.c_str());
        m_pTarget->AcceptEvent(cie);
+	   m_locker.Release();
        return retvalue;
    }
 
    retvalue = kError_NoErr;
 
+   memset(&dinfo, 0, sizeof(struct disc_info));
+
    cd_stat(m_cdDesc, &dinfo);
+   m_locker.Release();
 
    tracks = dinfo.disc_total_tracks;
-   cddbid = cddb_direct_discid(dinfo);
+   cddbid = cddb_direct_discid(&dinfo);
 
    char *cdindex = new char[256];
-   cdindex_direct_discid(dinfo, cdindex, 256);
+   cdindex_direct_discid(&dinfo, cdindex, 256);
    cdindexid = cdindex;
    delete [] cdindex;
 
    CDInfoEvent *cie = new CDInfoEvent(tracks, cddbid, (char *)cdindexid.c_str());
    m_pTarget->AcceptEvent(cie);
+
    return retvalue;
 }
 
@@ -219,9 +243,9 @@ char *CDPMO::GetcdindexDiscID(void)
     return (char *)cdindexid.c_str();
 }
 
-struct disc_info CDPMO::GetDiscInfo(void)
+struct disc_info *CDPMO::GetDiscInfo(void)
 {
-    return dinfo;
+    return &dinfo;
 }
 
 Error CDPMO::Reset(bool user_stop)
@@ -229,14 +253,10 @@ Error CDPMO::Reset(bool user_stop)
    if (m_cdDesc == "")
       return kError_NoErr;
 
-   if (user_stop)
-   {
-       cd_stop(m_cdDesc);
-   }
-   else
-   {
-       cd_stop(m_cdDesc);
-   }
+   m_locker.Acquire();
+   cd_stop(m_cdDesc);
+   m_locker.Release();
+
    return kError_NoErr;
 }
 
@@ -245,7 +265,9 @@ void CDPMO::Pause(void)
     if (m_cdDesc == "")
         return;
 
+	m_locker.Acquire();
     cd_pause(m_cdDesc);
+	m_locker.Release();
 }
 
 void CDPMO::Resume(void)
@@ -253,7 +275,9 @@ void CDPMO::Resume(void)
     if (m_cdDesc == "")
         return;
 
+	m_locker.Acquire();
     cd_resume(m_cdDesc);
+	m_locker.Release();
 }
 
 Error CDPMO::ChangePosition(int32 newposition)
@@ -261,7 +285,9 @@ Error CDPMO::ChangePosition(int32 newposition)
     if (m_cdDesc == "" || m_track < 0)
         return kError_NoErr;
 
+	m_locker.Acquire();
     cd_play_track_pos(m_cdDesc, m_track, m_track, newposition);
+    m_locker.Release();
 
     return kError_NoErr;
 }
@@ -274,17 +300,21 @@ void CDPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
    struct disc_info disc;
    struct disc_timeval val;
 
+   m_locker.Acquire();
    if (cd_stat(m_cdDesc, &disc, false) < 0) {
        trackDone = true;
+	   m_locker.Release();
        return;
    }
  
    if (!disc.disc_present) {
        trackDone = true;
+	   m_locker.Release();
        return;
    }
 
    cd_stat(m_cdDesc, &disc);
+   m_locker.Release();
 
    if (!sentData) {
        val = disc.disc_track[m_track - 1].track_length;

@@ -127,8 +127,8 @@ int cd_pause(string cd_desc);
 int cd_resume(string cd_desc);
 int cd_set_volume(string cd_desc, struct disc_volume vol);
 int cd_get_volume(string cd_desc, struct disc_volume *vol);
-long unsigned cddb_direct_discid(struct disc_info disc);
+long unsigned cddb_direct_discid(struct disc_info *disc);
 long cddb_discid(string cd_desc);
-int cdindex_direct_discid(struct disc_info disc, char *discid, int len);
+int cdindex_direct_discid(struct disc_info *disc, char *discid, int len);
 int cdindex_discid(string cd_desc, char *discid, int len);
 #endif

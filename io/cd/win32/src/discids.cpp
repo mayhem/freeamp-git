@@ -28,6 +28,8 @@ ____________________________________________________________________________*/
 #include <string.h>
 #include <stdarg.h>
 
+#include <windows.h>
+
 #ifndef HAVE_SNPRINTF
 /* The system doesn't have a snprintf() function.  Punt, and map it to
    sprintf(). */
@@ -60,16 +62,16 @@ cddb_sum(long val)
 
 /* Produce CDDB ID for the CD in the device referred to by cd_desc */
 unsigned long
-cddb_direct_discid(struct disc_info disc)
+cddb_direct_discid(struct disc_info *disc)
 {
    int index, tracksum = 0, discid;
 
-   for(index = 0; index < disc.disc_total_tracks; index++)
-     tracksum += cddb_sum(disc.disc_track[index].track_pos.minutes * 60 + disc.disc_track[index].track_pos.seconds);
+   for(index = 0; index < disc->disc_total_tracks; index++)
+     tracksum += cddb_sum(disc->disc_track[index].track_pos.minutes * 60 + disc->disc_track[index].track_pos.seconds);
 
-   discid = (disc.disc_length.minutes * 60 + disc.disc_length.seconds) - (disc.disc_track[0].track_pos.minutes * 60 + disc.disc_track[0].track_pos.seconds);
+   discid = (disc->disc_length.minutes * 60 + disc->disc_length.seconds) - (disc->disc_track[0].track_pos.minutes * 60 + disc->disc_track[0].track_pos.seconds);
 
-   return ((tracksum % 0xFF) << 24 | discid << 8 | disc.disc_total_tracks);
+   return ((tracksum % 0xFF) << 24 | discid << 8 | disc->disc_total_tracks);
 }
 
 long
@@ -83,7 +85,7 @@ cddb_discid(string cd_desc)
    if(!disc.disc_present)
      return -1;
 
-   return cddb_direct_discid(disc);
+   return cddb_direct_discid(&disc);
 }
 
 
@@ -330,7 +332,7 @@ sha_final(unsigned char digest[20], struct sha_data *sha)
 }
 
 int
-cdindex_direct_discid(struct disc_info disc, char *discid, int len)
+cdindex_direct_discid(struct disc_info *disc, char *discid, int len)
 {
    int index;
    struct sha_data sha;
@@ -339,15 +341,15 @@ cdindex_direct_discid(struct disc_info disc, char *discid, int len)
    memset(sha.data, '\0', 64);
    sha_init(&sha);
 
-   snprintf((char *)temp, 9, "%02X", disc.disc_first_track);
+   snprintf((char *)temp, 9, "%02X", disc->disc_first_track);
    sha_update(&sha, temp, strlen((char *)temp));
-   snprintf((char *)temp, 9, "%02X", disc.disc_total_tracks);
+   snprintf((char *)temp, 9, "%02X", disc->disc_total_tracks);
    sha_update(&sha, temp, strlen((char *)temp));
-   snprintf((char *)temp, 9, "%08X", disc.disc_track[disc.disc_total_tracks].track_lba + 150);
+   snprintf((char *)temp, 9, "%08X", disc->disc_track[disc->disc_total_tracks - 1].track_lba + 150);
    sha_update(&sha, temp, strlen((char *)temp));
    for(index = 0; index < 99; index++) {
-      if(index < disc.disc_total_tracks)
-        snprintf((char *)temp, 9, "%08X", disc.disc_track[index].track_lba + 150);
+      if(index < disc->disc_total_tracks)
+        snprintf((char *)temp, 9, "%08X", disc->disc_track[index].track_lba + 150);
       else
         snprintf((char *)temp, 9, "%08X", 0);
       sha_update(&sha, temp, strlen((char *)temp));
@@ -367,7 +369,7 @@ cdindex_discid(string cd_desc, char *discid, int len)
    if(!disc.disc_present)
      return -1;
 
-   if(cdindex_direct_discid(disc, discid, len) < 0)
+   if(cdindex_direct_discid(&disc, discid, len) < 0)
      return -1;
 
    return 0;

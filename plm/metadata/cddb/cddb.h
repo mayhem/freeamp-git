@@ -47,20 +47,18 @@ class CDDB : public MetaDataFormat {
     virtual MetaDataOrder Order() { return MetaDataOrder_Low; }
 
  private:
-    FAContext       *m_context;
-    unsigned long    m_discid;
-    int              m_total_tracks;
-    struct disc_info m_discinfo;
+    FAContext        *m_context;
+    unsigned long     m_discid;
+    int               m_total_tracks;
+    struct disc_info *m_discinfo;
 
     int cddb_read_disc_data(struct disc_data *outdata);
     int cddb_generate_unknown_entry(struct disc_data *outdata);
     int cddb_process_line(char *line, struct __unprocessed_disc_data *data);
     int cddb_read_data(struct disc_data *data);
     int cddb_quit(int sock);
-    int cddb_read(int sock, int mode, struct cddb_entry entry, 
-                  struct disc_data *data, ...);
-    int cddb_vread(int sock, int mode, struct cddb_entry *entry, 
-                   struct disc_data *data, va_list arglist);
+    int cddb_read(int sock, int mode, struct cddb_entry *entry, 
+                  struct disc_data *data, char *http_string = NULL);
     char *cddb_genre(int genre);
     int cddb_genre_value(char *genre);
     int cddb_read_line(int sock, char *inbuffer, int len);
@@ -69,7 +67,7 @@ class CDDB : public MetaDataFormat {
     int cddb_generate_http_request(char *outbuffer, const char *cmd, 
                                    char *http_string, int outbuffer_len);
     int cddb_connect_server(struct cddb_host host, struct cddb_server *proxy,
-                            struct cddb_hello hello, ...);
+                            struct cddb_hello *hello, ...);
     int cddb_connect(struct cddb_server *server);
     int cddb_process_url(struct cddb_host *host, const char *url);  
     int cddb_read_serverlist(struct cddb_conf *conf, 

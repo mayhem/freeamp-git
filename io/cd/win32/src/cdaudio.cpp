@@ -53,7 +53,7 @@ cd_init_device(string device_name)
    if (atoi(mciReturn) <= 0)
 	   return -1;
 
-   sprintf(mciCommand, "open %s shareable wait", device_name.c_str());
+   sprintf(mciCommand, "open cdaudio shareable alias %s wait", device_name.c_str());
    mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
 
    return 0;
@@ -81,7 +81,7 @@ cd_stat(string cd_desc, struct disc_info *disc, bool read_toc)
       complicated... */
 
    struct disc_status status;
-   int readtracks;
+   int readtracks, pos;
    
    if(cd_poll(cd_desc, &status) < 0)
      return -1;
@@ -99,7 +99,7 @@ cd_stat(string cd_desc, struct disc_info *disc, bool read_toc)
    char mciCommand[128];
    char mciReturn[128];
 
-   sprintf(mciCommand, "status %s number of tracks", cd_desc.c_str());
+   sprintf(mciCommand, "status %s number of tracks wait", cd_desc.c_str());
    mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
 
    int numTracks = atoi(mciReturn);
@@ -107,10 +107,11 @@ cd_stat(string cd_desc, struct disc_info *disc, bool read_toc)
    disc->disc_first_track = 1;
    disc->disc_total_tracks = numTracks;
 
-   sprintf(mciCommand, "set %s time format msf wait", cd_desc.c_str());
-   mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
+   int lastpos = 0;
 
    for(readtracks = 0; readtracks < disc->disc_total_tracks; readtracks++) {
+      sprintf(mciCommand, "set %s time format msf wait", cd_desc.c_str());
+      mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
 	  sprintf(mciCommand, "status %s position track %d wait", cd_desc.c_str(), readtracks + 1);
 	  mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
 
@@ -118,18 +119,30 @@ cd_stat(string cd_desc, struct disc_info *disc, bool read_toc)
       disc->disc_track[readtracks].track_pos.seconds = atoi(mciReturn + 3);
       disc->disc_track[readtracks].track_pos.frames = atoi(mciReturn + 6);
 
-	  sprintf(mciCommand, "status %s cdaudio type track %d", cd_desc.c_str(), readtracks + 1);
+	  pos = cd_msf_to_frames(disc->disc_track[readtracks].track_pos);
+	  if (pos < lastpos)
+		  MessageBox(NULL, mciReturn, "Track pos < lastpos", MB_OK);
+	  lastpos = pos;
+
+	  sprintf(mciCommand, "status %s cdaudio type track %d wait", cd_desc.c_str(), readtracks + 1);
 	  mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
       disc->disc_track[readtracks].track_type = (!strcmp("audio", mciReturn)) ? CDAUDIO_TRACK_AUDIO : CDAUDIO_TRACK_DATA;
       disc->disc_track[readtracks].track_lba = cd_msf_to_lba(disc->disc_track[readtracks].track_pos);
 
+      sprintf(mciCommand, "set %s time format msf wait", cd_desc.c_str());
+      mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
       sprintf(mciCommand, "status %s length track %d wait", cd_desc.c_str(), readtracks + 1);
       mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
+
       disc->disc_track[readtracks].track_length.minutes = atoi(mciReturn);
       disc->disc_track[readtracks].track_length.seconds = atoi(mciReturn + 3);
       disc->disc_track[readtracks].track_length.frames = atoi(mciReturn + 6);
    }
-            
+
+   pos = cd_msf_to_frames(disc->disc_track[disc->disc_total_tracks-1].track_pos) +
+         cd_msf_to_frames(disc->disc_track[disc->disc_total_tracks-1].track_length);
+   cd_frames_to_msf(&disc->disc_track[disc->disc_total_tracks].track_pos, pos);
+   
    disc->disc_length.minutes = disc->disc_track[disc->disc_total_tracks].track_pos.minutes;
    disc->disc_length.seconds = disc->disc_track[disc->disc_total_tracks].track_pos.seconds;
    disc->disc_length.frames = disc->disc_track[disc->disc_total_tracks].track_pos.frames;
@@ -146,7 +159,7 @@ cd_poll(string cd_desc, struct disc_status *status)
    char mciCommand[128];
    char mciReturn[128];
 
-   sprintf(mciCommand, "status %s media present", cd_desc.c_str());
+   sprintf(mciCommand, "status %s media present wait", cd_desc.c_str());
    mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
 
    if (!strcmp("true", mciReturn) && !strcmp("TRUE", mciReturn)) {
@@ -156,7 +169,9 @@ cd_poll(string cd_desc, struct disc_status *status)
 
    status->status_present = 1;
 
-   sprintf(mciCommand, "status %s position", cd_desc.c_str());
+   sprintf(mciCommand, "set %s time format msf wait", cd_desc.c_str());
+   mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
+   sprintf(mciCommand, "status %s position wait", cd_desc.c_str());
    mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
 
    status->status_disc_time.minutes = atoi(mciReturn);
@@ -165,7 +180,7 @@ cd_poll(string cd_desc, struct disc_status *status)
 
    sprintf(mciCommand, "set %s time format tmsf wait", cd_desc.c_str());
    mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
-   sprintf(mciCommand, "status %s position", cd_desc.c_str());
+   sprintf(mciCommand, "status %s position wait", cd_desc.c_str());
    mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
 
    char *colon = strchr(mciReturn, ':');
@@ -182,11 +197,11 @@ cd_poll(string cd_desc, struct disc_status *status)
 	  status->status_track_time.frames = 0;
 	  status->status_current_track = 0;
    }
-  
+
+   
    sprintf(mciCommand, "set %s time format msf wait", cd_desc.c_str());
    mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
-
-   sprintf(mciCommand, "status %s mode", cd_desc.c_str());
+   sprintf(mciCommand, "status %s mode wait", cd_desc.c_str());
    mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
 
    if (!strcmp(mciReturn, "playing"))
@@ -211,28 +226,26 @@ cd_play_track_pos(string cd_desc, int starttrack, int endtrack, int startpos)
    time.seconds = startpos % 60;
    time.frames = 0;
   
-   char mciCommand[128];
+   char mciCommand[128], mciPlay[128];
    char mciReturn[128];
 
-   sprintf(mciCommand, "status %s number of tracks", cd_desc.c_str());
+   sprintf(mciCommand, "status %s number of tracks wait", cd_desc.c_str());
    mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
 
    int numtracks = atoi(mciReturn);
 
-   sprintf(mciCommand, "set %s time format tmsf wait", cd_desc.c_str());
-   mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
-
    if (endtrack < numtracks)
-       sprintf(mciCommand, "play %s from %d:%d:%d to %d", cd_desc.c_str(), starttrack, time.minutes, 
+       sprintf(mciPlay, "play %s from %d:%d:%d to %d", cd_desc.c_str(), starttrack, time.minutes, 
 	           time.seconds, endtrack + 1);
    else 
-	   sprintf(mciCommand, "play %s from %d:%d:%d", cd_desc.c_str(), starttrack, time.minutes, 
+	   sprintf(mciPlay, "play %s from %d:%d:%d", cd_desc.c_str(), starttrack, time.minutes, 
 	           time.seconds);
+   sprintf(mciCommand, "set %s time format tmsf wait", cd_desc.c_str());
    mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
-
+   mciSendString(mciPlay, mciReturn, sizeof(mciReturn), NULL);
    sprintf(mciCommand, "set %s time format msf wait", cd_desc.c_str());
    mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
-   
+
    return 0;
 }
 
@@ -240,26 +253,24 @@ cd_play_track_pos(string cd_desc, int starttrack, int endtrack, int startpos)
 int
 cd_play_track(string cd_desc, int starttrack, int endtrack)
 {
-   char mciCommand[128];
+   char mciCommand[128], mciPlay[128];
    char mciReturn[128];
 
-   sprintf(mciCommand, "status %s number of tracks", cd_desc.c_str());
+   sprintf(mciCommand, "status %s number of tracks wait", cd_desc.c_str());
    mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
 
    int numtracks = atoi(mciReturn);
 
+   if (endtrack < numtracks)
+       sprintf(mciPlay, "play %s from %d to %d", cd_desc.c_str(), starttrack, endtrack + 1);
+   else
+	   sprintf(mciPlay, "play %s from %d", cd_desc.c_str(), starttrack);
    sprintf(mciCommand, "set %s time format tmsf wait", cd_desc.c_str());
    mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
-
-   if (endtrack < numtracks)
-       sprintf(mciCommand, "play %s from %d to %d", cd_desc.c_str(), starttrack, endtrack + 1);
-   else
-	   sprintf(mciCommand, "play %s from %d", cd_desc.c_str(), starttrack);
-   mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
-
+   mciSendString(mciPlay, mciReturn, sizeof(mciReturn), NULL);
    sprintf(mciCommand, "set %s time format msf wait", cd_desc.c_str());
    mciSendString(mciCommand, mciReturn, sizeof(mciReturn), NULL);
-   
+
    return 0;
 }
 

@@ -37,6 +37,8 @@ using namespace std;
 #include "pmoevent.h"
 #include "eventbuffer.h"
 
+#include "mutex.h"
+
 static const uint32 OBUFFERSIZE = 2 * 1152;
 
 enum
@@ -64,7 +66,7 @@ class CDPMO:public PhysicalMediaOutput
    virtual Error ChangePosition(int32);
    virtual Error SetTo(const char *url); 
 
-   virtual struct disc_info GetDiscInfo();
+   virtual struct disc_info *GetDiscInfo();
    virtual uint32  GetCDDBDiscID();
    virtual char   *GetcdindexDiscID();
 

@@ -92,18 +92,20 @@ bool CDDB::ReadMetaData(const char* url, MetaData* metadata)
         pmo->SetPropManager(m_context->props);
         pmo->Init(NULL);
 
-        m_discinfo = (pmo)->GetDiscInfo();
+        m_discinfo = ((CDPMO*)pmo)->GetDiscInfo();
 
-        if (!m_discinfo.disc_present) {
+        if (!m_discinfo->disc_present) {
             delete pmo;
             return retvalue;
         }
 
         m_discid = ((CDPMO*)pmo)->GetCDDBDiscID();
+        if (!m_discid) {
+			delete pmo;
+			return retvalue;
+		}
 
-        m_total_tracks = m_discinfo.disc_total_tracks;
-
-        delete pmo;
+        m_total_tracks = m_discinfo->disc_total_tracks;
 
         struct disc_data data;
         if (cddb_read_disc_data(&data) < 0)
@@ -114,6 +116,11 @@ bool CDDB::ReadMetaData(const char* url, MetaData* metadata)
             tracknumber = (char *)url;
         else
             tracknumber++;
+
+#ifdef WIN32
+		while (!isdigit(tracknumber[0]))
+			tracknumber++;
+#endif
 
         int m_track = atoi(tracknumber);
 
@@ -130,11 +137,14 @@ bool CDDB::ReadMetaData(const char* url, MetaData* metadata)
         metadata->SetComment(data.data_track[m_track].track_extended);
         metadata->SetTrack(m_track + 1);
         metadata->SetGenre(cddb_genre(data.data_genre));
-        metadata->SetTime(m_discinfo.disc_track[m_track].track_length.minutes *
+        metadata->SetTime(m_discinfo->disc_track[m_track].track_length.minutes *
                           60 +  
-                          m_discinfo.disc_track[m_track].track_length.seconds);
+                          m_discinfo->disc_track[m_track].track_length.seconds);
 
+		cerr << m_discid << " " << m_track << " " << metadata->Title().c_str() << endl;
         retvalue = true;
+
+		delete pmo;
     }
     return retvalue;
 }
