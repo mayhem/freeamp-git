@@ -54,6 +54,7 @@ MusicBrowserUI::MusicBrowserUI(FAContext *context)
     m_plm = NULL;
     m_browserCreated = false;
     statusContext = 0;
+    playlistList = NULL;
 #else
     m_state = STATE_EXPANDED;
     m_hWnd = NULL;    
@@ -68,7 +69,6 @@ MusicBrowserUI::MusicBrowserUI(FAContext *context)
 MusicBrowserUI::~MusicBrowserUI()
 {
 }
-
 
 Error MusicBrowserUI::Init(int32 startup_level) 
 {
@@ -98,51 +98,21 @@ Error MusicBrowserUI::Init(int32 startup_level)
 #endif    
 }
 
-#ifdef HAVE_GTK
-void MusicBrowserUI::gtkServiceFunction(void *p) 
-{
-    assert(p);
-    ((MusicBrowserUI *)p)->GTKEventService();
-}
-
-void MusicBrowserUI::GTKEventService(void)
-{
-    string lastPlaylist = FreeampDir(m_context->prefs);
-    lastPlaylist += "/currentlist.m3u";
-
-    LoadToMaster(lastPlaylist);
-
-    weAreGTK = false;
-    m_context->gtkLock.Acquire();
-    if (!m_context->gtkInitialized) {
-        m_context->gtkInitialized = true;
-        g_thread_init(NULL);
-        gtk_init(&m_argc, &m_argv);
-        gdk_rgb_init();
-        weAreGTK = true;
-    }
-    m_context->gtkLock.Release();
-
-    if (weAreGTK)
-        gtk_main();
-}
-
-#endif
-
 int32 MusicBrowserUI::AcceptEvent(Event *event)
 {
     switch (event->Type()) {
         case CMD_Cleanup: {
+
 #ifdef HAVE_GTK        
             if (weAreGTK) {
                 gdk_threads_enter();
                 gtk_main_quit();
                 gdk_threads_leave();
             }
-
             gtkThread->Join();
-#else            
-            WritePlaylist();
+            SaveCurrentPlaylist(NULL);
+#else       
+            WritePlaylist();     
             CloseMainDialog();
 #endif            
             
@@ -341,18 +311,31 @@ void MusicBrowserUI::MoveItemEvent(int source, int dest)
 
 void MusicBrowserUI::AddTrackPlaylistEvent(char *path)
 {
-    m_plm->AddItem(path, m_currentindex);
+    char *tempurl = new char[_MAX_PATH];
+    uint32 length = _MAX_PATH;
+
+    FilePathToURL(path, tempurl, &length);
+    if (m_currentindex == kInvalidIndex) 
+        m_currentindex = 0;
+    m_plm->AddItem(tempurl, m_currentindex);
+   
+    delete [] tempurl;
+
     UpdatePlaylistList();
 }
 
 void MusicBrowserUI::AddTrackPlaylistEvent(PlaylistItem *newitem)
 {
+    if (m_currentindex == kInvalidIndex)
+        m_currentindex = 0;
     m_plm->AddItem(newitem, m_currentindex, false);
     UpdatePlaylistList();
 }
 
 void MusicBrowserUI::AddTracksPlaylistEvent(vector<PlaylistItem *> *newlist)
 {
+    if (m_currentindex == kInvalidIndex)
+        m_currentindex = 0;
     m_plm->AddItems(newlist, m_currentindex, false);
     UpdatePlaylistList();
 }
@@ -370,6 +353,7 @@ void MusicBrowserUI::StartMusicSearch(void)
     
     oPathList.push_back(string(ROOT_DIR));
     m_context->browser->SearchMusic(oPathList);
+    
 #else
     DWORD  dwDrives;
     char  *szPath = "X:\\";
@@ -413,6 +397,9 @@ void MusicBrowserUI::SortPlaylistEvent(PlaylistSortKey order, PlaylistSortType
 void MusicBrowserUI::PopUpInfoEditor(void)
 {
 #if HAVE_GTK
+    if (m_currentindex == kInvalidIndex)
+        return;
+
     infoeditorUI *infoedit = new infoeditorUI(m_context, 
                                               m_plm->ItemAt(m_currentindex));
     
@@ -463,7 +450,6 @@ void MusicBrowserUI::ImportPlaylist(char *path)
         return;
     m_context->browser->m_catalog->AddPlaylist(path);
     UpdateCatalog();
-//    UpdateCombo();
 }
 #endif
 

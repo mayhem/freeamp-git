@@ -363,7 +363,11 @@ void MusicBrowser::DoSearchMusic(char *path)
                     file.append(DIR_MARKER_STR);
                     file.append(find.cFileName);
 
-                    PlaylistItem *plist = new PlaylistItem(file.c_str());
+                    char *tempurl = new char[file.length() + 15];
+                    uint32 length = file.length() + 15;
+
+                    FilePathToURL(file.c_str(), tempurl, &length);
+                    PlaylistItem *plist = new PlaylistItem(tempurl);
                     m_plm->RetrieveMetaData(plist);
 
                     while (plist->GetState() != kPlaylistItemState_Normal)

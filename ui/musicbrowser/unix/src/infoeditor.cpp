@@ -139,7 +139,6 @@ void infoeditorUI::DisplayInfo(void)
    gtk_signal_connect(GTK_OBJECT(m_titleEntry), "changed",
                       GTK_SIGNAL_FUNC(text_changed_event), this);
    gtk_table_attach_defaults(GTK_TABLE(table), m_titleEntry, 1, 2, 0, 1);
-//                    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 1);
    gtk_widget_show(m_titleEntry);
 
    /* Artist entry */
@@ -155,7 +154,6 @@ void infoeditorUI::DisplayInfo(void)
    gtk_signal_connect(GTK_OBJECT(m_artistEntry), "changed",
                       GTK_SIGNAL_FUNC(text_changed_event), this);
    gtk_table_attach_defaults(GTK_TABLE(table), m_artistEntry, 1, 2, 1, 2);
-//                 GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 1);
    gtk_widget_show(m_artistEntry);
 
    /* Album entry */
@@ -171,7 +169,6 @@ void infoeditorUI::DisplayInfo(void)
    gtk_signal_connect(GTK_OBJECT(m_albumEntry), "changed",
                       GTK_SIGNAL_FUNC(text_changed_event), this);
    gtk_table_attach_defaults(GTK_TABLE(table), m_albumEntry, 1, 2, 2, 3);
-//                    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 1);
    gtk_widget_show(m_albumEntry);
 
    /* Year entry */
@@ -190,7 +187,6 @@ void infoeditorUI::DisplayInfo(void)
    gtk_signal_connect(GTK_OBJECT(m_yearEntry), "changed",
                       GTK_SIGNAL_FUNC(text_changed_event), this);
    gtk_table_attach_defaults(GTK_TABLE(table), m_yearEntry, 1, 2, 3, 4);
-//                    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 1);
    gtk_widget_show(m_yearEntry);
 
    /* Genre entry */
@@ -206,7 +202,6 @@ void infoeditorUI::DisplayInfo(void)
    gtk_signal_connect(GTK_OBJECT(m_genreEntry), "changed",
                       GTK_SIGNAL_FUNC(text_changed_event), this);
    gtk_table_attach_defaults(GTK_TABLE(table), m_genreEntry, 1, 2, 4, 5);
-//                    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 1);
    gtk_widget_show(m_genreEntry);
 
    /* Track Entry */
@@ -225,7 +220,6 @@ void infoeditorUI::DisplayInfo(void)
    gtk_signal_connect(GTK_OBJECT(m_trackEntry), "changed",
                       GTK_SIGNAL_FUNC(text_changed_event), this);
    gtk_table_attach_defaults(GTK_TABLE(table), m_trackEntry, 1, 2, 5, 6);
-//                    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 1);
    gtk_widget_show(m_trackEntry);
 
    /* Comment entry */
@@ -241,7 +235,6 @@ void infoeditorUI::DisplayInfo(void)
    gtk_signal_connect(GTK_OBJECT(m_commentEntry), "changed",
                       GTK_SIGNAL_FUNC(text_changed_event), this);
    gtk_table_attach_defaults(GTK_TABLE(table), m_commentEntry, 1, 2, 6, 7);
-//                    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 1);
    gtk_widget_show(m_commentEntry);
 
    /* Length display */
@@ -265,7 +258,6 @@ void infoeditorUI::DisplayInfo(void)
       GtkWidget *time_label;
       time_label = gtk_label_new(length);
       gtk_table_attach_defaults(GTK_TABLE(table), time_label, 1, 2, 7, 8);
-//                       GTK_EXPAND | GTK_FILL, GTK_FILL, 10, 1);
       gtk_widget_show(time_label);
    }
 

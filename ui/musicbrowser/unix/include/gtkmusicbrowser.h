@@ -97,7 +97,6 @@ class MusicBrowserUI : public UserInterface {
     GtkWidget *musicBrowserWindow;
     GtkWidget *musicBrowserTree;
     GtkWidget *playlistList;
-    GtkWidget *expandLabel;
     GtkWidget *playlistOMenu;
     GtkWidget *playlistMenu;    
 
@@ -131,7 +130,6 @@ class MusicBrowserUI : public UserInterface {
     void PopUpInfoEditor();
     void SaveCurrentPlaylist(char *path = NULL);
     void LoadPlaylist(string &oPlaylist);
-    void LoadToMaster(string &oPlaylist);
     void ImportPlaylist(char *path);
 };
 

@@ -594,7 +594,6 @@ void MusicBrowserUI::ExpandCollapseEvent(void)
         CreateExpanded();
         m_state = STATE_EXPANDED;
         gtk_widget_show(masterBrowserBox);
-//        gtk_label_set_text(GTK_LABEL(expandLabel), "<< Collapse");
         gtk_window_set_title(GTK_WINDOW(musicBrowser), BRANDING" - Music Browser");
         UpdateCatalog();
     }
@@ -602,7 +601,6 @@ void MusicBrowserUI::ExpandCollapseEvent(void)
         m_state = STATE_COLLAPSED;
 
         gtk_widget_hide(masterBrowserBox);
-//        gtk_label_set_text(GTK_LABEL(expandLabel), "<< Expand");
         gtk_window_set_title(GTK_WINDOW(musicBrowser), BRANDING" - Playlist Editor");
     }
 }
@@ -649,11 +647,14 @@ void add_track_plist_internal(GtkWidget *widget, MusicBrowserUI *p)
 
         if (filereturn) {
             char *temp;
+            char *first;
 
-            temp = strtok(filereturn, "\n");
-            p->AddTrackPlaylistEvent(temp);
-            while ((temp = strtok(NULL, "\n")))
+            first = strtok(filereturn, "\n");
+            while ((temp = strtok(NULL, "\n"))) {
                 p->AddTrackPlaylistEvent(temp);
+                p->m_currentindex++;
+            }
+            p->AddTrackPlaylistEvent(first);
        }
        delete filereturn;
     }
@@ -825,7 +826,7 @@ void MusicBrowserUI::CreateMenu(GtkWidget *topbox)
 
 void MusicBrowserUI::UpdatePlaylistList(void)
 {
-    if (!playlistList)
+    if (!playlistList || !m_plm)
         return;
 
     gtk_clist_freeze(GTK_CLIST(playlistList));
@@ -848,7 +849,7 @@ void MusicBrowserUI::UpdatePlaylistList(void)
         char *artist;
         char length[50];
 
-        if (mdata.Title() == " ") {
+        if (mdata.Title() == "" || mdata.Title() == " ") {
             char *filename = new char[_MAX_PATH];
             char *tempdir = strrchr(item->URL().c_str(), '/');
             if (tempdir)
@@ -942,95 +943,21 @@ void MusicBrowserUI::SetStatusText(const char *text)
     gtk_statusbar_push(GTK_STATUSBAR(statusBar), 1, text);
 }
 
-void MusicBrowserUI::LoadToMaster(string &oPlaylist)
-{
-    if (oPlaylist.length() == 0)
-        return;
-
-    m_plm->ReadPlaylist((char *)oPlaylist.c_str());
-}
-
 void MusicBrowserUI::LoadPlaylist(string &oPlaylist)
 {
-    if (oPlaylist == m_currentListName) 
+    if (oPlaylist == m_currentListName)
         return;
 
-    SaveCurrentPlaylist(NULL);
+    if (oPlaylist.length() == 0) 
+        return;
 
-    if (oPlaylist.length() == 0) {
-        m_context->plm->SetActivePlaylist(kPlaylistKey_MasterPlaylist);
-//        gtk_option_menu_set_history(GTK_OPTION_MENU(playlistOMenu), 0);
-    }
-    else {
-        m_context->plm->SetExternalPlaylist((char *)oPlaylist.c_str());
-        m_context->plm->SetActivePlaylist(kPlaylistKey_ExternalPlaylist);
-//        SetComboSelection(oPlaylist);
-    }
+    if (m_currentListName.length() != 0)
+        SaveCurrentPlaylist(NULL);
+
+    m_plm->ReadPlaylist((char *)oPlaylist.c_str());
     m_currentListName = oPlaylist;
-    m_currentindex = 0;
     UpdatePlaylistList();
 }
-
-/*
-void combo_select(GtkWidget *w, char *newPath)
-{
-    string Path;
-    if (!newPath)
-        Path = "";
-    else
-        Path = newPath;
-    localui->LoadPlaylist(Path);
-}
-
-void MusicBrowserUI::SetComboSelection(string &oName)
-{
-    vector<string>::iterator i = m_context->browser->m_catalog->m_playlists->begin();
-    int iIndex = 0;
-    bool found = false;
-
-    for (; i != m_context->browser->m_catalog->m_playlists->end(); i++,
-          iIndex++) {
-        if (!iIndex)
-            continue;
-        if (oName == (*i)) {
-            found = true;
-            break;
-        }
-    }
-    if (!found)
-        iIndex = 0;
-    gtk_option_menu_set_history(GTK_OPTION_MENU(playlistOMenu), iIndex);
-}
-
-void MusicBrowserUI::UpdateCombo(void)
-{
-    vector<string>::iterator i = m_context->browser->m_catalog->m_playlists->begin();
-    int iIndex = 0;
-
-    if (playlistMenu)
-        gtk_widget_destroy(playlistMenu);
-
-    playlistMenu = gtk_menu_new();
-    GtkWidget *menuitem = gtk_menu_item_new_with_label("Master Playlist");
-    gtk_signal_connect(GTK_OBJECT(menuitem), "activate", 
-                       GTK_SIGNAL_FUNC(combo_select), NULL);
-    gtk_widget_show(menuitem);
-    gtk_menu_append(GTK_MENU(playlistMenu), menuitem);
-    
-    for (; i != m_context->browser->m_catalog->m_playlists->end(); i++, 
-          iIndex++) {
-        if (!iIndex)
-            continue;
-        menuitem = gtk_menu_item_new_with_label((*i).c_str());
-        gtk_signal_connect(GTK_OBJECT(menuitem), "activate", 
-                           GTK_SIGNAL_FUNC(combo_select), (char *)(*i).c_str());
-        gtk_widget_show(menuitem);
-        gtk_menu_append(GTK_MENU(playlistMenu), menuitem);
-    }
-    gtk_option_menu_set_menu(GTK_OPTION_MENU(playlistOMenu), playlistMenu);
-    gtk_option_menu_set_history(GTK_OPTION_MENU(playlistOMenu), 0);
-}
-*/       
 
 void MusicBrowserUI::CreatePlaylist(void)
 {
@@ -1040,7 +967,6 @@ void MusicBrowserUI::CreatePlaylist(void)
     GtkWidget *playlistwindow;
     GtkWidget *controlhbox;
     GtkWidget *arrow;
-    GtkWidget *label;
     GtkWidget *button;
 
     localui = this;
@@ -1074,20 +1000,6 @@ void MusicBrowserUI::CreatePlaylist(void)
     hbox = gtk_hbox_new(FALSE, 0);
     gtk_box_pack_start(GTK_BOX(masterPlaylistBox), hbox, FALSE, FALSE, 0);
     gtk_widget_show(hbox);
-
-/*
-    playlistOMenu = gtk_option_menu_new();
-    gtk_box_pack_end(GTK_BOX(hbox), playlistOMenu, FALSE, FALSE, 10);
-    gtk_widget_show(playlistOMenu);
-
-    playlistMenu = NULL;
-    UpdateCombo();
-
-
-    label = gtk_label_new("View Playlist:");
-    gtk_box_pack_end(GTK_BOX(hbox), label, FALSE, FALSE, 10);
-    gtk_widget_show(label);
-*/
 
     vbox = gtk_vbox_new(FALSE, 0);
     gtk_container_add(GTK_CONTAINER(masterPlaylistBox), vbox);
@@ -1158,18 +1070,6 @@ void MusicBrowserUI::CreatePlaylist(void)
     gtk_box_pack_start(GTK_BOX(masterPlaylistBox), controlhbox, FALSE, FALSE, 0);
     gtk_widget_show(controlhbox);
 
-/*
-    expandLabel = gtk_label_new("<< Expand");
-    gtk_misc_set_alignment(GTK_MISC(expandLabel), 0.5, 0.5);
-    button = gtk_button_new();
-    gtk_container_add(GTK_CONTAINER(button), expandLabel);
-    gtk_widget_show(expandLabel);
-    gtk_box_pack_start(GTK_BOX(controlhbox), button, FALSE, FALSE, 3);
-    gtk_signal_connect(GTK_OBJECT(button), "clicked",
-                       GTK_SIGNAL_FUNC(expand_collapse_internal), this);
-    gtk_widget_show(button);
-*/
-
     button = gtk_button_new_with_label("  Close  ");
     gtk_box_pack_end(GTK_BOX(controlhbox), button, FALSE, FALSE, 3);
     gtk_signal_connect(GTK_OBJECT(button), "clicked",
@@ -1179,4 +1079,30 @@ void MusicBrowserUI::CreatePlaylist(void)
     gtk_widget_show(musicBrowser);
 
     m_state = STATE_COLLAPSED;
+}
+
+void MusicBrowserUI::gtkServiceFunction(void *p)
+{
+    assert(p);
+    ((MusicBrowserUI *)p)->GTKEventService();
+}
+
+void MusicBrowserUI::GTKEventService(void)
+{
+    string lastPlaylist = FreeampDir(m_context->prefs);
+    lastPlaylist += "/currentlist.m3u";
+    LoadPlaylist(lastPlaylist);
+    weAreGTK = false;
+    m_context->gtkLock.Acquire();
+    if (!m_context->gtkInitialized) {
+        m_context->gtkInitialized = true;
+        g_thread_init(NULL);
+        gtk_init(&m_argc, &m_argv);
+        gdk_rgb_init();
+        weAreGTK = true;
+    }
+    m_context->gtkLock.Release();
+
+    if (weAreGTK)
+        gtk_main();
 }
