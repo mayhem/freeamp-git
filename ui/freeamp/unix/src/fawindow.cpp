@@ -90,7 +90,7 @@ void FAMainWindow::DoEvent(XEvent e) {
 	case Expose:
 	    if (e.xexpose.count != 0)
 		return;
-	    Draw(0);
+	    Draw();
 	    break;
 	case ButtonPress:
 	    m_buttonClickSpotX = e.xbutton.x;
@@ -136,7 +136,7 @@ void FADumbWindow::DoEvent(XEvent e) {
 	case Expose:
 	    if (e.xexpose.count != 0)
 		return;
-	    Draw(0);
+	    Draw();
 	    break;
     }
 }
@@ -178,7 +178,7 @@ bool FATriStateWindow::IsActivated() { return m_activated; }
 void FATriStateWindow::SetActivated() {
     //cerr << "SetActivated" << endl;
     m_activated = true;
-    //Draw(0);
+    //Draw();
 //    XEvent x;
 //    x.xexpose.count = 0;
 //    XSendEvent(m_display,m_me,false,ExposureMask,&x);
@@ -188,7 +188,7 @@ void FATriStateWindow::SetActivated() {
 void FATriStateWindow::ClearActivated() {
     //cerr << "ClearActivated" << endl;
     m_activated = false;
-    //Draw(0);
+    //Draw();
 //    XEvent x;
 //    x.xexpose.count = 0;
 //    XSendEvent(m_display,m_me,false,ExposureMask,&x);
@@ -201,11 +201,11 @@ void FATriStateWindow::DoEvent(XEvent e) {
 	    //cerr << "got exposure" << endl;
 	    if (e.xexpose.count != 0)
 		return;
-	    Draw(0);
+	    Draw();
 	    break;
 	case ButtonPress:
 	    m_pressed = true;
-	    Draw(0);
+	    Draw();
 	    break;
 	case ButtonRelease:
 	    //cerr << "button release" << endl;
@@ -214,16 +214,16 @@ void FATriStateWindow::DoEvent(XEvent e) {
 		m_clickFunction(m_cookie);
 	    }
 	    //cerr << "about to draw" << endl;
-	    Draw(0);
+	    Draw();
 	    //cerr << "done drawing" << endl;
 	    break;
 	case EnterNotify:
 	    m_insideButton = true;
-	    Draw(0);
+	    Draw();
 	    break;
 	case LeaveNotify:
 	    m_insideButton = false;
-	    Draw(0);
+	    Draw();
 	    break;
 	case UnmapNotify:
 	    m_mapped = false;
@@ -792,13 +792,13 @@ void FADialWindow::DoEvent(XEvent e) {
 		    m_func(m_cookie,2,e.xmotion.x_root,e.xmotion.y_root);
 		}
 		m_prevY = e.xmotion.y_root;
-		Draw(0);
+		Draw();
 	    }
 	    break;
 	case Expose:
 	    if (e.xexpose.count != 0)
 		return;
-	    Draw(0);
+	    Draw();
 	    break;
 	case ButtonPress:
 	    m_buttonClickSpotX = e.xbutton.x_root;

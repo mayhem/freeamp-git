@@ -57,7 +57,10 @@ UserInterface *Initialize() {
 	   }
 
 FreeAmpUI::FreeAmpUI() {
-    XInitThreads();
+    int32 foo = 0;
+    if (!(foo = XInitThreads())) {
+	fprintf(stderr, "FreeAmpUI: XInitThreads returned %d: Unexplained X errors may arise!\n",foo);
+    }
     m_windowHash = new WindowHash();
     m_done = false;
     m_initialized = false;
@@ -427,8 +430,16 @@ void FreeAmpUI::Init()
 
 
 
+    gtkListenThread = Thread::CreateThread();
+    gtkListenThread->Create(FreeAmpUI::x11ServiceFunction,this);
 
+    m_timerContinue = true;
+    m_timerThread = Thread::CreateThread();
+    m_timerThread->Create(FreeAmpUI::TimerEventFunction,this);
 
+}
+
+void FreeAmpUI::ParseArgs() {
     char *arg = NULL;
     bool shuffle = false;
     bool autoplay = false;
@@ -459,19 +470,8 @@ void FreeAmpUI::Init()
     
     if(autoplay)
        m_playerEQ->AcceptEvent(new Event(CMD_Play));
-
-
-
-
-
-    gtkListenThread = Thread::CreateThread();
-    gtkListenThread->Create(FreeAmpUI::x11ServiceFunction,this);
-
-    m_timerContinue = true;
-    m_timerThread = Thread::CreateThread();
-    m_timerThread->Create(FreeAmpUI::TimerEventFunction,this);
-
 }
+
 
 void FreeAmpUI::x11ServiceFunction(void *p) {
     ((FreeAmpUI *)p)->X11EventService();
@@ -498,6 +498,9 @@ void FreeAmpUI::X11EventService() {
     m_volumeWindow->MapWindow();
     m_seekWindow->MapWindow();
 
+
+    ParseArgs();
+
 //    fprintf(stderr,"Main window ID: %x\n",m_mainWindow->GetWindow());
 //    fprintf(stderr,"Play Button ID: %x\n",m_playButton->GetWindow());
 //    fprintf(stderr,"PauseButton ID: %x\n",m_pauseButton->GetWindow());
@@ -508,12 +511,13 @@ void FreeAmpUI::X11EventService() {
     /* get events, use first to display text and graphics */
     while (!m_done)  {
 	XNextEvent(m_display, &report);
-	//fprintf(stderr, "window ID: %x\n", report.xany.window);
         FAWindow *w = m_windowHash->Value(report.xany.window);
 	
 	if (w) {
 	    //fprintf(stderr, "handling by class\n");
+	    XLockDisplay(m_display);
 	    w->DoEvent(report);
+	    XUnlockDisplay(m_display);
 	}
     } /* end while */
     m_playerEQ->AcceptEvent(new Event(CMD_QuitPlayer));
@@ -535,7 +539,7 @@ int32 FreeAmpUI::AcceptEvent(Event *e) {
 	    m_playButton->UnMapWindow();
 	    m_pauseButton->ClearActivated();
 	    XLockDisplay(m_display);
-	    m_pauseButton->Draw(0);
+	    m_pauseButton->Draw();
 	    XUnlockDisplay(m_display);
 	    break;
 	case INFO_Paused:
@@ -543,7 +547,7 @@ int32 FreeAmpUI::AcceptEvent(Event *e) {
 	    m_stopButton->MapWindow();
 	    m_playButton->UnMapWindow();
 	    XLockDisplay(m_display);
-	    m_pauseButton->Draw(0);
+	    m_pauseButton->Draw();
 	    XUnlockDisplay(m_display);
 	    break;
 	case INFO_Stopped:
@@ -551,7 +555,7 @@ int32 FreeAmpUI::AcceptEvent(Event *e) {
 	    m_currSeconds = 0;
 	    m_pauseButton->ClearActivated();
 	    XLockDisplay(m_display);
-	    m_pauseButton->Draw(0);
+	    m_pauseButton->Draw();
 	    m_lcdWindow->Draw(FALcdWindow::TimeOnly);
 	    XUnlockDisplay(m_display);
 	    m_playButton->MapWindow();

@@ -118,6 +118,7 @@ class FreeAmpUI : public UserInterface {
     int32 m_argc;
     char **m_argv;
     void processSwitch(char *);
+    void ParseArgs();
     Thread *gtkListenThread;
     PlayListManager *m_plm;
 };
