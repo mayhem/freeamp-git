@@ -70,7 +70,11 @@ PhysicalMediaInput::~PhysicalMediaInput()
 
 Error PhysicalMediaInput::SetTo(const char *url)
 {
-    delete [] m_path;
+    if (m_path != NULL) 
+	{
+		delete [] m_path;
+		m_path = NULL;
+	}
 
     m_path = new char[strlen(url) + 1];
     strcpy(m_path, url);
