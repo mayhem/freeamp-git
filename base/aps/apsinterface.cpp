@@ -175,7 +175,7 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
     o = mb_New();
 
     mb_UseUTF8(o, 0);
-    mb_SetDebug(o, 1);
+    //mb_SetDebug(o, 1);
     mb_SetServer(o, hostname, port);
     if (m_strProxyAddr.size() > 7)
         mb_SetProxy(o, (char *)m_strProxyAddr.c_str(), m_nProxyPort);
