@@ -264,6 +264,12 @@ class PlaylistManager {
     Error MoveItems(vector<PlaylistItem*>* items, uint32 index);
     Error MoveItems(vector<uint32>* items, uint32 index);
 
+    // Functions for updating
+    // This function searches the items in the playlist
+    // and updates the metadata if the tracks are the
+    // same (matched based on URL)
+    Error UpdateTrackMetaData(PlaylistItem* updatedTrack);
+
     // Functions for sorting
     Error Sort(PlaylistSortKey key, PlaylistSortType type = PlaylistSortType_Ascending);
     PlaylistSortKey GetPlaylistSortKey() const;

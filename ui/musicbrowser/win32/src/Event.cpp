@@ -443,6 +443,8 @@ void MusicBrowserUI::EditInfoEvent()
                 (*track)->SetMetaData(&newMetaData);
 
                 m_context->catalog->UpdateSong(*track);
+
+                m_oPlm->UpdateTrackMetaData(*track);
             }
         } 
     }

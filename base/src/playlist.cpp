@@ -1400,6 +1400,32 @@ Error PlaylistManager::MoveItems(vector<uint32>* items, uint32 index)
     return result;
 }
 
+// Functions for updating
+// This function searches the items in the playlist
+// and updates the metadata if the tracks are the
+// same (matched based on URL)
+Error PlaylistManager::UpdateTrackMetaData(PlaylistItem* updatedTrack)
+{
+    Error result = kError_InvalidParam;
+    m_mutex.Acquire();
+
+    vector<PlaylistItem*>::iterator i = m_activeList->begin();
+
+    MetaData metadata = updatedTrack->GetMetaData();
+
+    for(; i != m_activeList->end(); i++)
+    {
+        if((*i)->URL() == updatedTrack->URL())
+        {
+            (*i)->SetMetaData(&metadata);
+            m_context->target->AcceptEvent(new PlaylistItemUpdatedEvent(*i, this));
+        }
+    }
+
+    m_mutex.Release();
+    return result;
+}
+
 
 // Functions for sorting
 Error PlaylistManager::Sort(PlaylistSortKey key, PlaylistSortType type)
