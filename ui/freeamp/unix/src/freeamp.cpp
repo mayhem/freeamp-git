@@ -540,7 +540,9 @@ void FreeAmpUI::X11EventService() {
 	    XUnlockDisplay(m_display);
 	}
     } /* end while */
-    m_playerEQ->AcceptEvent(new Event(CMD_QuitPlayer));
+    if (m_startupType == PRIMARY_UI) {
+	m_playerEQ->AcceptEvent(new Event(CMD_QuitPlayer));
+    }
 }
 
 int32 FreeAmpUI::AcceptEvent(Event *e) {

@@ -128,6 +128,7 @@ Error LcdUI::Init(int32 startupType) {
     m_lcdLock->Release();
 
     if ((m_startupType = startupType) == PRIMARY_UI) {
+	cout << "LCD Startup Type: PRIMARY_UI" << endl;
 	ProcessArgs();
 	tcgetattr(stdinfd, &::normalTTY);
 	::rawTTY = ::normalTTY;
@@ -211,8 +212,10 @@ int32 LcdUI::AcceptEvent(Event *e) {
 	//cout << "LcdUI: processing event " << e->Type() << endl;
 	switch (e->Type()) {
 	    case INFO_PlayListDonePlay: {
-		Event *e = new Event(CMD_QuitPlayer);
-		m_playerEQ->AcceptEvent(e);
+		if (m_startupType == PRIMARY_UI) {
+		    Event *e = new Event(CMD_QuitPlayer);
+		    m_playerEQ->AcceptEvent(e);
+		}
 		break; }
 	    case CMD_Cleanup: {
 		Event *e = new Event(INFO_ReadyToDieUI);
@@ -224,6 +227,7 @@ int32 LcdUI::AcceptEvent(Event *e) {
 		BlitTimeLine();
 		lcd.flush();
 		m_lcdLock->Release();
+		break;
 	    }
 	    case INFO_UserMessage: {
 		if (!strcmp("time_curr_mode",((UserMessageEvent *)e)->GetInfo())) {
