@@ -752,22 +752,14 @@ HttpInput::Open(void)
          redir = strstr(pInitialBuffer, "Location: ");
          if (redir)
          {
-             int port, ret;
-             char url[MAX_PATH], temp[MAX_PATH];
+             char url[MAX_PATH];
 
-             ret = sscanf(redir, "Location: %255[0-9.]:%d", url, &port);
-             if (ret == 0)
-                 ret = sscanf(redir, "Location: http://%255[0-9.]:%d", url, &port);
-             if (ret)
+             int ret = sscanf(redir, "Location: %255[^\r\n]", url);
+             if (ret == 1)
              {
-                 if (ret == 2)
-                    sprintf(temp, "http://%s:%d", url, port);
-                 else
-                    sprintf(temp, "http://%s", url);
-
                  delete [] m_path;
-                 m_path = new char[strlen(temp) + 1];
-                 strcpy(m_path, temp);
+                 m_path = new char[strlen(url) + 1];
+                 strcpy(m_path, url);
 
                  sprintf(url, "Redirected to: %s", m_path);
                  ReportStatus(url);
