@@ -47,10 +47,10 @@ sub append_line {
 
 %size_prefix = (
     ""  => "",
-    "b" => "byte ptr ",
-    "w" => "word ptr ",
-    "l" => "dword ptr ",
-    "q" => "quad ptr "		# XXX Just a guess, may be wrong
+    "b" => "BYTE PTR ",
+    "w" => "WORD PTR ",
+    "l" => "DWORD PTR ",
+    "q" => "QUAD PTR "		# XXX Just a guess, may be wrong
 );
 
 print ";; ***************************************************\n";
@@ -80,8 +80,10 @@ while (<>) {
     }
 
     if (!$header_done && $_ ne "") {
-    	$leader = "BITS 32\n" .
-		  "SECTION .text USE32\n\n" .
+    	$leader = ".386\n" .
+		  "FLAT\tgroup _TEXT\n" .
+		  "\tassume cs:FLAT, ds:FLAT, ss:FLAT\n" .
+		  "_TEXT\tsegment para public use32 'CODE'\n\n" .
 		  $leader;
     	$header_done = 1;
     }
@@ -92,17 +94,33 @@ while (<>) {
 	$label = "";
     }
 
-    if ($_ eq "") {		# Blank line, no translation
+    if ($_ eq "" && $trailer =~ /^\s*;%% (\w+)$/) {
+	$_ = $1;
+	tr/A-Z/a-z/;
+	$trailer = "\n";
+	if (/^proc$/) {
+	    $proclabel = $label;
+	    $label = "";
+	    $proclabel =~ s/:.*//;
+	    $_ = "$proclabel proc near";
+	} elsif (/^endp$/) {
+	    $_ = "$proclabel endp";
+	    $proclabel = "";
+	} else {
+	    &lerr ("Unrecognized special comment\n");
+	}
+    } elsif ($_ eq "") {		# Blank line, no translation
     } elsif (/^\.globa?l\s+($re_sym)$/) {
 	my $sym = &translate_sym ($1);
 
-	$_ = "GLOBAL $sym";
+	$_ = "public $sym";
     } elsif (/^\.extern\s+($re_sym)$/) {
 	my $sym = &translate_sym ($1);
 
-	$_ = "EXTERN $sym";
+	# $_ = "EXTERN $sym";
+	$_ = "";		# For now, ignore .extern directives
     } elsif (/^\.align\s+([0-9]+)$/) {
-	$_ = "; ALIGN $1";	# Don't know how to translate this
+	$_ = "align $1";	# Don't know how to translate this
     } elsif (/^\.type\s+/) {
 	$_ = "";		# No need for .type directives
     } elsif (/^\.size\s+/) {
@@ -212,17 +230,25 @@ while (<>) {
 		} elsif (/^(.*)\((.*)\)$/) {	# Memory operand
 		    $disp = $1;
 		    $elms = $2;
-		    $disp = "+" . $disp if ($disp ne "" && $disp !~ /^[-+]/);
+		    if ($disp =~ /^[0-9]/) {
+			$symdisp = "";
+			$numdisp = "+" . $disp;
+		    } elsif ($disp =~ /^[-+]/) {
+			$symdisp = "";
+			$numdisp = $disp;
+		    } else {
+			$symdisp = $disp;
+			$numdisp = "";
+		    }
 		    ($base,$index,$scale,$extra) = split (/\s*,\s*/, $elms);
 		    $base =~ s/^%//;
 		    $index =~ s/^%//;
 		    &lerr ("Too many elements in mem ref\n") if ($extra ne "");
 
-		    $_ = $size_prefix{$size} . "[" . $base;
-		    $_ .= $disp if $disp ne "";
+		    $_ = $size_prefix{$size} . $symdisp . "[" . $base;
 		    $_ .= "+" . $index if $index ne "";
 		    $_ .= "*" . $scale if $scale ne "";
-		    $_ .= "]";
+		    $_ .= $numdisp . "]";
 		}
 	    }
 
@@ -237,5 +263,6 @@ if ($#nested_repeat_bufs >= 0) {
 }
 
 print $repeat_buf;
-print "end\n";
+print "_TEXT\tends\n";
+print "\tend\n";
 
