@@ -4,10 +4,10 @@ group1=ID3v1 MetaData
 group2=Program Executable Files
 group3=Direct Sound Output
 group4=Default Plugins
-group5=Soundcard Output
+group5=OBS Input
 group6=ID3v2 MetaData
 group10=PMP300 Portable
-group7=OBS Input
+group7=Soundcard Output
 group11=M3U Playlist
 group8=Default Theme
 group9=HTTP Input
@@ -82,7 +82,7 @@ COMPRESSDLL=
 POTENTIALLY=No
 MISC=
 
-[OBS Input]
+[Soundcard Output]
 SELFREGISTERING=No
 HTTPLOCATION=
 LANGUAGE=
@@ -110,7 +110,7 @@ COMPRESSDLL=
 POTENTIALLY=No
 MISC=
 
-[Soundcard Output]
+[OBS Input]
 SELFREGISTERING=No
 HTTPLOCATION=
 LANGUAGE=
