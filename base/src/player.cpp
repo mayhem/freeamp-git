@@ -1411,6 +1411,11 @@ GenerateSigsWork(set<PlaylistItem *> *items)
 
         m_signatureSem->Signal();
     }
+
+    while (items->size() > 0) {
+        delete *(items->begin());
+        items->erase(items->begin());
+    }
     delete items;
 }
 

@@ -487,8 +487,10 @@ bool MusicCatalog::CaseCompare(string s1, string s2)
 
 void MusicCatalog::GenerateSignature(PlaylistItem *track)
 {
-    if (m_context->aps->GetCurrentProfileName() != "")
-        m_sigs->insert(track);
+    if (m_context->aps->GetCurrentProfileName() != "") {
+        PlaylistItem *copy = new PlaylistItem(*track);
+        m_sigs->insert(copy);
+    }
 }
 
 Error MusicCatalog::AddSong(const char *url)
