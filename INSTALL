@@ -13,8 +13,6 @@ Linux:
 
 	make install  
 	  (freeamp is installed to $(bindir), as set above)
-
-	make install_plugins
 	  (plugins are installed to $(libdir)/freeamp/plugins, as set
 	  above)
 
