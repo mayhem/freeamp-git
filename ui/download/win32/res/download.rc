@@ -73,8 +73,10 @@ BEGIN
     CONTROL         "",IDC_OVERALL_PROGRESS,"Button",BS_OWNERDRAW,2,110,270,
                     11
     PUSHBUTTON      "Help",IDC_SHOWHELP,169,192,50,14
-    CONTROL         "",IDC_RICHEDIT,"RICHEDIT",ES_MULTILINE | ES_AUTOHSCROLL | 
-                    ES_READONLY | WS_TABSTOP,2,4,270,25
+    CONTROL         "http://www.emusic.com/music/free.html",IDC_FREETRACKS,
+                    "Button",BS_OWNERDRAW | BS_FLAT | WS_TABSTOP,2,18,270,11
+    LTEXT           "The Download Manager enables you to download music from sites that support the RMP or RealJukebox download format. To try it check out the free music at",
+                    IDC_STATIC,2,2,270,17
 END
 
 
@@ -154,6 +156,14 @@ IDB_PROGRESS            BITMAP  DISCARDABLE     "progress256.bmp"
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_EXE_ICON            ICON    DISCARDABLE     "icon1.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_HAND                CURSOR  FIXED IMPURE    "hand.cur"
+
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 

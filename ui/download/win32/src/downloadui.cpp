@@ -54,6 +54,7 @@ static const int32 kPostPadding = 5;
 static const int32 kMinProgressWidth = 3;
 static const int32 kTotalPadding = kPrePadding + kElementPadding + kPostPadding;
 
+
 HINSTANCE g_hInstance = NULL;
 
 BOOL CALLBACK MainProc(	HWND hwnd, 
@@ -66,6 +67,12 @@ ProgressWndProc(HWND hwnd,
                 UINT msg, 
                 WPARAM wParam, 
                 LPARAM lParam);
+
+LRESULT WINAPI 
+FreeTracksWndProc(HWND hwnd, 
+                  UINT msg, 
+                  WPARAM wParam, 
+                  LPARAM lParam);
 
 #define UM_SETINFO WM_USER + 666
 
@@ -114,6 +121,7 @@ DownloadUI::DownloadUI(FAContext *context):UserInterface()
     m_target = m_context->target;
     m_propManager = m_context->props;
     m_dlm = m_context->downloadManager;
+    m_overURL = false;
 
     m_uiSemaphore = new Semaphore();
 
@@ -127,9 +135,16 @@ DownloadUI::DownloadUI(FAContext *context):UserInterface()
 
 DownloadUI::~DownloadUI()
 {
-    DeleteObject(m_progressBitmap);
+    if(m_progressBitmap)
+        DeleteObject(m_progressBitmap);
+
+    if(m_handCursor)
+        DeleteObject(m_handCursor);
+
     delete m_uiSemaphore;
     delete m_uiThread;
+
+
 }
 
 int32 DownloadUI::AcceptEvent(Event* event)
@@ -387,11 +402,7 @@ Error DownloadUI::Init(int32 startup_type)
     return kError_NoErr;
 }
 
-const char* kDownloadInstructions = "The Download Manager allows you to "
-                                    "download files from websites which "
-                                    "support the RMP or RealJukebox download "
-                                    "method. To try it out check out the free "
-                                    "music available at ";
+
 BOOL DownloadUI::InitDialog()
 {
     // get hwnds for all my controls
@@ -402,9 +413,7 @@ BOOL DownloadUI::InitDialog()
     m_hwndResume = GetDlgItem(m_hwnd, IDC_RESUME);
     m_hwndClose = GetDlgItem(m_hwnd, IDC_CLOSE);
     m_hwndProgress = GetDlgItem(m_hwnd, IDC_OVERALL_PROGRESS);
-    m_hwndText = GetDlgItem(m_hwnd, IDC_RICHEDIT);
-
-    SetWindowText(m_hwndText, kDownloadInstructions);
+    m_hwndText = GetDlgItem(m_hwnd, IDC_FREETRACKS);
 
     // Set the proc address as a property 
 	// of the window so it can get it
@@ -415,7 +424,23 @@ BOOL DownloadUI::InitDialog()
 	// Subclass the window so we can draw it
 	SetWindowLong(	m_hwndProgress, 
 					GWL_WNDPROC, 
-					(DWORD)ProgressWndProc );  
+					(DWORD)ProgressWndProc ); 
+    
+    // Set the proc address as a property 
+	// of the window so it can get it
+	SetProp(m_hwndText, 
+			"oldproc",
+			(HANDLE)GetWindowLong(m_hwndText, GWL_WNDPROC));
+
+    SetProp(m_hwndText, 
+			"ui",
+			(HANDLE)this);
+
+    // Subclass the window so we can draw it
+	SetWindowLong(	m_hwndText, 
+					GWL_WNDPROC, 
+                    (DWORD)::FreeTracksWndProc ); 
+
 
     HINSTANCE hinst = (HINSTANCE)GetWindowLong(m_hwnd, GWL_HINSTANCE);
     HICON appIcon = LoadIcon(hinst, MAKEINTRESOURCE(IDI_EXE_ICON));
@@ -464,7 +489,6 @@ BOOL DownloadUI::InitDialog()
 			"bitmap",
 			(HANDLE)m_progressBitmap);
 
-
     ListView_SetImageList(m_hwndList, m_noteImage, LVSIL_SMALL);
 
     // Add items to info view
@@ -509,6 +533,8 @@ BOOL DownloadUI::InitDialog()
 
     UpdateOverallProgress();*/
 
+    m_handCursor = LoadCursor(g_hInstance, MAKEINTRESOURCE(IDC_HAND));
+
     m_uiSemaphore->Signal();
     return TRUE;
 }
@@ -519,6 +545,59 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
 
     switch(controlId)
     {
+        case IDC_FREETRACKS:
+        {
+            HFONT font = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
+            HPEN pen = CreatePen(PS_SOLID, 1, RGB(0,0,238));
+            HFONT oldFont;
+            HPEN oldPen;
+            char url[256];
+
+            GetWindowText(dis->hwndItem, url, sizeof(url));
+
+            oldFont = (HFONT)SelectObject(dis->hDC, font);
+            oldPen = (HPEN)SelectObject(dis->hDC, pen);
+               
+            RECT clientRect;
+
+            GetClientRect(dis->hwndItem, &clientRect);
+
+            // Set the text background and foreground colors to the
+            // standard window colors
+            SetTextColor(dis->hDC, RGB(0,0,238));
+            SetBkColor(dis->hDC, GetSysColor(COLOR_3DFACE));
+             
+            RECT rcClip = clientRect;
+            int height = 0;
+
+            height = DrawText(   
+                        dis->hDC, 
+                        url,
+                        strlen(url),
+                        &rcClip,
+                        DT_LEFT|DT_WORDBREAK|DT_SINGLELINE|DT_CALCRECT);
+
+            height = DrawText(   
+                        dis->hDC, 
+                        url,
+                        strlen(url),
+                        &rcClip,
+                        DT_LEFT|DT_WORDBREAK|DT_SINGLELINE);
+
+            rcClip.bottom = rcClip.top + height + 1;
+
+            MoveToEx(dis->hDC, rcClip.left, rcClip.bottom, NULL);
+            LineTo(dis->hDC, rcClip.right, rcClip.bottom);
+
+            SelectObject(dis->hDC, oldFont);
+            SelectObject(dis->hDC, oldPen);
+
+            m_urlRect = rcClip;
+
+            DeleteObject(font);
+            break;
+        }
+
         case IDC_LIST:
         {
             uint32 uiFlags = ILD_TRANSPARENT;
@@ -1574,6 +1653,93 @@ void DownloadUI::UpdateOverallProgress()
     SendMessage(m_hwndProgress, UM_SETINFO, 0, (LPARAM)&pis);
 }
 
+
+LRESULT WINAPI 
+FreeTracksWndProc(HWND hwnd, 
+                  UINT msg, 
+                  WPARAM wParam, 
+                  LPARAM lParam)
+{
+    DownloadUI* ui = (DownloadUI*)GetProp( hwnd, "ui" );
+
+	
+
+    //  Pass all non-custom messages to old window proc
+	return ui->FreeTracksWndProc(hwnd, msg, wParam, lParam);
+}
+
+LRESULT DownloadUI::FreeTracksWndProc(HWND hwnd, 
+                                      UINT msg, 
+                                      WPARAM wParam, 
+                                      LPARAM lParam)
+{
+    WNDPROC lpOldProc = (WNDPROC)GetProp( hwnd, "oldproc" );
+
+    switch(msg)
+	{
+		case WM_DESTROY:   
+		{
+			//  Put back old window proc and
+			SetWindowLong( hwnd, GWL_WNDPROC, (DWORD)lpOldProc );
+
+			// remove window property
+			RemoveProp( hwnd, "oldproc" );
+            RemoveProp( hwnd, "ui" ); 
+			break;
+		}
+
+        case WM_SETCURSOR:   
+		{
+		    if(m_overURL)
+            {
+                SetCursor(m_handCursor);
+                return TRUE;
+            }
+			break;
+		}
+
+        case WM_MOUSEMOVE:
+        {
+            POINT pt;
+
+		    pt.x = LOWORD(lParam);  // horizontal position of cursor 
+            pt.y = HIWORD(lParam);  // vertical position of cursor 
+
+            if(PtInRect(&m_urlRect, pt))
+                m_overURL = true;
+            else
+                m_overURL = false;
+			break;
+		}
+
+        case WM_LBUTTONDOWN:
+        {
+            POINT pt;
+
+		    pt.x = LOWORD(lParam);  // horizontal position of cursor 
+            pt.y = HIWORD(lParam);  // vertical position of cursor 
+
+            if(PtInRect(&m_urlRect, pt))
+            {
+                char url[256];
+
+                GetWindowText(hwnd, url, sizeof(url));
+
+                ShellExecute(hwnd, 
+                             "open", 
+                             url, 
+                             NULL, 
+                             NULL, 
+                             SW_SHOWNORMAL);
+            }
+                
+			break;
+		}
+    }
+
+    return CallWindowProc(lpOldProc, hwnd, msg, wParam, lParam);
+}
+
 LRESULT WINAPI 
 ProgressWndProc(HWND hwnd, 
                 UINT msg, 
@@ -1765,6 +1931,7 @@ ProgressWndProc(HWND hwnd,
 	//  Pass all non-custom messages to old window proc
 	return CallWindowProc(lpOldProc, hwnd, msg, wParam, lParam ) ;
 }
+
 
 void DownloadUI::ShowHelp(uint32 topic)
 {

@@ -63,6 +63,11 @@ class DownloadUI : public UserInterface {
     BOOL MeasureItem(HWND hwnd, MEASUREITEMSTRUCT* mis);
     BOOL Destroy();
     void ShowHelp(uint32 topic);
+
+    LRESULT FreeTracksWndProc(HWND hwnd, 
+                              UINT msg, 
+                              WPARAM wParam, 
+                              LPARAM lParam);
    
  protected:
 
@@ -95,6 +100,10 @@ class DownloadUI : public UserInterface {
 
     HIMAGELIST  m_noteImage;
     HBITMAP  m_progressBitmap;
+
+    RECT m_urlRect;
+    HCURSOR m_handCursor;
+    bool m_overURL;
 };
 
 
