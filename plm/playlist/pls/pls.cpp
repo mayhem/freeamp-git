@@ -273,7 +273,7 @@ void PLS::AddItem(vector<PlaylistItem*>* list, char *entry,
             entry[index] = 0x00;
         }
         else
-            return;
+            break;
     }
 
     // is there anything left?
