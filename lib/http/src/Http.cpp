@@ -310,7 +310,7 @@ Error Http::Download(const string &url, bool fileDownload)
     {
         Error err;
         int   ret;
-        
+       
         err = Connect(s, (struct sockaddr*)&addr, ret);
         if (IsError(err))
             result = kError_UserCancel;
@@ -322,20 +322,20 @@ Error Http::Download(const string &url, bool fileDownload)
         {
             gethostname(localname, kMaxHostNameLen);    
 
-            const char* kHTTPQuery = "GET %s HTTP/1.1\r\n"
-                                     "Host: %s\r\n"
-                                     "Accept: */*\r\n" 
-                                     "User-Agent: FreeAmp/%s\r\n";
+            const char* kHTTPQuery = "GET %s HTTP/1.0\r\n"
+                                     "Host: %s:80\r\n"
+                                     "User-Agent: FreeAmp/%s\r\n"
+                                     "Accept: */*\r\n";
 
             // the magic 256 is enough for a time field that
             // we got from the server
             char* query = new char[ strlen(kHTTPQuery) + 
                                     file.length() +
-                                    strlen(localname) +
+                                    strlen(hostname) +
                                     strlen(FREEAMP_VERSION)+
                                     2];
         
-            sprintf(query, kHTTPQuery, file.c_str(), localname, FREEAMP_VERSION);
+            sprintf(query, kHTTPQuery, file.c_str(), hostname, FREEAMP_VERSION);
             strcat(query, "\r\n");
 
             int count;
@@ -407,7 +407,6 @@ Error Http::Download(const string &url, bool fileDownload)
             //cout << buffer << endl;
 
             //cout << returnCode << endl;
-
             switch(buffer[9])
             {
                 // 1xx: Informational - Request received, continuing process
