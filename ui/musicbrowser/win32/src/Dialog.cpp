@@ -1185,6 +1185,8 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
         }
     }
 
+    CheckForCD();
+
     m_initialized = true;
 }
 

@@ -338,6 +338,7 @@ class MusicBrowserUI : public UserInterface
 
     void RefreshCDList(vector<PlaylistItem*>* tracks);
     void DeviceChanged(uint32 event, PDEV_BROADCAST_HDR data);
+    void CheckForCD();
 
     // Functions in EditTrackInfoDialog.cpp
     void CreateEditInfoLists(set<string>& artists,
