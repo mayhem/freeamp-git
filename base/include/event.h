@@ -54,6 +54,7 @@ class EventQueue {
 #define CMD_NextMediaPiece      3  // set pointer in playlist to next mediapiece (no arg)
 #define CMD_PrevMediaPiece      4  // set pointer in playlist to prev mediapiece (no arg)
 #define CMD_Pause               5  // pause current play (no arg)
+#define CMD_PlayPaused			6  // play, but start in the 'paused' mode
 #define CMD_QuitPlayer          7  // tells player to quit (no arg)
 #define CMD_Cleanup             8  // player tells modules to cleanup and get ready for termination (no arg)
 //#define CMD_Terminate           9  // is sent by player to COOs, and the DummyCOO makes the main thread delete player and exit (no arg)

@@ -2099,6 +2099,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 									sizeof(szFile));
 
 			g_ui->m_plm->RemoveAll();
+			g_ui->m_target->AcceptEvent(new Event(CMD_Stop));
 			for(int32 i = 0; i < count; i++)
 			{
 				DragQueryFile(	hDrop,

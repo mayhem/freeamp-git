@@ -197,6 +197,9 @@ void PlayListManager::SendInfoToPlayer() {
 		MediaInfoEvent *mie = pli->GetMediaInfo();
 		if (mie) {
 			m_target->AcceptEvent(mie);
+		} else {
+			MediaInfoEvent *pMIE = new MediaInfoEvent(pli->m_url,0);
+			m_target->AcceptEvent(pMIE);
 		}
     }
 }

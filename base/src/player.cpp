@@ -516,6 +516,7 @@ int32 Player::ServiceEvent(Event *pC) {
 		return 0;
 		break;
 	    }
+		case CMD_PlayPaused:
 	    case CMD_Play: {
 		PlayListItem *pc = m_plm->GetCurrent();
 		Error error = kError_NoErr;
@@ -527,45 +528,57 @@ int32 Player::ServiceEvent(Event *pC) {
 			m_lmc = NULL;
 		    }
 		    
-		    RegistryItem* item = NULL;
 		    PhysicalMediaOutput *pmo = NULL;
 		    PhysicalMediaInput *pmi = NULL;
-		    item = pc->GetPMIRegistryItem();
-		    
-		    if(item) {
-			pmi = (PhysicalMediaInput *)item->InitFunction()();
-			error = pmi->SetTo(pc->m_url);
-			
-			if(IsError(error))
-			{
-			    delete pmi;
-			    break;
+		    RegistryItem *pmi_item = pc->GetPMIRegistryItem();
+			RegistryItem *lmc_item = pc->GetLMCRegistryItem();
+
+			if (!pmi_item || !lmc_item) {
+#ifdef WIN32
+				char foo[512];
+				sprintf(foo,"Sorry, FreeAmp currently does not support the file %s\n\nClick Next to go to the next song",pc->m_url);
+				MessageBox(NULL,foo,"FreeAmp Error",MB_OK | MB_TASKMODAL);
+#endif
+				if (SetState(STATE_Stopped)) {
+					SEND_NORMAL_EVENT(INFO_Stopped);
+				}
+				delete pC;
+				return 0;
 			}
+
+		    if(pmi_item) {
+				pmi = (PhysicalMediaInput *)pmi_item->InitFunction()();
+				error = pmi->SetTo(pc->m_url);
+				
+				if(IsError(error))
+				{
+					delete pmi;
+					break;
+				}
 		    }
 		    
-		    item = m_pmoRegistry->GetItem(0);
+		    RegistryItem *item = m_pmoRegistry->GetItem(0);
 		    
 		    if(item) {
-			pmo = (PhysicalMediaOutput *)item->InitFunction()();
+				pmo = (PhysicalMediaOutput *)item->InitFunction()();
 		    }
 		    
-		    item = pc->GetLMCRegistryItem();
 		    error = kError_NoErr;
-		    if(item) {
-			m_lmc = (LogicalMediaConverter *)item->InitFunction()();
-			
-			if ((error = m_lmc->SetTarget((EventQueue *)this)) != kError_NoErr) {
-			    DISPLAY_ERROR(m_lmc,error);
-			    return 0;
-			}
-			if ((error = m_lmc->SetPMI(pmi)) != kError_NoErr) {
-			    DISPLAY_ERROR(m_lmc,error);
-			    return 0;
-			}
-			if ((error = m_lmc->SetPMO(pmo)) != kError_NoErr) {
-			    DISPLAY_ERROR(m_lmc,error);
-			    return 0;
-			}
+		    if(lmc_item) {
+				m_lmc = (LogicalMediaConverter *)lmc_item->InitFunction()();
+				
+				if ((error = m_lmc->SetTarget((EventQueue *)this)) != kError_NoErr) {
+					DISPLAY_ERROR(m_lmc,error);
+					return 0;
+				}
+				if ((error = m_lmc->SetPMI(pmi)) != kError_NoErr) {
+					DISPLAY_ERROR(m_lmc,error);
+					return 0;
+				}
+				if ((error = m_lmc->SetPMO(pmo)) != kError_NoErr) {
+					DISPLAY_ERROR(m_lmc,error);
+					return 0;
+				}
 		    }
 		    
 		    if ((error = m_lmc->InitDecoder()) != kError_NoErr) {
@@ -579,7 +592,7 @@ int32 Player::ServiceEvent(Event *pC) {
 				delete pC;
 				return 0;
 			}
-			if (m_playerState == STATE_Paused) {
+			if ((m_playerState == STATE_Paused) || (pC->Type() == CMD_PlayPaused)) {
 				if ((error = m_lmc->Pause()) != kError_NoErr) {
 					DISPLAY_ERROR(m_lmc,error);
 					delete pC;
@@ -589,6 +602,9 @@ int32 Player::ServiceEvent(Event *pC) {
 					DISPLAY_ERROR(m_lmc,error);
 					delete pC;
 					return 0;
+				}
+				if (SetState(STATE_Paused)) {
+					SEND_NORMAL_EVENT(INFO_Paused);
 				}
 			} else {
 				if ((error = m_lmc->Decode()) != kError_NoErr) {
