@@ -98,7 +98,7 @@ FAMainWindow::FAMainWindow(Display *display, int32 screen_num,GC gc, Window pare
 
     mwmhints = XInternAtom(m_display, "_MOTIF_WM_HINTS", false);
     hints.decorations = 0;
-    hints.flags |= MWM_HINTS_DECORATIONS;
+    hints.flags = MWM_HINTS_DECORATIONS;
     XChangeProperty(m_display, m_me, mwmhints, mwmhints, 32, PropModeReplace, (unsigned char *)&hints, 5);
 
 }
@@ -394,7 +394,7 @@ void FALcdWindow::SetState(int32 state) {
 }
 
 void FALcdWindow::SetMainText(const char *pText) {
-    if (m_text) delete m_text;
+    if (m_text) delete [] m_text;
     int32 l = strlen(pText);
     m_text = new char[l+1];
     memcpy(m_text,pText,l*sizeof(char));

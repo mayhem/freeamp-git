@@ -103,6 +103,8 @@ void FreeAmpUI::SetPlayListManager(PlayListManager *plm) {
 
 Error FreeAmpUI::Init(int32 startup_type)
 {
+    assert(this);
+
     m_startupType = startup_type;
     if (m_noStartUp) {
 	return kError_InitFailedSafely;
@@ -498,6 +500,7 @@ void FreeAmpUI::ParseArgs() {
 
 
 void FreeAmpUI::x11ServiceFunction(void *p) {
+    assert(p);
     ((FreeAmpUI *)p)->X11EventService();
 }
 
