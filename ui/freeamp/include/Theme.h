@@ -113,6 +113,8 @@ class Theme : public Parse
       string            m_oDefaultFont;
 	  string            m_oThemeName, m_oThemeAuthor;
 	  string            m_oAuthorEMail, m_oAuthorWebPage;
+	  string            m_oSavedText;
+	  bool              m_bCreditsShown;
 };
 
 #endif
