@@ -340,7 +340,8 @@ void AlsaPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
 
    if (m_iBaseTime < 0)
    {
-       m_iBaseTime = (pEvent->GetFrameNumber() * 1152) / 
+       m_iBaseTime = (pEvent->GetFrameNumber() * 
+                      myInfo->samples_per_frame) / 
                       myInfo->samples_per_second;
    }
 

@@ -92,6 +92,9 @@ void VSliderControl::Transition(ControlTransitionEnum  eTrans,
        {
        	   int iNewPos;	
 
+           if (m_iValue < 0 || m_iValue > 100)
+              return;
+              
            iNewPos = ((100 - m_iValue) * m_iRange) / 100;
            if (iNewPos == m_iCurrentPos)
                return;

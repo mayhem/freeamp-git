@@ -417,7 +417,7 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
                      info->m_seconds;
          if (iSeconds == m_iCurrentSeconds || m_bSeekInProgress)
              break;
-             
+
          m_iCurrentSeconds = iSeconds;            
          UpdateTimeDisplay(m_iCurrentSeconds);
 

@@ -80,6 +80,7 @@ public:
 	uint32			m_hdr_size;
 	uint32			m_data_size;
 	uint32			m_num_headers;
+	uint32          m_samples_per_frame;
 	bool			m_initialized, m_bPaused;
 
     Thread         *m_pBufferThread;

@@ -59,7 +59,7 @@ typedef struct OutputInfo
 	uint32 number_of_channels;
 	uint32 samples_per_second;
 	uint32 max_buffer_size;
-
+    uint32 samples_per_frame;
 }OutputInfo;
 
 class EventBuffer;

@@ -104,7 +104,7 @@ public:
   Error           DSWriteToSecBuffer(int32&, void*, int32);
   WAVEFORMATEX*   m_wfex;
 
-  uint32          m_samples_per_second;
+  uint32          m_samples_per_second, m_samples_per_frame;
   uint32          m_data_size, m_iLastVolume;
   bool            m_initialized;
 

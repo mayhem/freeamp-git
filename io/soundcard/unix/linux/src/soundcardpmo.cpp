@@ -290,7 +290,8 @@ void SoundCardPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
 
    if (pEvent->GetFrameNumber() != m_iLastFrame + 1)
    {
-       m_iTotalBytesWritten = 1152 * pEvent->GetFrameNumber() * 
+       m_iTotalBytesWritten = myInfo->samples_per_frame * 
+                              pEvent->GetFrameNumber() * 
                               m_iBytesPerSample; 
    }
    m_iLastFrame = pEvent->GetFrameNumber();

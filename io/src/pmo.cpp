@@ -114,11 +114,10 @@ void PhysicalMediaOutput::SetPMI(PhysicalMediaInput *pPMI)
 
 void PhysicalMediaOutput::Pause(void)
 {
-    PipelineUnit::Pause();
-
-    m_pPmi->PauseLoop(true);
-
     Reset(true);
+
+    PipelineUnit::Pause();
+    m_pPmi->PauseLoop(true);
 }
 
 void PhysicalMediaOutput::Resume(void)
