@@ -977,7 +977,7 @@ void MusicBrowserUI::CreateToolbar(void)
 				REBARCLASSNAME,
 				NULL,
                 WS_VISIBLE | WS_BORDER | WS_CHILD | 0 |
-                  WS_CLIPSIBLINGS | CCS_NODIVIDER | RBS_VARHEIGHT | 
+                  WS_CLIPSIBLINGS | CCS_NODIVIDER | RBS_VARHEIGHT |
                   RBS_BANDBORDERS | CCS_NOPARENTALIGN,
 				0, 0, rect.right - rect.left, toolbarHeight,
 				m_hWnd,
