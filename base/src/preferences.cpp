@@ -86,6 +86,7 @@ const char* kWatchThisDirTimeoutPref = "WatchThisDirectoryTimeout";
 const char* kWriteID3v1Pref = "WriteID3v1Tags";
 const char* kWriteID3v2Pref = "WriteID3v2Tags";
 const char* kEqualizerSettingsPref = "EqualizerSettings";
+const char* kSavedPlaylistPositionPref = "SavedPlaylistPosition";
 
 //logging
 const char* kUseDebugLogPref = "UseDebugLog";
@@ -148,6 +149,7 @@ const int32 kDefaultWatchThisDirTimeout = 600000;
 const bool  kDefaultWriteID3v1 = true;
 const bool  kDefaultWriteID3v2 = true;
 const char* kDefaultEqualizerSettings = "1,50,50,50,50,50,50,50,50,50,50";
+const uint32 kDefaultSavedPlaylistPosition = 0;
 
 Error
 Preferences::
@@ -349,6 +351,9 @@ SetDefaults()
     if (GetPrefString(kEqualizerSettingsPref, dummyString, 
         (uint32 *)&dummyInt) == kError_NoPrefValue)
         SetPrefString(kEqualizerSettingsPref, kDefaultEqualizerSettings);
+
+    if (GetPrefInt32(kSavedPlaylistPositionPref, &dummyInt) == kError_NoPrefValue)
+        SetPrefInt32(kSavedPlaylistPositionPref, kDefaultSavedPlaylistPosition);
 
     return kError_NoErr;
 }
@@ -1195,6 +1200,20 @@ Preferences::
 SetEqualizerSettings(const char* settings)
 {
     return SetPrefString(kEqualizerSettingsPref, settings);
+}
+
+Error
+Preferences::
+GetSavedPlaylistPosition(uint32* value)
+{
+    return GetPrefInt32(kSavedPlaylistPositionPref, (int32*)value);
+}
+
+Error
+Preferences::
+SetSavedPlaylistPosition(uint32 value)
+{
+    return SetPrefInt32(kSavedPlaylistPositionPref, (int32)value);
 }
 
 LibDirFindHandle *

@@ -92,6 +92,7 @@ extern const char* kWatchThisDirTimeoutPref;
 extern const char* kWriteID3v1Pref;
 extern const char* kWriteID3v2Pref;
 extern const char* kEqualizerSettingsPref;
+extern const char* kSavedPlaylistPositionPref;
 
 extern const int32 kDefaultWatchThisDirTimeout;
 
@@ -298,6 +299,9 @@ class Preferences {
 
     Error GetEqualizerSettings(char* settings, uint32* len);
     Error SetEqualizerSettings(const char* settings);
+
+    Error GetSavedPlaylistPosition(uint32* value);
+    Error SetSavedPlaylistPosition(uint32  value);
 };
 
 #endif /* _PREFERENCES_H */

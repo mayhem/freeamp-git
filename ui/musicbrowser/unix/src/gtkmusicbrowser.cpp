@@ -1082,8 +1082,13 @@ GTKMusicBrowser::GTKMusicBrowser(FAContext *context, MusicBrowserUI *masterUI,
         bool saveOnExit;
         m_context->prefs->GetSaveCurrentPlaylistOnExit(&saveOnExit);
 
-        if (saveOnExit) 
+        if (saveOnExit) {
             LoadPlaylist(playlistURL);
+            uint32 pos = 0; 
+            m_context->prefs->GetSavedPlaylistPosition(&pos);
+
+            m_plm->SetCurrentIndex(pos);   
+        }
         else
             m_currentListName = playlistURL;
     }
@@ -1164,11 +1169,14 @@ void GTKMusicBrowser::Close(bool inMain)
         bool saveOnExit = false;
         m_context->prefs->GetSaveCurrentPlaylistOnExit(&saveOnExit);
 
-        if (saveOnExit && m_plm)
+        if (saveOnExit && m_plm) {
             SaveCurrentPlaylist(NULL);
+            m_context->prefs->SetSavedPlaylistPosition(m_plm->GetCurrentIndex());
+        }
     }
     else {
-        if (m_plm && m_currentListName.length() == 0 && m_plm->CountItems() > 0) {
+        if (m_plm && m_currentListName.length() == 0 && m_plm->CountItems() > 0) 
+        {
             gdk_window_raise(musicBrowser->window);
             GTKMessageDialog oBox;
             string oMessage = string("Do you want to save this playlist to disk? ");

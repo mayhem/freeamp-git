@@ -57,13 +57,13 @@ FREEAMPbeosOBJ += base/beos/src/mutex.o base/beos/src/semaphore.o
 FREEAMPbeosOBJ += base/beos/src/utility.o base/beos/src/freeampapp.o
 FREEAMPbeosOBJ += base/beos/src/win32impl.o
 
-FREEAMPOBJ =  base/src/log.o base/src/player.o base/src/musiccatalog.doh
+FREEAMPOBJ =  base/src/log.o base/src/player.o base/src/musiccatalog.o
 FREEAMPOBJ += base/src/playlist.o base/src/propimpl.o base/src/registrar.o
 FREEAMPOBJ += base/src/registry.o base/src/thread.o io/src/eventbuffer.o
 FREEAMPOBJ += base/src/prefixprefs.o base/src/preferences.o
 FREEAMPOBJ += base/src/debug.o base/src/utility.o base/src/database.o 
 FREEAMPOBJ += base/src/downloadmanager.o base/src/errors.o
-FREEAMPOBJ += io/src/pullbuffer.o io/src/streambuffer.o io/src/tstream.o
+FREEAMPOBJ += io/src/pullbuffer.o io/src/tstream.o
 FREEAMPOBJ += base/src/undomanager.o #base/src/updatemanager.o
 FREEAMPOBJ += base/src/timer.o io/src/pipeline.o
 FREEAMPOBJ += $(FREEAMP$(HOST_OS)OBJ)
