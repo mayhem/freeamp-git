@@ -228,6 +228,14 @@ bool ID3v2::ReadMetaData(const char* url, MetaData* metadata)
     URLToFilePath(url, path, &length);
 
     pTag = ID3Tag_New();
+#ifdef WIN32
+    int ret = ID3Tag_Link(pTag, path);
+	if (ret <= 0)
+	{
+		ID3Tag_Delete(pTag);
+		return false;
+	}
+#else
     ID3Tag_Link(pTag, path);
 
     if (!ID3Tag_HasTagType(pTag, ID3TT_ID3V1) &&
@@ -237,6 +245,7 @@ bool ID3v2::ReadMetaData(const char* url, MetaData* metadata)
         ID3Tag_Delete(pTag);
         return false;
     }
+#endif
 
 #if (ID3LIB_PATCH_VERSION >= 13) || (ID3LIB_MINOR_VERSION > 7) || \
     (ID3LIB_MAJOR_VERSION > 3)
