@@ -60,7 +60,7 @@ ToolBarButton::Draw( BRect updateRect )
 
     MovePenTo( 0.5 * ( bounds.Width() - m_bitmapEnabledOn->Bounds().Width() ),
                bounds.top + MARGIN );
-    SetDrawingMode( B_OP_OVER );
+    SetDrawingMode( B_OP_ALPHA );
     DrawBitmap( m_bitmapEnabledOn );
 
     // Label.
@@ -69,6 +69,7 @@ ToolBarButton::Draw( BRect updateRect )
     MovePenTo( bounds.left + MARGIN, bounds.bottom - MARGIN );
     SetHighColor( 0, 0, 0, 255 );
     DrawString( Label() );
+	SetDrawingMode( B_OP_COPY );
 }
 
 void

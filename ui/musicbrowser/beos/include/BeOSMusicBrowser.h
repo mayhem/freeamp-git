@@ -36,7 +36,7 @@ enum {
     // These are simply BMessage wrappers for the similarly named
     // FreeAmp events (those dispatched to/from AcceptEvent())
     MBMSG_PLAYLIST_CURRENT_ITEM_INFO = 'plci',
-    MBMSG_PLAYLIST_ITEM_UPDATED = 'piud',
+    MBMSG_PLAYLIST_ITEMS_UPDATED = 'piud',
     MBMSG_PLAYLIST_SORTED = 'plsd',
     MBMSG_PLAYLIST_UPDATED = 'plud',
     MBMSG_SEARCH_MUSIC_DONE = 'smdn',
