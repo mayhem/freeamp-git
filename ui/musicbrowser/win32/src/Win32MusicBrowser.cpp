@@ -892,11 +892,16 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
             {
                 HWND hwnd = (HWND)prop->GetInt32();
     
-                vector<PlaylistItem*> items;
+                PlaylistItem* item = m_plm->GetCurrentItem();
 
-                items.push_back(m_plm->GetCurrentItem());
+                if(item)
+                {
+                    vector<PlaylistItem*> list;
 
-                EditInfo(items, hwnd);
+                    list.push_back(item);
+
+                    EditInfo(list, hwnd);
+                }
             }
 
             break;
