@@ -25,6 +25,7 @@ ____________________________________________________________________________*/
 #define INCLUDED_GTKFONT_H__
 
 #include "config.h"
+#include "facontext.h"
 
 #include <string>
 #include <gdk/gdk.h>
@@ -53,7 +54,8 @@ class GTKFont : public Font
 {
     public:
 
-               GTKFont(string &oName, string &oFace, string &oDefault);
+               GTKFont(FAContext *context, string &oName, string &oFace, 
+                       string &oDefault);
       virtual ~GTKFont(void);
 
       Error    Load(int iFontHeight, bool bBold, bool bItalic);
@@ -62,6 +64,9 @@ class GTKFont : public Font
       void     Render(Rect &oClipRect, string &oText, int iOffset, 
                       const Color &oColor, GTKBitmap *bitmap, bool bUnderline);
       
+    protected:
+      FAContext *m_context;
+
     private:
       FontTypeEnum type;
 

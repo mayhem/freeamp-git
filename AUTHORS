@@ -91,3 +91,7 @@ Other major contributors and their contributions:
 
 "Jimen Ching" <jching@flex.com>
 * patch to configure to change the gcc check to a g++ check
+
+"Brian Almeida" <bma@debian.org>
+* Debian maintainer
+* various small fixes and patches

@@ -95,6 +95,8 @@ gint do_timeout(GTKWindow *ui)
     ui->m_pMindMeldMutex->Acquire();
     ui->TimerEvent();
     ui->m_pMindMeldMutex->Release();
+    
+    return TRUE;
 }
 
 GTKWindow::GTKWindow(Theme *pTheme, string &oName)

@@ -24,11 +24,14 @@ ____________________________________________________________________________*/
 #include "config.h"
 
 #include <gtk/gtk.h>
+#include <sys/stat.h>
 #include <strstream>
 #include <iostream>
 
 #include "utility.h"
 #include "downloadui.h"
+#include "help.h"
+#include "gtkmessagedialog.h"
 
 void DownloadUI::ToggleVisEvent(void)
 {
@@ -239,9 +242,30 @@ void resume_internal(GtkWidget *w, DownloadUI *p)
     p->ResumeEvent();
 }
 
-void add_button_event(GtkWidget *w, DownloadUI *p)
+void DownloadUI::ShowHelp(void)
 {
-    p->AddURLEvent();
+    string oHelpFile;
+    char   dir[_MAX_PATH];
+    uint32 len = _MAX_PATH;
+
+    m_context->prefs->GetInstallDirectory(dir, &len);
+    oHelpFile = string(dir) + string(DIR_MARKER_STR) + string("../share/");
+    oHelpFile += string(HELP_FILE);
+
+    struct stat st;
+
+    if (stat(oHelpFile.c_str(), &st) == 0 && st.st_mode & S_IFREG)
+        LaunchBrowser((char *)oHelpFile.c_str());
+    else {
+        GTKMessageDialog oBox;
+        string oMessage("Cannot find the help files. Please make sure that the help files are properly installed, and you are not running "BRANDING" from the build directory.");
+        oBox.Show(oMessage.c_str(), string(BRANDING), kMessageOk, true);
+    }
+}
+
+void help_button_click(GtkWidget *w, DownloadUI *p)
+{
+    p->ShowHelp();
 }
 
 void DownloadUI::CreateDownloadUI(void)
@@ -256,25 +280,6 @@ void DownloadUI::CreateDownloadUI(void)
     GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
     gtk_container_add(GTK_CONTAINER(m_downloadUI), vbox);
     gtk_widget_show(vbox);
-
-    GtkWidget *addHbox = gtk_hbox_new(FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), addHbox, FALSE, FALSE, 5);
-    gtk_widget_show(addHbox);
-
-    GtkWidget *label = gtk_label_new("Add URL: ");
-    gtk_box_pack_start(GTK_BOX(addHbox), label, FALSE, FALSE, 5);
-    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5); 
-    gtk_widget_show(label);
-
-    addEntry = gtk_entry_new();
-    gtk_box_pack_start(GTK_BOX(addHbox), addEntry, TRUE, TRUE, 0);
-    gtk_widget_show(addEntry);
-
-    GtkWidget *addButton = gtk_button_new_with_label(" Add ");
-    gtk_signal_connect(GTK_OBJECT(addButton), "clicked",
-                       GTK_SIGNAL_FUNC(add_button_event), this);
-    gtk_box_pack_start(GTK_BOX(addHbox), addButton, FALSE, FALSE, 5);
-    gtk_widget_show(addButton);
 
     GtkWidget *listwindow = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(listwindow),
@@ -291,7 +296,7 @@ void DownloadUI::CreateDownloadUI(void)
     gtk_box_pack_start(GTK_BOX(vbox), table, FALSE, FALSE, 0);
     gtk_widget_show(table);
 
-    label = gtk_label_new("Artist:");
+    GtkWidget *label = gtk_label_new("Artist:");
     gtk_misc_set_alignment(GTK_MISC(label), (gfloat)0.0, (gfloat)0.5);
     gtk_table_attach(GTK_TABLE(table), label, 0, 1, 0, 1, GTK_FILL, GTK_FILL,
                      10, 1);
@@ -378,19 +383,19 @@ void DownloadUI::CreateDownloadUI(void)
     gtk_box_pack_end(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
     gtk_widget_show(hbox);
 
-    m_CancelButton = gtk_button_new_with_label("Cancel Download");
+    m_CancelButton = gtk_button_new_with_label("  Cancel  ");
     gtk_box_pack_start(GTK_BOX(hbox), m_CancelButton, FALSE, FALSE, 5);
     gtk_signal_connect(GTK_OBJECT(m_CancelButton), "clicked",
                        GTK_SIGNAL_FUNC(cancel_internal), this);
     gtk_widget_show(m_CancelButton);
 
-    m_PauseButton = gtk_button_new_with_label("Pause Download");
+    m_PauseButton = gtk_button_new_with_label("  Pause  ");
     gtk_box_pack_start(GTK_BOX(hbox), m_PauseButton, FALSE, FALSE, 5);
     gtk_signal_connect(GTK_OBJECT(m_PauseButton), "clicked",
                        GTK_SIGNAL_FUNC(pause_internal), this);
     gtk_widget_show(m_PauseButton);
 
-    m_ResumeButton = gtk_button_new_with_label("Resume Download");
+    m_ResumeButton = gtk_button_new_with_label("  Resume  ");
     gtk_box_pack_start(GTK_BOX(hbox), m_ResumeButton, FALSE, FALSE, 5);
     gtk_signal_connect(GTK_OBJECT(m_ResumeButton), "clicked", 
                        GTK_SIGNAL_FUNC(resume_internal), this);
@@ -400,7 +405,13 @@ void DownloadUI::CreateDownloadUI(void)
     gtk_box_pack_start(GTK_BOX(hbox), sep, TRUE, FALSE, 5);
     gtk_widget_show(sep);
 
-    m_CloseButton = gtk_button_new_with_label("Close");
+    m_helpButton = gtk_button_new_with_label("  Help  ");
+    gtk_box_pack_end(GTK_BOX(hbox), m_helpButton, FALSE, FALSE, 5);
+    gtk_signal_connect(GTK_OBJECT(m_helpButton), "clicked", 
+                       GTK_SIGNAL_FUNC(help_button_click), this);
+    gtk_widget_show(m_helpButton);
+
+    m_CloseButton = gtk_button_new_with_label("  Close  ");
     gtk_box_pack_end(GTK_BOX(hbox), m_CloseButton, FALSE, FALSE, 5);
     gtk_signal_connect(GTK_OBJECT(m_CloseButton), "clicked",
                        GTK_SIGNAL_FUNC(toggle_vis_internal), this);

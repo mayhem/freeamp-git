@@ -24,7 +24,6 @@ ____________________________________________________________________________*/
 #include <gtk/gtk.h>
 #include "downloadui.h" 
 #include "eventdata.h"
-#include "gtkmessagedialog.h"
 
 extern "C" {
 
@@ -271,39 +270,4 @@ void DownloadUI::SelChangeEvent(int row)
             break;
     }
     UpdateInfo();
-}
-
-void DownloadUI::AddURLEvent(void)
-{
-    char *text = gtk_entry_get_text(GTK_ENTRY(addEntry));
-    if (text) {
-        uint32 length = strlen(text);
-        if (length) {
-            length++;
-            char *sp = NULL;
-            char *url = new char[length + 7];
- 
-            strcpy(url+7, text);
-
-            if ((sp = strstr(url + 7, "://"))) {
-                if (strncasecmp(url + 7, "http://", 7)) {
-                    GTKMessageDialog oBox;
-                    string oMessage = "The Download Manager only supports http:// URLs for now.";
-                    oBox.Show(oMessage.c_str(), "Error", kMessageOk, true);
-
-                    delete [] url;
-                    return;
-                }
-                sp = url + 7;
-            }
-            else {
-                memcpy(url, "http://", 7);
-                sp = url;
-            }
-
-        m_dlm->AddItem(sp);
-
-        delete [] url;
-        }
-    }
 }

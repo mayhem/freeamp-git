@@ -148,6 +148,11 @@ class GTKMusicBrowser {
     GtkWidget *toolDown;
     GtkItemFactory *menuFactory;
 
+    GtkCTreeNode *mainTree;
+    GtkCTreeNode *allTree;
+    GtkCTreeNode *uncatTree;
+    GtkCTreeNode *playlistTree;
+
     GtkWidget *NewPixmap(char **data);
 
     void SetStatusText(const char *text);

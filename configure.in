@@ -72,7 +72,7 @@ dnl Check for some more stuff
 cmdline="true"
 isunix="true"
 OSLINK=""
-FPIC="-fpic"
+FPIC="-fPIC"
 LINKMOD="$CC -shared"
 LIBMOD="ar -r"
 OSTYPE="UNIX";

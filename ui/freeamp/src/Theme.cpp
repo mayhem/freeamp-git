@@ -462,7 +462,8 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
 #ifdef WIN32
        pFont = new Win32Font(oAttrMap["Name"], oAttrMap["Face"], m_oDefaultFont);
 #elif defined (HAVE_GTK)
-       pFont = new GTKFont(oAttrMap["Name"], oAttrMap["Face"], m_oDefaultFont);
+       pFont = new GTKFont(m_pContext, oAttrMap["Name"], oAttrMap["Face"], 
+                           m_oDefaultFont);
 #elif defined (__BEOS__)
        pFont = new BeOSFont(oAttrMap["Name"], oAttrMap["Face"], m_oDefaultFont);
 #endif

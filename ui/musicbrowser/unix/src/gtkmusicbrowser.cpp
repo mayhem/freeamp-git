@@ -716,6 +716,67 @@ static gint nocase_compare(GtkCList *clist, gconstpointer ptr1,
     return strcasecmp (text1, text2);
 }
 
+static gint TreeDataCompare(TreeData *a, TreeData *b)
+{
+    bool retvalue = false;
+    if ((a->type == b->type) && (a->catalog == b->catalog) && 
+        (a->album == b->album) && (a->track == b->track) && 
+        (a->playlistname == b->playlistname) && (a->message == b->message))
+        retvalue = true;
+    return retvalue;
+}
+/*            
+GList *GTKMusicBrowser::FindTrackNode(const ArtistList *artist,             
+                                      const AlbumList  *album,
+                                      const PlaylistItem *item)
+{
+    vector<GtkCTreeNode *> *nodelist = new vector<GtkCTreeNode *>;
+
+    TreeData *data = NewTreeData(kTreeTrack, NULL, artist, album, item);
+
+    return gtk_ctree_find_all_by_row_data_custom(musicBrowserTree, NULL,
+                                                 data, 
+                                                 (GCompareFunc)TreeDataCompare);
+}
+
+void GTKMusicBrowser::AddCatTrack(const ArtistList *artist, 
+                                  const AlbumList *album,
+                                  const PlaylistItem *item)
+{
+    gtk_clist_freeze(GTK_CLIST(musicBrowserTree));
+    char *name[1];
+
+    if (!artist) {
+        GtkCTreeNode *treeItem;
+        MetaData mdata = item->GetMetaData();
+        name[0] = (char *)mdata.Title().c_str();
+        pixmap = gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, &mask,
+                                          &style->bg[GTK_STATE_NORMAL],
+                                          track_pix);
+        treeItem = gtk_ctree_insert_node(musicBrowserTree, uncatTree,
+                                         NULL, name, 5,
+                                         pixmap, mask, pixmap, mask, true,
+                                         false);
+        data = NewTreeData(kTreeTrack, NULL, NULL, NULL, item);
+        gtk_ctree_node_set_row_data(musicBrowserTree, uncatItem, data);
+
+        treeItem = gtk_ctree_insert_node(musicBrowserTree, allTree,
+                                         NULL, name, 5, pixmap, mask, pixmap,
+                                         mask, true, false);
+        data = NewTreeData(kTreeTrack, NULL, NULL, NULL, item);
+        gtk_ctree_node_set_row_data(musicBrowserTree, allItem, data);
+    }
+
+    GList *nodeList = FindTrackNode(artist, album, NULL);
+    if (!nodeList) {
+    }
+    else {
+    }
+
+    gtk_ctree_sort_recursive(musicBrowserTree, allTree);
+    gtk_clist_thaw(GTK_CLIST(musicBrowserTree));
+}
+*/
 void GTKMusicBrowser::UpdateCatalog(void)
 {
     m_musicCatalog = m_context->browser->m_catalog;
@@ -744,7 +805,7 @@ void GTKMusicBrowser::UpdateCatalog(void)
     if (musicBrowserTree) 
         gtk_clist_clear(GTK_CLIST(musicBrowserTree));
 
-    GtkCTreeNode *mainTree, *allTree, *allItem, *uncatTree, *uncatItem;
+    GtkCTreeNode *allItem, *uncatItem;
     TreeData *data;
     char *name[1];
 
@@ -845,7 +906,7 @@ void GTKMusicBrowser::UpdateCatalog(void)
                                                   NULL, name,  
                                                   5, pixmap, mask, pixmap, mask,
                                                   true, false);
-                data = NewTreeData(kTreeTrack, NULL, NULL, NULL, (*k));
+                data = NewTreeData(kTreeTrack, NULL, (*i), (*j), (*k));
                 gtk_ctree_node_set_row_data(musicBrowserTree, trackItem, data);
 
 
@@ -853,7 +914,7 @@ void GTKMusicBrowser::UpdateCatalog(void)
                                                 NULL, name,
                                                 5, pixmap, mask, pixmap, mask,
                                                 true, false);
-                data = NewTreeData(kTreeTrack, NULL, NULL, NULL, (*k));
+                data = NewTreeData(kTreeTrack, NULL, (*i), (*j), (*k));
                 gtk_ctree_node_set_row_data(musicBrowserTree, allItem, data);
             }
         }
@@ -864,11 +925,12 @@ void GTKMusicBrowser::UpdateCatalog(void)
                                           &style->bg[GTK_STATE_NORMAL],
                                           playlist_pix);
     name[0] = "My Playlists";
-    mainTree = gtk_ctree_insert_node(musicBrowserTree, NULL, NULL, name, 5,
-                                     pixmap, mask, pixmap, mask, false, false);
+    playlistTree = gtk_ctree_insert_node(musicBrowserTree, NULL, NULL, name, 5,
+                                         pixmap, mask, pixmap, mask, false, 
+                                         false);
     data = NewTreeData(kTreePlaylistHead, NULL, NULL, NULL, NULL, NULL,
                        "This tree item contains all of your playlists");
-    gtk_ctree_node_set_row_data(musicBrowserTree, mainTree, data);
+    gtk_ctree_node_set_row_data(musicBrowserTree, playlistTree, data);
 
     vector<string>::const_iterator m = playlists->begin();
     for (; m != playlists->end(); m++) {
@@ -887,7 +949,7 @@ void GTKMusicBrowser::UpdateCatalog(void)
         pixmap = gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, &mask,
                                           &style->bg[GTK_STATE_NORMAL],
                                           playlist_pix);
-        allItem = gtk_ctree_insert_node(musicBrowserTree, mainTree, NULL, 
+        allItem = gtk_ctree_insert_node(musicBrowserTree, playlistTree, NULL, 
                                         name, 5, pixmap, mask, pixmap, mask, 
                                         true, false);
         data = NewTreeData(kTreePlaylist, NULL, NULL, NULL, NULL,

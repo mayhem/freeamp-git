@@ -21,41 +21,129 @@
    $Id$
 ____________________________________________________________________________*/ 
 
+#include <sys/stat.h>
 #include "GTKFont.h"
 #include "GTKUtility.h"
-#include <unistd.h>
+#include "win32impl.h"
+#include "utility.h"
 
-GTKFont::GTKFont(string &oName, string &oFace, string &oDefault) :
+GTKFont::GTKFont(FAContext *context, string &oName, string &oFace, 
+                 string &oDefault) :
                 Font(oName, oFace, oDefault)
 {
+    m_context = context;
+
     type = kFontTypeUnknown;
-    
+
+    string finalName;    
+    vector<string> Names;
+    vector<string>::iterator i;
+
     char *dup = strdup(m_oFace.c_str());
     char *token = strtok(dup, ",");
+    while (token) {
+         Names.push_back(string(token));
+         token = strtok(NULL, ",");
+    }
+
     bool gdkfound = false;
     bool ttffound = false;
-    gdk_threads_enter();
-    for (;;) {
-        if (gdkfound = ListFonts(token))
-            break;
-        token = strtok(NULL, ",");
-        if (token == NULL)
-            break;
+
+#ifdef HAVE_FREETYPE
+    char dir[_MAX_PATH];
+    uint32 len = sizeof(dir);
+    string ttfbase, ttfpath;
+    WIN32_FIND_DATA find;
+    HANDLE handle;
+ 
+    m_context->prefs->GetInstallDirectory(dir, &len);
+    ttfbase = string(dir) + "/../share/freeamp/fonts";
+    ttfpath = ttfbase + "/*.ttf";
+ 
+    struct stat st;
+    if (-1 == stat(ttfbase.c_str(), &st))
+        mkdir(ttfbase.c_str(), 0755);
+
+    handle = FindFirstFile((char *)ttfpath.c_str(), &find);
+    if (handle != INVALID_HANDLE_VALUE)
+        do { 
+            i = Names.begin(); 
+            for (; i != Names.end(); i++) {
+                if (!strcasecmp(find.cFileName, (*i).c_str())) {
+                    finalName = (*i);
+                    ttffound = true;
+                    break;
+                }
+            }
+            if (ttffound == true)
+                break;
+        } while (FindNextFile(handle, &find));
+
+    ttfbase = FreeampDir(NULL) + string("/fonts");
+    if (-1 == stat(ttfbase.c_str(), &st))
+        mkdir(ttfbase.c_str(), 0755);
+
+    ttfpath = ttfbase + string("/*.ttf");
+    handle = FindFirstFile((char *)ttfpath.c_str(), &find);
+    if (handle != INVALID_HANDLE_VALUE)
+        do {
+            i = Names.begin();
+            for (; i != Names.end(); i++) {
+                if (!strcasecmp(find.cFileName, (*i).c_str())) {
+                    finalName = *i;
+                    ttffound = true;
+                    break;
+                }
+            }
+            if (ttffound == true)
+                break;
+        } while (FindNextFile(handle, &find));
+
+    ttfbase = "./fonts";
+    ttfpath = ttfbase + string("/*.ttf");
+    handle = FindFirstFile((char *)ttfpath.c_str(), &find);
+    if (handle != INVALID_HANDLE_VALUE)
+        do {
+            i = Names.begin();
+            for (; i != Names.end(); i++) {
+                if (!strcasecmp(find.cFileName, (*i).c_str())) {
+                    finalName = *i;
+                    ttffound = true;
+                    break;
+                }
+            }
+            if (ttffound == true)
+                break;
+        } while (FindNextFile(handle, &find));
+#endif
+
+    if (!ttffound) {
+        gdk_threads_enter();
+        i = Names.begin();
+        for (; i != Names.end(); i++) {
+            if (gdkfound = ListFonts((char *)(*i).c_str())) {
+                finalName = *i;
+                break;
+            }
+        }
+        gdk_threads_leave();
     }
-    gdk_threads_leave(); 
+
     if (gdkfound) {
-        m_oFace = token;
+        m_oFace = finalName; 
         type = kFontTypeGdk;
     }
+#ifdef HAVE_FREETYPE
     else if (ttffound) { 
-        m_oFace = token;
+        m_oFace = finalName;
         type = kFontTypeTTF;
     }
+#endif
     else {
         m_oFace = m_oDefault;
         type = kFontTypeGdk;
     }
-//    free(dup);
+    free(dup);
 
     gfont = NULL;
 #ifdef HAVE_FREETYPE
@@ -81,14 +169,17 @@ Error GTKFont::Load(int iFontHeight, bool bBold, bool bItalic)
             string fontname = BuildFontString(bold, italic, size);
             gfont = gdk_font_load(fontname.c_str());
             if (!gfont) {
-                fontname = "-*-" + m_oFace + string("-*");
+                fontname = BuildFontString(bold, italic, size - 1);
                 gfont = gdk_font_load(fontname.c_str());
                 if (!gfont) {
-                    gfont = gdk_font_load("default");  
+                    gfont = gdk_font_load("variable");  
                     if (!gfont) {
-                        gdk_threads_leave();
-                        cout << "oops, couldn't load _any_ fonts...\n";
-                        return kError_YouScrewedUp;
+                        gfont = gdk_font_load("default");
+                        if (!gfont) {
+                            gdk_threads_leave();
+                            cout << "oops, couldn't load _any_ fonts...\n";
+                            return kError_YouScrewedUp;
+                        }
                     }
                 }
             } 

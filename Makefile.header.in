@@ -111,5 +111,5 @@ CXXLINK = $(CXXLD) $(CXXFLAGS) $(LDFLAGS) $(RELOC) -o $@
 
 @SET_MAKE@
 
-PIMAKE = $(MAKE) -$(MAKEFLAGS) -f Makefile-plugins
+PIMAKE = $(MAKE) -f Makefile-plugins -$(MAKEFLAGS)
 
