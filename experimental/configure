@@ -2352,7 +2352,11 @@ int main() {
 EOF
 if { (eval echo configure:2354: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest && (./conftest; exit) 2>/dev/null
 then
-  echo "$ac_t""yes" 1>&6
+  cat >> confdefs.h <<\EOF
+#define HAVE_LINUX_LIBC5 1
+EOF
+
+    echo "$ac_t""yes" 1>&6
 echo "***"
 echo "*** X11 compilation has been enabled and libc5 was found."
 echo "*** This means it is likely that your libX11 was built with"
@@ -2377,7 +2381,7 @@ fi
 fi
 
 echo $ac_n "checking for dlopen in -ldl""... $ac_c" 1>&6
-echo "configure:2381: checking for dlopen in -ldl" >&5
+echo "configure:2385: checking for dlopen in -ldl" >&5
 ac_lib_var=`echo dl'_'dlopen | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -2385,7 +2389,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-ldl  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 2389 "configure"
+#line 2393 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -2396,7 +2400,7 @@ int main() {
 dlopen()
 ; return 0; }
 EOF
-if { (eval echo configure:2400: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
+if { (eval echo configure:2404: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -2441,6 +2445,7 @@ case "$host_os" in
 #define HAVE_LINUX 1
 EOF
 
+    LDFLAGS="$LDFLAGS -Wl,--export-dynamic"
     ;;
   solaris*)
     host_os="solaris"
@@ -2471,10 +2476,11 @@ if test "$isunix" = "false"  ; then
   OSINC="-Ibase/$host_os/include -Iui/freeamp/$host_os"
   OSDEP="$host_os"
 else
-  OSDEPSRC=`find base/unix/src -name '*.c*' -print`
+  OSDEPSRC=`find base/unix/src \( -name '*.c' -or -name '*.cpp' \) -print`
 fi
 
-OSDEPSRC="$OSDEPSRC `find base/$OSDEP/src -name '*.c*' -print`"
+OSDEPSRC="$OSDEPSRC `find base/$OSDEP/src \( -name '*.c' -or		\
+					     -name '*.cpp' \) -print`"
 OSDEPOBJ=`echo $OSDEPSRC | sed -e 's,\.cp*,.o,g' | xargs echo`
 
 
@@ -2540,9 +2546,9 @@ elif test "$host_os" = "beos"; then
 else
 
 echo $ac_n "checking for MIT PThreads""... $ac_c" 1>&6
-echo "configure:2544: checking for MIT PThreads" >&5
+echo "configure:2550: checking for MIT PThreads" >&5
 cat > conftest.$ac_ext <<EOF
-#line 2546 "configure"
+#line 2552 "configure"
 #include "confdefs.h"
 #include <pthread.h>
 EOF
@@ -2563,9 +2569,9 @@ rm -f conftest*
 
 
 echo $ac_n "checking for Base LinuxThreads""... $ac_c" 1>&6
-echo "configure:2567: checking for Base LinuxThreads" >&5
+echo "configure:2573: checking for Base LinuxThreads" >&5
 cat > conftest.$ac_ext <<EOF
-#line 2569 "configure"
+#line 2575 "configure"
 #include "confdefs.h"
 #include <pthread.h>
 EOF
@@ -2588,9 +2594,9 @@ rm -f conftest*
 
 
 echo $ac_n "checking for LinuxThreads w/ErrorCheck Mutex""... $ac_c" 1>&6
-echo "configure:2592: checking for LinuxThreads w/ErrorCheck Mutex" >&5
+echo "configure:2598: checking for LinuxThreads w/ErrorCheck Mutex" >&5
 cat > conftest.$ac_ext <<EOF
-#line 2594 "configure"
+#line 2600 "configure"
 #include "confdefs.h"
 #include <pthread.h>
 EOF
@@ -2616,13 +2622,13 @@ mitpth="true";
 if test "$mitpth" = "false"; then
     if test "$ltr" = "false"; then
 	echo $ac_n "checking for broken Slackware MIT PThreads header (Obj C stub) and implementation""... $ac_c" 1>&6
-echo "configure:2620: checking for broken Slackware MIT PThreads header (Obj C stub) and implementation" >&5
+echo "configure:2626: checking for broken Slackware MIT PThreads header (Obj C stub) and implementation" >&5
 	if test "$cross_compiling" = yes; then
   echo "$ac_t""assuming no" 1>&6
 	
 else
   cat > conftest.$ac_ext <<EOF
-#line 2626 "configure"
+#line 2632 "configure"
 #include "confdefs.h"
 
 	    #define _MIT_POSIX_THREADS 1
@@ -2634,7 +2640,7 @@ else
             }
 	    
 EOF
-if { (eval echo configure:2638: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:2644: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest && (./conftest; exit) 2>/dev/null
 then
   cat >> confdefs.h <<\EOF
 #define HAVE_BROKENMITPTHREADS 1
@@ -2706,17 +2712,17 @@ fi
 
 ac_safe=`echo "sys/asoundlib.h" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for sys/asoundlib.h""... $ac_c" 1>&6
-echo "configure:2710: checking for sys/asoundlib.h" >&5
+echo "configure:2716: checking for sys/asoundlib.h" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 2715 "configure"
+#line 2721 "configure"
 #include "confdefs.h"
 #include <sys/asoundlib.h>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:2720: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:2726: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -2733,7 +2739,7 @@ fi
 if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
   echo "$ac_t""yes" 1>&6
   echo $ac_n "checking for main in -lasound""... $ac_c" 1>&6
-echo "configure:2737: checking for main in -lasound" >&5
+echo "configure:2743: checking for main in -lasound" >&5
 ac_lib_var=`echo asound'_'main | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -2741,14 +2747,14 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lasound  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 2745 "configure"
+#line 2751 "configure"
 #include "confdefs.h"
 
 int main() {
 main()
 ; return 0; }
 EOF
-if { (eval echo configure:2752: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
+if { (eval echo configure:2758: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -2764,11 +2770,11 @@ fi
 if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
   echo "$ac_t""yes" 1>&6
   have_alsa="true"
-
+			     
 else
   echo "$ac_t""no" 1>&6
 have_alsa="false"
-
+		
 fi
 
 		
@@ -2788,10 +2794,16 @@ fi
 
 
 
-if test "$host_cpu" = "`echo $host_cpu | awk '/i.86$/ {print $1}'`"; then
-  echo "$ac_t""Using x86 optimizations" 1>&6
-  XINGASM="lmc/xingmp3/src/x86gas.o"
-  XINGDEFS="$DEFS -DASM_FDCT32 -DASM_WINDOW_DUAL"
+if expr "$host_cpu" : "i.86$" > /dev/null; then
+  if test -n "$NASM"; then
+    echo "$ac_t""Using x86 optimizations" 1>&6
+    XINGASM="`echo lmc/xingmp3/src/{cdct,cwin,cwin8,mdct,msis}asm.o`"
+    XINGDEFS="$DEFS -DASM_X86"
+  else
+    echo "$ac_t""nasm not available, using older x86 optimizations" 1>&6
+    XINGASM=lmc/xingmp3/src/x86gas.o
+    XINGDEFS="$DEFS -DASM_FDCT32 -DASM_WINDOW_DUAL"
+  fi
 fi
 
 

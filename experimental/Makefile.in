@@ -97,9 +97,9 @@ all: freeamp plugins
 
 freeamp: $(FREEAMPOBJ) $(freeamp_DEPENDENCIES)
 	@rm -f freeamp
-	$(CXXLINK) $(FREEAMPOBJ) $(LDFLAGS) -ldl -lpthread $(X_LIBS) $(X_EXTRA_LIBS)
+	$(CXXLINK) $(FREEAMPOBJ) -ldl -lpthread -lm $(X_LIBS) $(X_EXTRA_LIBS)
 
-.SUFFIXES: .S .c .cpp .o .s
+.SUFFIXES: .S .c .cpp .o .s .asm .asm1
 
 
 .cpp.o:
@@ -107,6 +107,12 @@ freeamp: $(FREEAMPOBJ) $(freeamp_DEPENDENCIES)
 
 .c.o:
 	$(COMPILE) $(FPIC) -c $< -o $@
+
+.asm.asm1:
+	$(PERL) -pe 's/\b_//g' $< > $@
+
+.asm1.o:
+	$(NASM) -f elf -o $@ $<
 
 .s.o:
 	$(COMPILE) -c $< -o $@

@@ -194,6 +194,7 @@ case "$host_os" in
   linux*)
     AC_DEFINE(HAVE_LINUX)
 dnl  OSLINK='-Wl,soname,${*F}'
+    LDFLAGS="$LDFLAGS -Wl,--export-dynamic"
 dnl not needed.
     ;;
   solaris*)
@@ -224,10 +225,11 @@ if test "$isunix" = "false"  ; then
   OSINC="-Ibase/$host_os/include -Iui/freeamp/$host_os"
   OSDEP="$host_os"
 else
-  OSDEPSRC=`find base/unix/src -name '*.c*' -print`
+  OSDEPSRC=`find base/unix/src \( -name '*.c' -or -name '*.cpp' \) -print`
 fi
 
-OSDEPSRC="$OSDEPSRC `find base/$OSDEP/src -name '*.c*' -print`"
+OSDEPSRC="$OSDEPSRC `find base/$OSDEP/src \( -name '*.c' -or		\
+					     -name '*.cpp' \) -print`"
 OSDEPOBJ=`echo $OSDEPSRC | sed -e 's,\.cp*,.o,g' | xargs echo`
 dnl I know. This is an abominable way to generate a dependency list.
 dnl it's either here or hardcoded in a Makefile, though.
@@ -388,12 +390,12 @@ dnl Check for alsa
 dnl ****
 AC_CHECK_HEADER(sys/asoundlib.h,
 		AC_CHECK_LIB(asound, main,
-have_alsa="true"
-,
-have_alsa="false"
-)
+			     have_alsa="true"
+			     ,
+			     have_alsa="false"
+		)
 		,
-have_alsa="false"
+		have_alsa="false"
 )
 
 ALSAPMOPLUGIN=plugins/almasoundcard-${host_os}.pmo
@@ -405,10 +407,16 @@ fi
 
 AC_SUBST(OSDEPPLUGINS)
 
-if test "$host_cpu" = "`echo $host_cpu | awk '/i.86$/ {print $1}'`"; then
-  AC_MSG_RESULT([Using x86 optimizations])
-  XINGASM="lmc/xingmp3/src/x86gas.o"
-  XINGDEFS="$DEFS -DASM_FDCT32 -DASM_WINDOW_DUAL"
+if expr "$host_cpu" : "i.86$" > /dev/null; then
+  if test -n "$NASM"; then
+    AC_MSG_RESULT([Using x86 optimizations])
+    XINGASM="`echo lmc/xingmp3/src/{cdct,cwin,cwin8,mdct,msis}asm.o`"
+    XINGDEFS="$DEFS -DASM_X86"
+  else
+    AC_MSG_RESULT([nasm not available, using older x86 optimizations])
+    XINGASM=lmc/xingmp3/src/x86gas.o
+    XINGDEFS="$DEFS -DASM_FDCT32 -DASM_WINDOW_DUAL"
+  fi
 fi
 
 AC_SUBST(XINGDEFS)
