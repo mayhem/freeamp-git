@@ -405,9 +405,14 @@ Error Http::Download(const string &url, bool fileDownload)
 
                     do
                     {
-                        err = Recv(s, buffer,
-                                   min(bufferSize, fileSize - bytesReceived),
-                                   0, count);
+                        if (min(bufferSize, fileSize - bytesReceived) != 0)
+						{
+							err = Recv(s, buffer,
+									min(bufferSize, fileSize - bytesReceived),
+									0, count);
+						}
+						else
+							count = 0;
                         if (IsError(err))
                             result = kError_UserCancel;
                         else
