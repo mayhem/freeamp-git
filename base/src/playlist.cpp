@@ -953,6 +953,8 @@ Error PlaylistManager::RemoveItem(uint32 index)
 
     if(index != kInvalidIndex)
     {
+        const PlaylistItem* currentItem = GetCurrentItem();
+
         PlaylistItem* item = (*m_activeList)[index];
 
         m_activeList->erase(&(*m_activeList)[index]);
@@ -986,6 +988,20 @@ Error PlaylistManager::RemoveItem(uint32 index)
             delete item;
         }
 
+        if(kPlaylistKey_MasterPlaylist == GetActivePlaylist())
+        {
+            uint32 newIndex = IndexOf(currentItem);
+            
+            if(index != kInvalidIndex)
+            {
+                InternalSetCurrentIndex(newIndex);
+            }
+            else if(m_current != kInvalidIndex && m_current >= m_activeList->size())
+            {
+                InternalSetCurrentIndex(m_activeList->size() - 1);
+            }
+        }
+
         m_context->target->AcceptEvent(new PlaylistItemRemovedEvent(item, index, this));
 
         result = kError_NoErr;
@@ -1005,6 +1021,7 @@ Error PlaylistManager::RemoveItems(uint32 index, uint32 count)
     if(index != kInvalidIndex)
     {
         uint32 i;
+        const PlaylistItem* currentItem = GetCurrentItem();
 
         /*UndoMultiItem* multiItem= new UndoMultiItem();
 
@@ -1053,6 +1070,20 @@ Error PlaylistManager::RemoveItems(uint32 index, uint32 count)
 
         m_activeList->erase(&(*m_activeList)[index], &(*m_activeList)[index + count]);
 
+        if(kPlaylistKey_MasterPlaylist == GetActivePlaylist())
+        {
+            uint32 newIndex = IndexOf(currentItem);
+            
+            if(index != kInvalidIndex)
+            {
+                InternalSetCurrentIndex(newIndex);
+            }
+            else if(m_current != kInvalidIndex && m_current >= m_activeList->size())
+            {
+                InternalSetCurrentIndex(m_activeList->size() - 1);
+            }
+        }
+
         result = kError_NoErr;
     }
 
@@ -1073,6 +1104,7 @@ Error PlaylistManager::RemoveItems(vector<PlaylistItem*>* items)
         uint32 size = 0;
         PlaylistItem* item = NULL;
         uint32 oldIndex;
+        const PlaylistItem* currentItem = GetCurrentItem();
 
         size = items->size();
 
@@ -1128,12 +1160,17 @@ Error PlaylistManager::RemoveItems(vector<PlaylistItem*>* items)
 
         if(kPlaylistKey_MasterPlaylist == GetActivePlaylist())
         {
-            if(!m_activeList->size())
-                m_current = kInvalidIndex;
-            else if(m_current >= m_activeList->size())
+            uint32 newIndex = IndexOf(currentItem);
+            
+            if(index != kInvalidIndex)
+            {
+                InternalSetCurrentIndex(newIndex);
+            }
+            else if(m_current != kInvalidIndex && m_current >= m_activeList->size())
+            {
                 InternalSetCurrentIndex(m_activeList->size() - 1);
+            }
         }
-
     }
 
     m_mutex.Release();
