@@ -26,9 +26,6 @@ ____________________________________________________________________________*/
 #include <assert.h>
 #include <string.h>
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
 
 #include "eventbuffer.h"
 
@@ -49,8 +46,6 @@ EventBuffer::~EventBuffer(void)
 Error EventBuffer::BeginRead(void *&pBuffer, size_t &iBytesWanted)
 {
    BufferEvent *pEvent;
-   Event       *pPMOEvent;
-   Error        eRet;
    int          iReadIndex, iMaxBytes;
 
    pEvent = m_pQueue->Peek();
@@ -105,7 +100,6 @@ Error EventBuffer::BeginWrite(void *&pBuffer, size_t &iBytesWanted)
 
 Error EventBuffer::AcceptEvent(Event *pPMOEvent)
 {
-   Error        eRet;
    BufferEvent *pEvent;
 
    pEvent = new BufferEvent;

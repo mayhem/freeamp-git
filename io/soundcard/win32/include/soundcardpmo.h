@@ -33,8 +33,10 @@ ____________________________________________________________________________*/
 /* project headers */
 #include "config.h"
 #include "pmo.h"
+#include "thread.h"
 #include "mutex.h"
 #include "properties.h"
+#include "eventbuffer.h"
 
 #define BIT_SELECT  0x1f
 #define SLEEPTIME   256
@@ -42,23 +44,37 @@ ____________________________________________________________________________*/
 static const uint32 OBUFFERSIZE = 2 * 1152;
 
 
-class SoundCardPMO : public PhysicalMediaOutput{
+class SoundCardPMO : public PhysicalMediaOutput, public EventBuffer
+{
 
 public:
     SoundCardPMO();
     virtual ~SoundCardPMO();
     
     virtual Error Init(OutputInfo* info);
-    virtual Error Reset(bool user_stop);
     virtual Error Write(int32&,void*,int32);
     virtual Error Pause();
     virtual Error Resume();
-    virtual Error SetPropManager(Properties *p) { m_propManager = p; if (p) return kError_NoErr; else return kError_UnknownErr; }
+    virtual void  WaitToQuit();
+    virtual Error Clear();
+
+    virtual Error SetPropManager(Properties *p);
+
+    static void   StartWorkerThread(void *);
+    virtual Error BeginWrite(void *&pBuffer, size_t &iBytesToWrite);
+    virtual Error EndWrite  (size_t iNumBytesWritten);
+    virtual Error AcceptEvent(Event *);
+    virtual int   GetBufferPercentage();
+
     
  private:
 	WAVEHDR* NextHeader();
 
-private:
+	void          WorkerThread(void); 
+    virtual Error Reset(bool user_stop);
+    void          HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent);
+
+ private:
 	Properties *    m_propManager;
 	WAVEFORMATEX*	m_wfex;
 	LPWAVEHDR*		m_wavehdr_array;
@@ -67,6 +83,7 @@ private:
 	uint32			m_index;
 	uint32			m_buffer[MAXCHANNELS];
 	uint32			m_channels;
+	uint32          m_samples_per_second;
 	uint32			m_buffer_count;
 	uint32			m_hdr_size;
 	uint32			m_fillup;
@@ -75,8 +92,11 @@ private:
 	bool			m_user_stop;
 	bool			m_initialized;
 
-	Mutex*			m_pauseMutex;
-    
+    Thread         *m_pBufferThread;
+    Semaphore      *m_pPauseSem;
+    bool            m_bPause;
+    int             m_iOutputBufferSize, m_iTotalBytesWritten, m_iBytesPerSample;
+    int             m_iLastFrame;
 };
 
 #endif /* _SOUNDCARDPMO_H_ */

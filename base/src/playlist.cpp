@@ -105,7 +105,6 @@ void PlayListManager::Add(char *pc, int type)
         item->SetType(type);
 
         m_pMediaElems->Insert(item);
-
         if (m_pMediaElems->NumElements() == 1)
         {
             m_current = 0;         // set current to first

@@ -74,7 +74,7 @@ public:
 	               {return 0;};
                  
     virtual Error SetTarget(EventQueue *target)
-                  {m_target = target; }
+                  {m_target = target; return kError_NoErr; }
     virtual Error Pause(){ return kError_GotDefaultMethod;}
     virtual Error Resume(){ return kError_GotDefaultMethod; }
     virtual Error Clear(){ return kError_GotDefaultMethod; }

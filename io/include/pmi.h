@@ -90,7 +90,7 @@ public:
 		 
     virtual Error SetTo(char* url) = 0;
     virtual Error SetTarget(EventQueue *target)
-                  { m_target = target; };
+                  { m_target = target; return kError_NoErr; };
     virtual Error Close(void) = 0;
     virtual const char* Url(void) const = 0;
 

@@ -47,6 +47,7 @@ ____________________________________________________________________________*/
 #include "semaphore.h"
 #include "lmc.h"
 #include "log.h"
+//#include "debug.hpp"
 
 #if MP3_PROF
 extern LogFile *g_Log;
@@ -888,6 +889,7 @@ Error XingLMC::BeginRead(void *&pBuffer, unsigned int iBytesNeeded)
   	if (iNow != m_iBufferUpdate)
   	{
   	    printf("Input: %3d%% Output: %3d%%\r", iInPercent, iOutPercent);
+  	    //Debug_v("Input: %3d%% Output: %3d%%", iInPercent, iOutPercent);
   	    fflush(stdout);
        m_iBufferUpdate = iNow;
   	}
