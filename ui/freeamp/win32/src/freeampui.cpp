@@ -162,7 +162,7 @@ AcceptEvent(Event* event)
 					    break;
 				}
 
-                UpdateControls(m_hwnd);
+                UpdateControl(m_hwnd, kIconArea);
 				break;
 			}
 
@@ -182,7 +182,7 @@ AcceptEvent(Event* event)
 					    g_displayInfo.shuffled = false;
 				};
 
-                UpdateControls(m_hwnd);
+                UpdateControl(m_hwnd, kIconArea);
 				break;
 			}
 
@@ -193,11 +193,13 @@ AcceptEvent(Event* event)
                 g_buttonStateArray[kStopControl].shown = TRUE;
                 g_buttonStateArray[kStopControl].dirty = TRUE;
                 g_buttonStateArray[kPauseControl].state = Deactivated;
+                g_buttonStateArray[kPauseControl].dirty = TRUE;
 
                 if(g_displayInfo.state == TotalTime)
                     g_displayInfo.state = CurrentTime;
 
-                UpdateControls(m_hwnd);
+                UpdateControl(m_hwnd, kPauseControl);
+                UpdateControl(m_hwnd, kStopControl);
 
 	            break; 
             }
@@ -206,7 +208,7 @@ AcceptEvent(Event* event)
             {
 				m_state = STATE_Paused;
                 g_buttonStateArray[kPauseControl].state = Activated;
-                UpdateControls(m_hwnd);
+                UpdateControl(m_hwnd, kPauseControl);
 	            break; 
             }
 
@@ -222,8 +224,10 @@ AcceptEvent(Event* event)
 				m_state = STATE_Stopped;
                 g_buttonStateArray[kPauseControl].state = Deactivated;
                 g_buttonStateArray[kPlayControl].shown = TRUE;
+                g_buttonStateArray[kPlayControl].dirty = TRUE;
                 g_buttonStateArray[kStopControl].shown = FALSE;
-                UpdateControls(m_hwnd);
+                UpdateControl(m_hwnd, kPlayControl);
+                UpdateControl(m_hwnd, kPauseControl);
 	            break; 
             }
 

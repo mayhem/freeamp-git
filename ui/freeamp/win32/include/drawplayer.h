@@ -94,6 +94,8 @@ typedef struct ControlInfo{
 
 #define kNumControls        14
 
+#define kIconArea           kFinalControl + 1   
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -102,7 +104,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                             WPARAM wParam, 
                             LPARAM lParam );
 
-void UpdateControls(HWND hwnd);
+void UpdateControl(HWND hwnd, int32 control_id);
 void UpdateDisplay(HWND hwnd);
 bool NeedToScroll();
 

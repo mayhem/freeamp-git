@@ -109,6 +109,7 @@ static HBITMAP repeatIconBitmap;
 static HBITMAP allIconBitmap;
 
 static HRGN g_displayRegion;
+static HRGN g_iconAreaRegion;
 static HRGN g_playerRegion;
 static HRGN* g_controlRegions = NULL;
 
@@ -147,8 +148,6 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
     BITMAP bmp;
     int32 i;
     HRGN clipRegion = CreateRectRgn(0,0,0,0);
-
-    
     
     if(palette)
     {
@@ -174,7 +173,6 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
 
         GetObject(leftBitmap, sizeof(BITMAP), (LPSTR)&bmp);
 
-        OutputDebugString("left side\r\n");
         BitBlt( bufferdc, 
                 0, 0, bmp.bmWidth, bmp.bmHeight,
                 memdc, 
@@ -188,7 +186,6 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
 
         GetObject(dialBitmap, sizeof(BITMAP), (LPSTR)&bmp);
 
-        OutputDebugString("volume dial\r\n");
         BitBlt( bufferdc, 
                 width, 0, DIAL_SECTION, bmp.bmHeight,
                 memdc, 
@@ -201,7 +198,7 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
         SelectObject(memdc, middleBitmap);
 
         GetObject(middleBitmap, sizeof(BITMAP), (LPSTR)&bmp);
-        OutputDebugString("middle side\r\n");
+
         BitBlt( bufferdc, 
                 width, 0, bmp.bmWidth, bmp.bmHeight,
                 memdc, 
@@ -214,7 +211,7 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
         SelectObject(memdc, dialBitmap);
 
         GetObject(dialBitmap, sizeof(BITMAP), (LPSTR)&bmp);
-        OutputDebugString("seek dial\r\n");
+
         BitBlt( bufferdc, 
                 width, 0, DIAL_SECTION, bmp.bmHeight,
                 memdc, 
@@ -227,7 +224,7 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
         SelectObject(memdc,rightBitmap);
 
         GetObject(rightBitmap, sizeof(BITMAP), (LPSTR)&bmp);
-        OutputDebugString("right side\r\n");
+
         BitBlt( bufferdc, 
                 width, 0, bmp.bmWidth, bmp.bmHeight,
                 memdc, 
@@ -246,7 +243,7 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
 
         GetRgnBox(g_buttonStateArray[i].region, &rect);
 
-        if(g_buttonStateArray[i].dirty)
+        if(g_buttonStateArray[i].dirty || repaintAll)
         {
             CombineRgn( clipRegion,
                         clipRegion,
@@ -264,7 +261,7 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
                 {
                     int32 srcOffset = 0;
                     
-                    int32 id = g_buttonStateArray[i].control_id;
+                    /*int32 id = g_buttonStateArray[i].control_id;
 
                     if(id == kModeControl)
                         OutputDebugString("Drawing kModeControl\r\n");
@@ -279,7 +276,7 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
                     else if(id == kOpenControl)
                         OutputDebugString("Drawing kOpenControl\r\n");
                     else
-                        OutputDebugString("UNKNOWN BLIT!!!!!!!!\r\n");
+                        OutputDebugString("UNKNOWN BLIT!!!!!!!!\r\n");*/
                    
                     SelectObject(memdc, g_buttonStateArray[i].bitmap);
                     
@@ -314,7 +311,7 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
                 {
                     int32 srcOffset = 0;
 
-                    int32 id = g_buttonStateArray[i].control_id;
+                    /*int32 id = g_buttonStateArray[i].control_id;
 
                     if(id == kPlayControl)
                         OutputDebugString("Drawing kPlayControl\r\n");
@@ -327,7 +324,7 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
                     else if(id == kLastControl)
                         OutputDebugString("Drawing kLastControl\r\n");
                     else
-                        OutputDebugString("UNKNOWN BLIT!!!!!!!!\r\n");
+                        OutputDebugString("UNKNOWN BLIT!!!!!!!!\r\n");*/
 
                     SelectObject(memdc, g_buttonStateArray[i].bitmap);
 
@@ -367,14 +364,14 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
                 {
                     SelectObject(memdc, middleBitmap);
 
-                    int32 id = g_buttonStateArray[i].control_id;
+                    /*int32 id = g_buttonStateArray[i].control_id;
 
                     if(id == kPlaylistControl)
                         OutputDebugString("Drawing kPlaylistControl\r\n");
                     else if(id == kDisplayControl)
                         OutputDebugString("Drawing kDisplayControl\r\n");
                     else
-                        OutputDebugString("UNKNOWN BLIT!!!!!!!!\r\n");
+                        OutputDebugString("UNKNOWN BLIT!!!!!!!!\r\n");*/
 
                     GetObject(middleBitmap, sizeof(BITMAP), (LPSTR)&bmp);
 
@@ -395,14 +392,14 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
                 {
                     int32 srcOffset = 0;
 
-                    int32 id = g_buttonStateArray[i].control_id;
+                    /*int32 id = g_buttonStateArray[i].control_id;
 
                     if(id == kVolumeControl)
                         OutputDebugString("Drawing kVolumeControl\r\n");
                     else if(id == kSeekControl)
                         OutputDebugString("Drawing kSeekControl\r\n");
                     else
-                        OutputDebugString("UNKNOWN BLIT!!!!!!!!\r\n");
+                        OutputDebugString("UNKNOWN BLIT!!!!!!!!\r\n");*/
 
                     if( g_buttonStateArray[i].state == Selected )
                     {
@@ -444,13 +441,19 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
     RECT displayRect;
     GetRgnBox(g_displayRegion, &displayRect);
 
+    CombineRgn( clipRegion,
+                clipRegion,
+                g_iconAreaRegion,
+                RGN_OR);
+
+    //OutputDebugString("shuffled blit?\r\n");
+
     if(g_displayInfo.shuffled)
     {
+        //OutputDebugString("shuffled blit!!\r\n");
         int32 offset = displayRect.right + 3;
 
         SelectObject(memdc, shuffledIconBitmap);
-
-        OutputDebugString("Drawing Shuffle Icon\r\n");
    
         BitBlt( bufferdc, 
                 offset, 
@@ -471,7 +474,6 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
 
         SelectObject(memdc, repeatIconBitmap);
    
-        OutputDebugString("Drawing Repeat Icon\r\n");
         BitBlt( bufferdc, 
                 offset, 
                 22, 
@@ -488,8 +490,6 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
 
             SelectObject(memdc, allIconBitmap);
    
-            OutputDebugString("Drawing Repeat All Icon\r\n");
-
             BitBlt( bufferdc, 
                     offset, 
                     29, 
@@ -502,9 +502,17 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
         }
     }
 
-    SelectClipRgn(hdc, clipRegion);
 
-    OutputDebugString("Drawing To Screen\r\n");
+    //HRGN clipRegion = CreateRectRgn(0,0,0,0);
+
+    //GetClipRgn(hdc, clipRegion);
+
+    /*CombineRgn( clipRegion,
+                clipRegion,
+                g_displayRegion,
+                RGN_DIFF);*/
+    
+    SelectClipRgn(hdc, clipRegion);
 
     BitBlt( hdc, 
             0, 
@@ -517,6 +525,7 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
             SRCCOPY);
 
     SelectClipRgn(hdc, NULL);
+
 
     DeleteObject(clipRegion);
 
@@ -960,8 +969,12 @@ void DrawDisplay(HDC hdc, DisplayInfo* state)
     DeleteObject(bufferBitmap);
 }
 
-void UpdateControls(HWND hwnd)
+void UpdateControl(HWND hwnd, int32 control_id)
 {
+    if(control_id == kIconArea)
+        InvalidateRgn(hwnd, g_iconAreaRegion, FALSE);
+    else
+        InvalidateRgn(hwnd, g_buttonStateArray[control_id].region, FALSE);
     /*HDC hdc = GetDC(hwnd);
 
     DrawPlayer(hdc, g_buttonStateArray, false);
@@ -1440,6 +1453,8 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
             g_displayRegion = g_controlRegions[kDisplayControl];
 
+            g_iconAreaRegion = CreateRectRgn(307, 10, 322, 37);
+
             // player
             //Color black = {0,0,0,0};
             //playerRegion = DetermineRegion(playerMask, &black);
@@ -1565,8 +1580,8 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                         multiplier += .55;
                     }
 
-                    InvalidateRgn(hwnd, g_displayRegion, FALSE);
-                    //DrawDisplay(hdc, &g_displayInfo);
+                    //InvalidateRgn(hwnd, g_displayRegion, FALSE);
+                    DrawDisplay(hdc, &g_displayInfo);
 
                     ReleaseDC(hwnd, hdc);
 
@@ -1579,7 +1594,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                     int32 i;
                     RECT rect;
                     static int32 increment = 1;
-                    HDC hdc = GetDC(hwnd);
+                    //HDC hdc = GetDC(hwnd);
 
                     GetRgnBox(g_displayRegion, &rect);
 
@@ -1616,7 +1631,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 
                     //DrawDisplay(hdc, &g_displayInfo);
 
-                    ReleaseDC(hwnd, hdc);
+                    //ReleaseDC(hwnd, hdc);
 
                     break;
                 }
@@ -1624,7 +1639,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                 case 2:
                 {
                     //char foo[1024];
-                    HDC hdc = GetDC(hwnd);
+                    //HDC hdc = GetDC(hwnd);
 
                     g_displayInfo.seekframe += seekSpeed*20*abs(seekSpeed);
 
@@ -1652,7 +1667,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                     InvalidateRgn(hwnd, g_displayRegion, FALSE);
                     //DrawDisplay(hdc, &g_displayInfo);
 
-                    ReleaseDC(hwnd, hdc);
+                    //ReleaseDC(hwnd, hdc);
 
                     break;
                 }
@@ -1667,7 +1682,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
             HDC hdc;
             
             hdc = BeginPaint( hwnd, &ps );
-
+                
             DrawPlayer(hdc, g_buttonStateArray, (ps.fErase == TRUE));
             DrawDisplay(hdc, &g_displayInfo);
             
@@ -1728,14 +1743,10 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
             WPARAM fwKeys = wParam;        // key flags 
             LPARAM xPos = LOWORD(lParam);  // horizontal position of cursor 
             LPARAM yPos = HIWORD(lParam);  // vertical position of cursor 
-            HDC hdc;
             int32 i;
 
             if(pressed)
             {
-                //for(i = 0; i < kNumControls; i++)
-                //{
-
                 i = pressedIndex;
 
                 if(i == kVolumeControl || i == kSeekControl )
@@ -1747,6 +1758,8 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                         g_buttonStateArray[i].dirty = TRUE;
                         g_buttonStateArray[i].position = 0;
                         g_displayInfo.state = g_displayInfo.oldstate;
+                        InvalidateRgn(hwnd, g_displayRegion, FALSE);
+                        InvalidateRgn(hwnd, g_buttonStateArray[i].region, FALSE);
 
                         if(i == kSeekControl)
                         {
@@ -1814,7 +1827,6 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
             WPARAM fwKeys = wParam;        // key flags 
             LPARAM xPos = LOWORD(lParam);  // horizontal position of cursor 
             LPARAM yPos = HIWORD(lParam);  // vertical position of cursor 
-            HDC hdc;
             int32 i;
 
             pressPt.x = xPos;
@@ -2106,7 +2118,6 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 	        {
                 case kRepeatControl:
                 {
-					//OutputDebugString("Repeat Control\n");
 					g_ui->m_plm->ToggleRepeat();
 			        break;        
 		        }
