@@ -69,7 +69,7 @@ Error ThemeManager::GetDefaultTheme(string &oThemePath)
 
     GetThemeList(oThemeList);
 
-    char themeName = new char[strlen(BRANDING_DEFAULT_THEME) + 1];
+    char *themeName = new char[strlen(BRANDING_DEFAULT_THEME) + 1];
     strcpy(themeName, BRANDING_DEFAULT_THEME);
     char *dot;
 
