@@ -21,7 +21,6 @@ CFG=rmp - Win32 NASM Debug MS STL
 !MESSAGE "rmp - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "rmp - Win32 NASM Release" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "rmp - Win32 NASM Debug" (based on "Win32 (x86) Dynamic-Link Library")
-!MESSAGE "rmp - Win32 NASM Debug MS STL" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE 
 
 # Begin Project
@@ -155,39 +154,6 @@ SOURCE="$(InputPath)"
 PostBuild_Cmds=IF NOT EXIST ..\..\..\base\win32\prj\plugins mkdir                                  ..\..\..\base\win32\prj\plugins	copy rmp.dlf  ..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
-!ELSEIF  "$(CFG)" == "rmp - Win32 NASM Debug MS STL"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "Debug"
-# PROP BASE Intermediate_Dir "Debug"
-# PROP BASE Ignore_Export_Lib 0
-# PROP BASE Target_Dir ""
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 1
-# PROP Output_Dir "Debug"
-# PROP Intermediate_Dir "Debug"
-# PROP Ignore_Export_Lib 0
-# PROP Target_Dir ""
-# ADD BASE CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\\" /I "..\..\include" /I "..\include" /I "..\..\..\io\include" /I "..\..\..\base\include" /I "..\..\..\base\win32\include" /I "..\..\..\config" /I "..\..\..\ui\include" /I "..\..\..\lib\xml\include" /D "_DEBUG" /D "_WINDOWS" /D "WIN32" /D "NOMINMAX" /YX /FD /c
-# SUBTRACT BASE CPP /X
-# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\\" /I "..\..\include" /I "..\include" /I "..\..\..\io\include" /I "..\..\..\base\include" /I "..\..\..\base\win32\include" /I "..\..\..\config" /I "..\..\..\ui\include" /I "..\..\..\lib\xml\include" /D "_DEBUG" /D "_WINDOWS" /D "WIN32" /YX /FD /c
-# SUBTRACT CPP /X
-# ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32
-# ADD MTL /nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32
-# ADD BASE RSC /l 0x409 /d "_DEBUG"
-# ADD RSC /l 0x409 /d "_DEBUG"
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-LINK32=link.exe
-# ADD BASE LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x11300000" /subsystem:windows /dll /debug /machine:I386 /out:"rmp.dlf" /pdbtype:sept /libpath:"..\..\..\base\win32"
-# ADD LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x11300000" /subsystem:windows /dll /debug /machine:I386 /out:"rmp.dlf" /pdbtype:sept /libpath:"..\..\..\base\win32"
-# Begin Special Build Tool
-SOURCE="$(InputPath)"
-PostBuild_Cmds=IF NOT EXIST ..\..\..\base\win32\prj\plugins mkdir                                  ..\..\..\base\win32\prj\plugins	copy rmp.dlf  ..\..\..\base\win32\prj\plugins
-# End Special Build Tool
-
 !ENDIF 
 
 # Begin Target
@@ -196,7 +162,6 @@ PostBuild_Cmds=IF NOT EXIST ..\..\..\base\win32\prj\plugins mkdir               
 # Name "rmp - Win32 Debug"
 # Name "rmp - Win32 NASM Release"
 # Name "rmp - Win32 NASM Debug"
-# Name "rmp - Win32 NASM Debug MS STL"
 # Begin Group "src"
 
 # PROP Default_Filter ""

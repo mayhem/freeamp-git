@@ -4,7 +4,7 @@
 
 # TARGTYPE "Win32 (x86) Application" 0x0101
 
-CFG=freeamp - Win32 NASM Debug MS STL
+CFG=freeamp - Win32 Release
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
@@ -13,7 +13,7 @@ CFG=freeamp - Win32 NASM Debug MS STL
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "freeamp.mak" CFG="freeamp - Win32 NASM Debug MS STL"
+!MESSAGE NMAKE /f "freeamp.mak" CFG="freeamp - Win32 Release"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
@@ -21,7 +21,6 @@ CFG=freeamp - Win32 NASM Debug MS STL
 !MESSAGE "freeamp - Win32 Debug" (based on "Win32 (x86) Application")
 !MESSAGE "freeamp - Win32 NASM Release" (based on "Win32 (x86) Application")
 !MESSAGE "freeamp - Win32 NASM Debug" (based on "Win32 (x86) Application")
-!MESSAGE "freeamp - Win32 NASM Debug MS STL" (based on "Win32 (x86) Application")
 !MESSAGE 
 
 # Begin Project
@@ -147,37 +146,6 @@ LINK32=link.exe
 # ADD LINK32 musicbrainz.lib fabaselib.lib zlib.lib gdbm.lib version.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /out:"freeamp.exe" /pdbtype:sept /libpath:"..\..\..\lib\gdbm" /libpath:"..\..\..\lib\zlib" /libpath:"..\\" /libpath:"..\..\..\lib\musicbrainz"
 # SUBTRACT LINK32 /profile
 
-!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug MS STL"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "Debug"
-# PROP BASE Intermediate_Dir "Debug"
-# PROP BASE Ignore_Export_Lib 0
-# PROP BASE Target_Dir ""
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 1
-# PROP Output_Dir "Debug"
-# PROP Intermediate_Dir "Debug"
-# PROP Ignore_Export_Lib 0
-# PROP Target_Dir ""
-# ADD BASE CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\..\..\base\aps" /I "..\..\..\lib\zlib\include" /I "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /D "_DEBUG" /D "_WINDOWS" /D "WIN32" /D "NOMINMAX" /YX /FD /c
-# SUBTRACT BASE CPP /X
-# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\..\..\base\aps" /I "..\..\..\lib\zlib\include" /I "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /D "_DEBUG" /D "_WINDOWS" /D "WIN32" /YX /FD /c
-# SUBTRACT CPP /X
-# ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32
-# ADD MTL /nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32
-# ADD BASE RSC /l 0x409 /d "_DEBUG"
-# ADD RSC /l 0x409 /d "_DEBUG"
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-LINK32=link.exe
-# ADD BASE LINK32 musicbrainz.lib fabaselib.lib zlib.lib gdbm.lib version.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /out:"freeamp.exe" /pdbtype:sept /libpath:"..\..\..\lib\gdbm" /libpath:"..\..\..\lib\zlib" /libpath:"..\\" /libpath:"..\..\..\lib\musicbrainz"
-# SUBTRACT BASE LINK32 /profile
-# ADD LINK32 musicbrainz.lib fabaselib.lib zlib.lib gdbm.lib version.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /out:"freeamp.exe" /pdbtype:sept /libpath:"..\..\..\lib\gdbm" /libpath:"..\..\..\lib\zlib" /libpath:"..\\" /libpath:"..\..\..\lib\musicbrainz"
-# SUBTRACT LINK32 /profile
-
 !ENDIF 
 
 # Begin Target
@@ -186,7 +154,6 @@ LINK32=link.exe
 # Name "freeamp - Win32 Debug"
 # Name "freeamp - Win32 NASM Release"
 # Name "freeamp - Win32 NASM Debug"
-# Name "freeamp - Win32 NASM Debug MS STL"
 # Begin Group "source"
 
 # PROP Default_Filter ""
@@ -225,16 +192,6 @@ InputPath=..\..\..\config\config.win32
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
-
-# Begin Custom Build
-InputPath=..\..\..\config\config.win32
-
-"..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\config\config.win32 ..\..\..\config\config.h
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug MS STL"
 
 # Begin Custom Build
 InputPath=..\..\..\config\config.win32
@@ -303,16 +260,6 @@ InputPath=..\..\..\AUTHORS
 
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug MS STL"
-
-# Begin Custom Build
-InputPath=..\..\..\AUTHORS
-
-"..\..\..\Authors.txt" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\AUTHORS ..\..\..\Authors.txt
-
-# End Custom Build
-
 !ENDIF 
 
 # End Source File
@@ -351,16 +298,6 @@ InputPath=..\..\..\CHANGES
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
-
-# Begin Custom Build
-InputPath=..\..\..\CHANGES
-
-"..\..\..\Changes.txt" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\CHANGES ..\..\..\Changes.txt
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug MS STL"
 
 # Begin Custom Build
 InputPath=..\..\..\CHANGES
@@ -417,16 +354,6 @@ InputPath=..\..\..\COPYING
 
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug MS STL"
-
-# Begin Custom Build
-InputPath=..\..\..\COPYING
-
-"..\..\..\Copying.txt" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\COPYING ..\..\..\Copying.txt
-
-# End Custom Build
-
 !ENDIF 
 
 # End Source File
@@ -465,16 +392,6 @@ InputPath=..\..\..\README
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
-
-# Begin Custom Build
-InputPath=..\..\..\README
-
-"..\..\..\ReadMe.txt" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\README ..\..\..\ReadMe.txt
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug MS STL"
 
 # Begin Custom Build
 InputPath=..\..\..\README
@@ -623,16 +540,6 @@ InputPath=..\..\..\lib\portio\i386\free\portio.sys
 
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug MS STL"
-
-# Begin Custom Build
-InputPath=..\..\..\lib\portio\i386\free\portio.sys
-
-".\portio.sys" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\lib\portio\i386\free\portio.sys .\portio.sys
-
-# End Custom Build
-
 !ENDIF 
 
 # End Source File
@@ -685,18 +592,6 @@ InputName=Aquatica
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
-
-# Begin Custom Build
-InputPath=..\..\..\themes\Aquatica.fat
-InputName=Aquatica
-
-".\themes\$(InputName).fat" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST themes mkdir themes 
-	copy $(InputPath) themes 
-	
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug MS STL"
 
 # Begin Custom Build
 InputPath=..\..\..\themes\Aquatica.fat
@@ -763,18 +658,6 @@ InputName=EMusic
 	
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug MS STL"
-
-# Begin Custom Build
-InputPath=..\..\..\themes\EMusic.fat
-InputName=EMusic
-
-".\themes\$(InputName).fat" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST themes mkdir themes 
-	copy $(InputPath) themes 
-	
-# End Custom Build
-
 !ENDIF 
 
 # End Source File
@@ -830,18 +713,6 @@ InputName=FreeAmp
 	
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug MS STL"
-
-# Begin Custom Build
-InputPath=..\..\..\themes\FreeAmp.fat
-InputName=FreeAmp
-
-".\themes\$(InputName).fat" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST themes mkdir themes 
-	copy $(InputPath) themes 
-	
-# End Custom Build
-
 !ENDIF 
 
 # End Source File
@@ -886,18 +757,6 @@ InputName=FreeAmpClassic
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
-
-# Begin Custom Build
-InputPath=..\..\..\themes\FreeAmpClassic.fat
-InputName=FreeAmpClassic
-
-".\themes\$(InputName).fat" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST themes mkdir themes 
-	copy $(InputPath) themes 
-	
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug MS STL"
 
 # Begin Custom Build
 InputPath=..\..\..\themes\FreeAmpClassic.fat
@@ -1062,68 +921,6 @@ SOURCE=..\include\win32prefs.h
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\..\..\lib\id3\id3lib.dll
-
-!IF  "$(CFG)" == "freeamp - Win32 Release"
-
-# Begin Custom Build
-InputPath=..\..\..\lib\id3\id3lib.dll
-InputName=id3lib
-
-".\$(InputName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy $(InputPath) .
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
-
-# Begin Custom Build
-InputPath=..\..\..\lib\id3\id3lib.dll
-InputName=id3lib
-
-".\$(InputName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy $(InputPath) .
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
-
-# Begin Custom Build
-InputPath=..\..\..\lib\id3\id3lib.dll
-InputName=id3lib
-
-".\$(InputName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy $(InputPath) .
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
-
-# Begin Custom Build
-InputPath=..\..\..\lib\id3\id3lib.dll
-InputName=id3lib
-
-".\$(InputName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy $(InputPath) .
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug MS STL"
-
-# Begin Custom Build
-InputPath=..\..\..\lib\id3\id3lib.dll
-InputName=id3lib
-
-".\$(InputName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy $(InputPath) .
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\..\lib\musicbrainz\musicbrainz.dll
 
 !IF  "$(CFG)" == "freeamp - Win32 Release"
@@ -1160,17 +957,6 @@ InputName=musicbrainz
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
-
-# Begin Custom Build
-InputPath=..\..\..\lib\musicbrainz\musicbrainz.dll
-InputName=musicbrainz
-
-".\$(InputName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy $(InputPath) .
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug MS STL"
 
 # Begin Custom Build
 InputPath=..\..\..\lib\musicbrainz\musicbrainz.dll

@@ -21,7 +21,6 @@ CFG=gdbm - Win32 NASM Debug MS STL
 !MESSAGE "gdbm - Win32 Debug" (based on "Win32 (x86) Static Library")
 !MESSAGE "gdbm - Win32 NASM Release" (based on "Win32 (x86) Static Library")
 !MESSAGE "gdbm - Win32 NASM Debug" (based on "Win32 (x86) Static Library")
-!MESSAGE "gdbm - Win32 NASM Debug MS STL" (based on "Win32 (x86) Static Library")
 !MESSAGE 
 
 # Begin Project
@@ -123,29 +122,6 @@ LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo /out:"..\gdbm.lib"
 # ADD LIB32 /nologo /out:"..\gdbm.lib"
 
-!ELSEIF  "$(CFG)" == "gdbm - Win32 NASM Debug MS STL"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "Debug"
-# PROP BASE Intermediate_Dir "Debug"
-# PROP BASE Target_Dir ""
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 1
-# PROP Output_Dir "Debug"
-# PROP Intermediate_Dir "Debug"
-# PROP Target_Dir ""
-# ADD BASE CPP /nologo /MDd /W3 /GX /Z7 /Od /I "..\config" /I ".\\" /I "..\\" /D "_DEBUG" /D "_WINDOWS" /D "WIN32" /D "NOMINMAX" /YX /FD /c
-# ADD CPP /nologo /MDd /W3 /GX /Z7 /Od /I "..\config" /I ".\\" /I "..\\" /D "_DEBUG" /D "_WINDOWS" /D "WIN32" /YX /FD /c
-# ADD BASE RSC /l 0x409
-# ADD RSC /l 0x409
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-LIB32=link.exe -lib
-# ADD BASE LIB32 /nologo /out:"..\gdbm.lib"
-# ADD LIB32 /nologo /out:"..\gdbm.lib"
-
 !ENDIF 
 
 # Begin Target
@@ -154,7 +130,6 @@ LIB32=link.exe -lib
 # Name "gdbm - Win32 Debug"
 # Name "gdbm - Win32 NASM Release"
 # Name "gdbm - Win32 NASM Debug"
-# Name "gdbm - Win32 NASM Debug MS STL"
 # Begin Source File
 
 SOURCE=..\bucket.c
@@ -194,16 +169,6 @@ InputPath=..\config\config.win32
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "gdbm - Win32 NASM Debug"
-
-# Begin Custom Build
-InputPath=..\config\config.win32
-
-"..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	if not exist ..\config\config.h copy ..\config\config.win32 ..\config\config.h
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "gdbm - Win32 NASM Debug MS STL"
 
 # Begin Custom Build
 InputPath=..\config\config.win32

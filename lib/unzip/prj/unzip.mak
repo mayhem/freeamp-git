@@ -4,7 +4,7 @@ CFG=unzip - Win32 NASM Debug MS STL
 !MESSAGE No configuration specified. Defaulting to unzip - Win32 NASM Debug MS STL.
 !ENDIF 
 
-!IF "$(CFG)" != "unzip - Win32 Release" && "$(CFG)" != "unzip - Win32 Debug" && "$(CFG)" != "unzip - Win32 NASM Debug" && "$(CFG)" != "unzip - Win32 NASM Release" && "$(CFG)" != "unzip - Win32 NASM Debug MS STL"
+!IF "$(CFG)" != "unzip - Win32 Release" && "$(CFG)" != "unzip - Win32 Debug" && "$(CFG)" != "unzip - Win32 NASM Debug" && "$(CFG)" != "unzip - Win32 NASM Release"
 !MESSAGE Invalid configuration "$(CFG)" specified.
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
@@ -17,7 +17,6 @@ CFG=unzip - Win32 NASM Debug MS STL
 !MESSAGE "unzip - Win32 Debug" (based on "Win32 (x86) Static Library")
 !MESSAGE "unzip - Win32 NASM Debug" (based on "Win32 (x86) Static Library")
 !MESSAGE "unzip - Win32 NASM Release" (based on "Win32 (x86) Static Library")
-!MESSAGE "unzip - Win32 NASM Debug MS STL" (based on "Win32 (x86) Static Library")
 !MESSAGE 
 !ERROR An invalid configuration is specified.
 !ENDIF 
@@ -187,45 +186,6 @@ LIB32_OBJS= \
   $(LIB32_FLAGS) $(DEF_FLAGS) $(LIB32_OBJS)
 <<
 
-!ELSEIF  "$(CFG)" == "unzip - Win32 NASM Debug MS STL"
-
-OUTDIR=.\Debug
-INTDIR=.\Debug
-
-ALL : "..\unzip.lib"
-
-
-CLEAN :
-	-@erase "$(INTDIR)\vc60.idb"
-	-@erase "$(INTDIR)\zip_header.obj"
-	-@erase "$(INTDIR)\zip_inflate.obj"
-	-@erase "$(INTDIR)\zip_testcrc.obj"
-	-@erase "$(INTDIR)\zip_utils.obj"
-	-@erase "$(INTDIR)\zip_wrapper.obj"
-	-@erase "..\unzip.lib"
-
-"$(OUTDIR)" :
-    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
-
-CPP_PROJ=/nologo /MDd /W3 /GX /Z7 /Od /I "..\include" /I "..\..\zlib\include" /I "..\..\..\config" /D "_DEBUG" /D "_WINDOWS" /D "WIN32" /Fp"$(INTDIR)\unzip.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
-BSC32=bscmake.exe
-BSC32_FLAGS=/nologo /o"$(OUTDIR)\unzip.bsc" 
-BSC32_SBRS= \
-	
-LIB32=link.exe -lib
-LIB32_FLAGS=/nologo /out:"..\unzip.lib" 
-LIB32_OBJS= \
-	"$(INTDIR)\zip_header.obj" \
-	"$(INTDIR)\zip_inflate.obj" \
-	"$(INTDIR)\zip_testcrc.obj" \
-	"$(INTDIR)\zip_utils.obj" \
-	"$(INTDIR)\zip_wrapper.obj"
-
-"..\unzip.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
-    $(LIB32) @<<
-  $(LIB32_FLAGS) $(DEF_FLAGS) $(LIB32_OBJS)
-<<
-
 !ENDIF 
 
 .c{$(INTDIR)}.obj::
@@ -268,7 +228,7 @@ LIB32_OBJS= \
 !ENDIF 
 
 
-!IF "$(CFG)" == "unzip - Win32 Release" || "$(CFG)" == "unzip - Win32 Debug" || "$(CFG)" == "unzip - Win32 NASM Debug" || "$(CFG)" == "unzip - Win32 NASM Release" || "$(CFG)" == "unzip - Win32 NASM Debug MS STL"
+!IF "$(CFG)" == "unzip - Win32 Release" || "$(CFG)" == "unzip - Win32 Debug" || "$(CFG)" == "unzip - Win32 NASM Debug" || "$(CFG)" == "unzip - Win32 NASM Release"
 SOURCE=..\src\zip_header.cpp
 
 "$(INTDIR)\zip_header.obj" : $(SOURCE) "$(INTDIR)"

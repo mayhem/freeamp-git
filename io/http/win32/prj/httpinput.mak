@@ -4,7 +4,7 @@ CFG=httpinput - Win32 NASM Debug MS STL
 !MESSAGE No configuration specified. Defaulting to httpinput - Win32 NASM Debug MS STL.
 !ENDIF 
 
-!IF "$(CFG)" != "httpinput - Win32 Release" && "$(CFG)" != "httpinput - Win32 Debug" && "$(CFG)" != "httpinput - Win32 NASM Debug" && "$(CFG)" != "httpinput - Win32 NASM Release" && "$(CFG)" != "httpinput - Win32 NASM Debug MS STL"
+!IF "$(CFG)" != "httpinput - Win32 Release" && "$(CFG)" != "httpinput - Win32 Debug" && "$(CFG)" != "httpinput - Win32 NASM Debug" && "$(CFG)" != "httpinput - Win32 NASM Release"
 !MESSAGE Invalid configuration "$(CFG)" specified.
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
@@ -17,7 +17,6 @@ CFG=httpinput - Win32 NASM Debug MS STL
 !MESSAGE "httpinput - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "httpinput - Win32 NASM Debug" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "httpinput - Win32 NASM Release" (based on "Win32 (x86) Dynamic-Link Library")
-!MESSAGE "httpinput - Win32 NASM Debug MS STL" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE 
 !ERROR An invalid configuration is specified.
 !ENDIF 
@@ -322,80 +321,6 @@ $(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Release" ".\httpinput.pmi"
 	copy httpinput.pmi                          ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
-!ELSEIF  "$(CFG)" == "httpinput - Win32 NASM Debug MS STL"
-
-OUTDIR=.\Debug
-INTDIR=.\Debug
-
-!IF "$(RECURSE)" == "0" 
-
-ALL : ".\httpinput.pmi"
-
-!ELSE 
-
-ALL : "fabaselib - Win32 NASM Debug MS STL" ".\httpinput.pmi"
-
-!ENDIF 
-
-!IF "$(RECURSE)" == "1" 
-CLEAN :"fabaselib - Win32 NASM Debug MS STLCLEAN" 
-!ELSE 
-CLEAN :
-!ENDIF 
-	-@erase "$(INTDIR)\debug.obj"
-	-@erase "$(INTDIR)\http.res"
-	-@erase "$(INTDIR)\httpinput.obj"
-	-@erase "$(INTDIR)\pipeline.obj"
-	-@erase "$(INTDIR)\pmi.obj"
-	-@erase "$(INTDIR)\pullbuffer.obj"
-	-@erase "$(INTDIR)\tstream.obj"
-	-@erase "$(INTDIR)\vc60.idb"
-	-@erase "$(INTDIR)\vc60.pdb"
-	-@erase "$(OUTDIR)\httpinput.exp"
-	-@erase "$(OUTDIR)\httpinput.lib"
-	-@erase "$(OUTDIR)\httpinput.pdb"
-	-@erase ".\httpinput.ilk"
-	-@erase ".\httpinput.pmi"
-
-"$(OUTDIR)" :
-    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
-
-CPP_PROJ=/nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\..\\" /I "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /D "_DEBUG" /D "_WINDOWS" /D "WIN32" /Fp"$(INTDIR)\httpinput.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
-MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32 
-RSC_PROJ=/l 0x409 /fo"$(INTDIR)\http.res" /d "_DEBUG" 
-BSC32=bscmake.exe
-BSC32_FLAGS=/nologo /o"$(OUTDIR)\httpinput.bsc" 
-BSC32_SBRS= \
-	
-LINK32=link.exe
-LINK32_FLAGS=fabaselib.lib gdbm.lib version.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib musicbrainz.lib /nologo /base:"0x10400000" /subsystem:windows /dll /incremental:yes /pdb:"$(OUTDIR)\httpinput.pdb" /debug /machine:I386 /def:".\httpinput.def" /out:"httpinput.pmi" /implib:"$(OUTDIR)\httpinput.lib" /pdbtype:sept /libpath:"..\..\..\..\base\win32" /libpath:"..\..\..\..\lib\gdbm" /libpath:"..\..\..\..\lib\musicbrainz" 
-DEF_FILE= \
-	".\httpinput.def"
-LINK32_OBJS= \
-	"$(INTDIR)\debug.obj" \
-	"$(INTDIR)\httpinput.obj" \
-	"$(INTDIR)\pipeline.obj" \
-	"$(INTDIR)\pmi.obj" \
-	"$(INTDIR)\pullbuffer.obj" \
-	"$(INTDIR)\tstream.obj" \
-	"$(INTDIR)\http.res" \
-	"..\..\..\..\base\win32\fabaselib.lib"
-
-".\httpinput.pmi" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
-    $(LINK32) @<<
-  $(LINK32_FLAGS) $(LINK32_OBJS)
-<<
-
-SOURCE="$(InputPath)"
-DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
-
-ALL : $(DS_POSTBUILD_DEP)
-
-$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Debug MS STL" ".\httpinput.pmi"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins
-	copy httpinput.pmi                          ..\..\..\..\base\win32\prj\plugins
-	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
-
 !ENDIF 
 
 .c{$(INTDIR)}.obj::
@@ -438,7 +363,7 @@ $(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Debug MS STL" ".\httpinput.pmi"
 !ENDIF 
 
 
-!IF "$(CFG)" == "httpinput - Win32 Release" || "$(CFG)" == "httpinput - Win32 Debug" || "$(CFG)" == "httpinput - Win32 NASM Debug" || "$(CFG)" == "httpinput - Win32 NASM Release" || "$(CFG)" == "httpinput - Win32 NASM Debug MS STL"
+!IF "$(CFG)" == "httpinput - Win32 Release" || "$(CFG)" == "httpinput - Win32 Debug" || "$(CFG)" == "httpinput - Win32 NASM Debug" || "$(CFG)" == "httpinput - Win32 NASM Release"
 SOURCE=..\..\..\..\base\src\debug.cpp
 
 "$(INTDIR)\debug.obj" : $(SOURCE) "$(INTDIR)"
@@ -505,13 +430,6 @@ SOURCE=..\res\http.rc
 	$(RSC) /l 0x409 /fo"$(INTDIR)\http.res" /i "\Local\src\freeamp\io\http\win32\res" /d "NDEBUG" $(SOURCE)
 
 
-!ELSEIF  "$(CFG)" == "httpinput - Win32 NASM Debug MS STL"
-
-
-"$(INTDIR)\http.res" : $(SOURCE) "$(INTDIR)"
-	$(RSC) /l 0x409 /fo"$(INTDIR)\http.res" /i "\Local\src\freeamp\io\http\win32\res" /d "_DEBUG" $(SOURCE)
-
-
 !ENDIF 
 
 !IF  "$(CFG)" == "httpinput - Win32 Release"
@@ -560,18 +478,6 @@ SOURCE=..\res\http.rc
 "fabaselib - Win32 NASM ReleaseCLEAN" : 
    cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Release" RECURSE=1 CLEAN 
-   cd "..\..\..\io\http\win32\prj"
-
-!ELSEIF  "$(CFG)" == "httpinput - Win32 NASM Debug MS STL"
-
-"fabaselib - Win32 NASM Debug MS STL" : 
-   cd "\Local\src\freeamp\base\win32\prj"
-   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug MS STL" 
-   cd "..\..\..\io\http\win32\prj"
-
-"fabaselib - Win32 NASM Debug MS STLCLEAN" : 
-   cd "\Local\src\freeamp\base\win32\prj"
-   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug MS STL" RECURSE=1 CLEAN 
    cd "..\..\..\io\http\win32\prj"
 
 !ENDIF 

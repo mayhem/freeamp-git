@@ -4,7 +4,7 @@ CFG=id3v1 - Win32 NASM Debug MS STL
 !MESSAGE No configuration specified. Defaulting to id3v1 - Win32 NASM Debug MS STL.
 !ENDIF 
 
-!IF "$(CFG)" != "id3v1 - Win32 Release" && "$(CFG)" != "id3v1 - Win32 Debug" && "$(CFG)" != "id3v1 - Win32 NASM Release" && "$(CFG)" != "id3v1 - Win32 NASM Debug" && "$(CFG)" != "id3v1 - Win32 NASM Debug MS STL"
+!IF "$(CFG)" != "id3v1 - Win32 Release" && "$(CFG)" != "id3v1 - Win32 Debug" && "$(CFG)" != "id3v1 - Win32 NASM Release" && "$(CFG)" != "id3v1 - Win32 NASM Debug"
 !MESSAGE Invalid configuration "$(CFG)" specified.
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
@@ -17,7 +17,6 @@ CFG=id3v1 - Win32 NASM Debug MS STL
 !MESSAGE "id3v1 - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "id3v1 - Win32 NASM Release" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "id3v1 - Win32 NASM Debug" (based on "Win32 (x86) Dynamic-Link Library")
-!MESSAGE "id3v1 - Win32 NASM Debug MS STL" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE 
 !ERROR An invalid configuration is specified.
 !ENDIF 
@@ -282,70 +281,6 @@ $(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Debug" ".\id3v1.mdf"
 	copy id3v1.mdf      ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
-!ELSEIF  "$(CFG)" == "id3v1 - Win32 NASM Debug MS STL"
-
-OUTDIR=.\Debug
-INTDIR=.\Debug
-
-!IF "$(RECURSE)" == "0" 
-
-ALL : ".\id3v1.mdf"
-
-!ELSE 
-
-ALL : "fabaselib - Win32 NASM Debug MS STL" ".\id3v1.mdf"
-
-!ENDIF 
-
-!IF "$(RECURSE)" == "1" 
-CLEAN :"fabaselib - Win32 NASM Debug MS STLCLEAN" 
-!ELSE 
-CLEAN :
-!ENDIF 
-	-@erase "$(INTDIR)\id3v1.obj"
-	-@erase "$(INTDIR)\id3v1.res"
-	-@erase "$(INTDIR)\vc60.idb"
-	-@erase "$(INTDIR)\vc60.pdb"
-	-@erase "$(OUTDIR)\id3v1.exp"
-	-@erase "$(OUTDIR)\id3v1.lib"
-	-@erase "$(OUTDIR)\id3v1.pdb"
-	-@erase ".\id3v1.ilk"
-	-@erase ".\id3v1.mdf"
-
-"$(OUTDIR)" :
-    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
-
-CPP_PROJ=/nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\..\\" /I "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /D "_DEBUG" /D "_WINDOWS" /D "WIN32" /Fp"$(INTDIR)\id3v1.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
-MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32 
-RSC_PROJ=/l 0x409 /fo"$(INTDIR)\id3v1.res" /d "_DEBUG" 
-BSC32=bscmake.exe
-BSC32_FLAGS=/nologo /o"$(OUTDIR)\id3v1.bsc" 
-BSC32_SBRS= \
-	
-LINK32=link.exe
-LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x10500000" /subsystem:windows /dll /incremental:yes /pdb:"$(OUTDIR)\id3v1.pdb" /debug /machine:I386 /def:".\id3v1.def" /out:"id3v1.mdf" /implib:"$(OUTDIR)\id3v1.lib" /pdbtype:sept /libpath:"..\..\..\..\base\win32" 
-DEF_FILE= \
-	".\id3v1.def"
-LINK32_OBJS= \
-	"$(INTDIR)\id3v1.obj" \
-	"$(INTDIR)\id3v1.res" \
-	"..\..\..\..\base\win32\fabaselib.lib"
-
-".\id3v1.mdf" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
-    $(LINK32) @<<
-  $(LINK32_FLAGS) $(LINK32_OBJS)
-<<
-
-SOURCE="$(InputPath)"
-DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
-
-ALL : $(DS_POSTBUILD_DEP)
-
-$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Debug MS STL" ".\id3v1.mdf"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins
-	copy id3v1.mdf      ..\..\..\..\base\win32\prj\plugins
-	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
-
 !ENDIF 
 
 .c{$(INTDIR)}.obj::
@@ -388,7 +323,7 @@ $(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Debug MS STL" ".\id3v1.mdf"
 !ENDIF 
 
 
-!IF "$(CFG)" == "id3v1 - Win32 Release" || "$(CFG)" == "id3v1 - Win32 Debug" || "$(CFG)" == "id3v1 - Win32 NASM Release" || "$(CFG)" == "id3v1 - Win32 NASM Debug" || "$(CFG)" == "id3v1 - Win32 NASM Debug MS STL"
+!IF "$(CFG)" == "id3v1 - Win32 Release" || "$(CFG)" == "id3v1 - Win32 Debug" || "$(CFG)" == "id3v1 - Win32 NASM Release" || "$(CFG)" == "id3v1 - Win32 NASM Debug"
 SOURCE=..\id3v1.cpp
 
 "$(INTDIR)\id3v1.obj" : $(SOURCE) "$(INTDIR)"
@@ -419,13 +354,6 @@ SOURCE=..\res\id3v1.rc
 
 
 !ELSEIF  "$(CFG)" == "id3v1 - Win32 NASM Debug"
-
-
-"$(INTDIR)\id3v1.res" : $(SOURCE) "$(INTDIR)"
-	$(RSC) /l 0x409 /fo"$(INTDIR)\id3v1.res" /i "\Local\src\freeamp\plm\metadata\id3v1\res" /d "_DEBUG" $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "id3v1 - Win32 NASM Debug MS STL"
 
 
 "$(INTDIR)\id3v1.res" : $(SOURCE) "$(INTDIR)"
@@ -480,18 +408,6 @@ SOURCE=..\res\id3v1.rc
 "fabaselib - Win32 NASM DebugCLEAN" : 
    cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug" RECURSE=1 CLEAN 
-   cd "..\..\..\plm\metadata\id3v1\prj"
-
-!ELSEIF  "$(CFG)" == "id3v1 - Win32 NASM Debug MS STL"
-
-"fabaselib - Win32 NASM Debug MS STL" : 
-   cd "\Local\src\freeamp\base\win32\prj"
-   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug MS STL" 
-   cd "..\..\..\plm\metadata\id3v1\prj"
-
-"fabaselib - Win32 NASM Debug MS STLCLEAN" : 
-   cd "\Local\src\freeamp\base\win32\prj"
-   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug MS STL" RECURSE=1 CLEAN 
    cd "..\..\..\plm\metadata\id3v1\prj"
 
 !ENDIF 

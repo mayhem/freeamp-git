@@ -21,7 +21,6 @@ CFG=xing - Win32 NASM Debug MS STL
 !MESSAGE "xing - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "xing - Win32 NASM Release" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "xing - Win32 NASM Debug" (based on "Win32 (x86) Dynamic-Link Library")
-!MESSAGE "xing - Win32 NASM Debug MS STL" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE 
 
 # Begin Project
@@ -157,39 +156,6 @@ SOURCE="$(InputPath)"
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                    ..\..\..\..\base\win32\prj\plugins	copy xing.lmc                            ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
-!ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug MS STL"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "Debug"
-# PROP BASE Intermediate_Dir "Debug"
-# PROP BASE Ignore_Export_Lib 0
-# PROP BASE Target_Dir ""
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 1
-# PROP Output_Dir "Debug"
-# PROP Intermediate_Dir "Debug"
-# PROP Ignore_Export_Lib 0
-# PROP Target_Dir ""
-# ADD BASE CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\..\\" /I "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /D "_DEBUG" /D "_WINDOWS" /D "ASM_X86" /D "WIN32" /D "NOMINMAX" /YX /FD /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\..\\" /I "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /D "_DEBUG" /D "_WINDOWS" /D "ASM_X86" /D "WIN32" /YX /FD /c
-# ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32
-# ADD MTL /nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32
-# ADD BASE RSC /l 0x409 /d "_DEBUG"
-# ADD RSC /l 0x409 /d "_DEBUG"
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-LINK32=link.exe
-# ADD BASE LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x11800000" /subsystem:windows /dll /debug /machine:I386 /out:"xing.lmc" /pdbtype:sept /libpath:"..\..\..\..\base\win32"
-# SUBTRACT BASE LINK32 /profile /nodefaultlib
-# ADD LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x11800000" /subsystem:windows /dll /debug /machine:I386 /out:"xing.lmc" /pdbtype:sept /libpath:"..\..\..\..\base\win32"
-# SUBTRACT LINK32 /profile /nodefaultlib
-# Begin Special Build Tool
-SOURCE="$(InputPath)"
-PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                    ..\..\..\..\base\win32\prj\plugins	copy xing.lmc                            ..\..\..\..\base\win32\prj\plugins
-# End Special Build Tool
-
 !ENDIF 
 
 # Begin Target
@@ -198,7 +164,6 @@ PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir            
 # Name "xing - Win32 Debug"
 # Name "xing - Win32 NASM Release"
 # Name "xing - Win32 NASM Debug"
-# Name "xing - Win32 NASM Debug MS STL"
 # Begin Group "general source"
 
 # PROP Default_Filter ""
@@ -237,16 +202,6 @@ InputPath=..\..\..\..\config\config.win32
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug"
-
-# Begin Custom Build
-InputPath=..\..\..\..\config\config.win32
-
-"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug MS STL"
 
 # Begin Custom Build
 InputPath=..\..\..\..\config\config.win32
@@ -403,18 +358,6 @@ InputName=cdctasm
 
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug MS STL"
-
-# Begin Custom Build
-IntDir=.\Debug
-InputPath=..\..\src\cdctasm.asm
-InputName=cdctasm
-
-"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-
-# End Custom Build
-
 !ENDIF 
 
 # End Source File
@@ -443,18 +386,6 @@ InputName=cwin8asm
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug"
-
-# Begin Custom Build
-IntDir=.\Debug
-InputPath=..\..\src\cwin8asm.asm
-InputName=cwin8asm
-
-"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug MS STL"
 
 # Begin Custom Build
 IntDir=.\Debug
@@ -505,18 +436,6 @@ InputName=cwinasm
 
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug MS STL"
-
-# Begin Custom Build
-IntDir=.\Debug
-InputPath=..\..\src\cwinasm.asm
-InputName=cwinasm
-
-"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-
-# End Custom Build
-
 !ENDIF 
 
 # End Source File
@@ -556,18 +475,6 @@ InputName=mdctasm
 
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug MS STL"
-
-# Begin Custom Build
-IntDir=.\Debug
-InputPath=..\..\src\mdctasm.asm
-InputName=mdctasm
-
-"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-
-# End Custom Build
-
 !ENDIF 
 
 # End Source File
@@ -596,18 +503,6 @@ InputName=msisasm
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug"
-
-# Begin Custom Build
-IntDir=.\Debug
-InputPath=..\..\src\msisasm.asm
-InputName=msisasm
-
-"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug MS STL"
 
 # Begin Custom Build
 IntDir=.\Debug

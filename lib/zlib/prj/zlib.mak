@@ -4,7 +4,7 @@ CFG=zlib - Win32 NASM Debug MS STL
 !MESSAGE No configuration specified. Defaulting to zlib - Win32 NASM Debug MS STL.
 !ENDIF 
 
-!IF "$(CFG)" != "zlib - Win32 Release" && "$(CFG)" != "zlib - Win32 Debug" && "$(CFG)" != "zlib - Win32 NASM Debug" && "$(CFG)" != "zlib - Win32 NASM Release" && "$(CFG)" != "zlib - Win32 NASM Debug MS STL"
+!IF "$(CFG)" != "zlib - Win32 Release" && "$(CFG)" != "zlib - Win32 Debug" && "$(CFG)" != "zlib - Win32 NASM Debug" && "$(CFG)" != "zlib - Win32 NASM Release"
 !MESSAGE Invalid configuration "$(CFG)" specified.
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
@@ -17,7 +17,6 @@ CFG=zlib - Win32 NASM Debug MS STL
 !MESSAGE "zlib - Win32 Debug" (based on "Win32 (x86) Static Library")
 !MESSAGE "zlib - Win32 NASM Debug" (based on "Win32 (x86) Static Library")
 !MESSAGE "zlib - Win32 NASM Release" (based on "Win32 (x86) Static Library")
-!MESSAGE "zlib - Win32 NASM Debug MS STL" (based on "Win32 (x86) Static Library")
 !MESSAGE 
 !ERROR An invalid configuration is specified.
 !ENDIF 
@@ -259,63 +258,6 @@ LIB32_OBJS= \
   $(LIB32_FLAGS) $(DEF_FLAGS) $(LIB32_OBJS)
 <<
 
-!ELSEIF  "$(CFG)" == "zlib - Win32 NASM Debug MS STL"
-
-OUTDIR=.\Debug
-INTDIR=.\Debug
-
-ALL : "..\zlib.lib"
-
-
-CLEAN :
-	-@erase "$(INTDIR)\adler32.obj"
-	-@erase "$(INTDIR)\compress.obj"
-	-@erase "$(INTDIR)\crc32.obj"
-	-@erase "$(INTDIR)\deflate.obj"
-	-@erase "$(INTDIR)\gzio.obj"
-	-@erase "$(INTDIR)\infblock.obj"
-	-@erase "$(INTDIR)\infcodes.obj"
-	-@erase "$(INTDIR)\inffast.obj"
-	-@erase "$(INTDIR)\inflate.obj"
-	-@erase "$(INTDIR)\inftrees.obj"
-	-@erase "$(INTDIR)\infutil.obj"
-	-@erase "$(INTDIR)\trees.obj"
-	-@erase "$(INTDIR)\uncompr.obj"
-	-@erase "$(INTDIR)\vc60.idb"
-	-@erase "$(INTDIR)\zutil.obj"
-	-@erase "..\zlib.lib"
-
-"$(OUTDIR)" :
-    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
-
-CPP_PROJ=/nologo /MDd /W3 /GX /Z7 /Od /I "..\include" /I "..\..\..\config" /D "_DEBUG" /D "_WINDOWS" /D "WIN32" /Fp"$(INTDIR)\zlib.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
-BSC32=bscmake.exe
-BSC32_FLAGS=/nologo /o"$(OUTDIR)\zlib.bsc" 
-BSC32_SBRS= \
-	
-LIB32=link.exe -lib
-LIB32_FLAGS=/nologo /out:"..\zlib.lib" 
-LIB32_OBJS= \
-	"$(INTDIR)\adler32.obj" \
-	"$(INTDIR)\compress.obj" \
-	"$(INTDIR)\crc32.obj" \
-	"$(INTDIR)\deflate.obj" \
-	"$(INTDIR)\gzio.obj" \
-	"$(INTDIR)\infblock.obj" \
-	"$(INTDIR)\infcodes.obj" \
-	"$(INTDIR)\inffast.obj" \
-	"$(INTDIR)\inflate.obj" \
-	"$(INTDIR)\inftrees.obj" \
-	"$(INTDIR)\infutil.obj" \
-	"$(INTDIR)\trees.obj" \
-	"$(INTDIR)\uncompr.obj" \
-	"$(INTDIR)\zutil.obj"
-
-"..\zlib.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
-    $(LIB32) @<<
-  $(LIB32_FLAGS) $(DEF_FLAGS) $(LIB32_OBJS)
-<<
-
 !ENDIF 
 
 .c{$(INTDIR)}.obj::
@@ -358,7 +300,7 @@ LIB32_OBJS= \
 !ENDIF 
 
 
-!IF "$(CFG)" == "zlib - Win32 Release" || "$(CFG)" == "zlib - Win32 Debug" || "$(CFG)" == "zlib - Win32 NASM Debug" || "$(CFG)" == "zlib - Win32 NASM Release" || "$(CFG)" == "zlib - Win32 NASM Debug MS STL"
+!IF "$(CFG)" == "zlib - Win32 Release" || "$(CFG)" == "zlib - Win32 Debug" || "$(CFG)" == "zlib - Win32 NASM Debug" || "$(CFG)" == "zlib - Win32 NASM Release"
 SOURCE=..\src\adler32.c
 
 "$(INTDIR)\adler32.obj" : $(SOURCE) "$(INTDIR)"
