@@ -222,8 +222,8 @@ int main(int argc, char **argv)
                     {
                         if (i == 0)
                         {
-                            if (!strcasecmp("fat", pPtr + strlen(pPtr) - 3) ||
-                                !strcasecmp("rmp", pPtr + strlen(pPtr) - 3))
+                            if (!strcasecmp("fat", pPtr + strlen(pPtr) - 3) || 
+                                !strcasecmp("rmp", pPtr + strlen(pPtr) - 3)) 
                                bPlay = false;
 
                             if (bPlay) 

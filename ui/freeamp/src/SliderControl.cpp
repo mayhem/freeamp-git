@@ -119,6 +119,7 @@ void SliderControl::Init(void)
                         break;
                     case 1:
                         SetStateBitmap(m_pBitmap, oFrameRect, CS_MouseOver, row);
+                        SetStateBitmap(m_pBitmap, oFrameRect, CS_Dragging, row);
                         break;
                     case 2:
                         SetStateBitmap(m_pBitmap, oFrameRect, CS_Disabled, row);
@@ -377,7 +378,9 @@ void SliderControl::MoveThumb(int iCurrentPos, int iNewPos)
     int iThumbNumber = iNewPos * m_iNumThumbStates / m_iRange;
     iThumbNumber = min(m_iNumThumbStates - 1, iThumbNumber);
 
-    BlitTrough(iNewPos);
+    if (m_eCurrentState == CS_Normal || m_eCurrentState == CS_Dragging ||
+        m_eCurrentState == CS_MouseOver || m_eCurrentState == CS_Disabled) 
+        BlitTrough(iNewPos);
 
     switch(m_eCurrentState)
     {
@@ -386,6 +389,9 @@ void SliderControl::MoveThumb(int iCurrentPos, int iNewPos)
           break;
 
        case CS_Dragging:
+          BlitFrame(CS_Dragging, iThumbNumber, &oRect, false);
+          break;
+
        case CS_MouseOver:
           BlitFrame(CS_MouseOver, iThumbNumber, &oRect, false);
           break;

@@ -144,7 +144,7 @@ void MusicBrowserUI::GTKEventService(void)
     }
     m_context->gtkLock.Release();
 
-    gtk_timeout_add(1000, cd_check_timeout, this);
+    gtk_timeout_add(5000, cd_check_timeout, this);
 
     if (weAreGTK) {
         gtk_timeout_add(250, musicbrowser_timeout, this);

@@ -15,6 +15,7 @@ install-plugins: plugins
 	     $(INSTALL_PROGRAM) $$p $(DESTDIR)$(libdir)/freeamp/`echo $$p|sed '$(transform)'`; \
 	  else :; fi; \
 	done
+	$(INSTALL_PROGRAM) ftc/winamp/winamp_theme.xml $(DESTDIR)$(datadir)/freeamp/winamp_theme.xml
 
 uninstall_plugins uninstall-plugins:
 	@list=`ls plugins/*.*`; for p in $$list; do \
@@ -31,6 +32,7 @@ clean-plugins plugins-clean:
 	-rm -f $(CDDBOBJ) $(PLSOBJ) $(RMPOBJ) $(MISCOBJ) $(ZLIBOBJ) $(MUSICBROWSEROBJ) $(MAKETHEMEOBJ) $(LFIOBJ) $(HTTPOBJ) $(OBSPMI) $(SCPMOOBJ) $(ALSAOBJ) $(ESNDOBJ) $(DOWNLOADUIOBJ) $(CMDUIOBJ) $(MPG123UIOBJ) $(NCURSESUIOBJ) $(LCDUIOBJ) $(IRMANUIOBJ) $(FREEAMPUIOBJ) $(ID3V1OBJ) $(ID3V2OBJ) $(M3UOBJ) $(PMP300OBJ) $(XINGLMCOBJ) MakeTheme plugins/*.*
 
 PLUGINS =  lib/zlib/lib/libzlib.la
+PLUGINS += lib/unzip/lib/libunzip.la
 PLUGINS += plugins/localfileinput.pmi
 PLUGINS += plugins/httpinput.pmi
 PLUGINS += plugins/obsinput.pmi
@@ -55,6 +57,8 @@ PLUGINS += plugins/m3u.plf
 PLUGINS += plugins/pls.plf
 
 PLUGINS += plugins/rmp.dlf
+
+PLUGINS += plugins/winamp.ftf
 
 plugins plugins-cc: $(PLUGINS) $(OSDEPPLUGINS)
 
@@ -165,8 +169,9 @@ FREEAMPUIOBJ += ui/freeamp/src/Control.o ui/freeamp/src/TextControl.o
 FREEAMPUIOBJ += ui/freeamp/src/DialControl.o ui/freeamp/src/Font.o 
 FREEAMPUIOBJ += ui/freeamp/src/FreeAmpTheme.o ui/freeamp/src/ThemeZip.o 
 FREEAMPUIOBJ += ui/freeamp/src/MultiStateControl.o ui/freeamp/src/Headlines.o
-FREEAMPUIOBJ += base/src/utility.lo
+FREEAMPUIOBJ += ui/freeamp/src/ForeignTheme.o base/src/utility.lo
 FREEAMPUIOBJ += lib/zlib/lib/libzlib.la lib/xml/src/Parse.lo
+FREEAMPUIOBJ += lib/unzip/lib/libunzip.la
 FREEAMPUIOBJ += $($(OSTYPE)FREEAMPUIOBJ)
 FREEAMPUILIBS = $($(OSTYPE)FREEAMPUILIBS)
 
@@ -204,7 +209,7 @@ plugins/freeamp.ui: $(FREEAMPUIOBJ)
 MAKETHEMEOBJ = ui/freeamp/tools/src/MakeTheme.o ui/freeamp/src/ThemeZip.o
 
 MakeTheme: $(MAKETHEMEOBJ)
-	$(CXXLINK) $(MAKETHEMEOBJ) lib/zlib/lib/libzlib.a 
+	$(CXXLINK) $(MAKETHEMEOBJ) lib/zlib/lib/libzlib.a lib/unzip/lib/libunzip.la 
 
 # cmdline
 CMDUIOBJ = ui/cmdline/cmdlineUI.o 
@@ -323,12 +328,21 @@ plugins/pmp300.ppp: $(PMP300OBJ)
 
 # DLM section
 
-#rmo
+# rmp
 
 RMPOBJ = dlm/rmp/rmp.o lib/xml/src/Parse.lo 
 
 plugins/rmp.dlf: $(RMPOBJ)
 	$(LINKMOD) -o $@ $(RMPOBJ) $(STATICLD) 
+
+# FTC section
+
+# winamp
+
+WINAMPOBJ = ftc/winamp/winamp.o
+
+plugins/winamp.ftf: $(WINAMPOBJ)
+	$(LINKMOD) -o $@ $(WINAMPOBJ) $(STATICLD)
 
 # zlib section
 
@@ -343,8 +357,19 @@ lib/zlib/lib/libzlib.la: $(ZLIBOBJ)
 	+test -d lib/zlib/lib || mkdir lib/zlib/lib 
 	$(LIBMOD) $@ $(ZLIBOBJ)
 
+# unzip section
+
+UNZIPOBJ  = lib/unzip/src/zip_header.o lib/unzip/src/zip_inflate.o
+UNZIPOBJ += lib/unzip/src/zip_testcrc.o lib/unzip/src/zip_utils.o
+UNZIPOBJ += lib/unzip/src/zip_wrapper.o
+
+lib/unzip/lib/libunzip.la: $(UNZIPOBJ)
+	+test -d lib/unzip/lib || mkdir lib/unzip/lib
+	$(LIBMOD) $@ $(UNZIPOBJ)
+
+
 depend:
-	makedepend -fMakefile-plugins -- $(DEFS) $(INCLUDES) $(CFLAGS) -- `echo $(LFIOBJ) $(DOWNLOADUIOBJ) $(CDDBOBJ) $(CDPMIOBJ) $(CDLMCOBJ) $(THEMEUIOBJ) $(MUSICBROWSEROBJ) $(HTTPOBJ) $(SCPMOOBJ) $(ALSAOBJ) $(ESNDOBJ) $(CMDUIOBJ) $(MPG123UIOBJ) $(NCURSESUIOBJ) $(LCDUIOBJ) $(IRMANUIOBJ) $(GTKUIOBJ) $(FREEAMPUIOBJ) $(XINGLMCOBJ) $(PMP300OBJ) $(M3UOBJ) $(ID3V1OBJ) $(ID3V2OBJ) | sed -e 's,\.o,.cpp,g' | sed -e 's,\.doh,.cpp,g'`
+	makedepend -fMakefile-plugins -- $(DEFS) $(INCLUDES) $(CFLAGS) -- `echo $(UNZIPOBJ) $(WINAMPOBJ) $(LFIOBJ) $(DOWNLOADUIOBJ) $(CDDBOBJ) $(CDPMIOBJ) $(CDLMCOBJ) $(THEMEUIOBJ) $(MUSICBROWSEROBJ) $(HTTPOBJ) $(SCPMOOBJ) $(ALSAOBJ) $(ESNDOBJ) $(CMDUIOBJ) $(MPG123UIOBJ) $(NCURSESUIOBJ) $(LCDUIOBJ) $(IRMANUIOBJ) $(GTKUIOBJ) $(FREEAMPUIOBJ) $(XINGLMCOBJ) $(PMP300OBJ) $(M3UOBJ) $(ID3V1OBJ) $(ID3V2OBJ) | sed -e 's,\.o,.cpp,g' | sed -e 's,\.doh,.cpp,g'`
  
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 

@@ -267,7 +267,7 @@ void Control::BlitFrame(ControlStateEnum eFrame, int iState, Rect *pRect,
         iState = 0;
 
     if (m_oStateBitmapRect[iState].find(eFrame) == 
-        m_oStateBitmapRect[iState].end())
+        m_oStateBitmapRect[iState].end()) 
         m_oStateBitmapRect[iState][eFrame] = 
                                     m_oStateBitmapRect[iState][CS_Normal];
 

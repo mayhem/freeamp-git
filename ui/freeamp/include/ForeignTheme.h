@@ -1,8 +1,8 @@
 /*____________________________________________________________________________
-
+        
    FreeAmp - The Free MP3 Player
 
-   Copyright (C) 1999 EMusic
+   Copyright (C) 2000 EMusic.com
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,12 +17,12 @@
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-
+        
    $Id$
-____________________________________________________________________________*/ 
+____________________________________________________________________________*/
 
-#ifndef INCLUDED_THEMEZIP_H__
-#define INCLUDED_THEMEZIP_H__
+#ifndef INCLUDED_FOREIGN_H
+#define INCLUDED_FOREIGN_H
 
 // The debugger can't handle symbols more than 255 characters long.
 // STL often creates symbols longer than that.
@@ -31,34 +31,27 @@ ____________________________________________________________________________*/
 #pragma warning(disable:4786)
 #endif
 
-#include <string>
-#include <vector>
+#include "config.h"
+#include "facontext.h"
 #include "errors.h"
+#include "registry.h"
+#include "themeformat.h"
 
-using namespace std;
-
-class ThemeZip
+class ForeignTheme
 {
     public:
 
-               ThemeZip(void);
-      virtual ~ThemeZip(void);
+        ForeignTheme(FAContext *context);
+       ~ForeignTheme();
 
-      virtual  Error CompressThemeZip(const string &oDestFile, 
-                                      vector<string *> &oFileList);
-      virtual  Error DecompressTheme(const string &oSrcFile,
-                                     const string &oDestPath);
-      virtual  Error CleanupThemeZip(void);                                  
-      virtual  Error GetDescriptiveName(const string &oSrcFile, 
-                                        string &oDescriptiveName);
-
-    protected:
-     
+        void TryToConvert(string &oDir);
+ 
     private:
-          Error DecompressZip(const string &oSrcFile, const string &oDestFile);
-          Error DecompressGZ(const string &oSrcFile, const string &oDestFile);
+       
+        FAContext *m_context;
+        Registry   m_formatRegistry;
 
-	  vector<string> m_oCreatedFiles;
+        vector<ThemeFormat *> m_formats;
 };
 
 #endif

@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
     if (destFile == string("-d"))
     {
         destFile = argv[2];
-        err = oZip.DecompressThemeZip(destFile, string("."));
+        err = oZip.DecompressTheme(destFile, string("."));
         if (err == kError_NoErr)
         {
             printf("Theme unzipped ok.\n");

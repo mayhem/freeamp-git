@@ -51,6 +51,8 @@ ____________________________________________________________________________*/
 #include "ThemeZip.h"
 #include "MessageDialog.h"
 #include "debug.h"
+#include "ForeignTheme.h"
+
 #include "config.h"
 
 #define DB Debug_v("%s:%d\n", __FILE__, __LINE__);
@@ -99,6 +101,7 @@ Theme::Theme(FAContext *context)
     m_oReloadWindow = string("");
     m_eCurrentControl = eUndefinedControl;
     m_pThemeMan = new ThemeManager(m_pContext);
+    m_pForeignThemes = new ForeignTheme(m_pContext);
     m_bThemeLoaded = false;
     m_bCreditsShown = false;
 	m_pHeadlineGrabber = NULL;
@@ -121,7 +124,8 @@ Theme::~Theme(void)
     delete m_pCurrentControl;
     delete m_pThemeMan;
     delete m_pWindow;
-    
+    delete m_pForeignThemes;   
+ 
     ClearWindows();
     ClearBitmaps();
     ClearFonts();
@@ -196,6 +200,7 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
     if (_stat(oFile.c_str(), &buf) == 0 && (buf.st_mode & _S_IFDIR))
     {
         SetThemePath(oFile);
+        ConvertForeignFormat(oFile);
         oCompleteFile = oFile + string(DIR_MARKER_STR) + string("theme.xml");
         eRet = Parse::ParseFile(oCompleteFile);
     }
@@ -215,7 +220,7 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
         SetThemePath(oTempPath);
 
         pZip = new ThemeZip();
-        eRet = pZip->DecompressThemeZip(oFile, oTempPath);
+        eRet = pZip->DecompressTheme(oFile, oTempPath);
         if (eRet == kError_FileNotFound)
         {
             string oDefaultPath;
@@ -230,7 +235,7 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
             }
        
             m_pThemeMan->GetDefaultTheme(oFile);
-            eRet = pZip->DecompressThemeZip(oFile, oTempPath);
+            eRet = pZip->DecompressTheme(oFile, oTempPath);
             if (IsError(eRet))
             {
                 m_oLastError = "Cannot find default theme";
@@ -250,7 +255,7 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
             oBox.Show(oMessage.c_str(), string(BRANDING), kMessageOk);
             
             m_pThemeMan->GetDefaultTheme(oFile);
-            eRet = pZip->DecompressThemeZip(oFile, oTempPath);
+            eRet = pZip->DecompressTheme(oFile, oTempPath);
             if (IsError(eRet))
             {
                 m_oLastError = "Cannot find default theme";
@@ -259,6 +264,8 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
                 return kError_InvalidParam;
             }    
         }    
+
+        ConvertForeignFormat(oTempPath);
 
         oCompleteFile = oTempPath + string(DIR_MARKER_STR) 
 	                + string("theme.xml");
@@ -1483,4 +1490,9 @@ void Theme::ShowThemeCredits(void)
        
     m_pWindow->ControlStringValue("Title", true, oText);
     m_bCreditsShown = true;
+}
+
+void Theme::ConvertForeignFormat(string &oDir)
+{
+    m_pForeignThemes->TryToConvert(oDir);
 }

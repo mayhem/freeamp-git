@@ -115,13 +115,13 @@ Other major contributors and their contributions:
 * Contributed the README.win32 file which contains instructions on how
   to build the Win32 source code.
 
-"Harald Klein" <linux@chello.at>
-* key support for lcd ui
-
 "Tony Arcieri" <bascule@procyon.mesa.k12.co.us>
 * the libcdaudio library, included for CD support.
 
 "Harald Klein" <linux@chello.at>
+* key support for the lcd ui
 * media info support for lcd ui
 * v0.2 lcdproc protocol changes
 
+"Tero Koskinen" <tkoskine@gnwmail.com>
+* wrote cxunzip, the basis for the code in lib/unzip

@@ -428,7 +428,7 @@ void Player::HandleSingleArg(char *arg)
                             break;
                         }
                     }
-                    if (strcasecmp(extension, themeExtension) == 0)
+                    if (!strcasecmp(extension, themeExtension))
                         giveToTheme = true; 
                 }
 
@@ -485,7 +485,7 @@ void Player::HandleSingleArg(char *arg)
                     break;
                 }
             }
-            if (strcasecmp(extension, themeExtension) == 0)
+            if (!strcasecmp(extension, themeExtension))
                 giveToTheme = true; 
         }
 
