@@ -133,40 +133,12 @@ static void import_tool(GtkWidget *w, GTKMusicBrowser *p)
 
 static void remove_tool(GtkWidget *w, GTKMusicBrowser *p)
 {
-    if (p->GetClickState() == kContextPlaylist) {
-        p->DeleteEvent();
-    }
-    else if (p->GetClickState() == kContextBrowser) {
-        switch (p->GetTreeClick()) {
-            case kTreePlaylist: {
-                p->GetContext()->catalog->RemovePlaylist(p->mbSelection->playlistname.c_str());
-                break; }
-            case kTreeTrack: {
-                p->GetContext()->catalog->RemoveSong(p->mbSelection->track->URL().c_str());
-                break; }
-            default:
-                break;
-        }
-    }
+    p->DeleteEvent();
 }
 
 static void edit_tool(GtkWidget *w, GTKMusicBrowser *p)
 {
-    if (p->GetClickState() == kContextPlaylist) {
-        p->PopUpInfoEditor();
-    }
-    else if (p->GetClickState() == kContextBrowser) {
-        switch (p->GetTreeClick()) {
-            case kTreePlaylist: {
-                p->CreateNewEditor((char *)p->mbSelection->playlistname.c_str());
-                break; }
-            case kTreeTrack: {
-                p->PopUpInfoEditor(p->mbSelection->track);
-                break; }
-            default:
-                break;
-        }
-    }
+    p->PopUpInfoEditor();
 }
 
 static void infoedit(GTKMusicBrowser *p, guint action, GtkWidget *w)
@@ -292,29 +264,14 @@ static void add_track(GTKMusicBrowser *p, guint action, GtkWidget *w)
     delete filesel;
 }
 
-static void delete_sel(GTKMusicBrowser *p, guint action, GtkWidget *w)
+bool GTKMusicBrowser::AskToDelete(string url)
 {
-    string urlToDel;
+    bool retvalue = false;
 
-    if (p->GetClickState() == kContextPlaylist)
-        urlToDel = p->GetContext()->plm->ItemAt(p->m_currentindex)->URL();
-    else if (p->GetClickState() == kContextBrowser) {
-        switch (p->GetTreeClick()) {
-            case kTreePlaylist:
-                urlToDel = p->mbSelection->playlistname;
-                break;
-            case kTreeTrack:
-                urlToDel = p->mbSelection->track->URL();
-                break;
-            default: 
-                return;
-        }
-    }
-
-    uint32 length = urlToDel.length();
+    uint32 length = url.size() + 1;
     char *filename = new char[length];
 
-    if (IsntError(URLToFilePath(urlToDel.c_str(), filename, &length))) {
+    if (IsntError(URLToFilePath(url.c_str(), filename, &length))) {
         GTKMessageDialog oBox;
         string oMessage = string("Are you sure you want to delete ")
                           + string(filename) + string("?");
@@ -323,19 +280,47 @@ static void delete_sel(GTKMusicBrowser *p, guint action, GtkWidget *w)
                       true, false, "Delete it Permantly From the Disk")
                       == kMessageReturnYes) {
 
-            if (oBox.GetCheckStatus())
+            if (oBox.GetCheckStatus()) 
                 unlink(filename);
 
-            if (p->GetClickState() == kContextPlaylist) {
-                p->DeleteEvent();
-            }
-            else if (p->GetClickState() == kContextBrowser) {
-                switch (p->GetTreeClick()) {
+            retvalue = true;
+        }
+    }
+
+    delete [] filename;
+
+    return retvalue;
+}
+
+static void delete_sel(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+    string urlToDel;
+ 
+    if (p->GetClickState() == kContextPlaylist) {
+        urlToDel = p->GetContext()->plm->ItemAt(p->m_currentindex)->URL();
+
+        if (p->AskToDelete(urlToDel)) 
+            p->DeletePlaylistItem(p->m_currentindex);
+    }
+    else if (p->GetClickState() == kContextBrowser) {
+        vector<TreeData *>::iterator i = p->mbSelections->begin();
+        for (; i != p->mbSelections->end(); i++) {
+            TreeNodeType type = (*i)->type;
+            
+            if (type == kTreePlaylist) 
+                urlToDel = (*i)->playlistname;
+            else if (type == kTreeTrack)
+                urlToDel = (*i)->track->URL();
+            else
+                continue;
+
+            if (p->AskToDelete(urlToDel)) {
+                switch (type) {
                     case kTreePlaylist: {
-                        p->GetContext()->catalog->RemovePlaylist(p->mbSelection->playlistname.c_str());
+                        p->GetContext()->catalog->RemovePlaylist(urlToDel.c_str());
                         break; }
                     case kTreeTrack: {
-                        p->GetContext()->catalog->RemoveSong(p->mbSelection->track->URL().c_str());
+                        p->GetContext()->catalog->RemoveSong(urlToDel.c_str());
                         break; }
                     default:
                         break;
@@ -343,8 +328,6 @@ static void delete_sel(GTKMusicBrowser *p, guint action, GtkWidget *w)
             }
         }
     }
-
-    delete [] filename;
 }
 
 static void move_up(GTKMusicBrowser *p, guint action, GtkWidget *w)

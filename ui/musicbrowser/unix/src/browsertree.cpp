@@ -60,7 +60,7 @@ ____________________________________________________________________________*/
 #include "../res/streams_pix.xpm"
 #include "../res/favorites_pix.xpm"
 
-const string streamURL = "http://mizar/streams.xml";
+const string streamURL = "http://www.freeamp.org/streams.xml";
 
 void kill_treedata(TreeData *dead)
 {
@@ -1074,12 +1074,11 @@ static void tree_clicked(GtkWidget *widget, GdkEventButton *event,
     if (event->window != clist->clist_window)
         return;
 
+    p->SetClickState(kContextBrowser);
+
     if (event->type == GDK_2BUTTON_PRESS) {
         vector<PlaylistItem *> *newlist = p->GetTreeSelection();
         p->AddTracksDoubleClick(newlist);
-
-//        if (p->GetTreeClick() == kTreeFavoriteStreamsHead)
-//            p->AddNewStream();
     }
     else {
         int row, column;
@@ -1089,17 +1088,46 @@ static void tree_clicked(GtkWidget *widget, GdkEventButton *event,
             return;
 
         GtkCTreeNode *node = GTK_CTREE_NODE(g_list_nth(clist->row_list, row));
-        p->mbSelection = (TreeData *)gtk_ctree_node_get_row_data(ctree, node);
-        p->SetTreeClick(p->mbSelection->type);
+        TreeData *data = (TreeData *)gtk_ctree_node_get_row_data(ctree, node);
+        p->SetTreeClick(data->type);
 
         if (event->button == 3) {
+            gtk_clist_unselect_all(clist);
             gtk_ctree_select(ctree, node);
             p->TreeRightClick((int)event->x_root, (int)event->y_root,
                               event->time);
         }
     }
+}
 
-    p->SetClickState(kContextBrowser);
+static void ctree_selected(GtkCTree *ctree, GtkCTreeNode *node, gint col,
+                          GTKMusicBrowser *p)
+{
+    TreeData *data = (TreeData *)gtk_ctree_node_get_row_data(ctree, node);
+    bool found = false;
+    vector<TreeData *>::iterator i = p->mbSelections->begin();
+    for (; i != p->mbSelections->end(); i++) {
+        if (*i == data) {
+            found = true;
+            break;
+        }
+    }
+
+    if (!found)
+        p->mbSelections->push_back(data);
+}
+
+static void ctree_unselected(GtkCTree *ctree, GtkCTreeNode *node, gint col,
+                            GTKMusicBrowser *p)
+{
+    TreeData *data = (TreeData *)gtk_ctree_node_get_row_data(ctree, node);
+    vector<TreeData *>::iterator i = p->mbSelections->begin();
+    for (; i != p->mbSelections->end(); i++) {
+        if (*i == data) {
+            p->mbSelections->erase(i);
+            break;
+        }
+    }
 }
 
 void GTKMusicBrowser::stream_timer_func(void *arg)
@@ -1319,7 +1347,7 @@ void GTKMusicBrowser::TreeRightClick(int x, int y, uint32 time)
 {
     GtkItemFactory *itemfact = NULL;
 
-    switch (mbSelection->type) {
+    switch ((*(mbSelections->begin()))->type) {
         case kTreeCD:
         case kTreeCDHead:
             itemfact = cdPopup;
@@ -1371,19 +1399,7 @@ static void add_play_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
 
 static void remove_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
-    switch (p->GetTreeClick()) {
-        case kTreePlaylist: {
-            p->GetContext()->catalog->RemovePlaylist(p->mbSelection->playlistname.c_str());
-            break; }
-        case kTreeTrack: {
-            p->GetContext()->catalog->RemoveSong(p->mbSelection->track->URL().c_str());
-            break; }
-        case kTreeFavStream: {
-            p->GetContext()->catalog->RemoveStream(p->mbSelection->track->URL().c_str());
-            break; }
-        default:
-            break;
-    }
+    p->DeleteEvent();
 }
     
 static void add_stream_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
@@ -1403,16 +1419,7 @@ static void eject_cd_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
 
 static void edit_info_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
-    switch (p->GetTreeClick()) {
-        case kTreePlaylist: {
-            p->CreateNewEditor((char *)p->mbSelection->playlistname.c_str());
-            break; }
-        case kTreeTrack: {
-            p->PopUpInfoEditor(p->mbSelection->track);
-            break; }
-        default:
-            break;
-    }
+    p->PopUpInfoEditor();
 }
 
 void GTKMusicBrowser::CreateTreePopups(void)
@@ -1529,6 +1536,12 @@ void GTKMusicBrowser::CreateTree(void)
                        GTK_SIGNAL_FUNC(ctree_expand), this);
     gtk_signal_connect(GTK_OBJECT(musicBrowserTree), "tree_collapse",
                        GTK_SIGNAL_FUNC(ctree_collapse), this);
+    gtk_signal_connect(GTK_OBJECT(musicBrowserTree), "tree_select_row",
+                       GTK_SIGNAL_FUNC(ctree_selected), this);
+    gtk_signal_connect(GTK_OBJECT(musicBrowserTree), "tree_unselect_row",
+                       GTK_SIGNAL_FUNC(ctree_unselected), this);
+    gtk_clist_set_selection_mode(GTK_CLIST(musicBrowserTree), 
+                                 GTK_SELECTION_EXTENDED);
     gtk_clist_set_compare_func(GTK_CLIST(musicBrowserTree), nocase_compare);
 
     gtk_clist_set_row_height(GTK_CLIST(musicBrowserTree), 16);

@@ -99,7 +99,7 @@ class GTKMusicBrowser {
     int m_playlistLastSort;
     string m_currentListName;
 
-    TreeData *mbSelection;
+    vector<TreeData *> *mbSelections;
     GtkCTree *musicBrowserTree;
  
     FAContext *GetContext(void) { return m_context; }
@@ -275,6 +275,8 @@ class GTKMusicBrowser {
     void AddFileCMD();
     void DeleteListEvent();
     void DeleteEvent();
+    bool AskToDelete(string url);
+    void DeletePlaylistItem(uint32 loc);
     void MoveUpEvent();
     void MoveDownEvent();
     void MoveItemEvent(int source, int dest);

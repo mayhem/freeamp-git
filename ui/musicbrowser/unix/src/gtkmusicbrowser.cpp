@@ -42,11 +42,17 @@ using namespace std;
 
 void GTKMusicBrowser::AddStreamToFavs(void)
 {
-    PlaylistItem *stream = mbSelection->track;
-    m_context->catalog->WriteMetaDataToDatabase(stream->URL().c_str(),
-                                                stream->GetMetaData(),
-                                                kTypeStream);
-    m_context->catalog->AddStream(stream->URL().c_str());
+    vector<TreeData *>::iterator i = mbSelections->begin();
+    for (; i != mbSelections->end(); i++) {
+        if ((*i)->type != kTreeStream)
+            continue;
+
+        PlaylistItem *stream = (*i)->track;
+        m_context->catalog->WriteMetaDataToDatabase(stream->URL().c_str(),
+                                                    stream->GetMetaData(),
+                                                    kTypeStream);
+        m_context->catalog->AddStream(stream->URL().c_str());
+    }
 }
 
 static gboolean add_new_destroy(GtkWidget *w, gpointer p)
@@ -780,24 +786,48 @@ void GTKMusicBrowser::SetClickState(ClickState newState)
     }
 }
 
-void GTKMusicBrowser::DeleteEvent(void)
+void GTKMusicBrowser::DeletePlaylistItem(uint32 loc)
 {
     bool stopped = false;
-    uint32 deleteindex = m_currentindex;
     if (master) {
-        if (m_currentindex == m_playingindex) {
+        if (loc == m_playingindex) {
             m_context->target->AcceptEvent(new Event(CMD_Stop));
             stopped = true;
         }
-        else if (m_playingindex > m_currentindex)
+        else if (m_playingindex > loc) 
             m_playingindex--;
 
-        if (stopped && (m_plm->CountItems() - 1 > deleteindex)) {
-            m_plm->SetCurrentIndex(m_currentindex + 1);
+        if (stopped && (m_plm->CountItems() - 1 > loc)) {
+            m_plm->SetCurrentIndex(loc + 1);
             m_context->target->AcceptEvent(new Event(CMD_Play));
         }
     }
-    m_plm->RemoveItem(deleteindex);
+    m_plm->RemoveItem(loc);
+}
+
+void GTKMusicBrowser::DeleteEvent(void)
+{
+    if (GetClickState() == kContextPlaylist) {
+        DeletePlaylistItem(m_currentindex);
+    }
+    else if (GetClickState() == kContextBrowser) {
+        vector<TreeData *>::iterator i = mbSelections->begin();
+        for (; i != mbSelections->end(); i++) {
+            switch ((*i)->type) {
+                case kTreePlaylist: {
+                    m_context->catalog->RemovePlaylist((*i)->playlistname.c_str());
+                    break; }
+                case kTreeTrack: {
+                    m_context->catalog->RemoveSong((*i)->track->URL().c_str());
+                    break; }
+                case kTreeFavStream: {
+                    m_context->catalog->RemoveStream((*i)->track->URL().c_str());
+                    break; }
+                default:
+                    break;
+            }
+        }
+    }
 }
 
 void GTKMusicBrowser::MoveUpEvent(void)
@@ -938,16 +968,106 @@ void GTKMusicBrowser::SortPlaylistEvent(PlaylistSortKey order, PlaylistSortType
 
 void GTKMusicBrowser::PopUpInfoEditor(PlaylistItem *editee)
 {
-    if ((m_currentindex == kInvalidIndex) && editee == NULL)
+    if (editee) {
+        vector<PlaylistItem *> *list = new vector<PlaylistItem *>;
+        list->push_back(editee);
+        infoeditorUI *infoedit = new infoeditorUI(m_context, m_plm, list);
+        infoedit->DisplayInfo();
         return;
-   
-    infoeditorUI *infoedit;
-    if (editee == NULL)
-        infoedit = new infoeditorUI(m_context, m_plm->ItemAt(m_currentindex));
-    else
-        infoedit = new infoeditorUI(m_context, editee);
+    }
 
-    infoedit->DisplayInfo();
+    if (GetClickState() == kContextPlaylist) {
+        if (m_currentindex == kInvalidIndex)
+            return;
+   
+        vector<PlaylistItem *> *list = new vector<PlaylistItem *>;
+        list->push_back(m_plm->ItemAt(m_currentindex));
+        infoeditorUI *infoedit = new infoeditorUI(m_context, m_plm, list);
+        infoedit->DisplayInfo();
+    }
+    else if (GetClickState() == kContextBrowser) {
+        vector<PlaylistItem *> *list = NULL;
+        vector<TreeData *>::iterator i = mbSelections->begin();
+        for (; i != mbSelections->end(); i++) {
+            switch ((*i)->type) {
+                case kTreePlaylist: {
+                    CreateNewEditor((char*)(*i)->playlistname.c_str());
+                break; }
+                case kTreeTrack: {
+                    if (!list)
+                        list = new vector<PlaylistItem *>;
+                    list->push_back((*i)->track);
+                    break; }
+                case kTreeUncat: {
+                    MusicCatalog *cat = m_context->catalog;
+                    vector<PlaylistItem *> *unsort = 
+                               (vector<PlaylistItem *>*)cat->GetUnsortedMusic();
+                    if (unsort->size() > 0) {
+                        if (!list)
+                            list = new vector<PlaylistItem *>;
+                        vector<PlaylistItem *>::iterator k = unsort->begin();
+                        for (; k != unsort->end(); k++)
+                            list->push_back(*k);
+                    }
+                    break; }
+                case kTreeAlbum: {
+                    AlbumList *alb = (*i)->album;
+                    vector<PlaylistItem *>::iterator j = 
+                                                    alb->m_trackList->begin();
+                    if (!list)
+                        list = new vector<PlaylistItem *>;
+                    for (; j != alb->m_trackList->end(); j++) 
+                        list->push_back(*j);
+                    break; }
+                case kTreeArtist: {
+                    ArtistList *art = (*i)->artist;
+                    vector<AlbumList *>::iterator j = 
+                                                   art->m_albumList->begin();
+                    if (!list)
+                        list = new vector<PlaylistItem *>;
+                    for (; j != art->m_albumList->end(); j++) {
+                        vector<PlaylistItem *>::iterator k = 
+                                                (*j)->m_trackList->begin();
+                        for (; k != (*j)->m_trackList->end(); k++) 
+                            list->push_back(*k);
+                    }
+                    break; }
+                case kTreeMyMusic:
+                case kTreeAll: {
+                    MusicCatalog *cat = m_context->catalog;
+                    vector<PlaylistItem *> *unsort =
+                               (vector<PlaylistItem *>*)cat->GetUnsortedMusic();
+                    vector<ArtistList *> *artlist = 
+                               (vector<ArtistList *>*)cat->GetMusicList();
+                    if (!list)
+                        list = new vector<PlaylistItem *>;
+                    vector<ArtistList *>::iterator h = artlist->begin();
+                    for (; h != artlist->end(); h++) {
+                        vector<AlbumList *>::iterator z = 
+                                                  (*h)->m_albumList->begin();
+                        for (; z != (*h)->m_albumList->end(); z++) {
+                            vector<PlaylistItem *>::iterator x = 
+                                                   (*z)->m_trackList->begin();
+                            for (; x != (*z)->m_trackList->end(); x++) 
+                                list->push_back(*x);
+                        }
+                    }
+                    
+                    if (unsort->size() > 0) {
+                        vector<PlaylistItem *>::iterator k = unsort->begin();
+                        for (; k != unsort->end(); k++)
+                            list->push_back(*k);
+                    }
+                    break; }
+                default:
+                    break;
+            }
+        }
+        if (list) {
+            infoeditorUI *infoedit = new infoeditorUI(m_context, NULL, list);
+            infoedit->DisplayInfo();
+        }
+    }
 }
 
 void GTKMusicBrowser::SaveCurrentPlaylist(char *path)
@@ -1066,6 +1186,8 @@ GTKMusicBrowser::GTKMusicBrowser(FAContext *context, MusicBrowserUI *masterUI,
     m_bCDMode = cdCreationMode;
     stream_timer_started = false;
     stream_timer = NULL;
+
+    mbSelections = new vector<TreeData *>;
 
     parentUI = masterUI;
  

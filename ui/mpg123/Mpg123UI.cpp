@@ -60,6 +60,7 @@ Mpg123UI::Mpg123UI(FAContext * context)
 
    m_plm = NULL;
 
+   m_displaystuff = true;
 }
 
 Error     Mpg123UI::
@@ -187,6 +188,7 @@ AcceptEvent(Event * e)
             int       m = (int) lastSeconds / 60;
             int       s = (int) lastSeconds % 60;
 
+            m_displaystuff = true;
             fprintf(stderr, "\n[%d:%02d] Decoding of %s finished.\n", m, s, fileName);
             break;
          }
@@ -215,11 +217,17 @@ DisplayStuff()
    if (!m_mpegInfo_set)
       return;
 
+   if (!m_displaystuff)
+       return;
+
+   m_displaystuff = false;
+
    char     *path = m_mediaInfo->m_filename;
    char     *pLastSlash = strrchr(path, '/');
    char     *dir = NULL;
    char     *fname = NULL;
 
+   m_mpegInfo_set = false;
    if (pLastSlash)
    {
       *pLastSlash = '\0';

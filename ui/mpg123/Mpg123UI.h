@@ -66,6 +66,8 @@ class Mpg123UI : public UserInterface {
     int32 skipFirst;
     char fileName[512];
     float lastSeconds;
+
+    bool m_displaystuff;
 };
 
 
