@@ -76,14 +76,14 @@ plugins/obsinput-$(HOST_OS).pmi: $(OBSPMI)
 
 SCPMOlinuxOBJ = 
 
-SCPMObeosOBJ = io/soundcard/beos/src/ringbuffer.o 
-#SCPMObeosOBJ+=io/soundcard/beos/src/soundutils.o io/soundcard/beos/TestRing.o
+SCPMObeosOBJ=io/soundcard/beos/src/soundutils.o
+SCPMObeosLIB="-lmedia -lbe -lroot"
 
 SCPMOOBJ = io/soundcard/$(OSDEP)/src/soundcardpmo.o io/src/pmo.o \
            io/src/pipeline.o $(SCPMO$(HOST_OS)OBJ)
 
 plugins/soundcard-$(HOST_OS).pmo: $(SCPMOOBJ)
-	$(LINKMOD) -o $@ $(SCPMOOBJ)
+	$(LINKMOD) -o $@ $(SCPMOOBJ) $(SCPMO$(HOST_OS)LIB)
 
 # alsa
 ALSAOBJ = io/alsa/$(OSDEP)/src/alsapmo.o io/src/pipeline.o io/src/pmo.o

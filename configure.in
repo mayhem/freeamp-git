@@ -177,9 +177,13 @@ fi
 dnl ******************
 dnl Check for dynamic loading library
 dnl ******************
-AC_CHECK_LIB(dl, dlopen, foo="bar",
-  AC_MSG_ERROR([FreeAmp requires the ability to load libraries dynamically (-ldl must work)])
-)
+if test "$host_os" = "beos"; then
+  AC_MSG_WARN([skipping libdl check, using BeOS add-on mechanism])
+else
+  AC_CHECK_LIB(dl, dlopen, foo="bar",
+    AC_MSG_ERROR([FreeAmp requires the ability to load libraries dynamically (-ldl must work)])
+  )
+fi
 
 dnl Check for some more stuff
 
@@ -188,6 +192,7 @@ isunix="true"
 OSLINK=""
 FPIC="-fpic"
 LINKMOD="gcc -shared"
+OSTYPE="UNIX";
 
 case "$host_os" in
   windowsnt)
@@ -196,8 +201,13 @@ case "$host_os" in
     ;;
   win32)
     isunix="false"
+    OSTYPE="CYGWIN"
     ;;
   beos*)
+    AC_DEFINE(HAVE_BEOS)
+    OSTYPE="BEOS"
+    CFLAGS="$CFLAGS -Wno-multichar -Wno-ctor-dtor-privacy"
+    LINKMOD='g++ -nostart -Xlinker -soname=${@F} freeamp'
     isunix="false"
     ;;
   linux*)
@@ -242,6 +252,7 @@ dnl not needed.
     
 esac  
 
+AC_SUBST(OSTYPE)
 AC_DEFINE_UNQUOTED(HOST_OS, "${host_os}")
 AC_DEFINE_UNQUOTED(HOST_CPU, "${host_cpu}")
 

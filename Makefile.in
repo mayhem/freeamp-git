@@ -24,7 +24,7 @@ FREEAMPlinuxOBJ += base/unix/linux/src/utility.o $(FREEAMPunixOBJ)
 FREEAMPbeosOBJ  = base/beos/src/beosprefs.o base/beos/src/beosthread.o
 FREEAMPbeosOBJ += base/beos/src/bootstrap.o base/beos/src/debug.o 
 FREEAMPbeosOBJ += base/beos/src/mutex.o base/beos/src/semaphore.o 
-FREEAMPbeosOBJ += base/beos/src/utility.o base/beos/src/volume.o 
+FREEAMPbeosOBJ += base/beos/src/utility.o
 FREEAMPbeosOBJ += base/beos/src/win32impl.o
 
 FREEAMPOBJ =  base/src/hashtable.o base/src/log.o base/src/player.o
@@ -38,6 +38,12 @@ FREEAMPOBJ += $(FREEAMP$(HOST_OS)OBJ)
 #FREEAMPOBJ += $(OSDEPOBJ)
 
 all: freeamp plugins
+
+#CYGWINFREEAMPLIBS =
+UNIXFREEAMPLIBS = -ldl -lpthread $(X_LIBS) $(X_EXTRA_LIBS) $(EXTRALIBS)
+BEOSFREEAMPLIBS = -lbe -lroot
+
+FREEAMPLIBS = $($(OSTYPE)FREEAMPLIBS)
 
 freeamp: $(FREEAMPOBJ) $(freeamp_DEPENDENCIES)
 	@rm -f freeamp
