@@ -51,15 +51,6 @@ ____________________________________________________________________________*/
 
 #define DB Debug_v("%s:%d\n", __FILE__, __LINE__);
 
-#ifndef min
-#define min _cpp_min 
-#endif
-
-#ifndef max
-#define max _cpp_max
-#endif
-
-
 const int iMajorVersion = 1;
 const int iMinorVersion = 0;
 const int iBufferSize = 8192;

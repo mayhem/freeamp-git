@@ -423,7 +423,7 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
             CDInfoEvent* cie = (CDInfoEvent*)event;
             uint32 numTracks = cie->GetNumTracks();
 
-            if(cie->GetCDDB() != m_cdId)
+            if(m_cdTracks && cie->GetCDDB() != m_cdId)
             {			
                 m_cdId = cie->GetCDDB();
 

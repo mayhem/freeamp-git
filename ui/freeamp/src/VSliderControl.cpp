@@ -26,9 +26,6 @@ ____________________________________________________________________________*/
 #include "Window.h"
 #include "debug.h"
 
-#define min _MIN 
-#define max _MAX 
-
 #define DB Debug_v("%s:%d\n", __FILE__, __LINE__);
 
 // Bitmap Info:

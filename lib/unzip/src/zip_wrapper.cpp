@@ -143,7 +143,7 @@ void zip_file_free_current(ZipCDR *data)
 		return;
 
 	if (data->filename)
-		delete data->filename;
+		free(data->filename);
 
 	data->filename=NULL;
 }

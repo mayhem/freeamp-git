@@ -30,6 +30,7 @@ ____________________________________________________________________________*/
 COMSocket::COMSocket(int nSocket, int nSockType)
 {
     m_nSocket = nSocket;
+	m_bConnected = false;
     if (m_nSocket != INVALID_SOCKET) 
         m_bConnected = true;
     m_nSockType = nSockType;

@@ -162,6 +162,8 @@ Error CDPMO::Init(OutputInfo *info)
 
    m_locker.Acquire();
 
+   memset(&dinfo, 0, sizeof(struct disc_info));
+
    cddbid = 0;
    cdindexid = "";
 

@@ -76,14 +76,6 @@ extern HINSTANCE g_hinst;
 #include "missingfile.h"
 #include "utility.h"
 
-#ifndef min
-#define min _cpp_min 
-#endif
-
-#ifndef max
-#define max _cpp_max
-#endif
-
 void WorkerThreadStart(void* arg);
 
 #define DB Debug_v("%s:%d\n", __FILE__, __LINE__);

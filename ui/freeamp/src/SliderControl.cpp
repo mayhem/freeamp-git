@@ -28,14 +28,6 @@ ____________________________________________________________________________*/
 
 #define DB Debug_v("%s:%d\n", __FILE__, __LINE__);
 
-#ifndef min
-#define min _cpp_min 
-#endif
-
-#ifndef max
-#define max _cpp_max
-#endif
-
 // Bitmap Info:
 // Frame 0: Normal slider
 // Frame 1: Selected slider
