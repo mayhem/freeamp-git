@@ -29,7 +29,8 @@ typedef int HANDLE;
 #define INVALID_HANDLE_VALUE ((HANDLE)-1)
 typedef void *HMODULE;
 #define HINSTANCE HMODULE
-typedef void (*FARPROC)(void *);
+
+typedef void *FARPROC;
 
 HANDLE FindFirstFile(char *lpFileName, WIN32_FIND_DATA *lpFindFileData);
 bool FindNextFile(HANDLE hFindFile, WIN32_FIND_DATA *lpFindFileData);
