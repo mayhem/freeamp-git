@@ -49,7 +49,7 @@ WININT vbuf2[512];
 static WINCOEF iwincoef[264];
 
 /*==================================================================*/
-WINCOEF *i_wincoef_addr(void)
+WINCOEF *i_wincoef_addr()
 {
    return iwincoef;
 }

@@ -53,9 +53,10 @@ TO DO: Test mixed blocks (mixed long/short)
 #include <memory.h>
 #include <string.h>
 #include <assert.h>
-#include "mhead.h"		/* mpeg header structure */
 #include "L3.h"
+#include "mhead.h"		/* mpeg header structure */
 #include "jdw.h"
+#include "protos.h"
 
 
 /*====================================================================*/
@@ -69,114 +70,21 @@ static int mp_br_tableL3[2][16] =
 
 /*-- global band tables */
 /*-- short portion is 3*x !! --*/
-int nBand[2][22];		/* [long/short][cb] */
-int sfBandIndex[2][22];		/* [long/short][cb] */
 
 /*====================================================================*/
 
-/*----------------*/
-extern DEC_INFO decinfo;
-
-/*----------------*/
-static int mpeg25_flag;
-
-int iframe;
-
-/*-------*/
-static int band_limit = (576);
-static int band_limit21 = (576);	/* limit for sf band 21 */
-
-static int band_limit12 = (576);	/* limit for sf band 12 short */
-
-int band_limit_nsb = 32;	/* global for hybrid */
-static int nsb_limit = 32;
-static int gain_adjust = 0;	/* adjust gain e.g. cvt to mono */
-static int id;
-static int ncbl_mixed;		/* number of long cb's in mixed block 8 or 6 */
-static int sr_index;
-static int outvalues;
-static int outbytes;
-static int half_outbytes;
-static int framebytes;
-static int padframebytes;
-static int crcbytes;
-static int pad;
-static int stereo_flag;
-static int nchan;
-static int ms_mode;
-static int is_mode;
-static unsigned int zero_level_pcm = 0;
-
-/* cb_info[igr][ch], compute by dequant, used by joint */
-static CB_INFO cb_info[2][2];
-static IS_SF_INFO is_sf_info;	/* MPEG-2 intensity stereo */
-
 /*---------------------------------*/
-/* main data bit buffer */
-#define NBUF (8*1024)
-#define BUF_TRIGGER (NBUF-1500)
-static unsigned char buf[NBUF];
-static int buf_ptr0 = 0;
-static int buf_ptr1 = 0;
-static int main_pos_bit;
-
 /*---------------------------------*/
-static SIDE_INFO side_info;
-
-static SCALEFACT sf[2][2];	/* [gr][ch] */
-
-static int nsamp[2][2];		/* must start = 0, for nsamp[igr_prev] */
-
 /*- sample union of int/float  sample[ch][gr][576] */
-/* static SAMPLE sample[2][2][576]; */
-extern SAMPLE sample[2][2][576];
-static float yout[576];		/* hybrid out, sbt in */
+/* Sample is the same as cup.sample */
 
-typedef void (*SBT_FUNCTION) (float *sample, short *pcm, int ch);
-void sbt_dual_L3(float *sample, short *pcm, int n);
-static SBT_FUNCTION sbt_L3 = sbt_dual_L3;
+void sbt_dual_L3(MPEG *m, float *sample, short *pcm, int n);
 
-typedef void (*XFORM_FUNCTION) (void *pcm, int igr);
-static void Xform_dual(void *pcm, int igr);
-static XFORM_FUNCTION Xform = Xform_dual;
-
-IN_OUT L3audio_decode_MPEG1(unsigned char *bs, unsigned char *pcm);
-IN_OUT L3audio_decode_MPEG2(unsigned char *bs, unsigned char *pcm);
-typedef IN_OUT(*DECODE_FUNCTION) (unsigned char *bs, unsigned char *pcm);
+IN_OUT L3audio_decode_MPEG1(void *mv, unsigned char *bs, unsigned char *pcm);
+IN_OUT L3audio_decode_MPEG2(void *mv, unsigned char *bs, unsigned char *pcm);
+/*
 static DECODE_FUNCTION decode_function = L3audio_decode_MPEG1;
-
-
-/*====================================================================*/
-int hybrid(void *xin, void *xprev, float *y,
-	   int btype, int nlong, int ntot, int nprev);
-int hybrid_sum(void *xin, void *xin_left, float *y,
-	       int btype, int nlong, int ntot);
-void sum_f_bands(void *a, void *b, int n);
-void FreqInvert(float *y, int n);
-void antialias(void *x, int n);
-void ms_process(void *x, int n);	/* sum-difference stereo */
-void is_process_MPEG1(void *x,	/* intensity stereo */
-		      SCALEFACT * sf,
-		      CB_INFO cb_info[2],	/* [ch] */
-		      int nsamp, int ms_mode);
-void is_process_MPEG2(void *x,	/* intensity stereo */
-		      SCALEFACT * sf,
-		      CB_INFO cb_info[2],	/* [ch] */
-		      IS_SF_INFO * is_sf_info,
-		      int nsamp, int ms_mode);
-
-void unpack_huff(void *xy, int n, int ntable);
-int unpack_huff_quad(void *vwxy, int n, int nbits, int ntable);
-void dequant(SAMPLE sample[], int *nsamp,
-	     SCALEFACT * sf,
-	     GR * gr,
-	     CB_INFO * cb_info, int ncbl_mixed);
-void unpack_sf_sub_MPEG1(SCALEFACT * scalefac, GR * gr,
-			 int scfsi,	/* bit flag */
-			 int igr);
-void unpack_sf_sub_MPEG2(SCALEFACT sf[],	/* return intensity scale */
-			 GR * grdat,
-			 int is_and_ch, IS_SF_INFO * is_sf_info);
+*/
 
 /*====================================================================*/
 /* get bits from bitstream in endian independent way */
@@ -196,7 +104,7 @@ static void bitget_init_end(unsigned char *buf_end)
    bitdat.bs_ptr_end = buf_end;
 }
 /*------------- get n bits from bitstream -------------*/
-int bitget_bits_used(void)
+int bitget_bits_used()
 {
    int n;			/* compute bits used from last init call */
 
@@ -234,7 +142,7 @@ unsigned int bitget(int n)
    return x;
 }
 /*------------- get 1 bit from bitstream -------------*/
-unsigned int bitget_1bit(void)
+unsigned int bitget_1bit()
 {
    unsigned int x;
 
@@ -252,140 +160,145 @@ unsigned int bitget_1bit(void)
    return x;
 }
 /*====================================================================*/
-static void Xform_mono(void *pcm, int igr)
+static void Xform_mono(void *mv, void *pcm, int igr)
 {
+   MPEG *m = mv;
    int igr_prev, n1, n2;
 
 /*--- hybrid + sbt ---*/
-   n1 = n2 = nsamp[igr][0];	/* total number bands */
-   if (side_info.gr[igr][0].block_type == 2)
+   n1 = n2 = m->cupl.nsamp[igr][0];	/* total number bands */
+   if (m->cupl.side_info.gr[igr][0].block_type == 2)
    {				/* long bands */
       n1 = 0;
-      if (side_info.gr[igr][0].mixed_block_flag)
-	 n1 = sfBandIndex[0][ncbl_mixed - 1];
+      if (m->cupl.side_info.gr[igr][0].mixed_block_flag)
+	 n1 = m->cupl.sfBandIndex[0][m->cupl.ncbl_mixed - 1];
    }
-   if (n1 > band_limit)
-      n1 = band_limit;
-   if (n2 > band_limit)
-      n2 = band_limit;
+   if (n1 > m->cupl.band_limit)
+      n1 = m->cupl.band_limit;
+   if (n2 > m->cupl.band_limit)
+      n2 = m->cupl.band_limit;
    igr_prev = igr ^ 1;
 
-   nsamp[igr][0] = hybrid(sample[0][igr], sample[0][igr_prev],
-	 yout, side_info.gr[igr][0].block_type, n1, n2, nsamp[igr_prev][0]);
-   FreqInvert(yout, nsamp[igr][0]);
-   sbt_L3(yout, pcm, 0);
+   m->cupl.nsamp[igr][0] = hybrid(m,m->cupl.sample[0][igr], m->cupl.sample[0][igr_prev],
+	 m->cupl.yout, m->cupl.side_info.gr[igr][0].block_type, n1, n2, m->cupl.nsamp[igr_prev][0]);
+   FreqInvert(m->cupl.yout, m->cupl.nsamp[igr][0]);
+   m->cupl.sbt_L3(m,m->cupl.yout, pcm, 0);
 
 }
+
 /*--------------------------------------------------------------------*/
-static void Xform_dual_right(void *pcm, int igr)
+static void Xform_dual_right(void *mv, void *pcm, int igr)
 {
+   MPEG *m = mv;
    int igr_prev, n1, n2;
 
 /*--- hybrid + sbt ---*/
-   n1 = n2 = nsamp[igr][1];	/* total number bands */
-   if (side_info.gr[igr][1].block_type == 2)
+   n1 = n2 = m->cupl.nsamp[igr][1];	/* total number bands */
+   if (m->cupl.side_info.gr[igr][1].block_type == 2)
    {				/* long bands */
       n1 = 0;
-      if (side_info.gr[igr][1].mixed_block_flag)
-	 n1 = sfBandIndex[0][ncbl_mixed - 1];
+      if (m->cupl.side_info.gr[igr][1].mixed_block_flag)
+	 n1 = m->cupl.sfBandIndex[0][m->cupl.ncbl_mixed - 1];
    }
-   if (n1 > band_limit)
-      n1 = band_limit;
-   if (n2 > band_limit)
-      n2 = band_limit;
+   if (n1 > m->cupl.band_limit)
+      n1 = m->cupl.band_limit;
+   if (n2 > m->cupl.band_limit)
+      n2 = m->cupl.band_limit;
    igr_prev = igr ^ 1;
-   nsamp[igr][1] = hybrid(sample[1][igr], sample[1][igr_prev],
-	 yout, side_info.gr[igr][1].block_type, n1, n2, nsamp[igr_prev][1]);
-   FreqInvert(yout, nsamp[igr][1]);
-   sbt_L3(yout, pcm, 0);
+   m->cupl.nsamp[igr][1] = hybrid(m,m->cupl.sample[1][igr], m->cupl.sample[1][igr_prev],
+	 m->cupl.yout, m->cupl.side_info.gr[igr][1].block_type, n1, n2, m->cupl.nsamp[igr_prev][1]);
+   FreqInvert(m->cupl.yout, m->cupl.nsamp[igr][1]);
+   m->cupl.sbt_L3(m,m->cupl.yout, pcm, 0);
 
 }
 /*--------------------------------------------------------------------*/
-static void Xform_dual(void *pcm, int igr)
+static void Xform_dual(void *mv, void *pcm, int igr)
 {
+   MPEG *m = mv;
    int ch;
    int igr_prev, n1, n2;
 
 /*--- hybrid + sbt ---*/
    igr_prev = igr ^ 1;
-   for (ch = 0; ch < nchan; ch++)
+   for (ch = 0; ch < m->cupl.nchan; ch++)
    {
-      n1 = n2 = nsamp[igr][ch];	/* total number bands */
-      if (side_info.gr[igr][ch].block_type == 2)
+      n1 = n2 = m->cupl.nsamp[igr][ch];	/* total number bands */
+      if (m->cupl.side_info.gr[igr][ch].block_type == 2)
       {				/* long bands */
 	 n1 = 0;
-	 if (side_info.gr[igr][ch].mixed_block_flag)
-	    n1 = sfBandIndex[0][ncbl_mixed - 1];
+	 if (m->cupl.side_info.gr[igr][ch].mixed_block_flag)
+	    n1 = m->cupl.sfBandIndex[0][m->cupl.ncbl_mixed - 1];
       }
-      if (n1 > band_limit)
-	 n1 = band_limit;
-      if (n2 > band_limit)
-	 n2 = band_limit;
-      nsamp[igr][ch] = hybrid(sample[ch][igr], sample[ch][igr_prev],
-       yout, side_info.gr[igr][ch].block_type, n1, n2, nsamp[igr_prev][ch]);
-      FreqInvert(yout, nsamp[igr][ch]);
-      sbt_L3(yout, pcm, ch);
+      if (n1 > m->cupl.band_limit)
+	 n1 = m->cupl.band_limit;
+      if (n2 > m->cupl.band_limit)
+	 n2 = m->cupl.band_limit;
+      m->cupl.nsamp[igr][ch] = hybrid(m,m->cupl.sample[ch][igr], m->cupl.sample[ch][igr_prev],
+       m->cupl.yout, m->cupl.side_info.gr[igr][ch].block_type, n1, n2, m->cupl.nsamp[igr_prev][ch]);
+      FreqInvert(m->cupl.yout, m->cupl.nsamp[igr][ch]);
+      m->cupl.sbt_L3(m,m->cupl.yout, pcm, ch);
    }
 
 }
 /*--------------------------------------------------------------------*/
-static void Xform_dual_mono(void *pcm, int igr)
+static void Xform_dual_mono(void *mv, void *pcm, int igr)
 {
+   MPEG *m = mv;
    int igr_prev, n1, n2, n3;
 
 /*--- hybrid + sbt ---*/
    igr_prev = igr ^ 1;
-   if ((side_info.gr[igr][0].block_type == side_info.gr[igr][1].block_type)
-       && (side_info.gr[igr][0].mixed_block_flag == 0)
-       && (side_info.gr[igr][1].mixed_block_flag == 0))
+   if ((m->cupl.side_info.gr[igr][0].block_type == m->cupl.side_info.gr[igr][1].block_type)
+       && (m->cupl.side_info.gr[igr][0].mixed_block_flag == 0)
+       && (m->cupl.side_info.gr[igr][1].mixed_block_flag == 0))
    {
 
-      n2 = nsamp[igr][0];	/* total number bands max of L R */
-      if (n2 < nsamp[igr][1])
-	 n2 = nsamp[igr][1];
-      if (n2 > band_limit)
-	 n2 = band_limit;
+      n2 = m->cupl.nsamp[igr][0];	/* total number bands max of L R */
+      if (n2 < m->cupl.nsamp[igr][1])
+	 n2 = m->cupl.nsamp[igr][1];
+      if (n2 > m->cupl.band_limit)
+	 n2 = m->cupl.band_limit;
       n1 = n2;			/* n1 = number long bands */
-      if (side_info.gr[igr][0].block_type == 2)
+      if (m->cupl.side_info.gr[igr][0].block_type == 2)
 	 n1 = 0;
-      sum_f_bands(sample[0][igr], sample[1][igr], n2);
-      n3 = nsamp[igr][0] = hybrid(sample[0][igr], sample[0][igr_prev],
-	 yout, side_info.gr[igr][0].block_type, n1, n2, nsamp[igr_prev][0]);
+      sum_f_bands(m->cupl.sample[0][igr], m->cupl.sample[1][igr], n2);
+      n3 = m->cupl.nsamp[igr][0] = hybrid(m,m->cupl.sample[0][igr], m->cupl.sample[0][igr_prev],
+	 m->cupl.yout, m->cupl.side_info.gr[igr][0].block_type, n1, n2, m->cupl.nsamp[igr_prev][0]);
    }
    else
    {				/* transform and then sum (not tested - never happens in test) */
 /*-- left chan --*/
-      n1 = n2 = nsamp[igr][0];	/* total number bands */
-      if (side_info.gr[igr][0].block_type == 2)
+      n1 = n2 = m->cupl.nsamp[igr][0];	/* total number bands */
+      if (m->cupl.side_info.gr[igr][0].block_type == 2)
       {
 	 n1 = 0;		/* long bands */
-	 if (side_info.gr[igr][0].mixed_block_flag)
-	    n1 = sfBandIndex[0][ncbl_mixed - 1];
+	 if (m->cupl.side_info.gr[igr][0].mixed_block_flag)
+	    n1 = m->cupl.sfBandIndex[0][m->cupl.ncbl_mixed - 1];
       }
-      n3 = nsamp[igr][0] = hybrid(sample[0][igr], sample[0][igr_prev],
-	 yout, side_info.gr[igr][0].block_type, n1, n2, nsamp[igr_prev][0]);
+      n3 = m->cupl.nsamp[igr][0] = hybrid(m,m->cupl.sample[0][igr], m->cupl.sample[0][igr_prev],
+	 m->cupl.yout, m->cupl.side_info.gr[igr][0].block_type, n1, n2, m->cupl.nsamp[igr_prev][0]);
 /*-- right chan --*/
-      n1 = n2 = nsamp[igr][1];	/* total number bands */
-      if (side_info.gr[igr][1].block_type == 2)
+      n1 = n2 = m->cupl.nsamp[igr][1];	/* total number bands */
+      if (m->cupl.side_info.gr[igr][1].block_type == 2)
       {
 	 n1 = 0;		/* long bands */
-	 if (side_info.gr[igr][1].mixed_block_flag)
-	    n1 = sfBandIndex[0][ncbl_mixed - 1];
+	 if (m->cupl.side_info.gr[igr][1].mixed_block_flag)
+	    n1 = m->cupl.sfBandIndex[0][m->cupl.ncbl_mixed - 1];
       }
-      nsamp[igr][1] = hybrid_sum(sample[1][igr], sample[0][igr],
-			     yout, side_info.gr[igr][1].block_type, n1, n2);
-      if (n3 < nsamp[igr][1])
-	 n1 = nsamp[igr][1];
+      m->cupl.nsamp[igr][1] = hybrid_sum(m, m->cupl.sample[1][igr], m->cupl.sample[0][igr],
+			     m->cupl.yout, m->cupl.side_info.gr[igr][1].block_type, n1, n2);
+      if (n3 < m->cupl.nsamp[igr][1])
+	 n1 = m->cupl.nsamp[igr][1];
    }
 
 /*--------*/
-   FreqInvert(yout, n3);
-   sbt_L3(yout, pcm, 0);
+   FreqInvert(m->cupl.yout, n3);
+   m->cupl.sbt_L3(m,m->cupl.yout, pcm, 0);
 
 }
 /*--------------------------------------------------------------------*/
 /*====================================================================*/
-static int unpack_side_MPEG1(void)
+static int unpack_side_MPEG1(MPEG *m)
 {
    int prot;
    int br_index;
@@ -395,103 +308,103 @@ static int unpack_side_MPEG1(void)
 /* decode partial header plus initial side info */
 /* at entry bit getter points at id, sync skipped by caller */
 
-   id = bitget(1);		/* id */
+   m->cupl.id = bitget(1);		/* id */
    bitget(2);			/* skip layer */
    prot = bitget(1);		/* bitget prot bit */
    br_index = bitget(4);
-   sr_index = bitget(2);
-   pad = bitget(1);
+   m->cupl.sr_index = bitget(2);
+   m->cupl.pad = bitget(1);
    bitget(1);			/* skip to mode */
-   side_info.mode = bitget(2);	/* mode */
-   side_info.mode_ext = bitget(2);	/* mode ext */
+   m->cupl.side_info.mode = bitget(2);	/* mode */
+   m->cupl.side_info.mode_ext = bitget(2);	/* mode ext */
 
-   if (side_info.mode != 1)
-      side_info.mode_ext = 0;
+   if (m->cupl.side_info.mode != 1)
+      m->cupl.side_info.mode_ext = 0;
 
 /* adjust global gain in ms mode to avoid having to mult by 1/sqrt(2) */
-   ms_mode = side_info.mode_ext >> 1;
-   is_mode = side_info.mode_ext & 1;
+   m->cupl.ms_mode = m->cupl.side_info.mode_ext >> 1;
+   m->cupl.is_mode = m->cupl.side_info.mode_ext & 1;
 
 
-   crcbytes = 0;
+   m->cupl.crcbytes = 0;
    if (prot)
       bitget(4);		/* skip to data */
    else
    {
       bitget(20);		/* skip crc */
-      crcbytes = 2;
+      m->cupl.crcbytes = 2;
    }
 
    if (br_index > 0)		/* framebytes fixed for free format */
 	{
-      framebytes =
-	 2880 * mp_br_tableL3[id][br_index] / mp_sr20_table[id][sr_index];
+      m->cupl.framebytes =
+	 2880 * mp_br_tableL3[m->cupl.id][br_index] / mp_sr20_table[m->cupl.id][m->cupl.sr_index];
    }
 
-   side_info.main_data_begin = bitget(9);
-   if (side_info.mode == 3)
+   m->cupl.side_info.main_data_begin = bitget(9);
+   if (m->cupl.side_info.mode == 3)
    {
-      side_info.private_bits = bitget(5);
-      nchan = 1;
-      stereo_flag = 0;
+      m->cupl.side_info.private_bits = bitget(5);
+      m->cupl.nchan = 1;
+      m->cupl.stereo_flag = 0;
       side_bytes = (4 + 17);
 /*-- with header --*/
    }
    else
    {
-      side_info.private_bits = bitget(3);
-      nchan = 2;
-      stereo_flag = 1;
+      m->cupl.side_info.private_bits = bitget(3);
+      m->cupl.nchan = 2;
+      m->cupl.stereo_flag = 1;
       side_bytes = (4 + 32);
 /*-- with header --*/
    }
-   for (ch = 0; ch < nchan; ch++)
-      side_info.scfsi[ch] = bitget(4);
+   for (ch = 0; ch < m->cupl.nchan; ch++)
+      m->cupl.side_info.scfsi[ch] = bitget(4);
 /* this always 0 (both igr) for short blocks */
 
    for (igr = 0; igr < 2; igr++)
    {
-      for (ch = 0; ch < nchan; ch++)
+      for (ch = 0; ch < m->cupl.nchan; ch++)
       {
-	 side_info.gr[igr][ch].part2_3_length = bitget(12);
-	 side_info.gr[igr][ch].big_values = bitget(9);
+	 m->cupl.side_info.gr[igr][ch].part2_3_length = bitget(12);
+	 m->cupl.side_info.gr[igr][ch].big_values = bitget(9);
 
-         if (side_info.gr[igr][ch].big_values > 288)
+         if (m->cupl.side_info.gr[igr][ch].big_values > 288)
              return -1;
 	 
-	 side_info.gr[igr][ch].global_gain = bitget(8) + gain_adjust;
-	 if (ms_mode)
-	    side_info.gr[igr][ch].global_gain -= 2;
-	 side_info.gr[igr][ch].scalefac_compress = bitget(4);
-	 side_info.gr[igr][ch].window_switching_flag = bitget(1);
-	 if (side_info.gr[igr][ch].window_switching_flag)
+	 m->cupl.side_info.gr[igr][ch].global_gain = bitget(8) + m->cupl.gain_adjust;
+	 if (m->cupl.ms_mode)
+	    m->cupl.side_info.gr[igr][ch].global_gain -= 2;
+	 m->cupl.side_info.gr[igr][ch].scalefac_compress = bitget(4);
+	 m->cupl.side_info.gr[igr][ch].window_switching_flag = bitget(1);
+	 if (m->cupl.side_info.gr[igr][ch].window_switching_flag)
 	 {
-	    side_info.gr[igr][ch].block_type = bitget(2);
-	    side_info.gr[igr][ch].mixed_block_flag = bitget(1);
-	    side_info.gr[igr][ch].table_select[0] = bitget(5);
-	    side_info.gr[igr][ch].table_select[1] = bitget(5);
-	    side_info.gr[igr][ch].subblock_gain[0] = bitget(3);
-	    side_info.gr[igr][ch].subblock_gain[1] = bitget(3);
-	    side_info.gr[igr][ch].subblock_gain[2] = bitget(3);
+	    m->cupl.side_info.gr[igr][ch].block_type = bitget(2);
+	    m->cupl.side_info.gr[igr][ch].mixed_block_flag = bitget(1);
+	    m->cupl.side_info.gr[igr][ch].table_select[0] = bitget(5);
+	    m->cupl.side_info.gr[igr][ch].table_select[1] = bitget(5);
+	    m->cupl.side_info.gr[igr][ch].subblock_gain[0] = bitget(3);
+	    m->cupl.side_info.gr[igr][ch].subblock_gain[1] = bitget(3);
+	    m->cupl.side_info.gr[igr][ch].subblock_gain[2] = bitget(3);
 	  /* region count set in terms of long block cb's/bands */
 	  /* r1 set so r0+r1+1 = 21 (lookup produces 576 bands ) */
 	  /* if(window_switching_flag) always 36 samples in region0 */
-	    side_info.gr[igr][ch].region0_count = (8 - 1);	/* 36 samples */
-	    side_info.gr[igr][ch].region1_count = 20 - (8 - 1);
+	    m->cupl.side_info.gr[igr][ch].region0_count = (8 - 1);	/* 36 samples */
+	    m->cupl.side_info.gr[igr][ch].region1_count = 20 - (8 - 1);
 	 }
 	 else
 	 {
-	    side_info.gr[igr][ch].mixed_block_flag = 0;
-	    side_info.gr[igr][ch].block_type = 0;
-	    side_info.gr[igr][ch].table_select[0] = bitget(5);
-	    side_info.gr[igr][ch].table_select[1] = bitget(5);
-	    side_info.gr[igr][ch].table_select[2] = bitget(5);
-	    side_info.gr[igr][ch].region0_count = bitget(4);
-	    side_info.gr[igr][ch].region1_count = bitget(3);
+	    m->cupl.side_info.gr[igr][ch].mixed_block_flag = 0;
+	    m->cupl.side_info.gr[igr][ch].block_type = 0;
+	    m->cupl.side_info.gr[igr][ch].table_select[0] = bitget(5);
+	    m->cupl.side_info.gr[igr][ch].table_select[1] = bitget(5);
+	    m->cupl.side_info.gr[igr][ch].table_select[2] = bitget(5);
+	    m->cupl.side_info.gr[igr][ch].region0_count = bitget(4);
+	    m->cupl.side_info.gr[igr][ch].region1_count = bitget(3);
 	 }
-	 side_info.gr[igr][ch].preflag = bitget(1);
-	 side_info.gr[igr][ch].scalefac_scale = bitget(1);
-	 side_info.gr[igr][ch].count1table_select = bitget(1);
+	 m->cupl.side_info.gr[igr][ch].preflag = bitget(1);
+	 m->cupl.side_info.gr[igr][ch].scalefac_scale = bitget(1);
+	 m->cupl.side_info.gr[igr][ch].count1table_select = bitget(1);
       }
    }
 
@@ -501,7 +414,7 @@ static int unpack_side_MPEG1(void)
    return side_bytes;
 }
 /*====================================================================*/
-static int unpack_side_MPEG2(int igr)
+static int unpack_side_MPEG2(MPEG *m, int igr)
 {
    int prot;
    int br_index;
@@ -511,88 +424,88 @@ static int unpack_side_MPEG2(int igr)
 /* decode partial header plus initial side info */
 /* at entry bit getter points at id, sync skipped by caller */
 
-   id = bitget(1);		/* id */
+   m->cupl.id = bitget(1);		/* id */
    bitget(2);			/* skip layer */
    prot = bitget(1);		/* bitget prot bit */
    br_index = bitget(4);
-   sr_index = bitget(2);
-   pad = bitget(1);
+   m->cupl.sr_index = bitget(2);
+   m->cupl.pad = bitget(1);
    bitget(1);			/* skip to mode */
-   side_info.mode = bitget(2);	/* mode */
-   side_info.mode_ext = bitget(2);	/* mode ext */
+   m->cupl.side_info.mode = bitget(2);	/* mode */
+   m->cupl.side_info.mode_ext = bitget(2);	/* mode ext */
 
-   if (side_info.mode != 1)
-      side_info.mode_ext = 0;
+   if (m->cupl.side_info.mode != 1)
+      m->cupl.side_info.mode_ext = 0;
 
 /* adjust global gain in ms mode to avoid having to mult by 1/sqrt(2) */
-   ms_mode = side_info.mode_ext >> 1;
-   is_mode = side_info.mode_ext & 1;
+   m->cupl.ms_mode = m->cupl.side_info.mode_ext >> 1;
+   m->cupl.is_mode = m->cupl.side_info.mode_ext & 1;
 
-   crcbytes = 0;
+   m->cupl.crcbytes = 0;
    if (prot)
       bitget(4);		/* skip to data */
    else
    {
       bitget(20);		/* skip crc */
-      crcbytes = 2;
+      m->cupl.crcbytes = 2;
    }
 
    if (br_index > 0)
    {				/* framebytes fixed for free format */
-      if (mpeg25_flag == 0)
+      if (m->cupl.mpeg25_flag == 0)
       {
-	 framebytes =
-	    1440 * mp_br_tableL3[id][br_index] / mp_sr20_table[id][sr_index];
+	 m->cupl.framebytes =
+	    1440 * mp_br_tableL3[m->cupl.id][br_index] / mp_sr20_table[m->cupl.id][m->cupl.sr_index];
       }
       else
       {
-	 framebytes =
-	    2880 * mp_br_tableL3[id][br_index] / mp_sr20_table[id][sr_index];
-       /*if( sr_index == 2 ) return 0; */ /* fail mpeg25 8khz */
+	 m->cupl.framebytes =
+	    2880 * mp_br_tableL3[m->cupl.id][br_index] / mp_sr20_table[m->cupl.id][m->cupl.sr_index];
+       //if( sr_index == 2 ) return 0;  // fail mpeg25 8khz
       }
    }
-   side_info.main_data_begin = bitget(8);
-   if (side_info.mode == 3)
+   m->cupl.side_info.main_data_begin = bitget(8);
+   if (m->cupl.side_info.mode == 3)
    {
-      side_info.private_bits = bitget(1);
-      nchan = 1;
-      stereo_flag = 0;
+      m->cupl.side_info.private_bits = bitget(1);
+      m->cupl.nchan = 1;
+      m->cupl.stereo_flag = 0;
       side_bytes = (4 + 9);
 /*-- with header --*/
    }
    else
    {
-      side_info.private_bits = bitget(2);
-      nchan = 2;
-      stereo_flag = 1;
+      m->cupl.side_info.private_bits = bitget(2);
+      m->cupl.nchan = 2;
+      m->cupl.stereo_flag = 1;
       side_bytes = (4 + 17);
 /*-- with header --*/
    }
-   side_info.scfsi[1] = side_info.scfsi[0] = 0;
+   m->cupl.side_info.scfsi[1] = m->cupl.side_info.scfsi[0] = 0;
 
 
-   for (ch = 0; ch < nchan; ch++)
+   for (ch = 0; ch < m->cupl.nchan; ch++)
    {
-      side_info.gr[igr][ch].part2_3_length = bitget(12);
-      side_info.gr[igr][ch].big_values = bitget(9);
+      m->cupl.side_info.gr[igr][ch].part2_3_length = bitget(12);
+      m->cupl.side_info.gr[igr][ch].big_values = bitget(9);
 	  
-      if (side_info.gr[igr][ch].big_values > 288)
+      if (m->cupl.side_info.gr[igr][ch].big_values > 288)
 	  return -1; // to catch corrupt sideband data
       
-      side_info.gr[igr][ch].global_gain = bitget(8) + gain_adjust;
-      if (ms_mode)
-	 side_info.gr[igr][ch].global_gain -= 2;
-      side_info.gr[igr][ch].scalefac_compress = bitget(9);
-      side_info.gr[igr][ch].window_switching_flag = bitget(1);
-      if (side_info.gr[igr][ch].window_switching_flag)
+      m->cupl.side_info.gr[igr][ch].global_gain = bitget(8) + m->cupl.gain_adjust;
+      if (m->cupl.ms_mode)
+	 m->cupl.side_info.gr[igr][ch].global_gain -= 2;
+      m->cupl.side_info.gr[igr][ch].scalefac_compress = bitget(9);
+      m->cupl.side_info.gr[igr][ch].window_switching_flag = bitget(1);
+      if (m->cupl.side_info.gr[igr][ch].window_switching_flag)
       {
-	 side_info.gr[igr][ch].block_type = bitget(2);
-	 side_info.gr[igr][ch].mixed_block_flag = bitget(1);
-	 side_info.gr[igr][ch].table_select[0] = bitget(5);
-	 side_info.gr[igr][ch].table_select[1] = bitget(5);
-	 side_info.gr[igr][ch].subblock_gain[0] = bitget(3);
-	 side_info.gr[igr][ch].subblock_gain[1] = bitget(3);
-	 side_info.gr[igr][ch].subblock_gain[2] = bitget(3);
+	 m->cupl.side_info.gr[igr][ch].block_type = bitget(2);
+	 m->cupl.side_info.gr[igr][ch].mixed_block_flag = bitget(1);
+	 m->cupl.side_info.gr[igr][ch].table_select[0] = bitget(5);
+	 m->cupl.side_info.gr[igr][ch].table_select[1] = bitget(5);
+	 m->cupl.side_info.gr[igr][ch].subblock_gain[0] = bitget(3);
+	 m->cupl.side_info.gr[igr][ch].subblock_gain[1] = bitget(3);
+	 m->cupl.side_info.gr[igr][ch].subblock_gain[2] = bitget(3);
        /* region count set in terms of long block cb's/bands  */
        /* r1 set so r0+r1+1 = 21 (lookup produces 576 bands ) */
        /* bt=1 or 3       54 samples */
@@ -601,46 +514,38 @@ static int unpack_side_MPEG2(int igr)
        /* region0 discussion says 54 but this would mix long */
        /* and short in region0 if scale factors switch */
        /* at band 36 (6 long scale factors) */
-	 if ((side_info.gr[igr][ch].block_type == 2))
+	 if ((m->cupl.side_info.gr[igr][ch].block_type == 2))
 	 {
-	    side_info.gr[igr][ch].region0_count = (6 - 1);	/* 36 samples */
-	    side_info.gr[igr][ch].region1_count = 20 - (6 - 1);
+	    m->cupl.side_info.gr[igr][ch].region0_count = (6 - 1);	/* 36 samples */
+	    m->cupl.side_info.gr[igr][ch].region1_count = 20 - (6 - 1);
 	 }
 	 else
 	 {			/* long block type 1 or 3 */
-	    side_info.gr[igr][ch].region0_count = (8 - 1);	/* 54 samples */
-	    side_info.gr[igr][ch].region1_count = 20 - (8 - 1);
+	    m->cupl.side_info.gr[igr][ch].region0_count = (8 - 1);	/* 54 samples */
+	    m->cupl.side_info.gr[igr][ch].region1_count = 20 - (8 - 1);
 	 }
       }
       else
       {
-	 side_info.gr[igr][ch].mixed_block_flag = 0;
-	 side_info.gr[igr][ch].block_type = 0;
-	 side_info.gr[igr][ch].table_select[0] = bitget(5);
-	 side_info.gr[igr][ch].table_select[1] = bitget(5);
-	 side_info.gr[igr][ch].table_select[2] = bitget(5);
-	 side_info.gr[igr][ch].region0_count = bitget(4);
-	 side_info.gr[igr][ch].region1_count = bitget(3);
+	 m->cupl.side_info.gr[igr][ch].mixed_block_flag = 0;
+	 m->cupl.side_info.gr[igr][ch].block_type = 0;
+	 m->cupl.side_info.gr[igr][ch].table_select[0] = bitget(5);
+	 m->cupl.side_info.gr[igr][ch].table_select[1] = bitget(5);
+	 m->cupl.side_info.gr[igr][ch].table_select[2] = bitget(5);
+	 m->cupl.side_info.gr[igr][ch].region0_count = bitget(4);
+	 m->cupl.side_info.gr[igr][ch].region1_count = bitget(3);
       }
-      side_info.gr[igr][ch].preflag = 0;
-      side_info.gr[igr][ch].scalefac_scale = bitget(1);
-	  
-	  /* To catch corrupt scalefac data */
-	  assert((side_info.gr[igr][ch].scalefac_scale < 16) && (side_info.gr[igr][ch].scalefac_scale >= 0)); 
-      
-	  side_info.gr[igr][ch].count1table_select = bitget(1);
+      m->cupl.side_info.gr[igr][ch].preflag = 0;
+      m->cupl.side_info.gr[igr][ch].scalefac_scale = bitget(1);
+      m->cupl.side_info.gr[igr][ch].count1table_select = bitget(1);
    }
 
 /* return  bytes in header + side info */
    return side_bytes;
 }
 
-extern float equalizer[32];
-extern float EQ_gain_adjust;
-extern int enableEQ; 
-
 /*-----------------------------------------------------------------*/
-static void unpack_main(unsigned char *pcm, int igr)
+static void unpack_main(MPEG *m, unsigned char *pcm, int igr)
 {
    int ch;
    int bit0;
@@ -650,152 +555,154 @@ static void unpack_main(unsigned char *pcm, int igr)
    int m0;
 
 
-   for (ch = 0; ch < nchan; ch++)
+   for (ch = 0; ch < m->cupl.nchan; ch++)
    {
-      bitget_init(buf + (main_pos_bit >> 3));
-      bit0 = (main_pos_bit & 7);
+      bitget_init(m->cupl.buf + (m->cupl.main_pos_bit >> 3));
+      bit0 = (m->cupl.main_pos_bit & 7);
       if (bit0)
 	 bitget(bit0);
-      main_pos_bit += side_info.gr[igr][ch].part2_3_length;
-      bitget_init_end(buf + ((main_pos_bit + 39) >> 3));
+      m->cupl.main_pos_bit += m->cupl.side_info.gr[igr][ch].part2_3_length;
+      bitget_init_end(m->cupl.buf + ((m->cupl.main_pos_bit + 39) >> 3));
 /*-- scale factors --*/
-      if (id)
-	 unpack_sf_sub_MPEG1(&sf[igr][ch],
-			  &side_info.gr[igr][ch], side_info.scfsi[ch], igr);
+      if (m->cupl.id)
+	 unpack_sf_sub_MPEG1(&m->cupl.sf[igr][ch],
+			  &m->cupl.side_info.gr[igr][ch], m->cupl.side_info.scfsi[ch], igr);
       else
-	 unpack_sf_sub_MPEG2(&sf[igr][ch],
-			 &side_info.gr[igr][ch], is_mode & ch, &is_sf_info);
 
-      if (enableEQ)
-          side_info.gr[igr][ch].global_gain += EQ_gain_adjust;
+         unpack_sf_sub_MPEG2(&m->cupl.sf[igr][ch],
+			 &m->cupl.side_info.gr[igr][ch], m->cupl.is_mode & ch, &m->cupl.is_sf_info);
 
+      if (m->eq.enableEQ)
+	  m->cupl.side_info.gr[igr][ch].global_gain += m->eq.EQ_gain_adjust;
 /*--- huff data ---*/
-      n1 = sfBandIndex[0][side_info.gr[igr][ch].region0_count];
-      n2 = sfBandIndex[0][side_info.gr[igr][ch].region0_count
-			  + side_info.gr[igr][ch].region1_count + 1];
-      n3 = side_info.gr[igr][ch].big_values;
+      n1 = m->cupl.sfBandIndex[0][m->cupl.side_info.gr[igr][ch].region0_count];
+      n2 = m->cupl.sfBandIndex[0][m->cupl.side_info.gr[igr][ch].region0_count
+			  + m->cupl.side_info.gr[igr][ch].region1_count + 1];
+      n3 = m->cupl.side_info.gr[igr][ch].big_values;
       n3 = n3 + n3;
 
 
-      if (n3 > band_limit)
-	 n3 = band_limit;
+      if (n3 > m->cupl.band_limit)
+	 n3 = m->cupl.band_limit;
       if (n2 > n3)
 	 n2 = n3;
       if (n1 > n3)
 	 n1 = n3;
       nn3 = n3 - n2;
       nn2 = n2 - n1;
-      unpack_huff(sample[ch][igr], n1, side_info.gr[igr][ch].table_select[0]);
-      unpack_huff(sample[ch][igr] + n1, nn2, side_info.gr[igr][ch].table_select[1]);
-      unpack_huff(sample[ch][igr] + n2, nn3, side_info.gr[igr][ch].table_select[2]);
-      qbits = side_info.gr[igr][ch].part2_3_length - (bitget_bits_used() - bit0);
-      nn4 = unpack_huff_quad(sample[ch][igr] + n3, band_limit - n3, qbits,
-			     side_info.gr[igr][ch].count1table_select);
+      unpack_huff(m->cupl.sample[ch][igr], n1, m->cupl.side_info.gr[igr][ch].table_select[0]);
+      unpack_huff(m->cupl.sample[ch][igr] + n1, nn2, m->cupl.side_info.gr[igr][ch].table_select[1]);
+      unpack_huff(m->cupl.sample[ch][igr] + n2, nn3, m->cupl.side_info.gr[igr][ch].table_select[2]);
+      qbits = m->cupl.side_info.gr[igr][ch].part2_3_length - (bitget_bits_used() - bit0);
+      nn4 = unpack_huff_quad(m->cupl.sample[ch][igr] + n3, m->cupl.band_limit - n3, qbits,
+			     m->cupl.side_info.gr[igr][ch].count1table_select);
       n4 = n3 + nn4;
-      nsamp[igr][ch] = n4;
-    /*/limit n4 or allow deqaunt to sf band 22*/
-      if (side_info.gr[igr][ch].block_type == 2)
-	 n4 = min(n4, band_limit12);
+      m->cupl.nsamp[igr][ch] = n4;
+    //limit n4 or allow deqaunt to sf band 22
+      if (m->cupl.side_info.gr[igr][ch].block_type == 2)
+	 n4 = min(n4, m->cupl.band_limit12);
       else
-	 n4 = min(n4, band_limit21);
+	 n4 = min(n4, m->cupl.band_limit21);
       if (n4 < 576)
-	 memset(sample[ch][igr] + n4, 0, sizeof(SAMPLE) * (576 - n4));
+	 memset(m->cupl.sample[ch][igr] + n4, 0, sizeof(SAMPLE) * (576 - n4));
       if (bitdat.bs_ptr > bitdat.bs_ptr_end)
-      {				/* bad data overrun */
+      {				// bad data overrun
 
-	 memset(sample[ch][igr], 0, sizeof(SAMPLE) * (576));
+	 memset(m->cupl.sample[ch][igr], 0, sizeof(SAMPLE) * (576));
       }
    }
 
 
 
 /*--- dequant ---*/
-   for (ch = 0; ch < nchan; ch++)
+   for (ch = 0; ch < m->cupl.nchan; ch++)
    {
-      dequant(sample[ch][igr],
-	      &nsamp[igr][ch],	/* nsamp updated for shorts */
-	      &sf[igr][ch], &side_info.gr[igr][ch],
-	      &cb_info[igr][ch], ncbl_mixed);
+      dequant(m,m->cupl.sample[ch][igr],
+	      &m->cupl.nsamp[igr][ch],	/* nsamp updated for shorts */
+	      &m->cupl.sf[igr][ch], &m->cupl.side_info.gr[igr][ch],
+	      &m->cupl.cb_info[igr][ch], m->cupl.ncbl_mixed);
    }
 
 /*--- ms stereo processing  ---*/
-   if (ms_mode)
+   if (m->cupl.ms_mode)
    {
-      if (is_mode == 0)
+      if (m->cupl.is_mode == 0)
       {
-	 m0 = nsamp[igr][0];	/* process to longer of left/right */
-	 if (m0 < nsamp[igr][1])
-	    m0 = nsamp[igr][1];
+	 m0 = m->cupl.nsamp[igr][0];	/* process to longer of left/right */
+	 if (m0 < m->cupl.nsamp[igr][1])
+	    m0 = m->cupl.nsamp[igr][1];
       }
       else
       {				/* process to last cb in right */
-	 m0 = sfBandIndex[cb_info[igr][1].cbtype][cb_info[igr][1].cbmax];
+	 m0 = m->cupl.sfBandIndex[m->cupl.cb_info[igr][1].cbtype][m->cupl.cb_info[igr][1].cbmax];
       }
-      ms_process(sample[0][igr], m0);
+      ms_process(m->cupl.sample[0][igr], m0);
    }
 
 /*--- is stereo processing  ---*/
-   if (is_mode)
+   if (m->cupl.is_mode)
    {
-      if (id)
-	 is_process_MPEG1(sample[0][igr], &sf[igr][1],
-			  cb_info[igr], nsamp[igr][0], ms_mode);
+      if (m->cupl.id)
+	 is_process_MPEG1(m, m->cupl.sample[0][igr], &m->cupl.sf[igr][1],
+			  m->cupl.cb_info[igr], m->cupl.nsamp[igr][0], m->cupl.ms_mode);
       else
-	 is_process_MPEG2(sample[0][igr], &sf[igr][1],
-			  cb_info[igr], &is_sf_info,
-			  nsamp[igr][0], ms_mode);
+	 is_process_MPEG2(m,m->cupl.sample[0][igr], &m->cupl.sf[igr][1],
+			  m->cupl.cb_info[igr], &m->cupl.is_sf_info,
+			  m->cupl.nsamp[igr][0], m->cupl.ms_mode);
    }
 
 /*-- adjust ms and is modes to max of left/right */
-   if (side_info.mode_ext)
+   if (m->cupl.side_info.mode_ext)
    {
-      if (nsamp[igr][0] < nsamp[igr][1])
-	 nsamp[igr][0] = nsamp[igr][1];
+      if (m->cupl.nsamp[igr][0] < m->cupl.nsamp[igr][1])
+	 m->cupl.nsamp[igr][0] = m->cupl.nsamp[igr][1];
       else
-	 nsamp[igr][1] = nsamp[igr][0];
+	 m->cupl.nsamp[igr][1] = m->cupl.nsamp[igr][0];
    }
 
 /*--- antialias ---*/
-   for (ch = 0; ch < nchan; ch++)
+   for (ch = 0; ch < m->cupl.nchan; ch++)
    {
-      if (cb_info[igr][ch].ncbl == 0)
+      if (m->cupl.cb_info[igr][ch].ncbl == 0)
 	 continue;		/* have no long blocks */
-      if (side_info.gr[igr][ch].mixed_block_flag)
+      if (m->cupl.side_info.gr[igr][ch].mixed_block_flag)
 	 n1 = 1;		/* 1 -> 36 samples */
       else
-	 n1 = (nsamp[igr][ch] + 7) / 18;
+	 n1 = (m->cupl.nsamp[igr][ch] + 7) / 18;
       if (n1 > 31)
 	 n1 = 31;
-      antialias(sample[ch][igr], n1);
+      antialias(m, m->cupl.sample[ch][igr], n1);
       n1 = 18 * n1 + 8;		/* update number of samples */
-      if (n1 > nsamp[igr][ch])
-	 nsamp[igr][ch] = n1;
+      if (n1 > m->cupl.nsamp[igr][ch])
+	 m->cupl.nsamp[igr][ch] = n1;
    }
 
 
 
 /*--- hybrid + sbt ---*/
-   Xform(pcm, igr);
+   m->cupl.Xform(m, pcm, igr);
 
 
 /*-- done --*/
 }
 /*--------------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-IN_OUT L3audio_decode(unsigned char *bs, unsigned char *pcm)
+IN_OUT L3audio_decode(void *mv, unsigned char *bs, unsigned char *pcm)
 {
-   return decode_function(bs, pcm);
+   MPEG *m = mv;
+   return m->cupl.decode_function((MPEG *)mv, bs, pcm);
 }
 
 /*--------------------------------------------------------------------*/
-IN_OUT L3audio_decode_MPEG1(unsigned char *bs, unsigned char *pcm)
+IN_OUT L3audio_decode_MPEG1(void *mv, unsigned char *bs, unsigned char *pcm)
 {
+   MPEG *m = mv;
    int sync;
    IN_OUT in_out;
    int side_bytes;
    int nbytes;
    
-   iframe++;
+   m->cupl.iframe++;
 
    bitget_init(bs);		/* initialize bit getter */
 /* test sync */
@@ -808,52 +715,52 @@ IN_OUT L3audio_decode_MPEG1(unsigned char *bs, unsigned char *pcm)
 /*-----------*/
 
 /*-- unpack side info --*/
-   side_bytes = unpack_side_MPEG1();
+   side_bytes = unpack_side_MPEG1(m);
    if (side_bytes < 0)
-	{
-	    in_out.in_bytes = 0;
-		 return in_out;
+   {
+       in_out.in_bytes = 0;
+       return in_out;
    }
-   padframebytes = framebytes + pad;
-   in_out.in_bytes = padframebytes;
+   m->cupl.padframebytes = m->cupl.framebytes + m->cupl.pad;
+   in_out.in_bytes = m->cupl.padframebytes;
 
 /*-- load main data and update buf pointer --*/
 /*------------------------------------------- 
    if start point < 0, must just cycle decoder 
    if jumping into middle of stream, 
 w---------------------------------------------*/
-   buf_ptr0 = buf_ptr1 - side_info.main_data_begin;	/* decode start point */
-   if (buf_ptr1 > BUF_TRIGGER)
+   m->cupl.buf_ptr0 = m->cupl.buf_ptr1 - m->cupl.side_info.main_data_begin;	/* decode start point */
+   if (m->cupl.buf_ptr1 > BUF_TRIGGER)
    {				/* shift buffer */
-      memmove(buf, buf + buf_ptr0, side_info.main_data_begin);
-      buf_ptr0 = 0;
-      buf_ptr1 = side_info.main_data_begin;
+      memmove(m->cupl.buf, m->cupl.buf + m->cupl.buf_ptr0, m->cupl.side_info.main_data_begin);
+      m->cupl.buf_ptr0 = 0;
+      m->cupl.buf_ptr1 = m->cupl.side_info.main_data_begin;
    }
-   nbytes = padframebytes - side_bytes - crcbytes;
+   nbytes = m->cupl.padframebytes - side_bytes - m->cupl.crcbytes;
 
-   /* RAK: This is no bueno. :-( */
+   // RAK: This is no bueno. :-(
 	if (nbytes < 0 || nbytes > NBUF)
 	{
 	    in_out.in_bytes = 0;
 		 return in_out;
    }
 
-   memmove(buf + buf_ptr1, bs + side_bytes + crcbytes, nbytes);
-   buf_ptr1 += nbytes;
+   memmove(m->cupl.buf + m->cupl.buf_ptr1, bs + side_bytes + m->cupl.crcbytes, nbytes);
+   m->cupl.buf_ptr1 += nbytes;
 /*-----------------------*/
 
-   if (buf_ptr0 >= 0)
+   if (m->cupl.buf_ptr0 >= 0)
    {
-/* dump_frame(buf+buf_ptr0, 64); */
-      main_pos_bit = buf_ptr0 << 3;
-      unpack_main(pcm, 0);
-      unpack_main(pcm + half_outbytes, 1);
-      in_out.out_bytes = outbytes;
+// dump_frame(buf+buf_ptr0, 64);
+      m->cupl.main_pos_bit = m->cupl.buf_ptr0 << 3;
+      unpack_main(m,pcm, 0);
+      unpack_main(m,pcm + m->cupl.half_outbytes, 1);
+      in_out.out_bytes = m->cupl.outbytes;
    }
    else
    {
-      memset(pcm, zero_level_pcm, outbytes);	/* fill out skipped frames */
-      in_out.out_bytes = outbytes;
+      memset(pcm, m->cupl.zero_level_pcm, m->cupl.outbytes);	/* fill out skipped frames */
+      in_out.out_bytes = m->cupl.outbytes;
 /* iframe--;  in_out.out_bytes = 0;  // test test */
    }
 
@@ -861,15 +768,16 @@ w---------------------------------------------*/
 }
 /*--------------------------------------------------------------------*/
 /*--------------------------------------------------------------------*/
-IN_OUT L3audio_decode_MPEG2(unsigned char *bs, unsigned char *pcm)
+IN_OUT L3audio_decode_MPEG2(void *mv, unsigned char *bs, unsigned char *pcm)
 {
+   MPEG *m = mv;
    int sync;
    IN_OUT in_out;
    int side_bytes;
    int nbytes;
    static int igr = 0;
 
-   iframe++;
+   m->cupl.iframe++;
 
 
    bitget_init(bs);		/* initialize bit getter */
@@ -878,12 +786,12 @@ IN_OUT L3audio_decode_MPEG2(unsigned char *bs, unsigned char *pcm)
    in_out.out_bytes = 0;
    sync = bitget(12);
 
-/* if( sync != 0xFFF ) return in_out; */   /* sync fail */
+// if( sync != 0xFFF ) return in_out;       /* sync fail */
 
-   mpeg25_flag = 0;
+   m->cupl.mpeg25_flag = 0;
    if (sync != 0xFFF)
    {
-      mpeg25_flag = 1;		/* mpeg 2.5 sync */
+      m->cupl.mpeg25_flag = 1;		/* mpeg 2.5 sync */
       if (sync != 0xFFE)
 	 return in_out;		/* sync fail */
    }
@@ -891,44 +799,44 @@ IN_OUT L3audio_decode_MPEG2(unsigned char *bs, unsigned char *pcm)
 
 
 /*-- unpack side info --*/
-   side_bytes = unpack_side_MPEG2(igr);
+   side_bytes = unpack_side_MPEG2(m,igr);
    if (side_bytes < 0)
-	{
-	    in_out.in_bytes = 0;
-		 return in_out;
+   {
+       in_out.in_bytes = 0;
+       return in_out;
    }
-   padframebytes = framebytes + pad;
-   in_out.in_bytes = padframebytes;
+   m->cupl.padframebytes = m->cupl.framebytes + m->cupl.pad;
+   in_out.in_bytes = m->cupl.padframebytes;
 
-   buf_ptr0 = buf_ptr1 - side_info.main_data_begin;	/* decode start point */
-   if (buf_ptr1 > BUF_TRIGGER)
+   m->cupl.buf_ptr0 = m->cupl.buf_ptr1 - m->cupl.side_info.main_data_begin;	/* decode start point */
+   if (m->cupl.buf_ptr1 > BUF_TRIGGER)
    {				/* shift buffer */
-      memmove(buf, buf + buf_ptr0, side_info.main_data_begin);
-      buf_ptr0 = 0;
-      buf_ptr1 = side_info.main_data_begin;
+      memmove(m->cupl.buf, m->cupl.buf + m->cupl.buf_ptr0, m->cupl.side_info.main_data_begin);
+      m->cupl.buf_ptr0 = 0;
+      m->cupl.buf_ptr1 = m->cupl.side_info.main_data_begin;
    }
-   nbytes = padframebytes - side_bytes - crcbytes;
-   /* RAK: This is no bueno. :-( */
+   nbytes = m->cupl.padframebytes - side_bytes - m->cupl.crcbytes;
+   // RAK: This is no bueno. :-(
 	if (nbytes < 0 || nbytes > NBUF)
 	{
 	    in_out.in_bytes = 0;
 		 return in_out;
    }
-   memmove(buf + buf_ptr1, bs + side_bytes + crcbytes, nbytes);
-   buf_ptr1 += nbytes;
+   memmove(m->cupl.buf + m->cupl.buf_ptr1, bs + side_bytes + m->cupl.crcbytes, nbytes);
+   m->cupl.buf_ptr1 += nbytes;
 /*-----------------------*/
 
-   if (buf_ptr0 >= 0)
+   if (m->cupl.buf_ptr0 >= 0)
    {
-      main_pos_bit = buf_ptr0 << 3;
-      unpack_main(pcm, igr);
-      in_out.out_bytes = outbytes;
+      m->cupl.main_pos_bit = m->cupl.buf_ptr0 << 3;
+      unpack_main(m,pcm, igr);
+      in_out.out_bytes = m->cupl.outbytes;
    }
    else
    {
-      memset(pcm, zero_level_pcm, outbytes);	/* fill out skipped frames */
-      in_out.out_bytes = outbytes;
-/* iframe--;  in_out.out_bytes = 0; return in_out; */ /* test test */
+      memset(pcm, m->cupl.zero_level_pcm, m->cupl.outbytes);	/* fill out skipped frames */
+      in_out.out_bytes = m->cupl.outbytes;
+// iframe--;  in_out.out_bytes = 0; return in_out;// test test */
    }
 
 
@@ -1040,7 +948,7 @@ sfBandIndexTable[3][3] =
 	 }
       }
       ,
-/* this 8khz table, and only 8khz, from mpeg123) */
+// this 8khz table, and only 8khz, from mpeg123)
       {
 	 {
 	    0, 12, 24, 36, 48, 60, 72, 88, 108, 132, 160, 192, 232, 280, 336, 400, 476, 566, 568, 570, 572, 574, 576
@@ -1056,44 +964,44 @@ sfBandIndexTable[3][3] =
 };
 
 
-void sbt_mono_L3(float *sample, signed short *pcm, int ch);
-void sbt_dual_L3(float *sample, signed short *pcm, int ch);
-void sbt16_mono_L3(float *sample, signed short *pcm, int ch);
-void sbt16_dual_L3(float *sample, signed short *pcm, int ch);
-void sbt8_mono_L3(float *sample, signed short *pcm, int ch);
-void sbt8_dual_L3(float *sample, signed short *pcm, int ch);
+void sbt_mono_L3(MPEG *m, float *sample, signed short *pcm, int ch);
+void sbt_dual_L3(MPEG *m, float *sample, signed short *pcm, int ch);
+void sbt16_mono_L3(MPEG *m, float *sample, signed short *pcm, int ch);
+void sbt16_dual_L3(MPEG *m, float *sample, signed short *pcm, int ch);
+void sbt8_mono_L3(MPEG *m, float *sample, signed short *pcm, int ch);
+void sbt8_dual_L3(MPEG *m, float *sample, signed short *pcm, int ch);
 
-void sbtB_mono_L3(float *sample, unsigned char *pcm, int ch);
-void sbtB_dual_L3(float *sample, unsigned char *pcm, int ch);
-void sbtB16_mono_L3(float *sample, unsigned char *pcm, int ch);
-void sbtB16_dual_L3(float *sample, unsigned char *pcm, int ch);
-void sbtB8_mono_L3(float *sample, unsigned char *pcm, int ch);
-void sbtB8_dual_L3(float *sample, unsigned char *pcm, int ch);
+void sbtB_mono_L3(MPEG *m, float *sample, unsigned char *pcm, int ch);
+void sbtB_dual_L3(MPEG *m, float *sample, unsigned char *pcm, int ch);
+void sbtB16_mono_L3(MPEG *m, float *sample, unsigned char *pcm, int ch);
+void sbtB16_dual_L3(MPEG *m, float *sample, unsigned char *pcm, int ch);
+void sbtB8_mono_L3(MPEG *m, float *sample, unsigned char *pcm, int ch);
+void sbtB8_dual_L3(MPEG *m, float *sample, unsigned char *pcm, int ch);
 
 
 
-static SBT_FUNCTION sbt_table[2][3][2] =
+static SBT_FUNCTION_F sbt_table[2][3][2] =
 {
-{{ (SBT_FUNCTION) sbt_mono_L3,
-   (SBT_FUNCTION) sbt_dual_L3 } ,
- { (SBT_FUNCTION) sbt16_mono_L3,
-   (SBT_FUNCTION) sbt16_dual_L3 } ,
- { (SBT_FUNCTION) sbt8_mono_L3,
-   (SBT_FUNCTION) sbt8_dual_L3 }} ,
+{{ (SBT_FUNCTION_F) sbt_mono_L3,
+   (SBT_FUNCTION_F) sbt_dual_L3 } ,
+ { (SBT_FUNCTION_F) sbt16_mono_L3,
+   (SBT_FUNCTION_F) sbt16_dual_L3 } ,
+ { (SBT_FUNCTION_F) sbt8_mono_L3,
+   (SBT_FUNCTION_F) sbt8_dual_L3 }} ,
 /*-- 8 bit output -*/
-{{ (SBT_FUNCTION) sbtB_mono_L3,
-   (SBT_FUNCTION) sbtB_dual_L3 },
- { (SBT_FUNCTION) sbtB16_mono_L3,
-   (SBT_FUNCTION) sbtB16_dual_L3 },
- { (SBT_FUNCTION) sbtB8_mono_L3,
-   (SBT_FUNCTION) sbtB8_dual_L3 }}
+{{ (SBT_FUNCTION_F) sbtB_mono_L3,
+   (SBT_FUNCTION_F) sbtB_dual_L3 },
+ { (SBT_FUNCTION_F) sbtB16_mono_L3,
+   (SBT_FUNCTION_F) sbtB16_dual_L3 },
+ { (SBT_FUNCTION_F) sbtB8_mono_L3,
+   (SBT_FUNCTION_F) sbtB8_dual_L3 }}
 };
 
 
-static void Xform_mono(void *pcm, int igr);
-static void Xform_dual(void *pcm, int igr);
-static void Xform_dual_mono(void *pcm, int igr);
-static void Xform_dual_right(void *pcm, int igr);
+void Xform_mono(void *mv, void *pcm, int igr);
+void Xform_dual(void *mv, void *pcm, int igr);
+void Xform_dual_mono(void *mv, void *pcm, int igr);
+void Xform_dual_right(void *mv, void *pcm, int igr);
 
 static XFORM_FUNCTION xform_table[5] =
 {
@@ -1103,39 +1011,42 @@ static XFORM_FUNCTION xform_table[5] =
    Xform_mono,			/* left */
    Xform_dual_right,
 };
-int L3table_init(void);
-void msis_init(void);
-void sbt_init(void);
+int L3table_init(MPEG *m);
+void msis_init(MPEG *m);
+void sbt_init(MPEG *m);
+#if 0
 typedef int iARRAY22[22];
-iARRAY22 *quant_init_band_addr(void);
-iARRAY22 *msis_init_band_addr(void);
+#endif
+iARRAY22 *quant_init_band_addr();
+iARRAY22 *msis_init_band_addr();
 
 /*---------------------------------------------------------*/
 /* mpeg_head defined in mhead.h  frame bytes is without pad */
-int L3audio_decode_init(MPEG_HEAD * h, int framebytes_arg,
+int L3audio_decode_init(void *mv, MPEG_HEAD * h, int framebytes_arg,
 		   int reduction_code, int transform_code, int convert_code,
 			int freq_limit)
 {
+   MPEG *m = mv;
    int i, j, k;
-   /* static int first_pass = 1; */
+   // static int first_pass = 1;
    int samprate;
    int limit;
    int bit_code;
    int out_chans;
 
-   buf_ptr0 = 0;
-   buf_ptr1 = 0;
+   m->cupl.buf_ptr0 = 0;
+   m->cupl.buf_ptr1 = 0;
 
 /* check if code handles */
    if (h->option != 1)
       return 0;			/* layer III only */
 
    if (h->id)
-      ncbl_mixed = 8;		/* mpeg-1 */
+      m->cupl.ncbl_mixed = 8;		/* mpeg-1 */
    else
-      ncbl_mixed = 6;		/* mpeg-2 */
+      m->cupl.ncbl_mixed = 6;		/* mpeg-2 */
 
-   framebytes = framebytes_arg;
+   m->cupl.framebytes = framebytes_arg;
 
    transform_code = transform_code;	/* not used, asm compatability */
    bit_code = 0;
@@ -1152,50 +1063,50 @@ int L3audio_decode_init(MPEG_HEAD * h, int framebytes_arg,
 
    samprate = sr_table[4 * h->id + h->sr_index];
    if ((h->sync & 1) == 0)
-      samprate = samprate / 2;	/* mpeg 2.5 */
+      samprate = samprate / 2;	// mpeg 2.5 
 /*----- compute nsb_limit --------*/
-   nsb_limit = (freq_limit * 64L + samprate / 2) / samprate;
+   m->cupl.nsb_limit = (freq_limit * 64L + samprate / 2) / samprate;
 /*- caller limit -*/
    limit = (32 >> reduction_code);
    if (limit > 8)
       limit--;
-   if (nsb_limit > limit)
-      nsb_limit = limit;
-   limit = 18 * nsb_limit;
+   if (m->cupl.nsb_limit > limit)
+      m->cupl.nsb_limit = limit;
+   limit = 18 * m->cupl.nsb_limit;
 
    k = h->id;
    if ((h->sync & 1) == 0)
-      k = 2;			/* mpeg 2.5 */
+      k = 2;			// mpeg 2.5 
 
    if (k == 1)
    {
-      band_limit12 = 3 * sfBandIndexTable[k][h->sr_index].s[13];
-      band_limit = band_limit21 = sfBandIndexTable[k][h->sr_index].l[22];
+      m->cupl.band_limit12 = 3 * sfBandIndexTable[k][h->sr_index].s[13];
+      m->cupl.band_limit = m->cupl.band_limit21 = sfBandIndexTable[k][h->sr_index].l[22];
    }
    else
    {
-      band_limit12 = 3 * sfBandIndexTable[k][h->sr_index].s[12];
-      band_limit = band_limit21 = sfBandIndexTable[k][h->sr_index].l[21];
+      m->cupl.band_limit12 = 3 * sfBandIndexTable[k][h->sr_index].s[12];
+      m->cupl.band_limit = m->cupl.band_limit21 = sfBandIndexTable[k][h->sr_index].l[21];
    }
-   band_limit += 8;		/* allow for antialias */
-   if (band_limit > limit)
-      band_limit = limit;
+   m->cupl.band_limit += 8;		/* allow for antialias */
+   if (m->cupl.band_limit > limit)
+      m->cupl.band_limit = limit;
 
-   if (band_limit21 > band_limit)
-      band_limit21 = band_limit;
-   if (band_limit12 > band_limit)
-      band_limit12 = band_limit;
+   if (m->cupl.band_limit21 > m->cupl.band_limit)
+      m->cupl.band_limit21 = m->cupl.band_limit;
+   if (m->cupl.band_limit12 > m->cupl.band_limit)
+      m->cupl.band_limit12 = m->cupl.band_limit;
 
 
-   band_limit_nsb = (band_limit + 17) / 18;	/* limit nsb's rounded up */
+   m->cupl.band_limit_nsb = (m->cupl.band_limit + 17) / 18;	/* limit nsb's rounded up */
 /*----------------------------------------------*/
-   gain_adjust = 0;		/* adjust gain e.g. cvt to mono sum channel */
+   m->cupl.gain_adjust = 0;		/* adjust gain e.g. cvt to mono sum channel */
    if ((h->mode != 3) && (convert_code == 1))
-      gain_adjust = -4;
+      m->cupl.gain_adjust = -4;
 
-   outvalues = 1152 >> reduction_code;
+   m->cupl.outvalues = 1152 >> reduction_code;
    if (h->id == 0)
-      outvalues /= 2;
+      m->cupl.outvalues /= 2;
 
    out_chans = 2;
    if (h->mode == 3)
@@ -1203,39 +1114,37 @@ int L3audio_decode_init(MPEG_HEAD * h, int framebytes_arg,
    if (convert_code)
       out_chans = 1;
 
-   sbt_L3 = sbt_table[bit_code][reduction_code][out_chans - 1];
+   m->cupl.sbt_L3 = sbt_table[bit_code][reduction_code][out_chans - 1];
    k = 1 + convert_code;
    if (h->mode == 3)
       k = 0;
-   Xform = xform_table[k];
+   m->cupl.Xform = xform_table[k];
 
 
-   outvalues *= out_chans;
-
-   if (bit_code)
-      outbytes = outvalues;
-   else
-      outbytes = sizeof(short) * outvalues;
+   m->cupl.outvalues *= out_chans;
 
    if (bit_code)
-      zero_level_pcm = 128;	/* 8 bit output */
+      m->cupl.outbytes = m->cupl.outvalues;
    else
-      zero_level_pcm = 0;
-
-
-   decinfo.channels = out_chans;
-   decinfo.outvalues = outvalues;
-   decinfo.samprate = samprate >> reduction_code;
+      m->cupl.outbytes = sizeof(short) * m->cupl.outvalues;
 
    if (bit_code)
-      decinfo.bits = 8;
+      m->cupl.zero_level_pcm = 128;	/* 8 bit output */
    else
-      decinfo.bits = sizeof(short) * 8;
+      m->cupl.zero_level_pcm = 0;
 
-   decinfo.framebytes = framebytes;
-   decinfo.type = 0;
+   m->cup.decinfo.channels = out_chans;
+   m->cup.decinfo.outvalues = m->cupl.outvalues;
+   m->cup.decinfo.samprate = samprate >> reduction_code;
+   if (bit_code)
+      m->cup.decinfo.bits = 8;
+   else
+      m->cup.decinfo.bits = sizeof(short) * 8;
 
-   half_outbytes = outbytes / 2;
+   m->cup.decinfo.framebytes = m->cupl.framebytes;
+   m->cup.decinfo.type = 0;
+
+   m->cupl.half_outbytes = m->cupl.outbytes / 2;
 /*------------------------------------------*/
 
 /*- init band tables --*/
@@ -1243,53 +1152,60 @@ int L3audio_decode_init(MPEG_HEAD * h, int framebytes_arg,
 
    k = h->id;
    if ((h->sync & 1) == 0)
-      k = 2;			/* mpeg 2.5 */
+      k = 2;			// mpeg 2.5 
 
    for (i = 0; i < 22; i++)
-      sfBandIndex[0][i] = sfBandIndexTable[k][h->sr_index].l[i + 1];
+      m->cupl.sfBandIndex[0][i] = sfBandIndexTable[k][h->sr_index].l[i + 1];
    for (i = 0; i < 13; i++)
-      sfBandIndex[1][i] = 3 * sfBandIndexTable[k][h->sr_index].s[i + 1];
+      m->cupl.sfBandIndex[1][i] = 3 * sfBandIndexTable[k][h->sr_index].s[i + 1];
    for (i = 0; i < 22; i++)
-      nBand[0][i] =
+      m->cupl.nBand[0][i] =
 	 sfBandIndexTable[k][h->sr_index].l[i + 1]
 	 - sfBandIndexTable[k][h->sr_index].l[i];
    for (i = 0; i < 13; i++)
-      nBand[1][i] =
+      m->cupl.nBand[1][i] =
 	 sfBandIndexTable[k][h->sr_index].s[i + 1]
 	 - sfBandIndexTable[k][h->sr_index].s[i];
 
 
 /* init tables */
-   L3table_init();
+   L3table_init(m);
 /* init ms and is stereo modes */
-   msis_init();
+   msis_init(m);
 
 /*----- init sbt ---*/
-   sbt_init();
+   sbt_init(m);
 
 
 
 /*--- clear buffers --*/
    for (i = 0; i < 576; i++)
-      yout[i] = 0.0f;
+      m->cupl.yout[i] = 0.0f;
    for (j = 0; j < 2; j++)
    {
       for (k = 0; k < 2; k++)
       {
 	 for (i = 0; i < 576; i++)
 	 {
-	    sample[j][k][i].x = 0.0f;
-	    sample[j][k][i].s = 0;
+	    m->cupl.sample[j][k][i].x = 0.0f;
+	    m->cupl.sample[j][k][i].s = 0;
 	 }
       }
    }
 
    if (h->id == 1)
-      decode_function = L3audio_decode_MPEG1;
+      m->cupl.decode_function = L3audio_decode_MPEG1;
    else
-      decode_function = L3audio_decode_MPEG2;
+      m->cupl.decode_function = L3audio_decode_MPEG2;
 
    return 1;
 }
 /*---------------------------------------------------------*/
 /*==========================================================*/
+void cup3_init(MPEG *m)
+{
+	m->cupl.sbt_L3 = sbt_dual_L3;
+	m->cupl.Xform = Xform_dual;
+	m->cupl.sbt_L3 = sbt_dual_L3;
+	m->cupl.decode_function = L3audio_decode_MPEG1;
+}

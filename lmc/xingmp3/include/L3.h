@@ -24,6 +24,9 @@
 	$Id$
 ____________________________________________________________________________*/
 
+#ifndef _L3_H_
+#define _L3_H_
+
 /****  L3.h  ***************************************************
 
   Layer III structures
@@ -32,8 +35,6 @@ ____________________________________________________________________________*/
   *** Layer III code assumes 32 bit int ***
 
 ******************************************************************/
-
-#include "config.h"
 
 #define GLOBAL_GAIN_SCALE (4*15)
 /* #define GLOBAL_GAIN_SCALE 0 */
@@ -49,20 +50,6 @@ ____________________________________________________________________________*/
 
 #ifdef sparc
 #define LITTLE_ENDIAN 0
-#endif
-
-#if defined(__POWERPC__)
-#define LITTLE_ENDIAN 0
-#elif defined(__INTEL__)
-#define LITTLE_ENDIAN 1
-#endif
-
-#ifndef LITTLE_ENDIAN
-#if defined(WORDS_BIGENDIAN)
-#define LITTLE_ENDIAN 0
-#else
-#define LITTLE_ENDIAN 1
-#endif
 #endif
 
 #ifndef LITTLE_ENDIAN
@@ -81,7 +68,7 @@ typedef union
       unsigned char signbits;
       unsigned char x;
       unsigned char y;
-      unsigned char purgebits;	/* 0 = esc */
+      unsigned char purgebits;	// 0 = esc
 
    }
    b;
@@ -94,7 +81,7 @@ typedef union
    int ptr;			/* int must be 32 bits or more */
    struct
    {
-      unsigned char purgebits;	/* 0 = esc */
+      unsigned char purgebits;	// 0 = esc
 
       unsigned char y;
       unsigned char x;
@@ -112,7 +99,7 @@ typedef struct
    int bits;
    unsigned char *bs_ptr;
    unsigned char *bs_ptr0;
-   unsigned char *bs_ptr_end;	/* optional for overrun test */
+   unsigned char *bs_ptr_end;	// optional for overrun test
 
 }
 BITDAT;
@@ -151,8 +138,8 @@ SIDE_INFO;
 
 /*-----------------------------------------------------------*/
 /*-- scale factors ---*/
-/* check dimensions - need 21 long, 3*12 short 
-   plus extra for implicit sf=0 above highest cb */
+// check dimensions - need 21 long, 3*12 short
+// plus extra for implicit sf=0 above highest cb
 typedef struct
 {
    int l[23];			/* [cb] */
@@ -165,7 +152,7 @@ typedef struct
 {
    int cbtype;			/* long=0 short=1 */
    int cbmax;			/* max crit band */
-/*   int lb_type;	*/		/* long block type 0 1 3 */
+//   int lb_type;			/* long block type 0 1 3 */
    int cbs0;			/* short band start index 0 3 12 (12=no shorts */
    int ncbl;			/* number long cb's 0 8 21 */
    int cbmax_s[3];		/* cbmax by individual short blocks */
@@ -191,3 +178,5 @@ typedef union
 SAMPLE;
 
 /*-----------------------------------------------------------*/
+
+#endif

@@ -99,124 +99,129 @@ IN_OUT structure returns:
 #include <stdio.h>
 #include <float.h>
 #include <math.h>
+#include "L3.h"
 #include "mhead.h"		/* mpeg header structure */
 
 
-static unsigned char look_u[8192];
 
 
-static short pcm[2304];
-static int ncnt = 8 * 288;
-static int ncnt1 = 8 * 287;
-static int nlast = 287;
-static int ndeci = 11;
-static int kdeci = 8 * 288;
-static short xsave;
 
 /*------------------------------------------*/
 static int output_code;
-static int convert(unsigned char *pcm);
-static int convert_8bit(unsigned char *pcm);
-static int convert_u(unsigned char *pcm);
-typedef int (*CVT_FUNCTION) (unsigned char *pcm);
-static CVT_FUNCTION convert_routine;
-static CVT_FUNCTION cvt_table[3] =
+static int convert(void *mv, unsigned char *pcm);
+static int convert_8bit(void *mv, unsigned char *pcm);
+static int convert_u(void *mv, unsigned char *pcm);
+static CVT_FUNCTION_8 cvt_table[3] =
 {
    convert,
    convert_8bit,
    convert_u,
 };
 
+void mpeg8_init(MPEG8 *m)
+{
+	memset(&m->dec, 0, sizeof(m->dec));
+	m->dec.ncnt = 8 * 288;
+	m->dec.ncnt1 = 8 * 287;
+	m->dec.nlast = 287;
+	m->dec.ndeci = 11;
+	m->dec.kdeci = 8 * 288;
+	m->dec.first_pass = 1;
+}
+
 /*====================================================================*/
-IN_OUT audio_decode8(unsigned char *bs, signed short *pcmbuf)
+IN_OUT audio_decode8(MPEG8 *m, unsigned char *bs, signed short *pcmbuf)
 {
    IN_OUT x;
 
-   x = audio_decode(bs, pcm);
+   x = audio_decode(&m->cupper, bs, m->dec.pcm);
    if (x.in_bytes <= 0)
       return x;
-   x.out_bytes = convert_routine((void *) pcmbuf);
+   x.out_bytes = m->dec.convert_routine(m, (void *) pcmbuf);
 
    return x;
 }
 /*--------------8Ks 16 bit pcm --------------------------------*/
-static int convert(unsigned char y0[])
+static int convert(void *mv, unsigned char y0[])
 {
+	MPEG8 *m = mv;
    int i, k;
    long alpha;
    short *y;
 
    y = (short *) y0;
    k = 0;
-   if (kdeci < ncnt)
+   if (m->dec.kdeci < m->dec.ncnt)
    {
-      alpha = kdeci & 7;
-      y[k++] = (short) (xsave + ((alpha * (pcm[0] - xsave)) >> 3));
-      kdeci += ndeci;
+      alpha = m->dec.kdeci & 7;
+      y[k++] = (short) (m->dec.xsave + ((alpha * (m->dec.pcm[0] - m->dec.xsave)) >> 3));
+      m->dec.kdeci += m->dec.ndeci;
    }
-   kdeci -= ncnt;
-   for (; kdeci < ncnt1; kdeci += ndeci)
+   m->dec.kdeci -= m->dec.ncnt;
+   for (; m->dec.kdeci < m->dec.ncnt1; m->dec.kdeci += m->dec.ndeci)
    {
-      i = kdeci >> 3;
-      alpha = kdeci & 7;
-      y[k++] = (short) (pcm[i] + ((alpha * (pcm[i + 1] - pcm[i])) >> 3));
+      i = m->dec.kdeci >> 3;
+      alpha = m->dec.kdeci & 7;
+      y[k++] = (short) (m->dec.pcm[i] + ((alpha * (m->dec.pcm[i + 1] - m->dec.pcm[i])) >> 3));
    }
-   xsave = pcm[nlast];
+   m->dec.xsave = m->dec.pcm[m->dec.nlast];
 
 /* printf("\n k out = %4d", k);   */
 
    return sizeof(short) * k;
 }
 /*----------------8Ks 8 bit unsigned pcm ---------------------------*/
-static int convert_8bit(unsigned char y[])
+static int convert_8bit(void *mv, unsigned char y[])
 {
+   MPEG8 *m = mv;
    int i, k;
    long alpha;
 
    k = 0;
-   if (kdeci < ncnt)
+   if (m->dec.kdeci < m->dec.ncnt)
    {
-      alpha = kdeci & 7;
-      y[k++] = (unsigned char) (((xsave + ((alpha * (pcm[0] - xsave)) >> 3)) >> 8) + 128);
-      kdeci += ndeci;
+      alpha = m->dec.kdeci & 7;
+      y[k++] = (unsigned char) (((m->dec.xsave + ((alpha * (m->dec.pcm[0] - m->dec.xsave)) >> 3)) >> 8) + 128);
+      m->dec.kdeci += m->dec.ndeci;
    }
-   kdeci -= ncnt;
-   for (; kdeci < ncnt1; kdeci += ndeci)
+   m->dec.kdeci -= m->dec.ncnt;
+   for (; m->dec.kdeci < m->dec.ncnt1; m->dec.kdeci += m->dec.ndeci)
    {
-      i = kdeci >> 3;
-      alpha = kdeci & 7;
-      y[k++] = (unsigned char) (((pcm[i] + ((alpha * (pcm[i + 1] - pcm[i])) >> 3)) >> 8) + 128);
+      i = m->dec.kdeci >> 3;
+      alpha = m->dec.kdeci & 7;
+      y[k++] = (unsigned char) (((m->dec.pcm[i] + ((alpha * (m->dec.pcm[i + 1] - m->dec.pcm[i])) >> 3)) >> 8) + 128);
    }
-   xsave = pcm[nlast];
+   m->dec.xsave = m->dec.pcm[m->dec.nlast];
 
 /* printf("\n k out = %4d", k);   */
 
    return k;
 }
 /*--------------8Ks u-law --------------------------------*/
-static int convert_u(unsigned char y[])
+static int convert_u(void *mv, unsigned char y[])
 {
+   MPEG8 *m = mv;
    int i, k;
    long alpha;
    unsigned char *look;
 
-   look = look_u + 4096;
+   look = m->dec.look_u + 4096;
 
    k = 0;
-   if (kdeci < ncnt)
+   if (m->dec.kdeci < m->dec.ncnt)
    {
-      alpha = kdeci & 7;
-      y[k++] = look[(xsave + ((alpha * (pcm[0] - xsave)) >> 3)) >> 3];
-      kdeci += ndeci;
+      alpha = m->dec.kdeci & 7;
+      y[k++] = look[(m->dec.xsave + ((alpha * (m->dec.pcm[0] - m->dec.xsave)) >> 3)) >> 3];
+      m->dec.kdeci += m->dec.ndeci;
    }
-   kdeci -= ncnt;
-   for (; kdeci < ncnt1; kdeci += ndeci)
+   m->dec.kdeci -= m->dec.ncnt;
+   for (; m->dec.kdeci < m->dec.ncnt1; m->dec.kdeci += m->dec.ndeci)
    {
-      i = kdeci >> 3;
-      alpha = kdeci & 7;
-      y[k++] = look[(pcm[i] + ((alpha * (pcm[i + 1] - pcm[i])) >> 3)) >> 3];
+      i = m->dec.kdeci >> 3;
+      alpha = m->dec.kdeci & 7;
+      y[k++] = look[(m->dec.pcm[i] + ((alpha * (m->dec.pcm[i + 1] - m->dec.pcm[i])) >> 3)) >> 3];
    }
-   xsave = pcm[nlast];
+   m->dec.xsave = m->dec.pcm[m->dec.nlast];
 
 /* printf("\n k out = %4d", k);   */
 
@@ -252,16 +257,16 @@ static int ucomp3(int x)	/* re analog devices CCITT G.711 */
    return u;
 }
 /*------------------------------------------------------------------*/
-static void table_init(void)
+static void table_init(MPEG8 *m)
 {
    int i;
 
    for (i = -4096; i < 4096; i++)
-      look_u[4096 + i] = (unsigned char) (ucomp3(2 * i));
+      m->dec.look_u[4096 + i] = (unsigned char) (ucomp3(2 * i));
 
 }
 /*-------------------------------------------------------------------*/
-int audio_decode8_init(MPEG_HEAD * h, int framebytes_arg,
+int audio_decode8_init(MPEG8 *m, MPEG_HEAD * h, int framebytes_arg,
 		   int reduction_code, int transform_code, int convert_code,
 		       int freq_limit)
 {
@@ -269,16 +274,15 @@ int audio_decode8_init(MPEG_HEAD * h, int framebytes_arg,
    int outvals;
    static int sr_table[2][4] =
    {{22, 24, 16, 0}, {44, 48, 32, 0}};
-   static int first_pass = 1;
 
-   if (first_pass)
+   if (m->dec.first_pass)
    {
-      table_init();
-      first_pass = 0;
+      table_init(m);
+      m->dec.first_pass = 0;
    }
 
    if ((h->sync & 1) == 0)
-      return 0;			/* fail mpeg 2.5 */
+      return 0;			// fail mpeg 2.5
 
    output_code = convert_code >> 2;
    if (output_code < 1)
@@ -295,7 +299,7 @@ int audio_decode8_init(MPEG_HEAD * h, int framebytes_arg,
       reduction_code = 2;
 
 /* select convert routine */
-   convert_routine = cvt_table[output_code - 1];
+   m->dec.convert_routine = cvt_table[output_code - 1];
 
 /* init decimation/convert routine */
 /*-- MPEG-2 layer III --*/
@@ -306,15 +310,15 @@ int audio_decode8_init(MPEG_HEAD * h, int framebytes_arg,
 /*-- layer I --*/
    else
       outvals = 1152 >> reduction_code;
-   ncnt = 8 * outvals;
-   ncnt1 = 8 * (outvals - 1);
-   nlast = outvals - 1;
-   ndeci = sr_table[h->id][h->sr_index] >> reduction_code;
-   kdeci = 8 * outvals;
+   m->dec.ncnt = 8 * outvals;
+   m->dec.ncnt1 = 8 * (outvals - 1);
+   m->dec.nlast = outvals - 1;
+   m->dec.ndeci = sr_table[h->id][h->sr_index] >> reduction_code;
+   m->dec.kdeci = 8 * outvals;
 /* printf("\n outvals %d", outvals);  */
 
    freq_limit = 3200;
-   istat = audio_decode_init(h, framebytes_arg,
+   istat = audio_decode_init(&m->cupper, h, framebytes_arg,
 			     reduction_code, transform_code, convert_code,
 			     freq_limit);
 
@@ -322,10 +326,10 @@ int audio_decode8_init(MPEG_HEAD * h, int framebytes_arg,
    return istat;
 }
 /*-----------------------------------------------------------------*/
-void audio_decode8_info(DEC_INFO * info)
+void audio_decode8_info(MPEG8 *m, DEC_INFO * info)
 {
 
-   audio_decode_info(info);
+   audio_decode_info(&m->cupper, info);
    info->samprate = 8000;
    if (output_code != 1)
       info->bits = 8;

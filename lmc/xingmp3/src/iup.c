@@ -54,7 +54,7 @@ mods 1/7/97 warnings
        native mpeg rate.
 
 -------------------------------------
-int i_audio_decode_init(MPEG_HEAD *h, int framebytes_arg,
+int i_audio_decode_init(MPEG *m, MPEG_HEAD *h, int framebytes_arg,
          int reduction_code, int transform_code, int convert_code,
          int freq_limit)
 
@@ -79,7 +79,7 @@ freq_limit      input, limits bandwidth of pcm output to specified
 
 
 ---------------------------------
-void i_audio_decode_info( DEC_INFO *info)
+void i_audio_decode_info( MPEG *m, DEC_INFO *info)
 
 information return:
           Call after audio_decode_init.  See mhead.h for
@@ -87,7 +87,7 @@ information return:
 
 
 ---------------------------------
-IN_OUT i_audio_decode(unsigned char *bs, void *pcmbuf)
+IN_OUT i_audio_decode(MPEG *m, unsigned char *bs, void *pcmbuf)
 
 decode one mpeg audio frame:
 bs        input, mpeg bitstream, must start with
@@ -105,8 +105,8 @@ IN_OUT structure returns:
 #include <stdio.h>
 #include <float.h>
 #include <math.h>
+#include "L3.h"
 #include "mhead.h"		/* mpeg header structure */
-#include "itype.h"
 #include "jdw.h"
 
 /*-------------------------------------------------------
@@ -121,20 +121,7 @@ not cause a memory access violation (protection fault)
 #endif
 
 
-
-/*=====================================================================*/
-/*----------------*/
-static DEC_INFO decinfo;
-
-/*----------------*/
-static int look_c_value[18];	/* built by init */
-static int look_c_shift[18];	/* built by init */
-
-/*----------------*/
-static int outbytes;
-static int framebytes;
-static int outvalues;
-static int pad;
+/* Okay to be global -- is read/only */
 static int look_joint[16] =
 {				/* lookup stereo sb's by mode+ext */
    64, 64, 64, 64,		/* stereo */
@@ -143,118 +130,75 @@ static int look_joint[16] =
    32, 32, 32, 32,		/* mono */
 };
 
-/*----------------*/
-static int max_sb;
-static int stereo_sb;
-
-/*----------------*/
-static int nsb_limit = 6;
-static int bit_skip;
+/* Okay to be global -- is read/only */
 static int bat_bit_master[] =
 {
    0, 5, 7, 9, 10, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48};
 
-/*----------------*/
-static int nbat[4] =
-{3, 8, 12, 7};
-static int bat[4][16];
-static int ballo[64];		/* set by unpack_ba */
-static unsigned int samp_dispatch[66];	/* set by unpack_ba */
-static int c_value[64];		/* set by unpack_ba */
-static int c_shift[64];		/* set by unpack_ba */
-
-/*----------------*/
-static unsigned int sf_dispatch[66];	/* set by unpack_ba */
-static int sf_table[64];
-
-/*--- static int cs_factor[3][64];   ---*/
-static INT32 cs_factor[3][64];
-
-/*----------------*/
-static SAMPLEINT sample[2304];
-static signed char group3_table[32][3];
-static signed char group5_table[128][3];
-static signed short group9_table[1024][3];
-
-/*----------------*/
-
-static int nsbt = 36;
-typedef void (*SBT_FUNCTION) (SAMPLEINT * sample, short *pcm, int n);
 void i_sbt_mono(SAMPLEINT * sample, short *pcm, int n);
 void i_sbt_dual(SAMPLEINT * sample, short *pcm, int n);
-static SBT_FUNCTION sbt = i_sbt_mono;
 
-typedef void (*UNPACK_FUNCTION) (void);
-static void unpack(void);
-static UNPACK_FUNCTION unpack_routine = unpack;
-
-/*======================================================================*/
-/*======================================================================*/
-/* get bits from bitstream in endian independent way */
-static unsigned char *bs_ptr;
-static UINT32 bitbuf;
-static int bits;
-static INT32 bitval;
+static void unpack();
 
 /*------------- initialize bit getter -------------*/
-static void load_init(unsigned char *buf)
+static void load_init(MPEGI *m, unsigned char *buf)
 {
-   bs_ptr = buf;
-   bits = 0;
-   bitbuf = 0;
+   m->iup.bs_ptr = buf;
+   m->iup.bits = 0;
+   m->iup.bitbuf = 0;
 }
 /*------------- get n bits from bitstream -------------*/
-static INT32 load(int n)
+static INT32 load(MPEGI *m, int n)
 {
    UINT32 x;
 
-   if (bits < n)
+   if (m->iup.bits < n)
    {				/* refill bit buf if necessary */
-      while (bits <= 24)
+      while (m->iup.bits <= 24)
       {
-	 bitbuf = (bitbuf << 8) | *bs_ptr++;
-	 bits += 8;
+	 m->iup.bitbuf = (m->iup.bitbuf << 8) | *m->iup.bs_ptr++;
+	 m->iup.bits += 8;
       }
    }
-   bits -= n;
-   x = bitbuf >> bits;
-   bitbuf -= x << bits;
+   m->iup.bits -= n;
+   x = m->iup.bitbuf >> m->iup.bits;
+   m->iup.bitbuf -= x << m->iup.bits;
    return x;
 }
 /*------------- skip over n bits in bitstream -------------*/
-static void skip(int n)
+static void skip(MPEGI *m, int n)
 {
    int k;
 
-   if (bits < n)
+   if (m->iup.bits < n)
    {
-      n -= bits;
+      n -= m->iup.bits;
       k = n >> 3;
 /*--- bytes = n/8 --*/
-      bs_ptr += k;
+      m->iup.bs_ptr += k;
       n -= k << 3;
-      bitbuf = *bs_ptr++;
-      bits = 8;
+      m->iup.bitbuf = *m->iup.bs_ptr++;
+      m->iup.bits = 8;
    }
-   bits -= n;
-   bitbuf -= (bitbuf >> bits) << bits;
+   m->iup.bits -= n;
+   m->iup.bitbuf -= (m->iup.bitbuf >> m->iup.bits) << m->iup.bits;
 }
 /*--------------------------------------------------------------*/
 #define mac_load_check(n)                     \
-   if( bits < (n) ) {                           \
-          while( bits <= 24 ) {               \
-             bitbuf = (bitbuf << 8) | *bs_ptr++;  \
-             bits += 8;                       \
+   if( m->iup.bits < (n) ) {                           \
+          while( m->iup.bits <= 24 ) {               \
+             m->iup.bitbuf = (m->iup.bitbuf << 8) | *m->iup.bs_ptr++;  \
+             m->iup.bits += 8;                       \
           }                                   \
    }
 /*--------------------------------------------------------------*/
 #define mac_load(n)                    \
-       ( bits -= n,                    \
-         bitval = bitbuf >> bits,      \
-         bitbuf -= bitval << bits,     \
-         bitval )
+       ( m->iup.bits -= n,                    \
+         m->iup.bitval = m->iup.bitbuf >> m->iup.bits,      \
+         m->iup.bitbuf -= m->iup.bitval << m->iup.bits,     \
+         m->iup.bitval )
 /*======================================================================*/
-static void unpack_ba(void)
+static void unpack_ba(MPEGI *m)
 {
    int i, j, k;
    static int nbit[4] =
@@ -262,91 +206,91 @@ static void unpack_ba(void)
    int nstereo;
    int n;
 
-   bit_skip = 0;
-   nstereo = stereo_sb;
+   m->iup.bit_skip = 0;
+   nstereo = m->iup.stereo_sb;
    k = 0;
    for (i = 0; i < 4; i++)
    {
-      for (j = 0; j < nbat[i]; j++, k++)
+      for (j = 0; j < m->iup.nbat[i]; j++, k++)
       {
 	 mac_load_check(4);
-	 n = ballo[k] = samp_dispatch[k] = bat[i][mac_load(nbit[i])];
-	 if (k >= nsb_limit)
-	    bit_skip += bat_bit_master[samp_dispatch[k]];
-	 c_value[k] = look_c_value[n];
-	 c_shift[k] = look_c_shift[n];
+	 n = m->iup.ballo[k] = m->iup.samp_dispatch[k] = m->iup.bat[i][mac_load(nbit[i])];
+	 if (k >= m->iup.nsb_limit)
+	    m->iup.bit_skip += bat_bit_master[m->iup.samp_dispatch[k]];
+	 m->iup.c_value[k] = m->iup.look_c_value[n];
+	 m->iup.c_shift[k] = m->iup.look_c_shift[n];
 	 if (--nstereo < 0)
 	 {
-	    ballo[k + 1] = ballo[k];
-	    samp_dispatch[k] += 18;	/* flag as joint */
-	    samp_dispatch[k + 1] = samp_dispatch[k];	/* flag for sf */
-	    c_value[k + 1] = c_value[k];
-	    c_shift[k + 1] = c_shift[k];
+	    m->iup.ballo[k + 1] = m->iup.ballo[k];
+	    m->iup.samp_dispatch[k] += 18;	/* flag as joint */
+	    m->iup.samp_dispatch[k + 1] = m->iup.samp_dispatch[k];	/* flag for sf */
+	    m->iup.c_value[k + 1] = m->iup.c_value[k];
+	    m->iup.c_shift[k + 1] = m->iup.c_shift[k];
 	    k++;
 	    j++;
 	 }
       }
    }
-   samp_dispatch[nsb_limit] = 37;	/* terminate the dispatcher with skip */
-   samp_dispatch[k] = 36;	/* terminate the dispatcher */
+   m->iup.samp_dispatch[m->iup.nsb_limit] = 37;	/* terminate the dispatcher with skip */
+   m->iup.samp_dispatch[k] = 36;	/* terminate the dispatcher */
 
 }
 /*-------------------------------------------------------------------------*/
-static void unpack_sfs(void)	/* unpack scale factor selectors */
+static void unpack_sfs(MPEGI *m)	/* unpack scale factor selectors */
 {
    int i;
 
-   for (i = 0; i < max_sb; i++)
+   for (i = 0; i < m->iup.max_sb; i++)
    {
       mac_load_check(2);
-      if (ballo[i])
-	 sf_dispatch[i] = mac_load(2);
+      if (m->iup.ballo[i])
+	 m->iup.sf_dispatch[i] = mac_load(2);
       else
-	 sf_dispatch[i] = 4;	/* no allo */
+	 m->iup.sf_dispatch[i] = 4;	/* no allo */
    }
-   sf_dispatch[i] = 5;		/* terminate dispatcher */
+   m->iup.sf_dispatch[i] = 5;		/* terminate dispatcher */
 }
 /*-------------------------------------------------------------------------*/
 /*--- multiply note -------------------------------------------------------*/
 /*--- 16bit x 16bit mult --> 32bit >> 15 --> 16 bit  or better  -----------*/
-static void unpack_sf(void)	/* unpack scale factor */
+static void unpack_sf(MPEGI *m)		/* unpack scale factor */
 {				/* combine dequant and scale factors */
    int i, n;
    INT32 tmp;			/* only reason tmp is 32 bit is to get 32 bit mult result */
 
    i = -1;
- dispatch:switch (sf_dispatch[++i])
+ dispatch:switch (m->iup.sf_dispatch[++i])
    {
       case 0:			/* 3 factors 012 */
 	 mac_load_check(18);
-	 tmp = c_value[i];
-	 n = c_shift[i];
-	 cs_factor[0][i] = (tmp * sf_table[mac_load(6)]) >> n;
-	 cs_factor[1][i] = (tmp * sf_table[mac_load(6)]) >> n;
-	 cs_factor[2][i] = (tmp * sf_table[mac_load(6)]) >> n;
+	 tmp = m->iup.c_value[i];
+	 n = m->iup.c_shift[i];
+	 m->iup.cs_factor[0][i] = (tmp * m->iup.sf_table[mac_load(6)]) >> n;
+	 m->iup.cs_factor[1][i] = (tmp * m->iup.sf_table[mac_load(6)]) >> n;
+	 m->iup.cs_factor[2][i] = (tmp * m->iup.sf_table[mac_load(6)]) >> n;
 	 goto dispatch;
       case 1:			/* 2 factors 002 */
 	 mac_load_check(12);
-	 tmp = c_value[i];
-	 n = c_shift[i];
-	 cs_factor[1][i] = cs_factor[0][i] =
-	    (tmp * sf_table[mac_load(6)]) >> n;
-	 cs_factor[2][i] = (tmp * sf_table[mac_load(6)]) >> n;
+	 tmp = m->iup.c_value[i];
+	 n = m->iup.c_shift[i];
+	 m->iup.cs_factor[1][i] = m->iup.cs_factor[0][i] =
+	    (tmp * m->iup.sf_table[mac_load(6)]) >> n;
+	 m->iup.cs_factor[2][i] = (tmp * m->iup.sf_table[mac_load(6)]) >> n;
 	 goto dispatch;
       case 2:			/* 1 factor 000 */
 	 mac_load_check(6);
-	 tmp = c_value[i];
-	 n = c_shift[i];
-	 cs_factor[2][i] = cs_factor[1][i] = cs_factor[0][i] =
-	    (tmp * sf_table[mac_load(6)]) >> n;
+	 tmp = m->iup.c_value[i];
+	 n = m->iup.c_shift[i];
+	 m->iup.cs_factor[2][i] = m->iup.cs_factor[1][i] = m->iup.cs_factor[0][i] =
+	    (tmp * m->iup.sf_table[mac_load(6)]) >> n;
 	 goto dispatch;
       case 3:			/* 2 factors 022 */
 	 mac_load_check(12);
-	 tmp = c_value[i];
-	 n = c_shift[i];
-	 cs_factor[0][i] = (tmp * sf_table[mac_load(6)]) >> n;
-	 cs_factor[2][i] = cs_factor[1][i] =
-	    (tmp * sf_table[mac_load(6)]) >> n;
+	 tmp = m->iup.c_value[i];
+	 n = m->iup.c_shift[i];
+	 m->iup.cs_factor[0][i] = (tmp * m->iup.sf_table[mac_load(6)]) >> n;
+	 m->iup.cs_factor[2][i] = m->iup.cs_factor[1][i] =
+	    (tmp * m->iup.sf_table[mac_load(6)]) >> n;
 	 goto dispatch;
       case 4:			/* no allo */
 	 goto dispatch;
@@ -359,50 +303,50 @@ static void unpack_sf(void)	/* unpack scale factor */
 /*--- unpack multiply note ------------------------------------------------*/
 /*--- 16bit x 16bit mult --> 32bit  or better required---------------------*/
 #define UNPACK_N(n)                                          \
-    s[k]     =  ((cs_factor[i][k]*(load(n)-((1 << (n-1)) -1)))>>(n-1));   \
-    s[k+64]  =  ((cs_factor[i][k]*(load(n)-((1 << (n-1)) -1)))>>(n-1));   \
-    s[k+128] =  ((cs_factor[i][k]*(load(n)-((1 << (n-1)) -1)))>>(n-1));   \
+    s[k]     =  ((m->iup.cs_factor[i][k]*(load(m,n)-((1 << (n-1)) -1)))>>(n-1));   \
+    s[k+64]  =  ((m->iup.cs_factor[i][k]*(load(m,n)-((1 << (n-1)) -1)))>>(n-1));   \
+    s[k+128] =  ((m->iup.cs_factor[i][k]*(load(m,n)-((1 << (n-1)) -1)))>>(n-1));   \
     goto dispatch;
 #define UNPACK_N2(n)                                             \
     mac_load_check(3*n);                                         \
-    s[k]     =  (cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1)))>>(n-1);   \
-    s[k+64]  =  (cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1)))>>(n-1);   \
-    s[k+128] =  (cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1)))>>(n-1);   \
+    s[k]     =  (m->iup.cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1)))>>(n-1);   \
+    s[k+64]  =  (m->iup.cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1)))>>(n-1);   \
+    s[k+128] =  (m->iup.cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1)))>>(n-1);   \
     goto dispatch;
 #define UNPACK_N3(n)                                             \
     mac_load_check(2*n);                                         \
-    s[k]     =  (cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1)))>>(n-1);   \
-    s[k+64]  =  (cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1)))>>(n-1);   \
+    s[k]     =  (m->iup.cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1)))>>(n-1);   \
+    s[k+64]  =  (m->iup.cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1)))>>(n-1);   \
     mac_load_check(n);                                           \
-    s[k+128] =  (cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1)))>>(n-1);   \
+    s[k+128] =  (m->iup.cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1)))>>(n-1);   \
     goto dispatch;
 #define UNPACKJ_N(n)                                         \
-    tmp        =  (load(n)-((1 << (n-1)) -1));                 \
-    s[k]       =  (cs_factor[i][k]*tmp)>>(n-1);                       \
-    s[k+1]     =  (cs_factor[i][k+1]*tmp)>>(n-1);                     \
-    tmp        =  (load(n)-((1 << (n-1)) -1));                 \
-    s[k+64]    =  (cs_factor[i][k]*tmp)>>(n-1);                       \
-    s[k+64+1]  =  (cs_factor[i][k+1]*tmp)>>(n-1);                     \
-    tmp        =  (load(n)-((1 << (n-1)) -1));                 \
-    s[k+128]   =  (cs_factor[i][k]*tmp)>>(n-1);                       \
-    s[k+128+1] =  (cs_factor[i][k+1]*tmp)>>(n-1);                     \
+    tmp        =  (load(m,n)-((1 << (n-1)) -1));                 \
+    s[k]       =  (m->iup.cs_factor[i][k]*tmp)>>(n-1);                       \
+    s[k+1]     =  (m->iup.cs_factor[i][k+1]*tmp)>>(n-1);                     \
+    tmp        =  (load(m,n)-((1 << (n-1)) -1));                 \
+    s[k+64]    =  (m->iup.cs_factor[i][k]*tmp)>>(n-1);                       \
+    s[k+64+1]  =  (m->iup.cs_factor[i][k+1]*tmp)>>(n-1);                     \
+    tmp        =  (load(m,n)-((1 << (n-1)) -1));                 \
+    s[k+128]   =  (m->iup.cs_factor[i][k]*tmp)>>(n-1);                       \
+    s[k+128+1] =  (m->iup.cs_factor[i][k+1]*tmp)>>(n-1);                     \
     k++;       /* skip right chan dispatch */                \
     goto dispatch;
 /*-------------------------------------------------------------------------*/
-static void unpack_samp(void)	/* unpack samples */
+static void unpack_samp(MPEGI *m)	/* unpack samples */
 {
    int i, j, k;
    SAMPLEINT *s;
    int n;
    INT32 tmp;
 
-   s = sample;
+   s = m->iup.sample;
    for (i = 0; i < 3; i++)
    {				/* 3 groups of scale factors */
       for (j = 0; j < 4; j++)
       {
 	 k = -1;
-       dispatch:switch (samp_dispatch[++k])
+       dispatch:switch (m->iup.samp_dispatch[++k])
 	 {
 	    case 0:
 	       s[k + 128] = s[k + 64] = s[k] = 0;
@@ -410,25 +354,25 @@ static void unpack_samp(void)	/* unpack samples */
 	    case 1:		/* 3 levels grouped 5 bits */
 	       mac_load_check(5);
 	       n = mac_load(5);
-	       s[k] = ((INT32) cs_factor[i][k] * group3_table[n][0]) >> 1;
-	       s[k + 64] = ((INT32) cs_factor[i][k] * group3_table[n][1]) >> 1;
-	       s[k + 128] = ((INT32) cs_factor[i][k] * group3_table[n][2]) >> 1;
+	       s[k] = ((INT32) m->iup.cs_factor[i][k] * m->iup.group3_table[n][0]) >> 1;
+	       s[k + 64] = ((INT32) m->iup.cs_factor[i][k] * m->iup.group3_table[n][1]) >> 1;
+	       s[k + 128] = ((INT32) m->iup.cs_factor[i][k] * m->iup.group3_table[n][2]) >> 1;
 	       goto dispatch;
 	    case 2:		/* 5 levels grouped 7 bits */
 	       mac_load_check(7);
 	       n = mac_load(7);
-	       s[k] = ((INT32) cs_factor[i][k] * group5_table[n][0]) >> 2;
-	       s[k + 64] = ((INT32) cs_factor[i][k] * group5_table[n][1]) >> 2;
-	       s[k + 128] = ((INT32) cs_factor[i][k] * group5_table[n][2]) >> 2;
+	       s[k] = ((INT32) m->iup.cs_factor[i][k] * m->iup.group5_table[n][0]) >> 2;
+	       s[k + 64] = ((INT32) m->iup.cs_factor[i][k] * m->iup.group5_table[n][1]) >> 2;
+	       s[k + 128] = ((INT32) m->iup.cs_factor[i][k] * m->iup.group5_table[n][2]) >> 2;
 	       goto dispatch;
 	    case 3:
 	       UNPACK_N2(3)	/* 7 levels */
 	    case 4:		/* 9 levels grouped 10 bits */
 	       mac_load_check(10);
 	       n = mac_load(10);
-	       s[k] = ((INT32) cs_factor[i][k] * group9_table[n][0]) >> 3;
-	       s[k + 64] = ((INT32) cs_factor[i][k] * group9_table[n][1]) >> 3;
-	       s[k + 128] = ((INT32) cs_factor[i][k] * group9_table[n][2]) >> 3;
+	       s[k] = ((INT32) m->iup.cs_factor[i][k] * m->iup.group9_table[n][0]) >> 3;
+	       s[k + 64] = ((INT32) m->iup.cs_factor[i][k] * m->iup.group9_table[n][1]) >> 3;
+	       s[k + 128] = ((INT32) m->iup.cs_factor[i][k] * m->iup.group9_table[n][2]) >> 3;
 	       goto dispatch;
 	    case 5:
 	       UNPACK_N2(4)	/* 15 levels */
@@ -462,35 +406,35 @@ static void unpack_samp(void)	/* unpack samples */
 	       k++;		/* skip right chan dispatch */
 	       goto dispatch;
 	    case 18 + 1:	/* 3 levels grouped 5 bits */
-	       n = load(5);
-	       s[k] = ((INT32) cs_factor[i][k] * group3_table[n][0]) >> 1;
-	       s[k + 1] = ((INT32) cs_factor[i][k + 1] * group3_table[n][0]) >> 1;
-	       s[k + 64] = ((INT32) cs_factor[i][k] * group3_table[n][1]) >> 1;
-	       s[k + 64 + 1] = ((INT32) cs_factor[i][k + 1] * group3_table[n][1]) >> 1;
-	       s[k + 128] = ((INT32) cs_factor[i][k] * group3_table[n][2]) >> 1;
-	       s[k + 128 + 1] = ((INT32) cs_factor[i][k + 1] * group3_table[n][2]) >> 1;
+	       n = load(m,5);
+	       s[k] = ((INT32) m->iup.cs_factor[i][k] * m->iup.group3_table[n][0]) >> 1;
+	       s[k + 1] = ((INT32) m->iup.cs_factor[i][k + 1] * m->iup.group3_table[n][0]) >> 1;
+	       s[k + 64] = ((INT32) m->iup.cs_factor[i][k] * m->iup.group3_table[n][1]) >> 1;
+	       s[k + 64 + 1] = ((INT32) m->iup.cs_factor[i][k + 1] * m->iup.group3_table[n][1]) >> 1;
+	       s[k + 128] = ((INT32) m->iup.cs_factor[i][k] * m->iup.group3_table[n][2]) >> 1;
+	       s[k + 128 + 1] = ((INT32) m->iup.cs_factor[i][k + 1] * m->iup.group3_table[n][2]) >> 1;
 	       k++;		/* skip right chan dispatch */
 	       goto dispatch;
 	    case 18 + 2:	/* 5 levels grouped 7 bits */
-	       n = load(7);
-	       s[k] = ((INT32) cs_factor[i][k] * group5_table[n][0]) >> 2;
-	       s[k + 1] = ((INT32) cs_factor[i][k + 1] * group5_table[n][0]) >> 2;
-	       s[k + 64] = ((INT32) cs_factor[i][k] * group5_table[n][1]) >> 2;
-	       s[k + 64 + 1] = ((INT32) cs_factor[i][k + 1] * group5_table[n][1]) >> 2;
-	       s[k + 128] = ((INT32) cs_factor[i][k] * group5_table[n][2]) >> 2;
-	       s[k + 128 + 1] = ((INT32) cs_factor[i][k + 1] * group5_table[n][2]) >> 2;
+	       n = load(m,7);
+	       s[k] = ((INT32) m->iup.cs_factor[i][k] * m->iup.group5_table[n][0]) >> 2;
+	       s[k + 1] = ((INT32) m->iup.cs_factor[i][k + 1] * m->iup.group5_table[n][0]) >> 2;
+	       s[k + 64] = ((INT32) m->iup.cs_factor[i][k] * m->iup.group5_table[n][1]) >> 2;
+	       s[k + 64 + 1] = ((INT32) m->iup.cs_factor[i][k + 1] * m->iup.group5_table[n][1]) >> 2;
+	       s[k + 128] = ((INT32) m->iup.cs_factor[i][k] * m->iup.group5_table[n][2]) >> 2;
+	       s[k + 128 + 1] = ((INT32) m->iup.cs_factor[i][k + 1] * m->iup.group5_table[n][2]) >> 2;
 	       k++;		/* skip right chan dispatch */
 	       goto dispatch;
 	    case 18 + 3:
 	       UNPACKJ_N(3)	/* 7 levels */
 	    case 18 + 4:	/* 9 levels grouped 10 bits */
-	       n = load(10);
-	       s[k] = ((INT32) cs_factor[i][k] * group9_table[n][0]) >> 3;
-	       s[k + 1] = ((INT32) cs_factor[i][k + 1] * group9_table[n][0]) >> 3;
-	       s[k + 64] = ((INT32) cs_factor[i][k] * group9_table[n][1]) >> 3;
-	       s[k + 64 + 1] = ((INT32) cs_factor[i][k + 1] * group9_table[n][1]) >> 3;
-	       s[k + 128] = ((INT32) cs_factor[i][k] * group9_table[n][2]) >> 3;
-	       s[k + 128 + 1] = ((INT32) cs_factor[i][k + 1] * group9_table[n][2]) >> 3;
+	       n = load(m,10);
+	       s[k] = ((INT32) m->iup.cs_factor[i][k] * m->iup.group9_table[n][0]) >> 3;
+	       s[k + 1] = ((INT32) m->iup.cs_factor[i][k + 1] * m->iup.group9_table[n][0]) >> 3;
+	       s[k + 64] = ((INT32) m->iup.cs_factor[i][k] * m->iup.group9_table[n][1]) >> 3;
+	       s[k + 64 + 1] = ((INT32) m->iup.cs_factor[i][k + 1] * m->iup.group9_table[n][1]) >> 3;
+	       s[k + 128] = ((INT32) m->iup.cs_factor[i][k] * m->iup.group9_table[n][2]) >> 3;
+	       s[k + 128 + 1] = ((INT32) m->iup.cs_factor[i][k + 1] * m->iup.group9_table[n][2]) >> 3;
 	       k++;		/* skip right chan dispatch */
 	       goto dispatch;
 	    case 18 + 5:
@@ -521,7 +465,7 @@ static void unpack_samp(void)	/* unpack samples */
 	       UNPACKJ_N(16)	/* 65535 levels */
 /* -- end of dispatch -- */
 	    case 37:
-	       skip(bit_skip);
+	       skip(m, m->iup.bit_skip);
 	    case 36:
 	       s += 3 * 64;
 	 }			/* end switch */
@@ -531,52 +475,52 @@ static void unpack_samp(void)	/* unpack samples */
 
 }
 /*-------------------------------------------------------------------------*/
-static void unpack(void)
+static void unpack(MPEGI *m)
 {
    int prot;
 
 /* at entry bit getter points at id, sync skipped by caller */
 
-   load(3);			/* skip id and option (checked by init) */
-   prot = load(1);		/* load prot bit */
-   load(6);			/* skip to pad */
-   pad = load(1);
-   load(1);			/* skip to mode */
-   stereo_sb = look_joint[load(4)];
+   load(m,3);			/* skip id and option (checked by init) */
+   prot = load(m,1);		/* load prot bit */
+   load(m,6);			/* skip to pad */
+   m->iup.pad = load(m,1);
+   load(m,1);			/* skip to mode */
+   m->iup.stereo_sb = look_joint[load(m,4)];
    if (prot)
-      load(4);			/* skip to data */
+      load(m,4);			/* skip to data */
    else
-      load(20);			/* skip crc */
+      load(m,20);			/* skip crc */
 
-   unpack_ba();			/* unpack bit allocation */
-   unpack_sfs();		/* unpack scale factor selectors */
-   unpack_sf();			/* unpack scale factor */
-   unpack_samp();		/* unpack samples */
+   unpack_ba(m);			/* unpack bit allocation */
+   unpack_sfs(m);		/* unpack scale factor selectors */
+   unpack_sf(m);			/* unpack scale factor */
+   unpack_samp(m);		/* unpack samples */
 
 
 }
 /*-------------------------------------------------------------------------*/
-IN_OUT i_audio_decode(unsigned char *bs, signed short *pcm)
+IN_OUT i_audio_decode(MPEGI *m, unsigned char *bs, signed short *pcm)
 {
    int sync;
    IN_OUT in_out;
 
-   load_init(bs);		/* initialize bit getter */
+   load_init(m,bs);		/* initialize bit getter */
 /* test sync */
    in_out.in_bytes = 0;		/* assume fail */
    in_out.out_bytes = 0;
-   sync = load(12);
+   sync = load(m,12);
 
    if (sync != 0xFFF)
       return in_out;		/* sync fail */
 /*-----------*/
-   unpack_routine();
+   m->iup.unpack_routine();
 
 
-   sbt(sample, pcm, nsbt);
+   m->iup.sbt(m->iup.sample, pcm, m->iup.nsbt);
 /*-----------*/
-   in_out.in_bytes = framebytes + pad;
-   in_out.out_bytes = outbytes;
+   in_out.in_bytes = m->iup.framebytes + m->iup.pad;
+   in_out.out_bytes = m->iup.outbytes;
    return in_out;
 }
 /*-------------------------------------------------------------------------*/

@@ -33,86 +33,81 @@ icupL1 integer version of cupL1.c
 
 ******************************************************************/
 /*======================================================================*/
-static int nbatL1 = 32;
+/* Read Only */
 static int bat_bit_masterL1[] =
 {
    0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
 
-/*--- static int *cs_factorL1 = cs_factor[0];   ---*/
-static INT32 *cs_factorL1 = cs_factor[0];
-static int look_c_valueL1[16];	/* built by init */
-static int look_c_shiftL1[16];	/* built by init */
-
 /*======================================================================*/
-static void unpack_baL1(void)
+static void unpack_baL1(MPEGI *m)
 {
    int k;
    int nstereo;
    int n;
 
-   bit_skip = 0;
-   nstereo = stereo_sb;
-   for (k = 0; k < nbatL1; k++)
+   m->iup.bit_skip = 0;
+   nstereo = m->iup.stereo_sb;
+   for (k = 0; k < m->iup.nbatL1; k++)
    {
       mac_load_check(4);
-      n = ballo[k] = samp_dispatch[k] = mac_load(4);
-      if (k >= nsb_limit)
-	 bit_skip += bat_bit_masterL1[samp_dispatch[k]];
-      c_value[k] = look_c_valueL1[n];
-      c_shift[k] = look_c_shiftL1[n];
+      n = m->iup.ballo[k] = m->iup.samp_dispatch[k] = mac_load(4);
+      if (k >= m->iup.nsb_limit)
+	 m->iup.bit_skip += bat_bit_masterL1[m->iup.samp_dispatch[k]];
+      m->iup.c_value[k] = m->iup.look_c_valueL1[n];
+      m->iup.c_shift[k] = m->iup.look_c_shiftL1[n];
       if (--nstereo < 0)
       {
-	 ballo[k + 1] = ballo[k];
-	 samp_dispatch[k] += 15;	/* flag as joint */
-	 samp_dispatch[k + 1] = samp_dispatch[k];	/* flag for sf */
-	 c_value[k + 1] = c_value[k];
-	 c_shift[k + 1] = c_shift[k];
+	 m->iup.ballo[k + 1] = m->iup.ballo[k];
+	 m->iup.samp_dispatch[k] += 15;	/* flag as joint */
+	 m->iup.samp_dispatch[k + 1] = m->iup.samp_dispatch[k];	/* flag for sf */
+	 m->iup.c_value[k + 1] = m->iup.c_value[k];
+	 m->iup.c_shift[k + 1] = m->iup.c_shift[k];
 	 k++;
       }
    }
-   samp_dispatch[nsb_limit] = 31;	/* terminate the dispatcher with skip */
-   samp_dispatch[k] = 30;	/* terminate the dispatcher */
+   m->iup.samp_dispatch[m->iup.nsb_limit] = 31;	/* terminate the dispatcher with skip */
+   m->iup.samp_dispatch[k] = 30;	/* terminate the dispatcher */
 
 }
 /*-------------------------------------------------------------------------*/
-static void unpack_sfL1(void)	/* unpack scale factor */
+static void unpack_sfL1(MPEGI *m)	/* unpack scale factor */
 {				/* combine dequant and scale factors */
    int i, n;
    INT32 tmp;			/* only reason tmp is 32 bit is to get 32 bit mult result */
 
-   for (i = 0; i < nbatL1; i++)
+   for (i = 0; i < m->iup.nbatL1; i++)
    {
-      if (ballo[i])
+      if (m->iup.ballo[i])
       {
 	 mac_load_check(6);
-	 tmp = c_value[i];
-	 n = c_shift[i];
-	 cs_factorL1[i] = (tmp * sf_table[mac_load(6)]) >> n;
+	 tmp = m->iup.c_value[i];
+	 n = m->iup.c_shift[i];
+	 m->iup.cs_factorL1[i] = (tmp * m->iup.sf_table[mac_load(6)]) >> n;
       }
    }
 
 /*-- done --*/
 }
 /*-------------------------------------------------------------------------*/
-#define UNPACKL1_N(n)  s[k]     =  (cs_factorL1[k]*(load(n)-((1 << (n-1)) -1)))>>(n-1);   \
+#define UNPACKL1_N(n)  s[k]     =  (m->iup.cs_factorL1[k]*(load(m,n)-((1 << (n-1)) -1)))>>(n-1);   \
     goto dispatch;
-#define UNPACKL1J_N(n) tmp        =  (load(n)-((1 << (n-1)) -1));                 \
-    s[k]       =  (cs_factorL1[k]*tmp)>>(n-1);               \
-    s[k+1]     =  (cs_factorL1[k+1]*tmp)>>(n-1);             \
+#define UNPACKL1J_N(n) tmp        =  (load(m,n)-((1 << (n-1)) -1));                 \
+    s[k]       =  (m->iup.cs_factorL1[k]*tmp)>>(n-1);               \
+    s[k+1]     =  (m->iup.cs_factorL1[k+1]*tmp)>>(n-1);             \
     k++;       /* skip right chan dispatch */                \
     goto dispatch;
 /*-------------------------------------------------------------------------*/
-static void unpack_sampL1(void)	/* unpack samples */
+static void unpack_sampL1(MPEGI *m)	/* unpack samples */
 {
    int j, k;
    SAMPLEINT *s;
    INT32 tmp;
 
-   s = sample;
+   s = m->iup.sample;
    for (j = 0; j < 12; j++)
    {
       k = -1;
-    dispatch:switch (samp_dispatch[++k])
+    dispatch:switch (m->iup.samp_dispatch[++k])
       {
 	 case 0:
 	    s[k] = 0;
@@ -182,7 +177,7 @@ static void unpack_sampL1(void)	/* unpack samples */
 
 /* -- end of dispatch -- */
 	 case 31:
-	    skip(bit_skip);
+	    skip(m, m->iup.bit_skip);
 	 case 30:
 	    s += 64;
       }				/* end switch */
@@ -191,26 +186,26 @@ static void unpack_sampL1(void)	/* unpack samples */
 /*-- done --*/
 }
 /*-------------------------------------------------------------------------*/
-static void unpackL1(void)
+static void unpackL1(MPEGI *m)
 {
    int prot;
 
 /* at entry bit getter points at id, sync skipped by caller */
 
-   load(3);			/* skip id and option (checked by init) */
-   prot = load(1);		/* load prot bit */
-   load(6);			/* skip to pad */
-   pad = load(1) << 2;
-   load(1);			/* skip to mode */
-   stereo_sb = look_joint[load(4)];
+   load(m,3);			/* skip id and option (checked by init) */
+   prot = load(m,1);		/* load prot bit */
+   load(m,6);			/* skip to pad */
+   m->iup.pad = load(m,1) << 2;
+   load(m,1);			/* skip to mode */
+   m->iup.stereo_sb = look_joint[load(m,4)];
    if (prot)
-      load(4);			/* skip to data */
+      load(m,4);			/* skip to data */
    else
-      load(20);			/* skip crc */
+      load(m,20);			/* skip crc */
 
-   unpack_baL1();		/* unpack bit allocation */
-   unpack_sfL1();		/* unpack scale factor */
-   unpack_sampL1();		/* unpack samples */
+   unpack_baL1(m);		/* unpack bit allocation */
+   unpack_sfL1(m);		/* unpack scale factor */
+   unpack_sampL1(m);		/* unpack samples */
 
 
 }
@@ -220,12 +215,11 @@ static void unpackL1(void)
 #pragma warning(disable: 4056)
 #endif
 
-int i_audio_decode_initL1(MPEG_HEAD * h, int framebytes_arg,
+int i_audio_decode_initL1(MPEGI *m, MPEG_HEAD * h, int framebytes_arg,
 		   int reduction_code, int transform_code, int convert_code,
 			  int freq_limit)
 {
    int i, k;
-   static int first_pass = 1;
    long samprate;
    int limit;
    int stepbit;
@@ -234,21 +228,21 @@ int i_audio_decode_initL1(MPEG_HEAD * h, int framebytes_arg,
 
 /*--- sf table built by Layer II init ---*/
 
-   if (first_pass)
+   if (m->iup.first_pass_L1)
    {
       stepbit = 2;
       step = 4;
       for (i = 1; i < 16; i++)
       {
-	 look_c_valueL1[i] = (int) (32768.0 * 2.0 / (step - 1));
-	 look_c_shiftL1[i] = 16 - stepbit;
+	 m->iup.look_c_valueL1[i] = (int) (32768.0 * 2.0 / (step - 1));
+	 m->iup.look_c_shiftL1[i] = 16 - stepbit;
 	 stepbit++;
 	 step <<= 1;
       }
-      first_pass = 0;
+      m->iup.first_pass_L1 = 0;
    }
 
-   unpack_routine = unpackL1;
+   m->iup.unpack_routine = unpackL1;
 
 
    transform_code = transform_code;	/* not used, asm compatability */
@@ -264,63 +258,63 @@ int i_audio_decode_initL1(MPEG_HEAD * h, int framebytes_arg,
       freq_limit = 1000;
 
 
-   framebytes = framebytes_arg;
+   m->iup.framebytes = framebytes_arg;
 /* check if code handles */
    if (h->option != 3)
       return 0;			/* layer I only */
 
-   nbatL1 = 32;
-   max_sb = nbatL1;
+   m->iup.nbatL1 = 32;
+   m->iup.max_sb = m->iup.nbatL1;
 /*----- compute nsb_limit --------*/
    samprate = sr_table[4 * h->id + h->sr_index];
-   nsb_limit = (freq_limit * 64L + samprate / 2) / samprate;
+   m->iup.nsb_limit = (freq_limit * 64L + samprate / 2) / samprate;
 /*- caller limit -*/
 /*---- limit = 0.94*(32>>reduction_code);  ----*/
    limit = (32 >> reduction_code);
    if (limit > 8)
       limit--;
-   if (nsb_limit > limit)
-      nsb_limit = limit;
-   if (nsb_limit > max_sb)
-      nsb_limit = max_sb;
+   if (m->iup.nsb_limit > limit)
+      m->iup.nsb_limit = limit;
+   if (m->iup.nsb_limit > m->iup.max_sb)
+      m->iup.nsb_limit = m->iup.max_sb;
 
-   outvalues = 384 >> reduction_code;
+   m->iup.outvalues = 384 >> reduction_code;
    if (h->mode != 3)
    {				/* adjust for 2 channel modes */
-      nbatL1 *= 2;
-      max_sb *= 2;
-      nsb_limit *= 2;
+      m->iup.nbatL1 *= 2;
+      m->iup.max_sb *= 2;
+      m->iup.nsb_limit *= 2;
    }
 
 /* set sbt function */
-   nsbt = 12;
+   m->iup.nsbt = 12;
    k = 1 + convert_code;
    if (h->mode == 3)
    {
       k = 0;
    }
-   sbt = sbt_table[bit_code][reduction_code][k];
-   outvalues *= out_chans[k];
+   m->iup.sbt = sbt_table[bit_code][reduction_code][k];
+   m->iup.outvalues *= out_chans[k];
    if (bit_code != 0)
-      outbytes = outvalues;
+      m->iup.outbytes = m->iup.outvalues;
    else
-      outbytes = sizeof(short) * outvalues;
+      m->iup.outbytes = sizeof(short) * m->iup.outvalues;
 
-   decinfo.channels = out_chans[k];
-   decinfo.outvalues = outvalues;
-   decinfo.samprate = samprate >> reduction_code;
+   m->iup.decinfo.channels = out_chans[k];
+   m->iup.decinfo.outvalues = m->iup.outvalues;
+   m->iup.decinfo.samprate = samprate >> reduction_code;
    if (bit_code != 0)
-      decinfo.bits = 8;
+      m->iup.decinfo.bits = 8;
    else
-      decinfo.bits = sizeof(short) * 8;
+      m->iup.decinfo.bits = sizeof(short) * 8;
 
-   decinfo.framebytes = framebytes;
-   decinfo.type = 0;
+   m->iup.decinfo.framebytes = m->iup.framebytes;
+   m->iup.decinfo.type = 0;
 
 
 /* clear sample buffer, unused sub bands must be 0 */
    for (i = 0; i < 768; i++)
-      sample[i] = 0;
+      m->iup.sample[i] = 0;
 
 
 /* init sub-band transform */

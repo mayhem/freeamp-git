@@ -35,6 +35,8 @@ ____________________________________________________________________________*/
 #include <float.h>
 #include <math.h>
 #include "L3.h"
+#include "mhead.h"
+#include "protos.h"
 
 /* get rid of precision loss warnings on conversion */
 #ifdef _MSC_VER
@@ -42,33 +44,14 @@ ____________________________________________________________________________*/
 #endif
 
 
-/*---------- quant ---------------------------------*/
-/* 8 bit lookup x = pow(2.0, 0.25*(global_gain-210)) */
-float *quant_init_global_addr(void);
-
-
-/* x = pow(2.0, -0.5*(1+scalefact_scale)*scalefac + preemp) */
-typedef float LS[4][32];
-LS *quant_init_scale_addr(void);
-
-
-float *quant_init_pow_addr(void);
-float *quant_init_subblock_addr(void);
-
-typedef int iARRAY22[22];
-iARRAY22 *quant_init_band_addr(void);
-
-/*---------- antialias ---------------------------------*/
-typedef float PAIR[2];
-PAIR *alias_init_addr(void);
 
 static const float Ci[8] =
 {
    -0.6f, -0.535f, -0.33f, -0.185f, -0.095f, -0.041f, -0.0142f, -0.0037f};
 
 
-void hwin_init(void);		/* hybrid windows -- */
-void imdct_init(void);
+void hwin_init(MPEG *m);		/* hybrid windows -- */
+void imdct_init(MPEG *m);
 typedef struct
 {
    float *w;
@@ -77,11 +60,11 @@ typedef struct
 }
 IMDCT_INIT_BLOCK;
 
-void msis_init(void);
-void msis_init_MPEG2(void);
+void msis_init(MPEG *m);
+void msis_init_MPEG2(MPEG *m);
 
 /*=============================================================*/
-int L3table_init(void)
+int L3table_init(MPEG *m)
 {
    int i;
    float *x;
@@ -95,13 +78,13 @@ int L3table_init(void)
 /* 8 bit plus 2 lookup x = pow(2.0, 0.25*(global_gain-210)) */
 /* extra 2 for ms scaling by 1/sqrt(2) */
 /* extra 4 for cvt to mono scaling by 1/2 */
-   x = quant_init_global_addr();
+   x = quant_init_global_addr(m);
    for (i = 0; i < 256 + 2 + 4; i++)
       x[i] = (float) pow(2.0, 0.25 * ((i - (2 + 4)) - 210 + GLOBAL_GAIN_SCALE));
 
 
 /* x = pow(2.0, -0.5*(1+scalefact_scale)*scalefac + preemp) */
-   ls = quant_init_scale_addr();
+   ls = quant_init_scale_addr(m);
    for (scalefact_scale = 0; scalefact_scale < 2; scalefact_scale++)
    {
       for (preemp = 0; preemp < 4; preemp++)
@@ -115,7 +98,7 @@ int L3table_init(void)
    }
 
 /*--- iSample**(4/3) lookup, -32<=i<=31 ---*/
-   x = quant_init_pow_addr();
+   x = quant_init_pow_addr(m);
    for (i = 0; i < 64; i++)
    {
       tmp = i - 32;
@@ -124,18 +107,18 @@ int L3table_init(void)
 
 
 /*-- pow(2.0, -0.25*8.0*subblock_gain)  3 bits --*/
-   x = quant_init_subblock_addr();
+   x = quant_init_subblock_addr(m);
    for (i = 0; i < 8; i++)
    {
       x[i] = (float) pow(2.0, 0.25 * -8.0 * i);
    }
 
 /*-------------------------*/
-/* quant_init_sf_band(sr_index);   replaced by code in sup.c */
+// quant_init_sf_band(sr_index);   replaced by code in sup.c
 
 
 /*================ antialias ===============================*/
-   csa = alias_init_addr();
+   csa = alias_init_addr(m);
    for (i = 0; i < 8; i++)
    {
       csa[i][0] = (float) (1.0 / sqrt(1.0 + Ci[i] * Ci[i]));
@@ -144,29 +127,29 @@ int L3table_init(void)
 
 
 /*================ msis ===============================*/
-   msis_init();
-   msis_init_MPEG2();
+   msis_init(m);
+   msis_init_MPEG2(m);
 
 /*================ imdct ===============================*/
-   imdct_init();
+   imdct_init(m);
 
 /*--- hybrid windows ------------*/
-   hwin_init();
+   hwin_init(m);
 
    return 0;
 }
 /*====================================================================*/
 typedef float ARRAY36[36];
-ARRAY36 *hwin_init_addr(void);
+ARRAY36 *hwin_init_addr();
 
 /*--------------------------------------------------------------------*/
-void hwin_init(void)
+void hwin_init(MPEG *m)
 {
    int i, j;
    double pi;
    ARRAY36 *win;
 
-   win = hwin_init_addr();
+   win = hwin_init_addr(m);
 
    pi = 4.0 * atan(1.0);
 
@@ -217,11 +200,11 @@ void hwin_init(void)
 }
 /*=============================================================*/
 typedef float ARRAY4[4];
-IMDCT_INIT_BLOCK *imdct_init_addr_18(void);
-IMDCT_INIT_BLOCK *imdct_init_addr_6(void);
+IMDCT_INIT_BLOCK *imdct_init_addr_18();
+IMDCT_INIT_BLOCK *imdct_init_addr_6();
 
 /*-------------------------------------------------------------*/
-void imdct_init(void)
+void imdct_init(MPEG *m)
 {
    int k, p, n;
    double t, pi;
@@ -280,10 +263,10 @@ void imdct_init(void)
 }
 /*===============================================================*/
 typedef float ARRAY8_2[8][2];
-ARRAY8_2 *msis_init_addr(void);
+ARRAY8_2 *msis_init_addr(MPEG *m);
 
 /*-------------------------------------------------------------*/
-void msis_init()
+void msis_init(MPEG *m)
 {
    int i;
    double s, c;
@@ -291,7 +274,7 @@ void msis_init()
    double t;
    ARRAY8_2 *lr;
 
-   lr = msis_init_addr();
+   lr = msis_init_addr(m);
 
 
    pi = 4.0 * atan(1.0);
@@ -327,10 +310,10 @@ for(i=0;i<12;i++) nBand[1][i] =
 /*-------------------------------------------------------------*/
 /*===============================================================*/
 typedef float ARRAY2_64_2[2][64][2];
-ARRAY2_64_2 *msis_init_addr_MPEG2(void);
+ARRAY2_64_2 *msis_init_addr_MPEG2(MPEG *m);
 
 /*-------------------------------------------------------------*/
-void msis_init_MPEG2()
+void msis_init_MPEG2(MPEG *m)
 {
    int k, n;
    double t;
@@ -342,7 +325,7 @@ void msis_init_MPEG2()
    ms_factor[0] = 1.0;
    ms_factor[1] = (float) sqrt(2.0);
 
-   lr = msis_init_addr_MPEG2();
+   lr = msis_init_addr_MPEG2(m);
 
 /* intensity stereo MPEG2 */
 /* lr2[intensity_scale][ms_mode][sflen_offset+sf][left/right] */

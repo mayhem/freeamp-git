@@ -37,44 +37,38 @@ portable C
 #include <stdio.h>
 #include <float.h>
 #include <math.h>
+#include "L3.h"
+#include "mhead.h"
 
-void fdct32(float *, float *);
-void fdct32_dual(float *, float *);
-void fdct32_dual_mono(float *, float *);
-void fdct16(float *, float *);
-void fdct16_dual(float *, float *);
-void fdct16_dual_mono(float *, float *);
-void fdct8(float *, float *);
-void fdct8_dual(float *, float *);
-void fdct8_dual_mono(float *, float *);
+void fdct32(MPEG *m, float *, float *);
+void fdct32_dual(MPEG *m, float *, float *);
+void fdct32_dual_mono(MPEG *m, float *, float *);
+void fdct16(MPEG *m, float *, float *);
+void fdct16_dual(MPEG *m, float *, float *);
+void fdct16_dual_mono(MPEG *m, float *, float *);
+void fdct8(MPEG *m, float *, float *);
+void fdct8_dual(MPEG *m, float *, float *);
+void fdct8_dual_mono(MPEG *m, float *, float *);
 
-void window(float *vbuf, int vb_ptr, short *pcm);
-void window_dual(float *vbuf, int vb_ptr, short *pcm);
-void window16(float *vbuf, int vb_ptr, short *pcm);
-void window16_dual(float *vbuf, int vb_ptr, short *pcm);
-void window8(float *vbuf, int vb_ptr, short *pcm);
-void window8_dual(float *vbuf, int vb_ptr, short *pcm);
-float *dct_coef_addr(void);
-
-float *dct_coef_addr(void);
+void window(MPEG *m, float *, int , short *pcm);
+void window_dual(MPEG *m, float *, int , short *pcm);
+void window16(MPEG *m, float *, int , short *pcm);
+void window16_dual(MPEG *m, float *, int , short *pcm);
+void window8(MPEG *m, float *, int , short *pcm);
+void window8_dual(MPEG *m, float *, int , short *pcm);
+float *dct_coef_addr(MPEG *m);
 
 /*-------------------------------------------------------------------------*/
 /* circular window buffers */
-static signed int vb_ptr;
-static signed int vb2_ptr;
-static float vbuf[512];
-static float vbuf2[512];
-
-float *dct_coef_addr(void);
 
 /*======================================================================*/
-static void gencoef(void)	/* gen coef for N=32 (31 coefs) */
+static void gencoef(MPEG *m)		/* gen coef for N=32 (31 coefs) */
 {
    int p, n, i, k;
    double t, pi;
    float *coef32;
 
-   coef32 = dct_coef_addr();
+   coef32 = dct_coef_addr(m);
 
    pi = 4.0 * atan(1.0);
    n = 16;
@@ -90,56 +84,55 @@ static void gencoef(void)	/* gen coef for N=32 (31 coefs) */
    }
 }
 /*------------------------------------------------------------*/
-void sbt_init(void)
+void sbt_init(MPEG *m)
 {
    int i;
-   static int first_pass = 1;
 
-   if (first_pass)
+   if (m->csbt.first_pass)
    {
-      gencoef();
-      first_pass = 0;
+      gencoef(m);
+      m->csbt.first_pass = 0;
    }
 
-/* clear window vbuf */
+/* clear window m->csbt.vbuf */
    for (i = 0; i < 512; i++)
    {
-      vbuf[i] = 0.0F;
-      vbuf2[i] = 0.0F;
+      m->csbt.vbuf[i] = 0.0F;
+      m->csbt.vbuf2[i] = 0.0F;
    }
-   vb2_ptr = vb_ptr = 0;
+   m->csbt.vb2_ptr = m->csbt.vb_ptr = 0;
 
 }
 /*============================================================*/
 /*============================================================*/
 /*============================================================*/
-void sbt_mono(float *sample, short *pcm, int n)
+void sbt_mono(MPEG *m, float *sample, short *pcm, int n)
 {
    int i;
 
    for (i = 0; i < n; i++)
    {
-      fdct32(sample, vbuf + vb_ptr);
-      window(vbuf, vb_ptr, pcm);
+      fdct32(m, sample, m->csbt.vbuf + m->csbt.vb_ptr);
+      window(m, m->csbt.vbuf, m->csbt.vb_ptr, pcm);
       sample += 64;
-      vb_ptr = (vb_ptr - 32) & 511;
+      m->csbt.vb_ptr = (m->csbt.vb_ptr - 32) & 511;
       pcm += 32;
    }
 
 }
 /*------------------------------------------------------------*/
-void sbt_dual(float *sample, short *pcm, int n)
+void sbt_dual(MPEG *m, float *sample, short *pcm, int n)
 {
    int i;
 
    for (i = 0; i < n; i++)
    {
-      fdct32_dual(sample, vbuf + vb_ptr);
-      fdct32_dual(sample + 1, vbuf2 + vb_ptr);
-      window_dual(vbuf, vb_ptr, pcm);
-      window_dual(vbuf2, vb_ptr, pcm + 1);
+      fdct32_dual(m,sample, m->csbt.vbuf + m->csbt.vb_ptr);
+      fdct32_dual(m,sample + 1, m->csbt.vbuf2 + m->csbt.vb_ptr);
+      window_dual(m,m->csbt.vbuf, m->csbt.vb_ptr, pcm);
+      window_dual(m,m->csbt.vbuf2, m->csbt.vb_ptr, pcm + 1);
       sample += 64;
-      vb_ptr = (vb_ptr - 32) & 511;
+      m->csbt.vb_ptr = (m->csbt.vb_ptr - 32) & 511;
       pcm += 64;
    }
 
@@ -147,201 +140,201 @@ void sbt_dual(float *sample, short *pcm, int n)
 }
 /*------------------------------------------------------------*/
 /* convert dual to mono */
-void sbt_dual_mono(float *sample, short *pcm, int n)
+void sbt_dual_mono(MPEG *m, float *sample, short *pcm, int n)
 {
    int i;
 
    for (i = 0; i < n; i++)
    {
-      fdct32_dual_mono(sample, vbuf + vb_ptr);
-      window(vbuf, vb_ptr, pcm);
+      fdct32_dual_mono(m,sample, m->csbt.vbuf + m->csbt.vb_ptr);
+      window(m,m->csbt.vbuf, m->csbt.vb_ptr, pcm);
       sample += 64;
-      vb_ptr = (vb_ptr - 32) & 511;
+      m->csbt.vb_ptr = (m->csbt.vb_ptr - 32) & 511;
       pcm += 32;
    }
 
 }
 /*------------------------------------------------------------*/
 /* convert dual to left */
-void sbt_dual_left(float *sample, short *pcm, int n)
+void sbt_dual_left(MPEG *m, float *sample, short *pcm, int n)
 {
    int i;
 
    for (i = 0; i < n; i++)
    {
-      fdct32_dual(sample, vbuf + vb_ptr);
-      window(vbuf, vb_ptr, pcm);
+      fdct32_dual(m,sample, m->csbt.vbuf + m->csbt.vb_ptr);
+      window(m,m->csbt.vbuf, m->csbt.vb_ptr, pcm);
       sample += 64;
-      vb_ptr = (vb_ptr - 32) & 511;
+      m->csbt.vb_ptr = (m->csbt.vb_ptr - 32) & 511;
       pcm += 32;
    }
 }
 /*------------------------------------------------------------*/
 /* convert dual to right */
-void sbt_dual_right(float *sample, short *pcm, int n)
+void sbt_dual_right(MPEG *m, float *sample, short *pcm, int n)
 {
    int i;
 
    sample++;			/* point to right chan */
    for (i = 0; i < n; i++)
    {
-      fdct32_dual(sample, vbuf + vb_ptr);
-      window(vbuf, vb_ptr, pcm);
+      fdct32_dual(m,sample, m->csbt.vbuf + m->csbt.vb_ptr);
+      window(m,m->csbt.vbuf, m->csbt.vb_ptr, pcm);
       sample += 64;
-      vb_ptr = (vb_ptr - 32) & 511;
+      m->csbt.vb_ptr = (m->csbt.vb_ptr - 32) & 511;
       pcm += 32;
    }
 }
 /*------------------------------------------------------------*/
 /*---------------- 16 pt sbt's  -------------------------------*/
 /*------------------------------------------------------------*/
-void sbt16_mono(float *sample, short *pcm, int n)
+void sbt16_mono(MPEG *m, float *sample, short *pcm, int n)
 {
    int i;
 
    for (i = 0; i < n; i++)
    {
-      fdct16(sample, vbuf + vb_ptr);
-      window16(vbuf, vb_ptr, pcm);
+      fdct16(m,sample, m->csbt.vbuf + m->csbt.vb_ptr);
+      window16(m,m->csbt.vbuf, m->csbt.vb_ptr, pcm);
       sample += 64;
-      vb_ptr = (vb_ptr - 16) & 255;
+      m->csbt.vb_ptr = (m->csbt.vb_ptr - 16) & 255;
       pcm += 16;
    }
 
 
 }
 /*------------------------------------------------------------*/
-void sbt16_dual(float *sample, short *pcm, int n)
+void sbt16_dual(MPEG *m, float *sample, short *pcm, int n)
 {
    int i;
 
    for (i = 0; i < n; i++)
    {
-      fdct16_dual(sample, vbuf + vb_ptr);
-      fdct16_dual(sample + 1, vbuf2 + vb_ptr);
-      window16_dual(vbuf, vb_ptr, pcm);
-      window16_dual(vbuf2, vb_ptr, pcm + 1);
+      fdct16_dual(m,sample, m->csbt.vbuf + m->csbt.vb_ptr);
+      fdct16_dual(m,sample + 1, m->csbt.vbuf2 + m->csbt.vb_ptr);
+      window16_dual(m,m->csbt.vbuf, m->csbt.vb_ptr, pcm);
+      window16_dual(m,m->csbt.vbuf2, m->csbt.vb_ptr, pcm + 1);
       sample += 64;
-      vb_ptr = (vb_ptr - 16) & 255;
+      m->csbt.vb_ptr = (m->csbt.vb_ptr - 16) & 255;
       pcm += 32;
    }
 }
 /*------------------------------------------------------------*/
-void sbt16_dual_mono(float *sample, short *pcm, int n)
+void sbt16_dual_mono(MPEG *m, float *sample, short *pcm, int n)
 {
    int i;
 
    for (i = 0; i < n; i++)
    {
-      fdct16_dual_mono(sample, vbuf + vb_ptr);
-      window16(vbuf, vb_ptr, pcm);
+      fdct16_dual_mono(m,sample, m->csbt.vbuf + m->csbt.vb_ptr);
+      window16(m,m->csbt.vbuf, m->csbt.vb_ptr, pcm);
       sample += 64;
-      vb_ptr = (vb_ptr - 16) & 255;
+      m->csbt.vb_ptr = (m->csbt.vb_ptr - 16) & 255;
       pcm += 16;
    }
 }
 /*------------------------------------------------------------*/
-void sbt16_dual_left(float *sample, short *pcm, int n)
+void sbt16_dual_left(MPEG *m, float *sample, short *pcm, int n)
 {
    int i;
 
    for (i = 0; i < n; i++)
    {
-      fdct16_dual(sample, vbuf + vb_ptr);
-      window16(vbuf, vb_ptr, pcm);
+      fdct16_dual(m,sample, m->csbt.vbuf + m->csbt.vb_ptr);
+      window16(m,m->csbt.vbuf, m->csbt.vb_ptr, pcm);
       sample += 64;
-      vb_ptr = (vb_ptr - 16) & 255;
+      m->csbt.vb_ptr = (m->csbt.vb_ptr - 16) & 255;
       pcm += 16;
    }
 }
 /*------------------------------------------------------------*/
-void sbt16_dual_right(float *sample, short *pcm, int n)
+void sbt16_dual_right(MPEG *m, float *sample, short *pcm, int n)
 {
    int i;
 
    sample++;
    for (i = 0; i < n; i++)
    {
-      fdct16_dual(sample, vbuf + vb_ptr);
-      window16(vbuf, vb_ptr, pcm);
+      fdct16_dual(m,sample, m->csbt.vbuf + m->csbt.vb_ptr);
+      window16(m,m->csbt.vbuf, m->csbt.vb_ptr, pcm);
       sample += 64;
-      vb_ptr = (vb_ptr - 16) & 255;
+      m->csbt.vb_ptr = (m->csbt.vb_ptr - 16) & 255;
       pcm += 16;
    }
 }
 /*------------------------------------------------------------*/
 /*---------------- 8 pt sbt's  -------------------------------*/
 /*------------------------------------------------------------*/
-void sbt8_mono(float *sample, short *pcm, int n)
+void sbt8_mono(MPEG *m, float *sample, short *pcm, int n)
 {
    int i;
 
    for (i = 0; i < n; i++)
    {
-      fdct8(sample, vbuf + vb_ptr);
-      window8(vbuf, vb_ptr, pcm);
+      fdct8(m,sample, m->csbt.vbuf + m->csbt.vb_ptr);
+      window8(m,m->csbt.vbuf, m->csbt.vb_ptr, pcm);
       sample += 64;
-      vb_ptr = (vb_ptr - 8) & 127;
+      m->csbt.vb_ptr = (m->csbt.vb_ptr - 8) & 127;
       pcm += 8;
    }
 
 }
 /*------------------------------------------------------------*/
-void sbt8_dual(float *sample, short *pcm, int n)
+void sbt8_dual(MPEG *m, float *sample, short *pcm, int n)
 {
    int i;
 
    for (i = 0; i < n; i++)
    {
-      fdct8_dual(sample, vbuf + vb_ptr);
-      fdct8_dual(sample + 1, vbuf2 + vb_ptr);
-      window8_dual(vbuf, vb_ptr, pcm);
-      window8_dual(vbuf2, vb_ptr, pcm + 1);
+      fdct8_dual(m,sample, m->csbt.vbuf + m->csbt.vb_ptr);
+      fdct8_dual(m,sample + 1, m->csbt.vbuf2 + m->csbt.vb_ptr);
+      window8_dual(m,m->csbt.vbuf, m->csbt.vb_ptr, pcm);
+      window8_dual(m,m->csbt.vbuf2, m->csbt.vb_ptr, pcm + 1);
       sample += 64;
-      vb_ptr = (vb_ptr - 8) & 127;
+      m->csbt.vb_ptr = (m->csbt.vb_ptr - 8) & 127;
       pcm += 16;
    }
 }
 /*------------------------------------------------------------*/
-void sbt8_dual_mono(float *sample, short *pcm, int n)
+void sbt8_dual_mono(MPEG *m, float *sample, short *pcm, int n)
 {
    int i;
 
    for (i = 0; i < n; i++)
    {
-      fdct8_dual_mono(sample, vbuf + vb_ptr);
-      window8(vbuf, vb_ptr, pcm);
+      fdct8_dual_mono(m,sample, m->csbt.vbuf + m->csbt.vb_ptr);
+      window8(m,m->csbt.vbuf, m->csbt.vb_ptr, pcm);
       sample += 64;
-      vb_ptr = (vb_ptr - 8) & 127;
+      m->csbt.vb_ptr = (m->csbt.vb_ptr - 8) & 127;
       pcm += 8;
    }
 }
 /*------------------------------------------------------------*/
-void sbt8_dual_left(float *sample, short *pcm, int n)
+void sbt8_dual_left(MPEG *m, float *sample, short *pcm, int n)
 {
    int i;
 
    for (i = 0; i < n; i++)
    {
-      fdct8_dual(sample, vbuf + vb_ptr);
-      window8(vbuf, vb_ptr, pcm);
+      fdct8_dual(m,sample, m->csbt.vbuf + m->csbt.vb_ptr);
+      window8(m,m->csbt.vbuf, m->csbt.vb_ptr, pcm);
       sample += 64;
-      vb_ptr = (vb_ptr - 8) & 127;
+      m->csbt.vb_ptr = (m->csbt.vb_ptr - 8) & 127;
       pcm += 8;
    }
 }
 /*------------------------------------------------------------*/
-void sbt8_dual_right(float *sample, short *pcm, int n)
+void sbt8_dual_right(MPEG *m, float *sample, short *pcm, int n)
 {
    int i;
 
    sample++;
    for (i = 0; i < n; i++)
    {
-      fdct8_dual(sample, vbuf + vb_ptr);
-      window8(vbuf, vb_ptr, pcm);
+      fdct8_dual(m,sample, m->csbt.vbuf + m->csbt.vb_ptr);
+      window8(m,m->csbt.vbuf, m->csbt.vb_ptr, pcm);
       sample += 64;
-      vb_ptr = (vb_ptr - 8) & 127;
+      m->csbt.vb_ptr = (m->csbt.vb_ptr - 8) & 127;
       pcm += 8;
    }
 }

@@ -46,7 +46,7 @@ mod 11/15/95 for Layer I
 
 
 
-
+/* Read Only */
 static long steps[18] =
 {
    0, 3, 5, 7, 9, 15, 31, 63, 127,
@@ -55,6 +55,7 @@ static long steps[18] =
 
 /* ABCD_INDEX = lookqt[mode][sr_index][br_index]  */
 /* -1 = invalid  */
+/* Read Only */
 static signed char lookqt[4][3][16] =
 {
  {{1, -1, -1, -1, 2, -1, 2, 0, 0, 0, 1, 1, 1, 1, 1, -1},	/*  44ks stereo */
@@ -66,16 +67,16 @@ static signed char lookqt[4][3][16] =
  {{1, -1, -1, -1, 2, -1, 2, 0, 0, 0, 1, 1, 1, 1, 1, -1},	/*  44ks dual chan */
   {0, -1, -1, -1, 2, -1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -1},	/*  48ks */
   {1, -1, -1, -1, 3, -1, 3, 0, 0, 0, 1, 1, 1, 1, 1, -1}},	/*  32ks */
-/* mono extended beyond legal br index */
-/*  1,2,2,0,0,0,1,1,1,1,1,1,1,1,1,-1, */         /*  44ks single chan */
-/*  0,2,2,0,0,0,0,0,0,0,0,0,0,0,0,-1, */         /*  48ks */
-/*  1,3,3,0,0,0,1,1,1,1,1,1,1,1,1,-1, */         /*  32ks */
-/* legal mono */
+// mono extended beyond legal br index
+//  1,2,2,0,0,0,1,1,1,1,1,1,1,1,1,-1,          /*  44ks single chan */
+//  0,2,2,0,0,0,0,0,0,0,0,0,0,0,0,-1,          /*  48ks */
+//  1,3,3,0,0,0,1,1,1,1,1,1,1,1,1,-1,          /*  32ks */
+// legal mono
  {{1, 2, 2, 0, 0, 0, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1},	/*  44ks single chan */
   {0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1, -1, -1},	/*  48ks */
   {1, 3, 3, 0, 0, 0, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1}},	/*  32ks */
 };
-
+/* Read Only */
 static long sr_table[8] =
 {22050L, 24000L, 16000L, 1L,
  44100L, 48000L, 32000L, 1L};
@@ -83,6 +84,7 @@ static long sr_table[8] =
 /* bit allocation table look up */
 /* table per mpeg spec tables 3b2a/b/c/d  /e is mpeg2 */
 /* look_bat[abcd_index][4][16]  */
+/* Read Only */
 static unsigned char look_bat[5][4][16] =
 {
 /* LOOK_BATA */
@@ -113,6 +115,7 @@ static unsigned char look_bat[5][4][16] =
 };
 
 /* look_nbat[abcd_index]][4] */
+/* Read Only */
 static unsigned char look_nbat[5][4] =
 {
   {3, 8, 12, 4},
@@ -123,60 +126,60 @@ static unsigned char look_nbat[5][4] =
 };
 
 
-void sbt_mono(float *sample, short *pcm, int n);
-void sbt_dual(float *sample, short *pcm, int n);
-void sbt_dual_mono(float *sample, short *pcm, int n);
-void sbt_dual_left(float *sample, short *pcm, int n);
-void sbt_dual_right(float *sample, short *pcm, int n);
-void sbt16_mono(float *sample, short *pcm, int n);
-void sbt16_dual(float *sample, short *pcm, int n);
-void sbt16_dual_mono(float *sample, short *pcm, int n);
-void sbt16_dual_left(float *sample, short *pcm, int n);
-void sbt16_dual_right(float *sample, short *pcm, int n);
-void sbt8_mono(float *sample, short *pcm, int n);
-void sbt8_dual(float *sample, short *pcm, int n);
-void sbt8_dual_mono(float *sample, short *pcm, int n);
-void sbt8_dual_left(float *sample, short *pcm, int n);
-void sbt8_dual_right(float *sample, short *pcm, int n);
+void sbt_mono(MPEG *m, float *sample, short *pcm, int n);
+void sbt_dual(MPEG *m, float *sample, short *pcm, int n);
+void sbt_dual_mono(MPEG *m, float *sample, short *pcm, int n);
+void sbt_dual_left(MPEG *m, float *sample, short *pcm, int n);
+void sbt_dual_right(MPEG *m, float *sample, short *pcm, int n);
+void sbt16_mono(MPEG *m, float *sample, short *pcm, int n);
+void sbt16_dual(MPEG *m, float *sample, short *pcm, int n);
+void sbt16_dual_mono(MPEG *m, float *sample, short *pcm, int n);
+void sbt16_dual_left(MPEG *m, float *sample, short *pcm, int n);
+void sbt16_dual_right(MPEG *m, float *sample, short *pcm, int n);
+void sbt8_mono(MPEG *m, float *sample, short *pcm, int n);
+void sbt8_dual(MPEG *m, float *sample, short *pcm, int n);
+void sbt8_dual_mono(MPEG *m, float *sample, short *pcm, int n);
+void sbt8_dual_left(MPEG *m, float *sample, short *pcm, int n);
+void sbt8_dual_right(MPEG *m, float *sample, short *pcm, int n);
 
 /*--- 8 bit output ---*/
-void sbtB_mono(float *sample, unsigned char *pcm, int n);
-void sbtB_dual(float *sample, unsigned char *pcm, int n);
-void sbtB_dual_mono(float *sample, unsigned char *pcm, int n);
-void sbtB_dual_left(float *sample, unsigned char *pcm, int n);
-void sbtB_dual_right(float *sample, unsigned char *pcm, int n);
-void sbtB16_mono(float *sample, unsigned char *pcm, int n);
-void sbtB16_dual(float *sample, unsigned char *pcm, int n);
-void sbtB16_dual_mono(float *sample, unsigned char *pcm, int n);
-void sbtB16_dual_left(float *sample, unsigned char *pcm, int n);
-void sbtB16_dual_right(float *sample, unsigned char *pcm, int n);
-void sbtB8_mono(float *sample, unsigned char *pcm, int n);
-void sbtB8_dual(float *sample, unsigned char *pcm, int n);
-void sbtB8_dual_mono(float *sample, unsigned char *pcm, int n);
-void sbtB8_dual_left(float *sample, unsigned char *pcm, int n);
-void sbtB8_dual_right(float *sample, unsigned char *pcm, int n);
+void sbtB_mono(MPEG *m, float *sample, unsigned char *pcm, int n);
+void sbtB_dual(MPEG *m, float *sample, unsigned char *pcm, int n);
+void sbtB_dual_mono(MPEG *m, float *sample, unsigned char *pcm, int n);
+void sbtB_dual_left(MPEG *m, float *sample, unsigned char *pcm, int n);
+void sbtB_dual_right(MPEG *m, float *sample, unsigned char *pcm, int n);
+void sbtB16_mono(MPEG *m, float *sample, unsigned char *pcm, int n);
+void sbtB16_dual(MPEG *m, float *sample, unsigned char *pcm, int n);
+void sbtB16_dual_mono(MPEG *m, float *sample, unsigned char *pcm, int n);
+void sbtB16_dual_left(MPEG *m, float *sample, unsigned char *pcm, int n);
+void sbtB16_dual_right(MPEG *m, float *sample, unsigned char *pcm, int n);
+void sbtB8_mono(MPEG *m, float *sample, unsigned char *pcm, int n);
+void sbtB8_dual(MPEG *m, float *sample, unsigned char *pcm, int n);
+void sbtB8_dual_mono(MPEG *m, float *sample, unsigned char *pcm, int n);
+void sbtB8_dual_left(MPEG *m, float *sample, unsigned char *pcm, int n);
+void sbtB8_dual_right(MPEG *m, float *sample, unsigned char *pcm, int n);
 
 
-static SBT_FUNCTION sbt_table[2][3][5] =
+static SBT_FUNCTION_F sbt_table[2][3][5] =
 {
  {{sbt_mono, sbt_dual, sbt_dual_mono, sbt_dual_left, sbt_dual_right},
   {sbt16_mono, sbt16_dual, sbt16_dual_mono, sbt16_dual_left, sbt16_dual_right},
   {sbt8_mono, sbt8_dual, sbt8_dual_mono, sbt8_dual_left, sbt8_dual_right}},
- {{(SBT_FUNCTION) sbtB_mono,
-   (SBT_FUNCTION) sbtB_dual,
-   (SBT_FUNCTION) sbtB_dual_mono,
-   (SBT_FUNCTION) sbtB_dual_left,
-   (SBT_FUNCTION) sbtB_dual_right},
-  {(SBT_FUNCTION) sbtB16_mono,
-   (SBT_FUNCTION) sbtB16_dual,
-   (SBT_FUNCTION) sbtB16_dual_mono,
-   (SBT_FUNCTION) sbtB16_dual_left,
-   (SBT_FUNCTION) sbtB16_dual_right},
-  {(SBT_FUNCTION) sbtB8_mono,
-   (SBT_FUNCTION) sbtB8_dual,
-   (SBT_FUNCTION) sbtB8_dual_mono,
-   (SBT_FUNCTION) sbtB8_dual_left,
-   (SBT_FUNCTION) sbtB8_dual_right}},
+ {{(SBT_FUNCTION_F) sbtB_mono,
+   (SBT_FUNCTION_F) sbtB_dual,
+   (SBT_FUNCTION_F) sbtB_dual_mono,
+   (SBT_FUNCTION_F) sbtB_dual_left,
+   (SBT_FUNCTION_F) sbtB_dual_right},
+  {(SBT_FUNCTION_F) sbtB16_mono,
+   (SBT_FUNCTION_F) sbtB16_dual,
+   (SBT_FUNCTION_F) sbtB16_dual_mono,
+   (SBT_FUNCTION_F) sbtB16_dual_left,
+   (SBT_FUNCTION_F) sbtB16_dual_right},
+  {(SBT_FUNCTION_F) sbtB8_mono,
+   (SBT_FUNCTION_F) sbtB8_dual,
+   (SBT_FUNCTION_F) sbtB8_dual_mono,
+   (SBT_FUNCTION_F) sbtB8_dual_left,
+   (SBT_FUNCTION_F) sbtB8_dual_right}},
 };
 
 static int out_chans[5] =
@@ -186,12 +189,12 @@ static int out_chans[5] =
 int audio_decode_initL1(MPEG_HEAD * h, int framebytes_arg,
 		   int reduction_code, int transform_code, int convert_code,
 			int freq_limit);
-void sbt_init(void);
+void sbt_init(MPEG *m);
 
 
-IN_OUT L1audio_decode(unsigned char *bs, signed short *pcm);
-IN_OUT L2audio_decode(unsigned char *bs, signed short *pcm);
-IN_OUT L3audio_decode(unsigned char *bs, unsigned char *pcm);
+IN_OUT L1audio_decode(void *mv, unsigned char *bs, signed short *pcm);
+IN_OUT L2audio_decode(void *mv, unsigned char *bs, signed short *pcm);
+IN_OUT L3audio_decode(void *mv, unsigned char *bs, unsigned char *pcm);
 static AUDIO_DECODE_ROUTINE decode_routine_table[4] =
 {
    L2audio_decode,
@@ -199,19 +202,59 @@ static AUDIO_DECODE_ROUTINE decode_routine_table[4] =
    L2audio_decode,
    L1audio_decode,};
 
+extern void cup3_init(MPEG *m);
+
+void mpeg_init(MPEG *m)
+{
+   // Init everything but the equalizer stuff -- that is done in the
+   // function below. This is seperate, because we don't want to reset
+   // the eq when we reset the decoder
+	memset(m, 0, sizeof(MPEG) - sizeof(eq_info));
+
+	m->cup.nsb_limit = 6;
+	m->cup.nbat[0] = 3;
+	m->cup.nbat[1] = 8;
+	m->cup.nbat[3] = 12;
+	m->cup.nbat[4] = 7;
+	m->cup.sbt = sbt_mono;
+	m->cup.first_pass = 1;
+	m->cup.first_pass_L1 = 1;
+	m->cup.audio_decode_routine = L2audio_decode;
+	m->cup.cs_factorL1 = m->cup.cs_factor[0];
+	m->cup.nbatL1 = 32;
+	m->cupl.band_limit = 576;
+	m->cupl.band_limit21 = 567;
+	m->cupl.band_limit12 = 576;
+	m->cupl.band_limit_nsb = 32;
+	m->cupl.nsb_limit=32;
+	m->cup.sample = (float *)&m->cupl.sample;
+	m->csbt.first_pass = 1;
+	cup3_init(m);
+}
+
+void mpeg_eq_init(MPEG *m)
+{
+   int i;
+
+   m->eq.enableEQ = 0;
+   for(i = 0; i < 32; i++)
+      m->eq.equalizer[i] = 1.0;
+   m->eq.EQ_gain_adjust = 1.0;
+}
+
 /*---------------------------------------------------------*/
-static void table_init(void)
+static void table_init(MPEG *m)
 {
    int i, j;
    int code;
 
 /*--  c_values (dequant) --*/
    for (i = 1; i < 18; i++)
-      look_c_value[i] = 2.0F / steps[i];
+      m->cup.look_c_value[i] = 2.0F / steps[i];
 
 /*--  scale factor table, scale by 32768 for 16 pcm output  --*/
    for (i = 0; i < 64; i++)
-      sf_table[i] = (float) (32768.0 * 2.0 * pow(2.0, -i / 3.0));
+      m->cup.sf_table[i] = (float) (32768.0 * 2.0 * pow(2.0, -i / 3.0));
 
 /*--  grouped 3 level lookup table 5 bit token --*/
    for (i = 0; i < 32; i++)
@@ -219,7 +262,7 @@ static void table_init(void)
       code = i;
       for (j = 0; j < 3; j++)
       {
-	 group3_table[i][j] = (char) ((code % 3) - 1);
+	 m->cup.group3_table[i][j] = (char) ((code % 3) - 1);
 	 code /= 3;
       }
    }
@@ -229,7 +272,7 @@ static void table_init(void)
       code = i;
       for (j = 0; j < 3; j++)
       {
-	 group5_table[i][j] = (char) ((code % 5) - 2);
+	 m->cup.group5_table[i][j] = (char) ((code % 5) - 2);
 	 code /= 5;
       }
    }
@@ -239,7 +282,7 @@ static void table_init(void)
       code = i;
       for (j = 0; j < 3; j++)
       {
-	 group9_table[i][j] = (short) ((code % 9) - 4);
+	 m->cup.group9_table[i][j] = (short) ((code % 9) - 4);
 	 code /= 9;
       }
    }
@@ -247,42 +290,41 @@ static void table_init(void)
 
 }
 /*---------------------------------------------------------*/
-int L1audio_decode_init(MPEG_HEAD * h, int framebytes_arg,
+int L1audio_decode_init(MPEG *m, MPEG_HEAD * h, int framebytes_arg,
 		   int reduction_code, int transform_code, int convert_code,
 			int freq_limit);
-int L3audio_decode_init(MPEG_HEAD * h, int framebytes_arg,
+int L3audio_decode_init(MPEG *m, MPEG_HEAD * h, int framebytes_arg,
 		   int reduction_code, int transform_code, int convert_code,
 			int freq_limit);
 
 /*---------------------------------------------------------*/
 /* mpeg_head defined in mhead.h  frame bytes is without pad */
-int audio_decode_init(MPEG_HEAD * h, int framebytes_arg,
+int audio_decode_init(MPEG *m, MPEG_HEAD * h, int framebytes_arg,
 		   int reduction_code, int transform_code, int convert_code,
 		      int freq_limit)
 {
    int i, j, k;
-   static int first_pass = 1;
    int abcd_index;
    long samprate;
    int limit;
    int bit_code;
 
-   if (first_pass)
+   if (m->cup.first_pass)
    {
-      table_init();
-      first_pass = 0;
+      table_init(m);
+      m->cup.first_pass = 0;
    }
 
 /* select decoder routine Layer I,II,III */
-   audio_decode_routine = decode_routine_table[h->option & 3];
+   m->cup.audio_decode_routine = decode_routine_table[h->option & 3];
 
 
    if (h->option == 3)		/* layer I */
-      return L1audio_decode_init(h, framebytes_arg,
+      return L1audio_decode_init(m, h, framebytes_arg,
 		  reduction_code, transform_code, convert_code, freq_limit);
 
    if (h->option == 1)		/* layer III */
-      return L3audio_decode_init(h, framebytes_arg,
+      return L3audio_decode_init(m, h, framebytes_arg,
 		  reduction_code, transform_code, convert_code, freq_limit);
 
 
@@ -300,7 +342,7 @@ int audio_decode_init(MPEG_HEAD * h, int framebytes_arg,
       freq_limit = 1000;
 
 
-   framebytes = framebytes_arg;
+   m->cup.framebytes = framebytes_arg;
 /* check if code handles */
    if (h->option != 2)
       return 0;			/* layer II only */
@@ -314,34 +356,34 @@ int audio_decode_init(MPEG_HEAD * h, int framebytes_arg,
       abcd_index = 4;		/* mpeg 2 */
 
    if (abcd_index < 0)
-      return 0;			/* fail invalid Layer II bit rate index */
+      return 0;			// fail invalid Layer II bit rate index
 
    for (i = 0; i < 4; i++)
       for (j = 0; j < 16; j++)
-	 bat[i][j] = look_bat[abcd_index][i][j];
+	 m->cup.bat[i][j] = look_bat[abcd_index][i][j];
    for (i = 0; i < 4; i++)
-      nbat[i] = look_nbat[abcd_index][i];
-   max_sb = nbat[0] + nbat[1] + nbat[2] + nbat[3];
+      m->cup.nbat[i] = look_nbat[abcd_index][i];
+   m->cup.max_sb = m->cup.nbat[0] + m->cup.nbat[1] + m->cup.nbat[2] + m->cup.nbat[3];
 /*----- compute nsb_limit --------*/
    samprate = sr_table[4 * h->id + h->sr_index];
-   nsb_limit = (freq_limit * 64L + samprate / 2) / samprate;
+   m->cup.nsb_limit = (freq_limit * 64L + samprate / 2) / samprate;
 /*- caller limit -*/
 /*---- limit = 0.94*(32>>reduction_code);  ----*/
    limit = (32 >> reduction_code);
    if (limit > 8)
       limit--;
-   if (nsb_limit > limit)
-      nsb_limit = limit;
-   if (nsb_limit > max_sb)
-      nsb_limit = max_sb;
+   if (m->cup.nsb_limit > limit)
+      m->cup.nsb_limit = limit;
+   if (m->cup.nsb_limit > m->cup.max_sb)
+      m->cup.nsb_limit = m->cup.max_sb;
 
-   outvalues = 1152 >> reduction_code;
+   m->cup.outvalues = 1152 >> reduction_code;
    if (h->mode != 3)
    {				/* adjust for 2 channel modes */
       for (i = 0; i < 4; i++)
-	 nbat[i] *= 2;
-      max_sb *= 2;
-      nsb_limit *= 2;
+	 m->cup.nbat[i] *= 2;
+      m->cup.max_sb *= 2;
+      m->cup.nsb_limit *= 2;
    }
 
 /* set sbt function */
@@ -350,43 +392,43 @@ int audio_decode_init(MPEG_HEAD * h, int framebytes_arg,
    {
       k = 0;
    }
-   sbt = sbt_table[bit_code][reduction_code][k];
-   outvalues *= out_chans[k];
+   m->cup.sbt = sbt_table[bit_code][reduction_code][k];
+   m->cup.outvalues *= out_chans[k];
    if (bit_code)
-      outbytes = outvalues;
+      m->cup.outbytes = m->cup.outvalues;
    else
-      outbytes = sizeof(short) * outvalues;
+      m->cup.outbytes = sizeof(short) * m->cup.outvalues;
 
-   decinfo.channels = out_chans[k];
-   decinfo.outvalues = outvalues;
-   decinfo.samprate = samprate >> reduction_code;
+   m->cup.decinfo.channels = out_chans[k];
+   m->cup.decinfo.outvalues = m->cup.outvalues;
+   m->cup.decinfo.samprate = samprate >> reduction_code;
    if (bit_code)
-      decinfo.bits = 8;
+      m->cup.decinfo.bits = 8;
    else
-      decinfo.bits = sizeof(short) * 8;
+      m->cup.decinfo.bits = sizeof(short) * 8;
 
-   decinfo.framebytes = framebytes;
-   decinfo.type = 0;
+   m->cup.decinfo.framebytes = m->cup.framebytes;
+   m->cup.decinfo.type = 0;
 
 
 
 /* clear sample buffer, unused sub bands must be 0 */
    for (i = 0; i < 2304; i++)
-      sample[i] = 0.0F;
+      m->cup.sample[i] = 0.0F;
 
 
 /* init sub-band transform */
-   sbt_init();
+   sbt_init(m);
 
    return 1;
 }
 /*---------------------------------------------------------*/
-void audio_decode_info(DEC_INFO * info)
+void audio_decode_info(MPEG *m, DEC_INFO * info)
 {
-   *info = decinfo;		/* info return, call after init */
+   *info = m->cup.decinfo;		/* info return, call after init */
 }
 /*---------------------------------------------------------*/
-void decode_table_init(void)
+void decode_table_init(MPEG *m)
 {
 /* dummy for asm version compatability */
 }

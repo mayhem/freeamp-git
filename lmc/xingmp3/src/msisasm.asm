@@ -29,22 +29,23 @@ SECTION .data USE32
 
 GLOBAL _antialias_asm
 
-EXTERN _csa
+;EXTERN _csa
 
 SECTION .text USE32
 
 ;/*
 ; * Antialias ASM Version
 ; */
-_antialias_asm: ;// PROC x, n :  DWORD
-                ;//      ebp ebp+4
+_antialias_asm: ;// PROC x,  n     csa:  DWORD
+                ;//      ebp ebp+4 ebp+8
         push   ebp
         lea    ebp,[esp+8]
         pushad
 
 ;//   for (k = 0; k < n; k++)
 ;//   {
-        mov    ecx,[ebp+4]
+        mov    ecx, [ebp + 4]
+        mov    eax, [ebp + 8]
 
         cmp    ecx,0
         je     near .Skip
@@ -56,27 +57,27 @@ _antialias_asm: ;// PROC x, n :  DWORD
 %assign i 0
 %rep 8
 ;//        a = x[17 - i];
-        fld    dword [ebp+(17-i)*4]    ;/* a */
+        fld    dword [ebp + (17 - i) * 4]    ;/* a */
 ;//        b = x[18 + i];
-        fld    dword [ebp+(18+i)*4]    ;/* b a */
+        fld    dword [ebp + (18 + i) * 4]    ;/* b a */
 ;//        x[17 - i] = a * csa[i][0] - b * csa[i][1];
-        fld    st1                     ;/* a b a */
-        fmul   dword [_csa+i*8]        ;/* a*csa[i][0] b a */
-        fld    st1                     ;/* b a*csa[i][0] b a */
-        fmul   dword [_csa+i*8+4]      ;/* b*csa[i][1] a*csa[i][0] b a */
-        fsubp  st1,st0                 ;/* x[17-i] b a */
-        fstp   dword [ebp+(17-i)*4]    ;/* b a */
+        fld    st1                          ;/* a b a */
+        fmul   dword [eax + i * 8]          ;/* a*csa[i][0] b a */
+        fld    st1                          ;/* b a*csa[i][0] b a */
+        fmul   dword [eax + i * 8 + 4]      ;/* b*csa[i][1] a*csa[i][0] b a */
+        fsubp  st1,st0                      ;/* x[17-i] b a */
+        fstp   dword [ebp + (17 - i) * 4]   ;/* b a */
 ;//        x[18 + i] = b * csa[i][0] + a * csa[i][1];
-        fmul   dword [_csa+i*8]        ;/* b*csa[i][0] a */
-        fxch   st1                     ;/* a b*csa[i][0] */
-        fmul   dword [_csa+i*8+4]      ;/* a*csa[i][1] b*csa[i][0] */
-        faddp  st1,st0                 ;/* x[18+i] */
-        fstp   dword [ebp+(18+i)*4]    ;/* - */
+        fmul   dword [eax + i * 8]          ;/* b*csa[i][0] a */
+        fxch   st1                          ;/* a b*csa[i][0] */
+        fmul   dword [eax + i * 8 + 4]      ;/* a*csa[i][1] b*csa[i][0] */
+        faddp  st1,st0                      ;/* x[18+i] */
+        fstp   dword [ebp + (18 + i) * 4]   ;/* - */
 ;//      }
 %assign i i+1
 %endrep
 ;//      x += 18;
-        add    ebp,18*4
+        add    ebp, 18 * 4
 ;//   }
         dec    ecx
         jnz    near .Loop

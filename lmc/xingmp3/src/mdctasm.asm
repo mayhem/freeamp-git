@@ -42,8 +42,8 @@ EXTERN _mdct6_3v
 EXTERN _mdct6_3v2
 EXTERN _coef
 EXTERN _coef87
-EXTERN _win
-EXTERN _band_limit_nsb
+;EXTERN _win
+;EXTERN _band_limit_nsb
 
 WINSIZE equ 144
 
@@ -1000,8 +1000,8 @@ _imdct6_3_asm: ;// PROC f[]
 ; * hybrid ASM Version
 ; * Uses imdct18 and imdct6_3 macros
 ; */
-_hybrid_asm: ;// xin[] xprev[] y[18][32] btype  nlong  ntot   nprev
-             ;// ebp   ebp+4   ebp+8     ebp+12 ebp+16 ebp+20 ebp+24
+_hybrid_asm: ;// xin[] xprev[] y[18][32] btype  nlong  ntot   nprev  win    band_limit
+             ;// ebp   ebp+4   ebp+8     ebp+12 ebp+16 ebp+20 ebp+24 ebp+28 ebp+32
         push   ebp
         lea    ebp,[esp+8]
         pushad
@@ -1015,7 +1015,7 @@ _hybrid_asm: ;// xin[] xprev[] y[18][32] btype  nlong  ntot   nprev
         mov    eax,WINSIZE
         mul    ebx
         mov    ecx,eax                 ;/* Store win[btype] address */
-        add    ecx,_win
+        add    ecx,[ebp+28]
 
         ;/* Compute number of dct's to do */
         mov    eax,[ebp+16]
@@ -1098,7 +1098,9 @@ _hybrid_asm: ;// xin[] xprev[] y[18][32] btype  nlong  ntot   nprev
         mov    ebx,18
         cdq
         div    ebx                     ;/* Number of 6 pts dct's triples to do in eax */
-        mov    edx,_win+(WINSIZE*2)    ;/* address of win[2] is in edx */
+;        mov    edx,_win+(WINSIZE*2)    
+        mov    edx, [ebp + 28]         ;/* address of win[2] is in edx */
+        add    edx, WINSIZE * 2
         mov    ebx,[ebp+8]             ;/* ebx is y */
 
         ;/* First check */
@@ -1218,11 +1220,11 @@ _hybrid_asm: ;// xin[] xprev[] y[18][32] btype  nlong  ntot   nprev
 
 %assign j 0
 %rep 18
-        mov    edx,[esi+j*4]
-        mov    [ebx+ecx*4+j*128],edx
+        mov    edx,[esi + j * 4]
+        mov    [ebx + ecx * 4 + j * 128], edx
 %assign j j+1
 %endrep
-        add    esi,18*4
+        add    esi,18 * 4
 
         inc    ecx
         cmp    ecx,eax
@@ -1234,13 +1236,14 @@ _hybrid_asm: ;// xin[] xprev[] y[18][32] btype  nlong  ntot   nprev
         mul    ecx
         mov    [SaveReturn],eax
 
-        mov    eax,[_band_limit_nsb]
+;        mov    eax,[_band_limit_nsb]
+        mov    eax,[ebp + 32]
         cmp    ecx,eax
         jge    near .SkipFinalClear
       .FinalClear:
 %assign j 0
 %rep 18
-        mov    dword [ebx+ecx*4+j*128],0
+        mov    dword [ebx + ecx * 4 + j * 128], 0
 %assign j j+1
 %endrep
         inc    ecx

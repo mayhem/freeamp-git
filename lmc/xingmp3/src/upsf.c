@@ -39,8 +39,6 @@ Layer III
 #include <math.h>
 #include "L3.h"
 
-extern int iframe;
-
 unsigned int bitget(int n);
 
 /*------------------------------------------------------------*/

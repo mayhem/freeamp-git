@@ -39,7 +39,8 @@ ____________________________________________________________________________*/
 #include <math.h>
 #include <string.h>
 #include "L3.h"
-
+#include "mhead.h"
+#include "protos.h"
 
 
 /*----------
@@ -62,52 +63,45 @@ static int pretab[2][22] =
 };
 
 
-extern int nBand[2][22];	/* long = nBand[0][i], short = nBand[1][i] */
-
 /* 8 bit plus 2 lookup x = pow(2.0, 0.25*(global_gain-210)) */
 /* two extra slots to do 1/sqrt(2) scaling for ms */
 /* 4 extra slots to do 1/2 scaling for cvt to mono */
-static float look_global[256 + 2 + 4];
 
 /*-------- scaling lookup
 x = pow(2.0, -0.5*(1+scalefact_scale)*scalefac + preemp)
 look_scale[scalefact_scale][preemp][scalefac]
 -----------------------*/
-static float look_scale[2][4][32];
+#if 0
 typedef float LS[4][32];
-
+#endif
 
 /*--- iSample**(4/3) lookup, -32<=i<=31 ---*/
-#define ISMAX 32
-static float look_pow[2 * ISMAX];
 
 /*-- pow(2.0, -0.25*8.0*subblock_gain) --*/
-static float look_subblock[8];
 
 /*-- reorder buffer ---*/
-static float re_buf[192][3];
 typedef float ARRAY3[3];
 
 
 /*=============================================================*/
-float *quant_init_global_addr(void)
+float *quant_init_global_addr(MPEG *m)
 {
-   return look_global;
+   return m->cupl.look_global;
 }
 /*-------------------------------------------------------------*/
-LS *quant_init_scale_addr(void)
+LS *quant_init_scale_addr(MPEG *m)
 {
-   return look_scale;
+   return m->cupl.look_scale;
 }
 /*-------------------------------------------------------------*/
-float *quant_init_pow_addr(void)
+float *quant_init_pow_addr(MPEG *m)
 {
-   return look_pow;
+   return m->cupl.look_pow;
 }
 /*-------------------------------------------------------------*/
-float *quant_init_subblock_addr(void)
+float *quant_init_subblock_addr(MPEG *m)
 {
-   return look_subblock;
+   return m->cupl.look_subblock;
 }
 /*=============================================================*/
 
@@ -115,7 +109,7 @@ float *quant_init_subblock_addr(void)
 #pragma warning(disable: 4056)
 #endif
 
-void dequant(SAMPLE Sample[], int *nsamp,
+void dequant(MPEG *m, SAMPLE Sample[], int *nsamp,
 	     SCALEFACT * sf,
 	     GR * gr,
 	     CB_INFO * cb_info, int ncbl_mixed)
@@ -160,14 +154,14 @@ void dequant(SAMPLE Sample[], int *nsamp,
 
    cbmax[2] = cbmax[1] = cbmax[0] = 0;
 /* global gain pre-adjusted by 2 if ms_mode, 0 otherwise */
-   x0 = look_global[(2 + 4) + gr->global_gain];
+   x0 = m->cupl.look_global[(2 + 4) + gr->global_gain];
    i = 0;
 /*----- long blocks ---*/
    for (cb = 0; cb < ncbl; cb++)
    {
       non_zero = 0;
-      xs = x0 * look_scale[gr->scalefac_scale][pretab[gr->preflag][cb]][sf->l[cb]];
-      n = nBand[0][cb];
+      xs = x0 * m->cupl.look_scale[gr->scalefac_scale][pretab[gr->preflag][cb]][sf->l[cb]];
+      n = m->cupl.nBand[0][cb];
       for (j = 0; j < n; j++, i++)
       {
 	 if (Sample[i].s == 0)
@@ -176,7 +170,7 @@ void dequant(SAMPLE Sample[], int *nsamp,
 	 {
 	    non_zero = 1;
 	    if ((Sample[i].s >= (-ISMAX)) && (Sample[i].s < ISMAX))
-	       Sample[i].x = xs * look_pow[ISMAX + Sample[i].s];
+	       Sample[i].x = xs * m->cupl.look_pow[ISMAX + Sample[i].s];
 	    else
 	    {
 		float tmpConst = (float)(1.0/3.0);
@@ -192,7 +186,7 @@ void dequant(SAMPLE Sample[], int *nsamp,
    }
 
    cb_info->cbmax = cbmax[0];
-   cb_info->cbtype = 0;		/* type = long */
+   cb_info->cbtype = 0;		// type = long
 
    if (cbs0 >= 12)
       return;
@@ -201,16 +195,16 @@ block type = 2  short blocks
 ----------------------------*/
    cbmax[2] = cbmax[1] = cbmax[0] = cbs0;
    i0 = i;			/* save for reorder */
-   buf = re_buf;
+   buf = m->cupl.re_buf;
    for (w = 0; w < 3; w++)
-      xsb[w] = x0 * look_subblock[gr->subblock_gain[w]];
+      xsb[w] = x0 * m->cupl.look_subblock[gr->subblock_gain[w]];
    for (cb = cbs0; cb < 13; cb++)
    {
-      n = nBand[1][cb];
+      n = m->cupl.nBand[1][cb];
       for (w = 0; w < 3; w++)
       {
 	 non_zero = 0;
-	 xs = xsb[w] * look_scale[gr->scalefac_scale][0][sf->s[w][cb]];
+	 xs = xsb[w] * m->cupl.look_scale[gr->scalefac_scale][0][sf->s[w][cb]];
 	 for (j = 0; j < n; j++, i++)
 	 {
 	    if (Sample[i].s == 0)
@@ -219,7 +213,7 @@ block type = 2  short blocks
 	    {
 	       non_zero = 1;
 	       if ((Sample[i].s >= (-ISMAX)) && (Sample[i].s < ISMAX))
-		  buf[j][w] = xs * look_pow[ISMAX + Sample[i].s];
+		  buf[j][w] = xs * m->cupl.look_pow[ISMAX + Sample[i].s];
 	       else
 	       {
 		  float tmpConst = (float)(1.0/3.0);
@@ -237,7 +231,7 @@ block type = 2  short blocks
    }
 
 
-   memmove(&Sample[i0].x, &re_buf[0][0], sizeof(float) * (i - i0));
+   memmove(&Sample[i0].x, &m->cupl.re_buf[0][0], sizeof(float) * (i - i0));
 
    *nsamp = i;			/* update nsamp */
    cb_info->cbmax_s[0] = cbmax[0];

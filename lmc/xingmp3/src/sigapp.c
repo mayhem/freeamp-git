@@ -90,6 +90,7 @@ int ff_decode(char *filename, char ascii_sig[37],
    int       framebytes;
    int       u;
    MPEG_HEAD head;
+   MPEG      m;
    IN_OUT    x;
    int       in_bytes, out_bytes;
    DEC_INFO  decinfo;
@@ -100,7 +101,7 @@ int ff_decode(char *filename, char ascii_sig[37],
 
 
 /*------------------------------------------*/
-   typedef struct
+/*   typedef struct
    {
       int       (*decode_init) (MPEG_HEAD * h, int framebytes_arg,
                                 int reduction_code, int transform_code,
@@ -121,13 +122,13 @@ int ff_decode(char *filename, char ascii_sig[37],
          {audio_decode8_init, audio_decode8_info, audio_decode8},
       }
    };
-
+*/
 /*-----------------------*/
 /*-----select decoder --------------*/
-   if (decode8_flag && (convert_code >= 4))
+/*   if (decode8_flag && (convert_code >= 4))
       audio = audio_table[integer & 1][1];
    else
-      audio = audio_table[integer & 1][0];
+      audio = audio_table[integer & 1][0]; */
 /*-----------------------*/
 
    in_bytes = out_bytes = 0;
@@ -183,17 +184,18 @@ int ff_decode(char *filename, char ascii_sig[37],
    }
 
 /*---- init decoder -------*/
-   if (!audio.decode_init(&head, framebytes,
+   mpeg_init(&m);
+   mpeg_eq_init(&m);
+   if (!audio_decode_init(&m, &head, framebytes,
                           reduction_code, 0, convert_code, freq_limit))
    {
       printf("\n DECODER INIT FAIL \n");
       goto abort;
    }
 /*---- get info -------*/
-   audio.decode_info(&decinfo);
+   audio_decode_info(&m, &decinfo);
 
    mb = mb_New();
-   printf("%d %d %d\n", decinfo.samprate, decinfo.channels, decinfo.bits);
    mb_SetPCMDataInfo(mb, decinfo.samprate, decinfo.channels, decinfo.bits);
    cvt_to_wave_init(decinfo.bits);
 
@@ -203,7 +205,7 @@ int ff_decode(char *filename, char ascii_sig[37],
          break;
       if (bs_bufbytes < framebytes)
          break;                 /* end of file */
-      x = audio.decode(bs_bufptr, (short *) (pcm_buffer + pcm_bufbytes));
+      x = audio_decode(&m, bs_bufptr, (short *) (pcm_buffer + pcm_bufbytes));
       if (x.in_bytes <= 0)
       {
          printf("\n BAD SYNC IN MPEG FILE\n");

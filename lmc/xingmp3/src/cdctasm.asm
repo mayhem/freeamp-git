@@ -4,7 +4,7 @@
 ; * Copyright (c) 1999, Jean-Michel HERVE
 ; *
 ; * Code : TuO / StG
-; * Date : 08/04/99
+; * Date : 08/04/1999
 ; *
 ; * WARNING : only _fdct32_* has been tested. The other ones are made from
 ; *           this function, but hasn't been tested at all. Should check it.
@@ -39,7 +39,7 @@ GLOBAL _back_bf_asm
 GLOBAL _fdct32_asm
 GLOBAL _fdct32_dual_asm
 
-EXTERN _coef32
+;EXTERN _coef32
 
 ValC    dd 0
 Val4N   dd 0
@@ -63,55 +63,55 @@ SECTION .text USE32
 _forward_bf_asm: ;// PROC m,  n,    x[],  f[],   coef[] :  DWORD
                  ;//      ebp ebp+4 ebp+8 ebp+12 ebp+16
         push   ebp
-        lea    ebp,[esp+8]
+        lea    ebp,[esp + 8]
         pushad
 
         ;/* Initialization part */
-        mov    eax,[ebp+4]
-        mov    [ValN],eax
-        shr    eax,1
-        mov    [ValN2],eax             ;/* n2 is eax */
-        mov    esi,[ebp+8]             ;/* x[0] is esi */
-        mov    ebx,[ebp+12]            ;/* f[0] is ebx */
-        lea    edx,[ebx+eax*4]         ;/* f[n2] is edx */
-        mov    edi,[ebp+16]            ;/* coef[] is edi */
-        mov    [ValCoef],edi
+        mov    eax,[ebp + 4]
+        mov    [ValN], eax
+        shr    eax, 1
+        mov    [ValN2], eax                      ;/* n2 is eax */
+        mov    esi, [ebp + 8]                    ;/* x[0] is esi */
+        mov    ebx, [ebp + 12]                   ;/* f[0] is ebx */
+        lea    edx, [ebx + eax * 4]              ;/* f[n2] is edx */
+        mov    edi, [ebp + 16]                   ;/* coef[] is edi */
+        mov    [ValCoef], edi             
 
-        mov    dword [ValP0],0
+        mov    dword [ValP0], 0
 
-        mov    ecx,[ebp]               ;/* m-controled loop */
+        mov    ecx, [ebp]                        ;/* m-controled loop */
       .BigLoop:
         push   ecx
 
-        mov    edi,[ValCoef]           ;/* coef is edi */
-        mov    ecx,[ValP0]             ;/* p is ecx */
-        mov    ebp,ecx
-        add    ebp,[ValN2]
-        dec    ebp                     ;/* q-n2 is ebp */
-        lea    ebp,[esi+ebp*4]         ;/* x[q-n2] is ebp */
-                                       ;/* This way we can use the loop */
-                                       ;/* counter to index the table */
-                                       ;/* it save 1 dec per loop */
-        mov    eax,[ValN2]             ;/* n2-controled loop */
+        mov    edi, [ValCoef]                    ;/* coef is edi */
+        mov    ecx, [ValP0]                      ;/* p is ecx */
+        mov    ebp, ecx
+        add    ebp, [ValN2]
+        dec    ebp                               ;/* q-n2 is ebp */
+        lea    ebp, [esi + ebp * 4]              ;/* x[q-n2] is ebp */
+                                                 ;/* This way we can use the loop */
+                                                 ;/* counter to index the table */
+                                                 ;/* it save 1 dec per loop */
+        mov    eax, [ValN2]                      ;/* n2-controled loop */
       .SmallLoop:
-        fld    dword [esi+ecx*4]       ;/* Load x[p] */
-        fld    st0                     ;/* Duplicate x[p] */
-        fld    dword [ebp+eax*4]       ;/* Load x[q] */
-        fld    st0                     ;/* Duplicate x[q] */
-        faddp  st2,st0                 ;/* x[p]+x[q] */
-        fxch   st0,st1                 ;/* put value to the top */
-        fstp   dword [ebx+ecx*4]       ;/* Store value */
-        fsubp  st1,st0                 ;/* x[p]-x[q] */
-        fmul   dword [edi]             ;/* coef[k] * (x[p]-x[q]) */
-        fstp   dword [edx+ecx*4]
+        fld    dword [esi + ecx * 4]             ;/* Load x[p] */
+        fld    st0                               ;/* Duplicate x[p] */
+        fld    dword [ebp + eax * 4]             ;/* Load x[q] */
+        fld    st0                               ;/* Duplicate x[q] */
+        faddp  st2, st0                          ;/* x[p]+x[q] */
+        fxch   st0, st1                          ;/* put value to the top */
+        fstp   dword [ebx + ecx * 4]             ;/* Store value */
+        fsubp  st1, st0                          ;/* x[p]-x[q] */
+        fmul   dword [edi]                       ;/* coef[k] * (x[p]-x[q]) */
+        fstp   dword [edx + ecx * 4]
 
-        add    edi,4                   ;/* Update coef[k] */
-        inc    ecx                     ;/* Update p */
-        dec    eax                     ;/* Update loop counter */
+        add    edi, 4                            ;/* Update coef[k] */
+        inc    ecx                               ;/* Update p */
+        dec    eax                               ;/* Update loop counter */
         jnz    .SmallLoop
 
-        mov    eax,[ValN]
-        add    [ValP0],eax             ;/* Update p0 */
+        mov    eax, [ValN]
+        add    [ValP0], eax                      ;/* Update p0 */
 
         pop    ecx
         dec    ecx
@@ -127,56 +127,56 @@ _forward_bf_asm: ;// PROC m,  n,    x[],  f[],   coef[] :  DWORD
 _back_bf_asm: ;// PROC m,  n,    x[],  f[],   :  DWORD
               ;//      ebp ebp+4 ebp+8 ebp+12
         push   ebp
-        lea    ebp,[esp+8]
+        lea    ebp, [esp + 8]
         pushad
 
-        mov    edi,[ebp+8]             ;/* x[0] is esi */
-        mov    esi,[ebp+12]            ;/* f[0] is esi */
+        mov    edi, [ebp + 8]                    ;/* x[0] is esi */
+        mov    esi, [ebp + 12]                   ;/* f[0] is esi */
 
-        mov    eax,[ebp+4]
-        mov    [ValN],eax
-        shl    eax,2
-        mov    [Val4N],eax
-        shr    eax,3
-        mov    [ValN2],eax
+        mov    eax, [ebp + 4]
+        mov    [ValN], eax
+        shl    eax, 2
+        mov    [Val4N], eax
+        shr    eax, 3
+        mov    [ValN2], eax
 
-        lea    edx,[edi+eax*4]
+        lea    edx,[edi + eax * 4]
 
         dec    eax
-        mov    [ValN21],eax
+        mov    [ValN21], eax
 
-        mov    ecx,[ebp]
-        mov    ebp,edx
+        mov    ecx, [ebp]
+        mov    ebp, edx
       .BigLoop:
 
-        xor    ebx,ebx
-        mov    eax,[ValN2]
+        xor    ebx, ebx
+        mov    eax, [ValN2]
       .SmallLoop1:
-        mov    edx,[edi+ebx*4]
-        mov    [esi+ebx*8],edx         ;/* f[p]=x[q] */
+        mov    edx,[edi + ebx * 4]
+        mov    [esi + ebx * 8], edx              ;/* f[p]=x[q] */
         inc    ebx
         dec    eax
         jnz    .SmallLoop1
 
-        xor    ebx,ebx
+        xor    ebx, ebx
 
-        mov    eax,[ValN21]            ;/* n/2 -1 */
+        mov    eax, [ValN21]                     ;/* n/2 -1 */
       .SmallLoop2:
 
-        fld    dword [ebp+ebx*4]       ;/* x[q] */
-        fadd   dword [ebp+ebx*4+4]     ;/* x[q]+x[q+1] */
-        fstp   dword [esi+ebx*8+4]     ;/* f[p]=x[q]+x[q+1] */
+        fld    dword [ebp + ebx * 4]             ;/* x[q] */
+        fadd   dword [ebp + ebx * 4 + 4]         ;/* x[q]+x[q+1] */
+        fstp   dword [esi + ebx * 8 + 4]         ;/* f[p]=x[q]+x[q+1] */
         inc    ebx
         dec    eax
         jnz    .SmallLoop2
 
-        mov    edx,[ebp+ebx*4]
-        mov    [esi+ebx*8+4],edx         ;/* f[p]=x[q] */
+        mov    edx, [ebp + ebx * 4]
+        mov    [esi + ebx * 8 + 4], edx          ;/* f[p]=x[q] */
 
-        mov    eax,[Val4N]
-        add    edi,eax                 ;/* Update p0 (edi) */
-        add    ebp,eax                 ;/* Update p0 (edi) */
-        add    esi,eax                 ;/* Update p0 (esi) */
+        mov    eax, [Val4N]
+        add    edi, eax                          ;/* Update p0 (edi) */
+        add    ebp, eax                          ;/* Update p0 (edi) */
+        add    esi, eax                          ;/* Update p0 (esi) */
 
         dec    ecx
         jnz    .BigLoop
@@ -191,32 +191,32 @@ _back_bf_asm: ;// PROC m,  n,    x[],  f[],   :  DWORD
 %macro forward_bf_macro 5 ;// PROC m,  n,    x[],  f[],   coef[] :  DWORD
                           ;//      ebp ebp+4 ebp+8 ebp+12 ebp+16
         ;/* Initialization part */
-        mov    ebx,%4                  ;/* f[0] is ebx */
-        mov    esi,%3                  ;/* x[0] is esi */
-        lea    edx,[ebx+((%2)/2)*4]    ;/* f[n2] is edx */
+        mov    ebx, %4                           ;/* f[0] is ebx */
+        mov    esi, %3                           ;/* x[0] is esi */
+        lea    edx, [ebx + ((%2) / 2) * 4]       ;/* f[n2] is edx */
 
-        xor    edi,edi                 ;/* edi is p0 */
-
-        mov    ecx,%1                  ;/* m-controled loop */
+        xor    edi, edi                          ;/* edi is p0 */
+                                          
+        mov    ecx, %1                           ;/* m-controled loop */
       %%BigLoop:
 ;/* Hiho, unrolled loop */
 %assign i 0
 %assign j %2-1
 %rep (%2)/2
-        fld    dword [esi+edi*4+i*4]   ;/* Load x[p] */
-        fld    st0                     ;/* Duplicate x[p] */
-        fld    dword [esi+edi*4+j*4]   ;/* Load x[q] */
-        fadd   st1,st0                 ;/* x[p]+x[q] */
-        fxch   st1                     ;/* put value to the top */
-        fstp   dword [ebx+edi*4+i*4]   ;/* Store value */
-        fsubp  st1,st0                 ;/* x[p]-x[q] */
-        fmul   dword [%5+i*4]          ;/* coef[k] * (x[p]-x[q]) */
-        fstp   dword [edx+edi*4+i*4]
+        fld    dword [esi + edi * 4 + i * 4]     ;/* Load x[p] */
+        fld    st0                               ;/* Duplicate x[p] */
+        fld    dword [esi + edi * 4 + j * 4]     ;/* Load x[q] */
+        fadd   st1, st0                          ;/* x[p]+x[q] */
+        fxch   st1                               ;/* put value to the top */
+        fstp   dword [ebx + edi * 4 + i * 4]     ;/* Store value */
+        fsubp  st1, st0                          ;/* x[p]-x[q] */
+        fmul   dword [%5 + i * 4]                ;/* coef[k] * (x[p]-x[q]) */
+        fstp   dword [edx + edi * 4 + i * 4]
 %assign i i+1
 %assign j j-1
 %endrep
 
-        add    edi,%2                  ;/* Update p0 */
+        add    edi, %2                           ;/* Update p0 */
 
         dec    ecx
         jnz    near %%BigLoop
@@ -227,22 +227,22 @@ _back_bf_asm: ;// PROC m,  n,    x[],  f[],   :  DWORD
 ; */
 %macro back_bf_macro 4 ;// PROC m,  n,    x[],  f[],   :  DWORD
                        ;//      ebp ebp+4 ebp+8 ebp+12
-        mov    edi,%3                  ;/* x[0] is esi */
-        mov    esi,%4                  ;/* f[0] is esi */
-        mov    ebp,%3+((%2/2)*4)       ;/* x[n2] is ebp */
-        xor    eax,eax                 ;/* p0 is eax */
+        mov    edi, %3                           ;/* x[0] is esi */
+        mov    esi, %4                           ;/* f[0] is esi */
+        mov    ebp, %3 + ((%2 / 2) * 4)          ;/* x[n2] is ebp */
+        xor    eax, eax                          ;/* p0 is eax */
 
 ;/* Main loop counter initialization (if needed!) */
 %if (%1)>1
-        mov    ecx,%1                  ;/* Avoid 1 step loop */
+        mov    ecx, %1                           ;/* Avoid 1 step loop */
       %%BigLoop:
 %endif
 
 ;/* Unrolled loop */
 %assign j 0
 %rep (%2)/2
-        mov    edx,[edi+eax+j*4]
-        mov    [esi+eax+j*8],edx       ;/* f[p]=x[q] */
+        mov    edx, [edi + eax + j * 4]
+        mov    [esi + eax + j * 8], edx          ;/* f[p]=x[q] */
 %assign j j+1
 %endrep
 
@@ -250,19 +250,19 @@ _back_bf_asm: ;// PROC m,  n,    x[],  f[],   :  DWORD
 ;/* Another unrolled loop */
 %assign j 0
 %rep ((%2)/2)-1
-        fld    dword [ebp+eax+j*4]     ;/* x[q] */
-        fadd   dword [ebp+eax+j*4+4]   ;/* x[q]+x[q+1] */
-        fstp   dword [esi+eax+j*8+4]   ;/* f[p]=x[q]+x[q+1] */
+        fld    dword [ebp + eax + j * 4]         ;/* x[q] */
+        fadd   dword [ebp + eax + j * 4 + 4]     ;/* x[q]+x[q+1] */
+        fstp   dword [esi + eax + j * 8 + 4]     ;/* f[p]=x[q]+x[q+1] */
 %assign j j+1
 %endrep
 
-        mov    edx,[ebp+eax+j*4]
-        mov    [esi+eax+j*8+4],edx     ;/* f[p]=x[q] */
+        mov    edx, [ebp + eax + j * 4]
+        mov    [esi + eax + j * 8 + 4], edx      ;/* f[p]=x[q] */
 
-        add    eax,%2*4                ;/* Update p0 */
+        add    eax, %2 * 4                       ;/* Update p0 */
 
 ;/* Loop */
-%if (%1)>1                             ;/* Avoid 1 step loop */
+%if (%1)>1                                       ;/* Avoid 1 step loop */
         dec    ecx
         jnz    near %%BigLoop
 %endif
@@ -270,20 +270,20 @@ _back_bf_asm: ;// PROC m,  n,    x[],  f[],   :  DWORD
 
 ;/* Special case of fdct32 and fdct32_dual functions */
 %macro fdct32_specialcase 1
-        mov    edi,[ebp]               ;/* x[0] is edi */
+        mov    edi,[ebp+4]                       ;/* x[0] is edi */
 ;/* Unrolled loop */
 %assign p 0
 %assign q 31
 %rep 16
-        fld    dword [edi+p*4*%1]      ;/* Load x[p] */
+        fld    dword [edi + p * 4 * %1]          ;/* Load x[p] */
         fld    st0
-        fld    dword [edi+q*4*%1]      ;/* Load x[q] */
-        fadd   st1,st0                 ;/* x[p]+x[q] */
-        fxch   st1                     ;/* put value to the top */
-        fstp   dword [tab_a+p*4]       ;/* Store value */
-        fsubp  st1,st0                 ;/* x[p]-x[q] */
-        fmul   dword [_coef32+p*4]     ;/* coef32[p] * (x[p]-x[q]) */
-        fstp   dword [tab_a+p*4+16*4]
+        fld    dword [edi + q * 4 * %1]          ;/* Load x[q] */
+        fadd   st1, st0                          ;/* x[p]+x[q] */
+        fxch   st1                               ;/* put value to the top */
+        fstp   dword [tab_a + p * 4]             ;/* Store value */
+        fsubp  st1, st0                          ;/* x[p]-x[q] */
+        fmul   dword [eax + p * 4]               ;/* coef32[p] * (x[p]-x[q]) */
+        fstp   dword [tab_a + p * 4 + 16 * 4]
 %assign p p+1
 %assign q q-1
 %endrep
@@ -292,22 +292,23 @@ _back_bf_asm: ;// PROC m,  n,    x[],  f[],   :  DWORD
 ;/*
 ; * fdct32 ASM Version
 ; */
-_fdct32_asm: ;// PROC x[], c[] :  DWORD
-             ;//      ebp  ebp+4
+_fdct32_asm: ;// PROC coef32, x[],  c[] :  DWORD
+             ;//      ebp     ebp+4 ebp+8
         push   ebp
-        lea    ebp,[esp+8]
+        lea    ebp, [esp + 8]
         pushad
 
-        mov    eax,[ebp+4]
-        mov    [ValC],eax
+        mov    eax, [ebp + 8]
+        mov    [ValC], eax
+        mov    eax, [ebp]
 
         ;/* Special first stage for single chan */
         fdct32_specialcase 1
 
-        forward_bf_macro 2 , 16, tab_a, tab_b, _coef32 + (16)*4
-        forward_bf_macro 4 , 8 , tab_b, tab_a, _coef32 + (16 + 8)*4
-        forward_bf_macro 8 , 4 , tab_a, tab_b, _coef32 + (16 + 8 + 4)*4
-        forward_bf_macro 16, 2 , tab_b, tab_a, _coef32 + (16 + 8 + 4 + 2)*4
+        forward_bf_macro 2 , 16, tab_a, tab_b, (eax + (16) * 4)
+        forward_bf_macro 4 , 8 , tab_b, tab_a, (eax + (16 + 8) * 4)
+        forward_bf_macro 8 , 4 , tab_a, tab_b, (eax + (16 + 8 + 4) * 4)
+        forward_bf_macro 16, 2 , tab_b, tab_a, (eax + (16 + 8 + 4 + 2) * 4)
         back_bf_macro    8 , 4 , tab_a, tab_b
         back_bf_macro    4 , 8 , tab_b, tab_a
         back_bf_macro    2 , 16, tab_a, tab_b
@@ -320,22 +321,23 @@ _fdct32_asm: ;// PROC x[], c[] :  DWORD
 ;/*
 ; * fdct32_dual ASM Version
 ; */
-_fdct32_dual_asm: ;// PROC x[], c[] :  DWORD
-                  ;//      ebp  ebp+4
+_fdct32_dual_asm: ;// PROC m,   x[],  c[] :  DWORD
+                  ;//      ebp  ebp+4 ebp+8
         push   ebp
-        lea    ebp,[esp+8]
+        lea    ebp, [esp + 8]
         pushad
 
-        mov    eax,[ebp+4]
-        mov    [ValC],eax
+        mov    eax, [ebp + 8]
+        mov    [ValC], eax
+        mov    eax, [ebp]
 
         ;/* Special first stage for dual chan (interleaved x) */
         fdct32_specialcase 2
 
-        forward_bf_macro 2 , 16, tab_a, tab_b, _coef32 + (16)*4
-        forward_bf_macro 4 , 8 , tab_b, tab_a, _coef32 + (16 + 8)*4
-        forward_bf_macro 8 , 4 , tab_a, tab_b, _coef32 + (16 + 8 + 4)*4
-        forward_bf_macro 16, 2 , tab_b, tab_a, _coef32 + (16 + 8 + 4 + 2)*4
+        forward_bf_macro 2 , 16, tab_a, tab_b, (eax + (16) * 4)
+        forward_bf_macro 4 , 8 , tab_b, tab_a, (eax + (16 + 8) * 4)
+        forward_bf_macro 8 , 4 , tab_a, tab_b, (eax + (16 + 8 + 4) * 4)
+        forward_bf_macro 16, 2 , tab_b, tab_a, (eax + (16 + 8 + 4 + 2) * 4)
         back_bf_macro    8 , 4 , tab_a, tab_b
         back_bf_macro    4 , 8 , tab_b, tab_a
         back_bf_macro    2 , 16, tab_a, tab_b

@@ -35,44 +35,40 @@ hybrid window/filter
 #include <stdio.h>
 #include <float.h>
 #include <math.h>
+#include "L3.h"
+#include "mhead.h"
 
-extern int band_limit_nsb;
 #ifdef ASM_X86
 extern int hybrid_asm(float xin[], float xprev[], float y[18][32],
-	   int btype, int nlong, int ntot, int nprev);
+	   int btype, int nlong, int ntot, int nprev, float *win, int band_limit_nsb);
 extern void FreqInvert_asm(float y[18][32], int n);
 #endif /* ASM_X86 */
 
 
 typedef float ARRAY36[36];
 
-/*-- windows by block type --*/
-float win[4][36];
-
-
 /*====================================================================*/
 void imdct18(float f[]);	/* 18 point */
 void imdct6_3(float f[]);	/* 6 point */
 
 /*====================================================================*/
-ARRAY36 *hwin_init_addr(void)
+ARRAY36 *hwin_init_addr(MPEG *m)
 {
-   return win;
+   return m->cupl.win;
 }
 
 #ifdef ASM_X86
 #ifdef _MSC_VER
 #pragma warning(disable: 4035)
-#pragma warning(disable:4716)
 #endif /* _MSC_VER */ 
 #endif /* ASM_X86 */
 
 /*====================================================================*/
-int hybrid(float xin[], float xprev[], float y[18][32],
+int hybrid(MPEG *m, float xin[], float xprev[], float y[18][32],
 	   int btype, int nlong, int ntot, int nprev)
 {
 #ifdef ASM_X86
-   hybrid_asm(xin, xprev, y, btype, nlong, ntot, nprev);
+   return hybrid_asm(xin, xprev, y, btype, nlong, ntot, nprev, (float *)m->cupl.win, m->cupl.band_limit_nsb);
 #else
    int i, j;
    float *x, *x0;
@@ -94,22 +90,22 @@ int hybrid(float xin[], float xprev[], float y[18][32],
       imdct18(x);
       for (j = 0; j < 9; j++)
       {
-	 y[j][i] = x0[j] + win[btype][j] * x[9 + j];
-	 y[9 + j][i] = x0[9 + j] + win[btype][9 + j] * x[17 - j];
+	 y[j][i] = x0[j] + m->cupl.win[btype][j] * x[9 + j];
+	 y[9 + j][i] = x0[9 + j] + m->cupl.win[btype][9 + j] * x[17 - j];
       }
     /* window x for next time x0 */
       for (j = 0; j < 4; j++)
       {
 	 xa = x[j];
 	 xb = x[8 - j];
-	 x[j] = win[btype][18 + j] * xb;
-	 x[8 - j] = win[btype][(18 + 8) - j] * xa;
-	 x[9 + j] = win[btype][(18 + 9) + j] * xa;
-	 x[17 - j] = win[btype][(18 + 17) - j] * xb;
+	 x[j] = m->cupl.win[btype][18 + j] * xb;
+	 x[8 - j] = m->cupl.win[btype][(18 + 8) - j] * xa;
+	 x[9 + j] = m->cupl.win[btype][(18 + 9) + j] * xa;
+	 x[17 - j] = m->cupl.win[btype][(18 + 17) - j] * xb;
       }
       xa = x[j];
-      x[j] = win[btype][18 + j] * xa;
-      x[9 + j] = win[btype][(18 + 9) + j] * xa;
+      x[j] = m->cupl.win[btype][18 + j] * xa;
+      x[9 + j] = m->cupl.win[btype][(18 + 9) + j] * xa;
 
       x += 18;
       x0 += 18;
@@ -125,22 +121,22 @@ int hybrid(float xin[], float xprev[], float y[18][32],
 	 y[j][i] = x0[j];
 	 y[3 + j][i] = x0[3 + j];
 
-	 y[6 + j][i] = x0[6 + j] + win[2][j] * x[3 + j];
-	 y[9 + j][i] = x0[9 + j] + win[2][3 + j] * x[5 - j];
+	 y[6 + j][i] = x0[6 + j] + m->cupl.win[2][j] * x[3 + j];
+	 y[9 + j][i] = x0[9 + j] + m->cupl.win[2][3 + j] * x[5 - j];
 
-	 y[12 + j][i] = x0[12 + j] + win[2][6 + j] * x[2 - j] + win[2][j] * x[(6 + 3) + j];
-	 y[15 + j][i] = x0[15 + j] + win[2][9 + j] * x[j] + win[2][3 + j] * x[(6 + 5) - j];
+	 y[12 + j][i] = x0[12 + j] + m->cupl.win[2][6 + j] * x[2 - j] + m->cupl.win[2][j] * x[(6 + 3) + j];
+	 y[15 + j][i] = x0[15 + j] + m->cupl.win[2][9 + j] * x[j] + m->cupl.win[2][3 + j] * x[(6 + 5) - j];
       }
     /* window x for next time x0 */
       for (j = 0; j < 3; j++)
       {
-	 x[j] = win[2][6 + j] * x[(6 + 2) - j] + win[2][j] * x[(12 + 3) + j];
-	 x[3 + j] = win[2][9 + j] * x[6 + j] + win[2][3 + j] * x[(12 + 5) - j];
+	 x[j] = m->cupl.win[2][6 + j] * x[(6 + 2) - j] + m->cupl.win[2][j] * x[(12 + 3) + j];
+	 x[3 + j] = m->cupl.win[2][9 + j] * x[6 + j] + m->cupl.win[2][3 + j] * x[(12 + 5) - j];
       }
       for (j = 0; j < 3; j++)
       {
-	 x[6 + j] = win[2][6 + j] * x[(12 + 2) - j];
-	 x[9 + j] = win[2][9 + j] * x[12 + j];
+	 x[6 + j] = m->cupl.win[2][6 + j] * x[(12 + 2) - j];
+	 x[9 + j] = m->cupl.win[2][9 + j] * x[12 + j];
       }
       for (j = 0; j < 3; j++)
       {
@@ -162,7 +158,7 @@ int hybrid(float xin[], float xprev[], float y[18][32],
    nout = 18 * i;
 
 /*--- clear remaining only to band limit --*/
-   for (; i < band_limit_nsb; i++)
+   for (; i < m->cupl.band_limit_nsb; i++)
    {
       for (j = 0; j < 18; j++)
 	 y[j][i] = 0.0f;
@@ -182,7 +178,7 @@ int hybrid(float xin[], float xprev[], float y[18][32],
 /*--------------------------------------------------------------------*/
 /*-- convert to mono, add curr result to y,
     window and add next time to current left */
-int hybrid_sum(float xin[], float xin_left[], float y[18][32],
+int hybrid_sum(MPEG *m, float xin[], float xin_left[], float y[18][32],
 	       int btype, int nlong, int ntot)
 {
    int i, j;
@@ -205,22 +201,22 @@ int hybrid_sum(float xin[], float xin_left[], float y[18][32],
       imdct18(x);
       for (j = 0; j < 9; j++)
       {
-	 y[j][i] += win[btype][j] * x[9 + j];
-	 y[9 + j][i] += win[btype][9 + j] * x[17 - j];
+	 y[j][i] += m->cupl.win[btype][j] * x[9 + j];
+	 y[9 + j][i] += m->cupl.win[btype][9 + j] * x[17 - j];
       }
     /* window x for next time x0 */
       for (j = 0; j < 4; j++)
       {
 	 xa = x[j];
 	 xb = x[8 - j];
-	 x0[j] += win[btype][18 + j] * xb;
-	 x0[8 - j] += win[btype][(18 + 8) - j] * xa;
-	 x0[9 + j] += win[btype][(18 + 9) + j] * xa;
-	 x0[17 - j] += win[btype][(18 + 17) - j] * xb;
+	 x0[j] += m->cupl.win[btype][18 + j] * xb;
+	 x0[8 - j] += m->cupl.win[btype][(18 + 8) - j] * xa;
+	 x0[9 + j] += m->cupl.win[btype][(18 + 9) + j] * xa;
+	 x0[17 - j] += m->cupl.win[btype][(18 + 17) - j] * xb;
       }
       xa = x[j];
-      x0[j] += win[btype][18 + j] * xa;
-      x0[9 + j] += win[btype][(18 + 9) + j] * xa;
+      x0[j] += m->cupl.win[btype][18 + j] * xa;
+      x0[9 + j] += m->cupl.win[btype][(18 + 9) + j] * xa;
 
       x += 18;
       x0 += 18;
@@ -233,22 +229,22 @@ int hybrid_sum(float xin[], float xin_left[], float y[18][32],
       imdct6_3(x);
       for (j = 0; j < 3; j++)
       {
-	 y[6 + j][i] += win[2][j] * x[3 + j];
-	 y[9 + j][i] += win[2][3 + j] * x[5 - j];
+	 y[6 + j][i] += m->cupl.win[2][j] * x[3 + j];
+	 y[9 + j][i] += m->cupl.win[2][3 + j] * x[5 - j];
 
-	 y[12 + j][i] += win[2][6 + j] * x[2 - j] + win[2][j] * x[(6 + 3) + j];
-	 y[15 + j][i] += win[2][9 + j] * x[j] + win[2][3 + j] * x[(6 + 5) - j];
+	 y[12 + j][i] += m->cupl.win[2][6 + j] * x[2 - j] + m->cupl.win[2][j] * x[(6 + 3) + j];
+	 y[15 + j][i] += m->cupl.win[2][9 + j] * x[j] + m->cupl.win[2][3 + j] * x[(6 + 5) - j];
       }
     /* window x for next time */
       for (j = 0; j < 3; j++)
       {
-	 x0[j] += win[2][6 + j] * x[(6 + 2) - j] + win[2][j] * x[(12 + 3) + j];
-	 x0[3 + j] += win[2][9 + j] * x[6 + j] + win[2][3 + j] * x[(12 + 5) - j];
+	 x0[j] += m->cupl.win[2][6 + j] * x[(6 + 2) - j] + m->cupl.win[2][j] * x[(12 + 3) + j];
+	 x0[3 + j] += m->cupl.win[2][9 + j] * x[6 + j] + m->cupl.win[2][3 + j] * x[(12 + 5) - j];
       }
       for (j = 0; j < 3; j++)
       {
-	 x0[6 + j] += win[2][6 + j] * x[(12 + 2) - j];
-	 x0[9 + j] += win[2][9 + j] * x[12 + j];
+	 x0[6 + j] += m->cupl.win[2][6 + j] * x[(12 + 2) - j];
+	 x0[9 + j] += m->cupl.win[2][9 + j] * x[12 + j];
       }
       x += 18;
       x0 += 18;
@@ -280,7 +276,7 @@ void FreqInvert(float y[18][32], int n)
    {
       for (i = 0; i < n; i += 2)
       {
-	 y[1 + j][1 + i] = -y[1 + j][1 + i];
+    	 y[1 + j][1 + i] = -y[1 + j][1 + i];
       }
    }
 #endif

@@ -44,13 +44,14 @@ mods 11/15/95 for Layer I
        native mpeg rate. dec8.c adds oupuut conversion features.
 
 -------------------------------------
-int audio_decode_init(MPEG_HEAD *h, int framebytes_arg,
+int audio_decode_init(MPEG *m, MPEG_HEAD *h, int framebytes_arg,
          int reduction_code, int transform_code, int convert_code,
          int freq_limit)
 
 initilize decoder:
        return 0 = fail, not 0 = success
 
+MPEG *m			input, mpeg structure for multiple streams
 MPEG_HEAD *h    input, mpeg header info (returned by call to head_info)
 framebytes      input, mpeg frame size (returned by call to head_info)
 reduction_code  input, sample rate reduction code
@@ -69,8 +70,9 @@ freq_limit      input, limits bandwidth of pcm output to specified
 
 
 ---------------------------------
-void audio_decode_info( DEC_INFO *info)
+void audio_decode_info( MPEG *m, DEC_INFO *info)
 
+MPEG *m			input, mpeg structure for multiple streams
 information return:
           Call after audio_decode_init.  See mhead.h for
           information returned in DEC_INFO structure.
@@ -97,6 +99,7 @@ IN_OUT structure returns:
 #include <stdio.h>
 #include <float.h>
 #include <math.h>
+#include "L3.h"
 #include "mhead.h"		/* mpeg header structure */
 
 
@@ -113,257 +116,214 @@ not cause a memory access violation (protection fault)
 
 /*====================================================================*/
 /*----------------*/
-DEC_INFO decinfo;		/* global for Layer III */
 
-/*----------------*/
-static float look_c_value[18];	/* built by init */
-
-/*----------------*/
-static int outbytes;
-static int framebytes;
-static int outvalues;
-static int pad;
+/* Read Only */
 static int look_joint[16] =
 {				/* lookup stereo sb's by mode+ext */
    64, 64, 64, 64,		/* stereo */
    2 * 4, 2 * 8, 2 * 12, 2 * 16,	/* joint */
    64, 64, 64, 64,		/* dual */
    32, 32, 32, 32,		/* mono */
-};
+};	/* Okay to be global */
 
-/*----------------*/
-static int max_sb;
-static int stereo_sb;
-
-/*----------------*/
-static int nsb_limit = 6;
-static int bit_skip;
+/* Read Only */
 static int bat_bit_master[] =
 {
    0, 5, 7, 9, 10, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48};
 
-/*----------------*/
-static int nbat[4] =
-{3, 8, 12, 7};
-static int bat[4][16];
-static int ballo[64];		/* set by unpack_ba */
-static unsigned int samp_dispatch[66];	/* set by unpack_ba */
-static float c_value[64];	/* set by unpack_ba */
 
-/*----------------*/
-static unsigned int sf_dispatch[66];	/* set by unpack_ba */
-static float sf_table[64];
-static float cs_factor[3][64];
-
-/*----------------*/
-float sample[2304];		/* global for use by Later 3 */
-static signed char group3_table[32][3];
-static signed char group5_table[128][3];
-static signed short group9_table[1024][3];
-
-/*----------------*/
-
-typedef void (*SBT_FUNCTION) (float *sample, short *pcm, int n);
-void sbt_mono(float *sample, short *pcm, int n);
-void sbt_dual(float *sample, short *pcm, int n);
-static SBT_FUNCTION sbt = sbt_mono;
+void sbt_mono(MPEG *m, float *sample, short *pcm, int n);
+void sbt_dual(MPEG *m, float *sample, short *pcm, int n);
 
 
-typedef IN_OUT(*AUDIO_DECODE_ROUTINE) (unsigned char *bs, signed short *pcm);
-IN_OUT L2audio_decode(unsigned char *bs, signed short *pcm);
-static AUDIO_DECODE_ROUTINE audio_decode_routine = L2audio_decode;
+IN_OUT L2audio_decode(void *mv, unsigned char *bs, signed short *pcm);
 
 /*======================================================================*/
 /*======================================================================*/
-/* get bits from bitstream in endian independent way */
-static unsigned char *bs_ptr;
-static unsigned long bitbuf;
-static int bits;
-static long bitval;
 
 /*------------- initialize bit getter -------------*/
-static void load_init(unsigned char *buf)
+static void load_init(MPEG *m, unsigned char *buf)
 {
-   bs_ptr = buf;
-   bits = 0;
-   bitbuf = 0;
+   m->cup.bs_ptr = buf;
+   m->cup.bits = 0;
+   m->cup.bitbuf = 0;
 }
 /*------------- get n bits from bitstream -------------*/
-static long load(int n)
+static long load(MPEG *m, int n)
 {
    unsigned long x;
 
-   if (bits < n)
+   if (m->cup.bits < n)
    {				/* refill bit buf if necessary */
-      while (bits <= 24)
+      while (m->cup.bits <= 24)
       {
-	 bitbuf = (bitbuf << 8) | *bs_ptr++;
-	 bits += 8;
+	 m->cup.bitbuf = (m->cup.bitbuf << 8) | *m->cup.bs_ptr++;
+	 m->cup.bits += 8;
       }
    }
-   bits -= n;
-   x = bitbuf >> bits;
-   bitbuf -= x << bits;
+   m->cup.bits -= n;
+   x = m->cup.bitbuf >> m->cup.bits;
+   m->cup.bitbuf -= x << m->cup.bits;
    return x;
 }
 /*------------- skip over n bits in bitstream -------------*/
-static void skip(int n)
+static void skip(MPEG *m, int n)
 {
    int k;
 
-   if (bits < n)
+   if (m->cup.bits < n)
    {
-      n -= bits;
+      n -= m->cup.bits;
       k = n >> 3;
 /*--- bytes = n/8 --*/
-      bs_ptr += k;
+      m->cup.bs_ptr += k;
       n -= k << 3;
-      bitbuf = *bs_ptr++;
-      bits = 8;
+      m->cup.bitbuf = *m->cup.bs_ptr++;
+      m->cup.bits = 8;
    }
-   bits -= n;
-   bitbuf -= (bitbuf >> bits) << bits;
+   m->cup.bits -= n;
+   m->cup.bitbuf -= (m->cup.bitbuf >> m->cup.bits) << m->cup.bits;
 }
 /*--------------------------------------------------------------*/
-#define mac_load_check(n) if( bits < (n) ) {                           \
-          while( bits <= 24 ) {               \
-             bitbuf = (bitbuf << 8) | *bs_ptr++;  \
-             bits += 8;                       \
+#define mac_load_check(n) if( m->cup.bits < (n) ) {                           \
+          while( m->cup.bits <= 24 ) {               \
+             m->cup.bitbuf = (m->cup.bitbuf << 8) | *m->cup.bs_ptr++;  \
+             m->cup.bits += 8;                       \
           }                                   \
    }
 /*--------------------------------------------------------------*/
-#define mac_load(n) ( bits -= n,                    \
-         bitval = bitbuf >> bits,      \
-         bitbuf -= bitval << bits,     \
-         bitval )
+#define mac_load(n) ( m->cup.bits -= n,                    \
+         m->cup.bitval = m->cup.bitbuf >> m->cup.bits,      \
+         m->cup.bitbuf -= m->cup.bitval << m->cup.bits,     \
+         m->cup.bitval )
 /*======================================================================*/
-static void unpack_ba(void)
+static void unpack_ba(MPEG *m)
 {
    int i, j, k;
+   /* Read Only */
    static int nbit[4] =
    {4, 4, 3, 2};
    int nstereo;
 
-   bit_skip = 0;
-   nstereo = stereo_sb;
+   m->cup.bit_skip = 0;
+   nstereo = m->cup.stereo_sb;
    k = 0;
    for (i = 0; i < 4; i++)
    {
-      for (j = 0; j < nbat[i]; j++, k++)
+      for (j = 0; j < m->cup.nbat[i]; j++, k++)
       {
 	 mac_load_check(4);
-	 ballo[k] = samp_dispatch[k] = bat[i][mac_load(nbit[i])];
-	 if (k >= nsb_limit)
-	    bit_skip += bat_bit_master[samp_dispatch[k]];
-	 c_value[k] = look_c_value[samp_dispatch[k]];
+	 m->cup.ballo[k] = m->cup.samp_dispatch[k] = m->cup.bat[i][mac_load(nbit[i])];
+	 if (k >= m->cup.nsb_limit)
+	    m->cup.bit_skip += bat_bit_master[m->cup.samp_dispatch[k]];
+	 m->cup.c_value[k] = m->cup.look_c_value[m->cup.samp_dispatch[k]];
 	 if (--nstereo < 0)
 	 {
-	    ballo[k + 1] = ballo[k];
-	    samp_dispatch[k] += 18;	/* flag as joint */
-	    samp_dispatch[k + 1] = samp_dispatch[k];	/* flag for sf */
-	    c_value[k + 1] = c_value[k];
+	    m->cup.ballo[k + 1] = m->cup.ballo[k];
+	    m->cup.samp_dispatch[k] += 18;	/* flag as joint */
+	    m->cup.samp_dispatch[k + 1] = m->cup.samp_dispatch[k];	/* flag for sf */
+	    m->cup.c_value[k + 1] = m->cup.c_value[k];
 	    k++;
 	    j++;
 	 }
       }
    }
-   samp_dispatch[nsb_limit] = 37;	/* terminate the dispatcher with skip */
-   samp_dispatch[k] = 36;	/* terminate the dispatcher */
+   m->cup.samp_dispatch[m->cup.nsb_limit] = 37;	/* terminate the dispatcher with skip */
+   m->cup.samp_dispatch[k] = 36;	/* terminate the dispatcher */
 
 }
 /*-------------------------------------------------------------------------*/
-static void unpack_sfs(void)	/* unpack scale factor selectors */
+static void unpack_sfs(MPEG *m)	/* unpack scale factor selectors */
 {
    int i;
-
-   for (i = 0; i < max_sb; i++)
+   for (i = 0; i < m->cup.max_sb; i++)
    {
       mac_load_check(2);
-      if (ballo[i])
-	 sf_dispatch[i] = mac_load(2);
+      if (m->cup.ballo[i])
+	 m->cup.sf_dispatch[i] = mac_load(2);
       else
-	 sf_dispatch[i] = 4;	/* no allo */
+	 m->cup.sf_dispatch[i] = 4;	/* no allo */
    }
-   sf_dispatch[i] = 5;		/* terminate dispatcher */
+   m->cup.sf_dispatch[i] = 5;		/* terminate dispatcher */
 }
 /*-------------------------------------------------------------------------*/
-static void unpack_sf(void)	/* unpack scale factor */
+static void unpack_sf(MPEG *m)		/* unpack scale factor */
 {				/* combine dequant and scale factors */
    int i;
 
    i = -1;
- dispatch:switch (sf_dispatch[++i])
+ dispatch:switch (m->cup.sf_dispatch[++i])
    {
       case 0:			/* 3 factors 012 */
 	 mac_load_check(18);
-	 cs_factor[0][i] = c_value[i] * sf_table[mac_load(6)];
-	 cs_factor[1][i] = c_value[i] * sf_table[mac_load(6)];
-	 cs_factor[2][i] = c_value[i] * sf_table[mac_load(6)];
+	 m->cup.cs_factor[0][i] = m->cup.c_value[i] * m->cup.sf_table[mac_load(6)];
+	 m->cup.cs_factor[1][i] = m->cup.c_value[i] * m->cup.sf_table[mac_load(6)];
+	 m->cup.cs_factor[2][i] = m->cup.c_value[i] * m->cup.sf_table[mac_load(6)];
 	 goto dispatch;
       case 1:			/* 2 factors 002 */
 	 mac_load_check(12);
-	 cs_factor[1][i] = cs_factor[0][i] = c_value[i] * sf_table[mac_load(6)];
-	 cs_factor[2][i] = c_value[i] * sf_table[mac_load(6)];
+	 m->cup.cs_factor[1][i] = m->cup.cs_factor[0][i] = m->cup.c_value[i] * m->cup.sf_table[mac_load(6)];
+	 m->cup.cs_factor[2][i] = m->cup.c_value[i] * m->cup.sf_table[mac_load(6)];
 	 goto dispatch;
       case 2:			/* 1 factor 000 */
 	 mac_load_check(6);
-	 cs_factor[2][i] = cs_factor[1][i] = cs_factor[0][i] =
-	    c_value[i] * sf_table[mac_load(6)];
+	 m->cup.cs_factor[2][i] = m->cup.cs_factor[1][i] = m->cup.cs_factor[0][i] =
+	    m->cup.c_value[i] * m->cup.sf_table[mac_load(6)];
 	 goto dispatch;
       case 3:			/* 2 factors 022 */
 	 mac_load_check(12);
-	 cs_factor[0][i] = c_value[i] * sf_table[mac_load(6)];
-	 cs_factor[2][i] = cs_factor[1][i] = c_value[i] * sf_table[mac_load(6)];
+	 m->cup.cs_factor[0][i] = m->cup.c_value[i] * m->cup.sf_table[mac_load(6)];
+	 m->cup.cs_factor[2][i] = m->cup.cs_factor[1][i] = m->cup.c_value[i] * m->cup.sf_table[mac_load(6)];
 	 goto dispatch;
       case 4:			/* no allo */
-/*-- cs_factor[2][i] = cs_factor[1][i] = cs_factor[0][i] = 0.0;  --*/
+/*-- m->cup.cs_factor[2][i] = m->cup.cs_factor[1][i] = m->cup.cs_factor[0][i] = 0.0;  --*/
 	 goto dispatch;
       case 5:			/* all done */
 	 ;
    }				/* end switch */
 }
 /*-------------------------------------------------------------------------*/
-#define UNPACK_N(n) s[k]     =  cs_factor[i][k]*(load(n)-((1 << (n-1)) -1));   \
-    s[k+64]  =  cs_factor[i][k]*(load(n)-((1 << (n-1)) -1));   \
-    s[k+128] =  cs_factor[i][k]*(load(n)-((1 << (n-1)) -1));   \
+#define UNPACK_N(n) s[k]     =  m->cup.cs_factor[i][k]*(load(m,n)-((1 << (n-1)) -1));   \
+    s[k+64]  =  m->cup.cs_factor[i][k]*(load(m,n)-((1 << (n-1)) -1));   \
+    s[k+128] =  m->cup.cs_factor[i][k]*(load(m,n)-((1 << (n-1)) -1));   \
     goto dispatch;
 #define UNPACK_N2(n) mac_load_check(3*n);                                         \
-    s[k]     =  cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1));   \
-    s[k+64]  =  cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1));   \
-    s[k+128] =  cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1));   \
+    s[k]     =  m->cup.cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1));   \
+    s[k+64]  =  m->cup.cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1));   \
+    s[k+128] =  m->cup.cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1));   \
     goto dispatch;
 #define UNPACK_N3(n) mac_load_check(2*n);                                         \
-    s[k]     =  cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1));   \
-    s[k+64]  =  cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1));   \
+    s[k]     =  m->cup.cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1));   \
+    s[k+64]  =  m->cup.cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1));   \
     mac_load_check(n);                                           \
-    s[k+128] =  cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1));   \
+    s[k+128] =  m->cup.cs_factor[i][k]*(mac_load(n)-((1 << (n-1)) -1));   \
     goto dispatch;
-#define UNPACKJ_N(n) tmp        =  (load(n)-((1 << (n-1)) -1));                \
-    s[k]       =  cs_factor[i][k]*tmp;                       \
-    s[k+1]     =  cs_factor[i][k+1]*tmp;                     \
-    tmp        =  (load(n)-((1 << (n-1)) -1));                 \
-    s[k+64]    =  cs_factor[i][k]*tmp;                       \
-    s[k+64+1]  =  cs_factor[i][k+1]*tmp;                     \
-    tmp        =  (load(n)-((1 << (n-1)) -1));                 \
-    s[k+128]   =  cs_factor[i][k]*tmp;                       \
-    s[k+128+1] =  cs_factor[i][k+1]*tmp;                     \
+#define UNPACKJ_N(n) tmp        =  (load(m,n)-((1 << (n-1)) -1));                \
+    s[k]       =  m->cup.cs_factor[i][k]*tmp;                       \
+    s[k+1]     =  m->cup.cs_factor[i][k+1]*tmp;                     \
+    tmp        =  (load(m,n)-((1 << (n-1)) -1));                 \
+    s[k+64]    =  m->cup.cs_factor[i][k]*tmp;                       \
+    s[k+64+1]  =  m->cup.cs_factor[i][k+1]*tmp;                     \
+    tmp        =  (load(m,n)-((1 << (n-1)) -1));                 \
+    s[k+128]   =  m->cup.cs_factor[i][k]*tmp;                       \
+    s[k+128+1] =  m->cup.cs_factor[i][k+1]*tmp;                     \
     k++;       /* skip right chan dispatch */                \
     goto dispatch;
 /*-------------------------------------------------------------------------*/
-static void unpack_samp(void)	/* unpack samples */
+static void unpack_samp(MPEG *m)	/* unpack samples */
 {
    int i, j, k;
    float *s;
    int n;
    long tmp;
 
-   s = sample;
+   s = m->cup.sample;
    for (i = 0; i < 3; i++)
    {				/* 3 groups of scale factors */
       for (j = 0; j < 4; j++)
       {
 	 k = -1;
-       dispatch:switch (samp_dispatch[++k])
+       dispatch:switch (m->cup.samp_dispatch[++k])
 	 {
 	    case 0:
 	       s[k + 128] = s[k + 64] = s[k] = 0.0F;
@@ -371,25 +331,25 @@ static void unpack_samp(void)	/* unpack samples */
 	    case 1:		/* 3 levels grouped 5 bits */
 	       mac_load_check(5);
 	       n = mac_load(5);
-	       s[k] = cs_factor[i][k] * group3_table[n][0];
-	       s[k + 64] = cs_factor[i][k] * group3_table[n][1];
-	       s[k + 128] = cs_factor[i][k] * group3_table[n][2];
+	       s[k] = m->cup.cs_factor[i][k] * m->cup.group3_table[n][0];
+	       s[k + 64] = m->cup.cs_factor[i][k] * m->cup.group3_table[n][1];
+	       s[k + 128] = m->cup.cs_factor[i][k] * m->cup.group3_table[n][2];
 	       goto dispatch;
 	    case 2:		/* 5 levels grouped 7 bits */
 	       mac_load_check(7);
 	       n = mac_load(7);
-	       s[k] = cs_factor[i][k] * group5_table[n][0];
-	       s[k + 64] = cs_factor[i][k] * group5_table[n][1];
-	       s[k + 128] = cs_factor[i][k] * group5_table[n][2];
+	       s[k] = m->cup.cs_factor[i][k] * m->cup.group5_table[n][0];
+	       s[k + 64] = m->cup.cs_factor[i][k] * m->cup.group5_table[n][1];
+	       s[k + 128] = m->cup.cs_factor[i][k] * m->cup.group5_table[n][2];
 	       goto dispatch;
 	    case 3:
 	       UNPACK_N2(3)	/* 7 levels */
 	    case 4:		/* 9 levels grouped 10 bits */
 	       mac_load_check(10);
 	       n = mac_load(10);
-	       s[k] = cs_factor[i][k] * group9_table[n][0];
-	       s[k + 64] = cs_factor[i][k] * group9_table[n][1];
-	       s[k + 128] = cs_factor[i][k] * group9_table[n][2];
+	       s[k] = m->cup.cs_factor[i][k] * m->cup.group9_table[n][0];
+	       s[k + 64] = m->cup.cs_factor[i][k] * m->cup.group9_table[n][1];
+	       s[k + 128] = m->cup.cs_factor[i][k] * m->cup.group9_table[n][2];
 	       goto dispatch;
 	    case 5:
 	       UNPACK_N2(4)	/* 15 levels */
@@ -423,35 +383,35 @@ static void unpack_samp(void)	/* unpack samples */
 	       k++;		/* skip right chan dispatch */
 	       goto dispatch;
 	    case 18 + 1:	/* 3 levels grouped 5 bits */
-	       n = load(5);
-	       s[k] = cs_factor[i][k] * group3_table[n][0];
-	       s[k + 1] = cs_factor[i][k + 1] * group3_table[n][0];
-	       s[k + 64] = cs_factor[i][k] * group3_table[n][1];
-	       s[k + 64 + 1] = cs_factor[i][k + 1] * group3_table[n][1];
-	       s[k + 128] = cs_factor[i][k] * group3_table[n][2];
-	       s[k + 128 + 1] = cs_factor[i][k + 1] * group3_table[n][2];
+	       n = load(m,5);
+	       s[k] = m->cup.cs_factor[i][k] * m->cup.group3_table[n][0];
+	       s[k + 1] = m->cup.cs_factor[i][k + 1] * m->cup.group3_table[n][0];
+	       s[k + 64] = m->cup.cs_factor[i][k] * m->cup.group3_table[n][1];
+	       s[k + 64 + 1] = m->cup.cs_factor[i][k + 1] * m->cup.group3_table[n][1];
+	       s[k + 128] = m->cup.cs_factor[i][k] * m->cup.group3_table[n][2];
+	       s[k + 128 + 1] = m->cup.cs_factor[i][k + 1] * m->cup.group3_table[n][2];
 	       k++;		/* skip right chan dispatch */
 	       goto dispatch;
 	    case 18 + 2:	/* 5 levels grouped 7 bits */
-	       n = load(7);
-	       s[k] = cs_factor[i][k] * group5_table[n][0];
-	       s[k + 1] = cs_factor[i][k + 1] * group5_table[n][0];
-	       s[k + 64] = cs_factor[i][k] * group5_table[n][1];
-	       s[k + 64 + 1] = cs_factor[i][k + 1] * group5_table[n][1];
-	       s[k + 128] = cs_factor[i][k] * group5_table[n][2];
-	       s[k + 128 + 1] = cs_factor[i][k + 1] * group5_table[n][2];
+	       n = load(m,7);
+	       s[k] = m->cup.cs_factor[i][k] * m->cup.group5_table[n][0];
+	       s[k + 1] = m->cup.cs_factor[i][k + 1] * m->cup.group5_table[n][0];
+	       s[k + 64] = m->cup.cs_factor[i][k] * m->cup.group5_table[n][1];
+	       s[k + 64 + 1] = m->cup.cs_factor[i][k + 1] * m->cup.group5_table[n][1];
+	       s[k + 128] = m->cup.cs_factor[i][k] * m->cup.group5_table[n][2];
+	       s[k + 128 + 1] = m->cup.cs_factor[i][k + 1] * m->cup.group5_table[n][2];
 	       k++;		/* skip right chan dispatch */
 	       goto dispatch;
 	    case 18 + 3:
 	       UNPACKJ_N(3)	/* 7 levels */
 	    case 18 + 4:	/* 9 levels grouped 10 bits */
-	       n = load(10);
-	       s[k] = cs_factor[i][k] * group9_table[n][0];
-	       s[k + 1] = cs_factor[i][k + 1] * group9_table[n][0];
-	       s[k + 64] = cs_factor[i][k] * group9_table[n][1];
-	       s[k + 64 + 1] = cs_factor[i][k + 1] * group9_table[n][1];
-	       s[k + 128] = cs_factor[i][k] * group9_table[n][2];
-	       s[k + 128 + 1] = cs_factor[i][k + 1] * group9_table[n][2];
+	       n = load(m,10);
+	       s[k] = m->cup.cs_factor[i][k] * m->cup.group9_table[n][0];
+	       s[k + 1] = m->cup.cs_factor[i][k + 1] * m->cup.group9_table[n][0];
+	       s[k + 64] = m->cup.cs_factor[i][k] * m->cup.group9_table[n][1];
+	       s[k + 64 + 1] = m->cup.cs_factor[i][k + 1] * m->cup.group9_table[n][1];
+	       s[k + 128] = m->cup.cs_factor[i][k] * m->cup.group9_table[n][2];
+	       s[k + 128 + 1] = m->cup.cs_factor[i][k + 1] * m->cup.group9_table[n][2];
 	       k++;		/* skip right chan dispatch */
 	       goto dispatch;
 	    case 18 + 5:
@@ -482,7 +442,7 @@ static void unpack_samp(void)	/* unpack samples */
 	       UNPACKJ_N(16)	/* 65535 levels */
 /* -- end of dispatch -- */
 	    case 37:
-	       skip(bit_skip);
+	       skip(m, m->cup.bit_skip);
 	    case 36:
 	       s += 3 * 64;
 	 }			/* end switch */
@@ -492,44 +452,45 @@ static void unpack_samp(void)	/* unpack samples */
 
 }
 /*-------------------------------------------------------------------------*/
-IN_OUT audio_decode(unsigned char *bs, signed short *pcm)
+IN_OUT audio_decode(MPEG *m, unsigned char *bs, signed short *pcm)
 {
-   return audio_decode_routine(bs, pcm);
+   return m->cup.audio_decode_routine(m, bs, pcm);
 }
 /*-------------------------------------------------------------------------*/
-IN_OUT L2audio_decode(unsigned char *bs, signed short *pcm)
+IN_OUT L2audio_decode(void *mv, unsigned char *bs, signed short *pcm)
 {
+   MPEG *m = mv;
    int sync, prot;
    IN_OUT in_out;
 
-   load_init(bs);		/* initialize bit getter */
+   load_init(m, bs);		/* initialize bit getter */
 /* test sync */
    in_out.in_bytes = 0;		/* assume fail */
    in_out.out_bytes = 0;
-   sync = load(12);
+   sync = load(m,12);
    if (sync != 0xFFF)
       return in_out;		/* sync fail */
 
-   load(3);			/* skip id and option (checked by init) */
-   prot = load(1);		/* load prot bit */
-   load(6);			/* skip to pad */
-   pad = load(1);
-   load(1);			/* skip to mode */
-   stereo_sb = look_joint[load(4)];
+   load(m,3);			/* skip id and option (checked by init) */
+   prot = load(m,1);		/* load prot bit */
+   load(m,6);			/* skip to pad */
+   m->cup.pad = load(m,1);
+   load(m,1);			/* skip to mode */
+   m->cup.stereo_sb = look_joint[load(m,4)];
    if (prot)
-      load(4);			/* skip to data */
+      load(m,4);			/* skip to data */
    else
-      load(20);			/* skip crc */
+      load(m,20);			/* skip crc */
 
-   unpack_ba();			/* unpack bit allocation */
-   unpack_sfs();		/* unpack scale factor selectors */
-   unpack_sf();			/* unpack scale factor */
-   unpack_samp();		/* unpack samples */
+   unpack_ba(m);			/* unpack bit allocation */
+   unpack_sfs(m);		/* unpack scale factor selectors */
+   unpack_sf(m);			/* unpack scale factor */
+   unpack_samp(m);		/* unpack samples */
 
-   sbt(sample, pcm, 36);
+   m->cup.sbt(m, m->cup.sample, pcm, 36);
 /*-----------*/
-   in_out.in_bytes = framebytes + pad;
-   in_out.out_bytes = outbytes;
+   in_out.in_bytes = m->cup.framebytes + m->cup.pad;
+   in_out.out_bytes = m->cup.outbytes;
 
    return in_out;
 }

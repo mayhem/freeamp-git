@@ -50,16 +50,6 @@ extern    "C"
 #define BS_BUFBYTES 60000U
 #define PCM_BUFBYTES 60000U
 
-typedef struct
-{
-   int       (*decode_init) (MPEG_HEAD * h, int framebytes_arg,
-              int reduction_code, int transform_code,
-              int convert_code, int freq_limit);
-   void      (*decode_info) (DEC_INFO * info);
-             IN_OUT(*decode) (unsigned char *bs, short *pcm);
-}
-AUDIO;
-
 #define FRAMES_FLAG     0x0001
 #define BYTES_FLAG      0x0002
 #define TOC_FLAG        0x0004
@@ -150,12 +140,12 @@ class     XingLMC:public LogicalMediaConverter
    time_t               m_iBufferUpdate;
    char                *m_szUrl;
    const char          *m_szError;
-   AUDIO                m_audioMethods; 
    XHEADDATA           *m_pXingHeader;
    
    // These vars are used for a nasty hack.
    FILE                *m_fpFile;
    char                *m_pLocalReadBuffer;
+   MPEG                 m_sMPEG;
 };
 
 #endif /* _XINGLMC_H */

@@ -338,6 +338,7 @@ int ff_decode(char *filename, char *fileout,
    int framebytes;
    int u;
    MPEG_HEAD head;
+   MPEG m;
    unsigned int nwrite;
    IN_OUT x;
    int in_bytes, out_bytes;
@@ -345,7 +346,7 @@ int ff_decode(char *filename, char *fileout,
    int bitrate;
 
 /*------------------------------------------*/
-   typedef struct
+/*   typedef struct
    {
       int (*decode_init) (MPEG_HEAD * h, int framebytes_arg,
 			  int reduction_code, int transform_code,
@@ -366,7 +367,7 @@ int ff_decode(char *filename, char *fileout,
 	 {audio_decode8_init, audio_decode8_info, audio_decode8},
       }
    };
-
+*/
 /*------------------------------------------*/
 
 /*-----------------------*/
@@ -374,13 +375,16 @@ int ff_decode(char *filename, char *fileout,
    printf("\n    output file: %s", fileout);
 /*-----------------------*/
 /*-----select decoder --------------*/
-   if (decode8_flag && (convert_code >= 4))
+/*   if (decode8_flag && (convert_code >= 4))
       audio = audio_table[integer & 1][1];
    else
-      audio = audio_table[integer & 1][0];
+      audio = audio_table[integer & 1][0]; */
 /*-----------------------*/
 
 
+   mpeg_init(&m);
+   mpeg_eq_init(&m);
+   //memset(&m, 0, sizeof(MPEG));
    in_bytes = out_bytes = 0;
 /*-----------------------*/
    handout = -1;
@@ -506,14 +510,14 @@ int ff_decode(char *filename, char *fileout,
    }
 
 /*---- init decoder -------*/
-   if (!audio.decode_init(&head, framebytes,
+   if (!audio_decode_init(&m, &head, framebytes,
 			  reduction_code, 0, convert_code, freq_limit))
    {
       printf("\n DECODER INIT FAIL \n");
       goto abort;
    }
 /*---- get info -------*/
-   audio.decode_info(&decinfo);
+   audio_decode_info(&m, &decinfo);
 /*---- info display -------*/
    printf("\n output samprate = %6ld", decinfo.samprate);
    printf("\n output channels = %6d", decinfo.channels);
@@ -543,7 +547,7 @@ int ff_decode(char *filename, char *fileout,
 #ifdef TIME_TEST
       set_clock();
 #endif
-      x = audio.decode(bs_bufptr, (short *) (pcm_buffer + pcm_bufbytes));
+      x = audio_decode(&m, bs_bufptr, (short *) (pcm_buffer + pcm_bufbytes));
 #ifdef TIME_TEST
       get_clock();
       tot_cycles += global_cycles;

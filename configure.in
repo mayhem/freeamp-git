@@ -756,10 +756,6 @@ if test "x$enable_x86" = "xyes"; then
                      lmc/xingmp3/src/mdctasm.o \
                      lmc/xingmp3/src/msisasm.o`"
       AC_DEFINE(ASM_X86)
-    else
-      AC_MSG_RESULT([nasm not available, using older x86 optimizations])
-      XINGASM=lmc/xingmp3/src/x86gas.o
-      AC_DEFINE(ASM_X86_OLD)
     fi
   fi
 fi

@@ -90,9 +90,17 @@ doing the right thing.
 ------------------------------------------------------------------*/
 /*-- settings for MS C++ 4.0 flat 32 bit (long=int=32bit) --*/
 /*-- asm replacement modules must use these settings ---*/
+#ifndef ITYPES_H
+#define ITYPES_H
 
+#ifdef WIN32
+#include <basetsd.h>
+#endif
+
+#ifndef WIN32
 typedef long INT32;
 typedef unsigned long UINT32;
+#endif
 
 typedef int SAMPLEINT;
 
@@ -106,3 +114,4 @@ typedef int WINCOEF;
 
 #define WINBITS 10
 #define WINMULT(x,coef)  ((x)*(coef))
+#endif
