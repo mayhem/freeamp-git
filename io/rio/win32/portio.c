@@ -22,7 +22,6 @@
 ____________________________________________________________________________*/
 /* system headers */
 #include <ntddk.h>
-//#include <windows.h>
 #include <stdlib.h>
 
 typedef unsigned char BYTE;
@@ -82,6 +81,8 @@ NTSTATUS DriverCreateDispatch(
     IN  PDEVICE_OBJECT  deviceObject,
     IN  PIRP            irp)
 {
+    NTSTATUS result = STATUS_SUCCESS;
+
 	Ke386IoSetAccessProcess(PsGetCurrentProcess(), 1);
 	Ke386SetIoAccessMap(1, ioMap);
 
@@ -89,7 +90,7 @@ NTSTATUS DriverCreateDispatch(
     irp->IoStatus.Status = STATUS_SUCCESS;
     IoCompleteRequest(irp, IO_NO_INCREMENT);
 
-    return STATUS_SUCCESS;
+    return result;
 }
 
 // Standard entry point for the device driver. Initialize ourselves

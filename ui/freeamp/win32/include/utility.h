@@ -56,5 +56,10 @@ bool FileSaveDialog(HWND hwnd,
                     char* path,
                     uint32* pathLength);
 
+bool LoadDriver(const char* driverName, 
+                const char* driverPath);
+
+bool UnloadDriver(const char* driverName);
+
 
 #endif /* _UTILITY_H_ */

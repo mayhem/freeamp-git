@@ -514,3 +514,208 @@ FileSaveDialog( HWND hwnd,
 
     return result;
 }
+
+static 
+bool
+InstallDriver(  SC_HANDLE  scManager,
+                const char* driverName,
+                const char* driverPath)
+
+{
+    bool result = false;
+    SC_HANDLE  service;
+
+    service = CreateService(scManager,              // SCManager database
+                            driverName,             // name of service
+                            driverName,             // name to display
+                            SERVICE_ALL_ACCESS,     // desired access
+                            SERVICE_KERNEL_DRIVER,  // service type
+                            SERVICE_DEMAND_START,   // start type
+                            SERVICE_ERROR_NORMAL,   // error control type
+                            driverPath,             // service's binary
+                            NULL,                   // no load ordering group
+                            NULL,                   // no tag identifier
+                            NULL,                   // no dependencies
+                            NULL,                   // LocalSystem account
+                            NULL);                  // no password
+                                
+    if(service)
+    {
+        result = true;
+    }
+    
+    CloseServiceHandle(service);
+
+    return result;
+}
+
+static
+bool
+StartDriver(SC_HANDLE scManager,
+            const char* driverName)
+{
+    bool result = false;
+    SC_HANDLE  service;
+
+    service = OpenService(  scManager,
+                            driverName,
+                            SERVICE_ALL_ACCESS);
+
+    if(service)
+    {
+        BOOL error;
+
+        error = StartService(service, // service identifier
+                             0,       // number of arguments
+                             NULL);   // pointer to arguments
+
+        result = (error > 0);
+
+        CloseServiceHandle(service);    
+    }
+    
+    return result;
+}
+
+static
+bool
+OpenDevice(const char* driverName)
+{
+    bool    result = false;
+    char    path[MAX_PATH];
+    HANDLE  handle;
+
+    sprintf(path, "\\\\.\\%s", driverName);
+
+    handle = CreateFile(path,
+                        GENERIC_READ | GENERIC_WRITE,
+                        0,
+                        NULL,
+                        OPEN_EXISTING,
+                        FILE_ATTRIBUTE_NORMAL,
+                        NULL);
+
+    if(handle != INVALID_HANDLE_VALUE)
+    {
+        CloseHandle(handle);
+        result = true;
+    }
+   
+    return result;
+}
+
+
+bool 
+LoadDriver(const char* driverName, 
+           const char* driverPath)
+{
+
+    bool result = false;
+    SC_HANDLE scManager;
+
+    scManager = OpenSCManager(NULL,
+                              NULL,
+                              SC_MANAGER_ALL_ACCESS);
+
+    if(scManager)
+    {
+        result = InstallDriver( scManager,
+                                driverName,
+                                driverPath);
+        if(result)
+        {
+            result = StartDriver(scManager,
+                                 driverName);
+
+            if(result)
+            {
+                result = OpenDevice(driverName);
+            }
+        }
+
+        CloseServiceHandle(scManager);
+    }
+
+    return result;
+}
+
+static
+bool
+StopDriver( SC_HANDLE scManager,
+            const char* driverName)
+{
+    bool result = false;
+    SC_HANDLE service;
+    SERVICE_STATUS  serviceStatus;
+
+    service = OpenService(  scManager,
+                            driverName,
+                            SERVICE_ALL_ACCESS);
+
+    if(service)
+    {
+        BOOL error;
+
+        error = ControlService( service,
+                                SERVICE_CONTROL_STOP,
+                                &serviceStatus);
+
+        result = (error > 0);
+
+        CloseServiceHandle(service);
+    }
+
+    return result;
+}
+
+static
+bool
+RemoveDriver(   SC_HANDLE scManager,
+                const char* driverName)
+{
+    bool result = false;
+    SC_HANDLE  service;
+
+    service = OpenService(  scManager,
+                            driverName,
+                            SERVICE_ALL_ACCESS);
+    if(service)
+    {
+        BOOL error;
+
+        error = DeleteService(service);
+
+        result = (error > 0);
+
+        CloseServiceHandle(service);
+    }
+
+    return result;
+}
+
+bool 
+UnloadDriver(const char* driverName)
+{
+    bool result = false;
+    SC_HANDLE scManager;
+
+    scManager = OpenSCManager(NULL,
+                              NULL,
+                              SC_MANAGER_ALL_ACCESS);
+
+    if(scManager)
+    {
+        result = StopDriver(scManager,
+                            driverName);
+
+        if(result)
+        {
+            result = RemoveDriver(  scManager, 
+                                    driverName);
+        }
+
+        CloseServiceHandle(scManager);
+    }
+
+    return result;
+}
