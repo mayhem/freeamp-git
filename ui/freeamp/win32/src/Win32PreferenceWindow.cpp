@@ -1810,6 +1810,10 @@ bool Win32PreferenceWindow::PrefProfileProc(HWND hwnd,
     bool result = false;
     static HWND hwndProfileList = NULL;
     static HWND hwndAddProfile = NULL;
+    static HWND hwndAddProfileButton = NULL;
+    static HWND hwndDeleteProfile = NULL;
+    static HWND hwndEnableProfile = NULL;
+    static HWND hwndHelpMe = NULL;
 
     switch(msg)
     {
@@ -1817,10 +1821,15 @@ bool Win32PreferenceWindow::PrefProfileProc(HWND hwnd,
         {
             hwndProfileList = GetDlgItem(hwnd, IDC_PROFILE_LIST); 
             hwndAddProfile = GetDlgItem(hwnd, IDC_NEW_PROFILE);
+            hwndDeleteProfile = GetDlgItem(hwnd, IDC_DELETEPROFILE);
+            hwndEnableProfile = GetDlgItem(hwnd, IDC_PROFILE_ENABLE);
+            hwndHelpMe = GetDlgItem(hwnd, IDC_PROFILE_HELP);
+            hwndAddProfileButton = GetDlgItem(hwnd, IDC_ADDPROFILE);
 
             APSInterface *pTemp = m_pContext->aps;
             SetFocus(GetDlgItem(hwnd, IDC_PROFILE_LIST));
 
+            BOOL enabled = FALSE;
             if (pTemp != NULL)  
             {
                 vector<string>::iterator i;
@@ -1836,7 +1845,17 @@ bool Win32PreferenceWindow::PrefProfileProc(HWND hwnd,
                     }
                     SetFocus(GetDlgItem(hwnd, IDC_PROFILE_LIST));
                 }
+
+                if (pTemp->GetTurnedOnFlag())
+                    enabled = TRUE;
             }
+
+            Button_SetCheck(hwndEnableProfile, enabled);
+            Button_Enable(hwndAddProfile, enabled);
+            Button_Enable(hwndDeleteProfile, enabled);
+            Button_Enable(hwndProfileList, enabled);
+            Button_Enable(hwndAddProfileButton, enabled);
+
             break;
         }
         case WM_DRAWITEM:
@@ -1877,6 +1896,33 @@ bool Win32PreferenceWindow::PrefProfileProc(HWND hwnd,
                             break;
                         }
                     }
+                    break;
+                }
+                case IDC_PROFILE_ENABLE:
+                {
+                    BOOL enabled = false;
+
+                    if (Button_GetCheck(hwndEnableProfile) == BST_CHECKED)
+                    {
+                        m_pContext->aps->TurnOn();
+                        enabled = true;
+                    }
+                    else
+                    {
+                        m_pContext->aps->TurnOff();
+                        enabled = false;
+                    }
+
+                    Button_Enable(hwndAddProfile, enabled);
+                    Button_Enable(hwndDeleteProfile, enabled);
+                    Button_Enable(hwndProfileList, enabled);
+                    Button_Enable(hwndAddProfileButton, enabled);
+
+                    break;
+                }
+                case IDC_PROFILE_HELP:
+                {
+                    ShowHelp(m_pContext, Preferences_Relatable);
                     break;
                 }
                 case IDC_ADDPROFILE:
@@ -1963,7 +2009,7 @@ bool Win32PreferenceWindow::PrefProfileProc(HWND hwnd,
             {
                 case PSN_HELP:
                 {
-                    ShowHelp(m_pContext, Preferences_About);
+                    ShowHelp(m_pContext, Preferences_Relatable);
                     break;
                 }
                 case PSN_SETACTIVE:

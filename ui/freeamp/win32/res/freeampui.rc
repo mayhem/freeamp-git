@@ -336,18 +336,21 @@ END
 
 IDD_PREF_PROFILE DIALOG DISCARDABLE  0, 0, 233, 175
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Profiles"
+CAPTION "Relatable Profiles"
 FONT 8, "MS Sans Serif"
 BEGIN
-    GROUPBOX        "Profile Selection",IDC_STATIC,6,3,220,97
+    GROUPBOX        "Profile Selection",IDC_STATIC,6,19,220,85
     GROUPBOX        "New Profile",IDC_STATIC,6,104,220,64
-    LISTBOX         IDC_PROFILE_LIST,11,14,205,80,LBS_SORT | LBS_MULTIPLESEL | 
+    LISTBOX         IDC_PROFILE_LIST,11,29,205,65,LBS_SORT | LBS_MULTIPLESEL | 
                     LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     LTEXT           "To create a new profile simply name it in the box below and click Add Profile.  To use an existing profile select from the box above.",
                     IDC_STATIC,14,118,212,19
     EDITTEXT        IDC_NEW_PROFILE,11,149,91,13,ES_AUTOHSCROLL
     PUSHBUTTON      "&Add Profile",IDC_ADDPROFILE,109,148,45,14
     PUSHBUTTON      "&Delete Profile",IDC_DELETEPROFILE,160,148,53,14
+    CONTROL         "Enable Relatable Features",IDC_PROFILE_ENABLE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,6,7,125,8
+    PUSHBUTTON      "&What is all this?",IDC_PROFILE_HELP,156,7,70,12
 END
 
 
@@ -496,6 +499,7 @@ BEGIN
         TOPMARGIN, 3
         BOTTOMMARGIN, 171
     END
+
     IDD_PREF_PROFILE, DIALOG
     BEGIN
         LEFTMARGIN, 6

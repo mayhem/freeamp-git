@@ -445,6 +445,8 @@ BEGIN
     BEGIN
         MENUITEM "&Recommend Playlist",         ID_EDIT_GENERATEPLAYLIST
         MENUITEM "&Learn Playlist",             ID_EDIT_SUBMITPLAYLIST
+        MENUITEM SEPARATOR
+        MENUITEM "&Start Signaturing",          ID_EDIT_STARTSIGNATURING
     END
     POPUP "&Help"
     BEGIN

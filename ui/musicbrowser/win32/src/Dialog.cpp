@@ -270,6 +270,10 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                     SubmitPlaylistEvent();
                     return 1;
 
+                case ID_EDIT_STARTSIGNATURING:
+                    HandleSignature();
+                    return 1;
+
                 case ID_POPUP_EDITPLAYLIST:
                 case ID_EDIT_EDITPLAYLIST:
                     EditPlaylistEvent();
@@ -1828,6 +1832,22 @@ void MusicBrowserUI::UpdateMenuStates()
 
     SetMenuItemInfo(hMenu, ID_EDIT_REMOVE, false, &sMenuItem);
 
+    hMenu = GetSubMenu(hMenuRoot, 5);
+    EnableMenuItem(hMenu, ID_EDIT_STARTSIGNATURING,
+                   m_sigsExist ? MF_ENABLED : MF_GRAYED);
+
+    sMenuItem.cbSize = sizeof(MENUITEMINFO);
+    sMenuItem.fMask =  MIIM_DATA|MIIM_TYPE;
+    sMenuItem.fType = MFT_STRING;
+    sMenuItem.dwTypeData = "Start Signaturing";
+    if (!m_sigsStart)
+        sMenuItem.dwTypeData = "Stop Signaturing";
+    sMenuItem.cch = strlen(sMenuItem.dwTypeData);
+
+    SetMenuItemInfo(hMenu, ID_EDIT_STARTSIGNATURING, false,
+                    &sMenuItem);
+
+    hMenu = GetSubMenu(hMenuRoot, 1);
 
     // Can we move items up and down?
     uint32 index = ListView_GetItemCount(m_hPlaylistView);

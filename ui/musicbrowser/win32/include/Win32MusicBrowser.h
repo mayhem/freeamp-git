@@ -345,6 +345,10 @@ class MusicBrowserUI : public UserInterface
     void DeviceChanged(uint32 event, PDEV_BROADCAST_HDR data);
     void CheckForCD();
 
+    void AskSignatureDialog();
+    void AskOptIn();
+    void HandleSignature();
+
     // Functions in EditTrackInfoDialog.cpp
     void CreateEditInfoLists(set<string>& artists,
                              set<string>& albums,
@@ -399,6 +403,8 @@ class MusicBrowserUI : public UserInterface
     Thread*             m_fillAllThread;
     Thread*             m_fillStreamsThread;
 
+    bool                m_sigsExist;
+    bool                m_sigsStart;
 };
 
 #endif

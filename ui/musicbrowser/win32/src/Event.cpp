@@ -59,8 +59,52 @@ void MusicBrowserUI::ClearPlaylistEvent(void)
     m_plm->RemoveAll();
 }
 
+void MusicBrowserUI::HandleSignature(void)
+{
+    if (m_sigsStart)
+        m_context->catalog->StartGeneratingSigs();
+    else
+        m_context->catalog->StopGeneratingSigs();
+}
+
+void MusicBrowserUI::AskSignatureDialog(void)
+{
+    string caption = "Signature Tracks?";
+    char numtracks[10];
+    sprintf(numtracks, "%d", m_context->catalog->GetNumNeedingSigs());
+    string message = string("You need to signature ") + string(numtracks) +
+                     string(" tracks.  Do it?");
+
+    int ret = MessageBox(m_hWnd, message.c_str(), caption.c_str(),
+                         MB_YESNO|MB_ICONQUESTION);
+
+    if (ret == IDYES)
+        m_context->catalog->StartGeneratingSigs();
+}
+
+void MusicBrowserUI::AskOptIn(void)
+{
+    string caption = "Relatable Features Not Enabled";
+    string message = "You didn't opt-in to use the Relatable features.  Would you like to go to the options dialog and create a profile?";
+
+    int ret = MessageBox(m_hWnd, message.c_str(), caption.c_str(),
+                         MB_YESNO|MB_ICONSTOP);
+
+    if (ret == IDYES)
+        m_context->target->AcceptEvent(new ShowPreferencesEvent(6));
+}
+
 void MusicBrowserUI::SubmitPlaylistEvent(void)
 {
+    APSInterface *pInterface = m_context->aps;
+    if (!pInterface)
+        return;
+
+    if (!pInterface->IsTurnedOn()) {
+        AskOptIn();
+        return;
+    }
+
     vector<PlaylistItem*> items;
 
     GetSelectedMusicTreeItems(&items);
@@ -95,17 +139,22 @@ void MusicBrowserUI::SubmitPlaylistEvent(void)
 
        uint32 nResponse = 0;
 
-       APSInterface* pInterface = m_context->aps;
-       if (pInterface == NULL) 
-           return;
-
-        nResponse = pInterface->APSSubmitPlaylist(&InputPlaylist); 
+       nResponse = pInterface->APSSubmitPlaylist(&InputPlaylist); 
         // call the GetPlaylist function to generate a playlist
-    }
+   }
 }
 
 void MusicBrowserUI::GenPlaylistEvent()
 {
+    APSInterface *pInterface = m_context->aps;
+    if (!pInterface)
+        return;
+
+    if (!pInterface->IsTurnedOn()) {
+        AskOptIn();
+        return;
+    }
+
     vector<PlaylistItem*> items;
     GetSelectedMusicTreeItems(&items);
     if (items.empty())
@@ -117,11 +166,17 @@ void MusicBrowserUI::GenPlaylistEvent()
 
 void MusicBrowserUI::GenPlaylistEvent(vector<PlaylistItem*>* pSeed)
 {
+    APSInterface *pInterface = m_context->aps;
+    if (!pInterface)
+        return;
+
+    if (!pInterface->IsTurnedOn()) {
+        AskOptIn();
+        return;
+    }
+
     APSPlaylist ResultPlaylist;
     uint32 nResponse = 0;
-
-    if (!m_context->aps)
-        return;
 
     if ((pSeed) && (!pSeed->empty())) {
         APSPlaylist InputPlaylist;

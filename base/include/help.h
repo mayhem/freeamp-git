@@ -36,6 +36,7 @@ ____________________________________________________________________________*/
 #define Preferences_Advanced          "preferences_advanced_entry.html"
 #define Preferences_About             "preferences_about_entry.html"
 #define Preferences_Directory         "preferences_directory_entry.html"
+#define Preferences_Relatable         "relatable_profile.html"
 #define Edit_Info                     "edit_info_entry.html"
 
 #endif

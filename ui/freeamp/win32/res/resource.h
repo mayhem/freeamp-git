@@ -182,6 +182,8 @@
 #define IDC_NEW_PROFILE                 1068
 #define IDC_ADDPROFILE                  1069
 #define IDC_DELETEPROFILE               1070
+#define IDC_PROFILE_ENABLE              1071
+#define IDC_PROFILE_HELP                1072
 #define IDMC_MYMUSIC                    6900
 #define IDMC_PLAY                       6901
 #define IDMC_STOP                       6902
@@ -199,7 +201,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        201
 #define _APS_NEXT_COMMAND_VALUE         40013
-#define _APS_NEXT_CONTROL_VALUE         1071
+#define _APS_NEXT_CONTROL_VALUE         1073
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

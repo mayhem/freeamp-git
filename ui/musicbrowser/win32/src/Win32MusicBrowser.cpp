@@ -206,6 +206,9 @@ void MusicBrowserUI::Init()
     m_plm = NULL;
     m_portableDevice = NULL;
 
+    m_sigsExist = false;
+    m_sigsStart = true;
+
     short pattern[8];
     HBITMAP bmp;
 
@@ -925,7 +928,49 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
             }
             break;
         }
+        case INFO_UnsignaturedTracksExist:
+        {
+            if (m_context->catalog->GetNumNeedingSigs() > 0) {
+                m_sigsExist = true;
 
+                UpdateMenuStates();
+                AskSignatureDialog();
+
+                vector<MusicBrowserUI *>::iterator i;
+                for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
+                    (*i)->AcceptEvent(event);
+            }
+            break;
+        }
+        case INFO_SignaturingStarted:
+        {
+            m_sigsExist = true;
+            m_sigsStart = false;
+
+            UpdateMenuStates();
+
+            vector<MusicBrowserUI *>::iterator i;
+            for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
+                (*i)->AcceptEvent(event);
+
+            break;
+        }
+        case INFO_SignaturingStopped:
+        {
+            if (m_context->catalog->GetNumNeedingSigs() > 0)
+                m_sigsExist = true;
+            else
+                m_sigsExist = false;
+            m_sigsStart = true;
+
+            UpdateMenuStates();
+
+            vector<MusicBrowserUI *>::iterator i;
+            for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
+                (*i)->AcceptEvent(event);
+
+            break;
+        }
         default:
             break;
     }

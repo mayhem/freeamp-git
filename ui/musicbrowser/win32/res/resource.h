@@ -193,6 +193,7 @@
 #define ID_POPUP_ADDTOFAVORITES         40084
 #define ID_EDIT_GENERATEPLAYLIST        40085
 #define ID_EDIT_SUBMITPLAYLIST          40086
+#define ID_EDIT_STARTSIGNATURING        40087
 #define IDS_URL                         65535
 #define IDC_TRACKTEXT                   65535
 #define IDC_TITLETEXT                   65535
@@ -202,7 +203,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        142
-#define _APS_NEXT_COMMAND_VALUE         40087
+#define _APS_NEXT_COMMAND_VALUE         40088
 #define _APS_NEXT_CONTROL_VALUE         1053
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
