@@ -463,9 +463,7 @@ void MusicBrowserUI::ImportPlaylist(char *path)
         return;
     m_context->browser->m_catalog->AddPlaylist(path);
     UpdateCatalog();
-    UpdateCombo();
-    string Path = path;
-    LoadPlaylist(Path);
+//    UpdateCombo();
 }
 #endif
 

@@ -560,6 +560,12 @@ void MusicBrowserUI::CreateExpanded(void)
     gtk_box_pack_start(GTK_BOX(hbox), browserlabel, FALSE, FALSE, 10);
     gtk_widget_show(browserlabel);
 
+    button = gtk_button_new_with_label("Search for Music");
+    gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 10);
+    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                       GTK_SIGNAL_FUNC(music_search_internal), this);
+    gtk_widget_show(button);
+
     browservbox = gtk_vbox_new(FALSE, 0);
     gtk_container_add(GTK_CONTAINER(masterBrowserBox), browservbox);
     gtk_container_set_border_width(GTK_CONTAINER(browservbox), 5);
@@ -580,13 +586,6 @@ void MusicBrowserUI::CreateExpanded(void)
     hbox = gtk_hbox_new(FALSE, 5);
     gtk_box_pack_start(GTK_BOX(masterBrowserBox), hbox, FALSE, FALSE, 0);
     gtk_widget_show(hbox);
-
-    button = gtk_button_new_with_label("Music Search");
-    gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 3);
-    gtk_signal_connect(GTK_OBJECT(button), "clicked",
-                       GTK_SIGNAL_FUNC(music_search_internal), this);
-
-    gtk_widget_show(button);
 }
 
 void MusicBrowserUI::ExpandCollapseEvent(void)
@@ -595,7 +594,7 @@ void MusicBrowserUI::ExpandCollapseEvent(void)
         CreateExpanded();
         m_state = STATE_EXPANDED;
         gtk_widget_show(masterBrowserBox);
-        gtk_label_set_text(GTK_LABEL(expandLabel), "<< Collapse");
+//        gtk_label_set_text(GTK_LABEL(expandLabel), "<< Collapse");
         gtk_window_set_title(GTK_WINDOW(musicBrowser), BRANDING" - Music Browser");
         UpdateCatalog();
     }
@@ -603,7 +602,7 @@ void MusicBrowserUI::ExpandCollapseEvent(void)
         m_state = STATE_COLLAPSED;
 
         gtk_widget_hide(masterBrowserBox);
-        gtk_label_set_text(GTK_LABEL(expandLabel), "<< Expand");
+//        gtk_label_set_text(GTK_LABEL(expandLabel), "<< Expand");
         gtk_window_set_title(GTK_WINDOW(musicBrowser), BRANDING" - Playlist Editor");
     }
 }
@@ -960,18 +959,19 @@ void MusicBrowserUI::LoadPlaylist(string &oPlaylist)
 
     if (oPlaylist.length() == 0) {
         m_context->plm->SetActivePlaylist(kPlaylistKey_MasterPlaylist);
-        gtk_option_menu_set_history(GTK_OPTION_MENU(playlistOMenu), 0);
+//        gtk_option_menu_set_history(GTK_OPTION_MENU(playlistOMenu), 0);
     }
     else {
         m_context->plm->SetExternalPlaylist((char *)oPlaylist.c_str());
         m_context->plm->SetActivePlaylist(kPlaylistKey_ExternalPlaylist);
-        SetComboSelection(oPlaylist);
+//        SetComboSelection(oPlaylist);
     }
     m_currentListName = oPlaylist;
     m_currentindex = 0;
     UpdatePlaylistList();
 }
 
+/*
 void combo_select(GtkWidget *w, char *newPath)
 {
     string Path;
@@ -1030,7 +1030,8 @@ void MusicBrowserUI::UpdateCombo(void)
     gtk_option_menu_set_menu(GTK_OPTION_MENU(playlistOMenu), playlistMenu);
     gtk_option_menu_set_history(GTK_OPTION_MENU(playlistOMenu), 0);
 }
-       
+*/       
+
 void MusicBrowserUI::CreatePlaylist(void)
 {
     GtkWidget *vbox;
@@ -1074,6 +1075,7 @@ void MusicBrowserUI::CreatePlaylist(void)
     gtk_box_pack_start(GTK_BOX(masterPlaylistBox), hbox, FALSE, FALSE, 0);
     gtk_widget_show(hbox);
 
+/*
     playlistOMenu = gtk_option_menu_new();
     gtk_box_pack_end(GTK_BOX(hbox), playlistOMenu, FALSE, FALSE, 10);
     gtk_widget_show(playlistOMenu);
@@ -1081,9 +1083,11 @@ void MusicBrowserUI::CreatePlaylist(void)
     playlistMenu = NULL;
     UpdateCombo();
 
+
     label = gtk_label_new("View Playlist:");
     gtk_box_pack_end(GTK_BOX(hbox), label, FALSE, FALSE, 10);
     gtk_widget_show(label);
+*/
 
     vbox = gtk_vbox_new(FALSE, 0);
     gtk_container_add(GTK_CONTAINER(masterPlaylistBox), vbox);
@@ -1154,6 +1158,7 @@ void MusicBrowserUI::CreatePlaylist(void)
     gtk_box_pack_start(GTK_BOX(masterPlaylistBox), controlhbox, FALSE, FALSE, 0);
     gtk_widget_show(controlhbox);
 
+/*
     expandLabel = gtk_label_new("<< Expand");
     gtk_misc_set_alignment(GTK_MISC(expandLabel), 0.5, 0.5);
     button = gtk_button_new();
@@ -1163,6 +1168,7 @@ void MusicBrowserUI::CreatePlaylist(void)
     gtk_signal_connect(GTK_OBJECT(button), "clicked",
                        GTK_SIGNAL_FUNC(expand_collapse_internal), this);
     gtk_widget_show(button);
+*/
 
     button = gtk_button_new_with_label("  Close  ");
     gtk_box_pack_end(GTK_BOX(controlhbox), button, FALSE, FALSE, 3);

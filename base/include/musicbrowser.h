@@ -106,7 +106,6 @@ class MusicBrowser : public EventQueue
     void DoSearchPaths(vector<string> &pathList);
     void PruneDatabase(void);
     
-    int m_numSymLinks;
     bool m_exit;
     Mutex *m_mutex;
     
