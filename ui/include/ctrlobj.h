@@ -21,9 +21,6 @@
 	$Id$
 ____________________________________________________________________________*/
 
-// ctrlobj.h
-// Controller Input and Output  Object
-
 #ifndef _CTRLOBJ_H_
 #define _CTRLOBJ_H_
 
