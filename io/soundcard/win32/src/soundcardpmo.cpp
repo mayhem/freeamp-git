@@ -153,11 +153,15 @@ SoundCardPMO::~SoundCardPMO()
       g_pHeaderMutex = NULL;
    }
 
+/* GetInstance() returns only one pointer, so any deletion will cause segfaults
+   TODO: Add destruction/management of m_volume, perhaps to Win32Volume
+
    if ( m_volume )
    {
         delete m_volume;
         m_volume = NULL;
    }
+*/
 }
 
 bool SoundCardPMO::SetupVolumeControl( HWND hWnd)
