@@ -341,7 +341,8 @@ void XingLMC::DecodeWork() {
 	    float totalTime = (float)((double)m_frameCounter * (double)tpf);
 	    int32 hours = (int32)(totalTime/3600);
 	    int32 minutes = ((int32)totalTime - hours) / 60;
-	    MediaTimeInfoEvent *pmtpi = new MediaTimeInfoEvent(hours,minutes,totalTime,0,totalTime,m_frameCounter);
+        int32 seconds = totalTime - hours*3600 - minutes*60;
+	    MediaTimeInfoEvent *pmtpi = new MediaTimeInfoEvent(hours,minutes,seconds,0,totalTime,m_frameCounter);
 	    if (m_target) {
 		m_target->AcceptEvent(pmtpi);
 	    }
