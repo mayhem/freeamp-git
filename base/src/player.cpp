@@ -441,9 +441,11 @@ bool Player::SetState(PlayerState ps) {
 
 #define SEND_NORMAL_EVENT(e)  { Event *ev = new Event(e); GetUIManipLock(); SendToUI(ev); ReleaseUIManipLock(); delete ev;}
 
+#define DISPLAY_ERROR(s,e) { if (e & 0xFFFF0000) { cout << s->GetErrorString(e) << endl;} else { cout << "Error Number " << e << endl; } }
+
 int32 Player::ServiceEvent(Event *pC) {
     if (pC) {
-	//cout << "Player: serviceEvent: servicing Event: " << pC->GetEvent() << endl;
+	//cout << "Player: serviceEvent: servicing Event: " << pC->Type() << endl;
 	switch (pC->Type()) {
 	    case INFO_DoneOutputting: {  // LMC or PMO sends this when its done outputting whatever.  Now, go on to next piece in playlist
                 if (SetState(STATE_Stopped)) {
@@ -510,22 +512,41 @@ int32 Player::ServiceEvent(Event *pC) {
 		    }
 		    
 		    item = m_lmcRegistry->GetItem(0);
-
+		    Error error = kError_NoErr;
 		    if(item) {
 			m_lmc = (LogicalMediaConverter *)item->InitFunction()();
 			
-			m_lmc->SetTarget((EventQueue *)this);
-			m_lmc->SetPMI(pmi);
-			m_lmc->SetPMO(pmo);
+			if ((error = m_lmc->SetTarget((EventQueue *)this)) != kError_NoErr) {
+			    DISPLAY_ERROR(m_lmc,error);
+			    return 0;
+			}
+			if ((error = m_lmc->SetPMI(pmi)) != kError_NoErr) {
+			    DISPLAY_ERROR(m_lmc,error);
+			    return 0;
+			}
+			if ((error = m_lmc->SetPMO(pmo)) != kError_NoErr) {
+			    DISPLAY_ERROR(m_lmc,error);
+			    return 0;
+			}
 		    }
 		    
-		    m_lmc->InitDecoder();
+		    if ((error = m_lmc->InitDecoder()) != kError_NoErr) {
+			DISPLAY_ERROR(m_lmc,error);
+			return 0;
+		    }
+		    
 
 		    if (SetState(STATE_Playing)) {
 			    SEND_NORMAL_EVENT(INFO_Playing);
 		    }
-		    m_lmc->ChangePosition(m_myPlayList->GetSkip());
-		    m_lmc->Decode();
+		    if ((error = m_lmc->ChangePosition(m_myPlayList->GetSkip())) != kError_NoErr) {
+			DISPLAY_ERROR(m_lmc,error);
+			return 0;
+		    }
+		    if ((error = m_lmc->Decode()) != kError_NoErr) {
+			DISPLAY_ERROR(m_lmc,error);
+			return 0;
+		    }
 		} else {
 		    m_myPlayList->SetFirst();
 		    //cout << "no more in playlist..." << endl;
@@ -681,7 +702,13 @@ int32 Player::ServiceEvent(Event *pC) {
 		return 0;
 		break; 
 	    }
-	    
+	    case INFO_LMCError: {
+		LMCErrorEvent *e = (LMCErrorEvent *)pC;
+		DISPLAY_ERROR(m_lmc,(e->GetError()));
+		AcceptEvent(new Event(CMD_NextMediaPiece));
+		return 0;
+		break;
+	    }
 	    default:
 		cout << "serviceEvent: Unknown event (i.e. I don't do anything with it): " << pC->Type() << "  Passing..." << endl;
 		return 0;

@@ -44,7 +44,8 @@ typedef enum Error
     kError_FileNoHandles    = 13,
     kError_NoMoreLibDirs    = 14,
     kError_NullValueInvalid = 15,
-    kError_InvalidError     = 16
+    kError_InvalidError     = 16,
+    kError_PluginNotInitialized = 17
 }Error;
 
 

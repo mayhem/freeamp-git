@@ -28,6 +28,7 @@ ____________________________________________________________________________*/
 #include <iostream.h>
 #include <string.h>
 
+#include "lmc.h"
 #include "playlist.h"
 #include "event.h"
 #include "id3v1.h"
@@ -108,6 +109,17 @@ class ChangePositionEvent : public Event {
     ChangePositionEvent(int32 p) { m_type = CMD_ChangePosition; m_frame = p; }
     int32 GetPosition() { return m_frame; }
     virtual ~ChangePositionEvent() {}
+};
+
+class LMCErrorEvent : public Event {
+ private:
+    LogicalMediaConverter *m_lmc;
+    Error m_error;
+ public:
+    LMCErrorEvent(LogicalMediaConverter *p, Error e) { m_type = INFO_LMCError; m_lmc = p; m_error = e; }
+    LogicalMediaConverter *GetLMC() { return m_lmc; }
+    Error GetError() { return m_error; }
+    virtual ~LMCErrorEvent() {}
 };
 #endif /* _EVENTDATA_H_ */
 

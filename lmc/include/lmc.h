@@ -45,38 +45,7 @@ class LogicalMediaConverter {
     virtual Error SetTarget(EventQueue *) = 0;
     virtual Error InitDecoder() = 0;
 
-    virtual Error GetErrorString(int32 /*error*/, char *,int32 /*length of buffer*/) = 0;
+    virtual const char *GetErrorString(int32 /*error*/) = 0;
 };
-
-#if 0
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-typedef struct LMC{
-    void*   ref;
-
-    void    (*InitDecoder)       (struct LMC*);
-
-    void    (*SetPMI)            (struct LMC*, PMIRef);
-    void    (*SetPMO)            (struct LMC*, PMORef);
-    void    (*SetTarget) (struct LMC*, EventQueueRef);
-
-    bool    (*Decode)            (struct LMC*);
-    void    (*Stop)              (struct LMC*);
-    void    (*Pause)             (struct LMC*);
-    void    (*Resume)            (struct LMC*);
-    void    (*Reset)             (struct LMC*);
-    bool    (*ChangePosition)    (struct LMC*, int32);
-    void    (*Cleanup)           (struct LMC*);
-
-}LMC, *LMCRef;
-
-#ifdef __cplusplus
-} // extern "C"
-#endif
-
-#endif
 
 #endif // _LMC_H_

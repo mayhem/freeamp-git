@@ -62,13 +62,18 @@ static AUDIO audio_table[2][2] = {
     }
 };
 
-static char * g_ErrorArray[4] = {
-    "shouldn't get this one...",
+static char * g_ErrorArray[7] = {
+    "Invalid Error Code",
     "head_info2 return 0 bytes/frame",
     "audio.decode_init failed",
-    "bs_fill() failed"
+    "bs_fill() failed",
+    "creation of decoder thread failed",
+    "output didn't return the same number of bytes we wrote",
+    "decoder method didn't return anything"
 
 };
+
+#define ENSURE_INITIALIZED if (!m_properlyInitialized) return kError_PluginNotInitialized;
 
 Error XingLMC::SetTarget(EventQueue *eq) {
     if (m_target = eq) {
@@ -94,27 +99,23 @@ Error XingLMC::SetPMO(PhysicalMediaOutput *o) {
     }
 }
 
-Error XingLMC::GetErrorString(int32 error, char *pBuf, int32 length) {
-    if (!pBuf || !length) return kError_NullValueInvalid;
+const char *XingLMC::GetErrorString(int32 error) {
     if ((error <= lmcError_MinimumError) || (error >= lmcError_MaximumError)) {
-	cout << "Sorry... " << error << " " << lmcError_MinimumError << " " << lmcError_MaximumError << endl;
-	*pBuf = '\0';
-	return kError_InvalidError;
+	return g_ErrorArray[0];
     }
-    cout << "Copying from error " << error-lmcError_MinimumError << endl;
-    strncpy(pBuf,g_ErrorArray[error-lmcError_MinimumError],length);
-    return kError_NoErr;
+    return g_ErrorArray[error - lmcError_MinimumError];
 }
 
 Error XingLMC::InitDecoder() {
-    if (bs_fill()) {
+    if (!m_target || !m_input || !m_output) {
+	return kError_NullValueInvalid;
+    }
+    if (bs_fill() > 0) {
 	MPEG_HEAD head;
 	int32 bitrate;
 	// parse MPEG header
 	m_frameBytes = head_info2(m_bsBuffer, m_bsBufBytes, &head, &bitrate);
 	if (m_frameBytes == 0) {
-	    // BAD OR UNSUPPORTED MPEG FILE!!!
-	    //cout << "XingLMC::XingLMC: head_info2 return 0 bytes/frame" << endl;
 	    return (Error)lmcError_HeadInfoReturnedZero;
 	}
 
@@ -160,8 +161,12 @@ Error XingLMC::InitDecoder() {
                                                  totalTime, 
                                                  tag_info);
 
-	    if (m_target) 
-		m_target->AcceptEvent(mvi);
+	    if (mvi) {
+		if (m_target)
+		    m_target->AcceptEvent(mvi);
+	    } else {
+		return kError_OutOfMemory;
+	    }
 	}
 	
 	
@@ -189,6 +194,8 @@ Error XingLMC::InitDecoder() {
 	    m_output->Init(&info);
 
 	    m_pcmBuffer = new unsigned char[info.max_buffer_size];
+	    if (!m_pcmBuffer) 
+		return kError_OutOfMemory;
 	    m_pcmTrigger = info.max_buffer_size - 2500 * sizeof(short); 
 	    m_pcmBufBytes = 0;
 
@@ -200,6 +207,7 @@ Error XingLMC::InitDecoder() {
 	//cout << "Couldn't fill the manure pile..." << endl;
 	return (Error)lmcError_BSFillFailed;
     }
+    m_properlyInitialized = true;
     return (Error)kError_NoErr;
 }
 
@@ -208,6 +216,7 @@ XingLMC::
 XingLMC()
 {
     //cout << "XingLMC::XingLMC: Creating XingLMC..." << endl;
+    m_properlyInitialized = false;
     m_target = NULL;
     m_decoderThread = NULL;
     m_xcqueue = new Queue<XingCommand *>(false); 
@@ -259,9 +268,12 @@ XingLMC::~XingLMC() {
 
 
 Error XingLMC::Stop() {
+    ENSURE_INITIALIZED;
     //cout << "stopping..." << endl;
     if (m_decoderThread) {
 	XingCommand *xc = new XingCommand[1];
+	if (!xc)
+	    return kError_OutOfMemory;
 	xc[0] = XING_Stop;
 	m_xcqueue->Write(xc);
 	m_pauseSemaphore->Signal();
@@ -275,9 +287,13 @@ Error XingLMC::Stop() {
 }
 
 Error XingLMC::Decode() {
+    ENSURE_INITIALIZED;
     // kick off thread w/ DecodeWorkerThreadFunc(void *);
     if (!m_decoderThread) {
         m_decoderThread = Thread::CreateThread();
+	if (!m_decoderThread) {
+	    return (Error)lmcError_DecoderThreadFailed;
+	}
 	m_decoderThread->Create(XingLMC::DecodeWorkerThreadFunc,this);
     }
     
@@ -318,7 +334,9 @@ void XingLMC::DecodeWork() {
 	while (!m_xcqueue->IsEmpty()) {
 	    XingCommand *xc = m_xcqueue->Read();
 	    switch (*xc) {
-		case XING_Stop: return;
+		case XING_Stop: 
+		    if (m_target) m_target->AcceptEvent(new Event(INFO_DoneOutputting));
+		    return;
 		case XING_Pause:
 		    m_output->Pause();
 		    m_pauseSemaphore->Wait();
@@ -328,13 +346,18 @@ void XingLMC::DecodeWork() {
 	}
 
 	m_seekMutex->Acquire(WAIT_FOREVER);
-	if (!bs_fill()) break;
-	if (m_bsBufBytes < m_frameBytes) break; // end of file
+	if (!bs_fill()) {
+	    break; // no more data to read
+	} //else {
+	//if (m_target) m_target->AcceptEvent(new LMCErrorEvent(this,(Error)lmcError_BSFillFailed));
+	//return;
+	//}
+	if (m_bsBufBytes < m_frameBytes) 
+	    break; // end of file
 	IN_OUT x = m_audioMethods.decode(m_bsBufPtr, (short *) (m_pcmBuffer + m_pcmBufBytes));
 	if (x.in_bytes <= 0) {
-	    cout << "XingLMC: Bad sync in MPEG file" << endl;
-	    // BAD SYNC IN MPEG FILE
-	    break;
+	    if (m_target) m_target->AcceptEvent(new LMCErrorEvent(this,(Error)lmcError_DecodeDidntDecode));
+	    return;
 	}
 	m_bsBufPtr += x.in_bytes;
 	m_bsBufBytes -= x.in_bytes;
@@ -350,9 +373,8 @@ void XingLMC::DecodeWork() {
 		nwrite = m_output->Write(m_pcmBuffer,m_pcmBufBytes);
 		
 		if (nwrite != (int32)m_pcmBufBytes) {
-		    cout << "XingLMC: Write Error: bytes = " << nwrite << " pcmbufbytes: " << m_pcmBufBytes << endl;
-		    // WRITE ERROR
-		    break;
+		    if (m_target) m_target->AcceptEvent(new LMCErrorEvent(this,(Error)lmcError_OutputWriteFailed));
+		    return;
 		}
 	    }
 	    out_bytes += m_pcmBufBytes;
@@ -367,20 +389,17 @@ void XingLMC::DecodeWork() {
         #endif
 	nwrite = m_output->Write(m_pcmBuffer,m_pcmBufBytes);
 	if (nwrite != (int32)m_pcmBufBytes) {
-	    cout << "XingLMC: Write Error 2" << endl;
-	    // WRITE ERROR
+	    if (m_target) m_target->AcceptEvent(new LMCErrorEvent(this,(Error)lmcError_OutputWriteFailed));
+	    return;
 	}
 	out_bytes += m_pcmBufBytes;
 	m_pcmBufBytes = 0;
     }
-    if (m_target) {
-	m_target->AcceptEvent(new Event(INFO_DoneOutputting));
-    }
-
-    
+    if (m_target) m_target->AcceptEvent(new Event(INFO_DoneOutputting));
     return;
 }
 Error XingLMC::Pause() {
+    ENSURE_INITIALIZED;
     XingCommand *xc = new XingCommand[1];
     xc[0] = XING_Pause;
     m_xcqueue->Write(xc);
@@ -388,16 +407,19 @@ Error XingLMC::Pause() {
 }
 
 Error XingLMC::Resume() {
+    ENSURE_INITIALIZED;
     m_output->Resume();
     m_pauseSemaphore->Signal();
     return kError_NoErr;
 }
 
 Error XingLMC::Reset() {
+    ENSURE_INITIALIZED;
     return kError_NoErr;
 }
 
 Error XingLMC::ChangePosition(int32 position) {
+    ENSURE_INITIALIZED;
     m_seekMutex->Acquire(WAIT_FOREVER);
     //cout << "Seeking to ..." << position << endl;
 #if 1
@@ -443,7 +465,7 @@ int XingLMC::bs_fill() {
       if ((nread + 1) == 0) {
          /*-- test for -1 = error --*/
 	 m_bsTrigger = 0;
-	 printf("\n FILE_READ_ERROR\n");
+//	 printf("\n FILE_READ_ERROR\n");
 	 return 0;
       }
       m_bsBufBytes += nread;
@@ -452,3 +474,4 @@ int XingLMC::bs_fill() {
 
    return 1;
 }
+

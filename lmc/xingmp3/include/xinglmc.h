@@ -67,6 +67,9 @@ enum {
     lmcError_HeadInfoReturnedZero,
     lmcError_AudioDecodeInitFailed,
     lmcError_BSFillFailed,
+    lmcError_DecoderThreadFailed,
+    lmcError_OutputWriteFailed,
+    lmcError_DecodeDidntDecode,
     lmcError_MaximumError
 };
 
@@ -89,15 +92,16 @@ public:
     virtual Error SetPMO(PhysicalMediaOutput *);
     virtual Error SetTarget(EventQueue *);
     virtual Error InitDecoder();
-    virtual Error GetErrorString(int32, char *,int32);
+    virtual const char *GetErrorString(int32);
 
-    void DecodeWork();
 private:
     static void DecodeWorkerThreadFunc(void *);
+    void DecodeWork();
 
     int32 bs_fill();
     void bs_clear();
 private:
+    bool                    m_properlyInitialized;
     int32                   m_frameWaitTill;
     Semaphore *             m_pauseSemaphore;
     AUDIO                   m_audioMethods;

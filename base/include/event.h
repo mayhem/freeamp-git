@@ -49,24 +49,6 @@ class EventQueue {
 };
 
 
-#if 0
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-typedef struct EventQueue{
-    void*   ref;
-    int32   (*AcceptEvent)  (struct EventQueue*, Event*);
-
-}EventQueue, *EventQueueRef;
-
-#ifdef __cplusplus
-} // extern "C"
-#endif
-
-#endif
-
-
 #define CMD_Stop                1  // stop current play  (no arg)
 #define CMD_Play                2  // Play current media piece from beginning (no arg)
 #define CMD_NextMediaPiece      3  // set pointer in playlist to next mediapiece (no arg)
@@ -92,7 +74,7 @@ typedef struct EventQueue{
 #define CMD_TogglePause         24 // sent by CIO to player to change the boolean state Paused (no arg)
 #define INFO_Playing            26 // sent by player to COO to say that it is beginning to play a song
 #define CMD_ChangePosition      27 // sent by CIO to player to change the position in the song to decode from (arg = frame position)
-
+#define INFO_LMCError           28 // sent by LMC to player to signal an error condition in the decoder
 #endif // _EVENT_H_
 
 
