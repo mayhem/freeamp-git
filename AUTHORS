@@ -4,7 +4,7 @@ FreeAmp (www.freeamp.org) is an Open Source development effort
 Mark Elrod 
 Robert Kaye
 Brett Thomas 
-Mark Weaver
+Mark H. Weaver
 Jason Woodward
 
 The development of FreeAmp is sponsored by GoodNoise Corp. (www.goodnoise.com)
@@ -27,6 +27,3 @@ Other major contributors and their contributions:
 
 "Bill Yuan" <rainman_yuan@188.net>
 * RainPlay, an alternate UI
-
-"Mark H. Weaver" <mhw@netris.org>
-* Optimized x86 assembly code for MP3 decoder
