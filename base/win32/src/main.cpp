@@ -252,8 +252,8 @@ bool SendCommandLineToRealJukebox()
 								LONG regErr;
 								HKEY key;
 
-								regErr = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
-													  "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\realjbox.exe",
+                                regErr = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
+													  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\realjbox.exe",
 													  0, 
 													  KEY_ALL_ACCESS,
 													  &key);
@@ -271,11 +271,11 @@ bool SendCommandLineToRealJukebox()
                                                              (LPBYTE)buf, 
                                                              &len);
 
-                                    if(result == ERROR_SUCCESS)
+                                    if(regErr == ERROR_SUCCESS)
                                     {
                                         rjFound = true;
 
-                                        strcat(buf, "/m application/vnd.rn-rn_music_package ");
+                                        strcat(buf, " /m application/vnd.rn-rn_music_package ");
                                         strcat(buf, __argv[1]);
 
                                         WinExec(buf, SW_NORMAL);
