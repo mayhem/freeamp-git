@@ -636,13 +636,13 @@ int32 Player::ServiceEvent(Event *pC) {
 	    
 		case CMD_SetPlaylist: {
 			
-			if (m_myPlayList) {
+			PlayList *localPL = ((SetPlayListEvent *)pC)->GetPlayList();
+			if (m_myPlayList && (m_myPlayList != localPL)) {
 				delete m_myPlayList;
 				m_myPlayList = NULL;
 			}
 			
-			m_myPlayList = ((SetPlayListEvent *)pC)->GetPlayList();
-			//m_myPlayList->SetFirst();
+			m_myPlayList = localPL;
 
 			GetUIManipLock();
 			Event *pe = new PlayListEvent(m_myPlayList);

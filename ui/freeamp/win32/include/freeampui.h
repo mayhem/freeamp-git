@@ -65,13 +65,13 @@ class FreeAmpUI : public UserInterface {
 
     EventQueue*     m_target;
 	int32			m_state;
+	 PlayList *		m_playList;
 
  protected:
       static void UIThreadFunc(void *);
 
 
  private:
-	 PlayList *		m_playList;
     int32			m_totalSeconds;
     float			m_secondsPerFrame;
     Thread*         m_uiThread;
