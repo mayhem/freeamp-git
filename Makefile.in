@@ -360,9 +360,9 @@ check: all-am
 installcheck: installcheck-recursive
 all-am: Makefile $(PROGRAMS)
 
-install-exec-am: install-binPROGRAMS
+install-exec-am: install-binPROGRAMS install-exec-local
 
-uninstall-am: uninstall-binPROGRAMS
+uninstall-am: uninstall-binPROGRAMS uninstall-local
 
 install-exec: install-exec-recursive install-exec-am
 	@$(NORMAL_INSTALL)
@@ -439,6 +439,10 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
 include @top_srcdir@/config/Makefile.header
+
+install-exec-local: install_plugins
+
+uninstall-local: uninstall_plugins
 
 install_plugins:
 	$(mkinstalldirs) $(DESTDIR)$(libdir)/freeamp/plugins
