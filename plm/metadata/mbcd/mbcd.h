@@ -38,6 +38,7 @@ using namespace std;
 #include "config.h"
 #include "errors.h"
 #include "metadata.h"
+#include "database.h"
 #include "musicbrainz/mb_c.h"
 
 class MusicBrainzCD : public MetaDataFormat {
@@ -52,6 +53,10 @@ class MusicBrainzCD : public MetaDataFormat {
  private:
 
     bool    LookupCD(void);
+    void    WriteToCache(Database *db, char *diskId, 
+                         vector<int> &trackLens, char *rdf);
+    bool    ReadFromCache(Database *db, char *diskId, 
+                         vector<int> &trackLens, string &rdf);
 
     musicbrainz_t o;
     vector<int> m_trackLens;

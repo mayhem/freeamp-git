@@ -136,8 +136,19 @@ bool MusicBrainzCD::ReadMetaData(const char* url, MetaData* metadata)
 
 bool MusicBrainzCD::LookupCD(void)
 {
-    char          error[iDataLen], trackLens[1024], *ptr;
+    char          error[iDataLen], trackLens[1024], *ptr, *result;
+    char          diskId[64];
     int           ret;
+    char         *tempDir = new char[_MAX_PATH];
+    uint32        length = _MAX_PATH;
+    Database     *db;
+    string        rdf;
+
+    m_context->prefs->GetPrefString(kDatabaseDirPref, tempDir, &length);
+
+    string database = string(tempDir) + string(DIR_MARKER_STR) +
+                      string("mbcd");
+
 
     mb_SetServer(o, "www.musicbrainz.org", 80);
 
@@ -165,21 +176,46 @@ bool MusicBrainzCD::LookupCD(void)
     for(ptr = strtok(trackLens, " "); ptr; ptr = strtok(NULL, " "))
        m_trackLens.push_back(atoi(ptr));
 
-    ret = mb_Query(o, MB_GetCDInfo);
-    if (!ret)
-    {
-       mb_GetQueryError(o, error, iDataLen);
-       //m_context->target->AcceptEvent(new BrowserMessage(error));
-       printf("%s\n", error);
-       return false;
-    }
+    mb_GetResultData(o, MB_LocalGetId, diskId, 64);
 
-    if (mb_GetNumItems(o) == 0)
+    db = new Database(database.c_str());
+    delete [] tempDir;
+
+    if (ReadFromCache(db, diskId, m_trackLens, rdf) &&
+        mb_SetResultRDF(o, (char *)rdf.c_str()))
+    { 
+        //printf("Found in cache\n");
+    }
+    else
     {
-       //m_context->target->AcceptEvent(new BrowserMessage("CD not found."));
-       printf("CD not found\n");
-       return false;
-    }  
+        ret = mb_Query(o, MB_GetCDInfo);
+        if (!ret)
+        {
+           mb_GetQueryError(o, error, iDataLen);
+           //m_context->target->AcceptEvent(new BrowserMessage(error));
+           printf("%s\n", error);
+           delete db;
+           return false;
+        }
+    
+        if (mb_GetNumItems(o) == 0)
+        {
+           //m_context->target->AcceptEvent(new 
+           //          BrowserMessage("CD not found."));
+           printf("CD not found\n");
+           delete db;
+           return false;
+        }  
+    
+        ret = mb_GetResultRDFLen(o) + 1;
+        result = new char[ret];
+        if (mb_GetResultRDF(o, result, ret))
+        {
+            WriteToCache(db, diskId, m_trackLens, result); 
+        }
+        delete result;
+    }
+    delete db;
 
     return true;
 }
@@ -191,3 +227,53 @@ bool MusicBrainzCD::WriteMetaData(const char* url, const MetaData& metadata)
     return result;
 }
 
+void MusicBrainzCD::WriteToCache(Database *db, char *diskId, 
+                                 vector<int> &trackLens, char *rdf)
+{
+    char                  *data;
+    vector<int>::iterator  i;
+
+    if (db->Exists(diskId))
+    {
+       db->Remove(diskId);
+    }
+
+    data = new char[strlen(diskId) + strlen(rdf) + 1024];
+    data[0] = 0;
+    for(i = trackLens.begin(); i != trackLens.end(); i++)
+       sprintf(data + strlen(data), "%d ", *i); 
+
+    sprintf(data + strlen(data) - 1, "%s", rdf); 
+    db->Insert(diskId, data);
+    delete data;
+}
+
+bool MusicBrainzCD::ReadFromCache(Database *db, char *diskId, 
+                                 vector<int> &trackLens, string &rdf)
+{
+    char *data, temp[1024], *ptr;
+    bool  ret = false;
+
+    if (db->Exists(diskId))
+    {
+        data = db->Value(diskId);    
+
+        if (sscanf(data, "%[^<]", temp) > 0)
+        {
+           trackLens.clear();
+           for(ptr = strtok(temp, " "); ptr; ptr = strtok(NULL, " "))
+              trackLens.push_back(atoi(ptr));
+
+           ptr = strchr(data, '<');
+           if (ptr)
+           {
+               rdf = string(ptr);
+               ret = true;
+           }
+        }
+
+        delete data;
+    }
+
+    return ret;
+}
