@@ -53,7 +53,7 @@ class GTKFont : public Font
     public:
 
                GTKFont(FAContext *context, string &oName, string &oFace, 
-                       string &oDefault);
+                       string &oFile, string &oDefault);
       virtual ~GTKFont(void);
 
       Error    Load(int iFontHeight, bool bBold, bool bItalic);

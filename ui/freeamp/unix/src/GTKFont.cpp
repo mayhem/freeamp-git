@@ -28,8 +28,8 @@ ____________________________________________________________________________*/
 #include "utility.h"
 
 GTKFont::GTKFont(FAContext *context, string &oName, string &oFace, 
-                 string &oDefault) :
-                Font(oName, oFace, oDefault)
+                 string &oFile, string &oDefault) :
+                Font(oName, oFace, oFile, oDefault)
 {
     m_context = context;
 
