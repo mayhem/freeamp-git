@@ -211,6 +211,10 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                     return 1;
 
                 case ID_EDIT_REMOVE:
+                    MessageBox(hwnd, 
+                               "This feature is not yet implemented under win32.", 
+                               "doh!", 
+                               MB_OK);
                     //RemoveEvent();
                     return 1;
 
@@ -227,13 +231,20 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                     return 1;
 
                 case ID_EDIT_EDITINFO:
-
+                    MessageBox(hwnd, 
+                               "This feature is not yet implemented under win32.", 
+                               "doh!", 
+                               MB_OK);
                     return 1;
                 
                 case ID_VIEW_MUSICCATALOG:
                     ExpandCollapseEvent();
                     return 1;
 
+                case ID_VIEW_OPTIONS:
+                    m_context->target->AcceptEvent(new Event(CMD_ShowPreferences));
+                    return 1;
+                    
 
                 case ID_CONTROLS_PLAYPAUSE:
                 case ID_CONTROLS_STOP:
@@ -1185,6 +1196,9 @@ void MusicBrowserUI::UpdateButtonMenuStates()
     // start off disabled... might enable below
     EnableMenuItem(hMenu, ID_EDIT_REMOVE, MF_GRAYED);
     SendMessage(m_hToolbar, TB_ENABLEBUTTON, ID_EDIT_REMOVE, 0); 
+    EnableMenuItem(hMenu, ID_EDIT_EDITINFO, MF_GRAYED);
+    SendMessage(m_hToolbar, TB_ENABLEBUTTON, ID_EDIT_EDITINFO, 0); 
+    
 
     sMenuItem.cbSize = sizeof(MENUITEMINFO);
     sMenuItem.fMask =  MIIM_DATA|MIIM_TYPE;
@@ -1227,6 +1241,12 @@ void MusicBrowserUI::UpdateButtonMenuStates()
         SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
                     ID_EDIT_REMOVE, MAKELPARAM(TRUE, 0)); 
 
+        EnableMenuItem(hMenu, ID_EDIT_EDITINFO, MF_ENABLED);
+        SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
+                    ID_EDIT_EDITINFO, MAKELPARAM(TRUE, 0)); 
+
+
+
         sMenuItem.cbSize = sizeof(MENUITEMINFO);
         sMenuItem.fMask = MIIM_DATA|MIIM_TYPE;
         sMenuItem.fType = MFT_STRING;
@@ -1262,6 +1282,15 @@ void MusicBrowserUI::UpdateButtonMenuStates()
                     ID_EDIT_REMOVE, MAKELPARAM(TRUE, 0)); 
         }
 
+        if(treeSelect != m_hNewPlaylistItem && treeSelect != m_hAllItem &&
+           treeSelect != m_hCatalogItem && treeSelect != m_hUncatItem &&
+           treeSelect != m_hPlaylistItem)
+        {
+            EnableMenuItem(hMenu, ID_EDIT_EDITINFO, MF_ENABLED);
+            SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
+                    ID_EDIT_EDITINFO, MAKELPARAM(TRUE, 0)); 
+        }        
+
         sMenuItem.cbSize = sizeof(MENUITEMINFO);
         sMenuItem.fMask =  MIIM_DATA|MIIM_TYPE;
         sMenuItem.fType = MFT_STRING;
@@ -1269,10 +1298,49 @@ void MusicBrowserUI::UpdateButtonMenuStates()
         sMenuItem.cch = strlen(sMenuItem.dwTypeData);
 
         SetMenuItemInfo(hMenu, ID_EDIT_REMOVE, false, &sMenuItem);
+
+        TV_ITEM tv_item;
+        bool enableEditPlaylist = false;
+
+        if(m_hNewPlaylistItem)
+        {
+            // get the first playlist item
+            tv_item.hItem = TreeView_GetChild(m_hMusicCatalog, m_hPlaylistItem);
+            tv_item.mask = TVIF_STATE|TVIF_PARAM;
+            tv_item.stateMask = TVIS_SELECTED;
+            tv_item.state = 0;
+
+            // skip the "Create New Playlist..." item
+            if(tv_item.hItem)
+                tv_item.hItem = TreeView_GetNextSibling(m_hMusicCatalog, tv_item.hItem);
+
+            if(tv_item.hItem)
+            {
+                BOOL result = FALSE;
+
+                do
+                {
+                    result = TreeView_GetItem(m_hMusicCatalog, &tv_item);
+
+                    if(result && (tv_item.state & TVIS_SELECTED))
+                    {
+                        enableEditPlaylist = true;               
+                        break;
+                    }
+            
+                }while(result && 
+                       (tv_item.hItem = TreeView_GetNextSibling(m_hMusicCatalog, 
+                                                                tv_item.hItem)));
+            }
+        }
+
+        EnableMenuItem(hMenu, ID_EDIT_EDITPLAYLIST, 
+                        enableEditPlaylist ? MF_ENABLED : MF_GRAYED);
     }
     else
     {
         EnableMenuItem(hMenu, ID_EDIT_ADDTRACK, MF_GRAYED );
+        EnableMenuItem(hMenu, ID_EDIT_EDITPLAYLIST, MF_GRAYED);
     }
 
 

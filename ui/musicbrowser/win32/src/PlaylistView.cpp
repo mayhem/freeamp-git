@@ -345,7 +345,7 @@ void MusicBrowserUI::PlaylistListItemRemoved(const PlaylistItem* item,
     // item has already been deleted when we get this 
     // msg so don't access it. only use it for comparison
 
-    if(oldIndex != kInvalidIndex)
+    if(0)//oldIndex != kInvalidIndex)
     {
         LV_ITEM sItem;
         

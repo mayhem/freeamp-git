@@ -67,11 +67,24 @@ void MusicBrowserUI::DeleteEvent(void)
             {
                 found++;
                 ListView_DeleteItem(m_hPlaylistView, index);
+
+                uint32 oldIndex = index;
+
+                if(oldIndex >= ListView_GetItemCount(m_hPlaylistView))
+                    oldIndex = ListView_GetItemCount(m_hPlaylistView) - 1;
+
+                ListView_SetItemState(m_hPlaylistView, oldIndex, LVIS_SELECTED, LVIS_SELECTED);
+                ListView_RedrawItems(m_hPlaylistView, oldIndex, ListView_GetItemCount(m_hPlaylistView) - 1);
+
+                m_bListChanged = true;
+                
                 m_oPlm->RemoveItem(index);
             }
 
             index--;
         }
+
+        UpdateButtonMenuStates();
     }
     else if(hwndFocus == m_hMusicCatalog)
     {
