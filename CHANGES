@@ -8,6 +8,19 @@ Changes for Linux and Windows version 2.1.0 beta 9
 - Fixed a bug where FreeAmp would keep playing some tracks indefinitely
 - Fixed a win32 bug where FreeAmp crashed when it loaded a playlist that
   has a track missing.
+- Fixed the long startup time when not connected to the 'net and a Releatable
+  profile was enabled.
+- bunches of memory leaks plugged.
+- (Hopefully) fixed DnD on some Win98 boxes.
+- Added a link button to the Edit Track Info dialog that goes to the track's
+  page at musicbrainz.
+- Sort additions to the playlist from the music tree properly.
+- Try to grab track numbers from the filename.
+- Enhancements to the GTK My Music.
+- Save -20dB equalizer settings properly.
+- Bunches of little fixes to the Win32 My Music, mostly involving DnD.
+- Don't read tags from files that they don't need to be read on.
+- SoundsLike recommendations
 
 Changes for Linux and Windows version 2.1.0 beta 8
 --------------------------------------------------------------------
