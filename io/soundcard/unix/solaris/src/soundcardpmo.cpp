@@ -99,9 +99,30 @@ SoundCardPMO::~SoundCardPMO()
    }
 }
 
-VolumeManager *SoundCardPMO::GetVolumeManager()
+void SoundCardPMO::SetVolume(int32 v)
 {
-   return new SolarisVolumeManager();
+  struct audio_info ainfo;
+  int mixFd = open("/dev/audioctl",O_RDWR);
+  if (mixFd != -1) {
+    ioctl(mixFd, AUDIO_GETINFO, &ainfo);
+    ainfo.play.gain = v;
+    ioctl(mixFd, AUDIO_SETINFO, &ainfo);
+    close(mixFd);
+  }
+}
+
+int32 SoundCardPMO::GetVolume()
+{
+  struct audio_info ainfo;
+  int mixFd = open("/dev/audioctl",O_RDWR);
+  int volume = 0;
+  if (mixFd != -1) {
+    ioctl(mixFd, AUDIO_GETINFO, &ainfo);
+    volume = ainfo.play.gain;
+    volume &= 0xFF;
+    close(mixFd);
+  }
+  return volume;
 }
 
 int SoundCardPMO::audio_fd = -1;

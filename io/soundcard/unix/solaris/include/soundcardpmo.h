@@ -33,7 +33,6 @@ ____________________________________________________________________________*/
 #include "pmo.h"
 #include "pmoevent.h"
 #include "eventbuffer.h"
-#include "solarisvolume.h"
 
 #define BIT_SELECT  0x1f
 #define SLEEPTIME   256
@@ -63,9 +62,10 @@ class SoundCardPMO:public PhysicalMediaOutput
    virtual ~SoundCardPMO();
 
    virtual Error Init(OutputInfo * info);
-   virtual VolumeManager *GetVolumeManager();
 
    static void   StartWorkerThread(void *);
+          int32  GetVolume(void);
+          void   SetVolume(int32);
 
  private:
    void          WorkerThread(void); 

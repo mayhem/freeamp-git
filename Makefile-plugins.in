@@ -73,7 +73,6 @@ plugins/obsinput-$(HOST_OS).pmi: $(OBSPMI)
 #
 # PMO section
 
-SCPMOsolarisOBJ = io/soundcard/unix/solaris/src/volume.o
 SCPMOlinuxOBJ = 
 
 SCPMObeosOBJ = io/soundcard/beos/src/ringbuffer.o 
