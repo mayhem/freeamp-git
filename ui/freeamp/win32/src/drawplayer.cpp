@@ -1340,6 +1340,9 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
             g_buttonStateArray[kStopControl].shown = FALSE;
             g_buttonStateArray[kStopControl].region = g_buttonStateArray[kPlayControl].region;
 
+            // mode changing is currently disabled
+            g_buttonStateArray[kModeControl].enabled = FALSE;
+
             // display
             int32 displayOffset = LEFT_SECTION + DIAL_SECTION + 19;
 
@@ -1728,7 +1731,8 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
             for(i = 0; i < kNumControls; i++)
             {
                 if( PtInRegion(g_buttonStateArray[i].region, pressPt.x, pressPt.y) &&
-                    g_buttonStateArray[i].shown)
+                    g_buttonStateArray[i].shown &&
+                    g_buttonStateArray[i].enabled)
                 {
                     pressed = TRUE;
                     pressedIndex = i;
@@ -1881,7 +1885,8 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                 for(i = 0; i < kNumControls; i++)
                 {
                     if( PtInRegion(g_buttonStateArray[i].region, pt.x, pt.y) &&
-                        g_buttonStateArray[i].state != Activated)
+                        g_buttonStateArray[i].state != Activated &&
+                        g_buttonStateArray[i].enabled)
                     {
                         if(g_buttonStateArray[i].state != Selected )
                         {
