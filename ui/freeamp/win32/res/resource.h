@@ -30,13 +30,21 @@
 #define IDB_CLOSE                       135
 #define IDB_MINIMIZE                    136
 #define IDB_MODE                        137
+#define IDB_STOP_256                    138
+#define IDB_LAST_256                    139
+#define IDB_MINIMIZE_256                140
+#define IDB_MODE_256                    141
+#define IDB_NEXT_256                    142
+#define IDB_PAUSE_256                   143
+#define IDB_PLAY_256                    144
+#define IDB_CLOSE_256                   145
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        138
+#define _APS_NEXT_RESOURCE_VALUE        146
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1000
 #define _APS_NEXT_SYMED_VALUE           101

@@ -96,6 +96,14 @@ IDB_STOP                BITMAP  DISCARDABLE     "stop_buttons.bmp"
 IDB_CLOSE               BITMAP  DISCARDABLE     "close_buttons.bmp"
 IDB_MINIMIZE            BITMAP  DISCARDABLE     "minimize_buttons.bmp"
 IDB_MODE                BITMAP  DISCARDABLE     "mode_buttons.bmp"
+IDB_STOP_256            BITMAP  DISCARDABLE     "stop_buttons256.bmp"
+IDB_LAST_256            BITMAP  DISCARDABLE     "last_buttons256.bmp"
+IDB_MINIMIZE_256        BITMAP  DISCARDABLE     "minimize_buttons256.bmp"
+IDB_MODE_256            BITMAP  DISCARDABLE     "mode_buttons256.bmp"
+IDB_NEXT_256            BITMAP  DISCARDABLE     "next_buttons256.bmp"
+IDB_PAUSE_256           BITMAP  DISCARDABLE     "pause_buttons256.bmp"
+IDB_PLAY_256            BITMAP  DISCARDABLE     "play_buttons256.bmp"
+IDB_CLOSE_256           BITMAP  DISCARDABLE     "close_buttons256.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
