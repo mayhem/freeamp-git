@@ -1,5 +1,5 @@
 #
-# NOTES: This script is intended for building rpms for redhat 5.x
+# NOTES: This script is intended for building rpms for redhat 6.x
 #        systems. Automatic depedency checking has been turned off for
 #        this script becuase the rpm will check to see if ALSA/ESD
 #        are installed on the system automatically. If we let
@@ -16,7 +16,7 @@
 # 
 Summary: MP3 audio player with streaming support
 Name: freeamp
-Version: 1.3.1
+Version: 2.0
 Release: 1
 Copyright: GPL
 Group: Applications/Multimedia
@@ -35,15 +35,18 @@ player will run on Windows, Linux and Solaris.
 %build
 %install
 
-prefix=/usr/local
+prefix=/usr
 
 bindir="$prefix/bin"
 libdir="$prefix/lib"
 fadir="$libdir/freeamp"
 plugdir="$fadir/plugins"
+sharedir="$prefix/share"
+fathemedir="$sharedir/freeamp"
+themedir="$fathemedir/themes"
 
 # We could use mkdir -p, but not all unix systems' mkdir's support -p
-for dir in "$bindir" "$libdir" "$fadir" "$plugdir"; do
+for dir in "$bindir" "$libdir" "$fadir" "$plugdir" "$sharedir" "$fathemedir" "$themedir"; do
     if [ \! -d "$dir" ]; then
 	echo "mkdir $dir"
 	mkdir "$dir"
@@ -56,6 +59,15 @@ done
 
 install -c -m 755 freeamp "$bindir"
 echo "$bindir/freeamp" > installed.files
+if test -f "MakeTheme"; then 
+    install -c -m 755 MakeTheme "$bindir"
+    echo "$bindir/MakeTheme" >> installed.files
+fi
+for file in themes/*.*; do
+    echo "install -c -o root -m 644 $file $themedir"
+    install -c -o root -m 644 "$file" "$themedir"
+    echo "$themedir/$file" >> installed.files
+done
 for file in plugins/*.*; do
     enable=f
     case "$file" in
@@ -94,7 +106,9 @@ for file in plugins/*.*; do
 done
 
 %files -f installed.files
-%dir /usr/local/lib/freeamp 
-%dir /usr/local/lib/freeamp/plugins
+%dir /usr/lib/freeamp 
+%dir /usr/lib/freeamp/plugins
+%dir /usr/share/freeamp
+%dir /usr/share/freeamp/plugins
 %doc AUTHORS CHANGES COPYING ChangeLog INSTALL NEWS README
 

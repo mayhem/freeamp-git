@@ -58,21 +58,28 @@ BEOSFREEAMPLIBS = -lbe -lroot
 FREEAMPLIBS = $($(OSTYPE)FREEAMPLIBS)
 
 # hack hack hack
-DIRECTORIES  = base/beos/src base/src base/unix/src base/unix/linux/src 
-DIRECTORIES += base/unix/solaris/src dlm/rmp io/alsa/unix/linux/src
-DIRECTORIES += io/esound/src io/http io/local io/obs io/src 
+DIRECTORIES  = base base/beos base/beos/src base/src base/unix base/unix/src 
+DIRECTORIES += base/unix/linux base/unix/linux/src base/unix/solaris
+DIRECTORIES += base/unix/solaris/src dlm dlm/rmp io io/alsa io/alsa/unix
+DIRECTORIES += io/alsa/unix/linux io/alsa/unix/linux/src io/esound
+DIRECTORIES += io/esound/src io/http io/local io/obs io/src io/soundcard
+DIRECTORIES += io/soundcard/beos io/soundcard/unix io/soundcard/unix/linux
 DIRECTORIES += io/soundcard/beos/src io/soundcard/unix/linux/src
-DIRECTORIES += io/soundcard/solaris/src lib/gdbm lib/xml/src lib/zlib/src
+DIRECTORIES += io/soundcard/unix/solaris lib lib/xml lib/zlib lmc lmc/xingmp3
+DIRECTORIES += io/soundcard/unix/solaris/src lib/gdbm lib/xml/src lib/zlib/src
+DIRECTORIES += plm plm/metadata plm/playlist plm/portable plm/portable/pmp300
 DIRECTORIES += lmc/xingmp3/src plm/metadata/id3v1 plm/metadata/id3v2 
-DIRECTORIES += plm/metadata/misc plm/playlist/m3u plm/portable/pmp300/sba 
+DIRECTORIES += plm/metadata/misc plm/playlist/m3u plm/portable/pmp300/sba ui
+DIRECTORIES += ui/download ui/download/unix ui/freeamp ui/freeamp/beos 
 DIRECTORIES += ui/cmdline ui/download/unix/src ui/freeamp/beos/src 
+DIRECTORIES += ui/freeamp/tools ui/freeamp/unix ui/irman ui/lcd ui/musicbrowser
 DIRECTORIES += ui/freeamp/src ui/freeamp/tools/src ui/freeamp/unix/src
+DIRECTORIES += ui/musicbrowser/unix ui/mpg123
 DIRECTORIES += ui/irman/src ui/lcd/src ui/musicbrowser/unix/src ui/ncurses
-DIRECTORIES += ui/mpg123
 
 dirs:
 	for p in $(DIRECTORIES); do \
-	  test -d $$p || mkdir -p $$p; \
+	  test -d $$p || mkdir $$p; \
         done
           
 freeamp: $(FREEAMPOBJ) $(freeamp_DEPENDENCIES)
