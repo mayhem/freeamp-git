@@ -1264,6 +1264,20 @@ void MusicBrowserUI::MusicCatalogTrackChanged(const ArtistList *oldArtist,
     MusicCatalogTrackAdded(newArtist,newAlbum, newItem);   
 
 
+    if(oldArtist != newArtist)
+    {
+        if(!FindArtist(oldArtist))
+        {
+            artistItem = FindArtist(newArtist);
+
+            if(artistItem)
+            {
+                if(artistState & TVIS_EXPANDED)
+                    TreeView_Expand(m_hMusicView, artistItem, TVE_EXPAND);
+            }
+        }
+    }
+
     if(oldAlbum != newAlbum)
     {
         artistItem = FindArtist(newArtist);
