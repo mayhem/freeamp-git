@@ -17,7 +17,7 @@ extern CRainplayUI *g_ui;
 
 BOOL SavePlayListToFile(CString szFile, PlayListManager *plm)
 {
-	if (szFile.GetLength()==0 || !plm || plm->Total()==0)
+	if (szFile.GetLength()==0 || !plm || plm->CountItems()==0)
 		return FALSE;
 
 	PlayListItem *pli, *oldpli;
@@ -65,7 +65,7 @@ BOOL ReadPlaylistFromFile(CString szFile, PlayListManager *plm)
 			if (!szTemp.IsEmpty()) {
 				if (szTemp.Find(":\\")<0)
 					szTemp = szFile.Left(szFile.ReverseFind(_T('\\'))+1) + szTemp;
-				plm->Add((char *)LPCTSTR(szTemp),0);
+				plm->AddItem((char *)LPCTSTR(szTemp),0);
 			}
 		}
 		fclose(fp);

@@ -862,7 +862,7 @@ LRESULT CRainplayDlg::OnClickOpen(WPARAM wParam, LPARAM lParam)
 					szTemp.Right(3)=="m3u" ) {
 					ReadPlaylistFromFile(szTemp, g_ui->m_plm);
 				} else
-					g_ui->m_plm->Add((char *)LPCTSTR(szTemp),0);
+					g_ui->m_plm->AddItem((char *)LPCTSTR(szTemp),0);
 			} while(pos!=NULL);
 			g_ui->m_plm->SetFirst();
 			GetUILock();
@@ -1209,7 +1209,7 @@ void CRainplayDlg::OnDropFiles(HDROP hDropInfo)
 	g_ui->m_plm->RemoveAll();
 	for (UINT i=0; i<::DragQueryFile((HDROP) hDropInfo, 0xFFFFFFFF, NULL, 0); i++) {
 		::DragQueryFile(hDropInfo, i, szTemp, MAX_PATH);
-		g_ui->m_plm->Add(szTemp,0);
+		g_ui->m_plm->AddItem(szTemp,0);
 	}
 	g_ui->m_plm->SetFirst();
 	GetUILock();

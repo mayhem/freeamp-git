@@ -195,7 +195,7 @@ SetArgs(int32 argc, char** argv)
 				szTemp.Right(3)=="m3u" ) {
 				ReadPlaylistFromFile(szTemp, m_plm);
 			} else
-				m_plm->Add(arg,0);
+				m_plm->AddItem(arg,0);
             count++;
 	    }
     }
@@ -203,7 +203,7 @@ SetArgs(int32 argc, char** argv)
     m_plm->SetFirst();
 
     if(shuffle) 
-        m_plm->SetShuffle(SHUFFLE_SHUFFLED);
+        m_plm->SetShuffle(SHUFFLE_RANDOM);
     
     //if(autoplay)
        //m_target->AcceptEvent(m_target, new Event(CMD_Play));
