@@ -148,12 +148,12 @@ bool GTKPreferenceWindow::Show(Window *pWindow)
    
     GtkWidget *pane;
     GtkWidget *label;
-/*
+
     label = gtk_label_new("General");
     gtk_widget_show(label);
     pane = CreatePage1();
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), pane, label);
-*/
+
     label = gtk_label_new("Themes");
     gtk_widget_show(label);
     pane = CreatePage5();
@@ -306,6 +306,10 @@ void GTKPreferenceWindow::GetPrefsValues(Preferences* prefs,
 
     m_pThemeMan->GetCurrentTheme(values->currentTheme);
 
+    prefs->GetShowToolbarTextLabels(&values->useTextLabels);
+    prefs->GetShowToolbarImages(&values->useImages);
+    prefs->GetSaveCurrentPlaylistOnExit(&values->savePlaylistOnExit);
+
     if(kError_BufferTooSmall == prefs->GetSaveMusicDirectory(buffer, &size))
     {
         size++;
@@ -341,6 +345,10 @@ void GTKPreferenceWindow::GetPrefsValues(Preferences* prefs,
 void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs, 
                                           PrefsStruct* values)
 {
+    prefs->SetShowToolbarTextLabels(values->useTextLabels);
+    prefs->SetShowToolbarImages(values->useImages);
+    prefs->SetSaveCurrentPlaylistOnExit(values->savePlaylistOnExit);
+
     prefs->SetDefaultPMO(values->defaultPMO.c_str());
     prefs->SetInputBufferSize(values->inputBufferSize);
     prefs->SetOutputBufferSize(values->outputBufferSize);
@@ -399,12 +407,84 @@ void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs,
     }
 }
 
+void GTKPreferenceWindow::SaveMusicSet(char *newpath, bool set)
+{
+    proposedValues.saveMusicDirectory = newpath;
+    gtk_widget_set_sensitive(applyButton, TRUE);
+    if (set)
+        gtk_entry_set_text(GTK_ENTRY(saveMusicBox), newpath);
+}
+
+void save_music_change(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    char *text = gtk_entry_get_text(GTK_ENTRY(w));
+    p->SaveMusicSet(text, false);
+}
+
+void save_music_browse(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    GTKFileSelector *filesel = new GTKFileSelector("Select a New Directory");
+    if (filesel->Run(true)) {
+        char *returnpath = filesel->GetReturnPath();
+
+        struct stat st;
+
+        if (stat(returnpath, &st)) {
+            if (S_ISDIR(st.st_mode))
+                p->SaveMusicSet(returnpath, true);
+            else {
+                MessageDialog oBox(p->GetContext());
+                oBox.Show("Please select a directory to save dowloaded music.",
+                          "Save Music Browser Error", kMessageOk, true);
+            }
+        }
+    }
+    delete filesel;
+}
+
 GtkWidget *GTKPreferenceWindow::CreatePage1(void)
 {
     GtkWidget *pane = gtk_vbox_new(FALSE, 5);
     gtk_container_set_border_width(GTK_CONTAINER(pane), 5);
     gtk_widget_show(pane);
 
+    GtkWidget *frame = gtk_frame_new("Save Music Folder");
+    gtk_box_pack_start(GTK_BOX(pane), frame, FALSE, FALSE, 0);
+    gtk_widget_show(frame);
+
+    GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
+    gtk_container_set_border_width(GTK_CONTAINER(vbox), 5);
+    gtk_container_add(GTK_CONTAINER(frame), vbox);
+    gtk_widget_show(vbox);
+
+    char copys[_MAX_PATH];
+
+    GtkWidget *temphbox = gtk_hbox_new(FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), temphbox, FALSE, FALSE, 0);
+    gtk_widget_show(temphbox);
+
+    strncpy(copys, originalValues.saveMusicDirectory.c_str(), 256);
+    saveMusicBox = gtk_entry_new();
+    gtk_entry_set_text(GTK_ENTRY(saveMusicBox), copys);
+    gtk_entry_set_max_length(GTK_ENTRY(saveMusicBox), 64);
+    gtk_signal_connect(GTK_OBJECT(saveMusicBox), "changed",
+                       GTK_SIGNAL_FUNC(save_music_change), this);
+    gtk_box_pack_start(GTK_BOX(temphbox), saveMusicBox, TRUE, TRUE, 0);
+    gtk_widget_show(saveMusicBox);
+
+    GtkWidget *button = gtk_button_new_with_label(" Browse ");
+    gtk_box_pack_start(GTK_BOX(temphbox), button, FALSE, FALSE, 5);
+    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                       GTK_SIGNAL_FUNC(save_music_browse), this);
+    gtk_widget_show(button);
+
+/*
+    frame = gtk_frame_new("Show 'My Music' Toolbars As...");
+    gtk_box_pack_start(GTK_BOX(pane), frame, FALSE, FALSE, 0);
+    gtk_widget_show(frame);
+
+    GtkWidget *button = 
+*/
     return pane;
 }
 
@@ -426,7 +506,7 @@ void GTKPreferenceWindow::SaveLocalToggle(int active)
 {
     gtk_widget_set_sensitive(saveStreamLabel, active);
     gtk_widget_set_sensitive(saveStreamBox, active);
-//    gtk_widget_set_sensitive(saveBrowseBox, active);
+    gtk_widget_set_sensitive(saveBrowseBox, active);
     proposedValues.saveStreams = active;
     gtk_widget_set_sensitive(applyButton, TRUE);
 }
@@ -474,16 +554,39 @@ void alt_ip_toggle(GtkWidget *w, GTKPreferenceWindow *p)
     p->AltIPToggle(i);
 }
 
-void GTKPreferenceWindow::SaveLocalSet(char *newpath)
+void GTKPreferenceWindow::SaveLocalSet(char *newpath, bool set)
 {
     proposedValues.saveStreamsDirectory = newpath;
     gtk_widget_set_sensitive(applyButton, TRUE);
+    if (set)
+        gtk_entry_set_text(GTK_ENTRY(saveStreamBox), newpath);
 }
 
 void save_stream_change(GtkWidget *w, GTKPreferenceWindow *p)
 {
     char *text = gtk_entry_get_text(GTK_ENTRY(w));
-    p->SaveLocalSet(text);
+    p->SaveLocalSet(text, false);
+}
+
+void save_stream_browse(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    GTKFileSelector *filesel = new GTKFileSelector("Select a New Directory");
+    if (filesel->Run(true)) {
+        char *returnpath = filesel->GetReturnPath();
+ 
+        struct stat st;
+ 
+        if (stat(returnpath, &st)) {
+            if (S_ISDIR(st.st_mode)) 
+                p->SaveLocalSet(returnpath, true);
+            else {
+                MessageDialog oBox(p->GetContext());
+                oBox.Show("Please select a directory to save streams locally.",
+                          "Save Stream Browser Error", kMessageOk, true);
+            }
+        }
+    }
+    delete filesel;
 }
 
 void GTKPreferenceWindow::ProxyAddySet()
@@ -566,7 +669,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage2(void)
     gtk_widget_set_usize(entry, 32, 0);
     gtk_signal_connect(GTK_OBJECT(entry), "changed",
                        GTK_SIGNAL_FUNC(stream_interval_change), this);
-    gtk_box_pack_start(GTK_BOX(hbox), entry, TRUE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), entry, FALSE, FALSE, 0);
     gtk_widget_show(entry);
 
     label = gtk_label_new(" Seconds");
@@ -597,19 +700,29 @@ GtkWidget *GTKPreferenceWindow::CreatePage2(void)
 
     char copys[256];
 
+    GtkWidget *temphbox = gtk_hbox_new(FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), temphbox, FALSE, FALSE, 0);
+    gtk_widget_show(temphbox);
+
     strncpy(copys, originalValues.saveStreamsDirectory.c_str(), 256);
     saveStreamBox = gtk_entry_new();
     gtk_entry_set_text(GTK_ENTRY(saveStreamBox), copys); 
     gtk_entry_set_max_length(GTK_ENTRY(saveStreamBox), 64);
     gtk_signal_connect(GTK_OBJECT(saveStreamBox), "changed",
                        GTK_SIGNAL_FUNC(save_stream_change), this);
-    gtk_box_pack_start(GTK_BOX(vbox), saveStreamBox, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(temphbox), saveStreamBox, TRUE, TRUE, 0);
     gtk_widget_show(saveStreamBox);
+
+    saveBrowseBox = gtk_button_new_with_label(" Browse ");
+    gtk_box_pack_start(GTK_BOX(temphbox), saveBrowseBox, FALSE, FALSE, 5);
+    gtk_signal_connect(GTK_OBJECT(saveBrowseBox), "clicked",
+                       GTK_SIGNAL_FUNC(save_stream_browse), this);
+    gtk_widget_show(saveBrowseBox);
 
     if (!originalValues.saveStreams) {
         gtk_widget_set_sensitive(saveStreamLabel, FALSE);
         gtk_widget_set_sensitive(saveStreamBox, FALSE);
-//        gtk_widget_set_sensitive(saveBrowseBox, FALSE);
+        gtk_widget_set_sensitive(saveBrowseBox, FALSE);
     }
 
     check = gtk_check_button_new_with_label("Use Proxy Server");
@@ -661,7 +774,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage2(void)
     gtk_entry_set_text(GTK_ENTRY(proxyAddyBox), tempstr);
     gtk_signal_connect(GTK_OBJECT(proxyAddyBox), "changed",
                        GTK_SIGNAL_FUNC(proxy_change), this);
-    gtk_box_pack_start(GTK_BOX(hbox), proxyAddyBox, FALSE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), proxyAddyBox, TRUE, TRUE, 0);
     gtk_widget_show(proxyAddyBox);
 
     proxyColon = gtk_label_new(":");
@@ -704,7 +817,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage2(void)
     gtk_widget_show(hbox);
 
     ipLabel = gtk_label_new("IP Address: ");
-    gtk_box_pack_start(GTK_BOX(hbox), ipLabel, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), ipLabel, FALSE, FALSE, 10);
     gtk_widget_show(ipLabel);
 
     char *dot = NULL;
@@ -733,7 +846,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage2(void)
     gtk_widget_set_usize(ipOneBox, 32, 0);
     gtk_signal_connect(GTK_OBJECT(ipOneBox), "changed",
                        GTK_SIGNAL_FUNC(ip_change), this);
-    gtk_box_pack_start(GTK_BOX(hbox), ipOneBox, TRUE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), ipOneBox, FALSE, FALSE, 0);
     gtk_widget_show(ipOneBox);
 
     ipPeriod1 = gtk_label_new(".");
@@ -746,7 +859,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage2(void)
     gtk_widget_set_usize(ipTwoBox, 32, 0);
     gtk_signal_connect(GTK_OBJECT(ipOneBox), "changed",
                        GTK_SIGNAL_FUNC(ip_change), this);
-    gtk_box_pack_start(GTK_BOX(hbox), ipTwoBox, TRUE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), ipTwoBox, FALSE, FALSE, 0);
     gtk_widget_show(ipTwoBox);
 
     ipPeriod2 = gtk_label_new(".");
@@ -759,7 +872,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage2(void)
     gtk_widget_set_usize(ipThreeBox, 32, 0);
     gtk_signal_connect(GTK_OBJECT(ipThreeBox), "changed",
                        GTK_SIGNAL_FUNC(ip_change), this);
-    gtk_box_pack_start(GTK_BOX(hbox), ipThreeBox, TRUE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), ipThreeBox, FALSE, FALSE, 0);
     gtk_widget_show(ipThreeBox);
 
     ipPeriod3 = gtk_label_new(".");
@@ -772,7 +885,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage2(void)
     gtk_widget_set_usize(ipFourBox, 32, 0);
     gtk_signal_connect(GTK_OBJECT(ipFourBox), "changed",
                        GTK_SIGNAL_FUNC(ip_change), this);
-    gtk_box_pack_start(GTK_BOX(hbox), ipFourBox, TRUE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), ipFourBox, FALSE, FALSE, 0);
     gtk_widget_show(ipFourBox);
 
     if (!originalValues.useAlternateIP) {
@@ -818,7 +931,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage3(void)
     gtk_widget_show(pane);
 
     GtkWidget *frame = gtk_frame_new("Audio");
-    gtk_box_pack_start(GTK_BOX(pane), frame, TRUE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(pane), frame, FALSE, FALSE, 0);
     gtk_widget_show(frame);
 
     GtkWidget *table = gtk_table_new(2, 2, FALSE);
@@ -911,7 +1024,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage6(void)
     gtk_widget_show(pane);
 
     GtkWidget *frame = gtk_frame_new("Buffer Sizes");
-    gtk_box_pack_start(GTK_BOX(pane), frame, TRUE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(pane), frame, FALSE, FALSE, 0);
     gtk_widget_show(frame);
 
     GtkWidget *table = gtk_table_new(3, 2, FALSE);
@@ -1008,28 +1121,28 @@ GtkWidget *GTKPreferenceWindow::CreateAbout(void)
     textlabel = gtk_label_new(NULL);
     gtk_label_set_line_wrap(GTK_LABEL(textlabel), TRUE);
     gtk_label_set_text(GTK_LABEL(textlabel), "FreeAmp is an Open Source effort to build the best digital audio player available.  In the interest of supporting the free software community, while at the same time fostering the growth of the online delivery of music, EMusic.com, THE Source for Downloadable Music, is funding both the FreeAmp.org domain and the efforts of the FreeAmp team.  The FreeAmp team consists of: Mark B. Elrod, Robert Kaye, Isaac Richards, Brett Thomas, and Jason Woodward.");
-    gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_LEFT);
+    gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_FILL);
     gtk_box_pack_start(GTK_BOX(pane), textlabel, FALSE, FALSE, 0);
     gtk_widget_show(textlabel);
 
     textlabel = gtk_label_new(NULL);
     gtk_label_set_line_wrap(GTK_LABEL(textlabel), TRUE);
     gtk_label_set_text(GTK_LABEL(textlabel), "Other people have also contributed to FreeAmp:");
-    gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_LEFT);
+    gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_FILL);
     gtk_box_pack_start(GTK_BOX(pane), textlabel, FALSE, FALSE, 0);
     gtk_widget_show(textlabel);
 
     textlabel = gtk_label_new(NULL);
     gtk_label_set_line_wrap(GTK_LABEL(textlabel), TRUE);
     gtk_label_set_text(GTK_LABEL(textlabel), "William Bull, Alan Cutter, Gabor Fleischer, Jean-Michel HERVE, Hiromasa Kato, Michael Bruun Petersen, Sylvain Rebaud, The Snowblind Alliance, Tom Spindler, Valters Vingolds, Bill Yuan.");
-    gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_LEFT);
+    gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_FILL);
     gtk_box_pack_start(GTK_BOX(pane), textlabel, FALSE, FALSE, 0);
     gtk_widget_show(textlabel);
 
     textlabel = gtk_label_new(NULL);
     gtk_label_set_line_wrap(GTK_LABEL(textlabel), TRUE);
     gtk_label_set_text(GTK_LABEL(textlabel), "FreeAmp is being released under the terms of the GPL.  As is provided by the GPL, all of EMusic.com's and your efforts toward FreeAmp will be released back to the community at large.");
-    gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_LEFT);
+    gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_FILL);
     gtk_box_pack_start(GTK_BOX(pane), textlabel, FALSE, FALSE, 0);
     gtk_widget_show(textlabel);
 
@@ -1257,7 +1370,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage5(void)
     gtk_label_set_line_wrap(GTK_LABEL(textlabel), TRUE);
     gtk_label_set_text(GTK_LABEL(textlabel), "A theme may specify a font type that is not installed on your system.  The default font will by substituted in place of the missing font.");
     gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_LEFT);
-    gtk_box_pack_start(GTK_BOX(vbox), textlabel, FALSE, FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(vbox), textlabel, TRUE, TRUE, 0);
     gtk_widget_show(textlabel);
 
     hbox = gtk_hbox_new(FALSE, 5);
@@ -1267,11 +1380,11 @@ GtkWidget *GTKPreferenceWindow::CreatePage5(void)
     textlabel = gtk_label_new(NULL);
     gtk_label_set_line_wrap(GTK_LABEL(textlabel), TRUE);
     gtk_label_set_text(GTK_LABEL(textlabel), "Note: Only the font name will be used.  The font will appear in the style specified in the theme.");
-    gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_LEFT);
+    gtk_label_set_justify(GTK_LABEL(textlabel), GTK_JUSTIFY_FILL);
     gtk_box_pack_start(GTK_BOX(hbox), textlabel, FALSE, FALSE, 5);
     gtk_widget_show(textlabel);
 
-    button = gtk_button_new_with_label("Choose Font");
+    button = gtk_button_new_with_label(" Choose Font ");
     gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 5);
     gtk_signal_connect(GTK_OBJECT(button), "clicked",
                        GTK_SIGNAL_FUNC(choose_font_press), this);

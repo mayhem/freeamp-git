@@ -715,7 +715,7 @@ static gint nocase_compare(GtkCList *clist, gconstpointer ptr1,
 
     return strcasecmp (text1, text2);
 }
-
+/*
 static gint TreeDataCompare(TreeData *a, TreeData *b)
 {
     bool retvalue = false;
@@ -725,7 +725,7 @@ static gint TreeDataCompare(TreeData *a, TreeData *b)
         retvalue = true;
     return retvalue;
 }
-/*            
+           
 GList *GTKMusicBrowser::FindTrackNode(const ArtistList *artist,             
                                       const AlbumList  *album,
                                       const PlaylistItem *item)
@@ -1098,7 +1098,7 @@ void GTKMusicBrowser::CreateExpanded(void)
 
     musicBrowserWindow = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(musicBrowserWindow),
-                                   GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
+                                   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_box_pack_start(GTK_BOX(browservbox), musicBrowserWindow, TRUE, TRUE, 0);
     gtk_widget_set_usize(musicBrowserWindow, 200, 200);
 
@@ -1693,7 +1693,7 @@ void GTKMusicBrowser::CreatePlaylist(void)
 
     CreateMenu(vbox);
 
-    GtkWidget *toolbar = gtk_toolbar_new(GTK_ORIENTATION_HORIZONTAL, 
+    toolbar = gtk_toolbar_new(GTK_ORIENTATION_HORIZONTAL, 
                                          GTK_TOOLBAR_BOTH);
     gtk_toolbar_set_button_relief(GTK_TOOLBAR(toolbar), GTK_RELIEF_NONE);
     gtk_toolbar_set_space_style(GTK_TOOLBAR(toolbar), GTK_TOOLBAR_SPACE_LINE);
@@ -1748,6 +1748,7 @@ void GTKMusicBrowser::CreatePlaylist(void)
                             GTK_SIGNAL_FUNC(move_down_tool), this);
 
     gtk_box_pack_start(GTK_BOX(vbox), toolbar, FALSE, TRUE, 0);
+    SetToolbarType();
     gtk_widget_show(toolbar);
 
     GtkWidget *separator = gtk_hseparator_new();
@@ -1806,6 +1807,20 @@ void GTKMusicBrowser::DeleteListEvent(void)
     m_plm->RemoveAll();
     UpdatePlaylistList();
     m_currentindex = kInvalidIndex;
+}
+
+void GTKMusicBrowser::SetToolbarType(void)
+{
+    bool useText, useImages;
+    m_context->prefs->GetShowToolbarTextLabels(&useText);
+    m_context->prefs->GetShowToolbarImages(&useImages);
+
+    if (useText && useImages)
+        gtk_toolbar_set_style(GTK_TOOLBAR(toolbar), GTK_TOOLBAR_BOTH);
+    else if (useText)
+        gtk_toolbar_set_style(GTK_TOOLBAR(toolbar), GTK_TOOLBAR_TEXT);
+    else if (useImages)
+        gtk_toolbar_set_style(GTK_TOOLBAR(toolbar), GTK_TOOLBAR_ICONS);
 }
 
 void GTKMusicBrowser::SetClickState(ClickState newState)
@@ -2145,8 +2160,21 @@ void GTKMusicBrowser::ShowMusicBrowser(void)
         CreatePlaylist();
         m_initialized = true;
     }
-    if (m_state == kStateCollapsed)
-        ExpandCollapseEvent();
+    if (!master) {
+        if (m_state == kStateCollapsed)
+            ExpandCollapseEvent();
+    }
+    else {  
+         bool viewMusicBrowser = true;
+
+         m_context->prefs->GetViewMusicBrowser(&viewMusicBrowser);
+         
+         if (viewMusicBrowser && m_state == kStateCollapsed)
+             ExpandCollapseEvent();
+         else if (!viewMusicBrowser && m_state == kStateExpanded) 
+             ExpandCollapseEvent();
+    }
+
     gdk_threads_leave();
 }
 
@@ -2181,7 +2209,10 @@ void GTKMusicBrowser::Close(bool inMain)
             m_plm = NULL;
         }
         if (!master && inMain)
-            parentUI->WindowClose(this); 
+            parentUI->WindowClose(this);
+
+        if (master)
+            m_context->prefs->SetViewMusicBrowser(m_state == kStateExpanded); 
     }
 
     gdk_threads_leave();
@@ -2190,6 +2221,13 @@ void GTKMusicBrowser::Close(bool inMain)
 int32 GTKMusicBrowser::AcceptEvent(Event *e)
 {
     switch (e->Type()) {
+        case INFO_PrefsChanged: {
+            if (m_initialized) {
+                gdk_threads_enter();
+                SetToolbarType();
+                gdk_threads_leave();
+            }
+            break; } 
         case INFO_SearchMusicDone: {
             if (m_initialized) {
                 gdk_threads_enter();

@@ -146,6 +146,7 @@ class GTKMusicBrowser {
     GtkWidget *addFile;
     GtkWidget *toolUp;
     GtkWidget *toolDown;
+    GtkWidget *toolbar;
     GtkItemFactory *menuFactory;
 
     GtkCTreeNode *mainTree;
@@ -167,6 +168,8 @@ class GTKMusicBrowser {
                           ArtistList *art = NULL, AlbumList *alb = NULL, 
                           PlaylistItem *tr = NULL, char *pname = NULL,
                           char *message = NULL);
+
+    void SetToolbarType();
 
   public:
     ClickState GetClickState() { return m_clickState; }

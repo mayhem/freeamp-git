@@ -140,7 +140,7 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
                 mainBrowser->Close();
             else
                 mainBrowser->ShowPlaylist();
-            break; }
+            break; } 
         case CMD_ToggleMusicBrowserUI: {
             if (mainBrowser->Visible())
                 mainBrowser->Close();
@@ -153,6 +153,13 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
         case INFO_Playing: {
             if (mainBrowser->Visible())
                 mainBrowser->AcceptEvent(event);
+            break; }
+        case INFO_PrefsChanged: {
+            mainBrowser->AcceptEvent(event);
+            vector<GTKMusicBrowser *>::iterator i = browserWindows.begin();
+            for (; i != browserWindows.end(); i++)
+                if ((*i)->Visible())
+                    (*i)->AcceptEvent(event);
             break; }
         case INFO_MusicCatalogPlaylistAdded:
         case INFO_MusicCatalogPlaylistRemoved:

@@ -268,19 +268,42 @@ void help_button_click(GtkWidget *w, DownloadUI *p)
     p->ShowHelp();
 }
 
+void emusic_click(GtkWidget *w, DownloadUI *p)
+{
+    LaunchBrowser("http://www.emusic.com/music/free.html");
+}
+
 void DownloadUI::CreateDownloadUI(void)
 {
     m_downloadUI = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(m_downloadUI), BRANDING" - DownloadManager");
-    gtk_window_set_policy(GTK_WINDOW(m_downloadUI), TRUE, TRUE, TRUE);
+    gtk_window_set_policy(GTK_WINDOW(m_downloadUI), FALSE, FALSE, TRUE);
     gtk_signal_connect(GTK_OBJECT(m_downloadUI), "destroy",
                        GTK_SIGNAL_FUNC(toggle_vis_internal), this);
     gtk_container_set_border_width(GTK_CONTAINER(m_downloadUI), 5);
 
     GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
     gtk_container_add(GTK_CONTAINER(m_downloadUI), vbox);
+    gtk_widget_set_usize(vbox, 400, 400);
     gtk_widget_show(vbox);
 
+    GtkWidget *text = gtk_label_new(NULL);
+    gtk_label_set_line_wrap(GTK_LABEL(text), TRUE);
+    gtk_label_set_text(GTK_LABEL(text), "The Download Manager enables you to download music from sites that support the RMP or Real Jukebox download format.  To try it, check out the free music at:");
+    gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_FILL);
+    gtk_misc_set_alignment(GTK_MISC(text), (gfloat)0.0, (gfloat)0.0);
+    
+    gtk_box_pack_start(GTK_BOX(vbox), text, FALSE, FALSE, 2);
+    gtk_widget_set_usize(text, 400, 46);
+    gtk_widget_show(text);
+
+    GtkWidget *emusic_button = gtk_button_new_with_label("http://www.emusic.com/music/free.html");
+    gtk_box_pack_start(GTK_BOX(vbox), emusic_button, FALSE, FALSE, 2);
+    gtk_signal_connect(GTK_OBJECT(emusic_button), "clicked",
+                       GTK_SIGNAL_FUNC(emusic_click), this);
+
+    gtk_widget_show(emusic_button);
+ 
     GtkWidget *listwindow = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(listwindow),
                                    GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
@@ -405,17 +428,17 @@ void DownloadUI::CreateDownloadUI(void)
     gtk_box_pack_start(GTK_BOX(hbox), sep, TRUE, FALSE, 5);
     gtk_widget_show(sep);
 
-    m_helpButton = gtk_button_new_with_label("  Help  ");
-    gtk_box_pack_end(GTK_BOX(hbox), m_helpButton, FALSE, FALSE, 5);
-    gtk_signal_connect(GTK_OBJECT(m_helpButton), "clicked", 
-                       GTK_SIGNAL_FUNC(help_button_click), this);
-    gtk_widget_show(m_helpButton);
-
     m_CloseButton = gtk_button_new_with_label("  Close  ");
     gtk_box_pack_end(GTK_BOX(hbox), m_CloseButton, FALSE, FALSE, 5);
     gtk_signal_connect(GTK_OBJECT(m_CloseButton), "clicked",
                        GTK_SIGNAL_FUNC(toggle_vis_internal), this);
     gtk_widget_show(m_CloseButton);
+
+    m_helpButton = gtk_button_new_with_label("  Help  ");
+    gtk_box_pack_end(GTK_BOX(hbox), m_helpButton, FALSE, FALSE, 5);
+    gtk_signal_connect(GTK_OBJECT(m_helpButton), "clicked",
+                       GTK_SIGNAL_FUNC(help_button_click), this);
+    gtk_widget_show(m_helpButton);
 
     gtk_widget_show(m_downloadUI);
 }

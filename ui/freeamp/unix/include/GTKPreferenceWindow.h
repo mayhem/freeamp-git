@@ -55,7 +55,7 @@ typedef struct PrefsStruct
     bool saveStreams;
     string saveStreamsDirectory;
     bool useProxyServer;
-    string proxyServer; // is there a domain name length limit???
+    string proxyServer; 
     bool useAlternateIP;
     string alternateIP;
     
@@ -71,13 +71,20 @@ typedef struct PrefsStruct
     string defaultFont;
     string currentTheme;
     int    listboxIndex;
-   
+
+    bool useTextLabels;
+    bool useImages; 
+    bool savePlaylistOnExit;
+
     string saveMusicDirectory;
     PortableSet portablePlayers;
 
     bool operator == (const struct PrefsStruct& pref)
     {
         return (
+            useTextLabels == pref.useTextLabels &&
+            useImages == pref.useImages &&
+            savePlaylistOnExit == pref.savePlaylistOnExit &&
             defaultPMO == pref.defaultPMO &&
             inputBufferSize == pref.inputBufferSize &&
             outputBufferSize == pref.outputBufferSize &&
@@ -147,6 +154,8 @@ class GTKPreferenceWindow : public PreferenceWindow
       GtkWidget *CreatePage5(void);
       GtkWidget *CreatePage6(void);
 
+      GtkWidget *saveMusicBox;
+
       GtkWidget *applyButton;
 
       GtkWidget *saveStreamLabel;
@@ -196,7 +205,7 @@ class GTKPreferenceWindow : public PreferenceWindow
 
       void SetStreamInterval(int newvalue);
       void SaveLocalToggle(int active);
-      void SaveLocalSet(char *newpath);
+      void SaveLocalSet(char *newpath, bool set);
       void ProxyAddySet(void);
       void ProxyToggle(int active);
       void AltIPSet(void);
@@ -207,6 +216,10 @@ class GTKPreferenceWindow : public PreferenceWindow
       void SetPMO(int newsel);
 
       void ShowHelp(void);
+
+      void SaveMusicSet(char *newpath, bool set);
+
+      FAContext *GetContext(void) { return m_pContext; }
 };
 
 #endif
