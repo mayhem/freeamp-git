@@ -59,6 +59,8 @@ public:
     virtual Error Clear();
 
     virtual Error SetPropManager(Properties *p);
+    virtual void  SetVolume(int32);
+    virtual int32 GetVolume(void);
 
     static void   StartWorkerThread(void *);
     virtual Error BeginWrite(void *&pBuffer, size_t &iBytesToWrite);

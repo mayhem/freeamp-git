@@ -57,6 +57,9 @@ class LogicalMediaConverter {
     virtual Error SetEQData(float *) = 0;
     virtual Error SetEQData(bool) = 0;
 
+    virtual void  SetVolume(int32) = 0;
+    virtual int32 GetVolume(void) = 0;
+
     virtual void  ReportError(const char *szError)
                   {
                      assert(m_target);

@@ -40,7 +40,6 @@ ____________________________________________________________________________*/
 #include "preferences.h"
 #include "properties.h"
 #include "propimpl.h"
-#include "volume.h"
 
 #include "lmc.h"
 

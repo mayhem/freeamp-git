@@ -38,7 +38,6 @@ ____________________________________________________________________________*/
 #include "event.h"
 #include "thread.h"
 #include "eventdata.h"
-#include "volume.h"
 
 extern "C" {
 #include "ir.h"
@@ -156,21 +155,31 @@ void IRManUI::irServiceFunction(void *pclcio) {
 		    switch (*cmd) {
 			case IR_VolumeUp: {
 			    bounceTime = 100000;
-			    PropValue *pv = NULL;
-			    int32 vol = VolumeManager::GetVolume(); 
-			    vol += 5;
-			    if (vol > 100) vol == 100;
-			    Int32PropValue *ipv = new Int32PropValue(vol);
-			    pMe->m_propManager->SetProperty("pcm_volume",(PropValue *)ipv);
+			    
+             PropValue *pv;
+             pMe->m_propManager->GetProperty("pcm_volume", &pv);
+             if (pv)
+             {
+			        int32 vol = ((Int32PropValue *) pv)->GetInt32(); 
+             
+			        vol += 5;
+			        if (vol > 100) vol == 100;
+			        Int32PropValue *ipv = new Int32PropValue(vol);
+			        pMe->m_propManager->SetProperty("pcm_volume",(PropValue *)ipv);
+             }
 			    break; }
 			case IR_VolumeDown: {
 			    bounceTime = 100000;
-			    PropValue *pv = NULL;
-			    int32 vol = VolumeManager::GetVolume();
-			    vol -= 5;
-			    if (vol < 0) vol == 0;
-			    Int32PropValue *ipv = new Int32PropValue(vol);
-			    pMe->m_propManager->SetProperty("pcm_volume",(PropValue *)ipv);
+             PropValue *pv;
+             pMe->m_propManager->GetProperty("pcm_volume", &pv);
+             if (pv)
+             {
+			        int32 vol = ((Int32PropValue *) pv)->GetInt32(); 
+			        vol -= 5;
+			        if (vol < 0) vol == 0;
+			        Int32PropValue *ipv = new Int32PropValue(vol);
+			        pMe->m_propManager->SetProperty("pcm_volume",(PropValue *)ipv);
+             }
 			    break; }
 			default:
 			    bounceTime = 300000;

@@ -251,7 +251,6 @@ Error PullBuffer::BeginWrite(void *&pBuffer, size_t &iBytesToWrite)
 
    if (m_bExit)
    {
-       printf("bailing out!\n");
        m_pMutex->Release();
        return kError_Interrupt;
    }

@@ -255,6 +255,12 @@ void ObsBuffer::WorkerThread(void)
               m_pWriteSem->Wait();
               continue;
           }
+          if (eError == kError_NoErr && iToCopy < iRead)
+          {
+              EndWrite(0);
+              m_pWriteSem->Wait();
+              continue;
+          }
           break;
       }
       if (eError != kError_NoErr)
@@ -277,7 +283,7 @@ void ObsBuffer::WorkerThread(void)
       if (IsError(eError))
       {
          g_Log->Error("Obs: EndWrite returned: %d\n", eError);
-         break;
+         EndWrite(0);
       }
    }
 

@@ -82,6 +82,8 @@ public:
     virtual void  WaitToQuit(){ };
     virtual const char *GetErrorString(int32) { return NULL; }
     virtual Error SetPropManager(Properties *) = 0;
+    virtual void  SetVolume(int32) { ; };
+    virtual int32 GetVolume(void) { return 0; };
     virtual void  ReportError(const char *szError)
                   {
                      assert(m_target);
