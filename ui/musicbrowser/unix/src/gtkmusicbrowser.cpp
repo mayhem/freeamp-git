@@ -1340,6 +1340,7 @@ void GTKMusicBrowser::MoveUpEvent(void)
     if (m_lastindex == 0 || m_lastindex == kInvalidIndex)
         return;
     m_plm->SwapItems(m_lastindex, m_lastindex - 1);
+    m_plSelected.erase(m_lastindex);
     m_lastindex--;
     UpdatePlaylistList();
 }
@@ -1350,6 +1351,7 @@ void GTKMusicBrowser::MoveDownEvent(void)
         m_lastindex == kInvalidIndex)
         return;
     m_plm->SwapItems(m_lastindex, m_lastindex + 1);
+    m_plSelected.erase(m_lastindex);
     m_lastindex++;
     UpdatePlaylistList();
 }
