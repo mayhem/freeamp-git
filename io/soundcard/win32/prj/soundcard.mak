@@ -51,8 +51,10 @@ CLEAN :
 	-@erase "$(INTDIR)\eventbuffer.obj"
 	-@erase "$(INTDIR)\log.obj"
 	-@erase "$(INTDIR)\mutex.obj"
+	-@erase "$(INTDIR)\preferences.obj"
 	-@erase "$(INTDIR)\pullbuffer.obj"
 	-@erase "$(INTDIR)\semaphore.obj"
+	-@erase "$(INTDIR)\soundcard.res"
 	-@erase "$(INTDIR)\soundcardpmo.obj"
 	-@erase "$(INTDIR)\thread.obj"
 	-@erase "$(INTDIR)\vc50.idb"
@@ -72,6 +74,7 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\include" /I "..\..\include" /I\
 CPP_OBJS=.\Release/
 CPP_SBRS=.
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
+RSC_PROJ=/l 0x409 /fo"$(INTDIR)\soundcard.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\soundcard.bsc" 
 BSC32_SBRS= \
@@ -88,8 +91,10 @@ LINK32_OBJS= \
 	"$(INTDIR)\eventbuffer.obj" \
 	"$(INTDIR)\log.obj" \
 	"$(INTDIR)\mutex.obj" \
+	"$(INTDIR)\preferences.obj" \
 	"$(INTDIR)\pullbuffer.obj" \
 	"$(INTDIR)\semaphore.obj" \
+	"$(INTDIR)\soundcard.res" \
 	"$(INTDIR)\soundcardpmo.obj" \
 	"$(INTDIR)\thread.obj" \
 	"$(INTDIR)\win32thread.obj"
@@ -105,8 +110,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : ".\soundcard.pmo"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                      ..\..\..\..\base\win32\prj\plugins
-	copy soundcard.pmo                 ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                        ..\..\..\..\base\win32\prj\plugins
+	copy soundcard.pmo                   ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "soundcard - Win32 Debug"
@@ -128,8 +133,10 @@ CLEAN :
 	-@erase "$(INTDIR)\eventbuffer.obj"
 	-@erase "$(INTDIR)\log.obj"
 	-@erase "$(INTDIR)\mutex.obj"
+	-@erase "$(INTDIR)\preferences.obj"
 	-@erase "$(INTDIR)\pullbuffer.obj"
 	-@erase "$(INTDIR)\semaphore.obj"
+	-@erase "$(INTDIR)\soundcard.res"
 	-@erase "$(INTDIR)\soundcardpmo.obj"
 	-@erase "$(INTDIR)\thread.obj"
 	-@erase "$(INTDIR)\vc50.idb"
@@ -152,6 +159,7 @@ CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\include" /I "..\..\include" /I\
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
+RSC_PROJ=/l 0x409 /fo"$(INTDIR)\soundcard.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\soundcard.bsc" 
 BSC32_SBRS= \
@@ -168,8 +176,10 @@ LINK32_OBJS= \
 	"$(INTDIR)\eventbuffer.obj" \
 	"$(INTDIR)\log.obj" \
 	"$(INTDIR)\mutex.obj" \
+	"$(INTDIR)\preferences.obj" \
 	"$(INTDIR)\pullbuffer.obj" \
 	"$(INTDIR)\semaphore.obj" \
+	"$(INTDIR)\soundcard.res" \
 	"$(INTDIR)\soundcardpmo.obj" \
 	"$(INTDIR)\thread.obj" \
 	"$(INTDIR)\win32thread.obj"
@@ -185,8 +195,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : ".\soundcard.pmo"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                      ..\..\..\..\base\win32\prj\plugins
-	copy soundcard.pmo                 ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                        ..\..\..\..\base\win32\prj\plugins
+	copy soundcard.pmo                   ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 
@@ -261,7 +271,6 @@ DEP_CPP_EVENT=\
 	"..\..\..\include\pmo.h"\
 	"..\..\..\include\pmoevent.h"\
 	"..\..\..\include\pullbuffer.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"\
@@ -313,6 +322,36 @@ DEP_CPP_MUTEX=\
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+SOURCE=..\..\..\..\base\win32\src\preferences.cpp
+
+!IF  "$(CFG)" == "soundcard - Win32 Release"
+
+DEP_CPP_PREFE=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\win32\include\preferences.h"\
+	"..\..\..\..\config\config.h"\
+	
+
+"$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "soundcard - Win32 Debug"
+
+DEP_CPP_PREFE=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\win32\include\preferences.h"\
+	"..\..\..\..\config\config.h"\
+	
+
+"$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
 SOURCE=..\..\..\src\pullbuffer.cpp
 
 !IF  "$(CFG)" == "soundcard - Win32 Release"
@@ -358,6 +397,26 @@ DEP_CPP_SEMAP=\
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+SOURCE=..\res\soundcard.rc
+
+!IF  "$(CFG)" == "soundcard - Win32 Release"
+
+
+"$(INTDIR)\soundcard.res" : $(SOURCE) "$(INTDIR)"
+	$(RSC) /l 0x409 /fo"$(INTDIR)\soundcard.res" /i\
+ "\Local\src\freeamp\io\soundcard\win32\res" /d "NDEBUG" $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "soundcard - Win32 Debug"
+
+
+"$(INTDIR)\soundcard.res" : $(SOURCE) "$(INTDIR)"
+	$(RSC) /l 0x409 /fo"$(INTDIR)\soundcard.res" /i\
+ "\Local\src\freeamp\io\soundcard\win32\res" /d "_DEBUG" $(SOURCE)
+
+
+!ENDIF 
+
 SOURCE=..\src\soundcardpmo.cpp
 
 !IF  "$(CFG)" == "soundcard - Win32 Release"
@@ -373,6 +432,7 @@ DEP_CPP_SOUND=\
 	"..\..\..\..\base\include\queue.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\preferences.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\include\eventbuffer.h"\
@@ -400,6 +460,7 @@ DEP_CPP_SOUND=\
 	"..\..\..\..\base\include\queue.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\preferences.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\include\eventbuffer.h"\
@@ -424,9 +485,6 @@ DEP_CPP_THREA=\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\win32thread.h"\
 	"..\..\..\..\config\config.h"\
-	
-NODEP_CPP_THREA=\
-	"..\..\..\..\base\src\linuxthread.h"\
 	
 
 "$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"\

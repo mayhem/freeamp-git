@@ -49,10 +49,12 @@ ALL : ".\obsinput.pmi"
 CLEAN :
 	-@erase "$(INTDIR)\log.obj"
 	-@erase "$(INTDIR)\mutex.obj"
+	-@erase "$(INTDIR)\obs.res"
 	-@erase "$(INTDIR)\obsbuffer.obj"
 	-@erase "$(INTDIR)\obsinput.obj"
 	-@erase "$(INTDIR)\pullbuffer.obj"
 	-@erase "$(INTDIR)\semaphore.obj"
+	-@erase "$(INTDIR)\streambuffer.obj"
 	-@erase "$(INTDIR)\thread.obj"
 	-@erase "$(INTDIR)\vc50.idb"
 	-@erase "$(INTDIR)\win32thread.obj"
@@ -71,6 +73,7 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\..\\" /I "..\..\..\include" /I\
 CPP_OBJS=.\Release/
 CPP_SBRS=.
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
+RSC_PROJ=/l 0x409 /fo"$(INTDIR)\obs.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\obsinput.bsc" 
 BSC32_SBRS= \
@@ -86,10 +89,12 @@ DEF_FILE= \
 LINK32_OBJS= \
 	"$(INTDIR)\log.obj" \
 	"$(INTDIR)\mutex.obj" \
+	"$(INTDIR)\obs.res" \
 	"$(INTDIR)\obsbuffer.obj" \
 	"$(INTDIR)\obsinput.obj" \
 	"$(INTDIR)\pullbuffer.obj" \
 	"$(INTDIR)\semaphore.obj" \
+	"$(INTDIR)\streambuffer.obj" \
 	"$(INTDIR)\thread.obj" \
 	"$(INTDIR)\win32thread.obj"
 
@@ -104,8 +109,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : ".\obsinput.pmi"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir             ..\..\..\..\base\win32\prj\plugins
-	copy obsinput.pmi        ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                ..\..\..\..\base\win32\prj\plugins
+	copy obsinput.pmi           ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "obsinput - Win32 Debug"
@@ -126,10 +131,12 @@ ALL : ".\obsinput.pmi"
 CLEAN :
 	-@erase "$(INTDIR)\log.obj"
 	-@erase "$(INTDIR)\mutex.obj"
+	-@erase "$(INTDIR)\obs.res"
 	-@erase "$(INTDIR)\obsbuffer.obj"
 	-@erase "$(INTDIR)\obsinput.obj"
 	-@erase "$(INTDIR)\pullbuffer.obj"
 	-@erase "$(INTDIR)\semaphore.obj"
+	-@erase "$(INTDIR)\streambuffer.obj"
 	-@erase "$(INTDIR)\thread.obj"
 	-@erase "$(INTDIR)\vc50.idb"
 	-@erase "$(INTDIR)\vc50.pdb"
@@ -151,6 +158,7 @@ CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\..\\" /I "..\..\..\include" /I\
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
+RSC_PROJ=/l 0x409 /fo"$(INTDIR)\obs.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\obsinput.bsc" 
 BSC32_SBRS= \
@@ -166,10 +174,12 @@ DEF_FILE= \
 LINK32_OBJS= \
 	"$(INTDIR)\log.obj" \
 	"$(INTDIR)\mutex.obj" \
+	"$(INTDIR)\obs.res" \
 	"$(INTDIR)\obsbuffer.obj" \
 	"$(INTDIR)\obsinput.obj" \
 	"$(INTDIR)\pullbuffer.obj" \
 	"$(INTDIR)\semaphore.obj" \
+	"$(INTDIR)\streambuffer.obj" \
 	"$(INTDIR)\thread.obj" \
 	"$(INTDIR)\win32thread.obj"
 
@@ -184,8 +194,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : ".\obsinput.pmi"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir             ..\..\..\..\base\win32\prj\plugins
-	copy obsinput.pmi        ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                ..\..\..\..\base\win32\prj\plugins
+	copy obsinput.pmi           ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 
@@ -259,18 +269,47 @@ DEP_CPP_MUTEX=\
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+SOURCE=..\res\obs.rc
+
+!IF  "$(CFG)" == "obsinput - Win32 Release"
+
+
+"$(INTDIR)\obs.res" : $(SOURCE) "$(INTDIR)"
+	$(RSC) /l 0x409 /fo"$(INTDIR)\obs.res" /i\
+ "\Local\src\freeamp\io\obs\win32\res" /d "NDEBUG" $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "obsinput - Win32 Debug"
+
+
+"$(INTDIR)\obs.res" : $(SOURCE) "$(INTDIR)"
+	$(RSC) /l 0x409 /fo"$(INTDIR)\obs.res" /i\
+ "\Local\src\freeamp\io\obs\win32\res" /d "_DEBUG" $(SOURCE)
+
+
+!ENDIF 
+
 SOURCE=..\..\obsbuffer.cpp
+
+!IF  "$(CFG)" == "obsinput - Win32 Release"
+
 DEP_CPP_OBSBU=\
 	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\id3v1.h"\
+	"..\..\..\..\base\include\list.h"\
 	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
+	"..\..\..\include\pmi.h"\
 	"..\..\..\include\pullbuffer.h"\
 	"..\..\..\include\streambuffer.h"\
 	"..\..\obsbuffer.h"\
-	{$(INCLUDE)}"sys\types.h"\
+	"..\..\obsinput.h"\
 	
 
 "$(INTDIR)\obsbuffer.obj" : $(SOURCE) $(DEP_CPP_OBSBU) "$(INTDIR)"\
@@ -278,9 +317,44 @@ DEP_CPP_OBSBU=\
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+!ELSEIF  "$(CFG)" == "obsinput - Win32 Debug"
+
+DEP_CPP_OBSBU=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\id3v1.h"\
+	"..\..\..\..\base\include\list.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\include\pmi.h"\
+	"..\..\..\include\pullbuffer.h"\
+	"..\..\..\include\streambuffer.h"\
+	"..\..\obsbuffer.h"\
+	"..\..\obsinput.h"\
+	
+
+"$(INTDIR)\obsbuffer.obj" : $(SOURCE) $(DEP_CPP_OBSBU) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
 SOURCE=..\..\obsinput.cpp
+
+!IF  "$(CFG)" == "obsinput - Win32 Release"
+
 DEP_CPP_OBSIN=\
 	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\id3v1.h"\
+	"..\..\..\..\base\include\list.h"\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\thread.h"\
@@ -298,6 +372,34 @@ DEP_CPP_OBSIN=\
  "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+!ELSEIF  "$(CFG)" == "obsinput - Win32 Debug"
+
+DEP_CPP_OBSIN=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\id3v1.h"\
+	"..\..\..\..\base\include\list.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\include\pmi.h"\
+	"..\..\..\include\pullbuffer.h"\
+	"..\..\..\include\streambuffer.h"\
+	"..\..\obsbuffer.h"\
+	"..\..\obsinput.h"\
+	
+
+"$(INTDIR)\obsinput.obj" : $(SOURCE) $(DEP_CPP_OBSIN) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\..\..\src\pullbuffer.cpp
 
@@ -344,20 +446,71 @@ DEP_CPP_SEMAP=\
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+SOURCE=..\..\..\src\streambuffer.cpp
+
+!IF  "$(CFG)" == "obsinput - Win32 Release"
+
+DEP_CPP_STREA=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\include\pullbuffer.h"\
+	"..\..\..\include\streambuffer.h"\
+	
+
+"$(INTDIR)\streambuffer.obj" : $(SOURCE) $(DEP_CPP_STREA) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "obsinput - Win32 Debug"
+
+DEP_CPP_STREA=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\include\pullbuffer.h"\
+	"..\..\..\include\streambuffer.h"\
+	
+
+"$(INTDIR)\streambuffer.obj" : $(SOURCE) $(DEP_CPP_STREA) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
 SOURCE=..\..\..\..\base\src\thread.cpp
+
+!IF  "$(CFG)" == "obsinput - Win32 Release"
+
 DEP_CPP_THREA=\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\win32thread.h"\
 	"..\..\..\..\config\config.h"\
-	
-NODEP_CPP_THREA=\
-	"..\..\..\..\base\src\linuxthread.h"\
 	
 
 "$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"\
  "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+!ELSEIF  "$(CFG)" == "obsinput - Win32 Debug"
+
+DEP_CPP_THREA=\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\win32\include\win32thread.h"\
+	"..\..\..\..\config\config.h"\
+	
+
+"$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\..\..\..\base\win32\src\win32thread.cpp
 
