@@ -40,8 +40,8 @@ New features for beta 3:
   
 - The Play and Pause buttons are implemented as a MultiState button. 
   If you would rather have indenpendent Play/Pause buttons, simply
-  use the ButtonControls IPlay and IPause instead of the 
-  MultiStateControl Play.
+  use the ButtonControls Play and Pause instead of the 
+  MultiStateControl PlayPause. (formerly called Play)
 
 - The .fat files are now simple tar gzipped files. You can either
   create them using tar and gzip or you can continue to use MakeTheme.
@@ -326,14 +326,14 @@ MultiStateControl:
 ------------------
 
 A MultiStateControl is just like a button, but it can take on different
-states. The Play button is implemented as a MultiStateControl and it
+states. The PlayPause button is implemented as a MultiStateControl and it
 therefore doubles as the Pause button as well:
 
-    <MultiStateControl Name="Play" NumStates="2">
+    <MultiStateControl Name="PlayPause" NumStates="2">
     
 The NumStates attribute defines how many different states a button
 can have. This number depends on the type of control that is being
-implemented. The Play and the Shuffle controls will always have 2 states
+implemented. The PlayPause and the Shuffle controls will always have 2 states
 (Play/Pause, ShuffleNone/Shuffle) and the Repeat control will always 
 have 3 states (RepeatNone,RepeatOne,RepeatAll).    
 
@@ -671,21 +671,20 @@ Available Control Names
 
 MultiStateControls:
 
-Play     -- Play/Pause button
-Repeat	 -- Repeat None/Repeat One/Repeat All
-Shuffle  -- Normal/Shuffle mode
+PlayPause -- Play/Pause button
+Repeat	  -- Repeat None/Repeat One/Repeat All
+Shuffle   -- Normal/Shuffle mode
 
 Buttons:
 
-IPlay       -- The play button that gets disabled during playback
-IPause      -- The pause button that gets disabled during non playback
+Play        -- The play button that gets disabled during playback
+Pause       -- The pause button that gets disabled during non playback
 Stop	    -- stop playing
 Prev	    -- go to previous track
 Next        -- go to next track
 Quit        -- quit the player
 MyMusic		-- open musicbrowser
 Options		-- open options dialog
-Playlist	-- open playlist view (this will go away in beta III)
 Download	-- open the download manager
 Logo		-- FreeAmp logo, clicking it will open a web browser to 
                the FreeAmp site.
@@ -710,6 +709,7 @@ APPENDIX B
 
 This is the current theme.xml file:
 
+
 <Bitmap Name="Background" File="background.bmp" TransColor="#FF0000"/>
 <Bitmap Name="Buttons" File="buttons.bmp" TransColor="#FF0000"/>
 <Font Name="San Serif" Face="Arial,Helvetica"/>
@@ -719,12 +719,12 @@ This is the current theme.xml file:
 <Window Name="MainWindow">
     <BackgroundBitmap Name="Background" Rect="0, 0, 327, 191"/>
     <Controls>
-        <MultiStateControl Name="Play" NumStates="2">
-        	<Info Desc="Play/Pause the current track" Tip="Play"/>
+        <MultiStateControl Name="PlayPause" NumStates="2">
+        	<Info Desc="Play the current track||Pause the current track" Tip="Play||Pause"/>
             <Position Pos="202,122"/>
             <ControlBitmap Rect="0,68,127,135" Name="Buttons"/>
         </MultiStateControl>
-        <ButtonControl Name="Logo">
+        <ButtonControl Name="Logo" URL="http://www.freeamp.org">
         	<Info Desc="Go to the FreeAmp web site" Tip="FreeAmp"/>
             <Position Pos="23,128"/>
             <ControlBitmap Rect="0,236,267,255" Name="Buttons"/>
@@ -754,6 +754,11 @@ This is the current theme.xml file:
             <Position Rect="289,0,301,15"/>
             <ControlBitmap Rect="237,131,288,146" Name="Buttons"/>
         </ButtonControl>
+        <ButtonControl Name="Help">
+        	<Info Desc="View FreeAmp help" Tip="Help"/>
+            <Position Rect="275,0,287,15"/>
+            <ControlBitmap Rect="237,80,288,95" Name="Buttons"/>
+        </ButtonControl>
         <ButtonControl Name="ReloadTheme">
         	<Info Desc="Reload current theme" Tip="Reload theme"/>
             <Position Rect="12,0,24,15"/>
@@ -767,38 +772,32 @@ This is the current theme.xml file:
         <!--/ButtonControl!>
         <ButtonControl Name="MyMusic">
         	<Info Desc="Browse my music collection" Tip="MyMusic"/>
-            <Position Rect="46,100,110,115"/>
+            <Position Pos="62,100"/>
             <ControlBitmap Rect="0,171,259,186" Name="Buttons"/>
         </ButtonControl>
         <ButtonControl Name="Options">
         	<Info Desc="Open the options window" Tip="Options"/>
-            <Position Rect="114,100,178,115"/>
+            <Position Pos="150,100"/>
             <ControlBitmap Rect="0,187,259,202" Name="Buttons"/>
-        </ButtonControl>
-        <ButtonControl Name="Playlist">
-        	<Info Desc="Open the playlist window" Tip="Playlist"/>
-            <Position Rect="182,100,246,115"/>
-            <ControlBitmap Rect="0,203,259,218" Name="Buttons"/>
         </ButtonControl>
         <ButtonControl Name="Download">
         	<Info Desc="Open the download manager" Tip="Download"/>
-            <Position Rect="249,100,319,115"/>
+            <Position Pos="239,100"/>
             <ControlBitmap Rect="0,219,283,234" Name="Buttons"/>
         </ButtonControl>
         <MultiStateControl Name="Repeat" NumStates="3">
-        	<Info Desc="Set repeat mode" Tip="Repeat"/>
+        	<Info Desc="Repeat no tracks||Repeat current track||Repeat all tracks" 
+                  Tip="Repeat none||Repeat current||Repeat all"/>
             <Position Rect="140,125,163,150"/>
-            <!--Position Rect="140,125,163,150"/!>
             <ControlBitmap Rect="136,64,231,141" Name="Buttons"/>
         </MultiStateControl>
         <MultiStateControl Name="Shuffle" NumStates="2">
-        	<Info Desc="Set shuffle mode" Tip="Shuffle"/>
+        	<Info Desc="Play tracks in normal order||Play tracks in random order" Tip="Normal Play||Random Play"/>
             <Position Rect="116,125,139,150"/>
             <ControlBitmap Rect="136,11,231,62" Name="Buttons"/>
         </MultiStateControl>
         <TextControl Name="Title">
             <Position Rect="13,21,314,38"/>
-            <!--Position Rect="13,21,150,38"/>
             <Style Align="Left" Font="Serif" Bold="Yes"/>
         </TextControl>
         <TextControl Name="Info">
@@ -810,7 +809,7 @@ This is the current theme.xml file:
             <Style Font="San Serif"/>
         </TextControl>
         <TextControl Name="Time">
-        	<Info Desc="Change time display" Tip="Time"/>
+        	<Info Desc="Change time display"/>
             <Position Rect="210,41,314,67"/>
             <Style Font="San Serif" Align="Right" Bold="Yes"/>
         </TextControl>
@@ -826,4 +825,3 @@ This is the current theme.xml file:
         </SliderControl>
     </Controls>
 </Window>            
-

@@ -206,10 +206,10 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
          bool bEnable = false;
          
          int iState = 1;
-         m_pWindow->ControlIntValue(string("Play"), true, iState);
-         m_pWindow->ControlEnable(string("IPlay"), true, bEnable);
+         m_pWindow->ControlIntValue(string("PlayPause"), true, iState);
+         m_pWindow->ControlEnable(string("Play"), true, bEnable);
          bEnable = true;
-         m_pWindow->ControlEnable(string("IPause"), true, bEnable);
+         m_pWindow->ControlEnable(string("Pause"), true, bEnable);
          
          m_bPlayShown = true;
          break;
@@ -220,10 +220,10 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
          int iState = 0;
          bool bEnable = true;
          
-         m_pWindow->ControlIntValue(string("Play"), true, iState);
-         m_pWindow->ControlEnable(string("IPlay"), true, bEnable);
+         m_pWindow->ControlIntValue(string("PlayPause"), true, iState);
+         m_pWindow->ControlEnable(string("Play"), true, bEnable);
          bEnable = false;
-         m_pWindow->ControlEnable(string("IPause"), true, bEnable);
+         m_pWindow->ControlEnable(string("Pause"), true, bEnable);
          m_bPlayShown = false;
          
          if (e->Type() == INFO_Stopped)
@@ -514,7 +514,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
               
        return kError_NoErr;
    }    
-   if (oControlName == string("Play") && eMesg == CM_Pressed)
+   if (oControlName == string("PlayPause") && eMesg == CM_Pressed)
    {
    	   int iState = 0;
 
@@ -530,7 +530,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
            m_pContext->target->AcceptEvent(new Event(CMD_Pause));
        return kError_NoErr;
    }
-   if (oControlName == string("IPlay") && eMesg == CM_Pressed)
+   if (oControlName == string("Play") && eMesg == CM_Pressed)
    {
        if (m_pContext->plm->CountItems() == 0)
        {
@@ -540,7 +540,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
        m_pContext->target->AcceptEvent(new Event(CMD_Play));
        return kError_NoErr;
    }
-   if (oControlName == string("IPause") && eMesg == CM_Pressed)
+   if (oControlName == string("Pause") && eMesg == CM_Pressed)
    {
        m_pContext->target->AcceptEvent(new Event(CMD_Pause));
        return kError_NoErr;
@@ -724,11 +724,11 @@ void FreeAmpTheme::InitControls(void)
     
     // Set the Play/Pause buttons
     iState = m_bPlayShown ? 0 : 1;
-    m_pWindow->ControlIntValue(string("Play"), true, iState);
+    m_pWindow->ControlIntValue(string("PlayPause"), true, iState);
     bEnable = m_bPlayShown;
-    m_pWindow->ControlEnable(string("IPlay"), true, bEnable);
+    m_pWindow->ControlEnable(string("Play"), true, bEnable);
     bEnable = !m_bPlayShown;
-    m_pWindow->ControlEnable(string("IPause"), true, bEnable);
+    m_pWindow->ControlEnable(string("Pause"), true, bEnable);
     
 
     // Set the title text field to the current meta data, or if no
