@@ -162,6 +162,18 @@ void TextControl::TextChanged(void)
                                m_pFont, m_oColor, m_bBold, 
                                m_bItalic, m_bUnderline); 
 
+    // If this is the time display, don't marquee it
+    if (iRet > 0 && m_oName == string("Time") || 
+                    m_oName == string("TimeRemaining"))
+    {
+       pCanvas->Erase(m_oRect);
+       pCanvas->RenderText(m_oRect.Height(), m_oRect, 
+                           m_oValue, eRight, 
+                           m_pFont, m_oColor, m_bBold, 
+                           m_bItalic, m_bUnderline); 
+       iRet = 0;
+    }
+
     m_oMutex.Acquire();
     m_bWantsTimingMessages = (iRet > 0);
     m_oMutex.Release();
