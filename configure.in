@@ -439,7 +439,7 @@ fi
 AC_SUBST(GTK_CFLAGS)
 AC_SUBST(GTK_LIBS)
 
-AC_ARG_ENABLE(rio, [  --disable-rio           Don't compile the rio pmp300 support plugin], enable_rio=no, enable_rio=yes)
+AC_ARG_ENABLE(rio, [  --enable-rio            Don't compile the rio pmp300 support plugin], enable_rio=yes, enable_rio=no)
 
 if test "x$enable_rio" = "xyes"; then
    OSDEPPLUGINS="$OSDEPPLUGINS plugins/pmp300.ppp"

@@ -14,7 +14,7 @@ ac_default_prefix=/usr/local
 ac_help="$ac_help
   --disable-esd           Don't compile the EsounD output plugin"
 ac_help="$ac_help
-  --disable-rio           Don't compile the rio pmp300 support plugin"
+  --enable-rio            Don't compile the rio pmp300 support plugin"
 ac_help="$ac_help
   --enable-mp3prof        Enable profiling of the MP3 decoder (linux only!)"
 ac_help="$ac_help
@@ -3024,9 +3024,9 @@ fi
 # Check whether --enable-rio or --disable-rio was given.
 if test "${enable_rio+set}" = set; then
   enableval="$enable_rio"
-  enable_rio=no
-else
   enable_rio=yes
+else
+  enable_rio=no
 fi
 
 

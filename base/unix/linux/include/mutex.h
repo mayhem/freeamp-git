@@ -27,6 +27,23 @@ ____________________________________________________________________________*/
 
 #define WAIT_FOREVER -1
 
+#ifdef DEBUG_MUTEXES
+#include <vector>
+#include <string>
+using namespace std;
+
+typedef struct TraceRef {
+    string file;
+    int    line;
+};
+
+typedef struct MutexInfo {
+    void               *address;
+    TraceRef           *owner;
+    vector<TraceRef *> *waits;
+};  
+#endif
+
 class Mutex {
 
 public:
@@ -34,14 +51,14 @@ public:
         ~Mutex();
 
 #ifdef DEBUG_MUTEXES
-    bool __Acquire(char *filename, int line, long timeout = WAIT_FOREVER);
+    bool __Acquire(char *name, int line, long timeout = WAIT_FOREVER);
 #define Acquire() __Acquire(__FILE__, __LINE__)
-    void __Release(char *filename, int line);
-#define Release() __Release(__FILE__, __LINE__)
+    void DumpAllMutexes(void);
 #else
     bool Acquire(long timeout = WAIT_FOREVER);
-    void Release();
 #endif
+
+    void Release(void);
     void DumpMutex(void);
 
  private:
@@ -49,6 +66,10 @@ public:
     pthread_cond_t  m_tCond;
     int             m_iBusy;
     pthread_t       m_tOwner;
+
+#ifdef DEBUG_MUTEXES
+    MutexInfo      *m_info;
+#endif
 };
 
 #endif /* MUTEX_H */

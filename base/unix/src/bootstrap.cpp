@@ -21,10 +21,16 @@
 	$Id$
 ____________________________________________________________________________*/
 
+#include "config.h"
+
 #include <iostream.h>
 #include <stdio.h>
+#include <unistd.h>
 
-#include "config.h"
+#ifdef DEBUG_MUTEXES
+#include <signal.h>
+#endif
+
 #include "player.h"
 #include "event.h"
 #include "ui.h"
@@ -38,36 +44,39 @@ ____________________________________________________________________________*/
 
 #if MP3_PROF
 extern "C" {
-  Initialize();
+   Initialize();
 }
 #endif
 
-#if 0
-bool CompareName(const char *p1, const char *p2) {
-    //cout << "Comparing " << p1 << " to " << p2 << endl;
-    int32 i=0; int32 j=0;
-    if(!p1 ||!p2) return false;
-    while ((p1[i] == p2[j]) && p1[i] && p2[j]) {
-	i++; j++;
-    }
-    if (!p1[i] && (p2[j]=='-')) {
-	return true;
-    } else {
-	return false;
-    }
+#ifdef DEBUG_MUTEXES
+static void PrintMutexDebugInfo(int sig)
+{
+    Mutex newmutex;
+    newmutex.DumpAllMutexes();
 }
 #endif
 
-int main(int argc, char **argv) {
-    //exit(1);
-
+int main(int argc, char **argv) 
+{
     FAContext *context = new FAContext;
     UnixPrefs *unixPrefs = new UnixPrefs;
 
-    int errLine = unixPrefs->GetErrorLineNumber();
-    if (errLine)
-    	cerr << "ERROR parsing line " << errLine << " of ~/.freeamp/preferences\n";
+    int errLine;
+    if ((errLine = unixPrefs->GetErrorLineNumber()))
+    	cerr << "ERROR parsing line " << errLine 
+             << " of ~/.freeamp/preferences\n";
 
+#ifdef DEBUG_MUTEXES
+    struct sigaction sigact;
+    sigact.sa_handler = PrintMutexDebugInfo;
+    sigemptyset(&sigact.sa_mask);
+    sigact.sa_flags = 0;
+    sigaction(SIGUSR1, &sigact, 0);
+
+    cout << The_BRANDING << " has been compiled with mutex debugging enabled.\n"
+         << "To dump mutex info: kill -SIGUSR1 " << getpid() << endl;
+#endif
+    
     context->prefs = unixPrefs;
     context->log = new LogFile("freeamp.log");
 
@@ -79,23 +88,18 @@ int main(int argc, char **argv) {
     
     lmc = new Registry();
 #if MP3_PROF
-    {
-	RegistryItem* item = new RegistryItem;
-	item->SetPath("[builtin]");
-	item->SetName("xingmp3-linux.lmc");
-	item->SetDescription("xingmp3-linux.lmc");
-	item->SetInitFunction((InitializeFunction)Initialize);
-	lmc->Add(item);
-    }
+    RegistryItem* item = new RegistryItem;
+    item->SetPath("[builtin]");
+    item->SetName("xingmp3.lmc");
+    item->SetDescription("xingmp3.lmc");
+    item->SetInitFunction((InitializeFunction)Initialize);
+    lmc->Add(item);
 #else
-//    registrar->SetSubDir("lmc");
     registrar->SetSubDir("plugins");
     registrar->SetSearchString("*.lmc");
     registrar->InitializeRegistry(lmc,context->prefs);
 #endif
 
-
-//    registrar->SetSubDir("io");
     registrar->SetSubDir("plugins");
     registrar->SetSearchString("*.pmi");
     pmi = new Registry;
@@ -105,15 +109,12 @@ int main(int argc, char **argv) {
     pmo = new Registry;
     registrar->InitializeRegistry(pmo,context->prefs);
 
-
-//    registrar->SetSubDir("ui");
     registrar->SetSubDir("plugins");
     registrar->SetSearchString("*.ui");
     ui = new Registry;
     registrar->InitializeRegistry(ui,context->prefs);
 
     delete registrar;
-
 
     Semaphore *termSemaphore;
     termSemaphore = new Semaphore();
@@ -124,15 +125,13 @@ int main(int argc, char **argv) {
     pP->RegisterPMOs(pmo);
     pP->RegisterUIs(ui);
 
-
-
-
     if (pP->SetArgs(argc,argv)) {
 	pP->SetTerminationSemaphore(termSemaphore);
 	pP->Run();
 	
 	termSemaphore->Wait();
     }
+
     delete pP;
     delete context;
     return 0;

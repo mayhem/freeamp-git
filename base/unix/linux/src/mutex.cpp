@@ -32,6 +32,10 @@ ____________________________________________________________________________*/
 
 #include "mutex.h"
 
+#ifdef DEBUG_MUTEXES
+vector<MutexInfo *> mutexList;
+#endif
+
 Mutex::Mutex(bool createOwned)
 {
     pthread_mutexattr_t attr;
@@ -46,23 +50,62 @@ Mutex::Mutex(bool createOwned)
         if (createOwned)
             pthread_mutex_lock(&m_mutex);
     pthread_mutexattr_destroy(&attr);
+
+#ifdef DEBUG_MUTEXES
+    m_info = new MutexInfo;
+    m_info->address = this;
+    m_info->owner = NULL;
+    m_info->waits = new vector<TraceRef *>;
+
+    if (createOwned) {
+        TraceRef *tr = new TraceRef;
+        tr->file = "[creator]";
+        tr->line = 0;
+        m_info->owner = tr;
+    }
+
+    mutexList.push_back(m_info);
+#endif
 }
 
 Mutex::~Mutex()
 {
     pthread_mutex_destroy(&m_mutex);
     pthread_cond_destroy(&m_tCond);
+#ifdef DEBUG_MUTEXES
+    if (m_info) {
+        if (m_info->owner)
+            delete m_info->owner;
+        if (m_info->waits) {
+            vector<TraceRef *>::iterator a = m_info->waits->begin();
+            for (; a != m_info->waits->end(); a++) 
+                 delete (*a);
+            delete m_info->waits;
+        }
+        vector<MutexInfo *>::iterator i = mutexList.begin();
+        for (; i != mutexList.end(); i++) {
+            if (*i == m_info) {
+                mutexList.erase(i);
+                break;
+            }
+        }
+        delete m_info;
+    }
+#endif
 }
 
 #ifdef DEBUG_MUTEXES
-bool Mutex::__Acquire(char *filename, int line, long timeout)
+bool Mutex::__Acquire(char *name, int line, long timeout)
 #else
 bool Mutex::Acquire(long timeout)
 #endif
 {
 #ifdef DEBUG_MUTEXES
-    cerr << filename << ":" << line << " trying to acquire mutex " << this 
-         << endl;
+    TraceRef *wait = new TraceRef;
+    wait->file = name;
+    wait->line = line;
+    
+    m_info->waits->push_back(wait);
 #endif
     pthread_mutex_lock(&m_mutex);
     if (m_iBusy != 0) {
@@ -86,6 +129,16 @@ bool Mutex::Acquire(long timeout)
                     if (pthread_cond_timedwait(&m_tCond, &m_mutex, &sTime) == 
                         ETIMEDOUT) {
                         pthread_mutex_unlock(&m_mutex);
+#ifdef DEBUG_MUTEXES
+                        vector<TraceRef *>::iterator i = m_info->waits->begin();
+                        for (; i != m_info->waits->end(); i++) {
+                            if (*i == wait) {
+                                m_info->waits->erase(i);
+                                break;
+                            }
+                        }
+                        delete wait;
+#endif
                         return false;
                     }
                 }
@@ -97,36 +150,37 @@ bool Mutex::Acquire(long timeout)
     pthread_mutex_unlock(&m_mutex);
 
 #ifdef DEBUG_MUTEXES
-    cerr << filename << ":" << line << " sucessfully acquired mutex " << this
-         << endl;
+    vector<TraceRef *>::iterator i = m_info->waits->begin();
+    for (; i != m_info->waits->end(); i++) {
+        if (*i == wait) {
+            m_info->waits->erase(i);
+            break;
+        }
+    }
+    m_info->owner = wait;
 #endif
+
     return true;
 }
 
-#ifdef DEBUG_MUTEXES
-void Mutex::__Release(char *filename, int line)
-#else
 void Mutex::Release()
-#endif
 {
     int iOwnerShip;
 
-#ifdef DEBUG_MUTEXES
-    cerr << filename << ":" << line << " releasing mutex " << this << endl;
-#endif
     pthread_mutex_lock(&m_mutex);
     iOwnerShip = --m_iBusy;
     pthread_mutex_unlock(&m_mutex);
 
-    if (iOwnerShip == 0)
+    if (iOwnerShip == 0) {
         pthread_cond_signal(&m_tCond);
 #ifdef DEBUG_MUTEXES
-    cerr << filename << ":" << line << " released mutex " << this << endl;
+        delete m_info->owner;
+        m_info->owner = NULL;
 #endif
+    }
 }
 
-void      Mutex::
-DumpMutex(void)
+void Mutex::DumpMutex(void)
 {
 #if HAVE_LINUXTHREADS
     cerr << "pMutex = " << this << "\n";
@@ -136,3 +190,32 @@ DumpMutex(void)
     cerr << "Waiting = " << m_mutex.m_waiting.head << "\n";
 #endif
 }
+
+#ifdef DEBUG_MUTEXES
+void Mutex::DumpAllMutexes(void)
+{
+    cerr << "-------------- Mutex Dump Start ------------\n";
+    vector<MutexInfo *>::iterator i = mutexList.begin();
+    for (; i != mutexList.end(); i++) {
+        MutexInfo *ml = *i;
+        cerr << "Mutex " << ml->address << endl;
+        cerr << "Owned: ";
+        if (ml->owner)
+            cerr << ml->owner->file << ":" << ml->owner->line;
+        cerr << endl;
+        cerr << "Waits: ";
+        if (ml->waits->size() > 0) {
+            vector<TraceRef *>::iterator j = ml->waits->begin();
+            for (; j != ml->waits->end(); j++) {
+                if (j != ml->waits->begin()) 
+                    cerr << "       ";
+                cerr << (*j)->file << ":" << (*j)->line << endl;
+            }
+        }
+        else
+            cerr << endl;
+        cerr << "-------------------\n";
+    }
+    cerr << "-------------- Mutex Dump Done -------------\n";
+}
+#endif
