@@ -52,6 +52,7 @@ FREEAMPsolarisOBJ = $(FREEAMPunixOBJ)
 FREEAMPlinuxOBJ   = $(FREEAMPunixOBJ)
 FREEAMPfreebsdOBJ = $(FREEAMPunixOBJ)
 FREEAMPqnxOBJ     = $(FREEAMPunixOBJ)
+FREEAMPirixOBJ    = $(FREEAMPunixOBJ)
 
 FREEAMPbeosOBJ  = base/beos/src/beosprefs.o base/beos/src/beosthread.o
 FREEAMPbeosOBJ += base/beos/src/bootstrap.o base/beos/src/debug.o 
@@ -82,6 +83,7 @@ FREEAMPlinuxLIBS = -ldl -lpthread
 FREEAMPsolarisLIBS = -ldl -lpthread
 FREEAMPfreebsdLIBS = -pthread
 FREEAMPqnxLIBS = -lasound
+FREEAMPirixLIBX = -lpthread
 UNIXFREEAMPLIBS = $(FREEAMP$(HOST_OS)LIBS) -lmusicbrainz $(EXTRALIBS) #-ldmallocthcxx
 
 BEOSFREEAMPLIBS = -lbe -lroot
