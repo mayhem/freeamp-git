@@ -387,6 +387,11 @@ Error DownloadUI::Init(int32 startup_type)
     return kError_NoErr;
 }
 
+const char* kDownloadInstructions = "The Download Manager allows you to "
+                                    "download files from websites which "
+                                    "support the RMP or RealJukebox download "
+                                    "method. To try it out check out the free "
+                                    "music available at ";
 BOOL DownloadUI::InitDialog()
 {
     // get hwnds for all my controls
@@ -397,6 +402,9 @@ BOOL DownloadUI::InitDialog()
     m_hwndResume = GetDlgItem(m_hwnd, IDC_RESUME);
     m_hwndClose = GetDlgItem(m_hwnd, IDC_CLOSE);
     m_hwndProgress = GetDlgItem(m_hwnd, IDC_OVERALL_PROGRESS);
+    m_hwndText = GetDlgItem(m_hwnd, IDC_RICHEDIT);
+
+    SetWindowText(m_hwndText, kDownloadInstructions);
 
     // Set the proc address as a property 
 	// of the window so it can get it

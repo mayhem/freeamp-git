@@ -60,7 +60,7 @@ FONT 8, "MS Sans Serif"
 BEGIN
     CONTROL         "List2",IDC_LIST,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_OWNERDRAWFIXED | 
-                    LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,2,6,270,101,
+                    LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,2,32,270,75,
                     WS_EX_CLIENTEDGE
     CONTROL         "List3",IDC_INFO,"SysListView32",LVS_REPORT | 
                     LVS_OWNERDRAWFIXED | LVS_NOCOLUMNHEADER | WS_BORDER | 
@@ -73,6 +73,8 @@ BEGIN
     CONTROL         "",IDC_OVERALL_PROGRESS,"Button",BS_OWNERDRAW,2,110,270,
                     11
     PUSHBUTTON      "Help",IDC_SHOWHELP,169,192,50,14
+    CONTROL         "",IDC_RICHEDIT,"RICHEDIT",ES_MULTILINE | ES_AUTOHSCROLL | 
+                    ES_READONLY | WS_TABSTOP,2,4,270,25
 END
 
 
