@@ -1986,6 +1986,7 @@ void FreeAmpTheme::ShowOptions(uint32 defaultPage)
     
     if (m_bInOptions)
        return;
+    m_bInOptions = true;
        
     if (m_pOptionsThread)
     {  
@@ -2013,7 +2014,6 @@ void FreeAmpTheme::OptionsThread(uint32 defaultPage)
 {
     PreferenceWindow *pWindow;
 
-    m_bInOptions = true;
 
 #ifdef WIN32
     pWindow = new Win32PreferenceWindow(m_pContext, m_pThemeMan, m_pUpdateMan, defaultPage);
