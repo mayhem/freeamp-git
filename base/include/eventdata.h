@@ -550,6 +550,28 @@ public:
    }
 };
 
+class MusicCatalogStreamAddedEvent : public Event {
+private:
+    const PlaylistItem *m_item;
+public:
+    MusicCatalogStreamAddedEvent(const PlaylistItem *item)
+    { m_type = INFO_MusicCatalogStreamAdded; m_item = item; }
+    virtual ~MusicCatalogStreamAddedEvent() {}
+
+    const PlaylistItem *Item() const { return m_item; }
+};
+
+class MusicCatalogStreamRemovedEvent : public Event {
+private:
+    const PlaylistItem* m_item;
+public:
+    MusicCatalogStreamRemovedEvent(const PlaylistItem *item)
+    { m_type = INFO_MusicCatalogStreamRemoved; m_item = item; }
+    virtual ~MusicCatalogStreamRemovedEvent() {}
+
+    const PlaylistItem *Item() const { return m_item; }
+};
+
 class ArtistList;
 class AlbumList;
 

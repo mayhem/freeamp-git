@@ -30,7 +30,7 @@ OSDEPPLUGINS = @OSDEPPLUGINS@
 clean-plugins plugins-clean:
 	-rm -f $(PLSOBJ) $(RMPOBJ) $(MISCOBJ) $(ZLIBOBJ) $(MUSICBROWSEROBJ) $(MAKETHEMEOBJ) $(LFIOBJ) $(HTTPOBJ) $(OBSPMI) $(SCPMOOBJ) $(ALSAOBJ) $(ESNDOBJ) $(DOWNLOADUIOBJ) $(CMDUIOBJ) $(MPG123UIOBJ) $(NCURSESUIOBJ) $(LCDUIOBJ) $(IRMANUIOBJ) $(FREEAMPUIOBJ) $(ID3V1OBJ) $(ID3V2OBJ) $(M3UOBJ) $(PMP300OBJ) $(XINGLMCOBJ) MakeTheme plugins/*.*
 
-PLUGINS =  lib/zlib/lib/libzlib.a
+PLUGINS =  lib/zlib/lib/libzlib.la
 PLUGINS += plugins/localfileinput.pmi
 PLUGINS += plugins/httpinput.pmi
 PLUGINS += plugins/obsinput.pmi
@@ -154,7 +154,7 @@ FREEAMPUIOBJ += ui/freeamp/unix/src/GTKCanvas.o ui/freeamp/unix/src/ttfont.o
 FREEAMPUIOBJ += ui/freeamp/unix/src/ThemeManager.o 
 FREEAMPUIOBJ += ui/freeamp/unix/src/GTKPreferenceWindow.o
 FREEAMPUIOBJ += ui/freeamp/unix/src/GTKFileSelector.o  
-FREEAMPUIOBJ += lib/zlib/lib/libzlib.a lib/xml/src/Parse.lo
+FREEAMPUIOBJ += lib/zlib/lib/libzlib.la lib/xml/src/Parse.lo
 
 plugins/freeamp.ui: $(FREEAMPUIOBJ)
 	$(LINKMOD) -o $@ $(FREEAMPUIOBJ) $(GTK_LIBS) $(TTF_LIBS)
@@ -280,13 +280,14 @@ plugins/rmp.dlf: $(RMPOBJ)
 
 # zlib section
 
-ZLIBOBJ  = lib/zlib/src/adler32.o lib/zlib/src/compress.o lib/zlib/src/crc32.o
-ZLIBOBJ += lib/zlib/src/deflate.o lib/zlib/src/gzio.o lib/zlib/src/infblock.o
-ZLIBOBJ += lib/zlib/src/infcodes.o lib/zlib/src/inffast.o lib/zlib/src/inflate.o
-ZLIBOBJ += lib/zlib/src/inftrees.o lib/zlib/src/infutil.o lib/zlib/src/trees.o
-ZLIBOBJ += lib/zlib/src/uncompr.o lib/zlib/src/zutil.o
+ZLIBOBJ  = lib/zlib/src/adler32.lo lib/zlib/src/compress.lo lib/zlib/src/crc32.lo
+ZLIBOBJ += lib/zlib/src/deflate.lo lib/zlib/src/gzio.lo lib/zlib/src/infblock.lo
+ZLIBOBJ += lib/zlib/src/infcodes.lo lib/zlib/src/inffast.lo 
+ZLIBOBJ += lib/zlib/src/inflate.lo lib/zlib/src/inftrees.lo 
+ZLIBOBJ += lib/zlib/src/infutil.lo lib/zlib/src/trees.lo lib/zlib/src/uncompr.lo 
+ZLIBOBJ += lib/zlib/src/zutil.lo
 
-lib/zlib/lib/libzlib.a: $(ZLIBOBJ)
+lib/zlib/lib/libzlib.la: $(ZLIBOBJ)
 	+test -d lib/zlib/lib || mkdir lib/zlib/lib 
 	$(LIBMOD) $@ $(ZLIBOBJ)
 

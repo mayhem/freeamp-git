@@ -9,6 +9,16 @@ include Makefile.header
 
 all: dirs freeamp plugins
 
+ZLIBOBJ  = lib/zlib/src/adler32.o lib/zlib/src/compress.o lib/zlib/src/crc32.o
+ZLIBOBJ += lib/zlib/src/deflate.o lib/zlib/src/gzio.o lib/zlib/src/infblock.o
+ZLIBOBJ += lib/zlib/src/infcodes.o lib/zlib/src/inffast.o lib/zlib/src/inflate.o
+ZLIBOBJ += lib/zlib/src/inftrees.o lib/zlib/src/infutil.o lib/zlib/src/trees.o
+ZLIBOBJ += lib/zlib/src/uncompr.o lib/zlib/src/zutil.o
+
+lib/zlib/lib/libzlib.a: $(ZLIBOBJ)
+	+test -d lib/zlib/lib || mkdir lib/zlib/lib
+	$(LIBMOD) $@ $(ZLIBOBJ)
+
 GDBMOBJ  = lib/gdbm/bucket.o lib/gdbm/falloc.o lib/gdbm/findkey.o
 GDBMOBJ += lib/gdbm/gdbmclose.o lib/gdbm/gdbmdelete.o lib/gdbm/gdbmerrno.o
 GDBMOBJ += lib/gdbm/gdbmexists.o lib/gdbm/gdbmfdesc.o lib/gdbm/gdbmfetch.o
@@ -55,11 +65,11 @@ FREEAMPOBJ += base/src/prefixprefs.o base/src/preferences.o
 FREEAMPOBJ += base/src/debug.o base/src/utility.o base/src/database.o 
 FREEAMPOBJ += base/src/downloadmanager.o base/src/errors.o
 FREEAMPOBJ += io/src/pullbuffer.o io/src/streambuffer.o io/src/tstream.o
-FREEAMPOBJ += base/src/undomanager.o
+FREEAMPOBJ += base/src/undomanager.o base/src/updatemanager.o
 FREEAMPOBJ += $(FREEAMP$(HOST_OS)OBJ)
-FREEAMPOBJ += lib/gdbm/lib/libfagdbm.a lib/xml/lib/libfaxml.a
+FREEAMPOBJ += lib/gdbm/lib/libfagdbm.a lib/xml/lib/libfaxml.a 
+FREEAMPOBJ += lib/zlib/lib/libzlib.a
 
-#CYGWINFREEAMPLIBS =
 UNIXFREEAMPLIBS = -ldl -lpthread $(EXTRALIBS)
 BEOSFREEAMPLIBS = -lbe -lroot
 

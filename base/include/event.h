@@ -136,6 +136,7 @@ class EventQueue {
 #define INFO_MusicCatalogPlaylistRemoved 71 // sent by the MC to the player after a playlist removal
 #define INFO_MusicCatalogTrackChanged 72 // sent by the MC to the player after a track was changed
 #define INFO_MusicCatalogCleared    73 // sent by the MC whenever it clears its tree
-
+#define INFO_MusicCatalogStreamAdded  74 // sent by the MC when a stream is added
+#define INFO_MusicCatalogStreamRemoved 75 // sent by the MC when a stream is removed
 #endif // _EVENT_H_
 

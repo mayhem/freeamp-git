@@ -69,6 +69,7 @@ MusicCatalog::MusicCatalog(FAContext *context, char *databasepath)
     m_artistList = new vector<ArtistList *>;
     m_unsorted = new vector<PlaylistItem *>;
     m_playlists = new vector<string>;
+    m_streams = new vector<PlaylistItem *>;
    
     if (databasepath)
         SetDatabase(databasepath);
@@ -81,6 +82,7 @@ MusicCatalog::~MusicCatalog()
     delete m_artistList;
     delete m_unsorted;
     delete m_playlists;
+    delete m_streams;
     delete m_mutex;
 }
 
@@ -124,6 +126,10 @@ void MusicCatalog::Sort(void)
              comp_catalog());
     }
     sort(m_artistList->begin(), m_artistList->end(), comp_catalog());
+
+    // Sort the streams
+    sort(m_streams->begin(), m_streams->end(), comp_catalog());
+
     m_catMutex->Release();
 }
 
@@ -199,6 +205,35 @@ Error MusicCatalog::AddPlaylist(const char *url)
     return kError_DuplicateItem;
 }
 
+Error MusicCatalog::RemoveStream(const char *url)
+{
+    assert(url);
+
+    if (!m_database->Working())
+        return kError_DatabaseNotWorking;
+
+    MetaData *meta = ReadMetaDataFromDatabase(url);
+    if (!meta)
+        return kError_ItemNotFound;
+
+    m_database->Remove(url);
+
+    m_catMutex->Acquire();
+    
+    vector<PlaylistItem *>::iterator i = m_streams->begin();
+    for (; i != m_streams->end(); i++)
+         if ((*i)->URL() == url) {
+             AcceptEvent(new MusicCatalogStreamRemovedEvent(*i));
+             m_streams->erase(i);
+             break;
+         }
+
+    m_catMutex->Release();
+
+    delete meta;
+    return kError_NoErr;
+}
+
 Error MusicCatalog::RemoveSong(const char *url)
 {
     assert(url);
@@ -216,7 +251,7 @@ Error MusicCatalog::RemoveSong(const char *url)
     if ((meta->Artist().size() == 0) || (meta->Artist() == " ")) {
         vector<PlaylistItem *>::iterator i = m_unsorted->begin();
         for (; i != m_unsorted->end(); i++)
-            if (url == (*i)->URL())
+            if ((*i)->URL() == url)
             {
                 AcceptEvent(new MusicCatalogTrackRemovedEvent(*i, NULL, NULL));     
                 m_unsorted->erase(i);
@@ -271,6 +306,37 @@ Error MusicCatalog::RemoveSong(const char *url)
     return kError_NoErr;
 }
 
+Error MusicCatalog::AddStream(const char *url)
+{
+    assert(url);
+  
+    if (!m_database->Working())
+        return kError_DatabaseNotWorking;
+
+    PlaylistItem *newstream;
+
+    MetaData *meta = ReadMetaDataFromDatabase(url);
+
+    if (!meta)
+        return kError_DatabaseNotWorking;
+
+    newstream = new PlaylistItem(url, meta);
+
+    m_catMutex->Acquire();
+
+    vector<PlaylistItem *>::iterator i = m_streams->begin();
+    for (; i != m_streams->end(); i++) 
+        if ((*i)->URL() == url)
+            return kError_DuplicateItem;
+
+    m_streams->push_back(newstream);
+    AcceptEvent(new MusicCatalogStreamAddedEvent(newstream));
+
+    m_catMutex->Release();
+
+    return kError_NoErr;
+}
+
 Error MusicCatalog::AddSong(const char *url)
 {
     assert(url);
@@ -301,6 +367,12 @@ Error MusicCatalog::AddSong(const char *url)
 
     m_catMutex->Acquire();
     if ((meta->Artist().size() == 0) || (meta->Artist() == " ")) {
+
+        vector<PlaylistItem *>::iterator i = m_unsorted->begin();
+        for (; i != m_unsorted->end(); i++)
+             if ((*i)->URL() == url)
+                 return kError_DuplicateItem;
+
         m_unsorted->push_back(newtrack);
         AcceptEvent(new MusicCatalogTrackAddedEvent(newtrack, NULL, NULL));
     }
@@ -335,7 +407,7 @@ Error MusicCatalog::AddSong(const char *url)
                         vector<PlaylistItem *> *trList = (*j)->m_trackList;
                         vector<PlaylistItem *>::iterator k = trList->begin();
                         for (; k != trList->end(); k++) {
-                            if (url == (*k)->URL()) {
+                            if ((*k)->URL() == url) {
                                 delete newtrack;  
                                 m_catMutex->Release();
                                 return kError_DuplicateItem;
@@ -418,6 +490,8 @@ Error MusicCatalog::Remove(const char *url)
         retvalue = RemovePlaylist(url);
     else if (!strncmp("M", data, 1))
         retvalue = RemoveSong(url);
+    else if (!strncmp("S", data, 1))
+        retvalue = RemoveStream(url);
 
     delete [] data;
 
@@ -441,6 +515,8 @@ Error MusicCatalog::Add(const char *url)
         retvalue = AddPlaylist(url);
     else if (!strncmp("M", data, 1)) 
         retvalue = AddSong(url);
+    else if (!strncmp("S", data, 1))
+        retvalue = AddStream(url);
 
     delete [] data;
 
@@ -453,9 +529,11 @@ void MusicCatalog::ClearCatalog()
     delete m_artistList;
     delete m_unsorted;
     delete m_playlists;
+    delete m_streams;
     m_artistList = new vector<ArtistList *>;
     m_unsorted = new vector<PlaylistItem *>;
     m_playlists = new vector<string>;
+    m_streams = new vector<PlaylistItem *>;
     m_catMutex->Release();
     m_context->target->AcceptEvent(new Event(INFO_MusicCatalogCleared));
 }
@@ -686,7 +764,8 @@ void MusicCatalog::DoSearchMusic(char *path)
 }
 
 void MusicCatalog::WriteMetaDataToDatabase(const char *url, 
-                                           const MetaData metadata)
+                                           const MetaData metadata,
+                                           MetadataStorageType type)
 {
     if (!m_database->Working())
         return;
@@ -695,7 +774,10 @@ void MusicCatalog::WriteMetaDataToDatabase(const char *url,
     char num[256];
     const char *kDatabaseDelimiter = " ";
 
-    ost << "M" << kDatabaseDelimiter;
+    if (type == kTypeStream)
+        ost << "S" << kDatabaseDelimiter;
+    else
+        ost << "M" << kDatabaseDelimiter;
 
     ost << 9 << kDatabaseDelimiter;
 

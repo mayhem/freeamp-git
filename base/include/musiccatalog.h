@@ -33,6 +33,11 @@ using namespace std;
 #include "metadata.h"
 #include "playlist.h"
 
+typedef enum {
+   kTypeTrack = 0,
+   kTypeStream
+} MetadataStorageType;
+
 class FAContext;
 class Player;
 
@@ -79,11 +84,13 @@ class MusicCatalog : public EventQueue
     void SearchMusic(vector<string> &pathList);
     void StopSearchMusic(void);
 
-    void WriteMetaDataToDatabase(const char *url, const MetaData metadata);
+    void WriteMetaDataToDatabase(const char *url, const MetaData metadata,
+                                 MetadataStorageType type = kTypeTrack);
     MetaData *ReadMetaDataFromDatabase(const char *url);
 
     Error AddPlaylist(const char *url);
     Error AddSong(const char *url);
+    Error AddStream(const char *url);
     Error Add(const char *url);    
 
     Error UpdateSong(PlaylistItem *item);
@@ -92,6 +99,7 @@ class MusicCatalog : public EventQueue
 
     Error RemovePlaylist(const char *url);
     Error RemoveSong(const char *url);
+    Error RemoveStream(const char *url);
     Error Remove(const char *url);
 
     void  ClearCatalog(void);
@@ -101,6 +109,7 @@ class MusicCatalog : public EventQueue
     const vector<ArtistList *> *GetMusicList(void) { return m_artistList; }
     const vector<PlaylistItem *> *GetUnsortedMusic(void) { return m_unsorted; }
     const vector<string> *GetPlaylists(void) { return m_playlists; }
+    const vector<PlaylistItem *> *GetStreams(void) { return m_streams; }
 
     void  GetCatalogLock(void) { m_catMutex->Acquire(); }
     void  ReleaseCatalogLock(void) { m_catMutex->Release(); }
@@ -124,6 +133,7 @@ class MusicCatalog : public EventQueue
     vector<ArtistList *> *m_artistList;
     vector<PlaylistItem *> *m_unsorted;
     vector<string> *m_playlists;
+    vector<PlaylistItem *> *m_streams;
 
     Database *m_database;
     PlaylistManager *m_plm;

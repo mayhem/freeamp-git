@@ -68,7 +68,14 @@ Error ThemeManager::GetDefaultTheme(string &oThemePath)
     map<string, string> oThemeList;
 
     GetThemeList(oThemeList);
-    oThemePath = oThemeList["FreeAmp"];
+
+    string themeName = BRANDING_DEFAULT_THEME;
+    char *dot;
+
+    if ((dot = strchr(themeName.c_str(), '.')))
+        *dot = '\0';
+
+    oThemePath = oThemeList[themeName];
 
     return kError_NoErr;
 }
