@@ -102,7 +102,7 @@ SoundCardPMO::~SoundCardPMO()
 void SoundCardPMO::SetVolume(int32 left, int32 right)
 {
   struct audio_info ainfo;
-  int v = (left * right) / 2;
+  int v = (left + right) / 2;
   int mixFd = open("/dev/audioctl",O_RDWR | O_NONBLOCK);
   if (mixFd != -1) {
     ioctl(mixFd, AUDIO_GETINFO, &ainfo);
