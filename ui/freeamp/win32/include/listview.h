@@ -62,7 +62,7 @@ class ListView : public View {
     virtual void Draw(DIB* canvas, RECT* invalidRect);
 
     // Allow the view to get timer messages
-    virtual	void Pulse();
+    virtual	void KeyPressed(int32 keyCode);
 
     virtual	void TargetedByScrollView(ScrollView *scroller);
 	virtual	void ScrollTo(int32 index);

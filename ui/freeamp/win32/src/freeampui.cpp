@@ -224,6 +224,12 @@ MainWndProc(HWND hwnd,
             break;
         }
 
+        case WM_KEYDOWN:
+        {
+            ui->KeyDown(wParam);
+            break;
+        }
+
         default:
             result = DefWindowProc( hwnd, msg, wParam, lParam );
             break;
@@ -422,6 +428,23 @@ HitTest(int32 xPos,
     }
 
     return result;
+}
+
+void
+FreeAmpUI::
+KeyDown(int32 keyCode)
+{
+    switch(keyCode) 
+    { 
+        case VK_UP: 
+        case VK_DOWN: 
+        case VK_HOME: 
+        case VK_END: 
+        case VK_DELETE: 
+            m_playlistView->KeyPressed(keyCode);
+            break;
+    }
+
 }
 
 void 
@@ -1049,7 +1072,7 @@ CreateControls()
                                     m_controlRegions[kPlaylistDisplayControl],
                                     MULTIPLE_SELECTION_LIST);
 
-    for(int32 count = 0; count < 5; count++)
+    for(int32 count = 0; count < 9; count++)
     {
         char buffer[256];
 

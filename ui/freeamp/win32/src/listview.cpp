@@ -95,9 +95,67 @@ ListView::
 
 void 
 ListView::
-Pulse()
+KeyPressed(int32 keyCode)
 {
-    
+    switch(keyCode) 
+    { 
+        case VK_UP: 
+        {
+            if(m_firstVisible > 0)
+            {
+                ScrollTo(--m_firstVisible);
+
+                if(m_scroller)
+                    m_scroller->SetPosition(m_firstVisible);
+            }
+
+            break; 
+        }
+
+        case VK_DOWN: 
+        {
+            if(m_firstVisible < CountItems() - 8)
+            {
+                ScrollTo(++m_firstVisible); 
+
+                if(m_scroller)
+                    m_scroller->SetPosition(m_firstVisible);
+            }
+
+            break; 
+        }
+
+        case VK_HOME: 
+        {
+            m_firstVisible = 0;
+
+            ScrollTo(m_firstVisible); 
+
+            if(m_scroller)
+                m_scroller->SetPosition(m_firstVisible);
+
+            break; 
+        }
+
+        case VK_END: 
+        {
+            if(CountItems() > 8)
+            {
+                m_firstVisible = CountItems() - 8;
+
+                ScrollTo(m_firstVisible); 
+
+                if(m_scroller)
+                    m_scroller->SetPosition(m_firstVisible);
+            }
+
+            break; 
+        }
+
+        case VK_DELETE: 
+           
+            break; 
+    } 
 }
 
 void 

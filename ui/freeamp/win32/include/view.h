@@ -54,7 +54,7 @@ class View {
     virtual void Draw(DIB* canvas, RECT* invalidRect){}
 
     // Allow the view to deal with key presses
-    virtual	void KeyPressed(char byte){}
+    virtual	void KeyPressed(int32 keyCode){}
 
     // Allow the view to get timer messages
     virtual	void Pulse(){}

@@ -86,6 +86,7 @@ class FreeAmpUI : public UserInterface {
     bool LeftButtonUp(int32 xPos, int32 yPos, int32 modifiers);
     void Command(int32 command, View* source);
     void Notify(int32 command, LPNMHDR notifyMsgHdr);
+    void KeyDown(int32 keyCode);
 
 
  protected:
