@@ -46,6 +46,7 @@ ____________________________________________________________________________*/
 #include "facontext.h"
 #include "log.h"
 #include "utility.h"
+#include "debug.h"
 
 const uint32 iReadBlock = 8192;
 
@@ -146,7 +147,7 @@ Error LocalFileInput::SetTo(const char *url)
 {
     Error  result = kError_NoErr;
     uint32  len = strlen(url) + 1;
-    
+
     if (m_path)
     {
        delete m_path;

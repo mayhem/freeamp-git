@@ -68,7 +68,7 @@ class     UserMessageEvent:public Event
    }
 };
 
-class     StatusMessageEvent:public Event
+class StatusMessageEvent:public Event
 {
    private:
    char     *m_info;
@@ -78,8 +78,8 @@ class     StatusMessageEvent:public Event
    {
       if (m_info)
       {
-         delete    m_info;
-                   m_info = NULL;
+         free(m_info);
+         m_info = NULL;
       }
    }
    StatusMessageEvent()
@@ -90,13 +90,44 @@ class     StatusMessageEvent:public Event
    StatusMessageEvent(const char *info)
    {
       m_type = INFO_StatusMessage;
-      m_info = strdup_new(info);
+      m_info = strdup(info);
    }
    const char *GetStatusMessage()
    {
       return m_info;
    }
 };
+
+class ErrorMessageEvent:public Event
+{
+   private:
+   char     *m_info;
+
+   public:
+   virtual ~ ErrorMessageEvent()
+   {
+      if (m_info)
+      {
+         free(m_info);
+         m_info = NULL;
+      }
+   }
+   ErrorMessageEvent()
+   {
+      m_type = INFO_ErrorMessage;
+      m_info = "";
+   }
+   ErrorMessageEvent(const char *info)
+   {
+      m_type = INFO_ErrorMessage;
+      m_info = strdup(info);
+   }
+   const char *GetErrorMessage()
+   {
+      return m_info;
+   }
+};
+
 
 class     BrowserMessageEvent:public Event
 {
@@ -262,31 +293,6 @@ class     ChangePositionEvent:public Event
    virtual ~ ChangePositionEvent()
    {
    }
-};
-
-class     LMCErrorEvent:public Event
-{
-   public:
-
-   LMCErrorEvent(const char *szError)
-   {
-      m_szError = strdup(szError);
-      m_type = INFO_LMCError;
-   };
-
-   virtual ~ LMCErrorEvent()
-   {
-      free(m_szError);
-   };
-
-   const char *GetError()
-   {
-      return m_szError;
-   };
-
- private:
-
-   char     *m_szError;
 };
 
 class     MpegInfoEvent:public Event

@@ -102,7 +102,15 @@ void PipelineUnit::ReportError(const char *szError)
 {
     assert(m_pTarget);
 
-    m_pTarget->AcceptEvent(new LMCErrorEvent(szError));
+    m_pTarget->AcceptEvent(new ErrorMessageEvent(szError));
+    m_pTarget->AcceptEvent(new Event(INFO_DoneOutputting));
+}   
+
+void PipelineUnit::ReportStatus(const char *szError)
+{
+    assert(m_pTarget);
+
+    m_pTarget->AcceptEvent(new StatusMessageEvent(szError));
 }   
 
 void PipelineUnit::Pause(void)

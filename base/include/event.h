@@ -71,7 +71,7 @@ class EventQueue {
 #define CMD_TogglePause         24 // sent by CIO to player to change the boolean state Paused (no arg)
 #define INFO_Playing            26 // sent by player to COO to say that it is beginning to play a song
 #define CMD_ChangePosition      27 // sent by CIO to player to change the position in the song to decode from (arg = frame position)
-#define INFO_LMCError           28 // sent by LMC to player to signal an error condition in the decoder
+#define INFO_ErrorMessage       28 // sent to UIs to signal an error condition in the decoder
 #define INFO_MPEGInfo			29 // info about MPEG stuff (layer, samprate, etc.)
 #define INFO_ID3TagInfo			30 // info about ID3 tag
 #define CMD_PLMGetMediaInfo             31 // sent by PlaylistManager to player to get vital info about a particular playlistitem
@@ -123,8 +123,6 @@ class EventQueue {
 #define INFO_PlaylistItemRemoved    59 // sent by PLM to player to inform of a playlistitem update
 #define INFO_PlaylistCurrentItemInfo 60 // sent by PLM to player to inform of the current items info
 #define INFO_PrefsChanged           61 // send by a preferences window whenever the preferences changed
-#define INFO_ActivePlaylistChanged 62 // sent by the player when a playlist becomes the active playlist
-#define INFO_ActivePlaylistCleared 63 // sent by the player when the active playlist is no longer needed
 
 #endif // _EVENT_H_
 

@@ -171,6 +171,24 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
 {
    switch (e->Type())
    {
+      case INFO_ErrorMessage:
+      {
+         MessageDialog      oBox;
+         ErrorMessageEvent *pEvent = (ErrorMessageEvent *)e;
+         
+         string oDesc(pEvent->GetErrorMessage());
+  
+         oBox.Show(oDesc.c_str(), string(BRANDING), kMessageOk);
+         break;
+      }
+      case INFO_StatusMessage:
+      {
+         StatusMessageEvent *pEvent = (StatusMessageEvent *)e;
+         
+         string oDesc(pEvent->GetStatusMessage());
+         m_pWindow->ControlStringValue("Info", true, oDesc);
+         break;
+      }
       case CMD_Cleanup:
       {
          string oName("MainWindow");
@@ -237,10 +255,16 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
  
       case INFO_PlaylistItemUpdated :
       {
+         int                       i;
          PlaylistItemUpdatedEvent *pInfo = 
             (PlaylistItemUpdatedEvent *)e;
 
-         UpdateMetaData(pInfo->Item());
+         i = m_pContext->plm->GetCurrentIndex();
+         if (i >= 0)
+         {
+             if (m_pContext->plm->ItemAt(i) == pInfo->Item())
+                UpdateMetaData(pInfo->Item());
+         }       
          break;
       }
       case INFO_PlaylistCurrentItemInfo:
@@ -890,7 +914,11 @@ void FreeAmpTheme::DropFiles(vector<string> *pFileList)
             else   
                if (m_pContext->player->IsSupportedExtension(ext))
                {
-                   m_pContext->plm->AddItem((*i).c_str(),0);
+                   string url;
+                   
+                   url = string("file://") + (*i);
+                   m_pContext->plm->AddItem(url.c_str(),
+                        m_pContext->plm->CountItems());
                }    
         }
     }

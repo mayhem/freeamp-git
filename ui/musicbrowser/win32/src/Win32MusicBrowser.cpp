@@ -1411,9 +1411,10 @@ FileOpenDialog(HWND hwnd,
             {
 	            strcpy(file + ofn.nFileOffset, cp);
 
-                char* foo = new char[strlen(file) + 1];
+                char* foo = new char[strlen(file) + 8];
 
-                strcpy(foo, file);
+                strcpy(foo, "file://");
+                strcat(foo, file);
 
                 fileList->push_back(foo);
 

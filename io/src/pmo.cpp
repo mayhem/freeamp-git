@@ -40,6 +40,7 @@ ____________________________________________________________________________*/
 #include "eventdata.h"
 #include "facontext.h"
 #include "log.h"
+#include "debug.h"
 
 #define DB printf("%s:%d\n", __FILE__, __LINE__);  
 
@@ -83,7 +84,9 @@ Error PhysicalMediaOutput::SetTo(const char *url)
     m_pPmi->SetTo(url);
     eRet = m_pPmi->Prepare(pBuffer);
     if (!IsError(eRet))
+    {
          eRet = m_pLmc->Prepare(pBuffer, m_pInputBuffer);
+    }     
 
     m_pMutex->Release();
 

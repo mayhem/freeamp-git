@@ -55,6 +55,7 @@ ____________________________________________________________________________*/
 #include "obsinput.h"
 #include "log.h"
 #include "facontext.h"
+#include "debug.h"
 
 const int iMaxHostNameLen = 64;
 const int iGetHostNameBuffer = 1024;

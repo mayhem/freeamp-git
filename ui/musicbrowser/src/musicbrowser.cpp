@@ -125,13 +125,13 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
             break; }
 
 #ifdef WIN32
+        case INFO_PlaylistItemUpdated:
         case INFO_PlaylistCurrentItemInfo:
         {
             m_currentplaying = m_context->plm->GetCurrentIndex();
             UpdatePlaylistList();
             break; 
         }
-
 #endif
 
         case INFO_SearchMusicDone: {

@@ -1087,7 +1087,7 @@ CreatePMO(const PlaylistItem * pc, Event * pC)
 
       sprintf(szErr, "Cannot determine what pmi to use for %s\n", pc->URL().c_str());
       m_context->log->Error(szErr);
-      AcceptEvent(new LMCErrorEvent(szErr));
+      AcceptEvent(new ErrorMessageEvent(szErr));
 
       return;
    }
@@ -1154,7 +1154,7 @@ CreatePMO(const PlaylistItem * pc, Event * pC)
 
       sprintf(szErr, "Cannot initialize pmo: %d\n", error);
       m_context->log->Error(szErr);
-      AcceptEvent(new LMCErrorEvent(szErr));
+      AcceptEvent(new ErrorMessageEvent(szErr));
 
       goto epilogue;
    }
@@ -1486,16 +1486,6 @@ ReadyToDieUI(Event *pEvent)
 
 void 
 Player::
-UserMessage(Event *pEvent)
-{
-   GetUIManipLock();
-   SendToUI(pEvent);
-   ReleaseUIManipLock();
-   delete pEvent;
-}
-
-void 
-Player::
 HandleMediaInfo(Event *pEvent)
 {
    MediaInfoEvent *pmvi;
@@ -1584,21 +1574,6 @@ SendVisBuf(Event *pEvent)
 }
 #endif // _VISUAL_ENABLE_
 #undef  _VISUAL_ENABLE_
-
-void 
-Player::
-LMCError(Event *pEvent)
-{      
-#ifndef WIN32
-   printf("Error: %s\n", ((LMCErrorEvent *) pEvent)->GetError()); 
-#else
-   MessageBox(NULL, ((LMCErrorEvent *) pEvent)->GetError() ,NULL,MB_OK); 
-#endif
-   if (m_pmo)
-      Stop(pEvent);
-   else
-      delete pEvent;
-}
 
 void
 Player::
@@ -1697,12 +1672,6 @@ ServiceEvent(Event * pC)
         case INFO_ReadyToDieUI:
             return ReadyToDieUI(pC);
 
-        case INFO_UserMessage:
-        case INFO_StatusMessage:
-        case INFO_BrowserMessage:
-            UserMessage(pC);
-            break;
-
         case INFO_MediaInfo:
             HandleMediaInfo(pC);
             break;
@@ -1711,6 +1680,10 @@ ServiceEvent(Event * pC)
             HandleMediaTimeInfo(pC);
             break;
 
+        case INFO_UserMessage:
+        case INFO_StatusMessage:
+        case INFO_BrowserMessage:
+        case INFO_ErrorMessage:
         case INFO_PrefsChanged:
         case INFO_StreamInfo:
         case INFO_PlaylistShuffle:
@@ -1733,10 +1706,6 @@ ServiceEvent(Event * pC)
         case CMD_TogglePlaylistUI:
         case CMD_ToggleMusicBrowserUI:
             ToggleUI(pC);
-            break;
-
-        case INFO_LMCError:
-            LMCError(pC);
             break;
 
 #define _EQUALIZER_ENABLE_

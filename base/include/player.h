@@ -125,11 +125,9 @@ class Player : public EventQueue, Properties, PropertyWatcher
     void TogglePause(Event *pEvent);
     int  Quit(Event *pEvent);
     int  ReadyToDieUI(Event *pEvent);
-    void UserMessage(Event *pEvent);
     void HandleMediaInfo(Event *pEvent);
     void HandleMediaTimeInfo(Event *pEvent);
     void SendEventToUI(Event *pEvent);
-    void LMCError(Event *pEvent);
     void GetMediaTitle(Event *pEvent);
     void ToggleUI(Event *pEvent);
     
