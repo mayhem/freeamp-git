@@ -84,8 +84,10 @@ Error Window::VulcanMindMeld(Window *pOther)
     m_bWindowMove = pOther->m_bWindowMove;
     m_bStayOnTop = pOther->m_bLiveInToolbar;
 
+#ifdef WIN32
     if (m_pMouseInControl)
        m_pMouseInControl->AcceptTransition(CT_MouseLeave);
+#endif
     
     m_pMouseInControl = NULL;
     m_pCaptureControl = NULL;
