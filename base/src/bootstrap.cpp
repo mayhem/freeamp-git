@@ -32,6 +32,7 @@ ____________________________________________________________________________*/
 #include "ctrlobj.h"
 #include "vector.h"
 #include "buffer.h"
+#include "hashtable.h"
 #include "semaphore.h"
 
 #ifdef WIN32
@@ -41,9 +42,9 @@ ____________________________________________________________________________*/
 #define DEFAULT_PROG_NAME_LENGTH 19
 #define DEFAULT_CIO ConsoleCIO()
 #define DEFAULT_COO ConsoleCOO()
-#endif
 
-#ifdef __linux__
+#else
+
 #include "CommandLineCIO.h"
 #include "CommandLineCOO.h"
 #include "Mpg123UI.h"
@@ -57,7 +58,7 @@ Semaphore *termSemaphore;
 
 void testVector();
 void testBuffer();
-
+void testHashTable();
 class DummyCOO : public COO {
  public:
     virtual int32 acceptCOOEvent(Event *);
@@ -102,6 +103,8 @@ int32 DummyCOO::acceptCOOEvent(Event *pe) {
 int main(int argc, char **argv) {
     //testVector();
     //testBuffer();
+    //testHashTable();
+
 
     termSemaphore = new Semaphore();
     Player *pP = Player::getPlayer();
@@ -303,3 +306,18 @@ void testBuffer() {
 }
 
 
+void testHashTable() {
+    HashTable *pHT = new HashTable();
+    cout << "Adding 'foo'->1" << endl;
+    char *foo = "foo";
+    char *bar = "bar";
+    pHT->Insert(foo,(void *)1);
+    cout << "Adding 'bar'->2" << endl;
+    pHT->Insert(bar,(void *)2);
+
+    int out = (int32) pHT->Value(foo);
+    cout << "out 1:  " << out << endl;
+    out = (int32) pHT->Value(bar);
+    cout << "out 2:  " << out << endl;
+    exit(1);
+}

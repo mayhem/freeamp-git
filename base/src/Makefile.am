@@ -34,7 +34,7 @@ FILES =
 else
 TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
 PRG = freeamp
-FILES = player.cpp bootstrap.cpp command.cpp buffer.cpp playlist.cpp
+FILES = player.cpp bootstrap.cpp command.cpp buffer.cpp playlist.cpp hashtable.cpp
 DEPS = @top_srcdir@/base/unix/@target_os@/src/libfasys.a
 MYLDADD = @top_srcdir@/base/unix/@target_os@/src/libfasys.a -lpthread
 endif
