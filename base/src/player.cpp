@@ -40,7 +40,7 @@ ____________________________________________________________________________*/
 #include "log.h"
 
 Player   *Player::m_thePlayer = NULL;
-LogFile  *g_Log = NULL;
+LogFile *g_Log = NULL;
 
 #define DB //printf("%s:%d\n", __FILE__, __LINE__);
 #define SEND_NORMAL_EVENT(e) { Event *ev = new Event(e); GetUIManipLock();    \
@@ -73,8 +73,8 @@ EventQueue()
    assert(g_Log);
 
    assert(g_Log->Open());
-   // g_Log->AddLogLevel(LogInput);
-   // g_Log->AddLogLevel(LogDecode);
+   //g_Log->AddLogLevel(LogInput);
+   //g_Log->AddLogLevel(LogDecode);
 
    // cout << "Creating player..." << endl;
    m_eventSem = new Semaphore();
@@ -430,7 +430,7 @@ Run()
          {
             if (!CompareNames(item->Name(), name))
             {
-               m_ui = (UserInterface *) item->InitFunction()();
+               m_ui = (UserInterface *) item->InitFunction()(g_Log);
 
                m_ui->SetTarget((EventQueue *) this);
                m_ui->SetPropManager((Properties *) this);
@@ -670,7 +670,7 @@ RegistryItem *Player::ChoosePMI(char *szUrl)
    {
       pmi_item = m_pmiRegistry->GetItem(iLoop);
 
-      pmi = (PhysicalMediaInput *) pmi_item->InitFunction()();
+      pmi = (PhysicalMediaInput *) pmi_item->InitFunction()(g_Log);
       if (pmi->CanHandle(szUrl))
       {
          ret = pmi_item;
@@ -742,28 +742,21 @@ void Player::CreateLMC(PlayListItem * pc, Event * pC)
 
    if (pmi_item)
    {
-      pmi = (PhysicalMediaInput *) pmi_item->InitFunction()();
-      error = pmi->SetTo(pc->m_url);
-      if (IsError(error))
-      {
-         g_Log->Error("Cannot initialize input PMI: %d\n", error);
-
-         goto epilogue;
-      }
+      pmi = (PhysicalMediaInput *) pmi_item->InitFunction()(g_Log);
       pmi->SetPropManager((Properties *) this);
    }
 
    item = m_pmoRegistry->GetItem(0);
    if (item)
    {
-      pmo = (PhysicalMediaOutput *) item->InitFunction()();
+      pmo = (PhysicalMediaOutput *) item->InitFunction()(g_Log);
       pmo->SetPropManager((Properties *) this);
    }
 
    error = kError_NoErr;
    if (lmc_item)
    {
-      lmc = (LogicalMediaConverter *) lmc_item->InitFunction()();
+      lmc = (LogicalMediaConverter *) lmc_item->InitFunction()(g_Log);
 
       if ((error = lmc->SetTarget((EventQueue *) this)) != kError_NoErr)
       {
@@ -783,6 +776,14 @@ void Player::CreateLMC(PlayListItem * pc, Event * pC)
          goto epilogue;
       }
       pmo = NULL;
+
+      error = lmc->SetTo(pc->m_url);
+      if (IsError(error))
+      {
+         g_Log->Error("Cannot initialize input lmc: %d\n", error);
+
+         goto epilogue;
+      }
 
       lmc->SetPropManager((Properties *) this);
    }

@@ -47,6 +47,8 @@ ____________________________________________________________________________*/
 #include "lmc.h"
 #include "log.h"
 
+static LogFile *g_Log = NULL;
+
 #define DB printf("%08x: %s:%d\n", pthread_self(), __FILE__, __LINE__);
 
 extern    "C"
@@ -56,8 +58,10 @@ extern    "C"
 
 extern    "C"
 {
-   LogicalMediaConverter *Initialize()
+   LogicalMediaConverter *Initialize(LogFile *pLogFile)
    {
+      g_Log = pLogFile;
+
       return new XingLMC();
    }
 }
@@ -97,7 +101,7 @@ static int sample_rate_table[8] =
 };
 
 const int ID3_TAG_SIZE = 128;
-const int iMaxDecodeRetries = 15;
+const int iMaxDecodeRetries = 65535;
 const int iStreamingBufferSize = 3;  // in seconds
 const int iMaxFrameSize = 1046;
 
@@ -117,6 +121,7 @@ XingLMC::XingLMC()
 	m_iBufferUpdate = 0;
 	m_iBitRate = 0;
 	m_frameBytes = -1;
+   m_szUrl = NULL;
 
    m_pcmBuffer = NULL;
    m_frameCounter = 0;
@@ -163,6 +168,11 @@ XingLMC::~XingLMC()
 
       m_pcmBuffer = NULL;
    }
+   if (m_szUrl)
+   {
+      free(m_szUrl);
+      m_szUrl = NULL;
+   }
 
 }
 
@@ -181,6 +191,8 @@ Stop()
       xc[0] = XING_Stop;
       m_xcqueue->Write(xc);
       m_pauseSemaphore->Signal();
+
+      m_input->Break();
 
       m_decoderThread->Join();  // wait for thread to exit
 
@@ -233,6 +245,13 @@ Error XingLMC::SetTarget(EventQueue * eq)
    {
       return kError_NullValueInvalid;
    }
+}
+
+Error XingLMC::SetTo(char *szUrl)
+{
+   m_szUrl = strdup(szUrl);
+
+   return kError_NoErr;
 }
 
 Error XingLMC::SetPMI(PhysicalMediaInput * i)
@@ -294,12 +313,17 @@ Error XingLMC::AdvanceBufferToNextFrame()
    for(;;)
    {
 		 pBuffer = ((unsigned char *)pBufferBase) + 1;
+
+       //for(int i = 0; i<20; i++)
+       //   printf("%02X ", pBuffer[i] & 0xFF);
+       //printf("\n");
 	    
        for(iCount = 0; iCount < iNumBytes - 1 &&
            !(*pBuffer == 0xFF && (*(pBuffer+1) & 0xF0) == 0xF0); 
            pBuffer++, iCount++)
                ; // <=== Empty body!
-  
+ 
+       //printf("iNumBytes: %d iCount: %d\n", iNumBytes, iCount);
 
        g_Log->Log(LogDecode, "Skipped %d bytes in advance frame.\n", iCount + 1);
        if (m_input)
@@ -647,8 +671,20 @@ void XingLMC::DecodeWork()
 
    in_bytes = out_bytes = 0;
 
-   if (!m_input || !m_target)
+   if (!m_input || !m_target || !m_output)
       return;
+
+   Err = m_input->SetTo(m_szUrl);
+   if (Err == kError_Interrupt)
+      return;
+
+   if (IsError(Err))
+   {
+       g_Log->Error("PMI initialization failed: %d\n", Err);
+       m_target->AcceptEvent(new LMCErrorEvent(this,Err));
+
+       return;
+   }
 
    bRet = CanDecode();
    if (!bRet)
@@ -660,6 +696,9 @@ void XingLMC::DecodeWork()
    }
 
    Err = ExtractMediaInfo();
+   if (Err == kError_Interrupt)
+      return;
+
    if (IsError(Err))
    {
        g_Log->Error("ExtractMediaInfo failed: %d\n", Err);
@@ -669,6 +708,9 @@ void XingLMC::DecodeWork()
    }
 
    Err = InitDecoder();
+   if (Err == kError_Interrupt)
+      return;
+
    if (IsError(Err))
    {
        g_Log->Error("Initializing the decoder failed: %d\n", Err);
@@ -677,7 +719,6 @@ void XingLMC::DecodeWork()
        return;
    }
 
-	//m_input->Resume();
    for (m_frameCounter = 0;;)
    {
       if (m_frameCounter >= m_frameWaitTill)
@@ -753,14 +794,15 @@ void XingLMC::DecodeWork()
 			 {
              if (m_input)
                  m_input->EndRead(x.in_bytes);
-             else
-                 break;
 
              g_Log->Log(LogDecode, "Audio decode failed. Resetting the decoder.\n");
              m_audioMethods.decode_init(&m_sMpegHead, m_frameBytes,
 				                           0, 0, 0, 24000);
 
 			    Err = AdvanceBufferToNextFrame();
+             if (Err == kError_Interrupt)
+                 break;
+
              if (Err != kError_NoErr)
              {
                  m_seekMutex->Release();
@@ -895,17 +937,17 @@ Error XingLMC::BeginRead(void *&pBuffer, unsigned int iBytesNeeded)
            Err = kError_Interrupt;
 	    if (Err == kError_BufferingUp)
 	    {
-		if (!bBuffering)
-		{
-		    printf("Buffering up.\n");
-		    //if (m_target)
-		    //    m_target->AcceptEvent(new StreamBufferEvent(true, iPercent));
-		}
+		     if (!bBuffering)
+		     {
+		         printf("Buffering up.\n");
+		         //if (m_target)
+		         //    m_target->AcceptEvent(new StreamBufferEvent(true, iPercent));
+		     }
 		
-		bBuffering = true;
+		     bBuffering = true;
 		
-		sleep(1);
-		continue;
+		     sleep(1);
+		     continue;
 	    }
 	    break;
 	}

@@ -58,6 +58,4 @@ class LogFile
         int   m_iLogLevelFlags;
 };
 
-extern LogFile *g_Log;
-
 #endif

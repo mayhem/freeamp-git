@@ -42,6 +42,9 @@ ____________________________________________________________________________*/
 
 /* project headers */
 #include "obsinput.h"
+#include "log.h"
+
+LogFile *g_Log;
 
 const int iBufferSize = 8192;
 const int iOverflowSize = 1024;
@@ -49,8 +52,9 @@ const int iTriggerSize = 1024;
 
 extern    "C"
 {
-   PhysicalMediaInput *Initialize()
+   PhysicalMediaInput *Initialize(LogFile *pLog)
    {
+      g_Log = pLog;
       return new ObsInput();
    }
 }
@@ -166,7 +170,7 @@ SetTo(char *url)
 Error ObsInput::
 SetBufferSize(size_t iNewSize)
 {
-    return m_pPullBuffer->Resize(iNewSize, iNewSize / 8, iNewSize / 8);
+    return m_pPullBuffer->Resize(iNewSize, iNewSize / 6, iNewSize / 8);
 }
 
 Error ObsInput::

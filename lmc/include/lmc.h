@@ -47,6 +47,7 @@ class LogicalMediaConverter {
     virtual bool IsStreaming() = 0;
     virtual Error ExtractMediaInfo() = 0;
 
+    virtual Error SetTo(char *url) = 0;
     virtual Error SetPMI(PhysicalMediaInput *) = 0;
     virtual Error SetPMO(PhysicalMediaOutput *) = 0;
     virtual Error SetPropManager(Properties *) = 0;

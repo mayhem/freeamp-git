@@ -77,7 +77,7 @@ Error StreamBuffer::BeginRead(void *&pBuffer, size_t &iBytesNeeded)
 
 		 m_bBufferingUp = false;
 	}
-   
+  
    if (GetNumBytesInBuffer() < iBytesNeeded && !IsEndOfStream())
 	{
        if (IsEndOfStream())
@@ -107,9 +107,12 @@ Error StreamBuffer::BeginWrite(void *&pBuffer, size_t &iBytesNeeded)
   
 	if (m_bPause && eRet == kError_BufferTooSmall)
 	{
-	    DiscardBytes();
+	    eRet = DiscardBytes();
   
 	    m_pStreamMutex->Release();
+
+       if (IsError(eRet))
+          return eRet;
 
        return PullBuffer::BeginWrite(pBuffer, iBytesNeeded);
    }

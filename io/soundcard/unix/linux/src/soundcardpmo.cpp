@@ -35,12 +35,15 @@ ____________________________________________________________________________*/
 #include "soundcardpmo.h"
 #include "log.h"
 
+LogFile *g_Log;
+
 #define PIECES 50
 
 extern    "C"
 {
-   PhysicalMediaOutput *Initialize()
+   PhysicalMediaOutput *Initialize(LogFile *pLog)
    {
+      g_Log = pLog;
       return new SoundCardPMO();
    }
 }

@@ -40,6 +40,8 @@ ____________________________________________________________________________*/
 #include "httpbuffer.h"
 #include "log.h"
 
+extern LogFile *g_Log;
+
 const int iHttpPort = 80;
 const int iMaxHostNameLen = 64;
 const int iGetHostNameBuffer = 1024;
@@ -50,6 +52,7 @@ const int iICY_OK = 200;
 const int iTransmitTimeout = 60;
 
 #define DB printf("%s:%d\n", __FILE__, __LINE__);
+#define min(a,b) ((a) < (b) ? (a) : (b))
 
 static char *g_ErrorArray[9] =
 {
@@ -88,12 +91,24 @@ HttpBuffer::~HttpBuffer(void)
     }
 
     if (m_hHandle >= 0)
+    {
+       shutdown(m_hHandle, 2);
        close(m_hHandle);
+    }
 
     if (m_pID3Tag)
        delete m_pID3Tag;
 
     delete m_szError;
+}
+
+void HttpBuffer::LogError(char *szErrorMsg)
+{
+#ifdef WIN32
+    g_Log->Error("%s: %d\n", szErrorMsg, WSAGetLastError());
+#else
+    g_Log->Error("%s: %s\n", szErrorMsg, strerror(errno));
+#endif
 }
 
 // NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
@@ -151,7 +166,7 @@ Error HttpBuffer::Open(void)
     char                szHostName[iMaxHostNameLen+1], *szFile, *szQuery;
     char               *pInitialBuffer;
     unsigned            iPort;
-    int                 iRet, iErrno, iDummy, iRead, iLoop;
+    int                 iRet, iErrno, iDummy, iRead, iLoop, iConnect;
     struct sockaddr_in  sAddr;
     struct hostent      sHost, *pRes;
     Error               eRet;
@@ -188,17 +203,32 @@ Error HttpBuffer::Open(void)
     m_hHandle = socket(sHost.h_addrtype,SOCK_STREAM,0);
     if (m_hHandle < 0)
     {
-       g_Log->Error("Cannot create socket: %s\n", strerror(errno));
+       LogError("Cannot create socket");
        return (Error)httpError_CannotOpenSocket;
     }
 
-    if (connect(m_hHandle,(const sockaddr *)&sAddr,sizeof sAddr) < 0)
-    { 
-       g_Log->Error("Cannot connect socket: %s\n", strerror(errno));
-       close(m_hHandle);
-       return (Error)httpError_CannotConnect;
+    fcntl(m_hHandle, F_SETFL, fcntl(m_hHandle, F_GETFL) | O_NONBLOCK);
+    iConnect = connect(m_hHandle,(const sockaddr *)&sAddr,sizeof sAddr);
+    for(; iConnect && !m_bExit;)
+    {
+        sTv.tv_sec = iTransmitTimeout;
+        sTv.tv_usec = 0;
+        FD_ZERO(&sSet); FD_SET(m_hHandle, &sSet);
+        iRet = select(m_hHandle + 1, NULL, &sSet, NULL, &sTv);
+        if (!iRet)
+        {
+           continue;
+        }
+        if (iRet < 0)
+        { 
+           LogError("Cannot connect socket");
+           close(m_hHandle);
+           return (Error)httpError_CannotConnect;
+        }
+        break;
     }
-
+    if (m_bExit)
+        return (Error)kError_Interrupt;
 
     gethostname(szHostName, iMaxHostNameLen);    
     szQuery = new char[iMaxUrlLen];
@@ -209,27 +239,13 @@ Error HttpBuffer::Open(void)
         sprintf(szQuery, "GET / HTTP/1.0\nHost %s\nAccept: */*\n\n\n", 
                 szHostName);
 
-    for(; !m_bExit;)
+    iRet = send(m_hHandle, szQuery, strlen(szQuery), 0);
+    if (iRet != strlen(szQuery))
     {
-        sTv.tv_sec = iTransmitTimeout;
-        sTv.tv_usec = 0;
-        FD_ZERO(&sSet); FD_SET(m_hHandle, &sSet);
-        iRet = select(m_hHandle + 1, NULL, &sSet, NULL, &sTv);
-        if (!iRet)
-        {
-           continue;
-        }
-        iRet = send(m_hHandle, szQuery, strlen(szQuery), 0);
-        if (iRet != strlen(szQuery))
-        {
-            g_Log->Error("Cannot write to socket: %s\n", strerror(errno));
-            close(m_hHandle);
-            return (Error)httpError_SocketWrite;
-        }
-        break;
-    } 
-    if (m_bExit)
-        return (Error)kError_Interrupt;
+        LogError("Cannot write to socket");
+        close(m_hHandle);
+        return (Error)httpError_SocketWrite;
+    }
 
     delete szQuery;
 
@@ -248,7 +264,7 @@ Error HttpBuffer::Open(void)
         iRead = recv(m_hHandle, pInitialBuffer, iInitialBufferSize, 0);
         if (iRead < 0)
         {
-            g_Log->Error("Cannot read from socket: %s\n", strerror(errno));
+            LogError("Cannot read from socket");
             close(m_hHandle);
             return (Error)httpError_SocketRead;
         }
@@ -315,7 +331,7 @@ Error HttpBuffer::Open(void)
                 iRead = recv(m_hHandle, pInitialBuffer, iInitialBufferSize, 0);
                 if (iRead < 0)
                 {
-                    g_Log->Error("Cannot read from socket: %s\n", strerror(errno));
+                    LogError("Cannot read from socket");
                     close(m_hHandle);
                     return (Error)httpError_SocketRead;
                 }
@@ -354,6 +370,8 @@ Error HttpBuffer::Open(void)
     }
     else
     {
+        unsigned int iSize;
+
         // Its a regular HTTP download. Let's save the bytes we've
         // read into the pullbuffer.
 
@@ -362,10 +380,15 @@ Error HttpBuffer::Open(void)
 		  // file will be consumed before the user can hit play.
         Resume();
 
+        iSize = iRead;
         BeginWrite(pPtr, iSize);
-        assert(iSize > iInitialBufferSize);
-        memcpy(pPtr, pInitialBuffer, iInitialBufferSize);
-        EndWrite(iInitialBufferSize);
+        memcpy(pPtr, pInitialBuffer, iRead);
+        EndWrite(iRead);
+
+        //for(int i = 0; i < iRead; i++)
+        //   printf("%02X ", pInitialBuffer[i] & 0xFF);
+        //printf("\n");
+        //printf("%s\n", pInitialBuffer);
     }
 
     delete pInitialBuffer;
@@ -411,7 +434,7 @@ void HttpBuffer::StartWorkerThread(void *pVoidBuffer)
 void HttpBuffer::WorkerThread(void)
 {
    size_t          iToCopy; 
-   int             iRead, iRet;
+   int             iRead, iRet, iReadSize = 1024;
    void           *pBuffer;
    Error           eError;
    fd_set          sSet;
@@ -435,7 +458,8 @@ void HttpBuffer::WorkerThread(void)
       {
          continue;
       }
-          
+        
+      iToCopy = iReadSize;
       eError = BeginWrite(pBuffer, iToCopy);
       if (eError == kError_NoErr)
       {
@@ -447,6 +471,10 @@ void HttpBuffer::WorkerThread(void)
              break;
           }
 
+          //for(int i = 0; i<20; i++)
+          //   printf("%02X ", ((char*)pBuffer)[i] & 0xFF);
+          //printf(" (%d - %d)\n", iToCopy, iReadSize);
+
           EndWrite(iRead);
       }
       if (eError == kError_BufferTooSmall)
@@ -455,6 +483,7 @@ void HttpBuffer::WorkerThread(void)
       }
    }
 
+   shutdown(m_hHandle, 2);
    close(m_hHandle);
    m_hHandle = -1;
 }

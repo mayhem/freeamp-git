@@ -26,8 +26,9 @@ ____________________________________________________________________________*/
 
 #include "config.h"
 #include "vector.h"
+#include "log.h"
 
-typedef void *(*InitializeFunction)();
+typedef void *(*InitializeFunction)(LogFile *);
 
 class RegistryItem {
  public:

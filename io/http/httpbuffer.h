@@ -78,6 +78,8 @@ class HttpBuffer : public StreamBuffer
 
     private:
 
+      void            LogError(char *);
+
       int             m_hHandle;
       char            m_szUrl[iMaxUrlLen], *m_szError;
       Thread         *m_pBufferThread;

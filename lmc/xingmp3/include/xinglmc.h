@@ -102,6 +102,7 @@ class     XingLMC:public LogicalMediaConverter
    virtual bool  IsStreaming();
    virtual Error ExtractMediaInfo();
 
+   virtual Error SetTo(char *url);
    virtual Error SetPMI(PhysicalMediaInput *);
    virtual Error SetPMO(PhysicalMediaOutput *);
    virtual Error SetTarget(EventQueue *);
@@ -145,6 +146,7 @@ class     XingLMC:public LogicalMediaConverter
 
    int32     m_frameCounter;
 	time_t    m_iBufferUpdate;
+   char     *m_szUrl;
 
 };
 

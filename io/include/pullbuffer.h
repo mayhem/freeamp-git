@@ -50,9 +50,10 @@ class PullBuffer
       virtual  Error    BeginRead  (void *&pBuffer, size_t &iBytesNeeded);
       virtual  Error    EndRead    (size_t iBytesUsed);
 
-      virtual  void     DiscardBytes();
+      virtual  Error    DiscardBytes();
+      virtual  void     Break();
 
-      void     Clear        (void);
+      Error    Clear        (void);
       Error    Resize       (size_t iNewSize,
                              size_t iNewOverflowSize,
                              size_t iWriteTriggerSize);

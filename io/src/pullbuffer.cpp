@@ -29,6 +29,11 @@ ____________________________________________________________________________*/
 #include "pullbuffer.h"
 #include "log.h"
 
+extern LogFile *g_Log;
+
+#define min(a,b) ((a) < (b) ? (a) : (b))
+#define DB printf("%d\n", __LINE__);
+
 PullBuffer::PullBuffer(size_t iBufferSize,
                        size_t iOverflowSize,
                        size_t iWriteTriggerSize)
@@ -66,10 +71,20 @@ PullBuffer::~PullBuffer(void)
    delete m_pMutex;
 }
 
-void PullBuffer::Clear(void)
+void PullBuffer::Break(void)
+{
+   m_bExit = true;
+   m_pReadSem->Signal();
+   m_pWriteSem->Signal();
+}
+
+Error PullBuffer::Clear(void)
 {
    for(;;)
    {
+       if (m_bExit)
+          return kError_Interrupt;
+
        m_pMutex->Acquire();
 
        if (m_bReadOpPending || m_bWriteOpPending)
@@ -87,6 +102,8 @@ void PullBuffer::Clear(void)
    m_pWriteSem->Signal();
 
    m_pMutex->Release();
+
+   return kError_NoErr;
 }
 
 Error PullBuffer::Resize(size_t iNewSize, 
@@ -98,12 +115,15 @@ Error PullBuffer::Resize(size_t iNewSize,
    if (iNewSize <= m_iBufferSize)
        return kError_BufferTooSmall;
 
-   // If this is a complicated buffer re-size, screw it. :-)
-   if (m_iReadIndex > m_iWriteIndex)
+   // Nothing should've been read from the buffer yet!
+   if (m_iReadIndex != m_iWriteIndex)
        return kError_InvalidError;
 
    for(;;)
    {
+       if (m_bExit)
+          return kError_Interrupt;
+
        m_pMutex->Acquire();
 
        if (m_bReadOpPending || m_bWriteOpPending)
@@ -122,6 +142,7 @@ Error PullBuffer::Resize(size_t iNewSize,
    m_iBufferSize = iNewSize;
    m_iOverflowSize = iNewOverflowSize;
    m_iWriteTriggerSize = iNewWriteTriggerSize;
+   m_iWriteIndex = m_iBytesInBuffer;
 
    m_pWriteSem->Signal();
 
@@ -160,11 +181,15 @@ Error PullBuffer::BeginWrite(void *&pBuffer, size_t &iBytesToWrite)
 
    pBuffer = m_pPullBuffer + m_iWriteIndex;
 
+   //printf("BeginWrite: ReadIndex: %d WriteIndex %d Size: %d Bytes: %d\n", 
+   //    m_iReadIndex, m_iWriteIndex, m_iBufferSize, m_iBytesInBuffer);
    if (m_iWriteIndex > m_iReadIndex)
    {
-       iBytesToWrite = m_iBufferSize - m_iWriteIndex;
+       iBytesToWrite = m_iBufferSize - m_iWriteIndex + 
+                       min(m_iReadIndex, m_iOverflowSize);
        if (iBytesToWrite > m_iWriteTriggerSize)
           iBytesToWrite = m_iWriteTriggerSize;
+
    }
    else
    {
@@ -176,7 +201,9 @@ Error PullBuffer::BeginWrite(void *&pBuffer, size_t &iBytesToWrite)
               iBytesToWrite = 0;
       }
       else
+      {
           iBytesToWrite = m_iReadIndex - m_iWriteIndex;
+      }
 
       if (iBytesToWrite < m_iWriteTriggerSize)
          eError = kError_BufferTooSmall;
@@ -184,8 +211,10 @@ Error PullBuffer::BeginWrite(void *&pBuffer, size_t &iBytesToWrite)
       if (iBytesToWrite > m_iWriteTriggerSize)
          iBytesToWrite = m_iWriteTriggerSize;
    }
+   //printf("iBytesToWrite: %d\n", iBytesToWrite);
 
-   assert(m_iWriteIndex + iBytesToWrite <= m_iBufferSize);
+   assert(m_iWriteIndex + iBytesToWrite <= m_iBufferSize + m_iOverflowSize);
+   assert(m_iBytesInBuffer + iBytesToWrite <= m_iBufferSize);
 
    if (eError == kError_NoErr)
       m_bWriteOpPending = true;
@@ -204,8 +233,16 @@ Error PullBuffer::EndWrite(size_t iBytesWritten)
 
    m_pMutex->Acquire();
 
-   m_iWriteIndex = (m_iWriteIndex + iBytesWritten) % m_iBufferSize;
+   m_iWriteIndex = m_iWriteIndex + iBytesWritten;
+   if (m_iWriteIndex > m_iBufferSize)
+      memmove(m_pPullBuffer, m_pPullBuffer + m_iBufferSize,
+              m_iWriteIndex - m_iBufferSize);
+
+   m_iWriteIndex %= m_iBufferSize;
    m_iBytesInBuffer += iBytesWritten;
+   //printf("bytesinbuffer: %d byteswritten %d buffsize: %d\n", 
+   //   m_iBytesInBuffer, iBytesWritten, m_iBufferSize);
+   
    assert(m_iBytesInBuffer <= m_iBufferSize);
 
    m_pReadSem->Signal();
@@ -230,12 +267,12 @@ Error PullBuffer::BeginRead(void *&pBuffer, size_t &iBytesNeeded)
 
    for(;;)
    {
-      m_pMutex->Acquire();
-
       if (m_bExit)
       {
           return kError_Interrupt;
       }
+
+      m_pMutex->Acquire();
 
       if (m_bEOS && iBytesNeeded > m_iBytesInBuffer)
       {
@@ -311,11 +348,14 @@ Error PullBuffer::EndRead(size_t iBytesUsed)
    return kError_NoErr;
 }
 
-void PullBuffer::DiscardBytes()
+Error PullBuffer::DiscardBytes()
 {
 
    for(;;)
    {
+        if (m_bExit)
+           return kError_Interrupt;
+
         m_pMutex->Acquire();
         if (m_bReadOpPending || m_bWriteOpPending)
         {
@@ -325,9 +365,15 @@ void PullBuffer::DiscardBytes()
         break;
    }
 
-   m_iReadIndex = (m_iReadIndex + m_iWriteTriggerSize) % m_iBufferSize;
-	m_iBytesInBuffer -= m_iWriteTriggerSize;
-   g_Log->Log(LogInput, "Discarding %d bytes.\n", m_iWriteTriggerSize);
+   if (m_iBytesInBuffer < m_iWriteTriggerSize)
+   {
+      m_iReadIndex = (m_iReadIndex + m_iWriteTriggerSize) % m_iBufferSize;
+    	m_iBytesInBuffer -= m_iWriteTriggerSize;
+      assert(m_iBytesInBuffer <= m_iBufferSize);
+      g_Log->Log(LogInput, "Discarding %d bytes.\n", m_iWriteTriggerSize);
+   }
 
    m_pMutex->Release();
+
+   return kError_NoErr;
 }

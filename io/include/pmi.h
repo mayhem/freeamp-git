@@ -76,6 +76,8 @@ public:
 	               { };
 	 virtual void  Resume()
 	               { };
+	 virtual void  Break()
+	               { };
 	 virtual bool  CachePMI()
 	               { return false; };
 
