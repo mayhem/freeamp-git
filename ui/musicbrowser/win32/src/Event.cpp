@@ -692,8 +692,6 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                         }
                     }
 
-                    /*
-
                     if(treedata->IsTrack())
                     {
                         ostringstream ost;
@@ -721,9 +719,8 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                         tv_item.cchTextMax = strlen(tv_item.pszText);
 
                         TreeView_SetItem(m_hMusicView, &tv_item);
+                        result = FALSE;
                     }
-
-                    */
                 }
                 
                 break;
@@ -761,19 +758,15 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                     {
                         FillPlaylists();
                     }
-                    else if(pTreeView->itemNew.hItem == m_hIceCastItem)
+                    else if(pTreeView->itemNew.hItem == m_hStreamsItem)
                     {
-                        m_fillIceCastThread = Thread::CreateThread();
-	                    m_fillIceCastThread->Create(MusicBrowserUI::icecast_timer, this);
+                        m_fillStreamsThread = Thread::CreateThread();
+	                    m_fillStreamsThread->Create(MusicBrowserUI::streams_timer, this);
                         
-                        m_context->timerManager->StartTimer(&m_iceCastTimer,
-                                                            icecast_timer,
+                        m_context->timerManager->StartTimer(&m_streamsTimer,
+                                                            MusicBrowserUI::streams_timer,
                                                             60,
                                                             this);
-                    }
-                    else if(pTreeView->itemNew.hItem == m_hWiredPlanetItem)
-                    {
-                        FillWiredPlanet();
                     }
                     else if(pTreeView->itemNew.hItem == m_hFavoritesItem)
                     {

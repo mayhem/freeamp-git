@@ -61,9 +61,6 @@ char* kPortables = "My Portables";
 char* kNewPlaylist = "Create a New Playlist...";
 char* kNewPortable = "Setup a Portable Player...";
 char* kCDAudio = "CD Audio";
-char* kWiredPlanet = "Wired Planet";
-char* kShoutCast = "ShoutCast";
-char* kIceCast = "IceCast";
 char* kFavorites = "Favorites";
 char* kNewFavorite = "Add a New Stream...";
 
@@ -125,6 +122,7 @@ void MusicBrowserUI::InitTree()
     insert.hParent = NULL;
     m_hStreamsItem = TreeView_InsertItem(m_hMusicView, &insert);
 
+    /*
     insert.item.pszText = kFavorites;
     insert.item.cchTextMax = lstrlen(insert.item.pszText);
     insert.item.iImage = 14;
@@ -134,37 +132,8 @@ void MusicBrowserUI::InitTree()
     insert.hInsertAfter = TVI_LAST;
     insert.hParent = m_hStreamsItem;
     m_hFavoritesItem = TreeView_InsertItem(m_hMusicView, &insert);
-
-    insert.item.pszText = kWiredPlanet;
-    insert.item.cchTextMax = lstrlen(insert.item.pszText);
-    insert.item.iImage = 9;
-    insert.item.iSelectedImage = 9;
-    insert.item.cChildren= 1;
-    insert.item.lParam = NULL;
-    insert.hInsertAfter = TVI_LAST;
-    insert.hParent = m_hStreamsItem;
-    m_hWiredPlanetItem = TreeView_InsertItem(m_hMusicView, &insert);
-
-    insert.item.pszText = kIceCast;
-    insert.item.cchTextMax = lstrlen(insert.item.pszText);
-    insert.item.iImage = 10;
-    insert.item.iSelectedImage = 10;
-    insert.item.cChildren= 1;
-    insert.item.lParam = NULL;
-    insert.hInsertAfter = TVI_LAST;
-    insert.hParent = m_hStreamsItem;
-    m_hIceCastItem = TreeView_InsertItem(m_hMusicView, &insert);
+    */
    
-    /*insert.item.pszText = kShoutCast;
-    insert.item.cchTextMax = lstrlen(insert.item.pszText);
-    insert.item.iImage = 11;
-    insert.item.iSelectedImage = 11;
-    insert.item.cChildren= 1;
-    insert.item.lParam = NULL;
-    insert.hInsertAfter = TVI_LAST;
-    insert.hParent = m_hStreamsItem;
-    m_hShoutCastItem = TreeView_InsertItem(m_hMusicView, &insert);*/
-
     /*insert.item.pszText = kPortables;
     insert.item.cchTextMax = lstrlen(insert.item.pszText);
     insert.item.iImage = 7;
@@ -292,7 +261,7 @@ void MusicBrowserUI::FillTracks(TV_ITEM *pItem)
 
         metadata = (*track)->GetMetaData();
 
-        /*ostringstream ost;
+        ostringstream ost;
         
         if(metadata.Track() == 0)
             ost << "?. ";
@@ -302,13 +271,12 @@ void MusicBrowserUI::FillTracks(TV_ITEM *pItem)
         ost << metadata.Title();
 
         string title = ost.str();
-        */
 
         if(metadata.Title() == string(" ") ||
             metadata.Title().length() == 0)
             insert.item.pszText = "Unknown";
         else    
-            insert.item.pszText = (char *)(metadata.Title().c_str());
+            insert.item.pszText = (char *)(title.c_str());
             
         insert.item.cchTextMax = strlen(insert.item.pszText);
         insert.item.iImage = 4;
@@ -651,92 +619,13 @@ void MusicBrowserUI::FillFavorites()
     insert.hParent = m_hFavoritesItem;
     m_hNewFavoritesItem = TreeView_InsertItem(m_hMusicView, &insert);
 }
-void MusicBrowserUI::FillWiredPlanet()
-{
-    TV_INSERTSTRUCT insert;
-    TreeData        data;
 
-    char* stations[] = {
-        "Alpha 2.0", // (Downtempo / Trip-Hop)",
-		"Amplified", // (Punk, Garage, and Hard Alternative),
-        "Axis", // (Jazz in its many forms)",
-		"Butter", // (Melted grooves and dubbed out world-flavored Funk.),
-		"DJ Mix",
-		"Flipside",
-		"Hearts of Space",
-        "Nova Mundi", // (New Age / Ambient)",
-        "Oscillations", // (Electronic / Trance / House)",
-		"Pop 3",
-        "Red Shift", // (Drum \'n Bass / Jungle)",
-		"The Cut",
-		"The Fringe",
-		"World",
-		"Radio EMusic",
-		"Radio Epitaph",
-		"Radio Radio",
-        "Radio TMBG", // (They Might Be Giants)",
-		"Noise Pop"
-		
-    };
 
-    char* urls[] = {
-        "http://ice1.wiredplanet.com:8001/alph",
-		"http://ice1.wiredplanet.com:8001/ampp",
-        "http://ice1.wiredplanet.com:8001/axis",
-		"http://ice1.wiredplanet.com:8001/cjwp",
-		"http://ice1.wiredplanet.com:8001/oaky",
-		"http://ice1.wiredplanet.com:8001/flip",
-		"http://ice1.wiredplanet.com:8001/hrts",
-        "http://ice1.wiredplanet.com:8001/nova",
-        "http://ice1.wiredplanet.com:8001/oscl",
-		"http://ice1.wiredplanet.com:8001/popo",
-        "http://ice1.wiredplanet.com:8001/reds",
-		"http://ice1.wiredplanet.com:8001/tcut",
-		"http://ice1.wiredplanet.com:8001/frng",
-		"http://ice1.wiredplanet.com:8001/wrld",
-		"http://ice1.wiredplanet.com:8001/emus",
-		"http://ice1.wiredplanet.com:8001/punk",
-		"http://ice1.wiredplanet.com:8001/elvi",
-        "http://ice1.wiredplanet.com:8001/tmbg",
-		"http://ice1.wiredplanet.com:8001/nois"
-    };
-
-    uint32 numStations = (sizeof(stations)/sizeof(char*));
-
-    data.m_iLevel = 1;
-
-    insert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
-                        TVIF_SELECTEDIMAGE | TVIF_PARAM; 
-
-    for(uint32 i = 0; i < numStations; i++)
-    {
-        PlaylistItem* stream = new PlaylistItem;
-        MetaData metadata;
-
-        stream->SetURL(urls[i]);
-        metadata.SetTitle(stations[i]);
-        metadata.SetArtist("Wired Planet");
-        stream->SetMetaData(&metadata);
-
-        data.m_pStream = stream;
-
-        insert.item.pszText = stations[i];
-        insert.item.cchTextMax = strlen(insert.item.pszText);
-        insert.item.iImage = 8;
-        insert.item.iSelectedImage = 8;
-        insert.item.cChildren= 0;
-        insert.item.lParam = (LPARAM) new TreeData(data);
-        insert.hInsertAfter = TVI_SORT;
-        insert.hParent = m_hWiredPlanetItem;
-        TreeView_InsertItem(m_hMusicView, &insert);
-    }
-}
-
-void MusicBrowserUI::FillIceCast(vector<IcecastStreamInfo> &list)
+void MusicBrowserUI::FillStreams(vector<IcecastStreamInfo> &list)
 {
     HTREEITEM treeItem;
 
-    while(treeItem = TreeView_GetChild(m_hMusicView, m_hIceCastItem))
+    while(treeItem = TreeView_GetNextSibling(m_hMusicView, m_hFavoritesItem))
     {
         TreeView_DeleteItem(m_hMusicView, treeItem);
     }
@@ -771,15 +660,15 @@ void MusicBrowserUI::FillIceCast(vector<IcecastStreamInfo> &list)
         insert.item.iSelectedImage = 8;
         insert.item.cChildren= 0;
         insert.item.lParam = (LPARAM) new TreeData(data);
-        insert.hInsertAfter = TVI_SORT;
+        insert.hInsertAfter = TVI_LAST;
         insert.hParent = m_hIceCastItem;
         TreeView_InsertItem(m_hMusicView, &insert);
     }
 
-    if(m_fillIceCastThread)
+    if(m_fillStreamsThread)
     {
-        delete m_fillIceCastThread;
-        m_fillIceCastThread = NULL;
+        delete m_fillStreamsThread;
+        m_fillStreamsThread = NULL;
     }
 }
 
@@ -882,13 +771,13 @@ void MusicBrowserUI::FillPortables()
     }
 }
 
-void MusicBrowserUI::icecast_timer(void *arg)
+void MusicBrowserUI::streams_timer(void *arg)
 {
     MusicBrowserUI *ui = (MusicBrowserUI*)arg;
-    ui->IceCastTimer();
+    ui->StreamsTimer();
 }
 
-void MusicBrowserUI::IceCastTimer()
+void MusicBrowserUI::StreamsTimer()
 {
     Error error;
     Http icecastDownload(m_context);
@@ -905,7 +794,7 @@ void MusicBrowserUI::IceCastTimer()
 
         if(list.size() > 0)
         {
-            FillIceCast(list);
+            FillStreams(list);
         }
     }
 }
@@ -1468,13 +1357,34 @@ void MusicBrowserUI::MusicCatalogTrackAdded(const ArtistList* artist,
                     data.m_pTrack = (PlaylistItem*)item;
                     metadata = item->GetMetaData();
 
-                    if (metadata.Title() == string(" ") || 
+                    
+
+                    ostringstream ost;
+
+                    if(metadata.Track() == 0)
+                        ost << "?. ";
+                    else            
+                        ost << metadata.Track() << ". ";
+
+                    ost << metadata.Title();
+
+                    string title = ost.str();
+                
+                    if(metadata.Title() == string(" ") ||
+                       metadata.Title().length() == 0)
+                        insert.item.pszText = "Unknown";
+                    else    
+                        insert.item.pszText = (char *)(title.c_str());
+                    
+
+
+                    /*if (metadata.Title() == string(" ") || 
                         metadata.Title().length() == 0)
                         insert.item.pszText = "Unknown";
                     else    
-                        insert.item.pszText = (char *)(metadata.Title().c_str());
+                        insert.item.pszText = (char *)(metadata.Title().c_str());*/
     
-                    insert.item.cchTextMax = metadata.Title().length();
+                    insert.item.cchTextMax = strlen(insert.item.pszText);
                     insert.item.iImage = 4;
                     insert.item.iSelectedImage = 4;
                     insert.item.cChildren= 0;
@@ -1500,13 +1410,11 @@ void MusicBrowserUI::MusicCatalogTrackAdded(const ArtistList* artist,
                                 TreeData* treedata = (TreeData*)tv_item.lParam;
 
                                 if(treedata)
-                                {
-                                    PlaylistItem* track = treedata->m_pTrack;
-                                    MetaData metadata = track->GetMetaData();
-                                
+                                {                                
                                     if(metadata.Track())
                                     {
-                                        if(metadata.Track() > metadata.Track())
+                                        if(treedata->m_pTrack->GetMetaData().Track() >
+                                           metadata.Track())
                                         {
                                             if(sibling)
                                                 insert.hInsertAfter = sibling;
@@ -1517,7 +1425,8 @@ void MusicBrowserUI::MusicCatalogTrackAdded(const ArtistList* artist,
                                     }
                                     else
                                     {
-                                        if(metadata.Track() || metadata.Title() >  metadata.Title())
+                                        if(treedata->m_pTrack->GetMetaData().Title() > 
+                                           metadata.Title() )
                                         {
                                             if(sibling)
                                                 insert.hInsertAfter = sibling;

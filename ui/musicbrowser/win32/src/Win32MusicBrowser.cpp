@@ -251,9 +251,9 @@ void MusicBrowserUI::Init()
     else
         m_cdTracks = NULL;
 
-    m_iceCastTimer = NULL;
+    m_streamsTimer = NULL;
     m_fillAllThread = NULL;
-    m_fillIceCastThread = NULL;
+    m_fillStreamsThread = NULL;
 }
 
 MusicBrowserUI::~MusicBrowserUI()

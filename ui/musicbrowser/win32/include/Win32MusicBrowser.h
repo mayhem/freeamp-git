@@ -161,8 +161,8 @@ class MusicBrowserUI : public UserInterface
     
     const PlaylistManager* PLManager() const { return m_plm; }
 
-    static void icecast_timer(void* arg);
-    void IceCastTimer();
+    static void streams_timer(void* arg);
+    void StreamsTimer();
  
  protected:
     FAContext *m_context;
@@ -280,7 +280,7 @@ class MusicBrowserUI : public UserInterface
     void    FillUncatTracks();
     void    FillPortables();
     void    FillWiredPlanet();
-    void    FillIceCast(vector<IcecastStreamInfo> &list);
+    void    FillStreams(vector<IcecastStreamInfo> &list);
     void    FillFavorites();
     int32   GetCurrentItemFromMousePos();
     void    GetSelectedMusicTreeItems(vector<PlaylistItem*>* items);
@@ -380,9 +380,9 @@ class MusicBrowserUI : public UserInterface
     vector<PlaylistItem*>* m_cdTracks;
 
     uint32              m_cdId;
-    TimerRef            m_iceCastTimer;
+    TimerRef            m_streamsTimer;
     Thread*             m_fillAllThread;
-    Thread*             m_fillIceCastThread;
+    Thread*             m_fillStreamsThread;
 
 };
 

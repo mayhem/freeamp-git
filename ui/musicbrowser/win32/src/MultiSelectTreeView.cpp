@@ -807,7 +807,7 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
                                 // pause a half sec so this does not
                                 // look so jarring
                                 //Sleep(500);
-                                SetTimer(hwnd, 1, 500, NULL);
+                                SetTimer(hwnd, 1, GetDoubleClickTime(), NULL);
                                 g_editItem = item;
                                 //EditItemLabel(hwnd, item);
                             }
