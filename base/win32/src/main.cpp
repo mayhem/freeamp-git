@@ -383,13 +383,26 @@ const char* kFileTypes[][2] = {
     {".mp3", "MP3AudioFile"},
     {".m3u", "M3UPlaylistFile"},
     {".pls", "PLSPlaylistFile"},
+    {".rmp", "RealMusicPackage"},
     {NULL, NULL}
 };
 
+const char* kMimeTypes[] = {
+    "audio/x-mpeg",
+    "audio/x-mp3",
+    "audio/x-mpegurl",
+    "audio/x-scpls",
+    "audio/mpeg",
+    "audio/mp3",
+    "audio/mpegurl",
+    "audio/scpls",
+    NULL
+};
+
 const char* kOpenCommand = "\\shell\\open\\command";
-const char* kNotifyStolen = "File types normally associated with " BRANDING "\r\n"
+const char* kNotifyStolen = "Music files normally associated with " BRANDING "\r\n"
                             "have been associated with another application.\r\n"
-                            "Do you want to reclaim these file types?";
+                            "Do you want to reclaim these music files?";
 
 void ReclaimFileTypes(const char* path, bool askBeforeReclaiming)
 {
@@ -399,8 +412,13 @@ void ReclaimFileTypes(const char* path, bool askBeforeReclaiming)
     HKEY    appKey;
     DWORD   type;
     char    buf[MAX_PATH];
+    char    openString[MAX_PATH + 8];
     DWORD   len = sizeof(buf);
     bool    permission = false;
+
+    //"C:\Program Files\FreeAmp\freeamp.exe" "%1"
+
+    wsprintf(openString, "\"%s\" \"%%1\"", path);
 
     if(!askBeforeReclaiming)
         permission = true;
@@ -408,15 +426,16 @@ void ReclaimFileTypes(const char* path, bool askBeforeReclaiming)
     // reclaim the windows filetypes
     for(index = 0; ; index++)
     {
-        if(kFileTypes[index][1] == NULL)
+        if(kFileTypes[index][0] == NULL)
             break;
 
         result = RegOpenKeyEx(HKEY_CLASSES_ROOT,
-							  kFileTypes[index][1],
+							  kFileTypes[index][0],
 							  0, 
                               KEY_ALL_ACCESS,
                               &typeKey);
-        if(typeKey)
+
+        if(result == ERROR_SUCCESS)
 	    {
             len = sizeof(buf);
 		    result = RegQueryValueEx(typeKey,
@@ -429,7 +448,7 @@ void ReclaimFileTypes(const char* path, bool askBeforeReclaiming)
             if(result == ERROR_SUCCESS)
             {
                 //MessageBox(NULL, buf, "value", MB_OK);
-                if(strcmp(buf, kFileTypes[index][2]))
+                if(strcmp(buf, kFileTypes[index][1]))
                 {
                     if(!permission)
                     {
@@ -446,29 +465,29 @@ void ReclaimFileTypes(const char* path, bool askBeforeReclaiming)
                             RegCloseKey(typeKey);
                             return;
                         }
-
                     }
 
                     RegSetValueEx(typeKey,
                                   NULL, 
                                   NULL, 
                                   REG_SZ, 
-                                  (LPBYTE)kFileTypes[index][2], 
-                                  strlen(kFileTypes[index][2]) + 1);
+                                  (LPBYTE)kFileTypes[index][1], 
+                                  strlen(kFileTypes[index][1]) + 1);
                 }
             }
 
             RegCloseKey(typeKey);
         }
 
-        wsprintf(buf, "%s%s", kFileTypes[index][2], kOpenCommand);
+        wsprintf(buf, "%s%s", kFileTypes[index][1], kOpenCommand);
 
         result = RegOpenKeyEx(	HKEY_CLASSES_ROOT,
 							    buf,
 							    0, 
 							    KEY_ALL_ACCESS,
 							    &appKey);
-        if(appKey)
+
+        if(result == ERROR_SUCCESS)
 	    {
             len = sizeof(buf);
 		    result = RegQueryValueEx(appKey,
@@ -481,14 +500,31 @@ void ReclaimFileTypes(const char* path, bool askBeforeReclaiming)
             if(result == ERROR_SUCCESS)
             {
                 //MessageBox(NULL, buf, "value", MB_OK);
-                if(strcmp(buf, path))
+                if(strcmp(buf, openString))
                 {
+                    if(!permission)
+                    {
+                        int ret;
+                        ret = MessageBox(NULL, 
+                                   kNotifyStolen,
+                                   "Reclaim File Types?", 
+                                   MB_OKCANCEL|MB_ICONQUESTION);
+
+                        if(ret == IDOK)
+                            permission = true;
+                        else
+                        {
+                            RegCloseKey(appKey);
+                            return;
+                        }
+                    }
+
                     RegSetValueEx(appKey,
                                   NULL, 
                                   NULL, 
                                   REG_SZ, 
-                                  (LPBYTE)path, 
-                                  strlen(path) + 1);
+                                  (LPBYTE)openString, 
+                                  strlen(openString) + 1);
                 }
             }
 
@@ -496,5 +532,62 @@ void ReclaimFileTypes(const char* path, bool askBeforeReclaiming)
         }
     }
 
+
     // reclaim netscape filetypes
+
+    result = RegOpenKeyEx(HKEY_CURRENT_USER,
+                          "Software\\Netscape\\Netscape Navigator\\Viewers",
+                          0, 
+                          KEY_ALL_ACCESS,
+                          &appKey);
+
+    if(result == ERROR_SUCCESS)
+    {
+        for(index = 0; ; index++)
+        {
+            if(kMimeTypes[index] == NULL)
+                break;
+        
+            len = sizeof(buf);
+		    result = RegQueryValueEx(appKey,
+                                     kMimeTypes[index], 
+                                     NULL, 
+                                     &type, 
+                                     (LPBYTE)buf, 
+                                     &len);
+
+            if(result == ERROR_SUCCESS)
+            {
+                //MessageBox(NULL, buf, "value", MB_OK);
+                if(strcmp(buf, path))
+                {
+                    if(!permission)
+                    {
+                        int ret;
+                        ret = MessageBox(NULL, 
+                                   kNotifyStolen,
+                                   "Reclaim File Types?", 
+                                   MB_OKCANCEL|MB_ICONQUESTION);
+
+                        if(ret == IDOK)
+                            permission = true;
+                        else
+                        {
+                            RegCloseKey(appKey);
+                            return;
+                        }
+                    }
+
+                    RegSetValueEx(appKey,
+                                  kMimeTypes[index], 
+                                  NULL, 
+                                  REG_SZ, 
+                                  (LPBYTE)path, 
+                                  strlen(path) + 1);
+                }
+            }
+        }
+
+        RegCloseKey(appKey);
+    }
 }

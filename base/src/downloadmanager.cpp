@@ -1112,8 +1112,11 @@ Error DownloadManager::SubmitToDatabase(DownloadItem* item)
         char *url = new char[urlLength];
         
         if (IsntError(FilePathToURL(path, url, &urlLength)))
-            m_context->browser->WriteMetaDataToDatabase(path, 
+        {
+            m_context->browser->WriteMetaDataToDatabase(url, 
                                                         item->GetMetaData());
+            m_context->browser->m_catalog->AddSong(url);
+        }
 
         delete [] url;
     }

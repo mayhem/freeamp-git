@@ -112,19 +112,20 @@ END
 // Dialog
 //
 
-IDD_RECLAIMFILETYPES DIALOG DISCARDABLE  0, 0, 209, 72
+IDD_RECLAIMFILETYPES DIALOG DISCARDABLE  0, 0, 219, 73
 STYLE DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
     WS_SYSMENU
 CAPTION "Reclaim Music Files?"
 FONT 8, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "Yes",IDOK,90,51,54,14
-    PUSHBUTTON      "No",IDCANCEL,148,51,54,14
+    DEFPUSHBUTTON   "Yes",IDOK,99,52,54,14
+    PUSHBUTTON      "No",IDCANCEL,158,52,54,14
     LTEXT           "Music files normally associated with FreeAmp have been associated with another application.  Do you want FreeAmp to reclaim these music files?",
-                    -1,34,7,168,26
-    ICON            IDI_WARN,-1,7,7,20,20
-    CONTROL         "In the future do not check for ",IDC_CHECK,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,34,35,165,10
+                    -1,34,7,178,26
+    ICON            IDI_WARN,-1,7,7,21,20
+    CONTROL         "When FreeAmp starts, check music file associations.",
+                    IDC_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,34,35,
+                    178,10
 END
 
 
@@ -139,9 +140,9 @@ BEGIN
     IDD_RECLAIMFILETYPES, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 202
+        RIGHTMARGIN, 212
         TOPMARGIN, 7
-        BOTTOMMARGIN, 65
+        BOTTOMMARGIN, 66
     END
 END
 #endif    // APSTUDIO_INVOKED
