@@ -254,8 +254,8 @@ BOOL MusicBrowserUI::MusicSearchDlgProc(HWND hwnd,
 
                         if(SUCCEEDED(SHGetDesktopFolder(&desktop)))
                         {
-                            USHORT drive[MAX_PATH];
-                            USHORT path[MAX_PATH];
+                            OLECHAR drive[MAX_PATH];
+                            OLECHAR path[MAX_PATH];
                             ULONG eaten;
                             LPITEMIDLIST pidlPath;
 
@@ -265,37 +265,17 @@ BOOL MusicBrowserUI::MusicSearchDlgProc(HWND hwnd,
 
                             strcat(temp, "\\");
 
-                            MultiByteToWideChar(CP_OEMCP, MB_PRECOMPOSED, temp,
-                                                strlen(temp), drive, sizeof(drive));
+                            MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, temp,
+                                                -1, drive, sizeof(drive));
 
-                            HRESULT res;
-
-                            res = desktop->ParseDisplayName(hwnd, NULL, drive, &eaten, &pidlDrive, NULL);
-
-                            LPVOID lpMessageBuffer;
-
-		                    FormatMessage(
-		                      FORMAT_MESSAGE_ALLOCATE_BUFFER |
-		                      FORMAT_MESSAGE_FROM_SYSTEM,
-		                      NULL,
-		                      res,
-		                      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		                      (LPTSTR) &lpMessageBuffer,
-		                      0,
-		                      NULL );
-
-		                    // now display this string
- 		                    //MessageBox(NULL, (char*)lpMessageBuffer, 0, MB_OK);
-
-		                    // Free the buffer allocated by the system
-		                    LocalFree( lpMessageBuffer );
+                            desktop->ParseDisplayName(hwnd, NULL, drive, &eaten, &pidlDrive, NULL);                            
 
                             Edit_GetText(hwndDirectory, 
                                          temp,
                                          MAX_PATH);
 
-                            MultiByteToWideChar(CP_OEMCP, MB_PRECOMPOSED, temp, 
-                                                strlen(temp), path, sizeof(path));
+                            MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, temp, 
+                                                -1, path, sizeof(path));
 
                             desktop->ParseDisplayName(hwnd, NULL, path, &eaten, &pidlPath, NULL);
 
@@ -321,6 +301,15 @@ BOOL MusicBrowserUI::MusicSearchDlgProc(HWND hwnd,
 
                                 pMalloc->Free(browseId);
                             }
+
+                            // clean up
+                            if(pidlPath)
+                                pMalloc->Free(pidlPath);
+
+                            if(pidlDrive)
+                                pMalloc->Free(pidlDrive);
+
+                            desktop->Release();
                         }
                     }
                 
