@@ -820,6 +820,8 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
         m_oPlm->SetActivePlaylist(kPlaylistKey_ExternalPlaylist);
         LoadPlaylist(m_currentListName.c_str());
     }       
+
+    UpdateTotalTime();
     
     if(m_pParent)
         ShowWindow(m_hWnd, SW_SHOW);
