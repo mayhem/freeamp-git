@@ -125,7 +125,8 @@ void uuid_ascii(uuid_t1 in, char ascii[37])
     sprintf(ascii,
             "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
             foo.time_low, foo.time_mid, foo.time_hi_and_version,
-            (foo.clock_seq >> 8), foo.clock_seq,
+            (foo.clock_seq >> 8), foo.clock_seq & 0xFF,
             foo.node[0], foo.node[1], foo.node[2],
             foo.node[3], foo.node[4], foo.node[5]);
+    printf("%s\n", ascii);
 }
