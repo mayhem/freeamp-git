@@ -71,6 +71,9 @@ public:
     void SetNext();
     void SetPrev();
 
+    int32 Current() const {return m_current;}
+    int32 Total() const {return m_pOrderList->NumElements();}
+
     void SetOrder(OrderOfPlay oop);
     void SetRepeat(RepeatPlay rp);
     OrderOfPlay GetOrder() {return m_order;}

@@ -212,6 +212,11 @@ AcceptEvent(Event* event)
 						        1, 
 						        (LPARAM) szTemp);
 
+                    sprintf(szTemp, "%d of %d", 0,0);
+			        SendMessage(m_hwndStatus, 
+						        SB_SETTEXT, 
+						        2, 
+						        (LPARAM) szTemp);
 
                     SendMessage(m_hwndSlider,
 						        TBM_SETRANGE,
