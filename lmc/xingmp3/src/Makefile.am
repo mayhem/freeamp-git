@@ -49,5 +49,5 @@ CFLAGS = $(EXTRA_CFLAGS) $(REENT) -D__@target_os@__ -fPIC
 
 all-local: $(MYLIBS)
 	gcc -shared -Wl,-soname,xingmp3-@target_os@.lmc -o xingmp3-@target_os@.lmc *.o
-	cp xingmp3-@target_os@.lmc @top_srcdir@/lmc
+	cp xingmp3-@target_os@.lmc @top_srcdir@/plugins
 

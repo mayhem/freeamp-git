@@ -47,9 +47,7 @@ CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT) -D__@target_os@__
 
 
 all-local: mpg123-local
-##	gcc -shared -Wl,-soname,xingmp3-@target_os@.lmc -o xingmp3-@target_os@.lmc Mpg123UI.o
-##	cp xingmp3-@target_os@.lmc @top_srcdir@/lmc
 
 mpg123-local: Mpg123UI.o
 	gcc -shared -Wl,-soname,mpg123-@target_os@.ui -o mpg123-@target_os@.ui Mpg123UI.o
-	cp mpg123-@target_os@.ui @top_srcdir@/ui
+	cp mpg123-@target_os@.ui @top_srcdir@/plugins

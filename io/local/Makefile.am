@@ -48,4 +48,4 @@ all-local: localfile-local
 
 localfile-local: localfileinput.o localfilelib.o
 	gcc -shared -Wl,-soname,localfileinput-@target_os@.pmi -o localfileinput-@target_os@.pmi localfileinput.o localfilelib.o
-	cp localfileinput-@target_os@.pmi @top_srcdir@/io
+	cp localfileinput-@target_os@.pmi @top_srcdir@/plugins
