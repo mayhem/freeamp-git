@@ -40,7 +40,8 @@ ____________________________________________________________________________*/
 #include "../res/down_pic.xpm"
 #include "../res/edit_pic.xpm"
 #include "../res/new_pic.xpm"
-#include "../res/open_pic.xpm"
+#include "../res/import_pic.xpm"
+#include "../res/add_file.xpm"
 #include "../res/save_pic.xpm"
 #include "../res/trash_pic.xpm"
 #include "../res/up_pic.xpm"
@@ -1485,13 +1486,10 @@ GtkWidget *GTKMusicBrowser::NewPixmap(char **data)
     GdkBitmap *mask;
     GdkColor   color;
 
-    color.red = 0xc0;
-    color.green = 0xc0;
-    color.blue = 0xc0;
-    color.pixel = gdk_rgb_xpixel_from_rgb(color.red << 16 | color.green << 9 | color.blue);
+    gdk_color_parse("grey", &color);
 
     pixmap = gdk_pixmap_create_from_xpm_d(musicBrowser->window, &mask, 
-                                          &color, data);
+                                          NULL, data);
 
     wpixmap = gtk_pixmap_new(pixmap, mask);
     return wpixmap;
@@ -1548,7 +1546,7 @@ void GTKMusicBrowser::CreatePlaylist(void)
 
     gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Import Items",
                             "Import a Playlist or Track into My Music",
-                            "Toolbar/Import", NewPixmap(open_pic),
+                            "Toolbar/Import", NewPixmap(import_pic),
                             GTK_SIGNAL_FUNC(import_tool), this);
 
     gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Remove Track",
@@ -1565,7 +1563,7 @@ void GTKMusicBrowser::CreatePlaylist(void)
 
     addFile = gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Add File",
                             "Add a File to the Playlist",
-                            "Toolbar/Add", NewPixmap(open_pic),
+                            "Toolbar/Add", NewPixmap(add_file),
                             GTK_SIGNAL_FUNC(add_tool), this);
 
     toolUp = gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Move Up",
