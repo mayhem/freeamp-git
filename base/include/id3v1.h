@@ -48,10 +48,15 @@ class Id3TagInfo {
 	        memset(this,0,sizeof(Id3TagInfo));
 	        m_containsInfo = true;
 	        strncpy(m_songName, buffer + 3, 30);
+		KillTrailingWhiteSpace(m_songName);
 	        strncpy(m_artist, buffer + 33, 30);
+		KillTrailingWhiteSpace(m_artist);
 	        strncpy(m_album, buffer + 63, 30);
+		KillTrailingWhiteSpace(m_album);
 	        strncpy(m_year, buffer + 93, 4);
+		KillTrailingWhiteSpace(m_year);
 	        strncpy(m_comment, buffer + 97, 30);
+		KillTrailingWhiteSpace(m_comment);
 	        m_genre = buffer[127];
 	    } else {
 	        m_containsInfo = false;
@@ -60,6 +65,13 @@ class Id3TagInfo {
     }
 
  private:
+    void KillTrailingWhiteSpace(char *pStr) {
+	char *pChar = &(pStr[strlen(pStr)]);
+	do {
+	    *pChar = '\0';
+	    pChar--;
+	} while ((*pChar == ' ') && (pChar != pStr));
+    }
     void nullinit() {
 	    *m_songName = '\0';
 	    *m_artist = '\0';

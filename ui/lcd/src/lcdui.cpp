@@ -306,7 +306,7 @@ int32 LcdUI::AcceptEvent(Event *e) {
 		    char bar[128];
 		    sprintf(bar,"widget_set FA songname 1 1 20 3 h 2 {%s}\n",foo);
 		    sock_send_string(m_sock,bar);
-		    sock_send_string(m_sock,"widget_set FA artist 1 3 1 1 h 1 {}\n");
+		    sock_send_string(m_sock,"widget_set FA artist 1 3 2 1 h 1 { }\n");
 #else
 		    lcd.string(1,1,foo);
 #endif
