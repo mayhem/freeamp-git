@@ -119,6 +119,7 @@ ALL : $(DS_POSTBUILD_DEP)
 $(DS_POSTBUILD_DEP) : ".\MakeTheme.exe"
    IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                ..\..\..\..\base\win32\prj\tools
 	copy MakeTheme.exe ..\..\..\..\base\win32\prj\tools
+	copy ..\..\howto\ThemeHowTo.txt ..\..\..\..\base\win32\prj\tools
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 Debug"
@@ -209,6 +210,7 @@ ALL : $(DS_POSTBUILD_DEP)
 $(DS_POSTBUILD_DEP) : ".\MakeTheme.exe"
    IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                ..\..\..\..\base\win32\prj\tools
 	copy MakeTheme.exe ..\..\..\..\base\win32\prj\tools
+	copy ..\..\howto\ThemeHowTo.txt ..\..\..\..\base\win32\prj\tools
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Debug"
@@ -299,6 +301,7 @@ ALL : $(DS_POSTBUILD_DEP)
 $(DS_POSTBUILD_DEP) : ".\MakeTheme.exe"
    IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                ..\..\..\..\base\win32\prj\tools
 	copy MakeTheme.exe ..\..\..\..\base\win32\prj\tools
+	copy ..\..\howto\ThemeHowTo.txt ..\..\..\..\base\win32\prj\tools
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "MakeTheme - Win32 NASM Release"
@@ -384,6 +387,7 @@ ALL : $(DS_POSTBUILD_DEP)
 $(DS_POSTBUILD_DEP) : ".\MakeTheme.exe"
    IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir                                                ..\..\..\..\base\win32\prj\tools
 	copy MakeTheme.exe ..\..\..\..\base\win32\prj\tools
+	copy ..\..\howto\ThemeHowTo.txt ..\..\..\..\base\win32\prj\tools
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 

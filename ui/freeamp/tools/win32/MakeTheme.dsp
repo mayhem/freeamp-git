@@ -59,6 +59,7 @@ LINK32=link.exe
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir\
                                                 ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
+ ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
  ..\..\..\..\base\win32\prj\tools
 # End Special Build Tool
 
@@ -89,6 +90,7 @@ LINK32=link.exe
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir\
                                                 ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
+ ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
  ..\..\..\..\base\win32\prj\tools
 # End Special Build Tool
 
@@ -120,6 +122,7 @@ LINK32=link.exe
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir\
                                                 ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
+ ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
  ..\..\..\..\base\win32\prj\tools
 # End Special Build Tool
 
@@ -151,6 +154,7 @@ LINK32=link.exe
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\tools mkdir\
                                                 ..\..\..\..\base\win32\prj\tools	copy MakeTheme.exe\
+ ..\..\..\..\base\win32\prj\tools	copy ..\..\howto\ThemeHowTo.txt\
  ..\..\..\..\base\win32\prj\tools
 # End Special Build Tool
 
