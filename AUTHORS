@@ -194,3 +194,7 @@ Michael Rich <istan@alltel.net>
 
 "John Cantrill" <thejohncantrill@hotmail.com>
 * WAV LMC
+
+"Chris Gray" <cgray4@cs.mcgill.ca>
+* Contributed a couple of patches for orbit compile issues and an
+  unclutter bug fix.

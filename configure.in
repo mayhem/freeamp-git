@@ -545,7 +545,8 @@ AC_SUBST(CFLAGS)
 
 dnl orbit crap
 save_CPPFLAGS="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS $GTK_CFLAGS"
+ORBIT_CPP_CFLAGS=`orbit-config --cflags server`
+CPPFLAGS="$CPPFLAGS $GTK_CFLAGS $ORBIT_CPP_CFLAGS" 
 AC_LANG_SAVE
 AC_LANG_C
 AC_CHECK_HEADERS(orb/orbit.h, have_orbit="true", have_orbit="false")
@@ -749,21 +750,25 @@ AC_SUBST(ID3_LIBS)
 dnl Partly taken from SDL's configure.in
 dnl -------------------------------------------------------------
 
-AC_PATH_PROG(ARTSCCONFIG, artsc-config)
-if test x$ARTSCCONFIG = x -o x$ARTSCCONFIG = x'"$ARTSCCONFIG"'; then
-: # arts isn't installed
-else
-    CFLAGS="$CFLAGS `$ARTSCCONFIG --cflags`"
-    AC_TRY_COMPILE([
-     #include <artsc.h>
-    ],[
-     arts_stream_t stream;
-    ],[
-     OSDEPPLUGINS="$OSDEPPLUGINS plugins/arts.pmo";
-     OSINC="$OSINC -I$srcdir/io/arts/include"
-     ARTS_LIBS=`$ARTSCCONFIG --libs`
-     AC_MSG_RESULT([compiling arts pmo plugin])
-    ])
+AC_ARG_ENABLE(arts, [  --disable-arts          Don't try to compile the arts plugin.], enable_arts=no, enable_arts=yes)
+
+if test "x$enable_arts" = "xyes"; then
+    AC_PATH_PROG(ARTSCCONFIG, artsc-config)
+    if test x$ARTSCCONFIG = x -o x$ARTSCCONFIG = x'"$ARTSCCONFIG"'; then
+    : # arts isn't installed
+    else
+        CFLAGS="$CFLAGS `$ARTSCCONFIG --cflags`"
+        AC_TRY_COMPILE([
+         #include <artsc.h>
+        ],[
+         arts_stream_t stream;
+        ],[
+         OSDEPPLUGINS="$OSDEPPLUGINS plugins/arts.pmo";
+         OSINC="$OSINC -I$srcdir/io/arts/include"
+         ARTS_LIBS=`$ARTSCCONFIG --libs`
+         AC_MSG_RESULT([compiling arts pmo plugin])
+        ])
+    fi
 fi
 
 AC_SUBST(ARTS_LIBS)

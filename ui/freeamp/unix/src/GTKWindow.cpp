@@ -213,7 +213,7 @@ GTKWindow::GTKWindow(Theme *pTheme, string &oName)
     gtk_widget_set_app_paintable(mainWindow, TRUE);
     gtk_window_set_title(GTK_WINDOW(mainWindow), BRANDING);
     gtk_window_set_policy(GTK_WINDOW(mainWindow), TRUE, TRUE, TRUE);
-    gtk_widget_set_events(mainWindow, GDK_SUBSTRUCTURE_MASK | GDK_STRUCTURE_MASK
+    gtk_widget_set_events(mainWindow, GDK_STRUCTURE_MASK
                           | GDK_POINTER_MOTION_MASK | GDK_BUTTON_MOTION_MASK |
                           GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
                           GDK_KEY_PRESS_MASK); 
