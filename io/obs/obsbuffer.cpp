@@ -87,7 +87,7 @@ Error ObsBuffer::Open(void)
 {
     int    iRet, iPort;
     struct ip_mreq sMreq;
-    char   cReuse=0;
+    int    iReuse=0;
     char   szAddr[100];
 
     iRet = sscanf(m_szUrl, "obs://%[^:]:%d", szAddr, &iPort);
@@ -101,13 +101,13 @@ Error ObsBuffer::Open(void)
     m_pSin = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in));
     assert(m_pSin);
 
-    cReuse = 1;
+    iReuse = 1;
     m_pSin->sin_family = AF_INET;
     m_pSin->sin_port = htons(iPort);
     m_pSin->sin_addr.s_addr = htonl(INADDR_ANY);
 
     iRet = setsockopt(m_hHandle, SOL_SOCKET, SO_REUSEADDR, 
-                      &cReuse, sizeof(char));
+                      &iReuse, sizeof(int));
     if (iRet < 0)
     {
        close(m_hHandle);
