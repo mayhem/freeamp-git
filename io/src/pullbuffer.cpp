@@ -69,7 +69,8 @@ PullBuffer::~PullBuffer(void)
       delete m_pPullBuffer;
 
    delete m_pMutex;
-   delete m_pName;
+   if (m_pName)
+       delete m_pName;
 }
 
 void PullBuffer::SetName(char *name)

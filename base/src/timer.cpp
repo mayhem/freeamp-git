@@ -24,7 +24,7 @@ ____________________________________________________________________________*/
 #include "config.h"
 #include "timer.h"
 
-#ifdef __linux__
+#if defined(__linux__) || defined(solaris)
 #include <unistd.h>
 #define GoToSleep(x) usleep(x*1000)
 #elif defined(WIN32)
@@ -52,6 +52,7 @@ Timer::~Timer()
     {
         m_thread->Resume();
         m_semaphore.Wait();
+        m_thread->Join();
     }
 }
 

@@ -105,7 +105,7 @@ void SoundCardPMO::SetVolume(int32 v)
   int mixFd = open("/dev/audioctl",O_RDWR | O_NONBLOCK);
   if (mixFd != -1) {
     ioctl(mixFd, AUDIO_GETINFO, &ainfo);
-    ainfo.play.gain = v;
+    ainfo.play.gain = (v*255)/100;
     ioctl(mixFd, AUDIO_SETINFO, &ainfo);
     close(mixFd);
   }
@@ -118,7 +118,7 @@ int32 SoundCardPMO::GetVolume()
   int volume = 0;
   if (mixFd != -1) {
     ioctl(mixFd, AUDIO_GETINFO, &ainfo);
-    volume = ainfo.play.gain;
+    volume = (ainfo.play.gain*100)/255;
     volume &= 0xFF;
     close(mixFd);
   }

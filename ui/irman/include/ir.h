@@ -10,6 +10,9 @@
 
 /* timing details */
 
+#if defined(solaris)
+#undef SEC
+#endif
 #define SEC	* 1000000
 #define MSEC	* 1000
 #define USEC

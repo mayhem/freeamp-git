@@ -1,7 +1,9 @@
+
 /*____________________________________________________________________________
 	
 	FreeAmp - The Free MP3 Player
-	Portions copyright (C) 1998-1999 EMusic.com
+
+	Portions Copyright (C) 1998-2000 Emusic.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -20,29 +22,14 @@
 	$Id$
 ____________________________________________________________________________*/
 
-#ifndef MUTEX_H
-#define MUTEX_H
 
-#include <pthread.h>
+/* system headers */
+#include <stdlib.h>
+#include <stdio.h>
+#include <iostream.h>
 
-#define WAIT_FOREVER -1
+void debug_string(char* output)
+{
+    cout << "Debug: " << output << endl;
 
-class Mutex {
-
-public:
-	Mutex(bool createOwned = false);
-	~Mutex();
-
-
-	bool Acquire(long timeout = WAIT_FOREVER);
-	void Release();
-	void DumpMutex(void);
-
- private:
-	pthread_mutex_t m_mutex;
-	pthread_cond_t m_tCond;
-	int m_iBusy;
-	pthread_t m_tOwner;
-};
-
-#endif /* MUTEX_H */
+}

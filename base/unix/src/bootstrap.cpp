@@ -74,6 +74,18 @@ union semun
 };
 #endif
 
+#if defined(solaris)
+
+#include <poll.h>
+
+extern "C" {
+int usleep(unsigned int usec)
+{
+    return poll(NULL, 0, usec/1000+1);
+}
+}
+#endif
+
 int main(int argc, char **argv) 
 {
     FAContext *context = new FAContext;
@@ -97,6 +109,10 @@ int main(int argc, char **argv)
 
     bool allow_mult = false;
     context->prefs->GetAllowMultipleInstances(&allow_mult);
+
+#if defined(solaris)
+    allow_mult = true;
+#endif
 
     if (!allow_mult) {
         iCmdSem = semget(tSemKey, 1, IPC_CREAT | 0666);

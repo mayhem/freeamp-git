@@ -40,13 +40,6 @@ ____________________________________________________________________________*/
 #include <string>
 #include <algorithm>
 
-#if !defined(WIN32)
-#include <strstream>
-typedef ostrstream ostringstream;
-#else
-#include <sstream>
-#endif
-
 using namespace std;
 
 #include "config.h"
@@ -91,25 +84,10 @@ void MusicCatalog::StartTimer(void)
 
 MusicCatalog::~MusicCatalog()
 {
-//    vector<ArtistList *>::iterator a;
-//    vector<PlaylistItem *>::iterator p;
+    ClearCatalog();
 
     if (m_database)
         delete m_database;
-
-/*
-    for(a = m_artistList->begin(); a != m_artistList->end(); a++)
-       delete (*a);
-    delete m_artistList;
-
-    for(p = m_unsorted->begin(); p != m_unsorted->end(); p++)
-       delete (*p);
-    delete m_unsorted;
-    
-    for(p = m_streams->begin(); p != m_streams->end(); p++)
-       delete (*p);
-    delete m_streams;
-*/
 
     delete m_playlists;
     delete m_mutex;
@@ -595,7 +573,6 @@ void MusicCatalog::ClearCatalog()
     m_playlists = new vector<string>;
     m_streams = new vector<PlaylistItem *>;
     m_catMutex->Release();
-    m_context->target->AcceptEvent(new Event(INFO_MusicCatalogCleared));
 }
 
 Error MusicCatalog::RePopulateFromDatabase()
@@ -604,7 +581,9 @@ Error MusicCatalog::RePopulateFromDatabase()
         return kError_DatabaseNotWorking;
 
     ClearCatalog();
- 
+    m_context->target->AcceptEvent(new Event(INFO_MusicCatalogCleared));
+
+    m_catMutex->Acquire(); 
     char *key = m_database->NextKey(NULL);
     Error err = kError_NoErr;
 
@@ -613,11 +592,13 @@ Error MusicCatalog::RePopulateFromDatabase()
 
         if (IsError(err)) {
              m_context->target->AcceptEvent(new ErrorMessageEvent("There was an internal error during generation of the Music Catalog"));
+             m_catMutex->Release();
              return kError_YouScrewedUp;
         }
             
         key = m_database->NextKey(key);
     }
+    m_catMutex->Release();
     return kError_NoErr;
 }
 
@@ -635,7 +616,8 @@ void MusicCatalog::SetDatabase(const char *path)
 
     if (m_database) {
         RePopulateFromDatabase();
-        PruneDatabase(true, true);
+        if (m_timeout != 0)
+            PruneDatabase(true, true);
         Sort();
     }
 }
@@ -678,6 +660,7 @@ void MusicCatalog::prune_thread_function(void *arg)
 
 void MusicCatalog::PruneThread(bool sendmessages)
 {
+    m_catMutex->Acquire();
     char *key = m_database->NextKey(NULL);
     struct stat st;
 
@@ -702,6 +685,7 @@ void MusicCatalog::PruneThread(bool sendmessages)
         }
         key = m_database->NextKey(key);
     }
+    m_catMutex->Release();
 }
 
 void MusicCatalog::PruneDirectory(string &directory)
@@ -906,8 +890,11 @@ void MusicCatalog::DoSearchMusic(char *path, bool bSendMessages)
         FindClose(handle);
 
         if (metalist->size() > 0) {
-            while (m_itemWaitCount > 30)
+            int slept = 0;
+            while (m_itemWaitCount > 30 && slept < 30) {
                 usleep(50);
+                slept++;
+            }
             m_itemWaitCount += metalist->size();
             m_plm->RetrieveMetaData(metalist);
         }
@@ -923,48 +910,61 @@ void MusicCatalog::WriteMetaDataToDatabase(const char *url,
     if (!m_database->Working())
         return;
 
-    ostringstream ost;
-    char num[256];
+    string ost;
+    char *num = new char[4096];
+    char *temp = new char[1024];
     const char *kDatabaseDelimiter = " ";
 
     if (type == kTypeStream)
-        ost << "S" << kDatabaseDelimiter;
+        ost.append("S");
     else
-        ost << "M" << kDatabaseDelimiter;
+        ost.append("M");
+    ost.append(kDatabaseDelimiter);
+    ost.append("9");
+    ost.append(kDatabaseDelimiter);
 
-    ost << 9 << kDatabaseDelimiter;
+    sprintf(num, "%ld%s", (long int)metadata.Artist().size(), kDatabaseDelimiter);
+    ost.append(num);
+    sprintf(num, "%ld%s", (long int)metadata.Album().size(), kDatabaseDelimiter);
+    ost.append(num);
+    sprintf(num, "%ld%s", (long int)metadata.Title().size(), kDatabaseDelimiter);
+    ost.append(num);
+    sprintf(num, "%ld%s", (long int)metadata.Comment().size(), kDatabaseDelimiter);
+    ost.append(num);
+    sprintf(num, "%ld%s", (long int)metadata.Genre().size(), kDatabaseDelimiter);
+    ost.append(num);
+    sprintf(temp, "%ld", (long int)metadata.Year());
+    sprintf(num, "%ld%s", (long int)strlen(temp), kDatabaseDelimiter);
+    ost.append(num);
+    sprintf(temp, "%ld", (long int)metadata.Track());
+    sprintf(num, "%ld%s", (long int)strlen(temp), kDatabaseDelimiter);
+    ost.append(num);
+    sprintf(temp, "%ld", (long int)metadata.Time());
+    sprintf(num, "%ld%s", (long int)strlen(temp), kDatabaseDelimiter);
+    ost.append(num);
+    sprintf(temp, "%ld", (long int)metadata.Size());
+    sprintf(num, "%ld%s", (long int)strlen(temp), kDatabaseDelimiter);
+    ost.append(num);
 
-    ost << metadata.Artist().size() << kDatabaseDelimiter;
-    ost << metadata.Album().size() << kDatabaseDelimiter;
-    ost << metadata.Title().size() << kDatabaseDelimiter;
-    ost << metadata.Comment().size() << kDatabaseDelimiter;
-    ost << metadata.Genre().size() << kDatabaseDelimiter;
+    ost.append(metadata.Artist());
+    ost.append(metadata.Album());
+    ost.append(metadata.Title());
+    ost.append(metadata.Comment());
+    ost.append(metadata.Genre());
+    sprintf(temp, "%ld", (long int)metadata.Year());
+    ost.append(temp);
+    sprintf(temp, "%ld", (long int)metadata.Track());
+    ost.append(temp);
+    sprintf(temp, "%ld", (long int)metadata.Time());
+    ost.append(temp);
+    sprintf(temp, "%ld", (long int)metadata.Size());
+    ost.append(temp);
+    ost.append("\0");
 
-    sprintf(num, "%ld", (long int)metadata.Year());
-    ost << strlen(num) << kDatabaseDelimiter;
-    sprintf(num, "%ld", (long int)metadata.Track());
-    ost << strlen(num) << kDatabaseDelimiter;
-    sprintf(num, "%ld", (long int)metadata.Time());
-    ost << strlen(num) << kDatabaseDelimiter;
-    sprintf(num, "%ld", (long int)metadata.Size());
-    ost << strlen(num) << kDatabaseDelimiter;
+    m_database->Insert(url, (char *)ost.c_str());
 
-    ost << metadata.Artist();
-    ost << metadata.Album();
-    ost << metadata.Title();
-    ost << metadata.Comment();
-    ost << metadata.Genre();
-    ost << metadata.Year();
-    ost << metadata.Track();
-    ost << metadata.Time();
-    ost << metadata.Size();
-    ost << '\0';
-
-#ifdef WIN32
-    m_database->Insert(url, (char *)ost.str().c_str());
-#else
-    m_database->Insert(url, (char *)ost.str());
-#endif
+    delete [] num;
+    delete [] temp;
 }
 
 MetaData *MusicCatalog::ReadMetaDataFromDatabase(const char *url)
@@ -1149,8 +1149,12 @@ void WatchDirectoryTimer::Tick(void)
    string watchPath = watchDir;
 
    vector<string> searchPaths;
-   searchPaths.push_back(watchDir);
+   searchPaths.push_back(watchPath);
 
+cout << "tick\n";
    m_context->catalog->PruneDirectory(watchPath);
    m_context->catalog->SearchMusic(searchPaths, false);
+cout << "tick done\n";
+
+   delete [] watchDir;
 }

@@ -24,12 +24,10 @@ ____________________________________________________________________________*/
 #include "config.h"
 #include "thread.h"
 
-#ifdef __LINUX__
-    #include "linuxthread.h"
+#if defined(__LINUX__) || defined(solaris)
+    #include "pthreadthread.h"
 #elif WIN32
     #include "win32thread.h"
-#elif defined(solaris)
-    #include "solaristhread.h"
 #elif defined(__BEOS__)
     #include "beosthread.h"
 #else
@@ -42,12 +40,10 @@ ____________________________________________________________________________*/
 Thread* Thread::CreateThread()
 {
     Thread* thread = NULL;
-#ifdef __linux__
-    thread = new linuxThread();
+#if defined(__linux__) || defined(solaris)
+    thread = new pthreadThread();
 #elif defined(WIN32)
     thread = new win32Thread();
-#elif defined(solaris)
-    thread = new solarisThread();
 #elif defined(__BEOS__)
     thread = new beosThread();
 #else

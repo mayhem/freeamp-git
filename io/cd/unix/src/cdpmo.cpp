@@ -58,13 +58,6 @@ CDPMO::CDPMO(FAContext *context) :
    m_cdDesc = -1;
    sentData = false;
    trackDone = false;
-
-   if (!m_pBufferThread)
-   {
-      m_pBufferThread = Thread::CreateThread();
-      assert(m_pBufferThread);
-      m_pBufferThread->Create(CDPMO::StartWorkerThread, this);
-   }
 }
 
 CDPMO::~CDPMO()
@@ -129,6 +122,13 @@ Error CDPMO::SetTo(const char *url)
 
    if (m_track < 1 || m_track > MAX_TRACKS)
        return kError_InvalidTrack;
+
+   if (!m_pBufferThread)
+   {
+      m_pBufferThread = Thread::CreateThread();
+      assert(m_pBufferThread);
+      m_pBufferThread->Create(CDPMO::StartWorkerThread, this);
+   }
 
    cd_play_track(m_cdDesc, m_track, m_track);
 

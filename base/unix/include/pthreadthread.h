@@ -1,7 +1,8 @@
 /*____________________________________________________________________________
 	
-	FreeAMP - The Free MP3 Player
-	Portions copyright (C) 1998-1999 EMusic.com
+	FreeAmp - The Free MP3 Player
+
+	Portions Copyright (C) 1998-2000 EMusic.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -20,13 +21,44 @@
 	$Id$
 ____________________________________________________________________________*/
 
-#ifndef INCLUDED_UTILITY_H_
-#define INCLUDED_UTILITY_H_
+#ifndef INCLUDED_PTHREAD_THREAD_H
+#define INCLUDED_PTHREAD_THREAD_H
 
-#include "config.h"
-#include "errors.h"
+#include <pthread.h>
+#include "thread.h"
 
-Error GetInstallDirectory(char* path, int32 len);
+#include "mutex.h"
 
 
-#endif // _UTILITY_H_
+class pthreadThread : public Thread{
+
+public:
+	pthreadThread();
+       ~pthreadThread();
+
+
+	virtual bool Create(thread_function function, void* arg);
+	virtual void Destroy();
+	virtual void Suspend();
+	virtual void Resume();
+	virtual void Join();
+	virtual uint32 GetPriority() const;
+	virtual uint32 SetPriority(uint32 priority);
+
+	static void *internalThreadFunction(void *);
+	void *InternalThreadFunction();
+
+private:
+	pthread_t       m_threadHandle;
+	unsigned	m_threadId;
+	bool            m_suspended;
+	Mutex          *m_suspendMutex;
+	thread_function m_function;
+	void           *m_arg;
+};
+
+#endif /* _LINUX_THREAD_H */
+
+
+
+

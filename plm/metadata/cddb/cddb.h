@@ -30,6 +30,10 @@ using namespace std;
 
 #include <assert.h>
 
+#if defined(solaris)
+#include <stdarg.h>
+#endif
+
 #include "config.h"
 #include "errors.h"
 #include "facontext.h"

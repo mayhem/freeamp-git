@@ -1,7 +1,7 @@
 /*____________________________________________________________________________
 	
 	FreeAmp - The Free MP3 Player
-	Portions copyright (C) 1998-1999 EMusic.com
+	Portions copyright (C) 1998-2000 EMusic.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by

@@ -2,7 +2,7 @@
 	
 	FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1998-1999 EMusic.com
+	Portions Copyright (C) 1998-2000 EMusic.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -28,26 +28,25 @@ ____________________________________________________________________________*/
 #include <signal.h>
 #include <iostream.h>
 
-#include "solaristhread.h"
+#include "pthreadthread.h"
 #include "mutex.h"
 
-void solarisThread::Join() {
+void pthreadThread::Join() {
     pthread_join(m_threadHandle,NULL);
 }
 
-solarisThread::
-solarisThread():
+pthreadThread::
+pthreadThread():
 Thread()
 {
-    m_priority		= 0;
     m_threadHandle	= (pthread_t) NULL;
     m_threadId		= 0;
     m_suspended         = false;
     m_suspendMutex      = new Mutex();
 }
 
-solarisThread::
-~solarisThread()
+pthreadThread::
+~pthreadThread()
 {
     //pthread_cancel(m_threadHandle);
     if (m_suspendMutex) {
@@ -57,16 +56,16 @@ solarisThread::
 }
 
 void *
-solarisThread::
+pthreadThread::
 internalThreadFunction(void* arg)
 {
-    solarisThread* thread = (solarisThread*) arg;
+    pthreadThread* thread = (pthreadThread*) arg;
     thread->InternalThreadFunction();
     return NULL;
 }
 
 void *
-solarisThread::
+pthreadThread::
 InternalThreadFunction()
 {
     if (!m_function) {
@@ -81,14 +80,14 @@ InternalThreadFunction()
 }
 
 bool 
-solarisThread::
+pthreadThread::
 Create(thread_function function, void* arg)
 {
 //    cout << "Thread: Create" << endl;
     bool result = true;
     m_function = function;
     m_arg = arg;
-    if(pthread_create(&m_threadHandle, NULL,solarisThread::internalThreadFunction, this))
+    if(pthread_create(&m_threadHandle, NULL,pthreadThread::internalThreadFunction, this))
     {
 //	cout << "Create failed!!" << endl;
 	result = false;
@@ -98,17 +97,17 @@ Create(thread_function function, void* arg)
 }
 
 void 
-solarisThread::
+pthreadThread::
 Destroy()
 {
     pthread_cancel(m_threadHandle);
 }
 
 void 
-solarisThread::
+pthreadThread::
 Suspend()
 {
-    m_suspendMutex->Acquire(WAIT_FOREVER);
+    m_suspendMutex->Acquire();
     if (!m_suspended) {
 	pthread_kill(m_threadHandle, SIGSTOP);
 	m_suspended = true;
@@ -117,10 +116,10 @@ Suspend()
 }
 
 void 
-solarisThread::
+pthreadThread::
 Resume()
 {
-    m_suspendMutex->Acquire(WAIT_FOREVER);
+    m_suspendMutex->Acquire();
     if (m_suspended) {
 	pthread_kill(m_threadHandle, SIGCONT);
 	m_suspended = false;
@@ -129,17 +128,17 @@ Resume()
 }
 
 
-Priority 
-solarisThread::
+uint32 
+pthreadThread::
 GetPriority() const
 {
-    return((Priority) 0);
+    return( 0);
 }
 
-Priority 
-solarisThread::
-SetPriority(Priority priority)
+uint32 
+pthreadThread::
+SetPriority(uint32 priority)
 {
-    return((Priority) 0);
+    return( 0);
 }
 

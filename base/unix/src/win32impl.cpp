@@ -29,8 +29,6 @@ FindData::FindData() {
     pDir = NULL;
 }
 FindData::~FindData() {
-    if (dir) delete dir;
-    if (rest) delete rest;
 }
 
 bool Match(char *,char *);
@@ -157,10 +155,14 @@ bool Match(char *pattern,char *string) {
 
 void FillWin32FindData(char *pDir, char *pF,WIN32_FIND_DATA *wfd) {
 //    cout << "FillWin32FindData: Entering: " << pF << endl;
-    strcpy(wfd->cFileName,pF);
+    strncpy(wfd->cFileName,pF, MAX_PATH);
 
     struct stat st;
-    char *name = new char[strlen(pDir) + strlen(DIR_MARKER_STR) + strlen(pF) + 1];
+    char *name;
+    if (pDir)
+        name = new char[strlen(pDir) + strlen(DIR_MARKER_STR) + strlen(pF) + 2];
+    else
+        name = new char[strlen(pF)]; 
 
     if (pDir)
     {
@@ -212,6 +214,10 @@ bool FindClose(HANDLE hFindFile) {
     if (!hFindFile) return false;
     FindData *pFD = (FindData *)hFindFile;
     closedir(pFD->pDir);
+    if (pFD->dir)
+        delete pFD->dir;
+    if (pFD->rest)
+        delete pFD->rest;
     delete pFD;
 
     return true;

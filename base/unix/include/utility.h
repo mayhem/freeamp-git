@@ -1,9 +1,7 @@
-
 /*____________________________________________________________________________
 	
-	FreeAmp - The Free MP3 Player
-
-	Portions Copyright (C) 1998-1999 EMusic.com
+	FreeAMP - The Free MP3 Player
+	Portions copyright (C) 1998-2000 EMusic.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -22,27 +20,13 @@
 	$Id$
 ____________________________________________________________________________*/
 
+#ifndef INCLUDED_UTILITY_H_
+#define INCLUDED_UTILITY_H_
+
+#include "config.h"
+#include "errors.h"
+
+Error GetInstallDirectory(char* path, int32 len);
 
 
-#ifndef INCLUDED_SEMAPHORE_H_
-#define INCLUDED_SEMAPHORE_H_
-
-#include <pthread.h>
-
-class Semaphore {
- private:
-    int count;
-    pthread_mutex_t mutex;
-    pthread_cond_t cond;
-
- public:
-    Semaphore(int cnt = 1);
-    ~Semaphore();
-    void Wait();
-    void Signal();
-
-};
-
-
-
-#endif // _SEMAPHORE_H_
+#endif // _UTILITY_H_

@@ -57,6 +57,12 @@ ____________________________________________________________________________*/
 #endif
 
 #undef DEBUG_MUTEXES
+#undef USING_DMALLOC
+
+#ifdef USING_DMALLOC
+#include <dmalloc.h>
+#define DMALLOC_FUNC_CHECK 1
+#endif
 
 #undef HAVE_GTK
 #undef HAVE_FREETYPE_FREETYPE_H
@@ -135,13 +141,6 @@ ____________________________________________________________________________*/
 
 #if HAVE_LINUX /* Linux requires thread support */
 #define __LINUX__
-#if HAVE_BASELINUXTHREADS == 1 && HAVE_MITPTHREADS == 1
-#error "Can't have both MIT Pthreads and LinuxThreads!! (i.e. I don't know which to use...)"
-#endif
-
-#if HAVE_MITPTHREADS == 0 && HAVE_BASELINUXTHREADS == 0
-#error "Must have threads support!  (i.e. I can't find evidence of MIT pthreads or LinuxThreads)"
-#endif
 #endif /* HAVE_LINUX */
 
 #if HAVE_UNISTD_H

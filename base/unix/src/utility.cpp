@@ -1,8 +1,7 @@
 /*____________________________________________________________________________
 	
-	FreeAmp - The Free MP3 Player
-
-	Portions Copyright (C) 1998-1999 EMusic.com
+	FreeAMP - The Free MP3 Player
+	Portions copyright (C) 1998-2000 EMusic.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -21,40 +20,24 @@
 	$Id$
 ____________________________________________________________________________*/
 
-
-#include "config.h"
-
-#include <pthread.h>
+/* System Includes */
+#include <stdio.h>
+#include <string.h>
 #include <iostream.h>
+#include <unistd.h>
 
-#include "semaphore.h"
+/* Project Includes */
+#include "utility.h"
+#include "errors.h"
 
+#define MAIN_KEY    HKEY_CURRENT_USER
+#define INSTALL     "InstallDirectory"
+#define UI          "UI"
+#define DEFAULT_UI  "freeamp"
 
-Semaphore::Semaphore(int cnt) {
-    count = cnt;
-    pthread_mutex_init(&mutex,NULL);
-    pthread_cond_init(&cond,NULL);
+Error GetInstallDirectory(char* path, int32 len)
+{
+    getcwd(path,len);
+    return kError_NoErr;
 }
 
-Semaphore::~Semaphore() {
-    pthread_mutex_destroy(&mutex);
-    pthread_cond_destroy(&cond);
-}
-
-void Semaphore::Wait() {
-    //decrement the semaphore
-    pthread_mutex_lock(&mutex);
-    count--;
-    while (count <=0) {
-	pthread_cond_wait(&cond,&mutex);
-    }
-    pthread_mutex_unlock(&mutex);
-}
-
-void Semaphore::Signal() {
-    // increment the semaphore
-    pthread_mutex_lock(&mutex);
-    count++;
-    pthread_mutex_unlock(&mutex);
-    pthread_cond_signal(&cond);
-}
