@@ -73,7 +73,7 @@ SoundCardPMO::SoundCardPMO(FAContext *context) :
 {
    MMRESULT mmresult = 0;
    Int32PropValue *pProp;
-   HWND            hWnd;
+   hWnd =0;
    
    m_wfex = NULL;
    m_wavehdr_array = NULL;
@@ -94,6 +94,9 @@ SoundCardPMO::SoundCardPMO(FAContext *context) :
    m_iBytesPerSample = 0;
    m_num_headers = 0;
 
+   //   lillian
+   m_volume = NULL;
+
 pBase = 0;
    
    if (!m_pBufferThread)
@@ -103,21 +106,15 @@ pBase = 0;
       m_pBufferThread->Create(SoundCardPMO::StartWorkerThread, this);
    }
 
+    
    if (IsError(m_pContext->props->GetProperty("MainWindow", 
               (PropValue **)&pProp)))
       return;        
    else
       hWnd = (HWND)pProp->GetInt32();
    
-   mmresult = mixerOpen(&m_hmixer, 0, (DWORD)hWnd, NULL, 
-                        MIXER_OBJECTF_MIXER | CALLBACK_WINDOW);
-   if (mmresult != MMSYSERR_NOERROR)
-   {
-       m_hmixer = NULL;
-       m_pContext->log->Error("Cannot open Mixer device.");
-   }    
-   SetupVolumeControl();
-}
+   SetupVolumeControl( hWnd );
+} 
 
 SoundCardPMO::~SoundCardPMO()
 {
@@ -158,99 +155,22 @@ SoundCardPMO::~SoundCardPMO()
    }
 }
 
-bool SoundCardPMO::SetupVolumeControl(void)
+bool SoundCardPMO::SetupVolumeControl( HWND hWnd)
 {
-    MIXERLINE mxl;
-    MIXERCONTROL mxc;
-    MIXERLINECONTROLS mxlc;
-    
-    m_oDstLineName = "";
-    m_oVolumeControlName = "";
 
-    if (m_hmixer == NULL)
-        return FALSE;
+    m_volume = Win32Volume::GetInstance( Win32Volume::eWaveOut, hWnd );
 
-    mxl.cbStruct = sizeof(MIXERLINE);
-    mxl.dwComponentType = MIXERLINE_COMPONENTTYPE_SRC_WAVEOUT;
-    if (mixerGetLineInfo((HMIXEROBJ)m_hmixer,
-                         &mxl,
-                         MIXER_OBJECTF_HMIXER |
-                         MIXER_GETLINEINFOF_COMPONENTTYPE)
-        != MMSYSERR_NOERROR)
-        return false;
-
-    mxlc.cbStruct = sizeof(MIXERLINECONTROLS);
-    mxlc.dwLineID = mxl.dwLineID;
-    mxlc.dwControlType = MIXERCONTROL_CONTROLTYPE_VOLUME;
-    mxlc.cControls = 1;
-    mxlc.cbmxctrl = sizeof(MIXERCONTROL);
-    mxlc.pamxctrl = &mxc;
-
-    if (mixerGetLineControls((HMIXEROBJ)m_hmixer,
-                             &mxlc,
-                             MIXER_OBJECTF_HMIXER |
-                             MIXER_GETLINECONTROLSF_ONEBYTYPE)
-        != MMSYSERR_NOERROR)
-        return false;
-
-    // record dwControlID
-    m_oDstLineName = mxl.szName;
-    m_oVolumeControlName = mxc.szName;
-    m_dwMinimum = mxc.Bounds.dwMinimum;
-    m_dwMaximum = mxc.Bounds.dwMaximum;
-    m_dwVolumeControlID = mxc.dwControlID;
-
-    return TRUE;
+    return !!m_volume;
 }
 
 void SoundCardPMO::GetVolume(int32 &left, int32 &right) 
 {
-    MIXERCONTROLDETAILS_UNSIGNED mxcdVolume[2];
-    MIXERCONTROLDETAILS mxcd;
-    int                 ret;
-    
-    mxcd.cbStruct = sizeof(MIXERCONTROLDETAILS);
-    mxcd.dwControlID = m_dwVolumeControlID;
-    mxcd.cChannels = 2;
-    mxcd.cMultipleItems = 0;
-    mxcd.cbDetails = sizeof(MIXERCONTROLDETAILS_UNSIGNED);
-    mxcd.paDetails = &mxcdVolume;
-    ret = mixerGetControlDetails((HMIXEROBJ)m_hmixer,
-                                 &mxcd,
-                                 MIXER_OBJECTF_HMIXER |
-                                 MIXER_GETCONTROLDETAILSF_VALUE);
-    if (ret != MMSYSERR_NOERROR)
-        return;
-
-    left = (int)(((float)((mxcdVolume[0].dwValue - m_dwMinimum) * 100) /  
-                  (float)(m_dwMaximum - m_dwMinimum)) + 0.5); 
-    right = (int)(((float)((mxcdVolume[1].dwValue - m_dwMinimum) * 100) /  
-                  (float)(m_dwMaximum - m_dwMinimum)) + 0.5); 
+    m_volume->GetVolume(left, right);
 }
 
 void SoundCardPMO::SetVolume(int32 left, int32 right) 
 {
-    DWORD dwValLeft, dwValRight;
-    
-    dwValLeft = (left * (m_dwMaximum - m_dwMinimum) / 100);
-    dwValRight = (right * (m_dwMaximum - m_dwMinimum) / 100);
-
-    MIXERCONTROLDETAILS_UNSIGNED mxcdVolume[2];
-    MIXERCONTROLDETAILS mxcd;
-    
-    memcpy(&mxcdVolume[0], &dwValLeft, sizeof(MIXERCONTROLDETAILS_UNSIGNED));
-    memcpy(&mxcdVolume[1], &dwValRight, sizeof(MIXERCONTROLDETAILS_UNSIGNED));
-    
-    mxcd.cbStruct = sizeof(MIXERCONTROLDETAILS);
-    mxcd.dwControlID = m_dwVolumeControlID;
-    mxcd.cChannels = 2;
-    mxcd.cMultipleItems = 0;
-    mxcd.cbDetails = sizeof(MIXERCONTROLDETAILS_UNSIGNED);
-    mxcd.paDetails = &mxcdVolume;
-    
-    mixerSetControlDetails((HMIXEROBJ)m_hmixer, &mxcd, 
-                              MIXER_OBJECTF_HMIXER | 
-                              MIXER_SETCONTROLDETAILSF_VALUE);
+    m_volume->SetVolume(left, right);
 }
 
 Error SoundCardPMO::Init(OutputInfo * info)
