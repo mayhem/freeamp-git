@@ -449,7 +449,7 @@ UserInterface()
 
     m_uiSemaphore = new Semaphore();
 
-    m_uiThread = Thread::CreateThread();
+    /*LEAK-2*/m_uiThread = Thread::CreateThread();
     m_uiThread->Create(ui_thread_function, this);
 
     m_uiSemaphore->Wait();

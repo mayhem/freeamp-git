@@ -74,7 +74,7 @@ Create(thread_function function, void* arg)
     m_arg           = arg;
 
 	//m_threadHandle = (HANDLE) _beginthreadex(
-	/*LEAK*/m_threadHandle = ::CreateThread(
+	/*LEAK-2*/m_threadHandle = ::CreateThread(
 									NULL,
 									0,
 									internalThreadFunction,

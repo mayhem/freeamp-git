@@ -119,7 +119,7 @@ DetermineControlRegions(DIB* bitmap,
     for(i = 0; i < numControls; i++)
     {
         // empty region
-        controlRegions[i] = CreateRectRgn(0,0,0,0);
+        /*LEAK-2*/controlRegions[i] = CreateRectRgn(0,0,0,0);
     }
 
     regionColors = new uint32[numControls];

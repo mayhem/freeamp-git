@@ -50,14 +50,6 @@ extern    "C"
 #define BS_BUFBYTES 60000U
 #define PCM_BUFBYTES 60000U
 
-typedef enum
-{
-   XING_Stop = 1,
-   XING_Pause,
-   XING_Resume
-}
-XingCommand;
-
 typedef struct
 {
    int       (*decode_init) (MPEG_HEAD * h, int framebytes_arg,
@@ -127,7 +119,6 @@ class     XingLMC:public LogicalMediaConverter
    Semaphore  *m_pauseSemaphore;
    AUDIO       m_audioMethods;
    Mutex      *m_seekMutex;
-   Queue <XingCommand *> *m_xcqueue;
    PhysicalMediaInput *m_input;
    PhysicalMediaOutput *m_output;
 
