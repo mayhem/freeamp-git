@@ -58,7 +58,7 @@ ____________________________________________________________________________*/
 #define TIMER_VOLUME_POSITION   2
 #define TIMER_SHOW_STATUS_INFO  3
 
-#define kMenuStayOnTop  666
+#define UWM_TRAY  WM_USER + 666
 
 const char* kAudioFileFilter =
             "MPEG Audio Streams (.mpg, .mp1, .mp2, .mp3, .mpp)\0"
@@ -316,13 +316,19 @@ MainWndProc(HWND hwnd,
 
             ScreenToClient(hwnd, &pt);
 
-            ui->RightButtonDown(pt.x, pt.y, wParam);
+            ui->RightButtonUp(pt.x, pt.y, wParam);
             break;
         }
 
         case WM_KEYDOWN:
         {
             ui->KeyDown(wParam);
+            break;
+        }
+
+        case UWM_TRAY:
+        {
+            ui->TrayNotify(lParam);
             break;
         }
 
@@ -344,8 +350,15 @@ UserInterface()
     m_windowRegion  = NULL;
     m_playerRegion  = NULL;
     m_viewList      = NULL;
+    m_trayIcon      = NULL;
+
+    *m_trayTooltip = 0x00;
 
     m_mouseCaptured = false;
+
+    m_log = false;
+    m_onTop = false;
+    m_liveInTray = false;
 
     m_playerCanvas  = NULL;
     m_bodyBitmap    = NULL;
@@ -449,19 +462,21 @@ UserInterface()
 
     m_uiSemaphore = new Semaphore();
 
+    m_prefs = new Preferences;
+
     m_uiThread = Thread::CreateThread();
     m_uiThread->Create(ui_thread_function, this);
 
     m_uiSemaphore->Wait();
     delete m_uiSemaphore;
-
-    m_prefs = new Preferences;
 }
 
 FreeAmpUI::
 ~FreeAmpUI()
 {
     // Be good citizens and clean up after ourselves
+    RemoveTrayIcon();
+
     DeleteBitmaps();
     DeleteRegions();
 
@@ -479,6 +494,9 @@ FreeAmpUI::
 
     if(m_prefs)
         delete m_prefs;
+
+    if(m_trayIcon)
+        DeleteObject(m_trayIcon);
 }
 
 void 
@@ -533,6 +551,10 @@ Create()
     CreateControls();
 
     CreateTooltips();
+
+    m_trayIcon = LoadIcon(g_hinst, MAKEINTRESOURCE(IDI_EXE_ICON));
+
+    ReadPreferences();
 }
 
 void 
@@ -991,15 +1013,10 @@ Command(int32 command,
             break;
         }
 
-        case kMenuStayOnTop:
-        {
-            //OutputDebugString("StayOnTop\r\n");
-            break;
-        }
-
         case kPrefControl:
         {
-            DisplayPreferences(m_hwnd);
+            if(DisplayPreferences(m_hwnd))
+                ReadPreferences();
             break;
         }
     }
@@ -1482,7 +1499,7 @@ LeftButtonDoubleClick(  int32 xPos,
 
 bool
 FreeAmpUI::
-RightButtonDown(int32 xPos, 
+RightButtonUp(  int32 xPos, 
                 int32 yPos, 
                 int32 modifiers)
 {
@@ -1547,7 +1564,7 @@ RightButtonDown(int32 xPos,
 
 bool
 FreeAmpUI::
-RightButtonUp(  int32 xPos, 
+RightButtonDown(int32 xPos, 
                 int32 yPos, 
                 int32 modifiers)
 {
@@ -1555,6 +1572,126 @@ RightButtonUp(  int32 xPos,
 
     
     return result;
+}
+
+void 
+FreeAmpUI::
+TrayNotify(int32 notifyMessage)
+{
+    switch(notifyMessage)
+    {
+        case WM_LBUTTONUP:
+        {
+            ShowWindow( m_hwnd, SW_NORMAL);
+			SetForegroundWindow(m_hwnd);
+			break;
+        }
+
+        case WM_RBUTTONUP:
+        {
+            HMENU menuHandle, popupHandle;
+            HINSTANCE hinst = (HINSTANCE)GetWindowLong(m_hwnd, GWL_HINSTANCE);
+            POINT pt;
+            int32 command;
+
+            // need mouse coordinates relative to screen
+            GetCursorPos(&pt);
+          
+            // load the menu and retrieve its popup
+            menuHandle = LoadMenu(hinst, MAKEINTRESOURCE(IDM_TRAY));
+            popupHandle = GetSubMenu(menuHandle, 0);
+
+            if(m_state != UIState_Stopped)
+            {
+                MENUITEMINFO mii;
+
+                memset(&mii, 0x00, sizeof(MENUITEMINFO));
+
+                mii.cbSize = sizeof(MENUITEMINFO);
+                mii.fMask = MIIM_TYPE|MIIM_ID ;
+                mii.fType = MFT_STRING;
+                mii.dwTypeData = "Stop";
+                mii.cch = strlen("Stop");
+                mii.wID = IDC_STOP;
+
+                SetMenuItemInfo(popupHandle, 
+                                7,
+                                TRUE,
+                                &mii);
+            }
+
+            if(m_state == UIState_Paused)
+            {
+                MENUITEMINFO mii;
+
+                memset(&mii, 0x00, sizeof(MENUITEMINFO));
+
+                mii.cbSize = sizeof(MENUITEMINFO);
+                mii.fMask = MIIM_STATE;
+                mii.fState = MFS_CHECKED;
+
+                SetMenuItemInfo(popupHandle, 
+                                8,
+                                TRUE,
+                                &mii);
+            }
+
+            // display the popup
+            command = TrackPopupMenu(   popupHandle,			
+					                    TPM_RETURNCMD | TPM_RIGHTBUTTON,
+					                    pt.x, 
+                                        pt.y,       
+					                    0,  
+					                    m_hwnd,
+					                    NULL);
+
+            switch(command)
+            {
+                case IDC_ABOUT:
+                    SendMessage(m_hwnd, WM_COMMAND, kAboutControl, 0);
+                    break;
+
+                case IDC_OPEN:
+                    SendMessage(m_hwnd, WM_COMMAND, kOpenControl, 0);
+                    break;
+
+                case IDC_SAVE:
+                    SendMessage(m_hwnd, WM_COMMAND, kSaveControl, 0);
+                    break;
+
+                case IDC_PREF:
+                    SendMessage(m_hwnd, WM_COMMAND, kPrefControl, 0);
+                    break;
+
+                case IDC_PLAY:
+                    SendMessage(m_hwnd, WM_COMMAND, kPlayControl, 0);
+                    break;
+
+                case IDC_STOP:
+                    SendMessage(m_hwnd, WM_COMMAND, kStopControl, 0);
+                    break;
+
+                case IDC_PAUSE:
+                    SendMessage(m_hwnd, WM_COMMAND, kPauseControl, 0);
+                    break;
+
+                case IDC_NEXTSONG:
+                    SendMessage(m_hwnd, WM_COMMAND, kNextControl, 0);
+                    break;
+
+                case IDC_LASTSONG:
+                    SendMessage(m_hwnd, WM_COMMAND, kLastControl, 0);
+                    break;
+
+                case IDC_EXIT:
+                    SendMessage(m_hwnd, WM_COMMAND, kCloseControl, 0);
+                    break;
+            }
+
+			break;
+        }
+
+    }
 }
 
 int32 
@@ -1745,6 +1882,7 @@ CreateControls()
                                     TextType_MouseWiggle);
 
 	m_songTitleView->SetText("Welcome to FreeAmp");
+    SetTrayTooltip("Welcome to FreeAmp");
 
     m_prevSongInfoText = new char [strlen(m_songTitleView->Text()) + 1];
     strcpy(m_prevSongInfoText, m_songTitleView->Text());
@@ -2417,6 +2555,7 @@ AcceptEvent(Event* event)
 					strncat(foo,info->GetId3Tag().m_songName,sizeof(foo)-strlen(foo));
 
                     m_songTitleView->SetText(foo);
+                    SetTrayTooltip(foo);
 
                     if(m_prevSongInfoText)
                         delete m_prevSongInfoText;
@@ -2456,6 +2595,8 @@ AcceptEvent(Event* event)
 				{
 					m_songTitleView->SetText(info->m_filename);
 				}
+
+                SetTrayTooltip(m_songTitleView->Text());
 
                 if(m_prevSongInfoText)
                         delete m_prevSongInfoText;
@@ -2789,6 +2930,110 @@ UpdatePlayList()
 
         }
     }
+}
+
+void 
+FreeAmpUI::
+ReadPreferences()
+{
+    m_prefs->GetUseDebugLog(&m_log);
+
+    if(m_log)
+        m_prefs->GetLogMain(&m_log);
+
+    m_prefs->GetStayOnTop(&m_onTop);
+    m_prefs->GetLiveInTray(&m_liveInTray);
+
+    SetWindowPos(   m_hwnd, 
+                    (m_onTop ? HWND_TOPMOST: HWND_NOTOPMOST), 
+                    0, 0, 0, 0, 
+                    SWP_NOMOVE|SWP_NOSIZE);
+
+    // what follows is a sad hack that actually makes windows 
+    // refresh the toolbar correctly...
+    ShowWindow(m_hwnd, FALSE);
+
+    LONG styles, extendedStyles;
+
+    styles = GetWindowLong(m_hwnd, GWL_STYLE);
+    extendedStyles = GetWindowLong(m_hwnd, GWL_EXSTYLE);
+
+    if(extendedStyles & WS_EX_TOOLWINDOW)
+    {
+        if(!m_liveInTray)       
+        {
+            extendedStyles ^= WS_EX_TOOLWINDOW;
+            RemoveTrayIcon();
+        }
+    }
+    else 
+    {
+        if(m_liveInTray)
+        {
+            extendedStyles |= WS_EX_TOOLWINDOW;
+            AddTrayIcon();
+        }
+
+    }
+
+    SetWindowLong(m_hwnd, GWL_STYLE, WS_VISIBLE);
+    SetWindowLong(m_hwnd, GWL_STYLE, styles);
+    SetWindowLong(m_hwnd, GWL_EXSTYLE, extendedStyles);
+
+    ShowWindow(m_hwnd, TRUE);
+
+}
+
+void 
+FreeAmpUI::
+AddTrayIcon()
+{
+	NOTIFYICONDATA nid;
+	int rc;
+
+	// Fill out NOTIFYICONDATA structure
+	nid.cbSize = sizeof(NOTIFYICONDATA);	// sanitycheck
+	nid.hWnd = m_hwnd;					    // window to receive notifications
+	nid.uID = 1;							// application defined identifier for icon
+	nid.uFlags = NIF_MESSAGE |				// uCallbackMessage is valid, use it
+				 NIF_ICON |					// hIcon is valid, use it
+				 NIF_TIP;					// there is tooltip specified
+	nid.uCallbackMessage = UWM_TRAY;        // that's what we will receive in wndProc
+	nid.hIcon = m_trayIcon;
+
+	strcpy(nid.szTip, m_trayTooltip);
+
+	rc = Shell_NotifyIcon(NIM_ADD, &nid);	// this adds the icon
+}
+
+void
+FreeAmpUI::
+RemoveTrayIcon()
+{
+	NOTIFYICONDATA nid;
+	nid.cbSize = sizeof(NOTIFYICONDATA);
+	nid.hWnd = m_hwnd;
+	nid.uID = 1;
+	nid.uFlags = NIF_ICON;
+	nid.hIcon = m_trayIcon;
+
+	Shell_NotifyIcon(NIM_DELETE, &nid);
+}
+
+void
+FreeAmpUI::
+SetTrayTooltip(char *str)
+{
+	NOTIFYICONDATA nid;
+
+    strncpy(m_trayTooltip, str, sizeof(m_trayTooltip));
+
+	nid.cbSize = sizeof(NOTIFYICONDATA);
+	nid.hWnd = m_hwnd;
+	nid.uID = 1;
+	nid.uFlags = NIF_TIP;				// just change tip
+	strcpy(nid.szTip, m_trayTooltip);
+	Shell_NotifyIcon(NIM_MODIFY, &nid); // now, modify our tooltip
 }
 
 void

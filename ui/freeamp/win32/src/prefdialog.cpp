@@ -47,7 +47,7 @@ typedef struct PrefValues {
     int32 streamInterval;
     int32 decoderThreadPriority;
     bool stayOnTop;
-    bool minimizeToTray;
+    bool liveInTray;
 
     // page2
     bool enableLogging;
@@ -81,7 +81,7 @@ SavePrefValues( Preferences* prefs,
     prefs->SetOutputBufferSize(values->outputBufferSize);
     prefs->SetStreamBufferInterval(values->streamInterval);
     prefs->SetStayOnTop(values->stayOnTop);
-    prefs->SetMinimizeToTray(values->minimizeToTray);
+    prefs->SetLiveInTray(values->liveInTray);
     prefs->SetUseDebugLog(values->enableLogging);
     prefs->SetLogMain(values->logMain);
     prefs->SetLogDecode(values->logDecoder);
@@ -109,7 +109,7 @@ PrefPage1Proc(  HWND hwnd,
     static HWND hwndOutput = NULL;
     static HWND hwndStreamInterval = NULL;
     static HWND hwndStayOnTop = NULL;
-    static HWND hwndMinimizeToTray = NULL;
+    static HWND hwndLiveInTray = NULL;
     
 
     switch(msg)
@@ -128,7 +128,7 @@ PrefPage1Proc(  HWND hwnd,
             hwndOutput = GetDlgItem(hwnd, IDC_OUTPUT);
             hwndStreamInterval = GetDlgItem(hwnd, IDC_STREAM_INTERVAL);
             hwndStayOnTop = GetDlgItem(hwnd, IDC_STAYONTOP);
-            hwndMinimizeToTray = GetDlgItem(hwnd, IDC_TRAY);
+            hwndLiveInTray = GetDlgItem(hwnd, IDC_TRAY);
 
             // get registries
             Registrar registrar;
@@ -213,8 +213,8 @@ PrefPage1Proc(  HWND hwnd,
             prefs->GetStayOnTop(&originalValues.stayOnTop);
             Button_SetCheck(hwndStayOnTop, originalValues.stayOnTop);
 
-            prefs->GetMinimizeToTray(&originalValues.minimizeToTray);
-            Button_SetCheck(hwndMinimizeToTray, originalValues.minimizeToTray);
+            prefs->GetLiveInTray(&originalValues.liveInTray);
+            Button_SetCheck(hwndLiveInTray, originalValues.liveInTray);
 
             currentValues = originalValues;
             
@@ -375,13 +375,13 @@ PrefPage1Proc(  HWND hwnd,
 
                 case IDC_TRAY:
                 {
-                    if(Button_GetCheck(hwndMinimizeToTray) == BST_CHECKED)
+                    if(Button_GetCheck(hwndLiveInTray) == BST_CHECKED)
                     {
-                        currentValues.minimizeToTray = true;
+                        currentValues.liveInTray = true;
                     }
                     else
                     {
-                        currentValues.minimizeToTray = false;
+                        currentValues.liveInTray = false;
                     }
 
                     if(memcmp(  &originalValues, 

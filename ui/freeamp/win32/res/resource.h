@@ -105,6 +105,11 @@
 #define IDC_SAVE                        40004
 #define IDC_PREF                        40005
 #define IDC_EXIT                        40006
+#define IDC_PLAY                        40007
+#define IDC_PAUSE                       40009
+#define IDC_NEXTSONG                    40010
+#define IDC_LASTSONG                    40011
+#define IDC_STOP                        40012
 #define IDS_URL                         65535
 #define IDC_STATIC                      -1
 
@@ -114,7 +119,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        194
-#define _APS_NEXT_COMMAND_VALUE         40007
+#define _APS_NEXT_COMMAND_VALUE         40013
 #define _APS_NEXT_CONTROL_VALUE         1016
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

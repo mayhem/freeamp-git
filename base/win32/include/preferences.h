@@ -36,7 +36,7 @@ extern const char* kUIPref;
 extern const char* kPMOPref;
 extern const char* kOpenSaveDirPref;
 extern const char* kStayOnTopPref;
-extern const char* kMinimizeToTrayPref;
+extern const char* kLiveInTrayPref;
 extern const char* kInputBufferSizePref;
 extern const char* kOutputBufferSizePref;
 extern const char* kStreamBufferIntervalPref;
@@ -84,8 +84,8 @@ class Preferences {
     Error GetStayOnTop(bool* value);
     Error SetStayOnTop(bool value);
 
-    Error GetMinimizeToTray(bool* value);
-    Error SetMinimizeToTray(bool value);
+    Error GetLiveInTray(bool* value);
+    Error SetLiveInTray(bool value);
 
     Error GetInputBufferSize(int32* value);
     Error SetInputBufferSize(int32 value);

@@ -77,10 +77,11 @@ BEGIN
                     ES_NUMBER
     LTEXT           "Buffer Streams For",IDC_STATIC,8,148,59,8
     LTEXT           "Seconds",IDC_STATIC,103,148,29,8
-    CONTROL         "Minimize to tray",IDC_TRAY,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,153,130,64,10
+    CONTROL         "Manifest in Tray instead of Taskbar",IDC_TRAY,"Button",
+                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,153,133,75,
+                    17
     CONTROL         "Stay on top",IDC_STAYONTOP,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,153,114,52,10
+                    WS_TABSTOP,153,119,52,10
     GROUPBOX        "Misc",IDC_STATIC,145,102,85,62
 END
 
@@ -276,7 +277,22 @@ END
 
 IDM_TRAY MENU DISCARDABLE 
 BEGIN
-    MENUITEM "item 1",                      IDC_ITEM
+    POPUP "popup"
+    BEGIN
+        MENUITEM "FreeAmp...",                  IDC_ABOUT
+        MENUITEM SEPARATOR
+        MENUITEM "Open...",                     IDC_OPEN
+        MENUITEM "Save...",                     IDC_SAVE
+        MENUITEM SEPARATOR
+        MENUITEM "Preferences...",              IDC_PREF
+        MENUITEM SEPARATOR
+        MENUITEM "Play",                        IDC_PLAY
+        MENUITEM "Pause",                       IDC_PAUSE
+        MENUITEM "Next Song",                   IDC_NEXTSONG
+        MENUITEM "Last Song",                   IDC_LASTSONG
+        MENUITEM SEPARATOR
+        MENUITEM "Exit",                        IDC_EXIT
+    END
 END
 
 
