@@ -447,13 +447,13 @@ Error XingLMC::GetBitstreamStats(float &fTotalSeconds, float &fMsPerFrame,
           iTotalFrames = m_lFileSize / m_frameBytes;
           fTotalSeconds = (float)((double) iTotalFrames * 
                                   (double) fMsPerFrame / 1000);
-          fTotalSeconds -= 1;                        
+          //fTotalSeconds -= 1;                        
        }    
    }
    else
    {
        iTotalFrames = -1;
-       fTotalSeconds = -1;
+       //fTotalSeconds = -1;
    }
    
    return kError_NoErr;
@@ -781,9 +781,9 @@ void XingLMC::DecodeWork()
               return;
           }
 
-          if (iMaxFrameSize > m_pInputBuffer->GetNumBytesInBuffer())
+          if (iMaxFrameSize > (int)m_pInputBuffer->GetNumBytesInBuffer())
           {
-              if (m_pInputBuffer->GetNumBytesInBuffer() == m_frameBytes)
+              if ((int)m_pInputBuffer->GetNumBytesInBuffer() == m_frameBytes)
                   iReadSize = m_frameBytes;
               else    
                   iReadSize = m_frameBytes + 1;
