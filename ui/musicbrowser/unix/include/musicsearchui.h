@@ -51,12 +51,13 @@ class musicsearchUI {
     bool searchInProgress;
     bool searchDone;
     bool m_main;
+    bool done;
 
+    GtkWidget *m_window;
  protected:
     FAContext *m_context;
 
  private:
-    GtkWidget *m_window;
     GtkWidget *m_searchButton;
     GtkWidget *textEntry;
     GtkWidget *browseButton;

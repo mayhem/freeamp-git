@@ -25,6 +25,7 @@ ____________________________________________________________________________*/
 
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 #include "utility.h"
 #include "eventdata.h"
@@ -32,23 +33,18 @@ ____________________________________________________________________________*/
 #include "musicbrowser.h"
 #include "musicsearchui.h"
 
-gboolean search_delete_event(GtkWidget *widget, gpointer p) 
+gboolean search_destroy(GtkWidget *widget, gpointer p)
 {
     bool quitmain = (bool)p;
-    if (quitmain) 
+    if (quitmain)
         gtk_main_quit();
     return FALSE;
 }
 
-void search_destroy(GtkWidget *widget, musicsearchUI *p)
-{
-    delete p;
-}
-
 void start_search_button_event(GtkWidget *widget, musicsearchUI *p)
 {
-    if (p->searchDone)
-        delete p;
+    if (p->searchDone) 
+        gtk_widget_destroy(p->m_window);
     else if (p->searchInProgress)
         p->EndSearch();
     else  
@@ -59,7 +55,7 @@ void search_cancel_button_event(GtkWidget *widget, musicsearchUI *p)
 {
     if (p->searchInProgress)
         p->EndSearch();
-    delete p;
+    gtk_widget_destroy(p->m_window);
 }
 
 void musicsearchUI::UpdateEntry(void)
@@ -147,13 +143,14 @@ void musicsearchUI::Show(bool runMain)
    searchDone = false;
    searchPath = "/";
    custom = false;
+   done = false;
 
    m_main = runMain;
 
    m_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
    gtk_window_set_title(GTK_WINDOW(m_window), BRANDING" - Search For Music");
    gtk_signal_connect(GTK_OBJECT(m_window), "destroy",
-                      GTK_SIGNAL_FUNC(search_delete_event), (void *)runMain);
+                      GTK_SIGNAL_FUNC(search_destroy), (void *)runMain);
    gtk_container_set_border_width(GTK_CONTAINER(m_window), 5);
 
    vbox = gtk_vbox_new(FALSE, 5);
@@ -257,9 +254,9 @@ void musicsearchUI::Show(bool runMain)
 
 musicsearchUI::~musicsearchUI()
 {
-   gtk_widget_destroy(m_window);
-   if (searchInProgress)
-       EndSearch();
+    if (searchInProgress)
+        EndSearch();
+    gtk_widget_destroy(m_window);
 }
 
 void musicsearchUI::StartSearch(void)
@@ -268,7 +265,7 @@ void musicsearchUI::StartSearch(void)
     oPathList.push_back(searchPath);
     searchInProgress = true;
     m_context->browser->SearchMusic(oPathList);
-    gtk_label_set_text(GTK_LABEL(buttonLabel), "Cancel");
+    gtk_label_set_text(GTK_LABEL(buttonLabel), "Cancel Search");
 }
 
 void musicsearchUI::EndSearch(void)
@@ -282,11 +279,13 @@ int32 musicsearchUI::AcceptEvent(Event *e)
 {
     switch (e->Type()) {
         case INFO_SearchMusicDone: {
+            if (searchInProgress == false)
+                break;
             searchInProgress = false;
-            searchDone = true;
+            searchDone = false;
             gdk_threads_enter();
-            gtk_entry_set_text(GTK_ENTRY(textEntry), "Done.");
-            gtk_label_set_text(GTK_LABEL(buttonLabel), "Done.");
+            UpdateEntry();
+            gtk_label_set_text(GTK_LABEL(buttonLabel), "Start Search >");
             gdk_threads_leave();
             break;
         }
