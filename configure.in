@@ -82,8 +82,18 @@ if test "$x11"="true"; then
 
     if test "$x11" = "true"; then
        AC_CHECK_HEADER(X11/xpm.h, x11="true",
+[ echo "Hmmm. X11/xpm.h not showing up in your include path."
+  echo "Looking for $x_includes/X11/xpm.h directly..."
+  z=0;
+  if test -f "${x_includes}/X11/xpm.h"; then
+    z=1
+    echo "Found $x_includes/X11/xpm.h."
+  fi
+  if test $z = 0; then	
          x11="false"
          echo XPM Header not found. X11 UI build disabled.
+  fi
+]
        )
     fi
   fi
