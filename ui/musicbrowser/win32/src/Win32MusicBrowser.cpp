@@ -351,7 +351,8 @@ void MusicBrowserUI::MusicSearchDone()
 
 void MusicBrowserUI::DisplayBrowserMessage(const char* msg)
 {
-    SendMessage(m_hStatus, SB_SETTEXT, 0, (LPARAM)msg);
+    if (m_initialized)
+        SendMessage(m_hStatus, SB_SETTEXT, 0, (LPARAM)msg);
 }
 
 void MusicBrowserUI::SaveCurrentPlaylist()

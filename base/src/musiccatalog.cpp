@@ -63,6 +63,7 @@ MusicCatalog::MusicCatalog(FAContext *context, char *databasepath)
     m_inUpdateSong = false;
     m_addImmediately = false;
     m_bSurpressAddMessages = false;
+    m_trackCount = 0;
     m_artistList = new vector<ArtistList *>;
     m_unsorted = new vector<PlaylistItem *>;
     m_playlists = new vector<string>;
@@ -378,6 +379,7 @@ Error MusicCatalog::RemoveSong(const char *url)
             {
                 AcceptEvent(new MusicCatalogTrackRemovedEvent(*i, NULL, NULL));
                 m_unsorted->erase(i);
+                m_trackCount--;
                 break;
             }
     }
@@ -409,6 +411,7 @@ Error MusicCatalog::RemoveSong(const char *url)
                                 AcceptEvent(new MusicCatalogTrackRemovedEvent(*k, *i, *j));
                                 trList->erase(k);
                                 found = true;
+                                m_trackCount--;
                                 break;
                             }    
 
@@ -546,6 +549,7 @@ Error MusicCatalog::AddSong(const char *url)
 
         m_unsorted->push_back(newtrack);
         AcceptEvent(new MusicCatalogTrackAddedEvent(newtrack, NULL, NULL));
+        m_trackCount++;
     }
     else {
         bool changed = false;
@@ -586,7 +590,9 @@ Error MusicCatalog::AddSong(const char *url)
                             }
                         }
                         (*j)->m_trackList->push_back(newtrack);
-                        AcceptEvent(new MusicCatalogTrackAddedEvent(newtrack, *i, *j));
+                        AcceptEvent(new MusicCatalogTrackAddedEvent(newtrack, 
+                                                                    *i, *j));
+                        m_trackCount++;
                         break;
                      }
                 }
@@ -721,6 +727,8 @@ void MusicCatalog::ClearCatalog()
     delete m_sigs;
     delete m_guidTable;
 
+    m_trackCount = 0;
+
     m_artistList = new vector<ArtistList *>;
     m_unsorted = new vector<PlaylistItem *>;
     m_playlists = new vector<string>;
@@ -853,6 +861,8 @@ void MusicCatalog::PruneThread(bool sendmessages)
                         m_database->Remove(key);
                         key = NULL;
                     }
+                    if (m_sigs)
+                        m_sigs->erase(key);
                 }
             }
             delete [] filename;
@@ -879,6 +889,8 @@ void MusicCatalog::PruneDirectory(string &directory)
                     if (-1 == stat(filename, &st)) {
                         Remove(key);
                         key = NULL;
+                        if (m_sigs)
+                            m_sigs->erase(key);
                     }
                 }
             }
@@ -1441,7 +1453,16 @@ void MusicCatalog::WatchTimer(void)
         PruneDirectory(dir);
     } while ((temp = strtok(NULL, ";")));
 
+    unsigned int numsigs = 0;
+    if (m_sigs)
+        numsigs = m_sigs->size();
     SearchMusic(searchPaths, false);
+
+    if (m_sigs && (m_sigs->size() > numsigs) && m_context->aps->IsTurnedOn())
+    {
+        m_context->target->AcceptEvent(new Event(CMD_KillSigThread));
+        m_context->target->AcceptEvent(new Event(INFO_UnsignaturedTracksExist));
+    }
 
     delete [] watchDir;
 

@@ -107,13 +107,18 @@ void GTKMusicBrowser::StillNeedSignature(bool inMain)
     string caption = "Relatable Not Enabled";
     string message;
 
+    int numstill = m_context->catalog->GetNumNeedingSigs();
+    int numtotal = m_context->catalog->GetTotalNumTracks();
+
+    int togo = (int)(numtotal * 0.75) - (numtotal - numstill);
+
     char numtracks[10];
-    sprintf(numtracks, "%d", m_context->catalog->GetNumNeedingSigs());
+    sprintf(numtracks, "%d", togo);
 
     if (!m_sigsStart)
-        message = string("Before using any of the Relatable features, all tracks in your music collection need to be signatured.  "The_BRANDING" is currently in the process of generating the signatures, but there are still ") + string(numtracks) + string(" left to go.  NOTE: Signaturing will currently not take place while songs are being played.");
+        message = string("Before using any of the Relatable features, at least 75 percent of the tracks in your music collection need to be signatured.  "The_BRANDING" is currently in the process of generating the signatures, but there are still ") + string(numtracks) + string(" left to go.  NOTE: Signaturing will currently not take place while songs are being played.");
     else
-        message = "Before using any of the Relatable features, all tracks in your music collection need to be signatured.  Please click on 'Start Signaturing' in the Relatable menu.  NOTE: Signaturing will currently not take place while songs are being played.";
+        message = "Before using any of the Relatable features, at least 75 percent of the tracks in your music collection need to be signatured.  Please click on 'Start Signaturing' in the Relatable menu.  NOTE: Signaturing will currently not take place while songs are being played.";
 
     dialog->Show(message.c_str(), caption.c_str(), kMessageOk, inMain);
 
@@ -131,7 +136,10 @@ void GTKMusicBrowser::SubmitPlaylist(void)
         return;
     }
 
-    if (m_context->catalog->GetNumNeedingSigs() > 0) {
+    int totaltracks = m_context->catalog->GetTotalNumTracks();
+    int needingsigs = m_context->catalog->GetNumNeedingSigs();
+
+    if ((needingsigs * 100) / totaltracks > 25) {
         StillNeedSignature();
         return;
     }
@@ -156,20 +164,34 @@ void GTKMusicBrowser::SubmitPlaylist(void)
 
     if (!items->empty()) {
         APSPlaylist InputPlaylist;
-        
-        // Assumes that GUID's are set properly in meta structures
-        for (i = items->begin(); i != items->end(); i++)
+        bool allgood = true;
+ 
+        for (i = items->begin(); i != items->end(); i++) {
+            if ((*i)->GetMetaData().GUID().size() != 16) {
+                allgood = false;
+                break;
+            }
             InputPlaylist.Insert((*i)->GetMetaData().GUID().c_str(),
                                  (*i)->URL().c_str());
+        }
 
-        pInterface->APSSubmitPlaylist(&InputPlaylist);
+        if (allgood)
+            pInterface->APSSubmitPlaylist(&InputPlaylist);
+        else {
+            string caption = "Learn Playlist Error";
+            string message = "The item(s) you selected to train the Relatable Engine with are not signatured.  If signaturing is presently taking place, please wait a while longer and try again.  Otherwise, select 'Start Signaturing' from the Relatable menu to start the signaturing process.";
+ 
+            GTKMessageDialog *dialog = new GTKMessageDialog();
+            dialog->Show(message.c_str(), caption.c_str(), kMessageOk, true);
+            delete dialog;
+        }
     }
     else {
         string caption = "Learn Playlist Error";
         string message = "In order to train the Relatable Engine, you need to have tracks selected in the My Music tree, have tracks selected in the playlist, or just have an active playlist.  You don't have any of this right now, so the Relatable Engine has nothing to learn.";
 
         GTKMessageDialog *dialog = new GTKMessageDialog();
-        dialog->Show(message.c_str(), caption.c_str(), kMessageOk);
+        dialog->Show(message.c_str(), caption.c_str(), kMessageOk, true);
         delete dialog;
     }
 
@@ -187,7 +209,10 @@ void GTKMusicBrowser::GenSLPlaylist(float fMax)
         return;
     }
 
-    if (m_context->catalog->GetNumNeedingSigs() > 0) {
+    int totaltracks = m_context->catalog->GetTotalNumTracks();
+    int needingsigs = m_context->catalog->GetNumNeedingSigs();
+
+    if ((needingsigs * 100) / totaltracks > 25) {
         StillNeedSignature();
         return;
     }
@@ -208,7 +233,25 @@ void GTKMusicBrowser::GenSLPlaylist(float fMax)
     else
         return;
 
-    GenSLPlaylist(items, fMax);
+    bool allgood = true;
+    vector<PlaylistItem *>::iterator j = items->begin();
+    for (; j != items->end(); j++) {
+        if ((*j)->GetMetaData().GUID().size() != 16) {
+            allgood = false;
+            break;
+        }
+    }
+
+    if (allgood)
+        GenSLPlaylist(items, fMax);
+    else {
+        string caption = "Generate SoundsLike Error";
+        string message = "The item(s) you selected to seed the Relatable Engine with are not signatured.  If signaturing is presently taking place, please wait a while longer and try again.  Otherwise, select 'Start Signaturing' from the Relatable menu to start the signaturing process.";
+
+        GTKMessageDialog *dialog = new GTKMessageDialog();
+        dialog->Show(message.c_str(), caption.c_str(), kMessageOk, true);
+        delete dialog;
+    }
 
     delete items;
 }
@@ -294,7 +337,10 @@ void GTKMusicBrowser::GenPlaylist(void)
         return;
     }
 
-    if (m_context->catalog->GetNumNeedingSigs() > 0) {
+    int totaltracks = m_context->catalog->GetTotalNumTracks();
+    int needingsigs = m_context->catalog->GetNumNeedingSigs();
+
+    if ((needingsigs * 100) / totaltracks > 25) {
         StillNeedSignature();
         return;
     }
@@ -315,7 +361,25 @@ void GTKMusicBrowser::GenPlaylist(void)
     else
         return;
 
-    GenPlaylist(items);
+    bool allgood = true;
+    vector<PlaylistItem *>::iterator j = items->begin();
+    for (; j != items->end(); j++) {
+        if ((*j)->GetMetaData().GUID().size() != 16) {
+            allgood = false;
+            break;
+        }
+    }
+
+    if (allgood)
+        GenPlaylist(items);
+    else {
+        string caption = "Generate Playlist Error";
+        string message = "The item(s) you selected to seed the Relatable Engine with are not signatured.  If signaturing is presently taking place, please wait a while longer and try again.  Otherwise, select 'Start Signaturing' from the Relatable menu to start the signaturing process.";
+
+        GTKMessageDialog *dialog = new GTKMessageDialog();
+        dialog->Show(message.c_str(), caption.c_str(), kMessageOk, true);
+        delete dialog;
+    }
  
     delete items;
 }
@@ -331,11 +395,13 @@ void GTKMusicBrowser::GenPlaylist(vector<PlaylistItem *> *seed)
         return;
     }
 
-    if (m_context->catalog->GetNumNeedingSigs() > 0) {
+    int totaltracks = m_context->catalog->GetTotalNumTracks();
+    int needingsigs = m_context->catalog->GetNumNeedingSigs();
+
+    if ((needingsigs * 100) / totaltracks > 25) {
         StillNeedSignature(false);
         return;
     }
-
 
     APSPlaylist ResultPlaylist;
     uint32 nResponse = 0;
@@ -344,12 +410,27 @@ void GTKMusicBrowser::GenPlaylist(vector<PlaylistItem *> *seed)
         APSPlaylist InputPlaylist;
         vector<PlaylistItem *>::iterator i;
 
-        for (i = seed->begin(); i != seed->end(); i++) 
+        bool allgood = true;
+        for (i = seed->begin(); i != seed->end(); i++) {
+            if ((*i)->GetMetaData().GUID().size() != 16) {
+                allgood = false;
+                break;
+            }
             InputPlaylist.Insert((*i)->GetMetaData().GUID().c_str(),
                                  (*i)->URL().c_str());
+        }
 
-        nResponse = m_context->aps->APSGetPlaylist(&InputPlaylist, 
-                                                   &ResultPlaylist);
+        if (allgood)
+            nResponse = m_context->aps->APSGetPlaylist(&InputPlaylist, 
+                                                       &ResultPlaylist);
+        else {
+            string caption = "Generate Playlist Error";
+            string message = "The item(s) you selected to seed the Relatable Engine with are not signatured.  If signaturing is presently taking place, please wait a while longer and try again.  Otherwise, select 'Start Signaturing' from the Relatable menu to start the signaturing process.";
+
+            GTKMessageDialog *dialog = new GTKMessageDialog();
+            dialog->Show(message.c_str(), caption.c_str(), kMessageOk, false);
+            delete dialog;
+        }
     }
     else {
         APSPlaylist InputPlaylist;

@@ -1,3 +1,9 @@
+Changes for version 2.1.0 rc2
+--------------------------------------------------------------------
+- Quite a few bug fixes, including the intermittant deadlock when
+  switching streams.
+- Very prelimininary Fairtunes tipping integration.
+
 Changes for Linux and Windows version 2.1.0 rc1
 --------------------------------------------------------------------
 - The playlist can now be customized to change/reorder the fields that are 

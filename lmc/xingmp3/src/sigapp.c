@@ -193,6 +193,7 @@ int ff_decode(char *filename, char ascii_sig[37],
    audio.decode_info(&decinfo);
 
    mb = mb_New();
+   printf("%d %d %d\n", decinfo.samprate, decinfo.channels, decinfo.bits);
    mb_SetPCMDataInfo(mb, decinfo.samprate, decinfo.channels, decinfo.bits);
    cvt_to_wave_init(decinfo.bits);
 

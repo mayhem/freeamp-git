@@ -132,6 +132,8 @@ class MusicCatalog : public EventQueue
     void StartGeneratingSigs(void);
     void StopGeneratingSigs(void);
 
+    int32 GetTotalNumTracks(void) { return m_trackCount; }
+    
  protected:
     static void musicsearch_thread_function(void *arg);
     static void prune_thread_function(void *arg);
@@ -184,5 +186,7 @@ class MusicCatalog : public EventQueue
 
     int32    m_timeout;
     TimerRef m_watchTimer;
+
+    int32    m_trackCount;
 };
 #endif

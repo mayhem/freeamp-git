@@ -1403,7 +1403,7 @@ void
 Player::
 KillSigThread(Event *pEvent)
 {
-	m_sigStopMutex->Acquire();
+    m_sigStopMutex->Acquire();
     if (m_signatureThread) {
         m_bKillSignature = true;
         if (m_sigspmo) {
@@ -1416,7 +1416,7 @@ KillSigThread(Event *pEvent)
         m_signatureThread = NULL;
     }
     m_signatureThread = NULL;
-	m_sigStopMutex->Release();
+    m_sigStopMutex->Release();
 }
     
 typedef struct GenerateSigsStruct {
@@ -1432,7 +1432,7 @@ GenerateSignature(Event *pEvent)
     GenerateSignatureEvent *gse = (GenerateSignatureEvent *)pEvent;
     set<string> *tracks = gse->Tracks();
 
-	m_sigStopMutex->Acquire();
+    m_sigStopMutex->Acquire();
     if (m_signatureThread) {
         m_bKillSignature = true;
         if (m_sigspmo) {
@@ -1444,7 +1444,7 @@ GenerateSignature(Event *pEvent)
         delete m_signatureThread;
         m_signatureThread = NULL;
     }
-	m_sigStopMutex->Release();
+    m_sigStopMutex->Release();
         
     m_signatureThread = Thread::CreateThread();
     if (m_signatureThread) {

@@ -134,13 +134,17 @@ void MusicBrowserUI::StillNeedSignature(void)
     string caption = "Relatable Not Enabled";
     string message;
 
+    int numstill = m_context->catalog->GetNumNeedingSigs();
+    int numtotal = m_context->catalog->GetTotalNumTracks();
+    
+    int togo = (int)(numtotal * 0.75) - (numtotal - numstill);
     char numtracks[10];
-    sprintf(numtracks, "%d", m_context->catalog->GetNumNeedingSigs());
+    sprintf(numtracks, "%d", togo);
 
     if (!m_sigsStart)
-        message = string("Before using any of the Relatable features, all tracks in your music collection need to be signatured.  "The_BRANDING" is currently in the process of generating the signatures, but there are still ") + string(numtracks) + string(" left to go.  NOTE: Signaturing will currently not take place while songs are being played.");
+        message = string("Before using any of the Relatable features, at least 75 percent of the tracks in your music collection need to be signatured.  "The_BRANDING" is currently in the process of generating the signatures, but there are still ") + string(numtracks) + string(" left to go.  NOTE: Signaturing will currently not take place while songs are being played.");
     else
-        message = string("Before using any of the Relatable features, all tracks in your music collection need to be signatured.  "The_BRANDING" needs to signature ") + string(numtracks) + string(" track(s).  Please click on 'Start Signaturing' in the Relatable menu.  NOTE: Signaturing will currently not take place while songs are being played.");
+        message = string("Before using any of the Relatable features, at least 75 percent of the tracks in your music collection need to be signatured.  "The_BRANDING" needs to signature ") + string(numtracks) + string(" track(s).  Please click on 'Start Signaturing' in the Relatable menu.  NOTE: Signaturing will currently not take place while songs are being played.");
 
     MessageBox(m_hWnd, message.c_str(), caption.c_str(), MB_OK|MB_ICONSTOP|MB_SETFOREGROUND);
 }
@@ -156,7 +160,10 @@ void MusicBrowserUI::SubmitPlaylistEvent(void)
         return;
     }
 
-    if (m_context->catalog->GetNumNeedingSigs() > 0) {
+    int totaltracks = m_context->catalog->GetTotalNumTracks();
+    int needingsigs = m_context->catalog->GetNumNeedingSigs();
+
+    if ((needingsigs * 100) / totaltracks > 25) {
         StillNeedSignature();
         return;
     }
@@ -180,7 +187,7 @@ void MusicBrowserUI::SubmitPlaylistEvent(void)
             {
                 items.push_back(pPlaylistItem);
             }
-		} 
+	} 
     }
 
    vector<PlaylistItem*>::iterator i;
@@ -188,16 +195,27 @@ void MusicBrowserUI::SubmitPlaylistEvent(void)
    if (!items.empty())
    {
        APSPlaylist InputPlaylist;
+       bool allgood = true;
 
        // Assumes that GUID's are set properly in meta structures
        for (i = items.begin(); i != items.end(); i++)
        {
-           InputPlaylist.Insert((*i)->GetMetaData().GUID().c_str(), (*i)->URL().c_str());
+           if ((*i)->GetMetaData().GUID().size() != 16) {
+               allgood = false;
+               break;
+           }
+           InputPlaylist.Insert((*i)->GetMetaData().GUID().c_str(), 
+                                (*i)->URL().c_str());
        }
 
-       uint32 nResponse = 0;
+       if (allgood)
+           pInterface->APSSubmitPlaylist(&InputPlaylist); 
+       else {
+            string caption = "Learn Playlist Error";
+            string message = "The item(s) you selected to train the Relatable Engine with are not signatured.  If signaturing is presently taking place, please wait a while longer and try again.  Otherwise, select 'Start Signaturing' from the Relatable menu to start the signaturing process.";
 
-       nResponse = pInterface->APSSubmitPlaylist(&InputPlaylist); 
+            MessageBox(m_hWnd, message.c_str(), caption.c_str(), MB_OK|MB_ICONSTOP|MB_SETFOREGROUND);
+       }
    }
    else {
       string caption = "Learn Playlist Error";
@@ -219,7 +237,10 @@ void MusicBrowserUI::GenSLPlaylistEvent(float fMax)
         return;
     }
 
-    if (m_context->catalog->GetNumNeedingSigs() > 0) {
+    int totaltracks = m_context->catalog->GetTotalNumTracks();
+    int needingsigs = m_context->catalog->GetNumNeedingSigs();
+
+    if ((needingsigs * 100) / totaltracks > 25) {
         StillNeedSignature();
         return;
     }
@@ -230,7 +251,24 @@ void MusicBrowserUI::GenSLPlaylistEvent(float fMax)
     {
         GetSelectedPlaylistItems(&items);
     }
-    GenSLPlaylistEvent(&items, fMax);
+
+    bool allgood = true;
+    vector<PlaylistItem *>::iterator j = items->begin();
+    for (; j != items->end(); j++) {
+        if ((*j)->GetMetaData().GUID().size() != 16) {
+            allgood = false;
+            break;
+        }
+    }
+
+    if (allgood)
+        GenSLPlaylistEvent(&items, fMax);
+    else {
+        string caption = "Generate SoundsLike Error";
+        string message = "The item(s) you selected to seed the Relatable Engine with are not signatured.  If signaturing is presently taking place, please wait a while longer and try again.  Otherwise, select 'Start Signaturing' from the Relatable menu to start the signaturing process.";
+
+        MessageBox(m_hWnd, message.c_str(), caption.c_str(), MB_OK|MB_ICONSTOP|MB_SETFOREGROUND);
+    }
 }
 
 void MusicBrowserUI::GenSLPlaylistEvent(vector<PlaylistItem*>* pSeed, float fMax)
@@ -326,7 +364,10 @@ void MusicBrowserUI::GenPlaylistEvent()
         return;
     }
 
-    if (m_context->catalog->GetNumNeedingSigs() > 0) {
+    int totaltracks = m_context->catalog->GetTotalNumTracks();
+    int needingsigs = m_context->catalog->GetNumNeedingSigs();
+
+    if ((needingsigs * 100) / totaltracks > 25) {
         StillNeedSignature();
         return;
     }
@@ -351,7 +392,10 @@ void MusicBrowserUI::GenPlaylistEvent(vector<PlaylistItem*>* pSeed)
         return;
     }
 
-    if (m_context->catalog->GetNumNeedingSigs() > 0) {
+    int totaltracks = m_context->catalog->GetTotalNumTracks();
+    int needingsigs = m_context->catalog->GetNumNeedingSigs();
+
+    if ((needingsigs * 100) / totaltracks > 25) {
         StillNeedSignature();
         return;
     }
@@ -363,12 +407,27 @@ void MusicBrowserUI::GenPlaylistEvent(vector<PlaylistItem*>* pSeed)
         APSPlaylist InputPlaylist;
         vector<PlaylistItem *>::iterator i;
 
-        for (i = pSeed->begin(); i != pSeed->end(); i++)
+        bool allgood = true;
+        for (i = pSeed->begin(); i != pSeed->end(); i++) {
+            if ((*i)->GetMetaData().GUID().size() != 16) {
+                allgood = false;
+                break;
+            }
             InputPlaylist.Insert((*i)->GetMetaData().GUID().c_str(),
                                  (*i)->URL().c_str());
+        }
 
-        nResponse = m_context->aps->APSGetPlaylist(&InputPlaylist,
-                                                   &ResultPlaylist);
+        if (allgood)
+            nResponse = m_context->aps->APSGetPlaylist(&InputPlaylist,
+                                                       &ResultPlaylist);
+        else {
+            string caption = "Generate Playlist Error";
+            string message = "The item(s) you selected to seed the Relatable Engine with are not signatured.  If signaturing is presently taking place, please wait a while longer and try again.  Otherwise, select 'Start Signaturing' from the Relatable menu to start the signaturing process.";
+
+            MessageBox(m_hWnd, message.c_str(), caption.c_str(), MB_OK|MB_ICONSTOP|MB_SETFOREGROUND);
+
+            return;
+        }
     }
     else {
         APSPlaylist InputPlaylist;
@@ -376,11 +435,11 @@ void MusicBrowserUI::GenPlaylistEvent(vector<PlaylistItem*>* pSeed)
                                                    &ResultPlaylist);
     }
 
-	bool messageError = true;
+    bool messageError = true;
 
     if (nResponse == APS_NOERROR) {
         if (ResultPlaylist.Size() > 0) {
-			messageError = false;
+   	    messageError = false;
             vector<string> newitems;
             string strTemp;
             string strFilename;

@@ -812,15 +812,18 @@ int APSInterface::SyncLog()
         }
        
         fIn.close();
-        nRes = m_pYpClient->SyncLog(TheLog, 
-                                    (*m_pProfileMap)[m_strCurrentProfile]);
-       
-        if (nRes == 0)
+        if (TheLog.size() > 0)
         {
-           // empty the log file
-           fIn.open(logfilename.c_str(), ios_base::out | ios_base::trunc);
-           if (fIn.is_open())
-              fIn.close();
+            nRes = m_pYpClient->SyncLog(TheLog, 
+                                        (*m_pProfileMap)[m_strCurrentProfile]);
+       
+            if (nRes == 0)
+            {
+               // empty the log file
+               fIn.open(logfilename.c_str(), ios_base::out | ios_base::trunc);
+               if (fIn.is_open())
+                   fIn.close();
+            }
         }
     }
                       
