@@ -222,9 +222,11 @@ BeOSCanvas::Invalidate( Rect& oRect )
     CHECK_POINT_MSG( "Invalidate" );
     if ( m_canvasView->Window() )
     {
-        m_canvasView->LockLooper();
-        m_canvasView->Invalidate();
-        m_canvasView->UnlockLooper();
+        if ( m_canvasView->LockLooper() )
+        {
+            m_canvasView->Invalidate();
+            m_canvasView->UnlockLooper();
+        }
     }
     else
     {

@@ -29,7 +29,6 @@ ____________________________________________________________________________*/
 #include "PrefView.h"
 #endif
 
-#define DEBUG 1
 #if DEBUG
 #include <be/support/Debug.h>
 #define CHECK_POINT CHECK_POINT_MSG("")

@@ -92,6 +92,7 @@ Error ThemeManager::GetThemeList(map<string, string> &oThemeFileMap)
         }
         while(FindNextFile(handle, &find));
 
+#if 0
     oThemeBasePath = "./themes";
     oThemePath = oThemeBasePath + string("/*.fat");
     handle = FindFirstFile((char *)oThemePath.c_str(), &find);
@@ -104,6 +105,7 @@ Error ThemeManager::GetThemeList(map<string, string> &oThemeFileMap)
             oThemeFileMap[find.cFileName] = oThemeFile;
         }
         while(FindNextFile(handle, &find));
+#endif
 
     return kError_NoErr;
 }
