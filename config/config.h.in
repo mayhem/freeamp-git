@@ -71,7 +71,7 @@ ____________________________________________________________________________*/
 #undef HAVE_LIBVORBIS 
 #undef HAVE_ID3V2
 
-#undef USING_IMLIB
+#undef USING_GDKPIXBUF
 
 #define HAVE_UNISTD_H 0
 #define HAVE_IO_H 0

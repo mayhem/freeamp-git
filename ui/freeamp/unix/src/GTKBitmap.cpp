@@ -33,6 +33,10 @@ extern "C" {
 #include <sys/stat.h>
 #include <unistd.h>
 
+#ifdef USING_GDKPIXBUF
+#include <gdk-pixbuf/gdk-pixbuf.h>
+#endif
+
 // This is basically bmp.c from xmms, although cleaned up and with a couple 
 // additions/fixes from imlib's bmp loader.
 
@@ -54,9 +58,9 @@ GTKBitmap::GTKBitmap(string &oName)
           :Bitmap(oName)
 {
     m_oBitmapName = oName;
+    shape_set = false;
     m_Bitmap = NULL;
     m_MaskBitmap = NULL;
-    shape_set = false;
     gdk_threads_enter();
     m_GC = gdk_gc_new(gdk_window_foreign_new(GDK_ROOT_WINDOW()));
     gdk_threads_leave();
@@ -120,20 +124,7 @@ Error GTKBitmap::ReadleLong(FILE *file, gulong *ret)
 
 Error GTKBitmap::LoadBitmapFromDisk(string &oFile)
 {
-    FILE *file;
-    gchar type[2];
-    gulong size, offset, headSize, w, h, comp, imgsize, j, k, l;
-    gushort tmpShort, planes, bitcount, ncols, skip;
-    guchar tempchar, *data, *data_end, byte = 0, g, b, r, *buffer, *buffer_end;
     struct stat statbuf;
-    register guchar *ptr, *buffer_ptr;
-    register gulong i;
-    register gushort x, y;
-    RGBQUAD rgbQuads[256];
-
-    gulong rmask = 0xff, gmask = 0xff, bmask = 0xff;
-    gulong rshift = 0, gshift = 0, bshift = 0;
-
     string filename = oFile;
 
     if (stat(filename.c_str(), &statbuf) == -1) {
@@ -141,6 +132,39 @@ Error GTKBitmap::LoadBitmapFromDisk(string &oFile)
         if (stat(filename.c_str(), &statbuf) == -1) 
             return kError_LoadBitmapFailed;
     }
+
+#ifdef USING_GDKPIXBUF
+    GdkPixbuf *pixbuf;
+
+    gdk_threads_enter();
+    pixbuf = gdk_pixbuf_new_from_file(filename.c_str());
+    if (pixbuf) {
+        GdkPixbuf *newbuf;
+        newbuf = gdk_pixbuf_add_alpha(pixbuf, TRUE, m_oTransColor.red, 
+                                      m_oTransColor.green, m_oTransColor.blue);
+        gdk_pixbuf_render_pixmap_and_mask(newbuf, &m_Bitmap, &m_MaskBitmap, 
+                                          255);
+        gdk_pixbuf_unref(newbuf);
+        gdk_pixbuf_unref(pixbuf);
+        gdk_threads_leave();
+        return kError_NoErr;
+    }
+    gdk_threads_leave();
+    cout << "Gdk-Pixbuf: Falling back to native loader.\n";
+#endif
+
+    FILE *file;
+    gchar type[2];
+    gulong size, offset, headSize, w, h, comp, imgsize, j, k, l;
+    gushort tmpShort, planes, bitcount, ncols, skip;
+    guchar tempchar, *data, *data_end, byte = 0, g, b, r, *buffer, *buffer_end;
+    register guchar *ptr, *buffer_ptr;
+    register gulong i;
+    register gushort x, y;
+    RGBQUAD rgbQuads[256];
+
+    gulong rmask = 0xff, gmask = 0xff, bmask = 0xff;
+    gulong rshift = 0, gshift = 0, bshift = 0;
 
     size = statbuf.st_size;
 
@@ -616,18 +640,5 @@ Error GTKBitmap::MakeTransparent(Rect &oRect)
                        oRect.Width(), oRect.Height());
     gdk_gc_unref(tempgc);
     gdk_threads_leave();    
-
     return kError_NoErr;
 }
-
-void GTKBitmap::BlitIt(int x, int y)
-{
-   GdkGC *m_GC;
-
-   gdk_threads_enter();
-   m_GC = gdk_gc_new(gdk_window_foreign_new(GDK_ROOT_WINDOW()));
-   gdk_draw_pixmap(gdk_window_foreign_new(GDK_ROOT_WINDOW()), m_GC, 
-                   m_MaskBitmap, 0, 0, x, y, m_width, m_height);
-   gdk_gc_unref(m_GC);
-   gdk_threads_leave();    
-} 

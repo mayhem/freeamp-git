@@ -85,9 +85,10 @@ Error Winamp::ConvertToNative(string &oDir)
 
     m_context->prefs->GetInstallDirectory(dir, &len);
     sourcePath = string(dir);
-#if defined(unix)
-    sourcePath += string(BRANDING_SHARE_PATH);
+#ifdef unix
+    sourcePath += string("/freeamp");
 #endif
+    sourcePath += string(DIR_MARKER_STR) + string("plugins");
     sourcePath += string(DIR_MARKER_STR) + string("winamp_theme.xml");
 
     destPath = oDir + string(DIR_MARKER_STR) + string("theme.xml");

@@ -15,7 +15,7 @@ install-plugins: plugins
 	     $(INSTALL_PROGRAM) $$p $(DESTDIR)$(libdir)/freeamp/`echo $$p|sed '$(transform)'`; \
 	  else :; fi; \
 	done
-	$(INSTALL_PROGRAM) ftc/winamp/winamp_theme.xml $(DESTDIR)$(datadir)/freeamp/winamp_theme.xml
+	$(INSTALL_PROGRAM) ftc/winamp/winamp_theme.xml $(DESTDIR)$(libdir)/freeamp/plugins/winamp_theme.xml
 
 uninstall_plugins uninstall-plugins:
 	@list=`ls plugins/*.*`; for p in $$list; do \
@@ -217,7 +217,7 @@ UNIXFREEAMPUIOBJ += ui/freeamp/unix/src/ttfont.o
 UNIXFREEAMPUIOBJ += ui/freeamp/unix/src/ThemeManager.o 
 UNIXFREEAMPUIOBJ += ui/freeamp/unix/src/GTKPreferenceWindow.o 
 UNIXFREEAMPUIOBJ += ui/freeamp/unix/src/GTKFileSelector.o  
-UNIXFREEAMPUILIBS = $(GTK_LIBS) $(TTF_LIBS) 
+UNIXFREEAMPUILIBS = $(GTK_LIBS) $(TTF_LIBS) $(GDK_PIXBUF_LIBS)
 
 BEOSFREEAMPUIOBJ  = ui/freeamp/beos/src/BeOSWindow.o
 BEOSFREEAMPUIOBJ += ui/freeamp/beos/src/BeOSBitmap.o

@@ -59,11 +59,9 @@ class GTKBitmap : public Bitmap
 
      GdkPixmap *GetBitmap() { return m_Bitmap; }
      GdkPixmap *GetMask() { return m_MaskBitmap; }
-     void       SetMask(GdkPixmap *mask) { m_MaskBitmap = mask; }
-
-void BlitIt(int x, int y);
 
     protected:
+
      Error ReadleShort(FILE *file, gushort *ret);
      Error ReadleLong(FILE *file, gulong *ret);
 
