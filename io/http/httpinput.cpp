@@ -374,7 +374,7 @@ HttpInput::Win32GetHostByName(char *szHostName, struct hostent *pHostInfo)
       // That didn't work.  On some stacks a numeric IP address
       // will not parse with gethostbyname.  Try to convert it as a
       // numeric address before giving up.
-      if ((int) (IP_Adr = inet_addr(szHostName)) < 0)
+      if ((int) (IP_Adr = inet_addr(szHostName)) == INADDR_ANY)
          return kError_NoDataAvail;
 
       pHostInfo->h_length = sizeof(uint32);
@@ -428,13 +428,14 @@ HttpInput::GetHostByName(char *szHostName, struct hostent * pResult)
 #else
    pTemp = gethostbyname(szHostName);
 #endif
+pTemp = NULL;
 
    if (pTemp == NULL)
    {
       // That didn't work.  On some stacks a numeric IP address
       // will not parse with gethostbyname.  Try to convert it as a
       // numeric address before giving up.
-      if ((int) (IP_Adr = inet_addr(szHostName)) < 0)
+      if ((int) (IP_Adr = inet_addr(szHostName)) == INADDR_ANY)
          return kError_NoDataAvail;
 
       TempHostent.h_length = sizeof(uint32);
