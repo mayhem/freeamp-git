@@ -24,8 +24,12 @@ ____________________________________________________________________________*/
 #ifndef DIB_H
 #define DIB_H
 
+/* system headers */
+#define STRICT
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
+/* project headers */
 #include "config.h"
 
 typedef struct Color {
@@ -53,7 +57,7 @@ public:
 						uint32 height,
 						uint32 bitsPerPixel = 8);
 
-	virtual bool Load(HANDLE module, LPCTSTR resource);
+	virtual bool Load(HMODULE module, LPCTSTR resource);
 
     void Pixel(int32 x, int32 y, Color* color);
     uint32 Pixel(int32 x, int32 y);

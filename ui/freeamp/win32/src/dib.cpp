@@ -22,8 +22,12 @@
 	$Id$
 ____________________________________________________________________________*/
 
+/* system headers */
 #include <assert.h>
+#include <malloc.h>
+#include <math.h>
 
+/* project headers */
 #include "dib.h"
 
 
@@ -143,7 +147,7 @@ Create( uint32 width,
 
 bool 
 DIB::
-Load(HANDLE module, LPCTSTR resource) 
+Load(HMODULE module, LPCTSTR resource) 
 {
     bool result = false;
     HRSRC rsrcHandle = NULL;
