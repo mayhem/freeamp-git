@@ -33,7 +33,6 @@ using namespace std;
 
 #include "event.h"
 #include "playlist.h"
-#include "musicbrowser.h"
 #include "utility.h"
 
 class     LogicalMediaConverter;
@@ -548,6 +547,9 @@ public:
       szTitle[iSize - 1] = 0;
    }
 };
+
+class ArtistList;
+class AlbumList;
 
 class MusicCatalogTrackAddedEvent : public Event {
 private:
