@@ -721,12 +721,17 @@ if test "$have_alsa" = "true"; then
   AC_MSG_RESULT([compiling alsa pmo plugin])
 fi
 
-AC_CHECK_LIB(vorbisfile, ov_info,
- OSDEPPLUGINS="$OSDEPPLUGINS plugins/vorbis.lmc";
- OSDEPPLUGINS="$OSDEPPLUGINS plugins/vorbis.mdf";
- OSINC="$OSINC -I$srcdir/lmc/vorbis/include"
- AC_MSG_RESULT([compiling vorbis codec plugin]),, -lvorbis
-)
+AC_CHECK_LIB(ogg, ogg_sync_init, have_ogg="yes",)
+AC_CHECK_LIB(vorbisfile, ov_info, have_vorbis="yes",, -lvorbis -logg)
+
+if test "$have_ogg" = "yes"; then
+  if test "$have_vorbis" = "yes"; then
+     OSINC="$OSINC -I$srcdir/lmc/vorbis/include"
+     OSDEPPLUGINS="$OSDEPPLUGINS plugins/vorbis.lmc";
+     OSDEPPLUGINS="$OSDEPPLUGINS plugins/vorbis.mdf";
+     AC_MSG_RESULT([compiling vorbis codec plugin])
+  fi 
+fi 
 
 ID3_LIBS=""
 AC_CHECK_LIB(z, uncompress,
