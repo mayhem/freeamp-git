@@ -46,7 +46,7 @@ MCICallBack(HWAVEOUT hwo,
 		case WOM_DONE:
 		{
 			LPWAVEHDR lpWaveHdr = (LPWAVEHDR) dwParam1;
-			waveOutUnprepareHeader(&hwo, lpWaveHdr, sizeof(WAVEHDR));
+			waveOutUnprepareHeader(hwo, lpWaveHdr, sizeof(WAVEHDR));
 			//cerr << "Releasing: WAVHDR #" << lpWaveHdr->dwUser << endl;
 			lpWaveHdr->dwUser = 0;
 			ReleaseSemaphore(MCISemaphore, 1, NULL);
@@ -75,19 +75,26 @@ SoundCardPMO()
 SoundCardPMO::
 ~SoundCardPMO()
 {
-	if(m_user_stop) 
-	{
-		waveOutReset(m_hwo);
-	} 
 
-	if(m_initialized)
+    if(m_initialized)
 	{
+        char* buf = new char [m_data_size];
+
+        memset(buf, 0x00, m_data_size);
+
+        //for(int32 i = 0; i < 5; i++)
+       // {
+            Write(buf, m_data_size);
+        //}
+
+        delete [] buf;
+
 		// Unprepare and free the header memory.
-		for (int32 j = 2; j >= 0; j--) 
+		for (uint32 j = 0; j < m_num_headers; j++) 
 		{
-			if (m_wavehdr_array[j]->dwUser && !m_user_stop)
+			while(m_wavehdr_array[j]->dwUser)
 			{
-				WaitForSingleObject(MCISemaphore, 10000);
+				//WaitForSingleObject(MCISemaphore, 10000);
 			}
 
 			delete [] m_wavehdr_array[j]->lpData;
@@ -183,7 +190,7 @@ Init(OutputInfo* info)
 	   m_buffer[i] = i * m_channels;
 	}
 
-	MCISemaphore = CreateSemaphore(NULL, m_num_headers, 1024, "MCISemaphore");
+	MCISemaphore = CreateSemaphore(NULL, m_num_headers, m_num_headers, "MCISemaphore");
 
 	m_initialized = true; 
 
@@ -210,7 +217,6 @@ int32
 SoundCardPMO::
 Write(void *pBuffer,int32 length) 
 {
-
 	//cerr << "WriteThis: " << length << " bytes" << endl;
 	WaitForSingleObject(MCISemaphore, 10000);
 
@@ -278,7 +284,7 @@ Clear()
 {
 	waveOutReset(m_hwo);
 
-	if(m_initialized)
+	/*if(m_initialized)
 	{
 		uint32 i;
 
@@ -307,5 +313,5 @@ Clear()
 
 		// Force the m_buffers to m_fillup before playing.
 		m_fillup = m_buffer_count = 0;
-	}
+	}*/
 }

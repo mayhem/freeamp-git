@@ -477,7 +477,9 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
                         isPaused = false;
                     }
                     else
+                    {
                         m_ui->m_target->AcceptEvent( m_ui->m_target, new Event(CMD_Play));
+                    }
 
 					break;
 				}
@@ -571,6 +573,7 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 						}
 
 						m_ui->m_target->AcceptEvent(m_ui->m_target, new Event(CMD_SetPlaylist,playlist));
+                        EnableWindow(m_ui->m_hwndPlay, TRUE);
 					}
 
 					delete [] filelist;
@@ -653,6 +656,7 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 			}
 
 			m_ui->m_target->AcceptEvent(m_ui->m_target, new Event(CMD_SetPlaylist,playlist));
+            EnableWindow(m_ui->m_hwndPlay, TRUE);
 
 			break;
 		}
