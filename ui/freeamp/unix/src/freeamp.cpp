@@ -39,6 +39,7 @@ ____________________________________________________________________________*/
 
 #include "windowhash.h"
 #include "graphics.h"
+#include "queue.h"
 
 #define DEFINE_FONT_WIDTHS
 #include "font_width.h"
@@ -53,8 +54,10 @@ UserInterface *Initialize() {
 	   }
 
 FreeAmpUI::FreeAmpUI() {
+    XInitThreads();
     m_windowHash = new WindowHash();
     m_done = false;
+    m_initialized = false;
 }
 FreeAmpUI::~FreeAmpUI() {
     if (m_windowHash) {
@@ -72,39 +75,6 @@ void FreeAmpUI::SetPlayListManager(PlayListManager *plm) {
 
 void FreeAmpUI::Init()
 {
-
-    char *arg = NULL;
-    bool shuffle = false;
-    bool autoplay = false;
-    int32 count = 0;
-
-    for(int32 i = 1;i < m_argc; i++) {
-	arg = m_argv[i];
-	
-	if (arg[0] == '-') {
-	    switch (arg[1]) {
-		case 's':
-                    shuffle = true;
-		    break;
-                case 'p':
-                    autoplay = true;
-		    break;
-            }
-        } else {
-            m_plm->Add(arg,0);
-            count++;
-	}
-    }
-
-    m_plm->SetFirst();
-    
-    if(shuffle) 
-        m_plm->SetShuffle(SHUFFLE_SHUFFLED);
-    
-    if(autoplay)
-       m_playerEQ->AcceptEvent(new Event(CMD_Play));
-
-
 
     XSizeHints *size_hints;
     XIconSize *size_list;
@@ -138,7 +108,8 @@ void FreeAmpUI::Init()
     /* get screen size from display structure macro */
     m_screenNum = DefaultScreen(m_display);
     display_depth = DefaultDepth(m_display,m_screenNum);
-    cerr << endl<<endl<<"Screen Depth: " << display_depth << endl;
+
+//    cerr << endl<<endl<<"Screen Depth: " << display_depth << endl;
     
 //    m_mainWindow = XCreateSimpleWindow(m_display, RootWindow(m_display,m_screenNum), 
 //			      0, 0, TOTAL_WIDTH, TOTAL_HEIGHT, 0,
@@ -194,7 +165,9 @@ void FreeAmpUI::Init()
     m_lcdWindow = new FALcdWindow(m_display,m_screenNum,m_gc,m_mainWindow->GetWindow(),LCD_DISPLAY_X,LCD_DISPLAY_Y,LCD_DISPLAY_WIDTH,LCD_DISPLAY_HEIGHT);
 
     m_volumeWindow = new FADialWindow(m_display,m_screenNum,m_gc,m_mainWindow->GetWindow(), VOLUME_DIAL_X,VOLUME_DIAL_Y,SINGLE_DIAL_WIDTH,DIALS_HEIGHT);
+    m_volumeWindow->SetMotionFunction(VolumeDialFunction,this);
     m_seekWindow = new FADialWindow(m_display,m_screenNum,m_gc,m_mainWindow->GetWindow(), SEEK_DIAL_X,SEEK_DIAL_Y,SINGLE_DIAL_WIDTH,DIALS_HEIGHT);
+    m_seekWindow->SetMotionFunction(SeekDialFunction,this);
 
     if (display_depth >= 15) {
 	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),logo,&m_iconPixmap,NULL,NULL);	    
@@ -229,6 +202,10 @@ void FreeAmpUI::Init()
 	
 	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),small_font,&small_font_pixmap,NULL,NULL);
 	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),big_font,&big_font_pixmap,NULL,NULL);
+
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),shuffled_icon,&shuffled_icon_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),repeat_icon,&repeat_icon_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),all_icon,&all_icon_pixmap,NULL,NULL);
     } else if (display_depth >= 8) {
 	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),logo256,&m_iconPixmap,NULL,NULL);
 	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),leftside256,&left_side_pixmap,NULL,NULL);
@@ -262,6 +239,11 @@ void FreeAmpUI::Init()
 	
 	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),small_font256,&small_font_pixmap,NULL,NULL);
 	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),big_font256,&big_font_pixmap,NULL,NULL);
+
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),shuffled_icon256,&shuffled_icon_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),repeat_icon256,&repeat_icon_pixmap,NULL,NULL);
+	XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),all_icon256,&all_icon_pixmap,NULL,NULL);
+
     } else {
 	cerr << "Only know how to deal with bit depths  >= 8 !!!" << endl;
 	m_playerEQ->AcceptEvent(new Event(CMD_QuitPlayer));
@@ -300,6 +282,17 @@ void FreeAmpUI::Init()
     m_lcdWindow->SetSmallFontWidth(smallFontWidth);
     m_lcdWindow->SetLargeFontPixmap(big_font_pixmap);
     m_lcdWindow->SetLargeFontWidth(largeFontWidth);
+    XRectangle r;
+    m_lcdWindow->SetShufflePixmap(shuffled_icon_pixmap);
+    r.x = SHUFFLED_ICON_X; r.y = SHUFFLED_ICON_Y; r.width = SHUFFLED_ICON_WIDTH; r.height = SHUFFLED_ICON_HEIGHT;
+    m_lcdWindow->SetShuffleRect(r);
+    m_lcdWindow->SetRepeatPixmap(repeat_icon_pixmap);
+    r.x = REPEAT_ICON_X; r.y = REPEAT_ICON_Y; r.width = REPEAT_ICON_WIDTH; r.height = REPEAT_ICON_HEIGHT;
+    m_lcdWindow->SetRepeatRect(r);
+    m_lcdWindow->SetRepeatAllPixmap(all_icon_pixmap);
+    r.x = REPEAT_ALL_ICON_X; r.y = REPEAT_ALL_ICON_Y; r.width = REPEAT_ALL_ICON_WIDTH; r.height = REPEAT_ALL_ICON_HEIGHT;
+    m_lcdWindow->SetRepeatAllRect(r);
+
     m_playListDrawerWindow->SetPixmap(playlist_drawer_pixmap);
     m_playListDrawerWindow->SetMask(playlist_drawer_mask_pixmap);
 
@@ -383,19 +376,6 @@ void FreeAmpUI::Init()
     m_shuffleButton->SetMask(minor_button_mask_pixmap);
     m_openButton->SetMask(minor_button_mask_pixmap);
 
-    gtkListenThread = Thread::CreateThread();
-    gtkListenThread->Create(FreeAmpUI::x11ServiceFunction,this);
-    
-
-}
-
-void FreeAmpUI::x11ServiceFunction(void *p) {
-    ((FreeAmpUI *)p)->X11EventService();
-}
-
-void FreeAmpUI::X11EventService() {
-    XEvent report;
-
     m_playButton->SetClickAction(playFunction,this);
     m_stopButton->SetClickAction(stopFunction,this);
     m_pauseButton->SetClickAction(pauseFunction,this);
@@ -425,6 +405,62 @@ void FreeAmpUI::X11EventService() {
     m_windowHash->Insert(m_playListDrawerWindow->GetWindow(),(FAWindow *)m_playListDrawerWindow);
     m_windowHash->Insert(m_volumeWindow->GetWindow(),(FAWindow *)m_volumeWindow);
     m_windowHash->Insert(m_seekWindow->GetWindow(),(FAWindow *)m_seekWindow);
+
+    m_initialized = true;
+
+
+
+
+
+
+    char *arg = NULL;
+    bool shuffle = false;
+    bool autoplay = false;
+    int32 count = 0;
+
+    for(int32 i = 1;i < m_argc; i++) {
+	arg = m_argv[i];
+	
+	if (arg[0] == '-') {
+	    switch (arg[1]) {
+		case 's':
+                    shuffle = true;
+		    break;
+                case 'p':
+                    autoplay = true;
+		    break;
+            }
+        } else {
+            m_plm->Add(arg,0);
+            count++;
+	}
+    }
+
+    m_plm->SetFirst();
+    
+    if(shuffle) 
+        m_plm->SetShuffle(SHUFFLE_SHUFFLED);
+    
+    if(autoplay)
+       m_playerEQ->AcceptEvent(new Event(CMD_Play));
+
+
+
+
+
+    gtkListenThread = Thread::CreateThread();
+    gtkListenThread->Create(FreeAmpUI::x11ServiceFunction,this);
+    
+
+}
+
+void FreeAmpUI::x11ServiceFunction(void *p) {
+    ((FreeAmpUI *)p)->X11EventService();
+}
+
+void FreeAmpUI::X11EventService() {
+    XEvent report;
+
     /* Display window */
     m_mainWindow->MapWindow();
     m_playButton->MapWindow();
@@ -443,17 +479,16 @@ void FreeAmpUI::X11EventService() {
     m_volumeWindow->MapWindow();
     m_seekWindow->MapWindow();
 
-    fprintf(stderr,"Main window ID: %x\n",m_mainWindow->GetWindow());
-    fprintf(stderr,"Play Button ID: %x\n",m_playButton->GetWindow());
-    fprintf(stderr,"PauseButton ID: %x\n",m_pauseButton->GetWindow());
-    fprintf(stderr,"Prev Button ID: %x\n",m_prevButton->GetWindow());
-    fprintf(stderr,"Next Button ID: %x\n",m_nextButton->GetWindow());
-    fprintf(stderr,"MinimizeButtonID: %x\n",m_minimizeButton->GetWindow());
+//    fprintf(stderr,"Main window ID: %x\n",m_mainWindow->GetWindow());
+//    fprintf(stderr,"Play Button ID: %x\n",m_playButton->GetWindow());
+//    fprintf(stderr,"PauseButton ID: %x\n",m_pauseButton->GetWindow());
+//    fprintf(stderr,"Prev Button ID: %x\n",m_prevButton->GetWindow());
+//    fprintf(stderr,"Next Button ID: %x\n",m_nextButton->GetWindow());
+//    fprintf(stderr,"MinimizeButtonID: %x\n",m_minimizeButton->GetWindow());
 
     /* get events, use first to display text and graphics */
     while (!m_done)  {
 	XNextEvent(m_display, &report);
-
 	//fprintf(stderr, "window ID: %x\n", report.xany.window);
         FAWindow *w = m_windowHash->Value(report.xany.window);
 	
@@ -462,6 +497,7 @@ void FreeAmpUI::X11EventService() {
 	    w->DoEvent(report);
 	}
     } /* end while */
+    m_playerEQ->AcceptEvent(new Event(CMD_QuitPlayer));
 }
 
 int32 FreeAmpUI::AcceptEvent(Event *e) {
@@ -479,12 +515,25 @@ int32 FreeAmpUI::AcceptEvent(Event *e) {
 	    m_stopButton->MapWindow();
 	    m_playButton->UnMapWindow();
 	    m_pauseButton->ClearActivated();
+	    XLockDisplay(m_display);
+	    m_pauseButton->Draw(0);
+	    XUnlockDisplay(m_display);
 	    break;
 	case INFO_Paused:
 	    m_pauseButton->SetActivated();
+	    m_stopButton->MapWindow();
+	    m_playButton->UnMapWindow();
+	    XLockDisplay(m_display);
+	    m_pauseButton->Draw(0);
+	    XUnlockDisplay(m_display);
 	    break;
 	case INFO_Stopped:
+	    m_lcdWindow->SetCurrentTime(0,0,0);
 	    m_pauseButton->ClearActivated();
+	    XLockDisplay(m_display);
+	    m_pauseButton->Draw(0);
+	    m_lcdWindow->Draw(FALcdWindow::TimeOnly);
+	    XUnlockDisplay(m_display);
 	    m_playButton->MapWindow();
 	    m_stopButton->UnMapWindow();
 	    break;
@@ -498,14 +547,61 @@ int32 FreeAmpUI::AcceptEvent(Event *e) {
 	    int32 m = (s % 3600) / 60;
 	    s = ((s % 3600) % 60);
 	    m_lcdWindow->SetTotalTime(h,m,s);
+	    m_lcdWindow->SetCurrentTime(0,0,0);
+	    XLockDisplay(m_display);
 	    m_lcdWindow->Draw(FALcdWindow::FullRedraw);
+	    XUnlockDisplay(m_display);
 	    break;
 	}
 	case INFO_MediaTimeInfo: {
 	    MediaTimeInfoEvent *info = (MediaTimeInfoEvent *)e;
 	    m_lcdWindow->SetCurrentTime(info->m_hours,info->m_minutes,info->m_seconds);
+	    XLockDisplay(m_display);
 	    m_lcdWindow->Draw(FALcdWindow::TimeOnly);
+	    XUnlockDisplay(m_display);
 	    break;
+	}
+	case INFO_PlayListRepeat: {
+	    PlayListRepeatEvent *plre = (PlayListRepeatEvent *)e;
+	    switch (plre->GetRepeatMode()) 
+	    {
+		case REPEAT_CURRENT:
+		    m_lcdWindow->SetIcon(FALcdWindow::REPEAT);
+		    m_lcdWindow->ClearIcon(FALcdWindow::REPEAT_ALL);
+		    break;
+		case REPEAT_ALL:
+		    m_lcdWindow->SetIcon(FALcdWindow::REPEAT);
+		    m_lcdWindow->SetIcon(FALcdWindow::REPEAT_ALL);
+		    break;
+		case REPEAT_NOT:
+		default:
+		    m_lcdWindow->ClearIcon(FALcdWindow::REPEAT);
+		    m_lcdWindow->ClearIcon(FALcdWindow::REPEAT_ALL);
+		    break;
+	    }
+	    XLockDisplay(m_display);
+	    m_lcdWindow->Draw(FALcdWindow::IconsOnly);
+	    XUnlockDisplay(m_display);
+	    break;
+	}
+	case INFO_PlayListShuffle:
+	{
+	    PlayListShuffleEvent *plse = (PlayListShuffleEvent *)e;
+	    
+	    switch (plse->GetShuffleMode()) 
+	    {
+		case SHUFFLE_NOT_SHUFFLED:
+		    m_lcdWindow->ClearIcon(FALcdWindow::SHUFFLE);
+		    break;
+		case SHUFFLE_SHUFFLED:
+		    m_lcdWindow->SetIcon(FALcdWindow::SHUFFLE);
+		    break;
+		default:
+		    m_lcdWindow->ClearIcon(FALcdWindow::SHUFFLE);
+	    };
+	    XLockDisplay(m_display);
+	    m_lcdWindow->Draw(FALcdWindow::IconsOnly);
+	    XUnlockDisplay(m_display);
 	}
 	default:
 	    break;
@@ -525,6 +621,7 @@ void FreeAmpUI::playFunction(void *p) {
     //((FreeAmpUI *)p)->m_stopButton->MapWindow();
     //((FreeAmpUI *)p)->m_playButton->UnMapWindow();
     ((FreeAmpUI *)p)->m_playerEQ->AcceptEvent(new Event(CMD_Play));
+    ((FreeAmpUI *)p)->m_lcdWindow->SetDisplayState(FALcdWindow::CurrentTimeState);
 }
 
 void FreeAmpUI::stopFunction(void *p) {
@@ -536,7 +633,12 @@ void FreeAmpUI::stopFunction(void *p) {
 
 void FreeAmpUI::pauseFunction(void *p) {
     cerr << "pause" << endl;
-    ((FreeAmpUI *)p)->m_playerEQ->AcceptEvent(new Event(CMD_TogglePause));
+    if (((FreeAmpUI *)p)->m_playButton->IsMapped()) {
+	((FreeAmpUI *)p)->m_playerEQ->AcceptEvent(new Event(CMD_PlayPaused));
+	((FreeAmpUI *)p)->m_lcdWindow->SetDisplayState(FALcdWindow::CurrentTimeState);
+    } else {
+	((FreeAmpUI *)p)->m_playerEQ->AcceptEvent(new Event(CMD_TogglePause));
+    }
 }
 
 void FreeAmpUI::prevFunction(void *p) {
@@ -562,7 +664,7 @@ void FreeAmpUI::minimizeFunction(void *p) {
 
 void FreeAmpUI::closeFunction(void *p) {
     cerr << "close" << endl;
-    ((FreeAmpUI *)p)->m_playerEQ->AcceptEvent(new Event(CMD_QuitPlayer));
+    ((FreeAmpUI *)p)->m_done = true;
 }
 
 void FreeAmpUI::repeatFunction(void *p) {
@@ -578,6 +680,63 @@ void FreeAmpUI::shuffleFunction(void *p) {
 void FreeAmpUI::openFunction(void *p) {
     cerr << "open" << endl;
 }
+
+// 0 = off
+// 1 = on
+// 2 = up
+// 3 = down
+// 5 = no change
+void FreeAmpUI::VolumeDialFunction(void *p, int32 y) {
+    cout << "volume y: " << y << endl;
+    switch (y) {
+	case 0:
+	    ((FreeAmpUI *)p)->m_lcdWindow->SetDisplayState( ((FreeAmpUI *)p)->m_oldLcdState);
+	    break;
+	case 1:
+	    ((FreeAmpUI *)p)->m_oldLcdState = ((FreeAmpUI *)p)->m_lcdWindow->GetDisplayState();
+	    ((FreeAmpUI *)p)->m_lcdWindow->SetDisplayState(FALcdWindow::VolumeState);
+	    break;
+	case 2: {
+	    int foo = ((FreeAmpUI *)p)->m_volume;
+	    foo++;
+	    if ( foo > 100) {
+		foo = 100;
+	    }
+	    ((FreeAmpUI *)p)->m_lcdWindow->SetVolume( foo );
+	    ((FreeAmpUI *)p)->m_lcdWindow->Draw(FALcdWindow::TimeOnly);
+	    ((FreeAmpUI *)p)->m_volume = foo;
+	    break; }
+	case 3: {
+	    int foo = ((FreeAmpUI *)p)->m_volume;
+	    foo--;
+	    if ( foo < 0) {
+		foo= 0;
+	    }
+	    ((FreeAmpUI *)p)->m_lcdWindow->SetVolume( foo );
+	    ((FreeAmpUI *)p)->m_lcdWindow->Draw(FALcdWindow::TimeOnly);
+	    ((FreeAmpUI *)p)->m_volume = foo;
+	    break; }
+    }
+}
+
+void FreeAmpUI::SeekDialFunction(void *p, int32 y) {
+    cout << "seek y: " << y << endl;
+    switch (y) {
+	case 0:
+	    ((FreeAmpUI *)p)->m_lcdWindow->SetDisplayState( ((FreeAmpUI *)p)->m_oldLcdState);
+	    break;
+	case 1:
+	    ((FreeAmpUI *)p)->m_oldLcdState = ((FreeAmpUI *)p)->m_lcdWindow->GetDisplayState();
+	    ((FreeAmpUI *)p)->m_lcdWindow->SetDisplayState(FALcdWindow::SeekTimeState);
+	    break;
+	case 2:
+	    break;
+	case 3:
+	    break;
+    }
+}
+
+
 
 
 

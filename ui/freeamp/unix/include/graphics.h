@@ -208,7 +208,29 @@ Pixmap small_font_pixmap;
 #include "big_font256.xpm"
 Pixmap big_font_pixmap;
 
+#define SHUFFLED_ICON_X 145
+#define SHUFFLED_ICON_Y 4
+#define SHUFFLED_ICON_WIDTH 11
+#define SHUFFLED_ICON_HEIGHT 6
+#include "shuffled_icon.xpm"
+#include "shuffled_icon256.xpm"
+Pixmap shuffled_icon_pixmap;
 
+#define REPEAT_ICON_X 144
+#define REPEAT_ICON_Y 14
+#define REPEAT_ICON_WIDTH 12
+#define REPEAT_ICON_HEIGHT 7
+#include "repeat_icon.xpm"
+#include "repeat_icon256.xpm"
+Pixmap repeat_icon_pixmap;
+
+#define REPEAT_ALL_ICON_X 145
+#define REPEAT_ALL_ICON_Y 21
+#define REPEAT_ALL_ICON_WIDTH 11
+#define REPEAT_ALL_ICON_HEIGHT 8
+#include "all_icon.xpm"
+#include "all_icon256.xpm"
+Pixmap all_icon_pixmap;
 
 
 #endif // _GRAPHICS_H_

@@ -155,17 +155,17 @@ public:
 
 
 class PlayListManager {
-public:
-
  public:
     PlayListManager(EventQueue *);
     ~PlayListManager();
     void Add(char *,int);
-	Error RemoveAll();
+    Error RemoveAll();
     void SetSkip(int32 f) { m_skipNum = f; } // logical media units to skip at beginning
     int32 GetSkip() { return m_skipNum; }
 
     void AcceptEvent(Event *);
+
+    bool NextIsSame();
 
     PlayListItem *GetCurrent();
     void SetFirst();

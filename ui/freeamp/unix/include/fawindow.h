@@ -36,6 +36,8 @@ ____________________________________________________________________________*/
 #include "config.h"
 #include "event.h"
 
+
+
 class FAWindow {
  protected:
     bool m_mapped;
@@ -61,30 +63,33 @@ class FAWindow {
     void MapWindow();
     void UnMapWindow();
     void SelectInput(int32);
+    bool IsMapped();
     virtual void DoEvent(XEvent) = 0;
+    virtual void Draw(int32) = 0;
 };
 
 class FAMainWindow : public FAWindow {
  private:
     int32 m_buttonClickSpotX,m_buttonClickSpotY;
-    void Draw();
  public:
     FAMainWindow(Display *, int32,GC, Window,int32,int32,int32,int32);
     virtual ~FAMainWindow();
     virtual void DoEvent(XEvent);
+    virtual void Draw(int32);
 };
 
 class FADumbWindow : public FAWindow {
  private:
-    void Draw();
  public:
     FADumbWindow(Display *, int32,GC, Window,int32,int32,int32,int32);
     virtual ~FADumbWindow();
     virtual void DoEvent(XEvent);
+    virtual void Draw(int32);
 };
 
 
 typedef void (*action_function)(void *);
+
 
 class FATriStateWindow : public FAWindow {
  private:
@@ -93,7 +98,6 @@ class FATriStateWindow : public FAWindow {
     bool m_pressed;
     bool m_insideButton;
     int32 m_partialHeight;
-    void Draw();
     void *m_cookie;
     action_function m_clickFunction;
  public:
@@ -102,10 +106,12 @@ class FATriStateWindow : public FAWindow {
     void SetPartialHeight(int32);
     void SetActivated();
     void ClearActivated();
+    bool IsActivated();
     void SetClickAction(action_function,void *);
     void SetCurrentTime(int32 h, int32 m, int32 s);
     void SetTotalTime(int32 h, int32 m, int32 s);
     virtual void DoEvent(XEvent);
+    virtual void Draw(int32);
 };
 
 class FALcdWindow : public FAWindow {
@@ -121,10 +127,17 @@ class FALcdWindow : public FAWindow {
     Pixmap m_largeFontPixmap;
     Pixmap m_doubleBufferPixmap;
     int32 m_displayState;
+    int32 m_volume;
     Pixmap m_mainTextMask;
     Pixmap m_iconMask;
-
+    Pixmap m_shufflePixmap;
+    Pixmap m_repeatPixmap;
+    Pixmap m_repeatAllPixmap;
+    XRectangle m_shuffleRect;
+    XRectangle m_repeatRect;
+    XRectangle m_repeatAllRect;
     GC m_timeGC;
+    GC m_iconGC;
 
     bool m_insideDisplay;
 
@@ -139,8 +152,15 @@ class FALcdWindow : public FAWindow {
     void DrawSeekTimeState(int32);
     void DrawRemainingTimeState(int32);
     void DrawTotalTimeState(int32);
-
+    bool m_iconStates[3];
+    void BlitIcons(Drawable);
   public:
+    enum {
+	SHUFFLE = 0,
+	REPEAT,
+	REPEAT_ALL,
+	MAX
+    };
     enum {
 	IntroState,
 	VolumeState,
@@ -152,11 +172,18 @@ class FALcdWindow : public FAWindow {
     };
     enum {
 	FullRedraw,
-	TimeOnly
+	TimeOnly,
+	IconsOnly
     };
     FALcdWindow(Display *,int32,GC,Window,int32,int32,int32,int32);
     virtual ~FALcdWindow();
     virtual void DoEvent(XEvent);
+    void SetShufflePixmap(Pixmap p) { m_shufflePixmap = p; }
+    void SetShuffleRect(XRectangle r) { m_shuffleRect = r; }
+    void SetRepeatPixmap(Pixmap p) { m_repeatPixmap = p; }
+    void SetRepeatRect(XRectangle r) { m_repeatRect = r; }
+    void SetRepeatAllPixmap(Pixmap p) { m_repeatAllPixmap = p; }
+    void SetRepeatAllRect(XRectangle r) { m_repeatAllRect = r; }
     void SetSmallFontPixmap(Pixmap);
     void SetSmallFontWidth(int *);
     void SetLargeFontPixmap(Pixmap);
@@ -164,21 +191,28 @@ class FALcdWindow : public FAWindow {
     void SetMainText(const char *);
     void SetCurrentTime(int32 h, int32 m, int32 s);
     void SetTotalTime(int32 h, int32 m, int32 s);
-
+    void SetIcon(int32);
+    void ClearIcon(int32);
     void SetDisplayState(int32);
-    void Draw(int32);
+    void SetVolume(int32);
+    int32 GetDisplayState() { return m_displayState; }
+    virtual void Draw(int32);
 };
+
+typedef void (*dial_motion_function)(void *,int32);
 
 class FADialWindow : public FAWindow {
  private:
-    void Draw();
-    int32 m_buttonClickSpotX, m_buttonClickSpotY;
+    int32 m_buttonClickSpotX, m_buttonClickSpotY,m_prevY;
     int32 m_currentDial;
+    dial_motion_function m_func;
+    void *m_cookie;
  public:
     FADialWindow(Display *, int32,GC, Window,int32,int32,int32,int32);
     virtual ~FADialWindow();
+    void SetMotionFunction(dial_motion_function,void *);
     virtual void DoEvent(XEvent);
-
+    virtual void Draw(int32);
 
 };
 

@@ -479,6 +479,7 @@ int32 Player::ServiceEvent(Event *pC) {
 		    PhysicalMediaInput *pmi = (PhysicalMediaInput *)pmi_item->InitFunction()();
 		    if (pmi) {
 			error = pmi->SetTo(gmi->GetPlayListItem()->m_url);
+			//cout << "trying: " << gmi->GetPlayListItem()->m_url << endl;
 			if (IsntError(error)) {
 			    lmc_item = m_lmcRegistry->GetItem(0);
 			    if (lmc_item) {
@@ -487,6 +488,7 @@ int32 Player::ServiceEvent(Event *pC) {
 				    error = lmc->SetPMI(pmi);
 				    if (IsntError(error)) {
 					if (lmc->CanDecode()) {
+					    //cout << "yep" << endl;
 					    MediaInfoEvent *mie = NULL;
 					    error = lmc->ExtractMediaInfo(&mie);
 					    if (IsntError(error)) {
@@ -499,6 +501,7 @@ int32 Player::ServiceEvent(Event *pC) {
 						delete lmc;
 					    }
 					} else {
+					    //cout << "nope" << endl;
 					    delete lmc;
 					}
 				    } else {
@@ -516,7 +519,7 @@ int32 Player::ServiceEvent(Event *pC) {
 		return 0;
 		break;
 	    }
-		case CMD_PlayPaused:
+	    case CMD_PlayPaused:
 	    case CMD_Play: {
 		PlayListItem *pc = m_plm->GetCurrent();
 		Error error = kError_NoErr;
@@ -531,54 +534,67 @@ int32 Player::ServiceEvent(Event *pC) {
 		    PhysicalMediaOutput *pmo = NULL;
 		    PhysicalMediaInput *pmi = NULL;
 		    RegistryItem *pmi_item = pc->GetPMIRegistryItem();
-			RegistryItem *lmc_item = pc->GetLMCRegistryItem();
-
-			if (!pmi_item || !lmc_item) {
+		    RegistryItem *lmc_item = pc->GetLMCRegistryItem();
+		    
+		    if (!pmi_item || !lmc_item) {
 #ifdef WIN32
-				char foo[512];
-				sprintf(foo,"Sorry, FreeAmp currently does not support the file %s\n\nClick Next to go to the next song",pc->m_url);
-				MessageBox(NULL,foo,"FreeAmp Error",MB_OK | MB_TASKMODAL);
+			//char foo[512];
+			//sprintf(foo,"Sorry, FreeAmp currently does not support the file %s\n\nClick Next then Play to go to the next song",pc->m_url);
+			//MessageBox(NULL,foo,"FreeAmp Error",MB_OK | MB_TASKMODAL);
 #endif
-				if (SetState(STATE_Stopped)) {
-					SEND_NORMAL_EVENT(INFO_Stopped);
-				}
-				delete pC;
-				return 0;
+			if (SetState(STATE_Stopped)) {
+			    SEND_NORMAL_EVENT(INFO_Stopped);
 			}
-
+			if (!m_plm->NextIsSame()) {
+			    AcceptEvent(new Event(CMD_NextMediaPiece));
+			    if (m_playerState == STATE_Paused || (pC->Type() == CMD_PlayPaused)) {
+				AcceptEvent(new Event(CMD_PlayPaused));
+			    } else {
+				AcceptEvent(new Event(CMD_Play));
+			    }
+			} else {
+			    if (SetState(STATE_Stopped)) {
+				SEND_NORMAL_EVENT(INFO_Stopped);
+			    }
+			    
+			}
+			delete pC;
+			return 0;
+		    }
+		    
 		    if(pmi_item) {
-				pmi = (PhysicalMediaInput *)pmi_item->InitFunction()();
-				error = pmi->SetTo(pc->m_url);
-				
-				if(IsError(error))
-				{
-					delete pmi;
-					break;
-				}
+			pmi = (PhysicalMediaInput *)pmi_item->InitFunction()();
+			error = pmi->SetTo(pc->m_url);
+			
+			if(IsError(error))
+			{
+			    delete pmi;
+			    break;
+			}
 		    }
 		    
 		    RegistryItem *item = m_pmoRegistry->GetItem(0);
 		    
 		    if(item) {
-				pmo = (PhysicalMediaOutput *)item->InitFunction()();
+			pmo = (PhysicalMediaOutput *)item->InitFunction()();
 		    }
 		    
 		    error = kError_NoErr;
 		    if(lmc_item) {
-				m_lmc = (LogicalMediaConverter *)lmc_item->InitFunction()();
-				
-				if ((error = m_lmc->SetTarget((EventQueue *)this)) != kError_NoErr) {
-					DISPLAY_ERROR(m_lmc,error);
-					return 0;
-				}
-				if ((error = m_lmc->SetPMI(pmi)) != kError_NoErr) {
-					DISPLAY_ERROR(m_lmc,error);
-					return 0;
-				}
-				if ((error = m_lmc->SetPMO(pmo)) != kError_NoErr) {
-					DISPLAY_ERROR(m_lmc,error);
-					return 0;
-				}
+			m_lmc = (LogicalMediaConverter *)lmc_item->InitFunction()();
+			
+			if ((error = m_lmc->SetTarget((EventQueue *)this)) != kError_NoErr) {
+			    DISPLAY_ERROR(m_lmc,error);
+			    return 0;
+			}
+			if ((error = m_lmc->SetPMI(pmi)) != kError_NoErr) {
+			    DISPLAY_ERROR(m_lmc,error);
+			    return 0;
+			}
+			if ((error = m_lmc->SetPMO(pmo)) != kError_NoErr) {
+			    DISPLAY_ERROR(m_lmc,error);
+			    return 0;
+			}
 		    }
 		    
 		    if ((error = m_lmc->InitDecoder()) != kError_NoErr) {
@@ -587,35 +603,35 @@ int32 Player::ServiceEvent(Event *pC) {
 			return 0;
 		    }
 		    
-			if ((error = m_lmc->ChangePosition(m_plm->GetSkip())) != kError_NoErr) {
-				DISPLAY_ERROR(m_lmc,error);
-				delete pC;
-				return 0;
+		    if ((error = m_lmc->ChangePosition(m_plm->GetSkip())) != kError_NoErr) {
+			DISPLAY_ERROR(m_lmc,error);
+			delete pC;
+			return 0;
+		    }
+		    if ((m_playerState == STATE_Paused) || (pC->Type() == CMD_PlayPaused)) {
+			if ((error = m_lmc->Pause()) != kError_NoErr) {
+			    DISPLAY_ERROR(m_lmc,error);
+			    delete pC;
+			    return 0;
 			}
-			if ((m_playerState == STATE_Paused) || (pC->Type() == CMD_PlayPaused)) {
-				if ((error = m_lmc->Pause()) != kError_NoErr) {
-					DISPLAY_ERROR(m_lmc,error);
-					delete pC;
-					return 0;
-				}
-				if ((error = m_lmc->Decode()) != kError_NoErr) {
-					DISPLAY_ERROR(m_lmc,error);
-					delete pC;
-					return 0;
-				}
-				if (SetState(STATE_Paused)) {
-					SEND_NORMAL_EVENT(INFO_Paused);
-				}
-			} else {
-				if ((error = m_lmc->Decode()) != kError_NoErr) {
-					DISPLAY_ERROR(m_lmc,error);
-					delete pC;
-					return 0;
-				}
-				if (SetState(STATE_Playing)) {
-					SEND_NORMAL_EVENT(INFO_Playing);
-				}
+			if ((error = m_lmc->Decode()) != kError_NoErr) {
+			    DISPLAY_ERROR(m_lmc,error);
+			    delete pC;
+			    return 0;
 			}
+			if (SetState(STATE_Paused)) {
+			    SEND_NORMAL_EVENT(INFO_Paused);
+			}
+		    } else {
+			if ((error = m_lmc->Decode()) != kError_NoErr) {
+			    DISPLAY_ERROR(m_lmc,error);
+			    delete pC;
+			    return 0;
+			}
+			if (SetState(STATE_Playing)) {
+			    SEND_NORMAL_EVENT(INFO_Playing);
+			}
+		    }
 		} else {
 		    m_plm->SetFirst();
 		    //cout << "no more in playlist..." << endl;
@@ -625,7 +641,7 @@ int32 Player::ServiceEvent(Event *pC) {
 			m_lmc = NULL;
 		    }
 		    if (SetState(STATE_Stopped)) {
-			    SEND_NORMAL_EVENT(INFO_Stopped);
+			SEND_NORMAL_EVENT(INFO_Stopped);
 		    }
 		    //cout << "killed lmc" << endl;
 		    GetUIManipLock();
@@ -805,6 +821,7 @@ int32 Player::ServiceEvent(Event *pC) {
 		break;
 		
         }
+	//cout << "Done servicing event..." << endl;
     } 
     else {
 	cout << "serviceEvent: passed NULL event!!!" << endl;

@@ -145,6 +145,33 @@ void PlayListManager::SetFirst() {
 	ReleasePLManipLock();
 }
 
+bool PlayListManager::NextIsSame() {
+    GetPLManipLock();
+    bool rtn = false;
+    if (m_repeat == REPEAT_CURRENT) {
+	rtn =  true;
+    } else {
+	if (m_order == SHUFFLE_RANDOM) {
+	    if (m_pMediaElems->NumElements() == 1) 
+		rtn = true;
+	    else 
+		rtn =  false;
+	} else {
+	    if (m_repeat == REPEAT_ALL) {
+		// only same if there is only one song in list
+		if (m_pMediaElems->NumElements() == 1) 
+		    rtn =  true;
+	    } else {
+		// only same if current is the last song
+		if (m_current == m_pMediaElems->NumElements() - 1) 
+		    rtn = true;
+	    }
+	}
+    }
+    ReleasePLManipLock();
+    return rtn;
+}
+
 void PlayListManager::SetNext() { 
 	GetPLManipLock();
 	int32 elems = m_pMediaElems->NumElements();
