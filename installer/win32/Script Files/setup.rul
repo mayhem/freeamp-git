@@ -424,18 +424,31 @@ begin
 			szKey = "Software\\Netscape\\Netscape Navigator\\Suffixes";
 			RegDBSetKeyValueEx(szKey, "audio/x-mpeg", REGDB_STRING, "mp1,mp2,mp3", -1);
 			RegDBSetKeyValueEx(szKey, "audio/x-mp3", REGDB_STRING, "mp3", -1);
-			RegDBSetKeyValueEx(szKey, "audio/mpeg", REGDB_STRING, "mp1,mp2,mp3", -1);
-			RegDBSetKeyValueEx(szKey, "audio/mp3", REGDB_STRING, "mp3", -1);
 			RegDBSetKeyValueEx(szKey, "audio/x-mpegurl", REGDB_STRING, "m3u", -1);
 			RegDBSetKeyValueEx(szKey, "audio/x-scpls", REGDB_STRING, "pls", -1);
+			
+			// Some Apps are idiots and register these so if we do not
+			// there is a chance Netscape will ignore the actual
+			// mimetype above...grrr...
+			RegDBSetKeyValueEx(szKey, "audio/mpeg", REGDB_STRING, "mp1,mp2,mp3", -1);
+			RegDBSetKeyValueEx(szKey, "audio/mp3", REGDB_STRING, "mp3", -1);
+			RegDBSetKeyValueEx(szKey, "audio/mpegurl", REGDB_STRING, "m3u", -1);
+			RegDBSetKeyValueEx(szKey, "audio/scpls", REGDB_STRING, "pls", -1);
+			
 				
 			szKey = "Software\\Netscape\\Netscape Navigator\\Viewers";
 			RegDBSetKeyValueEx(szKey, "audio/x-mpeg", REGDB_STRING, szAppPath ^ @PRODUCT_KEY, -1);
 			RegDBSetKeyValueEx(szKey, "audio/x-mp3", REGDB_STRING, szAppPath ^ @PRODUCT_KEY, -1);
-			RegDBSetKeyValueEx(szKey, "audio/mpeg", REGDB_STRING, szAppPath ^ @PRODUCT_KEY, -1);
-			RegDBSetKeyValueEx(szKey, "audio/mp3", REGDB_STRING, szAppPath ^ @PRODUCT_KEY, -1);
 			RegDBSetKeyValueEx(szKey, "audio/x-mpegurl", REGDB_STRING, szAppPath ^ @PRODUCT_KEY, -1);
 			RegDBSetKeyValueEx(szKey, "audio/x-scpls", REGDB_STRING, szAppPath ^ @PRODUCT_KEY, -1);
+			
+			// Some servers are idiots and send these so if we do not
+			// there is a chance Netscape will not find the real type
+			RegDBSetKeyValueEx(szKey, "audio/mpeg", REGDB_STRING, szAppPath ^ @PRODUCT_KEY, -1);
+			RegDBSetKeyValueEx(szKey, "audio/mp3", REGDB_STRING, szAppPath ^ @PRODUCT_KEY, -1);
+			RegDBSetKeyValueEx(szKey, "audio/mpegurl", REGDB_STRING, szAppPath ^ @PRODUCT_KEY, -1);
+			RegDBSetKeyValueEx(szKey, "audio/scpls", REGDB_STRING, szAppPath ^ @PRODUCT_KEY, -1);
+			
 		
 			szKey = "Software\\Netscape\\Netscape Navigator\\User Trusted External Applications";
 			RegDBSetKeyValueEx(szKey, szAppPath ^ @PRODUCT_KEY, REGDB_STRING, "Yes", -1);	
@@ -974,6 +987,7 @@ end;
 // --- include script file section ---
 
 #include "sddialog.rul"
+
 
 
 

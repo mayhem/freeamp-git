@@ -61,8 +61,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                      ..\..\..\..\base\win32\prj\plugins	copy download.ui\
-                        ..\..\..\..\base\win32\prj\plugins
+                                       ..\..\..\..\base\win32\prj\plugins	copy download.ui\
+                         ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "download - Win32 Debug"
@@ -94,8 +94,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                      ..\..\..\..\base\win32\prj\plugins	copy download.ui\
-                        ..\..\..\..\base\win32\prj\plugins
+                                       ..\..\..\..\base\win32\prj\plugins	copy download.ui\
+                         ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "download - Win32 NASM Debug"
@@ -129,8 +129,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                      ..\..\..\..\base\win32\prj\plugins	copy download.ui\
-                        ..\..\..\..\base\win32\prj\plugins
+                                       ..\..\..\..\base\win32\prj\plugins	copy download.ui\
+                         ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "download - Win32 NASM Release"
@@ -162,8 +162,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                      ..\..\..\..\base\win32\prj\plugins	copy download.ui\
-                        ..\..\..\..\base\win32\prj\plugins
+                                       ..\..\..\..\base\win32\prj\plugins	copy download.ui\
+                         ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
@@ -254,6 +254,106 @@ SOURCE=..\res\note.bmp
 # Begin Source File
 
 SOURCE=..\res\progress256.bmp
+# End Source File
+# End Group
+# Begin Group "includes"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\..\..\config\config.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\downloadformat.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\downloadmanager.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\downloadui.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\errors.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\event.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\eventdata.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\facontext.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\win32\include\help.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\log.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\metadata.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\win32\include\mutex.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\playlist.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\playlistformat.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\plmevent.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\portabledevice.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\preferences.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\properties.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\queue.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\registry.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\win32\include\semaphore.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\thread.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\ui.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\utility.h
 # End Source File
 # End Group
 # End Target

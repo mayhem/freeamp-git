@@ -520,6 +520,12 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                 UpdateArtistName(m_oTreeIndex.Data(item.lParam).m_pArtist, 
                                  item.pszText);
             }
+            else if(m_oTreeIndex.IsUncatagorized(item.lParam))
+            {
+                // just change the title for this song
+                UpdateUncatagorizedTrackName(m_oTreeIndex.Data(item.lParam).m_pTrack, 
+                                item.pszText);
+            }
 
             return TRUE;
         }    

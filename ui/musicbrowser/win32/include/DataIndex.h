@@ -73,6 +73,7 @@ class TreeDataIndex
       bool  IsAlbum         (int32 lParam);
       bool  IsTrack         (int32 lParam);
       bool  IsLeaf          (int32 lParam);
+      bool  IsUncatagorized (int32 lParam);
       int32 GetLevel        (int32 lParam);
       const TreeData &Data  (int32 lParam); 
       int32 Add             (TreeData &pData);

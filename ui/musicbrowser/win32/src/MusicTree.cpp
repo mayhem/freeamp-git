@@ -956,7 +956,7 @@ void MusicBrowserUI::AddTrackItems(TV_ITEM* tv_item,
             items->push_back(*track);
         }
     }
-    else if(m_oTreeIndex.IsTrack(tv_item->lParam))
+    else if(m_oTreeIndex.IsTrack(tv_item->lParam) || m_oTreeIndex.IsUncatagorized(tv_item->lParam))
     {
         PlaylistItem* track = m_oTreeIndex.Data(tv_item->lParam).m_pTrack;
 
@@ -1252,6 +1252,20 @@ uint32 MusicBrowserUI::GetSelectedPlaylistCount()
 
     return result;
 }
+
+
+void MusicBrowserUI::UpdateUncatagorizedTrackName(PlaylistItem* track, 
+                                                  const char* name)
+{
+    MetaData metadata = track->GetMetaData();
+
+    metadata.SetTitle(name);
+
+    track->SetMetaData(&metadata);
+
+    m_context->browser->m_catalog->UpdateSong(track);
+}
+
 
 void MusicBrowserUI::UpdateTrackName(PlaylistItem* track, 
                                      const char* name)

@@ -41,7 +41,8 @@ ____________________________________________________________________________*/
 #include "utility.h"
 
 void CreateHiddenWindow(void* arg);
-void SendCommandLineToHiddenWindow();
+void SendCommandLineToHiddenWindow(void);
+void ReclaimFileTypes(const char* path, bool askBeforeReclaiming);
 
 const char* kHiddenWindow = "FreeAmp Hidden Window";
 HINSTANCE g_hinst = NULL;
@@ -103,6 +104,17 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     registrar->InitializeRegistry(ui, context->prefs);
 
     delete registrar;
+
+    bool reclaimFileTypes, askBeforeReclaiming;
+    char path[MAX_PATH];
+    uint32 length = sizeof(path);
+    context->prefs->GetReclaimFiletypes(&reclaimFileTypes);
+    context->prefs->GetAskToReclaimFiletypes(&askBeforeReclaiming);
+    context->prefs->GetInstallDirectory(path, &length);
+    strcat(path, "\\freeamp.exe");
+
+    if(reclaimFileTypes)
+        ReclaimFileTypes(path, askBeforeReclaiming);
 
     // create the player
 	Player *player = Player::GetPlayer(context);
@@ -363,4 +375,126 @@ void CreateHiddenWindow(void* arg)
             DispatchMessage(&msg);
         }
     }
+}
+
+const char* kFileTypes[][2] = {
+    {".mp1", "MP1AudioFile"},
+    {".mp2", "MP2AudioFile"},
+    {".mp3", "MP3AudioFile"},
+    {".m3u", "M3UPlaylistFile"},
+    {".pls", "PLSPlaylistFile"},
+    {NULL, NULL}
+};
+
+const char* kOpenCommand = "\\shell\\open\\command";
+const char* kNotifyStolen = "File types normally associated with " BRANDING "\r\n"
+                            "have been associated with another application.\r\n"
+                            "Do you want to reclaim these file types?";
+
+void ReclaimFileTypes(const char* path, bool askBeforeReclaiming)
+{
+    LONG    result; 
+    DWORD   index;
+    HKEY    typeKey;
+    HKEY    appKey;
+    DWORD   type;
+    char    buf[MAX_PATH];
+    DWORD   len = sizeof(buf);
+    bool permission = false;
+
+    if(!askBeforeReclaiming)
+        permission = true;
+
+    // reclaim the windows filetypes
+    for(index = 0; ; index++)
+    {
+        if(kFileTypes[index][1] == NULL)
+            break;
+
+        result = RegOpenKeyEx(HKEY_CLASSES_ROOT,
+							  kFileTypes[index][1],
+							  0, 
+                              KEY_ALL_ACCESS,
+                              &typeKey);
+        if(typeKey)
+	    {
+            len = sizeof(buf);
+		    result = RegQueryValueEx(typeKey,
+                                     NULL, 
+                                     NULL, 
+                                     &type, 
+                                     (LPBYTE)buf, 
+                                     &len);
+
+            if(result == ERROR_SUCCESS)
+            {
+                //MessageBox(NULL, buf, "value", MB_OK);
+                if(strcmp(buf, kFileTypes[index][2]))
+                {
+                    if(!permission)
+                    {
+                        int ret;
+                        ret = MessageBox(NULL, 
+                                   kNotifyStolen,
+                                   "Reclaim File Types?", 
+                                   MB_OKCANCEL|MB_ICONQUESTION);
+
+                        if(ret == IDOK)
+                            permission = true;
+                        else
+                            break;
+
+                    }
+
+                    RegSetValueEx(typeKey,
+                                  NULL, 
+                                  NULL, 
+                                  REG_SZ, 
+                                  (LPBYTE)kFileTypes[index][2], 
+                                  strlen(kFileTypes[index][2]) + 1);
+                }
+            }
+
+            RegCloseKey(typeKey);
+        }
+
+        wsprintf(buf, "%s%s", kFileTypes[index][2], kOpenCommand);
+
+        result = RegOpenKeyEx(	HKEY_CLASSES_ROOT,
+							    buf,
+							    0, 
+							    KEY_ALL_ACCESS,
+							    &appKey);
+        if(appKey)
+	    {
+            len = sizeof(buf);
+		    result = RegQueryValueEx(appKey,
+                                     NULL, 
+                                     NULL, 
+                                     &type, 
+                                     (LPBYTE)buf, 
+                                     &len);
+
+            if(result == ERROR_SUCCESS)
+            {
+                //MessageBox(NULL, buf, "value", MB_OK);
+                if(strcmp(buf, path))
+                {
+                    RegSetValueEx(appKey,
+                                  NULL, 
+                                  NULL, 
+                                  REG_SZ, 
+                                  (LPBYTE)path, 
+                                  strlen(path) + 1);
+                }
+            }
+
+            RegCloseKey(appKey);
+        }
+    }
+
+    if(!permission)
+        return;
+
+    // reclaim netscape filetypes
 }

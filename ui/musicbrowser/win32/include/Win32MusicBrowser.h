@@ -271,6 +271,7 @@ class MusicBrowserUI : public UserInterface
     void UpdatePlaylistName(string playlist, const char* name);
     void UpdateAlbumName(AlbumList* album, const char* name);
     void UpdateArtistName(ArtistList* artist, const char* name);
+    void UpdateUncatagorizedTrackName(PlaylistItem* track, const char* name);
 
     uint32 GetSelectedTrackCount(void);
     uint32 GetSelectedPlaylistCount(void);

@@ -59,7 +59,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
-               ..\..\..\themes\freeamp.fat themes
+                ..\..\..\themes\freeamp.fat themes
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
@@ -92,7 +92,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
-               ..\..\..\themes\freeamp.fat themes
+                ..\..\..\themes\freeamp.fat themes
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
@@ -126,7 +126,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
-               ..\..\..\themes\freeamp.fat themes
+                ..\..\..\themes\freeamp.fat themes
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
@@ -162,7 +162,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
-               ..\..\..\themes\freeamp.fat themes
+                ..\..\..\themes\freeamp.fat themes
 # End Special Build Tool
 
 !ENDIF 
@@ -603,6 +603,150 @@ InputPath=..\..\..\lib\portio\i386\free\portio.sys
 
 !ENDIF 
 
+# End Source File
+# End Group
+# Begin Group "includes"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\..\config\config.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\database.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\debug.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\downloadformat.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\downloadmanager.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\errors.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\event.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\eventdata.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\facontext.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lib\gdbm\gdbm_fa.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\hashtable.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lmc\include\lmc.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\log.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\metadata.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\musicbrowser.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\mutex.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lib\xml\include\Parse.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\io\include\pipeline.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\player.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\playlist.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\playlistformat.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\plmevent.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\portabledevice.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\preferences.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\properties.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\propimpl.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\io\include\pullbuffer.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\queue.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\registrar.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\registry.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\semaphore.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\thread.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\ui\include\ui.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\utility.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\win32prefs.h
 # End Source File
 # End Group
 # End Target

@@ -403,7 +403,8 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
                 bool wasFocus = item == focusItem;
                 bool wasSelected = (tv_item.state & TVIS_SELECTED) != 0;
 
-                selectedOnMouseDown = wasSelected;
+                HTREEITEM rootItem = TreeView_GetRoot(hwnd);
+                selectedOnMouseDown = wasSelected && (CountSelectedItems(rootItem) == 1);
                 
                 if(ctrlKeyPressed)
                 {
@@ -498,6 +499,8 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
                         
                         return TRUE;
                     }
+                    
+                    break;
                 }
                 else
                 {
@@ -624,7 +627,7 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
 
                     return TRUE;
                 }
-                else
+                else if(!shiftKeyPressed)
                 {
                     // need to iterate all the items and 
                     // make sure they aren't selected

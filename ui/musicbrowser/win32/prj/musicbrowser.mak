@@ -141,8 +141,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 Release" "fabaselib - Win32 Release"\
  ".\musicbrowser.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                        ..\..\..\..\base\win32\prj\plugins
-	copy musicbrowser.ui                                                                          ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                         ..\..\..\..\base\win32\prj\plugins
+	copy musicbrowser.ui                                                                           ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 Debug"
@@ -249,8 +249,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 Debug" "fabaselib - Win32 Debug"\
  ".\musicbrowser.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                        ..\..\..\..\base\win32\prj\plugins
-	copy musicbrowser.ui                                                                          ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                         ..\..\..\..\base\win32\prj\plugins
+	copy musicbrowser.ui                                                                           ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Debug"
@@ -358,8 +358,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 NASM Debug" "fabaselib - Win32 NASM Debug"\
  ".\musicbrowser.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                        ..\..\..\..\base\win32\prj\plugins
-	copy musicbrowser.ui                                                                          ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                         ..\..\..\..\base\win32\prj\plugins
+	copy musicbrowser.ui                                                                           ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Release"
@@ -466,8 +466,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 NASM Release"\
  "fabaselib - Win32 NASM Release" ".\musicbrowser.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                        ..\..\..\..\base\win32\prj\plugins
-	copy musicbrowser.ui                                                                          ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                         ..\..\..\..\base\win32\prj\plugins
+	copy musicbrowser.ui                                                                           ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 
@@ -532,9 +532,9 @@ DEP_CPP_DATAI=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -567,9 +567,9 @@ DEP_CPP_DATAI=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	
 
 "$(INTDIR)\DataIndex.obj" : $(SOURCE) $(DEP_CPP_DATAI) "$(INTDIR)"
@@ -600,9 +600,9 @@ DEP_CPP_DATAI=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	
 
 "$(INTDIR)\DataIndex.obj" : $(SOURCE) $(DEP_CPP_DATAI) "$(INTDIR)"
@@ -633,9 +633,9 @@ DEP_CPP_DATAI=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -673,9 +673,9 @@ DEP_CPP_DIALO=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -709,9 +709,9 @@ DEP_CPP_DIALO=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	
 
 "$(INTDIR)\Dialog.obj" : $(SOURCE) $(DEP_CPP_DIALO) "$(INTDIR)"
@@ -743,9 +743,9 @@ DEP_CPP_DIALO=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	
 
 "$(INTDIR)\Dialog.obj" : $(SOURCE) $(DEP_CPP_DIALO) "$(INTDIR)"
@@ -777,9 +777,9 @@ DEP_CPP_DIALO=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -792,8 +792,8 @@ DEP_CPP_DIALO=\
 
 SOURCE=..\src\DropObject.cpp
 DEP_CPP_DROPO=\
-	"..\include\dropobject.h"\
-	"..\include\enumformatetc.h"\
+	"..\include\DropObject.h"\
+	"..\include\EnumFormatEtc.h"\
 	
 
 "$(INTDIR)\DropObject.obj" : $(SOURCE) $(DEP_CPP_DROPO) "$(INTDIR)"
@@ -802,7 +802,7 @@ DEP_CPP_DROPO=\
 
 SOURCE=..\src\DropSource.cpp
 DEP_CPP_DROPS=\
-	"..\include\dropsource.h"\
+	"..\include\DropSource.h"\
 	
 
 "$(INTDIR)\DropSource.obj" : $(SOURCE) $(DEP_CPP_DROPS) "$(INTDIR)"
@@ -814,8 +814,8 @@ SOURCE=..\src\DropTarget.cpp
 !IF  "$(CFG)" == "musicbrowser - Win32 Release"
 
 DEP_CPP_DROPT=\
-	"..\include\dropobject.h"\
-	"..\include\droptarget.h"\
+	"..\include\DropObject.h"\
+	"..\include\DropTarget.h"\
 	
 
 "$(INTDIR)\DropTarget.obj" : $(SOURCE) $(DEP_CPP_DROPT) "$(INTDIR)"
@@ -825,8 +825,8 @@ DEP_CPP_DROPT=\
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 Debug"
 
 DEP_CPP_DROPT=\
-	"..\include\dropobject.h"\
-	"..\include\droptarget.h"\
+	"..\include\DropObject.h"\
+	"..\include\DropTarget.h"\
 	
 
 "$(INTDIR)\DropTarget.obj" : $(SOURCE) $(DEP_CPP_DROPT) "$(INTDIR)"
@@ -836,8 +836,8 @@ DEP_CPP_DROPT=\
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Debug"
 
 DEP_CPP_DROPT=\
-	"..\include\dropobject.h"\
-	"..\include\droptarget.h"\
+	"..\include\DropObject.h"\
+	"..\include\DropTarget.h"\
 	
 
 "$(INTDIR)\DropTarget.obj" : $(SOURCE) $(DEP_CPP_DROPT) "$(INTDIR)"
@@ -847,8 +847,8 @@ DEP_CPP_DROPT=\
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Release"
 
 DEP_CPP_DROPT=\
-	"..\include\dropobject.h"\
-	"..\include\droptarget.h"\
+	"..\include\DropObject.h"\
+	"..\include\DropTarget.h"\
 	
 
 "$(INTDIR)\DropTarget.obj" : $(SOURCE) $(DEP_CPP_DROPT) "$(INTDIR)"
@@ -882,9 +882,9 @@ DEP_CPP_EDITT=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -916,9 +916,9 @@ DEP_CPP_EDITT=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	
 
 "$(INTDIR)\EditTrackInfoDialog.obj" : $(SOURCE) $(DEP_CPP_EDITT) "$(INTDIR)"
@@ -948,9 +948,9 @@ DEP_CPP_EDITT=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	
 
 "$(INTDIR)\EditTrackInfoDialog.obj" : $(SOURCE) $(DEP_CPP_EDITT) "$(INTDIR)"
@@ -980,9 +980,9 @@ DEP_CPP_EDITT=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -995,7 +995,7 @@ DEP_CPP_EDITT=\
 
 SOURCE=..\src\EnumFormatEtc.cpp
 DEP_CPP_ENUMF=\
-	"..\include\enumformatetc.h"\
+	"..\include\EnumFormatEtc.h"\
 	
 
 "$(INTDIR)\EnumFormatEtc.obj" : $(SOURCE) $(DEP_CPP_ENUMF) "$(INTDIR)"
@@ -1028,9 +1028,9 @@ DEP_CPP_EVENT=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -1063,9 +1063,9 @@ DEP_CPP_EVENT=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	
 
 "$(INTDIR)\Event.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"
@@ -1096,9 +1096,9 @@ DEP_CPP_EVENT=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	
 
 "$(INTDIR)\Event.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"
@@ -1129,9 +1129,9 @@ DEP_CPP_EVENT=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -1167,11 +1167,11 @@ DEP_CPP_MULTI=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\dropobject.h"\
-	"..\include\dropsource.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropObject.h"\
+	"..\include\DropSource.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -1203,11 +1203,11 @@ DEP_CPP_MULTI=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\dropobject.h"\
-	"..\include\dropsource.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropObject.h"\
+	"..\include\DropSource.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	
 
 "$(INTDIR)\MultiSelectTreeView.obj" : $(SOURCE) $(DEP_CPP_MULTI) "$(INTDIR)"
@@ -1237,11 +1237,11 @@ DEP_CPP_MULTI=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\dropobject.h"\
-	"..\include\dropsource.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropObject.h"\
+	"..\include\DropSource.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	
 
 "$(INTDIR)\MultiSelectTreeView.obj" : $(SOURCE) $(DEP_CPP_MULTI) "$(INTDIR)"
@@ -1271,11 +1271,11 @@ DEP_CPP_MULTI=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\dropobject.h"\
-	"..\include\dropsource.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropObject.h"\
+	"..\include\DropSource.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -1312,9 +1312,9 @@ DEP_CPP_MUSIC=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -1347,9 +1347,9 @@ DEP_CPP_MUSIC=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	
 
 "$(INTDIR)\MusicSearchDialog.obj" : $(SOURCE) $(DEP_CPP_MUSIC) "$(INTDIR)"
@@ -1380,9 +1380,9 @@ DEP_CPP_MUSIC=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	
 
 "$(INTDIR)\MusicSearchDialog.obj" : $(SOURCE) $(DEP_CPP_MUSIC) "$(INTDIR)"
@@ -1413,9 +1413,9 @@ DEP_CPP_MUSIC=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -1451,11 +1451,11 @@ DEP_CPP_MUSICT=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\dropobject.h"\
-	"..\include\dropsource.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropObject.h"\
+	"..\include\DropSource.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -1487,11 +1487,11 @@ DEP_CPP_MUSICT=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\dropobject.h"\
-	"..\include\dropsource.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropObject.h"\
+	"..\include\DropSource.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	
 
 "$(INTDIR)\MusicTree.obj" : $(SOURCE) $(DEP_CPP_MUSICT) "$(INTDIR)"
@@ -1521,11 +1521,11 @@ DEP_CPP_MUSICT=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\dropobject.h"\
-	"..\include\dropsource.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropObject.h"\
+	"..\include\DropSource.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	
 
 "$(INTDIR)\MusicTree.obj" : $(SOURCE) $(DEP_CPP_MUSICT) "$(INTDIR)"
@@ -1555,11 +1555,11 @@ DEP_CPP_MUSICT=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\dropobject.h"\
-	"..\include\dropsource.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropObject.h"\
+	"..\include\DropSource.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -1596,9 +1596,9 @@ DEP_CPP_OPENS=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -1631,9 +1631,9 @@ DEP_CPP_OPENS=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	
 
 "$(INTDIR)\OpenSavePlaylists.obj" : $(SOURCE) $(DEP_CPP_OPENS) "$(INTDIR)"
@@ -1664,9 +1664,9 @@ DEP_CPP_OPENS=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	
 
 "$(INTDIR)\OpenSavePlaylists.obj" : $(SOURCE) $(DEP_CPP_OPENS) "$(INTDIR)"
@@ -1697,9 +1697,9 @@ DEP_CPP_OPENS=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -1735,11 +1735,11 @@ DEP_CPP_PLAYL=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\dropobject.h"\
-	"..\include\dropsource.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropObject.h"\
+	"..\include\DropSource.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -1771,11 +1771,11 @@ DEP_CPP_PLAYL=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\dropobject.h"\
-	"..\include\dropsource.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropObject.h"\
+	"..\include\DropSource.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	
 
 "$(INTDIR)\PlaylistView.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"
@@ -1805,11 +1805,11 @@ DEP_CPP_PLAYL=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\dropobject.h"\
-	"..\include\dropsource.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropObject.h"\
+	"..\include\DropSource.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	
 
 "$(INTDIR)\PlaylistView.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"
@@ -1839,11 +1839,11 @@ DEP_CPP_PLAYL=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\dropobject.h"\
-	"..\include\dropsource.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropObject.h"\
+	"..\include\DropSource.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -1927,9 +1927,9 @@ DEP_CPP_SAVEP=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -1961,9 +1961,9 @@ DEP_CPP_SAVEP=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	
 
 "$(INTDIR)\SavePlaylistDialog.obj" : $(SOURCE) $(DEP_CPP_SAVEP) "$(INTDIR)"
@@ -1993,9 +1993,9 @@ DEP_CPP_SAVEP=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	
 
 "$(INTDIR)\SavePlaylistDialog.obj" : $(SOURCE) $(DEP_CPP_SAVEP) "$(INTDIR)"
@@ -2025,9 +2025,9 @@ DEP_CPP_SAVEP=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -2065,9 +2065,9 @@ DEP_CPP_WIN32=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -2101,9 +2101,9 @@ DEP_CPP_WIN32=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	
 
 "$(INTDIR)\Win32MusicBrowser.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
@@ -2135,9 +2135,9 @@ DEP_CPP_WIN32=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	
 
 "$(INTDIR)\Win32MusicBrowser.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
@@ -2169,9 +2169,9 @@ DEP_CPP_WIN32=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
-	"..\include\dataindex.h"\
-	"..\include\droptarget.h"\
-	"..\include\win32musicbrowser.h"\
+	"..\include\DataIndex.h"\
+	"..\include\DropTarget.h"\
+	"..\include\Win32MusicBrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
