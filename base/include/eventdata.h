@@ -33,6 +33,7 @@ using namespace std;
 
 #include "event.h"
 #include "playlist.h"
+#include "musicbrowser.h"
 #include "utility.h"
 
 class     LogicalMediaConverter;
@@ -550,13 +551,20 @@ public:
 
 class MusicCatalogTrackAddedEvent : public Event {
 private:
-    const PlaylistItem* m_item;
+    const PlaylistItem *m_item;
+    const ArtistList *m_artist;
+    const AlbumList *m_album;
 public:
-    MusicCatalogTrackAddedEvent(const PlaylistItem* item)
-    { m_type = INFO_MusicCatalogTrackAdded; m_item = item; }
+    MusicCatalogTrackAddedEvent(const PlaylistItem *item, 
+                                const ArtistList *artist,
+                                const AlbumList *album)
+    { m_type = INFO_MusicCatalogTrackAdded; m_item = item; 
+      m_artist = artist; m_album = album; }
     virtual ~MusicCatalogTrackAddedEvent() {}
 
-    const PlaylistItem* Item() const { return m_item; }
+    const PlaylistItem *Item() const { return m_item; }
+    const ArtistList *Artist() const { return m_artist; }
+    const AlbumList *Album() const { return m_album; }
 };
 
 class MusicCatalogTrackRemovedEvent : public Event {

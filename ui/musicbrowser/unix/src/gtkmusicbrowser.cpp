@@ -1670,7 +1670,7 @@ void GTKMusicBrowser::DeleteEvent(void)
 
 void GTKMusicBrowser::MoveUpEvent(void)
 {
-    if (m_currentindex == 0)
+    if (m_currentindex == 0 || m_currentindex == kInvalidIndex)
         return;
     m_plm->SwapItems(m_currentindex, m_currentindex - 1);
     m_currentindex--;
@@ -1679,7 +1679,8 @@ void GTKMusicBrowser::MoveUpEvent(void)
 
 void GTKMusicBrowser::MoveDownEvent(void)
 {
-    if (m_currentindex == m_plm->CountItems() - 1)
+    if (m_currentindex == m_plm->CountItems() - 1 || 
+        m_currentindex == kInvalidIndex)
         return;
     m_plm->SwapItems(m_currentindex, m_currentindex + 1);
     m_currentindex++;
@@ -1765,7 +1766,7 @@ void GTKMusicBrowser::PopUpInfoEditor(PlaylistItem *editee)
 {
     if ((m_currentindex == kInvalidIndex) && editee == NULL)
         return;
-    
+   
     infoeditorUI *infoedit;
     if (editee == NULL)
         infoedit = new infoeditorUI(m_context, m_plm->ItemAt(m_currentindex));
