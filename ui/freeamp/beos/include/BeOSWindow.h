@@ -35,6 +35,10 @@ public:
                     BeOSWindow( Theme* pTheme, string& oName );
     virtual         ~BeOSWindow();
 
+    // VulcanMinkMeld is called when this window should 'become' the
+    // other window. 
+    virtual Error   VulcanMindMeld( Window* other );
+
     virtual Error   Run( Pos& oWindowPos );
     virtual Error   Close( void );
     virtual Error   Show( void );

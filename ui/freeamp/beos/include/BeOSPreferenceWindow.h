@@ -29,7 +29,8 @@ ____________________________________________________________________________*/
 class BeOSPreferenceWindow : public PreferenceWindow
 {
 public:
-                    BeOSPreferenceWindow( FAContext* context );
+                    BeOSPreferenceWindow( FAContext* context,
+                                          ThemeManager* themeMan );
     virtual         ~BeOSPreferenceWindow();
     virtual bool    Show( Window* pParent );
 

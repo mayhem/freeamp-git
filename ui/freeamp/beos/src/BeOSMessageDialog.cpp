@@ -22,6 +22,7 @@
 ____________________________________________________________________________*/ 
 
 #include "MessageDialog.h"
+#include <stdio.h>
 
 MessageDialog::MessageDialog()
 {
@@ -36,6 +37,7 @@ MessageDialog::Show( const char* szMessage,
                      const char* szTitle,
                      MessageDialogEnum eType )
 {
+    printf( "MessageDialog: %s\n", szMessage );
 }
 
 MessageDialogReturnEnum
@@ -43,4 +45,5 @@ MessageDialog::Show( const string& oMessage,
                      const string& oTitle,
                      MessageDialogEnum eType )
 {
+    printf( "MessageDialog: %s\n", oMessage.c_str() );
 }

@@ -49,6 +49,7 @@ public:
                             );
     virtual void        MouseUp( BPoint p );
 
+    void                SetParent( BeOSWindow* parent ) { m_parent = parent; }
     void                SetCanvasBitmap( BBitmap* bitmap ) { m_bitmap = bitmap; }
     BBitmap*            CanvasBitmap( void ) { return m_bitmap; }
 

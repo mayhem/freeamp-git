@@ -30,13 +30,14 @@ ____________________________________________________________________________*/
 #include <be/interface/Region.h>
 
 #define CHECK_POINT CHECK_POINT_MSG("")
-#define CHECK_POINT_MSG(a) PRINT(( "File %s Line %d: %s\n", __FILE__, __LINE__, a ))
+#define CHECK_POINT_MSG(a) PRINT(( "File %s Line %d, %x: %s\n", __FILE__, __LINE__, this, a ))
 
 BeOSCanvas::BeOSCanvas( BeOSWindow* pParent )
 :   Canvas(),
     m_pParent( pParent ),
     m_pBufferBitmap( NULL ),
-    m_canvasView( NULL )
+    m_canvasView( NULL ),
+    m_initialized( false )
 {
 }
 
@@ -49,6 +50,9 @@ void
 BeOSCanvas::Init( void )
 {
     CHECK_POINT_MSG( "Init" );
+
+    if ( m_initialized ) return;
+
     Rect destRect;
 
     m_pBufferBitmap = new BeOSBitmap(
@@ -70,6 +74,8 @@ BeOSCanvas::Init( void )
                         B_WILL_DRAW
                         );
     m_canvasView->SetCanvasBitmap( m_pBufferBitmap->GetBBitmap() );
+
+    m_initialized = true;
 }
 
 void
@@ -146,9 +152,16 @@ Error
 BeOSCanvas::Invalidate( Rect& oRect )
 {
     CHECK_POINT_MSG( "Invalidate" );
-    m_canvasView->LockLooper();
-    m_canvasView->Invalidate();
-    m_canvasView->UnlockLooper();
+    if ( m_canvasView->Window() )
+    {
+        m_canvasView->LockLooper();
+        m_canvasView->Invalidate();
+        m_canvasView->UnlockLooper();
+    }
+    else
+    {
+        return kError_NullValueInvalid;
+    }
     return kError_NoErr;
 }
 
@@ -156,9 +169,17 @@ Error
 BeOSCanvas::Update( void )
 {
     CHECK_POINT_MSG( "Update" );
-    m_canvasView->LockLooper();
-    m_canvasView->Invalidate();
-    m_canvasView->UnlockLooper();
+    if ( m_canvasView->Window() )
+    {
+        m_canvasView->LockLooper();
+        m_canvasView->Invalidate();
+        m_canvasView->UnlockLooper();
+    }
+    else
+    {
+        CHECK_POINT_MSG( "no window??" );
+        return kError_NullValueInvalid;
+    }
     return kError_NoErr;
 }
 
@@ -180,4 +201,11 @@ BeOSCanvas::MaskBlitRect( Bitmap* pSrcBitmap, Rect& oSrcRect, Rect& oDestRec )
     if ( !m_pBufferBitmap ) return kError_NoErr;
 
     return m_pBufferBitmap->MaskBlitRect( pSrcBitmap, oSrcRect, oDestRec );
+}
+
+void
+BeOSCanvas::SetParent( BeOSWindow* parent )
+{
+    m_pParent = parent;
+    m_canvasView->SetParent( m_pParent );
 }

@@ -37,7 +37,9 @@ BeOSWindow::BeOSWindow( Theme* pTheme, string& oName )
     m_mainWindow( NULL ),
     m_canvasView( NULL )
 {
-    CHECK_POINT;
+    CHECK_POINT_MSG( "BeOSWindow ctor" );
+    PRINT(( "i am %x\n", this ));
+    if ( m_bIsVulcanMindMeldHost ) { PRINT(( "and i am the host\n" )); }
     m_pCanvas = new BeOSCanvas( this );
 }
 
@@ -46,7 +48,37 @@ BeOSWindow::~BeOSWindow()
     CHECK_POINT_MSG( "~BeOSWindow" );
     delete m_pCanvas;
     m_pCanvas = NULL;
-    CHECK_POINT;
+}
+
+Error
+BeOSWindow::VulcanMindMeld( Window* other )
+{
+    Rect rect;
+
+    Error err = Window::VulcanMindMeld( other );
+    if ( IsError( err ) )
+    {
+        CHECK_POINT_MSG( "VulcanMindMeld error" );
+        return err;
+    }
+
+    m_mainWindow = new MainWindow( BRect(0,0,0,0), m_oName.c_str() );
+
+    // make myself parent of the canvas
+    ((BeOSCanvas*)GetCanvas())->SetParent( this );
+
+    // set the root view
+    m_canvasView = ((BeOSCanvas*)GetCanvas())->GetBView();
+    assert( m_canvasView );
+    m_mainWindow->AddChild( m_canvasView );
+
+    GetCanvas()->GetBackgroundRect( rect );
+    other->GetWindowPosition( rect );
+    SetWindowPosition( rect );
+
+    m_mainWindow->Run();
+
+    return kError_NoErr;
 }
 
 Error
@@ -54,19 +86,16 @@ BeOSWindow::Run( Pos& oWindowPos )
 {
     CHECK_POINT_MSG( "Run" );
 
-    m_pCanvas->Init();
-
     Rect rect;
     GetCanvas()->GetBackgroundRect( rect );
     BRect brect( rect.x1, rect.y1, rect.x2, rect.y2 );
     brect.OffsetTo( oWindowPos.x, oWindowPos.y );
-    m_mainWindow = new MainWindow( brect, m_oName.c_str() );
-
-    // set the root view
-    m_canvasView = ((BeOSCanvas*)GetCanvas())->GetBView();
-    assert( m_canvasView );
-    m_mainWindow->AddChild( m_canvasView );
     m_mainWindow->Show();
+    m_mainWindow->MoveTo( brect.left, brect.top );
+    m_mainWindow->ResizeTo( brect.Width(), brect.Height() );
+    m_mainWindow->Sync();
+
+    GetCanvas()->Update();
 
     Init();
 
@@ -189,6 +218,8 @@ BeOSWindow::GetMousePos( Pos& oMousePos )
     BPoint p;
     uint32 buttons;
 
+    if ( !m_mainWindow ) return kError_NullValueInvalid;
+
     m_mainWindow->Lock();
     m_canvasView->GetMouse( &p, &buttons, false );
     m_mainWindow->Unlock();
@@ -203,7 +234,8 @@ BeOSWindow::GetMousePos( Pos& oMousePos )
 Error
 BeOSWindow::SetWindowPosition( Rect& oWindowRect )
 {
-    CHECK_POINT_MSG( "SetWindowPosition" );
+
+    if ( !m_mainWindow ) return kError_NullValueInvalid;
 
     m_mainWindow->MoveTo( float(oWindowRect.x1), float(oWindowRect.y1) );
     m_mainWindow->Sync();
@@ -214,7 +246,7 @@ BeOSWindow::SetWindowPosition( Rect& oWindowRect )
 Error
 BeOSWindow::GetWindowPosition( Rect& oWindowRect )
 {
-    CHECK_POINT_MSG( "GetWindowPosition" );
+    if ( !m_mainWindow ) return kError_NullValueInvalid;
 
     m_mainWindow->Lock();
     BRect frame = m_mainWindow->Frame();

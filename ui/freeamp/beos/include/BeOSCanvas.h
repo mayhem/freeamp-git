@@ -56,6 +56,7 @@ public:
                                       Rect& oDestRect );
 
     BView*              GetBView( void ) { return m_canvasView; }
+    void                SetParent( BeOSWindow* parent );
 
 protected:
 
@@ -63,6 +64,7 @@ private:
     BeOSWindow*         m_pParent;
     BeOSBitmap*         m_pBufferBitmap;
     CanvasView*         m_canvasView;
+    bool                m_initialized;
 };
 
 #endif // INCLUDED_BEOSCANVAS_H__
