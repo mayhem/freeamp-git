@@ -17,15 +17,15 @@
 
 Summary: MP3 audio player with streaming support
 Name: freeamp
-Version: 1.3.0
+Version: 1.3.1
 Release: 1
 Copyright: GPL
 Group: Applications/Multimedia
-Source: www.freeamp.org:/pub/freeamp/freeamp-1.3.0-linux-x86-glibc2.tar.gz
+Source: www.freeamp.org:/pub/freeamp/freeamp-1.3.1-linux-x86-glibc2.tar.gz
 
 # Please read note above
 AutoReqProv: No
-Requires: ld-linux.so.2 libX11.so.6 libXext.so.6 libXpm.so.4 libc.so.6 libdl.so.2 libm.so.6 libpthread.so.0 libstdc++.so.2.8 
+Requires: ld-linux.so.2 libc.so.6 libdl.so.2 libm.so.6 libnsl.so.1 libpthread.so.0 libX11.so.6 libXext.so.6 libXpm.so.4
 
 %description
 This program plays MP3 (MPEG-1 audio layer 3) files and streams. The
