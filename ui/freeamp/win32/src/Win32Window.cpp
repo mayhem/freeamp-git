@@ -309,6 +309,9 @@ LRESULT Win32Window::WindowProc(HWND hwnd, UINT msg,
             break;
         }
 
+		case WM_WINDOWPOSCHANGING:
+			break;
+
         case MM_MIXM_CONTROL_CHANGE:
         {
             VolumeChanged();
@@ -389,10 +392,6 @@ Error Win32Window::Run(Pos &oPos)
             m_oWindowPos.y = (iMaxY - oRect.Height())/2;
         }
     }
-
-//	if (SystemParametersInfo(SPI_GETWHEELSCROLLINGLLINES,
-//		                     0, &m_lScrollLines, 0) == 0)
-//		 m_lScrollLines = 0;
 
     if (m_bLiveInToolbar)
         m_hWnd = CreateWindowEx(WS_EX_TOOLWINDOW,

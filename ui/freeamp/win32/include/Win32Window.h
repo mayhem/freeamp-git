@@ -96,7 +96,6 @@ class Win32Window : public Window
      Mutex   *m_pMindMeldMutex;
 	 bool     m_bMouseInWindow;
      bool     m_bMindMeldInProgress;
-	 unsigned long m_lScrollLines;
 };
 
 #endif
