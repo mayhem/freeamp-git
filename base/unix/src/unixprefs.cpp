@@ -731,7 +731,8 @@ GetLibDirs()
         uint32 size = 1024;
         m_libDirs = new char[size];
 
-        GetPrefString(kLibraryPathPref, m_libDirs, &size);
+        strcpy(m_libDirs, kDefaultLibraryPath);
+        //GetPrefString(kLibraryPathPref, m_libDirs, &size);
     }
     return m_libDirs;
 }

@@ -162,7 +162,7 @@ void GTKMusicBrowser::SubmitPlaylist(void)
         string caption = "Learn Playlist Error";
         string message = "In order to train the Relatable Engine, you need to have tracks selected in the My Music tree, have tracks selected in the playlist, or just have an active playlist.  You don't have any of this right now, so the Relatable Engine has nothing to learn.";
 
-        GTKessageDialog *dialog = new GTKMessageDialog();
+        GTKMessageDialog *dialog = new GTKMessageDialog();
         dialog->Show(message.c_str(), caption.c_str(), kMessageOk);
         delete dialog;
     }
