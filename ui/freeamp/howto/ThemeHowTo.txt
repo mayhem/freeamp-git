@@ -34,6 +34,14 @@ New features for final release:
   to distribute) font embedded in them.
 - There is now a PlayStop button as well as a PlayPause button. Works
   just like the PlayPause button, but with stop instead of Pause.
+- There is now a MPause button, which is 2 state MultiStateControl. The
+  first state is the normal state of the pause button and the second
+  state is the button when the player is paused. This gives the player
+  a way to indicate to the user that the player is paused.
+- To give your theme a descriptive title in the options dialog, simply
+  include a file called title.txt in your theme. The first line of that
+  file will be used as the name of the theme when the theme is shown in
+  the options dialog.
 
 GETTING STARTED
 
@@ -51,13 +59,15 @@ unpacked. Or you can look at Appendix B. :-) Then read on.
 
 THEMES
 
-A theme consists of at least three files that get packaged into one
+A theme consists of at least four files that get packaged into one
 .fat file:
 
   1) A bitmap for buttons/controls
   2) A background bitmap for the player
   3) theme.xml, which is an XML document that describes the layout 
      of the theme
+  4) A title.txt file which contains a descriptive name of the
+     theme. Only the first line of this file is used.
 
 Don't be scared by the XML -- in this case you might as well call it
 an HTML-like syntax, which sounds less intimidating. :-)
@@ -79,7 +89,7 @@ When you are done with your theme and want to ship it off to the
 FreeAmp theme repository or to your friends, package it up using
 the MakeTheme program bundled with FreeAmp. Simply do:
 
-    MakeTheme mytheme.fat theme.xml *.bmp
+    MakeTheme mytheme.fat theme.xml title.txt *.bmp
     
 in your theme directory. You can then add the mytheme.fat in
 the options dialog to load your theme. 
@@ -88,7 +98,7 @@ Note: The .fat format is simple (no symlinks, no directories)
 implementation of a tar'ed, gzipped file. If you prefer you can
 do:
 
-    tar -czf mytheme.fat theme.xml *.bmp
+    tar -czf mytheme.fat theme.xml title.txt *.bmp
     
 It will give you the same result. NOTE: You must use _gzip_ not
 the windows based pkzip or winzip.
@@ -114,37 +124,15 @@ this name in the theme.xml file.
 
 FONTS
 
-On Windows, TrueType fonts are used and on Linux the normal X Fonts
-are used. Hopefully by the final FreeAmp 2.0 release we will have
-TrueType font support for Linux as well. TrueType fonts will be
-the natural font choice for FreeAmp.
+TrueType fonts are used both on Linux and Windows. If you use some fancy 
+font in a theme, there is a good chance that other people will not have 
+that font on their machine. In that case, you should include your font 
+in the theme package. Please make sure that you have the right to
+distribute that font with theme. If you are unsure of the rights regarding
+fonts, you may want to use Microsoft's WebFonts, which you can redistribute.
 
-However, there are a couple of issues to be considered with fonts.
-If you use some fancy font in a theme, there is a good chance that
-other people will not have that font on their machine. In that case,
-FreeAmp will fall back to the user configurable default font. This
-limits theme designers in their use of fonts, or their themes won't
-look as cool as they did on their own machine.
+A font is given a name, which TextControl controls will refer back to.
 
-To alleviate this problem there are two solutions:
-
- 1) Allow a theme designer to package a font with the theme. This is 
-    a bad idea from a legal perspective -- a lot of fonts in use today
-    are copyrighted non free fonts and including a non-free font
-    presents a legal liability to us if we want to have a FreeAmp
-    theme repository on the FreeAmp site.
- 2) Allow a theme designer to include a URL to a font. This way a theme
-    designer can use fonts that are freely available on the free font
-    repositories on the net. When FreeAmp comes across a font it does
-    not have, it will attempt to download that font, and then use
-    that font as soon as it is downloaded.
-
-#1 is out and I hope to be able to implement #2 before release. But,
-for right now, you need to rely the fonts that are installed on the
-users machine.
-
-A font is also given a name, which TextControl controls will refer back
-to.
 
 RECTS
 
@@ -186,6 +174,12 @@ Also, we currently do not have a DTD specified for these XML files.
 Once we get out of beta, I will bring this HOWTO and a DTD up to
 the latest and greatest info.
 
+TITLE.TXT
+
+The file TITLE.TXT should contain one line of text that gives the theme
+a descriptive name. This text will be shown in the options dialog
+when all the available themes are listed. Note: Only the first line
+of text of this file will be used.
 
 Bitmap:
 -------
@@ -727,6 +721,10 @@ PlayPause     -- Play/Pause button
 PlayStop      -- Play/Stop button
 Repeat        -- Repeat None/Repeat One/Repeat All
 Shuffle       -- Normal/Shuffle mode
+MPause        -- Multistate Pause button. State 0 is shown when the player
+                 is not paused, and state 1 is shown when the player is
+				 paused to give the user visual feedback that the player is
+				 paused.
 
 Buttons:
 
@@ -773,7 +771,6 @@ This is the current Emusic theme.xml file:
 <ThemeInfo Name="EMusic Theme" Author="Bill Bull, Robert Kaye & Mark B. Elrod " 
            EMail="info@freeamp.org" WebPage="http://www.emusic.com"/>
 
-<!-- This is a comment! -->
 <Window Name="MainWindow">
     <BackgroundBitmap Name="Background" Rect="0, 0, 327, 161"/>
     <Controls>
@@ -787,10 +784,11 @@ This is the current Emusic theme.xml file:
             <Position Pos="228,124"/>
             <ControlBitmap Rect="0,96,119,159" Name="Buttons"/>
         </MultiStateControl>
-        <ButtonControl Name="Pause">
-        	<Info Desc="Pause the current track" Tip="Pause"/>
+        <MultiStateControl Name="MPause" NumStates="2">
+        	<Info Desc="Pause the current track||Continue playing" 
+        	            Tip="Pause||Continue"/>
             <Position Pos="258,124"/>
-            <ControlBitmap Rect="0,64,119,95" Name="Buttons"/>
+            <ControlBitmap Rect="0,282,119,345" Name="Buttons"/>
         </ButtonControl>
         <ButtonControl Name="Prev">
         	<Info Desc="Move to previous track" Tip="Previous"/>
