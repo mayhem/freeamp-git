@@ -91,6 +91,9 @@ void TimerManager::StartTimer(TimerRef* timerRef,
 
 void TimerManager::StopTimer(TimerRef timer)
 {
+    if (timer == NULL)
+        return;
+
     timer->ticks = 0;
     timer->duration = 0;
 
@@ -111,6 +114,9 @@ void TimerManager::StopTimer(TimerRef timer)
 
 void TimerManager::SetTimer(TimerRef timer, uint32 seconds)
 {
+    if (timer == NULL)
+        return;
+
     vector<TimerRef>::iterator i = m_list.begin();
 
     for(; i != m_list.end(); i++)

@@ -56,6 +56,7 @@ class Semaphore;
 class YPClient;
 class SigClient;
 class AudioSig;
+class SoundsLikeClient;
 
 #define APS_NOERROR       0
 #define APS_EMPTYLIST     1
@@ -97,8 +98,15 @@ public:
         by comparing the record/filenames against a master music 
         database. */ 
     int APSFillMetaData(APSMetaData* pmetaData);
-       
+      
     // Playlist Submission/Sorting/Generation Functions
+    /** TEMPORARY.  Used to generate a playlist based on the SoundsLike algo.
+        To be removed before next beta */
+    int APSGetSoundsLike(vector<string> *seedGUIDs,
+                         vector<string> *collectionGUIDs,
+                         vector<string> *returnGUIDs,
+                         int items, float fMax = -1.0);
+
     /** Used to generate a playlist. pPlayList is an optional
         list of seed items to focus the recommendation from, otherwise
         a profile query based on a psuedorandom gittering of the current
@@ -210,8 +218,8 @@ private:
                                      // if the server is down ;)
     string m_profilePath;            // store the path to the profile
     bool m_bRelatableOn;             // is this thing on?
+
+    SoundsLikeClient *m_pSLClient;   // FIXME: remove before b9
 };
-
-
 
 #endif

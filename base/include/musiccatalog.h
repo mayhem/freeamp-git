@@ -131,7 +131,9 @@ class MusicCatalog : public EventQueue
     int32 GetNumNeedingSigs(void) { return m_sigs->size(); }
     void StartGeneratingSigs(void);
     void StopGeneratingSigs(void);
-    
+
+    vector<string> *m_guidList; // FIXME: remove before b9
+
  protected:
     static void musicsearch_thread_function(void *arg);
     static void prune_thread_function(void *arg);

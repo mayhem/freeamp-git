@@ -145,3 +145,6 @@ Michael Rich <istan@alltel.net>
 
 "Roger Hardiman" <roger@cs.strath.ac.uk>
 * Preliminary FreeBSD support
+
+"Chris Kuklewicz" <chrisk@mit.edu>
+* patch to StopTimer to properly handle NULL timers.

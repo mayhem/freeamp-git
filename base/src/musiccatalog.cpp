@@ -70,7 +70,9 @@ MusicCatalog::MusicCatalog(FAContext *context, char *databasepath)
     m_sigs = new set<string>;
     m_guidTable = new multimap<string, string, less<string> >;
     m_watchTimer = NULL;
-   
+
+    m_guidList = new vector<string>; // FIXME: remove before b9
+ 
     m_timeout = 0;
     context->prefs->GetPrefInt32(kWatchThisDirTimeoutPref, &m_timeout);
 
@@ -456,7 +458,7 @@ Error MusicCatalog::AddStream(const char *url)
 
     m_catMutex->Acquire();
 
-    if (meta->GUID().size() > 0)
+    if (meta->GUID().size() > 0) 
         m_guidTable->insert(multimap<string, string, less<string> >
                             ::value_type(meta->GUID(), url));
 
@@ -1133,9 +1135,11 @@ void MusicCatalog::WriteMetaDataToDatabase(const char *url,
     ost.append("\0");
 
     if (metadata.GUID().size() > 0)
-        if (GetFilename(metadata.GUID()).size() == 0) 
+        if (GetFilename(metadata.GUID()).size() == 0) {
             m_guidTable->insert(multimap<string, string, less<string> >
                                 ::value_type(metadata.GUID().c_str(), url));
+            m_guidList->push_back(metadata.GUID()); // FIXME: remove
+        }
          
     m_database->Insert(url, (char *)ost.c_str());
 
@@ -1235,9 +1239,11 @@ MetaData *MusicCatalog::ReadMetaDataFromDatabase(const char *url)
     delete [] dbasedata;
 
     if (metadata->GUID().size() > 0)
-        if (GetFilename(metadata->GUID()).size() == 0)
+        if (GetFilename(metadata->GUID()).size() == 0) {
             m_guidTable->insert(multimap<string, string, less<string> >
                                 ::value_type(metadata->GUID().c_str(), url));
+            m_guidList->push_back(metadata->GUID()); // FIXME: Remove
+        }
 
     return metadata;
 }

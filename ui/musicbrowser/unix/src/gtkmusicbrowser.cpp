@@ -170,6 +170,120 @@ void GTKMusicBrowser::SubmitPlaylist(void)
     delete items;    
 }
 
+void GTKMusicBrowser::GenSLPlaylist(float fMax)
+{
+    APSInterface *pInterface = m_context->aps;
+    if (!pInterface)
+        return;
+
+    if (!pInterface->IsTurnedOn()) {
+        AskOptIn();
+        return;
+    }
+
+    if (m_context->catalog->GetNumNeedingSigs() > 0) {
+        StillNeedSignature();
+        return;
+    }
+
+    vector<PlaylistItem *> *items;
+
+    if (GetClickState() == kContextPlaylist) {
+        items = new vector<PlaylistItem *>;
+        set<uint32>::iterator i = m_plSelected.begin();
+        for (; i != m_plSelected.end(); i++) {
+            PlaylistItem *item = m_plm->ItemAt(*i);
+            if (item)
+                items->push_back(item);
+        }
+    }
+    else if (GetClickState() == kContextBrowser)
+        items = GetTreeSelection();
+    else
+        return;
+
+    GenSLPlaylist(items, fMax);
+
+    delete items;
+}
+
+void GTKMusicBrowser::GenSLPlaylist(vector<PlaylistItem *> *seed, float fMax)
+{
+    APSInterface *pInterface = m_context->aps;
+    if (!pInterface)
+        return;
+
+    if (!pInterface->IsTurnedOn()) {
+        AskOptIn(false);
+        return;
+    }
+
+    if (m_context->catalog->GetNumNeedingSigs() > 0) {
+        StillNeedSignature(false);
+        return;
+    }
+
+    vector<string> seedList;
+    vector<string> returnList;
+    uint32 nResponse = 0;
+
+    if ((seed) && (!seed->empty())) {
+        APSPlaylist InputPlaylist;
+        vector<PlaylistItem *>::iterator i;
+
+        for (i = seed->begin(); i != seed->end(); i++)
+            seedList.push_back((*i)->GetMetaData().GUID());
+
+        nResponse = m_context->aps->APSGetSoundsLike(&seedList,
+                               m_context->catalog->m_guidList, &returnList, 10,
+                               fMax);
+    }
+    else {
+        nResponse = m_context->aps->APSGetSoundsLike(&seedList,
+                               m_context->catalog->m_guidList, &returnList, 10,
+                               fMax);
+    }
+
+    if (nResponse == APS_NOERROR) {
+        if (returnList.size() > 0) {
+            vector<string> newitems;
+            string strTemp;
+            string strFilename;
+            vector<string>::iterator j;
+
+            for (j = returnList.begin(); j != returnList.end(); j++) {
+                strFilename = m_context->catalog->GetFilename(*j);
+                if (strFilename != "")
+                    newitems.push_back(strFilename.c_str());
+            }
+
+            for (int z = m_plm->CountItems() - 1; z >= 0; z--) {
+                PlaylistItem *testitem = m_plm->ItemAt(z);
+                bool remove = true;
+
+                if ((seed) && (!seed->empty())) {
+                    vector<PlaylistItem *>::iterator i = seed->begin();
+                    for (; i != seed->end(); i++) {
+                        if ((*i)->GetMetaData().GUID() ==
+                             testitem->GetMetaData().GUID()) {
+                            remove = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (remove)
+                    m_plm->RemoveItem(z);
+            }
+            m_plm->AddItems(newitems);
+        }
+        else
+           cerr << "SoundsLike recommendation didn't return any items\n";
+    }
+    else
+        cerr << "SoundsLike server error\n";
+}
+
 void GTKMusicBrowser::GenPlaylist(void)
 {
     APSInterface *pInterface = m_context->aps;
@@ -222,6 +336,7 @@ void GTKMusicBrowser::GenPlaylist(vector<PlaylistItem *> *seed)
         StillNeedSignature(false);
         return;
     }
+
 
     APSPlaylist ResultPlaylist;
     uint32 nResponse = 0;
@@ -276,7 +391,11 @@ void GTKMusicBrowser::GenPlaylist(vector<PlaylistItem *> *seed)
             }         
             m_plm->AddItems(newitems);
         }
+        else
+           cerr << "Recommendation didn't return any items\n";
     }
+    else
+        cerr << "Recommendation server error\n";
 }
 
 void GTKMusicBrowser::AddPLStreamToFavs(void)

@@ -285,8 +285,10 @@ Player::
     TYPICAL_DELETE(m_uiRegistry);
     TYPICAL_DELETE(m_lmcExtensions);
     TYPICAL_DELETE(m_context->timerManager);
-	TYPICAL_DELETE(m_sigStopMutex);
-    //TYPICAL_DELETE(m_plm);
+    TYPICAL_DELETE(m_sigStopMutex);
+#ifndef WIN32
+    TYPICAL_DELETE(m_plm);
+#endif
 }
 
 void      
