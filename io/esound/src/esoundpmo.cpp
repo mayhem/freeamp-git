@@ -97,8 +97,9 @@ EsounDPMO::~EsounDPMO()
       delete m_pBufferThread;
    }
 
-   close(audio_fd);
-   close(mixer_fd);
+   esd_close(audio_fd);
+   if (mixer_fd >= 0)
+      esd_close(mixer_fd);
    
    if (m_espeaker)
    {
@@ -118,6 +119,7 @@ void EsounDPMO::GetVolume(int32 &left, int32 &right)
 {
    left = right = -1;
 
+   mixer_fd = esd_open_sound(m_espeaker);
    if (mixer_fd > 0)
    {
       esd_info_t *info;
@@ -129,25 +131,30 @@ void EsounDPMO::GetVolume(int32 &left, int32 &right)
          return;
 
       for (plr = info->player_list; plr; plr = plr->next)
+      {
           if (!strncmp(stream_name, plr->name, ESD_NAME_MAX))
           {
              left = plr->left_vol_scale;
              right = plr->right_vol_scale;
              break;
           }
-      left = 50 * left / ESD_VOLUME_BASE;
-      right = 50 * right / ESD_VOLUME_BASE;
+      }
+      left = 100 * left / ESD_VOLUME_BASE;
+      right = 100 * right / ESD_VOLUME_BASE;
       esd_free_all_info(info);
+      esd_close(mixer_fd);
    }
 }
 
 void EsounDPMO::SetVolume(int32 left, int32 right)
 {
+   mixer_fd = esd_open_sound(m_espeaker);
    if (mixer_fd > 0)
    {
-      left = ESD_VOLUME_BASE * (left & 0xff) / 50;
-      right = ESD_VOLUME_BASE * (right & 0xff) / 50;
+      left = ESD_VOLUME_BASE * left / 100;
+      right = ESD_VOLUME_BASE * right / 100;
       esd_set_stream_pan(mixer_fd, stream_id, left, right);
+      esd_close(mixer_fd);
    }
 }
 
@@ -214,6 +221,8 @@ Error EsounDPMO::Init(OutputInfo * info)
             break;
          }
       esd_free_all_info(info);
+
+      esd_close(mixer_fd);
    }
 
    return kError_NoErr;
