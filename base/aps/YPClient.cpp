@@ -487,7 +487,7 @@ string& strCollectionID)
                                 nOffset += nBytes;
                         }
                         nBytes = nOffset;
-
+						nOffset = 0;
         FromBuffer(ResultList, &pBuffer[nOffset], nTemp);
         nOffset += nTemp;
                         nRes = 0;
