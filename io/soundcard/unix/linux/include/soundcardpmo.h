@@ -30,7 +30,6 @@ ____________________________________________________________________________*/
 /* project headers */
 #include <config.h>
 #include "pmo.h"
-#include "buffer.h"
 
 
 #define BIT_SELECT  0x1f

@@ -32,7 +32,7 @@ TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
 FILES = 
 else
 TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
-FILES = player.cpp bootstrap.cpp command.cpp buffer.cpp playlist.cpp hashtable.cpp thread.cpp registrar.cpp win32impl.cpp registry.cpp
+FILES = player.cpp bootstrap.cpp command.cpp playlist.cpp hashtable.cpp thread.cpp registrar.cpp win32impl.cpp registry.cpp
 endif
 
 if AM_HAVE_LINUXTHREADS

@@ -28,7 +28,6 @@ ____________________________________________________________________________*/
 #include "event.h"
 #include "ctrlobj.h"
 #include "vector.h"
-#include "buffer.h"
 #include "hashtable.h"
 #include "semaphore.h"
 #include "dummycoo.h"
@@ -42,7 +41,6 @@ ____________________________________________________________________________*/
 #define DEFAULT_COO CommandLineCOO()
 
 void testVector();
-void testBuffer();
 void testHashTable();
 
 int main(int argc, char **argv) {
@@ -202,95 +200,6 @@ void testVector() {
 	cout << "Final Test failed!! (2nd one)" << endl;
     }
     cout << "Ending testVector..." << endl;
-}
-void testBuffer() {
-    cout << "Begin testBuffer()...." << endl;
-    Buffer *pBuf = new Buffer();
-    cout << "Created buffer" << endl;
-    int32 hRead0 = pBuf->registerReader();
-    cout << "Registered reader 0" << endl;
-    int32 hRead1 = pBuf->registerReader();
-    cout << "Registered reader 1" << endl;
-    int32 hRead2 = pBuf->registerReader();
-    cout << "Registered reader 2" << endl;
-
-
-    char *pStr1 = new char[1024];
-    char *pStr2 = new char[1024];
-    char *pStr3 = new char[1024];
-    sprintf(pStr1,"Test string 1");
-    sprintf(pStr2,"Test string 2");
-    sprintf(pStr3,"Test string 3");
-
-    cout << "Created blocks..." << endl;
-
-    pBuf->writeBlock(pStr1,1024);
-    cout << "wrote block 1" << endl;
-    pBuf->writeBlock(pStr2,1024);
-    cout << "wrote block 2" << endl;
-    pBuf->writeBlock(pStr3,1024);
-    cout << "wrote block 3" << endl;
-
-
-    
-    delete pStr1;
-    delete pStr2;
-    delete pStr3;
-
-    
-    pBuf->getBlock(hRead0,&pStr1);
-    cout << pStr1 << endl;
-    delete pStr1;
-    pBuf->getBlock(hRead0,&pStr1);
-    cout << pStr1 << endl;
-    delete pStr1;
-    pBuf->getBlock(hRead0,&pStr1);
-    cout << pStr1 << endl;
-    delete pStr1;
-
-    pBuf->getBlock(hRead1,&pStr1);
-    cout << pStr1 << endl;
-    delete pStr1;
-    pBuf->getBlock(hRead2,&pStr1);
-    cout << pStr1 << endl;
-    delete pStr1;
-    pBuf->getBlock(hRead1,&pStr1);
-    cout << pStr1 << endl;
-    delete pStr1;
-    pBuf->getBlock(hRead2,&pStr1);
-    cout << pStr1 << endl;
-    delete pStr1;
-    pBuf->getBlock(hRead1,&pStr1);
-    cout << pStr1 << endl;
-    delete pStr1;
-    pBuf->getBlock(hRead2,&pStr1);
-    cout << pStr1 << endl;
-    delete pStr1;
-    
-    pBuf->releaseReader(hRead1);
-
-    pStr1 = new char[1024];
-    sprintf(pStr1,"Test String 4");
-    pBuf->writeBlock(pStr1,1024);
-    delete pStr1;
-
-    pBuf->getBlock(hRead0,&pStr1);
-    cout << pStr1 << endl;
-    delete pStr1;
-    
-    pBuf->getBlock(hRead1,&pStr1);
-    if (pStr1 != NULL) {
-	cout << "Didn't return null!!" << endl;
-    } else {
-	cout << "Returned null properly!" << endl;
-    }
-
-    pBuf->getBlock(hRead2,&pStr1);
-    cout << pStr1 << endl;
-    delete pStr1;
-
-    delete pBuf;
-    cout << "End testBuffer()..." << endl;
 }
 
 
