@@ -165,7 +165,7 @@ MouseMove(int32 x, int32 y, int32 modifiers)
                                 (float)(viewRect.bottom - viewRect.top));
 
 
-            int32 index = total * proportion;
+            int32 index = (int32)((float)total * proportion);
 
             m_target->ScrollTo(index);
 

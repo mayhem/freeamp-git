@@ -58,8 +58,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                          ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
-         ..\..\..\..\base\win32\prj\plugins
+                           ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
+          ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
@@ -91,8 +91,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                          ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
-         ..\..\..\..\base\win32\prj\plugins
+                           ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
+          ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
@@ -104,6 +104,14 @@ PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
 # Begin Group "source"
 
 # PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\src\bitmapview.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\buttonview.cpp
+# End Source File
 # Begin Source File
 
 SOURCE=..\..\..\..\config\config.win32
@@ -133,7 +141,23 @@ InputPath=..\..\..\..\config\config.win32
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\drawplayer.cpp
+SOURCE=..\src\control.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\controlinfo.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\dialview.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\dib.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\fontwidth.cpp
 # End Source File
 # Begin Source File
 
@@ -149,6 +173,10 @@ SOURCE=.\freeampui.def
 # End Source File
 # Begin Source File
 
+SOURCE=..\src\listview.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\base\win32\src\mutex.cpp
 # End Source File
 # Begin Source File
@@ -161,11 +189,51 @@ SOURCE=..\..\..\..\base\win32\src\preferences.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\src\renderer.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\scrollview.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\base\win32\src\semaphore.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\src\statusview.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\stringitem.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\testitem.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\textview.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\base\src\thread.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\timeview.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\utility.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\view.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\volumeview.cpp
 # End Source File
 # Begin Source File
 

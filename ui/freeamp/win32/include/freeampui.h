@@ -36,6 +36,8 @@ ____________________________________________________________________________*/
 #include "mutex.h"
 #include "queue.h"
 #include "playlist.h"
+#include "errors.h"
+#include "properties.h"
 #include "control.h"
 #include "controlinfo.h"
 #include "view.h"
@@ -60,11 +62,13 @@ class FreeAmpUI : public UserInterface {
     FreeAmpUI();
     ~FreeAmpUI();
 
-    virtual void Init() {}
+    virtual Error Init(int32 startup_type) { return kError_NoErr;}
     virtual void SetTarget(EventQueue* eq){m_target = eq;}
     virtual int32 AcceptEvent(Event*);
     virtual void SetArgs(int32,char**);
 	virtual void SetPlayListManager(PlayListManager*);
+    virtual Error SetPropManager(Properties *p) 
+    { m_propManager = p; if (p) return kError_NoErr; else return kError_UnknownErr; }
 
     void SetWindowHandle(HWND hwnd){m_hwnd = hwnd;}
     HCURSOR SetCursor(HCURSOR cursor)
@@ -106,7 +110,7 @@ class FreeAmpUI : public UserInterface {
     float			    m_secondsPerFrame;
 
  private:
-
+    Properties*         m_propManager;
     Thread*             m_uiThread;
     HWND                m_hwnd;
     HCURSOR             m_cursor;
