@@ -7,6 +7,10 @@ file4=..\..\base\win32\prj\plugins\fileinput.pmi
 file5=..\..\base\win32\prj\plugins\misc.mdf
 file6=..\..\base\win32\prj\plugins\toolbar.ui
 file7=..\..\base\win32\prj\plugins\rmp.dlf
+file8=..\..\base\win32\prj\plugins\cd.lmc
+file9=..\..\base\win32\prj\plugins\cd.pmo
+file10=..\..\base\win32\prj\plugins\cddb.mdf
+file11=..\..\base\win32\prj\plugins\winamp.ftf
 
 [General]
 Type=FILELIST

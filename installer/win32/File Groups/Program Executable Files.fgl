@@ -7,6 +7,8 @@ file4=..\..\Authors.txt
 file5=..\..\base\win32\prj\update.exe
 file6=..\..\base\win32\prj\freeamp.cnt
 file7=..\..\base\win32\prj\freeamp.hlp
+file8=..\..\base\win32\prj\winamp_theme.xml
+file9=..\..\base\win32\prj\id3lib.dll
 
 [General]
 Type=FILELIST
