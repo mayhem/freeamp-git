@@ -151,26 +151,48 @@ EditLabelWndProc(HWND hwnd,
 void MusicBrowserUI::EditItemLabel(HWND hwnd, HTREEITEM item)
 {
     g_editItem = item;
+
+    bool isPlaylist = false;
+    TV_ITEM tv_item;
+
+    tv_item.hItem = item;
+    tv_item.mask = TVIF_PARAM;
+
+    TreeView_GetItem(hwnd, &tv_item);
+
+    TreeData* treedata = (TreeData*)tv_item.lParam;
+
+    if(treedata)
+    {
+        isPlaylist = treedata->IsPlaylist();
+
+        if(treedata->IsTrack())
+        {
+            TV_ITEM tv_item;
+
+            tv_item.mask = TVIF_HANDLE | TVIF_TEXT;
+            tv_item.hItem = item;
+            tv_item.pszText = (char*)treedata->m_pTrack->GetMetaData().Title().c_str();
+            tv_item.cchTextMax = strlen(tv_item.pszText);
+
+            TreeView_SetItem(hwnd, &tv_item);        
+        }
+    }
+
     SetFocus(hwnd);
 
     HWND hwndEdit = TreeView_EditLabel(hwnd, item);
 
     if(hwndEdit)
     {
-        bool isPlaylist = false;
-        TV_ITEM tv_item;
+        /*RECT rect;
 
-        tv_item.hItem = item;
-        tv_item.mask = TVIF_PARAM;
+        GetWindowRect(hwndEdit, &rect);
 
-        TreeView_GetItem(hwnd, &tv_item);
+        MapWindowPoints(NULL, hwnd, (LPPOINT)&rect, 2);
 
-        TreeData* treedata = (TreeData*)tv_item.lParam;
-
-        if(treedata)
-        {
-            isPlaylist = treedata->IsPlaylist();
-        }
+        MoveWindow(hwndEdit, rect.left, rect.top, (rect.right - rect.left)/2,
+            rect.bottom - rect.top, TRUE);*/
 
         SetProp(hwndEdit, 
                 "oldproc",
@@ -180,10 +202,10 @@ void MusicBrowserUI::EditItemLabel(HWND hwnd, HTREEITEM item)
                 "playlist",
                 (HANDLE)isPlaylist);
 
-	    // Subclass the window so we can handle multi-select
-	    SetWindowLong(hwndEdit, 
+        // Subclass the window so we can filter characters
+        SetWindowLong(hwndEdit, 
 			          GWL_WNDPROC, 
-                      (DWORD)::EditLabelWndProc);  
+                      (DWORD)::EditLabelWndProc);
     }
 }
 

@@ -27,6 +27,10 @@ ____________________________________________________________________________*/
 #include <sys/stat.h>
 #include <direct.h>
 
+#include <sstream>
+
+using namespace std;
+
 #include "config.h"
 #include "utility.h"
 #include "resource.h"
@@ -648,13 +652,12 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
             {
                 TV_DISPINFO* info = (TV_DISPINFO*)pHdr;
                 TV_ITEM tv_item = info->item;
-
-                // was the operation cancelled?
-                if(tv_item.pszText)
+                TreeData* treedata = (TreeData*)tv_item.lParam;
+                
+                if(treedata)
                 {
-                    TreeData* treedata = (TreeData*)tv_item.lParam;
-
-                    if(treedata)
+                    // was the operation cancelled?
+                    if(tv_item.pszText)
                     {
                         if(treedata->IsTrack())
                         {
@@ -689,9 +692,40 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                         }
                     }
 
-                    result = TRUE;
-                }
+                    /*
 
+                    if(treedata->IsTrack())
+                    {
+                        ostringstream ost;
+    
+                        if(treedata->m_pTrack->GetMetaData().Track() == 0)
+                            ost << "?. ";
+                        else            
+                            ost << treedata->m_pTrack->GetMetaData().Track() << ". ";
+
+                        if(tv_item.pszText)
+                            ost << tv_item.pszText;
+                        else
+                            ost << treedata->m_pTrack->GetMetaData().Title();
+
+                        string title = ost.str();
+                    
+                        if(!tv_item.pszText &&
+                           treedata->m_pTrack->GetMetaData().Title() == string(" ") ||
+                           treedata->m_pTrack->GetMetaData().Title().length() == 0)
+                            tv_item.pszText = "Unknown";
+                        else    
+                            tv_item.pszText = (char *)(title.c_str());
+                    
+                        tv_item.mask = TVIF_HANDLE | TVIF_TEXT;
+                        tv_item.cchTextMax = strlen(tv_item.pszText);
+
+                        TreeView_SetItem(m_hMusicView, &tv_item);
+                    }
+
+                    */
+                }
+                
                 break;
             }
 
@@ -1350,7 +1384,7 @@ void MusicBrowserUI::AddTrackAndPlayEvent(void)
     }
 }
 
-void MusicBrowserUI::AddFileEvent(HWND hwndParent)
+void MusicBrowserUI::AddFileEvent(HWND hwndParent, bool playNow)
 {
     PlaylistFormatInfo format;
     int32 i, iOffset = 0;
@@ -1398,7 +1432,20 @@ void MusicBrowserUI::AddFileEvent(HWND hwndParent)
         newSize += oFileList.size();
         ListView_SetItemCount(m_hPlaylistView, newSize);
 
+        uint32 initialCount = m_context->plm->CountItems();
+
+        if(playNow)
+        {
+            m_context->target->AcceptEvent(new Event(CMD_Stop));
+            m_context->plm->RemoveAll();
+        }
+
         m_plm->AddItems(oFileList);
+
+        if(playNow || !initialCount)
+        {
+            m_context->target->AcceptEvent(new Event(CMD_Play));
+        }
     }
 }
 

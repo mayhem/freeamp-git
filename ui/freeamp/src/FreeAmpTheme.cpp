@@ -1708,15 +1708,15 @@ void FreeAmpTheme::DropFiles(vector<string> *pFileList)
     uint32                   length, countbefore;
     vector<string>::iterator i;
     bool                     bPlay;
-    int                      iItems;
+    bool                     bEmptied = false;
     
     ext = new char[_MAX_PATH];
     url = new char[_MAX_PATH + 7];
 
     m_pContext->prefs->GetPlayImmediately(&bPlay);
-    iItems = m_pContext->plm->CountItems();
     
     countbefore = m_pContext->plm->CountItems();
+
     for(i = pFileList->begin(); i != pFileList->end(); i++)
     {
         char          *pExtension = NULL;
@@ -1735,14 +1735,14 @@ void FreeAmpTheme::DropFiles(vector<string> *pFileList)
             FindMusicFiles(i->c_str(), oList, oQuery); 
             if (oList.size() > 0)
             {
-               if (bPlay)
-               {
-                   m_pContext->target->AcceptEvent(new Event(CMD_Stop));
-                   m_pContext->plm->RemoveAll(); 
-               }
-               m_pContext->plm->AddItems(oList);
-               if (iItems == 0 || bPlay)
-                   m_pContext->target->AcceptEvent(new Event(CMD_Play));
+                if(bPlay && !bEmptied)
+                {
+                    m_pContext->target->AcceptEvent(new Event(CMD_Stop));
+                    m_pContext->plm->RemoveAll();
+                    bEmptied = true;
+                }
+
+                m_pContext->plm->AddItems(oList);
             }
         }
         else
@@ -1754,53 +1754,54 @@ void FreeAmpTheme::DropFiles(vector<string> *pFileList)
             
             pExtension = strrchr((*i).c_str(), '.');
             if (!pExtension)
-               continue;
+                continue;
 
             strcpy(ext, pExtension + 1);
             ToUpper(ext);
 
             for(j = 0; ; j++)
             {
-               eRet = m_pContext->plm->GetSupportedPlaylistFormats(&oInfo, j);
-               if (IsError(eRet))
-                  break;
-            
-               if (strcasecmp(oInfo.GetExtension(), ext) == 0)
-                  break;   
+                eRet = m_pContext->plm->GetSupportedPlaylistFormats(&oInfo, j);
+                if (IsError(eRet))
+                    break;
+
+                if (strcasecmp(oInfo.GetExtension(), ext) == 0)
+                    break;   
             }
+
             if (!IsError(eRet))
             {
                 length = _MAX_PATH + 7;
                 FilePathToURL((*i).c_str(), url, &length);
                 
-                if (bPlay)
+                if (bPlay && !bEmptied)
                 {
                     m_pContext->target->AcceptEvent(new Event(CMD_Stop));
-                    m_pContext->plm->RemoveAll(); 
+                    m_pContext->plm->RemoveAll();
+                    bEmptied = true;
                 }
+
                 m_pContext->plm->ReadPlaylist(url);
-                if (iItems == 0 || bPlay)
-                    m_pContext->target->AcceptEvent(new Event(CMD_Play));
             }   
-            else   
-                if (m_pContext->player->IsSupportedExtension(ext))
+            else if (m_pContext->player->IsSupportedExtension(ext))
+            {
+                length = _MAX_PATH + 7;
+                FilePathToURL((*i).c_str(), url, &length);
+            
+                if (bPlay && !bEmptied)
                 {
-                    length = _MAX_PATH + 7;
-                    FilePathToURL((*i).c_str(), url, &length);
+                    m_pContext->target->AcceptEvent(new Event(CMD_Stop));
+                    m_pContext->plm->RemoveAll();
+                    bEmptied = true;
+                }
+
+                m_pContext->plm->AddItem(url);
                 
-                    if (bPlay)
-                    {
-                        m_pContext->target->AcceptEvent(new Event(CMD_Stop));
-                        m_pContext->plm->RemoveAll(); 
-                    }
-                    m_pContext->plm->AddItem(url);
-                    if (iItems == 0 || bPlay)
-                        m_pContext->target->AcceptEvent(new Event(CMD_Play));
-                }    
+            }    
         }
     }
     
-    if (countbefore == 0)
+    if (countbefore == 0 || bPlay)
         m_pContext->target->AcceptEvent(new Event(CMD_Play));
         
     delete [] ext;

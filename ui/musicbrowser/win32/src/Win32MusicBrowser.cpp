@@ -871,8 +871,11 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
             if(IsntError(m_context->props->GetProperty("MainWindow", (PropValue **)&prop)))
             {
                 HWND hwnd = (HWND)prop->GetInt32();
-    
-                AddFileEvent(hwnd);
+                bool playNow;
+
+                m_context->prefs->GetPlayImmediately(&playNow);
+
+                AddFileEvent(hwnd, playNow);
             }
             
             break;
