@@ -179,6 +179,20 @@ Error SoundCardPMO::Init(OutputInfo * info)
 
    channels = info->number_of_channels;
 
+   int mask;
+
+   if (ioctl(audio_fd, SNDCTL_DSP_GETFMTS, &mask) == -1) 
+   {
+      ReportError("Cannot determing the playback formats supported by"
+                  " the soundcard");
+      return (Error) pmoError_IOCTL_SNDCTL_DSP_SAMPLESIZE;
+   }
+   if ((mask & AFMT_S16_LE) == 0)
+   {
+      ReportError("The soundcard does not support 16 bit sample size.");
+      return (Error) pmoError_IOCTL_SNDCTL_DSP_SAMPLESIZE;
+   }
+
    // configure the device:
    int       play_precision = 16;
    int       play_stereo = channels - 1;

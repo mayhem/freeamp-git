@@ -366,11 +366,11 @@ Error HttpInput::Open(void)
      }   
 
 #if defined(WIN32)
-	unsigned long lMicrosoftSucksBalls = 1;
-	ioctlsocket(m_hHandle, FIONBIO, &lMicrosoftSucksBalls);
+    unsigned long lMicrosoftSucksBalls = 1;
+    ioctlsocket(m_hHandle, FIONBIO, &lMicrosoftSucksBalls);
 #elif defined(__BEOS__)
-//	int on = 1;
-//	setsockopt( m_hHandle, SOL_SOCKET, SO_NONBLOCK, &on, sizeof( on ) );
+//  int on = 1;
+//  setsockopt( m_hHandle, SOL_SOCKET, SO_NONBLOCK, &on, sizeof( on ) );
 #else
     fcntl(m_hHandle, F_SETFL, fcntl(m_hHandle, F_GETFL) | O_NONBLOCK);
 #endif
@@ -449,7 +449,7 @@ Error HttpInput::Open(void)
         closesocket(m_hHandle);
         return (Error)httpError_SocketWrite;
     }
-	delete szQuery;
+    delete szQuery;
 
     pInitialBuffer = new char[iInitialBufferSize + 1];
     for(;!m_bExit;)
@@ -459,7 +459,7 @@ Error HttpInput::Open(void)
         iRet = select(m_hHandle + 1, &sSet, NULL, NULL, &sTv);
         if (!iRet)
         {
-		   usleep(10000);
+           usleep(10000);
            continue;
         }
         iRead = recv(m_hHandle, pInitialBuffer, iInitialBufferSize, 0);
@@ -623,7 +623,7 @@ Error HttpInput::Open(void)
     {
         char szPath[255], szFile[255];
         unsigned i;
-					
+                    
         if (szStreamName == NULL)
         {
            szStreamName = new char[255];
@@ -757,18 +757,17 @@ void HttpInput::WorkerThread(void)
               iMaxReadBytes = iReadSize;
               
           iRead = recv(m_hHandle, (char *)pBuffer, iMaxReadBytes, 0);
-		  if (iRead < 0)
-		  {
-#ifdef WIN32
-			 if (WSAGetLastError() == WSAEWOULDBLOCK)
-#else
-	         if (errno == EAGAIN)
-#endif
-				 iRead = 0;
-		  }
           if (iRead < 0)
           {
-			 Debug_v("iRead: %d (le: %d)", iRead, WSAGetLastError());
+#ifdef WIN32
+             if (WSAGetLastError() == WSAEWOULDBLOCK)
+#else
+             if (errno == EAGAIN)
+#endif
+                 iRead = 0;
+          }
+          if (iRead < 0)
+          {
              m_pOutputBuffer->SetEndOfStream(true);
              m_pOutputBuffer->EndWrite(0);
              break;
