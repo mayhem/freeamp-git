@@ -23,12 +23,13 @@ ____________________________________________________________________________*/
 
 #include <assert.h>
 #include <string>
+#include <errno.h>
 
 using namespace std;
 
 #include "config.h"
 #include "errors.h"
-#include "errno.h"
+#include "utility.h"
 
 #include "id3v1.h"
 
@@ -248,8 +249,12 @@ bool ID3v1::ReadMetaData(const char* url, MetaData* metadata)
     if(url && metadata)
     {
         FILE* fp;
+        char path[_MAX_PATH];
+        uint32 length = sizeof(path);
 
-        fp = fopen(url, "rb");
+        URLToFilePath(url, path, &length);
+
+        fp = fopen(path, "rb");
 
         if(fp)
         {

@@ -25,6 +25,7 @@ ____________________________________________________________________________*/
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <errno.h>
 #ifdef WIN32
 #include <winsock.h>
 #else
@@ -33,7 +34,7 @@ ____________________________________________________________________________*/
 
 #include "config.h"
 #include "errors.h"
-#include "errno.h"
+#include "utility.h"
 
 #include "id3v2.h"
 
@@ -112,7 +113,12 @@ bool ID3v2::ReadMetaData(const char* url, MetaData* metadata)
     assert(url);
     assert(metadata);
 
-    inFile = fopen(url, "rb");
+    char path[_MAX_PATH];
+    uint32 length = sizeof(path);
+
+    URLToFilePath(url, path, &length);
+
+    inFile = fopen(path, "rb");
     if (inFile == NULL)
         return result;
 

@@ -406,7 +406,7 @@ SetArgs(int32 argc, char **argv)
                 }
                 else // is this a URL we know how to handle ?
                 {
-                    m_plm->AddItem(arg);
+                    // file not found? don't add it...
                     continue;
                 }
 #else

@@ -104,11 +104,11 @@ Error M3U::ReadPlaylist(const char* url,
         char path[_MAX_PATH];
         PlaylistItem* item;
         char* cp = NULL;
-        uint32 length = sizeof(root);
+        uint32 length = sizeof(path);
 
-        //URLToFilePath(url, root, &length);
+        URLToFilePath(url, path, &length);
 
-        strcpy(root, url);
+        strcpy(root, path);
 
         cp = strrchr(root, DIR_MARKER);
 
@@ -117,7 +117,7 @@ Error M3U::ReadPlaylist(const char* url,
 	    
         result = kError_FileNotFound;
 
-	    fp = fopen(url, "rb");
+	    fp = fopen(path, "rb");
 
         if(fp)
         {
@@ -210,14 +210,13 @@ Error M3U::WritePlaylist(const char* url, PlaylistFormatInfo* format,
         {
             FILE* fp = NULL;
             char path[_MAX_PATH];
-        
             uint32 length = sizeof(path);
 
             URLToFilePath(url, path, &length);
 
             result = kError_FileNoAccess;
 
-	        fp = fopen(url, "wb");
+	        fp = fopen(path, "wb");
 
 	        if(fp)
             {
