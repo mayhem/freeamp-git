@@ -499,7 +499,12 @@ SetArgs(int32 argc, char **argv)
             }
         }
     }
-
+    
+    if(m_autoplay)
+    {
+        AcceptEvent(new Event(CMD_Play));
+    }  
+    
     delete [] path;
     delete [] url;
 
