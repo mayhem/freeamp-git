@@ -174,6 +174,14 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
 
     uuid_ascii((unsigned char*)pmetaData->GUID().c_str(), guid);
 
+    string guidMapping = m_profilePath + string(DIR_MARKER_STR) +
+                         string("guid_mapping.txt");
+
+    FILE *guidLogfile = fopen(guidMapping.c_str(), "a+");
+    fprintf(guidLogfile, "%s\t%s\n", pmetaData->Filename().c_str(),
+                                     guid);
+    fclose(guidLogfile);
+
     args[0] = strdup(pmetaData->Title().c_str());
     args[1] = strdup(guid);
     args[2] = strdup(pmetaData->Filename().c_str());
