@@ -199,6 +199,14 @@ bool MetaDataSort::operator() (MetaDataFormat* item1,
     return result;
 }
 
+// return an integral random number in the range 0 - (n - 1)
+static int my_rand(int n)
+{
+    srand( (unsigned)time( NULL ) );
+
+    return rand() % n;
+}
+
 // Implementation of the PlaylistManager Class
 PlaylistManager::PlaylistManager(FAContext* context)
 {
@@ -213,8 +221,6 @@ PlaylistManager::PlaylistManager(FAContext* context)
 
     m_context->prefs->GetPlaylistShuffle(&m_shuffle);
     m_context->prefs->GetPlaylistRepeat((int32*)&m_repeatMode);
-
-    srand( (unsigned)time( NULL ) );
 
     Registrar registrar;
 
@@ -475,7 +481,8 @@ Error PlaylistManager::GotoNextItem(bool userAction)
 
                 if(m_shuffle)
                 {
-                    random_shuffle(m_shuffleList.begin(), m_shuffleList.end());
+                    random_shuffle(m_shuffleList.begin(), m_shuffleList.end(),
+                                   pointer_to_unary_function<int, int>(my_rand));
                 }
             }
             else if(index >= count)
@@ -514,7 +521,8 @@ Error PlaylistManager::GotoPreviousItem(bool userAction)
 
                 if(m_shuffle)
                 {
-                    random_shuffle(m_shuffleList.begin(), m_shuffleList.end());
+                    random_shuffle(m_shuffleList.begin(), m_shuffleList.end(),
+                                   pointer_to_unary_function<int, int>(my_rand));
                 }
             }
             else if(index != 0)
@@ -558,21 +566,23 @@ Error PlaylistManager::SetShuffleMode(bool shuffle)
 {
     m_mutex.Acquire();
 
+    const PlaylistItem* currentItem = GetCurrentItem();
+
+    m_shuffle = shuffle;
+
     if(shuffle)
     {
-        random_shuffle(m_shuffleList.begin(), m_shuffleList.end());
+        random_shuffle(m_shuffleList.begin(), m_shuffleList.end(),
+                       pointer_to_unary_function<int, int>(my_rand));
+
+        if(currentItem)
+            m_current = InternalIndexOf(&m_shuffleList, currentItem);
     }
     else
     {
-        // need to change current index so that this plays from 
-        // current song when it continues
-        const PlaylistItem* currentItem = GetCurrentItem();
-
-        if(currentItem && kPlaylistKey_MasterPlaylist == GetActivePlaylist())
-            InternalSetCurrentIndex(IndexOf(currentItem));
+        if(currentItem)
+            m_current = IndexOf(currentItem);
     }
-
-    m_shuffle = shuffle;
 
     m_context->target->AcceptEvent(new PlaylistShuffleEvent(m_shuffle, this));
 
@@ -1508,7 +1518,8 @@ Error PlaylistManager::Sort(PlaylistSortKey key, PlaylistSortType type)
     }
     else if(currentItem && key == kPlaylistSortKey_Random)
     {
-        random_shuffle(m_activeList->begin(), m_activeList->end());
+        random_shuffle(m_activeList->begin(), m_activeList->end(),
+                       pointer_to_unary_function<int, int>(my_rand));
         
         m_sortKey = key;
         m_sortType = type;
@@ -2256,7 +2267,8 @@ void PlaylistManager::AddItemToShuffleList(PlaylistItem* item)
 
 void PlaylistManager::AddItemsToShuffleList(vector<PlaylistItem*>* list)
 {
-    random_shuffle(list->begin(), list->end());
+    random_shuffle(list->begin(), list->end(),
+                   pointer_to_unary_function<int, int>(my_rand));
 
     m_shuffleList.insert(m_shuffleList.end(),
                          list->begin(), 
