@@ -1049,7 +1049,8 @@ void FreeAmpTheme::PostWindowCreate(void)
     pProp = new Int32PropValue((int)((Win32Window *)m_pWindow)->GetWindowHandle());
     m_pContext->props->SetProperty("MainWindow", pProp);
 #endif
-    m_pWindow->SetTitle(string(BRANDING));
+    string winTitle = string(BRANDING);
+    m_pWindow->SetTitle(winTitle);
 }
 
 void FreeAmpTheme::ShowHelp(void)
