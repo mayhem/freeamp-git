@@ -48,7 +48,11 @@ ____________________________________________________________________________*/
 #include "lmc.h"
 #include "log.h"
 
+#if MP3_PROF
+extern LogFile *g_Log;
+#else
 LogFile *g_Log = NULL;
+#endif
 
 #define DB printf("%08x: %s:%d\n", pthread_self(), __FILE__, __LINE__);
 
@@ -61,7 +65,9 @@ extern    "C"
 {
    LogicalMediaConverter *Initialize(LogFile *pLogFile)
    {
+#if !MP3_PROF
       g_Log = pLogFile;
+#endif
 
       return new XingLMC();
    }

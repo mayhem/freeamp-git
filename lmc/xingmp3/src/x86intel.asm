@@ -27,7 +27,7 @@
 ;	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 ;
 ;	$Id$
-;	Generated from Id: x86gas.s,v 1.7 1999/03/04 07:28:16 mhw Exp $
+;	Generated from Id: x86gas.s,v 1.8 1999/03/05 01:16:21 mhw Exp $
 ;
 
 .386
@@ -317,9 +317,9 @@ L_in EQU 160
 L_out EQU 164
 L_locals EQU 140	; Bytes used for locals
 
-public _fdct32
+public _asm_fdct32
 	align 16
-_fdct32 proc near
+_asm_fdct32 proc near
 	push ebp
 	push edi
 	push esi
@@ -456,7 +456,7 @@ BackInnerLoop:
 	pop edi
 	pop ebp
 	ret 
-_fdct32 endp
+_asm_fdct32 endp
 
 _TEXT	ends
 	end

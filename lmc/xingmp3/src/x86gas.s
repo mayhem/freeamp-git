@@ -236,12 +236,12 @@ window_dual:	#%% proc
 .equ L_out,	164
 .equ L_locals,	140	# Bytes used for locals
 
-.globl fdct32
+.globl asm_fdct32
 	.align 16
 #%% end-not-inline
-#%% ! void fdct32(float in[], float out[])
+#%% ! void asm_fdct32(float in[], float out[])
 #%% ! {
-fdct32:		#%% proc
+asm_fdct32:	#%% proc
 #%% if-not-inline
 	pushl %ebp
 	pushl %edi

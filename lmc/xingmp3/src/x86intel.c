@@ -27,7 +27,7 @@
 /*	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 /*	$Id$ */
-/*	Generated from Id: x86gas.s,v 1.7 1999/03/04 07:28:16 mhw Exp $ */
+/*	Generated from Id: x86gas.s,v 1.8 1999/03/05 01:16:21 mhw Exp $ */
 
 
 extern float wincoef[264];
@@ -302,7 +302,7 @@ LastInRange:
 #define L_out 16
 #define L_buf 20	/* Temporary buffer */
 #define L_locals 148	/* Bytes used for locals */
-void fdct32(float in[], float out[])
+void asm_fdct32(float in[], float out[])
 {
 __asm {
 
