@@ -66,6 +66,9 @@ class FAContext
 	  gtkInitialized(false),
           gtkRunning(false),
 #endif	  
+#ifdef WIN32
+      hInstance(0),
+#endif      
 	  argc(0),
           argv(0),	  
 	  argFlags(0) { }
@@ -97,6 +100,9 @@ class FAContext
     bool gtkInitialized;
     bool gtkRunning;
 #endif    
+#ifdef WIN32
+    HINSTANCE hInstance;
+#endif
     int32 argc;
     char** argv;
     uint32 argFlags;

@@ -893,7 +893,7 @@ static BOOL CALLBACK IntroWizardMusicBrainz(HWND hwnd,
                 }
                 case PSN_WIZNEXT:
                 {
-                    context->prefs->SetPrefBoolean(kEnableMusicBrainzBitziPref, 
+                    context->prefs->SetPrefBoolean(kEnableMusicBrainzPref, 
                                      Button_GetCheck(hwndOptIn) == BST_CHECKED);
                     break;
                 }

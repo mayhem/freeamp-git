@@ -106,6 +106,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     FAContext *context = new FAContext;
     context->prefs = new Win32Prefs();
     context->prefs->GetPrefBoolean(kAllowMultipleInstancesPref, &allowMultipleInst);
+    context->hInstance = hInstance;
 
 	if (!allowMultipleInst)
     {

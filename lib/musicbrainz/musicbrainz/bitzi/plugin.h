@@ -25,7 +25,7 @@ typedef struct _Attribute
     char *value;
 } Attribute;
 
-typedef void *Context;
+typedef void Context;
 
 typedef struct _PluginMethods
 {
@@ -37,11 +37,11 @@ typedef struct _PluginMethods
    
     Attribute        *(*file_analyze)         (const char *fileName);
 
-    Context           (*mem_analyze_init)     (void);
-    void              (*mem_analyze_update)   (Context context, 
-                                               const unsigned char *,
-                                               unsigned bufLen);
-    Attribute        *(*mem_analyze_final)    (Context context);
+    Context          *(*mem_analyze_init)     (void);
+    void              (*mem_analyze_update)   (Context             *context, 
+                                               const unsigned char *buf,
+                                               unsigned             bufLen);
+    Attribute        *(*mem_analyze_final)    (Context *context);
 
     void              (*free_attributes)      (Attribute *attrList);
 

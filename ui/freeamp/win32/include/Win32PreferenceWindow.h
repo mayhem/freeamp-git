@@ -97,6 +97,7 @@ typedef struct PrefsStruct
 	// page 8
 	bool updateCDAutomatically;
 	bool enableMB;
+	bool enableBitzi;
     string MBServerURL;
 
     // Browser page

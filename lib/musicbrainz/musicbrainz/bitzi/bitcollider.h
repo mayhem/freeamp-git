@@ -107,6 +107,8 @@ b_bool                 analyze_file        (BitcolliderSubmission *tag,
 b_bool                 submit_submission   (BitcolliderSubmission *tag, 
                                             const char *url,
                                             BrowserEnum browser);
+BitcolliderSubmission *read_submission_from_file(Bitcollider *bc, 
+                                            char *tagFile);
 int                    get_num_bitprints   (BitcolliderSubmission *sub);
 void                   print_submission    (BitcolliderSubmission *tag);
 void                   convert_to_hex      (const unsigned char *buffer, 

@@ -12,8 +12,16 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 DWORD WINAPI BitcolliderThread(LPVOID arg);
 extern HWND init_gui(void);
 extern void win32_progress_callback(int percent, const char *file, const char *message);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

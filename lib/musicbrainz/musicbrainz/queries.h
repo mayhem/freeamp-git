@@ -416,6 +416,22 @@
         "http://musicbrainz.org/mm/mm-2.0#toc [] http://musicbrainz.org/mm/mm-2.0#numSectors"
 
 /* -------------------------------------------------------------------------
+ * Extract queries for the MBQ_AuthenticateQuery query
+ * -------------------------------------------------------------------------
+ */
+/**
+ * return the Session Id from the Auth Query. This query will be used 
+ * internally by the client library.
+ */
+#define MBE_AuthGetSessionId  "http://musicbrainz.org/mm/mq-1.0#sessionId"
+
+/**
+ * return the Auth Challenge data from the Auth Query This query will be used 
+ * internally by the client library.
+ */
+#define MBE_AuthGetChallenge  "http://musicbrainz.org/mm/mq-1.0#authChallenge"
+
+/* -------------------------------------------------------------------------
  * Local queries (queries are automatically generated)
  * -------------------------------------------------------------------------
  */
@@ -442,9 +458,25 @@
         "@CDINFOASSOCIATECD@"
 
 /* -------------------------------------------------------------------------
- * Server queries (queries must have argument substituted in them)
+ * Server queries (queries must have argument(s) substituted in them)
  * -------------------------------------------------------------------------
  */
+
+/**
+ * This query is use to start an authenticated session with the MB server.
+ * The username is sent to the server, and the server responds with 
+ * session id and a challenge sequence that the client needs to use to create 
+ * a session key. The session key and session id need to be provided with
+ * the MBQ_SubmitXXXX functions in order to give moderators/users credit
+ * for their submissions. This query will be carried out by the client
+ * libary automatically -- you should not need to use it.
+ * @param username -- the name of the user who would like to submit data.
+ */
+#define MBQ_Authenticate \
+    "<mq:AuthenticateQuery>\n" \
+    "   <mq:username>@1@</mq:username>\n" \
+    "</mq:AuthenticateQuery>\n" 
+
 /**
  * Use this query to return an albumList for the given CD Index Id
  * @param cdindexId The cdindex id to look up at the remote server.
@@ -515,34 +547,34 @@
  * Retrieve an artistList from a given Artist id 
  */
 #define MBQ_GetArtistById \
-    "http://@URL@/artist/@1@" 
+    "http://@URL@/artist/@1@/@DEPTH@" 
 
 /** 
  * Retrieve an albumList from a given Album id 
  */
 #define MBQ_GetAlbumById \
-    "http://@URL@/album/@1@" 
+    "http://@URL@/album/@1@/@DEPTH@" 
 
 /** 
  * Retrieve an trackList from a given Track id 
  */
 #define MBQ_GetTrackById \
-    "http://@URL@/track/@1@" 
+    "http://@URL@/track/@1@/@DEPTH@" 
 
 /** 
  * Retrieve an trackList from a given TRM Id 
  */
 #define MBQ_GetTrackByTRMId \
-    "http://@URL@/trmid/@1@" 
+    "http://@URL@/trmid/@1@/@DEPTH@" 
 
 /** 
  * Retrieve an lyricList from a given Track Id
  */
 #define MBQ_GetSyncTextById \
-    "http://@URL@/synctext/@1@" 
+    "http://@URL@/synctext/@1@/@DEPTH@" 
 
 /**
- * Do a Metadata exchange with the MusicBrainz server. The user
+ * Do a full Metadata exchange with the MusicBrainz server. The user
  * must fill out as many of the fields as possible. All of the
  * fields but fileName, issued, genre, description are required.
  * If not all required fields are present, the server will not
@@ -593,6 +625,43 @@
     "</mq:ExchangeMetadata>\n" 
 
 /**
+ * Do a lite (without Bitzi data) Metadata exchange with the MusicBrainz 
+ * server. The user  must fill out as many of the fields as possible. All 
+ * of the
+ * fields but fileName, issued, genre, description are required.
+ * If not all required fields are present, the server will not
+ * accept the metadata into its Pending Table. However, the
+ * server will attempt to look up any known information about
+ * the track from the TRM ID, and return this data to the
+ * user. The user may extract the information returned by the
+ * server by using the MBE_MEXXXXXXX functions.
+ * @param artistName The name of the artist for the given track. 
+ * @param albumName The name of the album for the given track.
+ * @param trackName The name of the track.
+ * @param trmid The TRM Id of the track.
+ * @param fileName The complete filename of the track.
+ * @param issued The year the track was released
+ * @param genre The genre that this track is classified as.
+ * @param description A description associated with this track.
+ * @param duration The length of the track in milliseconds.
+ * @param sha1 The sha1 hash value calculated for the entire file
+ */
+#define MBQ_ExchangeMetadataLite \
+    "<mq:ExchangeMetadataLite>\n" \
+    "   <mq:artistName>@1@</mq:artistName>\n" \
+    "   <mq:albumName>@2@</mq:albumName>\n" \
+    "   <mq:trackName>@3@</mq:trackName>\n" \
+    "   <mm:trackNum>@4@</mm:trackNum>\n" \
+    "   <mm:trmid>@5@</mm:trmid>\n" \
+    "   <mm:fileName>@6@</mm:fileName>\n" \
+    "   <mm:issued>@7@</mm:issued>\n" \
+    "   <mm:genre>@8@</mm:genre>\n" \
+    "   <dc:description>@9@</dc:description>\n" \
+    "   <mm:sha1>@10@</mm:sha1>\n" \
+    "   <mm:duration>@11@</mm:duration>\n" \
+    "</mq:ExchangeMetadataLite>\n" 
+
+/**
  * Look up a track using only a TRM ID. This query returns the same
  * information as the ExchangeMetadata query, but no metadata is sent
  * to the server.
@@ -618,6 +687,26 @@
     "   <mm:genre>@8@</mm:genre>\n" \
     "   <dc:description>@9@</dc:description>\n" \
     "   <mm:link>@10@</mm:link>\n" \
+    "   <mq:sessionId>@SESSID@</mq:sessionId>\n" \
+    "   <mq:sessionKey>@SESSKEY@</mq:sessionKey>\n" \
     "</mq:SubmitTrack>\n" 
+
+/** 
+ * JOHAN: submission of the Track Global ID, TRMId connection from Tunetagger
+ * Allows the addition of signatures without any moderation or insert process.
+ * Directly inserts the TRMId in the GUID and GUIDJoin table if trackGID exists
+ * and the TRMId is not already attached to different track
+ *
+ * ToDo: extend it with moderation, voting, from a list of recent additions.
+ * @param TrackGID  The Global ID field of the track
+ * @param trmid     The TRM Id of the track.
+ */
+#define MBQ_SubmitTrackTRMId \
+    "<mq:SubmitTrackTRMId>\n" \
+    "   <mm:trackid>@1@</mm:trackid>\n" \
+    "   <mm:trmid>@2@</mm:trmid>\n" \
+    "   <mq:sessionId>@SESSID@</mq:sessionId>\n" \
+    "   <mq:sessionKey>@SESSKEY@</mq:sessionKey>\n" \
+    "</mq:SubmitTrackTRMId>\n"  \
 
 #endif

@@ -26,7 +26,7 @@
 
 #include "errors.h"
 #include "queries.h"
-#include "bitprint.h"
+#include "bitprintinfo.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -69,6 +69,15 @@ void      mb_Delete            (musicbrainz_t o);
  */
 int       mb_SetServer         (musicbrainz_t o, char *serverAddr, 
                                 short serverPort);
+
+/**
+ * Enable debug out to stdout by sending a non-zero value to this
+ * function. 
+ * @param o the musicbrainz_t object returned from mb_New
+ * @param debug whether or not to enable debug (non zero enables debug output)
+ */
+void       mb_SetDebug         (musicbrainz_t o, int debug);
+
 /**
  * Set the name of the HTTP Proxy to use. This function must be called anytime
  * the client library must communicate via a proxy firewall. 
@@ -102,6 +111,20 @@ void      mb_WSAInit           (musicbrainz_t o);
  */
 void      mb_WSAStop           (musicbrainz_t o);
 #endif 
+
+/**
+ * This function must be called if you want to submit data to the server
+ * and give the user credit for the submission. If you're looking up
+ * data from the server, you do not need to call mb_Authenticate.
+ * If you are submitting data to the MB server and you want your submissions
+ * be submitted anonymously, then do not call this function.
+ * @param o the musicbrainz_t object returned from mb_New()
+ * @param userName the name of the user
+ * @param password the plaintext password of the user.
+ * @return returns true if the server authentication was correctly
+ *         initiated.
+ */
+int mb_Authenticate(musicbrainz_t o, char *userName, char *password);
 
 /**
  * Call this function to set the CD-ROM drive device if you plan to use
@@ -362,6 +385,19 @@ int       mb_SetResultRDF      (musicbrainz_t o, char *RDF);
  */
 void      mb_GetIDFromURL      (musicbrainz_t o, char *url, char *id, 
                                 int idLen);
+/**
+ * Calculate the sha1 hash for a given filename. This function is
+ * often used in conjunction with an MBQ_ExchangeMetadataLite query,
+ * to calculate the needed arguments for a metadata exchange with the
+ * MusicBrainz server.
+ * @see mb_QueryWithArgs
+ * @param o the musicbrainz_t object returned from mb_New()
+ * @param fileName the file to calculate a sha1 value for
+ * @param sha1 a string with space for 41 bytes that will hold the sha1 value
+ * @return true if the sha1 value was successfully calculated, false otherwise.
+ */
+int       mb_CalculateSha1     (musicbrainz_t o, char *fileName, 
+                                char sha1[41]);
 /**
  * Calculate Bitzi bitprint info for a given filename. This function is
  * often used in conjunction with an MBQ_ExchangeMetadata query,

@@ -622,11 +622,10 @@ static bool IsHTTPHeaderComplete(char* buffer, uint32 length)
 #define WM_WINDOWS_IS_DONE_PICKING_ITS_BUTT (WM_USER + 1)
 
 static LRESULT WINAPI WndProc(HWND hwnd, UINT msg,
-
                               WPARAM wParam, LPARAM lParam);
 
 Error
-HttpInput::Win32GetHostByName(char *szHostName, struct hostent *pHostInfo)
+DownloadManager::Win32GetHostByName(char *szHostName, struct hostent *pHostInfo)
 {
    WNDCLASS  wc;
    MSG       msg;
@@ -639,7 +638,7 @@ HttpInput::Win32GetHostByName(char *szHostName, struct hostent *pHostInfo)
 
    wc.style = CS_HREDRAW | CS_VREDRAW;
    wc.lpfnWndProc = WndProc;
-   wc.hInstance = g_hinst;
+   wc.hInstance = m_context->hInstance;
    wc.hCursor = NULL;
    wc.hIcon = NULL;
    wc.hbrBackground = (HBRUSH) GetStockObject(WHITE_BRUSH);
@@ -650,7 +649,7 @@ HttpInput::Win32GetHostByName(char *szHostName, struct hostent *pHostInfo)
    hWnd = CreateWindow(wc.lpszClassName, "Fuss",
                        WS_OVERLAPPEDWINDOW,
                        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-                       CW_USEDEFAULT, NULL, NULL, g_hinst, NULL);
+                       CW_USEDEFAULT, NULL, NULL, m_context->hInstance, NULL);
    if (hWnd == NULL)
       return kError_NoDataAvail;
 
@@ -674,7 +673,7 @@ HttpInput::Win32GetHostByName(char *szHostName, struct hostent *pHostInfo)
       DispatchMessage(&msg);
    }
 
-   if (m_bExit)
+   if (m_exit)
    {
       WSACancelAsyncRequest(hHandle);
    }
@@ -682,7 +681,7 @@ HttpInput::Win32GetHostByName(char *szHostName, struct hostent *pHostInfo)
    m_hWnd = NULL;
    DestroyWindow(hWnd);
 
-   if (m_bExit)
+   if (m_exit)
    {
       return kError_Interrupt;
    }

@@ -486,7 +486,8 @@ void Win32PreferenceWindow::GetPrefsValues(PrefsStruct* values)
     m_prefs->GetPrefBoolean(kPlayImmediatelyPref, &values->playImmediately);
     m_prefs->GetPrefBoolean(kConvertUnderscoresToSpacesPref, &values->convertUnderscores);
     m_prefs->GetPrefBoolean(kCheckCDAutomaticallyPref, &values->updateCDAutomatically);
-    m_prefs->GetPrefBoolean(kEnableMusicBrainzBitziPref, &values->enableMB);
+    m_prefs->GetPrefBoolean(kEnableMusicBrainzPref, &values->enableMB);
+    m_prefs->GetPrefBoolean(kEnableBitziPref, &values->enableBitzi);
 
     free(buffer);
 }
@@ -560,7 +561,8 @@ void Win32PreferenceWindow::SavePrefsValues(PrefsStruct* values)
     m_prefs->SetPrefInt32(kWatchThisDirTimeoutPref, (values->watchForNewMusic ? kDefaultWatchThisDirTimeout : 0));
     m_prefs->SetPrefBoolean(kCheckCDAutomaticallyPref, values->updateCDAutomatically);
     m_prefs->SetPrefString(kMBServerPref, values->MBServerURL.c_str());
-    m_prefs->SetPrefBoolean(kEnableMusicBrainzBitziPref, values->enableMB);
+    m_prefs->SetPrefBoolean(kEnableMusicBrainzPref, values->enableMB);
+    m_prefs->SetPrefBoolean(kEnableBitziPref, values->enableBitzi);
 
     m_pContext->target->AcceptEvent(new Event(INFO_PrefsChanged));
     m_currentValues = m_proposedValues = *values;

@@ -159,6 +159,11 @@ class DownloadItem {
     const string& MTime() const { return m_mtime; }
 
  protected:
+
+#ifdef WIN32 
+    Error Win32GetHostByName(char *szHostName, struct hostent *pHostInfo);
+#endif
+
     Error SetBuffer(char* dest, const char* src, uint32* len)
     {
         Error result = kError_InvalidParam;
@@ -280,6 +285,11 @@ class DownloadManager {
     Error Recv(int hHandle, char *pBuffer, int iSize, int iFlags, int &iRet, DownloadItem *item);
     Error Send(int hHandle, char *pBuffer, int iSize, int iFlags, int &iRet, DownloadItem *item);
     Error Connect(int hHandle, const sockaddr *pAddr, int &iRet, DownloadItem *item);
+
+#ifdef WIN32 
+    HWND m_hWnd;
+    Error Win32GetHostByName(char *szHostName, struct hostent *pHostInfo);
+#endif
 
  private:
 
