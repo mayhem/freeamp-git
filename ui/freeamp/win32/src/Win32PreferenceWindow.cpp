@@ -1776,6 +1776,7 @@ bool Win32PreferenceWindow::PrefPage5Proc(HWND hwnd,
 
 typedef struct ThreadStruct {
     Thread* thread;
+    FAContext* context;
     UpdateManager* um;
     HWND hwndList;
 }ThreadStruct;
@@ -1878,6 +1879,47 @@ static void check_function(void* arg)
 
     ts->um->RetrieveLatestVersionInfo(callback_function, ts);
 
+    // Clear the list
+    ListView_DeleteAllItems(ts->hwndList);
+
+    // Add items
+    LV_ITEM lv_item;
+    UpdateItem* item = NULL;
+    uint32 i = 0;
+    uint32 count = ListView_GetItemCount(ts->hwndList);
+
+    while(item = ts->um->ItemAt(i++))
+    {
+        bool newItem = true;
+
+        for(uint32 j = 0; j < count; j++)
+        {
+            lv_item.mask = LVIF_PARAM;
+            lv_item.iItem = j;
+
+            if(ListView_GetItem(ts->hwndList, &lv_item))
+            {
+                if((UpdateItem*)lv_item.lParam == item)
+                {
+                    newItem = false;
+                    break;
+                }
+            }
+        }
+
+        if(newItem)
+        {
+            lv_item.mask = LVIF_PARAM | LVIF_STATE;
+            lv_item.state = 0;
+            lv_item.stateMask = 0;
+            lv_item.iItem = ListView_GetItemCount(ts->hwndList);
+            lv_item.iSubItem = 0;
+            lv_item.lParam = (LPARAM)item;
+
+            ListView_InsertItem(ts->hwndList, &lv_item);
+        }
+    }
+
     ListView_RedrawItems(ts->hwndList, 0, ListView_GetItemCount(ts->hwndList) - 1);
 
     delete ts->thread;
@@ -1887,12 +1929,39 @@ static void check_function(void* arg)
 static void update_function(void* arg)
 {
     ThreadStruct* ts = (ThreadStruct*)arg;
+    Error result;
 
     ts->um->RetrieveLatestVersionInfo();
 
     ListView_RedrawItems(ts->hwndList, 0, ListView_GetItemCount(ts->hwndList) - 1);
 
-    ts->um->UpdateComponents(callback_function, ts);
+    result = ts->um->UpdateComponents(callback_function, ts);
+
+    if(IsntError(result))
+    {
+        int32 response;
+        HWND hwnd = GetParent(GetParent(ts->hwndList));
+
+        response = MessageBox(hwnd, 
+                            "FreeAmp needs to close down and restart in order to replace components\r\n"
+                            "which are being used. If you do not wish to quit the application you\r\n"
+                            "can choose \"Cancel\" and update again at a later time.",
+                            "Restart FreeAmp?", 
+                            MB_OKCANCEL|MB_ICONQUESTION);
+
+        if(response == IDOK)
+        {
+            char appPath[MAX_PATH];
+            uint32 length = sizeof(appPath);
+            ts->context->prefs->GetPrefString(kInstallDirPref, appPath, &length);
+            
+            strcat(appPath, "\\update.exe");
+
+            ts->context->target->AcceptEvent(new Event(CMD_QuitPlayer));
+
+            WinExec(appPath, SW_NORMAL);
+        }
+    }
 
     delete ts->thread;
     delete ts;
@@ -2001,6 +2070,7 @@ bool Win32PreferenceWindow::PrefPage6Proc(HWND hwnd,
                         ts->thread = thread;
                         ts->um = um;
                         ts->hwndList = hwndList;
+                        ts->context = m_pContext;
 
                         thread->Create(update_function, ts);
                     }
@@ -2018,6 +2088,7 @@ bool Win32PreferenceWindow::PrefPage6Proc(HWND hwnd,
                         ts->thread = thread;
                         ts->um = um;
                         ts->hwndList = hwndList;
+                        ts->context = m_pContext;
 
                         thread->Create(check_function, ts);
                     }

@@ -50,7 +50,7 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
 							    BRANDING" Should Only Run One Time!");
 
     // make sure FreeAmp is not running while this happens...
-    while(WAIT_TIMEOUT == WaitForSingleObject(runOnceMutex, 0))
+    while(WAIT_TIMEOUT == WaitForSingleObject(runOnceMutex, 5000))
     {
         int32 result;
 
@@ -78,6 +78,9 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
     MoveFiles(updatePath, appPath);
 
     CloseHandle(runOnceMutex);
+
+    strcat(appPath, "\\freeamp.exe");
+    WinExec(appPath, SW_NORMAL);
 
 	return 0;
 }
