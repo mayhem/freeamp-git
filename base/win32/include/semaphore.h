@@ -32,7 +32,7 @@ class Semaphore {
  public:
     Semaphore(int cnt = 0);
     ~Semaphore();
-    void Wait();
+    bool Wait(int ms = -1); // returns false if it times out
     void Signal();
  
  private:

@@ -38,12 +38,10 @@ class Semaphore {
  public:
     Semaphore(int cnt = 1);
     ~Semaphore();
-    void Wait();
+    bool Wait(int ms = -1);
     bool TimedWait(int iMilliSecs);
     void Signal();
 
 };
-
-
 
 #endif // _SEMAPHORE_H_

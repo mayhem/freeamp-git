@@ -37,8 +37,18 @@ Semaphore::~Semaphore() {
    CloseHandle(m_sem);
 }
 
-void Semaphore::Wait() {	
+void Semaphore::Wait(int ms) 
+{	
+   if (ms > 0)
+   {
+	   if (WaitForSingleObject(m_sem, ms) == WAIT_TIMEOUT)
+          return false;
+
+      return true;
+   }
+
 	WaitForSingleObject(m_sem, INFINITE);	
+   return true;
 }
 
 void Semaphore::Signal() {

@@ -45,8 +45,11 @@ Semaphore::~Semaphore() {
     pthread_cond_destroy(&cond);
 }
 
-void Semaphore::Wait() {
-    //decrement the semaphore
+bool Semaphore::Wait(int iMilliSecs) 
+{
+    if (iMilliSecs > 0)
+        return TimedWait(iMilliSecs);
+    
     pthread_mutex_lock(&mutex);
     count--;
     while (count <=0) 
@@ -54,6 +57,7 @@ void Semaphore::Wait() {
         pthread_cond_wait(&cond,&mutex);
     }
     pthread_mutex_unlock(&mutex);
+    return true;
 }
 
 bool Semaphore::TimedWait(int iMilliSecs)
