@@ -73,6 +73,9 @@ dnl *****
 dnl Check for LinuxThreads or MIT pthreads
 dnl *****
 
+mitpth="false"
+ltr="false"
+
 AC_MSG_CHECKING(for MIT PThreads)
 AC_EGREP_HEADER(PTHREAD_MUTEXTYPE_FAST,
 pthread.h,AC_DEFINE(HAVE_MITPTHREADS) AC_MSG_RESULT(yes)
