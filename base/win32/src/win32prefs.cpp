@@ -291,7 +291,7 @@ SetDefaults()
     {
         strcpy(path, cwd);
         strcat(path, "\\");
-        strcat(path, "MyMusic");
+        strcat(path, "My Music");
 	    SetPrefString(kSaveMusicDirPref, path);
     }
 

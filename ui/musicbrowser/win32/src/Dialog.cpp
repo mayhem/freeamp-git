@@ -212,7 +212,7 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
 
 
             // Make sure the control is the listview control
-            if (mis->CtlType != ODT_LISTVIEW || mis->CtlID == IDC_PLAYLISTBOX)
+            if (mis->CtlType != ODT_LISTVIEW || mis->CtlID != IDC_PLAYLISTBOX)
                 return FALSE;
 
 	        // Get the handle of the ListView control we're using

@@ -31,6 +31,7 @@ ____________________________________________________________________________*/
 #include <assert.h>
 
 #include <sstream>
+#include <set>
 
 using namespace std;
 
@@ -53,58 +54,76 @@ const char* kThemeFileFilter =
 uint32 CalcStringEllipsis(HDC hdc, string& displayString, int32 columnWidth);
 
 static BOOL CALLBACK 
-PrefPage1Callback(HWND hwnd, 
-                  UINT msg, 
-                  WPARAM wParam, 
-                  LPARAM lParam)
+PrefGeneralCallback(HWND hwnd, 
+                    UINT msg, 
+                    WPARAM wParam, 
+                    LPARAM lParam)
 {
-	return g_pCurrentPrefWindow->PrefPage1Proc(hwnd, msg, wParam, lParam);
+	return g_pCurrentPrefWindow->PrefGeneralProc(hwnd, msg, wParam, lParam);
 }          
 
 static BOOL CALLBACK 
-PrefPage2Callback(HWND hwnd, 
+PrefThemeCallback(HWND hwnd, 
                   UINT msg, 
                   WPARAM wParam, 
                   LPARAM lParam)
 {
-	return g_pCurrentPrefWindow->PrefPage2Proc(hwnd, msg, wParam, lParam);
+	return g_pCurrentPrefWindow->PrefThemeProc(hwnd, msg, wParam, lParam);
 }          
 
 static BOOL CALLBACK 
-PrefPage3Callback(HWND hwnd, 
-                  UINT msg, 
-                  WPARAM wParam, 
-                  LPARAM lParam)
+PrefStreamingCallback(HWND hwnd, 
+                      UINT msg, 
+                      WPARAM wParam, 
+                      LPARAM lParam)
 {
-	return g_pCurrentPrefWindow->PrefPage3Proc(hwnd, msg, wParam, lParam);
+	return g_pCurrentPrefWindow->PrefStreamingProc(hwnd, msg, wParam, lParam);
 }          
 
 static BOOL CALLBACK 
-PrefPage4Callback(HWND hwnd, 
-                  UINT msg, 
-                  WPARAM wParam, 
-                  LPARAM lParam)
+PrefPluginsCallback(HWND hwnd, 
+                    UINT msg, 
+                    WPARAM wParam, 
+                    LPARAM lParam)
 {
-	return g_pCurrentPrefWindow->PrefPage4Proc(hwnd, msg, wParam, lParam);
+	return g_pCurrentPrefWindow->PrefPluginsProc(hwnd, msg, wParam, lParam);
 }          
 
 static BOOL CALLBACK 
-PrefPage5Callback(HWND hwnd, 
-                  UINT msg, 
-                  WPARAM wParam, 
-                  LPARAM lParam)
+PrefUpdateCallback(HWND hwnd, 
+                   UINT msg, 
+                   WPARAM wParam, 
+                   LPARAM lParam)
 {
-	return g_pCurrentPrefWindow->PrefPage5Proc(hwnd, msg, wParam, lParam);
+	return g_pCurrentPrefWindow->PrefUpdateProc(hwnd, msg, wParam, lParam);
 }      
 
 static BOOL CALLBACK 
-PrefPage6Callback(HWND hwnd, 
+PrefAdvancedCallback(HWND hwnd, 
+                     UINT msg, 
+                     WPARAM wParam, 
+                     LPARAM lParam)
+{
+	return g_pCurrentPrefWindow->PrefAdvancedProc(hwnd, msg, wParam, lParam);
+}    
+
+static BOOL CALLBACK 
+PrefAboutCallback(HWND hwnd, 
                   UINT msg, 
                   WPARAM wParam, 
                   LPARAM lParam)
 {
-	return g_pCurrentPrefWindow->PrefPage6Proc(hwnd, msg, wParam, lParam);
-}             
+	return g_pCurrentPrefWindow->PrefAboutProc(hwnd, msg, wParam, lParam);
+}      
+
+static BOOL CALLBACK 
+PrefDebugCallback(HWND hwnd, 
+                  UINT msg, 
+                  WPARAM wParam, 
+                  LPARAM lParam)
+{
+	return g_pCurrentPrefWindow->PrefDebugProc(hwnd, msg, wParam, lParam);
+}            
 
 Win32PreferenceWindow::Win32PreferenceWindow(FAContext *context,
                                              ThemeManager *pThemeMan) :
@@ -129,7 +148,7 @@ bool Win32PreferenceWindow::Show(Window *pWindow)
 bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent, Preferences* prefs)
 {
     bool result = false;
-    PROPSHEETPAGE psp[6];
+    PROPSHEETPAGE psp[7];
     PROPSHEETHEADER psh;
 	
     HINSTANCE hinst = (HINSTANCE)GetWindowLong(hwndParent, GWL_HINSTANCE);
@@ -137,29 +156,38 @@ bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent, Preferences* pre
     psp[0].dwSize = sizeof(PROPSHEETPAGE);
     psp[0].dwFlags = 0;
     psp[0].hInstance = hinst;
-    psp[0].pszTemplate = MAKEINTRESOURCE(IDD_PREF1);
+    psp[0].pszTemplate = MAKEINTRESOURCE(IDD_PREF_GENERAL);
     psp[0].pszIcon = NULL;
-    psp[0].pfnDlgProc = PrefPage1Callback;
+    psp[0].pfnDlgProc = PrefGeneralCallback;
     psp[0].pszTitle = NULL;
     psp[0].lParam = (LPARAM)prefs;
 
     psp[1].dwSize = sizeof(PROPSHEETPAGE);
     psp[1].dwFlags = 0;
     psp[1].hInstance = hinst;
-    psp[1].pszTemplate = MAKEINTRESOURCE(IDD_PREF5);
+    psp[1].pszTemplate = MAKEINTRESOURCE(IDD_PREF_THEME);
     psp[1].pszIcon = NULL;
-    psp[1].pfnDlgProc = PrefPage5Callback;
+    psp[1].pfnDlgProc = PrefThemeCallback;
     psp[1].pszTitle = NULL;
     psp[1].lParam = (LPARAM)prefs;
 
     psp[2].dwSize = sizeof(PROPSHEETPAGE);
     psp[2].dwFlags = 0;
     psp[2].hInstance = hinst;
-    psp[2].pszTemplate = MAKEINTRESOURCE(IDD_PREF2);
+    psp[2].pszTemplate = MAKEINTRESOURCE(IDD_PREF_STREAMING);
     psp[2].pszIcon = NULL;
-    psp[2].pfnDlgProc = PrefPage2Callback;
+    psp[2].pfnDlgProc = PrefStreamingCallback;
     psp[2].pszTitle = NULL;
     psp[2].lParam = (LPARAM)prefs;
+
+    psp[3].dwSize = sizeof(PROPSHEETPAGE);
+    psp[3].dwFlags = 0;
+    psp[3].hInstance = hinst;
+    psp[3].pszTemplate = MAKEINTRESOURCE(IDD_PREF_PLUGINS);
+    psp[3].pszIcon = NULL;
+    psp[3].pfnDlgProc = PrefPluginsCallback;
+    psp[3].pszTitle = NULL;
+    psp[3].lParam = (LPARAM)prefs;
 
     UpdateManager* updateManager = NULL;
 
@@ -167,33 +195,34 @@ bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent, Preferences* pre
     updateManager->DetermineLocalVersions();
     updateManager->SetPlatform(string("WIN32"));
 
-    psp[3].dwSize = sizeof(PROPSHEETPAGE);
-    psp[3].dwFlags = 0;
-    psp[3].hInstance = hinst;
-    psp[3].pszTemplate = MAKEINTRESOURCE(IDD_PREF6);
-    psp[3].pszIcon = NULL;
-    psp[3].pfnDlgProc = PrefPage6Callback;
-    psp[3].pszTitle = NULL;
-    psp[3].lParam = (LPARAM)updateManager;
-
     psp[4].dwSize = sizeof(PROPSHEETPAGE);
     psp[4].dwFlags = 0;
     psp[4].hInstance = hinst;
-    psp[4].pszTemplate = MAKEINTRESOURCE(IDD_PREF3);
+    psp[4].pszTemplate = MAKEINTRESOURCE(IDD_PREF_UPDATE);
     psp[4].pszIcon = NULL;
-    psp[4].pfnDlgProc = PrefPage3Callback;
+    psp[4].pfnDlgProc = PrefUpdateCallback;
     psp[4].pszTitle = NULL;
-    psp[4].lParam = (LPARAM)prefs;
+    psp[4].lParam = (LPARAM)updateManager;
 
     psp[5].dwSize = sizeof(PROPSHEETPAGE);
     psp[5].dwFlags = 0;
     psp[5].hInstance = hinst;
-    psp[5].pszTemplate = MAKEINTRESOURCE(IDD_PREF4);
+    psp[5].pszTemplate = MAKEINTRESOURCE(IDD_PREF_ADVANCED);
     psp[5].pszIcon = NULL;
-    psp[5].pfnDlgProc = PrefPage4Callback;
+    psp[5].pfnDlgProc = PrefAdvancedCallback;
     psp[5].pszTitle = NULL;
     psp[5].lParam = (LPARAM)prefs;
 
+    psp[6].dwSize = sizeof(PROPSHEETPAGE);
+    psp[6].dwFlags = 0;
+    psp[6].hInstance = hinst;
+    psp[6].pszTemplate = MAKEINTRESOURCE(IDD_PREF_ABOUT);
+    psp[6].pszIcon = NULL;
+    psp[6].pfnDlgProc = PrefAboutCallback;
+    psp[6].pszTitle = NULL;
+    psp[6].lParam = (LPARAM)prefs;
+
+   
     psh.dwSize = sizeof(PROPSHEETHEADER);
     psh.dwFlags = PSH_PROPSHEETPAGE;
     psh.hwndParent = hwndParent;
@@ -208,7 +237,7 @@ bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent, Preferences* pre
     GetPrefsValues(prefs, &originalValues);
 
     currentValues = originalValues;
-
+    
     result = (PropertySheet(&psh) > 0);
 
     delete updateManager;
@@ -219,48 +248,144 @@ bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent, Preferences* pre
 void Win32PreferenceWindow::GetPrefsValues(Preferences* prefs, 
                                            PrefsStruct* values)
 {
-    uint32 size = 256;
+    uint32 bufferSize = 1;
+    uint32 size;
 
-    prefs->GetDefaultPMO(values->defaultPMO, &size);
-    size = 256;
-    prefs->GetDefaultUI(values->defaultUI, &size);
+    // get the string prefs
+    char* buffer = (char*)malloc(bufferSize);
+
+    size = bufferSize;
+
+    if(kError_BufferTooSmall == prefs->GetDefaultPMO(buffer, &size))
+    {
+        bufferSize = size;
+        buffer = (char*)realloc(buffer, bufferSize);
+        prefs->GetDefaultPMO(buffer, &size);
+    }
+
+    values->defaultPMO = buffer;
+    size = bufferSize;
+
+    if(kError_BufferTooSmall == prefs->GetDefaultUI(buffer, &size))
+    {
+        bufferSize = size;
+        buffer = (char*)realloc(buffer, bufferSize);
+        prefs->GetDefaultUI(buffer, &size);
+    }
+    
+    values->defaultUI = buffer;
+    size = bufferSize;
+
+    if(kError_BufferTooSmall == prefs->GetProxyServerAddress(buffer, &size))
+    {
+        bufferSize = size;
+        buffer = (char*)realloc(buffer, bufferSize);
+        prefs->GetProxyServerAddress(buffer, &size);
+    }
+
+    values->proxyServer = buffer;
+    size = bufferSize;
+
+    if(kError_BufferTooSmall == prefs->GetSaveStreamsDirectory(buffer, &size))
+    {
+        bufferSize = size;
+        buffer = (char*)realloc(buffer, bufferSize);
+        prefs->GetSaveStreamsDirectory(buffer, &size);
+    }
+
+    values->saveStreamsDirectory = buffer;
+    size = bufferSize;
+
+    if(kError_BufferTooSmall == prefs->GetAlternateNICAddress(buffer, &size))
+    {
+        bufferSize = size;
+        buffer = (char*)realloc(buffer, bufferSize);
+        prefs->GetAlternateNICAddress(buffer, &size);
+    }
+
+    values->alternateIP = buffer;
+    size = bufferSize;
+
+    if(kError_BufferTooSmall == prefs->GetThemeDefaultFont(buffer, &size))
+    {
+        bufferSize = size;
+        buffer = (char*)realloc(buffer, bufferSize);
+        prefs->GetThemeDefaultFont(buffer, &size);
+    }
+
+    values->defaultFont = buffer;
+    size = bufferSize;
+
+    if(kError_BufferTooSmall == prefs->GetSaveMusicDirectory(buffer, &size))
+    {
+        bufferSize = size;
+        buffer = (char*)realloc(buffer, bufferSize);
+        prefs->GetSaveMusicDirectory(buffer, &size);
+    }
+
+    values->saveMusicDirectory = buffer;
+    size = bufferSize;
+
+    if(kError_BufferTooSmall == prefs->GetUsersPortablePlayers(buffer, &size))
+    {
+        bufferSize = size;
+        buffer = (char*)realloc(buffer, bufferSize);
+        prefs->GetUsersPortablePlayers(buffer, &size);
+    }
+
+    char* cp = buffer;
+    char* name = cp;
+
+    while(cp = strchr(cp, ';'))
+    {
+        *cp = 0x00;
+        values->portablePlayers.insert(string(name));
+        //MessageBox(NULL, name, "name", MB_OK);
+
+        cp++;
+        name = cp;
+    }
+
+    if(*name)
+    {
+        values->portablePlayers.insert(string(name));
+        //MessageBox(NULL, name, "name", MB_OK);
+    }
+
+    //values->portablePlayers = buffer;
+    size = bufferSize;
+
+    m_pThemeMan->GetCurrentTheme(values->currentTheme);
+
+    // get the other prefs
     prefs->GetDecoderThreadPriority(&values->decoderThreadPriority);
     prefs->GetInputBufferSize(&values->inputBufferSize);
     prefs->GetOutputBufferSize(&values->outputBufferSize);
     prefs->GetPrebufferLength(&values->preBufferLength);
     prefs->GetStayOnTop(&values->stayOnTop);
     prefs->GetLiveInTray(&values->liveInTray);
-
     prefs->GetStreamBufferInterval(&values->streamInterval);
     prefs->GetSaveStreams(&values->saveStreams);
-    size = 256;
-    prefs->GetProxyServerAddress(values->proxyServer, &size);
     prefs->GetUseProxyServer(&values->useProxyServer);
-    size = MAX_PATH;
-    prefs->GetSaveStreamsDirectory(values->saveStreamsDirectory, &size);
-    size = 16;
-    prefs->GetAlternateNICAddress(values->alternateIP, &size);
     prefs->GetUseAlternateNIC(&values->useAlternateIP);
-
     prefs->GetUseDebugLog(&values->enableLogging);
     prefs->GetLogMain(&values->logMain);
     prefs->GetLogDecode(&values->logDecoder);
     prefs->GetLogInput(&values->logInput);
     prefs->GetLogOutput(&values->logOutput);
     prefs->GetLogPerformance(&values->logPerformance);
-    
-    size = 64;
-    prefs->GetThemeDefaultFont(values->defaultFont, &size);
-    m_pThemeMan->GetCurrentTheme(values->currentTheme);
-
     prefs->GetCheckForUpdates(&values->checkForUpdates);
+    prefs->GetAskToReclaimFiletypes(&values->askReclaimFiletypes);
+    prefs->GetReclaimFiletypes(&values->reclaimFiletypes);
+
+    free(buffer);
 }
 
 void Win32PreferenceWindow::SavePrefsValues(Preferences* prefs, 
                                             PrefsStruct* values)
 {
-    prefs->SetDefaultPMO(values->defaultPMO);
-    prefs->SetDefaultUI(values->defaultUI);
+    prefs->SetDefaultPMO(values->defaultPMO.c_str());
+    prefs->SetDefaultUI(values->defaultUI.c_str());
     prefs->SetDecoderThreadPriority(values->decoderThreadPriority);
     prefs->SetInputBufferSize(values->inputBufferSize);
     prefs->SetOutputBufferSize(values->outputBufferSize);
@@ -270,10 +395,10 @@ void Win32PreferenceWindow::SavePrefsValues(Preferences* prefs,
 
     prefs->SetStreamBufferInterval(values->streamInterval);
     prefs->SetSaveStreams(values->saveStreams);
-    prefs->SetSaveStreamsDirectory(values->saveStreamsDirectory);
-    prefs->SetProxyServerAddress(values->proxyServer);
+    prefs->SetSaveStreamsDirectory(values->saveStreamsDirectory.c_str());
+    prefs->SetProxyServerAddress(values->proxyServer.c_str());
     prefs->SetUseProxyServer(values->useProxyServer);
-    prefs->SetAlternateNICAddress(values->alternateIP);
+    prefs->SetAlternateNICAddress(values->alternateIP.c_str());
     prefs->SetUseAlternateNIC(values->useAlternateIP);
 
     prefs->SetUseDebugLog(values->enableLogging);
@@ -283,26 +408,38 @@ void Win32PreferenceWindow::SavePrefsValues(Preferences* prefs,
     prefs->SetLogOutput(values->logOutput);
     prefs->SetLogPerformance(values->logPerformance);
 
-    prefs->SetThemeDefaultFont(values->defaultFont);
+    prefs->SetThemeDefaultFont(values->defaultFont.c_str());
     m_pThemeMan->UseTheme(m_oThemeList[currentValues.currentTheme]);
 
     prefs->SetCheckForUpdates(values->checkForUpdates);
+    prefs->SetSaveMusicDirectory(values->saveMusicDirectory.c_str());
+    prefs->SetAskToReclaimFiletypes(values->askReclaimFiletypes);
+    prefs->SetReclaimFiletypes(values->reclaimFiletypes);
+
+    PortableSet::const_iterator i;
+    string portableList;
+
+    for(i = values->portablePlayers.begin(); i != values->portablePlayers.end(); i++)
+    {
+        portableList += *i;
+        portableList += ";";
+    }
+
+    prefs->SetUsersPortablePlayers(portableList.c_str());
+    
 }
 
-bool Win32PreferenceWindow::PrefPage1Proc(HWND hwnd, 
-                                          UINT msg, 
-                                          WPARAM wParam, 
-                                          LPARAM lParam)      
+bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd, 
+                                            UINT msg, 
+                                            WPARAM wParam, 
+                                            LPARAM lParam)      
 {
     bool result = false;
     static PROPSHEETPAGE* psp = NULL;
     static Preferences* prefs = NULL;
-    static HWND hwndUI = NULL;
-    static HWND hwndPMO = NULL;
-    static HWND hwndPriority = NULL;
-    static HWND hwndInput = NULL;
-    static HWND hwndOutput = NULL;
-    static HWND hwndPrebuffer = NULL;
+    static HWND hwndAskReclaimFiletypes = NULL;
+    static HWND hwndReclaimFiletypes = NULL;
+    static HWND hwndSaveMusicDir = NULL;
     static HWND hwndStayOnTop = NULL;
     static HWND hwndLiveInTray = NULL;
     
@@ -316,111 +453,24 @@ bool Win32PreferenceWindow::PrefPage1Proc(HWND hwnd,
             prefs = (Preferences*)psp->lParam;
 
             // get the handles to all our controls
-            hwndUI = GetDlgItem(hwnd, IDC_UI);
-            hwndPMO = GetDlgItem(hwnd, IDC_PMO);
-            hwndPriority = GetDlgItem(hwnd, IDC_PRIORITY);
-            hwndInput = GetDlgItem(hwnd, IDC_INPUT);
-            hwndOutput = GetDlgItem(hwnd, IDC_OUTPUT);
-            hwndPrebuffer = GetDlgItem(hwnd, IDC_PREBUFFER);
+            
             hwndStayOnTop = GetDlgItem(hwnd, IDC_STAYONTOP);
             hwndLiveInTray = GetDlgItem(hwnd, IDC_TRAY);
+            hwndAskReclaimFiletypes = GetDlgItem(hwnd, IDC_ASKRECLAIM);
+            hwndReclaimFiletypes = GetDlgItem(hwnd, IDC_RECLAIMFILETYPES);
+            hwndSaveMusicDir = GetDlgItem(hwnd, IDC_SAVEMUSICDIR);
 
-            // get registries
-            Registrar registrar;
-            Registry pmo;
-            Registry ui;
-
-            registrar.SetSubDir("plugins");
-            registrar.SetSearchString("*.pmo");
-            registrar.InitializeRegistry(&pmo, prefs);
-            registrar.SetSearchString("*.ui");
-            registrar.InitializeRegistry(&ui, prefs);
-
-            // initialize our controls
-
-            int32 i = 0;
-            int32 pos = 0;
-            RegistryItem *item;
-
-            while(item = pmo.GetItem(i++))
-            {
-                if(*item->Description())
-                    pos = ComboBox_AddString(hwndPMO, item->Description());
-                else
-                    pos = ComboBox_AddString(hwndPMO, item->Name());
-
-                string* name = new string(item->Name());
-
-                ComboBox_SetItemData(hwndPMO, pos, (DWORD)name);
-
-                if(!strcmp(originalValues.defaultPMO, item->Name()))
-                {
-                    ComboBox_SetCurSel(hwndPMO, pos);
-                }
-            }
-            
-            i = 0;
-
-            while(item = ui.GetItem(i++))
-            {
-                pos = ComboBox_AddString(hwndUI, item->Name());
-
-                if(!strcmp(originalValues.defaultUI, item->Name()))
-                {
-                    ComboBox_SetCurSel(hwndUI, pos);
-                }
-            }
-
-            SendMessage(hwndPriority, 
-                        TBM_SETRANGE, 
-                        (WPARAM) TRUE,                   
-                        (LPARAM) MAKELONG(0, 6));
-
-            SendMessage(hwndPriority, 
-                        TBM_SETPOS, 
-                        (WPARAM) TRUE,                   
-                        (LPARAM) originalValues.decoderThreadPriority);
-
-            int32 value;
-            char temp[256];
-
-            value = originalValues.inputBufferSize;
-            sprintf(temp, "%d", value);
-            Edit_LimitText(hwndInput, 4);
-            Edit_SetText(hwndInput, temp);
-
-            value = originalValues.outputBufferSize;
-            sprintf(temp, "%d", value);
-            Edit_LimitText(hwndOutput, 4);
-            Edit_SetText(hwndOutput, temp);
-
-            value = originalValues.preBufferLength;
-            sprintf(temp, "%d", value);
-            Edit_LimitText(hwndPrebuffer, 2);
-            Edit_SetText(hwndPrebuffer, temp);
 
             Button_SetCheck(hwndStayOnTop, originalValues.stayOnTop);
-
             Button_SetCheck(hwndLiveInTray, originalValues.liveInTray);
+
+            Button_SetCheck(hwndReclaimFiletypes, originalValues.reclaimFiletypes);
+            Button_SetCheck(hwndAskReclaimFiletypes, originalValues.askReclaimFiletypes);
+           
+
+            Edit_SetText(hwndSaveMusicDir, 
+                         originalValues.saveMusicDirectory.c_str());
             
-            break;
-        }
-
-        case WM_DESTROY:
-        {
-            int32 count = ComboBox_GetCount(hwndPMO);
-
-            if(count != CB_ERR)
-            {
-                for(int32 i = 0; i < count;i++)
-                {
-                    string* s;
-                    s = (string*)ComboBox_GetItemData(hwndPMO, i);
-
-                    if(s)
-                        delete s;
-                }
-            }
             break;
         }
 
@@ -428,140 +478,6 @@ bool Win32PreferenceWindow::PrefPage1Proc(HWND hwnd,
         {
             switch(LOWORD(wParam))
             {
-                case IDC_PMO:
-                {
-                    if(HIWORD(wParam) == CBN_CLOSEUP)
-                    {
-                        memset(currentValues.defaultPMO, 0x00, 256);
-
-                        int32 sel = ComboBox_GetCurSel(hwndPMO);
-
-                        if(sel != CB_ERR)
-                        {
-                            string* s;
-                            s = (string*)ComboBox_GetItemData(hwndPMO, sel);
-                            
-                            strcpy(currentValues.defaultPMO, s->c_str());
-                        }
-
-                        /*ComboBox_GetText( hwndPMO, 
-                                            currentValues.defaultPMO, 
-                                            256);*/
-
-                        if(memcmp(  &originalValues, 
-                                    &currentValues, 
-                                    sizeof(PrefsStruct)))
-                        {
-                            PropSheet_Changed(GetParent(hwnd), hwnd);
-                        }
-                        else
-                        {
-                            PropSheet_UnChanged(GetParent(hwnd), hwnd);
-                        }
-                    }
-
-                    break;
-                }
-
-                case IDC_UI:
-                {
-                    if(HIWORD(wParam) == CBN_CLOSEUP)
-                    {
-                        memset(currentValues.defaultUI, 0x00, 256);
-                        ComboBox_GetText(   hwndUI, 
-                                            currentValues.defaultUI, 
-                                            256);
-
-                        if(memcmp(  &originalValues, 
-                                    &currentValues, 
-                                    sizeof(PrefsStruct)))
-                        {
-                            PropSheet_Changed(GetParent(hwnd), hwnd);
-                        }
-                        else
-                        {
-                            PropSheet_UnChanged(GetParent(hwnd), hwnd);
-                        }
-                    }
-
-                    break;
-                }
-
-                case IDC_INPUT:
-                {
-                    if(HIWORD(wParam) == EN_CHANGE)
-                    {
-                        char text[128];
-
-                        Edit_GetText(hwndInput, text, sizeof(text));
-
-                        currentValues.inputBufferSize = atoi(text);
-
-                        if(memcmp(  &originalValues, 
-                                    &currentValues, 
-                                    sizeof(PrefsStruct)))
-                        {
-                            PropSheet_Changed(GetParent(hwnd), hwnd);
-                        }
-                        else
-                        {
-                            PropSheet_UnChanged(GetParent(hwnd), hwnd);
-                        }
-                    }
-
-                    break;
-                }
-
-                case IDC_OUTPUT:
-                {
-                    if(HIWORD(wParam) == EN_CHANGE)
-                    {
-                        char text[128];
-
-                        Edit_GetText(hwndOutput, text, sizeof(text));
-
-                        currentValues.outputBufferSize = atoi(text);
-
-                        if(memcmp(  &originalValues, 
-                                    &currentValues, 
-                                    sizeof(PrefsStruct)))
-                        {
-                            PropSheet_Changed(GetParent(hwnd), hwnd);
-                        }
-                        else
-                        {
-                            PropSheet_UnChanged(GetParent(hwnd), hwnd);
-                        }
-                    }
-
-                    break;
-                }
-
-                case IDC_PREBUFFER:
-                {
-                    if(HIWORD(wParam) == EN_CHANGE)
-                    {
-                        char text[128];
-
-                        Edit_GetText(hwndPrebuffer, text, sizeof(text));
-
-                        currentValues.preBufferLength = atoi(text);
-
-                        if(memcmp(  &originalValues, 
-                                    &currentValues, 
-                                    sizeof(PrefsStruct)))
-                        {
-                            PropSheet_Changed(GetParent(hwnd), hwnd);
-                        }
-                        else
-                        {
-                            PropSheet_UnChanged(GetParent(hwnd), hwnd);
-                        }
-                    }
-
-                    break;
-                }
-
                 case IDC_STAYONTOP:
                 {
                     if(Button_GetCheck(hwndStayOnTop) == BST_CHECKED)
@@ -573,9 +489,7 @@ bool Win32PreferenceWindow::PrefPage1Proc(HWND hwnd,
                         currentValues.stayOnTop = false;
                     }
 
-                    if(memcmp(  &originalValues, 
-                                &currentValues, 
-                                sizeof(PrefsStruct)))
+                    if(originalValues != currentValues)
                     {
                         PropSheet_Changed(GetParent(hwnd), hwnd);
                     }
@@ -598,9 +512,7 @@ bool Win32PreferenceWindow::PrefPage1Proc(HWND hwnd,
                         currentValues.liveInTray = false;
                     }
 
-                    if(memcmp(  &originalValues, 
-                                &currentValues, 
-                                sizeof(PrefsStruct)))
+                    if(originalValues != currentValues)
                     {
                         PropSheet_Changed(GetParent(hwnd), hwnd);
                     }
@@ -611,37 +523,66 @@ bool Win32PreferenceWindow::PrefPage1Proc(HWND hwnd,
 
                     break;
                 }
-            }
 
-            break;
-        }
-
-        case WM_HSCROLL:
-		{
-			LRESULT position;
-            HWND hwndScroll = (HWND) lParam;
-
-			switch (LOWORD(wParam)) 
-			{
-				case TB_LINEUP:
-				case TB_LINEDOWN:
-				case TB_PAGEDOWN:
-				case TB_PAGEUP:
-				case TB_THUMBPOSITION:
-                case TB_THUMBTRACK:
-				{
-                    if(hwndScroll == hwndPriority)
+                case IDC_RECLAIMFILETYPES:
+                {
+                    if(Button_GetCheck(hwndReclaimFiletypes) == BST_CHECKED)
                     {
-		  			    position = SendMessage(	hwndScroll, 
-											    TBM_GETPOS, 
-											    0, 
-											    0);
+                        currentValues.reclaimFiletypes = true;
+                    }
+                    else
+                    {
+                        currentValues.reclaimFiletypes = false;
+                    }
 
-                        currentValues.decoderThreadPriority = position;
+                    if(originalValues != currentValues)
+                    {
+                        PropSheet_Changed(GetParent(hwnd), hwnd);
+                    }
+                    else
+                    {
+                        PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                    }
 
-                        if(memcmp(  &originalValues, 
-                                    &currentValues, 
-                                    sizeof(PrefsStruct)))
+                    break;
+                }
+
+                case IDC_ASKRECLAIM:
+                {
+                    if(Button_GetCheck(hwndAskReclaimFiletypes) == BST_CHECKED)
+                    {
+                        currentValues.askReclaimFiletypes = true;
+                    }
+                    else
+                    {
+                        currentValues.askReclaimFiletypes = false;
+                    }
+
+                    if(originalValues != currentValues)
+                    {
+                        PropSheet_Changed(GetParent(hwnd), hwnd);
+                    }
+                    else
+                    {
+                        PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                    }
+
+                    break;
+                }
+
+                case IDC_SAVEMUSICDIR:
+                {
+                    if(HIWORD(wParam) == EN_CHANGE)
+                    {
+                        char temp[MAX_PATH];
+
+                        Edit_GetText(   hwndSaveMusicDir, 
+                                        temp,
+                                        MAX_PATH);
+
+                        currentValues.saveMusicDirectory = temp;
+
+                        if(originalValues != currentValues)
                         {
                             PropSheet_Changed(GetParent(hwnd), hwnd);
                         }
@@ -650,10 +591,48 @@ bool Win32PreferenceWindow::PrefPage1Proc(HWND hwnd,
                             PropSheet_UnChanged(GetParent(hwnd), hwnd);
                         }
                     }
-                }
-			}
 
-			break;
+                    break;
+                }
+
+                case IDC_BROWSE:
+                {
+                    LPMALLOC pMalloc;
+
+                    if(SUCCEEDED(SHGetMalloc(&pMalloc)))
+                    {
+                        BROWSEINFO bi; 
+                        LPITEMIDLIST browseId;
+                        char displayName[MAX_PATH + 1];
+
+                        bi.hwndOwner = hwnd;
+                        bi.pidlRoot = NULL;
+                        bi.pszDisplayName = displayName;
+                        bi.lpszTitle = "Please select the folder to which you want to save music.";
+                        bi.ulFlags = BIF_RETURNONLYFSDIRS;
+                        bi.lpfn = NULL;
+
+                        browseId = SHBrowseForFolder(&bi);
+            
+                        if(browseId)
+                        {
+                            char temp[MAX_PATH];
+
+                            SHGetPathFromIDList(browseId, temp);
+                            
+                            currentValues.saveMusicDirectory = temp;
+
+                            Edit_SetText(hwndSaveMusicDir, temp);
+
+                            pMalloc->Free(browseId);
+                        }
+                    }
+                
+                    break;
+                } 
+            }
+
+            break;
         }
 
         case WM_NOTIFY:
@@ -664,7 +643,6 @@ bool Win32PreferenceWindow::PrefPage1Proc(HWND hwnd,
             {
                 case PSN_SETACTIVE:
                 {
-                    
                     break;
                 }
 
@@ -676,7 +654,6 @@ bool Win32PreferenceWindow::PrefPage1Proc(HWND hwnd,
 
                 case PSN_KILLACTIVE:
                 {
-                    
                     break;
                 }
 
@@ -694,10 +671,10 @@ bool Win32PreferenceWindow::PrefPage1Proc(HWND hwnd,
     return result;
 }
 
-bool Win32PreferenceWindow::PrefPage2Proc(HWND hwnd, 
-                                          UINT msg, 
-                                          WPARAM wParam, 
-                                          LPARAM lParam)      
+bool Win32PreferenceWindow::PrefStreamingProc(HWND hwnd, 
+                                              UINT msg, 
+                                              WPARAM wParam, 
+                                              LPARAM lParam)      
 {
     bool result = false;
     static PROPSHEETPAGE* psp = NULL;
@@ -771,7 +748,7 @@ bool Win32PreferenceWindow::PrefPage2Proc(HWND hwnd,
 
 
             Edit_SetText(   hwndSaveStreamsDirectory, 
-                            originalValues.saveStreamsDirectory);
+                            originalValues.saveStreamsDirectory.c_str());
 
             Button_Enable(  hwndSaveStreamsDirectory, 
                             originalValues.saveStreams);
@@ -784,7 +761,7 @@ bool Win32PreferenceWindow::PrefPage2Proc(HWND hwnd,
 
             char* port = NULL;
 
-            strcpy(temp, originalValues.proxyServer);
+            strcpy(temp, originalValues.proxyServer.c_str());
             port = strrchr(temp, ':');
 
             if(port)
@@ -825,7 +802,7 @@ bool Win32PreferenceWindow::PrefPage2Proc(HWND hwnd,
             char* ip[4];
             int32 i = 1;
 
-            strcpy(temp, originalValues.alternateIP);
+            strcpy(temp, originalValues.alternateIP.c_str());
             ip[0] = temp;
             dot = temp;
 
@@ -890,9 +867,7 @@ bool Win32PreferenceWindow::PrefPage2Proc(HWND hwnd,
 
                         currentValues.streamInterval = atoi(text);
 
-                        if(memcmp(  &originalValues, 
-                                    &currentValues, 
-                                    sizeof(PrefsStruct)))
+                        if(originalValues != currentValues)
                         {
                             PropSheet_Changed(GetParent(hwnd), hwnd);
                         }
@@ -925,9 +900,7 @@ bool Win32PreferenceWindow::PrefPage2Proc(HWND hwnd,
                     Button_Enable(  hwndSaveLocationText,enabled);
 
 
-                    if(memcmp(  &originalValues, 
-                                &currentValues, 
-                                sizeof(PrefsStruct)))
+                    if(originalValues != currentValues)
                     {
                         PropSheet_Changed(GetParent(hwnd), hwnd);
                     }
@@ -943,14 +916,15 @@ bool Win32PreferenceWindow::PrefPage2Proc(HWND hwnd,
                 {
                     if(HIWORD(wParam) == EN_CHANGE)
                     {
-                        memset(currentValues.saveStreamsDirectory, 0x00, MAX_PATH);
+                        char temp[MAX_PATH];
+
                         Edit_GetText(   hwndSaveStreamsDirectory, 
-                                        currentValues.saveStreamsDirectory,
+                                        temp,
                                         MAX_PATH);
 
-                        if(memcmp(  &originalValues, 
-                                    &currentValues, 
-                                    sizeof(PrefsStruct)))
+                        currentValues.saveStreamsDirectory = temp;
+
+                        if(originalValues != currentValues)
                         {
                             PropSheet_Changed(GetParent(hwnd), hwnd);
                         }
@@ -981,18 +955,16 @@ bool Win32PreferenceWindow::PrefPage2Proc(HWND hwnd,
                         bi.lpfn = NULL;
 
                         browseId = SHBrowseForFolder(&bi);
-
+            
                         if(browseId)
                         {
-                            memset( currentValues.saveStreamsDirectory, 
-                                    0x00, 
-                                    MAX_PATH);
+                            char temp[MAX_PATH];
 
-                            SHGetPathFromIDList(browseId,
-                                                currentValues.saveStreamsDirectory);
+                            SHGetPathFromIDList(browseId, temp);
                             
-                            Edit_SetText(   hwndSaveStreamsDirectory, 
-                                            currentValues.saveStreamsDirectory);
+                            currentValues.saveStreamsDirectory = temp;
+
+                            Edit_SetText(hwndSaveStreamsDirectory, temp);
 
                             pMalloc->Free(browseId);
                         }
@@ -1027,9 +999,7 @@ bool Win32PreferenceWindow::PrefPage2Proc(HWND hwnd,
                     Button_Enable(hwndColon, enabled);
 
 
-                    if(memcmp(  &originalValues, 
-                                &currentValues, 
-                                sizeof(PrefsStruct)))
+                    if(originalValues != currentValues)
                     {
                         PropSheet_Changed(GetParent(hwnd), hwnd);
                     }
@@ -1046,26 +1016,27 @@ bool Win32PreferenceWindow::PrefPage2Proc(HWND hwnd,
                 {
                     if(HIWORD(wParam) == EN_CHANGE)
                     {
+                        char temp[MAX_PATH];
                         char port[6];
 
-                        memset(currentValues.proxyServer, 0x00, MAX_PATH);
-                        Edit_GetText(   hwndProxyServerAddress, 
-                                        currentValues.proxyServer,
-                                        MAX_PATH);
+                        Edit_GetText( hwndProxyServerAddress, 
+                                      temp,
+                                      MAX_PATH);
 
-                        Edit_GetText(   hwndProxyServerPort, 
-                                        port,
-                                        sizeof(port));
+                        currentValues.proxyServer = temp;
+
+
+                        Edit_GetText( hwndProxyServerPort, 
+                                      port,
+                                      sizeof(port));
 
                         if(*port)
                         {
-                            strcat(currentValues.proxyServer, ":");
-                            strcat(currentValues.proxyServer, port);
+                            currentValues.proxyServer += ":";
+                            currentValues.proxyServer += port;
                         }
 
-                        if(memcmp(  &originalValues, 
-                                    &currentValues, 
-                                    sizeof(PrefsStruct)))
+                        if(originalValues != currentValues)
                         {
                             PropSheet_Changed(GetParent(hwnd), hwnd);
                         }
@@ -1104,9 +1075,7 @@ bool Win32PreferenceWindow::PrefPage2Proc(HWND hwnd,
                     
 
 
-                    if(memcmp(  &originalValues, 
-                                &currentValues, 
-                                sizeof(PrefsStruct)))
+                    if(originalValues != currentValues)
                     {
                         PropSheet_Changed(GetParent(hwnd), hwnd);
                     }
@@ -1127,61 +1096,57 @@ bool Win32PreferenceWindow::PrefPage2Proc(HWND hwnd,
                     {
                         char ip[4];
 
-                        memset(currentValues.alternateIP, 0x00, 16);
                         Edit_GetText(hwndAlternateIPAddress1, ip, 4);
 
                         if(*ip)
                         {
-                            strcat(currentValues.alternateIP, ip);
+                            currentValues.alternateIP += ip;
                         }
                         else
                         {
-                            strcat(currentValues.alternateIP, "0");
+                            currentValues.alternateIP += "0";
                         }
 
-                        strcat(currentValues.alternateIP, ".");
-
+                        currentValues.alternateIP += ".";
 
                         Edit_GetText(hwndAlternateIPAddress2, ip, 4);
 
                         if(*ip)
                         {
-                            strcat(currentValues.alternateIP, ip);
+                            currentValues.alternateIP += ip;
                         }
                         else
                         {
-                            strcat(currentValues.alternateIP, "0");
+                            currentValues.alternateIP += "0";
                         }
 
-                        strcat(currentValues.alternateIP, ".");
+                        currentValues.alternateIP += ".";
 
                         Edit_GetText(hwndAlternateIPAddress3, ip, 4);
 
                         if(*ip)
                         {
-                            strcat(currentValues.alternateIP, ip);
+                            currentValues.alternateIP += ip;
                         }
                         else
                         {
-                            strcat(currentValues.alternateIP, "0");
+                            currentValues.alternateIP += "0";
                         }
 
-                        strcat(currentValues.alternateIP, ".");
+                        currentValues.alternateIP += ".";
 
                         Edit_GetText(hwndAlternateIPAddress4, ip, 4);
 
                         if(*ip)
                         {
-                            strcat(currentValues.alternateIP, ip);
+                            currentValues.alternateIP += ip;
                         }
                         else
                         {
-                            strcat(currentValues.alternateIP, "0");
+                           currentValues.alternateIP += "0";
                         }
 
-                        if(memcmp(  &originalValues, 
-                                    &currentValues, 
-                                    sizeof(PrefsStruct)))
+                        if(originalValues != currentValues)
                         {
                             PropSheet_Changed(GetParent(hwnd), hwnd);
                         }
@@ -1238,7 +1203,7 @@ bool Win32PreferenceWindow::PrefPage2Proc(HWND hwnd,
     return result;
 }
 
-bool Win32PreferenceWindow::PrefPage3Proc(HWND hwnd, 
+bool Win32PreferenceWindow::PrefDebugProc(HWND hwnd, 
                                           UINT msg, 
                                           WPARAM wParam, 
                                           LPARAM lParam)      
@@ -1316,9 +1281,7 @@ bool Win32PreferenceWindow::PrefPage3Proc(HWND hwnd,
                     Button_Enable(hwndLogMain, enabled);
                     Button_Enable(hwndLogPerformance, enabled);
 
-                    if(memcmp(  &originalValues, 
-                                &currentValues, 
-                                sizeof(PrefsStruct)))
+                    if(originalValues != currentValues)
                     {
                         PropSheet_Changed(GetParent(hwnd), hwnd);
                     }
@@ -1341,9 +1304,7 @@ bool Win32PreferenceWindow::PrefPage3Proc(HWND hwnd,
                         currentValues.logDecoder = false;
                     }
 
-                    if(memcmp(  &originalValues, 
-                                &currentValues, 
-                                sizeof(PrefsStruct)))
+                    if(originalValues != currentValues)
                     {
                         PropSheet_Changed(GetParent(hwnd), hwnd);
                     }
@@ -1366,9 +1327,7 @@ bool Win32PreferenceWindow::PrefPage3Proc(HWND hwnd,
                         currentValues.logInput = false;
                     }
 
-                    if(memcmp(  &originalValues, 
-                                &currentValues, 
-                                sizeof(PrefsStruct)))
+                    if(originalValues != currentValues)
                     {
                         PropSheet_Changed(GetParent(hwnd), hwnd);
                     }
@@ -1391,9 +1350,7 @@ bool Win32PreferenceWindow::PrefPage3Proc(HWND hwnd,
                         currentValues.logOutput = false;
                     }
 
-                    if(memcmp(  &originalValues, 
-                                &currentValues, 
-                                sizeof(PrefsStruct)))
+                    if(originalValues != currentValues)
                     {
                         PropSheet_Changed(GetParent(hwnd), hwnd);
                     }
@@ -1416,9 +1373,7 @@ bool Win32PreferenceWindow::PrefPage3Proc(HWND hwnd,
                         currentValues.logPerformance = false;
                     }
 
-                    if(memcmp(  &originalValues, 
-                                &currentValues, 
-                                sizeof(PrefsStruct)))
+                    if(originalValues != currentValues)
                     {
                         PropSheet_Changed(GetParent(hwnd), hwnd);
                     }
@@ -1441,9 +1396,7 @@ bool Win32PreferenceWindow::PrefPage3Proc(HWND hwnd,
                         currentValues.logMain = false;
                     }
 
-                    if(memcmp(  &originalValues, 
-                                &currentValues, 
-                                sizeof(PrefsStruct)))
+                    if(originalValues != currentValues)
                     {
                         PropSheet_Changed(GetParent(hwnd), hwnd);
                     }
@@ -1497,7 +1450,7 @@ bool Win32PreferenceWindow::PrefPage3Proc(HWND hwnd,
     return result;
 }
 
-bool Win32PreferenceWindow::PrefPage4Proc(HWND hwnd, 
+bool Win32PreferenceWindow::PrefAboutProc(HWND hwnd, 
                                           UINT msg, 
                                           WPARAM wParam, 
                                           LPARAM lParam)      
@@ -1614,7 +1567,7 @@ void Win32PreferenceWindow::LoadThemeListBox(HWND hwnd)
     currentValues.fontChanged = false;
 }
 
-bool Win32PreferenceWindow::PrefPage5Proc(HWND hwnd, 
+bool Win32PreferenceWindow::PrefThemeProc(HWND hwnd, 
                                           UINT msg, 
                                           WPARAM wParam, 
                                           LPARAM lParam)      
@@ -1716,10 +1669,10 @@ bool Win32PreferenceWindow::PrefPage5Proc(HWND hwnd,
                     oThemeName = szCurSel;
                     oMesg = string("Are you sure you want to delete theme ") +
                             oThemeName + string("?");
-                    if (MessageBox(hwnd, oMesg.c_str(), "Confirm Delete", MB_YESNO) == IDYES)        
+                    if(MessageBox(hwnd, oMesg.c_str(), "Confirm Delete", MB_YESNO) == IDYES)        
                     {
                         eRet = m_pThemeMan->DeleteTheme(m_oThemeList[oThemeName]);
-                        if (IsError(eRet))
+                        if(IsError(eRet))
                             MessageBox(hwnd, "Could not delete theme.", "Delete Theme", MB_OK);
                         LoadThemeListBox(hwnd);
                     }    
@@ -1734,7 +1687,7 @@ bool Win32PreferenceWindow::PrefPage5Proc(HWND hwnd,
                     
                     memset(&sLogFont, 0, sizeof(sLogFont));
                     
-                    strcpy(sLogFont.lfFaceName, currentValues.defaultFont);
+                    strcpy(sLogFont.lfFaceName, currentValues.defaultFont.c_str());
                     sLogFont.lfWeight = FW_NORMAL;
                     sLogFont.lfHeight = -24;
                     
@@ -1749,11 +1702,9 @@ bool Win32PreferenceWindow::PrefPage5Proc(HWND hwnd,
                     sFont.nSizeMin = 18;              
                     sFont.nSizeMax = 18;              
                     
-                    if (ChooseFont(&sFont))
+                    if(ChooseFont(&sFont))
                     {
-                        memset(currentValues.defaultFont, 0x00, 64);
-                    	strcpy(currentValues.defaultFont, 
-                               sLogFont.lfFaceName);
+                    	currentValues.defaultFont= sLogFont.lfFaceName;
                         currentValues.fontChanged = true;
                         PropSheet_Changed(GetParent(hwnd), hwnd);
                     }    
@@ -2099,10 +2050,10 @@ static void update_function(void* arg)
     delete ts->thread;
 }
 
-bool Win32PreferenceWindow::PrefPage6Proc(HWND hwnd, 
-                                          UINT msg, 
-                                          WPARAM wParam, 
-                                          LPARAM lParam)      
+bool Win32PreferenceWindow::PrefUpdateProc(HWND hwnd, 
+                                           UINT msg, 
+                                           WPARAM wParam, 
+                                           LPARAM lParam)      
 {
     bool result = false;
     static PROPSHEETPAGE* psp = NULL;
@@ -2246,9 +2197,7 @@ bool Win32PreferenceWindow::PrefPage6Proc(HWND hwnd,
                         currentValues.checkForUpdates = false;
                     }
 
-                    if(memcmp(  &originalValues, 
-                                &currentValues, 
-                                sizeof(PrefsStruct)))
+                    if(originalValues != currentValues)
                     {
                         PropSheet_Changed(GetParent(hwnd), hwnd);
                     }
@@ -2514,4 +2463,755 @@ uint32 CalcStringEllipsis(HDC hdc, string& displayString, int32 columnWidth)
     GetTextExtentPoint32(hdc, displayString.c_str(), displayString.size(), &sizeString);
 
     return sizeString.cx;
+}
+
+bool Win32PreferenceWindow::PrefAdvancedProc(HWND hwnd, 
+                                             UINT msg, 
+                                             WPARAM wParam, 
+                                             LPARAM lParam)      
+{
+    bool result = false;
+    static PROPSHEETPAGE* psp = NULL;
+    static Preferences* prefs = NULL;
+    static HWND hwndPMO = NULL;
+    static HWND hwndPriority = NULL;
+    static HWND hwndInput = NULL;
+    static HWND hwndOutput = NULL;
+    static HWND hwndPrebuffer = NULL;
+    static HWND hwndStayOnTop = NULL;
+    static HWND hwndLiveInTray = NULL;
+    
+
+    switch(msg)
+    {
+        case WM_INITDIALOG:
+        {
+            // remember these for later...
+            psp = (PROPSHEETPAGE*)lParam;
+            prefs = (Preferences*)psp->lParam;
+
+            // get the handles to all our controls
+            hwndPMO = GetDlgItem(hwnd, IDC_PMO);
+            hwndPriority = GetDlgItem(hwnd, IDC_PRIORITY);
+            hwndInput = GetDlgItem(hwnd, IDC_INPUT);
+            hwndOutput = GetDlgItem(hwnd, IDC_OUTPUT);
+            hwndPrebuffer = GetDlgItem(hwnd, IDC_PREBUFFER);
+
+            // get registries
+            Registrar registrar;
+            Registry pmo;
+            Registry ui;
+
+            registrar.SetSubDir("plugins");
+            registrar.SetSearchString("*.pmo");
+            registrar.InitializeRegistry(&pmo, prefs);
+            registrar.SetSearchString("*.ui");
+            registrar.InitializeRegistry(&ui, prefs);
+
+            // initialize our controls
+
+            int32 i = 0;
+            int32 pos = 0;
+            RegistryItem *item;
+
+            while(item = pmo.GetItem(i++))
+            {
+                if(*item->Description())
+                    pos = ComboBox_AddString(hwndPMO, item->Description());
+                else
+                    pos = ComboBox_AddString(hwndPMO, item->Name());
+
+                string* name = new string(item->Name());
+
+                ComboBox_SetItemData(hwndPMO, pos, (DWORD)name);
+
+                if(originalValues.defaultPMO == item->Name())
+                {
+                    ComboBox_SetCurSel(hwndPMO, pos);
+                }
+            }
+
+            SendMessage(hwndPriority, 
+                        TBM_SETRANGE, 
+                        (WPARAM) TRUE,                   
+                        (LPARAM) MAKELONG(0, 6));
+
+            SendMessage(hwndPriority, 
+                        TBM_SETPOS, 
+                        (WPARAM) TRUE,                   
+                        (LPARAM) originalValues.decoderThreadPriority);
+
+            int32 value;
+            char temp[256];
+
+            value = originalValues.inputBufferSize;
+            sprintf(temp, "%d", value);
+            Edit_LimitText(hwndInput, 4);
+            Edit_SetText(hwndInput, temp);
+
+            value = originalValues.outputBufferSize;
+            sprintf(temp, "%d", value);
+            Edit_LimitText(hwndOutput, 4);
+            Edit_SetText(hwndOutput, temp);
+
+            value = originalValues.preBufferLength;
+            sprintf(temp, "%d", value);
+            Edit_LimitText(hwndPrebuffer, 2);
+            Edit_SetText(hwndPrebuffer, temp);
+            
+            break;
+        }
+
+        case WM_DESTROY:
+        {
+            int32 count = ComboBox_GetCount(hwndPMO);
+
+            if(count != CB_ERR)
+            {
+                for(int32 i = 0; i < count;i++)
+                {
+                    string* s;
+                    s = (string*)ComboBox_GetItemData(hwndPMO, i);
+
+                    if(s)
+                        delete s;
+                }
+            }
+            break;
+        }
+
+        case WM_COMMAND:
+        {
+            switch(LOWORD(wParam))
+            {
+                case IDC_PMO:
+                {
+                    if(HIWORD(wParam) == CBN_CLOSEUP)
+                    {
+
+                        int32 sel = ComboBox_GetCurSel(hwndPMO);
+
+                        if(sel != CB_ERR)
+                        {
+                            string* s;
+                            s = (string*)ComboBox_GetItemData(hwndPMO, sel);
+                            
+                            currentValues.defaultPMO = *s;
+                        }
+
+                        /*ComboBox_GetText( hwndPMO, 
+                                            currentValues.defaultPMO, 
+                                            256);*/
+
+                        if(originalValues != currentValues)
+                        {
+                            PropSheet_Changed(GetParent(hwnd), hwnd);
+                        }
+                        else
+                        {
+                            PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                        }
+                    }
+
+                    break;
+                }                
+
+                case IDC_INPUT:
+                {
+                    if(HIWORD(wParam) == EN_CHANGE)
+                    {
+                        char text[128];
+
+                        Edit_GetText(hwndInput, text, sizeof(text));
+
+                        currentValues.inputBufferSize = atoi(text);
+
+                        if(originalValues != currentValues)
+                        {
+                            PropSheet_Changed(GetParent(hwnd), hwnd);
+                        }
+                        else
+                        {
+                            PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                        }
+                    }
+
+                    break;
+                }
+
+                case IDC_OUTPUT:
+                {
+                    if(HIWORD(wParam) == EN_CHANGE)
+                    {
+                        char text[128];
+
+                        Edit_GetText(hwndOutput, text, sizeof(text));
+
+                        currentValues.outputBufferSize = atoi(text);
+
+                        if(originalValues != currentValues)
+                        {
+                            PropSheet_Changed(GetParent(hwnd), hwnd);
+                        }
+                        else
+                        {
+                            PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                        }
+                    }
+
+                    break;
+                }
+
+                case IDC_PREBUFFER:
+                {
+                    if(HIWORD(wParam) == EN_CHANGE)
+                    {
+                        char text[128];
+
+                        Edit_GetText(hwndPrebuffer, text, sizeof(text));
+
+                        currentValues.preBufferLength = atoi(text);
+
+                        if(originalValues != currentValues)
+                        {
+                            PropSheet_Changed(GetParent(hwnd), hwnd);
+                        }
+                        else
+                        {
+                            PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                        }
+                    }
+
+                    break;
+                }
+            }
+
+            break;
+        }
+
+        case WM_HSCROLL:
+		{
+			LRESULT position;
+            HWND hwndScroll = (HWND) lParam;
+
+			switch (LOWORD(wParam)) 
+			{
+				case TB_LINEUP:
+				case TB_LINEDOWN:
+				case TB_PAGEDOWN:
+				case TB_PAGEUP:
+				case TB_THUMBPOSITION:
+                case TB_THUMBTRACK:
+				{
+                    if(hwndScroll == hwndPriority)
+                    {
+		  			    position = SendMessage(	hwndScroll, 
+											    TBM_GETPOS, 
+											    0, 
+											    0);
+
+                        currentValues.decoderThreadPriority = position;
+
+                        if(originalValues != currentValues)
+                        {
+                            PropSheet_Changed(GetParent(hwnd), hwnd);
+                        }
+                        else
+                        {
+                            PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                        }
+                    }
+                }
+			}
+
+			break;
+        }
+
+        case WM_NOTIFY:
+        {
+            NMHDR* notify = (NMHDR*)lParam;
+
+            switch(notify->code)
+            {
+                case PSN_SETACTIVE:
+                {
+                    
+                    break;
+                }
+
+                case PSN_APPLY:
+                {
+                    SavePrefsValues(prefs, &currentValues);
+                    break;
+                }
+
+                case PSN_KILLACTIVE:
+                {
+                    
+                    break;
+                }
+
+                case PSN_RESET:
+                {
+                    SavePrefsValues(prefs, &originalValues);
+                    break;
+                }
+            }
+
+            break;
+        }
+    }
+
+    return result;
+}
+
+typedef struct PortablePlayer {
+    string name;
+    string plugin;
+    bool checked;
+} PortablePlayer;
+
+
+LRESULT WINAPI 
+ListViewWndProc(HWND hwnd, 
+                UINT msg, 
+                WPARAM wParam, 
+                LPARAM lParam);
+
+bool Win32PreferenceWindow::PrefPluginsProc(HWND hwnd, 
+                                            UINT msg, 
+                                            WPARAM wParam, 
+                                            LPARAM lParam)      
+{
+    bool result = false;
+    static PROPSHEETPAGE* psp = NULL;
+    static Preferences* prefs = NULL;
+    static HWND hwndList = NULL;
+    static HWND hwndPMO = NULL;
+    static HIMAGELIST imageList = NULL;
+    static PortableSet originalSet;
+    static PortableSet currentSet;
+
+    
+    switch(msg)
+    {
+        case WM_INITDIALOG:
+        {
+            // remember these for later...
+            psp = (PROPSHEETPAGE*)lParam;
+            prefs = (Preferences*)psp->lParam;
+
+            // get the handles to all our controls
+            hwndList = GetDlgItem(hwnd, IDC_PORTABLELIST);
+            hwndPMO = GetDlgItem(hwnd, IDC_PMO);
+
+            // Init our controls
+
+            // get registries
+            Registrar registrar;
+            Registry pmo;
+            Registry ppp;
+
+            registrar.SetSubDir("plugins");
+            registrar.SetSearchString("*.pmo");
+            registrar.InitializeRegistry(&pmo, prefs);
+
+            registrar.SetSearchString("*.ppp");
+            registrar.InitializeRegistry(&ppp, prefs);
+
+            uint32 i = 0;
+            int32 pos = 0;
+            RegistryItem *item;
+
+            while(item = pmo.GetItem(i++))
+            {
+                if(*item->Description())
+                    pos = ComboBox_AddString(hwndPMO, item->Description());
+                else
+                    pos = ComboBox_AddString(hwndPMO, item->Name());
+
+                string* name = new string(item->Name());
+
+                ComboBox_SetItemData(hwndPMO, pos, (DWORD)name);
+
+                if(originalValues.defaultPMO == item->Name())
+                {
+                    ComboBox_SetCurSel(hwndPMO, pos);
+                }
+            }
+            
+            HINSTANCE hinst = (HINSTANCE) GetWindowLong(hwnd, GWL_HINSTANCE);
+
+            // get our checkbox images
+            imageList = ImageList_Create(16, 16, ILC_COLOR24|ILC_MASK, 2, 0);
+
+            HBITMAP bmp;
+            bmp = LoadBitmap(hinst, MAKEINTRESOURCE(IDB_UNCHECKED));
+            ImageList_AddMasked(imageList, bmp, RGB(255,0,0));
+            DeleteObject(bmp);
+            bmp = LoadBitmap(hinst, MAKEINTRESOURCE(IDB_CHECKED));
+            ImageList_AddMasked(imageList, bmp, RGB(255,0,0));
+            DeleteObject(bmp);
+
+            ListView_SetImageList(hwndList, imageList, LVSIL_SMALL); 
+
+            // add items to portable plugin list
+            LV_ITEM lv_item;
+            i = 0;
+
+            while(item = ppp.GetItem(i++))
+            {
+                lv_item.mask = LVIF_PARAM | LVIF_STATE;
+                lv_item.state = 0;
+                lv_item.stateMask = 0;
+                lv_item.iItem = ListView_GetItemCount(hwndList);
+                lv_item.iSubItem = 0;
+
+                PortablePlayer* p = new PortablePlayer;
+
+                lv_item.lParam = (LPARAM)p;
+
+                ListView_InsertItem(hwndList, &lv_item);
+
+                if(*item->Description())
+                    p->name = item->Description();
+                else
+                    p->name = item->Name();
+
+                p->plugin = item->Name();
+
+                PortableSet::iterator i;
+
+                i = originalValues.portablePlayers.find(string(item->Name()));
+
+                p->checked = i != originalValues.portablePlayers.end();
+
+            }
+
+            // add our columns
+            RECT rect;
+            GetClientRect(hwndList, &rect);
+
+            LV_COLUMN lvc;
+
+            lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
+            lvc.fmt = LVCFMT_LEFT; // left align column
+            lvc.cx = (rect.right-rect.left); // width of column in pixels
+            lvc.pszText = "Component Name";
+            lvc.iSubItem = 0;
+
+            lvc.cx -= GetSystemMetrics(SM_CXVSCROLL); // width of scrollbar
+
+            ListView_InsertColumn(hwndList, 0, &lvc);
+
+            break;
+        }
+
+        case WM_DESTROY:
+        {
+            int32 count = ComboBox_GetCount(hwndPMO);
+
+            if(count != CB_ERR)
+            {
+                for(int32 i = 0; i < count;i++)
+                {
+                    string* s;
+                    s = (string*)ComboBox_GetItemData(hwndPMO, i);
+
+                    if(s)
+                        delete s;
+                }
+            }
+
+
+            count = ListView_GetItemCount(hwndList);
+
+            if(count)
+            {
+                LV_ITEM item;
+
+                for(int32 i = 0; i < count; i++)
+                {
+                    item.mask = LVIF_PARAM;
+                    item.iItem = i;
+                    item.lParam = 0;
+
+                    if(ListView_GetItem(hwndList, &item))
+                    {
+                        if(item.lParam)
+                        {
+                            delete (PortablePlayer*)item.lParam;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            break;
+        }
+
+        case WM_COMMAND:
+        {
+            switch(LOWORD(wParam))
+            {
+                case IDC_PMO:
+                {
+                    if(HIWORD(wParam) == CBN_CLOSEUP)
+                    {
+
+                        int32 sel = ComboBox_GetCurSel(hwndPMO);
+
+                        if(sel != CB_ERR)
+                        {
+                            string* s;
+                            s = (string*)ComboBox_GetItemData(hwndPMO, sel);
+                            
+                            currentValues.defaultPMO = *s;
+                        }
+
+                        /*ComboBox_GetText( hwndPMO, 
+                                            currentValues.defaultPMO, 
+                                            256);*/
+
+                        if(originalValues != currentValues)
+                        {
+                            PropSheet_Changed(GetParent(hwnd), hwnd);
+                        }
+                        else
+                        {
+                            PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                        }
+                    }
+
+                    break;
+                }
+            }
+
+            break;
+        }
+
+        case WM_MEASUREITEM:
+        {
+            MEASUREITEMSTRUCT* mis = (MEASUREITEMSTRUCT*) lParam;
+            TEXTMETRIC tm;
+            HDC hdc;
+	        HFONT hFont, oldFont;
+	        HWND hwndLV;
+
+
+            // Make sure the control is the listview control
+            if (mis->CtlType != ODT_LISTVIEW || mis->CtlID != IDC_PORTABLELIST)
+                return FALSE;
+
+	        // Get the handle of the ListView control we're using
+	        hwndLV = GetDlgItem(hwnd, mis->CtlID);
+
+	        // Get the font the control is currently using
+	        hFont = (HFONT)(DWORD) SendMessage(hwndLV, WM_GETFONT, 0, 0L);
+
+	        // Set the font of the DC to the same font the control is using
+            hdc = GetDC(hwndLV);
+	        oldFont = (HFONT)SelectObject(hdc, hFont);
+
+            // Get the height of the font used by the control
+            if (!GetTextMetrics(hdc, &tm))
+                return FALSE;
+
+            // Add a little extra space between items
+            mis->itemHeight = tm.tmHeight + 1;
+
+            // Make sure there is enough room for the images which are CY_SMICON high
+            if (mis->itemHeight < 17)
+    	        mis->itemHeight = 17;
+
+            // width ?
+            RECT rect;
+            GetClientRect(hwndLV, &rect);
+
+            mis->itemWidth = (rect.right-rect.left); // width of column in pixels
+
+	        // Clean up
+            SelectObject(hdc, oldFont);
+	        ReleaseDC(hwndLV, hdc);
+
+            return TRUE;
+
+            break;
+        }
+
+        case WM_DRAWITEM:
+        {
+            DRAWITEMSTRUCT* dis = (DRAWITEMSTRUCT*) lParam;
+            int32 controlId = (UINT) wParam;
+            HIMAGELIST himl;
+            int32 cxImage = 0, cyImage = 0;
+            PortablePlayer* item = (PortablePlayer*)dis->itemData;
+
+            // Get Image List
+            himl = ListView_GetImageList(dis->hwndItem, LVSIL_SMALL);
+            ImageList_GetIconSize(himl, &cxImage, &cyImage);
+
+            uint32 uiFlags = ILD_TRANSPARENT;
+            RECT rcClip;
+
+            // Check to see if this item is selected
+            /*if(dis->itemState & ODS_SELECTED)
+            {
+                // Set the text background and foreground colors
+                SetTextColor(dis->hDC, GetSysColor(COLOR_HIGHLIGHTTEXT));
+                SetBkColor(dis->hDC, GetSysColor(COLOR_HIGHLIGHT));
+            }
+            else*/
+            {
+                // Set the text background and foreground colors 
+                // to the standard window colors
+                SetTextColor(dis->hDC, GetSysColor(COLOR_WINDOWTEXT));
+                SetBkColor(dis->hDC, GetSysColor(COLOR_WINDOW));
+            }
+
+            rcClip = dis->rcItem;            
+
+            // Check to see if the string fits in the clip rect.  If not, truncate
+            // the string and add "...".
+            string displayString = item->name;
+
+            /*CalcStringEllipsis(dis->hDC, 
+                               displayString, 
+                               ListView_GetColumnWidth(hwndList, 0));*/
+
+            // Get the height of the font used by the control
+            TEXTMETRIC tm;
+            GetTextMetrics(dis->hDC, &tm);
+            
+            uint32 top = rcClip.top + ((rcClip.bottom - rcClip.top) - tm.tmHeight)/2;
+
+            ExtTextOut( dis->hDC, 
+                        rcClip.left + cxImage + 3, top, 
+                        ETO_CLIPPED | ETO_OPAQUE,
+                        &rcClip, 
+                        displayString.c_str(),
+                        displayString.size(),
+                        NULL);
+
+            // Draw the icon. Drawing it after the first item allows us
+            // to let ExtTextOut draw the correct background 
+            if(himl)
+            {
+                top = rcClip.top + ((rcClip.bottom - rcClip.top) - cyImage)/2;
+                int32 index = item->checked ? 1 : 0;
+                ImageList_Draw( himl, index, dis->hDC, 
+                                rcClip.left, top,
+                                uiFlags);
+            }
+
+            // If we changed the colors for the selected item, undo it
+            if(dis->itemState & ODS_SELECTED)
+            {
+                // Set the text background and foreground colors
+                SetTextColor(dis->hDC, GetSysColor(COLOR_WINDOWTEXT));
+                SetBkColor(dis->hDC, GetSysColor(COLOR_WINDOW));
+            }
+
+            // If the item is focused, now draw a focus rect around the entire row
+            /*if(dis->itemState & ODS_FOCUS)
+            {
+                // Draw the focus rect
+                DrawFocusRect(dis->hDC, &dis->rcItem);
+            }*/
+
+            
+
+            result = true;
+            break;
+        }
+
+        case WM_NOTIFY:
+        {
+            NMHDR* notify = (NMHDR*)lParam;
+
+            if(notify->hwndFrom == hwndList)
+            {
+                NM_LISTVIEW* nmlv = (NM_LISTVIEW*)notify;
+
+                if(notify->code == NM_CLICK)
+                {
+                    LV_HITTESTINFO hti;
+                    POINT pt;
+
+                    GetCursorPos(&pt);
+                    ScreenToClient(hwndList, &pt);
+            
+                    hti.pt.x = pt.x;
+                    hti.pt.y = pt.y;
+
+                    int32 index = ListView_HitTest(hwndList, &hti);
+
+                    if(index >= 0)
+                    {
+                        LV_ITEM lv_item;
+
+                        lv_item.mask = LVIF_PARAM;
+                        lv_item.iItem = index;
+                        lv_item.iSubItem = 0;
+
+                        if(ListView_GetItem(hwndList, &lv_item ))
+                        {
+                            PortablePlayer* p = (PortablePlayer*)lv_item.lParam;
+
+                            p->checked = !p->checked;
+
+                            if(p->checked)
+                                currentValues.portablePlayers.insert(p->plugin);
+                            else
+                                currentValues.portablePlayers.erase(p->plugin);
+                          
+                            if(originalValues != currentValues)
+                            {
+                                PropSheet_Changed(GetParent(hwnd), hwnd);
+                            }
+                            else
+                            {
+                                PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                            }
+
+                            ListView_RedrawItems(hwndList, index, index);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                switch(notify->code)
+                {
+                    case PSN_SETACTIVE:
+                    {
+                        // initialize temporary sets
+                        break;
+                    }
+
+                    case PSN_APPLY:
+                    {
+                        SavePrefsValues(prefs, &currentValues);
+                        break;
+                    }
+
+                    case PSN_KILLACTIVE:
+                    {
+                        // write out sets
+                        break;
+                    }
+
+                    case PSN_RESET:
+                    {
+                        SavePrefsValues(prefs, &originalValues);
+                        break;
+                    }
+                }
+            }
+
+            break;
+        }
+    }
+
+    return result;
 }

@@ -379,11 +379,11 @@ BEGIN
             VALUE "CompanyName", "FreeAmp Open Source Development Effort\0"
             VALUE "FileDescription", "Simple interface to the FreeAmp player. It is currently deprecated and works with version 1.3 and earlier.\0"
             VALUE "FileVersion", "1.3\0"
-            VALUE "InternalName", "FreeAmp\0"
+            VALUE "InternalName", "simple\0"
             VALUE "LegalCopyright", "http://www.gnu.org/copyleft/gpl.html\0"
             VALUE "LegalTrademarks", "FreeAmp\0"
             VALUE "OriginalFilename", "simple.ui\0"
-            VALUE "ProductName", "FreeAmp\0"
+            VALUE "ProductName", "Simple User Interface\0"
             VALUE "ProductVersion", "1.3\0"
         END
     END

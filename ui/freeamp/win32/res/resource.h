@@ -79,13 +79,24 @@
 #define IDM_TRAY                        192
 #define IDD_PREF                        193
 #define IDD_PREF1                       193
+#define IDD_PREF_GENERAL                193
 #define IDD_OPENURL                     219
 #define IDD_SAVERIO                     220
 #define IDD_PREF3                       221
+#define IDD_PREF_DEBUG                  221
 #define IDD_PREF2                       223
+#define IDD_PREF_STREAMING              223
 #define IDD_PREF4                       224
+#define IDD_PREF_ABOUT                  224
 #define IDD_PREF5                       225
+#define IDD_PREF_THEME                  225
 #define IDD_PREF6                       226
+#define IDD_PREF_UPDATE                 226
+#define IDD_PREF_GENERAL_OLD            227
+#define IDD_PREF_ADVANCED               233
+#define IDD_PREF_PLUGINS                234
+#define IDB_CHECKED                     542
+#define IDB_UNCHECKED                   543
 #define IDC_SAVE_RIO                    1002
 #define IDC_UI                          1005
 #define IDC_PMO                         1006
@@ -106,6 +117,7 @@
 #define IDC_BROWSE                      1018
 #define IDC_SAVELOCATION_TEXT           1019
 #define IDC_PORT                        1020
+#define IDC_SAVEMUSICDIR                1020
 #define IDC_PROXYADDRESS_TEXT           1021
 #define IDC_PORT_TEXT                   1022
 #define IDC_USEPROXY                    1023
@@ -137,6 +149,9 @@
 #define IDC_STATUS                      1049
 #define IDC_AUTOCHECK                   1050
 #define IDC_CANCELUPDATE                1051
+#define IDC_RECLAIMFILETYPES            1052
+#define IDC_ASKRECLAIM                  1053
+#define IDC_PORTABLELIST                1054
 #define IDC_ITEM                        40001
 #define IDC_ABOUT                       40002
 #define IDC_OPEN                        40003
@@ -158,7 +173,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        197
 #define _APS_NEXT_COMMAND_VALUE         40013
-#define _APS_NEXT_CONTROL_VALUE         1051
+#define _APS_NEXT_CONTROL_VALUE         1055
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -27,7 +27,163 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // Dialog
 //
 
-IDD_PREF1 DIALOG DISCARDABLE  0, 0, 233, 174
+IDD_PREF_GENERAL DIALOG DISCARDABLE  0, 0, 233, 174
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "General"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Remain on top of all other windows.",IDC_STAYONTOP,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,116,128,10
+    CONTROL         "Manifest in Windows Tray instead of Taskbar.",IDC_TRAY,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,132,158,10
+    GROUPBOX        "Miscellaneous",IDC_STATIC,3,104,227,44
+    GROUPBOX        "Save Music Folder",IDC_STATIC,3,3,227,42
+    EDITTEXT        IDC_SAVEMUSICDIR,11,21,160,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Browse...",IDC_BROWSE,175,21,50,14
+    GROUPBOX        "File Associations",IDC_STATIC,3,51,227,47
+    CONTROL         "Reclaim stolen filetypes when application starts.",
+                    IDC_RECLAIMFILETYPES,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,18,65,163,10
+    CONTROL         "Ask before reclaiming filetypes.",IDC_ASKRECLAIM,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,18,80,113,10
+END
+
+IDD_PREF_DEBUG DIALOG DISCARDABLE  0, 0, 233, 174
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Debug"
+FONT 8, "MS Sans Serif"
+BEGIN
+    GROUPBOX        "",IDC_STATIC,3,84,227,86
+    LTEXT           " ",IDC_STATIC,9,84,8,8
+    CONTROL         "Enable Logging",IDC_LOG,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,11,83,63,10
+    CONTROL         "Log general player errors (e.g. Loading plugins)",
+                    IDC_LOGMAIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,98,
+                    163,10
+    CONTROL         "Log input from PMIs (e.g. File, HTTP, ShoutCAST)",
+                    IDC_LOGINPUT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,
+                    112,174,10
+    CONTROL         "Log output from PMOs (e.g. Wave, DirectSound)",
+                    IDC_LOGOUTPUT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,
+                    126,169,10
+    CONTROL         "Log decoding process (e.g. MP3, CDDA)",IDC_LOGDECODER,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,140,145,10
+    CONTROL         "Log performance issues (e.g. Timings, Buffer Under/Overflows)",
+                    IDC_LOGPERFORMANCE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    13,154,213,10
+    LTEXT           "If you are experiencing a problem with FreeAmp it is possible to log what the program is doing in order to help us track down the cause. When you enable logging a file is created in the program's install directory ",
+                    IDC_STATIC,3,3,227,24
+    LTEXT           "called freeamp.log. You should send us the log file when you report a bug.",
+                    IDC_STATIC,3,27,227,17
+    LTEXT           "You have the ability to narrow the logging to a particular portion of FreeAmp by selecting the various logging options. If you are not sure in which portion of the program the problem is occuring you can simply enable all the logging options.",
+                    IDC_STATIC,3,46,227,32
+END
+
+IDD_PREF_STREAMING DIALOG DISCARDABLE  0, 0, 233, 174
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Streaming"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "Buffer Streams For",IDC_STATIC,57,17,59,8
+    EDITTEXT        IDC_STREAM_INTERVAL,117,15,25,12,ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    LTEXT           "Seconds",IDC_STATIC,146,17,29,8
+    GROUPBOX        "",IDC_STATIC,3,40,227,42
+    LTEXT           " ",IDC_STATIC,9,42,8,8
+    CONTROL         "Save Streams Locally",IDC_SAVESTREAMS,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,11,40,83,10
+    LTEXT           "Save Location:",IDC_SAVELOCATION_TEXT,11,52,49,8
+    EDITTEXT        IDC_STREAMSAVEDIR,11,62,160,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Browse...",IDC_BROWSE,175,62,50,14
+    GROUPBOX        "",IDC_STATIC,3,89,227,41
+    LTEXT           " ",IDC_STATIC,9,90,8,8
+    CONTROL         "Use Proxy Server",IDC_USEPROXY,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,11,89,69,10
+    EDITTEXT        IDC_PROXYADDRESS,11,111,173,14,ES_AUTOHSCROLL
+    CTEXT           ":",IDC_COLON_TEXT,185,114,8,8
+    EDITTEXT        IDC_PORT,193,111,29,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Port:",IDC_PORT_TEXT,193,101,15,8
+    LTEXT           "Proxy Address:",IDC_PROXYADDRESS_TEXT,11,101,47,8
+    GROUPBOX        "",IDC_STATIC,3,137,227,32
+    LTEXT           " ",IDC_STATIC,9,138,8,8
+    CONTROL         "Use Alternate IP",IDC_USETHISIP,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,11,137,64,10
+    EDITTEXT        IDC_IPADDRESS1,90,149,18,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "IP Address:",IDC_IPADDRESS_TEXT,47,153,37,8
+    CTEXT           ".",IDC_PERIOD1,108,155,8,8
+    EDITTEXT        IDC_IPADDRESS2,116,149,18,14,ES_AUTOHSCROLL | ES_NUMBER
+    CTEXT           ".",IDC_PERIOD2,134,155,8,8
+    EDITTEXT        IDC_IPADDRESS3,143,149,18,14,ES_AUTOHSCROLL | ES_NUMBER
+    CTEXT           ".",IDC_PERIOD3,161,155,8,8
+    EDITTEXT        IDC_IPADDRESS4,169,149,18,14,ES_AUTOHSCROLL | ES_NUMBER
+    GROUPBOX        "Buffer Sizes",IDC_STATIC,3,3,227,30
+END
+
+IDD_PREF_ABOUT DIALOG DISCARDABLE  0, 0, 233, 174
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "FreeAmp is an Open Source effort to build the best digital audio player available.  In the interest of supporting the free software community, while at the same time fostering the growth of the online delivery of",
+                    IDC_STATIC,3,24,227,24
+    LTEXT           "music, EMusic.com, THE Source for Downloadable Music, is funding both the FreeAmp.org domain and the efforts of the FreeAmp team. The FreeAmp team consists of: Mark B. Elrod, Robert Kaye, Isaac Richards, Brett Thomas, and Jason Woodward.",
+                    IDC_STATIC,3,48,227,33
+    LTEXT           "Other people have also contributed to FreeAmp:",
+                    IDC_STATIC,3,83,227,9
+    LTEXT           "FreeAmp is being released under the terms of the GPL. As is provided by the GPL, all of EMusic.com's and your efforts toward FreeAmp will be released back to the community at large.",
+                    IDC_STATIC,3,123,227,25
+    LTEXT           "William Bull, Alan Cutter, Gabor Fleischer, Jean-Michel HERVE, Hiromasa Kato, Michael Bruun Petersen, Sylvain Rebaud, The Snowblind Alliance, Tom Spindler, Valters Vingolds, Bill Yuan.",
+                    IDC_STATIC,3,94,227,24
+    LTEXT           "version 2.0 beta 2",IDC_STATIC,88,14,58,8
+    LTEXT           "FreeAmp",IDC_STATIC,102,5,29,8
+    PUSHBUTTON      "Visit FreeAmp.org",IDC_GOTOFREEAMP,30,156,67,14
+    PUSHBUTTON      "Visit EMusic.com",IDC_GOTOEMUSIC,136,156,67,14
+END
+
+IDD_PREF_THEME DIALOG DISCARDABLE  0, 0, 233, 174
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Themes"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LISTBOX         IDC_THEMELISTBOX,11,13,153,88,LBS_SORT | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Theme Selection",IDC_STATIC,5,3,224,106
+    PUSHBUTTON      "&Add Theme",IDC_ADDTHEME,170,14,54,14
+    PUSHBUTTON      "&Delete Theme",IDC_DELETETHEME,170,33,54,14
+    GROUPBOX        "Default Font",IDC_STATIC,5,116,224,53
+    LTEXT           "A theme may specify a font type that is not installed on your system. The default font will be substituted in place of the missing font.",
+                    IDC_STATIC,11,127,212,19
+    PUSHBUTTON      "Choose &Font",IDC_CHOOSEFONT,172,149,50,14
+    LTEXT           "Note: Only the font name will be used. The font will appear in the style specified in the theme.",
+                    IDC_STATIC,11,146,156,17
+END
+
+IDD_PREF_UPDATE DIALOGEX 0, 0, 233, 174
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Update"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    GROUPBOX        "Description",-1,3,80,227,46
+    PUSHBUTTON      "Update Components",IDC_UPDATE,121,131,90,14
+    PUSHBUTTON      "Check for Latest Versions",IDC_CHECK,23,131,90,14
+    LTEXT           "This is a test. This text will tell the user what the hell the component actually does.By filling in this text I can see how the text will appear to the user when it is asctually filled in by the program and see if it looks good or bad the way it is.",
+                    IDC_DESCRIPTION,10,91,214,33
+    CONTROL         "List1",IDC_LIST,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_OWNERDRAWFIXED | 
+                    LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,3,3,227,74,
+                    WS_EX_CLIENTEDGE
+    LTEXT           " Status: No update in progress.",IDC_STATUS,0,163,233,
+                    11,0,WS_EX_CLIENTEDGE
+    CONTROL         "Check for the availability of updates when the application starts.",
+                    IDC_AUTOCHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,
+                    149,216,10
+    PUSHBUTTON      "Cancel Version Check",IDC_CANCELCHECK,23,131,90,14,NOT 
+                    WS_VISIBLE | WS_DISABLED
+    PUSHBUTTON      "Cancel Update",IDC_CANCELUPDATE,121,131,90,14,NOT 
+                    WS_VISIBLE | WS_DISABLED
+END
+
+IDD_PREF_GENERAL_OLD DIALOG DISCARDABLE  0, 0, 233, 174
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "General"
 FONT 8, "MS Sans Serif"
@@ -67,139 +223,50 @@ BEGIN
     LTEXT           "Seconds",IDC_STATIC,103,156,29,8
 END
 
-IDD_PREF3 DIALOG DISCARDABLE  0, 0, 233, 174
+IDD_PREF_ADVANCED DIALOG DISCARDABLE  0, 0, 233, 174
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Debug"
+CAPTION "Advanced"
 FONT 8, "MS Sans Serif"
 BEGIN
-    GROUPBOX        "",IDC_STATIC,3,84,227,86
-    LTEXT           " ",IDC_STATIC,9,84,8,8
-    CONTROL         "Enable Logging",IDC_LOG,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,11,83,63,10
-    CONTROL         "Log general player errors (e.g. Loading plugins)",
-                    IDC_LOGMAIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,98,
-                    163,10
-    CONTROL         "Log input from PMIs (e.g. File, HTTP, ShoutCAST)",
-                    IDC_LOGINPUT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,
-                    112,174,10
-    CONTROL         "Log output from PMOs (e.g. Wave, DirectSound)",
-                    IDC_LOGOUTPUT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,
-                    126,169,10
-    CONTROL         "Log decoding process (e.g. MP3, CDDA)",IDC_LOGDECODER,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,140,145,10
-    CONTROL         "Log performance issues (e.g. Timings, Buffer Under/Overflows)",
-                    IDC_LOGPERFORMANCE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    13,154,213,10
-    LTEXT           "If you are experiencing a problem with FreeAmp it is possible to log what the program is doing in order to help us track down the cause. When you enable logging a file is created in the program's install directory ",
-                    IDC_STATIC,3,3,227,24
-    LTEXT           "called freeamp.log. You should send us the log file when you report a bug.",
-                    IDC_STATIC,3,27,227,17
-    LTEXT           "You have the ability to narrow the logging to a particular portion of FreeAmp by selecting the various logging options. If you are not sure in which portion of the program the problem is occuring you can simply enable all the logging options.",
-                    IDC_STATIC,3,46,227,32
+    CONTROL         "Slider1",IDC_PRIORITY,"msctls_trackbar32",TBS_AUTOTICKS | 
+                    WS_TABSTOP,9,20,214,15
+    EDITTEXT        IDC_INPUT,119,79,25,12,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_OUTPUT,119,95,25,12,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_PREBUFFER,119,111,25,12,ES_AUTOHSCROLL | ES_NUMBER
+    GROUPBOX        "Decoder Priority",-1,3,3,227,59
+    GROUPBOX        "Buffer Sizes",-1,3,66,227,64
+    LTEXT           "Input Buffer Size:",-1,59,81,57,8
+    LTEXT           "Output Buffer Size:",-1,54,97,60,8
+    LTEXT           "Kilobytes",-1,149,81,29,8
+    LTEXT           "Kilobytes",-1,149,97,29,8
+    LTEXT           "Low",-1,41,38,14,8
+    LTEXT           "Normal",-1,104,38,23,8
+    LTEXT           "High",-1,175,38,16,8
+    LTEXT           "Realtime",-1,199,38,28,8
+    LTEXT           "Idle",-1,10,38,12,8
+    CTEXT           "Below Normal",-1,69,38,29,15
+    CTEXT           "Above Normal",-1,135,38,27,16
+    LTEXT           "Prebuffer Streams:",-1,55,113,59,8
+    LTEXT           "Seconds",-1,149,113,29,8
 END
 
-IDD_PREF2 DIALOG DISCARDABLE  0, 0, 233, 174
+IDD_PREF_PLUGINS DIALOGEX 0, 0, 233, 174
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Streaming"
+CAPTION "Plugins"
 FONT 8, "MS Sans Serif"
 BEGIN
-    LTEXT           "Buffer Streams For",IDC_STATIC,57,17,59,8
-    EDITTEXT        IDC_STREAM_INTERVAL,117,15,25,12,ES_AUTOHSCROLL | 
-                    ES_NUMBER
-    LTEXT           "Seconds",IDC_STATIC,146,17,29,8
-    GROUPBOX        "",IDC_STATIC,3,40,227,42
-    LTEXT           " ",IDC_STATIC,9,42,8,8
-    CONTROL         "Save Streams Locally",IDC_SAVESTREAMS,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,11,41,83,10
-    LTEXT           "Save Location:",IDC_SAVELOCATION_TEXT,11,52,49,8
-    EDITTEXT        IDC_STREAMSAVEDIR,11,62,160,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "Browse...",IDC_BROWSE,175,62,50,14
-    GROUPBOX        "",IDC_STATIC,3,89,227,41
-    LTEXT           " ",IDC_STATIC,9,90,8,8
-    CONTROL         "Use Proxy Server",IDC_USEPROXY,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,11,89,69,10
-    EDITTEXT        IDC_PROXYADDRESS,11,111,173,14,ES_AUTOHSCROLL
-    CTEXT           ":",IDC_COLON_TEXT,185,114,8,8
-    EDITTEXT        IDC_PORT,193,111,29,14,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "Port:",IDC_PORT_TEXT,193,101,15,8
-    LTEXT           "Proxy Address:",IDC_PROXYADDRESS_TEXT,11,101,47,8
-    GROUPBOX        "",IDC_STATIC,3,137,227,32
-    LTEXT           " ",IDC_STATIC,9,138,8,8
-    CONTROL         "Use Alternate IP",IDC_USETHISIP,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,11,137,64,10
-    EDITTEXT        IDC_IPADDRESS1,90,149,18,14,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "IP Address:",IDC_IPADDRESS_TEXT,47,153,37,8
-    CTEXT           ".",IDC_PERIOD1,108,155,8,8
-    EDITTEXT        IDC_IPADDRESS2,116,149,18,14,ES_AUTOHSCROLL | ES_NUMBER
-    CTEXT           ".",IDC_PERIOD2,134,155,8,8
-    EDITTEXT        IDC_IPADDRESS3,143,149,18,14,ES_AUTOHSCROLL | ES_NUMBER
-    CTEXT           ".",IDC_PERIOD3,161,155,8,8
-    EDITTEXT        IDC_IPADDRESS4,169,149,18,14,ES_AUTOHSCROLL | ES_NUMBER
-    GROUPBOX        "Buffer Sizes",IDC_STATIC,3,3,227,30
-END
-
-IDD_PREF4 DIALOG DISCARDABLE  0, 0, 233, 174
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "About"
-FONT 8, "MS Sans Serif"
-BEGIN
-    LTEXT           "FreeAmp is an Open Source effort to build the best digital audio player available.  In the interest of supporting the free software community, while at the same time fostering the growth of the online delivery of",
-                    IDC_STATIC,3,24,227,24
-    LTEXT           "music, EMusic.com, THE Source for Downloadable Music, is funding both the FreeAmp.org domain and the efforts of the FreeAmp team. The FreeAmp team consists of: Mark B. Elrod, Robert Kaye, Brett Thomas, Jason Woodward, and Isaac Richards.",
-                    IDC_STATIC,3,48,227,33
-    LTEXT           "Other people have also contributed to FreeAmp:",
-                    IDC_STATIC,3,83,227,9
-    LTEXT           "FreeAmp is being released under the terms of the GPL. As is provided by the GPL, all of EMusic.com's and your efforts toward FreeAmp will be released back to the community at large.",
-                    IDC_STATIC,3,122,227,25
-    LTEXT           "Alan Cutter, Gabor Fleischer, Jean-Michel HERVE, Hiromasa Kato, Michael Bruun Petersen, Sylvain Rebaud, The Snowblind Alliance, Tom Spindler, Valters Vingolds, Bill Yuan, and Bill Bull.",
-                    IDC_STATIC,3,92,227,24
-    LTEXT           "version 2.0 beta 2",IDC_STATIC,88,14,58,8
-    LTEXT           "FreeAmp",IDC_STATIC,102,5,29,8
-    PUSHBUTTON      "Visit FreeAmp.org",IDC_GOTOFREEAMP,30,156,67,14
-    PUSHBUTTON      "Visit EMusic.com",IDC_GOTOEMUSIC,136,156,67,14
-END
-
-IDD_PREF5 DIALOG DISCARDABLE  0, 0, 233, 174
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Themes"
-FONT 8, "MS Sans Serif"
-BEGIN
-    LISTBOX         IDC_THEMELISTBOX,11,13,153,88,LBS_SORT | 
-                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "Theme Selection",IDC_STATIC,5,3,224,106
-    PUSHBUTTON      "&Add Theme",IDC_ADDTHEME,170,14,54,14
-    PUSHBUTTON      "&Delete Theme",IDC_DELETETHEME,170,33,54,14
-    GROUPBOX        "Default Font",IDC_STATIC,5,116,224,53
-    LTEXT           "A theme may specify a font type that is not installed on your system. The default font will be substituted in place of the missing font.",
-                    IDC_STATIC,11,127,212,19
-    PUSHBUTTON      "Choose &Font",IDC_CHOOSEFONT,172,149,50,14
-    LTEXT           "Note: Only the font name will be used. The font will appear in the style specified in the theme.",
-                    IDC_STATIC,11,146,156,17
-END
-
-IDD_PREF6 DIALOGEX 0, 0, 233, 174
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Update"
-FONT 8, "MS Sans Serif", 0, 0, 0x1
-BEGIN
-    GROUPBOX        "Description",-1,3,80,227,46
-    PUSHBUTTON      "Update Components",IDC_UPDATE,121,131,90,14
-    PUSHBUTTON      "Check for Latest Versions",IDC_CHECK,23,131,90,14
-    LTEXT           "This is a test. This text will tell the user what the hell the component actually does.By filling in this text I can see how the text will appear to the user when it is asctually filled in by the program and see if it looks good or bad the way it is.",
-                    IDC_DESCRIPTION,10,91,214,33
-    CONTROL         "List1",IDC_LIST,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_OWNERDRAWFIXED | 
-                    LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,3,3,227,74,
-                    WS_EX_CLIENTEDGE
-    LTEXT           " Status: No update in progress.",IDC_STATUS,0,163,233,
-                    11,0,WS_EX_CLIENTEDGE
-    CONTROL         "Check for the availability of updates when the application starts.",
-                    IDC_AUTOCHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,
-                    149,216,10
-    PUSHBUTTON      "Cancel Version Check",IDC_CANCELCHECK,23,131,90,14,NOT 
-                    WS_VISIBLE | WS_DISABLED
-    PUSHBUTTON      "Cancel Update",IDC_CANCELUPDATE,121,131,90,14,NOT 
-                    WS_VISIBLE | WS_DISABLED
+    COMBOBOX        IDC_PMO,78,16,125,54,CBS_DROPDOWNLIST | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Audio Output:",IDC_STATIC,30,18,44,8
+    GROUPBOX        "Audio",IDC_STATIC,3,2,227,37
+    GROUPBOX        "Portable Devices",IDC_STATIC,3,45,227,126
+    LTEXT           "Select from the list above any portable devices you own. This will enable you to edit the contents of your portable device directly from the ""My Music"" window. If you do not see your portable device",
+                    IDC_STATIC,10,122,214,26
+    LTEXT           "listed try doing an update. We might have added support for it since you installed.",
+                    IDC_STATIC,10,146,214,19
+    CONTROL         "List1",IDC_PORTABLELIST,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_OWNERDRAWFIXED | LVS_NOCOLUMNHEADER | 
+                    WS_BORDER | WS_TABSTOP,10,60,214,55,WS_EX_CLIENTEDGE
 END
 
 
@@ -247,7 +314,7 @@ IDI_EXE_ICON            ICON    DISCARDABLE     "icon1.ico"
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO DISCARDABLE 
 BEGIN
-    IDD_PREF1, DIALOG
+    IDD_PREF_GENERAL, DIALOG
     BEGIN
         LEFTMARGIN, 3
         RIGHTMARGIN, 230
@@ -255,7 +322,7 @@ BEGIN
         BOTTOMMARGIN, 171
     END
 
-    IDD_PREF3, DIALOG
+    IDD_PREF_DEBUG, DIALOG
     BEGIN
         LEFTMARGIN, 3
         RIGHTMARGIN, 230
@@ -263,7 +330,7 @@ BEGIN
         BOTTOMMARGIN, 170
     END
 
-    IDD_PREF2, DIALOG
+    IDD_PREF_STREAMING, DIALOG
     BEGIN
         LEFTMARGIN, 3
         RIGHTMARGIN, 230
@@ -271,7 +338,7 @@ BEGIN
         BOTTOMMARGIN, 169
     END
 
-    IDD_PREF4, DIALOG
+    IDD_PREF_ABOUT, DIALOG
     BEGIN
         LEFTMARGIN, 3
         RIGHTMARGIN, 230
@@ -279,10 +346,34 @@ BEGIN
         BOTTOMMARGIN, 170
     END
 
-    IDD_PREF6, DIALOG
+    IDD_PREF_UPDATE, DIALOG
     BEGIN
         TOPMARGIN, 3
         BOTTOMMARGIN, 172
+    END
+
+    IDD_PREF_GENERAL_OLD, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 230
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 171
+    END
+
+    IDD_PREF_ADVANCED, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 230
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 170
+    END
+
+    IDD_PREF_PLUGINS, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 230
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 171
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -319,7 +410,7 @@ BEGIN
             VALUE "LegalCopyright", "Copyright © EMusic.com 1999\0"
             VALUE "LegalTrademarks", "FreeAmp, EMusic\0"
             VALUE "OriginalFilename", "freeamp.ui\0"
-            VALUE "ProductName", "FreeAmp\0"
+            VALUE "ProductName", "FreeAmp User interface\0"
             VALUE "ProductVersion", "2.0 beta 2\0"
         END
     END
@@ -331,6 +422,14 @@ END
 
 #endif    // !_MAC
 
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_CHECKED             BITMAP  FIXED IMPURE    "checked.bmp"
+IDB_UNCHECKED           BITMAP  FIXED IMPURE    "unchecked.bmp"
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 

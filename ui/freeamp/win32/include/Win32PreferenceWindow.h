@@ -32,6 +32,7 @@ ____________________________________________________________________________*/
 #endif
 
 #include <map>
+#include <set>
 
 using namespace std;
 
@@ -42,13 +43,13 @@ using namespace std;
 #include "registrar.h"
 #include "resource.h"
 
+typedef set<string> PortableSet;
+
 typedef struct PrefsStruct 
 {
-    Preferences* prefs;
-
     // page 1
-    char defaultUI[256];
-    char defaultPMO[256];
+    string defaultUI;
+    string defaultPMO;
     int32 inputBufferSize;
     int32 outputBufferSize;
     int32 preBufferLength;
@@ -59,11 +60,11 @@ typedef struct PrefsStruct
     // page 2
     int32 streamInterval;
     bool saveStreams;
-    char saveStreamsDirectory[MAX_PATH];
+    string saveStreamsDirectory;
     bool useProxyServer;
-    char proxyServer[256]; // is there a domain name length limit???
+    string proxyServer;
     bool useAlternateIP;
-    char alternateIP[16];
+    string alternateIP;
     
     // page 3
     bool enableLogging;
@@ -74,7 +75,7 @@ typedef struct PrefsStruct
     bool logPerformance;
 
 	// page 5
-    char   defaultFont[64];
+    string   defaultFont;
     bool   fontChanged;
     string currentTheme;
     int    listboxIndex;
@@ -82,14 +83,58 @@ typedef struct PrefsStruct
     // page 6
     bool checkForUpdates;
 
-    PrefsStruct()
+    bool reclaimFiletypes;
+    bool askReclaimFiletypes;
+    string saveMusicDirectory;
+
+    PortableSet portablePlayers;
+
+    
+    bool operator == (const struct PrefsStruct& pref)
     {
-        memset(defaultUI, 0x00, sizeof(defaultUI));
-        memset(defaultPMO, 0x00, sizeof(defaultPMO));
-        memset(saveStreamsDirectory, 0x00, sizeof(saveStreamsDirectory));
-        memset(proxyServer, 0x00, sizeof(proxyServer));
-        memset(alternateIP, 0x00, sizeof(alternateIP));
-        memset(defaultFont, 0x00, sizeof(defaultFont));
+        return (
+            defaultUI == pref.defaultUI &&
+            defaultPMO == pref.defaultPMO &&
+            inputBufferSize == pref.inputBufferSize &&
+            outputBufferSize == pref.outputBufferSize &&
+            preBufferLength == pref.preBufferLength &&
+            decoderThreadPriority == pref.decoderThreadPriority &&
+            stayOnTop == pref.stayOnTop &&
+            liveInTray == pref.liveInTray &&
+            streamInterval == pref.streamInterval &&
+            saveStreams == pref.saveStreams &&
+            saveStreamsDirectory == pref.saveStreamsDirectory &&
+            useProxyServer == pref.useProxyServer &&
+            proxyServer == pref.proxyServer &&
+            useAlternateIP == pref.useAlternateIP &&
+            alternateIP == pref.alternateIP &&
+            enableLogging == pref.enableLogging &&
+            logMain == pref.logMain &&
+            logInput == pref.logInput &&
+            logOutput == pref.logOutput &&
+            logDecoder == pref.logDecoder &&
+            logPerformance == pref.logPerformance &&
+
+            defaultFont == pref.defaultFont &&
+            fontChanged == pref.fontChanged &&
+            currentTheme == pref.currentTheme &&
+            listboxIndex == pref.listboxIndex &&
+
+            checkForUpdates == pref.checkForUpdates &&
+
+            reclaimFiletypes == pref.reclaimFiletypes &&
+            askReclaimFiletypes == pref.askReclaimFiletypes &&
+            saveMusicDirectory == pref.saveMusicDirectory &&
+
+            portablePlayers == pref.portablePlayers &&
+
+            true
+        );
+    }
+
+    bool operator != (const struct PrefsStruct& pref)
+    {
+        return ! (*this == pref);
     }
 
 } PrefsStruct;
@@ -110,27 +155,35 @@ class Win32PreferenceWindow : public PreferenceWindow
                void SavePrefsValues(Preferences* prefs, 
                                     PrefsStruct* values);
 
-               bool PrefPage1Proc(HWND hwnd, 
+               bool PrefGeneralProc(HWND hwnd, 
                                   UINT msg, 
                                   WPARAM wParam, 
                                   LPARAM lParam);
-               bool PrefPage2Proc(HWND hwnd, 
+               bool PrefThemeProc(HWND hwnd, 
                                   UINT msg, 
                                   WPARAM wParam, 
                                   LPARAM lParam);
-               bool PrefPage3Proc(HWND hwnd, 
+               bool PrefStreamingProc(HWND hwnd, 
                                   UINT msg, 
                                   WPARAM wParam, 
                                   LPARAM lParam);
-               bool PrefPage4Proc(HWND hwnd, 
+               bool PrefPluginsProc(HWND hwnd, 
                                   UINT msg, 
                                   WPARAM wParam, 
                                   LPARAM lParam);
-               bool PrefPage5Proc(HWND hwnd, 
+               bool PrefUpdateProc(HWND hwnd, 
                                   UINT msg, 
                                   WPARAM wParam, 
                                   LPARAM lParam);
-               bool PrefPage6Proc(HWND hwnd, 
+               bool PrefAdvancedProc(HWND hwnd, 
+                                  UINT msg, 
+                                  WPARAM wParam, 
+                                  LPARAM lParam);
+               bool PrefAboutProc(HWND hwnd, 
+                                  UINT msg, 
+                                  WPARAM wParam, 
+                                  LPARAM lParam);
+               bool PrefDebugProc(HWND hwnd, 
                                   UINT msg, 
                                   WPARAM wParam, 
                                   LPARAM lParam);

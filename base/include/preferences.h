@@ -69,6 +69,9 @@ extern const char* kPlaylistShufflePref;
 extern const char* kTimeDisplayPref;
 extern const char* kVolumePref;
 extern const char* kUserNamePref;
+extern const char* kReclaimFiletypesPref;
+extern const char* kAskToReclaimFiletypesPref;
+extern const char* kUsersPortablePlayersPref;
 
 class LibDirFindHandle;
 
@@ -104,19 +107,19 @@ class Preferences {
 
     // convenience functions
     Error GetInstallDirectory(char* path, uint32* len);
-    Error SetInstallDirectory(char* path);
+    Error SetInstallDirectory(const char* path);
 
     Error GetDefaultUI(char* name, uint32* len);
-    Error SetDefaultUI(char* name);
+    Error SetDefaultUI(const char* name);
 
     Error GetDefaultTextUI(char* name, uint32* len);
-    Error SetDefaultTextUI(char* name);
+    Error SetDefaultTextUI(const char* name);
 
     Error GetDefaultPMO(char* name, uint32* len);
-    Error SetDefaultPMO(char* name);
+    Error SetDefaultPMO(const char* name);
 
     Error GetOpenSaveDirectory(char* path, uint32* len);
-    Error SetOpenSaveDirectory(char* path);
+    Error SetOpenSaveDirectory(const char* path);
 
     Error GetStayOnTop(bool* value);
     Error SetStayOnTop(bool value);
@@ -168,13 +171,13 @@ class Preferences {
     Error SetSaveStreams(bool value);
 
     Error GetSaveStreamsDirectory(char* path, uint32* len);
-    Error SetSaveStreamsDirectory(char* path);
+    Error SetSaveStreamsDirectory(const char* path);
 
     Error GetUseProxyServer(bool* value);
     Error SetUseProxyServer(bool value);
 
     Error GetProxyServerAddress(char* host, uint32* len);
-    Error SetProxyServerAddress(char* host);
+    Error SetProxyServerAddress(const char* host);
 
     Error GetPrebufferLength(int32* value);
     Error SetPrebufferLength(int32 value);
@@ -183,13 +186,13 @@ class Preferences {
     Error SetUseAlternateNIC(bool value);
 
     Error GetAlternateNICAddress(char* address, uint32* len);
-    Error SetAlternateNICAddress(char* address);
+    Error SetAlternateNICAddress(const char* address);
 
     Error GetThemeDefaultFont(char* font, uint32* len);
-    Error SetThemeDefaultFont(char* font);
+    Error SetThemeDefaultFont(const char* font);
 
     Error GetThemePath(char* path, uint32* len);
-    Error SetThemePath(char* path);
+    Error SetThemePath(const char* path);
 
     Error GetCheckForUpdates(bool* value);
     Error SetCheckForUpdates(bool value);
@@ -207,7 +210,20 @@ class Preferences {
     Error SetVolume(int32 value);  
 
     Error GetUserName(char* name, uint32* len);
-    Error SetUserName(char* name);
+    Error SetUserName(const char* name);
+
+    Error GetSaveMusicDirectory(char* path, uint32* len);
+    Error SetSaveMusicDirectory(const char* path);
+
+    Error GetReclaimFiletypes(bool* value);
+    Error SetReclaimFiletypes(bool value);
+
+    Error GetAskToReclaimFiletypes(bool* value);
+    Error SetAskToReclaimFiletypes(bool value);
+
+    Error GetUsersPortablePlayers(char* list, uint32* len);
+    Error SetUsersPortablePlayers(const char* list);
+
 };
 
 #endif /* _PREFERENCES_H */

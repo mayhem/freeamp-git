@@ -62,6 +62,9 @@ const char* kPlaylistShufflePref = "PlaylistShuffle";
 const char* kTimeDisplayPref = "TimeDisplay";
 const char* kVolumePref = "Volume";
 const char* kUserNamePref = "UserName";
+const char* kReclaimFiletypesPref = "ReclaimFiletypes";
+const char* kAskToReclaimFiletypesPref = "AskToReclaimFiletypes";
+const char* kUsersPortablePlayersPref = "UsersPortablePlayers";
 
 //logging
 const char* kUseDebugLogPref = "UseDebugLog";
@@ -100,6 +103,9 @@ const bool kDefaultPlaylistShuffle = false;
 const int32 kDefaultTimeDisplay = 0;
 const int32 kDefaultVolume = 85;
 const char* kDefaultUserName = "";
+const bool kDefaultReclaimFiletypes = true;
+const bool kDefaultAskToReclaimFiletypesPref = true;
+const char* kDefaultUsersPortablePlayers = "";
 
 Error
 Preferences::
@@ -217,6 +223,17 @@ SetDefaults()
         (uint32 *)&dummyInt) == kError_NoPrefValue)
         SetPrefString(kUserNamePref, kDefaultUserName);
 
+    if (GetPrefBoolean(kReclaimFiletypesPref, &dummyBool) == kError_NoPrefValue)
+        SetPrefBoolean(kReclaimFiletypesPref, kDefaultReclaimFiletypes);
+
+    if (GetPrefBoolean(kAskToReclaimFiletypesPref, &dummyBool) == kError_NoPrefValue)
+        SetPrefBoolean(kAskToReclaimFiletypesPref, kDefaultAskToReclaimFiletypesPref);
+
+    dummyInt = 255;
+    if (GetPrefString(kUsersPortablePlayersPref, dummyString, 
+        (uint32 *)&dummyInt) == kError_NoPrefValue)
+        SetPrefString(kUsersPortablePlayersPref, kDefaultUsersPortablePlayers);
+
     return kError_NoErr;
 }
 
@@ -315,7 +332,7 @@ GetInstallDirectory(char* path, uint32* len)
 
 Error 
 Preferences::
-SetInstallDirectory(char* path)
+SetInstallDirectory(const char* path)
 {
     return SetPrefString(kInstallDirPref, path);
 }
@@ -329,7 +346,7 @@ GetDefaultUI(char* name, uint32* len)
 
 Error 
 Preferences::
-SetDefaultUI(char* name)
+SetDefaultUI(const char* name)
 {
     return SetPrefString(kUIPref, name);
 }
@@ -343,7 +360,7 @@ GetDefaultTextUI(char* name, uint32* len)
 
 Error 
 Preferences::
-SetDefaultTextUI(char* name)
+SetDefaultTextUI(const char* name)
 {
     return SetPrefString(kTextUIPref, name);
 }
@@ -357,7 +374,7 @@ GetDefaultPMO(char* name, uint32* len)
 
 Error 
 Preferences::
-SetDefaultPMO(char* name)
+SetDefaultPMO(const char* name)
 {
     return SetPrefString(kPMOPref, name);
 }
@@ -371,7 +388,7 @@ GetOpenSaveDirectory(char* path, uint32* len)
 
 Error 
 Preferences::
-SetOpenSaveDirectory(char* path)
+SetOpenSaveDirectory(const char* path)
 {
     return SetPrefString(kOpenSaveDirPref, path);
 }
@@ -567,7 +584,7 @@ GetSaveStreamsDirectory(char* path, uint32* len)
 
 Error 
 Preferences::
-SetSaveStreamsDirectory(char* path)
+SetSaveStreamsDirectory(const char* path)
 {
     return SetPrefString(kSaveStreamsDirPref, path);
 }
@@ -595,7 +612,7 @@ GetProxyServerAddress(char* host, uint32* len)
 
 Error
 Preferences::
-SetProxyServerAddress(char* host)
+SetProxyServerAddress(const char* host)
 {
     return SetPrefString(kProxyHostPref, host);
 }
@@ -637,7 +654,7 @@ GetAlternateNICAddress(char* address, uint32* len)
 
 Error
 Preferences::
-SetAlternateNICAddress(char* address)
+SetAlternateNICAddress(const char* address)
 {
     return SetPrefString(kAlternateNICAddressPref, address);
 }
@@ -651,7 +668,7 @@ GetThemeDefaultFont(char* font, uint32* len)
 
 Error
 Preferences::
-SetThemeDefaultFont(char* font)
+SetThemeDefaultFont(const char* font)
 {
     return SetPrefString(kThemeDefaultFontPref, font);
 }
@@ -665,7 +682,7 @@ GetThemePath(char* path, uint32* len)
 
 Error
 Preferences::
-SetThemePath(char* path)
+SetThemePath(const char* path)
 {
     return SetPrefString(kThemePathPref, path);
 }
@@ -750,11 +767,66 @@ GetUserName(char* name, uint32* len)
 
 Error
 Preferences::
-SetUserName(char* name)
+SetUserName(const char* name)
 {
     return SetPrefString(kUserNamePref, name);
 }
 
+Error 
+Preferences::
+GetSaveMusicDirectory(char* path, uint32* len)
+{
+    return GetPrefString(kSaveMusicDirPref, path, len);
+}
+
+Error 
+Preferences::
+SetSaveMusicDirectory(const char* path)
+{
+    return SetPrefString(kSaveMusicDirPref, path);
+}
+
+Error
+Preferences::
+GetReclaimFiletypes(bool* value)
+{
+    return GetPrefBoolean(kReclaimFiletypesPref, value);
+}
+
+Error
+Preferences::
+SetReclaimFiletypes(bool value)
+{
+    return SetPrefBoolean(kReclaimFiletypesPref, value);
+}
+
+Error
+Preferences::
+GetAskToReclaimFiletypes(bool* value)
+{
+    return GetPrefBoolean(kAskToReclaimFiletypesPref, value);
+}
+
+Error
+Preferences::
+SetAskToReclaimFiletypes(bool value)
+{
+    return SetPrefBoolean(kAskToReclaimFiletypesPref, value);
+}
+
+Error 
+Preferences::
+GetUsersPortablePlayers(char* list, uint32* len)
+{
+    return GetPrefString(kUsersPortablePlayersPref, list, len);
+}
+
+Error 
+Preferences::
+SetUsersPortablePlayers(const char* list)
+{
+    return SetPrefString(kUsersPortablePlayersPref, list);
+}
 
 LibDirFindHandle *
 Preferences::

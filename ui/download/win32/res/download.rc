@@ -56,7 +56,7 @@ IDD_DIALOG DIALOGEX 0, 0, 274, 210
 STYLE DS_NOIDLEMSG | DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | WS_CLIPCHILDREN | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "FreeAmp - Download Manager"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     CONTROL         "List2",IDC_LIST,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_OWNERDRAWFIXED | 
@@ -123,11 +123,11 @@ BEGIN
             VALUE "CompanyName", "FreeAmp Open Source Development Effort\0"
             VALUE "FileDescription", "A user interface for FreeAmp which allows users to download audio files.\0"
             VALUE "FileVersion", "2.0 beta 2\0"
-            VALUE "InternalName", "FreeAmp\0"
+            VALUE "InternalName", "download\0"
             VALUE "LegalCopyright", "http://www.gnu.org/copyleft/gpl.html\0"
             VALUE "LegalTrademarks", "FreeAmp\0"
             VALUE "OriginalFilename", "download.ui\0"
-            VALUE "ProductName", "FreeAmp\0"
+            VALUE "ProductName", "Download User Interface\0"
             VALUE "ProductVersion", "2.0 beta 2\0"
         END
     END
