@@ -50,6 +50,12 @@ $binary = $opt_o;
 $appsig = $opt_s;
 $filetype = $opt_t;
 
+# strip the excess fat.
+
+echo_and_run( "strip $binary" );
+
+# add the resources.
+
 foreach $file ( @ARGV )
 {
     if ( $file =~ /.+\.r$/ )
@@ -86,3 +92,8 @@ if ( $appsig )
 {
     echo_and_run( "settype -s \"$appsig\" $binary" );
 }
+
+# Update the file attribute.
+
+echo_and_run( "mimeset -F $binary" );
+
