@@ -1,26 +1,26 @@
-# Microsoft Developer Studio Project File - Name="vorbis" - Package Owner=<4>
+# Microsoft Developer Studio Project File - Name="vorbismdf" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Dynamic-Link Library" 0x0102
 
-CFG=vorbis - Win32 NASM Debug
+CFG=vorbismdf - Win32 NASM Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
-!MESSAGE NMAKE /f "vorbis.mak".
+!MESSAGE NMAKE /f "vorbismdf.mak".
 !MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "vorbis.mak" CFG="vorbis - Win32 NASM Debug"
+!MESSAGE NMAKE /f "vorbismdf.mak" CFG="vorbismdf - Win32 NASM Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "vorbis - Win32 Release" (based on "Win32 (x86) Dynamic-Link Library")
-!MESSAGE "vorbis - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
-!MESSAGE "vorbis - Win32 NASM Release" (based on "Win32 (x86) Dynamic-Link Library")
-!MESSAGE "vorbis - Win32 NASM Debug" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "vorbismdf - Win32 Release" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "vorbismdf - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "vorbismdf - Win32 NASM Release" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "vorbismdf - Win32 NASM Debug" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE 
 
 # Begin Project
@@ -31,7 +31,7 @@ CPP=cl.exe
 MTL=midl.exe
 RSC=rc.exe
 
-!IF  "$(CFG)" == "vorbis - Win32 Release"
+!IF  "$(CFG)" == "vorbismdf - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
@@ -55,13 +55,13 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x10500000" /subsystem:windows /dll /machine:I386 /out:"vorbis.mdf" /libpath:"..\..\..\..\base\win32"
+# ADD LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x10500000" /subsystem:windows /dll /machine:I386 /out:"vorbismdf.mdf" /libpath:"..\..\..\..\base\win32"
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins	copy vorbis.mdf      ..\..\..\..\base\win32\prj\plugins
+PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins	copy vorbismdf.mdf      ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
-!ELSEIF  "$(CFG)" == "vorbis - Win32 Debug"
+!ELSEIF  "$(CFG)" == "vorbismdf - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -85,18 +85,18 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x10500000" /subsystem:windows /dll /debug /machine:I386 /out:"vorbis.mdf" /pdbtype:sept /libpath:"..\..\..\..\base\win32"
+# ADD LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x10500000" /subsystem:windows /dll /debug /machine:I386 /out:"vorbismdf.mdf" /pdbtype:sept /libpath:"..\..\..\..\base\win32"
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins	copy vorbis.mdf      ..\..\..\..\base\win32\prj\plugins
+PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins	copy vorbismdf.mdf      ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
-!ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Release"
+!ELSEIF  "$(CFG)" == "vorbismdf - Win32 NASM Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "vorbis__0"
-# PROP BASE Intermediate_Dir "vorbis__0"
+# PROP BASE Output_Dir "vorbismdf__0"
+# PROP BASE Intermediate_Dir "vorbismdf__0"
 # PROP BASE Ignore_Export_Lib 0
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
@@ -115,19 +115,19 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386 /out:"vorbis.mdf"
-# ADD LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x10500000" /subsystem:windows /dll /machine:I386 /out:"vorbis.mdf" /libpath:"..\..\..\..\base\win32"
+# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386 /out:"vorbismdf.mdf"
+# ADD LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x10500000" /subsystem:windows /dll /machine:I386 /out:"vorbismdf.mdf" /libpath:"..\..\..\..\base\win32"
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins	copy vorbis.mdf      ..\..\..\..\base\win32\prj\plugins
+PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins	copy vorbismdf.mdf      ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
-!ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Debug"
+!ELSEIF  "$(CFG)" == "vorbismdf - Win32 NASM Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "vorbis___"
-# PROP BASE Intermediate_Dir "vorbis___"
+# PROP BASE Output_Dir "vorbismdf___"
+# PROP BASE Intermediate_Dir "vorbismdf___"
 # PROP BASE Ignore_Export_Lib 0
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
@@ -146,21 +146,21 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"vorbis.mdf" /pdbtype:sept
-# ADD LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x10500000" /subsystem:windows /dll /debug /machine:I386 /out:"vorbis.mdf" /pdbtype:sept /libpath:"..\..\..\..\base\win32"
+# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"vorbismdf.mdf" /pdbtype:sept
+# ADD LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x10500000" /subsystem:windows /dll /debug /machine:I386 /out:"vorbismdf.mdf" /pdbtype:sept /libpath:"..\..\..\..\base\win32"
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins	copy vorbis.mdf      ..\..\..\..\base\win32\prj\plugins
+PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins	copy vorbismdf.mdf      ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
 
 # Begin Target
 
-# Name "vorbis - Win32 Release"
-# Name "vorbis - Win32 Debug"
-# Name "vorbis - Win32 NASM Release"
-# Name "vorbis - Win32 NASM Debug"
+# Name "vorbismdf - Win32 Release"
+# Name "vorbismdf - Win32 Debug"
+# Name "vorbismdf - Win32 NASM Release"
+# Name "vorbismdf - Win32 NASM Debug"
 # Begin Group "src"
 
 # PROP Default_Filter ""
@@ -170,7 +170,7 @@ SOURCE=..\vorbis.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\vorbis.def
+SOURCE=.\vorbismdf.def
 # End Source File
 # End Group
 # Begin Group "res"
