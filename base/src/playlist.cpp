@@ -890,12 +890,13 @@ CheckIndex(int32 index)
 }
 
 // Note: This function does not clear the list ahead of time!
-Error PlayListManager::
+Error 
+PlayListManager::
 ExpandM3U(char *szM3UFile, List<char *> &MP3List)
 {
 	FILE  *fpFile;
 	char  *szLine, *szMP3 = NULL;
-	int    iIndex;
+	int32 iIndex;
 
 	fpFile = fopen(szM3UFile, "r");
 	if (fpFile == NULL)
@@ -927,4 +928,30 @@ ExpandM3U(char *szM3UFile, List<char *> &MP3List)
 	fclose(fpFile);
 
 	return kError_NoErr;
+}
+
+Error
+PlayListManager::
+ExportAsM3U(const char* file)
+{
+    Error result = kError_FileNotFound;
+    FILE* fp;
+
+	fp = fopen(file, "w");
+
+	if(fp)
+    {
+        int32 i = 0;
+        PlayListItem* item = NULL;
+
+        while(item = m_list->ItemAt(i++))
+        {
+            fprintf(fp, "%s%s", item->URL(), LINE_END_MARKER_STR);
+            result = kError_NoErr;
+        }
+
+	    fclose(fp);
+    }
+
+	return result;
 }

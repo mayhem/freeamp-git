@@ -58,8 +58,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                               ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
-              ..\..\..\..\base\win32\prj\plugins
+                                ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
+               ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
@@ -91,8 +91,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                               ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
-              ..\..\..\..\base\win32\prj\plugins
+                                ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
+               ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
@@ -209,10 +209,6 @@ SOURCE=..\src\stringitem.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\testitem.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\src\textview.cpp
 # End Source File
 # Begin Source File
@@ -243,6 +239,14 @@ SOURCE=..\..\..\..\base\win32\src\win32thread.cpp
 # Begin Group "resources"
 
 # PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\res\add_buttons.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\add_buttons256.bmp
+# End Source File
 # Begin Source File
 
 SOURCE=..\res\all_icon.bmp
@@ -293,6 +297,14 @@ SOURCE=..\res\control_mask_mid.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=..\res\delete_buttons.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\delete_buttons256.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=..\res\dials.bmp
 # End Source File
 # Begin Source File
@@ -338,6 +350,14 @@ SOURCE=..\res\leftside.bmp
 # Begin Source File
 
 SOURCE=..\res\leftside256.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\load_buttons.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\load_buttons256.bmp
 # End Source File
 # Begin Source File
 
@@ -450,6 +470,14 @@ SOURCE=..\res\rightside.bmp
 # Begin Source File
 
 SOURCE=..\res\rightside256.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\save_buttons.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\save_buttons256.bmp
 # End Source File
 # Begin Source File
 

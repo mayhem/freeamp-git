@@ -56,6 +56,24 @@ Error Preferences::SetDefaultUI(char* name) {
     return kError_NoErr;
 }
 
+Error Preferences::GetDefaultPMO(char* name, uint32* len) {
+    strcpy(name, "");
+    return kError_NoErr;
+}
+
+Error Preferences::SetDefaultPMO(char* name) {
+    return kError_NoErr;
+}
+
+Error Preferences::GetOpenSaveDirectory(char* path, uint32* len)
+{
+    return kError_NoErr;
+}
+
+Error Preferences::SetOpenSaveDirectory(char* path)
+{
+    return kError_NoErr;
+}
 
 Error Preferences::GetPrefString(const char* pref, char* buf, uint32* len) {
     return kError_NoErr;

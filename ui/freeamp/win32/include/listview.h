@@ -79,6 +79,8 @@ class ListView : public View {
     virtual bool        RemoveItems(int32 index, int32 count);
     virtual bool        RemoveAll();
 
+    virtual bool        DeleteSelection();
+
     virtual	void SetListType(list_view_type type);
 
             list_view_type	ListType() const;

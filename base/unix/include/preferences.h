@@ -48,7 +48,13 @@ class Preferences {
     Error SetInstallDirectory(char* path);
 
     Error GetDefaultUI(char* name, uint32* len);
-    Error SetDefaultUI(char* path);
+    Error SetDefaultUI(char* name);
+
+    Error GetDefaultPMO(char* name, uint32* len);
+    Error SetDefaultPMO(char* name);
+
+    Error GetOpenSaveDirectory(char* path, uint32* len);
+    Error SetOpenSaveDirectory(char* path);
 
     HANDLE GetFirstLibDir(char *path, uint32 *len);
     Error GetNextLibDir(HANDLE hLibDirFind,char *path, uint32 *len);

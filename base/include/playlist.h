@@ -318,6 +318,7 @@ class PlayListManager {
     const PlayListItem** Items() const;
 
     Error ExpandM3U(char *szM3UFile, List<char *> &MP3List);
+    Error ExportAsM3U(const char* file);
 
 
  protected:

@@ -126,6 +126,14 @@ IDB_SCROLLBAR_256       BITMAP  DISCARDABLE     "scrollbar256.bmp"
 IDB_PANEL_BACKING_256   BITMAP  DISCARDABLE     "panel_backing256.bmp"
 IDB_PLAYLIST_BODY_256   BITMAP  DISCARDABLE     "playlist_back256.bmp"
 IDB_DRAWER_256          BITMAP  DISCARDABLE     "drawer256.bmp"
+IDB_DELETE_256          BITMAP  DISCARDABLE     "delete_buttons256.bmp"
+IDB_ADD_256             BITMAP  DISCARDABLE     "add_buttons256.bmp"
+IDB_DELETE              BITMAP  DISCARDABLE     "delete_buttons.bmp"
+IDB_ADD                 BITMAP  DISCARDABLE     "add_buttons.bmp"
+IDB_SAVE_256            BITMAP  DISCARDABLE     "save_buttons256.bmp"
+IDB_LOAD_256            BITMAP  DISCARDABLE     "load_buttons256.bmp"
+IDB_SAVE                BITMAP  DISCARDABLE     "save_buttons.bmp"
+IDB_LOAD                BITMAP  DISCARDABLE     "load_buttons.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //

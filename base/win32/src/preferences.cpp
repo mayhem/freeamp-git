@@ -32,8 +32,11 @@ const char* kFreeAmpKey = "SOFTWARE\\FreeAmp";
 const char* kFreeAmpVersionKey = "FreeAmp v1.2";
 const char* kInstallDirPref = "InstallDirectory";
 const char* kUIPref = "UI";
-const char* kOpenSaveDirPref = "OpenSaveDir";
+const char* kPMOPref = "PMO";
+const char* kOpenSaveDirPref = "OpenSaveDirectory";
+
 const char* kDefaultUI = "freeamp.ui";
+const char* kDefaultPMO = "soundcard.pmo";
 
 
 Preferences::
@@ -143,28 +146,16 @@ Initialize()
         if(result == ERROR_SUCCESS)
         {
             // set install directory value
-            result = RegSetValueEx( m_prefsKey,
-                                    kInstallDirPref, 
-                                    NULL, 
-                                    REG_SZ, 
-                                    (LPBYTE)cwd, 
-                                    strlen(cwd) + 1);
-
+            SetPrefString(kInstallDirPref, cwd);
+            
             // set default ui value
-            result = RegSetValueEx( m_prefsKey,
-                                    kUIPref, 
-                                    NULL, 
-                                    REG_SZ, 
-                                    (LPBYTE)kDefaultUI, 
-                                    strlen(kDefaultUI) + 1);
+            SetPrefString(kUIPref, kDefaultUI);
+            
+            // set default pmo value
+            SetPrefString(kPMOPref, kDefaultPMO);
 
             // set default open/save dlg path value
-            result = RegSetValueEx( m_prefsKey,
-                                    kOpenSaveDirPref, 
-                                    NULL, 
-                                    REG_SZ, 
-                                    (LPBYTE)cwd, 
-                                    strlen(cwd) + 1);
+            SetPrefString(kOpenSaveDirPref, cwd);
 
              error = kError_NoErr;
         }
@@ -207,6 +198,20 @@ Preferences::
 SetDefaultUI(char* name)
 {
     return SetPrefString(kUIPref, name);
+}
+
+Error 
+Preferences::
+GetDefaultPMO(char* name, uint32* len)
+{
+    return GetPrefString(kPMOPref, name, len);
+}
+
+Error 
+Preferences::
+SetDefaultPMO(char* name)
+{
+    return SetPrefString(kPMOPref, name);
 }
 
 Error 
@@ -264,7 +269,7 @@ GetPrefString(const char* pref, char* buf, uint32* len)
 
 Error
 Preferences::
-SetPrefString(const char* pref, char* buf)
+SetPrefString(const char* pref, const char* buf)
 {
     Error   error = kError_UnknownErr;
 	LONG    result;
@@ -274,8 +279,6 @@ SetPrefString(const char* pref, char* buf)
         error = kError_InvalidParam;
         return error;
     }
-
-    *buf = 0x00;
 
 	if(m_prefsKey)
 	{

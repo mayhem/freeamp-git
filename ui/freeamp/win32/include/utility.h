@@ -24,6 +24,13 @@ ____________________________________________________________________________*/
 #ifndef _UTILITY_H_
 #define _UTILITY_H_
 
+/* system headers */
+#define STRICT
+#define WIN32_LEAN_AND_MEAN 
+#include <windows.h>
+
+/* project headers */  
+#include "list.h"
 #include "dib.h"
 
 HRGN
@@ -35,5 +42,15 @@ DetermineControlRegions(DIB* bitmap,
                         HRGN controlRegions[],
 			            Color controlColors[],
                         int32 numControls);
+
+bool FileOpenDialog(HWND hwndParent, 
+                    List<char*>* fileList,
+                    char* filter);
+
+bool FileSaveDialog(HWND hwndParent, 
+                    char* buffer,
+                    uint32* bufferLength,
+                    char* filter);
+
 
 #endif /* _UTILITY_H_ */

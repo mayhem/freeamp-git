@@ -51,8 +51,12 @@ extern Color g_controlColors[];
 #define kPlaylistDisplayControl 19
 #define kPanelBackingControl    20
 #define kScrollbarControl       21
+#define kAddControl             22
+#define kDeleteControl          23
+#define kSaveControl            24
+#define kLoadControl            25
 
-#define kFinalControl           22
+#define kFinalControl           26
 
 #define kNumControls            kFinalControl
 

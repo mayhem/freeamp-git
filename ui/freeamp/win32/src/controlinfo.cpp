@@ -51,5 +51,9 @@ Color g_controlColors[] = {
         {255, 95,  170, 0}, // kShuffleStatusControl
         {42,  191, 255, 0}, // kPlaylistDisplayControl
         {212, 0,   85,  0}, // kPanelBackingControl
-        {0,   191, 85, 0}   // kScrollbarControl
+        {0,   191, 85,  0}, // kScrollbarControl
+        {85,  63,  0,   0}, // kAddControl
+        {0,   159, 0,   0}, // kDeleteControl
+        {255, 159, 85,  0}, // kSaveControl
+        {42,  0,   85,  0}  // kLoadControl
 };

@@ -787,7 +787,26 @@ void Player::CreateLMC(PlayListItem * pc, Event * pC)
       pmi->SetTarget((EventQueue *)this);
    }
 
-   item = m_pmoRegistry->GetItem(0);
+   char defaultPMO[256];
+   uint32 size = sizeof(defaultPMO);
+
+   m_prefs->GetDefaultPMO(defaultPMO, &size);
+
+   int32 i = 0;
+
+   while(item = m_pmoRegistry->GetItem(i++))
+   {
+        if(!strcmp(defaultPMO, item->Name()))
+        {
+            break;
+        }
+   }
+
+   // if the default isn't around then just use first one 
+   // is there a better way?
+   if(!item)
+      item = m_pmoRegistry->GetItem(0);
+
    if (item)
    {
       pmo = (PhysicalMediaOutput *) item->InitFunction()(g_Log);

@@ -72,7 +72,6 @@ CLEAN :
 	-@erase "$(INTDIR)\semaphore.obj"
 	-@erase "$(INTDIR)\statusview.obj"
 	-@erase "$(INTDIR)\stringitem.obj"
-	-@erase "$(INTDIR)\testitem.obj"
 	-@erase "$(INTDIR)\textview.obj"
 	-@erase "$(INTDIR)\thread.obj"
 	-@erase "$(INTDIR)\timeview.obj"
@@ -129,7 +128,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\semaphore.obj" \
 	"$(INTDIR)\statusview.obj" \
 	"$(INTDIR)\stringitem.obj" \
-	"$(INTDIR)\testitem.obj" \
 	"$(INTDIR)\textview.obj" \
 	"$(INTDIR)\thread.obj" \
 	"$(INTDIR)\timeview.obj" \
@@ -153,8 +151,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "xing - Win32 Release" "soundcard - Win32 Release"\
  "fileinput - Win32 Release" ".\freeamp.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins
-	copy freeamp.ui              ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                ..\..\..\..\base\win32\prj\plugins
+	copy freeamp.ui               ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
@@ -197,7 +195,6 @@ CLEAN :
 	-@erase "$(INTDIR)\semaphore.obj"
 	-@erase "$(INTDIR)\statusview.obj"
 	-@erase "$(INTDIR)\stringitem.obj"
-	-@erase "$(INTDIR)\testitem.obj"
 	-@erase "$(INTDIR)\textview.obj"
 	-@erase "$(INTDIR)\thread.obj"
 	-@erase "$(INTDIR)\timeview.obj"
@@ -258,7 +255,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\semaphore.obj" \
 	"$(INTDIR)\statusview.obj" \
 	"$(INTDIR)\stringitem.obj" \
-	"$(INTDIR)\testitem.obj" \
 	"$(INTDIR)\textview.obj" \
 	"$(INTDIR)\thread.obj" \
 	"$(INTDIR)\timeview.obj" \
@@ -282,8 +278,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "xing - Win32 Debug" "soundcard - Win32 Debug"\
  "fileinput - Win32 Debug" ".\freeamp.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins
-	copy freeamp.ui              ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                ..\..\..\..\base\win32\prj\plugins
+	copy freeamp.ui               ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 
@@ -436,6 +432,7 @@ DEP_CPP_CONTRO=\
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
 
 DEP_CPP_CONTRO=\
+	"..\..\..\..\base\include\list.h"\
 	"..\..\..\..\config\config.h"\
 	"..\include\dib.h"\
 	"..\include\utility.h"\
@@ -580,6 +577,8 @@ DEP_CPP_FONTW=\
 
 SOURCE=..\res\freeamp.rc
 DEP_RSC_FREEA=\
+	"..\res\add_buttons.bmp"\
+	"..\res\add_buttons256.bmp"\
 	"..\res\all_icon.bmp"\
 	"..\res\all_icon256.bmp"\
 	"..\res\arrow.cur"\
@@ -590,6 +589,8 @@ DEP_RSC_FREEA=\
 	"..\res\close_buttons.bmp"\
 	"..\res\close_buttons256.bmp"\
 	"..\res\control_mask_mid.bmp"\
+	"..\res\delete_buttons.bmp"\
+	"..\res\delete_buttons256.bmp"\
 	"..\res\dials.bmp"\
 	"..\res\dials256.bmp"\
 	"..\res\drawer.bmp"\
@@ -598,6 +599,8 @@ DEP_RSC_FREEA=\
 	"..\res\icon1.ico"\
 	"..\res\last_buttons.bmp"\
 	"..\res\last_buttons256.bmp"\
+	"..\res\load_buttons.bmp"\
+	"..\res\load_buttons256.bmp"\
 	"..\res\logo.bmp"\
 	"..\res\logo256.bmp"\
 	"..\res\minimize_buttons.bmp"\
@@ -622,6 +625,8 @@ DEP_RSC_FREEA=\
 	"..\res\repeat_buttons256.bmp"\
 	"..\res\repeat_icon.bmp"\
 	"..\res\repeat_icon256.bmp"\
+	"..\res\save_buttons.bmp"\
+	"..\res\save_buttons256.bmp"\
 	"..\res\scrollbar.bmp"\
 	"..\res\scrollbar256.bmp"\
 	"..\res\shuffle_buttons.bmp"\
@@ -673,6 +678,7 @@ DEP_CPP_FREEAM=\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\preferences.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\io\include\pmi.h"\
@@ -691,13 +697,11 @@ DEP_CPP_FREEAM=\
 	"..\include\scrollview.h"\
 	"..\include\statusview.h"\
 	"..\include\stringitem.h"\
-	"..\include\testitem.h"\
 	"..\include\textview.h"\
 	"..\include\timeview.h"\
 	"..\include\utility.h"\
 	"..\include\view.h"\
 	"..\include\volumeview.h"\
-	{$(INCLUDE)}"\mmsystem.h"\
 	
 
 "$(INTDIR)\freeampui.obj" : $(SOURCE) $(DEP_CPP_FREEAM) "$(INTDIR)"\
@@ -721,6 +725,7 @@ DEP_CPP_FREEAM=\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\preferences.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\io\include\pmi.h"\
@@ -739,7 +744,6 @@ DEP_CPP_FREEAM=\
 	"..\include\scrollview.h"\
 	"..\include\statusview.h"\
 	"..\include\stringitem.h"\
-	"..\include\testitem.h"\
 	"..\include\textview.h"\
 	"..\include\timeview.h"\
 	"..\include\utility.h"\
@@ -904,6 +908,9 @@ DEP_CPP_PLAYL=\
 !ENDIF 
 
 SOURCE=..\..\..\..\base\win32\src\preferences.cpp
+
+!IF  "$(CFG)" == "freeampui - Win32 Release"
+
 DEP_CPP_PREFE=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\win32\include\preferences.h"\
@@ -914,6 +921,21 @@ DEP_CPP_PREFE=\
  "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+!ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
+
+DEP_CPP_PREFE=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\win32\include\preferences.h"\
+	"..\..\..\..\config\config.h"\
+	
+
+"$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\src\renderer.cpp
 
@@ -1056,40 +1078,6 @@ DEP_CPP_STRIN=\
 
 !ENDIF 
 
-SOURCE=..\src\testitem.cpp
-
-!IF  "$(CFG)" == "freeampui - Win32 Release"
-
-DEP_CPP_TESTI=\
-	"..\..\..\..\config\config.h"\
-	"..\include\dib.h"\
-	"..\include\listitem.h"\
-	"..\include\renderer.h"\
-	"..\include\testitem.h"\
-	
-
-"$(INTDIR)\testitem.obj" : $(SOURCE) $(DEP_CPP_TESTI) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
-
-DEP_CPP_TESTI=\
-	"..\..\..\..\config\config.h"\
-	"..\include\dib.h"\
-	"..\include\listitem.h"\
-	"..\include\renderer.h"\
-	"..\include\testitem.h"\
-	
-
-"$(INTDIR)\testitem.obj" : $(SOURCE) $(DEP_CPP_TESTI) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
-
 SOURCE=..\src\textview.cpp
 
 !IF  "$(CFG)" == "freeampui - Win32 Release"
@@ -1136,9 +1124,6 @@ DEP_CPP_THREA=\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\win32thread.h"\
 	"..\..\..\..\config\config.h"\
-	
-NODEP_CPP_THREA=\
-	"..\..\..\..\base\src\linuxthread.h"\
 	
 
 "$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"\
@@ -1213,6 +1198,9 @@ DEP_CPP_UTILI=\
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
 
 DEP_CPP_UTILI=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\list.h"\
+	"..\..\..\..\base\win32\include\preferences.h"\
 	"..\..\..\..\config\config.h"\
 	"..\include\dib.h"\
 	"..\include\utility.h"\

@@ -69,13 +69,21 @@
 #define IDB_PLAYLIST_BODY_256           179
 #define IDB_DRAWER_256                  180
 #define IDD_OPENSONG                    181
+#define IDB_DELETE_256                  182
+#define IDB_ADD_256                     183
+#define IDB_DELETE                      184
+#define IDB_ADD                         185
+#define IDB_SAVE_256                    186
+#define IDB_LOAD_256                    187
+#define IDB_SAVE                        188
+#define IDB_LOAD                        189
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        182
+#define _APS_NEXT_RESOURCE_VALUE        190
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           101

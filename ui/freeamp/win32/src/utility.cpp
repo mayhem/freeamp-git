@@ -32,6 +32,7 @@ ____________________________________________________________________________*/
 #include "config.h"
 #include "resource.h"
 #include "utility.h"
+#include "preferences.h"
 
 HRGN
 DetermineRegion(DIB* bitmap, 
@@ -200,4 +201,155 @@ DetermineControlRegions(DIB* bitmap,
     }
 
     delete [] regionColors;
+}
+
+bool 
+FileOpenDialog(HWND hwndParent, 
+               List<char*>* fileList,
+               char* filter)
+{
+    bool result = false;
+    Preferences prefs;
+    OPENFILENAME ofn;
+    char szTitle[] = "Open Audio File";
+    char szInitialDir[MAX_PATH + 1];
+    uint32 initialDirSize = sizeof(szInitialDir);
+    const int32 kBufferSize = MAX_PATH * 128;
+    char* fileBuffer = new char[kBufferSize];
+
+    *fileBuffer = 0x00;
+
+    prefs.GetOpenSaveDirectory( szInitialDir, &initialDirSize);
+
+    // Setup open file dialog box structure
+    ofn.lStructSize       = sizeof(OPENFILENAME);
+    ofn.hwndOwner         = hwndParent;
+    ofn.hInstance         = (HINSTANCE)GetWindowLong(hwndParent, 
+                                                     GWL_HINSTANCE);
+    ofn.lpstrFilter       = filter;
+    ofn.lpstrCustomFilter = NULL;
+    ofn.nMaxCustFilter    = 0;
+    ofn.nFilterIndex      = 1;
+    ofn.lpstrFile         = fileBuffer;
+    ofn.nMaxFile          = kBufferSize;
+    ofn.lpstrFileTitle    = NULL;
+    ofn.nMaxFileTitle     = 0;
+    ofn.lpstrInitialDir   = szInitialDir;
+    ofn.lpstrTitle        = szTitle;
+    ofn.Flags             = OFN_FILEMUSTEXIST | 
+					        OFN_PATHMUSTEXIST |
+  	     			        OFN_HIDEREADONLY | 
+					        OFN_ALLOWMULTISELECT |
+					        OFN_EXPLORER;
+    ofn.nFileOffset       = 0;
+    ofn.nFileExtension    = 0;
+    ofn.lpstrDefExt       = "MP*";
+    ofn.lCustData         = 0;
+    ofn.lpfnHook          = NULL;
+    ofn.lpTemplateName    = NULL;
+
+    if(GetOpenFileName(&ofn))
+    {
+        char file[MAX_PATH + 1];
+        char* cp = NULL;
+
+        strncpy(file, fileBuffer, ofn.nFileOffset);
+
+        if(*(fileBuffer + ofn.nFileOffset - 1) != DIR_MARKER)
+            strcat(file, DIR_MARKER_STR);
+
+        cp = fileBuffer + ofn.nFileOffset;
+
+        while(*cp)
+        {
+	        strcpy(file + ofn.nFileOffset, cp);
+
+            char* foo = new char[strlen(file) + 1];
+
+            strcpy(foo, file);
+
+            fileList->AddItem(foo);
+
+	        cp += strlen(cp) + 1;
+        }
+
+        //*(fileBuffer + ofn.nFileOffset - 1) = 0x00;
+
+        prefs.SetOpenSaveDirectory(fileBuffer);
+
+        result = true;
+    }
+
+    delete [] fileBuffer;
+
+    return result;
+}
+
+bool 
+FileSaveDialog(HWND hwndParent, 
+               char* buffer,
+               uint32* bufferLength,
+               char* filter)
+{
+    bool result = false;
+    Preferences prefs;
+    OPENFILENAME ofn;
+    char szTitle[] = "Save Playlist";
+    char szInitialDir[MAX_PATH + 1];
+    char szFile[MAX_PATH + 1] = {0x00};
+    uint32 initialDirSize = sizeof(szInitialDir);
+  
+    *buffer = 0x00;
+
+    prefs.GetOpenSaveDirectory(szInitialDir, &initialDirSize);
+
+    // Setup open file dialog box structure
+    ofn.lStructSize       = sizeof(OPENFILENAME);
+    ofn.hwndOwner         = hwndParent;
+    ofn.hInstance         = (HINSTANCE)GetWindowLong(hwndParent, 
+                                                     GWL_HINSTANCE);
+    ofn.lpstrFilter       = filter;
+    ofn.lpstrCustomFilter = NULL;
+    ofn.nMaxCustFilter    = 0;
+    ofn.nFilterIndex      = 1;
+    ofn.lpstrFile         = szFile;
+    ofn.nMaxFile          = sizeof(szFile);
+    ofn.lpstrFileTitle    = NULL;
+    ofn.nMaxFileTitle     = 0;
+    ofn.lpstrInitialDir   = szInitialDir;
+    ofn.lpstrTitle        = szTitle;
+    ofn.Flags             = OFN_HIDEREADONLY | 
+                            OFN_OVERWRITEPROMPT |
+					        OFN_EXPLORER;
+    ofn.nFileOffset       = 0;
+    ofn.nFileExtension    = 0;
+    ofn.lpstrDefExt       = "M3U";
+    ofn.lCustData         = 0;
+    ofn.lpfnHook          = NULL;
+    ofn.lpTemplateName    = NULL;
+
+    if(GetSaveFileName(&ofn))
+    {
+        if(*bufferLength > strlen(szFile))
+        {
+            strcpy(buffer, szFile);
+            result = true;
+        }
+        else
+        {
+            *bufferLength = strlen(szFile) + 1;
+        }
+
+        *(szFile + ofn.nFileOffset - 1) = 0x00;
+
+        prefs.SetOpenSaveDirectory(szFile);
+
+        result = true;
+    }
+    else
+    {
+        int32 error = CommDlgExtendedError();
+    }
+
+    return result;
 }

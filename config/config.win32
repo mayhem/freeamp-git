@@ -107,6 +107,14 @@ typedef short			int32;
 #define DIR_MARKER_STR "/"
 #endif /* WIN32 */
 
+// What character(s) marks the end of a line in a text file? 
+// For DOS and Windows, it is "\r\n"; in UNIX it is "\r".
+#if defined(WIN32) || defined(OS2) || defined(__DOS__)
+#define LINE_END_MARKER_STR "\r\n"
+#else
+#define LINE_END__MARKER_STR "\n"
+#endif /* WIN32 */
+
 #ifndef NULL
 #ifdef  __cplusplus
 #define NULL    0

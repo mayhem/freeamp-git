@@ -125,8 +125,9 @@ class FreeAmpUI : public UserInterface {
 
     void UpdatePlayList();
 
-    bool OpenSong(List<char*>* filelist);
+    bool OpenSong(List<char*>* fileList);
 
+    void AddFileListToPlayList(List<char*>* fileList);
 
  public:
     
@@ -199,6 +200,11 @@ class FreeAmpUI : public UserInterface {
 
     DIB*                m_scrollbarBitmap;
 
+    DIB*                m_addBitmap;
+    DIB*                m_deleteBitmap;
+    DIB*                m_saveBitmap;
+    DIB*                m_loadBitmap;
+
 
 	int32			    m_width;
 	int32			    m_height;
@@ -240,6 +246,11 @@ class FreeAmpUI : public UserInterface {
     ListView*           m_playlistView;
 
     ScrollView*         m_scrollbarView;
+
+    ButtonView*         m_addView;
+    ButtonView*         m_deleteView;
+    ButtonView*         m_loadView;
+    ButtonView*         m_saveView;
 
 
 };

@@ -300,6 +300,11 @@ UserInterface()
 
     m_scrollbarBitmap   = NULL;
 
+    m_addBitmap     = NULL;
+    m_deleteBitmap  = NULL;
+    m_saveBitmap    = NULL;
+    m_loadBitmap    = NULL;
+
     m_captureView   = NULL;
     m_mouseView     = NULL;
 
@@ -334,6 +339,11 @@ UserInterface()
     m_playlistView      = NULL;
 
     m_scrollbarView     = NULL;
+
+    m_addView     = NULL;
+    m_deleteView  = NULL;
+    m_saveView    = NULL;
+    m_loadView    = NULL;
 
 	m_width			= 0;
 	m_height		= 0;
@@ -596,14 +606,77 @@ Command(int32 command,
         case kRepeatControl:
         {
             m_plm->ToggleRepeat();
-
             break;
         }
 
         case kShuffleControl:
         {
             m_plm->ToggleShuffle();
+            break;
+        }
 
+        case kAddControl:
+        {
+            List<char*> fileList;
+            char fileFilter[] =
+            "MPEG Audio Streams (.mpg, .mp1, .mp2, .mp3, .mpp)\0"
+            "*.mpg;*.mp1;*.mp2;*.mp3;*.mpp\0"
+            "Playlists (.m3u)\0"
+            "*.m3u\0"
+            "All Files (*.*)\0"
+            "*.*\0";
+
+            if(FileOpenDialog(m_hwnd, &fileList, fileFilter))
+            {
+                AddFileListToPlayList(&fileList);
+            }
+
+            break;
+        }
+
+        case kDeleteControl:
+        {
+            m_playlistView->DeleteSelection();
+            break;
+        }
+
+        case kSaveControl:
+        {
+            char file[MAX_PATH + 1];
+            char fileFilter[] =
+            "Playlists (.m3u)\0"
+            "*.m3u\0"
+            "All Files (*.*)\0"
+            "*.*\0";
+            uint32 size = sizeof(file);
+
+            if(FileSaveDialog(m_hwnd, file, &size, fileFilter))
+            {
+               m_plm->ExportAsM3U(file);
+            }
+           
+            break;
+        }
+
+        case kLoadControl:
+        {
+            List<char*> fileList;
+            char fileFilter[] =
+            "Playlists (.m3u)\0"
+            "*.m3u\0"
+            "MPEG Audio Streams (.mpg, .mp1, .mp2, .mp3, .mpp)\0"
+            "*.mpg;*.mp1;*.mp2;*.mp3;*.mpp\0"
+            "All Files (*.*)\0"
+            "*.*\0";
+
+            if(FileOpenDialog(m_hwnd, &fileList, fileFilter))
+            {
+                m_plm->MakeEmpty();
+
+                AddFileListToPlayList(&fileList);
+
+                m_plm->SetFirst();
+            }
             break;
         }
 
@@ -613,47 +686,11 @@ Command(int32 command,
 
 			if(OpenSong(&fileList))
 			{
-                List<char*> m3uFileList;
-                char* file = NULL;
-                int32 i = 0;
+                m_plm->MakeEmpty();
 
-				m_plm->MakeEmpty();
+                AddFileListToPlayList(&fileList);
 
-				while(file = fileList.ItemAt(i++))
-				{
-                    char* pExtension = NULL;
-
-                    pExtension = strrchr(file, '.');
-
-                    if(pExtension && strcasecmp(pExtension, ".m3u") == 0)
-                    { 
-                        Error error;
-
-                        error = m_plm->ExpandM3U(file, m3uFileList);
-
-                        if(IsError(error))
-                        {
-                            MessageBox(NULL, "Cannot open playlist file", file, MB_OK); 
-                        }
-                        else
-                        {
-                            char* item = NULL;
-                            int32 i = 0;
-
-                            while(item = m3uFileList.ItemAt(i++))
-                            {
-                                m_plm->AddItem(item,0);
-                                delete [] item;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        m_plm->AddItem(file,0);
-                    }
-
-                    delete [] file;
-				}
+                m_plm->SetFirst();
 
                 if(m_state == STATE_Playing)
                 {
@@ -665,8 +702,6 @@ Command(int32 command,
 					;
                 }
 			}
-
-            m_plm->SetFirst();
 
 			break;        
 		}
@@ -710,6 +745,10 @@ Command(int32 command,
                 m_panelBackingView->Show();
                 m_playlistView->Show();
                 m_scrollbarView->Show();
+                m_addView->Show();
+                m_deleteView->Show();
+                m_loadView->Show();
+                m_saveView->Show();
             }
             else
             {
@@ -743,6 +782,10 @@ Command(int32 command,
                 m_panelBackingView->Hide();
                 m_playlistView->Hide();
                 m_scrollbarView->Hide();
+                m_addView->Hide();
+                m_deleteView->Hide();
+                m_loadView->Hide();
+                m_saveView->Hide();
             }
 
             DIB* canvas = new DIB();
@@ -1467,14 +1510,6 @@ CreateControls()
                                     NULL,
                                     m_controlRegions[kPlaylistDisplayControl],
                                     MULTIPLE_SELECTION_LIST);
-
-   
-
-    /*m_playlistView->AddItem(new TestItem);
-    m_playlistView->AddItem(new TestItem);
-    m_playlistView->AddItem(new TestItem);
-    m_playlistView->AddItem(new TestItem);
-    m_playlistView->AddItem(new TestItem);*/
     
     m_playlistView->Hide();
 
@@ -1488,17 +1523,33 @@ CreateControls()
 
     m_scrollbarView->SetTarget(m_playlistView);
 
-    /*for(int32 count = 0; count < 9; count++)
-    {
-        char buffer[256];
+    m_addView = new ButtonView( m_hwnd, 
+                                m_panelBackingView, 
+                                m_controlRegions[kAddControl], 
+                                m_addBitmap,
+                                kAddControl);
+    m_addView->Hide();
 
-        sprintf(buffer, "This is StringItem #%d", count);
+    m_deleteView = new ButtonView(  m_hwnd, 
+                                    m_panelBackingView, 
+                                    m_controlRegions[kDeleteControl], 
+                                    m_deleteBitmap,
+                                    kDeleteControl);
+    m_deleteView->Hide();
 
-        m_playlistView->AddItem(new StringItem(buffer,
-                                m_smallFontBitmap,
-                                10,
-                                smallFontWidth));
-    }*/
+    m_loadView = new ButtonView(m_hwnd, 
+                                m_panelBackingView, 
+                                m_controlRegions[kLoadControl], 
+                                m_loadBitmap,
+                                kLoadControl);
+    m_loadView->Hide();
+
+    m_saveView = new ButtonView(m_hwnd, 
+                                m_panelBackingView, 
+                                m_controlRegions[kSaveControl], 
+                                m_saveBitmap,
+                                kSaveControl);
+    m_saveView->Hide();
 
     m_viewList->Append(m_backgroundView);
     m_viewList->Append(m_playlistBackView);
@@ -1524,6 +1575,10 @@ CreateControls()
     m_viewList->Append(m_playlistView);
     m_viewList->Append(m_scrollbarView);
     m_viewList->Append(m_panelBackingView);
+    m_viewList->Append(m_addView);
+    m_viewList->Append(m_deleteView);
+    m_viewList->Append(m_loadView);
+    m_viewList->Append(m_saveView);
     m_viewList->Append(m_drawerView);
 }
 
@@ -1622,6 +1677,18 @@ LoadBitmaps()
         m_scrollbarBitmap = new DIB;
         m_scrollbarBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_SCROLLBAR_256));
 
+        m_addBitmap = new DIB;
+        m_addBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_ADD_256));
+
+        m_deleteBitmap = new DIB;
+        m_deleteBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_DELETE_256));
+
+        m_loadBitmap = new DIB;
+        m_loadBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_LOAD_256));
+
+        m_saveBitmap = new DIB;
+        m_saveBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_SAVE_256));
+
         CreatePalette();
 	}
     else
@@ -1697,6 +1764,18 @@ LoadBitmaps()
 
         m_scrollbarBitmap = new DIB;
         m_scrollbarBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_SCROLLBAR));
+
+        m_addBitmap = new DIB;
+        m_addBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_ADD));
+
+        m_deleteBitmap = new DIB;
+        m_deleteBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_DELETE));
+
+        m_loadBitmap = new DIB;
+        m_loadBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_LOAD));
+
+        m_saveBitmap = new DIB;
+        m_saveBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_SAVE));
     }
 
     m_drawerMaskBitmap = new DIB;
@@ -2200,6 +2279,51 @@ SetPlayListManager(PlayListManager *plm)
 
 void
 FreeAmpUI::
+AddFileListToPlayList(List<char*>* fileList)
+{
+    List<char*> m3uFileList;
+    char* file = NULL;
+    int32 i = 0;
+
+	while(file = fileList->ItemAt(i++))
+	{
+        char* pExtension = NULL;
+
+        pExtension = strrchr(file, '.');
+
+        if(pExtension && strcasecmp(pExtension, ".m3u") == 0)
+        { 
+            Error error;
+
+            error = m_plm->ExpandM3U(file, m3uFileList);
+
+            if(IsError(error))
+            {
+                MessageBox(NULL, "Cannot open playlist file", file, MB_OK); 
+            }
+            else
+            {
+                char* item = NULL;
+                int32 i = 0;
+
+                while(item = m3uFileList.ItemAt(i++))
+                {
+                    m_plm->AddItem(item,0);
+                    delete [] item;
+                }
+            }
+        }
+        else
+        {
+            m_plm->AddItem(file,0);
+        }
+
+        delete [] file;
+	}
+}
+
+void
+FreeAmpUI::
 UpdatePlayList() 
 {
     assert(m_plm);
@@ -2286,10 +2410,6 @@ UpdatePlayList()
         }
     }
 }
-typedef struct _OpenSongStruct{
-    char* filelist;
-    int32 bufferSize;
-}OpenSongStruct;
 
 static
 BOOL
@@ -2320,88 +2440,24 @@ OpenSongDialogProc( HWND hwnd,
             {
                 case IDC_BROWSE:
                 {            
+                    char fileFilter[] =
+                    "MPEG Audio Streams (.mpg, .mp1, .mp2, .mp3, .mpp)\0"
+                    "*.mpg;*.mp1;*.mp2;*.mp3;*.mpp\0"
+                    "Playlists (.m3u)\0"
+                    "*.m3u\0"
+                    "All Files (*.*)\0"
+                    "*.*\0";
+
                     ShowWindow(hwnd, SW_HIDE);
 
-                    Preferences prefs;
-                    OPENFILENAME ofn;
-	                char szTitle[] = "Open Audio File";
-	                char szFilter[] =
-	                "MPEG Audio Streams (.mpg, .mp1, .mp2, .mp3, .mpp)\0"
-	                "*.mpg;*.mp1;*.mp2;*.mp3;*.mpp\0"
-	                "Playlists (.m3u)\0"
-	                "*.m3u\0"
-	                "All Files (*.*)\0"
-	                "*.*\0";
-                    char szInitialDir[MAX_PATH + 1];
-                    uint32 initialDirSize = sizeof(szInitialDir);
-                    const int32 kBufferSize = MAX_PATH * 128;
-                    char* fileBuffer = new char[kBufferSize];
-			
-			        *fileBuffer = 0x00;
-
-                    prefs.GetOpenSaveDirectory( szInitialDir, 
-                                                &initialDirSize);
-
-	                // Setup open file dialog box structure
-	                ofn.lStructSize       = sizeof(OPENFILENAME);
-	                ofn.hwndOwner         = hwnd;
-	                ofn.hInstance         = (HINSTANCE)GetWindowLong(hwnd, 
-											                GWL_HINSTANCE);
-	                ofn.lpstrFilter       = szFilter;
-	                ofn.lpstrCustomFilter = NULL;
-	                ofn.nMaxCustFilter    = 0;
-	                ofn.nFilterIndex      = 1;
-	                ofn.lpstrFile         = fileBuffer;
-	                ofn.nMaxFile          = kBufferSize;
-	                ofn.lpstrFileTitle    = NULL;
-	                ofn.nMaxFileTitle     = 0;
-	                ofn.lpstrInitialDir   = szInitialDir;
-	                ofn.lpstrTitle        = szTitle;
-	                ofn.Flags             = OFN_FILEMUSTEXIST | 
-							                OFN_PATHMUSTEXIST |
-  	     				   	                OFN_HIDEREADONLY | 
-							                OFN_ALLOWMULTISELECT |
-							                OFN_EXPLORER;
-	                ofn.nFileOffset       = 0;
-	                ofn.nFileExtension    = 0;
-	                ofn.lpstrDefExt       = "MP*";
-	                ofn.lCustData         = 0;
-	                ofn.lpfnHook          = NULL;
-	                ofn.lpTemplateName    = NULL;
-
-                    if(GetOpenFileName(&ofn))
+                    if(FileOpenDialog(hwnd, fileList, fileFilter))
                     {
-                        char file[MAX_PATH + 1];
-				        char* cp = NULL;
-
-                        prefs.SetOpenSaveDirectory(szInitialDir);
-
-				        strncpy(file, fileBuffer, ofn.nFileOffset);
-
-				        cp = fileBuffer + ofn.nFileOffset;
-
-				        while(*cp)
-				        {
-					        strcpy(file + ofn.nFileOffset, cp);
-
-                            char* foo = new char[strlen(file) + 1];
-
-                            strcpy(foo, file);
-
-                            fileList->AddItem(foo);
-
-					        cp += strlen(cp) + 1;
-				        }
-
-
                         EndDialog(hwnd, TRUE);
                     }
                     else
                     {
                         ShowWindow(hwnd, SW_SHOW);
                     }
-
-                    delete [] fileBuffer;
 
                     break;
                 }
@@ -2410,10 +2466,10 @@ OpenSongDialogProc( HWND hwnd,
                 {         
                     char url[2048];
 
-                    if(GetDlgItemText( hwnd,
-                                    IDC_URL,
-                                    url,
-                                    sizeof(url)))
+                    if(GetDlgItemText(  hwnd,
+                                        IDC_URL,
+                                        url,
+                                        sizeof(url)))
                     {
                         char* foo = new char[strlen(url) + 1];
 
@@ -2446,7 +2502,7 @@ OpenSongDialogProc( HWND hwnd,
 
 bool
 FreeAmpUI::
-OpenSong(List<char*>* filelist)
+OpenSong(List<char*>* fileList)
 {
     bool result = false;
     HINSTANCE hinst = (HINSTANCE)GetWindowLong(m_hwnd, GWL_HINSTANCE);
@@ -2455,7 +2511,7 @@ OpenSong(List<char*>* filelist)
                         MAKEINTRESOURCE(IDD_OPENSONG), 
                         m_hwnd,
                         OpenSongDialogProc,
-                        (LPARAM)filelist))
+                        (LPARAM)fileList))
     {
         result = true;
     }
