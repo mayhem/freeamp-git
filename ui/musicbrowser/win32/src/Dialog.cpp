@@ -1257,7 +1257,10 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
         }
     }
 
-    CheckForCD();
+	bool check;
+	m_context->prefs->GetPrefBoolean(kCheckCDAutomaticallyPref, &check);
+	if (check)
+       CheckForCD();
 
     m_initialized = true;
 	

@@ -52,6 +52,7 @@ using namespace std;
 #include "DropObject.h"
 #include "registrar.h"
 #include "Http.h"
+#include "debug.h"
 
 char* kMyMusic = "My Music";
 char* kAllTracks = "All Tracks";
@@ -1138,11 +1139,16 @@ HTREEITEM MusicBrowserUI::FindFavorite(const PlaylistItem* stream)
 
 void MusicBrowserUI::MusicCatalogCleared()
 {
+	bool check = true;
+
     if(m_initialized)
         InitTree();
 
 	m_cdId = -1;
-	CheckForCD();
+
+	m_context->prefs->GetPrefBoolean(kCheckCDAutomaticallyPref, &check);
+	if (check)
+	   CheckForCD();
 }
 
 void MusicBrowserUI::MusicCatalogTrackChanged(const ArtistList *oldArtist,
@@ -2516,6 +2522,8 @@ void MusicBrowserUI::CheckForCD()
     RegistryItem *pmo_item = NULL;
     int32 i = 0;
 
+	Debug_v("check cd\n");
+
     if(!pmoRegistry)
         return;
 
@@ -2545,6 +2553,12 @@ void MusicBrowserUI::CheckForCD()
 
 void MusicBrowserUI::DeviceChanged(uint32 event, PDEV_BROADCAST_HDR data)
 {
+	bool check;
+
+	m_context->prefs->GetPrefBoolean(kCheckCDAutomaticallyPref, &check);
+	if (!check)
+       return;
+
     switch(event)
     {
         case DBT_DEVICEARRIVAL:

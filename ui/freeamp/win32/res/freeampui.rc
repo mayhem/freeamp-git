@@ -150,6 +150,19 @@ BEGIN
                     BS_FLAT | WS_TABSTOP,3,33,227,120
 END
 
+IDD_PREF_CDAUDIO DIALOG DISCARDABLE  0, 0, 233, 174
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "CD Audio"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Automatically update Audio CD item in MyMusic",
+                    IDC_UPDATE_AUDIO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,
+                    8,221,10
+    EDITTEXT        IDC_MB_URL,6,42,221,14,ES_AUTOHSCROLL
+    LTEXT           "MusicBrainz server URL for Audio CD/Metadata lookups:",
+                    IDC_STATIC,7,29,217,8
+END
+
 IDD_PREF_THEME DIALOG DISCARDABLE  0, 0, 233, 174
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Themes"

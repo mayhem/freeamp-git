@@ -94,6 +94,10 @@ typedef struct PrefsStruct
     // page 7
     bool checkForUpdates;
 
+	// page 8
+	bool updateCDAutomatically;
+    string MBServerURL;
+
     // Browser page
     string playlistHeaderColumns;
     
@@ -142,6 +146,9 @@ typedef struct PrefsStruct
 
             watchForNewMusic == pref.watchForNewMusic &&
             watchDirectories == pref.watchDirectories &&
+
+			updateCDAutomatically == pref.updateCDAutomatically &&
+            MBServerURL == pref.MBServerURL &&
 
             true
         );
@@ -203,7 +210,7 @@ class Win32PreferenceWindow : public PreferenceWindow
                                   UINT msg, 
                                   WPARAM wParam, 
                                   LPARAM lParam);
-	       bool PrefBrowserProc(HWND hwnd,
+               bool PrefBrowserProc(HWND hwnd,
                                   UINT msg,
                                   WPARAM wParam,
                                   LPARAM lParam);
@@ -231,6 +238,11 @@ class Win32PreferenceWindow : public PreferenceWindow
                                   UINT msg,
                                   WPARAM wParam,
                                   LPARAM lParam);
+               bool PrefCDAudioProc(HWND hwnd,
+                                  UINT msg,
+                                  WPARAM wParam,
+                                  LPARAM lParam);
+
 
 	protected:
     

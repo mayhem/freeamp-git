@@ -121,6 +121,15 @@ PrefUpdateCallback(HWND hwnd,
 }
 
 static BOOL CALLBACK 
+PrefCDAudioCallback(HWND hwnd, 
+                    UINT msg, 
+                    WPARAM wParam, 
+                    LPARAM lParam)
+{
+	return g_pCurrentPrefWindow->PrefCDAudioProc(hwnd, msg, wParam, lParam);
+}
+
+static BOOL CALLBACK 
 PrefAdvancedCallback(HWND hwnd, 
                      UINT msg, 
                      WPARAM wParam, 
@@ -248,6 +257,10 @@ bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent)
     page.pfnDlgProc = PrefPluginsCallback;
     m_pages.push_back(page);
 
+    page.pszTemplate = MAKEINTRESOURCE(IDD_PREF_CDAUDIO);
+    page.pfnDlgProc = PrefCDAudioCallback;
+    m_pages.push_back(page);
+
     page.pszTemplate = MAKEINTRESOURCE(IDD_PREF_UPDATE);
     page.pfnDlgProc = PrefUpdateCallback;
     m_pages.push_back(page);
@@ -272,36 +285,10 @@ bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent)
     GetPrefsValues(&m_currentValues);
     GetPrefsValues(&m_proposedValues);
 
-    //result = (PropertySheet(&psh) > 0);
     result = (DialogBox(hinst, 
                         MAKEINTRESOURCE(IDD_MAIN_PREF_DIALOG),
                         hwndParent,
                         MainCallback) > 0);
-
-    /*HWND hwnd = CreateDialog(
-                hinst, 
-                MAKEINTRESOURCE(IDD_MAIN_PREF_DIALOG),
-                hwndParent,
-                MainCallback);
-
-    if(hwnd)
-    {
-        MSG msg;
-
-        ShowWindow(hwnd, SW_NORMAL);
-        UpdateWindow(hwnd);
-
-        while(GetMessage(&msg, NULL, 0, 0))
-        {
-            if(!IsDialogMessage(hwnd, &msg))
-            {
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);  
-            }
-        }
-
-        DestroyWindow(hwnd);
-    }*/
 
     if(deleteUpdateManager)
         delete m_updateManager;
@@ -399,12 +386,24 @@ void Win32PreferenceWindow::GetPrefsValues(PrefsStruct* values)
     values->saveMusicDirectory = buffer;
     size = bufferSize;
 
+    if(kError_BufferTooSmall == m_prefs->GetPrefString(kMBServerPref, buffer, &size))
+    {
+        bufferSize = size;
+        buffer = (char*)realloc(buffer, bufferSize);
+        m_prefs->GetPrefString(kMBServerPref, buffer, &size);
+    }
+
+    values->MBServerURL = buffer;
+    size = bufferSize;
+
     if(kError_BufferTooSmall == m_prefs->GetPrefString(kUsersPortablePlayersPref, buffer, &size))
     {
         bufferSize = size;
         buffer = (char*)realloc(buffer, bufferSize);
         m_prefs->GetPrefString(kUsersPortablePlayersPref, buffer, &size);
     }
+
+    size = bufferSize;
 
     char* cp = buffer;
     char* name = cp;
@@ -482,6 +481,7 @@ void Win32PreferenceWindow::GetPrefsValues(PrefsStruct* values)
     m_prefs->GetPrefBoolean(kSaveCurrentPlaylistOnExitPref, &values->savePlaylistOnExit);
     m_prefs->GetPrefBoolean(kPlayImmediatelyPref, &values->playImmediately);
     m_prefs->GetPrefBoolean(kConvertUnderscoresToSpacesPref, &values->convertUnderscores);
+    m_prefs->GetPrefBoolean(kCheckCDAutomaticallyPref, &values->updateCDAutomatically);
 
     free(buffer);
 }
@@ -553,6 +553,8 @@ void Win32PreferenceWindow::SavePrefsValues(PrefsStruct* values)
 
     m_prefs->SetPrefString(kWatchThisDirectoryPref, dirList.c_str());
     m_prefs->SetPrefInt32(kWatchThisDirTimeoutPref, (values->watchForNewMusic ? kDefaultWatchThisDirTimeout : 0));
+    m_prefs->SetPrefBoolean(kCheckCDAutomaticallyPref, values->updateCDAutomatically);
+    m_prefs->SetPrefString(kMBServerPref, values->MBServerURL.c_str());
 
     m_pContext->target->AcceptEvent(new Event(INFO_PrefsChanged));
     m_currentValues = m_proposedValues = *values;
@@ -2360,6 +2362,7 @@ bool Win32PreferenceWindow::PrefAboutProc(HWND hwnd,
     }
 
     return result;
+
 }
 
 bool Win32PreferenceWindow::PrefDirectoryProc(HWND hwnd, 
@@ -5146,3 +5149,101 @@ void Win32PreferenceWindow::ShowPrefPage(PrefPage* page, bool show)
         InvalidateRect(m_hwndPref, &fadeRect, FALSE);
     }
 }
+
+bool Win32PreferenceWindow::PrefCDAudioProc(HWND hwnd, 
+                                           UINT msg, 
+                                           WPARAM wParam, 
+                                           LPARAM lParam)      
+{
+    bool result = false;
+    
+    switch(msg)
+    {
+        case WM_INITDIALOG:
+        {
+            SetWindowText(GetDlgItem(hwnd, IDC_MB_URL), m_originalValues.MBServerURL.c_str());
+            Button_SetCheck(GetDlgItem(hwnd, IDC_UPDATE_AUDIO), m_originalValues.updateCDAutomatically);
+            break;
+        }
+
+        case WM_COMMAND:
+        {
+            switch(LOWORD(wParam))
+            {
+                case IDC_MB_URL:
+                {
+					char temp[MAX_PATH];
+
+                    GetWindowText(GetDlgItem(hwnd, IDC_MB_URL), temp, MAX_PATH);
+					m_proposedValues.MBServerURL = string(temp);
+                    break;
+                }
+                case IDC_UPDATE_AUDIO:
+                {
+					m_proposedValues.updateCDAutomatically = 
+                       Button_GetCheck(GetDlgItem(hwnd, IDC_UPDATE_AUDIO)) == BST_CHECKED;
+                    break;
+                }
+            }
+            if(m_proposedValues != m_currentValues)
+            {
+                PropSheet_Changed(GetParent(hwnd), hwnd);
+            }
+            else
+            {
+                PropSheet_UnChanged(GetParent(hwnd), hwnd);
+            }
+
+            break;
+        }
+
+        case UWM_HELP:
+        case WM_HELP:
+        {
+            ShowHelp(m_pContext, Preferences_About);
+            break;
+        }
+
+        case WM_NOTIFY:
+        {
+            NMHDR* notify = (NMHDR*)lParam;
+
+            switch(notify->code)
+            {
+                case PSN_HELP:
+                {
+                    ShowHelp(m_pContext, Preferences_About);
+                    break;
+                }
+                case PSN_SETACTIVE:
+                {
+                    
+                    break;
+                }
+
+                case PSN_APPLY:
+                {
+                    SavePrefsValues(&m_proposedValues);
+                    break;
+                }
+
+                case PSN_KILLACTIVE:
+                {
+                    
+                    break;
+                }
+
+                case PSN_RESET:
+                {
+                    SavePrefsValues(&m_originalValues);
+                    break;
+                }
+            }
+
+            break;
+        }
+    }
+
+    return result;
+}
+
