@@ -3239,6 +3239,10 @@ cat >> confdefs.h <<EOF
 #define AC_HOST_CPU "${host_cpu}"
 EOF
 
+cat >> confdefs.h <<EOF
+#define FREEAMP_VERSION "${VERSION}"
+EOF
+
 
 trap '' 1 2 15
 cat > confcache <<\EOF

@@ -334,6 +334,7 @@ AM_CONDITIONAL(AM_HAVE_X86, expr "$host_cpu" : "i.86$" > /dev/null)
 
 AC_DEFINE_UNQUOTED(AC_HOST_OS, "${host_os}")
 AC_DEFINE_UNQUOTED(AC_HOST_CPU, "${host_cpu}")
+AC_DEFINE_UNQUOTED(FREEAMP_VERSION, "${VERSION}")
 
 AC_OUTPUT(Makefile base/Makefile base/src/Makefile io/Makefile
           base/unix/Makefile ui/freeamp/Makefile ui/freeamp/unix/Makefile ui/freeamp/unix/src/Makefile

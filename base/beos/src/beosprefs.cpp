@@ -24,6 +24,7 @@ ____________________________________________________________________________*/
 #include <unistd.h>
 #include <stdlib.h>
 
+#include "config.h"
 #include "beosprefs.h"
 
 class LibDirFindHandle {
@@ -63,7 +64,7 @@ Error BeOSPrefs::SetPrefString(const char* pref, char* buf) {
 HANDLE BeOSPrefs::GetFirstLibDir(char *path, uint32 *len) {
     // if no FREEAMP_PATH, libdirs = ~/.freeamp : @lib_installdir@/freeamp : .
     // if FREEAMP_PATH, then its FREEAMP_PATH
-    char *pEnv = getenv("FREEAMP_PATH");
+    char *pEnv = getenv(FREEAMP_PATH_ENV);
     char *pPath = NULL;
     if (pEnv) {
 //	cout << "Using env: " << pEnv << endl;

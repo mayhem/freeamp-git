@@ -357,6 +357,7 @@ UnixPrefs()
     FILE *prefsFile = fopen(m_prefsFilePath, "r");
     if (!prefsFile && errno != ENOENT)
     {
+	m_saveEnable = false;
 	fprintf(stderr, "Error opening %s: %s\n",
 		m_prefsFilePath, strerror(errno));
     }
@@ -676,7 +677,7 @@ GetFirstLibDir(char *path, uint32 *len)
 {
     // if no FREEAMP_PATH, use kLibraryPathPref
     // if FREEAMP_PATH, then its FREEAMP_PATH
-    char *pEnv = getenv("FREEAMP_PATH");
+    char *pEnv = getenv(FREEAMP_PATH_ENV);
     char *pPath = NULL;
     if (pEnv) {
 //	cout << "Using env: " << pEnv << endl;

@@ -28,6 +28,7 @@ ____________________________________________________________________________*/
 
 
 #define FREEAMP_PATH_ENV "FREEAMP_PATH"
+#define FREEAMP_VERSION "unknown"
 
 
 #define HAVE_UNISTD_H 0

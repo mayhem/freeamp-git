@@ -10,7 +10,7 @@ INSTALLATION:
 
 From the source:
 
-  See the document install/INSTALL
+  See the document INSTALL
 
 From binaries:
 
@@ -80,7 +80,7 @@ Notes:
          UI: freeamp-linux.ui
          TextUI: freeampcmd-linux.ui
          PMO: soundcard-linux.pmo
-         ALSADevice: 1:0
+         ALSADevice: 1:1
          InputBufferSize: 64
          OutputBufferSize: 512
          StreamBufferInterval: 3
@@ -149,11 +149,12 @@ ABOUT FreeAmp:
 ----------------------------------------------------------------------
 
 FreeAmp is an Open Source effort to build the best digital audio player
-available.  In the interest of supporting the free software community, while at
-the same time fostering the growth of the online delivery of music, GoodNoise
-Corporation, The Internet Record Company, is funding both the FreeAmp.org
-domain and the efforts of the FreeAmp team. The FreeAmp team consists of:
-Mark B. Elrod, Robert Kaye, Brett Thomas, Jason Woodward, and Mark Weaver. 
+available.  In the interest of supporting the free software community,
+while at the same time fostering the growth of the online delivery of
+music, GoodNoise Corporation, The Internet Record Company, is funding both
+the FreeAmp.org domain and the efforts of the FreeAmp team. The FreeAmp
+team consists of: Mark B. Elrod, Robert Kaye, Brett Thomas, Jason Woodward,
+and Mark H. Weaver. 
 
 Other people have also contributed to FreeAmp. Bill Yuan in China has
 contributed the RainPlay user interface and Gabor Fleischer in Hungary has

@@ -335,7 +335,7 @@ Usage(const char *progname)
    if (m_didUsage)
       return;
 
-   printf("FreeAmp version 1.2.1 -- Usage:\n\n");
+   printf("FreeAmp version " FREEAMP_VERSION " -- Usage:\n\n");
    printf("freeamp [-ui <UI plugin name>] <MP3 file/stream> "
 	  "[MP3 file/stream] ...\n\n");
    printf("Example command line:\n\n");
