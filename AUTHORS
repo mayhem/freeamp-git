@@ -169,3 +169,6 @@ Michael Rich <istan@alltel.net>
 
 "Stephen Frost" <sfrost@snowman.net>
 * irix and solaris porting efforts
+
+"Mark Spencer" <markster@linux-support.net>
+* tweaked the xing decoder to be reentrant

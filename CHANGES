@@ -1,3 +1,17 @@
+Changes for version 2.1.0 rc4
+--------------------------------------------------------------------
+- MusicBrainz CD lookup will no longer attempt to look up each track
+  after the first track lookup fails.
+- The data coming from the MB client lib and the vorbis metadata plugin
+  now gets converted to ISO 8859-1
+- The ALSA plugin does not report an error during stream rebuffering
+- Stream rebuffering values have been tweaked a bit to improve the
+  rebuffering of the stream.
+- The proxy support has been improved. Previously the URI special
+  character encoding function was a bit too overzealous.
+- The mouse wheel/middle button mute was not working properly on themes
+  without a mute button.
+
 Changes for version 2.1.0 rc3
 --------------------------------------------------------------------
 - More bugfixes
