@@ -502,7 +502,7 @@ void SoundCardPMO::WorkerThread(void)
       }
 
       iRet = write(audio_fd, pBuffer, m_iDataSize);
-      if (iRet < 0)
+      if ((int)iRet < 0)
       {
          m_pInputBuffer->EndRead(0);
          ReportError("Could not write sound data to the soundcard.");

@@ -1452,7 +1452,7 @@ static void edit_info_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
 void GTKMusicBrowser::CreateTreePopups(void)
 {
     GtkItemFactoryEntry genstream_items[] = {
-     {"/Add New Stream", NULL,    (void(*)())add_stream_pop, 0, 0 }
+     {"/Add New Stream", NULL,    (void(*)(...))add_stream_pop, 0, 0 }
     };
     int ngenstream_items = sizeof(genstream_items) / sizeof(genstream_items[0]);
 
@@ -1462,10 +1462,10 @@ void GTKMusicBrowser::CreateTreePopups(void)
                                   genstream_items, (void*)this);
 
     GtkItemFactoryEntry stream_items[] = {
-     {"/Add to Playlist",NULL,    (void(*)())add_pop,       0, 0 },
-     {"/Add and Play Now",NULL,   (void(*)())add_play_pop,  0, 0 },
+     {"/Add to Playlist",NULL,    (void(*)(...))add_pop,       0, 0 },
+     {"/Add and Play Now",NULL,   (void(*)(...))add_play_pop,  0, 0 },
      {"/sep1",         NULL,      0,                        0, "<Separator>" },
-     {"/Add To Favorites", NULL,  (void(*)())add_fav_pop,   0, 0 }
+     {"/Add To Favorites", NULL,  (void(*)(...))add_fav_pop,   0, 0 }
     };
     int nstream_items = sizeof(stream_items) / sizeof(stream_items[0]);
 
@@ -1475,10 +1475,10 @@ void GTKMusicBrowser::CreateTreePopups(void)
                                   (void*)this);
 
     GtkItemFactoryEntry fav_items[] = {
-     {"/Add to Playlist",NULL,    (void(*)())add_pop,       0, 0 },
-     {"/Add and Play Now",NULL,   (void(*)())add_play_pop,  0, 0 },
+     {"/Add to Playlist",NULL,    (void(*)(...))add_pop,       0, 0 },
+     {"/Add and Play Now",NULL,   (void(*)(...))add_play_pop,  0, 0 },
      {"/sep1",         NULL,      0,                        0, "<Separator>" },
-     {"/Remove",       NULL,      (void(*)())remove_pop,    0, 0 }
+     {"/Remove",       NULL,      (void(*)(...))remove_pop,    0, 0 }
     };
     int nfav_items = sizeof(fav_items) / sizeof(fav_items[0]);
     
@@ -1486,10 +1486,10 @@ void GTKMusicBrowser::CreateTreePopups(void)
     gtk_item_factory_create_items(favPopup, nfav_items, fav_items, (void*)this);
 
     GtkItemFactoryEntry cd_items[] = {
-     {"/Add to Playlist",NULL,  (void(*)())add_pop,  0, 0 },
-     {"/Add and Play Now",NULL, (void(*)())add_play_pop,   0, 0 },
+     {"/Add to Playlist",NULL,  (void(*)(...))add_pop,  0, 0 },
+     {"/Add and Play Now",NULL, (void(*)(...))add_play_pop,   0, 0 },
      {"/sep1",         NULL,    0,                        0, "<Separator>" },
-     {"/Eject CD",     NULL,    (void(*)())eject_cd_pop,0, 0 }
+     {"/Eject CD",     NULL,    (void(*)(...))eject_cd_pop,0, 0 }
     };
     int ncd_items = sizeof(cd_items) / sizeof(cd_items[0]);
 
@@ -1497,12 +1497,12 @@ void GTKMusicBrowser::CreateTreePopups(void)
     gtk_item_factory_create_items(cdPopup, ncd_items, cd_items, (void*)this);
 
     GtkItemFactoryEntry plist_items[] = {
-     {"/Add to Playlist",NULL,  (void(*)())add_pop,  0, 0 },
-     {"/Add and Play Now",NULL, (void(*)())add_play_pop,   0, 0 },
+     {"/Add to Playlist",NULL,  (void(*)(...))add_pop,  0, 0 },
+     {"/Add and Play Now",NULL, (void(*)(...))add_play_pop,   0, 0 },
      {"/sep1",         NULL,    0,                        0, "<Separator>" },
-     {"/Remove",       NULL,    (void(*)())remove_pop,     0, 0 },
+     {"/Remove",       NULL,    (void(*)(...))remove_pop,     0, 0 },
      {"/sep2",         NULL,    0,                        0, "<Separator>" },
-     {"/Edit",         NULL,    (void(*)())edit_info_pop,0, 0 }
+     {"/Edit",         NULL,    (void(*)(...))edit_info_pop,0, 0 }
     };
     int nplist_items = sizeof(plist_items) / sizeof(plist_items[0]);
 
@@ -1512,12 +1512,12 @@ void GTKMusicBrowser::CreateTreePopups(void)
                                   (void*)this);
     
     GtkItemFactoryEntry track_items[] = {
-     {"/Add to Playlist",NULL,  (void(*)())add_pop,  0, 0 },
-     {"/Add and Play Now",NULL, (void(*)())add_play_pop,   0, 0 },
+     {"/Add to Playlist",NULL,  (void(*)(...))add_pop,  0, 0 },
+     {"/Add and Play Now",NULL, (void(*)(...))add_play_pop,   0, 0 },
      {"/sep1",         NULL,    0,                        0, "<Separator>" },
-     {"/Remove",       NULL,    (void(*)())remove_pop,     0, 0 },
+     {"/Remove",       NULL,    (void(*)(...))remove_pop,     0, 0 },
      {"/sep2",         NULL,    0,                        0, "<Separator>" },
-     {"/Edit Info", NULL,       (void(*)())edit_info_pop,0, 0 }
+     {"/Edit Info", NULL,       (void(*)(...))edit_info_pop,0, 0 }
     };
     int ntrack_items = sizeof(track_items) / sizeof(track_items[0]);
 
@@ -1527,8 +1527,8 @@ void GTKMusicBrowser::CreateTreePopups(void)
                                   (void*)this);
 
     GtkItemFactoryEntry other_items[] = {
-     {"/Add to Playlist",NULL,  (void(*)())add_pop,  0, 0 },
-     {"/Add and Play Now",NULL, (void(*)())add_play_pop,   0, 0 },
+     {"/Add to Playlist",NULL,  (void(*)(...))add_pop,  0, 0 },
+     {"/Add and Play Now",NULL, (void(*)(...))add_play_pop,   0, 0 },
     };
     int nother_items = sizeof(other_items) / sizeof(other_items[0]);
 

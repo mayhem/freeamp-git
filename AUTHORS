@@ -132,3 +132,6 @@ Michael Rich <istan@alltel.net>
 
 "Terje Malmedal" <tm@funcom.com>
 * fix for displaying European characters in the linux freeamp ui
+
+"Michael Jennings" <mej@valinux.com>
+* compile fixes for the linux build

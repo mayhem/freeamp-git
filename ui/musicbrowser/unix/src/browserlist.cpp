@@ -831,27 +831,27 @@ static void list_clicked(GtkWidget *w, GdkEventButton *event,
 void GTKMusicBrowser::CreatePlaylistList(GtkWidget *box)
 {
     GtkItemFactoryEntry popup_items[] = {
-     {"/Play Now",     NULL,      (void(*)())play_now_pop,  0, 0 },
-     {"/Move Up",      NULL,      (void(*)())move_up_pop,   0, 0 },
-     {"/Move Down",    NULL,      (void(*)())move_down_pop, 0, 0 },
+     {"/Play Now",     NULL,      (void(*)(...))play_now_pop,  0, 0 },
+     {"/Move Up",      NULL,      (void(*)(...))move_up_pop,   0, 0 },
+     {"/Move Down",    NULL,      (void(*)(...))move_down_pop, 0, 0 },
      {"/sep1",         NULL,      0,                        0, "<Separator>" },
-     {"/Remove",       NULL,      (void(*)())delete_pop,     0, 0 },
+     {"/Remove",       NULL,      (void(*)(...))delete_pop,     0, 0 },
      {"/sep2",         NULL,      0,                        0, "<Separator>" },
-     {"/Edit Info",    NULL,      (void(*)())edit_pop,      0, 0 }
+     {"/Edit Info",    NULL,      (void(*)(...))edit_pop,      0, 0 }
     };
  
     int nmenu_items = sizeof(popup_items) / sizeof(popup_items[0]);
 
     GtkItemFactoryEntry popup2_items[] = {
-     {"/Play Now",     NULL,      (void(*)())play_now_pop,  0, 0 },
-     {"/Move Up",      NULL,      (void(*)())move_up_pop,   0, 0 },
-     {"/Move Down",    NULL,      (void(*)())move_down_pop, 0, 0 },
+     {"/Play Now",     NULL,      (void(*)(...))play_now_pop,  0, 0 },
+     {"/Move Up",      NULL,      (void(*)(...))move_up_pop,   0, 0 },
+     {"/Move Down",    NULL,      (void(*)(...))move_down_pop, 0, 0 },
      {"/sep1",         NULL,      0,                        0, "<Separator>" },
-     {"/Remove",       NULL,      (void(*)())delete_pop,    0, 0 },
+     {"/Remove",       NULL,      (void(*)(...))delete_pop,    0, 0 },
      {"/sep2",         NULL,      0,                        0, "<Separator>" },
-     {"/Edit Info",    NULL,      (void(*)())edit_pop,      0, 0 },
+     {"/Edit Info",    NULL,      (void(*)(...))edit_pop,      0, 0 },
      {"/sep3",         NULL,      0,                        0, "<Separator>" },
-     {"/Add Stream to Favorites", NULL, (void(*)())add_fav_pop, 0, 0 }
+     {"/Add Stream to Favorites", NULL, (void(*)(...))add_fav_pop, 0, 0 }
     };
 
     int nmenu2_items = sizeof(popup2_items) / sizeof(popup2_items[0]);
