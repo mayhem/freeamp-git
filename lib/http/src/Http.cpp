@@ -224,10 +224,12 @@ Error Http::Download(const string &url, bool fileDownload)
         }
         else
         {
+            const char *ptr;
             numFields = sscanf(url.c_str(), 
                            "http://%[^:/]:%hu", hostname, &port);
 
-            file = string(strchr(url.c_str() + 7, '/'));
+            ptr = strchr(url.c_str() + 7, '/');
+            file = string(ptr ? ptr : "");
         }
         EncodeURI(file);
 

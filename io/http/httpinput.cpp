@@ -496,6 +496,8 @@ HttpInput::Open(void)
    szStreamUrl = NULL;
    if (!m_bUseProxy)
    {
+      const char* ptr;
+
       iRet = sscanf(m_path, " http://%[^:/]:%d", szHostName, &iPort);
       if (iRet < 1)
       {
@@ -503,7 +505,8 @@ HttpInput::Open(void)
                      ":[port][/path]. Please check the URL and try again.");
          return (Error) httpError_BadUrl;
       }
-      file = string(strchr(m_path + 7, '/'));
+      ptr = strchr(m_path + 7, '/');
+      file = (ptr ? ptr : "");
    }
    else
    {
