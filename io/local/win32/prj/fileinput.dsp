@@ -58,8 +58,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-      ..\..\..\..\base\win32\prj\plugins	copy fileinput.pmi\
- ..\..\..\..\base\win32\prj\plugins
+       ..\..\..\..\base\win32\prj\plugins	copy fileinput.pmi\
+  ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "fileinput - Win32 Debug"
@@ -90,8 +90,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-      ..\..\..\..\base\win32\prj\plugins	copy fileinput.pmi\
- ..\..\..\..\base\win32\prj\plugins
+       ..\..\..\..\base\win32\prj\plugins	copy fileinput.pmi\
+  ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
@@ -134,10 +134,6 @@ SOURCE=.\fileinput.def
 # Begin Source File
 
 SOURCE=..\..\localfileinput.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\localfilelib.cpp
 # End Source File
 # End Target
 # End Project

@@ -42,7 +42,7 @@ class SimpleUI : public UserInterface {
     SimpleUI();
     ~SimpleUI();
 
-    virtual void SetTarget(EventQueueRef);
+    virtual void SetTarget(EventQueue*);
     virtual int32 AcceptEvent(Event *);
     virtual void SetArgs(int32,char **);
 
@@ -66,7 +66,7 @@ class SimpleUI : public UserInterface {
 
  private:
     Thread*         m_uiThread;
-    EventQueueRef   m_target;
+    EventQueue*     m_target;
 
     HWND            m_hwnd;
     HWND            m_hwndPlay;

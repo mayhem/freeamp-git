@@ -174,8 +174,6 @@ int32 SoundCardPMO::Write(void *pBuffer,int32 length) {
     return actual;
 }
 
-void SoundCardPMO::Clear() { }
-
 
 
 

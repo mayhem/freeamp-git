@@ -52,7 +52,6 @@ public:
     virtual int32 Write(void*,int32);
     virtual void Pause();
     virtual void Resume();
-    virtual void Clear();
     
     
  private:

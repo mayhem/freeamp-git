@@ -62,7 +62,6 @@ public:
 	virtual int32 Write(void * /* pBuffer */, int32 /* bufflength */) { return -1; }
     virtual void Pause(){}
     virtual void Resume(){}
-	virtual void Clear(){ }
 };
 
 #ifdef __cplusplus

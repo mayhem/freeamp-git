@@ -32,6 +32,15 @@ ____________________________________________________________________________*/
 
 HANDLE MCISemaphore;
 
+extern "C" {
+
+PhysicalMediaOutput* Initialize() 
+{
+    return new SoundCardPMO();
+}
+
+}
+
 static 
 void 
 CALLBACK 
@@ -262,51 +271,12 @@ void
 SoundCardPMO::
 Pause()
 {
-     //waveOutPause(m_hwo);
+     waveOutPause(m_hwo);
 }
 
 void 
 SoundCardPMO::
 Resume()
 {
-    //waveOutRestart(m_hwo);
-}
-
-
-void 
-SoundCardPMO::
-Clear()
-{
-	waveOutReset(m_hwo);
-
-	/*if(m_initialized)
-	{
-		uint32 i;
-
-		for(i = 0; i < 3; i++) 
-		{
-			LPWAVEHDR temp = m_wavehdr_array[i];
-
-			if ((temp->dwUser) && (i < 2))
-			{
-				WaitForSingleObject(MCISemaphore, 10000);
-			}
-
-			temp->dwUser = 0;
-
-			for(uint32 j = 0; j < m_data_size; j++)
-			{
-				temp->lpData[j] = (char) 0;
-			}
-		}
-
-		// Reset m_buffer pointers
-		for(i = 0; i < m_channels; i++)
-		{
-			m_buffer[i] = i * m_channels;
-		}
-
-		// Force the m_buffers to m_fillup before playing.
-		m_fillup = m_buffer_count = 0;
-	}*/
+    waveOutRestart(m_hwo);
 }

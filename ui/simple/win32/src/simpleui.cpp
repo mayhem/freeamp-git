@@ -48,6 +48,12 @@ BOOL CALLBACK MainProc(	HWND hwnd,
 						WPARAM wParam, 
 						LPARAM lParam ); 
 
+extern "C" {
+SimpleUI *Initialize() {
+    return new SimpleUI();
+}
+	   }
+
 
 INT WINAPI DllMain (HINSTANCE hInst,
                     ULONG ul_reason_being_called,
@@ -126,7 +132,7 @@ AcceptEvent(Event* event)
     if (event) 
     {
         
-        switch (event->GetEvent()) 
+        switch (event->Type()) 
         {
             case INFO_Playing: 
             {   
@@ -175,123 +181,114 @@ AcceptEvent(Event* event)
 	            break; 
             }
 
-            case INFO_MediaVitalStats: 
+            case INFO_MediaInfo: 
             {
-                MediaVitalInfo *pmvi = (MediaVitalInfo*)event->GetArgument();
+                MediaInfoEvent *info = (MediaInfoEvent*)event;
 
-                if (pmvi) 
-                {
-                    char timeString[256] = "00:00:00";
-			        char szTemp[256];
-
-                    SetWindowText(m_hwndCurrent, timeString);
-
-
-                    int32 seconds = (int32)ceil(pmvi->m_totalTime);
-			        int32 hours = seconds / 3600;
-			        int32 minutes = seconds / 60 - hours * 60;
-			        seconds = seconds - minutes * 60 - hours * 3600;
-
-
-                    sprintf(timeString,"%02d:%02d:%02d",hours,
-				                                        minutes,
-				                                        seconds);
-
-			        SetWindowText(m_hwndTotal, timeString);
-
-
-                    sprintf(szTemp, "%d kbps",  pmvi->m_bps/1000);
-                    SendMessage(m_hwndStatus, 
-						        SB_SETTEXT, 
-						        0, 
-						        (LPARAM)szTemp);
-
-                    sprintf(szTemp, "%.1f kHz",  ((float)pmvi->m_freq)/1000);
-			        SendMessage(m_hwndStatus, 
-						        SB_SETTEXT, 
-						        1, 
-						        (LPARAM) szTemp);
-
-                    sprintf(szTemp, "%d of %d", pmvi->indexOfSong,pmvi->totalSongs);
-			        SendMessage(m_hwndStatus, 
-						        SB_SETTEXT, 
-						        2, 
-						        (LPARAM) szTemp);
-
-                    SendMessage(m_hwndSlider,
-						        TBM_SETRANGE,
-						        (WPARAM)TRUE,
-						        MAKELPARAM(0, pmvi->m_totalFrames));
-			
-			        SendMessage(m_hwndSlider,
-						        TBM_SETPOS,
-						        (WPARAM)TRUE,
-						        (LPARAM)0);
-
-                    SetWindowText(m_hwnd, pmvi->m_filename);
-
-
-		            /*totalFrames = pmvi->totalFrames;
-		            totalTime = pmvi->totalTime;
-		            char *path = pmvi->filename;
-		            char *pLastSlash = strrchr(path,'/');
-		            char *dir = NULL;
-		            char *fname = NULL;
-		            if (pLastSlash) {
-			        *pLastSlash = '\0';
-			        fname = (char *)((int)pLastSlash + 1);
-			        dir = path;
-		            } else {
-			        fname = path;
-		            }
-		            strncpy(fileName,fname,511);
-
-		            fileName[511] = '\0';
-
-		            if (pmvi->tagInfo.contains_info) 
-                    {
-			            fprintf(stderr,"Title  : %30s  Artist: %s\n",pmvi->tagInfo.songname,pmvi->tagInfo.artist);
-			            fprintf(stderr,"Album  : %30s  Year: %4s, Genre: %d\n",pmvi->tagInfo.album,pmvi->tagInfo.year,(int)pmvi->tagInfo.genre);
-			            fprintf(stderr,"Comment: %30s \n",pmvi->tagInfo.comment);
-		            }
-
-		            if (verboseMode == false) 
-                    {
-                    cerr << "Playing MPEG stream from " << fileName << " ..." << endl;
-			        cerr << "MPEG 1.0, Layer: III, Freq: " << pmvi->freq << ", mode: Joint-Stereo, modext: 3, BPF : " << pmvi->bytesPerFrame  << endl;
-			        cerr << "Channels: 2, copyright: No, original: Yes, CRC: No, emphasis: 0." << endl;
-			        cerr << "Bitrate: " << pmvi->bps/1000 << " KBits/s, Extension value: 0" << endl;
-			        cerr << "Audio: 1:1 conversion, rate: " << pmvi->freq << ", encoding: signed 16 bit, channels: 2" << endl;
-		            }*/
-		        }
-
-	            break; 
-            }
-
-            case INFO_MediaTimePosition: 
-            {
-                MediaTimePositionInfo *pmtp = (MediaTimePositionInfo *)event->GetArgument();
+                
                 char timeString[256] = "00:00:00";
-                static int32 lastSeconds = 0, lastMinutes = 0, lastHours = 0;
+			    char szTemp[256];
 
-		        //pmtp->seconds,totalTime-pmtp->seconds);
-	            
-                int32 seconds = (int32)ceil(pmtp->m_seconds);
+                SetWindowText(m_hwndCurrent, timeString);
+
+
+                int32 seconds = (int32)ceil(info->m_totalTime);
 			    int32 hours = seconds / 3600;
 			    int32 minutes = seconds / 60 - hours * 60;
 			    seconds = seconds - minutes * 60 - hours * 3600;
 
-                if(lastSeconds != seconds ||
-                    lastMinutes != minutes ||
-                    lastHours != hours)
-                {
-                    lastSeconds = seconds;
-                    lastMinutes = minutes;
-                    lastHours = hours;
 
-                    sprintf(timeString,"%02d:%02d:%02d",hours,
+                sprintf(timeString,"%02d:%02d:%02d",hours,
 				                                    minutes,
 				                                    seconds);
+
+			    SetWindowText(m_hwndTotal, timeString);
+
+
+                sprintf(szTemp, "%d kbps",  info->m_bps/1000);
+                SendMessage(m_hwndStatus, 
+						    SB_SETTEXT, 
+						    0, 
+						    (LPARAM)szTemp);
+
+                sprintf(szTemp, "%.1f kHz",  ((float)info->m_freq)/1000);
+			    SendMessage(m_hwndStatus, 
+						    SB_SETTEXT, 
+						    1, 
+						    (LPARAM) szTemp);
+
+                sprintf(szTemp, "%d of %d", info->m_indexOfSong,info->m_totalSongs);
+			    SendMessage(m_hwndStatus, 
+						    SB_SETTEXT, 
+						    2, 
+						    (LPARAM) szTemp);
+
+                SendMessage(m_hwndSlider,
+						    TBM_SETRANGE,
+						    (WPARAM)TRUE,
+						    MAKELPARAM(0, info->m_totalFrames));
+		
+			    SendMessage(m_hwndSlider,
+						    TBM_SETPOS,
+						    (WPARAM)TRUE,
+						    (LPARAM)0);
+
+                SetWindowText(m_hwnd, info->m_filename);
+
+
+		        /*totalFrames = info->totalFrames;
+		        totalTime = info->totalTime;
+		        char *path = info->filename;
+		        char *pLastSlash = strrchr(path,'/');
+		        char *dir = NULL;
+		        char *fname = NULL;
+		        if (pLastSlash) {
+			    *pLastSlash = '\0';
+			    fname = (char *)((int)pLastSlash + 1);
+			    dir = path;
+		        } else {
+			    fname = path;
+		        }
+		        strncpy(fileName,fname,511);
+
+		        fileName[511] = '\0';
+
+		        if (info->tagInfo.contains_info) 
+                {
+			        fprintf(stderr,"Title  : %30s  Artist: %s\n",info->tagInfo.songname,info->tagInfo.artist);
+			        fprintf(stderr,"Album  : %30s  Year: %4s, Genre: %d\n",info->tagInfo.album,info->tagInfo.year,(int)info->tagInfo.genre);
+			        fprintf(stderr,"Comment: %30s \n",info->tagInfo.comment);
+		        }
+
+		        if (verboseMode == false) 
+                {
+                cerr << "Playing MPEG stream from " << fileName << " ..." << endl;
+			    cerr << "MPEG 1.0, Layer: III, Freq: " << info->freq << ", mode: Joint-Stereo, modext: 3, BPF : " << info->bytesPerFrame  << endl;
+			    cerr << "Channels: 2, copyright: No, original: Yes, CRC: No, emphasis: 0." << endl;
+			    cerr << "Bitrate: " << info->bps/1000 << " KBits/s, Extension value: 0" << endl;
+			    cerr << "Audio: 1:1 conversion, rate: " << info->freq << ", encoding: signed 16 bit, channels: 2" << endl;
+		        }*/
+
+	            break; 
+            }
+
+            case INFO_MediaTimeInfo: 
+            {
+                MediaTimeInfoEvent* info = (MediaTimeInfoEvent*)event;
+                char timeString[256] = "00:00:00";
+                static int32 lastSeconds = 0, lastMinutes = 0, lastHours = 0;
+	            
+                if(lastSeconds != info->m_seconds ||
+                    lastMinutes != info->m_minutes ||
+                    lastHours != info->m_hours)
+                {
+                    lastSeconds = info->m_seconds;
+                    lastMinutes = info->m_minutes;
+                    lastHours = info->m_hours;
+
+                    sprintf(timeString,"%02d:%02d:%02d",info->m_hours,
+				                                    info->m_minutes,
+				                                    info->m_seconds);
 
 			        SetWindowText(m_hwndCurrent, timeString);
                 }
@@ -302,7 +299,7 @@ AcceptEvent(Event* event)
                     SendMessage(m_hwndSlider,
 						        TBM_SETPOS,
 						        (WPARAM)TRUE,
-						        (LPARAM)pmtp->m_frame);
+						        (LPARAM)info->m_frame);
 
                 }
 
@@ -346,7 +343,7 @@ AcceptEvent(Event* event)
 
 	        case CMD_Cleanup: 
             {
-	            m_target->AcceptEvent(m_target, new Event(INFO_ReadyToDieUI));
+	            m_target->AcceptEvent(new Event(INFO_ReadyToDieUI));
 	            break; 
             }
 
@@ -404,7 +401,7 @@ SetArgs(int32 argc, char** argv)
     if(shuffle) 
         playlist->SetOrder(PlayList::ORDER_SHUFFLED);
     
-    m_target->AcceptEvent(m_target, new Event(CMD_SetPlaylist,playlist));
+    m_target->AcceptEvent(new SetPlayListEvent(playlist));
 
 
     if(count)
@@ -430,7 +427,7 @@ CreateUI()
                     MainProc, 
                     (LPARAM)this);
 
-    m_target->AcceptEvent(m_target, new Event(CMD_QuitPlayer));
+    m_target->AcceptEvent(new Event(CMD_QuitPlayer));
 }
 
 void 
@@ -501,12 +498,12 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 				{
                     if(isPaused)
                     {
-                        m_ui->m_target->AcceptEvent( m_ui->m_target, new Event(CMD_TogglePause));
+                        m_ui->m_target->AcceptEvent(new Event(CMD_TogglePause));
                         isPaused = false;
                     }
                     else
                     {
-                        m_ui->m_target->AcceptEvent( m_ui->m_target, new Event(CMD_Play));
+                        m_ui->m_target->AcceptEvent(new Event(CMD_Play));
                     }
 
 					break;
@@ -515,25 +512,25 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 				case IDC_PAUSE:
 				{
                     isPaused = true;
-                    m_ui->m_target->AcceptEvent( m_ui->m_target, new Event(CMD_TogglePause));
+                    m_ui->m_target->AcceptEvent(new Event(CMD_TogglePause));
 					break;
 				}
 
 				case IDC_STOP:
 				{
-                    m_ui->m_target->AcceptEvent( m_ui->m_target, new Event(CMD_Stop));
+                    m_ui->m_target->AcceptEvent(new Event(CMD_Stop));
 					break;
 				}
 
 				case IDC_NEXTSONG:
 				{
-                    m_ui->m_target->AcceptEvent( m_ui->m_target, new Event(CMD_NextMediaPiece));
+                    m_ui->m_target->AcceptEvent(new Event(CMD_NextMediaPiece));
 					break;
 				}
 
 				case IDC_LASTSONG:
 				{
-                    m_ui->m_target->AcceptEvent( m_ui->m_target, new Event(CMD_PrevMediaPiece));
+                    m_ui->m_target->AcceptEvent(new Event(CMD_PrevMediaPiece));
 					break;
 				}
 
@@ -602,7 +599,7 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 							cp += strlen(cp) + 1;
 						}
 
-						m_ui->m_target->AcceptEvent(m_ui->m_target, new Event(CMD_SetPlaylist,playlist));
+						m_ui->m_target->AcceptEvent(new SetPlayListEvent(playlist));
                         EnableWindow(m_ui->m_hwndPlay, TRUE);
 					}
 
@@ -685,7 +682,7 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 				playlist->Add(szFile,0);
 			}
 
-			m_ui->m_target->AcceptEvent(m_ui->m_target, new Event(CMD_SetPlaylist,playlist));
+			m_ui->m_target->AcceptEvent(new SetPlayListEvent(playlist));
             EnableWindow(m_ui->m_hwndPlay, TRUE);
 
 			break;
@@ -709,7 +706,7 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 											0, 
 											0);
                     
-                    m_ui->m_target->AcceptEvent( m_ui->m_target, new Event(CMD_ChangePosition, (void*)position));
+                    m_ui->m_target->AcceptEvent(new ChangePositionEvent(position));
 		  	
 					m_ui->m_scrolling = false;
 					break;

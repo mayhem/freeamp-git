@@ -58,8 +58,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-      ..\..\..\..\base\win32\prj\plugins	copy soundcard.pmo\
- ..\..\..\..\base\win32\prj\plugins
+       ..\..\..\..\base\win32\prj\plugins	copy soundcard.pmo\
+  ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "soundcard - Win32 Debug"
@@ -90,8 +90,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-      ..\..\..\..\base\win32\prj\plugins	copy soundcard.pmo\
- ..\..\..\..\base\win32\prj\plugins
+       ..\..\..\..\base\win32\prj\plugins	copy soundcard.pmo\
+  ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
@@ -130,10 +130,6 @@ InputPath=..\..\..\..\config\config.win32
 # Begin Source File
 
 SOURCE=.\soundcard.def
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\soundcardlib.cpp
 # End Source File
 # Begin Source File
 
