@@ -614,6 +614,120 @@ static bool IsHTTPHeaderComplete(char* buffer, uint32 length)
     return result;
 }
 
+#ifdef WIN32
+#define WM_WINDOWS_IS_DONE_PICKING_ITS_BUTT (WM_USER + 1)
+
+static LRESULT WINAPI WndProc(HWND hwnd, UINT msg,
+
+                              WPARAM wParam, LPARAM lParam);
+
+Error
+HttpInput::Win32GetHostByName(char *szHostName, struct hostent *pHostInfo)
+{
+   WNDCLASS  wc;
+   MSG       msg;
+   HWND      hWnd;
+   HANDLE    hHandle;
+   char      szBuffer[MAXGETHOSTSTRUCT];
+   int       result = -1;
+
+   memset(&wc, 0x00, sizeof(WNDCLASS));
+
+   wc.style = CS_HREDRAW | CS_VREDRAW;
+   wc.lpfnWndProc = WndProc;
+   wc.hInstance = g_hinst;
+   wc.hCursor = NULL;
+   wc.hIcon = NULL;
+   wc.hbrBackground = (HBRUSH) GetStockObject(WHITE_BRUSH);
+   wc.lpszClassName = "WindowsSucks";
+
+   result = RegisterClass(&wc);
+
+   hWnd = CreateWindow(wc.lpszClassName, "Fuss",
+                       WS_OVERLAPPEDWINDOW,
+                       CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+                       CW_USEDEFAULT, NULL, NULL, g_hinst, NULL);
+   if (hWnd == NULL)
+      return kError_NoDataAvail;
+
+   m_hWnd = hWnd;
+   hHandle =
+      WSAAsyncGetHostByName(hWnd, WM_WINDOWS_IS_DONE_PICKING_ITS_BUTT,
+                            szHostName, szBuffer, MAXGETHOSTSTRUCT);
+   if (hHandle == NULL)
+   {
+      DestroyWindow(hWnd);
+      return kError_NoDataAvail;
+   }
+
+   while (GetMessage(&msg, NULL, 0, 0))
+   {
+      TranslateMessage(&msg);
+
+      if (msg.message == WM_WINDOWS_IS_DONE_PICKING_ITS_BUTT)
+         result = WSAGETASYNCERROR(msg.lParam);
+
+      DispatchMessage(&msg);
+   }
+
+   if (m_bExit)
+   {
+      WSACancelAsyncRequest(hHandle);
+   }
+
+   m_hWnd = NULL;
+   DestroyWindow(hWnd);
+
+   if (m_bExit)
+   {
+      return kError_Interrupt;
+   }
+
+   if (result == 0)
+   {
+      memcpy(pHostInfo, szBuffer, sizeof(struct hostent));
+
+      return kError_NoErr;
+   }
+   else
+   {
+      static unsigned long IP_Adr;
+      static char *AdrPtrs[2] = { (char *) &IP_Adr, NULL };
+
+      // That didn't work.  On some stacks a numeric IP address
+      // will not parse with gethostbyname.  Try to convert it as a
+      // numeric address before giving up.
+      if ((IP_Adr = inet_addr(szHostName)) == INADDR_NONE)
+         return kError_NoDataAvail;
+
+      pHostInfo->h_length = sizeof(uint32);
+      pHostInfo->h_addrtype = AF_INET;
+      pHostInfo->h_addr_list = (char **) &AdrPtrs;
+      return kError_NoErr;
+   }
+
+   return kError_NoDataAvail;
+}
+
+static LRESULT WINAPI
+WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+   LRESULT   result = 0;
+
+   switch (msg)
+   {
+   case WM_WINDOWS_IS_DONE_PICKING_ITS_BUTT:
+      {
+         PostMessage(hwnd, WM_QUIT, 0, 0);
+      }
+   default:
+      return DefWindowProc(hwnd, msg, wParam, lParam);
+   }
+   return result;
+}
+
+#endif
+
 Error DownloadManager::Download(DownloadItem* item)
 {
     Error result = kError_InvalidParam;
@@ -710,6 +824,21 @@ Error DownloadManager::Download(DownloadItem* item)
 
             //*m_debug << "gethostbyname: " << hostname << endl;
             hostByName = gethostbyname(server);
+#ifdef WIN32
+            Error     eRet;
+            struct hostent TempHostent;
+         
+            eRet = Win32GetHostByName(server, &TempHostent);
+            if (eRet == kError_Interrupt)
+               return eRet;
+         
+            if (IsError(eRet))
+               hostByName = NULL;
+            else
+               hostByName = &TempHostent;
+#else
+            hostByName = gethostbyname(server);
+#endif
 
             // On some stacks a numeric IP address
             // will not parse with gethostbyname.  
