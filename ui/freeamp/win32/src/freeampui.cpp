@@ -892,7 +892,15 @@ Command(int32 command,
 
         case kMinimizeControl:
         {
-            ShowWindow(m_hwnd, SW_MINIMIZE);
+            bool liveInTray;
+
+            m_prefs->GetLiveInTray(&liveInTray);
+
+            if(liveInTray)
+                ShowWindow(m_hwnd, SW_HIDE);
+            else
+                ShowWindow(m_hwnd, SW_MINIMIZE);
+
             break;
         }
 
