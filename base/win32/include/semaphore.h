@@ -26,11 +26,14 @@ ____________________________________________________________________________*/
 				
 #include <windows.h>
 
+#define SEM_LOCKED   0
+#define SEM_UNLOCKED 1
+
 #define WAIT_FOREVER INFINITE
 
 class Semaphore {
  public:
-    Semaphore(int cnt = 0);
+    Semaphore(int cnt = SEM_LOCKED);
     ~Semaphore();
     bool Wait(int ms = WAIT_FOREVER); // returns false if it times out
     void Signal();

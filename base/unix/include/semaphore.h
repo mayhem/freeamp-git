@@ -29,6 +29,9 @@ ____________________________________________________________________________*/
 
 #include <pthread.h>
 
+#define SEM_LOCKED   1
+#define SEM_UNLOCKED 2
+
 class Semaphore {
  private:
     int count;
@@ -36,7 +39,7 @@ class Semaphore {
     pthread_cond_t cond;
 
  public:
-    Semaphore(int cnt = 1);
+    Semaphore(int cnt = SEM_LOCKED);
     ~Semaphore();
     bool Wait(int ms = -1);
     bool TimedWait(int iMilliSecs);

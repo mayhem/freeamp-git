@@ -110,7 +110,7 @@ EventQueue()
     m_pmiMutex = new Mutex();
     m_pmoMutex = new Mutex();
     m_uiMutex = new Mutex();
-    m_signatureSem = new Semaphore(2);
+    m_signatureSem = new Semaphore(SEM_UNLOCKED);
     // cout << "Created mutex" << endl;
     m_imQuitting = 0;
     m_quitWaitingFor = 0;

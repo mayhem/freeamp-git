@@ -54,7 +54,7 @@ ____________________________________________________________________________*/
 #define DB Debug_v("%s:%d\n",  __FILE__, __LINE__);
 
 const int iInitialOutputBufferSize = 64512;
-static Semaphore m_xingSem(2);
+static Semaphore m_xingSem(SEM_UNLOCKED);
 
 extern    "C"
 {
