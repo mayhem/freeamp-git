@@ -630,6 +630,19 @@ DB
     
     if (oElement == string("Panel"))
     {
+       Rect    oRect;
+       Pos     oPos;
+       Bitmap *pBitmap;
+       Canvas *pCanvas;
+
+       pCanvas = m_pCurrentWindow->GetCanvas();
+       if (pCanvas->GetBackgroundBitmap())
+       {
+           m_oLastError = string("Do not use a <BackgroundBitmap> tag in "
+                                 "conjunction with a <Panel>."); 
+           return kError_InvalidParam;
+       }
+
        if (m_pCurrentWindow == NULL)
        {
            m_oLastError = string("<Panel> must occur inside "
@@ -642,74 +655,35 @@ DB
            m_oLastError = string("the <Panel> tag needs a Name attribute");
            return kError_ParseError;
        }        
-
-       m_pCurrentPanel = new Panel;
-       m_pCurrentPanel->m_oName = oAttrMap["Name"];
-       return kError_NoErr;
-    }
-
-    if (oElement == string("Open"))
-    {
-       Bitmap *pBitmap;
-       Rect    oRect;
-
-       if (m_pCurrentPanel == NULL)
+       if (oAttrMap.find("ZOrder") == oAttrMap.end())
        {
-           m_oLastError = string("<Open> must occur inside "
-                                 "of a <Panel> tag");
-           return kError_InvalidParam;
-       }
-       if (oAttrMap.find("Name") == oAttrMap.end())
-       {
-           m_oLastError = string("the <Open> tag needs a Name attribute");
+           m_oLastError = string("the <Panel> tag needs a ZOrder attribute");
            return kError_ParseError;
        }        
        if (oAttrMap.find("Rect") == oAttrMap.end())
        {
-           m_oLastError = string("the <Open> tag needs a Rect attribute");
+           m_oLastError = string("the <Panel> tag needs a Rect attribute");
            return kError_ParseError;
        }        
-       eRet = ParseRect(oAttrMap["Rect"], oRect);
-       if (eRet != kError_NoErr)
+       if (oAttrMap.find("Pos") == oAttrMap.end())
        {
-           m_oLastError = string("Improperly formatted Rect coordinates: ") +
-                          oAttrMap["Rect"];
-           return kError_InvalidParam;
-       }
-       pBitmap = FindBitmap(oAttrMap["Name"]);
+           m_oLastError = string("the <Panel> tag needs a Pos attribute");
+           return kError_ParseError;
+       }        
+       if (oAttrMap.find("Bitmap") == oAttrMap.end())
+       {
+           m_oLastError = string("the <Panel> tag needs a Name attribute");
+           return kError_ParseError;
+       }        
+       pBitmap = FindBitmap(oAttrMap["Bitmap"]);
        if (pBitmap == NULL)
        {
            m_oLastError = string("Undefined bitmap ") +
                           oAttrMap["Name"] +
-                          string(" in tag <Open>");
+                          string(" in tag <Panel>");
            return kError_InvalidParam;
        }
-       m_pCurrentPanel->m_oOpenRect = oRect;
-       m_pCurrentPanel->m_pOpenBitmap = pBitmap;
-       return kError_NoErr;
-    }
-    if (oElement == string("Closed"))
-    {
-       Bitmap *pBitmap;
-       Rect    oRect;
-       Pos     oPos;
 
-       if (m_pCurrentPanel == NULL)
-       {
-           m_oLastError = string("<Closed> must occur inside "
-                                 "of a <Panel> tag");
-           return kError_InvalidParam;
-       }
-       if (oAttrMap.find("Name") == oAttrMap.end())
-       {
-           m_oLastError = string("the <Closed> tag needs a Name attribute");
-           return kError_ParseError;
-       }        
-       if (oAttrMap.find("Rect") == oAttrMap.end())
-       {
-           m_oLastError = string("the <Closed> tag needs a Rect attribute");
-           return kError_ParseError;
-       }        
        eRet = ParseRect(oAttrMap["Rect"], oRect);
        if (eRet != kError_NoErr)
        {
@@ -724,20 +698,12 @@ DB
                           oAttrMap["Pos"];
            return kError_InvalidParam;
        }
-       pBitmap = FindBitmap(oAttrMap["Name"]);
-       if (pBitmap == NULL)
-       {
-           m_oLastError = string("Undefined bitmap ") +
-                          oAttrMap["Name"] +
-                          string(" in tag <Opened>");
-           return kError_InvalidParam;
-       }
-       m_pCurrentPanel->m_oClosedRect = oRect;
-       m_pCurrentPanel->m_oOffset = oPos;
-       m_pCurrentPanel->m_pClosedBitmap = pBitmap;
+
+       m_pCurrentPanel = new Panel(oAttrMap["Name"], pBitmap, 
+                                   atoi(oAttrMap["ZOrder"].c_str()), oRect, oPos, 
+                                   m_pCurrentWindow);
        return kError_NoErr;
     }
-
     if (oElement == string("Controls"))
     {
        if (m_pCurrentWindow == NULL)
@@ -745,6 +711,11 @@ DB
            m_oLastError = string("<Controls> must occur inside of a "
                           "<Window> tag");
            return kError_InvalidParam;
+       }
+
+       if (m_pCurrentPanel == NULL)
+       {
+           m_pCurrentPanel = new Panel(m_pCurrentWindow);
        }
 
        return kError_NoErr;
@@ -933,7 +904,6 @@ DB
        m_eCurrentControl = eTextControl;
        m_pCurrentControl = new TextControl(m_pCurrentWindow,
                                            oAttrMap["Name"]);
-                                               
        return kError_NoErr;
     }
 
@@ -1516,8 +1486,6 @@ Error Theme::EndElement(string &oElement)
     if (oElement == string("Bitmap") ||
         oElement == string("BackgroundBitmap") ||
         oElement == string("TogglePanel") ||
-        oElement == string("Open") ||
-        oElement == string("Closed") ||
         oElement == string("Font") ||
         oElement == string("ChangeWindow") ||
         oElement == string("ThemeInfo") ||
@@ -1589,7 +1557,7 @@ Error Theme::EndElement(string &oElement)
            }    
        }
 
-       m_pCurrentWindow->AddControl(m_pCurrentControl);
+       m_pCurrentPanel->AddControl(m_pCurrentControl);
        m_pCurrentControl = NULL;
        m_eCurrentControl = eUndefinedControl;
 
@@ -1600,6 +1568,13 @@ Error Theme::EndElement(string &oElement)
     {
        if (!m_pParsedWindows)
            m_pParsedWindows = new vector<Window *>;
+
+       if (m_pCurrentPanel)
+       {
+          m_oPanels.push_back(m_pCurrentPanel);
+          m_pCurrentWindow->AddPanel(m_pCurrentPanel);
+          m_pCurrentPanel = NULL;
+       }
 
        m_pParsedWindows->push_back(m_pCurrentWindow);
        m_oPanels.clear();
@@ -1620,7 +1595,7 @@ Error Theme::EndElement(string &oElement)
 
     if (oElement == string("PixmapTimeControl"))
     {
-       m_pCurrentWindow->AddControl(m_pCurrentControl);
+       m_pCurrentPanel->AddControl(m_pCurrentControl);
        m_pCurrentControl = NULL;
        m_eCurrentControl = eUndefinedControl;
 
@@ -1662,7 +1637,8 @@ Panel *Theme::FindPanel(string &oName)
 
     for(i = m_oPanels.begin(); i != m_oPanels.end(); i++)
     {
-       if ((*i)->m_oName == oName)
+       (*i)->GetName(oTemp);
+       if (oTemp == oName)
           return *i;
     }
 

@@ -942,7 +942,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
        return kError_NoErr;
    }
    
-   if (strncmp(oControlName.c_str(), "Eq", 2) == 0 && eMesg == CM_SliderUpdate)
+   if (eMesg == CM_SliderUpdate && strncmp(oControlName.c_str(), "Eq", 2) == 0)
    {
        string oName("Info"), oDesc;
        char   szText[20];

@@ -412,3 +412,11 @@ bool Control::WantsTimingMessages(void)
 {
     return m_bWantsTimingMessages;
 }
+
+void Control::Move(Pos &oPos)
+{
+    m_oRect.x1 += oPos.x;
+    m_oRect.y1 += oPos.y;
+    m_oRect.x2 += oPos.x;
+    m_oRect.y2 += oPos.y;
+}

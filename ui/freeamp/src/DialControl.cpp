@@ -85,9 +85,9 @@ void DialControl::Transition(ControlTransitionEnum  eTrans,
            m_oMutex.Release();
            break;
 
-	   case CT_Show:
-		   Init();
-		   break;
+       case CT_Show:
+           Init();
+           break;
 
        default:
           break;
@@ -98,23 +98,23 @@ void DialControl::Transition(ControlTransitionEnum  eTrans,
     {    
        Pos oTemp;
        
-	   m_pParent->StartMouseCapture(this);
+       m_pParent->StartMouseCapture(this);
        m_pParent->GetMousePos(oTemp);
        
        m_oMutex.Acquire();
        m_oOrigin = oTemp;
        m_oMutex.Release();
        
-	   m_pParent->HideMouse(true);
+       m_pParent->HideMouse(true);
        return;
     }
 
     if (m_eCurrentState != CS_Dragging && 
         m_eLastState == CS_Dragging)
     {    
-	   m_pParent->EndMouseCapture();
+       m_pParent->EndMouseCapture();
        m_pParent->SetMousePos(m_oOrigin);
-	   m_pParent->HideMouse(false);
+       m_pParent->HideMouse(false);
        m_pParent->SendControlMessage(this, CM_ValueChanged);
        return;
     }   

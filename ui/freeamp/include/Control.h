@@ -149,6 +149,7 @@ class Control
       virtual bool WantsTimingMessages(void);
       virtual bool UseToDragWindow(void) { return false; };
       virtual void Init(void) = 0;
+      virtual void Move(Pos &oPos);
       virtual void AcceptTransition(ControlTransitionEnum eTrans,
                                     Pos *pMousePos = NULL);
 

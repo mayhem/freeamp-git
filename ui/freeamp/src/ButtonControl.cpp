@@ -168,7 +168,7 @@ void ButtonControl::Transition(ControlTransitionEnum  eTrans,
        }
        if (m_pPanelToToggle)
        {
-           m_pPanelToToggle->m_bIsOpen = !m_pPanelToToggle->m_bIsOpen;
+           m_pPanelToToggle->OpenPanel(!m_pPanelToToggle->IsOpen());
            m_pParent->SendControlMessage(this, CM_TogglePanel);
            return;
        }

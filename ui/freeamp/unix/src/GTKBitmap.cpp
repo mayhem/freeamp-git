@@ -64,7 +64,7 @@ GTKBitmap::GTKBitmap(string &oName)
     m_height = 0;
 }
 
-GTKBitmap::GTKBitmap(int iWidth, int iHeight, string &oName) 
+GTKBitmap::GTKBitmap(int iWidth, int iHeight, const string &oName) 
           :Bitmap(oName)
 {
     m_oBitmapName = oName;
