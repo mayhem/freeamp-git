@@ -1091,6 +1091,14 @@ RioThreadFunction()
 
             rio->TxDirectory();
         }
+        else
+        {
+            m_target->AcceptEvent(new StatusMessageEvent("Error Reading Directory"));
+        }
+    }
+    else
+    {
+        m_target->AcceptEvent(new StatusMessageEvent("Unable to find Rio!"));
     }
 
     delete rio;
