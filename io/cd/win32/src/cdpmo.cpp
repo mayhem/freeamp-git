@@ -128,8 +128,13 @@ Error CDPMO::SetTo(const char *url)
 
    m_track = atoi(tracknumber);
 
-   if (m_track < 1 || m_track > MAX_TRACKS)
+   if (m_track < 1 || m_track > MAX_TRACKS) {
+	   char errormsg[256];
+	   sprintf(errormsg, "Attempting to play an invalid track %d", m_track);
+	   ReportError(errormsg);
+
        return kError_InvalidTrack;
+   }
 
    cd_play_track(m_cdDesc, m_track, m_track);
 
@@ -139,58 +144,69 @@ Error CDPMO::SetTo(const char *url)
 
 Error CDPMO::Init(OutputInfo *info)
 {
+   Error retvalue = (Error)pmoError_DeviceOpenFailed;
    char device[256];
    uint32 len = 256;
+   int initreturn;
+   uint32 tracks = 0;
 
-   if (IsError(m_pContext->prefs->GetCDDevicePath(device, &len)))
-           return (Error)pmoError_DeviceOpenFailed;
+   cddbid = 0;
+   cdindexid = "";
+
+   if (IsError(m_pContext->prefs->GetCDDevicePath(device, &len))) {
+       CDInfoEvent *cie = new CDInfoEvent(tracks, cddbid, (char *)cdindexid.c_str());
+       m_pTarget->AcceptEvent(cie);
+       return retvalue;
+   }
 
    m_cdDesc = device;
    if (m_cdDesc == "") 
 	   m_cdDesc = "cdaudio";
    
-   int retvalue;
-   char errormsg[256];
-
-   if ((retvalue = cd_init_device(m_cdDesc)) != 0) {
+   if ((initreturn = cd_init_device(m_cdDesc)) != 0) {
        if (info) {
-           mciGetErrorString(retvalue, errormsg, 256);
+		   char errormsg[256];
+           mciGetErrorString(initreturn, errormsg, 256);
            ReportError(errormsg);
 	   }
-       return (Error)pmoError_DeviceOpenFailed;
+       CDInfoEvent *cie = new CDInfoEvent(tracks, cddbid, (char *)cdindexid.c_str());
+       m_pTarget->AcceptEvent(cie);
+       return retvalue;
    }
 
-   cddbid = 0;
-   cdindexid = "";
+   retvalue = kError_NoDiscInDrive;
 
    if (cd_stat(m_cdDesc, &dinfo, false) < 0) {
        if (info)
            ReportError("There is no disc in the CD-ROM drive.");
-       return kError_NoDiscInDrive;
+       CDInfoEvent *cie = new CDInfoEvent(tracks, cddbid, (char *)cdindexid.c_str());
+       m_pTarget->AcceptEvent(cie);
+       return retvalue;
    }
    
    if (!dinfo.disc_present) {
        if (info)
            ReportError("There is no disc in the CD-ROM drive.");
-       return kError_NoDiscInDrive;
+       CDInfoEvent *cie = new CDInfoEvent(tracks, cddbid, (char *)cdindexid.c_str());
+       m_pTarget->AcceptEvent(cie);
+       return retvalue;
    }
+
+   retvalue = kError_NoErr;
 
    cd_stat(m_cdDesc, &dinfo);
 
-   uint32 tracks = dinfo.disc_total_tracks;
+   tracks = dinfo.disc_total_tracks;
    cddbid = cddb_direct_discid(dinfo);
+
    char *cdindex = new char[256];
    cdindex_direct_discid(dinfo, cdindex, 256);
-
    cdindexid = cdindex;
+   delete [] cdindex;
 
-   CDInfoEvent *cie = new CDInfoEvent(tracks, cddbid, cdindex);
-
+   CDInfoEvent *cie = new CDInfoEvent(tracks, cddbid, (char *)cdindexid.c_str());
    m_pTarget->AcceptEvent(cie);
-
-   delete cdindex;
-
-   return kError_NoErr;
+   return retvalue;
 }
 
 uint32 CDPMO::GetCDDBDiscID(void)
@@ -286,8 +302,10 @@ void CDPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
        sentData = true;
    }
 
-   if (m_track != disc.disc_current_track)
+   if (m_track != disc.disc_current_track) {
        trackDone = true;
+	   return;
+   }
     
    int iTotalTime = disc.disc_track_time.minutes * 60 + 
                     disc.disc_track_time.seconds; 
