@@ -93,7 +93,7 @@ APSInterface::APSInterface(char *profilePath, const char* pIP,
 
     if (!m_strCurrentProfile.empty()) {
         ChangeProfile(m_strCurrentProfile.c_str());
-        SyncLog();
+        //SyncLog();
     }
 }
 

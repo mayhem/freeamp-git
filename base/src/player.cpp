@@ -209,7 +209,7 @@ Player(FAContext *context) : EventQueue()
 
     // Add timer for sync-ing the log to the relatable servers
     // only works if a profile is currently active
-    m_context->timerManager->StartTimer(&m_syncTimer, synclog_timer, 1800, this);
+    m_context->timerManager->StartTimer(&m_syncTimer, synclog_timer, 180, this);
 }
 
 #define TYPICAL_DELETE(x) /*printf("deleting...\n");*/ if (x) { delete x; x = NULL; }
