@@ -2,7 +2,7 @@
 
   FreeAmp - The Free MP3 Player
 
-  Copyright (C) 2000 Micheal Rich
+  Copyright (C) 2000 Michael Rich
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
