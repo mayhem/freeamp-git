@@ -30,8 +30,8 @@
 ;
 
 .386
-FLAT	group _TEXT
-	assume cs:FLAT, ds:FLAT, ss:FLAT
+;FLAT	group _TEXT
+;	assume cs:FLAT, ds:FLAT, ss:FLAT
 _TEXT	segment para public use32 'CODE'
 
 
@@ -59,11 +59,11 @@ _window_dual proc near
 ; First 16
 	mov dh,16		; i = 16
 	align 4
-.FirstOuter:
+FirstOuter:
 	fldz			; sum = 0.0
 	mov dl,2		; j = 2
 	align 4
-.FirstInner:
+FirstInner:
 ; REPEAT 4		; Unrolled loop
 	fld DWORD PTR [ecx]		; Push *coef
 	fmul DWORD PTR [ebp+esi*4]	; Multiply by vbuf[si]
@@ -124,7 +124,7 @@ _window_dual proc near
 ; END REPEAT
 
 	dec dl		; --j
-	jg .FirstInner		; Jump back if j > 0
+	jg FirstInner		; Jump back if j > 0
 
 	fistp DWORD PTR [esp]		; tmp = (long) round (sum)
 	inc esi		; si++
@@ -134,12 +134,12 @@ _window_dual proc near
 	sar eax,15
 	inc eax
 	sar eax,1
-	jz .FirstInRange	; Jump if in range
+	jz FirstInRange	; Jump if in range
 
 	sar eax,16		; Out of range
 	mov edi,32767
 	xor edi,eax
-.FirstInRange:
+FirstInRange:
 	mov eax,DWORD PTR [esp+32]
 	mov WORD PTR [eax],di		; Store sample in *pcm
 	add eax,4		; Increment pcm
@@ -147,14 +147,14 @@ _window_dual proc near
 	mov DWORD PTR [esp+32],eax
 
 	dec dh		; --i
-	jg .FirstOuter		; Jump back if i > 0
+	jg FirstOuter		; Jump back if i > 0
 
 
 ; Special case
 	fldz			; sum = 0.0
 	mov dl,4		; j = 4
 	align 4
-.SpecialInner:
+SpecialInner:
 ; REPEAT 2		; Unrolled loop
 	fld DWORD PTR [ecx]		; Push *coef
 	fmul DWORD PTR [ebp+ebx*4]	; Multiply by vbuf[bx]
@@ -173,7 +173,7 @@ _window_dual proc near
 ; END REPEAT
 
 	dec dl		; --j
-	jg .SpecialInner	; Jump back if j > 0
+	jg SpecialInner	; Jump back if j > 0
 
 	fistp DWORD PTR [esp]		; tmp = (long) round (sum)
 	dec esi		; si--
@@ -183,12 +183,12 @@ _window_dual proc near
 	sar eax,15
 	inc eax
 	sar eax,1
-	jz .SpecialInRange	; Jump if within range
+	jz SpecialInRange	; Jump if within range
 
 	sar eax,16		; Out of range
 	mov edi,32767
 	xor edi,eax
-.SpecialInRange:
+SpecialInRange:
 	mov eax,DWORD PTR [esp+32]
 	sub ecx,36		; Readjust coef pointer for last round
 	mov WORD PTR [eax],di		; Store sample in *pcm
@@ -200,11 +200,11 @@ _window_dual proc near
 ; Last 15
 	mov dh,15		; i = 15
 	align 4
-.LastOuter:
+LastOuter:
 	fldz			; sum = 0.0
 	mov dl,2		; j = 2
 	align 4
-.LastInner:
+LastInner:
 ; REPEAT 4		; Unrolled loop
 	fld DWORD PTR [ecx]		; Push *coef
 	fmul DWORD PTR [ebp+esi*4]	; Multiply by vbuf[si]
@@ -265,7 +265,7 @@ _window_dual proc near
 ; END REPEAT
 
 	dec dl		; --j
-	jg .LastInner		; Jump back if j > 0
+	jg LastInner		; Jump back if j > 0
 
 	fistp DWORD PTR [esp]		; tmp = (long) round (sum)
 	dec esi		; si--
@@ -275,12 +275,12 @@ _window_dual proc near
 	sar eax,15
 	inc eax
 	sar eax,1
-	jz .LastInRange		; Jump if in range
+	jz LastInRange		; Jump if in range
 
 	sar eax,16		; Out of range
 	mov edi,32767
 	xor edi,eax
-.LastInRange:
+LastInRange:
 	mov eax,DWORD PTR [esp+32]
 	mov WORD PTR [eax],di		; Store sample in *pcm
 	add eax,4		; Increment pcm
@@ -288,7 +288,7 @@ _window_dual proc near
 	mov DWORD PTR [esp+32],eax
 
 	dec dh		; --i
-	jg .LastOuter		; Jump back if i > 0
+	jg LastOuter		; Jump back if i > 0
 
 ; Restore regs and return
 	add esp,4
@@ -313,7 +313,7 @@ _fdct32 proc near
 	mov ecx,16		; n = 32 / 2
 
 	align 4
-.ForwardOuterLoop:
+ForwardOuterLoop:
 	mov ebx,DWORD PTR [esp+4]	; ebx = m (temporarily)
 	mov esi,DWORD PTR [esp+32]	; esi = f
 	mov DWORD PTR [esp+0],ebx	; mi = m
@@ -327,14 +327,14 @@ _fdct32 proc near
 	sal ecx,3		; n *= 8
 
 	align 4
-.ForwardMiddleLoop:
+ForwardMiddleLoop:
 	mov eax,ecx		; q = n
 	xor edx,edx		; p = 0
 	test eax,8
-	jnz .ForwardInnerLoop1
+	jnz ForwardInnerLoop1
 
 	align 4
-.ForwardInnerLoop:
+ForwardInnerLoop:
 	sub eax,4		; q -= 4
 	fld DWORD PTR [edi+eax]	; push x[q]
 	fld DWORD PTR [edi+edx]	; push x[p]
@@ -347,7 +347,7 @@ _fdct32 proc near
 	fstp DWORD PTR [ebx+edx]	; f2[p] = coef[p] * (x[p] - x[q])
 	add edx,4		; p += 4
 
-.ForwardInnerLoop1:
+ForwardInnerLoop1:
 	sub eax,4		; q -= 4
 	fld DWORD PTR [edi+eax]	; push x[q]
 	fld DWORD PTR [edi+edx]	; push x[p]
@@ -361,16 +361,16 @@ _fdct32 proc near
 	add edx,4		; p += 4
 
 	cmp edx,eax
-	jb .ForwardInnerLoop	; Jump back if (p < q)
+	jb ForwardInnerLoop	; Jump back if (p < q)
 
 	add esi,ecx		; f += n
 	add ebx,ecx		; f2 += n
 	add edi,ecx		; x += n
 	dec DWORD PTR [esp+0]		; mi--
-	jg .ForwardMiddleLoop	; Jump back if mi > 0
+	jg ForwardMiddleLoop	; Jump back if mi > 0
 
 	sar ecx,4		; n /= 16
-	jg .ForwardOuterLoop	; Jump back if n > 0
+	jg ForwardOuterLoop	; Jump back if n > 0
 
 
 ; Setup back loop
@@ -378,7 +378,7 @@ _fdct32 proc near
 	mov ecx,ebx		; n = 4 * 2
 
 	align 4
-.BackOuterLoop:
+BackOuterLoop:
 	mov esi,DWORD PTR [esp+32]	; esi = f
 	mov DWORD PTR [esp+0],ebx	; mi = m
 	mov edi,DWORD PTR [esp+28]	; edi = x
@@ -390,7 +390,7 @@ _fdct32 proc near
 	sal ecx,1		; n *= 2
 
 	align 4
-.BackMiddleLoop:
+BackMiddleLoop:
 	mov ebp,DWORD PTR [ebx+ecx-4]
 	mov DWORD PTR [esi+ecx-8],ebp	; f[n - 8] = x2[n - 4]
 	fld DWORD PTR [edi+ecx-4]	; push x[n - 4]
@@ -399,7 +399,7 @@ _fdct32 proc near
 	lea edx,DWORD PTR [ecx-16]	; p = n - 16
 
 	align 4
-.BackInnerLoop:
+BackInnerLoop:
 	mov ebp,DWORD PTR [ebx+eax]
 	mov DWORD PTR [esi+edx],ebp	; f[p] = x2[q]
 	fld DWORD PTR [edi+eax]	; push x[q]
@@ -408,18 +408,18 @@ _fdct32 proc near
 	fstp DWORD PTR [esi+edx+4]	; f[p + 4] = x[q] + x[q + 4]
 	sub eax,4		; q -= 4
 	sub edx,8		; p -= 8
-	jge .BackInnerLoop	; Jump back if p >= 0
+	jge BackInnerLoop	; Jump back if p >= 0
 
 	fstp DWORD PTR [esp-4]		; Pop (XXX is there a better way to do this?)
 	add esi,ecx		; f += n
 	add ebx,ecx		; x2 += n
 	add edi,ecx		; x += n
 	dec DWORD PTR [esp+0]		; mi--
-	jg .BackMiddleLoop	; Jump back if mi > 0
+	jg BackMiddleLoop	; Jump back if mi > 0
 
 	mov ebx,DWORD PTR [esp+4]	; ebx = m (temporarily)
 	sar ebx,1		; Halve m for next iter
-	jg .BackOuterLoop	; Jump back if m > 0
+	jg BackOuterLoop	; Jump back if m > 0
 
 
 	add esp,8
