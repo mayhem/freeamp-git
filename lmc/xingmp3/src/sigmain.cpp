@@ -217,7 +217,7 @@ int main(int argc, char *argv[])
        }
        hasmeta = true;
    }
-    
+   
    if (hasmeta || nosubmit)
    {
        if (ff_decode(argv[index], sig, 0, 0, 0, 24000, 0))

@@ -234,12 +234,6 @@ bool MetaDataSort::operator() (MetaDataFormat* item1,
 }
 
 
-// return an integral random number in the range 0 - (n - 1)
-static int my_rand(int n)
-{
-    return (int)((float)n * rand() / (RAND_MAX + 1.0));
-}
-
 // Implementation of the PlaylistManager Class
 PlaylistManager::PlaylistManager(FAContext* context)
 {
@@ -429,9 +423,12 @@ PlaylistManager::~PlaylistManager()
     m_context->prefs->SetPrefInt32(kPlaylistRepeatPref, m_repeatMode);
 }
 
-void PlaylistManager::ShuffleIt(void)
+void PlaylistManager::ShuffleIt(vector<PlaylistItem *> *toBeShuffled)
 {
-    int max = m_shuffleList.size();
+    if (!toBeShuffled)
+        toBeShuffled = &m_shuffleList;
+
+    int max = toBeShuffled->size();
     vector<PlaylistItem *> tempShuffled;
 
     srand((unsigned int)time(NULL));
@@ -458,16 +455,16 @@ void PlaylistManager::ShuffleIt(void)
                 used = true;
         } 
         usedList[index] = true;
-        PlaylistItem *dupe = m_shuffleList[index];
+        PlaylistItem *dupe = (*toBeShuffled)[index];
         tempShuffled.push_back(dupe);
         used = true;
         lastindex = index;
     }
 
-    m_shuffleList.erase(m_shuffleList.begin(), m_shuffleList.end());
+    toBeShuffled->erase(toBeShuffled->begin(), toBeShuffled->end());
     vector<PlaylistItem *>::iterator iter = tempShuffled.begin();
     for (; iter != tempShuffled.end(); iter++) 
-        m_shuffleList.push_back(*iter);
+        toBeShuffled->push_back(*iter);
 }
 
 Error PlaylistManager::SetCurrentItem(PlaylistItem* item)
@@ -1664,9 +1661,7 @@ Error PlaylistManager::Sort(PlaylistSortKey key, PlaylistSortType type)
     }
     else if(key == kPlaylistSortKey_Random)
     {
-        pointer_to_unary_function<int, int> lRand = 
-                       pointer_to_unary_function<int, int>(my_rand);
-        random_shuffle(m_activeList->begin(), m_activeList->end(), lRand);
+        ShuffleIt(m_activeList);
         
         m_sortKey = key;
         m_sortType = type;
@@ -2440,10 +2435,7 @@ void PlaylistManager::AddItemToShuffleList(PlaylistItem* item)
 
 void PlaylistManager::AddItemsToShuffleList(vector<PlaylistItem*>* list)
 {
-    pointer_to_unary_function<int, int> lRand = 
-                   pointer_to_unary_function<int, int>(my_rand);
-
-    random_shuffle(list->begin(), list->end(), lRand);
+    ShuffleIt(list);
 
     m_shuffleList.insert(m_shuffleList.end(),
                          list->begin(), 

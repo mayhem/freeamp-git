@@ -249,6 +249,17 @@ class GTKMusicBrowser {
     GtkStyle *redStyle;
     GtkStyle *greenStyle;
 
+    GdkPixmap *album_pmap;
+    GdkBitmap *album_mask;
+    GdkPixmap *artist_pmap;
+    GdkBitmap *artist_mask;
+    GdkPixmap *playlist_pmap;
+    GdkBitmap *playlist_mask;
+    GdkPixmap *track_pmap;
+    GdkBitmap *track_mask;
+    GdkPixmap *stream_pmap;
+    GdkBitmap *stream_mask;
+    
     void ChangeCurrentPlayingIndex(uint32 oldindex, uint32 newindex);
 
     void SetStatusText(const char *text);

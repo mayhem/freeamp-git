@@ -288,9 +288,11 @@ void CDPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
        sentData = true;
    }
 
-   if (m_track != disc.disc_current_track) {
+   if (m_track < disc.disc_current_track || (disc.disc_mode != CDAUDIO_PLAYING
+       && disc.disc_mode != CDAUDIO_PAUSED))
+   {
        trackDone = true;
-    }
+   }
     
    int iTotalTime = disc.disc_track_time.minutes * 60 + 
                     disc.disc_track_time.seconds; 

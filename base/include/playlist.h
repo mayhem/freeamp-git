@@ -366,7 +366,7 @@ class PlaylistManager {
 
 
  private:
-    void ShuffleIt(void);
+    void ShuffleIt(vector<PlaylistItem *> *toBeShuffled = NULL);
     
     FAContext* m_context;
 
