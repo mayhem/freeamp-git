@@ -160,7 +160,7 @@ Error ThemeZip::CompressThemeZip(const string &oDestFile,
        TarRecord.header.size[11]='\x20';
 
        time(&ltime);
-       sprintf(TarRecord.header.mtime,"%11o",ltime);
+       sprintf(TarRecord.header.mtime,"%11lo",ltime);
        TarRecord.header.mtime[11]='\x20';
 
        TarRecord.header.typeflag = REGTYPE; // normal file
@@ -170,7 +170,7 @@ Error ThemeZip::CompressThemeZip(const string &oDestFile,
        // last, create checksum
        memcpy(TarRecord.header.chksum,CHKBLANKS,8);
        int ctr,sum;
-       for(ctr=sum=0;ctr<sizeof(tar_record);ctr++) 
+       for(ctr=sum=0;ctr<(int)sizeof(tar_record);ctr++) 
            sum+=TarRecord.charptr[ctr];
        sprintf(TarRecord.header.chksum,"%6o",sum);
 
@@ -313,7 +313,7 @@ Error ThemeZip::DecompressThemeZip(const string &oSrcFile,
 
        // check if we are done (header record all 0)
        int ctr,sum;
-       for(ctr=sum=0; ctr<sizeof(tar_record); ctr++) 
+       for(ctr=sum=0; ctr<(int)sizeof(tar_record); ctr++) 
            sum+=TarRecord.charptr[ctr];
        if(sum==0)
        {
@@ -335,7 +335,7 @@ Error ThemeZip::DecompressThemeZip(const string &oSrcFile,
        // check if checksum is still OK
        int our_sum = from_oct(6,TarRecord.header.chksum);
        memcpy(TarRecord.header.chksum,CHKBLANKS,8);
-       for(ctr=sum=0;ctr<sizeof(tar_record);ctr++) 
+       for(ctr=sum=0;ctr<(int)sizeof(tar_record);ctr++) 
            sum+=TarRecord.charptr[ctr];
        if(sum!=our_sum)
        {
@@ -477,7 +477,7 @@ Error ThemeZip::GetDescriptiveName(const string &oSrcFile, string &oDescriptiveN
 
         // check if we are done (header record all 0)
         int ctr,sum;
-        for(ctr=sum=0; ctr<sizeof(tar_record); ctr++) 
+        for(ctr=sum=0; ctr<(int)sizeof(tar_record); ctr++) 
             sum+=TarRecord.charptr[ctr];
         if(sum==0)
         {
@@ -497,7 +497,7 @@ Error ThemeZip::GetDescriptiveName(const string &oSrcFile, string &oDescriptiveN
         // check if checksum is still OK
         int our_sum = from_oct(6,TarRecord.header.chksum);
         memcpy(TarRecord.header.chksum,CHKBLANKS,8);
-        for(ctr=sum=0;ctr<sizeof(tar_record);ctr++) 
+        for(ctr=sum=0;ctr<(int)sizeof(tar_record);ctr++) 
             sum+=TarRecord.charptr[ctr];
         if(sum!=our_sum)
         {

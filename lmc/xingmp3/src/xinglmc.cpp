@@ -786,7 +786,7 @@ Error XingLMC::BeginRead(void *&pBuffer, unsigned int iBytesNeeded,
 {
    time_t iNow;
    int32  iInPercent, iOutPercent;
-   unsigned iBufferUpBytes;
+   unsigned int iBufferUpBytes;
 
    if (m_fpFile)
    {
@@ -796,7 +796,7 @@ Error XingLMC::BeginRead(void *&pBuffer, unsigned int iBytesNeeded,
        m_pLocalReadBuffer = (char*)pBuffer;
        
        iRead = fread(pBuffer, sizeof(char), iBytesNeeded, m_fpFile);
-       if (iRead != iBytesNeeded)
+       if (iRead != (int)iBytesNeeded)
           return kError_ReadFile;
           
        return kError_NoErr;
