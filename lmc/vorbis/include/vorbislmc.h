@@ -62,14 +62,14 @@ class VorbisLMC : public LogicalMediaConverter
    virtual Error Prepare(PullBuffer *pInputBuffer, PullBuffer *&pOutBuffer);
    virtual Error InitDecoder();
 
-   virtual vector<char *> *GetExtensions(void);
+   virtual vector<const char *> *GetExtensions(void);
 
-   virtual Error SetEQData(float *f) { ; };
-   virtual Error SetEQData(bool b) { ; };
+   virtual Error SetEQData(float *f) { return kError_YouScrewedUp; };
+   virtual Error SetEQData(bool b) { return kError_YouScrewedUp; };
    
  private:
 
-   static int    SeekWrapper(void *stream, long offset, int whence);
+   static int    SeekWrapper(void *stream, int64_t offset, int whence);
    static long   TellWrapper(void *stream);
    static int CloseWrapper(void *stream);
    static size_t ReadWrapper(void *buf, size_t size, size_t num, void *stream);

@@ -121,9 +121,9 @@ void VorbisLMC::Clear()
       ((EventBuffer *)m_pOutputBuffer)->Clear();
 }
 
-vector<char *> *VorbisLMC::GetExtensions(void)
+vector<const char *> *VorbisLMC::GetExtensions(void)
 {
-   vector<char *> *extList = new vector<char *>;
+   vector<const char *> *extList = new vector<const char *>;
 
    extList->push_back("OGG");
 
@@ -417,9 +417,9 @@ Error VorbisLMC::ChangePosition(int32 position)
    return kError_NoErr;
 }
 
-int VorbisLMC::SeekWrapper(void *stream, long offset, int whence)
+int VorbisLMC::SeekWrapper(void *stream, int64_t offset, int whence)
 {
-   return ((VorbisLMC *)stream)->Seek(offset, whence);
+   return ((VorbisLMC *)stream)->Seek((int32)offset, whence);
 }
 
 int VorbisLMC::Seek(long offset, int whence)
