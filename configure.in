@@ -22,7 +22,7 @@ AC_INIT(base/src/player.cpp)
 AC_CONFIG_AUX_DIR(config)
 AC_CANONICAL_HOST
 
-AC_DEFINE_UNQUOTED(FREEAMP_VERSION, "2.0.4")
+AC_DEFINE_UNQUOTED(FREEAMP_VERSION, "2.1")
 
 AC_PROG_MAKE_SET
 
@@ -38,7 +38,7 @@ AC_CHECK_PROGS(NASM, nasm)
 dnl libcdaudio stuff
 AC_HEADER_STDC
 AC_CHECK_HEADERS(stdarg.h linux/cdrom.h linux/ucdrom.h sys/cdio.h io/cam/cdrom.h mntent.h sys/mntent.h sys/ucred.h sys/mount.h)
-AC_CHECK_FUNCS(getmntinfo snprintf)
+AC_CHECK_FUNCS(getmntinfo shmget shmat shmdt semget semctl shmctl snprintf)
 AC_FUNC_GETMNTENT
 
 AC_C_CONST

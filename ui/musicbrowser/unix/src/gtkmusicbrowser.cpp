@@ -1679,13 +1679,13 @@ static void sort_location(GTKMusicBrowser *p, guint action, GtkWidget *w)
 static void sort_normal(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
     p->iSetShuffleMode = true;
-    p->SortPlaylistEvent(kPlaylistSortKey_Random, kPlaylistSortType_Descending);
+    p->SortPlaylistEvent(kPlaylistSortKey_LastKey, kPlaylistSortType_Descending);
 }
 
 static void sort_random2(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
     p->iSetShuffleMode = true;
-    p->SortPlaylistEvent(kPlaylistSortKey_Random, kPlaylistSortType_Ascending);
+    p->SortPlaylistEvent(kPlaylistSortKey_LastKey, kPlaylistSortType_Ascending);
 }
 
 static void sort_random(GTKMusicBrowser *p, guint action, GtkWidget *w)
@@ -1943,9 +1943,6 @@ void GTKMusicBrowser::AddPlaylistItems(vector<PlaylistItem *> *items)
        if (!item) 
             continue;
 
-        while (item->GetState() == kPlaylistItemState_RetrievingMetaData)
-           usleep(10);
-
         MetaData mdata = item->GetMetaData();
         char *iText[4];
         char position[10];
@@ -1987,6 +1984,47 @@ void GTKMusicBrowser::AddPlaylistItems(vector<PlaylistItem *> *items)
     gtk_clist_select_row(GTK_CLIST(playlistList), m_currentindex, 0);
     gtk_clist_moveto(GTK_CLIST(playlistList), m_currentindex, 0, 0.5, -1);
     gtk_clist_thaw(GTK_CLIST(playlistList));
+}
+
+void GTKMusicBrowser::UpdatePlaylistItem(PlaylistItem *item)
+{
+    if (!item)
+        return;
+
+    uint32 pos = m_plm->IndexOf(item);
+
+    if (pos == kInvalidIndex)
+        return;
+
+    MetaData mdata = item->GetMetaData();
+    char *iText[4];
+    char position[10];
+    char *title;
+    char *artist;
+    char length[50];
+
+    sprintf(position, "%d", pos + 1);
+    title = (char *)mdata.Title().c_str();
+    artist = (char *)mdata.Artist().c_str();
+
+    if (mdata.Time() == 0)
+        sprintf(length, "Unknown");
+    else {
+        int secs = mdata.Time();
+        if (secs > 3600)
+           sprintf(length, "%d:%02d:%02d", secs / 3600, (secs / 60) % 60,
+                    secs % 60);
+        else
+            sprintf(length, "%d:%02d", (secs / 60) % 60, secs % 60);
+    }
+
+    iText[0] = position;
+    iText[1] = title;
+    iText[2] = artist;
+    iText[3] = length;
+
+    for (uint32 count = 0; count < 4; count++) 
+         gtk_clist_set_text(GTK_CLIST(playlistList), pos, count, iText[count]);
 }
 
 void GTKMusicBrowser::RemovePlaylistItems(vector<uint32> *indices)
@@ -2031,12 +2069,9 @@ void GTKMusicBrowser::UpdatePlaylistList(void)
         if (!item)
             continue;
 
-        while (item->GetState() == kPlaylistItemState_RetrievingMetaData)
-           usleep(10);
-
         MetaData mdata = item->GetMetaData();
         char *iText[4];
-        char position[10];
+        char position[40];
         char *title;
         char *artist;
         char length[50];
@@ -2586,7 +2621,7 @@ void GTKMusicBrowser::StartMusicSearch(bool runMain, bool intro)
 void GTKMusicBrowser::SortPlaylistEvent(PlaylistSortKey order, PlaylistSortType
                                         type)
 {
-    if (order == kPlaylistSortKey_Random) {
+    if (order == kPlaylistSortKey_LastKey) {
         if (type == kPlaylistSortType_Ascending)
             m_plm->SetShuffleMode(true);
         else
@@ -2594,7 +2629,6 @@ void GTKMusicBrowser::SortPlaylistEvent(PlaylistSortKey order, PlaylistSortType
     }
     else
         m_plm->Sort(order, type);
-    UpdatePlaylistList();
 }
 
 void GTKMusicBrowser::PopUpInfoEditor(PlaylistItem *editee)
@@ -2740,6 +2774,8 @@ void GTKMusicBrowser::ShowPlaylist(void)
 
     if (m_state == kStateExpanded)
         ExpandCollapseEvent();
+    UpdatePlaylistList();
+
     gdk_threads_leave();
 }
 
@@ -2778,6 +2814,7 @@ void GTKMusicBrowser::ShowMusicBrowser(void)
     SetToolbarType();
     if (scheduleCDredraw)
         RegenerateCDTree();
+    UpdatePlaylistList();
 
     gdk_threads_leave();
 }
@@ -2908,7 +2945,10 @@ Error GTKMusicBrowser::AcceptEvent(Event *e)
             }
             else
                 iSetShuffleMode = false;
-            if (master) {
+            break; }
+        case INFO_PlaylistSorted: {
+            PlaylistSortedEvent *pse = (PlaylistSortedEvent *)e;
+            if (pse->Manager() == m_plm) {
                 gdk_threads_enter();
                 UpdatePlaylistList();
                 gdk_threads_leave();
@@ -2974,9 +3014,6 @@ Error GTKMusicBrowser::AcceptEvent(Event *e)
                 gdk_threads_leave();
             }
             break; }
-        case INFO_PlaylistCurrentItemInfo: {
-            m_playingindex = m_plm->GetCurrentIndex();
-            break; }
         case INFO_CDDiscStatus: {
             CDInfoEvent *cie = (CDInfoEvent *)e;
 
@@ -2992,19 +3029,6 @@ Error GTKMusicBrowser::AcceptEvent(Event *e)
                     scheduleCDredraw = true;
             }
             break; }
-        case INFO_PlaylistItemUpdated: {
-            PlaylistItemUpdatedEvent *piue = (PlaylistItemUpdatedEvent *)e;
-            PlaylistItem *item = (PlaylistItem *)piue->Item();
-
-            char *url = (char *)item->URL().c_str();
-            char *ext = strrchr(url, '.');;
-            if (ext) 
-                ext++;
-            if (ext && *ext) {
-                if (!strncasecmp("CDA", ext, 3) && isVisible) 
-                    UpdateCDTree(item);
-            } 
-        }
         case INFO_PlaylistItemAdded: {
             if (m_initialized) {
                 PlaylistItemAddedEvent *piae = (PlaylistItemAddedEvent *)e;
@@ -3036,6 +3060,25 @@ Error GTKMusicBrowser::AcceptEvent(Event *e)
                     RemovePlaylistItems((vector<uint32>*)pire->Indices());
                     gdk_threads_leave();
                 }
+            }
+            break; }
+        case INFO_PlaylistItemUpdated: {
+            PlaylistItemUpdatedEvent *piue = (PlaylistItemUpdatedEvent *)e;
+            PlaylistItem *item = (PlaylistItem *)piue->Item();
+
+            char *url = (char *)item->URL().c_str();
+            char *ext = strrchr(url, '.');;
+            if (ext)
+                ext++;
+            if (ext && *ext) {
+                if (!strncasecmp("CDA", ext, 3) && isVisible)
+                    UpdateCDTree(item);
+            }
+
+            if (piue->Manager() == m_plm && isVisible) {
+                gdk_threads_enter();
+                UpdatePlaylistItem(item);
+                gdk_threads_leave();
             }
             break; }
         case INFO_PlaylistCurrentItemInfo: {

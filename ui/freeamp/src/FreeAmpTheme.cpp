@@ -234,7 +234,7 @@ void FreeAmpTheme::LoadFreeAmpTheme(void)
       oThemePath += string("themes");
       oThemePath += string(DIR_MARKER_STR);    
 
-      delete dir;
+      delete [] dir;
    }
    oThemePath += szTemp;
    
@@ -256,7 +256,7 @@ void FreeAmpTheme::LoadFreeAmpTheme(void)
    if (eRet == kError_InvalidParam)
        m_pContext->target->AcceptEvent(new Event(CMD_QuitPlayer));
        
-   delete szTemp;    
+   delete [] szTemp;    
 }
 
 
@@ -472,7 +472,7 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
          m_pWindow->ControlStringValue(oName, true, m_oTitle);
          oText = string(BRANDING": ") + string(szTitle);
          m_pWindow->SetTitle(oText);
-         delete szTitle;
+         delete [] szTitle;
 
          break;
       }
@@ -504,7 +504,7 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
              oName = string("StreamInfo");
 
          m_pWindow->ControlStringValue(oName, true, oText);
-         delete szTemp;
+         delete [] szTemp;
 
          break;
       }
@@ -542,7 +542,9 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
 
          text = new char[100];
          m_fSecondsPerFrame = info->GetSecondsPerFrame();
-         if (info->GetBitRate() == 0)
+         if (info->GetBitRate() == 1411200)
+              sprintf(text, "CD Audio");
+         else if (info->GetBitRate() == 0)
               sprintf(text, "VBR %ldkhz %s", 
                    (long int)(info->GetSampleRate() / 1000), 
                    info->GetChannels() ? "Stereo" : "Mono");
@@ -554,7 +556,7 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
 
          m_oStreamInfo = text;
          m_pWindow->ControlStringValue("StreamInfo", true, m_oStreamInfo);
-         delete text;
+         delete [] text;
       
          break;
       }
@@ -657,8 +659,8 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
           }
          
           unlink(szNewTheme);
-          delete szSavedTheme;
-          delete szNewTheme;
+          delete [] szSavedTheme;
+          delete [] szNewTheme;
           
           break;
       }
@@ -1135,7 +1137,7 @@ void FreeAmpTheme::ReloadTheme(void)
        oThemePath += string("themes");
        oThemePath += string(DIR_MARKER_STR);    
    
-       delete dir;
+       delete [] dir;
     }
     oThemePath += szTemp;
 
@@ -1154,7 +1156,7 @@ void FreeAmpTheme::ReloadTheme(void)
         oBox.Show(oMessage.c_str(), string(BRANDING), kMessageOk);
     }	
     
-    delete szTemp;
+    delete [] szTemp;
 }
 
 void FreeAmpTheme::SetVolume(int iVolume)
@@ -1468,8 +1470,8 @@ void FreeAmpTheme::DropFiles(vector<string> *pFileList)
     if (countbefore == 0)
         m_pContext->target->AcceptEvent(new Event(CMD_Play));
         
-    delete ext;
-    delete url;    
+    delete [] ext;
+    delete [] url;    
 }
 
 void FreeAmpTheme::PostWindowCreate(void)
@@ -1526,7 +1528,7 @@ void FreeAmpTheme::ShowHelp(void)
           oBox.Show(oMessage.c_str(), string(BRANDING), kMessageOk, true);
     }
 #endif
-    delete dir;
+    delete [] dir;
 }
 
 void FreeAmpTheme::update_thread(void* arg)
