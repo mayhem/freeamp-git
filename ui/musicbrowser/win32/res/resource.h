@@ -3,6 +3,7 @@
 // Used by musicbrowser.rc
 //
 #define IDS_TOOLBAR                     1
+#define IDC_RELATABLE_TEXT2             4
 #define IDB_TOOLBAR                     100
 #define IDD_MUSICBROWSER                101
 #define IDC_URL                         101
@@ -111,6 +112,7 @@
 #define IDC_RELATABLE_CAPTION1          1049
 #define IDC_RELATABLE_TEXT1             1050
 #define IDC_RELATABLE_CAPTION2          1051
+#define IDC_RELATABLE_CAPTION3          1051
 #define IDC_RELATABLE_EDIT1             1052
 #define IDC_BROWSE                      1110
 #define IDC_DRIVES                      1231

@@ -654,24 +654,24 @@ static BOOL CALLBACK IntroWizardRelatable(HWND hwnd,
 
             PROPSHEETPAGE *psp = (PROPSHEETPAGE*)lParam;
 
-            Button_SetCheck(hwndOptIn, FALSE);
-            Button_SetCheck(hwndOptOut, TRUE);
+            Button_SetCheck(hwndOptIn, TRUE);
+            Button_SetCheck(hwndOptOut, FALSE);
             break;
         }
         case WM_DRAWITEM:
         {
             DRAWITEMSTRUCT* dis = (DRAWITEMSTRUCT*)lParam;
             UINT ctrlId = wParam;
-            const char* kMsg1 = "Check out Relatable's new recommendation features\n"
-                                "This version of "the_BRANDING" offers Relatable features that automatically\n"
+            const char* kCaption1 = "Check out Relatable's new recommendation features";
+            const char* kMsg1 = "This version of "the_BRANDING" offers Relatable features that automatically\n"
                                 "recommend music playlists and streams. It's our first public test of\n"
                                 "an exciting new approach to discovering music. Relatable's system\n"
                                 "'learns' listener preferences through "the_BRANDING" and compares them\n"
                                 "with the preferences of like-minded listeners. Like virtual 'word of\n"
                                 "mouth', Relatable introduces you to music that people like\n"
-                                "you have enjoyed.\n\n"
-                                "Private by Design \n"
-                                "Please note that Relatable profiles are totally anonymous and\n"
+                                "you have enjoyed.";
+            const char* kCaption2 = "Private by Design";
+            const char* kMsg2 = "Please note that Relatable profiles are totally anonymous and\n"
                                 "individual profiles are never shared with third parties. We\n"
                                 "don't collect any personally identifiable information. Each\n"
                                 "anonymous profile is stored on Relatable's secure servers, and\n"
@@ -683,6 +683,7 @@ static BOOL CALLBACK IntroWizardRelatable(HWND hwnd,
             switch(ctrlId)
             {
                 case IDC_RELATABLE_TEXT1:
+				case IDC_RELATABLE_TEXT2:
                 {
                     HFONT font, oldFont;
 
@@ -693,9 +694,15 @@ static BOOL CALLBACK IntroWizardRelatable(HWND hwnd,
                     RECT clientRect;
                     GetClientRect(dis->hwndItem, &clientRect);
 
+					const char *msg;
+					if (ctrlId == IDC_RELATABLE_TEXT1)
+						msg = kMsg1;
+					else if (ctrlId == IDC_RELATABLE_TEXT2)
+						msg = kMsg2;
+
                     DrawText(dis->hDC,
-                             kMsg1,
-                             strlen(kMsg1),
+                             msg,
+                             strlen(msg),
                              &clientRect,
                              DT_LEFT|DT_WORDBREAK);
 
@@ -704,6 +711,43 @@ static BOOL CALLBACK IntroWizardRelatable(HWND hwnd,
                     DeleteObject(font);
                     break;
                 }
+                case IDC_RELATABLE_CAPTION1:
+                case IDC_RELATABLE_CAPTION2:
+                {
+                    HFONT font, oldFont;
+
+                    LOGFONT lf;
+
+                    GetObject(GetStockObject(DEFAULT_GUI_FONT), sizeof(LOGFONT), &lf);
+
+                    lf.lfWeight = FW_BOLD;
+
+                    font = CreateFontIndirect(&lf);
+
+                    oldFont = (HFONT)SelectObject(dis->hDC, font);
+
+                    RECT clientRect;
+                    GetClientRect(dis->hwndItem, &clientRect);
+
+                    const char* caption;
+
+                    if(ctrlId == IDC_RELATABLE_CAPTION1)
+                        caption = kCaption1;
+                    else if(ctrlId == IDC_RELATABLE_CAPTION2)
+                        caption = kCaption2;
+
+                    DrawText(dis->hDC, 
+                             caption,
+                             strlen(caption),
+                             &clientRect,
+                             DT_LEFT|DT_WORDBREAK);
+
+                    SelectObject(dis->hDC, oldFont);
+
+                    DeleteObject(font);
+
+                    break;
+                } 
             }
 
             break;
@@ -770,28 +814,20 @@ static BOOL CALLBACK IntroWizardRelatableTwo(HWND hwnd,
         {
             DRAWITEMSTRUCT* dis = (DRAWITEMSTRUCT*)lParam;
             UINT ctrlId = wParam;
-            const char* kMsg1 = "Here's how to enjoy Relatable Features\n"
-                                "Relatable automatically generates personalized playlists that are\n"
-                                                               "based on the files located on your computer and the music you\n"
-                                                               "listen to on the Web. The more you use the player, the better it\n"
-                                                               "works! You can create a profile below, or you can select the\n"
-                                                               "'Profiles' tab under 'Options' and create and save multiple\n"
-                                                               "profiles. Then, just start listening to music. After you have\n"
-                                                               "listened for a while, hit the 'Suggest' button to view and listen\n"
-                                                               "to a recommended list of songs. You can also check out\n"
-                                                               "'Recommended Streams' on the music browser window.  Learn\n"
-                                                               "more about Relatable features in the help menu.\n\n"
-                                                           //"Collecting Audio Signatures\n"
-                                                           //"Relatable's audio recognition technology enables "the_BRANDING" to\n"
-                                                               //"create unique'signatures' for the music files on your hard drive.\n"
-                                                               //"It lets the player identify each song file, even if the file is not\n"
-                                                               //"properly tagged. This helps everyone receive recommendations, since the system is sure what music you have.\n"
-                                                           //"Signaturing will carry on in the background for a few minutes, and takes less\n"
-                                                           //"than 2 seconds per music file (and getting faster!). You can stop it by selecting\n"
-                                                           //"'Stop Signaturing' from the Relatable menu in 'My Music'.\n"
-                                                           "Check out the help menu for details on Relatable features, and for\n"
-                                                               "more information, please see our Web site or send questions to\n"
-                                                               "info@relatable.com";
+            const char* kCaption3 = "Here's how to enjoy Relatable Features";
+            const char* kMsg1 = "Relatable automatically generates personalized playlists that are\n"
+                                "based on the files located on your computer and the music you\n"
+                                "listen to on the Web. The more you use the player, the better it\n"
+                                "works! You can create a profile below, or you can select the\n"
+                                "'Profiles' tab under 'Options' and create and save multiple\n"
+                                "profiles. Then, just start listening to music. After you have\n"
+                                "listened for a while, hit the 'Suggest' button to view and listen\n"
+                                "to a recommended list of songs. You can also check out\n"
+                                "'Recommended Streams' on the music browser window.  Learn\n"
+                                "more about Relatable features in the help menu.\n\n"
+                                "Check out the help menu for details on Relatable features, and for\n"
+                                "more information, please see our Web site or send questions to\n"
+                                "info@relatable.com";
 
             const char* kCaption1 = "Profile Name: ";
             switch(ctrlId)
@@ -852,7 +888,35 @@ static BOOL CALLBACK IntroWizardRelatableTwo(HWND hwnd,
                     DeleteObject(font);
                     break;
                 }
-                               
+                case IDC_RELATABLE_CAPTION3:
+                {
+                    HFONT font, oldFont;
+
+                    LOGFONT lf;
+
+                    GetObject(GetStockObject(DEFAULT_GUI_FONT), sizeof(LOGFONT), &lf);
+
+                    lf.lfWeight = FW_BOLD;
+
+                    font = CreateFontIndirect(&lf);
+
+                    oldFont = (HFONT)SelectObject(dis->hDC, font);
+
+                    RECT clientRect;
+                    GetClientRect(dis->hwndItem, &clientRect);
+
+                    DrawText(dis->hDC, 
+                             kCaption3,
+                             strlen(kCaption3),
+                             &clientRect,
+                             DT_LEFT|DT_WORDBREAK);
+
+                    SelectObject(dis->hDC, oldFont);
+
+                    DeleteObject(font);
+
+                    break;
+                }              
                 case IDC_RELATABLE_EDIT1:
                 {
                     break;
