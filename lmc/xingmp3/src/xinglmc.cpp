@@ -988,8 +988,8 @@ Error XingLMC::BeginRead(void *&pBuffer, unsigned int iBytesNeeded)
        if (eRet == kError_NoDataAvail)
        {
            m_pPmi->Wake();
-           if (Sleep())
-              return kError_Interrupt;
+           if (Sleep()) 
+              return kError_Interrupt; 
            continue;
        }
        break;

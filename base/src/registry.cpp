@@ -39,7 +39,7 @@ Registry::Registry()
 
 Registry::~Registry()
 {
-#ifndef WIN32
+#if 0
     uint32 count = m_elements.size();
 
     for(uint32 i = 0; i < count; i++) {

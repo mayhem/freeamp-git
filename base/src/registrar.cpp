@@ -214,8 +214,10 @@ CleanupRegistry(Registry* registry)
 {
     Error           error   = kError_NoErr;
     int count = registry->CountItems();
-    for (int i = 0; i < count; i++) {
+    for (int i = count - 1; i >= 0; i--) {
+#ifndef WIN32
         FreeLibrary(registry->GetItem(i)->Module());
+#endif
         delete (registry->GetItem(i));
     }
  
