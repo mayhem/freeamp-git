@@ -112,3 +112,6 @@ Other major contributors and their contributions:
 
 "Harald Klein" <linux@chello.at>
 * keybad support for lcd ui
+
+"Tony Arcieri" <bascule@procyon.mesa.k12.co.us>
+* the libcdaudio library, included for CD support.

@@ -61,7 +61,7 @@ class CDPMO:public PhysicalMediaOutput
    virtual Error ChangePosition(int32);
    virtual Error SetTo(const char *url); 
 
-   uint32  GetNumTracks();
+   struct disc_info GetDiscInfo();
    uint32  GetCDDBDiscID();
    char   *GetcdindexDiscID();
 
@@ -77,6 +77,10 @@ class CDPMO:public PhysicalMediaOutput
    int           m_track;
    bool          sentData;
    bool          trackDone;
+
+   uint32           cddbid;
+   string           cdindexid;
+   struct disc_info dinfo;
 };
 
 #endif /* _SOUNDCARDPMO_H_ */

@@ -1054,6 +1054,35 @@ void GTKMusicBrowser::CreateMainTreeItems(void)
     gtk_clist_thaw(GTK_CLIST(musicBrowserTree));
 }
 
+void GTKMusicBrowser::UpdateCDTree(PlaylistItem *update)
+{
+    if (!CDTree)
+        return;
+
+    GtkCTreeNode *find = FindNode(kTreeTrack, NULL, NULL, update, CDTree);
+
+    if (!find) {
+        return;
+    }
+    gtk_clist_freeze(GTK_CLIST(musicBrowserTree));
+    GdkPixmap *pixmap;
+    GdkBitmap *mask;
+    MetaData mdata = (MetaData)update->GetMetaData();
+    gtk_ctree_node_get_pixtext(musicBrowserTree, find, 0, NULL, NULL, &pixmap,
+                               &mask);
+    gtk_ctree_node_set_pixtext(musicBrowserTree, find, 0, mdata.Title().c_str(),
+                               5, pixmap, mask); 
+    gtk_ctree_node_get_pixtext(musicBrowserTree, CDTree, 0, NULL, NULL, &pixmap,
+                               &mask);
+    char *tempstr = new char[mdata.Album().size() + mdata.Artist().size() + 10];
+    sprintf(tempstr, "%s (%s)", mdata.Album().c_str(), mdata.Artist().c_str());
+    gtk_ctree_node_set_pixtext(musicBrowserTree, CDTree, 0, tempstr, 5, pixmap,
+                               mask);
+    gtk_clist_thaw(GTK_CLIST(musicBrowserTree));
+
+    delete [] tempstr;
+}
+
 void GTKMusicBrowser::RegenerateCDTree(void)
 {
     GtkCTreeRow *row = GTK_CTREE_ROW(CDTree);
@@ -1075,12 +1104,11 @@ void GTKMusicBrowser::RegenerateCDTree(void)
     char *name[1];
     GtkCTreeNode *cdItem;
     TreeData *data;
-    MetaData *empty = new MetaData;
     PlaylistItem *newitem;
 
     for (uint32 tracknum = 1; tracknum <= CD_numtracks; tracknum++) {
         sprintf(url, "/%d.cda", tracknum);
-        newitem = new PlaylistItem(url, empty);
+        newitem = new PlaylistItem(url);
 
         name[0] = (char *)newitem->URL().c_str();
         pixmap = gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, &mask,
@@ -1099,6 +1127,11 @@ void GTKMusicBrowser::RegenerateCDTree(void)
 
     copy(CDTracks->begin(), CDTracks->end(), metalist->begin());
     m_plm->RetrieveMetaData(metalist);
+
+    gtk_ctree_node_get_pixtext(musicBrowserTree, CDTree, 0, NULL, NULL, &pixmap,
+                               &mask);
+    gtk_ctree_node_set_pixtext(musicBrowserTree, CDTree, 0, "CD Audio", 5, 
+                               pixmap, mask);
 
     gtk_clist_thaw(GTK_CLIST(musicBrowserTree));
 }
@@ -2831,6 +2864,19 @@ Error GTKMusicBrowser::AcceptEvent(Event *e)
                     scheduleCDredraw = true;
             }
             break; }
+        case INFO_PlaylistItemUpdated: {
+            PlaylistItemUpdatedEvent *piue = (PlaylistItemUpdatedEvent *)e;
+            PlaylistItem *item = (PlaylistItem *)piue->Item();
+
+            char *url = (char *)item->URL().c_str();
+            char *ext = strrchr(url, '.');;
+            if (ext) 
+                ext++;
+            if (ext && *ext) {
+                if (!strncasecmp("CDA", ext, 3) && isVisible) 
+                    UpdateCDTree(item);
+            } 
+        }
         default:
             break;
     }

@@ -79,6 +79,7 @@ CDPMO::~CDPMO()
 
    if (m_properlyInitialized)
        Reset(true);
+
    cd_finish(m_cdDesc);
 }
 
@@ -131,8 +132,9 @@ Error CDPMO::SetTo(const char *url)
        return kError_InvalidTrack;
 
    cd_play_track(m_cdDesc, m_track, m_track);
- 
+
    m_properlyInitialized = true;
+   return kError_NoErr;
 }
 
 Error CDPMO::Init(OutputInfo *info)
@@ -141,7 +143,7 @@ Error CDPMO::Init(OutputInfo *info)
    uint32 len = 256;
 
    if (IsError(m_pContext->prefs->GetCDDevicePath(device, &len)))
-       return (Error)pmoError_DeviceOpenFailed;
+           return (Error)pmoError_DeviceOpenFailed;
 
    m_cdDesc = cd_init_device(device);
 
@@ -152,27 +154,32 @@ Error CDPMO::Init(OutputInfo *info)
        return (Error)pmoError_DeviceOpenFailed;
    }
 
-   struct disc_info disc;
-   if (cd_stat(m_cdDesc, &disc, false) < 0) {
+   cddbid = 0;
+   cdindexid = "";
+
+   if (cd_stat(m_cdDesc, &dinfo, false) < 0) {
        if (info)
            ReportError("There is no disc in the CD-ROM drive.");
+
        return kError_NoDiscInDrive;
    }
    
-   if (!disc.disc_present) {
+   if (!dinfo.disc_present) {
        if (info)
            ReportError("There is no disc in the CD-ROM drive.");
        return kError_NoDiscInDrive;
    }
 
-   cd_stat(m_cdDesc, &disc);
+   cd_stat(m_cdDesc, &dinfo);
 
-   uint32 tracks = disc.disc_total_tracks;
-   uint32 cddb = cddb_direct_discid(disc);
+   uint32 tracks = dinfo.disc_total_tracks;
+   cddbid = cddb_direct_discid(dinfo);
    char *cdindex = new char[256];
-   cdindex_direct_discid(disc, cdindex, 256);
+   cdindex_direct_discid(dinfo, cdindex, 256);
 
-   CDInfoEvent *cie = new CDInfoEvent(tracks, cddb, cdindex);
+   cdindexid = cdindex;
+
+   CDInfoEvent *cie = new CDInfoEvent(tracks, cddbid, cdindex);
 
    m_pTarget->AcceptEvent(cie);
 
@@ -183,70 +190,17 @@ Error CDPMO::Init(OutputInfo *info)
 
 uint32 CDPMO::GetCDDBDiscID(void)
 {
-   bool closeWhenDone = false;
-   uint32 retvalue = 0;
-   if (m_cdDesc < 0) {
-       if (IsError(Init(NULL)))
-           return 0;
-
-       closeWhenDone = true;
-   }
-
-   retvalue = cddb_discid(m_cdDesc);
-
-   if (closeWhenDone) 
-       cd_finish(m_cdDesc);
-
-   return retvalue;
+   return cddbid;
 }
 
 char *CDPMO::GetcdindexDiscID(void)
 {
-   bool closeWhenDone = false;
-   char *retvalue = NULL;
-   if (m_cdDesc < 0) {
-       if (IsError(Init(NULL))) 
-           return NULL;
-
-       closeWhenDone = true;
-   }
-
-   retvalue = new char[256];
-
-   if (cdindex_discid(m_cdDesc, retvalue, 256) == -1) {
-       delete retvalue;
-       retvalue = NULL;
-   }
-
-   if (closeWhenDone) 
-       cd_finish(m_cdDesc);
-
-   return retvalue;
+    return (char *)cdindexid.c_str();
 }
 
-uint32 CDPMO::GetNumTracks(void)
+struct disc_info CDPMO::GetDiscInfo(void)
 {
-   bool closeWhenDone = false;
-   uint32 retvalue = 0;
-   if (m_cdDesc < 0) {
-       if (IsError(Init(NULL))) 
-           return 0;
- 
-       closeWhenDone = true;
-   }
-
-   struct disc_info disc;
-
-   if (cd_stat(m_cdDesc, &disc) >= 0) {
-       if (disc.disc_present) {
-           retvalue = disc.disc_total_tracks;
-       }
-   }
-       
-   if (closeWhenDone) 
-       cd_finish(m_cdDesc);
-
-   return retvalue;
+    return dinfo;
 }
 
 Error CDPMO::Reset(bool user_stop)
@@ -296,7 +250,6 @@ void CDPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
    if (m_cdDesc < 0 || m_track < 0)
       return;
 
-
    struct disc_info disc;
    struct disc_timeval val;
 
@@ -328,8 +281,9 @@ void CDPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
        sentData = true;
    }
 
-   if (m_track != disc.disc_current_track)
+   if (m_track != disc.disc_current_track) {
        trackDone = true;
+    }
     
    int iTotalTime = disc.disc_track_time.minutes * 60 + 
                     disc.disc_track_time.seconds; 

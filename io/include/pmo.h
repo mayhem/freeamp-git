@@ -55,11 +55,12 @@ ____________________________________________________________________________*/
 
 typedef struct OutputInfo
 {
-	uint32 bits_per_sample;
-	uint32 number_of_channels;
-	uint32 samples_per_second;
-	uint32 max_buffer_size;
+    uint32 bits_per_sample;
+    uint32 number_of_channels;
+    uint32 samples_per_second;
+    uint32 max_buffer_size;
     uint32 samples_per_frame;
+    string devicename;
 }OutputInfo;
 
 class EventBuffer;
@@ -95,8 +96,8 @@ protected:
     PhysicalMediaInput    *m_pPmi;
     LogicalMediaConverter *m_pLmc;
     int32                  m_iPreBuffer;
-	int                    m_iBufferUpdate;
-	PullBuffer            *m_pPmiBuffer;
+    int                    m_iBufferUpdate;
+    PullBuffer            *m_pPmiBuffer;
 };
 
 #endif /* _PMO_H_ */

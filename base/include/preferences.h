@@ -82,6 +82,7 @@ extern const char* kWelcomePref;
 extern const char* kPlayImmediatelyPref;
 extern const char* kNumberOfURLsToRememberPref;
 extern const char* kCDDevicePathPref;
+extern const char* kCDDBServerPref;
 
 class LibDirFindHandle;
 
@@ -113,7 +114,6 @@ class Preferences {
     // XXX: This is a non-portable hack, and should only be used for user
     //      messages.  Normally, you should use the iterators above instead.
     virtual const char *GetLibDirs() = 0;
-
 
     // convenience functions
     Error GetInstallDirectory(char* path, uint32* len);
@@ -188,6 +188,9 @@ class Preferences {
 
     Error GetProxyServerAddress(char* host, uint32* len);
     Error SetProxyServerAddress(const char* host);
+
+    Error GetCDDBServerAddress(char* host, uint32* len);
+    Error SetCDDBServerAddress(const char* host);
 
     Error GetPrebufferLength(int32* value);
     Error SetPrebufferLength(int32 value);

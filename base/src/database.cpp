@@ -61,8 +61,10 @@ Database::Database(const char *name, int version)
 Database::~Database()
 {
     m_lock->Acquire();
-    if (m_dbase)
+    if (m_dbase) {
+        gdbm_sync(m_dbase);
         gdbm_close(m_dbase);
+    }
     delete m_lock;
 }
 

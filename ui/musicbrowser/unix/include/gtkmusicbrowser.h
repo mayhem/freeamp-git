@@ -116,6 +116,7 @@ class GTKMusicBrowser {
     uint32 CD_DiscID;
     uint32 CD_numtracks;
     bool   scheduleCDredraw;
+    void   UpdateCDTree(PlaylistItem *update);
     void   RegenerateCDTree(void);
 
     bool isVisible;

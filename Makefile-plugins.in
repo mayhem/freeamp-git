@@ -49,6 +49,7 @@ PLUGINS += plugins/cd.lmc
 PLUGINS += plugins/id3v1.mdf
 PLUGINS += plugins/id3v2.mdf
 PLUGINS += plugins/misc.mdf
+PLUGINS += plugins/cddb.mdf
 
 PLUGINS += plugins/m3u.plf
 PLUGINS += plugins/pls.plf
@@ -164,7 +165,7 @@ FREEAMPUIOBJ += ui/freeamp/src/Control.o ui/freeamp/src/TextControl.o
 FREEAMPUIOBJ += ui/freeamp/src/DialControl.o ui/freeamp/src/Font.o 
 FREEAMPUIOBJ += ui/freeamp/src/FreeAmpTheme.o ui/freeamp/src/ThemeZip.o 
 FREEAMPUIOBJ += ui/freeamp/src/MultiStateControl.o ui/freeamp/src/Headlines.o
-FREEAMPUIOBJ += lib/zlib/lib/libzlib.a lib/xml/src/Parse.lo
+FREEAMPUIOBJ += lib/zlib/lib/libzlib.la lib/xml/src/Parse.lo
 FREEAMPUIOBJ += $($(OSTYPE)FREEAMPUIOBJ)
 FREEAMPUILIBS = $($(OSTYPE)FREEAMPUILIBS)
 
@@ -289,6 +290,12 @@ MISCOBJ = plm/metadata/misc/misc.o
 
 plugins/misc.mdf: $(MISCOBJ)
 	$(LINKMOD) -o $@ $(MISCOBJ) $(STATICLD)
+
+#cddb
+CDDBOBJ = plm/metadata/cddb/cddb.o plm/metadata/cddb/cddb_proto.o
+
+plugins/cddb.mdf: $(CDDBOBJ)
+	$(LINKMOD) -o $@ $(CDDBOBJ) $(STATICLD)
 
 # PLF section
 
