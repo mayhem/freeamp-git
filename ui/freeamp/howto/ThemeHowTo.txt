@@ -19,8 +19,6 @@ can be anything the theme designer desires. Care to leave out some
 buttons or display items you don't care for? Go ahead leave them out --
 FreeAmp doesn't care.
 
-This HOWTO will get you started writing themes for FreeAmp. Please note
-that this HOWTO is still in the beta stages, much like FreeAmp 2.0.
 If you find any problems with this HOWTO, please mail rob@emusic.com
 with your comments, or better yet head over to Bugzilla and enter a 
 bug report <http://www.freeamp.org/bugzilla>.
@@ -30,11 +28,10 @@ GETTING STARTED
 
 To get started working on FreeAmp themes, I recommend that you 
 grab FreeAmp.fat from the themes directory in your FreeAmp
-installation and decompile it using the supplied program MakeTheme:
-(If MakeTheme is not in the distribution for some reason, you can
-get it from the FreeAmp website)
-
-   MakeTheme -d freeamp.fat
+installation and unzip it using your favorite ZIP program. A FreeAmp
+theme file is just a ZIP file with the extension changed from .zip to
+.fat. Some older themes may need to get unpackaged with the MakeTheme
+tool that is available fromt he freeamp.org website.
 
 Take a brief look at the theme.xml file and the bitmaps that get
 unpacked. Or you can look at Appendix B. :-) Then read on.
@@ -63,7 +60,7 @@ directory and then points FreeAmp to these files.
 The ThemePath preference should point to the theme directory or a 
 completed .fat file. To do this under Linux, edit the ThemePath preference 
 in ~/.freeamp/preferences, or under Windows edit the 
-HKEY_CURRENT_USER/Software/FreeAmp/FreeAmp v2.0/Main/ThemePath 
+HKEY_CURRENT_USER/Software/FreeAmp/FreeAmp v2.1/Main/ThemePath 
 registry value to point to your theme directory.
 
 If your theme supports the ReloadTheme button, you can edit the
@@ -197,10 +194,6 @@ in your themes.
 Window:
 -------
 
-FreeAmp supports different windows in the same theme. The theme
-that ships with beta 4 only has one window, but later themes will
-have support for window shades and other cool layouts. 
-
 The default window that FreeAmp opens a theme in is called 'MainWindow'.
 You may define as many other windows as you care -- make sure to
 include a ChangeWindow button to allow the user to change between
@@ -211,20 +204,68 @@ To specify the main window, use this construct:
 <Window Name="MainWindow">
 
 A Window cannot be an empty tag. Inside the Window tag you will need to
-define <BackgroundBitmap> and <Controls>.
+define a <Panel>.
 
 
-BackgroundBitmap:
------------------
+Panel & TogglePanel:
+--------------------
 
-This tag tells FreeAmp which bitmap to use a the background for this
-window:
+Each window needs to have at least one Panel. Panels can be linked to
+buttons which open and close the panels. The main FreeAmp theme is
+implemented using 3 panels: The top portion of the player that contains
+the display area, the equalizer section and the buttons on the bottom of
+the player. To specify a simple panel that does not does not have any
+pop-out panels, use the following:
 
-    <BackgroundBitmap Name="Background" Rect="0, 0, 327, 191"/>
+  <Panel Name="Default" Bitmap="Background" Pos="0,0" Rect="0,0,327,95"
+         ZOrder="1">
 
-The attributes include the Name, which refers to a name of a Bitmap
-as defined above, and a Rect which specifies the a rectangular area of
-the bitmap to use as the background.
+This specifies a panel named 'Default', using the Rect (0,0,327,95) area
+of bitmap 'Background' as the background. Pos specifies the panel will be 
+located at the logical theme origin and the default ZOrder of 1. If
+you do not plan on having panels that open/close you will need to
+simply make sure the background bitmap rects are correct, and you can 
+simply ignore Pos and ZOrder and set them to the defaults shown above.
+
+If you'd like to have fancy panels that pop open/closed to expose/hide
+features, you need to define multiple Panel tags inside the Window tag.
+For instance, the lower Panel in the freeamp theme is defined as follows:
+
+    <Panel Name="PlayerBottom" Bitmap="Background"
+           Rect="0, 95, 327, 161" Pos="0,95" TogglePos="0,170" ZOrder="2"
+           OnCloseHide="Equalizer" OnOpenShow="Equalizer">
+
+Name, Bitmap and Rect are the same as in the example above. Pos indicates
+where the panel will be placed when the panel is closed (not toggled). When
+the user toggles the panel, the panel will be moved to the TogglePos. Upon
+toggling the panel again, the panel moves back to Pos. One panel should
+be specified as the base panel, and other panels should then be specified
+in relation to the base panel.
+
+ZOrder specifies the how overlapping Panels will be ordered. If two
+or more panels overlap, the panel with the highest ZOrder value will
+be shown on top and the panel with the lowest ZOrder will be shown
+at the bottom.
+
+Optionally, you can specify to show or hide other panels when a panel
+gets toggled. The OnOpenShow, OnOpenHide, OnCloseShow, and OnCloseHide
+attributes specified other panels to show/hide when the current panel is
+opened/closed. In the example above, the Equalizer panel is hidden when
+the PlayerBottom panel is closed, and the same Equalizer panel is shown
+when the PlayerBottom panel is opened.
+
+When you have a panel that can be opened or closed, you will need to
+create a button that will open/close the panel when the button is
+pressed. This button can be of any name (make sure to not use one
+of the names that is already used by other components), but it must
+contain a TogglePanel tag:
+
+   <TogglePanel Panel="PlayerBottom"/>
+
+When the user clicks this button the PlayerBottom panel will get toggled. 
+
+A Panel cannot be an empty tag. Inside the Panel tag you will need to
+define <Controls>.
 
 
 Controls:
@@ -274,7 +315,8 @@ http://www.freeamp.org
 
 
 The ButtonControl will need to include the <Info>, <Position>, and
-<ControlBitmap> and optionally include the <ChangeWindow> tag.
+<ControlBitmap> and optionally include the <ChangeWindow> or <TogglePanel>
+tags.
 
 MultiStateControl:
 ------------------
@@ -319,31 +361,34 @@ SliderControls are used to control volume and seek position:
 
     <SliderControl Name="Volume">  
 
-The Name can either be Volume or Seek. The SliderControl needs to 
-define the <Info>, <Position>, and <ControlBitmap> tags. The only
-bitmaps associated with a slider control are the bitmaps for the
-thumb of the slider control. The actual frame of the control is part
-of the background bitmap. The thumb bitmap is specified by the
-<ControlBitmap> tag and has three states:
+SliderControls are also used to control the equalizer channels:
+
+    <SliderControl Name="Eq1" Notch="50%" NotchWidth="4">  
+
+The Name can either be Volume, Seek, Balance, Preamp, or Eq0 - Eq9 
+for the Equalizer sliders. The optional Notch and NotchWidth attributes
+allow the theme designer to specify a 'notch' that can be used as a 
+default position for a slider. When the user moves the slider across
+the notch position, the slider will snap to the notch postion. The
+eq sliders use notches in order to make it easier to set all the eq
+sliders to the neutral 50% position. Notch defines the slider percentage
+where the notch should be located, and NotchWidth defines the
+total width of the Notch. When the slider thumb is inside this NotchWidth
+zone, the slider remains snapped to the Notch center.
+
+The SliderControl needs to define the <Info>, <Position>, and 
+<ControlBitmap> tags. The only bitmaps associated with a slider control 
+are the bitmaps for the thumb of the slider control. The actual frame of 
+the control is part of the background bitmap. The thumb bitmap is specified 
+by the <ControlBitmap> tag and has three states:
 
     Normal, MouseOver, and Disabled
 
 VSliderControl:
 --------------
 
-VSliderControls are used to control volume and seek position. A VSlider
-is arranged vertically, where a normal Slider is horizontal:
-
-    <VSliderControl Name="Volume">  
-
-The Name can either be Volume or Seek. The VSliderControl needs to 
-define the <Info>, <Position>, and <ControlBitmap> tags. The only
-bitmaps associated with a VSlidercontrol are the bitmaps for the
-thumb of the slider control. The actual frame of the control is part
-of the background bitmap. The thumb bitmap is specified by the
-<ControlBitmap> tag and has three states:
-
-    Normal, MouseOver, and Disabled
+A VSliderControl is just a vertical version of the SliderControl. Please
+refer to the SliderControl docs above.
 
 Info:
 -----
@@ -473,6 +518,11 @@ which web page may have more info about the author/theme. The Misc
 field is for whatever miscellaneous credit information you'd like to
 include. Only the Name attribute is required.
 
+If you intend on submitting your themes to the FreeAmp.org page, please
+fill out the ThemeInfo tag completely. The script on our web page that
+automatically generates the themes page will open up each theme and pull
+out the ThemeInfo to display that on the theme page. If you don't fill out
+the ThemeInfo tag, you will not get credit for your theme.
 
 Headlines:
 ----------
@@ -558,21 +608,33 @@ QUICK REFERENCE
 
    Subtags:
    
-   <BackgroundBitmap> (required)
-   <Controls> (required)
+   <Panel> (required)
 
-<BackgroundBitmap>
+<Panel>
 
-   -- specifies which bitmap to use as the background bitmap
+   -- specifies a panel and a background bitmap
    
    Attributes:
    
-   Name -- The name of the bitmap to use for the background
-   Rect -- The which section of the bitmap to use as the background
+   Name -- The name of the Panel. Each Windows must defined one Panel.
+   Bitmap -- The bitmap to use as the background
+   Rect -- The rectangular area of the background bitmap to use as the
+           panel surface.
+   Pos -- Defines the closed location for the panel.
+   ZOrder -- Defines the ZOrder (layer) for this panel.
+   TogglePos -- Defines open location for this panel. [optional]
+   OnOpenShow -- Defines another panel to show when this panel is 
+                 opened. [optional]
+   OnOpenHide -- Defines another panel to hide when this panel is 
+                 opened. [optional]
+   OnCloseShow -- Defines another panel to show when this panel is 
+                  closed. [optional]
+   OnCloseHide -- Defines another panel to hide when this panel is 
+                  closed. [optional]
    
    Subtags:
    
-   None.
+   <Controls> (required)
    
 
 <Controls>
@@ -632,6 +694,11 @@ QUICK REFERENCE
    
    Name -- the name of the control. See Appendix A for a list of
            possible control names.
+   Notch -- define a location on the slider bar where the slider thumb
+            will snap to. This is specified in percent. (e.g. 50% will
+            place a notch in the middle of the slider) [optional]
+   NotchWidth -- Used with a Notch, it defines the width of the notch
+                 snap zone. [optional]
 
    Subtags:
 
@@ -740,10 +807,6 @@ Q: When I move the mouse over a button the button moves slightly.
 A: The Rect specified in the ControlBitmap tag is of a different size
    than the Rect specified in the Position tag.
 
-Q: Why does it hurt when I pee?
-
-A: http://www.emusic.com/artists/48/
-
 
 APPENDIX A
 
@@ -758,8 +821,16 @@ Repeat        -- Repeat None/Repeat One/Repeat All
 Shuffle       -- Normal/Shuffle mode
 MPause        -- Multistate Pause button. State 0 is shown when the player
                  is not paused, and state 1 is shown when the player is
-				 paused to give the user visual feedback that the player is
-				 paused.
+                 paused to give the user visual feedback that the player is
+                 paused.
+Mute          -- Mute volume control. State 0 is shown during normal playback
+                 and state 1 is shown when the player is muted.
+SigIndicator  -- The signatures pending indicator. State 0 is shown when
+                 no signatures are pending, state 1 when signatures are
+                 pending and state 2 when the player is signaturing tracks.
+EqEnable      -- Enabled/disable the equalizer. State 0 is shown when the
+                 equalizer is enabled and state 1 is shown when the equalizer
+                 is disabled.
 
 ButtonControls:
 
@@ -780,6 +851,7 @@ Credits       -- Shows the theme credits in the title field
 Help          -- Show the FreeAmp help files.
 Files         -- Allows the user to select a file to play.
 
+
 TextControls:
 
 Title         -- The song title text area
@@ -794,136 +866,375 @@ SliderControls,VSliderControls:
         
 Volume        -- adjusts the volume
 Seek          -- seek in a track
-
+Balance       -- adjusts the balance between the left and right speaker
+Preamp        -- adjusts the preamp
+Eq0 - Eq9     -- sliders that adjust the equalizers settings. Eq0 through
+                 Eq9 map to 60Hz, 170Hz, 310Hz, 600hz, 1Khz, 3Khz, 6Khz,
+                 12Khz, 14Khz, 16Khz, repectively.
    
 APPENDIX B
 
-This is the current Emusic theme.xml file:
+This is the current FreeAmp theme.xml file:
 
 <Bitmap Name="Background" File="background.bmp" TransColor="#FF0000"/>
 <Bitmap Name="Buttons" File="buttons.bmp" TransColor="#FF0000"/>
-<Font Name="Main" File="verdana.ttf" Face="Verdana"/>
+<Bitmap Name="MiniButtons" File="minibuttons.bmp" TransColor="#FF0000"/>
+<Bitmap Name="MiniBackground" File="minibackground.bmp" TransColor="#FF0000"/>
+<Bitmap Name="MediumBackground" File="mediumbackground.bmp" TransColor="#FF0000"/> 
+<Bitmap Name="Equalizer" File="equalizer.bmp" TransColor="#FF0000"/> 
 
-<ThemeInfo Name="EMusic Theme" Author="Bill Bull, Robert Kaye & Mark B. Elrod " 
-           EMail="info@freeamp.org" WebPage="http://www.emusic.com"/>
+<Font Name="Main" File="arial.ttf" Face="Arial"/>
+
+<ThemeInfo Name="FreeAmp Theme" Author="Bill Bull, Robert Kaye & Mark B. Elrod " 
+           EMail="info@freeamp.org" WebPage="http://www.freeamp.org"/>
 
 <Window Name="MainWindow">
-    <BackgroundBitmap Name="Background" Rect="0, 0, 327, 161"/>
+    <Panel Name="PlayerBottom" Bitmap="Background" 
+           Rect="0, 95, 327, 161" Pos="0,95" TogglePos="0,170" ZOrder="2"
+           OnCloseHide="Equalizer" OnOpenShow="Equalizer">
+        <Controls>
+            <ButtonControl Name="Logo" URL="http://www.freeamp.org">
+            	<Info Desc="Go to the FreeAmp web site" Tip="FreeAmp"/>
+                <Position Pos="23,33"/>
+                <ControlBitmap Rect="0,236,267,255" Name="Buttons"/>
+            </ButtonControl>
+            <MultiStateControl Name="PlayStop" NumStates="2">
+            	<Info Desc="Play the current track||Stop the current track" Tip="Play||Stop"/>
+                <Position Pos="228,29"/>
+                <ControlBitmap Rect="0,96,119,159" Name="Buttons"/>
+            </MultiStateControl>
+            <MultiStateControl Name="MPause" NumStates="2">
+            	<Info Desc="Pause the current track||Continue playing" 
+            	            Tip="Pause||Continue"/>
+                <Position Pos="258,29"/>
+                <ControlBitmap Rect="0,282,119,345" Name="Buttons"/>
+            </ButtonControl>
+            <ButtonControl Name="Prev">
+            	<Info Desc="Move to previous track" Tip="Previous"/>
+                <Position Pos="198,29"/>
+                <ControlBitmap Rect="0,0,119,31" Name="Buttons"/>
+            </ButtonControl>
+            <ButtonControl Name="Next">
+            	<Info Desc="Move to next track" Tip="Next"/>
+                <Position Pos="287,29"/>
+                <ControlBitmap Rect="0,32,119,63" Name="Buttons"/>
+            </ButtonControl>	
+            <ButtonControl Name="MyMusic">
+            	<Info Desc="Browse my music collection" Tip="MyMusic"/>
+                <Position Pos="44,7"/>
+                <ControlBitmap Rect="0,172,291,186" Name="Buttons"/>
+            </ButtonControl>
+            <ButtonControl Name="Options">
+            	<Info Desc="Open the options window" Tip="Options"/>
+                <Position Pos="119,7"/>
+                <ControlBitmap Rect="0,188,263,202" Name="Buttons"/>
+            </ButtonControl>
+            <ButtonControl Name="Download">
+             	 <Info Desc="Open the download manager" Tip="Download"/>
+                <Position Pos="187,7"/>
+                <ControlBitmap Rect="0,204,303,218" Name="Buttons"/>
+            </ButtonControl>
+            <ButtonControl Name="Files">
+            	<Info Desc="Open files/playlists to play" Tip="Files"/>
+                <Position Pos="265,7"/>
+                <ControlBitmap Rect="0,220,207,234" Name="Buttons"/>
+            </ButtonControl>
+            <MultiStateControl Name="Repeat" NumStates="3">
+            	<Info Desc="Play normally (No repeat)||Repeat current track||Repeat all tracks" 
+                      Tip="No Repeat||Repeat current||Repeat all"/>
+                <Position Pos="151,31"/>
+                <ControlBitmap Rect="123,11,286,85" Name="Buttons"/>
+            </MultiStateControl>
+            <MultiStateControl Name="Shuffle" NumStates="2">
+            	<Info Desc="Play tracks in normal order||Play tracks in random order" Tip="Normal play||Random play"/>
+                <Position Pos="109,31"/>
+                <ControlBitmap Rect="123,87,286,136" Name="Buttons"/>
+            </MultiStateControl>
+       </Controls>
+   </Panel>
+    <Panel Name="PlayerTop" Bitmap="Background" Rect="0, 0, 327, 95" 
+           Pos="0,0" ZOrder="1">
+        <Controls>
+            <!--ButtonControl Name="ReloadTheme">
+            <!--Info Desc="Reload current theme" Tip="Reload theme"/>
+                <!--Position Rect="12,0,24,15"/>
+                <!--ControlBitmap Rect="53,264,104,272" Name="Buttons"/>
+            <!--/ButtonControl>
+            <ButtonControl Name="Quit">
+            	<Info Desc="Quit FreeAmp" Tip="Quit"/>
+                <Position Rect="303,0,315,15"/>
+                <ControlBitmap Rect="212,264,263,272" Name="Buttons"/>
+            </ButtonControl>
+            <ButtonControl Name="Minimize">
+            	<Info Desc="Minimize FreeAmp" Tip="Minimize"/>
+                <Position Rect="289,0,301,15"/>
+                <ControlBitmap Rect="159,264,210,272" Name="Buttons"/>
+            </ButtonControl>
+            <ButtonControl Name="MediumView">
+             <Info Desc="Change to medium view" Tip="Medium view"/>
+                <Position Pos="275,0"/>
+                <ControlBitmap Rect="123,140,174,155" Name="Buttons"/>
+                <ChangeWindow Window="MediumView"/>
+            </ButtonControl>
+            <ButtonControl Name="Help">
+                <Info Desc="View the FreeAmp player help" Tip="Help"/>
+                <Position Pos="262,0"/>
+                <ControlBitmap Rect="106,264,157,279" Name="Buttons"/>
+            </ButtonControl> 
+            <ButtonControl Name="Equalizer">
+                <Info Desc="Open equalizer" Tip="Equalizer"/>
+                <Position Pos="249,0"/>
+                <ControlBitmap Rect="176,140,227,155" Name="Buttons"/>
+                <TogglePanel Panel="PlayerBottom"/>
+            </ButtonControl> 
+            <TextControl Name="Title">
+                <Position Rect="9,23,317,36"/>
+                <Style Align="Left" Font="Main" Bold="Yes"/>
+            </TextControl>
+            <TextControl Name="Info">
+                <Position Rect="9,55,179,67"/>
+                <Style Font="Main"/>
+            </TextControl>	 
+            <TextControl Name="StreamInfo">
+                <Position Rect="9,40,210,52"/>
+                <Style Font="Main"/>
+            </TextControl>
+            <TextControl Name="Time">
+            	   <Info Desc="Current time/Time remaining"/>
+                <Position Rect="210,43,317,65"/>
+                <Style Font="Main" Align="Right" Bold="Yes"/>
+            </TextControl>
+            <TextControl Name="TimeRemaining">
+            	   <Info Desc="Time remaining/Current time"/>
+                <Position Rect="210,43,317,65"/>
+                <Style Font="Main" Align="Right" Bold="Yes" Color="#666666"/>
+            </TextControl>
+            <MultiStateControl Name="Mute" NumStates="2">
+            	<Info Desc="Mute sound||Unmute sound" 
+                      Tip="Mute||Unmute"/>
+                <Position Pos="13,78"/>
+                <ControlBitmap Rect="230,140,293,165" Name="Buttons"/>
+            </MultiStateControl>
+            <MultiStateControl Name="SigIndicator" NumStates="3">
+                <Info Desc="No signatures to generate||Need to generate signatures||Generating signatures" 
+                      Tip="Idle||Pending||Generating"/>
+                <Position Pos="306,80"/>
+                <ControlBitmap Rect="121,307,156,333" Name="Buttons"/>
+            </MultiStateControl>
+            <SliderControl Name="Volume">  
+            	   <Info Desc="Change volume" Tip="Volume"/>
+                <Position Rect="34,80,114,88"/>
+                <ControlBitmap Rect="136,0,183,8" Name="Buttons"/>
+            </SliderControl>
+            <SliderControl Name="Seek">
+            	<Info Desc="Seek in the current track" Tip="Seek"/>
+                <Position Rect="142,80,299,88"/>
+                <ControlBitmap Rect="136,0,183,8" Name="Buttons"/>
+            </SliderControl>
+        </Controls>
+    </Panel>
+   <Panel Name="Equalizer" Bitmap="Equalizer" HideWhenClosed="yes" 
+          Rect="0, 0, 327, 76" Pos="0,95" ZOrder="0">
+       <Controls>
+            <SliderControl Name="Balance">
+                <Info Desc="Adjust speaker balance" Tip="Balance"/>
+                <Position Rect="216,194,296,201"/>
+                <ControlBitmap Rect="136,0,183,8" Name="Buttons"/>
+            </SliderControl>
+            <VSliderControl Name="Eq0" Notch="50%" NotchWidth="4">
+                <Info Desc="Equalize 60Hz" Tip="60Hz"/>
+                <Position Rect="86,23,98,65"/>
+                <ControlBitmap Rect="186,0,224,2" Name="Buttons"/>
+            </VSliderControl>  
+            <VSliderControl Name="Eq1" Notch="50%" NotchWidth="4">
+                <Info Desc="Equalize 170Hz" Tip="170Hz"/>
+                <Position Rect="102,23,114,65"/>
+                <ControlBitmap Rect="186,0,224,2" Name="Buttons"/>
+            </VSliderControl>
+            <VSliderControl Name="Eq2" Notch="50%" NotchWidth="4">
+                <Info Desc="Equalize 310Hz" Tip="310Hz"/>
+                <Position Rect="118,23,130,65"/>
+                <ControlBitmap Rect="186,0,224,2" Name="Buttons"/>
+            </VSliderControl>
+            <VSliderControl Name="Eq3" Notch="50%" NotchWidth="4">
+                <Info Desc="Equalize 600Hz" Tip="600Hz"/>
+                <Position Rect="134,23,146,65"/>
+                <ControlBitmap Rect="186,0,224,2" Name="Buttons"/>
+            </VSliderControl>
+            <VSliderControl Name="Eq4" Notch="50%" NotchWidth="4">
+                <Info Desc="Equalize 1kHz" Tip="1kHz"/>
+                <Position Rect="150,23,162,65"/>
+                <ControlBitmap Rect="186,0,224,2" Name="Buttons"/>
+            </VSliderControl>
+            <VSliderControl Name="Eq5" Notch="50%" NotchWidth="4">
+                <Info Desc="Equalize 3kHz" Tip="3kHz"/>
+                <Position Rect="166,23,178,65"/>
+                <ControlBitmap Rect="186,0,224,2" Name="Buttons"/>
+            </VSliderControl>
+            <VSliderControl Name="Eq6" Notch="50%" NotchWidth="4">
+                <Info Desc="Equalize 6kHz" Tip="6kHz"/>
+                <Position Rect="182,23,194,65"/>
+                <ControlBitmap Rect="186,0,224,2" Name="Buttons"/>
+            </VSliderControl>
+            <VSliderControl Name="Eq7" Notch="50%" NotchWidth="4">
+                <Info Desc="Equalize 12kHz" Tip="12kHz"/>
+                <Position Rect="198,23,210,65"/>
+                <ControlBitmap Rect="186,0,224,2" Name="Buttons"/>
+            </VSliderControl>
+            <VSliderControl Name="Eq8" Notch="50%" NotchWidth="4">
+                <Info Desc="Equalize 14kHz" Tip="14kHz"/>
+                <Position Rect="214,23,226,65"/>
+                <ControlBitmap Rect="186,0,224,2" Name="Buttons"/>
+            </VSliderControl>
+            <VSliderControl Name="Eq9" Notch="50%" NotchWidth="4">
+                <Info Desc="Equalize 16kHz" Tip="16kHz"/>
+                <Position Rect="230,23,242,65"/>
+                <ControlBitmap Rect="186,0,224,2" Name="Buttons"/>
+            </VSliderControl> 
+            <VSliderControl Name="Preamp" Notch="50%" NotchWidth="4">
+                <Info Desc="Preamp" Tip="Preamp"/>
+                <Position Rect="43,19,55,58"/>
+                <ControlBitmap Rect="227,0,265,5" Name="Buttons"/>
+            </VSliderControl> 
+            <MultiStateControl Name="EqEnable" NumStates="2">
+            	   <Info Desc="Turn off Equalizer||Turn on Equalizer" 
+                      Tip="Eq Off||Eq On"/>
+                <Position Pos="13,9"/>
+                <ControlBitmap Rect="121,282,168,305" Name="Buttons"/>
+            </MultiStateControl>
+        </Controls>
+   </Panel>
+</Window>            
+
+<Window Name="Mini-Me">
+    <BackgroundBitmap Name="MiniBackground" Rect="0, 0, 173, 37"/>
     <Controls>
-        <ButtonControl Name="Logo" URL="http://www.emusic.com">
-        	<Info Desc="Go to the EMusic web site" Tip="EMusic"/>
-            <Position Pos="17,126"/>
-            <ControlBitmap Rect="0,236,327,260" Name="Buttons"/>
-        </ButtonControl>
         <MultiStateControl Name="PlayStop" NumStates="2">
         	<Info Desc="Play the current track||Stop the current track" Tip="Play||Stop"/>
-            <Position Pos="228,124"/>
-            <ControlBitmap Rect="0,96,119,159" Name="Buttons"/>
+            <Position Pos="83,17"/>
+            <ControlBitmap Rect="0,79,95,116" Name="MiniButtons"/>
         </MultiStateControl>
         <MultiStateControl Name="MPause" NumStates="2">
         	<Info Desc="Pause the current track||Continue playing" 
         	            Tip="Pause||Continue"/>
-            <Position Pos="258,124"/>
-            <ControlBitmap Rect="0,282,119,345" Name="Buttons"/>
+            <Position Pos="107,17"/>
+            <ControlBitmap Rect="0,40,95,77" Name="MiniButtons"/>
         </ButtonControl>
         <ButtonControl Name="Prev">
         	<Info Desc="Move to previous track" Tip="Previous"/>
-            <Position Pos="198,124"/>
-            <ControlBitmap Rect="0,0,119,31" Name="Buttons"/>
+            <Position Pos="59,17"/>
+            <ControlBitmap Rect="0,0,95,18" Name="MiniButtons"/>
         </ButtonControl>
         <ButtonControl Name="Next">
         	<Info Desc="Move to next track" Tip="Next"/>
-            <Position Pos="287,124"/>
-            <ControlBitmap Rect="0,32,119,63" Name="Buttons"/>
+            <Position Pos="131,17"/>
+            <ControlBitmap Rect="0,20,95,38" Name="MiniButtons"/>
         </ButtonControl>	
         <ButtonControl Name="Quit">
-        	<Info Desc="Quit EMusic" Tip="Quit"/>
-            <Position Rect="303,0,315,15"/>
-            <ControlBitmap Rect="212,264,263,272" Name="Buttons"/>
+        	<Info Desc="Quit FreeAmp" Tip="Quit"/>
+            <Position Pos="153,0"/>
+            <ControlBitmap Rect="0,152,47,167" Name="MiniButtons"/>
         </ButtonControl>
         <ButtonControl Name="Minimize">
-        	<Info Desc="Minimize EMusic" Tip="Minimize"/>
-            <Position Rect="289,0,301,15"/>
-            <ControlBitmap Rect="159,264,210,272" Name="Buttons"/>
+        	<Info Desc="Minimize FreeAmp" Tip="Minimize"/>
+            <Position Pos="139,0"/>
+            <ControlBitmap Rect="0,118,55,133" Name="MiniButtons"/>
         </ButtonControl>
-        <ButtonControl Name="Help">
-        	<Info Desc="View EMusic help" Tip="Help"/>
-            <Position Rect="275,0,287,15"/>
-            <ControlBitmap Rect="106,264,157,272" Name="Buttons"/>
+        <ButtonControl Name="NormalView">
+        	<Info Desc="Change to normal view" Tip="Normal view"/>
+            <Position Pos="125,0"/>
+            <ControlBitmap Rect="0,135,55,150" Name="MiniButtons"/>
+            <ChangeWindow Window="MainWindow"/>
         </ButtonControl>
-        <ButtonControl Name="ReloadTheme">
-        	<Info Desc="Reload current theme" Tip="Reload theme"/>
-            <Position Rect="12,0,24,15"/>
-            <ControlBitmap Rect="53,264,104,272" Name="Buttons"/>
-        </ButtonControl>
-        <!--ButtonControl Name="WindowShade"!>
-        	<!--Info Desc="Change to windowshade" Tip="Windowshade"/!>
-            <!--Position Rect="269,4,280,13"/!>
-            <!--ControlBitmap Rect="0,264,51,272" Name="Buttons"/!>
-            <!--ChangeWindow Window="WindowShade"/!>
-        <!--/ButtonControl!>
-        <ButtonControl Name="MyMusic">
-        	<Info Desc="Browse my music collection" Tip="MyMusic"/>
-            <Position Pos="44,102"/>
-            <ControlBitmap Rect="0,172,291,186" Name="Buttons"/>
-        </ButtonControl>
-        <ButtonControl Name="Options">
-        	<Info Desc="Open the options window" Tip="Options"/>
-            <Position Pos="119,102"/>
-            <ControlBitmap Rect="0,188,263,202" Name="Buttons"/>
-        </ButtonControl>
-        <ButtonControl Name="Download">
-        	<Info Desc="Open the download manager" Tip="Download"/>
-            <Position Pos="187,102"/>
-            <ControlBitmap Rect="0,204,303,218" Name="Buttons"/>
-        </ButtonControl>
-        <ButtonControl Name="Files">
-        	<Info Desc="Open files/playlists to play" Tip="Files"/>
-            <Position Pos="265,102"/>
-            <ControlBitmap Rect="0,220,207,234" Name="Buttons"/>
-        </ButtonControl>
-        <MultiStateControl Name="Repeat" NumStates="3">
-        	<Info Desc="Repeat no tracks||Repeat current track||Repeat all tracks" 
-                  Tip="Repeat none||Repeat current||Repeat all"/>
-            <Position Pos="151,126"/>
-            <ControlBitmap Rect="123,11,286,85" Name="Buttons"/>
-        </MultiStateControl>
-        <MultiStateControl Name="Shuffle" NumStates="2">
-        	<Info Desc="Play tracks in normal order||Play tracks in random order" Tip="Normal Play||Random Play"/>
-            <Position Pos="109,126"/>
-            <ControlBitmap Rect="123,87,286,136" Name="Buttons"/>
-        </MultiStateControl>
-        <TextControl Name="Title">
-            <Position Rect="9,21,317,38"/>
-            <Style Align="Left" Font="Main" Bold="Yes"/>
-        </TextControl>
-        <TextControl Name="Info">
-            <Position Rect="9,53,179,67"/>
-            <Style Font="Main"/>
-        </TextControl>	 
-        <TextControl Name="StreamInfo">
-            <Position Rect="9,40,210,52"/>
-            <Style Font="Main"/>
-        </TextControl>
         <TextControl Name="Time">
         	   <Info Desc="Current time/time remaining"/>
-            <Position Rect="210,41,317,67"/>
+            <Position Rect="9,19,53,31"/>
             <Style Font="Main" Align="Right" Bold="Yes"/>
         </TextControl>
         <TextControl Name="TimeRemaining">
         	   <Info Desc="Time remaining/Current Time"/>
-            <Position Rect="210,41,317,67"/>
+            <Position Rect="9,19,53,31"/>
             <Style Font="Main" Align="Right" Bold="Yes" Color="#666666"/>
         </TextControl>
         <SliderControl Name="Volume">  
         	   <Info Desc="Change volume" Tip="Volume"/>
-            <Position Rect="37,80,117,88"/>
-            <ControlBitmap Rect="136,0,183,8" Name="Buttons"/>
+            <Position Rect="40,5,66,13"/>
+            <ControlBitmap Rect="61,118,72,126" Name="MiniButtons"/>
         </SliderControl>
         <SliderControl Name="Seek">
         	<Info Desc="Seek in the current track" Tip="Seek"/>
-            <Position Rect="151,80,308,88"/>
-            <ControlBitmap Rect="136,0,183,8" Name="Buttons"/>
+            <Position Rect="87,5,113,13"/>
+            <ControlBitmap Rect="61,118,72,126" Name="MiniButtons"/>
+        </SliderControl>
+    </Controls>
+</Window>            
+
+<Window Name="MediumView">
+    <BackgroundBitmap Name="MediumBackground" Rect="0, 0, 173, 55"/>
+    <Controls>
+        <MultiStateControl Name="PlayStop" NumStates="2">
+        	<Info Desc="Play the current track||Stop the current track" Tip="Play||Stop"/>
+            <Position Pos="83,35"/>
+            <ControlBitmap Rect="0,79,95,116" Name="MiniButtons"/>
+        </MultiStateControl>
+        <MultiStateControl Name="MPause" NumStates="2">
+        	<Info Desc="Pause the current track||Continue playing" 
+        	            Tip="Pause||Continue"/>
+            <Position Pos="107,35"/>
+            <ControlBitmap Rect="0,40,95,77" Name="MiniButtons"/>
+        </ButtonControl>
+        <ButtonControl Name="Prev">
+        	<Info Desc="Move to previous track" Tip="Previous"/>
+            <Position Pos="59,35"/>
+            <ControlBitmap Rect="0,0,95,18" Name="MiniButtons"/>
+        </ButtonControl>
+        <ButtonControl Name="Next">
+        	<Info Desc="Move to next track" Tip="Next"/>
+            <Position Pos="131,35"/>
+            <ControlBitmap Rect="0,20,95,38" Name="MiniButtons"/>
+        </ButtonControl>	
+
+        <ButtonControl Name="Quit">
+        	<Info Desc="Quit FreeAmp" Tip="Quit"/>
+            <Position Pos="153,0"/>
+            <ControlBitmap Rect="0,152,47,167" Name="MiniButtons"/>
+        </ButtonControl>
+        <ButtonControl Name="Minimize">
+        	<Info Desc="Minimize FreeAmp" Tip="Minimize"/>
+            <Position Pos="139,0"/>
+            <ControlBitmap Rect="0,118,55,133" Name="MiniButtons"/>
+        </ButtonControl>
+        <ButtonControl Name="MiniView">
+        	<Info Desc="Change to mini view" Tip="Mini view"/>
+            <Position Pos="125,0"/>
+            <ControlBitmap Rect="0,135,55,150" Name="MiniButtons"/>
+            <ChangeWindow Window="Mini-Me"/>
+        </ButtonControl>
+
+        <TextControl Name="Time">
+        	   <Info Desc="Current time/time remaining"/>
+            <Position Rect="9,37,53,49"/>
+            <Style Font="Main" Align="Right" Bold="Yes"/>
+        </TextControl>
+        <TextControl Name="TimeRemaining">
+        	   <Info Desc="Time remaining/Current Time"/>
+            <Position Rect="9,37,53,49"/>
+            <Style Font="Main" Align="Right" Bold="Yes" Color="#666666"/>
+        </TextControl>
+        <TextControl Name="Title">
+            <Position Rect="7,18,163,34"/>
+            <Style Align="Left" Font="Main" Color="#DDDDDD"/>
+        </TextControl>
+
+        <SliderControl Name="Volume">  
+        	   <Info Desc="Change volume" Tip="Volume"/>
+            <Position Rect="40,5,66,13"/>
+            <ControlBitmap Rect="61,118,72,126" Name="MiniButtons"/>
+        </SliderControl>
+        <SliderControl Name="Seek">
+        	<Info Desc="Seek in the current track" Tip="Seek"/>
+            <Position Rect="87,5,113,13"/>
+            <ControlBitmap Rect="61,118,72,126" Name="MiniButtons"/>
         </SliderControl>
     </Controls>
 </Window>            
