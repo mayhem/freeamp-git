@@ -324,6 +324,8 @@ GtkWidget *IntroWizardUI::RelatablePage(void)
    gtk_widget_show(label);
 
    GtkWidget *button = gtk_radio_button_new_with_label(NULL, "Enjoy Relatable Features");
+   skipRelatableTwo = false;
+   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
    gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 2);
    gtk_signal_connect(GTK_OBJECT(button), "clicked",
                       GTK_SIGNAL_FUNC(opt_in_selected), this);
@@ -333,8 +335,6 @@ GtkWidget *IntroWizardUI::RelatablePage(void)
                                             GTK_RADIO_BUTTON(button)),
                                             "Cool! But I'll pass");
    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
-   skipRelatableTwo = true;
-   gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 2);
    gtk_signal_connect(GTK_OBJECT(button), "clicked",
                       GTK_SIGNAL_FUNC(opt_out_selected), this);
    gtk_widget_show(button);

@@ -214,6 +214,7 @@ BOOL MissingFileDialog::DialogProc(HWND hwnd,
 
                 case IDCANCEL:
                 {
+		    m_context->plm->RemoveItem(m_item);
                     m_context->target->AcceptEvent(new Event(CMD_Stop));
                     EndDialog(hwnd, FALSE);
                     break;

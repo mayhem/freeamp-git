@@ -257,9 +257,10 @@ void MissingFileUI::Run(void)
     while (iRet == 0)
         usleep(20);
 
-    if (iRet == 2)
-        /* do cancel stuff... */
+    if (iRet == 2) {
+        m_context->plm->RemoveItem(m_missing);
         return;
+    }
 
     switch (m_iFunction) {
         /* browse */

@@ -519,24 +519,45 @@ Error HttpInput::Open(void)
 #endif
 
     iConnect = connect(m_hHandle,(const sockaddr *)&sAddr,sizeof(sAddr));
-    for(; iConnect && !m_bExit;)
-    {
-        sTv.tv_sec = 0; sTv.tv_usec = 0;
-        FD_ZERO(&sSet); FD_SET(m_hHandle, &sSet);
-        iRet = select(m_hHandle + 1, NULL, &sSet, NULL, &sTv);
-        if (!iRet)
-        {
-           usleep(100000);
-           continue;
-        }
+    
+    if (iConnect == -1) {
+        int error = errno;
 
-        if (iRet < 0)
-        { 
-           ReportError("Cannot connect to host: %s", szHostName);
-           closesocket(m_hHandle);
-           return (Error)httpError_CannotConnect;
-        }
-        break;
+        if (error != EINPROGRESS)
+	{
+	    ReportError("Cannot connect to host: %s", szHostName);
+	    closesocket(m_hHandle);
+	    return (Error)httpError_CannotConnect;
+	}
+	
+        int conattempt = 0;
+        for(; iConnect && !m_bExit;)
+        {
+	    if (conattempt > 50)
+	    {
+	       ReportError("Host not answering: %s", szHostName);
+	       closesocket(m_hHandle);
+	       return (Error)httpError_CannotConnect;
+	    }
+	    
+	    conattempt++;
+            sTv.tv_sec = 0; sTv.tv_usec = 0;
+            FD_ZERO(&sSet); FD_SET(m_hHandle, &sSet);
+            iRet = select(m_hHandle + 1, NULL, &sSet, NULL, &sTv);
+            if (!iRet)
+            {
+               usleep(100000);
+               continue;
+            }
+
+            if (iRet < 0)
+            {
+               ReportError("Cannot connect to host: %s", szHostName);
+               closesocket(m_hHandle);
+               return (Error)httpError_CannotConnect;
+            }
+            break;
+	}
     }
     if (m_bExit)
         return (Error)kError_Interrupt;
