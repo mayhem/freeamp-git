@@ -263,7 +263,7 @@ Error ObsInput::Open(void)
 
         m_pTitleStream = new TitleStreamServer(m_pContext, m_pTarget);
 
-        eRet = m_pTitleStream->MulticastInit(szAddr, iPort + 1);
+        eRet = m_pTitleStream->MulticastInit(szAddr, iPort + 2);
         if (IsError(eRet))
         {
             delete m_pTitleStream;
