@@ -603,7 +603,16 @@ Notify(int32 command, LPNMHDR notifyMsgHdr)
 
         m_oControls[idCtrl]->GetTip(strTip);
         if(strTip.length())
-           strncpy(lpttt->szText,strTip.c_str(),80); // if tip is there
+		{
+			if(strTip.length()>79)
+			{
+                // to avoid buffer overruns
+                lpttt->szText[79]=0;
+                strncpy(lpttt->szText,strTip.c_str(),78);
+			}
+			else
+			    strcpy(lpttt->szText,strTip.c_str()); // if tip is there
+		}
     }
 }
 

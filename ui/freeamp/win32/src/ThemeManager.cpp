@@ -97,6 +97,7 @@ Error ThemeManager::GetThemeList(map<string, string> &oThemeFileMap)
     uint32          len = sizeof(dir);
     string          oThemePath, oThemeBasePath, oThemeFile;
     string          oThemeName;
+    map<string,string>::iterator oDupName;
     ThemeZip        oZip;
 
 
@@ -121,6 +122,16 @@ Error ThemeManager::GetThemeList(map<string, string> &oThemeFileMap)
         if(oThemeName.length())
         {
             // got something
+
+            // see if the name is unique
+            oDupName = oThemeFileMap.find(oThemeName);
+            if(oDupName != oThemeFileMap.end())
+            {
+                // dupe found!
+                // manipulate theme name to include filename in it
+                oThemeName += string(" (") + string(find.cFileName) + string(")");
+            }
+            
             oThemeFileMap[oThemeName] = oThemeFile;
         }
         else
@@ -129,8 +140,8 @@ Error ThemeManager::GetThemeList(map<string, string> &oThemeFileMap)
             ptr = strrchr(find.cFileName, '.');
             if (ptr)
                *ptr = 0;
-        }
         oThemeFileMap[find.cFileName] = oThemeFile;
+        }
     }
     while(FindNextFile(handle, &find));
 
