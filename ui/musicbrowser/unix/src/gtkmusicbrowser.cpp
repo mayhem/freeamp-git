@@ -1358,6 +1358,8 @@ void GTKMusicBrowser::MoveDownEvent(void)
 
 void GTKMusicBrowser::MoveItemEvent(int source, int dest)
 {
+    m_plSelected.clear();
+    m_plSelected.insert(dest);
     m_plm->MoveItem(source, dest);
 }
 

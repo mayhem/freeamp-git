@@ -339,8 +339,8 @@ void GTKMusicBrowser::RemovePlaylistItems(vector<uint32> *indices)
     RenumberPlaylistList(minpos);
 
     gtk_clist_columns_autosize(GTK_CLIST(playlistList));
-    gtk_clist_select_row(GTK_CLIST(playlistList), m_lastindex, 0);
-    gtk_clist_moveto(GTK_CLIST(playlistList), m_lastindex, 0, 0.5, -1);
+    gtk_clist_select_row(GTK_CLIST(playlistList), minpos, 0);
+    gtk_clist_moveto(GTK_CLIST(playlistList), minpos, 0, 0.5, -1);
     gtk_clist_thaw(GTK_CLIST(playlistList));
 }
 
