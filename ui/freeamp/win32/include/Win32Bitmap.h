@@ -35,8 +35,8 @@ class Win32Bitmap : public Bitmap
 {
     public:
 
-              Win32Bitmap(string &oName);
-			  Win32Bitmap(int iWidth, int iHeight, string &oName);
+              Win32Bitmap(const string &oName);
+			  Win32Bitmap(int iWidth, int iHeight, const string &oName);
      virtual ~Win32Bitmap(void);
 
      virtual Error LoadBitmapFromDisk(string &oFile);

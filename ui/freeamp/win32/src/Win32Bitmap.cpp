@@ -26,7 +26,7 @@ ____________________________________________________________________________*/
 #include "debug.h"
 
 
-Win32Bitmap::Win32Bitmap(string &oName)
+Win32Bitmap::Win32Bitmap(const string &oName)
           :Bitmap(oName)
 {
    m_oBitmapName = oName;
@@ -35,7 +35,7 @@ Win32Bitmap::Win32Bitmap(string &oName)
    m_pBitmapData = NULL;
 }
 
-Win32Bitmap::Win32Bitmap(int iWidth, int iHeight, string &oName)
+Win32Bitmap::Win32Bitmap(int iWidth, int iHeight, const string &oName)
            :Bitmap(oName)
 {
    HDC hDc;
