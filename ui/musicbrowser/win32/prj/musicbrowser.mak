@@ -137,8 +137,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 Release" "fabaselib - Win32 Release"\
  ".\musicbrowser.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                    ..\..\..\..\base\win32\prj\plugins
-	copy musicbrowser.ui                                                                      ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                     ..\..\..\..\base\win32\prj\plugins
+	copy musicbrowser.ui                                                                       ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 Debug"
@@ -241,8 +241,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 Debug" "fabaselib - Win32 Debug"\
  ".\musicbrowser.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                    ..\..\..\..\base\win32\prj\plugins
-	copy musicbrowser.ui                                                                      ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                     ..\..\..\..\base\win32\prj\plugins
+	copy musicbrowser.ui                                                                       ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Debug"
@@ -346,8 +346,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 NASM Debug" "fabaselib - Win32 NASM Debug"\
  ".\musicbrowser.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                    ..\..\..\..\base\win32\prj\plugins
-	copy musicbrowser.ui                                                                      ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                     ..\..\..\..\base\win32\prj\plugins
+	copy musicbrowser.ui                                                                       ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Release"
@@ -450,8 +450,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 NASM Release"\
  "fabaselib - Win32 NASM Release" ".\musicbrowser.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                    ..\..\..\..\base\win32\prj\plugins
-	copy musicbrowser.ui                                                                      ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                     ..\..\..\..\base\win32\prj\plugins
+	copy musicbrowser.ui                                                                       ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 

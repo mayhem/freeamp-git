@@ -330,8 +330,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                 } 
                 else if(m_oTreeIndex.IsPlaylist(sItem.lParam))
                 {
-                    AddPlaylist(m_oTreeIndex.Data(sItem.lParam).m_oPlaylistPath);
-                    SetFocus(m_hPlaylistView);
+                    m_oPlm->ReadPlaylist(m_oTreeIndex.Data(sItem.lParam).m_oPlaylistPath.c_str());
                 }
                 else if(tv_htinfo.hItem == m_hNewPlaylistItem)
                 {

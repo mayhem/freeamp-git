@@ -375,9 +375,6 @@ void MusicBrowserUI::FillPlaylists(void)
 
     for(i = pList->begin(), iIndex = 0; i != pList->end(); i++,iIndex++)
     {
-        if (!iIndex) 
-            continue;
-
         _splitpath((char *)(*i).c_str(), NULL, NULL, szBase, NULL);   
         oData.m_oPlaylistName = string(szBase);
         oData.m_oPlaylistPath = *i;

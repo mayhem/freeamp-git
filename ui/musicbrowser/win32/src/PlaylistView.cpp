@@ -447,7 +447,7 @@ void MusicBrowserUI::PlaylistListItemAdded(const PlaylistItem* item)
         sItem.iSubItem = 0;
         sItem.iItem = index;
 
-        if(!ListView_GetItemCount(hwnd))
+        if(!ListView_GetItemCount(hwnd) && !m_pParent)
             m_context->target->AcceptEvent(new Event(CMD_Play));
 
         ListView_InsertItem(hwnd, &sItem);

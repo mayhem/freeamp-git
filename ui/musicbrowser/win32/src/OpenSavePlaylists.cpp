@@ -33,27 +33,6 @@ ____________________________________________________________________________*/
 #include "Win32MusicBrowser.h"
 #include "debug.h"
 
-void MusicBrowserUI::AddPlaylist(const string &oName)
-{
-    vector<PlaylistItem *>            oList;
-    vector<PlaylistItem *>::iterator  j;
-    int                               i;
-    char                              url[MAX_PATH];
-    uint32                            len = MAX_PATH;
-
-    FilePathToURL(oName.c_str(), url, &len);
-    m_oPlm->SetActivePlaylist(kPlaylistKey_ExternalPlaylist);
-    m_oPlm->SetExternalPlaylist(url);
-    for(i = 0; i < m_oPlm->CountItems(); i++)
-        oList.push_back(m_oPlm->ItemAt(i));
-
-    m_oPlm->SetActivePlaylist(kPlaylistKey_MasterPlaylist);
-    for(j = oList.begin(); j != oList.end(); j++)
-        m_oPlm->AddItem(new PlaylistItem(*(*j)), true);
-
-    m_bListChanged = true;
-}
-
 void MusicBrowserUI::LoadPlaylist(const string &oPlaylist)
 {
     vector<PlaylistItem*> items;

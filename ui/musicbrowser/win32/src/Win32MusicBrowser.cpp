@@ -206,6 +206,13 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
         {
             MusicCatalogTrackAddedEvent* pie = (MusicCatalogTrackAddedEvent*)event;
 
+            vector<MusicBrowserUI *>::iterator i;
+
+            for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
+            {
+                (*i)->MusicCatalogTrackAdded(pie->Artist(), pie->Album(), pie->Item());
+            }
+
             MusicCatalogTrackAdded(pie->Artist(), pie->Album(), pie->Item());
             
             break; 
@@ -223,6 +230,13 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
         {
             MusicCatalogPlaylistAddedEvent* pie = (MusicCatalogPlaylistAddedEvent*)event;
             
+            vector<MusicBrowserUI *>::iterator i;
+
+            for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
+            {
+                (*i)->MusicCatalogPlaylistAdded(pie->Item());
+            }
+
             MusicCatalogPlaylistAdded(pie->Item());
             
             break; 
