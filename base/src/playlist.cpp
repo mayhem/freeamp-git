@@ -90,114 +90,101 @@ Error PlayListManager::RemoveAll()
 void PlayListManager::Add(char *pc, int type)
 {
    GetPLManipLock();
-   if (pc)
-   {
-      PlayListItem *item = new PlayListItem();
 
-      if (!item)
-      {
+   if(pc)
+   {
+        PlayListItem *item = new PlayListItem();
+
+        if (!item)
+        {
          cerr << "Out of memory!" << endl;
          exit(1);
-      }
-      int       len = strlen(pc) + 1;
+        }
 
-      if (item->m_url = new char[len])
-      {
-         memcpy(item->m_url, pc, len);
-      }
-      else
-      {
-         cerr << "Out of memory!\n";
-         exit(1);
-      }
-      item->m_type = type;
-      m_pMediaElems->Insert(item);
-      if (m_pMediaElems->NumElements() == 1)
-      {
-         m_current = 0;         // set current to first
+        item->SetURL(pc);
+        item->SetType(type);
 
-      }
-      // add a corresponding element to the order list
-      OrderListItem *orderItem = new OrderListItem();
+        m_pMediaElems->Insert(item);
 
-      orderItem->m_indexToRealVector = m_pMediaElems->NumElements() - 1;
-      m_pOrderList->Insert(orderItem);
+        if (m_pMediaElems->NumElements() == 1)
+        {
+            m_current = 0;         // set current to first
+        }
+        // add a corresponding element to the order list
+        OrderListItem *orderItem = new OrderListItem();
 
-      //PLMGetMediaInfoEvent *gmi = new PLMGetMediaInfoEvent();
-      //gmi->SetPlayListItem(item);
-      //m_target->AcceptEvent(gmi);
-      m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
+        orderItem->m_indexToRealVector = m_pMediaElems->NumElements() - 1;
+        m_pOrderList->Insert(orderItem);
+
+        //PLMGetMediaInfoEvent *gmi = new PLMGetMediaInfoEvent();
+        //gmi->SetPlayListItem(item);
+        //m_target->AcceptEvent(gmi);
+        m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
    }
+
    ReleasePLManipLock();
 }
 
 Error     PlayListManager::
 AddAt(char *pc, int type, int32 at)
 {
-   Error     rtn = kError_UnknownErr;
+    Error     rtn = kError_UnknownErr;
 
-   GetPLManipLock();
-   if ((at >= 0) && (at <= m_pMediaElems->NumElements()))
-   {
-      if (pc)
-      {
-         PlayListItem *item = new PlayListItem();
+    GetPLManipLock();
+    if ((at >= 0) && (at <= m_pMediaElems->NumElements()))
+    {
+        if (pc)
+        {
+            PlayListItem *item = new PlayListItem();
 
-         if (!item)
-         {
-            cerr << "Out of memory!!!" << endl;
-            exit(1);
-         }
-         int       len = strlen(pc) + 1;
+            if (!item)
+            {
+                cerr << "Out of memory!!!" << endl;
+                exit(1);
+            }
 
-         if (item->m_url = new char[len])
-         {
-            memcpy(item->m_url, pc, len);
-         }
-         else
-         {
-            cerr << "Out of memory!" << endl;
-            exit(1);
-         }
-         item->m_type = type;
-         if (m_order == SHUFFLE_SHUFFLED)
-         {
-            m_pMediaElems->Insert(item);        // put the real thing at the
-                                                // end
+            item->SetURL(pc);
+            item->SetType(type);
 
-         }
-         else
-         {
-            m_pMediaElems->InsertAt(at, item);
-         }
-         if (m_pMediaElems->NumElements() == 1)
-         {
-            m_current = 0;
-         }
+            if (m_order == SHUFFLE_SHUFFLED)
+            {
+                m_pMediaElems->Insert(item); // put the real thing at the end
 
-         OrderListItem *orderItem = new OrderListItem();
+            }
+            else
+            {
+                m_pMediaElems->InsertAt(at, item);
+            }
+            if (m_pMediaElems->NumElements() == 1)
+            {
+                m_current = 0;
+            }
 
-         if (m_order == SHUFFLE_SHUFFLED)
-         {
-            orderItem->m_indexToRealVector = m_pMediaElems->NumElements() - 1;
-            m_pOrderList->InsertAt(at, orderItem);
-         }
-         else
-         {
-            orderItem->m_indexToRealVector = at;
-            m_pOrderList->InsertAt(at, orderItem);
-         }
+            OrderListItem *orderItem = new OrderListItem();
 
-         //PLMGetMediaInfoEvent *gmi = new PLMGetMediaInfoEvent();
-         //gmi->SetPlayListItem(item);
-         //m_target->AcceptEvent(gmi);
-         m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
+            if (m_order == SHUFFLE_SHUFFLED)
+            {
+                orderItem->m_indexToRealVector = m_pMediaElems->NumElements() - 1;
+                m_pOrderList->InsertAt(at, orderItem);
+            }
+            else
+            {
+                orderItem->m_indexToRealVector = at;
+                m_pOrderList->InsertAt(at, orderItem);
+            }
 
-         rtn = kError_NoErr;
-      }
-   }
-   ReleasePLManipLock();
-   return rtn;
+            //PLMGetMediaInfoEvent *gmi = new PLMGetMediaInfoEvent();
+            //gmi->SetPlayListItem(item);
+            //m_target->AcceptEvent(gmi);
+            m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
+
+            rtn = kError_NoErr;
+        }
+    }
+
+    ReleasePLManipLock();
+
+    return rtn;
 }
 
 Error PlayListManager::RemoveItem(int32 at)
@@ -430,7 +417,7 @@ void PlayListManager::SendInfoToPlayer()
       }
       else
       {
-         MediaInfoEvent *pMIE = new MediaInfoEvent(pli->m_url, 0);
+         MediaInfoEvent *pMIE = new MediaInfoEvent(pli->URL(), 0);
 
          m_target->AcceptEvent(pMIE);
       }
