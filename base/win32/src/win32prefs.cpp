@@ -27,9 +27,9 @@ ____________________________________________________________________________*/
 
 // location
 const HKEY  kMainKey = HKEY_CURRENT_USER;
-//const char* kPrefsKey = "SOFTWARE\\FreeAmp\\FreeAmp v1.2\\Main";
+//const char* kPrefsKey = "SOFTWARE\\FreeAmp\\FreeAmp v1.3\\Main";
 const char* kFreeAmpKey = "SOFTWARE\\FreeAmp";
-const char* kFreeAmpVersionKey = "FreeAmp v1.2";
+const char* kFreeAmpVersionKey = "FreeAmp v1.3";
 const char* kMainComponentKey = "Main";
 
 // default values
