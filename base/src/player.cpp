@@ -1814,11 +1814,6 @@ DoneOutputting(Event *pEvent)
       m_lmc = NULL;
    }
 
-   if (SetState(PlayerState_Stopped))
-   {
-       SEND_NORMAL_EVENT(INFO_Stopped);
-   }
-
    PlaylistItem *item = m_plm->GetCurrentItem();
    if (item)
    {
@@ -1826,10 +1821,14 @@ DoneOutputting(Event *pEvent)
       if (mdata.GUID().size() == 16) {
           mdata.AddPlayCount();
           item->SetMetaData(&mdata);
-          m_plm->UpdateTrackMetaData(item);
           m_musicCatalog->UpdateSong(item);
           m_APSInterface->WriteToLog(mdata.GUID());   
       }
+   }
+
+   if (SetState(PlayerState_Stopped))
+   {
+       SEND_NORMAL_EVENT(INFO_Stopped);
    }
 
    SEND_NORMAL_EVENT(INFO_DoneOutputting);

@@ -535,6 +535,9 @@ Error MusicCatalog::AddSong(const char *url)
         meta = ReadMetaDataFromDatabase(url);
     }
 
+    if (!meta)
+        return kError_DatabaseNotWorking;
+
     if (m_killGUIDs)
     { 
         meta->SetGUID("");
