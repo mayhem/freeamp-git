@@ -341,7 +341,7 @@ FONT 8, "MS Sans Serif"
 BEGIN
     CONTROL         "Enable Relatable Features",IDC_PROFILE_ENABLE,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,6,7,125,8
-    PUSHBUTTON      "&What is all this?",IDC_PROFILE_HELP,156,7,70,12
+    PUSHBUTTON      "&More on Relatable",IDC_PROFILE_HELP,156,7,70,12
     GROUPBOX        "Profile Selection",IDC_STATIC,6,19,220,85
     LISTBOX         IDC_PROFILE_LIST,11,29,205,65,LBS_SORT | LBS_MULTIPLESEL | 
                     LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
