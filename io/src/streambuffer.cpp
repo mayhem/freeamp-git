@@ -51,6 +51,7 @@ bool StreamBuffer::IsBufferingUp(int32 iBytesNeeded)
    return GetNumBytesInBuffer() < iBytesNeeded;
 }
 
+#if 0
 Error StreamBuffer::BeginRead(void *&pBuffer, size_t &iBytesNeeded)
 {
    Error eRet;
@@ -80,6 +81,8 @@ Error StreamBuffer::BeginRead(void *&pBuffer, size_t &iBytesNeeded)
   
    if (GetNumBytesInBuffer() < iBytesNeeded && !IsEndOfStream())
 	{
+       printf("bytes in buffer: %d needed %d size: %d\n", 
+            GetNumBytesInBuffer(), iBytesNeeded, GetBufferSize());
        if (IsEndOfStream())
            eRet = kError_InputUnsuccessful;
 		 else
@@ -97,6 +100,7 @@ Error StreamBuffer::BeginRead(void *&pBuffer, size_t &iBytesNeeded)
 
    return PullBuffer::BeginRead(pBuffer, iBytesNeeded);
 }
+#endif
 
 Error StreamBuffer::BeginWrite(void *&pBuffer, size_t &iBytesNeeded)
 {

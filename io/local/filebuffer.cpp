@@ -29,6 +29,9 @@ ____________________________________________________________________________*/
 #endif
 
 #include "filebuffer.h"
+#include "log.h"
+
+extern LogFile *g_Log;
 
 #define DB //printf("%s:%d\n", __FILE__, __LINE__);
 
@@ -202,7 +205,12 @@ void FileBuffer::WorkerThread(void)
       if (eError == kError_NoErr)
       {
           iRead = fread((unsigned char *)pBuffer, 1, iToCopy, m_fpFile);
-          EndWrite(iRead);
+          eError = EndWrite(iRead);
+          if (IsError(eError))
+          {
+              g_Log->Error("local: EndWrite returned: %d\n", eError);
+              break;
+          }
 
           if (iRead < iToCopy)
              SetEndOfStream(true);

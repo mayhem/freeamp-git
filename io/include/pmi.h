@@ -72,6 +72,8 @@ public:
 	               {return kError_GotDefaultMethod;}
     virtual int32 GetBufferPercentage()
 	               {return 0;};
+    virtual int32 GetNumBytesInBuffer()
+	               {return 0;};
 	 virtual void  Pause()
 	               { };
 	 virtual void  Resume()

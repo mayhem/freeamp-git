@@ -108,6 +108,58 @@ Error PullBuffer::Clear(void)
    return kError_NoErr;
 }
 
+int PullBuffer::GetReadIndex(void)
+{
+   int iRet;
+
+   for(;;)
+   {
+       if (m_bExit)
+          return kError_Interrupt;
+
+       m_pMutex->Acquire();
+
+       if (m_bReadOpPending)
+       {
+           m_pMutex->Release();
+           continue;
+       }
+       break;
+   }
+
+   iRet = m_iReadIndex;
+
+   m_pMutex->Release();
+ 
+   return iRet;
+}
+
+int PullBuffer::GetWriteIndex(void)
+{
+   int iRet;
+
+   for(;;)
+   {
+       if (m_bExit)
+          return kError_Interrupt;
+
+       m_pMutex->Acquire();
+
+       if (m_bWriteOpPending)
+       {
+           m_pMutex->Release();
+           continue;
+       }
+       break;
+   }
+
+   iRet = m_iWriteIndex;
+
+   m_pMutex->Release();
+ 
+   return iRet;
+}
+
 Error PullBuffer::Resize(size_t iNewSize, 
                          size_t iNewOverflowSize, 
                          size_t iNewWriteTriggerSize)
@@ -118,8 +170,11 @@ Error PullBuffer::Resize(size_t iNewSize,
        return kError_BufferTooSmall;
 
    // Nothing should've been read from the buffer yet!
-   if (m_iReadIndex != m_iWriteIndex)
+   if (m_iReadIndex != 0)
+   {
+       g_Log->Error("Pullbuffer: Not resized. The buffer has been read.\n");
        return kError_InvalidError;
+   }
 
    for(;;)
    {
@@ -183,8 +238,8 @@ Error PullBuffer::BeginWrite(void *&pBuffer, size_t &iBytesToWrite)
 
    pBuffer = m_pPullBuffer + m_iWriteIndex;
 
-   //printf("BeginWrite: ReadIndex: %d WriteIndex %d Size: %d Bytes: %d\n", 
-   //    m_iReadIndex, m_iWriteIndex, m_iBufferSize, m_iBytesInBuffer);
+   //printf("%08X: BeginWrite: ReadIndex: %d WriteIndex %d Size: %d Bytes: %d\n", 
+   //    pthread_self(), m_iReadIndex, m_iWriteIndex, m_iBufferSize, m_iBytesInBuffer);
    if (m_iWriteIndex > m_iReadIndex)
    {
        iBytesToWrite = m_iBufferSize - m_iWriteIndex + 
@@ -213,7 +268,7 @@ Error PullBuffer::BeginWrite(void *&pBuffer, size_t &iBytesToWrite)
       if (iBytesToWrite > m_iWriteTriggerSize)
          iBytesToWrite = m_iWriteTriggerSize;
    }
-   //printf("iBytesToWrite: %d\n", iBytesToWrite);
+   //printf("%08X: iBytesToWrite: %d\n", pthread_self(), iBytesToWrite);
 
    assert(m_iWriteIndex + iBytesToWrite <= m_iBufferSize + m_iOverflowSize);
    assert(m_iBytesInBuffer + iBytesToWrite <= m_iBufferSize);
@@ -232,6 +287,13 @@ Error PullBuffer::EndWrite(size_t iBytesWritten)
 
    m_pMutex->Acquire();
 
+   if (m_iBytesInBuffer + iBytesWritten > m_iBufferSize)
+   {
+       m_pMutex->Release();
+
+       return kError_YouScrewedUp;
+   }
+
    m_iWriteIndex = m_iWriteIndex + iBytesWritten;
    if (m_iWriteIndex > m_iBufferSize)
       memmove(m_pPullBuffer, m_pPullBuffer + m_iBufferSize,
@@ -239,8 +301,9 @@ Error PullBuffer::EndWrite(size_t iBytesWritten)
 
    m_iWriteIndex %= m_iBufferSize;
    m_iBytesInBuffer += iBytesWritten;
-   //printf("bytesinbuffer: %d byteswritten %d buffsize: %d\n", 
-   //   m_iBytesInBuffer, iBytesWritten, m_iBufferSize);
+
+   //printf("%08X: bytesinbuffer: %d byteswritten %d buffsize: %d\n", 
+   //   pthread_self(), m_iBytesInBuffer, iBytesWritten, m_iBufferSize);
    
    assert(m_iBytesInBuffer <= m_iBufferSize);
 
@@ -254,11 +317,10 @@ Error PullBuffer::EndWrite(size_t iBytesWritten)
    g_Log->Log(LogInput, "EndWrite: ReadIndex: %d WriteIndex %d\n", m_iReadIndex, m_iWriteIndex);
    m_pMutex->Release();
 
-
    return kError_NoErr;
 }
 
-Error PullBuffer::BeginRead(void *&pBuffer, size_t &iBytesNeeded)
+Error PullBuffer::BeginRead(void *&pBuffer, size_t &iBytesNeeded, bool bBlock)
 {
    assert(m_pPullBuffer != NULL);
    Error  eError = kError_UnknownErr;
@@ -283,8 +345,14 @@ Error PullBuffer::BeginRead(void *&pBuffer, size_t &iBytesNeeded)
       if (iBytesNeeded > m_iBytesInBuffer)
       {
           m_pMutex->Release();
-          m_pReadSem->Wait();
-          continue;
+
+          if (bBlock)
+          {
+             m_pReadSem->Wait();
+             continue;
+          }
+
+          return kError_NoDataAvail;
       }
 
       pBuffer = m_pPullBuffer + m_iReadIndex;

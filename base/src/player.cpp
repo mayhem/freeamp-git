@@ -25,6 +25,7 @@ ____________________________________________________________________________*/
 #include <assert.h>
 
 #include "event.h"
+#include "lmc.h"
 #include "player.h"
 #include "thread.h"
 #include "debug.h"
@@ -35,7 +36,6 @@ ____________________________________________________________________________*/
 #include "eventdata.h"
 #include "registrar.h"
 #include "preferences.h"
-#include "lmc.h"
 #include "properties.h"
 #include "log.h"
 
@@ -751,6 +751,7 @@ void Player::CreateLMC(PlayListItem * pc, Event * pC)
    {
       pmo = (PhysicalMediaOutput *) item->InitFunction()(g_Log);
       pmo->SetPropManager((Properties *) this);
+      pmo->SetTarget((EventQueue *)this);
    }
 
    error = kError_NoErr;

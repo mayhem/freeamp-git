@@ -28,11 +28,13 @@ ____________________________________________________________________________*/
 #include <iostream.h>
 #include <string.h>
 
-#include "lmc.h"
+//#include "lmc.h"
 //#include "playlist.h"
 #include "event.h"
 #include "id3v1.h"
 #include "vector.h"
+
+class LogicalMediaConverter; 
 
 class UserMessageEvent : public Event {
  private:

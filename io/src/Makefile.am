@@ -29,7 +29,8 @@ FILES =
 MYLIBS = 
 TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
 else
-FILES = pmiregistry.cpp pmoregistry.cpp pullbuffer.cpp streambuffer.cpp
+FILES = pmiregistry.cpp pmoregistry.cpp pullbuffer.cpp streambuffer.cpp \
+        eventbuffer.cpp
 MYLIBS = libfaiosrc.a
 TRGT_SYS_HEADS = @top_srcdir@/base/unix/@host_os@/include
 endif

@@ -31,6 +31,7 @@ ____________________________________________________________________________*/
 #include "registry.h"
 #include "eventdata.h"
 #include "mutex.h"
+#include "pmi.h"
 
 class PlayListItem {
  private:

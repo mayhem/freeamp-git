@@ -121,7 +121,7 @@ class     XingLMC:public LogicalMediaConverter
 	Error       AdvanceBufferToNextFrame();
 	Error       GetHeadInfo();
 
-   bool        m_properlyInitialized;
+   bool        m_properlyInitialized, m_bExit;
    int32       m_frameWaitTill;
    Semaphore  *m_pauseSemaphore;
    AUDIO       m_audioMethods;
@@ -131,11 +131,8 @@ class     XingLMC:public LogicalMediaConverter
    PhysicalMediaInput *m_input;
    PhysicalMediaOutput *m_output;
 
-   unsigned char *m_pcmBuffer;
-   uint32    m_pcmBufBytes;
-   uint32    m_pcmTrigger;
-
-   int       m_frameBytes;
+   int       m_iMaxWriteSize;
+   int       m_frameBytes, m_iBufferUpBytes;
 	MPEG_HEAD m_sMpegHead;
 	int32     m_iBitRate;
    bool      m_isPaused, m_bBufferingUp;

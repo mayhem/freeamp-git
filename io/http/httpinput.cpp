@@ -196,10 +196,14 @@ EndRead(size_t bytesused)
    return m_pPullBuffer->EndRead(bytesused);
 }
 
-int32 HttpInput::
-GetBufferPercentage()
+int32 HttpInput::GetBufferPercentage()
 {
    return m_pPullBuffer->GetBufferPercentage();
+}
+
+int32 HttpInput::GetNumBytesInBuffer()
+{
+   return m_pPullBuffer->GetNumBytesInBuffer();
 }
 
 void HttpInput::

@@ -479,7 +479,12 @@ void HttpBuffer::WorkerThread(void)
           //   printf("%02X ", ((char*)pBuffer)[i] & 0xFF);
           //printf(" (%d - %d)\n", iToCopy, iReadSize);
 
-          EndWrite(iRead);
+          eError = EndWrite(iRead);
+          if (IsError(eError))
+          {
+              g_Log->Error("http: EndWrite returned: %d\n", eError);
+              break;
+          }
       }
       if (eError == kError_BufferTooSmall)
       {

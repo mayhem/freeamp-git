@@ -199,14 +199,17 @@ EndRead(size_t bytesused)
    return m_pPullBuffer->EndRead(bytesused);
 }
 
-int32 ObsInput::
-GetBufferPercentage()
+int32 ObsInput::GetBufferPercentage()
 {
    return m_pPullBuffer->GetBufferPercentage();
 }
 
-void ObsInput::
-Pause()
+int32 ObsInput::GetNumBytesInBuffer()
+{
+   return m_pPullBuffer->GetNumBytesInBuffer();
+}
+
+void ObsInput:: Pause()
 {
    return m_pPullBuffer->Pause();
 }

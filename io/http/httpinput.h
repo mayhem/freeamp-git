@@ -21,8 +21,8 @@
         $Id$
 ____________________________________________________________________________*/
 
-#ifndef _HTTPFILEINPUT_H_
-#define _HTTPFILEINPUT_H_
+#ifndef _HTTPINPUT_H_
+#define _HTTPINPUT_H_
 
 /* system headers */
 #include <stdlib.h>
@@ -51,6 +51,7 @@ class     HttpInput:public PhysicalMediaInput
    virtual bool  IsStreaming(void)
                  { return true; };
 	virtual int32 GetBufferPercentage();
+	virtual int32 GetNumBytesInBuffer();
    virtual Error SetBufferSize(size_t iNewSize);
 	virtual bool  CachePMI()
 	              { return true; };

@@ -236,6 +236,7 @@ void ObsBuffer::WorkerThread(void)
 
       for(;;)
       {
+          iToCopy = iRead;
           eError = BeginWrite(pBuffer, iToCopy);
           if (eError == kError_BufferTooSmall)
           {
@@ -260,7 +261,12 @@ void ObsBuffer::WorkerThread(void)
 
       iRead -= iHeaderSize;
       memcpy(pBuffer, pTemp + iHeaderSize, iRead);
-      EndWrite(iRead);
+      eError = EndWrite(iRead);
+      if (IsError(eError))
+      {
+         g_Log->Error("Obs: EndWrite returned: %d\n", eError);
+         break;
+      }
    }
 
    delete pTemp;

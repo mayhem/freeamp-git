@@ -56,7 +56,9 @@ typedef enum Error
     kError_SeekFailed = 25,
     kError_CreateThreadFailed = 26,
     kError_BufferingUp = 27,
-    kError_Interrupt   = 28
+    kError_Interrupt   = 28,
+    kError_EventPending = 29,
+    kError_YouScrewedUp = 30
 }Error;
 
 

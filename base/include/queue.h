@@ -1,25 +1,25 @@
 
 /*____________________________________________________________________________
-	
-	FreeAmp - The Free MP3 Player
+        
+        FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1998 GoodNoise
+        Portions Copyright (C) 1998 GoodNoise
 
-	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; either version 2 of the License, or
-	(at your option) any later version.
+        This program is free software; you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation; either version 2 of the License, or
+        (at your option) any later version.
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+        This program is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-	
-	$Id$
+        You should have received a copy of the GNU General Public License
+        along with this program; if not, write to the Free Software
+        Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+        
+        $Id$
 ____________________________________________________________________________*/
 
 // queue.h
@@ -38,14 +38,16 @@ class Queue {
     ~Queue();
     
     T Read();
+    T Peek();
+    void  Clear();
     int32 Write(T &);
     bool IsEmpty();
 
  private:
     class QueueMember {
         public:
-	    QueueMember *m_behindMe;
-	    T m_myMember;
+            QueueMember *m_behindMe;
+            T m_myMember;
     };
 
     void GetLock();
@@ -74,17 +76,17 @@ template<class T> Queue<T>::~Queue() {
     m_tail = NULL;
     ReleaseLock();
     while (pQM != NULL) {
-	next = pQM->m_behindMe;
-	if (m_deleteWhenDone) {
-	    if (pQM->m_myMember) {
-		delete pQM->m_myMember;
-	    }
-	}
-	delete pQM;
-	pQM = next;
+        next = pQM->m_behindMe;
+        if (m_deleteWhenDone) {
+            if (pQM->m_myMember) {
+                delete pQM->m_myMember;
+            }
+        }
+        delete pQM;
+        pQM = next;
     }
     if (m_myLock) {
-	delete m_myLock;
+        delete m_myLock;
     }
 }
 
@@ -93,18 +95,32 @@ template<class T> T Queue<T>::Read() {
     //cout << "queue:: read" << endl;
     T rtnVal = NULL;
     if (m_head) {
-	//cout << "queue:: read got m_head" << endl;
-	QueueMember *tmp = m_head;
-	rtnVal = tmp->m_myMember;
-	m_head = tmp->m_behindMe;
-	delete tmp;
+        //cout << "queue:: read got m_head" << endl;
+        QueueMember *tmp = m_head;
+        rtnVal = tmp->m_myMember;
+        m_head = tmp->m_behindMe;
+        delete tmp;
     }
     if (m_head == NULL) {
-	// no m_tail anymore
-	m_tail = NULL;
+        // no m_tail anymore
+        m_tail = NULL;
     }
     //cout << "queue:: read ending" << endl;
     ReleaseLock();
+    return rtnVal;
+}
+
+template<class T> T Queue<T>::Peek() 
+{
+    GetLock();
+    T rtnVal = NULL;
+
+    if (m_head) 
+    {
+        rtnVal = m_head->m_myMember;
+    }
+    ReleaseLock();
+
     return rtnVal;
 }
 
@@ -114,16 +130,39 @@ template<class T> int32 Queue<T>::Write(T &c) {
     pQM->m_myMember = c;
     pQM->m_behindMe = NULL;
     if (m_tail) {
-	m_tail->m_behindMe = pQM;
+        m_tail->m_behindMe = pQM;
     }
     m_tail = pQM;
     if (m_head == NULL) {
-	// no m_head, this T we just pushed on is now the m_head
-	m_head = pQM;
+        // no m_head, this T we just pushed on is now the m_head
+        m_head = pQM;
     }
     ReleaseLock();
     return 0;
 }
+
+template<class T> void Queue<T>::Clear() 
+{
+    GetLock();
+
+    QueueMember *pQM = m_head;
+    QueueMember *next = NULL;
+    m_head = NULL;
+    m_tail = NULL;
+    ReleaseLock();
+
+    while (pQM != NULL) {
+        next = pQM->m_behindMe;
+        if (m_deleteWhenDone) {
+            if (pQM->m_myMember) {
+                delete pQM->m_myMember;
+            }
+        }
+        delete pQM;
+        pQM = next;
+    }
+}
+
 
 template<class T> bool Queue<T>::IsEmpty() {
     return (m_head ? false : true);
