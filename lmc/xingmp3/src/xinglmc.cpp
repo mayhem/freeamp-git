@@ -49,6 +49,7 @@ ____________________________________________________________________________*/
 #include "lmc.h"
 #include "facontext.h"
 #include "log.h"
+#include "Debug.h"
 
 #define DB Debug_v("%s:%d\n",  __FILE__, __LINE__);
 
@@ -114,6 +115,8 @@ XingLMC::XingLMC(FAContext *context) :
    m_iBufferSize = iStreamingBufferSize * 1024;
    m_pPmi = NULL;
    m_pPmo = NULL;
+   m_fpFile = NULL;
+   m_pLocalReadBuffer = NULL;
 }
 
 XingLMC::~XingLMC()
@@ -190,7 +193,7 @@ Error XingLMC::AdvanceBufferToNextFrame()
 
        m_pContext->log->Log(LogDecode, "Skipped %d bytes in advance frame.\n", 
                            iCount + 1);
-       m_pInputBuffer->EndRead(iCount + 1);
+       EndRead(iCount + 1);
 
        if (iCount != 0 && iCount < iMaxFrameSize - 1)
        {
@@ -236,7 +239,7 @@ Error XingLMC::GetHeadInfo()
                                     m_frameBytes + iForward + m_sMpegHead.pad,
                                     iMaxFrameSize - (m_frameBytes + iForward), 
                                     &sHead, &iBitRate, &iForward);
-              m_pInputBuffer->EndRead(0);
+              EndRead(0);
 
               if (m_frameBytes > 0 && m_frameBytes < iMaxFrameSize && 
                  (m_sMpegHead.option == 1 || m_sMpegHead.option == 2))
@@ -246,7 +249,7 @@ Error XingLMC::GetHeadInfo()
            }
            else
            {
-              m_pInputBuffer->EndRead(0);
+              EndRead(0);
            }
 
            Err = AdvanceBufferToNextFrame();
@@ -337,7 +340,10 @@ Error XingLMC::ExtractMediaInfo()
    static int32 l[4] = {25, 3, 2, 1};
 
    int32     layer = l[m_sMpegHead.option];
-   milliseconds_per_frame = (double)(1152 * 1000) / (double)samprate;
+   if (m_sMpegHead.id == 1)
+      milliseconds_per_frame = (double)(1152 * 1000) / (double)samprate;
+   else   
+      milliseconds_per_frame = (double)(576 * 1000) / (double)samprate;
 
    if (end > 0)
    {
@@ -380,6 +386,94 @@ Error XingLMC::ExtractMediaInfo()
       m_pTarget->AcceptEvent(pMIE);
 
    return kError_NoErr;
+}
+
+bool XingLMC::GetBitstreamStats(float &fTotalSeconds, float &fMsPerFrame,
+                                int &iTotalFrames, int &iSampleRate, 
+                                int &iLayer)
+{
+   size_t       end;
+   Error        Err;
+   static int32 l[4] = {25, 3, 2, 1};
+   int32        sampRateIndex;
+
+   fTotalSeconds = fMsPerFrame = 0.0;
+   iTotalFrames = iSampleRate = iLayer = 0;
+
+   if (!m_pPmi && !m_fpFile)
+      return false;
+ 
+   if (m_frameBytes < 0)
+   {
+       Err = GetHeadInfo();
+       if (Err != kError_NoErr)
+		    return false;
+   }
+
+   if (m_fpFile)
+   {
+      fseek(m_fpFile, 0, SEEK_END);
+      end = ftell(m_fpFile);
+      fseek(m_fpFile, 0, SEEK_SET);
+   }
+   else   
+      if (m_pPmi->GetLength(end) == kError_FileSeekNotSupported)
+          end = 0;
+
+   sampRateIndex = 4 * m_sMpegHead.id + m_sMpegHead.sr_index;
+   iSampleRate = sample_rate_table[sampRateIndex];
+
+   if ((m_sMpegHead.sync & 1) == 0)
+        iSampleRate = iSampleRate / 2;    // mpeg25
+
+   iLayer = l[m_sMpegHead.option];
+   if (m_sMpegHead.id == 1)
+      fMsPerFrame = (double)(1152 * 1000) / (double)iSampleRate;
+   else   
+      fMsPerFrame = (double)(576 * 1000) / (double)iSampleRate;
+
+   if (end > 0)
+   {
+       iTotalFrames = end / m_frameBytes;
+       fTotalSeconds = (float) ((double) iTotalFrames * 
+                                (double) fMsPerFrame / 1000);
+   }
+   else
+   {
+       iTotalFrames = -1;
+       fTotalSeconds = -1;
+   }
+   
+   return true;
+}
+
+uint32 XingLMC::CalculateSongLength(const char *szUrl)
+{
+    char   path[MAX_PATH];
+    uint32 len = MAX_PATH;
+    float  fTotalSeconds, fMsPerFrame;
+    int    iTotalFrames, iSampleRate, iLayer;
+    bool   bRet;
+
+    URLToFilePath(szUrl, path, &len);
+    m_fpFile = fopen(path, "rb");
+    if (m_fpFile == NULL)
+       return 0;
+
+    bRet = GetBitstreamStats(fTotalSeconds, fMsPerFrame, iTotalFrames, 
+                              iSampleRate, iLayer);
+    fclose(m_fpFile);
+    m_fpFile = NULL;
+                              
+    if (bRet)   
+    {
+        if (fTotalSeconds < 0)
+           return 0;
+           
+        return (int)fTotalSeconds;
+    }
+    
+    return 0;
 }
 
 Error XingLMC::InitDecoder()
@@ -606,7 +700,7 @@ void XingLMC::DecodeWork()
                                     (short *)pOutBuffer);
           if (x.in_bytes == 0)
 		    {
-             m_pInputBuffer->EndRead(x.in_bytes);
+             EndRead(x.in_bytes);
              m_pOutputBuffer->EndWrite(x.in_bytes);
              m_pContext->log->Log(LogDecode, "Audio decode failed. "
                                              "Resetting the decoder.\n");
@@ -638,7 +732,7 @@ void XingLMC::DecodeWork()
       {
           return;
       }
-      m_pInputBuffer->EndRead(x.in_bytes);
+      EndRead(x.in_bytes);
       m_pPmi->Wake();
 
       if (m_pOutputBuffer)
@@ -694,9 +788,23 @@ Error XingLMC::BeginRead(void *&pBuffer, unsigned int iBytesNeeded,
    int32  iInPercent, iOutPercent;
    unsigned iBufferUpBytes;
 
+   if (m_fpFile)
+   {
+       int iRead;
+       
+       pBuffer = new char[iBytesNeeded];
+       m_pLocalReadBuffer = (char*)pBuffer;
+       
+       iRead = fread(pBuffer, sizeof(char), iBytesNeeded, m_fpFile);
+       if (iRead != iBytesNeeded)
+          return kError_ReadFile;
+          
+       return kError_NoErr;
+   }
+
    if (m_pPmi && m_pInputBuffer && (!m_pPmi->IsStreaming() || m_iBitRate <= 0))
    {
-	    return BlockingBeginRead(pBuffer, iBytesNeeded);
+	   return BlockingBeginRead(pBuffer, iBytesNeeded);
    }
 
    iInPercent = m_pInputBuffer->GetBufferPercentage();
@@ -774,6 +882,19 @@ Error XingLMC::BlockingBeginRead(void *&pBuffer, unsigned int iBytesNeeded)
 
    return eRet;
 }
+
+Error XingLMC::EndRead(size_t iBytesUsed)
+{
+   if (m_fpFile)
+   {
+      delete m_pLocalReadBuffer;
+      m_pLocalReadBuffer = NULL;
+      return kError_NoErr;
+   }
+       
+   return m_pInputBuffer->EndRead(iBytesUsed);
+}
+
 		
 #define _EQUALIZER_ENABLE_
 #ifdef  _EQUALIZER_ENABLE_
@@ -813,7 +934,3 @@ Error XingLMC::ChangePosition(int32 position)
    return kError_NoErr;
 }
 
-uint32 XingLMC::CalculateSongLength()
-{
-    return 0;
-}

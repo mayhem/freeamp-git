@@ -45,12 +45,12 @@ ALL : ".\musicbrowser.ui"
 
 !ELSE 
 
-ALL : "gdbm - Win32 Release" "fabaselib - Win32 Release" ".\musicbrowser.ui"
+ALL : "fabaselib - Win32 Release" ".\musicbrowser.ui"
 
 !ENDIF 
 
 !IF "$(RECURSE)" == "1" 
-CLEAN :"fabaselib - Win32 ReleaseCLEAN" "gdbm - Win32 ReleaseCLEAN" 
+CLEAN :"fabaselib - Win32 ReleaseCLEAN" 
 !ELSE 
 CLEAN :
 !ENDIF 
@@ -136,8 +136,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\MusicTree.obj" \
 	"$(INTDIR)\PlaylistView.obj" \
 	"$(INTDIR)\Win32MusicBrowser.obj" \
-	"..\..\..\..\base\win32\fabaselib.lib" \
-	"..\..\..\..\lib\gdbm\gdbm.lib"
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\musicbrowser.ui" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -149,8 +148,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "gdbm - Win32 Release" "fabaselib - Win32 Release"\
- ".\musicbrowser.ui"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 Release" ".\musicbrowser.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                               ..\..\..\..\base\win32\prj\plugins
 	copy musicbrowser.ui                                                                 ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -166,12 +164,12 @@ ALL : ".\musicbrowser.ui"
 
 !ELSE 
 
-ALL : "gdbm - Win32 Debug" "fabaselib - Win32 Debug" ".\musicbrowser.ui"
+ALL : "fabaselib - Win32 Debug" ".\musicbrowser.ui"
 
 !ENDIF 
 
 !IF "$(RECURSE)" == "1" 
-CLEAN :"fabaselib - Win32 DebugCLEAN" "gdbm - Win32 DebugCLEAN" 
+CLEAN :"fabaselib - Win32 DebugCLEAN" 
 !ELSE 
 CLEAN :
 !ENDIF 
@@ -258,8 +256,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\MusicTree.obj" \
 	"$(INTDIR)\PlaylistView.obj" \
 	"$(INTDIR)\Win32MusicBrowser.obj" \
-	"..\..\..\..\base\win32\fabaselib.lib" \
-	"..\..\..\..\lib\gdbm\gdbm.lib"
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\musicbrowser.ui" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -271,8 +268,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "gdbm - Win32 Debug" "fabaselib - Win32 Debug"\
- ".\musicbrowser.ui"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 Debug" ".\musicbrowser.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                               ..\..\..\..\base\win32\prj\plugins
 	copy musicbrowser.ui                                                                 ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -288,13 +284,12 @@ ALL : ".\musicbrowser.ui"
 
 !ELSE 
 
-ALL : "gdbm - Win32 NASM Debug" "fabaselib - Win32 NASM Debug"\
- ".\musicbrowser.ui"
+ALL : "fabaselib - Win32 NASM Debug" ".\musicbrowser.ui"
 
 !ENDIF 
 
 !IF "$(RECURSE)" == "1" 
-CLEAN :"fabaselib - Win32 NASM DebugCLEAN" "gdbm - Win32 NASM DebugCLEAN" 
+CLEAN :"fabaselib - Win32 NASM DebugCLEAN" 
 !ELSE 
 CLEAN :
 !ENDIF 
@@ -381,8 +376,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\MusicTree.obj" \
 	"$(INTDIR)\PlaylistView.obj" \
 	"$(INTDIR)\Win32MusicBrowser.obj" \
-	"..\..\..\..\base\win32\fabaselib.lib" \
-	"..\..\..\..\lib\gdbm\gdbm.lib"
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\musicbrowser.ui" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -394,8 +388,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "gdbm - Win32 NASM Debug" "fabaselib - Win32 NASM Debug"\
- ".\musicbrowser.ui"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Debug" ".\musicbrowser.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                               ..\..\..\..\base\win32\prj\plugins
 	copy musicbrowser.ui                                                                 ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -411,13 +404,12 @@ ALL : ".\musicbrowser.ui"
 
 !ELSE 
 
-ALL : "gdbm - Win32 NASM Release" "fabaselib - Win32 NASM Release"\
- ".\musicbrowser.ui"
+ALL : "fabaselib - Win32 NASM Release" ".\musicbrowser.ui"
 
 !ENDIF 
 
 !IF "$(RECURSE)" == "1" 
-CLEAN :"fabaselib - Win32 NASM ReleaseCLEAN" "gdbm - Win32 NASM ReleaseCLEAN" 
+CLEAN :"fabaselib - Win32 NASM ReleaseCLEAN" 
 !ELSE 
 CLEAN :
 !ENDIF 
@@ -503,8 +495,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\MusicTree.obj" \
 	"$(INTDIR)\PlaylistView.obj" \
 	"$(INTDIR)\Win32MusicBrowser.obj" \
-	"..\..\..\..\base\win32\fabaselib.lib" \
-	"..\..\..\..\lib\gdbm\gdbm.lib"
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\musicbrowser.ui" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -516,8 +507,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "gdbm - Win32 NASM Release"\
- "fabaselib - Win32 NASM Release" ".\musicbrowser.ui"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Release" ".\musicbrowser.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                               ..\..\..\..\base\win32\prj\plugins
 	copy musicbrowser.ui                                                                 ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -686,6 +676,7 @@ DEP_CPP_DIALO=\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\help.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
@@ -720,6 +711,7 @@ DEP_CPP_DIALO=\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\help.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
@@ -752,6 +744,7 @@ DEP_CPP_DIALO=\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\help.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
@@ -784,6 +777,7 @@ DEP_CPP_DIALO=\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\help.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
@@ -1447,60 +1441,6 @@ DEP_RSC_MUSICB=\
    cd "\FreeAmp\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak\
  CFG="fabaselib - Win32 NASM Release" RECURSE=1 
-   cd "..\..\..\ui\musicbrowser\win32\prj"
-
-!ENDIF 
-
-!IF  "$(CFG)" == "musicbrowser - Win32 Release"
-
-"gdbm - Win32 Release" : 
-   cd "\FreeAmp\freeamp\lib\gdbm\prj"
-   $(MAKE) /$(MAKEFLAGS) /F .\gdbm.mak CFG="gdbm - Win32 Release" 
-   cd "..\..\..\ui\musicbrowser\win32\prj"
-
-"gdbm - Win32 ReleaseCLEAN" : 
-   cd "\FreeAmp\freeamp\lib\gdbm\prj"
-   $(MAKE) /$(MAKEFLAGS) CLEAN /F .\gdbm.mak CFG="gdbm - Win32 Release"\
- RECURSE=1 
-   cd "..\..\..\ui\musicbrowser\win32\prj"
-
-!ELSEIF  "$(CFG)" == "musicbrowser - Win32 Debug"
-
-"gdbm - Win32 Debug" : 
-   cd "\FreeAmp\freeamp\lib\gdbm\prj"
-   $(MAKE) /$(MAKEFLAGS) /F .\gdbm.mak CFG="gdbm - Win32 Debug" 
-   cd "..\..\..\ui\musicbrowser\win32\prj"
-
-"gdbm - Win32 DebugCLEAN" : 
-   cd "\FreeAmp\freeamp\lib\gdbm\prj"
-   $(MAKE) /$(MAKEFLAGS) CLEAN /F .\gdbm.mak CFG="gdbm - Win32 Debug" RECURSE=1\
- 
-   cd "..\..\..\ui\musicbrowser\win32\prj"
-
-!ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Debug"
-
-"gdbm - Win32 NASM Debug" : 
-   cd "\FreeAmp\freeamp\lib\gdbm\prj"
-   $(MAKE) /$(MAKEFLAGS) /F .\gdbm.mak CFG="gdbm - Win32 NASM Debug" 
-   cd "..\..\..\ui\musicbrowser\win32\prj"
-
-"gdbm - Win32 NASM DebugCLEAN" : 
-   cd "\FreeAmp\freeamp\lib\gdbm\prj"
-   $(MAKE) /$(MAKEFLAGS) CLEAN /F .\gdbm.mak CFG="gdbm - Win32 NASM Debug"\
- RECURSE=1 
-   cd "..\..\..\ui\musicbrowser\win32\prj"
-
-!ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Release"
-
-"gdbm - Win32 NASM Release" : 
-   cd "\FreeAmp\freeamp\lib\gdbm\prj"
-   $(MAKE) /$(MAKEFLAGS) /F .\gdbm.mak CFG="gdbm - Win32 NASM Release" 
-   cd "..\..\..\ui\musicbrowser\win32\prj"
-
-"gdbm - Win32 NASM ReleaseCLEAN" : 
-   cd "\FreeAmp\freeamp\lib\gdbm\prj"
-   $(MAKE) /$(MAKEFLAGS) CLEAN /F .\gdbm.mak CFG="gdbm - Win32 NASM Release"\
- RECURSE=1 
    cd "..\..\..\ui\musicbrowser\win32\prj"
 
 !ENDIF 

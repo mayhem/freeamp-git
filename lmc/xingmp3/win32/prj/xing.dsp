@@ -60,8 +60,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                ..\..\..\..\base\win32\prj\plugins	copy xing.lmc\
-                        ..\..\..\..\base\win32\prj\plugins
+                                 ..\..\..\..\base\win32\prj\plugins	copy xing.lmc\
+                         ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "xing - Win32 Debug"
@@ -93,8 +93,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                ..\..\..\..\base\win32\prj\plugins	copy xing.lmc\
-                        ..\..\..\..\base\win32\prj\plugins
+                                 ..\..\..\..\base\win32\prj\plugins	copy xing.lmc\
+                         ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "xing - Win32 NASM Release"
@@ -126,8 +126,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                ..\..\..\..\base\win32\prj\plugins	copy xing.lmc\
-                        ..\..\..\..\base\win32\prj\plugins
+                                 ..\..\..\..\base\win32\prj\plugins	copy xing.lmc\
+                         ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug"
@@ -161,8 +161,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                ..\..\..\..\base\win32\prj\plugins	copy xing.lmc\
-                        ..\..\..\..\base\win32\prj\plugins
+                                 ..\..\..\..\base\win32\prj\plugins	copy xing.lmc\
+                         ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
@@ -234,6 +234,10 @@ SOURCE=..\..\..\..\io\src\pipeline.cpp
 # Begin Source File
 
 SOURCE=..\..\..\..\io\src\pullbuffer.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\src\utility.cpp
 # End Source File
 # Begin Source File
 

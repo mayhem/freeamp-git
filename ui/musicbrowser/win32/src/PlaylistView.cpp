@@ -511,7 +511,16 @@ void MusicBrowserUI::UpdatePlaylistList(void)
         ListView_SetItem(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), &sItem);
 
         if (pItem->GetMetaData().Time() != 0)
-            sprintf(szText, "%d", pItem->GetMetaData().Time());
+        {
+           int iTime = pItem->GetMetaData().Time();
+           if (iTime > 3600)
+              sprintf(szText, "%d:%02d:%02d", iTime / 3600, 
+                                          (iTime % 3600) / 60,
+                                          iTime % 60);
+           else   
+               sprintf(szText, "%d:%02d", (iTime % 3600) / 60,
+                                        iTime % 60);
+        }      
         else    
             strcpy(szText, "Unknown");
         sItem.pszText = szText;

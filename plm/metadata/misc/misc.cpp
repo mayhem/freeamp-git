@@ -98,64 +98,42 @@ bool Misc::ReadMetaData(const char* url, MetaData* metadata)
     // do we need to calculate the song length?
     if(!strncasecmp(url, "file://", 7) && !metadata->Time())
     {
-        for (uint32 i = 0; i < (uint32)m_pmiReg.CountItems(); i++)
+        RegistryItem *lmcItem = NULL;
+        char* cp;
+
+        cp = strrchr(url, '.');
+        if(cp)
         {
-            PhysicalMediaInput* pmi;
-            RegistryItem* pmiItem = m_pmiReg.GetItem(i);
+            cp++;
+            
+            char temp[256];
 
-            pmi = (PhysicalMediaInput*)pmiItem->InitFunction()(m_context);
+            strcpy(temp, cp);
 
-            if(pmi->CanHandle(url, NULL))
+            cp = temp;
+
+            while(*cp)
             {
-                pmi->SetTo(url);
-                RegistryItem *lmcItem = NULL;
-                char* cp;
-
-                cp = strrchr(url, '.');
-
-                if(cp)
-                {
-                    cp++;
-                    
-                    char temp[256];
-
-                    strcpy(temp, cp);
-
-                    cp = temp;
-
-                    while(*cp)
-                    {
-                        *cp = toupper(*cp);
-                        cp++;
-                    }
-
-                    string ext = temp;
-
-                    ExtensionMap::const_iterator iter = m_extensions.find(ext);
-                
-                    if(iter != m_extensions.end())
-                    {
-                        LogicalMediaConverter* lmc;
-
-                        lmcItem = iter->second; 
-
-                        lmc = (LogicalMediaConverter*)lmcItem->InitFunction()(m_context);
-                    
-                        lmc->SetPMI(pmi);
-
-                        uint32 length = lmc->CalculateSongLength();
-
-                        metadata->SetTime(length);
-
-                        delete lmc;
-                    }
-                }
-
-                delete pmi;
-                break;
+                *cp = toupper(*cp);
+                cp++;
             }
 
-            delete pmi;
+            string ext = temp;
+
+            ExtensionMap::const_iterator iter = m_extensions.find(ext);
+            if(iter != m_extensions.end())
+            {
+                LogicalMediaConverter *lmc;
+                uint32                 length = 0;
+
+                lmcItem = iter->second; 
+
+                lmc = (LogicalMediaConverter*)lmcItem->InitFunction()(m_context);
+                length = lmc->CalculateSongLength(url);
+                metadata->SetTime(length);
+
+                delete lmc;
+            }
         }
     }
 

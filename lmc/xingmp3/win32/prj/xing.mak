@@ -72,6 +72,7 @@ CLEAN :
 	-@erase "$(INTDIR)\pullbuffer.obj"
 	-@erase "$(INTDIR)\uph.obj"
 	-@erase "$(INTDIR)\upsf.obj"
+	-@erase "$(INTDIR)\utility.obj"
 	-@erase "$(INTDIR)\vc50.idb"
 	-@erase "$(INTDIR)\wavep.obj"
 	-@erase "$(INTDIR)\xing.res"
@@ -160,6 +161,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\pullbuffer.obj" \
 	"$(INTDIR)\uph.obj" \
 	"$(INTDIR)\upsf.obj" \
+	"$(INTDIR)\utility.obj" \
 	"$(INTDIR)\wavep.obj" \
 	"$(INTDIR)\xing.res" \
 	"$(INTDIR)\xinglmc.obj" \
@@ -221,6 +223,7 @@ CLEAN :
 	-@erase "$(INTDIR)\pullbuffer.obj"
 	-@erase "$(INTDIR)\uph.obj"
 	-@erase "$(INTDIR)\upsf.obj"
+	-@erase "$(INTDIR)\utility.obj"
 	-@erase "$(INTDIR)\vc50.idb"
 	-@erase "$(INTDIR)\vc50.pdb"
 	-@erase "$(INTDIR)\wavep.obj"
@@ -313,6 +316,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\pullbuffer.obj" \
 	"$(INTDIR)\uph.obj" \
 	"$(INTDIR)\upsf.obj" \
+	"$(INTDIR)\utility.obj" \
 	"$(INTDIR)\wavep.obj" \
 	"$(INTDIR)\xing.res" \
 	"$(INTDIR)\xinglmc.obj" \
@@ -374,6 +378,7 @@ CLEAN :
 	-@erase "$(INTDIR)\pullbuffer.obj"
 	-@erase "$(INTDIR)\uph.obj"
 	-@erase "$(INTDIR)\upsf.obj"
+	-@erase "$(INTDIR)\utility.obj"
 	-@erase "$(INTDIR)\vc50.idb"
 	-@erase "$(INTDIR)\wavep.obj"
 	-@erase "$(INTDIR)\xing.res"
@@ -467,6 +472,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\pullbuffer.obj" \
 	"$(INTDIR)\uph.obj" \
 	"$(INTDIR)\upsf.obj" \
+	"$(INTDIR)\utility.obj" \
 	"$(INTDIR)\wavep.obj" \
 	"$(INTDIR)\xing.res" \
 	"$(INTDIR)\xinglmc.obj" \
@@ -528,6 +534,7 @@ CLEAN :
 	-@erase "$(INTDIR)\pullbuffer.obj"
 	-@erase "$(INTDIR)\uph.obj"
 	-@erase "$(INTDIR)\upsf.obj"
+	-@erase "$(INTDIR)\utility.obj"
 	-@erase "$(INTDIR)\vc50.idb"
 	-@erase "$(INTDIR)\vc50.pdb"
 	-@erase "$(INTDIR)\wavep.obj"
@@ -625,6 +632,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\pullbuffer.obj" \
 	"$(INTDIR)\uph.obj" \
 	"$(INTDIR)\upsf.obj" \
+	"$(INTDIR)\utility.obj" \
 	"$(INTDIR)\wavep.obj" \
 	"$(INTDIR)\xing.res" \
 	"$(INTDIR)\xinglmc.obj" \
@@ -1056,6 +1064,21 @@ DEP_CPP_PULLB=\
 
 
 !ENDIF 
+
+SOURCE=..\..\..\..\base\src\utility.cpp
+DEP_CPP_UTILI=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\config\config.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
+	
+
+"$(INTDIR)\utility.obj" : $(SOURCE) $(DEP_CPP_UTILI) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
 
 SOURCE=..\res\xing.rc
 
@@ -1652,6 +1675,7 @@ SOURCE=..\..\src\xinglmc.cpp
 !IF  "$(CFG)" == "xing - Win32 Release"
 
 DEP_CPP_XINGL=\
+	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
@@ -1691,6 +1715,7 @@ DEP_CPP_XINGL=\
 !ELSEIF  "$(CFG)" == "xing - Win32 Debug"
 
 DEP_CPP_XINGL=\
+	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
@@ -1730,6 +1755,7 @@ DEP_CPP_XINGL=\
 !ELSEIF  "$(CFG)" == "xing - Win32 NASM Release"
 
 DEP_CPP_XINGL=\
+	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
@@ -1769,6 +1795,7 @@ DEP_CPP_XINGL=\
 !ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug"
 
 DEP_CPP_XINGL=\
+	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\

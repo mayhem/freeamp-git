@@ -130,7 +130,7 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
         case WM_EMPTYDBCHECK:
             EmptyDBCheck();
             return 1;
-            
+
         case WM_COMMAND:
         {
         	switch(LOWORD(wParam))
