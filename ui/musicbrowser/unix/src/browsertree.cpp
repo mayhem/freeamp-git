@@ -1065,7 +1065,7 @@ static void tree_status(GtkWidget *w, GdkEventMotion *event,
             case kTreeCDHead:
             case kTreeStreamsHead:
             case kTreeFavoriteStreamsHead:
-                e = new BrowserMessageEvent(data->message.c_str());
+                e = new BrowserMessageEvent(data->message);
                 break;
             default:
                 e = new BrowserMessageEvent(" ");

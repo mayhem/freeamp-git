@@ -1301,6 +1301,7 @@ GetExtension(const char *title)
    if (!IsSupportedExtension(ext_return))
    {
        delete [] ext_return;
+       ext_return = NULL;
        proto = GetProtocol(title);
  
        if (IsSupportedProtocol(proto) && (strncasecmp(proto, "file", 4) != 0))
@@ -1590,7 +1591,7 @@ GenerateSigsWork(set<string> *items)
         }
 
         string browserInfo = "Generating signature for " + url;
-        AcceptEvent(new BrowserMessageEvent(browserInfo.c_str()));
+        AcceptEvent(new BrowserMessageEvent(browserInfo));
 
         m_sigspmo = pmo;
 
@@ -1600,7 +1601,7 @@ GenerateSigsWork(set<string> *items)
             usleep(50);
 
         browserInfo = " ";
-        AcceptEvent(new BrowserMessageEvent(browserInfo.c_str()));
+        AcceptEvent(new BrowserMessageEvent(browserInfo));
         items->erase(url);
     }
 

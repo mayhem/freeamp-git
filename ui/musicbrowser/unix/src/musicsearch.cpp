@@ -310,6 +310,8 @@ void musicsearchUI::StartSearch(void)
     searchInProgress = true;
     m_context->catalog->SearchMusic(oPathList);
     gtk_label_set_text(GTK_LABEL(buttonLabel), "Cancel Search");
+
+    gtk_widget_destroy(m_window);
 }
 
 void musicsearchUI::EndSearch(void)

@@ -94,27 +94,6 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
 
             m_playerEQ->AcceptEvent(new Event(INFO_ReadyToDieUI));
             break; }
-        case INFO_SearchMusicDone:
-        case INFO_BrowserMessage: {
-            mainBrowser->AcceptEvent(event);
-            vector<GTKMusicBrowser *>::iterator i = browserWindows.begin();
-            for (; i != browserWindows.end(); i++)
-                (*i)->AcceptEvent(event);
-            if (searching)
-                searching->AcceptEvent(event);
-            if (wiz)
-	        wiz->AcceptEvent(event);
-            if (event->Type() == INFO_SearchMusicDone) {
-                gdk_threads_enter();
-	        if (searching) {
-                    searching->Close();
-		}
-		if (wiz) {
-		    wiz->Close();
-		}
-                gdk_threads_leave();
-            }
-            break; }
         case CMD_ToggleMusicBrowserUI: {
             if (mainBrowser->Visible())
                 mainBrowser->Close();
@@ -133,6 +112,8 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
         case INFO_SignaturingStarted:
         case INFO_SignaturingStopped:
         case INFO_CDDiscStatus: 
+        case INFO_SearchMusicDone:
+        case INFO_BrowserMessage:
         case INFO_PrefsChanged: {
             mainBrowser->AcceptEvent(event);
             vector<GTKMusicBrowser *>::iterator i = browserWindows.begin();

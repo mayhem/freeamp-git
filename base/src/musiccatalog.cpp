@@ -1013,11 +1013,10 @@ void MusicCatalog::DoSearchMusic(char *path, bool bSendMessages)
         return;
 #endif
  
-    if (bSendMessages) {
-        string *info = new string("Searching: ");
-        (*info) += path;
-        m_context->player->AcceptEvent(new BrowserMessageEvent(info->c_str()));
-        delete info;
+    if (bSendMessages) 
+    {
+        string info = string("Searching: ") + search;
+        m_context->player->AcceptEvent(new BrowserMessageEvent(info));
     }
    
     if (search[search.size() - 1] != DIR_MARKER)
@@ -1134,7 +1133,8 @@ void MusicCatalog::DoSearchMusic(char *path, bool bSendMessages)
                     delete plist;
                     delete [] tempurl;
                 }
-                delete [] fileExt;
+                if (fileExt)
+                    delete [] fileExt;
             }
         }
         while (FindNextFile(handle, &find) && !m_exit);
@@ -1359,13 +1359,13 @@ Error MusicCatalog::AcceptEvent(Event *e)
             m_context->target->AcceptEvent(new Event(INFO_MusicCatalogRegenerating));
             m_database->Sync();
             string info = "Pruning the Music Catalog Database...";
-            m_context->target->AcceptEvent(new BrowserMessageEvent(info.c_str()));
+            m_context->target->AcceptEvent(new BrowserMessageEvent(info));
             PruneDatabase();
             info = "Regenerating the Music Catalog Database...";
-            m_context->target->AcceptEvent(new BrowserMessageEvent(info.c_str()));
+            m_context->target->AcceptEvent(new BrowserMessageEvent(info));
             RePopulateFromDatabase();
             info = "Sorting the Music Catalog Database...";
-            m_context->target->AcceptEvent(new BrowserMessageEvent(info.c_str()));
+            m_context->target->AcceptEvent(new BrowserMessageEvent(info));
             Sort();
             m_context->target->AcceptEvent(new Event(INFO_SearchMusicDone));
             m_context->target->AcceptEvent(new Event(INFO_MusicCatalogDoneRegenerating));

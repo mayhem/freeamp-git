@@ -135,27 +135,23 @@ class ErrorMessageEvent:public Event
 class     BrowserMessageEvent:public Event
 {
    private:
-   char *m_info;
+   string m_info;
 
    public:
-   virtual ~ BrowserMessageEvent()
-   {
-       if (m_info)
-           delete [] m_info;
-   }
+   virtual ~ BrowserMessageEvent() {}
    BrowserMessageEvent()
    {
       m_type = INFO_BrowserMessage;
-      m_info = NULL;
+      m_info = "";
    }
-   BrowserMessageEvent(const char *info)
+   BrowserMessageEvent(string info)
    {
       m_type = INFO_BrowserMessage;
-      m_info = strdup_new(info);
+      m_info = info;
    }
    const char *GetBrowserMessage()
    {
-      return m_info;
+      return m_info.c_str();
    }
 };
 
