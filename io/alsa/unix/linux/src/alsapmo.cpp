@@ -283,6 +283,9 @@ void AlsaPMO::WorkerThread(void)
    // Don't do anything until resume is called.
    m_pPauseSem->Wait();
 
+   // Sleep for a pre buffer period
+   PreBuffer();
+
    // The following should be abstracted out into the general thread
    // classes:
 #ifdef __linux__

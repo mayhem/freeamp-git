@@ -57,7 +57,6 @@ PhysicalMediaInput::PhysicalMediaInput(FAContext *context):
 
 PhysicalMediaInput::~PhysicalMediaInput()
 {
-
     m_bExit = true;
     m_bPause = false;
     m_pSleepSem->Signal();

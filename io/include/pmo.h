@@ -89,9 +89,11 @@ public:
 protected:
 
     virtual bool  WasteTime();
+    virtual void  PreBuffer();
 
     PhysicalMediaInput    *m_pPmi;
     LogicalMediaConverter *m_pLmc;
+    int                    m_iPreBuffer;
 };
 
 #endif /* _PMO_H_ */

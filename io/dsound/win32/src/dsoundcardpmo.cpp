@@ -878,6 +878,8 @@ WorkerThread(void)
 
   m_prefs->GetDecoderThreadPriority(&iValue);
 
+  PreBuffer();
+
   m_pBufferThread->SetPriority(iValue);
 
   for(; !m_bExit;)

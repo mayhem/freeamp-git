@@ -590,7 +590,6 @@ EventServiceThreadFunc(void *pPlayer)
          rtnVal = pP->ServiceEvent(pC);
       }
    }
-   printf("Event service thread bye bye!\n");
 }
 
 int32     
@@ -917,6 +916,10 @@ CreatePMO(PlayListItem * pc, Event * pC)
    pmo->SetPMI(pmi);
    pmo->SetLMC(lmc);
 
+   pmi = NULL;
+   m_lmc = lmc;
+   lmc = NULL;
+
    error = pmo->SetTo(pc->URL());
    if (IsError(error))
    {
@@ -924,11 +927,8 @@ CreatePMO(PlayListItem * pc, Event * pC)
       goto epilogue;
    }
 
-   pmi = NULL;
    m_pmo = pmo;
    pmo = NULL;
-   m_lmc = lmc;
-   lmc = NULL;
 
    epilogue:
 

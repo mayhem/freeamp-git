@@ -106,6 +106,7 @@ HttpInput::HttpInput(FAContext *context):
     m_hHandle = -1;
     m_bLoop = false;
     m_bDiscarded = false;
+    m_bIsStreaming = true;
     m_pBufferThread = NULL;
     m_fpSave = NULL;
     m_szError = new char[iMaxErrorLen];
@@ -154,6 +155,22 @@ bool HttpInput::CanHandle(char *szUrl, char *szTitle)
        strcpy(szTitle, szDefaultStreamTitle);
 
     return bRet;
+}
+
+Error HttpInput::GetID3v1Tag(Id3TagInfo &sTag)
+{
+    if (m_pID3Tag)
+    {
+        memcpy(&sTag, m_pID3Tag, sizeof(sTag));
+        return kError_NoErr;
+    }
+
+    // Let's make up a ficticous ID3 tag.
+    memset(&sTag, 0, sizeof(sTag));
+    sTag.m_containsInfo = true;
+    strcpy(sTag.m_songName, szDefaultStreamTitle); 
+
+    return kError_NoErr;
 }
 
 Error HttpInput::Prepare(PullBuffer *&pBuffer, bool bStartThread)
@@ -309,7 +326,6 @@ Error HttpInput::Open(void)
      }
      else
      {
-        printf("Using proxy!\n");
         iRet = sscanf(m_szProxyHost, "http://%[^:/]:%d", szHostName, &iPort);
         if (iRet < 1)
         {
@@ -419,8 +435,7 @@ Error HttpInput::Open(void)
     if (m_bExit)
         return (Error)kError_Interrupt;
 
-    if (sscanf(pInitialBuffer, " ICY %d %255[^\n\r]", &iRet, m_szError) ||
-        sscanf(pInitialBuffer, " %*s %d %255[^\n\r]", &iRet, m_szError))
+    if (sscanf(pInitialBuffer, " ICY %d %255[^\n\r]", &iRet, m_szError))
     {
         char *pHeaderData, *pPtr;
         int   iHeaderBytes = 0, iCurHeaderSize = iHeaderSize;
@@ -516,17 +531,48 @@ Error HttpInput::Open(void)
     {
         unsigned int iSize;
 
+        if (sscanf(pInitialBuffer, " %*s %d %255[^\n\r]", &iRet, m_szError) != 2)
+        {
+            char szErr[255];
+
+            sprintf(szErr, "Unknown server response.\n");
+            LogError(szErr);
+
+		      delete pInitialBuffer;
+		      closesocket(m_hHandle);
+				return (Error)httpError_CustomError;
+		  }
+		  if (iRet != iICY_OK)
+		  {
+            char szErr[255];
+
+            sprintf(szErr, "This stream is not available: %s\n", m_szError);
+            LogError(szErr);
+
+		      delete pInitialBuffer;
+		      closesocket(m_hHandle);
+				return (Error)httpError_CustomError;
+		  }
+
+        // Let's make up a ficticous ID3 tag.
+        if (m_pID3Tag)
+           delete m_pID3Tag;
+
+        m_pID3Tag = new Id3TagInfo();
+        memset(m_pID3Tag, 0, sizeof(Id3TagInfo));
+        m_pID3Tag->m_containsInfo = true;
+        sscanf(szFile, "%30[^\r\n]", m_pID3Tag->m_songName);
+
         // Its a regular HTTP download. Let's save the bytes we've
         // read into the pullbuffer.
-
-        // Set the pull buffer to not keep streaming while we're
-		  // not playing. Otherwise portions (if not all the) MP3
-		  // file will be consumed before the user can hit play.
-
         iSize = iRead;
         m_pOutputBuffer->BeginWrite(pPtr, iSize);
         memcpy(pPtr, pInitialBuffer, iRead);
         m_pOutputBuffer->EndWrite(iRead);
+
+        // This is not a case where we are really streaming -- its
+        // a lot closer to a normal file playback
+        m_bIsStreaming = false;
     }
 
     delete pInitialBuffer;
@@ -582,6 +628,8 @@ void HttpInput::WorkerThread(void)
    fd_set          sSet;
    struct timeval  sTv;
 
+   static int      iSize = 0;
+
    m_pSleepSem->Wait(); 
 
    for(; !m_bExit;)
@@ -611,6 +659,7 @@ void HttpInput::WorkerThread(void)
              m_pOutputBuffer->EndWrite(0);
              break;
           }
+          iSize += iRead;
 
           if (m_fpSave)
           {
@@ -621,7 +670,7 @@ void HttpInput::WorkerThread(void)
                  break;
              }
           }
-
+          
           eError = m_pOutputBuffer->EndWrite(iRead);
           if (IsError(eError))
           {
@@ -637,8 +686,10 @@ void HttpInput::WorkerThread(void)
              m_bDiscarded = true;
           }
           else
+          {
+             iSize = 0;
              m_pSleepSem->Wait();
-
+          }
           continue;
       }
    }

@@ -51,6 +51,8 @@ ____________________________________________________________________________*/
 #include "facontext.h"
 #include "log.h"
 
+#define DB printf("%s:%d\n",  __FILE__, __LINE__);
+
 const int iInitialOutputBufferSize = 64512;
 
 extern    "C"
@@ -187,7 +189,7 @@ Error XingLMC::AdvanceBufferToNextFrame()
                                   (*(pBuffer+1) & 0xF0) == 0xE0)); 
            pBuffer++, iCount++)
                ; // <=== Empty body!
- 
+
        m_pContext->log->Log(LogDecode, "Skipped %d bytes in advance frame.\n", 
                            iCount + 1);
        m_pInputBuffer->EndRead(iCount + 1);
@@ -226,8 +228,8 @@ Error XingLMC::GetHeadInfo()
            m_frameBytes = head_info3((unsigned char *)pBuffer,
 			                            iMaxFrameSize, &m_sMpegHead, 
                                      &m_iBitRate, &iForward);
-           if (m_frameBytes > 0 && m_frameBytes < 1050 && 
-               m_sMpegHead.option == 1)
+           if (m_frameBytes > 0 && m_frameBytes < iMaxFrameSize && 
+               (m_sMpegHead.option == 1 || m_sMpegHead.option == 2))
            {
               MPEG_HEAD sHead;
               int       iFrameBytes, iBitRate;
@@ -238,14 +240,16 @@ Error XingLMC::GetHeadInfo()
                                     &sHead, &iBitRate, &iForward);
               m_pInputBuffer->EndRead(0);
 
-              if (iFrameBytes > 0 && iFrameBytes < 1050 &&
-                  m_sMpegHead.option == 1)
+              if (m_frameBytes > 0 && m_frameBytes < iMaxFrameSize && 
+                 (m_sMpegHead.option == 1 || m_sMpegHead.option == 2))
               {
                  return kError_NoErr;
               }
            }
            else
+           {
               m_pInputBuffer->EndRead(0);
+           }
 
            Err = AdvanceBufferToNextFrame();
            if (Err != kError_NoErr)
@@ -634,7 +638,6 @@ void XingLMC::DecodeWork()
 
              if (Err == kError_EndOfStream)
              {
-                 m_pOutputBuffer->EndWrite(0);
                  ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(new PMOQuitEvent());
                  return;
              }

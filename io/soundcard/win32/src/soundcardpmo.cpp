@@ -414,6 +414,9 @@ void SoundCardPMO::WorkerThread(void)
    // Don't do anything until resume is called.
    m_pPauseSem->Wait();
 
+   // Wait for prebuffer period
+   PreBuffer();
+
    m_pContext->prefs->GetDecoderThreadPriority(&iValue);
    m_pBufferThread->SetPriority(iValue);
 
