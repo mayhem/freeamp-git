@@ -216,6 +216,41 @@ void LcdUI::keyboardServiceFunction(void *pclcio) {
 			    //cout << "lcd: Ignore " << argv[1] << endl;
 			} else if(0 == strcmp(argv[0], "key")) {
 			    cout << "lcd: Key " << argv[1] << endl;
+                            switch (argv[1][0])
+                            {
+                                case 'E': {
+                                    cout << "Toggle Pause" << endl;
+                                    Event    *e = new Event(CMD_TogglePause);
+                                    pMe->m_playerEQ->AcceptEvent(e);
+                                    break; 
+                                }
+                                case 'F': {
+                                    cout << "Next Piece" << endl;
+                                    Event   *e = new Event(CMD_NextMediaPiece);
+                                    pMe->m_playerEQ->AcceptEvent(e);
+                                    break;
+                                }
+                                case 'G': { 
+                                    cout << "Prev Piece" << endl;
+                                    Event   *e = new Event(CMD_PrevMediaPiece);
+                                    pMe->m_playerEQ->AcceptEvent(e);
+                                    break;
+                                }
+                                case 'H': {
+                                    cout << "Shuffle" << endl;
+                                    if (pMe->m_plm) {
+                                        pMe->m_plm->SetShuffleMode(true);
+                                        pMe->m_plm->SetCurrentIndex(0);
+                                    }
+                                    Event   *e = new Event(CMD_Stop);
+                                    pMe->m_playerEQ->AcceptEvent(e);
+                                    e = new Event(CMD_Play);
+                                    pMe->m_playerEQ->AcceptEvent(e);
+                                    break;
+                                }
+                                default:
+                                    break;
+                            }
 			} else if(0 == strcmp(argv[0], "menu")) {
 			} else if(0 == strcmp(argv[0], "connect")) {
 			} else {

@@ -109,3 +109,6 @@ Other major contributors and their contributions:
 "Daniel Pustka" <pustka@compuserve.com>
 * Fixed bugs in Win32 MusicBrowser
 * Split UpdateButtonMenuStates into UpdateButtonStates and UpdateMenuStates
+
+"Harald Klein" <linux@chello.at>
+* keybad support for lcd ui
