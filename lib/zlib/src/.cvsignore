@@ -1,0 +1,14 @@
+adler32.lo
+compress.lo
+crc32.lo
+deflate.lo
+gzio.lo
+infblock.lo
+infcodes.lo
+inffast.lo
+inflate.lo
+inftrees.lo
+infutil.lo
+trees.lo
+uncompr.lo
+zutil.lo

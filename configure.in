@@ -305,6 +305,7 @@ int main ()
      CFLAGS="$ac_save_CFLAGS"
      LIBS="$ac_save_LIBS"
      AC_LANG_RESTORE
+     rm -f conf.esdtest
   fi
 fi
 

@@ -1,0 +1,10 @@
+plugins
+Makefile
+Makefile-plugins
+Makefile.header
+config.log
+config.status
+config.cache
+freeamp
+MakeTheme
+.config.check
