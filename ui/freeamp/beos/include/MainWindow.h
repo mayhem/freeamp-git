@@ -27,20 +27,26 @@ ____________________________________________________________________________*/
 #include <be/interface/Window.h>
 
 class Semaphore;
+class BeOSWindow;
+class BMessageRunner;
 
 class MainWindow : public BWindow
 {
 public:
-                        MainWindow( BRect frame, const char* name );
+                        MainWindow( BRect frame, const char* name,
+                                    BeOSWindow* parent );
     virtual             ~MainWindow();
     virtual bool        QuitRequested( void );
+    virtual void        MessageReceived( BMessage* message );
     virtual void        WaitForQuit( BRect* windowRectOnExit );
 
 protected:
 
 private:
+    BeOSWindow*         m_parent;
     Semaphore*          m_quitSem;
     BRect               m_frame;
+    BMessageRunner*	m_timer;
 };
 
 #endif // INCLUDED_BEOSMAINWINDOW_H

@@ -75,7 +75,7 @@ BeOSWindow::VulcanMindMeld( Window* other )
 
     if ( !m_mainWindow )
     {
-        m_mainWindow = new MainWindow( BRect(0,0,0,0), m_oName.c_str() );
+        m_mainWindow = new MainWindow( BRect(0,0,0,0), m_oName.c_str(), this );
     }
     else
     {

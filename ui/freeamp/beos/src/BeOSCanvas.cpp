@@ -90,6 +90,9 @@ BeOSCanvas::Erase( Rect& oPaintRect )
     }
 }
 
+// This function returns the number of pixels of the text that
+// were clipped if the text does not fit into the clipping rect.
+// If the text all fit, it returns 0.
 int
 BeOSCanvas::RenderText( int iFontHeight, Rect& oClipRect,
                         string& oText, AlignEnum eAlign,
@@ -144,7 +147,7 @@ BeOSCanvas::RenderText( int iFontHeight, Rect& oClipRect,
 
     Invalidate( oClipRect );
 
-    return 0;
+    return (width < oClipRect.Width()) ? 0 : int(width - oClipRect.Width());
 }
 
 int
@@ -155,8 +158,62 @@ BeOSCanvas::RenderOffsetText( int iFontHeight, Rect& oClipRect,
                               bool bUnderline )
 {
     CHECK_POINT_MSG( "RenderOffsetText" );
-    printf( "RenderOffset: %s\n", oText.c_str() );
-    return 0;
+
+    Erase( oClipRect );
+
+    BView* v = m_pBufferBitmap->OffscreenView();
+    if ( !v ) return 0;
+
+    BBitmap* bitmap = m_pBufferBitmap->GetBBitmap();
+
+    BFont font;
+    font_height fontHeight;
+    BRect clipRect( float(oClipRect.x1), float(oClipRect.y1),
+                    float(oClipRect.x2-1), float(oClipRect.y2-1) );
+    BRegion clipRegion;
+    clipRegion.Set( clipRect );
+
+    bitmap->Lock();
+
+    v->ConstrainClippingRegion( &clipRegion );
+    if ( bBold )
+    {
+        v->SetFont( be_bold_font );
+    }
+    else
+    {
+        v->SetFont( be_plain_font );
+    }
+    v->SetFontSize( (float)iFontHeight - 1 );
+    v->GetFont( &font );
+    font.GetHeight( &fontHeight );
+
+    float width = v->StringWidth(oText.c_str(), oText.size());
+    width += iMarqueeSpacer;
+
+    if ( iOffset > width )
+    {
+        bitmap->Unlock();
+        return width - iOffset;
+    }
+
+    v->MovePenTo( float(oClipRect.x1 - iOffset),
+                  float(oClipRect.y2 - fontHeight.descent) );
+    v->DrawString( oText.c_str() );
+    int ret = width - iOffset - oClipRect.Width();
+    if ( ret < 0 )
+    {
+        v->MovePenTo( float(oClipRect.x1 - iOffset + width),
+                      float(oClipRect.y2 - fontHeight.descent) );
+        v->DrawString( oText.c_str() );
+    }
+
+    v->Sync();
+    bitmap->Unlock();
+
+    Invalidate( oClipRect );
+
+    return MAX( 0, ret );
 }
 
 Error
