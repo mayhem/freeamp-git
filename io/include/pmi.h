@@ -52,7 +52,9 @@ public:
     virtual ~PhysicalMediaInput() { }
     virtual int32 Read(void* /*buf*/, size_t /*numbytes*/) {return -1;}
     virtual int32 Seek(int32 offset, int32 origin) {return -1;}
-    virtual char *GetStreamName(void) = 0;
+    virtual bool SetTo(char* url) = 0;
+    virtual bool Close(void) = 0;
+    virtual const char* Url(void) const = 0;
 };
 
 #endif /* _PMI_H_ */

@@ -22,61 +22,65 @@
 	$Id$
 ____________________________________________________________________________*/
 
-#ifndef _PMO_H_
-#define _PMO_H_
+
+#ifndef _SOUNDCARDPMO_H_
+#define _SOUNDCARDPMO_H_
 
 /* system headers */
 #include <stdlib.h>
 
-#include <config.h>
-
-
-#if HAVE_UNISTD_H
-#include <unistd.h>
-#elif HAVE_IO_H
-#include <io.h>
-#else 
-#error Must have unistd.h or io.h!
-#endif // HAVE_UNISTD_H
-
-
 /* project headers */
-#include "config.h"
+#include <config.h>
+#include "pmo.h"
+#include "buffer.h"
 
-#define MAXCHANNELS		2
+
+#define BIT_SELECT  0x1f
+#define SLEEPTIME   256
+
+static const uint32 OBUFFERSIZE = 2 * 1152;
 
 
-typedef struct OutputInfo
-{
-	uint32 bits_per_sample;
-	uint32 number_of_channels;
-	uint32 samples_per_second;
-	uint32 max_buffer_size;
-
-}OutputInfo;
-
-class PhysicalMediaOutput{
+class SoundCardPMO : public PhysicalMediaOutput{
 
 public:
-	virtual ~PhysicalMediaOutput() { }
-	virtual bool Init(OutputInfo* /*info*/){ return false; }
-	virtual bool Reset(bool /*user_stop*/){ return false; }
-	virtual void Append(uint32 /*channel*/, int16 /*value*/) { }
-	virtual int32 Write() { return -1; }
-	virtual int32 WriteThis(void * /* pBuffer */, int32 /* bufflength */) { return -1; }
-	virtual void Clear(){ }
+    SoundCardPMO();
+    virtual ~SoundCardPMO();
+    
+    virtual bool Init(OutputInfo* info);
+    virtual bool Reset(bool user_stop);
+    virtual void Append(uint32 channel, int16 value);
+    virtual int32 Write();
+    virtual int32 WriteThis(void *,int32);
+    virtual void Clear();
+    
+    
+ private:
+	void wave_swap();
+
+	WAVEHDR* NextHeader();
+
+private:
+	WAVEFORMATEX*	m_wfex;
+	LPWAVEHDR*		m_wavehdr_array;
+	HWAVEOUT		m_hwo;
+
+	uint32			m_index;
+	uint32			m_buffer[MAXCHANNELS];
+	uint32			m_channels;
+	uint32			m_buffer_count;
+	uint32			m_hdr_size;
+	uint32			m_fillup;
+	uint32			m_data_size;
+	uint32			m_num_headers;
+	bool			m_user_stop;
+	bool			m_initialized;
+
+
+    
 };
 
-#endif /* _PMO_H_ */
-
-
-
-
-
-
-
-
-
+#endif /* _SOUNDCARDPMO_H_ */
 
 
 

@@ -43,13 +43,17 @@ ____________________________________________________________________________*/
 #include "localfileinput.h"
 
 
-LocalFileInput::LocalFileInput() : PhysicalMediaInput()
+LocalFileInput::
+LocalFileInput(): 
+PhysicalMediaInput()
 {
 	m_path = NULL;
 	m_fd = -1;
 }
 
-LocalFileInput::LocalFileInput(char* path) : PhysicalMediaInput()
+LocalFileInput::
+LocalFileInput(char* path): 
+PhysicalMediaInput()
 {
     if (path) {
 	int32 len = strlen(path) + 1;
@@ -66,7 +70,8 @@ LocalFileInput::LocalFileInput(char* path) : PhysicalMediaInput()
     }
 }
 
-LocalFileInput::~LocalFileInput()
+LocalFileInput::
+~LocalFileInput()
 {
     //cout << "Deleting LocalFileInput" << endl;
     if(m_path) {
@@ -80,15 +85,8 @@ LocalFileInput::~LocalFileInput()
     //cout << "Done deleting LocalFileInput" << endl;
 }
 
-char *LocalFileInput::GetStreamName(void) {
-    int32 len = strlen(m_path) + 1;
-    char *rtn = new char[len];
-    memcpy(rtn,m_path,len);
-    return rtn;
-}
-
-
-bool LocalFileInput::SetTo(char* path)
+bool LocalFileInput::
+SetTo(char* url)
 {
     if(m_fd >= 0) {
 	close(m_fd);
@@ -99,18 +97,18 @@ bool LocalFileInput::SetTo(char* path)
 	m_path = NULL;
     }
 
-    if (path) {
+    if (url) {
 	
-	int32 len = strlen(path) + 1;
+	int32 len = strlen(url) + 1;
 	m_path = new char[len];
 	
 	if(m_path) {
-	    memcpy(m_path,path,len);
+	    memcpy(m_path,url,len);
 	} else {
 	    return false;
 	}
 	
-	m_fd = open(path, RD_BNRY_FLAGS);
+	m_fd = open(m_path, RD_BNRY_FLAGS);
 	
 	if( m_fd < 0 ) {
 	    return false;
@@ -121,17 +119,20 @@ bool LocalFileInput::SetTo(char* path)
     }
 }
 
-int32 LocalFileInput::Read(void* buf, size_t numbytes)
+int32 LocalFileInput::
+Read(void* buf, size_t numbytes)
 {
 	return read(m_fd, (char*)buf, numbytes);
 }
 
-int32 LocalFileInput::Seek(int32 offset, int32 origin)
+int32 LocalFileInput::
+Seek(int32 offset, int32 origin)
 {
 	return lseek(m_fd, offset, origin);
 }
 
-bool LocalFileInput::Close(void)
+bool LocalFileInput::
+Close(void)
 {
 	close(m_fd);
 	m_fd = -1;
