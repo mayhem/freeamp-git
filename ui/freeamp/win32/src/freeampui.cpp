@@ -2167,11 +2167,17 @@ AcceptEvent(Event* event)
             {
                 MediaTimeInfoEvent* info = (MediaTimeInfoEvent*)event;
  
-				int32 seconds = (int32)ceil(info->m_totalSeconds);
+				/*
+                int32 seconds = (int32)ceil(info->m_totalSeconds);
 				int32 hours = seconds / 3600;
 				int32 minutes = (seconds - (hours * 3600)) / 60;
 				seconds = seconds - (hours * 3600) - (minutes * 60);
+                */
 
+                int32 hours = info->m_hours;
+				int32 minutes = info->m_minutes;
+                int32 seconds = info->m_seconds;
+		
                 m_timeView->SetCurrentTime(hours, minutes, seconds);
 				
 				m_currentFrame = info->m_frame;

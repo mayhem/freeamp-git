@@ -185,11 +185,12 @@ AcceptEvent(Event* event)
 
 	            break; 
             }
+
 			case INFO_MPEGInfo: 
-				{
-					MpegInfoEvent *info = (MpegInfoEvent *)event;
-					char szTemp[256];
-					m_secondsPerFrame = info->GetSecondsPerFrame();
+            {
+				MpegInfoEvent *info = (MpegInfoEvent *)event;
+				char szTemp[256];
+				m_secondsPerFrame = info->GetSecondsPerFrame();
                 sprintf(szTemp, "%d kbps",  info->GetBitRate()/1000);
                 SendMessage(m_hwndStatus, 
 						    SB_SETTEXT, 
@@ -201,16 +202,18 @@ AcceptEvent(Event* event)
 						    SB_SETTEXT, 
 						    1, 
 						    (LPARAM) szTemp);
+
                 SendMessage(m_hwndSlider,
 						    TBM_SETRANGE,
 						    (WPARAM)TRUE,
 						    MAKELPARAM(0, info->GetTotalFrames()));
 				
 				break;
-				}
+            }
+
             case INFO_MediaInfo: 
             {
-                MediaInfoEvent *info = (MediaInfoEvent*)event;
+                MediaInfoEvent *info = (MediaInfoEvent*)event; 
 
                 
                 char timeString[256] = "00:00:00";
@@ -247,7 +250,6 @@ AcceptEvent(Event* event)
 						    (LPARAM)0);
 
                 SetWindowText(m_hwnd, info->m_filename);
-
 
 		        /*totalFrames = info->totalFrames;
 		        totalTime = info->totalTime;
@@ -309,10 +311,12 @@ AcceptEvent(Event* event)
                 if(!m_scrolling)
                 {
 
-                    SendMessage(m_hwndSlider,
+                    int32 frame = (int32)((float)info->m_totalSeconds/m_secondsPerFrame);
+
+                    SendMessage(m_hwndSlider, 
 						        TBM_SETPOS,
 						        (WPARAM)TRUE,
-						        (LPARAM)info->m_frame);
+						        (LPARAM)frame);
 
                 }
 
@@ -404,7 +408,7 @@ SetArgs(int32 argc, char** argv)
         }
         else 
         {
-            playlist->Add(arg,0);
+            playlist->AddItem(arg,0);
             count++;
 	    }
     }
@@ -412,7 +416,7 @@ SetArgs(int32 argc, char** argv)
     playlist->SetFirst();
 
     if(shuffle) 
-        playlist->SetShuffle(SHUFFLE_SHUFFLED);
+        playlist->SetShuffle(SHUFFLE_RANDOM);
     
     if(count)
     {
@@ -592,6 +596,8 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 						PlayListManager* playlist = m_ui->m_plm;
 
 
+                        playlist->MakeEmpty();
+
 						strcpy(file, filelist);
 						strcat(file, "\\");
 
@@ -601,7 +607,7 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 						{
 							strcpy(file + ofn.nFileOffset, cp);
 
-							playlist->Add(file,0);
+							playlist->AddItem(file,0);
 
 							cp += strlen(cp) + 1;
 						}
@@ -682,7 +688,7 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 								szFile,
 								sizeof(szFile));
 
-				m_ui->m_plm->Add(szFile,0);
+				m_ui->m_plm->AddItem(szFile,0);
 			}
 
             EnableWindow(m_ui->m_hwndPlay, TRUE);

@@ -1,25 +1,25 @@
-
 /*____________________________________________________________________________
-	
-	FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1998 GoodNoise
+  FreeAmp - The Free MP3 Player
 
-	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; either version 2 of the License, or
-	(at your option) any later version.
+  Portions Copyright (C) 1998 GoodNoise
+  Portions Copyright (C) 1998.Sylvain Rebaud (soothe@jps.net)
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
 
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-	
-	$Id: dsoundcardpmo.h,v 1. 1998/11/11 00:00:00 sr
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+  $Id: dsoundcardpmo.h,v 1. 1998/11/11 00:00:00 sr
 ____________________________________________________________________________*/
 
 /* system headers */
@@ -31,709 +31,937 @@ ____________________________________________________________________________*/
 
 /* project headers */
 #include "config.h"
-#include "win32thread.h"
-#include "semaphore.h"
 #include "DSoundCardPMO.h"
+#include "eventdata.h"
+#include "log.h"
 
-#define BUFFER_DURATION				2000		/*   2 secs   */
-#define POLLTIME					100			/* 100 msecs  */               
-#define SLEEPTIME					50			/*  50 msecs  */               
-#define MSG_EXIT_THREAD				WM_USER
+LogFile  *g_Log;
 
-char DebugStr[255];
-#define	OUTPUTDEBUGVALUE(str, value)			\
-	sprintf(DebugStr, "%s %d\n", str, value);	\
-	OutputDebugString((LPCTSTR) DebugStr);
-#define	OUTPUTDEBUG(str)						\
-	OutputDebugString((LPCTSTR) DebugStr);
+const int iDefaultBufferSize  = 512 * 1024;
+const int iOrigBufferSize     = 64 * 1024;
+const int iOverflowSize       = 0;
+const int iWriteTriggerSize   = 4192;
 
+#define WRITESLEEPTIME        50      /*  50 msecs  */
 
-extern "C" {
-
-PhysicalMediaOutput* Initialize() 
+extern "C"
 {
+  PhysicalMediaOutput* Initialize(LogFile * pLog)
+  {
+    g_Log = pLog;
     return new DSoundCardPMO();
+  }
 }
 
-} 
- 
-static 
-bool 
+static
+bool
 CALLBACK
-EnumThreadWndProc(	HWND hwnd, 
-					LPARAM lParam )
+EnumThreadWndProc(  HWND hwnd,
+                    LPARAM lParam )
 {
-	DSoundCardPMO	*pDSoundCardPmo = (DSoundCardPMO *)lParam;
- 	pDSoundCardPmo->m_hMainWndHandle = hwnd;
-	return TRUE;
+  char  strName[128];
+  int   nCount;
+
+  DSoundCardPMO*  pDSoundCardPmo    = (DSoundCardPMO*)  lParam;
+  pDSoundCardPmo->m_hMainWndHandle  = hwnd;
+
+  nCount = GetWindowText(hwnd, strName, 128);
+  // If we found our main window, stop the enumeration
+  if (!_stricmp(strName, "FreeAmp"))
+    return false;
+
+  return true;
 }
 
-static 
-bool 
+static
+bool
 CALLBACK
-DSEnumCallback(	LPGUID	lpGuid,
-				LPSTR	strDescription,
-				LPSTR	strModule,
-				LPVOID	lpContext)
+DSEnumCallback( LPGUID  lpGuid,
+                LPSTR   strDescription,
+                LPSTR   strModule,
+                LPVOID  lpContext)
 {
-	DSDevice	*pDSDevice;
-	HRESULT		hResult;
-	size_t		size = 0;
+  DSDevice  *pDSDevice;
+  HRESULT   hResult;
+  size_t    size = 0;
 
-	DSoundCardPMO	*pDSoundCardPmo = (DSoundCardPMO *)lpContext;
+  DSoundCardPMO*  pDSoundCardPmo = (DSoundCardPMO *)  lpContext;
 
-	if (!pDSoundCardPmo)
-		return FALSE;
+  if (!pDSoundCardPmo)
+    return false;
 
-	if (pDSoundCardPmo->m_pDSDevices)
-		size = _msize( pDSoundCardPmo->m_pDSDevices );
+  if (pDSoundCardPmo->m_pDSDevices)
+    size = _msize( pDSoundCardPmo->m_pDSDevices );
 
-	pDSDevice = (DSDevice *)realloc(pDSoundCardPmo->m_pDSDevices, size + sizeof(DSDevice));
+  pDSDevice = (DSDevice *)realloc(pDSoundCardPmo->m_pDSDevices, size + sizeof(DSDevice));
 
-	if (pDSDevice == NULL)
-	{
-		OUTPUTDEBUG("error reallocating DSDevices memory...");
-		return FALSE;
-	}
+  if (pDSDevice == NULL)
+  {
+    g_Log->Log(LogOutput, "error reallocating DSDevices memory...\n");
+    return false;
+  }
 
-	pDSoundCardPmo->m_pDSDevices = pDSDevice;
-	pDSDevice = &pDSoundCardPmo->m_pDSDevices[pDSoundCardPmo->m_nNbDSDevices];
+  pDSoundCardPmo->m_pDSDevices = pDSDevice;
+  pDSDevice = &pDSoundCardPmo->m_pDSDevices[pDSoundCardPmo->m_nNbDSDevices];
 
-	if (lpGuid)
-	{
-		pDSDevice->pGuid = (GUID *)malloc(sizeof(GUID));
-		memcpy(pDSDevice->pGuid, lpGuid, sizeof(GUID));
-	}
-	else
-		pDSDevice->pGuid = NULL;
+  if (lpGuid)
+  {
+    pDSDevice->pGuid = (GUID *)malloc(sizeof(GUID));
+    memcpy(pDSDevice->pGuid, lpGuid, sizeof(GUID));
+  }
+  else
+    pDSDevice->pGuid = NULL;
 
-	pDSDevice->szName = strdup(strModule);
-	pDSDevice->szDescription = strdup(strDescription);
+  pDSDevice->szName = strdup(strModule);
+  pDSDevice->szDescription = strdup(strDescription);
 
-	hResult = DirectSoundCreate(pDSDevice->pGuid, &pDSDevice->pDSObject, NULL);
-	if (FAILED(hResult))
-	{
-		OUTPUTDEBUG("error creating DirectSound Object...");
-		if (lpGuid)
-			free((void *) pDSDevice->pGuid);
+  hResult = DirectSoundCreate(pDSDevice->pGuid, &pDSDevice->pDSObject, NULL);
+  if (FAILED(hResult))
+  {
+    g_Log->Log(LogOutput, "error creating DirectSound Object...\n");
+    if (lpGuid)
+      free((void *) pDSDevice->pGuid);
 
-		free((void *) pDSDevice->szName);
-		free((void *) pDSDevice->szDescription);
+    free((void *) pDSDevice->szName);
+    free((void *) pDSDevice->szDescription);
 
-		pDSDevice = (DSDevice *)realloc(pDSoundCardPmo->m_pDSDevices, size);
+    pDSDevice = (DSDevice *)realloc(pDSoundCardPmo->m_pDSDevices, size);
 
-		if (pDSDevice != NULL)
-			pDSoundCardPmo->m_pDSDevices = pDSDevice;
+    if (pDSDevice != NULL)
+      pDSoundCardPmo->m_pDSDevices = pDSDevice;
 
-		return FALSE;
-	}
+    return false;
+  }
 
-    pDSDevice->lCreated = 0;
+  pDSDevice->lCreated = 0;
 
-	pDSoundCardPmo->m_nNbDSDevices++;
+  pDSoundCardPmo->m_nNbDSDevices++;
 
-    return TRUE;
+  return true;
 }
 
 DSoundCardPMO::
-DSoundCardPMO()
+DSoundCardPMO():
+EventBuffer(iOrigBufferSize, iOverflowSize, iWriteTriggerSize)
 {
-	HRESULT hResult;
+  HRESULT hResult;
 
-	m_wfex				= NULL;
-	m_user_stop			= false;
-	m_bDSInitialized	= false;
-	m_bLMCHasPaused		= FALSE;
-	m_nNbDSDevices		= 0;
-	m_pDSDevices		= NULL;
-	m_nCurrentDevice	= -1;
-	m_bDSEnumFailed		= FALSE;
-	m_hMainWndHandle	= NULL;
+  m_samples_per_second  = 0;
+  m_data_size           = 0;
+  m_wfex                = NULL;
+  m_initialized         = false;
+  m_pBufferThread       = NULL;
+  m_bExit               = false;
+  m_iLastFrame          = -1;
+  m_iTotalBytesWritten  = 0;
 
-	m_DSBufferMonitor.pDSBMThread		= NULL;
-	m_DSBufferMonitor.pBufferSemaphore	= NULL;
-	m_DSBufferMonitor.pWriteSemaphore	= NULL;
+  m_nNbDSDevices        = 0;
+  m_pDSDevices          = NULL;
+  m_nCurrentDevice      = -1;
+  m_bDSEnumFailed       = false;
+  m_hMainWndHandle      = NULL;
+  m_pDSWriteSem         = new Semaphore(1);
+  m_pDSBufferSem        = new Semaphore(0);
+  m_DSBufferManager.pDSSecondaryBuffer  = NULL;
+  m_bIsBufferEmptyNow   = true;
+  m_bLMCsaidToPlay      = false;
 
-	// Get a list of windows handle
-	BOOL breturn = EnumWindows((WNDENUMPROC) EnumThreadWndProc, (LPARAM) this); 
-	// get a list of devices
-	hResult = DirectSoundEnumerate((LPDSENUMCALLBACK) DSEnumCallback, this);
 
-	if (FAILED(hResult))
-	{
-		m_bDSEnumFailed	= TRUE;
-	}
+  // Get a list of windows handle
+  BOOL breturn = EnumWindows((WNDENUMPROC) EnumThreadWndProc, (LPARAM) this);
+  // get a list of devices
+  hResult = DirectSoundEnumerate((LPDSENUMCALLBACK) DSEnumCallback, this);
+
+  if (FAILED(hResult))
+  {
+    m_bDSEnumFailed = true;
+  }
+
+  if (!m_pBufferThread)
+  {
+    m_pBufferThread = Thread::CreateThread();
+    assert(m_pBufferThread);
+    m_pBufferThread->Create(DSoundCardPMO::StartWorkerThread, this);
+  }
 }
-
-#define TYPICAL_DELETE(x) if (x) { delete x; x = NULL; }
 
 DSoundCardPMO::
 ~DSoundCardPMO()
 {
-	int	i;
+  int i;
 
-    if(m_bDSInitialized)
-	{
-		delete m_wfex;
+  m_bExit = true;
+  m_pWriteSem->Signal();
+  m_pReadSem->Signal();
+  m_pDSBufferSem->Signal();
+  m_pDSWriteSem->Signal();
 
-        // ask the BufferMonitor thread to exit
-        m_DSBufferMonitor.pDSBMThread->PostThreadMessage(MSG_EXIT_THREAD, 0, 0);
+  if (m_pBufferThread)
+  {
+    m_pBufferThread->Join();
+    delete m_pBufferThread;
+    m_pBufferThread = NULL;
+  }
 
-		// wait for the BufferMonitor thread to exit
-		m_DSBufferMonitor.pDSBMThread->Join();
-		TYPICAL_DELETE(m_DSBufferMonitor.pDSBMThread);
+  delete m_pDSBufferSem;
+  delete m_pDSWriteSem;
 
-        //release the synchronisation Init object
-        CloseHandle(m_DSBufferMonitor.hInitOKEvent);
-		TYPICAL_DELETE(m_DSBufferMonitor.pBufferSemaphore);
-		TYPICAL_DELETE(m_DSBufferMonitor.pWriteSemaphore);
+  if(m_initialized)
+  {
+    delete m_wfex;
 
+    // delete the direct sound secondary buffer
+    if (m_DSBufferManager.pDSSecondaryBuffer)
+    {
+      IDirectSoundBuffer_Stop(m_DSBufferManager.pDSSecondaryBuffer);
+      IDirectSoundBuffer_Release(m_DSBufferManager.pDSSecondaryBuffer);
+    }
 
-        // delete the direct sound secondary buffer
-        if (m_DSBufferManager.pDSSecondaryBuffer)
-		{
-		    IDirectSoundBuffer_Stop(m_DSBufferManager.pDSSecondaryBuffer);
-		    IDirectSoundBuffer_Release(m_DSBufferManager.pDSSecondaryBuffer);
+    // Do I need to release primary as well ?
+  }
+
+  if (m_pDSDevices != NULL)
+  {
+    for (i=0;i<m_nNbDSDevices;i++)
+    {
+      if (&m_pDSDevices[i] != NULL)
+      {
+        // Should I destroy the DirectSound object as well ?
+
+        if ((&m_pDSDevices[i])->pGuid)
+        {
+          free((void *) (&m_pDSDevices[i])->pGuid);
+          (&m_pDSDevices[i])->pGuid = NULL;
         }
 
-		// Do I need to release primary as well ?
-	}
-
-	if (m_pDSDevices != NULL)
-	{
-		for (i=0;i<m_nNbDSDevices;i++)
-		{
-			if (&m_pDSDevices[i] != NULL)
-			{
-				// Should I destroy the DirectSound object as well ?
-
-				if ((&m_pDSDevices[i])->pGuid)
-				{
-					free((void *) (&m_pDSDevices[i])->pGuid);
-					(&m_pDSDevices[i])->pGuid = NULL;
-				}
-
-				free((void *) (&m_pDSDevices[i])->szName);
-				(&m_pDSDevices[i])->szName = NULL;
-				free((void *) (&m_pDSDevices[i])->szDescription);
-				(&m_pDSDevices[i])->szDescription = NULL;
-			}
-		}
-		if (m_pDSDevices)
-		{
-			free((void *) (m_pDSDevices));
-			m_pDSDevices = NULL;
-		}
-	}
+        free((void *) (&m_pDSDevices[i])->szName);
+        (&m_pDSDevices[i])->szName = NULL;
+        free((void *) (&m_pDSDevices[i])->szDescription);
+        (&m_pDSDevices[i])->szDescription = NULL;
+      }
+    }
+    if (m_pDSDevices)
+    {
+      free((void *) (m_pDSDevices));
+      m_pDSDevices = NULL;
+    }
+  }
 }
 
-
-Error 
+Error
 DSoundCardPMO::
 Init(OutputInfo* info)
 {
-    HRESULT			hResult;
-	DSBUFFERDESC	DSBufferInfo;
-	Error			result	= kError_UnknownErr;
+  HRESULT       hResult;
+  DSBUFFERDESC  DSBufferInfo;
+  Error         result  = kError_UnknownErr;
+  int           iNewSize = iDefaultBufferSize;
+  PropValue     *pProp;
 
-	if ((m_bDSEnumFailed) || (m_nNbDSDevices == 0) || (m_pDSDevices == NULL))
-		return result;
+  if ((m_bDSEnumFailed) || (m_nNbDSDevices == 0) || (m_pDSDevices == NULL))
+    return result;
 
-	m_DSBufferManager.state				= UNDERFLOW;
-	// Use Primary Sound Driver
-	m_nCurrentDevice					= 0;
-	m_DSBufferManager.pDSDevice			= &m_pDSDevices[m_nCurrentDevice];
-	m_DSBufferManager.pDSSecondaryBuffer= NULL;
-	
-	// What if the Callback hasn't finished yet here ?
-	// Do it only if it didn't happen already
-	if (InterlockedExchange(&m_DSBufferManager.pDSDevice->lCreated,1) == 0)
-	{
-		// the device was not initialized
-   		// create primary buffer
+  m_samples_per_second  = info->samples_per_second;
+  m_data_size           = info->max_buffer_size;
 
-		// Should set cooperative level here to set primary buffer format
-		// but we need a handle to a window ... need to talk to Mark about that
-		hResult = IDirectSound_SetCooperativeLevel(	m_DSBufferManager.pDSDevice->pDSObject,
-													m_hMainWndHandle,
-    												DSSCL_PRIORITY);
-		if (FAILED(hResult))
-		{
-			OUTPUTDEBUG("error cannot set DSSCL_PRIORITY Cooperative Level...");
-			return result;
-		}
+  m_propManager->GetProperty("MainHwnd", &pProp);
+  if (pProp)
+  {
+    m_hMainWndHandle = (HWND) atoi(((StringPropValue *)pProp)->GetString());
+  }
 
-		memset(&DSBufferInfo, 0, sizeof(DSBUFFERDESC));
-		DSBufferInfo.dwSize		= sizeof(DSBUFFERDESC);
-		DSBufferInfo.dwFlags	= DSBCAPS_PRIMARYBUFFER;
+  m_propManager->GetProperty("OutputBuffer", &pProp);
+  if (pProp)
+  {
+    iNewSize = atoi(((StringPropValue *)pProp)->GetString()) * 1024;
+  }
+  iNewSize -= iNewSize % m_data_size;
+  result = Resize(iNewSize, 0, m_data_size);
+  if (IsError(result))
+  {
+    ReportError("Internal buffer sizing error occurred.");
+    g_Log->Error("Resize output buffer failed.\n");
+    return result;
+  }
 
-		hResult = IDirectSound_CreateSoundBuffer(	m_DSBufferManager.pDSDevice->pDSObject,
-													&DSBufferInfo,
-													&m_DSBufferManager.pDSPrimaryBuffer,
-													NULL);
-		if (FAILED(hResult))
-		{
-			OUTPUTDEBUG("error Creating Primary Buffer...");
-			return result;
-		}
+  m_iBytesPerSample = info->number_of_channels * (info->bits_per_sample >> 3);
 
-		// try to set the primary buffer to 44.1 stereo 16 bits
-		if (SUCCEEDED(hResult))
-		{
-			WAVEFORMATEX format;
+  m_DSBufferManager.state             = UNDERFLOW;
+  // Use Primary Sound Driver
+  m_nCurrentDevice                    = 0;
+  m_DSBufferManager.pDSDevice         = &m_pDSDevices[m_nCurrentDevice];
+  m_DSBufferManager.pDSSecondaryBuffer= NULL;
 
-			format.wFormatTag		= WAVE_FORMAT_PCM;
-			format.nChannels	    = 2; 
-			format.nSamplesPerSec	= 44100;
-			format.nAvgBytesPerSec  = 2*2*44100;
-			format.nBlockAlign		= 2*2; 
-			format.wBitsPerSample	= 16;
-			format.cbSize           = 0;
+  // What if the Callback hasn't finished yet here ?
+  // Do it only if it didn't happen already
+  if (InterlockedExchange(&m_DSBufferManager.pDSDevice->lCreated,1) == 0)
+  {
+    // the device was not initialized
+    // create primary buffer
 
-			hResult = IDirectSoundBuffer_SetFormat(m_DSBufferManager.pDSPrimaryBuffer, &format);
-			if (FAILED(hResult)) 
-			{
-				OUTPUTDEBUG("Cannot Set Primary Buffer Format...");
-				return result;
-			}
-		}
-
-	}
-
-
-	// create synchronization objects
-    m_DSBufferMonitor.hInitOKEvent		= CreateEvent(NULL, FALSE, FALSE, NULL);
-    m_DSBufferMonitor.pWriteSemaphore	= new Semaphore(1);
-    m_DSBufferMonitor.pBufferSemaphore	= new Semaphore(0);
-    m_DSBufferManager.lStateLock		= FALSE;
-
-	// create a BufferMonitor thread for the directsound circular buffer
-    m_DSBufferMonitor.pDSBMThread = new win32Thread();
-    if (!m_DSBufferMonitor.pDSBMThread->Create(DSoundCardPMO::DSBufferMonitorThreadProc,this))
-	{
-        return result;
-    }
-	else 
-	{
-		DWORD dwStatus = m_DSBufferMonitor.pDSBMThread->Join(m_DSBufferMonitor.hInitOKEvent, INFINITE);
-        if (dwStatus == WAIT_FAILED) 
-			return result;
-    }
-
-    // give thread high priority
-    m_DSBufferMonitor.pDSBMThread->SetPriority(Critical);
-
-	memset(&DSBufferInfo, 0, sizeof(DSBUFFERDESC));
-	m_wfex							= new WAVEFORMATEX;
-
-    // compute the levels and buffer size 
-	// For now, this is fixed to 2 secondes but maybe should use info->max_buffer_size
-	m_DSBufferManager.dwBufferSize	= (((info->bits_per_sample >> 3) * info->number_of_channels * 
-										info->samples_per_second) * BUFFER_DURATION)/1000;
-	m_DSBufferManager.dwOverflow	= 7 * (m_DSBufferManager.dwBufferSize >> 3);	/* 3/4 of max   */
-	m_DSBufferManager.dwUnderflow	= m_DSBufferManager.dwBufferSize >> 3;			/* 1/8 of max   */
-    m_DSBufferManager.dwTrigger		= m_DSBufferManager.dwBufferSize >> 1;			/* 1/2 of max   */
-    m_DSBufferManager.dwZerofill	= m_DSBufferManager.dwBufferSize >> 1;			/* 1/2 of max   */
-
-	m_wfex->wBitsPerSample			= info->bits_per_sample;
-	m_wfex->wFormatTag				= WAVE_FORMAT_PCM;
-	m_wfex->nChannels				= (WORD) info->number_of_channels;
-	m_wfex->nSamplesPerSec			= info->samples_per_second;
-	m_wfex->nAvgBytesPerSec			= info->number_of_channels * info->samples_per_second * 
-										(info->bits_per_sample >> 3);
-	m_wfex->nBlockAlign				= (WORD) (info->number_of_channels * (info->bits_per_sample >> 3));
-	m_wfex->cbSize					= 0;
-
-	DSBufferInfo.dwSize				= sizeof(DSBUFFERDESC);
-	DSBufferInfo.dwFlags			= 	DSBCAPS_CTRLFREQUENCY       |
-										DSBCAPS_CTRLPAN             |
-										DSBCAPS_CTRLVOLUME          |
-										DSBCAPS_GETCURRENTPOSITION2 |
-										DSBCAPS_GLOBALFOCUS;
-	DSBufferInfo.dwBufferBytes		= m_DSBufferManager.dwBufferSize;
-	DSBufferInfo.lpwfxFormat		= m_wfex;
-
-	// Create Secondary Buffer
-	hResult = IDirectSound_CreateSoundBuffer(m_DSBufferManager.pDSDevice->pDSObject,
-		                                    &DSBufferInfo,
-		                                    &m_DSBufferManager.pDSSecondaryBuffer,
-											NULL);
-	if (FAILED(hResult))
-	{
-		OUTPUTDEBUG("error Creating Secondary Buffer...");
-		m_DSBufferManager.pDSSecondaryBuffer = NULL;
-		return result;
-	}
-
-	m_bDSInitialized = true; 
-
-    // Clear the new buffer
-    DSClear();
-
-	// Release Semaphore so that Thread can start polling buffer state
-	m_DSBufferMonitor.pBufferSemaphore->Signal();
-
-	return kError_NoErr;
-}
-
-void 
-DSoundCardPMO::
-DSBufferMonitorThreadProc(void *lpParameter)
-{
-    DSoundCardPMO	*pDSoundCardPmo = (DSoundCardPMO *)lpParameter;
-	bool			bTimeToDie = FALSE;
-
-    // force the creation of a message queue
+    // Should set cooperative level here to set primary buffer format
+    // but we need a handle to a window ... need to talk to Mark about that
+    hResult = IDirectSound_SetCooperativeLevel( m_DSBufferManager.pDSDevice->pDSObject,
+                                                m_hMainWndHandle,
+                                                DSSCL_PRIORITY);
+    if (FAILED(hResult))
     {
-        MSG message;
-        PeekMessage(&message, NULL, WM_USER, WM_USER, PM_NOREMOVE);
-    }
-    
-    // signal the init event to say we're ready
-    SetEvent(pDSoundCardPmo->m_DSBufferMonitor.hInitOKEvent);
-
-	do 
-	{
-		MSG message;
-
-		// process messages in the queue if any
-		while(PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
-		{
-			switch(message.message)
-			{
-				case MSG_EXIT_THREAD:
-				bTimeToDie = TRUE;
-				break;
-			}
-		}
-
-		// look at the circular buffer and change state if necessary
-		pDSoundCardPmo->m_DSBufferMonitor.pBufferSemaphore->Wait();
-		pDSoundCardPmo->DSMonitorBufferState();
-		pDSoundCardPmo->m_DSBufferMonitor.pBufferSemaphore->Signal();
-
-        // sleep between loops
-        Sleep(POLLTIME);
-	} while(!bTimeToDie);
-
-    //return 0;
-}
-
-Error 
-DSoundCardPMO::
-DSWriteToSecBuffer(int32& wrote, void *pBuffer, int32 length) 
-{
-	HRESULT		hResult;
-	LPVOID		ptr1;
-	DWORD		dwBytes1;
-	LPVOID		ptr2;
-	DWORD		dwBytes2;
-	Error		result	= kError_UnknownErr;
-
-	//OUTPUTDEBUG("DSWriteToSecBuffer : ", length);
-
-    // grab the write semaphore
-	m_DSBufferMonitor.pWriteSemaphore->Wait();
-
-	// get a lock to a memory region to write to
-	hResult = IDirectSoundBuffer_Lock(	m_DSBufferManager.pDSSecondaryBuffer,
-										m_DSBufferManager.dwWritePtr, 
-										length,
-										&ptr1, 
-										&dwBytes1,
-										&ptr2, 
-										&dwBytes2,
-										0);
-	if (hResult == DSERR_BUFFERLOST)
-	{
-		hResult = IDirectSoundBuffer_Restore(m_DSBufferManager.pDSSecondaryBuffer);
-		if (FAILED(hResult)) 
-		{
-			wrote = 0;
-			return result;
-		}
-		hResult = IDirectSoundBuffer_Lock(	m_DSBufferManager.pDSSecondaryBuffer,
-											m_DSBufferManager.dwWritePtr, 
-											length,
-											&ptr1, 
-											&dwBytes1,
-											&ptr2, 
-											&dwBytes2,
-											0);
-	}
-
-	if (FAILED(hResult))
-	{
-		wrote = 0;
-		return result;
-	}
-
-	// copy the samples
-	if (pBuffer)
-		memcpy(ptr1, pBuffer, dwBytes1);
-	else
-		memset(ptr1, 0, dwBytes1);
-
-	m_DSBufferManager.dwWritePtr += dwBytes1;
-	if (m_DSBufferManager.dwWritePtr >= m_DSBufferManager.dwBufferSize)
-	{
-		m_DSBufferManager.dwWritePtr = 0;
-	}
-	if (ptr2)
-	{
-        if (pBuffer)
-			memcpy(ptr2, (unsigned char *)pBuffer + dwBytes1, dwBytes2);
-		else
-			memset(ptr2, 0, dwBytes2);
-		m_DSBufferManager.dwWritePtr = dwBytes2;
-	}
-
-	// unlock the memory region
-	IDirectSoundBuffer_Unlock(m_DSBufferManager.pDSSecondaryBuffer, 
-		                      ptr1, 
-							  dwBytes1, 
-							  ptr2, 
-							  dwBytes2);
-
-    // release the write semaphore
-	m_DSBufferMonitor.pWriteSemaphore->Signal();
-	
-	//OUTPUTDEBUG("Wrote : ", length);
-	wrote = length;
-    return kError_NoErr;
-}
-
-Error 
-DSoundCardPMO::
-Write(int32& wrote, void *pBuffer, int32 length) 
-{
-    int	nState;
-
-    // wait until we are in a normal state
-    nState = DSMonitorBufferState();
-    while(nState == -1 || nState == OVERFLOW || nState == STOPPING)
-	{
-		// Don't sleep if we paused, just return
-		// (Hoping the LMC will repost the data...)
-		if (m_bLMCHasPaused)
-		{
-			wrote = length;
-			//maybe wrote = 0;
-			return kError_NoErr;
-		}
-
-        Sleep(SLEEPTIME);
-        nState = DSMonitorBufferState();
+      g_Log->Log(LogOutput, "error cannot set DirectSound DSSCL_PRIORITY Cooperative Level...\n");
+      return result;
     }
 
-    return DSWriteToSecBuffer(wrote, pBuffer, length);
+    memset(&DSBufferInfo, 0, sizeof(DSBUFFERDESC));
+    DSBufferInfo.dwSize   = sizeof(DSBUFFERDESC);
+    DSBufferInfo.dwFlags  = DSBCAPS_PRIMARYBUFFER;
 
+    hResult = IDirectSound_CreateSoundBuffer( m_DSBufferManager.pDSDevice->pDSObject,
+                                              &DSBufferInfo,
+                                              &m_DSBufferManager.pDSPrimaryBuffer,
+                                              NULL);
+    if (FAILED(hResult))
+    {
+      g_Log->Log(LogOutput, "error Creating DirectSound Primary Buffer...\n");
+      return result;
+    }
+
+    // try to set the primary buffer to 44.1 stereo 16 bits
+    if (SUCCEEDED(hResult))
+    {
+      WAVEFORMATEX format;
+
+      format.wBitsPerSample   = 16;
+      format.wFormatTag       = WAVE_FORMAT_PCM;
+      format.nChannels        = 2;
+      format.nSamplesPerSec   = 44100;
+      format.nAvgBytesPerSec  = 2*2*44100;
+      format.nBlockAlign      = 2*2;
+      format.cbSize           = 0;
+
+      hResult = IDirectSoundBuffer_SetFormat(m_DSBufferManager.pDSPrimaryBuffer, &format);
+      if (FAILED(hResult))
+      {
+        g_Log->Log(LogOutput, "Cannot Set DirectSound Primary Buffer Format...\n");
+        return result;
+      }
+    }
+  }
+
+  memset(&DSBufferInfo, 0, sizeof(DSBUFFERDESC));
+  m_wfex              = new WAVEFORMATEX;
+
+  // compute the levels for monitoring
+  m_DSBufferManager.dwBufferSize  = 32*m_data_size;
+  m_DSBufferManager.dwOverflow    = m_DSBufferManager.dwBufferSize - m_data_size;
+  m_DSBufferManager.dwUnderflow   = m_data_size;
+  m_DSBufferManager.dwTrigger     = 3*m_data_size;
+  m_DSBufferManager.dwZerofill    = 4*m_data_size;
+
+  m_wfex->wBitsPerSample          = info->bits_per_sample;
+  m_wfex->wFormatTag              = WAVE_FORMAT_PCM;
+  m_wfex->nChannels               = (WORD) info->number_of_channels;
+  m_wfex->nSamplesPerSec          = info->samples_per_second;
+  m_wfex->nAvgBytesPerSec         = info->number_of_channels * info->samples_per_second *
+                                      (info->bits_per_sample >> 3);
+  m_wfex->nBlockAlign             = (WORD) (info->number_of_channels * (info->bits_per_sample >> 3));
+  m_wfex->cbSize                  = 0;
+
+  DSBufferInfo.dwSize             = sizeof(DSBUFFERDESC);
+  DSBufferInfo.dwFlags            =   DSBCAPS_CTRLFREQUENCY       |
+                                      DSBCAPS_CTRLPAN             |
+                                      DSBCAPS_CTRLVOLUME          |
+                                      DSBCAPS_GETCURRENTPOSITION2 |
+                                      DSBCAPS_GLOBALFOCUS;
+  DSBufferInfo.dwBufferBytes      = m_DSBufferManager.dwBufferSize;
+  DSBufferInfo.lpwfxFormat        = m_wfex;
+
+  // Create Secondary Buffer
+  hResult = IDirectSound_CreateSoundBuffer( m_DSBufferManager.pDSDevice->pDSObject,
+                                            &DSBufferInfo,
+                                            &m_DSBufferManager.pDSSecondaryBuffer,
+                                            NULL);
+  if (FAILED(hResult))
+  {
+    g_Log->Log(LogOutput, "error Creating DirectSound Secondary Buffer...\n");
+    m_DSBufferManager.pDSSecondaryBuffer = NULL;
+    return result;
+  }
+
+  m_initialized = true;
+
+  // Clear the new buffer
+  DSClear();
+
+  // Release Semaphore so that the DSMonitorBufferThread can start polling buffer state
+  m_pDSBufferSem->Signal();
+
+  return kError_NoErr;
+}
+
+void
+DSoundCardPMO::
+WaitToQuit()
+{
+  if (m_pBufferThread)
+  {
+    m_pBufferThread->Join();
+    delete m_pBufferThread;
+    m_pBufferThread = NULL;
+  }
+}
+
+int
+DSoundCardPMO::
+GetBufferPercentage()
+{
+  return PullBuffer::GetBufferPercentage();
+}
+
+Error
+DSoundCardPMO::
+Break()
+{
+  PullBuffer::BreakBlocks();
+
+  return kError_NoErr;
+}
+
+Error
+DSoundCardPMO::
+Pause()
+{
+  DSReset();
+  m_bLMCsaidToPlay = false;
+  m_bIsBufferEmptyNow = false;
+
+  return kError_NoErr;
+}
+
+Error
+DSoundCardPMO::
+Resume()
+{
+  m_bLMCsaidToPlay = true;
+  // If the LMC is pausing then resume manually
+  // otherwise, it's a seek or a stop (DSClear has been called)
+  // and we let the Monitor decide to start playing when there are data
+  if ((m_DSBufferManager.pDSSecondaryBuffer) && (m_bIsBufferEmptyNow == false))
+    IDirectSoundBuffer_Play(m_DSBufferManager.pDSSecondaryBuffer,
+                            0,
+                            0,
+                            DSBPLAY_LOOPING);
+
+  return kError_NoErr;
+}
+
+Error
+DSoundCardPMO::
+SetPropManager(Properties * p)
+{
+  m_propManager = p;
+
+  return kError_NoErr;
 }
 
 int32
 DSoundCardPMO::
-DSGetNumSamplesBuffered()
+GetVolume(void)
 {
-	DWORD dwReadPos;
-	DWORD dwWritePos;
+  int32 volume = 0;
 
-	if (m_DSBufferManager.pDSSecondaryBuffer == NULL)
-		return 0;
-
-	IDirectSoundBuffer_GetCurrentPosition(m_DSBufferManager.pDSSecondaryBuffer,
-		                                  &dwReadPos,
-										  &dwWritePos);
-
-	if (m_DSBufferManager.dwWritePtr >= dwReadPos)
-	{
-		return m_DSBufferManager.dwWritePtr - dwReadPos;
-	}
-	else
-	{
-		return (m_DSBufferManager.dwBufferSize - dwReadPos) +
-			    m_DSBufferManager.dwWritePtr;
-	}
+  if (m_DSBufferManager.pDSSecondaryBuffer)
+    IDirectSoundBuffer_GetVolume( m_DSBufferManager.pDSSecondaryBuffer,
+                                  (LPLONG) &volume);
+  return volume;
 }
 
-int32 
+void
 DSoundCardPMO::
-DSMonitorBufferState()
+SetVolume(int32 v)
 {
-    DWORD		dwBuffered;
-    DSState		new_state;
-	int32		wrote;
-
-    if (InterlockedExchange(&m_DSBufferManager.lStateLock, TRUE) == TRUE)
-	{
-        // this section of the code is locked
-        return -1;
-    }
-
-    new_state = m_DSBufferManager.state;
-
-    dwBuffered = DSGetNumSamplesBuffered();
-	//OUTPUTDEBUG("Buffered : ", dwBuffered);
-
-    switch(m_DSBufferManager.state)
-	{
-		case UNDERFLOW:
-			OUTPUTDEBUGVALUE("UNDERFLOW    : ", dwBuffered*100/m_DSBufferManager.dwBufferSize);
-			if (dwBuffered > m_DSBufferManager.dwTrigger)
-			{
-				if (dwBuffered >= m_DSBufferManager.dwBufferSize)
-				{
-					new_state = OVERFLOW;
-				}
-				else
-				{
-					new_state = NORMAL;
-				}
-
-				// restart the buffer
-				IDirectSoundBuffer_Play(m_DSBufferManager.pDSSecondaryBuffer, 
-										0, 
-										0, 
-										DSBPLAY_LOOPING);
-				m_bLMCHasPaused = FALSE;
-			}
-		break;
-
-		case NORMAL:
-			OUTPUTDEBUGVALUE("NORMAL       : ", dwBuffered*100/m_DSBufferManager.dwBufferSize);
-			if (dwBuffered < m_DSBufferManager.dwUnderflow)
-			{
-				new_state = STOPPING;
-				DSWriteToSecBuffer(wrote, NULL, m_DSBufferManager.dwZerofill);
-			}
-			else if (dwBuffered >= m_DSBufferManager.dwOverflow)
-			{
-				new_state = OVERFLOW;
-			}
-			else
-			{
-				new_state = NORMAL;
-			}
-		break;
-
-		case OVERFLOW:
-			OUTPUTDEBUGVALUE("OVERFLOW     : ", dwBuffered*100/m_DSBufferManager.dwBufferSize);
-			if (dwBuffered < m_DSBufferManager.dwUnderflow)
-			{
-				new_state = STOPPING;
-				DSWriteToSecBuffer(	wrote, NULL, m_DSBufferManager.dwZerofill);
-			}
-			else if (dwBuffered < m_DSBufferManager.dwOverflow)
-			{
-				new_state = NORMAL;
-			}
-        break;
-
-		case STOPPING:
-			OUTPUTDEBUGVALUE("STOPPING     : ", dwBuffered*100/m_DSBufferManager.dwBufferSize);
-			if (dwBuffered < m_DSBufferManager.dwZerofill)
-			{
-				DSReset();
-				DSClear();
-				new_state = UNDERFLOW;
-			}
-        break;
-    }
-
-    m_DSBufferManager.state = new_state;
-
-    InterlockedExchange(&m_DSBufferManager.lStateLock, FALSE);
-    
-	//OUTPUTDEBUG("New State : ", new_state);
-    return new_state;
+  if (m_DSBufferManager.pDSSecondaryBuffer)
+    IDirectSoundBuffer_SetVolume( m_DSBufferManager.pDSSecondaryBuffer,
+                                  (LONG) v);
 }
 
-Error 
-DSoundCardPMO::
-Pause()
-{
-    IDirectSoundBuffer_Stop(m_DSBufferManager.pDSSecondaryBuffer);
-	m_bLMCHasPaused = TRUE;
-	return kError_NoErr;
-}
-
-Error 
-DSoundCardPMO::
-Resume()
-{
-	Error result = kError_NoErr;
-    IDirectSoundBuffer_Play(m_DSBufferManager.pDSSecondaryBuffer,
-                            0, 
-							0, 
-							DSBPLAY_LOOPING);
-	m_bLMCHasPaused = FALSE;
-
-    return result;
-}
-
-Error 
+Error
 DSoundCardPMO::
 Reset(bool user_stop)
 {
-	Error result = kError_NoErr;
+  if(user_stop)
+  {
+    DSReset();
+    DSClear();
+  }
 
-	if(user_stop)
-	{
-		m_user_stop = user_stop;
-		m_DSBufferMonitor.pBufferSemaphore->Wait();
-		DSReset();
-		DSClear();
-		m_DSBufferMonitor.pBufferSemaphore->Signal();
-	}
-
-	return result;
+  return kError_NoErr;
 }
 
-void 
+Error
+DSoundCardPMO::
+BeginWrite(void *&pBuffer, size_t &iBytesToWrite)
+{
+  return EventBuffer::BeginWrite(pBuffer, iBytesToWrite);
+}
+
+Error
+DSoundCardPMO::
+EndWrite(size_t iNumBytesWritten)
+{
+  return EventBuffer::EndWrite(iNumBytesWritten);
+}
+
+Error
+DSoundCardPMO::
+AcceptEvent(Event *pEvent)
+{
+  return EventBuffer::AcceptEvent(pEvent);
+}
+
+Error
+DSoundCardPMO::
+Clear()
+{
+  DSClear();
+  return EventBuffer::Clear();
+}
+
+void
+DSoundCardPMO::
+HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
+{
+  MediaTimeInfoEvent* pmtpi;
+  int32               hours, minutes, seconds;
+  int                 iTotalTime = 0;
+
+  if (m_samples_per_second <= 0)
+    return;
+
+  // Since the Monitor modifies the m_iTotalBytesWritten, we meed exclusive access
+  m_pDSBufferSem->Wait();
+
+  if (pEvent->GetFrameNumber() != m_iLastFrame + 1)
+  {
+    m_iTotalBytesWritten = 1152 * pEvent->GetFrameNumber() *  m_iBytesPerSample;
+
+    //m_iTotalBytesWritten += 1152 * (pEvent->GetFrameNumber() - m_iLastFrame) *
+    //                        m_iBytesPerSample;
+  }
+  m_iLastFrame = pEvent->GetFrameNumber();
+
+  iTotalTime  = (m_iTotalBytesWritten) / (m_iBytesPerSample * m_samples_per_second);
+
+  m_pDSBufferSem->Signal();
+
+  hours       = iTotalTime / 3600;
+  minutes     = (iTotalTime - hours) / 60;
+  seconds     = iTotalTime - hours * 3600 - minutes * 60;
+
+  if (minutes < 0 || minutes > 59 || seconds < 0 || seconds > 59)
+    return;
+
+  pmtpi = new MediaTimeInfoEvent(hours, minutes, seconds, 0,
+                                (float)iTotalTime, 0);
+  m_target->AcceptEvent(pmtpi);
+
+}
+
+Error
+DSoundCardPMO::
+GetData(void *&pBuffer)
+{
+  Error     eRet;
+  unsigned  iRead;
+
+  iRead = m_data_size;
+  eRet = BeginRead(pBuffer, iRead);
+  if (eRet != kError_NoErr)
+    return eRet;
+
+  eRet = EndRead(0);
+  if (eRet != kError_NoErr)
+    return eRet;
+
+  return kError_NoErr;
+}
+
+Error
+DSoundCardPMO::
+Write(void *pBuffer)
+{
+  int   nState;
+  int32 wrote;
+
+  for(; !m_bExit;)
+  {
+    // wait until we are in a good state to write
+    nState = DSMonitorBufferState();
+    if (nState == -1 || nState == OVERFLOW || nState == STOPPING)
+    {
+      Sleep(WRITESLEEPTIME);
+    }
+    else
+      break;
+  }
+
+  if (m_bExit)
+    return kError_Interrupt;
+
+  return DSWriteToSecBuffer(wrote, pBuffer, m_data_size);
+}
+
+Error
+DSoundCardPMO::
+DSWriteToSecBuffer(int32& wrote, void *pBuffer, int32 length)
+{
+  HRESULT   hResult;
+  LPVOID    ptr1;
+  DWORD     dwBytes1;
+  LPVOID    ptr2;
+  DWORD     dwBytes2;
+  Error     result  = kError_UnknownErr;
+  unsigned  iRead;
+
+  iRead = m_data_size;
+  result = BeginRead(pBuffer, iRead);
+  if (result != kError_NoErr)
+    return result;
+
+  // grab the write semaphore
+  m_pDSWriteSem->Wait();
+
+  // get a lock to a memory region to write to
+  hResult = IDirectSoundBuffer_Lock(  m_DSBufferManager.pDSSecondaryBuffer,
+                                      m_DSBufferManager.dwWritePtr,
+                                      length,
+                                      &ptr1,
+                                      &dwBytes1,
+                                      &ptr2,
+                                      &dwBytes2,
+                                      0);
+  if (hResult == DSERR_BUFFERLOST)
+  {
+    hResult = IDirectSoundBuffer_Restore(m_DSBufferManager.pDSSecondaryBuffer);
+    if (FAILED(hResult))
+    {
+      wrote = 0;
+      m_pDSWriteSem->Signal();
+      g_Log->Log(LogOutput, "Exiting DSWriteToSecBuffer with DSound error\n");
+      return result;
+    }
+    hResult = IDirectSoundBuffer_Lock(  m_DSBufferManager.pDSSecondaryBuffer,
+                                        m_DSBufferManager.dwWritePtr,
+                                        length,
+                                        &ptr1,
+                                        &dwBytes1,
+                                        &ptr2,
+                                        &dwBytes2,
+                                        0);
+  }
+
+  if (FAILED(hResult))
+  {
+    wrote = 0;
+    m_pDSWriteSem->Signal();
+    g_Log->Log(LogOutput, "Exiting DSWriteToSecBuffer with DSound error\n");
+    return result;
+  }
+
+  // copy the samples
+  if (pBuffer)
+    memcpy(ptr1, pBuffer, dwBytes1);
+  else
+    memset(ptr1, 0, dwBytes1);
+
+  m_DSBufferManager.dwWritePtr += dwBytes1;
+  if (m_DSBufferManager.dwWritePtr >= m_DSBufferManager.dwBufferSize)
+  {
+    m_DSBufferManager.dwWritePtr = 0;
+  }
+  if (ptr2)
+  {
+    if (pBuffer)
+      memcpy(ptr2, (unsigned char *)pBuffer + dwBytes1, dwBytes2);
+    else
+      memset(ptr2, 0, dwBytes2);
+    m_DSBufferManager.dwWritePtr = dwBytes2;
+  }
+
+  // unlock the memory region
+  IDirectSoundBuffer_Unlock(m_DSBufferManager.pDSSecondaryBuffer,
+                            ptr1,
+                            dwBytes1,
+                            ptr2,
+                            dwBytes2);
+  if (FAILED(hResult))
+  {
+    wrote = 0;
+    m_pDSWriteSem->Signal();
+    g_Log->Log(LogOutput, "Exiting DSWriteToSecBuffer with DSound error\n");
+    return result;
+  }
+
+  wrote = length;
+  // release the write semaphore
+  m_pDSWriteSem->Signal();
+
+  result = EndRead(iRead);
+  if (result != kError_NoErr)
+    return result;
+
+  return kError_NoErr;
+}
+
+int32
+DSoundCardPMO::
+DSMonitorBufferState()
+{
+  DWORD     dwBuffered;
+  DSState   new_state;
+  int32     wrote;
+  DWORD     dwReadPos;
+  DWORD     dwWritePos;
+
+  if (m_DSBufferManager.pDSSecondaryBuffer == NULL)
+    return -1;
+
+  m_pDSBufferSem->Wait();
+
+  new_state = m_DSBufferManager.state;
+
+  IDirectSoundBuffer_GetCurrentPosition(m_DSBufferManager.pDSSecondaryBuffer,
+                                        &dwReadPos,
+                                        &dwWritePos);
+  if (m_DSBufferManager.dwWritePtr >= dwReadPos)
+  {
+    dwBuffered = m_DSBufferManager.dwWritePtr - dwReadPos;
+  }
+  else
+  {
+    dwBuffered = (m_DSBufferManager.dwBufferSize - dwReadPos) +
+                  m_DSBufferManager.dwWritePtr;
+  }
+  if (dwReadPos >= m_DSBufferManager.dwOldReadPos)
+  {
+    m_iTotalBytesWritten += dwReadPos - m_DSBufferManager.dwOldReadPos;
+  }
+  else
+  {
+    m_iTotalBytesWritten +=  (m_DSBufferManager.dwBufferSize - m_DSBufferManager.dwOldReadPos) +
+                              dwReadPos;
+  }
+  m_DSBufferManager.dwOldReadPos  = dwReadPos;
+
+  switch(m_DSBufferManager.state)
+  {
+    case UNDERFLOW:
+//      g_Log->Log(LogOutput, "UNDERFLOW    : %d\n", dwBuffered*100/m_DSBufferManager.dwBufferSize);
+      if (dwBuffered > m_DSBufferManager.dwTrigger)
+      {
+        if (dwBuffered >= m_DSBufferManager.dwBufferSize)
+        {
+          new_state = OVERFLOW;
+        }
+        else
+        {
+          new_state = NORMAL;
+        }
+
+        // restart the buffer
+        if (m_bLMCsaidToPlay && m_bIsBufferEmptyNow)
+        IDirectSoundBuffer_Play(m_DSBufferManager.pDSSecondaryBuffer,
+                    0,
+                    0,
+                    DSBPLAY_LOOPING);
+
+        m_bIsBufferEmptyNow = false;
+      }
+      break;
+
+    case NORMAL:
+//      g_Log->Log(LogOutput, "NORMAL       : %d\n", dwBuffered*100/m_DSBufferManager.dwBufferSize);
+      if (dwBuffered < m_DSBufferManager.dwUnderflow)
+      {
+        new_state = STOPPING;
+
+        DSWriteToSecBuffer(wrote, NULL, m_DSBufferManager.dwZerofill);
+
+      }
+      else if (dwBuffered >= m_DSBufferManager.dwOverflow)
+      {
+        new_state = OVERFLOW;
+      }
+      else
+      {
+        new_state = NORMAL;
+      }
+    break;
+
+    case OVERFLOW:
+//      g_Log->Log(LogOutput, "OVERFLOW     : %d\n", dwBuffered*100/m_DSBufferManager.dwBufferSize);
+      if (dwBuffered < m_DSBufferManager.dwUnderflow)
+      {
+        new_state = STOPPING;
+        DSWriteToSecBuffer( wrote, NULL, m_DSBufferManager.dwZerofill);
+      }
+      else if (dwBuffered < m_DSBufferManager.dwOverflow)
+      {
+        new_state = NORMAL;
+      }
+      break;
+
+    case STOPPING:
+//      g_Log->Log(LogOutput, "STOPPING     : %d\n", dwBuffered*100/m_DSBufferManager.dwBufferSize);
+      if (dwBuffered < m_DSBufferManager.dwZerofill)
+      {
+        Reset(true);
+        new_state = UNDERFLOW;
+      }
+      break;
+  }
+
+  m_DSBufferManager.state = new_state;
+
+  m_pDSBufferSem->Signal();
+
+  return new_state;
+}
+
+void
 DSoundCardPMO::
 DSReset()
 {
-	if (m_DSBufferManager.pDSSecondaryBuffer)
-	{
-		IDirectSoundBuffer_Stop(m_DSBufferManager.pDSSecondaryBuffer);
-	}
+  if (m_DSBufferManager.pDSSecondaryBuffer)
+  {
+    IDirectSoundBuffer_Stop(m_DSBufferManager.pDSSecondaryBuffer);
+  }
 }
 
-void 
+void
 DSoundCardPMO::
 DSClear()
 {
-	HRESULT	hResult;
-	LPVOID	ptr;
-	DWORD	dwBytes;
+  HRESULT hResult;
+  LPVOID  ptr;
+  DWORD dwBytes;
 
-	// grab the write semaphore
-	m_DSBufferMonitor.pWriteSemaphore->Wait();
+  // grab the write semaphore
+  m_pDSWriteSem->Wait();
 
-	// init the fields
-	m_DSBufferManager.dwWritePtr= 0;
-	m_DSBufferManager.state		= UNDERFLOW;
+  // init the fields
+  m_DSBufferManager.dwWritePtr    = 0;
+  m_DSBufferManager.dwOldReadPos  = 0;
+  m_DSBufferManager.state         = UNDERFLOW;
 
-	// reset the play cursor
-	IDirectSoundBuffer_SetCurrentPosition(m_DSBufferManager.pDSSecondaryBuffer, 0);
+  // reset the play cursor
+  IDirectSoundBuffer_SetCurrentPosition(m_DSBufferManager.pDSSecondaryBuffer, 0);
 
-	// write zeros into secondary buffer
-	hResult = IDirectSoundBuffer_Lock(m_DSBufferManager.pDSSecondaryBuffer,
-									 0, 
-									 m_DSBufferManager.dwBufferSize,
-			     					 &ptr, 
-									 &dwBytes,
-				    				 NULL, 
-									 NULL, 
-									 0);
-	if (SUCCEEDED(hResult))
-	{
-		memset(ptr, 0, m_DSBufferManager.dwBufferSize);
-		IDirectSoundBuffer_Unlock(m_DSBufferManager.pDSSecondaryBuffer,
-			     				  ptr, 
-								  dwBytes,
-				    			  NULL, 
-								  0);
-	}
-	// release the write semaphore
-	m_DSBufferMonitor.pWriteSemaphore->Signal();
+  // write zeros into secondary buffer
+  hResult = IDirectSoundBuffer_Lock(m_DSBufferManager.pDSSecondaryBuffer,
+                                    0,
+                                    m_DSBufferManager.dwBufferSize,
+                                    &ptr,
+                                    &dwBytes,
+                                    NULL,
+                                    NULL,
+                                    0);
+  if (SUCCEEDED(hResult))
+  {
+    memset(ptr, 0, m_DSBufferManager.dwBufferSize);
+    IDirectSoundBuffer_Unlock(m_DSBufferManager.pDSSecondaryBuffer,
+                              ptr,
+                              dwBytes,
+                              NULL,
+                              0);
+  }
+  m_bIsBufferEmptyNow = true;
+
+  // grab the write semaphore
+  m_pDSWriteSem->Signal();
+}
+
+void
+DSoundCardPMO::
+StartWorkerThread(void *pVoidBuffer)
+{
+  ((DSoundCardPMO*)pVoidBuffer)->WorkerThread();
+}
+
+void
+DSoundCardPMO::
+WorkerThread(void)
+{
+  void*   pBuffer;
+  Error   eErr;
+  Event*  pEvent;
+
+  SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
+
+  for(; !m_bExit;)
+  {
+    if (!m_initialized)
+    {
+      pEvent = GetEvent();
+
+      if (pEvent == NULL)
+      {
+        m_pReadSem->Wait();
+        continue;
+      }
+
+      if (pEvent->Type() == PMO_Init)
+      {
+        if (IsError(Init(((PMOInitEvent *)pEvent)->GetInfo())))
+        {
+          delete pEvent;
+          break;
+        }
+      }
+      delete pEvent;
+
+      continue;
+    }
+
+    eErr = GetData(pBuffer);
+    if (eErr == kError_InputUnsuccessful || eErr == kError_NoDataAvail)
+    {
+      m_pReadSem->Wait();
+      continue;
+    }
+
+    if (eErr == kError_EventPending)
+    {
+      pEvent = GetEvent();
+
+      if (pEvent->Type() == PMO_Init)
+        Init(((PMOInitEvent *)pEvent)->GetInfo());
+
+      if (pEvent->Type() == PMO_Reset)
+        Reset(false);
+
+      if (pEvent->Type() == PMO_Info)
+        HandleTimeInfoEvent((PMOTimeInfoEvent *)pEvent);
+
+      if (pEvent->Type() == PMO_Quit)
+      {
+        Reset(false);
+        delete pEvent;
+        break;
+      }
+
+      delete pEvent;
+
+      continue;
+    }
+
+    if (IsError(eErr))
+    {
+      ReportError("Internal error occured.");
+      g_Log->Error("Cannot read from buffer in PMO worker tread: %d\n",
+      eErr);
+      break;
+    }
+
+    Write(pBuffer);
+  }
+  g_Log->Log(LogOutput, "PMO: Soundcard thread exiting\n");
 }

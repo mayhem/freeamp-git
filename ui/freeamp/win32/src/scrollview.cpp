@@ -160,8 +160,8 @@ MouseMove(int32 x, int32 y, int32 modifiers)
 
             int32 total = m_max - m_min;
 
-            dy = m_scrollRect.top - viewRect.top;
-            float proportion = ((float)(m_scrollRect.top - viewRect.top)/
+            dy = rect.top - rect.top;
+            float proportion = ((float)(rect.top - viewRect.top)/
                                 (float)(viewRect.bottom - viewRect.top));
 
 

@@ -186,13 +186,18 @@ SetCurrentTime( int32 hours,
                 int32 minutes, 
                 int32 seconds)
 {
-    m_currentHours = hours;
-    m_currentMinutes = minutes;
-    m_currentSeconds = seconds;
+    if( m_currentHours != hours ||
+        m_currentMinutes != minutes ||
+        m_currentSeconds != seconds)
+    {
+        m_currentHours = hours;
+        m_currentMinutes = minutes;
+        m_currentSeconds = seconds;
 
-    CreateTimeString();
+        CreateTimeString();
 
-    Invalidate();
+        Invalidate();
+    }
 }
 
 void 
@@ -201,13 +206,18 @@ SetTotalTime(   int32 hours,
                 int32 minutes, 
                 int32 seconds)
 {
-    m_totalHours = hours;
-    m_totalMinutes = minutes;
-    m_totalSeconds = seconds;
+    if( m_totalHours != hours ||
+        m_totalMinutes != minutes ||
+        m_totalSeconds != seconds)
+    {
+        m_totalHours = hours;
+        m_totalMinutes = minutes;
+        m_totalSeconds = seconds;
 
-    CreateTimeString();
+        CreateTimeString();
 
-    Invalidate();
+        Invalidate();
+    }
 }
 
 void 
@@ -216,13 +226,18 @@ SetSeekTime(int32 hours,
 			int32 minutes, 
 			int32 seconds)
 {
-    m_seekHours = hours;
-    m_seekMinutes = minutes;
-    m_seekSeconds = seconds;
+    if( m_seekHours != hours ||
+        m_seekMinutes != minutes ||
+        m_seekSeconds != seconds)
+    {
+        m_seekHours = hours;
+        m_seekMinutes = minutes;
+        m_seekSeconds = seconds;
 
-    CreateTimeString();
+        CreateTimeString();
 
-    Invalidate();
+        Invalidate();
+    }
 
 }
 

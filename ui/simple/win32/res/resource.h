@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Developer Studio generated include file.
-// Used by freeamp.rc
+// Used by simple.rc
 //
 #define IDS_NAME                        1
 #define IDA_PLAYLISTEDITOR              1
