@@ -95,21 +95,18 @@ AlsaPMO::AlsaPMO(FAContext *context) :
       m_pBufferThread->Create(AlsaPMO::StartWorkerThread, this);
    }
 
-   ai = new struct audio_info_struct;
-   ai->handle = NULL;
-   ai->device = NULL;
-   ai->format = -1;
-   ai->channels = -1;
-   ai->rate = -1;
-   ai->mixer_handle=0;
+   m_handle = NULL;
+   m_device = NULL;
+   m_channels = -1;
+   m_rate = -1;
 
-	ai->device = (char *) malloc(deviceNameSize);
-	m_pContext->prefs->GetPrefString(kALSADevicePref, ai->device,
+	m_device = (char *) malloc(deviceNameSize);
+	m_pContext->prefs->GetPrefString(kALSADevicePref, m_device,
 					&deviceNameSize);
 
-   if (ai->device)
+   if (m_device)
    {
-        if (sscanf(ai->device, "%[^:]: %d", scard, &m_iDevice) != 2)
+        if (sscanf(m_device, "%[^:]: %d", scard, &m_iDevice) != 2)
         {
            ReportError("The ALSADevice statement in the preference file"
                        "is improperly formatted. Format: ALSADevice: "
@@ -160,7 +157,7 @@ AlsaPMO::AlsaPMO(FAContext *context) :
    }
    snd_mixer_close(pMixer);
 
-   delete ai->device;
+   delete m_device;
 }
 
 AlsaPMO::~AlsaPMO() 
@@ -175,14 +172,10 @@ AlsaPMO::~AlsaPMO()
        delete m_pBufferThread;
     }
 
-    snd_pcm_close(ai->handle);
+    snd_pcm_close(m_handle);
     if (myInfo) {
         delete myInfo;
         myInfo = NULL;
-    }
-    if (ai) {
-        delete ai;
-        ai = NULL;
     }
 }
 
@@ -265,7 +258,7 @@ Error AlsaPMO::Init(OutputInfo* info)
         // got info, so this is the beginning...
         m_iDataSize = info->max_buffer_size;
 
-        err=snd_pcm_open(&ai->handle, m_iCard, m_iDevice, 
+        err=snd_pcm_open(&m_handle, m_iCard, m_iDevice, 
                          SND_PCM_OPEN_PLAYBACK);
         if (err < 0)
         {
@@ -274,20 +267,18 @@ Error AlsaPMO::Init(OutputInfo* info)
             return (Error)pmoError_DeviceOpenFailed;
         }
 
-        snd_pcm_nonblock_mode(ai->handle, 1);
+        snd_pcm_nonblock_mode(m_handle, 1);
     }
 
-    channels = info->number_of_channels;
-    
     // configure the device:
-    ai->format=16;
-    ai->channels=channels;
-    ai->rate=info->samples_per_second;
+    m_channels=info->number_of_channels;
+    m_rate=info->samples_per_second;
 
     memset(&params, 0, sizeof(params)); 
     params.format.format = SND_PCM_SFMT_S16_LE;
     params.format.interleave = 1;
-    params.format.voices = channels;
+    //printf("Chan: %d rate: %d\n", m_channels, info->samples_per_second);
+    params.format.voices = m_channels;
     params.format.rate = info->samples_per_second;
     params.channel = SND_PCM_CHANNEL_PLAYBACK;
     params.mode = SND_PCM_MODE_BLOCK;
@@ -297,7 +288,13 @@ Error AlsaPMO::Init(OutputInfo* info)
     params.buf.block.frags_max = 32;
     params.buf.block.frags_min = 1;
 
-    err = snd_pcm_channel_params(ai->handle, &params);
+    err = snd_pcm_channel_params(m_handle, &params);
+    if (err < 0)
+    {
+        ReportError("Cannot initialized audio device.");
+        return (Error)pmoError_DeviceOpenFailed;
+    }
+    err = snd_pcm_channel_prepare(m_handle, SND_PCM_CHANNEL_PLAYBACK);
     if (err < 0)
     {
         ReportError("Cannot initialized audio device.");
@@ -307,15 +304,18 @@ Error AlsaPMO::Init(OutputInfo* info)
     memcpy(myInfo, info, sizeof(OutputInfo));
 
     snd_pcm_channel_setup_t aInfo;
-    aInfo.mode = SND_PCM_MODE_BLOCK;
     aInfo.channel = SND_PCM_CHANNEL_PLAYBACK;
-    snd_pcm_channel_setup(ai->handle,&aInfo);
+    err = snd_pcm_channel_setup(m_handle,&aInfo);
+    if (err < 0)
+    {
+        ReportError("Cannot initialized audio device.");
+        return (Error)pmoError_DeviceOpenFailed;
+    }
+
     m_iOutputBufferSize = aInfo.buf.block.frag_size * aInfo.buf.block.frags;
-    m_iTotalFragments = aInfo.buf.block.frags;
     m_iBytesPerSample = info->number_of_channels * (info->bits_per_sample / 8);
 
-    snd_pcm_channel_prepare(ai->handle, SND_PCM_CHANNEL_PLAYBACK);
-    snd_pcm_channel_go(ai->handle, SND_PCM_CHANNEL_PLAYBACK);
+
 
     m_properlyInitialized = true;
     return kError_NoErr;
@@ -324,11 +324,11 @@ Error AlsaPMO::Init(OutputInfo* info)
 Error AlsaPMO::Reset(bool user_stop) {
 
     if (user_stop) 
-        snd_pcm_playback_drain(ai->handle);
+        snd_pcm_playback_drain(m_handle);
     else
-        snd_pcm_playback_flush(ai->handle);
+        snd_pcm_playback_flush(m_handle);
 
-    snd_pcm_playback_prepare(ai->handle);
+    snd_pcm_playback_prepare(m_handle);
 
     return kError_NoErr;
 }
@@ -347,8 +347,7 @@ bool AlsaPMO::WaitForDrain(void)
    for(; !m_bExit && !m_bPause; )
    {
        ainfo.channel = SND_PCM_CHANNEL_PLAYBACK;
-       ainfo.mode = SND_PCM_MODE_BLOCK;
-       snd_pcm_channel_status(ai->handle,&ainfo);
+       snd_pcm_channel_status(m_handle,&ainfo);
 
        if (ainfo.underrun || ainfo.status == SND_PCM_STATUS_UNDERRUN)
        {
@@ -375,8 +374,7 @@ void AlsaPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
    }
 
    ainfo.channel = SND_PCM_CHANNEL_PLAYBACK;
-   ainfo.mode = SND_PCM_MODE_BLOCK;
-   snd_pcm_channel_status(ai->handle,&ainfo);
+   snd_pcm_channel_status(m_handle,&ainfo);
 
    iTotalTime = ainfo.scount / (m_iBytesPerSample * myInfo->samples_per_second);
    //printf("total: %d base: %d\n", iTotalTime, m_iBaseTime);
@@ -405,7 +403,7 @@ void AlsaPMO::WorkerThread(void)
 {
    void                      *pBuffer;
    Error                      eErr;
-   int                        iRet;
+   int                        iRet = -1;
    Event                     *pEvent;
    snd_pcm_channel_status_t  ainfo;
 
@@ -424,6 +422,7 @@ void AlsaPMO::WorkerThread(void)
    pthread_setschedparam(pthread_self(), SCHED_OTHER, &sParam);
 #endif
 
+   ainfo.channel = SND_PCM_CHANNEL_PLAYBACK;
    for(; !m_bExit;)
    {
       if (m_bPause)
@@ -532,35 +531,34 @@ void AlsaPMO::WorkerThread(void)
       // Now write the block to the audio device. If the block doesn't
       // all fit, pause and loop until the entire block has been played.
       // This loop could be written using non-blocking io...
-      for(;;)
+      for(;!m_bExit && !m_bPause;)
       {
-          if (m_bExit || m_bPause)
-              break;
-
-          iRet = snd_pcm_channel_status(ai->handle,&ainfo);
-          if (iRet < 0)
+          iRet = snd_pcm_write(m_handle,pBuffer,m_iDataSize);
+          if (iRet == -EAGAIN)
           {
-              m_bExit = true;
-              break;
-          }
-
-          if (ainfo.free < m_iDataSize)      
-          {
-              WasteTime();
-              continue;
+               WasteTime();
+               continue;
           }
           break;
-      }        
-      if (m_bExit || m_bPause)
+      }
+      if (m_bExit)
+          return;
+
+      if (m_bPause)
       {
-          m_pInputBuffer->EndRead(0);
-          continue;
+         if (iRet == -EAGAIN)
+             m_pInputBuffer->EndRead(0);
+         else
+         {
+             m_pInputBuffer->EndRead(iRet);
+             UpdateBufferStatus();
+         }
+         continue;   
       }
 
-      iRet = snd_pcm_write(ai->handle,pBuffer,m_iDataSize);
       if (iRet < 0)
       {
-         printf("ALSA: %s\n", snd_strerror(iRet));
+         //printf("ALSA: %s (%d==%d)\n", snd_strerror(iRet), iRet, EAGAIN);
          m_pInputBuffer->EndRead(0);
          ReportError("Could not write sound data to the soundcard.");
          m_pContext->log->Error("Failed to write to the soundcard: %s\n", 

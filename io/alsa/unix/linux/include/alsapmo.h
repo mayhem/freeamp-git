@@ -46,18 +46,6 @@ ____________________________________________________________________________*/
 #include "pmoevent.h"
 #include "eventbuffer.h"
 
-struct audio_info_struct
-{
-    snd_pcm_t *handle;
-
-    char *device;
-    int format;
-    int channels;
-    long rate;
-    void * mixer_handle;
-    snd_mixer_channel_t channel;
-};
-
 #define BIT_SELECT  0x1f
 #define SLEEPTIME   256
 
@@ -102,21 +90,22 @@ public:
     bool          WaitForDrain(void);  
 
     bool	         m_properlyInitialized;
-    uint32	      channels;
 #ifdef SOUNDCARD
     static int audio_fd;
 #endif
     OutputInfo  *myInfo;
     Thread      *m_pBufferThread;
     int          m_iOutputBufferSize, m_iBytesPerSample;
-    int          m_iTotalFragments, m_iBaseTime;
+    int          m_iBaseTime;
     int          m_iDataSize;
     int          m_iCard, m_iDevice;
 
     int		 m_iChannel;
     snd_mixer_gid_t m_gid;
     snd_mixer_group_t m_group;
-    struct audio_info_struct *ai;
+    snd_pcm_t *m_handle;
+    char      *m_device;
+    int        m_channels, m_rate;
 };
 
 #endif /* _ALSAPMO_H_ */
