@@ -1,3 +1,19 @@
+#
+# NOTES: This script is intended for building rpms for redhat 5.x
+#        systems. Automatic depedency checking has been turned off for
+#        this script becuase the rpm will check to see if ALSA/ESD
+#        are installed on the system automatically. If we let
+#        rpm determine the dependecies automatically it will complain
+#        to anyone who does not have ALSA/ESD installed.
+#
+#        To update this script, remove the Requires line and set
+#        AutoReqProv to yes. Then build the RPM, and copy the
+#        Requires line that it spits out and paste it where the
+#        Requires line is. Make sure to remove references to
+#        libesd, libasound, and libncurses, as the install
+#        script below will handle them correctly. Finally,
+#        Turn AutoReqProv back on and then build the rpm.
+# 
 Summary: MP3 audio player with streaming support
 Name: freeamp
 Version: 1.3.0
@@ -5,8 +21,10 @@ Release: 1
 Copyright: GPL
 Group: Applications/Multimedia
 Source: www.freeamp.org:/pub/freeamp/freeamp-1.3.0-linux-x86-glibc2.tar.gz
+
+# Please read note above  
 AutoReqProv: No
-Requires: ld-linux.so.2 libX11.so.6 libXext.so.6 libXpm.so.4 libc.so.6 libdl.so.2 libm.so.6 libpthread.so.0 libstdc++.so.2.9 libc.so.6(GLIBC_2.0) libc.so.6(GLIBC_2.1) libm.so.6(GLIBC_2.1) libdl.so.2(GLIBC_2.1) libdl.so.2(GLIBC_2.0) libpthread.so.0(GLIBC_2.1) libpthread.so.0(GLIBC_2.0) 
+Requires: ld-linux.so.2 libX11.so.6 libXext.so.6 libXpm.so.4 libc.so.6 libdl.so.2 libm.so.6 libpthread.so.0 libstdc++-libc6.1-1.so.2 libc.so.6(GLIBC_2.0) libc.so.6(GLIBC_2.1) libm.so.6(GLIBC_2.1) libdl.so.2(GLIBC_2.1) libdl.so.2(GLIBC_2.0) libpthread.so.0(GLIBC_2.1) libpthread.so.0(GLIBC_2.0)
 %description
 This program plays MP3 (MPEG-1 audio layer 3) files and streams. The
 player will run on Windows, Linux and Solaris.
