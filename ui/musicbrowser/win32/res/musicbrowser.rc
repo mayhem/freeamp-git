@@ -497,6 +497,7 @@ IDB_WIREDPLANET         BITMAP  DISCARDABLE     "wiredplanet.bmp"
 IDB_ICECAST             BITMAP  DISCARDABLE     "icecast.bmp"
 IDB_SHOUTCAST           BITMAP  DISCARDABLE     "shoutcast.bmp"
 IDB_BUSY                BITMAP  DISCARDABLE     "busy.bmp"
+IDB_STREAMS             BITMAP  DISCARDABLE     "streams.bmp"
 
 #ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////

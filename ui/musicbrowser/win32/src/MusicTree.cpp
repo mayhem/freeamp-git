@@ -83,8 +83,9 @@ void MusicBrowserUI::InitTree(void)
     insert.hParent = NULL;
     m_hPlaylistItem = TreeView_InsertItem(m_hMusicView, &insert);
 
-    /*
-    insert.item.pszText = kWiredPlanet;
+    HTREEITEM temp;
+
+    insert.item.pszText = "Streams";
     insert.item.cchTextMax = lstrlen(insert.item.pszText);
     insert.item.iImage = 8;
     insert.item.iSelectedImage = 8;
@@ -92,22 +93,33 @@ void MusicBrowserUI::InitTree(void)
     insert.item.lParam = NULL;
     insert.hInsertAfter = TVI_LAST;
     insert.hParent = NULL;
-    m_hWiredPlanetItem = TreeView_InsertItem(m_hMusicView, &insert);
+    temp = TreeView_InsertItem(m_hMusicView, &insert);
 
-    insert.item.pszText = kIceCast;
+    insert.item.pszText = kWiredPlanet;
     insert.item.cchTextMax = lstrlen(insert.item.pszText);
     insert.item.iImage = 9;
     insert.item.iSelectedImage = 9;
     insert.item.cChildren= 1;
     insert.item.lParam = NULL;
     insert.hInsertAfter = TVI_LAST;
-    insert.hParent = NULL;
-    m_hIceCastItem = TreeView_InsertItem(m_hMusicView, &insert);
+    insert.hParent = temp;
+    m_hWiredPlanetItem = TreeView_InsertItem(m_hMusicView, &insert);
 
-    insert.item.pszText = kShoutCast;
+    insert.item.pszText = kIceCast;
     insert.item.cchTextMax = lstrlen(insert.item.pszText);
     insert.item.iImage = 10;
     insert.item.iSelectedImage = 10;
+    insert.item.cChildren= 1;
+    insert.item.lParam = NULL;
+    insert.hInsertAfter = TVI_LAST;
+    insert.hParent = temp;
+    m_hIceCastItem = TreeView_InsertItem(m_hMusicView, &insert);
+
+    /*
+    insert.item.pszText = kShoutCast;
+    insert.item.cchTextMax = lstrlen(insert.item.pszText);
+    insert.item.iImage = 11;
+    insert.item.iSelectedImage = 11;
     insert.item.cChildren= 1;
     insert.item.lParam = NULL;
     insert.hInsertAfter = TVI_LAST;
@@ -453,12 +465,12 @@ void MusicBrowserUI::FillWiredPlanet()
     TreeData        data;
 
     char* stations[] = {
-        "Alpha 2.0 (Downtempo / Trip-Hop)",
-        "Axis (Jazz in its many forms)",
-        "Nova Mundi (New Age / Ambient)",
-        "Oscillations (Electronic / Trance / House)",
-        "Red Shift (Drum \'n Bass / Jungle)",
-        "Radio TMBG (They Might Be Giants)"
+        "Alpha 2.0", // (Downtempo / Trip-Hop)",
+        "Axis", // (Jazz in its many forms)",
+        "Nova Mundi", // (New Age / Ambient)",
+        "Oscillations", // (Electronic / Trance / House)",
+        "Red Shift", // (Drum \'n Bass / Jungle)",
+        "Radio TMBG" // (They Might Be Giants)"
     };
 
     char* urls[] = {

@@ -44,8 +44,8 @@ FooCast::FooCast(HWND hwndTree, HTREEITEM parentItem):
 
     insert.item.pszText = kBusy;
     insert.item.cchTextMax = lstrlen(insert.item.pszText);
-    insert.item.iImage = 11;
-    insert.item.iSelectedImage = 11;
+    insert.item.iImage = 12;
+    insert.item.iSelectedImage = 12;
     insert.item.cChildren= 0;
     insert.item.lParam = NULL;
     insert.hInsertAfter = TVI_LAST;

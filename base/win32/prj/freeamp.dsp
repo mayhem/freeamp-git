@@ -981,5 +981,33 @@ SOURCE=..\..\include\utility.h
 SOURCE=..\include\win32prefs.h
 # End Source File
 # End Group
+# Begin Source File
+
+SOURCE=..\res\music12.ico
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\music13.ico
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\music14.ico
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\music15.ico
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\music16.ico
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\music17.ico
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\music18.ico
+# End Source File
 # End Target
 # End Project

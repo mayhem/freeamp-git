@@ -145,8 +145,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 Release" "fabaselib - Win32 Release"\
  ".\musicbrowser.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                                ..\..\..\..\base\win32\prj\plugins
-	copy musicbrowser.ui                                                                                  ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                                 ..\..\..\..\base\win32\prj\plugins
+	copy musicbrowser.ui                                                                                   ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 Debug"
@@ -257,8 +257,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 Debug" "fabaselib - Win32 Debug"\
  ".\musicbrowser.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                                ..\..\..\..\base\win32\prj\plugins
-	copy musicbrowser.ui                                                                                  ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                                 ..\..\..\..\base\win32\prj\plugins
+	copy musicbrowser.ui                                                                                   ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Debug"
@@ -370,8 +370,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 NASM Debug" "fabaselib - Win32 NASM Debug"\
  ".\musicbrowser.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                                ..\..\..\..\base\win32\prj\plugins
-	copy musicbrowser.ui                                                                                  ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                                 ..\..\..\..\base\win32\prj\plugins
+	copy musicbrowser.ui                                                                                   ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Release"
@@ -482,8 +482,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 NASM Release"\
  "fabaselib - Win32 NASM Release" ".\musicbrowser.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                                ..\..\..\..\base\win32\prj\plugins
-	copy musicbrowser.ui                                                                                  ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                                 ..\..\..\..\base\win32\prj\plugins
+	copy musicbrowser.ui                                                                                   ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 
@@ -842,6 +842,9 @@ DEP_CPP_DROPS=\
 
 
 SOURCE=..\src\DropTarget.cpp
+
+!IF  "$(CFG)" == "musicbrowser - Win32 Release"
+
 DEP_CPP_DROPT=\
 	"..\include\DropObject.h"\
 	"..\include\DropTarget.h"\
@@ -850,6 +853,41 @@ DEP_CPP_DROPT=\
 "$(INTDIR)\DropTarget.obj" : $(SOURCE) $(DEP_CPP_DROPT) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+!ELSEIF  "$(CFG)" == "musicbrowser - Win32 Debug"
+
+DEP_CPP_DROPT=\
+	"..\include\DropObject.h"\
+	"..\include\DropTarget.h"\
+	
+
+"$(INTDIR)\DropTarget.obj" : $(SOURCE) $(DEP_CPP_DROPT) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Debug"
+
+DEP_CPP_DROPT=\
+	"..\include\DropObject.h"\
+	"..\include\DropTarget.h"\
+	
+
+"$(INTDIR)\DropTarget.obj" : $(SOURCE) $(DEP_CPP_DROPT) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Release"
+
+DEP_CPP_DROPT=\
+	"..\include\DropObject.h"\
+	"..\include\DropTarget.h"\
+	
+
+"$(INTDIR)\DropTarget.obj" : $(SOURCE) $(DEP_CPP_DROPT) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\src\EditTrackInfoDialog.cpp
 
@@ -2431,6 +2469,7 @@ DEP_RSC_MUSICB=\
 	"..\res\portable.bmp"\
 	"..\res\shoutcast.bmp"\
 	"..\res\splitter.cur"\
+	"..\res\streams.bmp"\
 	"..\res\toolbar.bmp"\
 	"..\res\track.bmp"\
 	"..\res\uncatagorized.bmp"\

@@ -822,7 +822,7 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
 
     HBITMAP bmp;
     
-    hList = ImageList_Create(16, 16, ILC_COLOR24|ILC_MASK, 9, 0);
+    hList = ImageList_Create(16, 16, ILC_COLOR24|ILC_MASK, 10, 0);
 
     bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_CATALOG));
     ImageList_AddMasked(hList, bmp, RGB(255,255,0));
@@ -848,6 +848,9 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
     bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_PORTABLE));
     ImageList_AddMasked(hList, bmp, RGB(255,0,0));
     DeleteObject(bmp);
+    bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_STREAMS));
+    ImageList_AddMasked(hList, bmp, RGB(255,0,0));
+    DeleteObject(bmp);
     bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_WIREDPLANET));
     ImageList_AddMasked(hList, bmp, RGB(255,0,0));
     DeleteObject(bmp);
@@ -860,6 +863,7 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
     bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_BUSY));
     ImageList_AddMasked(hList, bmp, RGB(255,0,0));
     DeleteObject(bmp);
+    
 
     TreeView_SetImageList(m_hMusicView, hList, TVSIL_NORMAL); 
     
