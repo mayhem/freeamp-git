@@ -173,6 +173,8 @@ void ButtonControl::Transition(ControlTransitionEnum  eTrans,
        {
            m_pPanelToToggle->TogglePanelPos();
            m_pParent->SendControlMessage(this, CM_TogglePanel);
+           m_eCurrentState = CS_MouseOver;
+           BlitFrame(m_eCurrentState);
            return;
        }
        if (m_oName == string("ReloadTheme"))
