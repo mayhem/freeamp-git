@@ -34,35 +34,65 @@ ____________________________________________________________________________*/
 #include "config.h"
 #include "utility.h"
 #include "resource.h"
-#include "Win32MusicBrowser.h"
+#include "EditTrackInfoDialog.h"
 #include "help.h"
 
+EditTrackInfoDialog::EditTrackInfoDialog(FAContext* context,
+                                         HWND hwnd, 
+                                         const vector<ArtistList*>* artistList,
+                                         MetaData* editMetaData):
+    m_hwnd(hwnd), m_artistList(artistList), 
+    m_editMetaData(editMetaData), m_context(context)
+{
 
+}
+
+EditTrackInfoDialog::~EditTrackInfoDialog()
+{
+
+}
+
+static
 BOOL CALLBACK EditTrackInfoDlgProc(HWND hwnd,
                                    UINT msg,
                                    WPARAM wParam,
                                    LPARAM lParam)
 {
-    MusicBrowserUI* ui = (MusicBrowserUI*)GetWindowLong(hwnd, GWL_USERDATA);
+    EditTrackInfoDialog* _this = 
+        (EditTrackInfoDialog*)GetWindowLong(hwnd, GWL_USERDATA);
 
     switch (msg)
     {
         case WM_INITDIALOG:
         {
-            ui = (MusicBrowserUI*)lParam;
-            assert(ui != NULL);
-            SetWindowLong(hwnd, GWL_USERDATA, (LONG)ui);
+            _this = (EditTrackInfoDialog*)lParam;
+            assert(_this != NULL);
+            SetWindowLong(hwnd, GWL_USERDATA, (LONG)_this);
             break;
         }            
     }
 
-    return ui->EditTrackInfoDlgProc(hwnd, msg, wParam, lParam);
-}        
+    return _this->DialogProc(hwnd, msg, wParam, lParam);
+}    
 
-BOOL MusicBrowserUI::EditTrackInfoDlgProc(HWND hwnd, 
-                                          UINT msg, 
-                                          WPARAM wParam, 
-                                          LPARAM lParam )
+bool EditTrackInfoDialog::Show()   
+{
+    bool result = false;
+    HINSTANCE hinst = (HINSTANCE)GetWindowLong(m_hwnd, GWL_HINSTANCE);
+
+    result = (0 < DialogBoxParam(
+                          hinst, 
+                          MAKEINTRESOURCE(IDD_EDITINFO),
+                          m_hwnd, 
+                          ::EditTrackInfoDlgProc, 
+                          (LPARAM )this));
+    return result;
+}
+
+BOOL EditTrackInfoDialog::DialogProc(HWND hwnd, 
+                                     UINT msg, 
+                                     WPARAM wParam, 
+                                     LPARAM lParam )
 {
     BOOL result = FALSE;
 
@@ -99,10 +129,10 @@ BOOL MusicBrowserUI::EditTrackInfoDlgProc(HWND hwnd,
             set<string>::iterator i;
 
             // track name
-            Edit_SetText(hwndTitle, m_editTrackMetaData.Title().c_str());
+            Edit_SetText(hwndTitle, m_editMetaData->Title().c_str());
 
             // track number
-            if(m_editTrackMetaData.Track() == -1)
+            if(m_editMetaData->Track() == -1)
             {
                 Edit_SetText(hwndTrack, "<Multiple>");
                 EnableWindow(hwndTrack, FALSE);
@@ -113,23 +143,23 @@ BOOL MusicBrowserUI::EditTrackInfoDlgProc(HWND hwnd,
             }
             else
             {
-                sprintf(number, "%d", m_editTrackMetaData.Track());
+                sprintf(number, "%d", m_editMetaData->Track());
                 Edit_SetText(hwndTrack, number);
             }
 
             // track year
-            if(m_editTrackMetaData.Year() == -1)
+            if(m_editMetaData->Year() == -1)
             {
                 Edit_SetText(hwndYear, "<Multiple>");
             }
             else
             {
-                sprintf(number, "%d", m_editTrackMetaData.Year());
+                sprintf(number, "%d", m_editMetaData->Year());
                 Edit_SetText(hwndYear, number);
             }
 
             // track comment
-            Edit_SetText(hwndComment, m_editTrackMetaData.Comment().c_str());
+            Edit_SetText(hwndComment, m_editMetaData->Comment().c_str());
 
 
             // add artists
@@ -155,7 +185,7 @@ BOOL MusicBrowserUI::EditTrackInfoDlgProc(HWND hwnd,
                 }
             }
 
-            ComboBox_SetText(hwndArtist, m_editTrackMetaData.Artist().c_str());
+            ComboBox_SetText(hwndArtist, m_editMetaData->Artist().c_str());
 
             // add albums
             for(i = albums.begin(); i != albums.end(); i++)
@@ -180,7 +210,7 @@ BOOL MusicBrowserUI::EditTrackInfoDlgProc(HWND hwnd,
                 }
             }
 
-            ComboBox_SetText(hwndAlbum, m_editTrackMetaData.Album().c_str());
+            ComboBox_SetText(hwndAlbum, m_editMetaData->Album().c_str());
 
             // add genres
             for(i = genres.begin(); i != genres.end(); i++)
@@ -205,14 +235,14 @@ BOOL MusicBrowserUI::EditTrackInfoDlgProc(HWND hwnd,
                 }
             }
 
-            ComboBox_SetText(hwndGenre, m_editTrackMetaData.Genre().c_str());
+            ComboBox_SetText(hwndGenre, m_editMetaData->Genre().c_str());
   
             break;
         }      
 
         case WM_HELP:
         {
-            ShowHelp(Edit_Info);
+            Help();
             result = TRUE;
             break;
         }
@@ -223,7 +253,7 @@ BOOL MusicBrowserUI::EditTrackInfoDlgProc(HWND hwnd,
             {
                 case IDHELP:
                 {
-                    ShowHelp(Edit_Info);
+                    Help();
                     break;
                 }
 
@@ -247,31 +277,31 @@ BOOL MusicBrowserUI::EditTrackInfoDlgProc(HWND hwnd,
                     length = ComboBox_GetTextLength(hwndArtist) + 1;
                     data = new char[length];
                     ComboBox_GetText(hwndArtist, data, length);
-                    m_editTrackMetaData.SetArtist(data);
+                    m_editMetaData->SetArtist(data);
                     delete [] data;
 
                     length = ComboBox_GetTextLength(hwndAlbum) + 1;
                     data = new char[length];
                     ComboBox_GetText(hwndAlbum, data, length);
-                    m_editTrackMetaData.SetAlbum(data);
+                    m_editMetaData->SetAlbum(data);
                     delete [] data;
 
                     length = ComboBox_GetTextLength(hwndGenre) + 1;
                     data = new char[length];
                     ComboBox_GetText(hwndGenre, data, length);
-                    m_editTrackMetaData.SetGenre(data);
+                    m_editMetaData->SetGenre(data);
                     delete [] data;
 
                     length = Edit_GetTextLength(hwndTitle) + 1;
                     data = new char[length];
                     Edit_GetText(hwndTitle, data, length);
-                    m_editTrackMetaData.SetTitle(data);
+                    m_editMetaData->SetTitle(data);
                     delete [] data;
 
                     length = Edit_GetTextLength(hwndComment) + 1;
                     data = new char[length];
                     Edit_GetText(hwndComment, data, length);
-                    m_editTrackMetaData.SetComment(data);
+                    m_editMetaData->SetComment(data);
                     delete [] data;
 
                     Edit_GetText(hwndTrack, number, sizeof(number));
@@ -281,7 +311,7 @@ BOOL MusicBrowserUI::EditTrackInfoDlgProc(HWND hwnd,
                     else if(!strcmp(number, "<Multiple>"))
                         strcpy(number, "-1");
 
-                    m_editTrackMetaData.SetTrack(atoi(number));
+                    m_editMetaData->SetTrack(atoi(number));
 
                     Edit_GetText(hwndYear, number, sizeof(number));
 
@@ -290,7 +320,7 @@ BOOL MusicBrowserUI::EditTrackInfoDlgProc(HWND hwnd,
                     else if(!strcmp(number, "<Multiple>"))
                         strcpy(number, "-1");
 
-                    m_editTrackMetaData.SetYear(atoi(number));
+                    m_editMetaData->SetYear(atoi(number));
                     
                     EndDialog(hwnd, TRUE);
                     break;
@@ -323,18 +353,27 @@ BOOL MusicBrowserUI::EditTrackInfoDlgProc(HWND hwnd,
     return result;
 }
 
-void MusicBrowserUI::CreateEditInfoLists(set<string>& artists,
-                                         set<string>& albums,
-                                         set<string>& genres)
+void EditTrackInfoDialog::Help()
 {
-    vector<ArtistList*>*            artistList;
-    vector<ArtistList*>::iterator   artist;    
+    string            helpFile;
+    char              dir[MAX_PATH];
+    uint32            len = sizeof(dir);
 
-    artistList = (vector<ArtistList*>*)
-            m_context->catalog->GetMusicList();
+    m_context->prefs->GetInstallDirectory(dir, &len);
+    helpFile = dir;
+    helpFile += "\\freeamp.hlp";    
 
-    for(artist = artistList->begin(); 
-        artist != artistList->end(); 
+    WinHelp(m_hwnd, helpFile.c_str(), HELP_CONTEXT, Edit_Info);
+}     
+
+void EditTrackInfoDialog::CreateEditInfoLists(set<string>& artists,
+                                              set<string>& albums,
+                                              set<string>& genres)
+{
+    vector<ArtistList*>::const_iterator   artist;    
+
+    for(artist = m_artistList->begin(); 
+        artist != m_artistList->end(); 
         artist++)
     {
         vector<AlbumList*>::iterator album;

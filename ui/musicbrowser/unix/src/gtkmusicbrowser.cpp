@@ -1504,55 +1504,55 @@ static void quit_menu(GTKMusicBrowser *p, guint action, GtkWidget *w)
 
 static void sort_artist(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
-    p->SortPlaylistEvent(kPlaylistSortKey_Artist, PlaylistSortType_Ascending);
+    p->SortPlaylistEvent(kPlaylistSortKey_Artist, kPlaylistSortType_Ascending);
 }
 
 static void sort_album(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
-    p->SortPlaylistEvent(kPlaylistSortKey_Album, PlaylistSortType_Ascending);
+    p->SortPlaylistEvent(kPlaylistSortKey_Album, kPlaylistSortType_Ascending);
 }
 
 static void sort_title(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
-    p->SortPlaylistEvent(kPlaylistSortKey_Title, PlaylistSortType_Ascending);
+    p->SortPlaylistEvent(kPlaylistSortKey_Title, kPlaylistSortType_Ascending);
 
 }
 
 static void sort_year(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
-    p->SortPlaylistEvent(kPlaylistSortKey_Year, PlaylistSortType_Ascending);
+    p->SortPlaylistEvent(kPlaylistSortKey_Year, kPlaylistSortType_Ascending);
 }
 
 static void sort_track(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
-    p->SortPlaylistEvent(kPlaylistSortKey_Track, PlaylistSortType_Ascending);
+    p->SortPlaylistEvent(kPlaylistSortKey_Track, kPlaylistSortType_Ascending);
 }
 
 static void sort_genre(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
-    p->SortPlaylistEvent(kPlaylistSortKey_Genre, PlaylistSortType_Ascending);
+    p->SortPlaylistEvent(kPlaylistSortKey_Genre, kPlaylistSortType_Ascending);
 }
 
 static void sort_time(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
-    p->SortPlaylistEvent(kPlaylistSortKey_Time, PlaylistSortType_Ascending);
+    p->SortPlaylistEvent(kPlaylistSortKey_Time, kPlaylistSortType_Ascending);
 }
 
 static void sort_location(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
-    p->SortPlaylistEvent(kPlaylistSortKey_Location, PlaylistSortType_Ascending);
+    p->SortPlaylistEvent(kPlaylistSortKey_Location, kPlaylistSortType_Ascending);
 }
 
 static void sort_normal(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
     p->iSetShuffleMode = true;
-    p->SortPlaylistEvent(kPlaylistSortKey_Random, PlaylistSortType_Descending);
+    p->SortPlaylistEvent(kPlaylistSortKey_Random, kPlaylistSortType_Descending);
 }
 
 static void sort_random2(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
     p->iSetShuffleMode = true;
-    p->SortPlaylistEvent(kPlaylistSortKey_Random, PlaylistSortType_Ascending);
+    p->SortPlaylistEvent(kPlaylistSortKey_Random, kPlaylistSortType_Ascending);
 }
 
 static void sort_random(GTKMusicBrowser *p, guint action, GtkWidget *w)
@@ -2324,7 +2324,7 @@ void GTKMusicBrowser::SortPlaylistEvent(PlaylistSortKey order, PlaylistSortType
                                         type)
 {
     if (order == kPlaylistSortKey_Random) {
-        if (type == PlaylistSortType_Ascending)
+        if (type == kPlaylistSortType_Ascending)
             m_plm->SetShuffleMode(true);
         else
             m_plm->SetShuffleMode(false);

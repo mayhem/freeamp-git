@@ -174,7 +174,7 @@ bool PlaylistItemSort::operator() (PlaylistItem* item1,
         }
     }
 
-    /*if(m_sortType == PlaylistSortType_Descending)
+    /*if(m_sortType == kPlaylistSortType_Descending)
     {
         result = !result;
     }*/
@@ -209,7 +209,7 @@ PlaylistManager::PlaylistManager(FAContext* context)
     m_shuffle = false;
     m_repeatMode = kPlaylistMode_RepeatNone;
     m_sortKey = kPlaylistSortKey_Random;
-    m_sortType = PlaylistSortType_Ascending;
+    m_sortType = kPlaylistSortType_Ascending;
 
     m_context->prefs->GetPlaylistShuffle(&m_shuffle);
     m_context->prefs->GetPlaylistRepeat((int32*)&m_repeatMode);
@@ -1485,9 +1485,9 @@ Error PlaylistManager::Sort(PlaylistSortKey key, PlaylistSortType type)
 
     const PlaylistItem* currentItem = GetCurrentItem();
 
-    if(key >= kPlaylistSortKey_FirstKey && key < kPlaylistSortKey_LastKey)
+    if(currentItem && key >= kPlaylistSortKey_FirstKey && key < kPlaylistSortKey_LastKey)
     {
-        if(type == PlaylistSortType_Ascending)
+        if(type == kPlaylistSortType_Ascending)
             stable_sort(m_activeList->begin(), m_activeList->end(), PlaylistItemSort(key));
         else
             stable_sort(m_activeList->begin(), m_activeList->end(), not2(PlaylistItemSort(key)));
@@ -1497,7 +1497,7 @@ Error PlaylistManager::Sort(PlaylistSortKey key, PlaylistSortType type)
 
         result = kError_NoErr;
     }
-    else if(key == kPlaylistSortKey_Random)
+    else if(currentItem && key == kPlaylistSortKey_Random)
     {
         random_shuffle(m_activeList->begin(), m_activeList->end());
         

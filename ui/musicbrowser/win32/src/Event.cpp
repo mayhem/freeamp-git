@@ -32,6 +32,7 @@ ____________________________________________________________________________*/
 #include "utility.h"
 #include "resource.h"
 #include "Win32MusicBrowser.h"
+#include "EditTrackInfoDialog.h"
 #include "eventdata.h"
 #include "debug.h"
 
@@ -48,7 +49,7 @@ void MusicBrowserUI::ClearPlaylistEvent(void)
 
 void MusicBrowserUI::RenameEvent(void)
 {
-    HWND hwnd = m_hMusicCatalog;
+    HWND hwnd = m_hMusicView;
 
     HTREEITEM item;
     //TV_HITTESTINFO hti;
@@ -66,7 +67,7 @@ void MusicBrowserUI::RenameEvent(void)
        item != m_hUncatItem &&
        item != m_hNewPlaylistItem && 
        item != m_hPortableItem &&
-       TreeView_GetParent(m_hMusicCatalog, item) != m_hPortableItem)
+       TreeView_GetParent(m_hMusicView, item) != m_hPortableItem)
     {
         EditItemLabel(hwnd, item);
     }
@@ -165,7 +166,7 @@ void MusicBrowserUI::RemoveEvent(void)
             index--;
         }        
     }
-    else if(hwndFocus == m_hMusicCatalog)
+    else if(hwndFocus == m_hMusicView)
     {
         bool deleteFromDrive = false;
 
@@ -321,13 +322,13 @@ void MusicBrowserUI::ExportPlaylistEvent()
     TV_ITEM tv_item;
 
     // get the first playlist item
-    tv_item.hItem = TreeView_GetChild(m_hMusicCatalog, m_hPlaylistItem);
+    tv_item.hItem = TreeView_GetChild(m_hMusicView, m_hPlaylistItem);
     tv_item.mask = TVIF_STATE|TVIF_PARAM;
     tv_item.stateMask = TVIS_SELECTED;
     tv_item.state = 0;
 
     // skip the "Create New Playlist..." item
-    tv_item.hItem = TreeView_GetNextSibling(m_hMusicCatalog, tv_item.hItem);
+    tv_item.hItem = TreeView_GetNextSibling(m_hMusicView, tv_item.hItem);
 
 
     if(tv_item.hItem)
@@ -341,7 +342,7 @@ void MusicBrowserUI::ExportPlaylistEvent()
         // multi-select in the treeview.
         do
         {
-            result = TreeView_GetItem(m_hMusicCatalog, &tv_item);
+            result = TreeView_GetItem(m_hMusicView, &tv_item);
 
             if(result && (tv_item.state & TVIS_SELECTED))
             {
@@ -354,7 +355,7 @@ void MusicBrowserUI::ExportPlaylistEvent()
             }
             
         }while(result && 
-               (tv_item.hItem = TreeView_GetNextSibling(m_hMusicCatalog, 
+               (tv_item.hItem = TreeView_GetNextSibling(m_hMusicView, 
                                                         tv_item.hItem)));
     }
 }
@@ -367,14 +368,16 @@ const char* kMultipleComments = "<Enter a new comment for all selected tracks.>"
 
 void MusicBrowserUI::EditInfoEvent()
 {
+    MetaData metadata;
+
     vector<PlaylistItem*> items;
 
     if(m_hPlaylistView == GetFocus())
         GetSelectedPlaylistItems(&items); 
-    else if(m_hMusicCatalog == GetFocus())
+    else if(m_hMusicView == GetFocus())
         GetSelectedMusicTreeItems(&items); 
 
-    m_editTrackMetaData = items[0]->GetMetaData();
+    metadata = items[0]->GetMetaData();
 
     bool sameArtist = true;
     bool sameAlbum = true;
@@ -386,44 +389,43 @@ void MusicBrowserUI::EditInfoEvent()
     {
         MetaData metadata = (*track)->GetMetaData();
 
-        if(metadata.Artist() != m_editTrackMetaData.Artist())
+        if(metadata.Artist() != metadata.Artist())
             sameArtist = false;
 
-        if(metadata.Album() != m_editTrackMetaData.Album())
+        if(metadata.Album() != metadata.Album())
             sameAlbum = false;
 
-        if(metadata.Genre() != m_editTrackMetaData.Genre())
+        if(metadata.Genre() != metadata.Genre())
             sameGenre = false;
 
-        if(metadata.Year() != m_editTrackMetaData.Year())
+        if(metadata.Year() != metadata.Year())
             sameYear = false;
     }
 
     if(!sameArtist)
-        m_editTrackMetaData.SetArtist(kMultipleArtists);
+        metadata.SetArtist(kMultipleArtists);
 
     if(!sameAlbum)
-        m_editTrackMetaData.SetAlbum(kMultipleAlbums);
+        metadata.SetAlbum(kMultipleAlbums);
 
     if(!sameYear)
-        m_editTrackMetaData.SetYear(-1);
+        metadata.SetYear(-1);
 
     if(!sameGenre)
-        m_editTrackMetaData.SetGenre(kMultipleGenres);
-
+        metadata.SetGenre(kMultipleGenres);
 
     if(items.size() > 1)
     {
-        m_editTrackMetaData.SetTitle(kMultipleTracks);
-        m_editTrackMetaData.SetTrack(-1);
-        m_editTrackMetaData.SetComment(kMultipleComments);
+        metadata.SetTitle(kMultipleTracks);
+        metadata.SetTrack(-1);
+        metadata.SetComment(kMultipleComments);
     }
 
-    if(0 < DialogBoxParam(g_hinst, 
-                          MAKEINTRESOURCE(IDD_EDITINFO),
-                          m_hWnd, 
-                          ::EditTrackInfoDlgProc, 
-                          (LPARAM )this))
+    EditTrackInfoDialog editTrackInfo(m_context,
+                                      m_hWnd,
+                                      m_context->catalog->GetMusicList(),
+                                      &metadata);
+    if(editTrackInfo.Show())
     {
         for(track = items.begin(); track != items.end(); track++)
         {
@@ -431,26 +433,26 @@ void MusicBrowserUI::EditInfoEvent()
 
             oldMetaData = newMetaData = (*track)->GetMetaData();
 
-            if(m_editTrackMetaData.Artist() != kMultipleArtists)
-                newMetaData.SetArtist(m_editTrackMetaData.Artist().c_str());
+            if(metadata.Artist() != kMultipleArtists)
+                newMetaData.SetArtist(metadata.Artist().c_str());
 
-            if(m_editTrackMetaData.Album() != kMultipleAlbums)
-                newMetaData.SetAlbum(m_editTrackMetaData.Album().c_str());
+            if(metadata.Album() != kMultipleAlbums)
+                newMetaData.SetAlbum(metadata.Album().c_str());
 
-            if(m_editTrackMetaData.Title() != kMultipleTracks)
-                newMetaData.SetTitle(m_editTrackMetaData.Title().c_str());
+            if(metadata.Title() != kMultipleTracks)
+                newMetaData.SetTitle(metadata.Title().c_str());
 
-            if(m_editTrackMetaData.Genre() != kMultipleGenres)
-                newMetaData.SetGenre(m_editTrackMetaData.Genre().c_str());
+            if(metadata.Genre() != kMultipleGenres)
+                newMetaData.SetGenre(metadata.Genre().c_str());
 
-            if(m_editTrackMetaData.Comment() != kMultipleComments)
-                newMetaData.SetComment(m_editTrackMetaData.Comment().c_str());
+            if(metadata.Comment() != kMultipleComments)
+                newMetaData.SetComment(metadata.Comment().c_str());
 
-            if(m_editTrackMetaData.Year() != -1)
-               newMetaData.SetYear(m_editTrackMetaData.Year());
+            if(metadata.Year() != -1)
+               newMetaData.SetYear(metadata.Year());
 
-            if(m_editTrackMetaData.Track() != -1)
-                newMetaData.SetTrack(m_editTrackMetaData.Track());
+            if(metadata.Track() != -1)
+                newMetaData.SetTrack(metadata.Track());
 
             if(newMetaData != oldMetaData)
             {
@@ -460,507 +462,485 @@ void MusicBrowserUI::EditInfoEvent()
 
                 m_oPlm->UpdateTrackMetaData(*track);
             }
-
-            /*m_editTrackMetaData.SetArtist("");
-            m_editTrackMetaData.SetAlbum("");
-            m_editTrackMetaData.SetTitle("");
-            m_editTrackMetaData.SetGenre("");
-            m_editTrackMetaData.SetComment("");
-            m_editTrackMetaData.SetYear(0);
-            m_editTrackMetaData.SetTrack(0);*/
         } 
     }
 }
 
 int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
 {
-	NM_TREEVIEW *pTreeView;
-	NM_LISTVIEW *pListView;
+    int32 result = 0;
+
 	TOOLTIPTEXT *pToolTipText;
-
-    pTreeView = (NM_TREEVIEW *)pHdr;
-    if (pTreeView->hdr.idFrom == IDC_MUSICTREE)
+    
+    
+    if (pHdr->idFrom == IDC_MUSICTREE)
     {
-	    if (pTreeView->hdr.code == TVN_BEGINDRAG )
+        NM_TREEVIEW* pTreeView = (NM_TREEVIEW*)pHdr;
+
+        switch(pTreeView->hdr.code)
         {
-            TVBeginDrag(m_hMusicCatalog, (NM_TREEVIEW*)pHdr);
-            return 0;
-        }    
-
-        if(pTreeView->hdr.code == TVN_KEYDOWN)
-        {
-            TV_KEYDOWN* pnkd = (TV_KEYDOWN*)pHdr; 
-
-            if(pnkd->wVKey == VK_DELETE)
+            case TVN_BEGINDRAG:
             {
-                RemoveEvent();  
+                TVBeginDrag(m_hMusicView, pTreeView);
+                break;
             }
-        }
 
-        if (pTreeView->hdr.code == TVN_BEGINLABELEDIT)
-        {
-            TV_DISPINFO* info = (TV_DISPINFO*)pHdr;
-            HTREEITEM item = info->item.hItem;
-
-            if(item == m_hCatalogItem ||
-               item == m_hPlaylistItem ||
-               item == m_hAllItem ||
-               item == m_hUncatItem ||
-               item == m_hNewPlaylistItem ||
-               item == m_hPortableItem ||
-               TreeView_GetParent(m_hMusicCatalog, item) == m_hPortableItem)
+            case TVN_KEYDOWN:
             {
-                return TRUE;
+                TV_KEYDOWN* pnkd = (TV_KEYDOWN*)pHdr; 
+
+                if(pnkd->wVKey == VK_DELETE)
+                    RemoveEvent();  
+
+                break;
             }
-            else
+
+            case TVN_BEGINLABELEDIT:
             {
-                return FALSE;
-            }
-        }   
-        
-        if (pTreeView->hdr.code == TVN_ENDLABELEDIT)
-        {
-            TV_DISPINFO* info = (TV_DISPINFO*)pHdr;
-            TV_ITEM item = info->item;
+                TV_DISPINFO* info = (TV_DISPINFO*)pHdr;
+                HTREEITEM item = info->item.hItem;
 
-            // was the operation cancelled?
-            if(!item.pszText)
-                return FALSE;
-           
-            if(m_oTreeIndex.IsTrack(item.lParam))
-            {
-                // just change the title for this song
-                UpdateTrackName(m_oTreeIndex.Data(item.lParam).m_pTrack, 
-                                item.pszText);
-            } 
-            else if(m_oTreeIndex.IsPlaylist(item.lParam))
-            {
-                // just change the title for this playlist
-                UpdatePlaylistName(m_oTreeIndex.Data(item.lParam).m_oPlaylistPath, 
-                                   item.pszText);
-            }
-            else if(m_oTreeIndex.IsAlbum(item.lParam))
-            {
-                // need to change the album for all tracks in album
-                UpdateAlbumName(m_oTreeIndex.Data(item.lParam).m_pAlbum, 
-                                item.pszText);
-            }
-            else if(m_oTreeIndex.IsArtist(item.lParam))
-            {
-                // need to change the artist for all albums
-                // and tracks by this artist
-                UpdateArtistName(m_oTreeIndex.Data(item.lParam).m_pArtist, 
-                                 item.pszText);
-            }
-            else if(m_oTreeIndex.IsUncatagorized(item.lParam))
-            {
-                // just change the title for this song
-                UpdateUncatagorizedTrackName(m_oTreeIndex.Data(item.lParam).m_pTrack, 
-                                item.pszText);
-            }
-
-            return TRUE;
-        }    
-
-        /*if (pTreeView->hdr.code == TVN_ITEMEXPANDING && 
-            pTreeView->itemNew.hItem == m_hPortableItem)
-        { 
-            if (TreeView_GetChild(m_hMusicCatalog, 
-                m_hPortableItem) == NULL)
-            {    
-                FillPortables();
-                return 0;
-            }
-            return 0;
-        }*/  
- 
-	    if (pTreeView->hdr.code == TVN_ITEMEXPANDING && 
-            pTreeView->itemNew.hItem == m_hPlaylistItem)
-        {    
-            if (TreeView_GetChild(m_hMusicCatalog, 
-                m_hPlaylistItem) == NULL)
-            {    
-                FillPlaylists();
-                return 0;
-            }
-            return 0;
-        }    
-
-	    if (pTreeView->hdr.code == TVN_ITEMEXPANDING && 
-            pTreeView->itemNew.hItem == m_hAllItem)
-        {    
-            if (TreeView_GetChild(m_hMusicCatalog, 
-                m_hAllItem) == NULL)
-            {    
-                FillAllTracks();
-                return 0;
-            }
-            return 0;
-        }    
-
-	    if (pTreeView->hdr.code == TVN_ITEMEXPANDING && 
-            pTreeView->itemNew.hItem == m_hUncatItem)
-        {    
-            if (TreeView_GetChild(m_hMusicCatalog, 
-                m_hUncatItem) == NULL)
-            {    
-                FillUncatTracks();
-                return 0;
-            }
-            return 0;
-        }    
-        
-	    if (pTreeView->hdr.code == TVN_ITEMEXPANDING && 
-            pTreeView->itemNew.hItem == m_hCatalogItem)
-        { 
-            if (TreeView_GetNextSibling(m_hMusicCatalog, 
-                m_hUncatItem) == NULL)
-            {    
-                FillArtists();
-                return 0;
-            }
-            return 0;
-        }    
-        
-	    if (pTreeView->hdr.code == TVN_ITEMEXPANDING && 
-            m_oTreeIndex.GetLevel(pTreeView->itemNew.lParam) == 1 &&
-            TreeView_GetChild(
-            m_hMusicCatalog, pTreeView->itemNew.hItem) == NULL)
-        {    
-            FillAlbums(&pTreeView->itemNew);
-            return 0;
-        }
-        
-	    if (pTreeView->hdr.code == TVN_ITEMEXPANDING )
-            if( m_oTreeIndex.GetLevel(pTreeView->itemNew.lParam) == 2)
-
-            if(TreeView_GetChild(
-            m_hMusicCatalog, pTreeView->itemNew.hItem) == NULL)
-        {    
-            FillTracks(&pTreeView->itemNew);
-            return 0;
-        }
-        
-	    if (pTreeView->hdr.code == TVN_SELCHANGED)
-        {
-            UpdateButtonMenuStates();
-            return 0;
-        }
-
-	    if (pTreeView->hdr.code == NM_DBLCLK)
-        {
-            //int32 lParam;
-            //lParam = GetCurrentItemFromMousePos();
-
-            /*TV_ITEM sItem;
-            TV_HITTESTINFO tv_htinfo;
-
-
-            GetCursorPos(&tv_htinfo.pt);
-            ScreenToClient(m_hMusicCatalog, &tv_htinfo.pt);
-
-            if(TreeView_HitTest(m_hMusicCatalog, &tv_htinfo))
-            {
-                sItem.hItem = TreeView_GetSelection(m_hMusicCatalog); 
-                sItem.mask = TVIF_PARAM | TVIF_HANDLE;
-                TreeView_GetItem(m_hMusicCatalog, &sItem);
-
-                if(m_oTreeIndex.IsTrack(sItem.lParam))
+                if(item == m_hCatalogItem ||
+                   item == m_hPlaylistItem ||
+                   item == m_hAllItem ||
+                   item == m_hUncatItem ||
+                   item == m_hNewPlaylistItem ||
+                   item == m_hPortableItem ||
+                   TreeView_GetParent(m_hMusicView, item) == m_hPortableItem)
                 {
-                    PlaylistItem *item;
+                    result = TRUE;
+                }
+
+                break;
+            }
+
+            case TVN_ENDLABELEDIT:
+            {
+                TV_DISPINFO* info = (TV_DISPINFO*)pHdr;
+                TV_ITEM item = info->item;
+
+                // was the operation cancelled?
+                if(item.pszText)
+                {
+                    if(m_oTreeIndex.IsTrack(item.lParam))
+                    {
+                        // just change the title for this song
+                        UpdateTrackName(m_oTreeIndex.Data(item.lParam).m_pTrack, 
+                                        item.pszText);
+                    } 
+                    else if(m_oTreeIndex.IsPlaylist(item.lParam))
+                    {
+                        // just change the title for this playlist
+                        UpdatePlaylistName(m_oTreeIndex.Data(item.lParam).m_oPlaylistPath, 
+                                           item.pszText);
+                    }
+                    else if(m_oTreeIndex.IsAlbum(item.lParam))
+                    {
+                        // need to change the album for all tracks in album
+                        UpdateAlbumName(m_oTreeIndex.Data(item.lParam).m_pAlbum, 
+                                        item.pszText);
+                    }
+                    else if(m_oTreeIndex.IsArtist(item.lParam))
+                    {
+                        // need to change the artist for all albums
+                        // and tracks by this artist
+                        UpdateArtistName(m_oTreeIndex.Data(item.lParam).m_pArtist, 
+                                         item.pszText);
+                    }
+                    else if(m_oTreeIndex.IsUncatagorized(item.lParam))
+                    {
+                        // just change the title for this song
+                        UpdateUncatagorizedTrackName(m_oTreeIndex.Data(item.lParam).m_pTrack, 
+                                        item.pszText);
+                    }
+
+                    result = TRUE;
+                }
+
+                break;
+            }
+
+            case TVN_ITEMEXPANDING:
+            {
+                if(!TreeView_GetChild(m_hMusicView, 
+                                      pTreeView->itemNew.hItem))
+                {
+                    if(pTreeView->itemNew.hItem == m_hCatalogItem)
+                    {
+                        FillArtists();
+                    }
+                    else if(pTreeView->itemNew.hItem == m_hAllItem)
+                    {
+                        FillAllTracks();
+                    }
+                    else if(pTreeView->itemNew.hItem == m_hUncatItem)
+                    {
+                        FillUncatTracks();
+                    }
+                    else if(m_oTreeIndex.GetLevel(pTreeView->itemNew.lParam) == 1)
+                    {
+                        FillAlbums(&pTreeView->itemNew);
+                    }
+                    else if(m_oTreeIndex.GetLevel(pTreeView->itemNew.lParam) == 2)
+                    {
+                        FillTracks(&pTreeView->itemNew);
+                    }
+                    else if(pTreeView->itemNew.hItem == m_hPlaylistItem)
+                    {
+                        FillPlaylists();
+                    }
+                    else if(pTreeView->itemNew.hItem == m_hIceCastItem)
+                    {
+                        FillIceCast();
+                    }
+                    else if(pTreeView->itemNew.hItem == m_hWiredPlanetItem)
+                    {
+                        FillWiredPlanet();
+                    }
+                    else if(pTreeView->itemNew.hItem == m_hPortableItem)
+                    {
+                        FillPortables();
+                    }
+                }
+
+                break;
+            }
+
+            case TVN_SELCHANGED:
+            {
+                UpdateButtonMenuStates();
+                break;
+            }
+
+            case NM_DBLCLK:
+            {
+                /*int32 lParam;
+                lParam = GetCurrentItemFromMousePos();
+
+                TV_ITEM sItem;
+                TV_HITTESTINFO tv_htinfo;
+
+
+                GetCursorPos(&tv_htinfo.pt);
+                ScreenToClient(m_hMusicView, &tv_htinfo.pt);
+
+                if(TreeView_HitTest(m_hMusicView, &tv_htinfo))
+                {
+                    sItem.hItem = TreeView_GetSelection(m_hMusicView); 
+                    sItem.mask = TVIF_PARAM | TVIF_HANDLE;
+                    TreeView_GetItem(m_hMusicView, &sItem);
+
+                    if(m_oTreeIndex.IsTrack(sItem.lParam))
+                    {
+                        PlaylistItem *item;
                 
-                    item = new PlaylistItem(*m_oTreeIndex.Data(sItem.lParam).m_pTrack);
-                    m_oPlm->AddItem(item, false);
-                } 
-                else if(m_oTreeIndex.IsPlaylist(sItem.lParam))
-                {
-                    m_oPlm->ReadPlaylist(m_oTreeIndex.Data(sItem.lParam).m_oPlaylistPath.c_str());
-                }
-                else if(m_oTreeIndex.IsPortable(sItem.lParam))
-                {
-                    EditPortablePlaylist(m_oTreeIndex.Data(sItem.lParam).m_pPortable);
-                }
-                else if(tv_htinfo.hItem == m_hNewPlaylistItem)
-                {
-                    NewPlaylist();
-                }
-                else if(tv_htinfo.hItem == m_hNewPortableItem)
-                {
-                    m_context->target->AcceptEvent(new ShowPreferencesEvent(3));
-                }
-            }*/
-        }
-        /*
-	    if (pTreeView->hdr.code == ??)
-        {
-            TV_HITTESTINFO sHit;
-            HTREEITEM      hItem;
-            POINT          sPoint;
+                        item = new PlaylistItem(*m_oTreeIndex.Data(sItem.lParam).m_pTrack);
+                        m_oPlm->AddItem(item, false);
+                    } 
+                    else if(m_oTreeIndex.IsPlaylist(sItem.lParam))
+                    {
+                        m_oPlm->ReadPlaylist(m_oTreeIndex.Data(sItem.lParam).m_oPlaylistPath.c_str());
+                    }
+                    else if(m_oTreeIndex.IsPortable(sItem.lParam))
+                    {
+                        EditPortablePlaylist(m_oTreeIndex.Data(sItem.lParam).m_pPortable);
+                    }
+                    else if(tv_htinfo.hItem == m_hNewPlaylistItem)
+                    {
+                        NewPlaylist();
+                    }
+                    else if(tv_htinfo.hItem == m_hNewPortableItem)
+                    {
+                        m_context->target->AcceptEvent(new ShowPreferencesEvent(3));
+                    }
+                }*/
+                break;
+            }
+
+            case NM_RCLICK:
+            {
+                HMENU menu;
+                HMENU subMenu;
+                POINT sPoint;
+                uint32 trackCount = 0;
+                uint32 playlistCount = 0;
+
+                trackCount = GetSelectedTrackCount();
+                playlistCount = GetSelectedPlaylistCount();
             
-            sHit.flags = TVHT_ONITEM;
+                GetCursorPos(&sPoint);
+
+                menu = LoadMenu(g_hinst, MAKEINTRESOURCE(IDR_TVPOPUP));
+                subMenu = GetSubMenu(menu, 0);
+
+                if(m_pParent)
+                {
+                    DeleteMenu(subMenu, ID_POPUP_ADDTRACK_PLAY, MF_BYCOMMAND);
+                }
+
+                if( IsItemSelected(m_hCatalogItem) ||
+                    IsItemSelected(m_hPlaylistItem) ||
+                    IsItemSelected(m_hAllItem) ||
+                    IsItemSelected(m_hUncatItem) ||
+                    (IsItemSelected(m_hNewPlaylistItem) && !(playlistCount + trackCount)))
+                {
+                    EnableMenuItem(subMenu,
+                                   ID_POPUP_REMOVE,
+                                   MF_BYCOMMAND|MF_GRAYED);
+                }
+
+
+                if( playlistCount > 1 ||
+                    IsItemSelected(m_hCatalogItem) ||
+                    IsItemSelected(m_hPlaylistItem) ||
+                    IsItemSelected(m_hAllItem) ||
+                    IsItemSelected(m_hUncatItem) ||
+                    (IsItemSelected(m_hNewPlaylistItem) && !(playlistCount + trackCount)))
+                {
+                    EnableMenuItem(subMenu,
+                                   ID_POPUP_EDITINFO,
+                                   MF_BYCOMMAND|MF_GRAYED);    
+                }
+
+
+                if( trackCount > 1 ||
+                    playlistCount > 1 ||
+                    IsItemSelected(m_hCatalogItem) ||
+                    IsItemSelected(m_hPlaylistItem) ||
+                    IsItemSelected(m_hAllItem) ||
+                    IsItemSelected(m_hUncatItem) ||
+                    IsItemSelected(m_hNewPlaylistItem))
+                {
+                    EnableMenuItem(subMenu,
+                                   ID_POPUP_RENAME,
+                                   MF_BYCOMMAND|MF_GRAYED);                         
+                }
+
+                if(trackCount == 0)
+                {
+                    EnableMenuItem(subMenu,
+                                   ID_POPUP_EDITINFO,
+                                   MF_BYCOMMAND|MF_GRAYED);
+
+                    if( IsItemSelected(m_hNewPlaylistItem) &&
+                        playlistCount == 1)
+                    {
+                        EnableMenuItem(subMenu,
+                                   ID_POPUP_ADDTRACK,
+                                   MF_BYCOMMAND|MF_GRAYED);
+
+                        EnableMenuItem(subMenu,
+                                   ID_POPUP_ADDTRACK_PLAY,
+                                   MF_BYCOMMAND|MF_GRAYED);
+
+                        EnableMenuItem(subMenu,
+                                   ID_POPUP_REMOVE,
+                                   MF_BYCOMMAND|MF_GRAYED);
+
+                        EnableMenuItem(subMenu,
+                                   ID_POPUP_RENAME,
+                                   MF_BYCOMMAND|MF_GRAYED);
+
+                        EnableMenuItem(subMenu,
+                                   ID_POPUP_EDITPLAYLIST,
+                                   MF_BYCOMMAND|MF_GRAYED);
+                    }
+                }
+
+                if(!playlistCount || trackCount)
+                {
+                    DeleteMenu(subMenu, ID_POPUP_EDITPLAYLIST, MF_BYCOMMAND);
+                }
+
+                TrackPopupMenu(subMenu, 
+                               TPM_LEFTALIGN|TPM_LEFTBUTTON, 
+                               sPoint.x, sPoint.y, 
+                               0, m_hWnd, NULL);
+
+                DestroyMenu(menu);
+
+                break;
+            }
+
+            /*case ??:
+            {
+                TV_HITTESTINFO sHit;
+                HTREEITEM      hItem;
+                POINT          sPoint;
+            
+                sHit.flags = TVHT_ONITEM;
           
-            GetCursorPos(&sPoint);
-            ScreenToClient(m_hWnd, &sPoint);
-            ClientToWindow(m_hWnd, &sPoint); 
-            sHit.pt = sPoint;
-            hItem = TreeView_HitTest(m_hMusicCatalog, &sHit);
-            if (hItem == m_hPlaylistItem)
-               SendMessage(m_hStatus, SB_SETTEXT, 0, 
-                           (LPARAM)"This tree item contains all of your playlists.");
-            else               
-            if (hItem == m_hCatalogItem)
-               SendMessage(m_hStatus, SB_SETTEXT, 0, 
-                           (LPARAM)"This tree item contains all of your music.");
-            else               
-            if (hItem == m_hAllItem)
-               SendMessage(m_hStatus, SB_SETTEXT, 0, 
-                           (LPARAM)"This tree item lists all of your music tracks.");
-            else               
-            if (hItem == m_hUncatItem)
-               SendMessage(m_hStatus, SB_SETTEXT, 0, 
-                           (LPARAM)"This tree item lists all of your uncategorized music tracks.");
-            else               
-               SendMessage(m_hStatus, SB_SETTEXT, 0, (LPARAM)"");
-        }
-        */
-       
-        if (pTreeView->hdr.code == NM_RCLICK)
-        {
-            HMENU menu;
-            HMENU subMenu;
-            POINT sPoint;
-            uint32 trackCount = 0;
-            uint32 playlistCount = 0;
+                GetCursorPos(&sPoint);
+                ScreenToClient(m_hWnd, &sPoint);
+                ClientToWindow(m_hWnd, &sPoint); 
+                sHit.pt = sPoint;
+                hItem = TreeView_HitTest(m_hMusicView, &sHit);
+                if (hItem == m_hPlaylistItem)
+                   SendMessage(m_hStatus, SB_SETTEXT, 0, 
+                               (LPARAM)"This tree item contains all of your playlists.");
+                else               
+                if (hItem == m_hCatalogItem)
+                   SendMessage(m_hStatus, SB_SETTEXT, 0, 
+                               (LPARAM)"This tree item contains all of your music.");
+                else               
+                if (hItem == m_hAllItem)
+                   SendMessage(m_hStatus, SB_SETTEXT, 0, 
+                               (LPARAM)"This tree item lists all of your music tracks.");
+                else               
+                if (hItem == m_hUncatItem)
+                   SendMessage(m_hStatus, SB_SETTEXT, 0, 
+                               (LPARAM)"This tree item lists all of your uncategorized music tracks.");
+                else               
+                   SendMessage(m_hStatus, SB_SETTEXT, 0, (LPARAM)"");
 
-            trackCount = GetSelectedTrackCount();
-            playlistCount = GetSelectedPlaylistCount();
-            
-            GetCursorPos(&sPoint);
-
-            menu = LoadMenu(g_hinst, MAKEINTRESOURCE(IDR_TVPOPUP));
-            subMenu = GetSubMenu(menu, 0);
-
-            if(m_pParent)
-            {
-                DeleteMenu(subMenu, ID_POPUP_ADDTRACK_PLAY, MF_BYCOMMAND);
-            }
-
-            if( IsItemSelected(m_hCatalogItem) ||
-                IsItemSelected(m_hPlaylistItem) ||
-                IsItemSelected(m_hAllItem) ||
-                IsItemSelected(m_hUncatItem) ||
-                (IsItemSelected(m_hNewPlaylistItem) && !(playlistCount + trackCount)))
-            {
-                EnableMenuItem(subMenu,
-                               ID_POPUP_REMOVE,
-                               MF_BYCOMMAND|MF_GRAYED);
-            }
-
-
-            if( playlistCount > 1 ||
-                IsItemSelected(m_hCatalogItem) ||
-                IsItemSelected(m_hPlaylistItem) ||
-                IsItemSelected(m_hAllItem) ||
-                IsItemSelected(m_hUncatItem) ||
-                (IsItemSelected(m_hNewPlaylistItem) && !(playlistCount + trackCount)))
-            {
-                EnableMenuItem(subMenu,
-                               ID_POPUP_EDITINFO,
-                               MF_BYCOMMAND|MF_GRAYED);    
-            }
-
-
-            if( trackCount > 1 ||
-                playlistCount > 1 ||
-                IsItemSelected(m_hCatalogItem) ||
-                IsItemSelected(m_hPlaylistItem) ||
-                IsItemSelected(m_hAllItem) ||
-                IsItemSelected(m_hUncatItem) ||
-                IsItemSelected(m_hNewPlaylistItem))
-            {
-                EnableMenuItem(subMenu,
-                               ID_POPUP_RENAME,
-                               MF_BYCOMMAND|MF_GRAYED);                         
-            }
-
-            if(trackCount == 0)
-            {
-                EnableMenuItem(subMenu,
-                               ID_POPUP_EDITINFO,
-                               MF_BYCOMMAND|MF_GRAYED);
-
-                if( IsItemSelected(m_hNewPlaylistItem) &&
-                    playlistCount == 1)
-                {
-                    EnableMenuItem(subMenu,
-                               ID_POPUP_ADDTRACK,
-                               MF_BYCOMMAND|MF_GRAYED);
-
-                    EnableMenuItem(subMenu,
-                               ID_POPUP_ADDTRACK_PLAY,
-                               MF_BYCOMMAND|MF_GRAYED);
-
-                    EnableMenuItem(subMenu,
-                               ID_POPUP_REMOVE,
-                               MF_BYCOMMAND|MF_GRAYED);
-
-                    EnableMenuItem(subMenu,
-                               ID_POPUP_RENAME,
-                               MF_BYCOMMAND|MF_GRAYED);
-
-                    EnableMenuItem(subMenu,
-                               ID_POPUP_EDITPLAYLIST,
-                               MF_BYCOMMAND|MF_GRAYED);
-                }
-            }
-
-            if(!playlistCount || trackCount)
-            {
-                DeleteMenu(subMenu, ID_POPUP_EDITPLAYLIST, MF_BYCOMMAND);
-            }
-
-            TrackPopupMenu(subMenu, 
-                           TPM_LEFTALIGN|TPM_LEFTBUTTON, 
-                           sPoint.x, sPoint.y, 
-                           0, m_hWnd, NULL);
-
-            DestroyMenu(menu);
-        }
-        
-        return 0;
-    }    
-
-    pListView = (NM_LISTVIEW *)pHdr;
-    if(pListView->hdr.idFrom == IDC_PLAYLISTBOX)
-    {
-        if(pListView->hdr.code == LVN_BEGINDRAG )
-        {
-            LVBeginDrag(m_hPlaylistView, (NM_LISTVIEW*)pHdr);
-            return 0;
-        }  
-        else if(pListView->hdr.code == NM_RCLICK)
-        {
-            HMENU menu;
-            HMENU subMenu;
-            POINT sPoint;
-            uint32 trackCount = 0;
-            uint32 playlistCount = 0;
-
-            trackCount = GetSelectedTrackCount();
-            playlistCount = GetSelectedPlaylistCount();
-            
-            GetCursorPos(&sPoint);
-
-            menu = LoadMenu(g_hinst, MAKEINTRESOURCE(IDR_LVPOPUP));
-            subMenu = GetSubMenu(menu, 0);
-
-            if(m_pParent)
-            {
-                DeleteMenu(subMenu, ID_POPUP_PLAY, MF_BYCOMMAND);
-            }
-
-            // Can we move items up and down?
-            uint32 count = ListView_GetItemCount(m_hPlaylistView);
-            uint32 selected = ListView_GetSelectedCount(m_hPlaylistView);
-
-            if(count)
-            {
-                uint32 state;
-
-                EnableMenuItem(subMenu, ID_POPUP_PLAY, MF_BYCOMMAND|
-                               (selected > 1) ? MF_GRAYED : MF_ENABLED );
-
-                state = ListView_GetItemState(m_hPlaylistView,
-                                              count - 1, 
-                                              LVIS_SELECTED);
-
-                EnableMenuItem(subMenu, ID_POPUP_MOVEDOWN, MF_BYCOMMAND|
-                               (state & LVIS_SELECTED) ? MF_GRAYED : MF_ENABLED );
-
-                state = ListView_GetItemState(m_hPlaylistView, 
-                                              0, 
-                                              LVIS_SELECTED);
-
-                EnableMenuItem(subMenu, ID_POPUP_MOVEUP, MF_BYCOMMAND|
-                               (state & LVIS_SELECTED) ? MF_GRAYED : MF_ENABLED );
-            }
-            else
-            {
-                EnableMenuItem(subMenu, ID_POPUP_PLAY, MF_BYCOMMAND|MF_GRAYED);
-                EnableMenuItem(subMenu, ID_POPUP_MOVEUP, MF_BYCOMMAND|MF_GRAYED);
-                EnableMenuItem(subMenu, ID_POPUP_MOVEDOWN, MF_BYCOMMAND|MF_GRAYED);
-                EnableMenuItem(subMenu, ID_POPUP_REMOVE, MF_BYCOMMAND|MF_GRAYED);
-                EnableMenuItem(subMenu, ID_POPUP_EDITINFO, MF_BYCOMMAND|MF_GRAYED);
-            }
-
-            TrackPopupMenu(subMenu, 
-                           TPM_LEFTALIGN, sPoint.x, sPoint.y, 
-                           0, m_hWnd, NULL);
-
-            DestroyMenu(menu);
-        }
-	    else if(pListView->hdr.code == LVN_ITEMCHANGED)
-        {
-            UpdateButtonMenuStates();
-        }
-	    else if(pListView->hdr.code == NM_DBLCLK)
-        {
-            // only do this for the root browser
-            if(!m_pParent)
-            {
-                m_playerEQ->AcceptEvent(new Event(CMD_Stop));
-                m_oPlm->SetCurrentIndex(pListView->iItem);
-                m_playerEQ->AcceptEvent(new Event(CMD_Play));
-            }
-        }   
-        else if(pListView->hdr.code == LVN_COLUMNCLICK)
-        {
-            int column = pListView->iSubItem;
-
-            switch(column)
-            {
-                case 1:
-                    SendMessage(m_hWnd, WM_COMMAND, ID_SORT_TITLE, 0);
-                    break;
-
-                case 2:
-                    SendMessage(m_hWnd, WM_COMMAND, ID_SORT_ARTIST, 0);
-                    break;
-
-                case 3:
-                    SendMessage(m_hWnd, WM_COMMAND, ID_SORT_ALBUM, 0);
-                    break;
-
-                case 4:
-                    SendMessage(m_hWnd, WM_COMMAND, ID_SORT_LENGTH, 0);
-                    break;
-            }
-        }   
-        else if(pListView->hdr.code == LVN_KEYDOWN)
-        {
-            LV_KEYDOWN* pnkd = (LV_KEYDOWN*)pHdr; 
-
-            if(pnkd->wVKey == VK_DELETE)
-            {
-                RemoveEvent();  
-            }
-            else if(pnkd->wVKey == 'A' && (GetKeyState(VK_CONTROL) < 0))
-            {
-                uint32 count = ListView_GetItemCount(pListView->hdr.hwndFrom);
-                
-                for(uint32 index = 0; index < count; index++)
-                    ListView_SetItemState(pListView->hdr.hwndFrom,
-                                          index,
-                                          LVIS_SELECTED,
-                                          LVIS_SELECTED);
-            }
+                break;
+            }*/
 
         }
-            
-        return 0;
     }
+    else if(pHdr->idFrom == IDC_PLAYLISTBOX)
+    {
+        NM_LISTVIEW* pListView = (NM_LISTVIEW*)pHdr;
 
-	if(pHdr->code == TTN_NEEDTEXT)
+        switch(pListView->hdr.code)
+        {
+            case LVN_BEGINDRAG:
+            {
+                LVBeginDrag(m_hPlaylistView, pListView);
+                break;
+            }
+
+            case NM_RCLICK:
+            {
+                HMENU menu;
+                HMENU subMenu;
+                POINT sPoint;
+                uint32 trackCount = 0;
+                uint32 playlistCount = 0;
+
+                trackCount = GetSelectedTrackCount();
+                playlistCount = GetSelectedPlaylistCount();
+            
+                GetCursorPos(&sPoint);
+
+                menu = LoadMenu(g_hinst, MAKEINTRESOURCE(IDR_LVPOPUP));
+                subMenu = GetSubMenu(menu, 0);
+
+                if(m_pParent)
+                {
+                    DeleteMenu(subMenu, ID_POPUP_PLAY, MF_BYCOMMAND);
+                }
+
+                // Can we move items up and down?
+                uint32 count = ListView_GetItemCount(m_hPlaylistView);
+                uint32 selected = ListView_GetSelectedCount(m_hPlaylistView);
+
+                if(count)
+                {
+                    uint32 state;
+
+                    EnableMenuItem(subMenu, ID_POPUP_PLAY, MF_BYCOMMAND|
+                                   (selected > 1) ? MF_GRAYED : MF_ENABLED );
+
+                    state = ListView_GetItemState(m_hPlaylistView,
+                                                  count - 1, 
+                                                  LVIS_SELECTED);
+
+                    EnableMenuItem(subMenu, ID_POPUP_MOVEDOWN, MF_BYCOMMAND|
+                                   (state & LVIS_SELECTED) ? MF_GRAYED : MF_ENABLED );
+
+                    state = ListView_GetItemState(m_hPlaylistView, 
+                                                  0, 
+                                                  LVIS_SELECTED);
+
+                    EnableMenuItem(subMenu, ID_POPUP_MOVEUP, MF_BYCOMMAND|
+                                   (state & LVIS_SELECTED) ? MF_GRAYED : MF_ENABLED );
+                }
+                else
+                {
+                    EnableMenuItem(subMenu, ID_POPUP_PLAY, MF_BYCOMMAND|MF_GRAYED);
+                    EnableMenuItem(subMenu, ID_POPUP_MOVEUP, MF_BYCOMMAND|MF_GRAYED);
+                    EnableMenuItem(subMenu, ID_POPUP_MOVEDOWN, MF_BYCOMMAND|MF_GRAYED);
+                    EnableMenuItem(subMenu, ID_POPUP_REMOVE, MF_BYCOMMAND|MF_GRAYED);
+                    EnableMenuItem(subMenu, ID_POPUP_EDITINFO, MF_BYCOMMAND|MF_GRAYED);
+                }
+
+                TrackPopupMenu(subMenu, 
+                               TPM_LEFTALIGN, sPoint.x, sPoint.y, 
+                               0, m_hWnd, NULL);
+
+                DestroyMenu(menu);
+                break;
+            }
+
+            case LVN_ITEMCHANGED:
+            {
+                UpdateButtonMenuStates();
+                break;
+            }
+
+            case NM_DBLCLK:
+            {
+                // only do this for the root browser
+                if(!m_pParent)
+                {
+                    m_playerEQ->AcceptEvent(new Event(CMD_Stop));
+                    m_oPlm->SetCurrentIndex(pListView->iItem);
+                    m_playerEQ->AcceptEvent(new Event(CMD_Play));
+                }
+                break;
+            }
+
+            case LVN_COLUMNCLICK:
+            {
+                int column = pListView->iSubItem;
+
+                switch(column)
+                {
+                    case 1:
+                        SendMessage(m_hWnd, WM_COMMAND, ID_SORT_TITLE, 0);
+                        break;
+
+                    case 2:
+                        SendMessage(m_hWnd, WM_COMMAND, ID_SORT_ARTIST, 0);
+                        break;
+
+                    case 3:
+                        SendMessage(m_hWnd, WM_COMMAND, ID_SORT_ALBUM, 0);
+                        break;
+
+                    case 4:
+                        SendMessage(m_hWnd, WM_COMMAND, ID_SORT_LENGTH, 0);
+                        break;
+                }
+                break;
+            }
+
+            case LVN_KEYDOWN:
+            {
+                LV_KEYDOWN* pnkd = (LV_KEYDOWN*)pHdr; 
+
+                if(pnkd->wVKey == VK_DELETE)
+                {
+                    RemoveEvent();  
+                }
+                else if(pnkd->wVKey == 'A' && (GetKeyState(VK_CONTROL) < 0))
+                {
+                    uint32 count = ListView_GetItemCount(pListView->hdr.hwndFrom);
+                
+                    for(uint32 index = 0; index < count; index++)
+                        ListView_SetItemState(pListView->hdr.hwndFrom,
+                                              index,
+                                              LVIS_SELECTED,
+                                              LVIS_SELECTED);
+                }
+
+                break;
+            }
+        }
+    }
+    
+    if(pHdr->code == TTN_NEEDTEXT)
     {
         pToolTipText = (LPTOOLTIPTEXT)pHdr;
 
@@ -968,35 +948,44 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
         {
             case ID_FILE_NEWPLAYLIST:
                 pToolTipText->lpszText = "Create a new playlist";
-                return true;
+                result = TRUE;
+                break;
             case ID_FILE_SAVEPLAYLIST:
                 pToolTipText->lpszText = "Save current playlist";
-                return true;
+                result = TRUE;
+                break;
             case ID_FILE_IMPORT:
                 pToolTipText->lpszText = "Import tracks and playlists from disk";
-                return true;
+                result = TRUE;
+                break;
             case ID_EDIT_REMOVE:
                 pToolTipText->lpszText = "Remove selected tracks and playlists";
-                return true;
+                result = TRUE;
+                break;
             case ID_EDIT_EDITINFO:
                 pToolTipText->lpszText = "Edit track or playlist info";
-                return true;
+                result = TRUE;
+                break;
             case ID_EDIT_ADDTRACK:
                 pToolTipText->lpszText = "Add selected tracks and playlists to playlist";
-                return true;
+                result = TRUE;
+                break;
             case ID_EDIT_ADDFILE:
                 pToolTipText->lpszText = "Add files from disk to playlist";
-                return true;
+                result = TRUE;
+                break;
             case ID_EDIT_MOVEUP:
                 pToolTipText->lpszText = "Move selected playlist items up";
-                return true;
+                result = TRUE;
+                break;
             case ID_EDIT_MOVEDOWN:
                 pToolTipText->lpszText = "Move selected playlist items down";
-                return true;
+                result = TRUE;
+                break;
         }      
     }
-    
-	return 1;
+ 
+	return result;
 }
 
 
@@ -1005,6 +994,9 @@ void MusicBrowserUI::SortEvent(int id)
     PlaylistSortKey oldKey, newKey;
     PlaylistSortType type;
     
+    if(!m_oPlm->CountItems())
+        return;
+
     switch(id)
     {
         case ID_SORT_ARTIST:
@@ -1042,8 +1034,8 @@ void MusicBrowserUI::SortEvent(int id)
     oldKey = m_oPlm->GetPlaylistSortKey();
 
     type = (oldKey == newKey && 
-            m_oPlm->GetPlaylistSortType() == PlaylistSortType_Ascending)
-            ? PlaylistSortType_Descending : PlaylistSortType_Ascending;
+            m_oPlm->GetPlaylistSortType() == kPlaylistSortType_Ascending)
+            ? kPlaylistSortType_Descending : kPlaylistSortType_Ascending;
 
     ::SetCursor(LoadCursor(NULL, IDC_WAIT));
     m_oPlm->Sort(newKey, type);
@@ -1103,6 +1095,7 @@ void MusicBrowserUI::AddTrackEvent(void)
     }
 
     GetSelectedPlaylistItems(&urls);
+    //GetSelectedStreamItems(&urls);
 
     // we know that we are gonna be adding a 
     // bunch of items so let windows know.
@@ -1215,13 +1208,13 @@ void MusicBrowserUI::EditPlaylistEvent(void)
     TV_ITEM tv_item;
 
     // get the first playlist item
-    tv_item.hItem = TreeView_GetChild(m_hMusicCatalog, m_hPlaylistItem);
+    tv_item.hItem = TreeView_GetChild(m_hMusicView, m_hPlaylistItem);
     tv_item.mask = TVIF_STATE|TVIF_PARAM;
     tv_item.stateMask = TVIS_SELECTED;
     tv_item.state = 0;
 
     // skip the "Create New Playlist..." item
-    tv_item.hItem = TreeView_GetNextSibling(m_hMusicCatalog, tv_item.hItem);
+    tv_item.hItem = TreeView_GetNextSibling(m_hMusicView, tv_item.hItem);
 
     if(tv_item.hItem)
     {
@@ -1229,7 +1222,7 @@ void MusicBrowserUI::EditPlaylistEvent(void)
 
         do
         {
-            result = TreeView_GetItem(m_hMusicCatalog, &tv_item);
+            result = TreeView_GetItem(m_hMusicView, &tv_item);
 
             if(result && (tv_item.state & TVIS_SELECTED))
             {
@@ -1241,49 +1234,9 @@ void MusicBrowserUI::EditPlaylistEvent(void)
             }
             
         }while(result && 
-               (tv_item.hItem = TreeView_GetNextSibling(m_hMusicCatalog, 
+               (tv_item.hItem = TreeView_GetNextSibling(m_hMusicView, 
                                                         tv_item.hItem)));
     }
-}
-
-void MusicBrowserUI::RemoveFromDiskEvent(void)
-{
-    int32     lParam;
-    char      szConfirm[MAX_PATH];
-    char      szBase[MAX_PATH];
-    HTREEITEM hItem;
-
-    lParam = GetMusicTreeSelection(&hItem);
-    if (m_oTreeIndex.IsTrack(lParam))
-    {
-        _splitpath(m_oTreeIndex.Data(lParam).m_pTrack->URL().c_str(),
-                   NULL, NULL, szBase, NULL);
-        sprintf(szConfirm, "Are you sure you want to remove track\r\n"
-                           "%s from the music catalog and the disk?",
-                           szBase);
-        if (MessageBox(m_hWnd, szConfirm, BRANDING, MB_YESNO) == IDYES)
-        {
-           unlink(m_oTreeIndex.Data(lParam).m_pTrack->URL().c_str());
-           m_context->catalog->RemoveSong(
-                  m_oTreeIndex.Data(lParam).m_pTrack->URL().c_str());
-           TreeView_DeleteItem(m_hMusicCatalog, hItem);
-        }   
-    }        
-    if (m_oTreeIndex.IsPlaylist(lParam))
-    {
-        _splitpath(m_oTreeIndex.Data(lParam).m_oPlaylistPath.c_str(),
-                   NULL, NULL, szBase, NULL);
-        sprintf(szConfirm, "Are you sure you want to remove the playlist\r\n"
-                           "%s from the music catalog and the disk?",
-                           szBase);
-        if (MessageBox(m_hWnd, szConfirm, BRANDING, MB_YESNO) == IDYES)
-        {
-            unlink(m_oTreeIndex.Data(lParam).m_oPlaylistPath.c_str());
-            m_context->catalog->RemovePlaylist( 
-                 m_oTreeIndex.Data(lParam).m_oPlaylistPath.c_str());
-            TreeView_DeleteItem(m_hMusicCatalog, hItem);
-        }            
-    }             
 }
 
 void MusicBrowserUI::PlayerControlsEvent(int command)
@@ -1328,8 +1281,6 @@ void MusicBrowserUI::PlayerControlsEvent(int command)
         case ID_CONTROLS_REPEATALL:
             m_oPlm->SetRepeatMode(kPlaylistMode_RepeatAll);
             break;
-
-
     }
 }
 

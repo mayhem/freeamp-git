@@ -42,6 +42,7 @@ class TreeData
             m_pAlbum = NULL;
             m_pTrack = NULL;
             m_pPortable = NULL;
+            m_pStream = NULL;
         };
 
         TreeData(const TreeData &oOther)
@@ -52,6 +53,8 @@ class TreeData
             m_pTrack = oOther.m_pTrack; 
             m_oPlaylistName = oOther.m_oPlaylistName;
             m_oPlaylistPath = oOther.m_oPlaylistPath;
+            m_pStream = oOther.m_pStream;
+
             if(oOther.m_pPortable)
                 m_pPortable = new DeviceInfo(*oOther.m_pPortable);
             else
@@ -71,6 +74,7 @@ class TreeData
         AlbumList    *m_pAlbum;
         PlaylistItem *m_pTrack;
         DeviceInfo   *m_pPortable;
+        PlaylistItem *m_pStream;
         string        m_oPlaylistName, m_oPlaylistPath;
 };
 
@@ -89,6 +93,7 @@ class TreeDataIndex
       bool  IsLeaf          (int32 lParam);
       bool  IsUncatagorized (int32 lParam);
       bool  IsPortable      (int32 lParam);
+      bool  IsStream        (int32 lParam);
       int32 GetLevel        (int32 lParam);
       const TreeData &Data  (int32 lParam); 
       int32 Add             (TreeData &pData);

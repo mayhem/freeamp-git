@@ -56,6 +56,10 @@ class FAContext;
 #define PLAYERSTATE_PLAYING 1
 #define PLAYERSTATE_PAUSED 2
 
+#define IDC_REBAR          13000
+#define IDC_TOOLBAR        13001
+#define TOOLBAR_INDENT	   8
+
 bool operator<(const TreeData &A, const TreeData &b);
 bool operator==(const TreeData &A, const TreeData &b);
 void ClientToWindow(HWND hWnd, POINT *Pt); 
@@ -107,12 +111,6 @@ RemoveTracksDlgProc(HWND hwnd,
                     WPARAM wParam, 
                     LPARAM lParam);
 
-BOOL CALLBACK 
-EditTrackInfoDlgProc(HWND hwnd, 
-                     UINT msg, 
-                     WPARAM wParam, 
-                     LPARAM lParam);
-
 class MusicBrowserUI : public UserInterface 
 {
  public:
@@ -156,15 +154,7 @@ class MusicBrowserUI : public UserInterface
     BOOL MusicSearchDlgProc(HWND hwnd, 
                             UINT msg, 
                             WPARAM wParam, 
-                            LPARAM lParam);
-
-    BOOL EditTrackInfoDlgProc(HWND hwnd, 
-                              UINT msg, 
-                              WPARAM wParam, 
-                              LPARAM lParam);
-
-
-    
+                            LPARAM lParam);    
     
     const PlaylistManager* PLManager() const { return m_oPlm; }
  
@@ -179,6 +169,7 @@ class MusicBrowserUI : public UserInterface
     void   ShowBrowser(bool bShowExpanded);
     void   HideBrowser();
     void   Close();
+    void   Destroy();
 	void   ExpandCollapseEvent();
     void   GetMinMaxInfo(MINMAXINFO *pInfo);
     void   SizeWindow(int type, int iWidth, int iHeight);
@@ -229,7 +220,6 @@ class MusicBrowserUI : public UserInterface
     void  SortEvent(int id);
     void  EmptyDBCheck();
     void  RemoveEvent();
-    void  RemoveFromDiskEvent();
     void  ImportEvent();
     void  MoveItemEvent(int source, int dest);
     void  PlayerControlsEvent(int command);
@@ -240,8 +230,7 @@ class MusicBrowserUI : public UserInterface
     void  EditInfoEvent();
     void  RenameEvent();
     void  PlayNowEvent();
-    bool  DeleteFromDrive(const char* url);
-    
+    bool  DeleteFromDrive(const char* url);    
 
     // Functions in PlaylistView.cpp
     void  PlaylistListItemAdded(const PlaylistItem* item);
@@ -254,6 +243,8 @@ class MusicBrowserUI : public UserInterface
     void  LVBeginDrag(HWND hwnd, NM_LISTVIEW* nmlv);
     void  UpdateTotalTime();
     void  GetSelectedPlaylistItems(vector<PlaylistItem*>* items);
+    void  ResizeHeader(HWND hwnd, uint32 column);
+
 
     // Functions in Win32MusicBrowser.cpp
     void  AddMusicBrowserWindow(MusicBrowserUI *pWindow);
@@ -270,6 +261,8 @@ class MusicBrowserUI : public UserInterface
     void    FillAllTracks();
     void    FillUncatTracks();
     void    FillPortables();
+    void    FillWiredPlanet();
+    void    FillIceCast();
     int32   GetCurrentItemFromMousePos();
     int32   GetMusicTreeSelection(HTREEITEM* hItem);
     void    GetSelectedMusicTreeItems(vector<PlaylistItem*>* items);
@@ -278,6 +271,7 @@ class MusicBrowserUI : public UserInterface
     void    AddAllTrackItems(vector<PlaylistItem*>* items);
     void    AddUncatagorizedTrackItems(vector<PlaylistItem*>* items);
     void    GetSelectedPlaylistItems(vector<string>* urls);
+    void    GetSelectedStreamItems(vector<string>* urls);
     void    TVBeginDrag(HWND hwnd, NM_TREEVIEW* nmtv);
     void    MusicCatalogTrackChanged(const ArtistList *oldArtist,
                                      const ArtistList *newArtist,
@@ -307,6 +301,7 @@ class MusicBrowserUI : public UserInterface
 
     uint32 GetSelectedTrackCount();
     uint32 GetSelectedPlaylistCount();
+    uint32 GetSelectedStreamCount();
     uint32 CountSelectedItems(HTREEITEM root);
     bool IsItemSelected(HTREEITEM item);
 
@@ -321,8 +316,8 @@ class MusicBrowserUI : public UserInterface
     int32               m_state, m_startupType, m_playerState;
     int32               m_currentplaying;
   	HWND                m_hWnd, m_hStatus, m_hParent, m_hRebar;
-    HWND                m_hMusicCatalog, m_hPlaylistView;
-    HWND                m_hPlaylistTitle, m_hMusicCatalogTitle;
+    HWND                m_hMusicView, m_hPlaylistView;
+    HWND                m_hPlaylistTitle, m_hMusicViewTitle;
     PlaylistManager*    m_oPlm;
     bool                m_initialized, isVisible, m_bListChanged, 
                         m_bSearchInProgress, m_bDragging;
@@ -346,11 +341,11 @@ class MusicBrowserUI : public UserInterface
     HWND                m_hToolbar, m_hTextToolbar, m_hImageToolbar, m_hBothToolbar;
     DropTarget*         m_playlistDropTarget;
     vector<string>      m_searchPathList;
-    HTREEITEM           m_hNewPlaylistItem, m_hNewPortableItem;  
+    HTREEITEM           m_hNewPlaylistItem, m_hNewPortableItem;
+    HTREEITEM           m_hWiredPlanetItem, m_hShoutCastItem, m_hIceCastItem;
     uint32              m_initialCount;
     uint32              m_itemsAddedBeforeWeWereCreated;
 
-    MetaData            m_editTrackMetaData;
     DeviceInfo*         m_portableDevice;
 
     bool                m_autoPlayHack;

@@ -492,6 +492,10 @@ IDB_UNCATAGORIZED       BITMAP  DISCARDABLE     "uncatagorized.bmp"
 IDB_PORTABLE            BITMAP  DISCARDABLE     "portable.bmp"
 IDB_WIZARD              BITMAP  DISCARDABLE     "wizard.bmp"
 IDB_WIZARD_SMALL        BITMAP  DISCARDABLE     "wizard_small.bmp"
+IDB_WIREDPLANET         BITMAP  DISCARDABLE     "wiredplanet.bmp"
+IDB_ICECAST             BITMAP  DISCARDABLE     "icecast.bmp"
+IDB_SHOUTCAST           BITMAP  DISCARDABLE     "shoutcast.bmp"
+IDB_BUSY                BITMAP  DISCARDABLE     "busy.bmp"
 
 #ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////

@@ -124,6 +124,18 @@ bool TreeDataIndex::IsPortable(int32 lParam)
     return result;
 }
 
+bool TreeDataIndex::IsStream(int32 lParam)
+{
+   bool result = false;
+
+    if (!IsValidParam(lParam))
+       return false;
+
+    result = m_oTreeData[lParam].m_pStream != NULL;
+    
+    return result;
+}
+
 bool TreeDataIndex::IsLeaf(int32 lParam)
 {
     if (!IsValidParam(lParam))

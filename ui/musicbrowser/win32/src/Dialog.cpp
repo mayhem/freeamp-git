@@ -36,7 +36,7 @@ ____________________________________________________________________________*/
 #include "help.h"
 #include "preferences.h"
 
-#define WM_EMPTYDBCHECK WM_USER + 69
+#define UWM_EMPTYDBCHECK WM_USER + 69
  
 
 TBBUTTON tbButtons[] = {
@@ -83,9 +83,7 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
     {
         case WM_DESTROY:
         {
-            RevokeDragDrop(m_hPlaylistView);
-            OleUninitialize(); 
-
+            Destroy();
             break;
         }
 
@@ -105,7 +103,7 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
 
         case WM_SYSCOLORCHANGE:
         {
-            SendMessage(m_hMusicCatalog, WM_SYSCOLORCHANGE, 0, 0);
+            SendMessage(m_hMusicView, WM_SYSCOLORCHANGE, 0, 0);
             SendMessage(m_hPlaylistView, WM_SYSCOLORCHANGE, 0, 0);
             SendMessage(m_hRebar, WM_SYSCOLORCHANGE, 0, 0);
 
@@ -155,7 +153,7 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
             MouseButtonUp(wParam, LOWORD(lParam), HIWORD(lParam));
             return 1;
             
-        case WM_EMPTYDBCHECK:
+        case UWM_EMPTYDBCHECK:
             EmptyDBCheck();
             return 1;
 
@@ -382,7 +380,7 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
     return 0;
 }
 
-bool MusicBrowserUI::CreateMainDialog(void)
+bool MusicBrowserUI::CreateMainDialog()
 {
     MSG   msg;
 
@@ -393,7 +391,7 @@ bool MusicBrowserUI::CreateMainDialog(void)
                     (LPARAM)this);
     if(m_hWnd)
     {
-        if (m_pParent)
+        if(m_pParent)
         {
             RECT sRect;
             
@@ -402,7 +400,8 @@ bool MusicBrowserUI::CreateMainDialog(void)
                          0, 0, SWP_NOZORDER|SWP_NOSIZE);
             ShowWindow(m_hWnd, SW_NORMAL);
             UpdateWindow(m_hWnd);
-        }    
+        }
+        
         while(GetMessage(&msg,NULL,0,0))
         {
             if(!IsDialogMessage(m_hWnd, &msg))
@@ -413,21 +412,9 @@ bool MusicBrowserUI::CreateMainDialog(void)
         }
     }
     
-    ImageList_Destroy(TreeView_SetImageList(
-                      m_hMusicCatalog,
-                          NULL, TVSIL_NORMAL)); 
-    ImageList_Destroy(ListView_SetImageList(
-                      m_hPlaylistView,
-                          NULL, LVSIL_SMALL)); 
     DestroyWindow(m_hWnd);
     m_hWnd = NULL;
 
-    if (m_pParent)
-    {
-       m_pParent->RemoveMusicBrowserWindow(this);
-       return true;
-    }
-    
     return false;
 }
 
@@ -439,7 +426,7 @@ void MusicBrowserUI::UIThreadFunc(void* arg)
        delete ui;
 }
 
-Error MusicBrowserUI::CloseMainDialog(void)
+Error MusicBrowserUI::CloseMainDialog()
 { 
     if(m_pParent)
     {
@@ -469,32 +456,51 @@ void MusicBrowserUI::ShowBrowser(bool bShowExpanded)
     ShowWindow(m_hWnd, SW_RESTORE);
 	ShowWindow(m_hWnd, SW_SHOW);
     SetForegroundWindow(m_hWnd);
-    PostMessage(m_hWnd, WM_EMPTYDBCHECK, 0, 0);
+    PostMessage(m_hWnd, UWM_EMPTYDBCHECK, 0, 0);
 }
 
-void MusicBrowserUI::HideBrowser(void)
+void MusicBrowserUI::HideBrowser()
 {
 	isVisible = false;
 	ShowWindow(m_hWnd, SW_HIDE);
 }
 
-void MusicBrowserUI::Close(void)
+void MusicBrowserUI::Close()
 {
-    if (m_pParent == NULL)
-    {
+    if(m_pParent == NULL)
        HideBrowser();
-    }   
     else
        CloseMainDialog();
 }
 
-void MusicBrowserUI::ExpandCollapseEvent(void)
+void MusicBrowserUI::Destroy()
+{
+    RevokeDragDrop(m_hPlaylistView);
+    OleUninitialize(); 
+
+    ImageList_Destroy(TreeView_SetImageList(
+                        m_hMusicView,
+                        NULL, TVSIL_NORMAL)); 
+    ImageList_Destroy(ListView_SetImageList(
+                        m_hPlaylistView,
+                        NULL, LVSIL_SMALL)); 
+
+    m_playlistDropTarget->Release();
+
+    if(m_pParent)
+    {
+        m_pParent->RemoveMusicBrowserWindow(this);
+        delete this;
+    }
+}
+
+void MusicBrowserUI::ExpandCollapseEvent()
 {
     HMENU        hMenu;
     MENUITEMINFO sItem;
     RECT catalogRect, playlistRect, titleRect;
 
-    GetWindowRect(m_hMusicCatalog, &catalogRect);
+    GetWindowRect(m_hMusicView, &catalogRect);
     GetWindowRect(m_hPlaylistView, &playlistRect);
     GetWindowRect(m_hPlaylistTitle, &titleRect);
     MapWindowPoints(NULL, m_hWnd, (LPPOINT)&catalogRect, 2);
@@ -507,8 +513,8 @@ void MusicBrowserUI::ExpandCollapseEvent(void)
        SetWindowText(m_hWnd,  "My Music - " BRANDING);
        sItem.dwTypeData = "View &Playlist Only";
 
-       ShowWindow(m_hMusicCatalog, SW_SHOW);
-       ShowWindow(m_hMusicCatalogTitle, SW_SHOW);
+       ShowWindow(m_hMusicView, SW_SHOW);
+       ShowWindow(m_hMusicViewTitle, SW_SHOW);
 
        MoveWindow(m_hPlaylistView, 
                   catalogRect.left + m_iCollapseMoveAmount, 
@@ -530,8 +536,8 @@ void MusicBrowserUI::ExpandCollapseEvent(void)
        SetWindowText(m_hWnd, "Playlist - " BRANDING);
        sItem.dwTypeData = "View &My Music";
 
-       ShowWindow(m_hMusicCatalog, SW_HIDE);
-       ShowWindow(m_hMusicCatalogTitle, SW_HIDE);
+       ShowWindow(m_hMusicView, SW_HIDE);
+       ShowWindow(m_hMusicViewTitle, SW_HIDE);
 
        m_iCollapseMoveAmount = playlistRect.left - catalogRect.left;
        
@@ -629,12 +635,12 @@ void MusicBrowserUI::SizeWindow(int iType, int iWidth, int iHeight)
 
 
     // Music Catalog View
-    GetWindowRect(m_hMusicCatalog, &controlRect); 
+    GetWindowRect(m_hMusicView, &controlRect); 
     MapWindowPoints(NULL, m_hWnd, (LPPOINT)&controlRect, 2);
     controlHeight = controlRect.bottom - controlRect.top;
     controlWidth = controlRect.right - controlRect.left;
 
-    hdwp = DeferWindowPos(hdwp, m_hMusicCatalog, NULL,
+    hdwp = DeferWindowPos(hdwp, m_hMusicView, NULL,
                            controlRect.left,
                            controlRect.top,
                            controlWidth,
@@ -663,11 +669,11 @@ void MusicBrowserUI::GetMinMaxInfo(MINMAXINFO *pInfo)
     pInfo->ptMinTrackSize = m_sMinSize;
 }
 
-void MusicBrowserUI::SetMinMaxInfo(void)
+void MusicBrowserUI::SetMinMaxInfo()
 {
 	RECT  sLoc, sLoc2;
     
-	GetWindowRect(m_hMusicCatalog, &sLoc);
+	GetWindowRect(m_hMusicView, &sLoc);
 	GetWindowRect(m_hPlaylistView, &sLoc2);
     //m_iCollapseMoveAmount = sLoc2.left - sLoc.left;
 }
@@ -684,33 +690,53 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
     SetClassLong(m_hWnd, GCL_HICON, (LONG)appIcon);
 
     m_hWnd = hWnd;
-    m_hMusicCatalog = GetDlgItem(m_hWnd, IDC_MUSICTREE);
+    m_hMusicView = GetDlgItem(m_hWnd, IDC_MUSICTREE);
     m_hPlaylistView = GetDlgItem(m_hWnd, IDC_PLAYLISTBOX);
     m_hPlaylistTitle = GetDlgItem(m_hWnd, IDC_PLAYLISTTITLE);
-    m_hMusicCatalogTitle = GetDlgItem(m_hWnd, IDC_MUSICCATALOGTEXT);
+    m_hMusicViewTitle = GetDlgItem(m_hWnd, IDC_MUSICCATALOGTEXT);
 
     HBITMAP bmp;
     
-    hList = ImageList_Create(16, 16, ILC_COLOR24|ILC_MASK, 8, 0);
+    hList = ImageList_Create(16, 16, ILC_COLOR24|ILC_MASK, 9, 0);
 
     bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_CATALOG));
     ImageList_AddMasked(hList, bmp, RGB(255,255,0));
+    DeleteObject(bmp);
     bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_PLAYLIST));
     ImageList_AddMasked(hList, bmp, RGB(255,0,0));
+    DeleteObject(bmp);
     bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_ARTIST));
     ImageList_AddMasked(hList, bmp, RGB(255,0,0));
+    DeleteObject(bmp);
     bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_ALBUM));
     ImageList_AddMasked(hList, bmp, RGB(255,0,0));
+    DeleteObject(bmp);
     bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_TRACK));
     ImageList_AddMasked(hList, bmp, RGB(255,0,0));
+    DeleteObject(bmp);
     bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_ALL));
     ImageList_AddMasked(hList, bmp, RGB(255,0,0));
+    DeleteObject(bmp);
     bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_UNCATAGORIZED));
     ImageList_AddMasked(hList, bmp, RGB(255,0,0));
+    DeleteObject(bmp);
     bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_PORTABLE));
     ImageList_AddMasked(hList, bmp, RGB(255,0,0));
- 
-    TreeView_SetImageList(m_hMusicCatalog, hList, TVSIL_NORMAL); 
+    DeleteObject(bmp);
+    bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_WIREDPLANET));
+    ImageList_AddMasked(hList, bmp, RGB(255,0,0));
+    DeleteObject(bmp);
+    bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_ICECAST));
+    ImageList_AddMasked(hList, bmp, RGB(255,0,0));
+    DeleteObject(bmp);
+    bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_SHOUTCAST));
+    ImageList_AddMasked(hList, bmp, RGB(255,0,0));
+    DeleteObject(bmp);
+    bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_BUSY));
+    ImageList_AddMasked(hList, bmp, RGB(255,0,0));
+    DeleteObject(bmp);
+
+    TreeView_SetImageList(m_hMusicView, hList, TVSIL_NORMAL); 
     
     hList = ImageList_Create(16, 16, ILC_COLOR24|ILC_MASK, 1, 0);
 
@@ -726,25 +752,26 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
     CreateToolbar();
 
     // Subclass the listview
+
+    // Set the proc address as a property 
+	// of the window so it can get it
+	SetProp(m_hPlaylistView,
+			"oldproc",
+            (HANDLE)GetWindowLong(m_hPlaylistView, GWL_WNDPROC));
+
+    SetProp(m_hPlaylistView,
+        "this",
+        (HANDLE)this);
+	
+	// Subclass the window so we can draw it
+	SetWindowLong(m_hPlaylistView,
+                  GWL_WNDPROC,
+                  (DWORD)::ListViewWndProc);
+
     m_hPlaylistHeader = FindWindowEx(m_hPlaylistView, NULL, WC_HEADER, NULL);
 
     if(m_hPlaylistHeader)
     {
-        // Set the proc address as a property 
-	    // of the window so it can get it
-	    SetProp(m_hPlaylistView, 
-			    "oldproc",
-                (HANDLE)GetWindowLong(m_hPlaylistView, GWL_WNDPROC));
-
-        SetProp(m_hPlaylistView, 
-            "this",
-            (HANDLE)this);
-	    
-	    // Subclass the window so we can draw it
-	    SetWindowLong(m_hPlaylistView, 
-                      GWL_WNDPROC, 
-                      (DWORD)::ListViewWndProc );  
-
         HD_ITEM hd_item;
     
         hd_item.mask = HDI_FORMAT;
@@ -757,16 +784,16 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
 
     // Set the proc address as a property 
 	// of the window so it can get it
-	SetProp(m_hMusicCatalog, 
+	SetProp(m_hMusicView, 
             "oldproc",
-            (HANDLE)GetWindowLong(m_hMusicCatalog, GWL_WNDPROC));
+            (HANDLE)GetWindowLong(m_hMusicView, GWL_WNDPROC));
 
-    SetProp(m_hMusicCatalog, 
+    SetProp(m_hMusicView, 
             "this",
             (HANDLE)this);
 	
 	// Subclass the window so we can handle multi-select
-	SetWindowLong(m_hMusicCatalog, 
+	SetWindowLong(m_hMusicView, 
 			      GWL_WNDPROC, 
                   (DWORD)::TreeViewWndProc );  
 
@@ -839,10 +866,6 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
     }
 }
 
-#define ID_TOOLBAR         13000
-#define ID_REBAR           13001
-#define TOOLBAR_INDENT	   8
-
 void MusicBrowserUI::AddToolbarButtons(bool textLabels, bool images)
 {
     if(!textLabels && !images)
@@ -882,7 +905,7 @@ void MusicBrowserUI::AddToolbarButtons(bool textLabels, bool images)
 		            RBBS_CHILDEDGE;
 	rbb.hbmBack = NULL;
 	rbb.hwndChild = m_hToolbar;
-	rbb.wID = ID_TOOLBAR;
+	rbb.wID = IDC_TOOLBAR;
 	rbb.cxMinChild = clientRect.right - clientRect.left;
 	rbb.cyMinChild = buttonRect.bottom - buttonRect.top;
 
@@ -904,10 +927,10 @@ void MusicBrowserUI::AddToolbarButtons(bool textLabels, bool images)
     HDWP hdwp = BeginDeferWindowPos(4);
 
     // move music catalog and playlist views
-    GetWindowRect(m_hMusicCatalogTitle, &windowRect);
+    GetWindowRect(m_hMusicViewTitle, &windowRect);
     MapWindowPoints(NULL, m_hWnd, (LPPOINT)&windowRect, 2);
 
-    hdwp = DeferWindowPos(hdwp, m_hMusicCatalogTitle, NULL, 
+    hdwp = DeferWindowPos(hdwp, m_hMusicViewTitle, NULL, 
                  windowRect.left, 
                  top,
                  0, 
@@ -924,15 +947,15 @@ void MusicBrowserUI::AddToolbarButtons(bool textLabels, bool images)
                  0, 
                  SWP_NOZORDER| SWP_NOSIZE );
 
-    GetWindowRect(m_hMusicCatalogTitle, &titleRect);
+    GetWindowRect(m_hMusicViewTitle, &titleRect);
     MapWindowPoints(NULL, m_hWnd, (LPPOINT)&titleRect, 2);
 
     top += titleRect.bottom - titleRect.top + 3;
 
-    GetWindowRect(m_hMusicCatalog, &windowRect);
+    GetWindowRect(m_hMusicView, &windowRect);
     MapWindowPoints(NULL, m_hWnd, (LPPOINT)&windowRect, 2);
 
-    hdwp = DeferWindowPos(hdwp, m_hMusicCatalog, NULL, 
+    hdwp = DeferWindowPos(hdwp, m_hMusicView, NULL, 
                  windowRect.left, 
                  top,
                  windowRect.right - windowRect.left, 
@@ -955,7 +978,7 @@ void MusicBrowserUI::AddToolbarButtons(bool textLabels, bool images)
     EndDeferWindowPos(hdwp);
 }
 
-void MusicBrowserUI::CreateToolbar(void)
+void MusicBrowserUI::CreateToolbar()
 {
     INITCOMMONCONTROLSEX icex;
     RECT rect;
@@ -981,7 +1004,7 @@ void MusicBrowserUI::CreateToolbar(void)
                   RBS_BANDBORDERS | CCS_NOPARENTALIGN,
 				0, 0, rect.right - rect.left, toolbarHeight,
 				m_hWnd,
-				(HMENU)ID_REBAR,
+				(HMENU)IDC_REBAR,
 				g_hinst,
 				NULL );
 
@@ -989,19 +1012,19 @@ void MusicBrowserUI::CreateToolbar(void)
                      WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT |
                      TBSTYLE_TOOLTIPS | WS_CLIPCHILDREN | 
                      WS_CLIPSIBLINGS | CCS_NODIVIDER | CCS_NORESIZE, 
-                     0, 0, 0, 0, m_hRebar, (HMENU) ID_TOOLBAR, g_hinst, NULL);
+                     0, 0, 0, 0, m_hRebar, (HMENU) IDC_TOOLBAR, g_hinst, NULL);
 
     m_hTextToolbar = CreateWindowEx(0, TOOLBARCLASSNAME, (LPSTR) NULL,
                      WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT |
                      TBSTYLE_TOOLTIPS | WS_CLIPCHILDREN | 
                      WS_CLIPSIBLINGS | CCS_NODIVIDER | CCS_NORESIZE, 
-                     0, 0, 0, 0, m_hRebar, (HMENU) ID_TOOLBAR + 1, g_hinst, NULL);
+                     0, 0, 0, 0, m_hRebar, (HMENU) IDC_TOOLBAR + 1, g_hinst, NULL);
 
     m_hBothToolbar = CreateWindowEx(0, TOOLBARCLASSNAME, (LPSTR) NULL,
                      WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT |
                      TBSTYLE_TOOLTIPS | WS_CLIPCHILDREN | 
                      WS_CLIPSIBLINGS | CCS_NODIVIDER | CCS_NORESIZE, 
-                     0, 0, 0, 0, m_hRebar, (HMENU) ID_TOOLBAR + 2, g_hinst, NULL);
+                     0, 0, 0, 0, m_hRebar, (HMENU) IDC_TOOLBAR + 2, g_hinst, NULL);
 
     // Send the TB_BUTTONSTRUCTSIZE message, which is required for 
     // backward compatibility. 
@@ -1069,7 +1092,7 @@ void MusicBrowserUI::CreateToolbar(void)
     AddToolbarButtons(useTextLabels, useImages);
 }
 
-void MusicBrowserUI::SetTitles(void)
+void MusicBrowserUI::SetTitles()
 {
     if (m_pParent == NULL)
     {
@@ -1168,7 +1191,7 @@ void MusicBrowserUI::MouseMove(uint32 uFlags, POINT &sPoint)
     {
         RECT catalogRect,playlistRect;
         
-        GetWindowRect(m_hMusicCatalog, &catalogRect);
+        GetWindowRect(m_hMusicView, &catalogRect);
         GetWindowRect(m_hPlaylistView, &playlistRect);
         MapWindowPoints(NULL, m_hWnd, (LPPOINT)&catalogRect, 2);
         MapWindowPoints(NULL, m_hWnd, (LPPOINT)&playlistRect, 2);
@@ -1203,7 +1226,7 @@ void MusicBrowserUI::MouseButtonDown(int keys, int x, int y)
     //InflateRect(&clientRect, -150, 0);
     clientRect.left += 125;
     clientRect.right -= 175;
-    GetWindowRect(m_hMusicCatalog, &catalogRect);
+    GetWindowRect(m_hMusicView, &catalogRect);
     GetWindowRect(m_hPlaylistView, &playlistRect);
     MapWindowPoints(m_hWnd, NULL, (LPPOINT)&pt, 1);
     MapWindowPoints(m_hWnd, NULL, (LPPOINT)&clientRect, 2);
@@ -1270,7 +1293,7 @@ void MusicBrowserUI::MouseButtonUp(int keys, int x, int y)
         RECT catalogRect, playlistRect, titleRect;
         int32 delta;
 
-        GetWindowRect(m_hMusicCatalog, &catalogRect);
+        GetWindowRect(m_hMusicView, &catalogRect);
         GetWindowRect(m_hPlaylistView, &playlistRect);
         GetWindowRect(m_hPlaylistTitle, &titleRect);
 
@@ -1284,7 +1307,7 @@ void MusicBrowserUI::MouseButtonUp(int keys, int x, int y)
         MapWindowPoints(NULL, m_hWnd, (LPPOINT)&titleRect, 2);
 
         
-        MoveWindow(m_hMusicCatalog, 
+        MoveWindow(m_hMusicView, 
                   catalogRect.left, 
                   catalogRect.top, 
         	      (catalogRect.right - catalogRect.left),
@@ -1420,7 +1443,7 @@ void MusicBrowserUI::UpdateButtonMenuStates()
     SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
             ID_EDIT_ADDTRACK, 0); 
 
-    //HTREEITEM treeSelect = TreeView_GetSelection(m_hMusicCatalog);
+    //HTREEITEM treeSelect = TreeView_GetSelection(m_hMusicView);
 
     uint32 trackCount = 0;
     uint32 playlistCount = 0;
@@ -1428,7 +1451,7 @@ void MusicBrowserUI::UpdateButtonMenuStates()
     trackCount = GetSelectedTrackCount();
     playlistCount = GetSelectedPlaylistCount();
 
-    if((trackCount + playlistCount) && m_hMusicCatalog == GetFocus())
+    if((trackCount + playlistCount) && m_hMusicView == GetFocus())
     {
         if(!IsItemSelected(m_hNewPlaylistItem) &&
             !IsItemSelected(m_hNewPlaylistItem))
@@ -1487,14 +1510,14 @@ void MusicBrowserUI::UpdateButtonMenuStates()
         if(m_hNewPlaylistItem)
         {
             // get the first playlist item
-            tv_item.hItem = TreeView_GetChild(m_hMusicCatalog, m_hPlaylistItem);
+            tv_item.hItem = TreeView_GetChild(m_hMusicView, m_hPlaylistItem);
             tv_item.mask = TVIF_STATE|TVIF_PARAM;
             tv_item.stateMask = TVIS_SELECTED;
             tv_item.state = 0;
 
             // skip the "Create New Playlist..." item
             if(tv_item.hItem)
-                tv_item.hItem = TreeView_GetNextSibling(m_hMusicCatalog, tv_item.hItem);
+                tv_item.hItem = TreeView_GetNextSibling(m_hMusicView, tv_item.hItem);
 
             if(tv_item.hItem)
             {
@@ -1502,7 +1525,7 @@ void MusicBrowserUI::UpdateButtonMenuStates()
 
                 do
                 {
-                    result = TreeView_GetItem(m_hMusicCatalog, &tv_item);
+                    result = TreeView_GetItem(m_hMusicView, &tv_item);
 
                     if(result && (tv_item.state & TVIS_SELECTED))
                     {
@@ -1511,7 +1534,7 @@ void MusicBrowserUI::UpdateButtonMenuStates()
                     }
             
                 }while(result && 
-                       (tv_item.hItem = TreeView_GetNextSibling(m_hMusicCatalog, 
+                       (tv_item.hItem = TreeView_GetNextSibling(m_hMusicView, 
                                                                 tv_item.hItem)));
             }
         }

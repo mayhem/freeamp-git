@@ -60,8 +60,8 @@ typedef enum {
 } PlaylistSortKey;
 
 typedef enum {
-    PlaylistSortType_Ascending,
-    PlaylistSortType_Descending
+    kPlaylistSortType_Ascending,
+    kPlaylistSortType_Descending
 } PlaylistSortType;
 
 typedef enum {
@@ -187,7 +187,7 @@ class PlaylistItemSort : public binary_function<PlaylistItem*, PlaylistItem*, bo
 
  public:
     PlaylistItemSort(PlaylistSortKey sortKey, 
-                     PlaylistSortType sortType = PlaylistSortType_Ascending) : 
+                     PlaylistSortType sortType = kPlaylistSortType_Ascending) : 
                      m_sortKey(sortKey), m_sortType(sortType) { }
 
     bool operator() (PlaylistItem* item1, PlaylistItem* item2) const;
@@ -271,7 +271,7 @@ class PlaylistManager {
     Error UpdateTrackMetaData(PlaylistItem* updatedTrack);
 
     // Functions for sorting
-    Error Sort(PlaylistSortKey key, PlaylistSortType type = PlaylistSortType_Ascending);
+    Error Sort(PlaylistSortKey key, PlaylistSortType type = kPlaylistSortType_Ascending);
     PlaylistSortKey GetPlaylistSortKey() const;
     PlaylistSortType GetPlaylistSortType() const;
 

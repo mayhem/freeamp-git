@@ -386,8 +386,11 @@ begin
 	// We want to look under HKEY_CURRENT_USER
 	RegDBSetDefaultRoot(HKEY_CURRENT_USER);
 	
-	szKey = "Software\\" + @PRODUCT_NAME + "\\" + @PRODUCT_NAME +
-			" v" + @PRODUCT_VERSION + "\\Main";
+	//szKey = "Software\\" + @COMPANY_NAME + "\\" + @PRODUCT_NAME +
+	//		" v" + @PRODUCT_VERSION + "\\Main";
+	
+	szKey = @MAIN_REGISTRY_KEY;
+	
 	szUserNameKey = "Software\\Microsoft\\MS Setup (ACME)\\User Info";
 			
 	// Create the ones that are dynamic
@@ -999,6 +1002,7 @@ end;
 // --- include script file section ---
 
 #include "sddialog.rul"
+
 
 
 

@@ -74,20 +74,10 @@ FreeTracksWndProc(HWND hwnd,
                   WPARAM wParam, 
                   LPARAM lParam);
 
-#define UM_SETINFO WM_USER + 666
-
-typedef struct ProgressInfoStruct {
-    uint32 totalItems;
-    uint32 doneItems;
-    uint32 totalBytes;
-    uint32 doneBytes;
-} ProgressInfoStruct;
-
 extern "C" DownloadUI *Initialize(FAContext *context)
 {
     return new DownloadUI(context);
 }
-
 
 INT WINAPI DllMain (HINSTANCE hInst,
                     ULONG ul_reason_being_called,
@@ -122,6 +112,11 @@ DownloadUI::DownloadUI(FAContext *context):UserInterface()
     m_propManager = m_context->props;
     m_dlm = m_context->downloadManager;
     m_overURL = false;
+
+    m_totalItems = 0;
+    m_doneItems = 0;
+    m_totalBytes = 0;
+    m_doneBytes = 0;
 
     m_uiSemaphore = new Semaphore();
 
@@ -414,17 +409,6 @@ BOOL DownloadUI::InitDialog()
     m_hwndClose = GetDlgItem(m_hwnd, IDC_CLOSE);
     m_hwndProgress = GetDlgItem(m_hwnd, IDC_OVERALL_PROGRESS);
     m_hwndText = GetDlgItem(m_hwnd, IDC_FREETRACKS);
-
-    // Set the proc address as a property 
-	// of the window so it can get it
-	SetProp(m_hwndProgress, 
-			"oldproc",
-			(HANDLE)GetWindowLong(m_hwndProgress, GWL_WNDPROC));
-	
-	// Subclass the window so we can draw it
-	SetWindowLong(	m_hwndProgress, 
-					GWL_WNDPROC, 
-					(DWORD)ProgressWndProc ); 
     
     // Set the proc address as a property 
 	// of the window so it can get it
@@ -598,6 +582,145 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             break;
         }
 
+        case IDC_OVERALL_PROGRESS:
+        {
+            HFONT font = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
+            HFONT oldFont;
+
+            oldFont = (HFONT)SelectObject(dis->hDC, font);
+           
+            if(m_progressBitmap)
+            {
+                string displayString;
+                ostringstream ost;
+                float total = m_totalBytes;
+                float recvd = m_doneBytes;
+                uint32 percent;
+                RECT clientRect;
+
+                GetClientRect(m_hwndProgress, &clientRect);
+
+                //HBRUSH brush = CreateSolidBrush(GetSysColor(COLOR_WINDOW));
+                //FillRect(dis->hDC, &rcClip, brush);
+                //DeleteObject(brush);
+
+                // Set the text background and foreground colors to the
+                // standard window colors
+                SetTextColor(dis->hDC, GetSysColor(COLOR_WINDOWTEXT));
+                SetBkColor(dis->hDC, GetSysColor(COLOR_3DFACE));
+
+                ost.precision(2);
+                ost.flags(ios_base::fixed);
+
+                percent = (uint32)recvd/total*100;
+
+                ost << percent << "%, " << m_doneItems << " of " << m_totalItems << " items (";
+
+                if(total >= 1048576)
+                {
+                    total /= 1048576;
+                    recvd /= 1048576;
+                    
+                    ost << recvd << " of " << total << " MB) ";
+                }
+                else if(total >= 1024)
+                {
+                    total /= 1024;
+                    recvd /= 1024;
+                    ost << recvd << " of " << total << " KB)";
+                }
+                else
+                {
+                    ost << m_doneBytes << " of " << m_totalBytes << " Bytes)";
+                }
+
+                displayString = "Overall Progress:";
+
+                SIZE stringSize;
+                RECT rcClip = clientRect;
+
+                GetTextExtentPoint32(dis->hDC, displayString.c_str(), 
+                                    displayString.size(), &stringSize);
+
+                rcClip.left += 3;
+                rcClip.top += ((rcClip.bottom - rcClip.top) - stringSize.cy)/2;
+                rcClip.bottom = rcClip.top + stringSize.cy;
+
+                ExtTextOut( dis->hDC, 
+                            rcClip.left, rcClip.top, 
+                            ETO_CLIPPED | ETO_OPAQUE,
+                            &rcClip, 
+                            displayString.c_str(),
+                            displayString.size(),
+                            NULL);
+
+                rcClip.left += stringSize.cx + kElementPadding;
+
+                displayString = ost.str();
+
+                GetTextExtentPoint32(dis->hDC, displayString.c_str(), 
+                                    displayString.size(), &stringSize);
+
+                int32 progressWidth = 100;
+                int32 bmpWidth = (float)(progressWidth - 3) * (float)percent/(float)100;
+                int32 count = bmpWidth/(kProgressWidth);
+                int32 remainder = bmpWidth%(kProgressWidth);
+
+                HDC memDC = CreateCompatibleDC(dis->hDC);              
+                HBITMAP oldBitmap = (HBITMAP)SelectObject(memDC, m_progressBitmap);
+                RECT progressRect = clientRect;
+
+                progressRect.left = rcClip.left;
+                progressRect.top += ((clientRect.bottom - clientRect.top) - kProgressHeight)/2 - 1;
+                progressRect.bottom = progressRect.top + kProgressHeight + 2;
+                progressRect.right = progressRect.left + progressWidth;
+
+                DrawEdge(dis->hDC, &progressRect, EDGE_SUNKEN, BF_RECT);
+
+                uint32 i = 0;
+
+                for(i = 0; i< count; i++)
+                {
+                    BitBlt(dis->hDC, progressRect.left + 2 + i*kProgressWidth, progressRect.top + 2, kProgressWidth, kProgressHeight, 
+                           memDC, 0, 0, SRCCOPY);
+
+                }
+
+                if(remainder)
+                {
+                    BitBlt(dis->hDC, progressRect.left + 2 + i*kProgressWidth, progressRect.top + 2, remainder, kProgressHeight, 
+                           memDC, 0, 0, SRCCOPY);
+                }
+
+
+                SelectObject(memDC, oldBitmap);
+                DeleteDC(memDC);
+
+                uint32 pad = 0;
+
+                if(progressWidth)
+                    pad = (progressWidth + kElementPadding);
+
+                rcClip.left += pad;
+
+                ExtTextOut( dis->hDC, 
+                            rcClip.left, rcClip.top, 
+                            ETO_CLIPPED | ETO_OPAQUE,
+                            &rcClip, 
+                            displayString.c_str(),
+                            displayString.size(),
+                            NULL);
+
+            }
+
+
+            SelectObject(dis->hDC, oldFont);
+
+            DeleteObject(font);
+
+            break;
+        }
+
         case IDC_LIST:
         {
             uint32 uiFlags = ILD_TRANSPARENT;
@@ -729,7 +852,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                     {
                         total /= 1024;
                         recvd /= 1024;
-                        ost << percent << "% ("<< recvd << " of "<< total << " MB)";
+                        ost << percent << "% ("<< recvd << " of "<< total << " KB)";
                     }
                     else
                     {
@@ -840,7 +963,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                     {
                         total /= 1024;
                         recvd /= 1024;
-                        ost << "Paused (" << recvd << " of "<< total << " MB - " << percent << "%)";
+                        ost << "Paused (" << recvd << " of "<< total << " KB - " << percent << "%)";
                     }
                     else
                     {
@@ -1643,14 +1766,11 @@ void DownloadUI::UpdateOverallProgress()
         }
     }
 
-    ProgressInfoStruct pis;
-
-    pis.totalBytes = totalBytes;
-    pis.doneBytes = doneBytes;
-    pis.totalItems = totalItems;
-    pis.doneItems = doneItems;
-
-    SendMessage(m_hwndProgress, UM_SETINFO, 0, (LPARAM)&pis);
+    m_totalBytes = totalBytes;
+    m_doneBytes = doneBytes;
+    m_totalItems = totalItems;
+    m_doneItems = doneItems;
+    InvalidateRect(m_hwndProgress, NULL, TRUE);
 }
 
 
@@ -1739,199 +1859,6 @@ LRESULT DownloadUI::FreeTracksWndProc(HWND hwnd,
 
     return CallWindowProc(lpOldProc, hwnd, msg, wParam, lParam);
 }
-
-LRESULT WINAPI 
-ProgressWndProc(HWND hwnd, 
-                UINT msg, 
-                WPARAM wParam, 
-                LPARAM lParam)
-{
-    WNDPROC lpOldProc = (WNDPROC)GetProp( hwnd, "oldproc" );
-    HBITMAP progressBitmap = (HBITMAP)GetProp( hwnd, "bitmap" );
-    static uint32 totalItems = 0;
-    static uint32 doneItems = 0;
-    static uint32 totalBytes = 0;
-    static uint32 doneBytes = 0;
-
-	switch(msg)
-	{
-		case WM_DESTROY:   
-		{
-			//  Put back old window proc and
-			SetWindowLong( hwnd, GWL_WNDPROC, (DWORD)lpOldProc );
-
-			// remove window property
-			RemoveProp( hwnd, "oldproc" ); 
-            RemoveProp( hwnd, "bitmap" ); 
-
-			break;
-		}
-
-        case UM_SETINFO:
-        {
-            ProgressInfoStruct* pis = (ProgressInfoStruct*)lParam;
-
-            totalItems = pis->totalItems;
-            doneItems = pis->doneItems;
-            totalBytes = pis->totalBytes;
-            doneBytes = pis->doneBytes;
-
-            InvalidateRect(hwnd, NULL, FALSE);
-            return 0;
-        }
-
-        case WM_PAINT:
-        {
-            HDC hdc;
-            PAINTSTRUCT ps;
-            HFONT font = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
-            HFONT oldFont;
-
-            hdc = BeginPaint(hwnd, &ps);
-
-            oldFont = (HFONT)SelectObject(hdc, font);
-           
-            if(progressBitmap)
-            {
-                string displayString;
-                ostringstream ost;
-                float total = totalBytes;
-                float recvd = doneBytes;
-                uint32 percent;
-                RECT clientRect;
-
-                GetClientRect(hwnd, &clientRect);
-
-                //HBRUSH brush = CreateSolidBrush(GetSysColor(COLOR_WINDOW));
-                //FillRect(hdc, &rcClip, brush);
-                //DeleteObject(brush);
-
-                // Set the text background and foreground colors to the
-                // standard window colors
-                SetTextColor(hdc, GetSysColor(COLOR_WINDOWTEXT));
-                SetBkColor(hdc, GetSysColor(COLOR_3DFACE));
-
-                ost.precision(2);
-                ost.flags(ios_base::fixed);
-
-                percent = (uint32)recvd/total*100;
-
-                ost << percent << "%, " << doneItems << " of " << totalItems << " items (";
-
-                if(total >= 1048576)
-                {
-                    total /= 1048576;
-                    recvd /= 1048576;
-                    
-                    ost << recvd << " of "<< total << " MB) ";
-                }
-                else if(total >= 1024)
-                {
-                    total /= 1024;
-                    recvd /= 1024;
-                    ost << recvd << " of "<< total << " MB)";
-                }
-                else
-                {
-                    ost << doneBytes << " of " << totalBytes << " Bytes)";
-                }
-
-                displayString = "Overall Progress:";
-
-                SIZE stringSize;
-                RECT rcClip = clientRect;
-
-                GetTextExtentPoint32(hdc, displayString.c_str(), 
-                                    displayString.size(), &stringSize);
-
-                rcClip.left += 3;
-                rcClip.top += ((rcClip.bottom - rcClip.top) - stringSize.cy)/2;
-                rcClip.bottom = rcClip.top + stringSize.cy;
-
-                ExtTextOut( hdc, 
-                            rcClip.left, rcClip.top, 
-                            ETO_CLIPPED | ETO_OPAQUE,
-                            &rcClip, 
-                            displayString.c_str(),
-                            displayString.size(),
-                            NULL);
-
-                rcClip.left += stringSize.cx + kElementPadding;
-
-                displayString = ost.str();
-
-                GetTextExtentPoint32(hdc, displayString.c_str(), 
-                                    displayString.size(), &stringSize);
-
-
-                int32 progressWidth = 100;
-                int32 bmpWidth = (float)(progressWidth - 3) * (float)percent/(float)100;
-                int32 count = bmpWidth/(kProgressWidth);
-                int32 remainder = bmpWidth%(kProgressWidth);
-
-                HDC memDC = CreateCompatibleDC(hdc);              
-                HBITMAP oldBitmap = (HBITMAP)SelectObject(memDC, progressBitmap);
-                RECT progressRect = clientRect;
-
-                progressRect.left = rcClip.left;
-                progressRect.top += ((clientRect.bottom - clientRect.top) - kProgressHeight)/2 - 1;
-                progressRect.bottom = progressRect.top + kProgressHeight + 2;
-                progressRect.right = progressRect.left + progressWidth;
-
-                DrawEdge(hdc, &progressRect, EDGE_SUNKEN, BF_RECT);
-
-                uint32 i = 0;
-
-                for(i = 0; i< count; i++)
-                {
-                    BitBlt(hdc, progressRect.left + 2 + i*kProgressWidth, progressRect.top + 2, kProgressWidth, kProgressHeight, 
-                           memDC, 0, 0, SRCCOPY);
-
-                }
-
-                if(remainder)
-                {
-                    BitBlt(hdc, progressRect.left + 2 + i*kProgressWidth, progressRect.top + 2, remainder, kProgressHeight, 
-                           memDC, 0, 0, SRCCOPY);
-                }
-
-
-                SelectObject(memDC, oldBitmap);
-                DeleteDC(memDC);
-
-                uint32 pad = 0;
-
-                if(progressWidth)
-                    pad = (progressWidth + kElementPadding);
-
-                rcClip.left += pad;
-
-                ExtTextOut( hdc, 
-                            rcClip.left, rcClip.top, 
-                            ETO_CLIPPED | ETO_OPAQUE,
-                            &rcClip, 
-                            displayString.c_str(),
-                            displayString.size(),
-                            NULL);
-
-            }
-
-
-            SelectObject(hdc, oldFont);
-
-            DeleteObject(font);
-
-            EndPaint(hwnd, &ps);
-            
-            return 0;
-        }
-
-    } 
-	
-	//  Pass all non-custom messages to old window proc
-	return CallWindowProc(lpOldProc, hwnd, msg, wParam, lParam ) ;
-}
-
 
 void DownloadUI::ShowHelp(uint32 topic)
 {

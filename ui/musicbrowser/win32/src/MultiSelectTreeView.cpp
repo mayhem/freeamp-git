@@ -362,16 +362,16 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
             TV_HITTESTINFO tv_htinfo;
 
             //GetCursorPos(&tv_htinfo.pt);
-            //ScreenToClient(m_hMusicCatalog, &tv_htinfo.pt);
+            //ScreenToClient(m_hMusicView, &tv_htinfo.pt);
             tv_htinfo.pt.x =  LOWORD(lParam);
             tv_htinfo.pt.y =  HIWORD(lParam);
 
 
-            if(TreeView_HitTest(m_hMusicCatalog, &tv_htinfo))
+            if(TreeView_HitTest(m_hMusicView, &tv_htinfo))
             {
-                sItem.hItem = TreeView_GetSelection(m_hMusicCatalog); 
+                sItem.hItem = TreeView_GetSelection(m_hMusicView); 
                 sItem.mask = TVIF_PARAM | TVIF_HANDLE;
-                TreeView_GetItem(m_hMusicCatalog, &sItem);
+                TreeView_GetItem(m_hMusicView, &sItem);
 
                 if(m_oTreeIndex.IsTrack(sItem.lParam))
                 {
@@ -388,6 +388,13 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
                 {
                     EditPortablePlaylist(m_oTreeIndex.Data(sItem.lParam).m_pPortable);
                 }
+                else if(m_oTreeIndex.IsStream(sItem.lParam))
+                {
+                    PlaylistItem *item;
+                
+                    item = new PlaylistItem(*m_oTreeIndex.Data(sItem.lParam).m_pStream);
+                    m_oPlm->AddItem(item, false);
+                }
                 else if(tv_htinfo.hItem == m_hNewPlaylistItem)
                 {
                     NewPlaylist();
@@ -396,6 +403,7 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
                 {
                     m_context->target->AcceptEvent(new ShowPreferencesEvent(3));
                 }
+                
             }
             break;
         }
@@ -717,7 +725,8 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
                                item != m_hUncatItem &&
                                item != m_hNewPlaylistItem&& 
                                item != m_hPortableItem &&
-                               TreeView_GetParent(m_hMusicCatalog, item) != m_hPortableItem)
+                               TreeView_GetParent(m_hMusicView, item) != m_hPortableItem &&
+                               TreeView_GetParent(m_hMusicView, item) != m_hWiredPlanetItem)
                             {
                                 // pause a half sec so this does not
                                 // look so jarring

@@ -410,7 +410,7 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
          PlaylistCurrentItemInfoEvent *pInfo = 
             (PlaylistCurrentItemInfoEvent *)e;
  
-         if (pInfo->Item())
+         if (m_pContext->plm->GetCurrentIndex() != kInvalidIndex)
              UpdateMetaData(pInfo->Item());
          break;
       }

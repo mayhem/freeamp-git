@@ -2048,7 +2048,7 @@ static bool callback_function(UMEvent* event, void* userData)
             {
                 total /= 1024;
                 recvd /= 1024;
-                ost << percent << "% ("<< recvd << " of "<< total << " MB)";
+                ost << percent << "% ("<< recvd << " of "<< total << " KB)";
             }
             else
             {

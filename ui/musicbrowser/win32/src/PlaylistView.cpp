@@ -723,6 +723,102 @@ ListViewWndProc(HWND hwnd,
     return ui->ListViewWndProc(hwnd, msg, wParam, lParam);
 }
 
+void MusicBrowserUI::ResizeHeader(HWND hwnd, uint32 column)
+{
+    if(ListView_GetItemCount(hwnd))
+    {
+        PlaylistItem* item = NULL;
+        uint32 textLength = 0;
+        int32 columnWidth = ListView_GetColumnWidth(hwnd,column);
+        uint32 i = 0;
+        string text;
+        HDC hdc = GetDC(hwnd);
+
+        while(item = m_oPlm->ItemAt(i++))
+        {
+            MetaData metadata = item->GetMetaData();
+       
+            switch(column)
+            {
+                case 1:
+                    text = metadata.Title();
+                    break;
+
+                case 2:
+                    text = metadata.Artist();
+                    break;
+
+                case 3:
+                    text = metadata.Album();
+                    break;
+
+                case 4:
+                {
+                    char buf[16];
+
+                    if(metadata.Time() != 0)
+                    {
+                        int32 seconds = metadata.Time();
+                        int32 hours = seconds / 3600;
+		                int32 minutes = seconds / 60 - hours * 60;
+                        seconds = seconds - minutes * 60 - hours * 3600;
+
+                        if(hours)
+                            sprintf(buf, "%d:%02d:%02d", hours, minutes, seconds);
+                        else
+                            sprintf(buf, "%d:%02d", minutes, seconds);
+
+                        text = buf;
+                    }
+                    else    
+                        text = "Unknown";
+
+                    break;
+                }
+
+                default:
+                    return;
+                    break;
+            }
+
+            SIZE size;
+
+            GetTextExtentPoint32(hdc, text.c_str(), text.size(), &size); 
+
+            if(size.cx > textLength)
+                textLength = size.cx;
+        }
+
+        ReleaseDC(hwnd, hdc);
+
+        textLength += 3;
+
+        if(column < 4)
+        {
+            int32 nextColumnWidth = ListView_GetColumnWidth(hwnd,column + 1);
+
+            ListView_SetColumnWidth(hwnd,column, textLength);
+
+            int32 delta = columnWidth - textLength;
+
+            nextColumnWidth += delta;
+
+            ListView_SetColumnWidth(hwnd,column + 1, nextColumnWidth);
+        }
+        else
+        {
+            int32 nextColumnWidth = ListView_GetColumnWidth(hwnd,column - 1);
+
+            ListView_SetColumnWidth(hwnd,column, textLength);
+
+            int32 delta = columnWidth - textLength;
+
+            nextColumnWidth += delta;
+
+            ListView_SetColumnWidth(hwnd,column - 1, nextColumnWidth);
+        }
+    }
+}
 
 LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd, 
                                         UINT msg, 
@@ -1086,46 +1182,20 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
             return TRUE;
             break;
         }
-#if 0
-        case WM_PAINT:
+
+        case WM_KEYDOWN:
         {
-            PAINTSTRUCT ps;
-
-            HDC hdc = BeginPaint(hwnd, &ps);
-
-            LRESULT result = CallWindowProc((int (__stdcall *)(void))lpOldProc, hwnd, msg, (WPARAM)hdc, lParam );
-            
-            HWND hwndHeader = FindWindowEx(hwnd, NULL, WC_HEADER, NULL);
-
-            if(hwndHeader /* && !ListView_GetItemCount(hwnd) */)
+            if(wParam == VK_ADD && (GetKeyState(VK_CONTROL) < 0))
             {
-                RECT headerRect;
-                
-                GetWindowRect(hwndHeader, &headerRect);
-        
-                //HDC hdc;
-
-                hdc = GetDC(hwnd);
-
-                RECT rect;
-
-                GetClientRect(hwnd, &rect);
-
-                rect.top += (headerRect.bottom - headerRect.top);
-                rect.right = rect.left + ListView_GetColumnWidth(hwnd, 0);
-            
-                FillRect(hdc, &rect, (HBRUSH)(COLOR_INFOBK + 1));
-
-                //ReleaseDC(hwnd, hdc);
-               
+                ResizeHeader(hwnd, 1);
+                ResizeHeader(hwnd, 2);
+                ResizeHeader(hwnd, 3);
+                //ResizeHeader(hwnd, 1);
+                return 0;
             }
-
-            EndPaint(hwnd, &ps);
-            
-            return result;
             break;
         }
-#endif
+
         case WM_NOTIFY:
         {
             int idCtrl = wParam; 
@@ -1181,6 +1251,12 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
             {
                 itemTrack = -1;   
                 oldWidth = 0;
+            }
+            else if(hdn->hdr.code == HDN_DIVIDERDBLCLICKW)
+            {
+                ResizeHeader(hwnd, hdn->iItem);
+
+                return TRUE;
             }
 
             break;

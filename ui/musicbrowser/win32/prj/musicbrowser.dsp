@@ -62,8 +62,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                                                                             ..\..\..\..\base\win32\prj\plugins	copy musicbrowser.ui\
-                                                                               ..\..\..\..\base\win32\prj\plugins
+                                                                                                ..\..\..\..\base\win32\prj\plugins	copy musicbrowser.ui\
+                                                                                  ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 Debug"
@@ -95,8 +95,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                                                                             ..\..\..\..\base\win32\prj\plugins	copy musicbrowser.ui\
-                                                                               ..\..\..\..\base\win32\prj\plugins
+                                                                                                ..\..\..\..\base\win32\prj\plugins	copy musicbrowser.ui\
+                                                                                  ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Debug"
@@ -130,8 +130,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                                                                             ..\..\..\..\base\win32\prj\plugins	copy musicbrowser.ui\
-                                                                               ..\..\..\..\base\win32\prj\plugins
+                                                                                                ..\..\..\..\base\win32\prj\plugins	copy musicbrowser.ui\
+                                                                                  ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Release"
@@ -163,8 +163,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                                                                             ..\..\..\..\base\win32\prj\plugins	copy musicbrowser.ui\
-                                                                               ..\..\..\..\base\win32\prj\plugins
+                                                                                                ..\..\..\..\base\win32\prj\plugins	copy musicbrowser.ui\
+                                                                                  ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
@@ -209,6 +209,10 @@ SOURCE=..\src\EnumFormatEtc.cpp
 # Begin Source File
 
 SOURCE=..\src\Event.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\FooCast.cpp
 # End Source File
 # Begin Source File
 
@@ -296,6 +300,10 @@ SOURCE=..\res\blank.ico
 # End Source File
 # Begin Source File
 
+SOURCE=..\res\busy.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=..\res\catalog.bmp
 # End Source File
 # Begin Source File
@@ -305,6 +313,10 @@ SOURCE=..\res\closed.ico
 # Begin Source File
 
 SOURCE=..\res\drag.cur
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\icecast.bmp
 # End Source File
 # Begin Source File
 
@@ -332,6 +344,10 @@ SOURCE=..\res\portable.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=..\res\shoutcast.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=..\res\splitter.cur
 # End Source File
 # Begin Source File
@@ -349,6 +365,10 @@ SOURCE=..\res\uncatagorized.bmp
 # Begin Source File
 
 SOURCE=..\res\warn.ico
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\wiredplanet.bmp
 # End Source File
 # Begin Source File
 
@@ -392,6 +412,10 @@ SOURCE=..\include\DropTarget.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\include\EditTrackInfoDialog.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\EnumFormatEtc.h
 # End Source File
 # Begin Source File
@@ -409,6 +433,10 @@ SOURCE=..\..\..\..\base\include\eventdata.h
 # Begin Source File
 
 SOURCE=..\..\..\..\base\include\facontext.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\FooCast.h
 # End Source File
 # Begin Source File
 

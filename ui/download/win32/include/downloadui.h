@@ -101,6 +101,11 @@ class DownloadUI : public UserInterface {
     HIMAGELIST  m_noteImage;
     HBITMAP  m_progressBitmap;
 
+    uint32 m_totalItems;
+    uint32 m_doneItems;
+    uint32 m_totalBytes;
+    uint32 m_doneBytes;
+
     RECT m_urlRect;
     HCURSOR m_handCursor;
     bool m_overURL;
