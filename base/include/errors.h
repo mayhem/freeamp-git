@@ -91,7 +91,7 @@ typedef enum Error
     kError_AlreadyUpdating      = 60,
     kError_UnlinkFailed         = 61,
     kError_CopyFailed           = 62,
-    kError_NoItemsUpdated       = 63
+    kError_NoItemsUpdated       = 63,
 
     kError_LastError            = 9999
 };
