@@ -281,7 +281,7 @@ Error XingLMC::GetHeadInfo()
                  delete m_pXingHeader->toc;
                  delete m_pXingHeader;
               }   
-                 
+
               m_pXingHeader = new XHEADDATA;
               m_pXingHeader->toc = new unsigned char[100];
               if (!GetXingHeader(m_pXingHeader, (unsigned char *)pBuffer))
@@ -362,7 +362,6 @@ Error XingLMC::ExtractMediaInfo()
       return eRet; 
 
    pMIE = new MediaInfoEvent(m_pPmi->Url(), totalSeconds);
-
    if (!pMIE)
       return kError_OutOfMemory;
 
@@ -437,12 +436,20 @@ Error XingLMC::GetBitstreamStats(float &fTotalSeconds, float &fMsPerFrame,
    if (m_lFileSize > 0)
    {
        if (m_pXingHeader)
+       {
           iTotalFrames = m_pXingHeader->frames;
+          fTotalSeconds = (float) ((double) iTotalFrames * 
+                                   (double) fMsPerFrame / 1000);
+          //Debug_v("VBR total: %f", fTotalSeconds);                        
+       }                            
        else    
+       {
           iTotalFrames = m_lFileSize / m_frameBytes;
-           
-       fTotalSeconds = (float) ((double) iTotalFrames * 
-                                (double) fMsPerFrame / 1000);
+          fTotalSeconds = (float)((double) iTotalFrames * 
+                                  (double) fMsPerFrame / 1000);
+          //Debug_v("CBR total: %f", fTotalSeconds);                        
+          fTotalSeconds -= 1;                        
+       }    
    }
    else
    {
@@ -475,7 +482,8 @@ uint32 XingLMC::CalculateSongLength(const char *szUrl)
     {
         if (fTotalSeconds < 0)
            return 0;
-           
+
+        //Debug_v("CSL: %f", fTotalSeconds);                        
         return (int)fTotalSeconds;
     }
     
@@ -547,13 +555,6 @@ int XingLMC::GetXingHeader(XHEADDATA *X,  unsigned char *buf)
     
     X->vbr_scale = -1;
     if( head_flags & VBR_SCALE_FLAG )  {X->vbr_scale = ExtractI4(buf); buf+=4;}
-    
-    //if( X->toc != NULL ) {
-    //for(i=0;i<100;i++) {
-    //    if( (i%10) == 0 ) printf("\n");
-    //    printf(" %3d", (int)(X->toc[i]));
-    //}
-    //}
     
     return 1;       // success
 }

@@ -1038,7 +1038,7 @@ void FreeAmpTheme::UpdateTimeDisplay(int iCurrentSeconds)
     
     if (m_eTimeDisplayState == kTimeRemaining && m_iTotalSeconds >= 0)
     {    
-        iSeconds = m_iTotalSeconds - iCurrentSeconds;
+        iSeconds = m_iTotalSeconds - iCurrentSeconds - 1;
         if (iSeconds > 3600)
             sprintf(szText, "-%d:%02d:%02d", 
                     iSeconds / 3600,

@@ -302,7 +302,10 @@ void LocalFileInput::SkipID3v2Tag(void)
         return;
 
     if (strncmp(sHead.tag, "ID3", 3))
+    {
+        fseek(m_fpFile, 0, SEEK_SET);
         return;
+    }    
 
     if (sHead.versionMajor != supportedVersion)
         return;
