@@ -561,6 +561,7 @@ Error Win32Window::VulcanMindMeld(Window *pOther)
         ShowWindow(m_hWnd, SW_SHOW);
         UpdateWindow(m_hWnd);
         SetForegroundWindow(m_hWnd);
+		SetFocus(m_hWnd);
     }    
 
     SetTimer(m_hWnd, 0, 250, NULL);
