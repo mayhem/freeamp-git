@@ -148,13 +148,7 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
     int32 i;
     HRGN clipRegion = CreateRectRgn(0,0,0,0);
 
-    if(repaintAll)
-    {
-        CombineRgn( clipRegion,
-                    clipRegion,
-                    g_playerRegion,
-                    RGN_OR);
-    }
+    
     
     if(palette)
     {
@@ -171,68 +165,79 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
     oldMemBitmap = (HBITMAP)SelectObject(memdc, leftBitmap);
     oldBufferBitmap = (HBITMAP)SelectObject(bufferdc, bufferBitmap);
 
-    GetObject(leftBitmap, sizeof(BITMAP), (LPSTR)&bmp);
+    if(repaintAll)
+    {
+        CombineRgn( clipRegion,
+                    clipRegion,
+                    g_playerRegion,
+                    RGN_OR);
 
-    BitBlt( bufferdc, 
-            0, 0, bmp.bmWidth, bmp.bmHeight,
-            memdc, 
-            0,0,
-            SRCCOPY);
+        GetObject(leftBitmap, sizeof(BITMAP), (LPSTR)&bmp);
 
-    width = bmp.bmWidth; 
-    height = bmp.bmHeight;
+        OutputDebugString("left side\r\n");
+        BitBlt( bufferdc, 
+                0, 0, bmp.bmWidth, bmp.bmHeight,
+                memdc, 
+                0,0,
+                SRCCOPY);
 
-    SelectObject(memdc, dialBitmap);
+        width = bmp.bmWidth; 
+        height = bmp.bmHeight;
 
-    GetObject(dialBitmap, sizeof(BITMAP), (LPSTR)&bmp);
+        SelectObject(memdc, dialBitmap);
 
-    BitBlt( bufferdc, 
-            width, 0, DIAL_SECTION, bmp.bmHeight,
-            memdc, 
-            0,0,
-            SRCCOPY);
+        GetObject(dialBitmap, sizeof(BITMAP), (LPSTR)&bmp);
 
-    width += DIAL_SECTION; 
-    height = bmp.bmHeight;
+        OutputDebugString("volume dial\r\n");
+        BitBlt( bufferdc, 
+                width, 0, DIAL_SECTION, bmp.bmHeight,
+                memdc, 
+                0,0,
+                SRCCOPY);
 
-    SelectObject(memdc, middleBitmap);
+        width += DIAL_SECTION; 
+        height = bmp.bmHeight;
 
-    GetObject(middleBitmap, sizeof(BITMAP), (LPSTR)&bmp);
+        SelectObject(memdc, middleBitmap);
 
-    BitBlt( bufferdc, 
-            width, 0, bmp.bmWidth, bmp.bmHeight,
-            memdc, 
-            0,0,
-            SRCCOPY);
+        GetObject(middleBitmap, sizeof(BITMAP), (LPSTR)&bmp);
+        OutputDebugString("middle side\r\n");
+        BitBlt( bufferdc, 
+                width, 0, bmp.bmWidth, bmp.bmHeight,
+                memdc, 
+                0,0,
+                SRCCOPY);
 
-    width += bmp.bmWidth; 
-    height = bmp.bmHeight;
+        width += bmp.bmWidth; 
+        height = bmp.bmHeight;
 
-    SelectObject(memdc, dialBitmap);
+        SelectObject(memdc, dialBitmap);
 
-    GetObject(dialBitmap, sizeof(BITMAP), (LPSTR)&bmp);
+        GetObject(dialBitmap, sizeof(BITMAP), (LPSTR)&bmp);
+        OutputDebugString("seek dial\r\n");
+        BitBlt( bufferdc, 
+                width, 0, DIAL_SECTION, bmp.bmHeight,
+                memdc, 
+                0,0,
+                SRCCOPY);
 
-    BitBlt( bufferdc, 
-            width, 0, DIAL_SECTION, bmp.bmHeight,
-            memdc, 
-            0,0,
-            SRCCOPY);
+        width += DIAL_SECTION; 
+        height = bmp.bmHeight;
 
-    width += DIAL_SECTION; 
-    height = bmp.bmHeight;
+        SelectObject(memdc,rightBitmap);
 
-    SelectObject(memdc,rightBitmap);
+        GetObject(rightBitmap, sizeof(BITMAP), (LPSTR)&bmp);
+        OutputDebugString("right side\r\n");
+        BitBlt( bufferdc, 
+                width, 0, bmp.bmWidth, bmp.bmHeight,
+                memdc, 
+                0,0,
+                SRCCOPY);
 
-    GetObject(rightBitmap, sizeof(BITMAP), (LPSTR)&bmp);
+        width += bmp.bmWidth; 
+        height = bmp.bmHeight;
+    }
 
-    BitBlt( bufferdc, 
-            width, 0, bmp.bmWidth, bmp.bmHeight,
-            memdc, 
-            0,0,
-            SRCCOPY);
-
-    width += bmp.bmWidth; 
-    height = bmp.bmHeight;
 
     // Render Controls...
     for(i = 0; i < kNumControls; i++)
@@ -273,6 +278,8 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
                         OutputDebugString("Drawing kShuffleControl\r\n");
                     else if(id == kOpenControl)
                         OutputDebugString("Drawing kOpenControl\r\n");
+                    else
+                        OutputDebugString("UNKNOWN BLIT!!!!!!!!\r\n");
                    
                     SelectObject(memdc, g_buttonStateArray[i].bitmap);
                     
@@ -306,6 +313,21 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
                 case kLastControl:
                 {
                     int32 srcOffset = 0;
+
+                    int32 id = g_buttonStateArray[i].control_id;
+
+                    if(id == kPlayControl)
+                        OutputDebugString("Drawing kPlayControl\r\n");
+                    else if(id == kPauseControl)
+                        OutputDebugString("Drawing kPauseControl\r\n");
+                    else if(id == kStopControl)
+                        OutputDebugString("Drawing kStopControl\r\n");
+                    else if(id == kNextControl)
+                        OutputDebugString("Drawing kNextControl\r\n");
+                    else if(id == kLastControl)
+                        OutputDebugString("Drawing kLastControl\r\n");
+                    else
+                        OutputDebugString("UNKNOWN BLIT!!!!!!!!\r\n");
 
                     SelectObject(memdc, g_buttonStateArray[i].bitmap);
 
@@ -343,6 +365,27 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
                 case kPlaylistControl:
                 case kDisplayControl:
                 {
+                    SelectObject(memdc, middleBitmap);
+
+                    int32 id = g_buttonStateArray[i].control_id;
+
+                    if(id == kPlaylistControl)
+                        OutputDebugString("Drawing kPlaylistControl\r\n");
+                    else if(id == kDisplayControl)
+                        OutputDebugString("Drawing kDisplayControl\r\n");
+                    else
+                        OutputDebugString("UNKNOWN BLIT!!!!!!!!\r\n");
+
+                    GetObject(middleBitmap, sizeof(BITMAP), (LPSTR)&bmp);
+
+                    int32 offset = LEFT_SECTION + DIAL_SECTION; 
+
+                    BitBlt( bufferdc, 
+                            offset, 0, bmp.bmWidth, bmp.bmHeight,
+                            memdc, 
+                            0,0,
+                            SRCCOPY);
+
                     //currentCursor = arrowCursor;
                     break;
                 }
@@ -350,12 +393,16 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
                 case kVolumeControl:
                 case kSeekControl:
                 {
+                    int32 srcOffset = 0;
+
                     int32 id = g_buttonStateArray[i].control_id;
 
                     if(id == kVolumeControl)
                         OutputDebugString("Drawing kVolumeControl\r\n");
                     else if(id == kSeekControl)
                         OutputDebugString("Drawing kSeekControl\r\n");
+                    else
+                        OutputDebugString("UNKNOWN BLIT!!!!!!!!\r\n");
 
                     if( g_buttonStateArray[i].state == Selected )
                     {
@@ -363,27 +410,25 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
                     }
                     else if( g_buttonStateArray[i].state == Pressed )
                     {
-                        int32 srcOffset = 0;
-
-                        SelectObject(memdc, dialBitmap);
-
                         /*vErrorOut(bg_blue|fg_white, 
                             "position = %d\toffset = %d\r\n", 
                             g_buttonStateArray[i].position, 
                             srcOffset);*/
 
                         srcOffset = g_buttonStateArray[i].position * 11;
-                                            
-                        BitBlt( bufferdc, 
-                                rect.left, 
-                                rect.top, 
-                                11, 
-                                rect.bottom - rect.top, 
-                                memdc, 
-                                srcOffset,
-                                0,
-                                SRCCOPY);
                     }
+
+                    SelectObject(memdc, dialBitmap);
+
+                    BitBlt( bufferdc, 
+                            rect.left, 
+                            rect.top, 
+                            11, 
+                            rect.bottom - rect.top, 
+                            memdc, 
+                            srcOffset,
+                            0,
+                            SRCCOPY);
 
                     break;
                 }
@@ -404,6 +449,8 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
         int32 offset = displayRect.right + 3;
 
         SelectObject(memdc, shuffledIconBitmap);
+
+        OutputDebugString("Drawing Shuffle Icon\r\n");
    
         BitBlt( bufferdc, 
                 offset, 
@@ -424,6 +471,7 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
 
         SelectObject(memdc, repeatIconBitmap);
    
+        OutputDebugString("Drawing Repeat Icon\r\n");
         BitBlt( bufferdc, 
                 offset, 
                 22, 
@@ -440,6 +488,8 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
 
             SelectObject(memdc, allIconBitmap);
    
+            OutputDebugString("Drawing Repeat All Icon\r\n");
+
             BitBlt( bufferdc, 
                     offset, 
                     29, 
@@ -453,6 +503,8 @@ static void DrawPlayer(HDC hdc, ControlInfo* state, bool repaintAll)
     }
 
     SelectClipRgn(hdc, clipRegion);
+
+    OutputDebugString("Drawing To Screen\r\n");
 
     BitBlt( hdc, 
             0, 
@@ -864,7 +916,7 @@ void DrawDisplay(HDC hdc, DisplayInfo* state)
         }
     }
 
-    if(state->state != Intro)
+    if(state->state != Intro )
     {
         int32 offset = displayRect.left + 1;
 
