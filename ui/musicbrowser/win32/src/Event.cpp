@@ -1158,20 +1158,22 @@ void MusicBrowserUI::AddFileEvent(HWND hwndParent)
 void MusicBrowserUI::EmptyDBCheck(void)
 {
     int iRet;
+
+    IntroductionWizard();
     
     if (m_context->catalog->GetPlaylists()->size() > 0 ||
         m_context->catalog->GetMusicList()->size() > 0 ||
         m_context->catalog->GetUnsortedMusic()->size() > 0)
         return;
         
-    iRet = MessageBox(m_hWnd, "Your music database does not contain any items.\r\n"
+    /*iRet = MessageBox(m_hWnd, "Your music database does not contain any items.\r\n"
                               "Would you like to start a search to find music\r\n"
                               "and playlists on your machine?",
                        "Populate My Music", MB_YESNO);
     if (iRet == IDYES)
-        StartStopMusicSearch();
+        StartStopMusicSearch();*/
 
-    //IntroductionWizard();
+    
 }
 
 void MusicBrowserUI::EditPlaylistEvent(void)

@@ -54,29 +54,38 @@ static BOOL CALLBACK IntroWizardHello(HWND hwnd,
         {
             DRAWITEMSTRUCT* dis = (DRAWITEMSTRUCT*)lParam;
             UINT ctrlId = wParam;
-            const char* kCaption = "Welcome to "BRANDING"!";
-            const char* kText = "This wizard will walk you though a quick "
-                                "tutorial to help you begin organizing your "
+            const char* kCaption1 = "Welcome!";
+            const char* kCaption2 = "What is My Music?";
+            const char* kMsg1 = "This wizard will help you begin organizing your "
                                 "music collection and get you started playing "
-                                "your music.\r\n"
-                                "\r\n"
-                                "Topics covered:\r\n\r\n"
-                                "* How does "BRANDING" help you to organize your "
-                                "music?\r\n\r\n"
-                                "* How do you choose what music you want to "
-                                "listen to?\r\n\r\n"
-                                "* Where can you go to find more music?\r\n\r\n"
-                                "* How does "BRANDING" help you download music?"
-                                "\r\n"
-                                "\r\n"
-                                "Finally, the wizard will allow you to search "
-                                "your computer for music you already own "
-                                "and organize it for you within "BRANDING".";
+                                "your music.";
+            const char* kMsg2 = "My Music helps you organize the music you have "
+                                "on your computer. The My Music window is divided "
+                                "into two panes: "
+                                "My Music Collection and Currently Listening To.";
+                                //"\r\n"
+            const char* kMsg3 = "My Music Collection provides a convenient, "
+                                "organized view of the music you have on your "
+                                "computer. It might help to think of this pane "
+                                "as a CD rack for your computer.";
+                                //"\r\n"
+            const char* kMsg4 = "Currently Listening To displays a list of the "
+                                "songs you have chosen to play. In order to listen "
+                                "to music all you have to do is add items to the "
+                                "list by dragging them from the My Music Collection "
+                                "pane on the left to the Currently Listening To "
+                                "pane on the right.";
+                                //"\r\n"
+            const char* kMsg5 = "For a more detailed explanation of how to use "
+                                "the My Music window you should access the "
+                                "application\'s help system through the Help menu "
+                                "or by clicking the \'?\' in the main player window.";
 
 
             switch(ctrlId)
             {
-                case IDC_CAPTION:
+                case IDC_CAPTION1:
+                case IDC_CAPTION2:
                 {
                     HFONT font, oldFont;
 
@@ -93,9 +102,16 @@ static BOOL CALLBACK IntroWizardHello(HWND hwnd,
                     RECT clientRect;
                     GetClientRect(dis->hwndItem, &clientRect);
 
+                    const char* caption;
+
+                    if(ctrlId == IDC_CAPTION1)
+                        caption = kCaption1;
+                    else if(ctrlId == IDC_CAPTION2)
+                        caption = kCaption2;
+
                     DrawText(dis->hDC, 
-                             kCaption,
-                             strlen(kCaption),
+                             caption,
+                             strlen(caption),
                              &clientRect,
                              DT_LEFT|DT_WORDBREAK);
 
@@ -106,7 +122,7 @@ static BOOL CALLBACK IntroWizardHello(HWND hwnd,
                     break;
                 } 
 
-                case IDC_TEXT:
+                case IDC_TEXT1:
                 {
                     HFONT font, oldFont;
 
@@ -118,8 +134,68 @@ static BOOL CALLBACK IntroWizardHello(HWND hwnd,
                     GetClientRect(dis->hwndItem, &clientRect);
 
                     DrawText(dis->hDC, 
-                             kText,
-                             strlen(kText),
+                             kMsg1,
+                             strlen(kMsg1),
+                             &clientRect,
+                             DT_LEFT|DT_WORDBREAK);
+
+                    SelectObject(dis->hDC, oldFont);
+
+                    DeleteObject(font);
+                    break;
+                }
+
+                case IDC_TEXT2:
+                {
+                    HFONT font, oldFont;
+
+                    font = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
+
+                    oldFont = (HFONT)SelectObject(dis->hDC, font);
+
+                    RECT clientRect;
+                    GetClientRect(dis->hwndItem, &clientRect);
+
+                    RECT halfHeightRect = clientRect;
+                    int halfHeight = DrawText(
+                                         dis->hDC, 
+                                         kMsg2,
+                                         strlen(kMsg2),
+                                         &halfHeightRect,
+                                         DT_LEFT|DT_SINGLELINE|DT_CALCRECT)/2;
+                    int height;
+
+                    height = DrawText(
+                             dis->hDC, 
+                             kMsg2,
+                             strlen(kMsg2),
+                             &clientRect,
+                             DT_LEFT|DT_WORDBREAK);
+
+                    clientRect.top += height + halfHeight;
+
+                    height = DrawText(
+                             dis->hDC, 
+                             kMsg3,
+                             strlen(kMsg3),
+                             &clientRect,
+                             DT_LEFT|DT_WORDBREAK);
+
+                    clientRect.top += height + halfHeight;
+
+                    height = DrawText(
+                             dis->hDC, 
+                             kMsg4,
+                             strlen(kMsg4),
+                             &clientRect,
+                             DT_LEFT|DT_WORDBREAK);
+
+                    clientRect.top += height + halfHeight;
+
+                    height = DrawText(
+                             dis->hDC, 
+                             kMsg5,
+                             strlen(kMsg5),
                              &clientRect,
                              DT_LEFT|DT_WORDBREAK);
 
@@ -175,7 +251,7 @@ static BOOL CALLBACK IntroWizardHello(HWND hwnd,
 	return result;
 }   
 
-static BOOL CALLBACK IntroWizardBrowser(HWND hwnd, 
+static BOOL CALLBACK IntroWizardSearch(HWND hwnd, 
                                         UINT msg, 
                                         WPARAM wParam, 
                                         LPARAM lParam)
@@ -193,14 +269,25 @@ static BOOL CALLBACK IntroWizardBrowser(HWND hwnd,
         {
             DRAWITEMSTRUCT* dis = (DRAWITEMSTRUCT*)lParam;
             UINT ctrlId = wParam;
-            const char* kCaption = "What is My Music?";
-            const char* kText = "My Music is a window that includes two separate "
-                                "panes. The pane on the left is titled My Music "
-                                "Collection.";
-
+            const char* kCaption1 = "Search Computer For Music";
+            const char* kCaption2 = "Where Would You Like to Look for Music?";
+            const char* kMsg1 = "In order to populate the My Music Collection pane "
+                                BRANDING" will search your computer for supported music "
+                                "files. The files will not be moved or modified during "
+                                "this process. Their location will be remembered in "
+                                "order to provide you with an organized view of your "
+                                "music collection.";
+                               
+            const char* kMsg2 = "By default "BRANDING" will search all the disk drives on "
+                                "your computer. If you would like to limit the "
+                                "scope of the search you may do so by selecting a "
+                                "disk drive for us to search. If you wish, you may "
+                                "also select a specific folder on that drive.";
+                                
             switch(ctrlId)
             {
-                case IDC_CAPTION:
+                case IDC_CAPTION1:
+                case IDC_CAPTION2:
                 {
                     HFONT font, oldFont;
 
@@ -217,9 +304,16 @@ static BOOL CALLBACK IntroWizardBrowser(HWND hwnd,
                     RECT clientRect;
                     GetClientRect(dis->hwndItem, &clientRect);
 
+                    const char* caption;
+
+                    if(ctrlId == IDC_CAPTION1)
+                        caption = kCaption1;
+                    else if(ctrlId == IDC_CAPTION2)
+                        caption = kCaption2;
+
                     DrawText(dis->hDC, 
-                             kCaption,
-                             strlen(kCaption),
+                             caption,
+                             strlen(caption),
                              &clientRect,
                              DT_LEFT|DT_WORDBREAK);
 
@@ -230,7 +324,8 @@ static BOOL CALLBACK IntroWizardBrowser(HWND hwnd,
                     break;
                 } 
 
-                case IDC_TEXT:
+                case IDC_TEXT1:
+                case IDC_TEXT2:
                 {
                     HFONT font, oldFont;
 
@@ -241,9 +336,16 @@ static BOOL CALLBACK IntroWizardBrowser(HWND hwnd,
                     RECT clientRect;
                     GetClientRect(dis->hwndItem, &clientRect);
 
+                    const char* text;
+
+                    if(ctrlId == IDC_TEXT1)
+                        text = kMsg1;
+                    else if(ctrlId == IDC_TEXT2)
+                        text = kMsg2;
+
                     DrawText(dis->hDC, 
-                             kText,
-                             strlen(kText),
+                             text,
+                             strlen(text),
                              &clientRect,
                              DT_LEFT|DT_WORDBREAK);
 
@@ -276,119 +378,12 @@ static BOOL CALLBACK IntroWizardBrowser(HWND hwnd,
 
                 case PSN_SETACTIVE:
                 {
-                    PropSheet_SetWizButtons(GetParent(hwnd), PSWIZB_BACK | PSWIZB_NEXT);
-                    break;
-                }
-
-                case PSN_WIZNEXT:
-                {
-                    break;
-                }
-
-                case PSN_WIZBACK:
-                {
-                    break;
-                }
-            }
-
-            break;
-        }
-
-    }
-
-	return result;
-}   
-
-static BOOL CALLBACK IntroWizardPlaylist(HWND hwnd, 
-                                         UINT msg, 
-                                         WPARAM wParam, 
-                                         LPARAM lParam)
-{
-	BOOL result = FALSE;
-
-    switch(msg)
-    {
-        case WM_INITDIALOG:
-        {
-            break;
-        }
-
-        case WM_NOTIFY:
-        {
-            switch(((NMHDR*)lParam)->code)
-            {
-                case PSN_KILLACTIVE:
-                {
-                    SetWindowLong(hwnd,	DWL_MSGRESULT, FALSE);
-                    result = TRUE;
-                    break;
-                }
-
-                case PSN_RESET:
-                {
-                    SetWindowLong(hwnd,	DWL_MSGRESULT, FALSE);
-                    break;
-                }
-
-                case PSN_SETACTIVE:
-                {
-                    PropSheet_SetWizButtons(GetParent(hwnd), PSWIZB_BACK | PSWIZB_NEXT);
-                    break;
-                }
-
-                case PSN_WIZNEXT:
-                {
-                    break;
-                }
-
-                case PSN_WIZBACK:
-                {
-                    break;
-                }
-            }
-
-            break;
-        }
-
-    }
-
-	return result;
-}   
-
-static BOOL CALLBACK IntroWizardSearch(HWND hwnd, 
-                                       UINT msg, 
-                                       WPARAM wParam, 
-                                       LPARAM lParam)
-{
-	BOOL result = FALSE;
-
-    switch(msg)
-    {
-        case WM_INITDIALOG:
-        {
-            break;
-        }
-
-        case WM_NOTIFY:
-        {
-            switch(((NMHDR*)lParam)->code)
-            {
-                case PSN_KILLACTIVE:
-                {
-                    SetWindowLong(hwnd,	DWL_MSGRESULT, FALSE);
-                    result = TRUE;
-                    break;
-                }
-
-                case PSN_RESET:
-                {
-                    SetWindowLong(hwnd,	DWL_MSGRESULT, FALSE);
-                    break;
-                }
-
-                case PSN_SETACTIVE:
-                {
+                    
                     PropSheet_SetWizButtons(GetParent(hwnd), PSWIZB_BACK | PSWIZB_FINISH);
+                    //HWND hwndFinish = GetDlgItem(GetParent(hwnd), 3025);
+                    HWND hwndFinish = FindWindowEx(GetParent(hwnd), NULL, NULL, "Finish");
+
+                    SetWindowText(hwndFinish, "Search");
                     break;
                 }
 
@@ -409,11 +404,11 @@ static BOOL CALLBACK IntroWizardSearch(HWND hwnd,
     }
 
 	return result;
-}      
+}   
 
 bool MusicBrowserUI::IntroductionWizard()
 {
-    PROPSHEETPAGE psp[4];
+    PROPSHEETPAGE psp[2];
     PROPSHEETHEADER psh;
 
     HINSTANCE hinst = (HINSTANCE)GetWindowLong(m_hWnd, GWL_HINSTANCE);
@@ -425,43 +420,16 @@ bool MusicBrowserUI::IntroductionWizard()
     psp[0].pszIcon = NULL;
     psp[0].pfnDlgProc = IntroWizardHello;
     psp[0].pszTitle = NULL;
-    psp[0].lParam = (LPARAM)0;
+    psp[0].lParam = (LPARAM)0;   
 
     psp[1].dwSize = sizeof(PROPSHEETPAGE);
     psp[1].dwFlags = 0;
     psp[1].hInstance = hinst;
-    psp[1].pszTemplate = MAKEINTRESOURCE(IDD_INTROWIZARD_BROWSER);
+    psp[1].pszTemplate = MAKEINTRESOURCE(IDD_INTROWIZARD_SEARCH);
     psp[1].pszIcon = NULL;
-    psp[1].pfnDlgProc = IntroWizardBrowser;
+    psp[1].pfnDlgProc = IntroWizardSearch;
     psp[1].pszTitle = NULL;
     psp[1].lParam = (LPARAM)0;
-
-    psp[2].dwSize = sizeof(PROPSHEETPAGE);
-    psp[2].dwFlags = 0;
-    psp[2].hInstance = hinst;
-    psp[2].pszTemplate = MAKEINTRESOURCE(IDD_INTROWIZARD_PLAYLIST);
-    psp[2].pszIcon = NULL;
-    psp[2].pfnDlgProc = IntroWizardPlaylist;
-    psp[2].pszTitle = NULL;
-    psp[2].lParam = (LPARAM)0;
-
-    psp[3].dwSize = sizeof(PROPSHEETPAGE);
-    psp[3].dwFlags = 0;
-    psp[3].hInstance = hinst;
-    psp[3].pszTemplate = MAKEINTRESOURCE(IDD_INTROWIZARD_SEARCH);
-    psp[3].pszIcon = NULL;
-    psp[3].pfnDlgProc = IntroWizardSearch;
-    psp[3].pszTitle = NULL;
-    psp[3].lParam = (LPARAM)0;
-
-    /*psp[4].dwSize = sizeof(PROPSHEETPAGE);
-    psp[4].dwFlags = 0;
-    psp[4].hInstance = hinst;
-    psp[4].pszTemplate = MAKEINTRESOURCE(IDD_INTROWIZARD_DONE);
-    psp[4].pszIcon = NULL;
-    psp[4].pfnDlgProc = IntroWizardSearch;
-    psp[4].pszTitle = NULL;
-    psp[4].lParam = (LPARAM)0;*/
 
     psh.dwSize = sizeof(PROPSHEETHEADER);
     psh.dwFlags = PSH_PROPSHEETPAGE | PSH_WIZARD | PSH_NOAPPLYNOW;
