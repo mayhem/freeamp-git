@@ -30,6 +30,7 @@ ____________________________________________________________________________*/
 using namespace std;
 
 #include <assert.h>
+#include <time.h>
 
 #if defined(solaris)
 #include <stdarg.h>
@@ -63,6 +64,8 @@ class MusicBrainzCD : public MetaDataFormat {
     vector<int> m_trackLens;
     int         m_nextTrack;
 	Mutex       m_mutex;
+	char        m_notFoundDiskId[48];
+	time_t      m_notFoundDiskIdExpire;
 };
 
 #endif

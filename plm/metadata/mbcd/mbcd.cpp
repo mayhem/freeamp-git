@@ -51,6 +51,7 @@ MusicBrainzCD::MusicBrainzCD(FAContext* context)
 {
     o = NULL;
     m_nextTrack = -1;
+	m_notFoundDiskId[0] = 0;
 }
 
 MusicBrainzCD::~MusicBrainzCD()
@@ -82,13 +83,6 @@ bool MusicBrainzCD::ReadMetaData(const char* url, MetaData* metadata)
     m_mutex.Acquire();
 
     track = atoi(ptr + 1);
-
-    if (track == m_nextTrack && o == NULL)
-    {
-       m_nextTrack++;
-       m_mutex.Release();
-       return false;
-    }
     if (track != m_nextTrack)
     {
         if (o)
@@ -207,6 +201,17 @@ bool MusicBrainzCD::LookupCD(void)
        m_trackLens.push_back(atoi(ptr));
     mb_GetResultData(o, MB_LocalGetId, diskId, 64);
 
+	if (strcmp(diskId, m_notFoundDiskId) == 0)
+    {
+	   time_t t;
+
+	   time(&t);
+	   if (t < m_notFoundDiskIdExpire)
+          return false;
+
+	   m_notFoundDiskId[0] = 0;
+    }
+
     db = new Database(database.c_str());
     delete [] tempDir;
 
@@ -229,9 +234,21 @@ bool MusicBrainzCD::LookupCD(void)
            return false;
         }
     
-        if (mb_GetNumItems(o) == 0)
+        if (1) //mb_GetNumItems(o) == 0)
         {
            char url[MAX_PATH];
+
+		   // Due to a shortcoming in the design of the metadata stuff, the
+		   // player will continue to ask for more tracks even after a CD has
+		   // not been found. In order to avoid hitting the server for each track
+		   // we'll keep the diskid around and if subsequently we're asked for a
+		   // query on the same CD, we will just skip the query. A timeout value
+		   // is associated with the not found cd id, so that if the cd info 
+		   // is entered into MB, and the user updates the cd we force the query
+		   // to the server after the timeout (suggested: 60 seconds)
+		   strcpy(m_notFoundDiskId, diskId);
+		   time(&m_notFoundDiskIdExpire);
+		   m_notFoundDiskIdExpire += 60;
 
            mb_GetWebSubmitURL(o, url, MAX_PATH);
            m_context->target->AcceptEvent(new 

@@ -1017,8 +1017,8 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
             if (MessageBox(m_hWnd, mbcdNotFoundMessage, "CD Not Found", 
                 MB_YESNO) == IDYES)
             {
-                ShellExecute(hwnd, "open", ev->URL().c_str(), NULL,
-                               NULL, SW_SHOWNORMAL);
+                ShellExecute(m_hParent, "open", ev->URL().c_str(), NULL,
+                             NULL, SW_SHOWNORMAL);
             }
 
             break; } 
