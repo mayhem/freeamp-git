@@ -45,7 +45,10 @@ typedef enum Error
     kError_NoMoreLibDirs    = 14,
     kError_NullValueInvalid = 15,
     kError_InvalidError     = 16,
-    kError_PluginNotInitialized = 17
+    kError_PluginNotInitialized = 17,
+    kError_GotDefaultMethod = 18,
+    kError_Unsuccessful = 19,
+    kError_FileSeekNotSupported = 20
 }Error;
 
 

@@ -62,14 +62,15 @@ static AUDIO audio_table[2][2] = {
     }
 };
 
-static char * g_ErrorArray[7] = {
+static char * g_ErrorArray[8] = {
     "Invalid Error Code",
     "head_info2 return 0 bytes/frame",
     "audio.decode_init failed",
     "bs_fill() failed",
     "creation of decoder thread failed",
     "output didn't return the same number of bytes we wrote",
-    "decoder method didn't return anything"
+    "decoder method didn't return anything",
+    "seeking and reading ID3v1(.1) tag failed"
 
 };
 
@@ -129,19 +130,28 @@ Error XingLMC::InitDecoder() {
 
 	    int32 totalFrames = 0;
 	    int32 bytesPerFrame = m_frameBytes;
-	    int32 backhere = m_input->Seek(0,SEEK_FROM_CURRENT);
+	    int32 backhere;
+	    Error error = m_input->Seek(backhere,0,SEEK_FROM_CURRENT);
 //	    cout << "Back here: " << backhere << endl;
-	    int32 end = m_input->Seek(0,SEEK_FROM_END);
-	    m_input->Seek(-128,SEEK_FROM_CURRENT);
+	    if (IsError(error)) { return (Error)lmcError_ID3ReadFailed; }
+	    int32 end;
+	    error = m_input->Seek(end,0,SEEK_FROM_END);
+	    if (IsError(error)) { return (Error)lmcError_ID3ReadFailed; }
+	    int32 dummy;
+	    error = m_input->Seek(dummy,-128,SEEK_FROM_CURRENT);
+	    if (IsError(error)) { return (Error)lmcError_ID3ReadFailed; }
 	    // look for id3 tag
 	    char buf[128];
 	    memset(buf,0,sizeof(buf));
-	    m_input->Read(buf,128);
+	    error = m_input->Read(dummy,buf,128);
+	    if (IsError(error)) { return (Error)lmcError_ID3ReadFailed; }
 	    Id3TagInfo tag_info(buf);
 	    if (tag_info.m_containsInfo) {
 		end -= 128;
 	    }
-	    m_input->Seek(backhere,SEEK_FROM_START);
+	    error = m_input->Seek(dummy,backhere,SEEK_FROM_START);
+ 	    if (IsError(error)) { return (Error)lmcError_ID3ReadFailed; }
+
 	    totalFrames = end / bytesPerFrame;
 
 	    double tpf = (double)1152 / (double)(44100 << 0);
@@ -420,12 +430,14 @@ Error XingLMC::Reset() {
 
 Error XingLMC::ChangePosition(int32 position) {
     ENSURE_INITIALIZED;
+    Error error = kError_NoErr;
     m_seekMutex->Acquire(WAIT_FOREVER);
     //cout << "Seeking to ..." << position << endl;
 #if 1
     m_bsBufBytes = 0;
     m_bsBufPtr = m_bsBuffer;
-    m_input->Seek(0,SEEK_FROM_START);
+    int32 dummy;
+    error = m_input->Seek(dummy,0,SEEK_FROM_START);
     m_frameCounter = 0;
     m_frameWaitTill = position;
     actually_decode = 0;
@@ -443,15 +455,15 @@ Error XingLMC::ChangePosition(int32 position) {
 
 #endif
     m_seekMutex->Release();
-
-    return kError_NoErr;
+    
+    return error;
 }
 
 void XingLMC::bs_clear() {
 }
 
 int XingLMC::bs_fill() {
-   unsigned int nread;
+   int32 nread;
 
    if (m_bsBufBytes < 0) {
       m_bsBufBytes = 0;		// signed var could be negative
@@ -460,13 +472,11 @@ int XingLMC::bs_fill() {
    if (m_bsBufBytes < m_bsTrigger) {
       memmove(m_bsBuffer, m_bsBufPtr, m_bsBufBytes);
       //cout << "Reading from " << m_input->Seek(m_input, 0,SEEK_FROM_CURRENT) << " to at most " << BS_BUFBYTES-m_bsBufBytes << endl;
-      nread = m_input->Read(m_bsBuffer + m_bsBufBytes, BS_BUFBYTES - m_bsBufBytes);
+      Error error = m_input->Read(nread, m_bsBuffer + m_bsBufBytes, BS_BUFBYTES - m_bsBufBytes);
       //nread = Read(handle, m_bsBuffer + m_bsBufBytes, BS_BUFBYTES - m_bsBufBytes);
-      if ((nread + 1) == 0) {
-         /*-- test for -1 = error --*/
-	 m_bsTrigger = 0;
-//	 printf("\n FILE_READ_ERROR\n");
-	 return 0;
+      if (error != kError_NoErr) {
+	  m_bsTrigger = 0;
+	  return 0;
       }
       m_bsBufBytes += nread;
       m_bsBufPtr = m_bsBuffer;
