@@ -55,7 +55,7 @@ CFLAGS = -Wall @CFLAGS@ -D_REENTRANT
 OSDEP = @OSDEP@
 OSINC = @OSINC@
 FPIC = @FPIC@
-LINKMOD = gcc -shared $(OSLINK) $(LDFLAGS)
+LINKMOD = gcc -shared $(LDFLAGS)
 
 OSDEPOBJ = @OSDEPOBJ@
 
@@ -86,9 +86,9 @@ FREEAMPOBJ += lmc/src/lmcregistry.o ui/src/uiregistry.o
 FREEAMPOBJ += $(OSDEPOBJ)
 
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CFLAGS)
-CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(CFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
+CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(CFLAGS) $(CPPFLAGS) $(CXXFLAGS)
 
-CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@
+CXXLINK = $(CXXLD) $(CXXFLAGS) $(LDFLAGS) -o $@
 
 #include @top_srcdir@/config/Makefile.header
 
@@ -98,7 +98,7 @@ freeamp: $(FREEAMPOBJ) $(freeamp_DEPENDENCIES)
 	@rm -f freeamp
 	$(CXXLINK) $(FREEAMPOBJ) $(LDFLAGS) -ldl -lpthread $(X_LIBS) $(X_EXTRA_LIBS)
 
-.SUFFIXES: .S .c .cpp .o .s
+.SUFFIXES: .S .c .cpp .o .s .asm .asm1
 
 
 .cpp.o:
@@ -106,6 +106,12 @@ freeamp: $(FREEAMPOBJ) $(freeamp_DEPENDENCIES)
 
 .c.o:
 	$(COMPILE) $(FPIC) -c $< -o $@
+
+.asm.asm1:
+       $(PERL) -pe 's/\b_//g' $< > $@
+
+.asm1.o:
+       $(NASM) -f elf -o $@ $<
 
 .s.o:
 	$(COMPILE) -c $< -o $@
