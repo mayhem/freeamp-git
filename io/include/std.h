@@ -4,6 +4,13 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#if defined(__OS2__)
+	#define		INCL_DOSMISC
+	#define		INCL_BASE
+	#include	<os2.h>
+	#define		_STD_
+#endif
+
 #ifndef		_STD_
 #define		_STD_
 

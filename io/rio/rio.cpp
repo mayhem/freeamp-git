@@ -18,6 +18,17 @@
 //					Added CheckPresent() member function.
 //					Support for Alpha platform.
 //
+//	v1.06 11/03/99	Added support for external flash ram.
+//					Added initialization with bad block check.
+//					Added file re-ordering support.
+//
+//	v1.07 10/06/99	Added support for FreeBSD.
+//					Added support for BSDI.
+//					Added support for OS/2.
+//					Added support for Rio 64M SE (Special Edition).
+//					Improved detection of device, using manufacturer ID.
+//					Selectable IO delays.
+//
 ///////////////////////////////////////////////////////////////////////////////
 #include	<stdio.h>
 #include	<string.h>
@@ -25,9 +36,9 @@
 #include	<time.h>
 #include	<errno.h>
 #include	<sys/stat.h>
-#include	"std.h"
-#include	"binary.h"
+
 #include	"rio.h"
+#include	"binary.h"
 
 // platform dependencies
 #if defined(_WINNT)
@@ -37,7 +48,7 @@
 	#include	"rioioctl.h"
 	#define		OUTPORT( p, v )			WinNTOutPort( p, v )
 	#define		INPORT( p )				WinNTInPort( p )
-	#define		CLOCK_SECOND			1000
+	#define		CLOCK_SECOND			CLOCKS_PER_SEC
 	#define		DELETEARRAY				delete[]
 	#define		ID_DRIVER_VERSION		101
 
@@ -46,7 +57,7 @@
 	#include	<conio.h>
 	#define		OUTPORT( p, v )			_outp( p, v )
 	#define		INPORT( p )				_inp( p )
-	#define		CLOCK_SECOND			1000
+	#define		CLOCK_SECOND			CLOCKS_PER_SEC
 	#define		DELETEARRAY				delete[]
 
 #elif defined(__linux__)
@@ -60,7 +71,34 @@
 	#include	<asm/io.h>
 	#define		OUTPORT(p,v)			outb( v, p )
 	#define		INPORT(p)				inb( p )
-	#define		CLOCK_SECOND			1000000
+	#define		CLOCK_SECOND			CLOCKS_PER_SEC
+	#define		DELETEARRAY				delete[]
+
+#elif defined(__FreeBSD__)
+	// FreeBSD g++
+	#include	<fcntl.h>
+	#include	<unistd.h>
+	#include	<machine/cpufunc.h>
+	#define		OUTPORT(p,v)			outb( p, v )
+	#define		INPORT(p)				inb( p )
+	#define		CLOCK_SECOND			CLOCKS_PER_SEC
+	#define		DELETEARRAY				delete[]
+
+#elif defined(__bsdi__)
+	// BSD/OS g++
+	#include	<unistd.h>
+	#include	<machine/inline.h>
+	#define		OUTPORT(p,v)			outb( p, v )
+	#define		INPORT(p)				inb( p )
+	#define		CLOCK_SECOND			CLOCKS_PER_SEC
+	#define		DELETEARRAY				delete[]
+
+#elif defined(__OS2__)
+	// OS/2 VisualAge C++ v. 3
+	#include	"iopl32.h"
+	#define		OUTPORT(p,v)			WPORT( p, v )
+	#define		INPORT(p)				((UCHAR)RPORT( p ))
+	#define		CLOCK_SECOND			CLOCKS_PER_SEC
 	#define		DELETEARRAY				delete[]
 
 #elif defined(__TURBOC__)
@@ -68,7 +106,7 @@
 	#include	<dos.h>
 	#define		OUTPORT( p, v )			outp( p, v )
 	#define		INPORT( p )				inp( p )
-	#define		CLOCK_SECOND			18
+	#define		CLOCK_SECOND			((int)CLOCKS_PER_SEC)
 	#define		DELETEARRAY				delete
 
 #else
@@ -84,8 +122,11 @@
 // max tx/rx block retry
 #define		MAX_RETRY				3
 
+// flash ram bank pos
+#define		POS_BANK_EXTERNALFLASH	4
+
 // delay's
-#define		IODELAY(c)				{ for( int _iA=0; _iA<c; ++_iA ) INPORT(m_iPortStatus); }
+#define		IODELAY(c)				{ for( long _lA=0; _lA<c; ++_lA ) INPORT(m_iPortStatus); }
 #define		DELAY(t)				{ long _lTime=clock()+t; while( _lTime > clock() ) ; }
 
 // new, delete
@@ -93,29 +134,11 @@
 #define		ZERONEWBLOCK( p )		{ NEWBLOCK(p); memset(p, 0, CRIO_SIZE_32KBLOCK); }
 #define		DELETEBLOCK( p )		{ if ( p ) { DELETEARRAY p; p = NULL; } }
 
-// 32Kblock used flag
-#define		ID_32KBLOCK_USED		0x00
-#define		ID_32KBLOCK_FREE		0xff
-
 // command out
 #define		COMMANDOUT(v1, v2, v3)	{ OUTPORT(m_iPortData, v1); OUTPORT(m_iPortControl, v2); OUTPORT(m_iPortControl, v3); }
 // wait for reply
 #define		WAITNIBBLE( v1 )		{ if (!WaitInput(v1)) return FALSE; }
 #define		WAITACK()				{ if (!WaitAck()) return FALSE; }
-
-// block to use to check for presense
-#define		ID_32KBLOCK_CHECKPRESENT	0x03ff
-
-// io delay constants
-#if defined(_WINNT)
-	#define		IODELAY_1				2000
-	#define		IODELAY_2				2
-	#define		IODELAY_3				10	//20
-#else
-	#define		IODELAY_1				20000
-	#define		IODELAY_2				2
-	#define		IODELAY_3				100
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // if WinNT
@@ -212,6 +235,16 @@ BOOL CRio::Set( int iPortBase )
 		}
 	#endif
 
+	// if FreeBSD
+	#if defined(__FreeBSD__)
+		// request direct access to memory addresses
+		if ( open("/dev/io", O_RDONLY) == -1 )
+		{
+			LogError( CRIO_ERROR_IOPRERM, "open() failed, reason '%s'\n", SZERROR );
+			return FALSE;
+		}
+	#endif
+
 	// if WinNT
 	#if defined(_WINNT)
 		// open generic IO device
@@ -245,6 +278,17 @@ CRio::CRio()
 	#if defined(_WINNT)
 		m_hDriver = NULL;
 	#endif
+
+	// default to use internal flash
+	m_bUseExternalFlash = FALSE;
+
+	// default to not using special edition
+	m_bSpecialEdition = FALSE;
+
+	// default io delay's
+	m_lTimeIODelayInit = CRIO_TIME_IODELAY_INIT;
+	m_lTimeIODelayTx = CRIO_TIME_IODELAY_TX;
+	m_lTimeIODelayRx = CRIO_TIME_IODELAY_RX;
 }
 
 CRio::~CRio()
@@ -271,7 +315,7 @@ UINT CRio::FindFirstFree32KBlock( void )
 	UCHAR* puc = m_cDirBlock.m_auc32KBlockUsed;
 	for( uiA=0; uiA<CRIO_MAX_32KBLOCK; ++uiA, ++puc )
 	{
-		if ( *puc == ID_32KBLOCK_FREE )
+		if ( *puc == CRIO_ID_32KBLOCK_FREE )
 			return uiA;
 	}
 	return 0xffff;
@@ -328,6 +372,32 @@ BOOL CRio::WaitAck( void )
 	return FALSE;
 }
 
+// get byte from status port
+UINT CRio::GetDataByte( void )
+{
+	// get hi nibble
+	OUTPORT( m_iPortControl, B_00000000 );
+	IODELAY( m_lTimeIODelayRx );
+	UCHAR ucRx = INPORT( m_iPortStatus );
+	UCHAR ucIn = ((ucRx & 0xf0) ^ 0x80) >> 4;
+
+	// get lo nibble and combine with previous nibble to make byte
+	OUTPORT( m_iPortControl, B_00000100 );
+	IODELAY( m_lTimeIODelayRx );
+	ucRx = INPORT( m_iPortStatus );
+	ucIn |= (ucRx & 0xf0) ^ 0x80;
+
+	// reverse bits in byte
+	UCHAR ucReversed = 0;
+	for( int iC=0; iC<8; ++iC )
+	{
+		ucReversed <<= 1;
+		ucReversed |= (ucIn & 1);
+		ucIn >>= 1;
+	}
+
+	return ucReversed;
+}
 
 // io intro
 BOOL CRio::IOIntro( void )
@@ -337,10 +407,10 @@ BOOL CRio::IOIntro( void )
 	COMMANDOUT( B_10101000, B_00001100, B_00000100 );
 
 	OUTPORT( m_iPortControl, B_00000000 );
-	IODELAY( IODELAY_1 );
+	IODELAY( m_lTimeIODelayInit );
 
 	OUTPORT( m_iPortControl, B_00000100 );
-	IODELAY( IODELAY_1 );
+	IODELAY( m_lTimeIODelayInit );
 
 	COMMANDOUT( B_10101101, B_00001100, B_00000100 );
 	COMMANDOUT( B_01010101, B_00000000, B_00000100 );
@@ -349,10 +419,10 @@ BOOL CRio::IOIntro( void )
 	COMMANDOUT( B_10101000, B_00001100, B_00000100 );
 
 	OUTPORT( m_iPortControl, B_00000000 );
-	IODELAY( IODELAY_1 );
+	IODELAY( m_lTimeIODelayInit );
 
 	OUTPORT( m_iPortControl, B_00000100 );
-	IODELAY( IODELAY_1 );
+	IODELAY( m_lTimeIODelayInit );
 
 	return TRUE;
 }
@@ -370,19 +440,40 @@ BOOL CRio::IOOutro( void )
 BOOL CRio::Tx32KBlockRetry( void* pv, UINT uiPos32KBlock, UINT uiPos32KBlockPrev,
 	UINT uiPos32KBlockNext )
 {
+	ULONG ulPos512ByteBlock;
+	ULONG ulPosHi;
+	ULONG ulPosMid;
+	ULONG ulPosLo;
 	int iA, iB;
 
 	// io intro
 	if ( !IOIntro() )
 		return FALSE;
 
-	// prepare 32K block
-	for( iA=0; iA<4; ++iA )
+	// if internal, blocksize = 8K else if external blocksize = 16K
+	int iCount8K = m_bUseExternalFlash ? 2 : 1;
+
+	// prepare all pages in block
+	for( iA=0; iA<4; iA+=iCount8K )
 	{
-		ULONG ulPos512ByteBlock = ((ULONG)uiPos32KBlock * 32768 + (ULONG)iA * 8192) / 512;
-		ULONG ulPosHi = ulPos512ByteBlock / 16384;
-		ULONG ulPosMid = (ulPos512ByteBlock & 0x3f00) >> 8;
-		ULONG ulPosLo = ulPos512ByteBlock & 0xff;
+		ulPos512ByteBlock = ((ULONG)uiPos32KBlock * 32768 + (ULONG)iA * 8192) / 512;
+		ulPosLo = ulPos512ByteBlock & 0xff;
+
+		if ( m_bUseExternalFlash )
+		{
+			ulPosHi = POS_BANK_EXTERNALFLASH;
+			ulPosMid = (ulPos512ByteBlock & 0xff00) >> 8;
+		}
+		else if ( m_bSpecialEdition )
+		{
+			ulPosHi	 = ulPos512ByteBlock / 32768;
+			ulPosMid = (ulPos512ByteBlock & 0x7f00) >> 8;
+		}
+		else
+		{
+			ulPosHi = ulPos512ByteBlock / 16384;
+			ulPosMid = (ulPos512ByteBlock & 0x3f00) >> 8;
+		}
 
 		COMMANDOUT( B_10101011, B_00001100, B_00000100 );
 		COMMANDOUT( ulPosHi, B_00000000, B_00000100 );
@@ -401,20 +492,34 @@ BOOL CRio::Tx32KBlockRetry( void* pv, UINT uiPos32KBlock, UINT uiPos32KBlockPrev
 		COMMANDOUT( B_10100000, B_00001100, B_00000100 );
 
 		OUTPORT( m_iPortControl, B_00000000 );
-		IODELAY( IODELAY_3 );
+		IODELAY( m_lTimeIODelayTx );
 
 		OUTPORT( m_iPortControl, B_00000100 );
-		IODELAY( IODELAY_3 );
+		IODELAY( m_lTimeIODelayTx );
 	}
 
 	// send 32K in 512 byte chunks
 	UCHAR* pauc = (UCHAR*)pv;
 	for( iA=0; iA<(32768/512); ++iA, pauc+=512 )
 	{
-		ULONG ulPos512ByteBlock = ((ULONG)uiPos32KBlock * 32768 + (ULONG)iA * 512) / 512;
-		ULONG ulPosHi = ulPos512ByteBlock / 16384;
-		ULONG ulPosMid = (ulPos512ByteBlock & 0x3f00) >> 8;
-		ULONG ulPosLo = ulPos512ByteBlock & 0xff;
+		ulPos512ByteBlock = ((ULONG)uiPos32KBlock * 32768 + (ULONG)iA * 512) / 512;
+		ulPosLo = ulPos512ByteBlock & 0xff;
+
+		if ( m_bUseExternalFlash )
+		{
+			ulPosHi = POS_BANK_EXTERNALFLASH;
+			ulPosMid = (ulPos512ByteBlock & 0xff00) >> 8;
+		}
+		else if ( m_bSpecialEdition )
+		{
+			ulPosHi	 = ulPos512ByteBlock / 32768;
+			ulPosMid = (ulPos512ByteBlock & 0x7f00) >> 8;
+		}
+		else
+		{
+			ulPosHi = ulPos512ByteBlock / 16384;
+			ulPosMid = (ulPos512ByteBlock & 0x3f00) >> 8;
+		}
 
 		// issue upload 512 byte block command
 		COMMANDOUT( B_10101011, B_00001100, B_00000100 );
@@ -469,8 +574,24 @@ BOOL CRio::Tx32KBlockRetry( void* pv, UINT uiPos32KBlock, UINT uiPos32KBlockPrev
 		else
 		{
 			cEnd512ByteBlock.m_ulPos512ByteBlockNextMult256 = ((ULONG)uiPos32KBlockNext * 64) * 256;
-			cEnd512ByteBlock.m_ucPos8192KBlockNext1 = uiPos32KBlockNext / 256;
-			cEnd512ByteBlock.m_ucPos8192KBlockNext2 = uiPos32KBlockNext / 256;
+
+			if ( !m_bSpecialEdition )
+			{
+				cEnd512ByteBlock.m_ucPos8192KBlockNext1 = uiPos32KBlockNext / 256;
+				cEnd512ByteBlock.m_ucPos8192KBlockNext2 = uiPos32KBlockNext / 256;
+			}
+			else
+			{
+				cEnd512ByteBlock.m_ucPos8192KBlockNext1 = uiPos32KBlockNext / 512;
+				cEnd512ByteBlock.m_ucPos8192KBlockNext2 = uiPos32KBlockNext / 512;
+			}
+
+			if ( m_bUseExternalFlash )
+			{
+				cEnd512ByteBlock.m_ulPos512ByteBlockNextMult256	+= 0x01000000;
+				cEnd512ByteBlock.m_ucPos8192KBlockNext1 = 0;
+				cEnd512ByteBlock.m_ucPos8192KBlockNext2 = 0;
+			}
 		}
 
 		if ( uiPos32KBlockPrev == 0xffff )
@@ -483,8 +604,25 @@ BOOL CRio::Tx32KBlockRetry( void* pv, UINT uiPos32KBlock, UINT uiPos32KBlockPrev
 		else
 		{
 			cEnd512ByteBlock.m_ulPos512ByteBlockPrevMult256 = ((ULONG)uiPos32KBlockPrev * 64) * 256;
-			cEnd512ByteBlock.m_ucPos8192KBlockPrev1 = uiPos32KBlockPrev / 256;
-			cEnd512ByteBlock.m_ucPos8192KBlockPrev2 = uiPos32KBlockPrev / 256;
+
+			if ( !m_bSpecialEdition )
+			{
+				cEnd512ByteBlock.m_ucPos8192KBlockPrev1 = uiPos32KBlockPrev / 256;
+				cEnd512ByteBlock.m_ucPos8192KBlockPrev2 = uiPos32KBlockPrev / 256;
+			}
+			else
+			{
+				cEnd512ByteBlock.m_ucPos8192KBlockPrev1 = uiPos32KBlockPrev / 512;
+				cEnd512ByteBlock.m_ucPos8192KBlockPrev2 = uiPos32KBlockPrev / 512;
+			}
+
+			if ( m_bUseExternalFlash )
+			{
+				cEnd512ByteBlock.m_ulPos512ByteBlockPrevMult256	+= 0x01000000;
+				cEnd512ByteBlock.m_ucPos8192KBlockPrev1 = 0;
+				cEnd512ByteBlock.m_ucPos8192KBlockPrev2 = 0;
+			}
+
 			cEnd512ByteBlock.m_usPos32KBlockPrevMult256 = uiPos32KBlockPrev * 256;
 		}
 
@@ -521,10 +659,10 @@ BOOL CRio::Tx32KBlockRetry( void* pv, UINT uiPos32KBlock, UINT uiPos32KBlockPrev
 		COMMANDOUT( B_10100000, B_00001100, B_00000100 );
 
 		OUTPORT( m_iPortControl, B_00000000 );
-		IODELAY( IODELAY_3 );
+		IODELAY( m_lTimeIODelayTx );
 
 		OUTPORT( m_iPortControl, B_00000100 );
-		IODELAY( IODELAY_3 );
+		IODELAY( m_lTimeIODelayTx );
 	}
 
 	return TRUE;
@@ -552,6 +690,10 @@ BOOL CRio::Tx32KBlock( void* pv, UINT uiPos32KBlock, UINT uiPos32KBlockPrev,
 // rx 32K block retry
 BOOL CRio::Rx32KBlockRetry( void* pv, UINT uiPos32KBlock )
 {
+	ULONG ulPos512ByteBlock;
+	ULONG ulPosHi;
+	ULONG ulPosMid;
+	ULONG ulPosLo;
 	int iA, iB;
 
 	// io intro
@@ -562,10 +704,24 @@ BOOL CRio::Rx32KBlockRetry( void* pv, UINT uiPos32KBlock )
 	UCHAR* pauc = (UCHAR*)pv;
 	for( iA=0; iA<(32768/512); ++iA, pauc+=512 )
 	{
-		ULONG ulPos512ByteBlock = ((ULONG)uiPos32KBlock * 32768 + (ULONG)iA * 512) / 512;
-		ULONG ulPosHi = ulPos512ByteBlock / 16384;
-		ULONG ulPosMid = (ulPos512ByteBlock & 0x3f00) >> 8;
-		ULONG ulPosLo = ulPos512ByteBlock & 0xff;
+		ulPos512ByteBlock = ((ULONG)uiPos32KBlock * 32768 + (ULONG)iA * 512) / 512;
+		ulPosLo = ulPos512ByteBlock & 0xff;
+
+		if ( m_bUseExternalFlash )
+		{
+			ulPosHi = POS_BANK_EXTERNALFLASH;
+			ulPosMid = (ulPos512ByteBlock & 0xff00) >> 8;
+		}
+		else if ( m_bSpecialEdition )
+		{
+			ulPosHi	 = ulPos512ByteBlock / 32768;
+			ulPosMid = (ulPos512ByteBlock & 0x7f00) >> 8;
+		}
+		else
+		{
+			ulPosHi = ulPos512ByteBlock / 16384;
+			ulPosMid = (ulPos512ByteBlock & 0x3f00) >> 8;
+		}
 
 		// issue download 512 byte block command
 		COMMANDOUT( B_10101011, B_00001100, B_00000100 );
@@ -589,48 +745,13 @@ BOOL CRio::Rx32KBlockRetry( void* pv, UINT uiPos32KBlock )
 				pauc, 512, &dwSizeReturn, NULL );
 		}
 		#else
-			UCHAR ucIn, ucRx;
-			UCHAR* pauc2 = pauc;
 			for( iB=0; iB<512; ++iB )
-			{
-				// get hi nibble
-				OUTPORT( m_iPortControl, B_00000000 );
-				IODELAY( IODELAY_2 );
-				ucRx = INPORT( m_iPortStatus );
-				ucIn = ((ucRx & 0xf0) ^ 0x80) >> 4;
-
-				// get lo nibble and combine with previous nibble to make byte
-				OUTPORT( m_iPortControl, B_00000100 );
-				IODELAY( IODELAY_2 );
-				ucRx = INPORT( m_iPortStatus );
-				ucIn |= (ucRx & 0xf0) ^ 0x80;
-
-				// reverse bits in byte
-				UCHAR ucReversed = 0;
-				for( int iC=0; iC<8; ++iC )
-				{
-					ucReversed <<= 1;
-					ucReversed |= (ucIn & 1);
-					ucIn >>= 1;
-				}
-
-				// store reversed byte
-				*pauc2++ = ucReversed;
-			}
+				*(pauc+iB) = GetDataByte();
 		#endif
 
 		// clock in 16 bytes which are ignored
 		for( iB=0; iB<16; ++iB )
-		{
-			// get hi nibble
-			OUTPORT( m_iPortControl, B_00000000 );
-			IODELAY( IODELAY_2 );
-			INPORT( m_iPortStatus );
-			// get lo nibble and combine with previous nibble to make byte
-			OUTPORT( m_iPortControl, B_00000100 );
- 			IODELAY( IODELAY_2 );
-			INPORT( m_iPortStatus );
-		}
+			GetDataByte();
 
 		// delay
 		WAITACK();
@@ -657,66 +778,165 @@ BOOL CRio::Rx32KBlock( void* pv, UINT uiPos32KBlock )
 	return FALSE;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// operations
-BOOL CRio::CheckPresent( void )
+// mark bad blocks
+BOOL CRio::MarkBadBlocks( BOOL (*pfProgress)(int iPos, int iCount, void* cookie), void* cookie)
 {
-	long lA;
-
 	// create temp block
 	UCHAR* paucBlock;
 	NEWBLOCK( paucBlock );
 
-	// get a block
-	BOOL bResult = Rx32KBlock( paucBlock, ID_32KBLOCK_CHECKPRESENT );
-	if ( bResult )
+	// block count
+	USHORT usPos32KBlockEnd;
+	if ( m_bUseExternalFlash )
+		usPos32KBlockEnd = m_uiCount32KBlockAvailableExternal;
+	else
+		usPos32KBlockEnd = m_bSpecialEdition ? CRIO_COUNT_32KBLOCKIN64M : CRIO_COUNT_32KBLOCKIN32M;
+
+	// assume directory block is ok
+	m_cDirBlock.m_auc32KBlockUsed[ 0 ] = CRIO_ID_32KBLOCK_FREE;
+
+	// process all blocks (except directory block)
+	int iCount32KBlockBad = 0;
+	USHORT usPos32KBlock;
+	for( usPos32KBlock=1; usPos32KBlock<usPos32KBlockEnd; ++usPos32KBlock )
 	{
-		// make copy of block
-		UCHAR* paucBlock2;
-		NEWBLOCK( paucBlock2 );
-		memcpy( paucBlock2, paucBlock, CRIO_SIZE_32KBLOCK );
+		UINT uiB;
 
-		// amend block
-		for( lA=0; lA<CRIO_SIZE_32KBLOCK; ++lA )
-			paucBlock2[ lA ] = (UCHAR)lA;
-
-		// save block
-		bResult = Tx32KBlock( paucBlock2, ID_32KBLOCK_CHECKPRESENT, 0, 0 );
-		if ( bResult )
+		// progress callback
+		if ( pfProgress )
 		{
-			// get block again
-			memset( paucBlock2, 0, CRIO_SIZE_32KBLOCK );
-			bResult = Rx32KBlock( paucBlock2, ID_32KBLOCK_CHECKPRESENT );
-			if ( bResult )
+			if ( !pfProgress(usPos32KBlock, usPos32KBlockEnd, cookie) )
 			{
-				// compare
-				for( lA=0; lA<CRIO_SIZE_32KBLOCK; ++lA )
-				{
-					if ( paucBlock2[lA] != (UCHAR)lA )
-						break;
-				}
-				// if block different
-				if ( lA < CRIO_SIZE_32KBLOCK )
-					bResult = FALSE;
-				// else block ok
-				else
-				{
-					//restore original block
-					bResult = Tx32KBlock( paucBlock, ID_32KBLOCK_CHECKPRESENT, 0, 0 );
-				}
+				LogError( CRIO_ERROR_INTERRUPTED, "operation interrupted" );
+				break;
 			}
 		}
 
-		DELETEBLOCK( paucBlock2 );
+		// default to bad block
+		UCHAR ucState = CRIO_ID_32KBLOCK_BAD;
+
+		// create and send test block 1
+		memset( paucBlock, B_10101010, CRIO_SIZE_32KBLOCK );
+		if ( !Tx32KBlock(paucBlock, usPos32KBlock, 0, 0) )
+			break;
+		// get test block 1
+		if ( !Rx32KBlock(paucBlock, usPos32KBlock) )
+			break;
+		// check test block 1
+		for( uiB=0; uiB<CRIO_SIZE_32KBLOCK; ++uiB )
+		{
+			if ( *(paucBlock+uiB) != B_10101010 )
+				break;
+		}
+		// if ok
+		if ( uiB == CRIO_SIZE_32KBLOCK )
+		{
+			// create and send test block 2
+			memset( paucBlock, B_01010101, CRIO_SIZE_32KBLOCK);
+			if ( !Tx32KBlock(paucBlock, usPos32KBlock, 0, 0) )
+				break;
+			// get test block 2
+			if ( !Rx32KBlock(paucBlock, usPos32KBlock) )
+				break;
+			// check test block 2
+			for( uiB=0; uiB<CRIO_SIZE_32KBLOCK; ++uiB )
+			{
+				if ( *(paucBlock+uiB) != B_01010101 )
+					break;
+			}
+			// if ok, block ok
+			if ( uiB == CRIO_SIZE_32KBLOCK )
+				ucState = CRIO_ID_32KBLOCK_FREE;
+		}
+
+		// store block state
+		m_cDirBlock.m_auc32KBlockUsed[ usPos32KBlock ] = ucState;
+
+		// adjust bad block count
+		if ( ucState == CRIO_ID_32KBLOCK_BAD )
+			++iCount32KBlockBad;
+	}
+	// if tx,rx block error or interrupted
+	if ( usPos32KBlock < usPos32KBlockEnd )
+		return FALSE;
+
+	// store blocks used and bad block count
+	m_cDirBlock.m_cDirHeader.m_usCount32KBlockUsed = iCount32KBlockBad;
+	m_cDirBlock.m_cDirHeader.m_usCount32KBlockBad = iCount32KBlockBad;
+
+	return TRUE;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// operations
+void CRio::UseExternalFlash( BOOL bUseExternalFlash )
+{
+	m_bUseExternalFlash = bUseExternalFlash;
+}
+
+BOOL CRio::CheckPresent( void )
+{
+	// io intro
+	if ( !IOIntro() )
+		return FALSE;
+
+	// bank to check (bank 0-3 are internal, bank 4 external)
+	int iPos = m_bUseExternalFlash ? POS_BANK_EXTERNALFLASH : 0;
+
+	// issue read id command
+	COMMANDOUT( 0xab, B_00001100, B_00000100 );
+	COMMANDOUT( iPos, B_00000000, B_00000100 );
+	COMMANDOUT( 0xa1, B_00001100, B_00000100 );
+	COMMANDOUT( 0x90, B_00000000, B_00000100 );
+	COMMANDOUT( 0xa2, B_00001100, B_00000100 );
+	COMMANDOUT( 0x00, B_00000000, B_00000100 );
+	COMMANDOUT( 0xa0, B_00001100, B_00000100 );
+	UCHAR ucManufacturer = GetDataByte();
+	UCHAR ucDevice = GetDataByte();
+
+	// check manufacturer code
+	switch( ucManufacturer )
+	{
+		case 0xa0:
+		case 0xaa:
+		case 0xff:
+		case 0xdd:
+		case 0x00:
+			LogError( CRIO_ERROR_DEVICENOTFOUND, "device not found" );
+			return FALSE;
 	}
 
-	DELETEBLOCK( paucBlock );
+	// determine bank size in 512 byte blocks
+	ULONG ulCount512ByteBlock;
+	switch( ucDevice )
+	{
+		case 0xea:
+		case 0x64:	ulCount512ByteBlock = 4096;		break;
+		case 0xe3:
+		case 0xe5:	ulCount512ByteBlock = 8192;		break;
+		case 0xe6:	ulCount512ByteBlock = 16384;	break;
+		case 0x73:	ulCount512ByteBlock = 32768;	break;
+		case 0x75:	ulCount512ByteBlock = 65536;	break;
+		default:
+			LogError( CRIO_ERROR_DEVICENOTFOUND, "device not found" );
+			return FALSE;
+	};
 
-	// if error
-	if ( !bResult )
-		LogError( CRIO_ERROR_DEVICENOTFOUND, "device not found" );
+	// if internal
+	if ( !m_bUseExternalFlash )
+	{
+		// if special edition found (each bank of 4 is 512 * 32768)
+		if ( ulCount512ByteBlock == 32768 )
+			m_bSpecialEdition = TRUE;
+	}
+	// else external
+	else
+	{
+		// convert page count to 32K block count
+		m_uiCount32KBlockAvailableExternal = (ulCount512ByteBlock * 512) / CRIO_SIZE_32KBLOCK;
+	}
 
-	return bResult;
+	return TRUE;
 }
 
 CDirEntry* CRio::FindFile( char* pszFile )
@@ -733,21 +953,39 @@ CDirEntry* CRio::FindFile( char* pszFile )
 	return NULL;
 }
 
-BOOL CRio::Initialize( void )
+BOOL CRio::Initialize( BOOL bMarkBadBlock, BOOL (*pfProgress)(int iPos, int iCount, void* cookie), void* cookie)
 {
+	CDirHeader& cDirHeader = m_cDirBlock.m_cDirHeader;
+
 	// init directory header
 	memset( &m_cDirBlock.m_cDirHeader, 0, sizeof(m_cDirBlock.m_cDirHeader) );
-	CDirHeader& cDirHeader = m_cDirBlock.m_cDirHeader;
-	cDirHeader.m_usCount32KBlockAvailable = 1024;
-	cDirHeader.m_usCount32KBlockRemaining = 1024;
+
 	//	set version (so compatible with Rio Manager v1.01)
 	cDirHeader.m_usVersion = 0x0100;
 	// init directory entries
 	memset( &m_cDirBlock.m_acDirEntry, 0, sizeof(m_cDirBlock.m_acDirEntry) );
 	// init block used flags
-	memset( &m_cDirBlock.m_auc32KBlockUsed, ID_32KBLOCK_FREE, sizeof(m_cDirBlock.m_auc32KBlockUsed) );
+	memset( &m_cDirBlock.m_auc32KBlockUsed, CRIO_ID_32KBLOCK_FREE, sizeof(m_cDirBlock.m_auc32KBlockUsed) );
 	// init FAT
 	memset( &m_cDirBlock.m_ausFAT, 0, sizeof(m_cDirBlock.m_ausFAT) );
+
+	// if mark bad block request
+	if ( bMarkBadBlock )
+	{
+		if ( !MarkBadBlocks(pfProgress, cookie) )
+			return FALSE;
+	}
+
+	// available blocks
+	if ( m_bUseExternalFlash )
+		cDirHeader.m_usCount32KBlockAvailable = m_uiCount32KBlockAvailableExternal;
+	else
+		cDirHeader.m_usCount32KBlockAvailable = m_bSpecialEdition ? CRIO_COUNT_32KBLOCKIN64M : CRIO_COUNT_32KBLOCKIN32M;
+
+	// blocks remaining (taking into account bad blocks)
+	cDirHeader.m_usCount32KBlockRemaining =
+		cDirHeader.m_usCount32KBlockAvailable -
+		cDirHeader.m_usCount32KBlockBad;
 
 	return TRUE;
 }
@@ -766,7 +1004,7 @@ BOOL CRio::RemoveFile( char* pszFile )
 	USHORT usPos32KBlock = pDirEntry->m_usPos32KBlock;
 	while( usPos32KBlock )
 	{
-		m_cDirBlock.m_auc32KBlockUsed[ usPos32KBlock ] = ID_32KBLOCK_FREE;
+		m_cDirBlock.m_auc32KBlockUsed[ usPos32KBlock ] = CRIO_ID_32KBLOCK_FREE;
 		USHORT usTemp = m_cDirBlock.m_ausFAT[ usPos32KBlock ];
 		m_cDirBlock.m_ausFAT[ usPos32KBlock ] = 0;
 		usPos32KBlock = usTemp;
@@ -796,45 +1034,76 @@ BOOL CRio::RemoveFile( char* pszFile )
 	return TRUE;
 }
 
-BOOL CRio::RemoveAllFiles()
+BOOL CRio::RemoveAllFiles( void )
 {
-	CDirEntry* pDirEntry = m_cDirBlock.m_acDirEntry;
-    int iCountEntry = m_cDirBlock.m_cDirHeader.m_usCountEntry;
+	CDirHeader& cDirHeader = m_cDirBlock.m_cDirHeader;
 
-	for(int count=0; count<iCountEntry; ++count)
+	// init entries
+	cDirHeader.m_usCountEntry = 0;
+
+	// init block used flags
+	UCHAR* pauc = m_cDirBlock.m_auc32KBlockUsed;
+	for( int iA=0; iA<CRIO_MAX_32KBLOCK; ++iA, ++pauc )
 	{
-	    // free FAT and blocks used
-	    USHORT usPos32KBlock = pDirEntry->m_usPos32KBlock;
-	    while( usPos32KBlock )
-	    {
-		    m_cDirBlock.m_auc32KBlockUsed[ usPos32KBlock ] = ID_32KBLOCK_FREE;
-		    USHORT usTemp = m_cDirBlock.m_ausFAT[ usPos32KBlock ];
-		    m_cDirBlock.m_ausFAT[ usPos32KBlock ] = 0;
-		    usPos32KBlock = usTemp;
-	    }
-
-	    // adjust directory header
-	    CDirHeader& cDirHeader = m_cDirBlock.m_cDirHeader;
-	    --cDirHeader.m_usCountEntry;
-	    cDirHeader.m_usCount32KBlockUsed -= pDirEntry->m_usCount32KBlock;
-	    cDirHeader.m_usCount32KBlockRemaining += pDirEntry->m_usCount32KBlock;
-
-	    // clear directory entry
-	    memset( pDirEntry, 0, sizeof(CDirEntry) );
-
-	    // shuffle directory entries
-	    int iPosEntry = pDirEntry - m_cDirBlock.m_acDirEntry;
-	    int iCount = (int)cDirHeader.m_usCountEntry - iPosEntry;
-	    for( int iA=0; iA<iCount; ++iA )
-	    {
-		    memcpy(
-			    &m_cDirBlock.m_acDirEntry[ iPosEntry+iA ],
-			    &m_cDirBlock.m_acDirEntry[ iPosEntry+iA+1 ],
-			    sizeof(CDirEntry)
-		    );
-	    }
+		if ( *pauc != CRIO_ID_32KBLOCK_BAD )
+			*pauc = CRIO_ID_32KBLOCK_FREE;
 	}
-	
+
+	// init FAT
+	memset( &m_cDirBlock.m_ausFAT, 0, sizeof(m_cDirBlock.m_ausFAT) );
+
+	// available blocks
+	if ( m_bUseExternalFlash )
+		cDirHeader.m_usCount32KBlockAvailable = m_uiCount32KBlockAvailableExternal;
+	else
+		cDirHeader.m_usCount32KBlockAvailable = m_bSpecialEdition ? CRIO_COUNT_32KBLOCKIN64M : CRIO_COUNT_32KBLOCKIN32M;
+
+	// used
+	cDirHeader.m_usCount32KBlockUsed = cDirHeader.m_usCount32KBlockBad;
+
+	// blocks remaining
+	cDirHeader.m_usCount32KBlockRemaining =
+		cDirHeader.m_usCount32KBlockAvailable -
+		cDirHeader.m_usCount32KBlockUsed;
+
+	return TRUE;
+}
+
+BOOL CRio::SetFileOrder( UINT* pauiPosOrder, UINT uiCount )
+{
+	// create copy of directory entries
+	CDirEntry* paDirEntry = m_cDirBlock.m_acDirEntry;
+	CDirEntry* paDirEntryNew = new CDirEntry[ CRIO_MAX_DIRENTRY ];
+	if ( !paDirEntryNew )
+	{
+		LogError( CRIO_ERROR_ALLOC, "new failed" );
+		return FALSE;
+	}
+	memcpy( paDirEntryNew, paDirEntry, CRIO_MAX_DIRENTRY * sizeof(CDirEntry) );
+
+	// current entry count
+	UINT uiCountEntry = m_cDirBlock.m_cDirHeader.m_usCountEntry;
+
+	// move entries
+	for( UINT uiPosNew=0; uiPosNew<uiCount; ++uiPosNew )
+	{
+		UINT uiPosOld = pauiPosOrder[ uiPosNew ];
+
+		if ( uiPosOld >= uiCountEntry || uiPosNew >= uiCountEntry )
+		{
+			LogError( CRIO_ERROR_INVALIDFILEPOSITION, "invalid file position" );
+			DELETEARRAY paDirEntryNew;
+			return FALSE;
+		}
+
+		memcpy( &paDirEntryNew[uiPosNew], &paDirEntry[uiPosOld], sizeof(CDirEntry) );
+	}
+
+	// update current directory entries
+	memcpy( paDirEntry, paDirEntryNew, CRIO_MAX_DIRENTRY * sizeof(CDirEntry) );
+
+	DELETEARRAY paDirEntryNew;
+
 	return TRUE;
 }
 
@@ -965,7 +1234,7 @@ BOOL CRio::TxFile( char* pszPathFile, BOOL (*pfProgress)(int iPos, int iCount, v
 		--cDirHeader.m_usCount32KBlockRemaining;
 
 		// mark first block as used by directory
-		m_cDirBlock.m_auc32KBlockUsed[ 0 ] = ID_32KBLOCK_USED;
+		m_cDirBlock.m_auc32KBlockUsed[ 0 ] = CRIO_ID_32KBLOCK_USED;
 
 		// first entry in FAT used by directory
 		m_cDirBlock.m_ausFAT[ 0 ] = 0;
@@ -1022,7 +1291,7 @@ BOOL CRio::TxFile( char* pszPathFile, BOOL (*pfProgress)(int iPos, int iCount, v
 		}
 
 		// mark as block used
-		m_cDirBlock.m_auc32KBlockUsed[ usPos32KBlockCurrent ] = ID_32KBLOCK_USED;
+		m_cDirBlock.m_auc32KBlockUsed[ usPos32KBlockCurrent ] = CRIO_ID_32KBLOCK_USED;
 
 		// get next block and update FAT
 		if ( usPos32KBlock == (usPos32KBlockEnd-1) )
@@ -1071,7 +1340,6 @@ BOOL CRio::TxFile( char* pszPathFile, BOOL (*pfProgress)(int iPos, int iCount, v
 	// if transfer ok
 	if ( usPos32KBlock == usPos32KBlockEnd )
 	{
-        pfProgress(usPos32KBlock, usPos32KBlockEnd, cookie);
 		// flag as ok
 		bResult = TRUE;
 		// IO outro
@@ -1154,7 +1422,6 @@ BOOL CRio::RxFile( char* pszPathFile, BOOL (*pfProgress)(int iPos, int iCount, v
 	// if transfer ok
 	if ( usPos32KBlock == usPos32KBlockEnd )
 	{
-        pfProgress(usPos32KBlock, usPos32KBlockEnd, cookie);
 		// flag as ok
 		bResult = TRUE;
 		// IO outro
@@ -1169,6 +1436,4 @@ BOOL CRio::RxFile( char* pszPathFile, BOOL (*pfProgress)(int iPos, int iCount, v
 
 	return bResult;
 }
-
-
 

@@ -11,7 +11,11 @@
 #include	"std.h"
 
 // version
-#define		CRIO_ID_VERSION				105
+#define		CRIO_ID_VERSION				107
+
+// blocks available on 32M and SE 64M unit
+#define		CRIO_COUNT_32KBLOCKIN32M	1024
+#define		CRIO_COUNT_32KBLOCKIN64M	2048
 
 // max available 32k blocks
 #define		CRIO_MAX_32KBLOCK			8192
@@ -21,6 +25,26 @@
 
 // max directory entries
 #define		CRIO_MAX_DIRENTRY			60
+
+// 32Kblock type
+#define		CRIO_ID_32KBLOCK_USED		0x00
+#define		CRIO_ID_32KBLOCK_BAD		0x0f
+#define		CRIO_ID_32KBLOCK_FREE		0xff
+
+// default io delay
+#if defined(_WINNT)
+	#define		CRIO_TIME_IODELAY_INIT	2000
+	#define		CRIO_TIME_IODELAY_RX	2
+	#define		CRIO_TIME_IODELAY_TX	10
+#elif defined(__OS2__)
+	#define		CRIO_TIME_IODELAY_INIT	3000
+	#define		CRIO_TIME_IODELAY_RX	0
+	#define		CRIO_TIME_IODELAY_TX	15
+#else
+	#define		CRIO_TIME_IODELAY_INIT	20000
+	#define		CRIO_TIME_IODELAY_RX	2
+	#define		CRIO_TIME_IODELAY_TX	100
+#endif
 
 // 32 bit word
 #if defined(__alpha)
@@ -43,6 +67,7 @@ enum
 	CRIO_ERROR_RXBLOCKRETRY,
 	CRIO_ERROR_CORRUPT,
 	CRIO_ERROR_FILENOTFOUND,
+	CRIO_ERROR_INVALIDFILEPOSITION,
 	CRIO_ERROR_MAXDIRENTRY,
 	CRIO_ERROR_MEMORY,
 	CRIO_ERROR_OPEN,
@@ -63,7 +88,7 @@ struct CDirHeader
 	USHORT m_usCount32KBlockAvailable;
 	USHORT m_usCount32KBlockUsed;
 	USHORT m_usCount32KBlockRemaining;
-	char m_acNotUsed[ 2 ];
+	USHORT m_usCount32KBlockBad;
 	SIGNED32 m_lTimeLastUpdate;
 	USHORT m_usChecksum1;
 	USHORT m_usChecksum2;
@@ -81,7 +106,7 @@ struct CDirEntry
 	SIGNED32 m_lSize;
 	char m_acNotUsed[ 5 ];
 	SIGNED32 m_lTimeUpload;
-	char m_aucProperty[ 4 ];
+	UCHAR m_aucProperty[ 4 ];
 	char m_acNotUsed3[ 5 ];
 	char m_szName[ 128 - 28 ];
 };
@@ -122,6 +147,14 @@ protected:
 	// error str
 	char m_szError[ 128 ];
 
+	// external flash 32K block count
+	UINT m_uiCount32KBlockAvailableExternal;
+
+	// io port delay's
+	long m_lTimeIODelayInit;
+	long m_lTimeIODelayTx;
+	long m_lTimeIODelayRx;
+
 	// port constants
 	int m_iPortBase;
 	int m_iPortData;
@@ -131,12 +164,20 @@ protected:
 	// error
 	int m_iIDError;
 
+	// internal/external flash ram flag
+	BOOL m_bUseExternalFlash;
+
+	// special edition flag
+	BOOL m_bSpecialEdition;
+
+	// operations
 	void LogError( int iType, const char* pszFormat, ... );
 	UINT FindFirstFree32KBlock( void );
 	UINT CalculateChecksum1( void );
 	UINT CalculateChecksum2( void );
 	BOOL WaitInput( int iValue );
 	BOOL WaitAck( void );
+	UINT GetDataByte( void );
 	BOOL IOIntro( void );
 	BOOL IOOutro( void );
 
@@ -146,6 +187,7 @@ protected:
 		UINT uiPos32KBlockNext );
 	BOOL Rx32KBlockRetry( void* pv, UINT uiPos32KBlock );
 	BOOL Rx32KBlock( void* pv, UINT uiPos32KBlock );
+	BOOL MarkBadBlocks( BOOL (*pfProgress)(int iPos, int iCount, void* cookie), void* cookie );
 
 public:
 
@@ -158,16 +200,26 @@ public:
 	~CRio();
 
 	// retrieval
+	long GetIODelayInit( void ) { return m_lTimeIODelayInit; }
+	long GetIODelayTx( void ) { return m_lTimeIODelayTx; }
+	long GetIODelayRx( void ) { return m_lTimeIODelayRx; }
 	CDirBlock& GetDirectoryBlock( void ) { return m_cDirBlock; }
 	int GetErrorID( void ) { return m_iIDError; }
 	char* GetErrorStr( void ) { return m_szError; }
+	BOOL GetUseExternalFlashStatus( void ) { return m_bUseExternalFlash; }
+	BOOL GetSpecialEditionStatus( void ) { return m_bSpecialEdition; }
 
 	// operations
+	void SetIODelayInit( long lTime ) { m_lTimeIODelayInit = lTime; }
+	void SetIODelayTx( long lTime ) { m_lTimeIODelayTx = lTime; }
+	void SetIODelayRx( long lTime ) { m_lTimeIODelayRx = lTime; }
+	void UseExternalFlash( BOOL bUseExternalFlash );
 	BOOL CheckPresent( void );
 	CDirEntry* FindFile( char* pszFile );
-	BOOL Initialize( void );
+	BOOL Initialize( BOOL bMarkBadBlock, BOOL (*pfProgress)(int iPos, int iCount, void* cookie), void* cookie);
 	BOOL RemoveFile( char* pszFile );
-    BOOL RemoveAllFiles( void );
+	BOOL RemoveAllFiles( void );
+	BOOL SetFileOrder( UINT* pauiPosOrder, UINT uiCount );
 	BOOL TxDirectory( void );
 	BOOL RxDirectory( void );
 	BOOL TxFile( char* pszPathFile, BOOL (*pfProgress)(int iPos, int iCount, void* cookie), void* cookie);
