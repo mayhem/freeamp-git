@@ -49,6 +49,12 @@ class SimpleUI : public UserInterface {
 
     void CreateUI();
 
+    static BOOL CALLBACK MainProc(	HWND hwnd, 
+						            UINT msg, 
+						            WPARAM wParam, 
+						            LPARAM lParam );
+    
+    void SetHwnd(HWND hwnd);
  protected:
       static void UIThreadFunc(void *);
 
@@ -58,6 +64,16 @@ class SimpleUI : public UserInterface {
     EventQueueRef   m_target;
     UIRef           m_ref;
 
+    HWND            m_hwnd;
+    HWND            m_hwndPlay;
+	HWND            m_hwndStop;
+	HWND            m_hwndPause;
+	HWND            m_hwndNext;
+	HWND            m_hwndLast;
+	HWND            m_hwndSlider;
+    HWND            m_hwndCurrent;
+    HWND            m_hwndTotal;
+	HWND            m_hwndStatus;
 };
 
 

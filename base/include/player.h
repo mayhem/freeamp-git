@@ -61,6 +61,7 @@ class Player {
     int32 RegisterUIs(UIRegistry* registry);
 
     void Run();
+    void SetArgs(int32 argc, char** argv);
 
     void testQueue();
     static void EventServiceThreadFunc(void *);

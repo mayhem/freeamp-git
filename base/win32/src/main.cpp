@@ -105,6 +105,11 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
     player->RegisterPMOs(pmo);
     player->RegisterUIs(ui);
 
+    // Let the player know if there are special requests from the user
+    // __argc and __argv are magical variables provided for us
+    // in MS's STDLIB.H file. 
+    player->SetArgs(__argc, __argv);
+
     // kick things off... player is now in charge!
     player->Run();
 
