@@ -24,7 +24,6 @@ ____________________________________________________________________________*/
 #define STRICT
 #ifdef WIN32
 #include <windows.h>
-#include <commctrl.h>
 #endif // WIN32
 
 #include <stdio.h>
