@@ -2134,7 +2134,7 @@ Error GTKMusicBrowser::AcceptEvent(Event *e)
                                               (PlaylistCurrentItemInfoEvent *)e;
             if (isVisible && pciie->Manager() == m_plm) {
                 gdk_threads_enter();
-                ChangeCurrentPlayingIndex(m_playingindex, temp);   
+                ChangeCurrentPlayingIndex(m_playingindex, temp);
                 gdk_threads_leave();
             }
             m_playingindex = temp;

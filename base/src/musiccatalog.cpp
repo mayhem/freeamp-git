@@ -51,7 +51,7 @@ using namespace std;
 #include "debug.h"
 
 #define METADATABASE_VERSION 1
-#define DATABASE_SUB_VERSION 2
+#define DATABASE_SUB_VERSION 3
 
 MusicCatalog::MusicCatalog(FAContext *context, char *databasepath)
 {
