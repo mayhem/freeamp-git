@@ -1,0 +1,787 @@
+                        FreeAmp Theme HOWTO
+                        -------------------
+                            written by
+                            Robert Kaye
+                         (rob@emusic.com)
+
+INTRODUCTION
+
+FreeAmp 2.0 supports fully customizable themes -- anyone with experience
+in Photoshop/Gimp and HTML should be able to create their own Themes.
+These themes are platform independent -- they will look exactly alike on
+Windows as they will on Linux. 
+
+FreeAmp themes are not limited to having one layout for the controls
+unlike WinAmp. The FreeAmp window can be any shape and the button layouts
+can be anything the theme designer desires. Care to leave out some 
+buttons or display items you don't care for? Go ahead leave them out --
+FreeAmp doesn't care.
+
+This howto will get you started writing themes for FreeAmp. Please note
+that this HOWTO is still in the beta stages, much like FreeAmp 2.0.
+If you find any problems with this HOWTO, please mail rob@emusic.com
+with your comments.
+
+
+NEW FEATURES IN BETA 3 (November 1, 1999)
+
+There are a few features that didn't make it into beta II:
+
+- The location for buttons on the theme can be specified as a point
+  and not as a rect.
+- Currently the Play and Pause buttons are implemented as a MultiState
+  button. For beta 3 the theme designer will also be able to choose
+  independent play and pause buttons called IPlay and IPause.
+
+
+NEW FEATURES BEFORE RELEASE
+
+- TrueType font support in Linux
+
+
+GETTING STARTED
+
+To get started working on FreeAmp themes, I recommend that you 
+grab freeamp.fat from the themes directory in your FreeAmp
+installation and decompile it using the supplied program MakeTheme:
+
+   MakeTheme -d freeamp.fat
+
+Take a brief look at the theme.xml file and the bitmaps that get
+unpackaged. Or you can look at Appendix B. :-) Then read on.
+
+
+THEMES
+
+A theme consists of at least three files that get packaged into one
+.fat file:
+
+  1) A bitmap for buttons/controls
+  2) A background bitmap for the player
+  3) theme.xml, which is an XML document that describes the layout 
+     of the theme
+
+Don't be scared by the XML -- in this case you might as well call it
+an HTML-like syntax, which sounds less intimidating. :-)
+
+A theme designer creates these three or more files in a seperate 
+directory and then points FreeAmp to these files. 
+
+The ThemePath preference should point to the theme directory or a 
+completed .fat file. To do this under Linux, edit the ThemePath preference 
+in ~/.freeamp/preferences, or under Windows edit the 
+HKEY_CURRENT_USER/Software/FreeAmp/FreeAmp v2.0/Main/ThemePath 
+registry value to point to your theme directory.
+
+If your theme supports the ReloadTheme button, you can edit the
+theme on disk and then click the ReloadTheme button to re-parse and
+reload the theme without exiting FreeAmp.
+
+When you are done with your theme and want to ship it off to the
+FreeAmp theme repository or to your friends, package it up using
+the MakeTheme program bundled with FreeAmp. Simply do:
+
+    MakeTheme mytheme.fat theme.xml *.bmp
+    
+in your theme directory. You can then add the mytheme.fat in
+the options dialog to load your theme.
+
+
+BITMAPS
+
+All controls in FreeAmp are bitmaps, and to keep things simple
+for all platforms all bitmaps are Windows bitmap format (BMP). 
+(Sorry, all you Linux fans. :-( ) It doesn't matter which bit depth 
+your theme bitmaps are, but usually 256 color bitmaps will suffice 
+while keeping the size of the theme down.
+
+For each bitmap the theme designer can specify a color which will
+be used as the transparent color in the bitmap. All pixels in that
+bitmap that are deemed to be transparent, will never be shown on
+a FreeAmp theme. This allows theme designers to create aribitrarily
+shaped FreeAmp windows and controls.
+
+Each bitmap is given a name -- other controls will refer back to
+this name in the theme.xml file.
+
+
+FONTS
+
+On Windows, TrueType fonts are used and on Linux the normal X Fonts
+are used. Hopefully by the final FreeAmp 2.0 release we will have
+TrueType font support for Linux as well. TrueType fonts will be
+the natural font choice for FreeAmp.
+
+However, there are a couple of issues to be considered with fonts.
+If you use some fancy font in a theme, there is a good chance that
+other people will not have that font on their machine. In that case,
+FreeAmp will fall back to the user configurable default font. This
+limits theme designers in their use of fonts, or their themes won't
+look as cool as they did on their own machine.
+
+To alleviate this problem there are two solutions:
+
+ 1) Allow a theme designer to package a font with the theme. This is 
+    a bad idea from a legal perspective -- a lot of fonts in use today
+    are copyrighted non free fonts and including a non-free font
+    presents a legal liability to us if we want to have a FreeAmp
+    theme respository on the FreeAmp site.
+ 2) Allow a theme designer to include a URL to a font. This way a theme
+    designer can use fonts that are freely available on the free font
+    repositories on the net. When FreeAmp comes across a font it does
+    not have, it will attempt to download that font, and then use
+    that font as soon as it is downloaded.
+
+#1 is out and I hope to be able to implement #2 before release. But,
+for right now, you need to rely the fonts that are installed on the
+users machine.
+
+A font is also given a name, which TextControl controls will refer back
+to.
+
+RECTS
+
+All througout a theme descriptions Rect attributes are used. A Rect
+specifies a rectangular region on a bitmap. The Rect is defined as
+
+   Rect="x1,y1,x2,y2"
+   
+Where x2 and y2 are inclusive of the Rect.
+
+
+THEME.XML
+
+The actual theme file is an XML document. Right now FreeAmp only
+supports XML documents encoded in ISO8859/1 (and even that has
+not been thouroughly tested). Just assume that the theme.xml
+file is a regular text file.
+
+XML differs from HTML in quite a few respects, but if you are
+familiar with HTML you should have no problem with XML. Just think
+as a theme as a special kind of HTML document.
+
+There are two major differences between HTML and XML. First, XML 
+is case sensitive. So ButtonControl is not the same as buttoncontrol.
+Second, XML has the concept of an empty tag where the two following
+constructs are equivalent:
+
+   <Info Desc="Subvert the dominant paradigm"> </Info>
+
+   <Info Desc="Subvert the dominant paradigm"/>
+
+The default FreeAmp theme makes copious use of the empty tag contsruct
+since many theme details are specified using attributes. 'Desc' in the 
+example above is an attribute to the Info tag. Attributes values *must*
+always be enclosed by double quotes and the attribute names are
+case sensitive as well.
+
+Also, we currently do not have a DTD specified for these XML files.
+Once we get out of beta, I will bring this HOWTO and a DTD up to
+the latest and greatest info.
+
+
+Bitmap:
+-------
+
+To specify a bitmap for use with a theme you might use:
+
+<Bitmap Name="Background" File="background.bmp" TransColor="#FF0000"/>
+
+This give the bitmap the name 'Background' and it tells FreeAmp
+that the bitmap resides in background.bmp, and that the Transparent
+color is primary red. The TransColor attribute specifies the color
+that is transparent. Just like HTML it does this with the triple
+hex notation with the # symbol. #FF0000 is red because it specifies all
+red, no green and no blue.
+
+You will want to specify one bitmap for the main background of your
+FreeAmp theme and one bitmap for buttons. You can use as many bitmaps
+as you like, but loading your theme om FreeAmp will be slower if you
+have many bitmaps. 
+
+
+Font:
+-----
+
+To specify a font:
+
+<Font Name="San Serif" Face="Arial,Helvetica"/>
+
+The Name attribute specifies the given name for this font that 
+TextControls will use. The Face attribute specifies which font to use.
+This can be a comma seperated list. FreeAmp will first attempt to
+find a font named Arial, and if it can't find that it will attempt
+to font font called Helvetica and so on. If FreeAmp can't find any
+of the specified fonts, it will use the default font.
+
+This comma seperated list is useful for specfying similar fonts on
+different operating systems. Using the contstruct above will pretty
+much garantee that you're going to get a san serif font on either
+Windows or Linux.
+
+
+Window:
+-------
+
+FreeAmp supports different windows in the same theme. The theme
+that ships with Beta 2 only has one window, but later themes will
+have support for window shades and other cool layouts. 
+
+The default window that FreeAmp opens a theme in is called 'MainWindow'.
+You may define as many other windows as you care -- make sure to
+include a ChangeWindow button to allow the user to change between
+windows. (See below for details)
+
+To specify the main window, use this construct:
+
+<Window Name="MainWindow">
+
+A Window cannot be an empty tag. Inside the Window tag you will need to
+define <BackgroundBitmap> and <Controls>.
+
+
+BackgroundBitmap:
+-----------------
+
+This tag tells freeamp which bitmap to use a the background for this
+window:
+
+    <BackgroundBitmap Name="Background" Rect="0, 0, 327, 191"/>
+
+The attributes include the Name, which refers to a name of a Bitmap
+as defined above, and a Rect which specifies the a rectangular area of
+the bitmap to use as the background.
+
+
+Controls:
+---------
+
+This tag has no attributes. It is a container for all the controls
+that are to be placed on a window. Inside of the Controls tag you may
+include <MultiStateControl>, <ButtonControl>, <TextControl> and
+<SliderControl> tags.
+
+
+ButtonControl:
+--------------
+
+Ok, now we're getting to the heart of FreeAmp themes. A ButtonControl
+presents a button to the user. The button may have 4 different states:
+ 
+    Normal, MouseOver, Pressed, and Disabled
+    
+A ControlBitmap (see below) will define bitmaps for each of these
+states. The ButtonControl tag only has one attribute:
+
+    <ButtonControl Name="Stop">
+
+The Name of the button is corresponds to a function in FreeAmp. In the
+case above, the control is tied to the Stop function. If the user presses
+this button the player will stop playing. See Appendix A at
+the end of this howto for a list of buttons that can be defined.
+The one exception to this rule are buttons that define a <ChangeWindow>
+tag. These buttons are used to switch to a different window layout
+and should use a name is not used by FreeAmp. I suggest that you use
+the name of the window layout that the ChangeWindow switches to. (Don't
+you hate people who end their sentences in prepositions?) 
+
+Buttons can be any arbitrary shape if the source bitmap specifies a
+transparent color with the TransColor attribute. Any portion of a button
+that is visible will be considered to be part of the active area of the
+button. When the user moves the mouse over an active portion of the
+button, a hint for that button is displayed in the Info text field.
+If the user clicks on the active area of a button it will be
+interpreted as a button press.
+
+The ButtonControl will need to include the <Info>, <Position>, and
+<ControlBitmap> and optionally include the <ChangeWindow> tag.
+
+
+MultiStateControl:
+------------------
+
+A MultiStateControl is just like a button, but it can take on different
+states. The Play button is implemented as a MultiStateControl and it
+therefore doubles as the Pause button as well:
+
+    <MultiStateControl Name="Play" NumStates="2">
+    
+The NumStates attribute defines how many different states a button
+can have. This number depends on the type of control that is being
+implemented. The Play and the Shuffle controls will always have 2 states
+(Play/Pause, ShuffleNone/Shuffle) and the Repeat control will always 
+have 3 states (RepeatNone,RepeatOne,RepeatAll).    
+
+The ButtonControl will need to include the <Info>, <Position>, and
+<ControlBitmap> tags.
+
+
+TextControl:
+------------
+
+A text control is an area where some information is displayed:
+
+    <TextControl Name="Title">
+
+The name of the TextControl is used to identify what information gets
+displayed in the field. You can specify Title, Info, BufferInfo, and
+Time TextControls.
+
+A TextControl will need to include the <Position> and <Style> tags.
+
+
+SliderControl:
+--------------
+
+SliderControls are used to control volume and seek position:
+
+    <SliderControl Name="Volume">  
+
+The Name can either be Volume or Seek. The SliderControl needs to 
+define the <Info>, <Position>, and <ControlBitmap> tags. The only
+bitmaps associated with a slider control are the bitmaps for the
+thumb of the slider control. The actual frame of the control is part
+of the background bitmap. The thumb bitmap is specified by the
+<ControlBitmap> tag and has three states:
+
+    Normal, MouseOver, and Disabled
+
+Info:
+-----
+
+The Info tag is used to give the user feedback about a control:
+
+   	<Info Desc="Play/Pause the current track" Tip="Play"/>
+
+The text contained in the Desc attribute is displayed in the Info
+TextControl when the user moves the mouse over the control that
+specifies the Info tag. And, once we get tooltips implemented,
+the Tip attribute will define the text shown in the tooltip when
+the mouse hovers over a button.
+
+Position:
+---------
+
+The position tag includes the Rect attribute to indicate where the
+control should be placed on the background bitmap:
+
+    <Position Rect="202,122,234,155"/>
+
+The coordinates specified in the Rect attribute are in background bitmap
+coordinates. In the example above, the button will be placed 202 
+pixels to the right of the left edge of the control bitmap and
+122 pixels below the top edge of the control bitmap.
+
+In beta 3, the theme designer should also be able to specify a Pos
+instead of a Rect, and the size of the button will be determined
+from the information given in the ControlBitmap tag.
+
+
+ControlBitmap:
+--------------
+
+The ControlBitmap tag specifies the bitmap to use for a control:
+
+    <ControlBitmap Rect="237,148,288,163" Name="Buttons"/>
+    
+The coordinates specified in the Rect attribute are in "Buttons" bitmap
+coordinates. In the above case, the control bitmap starts 237 pixels
+to the right of the left edge of the Buttons bitmap, and 148 pixels
+below the top edge of the Buttons bitmap.
+
+The x2 and y2 coordinates of the control bitmap depend how many 'frames'
+the control expects in the ControlBitmap. For instance, the regular
+ButtonControl has 4 frames (Normal, MouseOver, Pressed and Disabled)
+and the ControlBitmap for a ButtonControl should be 4 times as wide as
+the specified Rect from the Position tag.
+
+For instance:
+
+    <Position Rect="182,100,246,115"/>
+    <ControlBitmap Rect="0,203,259,218" Name="Buttons"/>
+
+The Position Rect specifies a rectangular region that is 65 pixels
+wide and 16 pixels high. (Remember that Rects are x2,y2 inclusive,
+which means that you need to calculate the width like: w = x2 - x1 + 1.
+Same goes for height)
+
+Therefore the ControlBitmap needs to 65 * 4 = 260 pixels wide,
+and 16 pixels high. If the control bitmap starts at 0,203 then you
+arrive at: Rect="0,203,259,218"
+
+For a SliderControl thumb, you will need 3 frames. For a MultiStateControl
+you will need the ControlBitmap to be 4 frames wide and n frames high
+wheren is the value defined by the NumStates attribute. State 0 will
+be in the first row of bitmaps, state 1 in the second row and so on.
+
+Style:
+------
+
+The Style tag is used to define the style of a TextControl:
+
+   <Style Align="Left" Font="Serif" Bold="Yes"/>
+
+The Style tag must define the Font attribute which identifies 
+the font (defined by the <Font> tag) to use. The Style tag may
+also have an Align (Left, Center, Right), a Bold (Yes, No),
+a Italic (Yes, No), and an Underline (Yes, No) attribute. 
+Only the Font attribute is required, the others are optional.
+
+
+ChangeWindow:
+-------------
+
+A ChangeWindow tag is used to specify that a button should change
+the theme to a different window layout:
+
+   <ChangeWindow Window="WindowShade">
+   
+The Window attribute defines which layout to activate when the user
+clicks on this button. This layout must be defined in the current
+theme.
+   
+
+
+QUICK REFERENCE
+
+<Bitmap>
+   -- specifies a bitmap for use in the theme
+   
+   Attributes:   
+
+   Name -- The name of the bitmap as referenced by other controls
+   File -- The file where this bitmap can be found
+   TransColor -- An HTML color specification for use as the transparent color  
+   
+   Subtags:
+   
+   None.
+
+<Font>
+
+   -- specifies a font for use in the theme
+   
+   Attributes:   
+
+   Name -- The name of the bitmap as referenced by other controls
+   Face -- A comma seperated list of font faces to use
+
+   Subtags:
+   
+   None.
+
+<Window>
+
+   -- specifies a window layout.
+   
+   Attributes:
+   
+   Name -- The name of the window. Each theme must define a 'MainWindow'.
+
+   Subtags:
+   
+   <BackgroundBitmap> (required)
+   <Controls> (required)
+
+<BackgroundBitmap>
+
+   -- specifies which bitmap to use as the background bitmap
+   
+   Attributes:
+   
+   Name -- The name of the bitmap to use for the background
+   Rect -- The which section of the bitmap to use as the background
+   
+   Subtags:
+   
+   None.
+   
+
+<Controls>
+   
+   -- specifies which controls to place in the window
+   
+   Attributes:
+   
+   None.
+   
+   Subtags:
+
+   <MultiStateControl>
+   <ButtonControl>
+   <TextControl>
+   <SliderControl>
+
+   
+<ButtonControls>
+
+   -- specifies a name button control
+   
+   Attributes:
+   
+   Name -- the name of the control. See Appendix A for a list of
+           possible control names.
+
+   Subtags:
+   
+   <Info> (required)
+   <Position> (required)
+   <ControlBitmap> (required) 
+
+<TextControl>
+
+   -- specifies a text display area
+   
+   Attributes:
+   
+   Name -- the name of the control. See Appendix A for a list of
+           possible control names.
+
+   Subtags:
+
+   <Position> (required)
+   <Style> (required) 
+
+<SliderControl>
+
+   -- specifies a slider control
+   
+   Attributes:
+   
+   Name -- the name of the control. See Appendix A for a list of
+           possible control names.
+
+   Subtags:
+
+   <Info> (required)
+   <Position> (required)
+   <ControlBitmap> (required) 
+
+<Info>
+
+   -- specifies textual information for this control such as the
+      description and the tooltip.   
+
+   Attributes:
+   
+   Desc -- the text displayed in the Info TextControl when the user
+           moves the mouse over the control.
+   Tip -- The tooltip text to display when the user places the mouse
+          over the control. (Not currently implemented) [optional]
+          
+   Subtags:
+   
+   None.
+   
+<Position>
+
+   -- specifies the location of the control on the window
+   
+   Attributes:
+   
+   Rect -- the location where the control should appear
+   
+   Subtags:
+   
+   None.
+   
+<ControlBitmap>
+
+   -- specifies the source bitmap and source locations for a control
+   
+   Attributes:
+   
+   Rect -- the location where the multi-frame bitmap is located
+   Name -- the name of the bitmap to take the bitmaps from
+   
+   Subtags:
+   
+   None.
+  
+<Style>
+
+   -- specifies the font and font style for a TextControl
+   
+   Attributes:
+   
+   Font -- The name of the font to be used in this control 
+   Align -- The text alignment within the control (Left, Center, Right) [optional]     
+   Bold -- Show text in boldface (Yes, No) [optional]
+   Italic -- Show text in italics (Yes, No) [optional]
+   Underline -- Show text underlined (Yes, No) [optional]
+   
+
+Troubleshooting:
+
+Q: When I move the mouse over a button the button moves slightly.
+   What's up with that?
+   
+A: The Rect specified in the ControlBitmap tag is of a different size
+   than the Rect specified in the Position tag.
+
+Q: Why does it hurt when I pee?
+
+A: http://www.emusic.com/artists/48/
+
+
+APPENDIX A
+
+
+Available Control Names
+
+MultiStateControls:
+
+Play     -- Play/Pause button
+Repeat	 -- Repeat None/Repeat One/Repeat All
+Shuffle  -- Normal/Shuffle mode
+
+Buttons:
+
+Stop	    -- stop playing
+Prev	    -- go to previous track
+Next        -- go to next track
+Quit        -- quit the player
+MyMusic		-- open musicbrowser
+Options		-- open options dialog
+Playlist	-- open playlist view (this will go away in beta III)
+Download	-- open the download manager
+Logo		-- FreeAmp logo, clicking it will open a web browser to 
+               the freeamp site.
+Minimize	-- Minimizes freeamp
+ReloadTheme -- Reload the current theme
+
+TextControls:
+
+Title		-- The song title text area
+Info		-- The area where button info and status messages get displayed
+BufferInfo  -- The input and output buffer states (for streaming only)
+Time        -- The time display
+        
+SliderControls:        
+        
+Volume  	-- adjusts the volume
+Seek        -- seek in a track
+  
+
+   
+APPENDIX B
+
+This is the current theme.xml file:
+
+
+<Bitmap Name="Background" File="background.bmp" TransColor="#FF0000"/>
+<Bitmap Name="Buttons" File="buttons.bmp" TransColor="#FF0000"/>
+<Font Name="San Serif" Face="Arial,Helvetica"/>
+<Font Name="Serif" Face="Footlight MT Light"/>
+
+<!-- This is a comment! -->
+<Window Name="MainWindow">
+    <BackgroundBitmap Name="Background" Rect="0, 0, 327, 191"/>
+    <Controls>
+        <MultiStateControl Name="Play" NumStates="2">
+        	<Info Desc="Play/Pause the current track" Tip="Play"/>
+            <Position Rect="202,122,234,155"/>
+            <ControlBitmap Rect="0,68,127,135" Name="Buttons"/>
+        </MultiStateControl>
+        <ButtonControl Name="Logo">
+        	<Info Desc="Go to the FreeAmp web site" Tip="FreeAmp"/>
+            <Position Rect="23,128,89,147"/>
+            <ControlBitmap Rect="0,236,267,255" Name="Buttons"/>
+        </ButtonControl>
+        <ButtonControl Name="Stop">
+        	<Info Desc="Stop the current track" Tip="Stop"/>
+            <Position Rect="235,122,267,155"/>
+            <ControlBitmap Rect="0,34,127,67" Name="Buttons"/>
+        </ButtonControl>
+        <ButtonControl Name="Prev">
+        	<Info Desc="Move to previous track" Tip="Prev"/>
+            <Position Rect="170,122,202,155"/>
+            <ControlBitmap Rect="0,0,127,33" Name="Buttons"/>
+        </ButtonControl>
+        <ButtonControl Name="Next">
+        	<Info Desc="Move to next track" Tip="Next"/>
+            <Position Rect="267,122,299,155"/>
+            <ControlBitmap Rect="0,136,127,169" Name="Buttons"/>
+        </ButtonControl>	
+        <ButtonControl Name="Quit">
+        	<Info Desc="Quit FreeAmp" Tip="Quit"/>
+            <Position Rect="303,0,315,15"/>
+            <ControlBitmap Rect="237,148,288,163" Name="Buttons"/>
+        </ButtonControl>
+        <ButtonControl Name="Minimize">
+        	<Info Desc="Minimize FreeAmp" Tip="Minimize"/>
+            <Position Rect="289,0,301,15"/>
+            <ControlBitmap Rect="237,131,288,146" Name="Buttons"/>
+        </ButtonControl>
+        <ButtonControl Name="ReloadTheme">
+        	<Info Desc="Reload current theme" Tip="Reload theme"/>
+            <Position Rect="12,0,24,15"/>
+            <ControlBitmap Rect="237,114,288,129" Name="Buttons"/>
+        </ButtonControl>
+        <!--ButtonControl Name="WindowShade"!>
+        	<!--Info Desc="Change to windowshade" Tip="Windowshade"/!>
+            <!--Position Rect="269,4,280,13"/!>
+            <!--ControlBitmap Rect="237,97,288,112" Name="Buttons"/!>
+            <!--ChangeWindow Window="WindowShade"/!>
+        <!--/ButtonControl!>
+        <ButtonControl Name="MyMusic">
+        	<Info Desc="Browse my music collection" Tip="MyMusic"/>
+            <Position Rect="46,100,110,115"/>
+            <ControlBitmap Rect="0,171,259,186" Name="Buttons"/>
+        </ButtonControl>
+        <ButtonControl Name="Options">
+        	<Info Desc="Open the options window" Tip="Options"/>
+            <Position Rect="114,100,178,115"/>
+            <ControlBitmap Rect="0,187,259,202" Name="Buttons"/>
+        </ButtonControl>
+        <ButtonControl Name="Playlist">
+        	<Info Desc="Open the playlist window" Tip="Playlist"/>
+            <Position Rect="182,100,246,115"/>
+            <ControlBitmap Rect="0,203,259,218" Name="Buttons"/>
+        </ButtonControl>
+        <ButtonControl Name="Download">
+        	<Info Desc="Open the download manager" Tip="Download"/>
+            <Position Rect="249,100,319,115"/>
+            <ControlBitmap Rect="0,219,283,234" Name="Buttons"/>
+        </ButtonControl>
+        <MultiStateControl Name="Repeat" NumStates="3">
+        	<Info Desc="Set repeat mode" Tip="Repeat"/>
+            <Position Rect="140,125,163,150"/>
+            <!--Position Rect="140,125,163,150"/!>
+            <ControlBitmap Rect="136,64,231,141" Name="Buttons"/>
+        </MultiStateControl>
+        <MultiStateControl Name="Shuffle" NumStates="2">
+        	<Info Desc="Set shuffle mode" Tip="Shuffle"/>
+            <Position Rect="116,125,139,150"/>
+            <ControlBitmap Rect="136,11,231,62" Name="Buttons"/>
+        </MultiStateControl>
+        <TextControl Name="Title">
+            <Position Rect="13,21,314,38"/>
+            <!--Position Rect="13,21,150,38"/>
+            <Style Align="Left" Font="Serif" Bold="Yes"/>
+        </TextControl>
+        <TextControl Name="Info">
+            <Position Rect="13,53,179,67"/>
+            <Style Font="San Serif"/>
+        </TextControl>	 
+        <TextControl Name="BufferInfo">
+            <Position Rect="14,40,126,52"/>
+            <Style Font="San Serif"/>
+        </TextControl>
+        <TextControl Name="Time">
+        	<Info Desc="Change time display" Tip="Time"/>
+            <Position Rect="210,41,314,67"/>
+            <Style Font="San Serif" Align="Right" Bold="Yes"/>
+        </TextControl>
+        <SliderControl Name="Volume">  
+        	<Info Desc="Change volume" Tip="Volume"/>
+            <Position Rect="34,80,112,88"/>
+            <ControlBitmap Rect="136,0,183,8" Name="Buttons"/>
+        </SliderControl>
+        <SliderControl Name="Seek">
+        	<Info Desc="Seek in the current track" Tip="Seek"/>
+            <Position Rect="147,80,304,88"/>
+            <ControlBitmap Rect="136,0,183,8" Name="Buttons"/>
+        </SliderControl>
+    </Controls>
+</Window>            
