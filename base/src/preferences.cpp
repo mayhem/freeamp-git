@@ -69,35 +69,37 @@ SetDefaults()
     bool dummyBool;
 
     // set default for input buffer size
-    if (GetPrefInt32(kInputBufferSizePref, &dummyInt) == kError_NoPrefs)
+    if (GetPrefInt32(kInputBufferSizePref, &dummyInt) == kError_NoPrefValue)
 	SetPrefInt32(kInputBufferSizePref, kDefaultInputBufferSize);
 
     // set default for output buffer size
-    if (GetPrefInt32(kOutputBufferSizePref, &dummyInt) == kError_NoPrefs)
+    if (GetPrefInt32(kOutputBufferSizePref, &dummyInt) == kError_NoPrefValue)
 	SetPrefInt32(kOutputBufferSizePref, kDefaultOutputBufferSize);
 
     // set default for streaming buffer interval
-    if (GetPrefInt32(kStreamBufferIntervalPref, &dummyInt) == kError_NoPrefs)
+    if (GetPrefInt32(kStreamBufferIntervalPref, &dummyInt)
+	== kError_NoPrefValue)
 	SetPrefInt32(kStreamBufferIntervalPref, 
 		     kDefaultStreamBufferInterval);
 
     // set default for decoder thread priority
-    if (GetPrefInt32(kDecoderThreadPriorityPref, &dummyInt) == kError_NoPrefs)
+    if (GetPrefInt32(kDecoderThreadPriorityPref, &dummyInt)
+	== kError_NoPrefValue)
 	SetPrefInt32(kDecoderThreadPriorityPref, 
 		     kDefaultDecoderThreadPriority);
 
     // set defaults for logging
-    if (GetPrefBoolean(kUseDebugLogPref, &dummyBool) == kError_NoPrefs)
+    if (GetPrefBoolean(kUseDebugLogPref, &dummyBool) == kError_NoPrefValue)
 	SetPrefBoolean(kUseDebugLogPref, kDefaultLogging);
-    if (GetPrefBoolean(kLogMainPref, &dummyBool) == kError_NoPrefs)
+    if (GetPrefBoolean(kLogMainPref, &dummyBool) == kError_NoPrefValue)
 	SetPrefBoolean(kLogMainPref, kDefaultLogging);
-    if (GetPrefBoolean(kLogDecodePref, &dummyBool) == kError_NoPrefs)
+    if (GetPrefBoolean(kLogDecodePref, &dummyBool) == kError_NoPrefValue)
 	SetPrefBoolean(kLogDecodePref, kDefaultLogging);
-    if (GetPrefBoolean(kLogInputPref, &dummyBool) == kError_NoPrefs)
+    if (GetPrefBoolean(kLogInputPref, &dummyBool) == kError_NoPrefValue)
 	SetPrefBoolean(kLogInputPref, kDefaultLogging);
-    if (GetPrefBoolean(kLogOutputPref, &dummyBool) == kError_NoPrefs)
+    if (GetPrefBoolean(kLogOutputPref, &dummyBool) == kError_NoPrefValue)
 	SetPrefBoolean(kLogOutputPref, kDefaultLogging);
-    if (GetPrefBoolean(kLogPerformancePref, &dummyBool) == kError_NoPrefs)
+    if (GetPrefBoolean(kLogPerformancePref, &dummyBool) == kError_NoPrefValue)
 	SetPrefBoolean(kLogPerformancePref, kDefaultLogging);
 
     return kError_NoErr;
@@ -118,7 +120,11 @@ GetPrefBoolean(const char* pref, bool* value)
 	if (0 == strcasecmp(temp, "true"))
 	    *value = true;
 	else if (0 != strcasecmp(temp, "false"))
-	    error = kError_InvalidError; // XXX: Is this the right error?
+	{
+	    // In the case of a syntax error, pretend the preference doesn't
+	    // exist, so that it'll be replaced by a default value.
+	    error = kError_NoPrefValue;
+	}
     }
     return error;
 
@@ -145,8 +151,10 @@ GetPrefInt32(const char* pref, int32* value)
     if (IsntError(error))
     {
 	*value = strtol(temp, &endp, 10);
+	// In the case of a syntax error, pretend the preference doesn't
+	// exist, so that it'll be replaced by a default value.
 	if (*endp != '\0')
-	    error = kError_InvalidError; // XXX: Is this the right error?
+	    error = kError_NoPrefValue;
     }
     return error;
 }

@@ -283,22 +283,22 @@ SetDefaults()
 
     // set install directory value
     size = sizeof(buf);
-    if (GetPrefString(kInstallDirPref, buf, &size) == kError_NoPrefs)
+    if (GetPrefString(kInstallDirPref, buf, &size) == kError_NoPrefValue)
 	SetPrefString(kInstallDirPref, cwd);
     
     // set default ui value
     size = sizeof(buf);
-    if (GetPrefString(kUIPref, buf, &size) == kError_NoPrefs)
+    if (GetPrefString(kUIPref, buf, &size) == kError_NoPrefValue)
 	SetPrefString(kUIPref, kDefaultUI);
     
     // set default pmo value
     size = sizeof(buf);
-    if (GetPrefString(kPMOPref, buf, &size) == kError_NoPrefs)
+    if (GetPrefString(kPMOPref, buf, &size) == kError_NoPrefValue)
 	SetPrefString(kPMOPref, kDefaultPMO);
 
     // set default open/save dlg path value
     size = sizeof(buf);
-    if (GetPrefString(kOpenSaveDirPref, buf, &size) == kError_NoPrefs)
+    if (GetPrefString(kOpenSaveDirPref, buf, &size) == kError_NoPrefValue)
 	SetPrefString(kOpenSaveDirPref, cwd);
 
     // set default for window staying on top
@@ -366,7 +366,7 @@ GetPrefString(const char* pref, char* buf, uint32* len)
     }
     else
     {
-        error = kError_NoPrefs;
+        error = kError_NoPrefValue;
     }
   
     return error;
@@ -400,7 +400,7 @@ SetPrefString(const char* pref, const char* buf)
     }
     else
     {
-        error = kError_NoPrefs;
+        error = kError_NoPrefValue;
     }
   
     return error;
@@ -442,7 +442,7 @@ GetPrefBoolean(const char* pref, bool* value)
     }
     else
     {
-        error = kError_NoPrefs;
+        error = kError_NoPrefValue;
     }
   
     return error;
@@ -478,7 +478,7 @@ SetPrefBoolean(const char* pref, bool value)
     }
     else
     {
-        error = kError_NoPrefs;
+        error = kError_NoPrefValue;
     }
   
     return error;
@@ -520,7 +520,7 @@ GetPrefInt32(const char* pref, int32* value)
     }
     else
     {
-        error = kError_NoPrefs;
+        error = kError_NoPrefValue;
     }
   
     return error;
@@ -556,7 +556,7 @@ SetPrefInt32(const char* pref, int32 value)
     }
     else
     {
-        error = kError_NoPrefs;
+        error = kError_NoPrefValue;
     }
   
     return error;

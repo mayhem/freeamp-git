@@ -462,32 +462,32 @@ SetDefaults()
 
     // set install directory value
     size = sizeof(buf);
-    if (GetPrefString(kInstallDirPref, buf, &size) == kError_NoPrefs)
+    if (GetPrefString(kInstallDirPref, buf, &size) == kError_NoPrefValue)
 	SetPrefString(kInstallDirPref, UNIX_LIBDIR);
 
     // set default freeamp library path value
     size = sizeof(buf);
-    if (GetPrefString(kLibraryPathPref, buf, &size) == kError_NoPrefs)
+    if (GetPrefString(kLibraryPathPref, buf, &size) == kError_NoPrefValue)
 	SetPrefString(kLibraryPathPref, kDefaultLibraryPath);
     
     // set default ui value
     size = sizeof(buf);
-    if (GetPrefString(kUIPref, buf, &size) == kError_NoPrefs)
+    if (GetPrefString(kUIPref, buf, &size) == kError_NoPrefValue)
 	SetPrefString(kUIPref, kDefaultUI);
     
     // set default text ui value
     size = sizeof(buf);
-    if (GetPrefString(kTextUIPref, buf, &size) == kError_NoPrefs)
+    if (GetPrefString(kTextUIPref, buf, &size) == kError_NoPrefValue)
 	SetPrefString(kTextUIPref, kDefaultTextUI);
     
     // set default pmo value
     size = sizeof(buf);
-    if (GetPrefString(kPMOPref, buf, &size) == kError_NoPrefs)
+    if (GetPrefString(kPMOPref, buf, &size) == kError_NoPrefValue)
 	SetPrefString(kPMOPref, kDefaultPMO);
 
     // set default ALSA device
     size = sizeof(buf);
-    if (GetPrefString(kALSADevicePref, buf, &size) == kError_NoPrefs)
+    if (GetPrefString(kALSADevicePref, buf, &size) == kError_NoPrefValue)
 	SetPrefString(kALSADevicePref, kDefaultALSADevice);
     
     Preferences::SetDefaults();
@@ -606,7 +606,7 @@ GetPrefString(const char* pref, char* buf, uint32* len)
     {
 	*len = 0;
 	m_mutex.Release();
-	return kError_NoPrefs;
+	return kError_NoPrefValue;
     }
 
     char *value = entry->value;
