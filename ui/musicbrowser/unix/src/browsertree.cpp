@@ -216,7 +216,11 @@ static gint nocase_compare(GtkCList *clist, gconstpointer ptr1,
 static gint TreeDataCompare(TreeData *a, TreeData *b)
 {
     bool retvalue = true;
-    if ((a->type == b->type) && (a->catalog == b->catalog) &&
+    if (!a && !b)
+        retvalue = false;
+    else if (!a || !b)
+        retvalue = true;
+    else if ((a->type == b->type) && (a->catalog == b->catalog) &&
         (a->artist == b->artist) && (a->album == b->album) &&
         (a->track == b->track) && (a->playlistname == b->playlistname))
         retvalue = false;
