@@ -194,18 +194,16 @@ CAPTION "Relatable"
 FONT 8, "MS Sans Serif"
 BEGIN
     CONTROL         "Text 2",IDC_RELATABLE_TEXT2,"Button",BS_OWNERDRAW | 
-                    BS_LEFT | BS_TOP | BS_FLAT | WS_TABSTOP,90,80,223,78
+                    BS_LEFT | BS_TOP | BS_FLAT | WS_TABSTOP,90,70,223,78
     CONTROL         141,IDC_STATIC,"Static",SS_BITMAP,2,2,81,161
     CONTROL         "Enjoy Relatable Features",IDC_RELATABLE_YES,"Button",
                     BS_AUTORADIOBUTTON,99,161,173,8
     CONTROL         "Cool! But I'll pass",IDC_RELATABLE_NO,"Button",
                     BS_AUTORADIOBUTTON,99,172,140,9
     CONTROL         "Text 1",IDC_RELATABLE_TEXT1,"Button",BS_OWNERDRAW | 
-                    BS_LEFT | BS_TOP | BS_FLAT | WS_TABSTOP,90,10,223,59
+                    BS_LEFT | BS_TOP | BS_FLAT | WS_TABSTOP,90,0,223,59
     CONTROL         "Caption 2",IDC_RELATABLE_CAPTION2,"Button",BS_OWNERDRAW | 
-                    BS_LEFT | BS_TOP | BS_FLAT | WS_TABSTOP,90,68,223,12
-    CONTROL         "Caption 1",IDC_RELATABLE_CAPTION1,"Button",BS_OWNERDRAW | 
-                    BS_LEFT | BS_TOP | BS_FLAT | WS_TABSTOP,90,0,223,11
+                    BS_LEFT | BS_TOP | BS_FLAT | WS_TABSTOP,90,58,223,12
 END
 
 IDD_INTROWIZARD_RELATABLETWO DIALOG DISCARDABLE  0, 0, 316, 182

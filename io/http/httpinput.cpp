@@ -521,15 +521,22 @@ Error HttpInput::Open(void)
     iConnect = connect(m_hHandle,(const sockaddr *)&sAddr,sizeof(sAddr));
     
     if (iConnect == -1) {
+
+#ifndef WIN32
         int error = errno;
 
         if (error != EINPROGRESS)
-	{
-	    ReportError("Cannot connect to host: %s", szHostName);
-	    closesocket(m_hHandle);
-	    return (Error)httpError_CannotConnect;
-	}
-	
+#else
+		int error = WSAGetLastError();
+
+		if (error != WSAEINPROGRESS)
+#endif
+		{
+	        ReportError("Cannot connect to host: %s", szHostName);
+	        closesocket(m_hHandle);
+	        return (Error)httpError_CannotConnect;
+		}
+
         int conattempt = 0;
         for(; iConnect && !m_bExit;)
         {

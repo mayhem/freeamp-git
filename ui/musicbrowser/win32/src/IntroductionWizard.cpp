@@ -819,16 +819,16 @@ static BOOL CALLBACK IntroWizardRelatableTwo(HWND hwnd,
             const char* kMsg1 = "Relatable automatically generates personalized playlists that are\n"
                                 "based on the files located on your computer and the music you\n"
                                 "listen to on the Web. The more you use the player, the better it\n"
-                                "works! You can create a profile below, or you can select the\n"
-                                "'Profiles' tab under 'Options' and create and save multiple\n"
-                                "profiles. Then, just start listening to music. After you have\n"
-                                "listened for a while, hit the 'Suggest' button to view and listen\n"
-                                "to a recommended list of songs. You can also check out\n"
-                                "'Recommended Streams' on the music browser window.  Learn\n"
-                                "more about Relatable features in the help menu.\n\n"
-                                "Check out the help menu for details on Relatable features, and for\n"
-                                "more information, please see our Web site or send questions to\n"
-                                "info@relatable.com";
+                                "works! Enter a profile name in the window below.  Then start\n"
+                                "listening to music.  After you have listened to a few songs, hit\n"
+                                "the 'Suggest' button on the player to view a personalized music\n"
+                                "playlist.  If you'd like to find music streams that are playing\n"
+                                "songs you like, check out the 'Recommended Streams' item in the\n"
+                                "'My Music' tree.\n\n"
+                                "Note: You can create additional music profiles by selecting\n"
+			                    "'Profiles' under the 'Options' menu in the My Music window. Check\n"
+								"out the Help menu for details on all the Relatable features,\n"
+								"or drop us a note with questions to info@relatable.com\n";
 
             const char* kCaption1 = "Profile Name: ";
             switch(ctrlId)
