@@ -381,9 +381,9 @@ int32 Player::ServiceEvent(Event *pC) {
 		    //cout << "released lock" << endl;
 		    delete e;
 		    
-		    e = new Event(CMD_QuitPlayer);
-	            Player::GetPlayer()->AcceptEvent(e);
-		    delete e;
+		    //e = new Event(CMD_QuitPlayer);
+	            //Player::GetPlayer()->AcceptEvent(e);
+		    //delete e;
 		    
 		}
 		return 0;

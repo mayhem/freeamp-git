@@ -34,20 +34,27 @@ ____________________________________________________________________________*/
 #include "registrar.h"
 
 
-#include "Mpg123UI.h"
-#define DEFAULT_PROG_NAME "freeamp"
-#define DEFAULT_PROG_NAME_LENGTH 7
-#define DEFAULT_CIO CommandLineCIO()
-#define DEFAULT_COO CommandLineCOO()
-
 void testVector();
 void testHashTable();
 
+bool CompareName(const char *p1, const char *p2) {
+    int32 i=0; int32 j=0;
+    if(!p1 ||!p2) return false;
+    while ((p1[i] == p2[j]) && p1[i] && p2[j]) {
+	i++; j++;
+    }
+    if (!p1[i] && (p2[j]=='-')) {
+	return true;
+    } else {
+	return false;
+    }
+}
 int main(int argc, char **argv) {
     //testVector();
     //testBuffer();
     //testHashTable();
 
+    Preferences *prefs = new Preferences();
     Registrar *registrar= new Registrar();
     LMCRegistry *lmc;
     PMIRegistry *pmi;
@@ -57,22 +64,22 @@ int main(int argc, char **argv) {
     registrar->SetSubDir("lmc");
     registrar->SetSearchString("*.lmc");
     lmc = new LMCRegistry();
-    registrar->InitializeRegistry(lmc);
+    registrar->InitializeRegistry(lmc,prefs);
 
     registrar->SetSubDir("io");
     registrar->SetSearchString("*.pmi");
     pmi = new PMIRegistry;
-    registrar->InitializeRegistry(pmi);
+    registrar->InitializeRegistry(pmi,prefs);
 
     registrar->SetSearchString("*.pmo");
     pmo = new PMORegistry;
-    registrar->InitializeRegistry(pmo);
+    registrar->InitializeRegistry(pmo,prefs);
 
 
     registrar->SetSubDir("ui");
     registrar->SetSearchString("*.ui");
     ui = new UIRegistry;
-    registrar->InitializeRegistry(ui);
+    registrar->InitializeRegistry(ui,prefs);
 
     delete registrar;
 
@@ -87,34 +94,6 @@ int main(int argc, char **argv) {
     //cout << "Registered DummyCOO" << endl;
     //Event *pe = new Event(CMD_QuitPlayer);
     //Player::GetPlayer()->AcceptEvent(pe);
-#if 0
-    int foo = strlen(argv[0]);
-    int endOfArgv0 = ((int)(argv[0])) + foo;
-    if (((int)(strstr(argv[0],DEFAULT_PROG_NAME)) + /*length of "freeamp" */ DEFAULT_PROG_NAME_LENGTH) == endOfArgv0) {
-	cout << "Using FreeAmp interface..." << endl;
-	pCIO = new DEFAULT_CIO;
-	pP->RegisterCIO(pCIO);
-	//cout << "Registered CommandLine CIO" << endl;
-	pCOO = new DEFAULT_COO;
-	pP->RegisterCOO(pCOO) ;
-	//cout << "Registered CommandLine COO" << endl;
-    } 
-
-    else if (((int)(strstr(argv[0],"mpg123")) + 6) == endOfArgv0) {
-	// mpg123, etc here
-	//cout << "Using mpg123 interface..." << endl;
-	Mpg123UI *pMpg = new Mpg123UI();
-	pCIO = (CIO *)pMpg;
-	pCOO = (COO *)pMpg;
-	pP->RegisterCIO(pCIO);
-	pP->RegisterCOO(pCOO) ;
-    }
-	cout << "Using FreeAmp interface..." << endl;
-	pCIO = new DEFAULT_CIO;
-	pP->RegisterCIO(pCIO);
-	pCOO = new DEFAULT_COO;
-	pP->RegisterCOO(pCOO) ;
-#endif
 
     pP->RegisterLMCs(lmc);
     pP->RegisterPMIs(pmi);
@@ -123,41 +102,28 @@ int main(int argc, char **argv) {
 
 
     //cout << "Looking to start up a UI..." << endl;
-    RegistryItem *item = ui->GetItem(0);
-    if (item) {
-	//cout << "Got an item..." << endl;
-	UI *myui = new UI;
-	item->InitFunction()(myui);
-	myui->SetArgs(myui,argc,argv);
+    char *calledName = strrchr(argv[0],'/');
+    if (!calledName) calledName = argv[0]; else calledName++;
+    int32 index = 0;
+    RegistryItem *item = ui->GetItem(index++);
+    while (item) {
+	if (CompareName(calledName,item->Name())) {
+	    UI *myui = new UI;
+	    item->InitFunction()(myui);
+	    myui->SetArgs(myui,argc,argv);
+//	    pP->RegisterActiveUI((EventQueue *)myui);
+	    break;
+	}
+	item = ui->GetItem(index++);
+    }
+
+    if (!item) {
+	cout << "Error initializing UI!" << endl;
+	return 1;
     }
 
 
-//    if (!pCIO || !pCOO) {
-//	cout << "Error initializing UI." << endl;
-//	return 255;
-    //   }
-//    pCIO->setArgs(argc,argv);
-//    pCIO = NULL;  // is deleted by player now that it is Registered.
-//    pCOO = NULL;
-    //cout << "Set the args..." << endl;
-    //pP->testQueue();
-
-//    Event *pC = new Event(CMD_Stop);
-//    pP->acceptEvent(*pC);
-//    delete pC;
-//    pC = new Event(CMD_NextSong);
-//    pP->acceptEvent(*pC);
-//    delete pC;
-//    pC = new Event(CMD_QuitPlayer);
-//    pP->acceptEvent(*pC);
-//    delete pC;
-//    cout << "main: stopping..." << endl;
-
     termSemaphore->Wait();
-
-//    while (globalTimeToTerminate == 0) {
-//	usleep(300000);
-//  }
     delete pP;
     return 0;
 }

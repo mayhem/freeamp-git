@@ -41,7 +41,7 @@ pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
 
-top_builddir = ../..
+top_builddir = ../../..
 
 ACLOCAL = @ACLOCAL@
 AUTOCONF = @AUTOCONF@
@@ -74,37 +74,34 @@ RANLIB = @RANLIB@
 VERSION = @VERSION@
 target_os = @target_os@
 
-@AM_HAVE_WIN32_TRUE@TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
 @AM_HAVE_WIN32_TRUE@FILES = 
-@AM_HAVE_WIN32_TRUE@INCLS = 
-@AM_HAVE_WIN32_FALSE@TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
-@AM_HAVE_WIN32_FALSE@FILES = player.cpp command.cpp playlist.cpp hashtable.cpp thread.cpp registrar.cpp registry.cpp
-@AM_HAVE_WIN32_FALSE@INCLS = -I@top_srcdir@/base/unix/include
+@AM_HAVE_WIN32_TRUE@MYLIBS = 
+@AM_HAVE_WIN32_FALSE@FILES = preferences.cpp bootstrap.cpp win32impl.cpp
+@AM_HAVE_WIN32_FALSE@MYLIBS = libfaunix.a
 
 @AM_HAVE_LINUXTHREADS_TRUE@REENT = -D_REENTRANT
 
-noinst_LIBRARIES = libfabase.a
-libfabase_a_SOURCES = $(FILES)
+noinst_LIBRARIES = $(MYLIBS)
+libfaunix_a_SOURCES = $(FILES)
 
-INCLUDES = -I@top_srcdir@/base/include -I$(TRGT_SYS_HEADS) -I@top_srcdir@/io/include -I@top_srcdir@/ui/include -I@top_srcdir@/lmc/include -I@top_srcdir@/ui/dummy/include -I@top_srcdir@/io/local -I@top_srcdir@/lmc/xingmp3/include -I@top_srcdir@/ui/cmdline $(INCLS)
-CXXFLAGS = -D__@target_os@__ $(REENT) $(EXTRA_CXXFLAGS)
+INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I@top_srcdir@/io/include -I@top_srcdir@/ui/include -I@top_srcdir@/base/unix/@target_os@/include -I@top_srcdir@/ui/dummy/include -I@top_srcdir@/lmc/include
+CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT) -D__@target_os@__
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
-CONFIG_HEADER = ../../config/config.h
+CONFIG_HEADER = ../../../config/config.h
 CONFIG_CLEAN_FILES = 
 LIBRARIES =  $(noinst_LIBRARIES)
 
 
-DEFS = @DEFS@ -I. -I$(srcdir) -I../../config
+DEFS = @DEFS@ -I. -I$(srcdir) -I../../../config
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-libfabase_a_LIBADD = 
-@AM_HAVE_WIN32_TRUE@cond0libfabase_a_OBJECTS = 
-@AM_HAVE_WIN32_FALSE@cond1libfabase_a_OBJECTS =  player.o command.o \
-@AM_HAVE_WIN32_FALSE@playlist.o hashtable.o thread.o registrar.o \
-@AM_HAVE_WIN32_FALSE@registry.o
-libfabase_a_OBJECTS =  $(cond0libfabase_a_OBJECTS) \
-$(cond1libfabase_a_OBJECTS)
+libfaunix_a_LIBADD = 
+@AM_HAVE_WIN32_TRUE@cond0libfaunix_a_OBJECTS = 
+@AM_HAVE_WIN32_FALSE@cond1libfaunix_a_OBJECTS =  preferences.o \
+@AM_HAVE_WIN32_FALSE@bootstrap.o win32impl.o
+libfaunix_a_OBJECTS =  $(cond0libfaunix_a_OBJECTS) \
+$(cond1libfaunix_a_OBJECTS)
 AR = ar
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 CXXLINK = $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@
@@ -115,18 +112,17 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP = --best
-DEP_FILES =  .deps/command.P .deps/hashtable.P .deps/player.P \
-.deps/playlist.P .deps/registrar.P .deps/registry.P .deps/thread.P
+DEP_FILES =  .deps/bootstrap.P .deps/preferences.P .deps/win32impl.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
-SOURCES = $(libfabase_a_SOURCES)
-OBJECTS = $(libfabase_a_OBJECTS)
+SOURCES = $(libfaunix_a_SOURCES)
+OBJECTS = $(libfaunix_a_OBJECTS)
 
 all: Makefile $(LIBRARIES)
 
 .SUFFIXES:
 .SUFFIXES: .S .c .cpp .o .s
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4)
-	cd $(top_srcdir) && $(AUTOMAKE) --gnu base/src/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu base/unix/src/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
@@ -158,10 +154,10 @@ distclean-compile:
 
 maintainer-clean-compile:
 
-libfabase.a: $(libfabase_a_OBJECTS) $(libfabase_a_DEPENDENCIES)
-	-rm -f libfabase.a
-	$(AR) cru libfabase.a $(libfabase_a_OBJECTS) $(libfabase_a_LIBADD)
-	$(RANLIB) libfabase.a
+libfaunix.a: $(libfaunix_a_OBJECTS) $(libfaunix_a_DEPENDENCIES)
+	-rm -f libfaunix.a
+	$(AR) cru libfaunix.a $(libfaunix_a_OBJECTS) $(libfaunix_a_LIBADD)
+	$(RANLIB) libfaunix.a
 .cpp.o:
 	$(CXXCOMPILE) -c $<
 
@@ -192,14 +188,14 @@ maintainer-clean-tags:
 
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 
-subdir = base/src
+subdir = base/unix/src
 
 distdir: $(DISTFILES)
 	here=`cd $(top_builddir) && pwd`; \
 	top_distdir=`cd $(top_distdir) && pwd`; \
 	distdir=`cd $(distdir) && pwd`; \
 	cd $(top_srcdir) \
-	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu base/src/Makefile
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu base/unix/src/Makefile
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  test -f $(distdir)/$$file \

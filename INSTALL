@@ -5,12 +5,7 @@ Linux:
 	Under Linux you must first build the binary:
 
 	./configure
-	make ; make
-
-	unfortunately, there is an issue with the build that is
-	currently open which makes you have to type make twice.  If
-	you are a Make and Autoconf wizard, we'd appreciate a fix.
-	Otherwise, please check out the Tar-O-Matic soon.
+	make 
 
 	then install it (by default, /usr/local/bin  which can be 
 	changed by providing the --bindir switch on the configure command 
