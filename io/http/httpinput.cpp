@@ -288,10 +288,10 @@ Error HttpInput::Open(void)
     szStreamUrl = NULL;
     if (!m_bUseProxy)
     {
-        iRet = sscanf(m_path, "http://%[^:/]:%d", szHostName, &iPort);
+        iRet = sscanf(m_path, " http://%[^:/]:%d", szHostName, &iPort);
         if (iRet < 1)
         {
-           ReportError("Bad URL format. URL format: http:<host name>"
+           ReportError("Bad URL format. URL format: http://<host name>"
                        ":[port][/path]. Please check the URL and try again.");
            return (Error)httpError_BadUrl;
         }
@@ -299,12 +299,14 @@ Error HttpInput::Open(void)
      }
      else
      {
-        iRet = sscanf(m_szProxyHost, "http://%[^:/]:%d", szHostName, &iPort);
+        iRet = sscanf(m_szProxyHost, " http://%[^:/]:%d", szHostName, &iPort);
         if (iRet < 1)
         {
            ReportError("Bad Proxy URL format. URL format: http:"
                        "//<host name>:[port]. Please check your proxy settings "
                        "in the Options.");
+                       
+           m_pContext->log->Error("Debug: m_szProxyHost: '%s'\n", m_szProxyHost);
            return (Error)httpError_BadUrl;
         }
         szFile = m_path;
