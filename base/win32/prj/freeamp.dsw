@@ -54,11 +54,23 @@ Package=<4>
     Project_Dep_Name xing
     End Project Dependency
     Begin Project Dependency
-    Project_Dep_Name simple
-    End Project Dependency
-    Begin Project Dependency
     Project_Dep_Name freeampui
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name freeampdev
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "freeampdev"=..\..\..\ui\freeampdev\win32\prj\freeampdev.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
 }}}
 
 ###############################################################################

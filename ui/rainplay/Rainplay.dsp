@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /Yu"stdafx.h" /FD /c
-# ADD CPP /nologo /GB /MD /W3 /GX /O2 /Op /Ob2 /I "..\..\config" /I "..\include" /I "..\..\base\include" /I "..\..\base\win32\include" /I "..\..\lmc\include" /I "..\..\io\include" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_WINDLL" /D "_MBCS" /D "_USRDLL" /D "__FREEAMP_UI__" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\..\config" /I "..\include" /I "..\..\base\include" /I "..\..\base\win32\include" /I "..\..\lmc\include" /I "..\..\io\include" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_WINDLL" /D "_MBCS" /D "_USRDLL" /D "__FREEAMP_UI__" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x804 /d "NDEBUG" /d "_AFXDLL"
@@ -57,8 +57,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\base\win32\prj\plugins mkdir\
-              ..\..\base\win32\prj\plugins	copy plugins\rainplay.ui\
-   ..\..\base\win32\prj\plugins
+               ..\..\base\win32\prj\plugins	copy plugins\rainplay.ui\
+    ..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "Rainplay - Win32 Debug"
@@ -75,7 +75,7 @@ PostBuild_Cmds=IF NOT EXIST ..\..\base\win32\prj\plugins mkdir\
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MDd /W3 /GX /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /Yu"stdafx.h" /FD /ZI /GZ /c
-# ADD CPP /nologo /MDd /W3 /GX /O2 /I "..\..\base\win32\include" /I "..\..\lmc\include" /I "..\..\io\include" /I "..\..\config" /I "..\include" /I "..\..\base\include" /D "_DEBUG" /D "_AFXDLL" /D "WIN32" /D "_WINDOWS" /D "_WINDLL" /D "_MBCS" /D "_USRDLL" /D "__FREEAMP_UI__" /FD /ZI /GZ /c
+# ADD CPP /nologo /MDd /W3 /GX /Od /I "..\..\base\win32\include" /I "..\..\lmc\include" /I "..\..\io\include" /I "..\..\config" /I "..\include" /I "..\..\base\include" /D "_DEBUG" /D "_AFXDLL" /D "WIN32" /D "_WINDOWS" /D "_WINDLL" /D "_MBCS" /D "_USRDLL" /D "__FREEAMP_UI__" /FD /ZI /GZ /c
 # SUBTRACT CPP /YX
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
@@ -90,8 +90,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\base\win32\prj\plugins mkdir\
-              ..\..\base\win32\prj\plugins	copy plugins\rainplay.ui\
-   ..\..\base\win32\prj\plugins
+               ..\..\base\win32\prj\plugins	copy plugins\rainplay.ui\
+    ..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 

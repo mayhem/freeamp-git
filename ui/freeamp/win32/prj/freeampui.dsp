@@ -44,7 +44,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /GB /MD /W3 /GX /O2 /Op /Ob2 /I "..\res" /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\res" /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o NUL /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /o NUL /win32
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
@@ -58,8 +58,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                        ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
-       ..\..\..\..\base\win32\prj\plugins
+                          ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
+         ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
@@ -76,7 +76,7 @@ PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /O2 /I "..\res" /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
+# ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\res" /I "..\include" /I "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /o NUL /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /o NUL /win32
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
@@ -91,8 +91,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                        ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
-       ..\..\..\..\base\win32\prj\plugins
+                          ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
+         ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
@@ -138,13 +138,6 @@ SOURCE=..\src\drawplayer.cpp
 # Begin Source File
 
 SOURCE=..\res\freeamp.rc
-
-!IF  "$(CFG)" == "freeampui - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
@@ -184,6 +177,14 @@ SOURCE=..\..\..\..\base\win32\src\win32thread.cpp
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=..\res\all_icon.bmp.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\all_icon256.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=..\res\arrow.cur
 # End Source File
 # Begin Source File
@@ -201,6 +202,10 @@ SOURCE=..\res\close_buttons.bmp
 # Begin Source File
 
 SOURCE=..\res\close_buttons256.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\colors.bmp
 # End Source File
 # Begin Source File
 
@@ -272,6 +277,14 @@ SOURCE=..\res\next_buttons256.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=..\res\open_buttons.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\open_buttons256.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=..\res\pause_buttons.bmp
 # End Source File
 # Begin Source File
@@ -296,11 +309,43 @@ SOURCE=..\res\player_mask.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=..\res\repeat_buttons.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\repeat_buttons256.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\repeat_icon.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\repeat_icon256.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=..\res\rightside.bmp
 # End Source File
 # Begin Source File
 
 SOURCE=..\res\rightside256.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\shuffle_buttons.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\shuffle_buttons256.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\shuffled_icon.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\shuffled_icon256.bmp
 # End Source File
 # Begin Source File
 
@@ -319,57 +364,5 @@ SOURCE=..\res\stop_buttons.bmp
 SOURCE=..\res\stop_buttons256.bmp
 # End Source File
 # End Group
-# Begin Source File
-
-SOURCE=..\res\all_icon.bmp.bmp
-# End Source File
-# Begin Source File
-
-SOURCE=..\res\all_icon256.bmp
-# End Source File
-# Begin Source File
-
-SOURCE=..\res\colors.bmp
-# End Source File
-# Begin Source File
-
-SOURCE=..\res\open_buttons.bmp
-# End Source File
-# Begin Source File
-
-SOURCE=..\res\open_buttons256.bmp
-# End Source File
-# Begin Source File
-
-SOURCE=..\res\repeat_buttons.bmp
-# End Source File
-# Begin Source File
-
-SOURCE=..\res\repeat_buttons256.bmp
-# End Source File
-# Begin Source File
-
-SOURCE=..\res\repeat_icon.bmp
-# End Source File
-# Begin Source File
-
-SOURCE=..\res\repeat_icon256.bmp
-# End Source File
-# Begin Source File
-
-SOURCE=..\res\shuffle_buttons.bmp
-# End Source File
-# Begin Source File
-
-SOURCE=..\res\shuffle_buttons256.bmp
-# End Source File
-# Begin Source File
-
-SOURCE=..\res\shuffled_icon.bmp
-# End Source File
-# Begin Source File
-
-SOURCE=..\res\shuffled_icon256.bmp
-# End Source File
 # End Target
 # End Project

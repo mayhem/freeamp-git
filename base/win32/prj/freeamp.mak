@@ -37,19 +37,21 @@ ALL : ".\freeamp.exe"
 
 !ELSE 
 
-ALL : "freeampui - Win32 Release" "simple - Win32 Release"\
- "xing - Win32 Release" "soundcard - Win32 Release" "fileinput - Win32 Release"\
- ".\freeamp.exe"
+ALL : "simple - Win32 Release" "Rainplay - Win32 Release"\
+ "freeampdev - Win32 Release" "freeampui - Win32 Release" "xing - Win32 Release"\
+ "soundcard - Win32 Release" "fileinput - Win32 Release" ".\freeamp.exe"
 
 !ENDIF 
 
 !IF "$(RECURSE)" == "1" 
 CLEAN :"fileinput - Win32 ReleaseCLEAN" "soundcard - Win32 ReleaseCLEAN"\
- "xing - Win32 ReleaseCLEAN" "simple - Win32 ReleaseCLEAN"\
- "freeampui - Win32 ReleaseCLEAN" 
+ "xing - Win32 ReleaseCLEAN" "freeampui - Win32 ReleaseCLEAN"\
+ "freeampdev - Win32 ReleaseCLEAN" "Rainplay - Win32 ReleaseCLEAN"\
+ "simple - Win32 ReleaseCLEAN" 
 !ELSE 
 CLEAN :
 !ENDIF 
+	-@erase "$(INTDIR)\freeamp.res"
 	-@erase "$(INTDIR)\hashtable.obj"
 	-@erase "$(INTDIR)\lmcregistry.obj"
 	-@erase "$(INTDIR)\main.obj"
@@ -72,7 +74,7 @@ CLEAN :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
 CPP=cl.exe
-CPP_PROJ=/nologo /MT /W3 /GX /O2 /I "..\include" /I "..\..\include" /I\
+CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\include" /I "..\..\include" /I\
  "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I\
  "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include"\
  /I "..\..\..\lmc\include" /I "..\..\..\ui\dummy\include" /D "WIN32" /D "NDEBUG"\
@@ -114,6 +116,7 @@ CPP_SBRS=.
 MTL=midl.exe
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
 RSC=rc.exe
+RSC_PROJ=/l 0x409 /fo"$(INTDIR)\freeamp.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\freeamp.bsc" 
 BSC32_SBRS= \
@@ -124,6 +127,7 @@ LINK32_FLAGS=winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
  odbc32.lib odbccp32.lib /nologo /subsystem:windows /incremental:no\
  /pdb:"$(OUTDIR)\freeamp.pdb" /machine:I386 /out:"freeamp.exe" 
 LINK32_OBJS= \
+	"$(INTDIR)\freeamp.res" \
 	"$(INTDIR)\hashtable.obj" \
 	"$(INTDIR)\lmcregistry.obj" \
 	"$(INTDIR)\main.obj" \
@@ -143,6 +147,8 @@ LINK32_OBJS= \
 	"..\..\..\io\soundcard\win32\prj\Release\soundcard.lib" \
 	"..\..\..\lmc\xingmp3\win32\prj\Release\xing.lib" \
 	"..\..\..\ui\freeamp\win32\prj\Release\freeamp.lib" \
+	"..\..\..\ui\freeampdev\win32\prj\Release\freeampdev.lib" \
+	"..\..\..\ui\rainplay\Release\Rainplay.lib" \
 	"..\..\..\ui\simple\win32\prj\Release\simple.lib"
 
 ".\freeamp.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
@@ -161,18 +167,21 @@ ALL : ".\freeamp.exe"
 
 !ELSE 
 
-ALL : "freeampui - Win32 Debug" "simple - Win32 Debug" "xing - Win32 Debug"\
+ALL : "simple - Win32 Debug" "Rainplay - Win32 Debug"\
+ "freeampdev - Win32 Debug" "freeampui - Win32 Debug" "xing - Win32 Debug"\
  "soundcard - Win32 Debug" "fileinput - Win32 Debug" ".\freeamp.exe"
 
 !ENDIF 
 
 !IF "$(RECURSE)" == "1" 
 CLEAN :"fileinput - Win32 DebugCLEAN" "soundcard - Win32 DebugCLEAN"\
- "xing - Win32 DebugCLEAN" "simple - Win32 DebugCLEAN"\
- "freeampui - Win32 DebugCLEAN" 
+ "xing - Win32 DebugCLEAN" "freeampui - Win32 DebugCLEAN"\
+ "freeampdev - Win32 DebugCLEAN" "Rainplay - Win32 DebugCLEAN"\
+ "simple - Win32 DebugCLEAN" 
 !ELSE 
 CLEAN :
 !ENDIF 
+	-@erase "$(INTDIR)\freeamp.res"
 	-@erase "$(INTDIR)\hashtable.obj"
 	-@erase "$(INTDIR)\lmcregistry.obj"
 	-@erase "$(INTDIR)\main.obj"
@@ -240,6 +249,7 @@ CPP_SBRS=.
 MTL=midl.exe
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
 RSC=rc.exe
+RSC_PROJ=/l 0x409 /fo"$(INTDIR)\freeamp.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\freeamp.bsc" 
 BSC32_SBRS= \
@@ -251,6 +261,7 @@ LINK32_FLAGS=winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
  /pdb:"$(OUTDIR)\freeamp.pdb" /debug /machine:I386 /out:"freeamp.exe"\
  /pdbtype:sept 
 LINK32_OBJS= \
+	"$(INTDIR)\freeamp.res" \
 	"$(INTDIR)\hashtable.obj" \
 	"$(INTDIR)\lmcregistry.obj" \
 	"$(INTDIR)\main.obj" \
@@ -270,6 +281,8 @@ LINK32_OBJS= \
 	"..\..\..\io\soundcard\win32\prj\Debug\soundcard.lib" \
 	"..\..\..\lmc\xingmp3\win32\prj\Debug\xing.lib" \
 	"..\..\..\ui\freeamp\win32\prj\Debug\freeamp.lib" \
+	"..\..\..\ui\freeampdev\win32\prj\Debug\freeampdev.lib" \
+	"..\..\..\ui\rainplay\Debug\rainplay.lib" \
 	"..\..\..\ui\simple\win32\prj\Debug\simple.lib"
 
 ".\freeamp.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
@@ -283,6 +296,9 @@ LINK32_OBJS= \
 !IF "$(CFG)" == "freeamp - Win32 Release" || "$(CFG)" ==\
  "freeamp - Win32 Debug"
 SOURCE=..\..\src\hashtable.cpp
+
+!IF  "$(CFG)" == "freeamp - Win32 Release"
+
 DEP_CPP_HASHT=\
 	"..\..\..\config\config.h"\
 	"..\..\include\hashtable.h"\
@@ -292,6 +308,20 @@ DEP_CPP_HASHT=\
  "..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
+
+DEP_CPP_HASHT=\
+	"..\..\..\config\config.h"\
+	"..\..\include\hashtable.h"\
+	
+
+"$(INTDIR)\hashtable.obj" : $(SOURCE) $(DEP_CPP_HASHT) "$(INTDIR)"\
+ "..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\src\main.cpp
 
@@ -309,6 +339,8 @@ DEP_CPP_MAIN_=\
 	"..\..\..\ui\include\uiregistry.h"\
 	"..\..\include\errors.h"\
 	"..\..\include\event.h"\
+	"..\..\include\eventdata.h"\
+	"..\..\include\id3v1.h"\
 	"..\..\include\player.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\queue.h"\
@@ -319,9 +351,6 @@ DEP_CPP_MAIN_=\
 	"..\include\mutex.h"\
 	"..\include\preferences.h"\
 	"..\include\semaphore.h"\
-	
-NODEP_CPP_MAIN_=\
-	"..\..\include\win32impl.h"\
 	
 
 "$(INTDIR)\main.obj" : $(SOURCE) $(DEP_CPP_MAIN_) "$(INTDIR)"\
@@ -343,6 +372,8 @@ DEP_CPP_MAIN_=\
 	"..\..\..\ui\include\uiregistry.h"\
 	"..\..\include\errors.h"\
 	"..\..\include\event.h"\
+	"..\..\include\eventdata.h"\
+	"..\..\include\id3v1.h"\
 	"..\..\include\player.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\queue.h"\
@@ -392,9 +423,6 @@ DEP_CPP_PLAYE=\
 	"..\include\preferences.h"\
 	"..\include\semaphore.h"\
 	
-NODEP_CPP_PLAYE=\
-	"..\..\include\win32impl.h"\
-	
 
 "$(INTDIR)\player.obj" : $(SOURCE) $(DEP_CPP_PLAYE) "$(INTDIR)"\
  "..\..\..\config\config.h"
@@ -443,8 +471,17 @@ SOURCE=..\..\src\playlist.cpp
 
 DEP_CPP_PLAYL=\
 	"..\..\..\config\config.h"\
+	"..\..\..\io\include\pmi.h"\
+	"..\..\..\io\include\pmo.h"\
+	"..\..\..\lmc\include\lmc.h"\
+	"..\..\include\errors.h"\
+	"..\..\include\event.h"\
+	"..\..\include\eventdata.h"\
+	"..\..\include\id3v1.h"\
 	"..\..\include\playlist.h"\
+	"..\..\include\registry.h"\
 	"..\..\include\vector.h"\
+	"..\include\mutex.h"\
 	
 
 "$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"\
@@ -456,8 +493,17 @@ DEP_CPP_PLAYL=\
 
 DEP_CPP_PLAYL=\
 	"..\..\..\config\config.h"\
+	"..\..\..\io\include\pmi.h"\
+	"..\..\..\io\include\pmo.h"\
+	"..\..\..\lmc\include\lmc.h"\
+	"..\..\include\errors.h"\
+	"..\..\include\event.h"\
+	"..\..\include\eventdata.h"\
+	"..\..\include\id3v1.h"\
 	"..\..\include\playlist.h"\
+	"..\..\include\registry.h"\
 	"..\..\include\vector.h"\
+	"..\include\mutex.h"\
 	
 
 "$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"\
@@ -479,9 +525,6 @@ DEP_CPP_REGIS=\
 	"..\..\include\registry.h"\
 	"..\..\include\vector.h"\
 	"..\include\preferences.h"\
-	
-NODEP_CPP_REGIS=\
-	"..\..\include\win32impl.h"\
 	
 
 "$(INTDIR)\registrar.obj" : $(SOURCE) $(DEP_CPP_REGIS) "$(INTDIR)"\
@@ -516,9 +559,6 @@ DEP_CPP_THREA=\
 	"..\..\..\config\config.h"\
 	"..\..\include\thread.h"\
 	"..\include\win32thread.h"\
-	
-NODEP_CPP_THREA=\
-	"..\..\src\linuxthread.h"\
 	
 
 "$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"\
@@ -734,6 +774,9 @@ DEP_CPP_PMORE=\
 !ENDIF 
 
 SOURCE=..\..\src\registry.cpp
+
+!IF  "$(CFG)" == "freeamp - Win32 Release"
+
 DEP_CPP_REGIST=\
 	"..\..\..\config\config.h"\
 	"..\..\include\registry.h"\
@@ -744,6 +787,21 @@ DEP_CPP_REGIST=\
  "..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
+
+DEP_CPP_REGIST=\
+	"..\..\..\config\config.h"\
+	"..\..\include\registry.h"\
+	"..\..\include\vector.h"\
+	
+
+"$(INTDIR)\registry.obj" : $(SOURCE) $(DEP_CPP_REGIST) "$(INTDIR)"\
+ "..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\..\..\ui\src\uiregistry.cpp
 
@@ -863,6 +921,90 @@ DEP_CPP_UIREG=\
 
 !IF  "$(CFG)" == "freeamp - Win32 Release"
 
+"freeampui - Win32 Release" : 
+   cd "\Local\src\freeamp\ui\freeamp\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\freeampui.mak CFG="freeampui - Win32 Release" 
+   cd "..\..\..\..\base\win32\prj"
+
+"freeampui - Win32 ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\ui\freeamp\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) CLEAN /F .\freeampui.mak\
+ CFG="freeampui - Win32 Release" RECURSE=1 
+   cd "..\..\..\..\base\win32\prj"
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
+
+"freeampui - Win32 Debug" : 
+   cd "\Local\src\freeamp\ui\freeamp\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\freeampui.mak CFG="freeampui - Win32 Debug" 
+   cd "..\..\..\..\base\win32\prj"
+
+"freeampui - Win32 DebugCLEAN" : 
+   cd "\Local\src\freeamp\ui\freeamp\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) CLEAN /F .\freeampui.mak CFG="freeampui - Win32 Debug"\
+ RECURSE=1 
+   cd "..\..\..\..\base\win32\prj"
+
+!ENDIF 
+
+!IF  "$(CFG)" == "freeamp - Win32 Release"
+
+"freeampdev - Win32 Release" : 
+   cd "\Local\src\freeamp\ui\freeampdev\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\freeampdev.mak CFG="freeampdev - Win32 Release" 
+   cd "..\..\..\..\base\win32\prj"
+
+"freeampdev - Win32 ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\ui\freeampdev\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) CLEAN /F .\freeampdev.mak\
+ CFG="freeampdev - Win32 Release" RECURSE=1 
+   cd "..\..\..\..\base\win32\prj"
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
+
+"freeampdev - Win32 Debug" : 
+   cd "\Local\src\freeamp\ui\freeampdev\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\freeampdev.mak CFG="freeampdev - Win32 Debug" 
+   cd "..\..\..\..\base\win32\prj"
+
+"freeampdev - Win32 DebugCLEAN" : 
+   cd "\Local\src\freeamp\ui\freeampdev\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) CLEAN /F .\freeampdev.mak\
+ CFG="freeampdev - Win32 Debug" RECURSE=1 
+   cd "..\..\..\..\base\win32\prj"
+
+!ENDIF 
+
+!IF  "$(CFG)" == "freeamp - Win32 Release"
+
+"Rainplay - Win32 Release" : 
+   cd "\Local\src\freeamp\ui\rainplay"
+   $(MAKE) /$(MAKEFLAGS) /F .\Rainplay.mak CFG="Rainplay - Win32 Release" 
+   cd "..\..\base\win32\prj"
+
+"Rainplay - Win32 ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\ui\rainplay"
+   $(MAKE) /$(MAKEFLAGS) CLEAN /F .\Rainplay.mak CFG="Rainplay - Win32 Release"\
+ RECURSE=1 
+   cd "..\..\base\win32\prj"
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
+
+"Rainplay - Win32 Debug" : 
+   cd "\Local\src\freeamp\ui\rainplay"
+   $(MAKE) /$(MAKEFLAGS) /F .\Rainplay.mak CFG="Rainplay - Win32 Debug" 
+   cd "..\..\base\win32\prj"
+
+"Rainplay - Win32 DebugCLEAN" : 
+   cd "\Local\src\freeamp\ui\rainplay"
+   $(MAKE) /$(MAKEFLAGS) CLEAN /F .\Rainplay.mak CFG="Rainplay - Win32 Debug"\
+ RECURSE=1 
+   cd "..\..\base\win32\prj"
+
+!ENDIF 
+
+!IF  "$(CFG)" == "freeamp - Win32 Release"
+
 "simple - Win32 Release" : 
    cd "\Local\src\freeamp\ui\simple\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\simple.mak CFG="simple - Win32 Release" 
@@ -889,31 +1031,26 @@ DEP_CPP_UIREG=\
 
 !ENDIF 
 
+SOURCE=..\res\freeamp.rc
+DEP_RSC_FREEA=\
+	"..\res\icon1.ico"\
+	
+
 !IF  "$(CFG)" == "freeamp - Win32 Release"
 
-"freeampui - Win32 Release" : 
-   cd "\Local\src\freeamp\ui\freeamp\win32\prj"
-   $(MAKE) /$(MAKEFLAGS) /F .\freeampui.mak CFG="freeampui - Win32 Release" 
-   cd "..\..\..\..\base\win32\prj"
 
-"freeampui - Win32 ReleaseCLEAN" : 
-   cd "\Local\src\freeamp\ui\freeamp\win32\prj"
-   $(MAKE) /$(MAKEFLAGS) CLEAN /F .\freeampui.mak\
- CFG="freeampui - Win32 Release" RECURSE=1 
-   cd "..\..\..\..\base\win32\prj"
+"$(INTDIR)\freeamp.res" : $(SOURCE) $(DEP_RSC_FREEA) "$(INTDIR)"
+	$(RSC) /l 0x409 /fo"$(INTDIR)\freeamp.res" /i\
+ "\Local\src\freeamp\base\win32\res" /d "NDEBUG" $(SOURCE)
+
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
 
-"freeampui - Win32 Debug" : 
-   cd "\Local\src\freeamp\ui\freeamp\win32\prj"
-   $(MAKE) /$(MAKEFLAGS) /F .\freeampui.mak CFG="freeampui - Win32 Debug" 
-   cd "..\..\..\..\base\win32\prj"
 
-"freeampui - Win32 DebugCLEAN" : 
-   cd "\Local\src\freeamp\ui\freeamp\win32\prj"
-   $(MAKE) /$(MAKEFLAGS) CLEAN /F .\freeampui.mak CFG="freeampui - Win32 Debug"\
- RECURSE=1 
-   cd "..\..\..\..\base\win32\prj"
+"$(INTDIR)\freeamp.res" : $(SOURCE) $(DEP_RSC_FREEA) "$(INTDIR)"
+	$(RSC) /l 0x409 /fo"$(INTDIR)\freeamp.res" /i\
+ "\Local\src\freeamp\base\win32\res" /d "_DEBUG" $(SOURCE)
+
 
 !ENDIF 
 
