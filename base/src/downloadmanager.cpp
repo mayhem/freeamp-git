@@ -631,7 +631,7 @@ Error DownloadManager::Download(DownloadItem* item)
         
         if(-1 != stat(destPath, &st))
         {
-            if (st.st_size >= item->GetTotalBytes())
+            if (st.st_size >= (int)item->GetTotalBytes())
             {
                if(destPath)
                    delete [] destPath;
