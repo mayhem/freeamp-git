@@ -49,7 +49,7 @@ DetermineRegion(DIB* bitmap,
     height = bitmap->Height();
 
     // empty region
-    /*LEAK*/result = CreateRectRgn(0,0,0,0);
+    result = CreateRectRgn(0,0,0,0);
 
     for(int32 y = 0; y < height; y++)
     {
@@ -75,12 +75,14 @@ DetermineRegion(DIB* bitmap,
                 scanning = false;
                 // regions are non-inclusive of their bottom & right edges
                 // so need to add one to values
-                /*LEAK*/scanline = CreateRectRgn(start, y, x, y + 1);
+                scanline = CreateRectRgn(start, y, x, y + 1);
 
                 CombineRgn( result,
                             result,
                             scanline,
                             RGN_OR);
+
+                DeleteObject(scanline);
 
             }
 
@@ -89,12 +91,14 @@ DetermineRegion(DIB* bitmap,
         // last pixel in scanline is included in region...
         if(scanning)
         {
-            /*LEAK*/scanline = CreateRectRgn(start, y, x, y + 1);
+            scanline = CreateRectRgn(start, y, x, y + 1);
 
             CombineRgn( result,
                         result,
                         scanline,
                         RGN_OR);
+
+            DeleteObject(scanline);
         }
     }
 
@@ -115,7 +119,7 @@ DetermineControlRegions(DIB* bitmap,
     for(i = 0; i < numControls; i++)
     {
         // empty region
-        /*LEAK*/controlRegions[i] = CreateRectRgn(0,0,0,0);
+        controlRegions[i] = CreateRectRgn(0,0,0,0);
     }
 
     regionColors = new uint32[numControls];
@@ -150,12 +154,14 @@ DetermineControlRegions(DIB* bitmap,
                     scanning = false;
                     // regions are non-inclusive of their bottom
                     // & right edges so need to add one
-                    /*LEAK*/scanline = CreateRectRgn(start, y, x, y + 1);
+                    scanline = CreateRectRgn(start, y, x, y + 1);
 
                     CombineRgn( controlRegions[scanIndex],
                                 controlRegions[scanIndex],
                                 scanline,
                                 RGN_OR);
+
+                    DeleteObject(scanline);
                 }
 
                 if(pixel != black && pixel != white)
@@ -199,6 +205,8 @@ DetermineControlRegions(DIB* bitmap,
                         controlRegions[scanIndex],
                         scanline,
                         RGN_OR);
+
+            DeleteObject(scanline);
         }
     }
 
@@ -430,11 +438,11 @@ SaveFileHookProc(   HWND hwnd,
 }
 
 bool 
-FileSaveDialog(HWND hwnd, 
-               const char* filter,
-               const char* title,
-               char* path,
-               uint32* pathLength)
+FileSaveDialog( HWND hwnd, 
+                const char* title,
+                const char* filter,
+                char* path,
+                uint32* pathLength)
 {
     bool result = false;
     Preferences prefs;

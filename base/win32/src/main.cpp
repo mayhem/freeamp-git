@@ -34,31 +34,90 @@ ____________________________________________________________________________*/
 #include "event.h"
 #include "registrar.h"
 #include "preferences.h"
- 
+
+static
+BOOL
+CALLBACK
+EnumThreadWndProc(  HWND hwnd,
+                    LPARAM lParam )
+{
+    BOOL    result = TRUE;
+    char    windowTitle[256];
+    char    freeampTitle[] = "FreeAmp";
+    int32   count;
+
+    count = GetWindowText(hwnd, windowTitle, sizeof(windowTitle));
+
+    // If we found our main window, stop the enumeration
+    if (!strncmp(windowTitle, freeampTitle, strlen(freeampTitle)))
+    {
+        HWND* phwnd = (HWND*)lParam;
+        *phwnd = hwnd;
+        result =  FALSE;
+    }
+
+    return result;
+}
+
 int APIENTRY WinMain(	HINSTANCE hInstance, 
 						HINSTANCE hPrevInstance,
 		 				LPSTR lpszCmdLine, 
 						int cmdShow)
 {
-    // Initialize the preferences in case the user moved the app
-   Preferences* prefs;
-   HANDLE runOnceMutex;
+    Preferences* prefs;
+    HANDLE runOnceMutex;
 
-   runOnceMutex = CreateMutex(	NULL,
+    runOnceMutex = CreateMutex(	NULL,
 							    TRUE,
 							    "FreeAmp Should Only Run One Time!");
 
-   if(GetLastError() == ERROR_ALREADY_EXISTS)
-   {
+    if(GetLastError() == ERROR_ALREADY_EXISTS)
+    {
+        HWND hwnd = NULL;
+        // find currently running FreeAmp player
+        EnumWindows(EnumThreadWndProc, (LPARAM)&hwnd);
+
+        if(hwnd)
+        {
+            COPYDATASTRUCT data;
+
+            if(__argc > 1)
+            {
+                char* filelist = NULL;
+                size_t length = 0;
+
+                for(int32 i = 1; i < __argc; i++)
+                {
+                    int32 argLength = strlen(__argv[i]) + 1;
+                    
+                    filelist = (char*)realloc(filelist, length + argLength);
+
+                    strcpy(filelist + length, __argv[i]);
+
+                    length += argLength;
+                }
+
+                data.dwData = __argc - 1;
+                data.cbData = length;
+                data.lpData = filelist;
+
+                SendMessage(hwnd, WM_COPYDATA, (WPARAM)NULL, (LPARAM)&data);
+
+                free(filelist);
+            }
+
+            SetForegroundWindow(hwnd);
+        }
+        
         CloseHandle(runOnceMutex);
         return 0;
-   }
+    }
 
-   WSADATA sGawdIHateMicrosoft;
-   WSAStartup(0x0002,  &sGawdIHateMicrosoft);
+    WSADATA sGawdIHateMicrosoft;
+    WSAStartup(0x0002,  &sGawdIHateMicrosoft);
 
-   prefs = new Preferences;
-   prefs->Initialize();
+    prefs = new Preferences;
+    prefs->Initialize();
 
     // find all the plug-ins we use
     Registrar* registrar;

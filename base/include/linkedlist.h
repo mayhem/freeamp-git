@@ -41,6 +41,11 @@ class Item {
         m_last = l;
     } 
 
+    ~Item() 
+    { 
+        delete m_member;
+    } 
+
     Item* Next() const { return m_next;}
     Item* Last() const { return m_last;}
 

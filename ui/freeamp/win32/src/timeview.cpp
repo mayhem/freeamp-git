@@ -174,7 +174,7 @@ SetLabel(char* label)
         delete [] m_label;
     }
 
-    /*LEAK*/m_label = new char[strlen(label) + 1];
+    m_label = new char[strlen(label) + 1];
     strcpy(m_label, label);
 
     Invalidate();

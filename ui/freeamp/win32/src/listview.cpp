@@ -56,7 +56,7 @@ View(hwnd, parent, viewRegion)
     m_pressedX = 0;
     m_pressedY = 0;
     m_dragging = false;
-    /*LEAK*/m_list = new List<ListItem*>();
+    m_list = new List<ListItem*>();
     m_scroller = NULL;
 
     m_thread = NULL;

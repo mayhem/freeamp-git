@@ -36,6 +36,10 @@ extern const char* kUIPref;
 extern const char* kPMOPref;
 extern const char* kOpenSaveDirPref;
 extern const char* kStayOnTopPref;
+extern const char* kMinimizeToTrayPref;
+extern const char* kInputBufferSizePref;
+extern const char* kOutputBufferSizePref;
+extern const char* kStreamBufferIntervalPref;
 
 
 class Preferences {
@@ -54,6 +58,9 @@ class Preferences {
     Error GetPrefBoolean(const char* pref, bool* value);
     Error SetPrefBoolean(const char* pref, bool value);
 
+    Error GetPrefInt32(const char* pref, int32* value);
+    Error SetPrefInt32(const char* pref, int32 value);
+
     // convenience functions
     Error GetInstallDirectory(char* path, uint32* len);
     Error SetInstallDirectory(char* path);
@@ -70,7 +77,17 @@ class Preferences {
     Error GetStayOnTop(bool* value);
     Error SetStayOnTop(bool value);
 
-    
+    Error GetMinimizeToTray(bool* value);
+    Error SetMinimizeToTray(bool value);
+
+    Error GetInputBufferSize(int32* value);
+    Error SetInputBufferSize(int32 value);
+
+    Error GetOutputBufferSize(int32* value);
+    Error SetOutputBufferSize(int32 value);
+
+    Error GetStreamBufferInterval(int32* value);
+    Error SetStreamBufferInterval(int32 value);
 
  protected:
     

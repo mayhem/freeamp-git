@@ -58,6 +58,7 @@ ____________________________________________________________________________*/
 #include "volumeview.h"
 #include "listview.h"
 #include "scrollview.h"
+#include "resizeview.h"
 
 enum {	STATE_Stopped = 0, 
 		STATE_Playing, 
@@ -95,6 +96,8 @@ class FreeAmpUI : public UserInterface {
     bool LeftButtonDown(int32 xPos, int32 yPos, int32 modifiers);
     bool LeftButtonUp(int32 xPos, int32 yPos, int32 modifiers);
     bool LeftButtonDoubleClick(int32 xPos, int32 yPos, int32 modifiers);
+    bool RightButtonDown(int32 xPos, int32 yPos, int32 modifiers);
+    bool RightButtonUp(int32 xPos, int32 yPos, int32 modifiers);
     void Command(int32 command, View* source);
     void Notify(int32 command, LPNMHDR notifyMsgHdr);
     void KeyDown(int32 keyCode);
@@ -102,7 +105,9 @@ class FreeAmpUI : public UserInterface {
     void CancelMode();
     void Timer(int32 timerID);
     void InitMenuPopup(HMENU menuHandle, uint32 position, bool systemMenu);
+    void MinMaxInfo(MINMAXINFO* info);
 
+    void FilesReceived(char* array, int32 count);
     bool MouseCaptured() const { return m_mouseCaptured; }
     void SetMouseCapture(bool capture) { m_mouseCaptured = capture; }
 
@@ -184,7 +189,8 @@ class FreeAmpUI : public UserInterface {
     DIB*                m_repeatBitmap;
     DIB*                m_shuffleBitmap;
     DIB*                m_openBitmap;
-    DIB*                m_dialBitmap;
+    DIB*                m_volumeDialBitmap;
+    DIB*                m_seekDialBitmap;
     DIB*                m_shuffleIconBitmap;
     DIB*                m_repeatIconBitmap;
     DIB*                m_repeatAllIconBitmap;
@@ -215,6 +221,8 @@ class FreeAmpUI : public UserInterface {
 
     BitmapView*         m_backgroundView;
     BitmapView*         m_playlistBackView;
+
+    //ResizeView*         m_resizeView;
 
     ButtonView*         m_playView;
     ButtonView*         m_stopView;

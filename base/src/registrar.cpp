@@ -159,7 +159,7 @@ InitializeRegistry(Registry* registry, Preferences* prefs)
                 HMODULE module = NULL;
                 error = kError_LoadLibFailed;
 
-                /*LEAK*/module = LoadLibrary(file);
+                module = LoadLibrary(file);
             
                 if(module)
                 {

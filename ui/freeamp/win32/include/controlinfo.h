@@ -48,17 +48,23 @@ extern Color g_controlColors[];
 #define kRepeatStatusControl    16
 #define kRepeatAllStatusControl 17
 #define kShuffleStatusControl   18
-#define kPlaylistDisplayControl 19
-#define kPanelBackingControl    20
-#define kScrollbarControl       21
-#define kAddControl             22
-#define kDeleteControl          23
-#define kSaveControl            24
-#define kLoadControl            25
+#define kResizeControl          19
+#define kPlaylistDisplayControl 20
+#define kPanelBackingControl    21
+#define kScrollbarControl       22
+#define kAddControl             23
+#define kDeleteControl          24
+#define kSaveControl            25
+#define kLoadControl            26
 
-#define kFinalControl           26
+#define kFinalControl           27
+
 
 #define kNumControls            kFinalControl
+
+// "virtual controls"...
+#define kAboutControl           kFinalControl + 1
+#define kPrefControl            kFinalControl + 2
 
 
 #endif /* _CONTROL_INFO_H_ */

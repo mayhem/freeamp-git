@@ -65,7 +65,7 @@ View(hwnd, parent, viewRegion)
     m_labelFontWidths = labelFontWidths;
     m_labelFontHeight = labelFontHeight;
 
-    /*LEAK*/m_viewBitmap = new DIB;
+    m_viewBitmap = new DIB;
     m_viewBitmap->Create(   Width(),
                             Height(),
                             backgroundBitmap->BitsPerPixel());

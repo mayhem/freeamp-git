@@ -2,7 +2,6 @@
 // Microsoft Developer Studio generated include file.
 // Used by freeamp.rc
 //
-#define IDC_BROWSE                      3
 #define IDI_EXE_ICON                    101
 #define IDC_URL                         101
 #define IDB_DIALS                       104
@@ -68,7 +67,6 @@
 #define IDB_PANEL_BACKING_256           178
 #define IDB_PLAYLIST_BODY_256           179
 #define IDB_DRAWER_256                  180
-#define IDD_OPENSONG                    181
 #define IDB_DELETE_256                  182
 #define IDB_ADD_256                     183
 #define IDB_DELETE                      184
@@ -77,10 +75,19 @@
 #define IDB_LOAD_256                    187
 #define IDB_SAVE                        188
 #define IDB_LOAD                        189
+#define IDM_MAIN                        191
+#define IDM_TRAY                        192
+#define IDD_PREF                        193
 #define IDD_OPENURL                     219
 #define IDD_SAVERIO                     220
 #define IDC_SAVE_RIO                    1002
 #define IDC_OPEN_URL                    1029
+#define IDC_ITEM                        40001
+#define IDC_ABOUT                       40002
+#define IDC_OPEN                        40003
+#define IDC_SAVE                        40004
+#define IDC_PREF                        40005
+#define IDC_EXIT                        40006
 #define IDS_URL                         65535
 #define IDC_STATIC                      -1
 
@@ -89,8 +96,8 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        190
-#define _APS_NEXT_COMMAND_VALUE         40001
+#define _APS_NEXT_RESOURCE_VALUE        194
+#define _APS_NEXT_COMMAND_VALUE         40007
 #define _APS_NEXT_CONTROL_VALUE         1003
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

@@ -49,6 +49,7 @@ Color g_controlColors[] = {
         {255, 255, 85,  0}, // kRepeatStatusControl
         {0,   191, 255, 0}, // kRepeatAllStatusControl
         {255, 95,  170, 0}, // kShuffleStatusControl
+        {127, 63,   0,  0}, // kResizeControl
         {42,  191, 255, 0}, // kPlaylistDisplayControl
         {212, 0,   85,  0}, // kPanelBackingControl
         {0,   191, 85,  0}, // kScrollbarControl

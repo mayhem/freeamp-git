@@ -35,6 +35,7 @@ ____________________________________________________________________________*/
 #include "eventdata.h"
 #include "mutex.h"
 #include "pmi.h"
+#include "thread.h"
 
 const int iMaxFileNameLen = 1024;
 
@@ -359,6 +360,7 @@ class PlayListManager {
     ShuffleMode             m_order;
     RepeatMode              m_repeat;
 
+    Thread*                 m_rioThread;
     char*                   m_txSong;
 
     

@@ -46,13 +46,13 @@ DetermineControlRegions(DIB* bitmap,
                         int32 numControls);
 
 bool FileOpenDialog(HWND hwnd, 
-                    const char* filter,
                     const char* title,
+                    const char* filter,
                     List<char*>* fileList);
 
 bool FileSaveDialog(HWND hwnd, 
-                    const char* filter,
                     const char* title,
+                    const char* filter,
                     char* path,
                     uint32* pathLength);
 

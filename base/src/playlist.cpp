@@ -52,6 +52,7 @@ PlayListManager(EventQueue * pPlayer)
    m_order = SHUFFLE_NOT_SHUFFLED;
    m_repeat = REPEAT_NOT;
    srand((unsigned int) time(NULL));
+   m_rioThread = NULL;
 }
 
 PlayListManager::
@@ -971,8 +972,12 @@ PlayListManager::
 ExportToRio()
 {
     Error result = kError_NoErr;
-    
-    Thread::CreateThread()->Create(rio_thread_function, this);
+
+    if(!m_rioThread)
+    {
+        m_rioThread = Thread::CreateThread();
+        m_rioThread->Create(rio_thread_function, this);
+    }
 
 	return result;
 }
@@ -1102,6 +1107,9 @@ RioThreadFunction()
     }
 
     delete rio;
+
+    delete m_rioThread;
+    m_rioThread = NULL;
 #endif    
 }
 

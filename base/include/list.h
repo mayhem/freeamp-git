@@ -501,11 +501,19 @@ bool
 List<T>::
 DeleteAll() 
 {
-    for(int32 i = 0; i < m_insertionPoint; i++) 
+    T item;
+    int32 i = 0;
+
+    while(item = ItemAt(i++))
+    {
+        delete item;
+    }
+
+    /*for(int32 i = 0; i < m_insertionPoint; i++) 
     {
 	    delete m_list[i];
 	    m_list[i] = NULL;
-    }
+    }*/
 
     m_insertionPoint = 0;
 

@@ -21,6 +21,10 @@
 	$Id$
 ____________________________________________________________________________*/
 
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 #include "registry.h"
 
 
@@ -85,6 +89,12 @@ RegistryItem::
 
     if(m_description)
         delete [] m_description;
+
+#ifdef WIN32
+    if(m_module)
+        FreeLibrary((HMODULE)m_module);
+#endif
+
 }
 
 void 

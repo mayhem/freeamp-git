@@ -39,11 +39,21 @@ const char* kUIPref = "UI";
 const char* kPMOPref = "PMO";
 const char* kOpenSaveDirPref = "OpenSaveDirectory";
 const char* kStayOnTopPref = "StayOnTop";
+const char* kMinimizeToTrayPref = "MinimizeToTray";
+const char* kInputBufferSizePref = "InputBufferSize";
+const char* kOutputBufferSizePref = "OutputBufferSize";
+const char* kStreamBufferIntervalPref = "StreamBufferInterval";
 
 // default values
-const char* kDefaultUI = "freeamp.ui";
-const char* kDefaultPMO = "soundcard.pmo";
-const bool  kDefaultStayOnTop = false;
+const char*  kDefaultUI = "freeamp.ui";
+const char*  kDefaultPMO = "soundcard.pmo";
+const bool   kDefaultStayOnTop = false;
+const bool   kDefaultMinimizeToTray = false;
+const int32  kDefaultInputBufferSize = 512;
+const int32  kDefaultOutputBufferSize = 512;
+const int32  kDefaultStreamBufferInterval = 15;
+
+
 
 
 Preferences::
@@ -277,7 +287,19 @@ Initialize()
             // set default for window staying on top
             SetPrefBoolean(kStayOnTopPref, kDefaultStayOnTop);
 
-             error = kError_NoErr;
+            // set default for minimizing to tray
+            SetPrefBoolean(kMinimizeToTrayPref, kDefaultMinimizeToTray);
+
+            // set default for input buffer size
+            SetPrefInt32(kInputBufferSizePref, kDefaultInputBufferSize);
+
+            // set default for output buffer size
+            SetPrefInt32(kOutputBufferSizePref, kDefaultOutputBufferSize);
+
+            // set default for streaming buffer interval
+            SetPrefInt32(kStreamBufferIntervalPref, kDefaultStreamBufferInterval);
+
+            error = kError_NoErr;
         }
         else
         {
@@ -361,6 +383,63 @@ Preferences::
 SetStayOnTop(bool value)
 {
     return SetPrefBoolean(kStayOnTopPref, value);
+}
+
+Error 
+Preferences::
+GetMinimizeToTray(bool* value)
+{
+    return GetPrefBoolean(kMinimizeToTrayPref, value);
+}
+
+Error 
+Preferences::
+SetMinimizeToTray(bool value)
+{
+    return SetPrefBoolean(kMinimizeToTrayPref, value);
+}
+
+
+Error 
+Preferences::
+GetInputBufferSize(int32* value)
+{
+    return GetPrefInt32(kInputBufferSizePref, value);
+}
+
+Error 
+Preferences::
+SetInputBufferSize(int32 value)
+{
+    return SetPrefInt32(kInputBufferSizePref, value);
+}
+
+Error 
+Preferences::
+GetOutputBufferSize(int32* value)
+{
+    return GetPrefInt32(kOutputBufferSizePref, value);
+}
+
+Error 
+Preferences::
+SetOutputBufferSize(int32 value)
+{
+    return SetPrefInt32(kOutputBufferSizePref, value);
+}
+
+Error 
+Preferences::
+GetStreamBufferInterval(int32* value)
+{
+    return GetPrefInt32(kStreamBufferIntervalPref, value);
+}
+
+Error 
+Preferences::
+SetStreamBufferInterval(int32 value)
+{
+    return SetPrefInt32(kStreamBufferIntervalPref, value);
 }
 
 Error
@@ -485,6 +564,84 @@ SetPrefBoolean(const char* pref, bool value)
     Error   error = kError_UnknownErr;
 	LONG    result;
     DWORD   buf = (value ? 1 : 0);
+
+    if(!pref)
+    {
+        error = kError_InvalidParam;
+        return error;
+    }
+
+
+	if(m_prefsKey)
+	{
+		// set install directory value
+        result = RegSetValueEx( m_prefsKey,
+                                pref, 
+                                NULL, 
+                                REG_DWORD , 
+                                (LPBYTE)&buf, 
+                                sizeof(DWORD));
+
+        if(result == ERROR_SUCCESS)
+            error = kError_NoErr;
+    }
+    else
+    {
+        error = kError_NoPrefs;
+    }
+  
+    return error;
+}
+
+Error 
+Preferences::
+GetPrefInt32(const char* pref, int32* value)
+{
+    Error   error = kError_UnknownErr;
+	DWORD   type;
+	LONG    result;
+    DWORD   buf = 0;
+    DWORD   len = sizeof(DWORD);
+
+    if(!value || !pref)
+    {
+        error = kError_InvalidParam;
+        return error;
+    }
+
+	if(m_prefsKey)
+	{
+		result = RegQueryValueEx(   m_prefsKey,
+                                    pref, 
+                                    NULL, 
+                                    &type, 
+                                    (LPBYTE)&buf, 
+                                    (DWORD*)&len);
+
+        if(result == ERROR_SUCCESS)
+        {
+            error = kError_NoErr;
+
+            *value = (int32)buf;
+        }
+        else if(result == ERROR_MORE_DATA)
+            error = kError_BufferTooSmall;    
+    }
+    else
+    {
+        error = kError_NoPrefs;
+    }
+  
+    return error;
+}
+
+Error
+Preferences:: 
+SetPrefInt32(const char* pref, int32 value)
+{
+    Error   error = kError_UnknownErr;
+	LONG    result;
+    DWORD   buf = value;
 
     if(!pref)
     {
