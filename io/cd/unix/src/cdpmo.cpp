@@ -198,9 +198,9 @@ char *CDPMO::GetcdindexDiscID(void)
     return (char *)cdindexid.c_str();
 }
 
-struct disc_info CDPMO::GetDiscInfo(void)
+struct disc_info *CDPMO::GetDiscInfo(void)
 {
-    return dinfo;
+    return &dinfo;
 }
 
 void CDPMO::Eject(void)

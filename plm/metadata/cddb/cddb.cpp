@@ -101,9 +101,9 @@ bool CDDB::ReadMetaData(const char* url, MetaData* metadata)
 
         m_discid = ((CDPMO*)pmo)->GetCDDBDiscID();
         if (!m_discid) {
-			delete pmo;
-			return retvalue;
-		}
+	    delete pmo;
+	    return retvalue;
+	}
 
         m_total_tracks = m_discinfo->disc_total_tracks;
 
@@ -118,8 +118,8 @@ bool CDDB::ReadMetaData(const char* url, MetaData* metadata)
             tracknumber++;
 
 #ifdef WIN32
-		while (!isdigit(tracknumber[0]))
-			tracknumber++;
+	while (!isdigit(tracknumber[0]))
+	    tracknumber++;
 #endif
 
         int m_track = atoi(tracknumber);
@@ -141,10 +141,9 @@ bool CDDB::ReadMetaData(const char* url, MetaData* metadata)
                           60 +  
                           m_discinfo->disc_track[m_track].track_length.seconds);
 
-		cerr << m_discid << " " << m_track << " " << metadata->Title().c_str() << endl;
         retvalue = true;
 
-		delete pmo;
+	delete pmo;
     }
     return retvalue;
 }
