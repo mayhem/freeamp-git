@@ -2276,10 +2276,10 @@ int32 GTKMusicBrowser::AcceptEvent(Event *e)
                 UpdatePlayPause();
                 gdk_threads_leave();
             }
-            break; }    
+            break; }  
+        case INFO_MusicCatalogTrackChanged: 
         case INFO_MusicCatalogTrackAdded:
         case INFO_MusicCatalogTrackRemoved:
-        case INFO_MusicCatalogTrackChanged:
         case INFO_MusicCatalogPlaylistRemoved:
         case INFO_MusicCatalogPlaylistAdded: {
             if (m_initialized) {

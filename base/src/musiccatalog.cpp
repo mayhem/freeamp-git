@@ -287,10 +287,18 @@ Error MusicCatalog::AddSong(const char *url)
         AcceptEvent(new MusicCatalogTrackAddedEvent(newtrack, NULL, NULL));
     }
     else {
-        if (meta->Album() == " " || meta->Album().size() == 0)
+        bool changed = false;
+        if (meta->Album() == " " || meta->Album().size() == 0) {
             meta->SetAlbum("Unknown");
-        if (meta->Title() == " " || meta->Title().size() == 0)
+            changed = true;
+        }
+        if (meta->Title() == " " || meta->Title().size() == 0) {
             meta->SetTitle("Unknown");
+            changed = true;
+        }
+  
+        if (changed)
+            WriteMetaDataToDatabase(url, *meta);
 
         bool found_artist = false;
         vector<ArtistList *>::iterator i = m_artistList->begin();
