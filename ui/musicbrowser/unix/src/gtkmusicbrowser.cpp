@@ -1927,7 +1927,7 @@ void GTKMusicBrowser::CreatePlaylist(void)
             titlestr += string("Editing playlist ") + m_currentListName;
     }
     gtk_window_set_title(GTK_WINDOW(musicBrowser), titlestr.c_str());
-    gtk_window_set_policy(GTK_WINDOW(musicBrowser), TRUE, TRUE, TRUE);
+    gtk_window_set_policy(GTK_WINDOW(musicBrowser), TRUE, TRUE, FALSE);
     gtk_signal_connect(GTK_OBJECT(musicBrowser), "destroy",
                        GTK_SIGNAL_FUNC(toggle_vis_destroy), this);
     gtk_container_set_border_width(GTK_CONTAINER(musicBrowser), 0);
@@ -1938,6 +1938,7 @@ void GTKMusicBrowser::CreatePlaylist(void)
     gtk_widget_show(vbox);
 
     statusBar = gtk_statusbar_new();
+    
     gtk_box_pack_end(GTK_BOX(vbox), statusBar, FALSE, TRUE, 0);
     gtk_widget_show(statusBar);
 
