@@ -58,7 +58,7 @@ void WorkerThreadStart(void* arg);
 
 #define DB Debug_v("%s:%d\n", __FILE__, __LINE__);
 
-const char *szWelcomeMsg = "Welcome to the "BRANDING" player!";
+const char *szWelcomeMsg = "Welcome to the "BRANDING" Player!";
 const char *szParseError = "Parsing the Theme description failed. Cause: ";
 const char *szCantFindHelpError = "Cannot find the help files. Please make "
                                   "sure that the help files are properly "
@@ -969,9 +969,10 @@ void FreeAmpTheme::DropFiles(vector<string> *pFileList)
 {
     char                     ext[MAX_PATH];
     char                     url[MAX_PATH + 7];
-    uint32                   length;
+    uint32                   length, countbefore;
     vector<string>::iterator i;
     
+    countbefore = m_pContext->plm->CountItems();
     for(i = pFileList->begin(); i != pFileList->end(); i++)
     {
         char          *pExtension = NULL;
@@ -985,6 +986,7 @@ void FreeAmpTheme::DropFiles(vector<string> *pFileList)
             WIN32_FIND_DATA findData;
             char            findPath[MAX_PATH + 1];
             char*           file;
+            vector<PlaylistItem*> oList;
 
             strcpy(findPath, (*i).c_str());
             strcat(findPath, DIR_MARKER_STR);
@@ -1005,21 +1007,22 @@ void FreeAmpTheme::DropFiles(vector<string> *pFileList)
                     ToUpper(ext);   
                     if (m_pContext->player->IsSupportedExtension(ext))
                     {   
-                       //strcpy(findPath, (*i).c_str());
-                       //strcat(findPath, DIR_MARKER_STR);
-                       //strcat(findPath, findData.cFileName);
-                        strcpy(file, findData.cFileName);
+                        strcpy(findPath, (*i).c_str());
+                        strcat(findPath, DIR_MARKER_STR);
+                        strcat(findPath, findData.cFileName);
                         
                         length = sizeof(url);
-                        FilePathToURL(file, url, &length);
-                        
-                        m_pContext->plm->AddItem(url);
+                        FilePathToURL(findPath, url, &length);
+                        PlaylistItem* item = new PlaylistItem(url);
+                        oList.push_back(item);
                     }   
 
                 }while(FindNextFile(findFileHandle, &findData));
 
                 FindClose(findFileHandle);
             }
+            if (oList.size() > 0)
+               m_pContext->plm->AddItems(&oList);
         }
         else
         {
@@ -1053,11 +1056,6 @@ void FreeAmpTheme::DropFiles(vector<string> *pFileList)
             else   
                 if (m_pContext->player->IsSupportedExtension(ext))
                 {
-                    //string url;
-
-                    //url = string("file://") + (*i);
-                    //m_pContext->plm->AddItem(url.c_str(),
-                    //     m_pContext->plm->CountItems());
                     length = sizeof(url);
                     FilePathToURL((*i).c_str(), url, &length);
                 
@@ -1065,6 +1063,9 @@ void FreeAmpTheme::DropFiles(vector<string> *pFileList)
                 }    
         }
     }
+    
+    if (countbefore == 0)
+        m_pContext->target->AcceptEvent(new Event(CMD_Play));
 }
 
 void FreeAmpTheme::PostWindowCreate(void)
