@@ -154,7 +154,7 @@ STYLE WS_CHILD | WS_DISABLED | WS_CAPTION
 CAPTION "Welcome!"
 FONT 8, "MS Sans Serif"
 BEGIN
-    CONTROL         "Text",IDC_TEXT2,"Button",BS_OWNERDRAW | BS_FLAT |
+    CONTROL         "Text",IDC_TEXT2,"Button",BS_OWNERDRAW | BS_FLAT | 
                     WS_TABSTOP,92,38,216,123
     CONTROL         135,IDC_STATIC,"Static",SS_BITMAP,0,0,81,161
     CONTROL         "Caption 1",IDC_CAPTION1,"Button",BS_OWNERDRAW | BS_LEFT | 
@@ -193,7 +193,7 @@ STYLE WS_CHILD | WS_DISABLED | WS_CAPTION
 CAPTION "Relatable"
 FONT 8, "MS Sans Serif"
 BEGIN
-    CONTROL         "Text 1",IDC_RELATABLE_TEXT1,"Button",BS_OWNERDRAW |
+    CONTROL         "Text 1",IDC_RELATABLE_TEXT1,"Button",BS_OWNERDRAW | 
                     BS_LEFT | BS_TOP | BS_FLAT | WS_TABSTOP,94,1,212,155
     CONTROL         141,IDC_STATIC,"Static",SS_BITMAP,2,2,81,161
     CONTROL         "Enjoy Relatable Features",IDC_RELATABLE_YES,"Button",
@@ -664,8 +664,8 @@ IDB_RELATABLE           BITMAP  DISCARDABLE     "relatable.bmp"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,1,0,5
- PRODUCTVERSION 2,1,0,5
+ FILEVERSION 2,1,0,6
+ PRODUCTVERSION 2,1,0,6
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -683,7 +683,7 @@ BEGIN
             VALUE "Comments", "For the latest version go to http://www.freeamp.org\0"
             VALUE "CompanyName", "FreeAmp Open Source Development Effort\0"
             VALUE "FileDescription", "The Music Browser user interface enables you to organize your music collection and select music to listen to.\0"
-            VALUE "FileVersion", "2.1.0.5\0"
+            VALUE "FileVersion", "2.1.0.6\0"
             VALUE "InternalName", "MusicBrowser\0"
             VALUE "LegalCopyright", "Copyright © EMusic.com 1999-2000 (http://www.gnu.org/copyleft/gpl.html)\0"
             VALUE "LegalTrademarks", "FreeAmp, EMusic\0"

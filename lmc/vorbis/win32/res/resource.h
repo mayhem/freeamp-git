@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Developer Studio generated include file.
-// Used by xing.rc
+// Used by vorbis.rc
 //
 #define IDI_ICON1                       101
 
