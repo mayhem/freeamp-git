@@ -134,17 +134,17 @@ BEGIN
     BEGIN
         MENUITEM "View &playlist only",         ID_VIEW_MUSICCATALOG
     END
-    POPUP "&Sort"
+    POPUP "&Sort Playlist"
     BEGIN
-        MENUITEM "&Artist",                     ID_SORT_ARTIST
-        MENUITEM "Al&bum",                      ID_SORT_ALBUM
-        MENUITEM "&Title",                      ID_SORT_TITLE
-        MENUITEM "&Year",                       ID_SORT_YEAR
-        MENUITEM "Trac&k",                      ID_SORT_TRACK
-        MENUITEM "&Genre",                      ID_SORT_GENRE
-        MENUITEM "&Length",                     ID_SORT_LENGTH
-        MENUITEM "L&ocation",                   ID_SORT_LOCATION
-        MENUITEM "&Random",                     ID_SORT_RANDOMIZE
+        MENUITEM "by &Artist",                  ID_SORT_ARTIST
+        MENUITEM "by Al&bum",                   ID_SORT_ALBUM
+        MENUITEM "by &Title",                   ID_SORT_TITLE
+        MENUITEM "by &Year",                    ID_SORT_YEAR
+        MENUITEM "by Trac&k",                   ID_SORT_TRACK
+        MENUITEM "by &Genre",                   ID_SORT_GENRE
+        MENUITEM "by &Length",                  ID_SORT_LENGTH
+        MENUITEM "by L&ocation",                ID_SORT_LOCATION
+        MENUITEM "&Randomly",                   ID_SORT_RANDOMIZE
     END
 END
 
