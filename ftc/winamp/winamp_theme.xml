@@ -211,7 +211,7 @@ None||Repeat current"/>
         <ButtonControl Name="PlayIndicator">
                 <Info Desc="" Tip=""/>
             <Position Pos="26, 28"/>
-            <ControlStateBitmap Rect="27, 0, 35, 8" State="Disabled"
+            <ControlStateBitmap Rect="18, 0, 26, 8" State="Disabled"
                                 Name="PlayPaus"/>
             <ControlStateBitmap Rect="0, 0, 8, 8" State="Normal"
                                 Name="PlayPaus"/>
@@ -219,7 +219,7 @@ None||Repeat current"/>
         <ButtonControl Name="PauseIndicator">
                 <Info Desc="" Tip=""/>
             <Position Pos="26, 28"/>
-            <ControlStateBitmap Rect="27, 0, 35, 8" State="Disabled"
+            <ControlStateBitmap Rect="18, 0, 26, 8" State="Disabled"
                                 Name="PlayPaus"/>
             <ControlStateBitmap Rect="9, 0, 17, 8" State="Normal"
                                 Name="PlayPaus"/>
@@ -227,7 +227,7 @@ None||Repeat current"/>
         <ButtonControl Name="StopIndicator">
                 <Info Desc="" Tip=""/>
             <Position Pos="26, 28"/>
-            <ControlStateBitmap Rect="27, 0, 35, 8" State="Disabled"
+            <ControlStateBitmap Rect="18, 0, 26, 8" State="Disabled"
                                 Name="PlayPaus"/>
             <ControlStateBitmap Rect="18, 0, 26, 8" State="Normal"
                                 Name="PlayPaus"/>

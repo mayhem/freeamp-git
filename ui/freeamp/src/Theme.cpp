@@ -313,7 +313,8 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
              pNewWindow = pMainWindow;
           
           // Save the old bitmaps and fonts
-          oFonts = *m_pFonts;
+          if (m_pFonts)
+              oFonts = *m_pFonts;
           oBitmaps = *m_pBitmaps;
 
           // Accept the new bitmaps and font.
