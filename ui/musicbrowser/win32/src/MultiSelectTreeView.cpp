@@ -382,6 +382,8 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
             {
                 tv_item.hItem = TreeView_GetSelection(m_hMusicView); 
                 tv_item.mask = TVIF_PARAM | TVIF_HANDLE;
+                tv_item.lParam = 0;
+
                 TreeView_GetItem(m_hMusicView, &tv_item);
 
                 TreeData* treedata = (TreeData*)tv_item.lParam;
