@@ -132,24 +132,27 @@ bool ID3v2::ReadMetaData(const char* url, MetaData* metadata)
     {
         pData[0] = 0;
         pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
-        metadata->SetTime(ID3Field_GetINT(pField)); 
-		Debug_v("len: %d\n", ID3Field_GetINT(pField));
+        ID3Field_GetASCII(pField, pData, iDataFieldLen, 1); 
+        if (strlen(pData) > 0)
+           metadata->SetTime(atoi(pData));
     }
     pFrame = ID3Tag_FindFrameWithID(pTag, ID3FID_YEAR);
     if (pFrame)
     {
         pData[0] = 0;
         pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
-        metadata->SetYear(ID3Field_GetINT(pField)); 
-		Debug_v("year: %d\n", ID3Field_GetINT(pField));
+        ID3Field_GetASCII(pField, pData, iDataFieldLen, 1); 
+        if (strlen(pData) > 0)
+           metadata->SetYear(atoi(pData));
     }
     pFrame = ID3Tag_FindFrameWithID(pTag, ID3FID_SIZE);
     if (pFrame)
     {
         pData[0] = 0;
         pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
-        metadata->SetSize(ID3Field_GetINT(pField)); 
-		Debug_v("size: %d\n", ID3Field_GetINT(pField));
+        ID3Field_GetASCII(pField, pData, iDataFieldLen, 1); 
+        if (strlen(pData) > 0)
+           metadata->SetSize(atoi(pData));
     }
 
     delete pData;
@@ -167,8 +170,6 @@ bool ID3v2::WriteMetaData(const char* url, const MetaData& metadata)
     char      dummy[20];
     bool      bWriteID3v1, bWriteID3v2;
     luint     whichTags;
-
-	Debug_v("Write metadata!\n");
 
     m_context->prefs->GetWriteID3v1(&bWriteID3v1);
     m_context->prefs->GetWriteID3v2(&bWriteID3v2);
@@ -245,7 +246,7 @@ bool ID3v2::WriteMetaData(const char* url, const MetaData& metadata)
         ID3Field_SetASCII(pField, (char *)metadata.Comment().c_str());
     }
 
-    sprintf(dummy, "%d", metadata.Size());
+    sprintf(dummy, "%d", metadata.Time());
     pFrame = ID3Tag_FindFrameWithID(pTag, ID3FID_SONGLEN);
     if (!pFrame)
     {
