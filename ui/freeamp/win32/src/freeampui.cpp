@@ -500,12 +500,12 @@ FreeAmpUI::
 DropFiles(HDROP dropHandle)
 {
 	int32 count;
-	char szFile[MAX_PATH + 1];
+	char file[MAX_PATH + 1];
 
 	count = DragQueryFile(	dropHandle,
 							-1L,
-							szFile,
-							sizeof(szFile));
+							file,
+							sizeof(file));
 
 	m_target->AcceptEvent(new Event(CMD_Stop));
 
@@ -513,10 +513,41 @@ DropFiles(HDROP dropHandle)
 	{
 		DragQueryFile(	dropHandle,
 						i,
-						szFile,
-						sizeof(szFile));
+						file,
+						sizeof(file));
 
-		m_plm->AddItem(szFile, 0);
+        char* pExtension = NULL;
+        List<char*> fileList;
+
+        pExtension = strrchr(file, '.');
+
+        if(pExtension && strcasecmp(pExtension, ".m3u") == 0)
+        { 
+            Error error;
+
+            error = m_plm->ExpandM3U(file, fileList);
+
+            if(IsError(error))
+            {
+                MessageBox(NULL, "Cannot open playlist file", file, MB_OK); 
+            }
+            else
+            {
+                char* item = NULL;
+                int32 i = 0;
+
+                while(item = fileList.ItemAt(i++))
+                {
+                    m_plm->AddItem(item,0);
+                }
+            }
+        }
+        else
+        {
+            m_plm->AddItem(file,0);
+        }
+
+		
 	}
 
 	if(count) 
@@ -661,6 +692,8 @@ Command(int32 command,
 			{
 				char file[MAX_PATH + 1];
 				char* cp = NULL;
+                List<char*> fileList;
+
 
 				strcpy(file, filelist);
 				strcat(file, "\\");
@@ -673,7 +706,35 @@ Command(int32 command,
 				{
 					strcpy(file + ofn.nFileOffset, cp);
 
-					m_plm->AddItem(file,0);
+                    char* pExtension = NULL;
+
+                    pExtension = strrchr(file, '.');
+
+                    if(pExtension && strcasecmp(pExtension, ".m3u") == 0)
+                    { 
+                        Error error;
+
+                        error = m_plm->ExpandM3U(file, fileList);
+
+                        if(IsError(error))
+                        {
+                            MessageBox(NULL, "Cannot open playlist file", file, MB_OK); 
+                        }
+                        else
+                        {
+                            char* item = NULL;
+                            int32 i = 0;
+
+                            while(item = fileList.ItemAt(i++))
+                            {
+                                m_plm->AddItem(item,0);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        m_plm->AddItem(file,0);
+                    }
 
 					cp += strlen(cp) + 1;
 				}
