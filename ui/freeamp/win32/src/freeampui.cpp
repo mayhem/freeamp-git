@@ -235,6 +235,12 @@ MainWndProc(HWND hwnd,
             break;
         }
 
+        case WM_LBUTTONDBLCLK:
+        {
+            ui->LeftButtonDoubleClick(LOWORD(lParam), HIWORD(lParam), wParam);
+            break;
+        }
+
         case WM_KEYDOWN:
         {
             ui->KeyDown(wParam);
@@ -1201,6 +1207,36 @@ LeftButtonUp(   int32 xPos,
     return result;
 }
 
+bool
+FreeAmpUI::
+LeftButtonDoubleClick(  int32 xPos, 
+                        int32 yPos, 
+                        int32 modifiers)
+{
+    bool result = false;
+
+    OutputDebugString("LeftButtonDoubleClick\r\n");
+
+    Item<View*>* viewItem = m_viewList->LastItem();
+    
+    do
+    {
+        if( viewItem->Member()->PointInView(xPos, yPos) && 
+            viewItem->Member()->Visible() &&
+            viewItem->Member()->Enabled())
+        {
+            viewItem->Member()->LeftButtonDoubleClick(xPos, yPos, modifiers);
+
+            result = true;
+
+            break;
+        }
+
+    }while(viewItem = m_viewList->PriorItem(viewItem) );
+
+    return result;
+}
+
 int32 
 FreeAmpUI::
 Paint()
@@ -1961,6 +1997,7 @@ AcceptEvent(Event* event)
                 m_playView->Show();
                 m_stopView->Hide();
                 m_pauseView->SetState(Unpressed);
+                m_timeView->SetCurrentTime(0, 0, 0);
 	            break; 
             }
 
@@ -1994,18 +2031,21 @@ AcceptEvent(Event* event)
 						pFoo--;
 					}
 
-					strncat(foo," - ",sizeof(foo)-strlen(foo));
-
-					strncat(foo,info->GetId3Tag().m_album,sizeof(foo)-strlen(foo));
-
-					// kill trailing spaces
-					pFoo = &(foo[strlen(foo)-1]);
-
-					while ((pFoo >= foo) && pFoo && (*pFoo == ' ')) 
+                    if(*info->GetId3Tag().m_album && *info->GetId3Tag().m_album != ' ')
                     {
-						*pFoo = '\0';
-						pFoo--;
-					}
+					    strncat(foo," - ",sizeof(foo)-strlen(foo));
+
+					    strncat(foo,info->GetId3Tag().m_album,sizeof(foo)-strlen(foo));
+
+					    // kill trailing spaces
+					    pFoo = &(foo[strlen(foo)-1]);
+
+					    while ((pFoo >= foo) && pFoo && (*pFoo == ' ')) 
+                        {
+						    *pFoo = '\0';
+						    pFoo--;
+					    }
+                    }
 
                     strncat(foo," - ",sizeof(foo)-strlen(foo));
 
@@ -2077,6 +2117,7 @@ AcceptEvent(Event* event)
 
             case INFO_DoneOutputting: 
             {
+                m_timeView->SetCurrentTime(0, 0, 0);
 	            break; 
             }
 
@@ -2452,7 +2493,7 @@ UIThreadFunction()
     
     memset(&wc, 0x00, sizeof(WNDCLASS));
 
-    wc.style = CS_OWNDC;
+    wc.style = CS_OWNDC|CS_DBLCLKS ;
     wc.lpfnWndProc = MainWndProc;
     wc.hInstance = g_hinst;
     wc.hCursor = LoadCursor( NULL, IDC_ARROW );

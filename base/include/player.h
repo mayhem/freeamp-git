@@ -102,7 +102,10 @@ class     Player:public EventQueue, Properties, PropertyWatcher
    int32     CompareNames(const char *, const char *);
    void      SendToUI(Event *);
    void      Usage(const char *);
-   bool      SetState(PlayerState);
+
+   bool         SetState(PlayerState);
+   PlayerState  State() const { return m_playerState; }
+
    int32     ServiceEvent(Event *);
    void      CreateLMC(PlayListItem * pc, Event * pC);
 

@@ -94,6 +94,7 @@ class FreeAmpUI : public UserInterface {
     bool MouseMove(int32 xPos, int32 yPos, int32 modifiers);
     bool LeftButtonDown(int32 xPos, int32 yPos, int32 modifiers);
     bool LeftButtonUp(int32 xPos, int32 yPos, int32 modifiers);
+    bool LeftButtonDoubleClick(int32 xPos, int32 yPos, int32 modifiers);
     void Command(int32 command, View* source);
     void Notify(int32 command, LPNMHDR notifyMsgHdr);
     void KeyDown(int32 keyCode);
@@ -103,6 +104,9 @@ class FreeAmpUI : public UserInterface {
 
     bool MouseCaptured() const { return m_mouseCaptured; }
     void SetMouseCapture(bool capture) { m_mouseCaptured = capture; }
+
+    EventQueue* Target() const { return m_target; }
+    int32 State() const { return m_state; }
 
  protected:
     static void ui_thread_function(void*);

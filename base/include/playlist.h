@@ -275,6 +275,7 @@ class PlayListManager {
     void SetPrev(bool bUserAction = false);
 
     int32 Current() const {return m_current;}
+    void SetCurrent(int32 index);
 
     void SetShuffle(ShuffleMode oop);
     void SetRepeat(RepeatMode rp);

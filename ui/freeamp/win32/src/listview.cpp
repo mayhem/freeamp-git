@@ -509,7 +509,27 @@ void
 ListView::
 LeftButtonDoubleClick(int32 x, int32 y, int32 modifiers)
 {
+    int32 index = IndexOf(x,y);
 
+    char buffer[256];
+    sprintf(buffer, "index %d\r\n", index);
+    OutputDebugString(buffer);
+
+
+    if(index >= 0)
+    {
+        FreeAmpUI* ui = (FreeAmpUI*)GetWindowLong(Window(), GWL_USERDATA);
+        PlayListManager* plm = ui->GetPlayListManager(); 
+
+        ui->Target()->AcceptEvent(new Event(CMD_Stop));
+
+        plm->SetCurrent(index); 
+
+        if (ui->State() == STATE_Paused)
+            ui->Target()->AcceptEvent(new Event(CMD_PlayPaused));
+        else
+            ui->Target()->AcceptEvent(new Event(CMD_Play));
+    }
 }
 
 void 

@@ -214,6 +214,22 @@ SetPrev(bool bUserAction)
 
 void 
 PlayListManager::
+SetCurrent(int32 index)
+{
+    GetPLManipLock();
+
+    index = CheckIndex(index);
+
+    if(index >= 0 )
+    {
+        m_current = index;
+        SendInfoToPlayer();
+    }
+    ReleasePLManipLock();
+}
+
+void 
+PlayListManager::
 SendInfoToPlayer()
 {
     PlayListItem         *pli = GetCurrent();
@@ -451,7 +467,7 @@ AddItem(char *url, int32 type)
             pTitle->SetPlayListItem(item);
             m_target->AcceptEvent(pTitle);
             m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
-            OutputDebugString("AddItem::AcceptEvent(INFO_PlayListUpdated)\r\n");
+            //OutputDebugString("AddItem::AcceptEvent(INFO_PlayListUpdated)\r\n");
         }  
     }
 
