@@ -176,6 +176,12 @@ AcceptEvent(Event* event)
 				m_state = STATE_Stopped;
 	            break; 
             }
+			case INFO_PlayList: 
+				{
+					PlayListEvent *info = (PlayListEvent *)event;
+					m_playList = info->GetPlayList();
+					break;
+				}
 			case INFO_MPEGInfo: 
 				{
 					MpegInfoEvent *info = (MpegInfoEvent *)event;

@@ -35,7 +35,7 @@ ____________________________________________________________________________*/
 #include "thread.h"
 #include "mutex.h"
 #include "queue.h"
-
+#include "playlist.h"
 
 enum { STATE_Stopped = 1, STATE_Playing, STATE_Paused };
 
@@ -71,6 +71,7 @@ class FreeAmpUI : public UserInterface {
 
 
  private:
+	 PlayList *		m_playList;
     int32			m_totalSeconds;
     float			m_secondsPerFrame;
     Thread*         m_uiThread;

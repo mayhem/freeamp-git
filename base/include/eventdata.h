@@ -33,6 +33,14 @@ ____________________________________________________________________________*/
 #include "event.h"
 #include "id3v1.h"
 
+class PlayListEvent : public Event {
+public:
+	PlayListEvent(PlayList *pl) { m_type = INFO_PlayList; m_arg = pl; }
+	PlayList *GetPlayList() { return m_arg; }
+	virtual ~PlayListEvent() {}
+private:
+	PlayList *m_arg;
+};
 
 class SetPlayListEvent : public Event {
  public:

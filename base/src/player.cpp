@@ -634,19 +634,24 @@ int32 Player::ServiceEvent(Event *pC) {
                 break;
 	    }
 	    
-	    case CMD_SetPlaylist:
-		
-		if (m_myPlayList) {
-		    delete m_myPlayList;
-		    m_myPlayList = NULL;
-		}
-		
-		m_myPlayList = ((SetPlayListEvent *)pC)->GetPlayList();
-		m_myPlayList->SetFirst();
-		
-		return 0;
+		case CMD_SetPlaylist: {
+			
+			if (m_myPlayList) {
+				delete m_myPlayList;
+				m_myPlayList = NULL;
+			}
+			
+			m_myPlayList = ((SetPlayListEvent *)pC)->GetPlayList();
+			//m_myPlayList->SetFirst();
+
+			GetUIManipLock();
+			Event *pe = new PlayListEvent(m_myPlayList);
+			SendToUI(pe);
+			delete pe;
+			ReleaseUIManipLock();
+			return 0;
 	    	break;
-		
+							  }
 	    case CMD_QuitPlayer: {
 		AcceptEvent(new Event(CMD_Stop));
 		// 1) Set "I'm already quitting flag" (or exit if its already Set)
