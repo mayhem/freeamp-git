@@ -45,6 +45,7 @@ using namespace std;
 #include "debug.h"
 #include "eventdata.h"
 #include "MissingFileDialog.h"
+#include "player.h"
 
 HINSTANCE g_hinst = NULL;
 const int iSpacer = 15;
@@ -343,6 +344,9 @@ void MusicBrowserUI::MusicSearchDone()
                 
     TreeView_Expand(m_hMusicView,m_hPlaylistItem, TVE_EXPAND);
     TreeView_Expand(m_hMusicView,m_hMyMusicItem, TVE_EXPAND);
+
+	AcceptEvent(new CDInfoEvent(0, 0, ""));
+	m_context->player->UpdateCDNow();
 }
 
 void MusicBrowserUI::DisplayBrowserMessage(const char* msg)
