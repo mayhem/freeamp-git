@@ -442,14 +442,41 @@ void save_music_browse(GtkWidget *w, GTKPreferenceWindow *p)
     delete filesel;
 }
 
+void GTKPreferenceWindow::SetToolbar(bool text, bool pics)
+{
+    proposedValues.useTextLabels = text;
+    proposedValues.useImages = pics;
+    if (!firsttime) 
+        gtk_widget_set_sensitive(applyButton, TRUE);
+    else
+        firsttime = false;
+}
+
+void text_selected(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    p->SetToolbar(true, false);
+}
+
+void images_selected(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    p->SetToolbar(false, true);
+}
+
+void both_selected(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    p->SetToolbar(true, true);
+}
+
 GtkWidget *GTKPreferenceWindow::CreatePage1(void)
 {
+    firsttime = true;
+
     GtkWidget *pane = gtk_vbox_new(FALSE, 5);
     gtk_container_set_border_width(GTK_CONTAINER(pane), 5);
     gtk_widget_show(pane);
 
     GtkWidget *frame = gtk_frame_new("Save Music Folder");
-    gtk_box_pack_start(GTK_BOX(pane), frame, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(pane), frame, FALSE, FALSE, 5);
     gtk_widget_show(frame);
 
     GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
@@ -459,8 +486,8 @@ GtkWidget *GTKPreferenceWindow::CreatePage1(void)
 
     char copys[_MAX_PATH];
 
-    GtkWidget *temphbox = gtk_hbox_new(FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), temphbox, FALSE, FALSE, 0);
+    GtkWidget *temphbox = gtk_hbox_new(FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(vbox), temphbox, FALSE, FALSE, 5);
     gtk_widget_show(temphbox);
 
     strncpy(copys, originalValues.saveMusicDirectory.c_str(), 256);
@@ -478,13 +505,44 @@ GtkWidget *GTKPreferenceWindow::CreatePage1(void)
                        GTK_SIGNAL_FUNC(save_music_browse), this);
     gtk_widget_show(button);
 
-/*
-    frame = gtk_frame_new("Show 'My Music' Toolbars As...");
-    gtk_box_pack_start(GTK_BOX(pane), frame, FALSE, FALSE, 0);
+    frame = gtk_frame_new("Show 'My Music' Toolbars As");
+    gtk_box_pack_start(GTK_BOX(pane), frame, FALSE, FALSE, 5);
     gtk_widget_show(frame);
 
-    GtkWidget *button = 
-*/
+    temphbox = gtk_hbox_new(FALSE, 5);
+    gtk_container_set_border_width(GTK_CONTAINER(temphbox), 5);
+    gtk_container_add(GTK_CONTAINER(frame), temphbox);
+    gtk_widget_show(temphbox);
+
+    button = gtk_radio_button_new_with_label(NULL, "Text Only");
+    if (originalValues.useTextLabels && !originalValues.useImages)
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
+    gtk_box_pack_start(GTK_BOX(temphbox), button, FALSE, FALSE, 0);
+    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                       GTK_SIGNAL_FUNC(text_selected), this);
+    gtk_widget_show(button);
+
+    button = gtk_radio_button_new_with_label(
+                             gtk_radio_button_group(GTK_RADIO_BUTTON(button)),
+                             "Images Only");
+    if (!originalValues.useTextLabels && originalValues.useImages)
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
+    gtk_box_pack_start(GTK_BOX(temphbox), button, FALSE, FALSE, 0);
+    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                       GTK_SIGNAL_FUNC(images_selected), this);
+    gtk_widget_show(button);
+
+
+    button = gtk_radio_button_new_with_label(
+                             gtk_radio_button_group(GTK_RADIO_BUTTON(button)),
+                             "Text and Images");
+    if (originalValues.useTextLabels && originalValues.useImages)
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
+    gtk_box_pack_start(GTK_BOX(temphbox), button, FALSE, FALSE, 0);
+    gtk_signal_connect(GTK_OBJECT(button), "clicked",
+                       GTK_SIGNAL_FUNC(both_selected), this);
+    gtk_widget_show(button);
+
     return pane;
 }
 

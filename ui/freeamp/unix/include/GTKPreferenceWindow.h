@@ -183,6 +183,8 @@ class GTKPreferenceWindow : public PreferenceWindow
 
       GtkWidget *fontDialog;
 
+      bool firsttime;
+
   public:
       GtkWidget *mainWindow;
       GtkWidget *pmoOptionMenu;
@@ -218,6 +220,7 @@ class GTKPreferenceWindow : public PreferenceWindow
       void ShowHelp(void);
 
       void SaveMusicSet(char *newpath, bool set);
+      void SetToolbar(bool text, bool pics);
 
       FAContext *GetContext(void) { return m_pContext; }
 };
