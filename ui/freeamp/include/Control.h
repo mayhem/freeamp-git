@@ -38,6 +38,7 @@ ____________________________________________________________________________*/
 
 using namespace std;
 
+#include "mutex.h"
 #include "Types.h"
 #include "Bitmap.h"
 #include "Canvas.h"
@@ -167,6 +168,7 @@ class Control
       bool                   m_bHorizontalBitmap;
       int                    m_iValue;
       string                 m_oValue;
+	  Mutex                  m_oMutex;
 };
 
 #endif

@@ -58,6 +58,7 @@ VSliderControl::VSliderControl(Window *pWindow, string &oName) :
      m_iCurrentPos = 0;
      m_oOrigin.y = -1;
      m_bIsDrag = false;
+     m_bInUpdate = false;
 };
 
 VSliderControl::~VSliderControl(void)
@@ -67,10 +68,13 @@ VSliderControl::~VSliderControl(void)
 
 void VSliderControl::Init(void)
 {
-    m_iThumbHeight = m_oBitmapRect.Height();
+    m_oMutex.Acquire();
     
+    m_iThumbHeight = m_oBitmapRect.Height();
     m_iRange = m_oRect.Height() - m_iThumbHeight;
 
+    m_oMutex.Release();
+    
     Transition(CT_None, NULL);
 }
 
@@ -90,17 +94,34 @@ void VSliderControl::Transition(ControlTransitionEnum  eTrans,
 
 	   case CT_SetValue:
        {
-       	   int iNewPos;	
+       	   int iNewPos, iOldPos;	
 
            if (m_iValue < 0 || m_iValue > 100)
+               return;
+
+           m_oMutex.Acquire();
+           if (m_bInUpdate)
+           {
+              m_oMutex.Release();
               return;
-              
+           }
+           m_bInUpdate = true;
+
            iNewPos = ((100 - m_iValue) * m_iRange) / 100;
            if (iNewPos == m_iCurrentPos)
-               return;
-               
-           MoveThumb(m_iCurrentPos, iNewPos);
+           {
+              m_bInUpdate = false;
+              m_oMutex.Release();
+              return;
+           }
+
+           iOldPos = m_iCurrentPos;
            m_iCurrentPos = iNewPos;
+           m_bInUpdate = false;
+           m_oMutex.Release();
+
+           MoveThumb(iOldPos, iNewPos);
+           
            return;
        }   
 
@@ -113,6 +134,7 @@ void VSliderControl::Transition(ControlTransitionEnum  eTrans,
     oRect.y1 = m_oRect.y1 + m_iCurrentPos;
     oRect.y2 = oRect.y1 + m_iThumbHeight;
 
+    m_oMutex.Acquire();
     if (m_eCurrentState != CS_Dragging && 
         m_eLastState == CS_Dragging)
     {    
@@ -120,23 +142,33 @@ void VSliderControl::Transition(ControlTransitionEnum  eTrans,
 	    {
 	    	Rect oRect;
 	 
-	        m_oOrigin.y = m_oRect.y1 + m_iCurrentPos + (m_iThumbHeight / 2);
+            m_oMutex.Release();
 	        m_pParent->GetWindowPosition(oRect);
+            m_oMutex.Acquire();
+            
+	        m_oOrigin.y = m_oRect.y1 + m_iCurrentPos + (m_iThumbHeight / 2);
 	        m_oOrigin.y += oRect.y1;
 	        m_oOrigin.x += oRect.x1;
 	        
-//	        m_pParent->SetMousePos(m_oOrigin);
+            m_oMutex.Release();
 	        m_pParent->EndMouseCapture();
 	        m_pParent->HideMouse(false);
+            m_oMutex.Acquire();
+            
 	        m_oOrigin.y = -1;
 	    }    
         m_iValue = 100 - ((m_iCurrentPos * 100) / m_iRange);
+
+        m_oMutex.Release();
         m_pParent->SendControlMessage(this, CM_ValueChanged);
+        m_oMutex.Acquire();
     }    
 
     if (m_eCurrentState == CS_Dragging && 
         m_eLastState != CS_Dragging)
 	   m_bIsDrag = oRect.IsPosInRect(*pPos);
+
+    m_oMutex.Release();
 
     switch(m_eCurrentState)
     {
@@ -149,12 +181,27 @@ void VSliderControl::Transition(ControlTransitionEnum  eTrans,
           break;
 
        case CS_Dragging:
+       
+          m_oMutex.Acquire();
+          if (m_bInUpdate)
+          {
+              m_oMutex.Release();
+              return;
+          }
+              
+          m_bInUpdate = true;
+          m_oMutex.Release();
+
           if (m_bIsDrag)
               HandleDrag(eTrans, pPos); 
           else
               HandleJump(eTrans, pPos);    
-          break;
 
+          m_oMutex.Acquire();
+          m_bInUpdate = false;
+          m_oMutex.Release();
+          break;
+          
        case CS_Disabled:
           BlitFrame(2, 3, &oRect);
           break;
@@ -169,18 +216,29 @@ void VSliderControl::HandleJump(ControlTransitionEnum  eTrans,
 {
     int     iNewPos;
 
+    m_oMutex.Acquire();
+
     iNewPos = pPos->y - m_oRect.y1 - (m_iThumbHeight / 2);
     iNewPos = min(max(iNewPos, 0), m_iRange);
+
     if (iNewPos == m_iCurrentPos)
+    {
+       m_oMutex.Release();
        return;
+    }   
+    m_oMutex.Release();
 
     MoveThumb(m_iCurrentPos, iNewPos);
+
+    m_oMutex.Acquire();
 
     m_iCurrentPos = iNewPos;
     m_oLastPos = *pPos;
     
     m_iValue = 100 - ((m_iCurrentPos * 100) / m_iRange);
     m_bIsDrag = true;
+    
+    m_oMutex.Release();
 }
 
 void VSliderControl::HandleDrag(ControlTransitionEnum  eTrans,
@@ -188,10 +246,14 @@ void VSliderControl::HandleDrag(ControlTransitionEnum  eTrans,
 {
     int     iDelta, iNewPos;
 
+    m_oMutex.Acquire();
+
     // Is this the beginning of a drag?
     if (m_oOrigin.y == -1)
     {
         m_oLastPos = m_oOrigin = *pPos;
+
+        m_oMutex.Release();
 
         m_pParent->HideMouse(true);
         m_pParent->StartMouseCapture(this);
@@ -200,20 +262,31 @@ void VSliderControl::HandleDrag(ControlTransitionEnum  eTrans,
     }
 
 	if (pPos->y < 0)
+    {
+        m_oMutex.Release();
         return;
+    }    
 
     iDelta = pPos->y - m_oLastPos.y; 
     iNewPos = min(max(m_iCurrentPos + iDelta, 0), m_iRange);
     
     if (iNewPos == m_iCurrentPos)
-       return;
+    {
+        m_oMutex.Release();
+        return;
+    }    
+    m_oMutex.Release();
 
 	MoveThumb(m_iCurrentPos, iNewPos);
 
+    m_oMutex.Acquire();
+    
     m_iCurrentPos = iNewPos;
     m_oLastPos = *pPos;
     
 	m_iValue = 100 - ((m_iCurrentPos * 100) / m_iRange);
+    m_oMutex.Release();
+    
     m_pParent->SendControlMessage(this, CM_SliderUpdate);
 }
 

@@ -58,6 +58,7 @@ SliderControl::SliderControl(Window *pWindow, string &oName) :
      m_iCurrentPos = 0;
      m_oOrigin.x = -1;
      m_bIsDrag = false;
+     m_bInUpdate = false;
 };
 
 SliderControl::~SliderControl(void)
@@ -67,10 +68,13 @@ SliderControl::~SliderControl(void)
 
 void SliderControl::Init(void)
 {
-    m_iThumbWidth = m_oBitmapRect.Width() / 3;
+    m_oMutex.Acquire();
     
+    m_iThumbWidth = m_oBitmapRect.Width() / 3;
     m_iRange = m_oRect.Width() - m_iThumbWidth;
 
+    m_oMutex.Release();
+    
     Transition(CT_None, NULL);
 }
 
@@ -90,18 +94,34 @@ void SliderControl::Transition(ControlTransitionEnum  eTrans,
 
 	   case CT_SetValue:
        {
-       	   int iNewPos;	
-
+       	   int iNewPos, iOldPos;	
 
            if (m_iValue < 0 || m_iValue > 100)
+               return;
+
+           m_oMutex.Acquire();
+           if (m_bInUpdate)
+           {
+              m_oMutex.Release();
               return;
+           }
+           m_bInUpdate = true;
 
            iNewPos = (m_iValue * m_iRange) / 100;
            if (iNewPos == m_iCurrentPos)
-               return;
-               
-           MoveThumb(m_iCurrentPos, iNewPos);
+           {
+              m_bInUpdate = false;
+              m_oMutex.Release();
+              return;
+           }
+
+           iOldPos = m_iCurrentPos;
            m_iCurrentPos = iNewPos;
+           m_bInUpdate = false;
+           m_oMutex.Release();
+
+           MoveThumb(iOldPos, iNewPos);
+           
            return;
        }   
 
@@ -114,6 +134,7 @@ void SliderControl::Transition(ControlTransitionEnum  eTrans,
     oRect.y1 = m_oRect.y1;
     oRect.y2 = m_oRect.y2;
 
+    m_oMutex.Acquire();
     if (m_eCurrentState != CS_Dragging && 
         m_eLastState == CS_Dragging)
     {    
@@ -121,24 +142,34 @@ void SliderControl::Transition(ControlTransitionEnum  eTrans,
 	    {
 	    	Rect oRect;
 	 
-	        m_oOrigin.x = m_oRect.x1 + m_iCurrentPos + (m_iThumbWidth / 2);
+            m_oMutex.Release();
 	        m_pParent->GetWindowPosition(oRect);
+            m_oMutex.Acquire();
+
+	        m_oOrigin.x = m_oRect.x1 + m_iCurrentPos + (m_iThumbWidth / 2);
 	        m_oOrigin.x += oRect.x1;
 	        m_oOrigin.y += oRect.y1;
 	        
-//	        m_pParent->SetMousePos(m_oOrigin);
+            m_oMutex.Release();
 	        m_pParent->EndMouseCapture();
 	        m_pParent->HideMouse(false);
+            m_oMutex.Acquire();
+  
 	        m_oOrigin.x = -1;
 	    }    
         m_iValue = (m_iCurrentPos * 100) / m_iRange;
+
+        m_oMutex.Release();
         m_pParent->SendControlMessage(this, CM_ValueChanged);
+        m_oMutex.Acquire();
     }    
 
     if (m_eCurrentState == CS_Dragging && 
         m_eLastState != CS_Dragging)
 	   m_bIsDrag = oRect.IsPosInRect(*pPos);
 
+    m_oMutex.Release();
+ 
     switch(m_eCurrentState)
     {
        case CS_Normal:
@@ -150,10 +181,26 @@ void SliderControl::Transition(ControlTransitionEnum  eTrans,
           break;
 
        case CS_Dragging:
+
+          m_oMutex.Acquire();
+          if (m_bInUpdate)
+          {
+              m_oMutex.Release();
+              return;
+          }
+              
+          m_bInUpdate = true;
+          m_oMutex.Release();
+
           if (m_bIsDrag)
               HandleDrag(eTrans, pPos); 
           else
               HandleJump(eTrans, pPos);    
+
+          m_oMutex.Acquire();
+          m_bInUpdate = false;
+          m_oMutex.Release();
+          
           break;
 
        case CS_Disabled:
@@ -168,25 +215,30 @@ void SliderControl::Transition(ControlTransitionEnum  eTrans,
 void SliderControl::HandleJump(ControlTransitionEnum  eTrans,
                                Pos                   *pPos)
 {
-    int     iNewPos;
+    int iNewPos, iOldPos;
 
-    //Debug_v("Handle jump: %d (%d - %d)", pPos->x, m_oRect.x1, m_oRect.x2);
+    m_oMutex.Acquire();
 
     iNewPos = pPos->x - m_oRect.x1 - (m_iThumbWidth / 2);
     iNewPos = min(max(iNewPos, 0), m_iRange);
+    
     if (iNewPos == m_iCurrentPos)
+    {
+       m_oMutex.Release();
        return;
+    }   
 
-    //Debug_v("iCurPos: %d iNewPos: %d Range: %d", 
-    //        m_iCurrentPos, iNewPos, m_iRange);
-    MoveThumb(m_iCurrentPos, iNewPos);
-
+    iOldPos = m_iCurrentPos;
+    
     m_iCurrentPos = iNewPos;
     m_oLastPos = *pPos;
     
     m_iValue = (m_iCurrentPos * 100) / m_iRange;
-    //Debug_v("new value: %d", m_iValue);
     m_bIsDrag = true;
+    
+    m_oMutex.Release();
+    
+    MoveThumb(iOldPos, iNewPos);
 }
 
 void SliderControl::HandleDrag(ControlTransitionEnum  eTrans,
@@ -194,10 +246,14 @@ void SliderControl::HandleDrag(ControlTransitionEnum  eTrans,
 {
     int     iDelta, iNewPos;
 
+    m_oMutex.Acquire();
+
     // Is this the beginning of a drag?
     if (m_oOrigin.x == -1)
     {
         m_oLastPos = m_oOrigin = *pPos;
+
+        m_oMutex.Release();
 
         m_pParent->HideMouse(true);
         m_pParent->StartMouseCapture(this);
@@ -206,20 +262,31 @@ void SliderControl::HandleDrag(ControlTransitionEnum  eTrans,
     }
 
 	if (pPos->x < 0)
+    {
+        m_oMutex.Release();
         return;
+    }    
 
     iDelta = pPos->x - m_oLastPos.x; 
     iNewPos = min(max(m_iCurrentPos + iDelta, 0), m_iRange);
     
     if (iNewPos == m_iCurrentPos)
-       return;
+    {
+        m_oMutex.Release();
+        return;
+    }    
+    m_oMutex.Release();
 
 	MoveThumb(m_iCurrentPos, iNewPos);
+
+    m_oMutex.Acquire();
 
     m_iCurrentPos = iNewPos;
     m_oLastPos = *pPos;
     
 	m_iValue = (m_iCurrentPos * 100) / m_iRange;
+    m_oMutex.Release();
+
     m_pParent->SendControlMessage(this, CM_SliderUpdate);
 }
 

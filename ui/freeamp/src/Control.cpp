@@ -71,65 +71,94 @@ Control::~Control(void)
 
 Error Control::Show(bool bSet, bool &bShow)
 {
+    m_oMutex.Acquire();
     if (bSet)
     {
         m_bShow = bShow;
+        m_oMutex.Release();
+        
         AcceptTransition(bShow ? CT_Show : CT_Hide);
+        return kError_NoErr;
     }
     else
+    {
         bShow = m_bShow;
-
-    return kError_NoErr;
+        m_oMutex.Release();
+        
+        return kError_NoErr;
+    }
 }
 
 Error Control::Enable(bool bSet, bool &bEnable)
 {
+    m_oMutex.Acquire();
+    
     if (bSet)
     {
         m_bEnable = bEnable;
+        m_oMutex.Release();
+        
         AcceptTransition(bEnable ? CT_Enable : CT_Disable);
+        return kError_NoErr;
     }
     else
+    {
         bEnable = m_bEnable;
-
-    return kError_NoErr;
+        m_oMutex.Release();
+        
+        return kError_NoErr;
+    }    
 }
 
 Error Control::IntValue(bool bSet, int &iValue)
 {
+    m_oMutex.Acquire();
+
     if (bSet)
     {
     	if (m_iValue != iValue)
         {
             m_iValue = iValue;
+            m_oMutex.Release();
+            
             AcceptTransition(CT_SetValue);
+            return kError_NoErr;
         }   
     }
     else
         iValue = m_iValue;
-
+    
+    m_oMutex.Release();
+    
     return kError_NoErr;
 }
 
 Error Control::StringValue(bool bSet, string &oValue)
 {
+    m_oMutex.Acquire();
     if (bSet)
     {
     	if (m_oValue.length() == 0 || m_oValue != oValue)
         {
             m_oValue = oValue;
+            m_oMutex.Release();
+            
             AcceptTransition(CT_SetValue);
+            return kError_NoErr;
         }   
     }
     else
         oValue = m_oValue;
-
+        
+    m_oMutex.Release();
     return kError_NoErr;
 }
 
 void Control::AcceptTransition(ControlTransitionEnum eTrans, Pos *pPos)
 {
     vector<TransitionInfo>::iterator i;
+
+    m_oMutex.Acquire();
    
     for(i = m_oTransitions.begin(); i != m_oTransitions.end(); i++)
     {
@@ -141,41 +170,54 @@ void Control::AcceptTransition(ControlTransitionEnum eTrans, Pos *pPos)
                 m_eLastState = m_eCurrentState;
                 m_eCurrentState = (*i).eNextState;
             }    
-            Transition(eTrans, pPos);
 
+            m_oMutex.Release();
+            Transition(eTrans, pPos);
+            
             return;
         }
     }
+    m_oMutex.Release();
 }
 
 void Control::SetParent(Window *pParent)
 {
+    m_oMutex.Acquire();
 	m_pParent = pParent;
+    m_oMutex.Release();
 }
 
 void Control::SetRect(Rect &oRect)
 {
+    m_oMutex.Acquire();
     m_oRect = oRect;
+    m_oMutex.Release();
 }
 
 void Control::GetRect(Rect &oRect)
 {
+    m_oMutex.Acquire();
     oRect = m_oRect;
+    m_oMutex.Release();
 }
 
 void Control::SetPos(Pos &oPos)
 {
+    m_oMutex.Acquire();
     m_oRect.x1 = oPos.x;
     m_oRect.y1 = oPos.y;
     m_oRect.x2 = -1;
     m_oRect.y2 = -1;
+    m_oMutex.Release();
 }
 
 void Control::SetBitmap(Bitmap *pBitmap, Rect &oBitmapRect, bool bHoriz)
 {
+    m_oMutex.Acquire();
     m_pBitmap = pBitmap;
     m_oBitmapRect = oBitmapRect;
     m_bHorizontalBitmap = bHoriz;
+    m_oMutex.Release();
 }
 
 Bitmap *Control::GetBitmap(void)
@@ -203,8 +245,6 @@ void Control::BlitFrame(int iFrame, int iNumFramesInBitmap, Rect *pRect)
 	else
 		BlitFrameVert(iFrame,iNumFramesInBitmap,pRect);
 }
-
-Bitmap *last = NULL;
 
 void Control::BlitFrameHoriz(int iFrame, int iNumFramesInBitmap, Rect *pRect)
 {
@@ -300,12 +340,16 @@ bool Control::PosInControl(Pos &oPos)
 
 void Control::SetDesc(const string &oDesc)
 {
+    m_oMutex.Acquire();
     m_oDesc = oDesc;
+    m_oMutex.Release();
 }    
 
 void Control::SetTip(const string &oTip)
 {
+    m_oMutex.Acquire();
     m_oToolTip = oTip;
+    m_oMutex.Release();
 }    
 
 void Control::GetDesc(string &oDesc)

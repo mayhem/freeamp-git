@@ -44,11 +44,11 @@ class SliderControl : public Control
 
               void MoveThumb(int iCurrentPos, int iNewPos);
 					  
-      Pos  m_oOrigin, m_oLastPos;
-      int  m_iRange;
-      int  m_iCurrentPos;
-      int  m_iThumbWidth;
-      bool m_bIsDrag;
+      Pos   m_oOrigin, m_oLastPos;
+      int   m_iRange;
+      int   m_iCurrentPos;
+      int   m_iThumbWidth;
+      bool  m_bIsDrag, m_bInUpdate;
 };
 
 #endif

@@ -386,7 +386,7 @@ Error Headlines::DownloadHeadlines(string &oUrl, string &oPage)
     if(s > 0)
         closesocket(s);
 
-    delete buffer;
+    free(buffer);
 
     return result;
 }

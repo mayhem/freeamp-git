@@ -73,9 +73,12 @@ void MultiStateControl::GetDesc(string &oDesc)
 {
     uint32 i = m_iState;
 
+    m_oMutex.Acquire();
+
     if (m_oDescs.size() == 0)
     {
        oDesc = "";
+       m_oMutex.Release();
        return;
     }
     
@@ -83,15 +86,20 @@ void MultiStateControl::GetDesc(string &oDesc)
       i = 0;
        
     oDesc = m_oDescs[i];
+    
+    m_oMutex.Release();
 }    
 
 void MultiStateControl::GetTip(string &oTip)
 {
     uint32 i = m_iState;
     
+    m_oMutex.Acquire();
+    
     if (m_oTips.size() == 0)
     {
        oTip = "";
+       m_oMutex.Release();
        return;
     }
     
@@ -99,6 +107,8 @@ void MultiStateControl::GetTip(string &oTip)
       i = 0;
        
     oTip = m_oTips[i];
+    
+    m_oMutex.Release();
 }    
 
 void MultiStateControl::Init(void)
@@ -106,6 +116,8 @@ void MultiStateControl::Init(void)
     uint32 iOffset;
     int    iRet;
     char  *szDup;
+
+    m_oMutex.Acquire();
 
     szDup = strdup(m_oDesc.c_str());
     iOffset = 0;
@@ -146,6 +158,7 @@ void MultiStateControl::Init(void)
         m_oRect.y2 = m_oRect.y1 + 
                      (m_oBitmapRect.y2 - m_oBitmapRect.y1)/m_iNumStates;
     }    
+    m_oMutex.Release();
     
     BlitMultiStateFrame(0, 4, m_iState, m_iNumStates);
 }
@@ -154,6 +167,7 @@ void MultiStateControl::Transition(ControlTransitionEnum  eTrans,
                                    Pos                   *pMousePos)
 {
 	Canvas *pCanvas;
+    
     
     switch(eTrans)
     {
@@ -210,6 +224,8 @@ bool MultiStateControl::PosInControl(Pos &oPos)
 {
     bool bRet;
     
+    m_oMutex.Acquire();
+    
     bRet = m_oRect.IsPosInRect(oPos);
     if (bRet && m_pBitmap)
     {
@@ -217,8 +233,12 @@ bool MultiStateControl::PosInControl(Pos &oPos)
         
         oLocalPos.x = (oPos.x - m_oRect.x1) + m_oBitmapRect.x1;
         oLocalPos.y = (oPos.y - m_oRect.y1) + m_oBitmapRect.y1;
+        
+        m_oMutex.Release();
         return m_pBitmap->IsPosVisible(oLocalPos);
     }    
+    
+    m_oMutex.Release();
     
     return bRet;    
 }        

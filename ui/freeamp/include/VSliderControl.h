@@ -48,7 +48,7 @@ class VSliderControl : public Control
       int  m_iRange;
       int  m_iCurrentPos;
       int  m_iThumbHeight;
-      bool m_bIsDrag;
+      bool m_bIsDrag, m_bInUpdate;
 };
 
 #endif
