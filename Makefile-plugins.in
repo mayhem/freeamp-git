@@ -36,7 +36,7 @@ PLUGINS += plugins/httpinput.pmi
 PLUGINS += plugins/obsinput.pmi
 
 PLUGINS += plugins/soundcard.pmo
-#PLUGINS += plugins/cd.pmo
+PLUGINS += plugins/cd.pmo
 
 PLUGINS += plugins/freeampcmd.ui
 PLUGINS += plugins/mpg123.ui
@@ -44,7 +44,7 @@ PLUGINS += plugins/lcd.ui
 PLUGINS += plugins/irman.ui
 
 PLUGINS += plugins/xingmp3.lmc
-#PLUGINS += plugins/cd.lmc
+PLUGINS += plugins/cd.lmc
 
 PLUGINS += plugins/id3v1.mdf
 PLUGINS += plugins/id3v2.mdf
@@ -117,8 +117,8 @@ plugins/esound.pmo: $(ESNDOBJ)
 #	$(LINKMOD) -o $@ $(ESNDOBJ) $(STATICLD) /usr/lib/libesd.a /usr/lib/libaudiofile.a
 
 # cd
-CDPMOOBJ  = io/cd/unix/src/cdpmo.o io/cd/unix/src/cdaudio.o io/src/pipeline.lo 
-CDPMOOBJ += io/src/pmo.o
+CDPMOOBJ  = io/cd/unix/src/cdpmo.o io/cd/unix/src/cdaudio.o 
+CDPMOOBJ += io/cd/unix/src/discids.o io/src/pipeline.lo io/src/pmo.o
 
 plugins/cd.pmo: $(CDPMOOBJ)
 	$(LINKMOD) -o $@ $(CDPMOOBJ) $(STATICLD)
@@ -241,7 +241,7 @@ plugins/irman.ui: $(IRMANUIOBJ)
 
 # dummy lmc for cd audio
 
-CDLMCOBJ = lmc/cd/src/cdlmc.o
+CDLMCOBJ = lmc/cd/src/cdlmc.o io/src/pipeline.lo
 
 plugins/cd.lmc: $(CDLMCOBJ)
 	$(LINKMOD) -o $@ $(CDLMCOBJ) $(STATICLD)

@@ -74,6 +74,7 @@ const char* kWindowModePref = "WindowMode";
 const char* kWelcomePref = "Welcome";
 const char* kPlayImmediatelyPref = "PlayImmediately";
 const char* kNumberOfURLsToRememberPref = "NumberOfURLsToRemember";
+const char* kCDDevicePathPref = "CDDevice";
 
 //logging
 const char* kUseDebugLogPref = "UseDebugLog";
@@ -102,8 +103,10 @@ const char *kDefaultMainWindowPos = "-1,-1";
 const char *kDefaultWindowMode = "MainWindow";
 #ifdef WIN32
 const char *kDefaultThemeDefaultFont = "Arial";
+const char *kDefaultCDDevicePath = "";
 #else
 const char *kDefaultThemeDefaultFont = "Helvetica";
+const char *kDefaultCDDevicePath = "/dev/cdrom";
 #endif
 const char *kDefaultDownloadManagerUI = "download.ui";
 const char *kDefaultMusicBrowserUI = "musicbrowser.ui";
@@ -250,6 +253,11 @@ SetDefaults()
     if (GetPrefString(kUserNamePref, dummyString, 
         (uint32 *)&dummyInt) == kError_NoPrefValue)
         SetPrefString(kUserNamePref, kDefaultUserName);
+
+    dummyInt = 255;
+    if (GetPrefString(kCDDevicePathPref, dummyString,
+        (uint32 *)&dummyInt) == kError_NoPrefValue)
+        SetPrefString(kCDDevicePathPref, kDefaultCDDevicePath);
 
     if (GetPrefBoolean(kReclaimFiletypesPref, &dummyBool) == kError_NoPrefValue)
         SetPrefBoolean(kReclaimFiletypesPref, kDefaultReclaimFiletypes);
@@ -833,6 +841,20 @@ Preferences::
 SetSaveMusicDirectory(const char* path)
 {
     return SetPrefString(kSaveMusicDirPref, path);
+}
+
+Error
+Preferences::
+GetCDDevicePath(char* path, uint32* len)
+{
+    return GetPrefString(kCDDevicePathPref, path, len);
+}
+
+Error
+Preferences::
+SetCDDevicePath(const char* path)
+{
+    return SetPrefString(kCDDevicePathPref, path);
 }
 
 Error

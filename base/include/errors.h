@@ -98,7 +98,8 @@ typedef enum Error
     kError_HTTPFileNotFound     = 67,
     kError_CDInitFailed         = 68,
     kError_InvalidTrack         = 69,
-    kError_DownloadDenied       = 70,  
+    kError_DownloadDenied       = 70,
+    kError_NoDiscInDrive        = 71,
     kError_LastError            = 9999
 };
 

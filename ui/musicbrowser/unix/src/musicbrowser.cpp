@@ -2,7 +2,7 @@
 
         FreeAmp - The Free MP3 Player
 
-        Portions Copyright (C) 1999 EMusic.com
+        Portions Copyright (C) 1999-2000 EMusic.com
 
         This program is free software; you can redistribute it and/or modify
         it under the terms of the GNU General Public License as published by
@@ -25,6 +25,8 @@ ____________________________________________________________________________*/
 #include "gtkmusicbrowser.h" 
 #include "infoeditor.h"
 #include "eventdata.h"
+#include "player.h"
+#include "pmo.h"
 
 #include <algorithm>
 using namespace std;
@@ -88,7 +90,44 @@ static int musicbrowser_timeout(MusicBrowserUI *p)
     p->SetRunning();
     if (p->doQuitNow)
         gtk_main_quit();
+
+    return TRUE;
 }
+
+void MusicBrowserUI::DoCDCheck(void)
+{
+    Registry *pmoRegistry = m_context->player->GetPMORegistry();
+    RegistryItem *pmo_item = NULL;
+    int32 i = 0;
+
+    while (NULL != (pmo_item = pmoRegistry->GetItem(i++))) {
+        if (!strcmp("cd.pmo", pmo_item->Name())) {
+            break;
+        }
+    }
+
+    if (!pmo_item)
+        return;
+
+    PhysicalMediaOutput *pmo;
+    pmo = (PhysicalMediaOutput *)pmo_item->InitFunction()(m_context);
+    pmo->SetPropManager((Properties *)(m_context->player));
+
+    if (IsError(pmo->Init(NULL))) {
+        CDInfoEvent *cie = new CDInfoEvent(0, 0, "");
+        m_playerEQ->AcceptEvent(cie);
+    }
+
+    delete pmo;
+}
+    
+static int cd_check_timeout(MusicBrowserUI *p)
+{
+    p->DoCDCheck();
+
+    return TRUE;
+}
+
 
 void MusicBrowserUI::GTKEventService(void)
 {
@@ -104,6 +143,8 @@ void MusicBrowserUI::GTKEventService(void)
         weAreGTK = true;
     }
     m_context->gtkLock.Release();
+
+    gtk_timeout_add(1000, cd_check_timeout, this);
 
     if (weAreGTK) {
         gtk_timeout_add(250, musicbrowser_timeout, this);
@@ -168,7 +209,9 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
                 mainBrowser->ShowMusicBrowser();
             break; }
         case CMD_AddFiles:
-        case INFO_PlaylistCurrentItemInfo: 
+        case INFO_PlaylistCurrentItemInfo:
+        case INFO_PlaylistItemUpdated:
+        case INFO_CDDiscStatus: 
         case INFO_PrefsChanged: {
             mainBrowser->AcceptEvent(event);
             vector<GTKMusicBrowser *>::iterator i = browserWindows.begin();

@@ -81,6 +81,7 @@ extern const char* kViewMusicBrowserPref;
 extern const char* kWelcomePref;
 extern const char* kPlayImmediatelyPref;
 extern const char* kNumberOfURLsToRememberPref;
+extern const char* kCDDevicePathPref;
 
 class LibDirFindHandle;
 
@@ -250,6 +251,9 @@ class Preferences {
 
     Error GetNumberOfURLsToRemember(int32* value);
     Error SetNumberOfURLsToRemember(int32 value);
+
+    Error GetCDDevicePath(char* path, uint32* len);
+    Error SetCDDevicePath(const char* path);
 };
 
 #endif /* _PREFERENCES_H */

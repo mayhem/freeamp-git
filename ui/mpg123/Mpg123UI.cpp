@@ -79,7 +79,7 @@ Init(int32 startup_level)
       // cout << endl << "mpg123 0.59k command line compatability mode" << endl 
       // << endl;
       cerr << "High Performance MPEG 1.0/2.0/2.5 Audio Player for Layer 1, 2 and 3" << endl;
-      cerr << "Version 2.0.2 (2000/Feb/04).  " << endl;
+      cerr << "Version 2.1.0 (2000/Feb/04).  " << endl;
       cerr << "Copyrights EMusic, XingTech. See 'README' for more!" << endl;
       cerr << "This software is distributed under the GNU GPL." << endl;
       signal(SIGTERM, mysigterm);

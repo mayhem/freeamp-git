@@ -143,5 +143,6 @@ class EventQueue {
 #define INFO_PlaylistItemsAdded 76 // sent by PLM to player to inform of a playlistitem update
 #define INFO_DoneOutputtingDueToError 77 // sent by PMO (or LMC controlling PMO) to Player when its done outputing but an error occurred
 #define INFO_HeadlineText             78 // Used to send Slashdot headlines to UIs
+#define INFO_CDDiscStatus             79 // sent by the CD PMO when a disc starts playing, so the MB gui knows the number of tracks, etc
 #endif // _EVENT_H_
 

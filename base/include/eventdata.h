@@ -580,6 +580,22 @@ public:
    }
 };
 
+class CDInfoEvent : public Event {
+private:
+    uint32 m_totalTracks;
+    uint32 m_cddb;
+    string m_cdindex;
+public:
+    CDInfoEvent(const uint32 numtracks, const uint32 cddb, char *cdindex)
+    { m_type = INFO_CDDiscStatus; m_totalTracks = numtracks; 
+      m_cddb = cddb; m_cdindex = cdindex; }
+    virtual ~CDInfoEvent() {}
+
+    const uint32 GetNumTracks() const { return m_totalTracks; }
+    const uint32 GetCDDB() const { return m_cddb; }
+    const string GetCdindex() const { return m_cdindex; }
+};
+
 class MusicCatalogStreamAddedEvent : public Event {
 private:
     const PlaylistItem *m_item;
