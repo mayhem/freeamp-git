@@ -109,6 +109,7 @@ void Window::LockUsageRef(void)
         if (m_iUsageCount > 0)
         {
             m_pUsageMutex->Release();
+            ProcessWaitingMessages();
             m_pUsageSem->Wait();
         }
         else

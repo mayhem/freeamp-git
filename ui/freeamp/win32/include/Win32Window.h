@@ -86,6 +86,7 @@ class Win32Window : public Window
      void  SetLiveInToolbar(bool bLive);
 	 void  MouseLeaveCheck(void);
      void  AddToSystemMenu(HWND hWnd);
+     void  ProcessWaitingMessages(void);
     
      HWND     m_hWnd;
 	 HPALETTE m_hPal;

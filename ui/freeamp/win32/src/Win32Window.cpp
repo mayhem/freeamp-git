@@ -410,6 +410,20 @@ Error Win32Window::Run(Pos &oPos)
     return kError_NoErr;
 }			
 
+void Win32Window::ProcessWaitingMessages(void)
+{
+    MSG msg;
+    
+    while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE)) 
+    {
+        if (msg.message == WM_QUIT)
+           return;
+           
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+}
+
 void Win32Window::Init(void)
 {
 	Window::Init();

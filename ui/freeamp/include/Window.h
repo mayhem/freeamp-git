@@ -123,17 +123,18 @@ class Window
       virtual Error GetMousePos(Pos &oMousePos) = 0;
       virtual Error SetWindowPosition(Rect &oWindowRect) = 0;
       virtual Error GetWindowPosition(Rect &oWindowRect) = 0;
-
+	  
     protected:
 
       Control *ControlFromPos(Pos &oPos);
       void     GetReloadWindowPos(Rect &oOldRect, int iNewWidth, int iNewHeight, 
                                   Rect &oNewRect);
 
-      void     IncUsageRef(void);
-	  void     DecUsageRef(void);
-	  void     LockUsageRef(void);
-	  void     UnlockUsageRef(void);
+              void  IncUsageRef(void);
+              void  DecUsageRef(void);
+              void  LockUsageRef(void);
+              void  UnlockUsageRef(void);
+      virtual void  ProcessWaitingMessages(void) { ; };
      
       string                    m_oName;
       vector<Control *>         m_oControls;
