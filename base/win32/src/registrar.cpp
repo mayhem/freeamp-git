@@ -204,8 +204,7 @@ Error RegisterUIs(UIRegistry* registry)
             {
                 char file[MAX_PATH];
 
-                strcpy(file, dir);
-                strcat(file, find.cFileName);
+                sprintf(file, "%s\\%s", dir, find.cFileName);
 
                 UIInfo* info = new UIInfo;
 
