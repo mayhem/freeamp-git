@@ -51,10 +51,14 @@ GTKPreferenceWindow::GTKPreferenceWindow(FAContext *context,
 
 GTKPreferenceWindow::~GTKPreferenceWindow(void)
 {
-    if (m_PMOnames)
+    if (m_PMOnames) 
         delete m_PMOnames;
-    if (paneList)
+    if (paneList) {
+        while (paneList->size() > 0) {
+            paneList->erase(paneList->begin());
+        }
         delete paneList;
+    }
 } 
 
 static gboolean pref_destroy(GtkWidget *widget, GTKPreferenceWindow *p)

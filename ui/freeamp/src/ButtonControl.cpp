@@ -70,7 +70,6 @@ ButtonControl::ButtonControl(Window *pWindow, string &oName, string &oUrl) :
 
 ButtonControl::~ButtonControl(void)
 {
-
 }
 
 void ButtonControl::Init(void)

@@ -248,7 +248,7 @@ uint32 VorbisLMC::CalculateSongLength(const char *url)
 
     dur = ov_time_total(&vf, 0);
 
-    fclose(fpFile);
+    ov_clear(&vf);
 
     return (int)dur;
 }
