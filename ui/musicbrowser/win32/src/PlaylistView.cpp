@@ -45,15 +45,6 @@ using namespace std;
 #include "DropSource.h"
 #include "DropObject.h"
 
-
-#ifndef min
-#define min _cpp_min 
-#endif
-
-#ifndef max
-#define max _cpp_max
-#endif
-
 #define kPrePadding 5
 
 BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)

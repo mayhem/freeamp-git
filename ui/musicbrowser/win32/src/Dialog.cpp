@@ -243,6 +243,10 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                     m_plm->Redo();
                     return 1;
 
+                case ID_POPUP_VISITWEB:
+                    VisitWebEvent();
+                    return 1;
+
                 case ID_POPUP_ADDTRACK:
                 case ID_EDIT_ADDTRACK:
                     AddTrackEvent();

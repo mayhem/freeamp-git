@@ -236,6 +236,7 @@ class MusicBrowserUI : public UserInterface
     void  MoveUpEvent();
     void  MoveDownEvent();
     void  AddTrackEvent();
+    void  VisitWebEvent(void);
     void  AddTrackAndPlayEvent();
     void  AddFileEvent(HWND hwndParent, bool playNow = false);
     void  EditPlaylistEvent();

@@ -836,6 +836,7 @@ void MusicBrowserUI::UpdateStreams(vector<FreeAmpStreamInfo> &list)
         MetaData metadata;
 
         stream->SetURL(i->m_streamUrl.c_str());
+        stream->SetWebURL(i->m_webUrl.c_str());
         metadata.SetTitle(i->m_name.c_str());
         metadata.SetArtist(i->m_webUrl.c_str());
         metadata.SetComment(i->m_desc.c_str());

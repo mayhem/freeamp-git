@@ -214,6 +214,7 @@
 #define ID_RELATABLE_EDITPROFILE        40098
 #define ID_HELP_RELATABLEWEBSITE        40099
 #define ID_POPUP_SUPDATE                40100
+#define ID_POPUP_VISITWEB               40101
 #define IDS_URL                         65535
 #define IDC_TRACKTEXT                   65535
 #define IDC_TITLETEXT                   65535

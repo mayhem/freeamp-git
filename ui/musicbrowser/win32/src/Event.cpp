@@ -1350,6 +1350,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                         EnableMenuItem(subMenu, ID_POPUP_ADDTRACK, MF_BYCOMMAND|MF_GRAYED);
                         EnableMenuItem(subMenu, ID_POPUP_ADDTRACK_PLAY, MF_BYCOMMAND|MF_GRAYED);
                         EnableMenuItem(subMenu, ID_POPUP_FAVORITE, MF_BYCOMMAND|MF_GRAYED);
+                        EnableMenuItem(subMenu, ID_POPUP_VISITWEB, MF_BYCOMMAND|MF_GRAYED);
                     }
 
                     if(tv_htinfo.hItem == m_hFavoritesItem || 
@@ -1357,6 +1358,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                     {
                         DeleteMenu(subMenu, 2, MF_BYPOSITION);
                         DeleteMenu(subMenu, 2, MF_BYPOSITION);
+                        DeleteMenu(subMenu, ID_POPUP_VISITWEB, MF_BYCOMMAND);
 
                         if(tv_htinfo.hItem == m_hFavoritesItem ||
                            tv_htinfo.hItem == m_hNewFavoritesItem)
@@ -1849,6 +1851,18 @@ void MusicBrowserUI::PlayNowEvent(void)
             }
         }
     }
+}
+
+void MusicBrowserUI::VisitWebEvent(void)
+{
+    vector<PlaylistItem*> items;
+
+    GetSelectedStreamItems(&items);
+	if (items.size() <= 0 || items[0]->WebURL().size() == 0)
+		return;
+
+	ShellExecute(m_hParent, "open", items[0]->WebURL().c_str(), 
+		         NULL, NULL, SW_SHOWNORMAL);
 }
 
 void MusicBrowserUI::AddTrackEvent(void)

@@ -628,6 +628,7 @@ BEGIN
         MENUITEM "&Edit Info...",               ID_POPUP_EDITSTREAMINFO
         MENUITEM SEPARATOR
         MENUITEM "&Update Streams",             ID_POPUP_SUPDATE
+        MENUITEM "&Visit Website",              ID_POPUP_VISITWEB
     END
 END
 
