@@ -447,7 +447,7 @@ GtkWidget *IntroWizardUI::RelatableTwoPage(void)
 
 static void musicbrainz_web(GtkWidget *w, IntroWizardUI *p)
 {
-    LaunchBrowser("http://www.musicbrainz.org/");
+    LaunchBrowser("http://www.musicbrainz.org/freeamp");
 }
 
 static void bitzi_web(GtkWidget *w, IntroWizardUI *p)

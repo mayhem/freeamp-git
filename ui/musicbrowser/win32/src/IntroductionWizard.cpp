@@ -847,7 +847,7 @@ static BOOL CALLBACK IntroWizardMusicBrainz(HWND hwnd,
                 }
                 case IDC_VISIT_MB:
                 {
-                  ShellExecute(hwnd, "open", "http://www.musicbrainz.org", NULL,
+                  ShellExecute(hwnd, "open", "http://www.musicbrainz.org/freeamp", NULL,
                                NULL, SW_SHOWNORMAL);
                   break;
                 }
