@@ -15,8 +15,13 @@
 #define IDI_BLANK                       107
 #define IDI_ACTIVELIST                  109
 #define IDR_POPUP                       110
+#define IDB_PLAYLIST                    113
 #define IDD_OPENURL                     219
 #define IDB_PLAYING                     542
+#define IDB_CATALOG                     543
+#define IDB_ARTIST                      544
+#define IDB_TRACK                       545
+#define IDB_ALBUM                       546
 #define IDC_MUSICTREE                   1000
 #define IDC_PLAYLISTBOX                 1002
 #define IDC_PLAYLISTCOMBO               1003
@@ -72,7 +77,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        113
+#define _APS_NEXT_RESOURCE_VALUE        116
 #define _APS_NEXT_COMMAND_VALUE         40035
 #define _APS_NEXT_CONTROL_VALUE         1019
 #define _APS_NEXT_SYMED_VALUE           101
