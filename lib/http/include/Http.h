@@ -27,6 +27,8 @@ ____________________________________________________________________________*/
 #include "facontext.h"
 #include <string>
 
+using namespace std;
+
 class Http
 {
 

@@ -256,6 +256,10 @@ SOURCE=..\..\src\Headlines.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\..\lib\http\src\Http.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\Median.cpp
 # End Source File
 # Begin Source File

@@ -61,6 +61,7 @@ CLEAN :
 	-@erase "$(INTDIR)\FreeAmpTheme.obj"
 	-@erase "$(INTDIR)\freeampui.res"
 	-@erase "$(INTDIR)\Headlines.obj"
+	-@erase "$(INTDIR)\Http.obj"
 	-@erase "$(INTDIR)\Median.obj"
 	-@erase "$(INTDIR)\MultiStateControl.obj"
 	-@erase "$(INTDIR)\Parse.obj"
@@ -128,6 +129,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32Window.obj" \
 	"$(INTDIR)\Window.obj" \
 	"$(INTDIR)\freeampui.res" \
+	"$(INTDIR)\Http.obj" \
 	"..\..\..\..\lib\zlib\zlib.lib" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\unzip\unzip.lib"
@@ -177,6 +179,7 @@ CLEAN :
 	-@erase "$(INTDIR)\FreeAmpTheme.obj"
 	-@erase "$(INTDIR)\freeampui.res"
 	-@erase "$(INTDIR)\Headlines.obj"
+	-@erase "$(INTDIR)\Http.obj"
 	-@erase "$(INTDIR)\Median.obj"
 	-@erase "$(INTDIR)\MultiStateControl.obj"
 	-@erase "$(INTDIR)\Parse.obj"
@@ -246,6 +249,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32Window.obj" \
 	"$(INTDIR)\Window.obj" \
 	"$(INTDIR)\freeampui.res" \
+	"$(INTDIR)\Http.obj" \
 	"..\..\..\..\lib\zlib\zlib.lib" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\unzip\unzip.lib"
@@ -295,6 +299,7 @@ CLEAN :
 	-@erase "$(INTDIR)\FreeAmpTheme.obj"
 	-@erase "$(INTDIR)\freeampui.res"
 	-@erase "$(INTDIR)\Headlines.obj"
+	-@erase "$(INTDIR)\Http.obj"
 	-@erase "$(INTDIR)\Median.obj"
 	-@erase "$(INTDIR)\MultiStateControl.obj"
 	-@erase "$(INTDIR)\Parse.obj"
@@ -364,6 +369,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32Window.obj" \
 	"$(INTDIR)\Window.obj" \
 	"$(INTDIR)\freeampui.res" \
+	"$(INTDIR)\Http.obj" \
 	"..\..\..\..\lib\zlib\zlib.lib" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\unzip\unzip.lib"
@@ -413,6 +419,7 @@ CLEAN :
 	-@erase "$(INTDIR)\FreeAmpTheme.obj"
 	-@erase "$(INTDIR)\freeampui.res"
 	-@erase "$(INTDIR)\Headlines.obj"
+	-@erase "$(INTDIR)\Http.obj"
 	-@erase "$(INTDIR)\Median.obj"
 	-@erase "$(INTDIR)\MultiStateControl.obj"
 	-@erase "$(INTDIR)\Parse.obj"
@@ -480,6 +487,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32Window.obj" \
 	"$(INTDIR)\Window.obj" \
 	"$(INTDIR)\freeampui.res" \
+	"$(INTDIR)\Http.obj" \
 	"..\..\..\..\lib\zlib\zlib.lib" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\unzip\unzip.lib"
@@ -641,6 +649,12 @@ SOURCE=..\..\src\FreeAmpTheme.cpp
 SOURCE=..\..\src\Headlines.cpp
 
 "$(INTDIR)\Headlines.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\..\..\..\lib\http\src\Http.cpp
+
+"$(INTDIR)\Http.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

@@ -24,7 +24,9 @@ ____________________________________________________________________________*/
 #include <stdio.h> 
 #include <sys/types.h>
 #include <sys/stat.h>
+#ifndef WIN32
 #include <sys/time.h>
+#endif
 #include <fcntl.h>    
 #include <errno.h>    
 
