@@ -143,9 +143,9 @@ void MusicBrowserUI::StillNeedSignature(void)
     sprintf(numtracks, "%d", togo);
 
     if (!m_sigsStart)
-        message = string("Before using any of the Relatable features, at least 75 percent of the tracks in your music collection need to be signatured.  "The_BRANDING" is currently in the process of generating the signatures, but there are still ") + string(numtracks) + string(" left to go.  NOTE: Signaturing will currently not take place while songs are being played.");
+        message = string("Before using any of the Relatable features, at least 75 percent of the tracks in your music collection need to be signatured.  "The_BRANDING" is currently in the process of generating the signatures, but there are still ") + string(numtracks) + string(" left to go.");
     else
-        message = string("Before using any of the Relatable features, at least 75 percent of the tracks in your music collection need to be signatured.  "The_BRANDING" needs to signature ") + string(numtracks) + string(" track(s).  Please click on 'Start Signaturing' in the Relatable menu.  NOTE: Signaturing will currently not take place while songs are being played.");
+        message = string("Before using any of the Relatable features, at least 75 percent of the tracks in your music collection need to be signatured.  "The_BRANDING" needs to signature ") + string(numtracks) + string(" track(s).  Please click on 'Start Signaturing' in the Relatable menu.");
 
     MessageBox(m_hWnd, message.c_str(), caption.c_str(), MB_OK|MB_ICONSTOP|MB_SETFOREGROUND);
 }
