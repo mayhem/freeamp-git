@@ -327,7 +327,6 @@ Error AlsaPMO::Init(OutputInfo* info) {
                 if (!isdigit(sdevice[0]) || device < 0 || device > 31) {
                         return (Error)pmoError_ALSA_DeviceNumber;
                 }
-            printf("opening alsa card %d device %d\n", card, device);
         }
         if((err=snd_pcm_open(&ai->handle, card, device, SND_PCM_OPEN_PLAYBACK)) < 0 )
         {
