@@ -1173,7 +1173,8 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                 openButtonBitmap = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_OPEN));
             }
             
-            playerMask = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_PLAYER_MASK));
+            HPALETTE tempPalette;
+            playerMask = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_PLAYER_MASK), &tempPalette);
 
             g_controlRegions = DetermineRegions(    playerMask,
                                                     g_buttonColorArray,
