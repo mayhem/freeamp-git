@@ -56,7 +56,7 @@ VSliderControl::VSliderControl(Window *pWindow, string &oName) :
 {
      m_iRange = -1;
      m_iCurrentPos = 0;
-     m_oOrigin.x = -1;
+     m_oOrigin.y = -1;
      m_bIsDrag = false;
 };
 
@@ -67,7 +67,7 @@ VSliderControl::~VSliderControl(void)
 
 void VSliderControl::Init(void)
 {
-    m_iThumbHeight = m_oBitmapRect.Height() / 3;
+    m_iThumbHeight = m_oBitmapRect.Height();
     
     m_iRange = m_oRect.Height() - m_iThumbHeight;
 

@@ -45,14 +45,12 @@ ALL : ".\freeamp.ui"
 
 !ELSE 
 
-ALL : "gdbm - Win32 Release" "fabaselib - Win32 Release" "zlib - Win32 Release"\
- ".\freeamp.ui"
+ALL : "fabaselib - Win32 Release" "zlib - Win32 Release" ".\freeamp.ui"
 
 !ENDIF 
 
 !IF "$(RECURSE)" == "1" 
-CLEAN :"zlib - Win32 ReleaseCLEAN" "fabaselib - Win32 ReleaseCLEAN"\
- "gdbm - Win32 ReleaseCLEAN" 
+CLEAN :"zlib - Win32 ReleaseCLEAN" "fabaselib - Win32 ReleaseCLEAN" 
 !ELSE 
 CLEAN :
 !ENDIF 
@@ -72,6 +70,7 @@ CLEAN :
 	-@erase "$(INTDIR)\ThemeManager.obj"
 	-@erase "$(INTDIR)\ThemeZip.obj"
 	-@erase "$(INTDIR)\vc50.idb"
+	-@erase "$(INTDIR)\VSliderControl.obj"
 	-@erase "$(INTDIR)\Win32Bitmap.obj"
 	-@erase "$(INTDIR)\Win32Canvas.obj"
 	-@erase "$(INTDIR)\Win32Font.obj"
@@ -162,6 +161,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\Theme.obj" \
 	"$(INTDIR)\ThemeManager.obj" \
 	"$(INTDIR)\ThemeZip.obj" \
+	"$(INTDIR)\VSliderControl.obj" \
 	"$(INTDIR)\Win32Bitmap.obj" \
 	"$(INTDIR)\Win32Canvas.obj" \
 	"$(INTDIR)\Win32Font.obj" \
@@ -170,7 +170,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32Window.obj" \
 	"$(INTDIR)\Window.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
-	"..\..\..\..\lib\gdbm\gdbm.lib" \
 	"..\..\..\..\lib\zlib\zlib.lib"
 
 ".\freeamp.ui" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
@@ -183,8 +182,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "gdbm - Win32 Release" "fabaselib - Win32 Release"\
- "zlib - Win32 Release" ".\freeamp.ui"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 Release" "zlib - Win32 Release"\
+ ".\freeamp.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                   ..\..\..\..\base\win32\prj\plugins
 	copy freeamp.ui                                  ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -200,14 +199,12 @@ ALL : ".\freeamp.ui"
 
 !ELSE 
 
-ALL : "gdbm - Win32 Debug" "fabaselib - Win32 Debug" "zlib - Win32 Debug"\
- ".\freeamp.ui"
+ALL : "fabaselib - Win32 Debug" "zlib - Win32 Debug" ".\freeamp.ui"
 
 !ENDIF 
 
 !IF "$(RECURSE)" == "1" 
-CLEAN :"zlib - Win32 DebugCLEAN" "fabaselib - Win32 DebugCLEAN"\
- "gdbm - Win32 DebugCLEAN" 
+CLEAN :"zlib - Win32 DebugCLEAN" "fabaselib - Win32 DebugCLEAN" 
 !ELSE 
 CLEAN :
 !ENDIF 
@@ -228,6 +225,7 @@ CLEAN :
 	-@erase "$(INTDIR)\ThemeZip.obj"
 	-@erase "$(INTDIR)\vc50.idb"
 	-@erase "$(INTDIR)\vc50.pdb"
+	-@erase "$(INTDIR)\VSliderControl.obj"
 	-@erase "$(INTDIR)\Win32Bitmap.obj"
 	-@erase "$(INTDIR)\Win32Canvas.obj"
 	-@erase "$(INTDIR)\Win32Font.obj"
@@ -320,6 +318,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\Theme.obj" \
 	"$(INTDIR)\ThemeManager.obj" \
 	"$(INTDIR)\ThemeZip.obj" \
+	"$(INTDIR)\VSliderControl.obj" \
 	"$(INTDIR)\Win32Bitmap.obj" \
 	"$(INTDIR)\Win32Canvas.obj" \
 	"$(INTDIR)\Win32Font.obj" \
@@ -328,7 +327,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32Window.obj" \
 	"$(INTDIR)\Window.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
-	"..\..\..\..\lib\gdbm\gdbm.lib" \
 	"..\..\..\..\lib\zlib\zlib.lib"
 
 ".\freeamp.ui" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
@@ -341,8 +339,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "gdbm - Win32 Debug" "fabaselib - Win32 Debug"\
- "zlib - Win32 Debug" ".\freeamp.ui"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 Debug" "zlib - Win32 Debug"\
+ ".\freeamp.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                   ..\..\..\..\base\win32\prj\plugins
 	copy freeamp.ui                                  ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -358,14 +356,12 @@ ALL : ".\freeamp.ui"
 
 !ELSE 
 
-ALL : "gdbm - Win32 NASM Debug" "fabaselib - Win32 NASM Debug"\
- "zlib - Win32 NASM Debug" ".\freeamp.ui"
+ALL : "fabaselib - Win32 NASM Debug" "zlib - Win32 NASM Debug" ".\freeamp.ui"
 
 !ENDIF 
 
 !IF "$(RECURSE)" == "1" 
-CLEAN :"zlib - Win32 NASM DebugCLEAN" "fabaselib - Win32 NASM DebugCLEAN"\
- "gdbm - Win32 NASM DebugCLEAN" 
+CLEAN :"zlib - Win32 NASM DebugCLEAN" "fabaselib - Win32 NASM DebugCLEAN" 
 !ELSE 
 CLEAN :
 !ENDIF 
@@ -386,6 +382,7 @@ CLEAN :
 	-@erase "$(INTDIR)\ThemeZip.obj"
 	-@erase "$(INTDIR)\vc50.idb"
 	-@erase "$(INTDIR)\vc50.pdb"
+	-@erase "$(INTDIR)\VSliderControl.obj"
 	-@erase "$(INTDIR)\Win32Bitmap.obj"
 	-@erase "$(INTDIR)\Win32Canvas.obj"
 	-@erase "$(INTDIR)\Win32Font.obj"
@@ -478,6 +475,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\Theme.obj" \
 	"$(INTDIR)\ThemeManager.obj" \
 	"$(INTDIR)\ThemeZip.obj" \
+	"$(INTDIR)\VSliderControl.obj" \
 	"$(INTDIR)\Win32Bitmap.obj" \
 	"$(INTDIR)\Win32Canvas.obj" \
 	"$(INTDIR)\Win32Font.obj" \
@@ -486,7 +484,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32Window.obj" \
 	"$(INTDIR)\Window.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
-	"..\..\..\..\lib\gdbm\gdbm.lib" \
 	"..\..\..\..\lib\zlib\zlib.lib"
 
 ".\freeamp.ui" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
@@ -499,8 +496,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "gdbm - Win32 NASM Debug" "fabaselib - Win32 NASM Debug"\
- "zlib - Win32 NASM Debug" ".\freeamp.ui"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Debug" "zlib - Win32 NASM Debug"\
+ ".\freeamp.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                   ..\..\..\..\base\win32\prj\plugins
 	copy freeamp.ui                                  ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -516,14 +513,13 @@ ALL : ".\freeamp.ui"
 
 !ELSE 
 
-ALL : "gdbm - Win32 NASM Release" "fabaselib - Win32 NASM Release"\
- "zlib - Win32 NASM Release" ".\freeamp.ui"
+ALL : "fabaselib - Win32 NASM Release" "zlib - Win32 NASM Release"\
+ ".\freeamp.ui"
 
 !ENDIF 
 
 !IF "$(RECURSE)" == "1" 
-CLEAN :"zlib - Win32 NASM ReleaseCLEAN" "fabaselib - Win32 NASM ReleaseCLEAN"\
- "gdbm - Win32 NASM ReleaseCLEAN" 
+CLEAN :"zlib - Win32 NASM ReleaseCLEAN" "fabaselib - Win32 NASM ReleaseCLEAN" 
 !ELSE 
 CLEAN :
 !ENDIF 
@@ -543,6 +539,7 @@ CLEAN :
 	-@erase "$(INTDIR)\ThemeManager.obj"
 	-@erase "$(INTDIR)\ThemeZip.obj"
 	-@erase "$(INTDIR)\vc50.idb"
+	-@erase "$(INTDIR)\VSliderControl.obj"
 	-@erase "$(INTDIR)\Win32Bitmap.obj"
 	-@erase "$(INTDIR)\Win32Canvas.obj"
 	-@erase "$(INTDIR)\Win32Font.obj"
@@ -633,6 +630,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\Theme.obj" \
 	"$(INTDIR)\ThemeManager.obj" \
 	"$(INTDIR)\ThemeZip.obj" \
+	"$(INTDIR)\VSliderControl.obj" \
 	"$(INTDIR)\Win32Bitmap.obj" \
 	"$(INTDIR)\Win32Canvas.obj" \
 	"$(INTDIR)\Win32Font.obj" \
@@ -641,7 +639,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32Window.obj" \
 	"$(INTDIR)\Window.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
-	"..\..\..\..\lib\gdbm\gdbm.lib" \
 	"..\..\..\..\lib\zlib\zlib.lib"
 
 ".\freeamp.ui" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
@@ -654,8 +651,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "gdbm - Win32 NASM Release"\
- "fabaselib - Win32 NASM Release" "zlib - Win32 NASM Release" ".\freeamp.ui"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Release"\
+ "zlib - Win32 NASM Release" ".\freeamp.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                   ..\..\..\..\base\win32\prj\plugins
 	copy freeamp.ui                                  ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -1230,10 +1227,12 @@ DEP_CPP_FREEA=\
 	"..\..\..\..\base\include\registrar.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\updatemanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\help.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\base\win32\include\win32updatemanager.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\io\include\pipeline.h"\
 	"..\..\..\..\io\include\pullbuffer.h"\
@@ -1287,10 +1286,12 @@ DEP_CPP_FREEA=\
 	"..\..\..\..\base\include\registrar.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\updatemanager.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\help.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\base\win32\include\win32updatemanager.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\io\include\pipeline.h"\
 	"..\..\..\..\io\include\pullbuffer.h"\
@@ -1750,6 +1751,7 @@ DEP_CPP_THEME=\
 	"..\..\include\Theme.h"\
 	"..\..\include\ThemeManager.h"\
 	"..\..\include\ThemeZip.h"\
+	"..\..\include\VSliderControl.h"\
 	"..\..\include\Window.h"\
 	"..\include\Win32Bitmap.h"\
 	"..\include\Win32Font.h"\
@@ -1798,6 +1800,7 @@ DEP_CPP_THEME=\
 	"..\..\include\Theme.h"\
 	"..\..\include\ThemeManager.h"\
 	"..\..\include\ThemeZip.h"\
+	"..\..\include\VSliderControl.h"\
 	"..\..\include\Window.h"\
 	"..\include\Win32Bitmap.h"\
 	"..\include\Win32Font.h"\
@@ -1835,6 +1838,7 @@ DEP_CPP_THEME=\
 	"..\..\include\Theme.h"\
 	"..\..\include\ThemeManager.h"\
 	"..\..\include\ThemeZip.h"\
+	"..\..\include\VSliderControl.h"\
 	"..\..\include\Window.h"\
 	"..\include\Win32Bitmap.h"\
 	"..\include\Win32Font.h"\
@@ -1872,6 +1876,7 @@ DEP_CPP_THEME=\
 	"..\..\include\Theme.h"\
 	"..\..\include\ThemeManager.h"\
 	"..\..\include\ThemeZip.h"\
+	"..\..\include\VSliderControl.h"\
 	"..\..\include\Window.h"\
 	"..\include\Win32Bitmap.h"\
 	"..\include\Win32Font.h"\
@@ -2049,6 +2054,27 @@ DEP_CPP_THEMEZ=\
 
 
 !ENDIF 
+
+SOURCE=..\..\src\VSliderControl.cpp
+DEP_CPP_VSLID=\
+	"..\..\..\..\base\include\debug.h"\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\include\Bitmap.h"\
+	"..\..\include\Canvas.h"\
+	"..\..\include\Control.h"\
+	"..\..\include\Font.h"\
+	"..\..\include\VSliderControl.h"\
+	"..\..\include\Window.h"\
+	
+
+"$(INTDIR)\VSliderControl.obj" : $(SOURCE) $(DEP_CPP_VSLID) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
 
 SOURCE=..\src\Win32Bitmap.cpp
 
@@ -2919,60 +2945,6 @@ DEP_RSC_FREEAM=\
    cd "\FreeAmp\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak\
  CFG="fabaselib - Win32 NASM Release" RECURSE=1 
-   cd "..\..\..\ui\freeamp\win32\prj"
-
-!ENDIF 
-
-!IF  "$(CFG)" == "freeampui - Win32 Release"
-
-"gdbm - Win32 Release" : 
-   cd "\FreeAmp\freeamp\lib\gdbm\prj"
-   $(MAKE) /$(MAKEFLAGS) /F .\gdbm.mak CFG="gdbm - Win32 Release" 
-   cd "..\..\..\ui\freeamp\win32\prj"
-
-"gdbm - Win32 ReleaseCLEAN" : 
-   cd "\FreeAmp\freeamp\lib\gdbm\prj"
-   $(MAKE) /$(MAKEFLAGS) CLEAN /F .\gdbm.mak CFG="gdbm - Win32 Release"\
- RECURSE=1 
-   cd "..\..\..\ui\freeamp\win32\prj"
-
-!ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
-
-"gdbm - Win32 Debug" : 
-   cd "\FreeAmp\freeamp\lib\gdbm\prj"
-   $(MAKE) /$(MAKEFLAGS) /F .\gdbm.mak CFG="gdbm - Win32 Debug" 
-   cd "..\..\..\ui\freeamp\win32\prj"
-
-"gdbm - Win32 DebugCLEAN" : 
-   cd "\FreeAmp\freeamp\lib\gdbm\prj"
-   $(MAKE) /$(MAKEFLAGS) CLEAN /F .\gdbm.mak CFG="gdbm - Win32 Debug" RECURSE=1\
- 
-   cd "..\..\..\ui\freeamp\win32\prj"
-
-!ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Debug"
-
-"gdbm - Win32 NASM Debug" : 
-   cd "\FreeAmp\freeamp\lib\gdbm\prj"
-   $(MAKE) /$(MAKEFLAGS) /F .\gdbm.mak CFG="gdbm - Win32 NASM Debug" 
-   cd "..\..\..\ui\freeamp\win32\prj"
-
-"gdbm - Win32 NASM DebugCLEAN" : 
-   cd "\FreeAmp\freeamp\lib\gdbm\prj"
-   $(MAKE) /$(MAKEFLAGS) CLEAN /F .\gdbm.mak CFG="gdbm - Win32 NASM Debug"\
- RECURSE=1 
-   cd "..\..\..\ui\freeamp\win32\prj"
-
-!ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Release"
-
-"gdbm - Win32 NASM Release" : 
-   cd "\FreeAmp\freeamp\lib\gdbm\prj"
-   $(MAKE) /$(MAKEFLAGS) /F .\gdbm.mak CFG="gdbm - Win32 NASM Release" 
-   cd "..\..\..\ui\freeamp\win32\prj"
-
-"gdbm - Win32 NASM ReleaseCLEAN" : 
-   cd "\FreeAmp\freeamp\lib\gdbm\prj"
-   $(MAKE) /$(MAKEFLAGS) CLEAN /F .\gdbm.mak CFG="gdbm - Win32 NASM Release"\
- RECURSE=1 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 !ENDIF 

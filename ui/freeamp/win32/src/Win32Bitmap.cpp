@@ -274,44 +274,49 @@ Error Win32Bitmap::MaskBlitRect(Bitmap *pOther, Rect &oSrcRect,
    return kError_NoErr;
 }
 
-HPALETTE Win32Bitmap::GetPaletteFromBackground(HDC hDC)
+void Win32Bitmap::SaveBitmap(char *szFile)
 {
-   HPALETTE hPal;
-   BITMAP   sBitmap;
-   HDC      hMemDC;
-   int      nColors;
+   BITMAP           sBitmap;
+   BITMAPINFO       sInfo;
+   BITMAPFILEHEADER sFile;
+   int              iBytesToWrite;
+   FILE             *fp;
    
-   GetObject(m_hBitmap, sizeof(sBitmap), &sBitmap);
+   GetObject(m_hBitmap, sizeof(BITMAP), (LPSTR)&sBitmap);
    
-   if (sBitmap.bmBitsPixel > 8)
-      return NULL;
+   iBytesToWrite = sBitmap.bmWidth * 3;
+   if (iBytesToWrite % 4)
+      iBytesToWrite += 4 - (iBytesToWrite % 4);
+   iBytesToWrite *= sBitmap.bmHeight;   
+   
+   Debug_v("Size: %d %d (%d)", sBitmap.bmWidth, sBitmap.bmHeight, iBytesToWrite);
+   
+   sInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER); 
+   sInfo.bmiHeader.biWidth = sBitmap.bmWidth; 
+   sInfo.bmiHeader.biHeight = sBitmap.bmHeight; 
+   sInfo.bmiHeader.biPlanes = 1; 
+   sInfo.bmiHeader.biBitCount = 24;
+   sInfo.bmiHeader.biCompression = BI_RGB; 
+   sInfo.bmiHeader.biSizeImage = 0; 
+   sInfo.bmiHeader.biXPelsPerMeter = 0; 
+   sInfo.bmiHeader.biYPelsPerMeter = 0; 
+   sInfo.bmiHeader.biClrUsed = 0; 
+   sInfo.bmiHeader.biClrImportant = 0; 
+
+   sFile.bfType = 'M' << 8 | 'B';
+   sFile.bfSize = sizeof(BITMAPINFO) + sizeof(BITMAPFILEHEADER) +
+                  iBytesToWrite;
+     
+   sFile.bfReserved1 = sFile.bfReserved2 = 0;
+   sFile.bfOffBits = sizeof(BITMAPINFO) + 11;
+
+   fp = fopen(szFile, "wb");
+   if (fp == NULL)
+      return;
       
-   nColors = 1 << sBitmap.bmBitsPixel;   
+   fwrite(&sFile, sizeof(BITMAPFILEHEADER), 1, fp);
+   fwrite(&sInfo, sizeof(BITMAPINFO), 1, fp);
+   fwrite(m_pBitmapData, iBytesToWrite, 1, fp);
 
-   RGBQUAD *pRGB = new RGBQUAD[sBitmap.bmBitsPixel];
-   hMemDC = CreateCompatibleDC(hDC);
-
-   SelectObject(hMemDC, m_hBitmap);
-   GetDIBColorTable(hMemDC, 0, nColors, pRGB );
-
-   UINT nSize = sizeof(LOGPALETTE) + (sizeof(PALETTEENTRY) * nColors);
-   LOGPALETTE *pLP = (LOGPALETTE *) new BYTE[nSize];
-
-   pLP->palVersion = 0x300;
-   pLP->palNumEntries = nColors;
-
-   for (int i=0; i < nColors; i++)
-   {
-       pLP->palPalEntry[i].peRed = pRGB[i].rgbRed;
-       pLP->palPalEntry[i].peGreen = pRGB[i].rgbGreen;
-       pLP->palPalEntry[i].peBlue = pRGB[i].rgbBlue;
-       pLP->palPalEntry[i].peFlags = 0;
-   }
-
-   hPal = CreatePalette(pLP);
-
-   delete[] pLP;
-   delete[] pRGB;
-
-   return hPal;
+   fclose(fp);
 }

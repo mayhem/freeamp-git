@@ -402,7 +402,6 @@ void Win32Window::Paint(void)
     PAINTSTRUCT ps;
     HDC         hDc;
     Rect        oRect;
-
     
 	hDc = BeginPaint(m_hWnd, &ps);
     oRect.x1 = ps.rcPaint.left;
