@@ -304,6 +304,8 @@ bool MusicBrowserUI::SaveNewPlaylist(string &oName)
         uint32 len = sizeof(url);
     
         FilePathToURL(oName.c_str(), url, &len);
+
+        oName = url;
         
         if(IsError(m_oPlm->WritePlaylist(url)))
         {

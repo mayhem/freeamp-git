@@ -412,11 +412,13 @@ void MusicBrowserUI::PlaylistListItemMoved(const PlaylistItem* item,
 
     if(index != kInvalidIndex)
     {
+        m_bListChanged = true;
+        UpdateButtonMenuStates();
 
-        char buf[256];
-        sprintf(buf, "oldIndex: %d\tnewIndex: %d\r\n", oldIndex, newIndex);
+        //char buf[256];
+        //sprintf(buf, "oldIndex: %d\tnewIndex: %d\r\n", oldIndex, newIndex);
 
-        OutputDebugString(buf);
+        //OutputDebugString(buf);
 
         //LV_ITEM sItem;
 
@@ -489,6 +491,7 @@ void MusicBrowserUI::PlaylistListItemRemoved(const PlaylistItem* item,
         SetFocus(m_hPlaylistView);
         m_bListChanged = true;
         UpdateTotalTime();
+        UpdateButtonMenuStates();
 
         HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
 
