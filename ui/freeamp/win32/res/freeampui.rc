@@ -34,31 +34,34 @@ CAPTION "General"
 FONT 8, "MS Sans Serif"
 BEGIN
     CONTROL         "Remain on top of all other windows.",IDC_STAYONTOP,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,145,128,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,148,128,10
     CONTROL         "Show application icon in the system tray instead of the taskbar.",
-                    IDC_TRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,157,
+                    IDC_TRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,158,
                     213,10
-    GROUPBOX        "Miscellaneous",IDC_STATIC,3,121,227,50
+    GROUPBOX        "Miscellaneous",IDC_STATIC,3,117,227,54
     GROUPBOX        "Save Music Folder",IDC_STATIC,3,3,227,34
     EDITTEXT        IDC_SAVEMUSICDIR,11,16,160,14,ES_AUTOHSCROLL
     PUSHBUTTON      "Browse...",IDC_BROWSE,175,16,50,14
-    GROUPBOX        "File Associations",IDC_STATIC,3,44,227,38
+    GROUPBOX        "File Associations",IDC_STATIC,3,42,227,38
     CONTROL         "Reclaim music file associations when application starts.",
                     IDC_RECLAIMFILETYPES,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,12,56,189,10
+                    WS_TABSTOP,12,54,189,10
     CONTROL         "Ask before reclaiming music file associations.",
                     IDC_ASKRECLAIM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,
-                    68,157,10
-    GROUPBOX        "Show Toolbars As",IDC_STATIC,3,89,227,26
+                    66,157,10
+    GROUPBOX        "Show Toolbars As",IDC_STATIC,3,85,227,26
     CONTROL         "Text only",IDC_TEXTONLY,"Button",BS_AUTORADIOBUTTON,178,
-                    100,43,10
+                    96,43,10
     CONTROL         "Images only",IDC_IMAGESONLY,"Button",BS_AUTORADIOBUTTON,
-                    101,100,53,10
+                    101,96,53,10
     CONTROL         "Text and images",IDC_TEXTANDIMAGES,"Button",
-                    BS_AUTORADIOBUTTON,11,100,66,10
+                    BS_AUTORADIOBUTTON,11,96,66,10
     CONTROL         "Save current playlist when exiting the application.",
                     IDC_SAVECURRENTLIST,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,12,133,171,10
+                    WS_TABSTOP,12,138,171,10
+    CONTROL         "Default action is to queue tracks rather than play them immediately.",
+                    IDC_DEFAULTACTION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    12,128,213,10
 END
 
 IDD_PREF_DEBUG DIALOG DISCARDABLE  0, 0, 233, 174

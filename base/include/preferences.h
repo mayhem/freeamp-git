@@ -79,6 +79,7 @@ extern const char* kShowToolbarImagesPref;
 extern const char* kSaveCurrentPlaylistOnExitPref;
 extern const char* kViewMusicBrowserPref;
 extern const char* kWelcomePref;
+extern const char* kPlayImmediatelyPref;
 
 class LibDirFindHandle;
 
@@ -242,6 +243,9 @@ class Preferences {
 
     Error GetViewMusicBrowser(bool* value);
     Error SetViewMusicBrowser(bool value);
+
+    Error GetPlayImmediately(bool* value);
+    Error SetPlayImmediately(bool value);
 
 };
 

@@ -163,6 +163,7 @@
 #define IDC_IMAGESONLY                  1058
 #define IDC_TEXTANDIMAGES               1059
 #define IDC_SAVECURRENTLIST             1060
+#define IDC_DEFAULTACTION               1061
 #define IDMC_MYMUSIC                    6900
 #define IDMC_PLAY                       6901
 #define IDMC_STOP                       6902
@@ -180,7 +181,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        199
 #define _APS_NEXT_COMMAND_VALUE         40013
-#define _APS_NEXT_CONTROL_VALUE         1061
+#define _APS_NEXT_CONTROL_VALUE         1062
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
