@@ -111,10 +111,6 @@ void GTKMusicBrowser::GenPlaylist(vector<PlaylistItem *> *seed)
     if (!m_context->aps)
         return;
 
-    // Branch here, based on number of selected elements.
-    // If nothing is selected, use a profile based query.
-    // If tracks are selected, use track based query
-
     if ((seed) && (!seed->empty())) {
         APSPlaylist InputPlaylist;
         vector<PlaylistItem *>::iterator i;
@@ -144,8 +140,25 @@ void GTKMusicBrowser::GenPlaylist(vector<PlaylistItem *> *seed)
                 if (strFilename != "")
                     newitems.push_back(strFilename.c_str());
             }
-         
-            DeleteListEvent();
+
+            for (int z = m_plm->CountItems() - 1; z >= 0; z--) {
+                PlaylistItem *testitem = m_plm->ItemAt(z);
+                bool remove = true;
+
+                if ((seed) && (!seed->empty())) {
+                    vector<PlaylistItem *>::iterator i = seed->begin();
+                    for (; i != seed->end(); i++) {
+                        if ((*i)->GetMetaData().GUID() == 
+                             testitem->GetMetaData().GUID()) {
+                            remove = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (remove)
+                    m_plm->RemoveItem(z);
+            }         
             m_plm->AddItems(newitems);
         }
     }

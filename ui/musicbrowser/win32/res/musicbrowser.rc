@@ -441,6 +441,11 @@ BEGIN
         MENUITEM "by &Filename",                ID_SORT_FILENAME
         MENUITEM "&Randomly",                   ID_SORT_RANDOMIZE
     END
+    POPUP "&Relatable"
+    BEGIN
+        MENUITEM "&Recommend Playlist",         ID_EDIT_GENERATEPLAYLIST
+        MENUITEM "&Learn Playlist",             ID_EDIT_SUBMITPLAYLIST
+    END
     POPUP "&Help"
     BEGIN
         MENUITEM "&Contents",                   ID_HELP_CONTENTS
@@ -449,11 +454,6 @@ BEGIN
         MENUITEM "&EMusic.com Web Site",        ID_HELP_EMUSICCOMWEBSITE
         MENUITEM SEPARATOR
         MENUITEM "&About...",                   ID_HELP_ABOUT
-    END
-    POPUP "&Relatable"
-    BEGIN
-        MENUITEM "&Recommend Playlist",         ID_EDIT_GENERATEPLAYLIST
-        MENUITEM "&Learn Playlist",             ID_EDIT_SUBMITPLAYLIST
     END
 END
 

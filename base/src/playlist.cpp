@@ -421,55 +421,6 @@ PlaylistManager::~PlaylistManager()
     m_context->prefs->SetPrefInt32(kPlaylistRepeatPref, m_repeatMode);
 }
 
-
-// Playlist actions
-Error PlaylistManager::GeneratePlaylist()
-{
-    APSPlaylist InputPlaylist;
-    APSPlaylist ResultList;
-    uint32 response = 0;
-
-    const PlaylistItem *item = GetCurrentItem();
-    if (item) {
-        // assumes GUIDs are set in metadata structs
-        InputPlaylist.Insert(item->GetMetaData().GUID().c_str(),
-                             item->URL().c_str());
-
-        response = m_context->aps->APSGetPlaylist(&InputPlaylist, &ResultList);
-    }
-    else
-        response = m_context->aps->APSGetPlaylist(&InputPlaylist, &ResultList);
-
-    if (response == (uint32)APS_NOERROR) {
-        if (ResultList.Size() > 0) {
-            vector<string> newitems;
-            string strTemp, strFilename;
-            APSPlaylist::iterator i = ResultList.begin();
-            for (; i.isvalid(); i.next()) {
-                strFilename = m_context->catalog->GetFilename(i.first());
-                if (strFilename != "")
-                    newitems.push_back(strFilename.c_str());
-            }
-
-            m_mutex.Acquire();
-
-            vector<PlaylistItem *> RemoveList(m_masterList);
-            vector<PlaylistItem *>::iterator j = RemoveList.begin();
-            for (; j != RemoveList.end(); j++) {
-                if ((*j)->GetMetaData().GUID() == item->GetMetaData().GUID())
-                {
-                    RemoveList.erase(j);
-                    break;
-                }
-            }
-            m_context->plm->RemoveItems(&RemoveList);
-            m_context->plm->AddItems(newitems);
-        }
-    }
-
-    return kError_NoErr;
-}
-
 Error PlaylistManager::SetCurrentItem(PlaylistItem* item)
 {
     return SetCurrentIndex(IndexOf(item));
@@ -2641,6 +2592,11 @@ RetrieveMetaDataNow(PlaylistItem* item)
             if (mdf)
                 mdf->ReadMetaData(item->URL().c_str(), &metadata);
         }
+
+        FAMetaUnit faTemp(&metadata, item->URL().c_str());
+        int nRes = m_context->aps->APSFillMetaData(&faTemp);
+        if (nRes == 0)
+            faTemp.GetMetaData(&metadata);
 
         item->SetMetaData(&metadata);
         item->SetState(kPlaylistItemState_Normal);

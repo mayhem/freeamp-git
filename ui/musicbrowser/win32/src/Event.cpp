@@ -117,99 +117,63 @@ void MusicBrowserUI::GenPlaylistEvent()
 
 void MusicBrowserUI::GenPlaylistEvent(vector<PlaylistItem*>* pSeed)
 {
-    vector<PlaylistItem*>::iterator i;
+    APSPlaylist ResultPlaylist;
+    uint32 nResponse = 0;
 
-    // Branch here, based on number of selected elements.
-    // If nothing is selected, use a profile based query.
-    // If tracks are selected, use track based query.
+    if (!m_context->aps)
+        return;
 
-   if ((pSeed != NULL) && (!pSeed->empty())) 
-       // tracks selected, use track based query
-   {
-       APSPlaylist InputPlaylist;
-       APSPlaylist ResultList;
+    if ((seed) && (!seed->empty())) {
+        APSPlaylist InputPlaylist;
+        vector<PlaylistItem *>::iterator i;
 
-       // Assumes that GUID's are set properly in meta structures
-       for (i = pSeed->begin(); i != pSeed->end(); i++)
-       {
-           InputPlaylist.Insert((*i)->GetMetaData().GUID().c_str(), 
-                                (*i)->URL().c_str());
-       }
+        for (i = seed->begin(); i != seed->end(); i++)
+            InputPlaylist.Insert((*i)->GetMetaData().GUID().c_str(),
+                                 (*i)->URL().c_str());
 
-       uint32 nResponse = 0;
+        nResponse = m_context->aps->APSGetPlaylist(&InputPlaylist,
+                                                   &ResultPlaylist);
+    }
+    else {
+        APSPlaylist InputPlaylist;
+        nResponse = m_context->aps->APSGetPlaylist(&InputPlaylist,
+                                                   &ResultPlaylist);
+    }
 
-       APSInterface* pInterface = NULL;
-       pInterface = m_context->aps;
-       if (pInterface == NULL)
-       {
-           //m_context->catalog->ConnectAPSInterface("172.16.0.10");
-           //pInterface = m_context->catalog->GetAPSInterface();
-           if (pInterface == NULL) 
-               return; // errored twice: abort;
-       }
+    if (nResponse == APS_NOERROR) {
+        if (ResultPlaylist.Size() > 0) {
+            vector<string> newitems;
+            string strTemp;
+            string strFilename;
+            APSPlaylist::iterator j;
 
-       nResponse = pInterface->APSGetPlaylist(&InputPlaylist, &ResultList); 
-       // call the GetPlaylist function to generate a playlist
+            for (j = ResultPlaylist.begin(); j.isvalid(); j.next()) {
+                strFilename = m_context->catalog->GetFilename(j.first());
+                if (strFilename != "")
+                    newitems.push_back(strFilename.c_str());
+            }
 
-       if (nResponse == APS_NOERROR)
-       {
-           if (ResultList.Size() > 0)
-           {
-               vector<string> newitems;
-               string strTemp;
-               string strFilename;
-               APSPlaylist::iterator j;
-               for (j = ResultList.begin(); j.isvalid(); j.next())
-               {
-                   strFilename = m_context->catalog->GetFilename(j.first());
-                   if (strFilename != "") 
-                       newitems.push_back(strFilename.c_str());
-               }
-               ClearPlaylistEvent();      // start by clearing the current 
-                                          // playlist
+            for (int z = m_plm->CountItems() - 1; z >= 0; z--) {
+                PlaylistItem *testitem = m_plm->ItemAt(z);
+                bool remove = true;
 
-               m_plm->AddItems(newitems); // add the filenames to the current 
-                                          // playlist and let freeamp take over
+                if ((seed) && (!seed->empty())) {
+                    vector<PlaylistItem *>::iterator i = seed->begin();
+                    for (; i != seed->end(); i++) {
+                        if ((*i)->GetMetaData().GUID() ==
+                             testitem->GetMetaData().GUID()) {
+                            remove = false;
+                            break;
+                        }
+                    }
+                }
 
-           }
-      }
-   } 
-   else
-   {
-       APSInterface* pInterface = m_context->aps;
-       if (pInterface == NULL)
-       {
-           // deal with error
-           return;
-       }
-
-       int nRes = 0;
-       APSPlaylist ResultList;
-       APSPlaylist InputList;
- 
-       nRes = pInterface->APSGetPlaylist(&InputList, &ResultList);
-       if (nRes == APS_NOERROR)
-       {
-           if (ResultList.Size() > 0)
-           {
-               vector<string> newitems;
-               string strTemp;
-               string strFilename;
-               APSPlaylist::iterator j;
-
-               for (j = ResultList.begin(); j.isvalid(); j.next())
-               {
-                    strFilename = m_context->catalog->GetFilename(j.first());
-                    if (strFilename != "") 
-                        newitems.push_back(strFilename.c_str());
-               }
-
-               ClearPlaylistEvent();
-
-               m_plm->AddItems(newitems);
-           }
-       }
-   }
+                if (remove)
+                    m_plm->RemoveItem(z);
+            }
+            m_plm->AddItems(newitems);
+        }
+    }
 }
 
 void MusicBrowserUI::RenameEvent(void)

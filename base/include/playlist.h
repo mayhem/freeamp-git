@@ -212,9 +212,6 @@ class PlaylistManager {
     PlaylistManager(FAContext* context);
     virtual ~PlaylistManager();
 
-    // Playlist actions
-    Error GeneratePlaylist();
-
     Error SetCurrentItem(PlaylistItem* item);
     PlaylistItem* GetCurrentItem();
     

@@ -1793,6 +1793,13 @@ Next(Event *pEvent)
 {
    if (m_playerState != PlayerState_Stopped)
    {
+       PlaylistItem *item = m_plm->GetCurrentItem();
+       if (item)
+       {
+          MetaData mdata = (MetaData)item->GetMetaData();
+          m_APSInterface->WriteToLog(mdata.GUID(), APSInterface::SongSkip);
+       }
+
       AcceptEvent(new Event(CMD_Stop));
    }
 
@@ -1819,6 +1826,13 @@ Previous(Event *pEvent)
 {
    if (m_playerState != PlayerState_Stopped)
    {
+       PlaylistItem *item = m_plm->GetCurrentItem();
+       if (item)
+       {
+          MetaData mdata = (MetaData)item->GetMetaData();
+          m_APSInterface->WriteToLog(mdata.GUID(), APSInterface::SongSkip);
+       }
+
       AcceptEvent(new Event(CMD_Stop));
    }
 
@@ -2332,6 +2346,5 @@ void Player::synclog_timer(void* arg)
 
 void Player::SyncLog()
 {
-cout << "sync!\n";
     m_context->aps->SyncLog();
 }
