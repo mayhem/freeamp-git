@@ -183,12 +183,24 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
 
         case INFO_SearchMusicDone: 
         {
+            HMENU        hMenu;
+            MENUITEMINFO sItem;
+            
             if (m_bSearchInProgress)
                 SendMessage(m_hStatus, SB_SETTEXT, 0, 
                             (LPARAM)"Music search completed.");
             else                
                 SendMessage(m_hStatus, SB_SETTEXT, 0, 
                             (LPARAM)"Music search interrupted -- your database may be incomplete.");
+
+            hMenu = GetMenu(m_hWnd);
+            hMenu = GetSubMenu(hMenu, 0);
+            sItem.cbSize = sizeof(MENUITEMINFO);
+            sItem.fMask = MIIM_TYPE;
+            sItem.fType = MFT_STRING;
+            sItem.dwTypeData = "Search for &Music...";
+            sItem.cch = strlen(sItem.dwTypeData);
+            SetMenuItemInfo(hMenu, ID_FILE_SEARCHFORMUSIC, false, &sItem);
                             
             SetWindowText(GetDlgItem(m_hWnd, IDC_SEARCH), "Music Search");
             m_bSearchInProgress = false;
@@ -345,6 +357,8 @@ void MusicBrowserUI::StartMusicSearch(void)
     char           *szPath = "X:\\";
     int32           i, ret;
     vector<string>  oPathList;
+    HMENU           hMenu;
+    MENUITEMINFO    sItem;
 
     if (m_bSearchInProgress)
     {
@@ -367,7 +381,14 @@ void MusicBrowserUI::StartMusicSearch(void)
     m_context->browser->SearchMusic(oPathList);
 
     m_bSearchInProgress = true;
-    SetWindowText(GetDlgItem(m_hWnd, IDC_SEARCH), "Stop Search");
+    hMenu = GetMenu(m_hWnd);
+    hMenu = GetSubMenu(hMenu, 0);
+    sItem.cbSize = sizeof(MENUITEMINFO);
+    sItem.fMask = MIIM_TYPE;
+    sItem.fType = MFT_STRING;
+    sItem.dwTypeData = "Stop &Music Search";
+    sItem.cch = strlen(sItem.dwTypeData);
+    SetMenuItemInfo(hMenu, ID_FILE_SEARCHFORMUSIC, false, &sItem);
 }
 
 void MusicBrowserUI::SortPlaylistEvent(PlaylistSortKey order, PlaylistSortType

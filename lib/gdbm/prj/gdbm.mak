@@ -489,8 +489,7 @@ DEP_CPP_BUCKE=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\bucket.obj" : $(SOURCE) $(DEP_CPP_BUCKE) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\bucket.obj" : $(SOURCE) $(DEP_CPP_BUCKE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -504,8 +503,7 @@ DEP_CPP_BUCKE=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\bucket.obj" : $(SOURCE) $(DEP_CPP_BUCKE) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\bucket.obj" : $(SOURCE) $(DEP_CPP_BUCKE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -521,8 +519,7 @@ DEP_CPP_BUCKE=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\bucket.obj" : $(SOURCE) $(DEP_CPP_BUCKE) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\bucket.obj" : $(SOURCE) $(DEP_CPP_BUCKE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -536,42 +533,9 @@ DEP_CPP_BUCKE=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\bucket.obj" : $(SOURCE) $(DEP_CPP_BUCKE) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\bucket.obj" : $(SOURCE) $(DEP_CPP_BUCKE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ENDIF 
-
-SOURCE=..\config\config.win32
-
-!IF  "$(CFG)" == "gdbm - Win32 Release"
-
-InputPath=..\config\config.win32
-
-"..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	cp ..\config\config.win32 ..\config\config.h
-
-!ELSEIF  "$(CFG)" == "gdbm - Win32 Debug"
-
-InputPath=..\config\config.win32
-
-"..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	cp ..\config\config.win32 ..\config\config.h
-
-!ELSEIF  "$(CFG)" == "gdbm - Win32 NASM Release"
-
-InputPath=..\config\config.win32
-
-"..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	cp ..\config\config.win32 ..\config\config.h
-
-!ELSEIF  "$(CFG)" == "gdbm - Win32 NASM Debug"
-
-InputPath=..\config\config.win32
-
-"..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	cp ..\config\config.win32 ..\config\config.h
 
 !ENDIF 
 
@@ -589,8 +553,7 @@ DEP_CPP_FALLO=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\falloc.obj" : $(SOURCE) $(DEP_CPP_FALLO) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\falloc.obj" : $(SOURCE) $(DEP_CPP_FALLO) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -604,8 +567,7 @@ DEP_CPP_FALLO=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\falloc.obj" : $(SOURCE) $(DEP_CPP_FALLO) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\falloc.obj" : $(SOURCE) $(DEP_CPP_FALLO) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -621,8 +583,7 @@ DEP_CPP_FALLO=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\falloc.obj" : $(SOURCE) $(DEP_CPP_FALLO) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\falloc.obj" : $(SOURCE) $(DEP_CPP_FALLO) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -636,8 +597,7 @@ DEP_CPP_FALLO=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\falloc.obj" : $(SOURCE) $(DEP_CPP_FALLO) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\falloc.obj" : $(SOURCE) $(DEP_CPP_FALLO) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -657,8 +617,7 @@ DEP_CPP_FINDK=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\findkey.obj" : $(SOURCE) $(DEP_CPP_FINDK) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\findkey.obj" : $(SOURCE) $(DEP_CPP_FINDK) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -672,8 +631,7 @@ DEP_CPP_FINDK=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\findkey.obj" : $(SOURCE) $(DEP_CPP_FINDK) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\findkey.obj" : $(SOURCE) $(DEP_CPP_FINDK) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -689,8 +647,7 @@ DEP_CPP_FINDK=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\findkey.obj" : $(SOURCE) $(DEP_CPP_FINDK) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\findkey.obj" : $(SOURCE) $(DEP_CPP_FINDK) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -704,8 +661,7 @@ DEP_CPP_FINDK=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\findkey.obj" : $(SOURCE) $(DEP_CPP_FINDK) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\findkey.obj" : $(SOURCE) $(DEP_CPP_FINDK) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -725,8 +681,7 @@ DEP_CPP_GDBMC=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\gdbmclose.obj" : $(SOURCE) $(DEP_CPP_GDBMC) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmclose.obj" : $(SOURCE) $(DEP_CPP_GDBMC) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -740,8 +695,7 @@ DEP_CPP_GDBMC=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\gdbmclose.obj" : $(SOURCE) $(DEP_CPP_GDBMC) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmclose.obj" : $(SOURCE) $(DEP_CPP_GDBMC) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -757,8 +711,7 @@ DEP_CPP_GDBMC=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\gdbmclose.obj" : $(SOURCE) $(DEP_CPP_GDBMC) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmclose.obj" : $(SOURCE) $(DEP_CPP_GDBMC) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -772,8 +725,7 @@ DEP_CPP_GDBMC=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\gdbmclose.obj" : $(SOURCE) $(DEP_CPP_GDBMC) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmclose.obj" : $(SOURCE) $(DEP_CPP_GDBMC) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -794,8 +746,7 @@ DEP_CPP_GDBMD=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\gdbmdelete.obj" : $(SOURCE) $(DEP_CPP_GDBMD) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmdelete.obj" : $(SOURCE) $(DEP_CPP_GDBMD) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -810,8 +761,7 @@ DEP_CPP_GDBMD=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\gdbmdelete.obj" : $(SOURCE) $(DEP_CPP_GDBMD) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmdelete.obj" : $(SOURCE) $(DEP_CPP_GDBMD) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -828,8 +778,7 @@ DEP_CPP_GDBMD=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\gdbmdelete.obj" : $(SOURCE) $(DEP_CPP_GDBMD) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmdelete.obj" : $(SOURCE) $(DEP_CPP_GDBMD) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -844,8 +793,7 @@ DEP_CPP_GDBMD=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\gdbmdelete.obj" : $(SOURCE) $(DEP_CPP_GDBMD) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmdelete.obj" : $(SOURCE) $(DEP_CPP_GDBMD) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -857,8 +805,7 @@ DEP_CPP_GDBME=\
 	"..\gdbmerrno.h"\
 	
 
-"$(INTDIR)\gdbmerrno.obj" : $(SOURCE) $(DEP_CPP_GDBME) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmerrno.obj" : $(SOURCE) $(DEP_CPP_GDBME) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -877,8 +824,7 @@ DEP_CPP_GDBMEX=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\gdbmexists.obj" : $(SOURCE) $(DEP_CPP_GDBMEX) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmexists.obj" : $(SOURCE) $(DEP_CPP_GDBMEX) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -893,8 +839,7 @@ DEP_CPP_GDBMEX=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\gdbmexists.obj" : $(SOURCE) $(DEP_CPP_GDBMEX) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmexists.obj" : $(SOURCE) $(DEP_CPP_GDBMEX) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -911,8 +856,7 @@ DEP_CPP_GDBMEX=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\gdbmexists.obj" : $(SOURCE) $(DEP_CPP_GDBMEX) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmexists.obj" : $(SOURCE) $(DEP_CPP_GDBMEX) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -927,8 +871,7 @@ DEP_CPP_GDBMEX=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\gdbmexists.obj" : $(SOURCE) $(DEP_CPP_GDBMEX) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmexists.obj" : $(SOURCE) $(DEP_CPP_GDBMEX) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -948,8 +891,7 @@ DEP_CPP_GDBMF=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\gdbmfdesc.obj" : $(SOURCE) $(DEP_CPP_GDBMF) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmfdesc.obj" : $(SOURCE) $(DEP_CPP_GDBMF) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -963,8 +905,7 @@ DEP_CPP_GDBMF=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\gdbmfdesc.obj" : $(SOURCE) $(DEP_CPP_GDBMF) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmfdesc.obj" : $(SOURCE) $(DEP_CPP_GDBMF) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -980,8 +921,7 @@ DEP_CPP_GDBMF=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\gdbmfdesc.obj" : $(SOURCE) $(DEP_CPP_GDBMF) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmfdesc.obj" : $(SOURCE) $(DEP_CPP_GDBMF) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -995,8 +935,7 @@ DEP_CPP_GDBMF=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\gdbmfdesc.obj" : $(SOURCE) $(DEP_CPP_GDBMF) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmfdesc.obj" : $(SOURCE) $(DEP_CPP_GDBMF) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1017,8 +956,7 @@ DEP_CPP_GDBMFE=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\gdbmfetch.obj" : $(SOURCE) $(DEP_CPP_GDBMFE) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmfetch.obj" : $(SOURCE) $(DEP_CPP_GDBMFE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1033,8 +971,7 @@ DEP_CPP_GDBMFE=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\gdbmfetch.obj" : $(SOURCE) $(DEP_CPP_GDBMFE) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmfetch.obj" : $(SOURCE) $(DEP_CPP_GDBMFE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1051,8 +988,7 @@ DEP_CPP_GDBMFE=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\gdbmfetch.obj" : $(SOURCE) $(DEP_CPP_GDBMFE) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmfetch.obj" : $(SOURCE) $(DEP_CPP_GDBMFE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1067,8 +1003,7 @@ DEP_CPP_GDBMFE=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\gdbmfetch.obj" : $(SOURCE) $(DEP_CPP_GDBMFE) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmfetch.obj" : $(SOURCE) $(DEP_CPP_GDBMFE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1089,8 +1024,7 @@ DEP_CPP_GDBMO=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\gdbmopen.obj" : $(SOURCE) $(DEP_CPP_GDBMO) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmopen.obj" : $(SOURCE) $(DEP_CPP_GDBMO) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1105,8 +1039,7 @@ DEP_CPP_GDBMO=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\gdbmopen.obj" : $(SOURCE) $(DEP_CPP_GDBMO) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmopen.obj" : $(SOURCE) $(DEP_CPP_GDBMO) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1123,8 +1056,7 @@ DEP_CPP_GDBMO=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\gdbmopen.obj" : $(SOURCE) $(DEP_CPP_GDBMO) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmopen.obj" : $(SOURCE) $(DEP_CPP_GDBMO) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1139,8 +1071,7 @@ DEP_CPP_GDBMO=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\gdbmopen.obj" : $(SOURCE) $(DEP_CPP_GDBMO) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmopen.obj" : $(SOURCE) $(DEP_CPP_GDBMO) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1162,8 +1093,7 @@ DEP_CPP_GDBMR=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\gdbmreorg.obj" : $(SOURCE) $(DEP_CPP_GDBMR) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmreorg.obj" : $(SOURCE) $(DEP_CPP_GDBMR) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1179,8 +1109,7 @@ DEP_CPP_GDBMR=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\gdbmreorg.obj" : $(SOURCE) $(DEP_CPP_GDBMR) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmreorg.obj" : $(SOURCE) $(DEP_CPP_GDBMR) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1198,8 +1127,7 @@ DEP_CPP_GDBMR=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\gdbmreorg.obj" : $(SOURCE) $(DEP_CPP_GDBMR) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmreorg.obj" : $(SOURCE) $(DEP_CPP_GDBMR) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1215,8 +1143,7 @@ DEP_CPP_GDBMR=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\gdbmreorg.obj" : $(SOURCE) $(DEP_CPP_GDBMR) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmreorg.obj" : $(SOURCE) $(DEP_CPP_GDBMR) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1237,8 +1164,7 @@ DEP_CPP_GDBMS=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\gdbmseq.obj" : $(SOURCE) $(DEP_CPP_GDBMS) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmseq.obj" : $(SOURCE) $(DEP_CPP_GDBMS) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1253,8 +1179,7 @@ DEP_CPP_GDBMS=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\gdbmseq.obj" : $(SOURCE) $(DEP_CPP_GDBMS) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmseq.obj" : $(SOURCE) $(DEP_CPP_GDBMS) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1271,8 +1196,7 @@ DEP_CPP_GDBMS=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\gdbmseq.obj" : $(SOURCE) $(DEP_CPP_GDBMS) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmseq.obj" : $(SOURCE) $(DEP_CPP_GDBMS) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1287,8 +1211,7 @@ DEP_CPP_GDBMS=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\gdbmseq.obj" : $(SOURCE) $(DEP_CPP_GDBMS) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmseq.obj" : $(SOURCE) $(DEP_CPP_GDBMS) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1309,8 +1232,7 @@ DEP_CPP_GDBMSE=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\gdbmsetopt.obj" : $(SOURCE) $(DEP_CPP_GDBMSE) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmsetopt.obj" : $(SOURCE) $(DEP_CPP_GDBMSE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1325,8 +1247,7 @@ DEP_CPP_GDBMSE=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\gdbmsetopt.obj" : $(SOURCE) $(DEP_CPP_GDBMSE) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmsetopt.obj" : $(SOURCE) $(DEP_CPP_GDBMSE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1343,8 +1264,7 @@ DEP_CPP_GDBMSE=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\gdbmsetopt.obj" : $(SOURCE) $(DEP_CPP_GDBMSE) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmsetopt.obj" : $(SOURCE) $(DEP_CPP_GDBMSE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1359,8 +1279,7 @@ DEP_CPP_GDBMSE=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\gdbmsetopt.obj" : $(SOURCE) $(DEP_CPP_GDBMSE) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmsetopt.obj" : $(SOURCE) $(DEP_CPP_GDBMSE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1381,8 +1300,7 @@ DEP_CPP_GDBMST=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\gdbmstore.obj" : $(SOURCE) $(DEP_CPP_GDBMST) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmstore.obj" : $(SOURCE) $(DEP_CPP_GDBMST) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1397,8 +1315,7 @@ DEP_CPP_GDBMST=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\gdbmstore.obj" : $(SOURCE) $(DEP_CPP_GDBMST) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmstore.obj" : $(SOURCE) $(DEP_CPP_GDBMST) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1415,8 +1332,7 @@ DEP_CPP_GDBMST=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\gdbmstore.obj" : $(SOURCE) $(DEP_CPP_GDBMST) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmstore.obj" : $(SOURCE) $(DEP_CPP_GDBMST) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1431,8 +1347,7 @@ DEP_CPP_GDBMST=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\gdbmstore.obj" : $(SOURCE) $(DEP_CPP_GDBMST) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmstore.obj" : $(SOURCE) $(DEP_CPP_GDBMST) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1453,8 +1368,7 @@ DEP_CPP_GDBMSY=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\gdbmsync.obj" : $(SOURCE) $(DEP_CPP_GDBMSY) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmsync.obj" : $(SOURCE) $(DEP_CPP_GDBMSY) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1469,8 +1383,7 @@ DEP_CPP_GDBMSY=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\gdbmsync.obj" : $(SOURCE) $(DEP_CPP_GDBMSY) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmsync.obj" : $(SOURCE) $(DEP_CPP_GDBMSY) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1487,8 +1400,7 @@ DEP_CPP_GDBMSY=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\gdbmsync.obj" : $(SOURCE) $(DEP_CPP_GDBMSY) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmsync.obj" : $(SOURCE) $(DEP_CPP_GDBMSY) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1503,8 +1415,7 @@ DEP_CPP_GDBMSY=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\gdbmsync.obj" : $(SOURCE) $(DEP_CPP_GDBMSY) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\gdbmsync.obj" : $(SOURCE) $(DEP_CPP_GDBMSY) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1525,8 +1436,7 @@ DEP_CPP_GLOBA=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\global.obj" : $(SOURCE) $(DEP_CPP_GLOBA) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\global.obj" : $(SOURCE) $(DEP_CPP_GLOBA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1541,8 +1451,7 @@ DEP_CPP_GLOBA=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\global.obj" : $(SOURCE) $(DEP_CPP_GLOBA) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\global.obj" : $(SOURCE) $(DEP_CPP_GLOBA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1559,8 +1468,7 @@ DEP_CPP_GLOBA=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\global.obj" : $(SOURCE) $(DEP_CPP_GLOBA) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\global.obj" : $(SOURCE) $(DEP_CPP_GLOBA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1575,8 +1483,7 @@ DEP_CPP_GLOBA=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\global.obj" : $(SOURCE) $(DEP_CPP_GLOBA) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\global.obj" : $(SOURCE) $(DEP_CPP_GLOBA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1596,8 +1503,7 @@ DEP_CPP_HASH_=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\hash.obj" : $(SOURCE) $(DEP_CPP_HASH_) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\hash.obj" : $(SOURCE) $(DEP_CPP_HASH_) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1611,8 +1517,7 @@ DEP_CPP_HASH_=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\hash.obj" : $(SOURCE) $(DEP_CPP_HASH_) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\hash.obj" : $(SOURCE) $(DEP_CPP_HASH_) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1628,8 +1533,7 @@ DEP_CPP_HASH_=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\hash.obj" : $(SOURCE) $(DEP_CPP_HASH_) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\hash.obj" : $(SOURCE) $(DEP_CPP_HASH_) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1643,8 +1547,7 @@ DEP_CPP_HASH_=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\hash.obj" : $(SOURCE) $(DEP_CPP_HASH_) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\hash.obj" : $(SOURCE) $(DEP_CPP_HASH_) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1664,8 +1567,7 @@ DEP_CPP_UPDAT=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\update.obj" : $(SOURCE) $(DEP_CPP_UPDAT) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\update.obj" : $(SOURCE) $(DEP_CPP_UPDAT) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1679,8 +1581,7 @@ DEP_CPP_UPDAT=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\update.obj" : $(SOURCE) $(DEP_CPP_UPDAT) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\update.obj" : $(SOURCE) $(DEP_CPP_UPDAT) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1696,8 +1597,7 @@ DEP_CPP_UPDAT=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\update.obj" : $(SOURCE) $(DEP_CPP_UPDAT) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\update.obj" : $(SOURCE) $(DEP_CPP_UPDAT) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1711,8 +1611,7 @@ DEP_CPP_UPDAT=\
 	"..\systems.h"\
 	
 
-"$(INTDIR)\update.obj" : $(SOURCE) $(DEP_CPP_UPDAT) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\update.obj" : $(SOURCE) $(DEP_CPP_UPDAT) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1723,8 +1622,7 @@ DEP_CPP_VERSI=\
 	"..\config\config.h"\
 	
 
-"$(INTDIR)\version.obj" : $(SOURCE) $(DEP_CPP_VERSI) "$(INTDIR)"\
- "..\config\config.h"
+"$(INTDIR)\version.obj" : $(SOURCE) $(DEP_CPP_VERSI) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

@@ -159,9 +159,6 @@ static BOOL CALLBACK MainDlgProc(HWND hwnd, UINT msg,
         {
         	switch(LOWORD(wParam))
             {
-                case IDC_COLLAPSE:
-                   ui->ExpandCollapseEvent();
-                return 1;
                 case ID_FILE_SEARCHFORMUSIC:
                 case IDC_SEARCH:
                    ui->StartMusicSearch();
@@ -399,7 +396,6 @@ void MusicBrowserUI::ExpandCollapseEvent(void)
     if (m_state == STATE_COLLAPSED)
     {
        m_state = STATE_EXPANDED;
-       SetWindowText(GetDlgItem(m_hWnd, IDC_COLLAPSE), "<< Collapse");
        SetWindowText(m_hWnd, "Music Browser");
        sItem.dwTypeData = "View &playlist only";
        
@@ -413,7 +409,6 @@ void MusicBrowserUI::ExpandCollapseEvent(void)
     else
     {                
        m_state = STATE_COLLAPSED;
-       SetWindowText(GetDlgItem(m_hWnd, IDC_COLLAPSE), "Expand >>");
        SetWindowText(m_hWnd, "Playlist Manager");
        sItem.dwTypeData = "View &music browser";
        
@@ -863,7 +858,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
 {
 	NM_TREEVIEW *pTreeView;
 	NM_LISTVIEW *pListView;
-    
+
     pTreeView = (NM_TREEVIEW *)pHdr;
     if (pTreeView->hdr.idFrom == IDC_MUSICTREE)
     {
@@ -995,6 +990,40 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                 }          
             }
         }
+        
+        // What is the define for -17? what is -17??
+	    if (pTreeView->hdr.code == -17)
+        {
+            TV_HITTESTINFO sHit;
+            HTREEITEM      hItem;
+            POINT          sPoint;
+            
+            sHit.flags = TVHT_ONITEM;
+          
+            GetCursorPos(&sPoint);
+            ScreenToClient(m_hWnd, &sPoint);
+            ClientToWindow(m_hWnd, &sPoint); 
+            sHit.pt = sPoint;
+            hItem = TreeView_HitTest(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sHit);
+            if (hItem == m_hPlaylistItem)
+               SendMessage(m_hStatus, SB_SETTEXT, 0, 
+                           (LPARAM)"This tree item contains all of your playlists.");
+            else               
+            if (hItem == m_hCatalogItem)
+               SendMessage(m_hStatus, SB_SETTEXT, 0, 
+                           (LPARAM)"This tree item contains all of your music.");
+            else               
+            if (hItem == m_hAllItem)
+               SendMessage(m_hStatus, SB_SETTEXT, 0, 
+                           (LPARAM)"This tree item lists all of your music tracks.");
+            else               
+            if (hItem == m_hUncatItem)
+               SendMessage(m_hStatus, SB_SETTEXT, 0, 
+                           (LPARAM)"This tree item lists all of your uncategorized music tracks.");
+            else               
+               SendMessage(m_hStatus, SB_SETTEXT, 0, (LPARAM)"");
+        }
+        
         return 0;
     }    
 

@@ -126,53 +126,6 @@ SOURCE=..\bucket.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\config\config.win32
-
-!IF  "$(CFG)" == "gdbm - Win32 Release"
-
-# Begin Custom Build
-InputPath=..\config\config.win32
-
-"..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	cp ..\config\config.win32 ..\config\config.h
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "gdbm - Win32 Debug"
-
-# Begin Custom Build
-InputPath=..\config\config.win32
-
-"..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	cp ..\config\config.win32 ..\config\config.h
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "gdbm - Win32 NASM Release"
-
-# Begin Custom Build
-InputPath=..\config\config.win32
-
-"..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	cp ..\config\config.win32 ..\config\config.h
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "gdbm - Win32 NASM Debug"
-
-# Begin Custom Build
-InputPath=..\config\config.win32
-
-"..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	cp ..\config\config.win32 ..\config\config.h
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
 SOURCE=..\falloc.c
 # End Source File
 # Begin Source File

@@ -62,7 +62,6 @@ extern    "C"
 {
    UserInterface *Initialize(FAContext * context)
    {
-	  Debug_v("##Clear");
       return new FreeAmpTheme(context);
    }
 }
