@@ -47,7 +47,7 @@ class DownloadUI : public UserInterface {
     ~DownloadUI();
 
     virtual Error Init(int32 startup_type);
-    virtual int32 AcceptEvent(Event*);
+    virtual Error AcceptEvent(Event*);
  
     void GTKEventService(void);
     void ToggleVisEvent(void);

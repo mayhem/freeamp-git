@@ -268,10 +268,10 @@ AppendToString(char **destPtr, const char *src, int32 length)
 
     if (oldStr)
     {
-        memcpy(newStr, oldStr, oldLen);
+        strncpy(newStr, oldStr, oldLen);
         delete[] oldStr;
     }
-    memcpy(newStr + oldLen, src, length);
+    strncpy(newStr + oldLen, src, length);
     newStr[newLen] = '\0';
     *destPtr = newStr;
 }
@@ -408,7 +408,7 @@ UnixPrefs()
             lineNumber++;
 
             p = buffer;
-            while (*p && isspace(*p))
+            while (*p && (*p == ' ' && *p == '\t'))
                 p++;
 
             if (*p == '#')
@@ -428,19 +428,21 @@ UnixPrefs()
                 int32 length;
                 
                 entry->key = ReadQuotableString(p, (const char **)&end, ":#");
-                if (entry->key && !m_ht.Value(entry->key))
+                if (entry->key && entry->key[0] == '/')
+                    continue;
+                else if (entry->key && !m_ht.Value(entry->key))
                     m_ht.Insert(entry->key, entry);
                 else if (!m_errorLineNumber)
                     m_errorLineNumber = lineNumber;
                 p = end;
                 
-                while (*p && isspace(*p))
+                while (*p && (*p == ' ' || *p == '\t'))
                     p++;
                 if (*p == ':')
                     p++;
                 else if (!m_errorLineNumber)
                     m_errorLineNumber = lineNumber;
-                while (*p && isspace(*p))
+                while (*p && (*p == ' ' || *p == '\t'))
                     p++;
                 
                 AppendToString(&entry->separator, end, p - end);
@@ -591,12 +593,12 @@ Save()
         for (i = 0; i < numEntries; i++)
         {
             entry = m_entries[i];
-            if (entry->prefix)
+            if (entry->prefix) 
                 fputs(entry->prefix, prefsFile);
             if (entry->key && entry->separator && entry->value)
             {
                 char *outStr;
-                
+
                 outStr = WriteQuotableString(entry->key, ":#");
                 fputs(outStr, prefsFile);
                 delete[] outStr;
@@ -674,7 +676,7 @@ GetPrefString(const char* pref, char* buf, uint32* len)
         return kError_BufferTooSmall;
     }
 
-    memcpy(buf, value, value_len);
+    strncpy(buf, value, value_len);
     *len = value_len;
     m_mutex.Release();
     return kError_NoErr;
