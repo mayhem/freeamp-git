@@ -1,2 +1,6 @@
 #!/bin/sh
-cp ../../../config/config.beos ../../../config/config.h
+if [ ! -e ../../../config/config.h ]
+then 
+	cp ../../../config/config.beos ../../../config/config.h
+fi
+

@@ -127,7 +127,16 @@ BeOSCanvas::RenderText( int iFontHeight, Rect& oClipRect,
     v->SetFontSize( (float)iFontHeight );
     v->GetFont( &font );
     font.GetHeight( &fontHeight );
-    v->MovePenTo( float(oClipRect.x1), float(oClipRect.y2-fontHeight.descent) );
+    
+    float width = v->StringWidth(oText.c_str(), oText.size());
+    
+    if(eAlign == eCenter)
+    	v->MovePenTo( float(oClipRect.x1) + (float(oClipRect.x2 - oClipRect.x1) - width)/2, float(oClipRect.y2-fontHeight.descent) );	
+    else if (eAlign == eRight)
+    	v->MovePenTo( float(oClipRect.x2) - width, float(oClipRect.y2-fontHeight.descent) );
+    else
+		v->MovePenTo( float(oClipRect.x1), float(oClipRect.y2-fontHeight.descent) );
+		
     v->DrawString( oText.c_str() );
     v->Sync();
 
