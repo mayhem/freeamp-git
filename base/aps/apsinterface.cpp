@@ -50,6 +50,7 @@ ____________________________________________________________________________*/
 #include "apsconvert.h"
 #include "sigclient.h"
 #include <math.h>
+#include "utility.h"
 
 #ifndef WIN32
 #define ios_base ios
@@ -58,7 +59,8 @@ ____________________________________________________________________________*/
 const int nAPSYPPort  = 4444;
 const int nAPSSigPort = 4445;
 
-APSInterface::APSInterface(const char* pIP, const char *pSigIP)
+APSInterface::APSInterface(char *profilePath, const char* pIP, 
+                           const char *pSigIP)
 {
     //srand((unsigned)time(NULL)); // comment out if already inited elsewhere
     m_strIP = pIP;
@@ -69,8 +71,10 @@ APSInterface::APSInterface(const char* pIP, const char *pSigIP)
     m_pActiveProfiles = new vector<string>;
 
     m_pLogFile = NULL;
+    m_profilePath = string(profilePath) + string(DIR_MARKER_STR) +
+                    string("profiles.txt");
 
-    LoadProfileMap("profiles.txt"); // could be made into a configurable option
+    LoadProfileMap(m_profilePath.c_str()); // could be made into a configurable option
 
     m_pYpClient = new YPClient;
     m_pYpClient->SetAddress(m_strIP.c_str(), nAPSYPPort);
@@ -87,7 +91,7 @@ APSInterface::APSInterface(const char* pIP, const char *pSigIP)
 
 APSInterface::~APSInterface()
 {
-    WriteProfileMap("profiles.txt");
+    WriteProfileMap(m_profilePath.c_str());
 
     if (m_pYpClient != NULL) 
     {
@@ -450,6 +454,12 @@ int APSInterface::LoadProfileMap(const char *pczFile)
     string strFilename;
 
     fTemp >> nNumProfiles >> strCurrentUser >> strCollectionID;
+
+    if (strCollectionID == "NULL")
+        m_strCollectionID = "";
+    else
+        m_strCollectionID = strCollectionID;
+
     for ( int i = 0; ((i < nNumProfiles) && !(fTemp.eof())); i++)
     {
         fTemp >> strUserName;
@@ -476,6 +486,10 @@ int APSInterface::WriteProfileMap(const char *pczFile)
     string strCurrentProfile = m_strCurrentProfile;
     if (strCurrentProfile.empty()) 
         strCurrentProfile = "NULL";
+    
+    string strCollectionID = m_strCollectionID;
+    if (strCollectionID.empty())
+        strCollectionID = "NULL";
 
     // to store current profile name (or none)
     fTemp << nNumProfiles << " " << strCurrentProfile << endl;

@@ -82,7 +82,7 @@ public:
     } APSEvent;
        
     /** IP of APS Servers can be overwridden in constructor. */
-    APSInterface(const char* pYpIP  = "209.249.187.199", 
+    APSInterface(char *profilePath, const char* pYpIP  = "209.249.187.199", 
                  const char* pSigIP = "209.249.187.199");
     virtual ~APSInterface(); // to be or not to be virtual....
        
@@ -197,6 +197,7 @@ private:
                                      // to the audio signature server
     int m_nMetaFailures;             // track metadata timeouts to stop lookups
                                      // if the server is down ;)
+    string m_profilePath;            // store the path to the profile
 };
 
 
