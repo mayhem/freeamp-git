@@ -67,6 +67,7 @@ class LcdUI : public UserInterface {
     Thread *keyboardListenThread;
     PlayListManager *m_plm;
     Mutex *m_lcdLock;
+    bool Quit;
 };
 
 

@@ -63,18 +63,18 @@ UserInterface *Initialize() {
 
 	   }
 
-static struct termios normalTTY;
-static struct termios rawTTY;
-int getKey() {
-    fd_set rdfs;
-
-    FD_ZERO(&rdfs);
-    FD_SET(stdinfd, &rdfs);
-    if (select (stdinfd+1,&rdfs,NULL,NULL,NULL) == 1) {
-	if (FD_ISSET(stdinfd, &rdfs)) return 1;
-    }
-    return 0;
-}
+//static struct termios normalTTY;
+//static struct termios rawTTY;
+//int getKey() {
+//    fd_set rdfs;
+//
+//    FD_ZERO(&rdfs);
+//    FD_SET(stdinfd, &rdfs);
+//    if (select (stdinfd+1,&rdfs,NULL,NULL,NULL) == 1) {
+//	if (FD_ISSET(stdinfd, &rdfs)) return 1;
+//    }
+//    return 0;
+//}
 
 
 void LcdUI::SetPlayListManager(PlayListManager *plm) {
@@ -101,9 +101,9 @@ LcdUI::LcdUI() {
 
 
 LcdUI::~LcdUI() {
-    if (m_startupType == PRIMARY_UI) {
-	tcsetattr(stdinfd, TCSANOW, &normalTTY);
-    }
+//    if (m_startupType == PRIMARY_UI) {
+//	tcsetattr(stdinfd, TCSANOW, &normalTTY);
+//    }
     //cout << "LcdUI: begin deleted..." << endl;
     
     m_lcdLock->Acquire();
@@ -115,9 +115,10 @@ LcdUI::~LcdUI() {
     lcd.string(1,3,"       FreeAmp      ");
     lcd.flush();
 #endif
-    
+
+    Quit = true;
     if (keyboardListenThread) {
-	keyboardListenThread->Destroy();
+	keyboardListenThread->Join();
 	delete keyboardListenThread;
 	keyboardListenThread = NULL;
     }
@@ -147,12 +148,13 @@ Error LcdUI::Init(int32 startupType) {
     sock_send_string(m_sock, "hello\n");
     sock_send_string(m_sock, "screen_add FA\n");
     sock_send_string(m_sock, "screen_set FA name {FreeAmp}\n");
-    sock_send_string(m_sock, "widget_add FA songname string\n");
+    sock_send_string(m_sock, "widget_add FA songname scroller\n");
     sock_send_string(m_sock, "widget_add FA timeline string\n");
-    sock_send_string(m_sock, "widget_add FA artist string\n");
-    sock_send_string(m_sock, "widget_set FA songname 1 1 {Welcome To FreeAmp}\n");
-    sock_send_string(m_sock, "widget_set FA timeline 4 1 {total       00:00:00}\n");
+    sock_send_string(m_sock, "widget_add FA artist scroller\n");
+    sock_send_string(m_sock, "widget_set FA songname 1 1 20 1 h 2 {Welcome To FreeAmp}\n");
+    sock_send_string(m_sock, "widget_set FA timeline 1 4 {total       00:00:00}\n");
     sock_send_string(m_sock, "widget_del FA heartbeat\n");
+    //sock_send_string(m_sock, "screen_set FA priority 32\n");
 #else 
     lcd.string(1,1," Welcome To FreeAmp");
     lcd.flush();
@@ -160,96 +162,74 @@ Error LcdUI::Init(int32 startupType) {
     m_lcdLock->Release();
 
     if ((m_startupType = startupType) == PRIMARY_UI) {
-	cout << "LCD Startup Type: PRIMARY_UI" << endl;
 	ProcessArgs();
-	tcgetattr(stdinfd, &::normalTTY);
-	::rawTTY = ::normalTTY;
-	::rawTTY.c_lflag &= ~ICANON;
-	::rawTTY.c_lflag &= ~ECHO;
-	tcsetattr(stdinfd, TCSANOW, &rawTTY);
-	
-	
-	keyboardListenThread = Thread::CreateThread();
-	keyboardListenThread->Create(LcdUI::keyboardServiceFunction,this);
     }
-
+    Quit = false;
+    keyboardListenThread = Thread::CreateThread();
+    keyboardListenThread->Create(LcdUI::keyboardServiceFunction,this);
+    
     return kError_NoErr;
 }
 
 void LcdUI::keyboardServiceFunction(void *pclcio) {
     LcdUI *pMe = (LcdUI *)pclcio;
-    char *buf = new char[8000];
-    char *pkey = new char[1];
-    char chr;
-    size_t rtn;
-    int fn = STDIN_FILENO;
+    int len;
+    char buf[8192];
+    char *argv[256];
+    int newtoken;
+    int argc;
+    int i;
+    while(!pMe->Quit) {
+	// Check for server input...
+	len = sock_recv(pMe->m_sock, buf, 8000);
+	
+	// Handle server input...
+	while(len > 0) {
+	    // Now split the string into tokens...
+	    argc = 0; newtoken = 1;
+	    for(i=0; i<len; i++) {
+		if(buf[i]) {    // For regular letters, keep tokenizing...
+		    switch(buf[i])  {
+			case ' ':
+			    newtoken = 1;
+			    buf[i] = 0;
+			    break;
+			case '\n':
+			    buf[i] = 0;
+			default:
+			    if(newtoken) {
+				argv[argc] = buf+i;
+				argc++;
+			    }
+			    newtoken = 0;
+			    break;
+		    }
+		} else {  // If we've got a zero, it's the end of a string...
+		    if(argc > 0) {
+			if(0 == strcmp(argv[0], "listen")) {
+			    //cout << "lcd: Listen " << argv[1] << endl;
+			} else if(0 == strcmp(argv[0], "ignore")) {
+			    //cout << "lcd: Ignore " << argv[1] << endl;
+			} else if(0 == strcmp(argv[0], "key")) {
+			    cout << "lcd: Key " << argv[1] << endl;
+			} else if(0 == strcmp(argv[0], "menu")) {
+			} else if(0 == strcmp(argv[0], "connect")) {
+			} else {
+			    cout << "lcd: ";
+			    for(int j=0;j<argc;j++) cout << argv[j] << " ";
+			    cout << endl;
+			}
 
-//#if LCDPROC_4    
-#if 0
-    while(1) {
-	len = sock_recv(m_sock,buf,8000);
-	if (len) {
-	    printf(buf);
-	}
-    }
-#else 
-    for (;;) {
-	::getKey();
-	read(stdinfd,&chr,1);
-	switch (chr) {
-	    case ' ': {
-		pMe->m_timeType = (pMe->m_timeType + 1) % TIME_MAX;
-		pMe->m_lcdLock->Acquire();
-		pMe->BlitTimeLine();
-#if !LCDPROC_4
-		lcd.flush();
-#endif
-		pMe->m_lcdLock->Release();
-		break;
-	    }
-	    case 'p':
-	    case 'P': {
-		Event *e = new Event(CMD_TogglePause);
-		pMe->m_playerEQ->AcceptEvent(e);
-		break;
-	    }
-	    case '-': {
-		Event *e = new Event(CMD_PrevMediaPiece);
-		pMe->m_playerEQ->AcceptEvent(e);
-		break;
-	    }
-	    case '=':
-	    case '+':
-	    case 'n':
-	    case 'N': {
-		Event *e = new Event(CMD_NextMediaPiece);
-		pMe->m_playerEQ->AcceptEvent(e);
-		break; }
-	    case 'q':
-	    case 'Q': {
-		Event *e = new Event(CMD_QuitPlayer);
-		pMe->m_playerEQ->AcceptEvent(e);
-		break; }
-	    case 's':
-	    case 'S': {
-		if (pMe->m_plm) {
-		    pMe->m_plm->SetShuffle(SHUFFLE_SHUFFLED);
-		    pMe->m_plm->SetFirst();
+		    }
+		    argc = 0;  newtoken = 1;
 		}
-		Event *e = new Event(CMD_Stop);
-		pMe->m_playerEQ->AcceptEvent(e);
-		e = new Event(CMD_Play);
-		pMe->m_playerEQ->AcceptEvent(e);
-		break;}
-//	    case 'f':{
-//		Event *e = new Event(CMD_ChangePosition,(void *)200);
-//		pMe->m_playerEQ->AcceptEvent(pMe->m_playerEQ,e);
-//	    }
-	    default:
-		break;
+	    }
+	    len = sock_recv(pMe->m_sock, buf, 8000);
+	    //debug("\n");
 	}
+#define TIME_UNIT 125000
+	usleep(TIME_UNIT);
     }
-#endif
 }
 
 int32 LcdUI::AcceptEvent(Event *e) {
@@ -263,6 +243,7 @@ int32 LcdUI::AcceptEvent(Event *e) {
 		}
 		break; }
 	    case CMD_Cleanup: {
+		Quit = true;
 		Event *e = new Event(INFO_ReadyToDieUI);
 		m_playerEQ->AcceptEvent(e);
 		break; }
@@ -323,9 +304,9 @@ int32 LcdUI::AcceptEvent(Event *e) {
 		    if (foo) foo++; else foo = pmvi->m_filename;
 #if LCDPROC_4
 		    char bar[128];
-		    sprintf(bar,"widget_set FA songname 1 1 {%s}\n",foo);
+		    sprintf(bar,"widget_set FA songname 1 1 20 3 h 2 {%s}\n",foo);
 		    sock_send_string(m_sock,bar);
-		    sock_send_string(m_sock,"widget_set FA artist 1 3 {}\n");
+		    sock_send_string(m_sock,"widget_set FA artist 1 3 1 1 h 1 {}\n");
 #else
 		    lcd.string(1,1,foo);
 #endif
@@ -364,9 +345,9 @@ int32 LcdUI::AcceptEvent(Event *e) {
 #endif
 #if LCDPROC_4
 		    char bar[64];
-		    sprintf(bar,"widget_set FA artist 1 1 {%s}\n",ti.m_artist);
+		    sprintf(bar,"widget_set FA artist 1 1 20 1 h 2 {%s}\n",ti.m_artist);
 		    sock_send_string(m_sock,bar);
-		    sprintf(bar,"widget_set FA songname 1 2 {%s}\n",ti.m_songName);
+		    sprintf(bar,"widget_set FA songname 1 2 20 1 h 2 {%s}\n",ti.m_songName);
 		    sock_send_string(m_sock,bar);
 #else
 			lcd.string(1,1,ti.m_artist);
