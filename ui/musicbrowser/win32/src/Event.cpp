@@ -186,7 +186,7 @@ void MusicBrowserUI::RemoveEvent(void)
                 }
             }
 
-            if(!keepGoing)
+            if(keepGoing)
             {
                 vector<string> urls;            
                 GetSelectedPlaylistItems(&urls);
