@@ -765,8 +765,8 @@ static gint TreeDataCompare(TreeData *a, TreeData *b)
 {
     bool retvalue = true;
     if ((a->type == b->type) && (a->catalog == b->catalog) && 
-        (a->album == b->album) && (a->track == b->track) && 
-        (a->playlistname == b->playlistname))
+        (a->artist == b->artist) && (a->album == b->album) && 
+        (a->track == b->track) && (a->playlistname == b->playlistname))
         retvalue = false;
     return retvalue;
 }
@@ -2606,7 +2606,7 @@ int32 GTKMusicBrowser::AcceptEvent(Event *e)
                 gdk_threads_enter();
                 AddCatTrack((ArtistList *)mct->Artist(), 
                             (AlbumList *)mct->Album(), 
-                            (PlaylistItem *)mct->Item());
+                            (PlaylistItem *)mct->Item(), false);
                 gdk_threads_leave();
             }
             break; }

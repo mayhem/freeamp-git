@@ -140,6 +140,10 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
                 (*i)->AcceptEvent(event);
             if (searching)
                 searching->AcceptEvent(event);
+            if (event->Type() == INFO_SearchMusicDone) {
+                delete searching;
+                searching = NULL;
+            }
             break; }
         case CMD_TogglePlaylistUI: {
             if (mainBrowser->Visible())
@@ -211,6 +215,4 @@ void MusicBrowserUI::StartSearch(bool runMain)
     searching = new musicsearchUI(m_context);
 
     searching->Show(runMain);
-
-    searching = NULL;
 }

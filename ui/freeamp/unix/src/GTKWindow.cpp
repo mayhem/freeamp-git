@@ -415,8 +415,8 @@ void GTKWindow::MouseLeaveCheck(void)
 
 Error GTKWindow::GetDesktopSize(int32 &iX, int32 &iY)
 {
-    iX = gdk_screen_width();
-    iY = gdk_screen_height();
+    iX = gdk_screen_width() / 2;
+    iY = gdk_screen_height() / 2;
 
     return kError_NoErr;
 }
