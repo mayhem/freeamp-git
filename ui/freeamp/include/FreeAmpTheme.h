@@ -101,8 +101,8 @@ class FreeAmpTheme : public UserInterface, public Theme
         Thread          *m_uiThread, *m_pUpdateThread;
         Thread          *m_pOptionsThread;
         Pos              m_oWindowPos;
-        bool             m_bSeekInProgress, m_bPlayShown;
-		bool             m_bPaused, m_bInOptions;
+        bool             m_bSeekInProgress, m_bVolumeChangeInProgress;
+		bool             m_bPaused, m_bInOptions, m_bPlayShown;
         string           m_oCurrentWindow, m_oTitle, m_oStreamInfo;
         TimeDisplayState m_eTimeDisplayState;
         UpdateManager   *m_pUpdateMan;
