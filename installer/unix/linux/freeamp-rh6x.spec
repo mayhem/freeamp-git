@@ -3,7 +3,7 @@
 # -------------------------------------------------------------------------
 %define name    freeamp
 %define cname   FreeAmp
-%define version 2.1.rc2
+%define version 2.1.rc5
 %define release 1
 %define prefix  /usr  
 
@@ -21,7 +21,7 @@ Prefix:      %{prefix}
 BuildRoot:   /var/tmp/%{name}-%{version}-root
 ExcludeArch: sparc
 AutoReqProv: No 
-Requires: id3lib >= 3.7.8 musicbrainz >= 1.0.0pre2 ld-linux.so.2 libc.so.6 libdl.so.2 libm.so.6 libnsl.so.1 libpthread.so.0 libstdc++-libc6.1-1.so.2 libX11.so.6 libXext.so.6 libgdk-1.2.so.0 libglib-1.2.so.0 libgmodule-1.2.so.0 libgthread-1.2.so.0 libgtk-1.2.so.0 libttf.so.2 libc.so.6(GLIBC_2.0) libm.so.6(GLIBC_2.1) libpthread.so.0(GLIBC_2.1) libpthread.so.0(GLIBC_2.0) libc.so.6(GLIBC_2.1) libdl.so.2(GLIBC_2.1) libdl.so.2(GLIBC_2.0)
+Requires: id3lib >= 3.7.13 musicbrainz >= 1.0.0pre6 ld-linux.so.2 libc.so.6 libdl.so.2 libm.so.6 libnsl.so.1 libpthread.so.0 libstdc++-libc6.1-1.so.2 libX11.so.6 libXext.so.6 libgdk-1.2.so.0 libglib-1.2.so.0 libgmodule-1.2.so.0 libgthread-1.2.so.0 libgtk-1.2.so.0 libttf.so.2 libc.so.6(GLIBC_2.0) libm.so.6(GLIBC_2.1) libpthread.so.0(GLIBC_2.1) libpthread.so.0(GLIBC_2.0) libc.so.6(GLIBC_2.1) libdl.so.2(GLIBC_2.1) libdl.so.2(GLIBC_2.0)
 
 %description
 %{cname} is an MP3/OggVorbis/AudioCD player/jukebox that can play local files,
