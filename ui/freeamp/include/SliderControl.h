@@ -41,7 +41,8 @@ class SliderControl : public Control
               void HandleJump(ControlTransitionEnum  eTrans,
                               Pos                   *pPos);
               void SetTroughBitmap(Bitmap *pBitmap, Rect &oBitmapRect,
-                                   int iFrames, bool bHoriz, int iDelta);
+                                   int iFrames, bool bHoriz, int iDelta,
+                                   bool bMiddle);
 
     private:
 
@@ -55,6 +56,7 @@ class SliderControl : public Control
       bool    m_bIsDrag, m_bInUpdate;
       int     m_iNumThumbStates, m_iNumFrames;
       bool    m_bHasTroughBitmap, m_bHorizontalTroughBitmap;
+      bool    m_bTroughMiddle;
       int     m_iTroughFrames, m_iCurrentTroughFrame, m_iTroughDelta;
       Rect    m_oTroughBitmapRect;
       Bitmap *m_pTroughBitmap;

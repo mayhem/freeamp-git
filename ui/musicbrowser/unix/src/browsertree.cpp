@@ -864,7 +864,7 @@ void GTKMusicBrowser::CreateMainTreeItems(void)
     name[0] = "My Music";
     mainTree = gtk_ctree_insert_node(musicBrowserTree, NULL, NULL, name, 5,
                                      pixmap, mask, pixmap, mask, false, false);
-    data = NewTreeData(kTreeMyMusic, NULL, NULL, NULL, NULL, NULL,
+    data = NewTreeData(kTreeMyMusic, m_musicCatalog, NULL, NULL, NULL, NULL,
                        "This tree item contains all of your music");
     gtk_ctree_node_set_row_data_full(musicBrowserTree, mainTree, data, 
                                      (GtkDestroyNotify)kill_treedata);

@@ -4,6 +4,7 @@
 <Bitmap Name="ShufRep" File="shufrep.bmp"/>
 <Bitmap Name="Posbar" File="posbar.bmp"/>
 <Bitmap Name="Volume" File="volume.bmp"/>
+<Bitmap Name="Balance" File="balance.bmp"/>
 <Bitmap Name="Text" File="text.bmp"/>
 <Bitmap Name="Numbers" File="numbers.bmp"/>
 <Bitmap Name="MonoSter" File="monoster.bmp"/>
@@ -170,6 +171,19 @@ None||Repeat current"/>
                                 Name="Volume"/>
             <SliderTroughBitmap Rect="0, 0, 67, 417" NumFrames="28" Style="Vert"
                                 DeltaBetweenFrames="2" Name="Volume"/>
+        </SliderControl>
+        <SliderControl Name="Balance">
+                <Info Desc="Adjust Speaker balance" Tip="Balance"/>
+            <Position Rect="177, 57, 214, 69"/>
+            <ControlStateBitmap Rect="15, 421, 28, 431" State="Normal"
+                                Name="Volume"/>
+            <ControlStateBitmap Rect="0, 421, 13, 431" State="Pressed"
+                                Name="Volume"/>
+            <ControlStateBitmap Rect="0, 421, 13, 431" State="Dragging"
+                                Name="Volume"/>
+            <SliderTroughBitmap Rect="9, 0, 46, 417" NumFrames="28" Style="Vert"
+                                DeltaBetweenFrames="2" Name="Balance"
+                                MaxInCenter="true"/>
         </SliderControl>
         <PixmapFontControl Name="Title" IgnoreCase="yes">
             <Position Rect="112, 27, 261, 32"/>

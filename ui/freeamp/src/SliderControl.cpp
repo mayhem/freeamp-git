@@ -63,6 +63,7 @@ SliderControl::SliderControl(Window *pWindow, string &oName, int iThumbs,
      m_bIsDrag = false;
      m_bInUpdate = false;
      m_bHasTroughBitmap = false;
+     m_bTroughMiddle = false;
      m_iCurrentTroughFrame = -1;
 };
 
@@ -72,7 +73,8 @@ SliderControl::~SliderControl(void)
 }
 
 void SliderControl::SetTroughBitmap(Bitmap *pBitmap, Rect &oBitmapRect, 
-                                    int iFrames, bool bHoriz, int iDelta)
+                                    int iFrames, bool bHoriz, int iDelta,
+                                    bool bMiddle)
 {
     m_oMutex.Acquire();
     m_pTroughBitmap = pBitmap;
@@ -81,6 +83,7 @@ void SliderControl::SetTroughBitmap(Bitmap *pBitmap, Rect &oBitmapRect,
     m_bHorizontalTroughBitmap = bHoriz;
     m_iTroughDelta = iDelta;
     m_bHasTroughBitmap = true;
+    m_bTroughMiddle = bMiddle;
     m_oMutex.Release();
 }
 
@@ -421,8 +424,19 @@ void SliderControl::BlitTrough(int iPos)
 
     oDestRect = m_oRect;
 
-    int iFrameNumber = iPos * m_iTroughFrames / m_iRange;
-    iFrameNumber = min(m_iTroughFrames - 1, iFrameNumber);
+    int iTotFrames = m_iTroughFrames;
+    if (m_bTroughMiddle)
+        iTotFrames *= 2;
+
+    int iFrameNumber = iPos * iTotFrames / m_iRange;
+    iFrameNumber = min(iTotFrames - 1, iFrameNumber);
+
+    if (m_bTroughMiddle) {
+        if (iFrameNumber >= m_iTroughFrames)
+            iFrameNumber = iFrameNumber - m_iTroughFrames;
+        else
+            iFrameNumber = (m_iTroughFrames - 1) - iFrameNumber;
+    }
 
     m_iCurrentTroughFrame = iFrameNumber;
 

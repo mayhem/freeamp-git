@@ -106,9 +106,15 @@ Error Winamp::ConvertToNative(string &oDir)
     sourcePath = oDir + string(DIR_MARKER_STR) + string("volbar.bmp");
     if (stat(sourcePath.c_str(), &st) == 0) {
         destPath = oDir + string(DIR_MARKER_STR) + string("volume.bmp");
-        if (stat(destPath.c_str(), &st) == 0) 
+        if (stat(destPath.c_str(), &st) != 0) 
             CopyFile(sourcePath.c_str(), destPath.c_str(), false);
     } 
+    
+    destPath = oDir + string(DIR_MARKER_STR) + string("balance.bmp");
+    if (stat(destPath.c_str(), &st) != 0) {
+        sourcePath = oDir + string(DIR_MARKER_STR) + string("volume.bmp");
+        CopyFile(sourcePath.c_str(), destPath.c_str(), false);
+    }
 
     return eErr;
 }

@@ -1186,16 +1186,26 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
            iDelta = atoi(oAttrMap["DeltaBetweenFrames"].c_str());
        }
 
+       bool bMiddle = false;
+
+       if (oAttrMap.find("MaxInCenter") != oAttrMap.end())
+       {
+           if (oAttrMap["MaxInCenter"] == string("true"))
+               bMiddle = true;
+       } 
+
        if (m_eCurrentControl == eSliderControl)
            ((SliderControl *)m_pCurrentControl)->SetTroughBitmap(pBitmap, oRect, 
                                                                  iFrames, 
                                                                  bHoriz, 
-                                                                 iDelta);
+                                                                 iDelta,
+                                                                 bMiddle);
        else
            ((VSliderControl *)m_pCurrentControl)->SetTroughBitmap(pBitmap, oRect,
                                                                  iFrames,
                                                                  bHoriz,
-                                                                 iDelta);
+                                                                 iDelta,
+                                                                 bMiddle);
 
        return kError_NoErr;
     }
