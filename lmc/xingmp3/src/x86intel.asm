@@ -77,7 +77,7 @@ FirstInner:
 	add ebx,64		; bx += 64
 	add ecx,4		; Advance coef pointer
 	and ebx,ebp		; bx &= 511
-	fsubrp st(1),st	; Subtract from sum
+	fsubp st(1),st	; Subtract from sum
 ;--
 	fld DWORD PTR [ecx]		; Push *coef
 	fmul DWORD PTR [edi+esi*4]	; Multiply by vbuf[si]
@@ -91,7 +91,7 @@ FirstInner:
 	add ebx,64		; bx += 64
 	add ecx,4		; Advance coef pointer
 	and ebx,ebp		; bx &= 511
-	fsubrp st(1),st	; Subtract from sum
+	fsubp st(1),st	; Subtract from sum
 ;--
 	fld DWORD PTR [ecx]		; Push *coef
 	fmul DWORD PTR [edi+esi*4]	; Multiply by vbuf[si]
@@ -105,7 +105,7 @@ FirstInner:
 	add ebx,64		; bx += 64
 	add ecx,4		; Advance coef pointer
 	and ebx,ebp		; bx &= 511
-	fsubrp st(1),st	; Subtract from sum
+	fsubp st(1),st	; Subtract from sum
 ;--
 	fld DWORD PTR [ecx]		; Push *coef
 	fmul DWORD PTR [edi+esi*4]	; Multiply by vbuf[si]
@@ -119,7 +119,7 @@ FirstInner:
 	add ebx,64		; bx += 64
 	add ecx,4		; Advance coef pointer
 	and ebx,ebp		; bx &= 511
-	fsubrp st(1),st	; Subtract from sum
+	fsubp st(1),st	; Subtract from sum
 ;--
 ; END REPEAT
 
@@ -351,7 +351,7 @@ ForwardInnerLoop:
 	fld st(1)
 	faddp st(1),st
 	fstp DWORD PTR [esi+edx]	; f[p] = x[p] + x[q]
-	fsubp st(1),st
+	fsubrp st(1),st
 	fmul DWORD PTR [ecx+edx]
 	fstp DWORD PTR [ebx+edx]	; f2[p] = coef[p] * (x[p] - x[q])
 	add edx,4		; p += 4
@@ -364,7 +364,7 @@ ForwardInnerLoop1:
 	fld st(1)
 	faddp st(1),st
 	fstp DWORD PTR [esi+edx]	; f[p] = x[p] + x[q]
-	fsubp st(1),st
+	fsubrp st(1),st
 	fmul DWORD PTR [ecx+edx]
 	fstp DWORD PTR [ebx+edx]	; f2[p] = coef[p] * (x[p] - x[q])
 	add edx,4		; p += 4
