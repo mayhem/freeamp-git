@@ -33,6 +33,17 @@ portable C
 
 ******************************************************************/
 /*-------------------------------------------------------------------------*/
+
+
+#ifdef ASM_X86
+extern void windowB_asm(float *a, int b, unsigned char *c);
+extern void windowB_dual_asm(float *a, int b, unsigned char *c);
+extern void windowB16_asm(float *a, int b, unsigned char *c);
+extern void windowB16_dual_asm(float *a, int b, unsigned char *c);
+extern void windowB8_asm(float *a, int b, unsigned char *c);
+extern void windowB8_dual_asm(float *a, int b, unsigned char *c);
+#endif /* ASM_X86 */
+
 void windowB(float *vbuf, int vb_ptr, unsigned char *pcm)
 {
 #ifdef ASM_X86

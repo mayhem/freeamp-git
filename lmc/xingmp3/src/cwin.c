@@ -35,6 +35,15 @@ portable C
 
 #include "config.h"
 
+#ifdef ASM_X86
+extern void window_mpg_asm(float *a, int b, short *c);
+extern void window_dual_asm(float *a, int b, short *c);
+extern void window16_asm(float *a, int b, short *c);
+extern void window16_dual_asm(float *a, int b, short *c);
+extern void window8_asm(float *a, int b, short *c);
+extern void window8_dual_asm(float *a, int b, short *c);
+#endif /* ASM_X86 */
+
 /*-------------------------------------------------------------------------*/
 void window(float *vbuf, int vb_ptr, short *pcm)
 {
