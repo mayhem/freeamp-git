@@ -448,8 +448,12 @@ static void drag_dest_cell (GtkCList *clist, gint x, gint y,
         dest_info->cell.row = clist->rows - 1;
         y = ROW_TOP_YPIXEL (clist, dest_info->cell.row) + clist->row_height;
     }
-    if (dest_info->cell.row < -1)
-        dest_info->cell.row = -1;
+    if (dest_info->cell.row < 0) {
+        dest_info->cell.column = -1;
+        dest_info->cell.row = 0;
+        dest_info->insert_pos = GTK_CLIST_DRAG_AFTER;
+        return;
+    }
 
     x -= GTK_CONTAINER (widget)->border_width +
          widget->style->klass->xthickness;
@@ -720,7 +724,7 @@ static gint list_drag_motion_internal(GtkWidget *widget,
         if (new_info.cell.row != dest_info->cell.row ||
             (new_info.cell.row == dest_info->cell.row &&
              dest_info->insert_pos != new_info.insert_pos)) {
-            if (dest_info->cell.row >= 0)
+            if (dest_info->cell.row >= 0 && dest_info->cell.column != -1)
                 GTK_CLIST_CLASS_FW(clist)->draw_drag_highlight(clist,
                         (GtkCListRow *)g_list_nth(clist->row_list,
                                                   dest_info->cell.row)->data,
@@ -729,7 +733,8 @@ static gint list_drag_motion_internal(GtkWidget *widget,
             dest_info->cell.row = new_info.cell.row;
             dest_info->cell.column = new_info.cell.column;
 
-            GTK_CLIST_CLASS_FW(clist)->draw_drag_highlight(clist,
+            if (dest_info->cell.column != -1)
+                GTK_CLIST_CLASS_FW(clist)->draw_drag_highlight(clist,
                         (GtkCListRow *)g_list_nth(clist->row_list,
                                                   dest_info->cell.row)->data,
                         dest_info->cell.row, dest_info->insert_pos);

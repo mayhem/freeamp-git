@@ -217,7 +217,7 @@ UNIXFREEAMPUIOBJ += ui/freeamp/unix/src/ttfont.o
 UNIXFREEAMPUIOBJ += ui/freeamp/unix/src/ThemeManager.o 
 UNIXFREEAMPUIOBJ += ui/freeamp/unix/src/GTKPreferenceWindow.o 
 UNIXFREEAMPUIOBJ += ui/freeamp/unix/src/GTKFileSelector.o  
-UNIXFREEAMPUILIBS = $(GTK_LIBS) $(TTF_LIBS)
+UNIXFREEAMPUILIBS = $(GTK_LIBS) $(TTF_LIBS) 
 
 BEOSFREEAMPUIOBJ  = ui/freeamp/beos/src/BeOSWindow.o
 BEOSFREEAMPUIOBJ += ui/freeamp/beos/src/BeOSBitmap.o

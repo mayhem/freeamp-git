@@ -3633,6 +3633,10 @@ fi
 
 
 
+
+
+
+
 trap '' 1 2 15
 cat > confcache <<\EOF
 # This file is a shell script that caches the results of configure
@@ -3802,6 +3806,7 @@ s%@EXTRALIBS@%$EXTRALIBS%g
 s%@OSDEPPLUGINS@%$OSDEPPLUGINS%g
 s%@XINGASM@%$XINGASM%g
 s%@DMALLOCLIB@%$DMALLOCLIB%g
+s%@IMLIB_LIBS@%$IMLIB_LIBS%g
 
 CEOF
 EOF

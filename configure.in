@@ -644,6 +644,18 @@ fi
 
 AC_SUBST(DMALLOCLIB)
 
+dnl AC_CHECK_LIB(Imlib2, imlib_context_set_visual,useimlib2="yes",)
+
+dnl if test "$useimlib2" != ""; then
+dnl    echo "Using imlib2 to speedup the main ui..."
+dnl    AC_DEFINE(USING_IMLIB)
+dnl    IMLIB_LIBS="-lImlib"
+dnl else
+dnl    IMLIB_LIBS=""
+dnl fi
+
+AC_SUBST(IMLIB_LIBS)
+
 AC_CONFIG_HEADER(config/config.h)
 AC_OUTPUT(Makefile Makefile-plugins Makefile.header Makefile.towav)
 touch .config.check
