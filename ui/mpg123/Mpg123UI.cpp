@@ -122,6 +122,7 @@ Mpg123UI::~Mpg123UI()
 Error     Mpg123UI::
 AcceptEvent(Event * e)
 {
+   printf("Accept event\n");
    if (e)
    {
       // cerr << "Mpg123COO: processing event " << e->Type() << endl;

@@ -320,6 +320,29 @@ plugins/xingmp3.lmc: $(XINGLMCOBJ)
 
 # vorbis lmc
 VORBISOBJ = lmc/vorbis/src/vorbislmc.o
+VORBISOBJ += lmc/vorbis/src/lib/analysis.o
+VORBISOBJ += lmc/vorbis/src/lib/barkmel.o
+VORBISOBJ += lmc/vorbis/src/lib/bitwise.o
+VORBISOBJ += lmc/vorbis/src/lib/block.o
+VORBISOBJ += lmc/vorbis/src/lib/codebook.o
+VORBISOBJ += lmc/vorbis/src/lib/envelope.o
+VORBISOBJ += lmc/vorbis/src/lib/floor0.o
+VORBISOBJ += lmc/vorbis/src/lib/framing.o
+VORBISOBJ += lmc/vorbis/src/lib/iir.o
+VORBISOBJ += lmc/vorbis/src/lib/info.o
+VORBISOBJ += lmc/vorbis/src/lib/lpc.o
+VORBISOBJ += lmc/vorbis/src/lib/lsp.o
+VORBISOBJ += lmc/vorbis/src/lib/mapping0.o
+VORBISOBJ += lmc/vorbis/src/lib/mdct.o
+VORBISOBJ += lmc/vorbis/src/lib/psy.o
+VORBISOBJ += lmc/vorbis/src/lib/registry.o
+VORBISOBJ += lmc/vorbis/src/lib/res0.o
+VORBISOBJ += lmc/vorbis/src/lib/sharedbook.o
+VORBISOBJ += lmc/vorbis/src/lib/smallft.o
+VORBISOBJ += lmc/vorbis/src/lib/synthesis.o
+VORBISOBJ += lmc/vorbis/src/lib/time0.o
+VORBISOBJ += lmc/vorbis/src/lib/vorbisfile.o
+VORBISOBJ += lmc/vorbis/src/lib/window.o
 plugins/vorbis.lmc: $(VORBISOBJ)
 	$(LINKMOD) -o $@ $(VORBISOBJ) $(STATICLD) /usr/lib/vorbisfile.a -lvorbis
 

@@ -56,7 +56,7 @@ extern    "C"
 }
 
 const int iDecodeBlockSize = 8192;
-const int iFramesPerSecond = 4;
+const int iFramesPerSecond = 10;
 const int iInitialOutputBufferSize = 64512; 
 const char *szFailRead = "Cannot read vorbis data from input plugin.";
 const char *szFailWrite = "Cannot write audio data to output buffer.";
