@@ -265,6 +265,9 @@ class Preferences {
 
     Error GetAllowMultipleInstances(bool* value);
     Error SetAllowMultipleInstances(bool  value);  
+
+    Error GetWAVOutDirectory(char* path, uint32* len);
+    Error SetWAVOutDirectory(const char* path);
 };
 
 #endif /* _PREFERENCES_H */

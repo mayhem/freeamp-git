@@ -474,6 +474,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "wavout"=..\..\..\io\wavout\win32\prj\wavout.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "winamp"=..\..\..\ftc\winamp\prj\winamp.dsp - Package Owner=<4>
 
 Package=<5>

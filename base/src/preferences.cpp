@@ -78,6 +78,7 @@ const char* kCDDevicePathPref = "CDDevice";
 const char* kCDDBServerPref = "CDDBServer";
 const char* kConvertUnderscoresToSpacesPref = "ConvertUnderscoresToSpaces";
 const char* kAllowMultipleInstancesPref = "AllowMultipleInstances";
+const char* kWAVOutputPathPref = "WAVOutputPath";
 
 //logging
 const char* kUseDebugLogPref = "UseDebugLog";
@@ -133,6 +134,7 @@ const int32 kDefaultNumberOfURLsToRemember = 10;
 const char* kDefaultCDDBServer = "http://www2.freedb.org/cgi-bin/cddb.cgi";
 const bool kDefaultConvertUnderscoresToSpaces = true;
 const bool kDefaultAllowMultipleInstances = false;
+const char* kDefaultWAVOutPath = ".";
 
 Error
 Preferences::
@@ -307,6 +309,11 @@ SetDefaults()
 
     if (GetPrefBoolean(kAllowMultipleInstancesPref, &dummyBool) == kError_NoPrefValue)
         SetPrefBoolean(kAllowMultipleInstancesPref, kDefaultAllowMultipleInstances);
+
+	dummyInt = 255;
+    if (GetPrefString(kWAVOutputPathPref, dummyString, 
+        (uint32 *)&dummyInt) == kError_NoPrefValue)
+        SetPrefString(kWAVOutputPathPref, kDefaultWAVOutPath);
 
     return kError_NoErr;
 }
@@ -1041,6 +1048,20 @@ Preferences::
 SetAllowMultipleInstances(bool value)
 {
     return SetPrefBoolean(kAllowMultipleInstancesPref, value);
+}
+
+Error 
+Preferences::
+GetWAVOutDirectory(char* path, uint32* len)
+{
+    return GetPrefString(kWAVOutputPathPref, path, len);
+}
+
+Error 
+Preferences::
+SetWAVOutDirectory(const char* path)
+{
+    return SetPrefString(kWAVOutputPathPref, path);
 }
 
 LibDirFindHandle *
