@@ -25,10 +25,8 @@ ____________________________________________________________________________*/
 
 #include "errors.h"
 #include "registry.h"
-/*#include "lmcregistry.h"
-#include "pmoregistry.h"
-#include "pmiregistry.h"
-#include "uiregistry.h"*/
+#include "preferences.h"
+
 
 #ifndef WIN32
 #include "win32impl.h"
@@ -39,7 +37,7 @@ class Registrar{
     Registrar(){m_subdir = NULL; m_search = NULL;}
     ~Registrar(){}
 
-    Error InitializeRegistry(Registry* registry);
+    Error InitializeRegistry(Registry* registry, Preferences* prefs);
     static Error CleanupRegistry(Registry* registry);
 
     void SetSubDir(const char* subdir){m_subdir = subdir;}

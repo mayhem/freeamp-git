@@ -38,7 +38,7 @@ ____________________________________________________________________________*/
 
 Error 
 Registrar::
-InitializeRegistry(Registry* registry)
+InitializeRegistry(Registry* registry, Preferences* prefs)
 {
     Error error = kError_NoErr;
     char dir[MAX_PATH];
@@ -53,7 +53,10 @@ InitializeRegistry(Registry* registry)
         error = kError_InvalidParam;
 
     if(IsntError(error))
-        error = GetInstallDirectory(dir, sizeof(dir));
+    {
+        uint32 len = sizeof(dir);
+        prefs->GetInstallDirectory(dir, &len);
+    }
 
     if(IsntError(error))
     {
@@ -80,11 +83,8 @@ InitializeRegistry(Registry* registry)
             do
             {
                 char file[MAX_PATH];
-#ifdef WIN32
-                sprintf(file, "%s\\%s", dir, find.cFileName);
-#else
-		sprintf(file, "%s/%s",dir, find.cFileName);
-#endif
+
+                sprintf(file, "%s%s%s", dir, DIR_MARKER_STR, find.cFileName);
 
                 RegistryItem* item = new RegistryItem;
 
@@ -158,220 +158,3 @@ CleanupRegistry(Registry* registry)
  
     return error;
 }
-/*
-Error InitializeLMCRegistry(LMCRegistry* registry)
-{
-    Error error = kError_NoErr;
-    char dir[MAX_PATH];
-
-    if(registry == NULL)
-        error = kError_InvalidParam;
-
-    if(IsntError(error))
-        error = GetInstallDirectory(dir, sizeof(dir));
-
-    if(IsntError(error))
-    {
-        WIN32_FIND_DATA find;
-        HANDLE handle;
-        char search[MAX_PATH];
-
-        strcpy(search, dir);
-        strcat(search, "\\lmc\\*.lmc");
-
-        handle = FindFirstFile(search, &find);
-
-        if(handle != INVALID_HANDLE_VALUE)
-        {
-            do
-            {
-                char file[MAX_PATH];
-
-                sprintf(file, "%s\\%s", dir, find.cFileName);
-
-                LMCItem* item = new LMCItem;
-
-                item->SetPath(file);
-                item->SetName(find.cFileName);
-                item->SetDescription(find.cFileName);
-
-                HMODULE module = NULL;
-                error = kError_LoadLibFailed;
-
-                module = LoadLibrary(file);
-            
-                if(module)
-                {
-                    InitializeFunction init = NULL;
-                    error = kError_FindFuncFailed;
-
-                    init = (InitializeFunction)GetProcAddress(module, "Initialize");
-
-                    if(init)
-                        error = kError_NoErr;
-                }
-                
-                if(IsntError(error))
-                    registry->Add(item);
-                else
-                    delete item;
-
-                //MessageBox(NULL, file, "Found File", MB_OK);
-                
-            }while(FindNextFile(handle, &find));
-
-            FindClose(handle);
-        }
-    }
-
-    return error;
-}
-
-Error InitializePMORegistry(PMORegistry* registry)
-{
-    Error error = kError_NoErr;
-    char dir[MAX_PATH];
-
-    if(registry == NULL)
-        error = kError_InvalidParam;
-
-    if(IsntError(error))
-        error = GetInstallDirectory(dir, sizeof(dir));
-
-    if(IsntError(error))
-    {
-        WIN32_FIND_DATA find;
-        HANDLE handle;
-        char search[MAX_PATH];
-
-        strcpy(search, dir);
-        strcat(search, "\\io\\*.pmo");
-
-        handle = FindFirstFile(search, &find);
-
-        if(handle != INVALID_HANDLE_VALUE)
-        {
-            do
-            {
-                char file[MAX_PATH];
-
-                sprintf(file, "%s\\%s", dir, find.cFileName);
-
-                PMOItem* item = new PMOItem;
-
-                item->SetPath(file);
-                item->SetName(find.cFileName);
-                item->SetDescription(find.cFileName);
-
-                registry->Add(item);
-
-                //MessageBox(NULL, file, "Found File", MB_OK);
-                
-            }while(FindNextFile(handle, &find));
-
-            FindClose(handle);
-        }
-    }
-
-    return error;
-}
-
-Error InitializePMIRegistry(PMIRegistry* registry)
-{
-    Error error = kError_NoErr;
-    char dir[MAX_PATH];
-
-    if(registry == NULL)
-        error = kError_InvalidParam;
-
-    if(IsntError(error))
-        error = GetInstallDirectory(dir, sizeof(dir));
-
-    if(IsntError(error))
-    {
-        WIN32_FIND_DATA find;
-        HANDLE handle;
-        char search[MAX_PATH];
-
-        strcpy(search, dir);
-        strcat(search, "\\io\\*.pmi");
-
-        handle = FindFirstFile(search, &find);
-
-        if(handle != INVALID_HANDLE_VALUE)
-        {
-            do
-            {
-                char file[MAX_PATH];
-
-                sprintf(file, "%s\\%s", dir, find.cFileName);
-
-                PMIItem* item = new PMIItem;
-
-                item->SetPath(file);
-                item->SetName(find.cFileName);
-                item->SetDescription(find.cFileName);
-
-                registry->Add(item);
-
-                //MessageBox(NULL, file, "Found File", MB_OK);
-                
-            }while(FindNextFile(handle, &find));
-
-            FindClose(handle);
-        }
-    }
-
-    return error;
-}
-
-Error InitializeUIRegistry(UIRegistry* registry)
-{
-    Error error = kError_NoErr;
-    char dir[MAX_PATH];
-
-    if(registry == NULL)
-        error = kError_InvalidParam;
-
-    if(IsntError(error))
-        error = GetInstallDirectory(dir, sizeof(dir));
-
-    if(IsntError(error))
-    {
-        WIN32_FIND_DATA find;
-        HANDLE handle;
-        char search[MAX_PATH];
-
-        strcpy(search, dir);
-        strcat(search, "\\ui\\*.ui");
-
-        handle = FindFirstFile(search, &find);
-
-        if(handle != INVALID_HANDLE_VALUE)
-        {
-            do
-            {
-                char file[MAX_PATH];
-
-                sprintf(file, "%s\\%s", dir, find.cFileName);
-
-                UIItem* item = new UIItem;
-
-                item->SetPath(file);
-                item->SetName(find.cFileName);
-                item->SetDescription(find.cFileName);
-
-                registry->Add(item);
-
-                //MessageBox(NULL, file, "Found File", MB_OK);
-                
-            }while(FindNextFile(handle, &find));
-
-            FindClose(handle);
-        }
-    }
-
-    return error;
-}
-
-*/
