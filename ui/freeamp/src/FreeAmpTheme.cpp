@@ -783,6 +783,9 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
       case INFO_UnsignaturedTracksExist:
       {
           int    iState = 1;
+ 
+          if (!m_pContext->aps->IsTurnedOn())
+              iState = 0;
 
           m_sigState = kSigsPending;
           m_pWindow->ControlIntValue(string("SigIndicator"), true, iState);
@@ -793,8 +796,12 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
       {
           int    iState = 2;
 
+          if (!m_pContext->aps->IsTurnedOn())
+              iState = 0;
+
           m_sigState = kGeneratingSigs;
           m_pWindow->ControlIntValue(string("SigIndicator"), true, iState);
+
       	 break;
       }
 
@@ -806,14 +813,17 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
           {
               m_sigState = kSigsPending;
               iState = 1;
-              m_pWindow->ControlIntValue(string("SigIndicator"), true, iState);
           }
           else
           {
               m_sigState = kIdle;
               iState = 0;
-              m_pWindow->ControlIntValue(string("SigIndicator"), true, iState);
           }
+
+          if (!m_pContext->aps->IsTurnedOn())
+              iState = 0;
+
+          m_pWindow->ControlIntValue(string("SigIndicator"), true, iState);
       	 break;
       }
 
@@ -1355,6 +1365,9 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
    } 
    if (oControlName == string("SigIndicator") && eMesg == CM_Pressed)
    {
+       if (!m_pContext->aps->IsTurnedOn())
+          return kError_NoErr;
+          
        if (m_sigState == kSigsPending)
           m_pContext->catalog->StartGeneratingSigs();
        else
@@ -1469,14 +1482,15 @@ void FreeAmpTheme::InitControls(void)
     iState = m_iMuteVolume != -1; 
     m_pWindow->ControlIntValue(string("Mute"), true, iState);
 
-	if (m_sigState == kGeneratingSigs)
-		iState = 2;
-	else if (m_sigState == kSigsPending)
-		iState = 1;
-	else
-		iState = 0;
+    if (m_sigState == kIdle || !m_pContext->aps->IsTurnedOn())
+       iState = 0;
+    else
+	 if (m_sigState == kGeneratingSigs)
+	 	 iState = 2;
+	 else 
+       iState = 1;
 
-	m_pWindow->ControlIntValue(string("SigIndicator"), true, iState);
+	 m_pWindow->ControlIntValue(string("SigIndicator"), true, iState);
 
     m_eq->InitControls(m_pWindow);
 }
@@ -2045,6 +2059,24 @@ void FreeAmpTheme::OptionsThread(uint32 defaultPage)
     pWindow->Show(m_pWindow);
 
     delete pWindow;
-   
+
+    int iState = 0;
+    switch(m_sigState)
+    {
+       case kIdle:
+          iState = 0;
+          break;
+       case kSigsPending:
+          iState = 1;
+          break;
+       case kGeneratingSigs:
+          iState = 2;
+          break;
+    }
+    if (!m_pContext->aps->IsTurnedOn())
+       iState = 0;
+
+    m_pWindow->ControlIntValue(string("SigIndicator"), true, iState);
     m_bInOptions = false;
 }
+ 
