@@ -737,7 +737,7 @@ Error DownloadManager::Download(DownloadItem* item)
             Error err;
             int   ret;
             
-            err = Connect(s, (const struct sockaddr*)&addr, ret, item);
+            err = Connect(s, (struct sockaddr*)&addr, ret, item);
             if (IsError(err))
                 result = kError_UserCancel;
                 
