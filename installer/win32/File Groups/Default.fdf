@@ -6,12 +6,15 @@ group3=Program Executable Files
 group4=Theme Tools
 group5=Direct Sound Output
 group6=Default Plugins
-group10=Default Theme
+group10=CDDB MetaData
 group7=OBS Input
-group11=HTTP Input
+group11=WinAmp Skin Support
 group8=ID3v2 MetaData
-group12=M3U Playlist
+group12=Wave File Output
 group9=Soundcard Output
+group13=Default Theme
+group14=HTTP Input
+group15=M3U Playlist
 
 [System DLLs]
 SELFREGISTERING=No
@@ -140,6 +143,48 @@ POTENTIALLY=No
 MISC=
 
 [OBS Input]
+SELFREGISTERING=No
+HTTPLOCATION=
+LANGUAGE=
+OPERATINGSYSTEM=
+FTPLOCATION=
+FILETYPE=No
+INFOTYPE=Standard
+COMMENT=
+COMPRESS=Yes
+COMPRESSDLL=
+POTENTIALLY=No
+MISC=
+
+[CDDB MetaData]
+SELFREGISTERING=No
+HTTPLOCATION=
+LANGUAGE=
+OPERATINGSYSTEM=
+FTPLOCATION=
+FILETYPE=No
+INFOTYPE=Standard
+COMMENT=
+COMPRESS=Yes
+COMPRESSDLL=
+POTENTIALLY=No
+MISC=
+
+[Wave File Output]
+SELFREGISTERING=No
+HTTPLOCATION=
+LANGUAGE=
+OPERATINGSYSTEM=
+FTPLOCATION=
+FILETYPE=No
+INFOTYPE=Standard
+COMMENT=
+COMPRESS=Yes
+COMPRESSDLL=
+POTENTIALLY=No
+MISC=
+
+[WinAmp Skin Support]
 SELFREGISTERING=No
 HTTPLOCATION=
 LANGUAGE=

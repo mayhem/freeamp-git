@@ -1,0 +1,8 @@
+[TopDir]
+file0=..\..\base\win32\prj\plugins\winamp.ftf
+file1=..\..\base\win32\prj\winamp_theme.xml
+
+[General]
+Type=FILELIST
+Version=1.00.000
+

@@ -478,6 +478,11 @@ begin
 				
 	endif;
 	
+	// We want RealJukebox to ask before taking RMP files back
+	RegDBSetDefaultRoot(HKEY_CLASSES_ROOT);
+	RegDBSetKeyValueEx("Software\\RealNetworks\\RealJukebox\\1.0\\Preferences\\DataTypes\\RealJukebox.RMP.1\\Type",
+						"", REGDB_STRING, "3", -1);
+	
     return nResult;
  end;
 
@@ -1027,6 +1032,7 @@ end;
 // --- include script file section ---
 
 #include "sddialog.rul"
+
 
 
 
