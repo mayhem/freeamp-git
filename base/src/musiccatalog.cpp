@@ -72,6 +72,7 @@ MusicCatalog::MusicCatalog(FAContext *context, char *databasepath)
     m_guidTable = new multimap<string, string, less<string> >;
     m_watchTimer = NULL;
 
+    m_pendingMBLookups = 0;
     m_timeout = 0;
     context->prefs->GetPrefInt32(kWatchThisDirTimeoutPref, &m_timeout);
 
@@ -1276,6 +1277,14 @@ MetaData *MusicCatalog::ReadMetaDataFromDatabase(const char *url)
     return metadata;
 }
 
+typedef struct MBLookupThreadStruct
+{
+    MusicCatalog *mc;
+    string url;
+    string GUID;
+    Thread *thread;
+} MBLookupTreadStruct;
+
 Error MusicCatalog::AcceptEvent(Event *e)
 {
     switch (e->Type()) {
@@ -1372,53 +1381,86 @@ Error MusicCatalog::AcceptEvent(Event *e)
             AudioSignatureGeneratedEvent *asge = 
                                      (AudioSignatureGeneratedEvent *)e;
 
-            //cout << "got audio sig for: " << asge->Url() << endl;
-            string GUID = asge->GUID();
+            m_sigs->erase(asge->Url());
 
-            if (GUID != "") {
-                m_sigs->erase(asge->Url());
+            uint32 length = asge->Url().size() + 20;
+            char *curl = new char[length];
+            FilePathToURL(asge->Url().c_str(), curl, &length);
 
-                uint32 length = asge->Url().size() + 20;
-                char *curl = new char[length];
-                FilePathToURL(asge->Url().c_str(), curl, &length);
+            string url = curl;
+            delete [] curl;
 
-                string url = curl;
-                delete [] curl;
+            m_sigs->erase(url);
 
-                m_sigs->erase(url);
+            Thread *thread = Thread::CreateThread();
 
-                MetaData *data = ReadMetaDataFromDatabase(url.c_str());
+            if (thread) {
+                MBLookupThreadStruct *mlts = new MBLookupThreadStruct;
 
-                if (!data) 
-                    data = new MetaData;
+                mlts->mc = this;
+                mlts->url = url;
+                mlts->GUID = asge->GUID();
+                mlts->thread = thread;
 
-                if (data->GUID() != "") { 
-                    if (strncmp(data->GUID().c_str(), GUID.c_str(), 16)) 
-                        cout << "ERROR! " << url << " has 2 GUIDs!\n";
-                }
-                data->SetGUID(GUID.c_str());
-
-                FAMetaUnit faTemp(data, url.c_str());
-                int nRes = m_context->aps->APSFillMetaData(&faTemp);
-                if (nRes == 0) 
-                    faTemp.GetMetaData(data);
-
-                WriteMetaDataToDatabase(url.c_str(), (*data));
-                m_database->Sync();
-
-                PlaylistItem *plitem = GetPlaylistItemFromURL(url.c_str());
-                if (plitem) {
-                    plitem->SetMetaData(data);
-                    UpdateSong(plitem);
-                    m_plm->UpdateTrackMetaData(plitem, false);
-                }
-
-                delete data;
+                thread->Create(mb_lookup_thread, mlts, true);
             }
             break; 
         }
     }
     return kError_NoErr; 
+}
+
+void MusicCatalog::mb_lookup_thread(void *arg)
+{
+    MBLookupThreadStruct *data = (MBLookupThreadStruct *)arg;
+
+    data->mc->MBLookupThread(data->url, data->GUID);
+
+    delete data->thread;
+    delete data;
+}
+
+void MusicCatalog::MBLookupThread(string url, string GUID)
+{
+    m_pendingMBLookups++;
+    if (GUID != "") {
+        MetaData *data = ReadMetaDataFromDatabase(url.c_str());
+
+        if (!data)
+            data = new MetaData;
+
+        if (data->GUID() != "") {
+            if (strncmp(data->GUID().c_str(), GUID.c_str(), 16))
+                cout << "ERROR! " << url << " has 2 GUIDs!\n";
+        }
+        data->SetGUID(GUID.c_str());
+
+        FAMetaUnit faTemp(data, url.c_str());
+        int nRes = m_context->aps->APSFillMetaData(&faTemp);
+        if (nRes == 0)
+            faTemp.GetMetaData(data);
+
+        WriteMetaDataToDatabase(url.c_str(), (*data));
+        m_database->Sync();
+
+        PlaylistItem *plitem = GetPlaylistItemFromURL(url.c_str());
+        if (plitem) {
+            plitem->SetMetaData(data);
+            UpdateSong(plitem);
+            m_plm->UpdateTrackMetaData(plitem, false);
+        }
+
+        delete data;
+    }
+    else {
+        cerr << "Signaturing Failure for :\n " << url << "\n"
+             << "failed.  Are you connected to the internet?  Do you need to\n"
+             << "set up a proxy?\n";
+    }
+    m_pendingMBLookups--;
+
+    if (m_pendingMBLookups == 0 && m_sigs->size() == 0)
+        m_context->target->AcceptEvent(new BrowserMessageEvent("Signaturing Has Completed."));
 }
 
 void MusicCatalog::watch_timer(void *arg) 

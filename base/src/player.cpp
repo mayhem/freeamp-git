@@ -147,8 +147,7 @@ Player(FAContext *context) : EventQueue()
     m_pmiMutex = new Mutex();
     m_pmoMutex = new Mutex();
     m_uiMutex = new Mutex();
-	m_sigStopMutex = new Mutex();
-    m_signatureSem = new Semaphore(SEM_UNLOCKED);
+    m_sigStopMutex = new Mutex();
     // cout << "Created mutex" << endl;
     m_imQuitting = 0;
     m_quitWaitingFor = 0;
@@ -314,7 +313,6 @@ Player::
     TYPICAL_DELETE(m_pmiMutex);
     TYPICAL_DELETE(m_pmoMutex);
     TYPICAL_DELETE(m_uiMutex);
-    TYPICAL_DELETE(m_signatureSem);
 
     TYPICAL_DELETE(m_lmcRegistry);
     TYPICAL_DELETE(m_pmiRegistry);
@@ -1474,15 +1472,12 @@ GenerateSigsWork(set<string> *items)
     //cout << "Generating signatures for " << items->size() << " tracks.\n";
     AcceptEvent(new Event(INFO_SignaturingStarted));
 
-    set<string>::iterator i = items->begin();
-    for (; i != items->end(); i++) 
+    set<string>::iterator i;
+    while (items->size() > 0 && !m_bKillSignature) 
     {
-		m_sigspmo = NULL;
+        m_sigspmo = NULL;
 
-        if (m_bKillSignature) 
-			break;
-
-        Error  error = kError_NoErr;
+        Error error = kError_NoErr;
         PhysicalMediaOutput *pmo = NULL;
         PhysicalMediaInput *pmi = NULL;
         LogicalMediaConverter *lmc = NULL;
@@ -1490,14 +1485,23 @@ GenerateSigsWork(set<string> *items)
         RegistryItem *lmc_item = NULL;
         RegistryItem *item = NULL;
 
+        i = items->begin();
         string url = *i;
+
+        PlaylistItem *plitem = m_plm->GetCurrentItem();
+
+        if (plitem && items->find(plitem->URL()) != items->end())
+        {
+            url = plitem->URL();
+        }
 
         pmi_item = ChoosePMI(url.c_str());
         if (!pmi_item)
         {
            char szErr[1024];
  
-           sprintf(szErr, "Cannot determine what pmi to use for %s\n", url.c_str());
+           sprintf(szErr, "Cannot determine what pmi to use for %s\n", 
+                   url.c_str());
            m_context->log->Error(szErr);
            AcceptEvent(new ErrorMessageEvent(szErr));
 
@@ -1507,7 +1511,7 @@ GenerateSigsWork(set<string> *items)
         lmc_item = ChooseLMC(url.c_str());
         if (!lmc_item)
         // FIXME: Should probably have a user definable default LMC
-           lmc_item = m_lmcRegistry->GetItem(0);
+            lmc_item = ChooseLMC("blah.mp3");
    
         pmi = (PhysicalMediaInput *) pmi_item->InitFunction()(m_context);
         pmi->SetPropManager((Properties *) this);
@@ -1526,19 +1530,14 @@ GenerateSigsWork(set<string> *items)
         pmo = (PhysicalMediaOutput *) item->InitFunction()(m_context);
         pmo->SetPropManager((Properties *) this);
 
-		while (!m_signatureSem->Wait(50)) {
-            if (m_bKillSignature) {
-                delete pmo;
-    			delete pmi;
-				m_sigspmo = NULL;
-				break;
-			}
+        if (m_bKillSignature) {
+            delete pmo;
+            delete pmi;
+            m_sigspmo = NULL;
+            break;
         }
 
-		if (m_bKillSignature) 
-			break;
-
-		error = kError_NoErr;
+        error = kError_NoErr;
         lmc = (LogicalMediaConverter *) lmc_item->InitFunction()(m_context);
         lmc->SetPropManager((Properties *) this);
 
@@ -1560,7 +1559,6 @@ GenerateSigsWork(set<string> *items)
             delete lmc;
             delete pmi;
             m_sigspmo = NULL;
-            m_signatureSem->Signal();
             continue;
         }
 
@@ -1568,13 +1566,13 @@ GenerateSigsWork(set<string> *items)
         {
             char szErr[1024];
 
-            sprintf(szErr, "Cannot setup the audio decode process: %d\n", error);
+            sprintf(szErr, "Cannot setup the audio decode process: %d\n", 
+                    error);
             m_context->log->Error(szErr);
             delete pmo;
             delete lmc;
             delete pmi;
             m_sigspmo = NULL;
-            m_signatureSem->Signal();
             continue;
         }
 
@@ -1590,8 +1588,7 @@ GenerateSigsWork(set<string> *items)
 
         browserInfo = " ";
         AcceptEvent(new BrowserMessageEvent(browserInfo.c_str()));
-
-        m_signatureSem->Signal();
+        items->erase(url);
     }
 
     AcceptEvent(new Event(INFO_SignaturingStopped));
@@ -1622,8 +1619,6 @@ CreatePMO(const PlaylistItem * pc, Event * pC)
          delete m_pmo;
          m_pmo = NULL;
 
-         m_signatureSem->Signal();
-
          m_lmc = NULL;
       }
       if (SetState(PlayerState_Stopped))
@@ -1645,9 +1640,6 @@ CreatePMO(const PlaylistItem * pc, Event * pC)
       m_pmo->Pause();
       delete    m_pmo;
       m_pmo = NULL;
-
-      m_signatureSem->Signal();
-
       m_lmc = NULL;
    }
 
@@ -1799,20 +1791,10 @@ DoneOutputting(Event *pEvent)
    // outputting whatever.  Now, go on to next
    // piece in playlist
 
-   if (m_sigspmo && pEvent->Type() == INFO_DoneOutputtingDueToError) 
-   {
-      delete m_sigspmo;
-      m_sigspmo = NULL;
-   
-      return;  
-   }
-
    if (m_pmo)
    {
       delete m_pmo;
       m_pmo = NULL;
-
-      m_signatureSem->Signal();
       m_lmc = NULL;
    }
 
@@ -1880,9 +1862,6 @@ Stop(Event *pEvent)
        m_pmo->Pause();
        delete m_pmo;
        m_pmo = NULL;
-
-       m_signatureSem->Signal();
- 
        m_lmc = NULL;
     }
 
@@ -1965,8 +1944,6 @@ Play(Event *pEvent)
     {
        delete m_pmo;
        m_pmo = NULL;
-
-       m_signatureSem->Signal();
        m_lmc = NULL;
 
        if (SetState(PlayerState_Stopped))
@@ -1999,13 +1976,6 @@ Play(Event *pEvent)
     }
     else
     {
-        if (m_playerState != PlayerState_Paused) {
-            while (!m_signatureSem->Wait(1)) {
-                if (m_sigspmo)
-                    delete m_sigspmo;
-                m_sigspmo = NULL;
-            }
-        }
         m_pmo->Resume();
         if (SetState(PlayerState_Playing))
         {
@@ -2312,8 +2282,8 @@ HandleAudioSigGenerated(Event *pEvent)
     AudioSignatureGeneratedEvent *asge = (AudioSignatureGeneratedEvent *)pEvent;
     if (m_sigspmo)
         delete asge->PMO();
-    m_musicCatalog->AcceptEvent(pEvent);
     m_sigspmo = NULL;
+    m_musicCatalog->AcceptEvent(pEvent);
 
     delete pEvent;
 }

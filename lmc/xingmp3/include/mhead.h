@@ -184,6 +184,7 @@ struct _mpeg
 		float look_pow[2 * ISMAX];
 		float look_subblock[8];
 		float re_buf[192][3];
+		BITDAT bitdat;
 	} cupl;
 	struct {
 		signed int vb_ptr;

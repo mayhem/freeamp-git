@@ -17,16 +17,16 @@ void is_process_MPEG2(MPEG *m, void *x,	/* intensity stereo */
 		      IS_SF_INFO * is_sf_info,
 		      int nsamp, int ms_mode);
 
-void unpack_huff(void *xy, int n, int ntable);
-int unpack_huff_quad(void *vwxy, int n, int nbits, int ntable);
+void unpack_huff(MPEG *m, void *xy, int n, int ntable);
+int unpack_huff_quad(MPEG *m, void *vwxy, int n, int nbits, int ntable);
 void dequant(MPEG *m, SAMPLE sample[], int *nsamp,
 	     SCALEFACT * sf,
 	     GR * gr,
 	     CB_INFO * cb_info, int ncbl_mixed);
-void unpack_sf_sub_MPEG1(SCALEFACT * scalefac, GR * gr,
+void unpack_sf_sub_MPEG1(MPEG *m, SCALEFACT * scalefac, GR * gr,
 			 int scfsi,	/* bit flag */
 			 int igr);
-void unpack_sf_sub_MPEG2(SCALEFACT sf[],	/* return intensity scale */
+void unpack_sf_sub_MPEG2(MPEG *m, SCALEFACT sf[], /* return intensity scale */
 			 GR * grdat,
 			 int is_and_ch, IS_SF_INFO * is_sf_info);
 

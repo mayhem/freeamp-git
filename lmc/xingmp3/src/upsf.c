@@ -38,8 +38,9 @@ Layer III
 #include <float.h>
 #include <math.h>
 #include "L3.h"
+#include "mhead.h"
 
-unsigned int bitget(int n);
+unsigned int bitget(MPEG *m, int n);
 
 /*------------------------------------------------------------*/
 static const int slen_table[16][2] =
@@ -84,7 +85,7 @@ static const int nr_table[6][3][4] =
 };
 
 /*=============================================================*/
-void unpack_sf_sub_MPEG1(SCALEFACT sf[],
+void unpack_sf_sub_MPEG1(MPEG *m, SCALEFACT sf[],
 			 GR * grdat,
 			 int scfsi,	/* bit flag */
 			 int gr)
@@ -107,32 +108,32 @@ void unpack_sf_sub_MPEG1(SCALEFACT sf[],
       if (mixed_block_flag)
       {				/* mixed */
 	 for (sfb = 0; sfb < 8; sfb++)
-	    sf[0].l[sfb] = bitget(slen0);
+	    sf[0].l[sfb] = bitget(m, slen0);
 	 for (sfb = 3; sfb < 6; sfb++)
 	 {
-	    sf[0].s[0][sfb] = bitget(slen0);
-	    sf[0].s[1][sfb] = bitget(slen0);
-	    sf[0].s[2][sfb] = bitget(slen0);
+	    sf[0].s[0][sfb] = bitget(m, slen0);
+	    sf[0].s[1][sfb] = bitget(m, slen0);
+	    sf[0].s[2][sfb] = bitget(m, slen0);
 	 }
 	 for (sfb = 6; sfb < 12; sfb++)
 	 {
-	    sf[0].s[0][sfb] = bitget(slen1);
-	    sf[0].s[1][sfb] = bitget(slen1);
-	    sf[0].s[2][sfb] = bitget(slen1);
+	    sf[0].s[0][sfb] = bitget(m, slen1);
+	    sf[0].s[1][sfb] = bitget(m, slen1);
+	    sf[0].s[2][sfb] = bitget(m, slen1);
 	 }
 	 return;
       }
       for (sfb = 0; sfb < 6; sfb++)
       {
-	 sf[0].s[0][sfb] = bitget(slen0);
-	 sf[0].s[1][sfb] = bitget(slen0);
-	 sf[0].s[2][sfb] = bitget(slen0);
+	 sf[0].s[0][sfb] = bitget(m, slen0);
+	 sf[0].s[1][sfb] = bitget(m, slen0);
+	 sf[0].s[2][sfb] = bitget(m, slen0);
       }
       for (; sfb < 12; sfb++)
       {
-	 sf[0].s[0][sfb] = bitget(slen1);
-	 sf[0].s[1][sfb] = bitget(slen1);
-	 sf[0].s[2][sfb] = bitget(slen1);
+	 sf[0].s[0][sfb] = bitget(m, slen1);
+	 sf[0].s[1][sfb] = bitget(m, slen1);
+	 sf[0].s[2][sfb] = bitget(m, slen1);
       }
       return;
    }
@@ -141,9 +142,9 @@ void unpack_sf_sub_MPEG1(SCALEFACT sf[],
    if (gr == 0)
    {
       for (sfb = 0; sfb < 11; sfb++)
-	 sf[0].l[sfb] = bitget(slen0);
+	 sf[0].l[sfb] = bitget(m, slen0);
       for (; sfb < 21; sfb++)
-	 sf[0].l[sfb] = bitget(slen1);
+	 sf[0].l[sfb] = bitget(m, slen1);
       return;
    }
 
@@ -154,32 +155,32 @@ void unpack_sf_sub_MPEG1(SCALEFACT sf[],
 	 sf[0].l[sfb] = sf[-2].l[sfb];
    else
       for (; sfb < 6; sfb++)
-	 sf[0].l[sfb] = bitget(slen0);
+	 sf[0].l[sfb] = bitget(m, slen0);
    if (scfsi & 4)
       for (; sfb < 11; sfb++)
 	 sf[0].l[sfb] = sf[-2].l[sfb];
    else
       for (; sfb < 11; sfb++)
-	 sf[0].l[sfb] = bitget(slen0);
+	 sf[0].l[sfb] = bitget(m, slen0);
    if (scfsi & 2)
       for (; sfb < 16; sfb++)
 	 sf[0].l[sfb] = sf[-2].l[sfb];
    else
       for (; sfb < 16; sfb++)
-	 sf[0].l[sfb] = bitget(slen1);
+	 sf[0].l[sfb] = bitget(m, slen1);
    if (scfsi & 1)
       for (; sfb < 21; sfb++)
 	 sf[0].l[sfb] = sf[-2].l[sfb];
    else
       for (; sfb < 21; sfb++)
-	 sf[0].l[sfb] = bitget(slen1);
+	 sf[0].l[sfb] = bitget(m, slen1);
 
 
 
    return;
 }
 /*=============================================================*/
-void unpack_sf_sub_MPEG2(SCALEFACT sf[],
+void unpack_sf_sub_MPEG2(MPEG *m, SCALEFACT sf[],
 			 GR * grdat,
 			 int is_and_ch, IS_SF_INFO * sf_info)
 {
@@ -296,7 +297,7 @@ void unpack_sf_sub_MPEG2(SCALEFACT sf[],
       {				/* mixed */
 	 if (slen1 != 0)	/* long block portion */
 	    for (sfb = 0; sfb < 6; sfb++)
-	       sf[0].l[sfb] = bitget(slen1);
+	       sf[0].l[sfb] = bitget(m, slen1);
 	 else
 	    for (sfb = 0; sfb < 6; sfb++)
 	       sf[0].l[sfb] = 0;
@@ -308,9 +309,9 @@ void unpack_sf_sub_MPEG2(SCALEFACT sf[],
 	 if (slen1 != 0)
 	    for (i = 0; i < nr1; i++, sfb++)
 	    {
-	       sf[0].s[0][sfb] = bitget(slen1);
-	       sf[0].s[1][sfb] = bitget(slen1);
-	       sf[0].s[2][sfb] = bitget(slen1);
+	       sf[0].s[0][sfb] = bitget(m, slen1);
+	       sf[0].s[1][sfb] = bitget(m, slen1);
+	       sf[0].s[2][sfb] = bitget(m, slen1);
 	    }
 	 else
 	    for (i = 0; i < nr1; i++, sfb++)
@@ -324,9 +325,9 @@ void unpack_sf_sub_MPEG2(SCALEFACT sf[],
       if (slen2 != 0)
 	 for (i = 0; i < nr2; i++, sfb++)
 	 {
-	    sf[0].s[0][sfb] = bitget(slen2);
-	    sf[0].s[1][sfb] = bitget(slen2);
-	    sf[0].s[2][sfb] = bitget(slen2);
+	    sf[0].s[0][sfb] = bitget(m, slen2);
+	    sf[0].s[1][sfb] = bitget(m, slen2);
+	    sf[0].s[2][sfb] = bitget(m, slen2);
 	 }
       else
 	 for (i = 0; i < nr2; i++, sfb++)
@@ -338,9 +339,9 @@ void unpack_sf_sub_MPEG2(SCALEFACT sf[],
       if (slen3 != 0)
 	 for (i = 0; i < nr3; i++, sfb++)
 	 {
-	    sf[0].s[0][sfb] = bitget(slen3);
-	    sf[0].s[1][sfb] = bitget(slen3);
-	    sf[0].s[2][sfb] = bitget(slen3);
+	    sf[0].s[0][sfb] = bitget(m, slen3);
+	    sf[0].s[1][sfb] = bitget(m, slen3);
+	    sf[0].s[2][sfb] = bitget(m, slen3);
 	 }
       else
 	 for (i = 0; i < nr3; i++, sfb++)
@@ -352,9 +353,9 @@ void unpack_sf_sub_MPEG2(SCALEFACT sf[],
       if (slen4 != 0)
 	 for (i = 0; i < nr4; i++, sfb++)
 	 {
-	    sf[0].s[0][sfb] = bitget(slen4);
-	    sf[0].s[1][sfb] = bitget(slen4);
-	    sf[0].s[2][sfb] = bitget(slen4);
+	    sf[0].s[0][sfb] = bitget(m, slen4);
+	    sf[0].s[1][sfb] = bitget(m, slen4);
+	    sf[0].s[2][sfb] = bitget(m, slen4);
 	 }
       else
 	 for (i = 0; i < nr4; i++, sfb++)
@@ -371,28 +372,28 @@ void unpack_sf_sub_MPEG2(SCALEFACT sf[],
    sfb = 0;
    if (slen1 != 0)
       for (i = 0; i < nr1; i++, sfb++)
-	 sf[0].l[sfb] = bitget(slen1);
+	 sf[0].l[sfb] = bitget(m, slen1);
    else
       for (i = 0; i < nr1; i++, sfb++)
 	 sf[0].l[sfb] = 0;
 
    if (slen2 != 0)
       for (i = 0; i < nr2; i++, sfb++)
-	 sf[0].l[sfb] = bitget(slen2);
+	 sf[0].l[sfb] = bitget(m, slen2);
    else
       for (i = 0; i < nr2; i++, sfb++)
 	 sf[0].l[sfb] = 0;
 
    if (slen3 != 0)
       for (i = 0; i < nr3; i++, sfb++)
-	 sf[0].l[sfb] = bitget(slen3);
+	 sf[0].l[sfb] = bitget(m, slen3);
    else
       for (i = 0; i < nr3; i++, sfb++)
 	 sf[0].l[sfb] = 0;
 
    if (slen4 != 0)
       for (i = 0; i < nr4; i++, sfb++)
-	 sf[0].l[sfb] = bitget(slen4);
+	 sf[0].l[sfb] = bitget(m, slen4);
    else
       for (i = 0; i < nr4; i++, sfb++)
 	 sf[0].l[sfb] = 0;

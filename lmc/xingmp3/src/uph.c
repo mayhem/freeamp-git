@@ -37,7 +37,7 @@ Layer 3 audio
 #include <math.h>
 
 #include "L3.h"
-
+#include "mhead.h"
 
 #ifdef _MSC_VER
 #pragma warning(disable: 4505)
@@ -125,8 +125,6 @@ static HUFF_SETUP table_look[] =
 };
 
 /*========================================================*/
-extern BITDAT bitdat;
-
 /*------------- get n bits from bitstream -------------*/
 /* unused
 static unsigned int bitget(int n)
@@ -148,21 +146,22 @@ static unsigned int bitget(int n)
 }
 */
 /*----- get n bits  - checks for n+2 avail bits (linbits+sign) -----*/
-static unsigned int bitget_lb(int n)
+static unsigned int bitget_lb(MPEG *m, int n)
 {
    unsigned int x;
 
-   if (bitdat.bits < (n + 2))
+   if (m->cupl.bitdat.bits < (n + 2))
    {				/* refill bit buf if necessary */
-      while (bitdat.bits <= 24)
+      while (m->cupl.bitdat.bits <= 24)
       {
-	 bitdat.bitbuf = (bitdat.bitbuf << 8) | *bitdat.bs_ptr++;
-	 bitdat.bits += 8;
+	 m->cupl.bitdat.bitbuf = (m->cupl.bitdat.bitbuf << 8) | 
+		                 *m->cupl.bitdat.bs_ptr++;
+	 m->cupl.bitdat.bits += 8;
       }
    }
-   bitdat.bits -= n;
-   x = bitdat.bitbuf >> bitdat.bits;
-   bitdat.bitbuf -= x << bitdat.bits;
+   m->cupl.bitdat.bits -= n;
+   x = m->cupl.bitdat.bitbuf >> m->cupl.bitdat.bits;
+   m->cupl.bitdat.bitbuf -= x << m->cupl.bitdat.bits;
    return x;
 }
 
@@ -170,67 +169,50 @@ static unsigned int bitget_lb(int n)
 
 
 /*------------- get n bits but DO NOT remove from bitstream --*/
-static unsigned int bitget2(int n)
+static unsigned int bitget2(MPEG *m, int n)
 {
    unsigned int x;
 
-   if (bitdat.bits < (MAXBITS + 2))
+   if (m->cupl.bitdat.bits < (MAXBITS + 2))
    {				/* refill bit buf if necessary */
-      while (bitdat.bits <= 24)
+      while (m->cupl.bitdat.bits <= 24)
       {
-	 bitdat.bitbuf = (bitdat.bitbuf << 8) | *bitdat.bs_ptr++;
-	 bitdat.bits += 8;
+	 m->cupl.bitdat.bitbuf = (m->cupl.bitdat.bitbuf << 8) | 
+		                 *m->cupl.bitdat.bs_ptr++;
+	 m->cupl.bitdat.bits += 8;
       }
    }
-   x = bitdat.bitbuf >> (bitdat.bits - n);
+   x = m->cupl.bitdat.bitbuf >> (m->cupl.bitdat.bits - n);
    return x;
 }
-/*------------- remove n bits from bitstream ---------*/
-/* unused
-static void bitget_purge(int n)
-{
-   bitdat.bits -= n;
-   bitdat.bitbuf -= (bitdat.bitbuf >> bitdat.bits) << bitdat.bits;
-}
-*/
-/*------------- get 1 bit from bitstream NO CHECK -------------*/
-/* unused
-static unsigned int bitget_1bit()
-{
-   unsigned int x;
-
-   bitdat.bits--;
-   x = bitdat.bitbuf >> bitdat.bits;
-   bitdat.bitbuf -= x << bitdat.bits;
-   return x;
-}
-*/
 /*========================================================*/
 /*========================================================*/
-#define mac_bitget_check(n) if( bitdat.bits < (n) ) {                   \
-    while( bitdat.bits <= 24 ) {            \
-        bitdat.bitbuf = (bitdat.bitbuf << 8) | *bitdat.bs_ptr++; \
-        bitdat.bits += 8;                   \
+#define mac_bitget_check(n) if( m->cupl.bitdat.bits < (n) ) {  \
+    while( m->cupl.bitdat.bits <= 24 ) {            \
+        m->cupl.bitdat.bitbuf = (m->cupl.bitdat.bitbuf << 8) | \
+		                *m->cupl.bitdat.bs_ptr++; \
+        m->cupl.bitdat.bits += 8;                   \
     }                                       \
 }
 /*---------------------------------------------------------*/
-#define mac_bitget2(n)  (bitdat.bitbuf >> (bitdat.bits-n));
+#define mac_bitget2(n)  (m->cupl.bitdat.bitbuf >> (m->cupl.bitdat.bits-n));
 /*---------------------------------------------------------*/
-#define mac_bitget(n) ( bitdat.bits -= n,           \
-         code  = bitdat.bitbuf >> bitdat.bits,     \
-         bitdat.bitbuf -= code << bitdat.bits,     \
+#define mac_bitget(n) ( m->cupl.bitdat.bits -= n,           \
+         code  = m->cupl.bitdat.bitbuf >> m->cupl.bitdat.bits,     \
+         m->cupl.bitdat.bitbuf -= code << m->cupl.bitdat.bits,     \
          code )
 /*---------------------------------------------------------*/
-#define mac_bitget_purge(n) bitdat.bits -= n,                    \
-    bitdat.bitbuf -= (bitdat.bitbuf >> bitdat.bits) << bitdat.bits;
+#define mac_bitget_purge(n) m->cupl.bitdat.bits -= n,                    \
+    m->cupl.bitdat.bitbuf -= (m->cupl.bitdat.bitbuf >> m->cupl.bitdat.bits) \
+                              << m->cupl.bitdat.bits;
 /*---------------------------------------------------------*/
-#define mac_bitget_1bit() ( bitdat.bits--,                           \
-         code  = bitdat.bitbuf >> bitdat.bits,    \
-         bitdat.bitbuf -= code << bitdat.bits,  \
+#define mac_bitget_1bit() ( m->cupl.bitdat.bits--,               \
+         code  = m->cupl.bitdat.bitbuf >> m->cupl.bitdat.bits,    \
+         m->cupl.bitdat.bitbuf -= code << m->cupl.bitdat.bits,  \
          code )
 /*========================================================*/
 /*========================================================*/
-void unpack_huff(int xy[][2], int n, int ntable)
+void unpack_huff(MPEG *m, int xy[][2], int n, int ntable)
 {
    int i;
    HUFF_ELEMENT *t;
@@ -277,7 +259,7 @@ void unpack_huff(int xy[][2], int n, int ntable)
 		  y = -y;
 	    xy[i][0] = x;
 	    xy[i][1] = y;
-	    if (bitdat.bs_ptr > bitdat.bs_ptr_end)
+	    if (m->cupl.bitdat.bs_ptr > m->cupl.bitdat.bs_ptr_end)
 	       break;		// bad data protect
 
 	 }
@@ -308,7 +290,7 @@ void unpack_huff(int xy[][2], int n, int ntable)
 		  y = -y;
 	    xy[i][0] = x;
 	    xy[i][1] = y;
-	    if (bitdat.bs_ptr > bitdat.bs_ptr_end)
+	    if (m->cupl.bitdat.bs_ptr > m->cupl.bitdat.bs_ptr_end)
 	       break;		// bad data protect
 
 	 }
@@ -321,7 +303,7 @@ void unpack_huff(int xy[][2], int n, int ntable)
 	    for (;;)
 	    {
 	       bits = t[0].b.signbits;
-	       code = bitget2(bits);
+	       code = bitget2(m, bits);
 	       if (t[1 + code].b.purgebits)
 		  break;
 	       t += t[1 + code].ptr;	/* ptr includes 1+code */
@@ -331,18 +313,18 @@ void unpack_huff(int xy[][2], int n, int ntable)
 	    x = t[1 + code].b.x;
 	    y = t[1 + code].b.y;
 	    if (x == 15)
-	       x += bitget_lb(linbits);
+	       x += bitget_lb(m, linbits);
 	    if (x)
 	       if (mac_bitget_1bit())
 		  x = -x;
 	    if (y == 15)
-	       y += bitget_lb(linbits);
+	       y += bitget_lb(m, linbits);
 	    if (y)
 	       if (mac_bitget_1bit())
 		  y = -y;
 	    xy[i][0] = x;
 	    xy[i][1] = y;
-	    if (bitdat.bs_ptr > bitdat.bs_ptr_end)
+	    if (m->cupl.bitdat.bs_ptr > m->cupl.bitdat.bs_ptr_end)
 	       break;		// bad data protect
 
 	 }
@@ -352,7 +334,7 @@ void unpack_huff(int xy[][2], int n, int ntable)
 
 }
 /*==========================================================*/
-int unpack_huff_quad(int vwxy[][4], int n, int nbits, int ntable)
+int unpack_huff_quad(MPEG *m, int vwxy[][4], int n, int nbits, int ntable)
 {
    int i;
    int code;
@@ -415,7 +397,7 @@ int unpack_huff_quad(int vwxy[][4], int n, int nbits, int ntable)
       vwxy[i][1] = w;
       vwxy[i][2] = x;
       vwxy[i][3] = y;
-      if (bitdat.bs_ptr > bitdat.bs_ptr_end)
+      if (m->cupl.bitdat.bs_ptr > m->cupl.bitdat.bs_ptr_end)
 	 break;			// bad data protect
 
    }
@@ -481,7 +463,7 @@ int unpack_huff_quad(int vwxy[][4], int n, int nbits, int ntable)
       vwxy[i][1] = w;
       vwxy[i][2] = x;
       vwxy[i][3] = y;
-      if (bitdat.bs_ptr > bitdat.bs_ptr_end)
+      if (m->cupl.bitdat.bs_ptr > m->cupl.bitdat.bs_ptr_end)
 	 break;			// bad data protect
 
    }

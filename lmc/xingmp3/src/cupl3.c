@@ -89,74 +89,44 @@ static DECODE_FUNCTION decode_function = L3audio_decode_MPEG1;
 /*====================================================================*/
 /* get bits from bitstream in endian independent way */
 
-BITDAT bitdat;			/* global for inline use by Huff */
-
 /*------------- initialize bit getter -------------*/
-static void bitget_init(unsigned char *buf)
+static void bitget_init(MPEG *m, unsigned char *buf)
 {
-   bitdat.bs_ptr0 = bitdat.bs_ptr = buf;
-   bitdat.bits = 0;
-   bitdat.bitbuf = 0;
+   m->cupl.bitdat.bs_ptr0 = m->cupl.bitdat.bs_ptr = buf;
+   m->cupl.bitdat.bits = 0;
+   m->cupl.bitdat.bitbuf = 0;
 }
 /*------------- initialize bit getter -------------*/
-static void bitget_init_end(unsigned char *buf_end)
+static void bitget_init_end(MPEG *m, unsigned char *buf_end)
 {
-   bitdat.bs_ptr_end = buf_end;
+   m->cupl.bitdat.bs_ptr_end = buf_end;
 }
 /*------------- get n bits from bitstream -------------*/
-int bitget_bits_used()
+int bitget_bits_used(MPEG *m)
 {
    int n;			/* compute bits used from last init call */
 
-   n = ((bitdat.bs_ptr - bitdat.bs_ptr0) << 3) - bitdat.bits;
+   n = ((m->cupl.bitdat.bs_ptr - m->cupl.bitdat.bs_ptr0) << 3) - 
+       m->cupl.bitdat.bits;
    return n;
 }
-/*------------- check for n bits in bitbuf -------------*/
-void bitget_check(int n)
-{
-   if (bitdat.bits < n)
-   {
-      while (bitdat.bits <= 24)
-      {
-	 bitdat.bitbuf = (bitdat.bitbuf << 8) | *bitdat.bs_ptr++;
-	 bitdat.bits += 8;
-      }
-   }
-}
 /*------------- get n bits from bitstream -------------*/
-unsigned int bitget(int n)
+unsigned int bitget(MPEG *m, int n)
 {
    unsigned int x;
 
-   if (bitdat.bits < n)
+   if (m->cupl.bitdat.bits < n)
    {				/* refill bit buf if necessary */
-      while (bitdat.bits <= 24)
+      while (m->cupl.bitdat.bits <= 24)
       {
-	 bitdat.bitbuf = (bitdat.bitbuf << 8) | *bitdat.bs_ptr++;
-	 bitdat.bits += 8;
+	 m->cupl.bitdat.bitbuf = (m->cupl.bitdat.bitbuf << 8) | 
+		                 *m->cupl.bitdat.bs_ptr++;
+	 m->cupl.bitdat.bits += 8;
       }
    }
-   bitdat.bits -= n;
-   x = bitdat.bitbuf >> bitdat.bits;
-   bitdat.bitbuf -= x << bitdat.bits;
-   return x;
-}
-/*------------- get 1 bit from bitstream -------------*/
-unsigned int bitget_1bit()
-{
-   unsigned int x;
-
-   if (bitdat.bits <= 0)
-   {				/* refill bit buf if necessary */
-      while (bitdat.bits <= 24)
-      {
-	 bitdat.bitbuf = (bitdat.bitbuf << 8) | *bitdat.bs_ptr++;
-	 bitdat.bits += 8;
-      }
-   }
-   bitdat.bits--;
-   x = bitdat.bitbuf >> bitdat.bits;
-   bitdat.bitbuf -= x << bitdat.bits;
+   m->cupl.bitdat.bits -= n;
+   x = m->cupl.bitdat.bitbuf >> m->cupl.bitdat.bits;
+   m->cupl.bitdat.bitbuf -= x << m->cupl.bitdat.bits;
    return x;
 }
 /*====================================================================*/
@@ -308,15 +278,15 @@ static int unpack_side_MPEG1(MPEG *m)
 /* decode partial header plus initial side info */
 /* at entry bit getter points at id, sync skipped by caller */
 
-   m->cupl.id = bitget(1);		/* id */
-   bitget(2);			/* skip layer */
-   prot = bitget(1);		/* bitget prot bit */
-   br_index = bitget(4);
-   m->cupl.sr_index = bitget(2);
-   m->cupl.pad = bitget(1);
-   bitget(1);			/* skip to mode */
-   m->cupl.side_info.mode = bitget(2);	/* mode */
-   m->cupl.side_info.mode_ext = bitget(2);	/* mode ext */
+   m->cupl.id = bitget(m, 1);		/* id */
+   bitget(m, 2);			/* skip layer */
+   prot = bitget(m, 1);		/* bitget prot bit */
+   br_index = bitget(m, 4);
+   m->cupl.sr_index = bitget(m, 2);
+   m->cupl.pad = bitget(m, 1);
+   bitget(m, 1);			/* skip to mode */
+   m->cupl.side_info.mode = bitget(m, 2);	/* mode */
+   m->cupl.side_info.mode_ext = bitget(m, 2);	/* mode ext */
 
    if (m->cupl.side_info.mode != 1)
       m->cupl.side_info.mode_ext = 0;
@@ -328,10 +298,10 @@ static int unpack_side_MPEG1(MPEG *m)
 
    m->cupl.crcbytes = 0;
    if (prot)
-      bitget(4);		/* skip to data */
+      bitget(m, 4);		/* skip to data */
    else
    {
-      bitget(20);		/* skip crc */
+      bitget(m, 20);		/* skip crc */
       m->cupl.crcbytes = 2;
    }
 
@@ -341,10 +311,10 @@ static int unpack_side_MPEG1(MPEG *m)
 	 2880 * mp_br_tableL3[m->cupl.id][br_index] / mp_sr20_table[m->cupl.id][m->cupl.sr_index];
    }
 
-   m->cupl.side_info.main_data_begin = bitget(9);
+   m->cupl.side_info.main_data_begin = bitget(m, 9);
    if (m->cupl.side_info.mode == 3)
    {
-      m->cupl.side_info.private_bits = bitget(5);
+      m->cupl.side_info.private_bits = bitget(m, 5);
       m->cupl.nchan = 1;
       m->cupl.stereo_flag = 0;
       side_bytes = (4 + 17);
@@ -352,40 +322,40 @@ static int unpack_side_MPEG1(MPEG *m)
    }
    else
    {
-      m->cupl.side_info.private_bits = bitget(3);
+      m->cupl.side_info.private_bits = bitget(m, 3);
       m->cupl.nchan = 2;
       m->cupl.stereo_flag = 1;
       side_bytes = (4 + 32);
 /*-- with header --*/
    }
    for (ch = 0; ch < m->cupl.nchan; ch++)
-      m->cupl.side_info.scfsi[ch] = bitget(4);
+      m->cupl.side_info.scfsi[ch] = bitget(m, 4);
 /* this always 0 (both igr) for short blocks */
 
    for (igr = 0; igr < 2; igr++)
    {
       for (ch = 0; ch < m->cupl.nchan; ch++)
       {
-	 m->cupl.side_info.gr[igr][ch].part2_3_length = bitget(12);
-	 m->cupl.side_info.gr[igr][ch].big_values = bitget(9);
+	 m->cupl.side_info.gr[igr][ch].part2_3_length = bitget(m, 12);
+	 m->cupl.side_info.gr[igr][ch].big_values = bitget(m, 9);
 
          if (m->cupl.side_info.gr[igr][ch].big_values > 288)
              return -1;
 	 
-	 m->cupl.side_info.gr[igr][ch].global_gain = bitget(8) + m->cupl.gain_adjust;
+	 m->cupl.side_info.gr[igr][ch].global_gain = bitget(m, 8) + m->cupl.gain_adjust;
 	 if (m->cupl.ms_mode)
 	    m->cupl.side_info.gr[igr][ch].global_gain -= 2;
-	 m->cupl.side_info.gr[igr][ch].scalefac_compress = bitget(4);
-	 m->cupl.side_info.gr[igr][ch].window_switching_flag = bitget(1);
+	 m->cupl.side_info.gr[igr][ch].scalefac_compress = bitget(m, 4);
+	 m->cupl.side_info.gr[igr][ch].window_switching_flag = bitget(m, 1);
 	 if (m->cupl.side_info.gr[igr][ch].window_switching_flag)
 	 {
-	    m->cupl.side_info.gr[igr][ch].block_type = bitget(2);
-	    m->cupl.side_info.gr[igr][ch].mixed_block_flag = bitget(1);
-	    m->cupl.side_info.gr[igr][ch].table_select[0] = bitget(5);
-	    m->cupl.side_info.gr[igr][ch].table_select[1] = bitget(5);
-	    m->cupl.side_info.gr[igr][ch].subblock_gain[0] = bitget(3);
-	    m->cupl.side_info.gr[igr][ch].subblock_gain[1] = bitget(3);
-	    m->cupl.side_info.gr[igr][ch].subblock_gain[2] = bitget(3);
+	    m->cupl.side_info.gr[igr][ch].block_type = bitget(m, 2);
+	    m->cupl.side_info.gr[igr][ch].mixed_block_flag = bitget(m, 1);
+	    m->cupl.side_info.gr[igr][ch].table_select[0] = bitget(m, 5);
+	    m->cupl.side_info.gr[igr][ch].table_select[1] = bitget(m, 5);
+	    m->cupl.side_info.gr[igr][ch].subblock_gain[0] = bitget(m, 3);
+	    m->cupl.side_info.gr[igr][ch].subblock_gain[1] = bitget(m, 3);
+	    m->cupl.side_info.gr[igr][ch].subblock_gain[2] = bitget(m, 3);
 	  /* region count set in terms of long block cb's/bands */
 	  /* r1 set so r0+r1+1 = 21 (lookup produces 576 bands ) */
 	  /* if(window_switching_flag) always 36 samples in region0 */
@@ -396,15 +366,15 @@ static int unpack_side_MPEG1(MPEG *m)
 	 {
 	    m->cupl.side_info.gr[igr][ch].mixed_block_flag = 0;
 	    m->cupl.side_info.gr[igr][ch].block_type = 0;
-	    m->cupl.side_info.gr[igr][ch].table_select[0] = bitget(5);
-	    m->cupl.side_info.gr[igr][ch].table_select[1] = bitget(5);
-	    m->cupl.side_info.gr[igr][ch].table_select[2] = bitget(5);
-	    m->cupl.side_info.gr[igr][ch].region0_count = bitget(4);
-	    m->cupl.side_info.gr[igr][ch].region1_count = bitget(3);
+	    m->cupl.side_info.gr[igr][ch].table_select[0] = bitget(m, 5);
+	    m->cupl.side_info.gr[igr][ch].table_select[1] = bitget(m, 5);
+	    m->cupl.side_info.gr[igr][ch].table_select[2] = bitget(m, 5);
+	    m->cupl.side_info.gr[igr][ch].region0_count = bitget(m, 4);
+	    m->cupl.side_info.gr[igr][ch].region1_count = bitget(m, 3);
 	 }
-	 m->cupl.side_info.gr[igr][ch].preflag = bitget(1);
-	 m->cupl.side_info.gr[igr][ch].scalefac_scale = bitget(1);
-	 m->cupl.side_info.gr[igr][ch].count1table_select = bitget(1);
+	 m->cupl.side_info.gr[igr][ch].preflag = bitget(m, 1);
+	 m->cupl.side_info.gr[igr][ch].scalefac_scale = bitget(m, 1);
+	 m->cupl.side_info.gr[igr][ch].count1table_select = bitget(m, 1);
       }
    }
 
@@ -424,15 +394,15 @@ static int unpack_side_MPEG2(MPEG *m, int igr)
 /* decode partial header plus initial side info */
 /* at entry bit getter points at id, sync skipped by caller */
 
-   m->cupl.id = bitget(1);		/* id */
-   bitget(2);			/* skip layer */
-   prot = bitget(1);		/* bitget prot bit */
-   br_index = bitget(4);
-   m->cupl.sr_index = bitget(2);
-   m->cupl.pad = bitget(1);
-   bitget(1);			/* skip to mode */
-   m->cupl.side_info.mode = bitget(2);	/* mode */
-   m->cupl.side_info.mode_ext = bitget(2);	/* mode ext */
+   m->cupl.id = bitget(m, 1);		/* id */
+   bitget(m, 2);			/* skip layer */
+   prot = bitget(m, 1);		/* bitget prot bit */
+   br_index = bitget(m, 4);
+   m->cupl.sr_index = bitget(m, 2);
+   m->cupl.pad = bitget(m, 1);
+   bitget(m, 1);			/* skip to mode */
+   m->cupl.side_info.mode = bitget(m, 2);	/* mode */
+   m->cupl.side_info.mode_ext = bitget(m, 2);	/* mode ext */
 
    if (m->cupl.side_info.mode != 1)
       m->cupl.side_info.mode_ext = 0;
@@ -443,10 +413,10 @@ static int unpack_side_MPEG2(MPEG *m, int igr)
 
    m->cupl.crcbytes = 0;
    if (prot)
-      bitget(4);		/* skip to data */
+      bitget(m, 4);		/* skip to data */
    else
    {
-      bitget(20);		/* skip crc */
+      bitget(m, 20);		/* skip crc */
       m->cupl.crcbytes = 2;
    }
 
@@ -464,10 +434,10 @@ static int unpack_side_MPEG2(MPEG *m, int igr)
        //if( sr_index == 2 ) return 0;  // fail mpeg25 8khz
       }
    }
-   m->cupl.side_info.main_data_begin = bitget(8);
+   m->cupl.side_info.main_data_begin = bitget(m, 8);
    if (m->cupl.side_info.mode == 3)
    {
-      m->cupl.side_info.private_bits = bitget(1);
+      m->cupl.side_info.private_bits = bitget(m, 1);
       m->cupl.nchan = 1;
       m->cupl.stereo_flag = 0;
       side_bytes = (4 + 9);
@@ -475,7 +445,7 @@ static int unpack_side_MPEG2(MPEG *m, int igr)
    }
    else
    {
-      m->cupl.side_info.private_bits = bitget(2);
+      m->cupl.side_info.private_bits = bitget(m, 2);
       m->cupl.nchan = 2;
       m->cupl.stereo_flag = 1;
       side_bytes = (4 + 17);
@@ -486,26 +456,26 @@ static int unpack_side_MPEG2(MPEG *m, int igr)
 
    for (ch = 0; ch < m->cupl.nchan; ch++)
    {
-      m->cupl.side_info.gr[igr][ch].part2_3_length = bitget(12);
-      m->cupl.side_info.gr[igr][ch].big_values = bitget(9);
+      m->cupl.side_info.gr[igr][ch].part2_3_length = bitget(m, 12);
+      m->cupl.side_info.gr[igr][ch].big_values = bitget(m, 9);
 	  
       if (m->cupl.side_info.gr[igr][ch].big_values > 288)
 	  return -1; // to catch corrupt sideband data
       
-      m->cupl.side_info.gr[igr][ch].global_gain = bitget(8) + m->cupl.gain_adjust;
+      m->cupl.side_info.gr[igr][ch].global_gain = bitget(m, 8) + m->cupl.gain_adjust;
       if (m->cupl.ms_mode)
 	 m->cupl.side_info.gr[igr][ch].global_gain -= 2;
-      m->cupl.side_info.gr[igr][ch].scalefac_compress = bitget(9);
-      m->cupl.side_info.gr[igr][ch].window_switching_flag = bitget(1);
+      m->cupl.side_info.gr[igr][ch].scalefac_compress = bitget(m, 9);
+      m->cupl.side_info.gr[igr][ch].window_switching_flag = bitget(m, 1);
       if (m->cupl.side_info.gr[igr][ch].window_switching_flag)
       {
-	 m->cupl.side_info.gr[igr][ch].block_type = bitget(2);
-	 m->cupl.side_info.gr[igr][ch].mixed_block_flag = bitget(1);
-	 m->cupl.side_info.gr[igr][ch].table_select[0] = bitget(5);
-	 m->cupl.side_info.gr[igr][ch].table_select[1] = bitget(5);
-	 m->cupl.side_info.gr[igr][ch].subblock_gain[0] = bitget(3);
-	 m->cupl.side_info.gr[igr][ch].subblock_gain[1] = bitget(3);
-	 m->cupl.side_info.gr[igr][ch].subblock_gain[2] = bitget(3);
+	 m->cupl.side_info.gr[igr][ch].block_type = bitget(m, 2);
+	 m->cupl.side_info.gr[igr][ch].mixed_block_flag = bitget(m, 1);
+	 m->cupl.side_info.gr[igr][ch].table_select[0] = bitget(m, 5);
+	 m->cupl.side_info.gr[igr][ch].table_select[1] = bitget(m, 5);
+	 m->cupl.side_info.gr[igr][ch].subblock_gain[0] = bitget(m, 3);
+	 m->cupl.side_info.gr[igr][ch].subblock_gain[1] = bitget(m, 3);
+	 m->cupl.side_info.gr[igr][ch].subblock_gain[2] = bitget(m, 3);
        /* region count set in terms of long block cb's/bands  */
        /* r1 set so r0+r1+1 = 21 (lookup produces 576 bands ) */
        /* bt=1 or 3       54 samples */
@@ -529,15 +499,15 @@ static int unpack_side_MPEG2(MPEG *m, int igr)
       {
 	 m->cupl.side_info.gr[igr][ch].mixed_block_flag = 0;
 	 m->cupl.side_info.gr[igr][ch].block_type = 0;
-	 m->cupl.side_info.gr[igr][ch].table_select[0] = bitget(5);
-	 m->cupl.side_info.gr[igr][ch].table_select[1] = bitget(5);
-	 m->cupl.side_info.gr[igr][ch].table_select[2] = bitget(5);
-	 m->cupl.side_info.gr[igr][ch].region0_count = bitget(4);
-	 m->cupl.side_info.gr[igr][ch].region1_count = bitget(3);
+	 m->cupl.side_info.gr[igr][ch].table_select[0] = bitget(m, 5);
+	 m->cupl.side_info.gr[igr][ch].table_select[1] = bitget(m, 5);
+	 m->cupl.side_info.gr[igr][ch].table_select[2] = bitget(m, 5);
+	 m->cupl.side_info.gr[igr][ch].region0_count = bitget(m, 4);
+	 m->cupl.side_info.gr[igr][ch].region1_count = bitget(m, 3);
       }
       m->cupl.side_info.gr[igr][ch].preflag = 0;
-      m->cupl.side_info.gr[igr][ch].scalefac_scale = bitget(1);
-      m->cupl.side_info.gr[igr][ch].count1table_select = bitget(1);
+      m->cupl.side_info.gr[igr][ch].scalefac_scale = bitget(m, 1);
+      m->cupl.side_info.gr[igr][ch].count1table_select = bitget(m, 1);
    }
 
 /* return  bytes in header + side info */
@@ -557,19 +527,19 @@ static void unpack_main(MPEG *m, unsigned char *pcm, int igr)
 
    for (ch = 0; ch < m->cupl.nchan; ch++)
    {
-      bitget_init(m->cupl.buf + (m->cupl.main_pos_bit >> 3));
+      bitget_init(m, m->cupl.buf + (m->cupl.main_pos_bit >> 3));
       bit0 = (m->cupl.main_pos_bit & 7);
       if (bit0)
-	 bitget(bit0);
+	 bitget(m, bit0);
       m->cupl.main_pos_bit += m->cupl.side_info.gr[igr][ch].part2_3_length;
-      bitget_init_end(m->cupl.buf + ((m->cupl.main_pos_bit + 39) >> 3));
+      bitget_init_end(m, m->cupl.buf + ((m->cupl.main_pos_bit + 39) >> 3));
 /*-- scale factors --*/
       if (m->cupl.id)
-	 unpack_sf_sub_MPEG1(&m->cupl.sf[igr][ch],
+	 unpack_sf_sub_MPEG1(m, &m->cupl.sf[igr][ch],
 			  &m->cupl.side_info.gr[igr][ch], m->cupl.side_info.scfsi[ch], igr);
       else
 
-         unpack_sf_sub_MPEG2(&m->cupl.sf[igr][ch],
+         unpack_sf_sub_MPEG2(m, &m->cupl.sf[igr][ch],
 			 &m->cupl.side_info.gr[igr][ch], m->cupl.is_mode & ch, &m->cupl.is_sf_info);
 
       if (m->eq.enableEQ)
@@ -590,11 +560,15 @@ static void unpack_main(MPEG *m, unsigned char *pcm, int igr)
 	 n1 = n3;
       nn3 = n3 - n2;
       nn2 = n2 - n1;
-      unpack_huff(m->cupl.sample[ch][igr], n1, m->cupl.side_info.gr[igr][ch].table_select[0]);
-      unpack_huff(m->cupl.sample[ch][igr] + n1, nn2, m->cupl.side_info.gr[igr][ch].table_select[1]);
-      unpack_huff(m->cupl.sample[ch][igr] + n2, nn3, m->cupl.side_info.gr[igr][ch].table_select[2]);
-      qbits = m->cupl.side_info.gr[igr][ch].part2_3_length - (bitget_bits_used() - bit0);
-      nn4 = unpack_huff_quad(m->cupl.sample[ch][igr] + n3, m->cupl.band_limit - n3, qbits,
+      unpack_huff(m, m->cupl.sample[ch][igr], n1, 
+                  m->cupl.side_info.gr[igr][ch].table_select[0]);
+      unpack_huff(m, m->cupl.sample[ch][igr] + n1, nn2, 
+                  m->cupl.side_info.gr[igr][ch].table_select[1]);
+      unpack_huff(m, m->cupl.sample[ch][igr] + n2, nn3, 
+                  m->cupl.side_info.gr[igr][ch].table_select[2]);
+      qbits = m->cupl.side_info.gr[igr][ch].part2_3_length - (bitget_bits_used(m) - bit0);
+      nn4 = unpack_huff_quad(m, m->cupl.sample[ch][igr] + n3, 
+                             m->cupl.band_limit - n3, qbits,
 			     m->cupl.side_info.gr[igr][ch].count1table_select);
       n4 = n3 + nn4;
       m->cupl.nsamp[igr][ch] = n4;
@@ -605,7 +579,7 @@ static void unpack_main(MPEG *m, unsigned char *pcm, int igr)
 	 n4 = min(n4, m->cupl.band_limit21);
       if (n4 < 576)
 	 memset(m->cupl.sample[ch][igr] + n4, 0, sizeof(SAMPLE) * (576 - n4));
-      if (bitdat.bs_ptr > bitdat.bs_ptr_end)
+      if (m->cupl.bitdat.bs_ptr > m->cupl.bitdat.bs_ptr_end)
       {				// bad data overrun
 
 	 memset(m->cupl.sample[ch][igr], 0, sizeof(SAMPLE) * (576));
@@ -704,11 +678,11 @@ IN_OUT L3audio_decode_MPEG1(void *mv, unsigned char *bs, unsigned char *pcm)
    
    m->cupl.iframe++;
 
-   bitget_init(bs);		/* initialize bit getter */
+   bitget_init(m, bs);		/* initialize bit getter */
 /* test sync */
    in_out.in_bytes = 0;		/* assume fail */
    in_out.out_bytes = 0;
-   sync = bitget(12);
+   sync = bitget(m, 12);
 
    if (sync != 0xFFF)
       return in_out;		/* sync fail */
@@ -780,11 +754,11 @@ IN_OUT L3audio_decode_MPEG2(void *mv, unsigned char *bs, unsigned char *pcm)
    m->cupl.iframe++;
 
 
-   bitget_init(bs);		/* initialize bit getter */
+   bitget_init(m, bs);		/* initialize bit getter */
 /* test sync */
    in_out.in_bytes = 0;		/* assume fail */
    in_out.out_bytes = 0;
-   sync = bitget(12);
+   sync = bitget(m, 12);
 
 // if( sync != 0xFFF ) return in_out;       /* sync fail */
 
