@@ -27,7 +27,7 @@ ____________________________________________________________________________*/
 #ifndef _CONSOLE_CIO_H_
 #define _CONSOLE_CIO_H_
 
-#include "ctrlobj.h"
+#include "ui.h"
 #include "event.h"
 #include "thread.h"
 

@@ -26,14 +26,6 @@ ____________________________________________________________________________*/
 
 
 Mutex::
-Mutex()
-{
-	m_mutex = CreateMutex(	NULL,
-							FALSE,
-							NULL);
-}
-
-Mutex::
 Mutex(bool createOwned)
 {
 	m_mutex = CreateMutex(	NULL,

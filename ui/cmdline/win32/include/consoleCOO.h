@@ -27,7 +27,7 @@ ____________________________________________________________________________*/
 #ifndef _CONSOLE_COO_H_
 #define _CONSOLE_COO_H_
 
-#include "ctrlobj.h"
+#include "ui.h"
 #include "event.h"
 
 class ConsoleCOO : public COO {

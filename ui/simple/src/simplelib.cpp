@@ -21,55 +21,52 @@
 ____________________________________________________________________________*/
 
 /* project headers */
-#include "pmolib.h"
-#include "soundcardpmo.h"
+#include "uilib.h"
+#include "simpleui.h"
 
 
-void Initialize(PMORef ref)
+void Initialize(UIRef ref)
 {
-    if(ref)
+    if(ref )
     {
-        PhysicalMediaOutput* pmo = new SoundCardPMO;
-        ref->ref = pmo;
+        UserInterface* ui = new SimpleUI;
+        ref->ref = ui;
 
-        ref->Init = Init;
-        ref->Reset = Reset;
-        ref->Write = Write;
-        ref->Clear = Clear;
-        ref->Cleanup = Cleanup;
+        ref->SetTarget = SetTarget;
+        ref->SetArgs = SetArgs;
+        ref->AcceptEvent = AcceptEvent;
+        ref->Cleanup = Cleanup;  
     }
 }
 
-bool Init(PMORef ref, OutputInfo* info)
+void SetTarget(UIRef ref, EventQueueRef eq)
 {
-    PhysicalMediaOutput* pmo = (PhysicalMediaOutput*)ref->ref;
+    SimpleUI* ui = (SimpleUI*)ref->ref;
 
-    return pmo->Init(info);
+    ui->SetTarget(eq);
 }
 
-bool Reset(PMORef ref, bool user_stop)
+void SetArgs(UIRef ref, int32 argc, char **argv)
 {
-    PhysicalMediaOutput* pmo = (PhysicalMediaOutput*)ref->ref;
+    SimpleUI* ui = (SimpleUI*)ref->ref;
 
-    return pmo->Reset(user_stop);
+    ui->SetArgs(argc, argv);
 }
 
-
-int32 Write(PMORef ref, void* buf, int32 len)
-{ 
-    PhysicalMediaOutput* pmo = (PhysicalMediaOutput*)ref->ref;
-
-    return pmo->Write(buf, len);
-}
-
-void Clear(PMORef ref)
+int32 AcceptEvent(UIRef ref, Event* event)
 {
-    PhysicalMediaOutput* pmo = (PhysicalMediaOutput*)ref->ref;
+    SimpleUI* ui = (SimpleUI*)ref->ref;
 
-    pmo->Clear();
+    return ui->AcceptEvent(event);
 }
 
-void Cleanup(PMORef ref)
+void Cleanup(UIRef ref)
 {
-    delete (PhysicalMediaOutput*)ref->ref;
+    SimpleUI* ui = (SimpleUI*)ref->ref;
+
+    delete ui;
 }
+
+
+
+

@@ -75,6 +75,8 @@ Player::Player() {
     m_uiRef = NULL;
 
     m_argUI = NULL;
+
+    m_autoplay = false;
 }
 
 Player::~Player() {
@@ -180,7 +182,6 @@ void Player::SetArgs(int32 argc, char** argv){
     PlayList* playlist = new PlayList;
     char *arg = NULL;
     bool shuffle = false;
-    bool play = false;
 
     for(int32 i = 1;i < argc; i++) 
     {
@@ -198,7 +199,7 @@ void Player::SetArgs(int32 argc, char** argv){
 
                 case 'p':
                 {
-                    play = true;
+                    m_autoplay = true;
 		            break;
 	            } 
 
@@ -228,9 +229,6 @@ void Player::SetArgs(int32 argc, char** argv){
 	    playlist->Shuffle();
     
     Player::GetPlayer()->AcceptEvent(new Event(CMD_SetPlaylist,playlist));
-
-    if(play)
-        Player::GetPlayer()->AcceptEvent(new Event(CMD_Play));
 }
 
 void Player::Run(){
@@ -287,6 +285,9 @@ void Player::Run(){
     }
 
     delete [] name;
+
+    if(m_autoplay)
+       AcceptEvent(new Event(CMD_Play));
  
 }
 
@@ -495,6 +496,7 @@ int32 Player::ServiceEvent(Event *pC) {
 		    m_lmcRef->ChangePosition(m_lmcRef, m_myPlayList->GetSkip());
 		    m_lmcRef->Decode(m_lmcRef);
 		} else {
+            m_myPlayList->SetFirst();
 		    //cout << "no more in playlist..." << endl;
 		    if (m_lmcRef) {
 			m_lmcRef->Stop(m_lmcRef);

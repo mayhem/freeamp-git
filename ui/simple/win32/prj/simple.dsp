@@ -56,7 +56,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\ui mkdir\
-        ..\..\..\..\base\win32\prj\ui	copy simple.ui ..\..\..\..\base\win32\prj\ui
+           ..\..\..\..\base\win32\prj\ui	copy simple.ui ..\..\..\..\base\win32\prj\ui
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "simple - Win32 Debug"
@@ -87,7 +87,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\ui mkdir\
-        ..\..\..\..\base\win32\prj\ui	copy simple.ui ..\..\..\..\base\win32\prj\ui
+           ..\..\..\..\base\win32\prj\ui	copy simple.ui ..\..\..\..\base\win32\prj\ui
 # End Special Build Tool
 
 !ENDIF 
@@ -128,11 +128,19 @@ InputPath=..\..\..\..\config\config.win32
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\..\base\win32\src\mutex.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\win32\src\semaphore.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\src\simplelib.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\src\simpleui.cpp
+SOURCE=..\src\simpleui.cpp
 # End Source File
 # Begin Source File
 

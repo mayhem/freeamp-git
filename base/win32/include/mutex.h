@@ -32,8 +32,7 @@ ____________________________________________________________________________*/
 class Mutex {
 
 public:
-	Mutex();
-	Mutex(bool createOwned);
+	Mutex(bool createOwned = false);
 	~Mutex();
 
 

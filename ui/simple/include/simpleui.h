@@ -29,8 +29,8 @@ ____________________________________________________________________________*/
 
 /* project headers */
 #include "config.h"
-#include "ctrlobj.h"
-#include "mutex.h"
+#include "ui.h"
+#include "semaphore.h"
 #include "event.h"
 #include "thread.h"
 #include "mutex.h"
@@ -45,7 +45,6 @@ class SimpleUI : public UserInterface {
     virtual void SetTarget(EventQueueRef);
     virtual int32 AcceptEvent(Event *);
     virtual void SetArgs(int32,char **);
-    virtual void SetRef(UIRef);
 
     void CreateUI();
 
@@ -55,6 +54,9 @@ class SimpleUI : public UserInterface {
 						            LPARAM lParam );
     
     void SetHwnd(HWND hwnd);
+
+    Semaphore*      m_uiSemaphore;
+
  protected:
       static void UIThreadFunc(void *);
 
@@ -62,7 +64,6 @@ class SimpleUI : public UserInterface {
  private:
     Thread*         m_uiThread;
     EventQueueRef   m_target;
-    UIRef           m_ref;
 
     HWND            m_hwnd;
     HWND            m_hwndPlay;
@@ -74,6 +75,8 @@ class SimpleUI : public UserInterface {
     HWND            m_hwndCurrent;
     HWND            m_hwndTotal;
 	HWND            m_hwndStatus;
+
+    
 };
 
 

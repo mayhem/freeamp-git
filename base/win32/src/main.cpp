@@ -96,8 +96,6 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
     dummyRef->AcceptEvent = dummy->AcceptEventStub;
     dummyRef->Cleanup = dummy->Cleanup;
 
-    dummy->SetRef(dummyRef);
-
     // register items... we give up ownership here
     player->RegisterActiveUI(dummyRef);
     player->RegisterLMCs(lmc);

@@ -26,7 +26,7 @@ ____________________________________________________________________________*/
 /* project headers */
 #include "config.h"
 #include "event.h"
-#include "ctrlobj.h"
+#include "ui.h"
 
 #ifdef __cplusplus
 extern "C" {
