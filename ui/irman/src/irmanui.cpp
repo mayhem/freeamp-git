@@ -30,7 +30,7 @@ ____________________________________________________________________________*/
 #include <sys/time.h>
 #include <termios.h>
 #include <signal.h>
-
+#include <errno.h>
 
 #include "config.h"
 #include "irmanui.h"
