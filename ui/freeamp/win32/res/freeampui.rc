@@ -353,6 +353,21 @@ BEGIN
     PUSHBUTTON      "&Delete Profile",IDC_DELETEPROFILE,160,148,53,14
 END
 
+IDD_PREF_BROWSER DIALOG DISCARDABLE  0, 0, 233, 174
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Browser"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "Available Columns",IDC_STATIC,9,11,58,8
+    LTEXT           "Current Columns",IDC_STATIC,137,11,52,8
+    LISTBOX         IDC_AVAILABLE_COLUMN_LIST,3,26,90,107,
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LISTBOX         IDC_CURRENT_COLUMN_LIST,134,26,90,107,
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "<<",IDC_REMOVE_COLUMN,99,35,30,15
+    PUSHBUTTON      ">>",IDC_ADD_COLUMN,99,54,30,15
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -506,6 +521,14 @@ BEGIN
         RIGHTMARGIN, 226
         TOPMARGIN, 7
         BOTTOMMARGIN, 168
+    END
+
+    IDD_PREF_BROWSER, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 230
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 170
     END
 END
 #endif    // APSTUDIO_INVOKED

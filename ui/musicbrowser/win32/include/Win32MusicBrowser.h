@@ -51,6 +51,7 @@ using namespace std;
 #include "DropTarget.h"
 #include "timer.h"
 #include "FreeAmpStreams.h"
+#include "ColumnInfo.h"
 
 class FAContext;
 
@@ -64,6 +65,15 @@ class FAContext;
 #define IDC_REBAR          13000
 #define IDC_TOOLBAR        13001
 #define TOOLBAR_INDENT	   8
+
+#define ALBUM_COLUMN      "Album"
+#define ARTIST_COLUMN      "Artist"
+#define COMMENT_COLUMN     "Comment"
+#define GENRE_COLUMN       "Genre"
+#define LOCATION_COLUMN    "Location"
+#define TIME_COLUMN        "Time"
+#define TITLE_COLUMN       "Title"
+#define YEAR_COLUMN        "Year"
 
 bool operator<(const TreeData &A, const TreeData &b);
 bool operator==(const TreeData &A, const TreeData &b);
@@ -266,11 +276,18 @@ class MusicBrowserUI : public UserInterface
                                   const vector<uint32>* oldIndexList);
     void  PlaylistListSorted();
     void  InitList();
+    
+    void  InsertColumn(const char *title, int position);
+    void  RemoveAllColumns();
+    void  ResizeColumns();
+
     void  LVBeginDrag(HWND hwnd, NM_LISTVIEW* nmlv);
     void  UpdateTotalTime();
     void  GetSelectedPlaylistItems(vector<PlaylistItem*>* items);
     void  ResizeHeader(HWND hwnd, uint32 column);
     void  DisplayCurrentItem();
+    int   GetColumnIndex(const char *columnTitle);
+    const char *GetColumnText(int column);
 
 
     // Functions in Win32MusicBrowser.cpp
@@ -408,6 +425,8 @@ class MusicBrowserUI : public UserInterface
 
     bool                m_sigsExist;
     bool                m_sigsStart;
+
+    ColumnInfo          m_columnInfo;
 };
 
 #endif

@@ -99,7 +99,7 @@ extern const char* kMusicBrowserHeaderWidthsPref;
 extern const char* kCloseDLMOnCompletePref;
 extern const char* kPerformDBCheckPref;
 extern const char* kWAVOutputPathPref;
-
+extern const char* kPlaylistHeaderColumnsPref;
 
 extern const int32 kDefaultWatchThisDirTimeout;
 

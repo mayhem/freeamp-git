@@ -92,6 +92,7 @@ const char* kMusicBrowserPositionPref = "MusicBrowserPosition";
 const char* kMusicBrowserHeaderWidthsPref = "MusicBrowserHeaderWidths";
 const char* kCloseDLMOnCompletePref = "CloseDLMOnComplete";
 const char* kPerformDBCheckPref = "PerformDBCheck";
+const char* kPlaylistHeaderColumnsPref = "PlaylistHeaderColumns";
 
 //logging
 const char* kUseDebugLogPref = "UseDebugLog";
@@ -160,6 +161,7 @@ const char* kDefaultMusicBrowserPosition = "-1,-1,-1,-1,-1";
 const char* kDefaultMusicBrowserHeaderWidths = "-1,-1,-1.-1";
 const bool  kDefaultCloseDLMOnComplete = false;
 const bool kDefaultPerformDBCheck = true;
+const char* kDefaultPlaylistHeaderColumns = "Title|Artist|Album|Time|Genre";
 
 Error
 Preferences::
@@ -386,6 +388,11 @@ SetDefaults()
     if (GetPrefBoolean(kCheckCDAutomaticallyPref, &dummyBool) == 
         kError_NoPrefValue)
         SetPrefBoolean(kCheckCDAutomaticallyPref, kDefaultCheckCDAutomatically);
+
+    dummyInt = 255;
+    if (GetPrefString(kPlaylistHeaderColumnsPref, dummyString,
+        (uint32 *)&dummyInt) == kError_NoPrefValue)
+        SetPrefString(kPlaylistHeaderColumnsPref, kDefaultPlaylistHeaderColumns);
 
     return kError_NoErr;
 }

@@ -43,6 +43,17 @@ class FAContext;
 class MusicBrowserUI;
 
 typedef enum {
+    kEmptyColumn,
+    kArtistColumn,
+    kAlbumColumn,
+    kCommentColumn,
+    kGenreColumn,
+    kLocationColumn,
+    kTitleColumn,
+    kTimeColumn
+} PlaylistColumns;
+
+typedef enum {
     kStateCollapsed,
     kStateExpanded
 } MusicBrowserView;

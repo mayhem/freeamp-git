@@ -165,6 +165,15 @@ PrefProfileCallback(HWND hwnd,
        return g_pCurrentPrefWindow->PrefProfileProc(hwnd, msg, wParam, lParam);
 }
 
+static BOOL CALLBACK 
+PrefBrowserCallback(HWND hwnd, 
+                    UINT msg, 
+                    WPARAM wParam, 
+                    LPARAM lParam)
+{
+      return g_pCurrentPrefWindow->PrefBrowserProc(hwnd, msg, wParam, lParam);
+}
+
 Win32PreferenceWindow::Win32PreferenceWindow(FAContext *context,
                                              ThemeManager *pThemeMan,
                                              UpdateManager *pUpdateMan,
@@ -249,6 +258,10 @@ bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent)
 
     page.pszTemplate = MAKEINTRESOURCE(IDD_PREF_PROFILE);
     page.pfnDlgProc = PrefProfileCallback;
+    m_pages.push_back(page);
+
+    page.pszTemplate = MAKEINTRESOURCE(IDD_PREF_BROWSER);
+    page.pfnDlgProc = PrefBrowserCallback;
     m_pages.push_back(page);
 
     page.pszTemplate = MAKEINTRESOURCE(IDD_PREF_ABOUT);
@@ -364,6 +377,16 @@ void Win32PreferenceWindow::GetPrefsValues(PrefsStruct* values)
     }
 
     values->defaultFont = buffer;
+    size = bufferSize;
+
+    if(kError_BufferTooSmall == m_prefs->GetPrefString(kPlaylistHeaderColumnsPref, buffer, &size))
+    {
+        bufferSize = size;
+        buffer = (char*)realloc(buffer, bufferSize);
+        m_prefs->GetPrefString(PlaylistHeaderColumnsPref, buffer, &size);
+    }
+
+    values->playlistHeaderColumns = buffer;
     size = bufferSize;
 
     if(kError_BufferTooSmall == m_prefs->GetPrefString(kSaveMusicDirPref, buffer, &size))
@@ -494,6 +517,7 @@ void Win32PreferenceWindow::SavePrefsValues(PrefsStruct* values)
 
     m_prefs->SetPrefBoolean(kCheckForUpdatesPref, values->checkForUpdates);
     m_prefs->SetPrefString(kSaveMusicDirPref, values->saveMusicDirectory.c_str());
+    m_prefs->SetPrefString(kPlaylistHeaderColumnsPref, values->playlistHeaderColumns.c_str());
     m_prefs->SetPrefBoolean(kAskToReclaimFiletypesPref, values->askReclaimFiletypes);
     m_prefs->SetPrefBoolean(kReclaimFiletypesPref, values->reclaimFiletypes);
 
@@ -528,7 +552,6 @@ void Win32PreferenceWindow::SavePrefsValues(PrefsStruct* values)
     }
 
     m_prefs->SetPrefString(kWatchThisDirectoryPref, dirList.c_str());
-
     m_prefs->SetPrefInt32(kWatchThisDirTimeoutPref, (values->watchForNewMusic ? kDefaultWatchThisDirTimeout : 0));
 
     m_pContext->target->AcceptEvent(new Event(INFO_PrefsChanged));
@@ -3808,6 +3831,162 @@ uint32 CalcStringEllipsis(HDC hdc, string& displayString, int32 columnWidth)
     GetTextExtentPoint32(hdc, displayString.c_str(), displayString.size(), &sizeString);
 
     return sizeString.cx;
+}
+
+bool Win32PreferenceWindow::PrefBrowserProc(HWND hwnd, 
+                                           UINT msg, 
+                                           WPARAM wParam, 
+                                           LPARAM lParam)      
+{
+    bool result = false;
+    switch(msg)
+    {
+        case WM_INITDIALOG:
+        {
+            //
+            //  Add all the columns that are currently in use to the
+            // rightmost listbox.
+            //
+            string columns, used;
+            columns = m_originalValues.playlistHeaderColumns;
+            char *token = strtok( (char *)columns.c_str(), "|" );
+            while( token != NULL )
+            {
+                SendDlgItemMessage(hwnd, IDC_CURRENT_COLUMN_LIST, LB_ADDSTRING,
+                                   0, (LPARAM)token);
+                      
+                used += token;
+                token = strtok( NULL, "|" );
+
+            }
+
+            //
+            //  Now add all those columns that aren't included to the 
+            // "Available" listbox.
+            //
+            char *available [] = {  "Artist",
+                                    "Album",
+                                    "Comment",
+                                    "Genre",
+                                    "Location",
+                                    "Time",
+                                    "Title",
+                                    "Year"
+                                  };
+
+            int nCols = sizeof( available ) / sizeof( available[ 0 ] );
+            for( int i = 0; i < nCols; i++ )
+            {
+                if ( !strstr( used.c_str(), available[ i ] ) )
+                {
+                    SendDlgItemMessage(hwnd, IDC_AVAILABLE_COLUMN_LIST, LB_ADDSTRING,
+                                       0, (LPARAM)available[ i ] );
+                }
+            }
+            break;
+        }
+        case WM_HELP:
+        {
+            LaunchHelp(hwnd, Preferences_General);
+            break;
+        }
+
+        case WM_COMMAND:
+        {
+            HWND hwndCtrl = (HWND) lParam;
+
+            switch(LOWORD(wParam))
+            {
+                 case IDCANCEL:
+                    SavePrefsValues(&m_originalValues);
+                    EndDialog(hwnd, FALSE);
+                    break;
+
+                case IDOK:
+                    SavePrefsValues(&m_proposedValues);
+                    EndDialog(hwnd, TRUE);
+                    break;
+
+                case IDC_HELPME:
+                    if(m_currentPage)
+                             SendMessage(m_currentPage->hwnd, UWM_HELP, 0, 0);
+                    break;
+
+                case IDC_APPLY:
+                {
+                    SavePrefsValues(&m_proposedValues);
+                    HWND hwndApply = GetDlgItem(hwnd, IDC_APPLY);
+
+                    EnableWindow(hwndApply, FALSE);
+                    break;
+                }
+                case IDC_REMOVE_COLUMN:
+                {
+                    int selIndex = SendDlgItemMessage( hwnd, IDC_CURRENT_COLUMN_LIST, LB_GETCURSEL, 0, 0 );
+
+                    if ( selIndex == LB_ERR )
+                    {
+                        MessageBox( hwnd, "No item selected for removing.", "Error", MB_OK );
+                        break;
+                    }
+                                      
+                    char selectedText[ 100];
+
+                    // Get the text of the item to remove.
+                    SendDlgItemMessage( hwnd, IDC_CURRENT_COLUMN_LIST, LB_GETTEXT, selIndex, (LPARAM)selectedText );
+                    // Add to end of the available list
+                    SendDlgItemMessage(hwnd, IDC_AVAILABLE_COLUMN_LIST, LB_ADDSTRING,
+                                       0, (LPARAM)selectedText);
+                    // Remove the item.
+                    SendDlgItemMessage( hwnd, IDC_CURRENT_COLUMN_LIST, LB_DELETESTRING, selIndex, 0);
+
+                    int nCols      = SendDlgItemMessage( hwnd, IDC_CURRENT_COLUMN_LIST, LB_GETCOUNT, 0, 0 );
+                    string columns = "";
+                    for( int i = 0; i < nCols; i++ )
+                    {
+                         SendDlgItemMessage( hwnd, IDC_CURRENT_COLUMN_LIST, LB_GETTEXT, i, (LPARAM)selectedText );
+                         columns += selectedText;
+                         if ( i != (nCols -1 ))
+                         columns += "|";
+                    }
+                    m_proposedValues.playlistHeaderColumns = columns;
+                    break;
+                }
+                case IDC_ADD_COLUMN:
+                {
+                    int selIndex = SendDlgItemMessage( hwnd, IDC_AVAILABLE_COLUMN_LIST, LB_GETCURSEL, 0, 0 );
+                    if ( selIndex == LB_ERR )
+                    {
+                        MessageBox( hwnd, "No item selected for adding.", "Error", MB_OK );
+                        break;
+                    }
+                                      
+                    char selectedText[ 100];
+
+                    // Get the text of the item to remove.
+                    SendDlgItemMessage( hwnd, IDC_AVAILABLE_COLUMN_LIST, LB_GETTEXT, selIndex, (LPARAM)selectedText );
+                    // Add to end of the available list
+                    SendDlgItemMessage(hwnd, IDC_CURRENT_COLUMN_LIST, LB_ADDSTRING,
+                                       0, (LPARAM)selectedText);
+                    // Remove the item.
+                    SendDlgItemMessage( hwnd, IDC_AVAILABLE_COLUMN_LIST, LB_DELETESTRING, selIndex, 0);
+
+                    int nCols      = SendDlgItemMessage( hwnd, IDC_CURRENT_COLUMN_LIST, LB_GETCOUNT, 0, 0 );
+                    string columns = "";
+                    for( int i = 0; i < nCols; i++ )
+                    {
+                        SendDlgItemMessage( hwnd, IDC_CURRENT_COLUMN_LIST, LB_GETTEXT, i, (LPARAM)selectedText );
+                        columns += selectedText;
+                        if ( i != (nCols -1 ))
+                            columns += "|";
+                    }
+                    m_proposedValues.playlistHeaderColumns = columns;
+                    break;
+                }
+            }       
+        }
+    }
+    return( result );
 }
 
 bool Win32PreferenceWindow::PrefAdvancedProc(HWND hwnd, 

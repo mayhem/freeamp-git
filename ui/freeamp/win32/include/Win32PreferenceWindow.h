@@ -94,11 +94,13 @@ typedef struct PrefsStruct
     // page 7
     bool checkForUpdates;
 
-
+    // Browser page
+    string playlistHeaderColumns;
     
     bool operator == (const struct PrefsStruct& pref)
     {
         return (
+            playlistHeaderColumns == pref.playlistHeaderColumns &&
             defaultUI == pref.defaultUI &&
             defaultPMO == pref.defaultPMO &&
             inputBufferSize == pref.inputBufferSize &&
@@ -200,6 +202,10 @@ class Win32PreferenceWindow : public PreferenceWindow
                bool PrefPluginsProc(HWND hwnd, 
                                   UINT msg, 
                                   WPARAM wParam, 
+                                  LPARAM lParam);
+	       bool PrefBrowserProc(HWND hwnd,
+                                  UINT msg,
+                                  WPARAM wParam,
                                   LPARAM lParam);
                bool PrefUpdateProc(HWND hwnd, 
                                   UINT msg, 

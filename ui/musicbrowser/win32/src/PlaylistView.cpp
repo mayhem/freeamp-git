@@ -53,30 +53,6 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
 
     switch(controlId)
     {
-        /*case IDC_STATUS:
-        {
-            RECT rcClip;
-            char* statusText = (char*)dis->itemData;
-
-            rcClip = dis->rcItem;
-
-            UINT oldAlign;
-
-            //oldAlign = SetTextAlign(dis->hDC, TA_RIGHT | TA_TOP );
-            
-            ExtTextOut( dis->hDC, 
-                        rcClip.left, rcClip.top + 1,
-                        ETO_CLIPPED | ETO_OPAQUE,
-                        &rcClip, 
-                        statusText,
-                        strlen(statusText),
-                        NULL);
-
-            //SetTextAlign(dis->hDC, oldAlign);
-
-            break;
-        }*/
-
         case IDC_PLAYLISTBOX:
         {
             uint32 uiFlags = ILD_TRANSPARENT;
@@ -222,118 +198,100 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             }
 
 
-            // Title
-            //ListView_GetItemText(hwndList, dis->itemID, 1, buf, 1024);
-            displayString = item->GetMetaData().Title();
+            // 
+            // Iterate over all the columns that are currently visible,
+            // finding the text that should be displayed in that particular
+            // slot.
+            // Paint the text, and update the paint rect.
+            //
 
-            CalcStringEllipsis(dis->hDC, 
-                               displayString, 
-                               ListView_GetColumnWidth(hwndList, 1) - kPrePadding);
+            HWND header = ListView_GetHeader(hwndList);
+            int nCols   = Header_GetItemCount(header);
 
-            ExtTextOut( dis->hDC, 
-                        rcClip.left + kPrePadding, rcClip.top + 1, 
-                        ETO_CLIPPED | ETO_OPAQUE,
-                        &rcClip, 
-                        displayString.c_str(),
-                        displayString.size(),
-                        NULL);            
-
-            // Move over to the next column
-            rcClip.left += ListView_GetColumnWidth(hwndList, 1);
-
-            // Artist
-            //ListView_GetItemText(hwndList, dis->itemID, 2, buf, 1024);
-            displayString = item->GetMetaData().Artist();
-
-            CalcStringEllipsis(dis->hDC, 
-                               displayString, 
-                               ListView_GetColumnWidth(hwndList, 2) - kPrePadding);
-
-            ExtTextOut( dis->hDC, 
-                        rcClip.left + kPrePadding, rcClip.top + 1, 
-                        ETO_CLIPPED | ETO_OPAQUE,
-                        &rcClip, 
-                        displayString.c_str(),
-                        displayString.size(),
-                        NULL);
-
-            // Move over to the next column
-            rcClip.left += ListView_GetColumnWidth(hwndList, 2);
-
-            // Album
-            //ListView_GetItemText(hwndList, dis->itemID, 3, buf, 1024);
-            displayString = item->GetMetaData().Album();
-
-            CalcStringEllipsis(dis->hDC, 
-                               displayString, 
-                               ListView_GetColumnWidth(hwndList, 3) - kPrePadding);
-
-            ExtTextOut( dis->hDC, 
-                        rcClip.left + kPrePadding, rcClip.top + 1, 
-                        ETO_CLIPPED | ETO_OPAQUE,
-                        &rcClip, 
-                        displayString.c_str(),
-                        displayString.size(),
-                        NULL);
-
-            // Move over to the next column
-            rcClip.left += ListView_GetColumnWidth(hwndList, 3);
-
-            // Length
-            //ListView_GetItemText(hwndList, dis->itemID, 4, buf, 1024);
-
-            if(item->GetMetaData().Time() != 0)
+            for (int i = 1; i < nCols; i++)
             {
-                int32 seconds = item->GetMetaData().Time();
-                int32 hours = seconds / 3600;
-		        int32 minutes = seconds / 60 - hours * 60;
-                seconds = seconds - minutes * 60 - hours * 3600;
+                const char *columnText = GetColumnText(i);
+                if (!columnText)
+                    break;
+ 
+                if (stricmp(columnText, ARTIST_COLUMN) == 0)
+                {
+                    displayString = item->GetMetaData().Artist();
+                }
+                else if ( stricmp( columnText, TITLE_COLUMN ) == 0 )
+                {
+                    displayString = item->GetMetaData().Title();
+                }
+                else if ( stricmp( columnText, ALBUM_COLUMN ) == 0 )
+                {
+                    displayString = item->GetMetaData().Album();
+                }
+                else if ( stricmp( columnText, LOCATION_COLUMN ) == 0 )
+                {
 
-                if(hours)
-                    sprintf(buf, "%d:%02d:%02d", hours, minutes, seconds);
+                    char path[_MAX_PATH];
+                    uint32 length = sizeof(path);
+                    URLToFilePath(item->URL().c_str(), path, &length);
+                    displayString = path;
+                }
+                else if ( stricmp( columnText, TIME_COLUMN ) == 0 )
+                {
+                    char buf[16];
+                    if (item->GetMetaData().Time() != 0)
+                    {
+                        int32 seconds = item->GetMetaData().Time();
+                        int32 hours = seconds / 3600;
+                        int32 minutes = seconds / 60 - hours * 60;
+                        seconds = seconds - minutes * 60 - hours * 3600;
+                           
+                        if (hours)
+                            sprintf(buf, "%d:%02d:%02d", hours, minutes, seconds);
+                        else
+                            sprintf(buf, "%d:%02d", minutes, seconds);
+
+                        displayString = buf;
+                    }
+                }
+                else if ( stricmp( columnText, GENRE_COLUMN ) == 0 )
+                {
+                    displayString = item->GetMetaData().Genre();
+                }
+                else if ( stricmp( columnText, COMMENT_COLUMN ) == 0 )
+                {
+                    displayString = item->GetMetaData().Comment();
+                }
+                else if ( stricmp( columnText, YEAR_COLUMN ) == 0 )
+                {
+                    char buf[16];
+                    if (item->GetMetaData().Year() != 0)
+                    {
+                        int32 year = item->GetMetaData().Year();
+                        if (year)
+                            sprintf(buf, "%d", year );
+                        else
+                            sprintf(buf, "Unknown");
+                    }
+                    displayString = buf;
+                }
                 else
-                    sprintf(buf, "%d:%02d", minutes, seconds);
+                {
+                    displayString = "Unknown";
+                }
+ 
+                CalcStringEllipsis(dis->hDC,               
+                                   displayString, 
+                                   ListView_GetColumnWidth(hwndList, i) - kPrePadding);
 
-                displayString = buf;
-            }
-            else    
-                displayString = "Unknown";
+                ExtTextOut( dis->hDC, 
+                            rcClip.left + kPrePadding, rcClip.top + 1, 
+                            ETO_CLIPPED | ETO_OPAQUE,
+                            &rcClip, 
+                            displayString.c_str(),
+                            displayString.size(),
+                            NULL);            
 
-            CalcStringEllipsis(dis->hDC, 
-                               displayString, 
-                               ListView_GetColumnWidth(hwndList, 4) - kPrePadding);
-
-            ExtTextOut( dis->hDC, 
-                        rcClip.left + kPrePadding, rcClip.top + 1, 
-                        ETO_CLIPPED | ETO_OPAQUE,
-                        &rcClip, 
-                        displayString.c_str(),
-                        displayString.size(),
-                        NULL);
-
-            // Move over to the next column
-            rcClip.left += ListView_GetColumnWidth(hwndList, 4);
-
-            // If we changed font undo it
-            if(dis->itemID == m_plm->GetCurrentIndex() && !m_pParent)
-            {
-                SelectObject(dis->hDC, oldFont);
-                DeleteObject(boldFont);
-            }
-
-            // If we changed the colors for the selected item, undo it
-            if(dis->itemState & ODS_SELECTED)
-            {
-                // Set the text background and foreground colors
-                SetTextColor(dis->hDC, GetSysColor(COLOR_WINDOWTEXT));
-                SetBkColor(dis->hDC, GetSysColor(COLOR_WINDOW));
-            }
-
-            // If the item is focused draw a focus rect around the entire row
-            if(dis->itemState & ODS_FOCUS && hwndList == GetFocus())
-            {
-                // Draw the focus rect
-                DrawFocusRect(dis->hDC, &dis->rcItem);
+                // Move over to the next column
+                rcClip.left += ListView_GetColumnWidth(hwndList, i);
             }
 
             break;
@@ -351,21 +309,6 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
 
 void MusicBrowserUI::InitList(void)
 {
-    LV_COLUMN lvc;
-    RECT      sRect;
-    
-    ListView_DeleteAllItems(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX));
-    GetClientRect(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), &sRect);
-
-    lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT;
-    lvc.fmt = LVCFMT_LEFT; // left align column
-
-    lvc.pszText = "#";
-    lvc.cchTextMax = strlen(lvc.pszText);
-    lvc.iSubItem = 0;
-    lvc.cx = INDEX_COLUMN_WIDTH; // width of column in pixels
-    ListView_InsertColumn(m_hPlaylistView, 0, &lvc);
-
     m_hPlaylistHeader = FindWindowEx(m_hPlaylistView, NULL, WC_HEADER, NULL);
 
     if(m_hPlaylistHeader)
@@ -378,30 +321,35 @@ void MusicBrowserUI::InitList(void)
         Header_SetItem(m_hPlaylistHeader, 0, &hd_item);
     }
 
-    int32 remainder = (sRect.right-sRect.left - FIXED_COLUMN_WIDTH)%3;
+    // First column is always inserted
+    InsertColumn("#", 0);
 
-    lvc.pszText = "Title";
-    lvc.cchTextMax = strlen(lvc.pszText);
-    lvc.iSubItem = 1;
-    lvc.cx = (sRect.right-sRect.left - FIXED_COLUMN_WIDTH)/3; // width of column in pixels
-    ListView_InsertColumn(m_hPlaylistView, 1, &lvc);
-    
-    lvc.pszText = "Artist";
-    lvc.cchTextMax = strlen(lvc.pszText);
-    lvc.iSubItem = 2;
-    ListView_InsertColumn(m_hPlaylistView, 2, &lvc);
+    //
+    // Insert the columns that are specified by the user.
+    // 
 
-    lvc.pszText = "Album";
-    lvc.cchTextMax = strlen(lvc.pszText);
-    lvc.iSubItem = 3;
-    ListView_InsertColumn(m_hPlaylistView, 3, &lvc);
+    uint32 size = 100;
+    char *buffer = new char[size];
+    if (kError_BufferTooSmall == m_context->prefs->GetPrefString(
+                                                     kPlaylistHeaderColumnsPref,
+                                                     buffer, &size))
+    {
+        int bufferSize = size;
+        delete [] buffer;
+        buffer = new char[bufferSize];
+        m_context->prefs->GetPrefString(kPlaylistHeaderColumnsPref, buffer, &size);
+    }
 
-    
-    lvc.pszText = "Length";
-    lvc.cx = LENGTH_COLUMN_WIDTH + remainder;//((sRect.right-sRect.left)/4) - 3; // width of column in pixels
-    lvc.cchTextMax = strlen(lvc.pszText);
-    lvc.iSubItem = 4;
-    ListView_InsertColumn(m_hPlaylistView, 4, &lvc);
+    int columnN = 1;
+    char *token = strtok(buffer, '|');
+    while (token != NULL)
+    {
+        InsertColumn(token, columnN);
+        token = strtok(NULL, '|');
+        columnN++;
+    }
+
+    delete [] buffer;
 
     if(m_itemsAddedBeforeWeWereCreated)
     {
@@ -419,10 +367,80 @@ void MusicBrowserUI::InitList(void)
         m_itemsAddedBeforeWeWereCreated = 0;
     }
 
-    //HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
+    ResizeColumns();
+}
 
-    //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_plm->CanUndo() ? MF_ENABLED : MF_GRAYED));
-    //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_plm->CanRedo() ? MF_ENABLED : MF_GRAYED));
+//
+//  The purpose of this function is to insert a new column
+// into the playlist view - making sure that the column information
+// that we maintain is updated at the same time.
+//
+void  MusicBrowserUI::InsertColumn( const char *title, int position )
+{
+    //
+    //  I've totally fudged the column width issue here, as the
+    // original implementation was breaking, and the new columns
+    // were being inserted off-screen.  Steve 
+    //
+    LV_COLUMN  lvc;
+       
+    lvc.mask = LVCF_FMT | LVCF_TEXT;
+    lvc.fmt = LVCFMT_LEFT; // left align column
+    lvc.pszText = (char *)title;
+    lvc.cchTextMax = strlen(lvc.pszText);
+    lvc.iSubItem = position;
+       
+    // First column is special.
+    if (0 == position)
+    {
+        lvc.cx = INDEX_COLUMN_WIDTH;
+        lcx.mask |= LVCF_WIDTH;
+    }
+
+    // Add to our list.
+    m_columnInfo.AddColumn( (char *)title, position );
+
+    // Actually perform the insertion.
+    ListView_InsertColumn(m_hPlaylistView, position, &lvc);
+} 
+
+//
+// Resizes the widths of the columns to appropratie sizes.
+//
+void MusicBrowserUI::ResizeColumns()
+{
+    //
+    // Disable repaints.
+    //
+
+    SendMessage(m_hlaylistView, WM_SETREDRAW, FALSE, 0);
+    ShowWindow(m_hPlaylistView, SW_HIDE);
+
+    HWND hwndList = GetDlgItem(m_hWnd, IDC_PLAYLISTBOX);
+    HWND header = ListView_GetHeader(hwndList);
+    int nCols   = Header_GetItemCount(header);
+    for (int col = 1; col < nCols ; col++) 
+    {
+        ResizeHeader(hwndList, col);
+    }
+      
+    //  Enable repaints.
+    //
+    ShowWindow( m_hPlaylistView, SW_SHOW);
+    SendMessage(m_hPlaylistView, WM_SETREDRAW, TRUE, 0);
+}
+
+void MusicBrowserUI::RemoveAllColumns( )
+{
+    HWND hwndList = GetDlgItem(m_hWnd, IDC_PLAYLISTBOX);
+
+    for( int i = 0; i < m_columnInfo.GetNColumns(); i++ )
+    { 
+        ListView_DeleteColumn( hwndList, 0);
+    }
+    m_columnInfo.Erase();
+
+    ListView_SetColumnWidth( hwndList, 0 , 0 );
 }
 
 void MusicBrowserUI::PlaylistListItemMoved(const PlaylistItem* item, 
@@ -919,48 +937,71 @@ void MusicBrowserUI::ResizeHeader(HWND hwnd, uint32 column)
         while(item = m_plm->ItemAt(i++))
         {
             MetaData metadata = item->GetMetaData();
-       
-            switch(column)
+      
+            const char *columnText = GetColumnText(column);
+
+            if ( stricmp( columnText, ARTIST_COLUMN ) == 0 )
             {
-                case 1:
-                    text = metadata.Title();
-                    break;
-
-                case 2:
-                    text = metadata.Artist();
-                    break;
-
-                case 3:
-                    text = metadata.Album();
-                    break;
-
-                case 4:
+                text = metadata.Artist();
+            }
+            else if ( stricmp( columnText, TITLE_COLUMN ) == 0 )
+            {
+                text = metadata.Title();
+            }
+            else if ( stricmp( columnText, ALBUM_COLUMN ) == 0 )
+            {
+                text = metadata.Album();
+            }
+            else if ( stricmp( columnText, LOCATION_COLUMN ) == 0 )
+            {
+                char path[_MAX_PATH];
+                uint32 length = sizeof(path);
+                URLToFilePath(item->URL().c_str(), path, &length);
+                text = path;
+            }
+            else if ( stricmp( columnText, TIME_COLUMN ) == 0 )
+            {
+                char buf[16];
+                if(metadata.Time() != 0)
                 {
-                    char buf[16];
+                    int32 seconds = metadata.Time();
+                    int32 hours = seconds / 3600;
+                    int32 minutes = seconds / 60 - hours * 60;
+                    seconds = seconds - minutes * 60 - hours * 3600;
 
-                    if(metadata.Time() != 0)
-                    {
-                        int32 seconds = metadata.Time();
-                        int32 hours = seconds / 3600;
-		                int32 minutes = seconds / 60 - hours * 60;
-                        seconds = seconds - minutes * 60 - hours * 3600;
+                    if(hours)
+                       sprintf(buf, "%d:%02d:%02d", hours, minutes, seconds);
+                    else
+                       sprintf(buf, "%d:%02d", minutes, seconds);
 
-                        if(hours)
-                            sprintf(buf, "%d:%02d:%02d", hours, minutes, seconds);
-                        else
-                            sprintf(buf, "%d:%02d", minutes, seconds);
-
-                        text = buf;
-                    }
-                    else    
-                        text = "Unknown";
-
-                    break;
+                    text = buf;
                 }
+            }
+            else if ( stricmp( columnText, GENRE_COLUMN ) == 0 )
+            {
+                text = metadata.Genre();
+            }
+            else if ( stricmp( columnText, COMMENT_COLUMN ) == 0 )
+            {
+                text = metadata.Comment();
+            }
+            else if ( stricmp( columnText, YEAR_COLUMN ) == 0 )
+            {
+                char buf[16];
+                if(metadata.Year() != 0)
+                {
+                    int32 year = metadata.Year();
+                    if(year)
+                        sprintf(buf, "%d", year );
+                    else
+                        sprintf(buf, "Unknown");
 
-                default:
-                    return;
-                    break;
+                    text = buf;
+                }
+            }
+            else
+            {
+                text = "Unknown";
             }
 
             SIZE size;
@@ -975,7 +1016,7 @@ void MusicBrowserUI::ResizeHeader(HWND hwnd, uint32 column)
 
         textLength += 3;
 
-        if(column < 4)
+        if(column < m_columnInfo.GetNColumns())
         {
             int32 nextColumnWidth = ListView_GetColumnWidth(hwnd,column + 1);
 
@@ -1377,12 +1418,25 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
 
         case WM_KEYDOWN:
         {
+            // Ctrl + "+"
             if(wParam == VK_ADD && (GetKeyState(VK_CONTROL) < 0))
             {
-                ResizeHeader(hwnd, 1);
-                ResizeHeader(hwnd, 2);
-                ResizeHeader(hwnd, 3);
-                //ResizeHeader(hwnd, 1);
+                //  Disable repaints.
+                SendMessage(m_hPlaylistView, WM_SETREDRAW, FALSE, 0);
+                ShowWindow( m_hPlaylistView, SW_HIDE );
+
+                //  Resize all columns
+                HWND hwndList = GetDlgItem(m_hWnd, IDC_PLAYLISTBOX);
+                HWND header = ListView_GetHeader(hwndList);
+                int nCols   = Header_GetItemCount(header);
+                for( int i = 1; i < nCols; i++ )
+                {
+                     ResizeHeader(hwnd, i);
+                }
+                               
+                //  Enable repaints.
+                ShowWindow( m_hPlaylistView, SW_SHOW);
+                SendMessage(m_hPlaylistView, WM_SETREDRAW, TRUE, 0);
                 return 0;
             }
             break;
@@ -1458,3 +1512,14 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
 	//  Pass all non-custom messages to old window proc
 	return CallWindowProc(lpOldProc, hwnd, msg, wParam, lParam );
 }
+
+int MusicBrowserUI::GetColumnIndex(const char *columnTitle)
+{
+    return (m_columnInfo.FindColumn((char  *)columnTitle));
+}
+
+const char *MusicBrowserUI::GetColumnText(int column)
+{
+    return (m_columnInfo.FindTitle(column));
+}
+

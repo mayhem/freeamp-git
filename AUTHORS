@@ -153,3 +153,6 @@ Michael Rich <istan@alltel.net>
 
 "Robert Hart" <ab6rah@bath.ac.uk>
 * patch to grab track numbers from filenames
+
+"Steve Kemp" <skx@tardis.ed.ac.uk>
+* Playlist column selection for Win32 version of musicbrowser.ui

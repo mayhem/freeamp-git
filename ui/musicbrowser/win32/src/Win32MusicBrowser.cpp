@@ -452,6 +452,37 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
                 (*i)->UpdateButtonStates();
             }
 
+            //
+            //  Remove all the columns in the playlist.
+            RemoveAllColumns( );
+            // First column is always inserted.
+            InsertColumn( "#", 0 );
+
+            //
+            //  Insert the columns that are specified by the user.
+            unsigned int size = 100;
+            char *buffer = (char *)malloc( size );
+            if(kError_BufferTooSmall == m_context->prefs->GetPrefString(kPlaylistHeaderColumnsPref, buffer, &size))
+            {
+                int bufferSize = size;
+                buffer = (char*)realloc(buffer, bufferSize);
+                m_context->prefs->GetPrefString(kPlaylistHeaderColumnsPref, buffer, &size);
+            } 
+
+            int columnN = 1;
+            char *token = strtok( buffer, "|" );
+            while( token != NULL )
+            {
+                InsertColumn( token , columnN );
+                token = strtok( NULL, "|" );
+                columnN += 1;
+            }
+
+            free( buffer );
+
+            // Resize the columns appropriately
+            ResizeColumns();
+
             AddToolbarButtons(useTextLabels, useImages);
             UpdateButtonStates();
 

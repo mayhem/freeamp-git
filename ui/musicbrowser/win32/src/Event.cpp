@@ -1554,24 +1554,39 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
             case LVN_COLUMNCLICK:
             {
                 int column = pListView->iSubItem;
+                const char *columnText = GetColumnText(column);
 
-                switch(column)
+                if (stricmp(columnText, ARTIST_COLUMN) == 0)
                 {
-                    case 1:
-                        SendMessage(m_hWnd, WM_COMMAND, ID_SORT_TITLE, 0);
-                        break;
-
-                    case 2:
-                        SendMessage(m_hWnd, WM_COMMAND, ID_SORT_ARTIST, 0);
-                        break;
-
-                    case 3:
-                        SendMessage(m_hWnd, WM_COMMAND, ID_SORT_ALBUM, 0);
-                        break;
-
-                    case 4:
-                        SendMessage(m_hWnd, WM_COMMAND, ID_SORT_LENGTH, 0);
-                        break;
+                    SendMessage(m_hWnd, WM_COMMAND, ID_SORT_ARTIST, 0);
+                }
+                else if (stricmp(columnText, TITLE_COLUMN) == 0)
+                {
+                    SendMessage(m_hWnd, WM_COMMAND, ID_SORT_TITLE, 0);
+                }
+                else if (stricmp(columnText, ALBUM_COLUMN) == 0)
+                {
+                    SendMessage(m_hWnd, WM_COMMAND, ID_SORT_ALBUM, 0);
+                }
+                else if (stricmp(columnText, TIME_COLUMN) == 0)
+                {
+                    SendMessage(m_hWnd, WM_COMMAND, ID_SORT_LENGTH, 0);
+                }
+                else if (stricmp(columnText, GENRE_COLUMN) == 0)
+                {
+                    SendMessage(m_hWnd, WM_COMMAND, ID_SORT_GENRE, 0);
+                }
+                else if (stricmp(columnText, COMMENT_COLUMN) == 0)
+                {
+                    SendMessage(m_hWnd, WM_COMMAND, ID_SORT_COMMENT, 0);
+                }
+                else if (stricmp(columnText, YEAR_COLUMN) == 0)
+                {
+                    SendMessage(m_hWnd, WM_COMMAND, ID_SORT_YEAR, 0);
+                }
+                else if (stricmp(columnText, LOCATION_COLUMN) == 0)
+                {
+                    SendMessage(m_hWnd, WM_COMMAND, ID_SORT_LOCATION, 0);
                 }
                 break;
             }
@@ -1679,7 +1694,10 @@ void MusicBrowserUI::SortEvent(int id)
             break;     
         case ID_SORT_GENRE:
             newKey = kPlaylistSortKey_Genre;
-            break;     
+            break;    
+        case ID_SORT_COMMENT:
+            newKey = kPlaylistSortKey_Comment;
+            break; 
         case ID_SORT_LOCATION:
             newKey = kPlaylistSortKey_Location;
             break;

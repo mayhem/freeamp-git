@@ -463,6 +463,7 @@ BEGIN
         MENUITEM "by &Length",                  ID_SORT_LENGTH
         MENUITEM "by L&ocation",                ID_SORT_LOCATION
         MENUITEM "by &Filename",                ID_SORT_FILENAME
+        MENUITEM "by &Comment",                 ID_SORT_COMMENT
         MENUITEM "&Randomly",                   ID_SORT_RANDOMIZE
     END
     POPUP "&Relatable"

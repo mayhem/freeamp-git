@@ -143,6 +143,12 @@ bool PlaylistItemSort::operator() (PlaylistItem* item1,
                 break;
             }
 
+            case kPlaylistSortKey_Comment:
+            {
+                result = (lstrcmpi(m1.Comment().c_str(), m2.Comment().c_str()) < 0);
+                break;
+            }
+
             case kPlaylistSortKey_Year:
             {
                 result = m1.Year() < m2.Year();
