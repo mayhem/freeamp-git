@@ -260,7 +260,27 @@ BOOL MusicBrowserUI::MusicSearchDlgProc(HWND hwnd,
                             MultiByteToWideChar(CP_OEMCP, MB_PRECOMPOSED, temp,
                                                 strlen(temp), drive, sizeof(drive));
 
-                            desktop->ParseDisplayName(hwnd, NULL, drive, &eaten, &pidlDrive, NULL);
+                            HRESULT res;
+
+                            res = desktop->ParseDisplayName(hwnd, NULL, drive, &eaten, &pidlDrive, NULL);
+
+                            LPVOID lpMessageBuffer;
+
+		                    FormatMessage(
+		                      FORMAT_MESSAGE_ALLOCATE_BUFFER |
+		                      FORMAT_MESSAGE_FROM_SYSTEM,
+		                      NULL,
+		                      res,
+		                      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		                      (LPTSTR) &lpMessageBuffer,
+		                      0,
+		                      NULL );
+
+		                    // now display this string
+ 		                    //MessageBox(NULL, (char*)lpMessageBuffer, 0, MB_OK);
+
+		                    // Free the buffer allocated by the system
+		                    LocalFree( lpMessageBuffer );
 
                             Edit_GetText(hwndDirectory, 
                                          temp,
