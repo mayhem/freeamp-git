@@ -174,7 +174,9 @@ bool FindClose(HANDLE hFindFile) {
 
 
 HINSTANCE LoadLibrary(char *lpLibFileName) {
-    return dlopen(lpLibFileName, RTLD_LAZY);
+    HINSTANCE hInst = dlopen(lpLibFileName, RTLD_LAZY);
+    if (!hInst) cout << dlerror() << endl;
+    return hInst;
 }
 
 

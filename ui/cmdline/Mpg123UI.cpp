@@ -41,6 +41,7 @@ ____________________________________________________________________________*/
 void mysigterm(int);
 void mysigint(int);
 
+EventQueueRef Mpg123UI::m_playerEQ = NULL;
 
 Mpg123UI::Mpg123UI() {
 
@@ -61,9 +62,9 @@ Mpg123UI::Mpg123UI() {
 
 void mysigterm(int f) {
     Event *e = new Event(CMD_Stop);
-    Player::GetPlayer()->AcceptEvent(e);
+    Mpg123UI::m_playerEQ->AcceptEvent(Mpg123UI::m_playerEQ,e);
     e = new Event(CMD_QuitPlayer);
-    Player::GetPlayer()->AcceptEvent(e);
+    Mpg123UI::m_playerEQ->AcceptEvent(Mpg123UI::m_playerEQ,e);
 }
 
 void mysigint(int f) {
@@ -71,23 +72,28 @@ void mysigint(int f) {
 }
 Mpg123UI::~Mpg123UI() {
     //cout << "deleting Mpg123UI" << endl;
+    // NOTE: we don't call cleanup on this EventQueueRef because it is pointing to the player here...
+    if (m_playerEQ) {
+	delete m_playerEQ;
+	m_playerEQ = NULL;
+    }
 }
 
 
 int32 Mpg123UI::AcceptEvent(Event *e) {
     if (e) {
-	cerr << "Mpg123COO: processing event " << e->GetEvent() << endl;
+	//cerr << "Mpg123COO: processing event " << e->GetEvent() << endl;
 	switch (e->GetEvent()) {
 	    case INFO_PlayListDonePlay: {
 		Event *e = new Event(CMD_QuitPlayer);
-		Player::GetPlayer()->AcceptEvent(e);
+		m_playerEQ->AcceptEvent(m_playerEQ,e);
 		break; }
 	    case INFO_MediaVitalStats: {
 		MediaVitalInfo *pmvi = (MediaVitalInfo *)e->GetArgument();
 		if (pmvi) {
-		    totalFrames = pmvi->totalFrames;
-		    totalTime = pmvi->totalTime;
-		    char *path = pmvi->filename;
+		    totalFrames = pmvi->m_totalFrames;
+		    totalTime = pmvi->m_totalTime;
+		    char *path = pmvi->m_filename;
 		    char *pLastSlash = strrchr(path,'/');
 		    char *dir = NULL;
 		    char *fname = NULL;
@@ -100,10 +106,10 @@ int32 Mpg123UI::AcceptEvent(Event *e) {
 		    }
 		    strncpy(fileName,fname,511);
 		    fileName[511] = '\0';
-		    if (pmvi->tagInfo.contains_info) {
-			fprintf(stderr,"Title  : %30s  Artist: %s\n",pmvi->tagInfo.songname,pmvi->tagInfo.artist);
-			fprintf(stderr,"Album  : %30s  Year: %4s, Genre: %d\n",pmvi->tagInfo.album,pmvi->tagInfo.year,(int)pmvi->tagInfo.genre);
-			fprintf(stderr,"Comment: %30s \n",pmvi->tagInfo.comment);
+		    if (pmvi->m_tagInfo.m_containsInfo) {
+			fprintf(stderr,"Title  : %30s  Artist: %s\n",pmvi->m_tagInfo.m_songName,pmvi->m_tagInfo.m_artist);
+			fprintf(stderr,"Album  : %30s  Year: %4s, Genre: %d\n",pmvi->m_tagInfo.m_album,pmvi->m_tagInfo.m_year,(int)pmvi->m_tagInfo.m_genre);
+			fprintf(stderr,"Comment: %30s \n",pmvi->m_tagInfo.m_comment);
 		    }
 		    cerr << endl;
 
@@ -113,34 +119,34 @@ int32 Mpg123UI::AcceptEvent(Event *e) {
 			    cerr << "Directory: " << dir << "/" << endl;
 			}
 			cerr << "Playing MPEG stream from " << fileName << " ..." << endl;
-			cerr << "MPEG 1.0 layer III, " << pmvi->bps/1000 << " KBit/s" << ", " << pmvi->freq << " Hz" << " joint-stereo" << endl;
+			cerr << "MPEG 1.0 layer III, " << pmvi->m_bps/1000 << " KBit/s" << ", " << pmvi->m_freq << " Hz" << " joint-stereo" << endl;
 		    } else {
 			// VERBOSE MODE
-			if (pmvi->tagInfo.contains_info) {
-			    fprintf(stderr,"Title  : %30s  Artist: %s\n",pmvi->tagInfo.songname,pmvi->tagInfo.artist);
-			    fprintf(stderr,"Album  : %30s  Year: %4s, Genre: %d\n",pmvi->tagInfo.album,pmvi->tagInfo.year,(int)pmvi->tagInfo.genre);
-			    fprintf(stderr,"Comment: %30s \n",pmvi->tagInfo.comment);
+			if (pmvi->m_tagInfo.m_containsInfo) {
+			    fprintf(stderr,"Title  : %30s  Artist: %s\n",pmvi->m_tagInfo.m_songName,pmvi->m_tagInfo.m_artist);
+			    fprintf(stderr,"Album  : %30s  Year: %4s, Genre: %d\n",pmvi->m_tagInfo.m_album,pmvi->m_tagInfo.m_year,(int)pmvi->m_tagInfo.m_genre);
+			    fprintf(stderr,"Comment: %30s \n",pmvi->m_tagInfo.m_comment);
 			}
 
 			if (dir) {
 			    cerr << "Directory: " << dir << "/" << endl;
 			}
 			cerr << "Playing MPEG stream from " << fileName << " ..." << endl;
-			cerr << "MPEG 1.0, Layer: III, Freq: " << pmvi->freq << ", mode: Joint-Stereo, modext: 3, BPF : " << pmvi->bytesPerFrame  << endl;
+			cerr << "MPEG 1.0, Layer: III, Freq: " << pmvi->m_freq << ", mode: Joint-Stereo, modext: 3, BPF : " << pmvi->m_bytesPerFrame  << endl;
 			cerr << "Channels: 2, copyright: No, original: Yes, CRC: No, emphasis: 0." << endl;
-			cerr << "Bitrate: " << pmvi->bps/1000 << " KBits/s, Extension value: 0" << endl;
-			cerr << "Audio: 1:1 conversion, rate: " << pmvi->freq << ", encoding: signed 16 bit, channels: 2" << endl;
+			cerr << "Bitrate: " << pmvi->m_bps/1000 << " KBits/s, Extension value: 0" << endl;
+			cerr << "Audio: 1:1 conversion, rate: " << pmvi->m_freq << ", encoding: signed 16 bit, channels: 2" << endl;
 		    }
 		}
 		break; }
 	    case INFO_MediaTimePosition: {
 		MediaTimePositionInfo *pmtp = (MediaTimePositionInfo *)(e->GetArgument());
 		if (verboseMode == true) {
-//		    cout << "foo: " << pmtp->frame << "  " << pmtp->seconds << endl;
-		    fprintf(stderr,"\rFrame# %5d [%5d], ",pmtp->frame,totalFrames-pmtp->frame);
-		    fprintf(stderr,"Time: %3.2f [%3.2f], ",pmtp->seconds,totalTime-pmtp->seconds);
+//		    cout << "foo: " << pmtp->m_frame << "  " << pmtp->m_seconds << endl;
+		    fprintf(stderr,"\rFrame# %5d [%5d], ",pmtp->m_frame,totalFrames-pmtp->m_frame);
+		    fprintf(stderr,"Time: %3.2f [%3.2f], ",pmtp->m_seconds,totalTime-pmtp->m_seconds);
 		}
-		lastSeconds = pmtp->seconds;
+		lastSeconds = pmtp->m_seconds;
 		break;}
 	    case INFO_Stopped: {
 		int m = (int)lastSeconds / 60;
@@ -151,7 +157,7 @@ int32 Mpg123UI::AcceptEvent(Event *e) {
 	    case CMD_Cleanup: {
 		Event *e = new Event(INFO_ReadyToDieUI,this);
 		//cout << "I'm gonna ACTUALLY kill myself" << endl;
-		Player::GetPlayer()->AcceptEvent(e);
+		m_playerEQ->AcceptEvent(m_playerEQ,e);
 		break; }
 	    default:
 		break;
@@ -297,26 +303,45 @@ void Mpg123UI::SetArgs(int argc, char **argv) {
 	pl->Shuffle();
     }
     Event *e = new Event(CMD_SetPlaylist,pl);
-    Player::GetPlayer()->AcceptEvent(e);
+    m_playerEQ->AcceptEvent(m_playerEQ,e);
     e = new Event(CMD_Play);
-    Player::GetPlayer()->AcceptEvent(e);
+    m_playerEQ->AcceptEvent(m_playerEQ,e);
+}
+
+void Mpg123UI::SetTarget(EventQueue *eq) {
+    m_playerEQ = eq;
+}
+
+void Mpg123UI::SetRef(UIRef ui) {
+
 }
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void SetArgs(UIRef ref, int32 c, char **v) {
-    UserInterface *ui = (UserInterface *)ref->ref;
-    ui->SetArgs(c,v);
-}
 
-int32 AcceptEvent(UIRef ref,Event *e) {
-    UserInterface *ui = (UserInterface *)ref->ref;
-    return ui->AcceptEvent(e);
-}
+    void SetArgs(UI *ref, int32 c, char **v) {
+	UserInterface *ui = (UserInterface *)ref->ref;
+	ui->SetArgs(c,v);
+    }
+    
+    int32 AcceptEvent(UI *ref,Event *e) {
+	UserInterface *ui = (UserInterface *)ref->ref;
+	return ui->AcceptEvent(e);
+    }
+    
+    void SetTarget(UI *ref, EventQueue *eq) {
+	UserInterface *ui = (UserInterface *)ref->ref;
+	ui->SetTarget(eq);
+    }
+	
+    void Cleanup(UI *ref) {
+	UserInterface *ui = (UserInterface *)ref->ref;
+	delete ui;
+    }
 
-void Initialize(UIRef ref)
+void Initialize(UI *ref)
 {
     if(ref)
     {
@@ -325,6 +350,8 @@ void Initialize(UIRef ref)
 
 	ref->SetArgs = SetArgs;
 	ref->AcceptEvent = AcceptEvent;
+	ref->SetTarget = SetTarget;
+	ref->Cleanup = Cleanup;
     }
 }
 

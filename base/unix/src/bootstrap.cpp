@@ -30,7 +30,7 @@ ____________________________________________________________________________*/
 #include "vector.h"
 #include "hashtable.h"
 #include "semaphore.h"
-#include "dummycoo.h"
+#include "dummyui.h"
 #include "registrar.h"
 
 
@@ -38,6 +38,7 @@ void testVector();
 void testHashTable();
 
 bool CompareName(const char *p1, const char *p2) {
+    cout << "Comparing " << p1 << " to " << p2 << endl;
     int32 i=0; int32 j=0;
     if(!p1 ||!p2) return false;
     while ((p1[i] == p2[j]) && p1[i] && p2[j]) {
@@ -87,18 +88,28 @@ int main(int argc, char **argv) {
     Semaphore *termSemaphore;
     termSemaphore = new Semaphore();
     Player *pP = Player::GetPlayer();
-    //cout << "Got player..." << endl;
-    DummyCOO *pDCOO = new DummyCOO(termSemaphore);
-    //cout << "Created dcoo..." << endl;
-    pP->RegisterActiveUI(pDCOO);
-    //cout << "Registered DummyCOO" << endl;
-    //Event *pe = new Event(CMD_QuitPlayer);
-    //Player::GetPlayer()->AcceptEvent(pe);
 
+    EventQueueRef eqRef = new EventQueue();
+    eqRef->ref = pP;
+    eqRef->AcceptEvent = Player::AcceptEventStub;
+
+
+
+    DummyUI *pDCOO = new DummyUI(termSemaphore);
+    pDCOO->SetTarget(eqRef);
+
+    UIRef dummyRef = new UI();
+    dummyRef->ref = pDCOO;
+    dummyRef->AcceptEvent = pDCOO->AcceptEventStub;
+    dummyRef->Cleanup = pDCOO->Cleanup;
+    pDCOO->SetRef(dummyRef);
+
+    pP->RegisterActiveUI(dummyRef);
     pP->RegisterLMCs(lmc);
     pP->RegisterPMIs(pmi);
     pP->RegisterPMOs(pmo);
     pP->RegisterUIs(ui);
+
 
 
     //cout << "Looking to start up a UI..." << endl;
@@ -110,8 +121,12 @@ int main(int argc, char **argv) {
 	if (CompareName(calledName,item->Name())) {
 	    UI *myui = new UI;
 	    item->InitFunction()(myui);
+	    EventQueueRef eqRef = new EventQueue();
+	    eqRef->ref = pP;
+	    eqRef->AcceptEvent = Player::AcceptEventStub;
+	    myui->SetTarget(myui,eqRef);
 	    myui->SetArgs(myui,argc,argv);
-//	    pP->RegisterActiveUI((EventQueue *)myui);
+	    pP->RegisterActiveUI(myui);
 	    break;
 	}
 	item = ui->GetItem(index++);
@@ -122,6 +137,8 @@ int main(int argc, char **argv) {
 	return 1;
     }
 
+    pP->SetArgs(argc,argv);
+    pP->Run();
 
     termSemaphore->Wait();
     delete pP;
@@ -153,12 +170,12 @@ void testVector() {
 	cout << "Final Test failed!!" << endl;
     }
 
-    Vector<DummyCOO *> *pVect2 = new Vector<DummyCOO *>(2);
-    DummyCOO *pd = new DummyCOO(NULL);
+    Vector<DummyUI *> *pVect2 = new Vector<DummyUI *>(2);
+    DummyUI *pd = new DummyUI(NULL);
     pVect2->Insert(pd);
-    pd = new DummyCOO(NULL);
+    pd = new DummyUI(NULL);
     pVect2->Insert(pd);
-    pd = new DummyCOO(NULL);
+    pd = new DummyUI(NULL);
     pVect2->Insert(pd);
 
     pVect2->DeleteAll();

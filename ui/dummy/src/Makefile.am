@@ -29,7 +29,7 @@ FILES =
 MYLIBS = 
 TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
 else
-FILES = dummycoo.cpp
+FILES = dummyui.cpp
 MYLIBS = libfauidummy.a
 TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
 endif

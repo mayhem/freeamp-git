@@ -77,7 +77,7 @@ target_os = @target_os@
 @AM_HAVE_WIN32_TRUE@FILES = 
 @AM_HAVE_WIN32_TRUE@MYLIBS = 
 @AM_HAVE_WIN32_TRUE@TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
-@AM_HAVE_WIN32_FALSE@FILES = dummycoo.cpp
+@AM_HAVE_WIN32_FALSE@FILES = dummyui.cpp
 @AM_HAVE_WIN32_FALSE@MYLIBS = libfauidummy.a
 @AM_HAVE_WIN32_FALSE@TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
 
@@ -100,7 +100,7 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 libfauidummy_a_LIBADD = 
 @AM_HAVE_WIN32_TRUE@cond0libfauidummy_a_OBJECTS = 
-@AM_HAVE_WIN32_FALSE@cond1libfauidummy_a_OBJECTS =  dummycoo.o
+@AM_HAVE_WIN32_FALSE@cond1libfauidummy_a_OBJECTS =  dummyui.o
 libfauidummy_a_OBJECTS =  $(cond0libfauidummy_a_OBJECTS) \
 $(cond1libfauidummy_a_OBJECTS)
 AR = ar
@@ -113,7 +113,7 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP = --best
-DEP_FILES =  .deps/dummycoo.P
+DEP_FILES =  .deps/dummyui.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 SOURCES = $(libfauidummy_a_SOURCES)
 OBJECTS = $(libfauidummy_a_OBJECTS)

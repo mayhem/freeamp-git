@@ -79,6 +79,7 @@ Preferences::~Preferences() {
 
 
 Error Preferences::GetInstallDirectory(char* path, uint32* len) {
+    getcwd(path,*len);
     return kError_NoErr;
 #if 0
     return GetPrefString(kInstallDirPref, path, len);
