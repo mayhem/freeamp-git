@@ -774,9 +774,28 @@ static void edit_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
     p->PopUpInfoEditor();
 }
 
+static void add_fav_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+    p->AddPLStreamToFavs();
+}
+
 void GTKMusicBrowser::PlaylistRightClick(int x, int y, uint32 time)
 {
-    gtk_item_factory_popup(playlistPopup, x, y, 3, time);
+    if (m_lastindex == kInvalidIndex)
+        return;
+
+    PlaylistItem *sel = m_plm->ItemAt(m_lastindex);
+    if (!sel)
+        return;
+
+    string url = sel->URL();
+    if (url.find("http://") < url.length() || url.find("rtp://") < url.length())
+    {
+        gtk_item_factory_popup(playlist2Popup, x, y, 3, time);
+cout << "stream context\n";
+    }
+    else
+        gtk_item_factory_popup(playlistPopup, x, y, 3, time);
 }
 
 static void list_clicked(GtkWidget *w, GdkEventButton *event,
@@ -822,7 +841,21 @@ void GTKMusicBrowser::CreatePlaylistList(GtkWidget *box)
     };
  
     int nmenu_items = sizeof(popup_items) / sizeof(popup_items[0]);
- 
+
+    GtkItemFactoryEntry popup2_items[] = {
+     {"/Play Now",     NULL,      (void(*)())play_now_pop,  0, 0 },
+     {"/Move Up",      NULL,      (void(*)())move_up_pop,   0, 0 },
+     {"/Move Down",    NULL,      (void(*)())move_down_pop, 0, 0 },
+     {"/sep1",         NULL,      0,                        0, "<Separator>" },
+     {"/Remove",       NULL,      (void(*)())delete_pop,    0, 0 },
+     {"/sep2",         NULL,      0,                        0, "<Separator>" },
+     {"/Edit Info",    NULL,      (void(*)())edit_pop,      0, 0 },
+     {"/sep3",         NULL,      0,                        0, "<Separator>" },
+     {"/Add Stream to Favorites", NULL, (void(*)())add_fav_pop, 0, 0 }
+    };
+
+    int nmenu2_items = sizeof(popup2_items) / sizeof(popup2_items[0]);
+     
     static char *titles[] =
     {
       "# ", "Title", "Artist", "Length"
@@ -865,6 +898,11 @@ void GTKMusicBrowser::CreatePlaylistList(GtkWidget *box)
                                          NULL);
     gtk_item_factory_create_items(playlistPopup, nmenu_items, popup_items, 
                                   (void *)this);
+
+    playlist2Popup = gtk_item_factory_new(GTK_TYPE_MENU, "<plist2_popup>", 
+                                          NULL);
+    gtk_item_factory_create_items(playlist2Popup, nmenu2_items,
+                                  popup2_items, (void *)this);
 
     gtk_clist_columns_autosize(GTK_CLIST(playlistList));
     gtk_widget_show(playlistList);

@@ -198,6 +198,7 @@ class GTKMusicBrowser {
 
     GtkItemFactory *menuFactory;
     GtkItemFactory *playlistPopup;
+    GtkItemFactory *playlist2Popup;
     GtkItemFactory *genstreamPopup;
     GtkItemFactory *streamPopup;
     GtkItemFactory *favPopup;
@@ -318,6 +319,7 @@ class GTKMusicBrowser {
     void EjectCD(void);
 
     void AddStreamToFavs(void);
+    void AddPLStreamToFavs(void);
     void AddNewStream(void);
 };
 

@@ -40,6 +40,15 @@ using namespace std;
 #include "cdaudio.h"
 #include "cdpmo.h"
 
+void GTKMusicBrowser::AddPLStreamToFavs(void)
+{
+    PlaylistItem *stream = m_plm->ItemAt(m_lastindex);
+    m_context->catalog->WriteMetaDataToDatabase(stream->URL().c_str(),
+                                                stream->GetMetaData(),
+                                                kTypeStream);
+    m_context->catalog->AddStream(stream->URL().c_str());
+}
+
 void GTKMusicBrowser::AddStreamToFavs(void)
 {
     vector<TreeData *>::iterator i = mbSelections->begin();
