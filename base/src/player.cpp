@@ -179,6 +179,9 @@ EventQueue()
     delete [] tempDir;
     m_dlm = new DownloadManager(m_context);
     m_context->downloadManager = m_dlm;
+
+    m_eqEnabled = false;
+    memset(m_eqValues, 0, sizeof(m_eqValues));
 }
 
 #define TYPICAL_DELETE(x) /*printf("deleting...\n");*/ if (x) { delete x; x = NULL; }
@@ -1259,6 +1262,7 @@ CreatePMO(const PlaylistItem * pc, Event * pC)
          delete m_pmo;
 
          m_pmo = NULL;
+         m_lmc = NULL;
       }
       if (SetState(PlayerState_Stopped))
       {
@@ -1280,6 +1284,7 @@ CreatePMO(const PlaylistItem * pc, Event * pC)
       delete    m_pmo;
 
       m_pmo = NULL;
+      m_lmc = NULL;
    }
 
    pmi_item = ChoosePMI(pc->URL().c_str());
@@ -1363,6 +1368,9 @@ CreatePMO(const PlaylistItem * pc, Event * pC)
    pmo->SetPMI(pmi);
    pmo->SetLMC(lmc);
 
+   lmc->SetEQData(m_eqValues);
+   lmc->SetEQData(m_eqEnabled);
+
    pmi = NULL;
    m_lmc = lmc;
    lmc = NULL;
@@ -1423,6 +1431,7 @@ DoneOutputting(Event *pEvent)
    {
       delete m_pmo;
       m_pmo = NULL;
+      m_lmc = NULL;
    }
 
    if (SetState(PlayerState_Stopped))
@@ -1477,6 +1486,7 @@ Stop(Event *pEvent)
        delete    m_pmo;
  
        m_pmo = NULL;
+       m_lmc = NULL;
     }
 
     if (SetState(PlayerState_Stopped))
@@ -1550,6 +1560,7 @@ Play(Event *pEvent)
     {
        delete m_pmo;
        m_pmo = NULL;
+       m_lmc = NULL;
 
        if (SetState(PlayerState_Stopped))
        {
@@ -1798,12 +1809,18 @@ void
 Player::
 SetEQData(Event *pEvent)
 {
+   if (((SetEqualizerDataEvent *) pEvent)->IsEQData())
+       memcpy(m_eqValues, ((SetEqualizerDataEvent *) pEvent)->GetEQData(), 
+              sizeof(float) * 32);
+   else
+       m_eqEnabled = ((SetEqualizerDataEvent *) pEvent)->GetEnableState();
+
    if (m_lmc)
    {
        if (((SetEqualizerDataEvent *) pEvent)->IsEQData())
-           m_lmc->SetEQData(((SetEqualizerDataEvent *) pEvent)->GetEQData());
+           m_lmc->SetEQData(m_eqValues);
        else
-           m_lmc->SetEQData(((SetEqualizerDataEvent *) pEvent)->GetEnableState());
+           m_lmc->SetEQData(m_eqEnabled);
    }
    delete pEvent;
 }

@@ -197,6 +197,8 @@ class Player : public EventQueue, Properties, PropertyWatcher
     UserInterface *m_downloadUI;
 
     TimerRef m_cdTimer;
+    float    m_eqValues[32];
+    bool     m_eqEnabled;
 };
 
 #endif // _PLAYER_H_
