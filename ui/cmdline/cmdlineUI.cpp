@@ -104,8 +104,6 @@ void cmdlineUI::keyboardServiceFunction(void *pclcio) {
 	    case '-': {
 		Event *e = new Event(CMD_PrevMediaPiece);
 		pMe->m_playerEQ->AcceptEvent(pMe->m_playerEQ,e);
-		e = new Event(CMD_Play);
-		pMe->m_playerEQ->AcceptEvent(pMe->m_playerEQ,e);
 		break;
 	    }
 	    case '=':
@@ -113,8 +111,6 @@ void cmdlineUI::keyboardServiceFunction(void *pclcio) {
 	    case 'n':
 	    case 'N': {
 		Event *e = new Event(CMD_NextMediaPiece);
-		pMe->m_playerEQ->AcceptEvent(pMe->m_playerEQ,e);
-		e = new Event(CMD_Play);
 		pMe->m_playerEQ->AcceptEvent(pMe->m_playerEQ,e);
 		break; }
 	    case 'q':

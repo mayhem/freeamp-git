@@ -74,7 +74,10 @@ HANDLE Preferences::GetFirstLibDir(char *path, uint32 *len) {
 //	cout << "Using env: " << pEnv << endl;
 	pPath = strdup(pEnv);
     } else {
-	pPath = strdup(".:~/.freeamp:/usr/local/lib/freeamp");
+	pPath = new char[1024];
+	strcpy(pPath,".:~/.freeamp:");
+	strcat(pPath,UNIX_LIBDIR);
+	strcat(pPath,"/freeamp");
 //	cout << "Using default: " << pPath << endl;
     }
     pEnv = pPath;

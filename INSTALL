@@ -17,7 +17,9 @@ Linux:
 	freeamp) must be copied to a directory named 'plugins'.
 	This 'plugins' directory is a subdirectory of either:
 	a) a directory in the built-in seach path:
-	   .:~/.freeamp:/usr/local/lib/freeamp
+	   .:~/.freeamp:LIBDIR/freeamp
+	   (where LIBDIR is either /usr/local/lib or the one you
+	   specified as --libdir= to ./configure)
 	b) the search path specified by the environment variable
 	   FREEAMP_PATH
 
