@@ -843,6 +843,7 @@ void FreeAmpUI::SeekDialFunction(void *p, int32 c,int32 x,int32 y) {
 	case 0: {
 	    pMe->m_seekDelta = 0;
 	    pMe->m_currSeconds = pMe->m_seekSeconds;
+       printf("Seek to: %d\n", pMe->m_seekSeconds);
 	    int32 s = pMe->m_seekSeconds;
 	    int32 h = s / 3600;
 	    int32 m = (s % 3600) / 60;

@@ -150,6 +150,7 @@ Error ObsInput::SetTo(char *url)
 Error ObsInput::
 SetBufferSize(size_t iNewSize)
 {
+    assert(m_pPullBuffer);
     return m_pPullBuffer->Resize(iNewSize, iNewSize / 6, iNewSize / 8);
 }
 
@@ -164,40 +165,51 @@ GetLength(size_t &iSize)
 Error ObsInput::
 GetID3v1Tag(unsigned char *pTag)
 {
+    assert(m_pPullBuffer);
     return m_pPullBuffer->GetID3v1Tag(pTag);
 }
 
 Error ObsInput::
 BeginRead(void *&buf, size_t &bytesneeded)
 {
+   assert(m_pPullBuffer);
    return m_pPullBuffer->BeginRead(buf, bytesneeded);
 }
 
 Error ObsInput::
 EndRead(size_t bytesused)
 {
+   assert(m_pPullBuffer);
    return m_pPullBuffer->EndRead(bytesused);
 }
 
 int32 ObsInput::GetBufferPercentage()
 {
-   return m_pPullBuffer->GetBufferPercentage();
+   if (m_pPullBuffer)
+      return m_pPullBuffer->GetBufferPercentage();
+
+   return 0;
 }
 
 int32 ObsInput::GetNumBytesInBuffer()
 {
-   return m_pPullBuffer->GetNumBytesInBuffer();
+   if (m_pPullBuffer)
+       return m_pPullBuffer->GetNumBytesInBuffer();
+
+   return 0;
 }
 
 void ObsInput:: Pause()
 {
-   m_pPullBuffer->Pause();
+   if (m_pPullBuffer)
+      m_pPullBuffer->Pause();
 }
 
 void ObsInput::
 Resume()
 {
-   m_pPullBuffer->Resume();
+   if (m_pPullBuffer)
+      m_pPullBuffer->Resume();
 }
 
 Error     ObsInput::

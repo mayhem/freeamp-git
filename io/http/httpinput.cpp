@@ -164,44 +164,52 @@ GetLength(size_t &iSize)
 Error HttpInput::
 GetID3v1Tag(unsigned char *pTag)
 {
+   assert(m_pPullBuffer);
     return m_pPullBuffer->GetID3v1Tag(pTag);
 }
 
 Error HttpInput::
 BeginRead(void *&buf, size_t &bytesneeded)
 {
+   assert(m_pPullBuffer);
    return m_pPullBuffer->BeginRead(buf, bytesneeded);
 }
 
 Error HttpInput::
 EndRead(size_t bytesused)
 {
+   assert(m_pPullBuffer);
    return m_pPullBuffer->EndRead(bytesused);
 }
 
 int32 HttpInput::GetBufferPercentage()
 {
+   assert(m_pPullBuffer);
    return m_pPullBuffer->GetBufferPercentage();
 }
 
 int32 HttpInput::GetNumBytesInBuffer()
 {
+   assert(m_pPullBuffer);
    return m_pPullBuffer->GetNumBytesInBuffer();
 }
 
 void HttpInput::Pause()
 {
-   m_pPullBuffer->Pause();
+   if (m_pPullBuffer)
+       m_pPullBuffer->Pause();
 }
 
 void HttpInput::Resume()
 {
-   m_pPullBuffer->Resume();
+   if (m_pPullBuffer)
+       m_pPullBuffer->Resume();
 }
 
 void HttpInput::Break()
 {
-   m_pPullBuffer->BreakBlocks();
+   if (m_pPullBuffer)
+       m_pPullBuffer->BreakBlocks();
 }
 
 Error     HttpInput::

@@ -43,7 +43,7 @@ ____________________________________________________________________________*/
 #include "log.h"
 
 #ifndef WIN32
-check the closesocket shit!
+#define closesocket(s) close(s)
 #endif
 
 extern LogFile *g_Log;

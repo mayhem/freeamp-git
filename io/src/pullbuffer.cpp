@@ -236,6 +236,13 @@ Error PullBuffer::BeginWrite(void *&pBuffer, size_t &iBytesToWrite)
 
    m_pMutex->Acquire();
 
+   if (m_bExit)
+   {
+       printf("bailing out!\n");
+       m_pMutex->Release();
+       return kError_Interrupt;
+   }
+
    pBuffer = m_pPullBuffer + m_iWriteIndex;
 
    //printf("%08X: BeginWrite: ReadIndex: %d WriteIndex %d Size: %d Bytes: %d\n", 

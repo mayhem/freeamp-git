@@ -201,13 +201,18 @@ Stop()
 
       xc[0] = XING_Stop;
       m_xcqueue->Write(xc);
-      m_pauseSemaphore->Signal();
 
       m_bExit = true;
-      m_output->Pause();
+      m_pauseSemaphore->Signal();
+
+      //printf("PMO break\n");
       m_output->Break();
+      //printf("PMO pause\n");
+      m_output->Pause();
+      //printf("PMI break\n");
       m_input->Break();
 
+      //printf("decoder join\n");
       m_decoderThread->Join();  // wait for thread to exit
 
       delete m_input;
@@ -761,6 +766,7 @@ void XingLMC::DecodeWork()
 		{
           x.in_bytes = 0;
           iOutBytesNeeded = m_iMaxWriteSize;
+          //printf("BeginWrite\n"); 
           Err = m_output->BeginWrite(pOutBuffer, iOutBytesNeeded);
 //		  if (Err == kError_BufferTooSmall)
 //		  {
@@ -789,10 +795,12 @@ void XingLMC::DecodeWork()
           }
 
           iBytesNeeded = iMaxFrameSize;
+          //printf("BeginRead\n"); 
           Err = BeginRead(pBuffer, iBytesNeeded);
           if (Err == kError_Interrupt || Err == kError_InputUnsuccessful)
              break;
 
+          //printf("Ready to decode\n"); 
           if (Err != kError_NoErr)
           {
               m_seekMutex->Release();
@@ -992,6 +1000,7 @@ ChangePosition(int32 position)
    int32     dummy;
 
    m_output->Pause();
+
    m_output->Clear();
 
    m_input->Seek(dummy, position * m_frameBytes, SEEK_FROM_START);

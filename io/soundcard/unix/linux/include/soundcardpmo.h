@@ -29,7 +29,7 @@ ____________________________________________________________________________*/
 /* project headers */
 #include <config.h>
 #include "thread.h"
-#include "semaphore.h"
+#include "mutex.h"
 #include "pmo.h"
 #include "pmoevent.h"
 #include "eventbuffer.h"
@@ -62,6 +62,7 @@ class SoundCardPMO:public PhysicalMediaOutput, public EventBuffer
    virtual Error Init(OutputInfo * info);
    virtual Error Pause();
    virtual Error Resume();
+   virtual Error Break();
    virtual void  WaitToQuit();
    virtual Error Clear();
    virtual Error SetPropManager(Properties * p);
@@ -87,8 +88,7 @@ class SoundCardPMO:public PhysicalMediaOutput, public EventBuffer
    OutputInfo  *myInfo;
    int32        getprocessed(void);
    Thread      *m_pBufferThread;
-   Semaphore   *m_pPauseSem;
-   bool         m_bPause;
+   Mutex       *m_pPauseMutex;
    int          m_iOutputBufferSize, m_iTotalBytesWritten, m_iBytesPerSample;
    int          m_iLastFrame;
 };
