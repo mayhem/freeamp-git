@@ -1042,4 +1042,15 @@ class MissingFileEvent:public Event
    PlaylistItem *Item() const{ return m_item; }
 };
 
+class CDNotFoundEvent:public Event
+{
+ private:
+   string m_submitUrl;
+ public:
+   CDNotFoundEvent(const string &url)
+   { m_type = INFO_CDNotFound; m_submitUrl = url; }
+   virtual ~ CDNotFoundEvent(){ }
+   const string &URL() const{ return m_submitUrl; }
+};
+
 #endif /* _EVENTDATA_H_ */

@@ -231,8 +231,13 @@ bool MusicBrainzCD::LookupCD(void)
     
         if (mb_GetNumItems(o) == 0)
         {
+           char url[MAX_PATH];
+
+           mb_GetWebSubmitURL(o, url, MAX_PATH);
            m_context->target->AcceptEvent(new 
                      BrowserMessageEvent("CD not found."));
+           m_context->target->AcceptEvent(new 
+                     CDNotFoundEvent(string(url)));
            delete db;
            return false;
         }  

@@ -157,5 +157,6 @@ class EventQueue {
 #define INFO_SignaturingStarted      90 // sent by player to inform UIs of signaturing status
 #define INFO_SignaturingStopped      91 // sent by player to inform UIs of signaturing status
 #define CMD_KillSigThread            92 // sent by MC to player to kill signaturing thread
+#define INFO_CDNotFound              93 // sent by mbcd plugin to musicbrowser 
 #endif // _EVENT_H_
 

@@ -23,6 +23,7 @@ ____________________________________________________________________________*/
 
 #include "musicbrowserui.h"
 #include "gtkmusicbrowser.h" 
+#include "gtkmessagedialog.h" 
 #include "missingfileui.h"
 #include "infoeditor.h"
 #include "eventdata.h"
@@ -167,6 +168,23 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
             
             MissingFileUI *mfui = new MissingFileUI(m_context, mfe->Item());
             mfui->Run();
+
+            break; }
+       case INFO_CDNotFound: {
+            CDNotFoundEvent *ev = (CDNotFoundEvent *)event;
+            GTKMessageDialog *dialog = new GTKMessageDialog();
+            string message = "This CD was not found in MusicBrainz. Would "
+               "you like to enter the information for this CD and submit "
+               "the data for inclusion in the MusicBrainz metadatabase?";
+
+            gdk_threads_enter();
+            if (dialog->Show(message.c_str(), "CD Not Found", 
+                             kMessageYesNo) == kMessageReturnYes) 
+            {
+                LaunchBrowser(ev->URL().c_str());
+            }
+            gdk_threads_leave();
+            delete dialog;
 
             break; }
         default:

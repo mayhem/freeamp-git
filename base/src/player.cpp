@@ -2492,6 +2492,7 @@ ServiceEvent(Event * pC)
         case CMD_ShowPreferences:
         case CMD_EditCurrentPlaylistItemInfo:
         case CMD_GeneratePlaylist:
+        case INFO_CDNotFound:
             SendEventToUI(pC);
             delete pC;
             break;
