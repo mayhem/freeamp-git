@@ -466,8 +466,11 @@ void MusicBrowserUI::PlaylistListItemMoved(const PlaylistItem* item,
                               state,
                               LVIS_SELECTED|LVIS_FOCUSED);
 
-        ListView_RedrawItems(m_hPlaylistView, oldIndex, oldIndex);
-        ListView_RedrawItems(m_hPlaylistView, newIndex, newIndex);
+		int lowerBound = min(oldIndex, newIndex);
+		int upperBound = max(oldIndex, newIndex);
+
+		for (int i = lowerBound; i <= upperBound; i++)
+            ListView_RedrawItems(m_hPlaylistView, i, i);
 
         //HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
 
@@ -1104,6 +1107,9 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
             if(insertIndex < 0)
             {
                 insertIndex = ListView_GetItemCount(hwnd) - 1;
+
+				if (insertIndex > 0)
+					insertIndex++;
             }
             else
             {   
@@ -1117,7 +1123,7 @@ LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd,
                 {                    
                     insertIndex++; 
                 }
-            }
+			}
 
             char buf[256];
             sprintf(buf, "insert: %d\r\n", insertIndex);

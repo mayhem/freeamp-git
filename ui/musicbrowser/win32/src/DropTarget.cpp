@@ -179,20 +179,20 @@ void DropTarget::ScrollFunction()
 
     // erase old
     PatBlt(hdc,
-           m_insertRect.left, 
-           m_insertRect.top, 
-           m_insertRect.right - m_insertRect.left, 
-           m_insertRect.bottom - m_insertRect.top, 
+           m_scrollRect.left, 
+           m_scrollRect.top, 
+           m_scrollRect.right - m_scrollRect.left, 
+           m_scrollRect.bottom - m_scrollRect.top, 
            PATINVERT);
 
     SendMessage(m_hwnd, WM_VSCROLL, MAKELONG(m_scrollCode, 0), NULL);
 
     // draw new
     PatBlt(hdc,
-           m_insertRect.left, 
-           m_insertRect.top, 
-           m_insertRect.right - m_insertRect.left, 
-           m_insertRect.bottom - m_insertRect.top, 
+           m_scrollRect.left, 
+           m_scrollRect.top, 
+           m_scrollRect.right - m_scrollRect.left, 
+           m_scrollRect.bottom - m_scrollRect.top, 
            PATINVERT);
 
     SelectObject(hdc, oldBrush);
@@ -221,6 +221,7 @@ void DropTarget::AutoScroll(int scrollCode)
     else if(!m_scrolling)
     {
         m_scrolling = true;
+		m_scrollRect = m_insertRect;
 
         m_timer = SetTimer(GetParent(m_hwnd), SCROLL_TIMER, 250, ScrollProc);
     }
@@ -329,20 +330,21 @@ STDMETHODIMP DropTarget::DragEnter(LPDATAOBJECT pDataObj,
         else
         {   
             int middle;
-
+ 
             ListView_GetItemRect(m_hwnd, hti.iItem, &itemRect, LVIR_BOUNDS);
 
             middle = itemRect.top + (itemRect.bottom - itemRect.top)/2;
 
             if(pt.y < middle)
             {
-                itemRect.top -= 2;
-                itemRect.bottom = itemRect.top + 1;
+                //itemRect.top -= 2;
+                itemRect.bottom = itemRect.top;
+				itemRect.top -= 2;
             }
             else
             {
-                itemRect.bottom += 2;
-                itemRect.top = itemRect.bottom - 1;
+                //itemRect.bottom += 2;
+                itemRect.top = itemRect.bottom - 2;
             }
         }
 
@@ -403,6 +405,10 @@ STDMETHODIMP DropTarget::DragOver(DWORD dwKeyState,
 
         m_oldItem = ListView_HitTest(m_hwnd, &hti);
 
+		bool checkScroll = true;
+        if (m_oldItem == 0)
+			checkScroll = false;
+
         if(m_oldItem < 0)
         {
             itemRect = m_insertRect;
@@ -420,6 +426,7 @@ STDMETHODIMP DropTarget::DragOver(DWORD dwKeyState,
                 if(m_oldItem == 0)
                 {
                     itemRect.bottom = itemRect.top + 2;
+					checkScroll = true;
                 }
                 else
                 {
@@ -442,6 +449,8 @@ STDMETHODIMP DropTarget::DragOver(DWORD dwKeyState,
         //sprintf(buf, "%d, %d, %d, %d\r\n", 
         //    itemRect.top, itemRect.left, itemRect.bottom, itemRect.right);
         //OutputDebugString(buf);
+
+		bool scrolling = m_scrolling;
 
         if(!m_scrolling)
         {
@@ -479,7 +488,8 @@ STDMETHODIMP DropTarget::DragOver(DWORD dwKeyState,
             ImageList_DragShowNolock(TRUE);
         }
 
-        CheckAutoScroll(hti.pt);
+		if (checkScroll)
+            CheckAutoScroll(hti.pt); 
     }
 
 	return NOERROR;
@@ -679,6 +689,6 @@ STDMETHODIMP DropTarget::Drop(LPDATAOBJECT pDataObj,
             return NOERROR;
         }
     }
-	MessageBox(NULL, "Drop failed.", "Drop failed", MB_OK);
+
 	return hr;      
 }

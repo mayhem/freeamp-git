@@ -34,6 +34,7 @@ ____________________________________________________________________________*/
 #include "eventdata.h"
 #include "help.h"
 #include "preferences.h"
+#include "player.h"
 
 #define UWM_EMPTYDBCHECK WM_USER + 69
  
@@ -325,6 +326,11 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                     EjectCDEvent();
                     return 1;
                 
+				case ID_POPUP_REFRESH_CD:
+					m_cdId = -1;
+					m_context->player->UpdateCDNow();
+					return 1;
+
                 case ID_VIEW_MUSICCATALOG:
                     ExpandCollapseEvent();
                     return 1;
@@ -469,6 +475,7 @@ bool MusicBrowserUI::CreateMainDialog()
                     NULL,
                     (DLGPROC)MainDlgProc, 
                     (LPARAM)this);
+
     if(m_hWnd)
     {
         if(m_pParent)
@@ -1771,9 +1778,8 @@ void MusicBrowserUI::UpdateButtonStates()
 
         if(trackCount + playlistCount)
         {
-
             if(!IsItemSelected(m_hNewPlaylistItem) &&
-                !IsItemSelected(m_hNewPlaylistItem))
+               !IsItemSelected(m_hNewPlaylistItem))
             {
                 SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
                             ID_EDIT_ADDTRACK, MAKELPARAM(TRUE, 0)); 
@@ -1783,6 +1789,7 @@ void MusicBrowserUI::UpdateButtonStates()
                !IsItemSelected(m_hNewPlaylistItem) && 
                !IsItemSelected(m_hPortableItem) &&
                !IsItemSelected(m_hNewPortableItem) &&
+			   !IsItemSelected(m_hMyMusicItem) &&
                !IsItemSelected(m_hAllItem))
             {
                 SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
@@ -1815,7 +1822,7 @@ void MusicBrowserUI::UpdateButtonStates()
         {
             // Edit Menu
             SendMessage(m_hToolbar, TB_ENABLEBUTTON, ID_EDIT_REMOVE, 0); 
-            SendMessage(m_hToolbar, TB_ENABLEBUTTON, ID_EDIT_EDITINFO, 0);    
+            SendMessage(m_hToolbar, TB_ENABLEBUTTON, ID_EDIT_EDITINFO, 0);  
         }
  
     }
@@ -1942,6 +1949,7 @@ void MusicBrowserUI::UpdateMenuStates()
            !IsItemSelected(m_hNewPlaylistItem) && 
            !IsItemSelected(m_hPortableItem) &&
            !IsItemSelected(m_hNewPortableItem) &&
+		   !IsItemSelected(m_hMyMusicItem) &&
            !IsItemSelected(m_hAllItem))
         {
             EnableMenuItem(hMenu, ID_EDIT_REMOVE, MF_ENABLED);

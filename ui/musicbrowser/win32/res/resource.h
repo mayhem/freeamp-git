@@ -114,6 +114,7 @@
 #define IDC_RELATABLE_CAPTION2          1051
 #define IDC_RELATABLE_CAPTION3          1051
 #define IDC_RELATABLE_EDIT1             1052
+#define IDC_TEXTTRACK                   1053
 #define IDC_BROWSE                      1110
 #define IDC_DRIVES                      1231
 #define IDC_ALBUM                       1462
@@ -206,6 +207,7 @@
 #define ID_SL_QUERY_10000               40091
 #define ID_SL_QUERY_20000               40092
 #define ID_SL_QUERY_NOMAX               40093
+#define ID_POPUP_REFRESH_CD             40095
 #define IDS_URL                         65535
 #define IDC_TRACKTEXT                   65535
 #define IDC_TITLETEXT                   65535
@@ -215,8 +217,8 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        142
-#define _APS_NEXT_COMMAND_VALUE         40094
-#define _APS_NEXT_CONTROL_VALUE         1053
+#define _APS_NEXT_COMMAND_VALUE         40096
+#define _APS_NEXT_CONTROL_VALUE         1054
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -1463,6 +1463,15 @@ void FreeAmpTheme::InitControls(void)
     iState = m_iMuteVolume != -1; 
     m_pWindow->ControlIntValue(string("Mute"), true, iState);
 
+	if (m_sigState == kGeneratingSigs)
+		iState = 2;
+	else if (m_sigState == kSigsPending)
+		iState = 1;
+	else
+		iState = 0;
+
+	m_pWindow->ControlIntValue(string("SigIndicator"), true, iState);
+
     m_eq->InitControls(m_pWindow);
 }
 

@@ -400,7 +400,7 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
             uint32 numTracks = cie->GetNumTracks();
 
             if(cie->GetCDDB() != m_cdId)
-            {
+            {			
                 m_cdId = cie->GetCDDB();
 
                 m_cdTracks->erase(m_cdTracks->begin(), m_cdTracks->end()); 

@@ -403,7 +403,8 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
             tv_htinfo.pt.y =  HIWORD(lParam);
 
 
-            if(TreeView_HitTest(m_hMusicView, &tv_htinfo))
+            if(TreeView_HitTest(m_hMusicView, &tv_htinfo) && 
+			   (tv_htinfo.flags & TVHT_ONITEM))
             {
                 tv_item.hItem = TreeView_GetSelection(m_hMusicView); 
                 tv_item.mask = TVIF_PARAM | TVIF_HANDLE;

@@ -33,12 +33,6 @@ STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "General"
 FONT 8, "MS Sans Serif"
 BEGIN
-    CONTROL         "Remain on top of all other windows.",IDC_STAYONTOP,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,144,128,10
-    CONTROL         "Show application icon in the system tray instead of the taskbar.",
-                    IDC_TRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,154,
-                    213,10
-    GROUPBOX        "Miscellaneous",IDC_STATIC,3,134,227,34
     GROUPBOX        "File Associations",IDC_STATIC,3,0,227,38
     CONTROL         "Reclaim music file associations when application starts.",
                     IDC_RECLAIMFILETYPES,"Button",BS_AUTOCHECKBOX | 
@@ -46,23 +40,29 @@ BEGIN
     CONTROL         "Ask before reclaiming music file associations.",
                     IDC_ASKRECLAIM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,
                     24,157,10
-    GROUPBOX        "Show Toolbars As",IDC_STATIC,3,101,227,26
-    CONTROL         "Text only",IDC_TEXTONLY,"Button",BS_AUTORADIOBUTTON,178,
-                    112,43,10
-    CONTROL         "Images only",IDC_IMAGESONLY,"Button",BS_AUTORADIOBUTTON,
-                    101,112,53,10
-    CONTROL         "Text and images",IDC_TEXTANDIMAGES,"Button",
-                    BS_AUTORADIOBUTTON,11,112,66,10
-    CONTROL         "Save current playlist when exiting the application.",
-                    IDC_SAVECURRENTLIST,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,12,68,171,10
+    GROUPBOX        "Playlist",IDC_STATIC,3,45,227,49
     CONTROL         "Default action is to queue tracks; do not play them immediately.",
                     IDC_DEFAULTACTION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     12,57,213,10
-    GROUPBOX        "Playlist",IDC_STATIC,3,45,227,49
+    CONTROL         "Save current playlist when exiting the application.",
+                    IDC_SAVECURRENTLIST,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,12,68,171,10
     CONTROL         "Convert underscores to spaces in track info.",
                     IDC_UNDERSCORES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,
                     79,155,10
+    GROUPBOX        "Show Toolbars As",IDC_STATIC,3,101,227,26
+    CONTROL         "Text and images",IDC_TEXTANDIMAGES,"Button",
+                    BS_AUTORADIOBUTTON,11,112,66,10
+    CONTROL         "Images only",IDC_IMAGESONLY,"Button",BS_AUTORADIOBUTTON,
+                    101,112,53,10
+    CONTROL         "Text only",IDC_TEXTONLY,"Button",BS_AUTORADIOBUTTON,178,
+                    112,43,10
+    GROUPBOX        "Miscellaneous",IDC_STATIC,3,134,227,34
+    CONTROL         "Remain on top of all other windows.",IDC_STAYONTOP,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,144,128,10
+    CONTROL         "Show application icon in the system tray instead of the taskbar.",
+                    IDC_TRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,154,
+                    213,10
 END
 
 IDD_PREF_DEBUG DIALOG DISCARDABLE  0, 0, 233, 174
@@ -170,22 +170,22 @@ END
 IDD_PREF_UPDATE DIALOGEX 0, 0, 233, 174
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Update"
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Sans Serif"
 BEGIN
-    GROUPBOX        "Description",-1,3,80,227,46
-    PUSHBUTTON      "Update Components",IDC_UPDATE,121,131,90,14
-    PUSHBUTTON      "Check for Latest Versions",IDC_CHECK,23,131,90,14
-    LTEXT           "This is a test. This text will tell the user what the hell the component actually does.By filling in this text I can see how the text will appear to the user when it is asctually filled in by the program and see if it looks good or bad the way it is.",
-                    IDC_DESCRIPTION,10,91,214,33
     CONTROL         "List1",IDC_LIST,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_OWNERDRAWFIXED | 
                     LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,3,3,227,74,
                     WS_EX_CLIENTEDGE
-    LTEXT           " Status: No update in progress.",IDC_STATUS,0,163,233,
-                    11,0,WS_EX_CLIENTEDGE
+    PUSHBUTTON      "Check for Latest Versions",IDC_CHECK,23,131,90,14
+    PUSHBUTTON      "Update Components",IDC_UPDATE,121,131,90,14
     CONTROL         "Check for the availability of updates when the application starts.",
                     IDC_AUTOCHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,
                     149,216,10
+    GROUPBOX        "Description",-1,3,80,227,46
+    LTEXT           "This is a test. This text will tell the user what the hell the component actually does.By filling in this text I can see how the text will appear to the user when it is asctually filled in by the program and see if it looks good or bad the way it is.",
+                    IDC_DESCRIPTION,10,91,214,33
+    LTEXT           " Status: No update in progress.",IDC_STATUS,0,163,233,
+                    11,0,WS_EX_CLIENTEDGE
     PUSHBUTTON      "Cancel Version Check",IDC_CANCELCHECK,23,131,90,14,NOT 
                     WS_VISIBLE | WS_DISABLED
     PUSHBUTTON      "Cancel Update",IDC_CANCELUPDATE,121,131,90,14,NOT 
@@ -339,18 +339,18 @@ STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Relatable Profiles"
 FONT 8, "MS Sans Serif"
 BEGIN
+    CONTROL         "Enable Relatable Features",IDC_PROFILE_ENABLE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,6,7,125,8
+    PUSHBUTTON      "&What is all this?",IDC_PROFILE_HELP,156,7,70,12
     GROUPBOX        "Profile Selection",IDC_STATIC,6,19,220,85
-    GROUPBOX        "New Profile",IDC_STATIC,6,104,220,64
     LISTBOX         IDC_PROFILE_LIST,11,29,205,65,LBS_SORT | LBS_MULTIPLESEL | 
                     LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "New Profile",IDC_STATIC,6,104,220,64
     LTEXT           "To create a new profile simply name it in the box below and click Add Profile.  To use an existing profile select from the box above.",
                     IDC_STATIC,14,118,212,19
     EDITTEXT        IDC_NEW_PROFILE,11,149,91,13,ES_AUTOHSCROLL
     PUSHBUTTON      "&Add Profile",IDC_ADDPROFILE,109,148,45,14
     PUSHBUTTON      "&Delete Profile",IDC_DELETEPROFILE,160,148,53,14
-    CONTROL         "Enable Relatable Features",IDC_PROFILE_ENABLE,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,6,7,125,8
-    PUSHBUTTON      "&What is all this?",IDC_PROFILE_HELP,156,7,70,12
 END
 
 

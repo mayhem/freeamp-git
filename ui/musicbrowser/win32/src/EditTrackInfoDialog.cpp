@@ -115,7 +115,7 @@ BOOL EditTrackInfoDialog::DialogProc(HWND hwnd,
             char number[64];
             
             CreateEditInfoLists(artists, albums, genres);
-
+  
             HWND hwndArtist = GetDlgItem(hwnd, IDC_ARTIST);
             HWND hwndAlbum = GetDlgItem(hwnd, IDC_ALBUM);
             HWND hwndGenre = GetDlgItem(hwnd, IDC_GENRE);

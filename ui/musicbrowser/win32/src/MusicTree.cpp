@@ -1139,6 +1139,9 @@ void MusicBrowserUI::MusicCatalogCleared()
 {
     if(m_initialized)
         InitTree();
+
+	m_cdId = -1;
+	CheckForCD();
 }
 
 void MusicBrowserUI::MusicCatalogTrackChanged(const ArtistList *oldArtist,
@@ -2371,6 +2374,8 @@ uint32 MusicBrowserUI::GetSelectedTrackCount()
     {
         result = CountSelectedItems(rootItem);
     }
+	if (IsItemSelected(m_hMyMusicItem))
+		result++;
 
     return result;
 }

@@ -65,6 +65,7 @@ class FAR DropTarget : public IDropTarget
     HBRUSH          m_insertBrush;
     int             m_oldItem; 
     RECT            m_insertRect;
+	RECT            m_scrollRect;
     bool            m_scrolling;
     int             m_scrollCode;
     int             m_timer;

@@ -117,36 +117,36 @@ FONT 8, "MS Sans Serif"
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,92,137,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,146,137,50,14
-    LTEXT           "Title:",IDC_TRACKTEXT,7,33,36,8
-    LTEXT           "Album:",IDC_TRACKTEXT,7,49,36,8
-    LTEXT           "Artist:",IDC_TRACKTEXT,7,65,36,8
-    LTEXT           "Genre:",IDC_TRACKTEXT,7,81,36,8
-    LTEXT           "Comments:",IDC_TRACKTEXT,7,100,36,8
+    EDITTEXT        IDC_TITLE,47,30,114,14,ES_AUTOHSCROLL
     COMBOBOX        IDC_ALBUM,47,47,114,69,CBS_DROPDOWN | CBS_AUTOHSCROLL | 
                     CBS_SORT | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_ARTIST,47,63,114,77,CBS_DROPDOWN | CBS_AUTOHSCROLL | 
                     CBS_SORT | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_GENRE,47,79,114,89,CBS_DROPDOWN | CBS_AUTOHSCROLL | 
                     CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Year:",IDC_TRACKTEXT,178,49,18,8
-    EDITTEXT        IDC_TITLE,47,30,114,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_COMMENT,47,97,203,14,ES_AUTOHSCROLL
-    LTEXT           "Use the fields below to change the information associated with your selected track(s).",
-                    IDC_TRACKTEXT,7,7,243,17
-    EDITTEXT        IDC_YEAR,199,47,51,14,ES_AUTOHSCROLL | ES_NUMBER
-    CONTROL         "Spin1",IDC_SPINYEAR,"msctls_updown32",UDS_WRAP | 
-                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | 
-                    UDS_ARROWKEYS | UDS_NOTHOUSANDS,243,47,7,14
+    EDITTEXT        IDC_LOCATION,47,116,203,14,ES_AUTOHSCROLL | ES_READONLY | 
+                    NOT WS_TABSTOP
     EDITTEXT        IDC_TRACK,199,30,51,14,ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "Spin2",IDC_SPINTRACK,"msctls_updown32",UDS_WRAP | 
                     UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | 
                     UDS_ARROWKEYS,243,30,7,14
-    LTEXT           "Track #:",IDC_TRACKTEXT,168,33,28,8
-    PUSHBUTTON      "Help",9,200,137,50,14
-    LTEXT           "Location:",IDC_LOCATIONTEXT,7,120,30,8
-    EDITTEXT        IDC_LOCATION,47,116,203,14,ES_AUTOHSCROLL | ES_READONLY | 
-                    NOT WS_TABSTOP
+    EDITTEXT        IDC_YEAR,199,47,51,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Spin1",IDC_SPINYEAR,"msctls_updown32",UDS_WRAP | 
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | 
+                    UDS_ARROWKEYS | UDS_NOTHOUSANDS,243,47,7,14
     EDITTEXT        IDC_PLAYCOUNT,200,63,50,11,ES_AUTOHSCROLL
+    PUSHBUTTON      "Help",9,200,137,50,14
+    LTEXT           "Title:",IDC_TRACKTEXT,7,33,36,8
+    LTEXT           "Album:",IDC_TRACKTEXT,7,49,36,8
+    LTEXT           "Artist:",IDC_TRACKTEXT,7,65,36,8
+    LTEXT           "Genre:",IDC_TRACKTEXT,7,81,36,8
+    LTEXT           "Comments:",IDC_TRACKTEXT,7,100,36,8
+    LTEXT           "Year:",IDC_TRACKTEXT,178,49,18,8
+    LTEXT           "Use the fields below to change the information associated with your selected track(s).",
+                    IDC_TEXTTRACK,7,7,243,17
+    LTEXT           "Track #:",IDC_TRACKTEXT,168,33,28,8
+    LTEXT           "Location:",IDC_LOCATIONTEXT,7,120,30,8
     LTEXT           "Playcount:",IDC_TRACKTEXT,164,65,34,8
 END
 
@@ -604,6 +604,8 @@ BEGIN
     BEGIN
         MENUITEM "&Add to Playlist",            ID_POPUP_ADDTRACK
         MENUITEM "Add and Play &Now",           ID_POPUP_ADDTRACK_PLAY
+        MENUITEM SEPARATOR
+        MENUITEM "Refresh CD",                  ID_POPUP_REFRESH_CD
         MENUITEM SEPARATOR
         MENUITEM "&Eject CD",                   ID_POPUP_EJECT
     END
