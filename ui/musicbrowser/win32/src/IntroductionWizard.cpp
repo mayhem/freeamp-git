@@ -642,6 +642,124 @@ static BOOL CALLBACK IntroWizardRelatable(HWND hwnd,
                                           LPARAM lParam)
 {
     BOOL result = FALSE;
+    static HWND hwndOptIn = NULL;
+    static HWND hwndOptOut = NULL;
+
+    switch(msg)
+    {
+        case WM_INITDIALOG:
+        {
+            hwndOptIn = GetDlgItem(hwnd, IDC_RELATABLE_YES);
+            hwndOptOut = GetDlgItem(hwnd, IDC_RELATABLE_NO);
+
+            PROPSHEETPAGE *psp = (PROPSHEETPAGE*)lParam;
+
+            Button_SetCheck(hwndOptIn, FALSE);
+            Button_SetCheck(hwndOptOut, TRUE);
+            break;
+        }
+        case WM_DRAWITEM:
+        {
+            DRAWITEMSTRUCT* dis = (DRAWITEMSTRUCT*)lParam;
+            UINT ctrlId = wParam;
+            const char* kMsg1 = "Check out Relatable's new recommendation features\n"
+                                "This version of "the_BRANDING" offers Relatable features that automatically\n"
+                                "recommends music playlists and streams. It's our first public test of\n"
+                                                               "an exciting new approach to discovering music. Relatable's system\n"
+                                                               "'learns' listener preferences through "the_BRANDING" and compares them\n"
+                                                               "with the preferences of like-minded listeners. It's like a virtual 'word\n"
+                                                               "of mouth' system that introduces you to music that people like\n"
+                                                               "you have enjoyed.\n\n"
+                                                               //"Essentially, Relatable creates communities of people based on what they\n"
+                                                               //"like listening to. So no matter how eclectic your tastes, Relatable can\n"
+                                                               //"introduce you to more great music. And Relatable dynamically generates\n"
+                                                               //"playlists of songs that go well together because it learns what people\n"
+                                                               //"like to play together.\n\n"
+                                                               "Privacy is Paramount! \n"
+                                                               "Please note that Relatable profiles are totally anonymous and are\n"
+                                                               "never shared with third parties. Each anonymous music profile is\n"
+                                                               "stored on Relatable's secure servers, and we're continually adding\n"
+                                                               "safeguards to protect our users. To enjoy these features and help\n"
+                                                               "us test the system, just opt-in. You will never be contacted by\n"
+                                                               "Relatable or anyone else (unless you ask, of course!). That's\n"
+                                                               "Relatable's privacy promise. Please feel free to ask any questions\n"
+                                                               "at info@relatable.com. We'll be happy to address your comments.";
+            switch(ctrlId)
+            {
+                case IDC_RELATABLE_TEXT1:
+                {
+                    HFONT font, oldFont;
+
+                    font = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
+
+                    oldFont = (HFONT)SelectObject(dis->hDC, font);
+
+                    RECT clientRect;
+                    GetClientRect(dis->hwndItem, &clientRect);
+
+                    DrawText(dis->hDC,
+                             kMsg1,
+                             strlen(kMsg1),
+                             &clientRect,
+                             DT_LEFT|DT_WORDBREAK);
+
+                    SelectObject(dis->hDC, oldFont);
+
+                    DeleteObject(font);
+                    break;
+                }
+            }
+
+            break;
+        }
+        case WM_NOTIFY:
+        {
+            switch(((NMHDR*)lParam)->code)
+            {
+                case PSN_KILLACTIVE:
+                {
+                    SetWindowLong(hwnd,        DWL_MSGRESULT, FALSE);
+                    result = TRUE;
+                    break;
+                }
+                case PSN_RESET:
+                {
+                    SetWindowLong(hwnd,        DWL_MSGRESULT, FALSE);
+                    break;
+                }
+
+                case PSN_SETACTIVE:
+                {
+                    PropSheet_SetWizButtons(GetParent(hwnd), PSWIZB_BACK | PSWIZB_NEXT);
+                    break;
+                }
+                case PSN_WIZNEXT:
+                {
+                    if (Button_GetCheck(hwndOptOut) == BST_CHECKED)
+                    {
+                        PropSheet_RemovePage(GetParent(hwnd), 2, NULL);
+                    }
+                    break;
+                }
+
+                case PSN_WIZBACK:
+                {
+                    break;
+                }
+            }
+            break;
+        }
+    }
+    return result;
+}
+
+static BOOL CALLBACK IntroWizardRelatableTwo(HWND hwnd,
+                                             UINT msg,
+                                             WPARAM wParam,
+                                             LPARAM lParam)
+{
+    BOOL result = FALSE;
+
     static APSInterface *pInterface;
   
     switch(msg)
@@ -656,23 +774,29 @@ static BOOL CALLBACK IntroWizardRelatable(HWND hwnd,
         {
             DRAWITEMSTRUCT* dis = (DRAWITEMSTRUCT*)lParam;
             UINT ctrlId = wParam;
-            const char* kMsg1 = "Thanks for using the Relatable-enabled FreeAmp player.\n"
-                                "Our music player features the Relatable Plug-in, designed to\n"
-                                "automatically generate personal playlists that are based on the files\n"
-                                "located on your computer and the music you listen to on the Web.\n"
-                                "The more you use our player, the better it works!\n\n"
-                                "To experience the power of Relatable...\n"
-                                "Select the \"Options\" tab, create and save your profile and then\n"
-                                "start listening to music.  After you have listened to just a few\n"
-                                "tunes, hit the button on the far right to view and listen to a\n"
-                                "recommended list of songs.\n\n"
-                                "Please note that your anonymous music profile is stored on\n"
-                                "Relatable's secure servers.  At Relatable, privacy is paramount:\n"
-                                "Your profile will NEVER be shared with third parties.  The\n"
-                                "Relatable Plug-in is an \"opt-in\" solution; if you don't want\n"
-                                "to use it don't create a profile.  Either way, enjoy the player!\n\n"
-                                "For more information, please review our 'Read-me' file or send\n"
-                                "questions to: freeamptest@relatable.com\n";
+            const char* kMsg1 = "Here's how to enjoy Relatable Features\n"
+                                "Relatable automatically generates personalized playlists that are\n"
+                                                               "based on the files located on your computer and the music you\n"
+                                                               "listen to on the Web. The more you use the player, the better it\n"
+                                                               "works! You can create a profile below, or you can select the\n"
+                                                               "'Profiles' tab under 'Options' and create and save multiple\n"
+                                                               "profiles. Then, just start listening to music. After you have\n"
+                                                               "listened for a while, hit the 'Suggest' button to view and listen\n"
+                                                               "to a recommended list of songs. You can also check out\n"
+                                                               "'Recommended Streams' on the music browser window.  Learn\n"
+                                                               "more about Relatable features in the help menu.\n\n"
+                                                           //"Collecting Audio Signatures\n"
+                                                           //"Relatable's audio recognition technology enables "the_BRANDING" to\n"
+                                                               //"create unique'signatures' for the music files on your hard drive.\n"
+                                                               //"It lets the player identify each song file, even if the file is not\n"
+                                                               //"properly tagged. This helps everyone receive recommendations, since the system is sure what music you have.\n"
+                                                           //"Signaturing will carry on in the background for a few minutes, and takes less\n"
+                                                           //"than 2 seconds per music file (and getting faster!). You can stop it by selecting\n"
+                                                           //"'Stop Signaturing' from the Relatable menu in 'My Music'.\n"
+                                                           "Check out the help menu for details on Relatable features, and for\n"
+                                                               "more information, please see our Web site or send questions to\n"
+                                                               "info@relatable.com";
+
             const char* kCaption1 = "Profile Name: ";
             switch(ctrlId)
             {
@@ -741,6 +865,19 @@ static BOOL CALLBACK IntroWizardRelatable(HWND hwnd,
 
             break;
         }
+        case WM_COMMAND:
+        {
+            switch(LOWORD(wParam))
+            {
+                case IDC_RELATABLE_WEB:
+                {
+                  ShellExecute(hwnd, "open", "http://beta.relatable.com", NULL,
+                               NULL, SW_SHOWNORMAL);
+                  break;
+                }
+            }
+            break;
+        }
         case WM_NOTIFY:
         {
             switch(((NMHDR*)lParam)->code)
@@ -794,7 +931,7 @@ static BOOL CALLBACK IntroWizardRelatable(HWND hwnd,
 bool MusicBrowserUI::IntroductionWizard(vector<string>* searchPaths,
                                         APSInterface *pInterface)
 {
-    PROPSHEETPAGE psp[3];
+    PROPSHEETPAGE psp[4];
     PROPSHEETHEADER psh;
 
     HINSTANCE hinst = (HINSTANCE)GetWindowLong(m_hWnd, GWL_HINSTANCE);
@@ -815,16 +952,25 @@ bool MusicBrowserUI::IntroductionWizard(vector<string>* searchPaths,
     psp[1].pszIcon = NULL;
     psp[1].pfnDlgProc = IntroWizardRelatable;
     psp[1].pszTitle = NULL;
-    psp[1].lParam = (LPARAM) pInterface;
+    psp[1].lParam = (LPARAM)0 ;
 
     psp[2].dwSize = sizeof(PROPSHEETPAGE);
     psp[2].dwFlags = 0;
     psp[2].hInstance = hinst;
-    psp[2].pszTemplate = MAKEINTRESOURCE(IDD_INTROWIZARD_SEARCH);
+    psp[2].pszTemplate = MAKEINTRESOURCE(IDD_INTROWIZARD_RELATABLETWO);
     psp[2].pszIcon = NULL;
-    psp[2].pfnDlgProc = IntroWizardSearch;
+    psp[2].pfnDlgProc = IntroWizardRelatableTwo;
     psp[2].pszTitle = NULL;
-    psp[2].lParam = (LPARAM)searchPaths;
+    psp[2].lParam = (LPARAM)pInterface;
+
+    psp[3].dwSize = sizeof(PROPSHEETPAGE);
+    psp[3].dwFlags = 0;
+    psp[3].hInstance = hinst;
+    psp[3].pszTemplate = MAKEINTRESOURCE(IDD_INTROWIZARD_SEARCH);
+    psp[3].pszIcon = NULL;
+    psp[3].pfnDlgProc = IntroWizardSearch;
+    psp[3].pszTitle = NULL;
+    psp[3].lParam = (LPARAM)searchPaths;
 
     psh.dwSize = sizeof(PROPSHEETHEADER);
     psh.dwFlags = PSH_PROPSHEETPAGE | PSH_WIZARD | PSH_NOAPPLYNOW;

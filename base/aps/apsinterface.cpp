@@ -31,6 +31,9 @@ ____________________________________________________________________________*/
 // Sometime: Stuff
 // 07/25/2000 : Lots of stuff/cruft/hallucinations cleaned up
 ///////////////////////////////////////////////////////////////////
+#ifdef WIN32
+#pragma warning(disable:4786)
+#endif
 
 #include "aps.h"
 #include "apsplaylist.h"
@@ -139,7 +142,7 @@ APSInterface::~APSInterface()
     }
 }
 
-int APSInterface::APSFillMetaData(APSMetaData* pmetaData, bool bUseCollection)
+int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
 {
     if (pmetaData == NULL) 
         return APS_PARAMERROR;
@@ -201,13 +204,19 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData, bool bUseCollection)
     return APS_NOERROR;
 }
 
-int APSInterface::APSLookupSignature(AudioSig *sig, string &strGUID)
+int APSInterface::APSLookupSignature(AudioSig *sig, string &strGUID, 
+                                     bool bUseCollection)
 {
     if (sig == NULL)
         return APS_PARAMERROR;
 
     m_pMutex->Acquire();
-    int nRes = m_pSigClient->GetSignature(sig, strGUID);
+
+    string strCollectionID = "EMPTY_COLLECTION";
+    if (bUseCollection && m_bRelatableOn && !m_strCollectionID.empty())
+        strCollectionID = m_strCollectionID;
+
+    int nRes = m_pSigClient->GetSignature(sig, strGUID, strCollectionID);
 
     fstream fout("sigs.txt", ios_base::out | ios_base::app);
     fout << "GetSignature returned: " << nRes << " and filled in " <<

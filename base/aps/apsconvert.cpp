@@ -20,6 +20,11 @@
         $Id$
 ____________________________________________________________________________*/
 
+#ifdef WIN32
+#pragma warning(disable:4786)
+#endif
+
+#include "config.h"
 #include "apsconvert.h"
 
 int BufSize(StreamList& TheVec)

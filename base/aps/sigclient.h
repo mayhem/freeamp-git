@@ -49,7 +49,8 @@ class SigClient
 public:
     SigClient();
    ~SigClient();
-    int GetSignature(AudioSig *sig, string &strGUID);
+    int GetSignature(AudioSig *sig, string &strGUID, 
+       	             string strCollectionID = "EMPTY_COLLECTION");
     void SetAddress(string strIP, int nPort) 
     { m_strIP = strIP; m_nPort = nPort; }
 

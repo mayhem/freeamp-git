@@ -87,15 +87,16 @@ public:
     virtual ~APSInterface(); // to be or not to be virtual....
        
     /** Submit an AudioSig structure to the Signature server, and get the
-        corresponding GUID */
-    int APSLookupSignature(AudioSig *sig, string &strGUID);
+        corresponding GUID. Option bUseCollection associates item to a
+        music collection, for narrowing recommendations by what is 
+        available on a given machine. */
+    int APSLookupSignature(AudioSig *sig, string &strGUID, 
+                           bool bUseCollection = true);
 
     /** Attempts to finish filling in the metadata Record, 
         by comparing the record/filenames against a master music 
-        database. Optional bUseCollection associates item to a music 
-        collection, for narrowing recommendations by what is available
-        on a given machine. */ 
-    int APSFillMetaData(APSMetaData* pmetaData, bool bUseCollection = true);
+        database. */ 
+    int APSFillMetaData(APSMetaData* pmetaData);
        
     // Playlist Submission/Sorting/Generation Functions
     /** Used to generate a playlist. pPlayList is an optional
@@ -190,7 +191,7 @@ private:
                                      // empty for non opt in clients.
     string m_strCollectionID;        // collection id of current music 
                                      // collection, so that you aren't
-                                     // recommended suff that isn't on your
+                                     // recommended stuff that isn't on your
                                      // HD or streamable ;)
     map<string, string>* m_pProfileMap; // map of profile names-profile GUIDs
     Mutex *m_pMutex;                 // Mutex for thread saftey

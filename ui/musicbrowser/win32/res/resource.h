@@ -40,6 +40,7 @@
 #define IDB_STREAMS                     136
 #define IDB_CD                          137
 #define IDD_INTROWIZARD_RELATABLE       138
+#define IDD_INTROWIZARD_RELATABLETWO    139
 #define IDB_RELATABLE                   141
 #define IDI_WARN                        207
 #define IDD_OPENURL                     219
@@ -92,13 +93,16 @@
 #define IDC_LOCATIONTEXT                1039
 #define IDC_RADIO1                      1040
 #define IDC_REMOVE                      1040
+#define IDC_RELATABLE_YES               1040
 #define IDC_RADIO2                      1041
 #define IDC_LOCATE                      1041
 #define IDC_DESCRIPTION                 1041
+#define IDC_RELATABLE_NO                1041
 #define IDC_EDIT1                       1042
 #define IDC_PATH                        1042
 #define IDC_CHECK                       1042
 #define IDC_BUTTON1                     1043
+#define IDC_RELATABLE_WEB               1043
 #define IDC_RADIO3                      1044
 #define IDC_EDIT2                       1045
 #define IDC_MISSINGTRACK                1045
