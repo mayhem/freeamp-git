@@ -45,12 +45,7 @@ class SetPlayListEvent : public Event {
 
 class MediaInfoEvent : public Event {
  public:
-    Id3TagInfo m_tagInfo;
-    int32 m_totalFrames;
-    int32 m_bytesPerFrame;
-    int32 m_bps;
-    int32 m_freq;
-    float m_totalTime;
+    float m_totalSeconds;
     int32 m_indexOfSong;
     int32 m_totalSongs;
     char m_songTitle[512];
@@ -58,20 +53,10 @@ class MediaInfoEvent : public Event {
     virtual ~MediaInfoEvent() {}
     MediaInfoEvent( const char *t,
                     const char *fn, 
-                    int32 tf, 
-                    int32 bpf, 
-                    int32 bitspersecond, 
-                    int32 fr, 
-                    float tt, 
-                    Id3TagInfo &tag) 
+                    float ts)
     {
-	m_type = INFO_MediaInfo;
-        m_tagInfo = tag;
-        m_totalFrames = tf;
-        m_bytesPerFrame = bpf;
-        m_bps = bitspersecond;
-        m_freq = fr;
-        m_totalTime = tt;
+		m_type = INFO_MediaInfo;
+        m_totalSeconds = ts;
         m_indexOfSong = 0;
         m_totalSongs = 0;
 
@@ -120,6 +105,45 @@ class LMCErrorEvent : public Event {
     LogicalMediaConverter *GetLMC() { return m_lmc; }
     Error GetError() { return m_error; }
     virtual ~LMCErrorEvent() {}
+};
+
+class MpegInfoEvent : public Event {
+public:
+	enum {LAYER_1=1,LAYER_2,LAYER_3};
+	enum {MPEG_1=1,MPEG_2=2, MPEG_25=3};
+private:
+    int32 m_totalFrames;
+    int32 m_bytesPerFrame;
+    int32 m_bitrate;
+    int32 m_sampleRate;
+	int32 m_layer;
+	int32 m_mpeg;
+public:
+	MpegInfoEvent(int32 tf, int32 bpf, int32 br,int32 sr,int32 layer,int32 mpeg) { 
+		m_type = INFO_MPEGInfo; 
+		m_totalFrames = tf;
+		m_bytesPerFrame = bpf;
+		m_bitrate = br;
+		m_sampleRate = sr;
+		m_layer = layer;
+		m_mpeg = mpeg;
+	}
+	int32 GetTotalFrames() { return m_totalFrames; }
+	int32 GetBytesPerFrame() { return m_bytesPerFrame; }
+	int32 GetBitRate() { return m_bitrate; }
+	int32 GetSampleRate() { return m_sampleRate; }
+	int32 GetLayer() { return m_layer; }
+	int32 GetMpegVersion() { return m_mpeg; }
+	virtual ~MpegInfoEvent() {}
+
+};
+
+class ID3TagEvent : public Event {
+private:
+	Id3TagInfo m_tagInfo;
+public:
+	ID3TagEvent(Id3TagInfo &t) { m_type = INFO_ID3TagInfo; Id3TagInfo m_tagInfo = t; }
+	virtual ~ID3TagEvent() {}
 };
 #endif /* _EVENTDATA_H_ */
 

@@ -180,7 +180,28 @@ AcceptEvent(Event* event)
 
 	            break; 
             }
+			case INFO_MPEGInfo: 
+				{
+					MpegInfoEvent *info = (MpegInfoEvent *)event;
+					char szTemp[256];
+                sprintf(szTemp, "%d kbps",  info->GetBitRate()/1000);
+                SendMessage(m_hwndStatus, 
+						    SB_SETTEXT, 
+						    0, 
+						    (LPARAM)szTemp);
 
+                sprintf(szTemp, "%.1f kHz",  ((float)info->GetSampleRate())/1000);
+			    SendMessage(m_hwndStatus, 
+						    SB_SETTEXT, 
+						    1, 
+						    (LPARAM) szTemp);
+                SendMessage(m_hwndSlider,
+						    TBM_SETRANGE,
+						    (WPARAM)TRUE,
+						    MAKELPARAM(0, info->GetTotalFrames()));
+				
+				break;
+				}
             case INFO_MediaInfo: 
             {
                 MediaInfoEvent *info = (MediaInfoEvent*)event;
@@ -192,7 +213,7 @@ AcceptEvent(Event* event)
                 SetWindowText(m_hwndCurrent, timeString);
 
 
-                int32 seconds = (int32)ceil(info->m_totalTime);
+                int32 seconds = (int32)ceil(info->m_totalSeconds);
 			    int32 hours = seconds / 3600;
 			    int32 minutes = seconds / 60 - hours * 60;
 			    seconds = seconds - minutes * 60 - hours * 3600;
@@ -205,17 +226,6 @@ AcceptEvent(Event* event)
 			    SetWindowText(m_hwndTotal, timeString);
 
 
-                sprintf(szTemp, "%d kbps",  info->m_bps/1000);
-                SendMessage(m_hwndStatus, 
-						    SB_SETTEXT, 
-						    0, 
-						    (LPARAM)szTemp);
-
-                sprintf(szTemp, "%.1f kHz",  ((float)info->m_freq)/1000);
-			    SendMessage(m_hwndStatus, 
-						    SB_SETTEXT, 
-						    1, 
-						    (LPARAM) szTemp);
 
                 sprintf(szTemp, "%d of %d", info->m_indexOfSong,info->m_totalSongs);
 			    SendMessage(m_hwndStatus, 
@@ -223,10 +233,6 @@ AcceptEvent(Event* event)
 						    2, 
 						    (LPARAM) szTemp);
 
-                SendMessage(m_hwndSlider,
-						    TBM_SETRANGE,
-						    (WPARAM)TRUE,
-						    MAKELPARAM(0, info->m_totalFrames));
 		
 			    SendMessage(m_hwndSlider,
 						    TBM_SETPOS,

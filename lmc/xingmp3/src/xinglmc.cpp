@@ -127,7 +127,7 @@ Error XingLMC::InitDecoder() {
 	m_audioMethods = audio_table[0][0];  // not integer, non 8 bit mode
 
 	{ // send track info (there is more info to be gotten, see towave.c : out_mpeg_info
-	    static int sr_table[8] =
+	    static int sample_rate_table[8] =
 	    {22050L, 24000L, 16000L, 1L,
 	     44100L, 48000L, 32000L, 1L};
 
@@ -135,7 +135,6 @@ Error XingLMC::InitDecoder() {
 	    int32 bytesPerFrame = m_frameBytes;
 	    int32 backhere;
 	    Error error = m_input->Seek(backhere,0,SEEK_FROM_CURRENT);
-//	    cout << "Back here: " << backhere << endl;
 	    if (IsError(error)) { return (Error)lmcError_ID3ReadFailed; }
 	    int32 end;
 	    error = m_input->Seek(end,0,SEEK_FROM_END);
@@ -156,30 +155,48 @@ Error XingLMC::InitDecoder() {
  	    if (IsError(error)) { return (Error)lmcError_ID3ReadFailed; }
 
 	    totalFrames = end / bytesPerFrame;
+		int32 sampRateIndex = 4*head.id+head.sr_index;
+	    int32 samprate = sample_rate_table[sampRateIndex];
+		if ((head.sync & 1) == 0)
+			samprate = samprate / 2;	// mpeg25
+		double milliseconds_per_frame = 0;
+		static int32 l[4] = {25,3,2,1};
+		int32 layer = l[head.option];
+		static double ms_p_f_table[3][3] = {
+											{8.707483f,  8.0f, 12.0f},
+											{26.12245f, 24.0f, 36.0f},
+											{26.12245f, 24.0f, 36.0f}
+		};
+		milliseconds_per_frame = ms_p_f_table[sampRateIndex][layer-1];
+		
+		float totalSeconds = (float)((double)totalFrames * (double)milliseconds_per_frame * 1000);
 
-	    double tpf = (double)1152 / (double)(44100 << 0);
-	    float totalTime = (float)((double)totalFrames * (double)tpf);
-
-	    char *pbitrate = new char[64];
-	    char *psamprate = new char[64];
-	    sprintf(pbitrate,"%d kbits/s",bitrate/1000);
-	    int32 samprate = sr_table[4*head.id+head.sr_index];
-	    if ((head.sync & 1) == 0) samprate = samprate / 2;
-	    sprintf(psamprate,"%d Hz",samprate);
 	    MediaInfoEvent *mvi = new MediaInfoEvent(m_input->Url(),
                                                  m_input->Url(),
-                                                 totalFrames,
-                                                 bytesPerFrame,
-                                                 bitrate,samprate,
-                                                 totalTime, 
-                                                 tag_info);
+												 totalSeconds);
 
 	    if (mvi) {
 		if (m_target)
 		    m_target->AcceptEvent(mvi);
+			mvi = NULL;
 	    } else {
 		return kError_OutOfMemory;
 	    }
+		ID3TagEvent *ite = new ID3TagEvent(tag_info);
+		if (ite) {
+			if (m_target) m_target->AcceptEvent(ite);
+			ite = NULL;
+		} else {
+			return kError_OutOfMemory;
+		}
+
+		MpegInfoEvent *mie = new MpegInfoEvent(totalFrames,m_frameBytes, bitrate, samprate, layer, ((head.sync & 1)==0)? 2:1);
+		if (mie) {
+			if (m_target) m_target->AcceptEvent(mie);
+			mie = NULL;
+		} else {
+			return kError_OutOfMemory;
+		}
 	}
 	
 	
@@ -206,7 +223,7 @@ Error XingLMC::InitDecoder() {
 //	    info.max_buffer_size = PCM_BUFBYTES;
 	    Error error = m_output->Init(&info);
 	    if (error != kError_NoErr) {
-		cout << "output init failed: " << m_output->GetErrorString(error) << endl;
+		//cout << "output init failed: " << m_output->GetErrorString(error) << endl;
 		return (Error)lmcError_OutputInitializeFailed;
 	    }
 
@@ -485,7 +502,12 @@ Error XingLMC::ChangePosition(int32 position) {
 //	m_bsBufPtr = &(m_bsBufPtr[pBuf]);
 	m_frameCounter = position;
 	m_pcmBufBytes = 0;
-
+	m_audioMethods.decode_init(  &head,
+								 m_frameBytes,
+								 0 /* reduction code */,
+								 0 /* transform code (ignored) */,
+								 0 /* convert code */, 
+			   					 24000 /* freq limit */);
 //    unsigned char buf[1024];
 //    int pBuf = 0;
 //    while ((m_bsBufPtr[pBuf] != 0xFF) && ((m_bsBufPtr[pBuf+1] & 0xF0) != 0xF0)) pBuf++;

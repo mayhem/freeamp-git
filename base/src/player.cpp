@@ -698,7 +698,8 @@ int32 Player::ServiceEvent(Event *pC) {
             return 0;
 		    break; 
 	    }
-	    
+		case INFO_ID3TagInfo:
+		case INFO_MPEGInfo:
 	    case INFO_MediaTimeInfo: {
             if(m_playerState == STATE_Playing)
             {

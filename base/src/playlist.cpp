@@ -93,7 +93,7 @@ void PlayList::Add(char *pc, int type) {
 	if (count > 1) {
 	    first = (int32)(((double) count * rand()) / (RAND_MAX+1.0));
 	    second = (int32)(((double) count * rand()) / (RAND_MAX+1.0));
-	    m_pMediaElems->Swap(first,second);
+	    //m_pMediaElems->Swap(first,second);
 	    m_pOrderList->Swap(first,second);
 	    if (m_current == first) {
 	    m_current = second;
