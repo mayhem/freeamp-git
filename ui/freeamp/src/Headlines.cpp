@@ -143,7 +143,7 @@ void Headlines::WorkerThread(void)
                                        m_oHeadlines[m_iIndex].c_str()));
             m_iIndex++;
         }
-        Sleep(m_oInfo.m_iHeadlineChangeInterval * 1000);
+        usleep(m_oInfo.m_iHeadlineChangeInterval * 1000000);
     }
 }
 
