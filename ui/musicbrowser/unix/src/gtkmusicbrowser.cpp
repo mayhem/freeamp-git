@@ -592,6 +592,8 @@ void GTKMusicBrowser::CreatePlaylist(void)
 
     CreateExpanded();
 
+    UpdateCatalog();
+
     SetClickState(kContextNone);
     gtk_widget_show(musicBrowser);
 
@@ -1251,14 +1253,12 @@ GTKMusicBrowser::~GTKMusicBrowser(void)
 
 void GTKMusicBrowser::ShowMusicBrowser(void)
 {
-    bool first_time = false;
     
     gdk_threads_enter();
     isVisible = true;
     if (m_initialized)
         gtk_widget_show(musicBrowser);
     else {
-        first_time = true;
         CreatePlaylist();
         m_initialized = true;
     }
@@ -1362,10 +1362,11 @@ Error GTKMusicBrowser::AcceptEvent(Event *e)
                 AddFileCMD();
             break; }
         case CMD_EditCurrentPlaylistItemInfo: {
-            if (master) {
+            PlaylistItem *editee = m_plm->GetCurrentItem();
+            if (master && editee) {
                 gdk_threads_enter();
                 PopUpInfoEditor(m_plm->GetCurrentItem());
-                gdk_threads_enter();
+                gdk_threads_leave();
             }
             break; }
         case INFO_Playing: {
