@@ -25,6 +25,7 @@ ____________________________________________________________________________*/
 #define INCLUDED_MBCD_H
 
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -53,6 +54,7 @@ class MusicBrainzCD : public MetaDataFormat {
     bool    LookupCD(void);
 
     musicbrainz_t o;
+    vector<int> m_trackLens;
 };
 
 #endif

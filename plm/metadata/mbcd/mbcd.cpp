@@ -123,7 +123,7 @@ bool MusicBrainzCD::ReadMetaData(const char* url, MetaData* metadata)
     }
 
     metadata->SetTrack(track);
-    metadata->SetTime(0);
+    metadata->SetTime(m_trackLens[track - 1]);
 
     if (track == numTracks)
     {
@@ -136,10 +136,35 @@ bool MusicBrainzCD::ReadMetaData(const char* url, MetaData* metadata)
 
 bool MusicBrainzCD::LookupCD(void)
 {
-    char          error[iDataLen];
+    char          error[iDataLen], trackLens[1024], *ptr;
     int           ret;
 
     mb_SetServer(o, "www.musicbrainz.org", 80);
+
+    ret = mb_Query(o, MB_GetCDTOC);
+    if (!ret)
+    {
+       mb_GetQueryError(o, error, iDataLen);
+       //m_context->target->AcceptEvent(new BrowserMessage(error));
+       printf("%s\n", error);
+       return false;
+    }
+
+    if (!mb_Select(o, MB_SelectLocalQuery))
+    {
+       return false;
+    }
+    if (!mb_GetResultData(o, MB_LocalGetTrackLengths, trackLens, 1024))
+    {
+       mb_GetQueryError(o, error, iDataLen);
+       printf("\n\nCannot get track lengths: %s\n", error);
+       return false;
+    }
+
+    m_trackLens.clear();
+    for(ptr = strtok(trackLens, " "); ptr; ptr = strtok(NULL, " "))
+       m_trackLens.push_back(atoi(ptr));
+
     ret = mb_Query(o, MB_GetCDInfo);
     if (!ret)
     {
