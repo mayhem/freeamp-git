@@ -243,7 +243,7 @@ XingLMC()
     m_bsBuffer = NULL;
     m_bsBufPtr = m_bsBuffer;
     m_bsBuffer = new unsigned char[BS_BUFBYTES];
-
+	m_pcmBuffer = NULL;
     m_frameCounter = 0;
     m_frameWaitTill = 0;
     actually_decode = 0;

@@ -441,8 +441,11 @@ bool Player::SetState(PlayerState ps) {
 
 #define SEND_NORMAL_EVENT(e)  { Event *ev = new Event(e); GetUIManipLock(); SendToUI(ev); ReleaseUIManipLock(); delete ev;}
 
+#ifndef WIN32
 #define DISPLAY_ERROR(s,e) { if (e & 0xFFFF0000) { cout << s->GetErrorString(e) << endl;} else { cout << "Error Number " << e << endl; } }
-
+#else
+#define DISPLAY_ERROR(s,e) { if (e & 0xFFFF0000) { MessageBox(NULL,s->GetErrorString(e),NULL,MB_OK);} else { char foo[1024];sprintf(foo,"ErrorNumber %d",e); MessageBox(NULL,foo,NULL,MB_OK); } }
+#endif
 int32 Player::ServiceEvent(Event *pC) {
     if (pC) {
 	//cout << "Player: serviceEvent: servicing Event: " << pC->Type() << endl;
