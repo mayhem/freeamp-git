@@ -74,15 +74,34 @@ dnl Check for LinuxThreads or MIT pthreads
 dnl *****
 
 AC_MSG_CHECKING(for MIT PThreads)
-AC_EGREP_HEADER(PTHREAD_MUTEXTYPE_FAST, pthread.h,AC_DEFINE(HAVE_MITPTHREADS) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+AC_EGREP_HEADER(PTHREAD_MUTEXTYPE_FAST,
+pthread.h,AC_DEFINE(HAVE_MITPTHREADS) AC_MSG_RESULT(yes), 
+AC_MSG_RESULT(no)
+mitpth="true"
+)
 
 AC_MSG_CHECKING(for Base LinuxThreads)
 AC_EGREP_HEADER(PTHREAD_MUTEX_FAST_NP,pthread.h, AC_DEFINE(HAVE_BASELINUXTHREADS) 
 hblt=true
-AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+AC_MSG_RESULT(yes), 
+AC_MSG_RESULT(no)
+ltr="true"
+)
 
 AC_MSG_CHECKING(for LinuxThreads w/ErrorCheck Mutex)
-AC_EGREP_HEADER(PTHREAD_MUTEX_ERRORCHECK_NP,pthread.h,AC_DEFINE(HAVE_ENHLINUXTHREADS) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+AC_EGREP_HEADER(PTHREAD_MUTEX_ERRORCHECK_NP,pthread.h,AC_DEFINE(HAVE_ENHLINUXTHREADS)
+AC_MSG_RESULT(yes), 
+AC_MSG_RESULT(no)
+ltr="true"
+)
+
+if test "$mitpth" = "false"; then
+   if test "$ltr" = "false"; then
+      echo "Can't find MIT PThreads or LinuxThreads complete development headers in /usr/include or /usr/local/include"
+      echo "Configure will stop."
+      exit 1
+   fi 
+fi
 
 dnl *****
 
@@ -109,7 +128,7 @@ AM_CONDITIONAL(AM_ENABLE_GTK, test "$gtk" = "true")
 AM_CONDITIONAL(AM_HAVE_WIN32, test "$target_os" = "windowsnt")
 AM_CONDITIONAL(AM_HAVE_LINUX, test "$target_os" = "linux")
 AC_OUTPUT(Makefile base/Makefile base/src/Makefile io/Makefile
-          base/unix/Makefile 
+          base/unix/Makefile lmc/mpg123/Makefile
 	  ui/Makefile base/unix/linux/Makefile base/unix/linux/src/Makefile
 	  io/local/Makefile ui/cmdline/Makefile lmc/Makefile lmc/xingmp3/Makefile
 	  lmc/xingmp3/src/Makefile lmc/src/Makefile io/src/Makefile ui/src/Makefile

@@ -1759,14 +1759,16 @@ EOF
 else
   rm -rf conftest*
   echo "$ac_t""no" 1>&6
+mitpth="true"
+
 fi
 rm -f conftest*
 
 
 echo $ac_n "checking for Base LinuxThreads""... $ac_c" 1>&6
-echo "configure:1768: checking for Base LinuxThreads" >&5
+echo "configure:1770: checking for Base LinuxThreads" >&5
 cat > conftest.$ac_ext <<EOF
-#line 1770 "configure"
+#line 1772 "configure"
 #include "confdefs.h"
 #include <pthread.h>
 EOF
@@ -1782,14 +1784,16 @@ echo "$ac_t""yes" 1>&6
 else
   rm -rf conftest*
   echo "$ac_t""no" 1>&6
+ltr="true"
+
 fi
 rm -f conftest*
 
 
 echo $ac_n "checking for LinuxThreads w/ErrorCheck Mutex""... $ac_c" 1>&6
-echo "configure:1791: checking for LinuxThreads w/ErrorCheck Mutex" >&5
+echo "configure:1795: checking for LinuxThreads w/ErrorCheck Mutex" >&5
 cat > conftest.$ac_ext <<EOF
-#line 1793 "configure"
+#line 1797 "configure"
 #include "confdefs.h"
 #include <pthread.h>
 EOF
@@ -1799,13 +1803,24 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
   cat >> confdefs.h <<\EOF
 #define HAVE_ENHLINUXTHREADS 1
 EOF
- echo "$ac_t""yes" 1>&6
+
+echo "$ac_t""yes" 1>&6
 else
   rm -rf conftest*
   echo "$ac_t""no" 1>&6
+ltr="true"
+
 fi
 rm -f conftest*
 
+
+if test "$mitpth" = "false"; then
+   if test "$ltr" = "false"; then
+      echo "Can't find MIT PThreads or LinuxThreads complete development headers in /usr/include or /usr/local/include"
+      echo "Configure will stop."
+      exit 1
+   fi 
+fi
 
 
 
@@ -1978,7 +1993,7 @@ ac_given_srcdir=$srcdir
 ac_given_INSTALL="$INSTALL"
 
 trap 'rm -fr `echo "Makefile base/Makefile base/src/Makefile io/Makefile
-          base/unix/Makefile 
+          base/unix/Makefile lmc/mpg123/Makefile
 	  ui/Makefile base/unix/linux/Makefile base/unix/linux/src/Makefile
 	  io/local/Makefile ui/cmdline/Makefile lmc/Makefile lmc/xingmp3/Makefile
 	  lmc/xingmp3/src/Makefile lmc/src/Makefile io/src/Makefile ui/src/Makefile
@@ -2099,7 +2114,7 @@ EOF
 cat >> $CONFIG_STATUS <<EOF
 
 CONFIG_FILES=\${CONFIG_FILES-"Makefile base/Makefile base/src/Makefile io/Makefile
-          base/unix/Makefile 
+          base/unix/Makefile lmc/mpg123/Makefile
 	  ui/Makefile base/unix/linux/Makefile base/unix/linux/src/Makefile
 	  io/local/Makefile ui/cmdline/Makefile lmc/Makefile lmc/xingmp3/Makefile
 	  lmc/xingmp3/src/Makefile lmc/src/Makefile io/src/Makefile ui/src/Makefile

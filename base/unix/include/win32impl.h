@@ -25,7 +25,7 @@ class WIN32_FIND_DATA {
     char cAlternateFileName[ 14 ];
 };
 
-typedef int HANDLE;
+typedef void *HANDLE;
 #define INVALID_HANDLE_VALUE ((HANDLE)-1)
 typedef void *HMODULE;
 #define HINSTANCE HMODULE

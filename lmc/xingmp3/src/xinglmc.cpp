@@ -260,6 +260,7 @@ Error XingLMC::InitDecoder() {
 	    info.bits_per_sample = decinfo.bits;
 	    info.number_of_channels = decinfo.channels;
 	    info.samples_per_second = decinfo.samprate;
+	    cout << "sampersec : " << decinfo.samprate;
 	    info.max_buffer_size = (info.number_of_channels * 2 * 1152) << 2;
 //	    info.max_buffer_size = PCM_BUFBYTES;
 	    Error error = m_output->Init(&info);
