@@ -53,6 +53,8 @@ public:
     BBitmap*            GetBBitmap( void ) { return m_bitmap; }
     BView*              OffscreenView( void ) { return m_offView; }
 
+    const char*         Name( void ) const { return m_oBitmapName.c_str(); }
+
 protected:
 
 private:

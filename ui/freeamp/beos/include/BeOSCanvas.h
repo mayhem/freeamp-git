@@ -54,11 +54,13 @@ public:
                                   Rect& oDestRec );
     virtual Error       MaskBlitRect( Bitmap* pSrcBitmap, Rect& oSrcRect,
                                       Rect& oDestRect );
+    virtual void        InitBackgrounds( vector<Panel*>* panels );
 
     BView*              GetBView( void ) { return m_canvasView; }
     void                SetParent( BeOSWindow* parent );
 
 protected:
+    void                InitBufferBitmap( void );
 
 private:
     BeOSWindow*         m_pParent;

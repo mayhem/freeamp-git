@@ -51,22 +51,9 @@ BeOSCanvas::~BeOSCanvas()
 void
 BeOSCanvas::Init( void )
 {
-    CHECK_POINT_MSG( "Init" );
-
     if ( m_initialized ) return;
 
     Rect destRect;
-
-    m_pBufferBitmap = new BeOSBitmap(
-                            m_oBGRect.Width(),
-                            m_oBGRect.Height(),
-                            string( "BufferBitmap" ),
-                            true // has offscreen BView for text rendering
-                            );
-    destRect.x1 = destRect.y1 = 0;
-    destRect.x2 = m_oBGRect.Width();
-    destRect.y2 = m_oBGRect.Height();
-    m_pBufferBitmap->MaskBlitRect( m_pBGBitmap, m_oBGRect, destRect );
 
     m_canvasView = new CanvasView(
                         m_pParent,
@@ -75,7 +62,8 @@ BeOSCanvas::Init( void )
                         B_FOLLOW_NONE,
                         B_WILL_DRAW
                         );
-    m_canvasView->SetCanvasBitmap( m_pBufferBitmap->GetBBitmap() );
+
+    InitBufferBitmap();
 
     m_initialized = true;
 }
@@ -83,7 +71,6 @@ BeOSCanvas::Init( void )
 void
 BeOSCanvas::Erase( Rect& oPaintRect )
 {
-    CHECK_POINT_MSG( "Erase" );
     if ( m_pBufferBitmap )
     {
         m_pBufferBitmap->MaskBlitRect( m_pBGBitmap, oPaintRect, oPaintRect );
@@ -99,8 +86,6 @@ BeOSCanvas::RenderText( int iFontHeight, Rect& oClipRect,
                         Font* pFont, const Color& oColor,
                         bool bBold, bool bItalic, bool bUnderline )
 {
-    CHECK_POINT_MSG( "RenderText" );
-
     Erase( oClipRect );
 
     BView* v = m_pBufferBitmap->OffscreenView();
@@ -166,8 +151,6 @@ BeOSCanvas::RenderOffsetText( int iFontHeight, Rect& oClipRect,
                               bool bBold, bool bItalic,
                               bool bUnderline )
 {
-    CHECK_POINT_MSG( "RenderOffsetText" );
-
     Erase( oClipRect );
 
     BView* v = m_pBufferBitmap->OffscreenView();
@@ -207,13 +190,13 @@ BeOSCanvas::RenderOffsetText( int iFontHeight, Rect& oClipRect,
     if ( iOffset > width )
     {
         bitmap->Unlock();
-        return width - iOffset;
+        return int( width ) - iOffset;
     }
 
     v->MovePenTo( float(oClipRect.x1 - iOffset),
                   float(oClipRect.y2 - fontHeight.descent) );
     v->DrawString( oText.c_str() );
-    int ret = width - iOffset - oClipRect.Width();
+    int ret = int( width ) - iOffset - oClipRect.Width();
     if ( ret < 0 )
     {
         v->MovePenTo( float(oClipRect.x1 - iOffset + width),
@@ -232,7 +215,6 @@ BeOSCanvas::RenderOffsetText( int iFontHeight, Rect& oClipRect,
 Error
 BeOSCanvas::Invalidate( Rect& oRect )
 {
-    CHECK_POINT_MSG( "Invalidate" );
     if ( m_canvasView->Window() )
     {
         if ( m_canvasView->LockLooper() )
@@ -251,16 +233,14 @@ BeOSCanvas::Invalidate( Rect& oRect )
 Error
 BeOSCanvas::Update( void )
 {
-    CHECK_POINT_MSG( "Update" );
-    if ( m_canvasView->Window() )
+    if ( m_canvasView->Window() && m_canvasView->LockLooper() )
     {
-        m_canvasView->LockLooper();
         m_canvasView->Invalidate();
         m_canvasView->UnlockLooper();
     }
     else
     {
-        CHECK_POINT_MSG( "no window??" );
+        CHECK_POINT_MSG( "locklooper error or no window??" );
         return kError_NullValueInvalid;
     }
     return kError_NoErr;
@@ -269,8 +249,6 @@ BeOSCanvas::Update( void )
 Error
 BeOSCanvas::BlitRect( Bitmap* pSrcBitmap, Rect& oSrcRect, Rect& oDestRec )
 {
-    CHECK_POINT_MSG( "BlitRect" );
-
     if ( !m_pBufferBitmap ) return kError_NoErr;
 
     return m_pBufferBitmap->BlitRect( pSrcBitmap, oSrcRect, oDestRec );
@@ -279,11 +257,53 @@ BeOSCanvas::BlitRect( Bitmap* pSrcBitmap, Rect& oSrcRect, Rect& oDestRec )
 Error
 BeOSCanvas::MaskBlitRect( Bitmap* pSrcBitmap, Rect& oSrcRect, Rect& oDestRec )
 {
-    CHECK_POINT_MSG( "MaskBlitRect" );
-
     if ( !m_pBufferBitmap ) return kError_NoErr;
 
     return m_pBufferBitmap->MaskBlitRect( pSrcBitmap, oSrcRect, oDestRec );
+}
+
+void
+BeOSCanvas::InitBackgrounds( vector<Panel*>* panels )
+{
+    Canvas::InitBackgrounds( panels );
+
+    PRINT(( "pBGBitmap = %x\n", m_pBGBitmap ));
+    InitBufferBitmap();
+}
+
+void
+BeOSCanvas::InitBufferBitmap( void )
+{
+    bool needToUnlock = false;
+    if ( m_canvasView && m_canvasView->Window() )
+    {
+        if ( !( needToUnlock = m_canvasView->LockLooper() ) )
+        {
+            DEBUGGER( "Geez, LockLooper failed" );
+        }
+    }
+
+    if ( m_pBufferBitmap )
+    {
+        delete m_pBufferBitmap;
+    }
+
+    m_pBufferBitmap = new BeOSBitmap(
+                        m_oBGRect.Width(),
+                        m_oBGRect.Height(),
+                        string( "BufferBitmap" ),
+                        true // has offscreen BView for text rendering
+                        );
+    m_pBufferBitmap->BlitRect( m_pBGBitmap, m_oBGRect, m_oBGRect );
+
+    if ( m_canvasView )
+    {
+        m_canvasView->SetCanvasBitmap( m_pBufferBitmap->GetBBitmap() );
+        if ( needToUnlock )
+        {
+            m_canvasView->UnlockLooper();
+        }
+    }
 }
 
 void
