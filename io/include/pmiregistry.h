@@ -27,10 +27,10 @@ ____________________________________________________________________________*/
 #include "config.h"
 #include "registry.h"
 
-class PMIInfo : public RegistryInfo {
+class PMIItem : public RegistryItem {
  public:
-    PMIInfo(){}
-    ~PMIInfo(){}
+    PMIItem();
+    ~PMIItem();
 };
 
 class PMIRegistry : public Registry{

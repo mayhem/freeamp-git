@@ -29,10 +29,132 @@ ____________________________________________________________________________*/
 #include <iostream.h>
 
 /* Project Includes */
+#include "config.h"
 #include "registrar.h"
 #include "utility.h"
+#include "error.h"
 
-Error RegisterLMCs(LMCRegistry* registry)
+Error 
+Registrar::
+InitializeRegistry(Registry* registry)
+{
+    Error error = kError_NoErr;
+    char dir[MAX_PATH];
+
+    if(registry == NULL)
+        error = kError_InvalidParam;
+
+    if(m_search == NULL)
+        error = kError_InvalidParam;
+
+    if(m_subdir == NULL)
+        error = kError_InvalidParam;
+
+    if(IsntError(error))
+        error = GetInstallDirectory(dir, sizeof(dir));
+
+    if(IsntError(error))
+    {
+        WIN32_FIND_DATA find;
+        HANDLE handle;
+        char search[MAX_PATH];
+
+        if(*m_subdir != DIR_MARKER)
+            strcat(dir, DIR_MARKER_STR);
+
+        strcat(dir, m_subdir);
+
+        strcpy(search, dir);
+
+        if(*m_search != DIR_MARKER)
+            strcat(search, DIR_MARKER_STR);
+
+        strcat(search, m_search);
+
+        handle = FindFirstFile(search, &find);
+
+        if(handle != INVALID_HANDLE_VALUE)
+        {
+            do
+            {
+                char file[MAX_PATH];
+
+                sprintf(file, "%s\\%s", dir, find.cFileName);
+
+                RegistryItem* item = new RegistryItem;
+
+                item->SetPath(file);
+                item->SetName(find.cFileName);
+                item->SetDescription(find.cFileName);
+
+                HMODULE module = NULL;
+                error = kError_LoadLibFailed;
+
+                module = LoadLibrary(file);
+            
+                if(module)
+                {
+                    InitializeFunction init = NULL;
+                    error = kError_FindFuncFailed;
+
+                    item->SetModule(module);
+
+                    init = (InitializeFunction)GetProcAddress(module, "Initialize");
+
+                    if(init)
+                    {
+                        error = kError_NoErr;
+                        item->SetInitFunction(init);
+                    }
+                }
+                
+                if(IsntError(error))
+                    registry->Add(item);
+                else
+                {
+                    if(module)
+                        FreeLibrary(module);
+
+                    delete item;
+                }
+
+                //MessageBox(NULL, file, "Found File", MB_OK);
+                
+            }while(FindNextFile(handle, &find));
+
+            FindClose(handle);
+        }
+        else
+        {
+            error = kError_NoFiles;
+        }
+    }
+
+    return error;
+}
+
+Error 
+Registrar::
+CleanupRegistry(Registry* registry)
+{
+    Error           error   = kError_NoErr;
+    RegistryItem*   item    = NULL;
+    int32           index   = 0;
+
+    while(item = registry->GetItem(index++))
+    {
+        HMODULE module = NULL;
+
+        module = (HMODULE)item->Module();
+
+        if(module)
+            FreeLibrary(module);
+    }
+ 
+    return error;
+}
+/*
+Error InitializeLMCRegistry(LMCRegistry* registry)
 {
     Error error = kError_NoErr;
     char dir[MAX_PATH];
@@ -62,12 +184,32 @@ Error RegisterLMCs(LMCRegistry* registry)
 
                 sprintf(file, "%s\\%s", dir, find.cFileName);
 
-                LMCInfo* info = new LMCInfo;
+                LMCItem* item = new LMCItem;
 
-                info->SetPath(file);
-                info->SetDescription(find.cFileName);
+                item->SetPath(file);
+                item->SetName(find.cFileName);
+                item->SetDescription(find.cFileName);
 
-                registry->Add(info);
+                HMODULE module = NULL;
+                error = kError_LoadLibFailed;
+
+                module = LoadLibrary(file);
+            
+                if(module)
+                {
+                    InitializeFunction init = NULL;
+                    error = kError_FindFuncFailed;
+
+                    init = (InitializeFunction)GetProcAddress(module, "Initialize");
+
+                    if(init)
+                        error = kError_NoErr;
+                }
+                
+                if(IsntError(error))
+                    registry->Add(item);
+                else
+                    delete item;
 
                 //MessageBox(NULL, file, "Found File", MB_OK);
                 
@@ -80,7 +222,7 @@ Error RegisterLMCs(LMCRegistry* registry)
     return error;
 }
 
-Error RegisterPMOs(PMORegistry* registry)
+Error InitializePMORegistry(PMORegistry* registry)
 {
     Error error = kError_NoErr;
     char dir[MAX_PATH];
@@ -110,12 +252,13 @@ Error RegisterPMOs(PMORegistry* registry)
 
                 sprintf(file, "%s\\%s", dir, find.cFileName);
 
-                PMOInfo* info = new PMOInfo;
+                PMOItem* item = new PMOItem;
 
-                info->SetPath(file);
-                info->SetDescription(find.cFileName);
+                item->SetPath(file);
+                item->SetName(find.cFileName);
+                item->SetDescription(find.cFileName);
 
-                registry->Add(info);
+                registry->Add(item);
 
                 //MessageBox(NULL, file, "Found File", MB_OK);
                 
@@ -128,7 +271,7 @@ Error RegisterPMOs(PMORegistry* registry)
     return error;
 }
 
-Error RegisterPMIs(PMIRegistry* registry)
+Error InitializePMIRegistry(PMIRegistry* registry)
 {
     Error error = kError_NoErr;
     char dir[MAX_PATH];
@@ -158,12 +301,13 @@ Error RegisterPMIs(PMIRegistry* registry)
 
                 sprintf(file, "%s\\%s", dir, find.cFileName);
 
-                PMIInfo* info = new PMIInfo;
+                PMIItem* item = new PMIItem;
 
-                info->SetPath(file);
-                info->SetDescription(find.cFileName);
+                item->SetPath(file);
+                item->SetName(find.cFileName);
+                item->SetDescription(find.cFileName);
 
-                registry->Add(info);
+                registry->Add(item);
 
                 //MessageBox(NULL, file, "Found File", MB_OK);
                 
@@ -176,7 +320,7 @@ Error RegisterPMIs(PMIRegistry* registry)
     return error;
 }
 
-Error RegisterUIs(UIRegistry* registry)
+Error InitializeUIRegistry(UIRegistry* registry)
 {
     Error error = kError_NoErr;
     char dir[MAX_PATH];
@@ -206,12 +350,13 @@ Error RegisterUIs(UIRegistry* registry)
 
                 sprintf(file, "%s\\%s", dir, find.cFileName);
 
-                UIInfo* info = new UIInfo;
+                UIItem* item = new UIItem;
 
-                info->SetPath(file);
-                info->SetDescription(find.cFileName);
+                item->SetPath(file);
+                item->SetName(find.cFileName);
+                item->SetDescription(find.cFileName);
 
-                registry->Add(info);
+                registry->Add(item);
 
                 //MessageBox(NULL, file, "Found File", MB_OK);
                 
@@ -223,3 +368,5 @@ Error RegisterUIs(UIRegistry* registry)
 
     return error;
 }
+
+*/

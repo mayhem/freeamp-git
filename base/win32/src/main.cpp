@@ -44,22 +44,35 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
     InitWindowsRegistry();
 
     // find all the plug-ins we use
+    Registrar* registrar;
     LMCRegistry* lmc;
     PMIRegistry* pmi;
     PMORegistry* pmo;
     UIRegistry*  ui;
 
+    registrar = new Registrar;
+
+    registrar->SetSubDir("lmc");
+    registrar->SetSearchString("*.lmc");
     lmc = new LMCRegistry;
-    RegisterLMCs(lmc);
+    registrar->InitializeRegistry(lmc);
 
+    registrar->SetSubDir("io");
+    registrar->SetSearchString("*.pmi");
     pmi = new PMIRegistry;
-    RegisterPMIs(pmi);
+    registrar->InitializeRegistry(pmi);
 
+    registrar->SetSearchString("*.pmo");
     pmo = new PMORegistry;
-    RegisterPMOs(pmo);
+    registrar->InitializeRegistry(pmo);
 
+
+    registrar->SetSubDir("ui");
+    registrar->SetSearchString("*.ui");
     ui = new UIRegistry;
-    RegisterUIs(ui);
+    registrar->InitializeRegistry(ui);
+
+    delete registrar;
 
     // need a way to signal main thread to quit...
     Semaphore *termination = new Semaphore();
@@ -68,7 +81,12 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
 	// create the player
 	Player *player = Player::GetPlayer();
 
+    // register items... we give up ownership here
     player->RegisterCOO(dummy);
+    player->RegisterLMCs(lmc);
+    player->RegisterPMIs(pmi);
+    player->RegisterPMOs(pmo);
+    player->RegisterUIs(ui);
 
     //CIO* defaultCIO;
     //COO* defaultCOO;
@@ -78,8 +96,16 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
     //player->RegisterCOO(defaultCOO);
     //player->RegisterCIO(defaultCIO);
 
-    Event *e = new Event(CMD_QuitPlayer);
-	Player::GetPlayer()->AcceptEvent(e);
+    PlayList* playlist = new PlayList();
+
+	playlist->Add("c:\\local\\mpegs\\311 - Beautiful Disaster.mp3",0);
+	
+    playlist->SetFirst();
+    Player::GetPlayer()->AcceptEvent(new Event(CMD_SetPlaylist,playlist));
+    Player::GetPlayer()->AcceptEvent(new Event(CMD_Play));
+
+    //Event *e = new Event(CMD_QuitPlayer);
+	//Player::GetPlayer()->AcceptEvent(e);
 
     // sit around and twiddle our thumbs
     termination->Wait();
@@ -87,13 +113,7 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
     // clean up our act
     delete player;
 
-    delete dummy;
     delete termination;
-
-    delete lmc;
-    delete pmi;
-    delete pmo;
-    delete ui;
 
 	return 0;
 }

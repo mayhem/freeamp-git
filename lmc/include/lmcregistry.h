@@ -27,10 +27,11 @@ ____________________________________________________________________________*/
 #include "config.h"
 #include "registry.h"
 
-class LMCInfo : public RegistryInfo {
+class LMCItem : public RegistryItem {
  public:
-    LMCInfo(){}
-    ~LMCInfo(){}
+    LMCItem();
+    ~LMCItem();
+     
 };
 
 class LMCRegistry : public Registry{

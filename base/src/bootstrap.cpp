@@ -1,4 +1,3 @@
-
 /*____________________________________________________________________________
 	
 	FreeAmp - The Free MP3 Player
@@ -21,8 +20,6 @@
 	
 	$Id$
 ____________________________________________________________________________*/
-
-// bootstrap.cpp -- Main freeamp program.  Loads Player object and registers compiled in modules
 
 #include <iostream.h>
 #include <stdio.h>

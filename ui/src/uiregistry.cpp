@@ -23,6 +23,18 @@ ____________________________________________________________________________*/
 
 #include "uiregistry.h"
 
+UIItem::
+UIItem():
+RegistryItem()
+{
+
+}
+
+UIItem::
+~UIItem()
+{
+    
+}
 
 UIRegistry::
 UIRegistry():

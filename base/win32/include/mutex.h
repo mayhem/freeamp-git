@@ -37,7 +37,7 @@ public:
 	~Mutex();
 
 
-	bool Acquire(unsigned long timeout);
+	bool Acquire(unsigned long timeout = WAIT_FOREVER);
 	void Release();
 
 

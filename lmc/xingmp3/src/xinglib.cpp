@@ -28,9 +28,10 @@ void Initialize(LMCRef ref)
 {
     if(ref)
     {
-        LMC* lmc = new XingLMC;
+        LogicalMediaConverter* lmc = new XingLMC;
         ref->ref = lmc;
 
+        ref->Init = Init;
         ref->SetPMI = SetPMI;
         ref->SetPMO = SetPMO;
         ref->SetInfoEventQueue = SetInfoEventQueue;
@@ -40,56 +41,62 @@ void Initialize(LMCRef ref)
         ref->Resume = Resume;
         ref->Reset = Reset;
         ref->ChangePosition = ChangePosition;
-
-        lmc->Init();
+        ref->Cleanup = Cleanup;
     }
 }
 
-void SetPMI(LMCRef ref, PhysicalMediaInput* input)
+void Init(LMCRef ref)
 {
-    LMC* lmc = (LMC*)ref;
+    LogicalMediaConverter* lmc = (LogicalMediaConverter*)ref->ref;
+
+    lmc->Init();
+}
+
+void SetPMI(LMCRef ref, PMIRef input)
+{
+    LogicalMediaConverter* lmc = (LogicalMediaConverter*)ref->ref;
 
     lmc->SetPMI(input);
 }
 
-void SetPMO(LMCRef ref, PhysicalMediaOutput* output)
+void SetPMO(LMCRef ref, PMORef output)
 {
-    LMC* lmc = (LMC*)ref;
+    LogicalMediaConverter* lmc = (LogicalMediaConverter*)ref->ref;
 
     lmc->SetPMO(output);
 }
 
 void SetInfoEventQueue(LMCRef ref, EventQueue* queue)
 {
-    LMC* lmc = (LMC*)ref;
+    LogicalMediaConverter* lmc = (LogicalMediaConverter*)ref->ref;
 
     lmc->SetInfoEventQueue(queue);
 }
 
 bool Decode(LMCRef ref)
 { 
-    LMC* lmc = (LMC*)ref;
+    LogicalMediaConverter* lmc = (LogicalMediaConverter*)ref->ref;
 
     return lmc->Decode();
 }
 
 void Stop(LMCRef ref)
 {
-    LMC* lmc = (LMC*)ref;
+    LogicalMediaConverter* lmc = (LogicalMediaConverter*)ref->ref;
 
     lmc->Stop();
 }
 
 void Pause(LMCRef ref)
 {
-    LMC* lmc = (LMC*)ref;
+    LogicalMediaConverter* lmc = (LogicalMediaConverter*)ref->ref;
 
     lmc->Pause();
 }
 
 void Resume(LMCRef ref)
 {
-    LMC* lmc = (LMC*)ref;
+    LogicalMediaConverter* lmc = (LogicalMediaConverter*)ref->ref;
 
     lmc->Resume();
 }
@@ -97,17 +104,25 @@ void Resume(LMCRef ref)
 void Reset(LMCRef ref)
 {
     
-    LMC* lmc = (LMC*)ref;
+    LogicalMediaConverter* lmc = (LogicalMediaConverter*)ref->ref;
 
     lmc->Reset();
 }
 
 bool ChangePosition(LMCRef ref, int32 pos)
 {
-    LMC* lmc = (LMC*)ref;
+    LogicalMediaConverter* lmc = (LogicalMediaConverter*)ref->ref;
 
     return lmc->ChangePosition(pos);
 }
+
+void Cleanup(LMCRef ref)
+{
+    LogicalMediaConverter* lmc = (LogicalMediaConverter*)ref->ref;
+
+    delete ref;
+}
+
 
 
 

@@ -23,6 +23,18 @@ ____________________________________________________________________________*/
 
 #include "pmoregistry.h"
 
+PMOItem::
+PMOItem():
+RegistryItem()
+{
+}
+
+PMOItem::
+~PMOItem()
+{
+    
+}
+
 
 PMORegistry::
 PMORegistry():

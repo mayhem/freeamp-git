@@ -1,4 +1,3 @@
-
 /*____________________________________________________________________________
 	
 	FreeAmp - The Free MP3 Player
@@ -37,8 +36,8 @@ ____________________________________________________________________________*/
 #include "xinglmc.h"
 #endif
 #include "semaphore.h"
-
 #include "eventdata.h"
+#include "registrar.h"
 
 
 
@@ -64,22 +63,34 @@ Player::Player() {
     coo_death_vector = new Vector<COO *>();
     //cout << "Created vectors" << endl;
     coManipLock = new Mutex();
+    m_lmcMutex = new Mutex();
+    m_pmiMutex = new Mutex();
+    m_pmoMutex = new Mutex();
+    m_uiMutex = new Mutex();
     //cout << "Created mutex" << endl;
     imQuitting = 0;
     quitWaitingFor = 0;
     myPlayList = NULL;
     myLMC = NULL;
     playerState = STATE_Stopped;
+
+    m_lmcRegistry = NULL;
+    m_pmiRegistry = NULL;
+    m_pmoRegistry = NULL;
+    m_uiRegistry = NULL;
+
+    m_lmcRef = NULL;
 }
 
 Player::~Player() {
     //cout << "waiting for service thread to end..." << endl;
     event_service_thread->Join();
     //cout << "serivce thread done.." << endl;
-    if (myLMC) {
-        myLMC->Stop();
-        delete myLMC;
-        myLMC = NULL;
+    if (m_lmcRef) {
+        m_lmcRef->Stop(m_lmcRef);
+        m_lmcRef->Cleanup(m_lmcRef);
+        delete m_lmcRef;
+        m_lmcRef = NULL;
     }
     //cout << "done deleting myLMC" << endl;
     if (event_sem) {
@@ -134,6 +145,46 @@ Player::~Player() {
         delete coManipLock;
         coManipLock = NULL;
     }
+
+    if (m_lmcMutex) {
+        delete m_lmcMutex;
+        m_lmcMutex = NULL;
+    }
+
+    if (m_pmiMutex) {
+        delete m_pmiMutex;
+        m_pmiMutex = NULL;
+    }
+
+    if (m_pmoMutex) {
+        delete m_pmoMutex;
+        m_pmoMutex = NULL;
+    }
+
+    if (m_uiMutex) {
+        delete m_uiMutex;
+        m_uiMutex = NULL;
+    }
+
+    if(m_lmcRegistry){
+        delete m_lmcRegistry;
+        m_lmcRegistry = NULL;
+    }
+
+    if(m_pmiRegistry){
+        delete m_pmiRegistry;
+        m_pmiRegistry = NULL;
+    }
+
+    if(m_pmoRegistry){
+        delete m_pmoRegistry;
+        m_pmoRegistry = NULL;
+    }
+
+    if(m_uiRegistry){
+        delete m_uiRegistry;
+        m_uiRegistry = NULL;
+    }
 }
 void Player::EventServiceThreadFunc(void *pPlayer) {
     //cout << "Beginning event service" << endl;
@@ -184,6 +235,69 @@ int32 Player::RegisterCIO(CIO *ed) {
     }
 }
 
+int32 Player::RegisterLMCs(LMCRegistry* registry){
+    int32 result = 0;
+    m_lmcMutex->Acquire();
+
+    if (m_lmcRegistry) {
+        Registrar::CleanupRegistry(m_lmcRegistry);
+        delete m_lmcRegistry;
+    }
+
+    m_lmcRegistry = registry;
+
+    m_lmcMutex->Release();
+    
+    return result;
+}
+int32 Player::RegisterPMIs(PMIRegistry* registry){
+    int32 result = 0;
+    m_pmiMutex->Acquire();
+
+    if (m_pmiRegistry) {
+        Registrar::CleanupRegistry(m_pmiRegistry);
+        delete m_pmiRegistry;
+    }
+
+    m_pmiRegistry = registry;
+
+    m_pmiMutex->Release();
+     
+    return result;
+}
+
+int32 Player::RegisterPMOs(PMORegistry* registry){
+    int32 result = 0;  
+    m_pmoMutex->Acquire();
+
+    if (m_pmoRegistry) {
+        Registrar::CleanupRegistry(m_pmoRegistry);
+        delete m_pmoRegistry;
+    } 
+
+    m_pmoRegistry = registry;
+
+    m_pmoMutex->Release();
+
+    return result;
+}
+
+int32 Player::RegisterUIs(UIRegistry* registry){
+    int32 result = 0;
+    m_uiMutex->Acquire();
+
+    if (m_uiRegistry) {
+        Registrar::CleanupRegistry(m_uiRegistry);
+        delete m_uiRegistry;
+    } 
+
+    m_uiRegistry = registry;
+
+    m_uiMutex->Release();
+
+    return result;
+}
+
 void Player::GetCOManipLock() {
     coManipLock->Acquire(WAIT_FOREVER);
 }
@@ -193,7 +307,8 @@ void Player::ReleaseCOManipLock() {
 }
 
 int32 Player::AcceptEvent(Event *e) {
-    event_queue->write(e);
+    Event* copy = new Event(*e);
+    event_queue->write(copy);
     event_sem->Signal();
     return 0;
 }
@@ -225,10 +340,11 @@ int32 Player::ServiceEvent(Event *pC) {
             }
 	    
 	    case CMD_Stop: {
-                if (myLMC) {
-		    myLMC->Stop();
-		    delete myLMC;
-		    myLMC = NULL;
+                if (m_lmcRef) {
+		    m_lmcRef->Stop(m_lmcRef);
+            m_lmcRef->Cleanup(m_lmcRef);
+		    delete m_lmcRef;
+		    m_lmcRef = NULL;
                 }
                 if (SetState(STATE_Stopped)) {
 		    SEND_NORMAL_EVENT(INFO_Stopped);
@@ -238,66 +354,103 @@ int32 Player::ServiceEvent(Event *pC) {
 	    }
 	    
 	    case CMD_Play: {
-                PlayListItem *pc = myPlayList->GetCurrent();
-                if (pc) {
-		    // MP3 from disk to soundcard proof of concept steps:
-		    // 1) Create a LocalFileInput with pc
-		    // 2) Create a SoundCardOutput
-		    // 3) Create a XingLMC(LocalFilePMI,SoundCardPMO)
-		    // 4) go nuts
-                    if (myLMC) {
-                        myLMC->Stop();
-			delete myLMC;
-			myLMC = NULL;
-		    }
-		    
-#ifdef __linux__
-		    PhysicalMediaInput* pmi = NULL;
-		    //cout << "Done deleting myLMC" << endl;
-		    if(pc->type == 0)
-			pmi = new LocalFileInput(pc->url);
-		    
-		    //cout << "New PMI..." << endl;
-		    SoundCardPMO *scPMO = new SoundCardPMO();
-		    //cout << "New scPMO..." << endl;
-		    myLMC = new XingLMC();
-		    //cout << "Created xing..." << endl;
-		    myLMC->SetInfoEventQueue((EventQueue *)this);
-		    myLMC->SetPMI(pmi);
-		    myLMC->SetPMO(scPMO);
-#endif
-		    myLMC->Init();
-		    if (SetState(STATE_Playing)) {
-			SEND_NORMAL_EVENT(INFO_Playing);
-		    }
-		    myLMC->ChangePosition(myPlayList->GetSkip());
-		    myLMC->Decode();
-		    //cout << "Kicked off decoder..." << endl;
-		    
-                } else {
-		    //cout << "no more in playlist..." << endl;
-		    if (myLMC) {
-			myLMC->Stop();
-			delete myLMC;
-			myLMC = NULL;
-		    }
-		    if (SetState(STATE_Stopped)) {
-			SEND_NORMAL_EVENT(INFO_Stopped);
-		    }
-		    //cout << "killed lmc" << endl;
-		    GetCOManipLock();
-		    //cout << "got lock" << endl;
-		    
-		    Event *e = new Event(INFO_PlayListDonePlay);
-		    SendToCIOCOO(e);
-		    //cout << "sent playlist done playing" << endl;
-		    ReleaseCOManipLock();
-		    //cout << "released lock" << endl;
-		    delete e;
+            PlayListItem *pc = myPlayList->GetCurrent();
+            if (pc) {
+                if (m_lmcRef) {
+                    m_lmcRef->Stop(m_lmcRef);
+                    m_lmcRef->Cleanup(m_lmcRef);
+			        delete m_lmcRef;
+			        m_lmcRef = NULL;
+		        }
+		
+                RegistryItem* item = NULL;
+                PMORef pmo = NULL;
+                PMIRef pmi = NULL;
+
+                item = m_pmiRegistry->GetItem(0);
+
+                if(item)
+                {
+                    pmi = new PMI;
+                    item->InitFunction()(pmi);
+                    pmi->SetTo(pmi, pc->url);
                 }
-                return 0;
-		break; 
+
+                item = m_pmoRegistry->GetItem(0);
+
+                if(item)
+                {
+                    pmo = new PMO;
+                    item->InitFunction()(pmo);
+                }
+                
+                item = m_lmcRegistry->GetItem(0);
+
+                if(item)
+                {
+                    m_lmcRef = new LMC;
+                    item->InitFunction()(m_lmcRef);
+                    m_lmcRef->SetInfoEventQueue(m_lmcRef, (EventQueue *)this);
+		            m_lmcRef->SetPMI(m_lmcRef, pmi);
+		            m_lmcRef->SetPMO(m_lmcRef, pmo);
+                }
+
+                m_lmcRef->Init(m_lmcRef);
+		        if (SetState(STATE_Playing)) {
+			    SEND_NORMAL_EVENT(INFO_Playing);
+		        }
+		        m_lmcRef->ChangePosition(m_lmcRef, myPlayList->GetSkip());
+		        m_lmcRef->Decode(m_lmcRef);
+
+#ifdef __linux__
+                
+		        PhysicalMediaInput* pmi = NULL;
+		        //cout << "Done deleting myLMC" << endl;
+		        if(pc->type == 0)
+			    pmi = new LocalFileInput(pc->url);
+		        
+		        //cout << "New PMI..." << endl;
+		        SoundCardPMO *scPMO = new SoundCardPMO();
+		        //cout << "New scPMO..." << endl;
+		        myLMC = new XingLMC();
+		        //cout << "Created xing..." << endl;
+		        myLMC->SetInfoEventQueue((EventQueue *)this);
+		        myLMC->SetPMI(pmi);
+		        myLMC->SetPMO(scPMO);
+
+		        myLMC->Init();
+		        if (SetState(STATE_Playing)) {
+			    SEND_NORMAL_EVENT(INFO_Playing);
+		        }
+		        myLMC->ChangePosition(myPlayList->GetSkip());
+		        myLMC->Decode();
+		        //cout << "Kicked off decoder..." << endl;
+#endif		
+            } else {
+		        //cout << "no more in playlist..." << endl;
+		        if (m_lmcRef) {
+			    m_lmcRef->Stop(m_lmcRef);
+                m_lmcRef->Cleanup(m_lmcRef);
+			    delete m_lmcRef;
+			    m_lmcRef = NULL;
+		        }
+		        if (SetState(STATE_Stopped)) {
+			    SEND_NORMAL_EVENT(INFO_Stopped);
+		        }
+		        //cout << "killed lmc" << endl;
+		        GetCOManipLock();
+		        //cout << "got lock" << endl;
+		        
+		        Event *e = new Event(INFO_PlayListDonePlay);
+		        SendToCIOCOO(e);
+		        //cout << "sent playlist done playing" << endl;
+		        ReleaseCOManipLock();
+		        //cout << "released lock" << endl;
+		        delete e;
             }
+            return 0;
+		    break; 
+        }
 	    
 	    case CMD_NextMediaPiece:
                 myPlayList->SetNext();
@@ -310,8 +463,8 @@ int32 Player::ServiceEvent(Event *pC) {
                 break;
 		
 	    case CMD_Pause: {
-		if (myLMC) {
-		    myLMC->Pause();
+		if (m_lmcRef) {
+		    m_lmcRef->Pause(m_lmcRef);
 		    if (SetState(STATE_Paused)) {
 			SEND_NORMAL_EVENT(INFO_Paused);
 		    }
@@ -321,8 +474,8 @@ int32 Player::ServiceEvent(Event *pC) {
 	    }
 	    
 	    case CMD_UnPause: {
-                if (myLMC) {
-		    myLMC->Resume();
+                if (m_lmcRef) {
+		    m_lmcRef->Resume(m_lmcRef);
 		    if (SetState(STATE_Playing)) {
 			SEND_NORMAL_EVENT(INFO_Playing);
 		    }
@@ -331,14 +484,14 @@ int32 Player::ServiceEvent(Event *pC) {
                 break;
 	    }
 	    case CMD_TogglePause: {
-                if (myLMC) {
+                if (m_lmcRef) {
 		    if (playerState == STATE_Playing) {
-                        myLMC->Pause();
+                        m_lmcRef->Pause(m_lmcRef);
                         if (SetState(STATE_Paused)) {
 			    SEND_NORMAL_EVENT(INFO_Paused);
                         }
 		    } else if (playerState == STATE_Paused) {
-                        myLMC->Resume();
+                        m_lmcRef->Resume(m_lmcRef);
                         if (SetState(STATE_Playing)) {
 			    SEND_NORMAL_EVENT(INFO_Playing);
                         }

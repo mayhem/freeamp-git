@@ -57,4 +57,20 @@ public:
     virtual const char* Url(void) const = 0;
 };
 
+extern "C" {
+
+typedef struct PMI {
+    void*       ref;
+    int32       (*Read)     (struct PMI*, void*, size_t);
+    int32       (*Seek)     (struct PMI*, int32, int32);
+    bool        (*SetTo)    (struct PMI*, char*);
+    bool        (*Close)    (struct PMI*);
+    const char* (*Url)      (struct PMI*);
+    void        (*Cleanup)  (struct PMI*);
+
+}PMI, *PMIRef;
+
+
+} // extern "C"
+
 #endif /* _PMI_H_ */

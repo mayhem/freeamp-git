@@ -34,42 +34,41 @@ void Initialize(PMORef ref)
         ref->Init = Init;
         ref->Reset = Reset;
         ref->Write = Write;
-        ref->WriteThis = WriteThis;
         ref->Clear = Clear;
+        ref->Cleanup = Cleanup;
     }
 }
 
 bool Init(PMORef ref, OutputInfo* info)
 {
-    PhysicalMediaOutput* pmo = (PhysicalMediaOutput*)ref;
+    PhysicalMediaOutput* pmo = (PhysicalMediaOutput*)ref->ref;
 
     return pmo->Init(info);
 }
 
 bool Reset(PMORef ref, bool user_stop)
 {
-    PhysicalMediaOutput* pmo = (PhysicalMediaOutput*)ref;
+    PhysicalMediaOutput* pmo = (PhysicalMediaOutput*)ref->ref;
 
     return pmo->Reset(user_stop);
 }
 
-int32 Write(PMORef ref)
-{
-    PhysicalMediaOutput* pmo = (PhysicalMediaOutput*)ref;
 
-    return pmo->Write();
-}
-
-int32 WriteThis(PMORef ref, void* buf, int32 len)
+int32 Write(PMORef ref, void* buf, int32 len)
 { 
-    PhysicalMediaOutput* pmo = (PhysicalMediaOutput*)ref;
+    PhysicalMediaOutput* pmo = (PhysicalMediaOutput*)ref->ref;
 
-    return pmo->WriteThis(buf, len);
+    return pmo->Write(buf, len);
 }
 
 void Clear(PMORef ref)
 {
-    PhysicalMediaOutput* pmo = (PhysicalMediaOutput*)ref;
+    PhysicalMediaOutput* pmo = (PhysicalMediaOutput*)ref->ref;
 
     pmo->Clear();
+}
+
+void Cleanup(PMORef ref)
+{
+    delete ref->ref;
 }

@@ -46,17 +46,17 @@ int wait_n_times;
 
 #define TEST_TIME 0
 
-#define SEND_EVENT(e) if (myEQ) myEQ->AcceptEvent(e);
+#define SEND_EVENT(e) if (myEQ) myEQ->AcceptEvent(e); delete e;
 
 void XingLMC::SetInfoEventQueue(EventQueue *eq) {
     myEQ = eq;
 }
 
-void XingLMC::SetPMI(PhysicalMediaInput *i) {
+void XingLMC::SetPMI(PMIRef i) {
     m_input = i;
 }
 
-void XingLMC::SetPMO(PhysicalMediaOutput *o) {
+void XingLMC::SetPMO(PMORef o) {
     m_output = o;
 }
 
@@ -78,20 +78,20 @@ void XingLMC::Init() {
 
 	    int32 totalFrames = 0;
 	    int32 bytesPerFrame = framebytes;
-	    int32 backhere = m_input->Seek(0,SEEK_FROM_CURRENT);
+	    int32 backhere = m_input->Seek(m_input,0,SEEK_FROM_CURRENT);
 //	    cout << "Back here: " << backhere << endl;
-	    int32 end = m_input->Seek(0,SEEK_FROM_END);
-	    m_input->Seek(-128,SEEK_FROM_CURRENT);
+	    int32 end = m_input->Seek(m_input,0,SEEK_FROM_END);
+	    m_input->Seek(m_input, -128,SEEK_FROM_CURRENT);
 	    // look for id3 tag
 	    char buf[128];
 	    memset(buf,0,sizeof(buf));
-	    m_input->Read(buf,128);
+	    m_input->Read(m_input,buf,128);
 	    Id3TagInfo tag_info(buf);
 	    if (tag_info.contains_info) {
 		end -= 128;
 	    }
-//	    cout << "now here: " << m_input->Seek(backhere,SEEK_FROM_START) << endl;
-	    m_input->Seek(backhere,SEEK_FROM_START);
+//	    cout << "now here: " << m_input->Seek(m_input,backhere,SEEK_FROM_START) << endl;
+	    m_input->Seek(m_input,backhere,SEEK_FROM_START);
 	    totalFrames = end / bytesPerFrame;
 
 	    double tpf = (double)1152 / (double)(44100 << 0);
@@ -103,7 +103,14 @@ void XingLMC::Init() {
 	    int32 samprate = sr_table[4*head.id+head.sr_index];
 	    if ((head.sync & 1) == 0) samprate = samprate / 2;
 	    sprintf(psamprate,"%d Hz",samprate);
-	    MediaVitalInfo *mvi = new MediaVitalInfo(m_input->Url(),m_input->Url(),totalFrames,bytesPerFrame,bitrate,samprate,totalTime, tag_info);
+	    MediaVitalInfo *mvi = new MediaVitalInfo(m_input->Url(m_input),
+                                                 m_input->Url(m_input),
+                                                 totalFrames,
+                                                 bytesPerFrame,
+                                                 bitrate,samprate,
+                                                 totalTime, 
+                                                 tag_info);
+
 	    Event *e = new Event(INFO_MediaVitalStats,mvi);
 	    SEND_EVENT(e);
 	}
@@ -112,7 +119,12 @@ void XingLMC::Init() {
 	pcm_trigger = (PCM_BUFBYTES - 2500 * sizeof(short));
 	pcm_bufbytes = 0;
 	
-	if (audio_decode_init(&head,framebytes,0 /* reduction code */,0,0 /* convert code */, 24000 /* freq limit */)) {
+	if (audio_decode_init(  &head,
+                            framebytes,
+                            0 /* reduction code */,
+                            0,
+                            0 /* convert code */, 
+                            24000 /* freq limit */)) {
 	    DEC_INFO decinfo;
 	    audio_decode_info(&decinfo);
 	    { // send track info (there is more info to be gotten, see towave.c : out_mpeg_info
@@ -134,7 +146,7 @@ void XingLMC::Init() {
 	    info.number_of_channels = decinfo.channels;
 	    info.samples_per_second = decinfo.samprate;
 	    info.max_buffer_size = (info.number_of_channels * 2 * 1152) << 5;
-	    m_output->Init(&info);
+	    m_output->Init(m_output, &info);
 	} else {
 	    cout << "Couldn't init decoder..." << endl;
 	    return;
@@ -170,10 +182,12 @@ XingLMC::~XingLMC() {
 	xcqueue = NULL;
     }
     if (m_output) {
+    m_output->Cleanup(m_output);
 	delete m_output;
 	m_output = NULL;
     }
     if (m_input) {
+    m_input->Cleanup(m_input);
 	delete m_input;
 	m_input = NULL;
     }
@@ -232,7 +246,7 @@ void XingLMC::DecodeWorkerThreadFunc(void *pxlmc) {
 		return; \
 		break; \
 	    case XING_Pause: \
-		m_output->Reset(true); \
+		m_output->Reset(m_output, true); \
 		isPaused = true; \
 		while (isPaused) { \
 		    if (!xcqueue->isEmpty()) { \
@@ -281,7 +295,7 @@ void XingLMC::DecodeWork() {
 #endif // TEST_TIME
 
     for (int32 u = 0;;) {
-//	cout << "I'm at: " << m_input->Seek(0,SEEK_FROM_CURRENT) << endl;
+//	cout << "I'm at: " << m_input->Seek(m_input, 0,SEEK_FROM_CURRENT) << endl;
 	if (u >= wait_n_times) {
 	    double tpf = (double)1152 / (double)44100;
 	    float totalTime = (float)((double)u * (double)tpf);
@@ -320,7 +334,7 @@ void XingLMC::DecodeWork() {
 	    
 
 #if 0 // 0 = mini block write, 1 = total block write
-	    nwrite = m_output->WriteThis(pcm_buffer,pcm_bufbytes);
+	    nwrite = m_output->Write(m_output, pcm_buffer,pcm_bufbytes);
 #else
 	    int32 writeBlockLength = pcm_bufbytes / PIECES;
 	    int32 thisTime = 0;
@@ -329,7 +343,7 @@ void XingLMC::DecodeWork() {
 		pv = (void *)((int32)pcm_buffer + (writeBlockLength*i));
 		CHECK_COMMAND;
 		if (u >= wait_n_times) 
-		    thisTime = m_output->WriteThis(pv,writeBlockLength);
+		    thisTime = m_output->Write(m_output, pv,writeBlockLength);
 #if TEST_TIME
 		__asm__ ("rdtsc" : "=d" (upper), "=a" (lower));
 //    cout.width(8);
@@ -351,7 +365,7 @@ void XingLMC::DecodeWork() {
 		pv = (void *)((int32)pcm_buffer + (writeBlockLength*PIECES));
 		CHECK_COMMAND;
 		if (u > wait_n_times) 
-		    thisTime = m_output->WriteThis(pv,md);
+		    thisTime = m_output->Write(m_output, pv,md);
 #if TEST_TIME
 		__asm__ ("rdtsc" : "=d" (upper), "=a" (lower));
 //    cout.width(8);
@@ -382,7 +396,7 @@ void XingLMC::DecodeWork() {
 	pcm_bufbytes = cvt_to_wave(pcm_buffer,pcm_bufbytes);
         #endif
 	CHECK_COMMAND;
-	nwrite = m_output->WriteThis(pcm_buffer,pcm_bufbytes);
+	nwrite = m_output->Write(m_output, pcm_buffer,pcm_bufbytes);
 	if (nwrite != (int32)pcm_bufbytes) {
 	    cout << "XingLMC: Write Error 2" << endl;
 	    // WRITE ERROR
@@ -415,7 +429,7 @@ void XingLMC::Reset() {
 bool XingLMC::ChangePosition(int32 position) {
     bs_bufbytes = 0;
     bs_bufptr = bs_buffer;
-    m_input->Seek(0,SEEK_FROM_START);
+    m_input->Seek(m_input, 0,SEEK_FROM_START);
     
     wait_n_times = position;
     return true;
@@ -433,8 +447,8 @@ int XingLMC::bs_fill() {
 
    if (bs_bufbytes < bs_trigger) {
       memmove(bs_buffer, bs_bufptr, bs_bufbytes);
-      //cout << "Reading from " << m_input->Seek(0,SEEK_FROM_CURRENT) << " to at most " << BS_BUFBYTES-bs_bufbytes << endl;
-      nread = m_input->Read(bs_buffer + bs_bufbytes, BS_BUFBYTES - bs_bufbytes);
+      //cout << "Reading from " << m_input->Seek(m_input, 0,SEEK_FROM_CURRENT) << " to at most " << BS_BUFBYTES-bs_bufbytes << endl;
+      nread = m_input->Read(m_input, bs_buffer + bs_bufbytes, BS_BUFBYTES - bs_bufbytes);
       //nread = read(handle, bs_buffer + bs_bufbytes, BS_BUFBYTES - bs_bufbytes);
       if ((nread + 1) == 0) {
          /*-- test for -1 = error --*/

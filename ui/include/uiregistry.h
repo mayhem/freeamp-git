@@ -27,10 +27,10 @@ ____________________________________________________________________________*/
 #include "config.h"
 #include "registry.h"
 
-class UIInfo : public RegistryInfo {
+class UIItem : public RegistryItem {
  public:
-    UIInfo(){}
-    ~UIInfo(){}
+    UIItem();
+    ~UIItem();
 };
 
 class UIRegistry : public Registry{

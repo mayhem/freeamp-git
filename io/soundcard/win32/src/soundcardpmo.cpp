@@ -79,38 +79,6 @@ SoundCardPMO::
 	{
 		waveOutReset(m_hwo);
 	} 
-	else if(m_initialized) 
-	{
-   		if (m_fillup == 1) 
-		{
-
-			// Write the last header calculated (at the top of the array).
-			waveOutPrepareHeader(m_hwo, m_wavehdr_array[0], m_hdr_size);
-			waveOutWrite(m_hwo, m_wavehdr_array[0], m_hdr_size);
-
-			// Header has been written.
-			m_wavehdr_array[0]->dwUser = 1;
-		}
-
-		if (m_buffer_count) 
-		{
-
-			// Write the last wave header (probably not be written due to buffer
-			//	size increase.)
-
-			for(uint32 i = m_buffer[m_channels - 1]; i < m_data_size; i++)
-			{
-				 m_wavehdr_array[2]->lpData[i] = (char) 0;
-			}
-
-			waveOutPrepareHeader(m_hwo, m_wavehdr_array[2], m_hdr_size);
-			waveOutWrite(m_hwo, m_wavehdr_array[2], m_hdr_size);
-
-			// Header has been written.
-			m_wavehdr_array[2]->dwUser = 1;
-			wave_swap();
-  		}
-	}
 
 	if(m_initialized)
 	{
@@ -240,7 +208,7 @@ Reset(bool user_stop)
 
 int32 
 SoundCardPMO::
-WriteThis(void *pBuffer,int32 length) 
+Write(void *pBuffer,int32 length) 
 {
 
 	//cerr << "WriteThis: " << length << " bytes" << endl;
@@ -289,67 +257,6 @@ NextHeader()
 	return result;
 }
 
-int32 
-SoundCardPMO::
-Write()
-{
-	int32 result = 0;
-
-	// Actually write only when m_buffer is actually full.
-	if ((m_buffer_count & BIT_SELECT) == 0) 
-	{
-		m_buffer_count = 0;
-
-		// Wait for 2 completed headers
-		if (m_fillup > 1) 
-		{
-			// Prepare & write newest header
-			waveOutPrepareHeader(m_hwo, m_wavehdr_array[2], m_hdr_size);
-			waveOutWrite(m_hwo, m_wavehdr_array[2], m_hdr_size);
-
-			// Header has now been sent
-			m_wavehdr_array[2]->dwUser = 1;
-
-			wave_swap();
-
-			// Unprepare oldest header
-			if (m_wavehdr_array[2]->dwUser) 
-			{
-			   WaitForSingleObject(MCISemaphore, 10000);
-			}
-
-		} 
-		else if (++m_fillup == 2) 
-		{
-			// Write the previously calculated 2 headers
-			waveOutPrepareHeader(m_hwo, m_wavehdr_array[0], m_hdr_size);
-			waveOutWrite(m_hwo, m_wavehdr_array[0], m_hdr_size);
-
-			// Header has now been sent
-			m_wavehdr_array[0]->dwUser = 1;
-
-			wave_swap();
-
-			waveOutPrepareHeader(m_hwo, m_wavehdr_array[0], m_hdr_size);
-			waveOutWrite(m_hwo, m_wavehdr_array[0], m_hdr_size);
-
-			// Header has now been sent
-			m_wavehdr_array[0]->dwUser = 1;
-
-		} 
-		else 
-		{
-			wave_swap();
-		}
-
-		for(uint32 i=0; i<m_channels; i++)
-		{
-			m_buffer[i] = i * m_channels;
-		}
-	}
-
-	return result;
-}
 void 
 SoundCardPMO::
 Clear()
@@ -387,14 +294,3 @@ Clear()
 		m_fillup = m_buffer_count = 0;
 	}
 }
-
-void 
-SoundCardPMO::
-wave_swap()
-{
-	LPWAVEHDR temp   = m_wavehdr_array[2];
-	m_wavehdr_array[2] = m_wavehdr_array[1];
-	m_wavehdr_array[1] = m_wavehdr_array[0];
-	m_wavehdr_array[0] = temp;
-}
-

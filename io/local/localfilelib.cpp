@@ -36,40 +36,46 @@ void Initialize(PMIRef ref)
         ref->SetTo = SetTo;
         ref->Close = Close;
         ref->Url = Url;
+        ref->Cleanup = Cleanup;
     }
 }
 
 int32 Read(PMIRef ref, void* buf, size_t len)
 {
-    PhysicalMediaInput* pmi = (PhysicalMediaInput*)ref;
+    PhysicalMediaInput* pmi = (PhysicalMediaInput*)ref->ref;
 
     return pmi->Read(buf, len);
 }
 
 int32 Seek(PMIRef ref, int32 offset, int32 origin)
 {
-    PhysicalMediaInput* pmi = (PhysicalMediaInput*)ref;
+    PhysicalMediaInput* pmi = (PhysicalMediaInput*)ref->ref;
 
     return pmi->Seek(offset, origin);
 }
 
 bool SetTo(PMIRef ref, char* url)
 {
-    PhysicalMediaInput* pmi = (PhysicalMediaInput*)ref;
+    PhysicalMediaInput* pmi = (PhysicalMediaInput*)ref->ref;
 
     return pmi->SetTo(url);
 }
 
 bool Close(PMIRef ref)
 { 
-    PhysicalMediaInput* pmi = (PhysicalMediaInput*)ref;
+    PhysicalMediaInput* pmi = (PhysicalMediaInput*)ref->ref;
 
     return pmi->Close();
 }
 
 const char* Url(PMIRef ref)
 {
-    PhysicalMediaInput* pmi = (PhysicalMediaInput*)ref;
+    PhysicalMediaInput* pmi = (PhysicalMediaInput*)ref->ref;
 
     return pmi->Url();
+}
+
+void Cleanup(PMIRef ref)
+{
+    delete ref->ref;
 }

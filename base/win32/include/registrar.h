@@ -24,15 +24,35 @@ ____________________________________________________________________________*/
 #define _REGISTRAR_H_
 
 #include "error.h"
-#include "lmcregistry.h"
+#include "registry.h"
+/*#include "lmcregistry.h"
 #include "pmoregistry.h"
 #include "pmiregistry.h"
-#include "uiregistry.h"
+#include "uiregistry.h"*/
 
-Error RegisterLMCs(LMCRegistry* registry);
-Error RegisterPMOs(PMORegistry* registry);
-Error RegisterPMIs(PMIRegistry* registry);
-Error RegisterUIs(UIRegistry* registry);
+class Registrar{
+ public:
+    Registrar(){m_subdir = NULL; m_search = NULL;}
+    ~Registrar(){}
+
+    Error InitializeRegistry(Registry* registry);
+    static Error CleanupRegistry(Registry* registry);
+
+    void SetSubDir(const char* subdir){m_subdir = subdir;}
+    const char* SubDir(void) const {return m_subdir;}
+    void SetSearchString(const char* search){m_search = search;}
+    const char* SearchString(void) const {return m_search;}
+
+ private:
+    const char* m_subdir;
+    const char* m_search;
+    
+};
+
+//Error InitializeLMCRegistry(LMCRegistry* registry);
+//Error InitializePMORegistry(PMORegistry* registry);
+//Error InitializePMIRegistry(PMIRegistry* registry);
+//Error InitializeUIRegistry(UIRegistry* registry);
 
 
 #endif // _REGISTRAR_H_

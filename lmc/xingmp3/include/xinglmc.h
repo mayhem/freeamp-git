@@ -49,7 +49,7 @@ typedef enum {
 } XingCommand;
 
 
-class XingLMC : public LMC {
+class XingLMC : public LogicalMediaConverter {
 
 public:
 //	XingLMC(PhysicalMediaInput* input, PhysicalMediaOutput* output,EventCallback callback, void* cookie);
@@ -64,8 +64,8 @@ public:
     virtual void Reset();
     virtual bool ChangePosition(int32 position);
 
-    virtual void SetPMI(PhysicalMediaInput *);
-    virtual void SetPMO(PhysicalMediaOutput *);
+    virtual void SetPMI(PMIRef);
+    virtual void SetPMO(PMORef);
     virtual void SetInfoEventQueue(EventQueue *);
     virtual void Init();
 //	bool SetCallback(EventCallback callback, void* cookie);
@@ -77,24 +77,24 @@ private:
     int32 bs_fill();
     void bs_clear();
 private:
-    EventQueue *myEQ;
+    EventQueue*             myEQ;
     Mutex *seek_mutex;
-    Queue<XingCommand *> *xcqueue;
-    PhysicalMediaInput*				m_input;
-    PhysicalMediaOutput*				m_output;
+    Queue<XingCommand *>*   xcqueue;
+    PMIRef                  m_input;
+    PMORef                  m_output;
     
-    int32 bs_bufbytes;
-    int32 bs_trigger;
-    unsigned char *bs_buffer;
-    unsigned char *bs_bufptr;
+    int32                   bs_bufbytes;
+    int32                   bs_trigger;
+    unsigned char*          bs_buffer;
+    unsigned char*          bs_bufptr;
 
-    unsigned char *pcm_buffer;
-    uint32 pcm_bufbytes;
-    uint32 pcm_trigger;
+    unsigned char*          pcm_buffer;
+    uint32                  pcm_bufbytes;
+    uint32                  pcm_trigger;
 
-    int32 framebytes;
-    bool isPaused;
-    Thread *decoderThread;
+    int32                   framebytes;
+    bool                    isPaused;
+    Thread*                 decoderThread;
 };
 
 #endif /* _XINGLMC_H */

@@ -24,6 +24,20 @@ ____________________________________________________________________________*/
 #include "lmcregistry.h"
 
 
+LMCItem::
+LMCItem():
+RegistryItem()
+{
+   
+}
+
+LMCItem::
+~LMCItem()
+{
+    
+}
+
+
 LMCRegistry::
 LMCRegistry():
 Registry()

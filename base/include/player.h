@@ -1,4 +1,3 @@
-
 /*____________________________________________________________________________
 	
 	FreeAmp - The Free MP3 Player
@@ -22,9 +21,6 @@
 	$Id$
 ____________________________________________________________________________*/
 
-
-// player.h
-
 #ifndef _PLAYER_H_
 #define _PLAYER_H_
 
@@ -37,6 +33,10 @@ ____________________________________________________________________________*/
 #include "mutex.h"
 #include "playlist.h"
 #include "semaphore.h"
+#include "lmcregistry.h"
+#include "pmiregistry.h"
+#include "pmoregistry.h"
+#include "uiregistry.h"
 
 
 #include "lmc.h"
@@ -57,30 +57,57 @@ class Player : public EventQueue {
     virtual int32 AcceptEvent(Event *);
     int32 RegisterCOO(COO *);
     int32 RegisterCIO(CIO *);
+    int32 RegisterLMCs(LMCRegistry* registry);
+    int32 RegisterPMIs(PMIRegistry* registry);
+    int32 RegisterPMOs(PMORegistry* registry);
+    int32 RegisterUIs(UIRegistry* registry);
+
     void testQueue();
     static void EventServiceThreadFunc(void *);
- private:
-    Semaphore *event_sem;
-    PlayerState playerState;
-    static Player *thePlayer;
+
+ protected:
     Player();
-    Queue<Event *> *event_queue;
-    Thread *event_service_thread;
-    int32 ServiceEvent(Event *);
-    int32 quitWaitingFor;  // keeps track of how many CIO's and COO's haven't sent in their "Ready To Die" infos.
-    int32 imQuitting;
-    Vector<COO *> *coo_vector;
-    Vector<CIO *> *cio_vector;
-    Vector<COO *> *coo_death_vector;
-    Vector<CIO *> *cio_death_vector;
     void GetCOManipLock();
     void ReleaseCOManipLock();
-    Mutex *coManipLock;
-    PlayList *myPlayList;
+
     void SendToCIOCOO(Event *);
     void SendToCOO(Event *);
+
     bool SetState(PlayerState);
-    LMC *myLMC;
+    int32 ServiceEvent(Event *);
+
+ private:
+    static Player           *thePlayer;
+    Semaphore               *event_sem;
+    PlayerState             playerState;
+    Queue<Event *>          *event_queue;
+    Thread                  *event_service_thread;
+    int32                   quitWaitingFor;  // keeps track of how many CIO's 
+                                             // and COO's haven't sent in 
+                                             // their "Ready To Die" infos.
+    int32                   imQuitting;
+    Vector<COO *>           *coo_vector;
+    Vector<CIO *>           *cio_vector;
+    Vector<COO *>           *coo_death_vector;
+    Vector<CIO *>           *cio_death_vector;
+    
+    Mutex                   *coManipLock;
+    Mutex                   *m_lmcMutex;
+    Mutex                   *m_pmiMutex;
+    Mutex                   *m_pmoMutex;
+    Mutex                   *m_uiMutex;
+    PlayList                *myPlayList;
+    
+    LogicalMediaConverter   *myLMC;
+
+    LMCRef                  m_lmcRef;
+
+    LMCRegistry             *m_lmcRegistry;
+    PMIRegistry             *m_pmiRegistry;
+    PMORegistry             *m_pmoRegistry;
+    UIRegistry              *m_uiRegistry;
+
+
 };
 
 #endif // _PLAYER_H_

@@ -1,4 +1,3 @@
-
 /*____________________________________________________________________________
 	
 	FreeAmp - The Free MP3 Player
@@ -22,16 +21,14 @@
 	$Id$
 ____________________________________________________________________________*/
 
-
-
 #include "semaphore.h"
 
 
 Semaphore::Semaphore(int cnt) {
     count = cnt;
     m_sem = CreateSemaphore(NULL, 
-		    				0,
-							cnt,
+		    				cnt,
+							1024,
 							""); 
 }
 

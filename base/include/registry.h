@@ -27,35 +27,51 @@ ____________________________________________________________________________*/
 #include "config.h"
 #include "vector.h"
 
-class RegistryInfo {
+typedef void (*InitializeFunction)(void* ref);
+
+class RegistryItem {
  public:
-    RegistryInfo();
-    virtual ~RegistryInfo();
+    RegistryItem();
+    virtual ~RegistryItem();
 
     virtual void SetPath(char* path);
     virtual const char* Path() const {return m_path;}
 
+    virtual void SetName(char* name);
+    virtual const char* Name() const {return m_name;}
+
     virtual void SetDescription(char* description);
     virtual const char* Description() const { return m_description;}
 
+    virtual void SetInitFunction(InitializeFunction function);
+    virtual const InitializeFunction InitFunction() const { return m_init;}
+
+    virtual void SetModule(void* module);
+    virtual const void* Module() const { return m_module;}
 
  private:
-    char* m_path;
-    char* m_description;
+     
+
+ private:
+    char*               m_path;
+    char*               m_name;
+    char*               m_description;
+    InitializeFunction  m_init;
+    void*               m_module;
 
 };
 
 class Registry {
  private:
-    Vector<RegistryInfo*> *m_elements;
+    Vector<RegistryItem*> *m_elements;
     int32 m_count;
     
  public:
     Registry();
     virtual ~Registry();
 
-    virtual void Add(RegistryInfo*);
-    virtual RegistryInfo* GetInfo(int32 index);
+    virtual void Add(RegistryItem*);
+    virtual RegistryItem* GetItem(int32 index);
 };
 
 

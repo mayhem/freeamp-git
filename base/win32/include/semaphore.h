@@ -37,7 +37,7 @@ class Semaphore {
    	HANDLE m_sem;	
  
  public:
-    Semaphore(int cnt = 1);
+    Semaphore(int cnt = 0);
     ~Semaphore();
     void Wait();
     void Signal();

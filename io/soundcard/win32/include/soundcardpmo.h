@@ -49,14 +49,11 @@ public:
     
     virtual bool Init(OutputInfo* info);
     virtual bool Reset(bool user_stop);
-    virtual int32 Write();
-    virtual int32 WriteThis(void *,int32);
+    virtual int32 Write(void*,int32);
     virtual void Clear();
     
     
  private:
-	void wave_swap();
-
 	WAVEHDR* NextHeader();
 
 private:

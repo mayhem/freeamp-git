@@ -30,9 +30,9 @@ ____________________________________________________________________________*/
 #include "pmo.h"
 #include "pmi.h"
 
-class LMC {
+class LogicalMediaConverter {
  public:
-    virtual ~LMC() {}
+    virtual ~LogicalMediaConverter() {}
     virtual bool Decode() = 0;
     virtual void Stop() = 0;
     virtual void Pause() = 0;
@@ -40,10 +40,33 @@ class LMC {
     virtual void Reset() = 0;
     virtual bool ChangePosition(int32) = 0;
 
-    virtual void SetPMI(PhysicalMediaInput *) = 0;
-    virtual void SetPMO(PhysicalMediaOutput *) = 0;
+    virtual void SetPMI(PMIRef) = 0;
+    virtual void SetPMO(PMORef) = 0;
     virtual void SetInfoEventQueue(EventQueue *) = 0;
     virtual void Init() = 0;
 };
+
+extern "C" {
+
+typedef struct LMC{
+    void*   ref;
+
+    void    (*Init)              (struct LMC*);
+
+    void    (*SetPMI)            (struct LMC*, PMIRef);
+    void    (*SetPMO)            (struct LMC*, PMORef);
+    void    (*SetInfoEventQueue) (struct LMC*, EventQueue*);
+
+    bool    (*Decode)            (struct LMC*);
+    void    (*Stop)              (struct LMC*);
+    void    (*Pause)             (struct LMC*);
+    void    (*Resume)            (struct LMC*);
+    void    (*Reset)             (struct LMC*);
+    bool    (*ChangePosition)    (struct LMC*, int32);
+    void    (*Cleanup)           (struct LMC*);
+
+}LMC, *LMCRef;
+
+} //extern "C"
 
 #endif // _LMC_H_

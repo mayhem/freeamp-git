@@ -27,7 +27,7 @@ ____________________________________________________________________________*/
 Registry::
 Registry()
 {
-    m_elements = new Vector<RegistryInfo*>();
+    m_elements = new Vector<RegistryItem*>();
     m_count = 0;
 }
 
@@ -43,40 +43,47 @@ Registry::
 
 void 
 Registry::
-Add(RegistryInfo* info)
+Add(RegistryItem* info)
 {
     if (info) {
 	    m_elements->insert(info);
     }
 }
 
-RegistryInfo* 
+RegistryItem* 
 Registry::
-GetInfo(int32 index)
+GetItem(int32 index)
 {
     return m_elements->elementAt(index);
 }
 
 
-RegistryInfo::
-RegistryInfo()
+RegistryItem::
+RegistryItem()
 {
     m_path = NULL;
     m_description = NULL;
+    m_name = NULL;
+    m_init = NULL;
+    m_module = NULL;
 }
 
-RegistryInfo::
-~RegistryInfo()
+RegistryItem::
+~RegistryItem()
 {
     if(m_path)
         delete m_path;
 
+    if(m_name)
+        delete m_name;
+
     if(m_description)
         delete m_description;
-
 }
 
-void RegistryInfo::SetPath(char* path)
+void 
+RegistryItem::
+SetPath(char* path)
 {
     if(path)
     {
@@ -88,9 +95,26 @@ void RegistryInfo::SetPath(char* path)
         strcpy(m_path, path);
     }
 }
+
+void 
+RegistryItem::
+SetName(char* name)
+{
+    if(name)
+    {
+        if(m_name)
+            delete m_name;
+
+        m_name = new char [strlen(name) + 1];
+
+        strcpy(m_name, name);
+    }
+}
  
 
-void RegistryInfo::SetDescription(char* description)
+void 
+RegistryItem::
+SetDescription(char* description)
 {
     if(description)
     {
@@ -101,4 +125,20 @@ void RegistryInfo::SetDescription(char* description)
 
         strcpy(m_description, description);
     }
+}
+
+void 
+RegistryItem::
+SetInitFunction(InitializeFunction function)
+{
+    if(function)
+        m_init = function;
+}
+
+void 
+RegistryItem::
+SetModule(void* module)
+{
+    if(module)
+        m_module = module;
 }

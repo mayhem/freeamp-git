@@ -23,6 +23,17 @@ ____________________________________________________________________________*/
 
 #include "pmiregistry.h"
 
+PMIItem::
+PMIItem():
+RegistryItem()
+{
+}
+
+PMIItem::
+~PMIItem()
+{
+    
+}
 
 PMIRegistry::
 PMIRegistry():
