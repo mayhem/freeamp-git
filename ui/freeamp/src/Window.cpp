@@ -277,7 +277,6 @@ void Window::HandleMouseMove(Pos &oScreenPos)
        m_oMoveStart.y1 += (oScreenPos.y - m_oMovePos.y);
        m_oMoveStart.y2 += (oScreenPos.y - m_oMovePos.y);
 
-       Debug_v("window: %d %d", m_oMoveStart.Width(), m_oMoveStart.Height());
        oActualPos = m_oMoveStart;
        if (m_iDesktopWidth > 0 && m_iDesktopHeight > 0)
        {

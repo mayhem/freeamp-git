@@ -778,7 +778,6 @@ Error Win32Window::GetDesktopSize(int32 &iX, int32 &iY)
     SystemParametersInfo(SPI_GETWORKAREA, 0, &sRect, 0);
     iX = sRect.right;
     iY = sRect.bottom;
-    Debug_v("size: %d %d", iX, iY);
 
     return kError_NoErr;
 }

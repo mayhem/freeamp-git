@@ -98,6 +98,7 @@ const int iInitialFrameSize = iMaxFrameSize * iNumSanityCheckFrames;
 
 const char *szFailRead = "Cannot read MP3 data from input plugin.";
 const char *szFailWrite = "Cannot write audio data to output buffer.";
+const char *szCannotDecode = BRANDING" cannot play this file/stream. This file/stream may be corrupted.";
 
 XingLMC::XingLMC(FAContext *context) :
          LogicalMediaConverter(context)
@@ -249,9 +250,9 @@ Error XingLMC::GetHeadInfo()
 			                         iInitialFrameSize - iOffset, &m_sMpegHead, 
                                      (int*)&m_iBitRate, &iForward);
 
-           iOffset += m_frameBytes + iForward + m_sMpegHead.pad;
-           if (iFrame == 0)
+           if (m_frameBytes > 0 && iFrame == 0)
            {
+               iOffset += m_frameBytes + iForward + m_sMpegHead.pad;
                iLastSRIndex = m_sMpegHead.sr_index;
                iLastOption = m_sMpegHead.option;
                iLastId = m_sMpegHead.id;
@@ -266,6 +267,7 @@ Error XingLMC::GetHeadInfo()
               iLastId == m_sMpegHead.id && 
               iLastMode == m_sMpegHead.mode)
            {
+              iOffset += m_frameBytes + iForward + m_sMpegHead.pad;
               iLastSRIndex = m_sMpegHead.sr_index;
               iLastOption = m_sMpegHead.option;
               iLastId = m_sMpegHead.id;
@@ -707,7 +709,7 @@ void XingLMC::DecodeWork()
    if (Err != kError_NoErr)
    {
        m_pContext->log->Error("CanDecode returned false.\n");
-       ReportError("This LMC cannot decode this media\n");
+       ReportError(szCannotDecode);
        return;
    }
 
@@ -718,7 +720,7 @@ void XingLMC::DecodeWork()
    if (IsError(Err))
    {
        m_pContext->log->Error("ExtractMediaInfo failed: %d\n", Err);
-       ReportError("This LMC cannot decode this media\n");
+       ReportError(szCannotDecode);
 
        return;
    }
@@ -903,7 +905,7 @@ Error XingLMC::BeginRead(void *&pBuffer, unsigned int iBytesNeeded,
        
        iRead = fread(pBuffer, sizeof(char), iBytesNeeded, m_fpFile);
        if (iRead != (int)iBytesNeeded)
-          return kError_ReadFile;
+          return kError_EndOfStream;
           
        return kError_NoErr;
    }
