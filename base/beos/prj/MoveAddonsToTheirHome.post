@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# create our add-on directory
+if [ ! -e /boot/home/config/add-ons/freeamp ]
+then 
+	mkdir /boot/home/config/add-ons/freeamp
+fi
+
+# make links to our add-ons
+cp -f ../../../io/local/beos/prj/FileInput.pmi /boot/home/config/add-ons/freeamp
+cp -f ../../../io/soundcard/beos/prj/Soundcard.pmo /boot/home/config/add-ons/freeamp
+cp -f ../../../lmc/xingmp3/beos/prj/XingMP3.lmc /boot/home/config/add-ons/freeamp
+cp -f ../../../ui/freeamp/beos/prj/FreeAmp.ui /boot/home/config/add-ons/freeamp
+
+# create our theme directory
+if [ ! -e ./themes ]
+then 
+	mkdir ./themes
+fi
+
+# copy the default theme
+if [ ! -e ./themes/FreeAmp.fat ]
+then 
+	cp ../../../themes/FreeAmp.fat ./themes
+fi
