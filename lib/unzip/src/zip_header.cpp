@@ -46,7 +46,9 @@ ZipHeaderType zip_find_header(FILE *file,int loop)
 		ch=fgetc(file);
 		if (ch==headerSign[mode])
 			mode++;
-		else
+		else if (ch==headerSign[0])
+                        mode=1;
+                else
 			mode=0;
 		if (ch==arjHeaderSign[0]) {
 			ch=fgetc(file);
