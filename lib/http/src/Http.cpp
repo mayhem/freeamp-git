@@ -51,6 +51,10 @@ ____________________________________________________________________________*/
 
 #include "Http.h"
 
+#ifndef min
+#define min(a, b)  (((a) < (b)) ? (a) : (b))
+#endif
+
 const unsigned short kHttpPort = 80;
 const unsigned int kMaxHostNameLen = 64;
 const unsigned int kMaxURLLen = 1024;
