@@ -22,14 +22,16 @@
 ____________________________________________________________________________*/
 
 #include <stdio.h>
+#include <assert.h>
 
 #include "preferences.h"
 
 // location
 const HKEY  kMainKey = HKEY_CURRENT_USER;
-const char* kPrefsKey = "SOFTWARE\\FreeAmp\\FreeAmp v1.2";
+//const char* kPrefsKey = "SOFTWARE\\FreeAmp\\FreeAmp v1.2\\Main";
 const char* kFreeAmpKey = "SOFTWARE\\FreeAmp";
 const char* kFreeAmpVersionKey = "FreeAmp v1.2";
+const char* kMainComponentKey = "Main";
 
 // preferences
 const char* kInstallDirPref = "InstallDirectory";
@@ -48,18 +50,113 @@ Preferences::
 Preferences()
 {
     LONG    result;
+    char*   prefsKey = NULL;
+    int32   keyLength = strlen(kFreeAmpKey) + 
+                        strlen(kFreeAmpVersionKey) +
+                        strlen(kMainComponentKey) + 3;
 
     m_prefsKey = NULL;
 
+    prefsKey = new char[keyLength];
+
+    sprintf(prefsKey, "%s\\%s\\%s", kFreeAmpKey, 
+                                    kFreeAmpVersionKey, 
+                                    kMainComponentKey);
+
     result = RegOpenKeyEx(	kMainKey,
-							kPrefsKey,
+							prefsKey,
 							0, 
 							KEY_ALL_ACCESS,
 							&m_prefsKey);
 
+    delete [] prefsKey;
+
     if(result != ERROR_SUCCESS)
     {
         m_prefsKey = NULL;
+    }
+}
+
+Preferences::
+Preferences(const char* componentName)
+{
+    LONG    result;
+    char*   prefsKey = NULL;
+    int32   keyLength = strlen(kFreeAmpKey) + 
+                        strlen(kFreeAmpVersionKey) + 3;
+
+    assert(componentName);
+
+    m_prefsKey = NULL;
+
+    if(componentName)
+    {
+        keyLength += strlen(componentName);
+
+        prefsKey = new char[keyLength];
+
+        sprintf(prefsKey, "%s\\%s\\%s", kFreeAmpKey, 
+                                        kFreeAmpVersionKey, 
+                                        componentName);
+
+        result = RegOpenKeyEx(	kMainKey,
+							    prefsKey,
+							    0, 
+							    KEY_ALL_ACCESS,
+							    &m_prefsKey);
+
+        delete [] prefsKey;
+
+        if(result != ERROR_SUCCESS)
+        {
+            DWORD disposition;
+            HKEY freeampKey;
+            HKEY versionKey;
+
+            // create the main key in the windows registry
+            result = RegCreateKeyEx(kMainKey,
+                                    kFreeAmpKey,
+                                    NULL, 
+                                    "",
+                                    REG_OPTION_NON_VOLATILE,
+                                    KEY_ALL_ACCESS,
+                                    NULL,
+                                    &freeampKey,
+                                    &disposition);
+
+            if(result == ERROR_SUCCESS)
+            {
+                // create the version key under the freeamp key
+                result = RegCreateKeyEx(freeampKey,
+                                        kFreeAmpVersionKey,
+                                        NULL, 
+                                        "",
+                                        REG_OPTION_NON_VOLATILE,
+                                        KEY_ALL_ACCESS,
+                                        NULL,
+                                        &versionKey,
+                                        &disposition);
+            }
+
+            if(result == ERROR_SUCCESS)
+            {
+                // create the version key under the freeamp key
+                result = RegCreateKeyEx(versionKey,
+                                        componentName,
+                                        NULL, 
+                                        "",
+                                        REG_OPTION_NON_VOLATILE,
+                                        KEY_ALL_ACCESS,
+                                        NULL,
+                                        &m_prefsKey,
+                                        &disposition);
+            }
+
+            if(result != ERROR_SUCCESS)
+            {
+                m_prefsKey = NULL;
+            }
+        }
     }
 }
 
@@ -85,7 +182,6 @@ Initialize()
     // Where are we starting the program from?
     GetCurrentDirectory(sizeof(cwd), cwd);
 
-
     if(m_prefsKey)
 	{
         // people DO move their apps around on windows
@@ -98,8 +194,7 @@ Initialize()
 		WIN32_FIND_DATA win32fd;
 
         // check for plugins directory in cwd
-
-		/*LEAK*/HANDLE h = FindFirstFile(foo,&win32fd);
+		HANDLE h = FindFirstFile(foo,&win32fd);
 
 		if (h != INVALID_HANDLE_VALUE) 
         {
@@ -115,6 +210,8 @@ Initialize()
 											strlen(cwd) + 1);
 				}
 			}
+
+            FindClose(h);
 		}
         error = kError_NoErr;
     }
@@ -122,6 +219,7 @@ Initialize()
     {
         DWORD disposition;
         HKEY freeampKey;
+        HKEY versionKey;
 
         // create the main key in the windows registry
         result = RegCreateKeyEx(kMainKey,
@@ -139,6 +237,20 @@ Initialize()
             // create the version key under the freeamp key
             result = RegCreateKeyEx(freeampKey,
                                     kFreeAmpVersionKey,
+                                    NULL, 
+                                    "",
+                                    REG_OPTION_NON_VOLATILE,
+                                    KEY_ALL_ACCESS,
+                                    NULL,
+                                    &versionKey,
+                                    &disposition);
+        }
+
+        if(result == ERROR_SUCCESS)
+        {
+            // create the version key under the freeamp key
+            result = RegCreateKeyEx(versionKey,
+                                    kMainComponentKey,
                                     NULL, 
                                     "",
                                     REG_OPTION_NON_VOLATILE,
@@ -173,6 +285,7 @@ Initialize()
         }
 
         RegCloseKey(freeampKey);
+        RegCloseKey(versionKey);
     }
 
     return error;

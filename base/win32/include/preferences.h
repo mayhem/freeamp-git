@@ -30,15 +30,31 @@ ____________________________________________________________________________*/
 #include "config.h"
 #include "errors.h"
 
+// preferences
+extern const char* kInstallDirPref;
+extern const char* kUIPref;
+extern const char* kPMOPref;
+extern const char* kOpenSaveDirPref;
+extern const char* kStayOnTopPref;
+
 
 class Preferences {
 
  public:
 	Preferences();
+    Preferences(const char* componentName);
 	~Preferences();
 
     Error Initialize();
 
+    // foundation preference functions
+    Error GetPrefString(const char* pref, char* buf, uint32* len);
+    Error SetPrefString(const char* pref, const char* buf);
+
+    Error GetPrefBoolean(const char* pref, bool* value);
+    Error SetPrefBoolean(const char* pref, bool value);
+
+    // convenience functions
     Error GetInstallDirectory(char* path, uint32* len);
     Error SetInstallDirectory(char* path);
 
@@ -54,12 +70,10 @@ class Preferences {
     Error GetStayOnTop(bool* value);
     Error SetStayOnTop(bool value);
 
- protected:
-    Error GetPrefString(const char* pref, char* buf, uint32* len);
-    Error SetPrefString(const char* pref, const char* buf);
+    
 
-    Error GetPrefBoolean(const char* pref, bool* value);
-    Error SetPrefBoolean(const char* pref, bool value);
+ protected:
+    
 
  private:
      HKEY   m_prefsKey;
