@@ -38,6 +38,7 @@ ____________________________________________________________________________*/
 #include "eventdata.h"
 #include "mutex.h"
 #include "semaphore.h"
+#include "lmc.h"
 
 extern "C" {
 int actually_decode;
@@ -108,31 +109,40 @@ const char *XingLMC::GetErrorString(int32 error) {
     return g_ErrorArray[error - lmcError_MinimumError];
 }
 
-Error XingLMC::InitDecoder() {
-    if (!m_target || !m_input || !m_output) {
-	return kError_NullValueInvalid;
-    }
-    m_properlyInitialized = false;
+bool XingLMC::CanDecode() {
+    if (!m_input) return false;
+    m_bsBufBytes = 0;
+    m_bsBufPtr = m_bsBuffer;
+    int32 dummy;
+    m_input->Seek(dummy,0,SEEK_FROM_START);
     if (bs_fill() > 0) {
 	MPEG_HEAD head;
 	int32 bitrate;
-	// parse MPEG header
-	m_frameBytes = head_info3(m_bsBuffer, m_bsBufBytes, &head, &bitrate,&m_searchAhead);
-	m_originalSearchAhead = m_searchAhead;
-	if (m_frameBytes == 0) {
-	    return (Error)lmcError_HeadInfoReturnedZero;
+	uint32 searchAhead;
+	int32 framebytes = head_info3(m_bsBuffer, m_bsBufBytes, &head, &bitrate, &searchAhead);
+	if (framebytes) {
+	    return true;
 	}
+    }
+    return false;
+}
 
-	// select decoder
-	m_audioMethods = audio_table[0][0];  // not integer, non 8 bit mode
-
-	{ // send track info (there is more info to be gotten, see towave.c : out_mpeg_info
-	    static int sample_rate_table[8] =
-	    {22050L, 24000L, 16000L, 1L,
-	     44100L, 48000L, 32000L, 1L};
-
+Error XingLMC::ExtractMediaInfo(MediaInfoEvent **pMIE) {
+    if (!m_input) return kError_NullValueInvalid;
+    m_bsBufBytes = 0;
+    m_bsBufPtr = m_bsBuffer;
+    int32 dummy;
+    m_input->Seek(dummy,0,SEEK_FROM_START);
+    if (bs_fill() > 0) {
+	MPEG_HEAD head;
+	int32 bitrate;
+	uint32 searchAhead;
+	int32 framebytes = head_info3(m_bsBuffer, m_bsBufBytes, &head, &bitrate, &searchAhead);
+	if (framebytes) {
+	    static int sample_rate_table[8] =  {22050L, 24000L, 16000L, 1L, 44100L, 48000L, 32000L, 1L};
+	    
 	    int32 totalFrames = 0;
-	    int32 bytesPerFrame = m_frameBytes;
+	    int32 bytesPerFrame = framebytes;
 	    int32 backhere;
 	    Error error = m_input->Seek(backhere,0,SEEK_FROM_CURRENT);
 	    if (IsError(error)) { return (Error)lmcError_ID3ReadFailed; }
@@ -153,45 +163,37 @@ Error XingLMC::InitDecoder() {
 	    }
 	    error = m_input->Seek(dummy,backhere,SEEK_FROM_START);
  	    if (IsError(error)) { return (Error)lmcError_ID3ReadFailed; }
-
+	    
 	    totalFrames = end / bytesPerFrame;
-		int32 sampRateIndex = 4*head.id+head.sr_index;
+	    int32 sampRateIndex = 4*head.id+head.sr_index;
 	    int32 samprate = sample_rate_table[sampRateIndex];
-		if ((head.sync & 1) == 0)
-			samprate = samprate / 2;	// mpeg25
-		double milliseconds_per_frame = 0;
-		static int32 l[4] = {25,3,2,1};
-		int32 layer = l[head.option];
-		static double ms_p_f_table[3][3] = {
-		    {8.707483f,  8.0f, 12.0f},
-		    {26.12245f, 24.0f, 36.0f},
-		    {26.12245f, 24.0f, 36.0f}
-		};
-		milliseconds_per_frame = ms_p_f_table[layer-1][head.sr_index];
-		
-		float totalSeconds = (float)((double)totalFrames * (double)milliseconds_per_frame / 1000);
-		
-		MediaInfoEvent *mvi = new MediaInfoEvent(m_input->Url(),
-							 m_input->Url(),
-							 totalSeconds);
-		
-		if (mvi) {
-		    if (m_target)
-			m_target->AcceptEvent(mvi);
-		    mvi = NULL;
+	    if ((head.sync & 1) == 0)
+		samprate = samprate / 2;	// mpeg25
+	    double milliseconds_per_frame = 0;
+	    static int32 l[4] = {25,3,2,1};
+	    int32 layer = l[head.option];
+	    static double ms_p_f_table[3][3] = {
+		{8.707483f,  8.0f, 12.0f},
+		{26.12245f, 24.0f, 36.0f},
+		{26.12245f, 24.0f, 36.0f}
+	    };
+	    milliseconds_per_frame = ms_p_f_table[layer-1][head.sr_index];
+	    
+	    float totalSeconds = (float)((double)totalFrames * (double)milliseconds_per_frame / 1000);
+	    
+	    *pMIE = new MediaInfoEvent(m_input->Url(), totalSeconds);
+	    
+	    if (*pMIE) {
+		ID3TagEvent *ite = new ID3TagEvent(tag_info);
+		if (ite) {
+		    (*pMIE)->AddChildEvent((Event *)ite);
+		    ite = NULL;
 		} else {
 		    return kError_OutOfMemory;
 		}
-		ID3TagEvent *ite = new ID3TagEvent(tag_info);
-		if (ite) {
-		    if (m_target) m_target->AcceptEvent(ite);
-		    ite = NULL;
-		} else {
-			return kError_OutOfMemory;
-		}
 
 		MpegInfoEvent *mie = new MpegInfoEvent(totalFrames,
-								milliseconds_per_frame / 1000,
+						       milliseconds_per_frame / 1000,
 						       m_frameBytes, 
 						       bitrate, 
 						       samprate, 
@@ -205,14 +207,41 @@ Error XingLMC::InitDecoder() {
 						       head.mode_ext
 		    );
 		if (mie) {
-			if (m_target) m_target->AcceptEvent(mie);
-			mie = NULL;
+		    (*pMIE)->AddChildEvent((Event *)mie);
+		    mie = NULL;
 		} else {
-			return kError_OutOfMemory;
+		    return kError_OutOfMemory;
 		}
+		return kError_NoErr;
+	    }
 	}
-	
-	
+    }
+    return kError_UnknownErr;
+}
+
+
+Error XingLMC::InitDecoder() {
+    if (!m_target || !m_input || !m_output) {
+	return kError_NullValueInvalid;
+    }
+    m_properlyInitialized = false;
+    m_bsBufBytes = 0;
+    m_bsBufPtr = m_bsBuffer;
+    int32 dummy;
+    m_input->Seek(dummy,0,SEEK_FROM_START);
+    if (bs_fill() > 0) {
+	MPEG_HEAD head;
+	int32 bitrate;
+	// parse MPEG header
+	m_frameBytes = head_info3(m_bsBuffer, m_bsBufBytes, &head, &bitrate,&m_searchAhead);
+	m_originalSearchAhead = m_searchAhead;
+	if (m_frameBytes == 0) {
+	    return (Error)lmcError_HeadInfoReturnedZero;
+	}
+
+	// select decoder
+	m_audioMethods = audio_table[0][0];  // not integer, non 8 bit mode
+
 	if (m_audioMethods.decode_init(  &head,
 					 m_frameBytes,
 					 0 /* reduction code */,

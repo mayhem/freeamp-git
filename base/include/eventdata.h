@@ -29,35 +29,52 @@ ____________________________________________________________________________*/
 #include <string.h>
 
 #include "lmc.h"
-#include "playlist.h"
+//#include "playlist.h"
 #include "event.h"
 #include "id3v1.h"
+#include "vector.h"
 
 class MediaInfoEvent : public Event {
  public:
-	 bool m_filled;
+    Vector<Event *> *m_childEvents;
+    bool m_filled;
     float m_totalSeconds;
     int32 m_indexOfSong;
     int32 m_totalSongs;
     char m_filename[512];
-    virtual ~MediaInfoEvent() {}
-    MediaInfoEvent() { m_type = INFO_MediaInfo; m_filled = false; m_filename[0] = '\0'; }
-    MediaInfoEvent( const char *t,
-                    const char *fn, 
+    uint32 m_plmID;
+    virtual ~MediaInfoEvent() {
+	if (m_childEvents) {
+	    m_childEvents->DeleteAll();
+	    delete m_childEvents;
+	    m_childEvents = NULL;
+	}
+    }
+    MediaInfoEvent() { 
+	m_type = INFO_MediaInfo; m_filled = false; m_filename[0] = '\0'; 
+	m_childEvents = new Vector<Event *>();
+    }
+    MediaInfoEvent( const char *fn, 
                     float ts)
     {
-		m_filled = true;
-		m_type = INFO_MediaInfo;
+	m_childEvents = new Vector<Event *>();
+	m_filled = true;
+	m_type = INFO_MediaInfo;
         m_totalSeconds = ts;
         m_indexOfSong = 0;
         m_totalSongs = 0;
 
         if (fn) {
-	        strncpy(m_filename,fn,511);
-	        m_filename[511] = '\0';
+	    strncpy(m_filename,fn,511);
+	    m_filename[511] = '\0';
         } else {
-	        m_filename[0] = '\0';
+	    m_filename[0] = '\0';
         }
+    }
+    void AddChildEvent(Event *pE) {
+	if (pE) {
+	    m_childEvents->Insert(pE);
+	}
     }
 };
 

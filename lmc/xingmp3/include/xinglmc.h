@@ -90,6 +90,9 @@ public:
     virtual Error Reset();
     virtual Error ChangePosition(int32 position);
 
+    virtual bool CanDecode();
+    virtual Error ExtractMediaInfo(MediaInfoEvent **);
+
     virtual Error SetPMI(PhysicalMediaInput *);
     virtual Error SetPMO(PhysicalMediaOutput *);
     virtual Error SetTarget(EventQueue *);

@@ -30,6 +30,8 @@ ____________________________________________________________________________*/
 #include "pmo.h"
 #include "pmi.h"
 
+class MediaInfoEvent;
+
 class LogicalMediaConverter {
  public:
     virtual ~LogicalMediaConverter() {}
@@ -39,6 +41,9 @@ class LogicalMediaConverter {
     virtual Error Resume() = 0;
     virtual Error Reset() = 0;
     virtual Error ChangePosition(int32) = 0;
+
+    virtual bool CanDecode() = 0;
+    virtual Error ExtractMediaInfo(MediaInfoEvent **) = 0;
 
     virtual Error SetPMI(PhysicalMediaInput *) = 0;
     virtual Error SetPMO(PhysicalMediaOutput *) = 0;

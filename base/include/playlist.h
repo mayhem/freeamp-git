@@ -28,21 +28,92 @@ ____________________________________________________________________________*/
 #include "vector.h"
 #include "errors.h"
 #include "event.h"
+#include "registry.h"
+#include "eventdata.h"
 
 class PlayListItem {
+ private:
+    RegistryItem *m_pmiRegItem;
+    RegistryItem *m_lmcRegItem;
+    MediaInfoEvent *m_mie;
  public:
     char* m_url;
     int32 m_type;
     int32 m_startFrame;
 
-    PlayListItem();
-    ~PlayListItem();
+    PlayListItem() {
+	m_mie = NULL;
+	m_url = NULL;
+	m_pmiRegItem = NULL;
+	m_lmcRegItem = NULL;
+    }
+    ~PlayListItem() {
+	if (m_mie) {
+	    delete m_mie;
+	    m_mie = NULL;
+	}
+	m_pmiRegItem = NULL;
+	m_lmcRegItem = NULL;
+	if (m_url) {
+	    delete m_url;
+	    m_url = NULL;
+	}
+    }
+
+    RegistryItem *GetPMIRegistryItem() { return m_pmiRegItem; }
+    void SetPMIRegistryItem(RegistryItem *ri) { m_pmiRegItem = ri; }
+    RegistryItem *GetLMCRegistryItem() { return m_lmcRegItem; }
+    void SetLMCRegistryItem(RegistryItem *ri) { m_lmcRegItem = ri; }
+    MediaInfoEvent *GetMediaInfo() { return m_mie; }
+    void SetMediaInfo(MediaInfoEvent *mie) { m_mie = mie; }
 };
 
 class OrderListItem {
  public:
     int32 m_index;
     int32 m_random;
+};
+
+class PLMGetMediaInfoEvent : public Event {
+ private:
+    PlayListItem *m_plItem;
+ public:
+    PLMGetMediaInfoEvent() {
+	m_type = CMD_PLMGetMediaInfo;
+	m_plItem = NULL;
+    }
+    virtual ~PLMGetMediaInfoEvent() {}
+    void SetPlayListItem(PlayListItem *pli) { m_plItem = pli; }
+    PlayListItem *GetPlayListItem() { return m_plItem; }
+};
+
+class PLMSetMediaInfoEvent : public Event {
+ private:
+    bool m_complete;
+    RegistryItem *m_pmiRegItem;
+    RegistryItem *m_lmcRegItem;
+    MediaInfoEvent *m_mie;
+    PlayListItem *m_pli;
+ public:
+    PLMSetMediaInfoEvent() {
+	m_type = CMD_PLMSetMediaInfo;
+	m_complete = false;
+	m_pmiRegItem = NULL;
+	m_lmcRegItem = NULL;
+	m_mie = NULL;
+	m_pli = NULL;
+    }
+    virtual ~PLMSetMediaInfoEvent() {}
+    void SetPlayListItem(PlayListItem *pli) { m_pli = pli; }
+    PlayListItem *GetPlayListItem() { return m_pli; }
+    void SetComplete() { m_complete = true; }
+    bool IsComplete() { return m_complete; }
+    void SetPMIRegistryItem(RegistryItem *item) { m_pmiRegItem = item; }
+    RegistryItem *GetPMIRegistryItem() { return m_pmiRegItem; }
+    void SetLMCRegistryItem(RegistryItem *item) { m_lmcRegItem = item; }
+    RegistryItem *GetLMCRegistryItem() { return m_lmcRegItem; }
+    void SetMediaInfo(MediaInfoEvent *mie) { m_mie = mie; }
+    MediaInfoEvent *GetMediaInfo() { return m_mie; }
 };
 
 
@@ -67,6 +138,9 @@ public:
 	Error RemoveAll();
     void SetSkip(int32 f) { m_skipNum = f; } // logical media units to skip at beginning
     int32 GetSkip() { return m_skipNum; }
+
+    void AcceptEvent(Event *);
+
     PlayListItem *GetFirst();
     PlayListItem *GetNext();
     PlayListItem *GetPrev();
@@ -84,7 +158,8 @@ public:
     RepeatPlay GetRepeat() {return m_repeat;}
 
  private:
-	 EventQueue *			m_target;
+    
+    EventQueue *			m_target;
     Vector<PlayListItem *>* m_pMediaElems;
     int32                   m_current;
     int32                   m_skipNum;
@@ -92,6 +167,8 @@ public:
     Vector<OrderListItem *> *m_pOrderList;
     OrderOfPlay m_order;
     RepeatPlay m_repeat;
+
+    void SendInfoToPlayer();
 
     void InitializeOrder();
     void ShuffleOrder();

@@ -99,6 +99,10 @@ void PlayListManager::Add(char *pc, int type) {
 	order_item->m_index = m_pMediaElems->NumElements() - 1;
 	order_item->m_random = 0;
 	m_pOrderList->Insert(order_item);
+
+	PLMGetMediaInfoEvent *gmi = new PLMGetMediaInfoEvent();
+	gmi->SetPlayListItem(item);
+	m_target->AcceptEvent(gmi);
     }
     if (m_order == ORDER_SHUFFLED) {
 	int32 count = m_pOrderList->NumElements();
@@ -147,6 +151,7 @@ void PlayListManager::SetFirst() {
     } else {
 	m_current = 0; 
     }
+    SendInfoToPlayer();
 }
 
 void PlayListManager::SetNext() { 
@@ -165,6 +170,7 @@ void PlayListManager::SetNext() {
 	    m_current++;
 	}
     }
+    SendInfoToPlayer();
 }
 
 void PlayListManager::SetPrev() {
@@ -179,6 +185,15 @@ void PlayListManager::SetPrev() {
 	if ((m_current < 0) && (m_repeat == REPEAT_ALL)) {
 	    m_current = count - 1;
 	}
+    }
+    SendInfoToPlayer();
+}
+
+void PlayListManager::SendInfoToPlayer() {
+    PlayListItem *pli = GetCurrent();
+    if (pli) {
+	MediaInfoEvent *mie = pli->GetMediaInfo();
+	m_target->AcceptEvent(mie);
     }
 }
 
@@ -281,15 +296,28 @@ int32 PlayListManager::PartitionOrderList(int32 first, int32 last) {
     }
 }
 
-PlayListItem::PlayListItem() {
-    m_url = NULL;
-}
-    
-PlayListItem::~PlayListItem() {
-    if(m_url)
-        delete m_url;
-}
 
+void PlayListManager::AcceptEvent(Event *e) {
+    if (e) {
+	switch (e->Type()) {
+	    case CMD_PLMSetMediaInfo: {
+		PLMSetMediaInfoEvent *smi = (PLMSetMediaInfoEvent *)e;
+		PlayListItem *pItem = smi->GetPlayListItem();
+		// make sure pItem still exists
+		pItem->SetPMIRegistryItem(smi->GetPMIRegistryItem());
+		pItem->SetLMCRegistryItem(smi->GetLMCRegistryItem());
+		pItem->SetMediaInfo(smi->GetMediaInfo());
+		// if pItem is the current item, send out the info posthaste
+		if (pItem == GetCurrent()) {
+		    SendInfoToPlayer();
+		}
+		break;
+	    }
+	    default:
+		break;
+	}
+    }
+}
 
 
 

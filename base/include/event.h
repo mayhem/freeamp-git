@@ -76,6 +76,8 @@ class EventQueue {
 #define INFO_LMCError           28 // sent by LMC to player to signal an error condition in the decoder
 #define INFO_MPEGInfo			29 // info about MPEG stuff (layer, samprate, etc.)
 #define INFO_ID3TagInfo			30 // info about ID3 tag
+#define CMD_PLMGetMediaInfo             31 // sent by PlayListManager to player to get vital info about a particular playlistitem
+#define CMD_PLMSetMediaInfo             32 // sent by Player to PlayListManger to set the info the PLM requested.
 #endif // _EVENT_H_
 
 
