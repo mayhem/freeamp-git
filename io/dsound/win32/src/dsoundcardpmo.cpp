@@ -36,7 +36,6 @@ ____________________________________________________________________________*/
 #include "preferences.h"
 #include "facontext.h"
 #include "log.h"
-#include "debug.hpp"
 
 #define DB Debug_v("%s:%d", __FILE__, __LINE__);
 
