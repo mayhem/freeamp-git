@@ -37,13 +37,6 @@ Preferences::
 Preferences()
 {
     LONG    result;
-    DWORD   type;
-	DWORD   size;
-    char    temp[MAX_PATH] = {0x00};
-    char    cwd[MAX_PATH]= {0x00};
-
-    // Where are we starting the program from?
-    GetCurrentDirectory(sizeof(cwd), cwd);
 
     m_prefsKey = NULL;
 
@@ -52,18 +45,39 @@ Preferences()
 							0, 
 							KEY_ALL_ACCESS,
 							&m_prefsKey);
+}
 
-    if(result == ERROR_SUCCESS)
+Preferences::
+~Preferences()
+{
+    if(m_prefsKey)
+    {
+        RegCloseKey(m_prefsKey);
+    }
+}
+
+Error
+Preferences::
+Initialize()
+{
+    LONG    result;
+	uint32  length;
+    char    path[MAX_PATH] = {0x00};
+    char    cwd[MAX_PATH]= {0x00};
+    Error   error = kError_UnknownErr;
+
+    // Where are we starting the program from?
+    GetCurrentDirectory(sizeof(cwd), cwd);
+
+
+    if(m_prefsKey)
 	{
         // people DO move their apps around on windows
-		result = RegQueryValueEx(   m_prefsKey,
-                                    kInstallDirPref, 
-                                    NULL, 
-                                    &type, 
-                                    (LPBYTE)temp, 
-                                    &size);
+        length = sizeof(path);
 
-        if(strcmp(cwd, temp))
+        error = GetInstallDirectory(path, &length);
+
+        if(IsError(error) || strcmp(cwd, path))
         {
             result = RegSetValueEx( m_prefsKey,
                                     kInstallDirPref, 
@@ -72,6 +86,8 @@ Preferences()
                                     (LPBYTE)cwd, 
                                     strlen(cwd) + 1);
         }
+
+        error = kError_NoErr;
     }
     else // keys need to be created for the first time
     {
@@ -105,17 +121,16 @@ Preferences()
                                     REG_SZ, 
                                     (LPBYTE)kDefaultUI, 
                                     strlen(kDefaultUI) + 1);
+
+             error = kError_NoErr;
+        }
+        else
+        {
+             error = kError_NoPrefs;
         }
     }
-}
 
-Preferences::
-~Preferences()
-{
-    if(m_prefsKey)
-    {
-        RegCloseKey(m_prefsKey);
-    }
+    return error;
 }
 
 

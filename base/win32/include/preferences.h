@@ -37,6 +37,8 @@ class Preferences {
 	Preferences();
 	~Preferences();
 
+    Error Initialize();
+
     Error GetInstallDirectory(char* path, uint32* len);
     Error SetInstallDirectory(char* path);
 

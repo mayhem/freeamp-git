@@ -40,10 +40,11 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
 		 				LPSTR lpszCmdLine, 
 						int cmdShow)
 {
-    // Initialize the preferences
+    // Initialize the preferences in case the user moved the app
    Preferences* prefs;
 
    prefs = new Preferences;
+   prefs->Initialize();
 
     // find all the plug-ins we use
     Registrar* registrar;
