@@ -33,7 +33,6 @@ ____________________________________________________________________________*/
 /* Project Includes */
 #include "config.h"
 #include "registrar.h"
-#include "utility.h"
 #include "errors.h"
 
 Error 
