@@ -116,7 +116,12 @@ void FreeAmpTheme::WorkerThread(void)
    char   szTemp[255];
    uint32 iLen = 255;
    Error  eRet;
+   int32  iValue;
 
+   m_pContext->prefs->GetTimeDisplay(&iValue);
+   if (iValue)
+       m_eTimeDisplayState = kTimeRemaining;
+   
    m_pContext->prefs->GetPrefString(kMainWindowPosPref, szTemp, &iLen);
    sscanf(szTemp, " %d , %d", &m_oWindowPos.x, &m_oWindowPos.y);
 
@@ -128,6 +133,8 @@ void FreeAmpTheme::WorkerThread(void)
    }
    else     
        m_pContext->target->AcceptEvent(new Event(CMD_QuitPlayer));
+       
+   m_pContext->prefs->SetTimeDisplay(m_eTimeDisplayState == kTimeRemaining);
 }
 
 void WorkerThreadStart(void* arg)
