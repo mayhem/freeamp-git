@@ -9,6 +9,7 @@ bindir="$prefix/bin"
 libdir="$prefix/lib"
 fadir="$libdir/freeamp"
 plugdir="$fadir/plugins"
+ldconf="/sbin/ldconfig"
 
 # We could use mkdir -p, but not all unix systems' mkdir's support -p
 for dir in "$bindir" "$libdir" "$fadir" "$plugdir"; do
@@ -27,7 +28,7 @@ for file in plugins/*.*; do
     enable=f
     case "$file" in
     	*/alsa-*.pmo)
-	      if ldconfig -p | grep 'libasound\.so' > /dev/null; then
+	      if $ldconf -p | grep 'libasound\.so' > /dev/null; then
 	      	enable=t
 	      else
 	      	enable=f
@@ -36,7 +37,7 @@ for file in plugins/*.*; do
 	      fi
 	   ;;
     	*/esound-*.pmo)
-	      if ldconfig -p | grep 'libesd\.so' > /dev/null; then
+	      if $ldconf -p | grep 'libesd\.so' > /dev/null; then
 	      	enable=t
 	      else
 	      	enable=f
@@ -45,7 +46,7 @@ for file in plugins/*.*; do
 	      fi
 	   ;;
       */ncurses-*.ui)
-         if ldconfig -p | grep 'libncurses\.so' > /dev/null; then
+         if $ldconf -p | grep 'libncurses\.so' > /dev/null; then
             enable=t
          else
             enable=f
