@@ -1693,7 +1693,6 @@ SendEventToUI(Event *pEvent)
    GetUIManipLock();
    SendToUI(pEvent);
    ReleaseUIManipLock();
-   delete pEvent;
 }
 
 void
@@ -1846,8 +1845,9 @@ ServiceEvent(Event * pC)
             break;
 
         case INFO_PlaylistItemUpdated:
-            SendEventToCatalog(pC);
             SendEventToUI(pC);
+            SendEventToCatalog(pC);
+            delete pC;
             break;
 
         case INFO_UserMessage:
@@ -1883,6 +1883,7 @@ ServiceEvent(Event * pC)
         case CMD_LoadTheme:
         case CMD_ShowPreferences:
             SendEventToUI(pC);
+            delete pC;
             break;
 
         case CMD_ToggleDownloadUI:

@@ -1137,11 +1137,13 @@ void GTKMusicBrowser::RegenerateCDTree(void)
 
         CDTracks->push_back(newitem);
     }
-    vector<PlaylistItem *> *metalist = 
+    if (CDTracks->size() > 0) {
+        vector<PlaylistItem *> *metalist = 
                                    new vector<PlaylistItem *>(CDTracks->size());
 
-    copy(CDTracks->begin(), CDTracks->end(), metalist->begin());
-    m_plm->RetrieveMetaData(metalist);
+        copy(CDTracks->begin(), CDTracks->end(), metalist->begin());
+        m_plm->RetrieveMetaData(metalist);
+    }
 
     gtk_ctree_node_get_pixtext(musicBrowserTree, CDTree, 0, NULL, NULL, &pixmap,
                                &mask);

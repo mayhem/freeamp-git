@@ -846,7 +846,6 @@ void MusicCatalog::DoSearchMusic(char *path)
                        
                     PlaylistItem *plist = new PlaylistItem(tempurl);
                     metalist->push_back(plist);
-                    m_itemWaitCount++;
 
                     delete [] tempurl;
                 }
@@ -856,8 +855,12 @@ void MusicCatalog::DoSearchMusic(char *path)
         while (FindNextFile(handle, &find) && !m_exit);
         FindClose(handle);
 
-        if (metalist->size() > 0)
+        if (metalist->size() > 0) {
+            while (m_itemWaitCount > 30)
+                usleep(50);
+            m_itemWaitCount += metalist->size();
             m_plm->RetrieveMetaData(metalist);
+        }
         else 
             delete metalist;
     }
@@ -1038,7 +1041,6 @@ Error MusicCatalog::AcceptEvent(Event *e)
                 WriteMetaDataToDatabase(piu->Item()->URL().c_str(), 
                                         (MetaData)piu->Item()->GetMetaData());
 
-                delete piu->Item();
                 m_itemWaitCount--;
             }
             break; }
