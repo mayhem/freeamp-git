@@ -106,104 +106,106 @@ Error M3U::ReadPlaylist(const char* url,
         char* cp = NULL;
         uint32 length = sizeof(path);
 
-        URLToFilePath(url, path, &length);
+        result = URLToFilePath(url, path, &length);
 
-        strcpy(root, path);
-
-        cp = strrchr(root, DIR_MARKER);
-
-        if(cp)
-            *(cp + 1) = 0x00;
-	    
-        result = kError_FileNotFound;
-
-        fp = fopen(path, "rb");
-
-        if(fp)
+        if(IsntError(result))
         {
-            while(fgets(entry, _MAX_PATH, fp))
+
+            strcpy(root, path);
+
+            cp = strrchr(root, DIR_MARKER);
+
+            if(cp)
+                *(cp + 1) = 0x00;
+	        
+            result = kError_FileNotFound;
+
+            fp = fopen(path, "rb");
+
+            if(fp)
             {
-                int32 index;
-
-                // is this a comment line?
-                if(entry[0] == '#')
-                    continue;
-
-                // if this is not a URL then let's
-                // enable people with different platforms 
-                // to swap files by changing the path 
-                // separator as necessary
-                if( strncmp(entry, "http://", 7) &&
-                    strncmp(entry, "rtp://", 6) &&
-                    strncmp(entry, "file://", 7))
+                while(fgets(entry, _MAX_PATH, fp))
                 {
+                    int32 index;
+
+                    // is this a comment line?
+                    if(entry[0] == '#')
+                        continue;
+
+                    // if this is not a URL then let's
+                    // enable people with different platforms 
+                    // to swap files by changing the path 
+                    // separator as necessary
+                    if( strncmp(entry, "http://", 7) &&
+                        strncmp(entry, "rtp://", 6) &&
+                        strncmp(entry, "file://", 7))
+                    {
+                        for (index = strlen(entry) - 1; index >=0; index--)
+                        {
+                            if(entry[index] == '\\' && DIR_MARKER == '/')
+                                entry[index] = DIR_MARKER;
+                            else if(entry[index] == '/' && DIR_MARKER == '\\')
+                                entry[index] = DIR_MARKER;
+                        }
+                    }
+
+                    // get rid of nasty trailing whitespace
                     for (index = strlen(entry) - 1; index >=0; index--)
                     {
-                        if(entry[index] == '\\' && DIR_MARKER == '/')
-                            entry[index] = DIR_MARKER;
-                        else if(entry[index] == '/' && DIR_MARKER == '\\')
-                            entry[index] = DIR_MARKER;
-                    }
-                }
-
-                // get rid of nasty trailing whitespace
-                for (index = strlen(entry) - 1; index >=0; index--)
-                {
-                    if(isspace(entry[index]))
-                    {
-                        entry[index] = 0x00;
-                    }
-                    else
-                        break;
-                }
-
-                // is there anything left?
-                if(strlen(entry))
-                {
-                    // is it a url already?
-                    if (!strncmp(entry, "http://", 7) ||
-                        !strncmp(entry, "rtp://", 6) ||
-                        !strncmp(entry, "file://", 7))
-                    {
-                        strcpy(path, entry);
-                    }
-                    else 
-                    {
-                        // is the path relative?
-                        if( !strncmp(entry, "..", 2) ||
-                            (strncmp(entry + 1, ":\\", 2) &&
-                             strncmp(entry, DIR_MARKER_STR, 1)))
+                        if(isspace(entry[index]))
                         {
-                            strcpy(path, root);
-                            strcat(path, entry);
+                            entry[index] = 0x00;
                         }
                         else
+                            break;
+                    }
+
+                    // is there anything left?
+                    if(strlen(entry))
+                    {
+                        // is it a url already?
+                        if (!strncmp(entry, "http://", 7) ||
+                            !strncmp(entry, "rtp://", 6) ||
+                            !strncmp(entry, "file://", 7))
                         {
                             strcpy(path, entry);
                         }
+                        else 
+                        {
+                            // is the path relative?
+                            if( !strncmp(entry, "..", 2) ||
+                                (strncmp(entry + 1, ":\\", 2) &&
+                                 strncmp(entry, DIR_MARKER_STR, 1)))
+                            {
+                                strcpy(path, root);
+                                strcat(path, entry);
+                            }
+                            else
+                            {
+                                strcpy(path, entry);
+                            }
                         
-                        // make it a url so we can add it to the playlist
-                        length = strlen(path) + 15;
-                        char *itemurl = new char[length];
+                            // make it a url so we can add it to the playlist
+                            length = strlen(path) + 15;
+                            char *itemurl = new char[length];
 
-                        if (IsntError(FilePathToURL(path, itemurl, &length)))
-                            strcpy(path, itemurl);
+                            if (IsntError(FilePathToURL(path, itemurl, &length)))
+                                strcpy(path, itemurl);
  
-                        delete [] itemurl;
+                            delete [] itemurl;
+                        }
+
+                        item = new PlaylistItem(path);
+
+                        list->push_back(item);
                     }
-
-                    item = new PlaylistItem(path);
-
-                    list->push_back(item);
                 }
+
+                fclose(fp);
+
+                result = kError_NoErr;
             }
-
-            fclose(fp);
-
-            result = kError_NoErr;
         }
-
-
     }
 
     return result;

@@ -106,7 +106,10 @@ Error PLS::ReadPlaylist(const char* url,
     assert(url);
     assert(list);
 
-    URLToFilePath(url, path, &length);
+    Error result = URLToFilePath(url, path, &length);
+
+    if(IsError(result))
+        return result;
 
     strcpy(root, path);
     cp = strrchr(root, DIR_MARKER);
