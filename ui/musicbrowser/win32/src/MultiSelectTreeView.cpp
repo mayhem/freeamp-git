@@ -90,6 +90,7 @@ EditLabelWndProc(HWND hwnd,
                  LPARAM lParam)
 {
     WNDPROC lpOldProc = (WNDPROC)GetProp(hwnd, "oldproc" );
+    BOOL isPlaylist = (BOOL)GetProp(hwnd, "playlist" );
 
     switch(msg)
 	{
@@ -100,6 +101,7 @@ EditLabelWndProc(HWND hwnd,
 
 			// remove window property
 			RemoveProp( hwnd, "oldproc" ); 
+            RemoveProp( hwnd, "playlist" ); 
 
 			break;
         }
@@ -122,6 +124,20 @@ EditLabelWndProc(HWND hwnd,
                 return 1;
             }
 
+            if( isPlaylist &&
+               (wParam == '\\'  ||
+                wParam == '/'   ||
+                wParam == ':'   ||
+                wParam == '*'   ||
+                wParam == '?'   ||
+                wParam == '\"'  ||
+                wParam == '<'   ||
+                wParam == '>'   ||
+                wParam == '|' ) )
+            {
+                return 1;
+            }
+
             break;
         }
 
@@ -131,7 +147,7 @@ EditLabelWndProc(HWND hwnd,
     return CallWindowProc((int (__stdcall *)(void))lpOldProc, hwnd, msg, wParam, lParam );
 }
 
-void EditItemLabel(HWND hwnd, HTREEITEM item)
+void MusicBrowserUI::EditItemLabel(HWND hwnd, HTREEITEM item)
 {
     g_editItem = item;
     SetFocus(hwnd);
@@ -140,9 +156,21 @@ void EditItemLabel(HWND hwnd, HTREEITEM item)
 
     if(hwndEdit)
     {
+        bool isPlaylist = false;
+        TV_ITEM tv_item;
+
+        tv_item.hItem = item;
+        tv_item.mask = TVIF_PARAM;
+
+        TreeView_GetItem(hwnd, &tv_item);
+
         SetProp(hwndEdit, 
                 "oldproc",
                 (HANDLE)GetWindowLong(hwndEdit, GWL_WNDPROC));
+
+        SetProp(hwndEdit, 
+                "playlist",
+                (HANDLE)m_oTreeIndex.IsPlaylist(tv_item.lParam));
 
 	    // Subclass the window so we can handle multi-select
 	    SetWindowLong(hwndEdit, 

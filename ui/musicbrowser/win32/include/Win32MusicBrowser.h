@@ -60,8 +60,6 @@ bool operator==(const TreeData &A, const TreeData &b);
 void ClientToWindow(HWND hWnd, POINT *Pt); 
 extern HINSTANCE g_hinst;
 
-void EditItemLabel(HWND hwnd, HTREEITEM item);
-
 bool FileOpenDialog(HWND hwnd, 
                     const char* title,
                     const char* filter,
@@ -120,6 +118,8 @@ class MusicBrowserUI : public UserInterface
     static void UIThreadFunc(void* arg);
     void   InitDialog(HWND hwnd);
     void   SetMinMaxInfo(void);
+    void   EditItemLabel(HWND hwnd, HTREEITEM item);
+
 
     BOOL   DialogProc(HWND hwnd, UINT msg, 
                       WPARAM wParam, LPARAM lParam);
