@@ -487,12 +487,12 @@ void MusicBrowserUI::PlaylistListItemRemoved(const PlaylistItem* item,
             ListView_SetItemState(m_hPlaylistView, oldIndex, LVIS_FOCUSED, LVIS_FOCUSED);
         }
 
-        ListView_RedrawItems(m_hPlaylistView, oldIndex, ListView_GetItemCount(m_hPlaylistView) - 1);
+        ListView_RedrawItems(m_hPlaylistView, oldIndex, ListView_GetItemCount(m_hPlaylistView) - 1);        
 
-        SetFocus(m_hPlaylistView);
         m_bListChanged = true;
         UpdateTotalTime();
         UpdateButtonStates();
+        SetFocus(m_hPlaylistView);
 
         //HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
 

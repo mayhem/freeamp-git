@@ -569,13 +569,14 @@ void CreateHiddenWindow(void* arg)
     }
 }
 
-const char* kFileTypes[][2] = {
-    {".mp1", "MPEGAudioFile"},
-    {".mp2", "MPEGAudioFile"},
-    {".mp3", "MPEGAudioFile"},
-    {".m3u", "M3UPlaylistFile"},
-    {".pls", "PLSPlaylistFile"},
-    {".rmp", "RealMusicPackage"},
+const char* kFileTypes[][5] = {
+    {".mp1", "MPEGAudioFile", "audio/x-mpeg", "MPEG Audio File", "13"},
+    {".mp2", "MPEGAudioFile", "audio/x-mpeg", "MPEG Audio File", "13"},
+    {".mp3", "MPEGAudioFile", "audio/x-mpeg", "MPEG Audio File", "13"},
+    {".m3u", "M3UPlaylistFile", "audio/x-mpegurl", "M3U Playlist File", "16"},
+    {".pls", "PLSPlaylistFile", "audio/x-scpls", "PLS Playlist File", "17"},
+    {".rmp", "RealMusicPackage", "application/vnd.rn-rn_music_package", "Real Music Package", "4"},
+    {".fat", "FreeAmpTheme", "application/x-freeamp-theme", "FreeAmp Theme File", "16"},
     {NULL, NULL}
 };
 
@@ -589,6 +590,7 @@ const char* kMimeTypes[] = {
     "audio/mpegurl",
     "audio/scpls",
     "application/vnd.rn-rn_music_package",
+    "application/x-freeamp-theme",
     NULL
 };
 
@@ -671,6 +673,28 @@ void ReclaimFileTypes(const char* path, bool askBeforeReclaiming)
 
             RegCloseKey(typeKey);
         }
+        else // create it
+        {
+            RegCreateKey(HKEY_CLASSES_ROOT,
+                         kFileTypes[index][0],
+                         &typeKey);
+
+            RegSetValueEx(typeKey,
+                          NULL, 
+                          NULL, 
+                          REG_SZ, 
+                          (LPBYTE)kFileTypes[index][1], 
+                          strlen(kFileTypes[index][1]) + 1);
+
+            RegSetValueEx(typeKey,
+                          "Content Type", 
+                          NULL, 
+                          REG_SZ, 
+                          (LPBYTE)kFileTypes[index][2], 
+                          strlen(kFileTypes[index][2]) + 1);
+
+            RegCloseKey(typeKey);
+        }
 
         wsprintf(buf, "%s%s", kFileTypes[index][1], kOpenCommand);
 
@@ -721,6 +745,54 @@ void ReclaimFileTypes(const char* path, bool askBeforeReclaiming)
                 }
             }
 
+            RegCloseKey(appKey);
+        }
+        else // create it
+        {
+            HKEY iconKey;
+            char iconPath[MAX_PATH];
+
+            RegCreateKey(HKEY_CLASSES_ROOT,
+                         kFileTypes[index][1],
+                         &appKey);
+
+            RegSetValueEx(appKey,
+                          NULL, 
+                          NULL, 
+                          REG_SZ, 
+                          (LPBYTE)kFileTypes[index][3], 
+                          strlen(kFileTypes[index][3]) + 1);
+            
+            
+            sprintf(iconPath, "%s,%s", path,  kFileTypes[index][4]);
+
+            RegCreateKey(appKey,
+                         "DefaultIcon",
+                         &iconKey);
+
+            RegSetValueEx(iconKey,
+                          NULL, 
+                          NULL, 
+                          REG_SZ, 
+                          (LPBYTE)iconPath, 
+                          strlen(iconPath) + 1);
+
+            
+            RegCloseKey(iconKey);
+            RegCloseKey(appKey);
+
+            RegCreateKey(HKEY_CLASSES_ROOT,
+                         buf,
+                         &appKey);
+
+            RegSetValueEx(appKey,
+                          NULL, 
+                          NULL, 
+                          REG_SZ, 
+                          (LPBYTE)openString, 
+                          strlen(openString) + 1);
+
+            
             RegCloseKey(appKey);
         }
     }

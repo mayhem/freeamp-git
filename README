@@ -41,6 +41,7 @@ The mimetypes that FreeAmp can handle are:
      audio/x-mpeg     audio/x-mp3     audio/x-mpegurl   audio/x-scpls
      audio/mpeg       audio/mp3       audio/mpegurl     audio/scpls
      application/vnd.rn-rn_music_package
+     application/x-freeamp-theme
 
 Just set up seperate associations for each of these mimetypes, and 
 FreeAmp will be launched whenever you click on a relavent URL in your

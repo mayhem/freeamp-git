@@ -431,9 +431,14 @@ begin
 		endif;
 		
 		
-		if(bRegisterFileTypes = TRUE) then		
-			// MP3 support
+		if(bRegisterFileTypes = TRUE) then	
+		
 			szKey = "Software\\Netscape\\Netscape Navigator\\Suffixes";
+			
+			// Theme support
+			RegDBSetKeyValueEx(szKey, "application/x-freeamp-theme", REGDB_STRING, "fat", -1);
+			
+			// MP3 support
 			RegDBSetKeyValueEx(szKey, "audio/x-mpeg", REGDB_STRING, "mp1,mp2,mp3", -1);
 			RegDBSetKeyValueEx(szKey, "audio/x-mp3", REGDB_STRING, "mp3", -1);
 			RegDBSetKeyValueEx(szKey, "audio/x-mpegurl", REGDB_STRING, "m3u", -1);
@@ -449,6 +454,11 @@ begin
 			
 				
 			szKey = "Software\\Netscape\\Netscape Navigator\\Viewers";
+			
+			// Theme support
+			RegDBSetKeyValueEx(szKey, "application/x-freeamp-theme", REGDB_STRING, szAppPath ^ @PRODUCT_KEY, -1);
+			
+			// MP3 support
 			RegDBSetKeyValueEx(szKey, "audio/x-mpeg", REGDB_STRING, szAppPath ^ @PRODUCT_KEY, -1);
 			RegDBSetKeyValueEx(szKey, "audio/x-mp3", REGDB_STRING, szAppPath ^ @PRODUCT_KEY, -1);
 			RegDBSetKeyValueEx(szKey, "audio/x-mpegurl", REGDB_STRING, szAppPath ^ @PRODUCT_KEY, -1);
@@ -1017,6 +1027,7 @@ end;
 // --- include script file section ---
 
 #include "sddialog.rul"
+
 
 
 
