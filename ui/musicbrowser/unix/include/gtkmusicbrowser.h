@@ -74,6 +74,7 @@ class GTKMusicBrowser {
 
     char *mbSelName;
     PlaylistItem *mbSel;
+    GtkWidget *mbSelWidget;
  
     FAContext *GetContext(void) { return m_context; }
     void UpdateCatalog(void);

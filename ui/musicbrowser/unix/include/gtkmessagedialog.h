@@ -57,12 +57,27 @@ class GTKMessageDialog
        MessageDialogReturnEnum Show(const char *szMessage, 
                                     const char *szTitle, 
                                     MessageDialogEnum eType,
-                                    bool inMain = false);
+                                    bool inMain = false,
+                                    bool bhasEntry = false,
+                                    const char *szCheckbox = NULL);
        MessageDialogReturnEnum Show(const string &oMessage, 
                                     const string &oTitle, 
                                     MessageDialogEnum eType,
                                     bool inMain = false);
 
+       bool  GetCheckStatus();
+       char *GetEntryText();
+ 
+       void      SetText(char *text) { entryText = text; }
+
+  private:
+       bool       hasCheck;
+       GtkWidget *checkBox;
+       string     checkText;
+
+       bool       hasEntry;
+       string     entryText;
+       GtkWidget *entryBox;       
 };
 
 #endif
