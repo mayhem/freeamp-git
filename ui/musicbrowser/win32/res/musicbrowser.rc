@@ -120,7 +120,7 @@ BEGIN
     LTEXT           "Album:",IDC_TRACKTEXT,7,49,36,8
     LTEXT           "Artist:",IDC_TRACKTEXT,7,65,36,8
     LTEXT           "Genre:",IDC_TRACKTEXT,7,81,36,8
-    LTEXT           "Comments:",IDC_TRACKTEXT,7,99,36,8
+    LTEXT           "Comments:",IDC_TRACKTEXT,7,100,36,8
     COMBOBOX        IDC_ALBUM,47,47,114,69,CBS_DROPDOWN | CBS_SORT | 
                     WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_ARTIST,47,63,114,77,CBS_DROPDOWN | CBS_SORT | 
@@ -436,6 +436,7 @@ IDB_TRACK               BITMAP  DISCARDABLE     "track.bmp"
 IDB_ALBUM               BITMAP  DISCARDABLE     "album.bmp"
 IDB_ALL                 BITMAP  DISCARDABLE     "all.bmp"
 IDB_UNCATAGORIZED       BITMAP  DISCARDABLE     "uncatagorized.bmp"
+IDB_PORTABLE            BITMAP  DISCARDABLE     "portable.bmp"
 
 #ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////

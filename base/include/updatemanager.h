@@ -132,6 +132,9 @@ class UpdateManager : public Parse {
     Error UpdateComponents(UMCallBackFunction function = NULL,
                            void* cookie = NULL);
 
+    bool IsUpdateAvailable(void);
+
+
     // Utility Functions
     bool            IsEmpty();
     uint32          CountItems();

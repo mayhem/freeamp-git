@@ -1894,6 +1894,7 @@ RemovePropertyWatcher(const char *pProp, PropertyWatcher * pPropWatch)
 {
    return m_props.RemovePropertyWatcher(pProp, pPropWatch);
 }
+
 /*
    void Player::testQueue() {
    Event *pC;

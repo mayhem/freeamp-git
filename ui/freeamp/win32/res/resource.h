@@ -6,6 +6,7 @@
 #define IDC_URL                         101
 #define IDB_DIALS                       104
 #define IDC_DIAL                        104
+#define IDI_INFO                        104
 #define IDB_CONTROL_MASK_MID            105
 #define IDB_MID                         111
 #define IDB_LEFT                        112
@@ -82,6 +83,7 @@
 #define IDD_PREF_GENERAL                193
 #define IDD_OPENURL                     219
 #define IDD_SAVERIO                     220
+#define IDD_UPDATEAVAILABLE             220
 #define IDD_PREF3                       221
 #define IDD_PREF_DEBUG                  221
 #define IDD_PREF2                       223

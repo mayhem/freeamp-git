@@ -669,7 +669,9 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
                                item != m_hPlaylistItem &&
                                item != m_hAllItem &&
                                item != m_hUncatItem &&
-                               item != m_hNewPlaylistItem)
+                               item != m_hNewPlaylistItem&& 
+                               item != m_hPortableItem &&
+                               TreeView_GetParent(m_hMusicCatalog, item) != m_hPortableItem)
                             {
                                 // pause a half sec so this does not
                                 // look so jarring

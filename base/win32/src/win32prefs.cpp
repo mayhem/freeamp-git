@@ -356,13 +356,14 @@ GetPrefString(const char* pref, char* buf, uint32* len)
 	DWORD   type;
 	LONG    result;
 
-    if(!buf || !len || !pref)
+    if((!buf && len && *len != 0) || !len || !pref)
     {
         error = kError_InvalidParam;
         return error;
     }
 
-    *buf = 0x00;
+    if(buf)
+        *buf = 0x00;
 
 	if(m_prefsKey)
 	{
@@ -374,9 +375,14 @@ GetPrefString(const char* pref, char* buf, uint32* len)
                                     (DWORD*)len);
 
         if(result == ERROR_SUCCESS)
-            error = kError_NoErr;
+        {
+            if(!buf)
+                error = kError_BufferTooSmall;    
+            else
+                error = kError_NoErr;
+        }
         else if(result == ERROR_MORE_DATA)
-            error = kError_BufferTooSmall;    
+            error = kError_BufferTooSmall;
         else if(result == ERROR_FILE_NOT_FOUND)
             error = kError_NoPrefValue;
 	    

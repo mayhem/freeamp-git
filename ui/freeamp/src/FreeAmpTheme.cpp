@@ -39,6 +39,9 @@ ____________________________________________________________________________*/
 #elif defined(WIN32)
 #include "Win32Window.h"
 #include "Win32PreferenceWindow.h"
+#include "win32updatemanager.h"
+#include "resource.h"
+extern HINSTANCE g_hinst;
 #elif defined(__BEOS__)
 #include "BeOSPreferenceWindow.h"
 #endif
@@ -91,6 +94,20 @@ FreeAmpTheme::FreeAmpTheme(FAContext * context)
    m_oTitle = string("");
    m_eTimeDisplayState = kNormal;
    m_oStreamInfo = string("");
+   m_pUpdateMan = NULL;
+   m_pUpdateThread = NULL;
+
+#if defined( WIN32 )
+    m_pUpdateMan = new Win32UpdateManager(m_pContext);
+    m_pUpdateMan->DetermineLocalVersions();
+    m_pUpdateMan->SetPlatform(string("WIN32"));
+#if defined( _M_ALPHA )
+     m_pUpdateMan->SetArchitecture(string("ALPHA"));
+#else
+     m_pUpdateMan->SetArchitecture(string("X86"));
+#endif // _M_ALPHA
+
+#endif // WIN32
 
    LoadFreeAmpTheme();
 }
@@ -101,40 +118,54 @@ FreeAmpTheme::~FreeAmpTheme()
 
 Error FreeAmpTheme::Init(int32 startup_type)
 {
-   assert(this);
+    assert(this);
 
-   m_iStartupType = startup_type;
+    m_iStartupType = startup_type;
 
-   m_uiThread = Thread::CreateThread();
-   m_uiThread->Create(WorkerThreadStart, this);
+    m_uiThread = Thread::CreateThread();
+    m_uiThread->Create(WorkerThreadStart, this);
 
-   return kError_NoErr;
+    return kError_NoErr;
 }
 
 void FreeAmpTheme::WorkerThread(void)
 {
-   char   szTemp[255];
-   uint32 iLen = 255;
-   Error  eRet;
-   int32  iValue;
+    char   szTemp[255];
+    uint32 iLen = 255;
+    Error  eRet;
+    int32  iValue;
 
-   m_pContext->prefs->GetTimeDisplay(&iValue);
-   if (iValue)
+    m_pContext->prefs->GetTimeDisplay(&iValue);
+    if (iValue)
        m_eTimeDisplayState = kTimeRemaining;
-   
-   m_pContext->prefs->GetPrefString(kMainWindowPosPref, szTemp, &iLen);
-   sscanf(szTemp, " %d , %d", &m_oWindowPos.x, &m_oWindowPos.y);
 
-   eRet = Theme::Run(m_oWindowPos);
-   if (!IsError(eRet))
-   {
+    m_pContext->prefs->GetPrefString(kMainWindowPosPref, szTemp, &iLen);
+    sscanf(szTemp, " %d , %d", &m_oWindowPos.x, &m_oWindowPos.y);
+
+#ifdef WIN32
+
+    bool checkForUpdates = false;
+
+    m_pContext->prefs->GetCheckForUpdates(&checkForUpdates);
+
+    if(checkForUpdates)
+    {
+        m_pUpdateThread = Thread::CreateThread();
+        m_pUpdateThread->Create(update_thread, this);
+    }
+
+#endif
+
+    eRet = Theme::Run(m_oWindowPos);
+    if (!IsError(eRet))
+    {
        sprintf(szTemp, "%d,%d", m_oWindowPos.x, m_oWindowPos.y);
        m_pContext->prefs->SetPrefString(kMainWindowPosPref, szTemp);
-   }
-   else     
+    }
+    else     
        m_pContext->target->AcceptEvent(new Event(CMD_QuitPlayer));
-       
-   m_pContext->prefs->SetTimeDisplay(m_eTimeDisplayState == kTimeRemaining);
+   
+    m_pContext->prefs->SetTimeDisplay(m_eTimeDisplayState == kTimeRemaining);
 }
 
 void WorkerThreadStart(void* arg)
@@ -983,7 +1014,7 @@ void FreeAmpTheme::ShowOptions(uint32 defaultPage, bool inEventLoop)
     PreferenceWindow *pWindow;
        
 #ifdef WIN32
-    pWindow = new Win32PreferenceWindow(m_pContext, m_pThemeMan, defaultPage);
+    pWindow = new Win32PreferenceWindow(m_pContext, m_pThemeMan, m_pUpdateMan, defaultPage);
 #elif defined(__BEOS__)
     pWindow = new BeOSPreferenceWindow(m_pContext, m_pThemeMan);
 #else
@@ -1215,3 +1246,32 @@ void FreeAmpTheme::ShowHelp(void)
 #endif
 }
 
+void FreeAmpTheme::update_thread(void* arg)
+{
+    FreeAmpTheme* _this = (FreeAmpTheme*)arg;
+
+    _this->UpdateThread();
+}
+
+void FreeAmpTheme::UpdateThread()
+{
+#ifdef WIN32
+
+    m_pUpdateMan->RetrieveLatestVersionInfo();
+
+    if(m_pUpdateMan->IsUpdateAvailable())
+    {
+        if(0 < DialogBoxParam(g_hinst, 
+                              MAKEINTRESOURCE(IDD_UPDATEAVAILABLE),
+                              NULL, 
+                              (int (__stdcall *)(void))::UpdateAvailableDlgProc, 
+                              (LPARAM) 0))
+        {
+            ShowOptions(4);
+        }
+    }
+
+#endif
+
+    delete m_pUpdateThread;
+}

@@ -69,6 +69,8 @@ class FreeAmpTheme : public UserInterface, public Theme
 
         void  WorkerThread(void);
 
+        static void update_thread(void*);
+
     protected:
 
         void             ReloadTheme(void);
@@ -76,6 +78,7 @@ class FreeAmpTheme : public UserInterface, public Theme
         void             UpdateTimeDisplay(int iCurrentTime);
         void             UpdateMetaData(const PlaylistItem *pItem);
         void             ShowHelp(void);
+        void             UpdateThread();
 
         FAContext       *m_pContext;
         int              m_iCurrentSeconds, m_iTotalSeconds, m_iSeekSeconds;
@@ -86,6 +89,9 @@ class FreeAmpTheme : public UserInterface, public Theme
         bool             m_bSeekInProgress, m_bPlayShown;
         string           m_oCurrentWindow, m_oTitle, m_oStreamInfo;
         TimeDisplayState m_eTimeDisplayState;
+        UpdateManager   *m_pUpdateMan;
+        Thread          *m_pUpdateThread;
+
 };
 
 #endif

@@ -38,6 +38,12 @@ using namespace std;
 #include "errors.h"
 #include "updatemanager.h"
 
+BOOL CALLBACK 
+UpdateAvailableDlgProc(HWND hwnd, 
+                       UINT msg, 
+                       WPARAM wParam, 
+                       LPARAM lParam);
+
 
 class Win32UpdateManager : public UpdateManager {
 

@@ -62,8 +62,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                                ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
-                               ..\..\..\..\base\win32\prj\plugins
+                                                 ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
+                                ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
@@ -95,8 +95,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                                ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
-                               ..\..\..\..\base\win32\prj\plugins
+                                                 ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
+                                ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Debug"
@@ -130,8 +130,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                                ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
-                               ..\..\..\..\base\win32\prj\plugins
+                                                 ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
+                                ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Release"
@@ -163,8 +163,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                                ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
-                               ..\..\..\..\base\win32\prj\plugins
+                                                 ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
+                                ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
@@ -336,6 +336,250 @@ SOURCE=..\res\icon1.ico
 # Begin Source File
 
 SOURCE=..\res\unchecked.bmp
+# End Source File
+# End Group
+# Begin Group "includes"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\include\Bitmap.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\ButtonControl.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\Canvas.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\config\config.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\Control.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\database.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\debug.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\DialControl.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\downloadformat.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\downloadmanager.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\errors.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\event.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\eventdata.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\facontext.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\Font.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\FreeAmpTheme.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\gdbm\gdbm_fa.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\hashtable.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\win32\include\help.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lmc\include\lmc.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\log.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\MessageDialog.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\metadata.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\MultiStateControl.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\musicbrowser.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\win32\include\mutex.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\xml\include\Parse.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\io\include\pipeline.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\player.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\playlist.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\playlistformat.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\plmevent.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\portabledevice.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\preferences.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\PreferenceWindow.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\properties.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\propimpl.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\io\include\pullbuffer.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\queue.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\registrar.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\registry.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\win32\include\semaphore.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\SliderControl.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\TextControl.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\Theme.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\ThemeManager.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\ThemeZip.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\thread.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\ui.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\updatemanager.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\include\utility.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\Win32Bitmap.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\Win32Canvas.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\Win32Font.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\Win32PreferenceWindow.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\win32\include\win32updatemanager.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\Win32Window.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\Window.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\zlib\include\zconf.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\zlib\include\zlib.h
 # End Source File
 # End Group
 # End Target

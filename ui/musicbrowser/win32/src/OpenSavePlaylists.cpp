@@ -383,6 +383,31 @@ void MusicBrowserUI::EditPlaylist(const string &oList)
     pNew->Init(SECONDARY_UI_STARTUP);
 }
 
+void MusicBrowserUI::EditPortablePlaylist(DeviceInfo* device)
+{
+    MusicBrowserUI *pNew;
+    
+    if(m_pParent)
+    {
+       pNew = new MusicBrowserUI(m_context, m_pParent, m_hWnd, device);
+       m_pParent->AddMusicBrowserWindow(pNew);
+    }   
+    else   
+    {
+       pNew = new MusicBrowserUI(m_context, this, m_hWnd, device);
+       AddMusicBrowserWindow(pNew);
+    }   
+       
+    pNew->Init(SECONDARY_UI_STARTUP);
+}
+
+void MusicBrowserUI::SavePortablePlaylist()
+{
+    if(m_oPlm->IsPortableAvailable(m_portableDevice))
+    {
+        m_oPlm->SyncPortablePlaylist(m_portableDevice);
+    }
+}
 
 void MusicBrowserUI::ImportTracksAndPlaylists(void)
 {

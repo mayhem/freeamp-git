@@ -93,6 +93,7 @@ class Player : public EventQueue, Properties, PropertyWatcher
     virtual Error RemovePropertyWatcher(const char *, PropertyWatcher *);
 
     virtual Error PropertyChange(const char *, PropValue *);
+
  protected:
               Player(FAContext *context);
     void      GetUIManipLock();

@@ -433,19 +433,24 @@ Error MusicBrowserUI::CloseMainDialog(void)
 { 
     if(m_pParent)
     {
-       if(m_bListChanged)
-       {
-           ShowWindow(m_hWnd, SW_RESTORE);
-           SetForegroundWindow(m_hWnd);
-           if (MessageBox(m_hWnd, "Would you like to save this playlist?",
-                          BRANDING, MB_YESNO) == IDYES)
-              SavePlaylist();
-       }    
+        if(m_bListChanged)
+        {
+            ShowWindow(m_hWnd, SW_RESTORE);
+            SetForegroundWindow(m_hWnd);
+            if (MessageBox(m_hWnd, "Would you like to save this playlist?",
+                  BRANDING, MB_YESNO) == IDYES)
+            {
+                if(!m_portableDevice)
+                    SavePlaylist();
+                else
+                    SavePortablePlaylist();
+            }
+        }    
     }
 
     m_bListChanged = false;   
     PostMessage(m_hWnd, WM_QUIT, 0, 0);
-       
+   
     return kError_NoErr;
 }
 
@@ -752,7 +757,7 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
 
     HBITMAP bmp;
     
-    hList = ImageList_Create(16, 16, ILC_COLOR24|ILC_MASK, 7, 0);
+    hList = ImageList_Create(16, 16, ILC_COLOR24|ILC_MASK, 8, 0);
 
     bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_CATALOG));
     ImageList_AddMasked(hList, bmp, RGB(255,255,0));
@@ -767,6 +772,8 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
     bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_ALL));
     ImageList_AddMasked(hList, bmp, RGB(255,0,0));
     bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_UNCATAGORIZED));
+    ImageList_AddMasked(hList, bmp, RGB(255,0,0));
+    bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_PORTABLE));
     ImageList_AddMasked(hList, bmp, RGB(255,0,0));
  
     TreeView_SetImageList(m_hMusicCatalog, hList, TVSIL_NORMAL); 
@@ -862,7 +869,20 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
 //       LoadPlaylist(lastPlaylist);
         m_oPlm->SetActivePlaylist(kPlaylistKey_MasterPlaylist);
     }   
-    else   
+    else if(m_portableDevice)
+    {
+        m_oPlm->SetActivePlaylist(kPlaylistKey_PortablePlaylist);
+        if(m_oPlm->IsPortableAvailable(m_portableDevice))
+        {
+            vector<PlaylistItem*> items;
+            m_oPlm->ReadPortablePlaylist(m_portableDevice, &items);
+
+            m_initialCount = items.size();
+
+            m_oPlm->AddItems(&items);
+        }
+    }
+    else
     {
         m_oPlm->SetActivePlaylist(kPlaylistKey_ExternalPlaylist);
         LoadPlaylist(m_currentListName.c_str());
@@ -1518,7 +1538,8 @@ void MusicBrowserUI::UpdateButtonMenuStates()
 
     if(treeSelect && m_hMusicCatalog == GetFocus())
     {
-        if(treeSelect != m_hNewPlaylistItem)
+        if(treeSelect != m_hNewPlaylistItem &&
+            treeSelect != m_hNewPlaylistItem)
         {
             EnableMenuItem(hMenu, ID_EDIT_ADDTRACK, MF_ENABLED );
             SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
@@ -1526,7 +1547,8 @@ void MusicBrowserUI::UpdateButtonMenuStates()
         }
 
         if(treeSelect != m_hNewPlaylistItem && 
-           treeSelect != m_hCatalogItem)
+           treeSelect != m_hPortableItem &&
+           treeSelect != m_hNewPortableItem)
         {
             EnableMenuItem(hMenu, ID_EDIT_REMOVE, MF_ENABLED);
             SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
@@ -1535,7 +1557,8 @@ void MusicBrowserUI::UpdateButtonMenuStates()
 
         if(treeSelect != m_hNewPlaylistItem && treeSelect != m_hAllItem &&
            treeSelect != m_hCatalogItem && treeSelect != m_hUncatItem &&
-           treeSelect != m_hPlaylistItem)
+           treeSelect != m_hPlaylistItem && treeSelect != m_hPortableItem &&
+           treeSelect != m_hNewPortableItem)
         {
             EnableMenuItem(hMenu, ID_EDIT_EDITINFO, MF_ENABLED);
             SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
@@ -1592,9 +1615,6 @@ void MusicBrowserUI::UpdateButtonMenuStates()
     {
         EnableMenuItem(hMenu, ID_EDIT_EDITPLAYLIST, MF_GRAYED);
     }
-
-
-   
 
     sMenuItem.cbSize = sizeof(MENUITEMINFO);
     sMenuItem.fMask =  MIIM_DATA;

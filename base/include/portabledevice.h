@@ -65,6 +65,10 @@ class DeviceInfo {
     { m_device = device; return kError_NoErr; }
     const char* GetDevice() { return m_device.c_str(); }
 
+    Error SetPluginName(const char* name) 
+    { m_pluginName = name; return kError_NoErr; }
+    const char* GetPluginName() { return m_pluginName.c_str(); }
+
     Error SetCapacity(uint32 bytesTotal, uint32 bytesUsed) 
     { m_bytesTotal = bytesTotal; m_bytesUsed = bytesUsed; return kError_NoErr; }
     void GetCapacity(uint32* bytesTotal, uint32* bytesUsed) 
@@ -92,6 +96,7 @@ class DeviceInfo {
     uint32 m_bytesUsed;
     uint32 m_port;
     uint32 m_numEntries;
+    string m_pluginName;
 };
 
 class PortableDevice {

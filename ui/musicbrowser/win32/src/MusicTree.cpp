@@ -27,12 +27,18 @@ ____________________________________________________________________________*/
 #include <sys/stat.h>
 #include <direct.h>
 
+#include <set>
+#include <string>
+
+using namespace std;
+
 #include "config.h"
 #include "utility.h"
 #include "resource.h"
 #include "Win32MusicBrowser.h"
 #include "DropSource.h"
 #include "DropObject.h"
+#include "registrar.h"
 
 char* kMusicCatalog = "My Music";
 char* kAllTracks = "<All>";
@@ -41,13 +47,14 @@ char* kPlaylists = "My Playlists";
 char* kStreams = "My Favorite Streams";
 char* kPortables = "My Portables";
 char* kNewPlaylist = "Create a New Playlist...";
+char* kNewPortable = "Setup a Portable Player...";
 
 void MusicBrowserUI::InitTree(void)
 {                          
     TV_ITEM         sItem;
     TV_INSERTSTRUCT sInsert;
     
-    TreeView_DeleteAllItems(GetDlgItem(m_hWnd, IDC_MUSICTREE));
+    TreeView_DeleteAllItems(m_hMusicCatalog);
     m_oTreeIndex.Clear();
     
     sItem.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
@@ -65,7 +72,7 @@ void MusicBrowserUI::InitTree(void)
     sInsert.item = sItem;
     sInsert.hInsertAfter = TVI_FIRST;
     sInsert.hParent = NULL;
-    m_hCatalogItem = TreeView_InsertItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sInsert);
+    m_hCatalogItem = TreeView_InsertItem(m_hMusicCatalog, &sInsert);
 
     sItem.pszText = kAllTracks;
     sItem.cchTextMax = lstrlen(sItem.pszText);
@@ -77,7 +84,7 @@ void MusicBrowserUI::InitTree(void)
     sInsert.item = sItem;
     sInsert.hInsertAfter = TVI_FIRST;
     sInsert.hParent = m_hCatalogItem;
-    m_hAllItem = TreeView_InsertItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sInsert);
+    m_hAllItem = TreeView_InsertItem(m_hMusicCatalog, &sInsert);
 
     sItem.pszText = kUncatagorized;
     sItem.cchTextMax = lstrlen(sItem.pszText);
@@ -89,7 +96,7 @@ void MusicBrowserUI::InitTree(void)
     sInsert.item = sItem;
     sInsert.hInsertAfter = TVI_LAST;
     sInsert.hParent = m_hCatalogItem;
-    m_hUncatItem = TreeView_InsertItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sInsert);
+    m_hUncatItem = TreeView_InsertItem(m_hMusicCatalog, &sInsert);
 
     sItem.pszText = kPlaylists;
     sItem.cchTextMax = lstrlen(sItem.pszText);
@@ -101,7 +108,19 @@ void MusicBrowserUI::InitTree(void)
     sInsert.item = sItem;
     sInsert.hInsertAfter = TVI_LAST;
     sInsert.hParent = NULL;
-    m_hPlaylistItem = TreeView_InsertItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sInsert);
+    m_hPlaylistItem = TreeView_InsertItem(m_hMusicCatalog, &sInsert);
+
+    /*sItem.pszText = kPortables;
+    sItem.cchTextMax = lstrlen(sItem.pszText);
+    sItem.iImage = 7;
+    sItem.iSelectedImage = 7;
+    sItem.cChildren= 1;
+    sItem.lParam = -1;
+        
+    sInsert.item = sItem;
+    sInsert.hInsertAfter = TVI_LAST;
+    sInsert.hParent = NULL;
+    m_hPortableItem = TreeView_InsertItem(m_hMusicCatalog, &sInsert);*/
 }
 
 
@@ -131,7 +150,7 @@ void MusicBrowserUI::FillArtists(void)
        sInsert.item.lParam = m_oTreeIndex.Add(oCrossRef);
        sInsert.hInsertAfter = TVI_SORT;
        sInsert.hParent = m_hCatalogItem;
-       TreeView_InsertItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sInsert);
+       TreeView_InsertItem(m_hMusicCatalog, &sInsert);
     }    
 }
 
@@ -165,7 +184,7 @@ void MusicBrowserUI::FillAlbums(TV_ITEM *pItem)
         sInsert.item.lParam = m_oTreeIndex.Add(oCrossRef);
         sInsert.hInsertAfter = TVI_SORT;
         sInsert.hParent = pItem->hItem;
-        TreeView_InsertItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sInsert);
+        TreeView_InsertItem(m_hMusicCatalog, &sInsert);
     }
 }
 
@@ -203,7 +222,7 @@ void MusicBrowserUI::FillTracks(TV_ITEM *pItem)
         sInsert.item.lParam = m_oTreeIndex.Add(oCrossRef);
         sInsert.hInsertAfter = TVI_SORT;
         sInsert.hParent = pItem->hItem;
-        TreeView_InsertItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sInsert);
+        TreeView_InsertItem(m_hMusicCatalog, &sInsert);
     }
 }
 
@@ -252,7 +271,7 @@ void MusicBrowserUI::FillAllTracks(void)
                 sInsert.item.lParam = m_oTreeIndex.Add(oCrossRef);
                 sInsert.hInsertAfter = TVI_SORT;
                 sInsert.hParent = m_hAllItem;
-                TreeView_InsertItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sInsert);
+                TreeView_InsertItem(m_hMusicCatalog, &sInsert);
             }
         }
     }       
@@ -282,7 +301,7 @@ void MusicBrowserUI::FillAllTracks(void)
         sInsert.item.lParam = m_oTreeIndex.Add(oCrossRef);
         sInsert.hInsertAfter = TVI_SORT;
         sInsert.hParent = m_hAllItem;
-        TreeView_InsertItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sInsert);
+        TreeView_InsertItem(m_hMusicCatalog, &sInsert);
     }
 }
 
@@ -322,7 +341,7 @@ void MusicBrowserUI::FillUncatTracks(void)
         sInsert.item.lParam = m_oTreeIndex.Add(oCrossRef);
         sInsert.hInsertAfter = TVI_SORT;
         sInsert.hParent = m_hUncatItem;
-        TreeView_InsertItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sInsert);
+        TreeView_InsertItem(m_hMusicCatalog, &sInsert);
     }
 }
 
@@ -331,11 +350,11 @@ int32 MusicBrowserUI::GetMusicTreeSelection(HTREEITEM hItem)
     TV_ITEM sItem;
     
     sItem.mask = TVIF_PARAM;
-    sItem.hItem = TreeView_GetSelection(GetDlgItem(m_hWnd, IDC_MUSICTREE));
+    sItem.hItem = TreeView_GetSelection(m_hMusicCatalog);
     if (sItem.hItem)
     {
        hItem = sItem.hItem;
-       TreeView_GetItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sItem);
+       TreeView_GetItem(m_hMusicCatalog, &sItem);
        return sItem.lParam;   
     }
     else
@@ -376,7 +395,7 @@ void MusicBrowserUI::FillPlaylists(void)
         sInsert.item.lParam = m_oTreeIndex.Add(oData);
         sInsert.hInsertAfter = TVI_SORT;
         sInsert.hParent = m_hPlaylistItem;
-        TreeView_InsertItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sInsert);
+        TreeView_InsertItem(m_hMusicCatalog, &sInsert);
     }
     
     sInsert.item.pszText = kNewPlaylist;
@@ -387,9 +406,107 @@ void MusicBrowserUI::FillPlaylists(void)
     sInsert.item.lParam = -1;
     sInsert.hInsertAfter = TVI_FIRST;
     sInsert.hParent = m_hPlaylistItem;
-    m_hNewPlaylistItem = TreeView_InsertItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sInsert);
+    m_hNewPlaylistItem = TreeView_InsertItem(m_hMusicCatalog, &sInsert);
 }
 
+void MusicBrowserUI::FillPortables(void)
+{
+    TV_INSERTSTRUCT         sInsert;
+    char*                   buffer = NULL;  
+    uint32                  size = 0;
+    set<string>             portablePlayers;
+    TreeData                oData;
+    uint32                  count = 0;
+    HTREEITEM               item;
+
+    // remove old ones if they exist
+    while(item = TreeView_GetChild(m_hMusicCatalog, m_hPortableItem))
+    {
+        TreeView_DeleteItem(m_hMusicCatalog, item);
+    }
+
+    sInsert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
+                        TVIF_SELECTEDIMAGE | TVIF_PARAM; 
+
+    if(kError_BufferTooSmall == m_context->prefs->GetUsersPortablePlayers(buffer, &size))
+    {
+        buffer = (char*)malloc(size);
+
+        if(buffer)
+        {
+            m_context->prefs->GetUsersPortablePlayers(buffer, &size);
+            char* cp = buffer;
+            char* name = cp;
+
+            while(cp = strchr(cp, ';'))
+            {
+                *cp = 0x00;
+                portablePlayers.insert(string(name));
+
+                cp++;
+                name = cp;
+            }
+
+            if(*name)
+            {
+                portablePlayers.insert(string(name));
+            }
+
+            free(buffer);
+        }
+    }
+   
+    uint32 i = 0;
+    DeviceInfo device;
+
+    while(IsntError(m_oPlm->GetSupportedPortables(&device, i++)))
+    {
+
+        if( portablePlayers.end() != 
+            portablePlayers.find(string(device.GetPluginName())) )
+        {
+            string displayString;
+
+            displayString = device.GetManufacturer();
+            displayString += " ";
+            displayString += device.GetDevice();
+
+            if(displayString.size())
+            {
+                sInsert.item.pszText = (char*)displayString.c_str();
+            }
+            else
+            {
+               sInsert.item.pszText = (char*)device.GetPluginName();
+            }
+
+            oData.m_pPortable = new DeviceInfo(device);
+                        
+            sInsert.item.cchTextMax = strlen(sInsert.item.pszText);
+            sInsert.item.iImage = 7;
+            sInsert.item.iSelectedImage = 7;
+            sInsert.item.cChildren= 0;
+            sInsert.item.lParam = m_oTreeIndex.Add(oData);
+            sInsert.hInsertAfter = TVI_SORT;
+            sInsert.hParent = m_hPortableItem;
+            TreeView_InsertItem(m_hMusicCatalog, &sInsert);
+            count++;
+        }
+    }
+
+    if(!count)
+    {
+        sInsert.item.pszText = kNewPortable;
+        sInsert.item.cchTextMax = strlen(sInsert.item.pszText);
+        sInsert.item.iImage = 7;
+        sInsert.item.iSelectedImage = 7;
+        sInsert.item.cChildren= 0;
+        sInsert.item.lParam = -1;
+        sInsert.hInsertAfter = TVI_FIRST;
+        sInsert.hParent = m_hPortableItem;
+        m_hNewPortableItem = TreeView_InsertItem(m_hMusicCatalog, &sInsert);
+    }
+}
 
 int32 MusicBrowserUI::GetCurrentItemFromMousePos(void)
 {
@@ -397,12 +514,12 @@ int32 MusicBrowserUI::GetCurrentItemFromMousePos(void)
     TV_HITTESTINFO tv_htinfo;
 
     GetCursorPos(&tv_htinfo.pt);
-    ScreenToClient(GetDlgItem(m_hWnd, IDC_MUSICTREE), &tv_htinfo.pt);
-    if(TreeView_HitTest(GetDlgItem(m_hWnd, IDC_MUSICTREE), &tv_htinfo))
+    ScreenToClient(m_hMusicCatalog, &tv_htinfo.pt);
+    if(TreeView_HitTest(m_hMusicCatalog, &tv_htinfo))
     {
-        sItem.hItem = TreeView_GetSelection(GetDlgItem(m_hWnd, IDC_MUSICTREE)); 
+        sItem.hItem = TreeView_GetSelection(m_hMusicCatalog); 
         sItem.mask = TVIF_PARAM | TVIF_HANDLE;
-        TreeView_GetItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sItem);
+        TreeView_GetItem(m_hMusicCatalog, &sItem);
         
         return sItem.lParam;
     }
@@ -832,7 +949,9 @@ void MusicBrowserUI::MusicCatalogTrackAdded(const ArtistList* artist,
 
 void MusicBrowserUI::TVBeginDrag(HWND hwnd, NM_TREEVIEW* nmtv)
 {
-    if(m_hNewPlaylistItem != nmtv->itemNew.hItem)
+    if(nmtv->itemNew.hItem != m_hNewPlaylistItem && 
+       nmtv->itemNew.hItem != m_hPortableItem &&
+       nmtv->itemNew.hItem != m_hNewPortableItem)
     {
         vector<PlaylistItem*> items;
         vector<string>* urls = new vector<string>;

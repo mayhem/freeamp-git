@@ -157,7 +157,7 @@ $(DS_POSTBUILD_DEP) : "pls - Win32 Release" "MakeTheme - Win32 Release"\
  "freeamp.cnt" ".\portio.sys" "..\..\..\ReadMe.txt" "..\..\..\Copying.txt"\
  "..\..\..\Changes.txt" "..\..\..\Authors.txt" ".\freeamp.exe"
    IF NOT EXIST themes mkdir themes
-	copy                 ..\..\..\themes\freeamp.fat themes
+	copy                  ..\..\..\themes\freeamp.fat themes
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
@@ -286,7 +286,7 @@ $(DS_POSTBUILD_DEP) : "pls - Win32 Debug" "MakeTheme - Win32 Debug"\
  ".\portio.sys" "..\..\..\ReadMe.txt" "..\..\..\Copying.txt"\
  "..\..\..\Changes.txt" "..\..\..\Authors.txt" ".\freeamp.exe"
    IF NOT EXIST themes mkdir themes
-	copy                 ..\..\..\themes\freeamp.fat themes
+	copy                  ..\..\..\themes\freeamp.fat themes
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
@@ -421,7 +421,7 @@ $(DS_POSTBUILD_DEP) : "pls - Win32 NASM Release"\
  "..\..\..\ReadMe.txt" "..\..\..\Copying.txt" "..\..\..\Changes.txt"\
  "..\..\..\Authors.txt" ".\freeamp.exe"
    IF NOT EXIST themes mkdir themes
-	copy                 ..\..\..\themes\freeamp.fat themes
+	copy                  ..\..\..\themes\freeamp.fat themes
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
@@ -555,7 +555,7 @@ $(DS_POSTBUILD_DEP) : "pls - Win32 NASM Debug" "MakeTheme - Win32 NASM Debug"\
  "freeamp.cnt" ".\portio.sys" "..\..\..\ReadMe.txt" "..\..\..\Copying.txt"\
  "..\..\..\Changes.txt" "..\..\..\Authors.txt" ".\freeamp.exe"
    IF NOT EXIST themes mkdir themes
-	copy                 ..\..\..\themes\freeamp.fat themes
+	copy                  ..\..\..\themes\freeamp.fat themes
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 
@@ -813,9 +813,6 @@ DEP_CPP_MAIN_=\
 !ENDIF 
 
 SOURCE=..\..\..\lib\xml\src\Parse.cpp
-
-!IF  "$(CFG)" == "freeamp - Win32 Release"
-
 DEP_CPP_PARSE=\
 	"..\..\..\config\config.h"\
 	"..\..\..\lib\xml\include\Parse.h"\
@@ -827,50 +824,6 @@ DEP_CPP_PARSE=\
  "..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
-
-DEP_CPP_PARSE=\
-	"..\..\..\config\config.h"\
-	"..\..\..\lib\xml\include\Parse.h"\
-	"..\..\include\debug.h"\
-	"..\..\include\errors.h"\
-	
-
-"$(INTDIR)\Parse.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"\
- "..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
-
-DEP_CPP_PARSE=\
-	"..\..\..\config\config.h"\
-	"..\..\..\lib\xml\include\Parse.h"\
-	"..\..\include\debug.h"\
-	"..\..\include\errors.h"\
-	
-
-"$(INTDIR)\Parse.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"\
- "..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
-
-DEP_CPP_PARSE=\
-	"..\..\..\config\config.h"\
-	"..\..\..\lib\xml\include\Parse.h"\
-	"..\..\include\debug.h"\
-	"..\..\include\errors.h"\
-	
-
-"$(INTDIR)\Parse.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"\
- "..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 SOURCE=..\..\..\AUTHORS
 

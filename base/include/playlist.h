@@ -307,6 +307,7 @@ class PlaylistManager {
                            void* cookie = NULL);
 
     Error ReadPortablePlaylist(DeviceInfo* device, 
+                               vector<PlaylistItem*>* items = NULL,
                                PLMCallBackFunction function = NULL,
                                void* cookie = NULL);
     Error SyncPortablePlaylist(DeviceInfo* device, 

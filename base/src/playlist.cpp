@@ -177,7 +177,7 @@ PlaylistManager::PlaylistManager(FAContext* context)
     registrar.SetSearchString("*.ppp");
     registrar.InitializeRegistry(&m_portableRegistry, context->prefs);
 
-    const RegistryItem* module = NULL;
+    RegistryItem* module = NULL;
     MetaDataFormat* mdf = NULL;
     int32 i = 0;
 
@@ -231,6 +231,7 @@ PlaylistManager::PlaylistManager(FAContext* context)
             while(IsntError(pd->GetSupportedDevices(&di, index++)))
             {
                 di.SetRef(pd);
+                di.SetPluginName(module->Name());
                 m_portablePlayers.push_back(new DeviceInfo(di));
             }
         }
@@ -1340,7 +1341,8 @@ Error PlaylistManager::SetActivePlaylist(PlaylistKey key)
 
             case kPlaylistKey_PortablePlaylist:
             {
-                m_activeList = &m_portableList;
+                //m_activeList = &m_portableList;
+                m_activeList = &m_externalList;
                 break;
             }
 
@@ -1451,7 +1453,7 @@ Error PlaylistManager::SetPortablePlaylist(DeviceInfo* device,
 
     if(device)
     {
-        result = ReadPortablePlaylist(device, function, cookie);
+        result = ReadPortablePlaylist(device, NULL, function, cookie);
         m_portableDevice = *device;
     }
 
@@ -1718,6 +1720,74 @@ Error PlaylistManager::InitializeDevice(DeviceInfo* device,
 
 }
 
+
+Error PlaylistManager::ReadPortablePlaylist(DeviceInfo* device,
+                                            vector<PlaylistItem*>* items,
+                                            PLMCallBackFunction function,
+                                            void* cookie)
+{
+    Error result = kError_InvalidParam;
+
+    assert(device);
+
+    if(device)
+    {
+        // first delete old playlist
+
+        if(!items)
+        {
+            uint32 index = 0;
+            uint32 numItems = 0;
+            PlaylistItem* item = NULL;
+
+            numItems = m_externalList.size();
+
+            for(index = 0; index < numItems; index++)
+            {
+                item = m_externalList[index];
+
+                if(item)
+                {
+                    // if the metadata thread is still accessing this item
+                    // we don't wanna delete the item  out from under it.
+                    // instead we set a flag and let the metadata thread
+                    // clean up when it returns.
+                    if(item->GetState() == kPlaylistItemState_RetrievingMetaData)
+                    {
+                        item->SetState(kPlaylistItemState_Delete);  
+                    }
+                    else
+                    {
+                        delete item;
+                    }
+                }
+            }
+        }
+
+        bool addToActiveList = false;
+      
+        if(!items)
+        {
+            items = new vector<PlaylistItem*>;
+            addToActiveList = true;
+        }
+
+        result = device->GetRef()->ReadPlaylist(device, 
+                                                items,
+                                                function, 
+                                                cookie);
+
+        if(addToActiveList)
+        {
+            AddItems(items);
+            delete items;
+        }
+    }
+
+    return result;
+}
+
+#if 0
 Error PlaylistManager::ReadPortablePlaylist(DeviceInfo* device,
                                             PLMCallBackFunction function,
                                             void* cookie)
@@ -1762,10 +1832,16 @@ Error PlaylistManager::ReadPortablePlaylist(DeviceInfo* device,
                                                 &m_portableList,
                                                 function, 
                                                 cookie);
+
+        vector<PlaylistItem *>::iterator i = m_portableList.begin();
+        for (; i != m_portableList.end(); i++)
+            m_context->target->AcceptEvent(new PlaylistItemAddedEvent(*i, this));
     }
 
     return result;
 }
+
+#endif
 
 Error PlaylistManager::SyncPortablePlaylist(DeviceInfo* device,
                                             PLMCallBackFunction function,
@@ -1778,7 +1854,7 @@ Error PlaylistManager::SyncPortablePlaylist(DeviceInfo* device,
     if(device)
     {
         result = device->GetRef()->WritePlaylist(device, 
-                                                &m_portableList,
+                                                &m_externalList,
                                                 function, 
                                                 cookie);
     }

@@ -85,9 +85,60 @@ UserInterface *Initialize(FAContext *context) {
 MusicBrowserUI::MusicBrowserUI(FAContext      *context, 
                                MusicBrowserUI *parent,
                                HWND            hParent,
+                               DeviceInfo     *pDevice)
+{
+    m_context = context;
+    m_pParent = parent;
+    m_hParent = hParent;
+
+    Init();
+
+    if (m_pParent == NULL)
+        m_oPlm = m_context->plm;
+    else
+    {
+        m_oPlm = new PlaylistManager(m_context);  
+        m_portableDevice = pDevice;
+
+        string displayString;
+
+        displayString = pDevice->GetManufacturer();
+        displayString += " ";
+        displayString += pDevice->GetDevice();
+
+        if(displayString.size())
+        {
+            m_currentListName = displayString;
+        }
+        else
+        {
+           m_currentListName = pDevice->GetPluginName();
+        }
+    }    
+}
+
+MusicBrowserUI::MusicBrowserUI(FAContext      *context, 
+                               MusicBrowserUI *parent,
+                               HWND            hParent,
                                const string   &oPlaylistName)
 {
     m_context = context;
+    m_pParent = parent;
+    m_hParent = hParent;
+
+    Init();
+
+    if (m_pParent == NULL)
+       m_oPlm = m_context->plm;
+    else
+    {
+       m_oPlm = new PlaylistManager(m_context);   
+       m_currentListName = oPlaylistName;
+    }    
+}
+
+void MusicBrowserUI::Init()
+{
     m_initialized = false;
     isVisible = false;
     m_currentListName = "";
@@ -97,20 +148,14 @@ MusicBrowserUI::MusicBrowserUI(FAContext      *context,
     m_bListChanged = false;
     m_bSearchInProgress = false;
     m_currentplaying = -1;
-    m_bDragging = false;
-    m_pParent = parent;
-    m_hParent = hParent;
-    m_uiThread = NULL;
-    if (parent == NULL)
-       m_oPlm = m_context->plm;
-    else
-    {
-       m_oPlm = new PlaylistManager(context);   
-       m_currentListName = oPlaylistName;
-    }   
 
+    m_bDragging = false;
+    m_uiThread = NULL;
     m_overSplitter = false;
     m_trackSplitter = false;
+
+    m_oPlm = NULL;
+    m_portableDevice = NULL;
 
     short pattern[8];
     HBITMAP bmp;
@@ -133,6 +178,8 @@ MusicBrowserUI::MusicBrowserUI(FAContext      *context,
     m_hNewPlaylistItem = NULL;
     m_hPlaylistView = NULL;
     m_hMusicCatalog = NULL;
+    m_hPortableItem = NULL;
+    m_hNewPortableItem = NULL;
 }
 
 MusicBrowserUI::~MusicBrowserUI()
@@ -202,6 +249,11 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
 
             AddToolbarButtons(useTextLabels, useImages);
             UpdateButtonMenuStates();
+
+            /*if(TreeView_GetChild(m_hMusicCatalog, m_hPortableItem) != NULL)
+            {    
+                FillPortables();
+            }*/
             break;
         }
 

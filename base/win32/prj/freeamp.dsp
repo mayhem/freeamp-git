@@ -59,7 +59,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
-                 ..\..\..\themes\freeamp.fat themes
+                  ..\..\..\themes\freeamp.fat themes
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
@@ -92,7 +92,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
-                 ..\..\..\themes\freeamp.fat themes
+                  ..\..\..\themes\freeamp.fat themes
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
@@ -126,7 +126,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
-                 ..\..\..\themes\freeamp.fat themes
+                  ..\..\..\themes\freeamp.fat themes
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
@@ -162,7 +162,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
-                 ..\..\..\themes\freeamp.fat themes
+                  ..\..\..\themes\freeamp.fat themes
 # End Special Build Tool
 
 !ENDIF 
@@ -604,6 +604,10 @@ InputPath=..\..\..\lib\portio\i386\free\portio.sys
 !ENDIF 
 
 # End Source File
+# Begin Source File
+
+SOURCE=..\res\warn.ico
+# End Source File
 # End Group
 # Begin Group "includes"
 
@@ -749,9 +753,5 @@ SOURCE=..\..\include\utility.h
 SOURCE=..\include\win32prefs.h
 # End Source File
 # End Group
-# Begin Source File
-
-SOURCE=..\res\warn.ico
-# End Source File
 # End Target
 # End Project

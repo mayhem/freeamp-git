@@ -152,11 +152,13 @@ static int CALLBACK PropSheetProc( HWND hwnd, UINT msg, LPARAM lParam)
 
 Win32PreferenceWindow::Win32PreferenceWindow(FAContext *context,
                                              ThemeManager *pThemeMan,
+                                             UpdateManager *pUpdateMan,
                                              uint32 defaultPage) :
      PreferenceWindow(context, pThemeMan)
 {     
 	g_pCurrentPrefWindow = this;
     m_defaultPage = defaultPage;
+    m_pUpdateManager = pUpdateMan;
 }
 
 Win32PreferenceWindow::~Win32PreferenceWindow(void)
@@ -218,14 +220,22 @@ bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent, Preferences* pre
 
     UpdateManager* updateManager = NULL;
 
-    updateManager = new Win32UpdateManager(m_pContext);
-    updateManager->DetermineLocalVersions();
-    updateManager->SetPlatform(string("WIN32"));
+    if(!m_pUpdateManager)
+    {
+
+        updateManager = new Win32UpdateManager(m_pContext);
+        updateManager->DetermineLocalVersions();
+        updateManager->SetPlatform(string("WIN32"));
 #if defined( _M_ALPHA )
-    updateManager->SetArchitecture(string("ALPHA"));
+        updateManager->SetArchitecture(string("ALPHA"));
 #else
-    updateManager->SetArchitecture(string("X86"));
+        updateManager->SetArchitecture(string("X86"));
 #endif
+    }
+    else
+    {
+        updateManager = m_pUpdateManager;
+    }
 
     psp[4].dwSize = sizeof(PROPSHEETPAGE);
     psp[4].dwFlags = PSP_HASHELP;
@@ -271,7 +281,8 @@ bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent, Preferences* pre
     m_proposedValues = m_currentValues = m_originalValues;
     result = (PropertySheet(&psh) > 0);
 
-    delete updateManager;
+    if(!m_pUpdateManager)
+        delete updateManager;
 
     return result;
 }
@@ -2118,6 +2129,10 @@ static void check_function(void* arg)
     {
         SetWindowText(hwndStatus, " Status: Update cancelled by user."); 
     }
+    else if(result == kError_AlreadyUpdating)
+    {
+        SetWindowText(hwndStatus, " Status: An update is already in progress."); 
+    }
 
     ListView_RedrawItems(ts->hwndList, 0, ListView_GetItemCount(ts->hwndList) - 1);
 
@@ -2154,7 +2169,21 @@ static void update_function(void* arg)
     ShowWindow(hwndUpdate, SW_HIDE);
     ShowWindow(hwndCancel, SW_SHOW);
 
-    ts->um->RetrieveLatestVersionInfo();
+    result = ts->um->RetrieveLatestVersionInfo();
+
+    if(IsError(result))
+    {
+        if(result == kError_UserCancel)
+        {
+            SetWindowText(hwndStatus, " Status: Update cancelled by user."); 
+        }
+        else if(result == kError_AlreadyUpdating)
+        {
+            SetWindowText(hwndStatus, " Status: An update is already in progress."); 
+        }
+
+        return;
+    }
 
     // Add items
     LV_ITEM lv_item;

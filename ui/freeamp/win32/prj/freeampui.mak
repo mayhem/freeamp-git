@@ -49,12 +49,14 @@ ALL : ".\freeamp.ui"
 
 !ELSE 
 
-ALL : "fabaselib - Win32 Release" "zlib - Win32 Release" ".\freeamp.ui"
+ALL : "gdbm - Win32 Release" "fabaselib - Win32 Release" "zlib - Win32 Release"\
+ ".\freeamp.ui"
 
 !ENDIF 
 
 !IF "$(RECURSE)" == "1" 
-CLEAN :"zlib - Win32 ReleaseCLEAN" "fabaselib - Win32 ReleaseCLEAN" 
+CLEAN :"zlib - Win32 ReleaseCLEAN" "fabaselib - Win32 ReleaseCLEAN"\
+ "gdbm - Win32 ReleaseCLEAN" 
 !ELSE 
 CLEAN :
 !ENDIF 
@@ -140,6 +142,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32Window.obj" \
 	"$(INTDIR)\Window.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
+	"..\..\..\..\lib\gdbm\gdbm.lib" \
 	"..\..\..\..\lib\zlib\zlib.lib"
 
 ".\freeamp.ui" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
@@ -152,8 +155,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "fabaselib - Win32 Release" "zlib - Win32 Release"\
- ".\freeamp.ui"
+$(DS_POSTBUILD_DEP) : "gdbm - Win32 Release" "fabaselib - Win32 Release"\
+ "zlib - Win32 Release" ".\freeamp.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                 ..\..\..\..\base\win32\prj\plugins
 	copy freeamp.ui                                ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -169,12 +172,14 @@ ALL : ".\freeamp.ui"
 
 !ELSE 
 
-ALL : "fabaselib - Win32 Debug" "zlib - Win32 Debug" ".\freeamp.ui"
+ALL : "gdbm - Win32 Debug" "fabaselib - Win32 Debug" "zlib - Win32 Debug"\
+ ".\freeamp.ui"
 
 !ENDIF 
 
 !IF "$(RECURSE)" == "1" 
-CLEAN :"zlib - Win32 DebugCLEAN" "fabaselib - Win32 DebugCLEAN" 
+CLEAN :"zlib - Win32 DebugCLEAN" "fabaselib - Win32 DebugCLEAN"\
+ "gdbm - Win32 DebugCLEAN" 
 !ELSE 
 CLEAN :
 !ENDIF 
@@ -263,6 +268,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32Window.obj" \
 	"$(INTDIR)\Window.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
+	"..\..\..\..\lib\gdbm\gdbm.lib" \
 	"..\..\..\..\lib\zlib\zlib.lib"
 
 ".\freeamp.ui" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
@@ -275,8 +281,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "fabaselib - Win32 Debug" "zlib - Win32 Debug"\
- ".\freeamp.ui"
+$(DS_POSTBUILD_DEP) : "gdbm - Win32 Debug" "fabaselib - Win32 Debug"\
+ "zlib - Win32 Debug" ".\freeamp.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                 ..\..\..\..\base\win32\prj\plugins
 	copy freeamp.ui                                ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -292,12 +298,14 @@ ALL : ".\freeamp.ui"
 
 !ELSE 
 
-ALL : "fabaselib - Win32 NASM Debug" "zlib - Win32 NASM Debug" ".\freeamp.ui"
+ALL : "gdbm - Win32 NASM Debug" "fabaselib - Win32 NASM Debug"\
+ "zlib - Win32 NASM Debug" ".\freeamp.ui"
 
 !ENDIF 
 
 !IF "$(RECURSE)" == "1" 
-CLEAN :"zlib - Win32 NASM DebugCLEAN" "fabaselib - Win32 NASM DebugCLEAN" 
+CLEAN :"zlib - Win32 NASM DebugCLEAN" "fabaselib - Win32 NASM DebugCLEAN"\
+ "gdbm - Win32 NASM DebugCLEAN" 
 !ELSE 
 CLEAN :
 !ENDIF 
@@ -386,6 +394,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32Window.obj" \
 	"$(INTDIR)\Window.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
+	"..\..\..\..\lib\gdbm\gdbm.lib" \
 	"..\..\..\..\lib\zlib\zlib.lib"
 
 ".\freeamp.ui" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
@@ -398,8 +407,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Debug" "zlib - Win32 NASM Debug"\
- ".\freeamp.ui"
+$(DS_POSTBUILD_DEP) : "gdbm - Win32 NASM Debug" "fabaselib - Win32 NASM Debug"\
+ "zlib - Win32 NASM Debug" ".\freeamp.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                 ..\..\..\..\base\win32\prj\plugins
 	copy freeamp.ui                                ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -415,13 +424,14 @@ ALL : ".\freeamp.ui"
 
 !ELSE 
 
-ALL : "fabaselib - Win32 NASM Release" "zlib - Win32 NASM Release"\
- ".\freeamp.ui"
+ALL : "gdbm - Win32 NASM Release" "fabaselib - Win32 NASM Release"\
+ "zlib - Win32 NASM Release" ".\freeamp.ui"
 
 !ENDIF 
 
 !IF "$(RECURSE)" == "1" 
-CLEAN :"zlib - Win32 NASM ReleaseCLEAN" "fabaselib - Win32 NASM ReleaseCLEAN" 
+CLEAN :"zlib - Win32 NASM ReleaseCLEAN" "fabaselib - Win32 NASM ReleaseCLEAN"\
+ "gdbm - Win32 NASM ReleaseCLEAN" 
 !ELSE 
 CLEAN :
 !ENDIF 
@@ -507,6 +517,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32Window.obj" \
 	"$(INTDIR)\Window.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
+	"..\..\..\..\lib\gdbm\gdbm.lib" \
 	"..\..\..\..\lib\zlib\zlib.lib"
 
 ".\freeamp.ui" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
@@ -519,8 +530,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Release"\
- "zlib - Win32 NASM Release" ".\freeamp.ui"
+$(DS_POSTBUILD_DEP) : "gdbm - Win32 NASM Release"\
+ "fabaselib - Win32 NASM Release" "zlib - Win32 NASM Release" ".\freeamp.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                 ..\..\..\..\base\win32\prj\plugins
 	copy freeamp.ui                                ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -787,28 +798,28 @@ SOURCE=..\..\..\..\config\config.win32
 
 InputPath=..\..\..\..\config\config.win32
 
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
 
 InputPath=..\..\..\..\config\config.win32
 
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Debug"
 
 InputPath=..\..\..\..\config\config.win32
 
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Release"
 
 InputPath=..\..\..\..\config\config.win32
 
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ENDIF 
@@ -1800,6 +1811,7 @@ DEP_CPP_THEMEM=\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\include\ThemeManager.h"\
+	"..\..\include\ThemeZip.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -1820,6 +1832,7 @@ DEP_CPP_THEMEM=\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\include\ThemeManager.h"\
+	"..\..\include\ThemeZip.h"\
 	
 
 "$(INTDIR)\ThemeManager.obj" : $(SOURCE) $(DEP_CPP_THEMEM) "$(INTDIR)"\
@@ -1838,6 +1851,7 @@ DEP_CPP_THEMEM=\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\include\ThemeManager.h"\
+	"..\..\include\ThemeZip.h"\
 	
 
 "$(INTDIR)\ThemeManager.obj" : $(SOURCE) $(DEP_CPP_THEMEM) "$(INTDIR)"\
@@ -1856,6 +1870,7 @@ DEP_CPP_THEMEM=\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\include\ThemeManager.h"\
+	"..\..\include\ThemeZip.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -2170,13 +2185,80 @@ DEP_CPP_WIN32F=\
 !ENDIF 
 
 SOURCE=..\src\Win32MessageDialog.cpp
+
+!IF  "$(CFG)" == "freeampui - Win32 Release"
+
 DEP_CPP_WIN32M=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
 	"..\..\include\MessageDialog.h"\
 	
 
-"$(INTDIR)\Win32MessageDialog.obj" : $(SOURCE) $(DEP_CPP_WIN32M) "$(INTDIR)"
+"$(INTDIR)\Win32MessageDialog.obj" : $(SOURCE) $(DEP_CPP_WIN32M) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+!ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
+
+DEP_CPP_WIN32M=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\include\MessageDialog.h"\
+	
+
+"$(INTDIR)\Win32MessageDialog.obj" : $(SOURCE) $(DEP_CPP_WIN32M) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Debug"
+
+DEP_CPP_WIN32M=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\include\MessageDialog.h"\
+	
+
+"$(INTDIR)\Win32MessageDialog.obj" : $(SOURCE) $(DEP_CPP_WIN32M) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Release"
+
+DEP_CPP_WIN32M=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\include\MessageDialog.h"\
+	
+
+"$(INTDIR)\Win32MessageDialog.obj" : $(SOURCE) $(DEP_CPP_WIN32M) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\src\Win32PreferenceWindow.cpp
 
@@ -2728,7 +2810,9 @@ DEP_CPP_WINDO=\
 
 SOURCE=..\res\freeampui.rc
 DEP_RSC_FREEAM=\
+	"..\res\checked.bmp"\
 	"..\res\icon1.ico"\
+	"..\res\unchecked.bmp"\
 	
 
 !IF  "$(CFG)" == "freeampui - Win32 Release"
@@ -2736,7 +2820,7 @@ DEP_RSC_FREEAM=\
 
 "$(INTDIR)\freeampui.res" : $(SOURCE) $(DEP_RSC_FREEAM) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\freeampui.res" /i\
- "\FreeAmp\freeamp\ui\freeamp\win32\res" /d "NDEBUG" $(SOURCE)
+ "\Local\src\freeamp\ui\freeamp\win32\res" /d "NDEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
@@ -2744,7 +2828,7 @@ DEP_RSC_FREEAM=\
 
 "$(INTDIR)\freeampui.res" : $(SOURCE) $(DEP_RSC_FREEAM) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\freeampui.res" /i\
- "\FreeAmp\freeamp\ui\freeamp\win32\res" /d "_DEBUG" $(SOURCE)
+ "\Local\src\freeamp\ui\freeamp\win32\res" /d "_DEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Debug"
@@ -2752,7 +2836,7 @@ DEP_RSC_FREEAM=\
 
 "$(INTDIR)\freeampui.res" : $(SOURCE) $(DEP_RSC_FREEAM) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\freeampui.res" /i\
- "\FreeAmp\freeamp\ui\freeamp\win32\res" /d "_DEBUG" $(SOURCE)
+ "\Local\src\freeamp\ui\freeamp\win32\res" /d "_DEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Release"
@@ -2760,7 +2844,7 @@ DEP_RSC_FREEAM=\
 
 "$(INTDIR)\freeampui.res" : $(SOURCE) $(DEP_RSC_FREEAM) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\freeampui.res" /i\
- "\FreeAmp\freeamp\ui\freeamp\win32\res" /d "NDEBUG" $(SOURCE)
+ "\Local\src\freeamp\ui\freeamp\win32\res" /d "NDEBUG" $(SOURCE)
 
 
 !ENDIF 
@@ -2768,12 +2852,12 @@ DEP_RSC_FREEAM=\
 !IF  "$(CFG)" == "freeampui - Win32 Release"
 
 "zlib - Win32 Release" : 
-   cd "\FreeAmp\freeamp\lib\zlib\prj"
+   cd "\Local\src\freeamp\lib\zlib\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\zlib.mak CFG="zlib - Win32 Release" 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 "zlib - Win32 ReleaseCLEAN" : 
-   cd "\FreeAmp\freeamp\lib\zlib\prj"
+   cd "\Local\src\freeamp\lib\zlib\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\zlib.mak CFG="zlib - Win32 Release"\
  RECURSE=1 
    cd "..\..\..\ui\freeamp\win32\prj"
@@ -2781,12 +2865,12 @@ DEP_RSC_FREEAM=\
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
 
 "zlib - Win32 Debug" : 
-   cd "\FreeAmp\freeamp\lib\zlib\prj"
+   cd "\Local\src\freeamp\lib\zlib\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\zlib.mak CFG="zlib - Win32 Debug" 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 "zlib - Win32 DebugCLEAN" : 
-   cd "\FreeAmp\freeamp\lib\zlib\prj"
+   cd "\Local\src\freeamp\lib\zlib\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\zlib.mak CFG="zlib - Win32 Debug" RECURSE=1\
  
    cd "..\..\..\ui\freeamp\win32\prj"
@@ -2794,12 +2878,12 @@ DEP_RSC_FREEAM=\
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Debug"
 
 "zlib - Win32 NASM Debug" : 
-   cd "\FreeAmp\freeamp\lib\zlib\prj"
+   cd "\Local\src\freeamp\lib\zlib\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\zlib.mak CFG="zlib - Win32 NASM Debug" 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 "zlib - Win32 NASM DebugCLEAN" : 
-   cd "\FreeAmp\freeamp\lib\zlib\prj"
+   cd "\Local\src\freeamp\lib\zlib\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\zlib.mak CFG="zlib - Win32 NASM Debug"\
  RECURSE=1 
    cd "..\..\..\ui\freeamp\win32\prj"
@@ -2807,12 +2891,12 @@ DEP_RSC_FREEAM=\
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Release"
 
 "zlib - Win32 NASM Release" : 
-   cd "\FreeAmp\freeamp\lib\zlib\prj"
+   cd "\Local\src\freeamp\lib\zlib\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\zlib.mak CFG="zlib - Win32 NASM Release" 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 "zlib - Win32 NASM ReleaseCLEAN" : 
-   cd "\FreeAmp\freeamp\lib\zlib\prj"
+   cd "\Local\src\freeamp\lib\zlib\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\zlib.mak CFG="zlib - Win32 NASM Release"\
  RECURSE=1 
    cd "..\..\..\ui\freeamp\win32\prj"
@@ -2822,12 +2906,12 @@ DEP_RSC_FREEAM=\
 !IF  "$(CFG)" == "freeampui - Win32 Release"
 
 "fabaselib - Win32 Release" : 
-   cd "\FreeAmp\freeamp\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Release" 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 "fabaselib - Win32 ReleaseCLEAN" : 
-   cd "\FreeAmp\freeamp\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak\
  CFG="fabaselib - Win32 Release" RECURSE=1 
    cd "..\..\..\ui\freeamp\win32\prj"
@@ -2835,12 +2919,12 @@ DEP_RSC_FREEAM=\
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
 
 "fabaselib - Win32 Debug" : 
-   cd "\FreeAmp\freeamp\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Debug" 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 "fabaselib - Win32 DebugCLEAN" : 
-   cd "\FreeAmp\freeamp\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak CFG="fabaselib - Win32 Debug"\
  RECURSE=1 
    cd "..\..\..\ui\freeamp\win32\prj"
@@ -2848,12 +2932,12 @@ DEP_RSC_FREEAM=\
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Debug"
 
 "fabaselib - Win32 NASM Debug" : 
-   cd "\FreeAmp\freeamp\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug" 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 "fabaselib - Win32 NASM DebugCLEAN" : 
-   cd "\FreeAmp\freeamp\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak\
  CFG="fabaselib - Win32 NASM Debug" RECURSE=1 
    cd "..\..\..\ui\freeamp\win32\prj"
@@ -2861,15 +2945,69 @@ DEP_RSC_FREEAM=\
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Release"
 
 "fabaselib - Win32 NASM Release" : 
-   cd "\FreeAmp\freeamp\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak\
  CFG="fabaselib - Win32 NASM Release" 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 "fabaselib - Win32 NASM ReleaseCLEAN" : 
-   cd "\FreeAmp\freeamp\base\win32\prj"
+   cd "\Local\src\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak\
  CFG="fabaselib - Win32 NASM Release" RECURSE=1 
+   cd "..\..\..\ui\freeamp\win32\prj"
+
+!ENDIF 
+
+!IF  "$(CFG)" == "freeampui - Win32 Release"
+
+"gdbm - Win32 Release" : 
+   cd "\Local\src\freeamp\lib\gdbm\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\gdbm.mak CFG="gdbm - Win32 Release" 
+   cd "..\..\..\ui\freeamp\win32\prj"
+
+"gdbm - Win32 ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\lib\gdbm\prj"
+   $(MAKE) /$(MAKEFLAGS) CLEAN /F .\gdbm.mak CFG="gdbm - Win32 Release"\
+ RECURSE=1 
+   cd "..\..\..\ui\freeamp\win32\prj"
+
+!ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
+
+"gdbm - Win32 Debug" : 
+   cd "\Local\src\freeamp\lib\gdbm\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\gdbm.mak CFG="gdbm - Win32 Debug" 
+   cd "..\..\..\ui\freeamp\win32\prj"
+
+"gdbm - Win32 DebugCLEAN" : 
+   cd "\Local\src\freeamp\lib\gdbm\prj"
+   $(MAKE) /$(MAKEFLAGS) CLEAN /F .\gdbm.mak CFG="gdbm - Win32 Debug" RECURSE=1\
+ 
+   cd "..\..\..\ui\freeamp\win32\prj"
+
+!ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Debug"
+
+"gdbm - Win32 NASM Debug" : 
+   cd "\Local\src\freeamp\lib\gdbm\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\gdbm.mak CFG="gdbm - Win32 NASM Debug" 
+   cd "..\..\..\ui\freeamp\win32\prj"
+
+"gdbm - Win32 NASM DebugCLEAN" : 
+   cd "\Local\src\freeamp\lib\gdbm\prj"
+   $(MAKE) /$(MAKEFLAGS) CLEAN /F .\gdbm.mak CFG="gdbm - Win32 NASM Debug"\
+ RECURSE=1 
+   cd "..\..\..\ui\freeamp\win32\prj"
+
+!ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Release"
+
+"gdbm - Win32 NASM Release" : 
+   cd "\Local\src\freeamp\lib\gdbm\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\gdbm.mak CFG="gdbm - Win32 NASM Release" 
+   cd "..\..\..\ui\freeamp\win32\prj"
+
+"gdbm - Win32 NASM ReleaseCLEAN" : 
+   cd "\Local\src\freeamp\lib\gdbm\prj"
+   $(MAKE) /$(MAKEFLAGS) CLEAN /F .\gdbm.mak CFG="gdbm - Win32 NASM Release"\
+ RECURSE=1 
    cd "..\..\..\ui\freeamp\win32\prj"
 
 !ENDIF 

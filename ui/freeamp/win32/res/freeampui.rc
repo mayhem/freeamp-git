@@ -282,6 +282,19 @@ BEGIN
                     WS_BORDER | WS_TABSTOP,10,60,214,55,WS_EX_CLIENTEDGE
 END
 
+IDD_UPDATEAVAILABLE DIALOG DISCARDABLE  0, 0, 219, 65
+STYLE DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Update Available"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "Update now",IDOK,52,44,54,14
+    PUSHBUTTON      "Update later",IDCANCEL,115,44,54,14
+    LTEXT           "There is an update available for FreeAmp. Would you like you like to continue the update process now or update later?",
+                    -1,34,7,178,26
+    ICON            IDI_INFO,-1,7,7,21,20
+END
+
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -318,6 +331,8 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_EXE_ICON            ICON    DISCARDABLE     "icon1.ico"
+IDI_INFO                ICON    FIXED IMPURE    "info.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -387,6 +402,14 @@ BEGIN
         RIGHTMARGIN, 230
         TOPMARGIN, 3
         BOTTOMMARGIN, 171
+    END
+
+    IDD_UPDATEAVAILABLE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 212
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 58
     END
 END
 #endif    // APSTUDIO_INVOKED

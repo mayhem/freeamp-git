@@ -141,8 +141,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 Release" "fabaselib - Win32 Release"\
  ".\musicbrowser.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                         ..\..\..\..\base\win32\prj\plugins
-	copy musicbrowser.ui                                                                           ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                          ..\..\..\..\base\win32\prj\plugins
+	copy musicbrowser.ui                                                                            ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 Debug"
@@ -249,8 +249,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 Debug" "fabaselib - Win32 Debug"\
  ".\musicbrowser.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                         ..\..\..\..\base\win32\prj\plugins
-	copy musicbrowser.ui                                                                           ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                          ..\..\..\..\base\win32\prj\plugins
+	copy musicbrowser.ui                                                                            ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Debug"
@@ -358,8 +358,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 NASM Debug" "fabaselib - Win32 NASM Debug"\
  ".\musicbrowser.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                         ..\..\..\..\base\win32\prj\plugins
-	copy musicbrowser.ui                                                                           ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                          ..\..\..\..\base\win32\prj\plugins
+	copy musicbrowser.ui                                                                            ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Release"
@@ -466,8 +466,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 NASM Release"\
  "fabaselib - Win32 NASM Release" ".\musicbrowser.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                         ..\..\..\..\base\win32\prj\plugins
-	copy musicbrowser.ui                                                                           ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                          ..\..\..\..\base\win32\prj\plugins
+	copy musicbrowser.ui                                                                            ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 
@@ -1008,9 +1008,9 @@ SOURCE=..\src\Event.cpp
 
 DEP_CPP_EVENT=\
 	"..\..\..\..\base\include\database.h"\
-	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
 	"..\..\..\..\base\include\facontext.h"\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\metadata.h"\
@@ -1043,9 +1043,9 @@ DEP_CPP_EVENT=\
 
 DEP_CPP_EVENT=\
 	"..\..\..\..\base\include\database.h"\
-	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
 	"..\..\..\..\base\include\facontext.h"\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\metadata.h"\
@@ -1076,9 +1076,9 @@ DEP_CPP_EVENT=\
 
 DEP_CPP_EVENT=\
 	"..\..\..\..\base\include\database.h"\
-	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
 	"..\..\..\..\base\include\facontext.h"\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\metadata.h"\
@@ -1109,9 +1109,9 @@ DEP_CPP_EVENT=\
 
 DEP_CPP_EVENT=\
 	"..\..\..\..\base\include\database.h"\
-	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
 	"..\..\..\..\base\include\facontext.h"\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\metadata.h"\
@@ -1444,6 +1444,7 @@ DEP_CPP_MUSICT=\
 	"..\..\..\..\base\include\portabledevice.h"\
 	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registrar.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
@@ -1458,6 +1459,9 @@ DEP_CPP_MUSICT=\
 	"..\include\Win32MusicBrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
+	
+NODEP_CPP_MUSICT=\
+	"..\..\..\..\base\include\win32impl.h"\
 	
 
 "$(INTDIR)\MusicTree.obj" : $(SOURCE) $(DEP_CPP_MUSICT) "$(INTDIR)"
@@ -1480,6 +1484,7 @@ DEP_CPP_MUSICT=\
 	"..\..\..\..\base\include\portabledevice.h"\
 	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registrar.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
@@ -1514,6 +1519,7 @@ DEP_CPP_MUSICT=\
 	"..\..\..\..\base\include\portabledevice.h"\
 	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registrar.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
@@ -1548,6 +1554,7 @@ DEP_CPP_MUSICT=\
 	"..\..\..\..\base\include\portabledevice.h"\
 	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registrar.h"\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
@@ -1562,6 +1569,9 @@ DEP_CPP_MUSICT=\
 	"..\include\Win32MusicBrowser.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
+	
+NODEP_CPP_MUSICT=\
+	"..\..\..\..\base\include\win32impl.h"\
 	
 
 "$(INTDIR)\MusicTree.obj" : $(SOURCE) $(DEP_CPP_MUSICT) "$(INTDIR)"
@@ -2192,6 +2202,7 @@ DEP_RSC_MUSICB=\
 	"..\res\icon1.ico"\
 	"..\res\playing.bmp"\
 	"..\res\playlist.bmp"\
+	"..\res\portable.bmp"\
 	"..\res\splitter.cur"\
 	"..\res\toolbar.bmp"\
 	"..\res\track.bmp"\

@@ -199,3 +199,42 @@ Error Win32UpdateManager::GetFileVersions(const char* path)
 
     return result;
 }
+
+
+BOOL CALLBACK 
+UpdateAvailableDlgProc(HWND hwnd, 
+                       UINT msg, 
+                       WPARAM wParam, 
+                       LPARAM lParam)
+{
+    BOOL result = FALSE;
+
+    switch (msg)
+    {
+        case WM_INITDIALOG:
+        {
+            
+            break;
+        }      
+
+        case WM_COMMAND:
+        {
+            switch(LOWORD(wParam))
+            {
+                case IDCANCEL:
+                    EndDialog(hwnd, FALSE);
+                    break;
+
+                case IDOK:
+                {
+                    EndDialog(hwnd, TRUE);
+                    break;
+                }
+            }
+  
+            break;
+        }
+    }
+
+    return result;
+}

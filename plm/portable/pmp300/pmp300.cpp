@@ -1404,7 +1404,6 @@ StartDriver(SC_HANDLE scManager,
             if(GetLastError() == ERROR_SERVICE_ALREADY_RUNNING)
                 result = true;
         }
-            
 
         CloseServiceHandle(service);    
     }

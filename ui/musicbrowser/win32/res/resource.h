@@ -27,6 +27,7 @@
 #define IDB_ALL                         124
 #define IDB_UNCATAGORIZED               125
 #define IDI_MYMUSIC                     126
+#define IDB_PORTABLE                    128
 #define IDI_WARN                        207
 #define IDD_OPENURL                     219
 #define IDD_DELETETRACKS                220
@@ -143,7 +144,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        127
+#define _APS_NEXT_RESOURCE_VALUE        129
 #define _APS_NEXT_COMMAND_VALUE         40071
 #define _APS_NEXT_CONTROL_VALUE         1030
 #define _APS_NEXT_SYMED_VALUE           101

@@ -35,29 +35,43 @@ class TreeData
 {
     public:
 
-               TreeData(void)
-                    {
-                        m_iLevel = -1;
-                        m_pArtist = NULL;
-                        m_pAlbum = NULL;
-                        m_pTrack = NULL;
-                    };
-               TreeData(const TreeData &oOther)
-                    {
-                        m_iLevel = oOther.m_iLevel; 
-                        m_pArtist= oOther.m_pArtist;
-                        m_pAlbum = oOther.m_pAlbum; 
-                        m_pTrack = oOther.m_pTrack; 
-                        m_oPlaylistName = oOther.m_oPlaylistName;
-                        m_oPlaylistPath = oOther.m_oPlaylistPath;
-                    };
-      virtual ~TreeData(void) { };
+        TreeData(void)
+        {
+            m_iLevel = -1;
+            m_pArtist = NULL;
+            m_pAlbum = NULL;
+            m_pTrack = NULL;
+            m_pPortable = NULL;
+        };
 
-      int32         m_iLevel;
-      ArtistList   *m_pArtist;
-      AlbumList    *m_pAlbum;
-      PlaylistItem *m_pTrack;
-      string        m_oPlaylistName, m_oPlaylistPath;
+        TreeData(const TreeData &oOther)
+        {
+            m_iLevel = oOther.m_iLevel; 
+            m_pArtist= oOther.m_pArtist;
+            m_pAlbum = oOther.m_pAlbum; 
+            m_pTrack = oOther.m_pTrack; 
+            m_oPlaylistName = oOther.m_oPlaylistName;
+            m_oPlaylistPath = oOther.m_oPlaylistPath;
+            if(oOther.m_pPortable)
+                m_pPortable = new DeviceInfo(*oOther.m_pPortable);
+            else
+                m_pPortable = NULL;
+        };
+
+        virtual ~TreeData(void) 
+        { 
+            if(m_pPortable) 
+                delete m_pPortable; 
+            
+            m_pPortable = NULL;
+        };
+
+        int32         m_iLevel;
+        ArtistList   *m_pArtist;
+        AlbumList    *m_pAlbum;
+        PlaylistItem *m_pTrack;
+        DeviceInfo   *m_pPortable;
+        string        m_oPlaylistName, m_oPlaylistPath;
 };
 
 class TreeDataIndex
@@ -74,6 +88,7 @@ class TreeDataIndex
       bool  IsTrack         (int32 lParam);
       bool  IsLeaf          (int32 lParam);
       bool  IsUncatagorized (int32 lParam);
+      bool  IsPortable      (int32 lParam);
       int32 GetLevel        (int32 lParam);
       const TreeData &Data  (int32 lParam); 
       int32 Add             (TreeData &pData);

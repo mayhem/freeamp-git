@@ -31,7 +31,7 @@ ____________________________________________________________________________*/
 #include "utility.h"
 #include "resource.h"
 #include "Win32MusicBrowser.h"
-#include "debug.h"
+#include "eventdata.h"
 
 const char* kAudioFileFilter =
             "MPEG Audio Streams (.mpg, .mp1, .mp2, .mp3, .mpp)\0"
@@ -62,7 +62,9 @@ void MusicBrowserUI::RenameEvent(void)
        item != m_hPlaylistItem &&
        item != m_hAllItem &&
        item != m_hUncatItem &&
-       item != m_hNewPlaylistItem)
+       item != m_hNewPlaylistItem && 
+       item != m_hPortableItem &&
+       TreeView_GetParent(m_hMusicCatalog, item) != m_hPortableItem)
     {
         EditItemLabel(hwnd, item);
     }
@@ -452,8 +454,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
     {
 	    if (pTreeView->hdr.code == TVN_BEGINDRAG )
         {
-            TVBeginDrag(GetDlgItem(m_hWnd, IDC_MUSICTREE), 
-                      (NM_TREEVIEW*)pHdr);
+            TVBeginDrag(m_hMusicCatalog, (NM_TREEVIEW*)pHdr);
             return 0;
         }    
 
@@ -476,7 +477,9 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                item == m_hPlaylistItem ||
                item == m_hAllItem ||
                item == m_hUncatItem ||
-               item == m_hNewPlaylistItem)
+               item == m_hNewPlaylistItem ||
+               item == m_hPortableItem ||
+               TreeView_GetParent(m_hMusicCatalog, item) == m_hPortableItem)
             {
                 return TRUE;
             }
@@ -529,11 +532,23 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
 
             return TRUE;
         }    
+
+        /*if (pTreeView->hdr.code == TVN_ITEMEXPANDING && 
+            pTreeView->itemNew.hItem == m_hPortableItem)
+        { 
+            if (TreeView_GetChild(m_hMusicCatalog, 
+                m_hPortableItem) == NULL)
+            {    
+                FillPortables();
+                return 0;
+            }
+            return 0;
+        }*/  
  
 	    if (pTreeView->hdr.code == TVN_ITEMEXPANDING && 
             pTreeView->itemNew.hItem == m_hPlaylistItem)
         {    
-            if (TreeView_GetChild(GetDlgItem(m_hWnd, IDC_MUSICTREE), 
+            if (TreeView_GetChild(m_hMusicCatalog, 
                 m_hPlaylistItem) == NULL)
             {    
                 FillPlaylists();
@@ -545,7 +560,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
 	    if (pTreeView->hdr.code == TVN_ITEMEXPANDING && 
             pTreeView->itemNew.hItem == m_hAllItem)
         {    
-            if (TreeView_GetChild(GetDlgItem(m_hWnd, IDC_MUSICTREE), 
+            if (TreeView_GetChild(m_hMusicCatalog, 
                 m_hAllItem) == NULL)
             {    
                 FillAllTracks();
@@ -557,7 +572,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
 	    if (pTreeView->hdr.code == TVN_ITEMEXPANDING && 
             pTreeView->itemNew.hItem == m_hUncatItem)
         {    
-            if (TreeView_GetChild(GetDlgItem(m_hWnd, IDC_MUSICTREE), 
+            if (TreeView_GetChild(m_hMusicCatalog, 
                 m_hUncatItem) == NULL)
             {    
                 FillUncatTracks();
@@ -569,7 +584,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
 	    if (pTreeView->hdr.code == TVN_ITEMEXPANDING && 
             pTreeView->itemNew.hItem == m_hCatalogItem)
         { 
-            if (TreeView_GetNextSibling(GetDlgItem(m_hWnd, IDC_MUSICTREE), 
+            if (TreeView_GetNextSibling(m_hMusicCatalog, 
                 m_hUncatItem) == NULL)
             {    
                 FillArtists();
@@ -581,7 +596,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
 	    if (pTreeView->hdr.code == TVN_ITEMEXPANDING && 
             m_oTreeIndex.GetLevel(pTreeView->itemNew.lParam) == 1 &&
             TreeView_GetChild(
-            GetDlgItem(m_hWnd, IDC_MUSICTREE), pTreeView->itemNew.hItem) == NULL)
+            m_hMusicCatalog, pTreeView->itemNew.hItem) == NULL)
         {    
             FillAlbums(&pTreeView->itemNew);
             return 0;
@@ -590,7 +605,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
 	    if (pTreeView->hdr.code == TVN_ITEMEXPANDING && 
             m_oTreeIndex.GetLevel(pTreeView->itemNew.lParam) == 2 &&
             TreeView_GetChild(
-            GetDlgItem(m_hWnd, IDC_MUSICTREE), pTreeView->itemNew.hItem) == NULL)
+            m_hMusicCatalog, pTreeView->itemNew.hItem) == NULL)
         {    
             FillTracks(&pTreeView->itemNew);
             return 0;
@@ -631,9 +646,17 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                 {
                     m_oPlm->ReadPlaylist(m_oTreeIndex.Data(sItem.lParam).m_oPlaylistPath.c_str());
                 }
+                else if(m_oTreeIndex.IsPortable(sItem.lParam))
+                {
+                    EditPortablePlaylist(m_oTreeIndex.Data(sItem.lParam).m_pPortable);
+                }
                 else if(tv_htinfo.hItem == m_hNewPlaylistItem)
                 {
                     NewPlaylist();
+                }
+                else if(tv_htinfo.hItem == m_hNewPortableItem)
+                {
+                    m_context->target->AcceptEvent(new ShowPreferencesEvent(3));
                 }
             }
         }
@@ -650,7 +673,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
             ScreenToClient(m_hWnd, &sPoint);
             ClientToWindow(m_hWnd, &sPoint); 
             sHit.pt = sPoint;
-            hItem = TreeView_HitTest(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sHit);
+            hItem = TreeView_HitTest(m_hMusicCatalog, &sHit);
             if (hItem == m_hPlaylistItem)
                SendMessage(m_hStatus, SB_SETTEXT, 0, 
                            (LPARAM)"This tree item contains all of your playlists.");
@@ -1125,7 +1148,6 @@ void MusicBrowserUI::EditPlaylistEvent(void)
     // skip the "Create New Playlist..." item
     tv_item.hItem = TreeView_GetNextSibling(m_hMusicCatalog, tv_item.hItem);
 
-
     if(tv_item.hItem)
     {
         BOOL result = FALSE;
@@ -1169,7 +1191,7 @@ void MusicBrowserUI::RemoveFromDiskEvent(void)
            unlink(m_oTreeIndex.Data(lParam).m_pTrack->URL().c_str());
            m_context->browser->m_catalog->RemoveSong(
                   m_oTreeIndex.Data(lParam).m_pTrack->URL().c_str());
-           TreeView_DeleteItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), hItem);
+           TreeView_DeleteItem(m_hMusicCatalog, hItem);
         }   
     }        
     if (m_oTreeIndex.IsPlaylist(lParam))
@@ -1184,7 +1206,7 @@ void MusicBrowserUI::RemoveFromDiskEvent(void)
             unlink(m_oTreeIndex.Data(lParam).m_oPlaylistPath.c_str());
             m_context->browser->m_catalog->RemovePlaylist( 
                  m_oTreeIndex.Data(lParam).m_oPlaylistPath.c_str());
-            TreeView_DeleteItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), hItem);
+            TreeView_DeleteItem(m_hMusicCatalog, hItem);
         }            
     }             
 }

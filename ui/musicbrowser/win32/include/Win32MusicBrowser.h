@@ -110,6 +110,12 @@ class MusicBrowserUI : public UserInterface
                             MusicBrowserUI *parent,
                             HWND            hParent,
                             const string   &oPlaylistName);
+
+             MusicBrowserUI(FAContext      *context, 
+                            MusicBrowserUI *parent,
+                            HWND            hParent,
+                            DeviceInfo     *pDevice);
+
     virtual ~MusicBrowserUI();
 
     virtual int32 AcceptEvent(Event *);
@@ -155,6 +161,8 @@ class MusicBrowserUI : public UserInterface
 
  private:
 
+    void   Init(void);
+
     // Functions in Dialog.cpp
     void   ShowBrowser(bool bShowExpanded);
     void   HideBrowser(void);
@@ -193,6 +201,8 @@ class MusicBrowserUI : public UserInterface
     bool SaveNewPlaylist(string &oName);
     void EditPlaylist(const string &oList);
     bool ExportPlaylist(string &oName);
+    void EditPortablePlaylist(DeviceInfo* device);
+    void SavePortablePlaylist(void);
 
     // Functions in Event.cpp
     int   Notify(WPARAM wParam, NMHDR *pNMHDR);
@@ -219,6 +229,7 @@ class MusicBrowserUI : public UserInterface
     void  RenameEvent(void);
     void  PlayNowEvent(void);
     bool  DeleteFromDrive(const char* url);
+    
 
     // Functions in PlaylistView.cpp
     void  PlaylistListItemAdded(const PlaylistItem* item);
@@ -244,6 +255,7 @@ class MusicBrowserUI : public UserInterface
     void    FillTracks(TV_ITEM *pItem);
     void    FillAllTracks(void);
     void    FillUncatTracks(void);
+    void    FillPortables(void);
     int32   GetCurrentItemFromMousePos(void);
     int32   GetMusicTreeSelection(HTREEITEM hItem);
     void    GetSelectedMusicTreeItems(vector<PlaylistItem*>* items);
@@ -297,7 +309,7 @@ class MusicBrowserUI : public UserInterface
     string              m_currentListName, m_activeListName;
     Thread*             m_uiThread;
     POINT               m_sMinSize;
-    HTREEITEM	        m_hPlaylistItem, m_hCatalogItem;
+    HTREEITEM	        m_hPlaylistItem, m_hCatalogItem, m_hPortableItem;
     HTREEITEM           m_hAllItem, m_hUncatItem;
     TreeDataIndex       m_oTreeIndex;
     int                 m_iCollapseMoveAmount;
@@ -314,11 +326,12 @@ class MusicBrowserUI : public UserInterface
     HWND                m_hToolbar, m_hTextToolbar, m_hImageToolbar;
     DropTarget*         m_playlistDropTarget;
     vector<string>      m_searchPathList;
-    HTREEITEM           m_hNewPlaylistItem;  
+    HTREEITEM           m_hNewPlaylistItem, m_hNewPortableItem;  
     uint32              m_initialCount;
     uint32              m_itemsAddedBeforeWeWereCreated;
 
     MetaData            m_editTrackMetaData;
+    DeviceInfo*         m_portableDevice;
 };
 
 #endif
