@@ -37,7 +37,7 @@ ____________________________________________________________________________*/
 #define DB Debug_v("%s:%d", __FILE__, __LINE__);
 
 #define MAXINT32 0x7FFFFFFF
-const int iFramesPerHeader = 8;
+const int iFramesPerHeader = 32;
 
 Mutex *g_pHeaderMutex;
 
