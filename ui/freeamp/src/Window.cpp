@@ -765,7 +765,7 @@ void Window::VolumeChanged(void)
 void Window::GetReloadWindowPos(Rect &oOldRect, int iNewWidth, int iNewHeight, 
                                 Rect &oNewRect)
 {
-    int  iSizeX, iSizeY;
+    int32 iSizeX, iSizeY;
  
     oNewRect = oOldRect;
     oNewRect.x2 = oNewRect.x1 + iNewWidth;

@@ -574,7 +574,7 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
              char   szText[64];
              
              sprintf(szText, "Buffering up [%d%%]", 
-                min(info->GetInputPercent()*2, 100));
+                min(info->GetInputPercent()*2, (int32)100));
              oDesc = string(szText);
              m_pWindow->ControlStringValue(oControl, true, oDesc);
              m_bBufferingUp = true;
