@@ -225,7 +225,7 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
             {
                 m_oLastError = "Cannot find default theme";
                 rmdir(oTempPath.c_str());
-                return eRet;
+                return kError_InvalidParam;
             }    
         }
         if (IsError(eRet))
@@ -234,7 +234,15 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
             string        oErr, oMessage(szThemeUnzipError);
 
             oBox.Show(oMessage.c_str(), string(BRANDING), kMessageOk);
-            return kError_InvalidParam;
+            
+            m_pThemeMan->GetDefaultTheme(oFile);
+            eRet = oZip.DecompressThemeZip(oFile, oTempPath);
+            if (IsError(eRet))
+            {
+                m_oLastError = "Cannot find default theme";
+                rmdir(oTempPath.c_str());
+                return kError_InvalidParam;
+            }    
         }    
 
         oCompleteFile = oTempPath + string(DIR_MARKER_STR) 
