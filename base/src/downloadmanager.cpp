@@ -213,16 +213,24 @@ Error DownloadManager::AddItem(const char* url, const char* filename)
 Error DownloadManager::AddItem(DownloadItem* item)
 {
     Error result = kError_InvalidParam;
+    vector<DownloadItem*>::iterator j;
+
     m_mutex.Acquire();
 
     assert(item);
 
     if(item)
     {
-        m_itemList.push_back(item);
-        SendItemAddedMessage(item);
-        QueueDownload(item);
+        for(j = m_itemList.begin(); j != m_itemList.end(); j++)
+           if ((*j)->SourceURL() == item->SourceURL())
+               break;
 
+        if (j == m_itemList.end())
+        {
+            m_itemList.push_back(item);
+            SendItemAddedMessage(item);
+            QueueDownload(item);
+        }
         result = kError_NoErr;
     }
 
@@ -233,22 +241,25 @@ Error DownloadManager::AddItem(DownloadItem* item)
 Error DownloadManager::AddItems(vector<DownloadItem*>* list)
 {
     Error result = kError_InvalidParam;
+    vector<DownloadItem*>::iterator i, j;
     m_mutex.Acquire();
 
     assert(list);
 
     if(list)
     {
-        m_itemList.insert( m_itemList.end(),
-                            list->begin(), 
-                            list->end());
-
-        uint32 count = list->size();
-
-        for(uint32 i = 0; i < count; i++)
+        for(i = list->begin(); i != list->end(); i++)
         {
-            SendItemAddedMessage((*list)[i]);
-            QueueDownload((*list)[i]);
+            for(j = m_itemList.begin(); j != m_itemList.end(); j++)
+                if ((*i)->SourceURL() == (*j)->SourceURL())
+                    break;
+
+            if (j == m_itemList.end())
+            {
+                m_itemList.push_back(*i);
+                SendItemAddedMessage(*i);
+                QueueDownload(*i);
+            }
         }
 
         result = kError_NoErr;
@@ -979,6 +990,11 @@ Error DownloadManager::Download(DownloadItem* item)
                                        SendProgressMessage(item);
                                    }
 
+if (item->GetBytesReceived() > 900000 && 
+    item->GetBytesReceived() < 902000 && 
+    rand() % 2)
+     result = kError_IOError;
+
                                 if(count < 0) 
                                     result = kError_IOError;
                                 
@@ -1247,7 +1263,8 @@ void DownloadManager::DownloadThreadFunction()
             else
             {
                 item->SetState(kDownloadItemState_Error);
-                CleanUpDownload(item);
+                if (result != kError_IOError)
+                    CleanUpDownload(item);
             }
 
             item->SetDownloadError(result);
@@ -1319,12 +1336,16 @@ void DownloadManager::SaveResumableDownloadItems()
 
                 if(item && 
                   (item->GetState() == kDownloadItemState_Paused ||
-                   item->GetState() == kDownloadItemState_Queued))
+                   item->GetState() == kDownloadItemState_Queued ||
+                   item->GetState() == kDownloadItemState_Error))
                 {
                     ostringstream ost;
                     char num[256];
                     const char* kDatabaseDelimiter = " ";
                     MetaData metadata = item->GetMetaData();
+
+                    if (item->GetState() == kDownloadItemState_Error)
+                       item->SetState(kDownloadItemState_Queued);
 
                     // write out the number of elements we have
                     ost << 16 << kDatabaseDelimiter;
