@@ -3,27 +3,6 @@ Microsoft Developer Studio Workspace File, Format Version 5.00
 
 ###############################################################################
 
-Project: "Rainplay"=..\..\..\ui\rainplay\Rainplay.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-    Begin Project Dependency
-    Project_Dep_Name fileinput
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name soundcard
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name xing
-    End Project Dependency
-}}}
-
-###############################################################################
-
 Project: "download"=..\..\..\ui\download\win32\prj\download.dsp - Package Owner=<4>
 
 Package=<5>
