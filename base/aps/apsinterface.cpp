@@ -367,9 +367,10 @@ void APSInterface::WriteToLog(const string& strGUID, int nEventType)
 
 int APSInterface::ChangeProfile(const char *pczUserName)
 {
-    if (pczUserName == NULL) 
-        return APS_PARAMERROR;
-    if (m_pProfileMap->empty()) 
+    if (pczUserName == NULL)
+        return APS_PARAMERROR;  
+
+    if (m_pProfileMap->empty())
         return APS_PARAMERROR;
 
     map<string, string>::iterator i;

@@ -117,7 +117,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386 /out:"vorbis.lmc"
-# ADD LINK32 fabaselib.lib version.lib gdbm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x11800000" /subsystem:windows /dll /machine:I386 /out:"vorbis.lmc" /libpath:"..\..\..\lib\gdbm" /libpath:"..\..\..\lib\zlib" /libpath:"..\\" /libpath:"..\..\..\lib\musicbrainz" /libpath:"..\..\..\..\lib\gdbm" /libpath:"..\..\..\..\lib\zlib" /libpath:"..\..\..\..\base\win32" /libpath:"..\..\..\..\lmc\vorbis\win32" /libpath:"..\..\..\..\lib\musicbrainz"
+# ADD LINK32 fabaselib.lib version.lib gdbm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib shell32.lib wsock32.lib ole32.lib /nologo /base:"0x11800000" /subsystem:windows /dll /machine:I386 /out:"vorbis.lmc" /libpath:"..\..\..\lib\gdbm" /libpath:"..\..\..\lib\zlib" /libpath:"..\\" /libpath:"..\..\..\lib\musicbrainz" /libpath:"..\..\..\..\lib\gdbm" /libpath:"..\..\..\..\lib\zlib" /libpath:"..\..\..\..\base\win32" /libpath:"..\..\..\..\lmc\vorbis\win32" /libpath:"..\..\..\..\lib\musicbrainz"
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                    ..\..\..\..\base\win32\prj\plugins	copy vorbis.lmc                            ..\..\..\..\base\win32\prj\plugins
@@ -259,6 +259,10 @@ SOURCE=..\..\..\..\lib\vorbis\vorbis.lib
 # Begin Source File
 
 SOURCE=..\..\..\..\lib\vorbis\ogg.lib
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\musicbrainz\musicbrainz.lib
 # End Source File
 # End Target
 # End Project

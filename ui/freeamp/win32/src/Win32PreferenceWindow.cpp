@@ -1974,7 +1974,7 @@ bool Win32PreferenceWindow::PrefProfileProc(HWND hwnd,
                             vector<string> *profiles = pAPS->GetKnownProfiles();
 
                             int nRes = pAPS->CreateProfile(szCurSel);
-                            if (nRes != APS_NOERROR)
+                            if (nRes == APS_NOERROR)
                             {
                                 SendDlgItemMessage(hwnd, IDC_PROFILE_LIST,
                                                    LB_ADDSTRING, NULL, 
