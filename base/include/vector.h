@@ -35,13 +35,8 @@ ____________________________________________________________________________*/
 
 template<class T>
 class Vector {
- private:
-    T *pObjs;  // pointer to array of objects
-    int32 threshhold;
-    int32 insertionPoint;
-    int32 currentLength;
  public:
-    Vector(int32 th = 10); // set threshhold to its arg
+    Vector(int32 th = 10); // set m_threshhold to its arg
     ~Vector();
     int32 RemoveAll();
     int32 DeleteAll();
@@ -52,76 +47,83 @@ class Vector {
     int32 DeleteElementAt(int32);
     int32 Insert(T &);
     int32 NumElements();
+ 
+ private:
+    T *m_pObjs;  // pointer to array of objects
+    int32 m_threshhold;
+    int32 m_insertionPoint;
+    int32 m_currentLength;
+ 
 };
 
 
 template<class T> T Vector<T>::RandomElement() {
     srand((unsigned int) time (NULL));
-    int32 foo = (int32) (((double)insertionPoint * rand()) / (RAND_MAX+1.0));
-    return pObjs[foo];
+    int32 foo = (int32) (((double)m_insertionPoint * rand()) / (RAND_MAX+1.0));
+    return m_pObjs[foo];
 }
 
 template<class T> void Vector<T>::Swap(int32 s1, int32 s2) {
     if ((s1 < 0) ||
 	(s2 < 0) ||
-	(s1 >= insertionPoint) ||
-	(s2 >= insertionPoint) ||
+	(s1 >= m_insertionPoint) ||
+	(s2 >= m_insertionPoint) ||
 	(s1 == s2)) {
 	return;
     }
-    T tmp = pObjs[s1];
-    pObjs[s1] = pObjs[s2];
-    pObjs[s2] = tmp;
+    T tmp = m_pObjs[s1];
+    m_pObjs[s1] = m_pObjs[s2];
+    m_pObjs[s2] = tmp;
 }
 
 template<class T> Vector<T>::Vector(int32 th) {
-    threshhold = th;
-    pObjs = new T[threshhold];
-    for (int32 i=0;i<threshhold;i++) pObjs[i] = NULL;
-    insertionPoint = 0;
-    currentLength = threshhold;
+    m_threshhold = th;
+    m_pObjs = new T[m_threshhold];
+    for (int32 i=0;i<m_threshhold;i++) m_pObjs[i] = NULL;
+    m_insertionPoint = 0;
+    m_currentLength = m_threshhold;
 }
 
 template<class T> Vector<T>::~Vector() {
-    delete pObjs;
+    delete m_pObjs;
 }
 
 template<class T> int32 Vector<T>::NumElements() {
-    return insertionPoint;
+    return m_insertionPoint;
 }
 
 template<class T> int32 Vector<T>::RemoveAll() {
-    for (int32 i=0;i<insertionPoint;i++) pObjs[i] = NULL;
-    insertionPoint = 0;
+    for (int32 i=0;i<m_insertionPoint;i++) m_pObjs[i] = NULL;
+    m_insertionPoint = 0;
     return 0;
 }
 
 template<class T> int32 Vector<T>::DeleteAll() {
-    for(int32 i=0;i<insertionPoint;i++) {
-	delete pObjs[i];
-	pObjs[i] = NULL;
+    for(int32 i=0;i<m_insertionPoint;i++) {
+	delete m_pObjs[i];
+	m_pObjs[i] = NULL;
     }
-    insertionPoint = 0;
+    m_insertionPoint = 0;
     return 0;
 }
 
 template<class T> T Vector<T>::ElementAt(int32 e) {
-    if ((e >= insertionPoint) || (e < 0)) {
+    if ((e >= m_insertionPoint) || (e < 0)) {
 	return NULL;
     }
-    return pObjs[e];
+    return m_pObjs[e];
 }
 
 template<class T> T Vector<T>::RemoveElementAt(int32 e) {
-    if ((e >= insertionPoint) || (e < 0)) {
+    if ((e >= m_insertionPoint) || (e < 0)) {
 	return NULL;
     }
-    T rtnval = pObjs[e];
-    memmove(&(pObjs[e]),&(pObjs[e+1]),sizeof(T)*(insertionPoint-e-1));
-    //for (int32 i = e;i<insertionPoint;i++) {
-    //   pObjs[i] = pObjs[i+1];
+    T rtnval = m_pObjs[e];
+    memmove(&(m_pObjs[e]),&(m_pObjs[e+1]),sizeof(T)*(m_insertionPoint-e-1));
+    //for (int32 i = e;i<m_insertionPoint;i++) {
+    //   m_pObjs[i] = m_pObjs[i+1];
     //}
-    insertionPoint--;
+    m_insertionPoint--;
     return rtnval;
 }
 
@@ -138,22 +140,22 @@ template<class T> int32 Vector<T>::DeleteElementAt(int32 e) {
 template<class T> int32 Vector<T>::Insert(T &pE) {
 //    cout << "v:inserting" << endl;
     if (pE) {
-	if (insertionPoint == currentLength) {
+	if (m_insertionPoint == m_currentLength) {
 	    //cout << "v:adding more" << endl;
 	    // add more and copy over
-	    T *pNewObjs = new T[currentLength+threshhold];
-	    //cout << "v:got it " << currentLength+threshhold << endl;
-	    memcpy(pNewObjs,pObjs,(sizeof (T))*currentLength);
+	    T *pNewObjs = new T[m_currentLength+m_threshhold];
+	    //cout << "v:got it " << m_currentLength+m_threshhold << endl;
+	    memcpy(pNewObjs,m_pObjs,(sizeof (T))*m_currentLength);
 	    //cout << "v:did copy" << endl;
-	    delete pObjs;
-	    pObjs = pNewObjs;
-	    for (int32 i=currentLength;i<currentLength + threshhold;i++) pObjs[i] = NULL;
-	    currentLength = currentLength + threshhold;
+	    delete m_pObjs;
+	    m_pObjs = pNewObjs;
+	    for (int32 i=m_currentLength;i<m_currentLength + m_threshhold;i++) m_pObjs[i] = NULL;
+	    m_currentLength = m_currentLength + m_threshhold;
 	}
-	pObjs[insertionPoint] = pE;
-	insertionPoint++;
+	m_pObjs[m_insertionPoint] = pE;
+	m_insertionPoint++;
 	//cout << "v:did it" << endl;
-	return insertionPoint-1;
+	return m_insertionPoint-1;
     } else {
 	return -1;
     }

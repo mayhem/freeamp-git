@@ -25,7 +25,7 @@ ____________________________________________________________________________*/
 
 
 Semaphore::Semaphore(int cnt) {
-    count = cnt;
+    m_count = cnt;
     m_sem = CreateSemaphore(NULL, 
 		    				cnt,
 							1024,

@@ -29,44 +29,44 @@ ____________________________________________________________________________*/
 
 class Id3TagInfo {
  public:
-    bool contains_info;
+    bool m_containsInfo;
 
-    char songname[31];
-    char artist[31];
-    char album[31];
-    char year[5];
-    char comment[31];
-    char genre;
+    char m_songName[31];
+    char m_artist[31];
+    char m_album[31];
+    char m_year[5];
+    char m_comment[31];
+    char m_genre;
 
     Id3TagInfo() {
-	    contains_info = false;
+	    m_containsInfo = false;
 	    nullinit();
     }
 
     Id3TagInfo(char *buffer) {
 	    if (buffer && (!strncmp(buffer,"TAG",3))) {
 	        memset(this,0,sizeof(Id3TagInfo));
-	        contains_info = true;
-	        strncpy(songname, buffer + 3, 30);
-	        strncpy(artist, buffer + 33, 30);
-	        strncpy(album, buffer + 63, 30);
-	        strncpy(year, buffer + 93, 4);
-	        strncpy(comment, buffer + 97, 30);
-	        genre = buffer[127];
+	        m_containsInfo = true;
+	        strncpy(m_songName, buffer + 3, 30);
+	        strncpy(m_artist, buffer + 33, 30);
+	        strncpy(m_album, buffer + 63, 30);
+	        strncpy(m_year, buffer + 93, 4);
+	        strncpy(m_comment, buffer + 97, 30);
+	        m_genre = buffer[127];
 	    } else {
-	        contains_info = false;
+	        m_containsInfo = false;
 	        nullinit();
 	    }
     }
 
  private:
     void nullinit() {
-	    *songname = '\0';
-	    *artist = '\0';
-	    *album = '\0';
-	    *year = '\0';
-	    *comment = '\0';
-	    genre = '\0';
+	    *m_songName = '\0';
+	    *m_artist = '\0';
+	    *m_album = '\0';
+	    *m_year = '\0';
+	    *m_comment = '\0';
+	    m_genre = '\0';
     }
 };
 

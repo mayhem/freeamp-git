@@ -31,10 +31,6 @@ ____________________________________________________________________________*/
 
 class Event {
 
- private:
-    int32 event;
-    void *arg;
-    int32 sizeofArg;
  public:
     Event(int32);
     Event(int32,void *);
@@ -43,7 +39,12 @@ class Event {
     ~Event();
     int32 GetEvent();
     void *GetArgument();
-    
+
+ private:
+    int32 m_event;
+    void* m_arg;
+    int32 m_sizeofArg;
+ 
 };
 
 class EventQueue {

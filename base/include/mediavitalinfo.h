@@ -33,24 +33,24 @@ ____________________________________________________________________________*/
 class MediaTimePositionInfo {
  public:
     MediaTimePositionInfo(float s,int32 f) {
-	    seconds = s; frame = f;
+	    m_seconds = s; m_frame = f;
     }
-    float seconds;
-    int32 frame;
+    float m_seconds;
+    int32 m_frame;
 };
 
 // Sent on INFO_MediaVitalStats 
 
 class MediaVitalInfo {
  public:
-    int32 totalFrames;
-    int32 bytesPerFrame;
-    char songTitle[512];
-    char filename[512];
-    int32 bps;  // bits per second
-    int32 freq; // is Hz
-    float totalTime;
-    Id3TagInfo tagInfo;
+    int32 m_totalFrames;
+    int32 m_bytesPerFrame;
+    char m_songTitle[512];
+    char m_filename[512];
+    int32 m_bps;  // bits per second
+    int32 m_freq; // is Hz
+    float m_totalTime;
+    Id3TagInfo m_tagInfo;
 
     MediaVitalInfo( const char *t,
                     const char *fn, 
@@ -61,25 +61,25 @@ class MediaVitalInfo {
                     float tt, 
                     Id3TagInfo &tag) 
     {
-        tagInfo = tag;
-        totalFrames = tf;
-        bytesPerFrame = bpf;
-        bps = bitspersecond;
-        freq = fr;
-        totalTime = tt;
+        m_tagInfo = tag;
+        m_totalFrames = tf;
+        m_bytesPerFrame = bpf;
+        m_bps = bitspersecond;
+        m_freq = fr;
+        m_totalTime = tt;
 
         if (t) {
-	        strncpy(songTitle,t,511);
-	        songTitle[511] = '\0';
+	        strncpy(m_songTitle,t,511);
+	        m_songTitle[511] = '\0';
         } else {
-	        songTitle[0] = '\0';
+	        m_songTitle[0] = '\0';
         }
 
         if (fn) {
-	        strncpy(filename,fn,511);
-	        filename[511] = '\0';
+	        strncpy(m_filename,fn,511);
+	        m_filename[511] = '\0';
         } else {
-	        filename[0] = '\0';
+	        m_filename[0] = '\0';
         }
     }
     

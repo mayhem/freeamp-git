@@ -32,16 +32,15 @@ ____________________________________________________________________________*/
 #define WAIT_FOREVER INFINITE
 
 class Semaphore {
- private:
-    int count;
-   	HANDLE m_sem;	
- 
  public:
     Semaphore(int cnt = 0);
     ~Semaphore();
     void Wait();
     void Signal();
-
+ 
+ private:
+    int m_count;
+   	HANDLE m_sem;	
 };
 
 

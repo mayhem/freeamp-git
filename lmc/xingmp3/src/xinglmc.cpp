@@ -87,7 +87,7 @@ void XingLMC::Init() {
 	    memset(buf,0,sizeof(buf));
 	    m_input->Read(m_input,buf,128);
 	    Id3TagInfo tag_info(buf);
-	    if (tag_info.contains_info) {
+	    if (tag_info.m_containsInfo) {
 		end -= 128;
 	    }
 //	    cout << "now here: " << m_input->Seek(m_input,backhere,SEEK_FROM_START) << endl;

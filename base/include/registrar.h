@@ -51,12 +51,6 @@ class Registrar{
     
 };
 
-//Error InitializeLMCRegistry(LMCRegistry* registry);
-//Error InitializePMORegistry(PMORegistry* registry);
-//Error InitializePMIRegistry(PMIRegistry* registry);
-//Error InitializeUIRegistry(UIRegistry* registry);
-
-
 #endif // _REGISTRAR_H_
 
 

@@ -36,37 +36,37 @@ ____________________________________________________________________________*/
 
 
 
-Player *Player::thePlayer = NULL;
+Player *Player::m_thePlayer = NULL;
 
 Player *Player::GetPlayer() {
-    if (thePlayer == NULL) {
-        thePlayer = new Player();
+    if (m_thePlayer == NULL) {
+        m_thePlayer = new Player();
     }
-    return thePlayer;
+    return m_thePlayer;
 }
 
 Player::Player() {
     //cout << "Creating player..." << endl;
-    event_sem = new Semaphore();
-    event_queue = new Queue<Event *>();
+    m_eventSem = new Semaphore();
+    m_eventQueue = new Queue<Event *>();
     //cout << "Created queue" << endl;
-    event_service_thread = Thread::CreateThread();
-    event_service_thread->Create(Player::EventServiceThreadFunc,this);
+    m_eventServiceThread = Thread::CreateThread();
+    m_eventServiceThread->Create(Player::EventServiceThreadFunc,this);
     //cout << "Started event thread" << endl;
-    ui_vector = new Vector<EventQueue *>();
-    ui_death_vector = new Vector<EventQueue *>();
+    m_uiVector = new Vector<EventQueue *>();
+    m_uiDeathVector = new Vector<EventQueue *>();
     //cout << "Created vectors" << endl;
-    uiManipLock = new Mutex();
+    m_uiManipLock = new Mutex();
     m_lmcMutex = new Mutex();
     m_pmiMutex = new Mutex();
     m_pmoMutex = new Mutex();
     m_uiMutex = new Mutex();
     //cout << "Created mutex" << endl;
-    imQuitting = 0;
-    quitWaitingFor = 0;
-    myPlayList = NULL;
-    myLMC = NULL;
-    playerState = STATE_Stopped;
+    m_imQuitting = 0;
+    m_quitWaitingFor = 0;
+    m_myPlayList = NULL;
+    m_myLMC = NULL;
+    m_playerState = STATE_Stopped;
 
     m_lmcRegistry = NULL;
     m_pmiRegistry = NULL;
@@ -78,7 +78,7 @@ Player::Player() {
 
 Player::~Player() {
     //cout << "waiting for service thread to end..." << endl;
-    event_service_thread->Join();
+    m_eventServiceThread->Join();
     //cout << "serivce thread done.." << endl;
     if (m_lmcRef) {
         m_lmcRef->Stop(m_lmcRef);
@@ -87,43 +87,43 @@ Player::~Player() {
         m_lmcRef = NULL;
     }
     //cout << "done deleting myLMC" << endl;
-    if (event_sem) {
-        delete event_sem;
-        event_sem = NULL;
+    if (m_eventSem) {
+        delete m_eventSem;
+        m_eventSem = NULL;
     }
     //cout << "Player: deleting event service thread" << endl;
-    if (event_service_thread) {
-        delete event_service_thread;
-        event_service_thread = NULL;
+    if (m_eventServiceThread) {
+        delete m_eventServiceThread;
+        m_eventServiceThread = NULL;
     }
     //cout << "Player: deleting event queue" << endl;
-    if (event_queue) {
-        delete event_queue;
-        event_queue = NULL;
+    if (m_eventQueue) {
+        delete m_eventQueue;
+        m_eventQueue = NULL;
     }
     // Delete PlayList
     //cout << "Player: deleting PlayList" << endl;
-    if (myPlayList) {
-        delete myPlayList;
-        myPlayList = NULL;
+    if (m_myPlayList) {
+        delete m_myPlayList;
+        m_myPlayList = NULL;
     }
 
     // Delete CIOs
     //cout << "Player: deleting CIOs" << endl;
-    if (ui_vector) {
+    if (m_uiVector) {
         //cio_vector->DeleteAll();
-        delete ui_vector;
-        ui_vector = NULL;
+        delete m_uiVector;
+        m_uiVector = NULL;
     }
-    if (ui_death_vector) {
-        ui_death_vector->DeleteAll();
-        delete ui_death_vector;
-        ui_death_vector = NULL;
+    if (m_uiDeathVector) {
+        m_uiDeathVector->DeleteAll();
+        delete m_uiDeathVector;
+        m_uiDeathVector = NULL;
     }
     //cout << "Player: deleting CIO/COO manipulation lock" << endl;
-    if (uiManipLock) {
-        delete uiManipLock;
-        uiManipLock = NULL;
+    if (m_uiManipLock) {
+        delete m_uiManipLock;
+        m_uiManipLock = NULL;
     }
 
     if (m_lmcMutex) {
@@ -173,22 +173,22 @@ void Player::EventServiceThreadFunc(void *pPlayer) {
     int32 rtnVal = 0x0;
     while (rtnVal == 0) {   // serviceEvent will return 1 if error or time to quit.
         //cout << "About to read queue..." << endl;
-        pP->event_sem->Wait();
-        pC = pP->event_queue->read();
+        pP->m_eventSem->Wait();
+        pC = pP->m_eventQueue->read();
         //cout << "Read queue..." << endl;
         if (pC) {
 	        rtnVal = pP->ServiceEvent(pC);
 	        delete pC;
         }
-        //if (pP->event_queue->isEmpty()) usleep(50000);
+        //if (pP->m_eventQueue->isEmpty()) usleep(50000);
     }
 //    cout << "EventServiceThreadFunc: quitting on " << rtnVal << endl;
     // Time to quit!!!
 }
 int32 Player::RegisterActiveUI(EventQueue* queue) {
     GetUIManipLock();
-    if (ui_vector && queue) {
-        ui_vector->Insert(queue);
+    if (m_uiVector && queue) {
+        m_uiVector->Insert(queue);
         ReleaseUIManipLock();
         return 0;
     } else {
@@ -261,24 +261,24 @@ int32 Player::RegisterUIs(UIRegistry* registry){
 }
 
 void Player::GetUIManipLock() {
-    uiManipLock->Acquire(WAIT_FOREVER);
+    m_uiManipLock->Acquire(WAIT_FOREVER);
 }
 
 void Player::ReleaseUIManipLock() {
-    uiManipLock->Release();
+    m_uiManipLock->Release();
 }
 
 int32 Player::AcceptEvent(Event *e) {
-    event_queue->write(e);
-    event_sem->Signal();
+    m_eventQueue->write(e);
+    m_eventSem->Signal();
     return 0;
 }
 
 bool Player::SetState(PlayerState ps) {
-    //cout << "Changing from " << playerState << " to " << ps << endl;
-    if (ps == playerState) 
+    //cout << "Changing from " << m_playerState << " to " << ps << endl;
+    if (ps == m_playerState) 
         return false;
-    playerState = ps;
+    m_playerState = ps;
     return true;
 }
 
@@ -293,7 +293,7 @@ int32 Player::ServiceEvent(Event *pC) {
                 if (SetState(STATE_Stopped)) {
 		    SEND_NORMAL_EVENT(INFO_Stopped);
                 }
-                myPlayList->SetNext();
+                m_myPlayList->SetNext();
                 Event *e = new Event(CMD_Play);
                 AcceptEvent(e);
                 return 0;
@@ -315,7 +315,7 @@ int32 Player::ServiceEvent(Event *pC) {
 	    }
 	    
 	    case CMD_Play: {
-		PlayListItem *pc = myPlayList->GetCurrent();
+		PlayListItem *pc = m_myPlayList->GetCurrent();
 		if (pc) {
 		    if (m_lmcRef) {
 			m_lmcRef->Stop(m_lmcRef);
@@ -333,7 +333,7 @@ int32 Player::ServiceEvent(Event *pC) {
 		    if(item) {
 			pmi = new PMI;
 			item->InitFunction()(pmi);
-			pmi->SetTo(pmi, pc->url);
+			pmi->SetTo(pmi, pc->m_url);
 		    }
 		    
 		    item = m_pmoRegistry->GetItem(0);
@@ -357,7 +357,7 @@ int32 Player::ServiceEvent(Event *pC) {
 		    if (SetState(STATE_Playing)) {
 			SEND_NORMAL_EVENT(INFO_Playing);
 		    }
-		    m_lmcRef->ChangePosition(m_lmcRef, myPlayList->GetSkip());
+		    m_lmcRef->ChangePosition(m_lmcRef, m_myPlayList->GetSkip());
 		    m_lmcRef->Decode(m_lmcRef);
 		} else {
 		    //cout << "no more in playlist..." << endl;
@@ -391,12 +391,12 @@ int32 Player::ServiceEvent(Event *pC) {
 	    }
 	    
 	    case CMD_NextMediaPiece:
-		myPlayList->SetNext();
+		m_myPlayList->SetNext();
 		return 0;
 	    break;
 	    
             case CMD_PrevMediaPiece:
-                myPlayList->SetPrev();
+                m_myPlayList->SetPrev();
                 return 0;
                 break;
 		
@@ -423,12 +423,12 @@ int32 Player::ServiceEvent(Event *pC) {
 	    }
 	    case CMD_TogglePause: {
                 if (m_lmcRef) {
-		    if (playerState == STATE_Playing) {
+		    if (m_playerState == STATE_Playing) {
                         m_lmcRef->Pause(m_lmcRef);
                         if (SetState(STATE_Paused)) {
 			    SEND_NORMAL_EVENT(INFO_Paused);
                         }
-		    } else if (playerState == STATE_Paused) {
+		    } else if (m_playerState == STATE_Paused) {
                         m_lmcRef->Resume(m_lmcRef);
                         if (SetState(STATE_Playing)) {
 			    SEND_NORMAL_EVENT(INFO_Playing);
@@ -440,8 +440,8 @@ int32 Player::ServiceEvent(Event *pC) {
 	    }
 	    
 	    case CMD_SetPlaylist:
-		myPlayList = (PlayList *)pC->GetArgument();
-		//myPlayList->SetFirst();  // Should be done by object creating the playlist
+		m_myPlayList = (PlayList *)pC->GetArgument();
+		//m_myPlayList->SetFirst();  // Should be done by object creating the playlist
 		return 0;
 		break;
 		
@@ -449,11 +449,11 @@ int32 Player::ServiceEvent(Event *pC) {
 		Event *e = new Event(CMD_Stop);
 		AcceptEvent(e);
 		// 1) Set "I'm already quitting flag" (or exit if its already Set)
-		imQuitting = 1;
+		m_imQuitting = 1;
 		// 2) Get CIO/COO manipulation lock
 		GetUIManipLock();
-		// 3) Count CIO/COO, put into quitWaitingFor.
-		quitWaitingFor = ui_vector->NumElements();
+		// 3) Count CIO/COO, put into m_quitWaitingFor.
+		m_quitWaitingFor = m_uiVector->NumElements();
 		// 4) Send CMD_Cleanup event to all CIO/COOs
 		
 		Event *pe = new Event(CMD_Cleanup);
@@ -466,18 +466,18 @@ int32 Player::ServiceEvent(Event *pC) {
             }
 	    
 	    case INFO_ReadyToDieUI: {
-		if (!imQuitting) 
+		if (!m_imQuitting) 
 		    return 0;
 		
 		if (pC->GetArgument()) {
 		    EventQueue *pCOO = (EventQueue *)(pC->GetArgument());
 		    //printf("having %x killed(COO)\n",pCOO);
-		    ui_death_vector->Insert(pCOO);
+		    m_uiDeathVector->Insert(pCOO);
 		}
 		
-		quitWaitingFor--;
+		m_quitWaitingFor--;
 		
-		if (quitWaitingFor) 
+		if (m_quitWaitingFor) 
 		    return 0;
 		
 		GetUIManipLock();
@@ -531,21 +531,21 @@ int32 Player::ServiceEvent(Event *pC) {
 
 void Player::SendToUI(Event *pe) {
     int32 i;
-    for (i = 0;i<ui_vector->NumElements();i++) {
-	ui_vector->ElementAt(i)->AcceptEvent(pe);
+    for (i = 0;i<m_uiVector->NumElements();i++) {
+	m_uiVector->ElementAt(i)->AcceptEvent(pe);
     }
 }
 
 void Player::testQueue() {
     Event *pC;
     
-    pC = event_queue->read();
+    pC = m_eventQueue->read();
     if (pC) {
 	    cout << "testQueue: First failed!!" << endl;
     } else {
 	    cout << "testQueue: First succeded!!" << endl;
     }
-    cout << "testQueue: isEmpty(): " << event_queue->isEmpty() << endl;
+    cout << "testQueue: isEmpty(): " << m_eventQueue->isEmpty() << endl;
 
 
     pC = new Event(CMD_Play);
@@ -555,21 +555,21 @@ void Player::testQueue() {
     pC = new Event(CMD_NextMediaPiece);
     AcceptEvent(pC);
 
-    pC = event_queue->read();
+    pC = m_eventQueue->read();
     cout << "testQueue: " << pC->GetEvent() << endl;
     delete pC;
-    pC = event_queue->read();
+    pC = m_eventQueue->read();
     cout << "testQueue: " << pC->GetEvent() << endl;
     delete pC;
-    cout << "testQueue: isEmpty(): " << event_queue->isEmpty() << endl;
-    pC = event_queue->read();
+    cout << "testQueue: isEmpty(): " << m_eventQueue->isEmpty() << endl;
+    pC = m_eventQueue->read();
     cout << "testQueue: " << pC->GetEvent() << endl;
     delete pC;
-    pC = event_queue->read();
+    pC = m_eventQueue->read();
     if (pC) {
 	    cout << "testQueue: Failed!!!" << endl;
     } else {
 	    cout << "testQueue: Final Succeeded!!" << endl;
     }
-    cout << "testQueue: isEmpty(): " << event_queue->isEmpty() << endl;
+    cout << "testQueue: isEmpty(): " << m_eventQueue->isEmpty() << endl;
 }

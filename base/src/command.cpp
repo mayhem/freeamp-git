@@ -33,31 +33,32 @@ ____________________________________________________________________________*/
 #include "mutex.h"
 
 Event::Event(int32 c) {
-    event = c;
-    arg = NULL;
+    m_event = c;
+    m_arg = NULL;
 }
 
 Event::Event(int32 c, void *a) {
-    event = c;
-    arg = a;
+    m_event = c;
+    m_arg = a;
 }
 
 Event::Event(const Event &c) {
-    event = c.event;
-    arg = c.arg;
+    m_event = c.m_event;
+    m_arg = c.m_arg;
 }
 
 Event::~Event() { }
 
 int32 Event::GetEvent() {
-    return event;
+    return m_event;
 }
 
 void *Event::GetArgument() {
-    return arg;
+    return m_arg;
 }
 
 
 
 
 
+    

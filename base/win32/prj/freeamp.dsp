@@ -163,7 +163,7 @@ SOURCE=..\src\semaphore.cpp
 SOURCE=..\src\win32thread.cpp
 # End Source File
 # End Group
-# Begin Group "Registries"
+# Begin Group "registries"
 
 # PROP Default_Filter ""
 # Begin Source File

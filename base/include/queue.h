@@ -32,19 +32,7 @@ ____________________________________________________________________________*/
 
 template<class T>
 class Queue {
- private:
-    class QueueMember {
-    public:
-	QueueMember *behindMe;
-	T myMember;
-    };
-    QueueMember *head;
-    QueueMember *tail;
-    
-    bool deleteWhenDone;
-    void getLock();
-    void releaseLock();
-    Mutex *myLock;
+
  public:
     Queue(bool dwd = true);
     ~Queue();
@@ -52,35 +40,50 @@ class Queue {
     T read();
     int32 write(T &);
     bool isEmpty();
+
+ private:
+    class QueueMember {
+        public:
+	    QueueMember *m_behindMe;
+	    T m_myMember;
+    };
+    QueueMember *m_head;
+    QueueMember *m_tail;
+    
+    bool m_deleteWhenDone;
+    void getLock();
+    void releaseLock();
+    Mutex *m_myLock;
+ 
 };
 
 
 template<class T> Queue<T>::Queue(bool dwd) {
-    deleteWhenDone = dwd;
-    head = NULL;
-    tail = NULL;
-    myLock = new Mutex();
+    m_deleteWhenDone = dwd;
+    m_head = NULL;
+    m_tail = NULL;
+    m_myLock = new Mutex();
 }
 
 template<class T> Queue<T>::~Queue() {
     getLock();
-    QueueMember *pQM = head;
+    QueueMember *pQM = m_head;
     QueueMember *next = NULL;
-    head = NULL;
-    tail = NULL;
+    m_head = NULL;
+    m_tail = NULL;
     releaseLock();
     while (pQM != NULL) {
-	next = pQM->behindMe;
-	if (deleteWhenDone) {
-	    if (pQM->myMember) {
-		delete pQM->myMember;
+	next = pQM->m_behindMe;
+	if (m_deleteWhenDone) {
+	    if (pQM->m_myMember) {
+		delete pQM->m_myMember;
 	    }
 	}
 	delete pQM;
 	pQM = next;
     }
-    if (myLock) {
-	delete myLock;
+    if (m_myLock) {
+	delete m_myLock;
     }
 }
 
@@ -88,16 +91,16 @@ template<class T> T Queue<T>::read() {
     getLock();
     //cout << "queue:: read" << endl;
     T rtnVal = NULL;
-    if (head) {
-	//cout << "queue:: read got head" << endl;
-	QueueMember *tmp = head;
-	rtnVal = tmp->myMember;
-	head = tmp->behindMe;
+    if (m_head) {
+	//cout << "queue:: read got m_head" << endl;
+	QueueMember *tmp = m_head;
+	rtnVal = tmp->m_myMember;
+	m_head = tmp->m_behindMe;
 	delete tmp;
     }
-    if (head == NULL) {
-	// no tail anymore
-	tail = NULL;
+    if (m_head == NULL) {
+	// no m_tail anymore
+	m_tail = NULL;
     }
     //cout << "queue:: read ending" << endl;
     releaseLock();
@@ -107,31 +110,31 @@ template<class T> T Queue<T>::read() {
 template<class T> int32 Queue<T>::write(T &c) {
     getLock();
     QueueMember *pQM = new QueueMember();
-    pQM->myMember = c;
-    pQM->behindMe = NULL;
-    if (tail) {
-	tail->behindMe = pQM;
+    pQM->m_myMember = c;
+    pQM->m_behindMe = NULL;
+    if (m_tail) {
+	m_tail->m_behindMe = pQM;
     }
-    tail = pQM;
-    if (head == NULL) {
-	// no head, this T we just pushed on is now the head
-	head = pQM;
+    m_tail = pQM;
+    if (m_head == NULL) {
+	// no m_head, this T we just pushed on is now the m_head
+	m_head = pQM;
     }
     releaseLock();
     return 0;
 }
 
 template<class T> bool Queue<T>::isEmpty() {
-    return (head ? false : true);
+    return (m_head ? false : true);
 }
 
 template<class T> void Queue<T>::getLock() {
-    myLock->Acquire(WAIT_FOREVER);
+    m_myLock->Acquire(WAIT_FOREVER);
     return;
 }
 
 template<class T> void Queue<T>::releaseLock() {
-    myLock->Release();
+    m_myLock->Release();
     return;
 }
 

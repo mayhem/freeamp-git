@@ -30,16 +30,16 @@ ____________________________________________________________________________*/
 #include "vector.h"
 
 PlayList::PlayList() {
-    pMediaElems = new Vector<PlayListItem *>();
-    current = -1;
-    skipNum = 0;
+    m_pMediaElems = new Vector<PlayListItem *>();
+    m_current = -1;
+    m_skipNum = 0;
 }
 
 PlayList::~PlayList() {
-    if (pMediaElems) {
-        pMediaElems->DeleteAll();
-	    delete pMediaElems;
-	    pMediaElems = NULL;
+    if (m_pMediaElems) {
+        m_pMediaElems->DeleteAll();
+	    delete m_pMediaElems;
+	    m_pMediaElems = NULL;
     }
 }
 
@@ -49,23 +49,23 @@ void PlayList::Add(char *pc, int type) {
 	//char *pNewC = new char[len];
 	PlayListItem* item = new PlayListItem;
 	int len = strlen(pc) + 1;
-	if(item->url = new char[len]) {
-	    //strcpy(item->url,pc);
-	    memcpy(item->url,pc,len);
+	if(item->m_url = new char[len]) {
+	    //strcpy(item->m_url,pc);
+	    memcpy(item->m_url,pc,len);
 	} else {
 	    //XXX FIXME Uhhh...what if we run out of memory?
 	    // --jdw:  then we're screwwwwwwwed
 	    cerr << "Out of memory!\n";
 	}
 	
-	item->type = type;
+	item->m_type = type;
 	
-	pMediaElems->Insert(item);
+	m_pMediaElems->Insert(item);
     }
 }
 
 void PlayList::Shuffle(void) {
-    double count= (double) pMediaElems->NumElements();
+    double count= (double) m_pMediaElems->NumElements();
     if (count < 2) {
 	return;
     }
@@ -77,11 +77,11 @@ void PlayList::Shuffle(void) {
     for (int32 i = 0; i < 3 * count; i++) {
 	first = (int32) ((count * rand()) / (RAND_MAX+1.0));
 	second = (int32) ((count * rand()) / (RAND_MAX+1.0));
-	pMediaElems->Swap(first,second);
+	m_pMediaElems->Swap(first,second);
 //	if (first != second) {
-//	    memcpy(temp, pMediaElems->elementAt(first), sizeof(PlayListItem));
-//	    memcpy(pMediaElems->elementAt(first), pMediaElems->elementAt(second), sizeof(PlayListItem));
-//	    memcpy(pMediaElems->elementAt(second), temp, sizeof(PlayListItem));
+//	    memcpy(temp, m_pMediaElems->elementAt(first), sizeof(PlayListItem));
+//	    memcpy(m_pMediaElems->elementAt(first), m_pMediaElems->elementAt(second), sizeof(PlayListItem));
+//	    memcpy(m_pMediaElems->elementAt(second), temp, sizeof(PlayListItem));
 //	}
     }
 //    delete (char *)temp;
@@ -103,19 +103,19 @@ void PlayList::Shuffle(void) {
 }
 
  PlayListItem *PlayList::GetCurrent() {
-    return pMediaElems->ElementAt(current);
+    return m_pMediaElems->ElementAt(m_current);
 }
 
- void PlayList::SetFirst() { current = 0; }
- void PlayList::SetNext() { current++; }
- void PlayList::SetPrev() { current--; }
+ void PlayList::SetFirst() { m_current = 0; }
+ void PlayList::SetNext() { m_current++; }
+ void PlayList::SetPrev() { m_current--; }
 
 PlayListItem::PlayListItem() {
-    url = NULL;
+    m_url = NULL;
 }
     
 PlayListItem::~PlayListItem() {
-    if(url)
-        delete url;
+    if(m_url)
+        delete m_url;
 }
 
