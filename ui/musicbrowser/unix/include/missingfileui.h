@@ -38,12 +38,20 @@ class MissingFileUI {
  
     void Run();
  
+    void SetFunc(int func);
+    void EnableEntry(bool enable);
+    void ChangeTextEntry(const char *entry, bool set = false);
+
  protected:
     FAContext *m_context;
 
  private:
-    
-    PlaylistItem   *m_missing;
+    int           m_iFunction;  
+    PlaylistItem *m_missing;
+    GtkWidget    *m_entry;
+    GtkWidget    *m_browse;
+
+    string        m_entryText;
 };
    
 
