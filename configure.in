@@ -187,19 +187,14 @@ if test "$isunix" = "true" ; then
     AC_LANG_CPLUSPLUS
     AC_MSG_CHECKING(for G++ >= 2.91)
     AC_TRY_RUN([
-#include <stdlib.h>
-#include <stdio.h>
 int main() {
 #if defined (__GNUC__)
 #if (__GNUC__ == 2 && __GNUC_MINOR__ >= 91) || __GNUC__ > 2
-    printf("%d.%d ", __GNUC__, __GNUC_MINOR__);
     return 0;
 #else
-    printf("%d.%d", __GNUC__, __GNUC_MINOR__);
     return 1;
 #endif
 #else
-    printf("You're not using gcc, This may or may not compile...\n");
     return 0;
 #endif
 }
