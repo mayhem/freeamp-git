@@ -1,26 +1,26 @@
-# Microsoft Developer Studio Project File - Name="xing" - Package Owner=<4>
+# Microsoft Developer Studio Project File - Name="vorbis" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Dynamic-Link Library" 0x0102
 
-CFG=xing - Win32 NASM Debug
+CFG=vorbis - Win32 NASM Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
-!MESSAGE NMAKE /f "xing.mak".
+!MESSAGE NMAKE /f "vorbis.mak".
 !MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "xing.mak" CFG="xing - Win32 NASM Debug"
+!MESSAGE NMAKE /f "vorbis.mak" CFG="vorbis - Win32 NASM Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "xing - Win32 Release" (based on "Win32 (x86) Dynamic-Link Library")
-!MESSAGE "xing - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
-!MESSAGE "xing - Win32 NASM Release" (based on "Win32 (x86) Dynamic-Link Library")
-!MESSAGE "xing - Win32 NASM Debug" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "vorbis - Win32 Release" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "vorbis - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "vorbis - Win32 NASM Release" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "vorbis - Win32 NASM Debug" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE 
 
 # Begin Project
@@ -31,7 +31,7 @@ CPP=cl.exe
 MTL=midl.exe
 RSC=rc.exe
 
-!IF  "$(CFG)" == "xing - Win32 Release"
+!IF  "$(CFG)" == "vorbis - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
@@ -55,13 +55,13 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x11800000" /subsystem:windows /dll /machine:I386 /out:"xing.lmc" /libpath:"..\..\..\..\base\win32"
+# ADD LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x11800000" /subsystem:windows /dll /machine:I386 /out:"vorbis.lmc" /libpath:"..\..\..\..\base\win32"
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                    ..\..\..\..\base\win32\prj\plugins	copy xing.lmc                            ..\..\..\..\base\win32\prj\plugins
+PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                    ..\..\..\..\base\win32\prj\plugins	copy vorbis.lmc                            ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
-!ELSEIF  "$(CFG)" == "xing - Win32 Debug"
+!ELSEIF  "$(CFG)" == "vorbis - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -85,19 +85,19 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x11800000" /subsystem:windows /dll /debug /machine:I386 /out:"xing.lmc" /pdbtype:sept /libpath:"..\..\..\..\base\win32"
+# ADD LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x11800000" /subsystem:windows /dll /debug /machine:I386 /out:"vorbis.lmc" /pdbtype:sept /libpath:"..\..\..\..\base\win32"
 # SUBTRACT LINK32 /profile /nodefaultlib
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                    ..\..\..\..\base\win32\prj\plugins	copy xing.lmc                            ..\..\..\..\base\win32\prj\plugins
+PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                    ..\..\..\..\base\win32\prj\plugins	copy vorbis.lmc                            ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
-!ELSEIF  "$(CFG)" == "xing - Win32 NASM Release"
+!ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "xing___W"
-# PROP BASE Intermediate_Dir "xing___W"
+# PROP BASE Output_Dir "vorbis___W"
+# PROP BASE Intermediate_Dir "vorbis___W"
 # PROP BASE Ignore_Export_Lib 0
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
@@ -116,19 +116,19 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386 /out:"xing.lmc"
-# ADD LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x11800000" /subsystem:windows /dll /machine:I386 /out:"xing.lmc" /libpath:"..\..\..\..\base\win32"
+# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386 /out:"vorbis.lmc"
+# ADD LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x11800000" /subsystem:windows /dll /machine:I386 /out:"vorbis.lmc" /libpath:"..\..\..\..\base\win32"
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                    ..\..\..\..\base\win32\prj\plugins	copy xing.lmc                            ..\..\..\..\base\win32\prj\plugins
+PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                    ..\..\..\..\base\win32\prj\plugins	copy vorbis.lmc                            ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
-!ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug"
+!ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "xing___0"
-# PROP BASE Intermediate_Dir "xing___0"
+# PROP BASE Output_Dir "vorbis___0"
+# PROP BASE Intermediate_Dir "vorbis___0"
 # PROP BASE Ignore_Export_Lib 0
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
@@ -147,23 +147,23 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"xing.lmc" /pdbtype:sept
+# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"vorbis.lmc" /pdbtype:sept
 # SUBTRACT BASE LINK32 /profile /nodefaultlib
-# ADD LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x11800000" /subsystem:windows /dll /debug /machine:I386 /out:"xing.lmc" /pdbtype:sept /libpath:"..\..\..\..\base\win32"
+# ADD LINK32 fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x11800000" /subsystem:windows /dll /debug /machine:I386 /out:"vorbis.lmc" /pdbtype:sept /libpath:"..\..\..\..\base\win32"
 # SUBTRACT LINK32 /profile /nodefaultlib
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                    ..\..\..\..\base\win32\prj\plugins	copy xing.lmc                            ..\..\..\..\base\win32\prj\plugins
+PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                    ..\..\..\..\base\win32\prj\plugins	copy vorbis.lmc                            ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
 
 # Begin Target
 
-# Name "xing - Win32 Release"
-# Name "xing - Win32 Debug"
-# Name "xing - Win32 NASM Release"
-# Name "xing - Win32 NASM Debug"
+# Name "vorbis - Win32 Release"
+# Name "vorbis - Win32 Debug"
+# Name "vorbis - Win32 NASM Release"
+# Name "vorbis - Win32 NASM Debug"
 # Begin Group "general source"
 
 # PROP Default_Filter ""
@@ -171,7 +171,7 @@ PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir            
 
 SOURCE=..\..\..\..\config\config.win32
 
-!IF  "$(CFG)" == "xing - Win32 Release"
+!IF  "$(CFG)" == "vorbis - Win32 Release"
 
 # Begin Custom Build
 InputPath=..\..\..\..\config\config.win32
@@ -181,7 +181,7 @@ InputPath=..\..\..\..\config\config.win32
 
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "xing - Win32 Debug"
+!ELSEIF  "$(CFG)" == "vorbis - Win32 Debug"
 
 # Begin Custom Build
 InputPath=..\..\..\..\config\config.win32
@@ -191,7 +191,7 @@ InputPath=..\..\..\..\config\config.win32
 
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "xing - Win32 NASM Release"
+!ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Release"
 
 # Begin Custom Build
 InputPath=..\..\..\..\config\config.win32
@@ -201,7 +201,7 @@ InputPath=..\..\..\..\config\config.win32
 
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug"
+!ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Debug"
 
 # Begin Custom Build
 InputPath=..\..\..\..\config\config.win32
@@ -228,11 +228,11 @@ SOURCE=..\..\..\..\io\src\pullbuffer.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\xing.def
+SOURCE=.\vorbis.def
 # End Source File
 # Begin Source File
 
-SOURCE=..\res\xing.rc
+SOURCE=..\res\vorbis.rc
 # End Source File
 # End Group
 # Begin Group "decoder"
@@ -316,7 +316,7 @@ SOURCE=..\..\src\wavep.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\src\xinglmc.cpp
+SOURCE=..\..\src\vorbislmc.cpp
 # End Source File
 # End Group
 # Begin Group "Assembly Files"
@@ -326,15 +326,15 @@ SOURCE=..\..\src\xinglmc.cpp
 
 SOURCE=..\..\src\cdctasm.asm
 
-!IF  "$(CFG)" == "xing - Win32 Release"
+!IF  "$(CFG)" == "vorbis - Win32 Release"
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "xing - Win32 Debug"
+!ELSEIF  "$(CFG)" == "vorbis - Win32 Debug"
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "xing - Win32 NASM Release"
+!ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Release"
 
 # Begin Custom Build
 IntDir=.\Release
@@ -346,7 +346,7 @@ InputName=cdctasm
 
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug"
+!ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Debug"
 
 # Begin Custom Build
 IntDir=.\Debug
@@ -365,15 +365,15 @@ InputName=cdctasm
 
 SOURCE=..\..\src\cwin8asm.asm
 
-!IF  "$(CFG)" == "xing - Win32 Release"
+!IF  "$(CFG)" == "vorbis - Win32 Release"
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "xing - Win32 Debug"
+!ELSEIF  "$(CFG)" == "vorbis - Win32 Debug"
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "xing - Win32 NASM Release"
+!ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Release"
 
 # Begin Custom Build
 IntDir=.\Release
@@ -385,7 +385,7 @@ InputName=cwin8asm
 
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug"
+!ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Debug"
 
 # Begin Custom Build
 IntDir=.\Debug
@@ -404,15 +404,15 @@ InputName=cwin8asm
 
 SOURCE=..\..\src\cwinasm.asm
 
-!IF  "$(CFG)" == "xing - Win32 Release"
+!IF  "$(CFG)" == "vorbis - Win32 Release"
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "xing - Win32 Debug"
+!ELSEIF  "$(CFG)" == "vorbis - Win32 Debug"
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "xing - Win32 NASM Release"
+!ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Release"
 
 # Begin Custom Build
 IntDir=.\Release
@@ -424,7 +424,7 @@ InputName=cwinasm
 
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug"
+!ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Debug"
 
 # Begin Custom Build
 IntDir=.\Debug
@@ -443,15 +443,15 @@ InputName=cwinasm
 
 SOURCE=..\..\src\mdctasm.asm
 
-!IF  "$(CFG)" == "xing - Win32 Release"
+!IF  "$(CFG)" == "vorbis - Win32 Release"
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "xing - Win32 Debug"
+!ELSEIF  "$(CFG)" == "vorbis - Win32 Debug"
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "xing - Win32 NASM Release"
+!ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Release"
 
 # Begin Custom Build
 IntDir=.\Release
@@ -463,7 +463,7 @@ InputName=mdctasm
 
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug"
+!ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Debug"
 
 # Begin Custom Build
 IntDir=.\Debug
@@ -482,15 +482,15 @@ InputName=mdctasm
 
 SOURCE=..\..\src\msisasm.asm
 
-!IF  "$(CFG)" == "xing - Win32 Release"
+!IF  "$(CFG)" == "vorbis - Win32 Release"
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "xing - Win32 Debug"
+!ELSEIF  "$(CFG)" == "vorbis - Win32 Debug"
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "xing - Win32 NASM Release"
+!ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Release"
 
 # Begin Custom Build
 IntDir=.\Release
@@ -502,7 +502,7 @@ InputName=msisasm
 
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug"
+!ELSEIF  "$(CFG)" == "vorbis - Win32 NASM Debug"
 
 # Begin Custom Build
 IntDir=.\Debug
