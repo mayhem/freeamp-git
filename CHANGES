@@ -1,3 +1,15 @@
+Changes for Linux version 1.3.1:
+--------------------------------------------------------------------
+
+- Fixed binary installs requiring esd and asound libs, when they
+  shouldn't have.
+- Fixed some random compile warnings
+- Fixed a source install issue where mkinstalldirs could not be found
+- Fixed ncurses.ui and mpeg123.ui to properly display id3 tags again
+- Added README.linux with some PMO change docs
+- The linux version can now play Windows .m3u files
+- Removed GTK config stuff in the configure.in script
+
 Changes for Linux and Windows version 1.3.0:
 --------------------------------------------------------------------
 
