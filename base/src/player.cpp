@@ -76,7 +76,7 @@ EventQueue() {
     m_lmc = NULL;
     m_ui = NULL;
 
-    m_argUI = NULL;
+    m_argUIvector = new Vector<char *>();
 
     m_argc  = 0;
     m_argv  = NULL;
@@ -92,7 +92,8 @@ EventQueue() {
 Player::~Player() {
 
     TYPICAL_DELETE(m_pTermSem);
-    
+    TYPICAL_DELETE(m_argUIvector);
+
     //cout << "waiting for service thread to end..." << endl;
     if (m_eventServiceThread) {
 	m_eventServiceThread->Join();
@@ -146,7 +147,6 @@ Player::~Player() {
 
 	TYPICAL_DELETE(m_prefs);
 
-	TYPICAL_DELETE(m_argUI);
 }
 
 void Player::SetTerminationSemaphore(Semaphore *pSem) {
@@ -159,18 +159,21 @@ typedef char *pchar;
 
 bool Player::SetArgs(int32 argc, char** argv){
     Vector<char *> argVector;
-
+    bool justGotArgvZero = false;
     char *arg = NULL;
 #ifndef WIN32
     // grab the UI name from how we are invoked.
-    m_argUI = new char[strlen(argv[0]) + 1 + 3];
+    char *argUI = new char[strlen(argv[0]) + 1 + 3];
     char *pBegin = strrchr(argv[0],'/');
     if (pBegin) {
 	pBegin++;
     } else {
 	pBegin = argv[0];
     }
-    sprintf(m_argUI,"%s",pBegin);
+    //sprintf(m_argUI,"%s",pBegin);
+    strcpy(argUI,pBegin);
+    m_argUIvector->Insert(argUI);
+    justGotArgvZero = true;
 #endif
     argVector.Insert(argv[0]);
     for(int32 i = 1;i < argc; i++) 
@@ -200,9 +203,14 @@ bool Player::SetArgs(int32 argc, char** argv){
 			    return false;
 			}
 			arg = argv[i];
-			if (m_argUI) delete m_argUI;
-                        m_argUI = new char[strlen(arg) + 1];
-                        strcpy(m_argUI, arg);
+			//if (m_argUI) delete m_argUI;
+                        argUI = new char[strlen(arg) + 1];
+                        strcpy(argUI, arg);
+			if (justGotArgvZero) {
+			    m_argUIvector->DeleteAll();
+			    justGotArgvZero = false;
+			}
+			m_argUIvector->Insert(argUI);
                     }
 		    break;
 		}
@@ -279,16 +287,17 @@ void Player::SetPreferences(Preferences * pP) {
 }
 
 void Player::Run(){
+    int32 uiVectorIndex = 0;
     Preferences* prefs;
     char* name = NULL;
     uint32 len = 256;
     Error error = kError_NoErr;
-
+    int32 uisActivated = 0;
     m_eventServiceThread = Thread::CreateThread();
     m_eventServiceThread->Create(Player::EventServiceThreadFunc,this);
 
     // which ui should we instantiate first??
-    if(m_argUI == NULL)
+    if(m_argUIvector->NumElements() == 0)
     {
         name = new char[len];
         prefs = new Preferences;
@@ -306,38 +315,44 @@ void Player::Run(){
     }
     else
     {
-        name = new char[strlen(m_argUI) + 1]; 
-        strcpy(name, m_argUI);
+        name = new char[1024]; 
+        strcpy(name, m_argUIvector->ElementAt(uiVectorIndex));
     }
 
     if(IsntError(error))
     {
-        RegistryItem* item = NULL;
-	UserInterface *ui = NULL;
-        int32 i = 0;
-	    int32 uisActivated = 0;
-	
-        while(item = m_uiRegistry->GetItem(i++))
-        {
-            if(!CompareNames(item->Name(),name))
-            {
-		        m_ui = (UserInterface *)item->InitFunction()();
-		
-		        m_ui->SetTarget((EventQueue *)this);
- 		        m_ui->SetPlayListManager(m_plm);
-			m_ui->SetArgs(m_argc, m_argv);
-		        Error er = m_ui->Init();
-			if (er == kError_NoErr) {
-			    RegisterActiveUI(m_ui);
-			} else {
-			    delete m_ui;
-			    m_ui = NULL;
-			}
-			uisActivated++;
-                break;
-            }
-        }
-	
+	while (*name) {
+	    RegistryItem* item = NULL;
+	    UserInterface *ui = NULL;
+	    int32 i = 0;
+	    
+	    while(item = m_uiRegistry->GetItem(i++))
+	    {
+		if(!CompareNames(item->Name(),name))
+		{
+		    m_ui = (UserInterface *)item->InitFunction()();
+		    
+		    m_ui->SetTarget((EventQueue *)this);
+		    m_ui->SetPlayListManager(m_plm);
+		    m_ui->SetArgs(m_argc, m_argv);
+		    Error er = m_ui->Init((uiVectorIndex == 0) ? PRIMARY_UI : SECONDARY_UI_STARTUP); // call it the primary if we're looking at the first ui
+		    if (er == kError_NoErr) {
+			RegisterActiveUI(m_ui);
+		    } else {
+			delete m_ui;
+			m_ui = NULL;
+		    }
+		    uisActivated++;
+		    break;
+		}
+	    }
+	    char *p = m_argUIvector->ElementAt(++uiVectorIndex);
+	    if (p) {
+		strcpy(name,p);
+	    } else {
+		*name = '\0';
+	    }
+	}
 	if (!uisActivated) {
 #ifdef WIN32
 	    char foo[1024];
@@ -376,6 +391,7 @@ void Player::EventServiceThreadFunc(void *pPlayer) {
     while (rtnVal == 0) {   // serviceEvent will return 1 if error or time to quit.
         //cout << "About to Read queue..." << endl;
         pP->m_eventSem->Wait();
+	//cout << "Wait returned..." << endl;
         pC = pP->m_eventQueue->Read();
         //cout << "Read queue..." << endl;
         if (pC) {
@@ -471,6 +487,9 @@ void Player::ReleaseUIManipLock() {
 }
 
 int32 Player::AcceptEvent(Event *e) {
+    if (e) {
+	//cout << "Accepting event: " << e->Type() << endl;
+    }
     m_eventQueue->Write(e);
     m_eventSem->Signal();
     return 0;
@@ -496,49 +515,18 @@ int32 Player::ServiceEvent(Event *pC) {
     if (pC) {
 	//cout << "Player: serviceEvent: servicing Event: " << pC->Type() << endl;
 	switch (pC->Type()) {
-
-#define	_EQUALIZER_ENABLE_
-#ifdef	_EQUALIZER_ENABLE_
-	case CMD_SetEQData: {
-			if(m_lmc) {
-				if (((SetEqualizerDataEvent *)pC)->IsEQData()) {
-					m_lmc->SetEQData(((SetEqualizerDataEvent *)pC)->GetEQData());
-				} else
-					m_lmc->SetEQData(((SetEqualizerDataEvent *)pC)->GetEnableState());
-			}
-			delete pC;
-			return 0;
-			}
-			break;
-#endif	//_EQUALIZER_ENABLE_
-#undef	_EQUALIZER_ENABLE_
-#define	_VISUAL_ENABLE_
-#ifdef	_VISUAL_ENABLE_
-	case CMD_SendVisBuf: {
-			if(m_playerState == STATE_Playing) {
-				GetUIManipLock();
-				SendToUI(pC);
-				ReleaseUIManipLock();
-			}
-			delete pC;
-			return 0;
-			}
-		break;
-#endif	//_VISUAL_ENABLE_
-#undef	_VISUAL_ENABLE_
-
 	    case INFO_DoneOutputting: {  // LMC or PMO sends this when its done outputting whatever.  Now, go on to next piece in playlist
-			if (SetState(STATE_Stopped)) {
-				SEND_NORMAL_EVENT(INFO_Stopped);
-			}
-			m_plm->SetNext();
-			Event *e = new Event(CMD_Play);
-			AcceptEvent(e);
-			delete pC;
-			return 0;
-			break; 
-			}
-	
+                if (SetState(STATE_Stopped)) {
+		    SEND_NORMAL_EVENT(INFO_Stopped);
+                }
+                m_plm->SetNext();
+                Event *e = new Event(CMD_Play);
+                AcceptEvent(e);
+		delete pC;
+                return 0;
+                break; 
+            }
+	    
 	    case CMD_Stop: {
                 if (m_lmc) {
 		    m_lmc->Stop();
@@ -870,6 +858,14 @@ int32 Player::ServiceEvent(Event *pC) {
 		break; 
 	    }
 	    
+	    case INFO_UserMessage: {
+		GetUIManipLock();
+		SendToUI(pC);
+		ReleaseUIManipLock();
+		delete pC;
+		break;
+	    }
+
 	    case INFO_MediaInfo: {
 		    GetUIManipLock();
 		    
@@ -918,6 +914,35 @@ int32 Player::ServiceEvent(Event *pC) {
 		return 0;
 		break;
 	    }
+#define _EQUALIZER_ENABLE_
+#ifdef  _EQUALIZER_ENABLE_
+        case CMD_SetEQData: {
+                        if(m_lmc) {
+                                if (((SetEqualizerDataEvent *)pC)->IsEQData()) {
+                                        m_lmc->SetEQData(((SetEqualizerDataEvent *)pC)->GetEQData());
+                                } else
+                                        m_lmc->SetEQData(((SetEqualizerDataEvent *)pC)->GetEnableState());
+                        }
+                        delete pC;
+                        return 0;
+                        }
+                        break;
+#endif  //_EQUALIZER_ENABLE_
+#undef  _EQUALIZER_ENABLE_
+#define _VISUAL_ENABLE_
+#ifdef  _VISUAL_ENABLE_
+        case CMD_SendVisBuf: {
+                        if(m_playerState == STATE_Playing) {
+                                GetUIManipLock();
+                                SendToUI(pC);
+                                ReleaseUIManipLock();
+                        }
+                        delete pC;
+                        return 0;
+                        }
+                break;
+#endif  //_VISUAL_ENABLE_
+#undef  _VISUAL_ENABLE_
 	    default:
 		cout << "serviceEvent: Unknown event (i.e. I don't do anything with it): " << pC->Type() << "  Passing..." << endl;
 		delete pC;

@@ -99,6 +99,9 @@ public:
     virtual Error InitDecoder();
     virtual const char *GetErrorString(int32);
 
+    virtual Error SetEQData(float *);
+    virtual Error SetEQData(bool);
+
 private:
     static void DecodeWorkerThreadFunc(void *);
     void DecodeWork();
@@ -132,6 +135,11 @@ private:
     Thread*                 m_decoderThread;
 
     int32                   m_frameCounter;
+
+    bool m_enableEQ;
+    float m_equalizer[32];
+
+
 };
 
 #endif /* _XINGLMC_H */

@@ -50,6 +50,9 @@ class LogicalMediaConverter {
     virtual Error SetTarget(EventQueue *) = 0;
     virtual Error InitDecoder() = 0;
 
+    virtual Error SetEQData(float *) = 0;
+    virtual Error SetEQData(bool) = 0;
+
     virtual const char *GetErrorString(int32 /*error*/) = 0;
 };
 
