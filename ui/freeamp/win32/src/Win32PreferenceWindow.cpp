@@ -344,7 +344,14 @@ bool Win32PreferenceWindow::PrefPage1Proc(HWND hwnd,
 
             while(item = pmo.GetItem(i++))
             {
-                pos = ComboBox_AddString(hwndPMO, item->Name());
+                if(*item->Description())
+                    pos = ComboBox_AddString(hwndPMO, item->Description());
+                else
+                    pos = ComboBox_AddString(hwndPMO, item->Name());
+
+                string* name = new string(item->Name());
+
+                ComboBox_SetItemData(hwndPMO, pos, (DWORD)name);
 
                 if(!strcmp(originalValues.defaultPMO, item->Name()))
                 {
@@ -399,6 +406,24 @@ bool Win32PreferenceWindow::PrefPage1Proc(HWND hwnd,
             break;
         }
 
+        case WM_DESTROY:
+        {
+            int32 count = ComboBox_GetCount(hwndPMO);
+
+            if(count != CB_ERR)
+            {
+                for(int32 i = 0; i < count;i++)
+                {
+                    string* s;
+                    s = (string*)ComboBox_GetItemData(hwndPMO, i);
+
+                    if(s)
+                        delete s;
+                }
+            }
+            break;
+        }
+
         case WM_COMMAND:
         {
             switch(LOWORD(wParam))
@@ -408,9 +433,20 @@ bool Win32PreferenceWindow::PrefPage1Proc(HWND hwnd,
                     if(HIWORD(wParam) == CBN_CLOSEUP)
                     {
                         memset(currentValues.defaultPMO, 0x00, 256);
-                        ComboBox_GetText(   hwndPMO, 
+
+                        int32 sel = ComboBox_GetCurSel(hwndPMO);
+
+                        if(sel != CB_ERR)
+                        {
+                            string* s;
+                            s = (string*)ComboBox_GetItemData(hwndPMO, sel);
+                            
+                            strcpy(currentValues.defaultPMO, s->c_str());
+                        }
+
+                        /*ComboBox_GetText( hwndPMO, 
                                             currentValues.defaultPMO, 
-                                            256);
+                                            256);*/
 
                         if(memcmp(  &originalValues, 
                                     &currentValues, 
