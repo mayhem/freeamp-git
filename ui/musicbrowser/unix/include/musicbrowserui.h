@@ -30,7 +30,7 @@ ____________________________________________________________________________*/
 #include "event.h"
 #include "thread.h"
 #include "playlist.h"
-#include "musicbrowser.h"
+#include "musiccatalog.h"
 #include "gtkmusicbrowser.h"
 #include "musicsearchui.h"
 

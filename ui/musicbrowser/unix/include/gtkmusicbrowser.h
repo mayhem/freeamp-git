@@ -32,7 +32,7 @@ ____________________________________________________________________________*/
 #include "event.h"
 #include "thread.h"
 #include "playlist.h"
-#include "musicbrowser.h"
+#include "musiccatalog.h"
 
 class FAContext;
 class MusicBrowserUI;

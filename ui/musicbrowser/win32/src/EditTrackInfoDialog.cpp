@@ -318,7 +318,7 @@ void MusicBrowserUI::CreateEditInfoLists(vector<string>& artists,
     vector<ArtistList*>::iterator   artist;    
 
     artistList = (vector<ArtistList*>*)
-            m_context->browser->m_catalog->GetMusicList();
+            m_context->catalog->GetMusicList();
 
     for(artist = artistList->begin(); 
         artist != artistList->end(); 

@@ -670,7 +670,7 @@ SOURCE=..\..\include\metadata.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\include\musicbrowser.h
+SOURCE=..\..\include\musiccatalog.h
 # End Source File
 # Begin Source File
 

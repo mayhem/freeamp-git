@@ -39,7 +39,7 @@ static const int32 c_minorVersion = 0;
 class PlaylistManager;
 class Properties;
 class EventQueue;
-class MusicBrowser;
+class MusicCatalog;
 class DownloadManager;
 class UpdateManager;
 class Player;
@@ -55,7 +55,7 @@ class FAContext
           props(0),
           plm(0),
           target(0),
-	  browser(0),
+	  catalog(0),
           downloadManager(0),
           //updateManager(0),
           player(0),
@@ -82,7 +82,7 @@ class FAContext
     Properties *props;
     PlaylistManager *plm;
     EventQueue *target;
-    MusicBrowser *browser;
+    MusicCatalog *catalog;
     DownloadManager *downloadManager;
     //UpdateManager *updateManager;
     Player *player;

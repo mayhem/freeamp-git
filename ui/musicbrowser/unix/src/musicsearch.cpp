@@ -30,7 +30,7 @@ ____________________________________________________________________________*/
 #include "utility.h"
 #include "eventdata.h"
 #include "fileselector.h"
-#include "musicbrowser.h"
+#include "musiccatalog.h"
 #include "musicsearchui.h"
 
 gboolean search_destroy(GtkWidget *widget, gpointer p)
@@ -264,13 +264,13 @@ void musicsearchUI::StartSearch(void)
     vector<string> oPathList;
     oPathList.push_back(searchPath);
     searchInProgress = true;
-    m_context->browser->SearchMusic(oPathList);
+    m_context->catalog->SearchMusic(oPathList);
     gtk_label_set_text(GTK_LABEL(buttonLabel), "Cancel Search");
 }
 
 void musicsearchUI::EndSearch(void)
 {
-    m_context->browser->StopSearchMusic();
+    m_context->catalog->StopSearchMusic();
     gtk_label_set_text(GTK_LABEL(buttonLabel), "Restart Search >");
     searchInProgress = false;    
 }

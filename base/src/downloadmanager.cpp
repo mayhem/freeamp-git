@@ -65,7 +65,7 @@ typedef ostrstream ostringstream;
 #include "utility.h"
 #include "event.h"
 #include "eventdata.h"
-#include "musicbrowser.h"
+#include "musiccatalog.h"
 
 
 DownloadManager::DownloadManager(FAContext* context)
@@ -1113,9 +1113,9 @@ Error DownloadManager::SubmitToDatabase(DownloadItem* item)
         
         if (IsntError(FilePathToURL(path, url, &urlLength)))
         {
-            m_context->browser->WriteMetaDataToDatabase(url, 
+            m_context->catalog->WriteMetaDataToDatabase(url, 
                                                         item->GetMetaData());
-            m_context->browser->m_catalog->AddSong(url);
+            m_context->catalog->AddSong(url);
         }
 
         delete [] url;

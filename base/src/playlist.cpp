@@ -47,7 +47,7 @@ using namespace std;
 #include "registrar.h"
 #include "event.h"
 #include "eventdata.h"
-#include "musicbrowser.h"
+#include "musiccatalog.h"
 
 
 // Function object used for sorting PlaylistItems in PlaylistManager
@@ -2021,7 +2021,7 @@ MetaDataThreadFunction(vector<PlaylistItem*>* list)
                 MetaData* dbData = NULL;
 
                 // is there any metadata stored for this item in the music db?
-                dbData = m_context->browser->ReadMetaDataFromDatabase(item->URL().c_str());
+                dbData = m_context->catalog->ReadMetaDataFromDatabase(item->URL().c_str());
 
                 if(dbData)
                 {

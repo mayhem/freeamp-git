@@ -40,7 +40,7 @@ using namespace std;
 #include "preferences.h"
 #include "properties.h"
 #include "propimpl.h"
-#include "musicbrowser.h"
+#include "musiccatalog.h"
 #include "hashtable.h"
 #include "downloadmanager.h"
 
@@ -184,7 +184,7 @@ class Player : public EventQueue, Properties, PropertyWatcher
 
     HashTable<RegistryItem *> *m_lmcExtensions;
 
-    MusicBrowser *m_musicBrowser;
+    MusicCatalog *m_musicCatalog;
     UserInterface *m_browserUI;
 
     DownloadManager* m_dlm;

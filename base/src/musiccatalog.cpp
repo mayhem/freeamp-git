@@ -48,26 +48,35 @@ typedef ostrstream ostringstream;
 using namespace std;
 
 #include "config.h"
-#include "musicbrowser.h"
+#include "musiccatalog.h"
 #include "player.h"
 #include "utility.h"
 #include "debug.h"
 
 #define METADATABASE_VERSION 1
 
-MusicCatalog::MusicCatalog(FAContext *context)
+MusicCatalog::MusicCatalog(FAContext *context, char *databasepath = NULL)
 {
+    m_database = NULL;
     m_context = context;
+    m_plm = context->plm;
+    m_mutex = new Mutex();
     m_artistList = new vector<ArtistList *>;
     m_unsorted = new vector<PlaylistItem *>;
     m_playlists = new vector<string>;
+   
+    if (databasepath)
+        SetDatabase(databasepath);
 }
 
 MusicCatalog::~MusicCatalog()
 {
+    if (m_database)
+        delete m_database;
     delete m_artistList;
     delete m_unsorted;
     delete m_playlists;
+    delete m_mutex;
 }
 
 class comp_catalog {
@@ -97,7 +106,7 @@ void MusicCatalog::Sort(void)
     // Sort the uncategorized tracks
     sort(m_unsorted->begin(), m_unsorted->end(), comp_catalog());
 
-    // sort the rest o the junk
+    // Sort the rest o the junk
     vector<ArtistList *>::iterator i = m_artistList->begin();
     for (; i != m_artistList->end(); i++) {
         vector<AlbumList *>::iterator j = (*i)->m_albumList->begin();
@@ -113,20 +122,18 @@ void MusicCatalog::Sort(void)
 
 Error MusicCatalog::RemovePlaylist(const char *url)
 {
-    Database *dbase = m_context->browser->GetDatabase();
-    assert(dbase);
     assert(url);
 
-    if (!dbase->Working())
+    if (!m_database->Working())
         return kError_DatabaseNotWorking;
 
-    char *data = dbase->Value(url);
+    char *data = m_database->Value(url);
 
     if (!data)
         return kError_ItemNotFound;
 
     delete [] data;
-    dbase->Remove(url);
+    m_database->Remove(url);
 
     vector<string>::iterator i = m_playlists->begin();
     for (; i != m_playlists->end(); i++)
@@ -146,16 +153,14 @@ Error MusicCatalog::RemovePlaylist(const char *url)
 
 Error MusicCatalog::AddPlaylist(const char *url)
 {
-    Database *dbase = m_context->browser->GetDatabase();
-    assert(dbase);
     assert(url);
 
-    if (!dbase->Working())
+    if (!m_database->Working())
         return kError_DatabaseNotWorking;
     
-    char *data = dbase->Value(url);
+    char *data = m_database->Value(url);
     if (!data) 
-        dbase->Insert(url, "P");
+        m_database->Insert(url, "P");
     else 
         delete [] data;
 
@@ -182,19 +187,16 @@ Error MusicCatalog::AddPlaylist(const char *url)
 
 Error MusicCatalog::RemoveSong(const char *url)
 {
-    Database *dbase = m_context->browser->GetDatabase();
-
-    assert(dbase);
     assert(url);
 
-    if (!dbase->Working())
+    if (!m_database->Working())
         return kError_DatabaseNotWorking;
 
-    MetaData *meta = m_context->browser->ReadMetaDataFromDatabase(url);
+    MetaData *meta = ReadMetaDataFromDatabase(url);
     if (!meta)
         return kError_ItemNotFound;
 
-    dbase->Remove(url);
+    m_database->Remove(url);
 
     if ((meta->Artist().size() == 0) || (meta->Artist() == " ")) {
         vector<PlaylistItem *>::iterator i = m_unsorted->begin();
@@ -255,16 +257,14 @@ Error MusicCatalog::RemoveSong(const char *url)
 
 Error MusicCatalog::AddSong(const char *url)
 {
-    Database *dbase = m_context->browser->GetDatabase();
-    assert(dbase);
     assert(url);
 
-    if (!dbase->Working())
+    if (!m_database->Working())
         return kError_DatabaseNotWorking;
 
     PlaylistItem *newtrack;
 
-    MetaData *meta = m_context->browser->ReadMetaDataFromDatabase(url);
+    MetaData *meta = ReadMetaDataFromDatabase(url);
 
     if (!meta) {
         newtrack = new PlaylistItem(url);
@@ -274,8 +274,8 @@ Error MusicCatalog::AddSong(const char *url)
             usleep(5);
 
         MetaData tempdata = (MetaData)(newtrack->GetMetaData());
-        m_context->browser->WriteMetaDataToDatabase(url, tempdata);
-        meta = m_context->browser->ReadMetaDataFromDatabase(url);
+        WriteMetaDataToDatabase(url, tempdata);
+        meta = ReadMetaDataFromDatabase(url);
     }
     else
         newtrack = new PlaylistItem(url, meta);
@@ -341,11 +341,9 @@ Error MusicCatalog::AddSong(const char *url)
 
 Error MusicCatalog::UpdateSong(PlaylistItem *item)
 {
-    Database *dbase = m_context->browser->GetDatabase();
-    assert(dbase);
     assert(item);
 
-    if (!dbase->Working())
+    if (!m_database->Working())
         return kError_DatabaseNotWorking;
 
     Error err = RemoveSong(item->URL().c_str());
@@ -353,24 +351,21 @@ Error MusicCatalog::UpdateSong(PlaylistItem *item)
     if (IsError(err))
         return err;
    
-    m_context->browser->WriteMetaDataToDatabase(item->URL().c_str(), 
-                                                item->GetMetaData());
+    WriteMetaDataToDatabase(item->URL().c_str(), item->GetMetaData());
 
-    dbase->Sync();
+    m_database->Sync();
 
     return AddSong(item->URL().c_str());
 }
 
 Error MusicCatalog::Remove(const char *url)
 {
-    Database *dbase = m_context->browser->GetDatabase();
-    assert(dbase);
     assert(url);
 
-    if (!dbase->Working())
+    if (!m_database->Working())
         return kError_DatabaseNotWorking;
 
-    char *data = dbase->Value(url);
+    char *data = m_database->Value(url);
     if (!data)
         return kError_ItemNotFound;
 
@@ -388,14 +383,12 @@ Error MusicCatalog::Remove(const char *url)
 
 Error MusicCatalog::Add(const char *url)
 {
-    Database *dbase = m_context->browser->GetDatabase();
-    assert(dbase);
     assert(url);
 
-    if (!dbase->Working())
+    if (!m_database->Working())
         return kError_DatabaseNotWorking;
 
-    char *data = dbase->Value(url);
+    char *data = m_database->Value(url);
     if (!data)
         return kError_ItemNotFound;
 
@@ -423,15 +416,12 @@ void MusicCatalog::ClearCatalog()
 
 Error MusicCatalog::RePopulateFromDatabase()
 {
-    Database *dbase = m_context->browser->GetDatabase();
-    assert(dbase);
-
-    if (!dbase->Working())
+    if (!m_database->Working())
         return kError_DatabaseNotWorking;
 
     ClearCatalog();
  
-    char *key = dbase->NextKey(NULL);
+    char *key = m_database->NextKey(NULL);
     Error err = kError_NoErr;
 
     while (key) {
@@ -442,32 +432,12 @@ Error MusicCatalog::RePopulateFromDatabase()
              return kError_YouScrewedUp;
         }
             
-        key = dbase->NextKey(key);
+        key = m_database->NextKey(key);
     }
     return kError_NoErr;
 }
 
-MusicBrowser::MusicBrowser(FAContext *context, char *path)
-{
-    m_database = NULL;
-    m_context = context;
-    m_plm = context->plm;
-    m_catalog = new MusicCatalog(context);
-    m_mutex = new Mutex();   
- 
-    if (path)
-        SetDatabase(path);
-}
-
-MusicBrowser::~MusicBrowser()
-{
-    if (m_database)
-        delete m_database;
-    delete m_catalog;
-    delete m_mutex;
-}
-
-void MusicBrowser::SetDatabase(const char *path)
+void MusicCatalog::SetDatabase(const char *path)
 {
     if (m_database)
         delete m_database;
@@ -482,12 +452,12 @@ void MusicBrowser::SetDatabase(const char *path)
     PruneDatabase();
 
     if (m_database) {
-        m_catalog->RePopulateFromDatabase();
-        m_catalog->Sort();
+        RePopulateFromDatabase();
+        Sort();
     }
 }
 
-void MusicBrowser::PruneDatabase(void)
+void MusicCatalog::PruneDatabase(void)
 {
     char *key = m_database->NextKey(NULL);
     struct stat st;
@@ -510,12 +480,12 @@ void MusicBrowser::PruneDatabase(void)
 }
 
 typedef struct MusicSearchThreadStruct {
-    MusicBrowser *mb;
+    MusicCatalog *mc;
     vector<string> pathList;
     Thread *thread;
 } MusicSearchThreadStruct;
 
-void MusicBrowser::SearchMusic(vector<string> &pathList)
+void MusicCatalog::SearchMusic(vector<string> &pathList)
 {
     if (!m_database->Working())
         return;
@@ -525,7 +495,7 @@ void MusicBrowser::SearchMusic(vector<string> &pathList)
     if (thread) {
         MusicSearchThreadStruct *mst = new MusicSearchThreadStruct;
 
-        mst->mb = this;
+        mst->mc = this;
         mst->pathList = pathList;
         mst->thread = thread;
 
@@ -533,29 +503,29 @@ void MusicBrowser::SearchMusic(vector<string> &pathList)
     }
 }
 
-void MusicBrowser::StopSearchMusic(void)
+void MusicCatalog::StopSearchMusic(void)
 {
     m_exit = true;
 }
 
-void MusicBrowser::musicsearch_thread_function(void *arg)
+void MusicCatalog::musicsearch_thread_function(void *arg)
 {
     MusicSearchThreadStruct *mst = (MusicSearchThreadStruct *)arg;
 
-    mst->mb->m_mutex->Acquire();
+    mst->mc->m_mutex->Acquire();
 
-    mst->mb->m_exit = false;
-    mst->mb->DoSearchPaths(mst->pathList);
+    mst->mc->m_exit = false;
+    mst->mc->DoSearchPaths(mst->pathList);
 
-    mst->mb->AcceptEvent(new Event(INFO_SearchMusicDone));
+    mst->mc->AcceptEvent(new Event(INFO_SearchMusicDone));
 
-    mst->mb->m_mutex->Release();
+    mst->mc->m_mutex->Release();
 
     delete mst->thread;
     delete mst;
 }
 
-void MusicBrowser::DoSearchPaths(vector<string> &pathList)
+void MusicCatalog::DoSearchPaths(vector<string> &pathList)
 {
     vector<string>::iterator i;
     
@@ -563,7 +533,7 @@ void MusicBrowser::DoSearchPaths(vector<string> &pathList)
         DoSearchMusic((char *)(*i).c_str());
 }
 
-void MusicBrowser::DoSearchMusic(char *path)
+void MusicCatalog::DoSearchMusic(char *path)
 {
     WIN32_FIND_DATA find;
     HANDLE handle;
@@ -657,7 +627,7 @@ void MusicBrowser::DoSearchMusic(char *path)
     }
 }
 
-void MusicBrowser::WriteMetaDataToDatabase(const char *url, 
+void MusicCatalog::WriteMetaDataToDatabase(const char *url, 
                                            const MetaData metadata)
 {
     if (!m_database->Working())
@@ -704,7 +674,7 @@ void MusicBrowser::WriteMetaDataToDatabase(const char *url,
 #endif
 }
 
-MetaData *MusicBrowser::ReadMetaDataFromDatabase(const char *url)
+MetaData *MusicCatalog::ReadMetaDataFromDatabase(const char *url)
 {
     if (!m_database->Working())
         return NULL;
@@ -791,7 +761,7 @@ MetaData *MusicBrowser::ReadMetaDataFromDatabase(const char *url)
     return metadata;
 }
 
-int32 MusicBrowser::AcceptEvent(Event *e)
+int32 MusicCatalog::AcceptEvent(Event *e)
 {
     switch (e->Type()) {
         case INFO_SearchMusicDone: {
@@ -801,10 +771,10 @@ int32 MusicBrowser::AcceptEvent(Event *e)
             PruneDatabase();
             info = "Regenerating the Music Catalog Database...";
             m_context->target->AcceptEvent(new BrowserMessageEvent(info.c_str()));
-            m_catalog->RePopulateFromDatabase();
+            RePopulateFromDatabase();
             info = "Sorting the Music Catalog Database...";
             m_context->target->AcceptEvent(new BrowserMessageEvent(info.c_str()));
-            m_catalog->Sort();
+            Sort();
             m_context->target->AcceptEvent(new Event(INFO_SearchMusicDone));
             break;
         } 

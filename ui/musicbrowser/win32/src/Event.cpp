@@ -174,7 +174,7 @@ void MusicBrowserUI::RemoveEvent(void)
 
             for(i = items.begin(); i != items.end(); i++)
             {
-                m_context->browser->m_catalog->RemoveSong((*i)->URL().c_str());
+                m_context->catalog->RemoveSong((*i)->URL().c_str());
 
                 if(deleteFromDrive)
                 {
@@ -194,7 +194,7 @@ void MusicBrowserUI::RemoveEvent(void)
             
                 for(j = urls.begin(); j != urls.end(); j++)
                 {
-                    m_context->browser->m_catalog->RemovePlaylist((*j).c_str());
+                    m_context->catalog->RemovePlaylist((*j).c_str());
 
                     if(deleteFromDrive)
                     {
@@ -274,7 +274,7 @@ void MusicBrowserUI::StartStopMusicSearch(void)
     if (m_bSearchInProgress)
     {
         m_bSearchInProgress = false;
-        m_context->browser->StopSearchMusic();
+        m_context->catalog->StopSearchMusic();
         return;
     }
 
@@ -287,7 +287,7 @@ void MusicBrowserUI::StartStopMusicSearch(void)
                           (LPARAM )this))
     {
         
-        m_context->browser->SearchMusic(m_searchPathList);
+        m_context->catalog->SearchMusic(m_searchPathList);
 
         m_bSearchInProgress = true;
         hMenu = GetMenu(m_hWnd);
@@ -438,7 +438,7 @@ void MusicBrowserUI::EditInfoEvent()
             {
                 (*track)->SetMetaData(&newMetaData);
 
-                m_context->browser->m_catalog->UpdateSong(*track);
+                m_context->catalog->UpdateSong(*track);
             }
         } 
     }
@@ -1127,9 +1127,9 @@ void MusicBrowserUI::EmptyDBCheck(void)
 {
     int iRet;
     
-    if (m_context->browser->m_catalog->GetPlaylists()->size() > 0 ||
-        m_context->browser->m_catalog->GetMusicList()->size() > 0 ||
-        m_context->browser->m_catalog->GetUnsortedMusic()->size() > 0)
+    if (m_context->catalog->GetPlaylists()->size() > 0 ||
+        m_context->catalog->GetMusicList()->size() > 0 ||
+        m_context->catalog->GetUnsortedMusic()->size() > 0)
         return;
         
     iRet = MessageBox(m_hWnd, "Your music database does not contain any items. "
@@ -1194,7 +1194,7 @@ void MusicBrowserUI::RemoveFromDiskEvent(void)
         if (MessageBox(m_hWnd, szConfirm, BRANDING, MB_YESNO) == IDYES)
         {
            unlink(m_oTreeIndex.Data(lParam).m_pTrack->URL().c_str());
-           m_context->browser->m_catalog->RemoveSong(
+           m_context->catalog->RemoveSong(
                   m_oTreeIndex.Data(lParam).m_pTrack->URL().c_str());
            TreeView_DeleteItem(m_hMusicCatalog, hItem);
         }   
@@ -1209,7 +1209,7 @@ void MusicBrowserUI::RemoveFromDiskEvent(void)
         if (MessageBox(m_hWnd, szConfirm, BRANDING, MB_YESNO) == IDYES)
         {
             unlink(m_oTreeIndex.Data(lParam).m_oPlaylistPath.c_str());
-            m_context->browser->m_catalog->RemovePlaylist( 
+            m_context->catalog->RemovePlaylist( 
                  m_oTreeIndex.Data(lParam).m_oPlaylistPath.c_str());
             TreeView_DeleteItem(m_hMusicCatalog, hItem);
         }            

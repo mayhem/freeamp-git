@@ -555,7 +555,7 @@ DEP_CPP_DOWNL=\
 	"..\..\include\facontext.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musicbrowser.h"\
+	"..\..\include\musiccatalog.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
 	"..\..\include\plmevent.h"\
@@ -593,7 +593,7 @@ DEP_CPP_DOWNL=\
 	"..\..\include\facontext.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musicbrowser.h"\
+	"..\..\include\musiccatalog.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
 	"..\..\include\plmevent.h"\
@@ -626,7 +626,7 @@ DEP_CPP_DOWNL=\
 	"..\..\include\facontext.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musicbrowser.h"\
+	"..\..\include\musiccatalog.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
 	"..\..\include\plmevent.h"\
@@ -659,7 +659,7 @@ DEP_CPP_DOWNL=\
 	"..\..\include\facontext.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musicbrowser.h"\
+	"..\..\include\musiccatalog.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
 	"..\..\include\plmevent.h"\
@@ -755,7 +755,7 @@ DEP_CPP_MUSIC=\
 	"..\..\include\hashtable.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musicbrowser.h"\
+	"..\..\include\musiccatalog.h"\
 	"..\..\include\player.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
@@ -802,7 +802,7 @@ DEP_CPP_MUSIC=\
 	"..\..\include\hashtable.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musicbrowser.h"\
+	"..\..\include\musiccatalog.h"\
 	"..\..\include\player.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
@@ -844,7 +844,7 @@ DEP_CPP_MUSIC=\
 	"..\..\include\hashtable.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musicbrowser.h"\
+	"..\..\include\musiccatalog.h"\
 	"..\..\include\player.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
@@ -886,7 +886,7 @@ DEP_CPP_MUSIC=\
 	"..\..\include\hashtable.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musicbrowser.h"\
+	"..\..\include\musiccatalog.h"\
 	"..\..\include\player.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
@@ -977,7 +977,7 @@ DEP_CPP_PLAYE=\
 	"..\..\include\hashtable.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musicbrowser.h"\
+	"..\..\include\musiccatalog.h"\
 	"..\..\include\player.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
@@ -1027,7 +1027,7 @@ DEP_CPP_PLAYE=\
 	"..\..\include\hashtable.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musicbrowser.h"\
+	"..\..\include\musiccatalog.h"\
 	"..\..\include\player.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
@@ -1072,7 +1072,7 @@ DEP_CPP_PLAYE=\
 	"..\..\include\hashtable.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musicbrowser.h"\
+	"..\..\include\musiccatalog.h"\
 	"..\..\include\player.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
@@ -1117,7 +1117,7 @@ DEP_CPP_PLAYE=\
 	"..\..\include\hashtable.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musicbrowser.h"\
+	"..\..\include\musiccatalog.h"\
 	"..\..\include\player.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
@@ -1161,7 +1161,7 @@ DEP_CPP_PLAYL=\
 	"..\..\include\facontext.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musicbrowser.h"\
+	"..\..\include\musiccatalog.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
 	"..\..\include\plmevent.h"\
@@ -1194,7 +1194,7 @@ DEP_CPP_PLAYL=\
 	"..\..\include\facontext.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musicbrowser.h"\
+	"..\..\include\musiccatalog.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
 	"..\..\include\plmevent.h"\
@@ -1224,7 +1224,7 @@ DEP_CPP_PLAYL=\
 	"..\..\include\facontext.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musicbrowser.h"\
+	"..\..\include\musiccatalog.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
 	"..\..\include\plmevent.h"\
@@ -1254,7 +1254,7 @@ DEP_CPP_PLAYL=\
 	"..\..\include\facontext.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musicbrowser.h"\
+	"..\..\include\musiccatalog.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
 	"..\..\include\plmevent.h"\

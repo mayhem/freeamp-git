@@ -43,7 +43,7 @@ using namespace std;
 #include "event.h"
 #include "thread.h"
 #include "playlist.h"
-#include "musicbrowser.h"
+#include "musiccatalog.h"
 #include "DataIndex.h"
 #include "DropTarget.h"
 

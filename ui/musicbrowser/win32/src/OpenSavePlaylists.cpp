@@ -273,7 +273,7 @@ bool MusicBrowserUI::SaveNewPlaylist(string &oName)
         {
             if(addToDB)
             {
-                m_context->browser->m_catalog->AddPlaylist(url); 
+                m_context->catalog->AddPlaylist(url); 
             }
 
             if(m_pParent)
@@ -462,9 +462,9 @@ void MusicBrowserUI::ImportTracksAndPlaylists(void)
             ext = strrchr(path, '.');
             
             if(ext && m_oPlm->IsSupportedPlaylistFormat(++ext))
-                m_context->browser->m_catalog->AddPlaylist((*i).c_str());
+                m_context->catalog->AddPlaylist((*i).c_str());
             else
-                m_context->browser->m_catalog->AddSong((*i).c_str());
+                m_context->catalog->AddSong((*i).c_str());
         }
     }
 }

@@ -62,13 +62,19 @@ class ArtistList {
     string name;
 };
 
-class MusicBrowser;
-
-class MusicCatalog
+class MusicCatalog : public EventQueue
 {
  public:
-    MusicCatalog(FAContext *context);
-    ~MusicCatalog();
+    MusicCatalog(FAContext *context, char *databasepath = NULL);
+    virtual ~MusicCatalog();
+
+    void SetDatabase(const char *path);
+
+    void SearchMusic(vector<string> &pathList);
+    void StopSearchMusic(void);
+
+    void WriteMetaDataToDatabase(const char *url, const MetaData metadata);
+    MetaData *ReadMetaDataFromDatabase(const char *url);
 
     Error AddPlaylist(const char *url);
     Error AddSong(const char *url);
@@ -90,46 +96,25 @@ class MusicCatalog
     const vector<PlaylistItem *> *GetUnsortedMusic(void) { return m_unsorted; }
     const vector<string> *GetPlaylists(void) { return m_playlists; }
 
-private:
-    vector<ArtistList *> *m_artistList;
-    vector<PlaylistItem *> *m_unsorted;
-    vector<string> *m_playlists;
-   
-    FAContext *m_context;
-};
-
-class MusicBrowser : public EventQueue
-{
- public:
-    MusicBrowser(FAContext *context, char *path = NULL);
-    virtual ~MusicBrowser();
-
-    void SetDatabase(const char *path);
-    void SearchMusic(vector<string> &pathList);
-    void StopSearchMusic(void);
-    
-    void WriteMetaDataToDatabase(const char *url, const MetaData metadata);
-    MetaData *ReadMetaDataFromDatabase(const char *url);
-
     virtual int32 AcceptEvent(Event *e);
-    
-    MusicCatalog *m_catalog;
-    Database *GetDatabase() { return m_database; }
 
  protected:
     static void musicsearch_thread_function(void *arg);
     void DoSearchMusic(char *path);
     void DoSearchPaths(vector<string> &pathList);
     void PruneDatabase(void);
-    
+
     bool m_exit;
     Mutex *m_mutex;
-    
+
     FAContext *m_context;
 
- private:   
+ private:
+    vector<ArtistList *> *m_artistList;
+    vector<PlaylistItem *> *m_unsorted;
+    vector<string> *m_playlists;
+
     Database *m_database;
     PlaylistManager *m_plm;
 };
-
 #endif

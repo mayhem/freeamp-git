@@ -29,7 +29,7 @@ ____________________________________________________________________________*/
 #endif
 
 #include "playlist.h"
-#include "musicbrowser.h"
+#include "musiccatalog.h"
 
 class TreeData
 {

@@ -648,7 +648,7 @@ DEP_CPP_MAIN_=\
 	"..\..\include\hashtable.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musicbrowser.h"\
+	"..\..\include\musiccatalog.h"\
 	"..\..\include\player.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
@@ -695,7 +695,7 @@ DEP_CPP_MAIN_=\
 	"..\..\include\hashtable.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musicbrowser.h"\
+	"..\..\include\musiccatalog.h"\
 	"..\..\include\player.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
@@ -739,7 +739,7 @@ DEP_CPP_MAIN_=\
 	"..\..\include\hashtable.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musicbrowser.h"\
+	"..\..\include\musiccatalog.h"\
 	"..\..\include\player.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
@@ -786,7 +786,7 @@ DEP_CPP_MAIN_=\
 	"..\..\include\hashtable.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musicbrowser.h"\
+	"..\..\include\musiccatalog.h"\
 	"..\..\include\player.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\

@@ -420,7 +420,7 @@ SOURCE=..\..\..\..\base\include\metadata.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\..\base\include\musicbrowser.h
+SOURCE=..\..\..\..\base\include\musiccatalog.h
 # End Source File
 # Begin Source File
 

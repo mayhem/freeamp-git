@@ -779,7 +779,7 @@ void GTKMusicBrowser::AddCatTrack(const ArtistList *artist,
 */
 void GTKMusicBrowser::UpdateCatalog(void)
 {
-    m_musicCatalog = m_context->browser->m_catalog;
+    m_musicCatalog = m_context->catalog;
     static bool triedUpdate = false;
     const vector<ArtistList *> *artistList = m_musicCatalog->GetMusicList();
     const vector<PlaylistItem *> *unsorted = m_musicCatalog->GetUnsortedMusic();
@@ -1026,10 +1026,10 @@ static void import_tool(GtkWidget *w, GTKMusicBrowser *p)
                 while (plist->GetState() != kPlaylistItemState_Normal)
                     usleep(5);
 
-                m_context->browser->WriteMetaDataToDatabase(tempurl, 
+                m_context->catalog->WriteMetaDataToDatabase(tempurl, 
                                                           plist->GetMetaData());
 
-                m_context->browser->m_catalog->AddSong(tempurl);
+                m_context->catalog->AddSong(tempurl);
 
                 delete plist;
             }
@@ -1047,10 +1047,10 @@ static void remove_tool(GtkWidget *w, GTKMusicBrowser *p)
     }
     else if (p->GetClickState() == kContextBrowser) {
         if (p->GetTreeClick() == kClickPlaylist) {
-            p->GetContext()->browser->m_catalog->RemovePlaylist(p->mbSelection->playlistname.c_str());
+            p->GetContext()->catalog->RemovePlaylist(p->mbSelection->playlistname.c_str());
         }
         else if (p->GetTreeClick() == kClickTrack) {
-            p->GetContext()->browser->m_catalog->RemoveSong(p->mbSelection->track->URL().c_str());
+            p->GetContext()->catalog->RemoveSong(p->mbSelection->track->URL().c_str());
         }
     }
 }
@@ -1462,10 +1462,10 @@ static void delete_sel(GTKMusicBrowser *p, guint action, GtkWidget *w)
             }
             else if (p->GetClickState() == kContextBrowser) {
                 if (p->GetTreeClick() == kClickPlaylist) {
-                    p->GetContext()->browser->m_catalog->RemovePlaylist(p->mbSelection->playlistname.c_str());
+                    p->GetContext()->catalog->RemovePlaylist(p->mbSelection->playlistname.c_str());
                 }
                 else if (p->GetTreeClick() == kClickTrack) {
-                    p->GetContext()->browser->m_catalog->RemoveSong(p->mbSelection->track->URL().c_str());
+                    p->GetContext()->catalog->RemoveSong(p->mbSelection->track->URL().c_str());
                 }
             }
         }
@@ -2050,7 +2050,7 @@ void GTKMusicBrowser::SaveCurrentPlaylist(char *path)
    
     if (!strncmp("file://", m_currentListName.c_str(), 7)) {
         m_plm->WritePlaylist(m_currentListName.c_str(), &format);
-        m_context->browser->m_catalog->AddPlaylist(m_currentListName.c_str());
+        m_context->catalog->AddPlaylist(m_currentListName.c_str());
     }
     else {
         uint32 urlLength = m_currentListName.length() + 20;
@@ -2058,7 +2058,7 @@ void GTKMusicBrowser::SaveCurrentPlaylist(char *path)
         Error err = FilePathToURL(m_currentListName.c_str(), writeURL, &urlLength);
         if (IsntError(err)) {
             m_plm->WritePlaylist(writeURL, &format);
-            m_context->browser->m_catalog->AddPlaylist(writeURL);
+            m_context->catalog->AddPlaylist(writeURL);
         }
         delete [] writeURL;
     }
@@ -2071,7 +2071,7 @@ void GTKMusicBrowser::ImportPlaylist(char *path)
     uint32 length = strlen(path) + 10;
     char *url = new char[length];
     if (IsntError(FilePathToURL(path, url, &length)))
-        m_context->browser->m_catalog->AddPlaylist(path);
+        m_context->catalog->AddPlaylist(path);
     delete [] url;
 }
 

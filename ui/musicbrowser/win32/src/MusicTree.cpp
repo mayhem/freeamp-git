@@ -137,8 +137,7 @@ void MusicBrowserUI::FillArtists(void)
                  TVIF_SELECTEDIMAGE | TVIF_PARAM; 
 
     oCrossRef.m_iLevel = 1;
-    pList = (vector<ArtistList *> *)m_context->browser->
-                                    m_catalog->GetMusicList();
+    pList = (vector<ArtistList *> *)m_context->catalog->GetMusicList();
     for(i = pList->begin(), iIndex = 0; i != pList->end(); i++,iIndex++)
     {
        oCrossRef.m_pArtist = (*i);
@@ -243,8 +242,7 @@ void MusicBrowserUI::FillAllTracks(void)
                  TVIF_SELECTEDIMAGE | TVIF_PARAM; 
 
     oCrossRef.m_iLevel = 3;
-    pArtistList = (vector<ArtistList *>*)m_context->browser->
-                                         m_catalog->GetMusicList();
+    pArtistList = (vector<ArtistList *>*)m_context->catalog->GetMusicList();
     for(i = pArtistList->begin(); i != pArtistList->end(); i++)
     {
         pAlbumList = (vector<AlbumList *>*)(*i)->m_albumList;
@@ -281,8 +279,7 @@ void MusicBrowserUI::FillAllTracks(void)
     oCrossRef.m_pArtist = NULL;
     oCrossRef.m_pAlbum = NULL;
     
-    pList = (vector<PlaylistItem *>*)m_context->browser->
-                                     m_catalog->GetUnsortedMusic();
+    pList = (vector<PlaylistItem *>*)m_context->catalog->GetUnsortedMusic();
     for(k = pList->begin(); k != pList->end(); k++)
     {
         oCrossRef.m_pTrack = (*k);
@@ -322,8 +319,7 @@ void MusicBrowserUI::FillUncatTracks(void)
     oCrossRef.m_pArtist = NULL;
     oCrossRef.m_pAlbum = NULL;
     
-    pList = (vector<PlaylistItem *>*)m_context->browser->
-                                     m_catalog->GetUnsortedMusic();
+    pList = (vector<PlaylistItem *>*)m_context->catalog->GetUnsortedMusic();
     for(i = pList->begin(), iIndex = 0; i != pList->end(); i++, iIndex++)
     {
         oCrossRef.m_pTrack = (*i);
@@ -377,8 +373,7 @@ void MusicBrowserUI::FillPlaylists(void)
     sInsert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
                         TVIF_SELECTEDIMAGE | TVIF_PARAM; 
 
-    pList = (vector<string>*)m_context->browser->
-                             m_catalog->GetPlaylists(); 
+    pList = (vector<string>*)m_context->catalog->GetPlaylists(); 
 
     oData.m_iLevel = 1;
 
@@ -996,7 +991,7 @@ void MusicBrowserUI::AddAllTrackItems(vector<PlaylistItem*>* items)
     vector<ArtistList*>::iterator   artist;    
 
     artistList = (vector<ArtistList*>*)
-            m_context->browser->m_catalog->GetMusicList();
+            m_context->catalog->GetMusicList();
 
     for(artist = artistList->begin(); 
         artist != artistList->end(); 
@@ -1028,7 +1023,7 @@ void MusicBrowserUI::AddUncatagorizedTrackItems(vector<PlaylistItem*>* items)
     vector<PlaylistItem*>::iterator track;
 
     trackList = (vector<PlaylistItem*>*)
-            m_context->browser->m_catalog->GetUnsortedMusic();
+            m_context->catalog->GetUnsortedMusic();
 
     for(track = trackList->begin(); 
         track != trackList->end(); 
@@ -1383,7 +1378,7 @@ void MusicBrowserUI::UpdateUncatagorizedTrackName(PlaylistItem* track,
 
     track->SetMetaData(&metadata);
 
-    m_context->browser->m_catalog->UpdateSong(track);
+    m_context->catalog->UpdateSong(track);
 }
 
 
@@ -1396,7 +1391,7 @@ void MusicBrowserUI::UpdateTrackName(PlaylistItem* track,
 
     track->SetMetaData(&metadata);
 
-    m_context->browser->m_catalog->UpdateSong(track);
+    m_context->catalog->UpdateSong(track);
 }
 
 const char* kFileExists = "There is already a playlist with that name.";
@@ -1442,8 +1437,8 @@ void MusicBrowserUI::UpdatePlaylistName(const string& playlist,
 
             FilePathToURL(path, url, &len);
 
-            m_context->browser->m_catalog->RemovePlaylist(playlist.c_str());
-            m_context->browser->m_catalog->AddPlaylist(url);
+            m_context->catalog->RemovePlaylist(playlist.c_str());
+            m_context->catalog->AddPlaylist(url);
         }
         else
         {
@@ -1472,7 +1467,7 @@ void MusicBrowserUI::UpdateAlbumName(AlbumList* album,
 
         (*track)->SetMetaData(&metadata);
 
-        m_context->browser->m_catalog->UpdateSong(*track);
+        m_context->catalog->UpdateSong(*track);
     }
 }
 
@@ -1497,7 +1492,7 @@ void MusicBrowserUI::UpdateArtistName(ArtistList* artist,
 
             (*track)->SetMetaData(&metadata);
 
-            m_context->browser->m_catalog->UpdateSong(*track);
+            m_context->catalog->UpdateSong(*track);
         }
 
     }

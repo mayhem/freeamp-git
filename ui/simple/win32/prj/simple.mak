@@ -541,7 +541,7 @@ DEP_CPP_PLAYL=\
 	"..\..\..\..\base\include\facontext.h"\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\metadata.h"\
-	"..\..\..\..\base\include\musicbrowser.h"\
+	"..\..\..\..\base\include\musiccatalog.h"\
 	"..\..\..\..\base\include\playlist.h"\
 	"..\..\..\..\base\include\playlistformat.h"\
 	"..\..\..\..\base\include\plmevent.h"\

@@ -24,7 +24,7 @@ ____________________________________________________________________________*/
 #include "utility.h"
 #include "infoeditor.h"
 #include "metadata.h"
-#include "musicbrowser.h"
+#include "musiccatalog.h"
 
 void infoeditorUI::DoApplyInfoEdit(void)
 {
@@ -58,7 +58,7 @@ void infoeditorUI::DoApplyInfoEdit(void)
 
     m_playlistItem->SetMetaData(&newmeta);
 
-    m_context->browser->m_catalog->UpdateSong(m_playlistItem);
+    m_context->catalog->UpdateSong(m_playlistItem);
 }
 
 gint info_delete_event(GtkWidget *widget, GdkEvent *event, gpointer data)

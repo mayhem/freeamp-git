@@ -128,8 +128,8 @@ EventQueue()
     m_context->props = &m_props;
     m_context->target = (EventQueue *) this;
 
-    m_musicBrowser = new MusicBrowser(m_context);
-    m_context->browser = m_musicBrowser;
+    m_musicCatalog = new MusicCatalog(m_context);
+    m_context->catalog = m_musicCatalog;
 
     // make sure the db dir exists so we have a place to store our 
     // stuff
@@ -148,7 +148,7 @@ EventQueue()
     string freeampdir = tempDir;
     freeampdir += DIR_MARKER_STR;
     freeampdir += "metadatabase";
-    m_musicBrowser->SetDatabase(freeampdir.c_str());
+    m_musicCatalog->SetDatabase(freeampdir.c_str());
 
     // make sure the music dir exists so we have a place to store our 
     // stuff
@@ -229,7 +229,7 @@ Player::
     TYPICAL_DELETE(m_pmoRegistry);
     TYPICAL_DELETE(m_uiRegistry);
     TYPICAL_DELETE(m_lmcExtensions);
-    TYPICAL_DELETE(m_musicBrowser);
+    TYPICAL_DELETE(m_musicCatalog);
 }
 
 void      

@@ -1004,7 +1004,7 @@ DEP_CPP_FREEA=\
 	"..\..\..\..\base\include\hashtable.h"\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\metadata.h"\
-	"..\..\..\..\base\include\musicbrowser.h"\
+	"..\..\..\..\base\include\musiccatalog.h"\
 	"..\..\..\..\base\include\player.h"\
 	"..\..\..\..\base\include\playlist.h"\
 	"..\..\..\..\base\include\playlistformat.h"\
@@ -1071,7 +1071,7 @@ DEP_CPP_FREEA=\
 	"..\..\..\..\base\include\hashtable.h"\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\metadata.h"\
-	"..\..\..\..\base\include\musicbrowser.h"\
+	"..\..\..\..\base\include\musiccatalog.h"\
 	"..\..\..\..\base\include\player.h"\
 	"..\..\..\..\base\include\playlist.h"\
 	"..\..\..\..\base\include\playlistformat.h"\
@@ -1130,7 +1130,7 @@ DEP_CPP_FREEA=\
 	"..\..\..\..\base\include\hashtable.h"\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\metadata.h"\
-	"..\..\..\..\base\include\musicbrowser.h"\
+	"..\..\..\..\base\include\musiccatalog.h"\
 	"..\..\..\..\base\include\player.h"\
 	"..\..\..\..\base\include\playlist.h"\
 	"..\..\..\..\base\include\playlistformat.h"\
@@ -1189,7 +1189,7 @@ DEP_CPP_FREEA=\
 	"..\..\..\..\base\include\hashtable.h"\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\metadata.h"\
-	"..\..\..\..\base\include\musicbrowser.h"\
+	"..\..\..\..\base\include\musiccatalog.h"\
 	"..\..\..\..\base\include\player.h"\
 	"..\..\..\..\base\include\playlist.h"\
 	"..\..\..\..\base\include\playlistformat.h"\
