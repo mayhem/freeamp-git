@@ -34,6 +34,7 @@ class FAR DropTarget : public IDropTarget
     DropTarget(HWND hwnd);
 	~DropTarget ();
     void Enable(BOOL bEnable);
+    void ScrollFunction();
 
     /* IUnknown methods */
     STDMETHOD(QueryInterface)(REFIID riid, void FAR* FAR* ppvObj);
@@ -48,12 +49,10 @@ class FAR DropTarget : public IDropTarget
     STDMETHOD(Drop)(LPDATAOBJECT pDataObj, DWORD grfKeyState, 
         POINTL pt, LPDWORD pdwEffect); 
  
-    unsigned long ScrollThreadFunction();
+    
  private:
     void CheckAutoScroll(POINT pt);
     void AutoScroll(int scrollCode);
-    static unsigned long __stdcall scrollThreadFunction(void* arg);
-
 
     ULONG           m_refs;  
 	HWND            m_hwnd;
@@ -64,11 +63,9 @@ class FAR DropTarget : public IDropTarget
     HBRUSH          m_insertBrush;
     int             m_oldItem; 
     RECT            m_insertRect;
-    HANDLE		    m_threadHandle;	
-	unsigned long	m_threadId;
-    bool            m_scroll;
     bool            m_scrolling;
     int             m_scrollCode;
+    int             m_timer;
 };  
 
 #endif // INCLUDED_DROPTARGET_H_

@@ -37,6 +37,7 @@ ____________________________________________________________________________*/
 #include "DropTarget.h"
 #include "DropObject.h"
 
+DropTarget* g_me = NULL;
 
 // IUnknown Methods
 
@@ -79,8 +80,9 @@ DropTarget::DropTarget(HWND	hwnd)
 	m_hwnd = hwnd;
 	m_bAcceptFmt = FALSE;
 	m_bEnabled = TRUE;
-    m_scroll = true;
     m_scrolling = true;
+
+    g_me = this;
 
     short pattern[8];
     HBITMAP bmp;
@@ -124,105 +126,99 @@ void DropTarget::CheckAutoScroll(POINT pt)
 
         GetClientRect(m_hwnd, &rect);
 
-        char buf[256];
-        sprintf(buf, "%d, %d\r\n", pt.x, pt.y);
+        //char buf[256];
+        //sprintf(buf, "%d, %d\r\n", pt.x, pt.y);
 
         //sprintf(buf, "%d, %d, %d, %d\r\n", 
         //    itemRect.top, itemRect.left, itemRect.bottom, itemRect.right);
-        OutputDebugString(buf);
+        //OutputDebugString(buf);
 
 
         if(PtInRect(&rect, pt))
         {
-            if(pt.y < rect.top + GetSystemMetrics(SM_CYHSCROLL))
+            if(pt.y < rect.top + 2*GetSystemMetrics(SM_CYHSCROLL))
             {
-                OutputDebugString("scroll up\r\n");
+                //OutputDebugString("scroll up\r\n");
                 // scroll up
                 AutoScroll(SCROLL_UP);
             }
             else if(pt.y > rect.bottom - GetSystemMetrics(SM_CYHSCROLL))
             {
                 // scroll down
-                OutputDebugString("scroll down\r\n");
+                //OutputDebugString("scroll down\r\n");
                 AutoScroll(SCROLL_DOWN);
             }
             else
             {
-                OutputDebugString("scroll off\r\n");
+                //OutputDebugString("scroll off\r\n");
                 AutoScroll(SCROLL_OFF);
             }
         }
     }
 }
 
-unsigned long __stdcall DropTarget::scrollThreadFunction(void* arg)
-{
-    DropTarget* me = (DropTarget*) arg;
 
-    return me->ScrollThreadFunction();
+void DropTarget::ScrollFunction()
+{
+    ImageList_DragShowNolock(FALSE);
+
+    //OutputDebugString("scrolling\r\n");
+
+    HDC hdc = GetDC(m_hwnd);
+
+    HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, m_insertBrush);
+
+    //OutputDebugString("erase old - scrolling\r\n");
+
+    // erase old
+    PatBlt(hdc,
+           m_insertRect.left, 
+           m_insertRect.top, 
+           m_insertRect.right - m_insertRect.left, 
+           m_insertRect.bottom - m_insertRect.top, 
+           PATINVERT);
+
+    SendMessage(m_hwnd, WM_VSCROLL, MAKELONG(m_scrollCode, 0), NULL);
+
+    // draw new
+    PatBlt(hdc,
+           m_insertRect.left, 
+           m_insertRect.top, 
+           m_insertRect.right - m_insertRect.left, 
+           m_insertRect.bottom - m_insertRect.top, 
+           PATINVERT);
+
+    SelectObject(hdc, oldBrush);
+
+    ReleaseDC(m_hwnd, hdc);
+
+    ImageList_DragShowNolock(TRUE);
 }
 
-unsigned long DropTarget::ScrollThreadFunction()
-{
-    
-
-    do
-    {
-        ImageList_DragShowNolock(FALSE);
-        SendMessage(m_hwnd, WM_VSCROLL, MAKELONG(m_scrollCode, 0), NULL);
-        ImageList_DragShowNolock(TRUE);
-
-        Sleep(500);
-    }while(m_scroll);
-
-    CloseHandle(m_threadHandle);
-
-    m_scrolling = false;
-    return 0;
-}
-
-int g_scrollCode;
 
 static void CALLBACK ScrollProc(HWND hwnd, UINT msg, UINT id, DWORD ticks)
 {
-    ImageList_DragShowNolock(FALSE);
-    SendMessage(hwnd, WM_VSCROLL, MAKELONG(g_scrollCode, 0), NULL);
-    ImageList_DragShowNolock(TRUE);
+    g_me->ScrollFunction();
 }
 
 void DropTarget::AutoScroll(int scrollCode)
 {
-    static int timer = 0;
+    m_scrollCode = (scrollCode == SCROLL_UP ? SB_LINEUP : SB_LINEDOWN);
 
-    g_scrollCode = (scrollCode == SCROLL_UP ? SB_LINEUP : SB_LINEDOWN);
-
-    if(scrollCode == SCROLL_OFF && m_scrolling)
+    if(scrollCode == SCROLL_OFF)
     {
-        KillTimer(NULL, timer);
+        //OutputDebugString("KillTimer\r\n");
+        KillTimer(GetParent(m_hwnd), SCROLL_TIMER);
         m_scrolling = false;
     }
     else if(!m_scrolling)
     {
         m_scrolling = true;
-        //m_scroll = true;
 
-        //OutputDebugString("set timer\r\n");
-
-        
-
-        //SetWindowLong(m_hwnd, GWL_USERDATA, (LONG) scrollCode);
-
-        /*m_threadHandle = ::CreateThread(
-									NULL,
-									0,
-									scrollThreadFunction,
-									this,
-									0,
-									&m_threadId);*/
-
-        timer = SetTimer(m_hwnd, SCROLL_TIMER, 250, (int (__stdcall *)(void))ScrollProc);
+        m_timer = SetTimer(GetParent(m_hwnd), SCROLL_TIMER, 250, (int (__stdcall *)(void))ScrollProc);
     }
 }
+
 //	________________________________________
 //
 //	IDropTarget Methods
@@ -332,6 +328,8 @@ STDMETHODIMP DropTarget::DragOver(DWORD grfKeyState,
                                   POINTL pt, 
                                   LPDWORD pdwEffect) 
 {
+    //OutputDebugString("Drag Over\r\n");
+
     if(m_bAcceptFmt && m_bEnabled) 
         *pdwEffect = DROPEFFECT_COPY; 
 	else 
@@ -388,52 +386,41 @@ STDMETHODIMP DropTarget::DragOver(DWORD grfKeyState,
     //    itemRect.top, itemRect.left, itemRect.bottom, itemRect.right);
     //OutputDebugString(buf);
 
-    HDC hdc = GetDC(m_hwnd);
-
-    HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, m_insertBrush);
-
-    // erase old
-    /*PatBlt(hdc,
-           m_insertRect.left, 
-           m_insertRect.top, 
-           m_insertRect.right - m_insertRect.left, 
-           m_insertRect.bottom - m_insertRect.top, 
-           PATINVERT);*/
-
-    SCROLLINFO si;
-    UINT columnWidth = ListView_GetColumnWidth(m_hwnd, 0);
-
-    si.cbSize = sizeof(SCROLLINFO);
-    si.fMask = SIF_ALL;
-
-    GetScrollInfo(m_hwnd, SB_HORZ, &si);
-    
-    RECT rectColumn;
-    RECT rectClient;
-
-    if(si.nPos < columnWidth)
+    if(!m_scrolling)
     {
-        rectClient = rectColumn = m_insertRect;
-        rectColumn.right = rectColumn.left + columnWidth - si.nPos - 1;
-        rectClient.left = rectColumn.right;
-        FillRect(hdc, &rectColumn, (HBRUSH)(COLOR_INFOBK + 1));
+        ImageList_DragShowNolock(FALSE);
+       
+        HDC hdc = GetDC(m_hwnd);
+
+        HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, m_insertBrush);
+
+        //OutputDebugString("erase old - drag over\r\n");
+        // erase old
+        PatBlt(hdc,
+               m_insertRect.left, 
+               m_insertRect.top, 
+               m_insertRect.right - m_insertRect.left, 
+               m_insertRect.bottom - m_insertRect.top, 
+               PATINVERT);
+
+        //OutputDebugString("draw new - drag over\r\n");
+
+        // draw new
+        PatBlt(hdc,
+               itemRect.left, 
+               itemRect.top, 
+               itemRect.right - itemRect.left, 
+               itemRect.bottom - itemRect.top, 
+               PATINVERT);
+
+        SelectObject(hdc, oldBrush);
+
+        ReleaseDC(m_hwnd, hdc);
+
+        m_insertRect = itemRect;
+
+        ImageList_DragShowNolock(TRUE);
     }
-
-    FillRect(hdc, &rectClient, (HBRUSH)GetClassLong(m_hwnd, GCL_HBRBACKGROUND));
-
-    // draw new
-    PatBlt(hdc,
-           itemRect.left, 
-           itemRect.top, 
-           itemRect.right - itemRect.left, 
-           itemRect.bottom - itemRect.top, 
-           PATINVERT);
-
-    SelectObject(hdc, oldBrush);
-
-    ReleaseDC(m_hwnd, hdc);
-
-    m_insertRect = itemRect;
 
     CheckAutoScroll(hti.pt);
 
@@ -444,40 +431,29 @@ STDMETHODIMP DropTarget::DragOver(DWORD grfKeyState,
 STDMETHODIMP DropTarget::DragLeave() 
 {   
     m_bAcceptFmt = FALSE;  
-
-    //ListView_RedrawItems(m_hwnd, m_oldItem - 1, m_oldItem + 1);
     
+    AutoScroll(SCROLL_OFF);
+
+    ImageList_DragShowNolock(FALSE);
+
     HDC hdc = GetDC(m_hwnd);
 
     HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, m_insertBrush);
 
     // erase old
-    SCROLLINFO si;
-    UINT columnWidth = ListView_GetColumnWidth(m_hwnd, 0);
+    PatBlt(hdc,
+           m_insertRect.left, 
+           m_insertRect.top, 
+           m_insertRect.right - m_insertRect.left, 
+           m_insertRect.bottom - m_insertRect.top, 
+           PATINVERT);
 
-    si.cbSize = sizeof(SCROLLINFO);
-    si.fMask = SIF_ALL;
-
-    GetScrollInfo(m_hwnd, SB_HORZ, &si);
-
-    RECT rectColumn;
-    RECT rectClient;
-
-    if(si.nPos < columnWidth)
-    {
-        rectClient = rectColumn = m_insertRect;
-        rectColumn.right = rectColumn.left + columnWidth - si.nPos - 1;
-        rectClient.left = rectColumn.right;
-        FillRect(hdc, &rectColumn, (HBRUSH)(COLOR_INFOBK + 1));
-    }
-
-    FillRect(hdc, &rectClient, (HBRUSH)GetClassLong(m_hwnd, GCL_HBRBACKGROUND));
-
+    // erase old
     SelectObject(hdc, oldBrush);
 
     ReleaseDC(m_hwnd, hdc);
 
-    AutoScroll(SCROLL_OFF);
+    ImageList_DragShowNolock(TRUE);
 
     return NOERROR;
 }
@@ -495,44 +471,36 @@ STDMETHODIMP DropTarget::Drop(LPDATAOBJECT pDataObj,
     *pdwEffect = DROPEFFECT_NONE;
     hr = NOERROR;
 
+    AutoScroll(SCROLL_OFF);
+
     if(m_bAcceptFmt && m_bEnabled) 
     {   
-        AutoScroll(SCROLL_OFF);
+        if(m_oldItem > 0)
+            m_oldItem--;
 
-        /*HDC hdc = GetDC(m_hwnd);
+        //ListView_RedrawItems(m_hwnd, m_oldItem, m_oldItem + 1);
+        ImageList_DragShowNolock(FALSE);
+
+        HDC hdc = GetDC(m_hwnd);
 
         HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, m_insertBrush);
 
         // erase old
-        SCROLLINFO si;
-        UINT columnWidth = ListView_GetColumnWidth(m_hwnd, 0);
+        PatBlt(hdc,
+               m_insertRect.left, 
+               m_insertRect.top, 
+               m_insertRect.right - m_insertRect.left, 
+               m_insertRect.bottom - m_insertRect.top, 
+               PATINVERT);
 
-        si.cbSize = sizeof(SCROLLINFO);
-        si.fMask = SIF_ALL;
-
-        GetScrollInfo(m_hwnd, SB_HORZ, &si);
-    
-        RECT rectColumn;
-        RECT rectClient;
-
-        if(si.nPos < columnWidth)
-        {
-            rectClient = rectColumn = m_insertRect;
-            rectColumn.right = rectColumn.left + columnWidth - si.nPos - 1;
-            rectClient.left = rectColumn.right;
-            FillRect(hdc, &rectColumn, (HBRUSH)(COLOR_INFOBK + 1));
-        }
-
-        FillRect(hdc, &rectClient, (HBRUSH)GetClassLong(m_hwnd, GCL_HBRBACKGROUND));
-
+        // erase old
         SelectObject(hdc, oldBrush);
 
-        ReleaseDC(m_hwnd, hdc);*/
+        ReleaseDC(m_hwnd, hdc);
 
-        if(m_oldItem > 0)
-            m_oldItem--;
+        AutoScroll(SCROLL_OFF);
 
-        ListView_RedrawItems(m_hwnd, m_oldItem, m_oldItem + 1);
+        ImageList_DragShowNolock(TRUE);
 
         // User has dropped on us. First, try getting data in the 
         // private FreeAmp format
