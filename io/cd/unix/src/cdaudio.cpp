@@ -39,7 +39,6 @@ ____________________________________________________________________________*/
 #include <cdaudio.h>
 #include <errno.h>
 #include <unistd.h>
-#include <netinet/in.h>
 
 /* We can check to see if the CD-ROM is mounted if this is available */
 #ifdef HAVE_MNTENT_H
