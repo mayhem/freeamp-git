@@ -752,7 +752,10 @@ Error MusicCatalog::RePopulateFromDatabase()
     m_catMutex->Release();
     if (!m_sigs->empty()) {
         set<string> *newset = new set<string>;
-        newset->insert(m_sigs->begin(), m_sigs->end());
+        set<string>::iterator i = m_sigs->begin();
+        for (; i != m_sigs->end(); i++) {
+            newset->insert(*i);
+        }
         m_context->target->AcceptEvent(new GenerateSignatureEvent(newset));
         m_sigs->erase(m_sigs->begin(), m_sigs->end());
     }
